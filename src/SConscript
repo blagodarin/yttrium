@@ -1,0 +1,20 @@
+Import('env', 'ports')
+
+build = env.Clone(BUILD = '.build')
+build.Append(CPPPATH = ['.'])
+
+build.VariantDir('$BUILD', '.', duplicate = 0)
+
+src = []
+
+src += ['base']
+if 'posix' in ports:
+	src += ['base/posix']
+if 'win32' in ports:
+	src += ['base/win32']
+
+yttrium = build.SharedLibrary('../lib/yttrium', [build.Glob('$BUILD/' + path + '/*.cpp') for path in src])
+
+build.Clean(yttrium, build.Dir('$BUILD'))
+
+Return('yttrium')
