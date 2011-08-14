@@ -5,13 +5,17 @@
 #ifndef __Y_GLOBAL_HPP
 #define __Y_GLOBAL_HPP
 
-#include <cstddef>  // NULL
+#include <cstddef> // NULL
 
 /// \def Y_API
 /// \brief %Yttrium API specifier.
 
 #ifndef Y_API
-	#define Y_API
+	#ifdef _MSC_VER
+		#define Y_API __declspec(dllimport)
+	#else
+		#define Y_API
+	#endif
 #endif
 
 /// \def Y_FUNC

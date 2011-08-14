@@ -34,7 +34,10 @@ release = GetOption('release')
 
 env = Environment(
 	CPPFLAGS = ['-Wall'], # We use GCC/MinGW.
-	ENV = {'HOME': os.environ['HOME'], 'PATH': os.environ['PATH']}, # GCC don't like an empty ENV.
+	ENV = { # For GCC and colorgcc.
+		'HOME': os.environ['HOME'],
+		'PATH': os.environ['PATH'],
+		'TERM': os.environ['TERM']},
 	LIBS = [],
 	TOOLS = [])
 

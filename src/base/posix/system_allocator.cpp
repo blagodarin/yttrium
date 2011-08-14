@@ -27,7 +27,7 @@ public:
 
 public: // Allocator
 
-	virtual void *allocate(size_t size, size_t align = 0)
+	virtual void *allocate(size_t size, size_t align)
 	{
 		Y_ASSERT(size);
 
@@ -71,7 +71,7 @@ public: // Allocator
 		}
 	}
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove)
+	virtual void *reallocate(void *pointer, size_t size, Movability movability)
 	{
 		Y_ASSERT(pointer);
 		Y_ASSERT(size);
@@ -153,7 +153,7 @@ static bool _system_allocator_initialized = false;
 
 static char _system_allocator_buffer[sizeof(SystemAllocatorImpl)];
 
-SystemAllocator *SystemAllocator::instance()
+SystemAllocator *SystemAllocator::instance() throw()
 {
 	if (__sync_bool_compare_and_swap(&_system_allocator_initialized, false, true))
 	{

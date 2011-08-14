@@ -4,6 +4,8 @@
 #ifndef __Y_ALLOCATORS_HPP
 #define __Y_ALLOCATORS_HPP
 
+#include <new> // new
+
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/types.hpp>
 
@@ -72,6 +74,14 @@ public:
 	///
 
 	template <typename T>
+	T *allocate_(size_t count = 1)
+	{
+		return static_cast<T *>(allocate(sizeof(T) * count));
+	}
+
+	///
+
+	template <typename T>
 	void delete_(T *pointer) throw()
 	{
 		if (pointer)
@@ -117,7 +127,7 @@ class Y_API HeapAllocator
 {
 public:
 
-	static HeapAllocator *instance();
+	static HeapAllocator *instance() throw();
 };
 
 /// System allocator.
@@ -139,7 +149,7 @@ public:
 
 	///
 
-	static SystemAllocator *instance();
+	static SystemAllocator *instance() throw();
 };
 
 /// Proxy allocator.
@@ -183,6 +193,23 @@ private:
 	Allocator    *_allocator;
 	Status       _status;
 	StaticString _name;
+};
+
+/// An allocator-managed object with overloaded \c new and \c delete operators.
+
+class Y_API Allocatable
+{
+public:
+
+	virtual ~Allocatable() throw()
+	{
+	}
+
+	static void *operator new(size_t size, Allocator *allocator = HeapAllocator::instance());
+
+	static void operator delete(void *pointer) throw();
+
+	Allocator *allocator() throw();
 };
 
 } // namespace Yttrium

@@ -7,6 +7,8 @@ build.VariantDir('$BUILD', '.', duplicate = 0)
 
 src = []
 
+src += ['application']
+
 src += ['base']
 if 'posix' in ports:
 	src += ['base/posix']
