@@ -29,6 +29,8 @@
 	#define Y_FUNC __func__
 #endif
 
+#define Y_LENGTH_OF(x) (sizeof(x) / sizeof (x)[0])
+
 #define __Y_STR(x) #x
 
 /// Stringification wrapper.

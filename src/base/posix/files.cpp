@@ -6,7 +6,7 @@
 #include <fcntl.h>  // open
 #include <unistd.h> // close, dup, fsync, ftruncate64, lseek64, pread64, pwrite64
 
-#include <Yttrium/file.hpp>
+#include <Yttrium/files.hpp>
 
 namespace Yttrium
 {

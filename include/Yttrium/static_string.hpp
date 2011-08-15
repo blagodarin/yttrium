@@ -87,59 +87,153 @@ public:
 		return _text[index];
 	}
 
-	/// String comparison operator.
+	///
+
+	bool operator <(const char *string) const throw()
+	{
+		return (strcmp(_text, string) < 0);
+	}
+
+	/**
+	* \overload
+	*/
 
 	bool operator <(const StaticString &string) const throw()
 	{
-		return strcmp(_text, string._text) < 0;
+		return (strcmp(_text, string._text) < 0);
 	}
-
-	/// String comparison operator.
-
-	bool operator >(const StaticString &string) const throw()
-	{
-		return strcmp(_text, string._text) > 0;
-	}
-
-	/// String comparison operator.
-
-	bool operator <=(const StaticString &string) const throw()
-	{
-		return strcmp(_text, string._text) <= 0;
-	}
-
-	/// String comparison operator.
-
-	bool operator >=(const StaticString &string) const throw()
-	{
-		return strcmp(_text, string._text) >= 0;
-	}
-
-	/// String comparison operator.
-
-	bool operator ==(const StaticString &string) const throw()
-	{
-		return strcmp(_text, string._text) == 0;
-	}
-
-	/// String comparison operator.
-
-	bool operator !=(const StaticString &string) const throw()
-	{
-		return strcmp(_text, string._text) != 0;
-	}
-
-protected:
 
 	///
 
-	static const char null = '\0';
+	bool operator >(const char *string) const throw()
+	{
+		return (strcmp(_text, string) > 0);
+	}
+
+	/**
+	* \overload
+	*/
+
+	bool operator >(const StaticString &string) const throw()
+	{
+		return (strcmp(_text, string._text) > 0);
+	}
+
+	///
+
+	bool operator <=(const char *string) const throw()
+	{
+		return (strcmp(_text, string) <= 0);
+	}
+
+	/**
+	* \overload
+	*/
+
+	bool operator <=(const StaticString &string) const throw()
+	{
+		return (strcmp(_text, string._text) <= 0);
+	}
+
+	///
+
+	bool operator >=(const char *string) const throw()
+	{
+		return (strcmp(_text, string) >= 0);
+	}
+
+	/**
+	* \overload
+	*/
+
+	bool operator >=(const StaticString &string) const throw()
+	{
+		return (strcmp(_text, string._text) >= 0);
+	}
+
+	///
+
+	bool operator ==(const char *string) const throw()
+	{
+		return (strcmp(_text, string) == 0);
+	}
+
+	/**
+	* \overload
+	*/
+
+	bool operator ==(const StaticString &right) const throw()
+	{
+		return (_size == right._size && strcmp(_text, right._text) == 0);
+	}
+
+	///
+
+	bool operator !=(const char *string) const throw()
+	{
+		return (strcmp(_text, string) != 0);
+	}
+
+	/**
+	* \overload
+	*/
+
+	bool operator !=(const StaticString &string) const throw()
+	{
+		return (_size != string._size || strcmp(_text, string._text) != 0);
+	}
 
 private:
 
 	const char *_text;
 	size_t     _size;
+
+private:
+
+	static const char null = '\0';
 };
+
+///
+
+inline bool operator <(const char *left, const StaticString &right) throw()
+{
+	return (strcmp(left, right.text()) < 0);
+}
+
+///
+
+inline bool operator >(const char *left, const StaticString &right) throw()
+{
+	return (strcmp(left, right.text()) > 0);
+}
+
+///
+
+inline bool operator <=(const char *left, const StaticString &right) throw()
+{
+	return (strcmp(left, right.text()) <= 0);
+}
+
+///
+
+inline bool operator >=(const char *left, const StaticString &right) throw()
+{
+	return (strcmp(left, right.text()) >= 0);
+}
+
+///
+
+inline bool operator ==(const char *left, const StaticString &right) throw()
+{
+	return (strcmp(left, right.text()) == 0);
+}
+
+///
+
+inline bool operator !=(const char *left, const StaticString &right) throw()
+{
+	return (strcmp(left, right.text()) != 0);
+}
 
 } // namespace Yttrium
 

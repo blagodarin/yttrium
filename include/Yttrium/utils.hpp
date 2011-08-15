@@ -8,7 +8,7 @@
 
 #include <Yttrium/types.hpp>
 
-namespace Yari
+namespace Yttrium
 {
 
 using std::max;
