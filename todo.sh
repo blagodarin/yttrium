@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find . -name '*.?pp' | xargs grep --color=always -n 'TODO:'
+find . -name '*.?pp' | sort | xargs grep --color=always -n 'TODO:'
