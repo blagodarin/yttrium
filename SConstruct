@@ -129,7 +129,6 @@ env.Append(LIBS = ['yttrium'], LIBPATH = ['#/lib'])
 # Tests
 
 tests = SConscript(dirs = 'tests', exports = 'env')
-#Depends(tests, yttrium)
 Alias('tests', tests)
 for test in tests:
 	env.Alias('test', test, '@' + str(test[0]) + ' --log_level=all')
@@ -137,17 +136,15 @@ AlwaysBuild('test')
 
 # Tools
 
-#tools = SConscript(dirs = 'tools')
-#Depends(tools, falx)
-#Alias('tools', tools)
-#Default('tools')
+tools = SConscript(dirs = 'tools', exports = 'env')
+Alias('tools', tools)
+Default('tools')
 
-# Projects
+# Examples
 
-#projects = []
-#for project_dir in [os.path.join('projects', dir) for dir in os.listdir('projects')
-#	if os.path.isdir(os.path.join('projects', dir)) and dir[0] != '.']:
-#		projects += [SConscript(dirs = project_dir, exports = ['env'])]
-##Depends(projects, falx)#, tools)
-#Alias('projects', projects)
-#Default('projects')
+examples = SConscript(dirs = 'examples', exports = 'env')
+Alias('examples', examples)
+
+# All targets
+
+Alias('all', [yttrium, tests, tools, examples])

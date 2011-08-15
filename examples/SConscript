@@ -1,0 +1,10 @@
+import os
+import os.path
+
+Import('env')
+
+examples = []
+for example_path in [path for path in os.listdir('.') if os.path.isdir(path) and path[0] != '.']:
+	examples += [env.SConscript(dirs = example_path, exports = 'env')]
+
+Return('examples')
