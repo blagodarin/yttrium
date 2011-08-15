@@ -1,0 +1,15 @@
+import os
+import os.path
+
+Import('env')
+
+test_env = env.Clone()
+test_env.Append(
+	CPPFLAGS = '-fexceptions', # We use GCC/MinGW.
+	LIBS = 'boost_unit_test_framework')
+
+tests = []
+for test_path in [path for path in os.listdir('.') if os.path.isdir(path) and path[0] != '.']:
+	tests += [test_env.SConscript(dirs = test_path, exports = {'env': test_env})]
+
+Return('tests')

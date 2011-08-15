@@ -124,16 +124,16 @@ yttrium = SConscript(dirs = 'src', exports = 'env ports')
 Alias('yttrium', yttrium)
 Default('yttrium')
 
-#env.Append(LIBS = ['yttrium'], LIBPATH = ['#'])
+env.Append(LIBS = ['yttrium'], LIBPATH = ['#/lib'])
 
 # Tests
 
-#tests = SConscript(dirs = 'tests', exports = 'env')
-##Depends(tests, falx)
-#Alias('tests', tests)
-#for test in tests:
-#	env.Alias('test', test, '@' + str(test[0]) + ' --log_level=all')
-#AlwaysBuild('test')
+tests = SConscript(dirs = 'tests', exports = 'env')
+#Depends(tests, yttrium)
+Alias('tests', tests)
+for test in tests:
+	env.Alias('test', test, '@' + str(test[0]) + ' --log_level=all')
+AlwaysBuild('test')
 
 # Tools
 
