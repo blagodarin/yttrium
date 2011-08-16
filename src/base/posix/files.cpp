@@ -25,7 +25,7 @@ bool FileReaderImpl::open_file(const StaticString &name) throw()
 		return false;
 	}
 
-	int _descriptor = ::open(name.text(), O_RDONLY | O_LARGEFILE, 0644);
+	_descriptor = ::open(name.text(), O_RDONLY | O_LARGEFILE, 0644);
 	if (_descriptor == -1)
 	{
 		return false;
@@ -144,7 +144,7 @@ bool FileWriterImpl::open_file(const StaticString &name) throw()
 		return false;
 	}
 
-	int _descriptor = ::open(name.text(), O_WRONLY | O_CREAT | O_LARGEFILE, 0644);
+	_descriptor = ::open(name.text(), O_WRONLY | O_CREAT | O_LARGEFILE, 0644);
 	if (_descriptor == -1)
 	{
 		return false;

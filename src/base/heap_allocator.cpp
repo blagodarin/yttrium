@@ -18,6 +18,10 @@ HeapAllocatorImpl::HeapAllocatorImpl() throw()
 {
 }
 
+void HeapAllocatorImpl::initialize()
+{
+}
+
 void *HeapAllocatorImpl::allocate(size_t size, size_t align)
 {
 	void *pointer = malloc(size);

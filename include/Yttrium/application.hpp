@@ -17,11 +17,16 @@ public:
 
 	///
 
-	Application();
+	Application() throw();
 
 	///
 
 	~Application() throw();
+
+	///
+	/// \note This function is not reentrant!
+
+	void initialize();
 
 public:
 

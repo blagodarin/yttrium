@@ -1,16 +1,23 @@
 #include <Yttrium/yttrium.hpp>
 
-namespace Y = Yttrium;
+using namespace Yttrium;
 
 int main(int argc, char **argv)
 {
-	Y::Logger::open("hello_world.log");
+	Application application;
 
-	Y::Application application;
+	Logger::open("hello_world.log");
+	Logger::set_root_level(Logger::All);
 
-	Y::Logger logger("hello_world");
+	application.initialize();
 
-	Y_LOG(logger, "Hello world!");
+	Logger root_logger;
+
+	Y_LOG(root_logger, "*** Yttrium example ***");
+
+	Logger logger("hello_world");
+
+	Y_DEBUG(logger, "Hello world!");
 
 	return 0;
 }

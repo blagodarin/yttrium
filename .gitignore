@@ -1,6 +1,6 @@
+*.log
 *.pyc
 .*
 bin/*
-config.log
 lib/*
 src/config.hpp
