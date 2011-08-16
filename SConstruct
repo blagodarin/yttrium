@@ -124,11 +124,13 @@ yttrium = SConscript(dirs = 'src', exports = 'env ports')
 Alias('yttrium', yttrium)
 Default('yttrium')
 
-env.Append(LIBS = ['yttrium'], LIBPATH = ['#/lib'])
+client_env = env.Clone(
+	LIBPATH = ['#/lib'],
+	LIBS = ['yttrium'])
 
 # Tests
 
-tests = SConscript(dirs = 'tests', exports = 'env')
+tests = SConscript(dirs = 'tests', exports = {'env': client_env})
 Alias('tests', tests)
 for test in tests:
 	env.Alias('test', test, '@' + str(test[0]) + ' --log_level=all')
@@ -136,13 +138,13 @@ AlwaysBuild('test')
 
 # Tools
 
-tools = SConscript(dirs = 'tools', exports = 'env')
+tools = SConscript(dirs = 'tools', exports = {'env': client_env})
 Alias('tools', tools)
 Default('tools')
 
 # Examples
 
-examples = SConscript(dirs = 'examples', exports = 'env')
+examples = SConscript(dirs = 'examples', exports = {'env': client_env})
 Alias('examples', examples)
 
 # All targets

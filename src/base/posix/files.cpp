@@ -6,98 +6,111 @@
 #include <fcntl.h>  // open
 #include <unistd.h> // close, dup, fsync, ftruncate64, lseek64, pread64, pwrite64
 
-#include <Yttrium/files.hpp>
+#include "files.hpp"
 
 namespace Yttrium
 {
 
-class FileReaderImpl: public FileReader
+FileReaderImpl::FileReaderImpl() throw()
+	: _descriptor(-1)
+	, _offset(0)
+	, _size(0)
 {
-public:
+}
 
-	FileReaderImpl(int descriptor) throw()
-		: _descriptor(descriptor)
-		, _offset(0)
-		, _size(lseek64(descriptor, 0, SEEK_END))
+bool FileReaderImpl::open_file(const StaticString &name) throw()
+{
+	if (_descriptor != -1)
 	{
+		return false;
 	}
 
-	FileReaderImpl(int descriptor, UOffset offset, UOffset size) throw()
-		: _descriptor(descriptor)
-		, _offset(offset)
-		, _size(size)
+	int _descriptor = ::open(name.text(), O_RDONLY | O_LARGEFILE, 0644);
+	if (_descriptor == -1)
 	{
+		return false;
 	}
 
-	virtual ~FileReaderImpl() throw()
+	_size = lseek64(_descriptor, 0, SEEK_END);
+	return true;
+}
+
+FileReaderImpl::~FileReaderImpl() throw()
+{
+	close(_descriptor);
+}
+
+FileReaderPtr FileReaderImpl::dup(Allocator *allocator)
+{
+	int descriptor = ::dup(_descriptor);
+	if (descriptor == -1)
 	{
-		close(_descriptor);
+		return FileReaderPtr();
 	}
 
-	virtual FileReaderPtr dup(Allocator *allocator)
+	try
 	{
-		int descriptor = ::dup(_descriptor);
-		if (descriptor == -1)
-		{
-			return FileReaderPtr();
-		}
-
-		try
-		{
-			return FileReaderPtr(new(allocator) FileReaderImpl(descriptor, _offset, _size));
-		}
-		catch (...)
-		{
-			close(descriptor);
-			throw;
-		}
+		return FileReaderPtr(new(allocator) FileReaderImpl(descriptor, _offset, _size));
 	}
-
-	virtual size_t read(void *buffer, size_t size) throw()
+	catch (...)
 	{
-		ssize_t result = pread64(_descriptor, buffer, size, _offset);
-		if (result != -1)
-		{
-			_offset += static_cast<size_t>(result);
-			return result;
-		}
-		return 0;
+		close(descriptor);
+		throw;
 	}
+}
 
-	virtual UOffset offset() throw()
+size_t FileReaderImpl::read(void *buffer, size_t size) throw()
+{
+	ssize_t result = pread64(_descriptor, buffer, size, _offset);
+	if (result != -1)
 	{
-		return _offset;
+		_offset += static_cast<size_t>(result);
+		return result;
 	}
+	return 0;
+}
 
-	virtual bool seek(Offset offset, Whence whence) throw()
+UOffset FileReaderImpl::offset() throw()
+{
+	return _offset;
+}
+
+bool FileReaderImpl::seek(Offset offset, Whence whence) throw()
+{
+	UOffset newOffset;
+
+	switch (whence)
 	{
-		UOffset newOffset;
-
-		switch (whence)
-		{
-		case Relative: newOffset = offset + _offset; break;
-		case Reverse:  newOffset = offset + _size;   break;
-		default:       newOffset = offset;           break;
-		}
-		if (newOffset > _size)
-		{
-			return false;
-		}
-		_offset = newOffset;
-		return true;
+	case Relative: newOffset = offset + _offset; break;
+	case Reverse:  newOffset = offset + _size;   break;
+	default:       newOffset = offset;           break;
 	}
-
-	virtual UOffset size() throw()
+	if (newOffset > _size)
 	{
-		return _size;
+		return false;
 	}
+	_offset = newOffset;
+	return true;
+}
 
-private:
+UOffset FileReaderImpl::size() throw()
+{
+	return _size;
+}
 
-	int     _descriptor;
-	UOffset _offset;
-	UOffset _size;
-};
+FileReaderImpl::FileReaderImpl(int descriptor) throw()
+	: _descriptor(descriptor)
+	, _offset(0)
+	, _size(lseek64(descriptor, 0, SEEK_END))
+{
+}
+
+FileReaderImpl::FileReaderImpl(int descriptor, UOffset offset, UOffset size) throw()
+	: _descriptor(descriptor)
+	, _offset(offset)
+	, _size(size)
+{
+}
 
 FileReaderPtr FileReader::open(const StaticString &name, Allocator *allocator)
 {
@@ -118,99 +131,111 @@ FileReaderPtr FileReader::open(const StaticString &name, Allocator *allocator)
 	}
 }
 
-class FileWriterImpl: public FileWriter
+FileWriterImpl::FileWriterImpl() throw()
+	: _descriptor(-1)
+	, _offset(0)
 {
-public:
+}
 
-	FileWriterImpl(int descriptor) throw()
-		: _descriptor(descriptor)
-		, _offset(0)
+bool FileWriterImpl::open_file(const StaticString &name) throw()
+{
+	if (_descriptor != -1)
 	{
+		return false;
 	}
 
-	FileWriterImpl(int descriptor, UOffset offset) throw()
-		: _descriptor(descriptor)
-		, _offset(offset)
+	int _descriptor = ::open(name.text(), O_WRONLY | O_CREAT | O_LARGEFILE, 0644);
+	if (_descriptor == -1)
 	{
+		return false;
 	}
 
-	virtual ~FileWriterImpl() throw()
+	return true;
+}
+
+FileWriterImpl::~FileWriterImpl() throw()
+{
+	close(_descriptor);
+}
+
+FileWriterPtr FileWriterImpl::dup(Allocator *allocator)
+{
+	int descriptor = ::dup(_descriptor);
+	if (descriptor == -1)
 	{
-		close(_descriptor);
+		return FileWriterPtr();
 	}
 
-	virtual FileWriterPtr dup(Allocator *allocator)
+	try
 	{
-		int descriptor = ::dup(_descriptor);
-		if (descriptor == -1)
-		{
-			return FileWriterPtr();
-		}
-
-		try
-		{
-			return FileWriterPtr(new(allocator) FileWriterImpl(descriptor, _offset));
-		}
-		catch (...)
-		{
-			close(descriptor);
-			throw;
-		}
+		return FileWriterPtr(new(allocator) FileWriterImpl(descriptor, _offset));
 	}
-
-	size_t write(const void *buffer, size_t size) throw()
+	catch (...)
 	{
-		ssize_t result = pwrite64(_descriptor, buffer, size, _offset);
-		if (result != -1)
-		{
-			_offset += static_cast<size_t>(result);
-			return result;
-		}
-		return 0;
+		close(descriptor);
+		throw;
 	}
+}
 
-	virtual bool flush() throw()
+size_t FileWriterImpl::write(const void *buffer, size_t size) throw()
+{
+	ssize_t result = pwrite64(_descriptor, buffer, size, _offset);
+	if (result != -1)
 	{
-		return !fsync(_descriptor);
+		_offset += static_cast<size_t>(result);
+		return result;
 	}
+	return 0;
+}
 
-	virtual UOffset offset() throw()
+bool FileWriterImpl::flush() throw()
+{
+	return !fsync(_descriptor);
+}
+
+UOffset FileWriterImpl::offset() throw()
+{
+	return _offset;
+}
+
+bool FileWriterImpl::seek(Offset offset, Whence whence) throw()
+{
+	switch (whence)
 	{
-		return _offset;
+	case Relative: _offset = offset + _offset; break;
+	case Reverse:  _offset = offset + size();  break;
+	default:       _offset = offset;           break;
 	}
+	return true;
+}
 
-	virtual bool seek(Offset offset, Whence whence) throw()
-	{
-		switch (whence)
-		{
-		case Relative: _offset = offset + _offset; break;
-		case Reverse:  _offset = offset + size();  break;
-		default:       _offset = offset;           break;
-		}
-		return true;
-	}
+UOffset FileWriterImpl::size() throw()
+{
+	off64_t result = lseek64(_descriptor, 0, SEEK_END);
+	return result != -1 ? result : 0;
+}
 
-	virtual UOffset size() throw()
-	{
-		off64_t result = lseek64(_descriptor, 0, SEEK_END);
-		return result != -1 ? result : 0;
-	}
+bool FileWriterImpl::resize(UOffset size) throw()
+{
+	return !ftruncate64(_descriptor, size);
+}
 
-	virtual bool resize(UOffset size) throw()
-	{
-		return !ftruncate64(_descriptor, size);
-	}
+bool FileWriterImpl::truncate() throw()
+{
+	return !ftruncate64(_descriptor, _offset);
+}
 
-	virtual bool truncate() throw()
-	{
-		return !ftruncate64(_descriptor, _offset);
-	}
+FileWriterImpl::FileWriterImpl(int descriptor) throw()
+	: _descriptor(descriptor)
+	, _offset(0)
+{
+}
 
-private:
-
-	int     _descriptor;
-	UOffset _offset;
-};
+FileWriterImpl::FileWriterImpl(int descriptor, UOffset offset) throw()
+	: _descriptor(descriptor)
+	, _offset(offset)
+{
+}
 
 FileWriterPtr FileWriter::open(const StaticString &name, Allocator *allocator)
 {
