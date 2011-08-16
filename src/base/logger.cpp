@@ -33,7 +33,7 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 		_location << " {" << file << ':' << line;
 		if (function)
 		{
-			_location << ' ' << function;
+			_location << "::" << function;
 		}
 		_location << '}';
 	}

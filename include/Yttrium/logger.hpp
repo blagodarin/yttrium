@@ -156,7 +156,7 @@ private:
 #ifndef __Y_DEBUG
 	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level
 #else
-	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level, __FILE__, __LINE__, Y_FUNC
+	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level, __FILE__, __LINE__, __func__
 #endif
 
 ///

@@ -81,6 +81,9 @@ else:
 env.Append(
 	CPPPATH = ['#/include'])
 
+env.Append(
+	CPPDEFINES = ['__Y_DEBUG'])
+
 linkflags_gui = ' -Wl,-subsystem,windows' # We use GCC/MinGW.
 
 # Compiler-specific configurations
