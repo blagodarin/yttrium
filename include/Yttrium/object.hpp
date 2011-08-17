@@ -5,7 +5,6 @@
 #define __Y_OBJECT_HPP
 
 #include <Yttrium/allocators.hpp>
-#include <Yttrium/assert.hpp>
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/types.hpp>
 
@@ -14,43 +13,34 @@ namespace Yttrium
 
 /// Reference-counted object that deletes itself when the counter reaches zero.
 
+// NOTE: This only adds the reference counter, so maybe it should be renamed to ReferenceCounted or something.
+
 class Y_API Object: public Allocatable
 {
-	template <typename>
+	template <typename T>
 	friend class ObjectPtr;
 
 protected:
 
-	///
+	/// Initialize the reference counter.
+	/// \param counter The initial counter value.
+	/// \note Non-ObjectPtr-managed (i.e. non-dynamic) Object descendants
+	/// should initialize the \a counter with 0 to avoid the assertion failure upon destruction.
 
 	Object(size_t counter = 1) throw()
 		: _counter(counter)
 	{
 	}
 
-	///
+	/// The destructor.
 
-	virtual ~Object() throw()
-	{
-		Y_ASSERT(_counter == 0);
-	}
+	virtual ~Object() throw();
 
 private:
 
-	void operator ++() throw()
-	{
-		++_counter;
-	}
+	void increment() throw();
 
-	void operator --() throw()
-	{
-		Y_ASSERT(_counter > 0);
-
-		if (!--_counter)
-		{
-			delete this;
-		}
-	}
+	void decrement() throw();
 
 private:
 
@@ -78,7 +68,7 @@ public:
 	{
 		if (_object)
 		{
-			++*_object;
+			_object->increment();
 		}
 	}
 
@@ -91,52 +81,11 @@ public:
 	{
 		if (_object)
 		{
-			--*_object;
+			_object->decrement();
 		}
 	}
 
-	ObjectPtr &operator =(const ObjectPtr &object) throw()
-	{
-		if (_object)
-		{
-			--*_object;
-		}
-		if ((_object = object._object))
-		{
-			++*_object;
-		}
-		return *this;
-	}
-
-	T &operator *() throw()
-	{
-		return *_object;
-	}
-
-	const T &operator *() const throw()
-	{
-		return *_object;
-	}
-
-	T *operator ->() throw()
-	{
-		return _object;
-	}
-
-	const T *operator ->() const throw()
-	{
-		return _object;
-	}
-
-	operator SafeBool() const throw()
-	{
-		return Y_SAFE_BOOL(_object);
-	}
-
-	bool operator !() const throw()
-	{
-		return !_object;
-	}
+public:
 
 	/// Explicitly release the object.
 
@@ -144,9 +93,9 @@ public:
 	{
 		if (_object)
 		{
-			--*_object;
+			_object->decrement();
+			_object = NULL;
 		}
-		_object = NULL;
 	}
 
 	/// Assign an object and lock it.
@@ -156,12 +105,12 @@ public:
 	{
 		if (_object)
 		{
-			--*_object;
+			_object->decrement();
 		}
 		_object = object;
 		if (object)
 		{
-			++*object;
+			object->increment();
 		}
 	}
 
@@ -180,6 +129,65 @@ public:
 	const T *pointer() const throw()
 	{
 		return _object;
+	}
+
+public:
+
+	///
+
+	ObjectPtr &operator =(const ObjectPtr &object) throw()
+	{
+		if (_object)
+		{
+			_object->decrement();
+		}
+		if ((_object = object._object))
+		{
+			_object->increment();
+		}
+		return *this;
+	}
+
+	///
+
+	T &operator *() throw()
+	{
+		return *_object;
+	}
+
+	///
+
+	const T &operator *() const throw()
+	{
+		return *_object;
+	}
+
+	///
+
+	T *operator ->() throw()
+	{
+		return _object;
+	}
+
+	///
+
+	const T *operator ->() const throw()
+	{
+		return _object;
+	}
+
+	///
+
+	operator SafeBool() const throw()
+	{
+		return Y_SAFE_BOOL(_object);
+	}
+
+	///
+
+	bool operator !() const throw()
+	{
+		return !_object;
 	}
 
 private:

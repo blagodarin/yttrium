@@ -1,7 +1,37 @@
+from genconfig import GenConfig
+
 Import('env', 'ports')
 
 build = env.Clone(BUILD = '.build')
-build.Append(CPPPATH = ['.'])
+
+def CheckAttributePacked(context):
+	context.Message('Checking for __attribute__((packed))... ')
+	result = context.TryCompile("""
+struct Foo
+{
+	int bar;
+}
+__attribute__((packed));
+""", '.cpp')
+	context.Result(result)
+	return result
+
+if not GetOption('clean'):
+	sconf = build.Configure(
+		custom_tests = {'CheckAttributePacked': CheckAttributePacked},
+		clean = True, help = False) # NOTE: Should be 'clean = False'.
+	config = GenConfig('__CONFIG_HPP')
+
+	config.define_if('__Y_POSIX', 'posix' in ports)
+	config.define_if('__Y_WIN32', 'win32' in ports)
+	config.define_if('__Y_X11', 'x11' in ports)
+
+	config.new_line()
+
+	config.define_select('Y_PACKED', sconf.CheckAttributePacked(), '__attribute__((packed))', None)
+
+	config.save('config.hpp')
+	build = sconf.Finish()
 
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
@@ -18,5 +48,6 @@ if 'win32' in ports:
 yttrium = build.SharedLibrary('../lib/yttrium', [build.Glob('$BUILD/' + path + '/*.cpp') for path in src])
 
 build.Clean(yttrium, build.Dir('$BUILD'))
+build.Clean(yttrium, 'config.hpp')
 
 Return('yttrium')
