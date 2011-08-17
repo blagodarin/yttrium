@@ -106,8 +106,11 @@ if build_platform == 'win32':
 # Special configuration for the master environment.
 
 env.Append(
-	CPPDEFINES = ['__Y_API_EXPORT'],
-	CPPFLAGS = ['-fvisibility=hidden'])
+	CPPDEFINES = [
+		'__Y_API_EXPORT'],
+	CPPFLAGS = [
+		'-fvisibility=hidden',
+		'-fvisibility-inlines-hidden'])
 
 ################################################################################
 # Targets.
