@@ -7,7 +7,7 @@
 
 #include <cstddef> // NULL
 
-// I don't believe one will use GCC 4.2 or older, but it is always better to check.
+// I don't believe that someone will use GCC 4.2 or older, but it is always better to check.
 // In MSVC 2010 (_MSC_VER == 1600), __func__ is still not supported.
 
 #if !defined(__func__) && ((defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3))) || defined(_MSC_VER))
@@ -17,21 +17,28 @@
 /// \def Y_API
 /// \brief %Yttrium API specifier.
 
-#ifndef Y_API
-	#ifdef _MSC_VER
+// GCC supports __declspec(dllexport) and __declspec(dllimport).
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+	#ifdef __Y_API_EXPORT
+		#define Y_API __declspec(dllexport)
+	#else
 		#define Y_API __declspec(dllimport)
+	#endif
+	#define Y_PRIVATE
+#else
+	#if defined(__GNUC__) && __GNUC__ >= 4
+		#define Y_API     __attribute__((visibility("default")))
+		#define Y_PRIVATE __attribute__((visibility("hidden")))
 	#else
 		#define Y_API
+		#define Y_PRIVATE
 	#endif
 #endif
 
+///
+
 #define Y_LENGTH_OF(x) (sizeof(x) / sizeof (x)[0])
-
-#define __Y_STR(x) #x
-
-/// Stringification wrapper.
-
-#define Y_STR(x) __Y_STR(x)
 
 /// %Yttrium namespace.
 

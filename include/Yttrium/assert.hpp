@@ -7,13 +7,25 @@
 #include <cassert>
 
 #include <Yttrium/global.hpp>
+#include <Yttrium/static_string.hpp>
 
 namespace Yttrium
 {
 
-void Y_API abort(const char *message = NULL) throw();
+/// Abort the program execution, outputting a message to the log.
+/// \param message The message to output.
+/// \param file Source file name (usually \c __FILE__).
+/// \param line Source file line number (usually \c __LINE__).
+/// \param function Source function (usually \c __func__).
+
+Y_API void abort(const StaticString &message, const char *file, int line, const char *function) throw();
 
 } // namespace Yttrium
+
+/// \def Y_ABORT(condition)
+/// \brief Terminate the program.
+
+#define Y_ABORT(message) Yttrium::abort(message, __FILE__, __LINE__, __func__)
 
 /// \def Y_ASSERT(condition)
 /// \brief Terminate the program if the \a condition is \c false.
@@ -25,7 +37,9 @@ void Y_API abort(const char *message = NULL) throw();
 		do \
 		{ \
 			if (!(condition)) \
-				Yttrium::abort("Assertion failed: " #condition " (" __FILE__ ":" Y_STR(__LINE__) ")"); \
+			{ \
+				Y_ABORT("Assertion failed: " #condition); \
+			} \
 		} while (false)
 #endif
 

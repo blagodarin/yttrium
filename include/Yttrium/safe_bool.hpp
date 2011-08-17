@@ -36,7 +36,7 @@ typedef __SafeBool::Type SafeBool;
 
 #define Y_SAFE_TRUE (&Yttrium::__SafeBool::value)
 
-/// Safe boolean value conversion helper.
+/// Safe boolean conversion helper.
 
 #define Y_SAFE_BOOL(x) ((x) ? Y_SAFE_TRUE : Y_SAFE_FALSE)
 

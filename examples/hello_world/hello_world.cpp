@@ -10,6 +10,8 @@ void bar()
 	Logger logger("hello_world.bar");
 
 	Y_INFO(logger, "Hello again!");
+
+	Y_ASSERT(false);
 }
 
 } // namespace Foo

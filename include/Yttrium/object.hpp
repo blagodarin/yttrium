@@ -13,7 +13,7 @@ namespace Yttrium
 
 /// Reference-counted object that deletes itself when the counter reaches zero.
 
-// NOTE: This only adds the reference counter, so maybe it should be renamed to ReferenceCounted or something.
+// NOTE: This only adds the reference counter, so maybe it should be renamed to ReferenceCounted or Referenced or something.
 
 class Y_API Object: public Allocatable
 {

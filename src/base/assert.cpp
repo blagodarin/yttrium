@@ -7,13 +7,11 @@
 namespace Yttrium
 {
 
-void abort(const char *message) throw()
+void abort(const StaticString &message, const char *file, int line, const char *function) throw()
 {
 	if (message)
 	{
-		Logger logger(SystemAllocator::instance());
-
-		Y_LOG(logger, message);
+		Logger(SystemAllocator::instance()).log(Logger::None, file, line, function) << message;
 	}
 	::abort();
 }

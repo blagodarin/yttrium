@@ -1,5 +1,5 @@
 /// \file
-/// \brief
+/// \brief %Application object.
 
 #ifndef __Y_APPLICATION_HPP
 #define __Y_APPLICATION_HPP
@@ -30,7 +30,7 @@ public:
 
 public:
 
-	class Private;
+	class Y_PRIVATE Private;
 
 private:
 
