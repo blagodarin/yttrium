@@ -16,26 +16,8 @@ namespace Yttrium
 
 class Y_API Object: public Allocatable
 {
-public:
-
-	/// Increment the reference counter.
-
-	void operator ++() throw()
-	{
-		++_counter;
-	}
-
-	/// Decrement the reference counter, deleting the object if required.
-
-	void operator --() throw()
-	{
-		Y_ASSERT(_counter > 0);
-
-		if (!--_counter)
-		{
-			delete this;
-		}
-	}
+	template <typename>
+	friend class ObjectPtr;
 
 protected:
 
@@ -51,6 +33,23 @@ protected:
 	virtual ~Object() throw()
 	{
 		Y_ASSERT(_counter == 0);
+	}
+
+private:
+
+	void operator ++() throw()
+	{
+		++_counter;
+	}
+
+	void operator --() throw()
+	{
+		Y_ASSERT(_counter > 0);
+
+		if (!--_counter)
+		{
+			delete this;
+		}
 	}
 
 private:
