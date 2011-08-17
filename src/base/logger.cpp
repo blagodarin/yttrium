@@ -9,23 +9,33 @@ namespace Yttrium
 
 Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, int line, const StaticString &function)
 	: _logger(logger)
-	, _message(128, logger.allocator())
 	, _location(64, logger.allocator())
 {
+	DateTime now = DateTime::now();
+
+	_logger._message
+		.append('[')
+		.append_dec(now.hour, 2, true)
+		.append(':')
+		.append_dec(now.minute, 2, true)
+		.append(':')
+		.append_dec(now.second, 2, true)
+		.append("] ");
+
 	if (_logger._name)
 	{
-		_message << _logger._name << " - ";
+		_logger._message << _logger._name << " - ";
 	}
 
 	switch (level)
 	{
-	case Fatal:   _message << "fatal: ";   break;
-	case Error:   _message << "error: ";   break;
-	case Warning: _message << "warning: "; break;
-	case Info:    _message << "info: ";    break;
-	case Debug:   _message << "debug: ";   break;
-	case Trace:   _message << "trace: ";   break;
-	default:                               break;
+	case Fatal:   _logger._message << "fatal: ";   break;
+	case Error:   _logger._message << "error: ";   break;
+	case Warning: _logger._message << "warning: "; break;
+	case Info:    _logger._message << "info: ";    break;
+	case Debug:   _logger._message << "debug: ";   break;
+	case Trace:   _logger._message << "trace: ";   break;
+	default:                                       break;
 	}
 
 	if (file)
@@ -66,16 +76,12 @@ void Logger::set_level(const StaticString &name, Level level)
 {
 }
 
-void Logger::write(const StaticString& message)
+void Logger::flush() throw()
 {
 	if (Application::Private::exists())
 	{
 		Application::Private *application_private = Application::Private::pointer();
 
-		DateTime now = DateTime::now();
-
-		_message.append('[').append_dec(now.hour, 2, true).append(':').append_dec(now.minute, 2, true)
-			.append(':').append_dec(now.second, 2, true).append("] ").append(message).append("\r\n");
 		if (application_private->log_file()->write(_message.text(), _message.size()))
 		{
 			application_private->log_file()->flush();

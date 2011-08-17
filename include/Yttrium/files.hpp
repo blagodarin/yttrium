@@ -72,6 +72,13 @@ public:
 	/// Create a file reader.
 
 	static FileReaderPtr open(const StaticString &name, Allocator *allocator = HeapAllocator::instance());
+
+protected:
+
+	FileReader(size_t counter = 1) throw()
+		: Object(counter)
+	{
+	}
 };
 
 class FileWriter;
@@ -133,6 +140,13 @@ public:
 	/// Create a file writer.
 
 	static FileWriterPtr open(const StaticString &name, Allocator *allocator = HeapAllocator::instance());
+
+protected:
+
+	FileWriter(size_t counter = 1) throw()
+		: Object(counter)
+	{
+	}
 };
 
 /// Utility class for data transfer between files.

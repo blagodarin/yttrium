@@ -12,7 +12,8 @@ namespace Yttrium
 {
 
 FileReaderImpl::FileReaderImpl() throw()
-	: _descriptor(-1)
+	: FileReader(0)
+	, _descriptor(-1)
 	, _offset(0)
 	, _size(0)
 {
@@ -132,7 +133,8 @@ FileReaderPtr FileReader::open(const StaticString &name, Allocator *allocator)
 }
 
 FileWriterImpl::FileWriterImpl() throw()
-	: _descriptor(-1)
+	: FileWriter(0)
+	, _descriptor(-1)
 	, _offset(0)
 {
 }

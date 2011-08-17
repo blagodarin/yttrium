@@ -18,13 +18,6 @@ class Y_API Object: public Allocatable
 {
 public:
 
-	/// Default constructor.
-
-	Object() throw()
-		: _counter(1)
-	{
-	}
-
 	/// Increment the reference counter.
 
 	void operator ++() throw()
@@ -45,6 +38,15 @@ public:
 	}
 
 protected:
+
+	///
+
+	Object(size_t counter = 1) throw()
+		: _counter(counter)
+	{
+	}
+
+	///
 
 	virtual ~Object() throw()
 	{

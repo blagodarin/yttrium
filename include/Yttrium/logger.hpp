@@ -51,7 +51,8 @@ public:
 
 		~Writer()
 		{
-			_logger.write(_message + _location);
+			_logger._message << _location << "\r\n";
+			_logger.flush();
 		}
 
 	public:
@@ -61,7 +62,7 @@ public:
 		template <typename T>
 		Writer &operator <<(const T &value)
 		{
-			_message << value;
+			_logger._message << value;
 			return *this;
 		}
 
@@ -73,7 +74,6 @@ public:
 	private:
 
 		Logger &_logger;
-		String _message;
 		String _location;
 	};
 
@@ -83,12 +83,14 @@ public:
 
 	Logger(Allocator *allocator = HeapAllocator::instance())
 		: _level(root_level())
+		, _name(allocator)
 		, _message(allocator)
 	{
 	}
 
 	Logger(Level level, Allocator *allocator = HeapAllocator::instance())
 		: _level(level)
+		, _name(allocator)
 		, _message(allocator)
 	{
 	}
@@ -142,7 +144,7 @@ private:
 		return _message.allocator();
 	}
 
-	void write(const StaticString& message);
+	void flush() throw();
 
 private:
 
