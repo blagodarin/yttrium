@@ -263,12 +263,13 @@ String &String::clear() throw()
 		if (*references == 1)
 		{
 			_text[0] = '\0';
+			_size = 0;
 			return *this;
 		}
 		--*references;
 		_buffer_size = 0;
 	}
-	_text = const_cast<char *>(&null);
+	_text = const_cast<char *>(&Null);
 	_size = 0;
 	return *this;
 }
@@ -800,6 +801,8 @@ String& String::set(const char *string, size_t size)
 	return *this;
 }
 
+SafeBool String::Reference = Y_SAFE_TRUE;
+
 void String::grow(size_t buffer_size)
 {
 	Y_ASSERT(_buffer_size);
@@ -859,6 +862,6 @@ char *String::init(size_t buffer_size)
 	return old_text;
 }
 
-const char String::null;
+const char String::Null;
 
 } // namespace Yttrium

@@ -30,7 +30,6 @@ public:
 
 	void initialize()
 	{
-		_heap_allocator.initialize();
 	}
 
 	LogManager &log_manager() throw()

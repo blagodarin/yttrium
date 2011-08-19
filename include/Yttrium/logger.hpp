@@ -96,7 +96,7 @@ public:
 	}
 
 	Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance())
-		: _level(level(name))
+		: _level(level(name, allocator))
 		, _name(name, allocator)
 		, _message(allocator)
 	{
@@ -117,7 +117,7 @@ public:
 
 	///
 
-	static Level level(const StaticString &name);
+	static Level level(const StaticString &name, Allocator *allocator = HeapAllocator::instance());
 
 	///
 	/// \note This function should not be used from multiple threads simultaneously.
@@ -166,7 +166,7 @@ private:
 #define Y_LOG(logger, message) \
 	do \
 	{ \
-		(logger).log(__Y_LOG_PARAMS(None)) << (message); \
+		(logger).log(__Y_LOG_PARAMS(None)) << message; \
 	} while (false)
 
 ///
@@ -176,7 +176,7 @@ private:
 	{ \
 		if (condition) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(None)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(None)) << message; \
 		} \
 	} while (false)
 
@@ -187,7 +187,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Fatal) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Fatal)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Fatal)) << message; \
 		} \
 	} while (false)
 
@@ -198,7 +198,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Fatal && (condition)) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Fatal)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Fatal)) << message; \
 		} \
 	} while (false)
 
@@ -209,7 +209,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Error) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Error)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Error)) << message; \
 		} \
 	} while (false)
 
@@ -220,7 +220,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Error && (condition)) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Error)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Error)) << message; \
 		} \
 	} while (false)
 
@@ -231,7 +231,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Warning) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Warning)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Warning)) << message; \
 		} \
 	} while (false)
 
@@ -242,7 +242,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Warning && (condition)) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Warning)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Warning)) << message; \
 		} \
 	} while (false)
 
@@ -253,7 +253,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Info) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Info)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Info)) << message; \
 		} \
 	} while (false)
 
@@ -264,7 +264,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Info && (condition)) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Info)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Info)) << message; \
 		} \
 	} while (false)
 
@@ -275,7 +275,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Debug) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Debug)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Debug)) << message; \
 		} \
 	} while (false)
 
@@ -286,7 +286,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Debug && (condition)) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Debug)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Debug)) << message; \
 		} \
 	} while (false)
 
@@ -297,7 +297,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Trace) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Trace)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Trace)) << message; \
 		} \
 	} while (false)
 
@@ -308,7 +308,7 @@ private:
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Trace && (condition)) \
 		{ \
-			(logger).log(__Y_LOG_PARAMS(Trace)) << (message); \
+			(logger).log(__Y_LOG_PARAMS(Trace)) << message; \
 		} \
 	} while (false)
 

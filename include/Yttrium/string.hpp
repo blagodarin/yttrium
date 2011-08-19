@@ -24,7 +24,7 @@ public:
 	///
 
 	String(Allocator *allocator = HeapAllocator::instance()) throw()
-		: _text(const_cast<char*>(&null))
+		: _text(const_cast<char*>(&Null))
 		, _size(0)
 		, _buffer_size(0)
 		, _allocator(allocator)
@@ -88,6 +88,54 @@ public:
 	*/
 
 	String(const StaticString &left, const StaticString &right, Allocator *allocator = HeapAllocator::instance());
+
+	/**
+	* \overload
+	*/
+
+	String(const char *string, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
+		: _text(const_cast<char *>(string))
+		, _size(strlen(string))
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
+	}
+
+	/**
+	* \overload
+	*/
+
+	String(const char *string, size_t size, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
+		: _text(const_cast<char *>(string))
+		, _size(size)
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
+	}
+
+	/**
+	* \overload
+	*/
+
+	String(const StaticString &string, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
+		: _text(const_cast<char *>(string.text()))
+		, _size(string.size())
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
+	}
+
+	/**
+	* \overload
+	*/
+
+	String(const String &string, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
+		: _text(string._text)
+		, _size(string._size)
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
+	}
 
 	/// Destructor.
 
@@ -623,62 +671,11 @@ public:
 		return String(20).append_dec(value, width, zeros);
 	}
 
-	/// Create a reference string.
+public:
 
-	static String reference(const char *string) throw()
-	{
-		return String(string, strlen(string), Y_SAFE_BOOL(true));
-	}
+	///
 
-	/**
-	* \overload
-	*/
-
-	static String reference(const char* string, size_t size) throw()
-	{
-		return String(string, size, Y_SAFE_BOOL(true));
-	}
-
-	/**
-	* \overload
-	*/
-
-	static String reference(const StaticString& string) throw()
-	{
-		return String(string, Y_SAFE_BOOL(true));
-	}
-
-	/**
-	* \overload
-	*/
-
-	static String reference(const String &string) throw()
-	{
-		return String(string, Y_SAFE_BOOL(true));
-	}
-
-private:
-
-	String(const char *string, size_t size, SafeBool) throw()
-		: _text(const_cast<char *>(string))
-		, _size(size)
-		, _buffer_size(0)
-	{
-	}
-
-	String(const StaticString &string, SafeBool) throw()
-		: _text(const_cast<char *>(string.text()))
-		, _size(string.size())
-		, _buffer_size(0)
-	{
-	}
-
-	String(const String &string, SafeBool) throw()
-		: _text(string._text)
-		, _size(string._size)
-		, _buffer_size(0)
-	{
-	}
+	static SafeBool Reference;
 
 private:
 
@@ -702,7 +699,7 @@ private:
 
 private:
 
-	static const char null = '\0';
+	static const char Null = '\0';
 };
 
 /// Concatenate the arguments into a single string.

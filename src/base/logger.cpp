@@ -49,11 +49,11 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 	}
 }
 
-Logger::Level Logger::level(const StaticString &name)
+Logger::Level Logger::level(const StaticString &name, Allocator *allocator)
 {
 	if (Application::Private::exists())
 	{
-		return Application::Private::pointer()->log_manager().level(name);
+		return Application::Private::pointer()->log_manager().level(name, allocator);
 	}
 	return None;
 }

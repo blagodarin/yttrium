@@ -22,7 +22,7 @@ public:
 	/// Construct an empty StaticString.
 
 	StaticString() throw()
-		: _text(&null)
+		: _text(&Null)
 		, _size(0)
 	{
 	}
@@ -54,6 +54,14 @@ public:
 	{
 		return strcmp(_text, string._text);
 	}
+
+	///
+
+	size_t find_first(char symbol, size_t offset = 0) const throw();
+
+	///
+
+	size_t find_last(char symbol, size_t offset = End) const throw();
 
 	/// Return the string size.
 	/// \return String size.
@@ -183,6 +191,10 @@ public:
 		return (_size != string._size || strcmp(_text, string._text) != 0);
 	}
 
+public:
+
+	static const size_t End = SIZE_MAX;
+
 private:
 
 	const char *_text;
@@ -190,7 +202,7 @@ private:
 
 private:
 
-	static const char null = '\0';
+	static const char Null = '\0';
 };
 
 ///

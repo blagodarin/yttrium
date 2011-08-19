@@ -1,5 +1,9 @@
+#include <functional> // greater
+#include <map>        // map
+
 #include <Yttrium/logger.hpp>
 #include <Yttrium/static_string.hpp>
+#include <Yttrium/string.hpp>
 
 #include "files.hpp"
 
@@ -15,7 +19,7 @@ public:
 	{
 	}
 
-	Logger::Level level(const StaticString &name) const throw();
+	Logger::Level level(const StaticString &name, Allocator *allocator = HeapAllocator::instance()) const throw();
 
 	bool open(const StaticString &file, Logger::OpenMode mode) throw();
 
@@ -32,8 +36,13 @@ public:
 
 private:
 
+	typedef std::map<String, Logger::Level, std::greater<String> > Levels;
+
+private:
+
 	FileWriterImpl _log;
 	Logger::Level  _root_level;
+	Levels         _levels;
 };
 
 } // namespace Yttrium

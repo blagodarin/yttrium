@@ -13,8 +13,6 @@ public:
 
 	HeapAllocatorImpl() throw();
 
-	void initialize();
-
 public: // Allocator
 
 	virtual void *allocate(size_t size, size_t align);
