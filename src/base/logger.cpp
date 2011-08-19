@@ -49,55 +49,64 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 	}
 }
 
+Logger::Level Logger::level(const StaticString &name)
+{
+	if (Application::Private::exists())
+	{
+		return Application::Private::pointer()->log_manager().level(name);
+	}
+	return None;
+}
+
 bool Logger::open(const StaticString &file, OpenMode mode, Level root_level)
 {
 	if (Application::Private::exists())
 	{
-		Application::Private *application_private = Application::Private::pointer();
+		LogManager &log_manager = Application::Private::pointer()->log_manager();
 
-		if (application_private->log_file()->open_file(file))
+		if (log_manager.open(file, mode))
 		{
-			if (mode == Rewrite)
-			{
-				application_private->log_file()->truncate();
-				application_private->log_file()->flush();
-			}
+			log_manager.set_root_level(root_level);
 			return true;
 		}
 	}
 	return false;
 }
 
-void Logger::set_root_level(Level level) throw()
+Logger::Level Logger::root_level() throw()
 {
+	if (Application::Private::exists())
+	{
+		return Application::Private::pointer()->log_manager().root_level();
+	}
+	return None;
 }
 
 void Logger::set_level(const StaticString &name, Level level)
 {
+	if (Application::Private::exists())
+	{
+		Application::Private::pointer()->log_manager().set_level(name, level);
+	}
+}
+
+void Logger::set_root_level(Level level) throw()
+{
+	if (Application::Private::exists())
+	{
+		Application::Private::pointer()->log_manager().set_root_level(level);
+	}
 }
 
 void Logger::flush() throw()
 {
 	if (Application::Private::exists())
 	{
-		Application::Private *application_private = Application::Private::pointer();
-
-		if (application_private->log_file()->write(_message.text(), _message.size()))
+		if (Application::Private::pointer()->log_manager().write(_message.text(), _message.size()))
 		{
-			application_private->log_file()->flush();
 			_message.clear();
 		}
 	}
-}
-
-Logger::Level Logger::root_level() throw()
-{
-	return All;
-}
-
-Logger::Level Logger::level(const StaticString &name)
-{
-	return All;
 }
 
 } // namespace Yttrium

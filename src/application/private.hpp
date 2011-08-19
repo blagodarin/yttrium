@@ -4,8 +4,8 @@
 #include <Yttrium/application.hpp>
 #include <Yttrium/types.hpp>
 
-#include "../base/files.hpp"
 #include "../base/heap_allocator.hpp"
+#include "../base/log_manager.hpp"
 
 namespace Yttrium
 {
@@ -33,9 +33,9 @@ public:
 		_heap_allocator.initialize();
 	}
 
-	FileWriterImpl *log_file() throw()
+	LogManager &log_manager() throw()
 	{
-		return &_log_file;
+		return _log_manager;
 	}
 
 public:
@@ -52,8 +52,8 @@ public:
 
 private:
 
-	FileWriterImpl    _log_file;
 	HeapAllocatorImpl _heap_allocator;
+	LogManager        _log_manager;
 
 private:
 

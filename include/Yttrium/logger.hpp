@@ -116,13 +116,13 @@ public:
 public:
 
 	///
+
+	static Level level(const StaticString &name);
+
+	///
 	/// \note This function should not be used from multiple threads simultaneously.
 
 	static bool open(const StaticString &file, OpenMode mode = Rewrite, Level root_level = Info);
-
-	///
-
-	static Level level(const StaticString &name);
 
 	///
 

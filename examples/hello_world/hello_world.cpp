@@ -20,8 +20,7 @@ int main(int argc, char **argv)
 {
 	Application application;
 
-	Logger::open("hello_world.log");
-	Logger::set_root_level(Logger::All);
+	Logger::open("hello_world.log", Logger::Rewrite, Logger::All);
 
 	application.initialize();
 
