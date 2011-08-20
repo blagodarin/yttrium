@@ -5,18 +5,22 @@
 namespace Yttrium
 {
 
-Logger::Level LogManager::level(const StaticString &name, Allocator *allocator) const throw()
+Logger::Level LogManager::level(const StaticString &name) const throw()
 {
 	size_t prefix_size = name.find_first('.');
 	if (prefix_size == StaticString::End)
 	{
-		Levels::const_iterator i = _levels.find(String(name, String::Reference, allocator));
+		Levels::const_iterator i = _levels.find(String(name, String::Reference, NULL));
 		return (i != _levels.end() ? i->second : _root_level);
 	}
 
-	String prefix(name.size(), allocator); // NOTE: This seems to be the only allocation. Perhaps it should be done by the StackAllocator?
+	char prefix_buffer[name.size() + 1]; // NOTE: This might be risky, but generally should be OK.
 
-	Levels::const_iterator begin = _levels.lower_bound(String(name, String::Reference, allocator));
+	prefix_buffer[0] = '\0';
+
+	String prefix(prefix_buffer, 0, String::Reference, NULL);
+
+	Levels::const_iterator begin = _levels.lower_bound(String(name, String::Reference, NULL));
 	Levels::const_iterator end = _levels.upper_bound(prefix.set(name.text(), prefix_size));
 
 	for (Levels::const_iterator i = begin; i != end; ++i)

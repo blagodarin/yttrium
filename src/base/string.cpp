@@ -795,6 +795,7 @@ String& String::set(const char *string, size_t size)
 	{
 		init(buffer_size);
 	}
+
 	memcpy(_text, string, size);
 	_text[size] = '\0';
 	_size = size;
@@ -837,9 +838,12 @@ void String::init()
 {
 	Y_ASSERT(_buffer_size);
 
-	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + _buffer_size));
-	*pointer = 1;
-	_text = reinterpret_cast<char *>(pointer + 1);
+	if (_allocator) // NOTE: Rely on this at your own risk.
+	{
+		size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + _buffer_size));
+		*pointer = 1;
+		_text = reinterpret_cast<char *>(pointer + 1);
+	}
 }
 
 void String::init(const char *string, size_t size)
@@ -853,13 +857,17 @@ char *String::init(size_t buffer_size)
 {
 	Y_ASSERT(!_buffer_size);
 
-	size_t adjusted_size = max<size_t>(buffer_size, StringReserve);
-	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + adjusted_size));
-	*pointer = 1;
-	char *old_text = _text;
-	_text = reinterpret_cast<char *>(pointer + 1);
-	_buffer_size = adjusted_size;
-	return old_text;
+	if (_allocator) // NOTE: Rely on this at your own risk.
+	{
+		size_t adjusted_size = max<size_t>(buffer_size, StringReserve);
+		size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + adjusted_size));
+		*pointer = 1;
+		char *old_text = _text;
+		_text = reinterpret_cast<char *>(pointer + 1);
+		_buffer_size = adjusted_size;
+		return old_text;
+	}
+	return _text;
 }
 
 const char String::Null;

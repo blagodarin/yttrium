@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	Logger::Level level(const StaticString &name, Allocator *allocator = HeapAllocator::instance()) const throw();
+	Logger::Level level(const StaticString &name) const throw();
 
 	bool open(const StaticString &file, Logger::OpenMode mode) throw();
 

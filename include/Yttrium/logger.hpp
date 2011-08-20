@@ -96,7 +96,7 @@ public:
 	}
 
 	Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance())
-		: _level(level(name, allocator))
+		: _level(level(name))
 		, _name(name, allocator)
 		, _message(allocator)
 	{
@@ -117,7 +117,7 @@ public:
 
 	///
 
-	static Level level(const StaticString &name, Allocator *allocator = HeapAllocator::instance());
+	static Level level(const StaticString &name) throw();
 
 	///
 	/// \note This function should not be used from multiple threads simultaneously.
