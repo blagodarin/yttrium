@@ -1,8 +1,7 @@
 #include <functional> // greater
 #include <map>        // map
 
-#include <Yttrium/logger.hpp>
-#include <Yttrium/static_string.hpp>
+#include <Yttrium/log_manager.hpp>
 #include <Yttrium/string.hpp>
 
 #include "files.hpp"
@@ -10,16 +9,23 @@
 namespace Yttrium
 {
 
-class LogManager
+class LogManager::Private
 {
+	friend class LogManager;
+
 public:
 
-	LogManager() throw()
+	Private() throw()
 		: _root_level(Logger::None)
 	{
 	}
 
 	Logger::Level level(const StaticString &name) const throw();
+
+	LogManager log_manager() throw()
+	{
+		return LogManager(this);
+	}
 
 	bool open(const StaticString &file, Logger::OpenMode mode) throw();
 

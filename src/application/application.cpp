@@ -31,4 +31,9 @@ void Application::initialize()
 	_private->initialize();
 }
 
+LogManager Application::log_manager() throw()
+{
+	return _private->_log_manager_private.log_manager();
+}
+
 } // namespace Yttrium

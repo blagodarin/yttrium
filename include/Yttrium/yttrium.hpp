@@ -9,6 +9,7 @@
 #include <Yttrium/assert.hpp>
 #include <Yttrium/files.hpp>
 #include <Yttrium/global.hpp>
+#include <Yttrium/log_manager.hpp>
 #include <Yttrium/logger.hpp>
 #include <Yttrium/object.hpp>
 #include <Yttrium/safe_bool.hpp>

@@ -4,7 +4,7 @@
 #ifndef __Y_APPLICATION_HPP
 #define __Y_APPLICATION_HPP
 
-#include <Yttrium/allocators.hpp>
+#include <Yttrium/log_manager.hpp>
 
 namespace Yttrium
 {
@@ -27,6 +27,11 @@ public:
 	/// \note This function is not reentrant!
 
 	void initialize();
+
+	///
+	/// \note The log manager can be retrieved before the Application initialization.
+
+	LogManager log_manager() throw();
 
 public:
 

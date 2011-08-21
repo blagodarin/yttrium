@@ -32,9 +32,9 @@ public:
 	{
 	}
 
-	LogManager &log_manager() throw()
+	LogManager::Private &log_manager_private() throw()
 	{
-		return _log_manager;
+		return _log_manager_private;
 	}
 
 public:
@@ -51,8 +51,8 @@ public:
 
 private:
 
-	HeapAllocatorImpl _heap_allocator;
-	LogManager        _log_manager;
+	HeapAllocatorImpl   _heap_allocator;
+	LogManager::Private _log_manager_private;
 
 private:
 

@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 
-Logger::Level LogManager::level(const StaticString &name) const throw()
+Logger::Level LogManager::Private::level(const StaticString &name) const throw()
 {
 	size_t prefix_size = name.find_first('.');
 	if (prefix_size == StaticString::End)
@@ -46,7 +46,7 @@ Logger::Level LogManager::level(const StaticString &name) const throw()
 	return _root_level;
 }
 
-bool LogManager::open(const StaticString &file, Logger::OpenMode mode) throw()
+bool LogManager::Private::open(const StaticString &file, Logger::OpenMode mode) throw()
 {
 	if (_log.open_file(file))
 	{
@@ -60,17 +60,17 @@ bool LogManager::open(const StaticString &file, Logger::OpenMode mode) throw()
 	return false;
 }
 
-void LogManager::set_level(const StaticString &name, Logger::Level level)
+void LogManager::Private::set_level(const StaticString &name, Logger::Level level)
 {
 	_levels.insert(Levels::value_type(String(name), level)); // NOTE: No allocator specified!
 }
 
-void LogManager::set_root_level(Logger::Level level) throw()
+void LogManager::Private::set_root_level(Logger::Level level) throw()
 {
 	_root_level = level;
 }
 
-bool LogManager::write(const void *buffer, size_t size) throw()
+bool LogManager::Private::write(const void *buffer, size_t size) throw()
 {
 	if (_log.write(buffer, size))
 	{
@@ -78,6 +78,41 @@ bool LogManager::write(const void *buffer, size_t size) throw()
 		return true;
 	}
 	return false;
+}
+
+Logger::Level LogManager::level(const StaticString &name) const throw()
+{
+	return _private->level(name);
+}
+
+bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level) throw()
+{
+	if (_private->open(file, mode))
+	{
+		_private->set_root_level(root_level);
+		return true;
+	}
+	return false;
+}
+
+Logger::Level LogManager::root_level() const throw()
+{
+	return _private->root_level();
+}
+
+void LogManager::set_level(const StaticString &name, Logger::Level level)
+{
+	_private->set_level(name, level);
+}
+
+void LogManager::set_root_level(Logger::Level level) throw()
+{
+	_private->set_root_level(level);
+}
+
+LogManager::LogManager(Private *private_) throw()
+	: _private(private_)
+{
 }
 
 } // namespace Yttrium

@@ -81,14 +81,14 @@ public:
 
 public:
 
-	Logger(Allocator *allocator = HeapAllocator::instance())
+	Logger(Allocator *allocator = HeapAllocator::instance()) throw()
 		: _level(root_level())
 		, _name(allocator)
 		, _message(allocator)
 	{
 	}
 
-	Logger(Level level, Allocator *allocator = HeapAllocator::instance())
+	Logger(Level level, Allocator *allocator = HeapAllocator::instance()) throw()
 		: _level(level)
 		, _name(allocator)
 		, _message(allocator)
@@ -113,29 +113,11 @@ public:
 		return Writer(*this, level, file, line, function);
 	}
 
-public:
-
-	///
+private:
 
 	static Level level(const StaticString &name) throw();
 
-	///
-	/// \note This function should not be used from multiple threads simultaneously.
-
-	static bool open(const StaticString &file, OpenMode mode = Rewrite, Level root_level = Info);
-
-	///
-
 	static Level root_level() throw();
-
-	///
-	/// \note This function should not be used from multiple threads simultaneously.
-
-	static void set_level(const StaticString &name, Level level);
-
-	///
-
-	static void set_root_level(Level level) throw();
 
 private:
 

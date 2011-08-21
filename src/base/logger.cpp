@@ -53,56 +53,25 @@ Logger::Level Logger::level(const StaticString &name) throw()
 {
 	if (Application::Private::exists())
 	{
-		return Application::Private::pointer()->log_manager().level(name);
+		return Application::Private::pointer()->log_manager_private().level(name);
 	}
 	return None;
-}
-
-bool Logger::open(const StaticString &file, OpenMode mode, Level root_level)
-{
-	if (Application::Private::exists())
-	{
-		LogManager &log_manager = Application::Private::pointer()->log_manager();
-
-		if (log_manager.open(file, mode))
-		{
-			log_manager.set_root_level(root_level);
-			return true;
-		}
-	}
-	return false;
 }
 
 Logger::Level Logger::root_level() throw()
 {
 	if (Application::Private::exists())
 	{
-		return Application::Private::pointer()->log_manager().root_level();
+		return Application::Private::pointer()->log_manager_private().root_level();
 	}
 	return None;
-}
-
-void Logger::set_level(const StaticString &name, Level level)
-{
-	if (Application::Private::exists())
-	{
-		Application::Private::pointer()->log_manager().set_level(name, level);
-	}
-}
-
-void Logger::set_root_level(Level level) throw()
-{
-	if (Application::Private::exists())
-	{
-		Application::Private::pointer()->log_manager().set_root_level(level);
-	}
 }
 
 void Logger::flush() throw()
 {
 	if (Application::Private::exists())
 	{
-		if (Application::Private::pointer()->log_manager().write(_message.text(), _message.size()))
+		if (Application::Private::pointer()->log_manager_private().write(_message.text(), _message.size()))
 		{
 			_message.clear();
 		}

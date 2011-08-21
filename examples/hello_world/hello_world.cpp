@@ -28,14 +28,22 @@ int main(int argc, char **argv)
 {
 	Application application;
 
-	Logger::open("hello_world.log", Logger::Rewrite, Logger::All);
+	// Set up the logging.
 
-	Logger::set_level("hello_universe", Logger::Fatal);
-	Logger::set_level("hello_world", Logger::Debug);
-	Logger::set_level("hello_world.bar", Logger::Info);
-	Logger::set_level("hello_world.pwn", Logger::Fatal);
+	LogManager log_manager = application.log_manager();
+
+	log_manager.open("hello_world.log", Logger::Rewrite, Logger::All);
+
+	log_manager.set_level("hello_universe", Logger::Fatal);
+	log_manager.set_level("hello_world", Logger::Debug);
+	log_manager.set_level("hello_world.bar", Logger::Info);
+	log_manager.set_level("hello_world.pwn", Logger::Fatal);
+
+	// Initialize the application.
 
 	application.initialize();
+
+	// Play!
 
 	Logger root_logger;
 
