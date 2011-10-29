@@ -1,7 +1,7 @@
-#ifndef __BASE_POSIX_FILES_HPP
-#define __BASE_POSIX_FILES_HPP
+#ifndef __BASE_POSIX_FILE_HPP
+#define __BASE_POSIX_FILE_HPP
 
-#include <Yttrium/files.hpp>
+#include <Yttrium/file.hpp>
 
 namespace Yttrium
 {

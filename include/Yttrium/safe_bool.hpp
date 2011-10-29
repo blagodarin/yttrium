@@ -9,15 +9,13 @@
 namespace Yttrium
 {
 
-class __SafeBool
+class Y_API __SafeBool
 {
 public:
 
 	typedef void (__SafeBool::*Type)();
 
-	void value()
-	{
-	}
+	void value();
 };
 
 /// Safe boolean type.

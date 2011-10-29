@@ -7,11 +7,12 @@
 #include <Yttrium/allocators.hpp>
 #include <Yttrium/application.hpp>
 #include <Yttrium/assert.hpp>
-#include <Yttrium/files.hpp>
+#include <Yttrium/file.hpp>
 #include <Yttrium/global.hpp>
 #include <Yttrium/log_manager.hpp>
 #include <Yttrium/logger.hpp>
 #include <Yttrium/object.hpp>
+#include <Yttrium/pool.hpp>
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>

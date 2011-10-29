@@ -51,7 +51,7 @@ public:
 
 		~Writer()
 		{
-			_logger._message << _location << "\r\n";
+			_logger._message << _location << Y_S("\r\n");
 			_logger.flush();
 		}
 
@@ -81,7 +81,7 @@ public:
 
 public:
 
-	Logger(Allocator *allocator = HeapAllocator::instance()) throw()
+	explicit Logger(Allocator *allocator = HeapAllocator::instance()) throw()
 		: _level(root_level())
 		, _name(allocator)
 		, _message(allocator)
@@ -140,7 +140,7 @@ private:
 #ifndef __Y_DEBUG
 	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level
 #else
-	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level, __FILE__, __LINE__, __func__
+	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level, Y_S(__FILE__), __LINE__, Y_S(__func__)
 #endif
 
 ///

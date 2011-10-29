@@ -16,6 +16,7 @@ namespace Yttrium
 {
 
 ///
+/// \note Strings with an allocated storage always store a zero terminator.
 
 class Y_API String
 {
@@ -30,14 +31,6 @@ public:
 		, _allocator(allocator)
 	{
 	}
-
-	///
-
-	String(const char *string, Allocator *allocator = HeapAllocator::instance());
-
-	///
-
-	String(const char *string, size_t size, Allocator *allocator = HeapAllocator::instance());
 
 	///
 
@@ -69,49 +62,13 @@ public:
 	* \overload
 	*/
 
-	String(const char *left, const StaticString &right, Allocator *allocator = HeapAllocator::instance());
-
-	/**
-	* \overload
-	*/
-
 	String(const StaticString &left, char right, Allocator *allocator = HeapAllocator::instance());
 
 	/**
 	* \overload
 	*/
 
-	String(const StaticString &left, const char *right, Allocator *allocator = HeapAllocator::instance());
-
-	/**
-	* \overload
-	*/
-
 	String(const StaticString &left, const StaticString &right, Allocator *allocator = HeapAllocator::instance());
-
-	/**
-	* \overload
-	*/
-
-	String(const char *string, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
-		: _text(const_cast<char *>(string))
-		, _size(strlen(string))
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
-
-	/**
-	* \overload
-	*/
-
-	String(const char *string, size_t size, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
-		: _text(const_cast<char *>(string))
-		, _size(size)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
 
 	/**
 	* \overload
@@ -160,18 +117,13 @@ public:
 		return const_cast<Allocator *>(_allocator);
 	}
 
-	/// Append the specified string \a s.
-
-	String &append(const char *string)
-	{
-		return append(string, strlen(string));
-	}
-
-	/// Append the specified \a string of known \a size.
-
-	String &append(const char *string, size_t size);
-
 	/// Append the specified \a string.
+
+	String &append(const char *text, size_t size);
+
+	/**
+	* \overload
+	*/
 
 	String &append(const StaticString &string)
 	{
@@ -182,9 +134,9 @@ public:
 	* \overload
 	*/
 
-	String &append(const String &string)
+	String &append(const char *text)
 	{
-		return append(string._text, string._size);
+		return append(text, strlen(text));
 	}
 
 	/// Append the specified \a symbol to the string \a count times.
@@ -238,6 +190,10 @@ public:
 
 	String &clear() throw();
 
+	///
+
+	int compare(const StaticString &string) const throw();
+
 	/// Return the number of occurences of any of the specified \a symbols in the string.
 	/// \param symbols The list of symbols to count.
 	/// \return The number of matching symbols in the string.
@@ -255,7 +211,7 @@ public:
 		{
 			// NOTE: We can swap the pointers (and allocators) here.
 
-			set(result._text, result._size);
+			set(result);
 		}
 		return *this;
 	}
@@ -318,20 +274,29 @@ public:
 
 	/// Set the string to the specified \a string.
 
-	String &set(const String &string);
+	String &set(const char *text, size_t size);
 
-	/// Set the string to the specified \a string.
+	/**
+	* \overload
+	*/
 
-	String &set(const char *string)
+	String &set(const StaticString &string)
 	{
-		return set(string, strlen(string));
+		return set(string.text(), string.size());
 	}
 
-	/// Set the string to the specified \a string of known \a size.
+	/**
+	* \overload
+	*/
 
-	String &set(const char *string, size_t size);
+	String &set(const char *text)
+	{
+		return set(text, strlen(text));
+	}
 
-	/// Set the string to the specified \a symbol.
+	/**
+	* \overload
+	*/
 
 	String &set(char symbol);
 
@@ -384,16 +349,7 @@ public:
 
 	String operator +(char symbol) const
 	{
-		return String(StaticString(*this), symbol);
-	}
-
-	/**
-	* \overload
-	*/
-
-	String operator +(const char *string) const
-	{
-		return String(StaticString(*this), string);
+		return String(*this, symbol);
 	}
 
 	/**
@@ -411,7 +367,7 @@ public:
 
 	String operator +(const String &string) const
 	{
-		return String(StaticString(*this), StaticString(string));
+		return String(*this, string);
 	}
 
 	///
@@ -425,18 +381,9 @@ public:
 	* \overload
 	*/
 
-	String &operator =(const char *string)
-	{
-		return set(string, strlen(string));
-	}
-
-	/**
-	* \overload
-	*/
-
 	String &operator =(const StaticString &string)
 	{
-		return set(string.text(), string.size());
+		return set(string);
 	}
 
 	/**
@@ -445,7 +392,7 @@ public:
 
 	String &operator =(const String &string)
 	{
-		return set(string._text, string._size);
+		return set(string);
 	}
 
 	///
@@ -459,18 +406,9 @@ public:
 	* \overload
 	*/
 
-	String &operator +=(const char *string)
-	{
-		return append(string, strlen(string));
-	}
-
-	/**
-	* \overload
-	*/
-
 	String &operator +=(const StaticString &string)
 	{
-		return append(string.text(), string.size());
+		return append(string);
 	}
 
 	/**
@@ -479,157 +417,49 @@ public:
 
 	String &operator +=(const String &string)
 	{
-		return append(string._text, string._size);
+		return append(string);
 	}
 
 	///
-
-	bool operator <(const char *string) const throw()
-	{
-		return (strcmp(_text, string) < 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator <(const StaticString &string) const throw()
-	{
-		return (strcmp(_text, string.text()) < 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator <(const String &string) const throw()
 	{
-		return (strcmp(_text, string._text) < 0);
+		return (compare(string) < 0);
 	}
 
 	///
-
-	bool operator >(const char *string) const throw()
-	{
-		return (strcmp(_text, string) > 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator >(const StaticString &string) const throw()
-	{
-		return (strcmp(_text, string.text()) > 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator >(const String &string) const throw()
 	{
-		return (strcmp(_text, string._text) > 0);
+		return (compare(string) > 0);
 	}
 
 	///
-
-	bool operator <=(const char *string) const throw()
-	{
-		return (strcmp(_text, string) <= 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator <=(const StaticString &string) const throw()
-	{
-		return (strcmp(_text, string.text()) <= 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator <=(const String &string) const throw()
 	{
-		return (strcmp(_text, string._text) <= 0);
+		return (compare(string) <= 0);
 	}
 
 	///
-
-	bool operator >=(const char *string) const throw()
-	{
-		return (strcmp(_text, string) >= 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator >=(const StaticString &string) const throw()
-	{
-		return (strcmp(_text, string.text()) >= 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator >=(const String &string) const throw()
 	{
-		return (strcmp(_text, string._text) >= 0);
+		return (compare(string) >= 0);
 	}
 
 	///
 
-	bool operator ==(const char *string) const throw()
+	bool operator ==(const String &string) const throw()
 	{
-		return (strcmp(_text, string) == 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator ==(const StaticString &right) const throw()
-	{
-		return (_size == right.size() && strcmp(_text, right.text()) == 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator ==(const String &right) const throw()
-	{
-		return (_size == right._size && strcmp(_text, right._text) == 0);
+		return (_size == string._size && compare(string) == 0);
 	}
 
 	///
-
-	bool operator !=(const char *string) const throw()
-	{
-		return (strcmp(_text, string) != 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator !=(const StaticString &string) const throw()
-	{
-		return (_size != string.size() || strcmp(_text, string.text()) != 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator !=(const String &string) const throw()
 	{
-		return (_size != string._size || strcmp(_text, string._text) != 0);
+		return (_size != string._size || compare(string) != 0);
 	}
 
 public:
@@ -692,9 +522,12 @@ private:
 	// (_buffer_size  > 0) => real string; ref_counter = *reinterpret_cast<size_t*>(_text - sizeof(size_t))
 	// (_buffer_size == 0) => 'const char *' string
 
+	// NOTE: The first two data members should match StaticString's ones,
+	// this may allow better optimization of String to StaticString casts.
+
 	char      *_text;
-	size_t    _size;
-	size_t    _buffer_size;
+	size_t     _size;
+	size_t     _buffer_size;
 	Allocator *_allocator;
 
 private:
@@ -704,7 +537,7 @@ private:
 
 /// Concatenate the arguments into a single string.
 
-inline String operator +(const char left, const StaticString &right)
+inline String operator +(char left, const StaticString &right)
 {
 	return String(left, right);
 }
@@ -756,18 +589,9 @@ inline String &operator <<(String &left, char right)
 * \overload
 */
 
-inline String &operator <<(String &left, const char *right)
-{
-	return left.append(right, strlen(right));
-}
-
-/**
-* \overload
-*/
-
 inline String &operator <<(String &left, const StaticString &right)
 {
-	return left.append(right.text(), right.size());
+	return left.append(right);
 }
 
 /**
@@ -776,7 +600,7 @@ inline String &operator <<(String &left, const StaticString &right)
 
 inline String &operator <<(String &left, const String &right)
 {
-	return left.append(right.text(), right.size());
+	return left.append(right);
 }
 
 /**

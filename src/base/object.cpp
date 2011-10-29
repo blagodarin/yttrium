@@ -12,6 +12,8 @@ Object::~Object() throw()
 void Object::increment() throw()
 {
 	++_counter;
+
+	Y_ASSERT(_counter > 0); // Check for counter overflow.
 }
 
 void Object::decrement() throw()

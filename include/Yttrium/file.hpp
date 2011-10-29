@@ -1,8 +1,8 @@
 /// \file
 /// \brief File facilities.
 
-#ifndef __Y_FILES_HPP
-#define __Y_FILES_HPP
+#ifndef __Y_FILE_HPP
+#define __Y_FILE_HPP
 
 #include <Yttrium/allocators.hpp>
 #include <Yttrium/object.hpp>
@@ -177,4 +177,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __Y_FILES_HPP
+#endif // __Y_FILE_HPP

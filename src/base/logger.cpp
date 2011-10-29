@@ -1,4 +1,4 @@
-#include <Yttrium/files.hpp>
+#include <Yttrium/file.hpp>
 #include <Yttrium/logger.hpp>
 #include <Yttrium/time.hpp>
 
@@ -20,7 +20,7 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 		.append_dec(now.minute, 2, true)
 		.append(':')
 		.append_dec(now.second, 2, true)
-		.append("] ");
+		.append(Y_S("] "));
 
 	if (_logger._name)
 	{
@@ -29,21 +29,21 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 
 	switch (level)
 	{
-	case Fatal:   _logger._message << "fatal: ";   break;
-	case Error:   _logger._message << "error: ";   break;
-	case Warning: _logger._message << "warning: "; break;
-	case Info:    _logger._message << "info: ";    break;
-	case Debug:   _logger._message << "debug: ";   break;
-	case Trace:   _logger._message << "trace: ";   break;
-	default:                                       break;
+	case Fatal:   _logger._message << Y_S("fatal: ");   break;
+	case Error:   _logger._message << Y_S("error: ");   break;
+	case Warning: _logger._message << Y_S("warning: "); break;
+	case Info:    _logger._message << Y_S("info: ");    break;
+	case Debug:   _logger._message << Y_S("debug: ");   break;
+	case Trace:   _logger._message << Y_S("trace: ");   break;
+	default:                                            break;
 	}
 
 	if (file)
 	{
-		_location << " {" << file << ':' << line;
+		_location << Y_S(" {") << file << ':' << line;
 		if (function)
 		{
-			_location << "::" << function;
+			_location << Y_S(" - ") << function;
 		}
 		_location << '}';
 	}

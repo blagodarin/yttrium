@@ -17,7 +17,7 @@
 /// \def Y_API
 /// \brief %Yttrium API specifier.
 
-// GCC supports __declspec(dllexport) and __declspec(dllimport).
+// GCC (thus MinGW) supports __declspec(dllexport) and __declspec(dllimport).
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	#ifdef __Y_API_EXPORT

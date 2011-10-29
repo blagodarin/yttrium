@@ -16,22 +16,6 @@ enum
 	StringGrowStep  = 256, ///< Linear String grow step after the boundary.
 };
 
-String::String(const char *string, Allocator *allocator)
-	: _size(strlen(string))
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
-	, _allocator(allocator)
-{
-	init(string, _size);
-}
-
-String::String(const char *string, size_t size, Allocator *allocator)
-	: _size(size)
-	, _buffer_size(max<size_t>(size + 1, StringReserve))
-	, _allocator(allocator)
-{
-	init(string, size);
-}
-
 String::String(const StaticString &string, Allocator *allocator)
 	: _size(string.size())
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
@@ -75,18 +59,6 @@ String::String(char left, const StaticString& right, Allocator *allocator)
 	_text[_size] = '\0';
 }
 
-String::String(const char *left, const StaticString &right, Allocator *allocator)
-	: _size(strlen(left) + right.size())
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
-	, _allocator(allocator)
-{
-	init();
-	size_t left_size = _size - right.size();
-	memcpy(_text, left, left_size);
-	memcpy(&_text[left_size], right.text(), right.size());
-	_text[_size] = '\0';
-}
-
 String::String(const StaticString &left, char right, Allocator *allocator)
 	: _size(left.size() + 1)
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
@@ -95,17 +67,6 @@ String::String(const StaticString &left, char right, Allocator *allocator)
 	init();
 	memcpy(_text, left.text(), left.size());
 	_text[left.size()] = right;
-	_text[_size] = '\0';
-}
-
-String::String(const StaticString &left, const char *right, Allocator *allocator)
-	: _size(left.size() + strlen(right))
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
-	, _allocator(allocator)
-{
-	init();
-	memcpy(_text, left.text(), left.size());
-	memcpy(&_text[left.size()], right, _size - left.size());
 	_text[_size] = '\0';
 }
 
@@ -120,7 +81,7 @@ String::String(const StaticString &left, const StaticString &right, Allocator *a
 	_text[_size] = '\0';
 }
 
-String &String::append(const char *string, size_t size)
+String &String::append(const char *text, size_t size)
 {
 	size_t new_size = _size + size;
 	if (_buffer_size)
@@ -132,7 +93,7 @@ String &String::append(const char *string, size_t size)
 		char *old_text = init(new_size + 1);
 		memcpy(_text, old_text, _size);
 	}
-	memcpy(&_text[_size], string, size);
+	memcpy(&_text[_size], text, size);
 	_text[new_size] = '\0';
 	_size = new_size;
 	return *this;
@@ -272,6 +233,20 @@ String &String::clear() throw()
 	_text = const_cast<char *>(&Null);
 	_size = 0;
 	return *this;
+}
+
+int String::compare(const StaticString &string) const throw()
+{
+	if (_size < string.size())
+	{
+		int result = memcmp(_text, string.text(), _size);
+		return (result ? result : (string[_size] == '\0' ? 0 : -1));
+	}
+	else
+	{
+		int result = memcmp(_text, string.text(), string.size());
+		return (result ? result : (_text[string.size()] == '\0' ? 0 : 1));
+	}
 }
 
 size_t String::count(const char *symbols) const throw()
@@ -783,7 +758,7 @@ String& String::set(char symbol)
 	return *this;
 }
 
-String& String::set(const char *string, size_t size)
+String& String::set(const char *text, size_t size)
 {
 	size_t buffer_size = size + 1;
 
@@ -796,7 +771,7 @@ String& String::set(const char *string, size_t size)
 		init(buffer_size);
 	}
 
-	memcpy(_text, string, size);
+	memcpy(_text, text, size);
 	_text[size] = '\0';
 	_size = size;
 	return *this;

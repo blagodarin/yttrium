@@ -1,5 +1,6 @@
 /// \file
 /// \brief Static string.
+/// \note The idea behind the static string with length is that the length of the string is almost always known.
 
 #ifndef __Y_STATIC_STRING_HPP
 #define __Y_STATIC_STRING_HPP
@@ -8,12 +9,20 @@
 
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/types.hpp>
+#include <Yttrium/utils.hpp>
+
+// We don't need const char * operations since we can convert the vast majority of strings
+// (even the literal ones) to StaticStrings of a specified length.
+
+// NOTE: There is no fun in having to write static string algorithms in two variants
+// (for static and dynamic strings), so we should do something about it.
 
 namespace Yttrium
 {
 
 /// Static string wrapper class.
-/// \note A StaticString can't hold \c NULL and, therefore, is always valid.
+/// \note Static strings can't implicitly hold \c NULL and therefore should always be valid.
+/// \note Static strings may have no zero terminator.
 
 class StaticString
 {
@@ -46,14 +55,13 @@ public:
 	{
 	}
 
+public:
+
 	/// Compares the string with the specified \a string.
 	/// \param string The string to compare with.
-	/// \return \c strcmp result.
+	/// \return \c memcmp result.
 
-	int compare(const StaticString &string) const throw()
-	{
-		return strcmp(_text, string._text);
-	}
+	int compare(const StaticString &string) const throw();
 
 	///
 
@@ -97,156 +105,73 @@ public:
 
 	///
 
-	bool operator <(const char *string) const throw()
-	{
-		return (strcmp(_text, string) < 0);
-	}
-
-	/**
-	* \overload
-	*/
-
 	bool operator <(const StaticString &string) const throw()
 	{
-		return (strcmp(_text, string._text) < 0);
+		return (compare(string) < 0);
 	}
 
 	///
-
-	bool operator >(const char *string) const throw()
-	{
-		return (strcmp(_text, string) > 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator >(const StaticString &string) const throw()
 	{
-		return (strcmp(_text, string._text) > 0);
+		return (compare(string) > 0);
 	}
 
 	///
-
-	bool operator <=(const char *string) const throw()
-	{
-		return (strcmp(_text, string) <= 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator <=(const StaticString &string) const throw()
 	{
-		return (strcmp(_text, string._text) <= 0);
+		return (compare(string) <= 0);
 	}
 
 	///
-
-	bool operator >=(const char *string) const throw()
-	{
-		return (strcmp(_text, string) >= 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator >=(const StaticString &string) const throw()
 	{
-		return (strcmp(_text, string._text) >= 0);
+		return (compare(string) >= 0);
 	}
 
 	///
 
-	bool operator ==(const char *string) const throw()
+	bool operator ==(const StaticString &string) const throw()
 	{
-		return (strcmp(_text, string) == 0);
-	}
-
-	/**
-	* \overload
-	*/
-
-	bool operator ==(const StaticString &right) const throw()
-	{
-		return (_size == right._size && strcmp(_text, right._text) == 0);
+		return (_size == string._size && compare(string) == 0);
 	}
 
 	///
-
-	bool operator !=(const char *string) const throw()
-	{
-		return (strcmp(_text, string) != 0);
-	}
-
-	/**
-	* \overload
-	*/
 
 	bool operator !=(const StaticString &string) const throw()
 	{
-		return (_size != string._size || strcmp(_text, string._text) != 0);
+		return (_size != string._size || compare(string) != 0);
 	}
 
 public:
 
+	///
+
 	static const size_t End = SIZE_MAX;
 
-private:
+protected:
 
 	const char *_text;
-	size_t     _size;
+	size_t      _size;
 
 private:
 
 	static const char Null = '\0';
 };
 
-///
-
-inline bool operator <(const char *left, const StaticString &right) throw()
-{
-	return (strcmp(left, right.text()) < 0);
-}
-
-///
-
-inline bool operator >(const char *left, const StaticString &right) throw()
-{
-	return (strcmp(left, right.text()) > 0);
-}
-
-///
-
-inline bool operator <=(const char *left, const StaticString &right) throw()
-{
-	return (strcmp(left, right.text()) <= 0);
-}
-
-///
-
-inline bool operator >=(const char *left, const StaticString &right) throw()
-{
-	return (strcmp(left, right.text()) >= 0);
-}
-
-///
-
-inline bool operator ==(const char *left, const StaticString &right) throw()
-{
-	return (strcmp(left, right.text()) == 0);
-}
-
-///
-
-inline bool operator !=(const char *left, const StaticString &right) throw()
-{
-	return (strcmp(left, right.text()) != 0);
-}
-
 } // namespace Yttrium
+
+///
+
+#define Y_S(literal) Yttrium::StaticString(literal, sizeof(literal) - 1)
+
+// NOTE: GCC 4.7 required.
+
+//Yttrium::StaticString operator "" _y(const char *text, size_t size) throw()
+//{
+//	return StaticString(text, size);
+//}
 
 #endif // __Y_STATIC_STRING_HPP

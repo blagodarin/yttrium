@@ -3,6 +3,16 @@
 namespace Yttrium
 {
 
+namespace
+{
+
+enum
+{
+	RateCounterPeriod = 1000, // The rate changes at most once per second.
+};
+
+} // namespace
+
 Clock Timer::reset() throw()
 {
 	Clock result = _time;
@@ -66,7 +76,7 @@ void RateCounter::tick() throw()
 	Clock time = Timer::clock();
 	_total_time += time - _last_time;
 	++_ticks;
-	if (_total_time >= 1000) // NOTE: The rate changes at most once per second.
+	if (_total_time >= RateCounterPeriod)
 	{
 		_rate = _ticks * 1000 / _total_time;
 		_total_time = 0;
