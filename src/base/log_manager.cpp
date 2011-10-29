@@ -18,7 +18,7 @@ Logger::Level LogManager::Private::level(const StaticString &name) const throw()
 
 	prefix_buffer[0] = '\0';
 
-	String prefix(StaticString(prefix_buffer, 0), String::Reference, NULL);
+	String prefix(prefix_buffer, 0, String::Reference, NULL);
 
 	Levels::const_iterator begin = _levels.lower_bound(String(name, String::Reference, NULL));
 	Levels::const_iterator end = _levels.upper_bound(prefix.set(name.text(), prefix_size));

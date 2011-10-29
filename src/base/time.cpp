@@ -3,15 +3,10 @@
 namespace Yttrium
 {
 
-namespace
-{
-
 enum
 {
 	RateCounterPeriod = 1000, // The rate changes at most once per second.
 };
-
-} // namespace
 
 Clock Timer::reset() throw()
 {

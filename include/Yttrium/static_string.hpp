@@ -5,7 +5,7 @@
 #ifndef __Y_STATIC_STRING_HPP
 #define __Y_STATIC_STRING_HPP
 
-#include <cstring> // strcmp, strlen
+#include <cstring> // strlen
 
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/types.hpp>
@@ -14,9 +14,6 @@
 // We don't need const char * operations since we can convert the vast majority of strings
 // (even the literal ones) to StaticStrings of a specified length.
 
-// NOTE: There is no fun in having to write static string algorithms in two variants
-// (for static and dynamic strings), so we should do something about it.
-
 namespace Yttrium
 {
 
@@ -24,14 +21,16 @@ namespace Yttrium
 /// \note Static strings can't implicitly hold \c NULL and therefore should always be valid.
 /// \note Static strings may have no zero terminator.
 
-class StaticString
+class Y_API StaticString
 {
+	friend class String;
+
 public:
 
 	/// Construct an empty StaticString.
 
 	StaticString() throw()
-		: _text(&Null)
+		: _text(const_cast<char *>(&Null))
 		, _size(0)
 	{
 	}
@@ -40,7 +39,7 @@ public:
 	/// \param text Source text.
 
 	StaticString(const char *text) throw()
-		: _text(text)
+		: _text(const_cast<char *>(text))
 		, _size(strlen(text))
 	{
 	}
@@ -50,7 +49,7 @@ public:
 	/// \param size Source text size.
 
 	StaticString(const char *text, size_t size) throw()
-		: _text(text)
+		: _text(const_cast<char *>(text))
 		, _size(size)
 	{
 	}
@@ -62,6 +61,14 @@ public:
 	/// \return \c memcmp result.
 
 	int compare(const StaticString &string) const throw();
+
+	/// Return the number of occurences of any of the specified \a symbols in the string.
+	/// \param symbols The list of symbols to count.
+	/// \return The number of matching symbols in the string.
+	/// \note If the same symbol appears several times in the \a symbols list,
+	/// it will count the same number of times.
+
+	size_t count(const char *symbols) const throw();
 
 	///
 
@@ -86,6 +93,42 @@ public:
 	{
 		return _text;
 	}
+
+	/// Convert to decimal \c double as much of the string as possible.
+	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
+
+	double to_double() const throw();
+
+	/// Convert to decimal \c int32_t as much of the string as possible.
+
+	int32_t to_int32() const throw();
+
+	/// Convert to decimal \c int64_t as much of the string as possible.
+
+	int64_t to_int64() const throw();
+
+	/// Try to interpret the string as a raw undecorated \a value.
+
+	bool to_number(int32_t &value) const throw();
+
+	/**
+	* \overload
+	*/
+
+	bool to_number(double &value) const throw();
+
+	/// Convert to decimal \c double time as much of the string as possible.
+	/// \note The time must be in form "[+|-][[HH:]MM:]SS[.{Z}]".
+
+	double to_time() const throw();
+
+	/// Convert to decimal \c uint32_t as much of the string as possible.
+
+	uint32_t to_uint32() const throw();
+
+	/// Convert to decimal \c uint64_t as much of the string as possible.
+
+	uint64_t to_uint64() const throw();
 
 public:
 
@@ -151,10 +194,17 @@ public:
 
 	static const size_t End = SIZE_MAX;
 
-protected:
+private:
 
-	const char *_text;
-	size_t      _size;
+	char   *_text;
+	size_t  _size;
+
+private:
+
+	StaticString(size_t size) throw()
+		: _size(size)
+	{
+	}
 
 private:
 
