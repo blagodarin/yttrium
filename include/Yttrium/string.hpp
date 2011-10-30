@@ -4,7 +4,7 @@
 #ifndef __Y_STRING_HPP
 #define __Y_STRING_HPP
 
-#include <cstring> // strcmp, strlen
+#include <cstring> // strlen
 
 #include <Yttrium/allocators.hpp>
 #include <Yttrium/global.hpp>
@@ -74,37 +74,6 @@ public:
 
 	String(char left, const StaticString& right, Allocator *allocator = HeapAllocator::instance());
 
-	///
-
-	String(const char *text, size_t size, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
-		: StaticString(text, size)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
-
-	/**
-	* \overload
-	*/
-
-	String(const StaticString &string, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
-		: StaticString(string)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
-
-	/**
-	* \overload
-	*/
-
-	String(const char *text, SafeBool, Allocator *allocator = HeapAllocator::instance()) throw()
-		: StaticString(text)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
-
 	/// Destructor.
 
 	~String() throw()
@@ -117,6 +86,52 @@ public:
 				_allocator->deallocate(references);
 			}
 		}
+	}
+
+public:
+
+	/// Reference specifier type.
+
+	struct ReferenceSpecifier
+	{
+	};
+
+	/// Reference specifier.
+
+	static const ReferenceSpecifier Reference;
+
+	/// Reference constructor.
+	/// \param text
+	/// \param size
+	/// \param allocator
+
+	String(const char *text, size_t size, const ReferenceSpecifier &, Allocator *allocator = HeapAllocator::instance()) throw()
+		: StaticString(text, size)
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
+	}
+
+	/**
+	* \overload
+	*/
+
+	String(const StaticString &string, const ReferenceSpecifier &, Allocator *allocator = HeapAllocator::instance()) throw()
+		: StaticString(string)
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
+	}
+
+	/**
+	* \overload
+	*/
+
+	String(const char *text, const ReferenceSpecifier &, Allocator *allocator = HeapAllocator::instance()) throw()
+		: StaticString(text)
+		, _buffer_size(0)
+		, _allocator(allocator)
+	{
 	}
 
 public:
@@ -344,12 +359,6 @@ public:
 		return String(20).append_dec(value, width, zeros);
 	}
 
-public:
-
-	///
-
-	static SafeBool Reference;
-
 private:
 
 	void grow(size_t buffer_size);
@@ -366,7 +375,7 @@ private:
 	// (_buffer_size == 0) => static string
 
 	size_t     _buffer_size;
-	Allocator* _allocator;
+	Allocator *_allocator;
 };
 
 /// Concatenate the arguments into a single string.

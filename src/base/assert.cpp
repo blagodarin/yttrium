@@ -7,7 +7,7 @@
 namespace Yttrium
 {
 
-void abort(const StaticString &message, const char *file, int line, const char *function) throw()
+void abort(const StaticString &message, const StaticString &file, int line, const StaticString &function) throw()
 {
 	if (message)
 	{

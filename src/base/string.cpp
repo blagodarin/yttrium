@@ -87,6 +87,8 @@ String::String(char left, const StaticString& right, Allocator *allocator)
 	_text[_size] = '\0';
 }
 
+const String::ReferenceSpecifier String::Reference = String::ReferenceSpecifier();
+
 String &String::append(const char *text, size_t size)
 {
 	size_t new_size = _size + size;
@@ -410,8 +412,6 @@ String& String::set(const char *text, size_t size)
 	_size = size;
 	return *this;
 }
-
-SafeBool String::Reference = Y_SAFE_TRUE;
 
 void String::grow(size_t buffer_size)
 {
