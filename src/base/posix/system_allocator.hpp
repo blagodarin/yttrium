@@ -1,17 +1,17 @@
-#ifndef __BASE_HEAP_ALLOCATOR_HPP
-#define __BASE_HEAP_ALLOCATOR_HPP
+#ifndef __BASE_POSIX_SYSTEM_ALLOCATOR_HPP
+#define __BASE_POSIX_SYSTEM_ALLOCATOR_HPP
 
 #include <Yttrium/allocator.hpp>
 
 namespace Yttrium
 {
 
-class HeapAllocatorImpl
-	: public HeapAllocator
+class SystemAllocatorImpl
+	: public SystemAllocator
 {
 public:
 
-	HeapAllocatorImpl() throw();
+	SystemAllocatorImpl() throw();
 
 public: // Allocator
 
@@ -23,13 +23,22 @@ public: // Allocator
 
 	virtual Status status() const throw();
 
+public: // SystemAllocator
+
+	virtual size_t lower_bound(size_t size) const throw();
+
+	virtual size_t upper_bound(size_t size) const throw();
+
+private:
+
+	static const size_t reserved_size;
+
 private:
 
 	AtomicStatus _status;
+	size_t       _page_size;
 };
-
-extern HeapAllocatorImpl *_heap_allocator;
 
 } // namespace Yttrium
 
-#endif // __BASE_HEAP_ALLOCATOR_HPP
+#endif // __BASE_POSIX_SYSTEM_ALLOCATOR_HPP

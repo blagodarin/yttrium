@@ -1,6 +1,6 @@
 #include <cstdlib> // abort
 
-#include <Yttrium/allocators.hpp>
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/assert.hpp>
 #include <Yttrium/logger.hpp>
 

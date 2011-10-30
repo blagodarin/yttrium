@@ -4,7 +4,7 @@
 #ifndef __Y_FILE_HPP
 #define __Y_FILE_HPP
 
-#include <Yttrium/allocators.hpp>
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/object.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/types.hpp>

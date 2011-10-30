@@ -4,7 +4,7 @@
 #ifndef __Y_LOGGER_HPP
 #define __Y_LOGGER_HPP
 
-#include <Yttrium/allocators.hpp>
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 

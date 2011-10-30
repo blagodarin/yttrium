@@ -4,7 +4,8 @@
 #ifndef __Y_ALLOCATORS_HPP
 #define __Y_ALLOCATORS_HPP
 
-#include <new> // new
+#include <atomic> // atomic_*
+#include <new>    // new
 
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/types.hpp>
@@ -26,6 +27,24 @@ public:
 		MayNotMove, ///< The memory may not be relocated.
 	};
 
+	///
+
+	struct Difference
+	{
+		size_t allocated;
+		size_t total;
+		bool   positive;
+
+		Difference &set(size_t allocated, size_t total, bool positive) throw()
+		{
+			this->allocated = allocated;
+			this->total = total;
+			this->positive = positive;
+
+			return *this;
+		}
+	};
+
 	/// %Allocator status.
 
 	struct Status
@@ -40,30 +59,51 @@ public:
 
 		///
 
-		Status()
-			: allocated_blocks(0)
-			, allocated_bytes(0)
-			, total_bytes(0)
-			, allocations(0)
-			, reallocations(0)
-			, deallocations(0)
-		{
-		}
+		Status() throw();
+	};
+
+	/// Atomic allocator status.
+
+	class AtomicStatus
+	{
+	public:
+
+		AtomicStatus() throw();
+
+		void allocate(const Difference &difference) throw();
+
+		void deallocate(const Difference &difference) throw();
+
+		void reallocate(const Difference &difference) throw();
+
+	public:
+
+		operator Status() const throw();
+
+	private:
+
+		std::atomic<size_t> _allocated_blocks;
+		std::atomic<size_t> _allocated_bytes;
+		std::atomic<size_t> _total_bytes;
+
+		std::atomic<size_t> _allocations;
+		std::atomic<size_t> _reallocations;
+		std::atomic<size_t> _deallocations;
 	};
 
 public:
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0) = 0;
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = NULL) = 0;
 
 	///
 
-	virtual void deallocate(void *pointer) throw() = 0;
+	virtual void deallocate(void *pointer, Difference *difference = NULL) throw() = 0;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove) = 0;
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = NULL) = 0;
 
 	///
 
@@ -174,15 +214,15 @@ public: // Allocator
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0);
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = NULL);
 
 	///
 
-	virtual void deallocate(void *pointer) throw();
+	virtual void deallocate(void *pointer, Difference *difference = NULL) throw();
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove);
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = NULL);
 
 	///
 
@@ -191,8 +231,8 @@ public: // Allocator
 private:
 
 	Allocator    *_allocator;
-	Status       _status;
-	StaticString _name;
+	AtomicStatus  _status;
+	StaticString  _name;
 };
 
 /// An allocator-managed object with overloaded \c new and \c delete operators.

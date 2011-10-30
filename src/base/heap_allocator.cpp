@@ -1,13 +1,7 @@
 #include <cstdlib> // free, malloc, realloc
 #include <new>     // bad_alloc
 
-#include <Yttrium/allocators.hpp>
-#include <Yttrium/assert.hpp>
-#include <Yttrium/types.hpp>
-
 #include "heap_allocator.hpp"
-
-// NOTE: We should be GCC-compatible here.
 
 // NOTE: The current implementation lamely uses CRT memory allocation routines.
 
@@ -18,7 +12,7 @@ HeapAllocatorImpl::HeapAllocatorImpl() throw()
 {
 }
 
-void *HeapAllocatorImpl::allocate(size_t size, size_t align)
+void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
 {
 	void *pointer = malloc(size);
 	if (!pointer)
@@ -26,30 +20,30 @@ void *HeapAllocatorImpl::allocate(size_t size, size_t align)
 		throw std::bad_alloc();
 	}
 
-	//__sync_add_and_fetch(&_status.total_bytes, total_bytes);
-	//__sync_add_and_fetch(&_status.allocated_bytes, allocated_bytes);
-	__sync_add_and_fetch(&_status.allocated_blocks, 1);
+	Difference local_difference;
 
-	__sync_add_and_fetch(&_status.allocations, 1);
+	if (!difference)
+		difference = &local_difference;
+	_status.allocate(difference->set(0, 0, true));
 
 	return pointer;
 }
 
-void HeapAllocatorImpl::deallocate(void *pointer) throw()
+void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference) throw()
 {
 	if (pointer)
 	{
 		free(pointer);
 
-		__sync_sub_and_fetch(&_status.allocated_blocks, 1);
-		//__sync_sub_and_fetch(&_status.allocated_bytes, allocated_bytes);
-		//__sync_sub_and_fetch(&_status.total_bytes, total_bytes);
+		Difference local_difference;
 
-		__sync_add_and_fetch(&_status.deallocations, 1);
+		if (!difference)
+			difference = &local_difference;
+		_status.deallocate(difference->set(0, 0, false));
 	}
 }
 
-void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability)
+void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	if (movability == MayNotMove)
 	{
@@ -62,22 +56,11 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 		throw std::bad_alloc();
 	}
 
-//	if (new_total_bytes > total_bytes)
-//	{
-//		size_t difference = new_total_bytes - total_bytes;
-//
-//		__sync_add_and_fetch(&_status.total_bytes, difference);
-//		__sync_add_and_fetch(&_status.allocated_bytes, difference);
-//	}
-//	else
-//	{
-//		size_t difference = total_bytes - new_total_bytes;
-//
-//		__sync_sub_and_fetch(&_status.allocated_bytes, difference);
-//		__sync_sub_and_fetch(&_status.total_bytes, difference);
-//	}
+	Difference local_difference;
 
-	__sync_add_and_fetch(&_status.reallocations, 1);
+	if (!difference)
+		difference = &local_difference;
+	_status.reallocate(difference->set(0, 0, true));
 
 	return new_pointer;
 }

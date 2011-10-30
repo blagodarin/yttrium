@@ -4,7 +4,7 @@
 #ifndef __Y_OBJECT_HPP
 #define __Y_OBJECT_HPP
 
-#include <Yttrium/allocators.hpp>
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/types.hpp>
 

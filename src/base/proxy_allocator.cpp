@@ -1,6 +1,4 @@
-#include <Yttrium/allocators.hpp>
-
-// NOTE: We should be GCC-compatible here.
+#include <Yttrium/allocator.hpp>
 
 namespace Yttrium
 {
@@ -11,57 +9,40 @@ ProxyAllocator::ProxyAllocator(Allocator *allocator, const StaticString &name)
 {
 }
 
-void *ProxyAllocator::allocate(size_t size, size_t align)
+void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference)
 {
-	Status before = _allocator->status();
-	void *pointer = _allocator->allocate(size, align);
-	Status after = _allocator->status();
+	Difference local_difference;
 
-	__sync_add_and_fetch(&_status.total_bytes, after.total_bytes - before.total_bytes);
-	__sync_add_and_fetch(&_status.allocated_bytes, after.allocated_bytes - before.allocated_bytes);
-	__sync_add_and_fetch(&_status.allocated_blocks, 1);
-
-	__sync_add_and_fetch(&_status.allocations, 1);
+	if (!difference)
+		difference = &local_difference;
+	void *pointer = _allocator->allocate(size, align, difference);
+	_status.allocate(*difference);
 
 	return pointer;
 }
 
-void ProxyAllocator::deallocate(void *pointer) throw()
+void ProxyAllocator::deallocate(void *pointer, Difference *difference) throw()
 {
 	if (pointer)
 	{
-		Status before = _allocator->status();
-		_allocator->deallocate(pointer);
-		Status after = _allocator->status();
+		Difference local_difference;
 
-		__sync_sub_and_fetch(&_status.allocated_blocks, 1);
-		__sync_sub_and_fetch(&_status.allocated_bytes, before.allocated_bytes - after.allocated_bytes);
-		__sync_sub_and_fetch(&_status.total_bytes, before.total_bytes - after.total_bytes);
-
-		__sync_add_and_fetch(&_status.deallocations, 1);
+		if (!difference)
+			difference = &local_difference;
+		_allocator->deallocate(pointer, difference);
+		_status.deallocate(*difference);
 	}
 }
 
-void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movability)
+void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
-	Status before = _allocator->status();
-	void *new_pointer = _allocator->reallocate(pointer, size, movability);
-	Status after = _allocator->status();
+	Difference local_difference;
 
-	if (new_pointer && before.reallocations != after.reallocations)
-	{
-		if (after.allocated_bytes > before.allocated_bytes)
-		{
-			__sync_add_and_fetch(&_status.total_bytes, after.total_bytes - before.total_bytes);
-			__sync_add_and_fetch(&_status.allocated_bytes, after.allocated_bytes - before.allocated_bytes);
-		}
-		else
-		{
-			__sync_sub_and_fetch(&_status.allocated_bytes, before.allocated_bytes - after.allocated_bytes);
-			__sync_sub_and_fetch(&_status.total_bytes, before.total_bytes - after.total_bytes);
-		}
-		__sync_add_and_fetch(&_status.reallocations, 1);
-	}
+	if (!difference)
+		difference = &local_difference;
+	void *new_pointer = _allocator->reallocate(pointer, size, movability, difference);
+	if (new_pointer)
+		_status.reallocate(*difference);
 
 	return new_pointer;
 }

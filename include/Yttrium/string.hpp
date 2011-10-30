@@ -6,7 +6,7 @@
 
 #include <cstring> // strlen
 
-#include <Yttrium/allocators.hpp>
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/global.hpp>
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/static_string.hpp>

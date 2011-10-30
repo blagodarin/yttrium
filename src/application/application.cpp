@@ -1,18 +1,24 @@
+#include <atomic>  // atomic_*
+#include <cstddef> // size_t
+
 #include <Yttrium/application.hpp>
 
 #include "private.hpp"
 
-// NOTE: We should be GCC-compatible here.
-
 namespace Yttrium
 {
 
-static size_t _application_private_references = 0;
+namespace
+{
+
+std::atomic<size_t> _application_private_references(0);
+
+} // namespace
 
 Application::Application() throw()
 	: _private(Private::pointer())
 {
-	if (!__sync_fetch_and_add(&_application_private_references, 1))
+	if (!std::atomic_fetch_add<size_t>(&_application_private_references, 1))
 	{
 		new(_private) Private();
 	}
@@ -20,7 +26,7 @@ Application::Application() throw()
 
 Application::~Application() throw()
 {
-	if (!__sync_sub_and_fetch(&_application_private_references, 1))
+	if (std::atomic_fetch_sub<size_t>(&_application_private_references, 1) == 1)
 	{
 		_private->Private::~Private();
 	}
