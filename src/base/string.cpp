@@ -76,7 +76,7 @@ String::String(const StaticString &left, char right, Allocator *allocator)
 	_text[_size] = '\0';
 }
 
-String::String(char left, const StaticString& right, Allocator *allocator)
+String::String(char left, const StaticString &right, Allocator *allocator)
 	: StaticString(1 + right._size)
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
 	, _allocator(allocator)
@@ -116,7 +116,7 @@ String &String::append(char symbol, size_t count)
 	}
 	else
 	{
-		char* old_text = init(new_size + 1);
+		char *old_text = init(new_size + 1);
 		memcpy(_text, old_text, _size);
 	}
 	memset(&_text[_size], symbol, count);
@@ -127,9 +127,7 @@ String &String::append(char symbol, size_t count)
 
 String &String::append_dec(int64_t value, int width, bool zeros)
 {
-	char buffer[21];
-
-	buffer[Y_LENGTH_OF(buffer) - 1] = '\0';
+	char buffer[20];
 
 	uint64_t uvalue;
 
@@ -143,7 +141,7 @@ String &String::append_dec(int64_t value, int width, bool zeros)
 		--width;
 	}
 
-	int i = Y_LENGTH_OF(buffer) - 1;
+	int i = Y_LENGTH_OF(buffer);
 
 	do
 	{
@@ -175,32 +173,29 @@ String &String::append_dec(int64_t value, int width, bool zeros)
 		}
 	}
 
-	append(&buffer[i], 20 - i);
+	append(&buffer[i], Y_LENGTH_OF(buffer) - i);
 	return *this;
 }
 
 String &String::append_dec(uint64_t value, int width, bool zeros)
 {
-	char buffer[21];
+	char buffer[20];
 
-	buffer[Y_LENGTH_OF(buffer) - 1] = '\0';
-
-	int i = Y_LENGTH_OF(buffer) - 1;
+	int i = Y_LENGTH_OF(buffer);
 
 	do
 	{
 		buffer[--i] = value % 10 + '0';
 		value /= 10;
 		--width;
-	}
-	while (value);
+	} while (value);
 
 	if (width > 0)
 	{
 		append(zeros ? '0' : ' ', width);
 	}
 
-	append(&buffer[i], 20 - i);
+	append(&buffer[i], Y_LENGTH_OF(buffer) - i);
 	return *this;
 }
 
@@ -247,7 +242,9 @@ String String::escaped(const char *symbols, char with) const
 {
 	String result(_size); // The best-case assumption.
 
-	for (const char *i = _text; *i; ++i)
+	const char *end = _text + _size;
+
+	for (const char *i = _text; i != end; ++i)
 	{
 		for (const char *j = symbols; *j; ++j)
 		{
@@ -281,7 +278,7 @@ void String::insert(char symbol, size_t index)
 	}
 	else
 	{
-		char* old_text = init(buffer_size);
+		char *old_text = init(buffer_size);
 		if (index)
 		{
 			memcpy(_text, old_text, index);
@@ -349,12 +346,13 @@ void String::reserve(size_t size)
 
 void String::truncate(size_t size)
 {
-	if (size > _size)
+	if (size >= _size)
 	{
 		return;
 	}
 
 	size_t *references = NULL;
+
 	if (_buffer_size)
 	{
 		references = reinterpret_cast<size_t *>(_text) - 1;
@@ -377,7 +375,7 @@ void String::truncate(size_t size)
 	}
 }
 
-String& String::set(char symbol)
+String &String::set(char symbol)
 {
 	if (_buffer_size)
 	{
@@ -391,10 +389,11 @@ String& String::set(char symbol)
 	_text[0] = symbol;
 	_text[1] = '\0';
 	_size = 1;
+
 	return *this;
 }
 
-String& String::set(const char *text, size_t size)
+String &String::set(const char *text, size_t size)
 {
 	size_t buffer_size = size + 1;
 
@@ -410,6 +409,7 @@ String& String::set(const char *text, size_t size)
 	memcpy(_text, text, size);
 	_text[size] = '\0';
 	_size = size;
+
 	return *this;
 }
 

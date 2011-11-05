@@ -5,7 +5,7 @@
 #ifndef __Y_STATIC_STRING_HPP
 #define __Y_STATIC_STRING_HPP
 
-#include <cstring> // strlen
+#include <cstring> // memcmp, strlen
 
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/types.hpp>
@@ -65,18 +65,48 @@ public:
 	/// Return the number of occurences of any of the specified \a symbols in the string.
 	/// \param symbols The list of symbols to count.
 	/// \return The number of matching symbols in the string.
-	/// \note If the same symbol appears several times in the \a symbols list,
-	/// it will count the same number of times.
+	/// \note <tt>count("x") == count("xxx")</tt>
 
 	size_t count(const char *symbols) const throw();
 
 	///
+	/// \param symbol
+	/// \param offset
+	/// \return
 
 	size_t find_first(char symbol, size_t offset = 0) const throw();
 
 	///
+	/// \param symbol
+	/// \param offset Offset to the beginning of the ignored part of the string.
+	/// \return
 
 	size_t find_last(char symbol, size_t offset = End) const throw();
+
+	///
+
+	StaticString left(size_t size) const throw()
+	{
+		return StaticString(_text, min(size, _size));
+	}
+
+	///
+
+	StaticString mid(size_t offset, size_t size = End) const throw()
+	{
+		return (offset < _size
+			? StaticString(_text + offset, min(size, _size))
+			: StaticString());
+	}
+
+	///
+
+	StaticString right(size_t size) const throw()
+	{
+		return (size < _size
+			? StaticString(&_text[_size - size], size)
+			: *this);
+	}
 
 	/// Return the string size.
 	/// \return String size.
@@ -109,13 +139,13 @@ public:
 
 	/// Try to interpret the string as a raw undecorated \a value.
 
-	bool to_number(int32_t &value) const throw();
+	bool to_number(int32_t *value) const throw();
 
 	/**
 	* \overload
 	*/
 
-	bool to_number(double &value) const throw();
+	bool to_number(double *value) const throw();
 
 	/// Convert to decimal \c double time as much of the string as possible.
 	/// \note The time must be in form "[+|-][[HH:]MM:]SS[.{Z}]".
@@ -178,14 +208,14 @@ public:
 
 	bool operator ==(const StaticString &string) const throw()
 	{
-		return (_size == string._size && compare(string) == 0);
+		return (_size == string._size && !memcmp(_text, string._text, _size));
 	}
 
 	///
 
 	bool operator !=(const StaticString &string) const throw()
 	{
-		return (_size != string._size || compare(string) != 0);
+		return (_size != string._size || memcmp(_text, string._text, _size));
 	}
 
 public:

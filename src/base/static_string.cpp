@@ -1,5 +1,4 @@
-#include <cmath>   // pow
-#include <cstring> // memcmp
+#include <cmath> // pow
 
 #include <Yttrium/static_string.hpp>
 
@@ -11,21 +10,28 @@ int StaticString::compare(const StaticString &string) const throw()
 	if (_size < string._size)
 	{
 		int result = memcmp(_text, string._text, _size);
-		return (result ? result : (string._text[_size] == '\0' ? 0 : -1));
+		return (result ? result : -1);
+	}
+	else if (_size > string._size)
+	{
+		int result = memcmp(_text, string._text, string._size);
+		return (result ? result : 1);
 	}
 	else
 	{
-		int result = memcmp(_text, string._text, string._size);
-		return (result ? result : (_text[string._size] == '\0' ? 0 : +1));
+		return memcmp(_text, string._text, _size);
 	}
 }
 
 size_t StaticString::count(const char *symbols) const throw()
 {
 	size_t result = 0;
-	for (const char *i = _text; *i; ++i)
+
+	const char *end = _text + _size;
+
+	for (const char* i = _text; i != end; ++i)
 	{
-		for (const char *j = symbols; *j; ++j)
+		for (const char* j = symbols; *j; ++j)
 		{
 			if (*i == *j)
 			{
@@ -34,6 +40,7 @@ size_t StaticString::count(const char *symbols) const throw()
 			}
 		}
 	}
+
 	return result;
 }
 
@@ -43,7 +50,7 @@ size_t StaticString::find_first(char symbol, size_t offset) const throw()
 	{
 		const char *end = _text + _size;
 
-		for (const char *c = &_text[offset]; c != end; ++c)
+		for (const char *c = _text + offset; c != end; ++c)
 		{
 			if (*c == symbol)
 			{
@@ -51,34 +58,44 @@ size_t StaticString::find_first(char symbol, size_t offset) const throw()
 			}
 		}
 	}
+
 	return End;
 }
 
 size_t StaticString::find_last(char symbol, size_t offset) const throw()
 {
-	if (offset >= _size)
+	if (offset > _size)
 	{
-		offset = _size - 1;
+		offset = _size;
 	}
 
 	const char *end = _text - 1;
 
-	for (const char *c = &_text[offset]; c != end; --c)
+	for (const char *c = _text + offset - 1; c != end; --c)
 	{
 		if (*c == symbol)
 		{
 			return c - _text;
 		}
 	}
+
 	return End;
 }
 
 double StaticString::to_double() const throw()
 {
-	double result = 0;
+	if (!_size)
+	{
+		return 0;
+	}
 
-	const char* p = _text;
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
 	bool negate_result = false;
+
 	switch (*p)
 	{
 	case '-': negate_result = true; // Fallthrough.
@@ -87,169 +104,194 @@ double StaticString::to_double() const throw()
 
 	// Whole.
 
-	for (; *p >= '0' && *p <= '9'; ++p)
+	double result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
 	{
-		result = result * 10 + *p - '0';
+		result = result * 10 + (*p - '0');
 	}
 
 	// Fraction.
 
-	if (*p == '.')
+	if (p != end && *p == '.')
 	{
-		++p;
 		double factor = 1;
-		for (; *p >= '0' && *p <= '9'; ++p)
+
+		for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
 		{
-			result = result * 10 + *p - '0';
+			result = result * 10 + (*p - '0');
 			factor *= 10;
 		}
 		result /= factor;
 	}
 
-	// Exponent.
+	// Power.
 
-	if (*p == 'E' || *p == 'e')
+	if (p != end && (*p == 'E' || *p == 'e'))
 	{
-		double exp = 0;
-		bool neg_exp = false;
-
 		++p;
+
+		// Power sign.
+
+		bool negate_power = false;
+
 		switch (*p)
 		{
-		case '-': neg_exp = true; // Fallthrough.
+		case '-': negate_power = true; // Fallthrough.
 		case '+': ++p;
 		}
 
-		// Exponent value.
+		// Power value.
 
-		for (; *p >= '0' && *p <= '9'; ++p)
+		double power = 0;
+
+		for (; p != end && *p >= '0' && *p <= '9'; ++p)
 		{
-			exp = exp * 10 + *p - '0';
+			power = power * 10 + (*p - '0');
 		}
-		if (neg_exp)
-		{
-			exp = -exp;
-		}
-		result *= pow(10.0, exp);
+
+		result *= pow(10.0, (negate_power ? -power : power));
 	}
 
-	if (negate_result)
-	{
-		result = -result;
-	}
-	return result;
+	return (negate_result ? -result : result);
 }
 
 int32_t StaticString::to_int32() const throw()
 {
-	int32_t result = 0;
+	if (!_size)
+	{
+		return 0;
+	}
 
-	const char* p = _text;
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
 	bool negate_result = false;
+
 	switch (*p)
 	{
 	case '-': negate_result = true; // Fallthrough.
 	case '+': ++p;
 	}
-	for (; *p >= '0' && *p <= '9'; ++p)
+
+	// Value.
+
+	int32_t result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
 	{
-		result = result * 10 + *p - '0';
+		result = result * 10 + (*p - '0');
 	}
-	if (negate_result)
-	{
-		result = -result;
-	}
-	return result;
+
+	return (negate_result ? -result : result);
 }
 
 int64_t StaticString::to_int64() const throw()
 {
+	if (!_size)
+	{
+		return 0;
+	}
+
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
+	bool negate_result = false;
+
+	switch (*p)
+	{
+	case '-': negate_result = true; // Fallthrough.
+	case '+': ++p;
+	}
+
+	// Value.
+
 	int64_t result = 0;
 
-	const char* p = _text;
-	bool negate_result = false;
-	switch (*p)
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
 	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
+		result = result * 10 + (*p - '0');
 	}
-	for (; *p >= '0' && *p <= '9'; ++p)
-	{
-		result = result * 10 + *p - '0';
-	}
-	if (negate_result)
-	{
-		result = -result;
-	}
-	return result;
+
+	return (negate_result ? -result : result);
 }
 
-bool StaticString::to_number(int32_t &value) const throw()
+bool StaticString::to_number(int32_t *value) const throw()
 {
-	bool negate_result = false;
-
-	const char* p = _text;
-	switch (*p)
-	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
-	}
-
-	char c = *p;
-	if (!(c >= '0' && c <= '9'))
+	if (!_size)
 	{
 		return false;
 	}
+
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
+	bool negate_result = false;
+
+	switch (*p)
+	{
+	case '-': negate_result = true; // Fallthrough.
+	case '+': ++p;
+	}
+
+	// Value.
+
+	if (p == end || *p < '0' || *p > '9')
+	{
+		return false;
+	}
+
+	// The threshold is the maximum value that can be multiplied by 10
+	// and still fit into int32_t, both positive and negative.
+
+	const uint32_t threshold    = 0x0CCCCCCC; // ... * 10 = 0x7FFFFFF8.
+	const uint32_t max_negative = 0x80000000;
+	const uint32_t max_positive = 0x7FFFFFFF;
 
 	uint32_t result = 0;
 
 	do
 	{
-		c -= '0';
-		if (result < 0x0CCCCCCC)
+		uint32_t digit = *p++ - '0';
+
+		if (result > threshold
+			&& ((negate_result && (result > (max_negative - digit) / 10))
+				|| result > (max_positive - digit) / 10))
 		{
-			result = result * 10 + c;
+			return false;
 		}
-		else
-		{
-			if (negate_result)
-			{
-				if (result <= (0x80000000u - c) / 10)
-				{
-					result = result * 10 + c;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if (result <= (0x7FFFFFFFu - c) / 10)
-				{
-					result = result * 10 + c;
-				}
-				else
-				{
-					return false;
-				}
-			}
-		}
-		c = *++p;
-	} while (c >= '0' && c <= '9');
-	if (c == 0)
+		result = result * 10 + digit;
+	} while (p != end && *p >= '0' && *p <= '9');
+
+	if (p != end)
 	{
-		value = negate_result ? -result : result;
-		return true;
+		return false;
 	}
-	return false;
+
+	*value = (negate_result ? -result : result);
+	return true;
 }
 
-bool StaticString::to_number(double &value) const throw()
+bool StaticString::to_number(double *value) const throw()
 {
+	if (!_size)
+	{
+		return false;
+	}
+
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
 	bool negate_result = false;
 
-	const char* p = _text;
 	switch (*p)
 	{
 	case '-': negate_result = true; // Fallthrough.
@@ -258,8 +300,7 @@ bool StaticString::to_number(double &value) const throw()
 
 	// Whole.
 
-	char c = *p;
-	if (!(c >= '0' && c <= '9'))
+	if (p == end || *p < '0' || *p > '9')
 	{
 		return false;
 	}
@@ -268,150 +309,203 @@ bool StaticString::to_number(double &value) const throw()
 
 	do
 	{
-		result = result * 10 + c - '0';
-		c = *++p;
-	} while (c >= '0' && c <= '9');
+		result = result * 10 + (*p++ - '0');
+	} while (p != end && *p >= '0' && *p <= '9');
 
 	// Fraction.
 
-	if (c == '.')
+	if (p != end && *p == '.')
 	{
-		c = *++p;
-		if (!(c >= '0' && c <= '9'))
+		++p;
+
+		if (p == end || *p < '0' || *p > '9')
 		{
 			return false;
 		}
+
 		double factor = 1;
+
 		do
 		{
-			result = result * 10 + c - '0';
+			result = result * 10 + (*p++ - '0');
 			factor *= 10;
-			c = *++p;
-		} while (c >= '0' && c <= '9');
+		} while (p != end && *p >= '0' && *p <= '9');
+
 		result /= factor;
 	}
 
-	// Exponent.
+	// Power.
 
-	if (c == 'E' || c == 'e')
+	if (p != end && (*p == 'E' || *p == 'e'))
 	{
-		bool neg_exp = false;
-		switch (*++p)
-		{
-		case '-': neg_exp = true; // Fallthrough.
-		case '+': ++p;
-		}
-
-		// Exponent value.
-
-		c = *p;
-		if (!(c >= '0' && c <= '9'))
+		if (++p == end)
 		{
 			return false;
 		}
-		double exp = 0;
+
+		// Power sign.
+
+		bool negate_power = false;
+
+		switch (*p)
+		{
+		case '-': negate_power = true; // Fallthrough.
+		case '+': ++p;
+		}
+
+		// Power value.
+
+		if (p == end || *p < '0' || *p > '9')
+		{
+			return false;
+		}
+
+		double power = 0;
+
 		do
 		{
-			exp = exp * 10 + c - '0';
-			c = *++p;
-		} while (c >= '0' && c <= '9');
-		if (neg_exp)
-		{
-			exp = -exp;
-		}
-		result *= pow(10.0, exp);
+			power = power * 10 + (*p++ - '0');
+		} while (p != end && *p >= '0' && *p <= '9');
+
+		result *= pow(10.0, (negate_power ? -power : power));
 	}
 
-	if (c == 0)
+	if (p != end)
 	{
-		value = negate_result ? -result : result;
-		return true;
+		return false;
 	}
-	return false;
+
+	*value = (negate_result ? -result : result);
+	return true;
 }
 
 double StaticString::to_time() const throw()
 {
-	double result = 0;
+	if (!_size)
+	{
+		return 0;
+	}
 
-	const char* p = _text;
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
 	bool negate_result = false;
+
 	switch (*p)
 	{
 	case '-': negate_result = true; // Fallthrough.
 	case '+': ++p;
 	}
-	for (; *p >= '0' && *p <= '9'; ++p)
+
+	// The first part (hours, minutes or seconds).
+
+	double result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
 	{
 		result = result * 10 + *p - '0';
 	}
-	if (*p == ':')
+
+	// The second part, if any (minutes or seconds).
+
+	if (p != end && *p == ':')
 	{
-		++p;
 		double mins_or_secs = 0;
-		for (; *p >= '0' && *p <= '9'; ++p)
+
+		for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
 		{
 			mins_or_secs = mins_or_secs * 10 + *p - '0';
 		}
 		result = result * 60 + mins_or_secs;
 	}
-	if (*p == ':')
+
+	// The third part, if any (seconds).
+
+	if (p != end && *p == ':')
 	{
-		++p;
 		double secs = 0;
-		for (; *p >= '0' && *p <= '9'; ++p)
+
+		for (++p; *p >= '0' && *p <= '9'; ++p)
 		{
 			secs = secs * 10 + *p - '0';
 		}
 		result = result * 60 + secs;
 	}
-	if (*p == '.')
+
+	// Fractions of seconds.
+
+	if (p != end && *p == '.')
 	{
-		++p;
 		double factor = 1;
-		for (; *p >= '0' && *p <= '9'; ++p)
+
+		for (++p; *p >= '0' && *p <= '9'; ++p)
 		{
 			result = result * 10 + *p - '0';
 			factor *= 10;
 		}
 		result /= factor;
 	}
-	if (negate_result)
-	{
-		result = -result;
-	}
-	return result;
+
+	return (negate_result ? -result : result);
 }
 
 uint32_t StaticString::to_uint32() const throw()
 {
-	uint32_t result = 0;
+	if (!_size)
+	{
+		return 0;
+	}
 
-	const char* p = _text;
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
 	if (*p == '+')
 	{
 		++p;
 	}
-	for (; *p >= '0' && *p <= '9'; ++p)
+
+	// Value.
+
+	uint32_t result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
 	{
 		result = result * 10 + *p - '0';
 	}
+
 	return result;
 }
 
 uint64_t StaticString::to_uint64() const throw()
 {
-	uint64_t result = 0;
+	if (!_size)
+	{
+		return 0;
+	}
 
-	const char* p = _text;
+	const char *p   = _text;
+	const char *end = _text + _size;
+
+	// Sign.
+
 	if (*p == '+')
 	{
 		++p;
 	}
-	for (; *p >= '0' && *p <= '9'; ++p)
+
+	// Value.
+
+	uint64_t result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
 	{
 		result = result * 10 + *p - '0';
 	}
+
 	return result;
 }
 

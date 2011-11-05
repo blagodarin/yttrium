@@ -72,7 +72,7 @@ public:
 	* \overload
 	*/
 
-	String(char left, const StaticString& right, Allocator *allocator = HeapAllocator::instance());
+	String(char left, const StaticString &right, Allocator *allocator = HeapAllocator::instance());
 
 	/// Destructor.
 
@@ -468,7 +468,7 @@ inline String &operator <<(String &left, float right)
 * \overload
 */
 
-inline String& operator <<(String &left, double right)
+inline String &operator <<(String &left, double right)
 {
 	return left.append_dec(right);
 }
