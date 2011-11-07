@@ -1,7 +1,7 @@
+#include "heap_allocator.hpp"
+
 #include <cstdlib> // free, malloc, realloc
 #include <new>     // bad_alloc
-
-#include "heap_allocator.hpp"
 
 // NOTE: The current implementation lamely uses CRT memory allocation routines.
 

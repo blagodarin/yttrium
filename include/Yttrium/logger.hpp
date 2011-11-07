@@ -88,14 +88,14 @@ public:
 	{
 	}
 
-	Logger(Level level, Allocator *allocator = HeapAllocator::instance()) throw()
+	explicit Logger(Level level, Allocator *allocator = HeapAllocator::instance()) throw()
 		: _level(level)
 		, _name(allocator)
 		, _message(allocator)
 	{
 	}
 
-	Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance())
+	explicit Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance())
 		: _level(level(name))
 		, _name(name, allocator)
 		, _message(allocator)

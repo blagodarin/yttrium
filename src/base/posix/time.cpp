@@ -1,6 +1,6 @@
-#include <time.h>
-
 #include <Yttrium/time.hpp>
+
+#include <time.h>
 
 namespace Yttrium
 {

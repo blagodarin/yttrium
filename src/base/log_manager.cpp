@@ -1,6 +1,6 @@
-#include <Yttrium/allocator.hpp>
-
 #include "log_manager.hpp"
+
+#include <Yttrium/allocator.hpp>
 
 namespace Yttrium
 {

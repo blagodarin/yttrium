@@ -1,6 +1,6 @@
-#include <cmath> // pow
-
 #include <Yttrium/static_string.hpp>
+
+#include <cmath> // pow
 
 namespace Yttrium
 {

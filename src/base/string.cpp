@@ -1,8 +1,9 @@
+#include <Yttrium/string.hpp>
+
 #include <cstdio>  // sprintf
 #include <cstring> // memcpy, memmove
 
 #include <Yttrium/assert.hpp>
-#include <Yttrium/string.hpp>
 #include <Yttrium/utils.hpp>
 
 namespace Yttrium

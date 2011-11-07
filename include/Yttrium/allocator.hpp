@@ -162,8 +162,7 @@ protected:
 
 /// Heap allocator.
 
-class Y_API HeapAllocator
-	: public Allocator
+class Y_API HeapAllocator: public Allocator
 {
 public:
 
@@ -172,8 +171,7 @@ public:
 
 /// System allocator.
 
-class Y_API SystemAllocator
-	: public Allocator
+class Y_API SystemAllocator: public Allocator
 {
 public:
 
@@ -194,8 +192,7 @@ public:
 
 /// Proxy allocator.
 
-class Y_API ProxyAllocator
-	: public Allocator
+class Y_API ProxyAllocator: public Allocator
 {
 public:
 

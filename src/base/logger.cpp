@@ -1,5 +1,6 @@
-#include <Yttrium/file.hpp>
 #include <Yttrium/logger.hpp>
+
+#include <Yttrium/file.hpp>
 #include <Yttrium/time.hpp>
 
 #include "../application/private.hpp"

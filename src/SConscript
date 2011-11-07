@@ -45,6 +45,8 @@ if 'posix' in ports:
 if 'win32' in ports:
 	src += ['base/win32']
 
+src += ['ion']
+
 yttrium = build.SharedLibrary('../lib/yttrium', [build.Glob('$BUILD/' + path + '/*.cpp') for path in src])
 
 build.Clean(yttrium, build.Dir('$BUILD'))

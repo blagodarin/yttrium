@@ -1,5 +1,6 @@
-#include <Yttrium/assert.hpp>
 #include <Yttrium/object.hpp>
+
+#include <Yttrium/assert.hpp>
 
 namespace Yttrium
 {

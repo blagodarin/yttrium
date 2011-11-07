@@ -247,7 +247,7 @@ private:
 
 #define Y_S(literal) Yttrium::StaticString(literal, sizeof(literal) - 1)
 
-// NOTE: GCC 4.7 required.
+// TODO: Uncomment this when GCC 4.7 becomes available.
 
 //Yttrium::StaticString operator "" _y(const char *text, size_t size) throw()
 //{

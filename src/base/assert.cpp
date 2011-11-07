@@ -1,7 +1,8 @@
+#include <Yttrium/assert.hpp>
+
 #include <cstdlib> // abort
 
 #include <Yttrium/allocator.hpp>
-#include <Yttrium/assert.hpp>
 #include <Yttrium/logger.hpp>
 
 namespace Yttrium
