@@ -26,7 +26,7 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	size_t total_bytes = _page_size * ((reserved_size + size + _page_size - 1) / _page_size);
 	size_t allocated_bytes = total_bytes - reserved_size;
 
-	void *base = mmap(NULL, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *base = mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (base == MAP_FAILED)
 	{
 		throw std::bad_alloc();
@@ -91,7 +91,7 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	{
 		if (movability == MayMove)
 			throw std::bad_alloc();
-		return NULL;
+		return nullptr;
 	}
 
 	static_cast<size_t *>(new_base)[0] = new_total_bytes;

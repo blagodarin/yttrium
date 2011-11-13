@@ -95,15 +95,15 @@ public:
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = NULL) = 0;
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) = 0;
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = NULL) throw() = 0;
+	virtual void deallocate(void *pointer, Difference *difference = nullptr) throw() = 0;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = NULL) = 0;
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) = 0;
 
 	///
 
@@ -211,15 +211,15 @@ public: // Allocator
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = NULL);
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr);
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = NULL) throw();
+	virtual void deallocate(void *pointer, Difference *difference = nullptr) throw();
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = NULL);
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr);
 
 	///
 

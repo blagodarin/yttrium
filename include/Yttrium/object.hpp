@@ -59,7 +59,7 @@ class ObjectPtr
 public:
 
 	ObjectPtr() throw()
-		: _object(NULL)
+		: _object(nullptr)
 	{
 	}
 
@@ -94,7 +94,7 @@ public:
 		if (_object)
 		{
 			_object->decrement();
-			_object = NULL;
+			_object = nullptr;
 		}
 	}
 

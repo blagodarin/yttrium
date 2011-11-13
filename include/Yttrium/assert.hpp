@@ -4,7 +4,6 @@
 #ifndef __Y_ASSERT_HPP
 #define __Y_ASSERT_HPP
 
-#include <Yttrium/global.hpp>
 #include <Yttrium/static_string.hpp>
 
 namespace Yttrium

@@ -47,7 +47,7 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 {
 	if (movability == MayNotMove)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	void *new_pointer = realloc(pointer, size);
@@ -70,7 +70,7 @@ Allocator::Status HeapAllocatorImpl::status() const throw()
 	return _status;
 }
 
-HeapAllocatorImpl *_heap_allocator = NULL;
+HeapAllocatorImpl *_heap_allocator = nullptr;
 
 HeapAllocator *HeapAllocator::instance() throw()
 {

@@ -24,7 +24,7 @@ public:
 
 	~Private() throw()
 	{
-		Yttrium::_heap_allocator = NULL;
+		Yttrium::_heap_allocator = nullptr;
 		_exists = false;
 	}
 

@@ -20,7 +20,7 @@ public:
 	Parser(/*Document& document, */Allocator *allocator = HeapAllocator::instance());
 
 	/// Parse the \a string as an ION document.
-	/// \note The \a string MUST have the zero terminator.
+	/// \note The \a string MUST have a zero terminator.
 
 	bool parse(const StaticString& string);
 
@@ -78,12 +78,12 @@ private:
 
 		State(Object *object)
 			: object(object)
-			, list(NULL)
+			, list(nullptr)
 		{
 		}
 
 		State(List *list)
-			: object(NULL)
+			: object(nullptr)
 			, list(list)
 		{
 		}

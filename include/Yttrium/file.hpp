@@ -34,7 +34,7 @@ class Y_API FileReader: public Object
 public:
 
 	/// Create a duplicate FileReader.
-	/// \return Duplicate FileReader or NULL.
+	/// \return Duplicate FileReader or \c nullptr.
 
 	virtual FileReaderPtr dup(Allocator *allocator = HeapAllocator::instance()) = 0;
 
@@ -94,7 +94,7 @@ class Y_API FileWriter: public Object
 public:
 
 	/// Create a duplicate FileWriter.
-	/// \return Duplicate FileWriter or NULL.
+	/// \return Duplicate FileWriter or \c nullptr.
 
 	virtual FileWriterPtr dup(Allocator *allocator = HeapAllocator::instance()) = 0;
 

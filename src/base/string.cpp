@@ -301,7 +301,7 @@ void String::remove(size_t index)
 		return;
 	}
 
-	size_t *references = NULL;
+	size_t *references = nullptr;
 
 	if (_buffer_size)
 	{
@@ -352,7 +352,7 @@ void String::truncate(size_t size)
 		return;
 	}
 
-	size_t *references = NULL;
+	size_t *references = nullptr;
 
 	if (_buffer_size)
 	{

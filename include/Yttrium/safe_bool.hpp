@@ -27,7 +27,7 @@ typedef __SafeBool::Type SafeBool;
 /// \def Y_SAFE_FALSE
 /// \brief Safe boolean \c false.
 
-#define Y_SAFE_FALSE (SafeBool(NULL))
+#define Y_SAFE_FALSE (SafeBool(nullptr)) // NOTE: Should be just nullptr.
 
 /// \def Y_SAFE_TRUE
 /// \brief Safe boolean \c true.

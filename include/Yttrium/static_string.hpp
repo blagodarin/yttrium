@@ -18,7 +18,7 @@ namespace Yttrium
 {
 
 /// Static string wrapper class.
-/// \note Static strings can't implicitly hold \c NULL and therefore should always be valid.
+/// \note Static strings can't implicitly hold \c nullptr and therefore should always be valid.
 /// \note Static strings may have no zero terminator.
 
 class Y_API StaticString
@@ -118,6 +118,15 @@ public:
 
 	/// Return the string text pointer.
 	/// \return String text pointer.
+
+	char *text() throw()
+	{
+		return _text;
+	}
+
+	/**
+	* \overload
+	*/
 
 	const char *text() const throw()
 	{
