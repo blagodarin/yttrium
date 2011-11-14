@@ -9,15 +9,15 @@ void bar()
 {
 	Logger logger(Y_S("hello_world.bar.ling"));
 
-	Y_INFO(logger, Y_S("Hello again!"));
-	Y_DEBUG(logger, Y_S("Hello again!"));
-	Y_FATAL(logger, Y_S("Hello again!"));
+	Y_LOG_INFO(logger, Y_S("Hello again!"));
+	Y_LOG_DEBUG(logger, Y_S("Hello again!"));
+	Y_LOG_FATAL(logger, Y_S("Hello again!"));
 
 	Logger logger2(Y_S("hello_world.blurp"));
 
-	Y_INFO(logger2, Y_S("Hello again!"));
-	Y_DEBUG(logger2, Y_S("Hello again!"));
-	Y_FATAL(logger2, Y_S("Hello again!"));
+	Y_LOG_INFO(logger2, Y_S("Hello again!"));
+	Y_LOG_DEBUG(logger2, Y_S("Hello again!"));
+	Y_LOG_FATAL(logger2, Y_S("Hello again!"));
 
 	Y_ASSERT(false);
 }
@@ -49,15 +49,15 @@ int main(int argc, char **argv)
 
 	Y_LOG(root_logger, Y_S("*** Yttrium example ***"));
 
-	Y_TRACE(root_logger, Y_S("Hello world?"));
-	Y_DEBUG(root_logger, Y_S("Hello world?"));
+	Y_LOG_TRACE(root_logger, Y_S("Hello world?"));
+	Y_LOG_DEBUG(root_logger, Y_S("Hello world?"));
 
 	Logger logger(Y_S("hello_world"));
 
-	Y_INFO(logger, Y_S("Hello world!"));
-	Y_DEBUG(logger, Y_S("Hello world!"));
-	Y_TRACE(logger, Y_S("Hello world!"));
-	Y_ERROR(logger, Y_S("Hello world!"));
+	Y_LOG_INFO(logger, Y_S("Hello world!"));
+	Y_LOG_DEBUG(logger, Y_S("Hello world!"));
+	Y_LOG_TRACE(logger, Y_S("Hello world!"));
+	Y_LOG_ERROR(logger, Y_S("Hello world!"));
 
 	Foo::bar();
 

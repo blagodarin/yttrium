@@ -10,7 +10,7 @@ Logger::Level LogManager::Private::level(const StaticString &name) const throw()
 	size_t prefix_size = name.find_first('.');
 	if (prefix_size == StaticString::End)
 	{
-		Levels::const_iterator i = _levels.find(String(name, String::Reference));
+		Levels::const_iterator i = _levels.find(String(name, String::Ref));
 		return (i != _levels.end() ? i->second : _root_level);
 	}
 
@@ -18,9 +18,9 @@ Logger::Level LogManager::Private::level(const StaticString &name) const throw()
 
 	prefix_buffer[0] = '\0';
 
-	String prefix(prefix_buffer, 0, String::Reference, nullptr);
+	String prefix(prefix_buffer, 0, String::Ref, nullptr);
 
-	Levels::const_iterator begin = _levels.lower_bound(String(name, String::Reference));
+	Levels::const_iterator begin = _levels.lower_bound(String(name, String::Ref));
 	Levels::const_iterator end = _levels.upper_bound(prefix.set(name.text(), prefix_size));
 
 	for (Levels::const_iterator i = begin; i != end; ++i)

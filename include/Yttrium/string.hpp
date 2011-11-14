@@ -92,20 +92,20 @@ public:
 
 	/// Reference specifier type.
 
-	struct ReferenceSpecifier
+	struct Reference
 	{
 	};
 
 	/// Reference specifier.
 
-	static const ReferenceSpecifier Reference;
+	static const Reference Ref;
 
 	/// Reference constructor.
 	/// \param text
 	/// \param size
 	/// \param allocator
 
-	String(const char *text, size_t size, const ReferenceSpecifier &, Allocator *allocator = HeapAllocator::instance()) throw()
+	String(const char *text, size_t size, const Reference &, Allocator *allocator = HeapAllocator::instance()) throw()
 		: StaticString(text, size)
 		, _buffer_size(0)
 		, _allocator(allocator)
@@ -116,7 +116,7 @@ public:
 	* \overload
 	*/
 
-	String(const StaticString &string, const ReferenceSpecifier &, Allocator *allocator = HeapAllocator::instance()) throw()
+	String(const StaticString &string, const Reference &, Allocator *allocator = HeapAllocator::instance()) throw()
 		: StaticString(string)
 		, _buffer_size(0)
 		, _allocator(allocator)
@@ -127,7 +127,7 @@ public:
 	* \overload
 	*/
 
-	String(const char *text, const ReferenceSpecifier &, Allocator *allocator = HeapAllocator::instance()) throw()
+	String(const char *text, const Reference &, Allocator *allocator = HeapAllocator::instance()) throw()
 		: StaticString(text)
 		, _buffer_size(0)
 		, _allocator(allocator)

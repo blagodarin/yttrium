@@ -27,7 +27,7 @@ Y_API void abort(const StaticString &message, const StaticString &file, int line
 /// \def Y_ASSERT(condition)
 /// \brief Terminate the program if the \a condition is \c false.
 
-#ifndef __Y_DEBUG
+#if !Y_DEBUG
 	#define Y_ASSERT(condition)
 #else
 	#define Y_ASSERT(condition) \

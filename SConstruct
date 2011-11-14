@@ -32,6 +32,7 @@ env.Decider('MD5-timestamp') # Make the builds a bit faster.
 platform = env['PLATFORM']
 
 if platform == 'posix':
+	platform = 'posix-x11'
 	env.Tool('default') # GCC or GCC-compatible toolkit expected.
 elif platform == 'win32':
 	env.Tool('mingw')
@@ -63,10 +64,7 @@ if build_mode is None:
 if build_platform is None:
 	build_platform = build_ini.get('build', 'platform')
 	if build_platform == 'default':
-		if platform == 'posix':
-			build_platform = 'posix-x11'
-		else:
-			build_platform = platform
+		build_platform = platform
 
 # Configure the environment.
 
@@ -75,10 +73,12 @@ ports = []
 if build_platform == 'posix-x11':
 	ports = ['posix', 'x11']
 elif build_platform == 'win32':
-	ports = ['win32']
+	ports = ['windows']
 
 if build_mode == 'debug':
-	env.Append(CPPDEFINES = ['__Y_DEBUG'])
+	env.Append(CPPDEFINES = ['_DEBUG'])
+else:
+	env.Append(CPPDEFINES = ['NDEBUG'])
 
 env.Append(CPPFLAGS = ['-std=gnu++0x', '-Wall']) # We use GCC/MinGW.
 if build_mode == 'release':
@@ -89,8 +89,9 @@ else:
 env.Prepend(LIBS = ['png', 'z', 'vorbisfile', 'vorbis', 'ogg', 'png', 'z'])
 if 'posix' in ports:
 	env.Append(LIBS = ['pthread', 'openal'])
-if 'win32' in ports:
-	env.Append(LIBS = ['OpenAL32', 'OpenGL32', 'ws2_32', 'winmm', 'gdi32'])
+if 'windows' in ports:
+	if build_platform == 'win32':
+		env.Append(LIBS = ['OpenAL32', 'OpenGL32', 'ws2_32', 'winmm', 'gdi32'])
 if 'x11' in ports:
 	env.Append(LIBS = ['GL', 'Xrandr', 'X11'])
 
@@ -100,14 +101,14 @@ slave_env = env.Clone(
 	LIBPATH = ['#/lib'],
 	LIBS = ['yttrium'])
 
-if build_platform == 'win32':
+if build_platform == 'windows':
 	slave_env.Append(LINKFLAGS = ['-Wl,-subsystem,windows']) # We use GCC/MinGW.
 
 # Special configuration for the master environment.
 
 env.Append(
 	CPPDEFINES = [
-		'__Y_API_EXPORT'],
+		'__YTTRIUM'],
 	CPPFLAGS = [
 		'-fvisibility=hidden',
 		'-fvisibility-inlines-hidden'])

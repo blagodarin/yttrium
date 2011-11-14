@@ -88,7 +88,7 @@ String::String(char left, const StaticString &right, Allocator *allocator)
 	_text[_size] = '\0';
 }
 
-const String::ReferenceSpecifier String::Reference = String::ReferenceSpecifier();
+const String::Reference String::Ref = String::Reference();
 
 String &String::append(const char *text, size_t size)
 {

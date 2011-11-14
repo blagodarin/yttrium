@@ -35,7 +35,7 @@ public:
 
 public:
 
-	class Y_PRIVATE Private;
+	class Private;
 
 private:
 

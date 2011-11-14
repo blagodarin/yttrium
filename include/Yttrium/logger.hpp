@@ -137,7 +137,7 @@ private:
 
 } // namespace Yttrium
 
-#ifndef __Y_DEBUG
+#if !Y_DEBUG
 	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level
 #else
 	#define __Y_LOG_PARAMS(level) Yttrium::Logger::level, Y_S(__FILE__), __LINE__, Y_S(__func__)
@@ -164,7 +164,7 @@ private:
 
 ///
 
-#define Y_FATAL(logger, message) \
+#define Y_LOG_FATAL(logger, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Fatal) \
@@ -175,7 +175,7 @@ private:
 
 ///
 
-#define Y_FATAL_IF(logger, condition, message) \
+#define Y_LOG_FATAL_IF(logger, condition, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Fatal && (condition)) \
@@ -186,7 +186,7 @@ private:
 
 ///
 
-#define Y_ERROR(logger, message) \
+#define Y_LOG_ERROR(logger, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Error) \
@@ -197,7 +197,7 @@ private:
 
 ///
 
-#define Y_ERROR_IF(logger, condition, message) \
+#define Y_LOG_ERROR_IF(logger, condition, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Error && (condition)) \
@@ -208,7 +208,7 @@ private:
 
 ///
 
-#define Y_WARNING(logger, message) \
+#define Y_LOG_WARNING(logger, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Warning) \
@@ -219,7 +219,7 @@ private:
 
 ///
 
-#define Y_WARNING_IF(logger, condition, message) \
+#define Y_LOG_WARNING_IF(logger, condition, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Warning && (condition)) \
@@ -230,7 +230,7 @@ private:
 
 ///
 
-#define Y_INFO(logger, message) \
+#define Y_LOG_INFO(logger, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Info) \
@@ -241,7 +241,7 @@ private:
 
 ///
 
-#define Y_INFO_IF(logger, condition, message) \
+#define Y_LOG_INFO_IF(logger, condition, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Info && (condition)) \
@@ -252,7 +252,7 @@ private:
 
 ///
 
-#define Y_DEBUG(logger, message) \
+#define Y_LOG_DEBUG(logger, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Debug) \
@@ -263,7 +263,7 @@ private:
 
 ///
 
-#define Y_DEBUG_IF(logger, condition, message) \
+#define Y_LOG_DEBUG_IF(logger, condition, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Debug && (condition)) \
@@ -274,7 +274,7 @@ private:
 
 ///
 
-#define Y_TRACE(logger, message) \
+#define Y_LOG_TRACE(logger, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Trace) \
@@ -285,7 +285,7 @@ private:
 
 ///
 
-#define Y_TRACE_IF(logger, condition, message) \
+#define Y_LOG_TRACE_IF(logger, condition, message) \
 	do \
 	{ \
 		if ((logger).level() >= Yttrium::Logger::Trace && (condition)) \

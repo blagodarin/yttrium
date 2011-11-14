@@ -15,7 +15,7 @@ Parser::Parser(/*Document& document, */Allocator *allocator)
 
 bool Parser::parse(const StaticString& string)
 {
-	Y_TRACE(_logger, "Parsing...");
+	Y_LOG_TRACE(_logger, "Parsing...");
 
 //	_objects.push_back(Object());
 //	_states.push_back(State(&_objects.back()));
@@ -186,7 +186,7 @@ bool Parser::parse(const StaticString& string)
 
 bool Parser::parse_name(const StaticString& name)
 {
-	Y_TRACE(_logger, "Token: " << name);
+	Y_LOG_TRACE(_logger, "Token: " << name);
 
 //	if (!_state->object)
 //		return false;
@@ -196,7 +196,7 @@ bool Parser::parse_name(const StaticString& name)
 
 bool Parser::parse_value(const StaticString& value)
 {
-	Y_TRACE(_logger, "Token: \"" << String(value, String::Reference, _allocator).escaped("\\\"", '\\') << "\"");
+	Y_LOG_TRACE(_logger, "Token: \"" << String(value, String::Ref, _allocator).escaped("\\\"", '\\') << "\"");
 
 //	if (!_state->list)
 //		return false;
@@ -206,7 +206,7 @@ bool Parser::parse_value(const StaticString& value)
 
 bool Parser::parse_lbrace()
 {
-	Y_TRACE(_logger, "Token: {");
+	Y_LOG_TRACE(_logger, "Token: {");
 
 //	if (!_state->list)
 //		return false;
@@ -217,7 +217,7 @@ bool Parser::parse_lbrace()
 
 bool Parser::parse_rbrace()
 {
-	Y_TRACE(_logger, "Token: }");
+	Y_LOG_TRACE(_logger, "Token: }");
 
 //	if (!_state->object || _states.size() == 1)
 //		return false;
@@ -228,7 +228,7 @@ bool Parser::parse_rbrace()
 
 bool Parser::parse_lbracket()
 {
-	Y_TRACE(_logger, "Token: [");
+	Y_LOG_TRACE(_logger, "Token: [");
 
 //	if (!_state->list)
 //		return false;
@@ -239,7 +239,7 @@ bool Parser::parse_lbracket()
 
 bool Parser::parse_rbracket()
 {
-	Y_TRACE(_logger, "Token: ]");
+	Y_LOG_TRACE(_logger, "Token: ]");
 
 //	if (_state->object || _states.size() == 1)
 //		return false;
@@ -250,7 +250,7 @@ bool Parser::parse_rbracket()
 
 bool Parser::parse_end()
 {
-	//FALX_LOG_TRACE(_logger, "Token: <end>");
+	Y_LOG_TRACE(_logger, "Token: <end>");
 
 //	return _states.size() == 1;
 	return true;

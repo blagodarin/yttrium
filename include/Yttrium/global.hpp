@@ -2,8 +2,8 @@
 /// \brief Global definitions.
 /// \note This header is included (directly or indirectly) in all other %Yttrium headers.
 
-// All the macros that start with __Y except __Y_DEBUG are internal and should
-// only be used in this header. As such, they are pseudo-documented by the ordinary
+// All the macros that start with __Y are internal to a single header and should
+// only be used in that header. As such, they are pseudo-documented by the ordinary
 // comments to provide some information about them, but hide them from the doxygen.
 
 #ifndef __Y_GLOBAL_HPP
@@ -54,7 +54,55 @@
 #endif
 
 /******************************************************************************\
-* 2) Neutralize the supported compilers' differences.
+* 2) Detect the target platform.
+\******************************************************************************/
+
+// If it's not Windows, then it's definitely Linux. I do not need Macs,
+// and I need FreeBSD etc. even less. =)
+
+/// \def Y_LINUX
+/// \brief
+
+#if defined(__linux__)
+	#define Y_LINUX   1
+#else
+	#define Y_LINUX 0
+#endif
+
+/// \def Y_POSIX
+/// \brief Defined to 1 for a POSIX system, including Linux.
+
+#if Y_LINUX || defined(__unix__)
+	#define Y_POSIX 1
+#else
+	#define Y_POSIX 0
+#endif
+
+/// \def Y_WINDOWS
+/// \brief
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+	#define Y_WINDOWS 1
+#else
+	#define Y_WINDOWS 0
+#endif
+
+// Check the correctness of the platform definitions.
+// NOTE: Do we need this really?
+
+#if Y_POSIX && Y_WINDOWS
+	#error Invalid target platform.
+#endif
+
+#if !(Y_POSIX || Y_WINDOWS)
+	#error Unknown target platform.
+#endif
+
+// Actually, Yttrium threats Windows as Windows and Linux as POSIX + X11 combo.
+// NOTE: There is one exception, namely SystemAllocator, which is for Linux.
+
+/******************************************************************************\
+* 3) Neutralize the supported compilers' differences.
 \******************************************************************************/
 
 // __func__ for MSVC (in MSVC 10.0, __func__ is still not supported).
@@ -69,31 +117,58 @@
 	#define nullptr __null
 #endif
 
-/// \def Y_API
-/// \brief Public API specifier.
+/// \def Y_EXPORT
+/// \brief Shared library exported definition specifier.
+
+/// \def Y_IMPORT
+/// \brief Shared library imported definition specifier.
 
 /// \def Y_PRIVATE
-/// \brief Private definition specifier.
+/// \brief Shared library private definition specifier.
 
 // GCC (thus MinGW) supports __declspec(dllexport) and __declspec(dllimport).
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-	#ifdef __YTTRIUM
-		#define Y_API __declspec(dllexport)
-	#else
-		#define Y_API __declspec(dllimport)
-	#endif
+#if Y_WINDOWS
+	#define Y_EXPORT __declspec(dllexport)
+	#define Y_IMPORT __declspec(dllimport)
 	#define Y_PRIVATE
-#elif __Y_GCC
-	#define Y_API     __attribute__((visibility("default")))
-	#define Y_PRIVATE __attribute__((visibility("hidden")))
 #else
-	#error Unsupported compiler and target platform combination.
+	#if __Y_GCC
+		#define Y_EXPORT __attribute__((visibility("default")))
+	#else
+		#define Y_EXPORT
+	#endif
+	#define Y_IMPORT
+	#if __Y_GCC
+		#define Y_PRIVATE __attribute__((visibility("hidden")))
+	#else
+		#define Y_PRIVATE
+	#endif
 #endif
 
+// Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
+
 /******************************************************************************\
-* 3) Provide some globally useful compiler-independent definitions.
+* 4) Provide some globally useful (now-) compiler-independent definitions.
 \******************************************************************************/
+
+/// \def Y_API
+/// \brief Public API specifier.
+
+#if defined(__YTTRIUM)
+	#define Y_API Y_EXPORT
+#else
+	#define Y_API Y_IMPORT
+#endif
+
+/// \def Y_DEBUG
+/// \brief
+
+#if defined(_DEBUG) && !defined(NDEBUG)
+	#define Y_DEBUG 1
+#else
+	#define Y_DEBUG 0
+#endif
 
 /// Calculate the static \a array length.
 
