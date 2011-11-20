@@ -108,9 +108,9 @@ public:
 			_object->decrement();
 		}
 		_object = object;
-		if (object)
+		if (_object)
 		{
-			object->increment();
+			_object->increment();
 		}
 	}
 
@@ -141,7 +141,8 @@ public:
 		{
 			_object->decrement();
 		}
-		if ((_object = object._object))
+		_object = object._object;
+		if (_object)
 		{
 			_object->increment();
 		}

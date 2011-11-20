@@ -4,21 +4,19 @@ build = env.Clone(BUILD = '.build')
 
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
-src = []
+src = [
+	'application',
+	'base',
+	'file_system',
+	'ion']
 
-src += ['application']
-
-src += ['base']
 if 'posix' in ports:
 	src += ['base/posix']
+
 if 'windows' in ports:
 	src += ['base/windows']
 
-src += ['ion']
-
 yttrium = build.SharedLibrary('#/lib/yttrium', [build.Glob('$BUILD/' + path + '/*.cpp') for path in src])
-
 build.Clean(yttrium, build.Dir('$BUILD'))
-build.Clean(yttrium, 'config.hpp')
 
 Return('yttrium')

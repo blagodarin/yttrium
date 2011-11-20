@@ -4,6 +4,7 @@
 #include <Yttrium/application.hpp>
 #include <Yttrium/types.hpp>
 
+#include "../file_system/file_system.hpp"
 #include "../base/heap_allocator.hpp"
 #include "../base/log_manager.hpp"
 
@@ -20,10 +21,12 @@ public:
 	{
 		_exists = true;
 		Yttrium::_heap_allocator = &_heap_allocator;
+		Yttrium::_file_system = &_file_system;
 	}
 
 	~Private() throw()
 	{
+		Yttrium::_file_system = nullptr;
 		Yttrium::_heap_allocator = nullptr;
 		_exists = false;
 	}
@@ -53,6 +56,7 @@ private:
 
 	HeapAllocatorImpl   _heap_allocator;
 	LogManager::Private _log_manager_private;
+	FileSystem          _file_system;
 
 private:
 
