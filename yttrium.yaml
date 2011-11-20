@@ -1,0 +1,19 @@
+Yttrium:
+- Add audio support.
+- Add image support.
+- Add renderer.
+- Add scripting support.
+- Add GUI (requires renderer and ION).
+- Add Windows port.
+
+    Base:
+    - Implement pools.
+
+    File system:
+    - Implement packages.
+
+    ION:
+    - Implement.
+
+Tools:
+- Add packer.
