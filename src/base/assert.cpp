@@ -8,12 +8,17 @@
 namespace Yttrium
 {
 
-void abort(const StaticString &message, const StaticString &file, int line, const StaticString &function) throw()
+void abort(const StaticString &file, int line, const StaticString &function, const StaticString &message, ...) noexcept
 {
 	if (message)
 	{
-		Logger(SystemAllocator::instance()).log(Logger::None, file, line, function) << message;
+		Allocator *allocator = SystemAllocator::instance();
+
+		// NOTE: On out of memory error we'll enter a recursive loop here.
+
+		Logger(allocator).log(Logger::None, file, line, function) << message;
 	}
+
 	::abort();
 }
 

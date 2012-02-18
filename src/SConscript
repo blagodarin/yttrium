@@ -1,12 +1,13 @@
 Import('env', 'ports')
 
 build = env.Clone(BUILD = '.build')
-
+build.Append(CPPFLAGS = ['-fno-exceptions']) # We use GCC/MinGW.
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
 src = [
 	'application',
 	'base',
+	'base/memory',
 	'file_system',
 	'ion']
 

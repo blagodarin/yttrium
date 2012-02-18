@@ -220,7 +220,7 @@ String &String::append_dec(double value) // NOTE: Terrible terrible implementati
 	return *this;
 }
 
-String &String::clear() throw()
+String &String::clear() noexcept
 {
 	if (_buffer_size)
 	{

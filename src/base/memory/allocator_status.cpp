@@ -3,17 +3,7 @@
 namespace Yttrium
 {
 
-Allocator::Status::Status() throw()
-	: allocated_blocks(0)
-	, allocated_bytes(0)
-	, total_bytes(0)
-	, allocations(0)
-	, reallocations(0)
-	, deallocations(0)
-{
-}
-
-Allocator::AtomicStatus::AtomicStatus() throw()
+Allocator::AtomicStatus::AtomicStatus() noexcept
 	: _allocated_blocks(0)
 	, _allocated_bytes(0)
 	, _total_bytes(0)
@@ -23,7 +13,7 @@ Allocator::AtomicStatus::AtomicStatus() throw()
 {
 }
 
-void Allocator::AtomicStatus::allocate(const Difference &difference) throw()
+void Allocator::AtomicStatus::allocate(const Difference &difference) noexcept
 {
 	std::atomic_fetch_add(&_total_bytes, difference.total);
 	std::atomic_fetch_add(&_allocated_bytes, difference.allocated);
@@ -32,7 +22,7 @@ void Allocator::AtomicStatus::allocate(const Difference &difference) throw()
 	std::atomic_fetch_add(&_allocations, 1u);
 }
 
-void Allocator::AtomicStatus::deallocate(const Difference &difference) throw()
+void Allocator::AtomicStatus::deallocate(const Difference &difference) noexcept
 {
 	std::atomic_fetch_sub(&_allocated_blocks, 1u);
 	std::atomic_fetch_sub(&_allocated_bytes, difference.allocated);
@@ -41,9 +31,9 @@ void Allocator::AtomicStatus::deallocate(const Difference &difference) throw()
 	std::atomic_fetch_add(&_deallocations, 1u);
 }
 
-void Allocator::AtomicStatus::reallocate(const Difference &difference) throw()
+void Allocator::AtomicStatus::reallocate(const Difference &difference) noexcept
 {
-	if (difference.positive)
+	if (difference.direction == Difference::Increment)
 	{
 		std::atomic_fetch_add(&_total_bytes, difference.total);
 		std::atomic_fetch_add(&_allocated_bytes, difference.allocated);
@@ -57,7 +47,7 @@ void Allocator::AtomicStatus::reallocate(const Difference &difference) throw()
 	std::atomic_fetch_add(&_reallocations, 1u);
 }
 
-Allocator::AtomicStatus::operator Status() const throw()
+Allocator::AtomicStatus::operator Status() const noexcept
 {
 	Status result;
 

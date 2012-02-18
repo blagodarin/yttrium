@@ -1,88 +1,64 @@
 #ifndef __BASE_POSIX_FILE_HPP
 #define __BASE_POSIX_FILE_HPP
 
+#include <atomic>
+
 #include <Yttrium/file.hpp>
 
 namespace Yttrium
 {
 
-class FileReaderImpl: public FileReader
+class File::Private
 {
-	friend class FileReader;
+public:
+
+	Allocator           *allocator;
+	std::atomic<size_t>  references;
+	int                  descriptor;
+	Mode                 mode;
 
 public:
 
-	FileReaderImpl() throw();
+	Private(int descriptor = -1, Mode mode = 0, Allocator *allocator = nullptr) noexcept
+		: allocator(allocator)
+		, references(1)
+		, descriptor(descriptor)
+		, mode(mode)
+	{
+	}
 
-	bool open_file(const StaticString &name) throw();
+public:
 
-public: // FileReader
-
-	virtual ~FileReaderImpl() throw();
-
-	virtual FileReaderPtr dup(Allocator *allocator);
-
-	virtual size_t read(void *buffer, size_t size) throw();
-
-	virtual UOffset offset() throw();
-
-	virtual bool seek(Offset offset, Whence whence) throw();
-
-	virtual UOffset size() throw();
-
-private:
-
-	FileReaderImpl(int descriptor) throw();
-
-	FileReaderImpl(int descriptor, UOffset offset, UOffset size) throw();
-
-private:
-
-	int     _descriptor;
-	UOffset _offset;
-	UOffset _size;
+	static int open(const StaticString &name, int flags, Allocator *allocator) noexcept;
 };
 
-class FileWriterImpl: public FileWriter
+class StaticFile: public File
 {
-	friend class FileWriter;
-
 public:
 
-	FileWriterImpl() throw();
+	StaticFile() noexcept
+		: File(&_private_data)
+	{
+	}
 
-	bool open_file(const StaticString &name) throw();
+	StaticFile(const StaticString &name, Mode mode) noexcept
+		: File(&_private_data)
+	{
+		File::open(name, mode, nullptr);
+	}
 
-public: // FileWriter
+	StaticFile(const StaticFile &file) = delete;
 
-	virtual ~FileWriterImpl() throw();
+	StaticFile &operator =(const StaticFile &file) = delete;
 
-	virtual FileWriterPtr dup(Allocator *allocator);
-
-	virtual size_t write(const void *buffer, size_t size) throw();
-
-	virtual bool flush() throw();
-
-	virtual UOffset offset() throw();
-
-	virtual bool seek(Offset offset, Whence whence) throw();
-
-	virtual UOffset size() throw();
-
-	virtual bool resize(UOffset size) throw();
-
-	virtual bool truncate() throw();
+	bool open(const StaticString &name, Mode mode) noexcept
+	{
+		return File::open(name, mode, nullptr);
+	}
 
 private:
 
-	FileWriterImpl(int descriptor) throw();
-
-	FileWriterImpl(int descriptor, UOffset offset) throw();
-
-private:
-
-	int     _descriptor;
-	UOffset _offset;
+	Private _private_data;
 };
 
 } // namespace Yttrium

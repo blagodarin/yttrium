@@ -22,7 +22,7 @@ using std::min;
 /// \note If \a lo > \a hi, the result is \a hi.
 
 template <typename T>
-const T &clamp(const T &a, const T &lo, const T &hi)
+const T &clamp(const T &a, const T &lo, const T &hi) noexcept
 {
 	return std::min(std::max(a, lo), hi);
 }
@@ -31,7 +31,7 @@ const T &clamp(const T &a, const T &lo, const T &hi)
 /// \param x Value to test.
 /// \return Power-of-two test result.
 
-inline bool is_power_of_2(int8_t x)
+inline bool is_power_of_2(int8_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -40,7 +40,7 @@ inline bool is_power_of_2(int8_t x)
 * \overload
 */
 
-inline bool is_power_of_2(uint8_t x)
+inline bool is_power_of_2(uint8_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -49,7 +49,7 @@ inline bool is_power_of_2(uint8_t x)
 * \overload
 */
 
-inline bool is_power_of_2(int16_t x)
+inline bool is_power_of_2(int16_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -58,7 +58,7 @@ inline bool is_power_of_2(int16_t x)
 * \overload
 */
 
-inline bool is_power_of_2(uint16_t x)
+inline bool is_power_of_2(uint16_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -67,7 +67,7 @@ inline bool is_power_of_2(uint16_t x)
 * \overload
 */
 
-inline bool is_power_of_2(int32_t x)
+inline bool is_power_of_2(int32_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -76,7 +76,7 @@ inline bool is_power_of_2(int32_t x)
 * \overload
 */
 
-inline bool is_power_of_2(uint32_t x)
+inline bool is_power_of_2(uint32_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -85,7 +85,7 @@ inline bool is_power_of_2(uint32_t x)
 * \overload
 */
 
-inline bool is_power_of_2(int64_t x)
+inline bool is_power_of_2(int64_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -94,7 +94,7 @@ inline bool is_power_of_2(int64_t x)
 * \overload
 */
 
-inline bool is_power_of_2(uint64_t x)
+inline bool is_power_of_2(uint64_t x) noexcept
 {
 	return !(x & (x - 1)) && x > 0;
 }
@@ -103,7 +103,7 @@ inline bool is_power_of_2(uint64_t x)
 /// \param x Source value.
 /// \return Next power of two.
 
-inline int8_t next_power_of_2(int8_t x)
+inline int8_t next_power_of_2(int8_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
@@ -116,7 +116,7 @@ inline int8_t next_power_of_2(int8_t x)
 * \overload
 */
 
-inline uint8_t next_power_of_2(uint8_t x)
+inline uint8_t next_power_of_2(uint8_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
@@ -129,21 +129,7 @@ inline uint8_t next_power_of_2(uint8_t x)
 * \overload
 */
 
-inline int16_t next_power_of_2(int16_t x)
-{
-	--x;
-	x |= x >> 1;
-	x |= x >> 2;
-	x |= x >> 4;
-	x |= x >> 8;
-	return x + 1;
-}
-
-/**
-* \overload
-*/
-
-inline uint16_t next_power_of_2(uint16_t x)
+inline int16_t next_power_of_2(int16_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
@@ -157,14 +143,13 @@ inline uint16_t next_power_of_2(uint16_t x)
 * \overload
 */
 
-inline int32_t next_power_of_2(int32_t x)
+inline uint16_t next_power_of_2(uint16_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
 	x |= x >> 2;
 	x |= x >> 4;
 	x |= x >> 8;
-	x |= x >> 16;
 	return x + 1;
 }
 
@@ -172,7 +157,7 @@ inline int32_t next_power_of_2(int32_t x)
 * \overload
 */
 
-inline uint32_t next_power_of_2(uint32_t x)
+inline int32_t next_power_of_2(int32_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
@@ -187,7 +172,22 @@ inline uint32_t next_power_of_2(uint32_t x)
 * \overload
 */
 
-inline int64_t next_power_of_2(int64_t x)
+inline uint32_t next_power_of_2(uint32_t x) noexcept
+{
+	--x;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	return x + 1;
+}
+
+/**
+* \overload
+*/
+
+inline int64_t next_power_of_2(int64_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
@@ -203,7 +203,7 @@ inline int64_t next_power_of_2(int64_t x)
 * \overload
 */
 
-inline uint64_t next_power_of_2(uint64_t x)
+inline uint64_t next_power_of_2(uint64_t x) noexcept
 {
 	--x;
 	x |= x >> 1;
@@ -220,7 +220,9 @@ inline uint64_t next_power_of_2(uint64_t x)
 /// \param y Second value.
 /// \return \c true if both values have the same sign.
 
-inline bool same_sign(int8_t x, int8_t y)
+// NOTE: Does it work for all the integer representations? If it does, add a doxy-note about it.
+
+inline bool same_sign(int8_t x, int8_t y) noexcept
 {
 	return (x ^ y) >= 0;
 }
@@ -229,7 +231,7 @@ inline bool same_sign(int8_t x, int8_t y)
 * \overload
 */
 
-inline bool same_sign(int16_t x, int16_t y)
+inline bool same_sign(int16_t x, int16_t y) noexcept
 {
 	return (x ^ y) >= 0;
 }
@@ -238,7 +240,7 @@ inline bool same_sign(int16_t x, int16_t y)
 * \overload
 */
 
-inline bool same_sign(int32_t x, int32_t y)
+inline bool same_sign(int32_t x, int32_t y) noexcept
 {
 	return (x ^ y) >= 0;
 }
@@ -247,7 +249,7 @@ inline bool same_sign(int32_t x, int32_t y)
 * \overload
 */
 
-inline bool same_sign(int64_t x, int64_t y)
+inline bool same_sign(int64_t x, int64_t y) noexcept
 {
 	return (x ^ y) >= 0;
 }

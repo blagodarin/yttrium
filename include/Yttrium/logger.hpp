@@ -49,7 +49,7 @@ public:
 
 		///
 
-		~Writer()
+		~Writer() noexcept
 		{
 			_logger._message << _location << Y_S("\r\n");
 			_logger.flush();
@@ -60,7 +60,7 @@ public:
 		///
 
 		template <typename T>
-		Writer &operator <<(const T &value)
+		Writer &operator <<(const T &value) noexcept
 		{
 			_logger._message << value;
 			return *this;
@@ -69,7 +69,7 @@ public:
 	private:
 
 		Writer(Logger &logger, Level level, const StaticString &file = StaticString(),
-			int line = 0, const StaticString &function = StaticString());
+			int line = 0, const StaticString &function = StaticString()) noexcept;
 
 	private:
 
@@ -81,52 +81,52 @@ public:
 
 public:
 
-	explicit Logger(Allocator *allocator = HeapAllocator::instance()) throw()
+	explicit Logger(Allocator *allocator = HeapAllocator::instance()) noexcept
 		: _level(root_level())
 		, _name(allocator)
 		, _message(allocator)
 	{
 	}
 
-	explicit Logger(Level level, Allocator *allocator = HeapAllocator::instance()) throw()
+	explicit Logger(Level level, Allocator *allocator = HeapAllocator::instance()) noexcept
 		: _level(level)
 		, _name(allocator)
 		, _message(allocator)
 	{
 	}
 
-	explicit Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance())
+	explicit Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance()) noexcept
 		: _level(level(name))
 		, _name(name, allocator)
 		, _message(allocator)
 	{
 	}
 
-	Level level() const throw()
+	Level level() const noexcept
 	{
 		return _level;
 	}
 
 	Writer log(Level level, const StaticString &file = StaticString(),
-		int line = 0, const StaticString &function = StaticString())
+		int line = 0, const StaticString &function = StaticString()) noexcept
 	{
 		return Writer(*this, level, file, line, function);
 	}
 
 private:
 
-	static Level level(const StaticString &name) throw();
+	static Level level(const StaticString &name) noexcept;
 
-	static Level root_level() throw();
+	static Level root_level() noexcept;
 
 private:
 
-	Allocator *allocator() const throw()
+	Allocator *allocator() const noexcept
 	{
 		return _message.allocator();
 	}
 
-	void flush() throw();
+	void flush() noexcept;
 
 private:
 

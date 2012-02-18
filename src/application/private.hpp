@@ -5,7 +5,7 @@
 #include <Yttrium/types.hpp>
 
 #include "../file_system/file_system.hpp"
-#include "../base/heap_allocator.hpp"
+#include "../base/memory/heap_allocator.hpp"
 #include "../base/log_manager.hpp"
 
 namespace Yttrium
@@ -17,14 +17,14 @@ class Application::Private
 
 public:
 
-	Private() throw()
+	Private()
 	{
 		_exists = true;
 		Yttrium::_heap_allocator = &_heap_allocator;
 		Yttrium::_file_system = &_file_system;
 	}
 
-	~Private() throw()
+	~Private()
 	{
 		Yttrium::_file_system = nullptr;
 		Yttrium::_heap_allocator = nullptr;
@@ -35,19 +35,19 @@ public:
 	{
 	}
 
-	LogManager::Private &log_manager_private() throw()
+	LogManager::Private &log_manager_private()
 	{
 		return _log_manager_private;
 	}
 
 public:
 
-	static bool exists() throw()
+	static bool exists()
 	{
 		return _exists;
 	}
 
-	static Private *pointer() throw()
+	static Private *pointer()
 	{
 		return reinterpret_cast<Private *>(_buffer);
 	}

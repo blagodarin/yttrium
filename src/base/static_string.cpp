@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 
-int StaticString::compare(const StaticString &string) const throw()
+int StaticString::compare(const StaticString &string) const noexcept
 {
 	if (_size < string._size)
 	{
@@ -23,7 +23,7 @@ int StaticString::compare(const StaticString &string) const throw()
 	}
 }
 
-size_t StaticString::count(const char *symbols) const throw()
+size_t StaticString::count(const char *symbols) const noexcept
 {
 	size_t result = 0;
 
@@ -44,7 +44,7 @@ size_t StaticString::count(const char *symbols) const throw()
 	return result;
 }
 
-size_t StaticString::find_first(char symbol, size_t offset) const throw()
+size_t StaticString::find_first(char symbol, size_t offset) const noexcept
 {
 	if (offset < _size)
 	{
@@ -62,7 +62,7 @@ size_t StaticString::find_first(char symbol, size_t offset) const throw()
 	return End;
 }
 
-size_t StaticString::find_last(char symbol, size_t offset) const throw()
+size_t StaticString::find_last(char symbol, size_t offset) const noexcept
 {
 	if (offset > _size)
 	{
@@ -82,7 +82,7 @@ size_t StaticString::find_last(char symbol, size_t offset) const throw()
 	return End;
 }
 
-double StaticString::to_double() const throw()
+double StaticString::to_double() const noexcept
 {
 	if (!_size)
 	{
@@ -156,7 +156,7 @@ double StaticString::to_double() const throw()
 	return (negate_result ? -result : result);
 }
 
-int32_t StaticString::to_int32() const throw()
+int32_t StaticString::to_int32() const noexcept
 {
 	if (!_size)
 	{
@@ -188,7 +188,7 @@ int32_t StaticString::to_int32() const throw()
 	return (negate_result ? -result : result);
 }
 
-int64_t StaticString::to_int64() const throw()
+int64_t StaticString::to_int64() const noexcept
 {
 	if (!_size)
 	{
@@ -220,7 +220,7 @@ int64_t StaticString::to_int64() const throw()
 	return (negate_result ? -result : result);
 }
 
-bool StaticString::to_number(int32_t *value) const throw()
+bool StaticString::to_number(int32_t *value) const noexcept
 {
 	if (!_size)
 	{
@@ -278,7 +278,7 @@ bool StaticString::to_number(int32_t *value) const throw()
 	return true;
 }
 
-bool StaticString::to_number(double *value) const throw()
+bool StaticString::to_number(double *value) const noexcept
 {
 	if (!_size)
 	{
@@ -379,7 +379,7 @@ bool StaticString::to_number(double *value) const throw()
 	return true;
 }
 
-double StaticString::to_time() const throw()
+double StaticString::to_time() const noexcept
 {
 	if (!_size)
 	{
@@ -451,7 +451,7 @@ double StaticString::to_time() const throw()
 	return (negate_result ? -result : result);
 }
 
-uint32_t StaticString::to_uint32() const throw()
+uint32_t StaticString::to_uint32() const noexcept
 {
 	if (!_size)
 	{
@@ -480,7 +480,7 @@ uint32_t StaticString::to_uint32() const throw()
 	return result;
 }
 
-uint64_t StaticString::to_uint64() const throw()
+uint64_t StaticString::to_uint64() const noexcept
 {
 	if (!_size)
 	{

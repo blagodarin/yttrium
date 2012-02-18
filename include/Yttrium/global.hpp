@@ -60,41 +60,41 @@
 // If it's not Windows, then it's definitely Linux. I do not need Macs,
 // and I need FreeBSD etc. even less. =)
 
-/// \def Y_LINUX
+/// \def Y_IS_LINUX
 /// \brief
 
 #if defined(__linux__)
-	#define Y_LINUX   1
+	#define Y_IS_LINUX   1
 #else
-	#define Y_LINUX 0
+	#define Y_IS_LINUX 0
 #endif
 
-/// \def Y_POSIX
+/// \def Y_IS_POSIX
 /// \brief Defined to 1 for a POSIX system, including Linux.
 
-#if Y_LINUX || defined(__unix__)
-	#define Y_POSIX 1
+#if Y_IS_LINUX || defined(__unix__)
+	#define Y_IS_POSIX 1
 #else
-	#define Y_POSIX 0
+	#define Y_IS_POSIX 0
 #endif
 
 /// \def Y_WINDOWS
 /// \brief
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-	#define Y_WINDOWS 1
+	#define Y_IS_WINDOWS 1
 #else
-	#define Y_WINDOWS 0
+	#define Y_IS_WINDOWS 0
 #endif
 
 // Check the correctness of the platform definitions.
 // NOTE: Do we need this really?
 
-#if Y_POSIX && Y_WINDOWS
+#if Y_IS_POSIX && Y_IS_WINDOWS
 	#error Invalid target platform.
 #endif
 
-#if !(Y_POSIX || Y_WINDOWS)
+#if !(Y_IS_POSIX || Y_IS_WINDOWS)
 	#error Unknown target platform.
 #endif
 
@@ -109,6 +109,13 @@
 
 #if __Y_MSVC && !defined(__func__)
 	#define __func__ __FUNCTION__
+#endif
+
+// noexcept for older versions of GCC.
+// MSVC doesn't support noexcept, but treats throw() just the same way.
+
+#if ((__Y_GCC && __Y_GCC < 46) || __Y_MSVC) && !defined(noexcept)
+	#define noexcept throw()
 #endif
 
 // nullptr for older versions of GCC.
@@ -128,7 +135,7 @@
 
 // GCC (thus MinGW) supports __declspec(dllexport) and __declspec(dllimport).
 
-#if Y_WINDOWS
+#if Y_IS_WINDOWS
 	#define Y_EXPORT __declspec(dllexport)
 	#define Y_IMPORT __declspec(dllimport)
 	#define Y_PRIVATE
@@ -161,13 +168,13 @@
 	#define Y_API Y_IMPORT
 #endif
 
-/// \def Y_DEBUG
+/// \def Y_IS_DEBUG
 /// \brief
 
 #if defined(_DEBUG) && !defined(NDEBUG)
-	#define Y_DEBUG 1
+	#define Y_IS_DEBUG 1
 #else
-	#define Y_DEBUG 0
+	#define Y_IS_DEBUG 0
 #endif
 
 /// Calculate the static \a array length.

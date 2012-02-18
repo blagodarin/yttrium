@@ -17,21 +17,21 @@ public:
 
 	///
 
-	Application() throw();
+	Application() noexcept;
 
 	///
 
-	~Application() throw();
+	~Application() noexcept;
 
 	///
 	/// \note This function is not reentrant!
 
-	void initialize();
+	void initialize() noexcept;
 
 	///
 	/// \note The log manager can be retrieved before the Application initialization.
 
-	LogManager log_manager() throw();
+	LogManager log_manager() noexcept;
 
 public:
 

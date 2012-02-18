@@ -3,68 +3,84 @@
 namespace Yttrium
 {
 
-FileReaderPtr FileSystem::open_reader(const StaticString &name, Order order)
+File FileSystem::open_file(const StaticString &name, File::Mode mode, Order order) noexcept
 {
-	FileReaderPtr reader;
+	if (mode != File::Read)
+	{
+		return File(name, mode); // NOTE: No allocator specified!
+	}
 
-	order = effective_order(order);
+	File file;
+
+	if (order == PresetOrder)
+	{
+		order = _order;
+	}
+
 	if (order == PackedFirst || order == PackedOnly)
 	{
-		if ((reader = open_packed(name)))
+		if ((file = open_packed(name)))
 		{
-			return reader;
+			return file;
 		}
 	}
+
 	if (order != PackedOnly)
 	{
-		if ((reader = FileReader::open(name)))
+		if ((file = File(name, mode)))
 		{
-			return reader;
+			return file;
 		}
+
 		if (order != SystemOnly)
 		{
 			return open_packed(name);
 		}
 	}
-	return FileReaderPtr();
+
+	return file;
 }
 
-bool FileSystem::mount(const StaticString &name, PackageFormat format)
+bool FileSystem::mount(const StaticString &name, PackageFormat format) noexcept
 {
 	PackageReader *package = PackageReader::open(name, format);
-	if (!package)
+
+	if (package)
 	{
-		return false;
+		_packages.push_back(package);
 	}
-	_packages.push_back(package);
-	return true;
+
+	return package;
 }
 
-void FileSystem::unmount_all() throw()
+void FileSystem::unmount_all() noexcept
 {
 	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
 		delete *i;
 	}
+
 	_packages.clear();
 }
 
-FileReaderPtr FileSystem::open_packed(const StaticString &name)
-{
-	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
-	{
-		FileReaderPtr file = (*i)->open_reader(name);
-		if (file)
-		{
-			return file;
-		}
-	}
-	return FileReaderPtr();
-}
-
-FileSystem &FileSystem::instance() throw()
+FileSystem &FileSystem::instance() noexcept
 {
 	return *_file_system;
+}
+
+File FileSystem::open_packed(const StaticString &name) const
+{
+	File file;
+
+	for (Packages::const_reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
+	{
+		file = (*i)->open_file(name);
+		if (file)
+		{
+			break;
+		}
+	}
+	return file;
 }
 
 FileSystem *_file_system = nullptr;

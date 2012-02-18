@@ -1,260 +1,284 @@
-#define _LARGEFILE64_SOURCE
-#define _XOPEN_SOURCE 500
-
-#define __USE_LARGEFILE64 // NOTE: Deprecated?
+#define _FILE_OFFSET_BITS 64
+//#define _XOPEN_SOURCE 500
 
 #include "file.hpp"
 
 #include <fcntl.h>  // open
-#include <unistd.h> // close, dup, fsync, ftruncate64, lseek64, pread64, pwrite64
+#include <unistd.h> // close, fsync, ftruncate, lseek, pread, pwrite, read, write
+
+#include <Yttrium/string.hpp>
 
 namespace Yttrium
 {
 
-FileReaderImpl::FileReaderImpl() throw()
-	: FileReader(0)
-	, _descriptor(-1)
+File::File(const StaticString &name, Mode mode, Allocator *allocator) noexcept
+	: _private(nullptr)
 	, _offset(0)
 	, _size(0)
+	, _base(0)
 {
+	open(name, mode, allocator);
 }
 
-bool FileReaderImpl::open_file(const StaticString &name) throw()
+File::File(const File &file) noexcept
+	: _private(file._private)
+	, _offset(file._offset)
+	, _size(file._size)
+	, _base(file._base)
 {
-	if (_descriptor != -1)
+	// NOTE: It may be theoretically possible that our copy-constructing thread will be interrupted
+	// just here, and then the file would be destroyed in another thread, leaving us with a crash.
+
+	if (_private)
+	{
+		++_private->references;
+	}
+}
+
+File::~File() noexcept
+{
+	close();
+}
+
+void File::close() noexcept
+{
+	if (_private)
+	{
+		if (_private->allocator)
+		{
+			if (!--_private->references)
+			{
+				::close(_private->descriptor);
+				_private->allocator->delete_(_private);
+			}
+			_private = nullptr;
+		}
+		else if (_private->mode & ReadWrite)
+		{
+			::close(_private->descriptor);
+			_private->mode = 0;
+		}
+	}
+	_offset = 0;
+	_size = 0;
+	_base = 0;
+}
+
+bool File::flush() noexcept
+{
+	return (_private && (_private->mode & Write)
+		? !fsync(_private->descriptor)
+		: false);
+}
+
+bool File::open(const StaticString &name, Mode mode, Allocator *allocator) noexcept
+{
+	close();
+
+	int flags = (Y_IS_LINUX ? O_NOATIME : 0);
+	switch (mode & ReadWrite)
+	{
+	case Read:      flags |= O_RDONLY;           break;
+	case Write:     flags |= O_WRONLY | O_CREAT; break;
+	case ReadWrite: flags = O_RDWR | O_CREAT;    break;
+	default:        return false;
+	}
+
+	int descriptor = Private::open(name, flags, allocator);
+
+	if (descriptor == -1)
 	{
 		return false;
 	}
 
-	_descriptor = ::open(name.text(), O_RDONLY | O_LARGEFILE, 0644);
-	if (_descriptor == -1)
+	if (!_private)
 	{
-		return false;
+		_private = new(allocator->allocate<Private>())
+			Private(descriptor, mode, allocator);
+
+		if ((_private->mode & (Read | Write | Pipe)) == Read)
+		{
+			_size = lseek(descriptor, 0, SEEK_END);
+		}
+	}
+	else
+	{
+		_private->descriptor = descriptor;
+		_private->mode = mode;
 	}
 
-	_size = lseek64(_descriptor, 0, SEEK_END);
 	return true;
 }
 
-FileReaderImpl::~FileReaderImpl() throw()
+bool File::opened() const noexcept
 {
-	close(_descriptor);
+	return (_private && (_private->mode & ReadWrite));
 }
 
-FileReaderPtr FileReaderImpl::dup(Allocator *allocator)
+size_t File::read(void *buffer, size_t size) noexcept
 {
-	int descriptor = ::dup(_descriptor);
-	if (descriptor == -1)
+	if (_private && (_private->mode & Read))
 	{
-		return FileReaderPtr();
-	}
+		ssize_t result;
 
-	try
-	{
-		return FileReaderPtr(new(allocator) FileReaderImpl(descriptor, _offset, _size));
-	}
-	catch (...)
-	{
-		close(descriptor);
-		throw;
-	}
-}
-
-size_t FileReaderImpl::read(void *buffer, size_t size) throw()
-{
-	ssize_t result = pread64(_descriptor, buffer, size, _offset);
-	if (result != -1)
-	{
-		_offset += static_cast<size_t>(result);
-		return result;
+		if (_private->mode & Pipe)
+		{
+			result = ::read(_private->descriptor, buffer, size);
+			if (result != -1)
+			{
+				return result;
+			}
+		}
+		else
+		{
+			result = pread(_private->descriptor, buffer, size, _base + _offset);
+			if (result != -1)
+			{
+				_offset += static_cast<size_t>(result);
+				return result;
+			}
+		}
 	}
 	return 0;
 }
 
-UOffset FileReaderImpl::offset() throw()
+bool File::resize(UOffset size) noexcept
 {
-	return _offset;
+	return (_private && ((_private->mode & (Write | Pipe)) == Write)
+		? !ftruncate(_private->descriptor, size)
+		: false);
 }
 
-bool FileReaderImpl::seek(Offset offset, Whence whence) throw()
+bool File::seek(UOffset offset, Whence whence) noexcept
 {
-	UOffset newOffset;
+	if (!_private || (_private->mode & Pipe))
+	{
+		return false;
+	}
+
+	bool read_only = ((_private->mode & ReadWrite) == Read);
 
 	switch (whence)
 	{
-	case Relative: newOffset = offset + _offset; break;
-	case Reverse:  newOffset = offset + _size;   break;
-	default:       newOffset = offset;           break;
+	case Relative:
+
+		{
+			UOffset limit = (read_only ? _size : UINT64_MAX); // NOTE: Hack: we don't exactly know the UOffset's size.
+
+			if (limit - _offset < offset)
+			{
+				return false;
+			}
+			_offset += offset;
+		}
+		break;
+
+	case Reverse:
+
+		{
+			UOffset size;
+
+			if (read_only)
+			{
+				size = _size;
+			}
+			else
+			{
+				off_t off = lseek(_private->descriptor, 0, SEEK_END);
+
+				if (off == -1)
+				{
+					return false;
+				}
+				size = static_cast<UOffset>(off);
+			}
+			if (size < offset)
+			{
+				return false;
+			}
+			_offset = size - offset;
+		}
+		break;
+
+	default:
+
+		if (read_only && offset > _size)
+		{
+			return false;
+		}
+		_offset = offset;
+		break;
 	}
-	if (newOffset > _size)
-	{
-		return false;
-	}
-	_offset = newOffset;
 	return true;
 }
 
-UOffset FileReaderImpl::size() throw()
+UOffset File::size() const noexcept
 {
-	return _size;
-}
-
-FileReaderImpl::FileReaderImpl(int descriptor) throw()
-	: _descriptor(descriptor)
-	, _offset(0)
-	, _size(lseek64(descriptor, 0, SEEK_END))
-{
-}
-
-FileReaderImpl::FileReaderImpl(int descriptor, UOffset offset, UOffset size) throw()
-	: _descriptor(descriptor)
-	, _offset(offset)
-	, _size(size)
-{
-}
-
-FileReaderPtr FileReader::open(const StaticString &name, Allocator *allocator)
-{
-	int descriptor = ::open(name.text(), O_RDONLY | O_LARGEFILE, 0644);
-	if (descriptor == -1)
+	if (_private)
 	{
-		return FileReaderPtr();
-	}
+		switch (_private->mode & (ReadWrite | Pipe))
+		{
+		case Read:
 
-	try
-	{
-		return FileReaderPtr(new(allocator) FileReaderImpl(descriptor));
-	}
-	catch (...)
-	{
-		close(descriptor);
-		throw;
-	}
-}
+			return _size;
 
-FileWriterImpl::FileWriterImpl() throw()
-	: FileWriter(0)
-	, _descriptor(-1)
-	, _offset(0)
-{
-}
+		case Write:
+		case ReadWrite:
 
-bool FileWriterImpl::open_file(const StaticString &name) throw()
-{
-	if (_descriptor != -1)
-	{
-		return false;
-	}
-
-	_descriptor = ::open(name.text(), O_WRONLY | O_CREAT | O_LARGEFILE, 0644);
-	if (_descriptor == -1)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-FileWriterImpl::~FileWriterImpl() throw()
-{
-	close(_descriptor);
-}
-
-FileWriterPtr FileWriterImpl::dup(Allocator *allocator)
-{
-	int descriptor = ::dup(_descriptor);
-	if (descriptor == -1)
-	{
-		return FileWriterPtr();
-	}
-
-	try
-	{
-		return FileWriterPtr(new(allocator) FileWriterImpl(descriptor, _offset));
-	}
-	catch (...)
-	{
-		close(descriptor);
-		throw;
-	}
-}
-
-size_t FileWriterImpl::write(const void *buffer, size_t size) throw()
-{
-	ssize_t result = pwrite64(_descriptor, buffer, size, _offset);
-	if (result != -1)
-	{
-		_offset += static_cast<size_t>(result);
-		return result;
+			{
+				off_t size = lseek(_private->descriptor, 0, SEEK_END);
+				if (size != -1)
+				{
+					return size;
+				}
+			}
+			break;
+		}
 	}
 	return 0;
 }
 
-bool FileWriterImpl::flush() throw()
+bool File::truncate() noexcept
 {
-	return !fsync(_descriptor);
+	return resize(_offset);
 }
 
-UOffset FileWriterImpl::offset() throw()
+size_t File::write(const void *buffer, size_t size) noexcept
 {
-	return _offset;
-}
-
-bool FileWriterImpl::seek(Offset offset, Whence whence) throw()
-{
-	switch (whence)
+	if (_private && (_private->mode & Write))
 	{
-	case Relative: _offset = offset + _offset; break;
-	case Reverse:  _offset = offset + size();  break;
-	default:       _offset = offset;           break;
+		if (_private->mode & Pipe)
+		{
+			ssize_t result = ::write(_private->descriptor, buffer, size);
+			if (result != -1)
+			{
+				return result;
+			}
+		}
+		else
+		{
+			ssize_t result = pwrite(_private->descriptor, buffer, size, _offset);
+			if (result != -1)
+			{
+				_offset += static_cast<size_t>(result);
+				return result;
+			}
+		}
 	}
-	return true;
+	return 0;
 }
 
-UOffset FileWriterImpl::size() throw()
+int File::Private::open(const StaticString &name, int flags, Allocator *allocator) noexcept
 {
-	off64_t result = lseek64(_descriptor, 0, SEEK_END);
-	return result != -1 ? result : 0;
-}
-
-bool FileWriterImpl::resize(UOffset size) throw()
-{
-	return !ftruncate64(_descriptor, size);
-}
-
-bool FileWriterImpl::truncate() throw()
-{
-	return !ftruncate64(_descriptor, _offset);
-}
-
-FileWriterImpl::FileWriterImpl(int descriptor) throw()
-	: _descriptor(descriptor)
-	, _offset(0)
-{
-}
-
-FileWriterImpl::FileWriterImpl(int descriptor, UOffset offset) throw()
-	: _descriptor(descriptor)
-	, _offset(offset)
-{
-}
-
-FileWriterPtr FileWriter::open(const StaticString &name, Allocator *allocator)
-{
-	int descriptor = ::open(name.text(), O_WRONLY | O_CREAT | O_LARGEFILE, 0644);
-	if (descriptor == -1)
+	if (name.zero_terminated()) // Avoid extra allocation.
 	{
-		return FileWriterPtr();
+		return ::open(name.text(), flags, 0644);
 	}
+	else
+	{
+		String fixed_name(name, allocator); // TODO: Think of using a stack (alloca) here.
 
-	try
-	{
-		return FileWriterPtr(new(allocator) FileWriterImpl(descriptor));
-	}
-	catch (...)
-	{
-		close(descriptor);
-		throw;
+		return ::open(fixed_name.text(), flags, 0644);
 	}
 }
 

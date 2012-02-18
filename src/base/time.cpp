@@ -8,7 +8,7 @@ enum
 	RateCounterPeriod = 1000, // The rate changes at most once per second.
 };
 
-Clock Timer::reset() throw()
+Clock Timer::reset() noexcept
 {
 	Clock result = _time;
 	if (_started)
@@ -21,7 +21,7 @@ Clock Timer::reset() throw()
 	return result;
 }
 
-Clock Timer::restart() throw()
+Clock Timer::restart() noexcept
 {
 	Clock time = clock();
 	Clock result = _time;
@@ -39,7 +39,7 @@ Clock Timer::restart() throw()
 	return result;
 }
 
-void Timer::start() throw()
+void Timer::start() noexcept
 {
 	if (!_started)
 	{
@@ -48,7 +48,7 @@ void Timer::start() throw()
 	}
 }
 
-Clock Timer::stop() throw()
+Clock Timer::stop() noexcept
 {
 	if (_started)
 	{
@@ -58,7 +58,7 @@ Clock Timer::stop() throw()
 	return _time;
 }
 
-void RateCounter::start() throw()
+void RateCounter::start() noexcept
 {
 	_last_time = Timer::clock();
 	_total_time = 0;
@@ -66,7 +66,7 @@ void RateCounter::start() throw()
 	_rate = 0;
 }
 
-void RateCounter::tick() throw()
+void RateCounter::tick() noexcept
 {
 	Clock time = Timer::clock();
 	_total_time += time - _last_time;

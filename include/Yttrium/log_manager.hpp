@@ -18,23 +18,23 @@ public:
 
 	///
 
-	Logger::Level level(const StaticString &name) const throw();
+	Logger::Level level(const StaticString &name) const noexcept;
 
 	///
 
-	bool open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level = Logger::Info) throw();
+	bool open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level = Logger::Info) noexcept;
 
 	///
 
-	Logger::Level root_level() const throw();
+	Logger::Level root_level() const noexcept;
 
 	///
 
-	void set_level(const StaticString &name, Logger::Level level);
+	void set_level(const StaticString &name, Logger::Level level) noexcept;
 
 	///
 
-	void set_root_level(Logger::Level level) throw();
+	void set_root_level(Logger::Level level) noexcept;
 
 public:
 
@@ -44,7 +44,7 @@ public:
 
 private:
 
-	LogManager(Private *private_) throw();
+	LogManager(Private *private_);
 
 private:
 

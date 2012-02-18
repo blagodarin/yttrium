@@ -15,30 +15,30 @@ class LogManager::Private
 
 public:
 
-	Private() throw()
+	Private()
 		: _root_level(Logger::None)
 	{
 	}
 
-	Logger::Level level(const StaticString &name) const throw();
+	Logger::Level level(const StaticString &name) const;
 
-	LogManager log_manager() throw()
+	LogManager log_manager()
 	{
 		return LogManager(this);
 	}
 
-	bool open(const StaticString &file, Logger::OpenMode mode) throw();
+	bool open(const StaticString &file, Logger::OpenMode mode);
 
-	Logger::Level root_level() const throw()
+	Logger::Level root_level() const
 	{
 		return _root_level;
 	}
 
 	void set_level(const StaticString &name, Logger::Level level);
 
-	void set_root_level(Logger::Level level) throw();
+	void set_root_level(Logger::Level level);
 
-	bool write(const void *buffer, size_t size) throw();
+	bool write(const void *buffer, size_t size);
 
 private:
 
@@ -46,9 +46,9 @@ private:
 
 private:
 
-	FileWriterImpl _log;
-	Logger::Level  _root_level;
-	Levels         _levels;
+	StaticFile    _log;
+	Logger::Level _root_level;
+	Levels        _levels;
 };
 
 } // namespace Yttrium

@@ -24,24 +24,32 @@ public:
 	enum Movability
 	{
 		MayMove,    ///< The memory may be relocated.
-		MayNotMove, ///< The memory may not be relocated.
+		MayNotMove, ///< The memory may not be relocated, and the function may return \c nullptr.
 	};
 
 	///
 
 	struct Difference
 	{
-		size_t allocated;
-		size_t total;
-		bool   positive;
+		///<
 
-		Difference &set(size_t allocated, size_t total, bool positive) throw()
+		enum Direction
 		{
-			this->allocated = allocated;
-			this->total = total;
-			this->positive = positive;
+			Increment, ///<
+			Decrement, ///<
+		};
 
-			return *this;
+		size_t    allocated; ///<
+		size_t    total;     ///<
+		Direction direction; ///<
+
+		///
+
+		Difference(size_t allocated = 0, size_t total = 0, Direction direction = Increment) noexcept
+			: allocated(allocated)
+			, total(total)
+			, direction(direction)
+		{
 		}
 	};
 
@@ -59,7 +67,15 @@ public:
 
 		///
 
-		Status() throw();
+		Status() noexcept
+			: allocated_blocks(0)
+			, allocated_bytes(0)
+			, total_bytes(0)
+			, allocations(0)
+			, reallocations(0)
+			, deallocations(0)
+		{
+		}
 	};
 
 	/// Atomic allocator status.
@@ -68,17 +84,27 @@ public:
 	{
 	public:
 
-		AtomicStatus() throw();
+		///
 
-		void allocate(const Difference &difference) throw();
+		AtomicStatus() noexcept;
 
-		void deallocate(const Difference &difference) throw();
+		///
 
-		void reallocate(const Difference &difference) throw();
+		void allocate(const Difference &difference) noexcept;
+
+		///
+
+		void deallocate(const Difference &difference) noexcept;
+
+		///
+
+		void reallocate(const Difference &difference) noexcept;
 
 	public:
 
-		operator Status() const throw();
+		///
+
+		operator Status() const noexcept;
 
 	private:
 
@@ -95,26 +121,22 @@ public:
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) = 0;
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept = 0;
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = nullptr) throw() = 0;
+	virtual void deallocate(void *pointer, Difference *difference = nullptr) noexcept = 0;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) = 0;
-
-	///
-
-	virtual Status status() const throw() = 0;
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept = 0;
 
 public:
 
 	///
 
 	template <typename T>
-	T *allocate_(size_t count = 1)
+	T *allocate(size_t count = 1) noexcept
 	{
 		return static_cast<T *>(allocate(sizeof(T) * count));
 	}
@@ -122,7 +144,7 @@ public:
 	///
 
 	template <typename T>
-	void delete_(T *pointer) throw()
+	void delete_(T *pointer) noexcept
 	{
 		if (pointer)
 		{
@@ -134,7 +156,7 @@ public:
 	///
 
 	template <typename T>
-	T *new_()
+	T *new_() noexcept
 	{
 		T *pointer = static_cast<T *>(allocate(sizeof(T)));
 		new(pointer) T();
@@ -144,20 +166,31 @@ public:
 	///
 
 	template <typename T, typename U>
-	T *new_(const U& source)
+	T *new_(const U& source) noexcept
 	{
 		T *p = static_cast<T *>(allocate(sizeof(T)));
 		new(p) T(source);
 		return p;
 	}
 
+	///
+
+	Status status() const noexcept
+	{
+		return _status;
+	}
+
 protected:
 
 	///
 
-	virtual ~Allocator() throw()
+	virtual ~Allocator() noexcept
 	{
 	}
+
+protected:
+
+	AtomicStatus _status;
 };
 
 /// Heap allocator.
@@ -166,7 +199,7 @@ class Y_API HeapAllocator: public Allocator
 {
 public:
 
-	static HeapAllocator *instance() throw();
+	static HeapAllocator *instance() noexcept;
 };
 
 /// System allocator.
@@ -177,17 +210,17 @@ public:
 
 	///
 
-	virtual size_t lower_bound(size_t size) const throw() = 0;
+	virtual size_t lower_bound(size_t size) const noexcept = 0;
 
 	///
 
-	virtual size_t upper_bound(size_t size) const throw() = 0;
+	virtual size_t upper_bound(size_t size) const noexcept = 0;
 
 public:
 
 	///
 
-	static SystemAllocator *instance() throw();
+	static SystemAllocator *instance() noexcept;
 };
 
 /// Proxy allocator.
@@ -198,11 +231,11 @@ public:
 
 	///
 
-	ProxyAllocator(Allocator *allocator, const StaticString &name = StaticString());
+	ProxyAllocator(Allocator *allocator, const StaticString &name = StaticString()) noexcept;
 
 	///
 
-	StaticString name() const throw()
+	StaticString name() const noexcept
 	{
 		return _name;
 	}
@@ -211,24 +244,19 @@ public: // Allocator
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr);
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept;
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = nullptr) throw();
+	virtual void deallocate(void *pointer, Difference *difference = nullptr) noexcept;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr);
-
-	///
-
-	virtual Status status() const throw();
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept;
 
 private:
 
 	Allocator    *_allocator;
-	AtomicStatus  _status;
 	StaticString  _name;
 };
 
@@ -238,15 +266,15 @@ class Y_API Allocatable
 {
 public:
 
-	virtual ~Allocatable() throw()
+	virtual ~Allocatable() noexcept
 	{
 	}
 
-	static void *operator new(size_t size, Allocator *allocator = HeapAllocator::instance());
+	static void *operator new(size_t size, Allocator *allocator = HeapAllocator::instance()) noexcept;
 
-	static void operator delete(void *pointer) throw();
+	static void operator delete(void *pointer) noexcept;
 
-	Allocator *allocator() throw();
+	Allocator *allocator() noexcept;
 };
 
 } // namespace Yttrium

@@ -30,7 +30,7 @@ public:
 	/// \param item_size Item size in bytes.
 	/// \param chunk_size Chunk size in items.
 
-	PoolAllocator(size_t item_size, size_t chunk_size, Allocator *allocator = HeapAllocator::instance())
+	PoolAllocator(size_t item_size, size_t chunk_size, Allocator *allocator = HeapAllocator::instance()) noexcept
 		: _item_size(item_size)
 		, _chunk_size(chunk_size)
 		, _allocator(allocator)
@@ -39,25 +39,25 @@ public:
 
 	///
 
-	virtual ~PoolAllocator() throw();
+	virtual ~PoolAllocator() noexcept;
 
 	///
 
-	size_t chunk_size() const throw()
+	size_t chunk_size() const noexcept
 	{
 		return _chunk_size;
 	}
 
 	///
 
-	size_t item_size() const throw()
+	size_t item_size() const noexcept
 	{
 		return _item_size;
 	}
 
 	///
 
-	PoolStatus pool_status() const throw()
+	PoolStatus pool_status() const noexcept
 	{
 		return _pool_status;
 	}
@@ -66,26 +66,21 @@ public: // Allocator
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr);
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept;
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = nullptr) throw();
+	virtual void deallocate(void *pointer, Difference *difference = nullptr) noexcept;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr);
-
-	///
-
-	virtual Status status() const throw();
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept;
 
 private:
 
 	size_t      _item_size;
 	size_t      _chunk_size;
 	Allocator  *_allocator;
-	Status      _status;
 	PoolStatus  _pool_status;
 };
 
@@ -98,14 +93,14 @@ public:
 
 	///
 
-	Pool(Allocator *allocator = HeapAllocator::instance())
+	Pool(Allocator *allocator = HeapAllocator::instance()) noexcept
 		: _allocator(sizeof(T), N, allocator)
 	{
 	}
 
 	///
 
-	PoolAllocator *allocator() throw()
+	PoolAllocator *allocator() noexcept
 	{
 		return &_allocator;
 	}

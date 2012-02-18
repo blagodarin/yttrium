@@ -27,20 +27,20 @@ protected:
 	/// \note Non-ObjectPtr-managed (i.e. non-dynamic) Object descendants
 	/// should initialize the \a counter with 0 to avoid the assertion failure upon destruction.
 
-	Object(size_t counter = 1) throw()
+	Object(size_t counter = 1) noexcept
 		: _counter(counter)
 	{
 	}
 
 	/// The destructor.
 
-	virtual ~Object() throw();
+	virtual ~Object() noexcept;
 
 private:
 
-	void increment() throw();
+	void increment() noexcept;
 
-	void decrement() throw();
+	void decrement() noexcept;
 
 private:
 
@@ -58,12 +58,12 @@ class ObjectPtr
 {
 public:
 
-	ObjectPtr() throw()
+	ObjectPtr() noexcept
 		: _object(nullptr)
 	{
 	}
 
-	ObjectPtr(const ObjectPtr &object) throw()
+	ObjectPtr(const ObjectPtr &object) noexcept
 		: _object(const_cast<T *>(object._object))
 	{
 		if (_object)
@@ -72,12 +72,12 @@ public:
 		}
 	}
 
-	explicit ObjectPtr(T *object) throw()
+	explicit ObjectPtr(T *object) noexcept
 		: _object(object)
 	{
 	}
 
-	~ObjectPtr() throw()
+	~ObjectPtr() noexcept
 	{
 		if (_object)
 		{
@@ -89,7 +89,7 @@ public:
 
 	/// Explicitly release the object.
 
-	void free() throw()
+	void free() noexcept
 	{
 		if (_object)
 		{
@@ -101,7 +101,7 @@ public:
 	/// Assign an object and lock it.
 	/// \param object Object to assign.
 
-	void set(T *object) throw()
+	void set(T *object) noexcept
 	{
 		if (_object)
 		{
@@ -117,7 +117,7 @@ public:
 	/// Get a raw object pointer.
 	/// \return Object pointer.
 
-	T *pointer() throw()
+	T *pointer() noexcept
 	{
 		return _object;
 	}
@@ -126,7 +126,7 @@ public:
 	* \overload
 	*/
 
-	const T *pointer() const throw()
+	const T *pointer() const noexcept
 	{
 		return _object;
 	}
@@ -135,7 +135,7 @@ public:
 
 	///
 
-	ObjectPtr &operator =(const ObjectPtr &object) throw()
+	ObjectPtr &operator =(const ObjectPtr &object) noexcept
 	{
 		if (_object)
 		{
@@ -151,42 +151,42 @@ public:
 
 	///
 
-	T &operator *() throw()
+	T &operator *() noexcept
 	{
 		return *_object;
 	}
 
 	///
 
-	const T &operator *() const throw()
+	const T &operator *() const noexcept
 	{
 		return *_object;
 	}
 
 	///
 
-	T *operator ->() throw()
+	T *operator ->() noexcept
 	{
 		return _object;
 	}
 
 	///
 
-	const T *operator ->() const throw()
+	const T *operator ->() const noexcept
 	{
 		return _object;
 	}
 
 	///
 
-	operator SafeBool() const throw()
+	operator SafeBool() const noexcept
 	{
 		return Y_SAFE_BOOL(_object);
 	}
 
 	///
 
-	bool operator !() const throw()
+	bool operator !() const noexcept
 	{
 		return !_object;
 	}

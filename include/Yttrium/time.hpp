@@ -22,7 +22,7 @@ struct Y_API DateTime
 
 	/// Get the current date and time.
 
-	static DateTime now() throw();
+	static DateTime now() noexcept;
 };
 
 /// Integer value representing timer time.
@@ -38,7 +38,7 @@ public:
 
 	///
 
-	Timer() throw()
+	Timer() noexcept
 		: _time(0)
 		, _started(false)
 	{
@@ -47,34 +47,34 @@ public:
 	/// Reset the timer time without changing any other state.
 	/// \return Timer value on reset.
 
-	Clock reset() throw();
+	Clock reset() noexcept;
 
 	/// Reset the timer and start it.
 	/// \return Timer value on restart.
 
-	Clock restart() throw();
+	Clock restart() noexcept;
 
 	/// Set the stored time to the specified value.
 	/// \param time Time to set.
 
-	void setTime(Clock time) throw()
+	void setTime(Clock time) noexcept
 	{
 		_time = time;
 	}
 
 	/// Start the timer if it's not started.
 
-	void start() throw();
+	void start() noexcept;
 
 	/// Stop the timer.
 	/// \return Timer value on stop.
 
-	Clock stop() throw();
+	Clock stop() noexcept;
 
 	/// Get the current timer time.
 	/// \return Timer time.
 
-	Clock time() const throw()
+	Clock time() const noexcept
 	{
 		return (_time + (_started ? clock() - _start_time : 0));
 	}
@@ -82,7 +82,7 @@ public:
 	/// Return \c true if the timer is started.
 	/// \return \c true for a started timer.
 
-	bool started() const throw()
+	bool started() const noexcept
 	{
 		return _started;
 	}
@@ -93,7 +93,7 @@ public:
 	/// \return Clock counter value in milliseconds.
 	/// \note Timer functionality is based on this function.
 
-	static Clock clock() throw();
+	static Clock clock() noexcept;
 
 private:
 
@@ -108,7 +108,7 @@ class Y_API RateCounter // NOTE: Rename.
 {
 public:
 
-	RateCounter() throw()
+	RateCounter() noexcept
 		: _rate(0)
 	{
 	}
@@ -116,17 +116,17 @@ public:
 	/// Start the counter.
 	/// \note Should be called just before the beginning of the counted loop.
 
-	void start() throw();
+	void start() noexcept;
 
 	/// Mark a tick.
 	/// \note Should be called in the very end of the counted loop.
 
-	void tick() throw();
+	void tick() noexcept;
 
 	/// Return the current rate.
 	/// \return Current rate.
 
-	size_t rate() const throw()
+	size_t rate() const noexcept
 	{
 		return _rate;
 	}

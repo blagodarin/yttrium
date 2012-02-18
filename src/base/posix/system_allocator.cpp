@@ -14,12 +14,12 @@
 namespace Yttrium
 {
 
-SystemAllocatorImpl::SystemAllocatorImpl() throw()
+SystemAllocatorImpl::SystemAllocatorImpl()
 	: _page_size(sysconf(_SC_PAGE_SIZE))
 {
 }
 
-void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
+void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *difference) noexcept
 {
 	Y_ASSERT(size);
 
@@ -29,7 +29,8 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	void *base = mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (base == MAP_FAILED)
 	{
-		throw std::bad_alloc();
+		Y_ABORT("Out of memory");
+		return nullptr;
 	}
 
 	static_cast<size_t *>(base)[0] = total_bytes;
@@ -38,13 +39,16 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	Difference local_difference;
 
 	if (!difference)
+	{
 		difference = &local_difference;
-	_status.deallocate(difference->set(allocated_bytes, total_bytes, true));
+	}
+	*difference = Difference(allocated_bytes, total_bytes, Difference::Increment);
+	_status.deallocate(*difference);
 
 	return static_cast<char *>(base) + reserved_size;
 }
 
-void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference) throw()
+void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference) noexcept
 {
 	if (pointer)
 	{
@@ -58,12 +62,15 @@ void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference) thro
 		Difference local_difference;
 
 		if (!difference)
+		{
 			difference = &local_difference;
-		_status.deallocate(difference->set(allocated_bytes, total_bytes, false));
+		}
+		*difference = Difference(allocated_bytes, total_bytes, Difference::Decrement);
+		_status.deallocate(*difference);
 	}
 }
 
-void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
+void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept
 {
 	Y_ASSERT(pointer);
 	Y_ASSERT(size);
@@ -77,12 +84,13 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	Difference local_difference;
 
 	if (!difference)
+	{
 		difference = &local_difference;
+	}
 
 	if (new_total_bytes == total_bytes)
 	{
-		if (difference)
-			difference->set(0, 0, true);
+		*difference = Difference(0, 0, Difference::Increment);
 		return pointer;
 	}
 
@@ -90,7 +98,9 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	if (new_base == MAP_FAILED)
 	{
 		if (movability == MayMove)
-			throw std::bad_alloc();
+		{
+			Y_ABORT("Out of memory");
+		}
 		return nullptr;
 	}
 
@@ -100,31 +110,26 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	if (new_total_bytes > total_bytes)
 	{
 		size_t shift = new_total_bytes - total_bytes;
-		difference->set(shift, shift, true);
+		*difference = Difference(shift, shift, Difference::Increment);
 	}
 	else
 	{
 		size_t shift = total_bytes - new_total_bytes;
-		difference->set(shift, shift, false);
+		*difference = Difference(shift, shift, Difference::Decrement);
 	}
 	_status.deallocate(*difference);
 
 	return static_cast<char *>(new_base) + reserved_size;
 }
 
-Allocator::Status SystemAllocatorImpl::status() const throw()
-{
-	return _status;
-}
-
-size_t SystemAllocatorImpl::lower_bound(size_t size) const throw()
+size_t SystemAllocatorImpl::lower_bound(size_t size) const noexcept
 {
 	Y_ASSERT(size);
 
 	return _page_size * ((reserved_size + size) / _page_size) - reserved_size;
 }
 
-size_t SystemAllocatorImpl::upper_bound(size_t size) const throw()
+size_t SystemAllocatorImpl::upper_bound(size_t size) const noexcept
 {
 	Y_ASSERT(size);
 

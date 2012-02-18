@@ -29,7 +29,7 @@ public:
 
 	/// Construct an empty StaticString.
 
-	StaticString() throw()
+	StaticString() noexcept
 		: _text(const_cast<char *>(&Null))
 		, _size(0)
 	{
@@ -38,7 +38,7 @@ public:
 	/// Construct a StaticString from the C-string.
 	/// \param text Source text.
 
-	StaticString(const char *text) throw()
+	StaticString(const char *text) noexcept
 		: _text(const_cast<char *>(text))
 		, _size(strlen(text))
 	{
@@ -48,7 +48,7 @@ public:
 	/// \param text Source text.
 	/// \param size Source text size.
 
-	StaticString(const char *text, size_t size) throw()
+	StaticString(const char *text, size_t size) noexcept
 		: _text(const_cast<char *>(text))
 		, _size(size)
 	{
@@ -60,39 +60,39 @@ public:
 	/// \param string The string to compare with.
 	/// \return \c memcmp result.
 
-	int compare(const StaticString &string) const throw();
+	int compare(const StaticString &string) const noexcept;
 
 	/// Return the number of occurences of any of the specified \a symbols in the string.
 	/// \param symbols The list of symbols to count.
 	/// \return The number of matching symbols in the string.
 	/// \note <tt>count("x") == count("xxx")</tt>
 
-	size_t count(const char *symbols) const throw();
+	size_t count(const char *symbols) const noexcept;
 
 	///
 	/// \param symbol
 	/// \param offset
 	/// \return
 
-	size_t find_first(char symbol, size_t offset = 0) const throw();
+	size_t find_first(char symbol, size_t offset = 0) const noexcept;
 
 	///
 	/// \param symbol
 	/// \param offset Offset to the beginning of the ignored part of the string.
 	/// \return
 
-	size_t find_last(char symbol, size_t offset = End) const throw();
+	size_t find_last(char symbol, size_t offset = End) const noexcept;
 
 	///
 
-	StaticString left(size_t size) const throw()
+	StaticString left(size_t size) const noexcept
 	{
 		return StaticString(_text, min(size, _size));
 	}
 
 	///
 
-	StaticString mid(size_t offset, size_t size = End) const throw()
+	StaticString mid(size_t offset, size_t size = End) const noexcept
 	{
 		return (offset < _size
 			? StaticString(_text + offset, min(size, _size))
@@ -101,7 +101,7 @@ public:
 
 	///
 
-	StaticString right(size_t size) const throw()
+	StaticString right(size_t size) const noexcept
 	{
 		return (size < _size
 			? StaticString(&_text[_size - size], size)
@@ -111,7 +111,7 @@ public:
 	/// Return the string size.
 	/// \return String size.
 
-	size_t size() const throw()
+	size_t size() const noexcept
 	{
 		return _size;
 	}
@@ -119,7 +119,7 @@ public:
 	/// Return the string text pointer.
 	/// \return String text pointer.
 
-	char *text() throw()
+	char *text() noexcept
 	{
 		return _text;
 	}
@@ -128,7 +128,7 @@ public:
 	* \overload
 	*/
 
-	const char *text() const throw()
+	const char *text() const noexcept
 	{
 		return _text;
 	}
@@ -136,93 +136,101 @@ public:
 	/// Convert to decimal \c double as much of the string as possible.
 	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
 
-	double to_double() const throw();
+	double to_double() const noexcept;
 
 	/// Convert to decimal \c int32_t as much of the string as possible.
 
-	int32_t to_int32() const throw();
+	int32_t to_int32() const noexcept;
 
 	/// Convert to decimal \c int64_t as much of the string as possible.
 
-	int64_t to_int64() const throw();
+	int64_t to_int64() const noexcept;
 
 	/// Try to interpret the string as a raw undecorated \a value.
 
-	bool to_number(int32_t *value) const throw();
+	bool to_number(int32_t *value) const noexcept;
 
 	/**
 	* \overload
 	*/
 
-	bool to_number(double *value) const throw();
+	bool to_number(double *value) const noexcept;
 
 	/// Convert to decimal \c double time as much of the string as possible.
 	/// \note The time must be in form "[+|-][[HH:]MM:]SS[.{Z}]".
 
-	double to_time() const throw();
+	double to_time() const noexcept;
 
 	/// Convert to decimal \c uint32_t as much of the string as possible.
 
-	uint32_t to_uint32() const throw();
+	uint32_t to_uint32() const noexcept;
 
 	/// Convert to decimal \c uint64_t as much of the string as possible.
 
-	uint64_t to_uint64() const throw();
+	uint64_t to_uint64() const noexcept;
+
+	/// Check whether the string is zero-terminated.
+	/// \note Might possibly crash if the string is allocated in the very end of a readable space.
+
+	bool zero_terminated() const noexcept
+	{
+		return !_text[_size];
+	}
 
 public:
 
 	///
 
-	operator SafeBool() const throw()
+	operator SafeBool() const noexcept
 	{
 		return Y_SAFE_BOOL(_size);
 	}
 
 	///
 
-	const char &operator [](size_t index) const throw()
+	const char &operator [](size_t index) const noexcept
 	{
 		return _text[index];
 	}
 
 	///
 
-	bool operator <(const StaticString &string) const throw()
+	bool operator <(const StaticString &string) const noexcept
 	{
 		return (compare(string) < 0);
 	}
 
 	///
 
-	bool operator >(const StaticString &string) const throw()
+	bool operator >(const StaticString &string) const noexcept
 	{
 		return (compare(string) > 0);
 	}
 
 	///
 
-	bool operator <=(const StaticString &string) const throw()
+	bool operator <=(const StaticString &string) const noexcept
 	{
 		return (compare(string) <= 0);
 	}
 
 	///
 
-	bool operator >=(const StaticString &string) const throw()
+	bool operator >=(const StaticString &string) const noexcept
 	{
 		return (compare(string) >= 0);
 	}
 
 	///
 
-	bool operator ==(const StaticString &string) const throw()
+	bool operator ==(const StaticString &string) const noexcept
 	{
 		return (_size == string._size && !memcmp(_text, string._text, _size));
 	}
 
 	///
 
-	bool operator !=(const StaticString &string) const throw()
+	bool operator !=(const StaticString &string) const noexcept
 	{
 		return (_size != string._size || memcmp(_text, string._text, _size));
 	}
@@ -240,7 +248,7 @@ private:
 
 private:
 
-	StaticString(size_t size) throw()
+	StaticString(size_t size) noexcept
 		: _size(size)
 	{
 	}
@@ -258,9 +266,11 @@ private:
 
 // TODO: Uncomment this when GCC 4.7 becomes available.
 
-//Yttrium::StaticString operator "" _y(const char *text, size_t size) throw()
+//Yttrium::StaticString operator "" _y(const char *text, size_t size) noexcept
 //{
 //	return StaticString(text, size);
 //}
+//
+//#define Y_S(literal) literal##_y
 
 #endif // __Y_STATIC_STRING_HPP

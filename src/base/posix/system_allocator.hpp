@@ -11,23 +11,21 @@ class SystemAllocatorImpl
 {
 public:
 
-	SystemAllocatorImpl() throw();
+	SystemAllocatorImpl();
 
 public: // Allocator
 
-	virtual void *allocate(size_t size, size_t align, Difference *difference);
+	virtual void *allocate(size_t size, size_t align, Difference *difference) noexcept;
 
-	virtual void deallocate(void *pointer, Difference *difference) throw();
+	virtual void deallocate(void *pointer, Difference *difference) noexcept;
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference);
-
-	virtual Status status() const throw();
+	virtual void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept;
 
 public: // SystemAllocator
 
-	virtual size_t lower_bound(size_t size) const throw();
+	virtual size_t lower_bound(size_t size) const noexcept;
 
-	virtual size_t upper_bound(size_t size) const throw();
+	virtual size_t upper_bound(size_t size) const noexcept;
 
 private:
 
@@ -35,8 +33,7 @@ private:
 
 private:
 
-	AtomicStatus _status;
-	size_t       _page_size;
+	size_t _page_size;
 };
 
 } // namespace Yttrium

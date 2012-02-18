@@ -10,24 +10,24 @@ namespace Yttrium
 {
 
 /// Terminate the program, outputting a message to the log.
-/// \param message The message to output.
 /// \param file Source file name (usually \c __FILE__).
 /// \param line Source file line number (usually \c __LINE__).
 /// \param function Source function (usually \c __func__).
+/// \param message The message to output.
 
-Y_API void abort(const StaticString &message, const StaticString &file, int line, const StaticString &function) throw();
+Y_API void abort(const StaticString &file, int line, const StaticString &function, const StaticString &message, ...) noexcept;
 
 } // namespace Yttrium
 
 /// \def Y_ABORT(condition)
 /// \brief Terminate the program, outputting a message to the log.
 
-#define Y_ABORT(message) Yttrium::abort(message, Y_S(__FILE__), __LINE__, Y_S(__func__))
+#define Y_ABORT(...) Yttrium::abort(Y_S(__FILE__), __LINE__, Y_S(__func__), __VA_ARGS__)
 
 /// \def Y_ASSERT(condition)
-/// \brief Terminate the program if the \a condition is \c false.
+/// \brief Terminate the program if the \a condition isn't met.
 
-#if !Y_DEBUG
+#if !Y_IS_DEBUG
 	#define Y_ASSERT(condition)
 #else
 	#define Y_ASSERT(condition) \

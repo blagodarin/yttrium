@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 
-Logger::Level LogManager::Private::level(const StaticString &name) const throw()
+Logger::Level LogManager::Private::level(const StaticString &name) const
 {
 	size_t prefix_size = name.find_first('.');
 	if (prefix_size == StaticString::End)
@@ -46,9 +46,9 @@ Logger::Level LogManager::Private::level(const StaticString &name) const throw()
 	return _root_level;
 }
 
-bool LogManager::Private::open(const StaticString &file, Logger::OpenMode mode) throw()
+bool LogManager::Private::open(const StaticString &file, Logger::OpenMode mode)
 {
-	if (_log.open_file(file))
+	if (_log.open(file, File::Write))
 	{
 		if (mode == Logger::Rewrite)
 		{
@@ -65,12 +65,12 @@ void LogManager::Private::set_level(const StaticString &name, Logger::Level leve
 	_levels.insert(Levels::value_type(String(name), level)); // NOTE: No allocator specified!
 }
 
-void LogManager::Private::set_root_level(Logger::Level level) throw()
+void LogManager::Private::set_root_level(Logger::Level level)
 {
 	_root_level = level;
 }
 
-bool LogManager::Private::write(const void *buffer, size_t size) throw()
+bool LogManager::Private::write(const void *buffer, size_t size)
 {
 	if (_log.write(buffer, size))
 	{
@@ -80,12 +80,12 @@ bool LogManager::Private::write(const void *buffer, size_t size) throw()
 	return false;
 }
 
-Logger::Level LogManager::level(const StaticString &name) const throw()
+Logger::Level LogManager::level(const StaticString &name) const noexcept
 {
 	return _private->level(name);
 }
 
-bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level) throw()
+bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level) noexcept
 {
 	if (_private->open(file, mode))
 	{
@@ -95,22 +95,22 @@ bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::L
 	return false;
 }
 
-Logger::Level LogManager::root_level() const throw()
+Logger::Level LogManager::root_level() const noexcept
 {
 	return _private->root_level();
 }
 
-void LogManager::set_level(const StaticString &name, Logger::Level level)
+void LogManager::set_level(const StaticString &name, Logger::Level level) noexcept
 {
 	_private->set_level(name, level);
 }
 
-void LogManager::set_root_level(Logger::Level level) throw()
+void LogManager::set_root_level(Logger::Level level) noexcept
 {
 	_private->set_root_level(level);
 }
 
-LogManager::LogManager(Private *private_) throw()
+LogManager::LogManager(Private *private_)
 	: _private(private_)
 {
 }

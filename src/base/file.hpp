@@ -3,9 +3,9 @@
 
 #include <Yttrium/global.hpp>
 
-#if Y_POSIX
+#if Y_IS_POSIX
 	#include "posix/file.hpp"
-#elif Y_WINDOWS
+#elif Y_IS_WINDOWS
 	#include "windows/file.hpp"
 #endif
 

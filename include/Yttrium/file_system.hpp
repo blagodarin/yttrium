@@ -36,14 +36,14 @@ public:
 
 	///
 
-	FileSystem() throw()
+	FileSystem() noexcept
 		: _order(PackedFirst)
 	{
 	}
 
 	///
 
-	~FileSystem() throw()
+	~FileSystem() noexcept
 	{
 		unmount_all();
 	}
@@ -52,18 +52,18 @@ public:
 	/// \param name The package name.
 	/// \param format
 
-	bool mount(const StaticString &name, PackageFormat format = PackageFormat::Auto);
+	bool mount(const StaticString &name, PackageFormat format = PackageFormat::Auto) noexcept;
 
-	/// Open a FileReader.
-	/// \param name File name.
+	/// Open a file.
+	/// \param name %File name.
 	/// \param order The order to look for the file with.
 
-	FileReaderPtr open_reader(const StaticString &name, Order order = PresetOrder);
+	File open_file(const StaticString &name, File::Mode mode = File::Read, Order order = PresetOrder) noexcept;
 
 	/// Set the default file system search order.
 	/// \param order The order to be set.
 
-	void set_order(Order order) throw()
+	void set_order(Order order) noexcept
 	{
 		if (order != PresetOrder)
 		{
@@ -73,30 +73,17 @@ public:
 
 	/// Unmount all the mounted packages from the file system.
 
-	void unmount_all() throw();
+	void unmount_all() noexcept;
 
 public:
 
 	/// Return the global FileSystem instance.
 
-	static FileSystem &instance() throw();
-
-	/// Open a FileWriter.
-	/// \param name File name.
-
-	static FileWriterPtr open_writer(const StaticString &name)
-	{
-		return FileWriter::open(name);
-	}
+	static FileSystem &instance() noexcept;
 
 private:
 
-	Order effective_order(Order order) const throw()
-	{
-		return (order == PresetOrder ? _order : order);
-	}
-
-	FileReaderPtr open_packed(const StaticString &name);
+	File open_packed(const StaticString &name) const;
 
 private:
 

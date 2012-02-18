@@ -24,19 +24,19 @@ class PackageReader
 {
 public:
 
-	virtual ~PackageReader()
+	virtual ~PackageReader() noexcept
 	{
 	}
 
 	///
 
-	virtual FileReaderPtr open_reader(const StaticString &name) = 0;
+	virtual File open_file(const StaticString &name) noexcept = 0;
 
 public:
 
 	///
 
-	static PackageReader *open(const StaticString &name, PackageFormat format = PackageFormat::Auto);
+	static PackageReader *open(const StaticString &name, PackageFormat format = PackageFormat::Auto) noexcept;
 };
 
 /// Package writer class.
@@ -45,19 +45,19 @@ class PackageWriter
 {
 public:
 
-	virtual ~PackageWriter()
+	virtual ~PackageWriter() noexcept
 	{
 	}
 
 	///
 
-	virtual FileWriterPtr open_writer(const StaticString &name) = 0;
+	virtual File open_file(const StaticString &name) noexcept = 0;
 
 public:
 
 	///
 
-	static PackageWriter *open(const StaticString &name, PackageFormat format);
+	static PackageWriter *open(const StaticString &name, PackageFormat format) noexcept;
 };
 
 } // namespace Yttrium

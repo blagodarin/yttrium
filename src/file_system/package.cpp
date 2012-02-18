@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 
-PackageReader *PackageReader::open(const StaticString &name, PackageFormat format)
+PackageReader *PackageReader::open(const StaticString &name, PackageFormat format) noexcept
 {
 	switch (format)
 	{
@@ -19,7 +19,7 @@ PackageReader *PackageReader::open(const StaticString &name, PackageFormat forma
 	}
 }
 
-PackageWriter *PackageWriter::open(const StaticString &name, PackageFormat format)
+PackageWriter *PackageWriter::open(const StaticString &name, PackageFormat format) noexcept
 {
 	switch (format)
 	{
