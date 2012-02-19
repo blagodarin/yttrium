@@ -14,7 +14,8 @@ void abort(const StaticString &file, int line, const StaticString &function, con
 	{
 		Allocator *allocator = SystemAllocator::instance();
 
-		// NOTE: On out of memory error we'll enter a recursive loop here.
+		// NOTE: If we're aborting on an out of memory error and the message size
+		// exceeds the allocated string capacity, we'll enter a recursive loop here.
 
 		Logger(allocator).log(Logger::None, file, line, function) << message;
 	}

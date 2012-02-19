@@ -5,23 +5,22 @@
 
 #include <Yttrium/file.hpp>
 
+#include "../private_base.hpp"
+
 namespace Yttrium
 {
 
-class File::Private
+class File::Private: public PrivateBase<File::Private>
 {
 public:
 
-	Allocator           *allocator;
-	std::atomic<size_t>  references;
-	int                  descriptor;
-	Mode                 mode;
+	int  descriptor;
+	Mode mode;
 
 public:
 
-	Private(int descriptor = -1, Mode mode = 0, Allocator *allocator = nullptr) noexcept
-		: allocator(allocator)
-		, references(1)
+	Private(int descriptor = -1, Mode mode = 0, Allocator *allocator = nullptr)
+		: PrivateBase(allocator)
 		, descriptor(descriptor)
 		, mode(mode)
 	{
@@ -29,19 +28,19 @@ public:
 
 public:
 
-	static int open(const StaticString &name, int flags, Allocator *allocator) noexcept;
+	static int open(const StaticString &name, int flags, Allocator *allocator);
 };
 
 class StaticFile: public File
 {
 public:
 
-	StaticFile() noexcept
+	StaticFile()
 		: File(&_private_data)
 	{
 	}
 
-	StaticFile(const StaticString &name, Mode mode) noexcept
+	StaticFile(const StaticString &name, Mode mode)
 		: File(&_private_data)
 	{
 		File::open(name, mode, nullptr);
@@ -51,7 +50,7 @@ public:
 
 	StaticFile &operator =(const StaticFile &file) = delete;
 
-	bool open(const StaticString &name, Mode mode) noexcept
+	bool open(const StaticString &name, Mode mode)
 	{
 		return File::open(name, mode, nullptr);
 	}

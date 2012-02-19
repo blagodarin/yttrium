@@ -4,6 +4,8 @@
 #ifndef __Y_OBJECT_HPP
 #define __Y_OBJECT_HPP
 
+#include <atomic> // atomic_*
+
 #include <Yttrium/allocator.hpp>
 #include <Yttrium/safe_bool.hpp>
 #include <Yttrium/types.hpp>
@@ -44,7 +46,7 @@ private:
 
 private:
 
-	size_t _counter;
+	std::atomic_size_t _counter;
 };
 
 /// Object pointer wrapper.

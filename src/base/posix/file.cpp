@@ -6,6 +6,7 @@
 #include <fcntl.h>  // open
 #include <unistd.h> // close, fsync, ftruncate, lseek, pread, pwrite, read, write
 
+#include <Yttrium/assert.hpp>
 #include <Yttrium/string.hpp>
 
 namespace Yttrium
@@ -21,18 +22,11 @@ File::File(const StaticString &name, Mode mode, Allocator *allocator) noexcept
 }
 
 File::File(const File &file) noexcept
-	: _private(file._private)
+	: _private(Private::copy(file._private))
 	, _offset(file._offset)
 	, _size(file._size)
 	, _base(file._base)
 {
-	// NOTE: It may be theoretically possible that our copy-constructing thread will be interrupted
-	// just here, and then the file would be destroyed in another thread, leaving us with a crash.
-
-	if (_private)
-	{
-		++_private->references;
-	}
 }
 
 File::~File() noexcept
@@ -42,22 +36,15 @@ File::~File() noexcept
 
 void File::close() noexcept
 {
-	if (_private)
+	if (Private::should_free(_private))
 	{
-		if (_private->allocator)
-		{
-			if (!--_private->references)
-			{
-				::close(_private->descriptor);
-				_private->allocator->delete_(_private);
-			}
-			_private = nullptr;
-		}
-		else if (_private->mode & ReadWrite)
+		if (_private->descriptor != -1)
 		{
 			::close(_private->descriptor);
+			_private->descriptor = -1;
 			_private->mode = 0;
 		}
+		Private::free(&_private);
 	}
 	_offset = 0;
 	_size = 0;

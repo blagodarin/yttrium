@@ -63,6 +63,8 @@ public:
 
 	~File() noexcept;
 
+public:
+
 	///
 
 	void close() noexcept;

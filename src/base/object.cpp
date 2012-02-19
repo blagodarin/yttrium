@@ -12,16 +12,18 @@ Object::~Object() noexcept
 
 void Object::increment() noexcept
 {
-	++_counter;
+	size_t last_counter = _counter++;
 
-	Y_ASSERT(_counter > 0); // Check for counter wrapping.
+	Y_ASSERT(last_counter != SIZE_MAX);
 }
 
 void Object::decrement() noexcept
 {
-	Y_ASSERT(_counter > 0);
+	size_t last_counter = _counter--;
 
-	if (!--_counter)
+	Y_ASSERT(last_counter > 0);
+
+	if (last_counter == 1)
 	{
 		delete this;
 	}
