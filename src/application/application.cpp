@@ -15,7 +15,7 @@ std::atomic<size_t> _application_private_references(0);
 
 } // namespace
 
-Application::Application() noexcept
+Application::Application()
 	: _private(Private::pointer())
 {
 	if (!std::atomic_fetch_add<size_t>(&_application_private_references, 1))
@@ -24,7 +24,7 @@ Application::Application() noexcept
 	}
 }
 
-Application::~Application() noexcept
+Application::~Application()
 {
 	if (std::atomic_fetch_sub<size_t>(&_application_private_references, 1) == 1)
 	{
@@ -32,12 +32,12 @@ Application::~Application() noexcept
 	}
 }
 
-void Application::initialize() noexcept
+void Application::initialize()
 {
 	_private->initialize();
 }
 
-LogManager Application::log_manager() noexcept
+LogManager Application::log_manager()
 {
 	return _private->_log_manager_private.log_manager();
 }

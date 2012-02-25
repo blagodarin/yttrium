@@ -75,7 +75,7 @@ const Node *Object::last(const StaticString &name) const
 	return nullptr;
 }
 
-String Object::to_string(int indentation) const noexcept
+String Object::to_string(int indentation) const
 {
 	String result(_document._allocator);
 

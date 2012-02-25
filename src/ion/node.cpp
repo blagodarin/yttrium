@@ -8,7 +8,7 @@ namespace Yttrium
 namespace Ion
 {
 
-void Node::to_string(String *result, int indentation) const noexcept
+void Node::to_string(String *result, int indentation) const
 {
 	if (indentation > 0)
 	{

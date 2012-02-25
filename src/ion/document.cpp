@@ -14,19 +14,19 @@ namespace Yttrium
 namespace Ion
 {
 
-Document::Document(Allocator *allocator) noexcept
+Document::Document(Allocator *allocator)
 	: Object(this)
 	, _allocator(allocator)
 	, _buffer(allocator)
 {
 }
 
-void Document::clear() noexcept
+void Document::clear()
 {
 	// TODO: Implement.
 }
 
-bool Document::load(const StaticString &filename, FileSystem::Order order, FileSystem &fileSystem) noexcept
+bool Document::load(const StaticString &filename, FileSystem::Order order, FileSystem &fileSystem)
 {
 	clear();
 
@@ -46,7 +46,7 @@ bool Document::load(const StaticString &filename, FileSystem::Order order, FileS
 	return Parser(this).parse(_buffer, filename);
 }
 
-void Document::save(const StaticString &filename, int indentation) const noexcept
+void Document::save(const StaticString &filename, int indentation) const
 {
 	StaticFile file(filename, File::Write);
 

@@ -3,13 +3,13 @@
 namespace Yttrium
 {
 
-ProxyAllocator::ProxyAllocator(Allocator *allocator, const StaticString &name) noexcept
+ProxyAllocator::ProxyAllocator(Allocator *allocator, const StaticString &name)
 	: _allocator(allocator)
 	, _name(name)
 {
 }
 
-void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference) noexcept
+void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference)
 {
 	Difference local_difference;
 
@@ -23,7 +23,7 @@ void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference
 	return pointer;
 }
 
-void ProxyAllocator::deallocate(void *pointer, Difference *difference) noexcept
+void ProxyAllocator::deallocate(void *pointer, Difference *difference)
 {
 	if (pointer)
 	{
@@ -38,7 +38,7 @@ void ProxyAllocator::deallocate(void *pointer, Difference *difference) noexcept
 	}
 }
 
-void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept
+void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	Difference local_difference;
 

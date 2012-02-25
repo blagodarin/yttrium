@@ -5,12 +5,12 @@
 namespace Yttrium
 {
 
-PoolAllocator::~PoolAllocator() noexcept
+PoolAllocator::~PoolAllocator()
 {
 	Y_ASSERT(!_pool_status.allocated_items);
 }
 
-void *PoolAllocator::allocate(size_t size, size_t, Difference *difference) noexcept
+void *PoolAllocator::allocate(size_t size, size_t, Difference *difference)
 {
 	Y_ASSERT(size <= _item_size);
 
@@ -19,11 +19,11 @@ void *PoolAllocator::allocate(size_t size, size_t, Difference *difference) noexc
 	return nullptr;
 }
 
-void PoolAllocator::deallocate(void *pointer, Difference *difference) noexcept
+void PoolAllocator::deallocate(void *pointer, Difference *difference)
 {
 }
 
-void *PoolAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept
+void *PoolAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	Y_ASSERT(size <= _item_size);
 

@@ -5,19 +5,19 @@
 namespace Yttrium
 {
 
-Object::~Object() noexcept
+Object::~Object()
 {
 	Y_ASSERT(_counter == 0);
 }
 
-void Object::increment() noexcept
+void Object::increment()
 {
 	size_t last_counter = _counter++;
 
 	Y_ASSERT(last_counter != SIZE_MAX);
 }
 
-void Object::decrement() noexcept
+void Object::decrement()
 {
 	size_t last_counter = _counter--;
 

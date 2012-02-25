@@ -9,7 +9,7 @@ static std::atomic_flag _system_allocator_initialized = ATOMIC_FLAG_INIT;
 
 static char _system_allocator_buffer[sizeof(SystemAllocatorImpl)];
 
-SystemAllocator *SystemAllocator::instance() noexcept
+SystemAllocator *SystemAllocator::instance()
 {
 	if (!std::atomic_flag_test_and_set(&_system_allocator_initialized))
 	{

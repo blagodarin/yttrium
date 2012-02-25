@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 
-void abort(const StaticString &file, int line, const StaticString &function, const StaticString &message, ...) noexcept
+void abort(const StaticString &file, int line, const StaticString &function, const StaticString &message, ...)
 {
 	if (message)
 	{

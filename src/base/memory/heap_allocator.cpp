@@ -13,7 +13,7 @@ HeapAllocatorImpl::HeapAllocatorImpl()
 {
 }
 
-void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *difference) noexcept
+void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
 {
 	void *pointer = malloc(size);
 	if (!pointer)
@@ -34,7 +34,7 @@ void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *differe
 	return pointer;
 }
 
-void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference) noexcept
+void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference)
 {
 	if (pointer)
 	{
@@ -51,7 +51,7 @@ void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference) noexce
 	}
 }
 
-void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept
+void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	if (movability == MayNotMove)
 	{
@@ -79,7 +79,7 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 
 HeapAllocatorImpl *_heap_allocator = nullptr;
 
-HeapAllocator *HeapAllocator::instance() noexcept
+HeapAllocator *HeapAllocator::instance()
 {
 	return _heap_allocator;
 }

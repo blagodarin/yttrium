@@ -80,12 +80,12 @@ bool LogManager::Private::write(const void *buffer, size_t size)
 	return false;
 }
 
-Logger::Level LogManager::level(const StaticString &name) const noexcept
+Logger::Level LogManager::level(const StaticString &name) const
 {
 	return _private->level(name);
 }
 
-bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level) noexcept
+bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level)
 {
 	if (_private->open(file, mode))
 	{
@@ -95,17 +95,17 @@ bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::L
 	return false;
 }
 
-Logger::Level LogManager::root_level() const noexcept
+Logger::Level LogManager::root_level() const
 {
 	return _private->root_level();
 }
 
-void LogManager::set_level(const StaticString &name, Logger::Level level) noexcept
+void LogManager::set_level(const StaticString &name, Logger::Level level)
 {
 	_private->set_level(name, level);
 }
 
-void LogManager::set_root_level(Logger::Level level) noexcept
+void LogManager::set_root_level(Logger::Level level)
 {
 	_private->set_root_level(level);
 }

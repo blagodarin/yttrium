@@ -50,7 +50,7 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 	}
 }
 
-Logger::Level Logger::level(const StaticString &name) noexcept
+Logger::Level Logger::level(const StaticString &name)
 {
 	if (Application::Private::exists())
 	{
@@ -59,7 +59,7 @@ Logger::Level Logger::level(const StaticString &name) noexcept
 	return None;
 }
 
-Logger::Level Logger::root_level() noexcept
+Logger::Level Logger::root_level()
 {
 	if (Application::Private::exists())
 	{
@@ -68,7 +68,7 @@ Logger::Level Logger::root_level() noexcept
 	return None;
 }
 
-void Logger::flush() noexcept
+void Logger::flush()
 {
 	if (Application::Private::exists())
 	{

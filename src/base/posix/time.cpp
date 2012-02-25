@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 
-DateTime DateTime::now() noexcept
+DateTime DateTime::now()
 {
 	time_t    unix_time;
 	struct tm local_time;
@@ -22,7 +22,7 @@ DateTime DateTime::now() noexcept
 	return result;
 }
 
-Clock Timer::clock() noexcept
+Clock Timer::clock()
 {
 	struct timespec time;
 

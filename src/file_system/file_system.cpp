@@ -3,7 +3,7 @@
 namespace Yttrium
 {
 
-File FileSystem::open_file(const StaticString &name, File::Mode mode, Order order) noexcept
+File FileSystem::open_file(const StaticString &name, File::Mode mode, Order order)
 {
 	if (mode != File::Read)
 	{
@@ -41,7 +41,7 @@ File FileSystem::open_file(const StaticString &name, File::Mode mode, Order orde
 	return file;
 }
 
-bool FileSystem::mount(const StaticString &name, PackageFormat format) noexcept
+bool FileSystem::mount(const StaticString &name, PackageFormat format)
 {
 	PackageReader *package = PackageReader::open(name, format);
 
@@ -53,7 +53,7 @@ bool FileSystem::mount(const StaticString &name, PackageFormat format) noexcept
 	return package;
 }
 
-void FileSystem::unmount_all() noexcept
+void FileSystem::unmount_all()
 {
 	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
@@ -63,7 +63,7 @@ void FileSystem::unmount_all() noexcept
 	_packages.clear();
 }
 
-FileSystem &FileSystem::instance() noexcept
+FileSystem &FileSystem::instance()
 {
 	return *_file_system;
 }

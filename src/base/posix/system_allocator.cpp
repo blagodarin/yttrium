@@ -19,7 +19,7 @@ SystemAllocatorImpl::SystemAllocatorImpl()
 {
 }
 
-void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *difference) noexcept
+void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
 {
 	Y_ASSERT(size);
 
@@ -48,7 +48,7 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	return static_cast<char *>(base) + reserved_size;
 }
 
-void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference) noexcept
+void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference)
 {
 	if (pointer)
 	{
@@ -70,7 +70,7 @@ void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference) noex
 	}
 }
 
-void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept
+void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	Y_ASSERT(pointer);
 	Y_ASSERT(size);
@@ -122,14 +122,14 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	return static_cast<char *>(new_base) + reserved_size;
 }
 
-size_t SystemAllocatorImpl::lower_bound(size_t size) const noexcept
+size_t SystemAllocatorImpl::lower_bound(size_t size) const
 {
 	Y_ASSERT(size);
 
 	return _page_size * ((reserved_size + size) / _page_size) - reserved_size;
 }
 
-size_t SystemAllocatorImpl::upper_bound(size_t size) const noexcept
+size_t SystemAllocatorImpl::upper_bound(size_t size) const
 {
 	Y_ASSERT(size);
 
