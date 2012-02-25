@@ -220,7 +220,7 @@ String &String::append_dec(double value) // NOTE: Terrible terrible implementati
 	return *this;
 }
 
-String &String::clear() noexcept
+String &String::clear()
 {
 	if (_buffer_size)
 	{
@@ -344,6 +344,23 @@ void String::reserve(size_t size)
 	}
 }
 
+void String::resize(size_t size)
+{
+	size_t buffer_size = size + 1;
+
+	if (_buffer_size)
+	{
+		grow(buffer_size);
+	}
+	else
+	{
+		char *old_text = init(max(_size + 1, buffer_size));
+		memcpy(_text, old_text, _size + 1);
+	}
+
+	_text[size] = '\0';
+	_size = size;
+}
 
 void String::truncate(size_t size)
 {
@@ -448,12 +465,14 @@ void String::init()
 {
 	Y_ASSERT(_buffer_size);
 
-	if (_allocator) // NOTE: Rely on this at your own risk.
+	if (!_allocator) // NOTE: Rely on this at your own risk.
 	{
-		size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + _buffer_size));
-		*pointer = 1;
-		_text = reinterpret_cast<char *>(pointer + 1);
+		return;
 	}
+
+	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + _buffer_size));
+	*pointer = 1;
+	_text = reinterpret_cast<char *>(pointer + 1);
 }
 
 void String::init(const char *string, size_t size)
@@ -467,17 +486,18 @@ char *String::init(size_t buffer_size)
 {
 	Y_ASSERT(!_buffer_size);
 
-	if (_allocator) // NOTE: Rely on this at your own risk.
+	if (!_allocator) // NOTE: Rely on this at your own risk.
 	{
-		size_t adjusted_size = max<size_t>(buffer_size, StringReserve);
-		size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + adjusted_size));
-		*pointer = 1;
-		char *old_text = _text;
-		_text = reinterpret_cast<char *>(pointer + 1);
-		_buffer_size = adjusted_size;
-		return old_text;
+		return _text;
 	}
-	return _text;
+
+	size_t adjusted_size = max<size_t>(buffer_size, StringReserve);
+	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + adjusted_size));
+	*pointer = 1;
+	char *old_text = _text;
+	_text = reinterpret_cast<char *>(pointer + 1);
+	_buffer_size = adjusted_size;
+	return old_text;
 }
 
 } // namespace Yttrium

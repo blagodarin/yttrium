@@ -27,7 +27,7 @@ File FileSystem::open_file(const StaticString &name, File::Mode mode, Order orde
 
 	if (order != PackedOnly)
 	{
-		if ((file = File(name, mode)))
+		if (file.open(name, mode)) // NOTE: No allocator specified!
 		{
 			return file;
 		}

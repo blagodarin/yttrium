@@ -12,7 +12,7 @@
 namespace Yttrium
 {
 
-File::File(const StaticString &name, Mode mode, Allocator *allocator) noexcept
+File::File(const StaticString &name, Mode mode, Allocator *allocator)
 	: _private(nullptr)
 	, _offset(0)
 	, _size(0)
@@ -21,7 +21,7 @@ File::File(const StaticString &name, Mode mode, Allocator *allocator) noexcept
 	open(name, mode, allocator);
 }
 
-File::File(const File &file) noexcept
+File::File(const File &file)
 	: _private(Private::copy(file._private))
 	, _offset(file._offset)
 	, _size(file._size)
@@ -29,12 +29,12 @@ File::File(const File &file) noexcept
 {
 }
 
-File::~File() noexcept
+File::~File()
 {
 	close();
 }
 
-void File::close() noexcept
+void File::close()
 {
 	if (Private::should_free(_private))
 	{
@@ -51,14 +51,14 @@ void File::close() noexcept
 	_base = 0;
 }
 
-bool File::flush() noexcept
+bool File::flush()
 {
 	return (_private && (_private->mode & Write)
 		? !fsync(_private->descriptor)
 		: false);
 }
 
-bool File::open(const StaticString &name, Mode mode, Allocator *allocator) noexcept
+bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 {
 	close();
 
@@ -97,12 +97,12 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator) noexc
 	return true;
 }
 
-bool File::opened() const noexcept
+bool File::opened() const
 {
 	return (_private && (_private->mode & ReadWrite));
 }
 
-size_t File::read(void *buffer, size_t size) noexcept
+size_t File::read(void *buffer, size_t size)
 {
 	if (_private && (_private->mode & Read))
 	{
@@ -129,14 +129,14 @@ size_t File::read(void *buffer, size_t size) noexcept
 	return 0;
 }
 
-bool File::resize(UOffset size) noexcept
+bool File::resize(UOffset size)
 {
 	return (_private && ((_private->mode & (Write | Pipe)) == Write)
 		? !ftruncate(_private->descriptor, size)
 		: false);
 }
 
-bool File::seek(UOffset offset, Whence whence) noexcept
+bool File::seek(UOffset offset, Whence whence)
 {
 	if (!_private || (_private->mode & Pipe))
 	{
@@ -199,7 +199,7 @@ bool File::seek(UOffset offset, Whence whence) noexcept
 	return true;
 }
 
-UOffset File::size() const noexcept
+UOffset File::size() const
 {
 	if (_private)
 	{
@@ -225,12 +225,12 @@ UOffset File::size() const noexcept
 	return 0;
 }
 
-bool File::truncate() noexcept
+bool File::truncate()
 {
 	return resize(_offset);
 }
 
-size_t File::write(const void *buffer, size_t size) noexcept
+size_t File::write(const void *buffer, size_t size)
 {
 	if (_private && (_private->mode & Write))
 	{
@@ -255,7 +255,7 @@ size_t File::write(const void *buffer, size_t size) noexcept
 	return 0;
 }
 
-int File::Private::open(const StaticString &name, int flags, Allocator *allocator) noexcept
+int File::Private::open(const StaticString &name, int flags, Allocator *allocator)
 {
 	if (name.zero_terminated()) // Avoid extra allocation.
 	{

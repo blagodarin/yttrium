@@ -6,20 +6,18 @@ namespace Yttrium
 namespace Ion
 {
 
-Parser::Parser(/*Document& document, */Allocator *allocator)
-	: _allocator(allocator)
-	, _logger("yttrium.ion.parser", allocator)
-//	, _document(document)
+Parser::Parser(Document *document)
+	: _logger("yttrium.ion.parser", document->_allocator)
+	, _document(*document)
 {
 }
 
-bool Parser::parse(const StaticString& string)
+bool Parser::parse(const StaticString &string, const StaticString &source_name)
 {
 	Y_LOG_TRACE(_logger, "Parsing...");
 
-//	_objects.push_back(Object());
-//	_states.push_back(State(&_objects.back()));
-//	_state = &_states.back();
+	_states.push_back(State(&_document));
+	_state = &_states.back();
 
 	for (const char *src = string.text(); ; )
 	{
@@ -31,8 +29,8 @@ bool Parser::parse(const StaticString& string)
 
 		case End:
 
-			return (src == string.text() + string.size())
-				&& parse_end();
+			return (src == string.text() + string.size()
+				&& parse_end());
 
 		case Space:
 
@@ -73,8 +71,9 @@ bool Parser::parse(const StaticString& string)
 
 				while (*src != '"')
 				{
-					if (!*src)
+					if (!*src && src == string.text() + string.size())
 					{
+						Y_LOG_ERROR(_logger, source_name << Y_S(": String continues past the end of source"));
 						return false;
 					}
 					else if (*src == '\\')
@@ -97,6 +96,7 @@ bool Parser::parse(const StaticString& string)
 							}
 							else
 							{
+								Y_LOG_ERROR(_logger, source_name << Y_S(": Bad second hex digit '") << c2 << '\'');
 								return false;
 							}
 
@@ -120,7 +120,10 @@ bool Parser::parse(const StaticString& string)
 							case 'n':  *dst++ = '\n'; break; // NOTE: It can be easily fixed to say "\r\n".
 							case 'r':  *dst++ = '\r'; break;
 							case 't':  *dst++ = '\t'; break;
-							default:   return false;
+							default:
+
+								Y_LOG_ERROR(_logger, source_name << Y_S(": Bad escape symbol '") << c1 << '\'');
+								return false;
 							}
 						}
 					}
@@ -188,19 +191,25 @@ bool Parser::parse_name(const StaticString& name)
 {
 	Y_LOG_TRACE(_logger, "Token: " << name);
 
-//	if (!_state->object)
-//		return false;
-//	_state->list = _state->object->add_node(name);
+	if (!_state->object)
+	{
+		return false;
+	}
+
+	_state->list = _state->object->append(name, String::Ref);
 	return true;
 }
 
 bool Parser::parse_value(const StaticString& value)
 {
-	Y_LOG_TRACE(_logger, "Token: \"" << String(value, String::Ref, _allocator).escaped("\\\"", '\\') << "\"");
+	Y_LOG_TRACE(_logger, "Token: \"" << String(value, String::Ref, _document._allocator).escaped("\\\"", '\\') << "\"");
 
-//	if (!_state->list)
-//		return false;
-//	_state->list->add_value(value);
+	if (!_state->list)
+	{
+		return false;
+	}
+
+	_state->list->append(value, String::Ref);
 	return true;
 }
 
@@ -208,10 +217,13 @@ bool Parser::parse_lbrace()
 {
 	Y_LOG_TRACE(_logger, "Token: {");
 
-//	if (!_state->list)
-//		return false;
-//	_states.push_back(State(_state->list->add_object()));
-//	_state = &_states.back();
+	if (!_state->list)
+	{
+		return false;
+	}
+
+	_states.push_back(State(_state->list->append_object()));
+	_state = &_states.back();
 	return true;
 }
 
@@ -219,10 +231,13 @@ bool Parser::parse_rbrace()
 {
 	Y_LOG_TRACE(_logger, "Token: }");
 
-//	if (!_state->object || _states.size() == 1)
-//		return false;
-//	_states.pop_back();
-//	_state = &_states.back();
+	if (!_state->object || _states.size() == 1)
+	{
+		return false;
+	}
+
+	_states.pop_back();
+	_state = &_states.back();
 	return true;
 }
 
@@ -230,10 +245,13 @@ bool Parser::parse_lbracket()
 {
 	Y_LOG_TRACE(_logger, "Token: [");
 
-//	if (!_state->list)
-//		return false;
-//	_states.push_back(State(_state->list->add_list()));
-//	_state = &_states.back();
+	if (!_state->list)
+	{
+		return false;
+	}
+
+	_states.push_back(State(_state->list->append_list()));
+	_state = &_states.back();
 	return true;
 }
 
@@ -241,10 +259,13 @@ bool Parser::parse_rbracket()
 {
 	Y_LOG_TRACE(_logger, "Token: ]");
 
-//	if (_state->object || _states.size() == 1)
-//		return false;
-//	_states.pop_back();
-//	_state = &_states.back();
+	if (_state->object || _states.size() == 1)
+	{
+		return false;
+	}
+
+	_states.pop_back();
+	_state = &_states.back();
 	return true;
 }
 
@@ -252,7 +273,7 @@ bool Parser::parse_end()
 {
 	Y_LOG_TRACE(_logger, "Token: <end>");
 
-//	return _states.size() == 1;
+	return _states.size() == 1;
 	return true;
 }
 
@@ -260,10 +281,10 @@ const Parser::CharClass Parser::char_class[256] =
 {
 	// #0 - #31: Special character set.
 
-	End,    Other,  Other, Other,   Other, Other,  Other, Other, // \0
-	Other,  Space,  Space, Space,   Space, Space,  Other, Other, // \t \n \v \f \r
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
+	End,    Other,  Other, Other,    Other, Other,    Other, Other, // \0
+	Other,  Space,  Space, Space,    Space, Space,    Other, Other, // \t \n \v \f \r
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
 
 	// #32 - #127: Basic character set.
 
@@ -282,22 +303,22 @@ const Parser::CharClass Parser::char_class[256] =
 
 	// #128 - #255: Extended character set.
 
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
-	Other,  Other,  Other, Other,   Other, Other,  Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+	Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
 };
 
 } // namespace Ion

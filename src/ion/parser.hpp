@@ -1,11 +1,12 @@
 #ifndef __ION_PARSER_HPP
 #define __ION_PARSER_HPP
 
+#include <vector>
+
 #include <Yttrium/allocator.hpp>
+#include <Yttrium/ion/document.hpp>
 #include <Yttrium/logger.hpp>
 #include <Yttrium/static_string.hpp>
-
-//#include <Yttrium/ion/document.hpp>
 
 namespace Yttrium
 {
@@ -17,12 +18,12 @@ class Parser
 {
 public:
 
-	Parser(/*Document& document, */Allocator *allocator = HeapAllocator::instance());
+	Parser(Document *document);
 
 	/// Parse the \a string as an ION document.
 	/// \note The \a string MUST have a zero terminator.
 
-	bool parse(const StaticString& string);
+	bool parse(const StaticString& string, const StaticString &source_name);
 
 private:
 
@@ -42,10 +43,8 @@ private:
 
 private:
 
-	Allocator *_allocator;
-	Logger     _logger;
-
-	//Document& _document;
+	Logger    _logger;
+	Document &_document;
 
 private:
 
@@ -68,7 +67,7 @@ private:
 	// NOTE: LParen and RParen are reserved for possible future parenthesized string notation.
 
 	static const CharClass char_class[256];
-/*
+
 private:
 
 	struct State
@@ -92,7 +91,7 @@ private:
 	typedef std::vector<State> States;
 
 	States  _states;
-	State  *_state;*/
+	State  *_state;
 };
 
 } // namespace Ion

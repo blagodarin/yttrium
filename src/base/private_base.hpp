@@ -25,6 +25,10 @@ public:
 		Y_ASSERT(_references == 0);
 	}
 
+	PrivateBase(const PrivateBase &) = delete;
+
+	PrivateBase &operator =(const PrivateBase &) = delete;
+
 public:
 
 	static T *copy(T *object)

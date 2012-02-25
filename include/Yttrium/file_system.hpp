@@ -15,7 +15,7 @@ namespace Yttrium
 
 /// File system manager.
 
-class FileSystem
+class Y_API FileSystem
 {
 public:
 

@@ -246,6 +246,10 @@ public:
 
 	void reserve(size_t size) noexcept;
 
+	/// Resize the string, filling the new part with random data.
+
+	void resize(size_t size) noexcept;
+
 	/// Truncate the string to the specified \a size.
 
 	void truncate(size_t size) noexcept;
