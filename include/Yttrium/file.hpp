@@ -53,7 +53,15 @@ public:
 
 	///
 
-	File(const StaticString &name, Mode mode, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	File(const StaticString &name, Mode mode, Allocator *allocator = HeapAllocator::instance()) noexcept
+		//: File() // TODO: Uncomment.
+		: _private(nullptr)
+		, _offset(0)
+		, _size(0)
+		, _base(0)
+	{
+		open(name, mode, allocator);
+	}
 
 	///
 
@@ -61,7 +69,10 @@ public:
 
 	///
 
-	~File() noexcept;
+	~File() noexcept
+	{
+		close();
+	}
 
 public:
 
@@ -117,9 +128,19 @@ public:
 
 	UOffset size() const noexcept;
 
+	///
+
+	bool skip(UOffset size) noexcept
+	{
+		return seek(size, Relative);
+	}
+
 	/// Truncate the file past the current pointer.
 
-	bool truncate() noexcept;
+	bool truncate() noexcept
+	{
+		return resize(_offset);
+	}
 
 	/// Write \a size bytes from the \a buffer.
 	/// \return Number of bytes written or 0 on failure.

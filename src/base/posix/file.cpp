@@ -12,31 +12,9 @@
 namespace Yttrium
 {
 
-File::File(const StaticString &name, Mode mode, Allocator *allocator)
-	: _private(nullptr)
-	, _offset(0)
-	, _size(0)
-	, _base(0)
-{
-	open(name, mode, allocator);
-}
-
-File::File(const File &file)
-	: _private(Private::copy(file._private))
-	, _offset(file._offset)
-	, _size(file._size)
-	, _base(file._base)
-{
-}
-
-File::~File()
-{
-	close();
-}
-
 void File::close()
 {
-	if (Private::should_free(_private))
+	if (Private::should_free(&_private))
 	{
 		if (_private->descriptor != -1)
 		{
@@ -95,11 +73,6 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 	}
 
 	return true;
-}
-
-bool File::opened() const
-{
-	return (_private && (_private->mode & ReadWrite));
 }
 
 size_t File::read(void *buffer, size_t size)
@@ -223,11 +196,6 @@ UOffset File::size() const
 		}
 	}
 	return 0;
-}
-
-bool File::truncate()
-{
-	return resize(_offset);
 }
 
 size_t File::write(const void *buffer, size_t size)

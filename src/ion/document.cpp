@@ -23,7 +23,13 @@ Document::Document(Allocator *allocator)
 
 void Document::clear()
 {
-	// TODO: Implement.
+	Object::clear();
+
+	_values.clear();
+	_nodes.clear();
+	_objects.clear();
+
+	_buffer.clear();
 }
 
 bool Document::load(const StaticString &filename, FileSystem::Order order, FileSystem &fileSystem)

@@ -154,6 +154,8 @@ private: // TODO: protected:
 
 	Node *append(const StaticString &name, const String::Reference &);
 
+	void clear();
+
 	void to_string(String *result, int indentation, bool document) const noexcept;
 
 private:

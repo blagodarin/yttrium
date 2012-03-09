@@ -45,6 +45,27 @@ public:
 
 	///
 
+	bool is_list() const noexcept
+	{
+		return (_type == ListType);
+	}
+
+	///
+
+	bool is_object() const noexcept
+	{
+		return (_type == ObjectType);
+	}
+
+	///
+
+	bool is_string() const noexcept
+	{
+		return (_type == StringType);
+	}
+
+	///
+
 	List &list() noexcept
 	{
 		return _list;

@@ -96,6 +96,12 @@ Node *Object::append(const StaticString &name, const String::Reference &)
 	return node;
 }
 
+void Object::clear()
+{
+	_node_map.clear();
+	_nodes.clear();
+}
+
 void Object::to_string(String *result, int indentation, bool document) const
 {
 	if (indentation < 0)
@@ -121,8 +127,6 @@ void Object::to_string(String *result, int indentation, bool document) const
 	}
 	else
 	{
-		result->truncate(result->size() - 1);
-
 		if (!document)
 		{
 			result->append('\n').append('\t', indentation).append(Y_S("{\n"));

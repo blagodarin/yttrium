@@ -61,6 +61,11 @@ void List::to_string(String *result, int indentation, bool node) const
 
 	if (value)
 	{
+		if (node && indentation >= 0 && !value->is_object())
+		{
+			result->append(' ');
+		}
+
 		for (; ; )
 		{
 			value->to_string(result, indentation);
@@ -69,7 +74,7 @@ void List::to_string(String *result, int indentation, bool node) const
 			{
 				break;
 			}
-			if (indentation >= 0)
+			if (indentation >= 0 && !value->is_object())
 			{
 				result->append(' ');
 			}

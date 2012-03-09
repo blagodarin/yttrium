@@ -1,8 +1,6 @@
 #ifndef __BASE_POSIX_FILE_HPP
 #define __BASE_POSIX_FILE_HPP
 
-#include <atomic>
-
 #include <Yttrium/file.hpp>
 
 #include "../private_base.hpp"
@@ -46,9 +44,9 @@ public:
 		File::open(name, mode, nullptr);
 	}
 
-	StaticFile(const StaticFile &file) = delete;
+	StaticFile(const StaticFile &) = delete;
 
-	StaticFile &operator =(const StaticFile &file) = delete;
+	StaticFile &operator =(const StaticFile &) = delete;
 
 	bool open(const StaticString &name, Mode mode)
 	{

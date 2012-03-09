@@ -13,10 +13,20 @@ int main(int argc, char **argv)
 
 	Ion::Document document;
 
-	if (document.load("examples/ion/example.ion"))
+	if (document.load(Y_S("example.ion")))
 	{
-		document.save("copy.ion");
-		document.save("copy2.ion", Ion::DontIndent);
+		document.save(Y_S("example_indented.ion"));
+		document.save(Y_S("example_unindented.ion"), Ion::DontIndent);
+
+		if (document.load(Y_S("example_indented.ion")))
+		{
+			document.save(Y_S("example_indented2.ion"));
+		}
+
+		if (document.load(Y_S("example_unindented.ion")))
+		{
+			document.save(Y_S("example_unindented2.ion"), Ion::DontIndent);
+		}
 	}
 
 	return 0;

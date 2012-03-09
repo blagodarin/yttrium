@@ -57,11 +57,23 @@ public:
 		}
 	}
 
-	static bool should_free(T *object)
+	static bool should_free(T **object_ptr)
 	{
-		return (object
-			? (!object->_allocator || !--object->_references)
-			: false);
+		T *object = *object_ptr;
+
+		if (!object || !object->_allocator)
+		{
+			return false;
+		}
+
+		bool result = !--object->_references;
+
+		if (!result)
+		{
+			*object_ptr = nullptr;
+		}
+
+		return result;
 	}
 
 private:

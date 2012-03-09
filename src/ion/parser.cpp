@@ -14,7 +14,7 @@ Parser::Parser(Document *document)
 
 bool Parser::parse(const StaticString &string, const StaticString &source_name)
 {
-	Y_LOG_TRACE(_logger, "Parsing...");
+	Y_LOG_TRACE(_logger, "Parsing:\n" << string);
 
 	_states.push_back(State(&_document));
 	_state = &_states.back();

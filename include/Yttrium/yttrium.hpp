@@ -7,6 +7,7 @@
 #include <Yttrium/allocator.hpp>
 #include <Yttrium/application.hpp>
 #include <Yttrium/assert.hpp>
+#include <Yttrium/audio/io.hpp>
 #include <Yttrium/file.hpp>
 #include <Yttrium/global.hpp>
 #include <Yttrium/ion.hpp>

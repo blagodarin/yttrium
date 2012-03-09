@@ -17,10 +17,6 @@ void Node::to_string(String *result, int indentation) const
 	result->append(_name);
 	if (!empty())
 	{
-		if (indentation >= 0)
-		{
-			result->append(' ');
-		}
 		List::to_string(result, indentation, true);
 	}
 }
