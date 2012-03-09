@@ -9,7 +9,6 @@ int main(int argc, char **argv)
 	LogManager log_manager = application.log_manager();
 
 	log_manager.open(Y_S("ion.log"), Logger::Rewrite, Logger::All);
-	application.initialize();
 
 	Ion::Document document;
 

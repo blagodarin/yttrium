@@ -6,7 +6,8 @@ build.VariantDir('$BUILD', '.', duplicate = 0)
 
 src = [
 	'application',
-	'audio',
+	'audio/al',
+	'audio/io',
 	'base',
 	'base/memory',
 	'file_system',

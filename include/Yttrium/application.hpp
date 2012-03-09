@@ -24,9 +24,8 @@ public:
 	~Application() noexcept;
 
 	///
-	/// \note This function is not reentrant!
 
-	void initialize() noexcept;
+	bool initialize_audio(const StaticString &device = StaticString());
 
 	///
 	/// \note The log manager can be retrieved before the Application initialization.

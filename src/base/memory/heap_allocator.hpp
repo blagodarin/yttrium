@@ -6,12 +6,22 @@
 namespace Yttrium
 {
 
+extern HeapAllocator *_heap_allocator;
+
 class HeapAllocatorImpl
 	: public HeapAllocator
 {
 public:
 
-	HeapAllocatorImpl();
+	HeapAllocatorImpl()
+	{
+		_heap_allocator = this;
+	}
+
+	virtual ~HeapAllocatorImpl() noexcept
+	{
+		_heap_allocator = nullptr;
+	}
 
 public: // Allocator
 
@@ -21,8 +31,6 @@ public: // Allocator
 
 	virtual void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept;
 };
-
-extern HeapAllocatorImpl *_heap_allocator;
 
 } // namespace Yttrium
 

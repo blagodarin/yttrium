@@ -13,6 +13,8 @@
 namespace Yttrium
 {
 
+// TODO: Prohibit custom FileSystem construction.
+
 /// File system manager.
 
 class Y_API FileSystem
@@ -36,17 +38,11 @@ public:
 
 	///
 
-	FileSystem() noexcept
-		: _order(PackedFirst)
-	{
-	}
+	FileSystem() noexcept;
 
 	///
 
-	~FileSystem() noexcept
-	{
-		unmount_all();
-	}
+	~FileSystem() noexcept;
 
 	/// Mount the specified package into the file system.
 	/// \param name The package name.

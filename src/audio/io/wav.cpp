@@ -2,7 +2,7 @@
 
 #include <Yttrium/file_system.hpp>
 
-#include "../base/fourcc.hpp"
+#include "../../base/fourcc.hpp"
 
 namespace Yttrium
 {

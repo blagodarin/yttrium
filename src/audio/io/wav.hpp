@@ -1,5 +1,5 @@
-#ifndef __AUDIO_WAV_HPP
-#define __AUDIO_WAV_HPP
+#ifndef __AUDIO_IO_WAV_HPP
+#define __AUDIO_IO_WAV_HPP
 
 #include "reader.hpp"
 
@@ -36,4 +36,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __AUDIO_WAV_HPP
+#endif // __AUDIO_IO_WAV_HPP

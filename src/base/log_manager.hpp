@@ -9,6 +9,8 @@
 namespace Yttrium
 {
 
+extern LogManager::Private *_log_manager_private;
+
 class LogManager::Private
 {
 	friend class LogManager;
@@ -18,7 +20,15 @@ public:
 	Private()
 		: _root_level(Logger::None)
 	{
+		_log_manager_private = this;
 	}
+
+	~Private()
+	{
+		_log_manager_private = nullptr;
+	}
+
+public:
 
 	Logger::Level level(const StaticString &name) const;
 

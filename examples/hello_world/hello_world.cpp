@@ -39,10 +39,6 @@ int main(int argc, char **argv)
 	log_manager.set_level(Y_S("hello_world.bar"), Logger::Info);
 	log_manager.set_level(Y_S("hello_world.pwn"), Logger::Fatal);
 
-	// Initialize the application.
-
-	application.initialize();
-
 	// Play!
 
 	Logger root_logger;

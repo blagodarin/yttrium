@@ -7,6 +7,7 @@
 #include "../file_system/file_system.hpp"
 #include "../base/memory/heap_allocator.hpp"
 #include "../base/log_manager.hpp"
+#include "../audio/manager.hpp"
 
 namespace Yttrium
 {
@@ -17,35 +18,12 @@ class Application::Private
 
 public:
 
-	Private()
-	{
-		_exists = true;
-		Yttrium::_heap_allocator = &_heap_allocator;
-		Yttrium::_file_system = &_file_system;
-	}
-
-	~Private()
-	{
-		Yttrium::_file_system = nullptr;
-		Yttrium::_heap_allocator = nullptr;
-		_exists = false;
-	}
-
-	void initialize()
-	{
-	}
-
 	LogManager::Private &log_manager_private()
 	{
 		return _log_manager_private;
 	}
 
 public:
-
-	static bool exists()
-	{
-		return _exists;
-	}
 
 	static Private *pointer()
 	{
@@ -55,12 +33,12 @@ public:
 private:
 
 	HeapAllocatorImpl   _heap_allocator;
-	LogManager::Private _log_manager_private;
 	FileSystem          _file_system;
+	LogManager::Private _log_manager_private;
+	AudioManager        _audio_manager;
 
 private:
 
-	static bool    _exists;
 	static uint8_t _buffer[];
 };
 

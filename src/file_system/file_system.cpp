@@ -3,6 +3,18 @@
 namespace Yttrium
 {
 
+FileSystem::FileSystem() noexcept
+	: _order(PackedFirst)
+{
+	_file_system = this;
+}
+
+FileSystem::~FileSystem() noexcept
+{
+	unmount_all();
+	_file_system = nullptr;
+}
+
 File FileSystem::open_file(const StaticString &name, File::Mode mode, Order order)
 {
 	if (mode != File::Read)

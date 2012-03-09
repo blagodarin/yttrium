@@ -1,8 +1,8 @@
 #include "reader.hpp"
 
-#include "../file_system/file_system.hpp"
+#include "../../file_system/file_system.hpp"
 
-//#include "ogg_vorbis.hpp"
+#include "ogg_vorbis.hpp"
 #include "wav.hpp"
 
 namespace Yttrium
@@ -42,10 +42,10 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 		_private = allocator->new_<WavReader>(allocator);
 		break;
 
-//	case AudioType::OggVorbis:
+	case AudioType::OggVorbis:
 
-//		_private = allocator->new_<OggVorbisReader>(allocator);
-//		break;
+		_private = allocator->new_<OggVorbisReader>(allocator);
+		break;
 
 	default:
 
@@ -55,10 +55,10 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 			{
 				_private = allocator->new_<WavReader>(allocator);
 			}
-//			else if (extension == ".ogg")
-//			{
-//				_private = allocator->new_<OggVorbisReader>(allocator);
-//			}
+			else if (extension == ".ogg")
+			{
+				_private = allocator->new_<OggVorbisReader>(allocator);
+			}
 		}
 		break;
 	}

@@ -3,7 +3,7 @@
 #include <Yttrium/file.hpp>
 #include <Yttrium/time.hpp>
 
-#include "../application/private.hpp"
+#include "log_manager.hpp"
 
 namespace Yttrium
 {
@@ -52,30 +52,19 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 
 Logger::Level Logger::level(const StaticString &name)
 {
-	if (Application::Private::exists())
-	{
-		return Application::Private::pointer()->log_manager_private().level(name);
-	}
-	return None;
+	return _log_manager_private->level(name);
 }
 
 Logger::Level Logger::root_level()
 {
-	if (Application::Private::exists())
-	{
-		return Application::Private::pointer()->log_manager_private().root_level();
-	}
-	return None;
+	return _log_manager_private->root_level();
 }
 
 void Logger::flush()
 {
-	if (Application::Private::exists())
+	if (_log_manager_private->write(_message.text(), _message.size()))
 	{
-		if (Application::Private::pointer()->log_manager_private().write(_message.text(), _message.size()))
-		{
-			_message.clear();
-		}
+		_message.clear();
 	}
 }
 

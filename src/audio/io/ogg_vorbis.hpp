@@ -1,5 +1,5 @@
-#ifndef __AUDIO_OGG_VORBIS_HPP
-#define __AUDIO_OGG_VORBIS_HPP
+#ifndef __AUDIO_IO_OGG_VORBIS_HPP
+#define __AUDIO_IO_OGG_VORBIS_HPP
 
 // <vorbis/vorbisfile.h> includes <stdint.h> without defining __STDC_LIMIT_MACROS,
 // so we should explicitly include <stdint.h> before it.
@@ -39,4 +39,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __AUDIO_OGG_VORBIS_HPP
+#endif // __AUDIO_IO_OGG_VORBIS_HPP

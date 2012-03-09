@@ -5,6 +5,8 @@
 namespace Yttrium
 {
 
+LogManager::Private *_log_manager_private = nullptr;
+
 Logger::Level LogManager::Private::level(const StaticString &name) const
 {
 	size_t prefix_size = name.find_first('.');

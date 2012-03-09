@@ -7,7 +7,7 @@ namespace Ion
 {
 
 Parser::Parser(Document *document)
-	: _logger("yttrium.ion.parser", document->_allocator)
+	: _logger(Y_S("ion.parser"), document->_allocator)
 	, _document(*document)
 {
 }

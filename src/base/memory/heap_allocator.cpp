@@ -9,9 +9,7 @@
 namespace Yttrium
 {
 
-HeapAllocatorImpl::HeapAllocatorImpl()
-{
-}
+HeapAllocator *_heap_allocator = nullptr;
 
 void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
 {
@@ -76,8 +74,6 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 
 	return result;
 }
-
-HeapAllocatorImpl *_heap_allocator = nullptr;
 
 HeapAllocator *HeapAllocator::instance()
 {

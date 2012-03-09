@@ -1,9 +1,9 @@
-#ifndef __AUDIO_READER_HPP
-#define __AUDIO_READER_HPP
+#ifndef __AUDIO_IO_READER_HPP
+#define __AUDIO_IO_READER_HPP
 
 #include <Yttrium/audio/io.hpp>
 
-#include "../base/file.hpp"
+#include "../../base/file.hpp"
 
 namespace Yttrium
 {
@@ -42,4 +42,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __AUDIO_READER_HPP
+#endif // __AUDIO_IO_READER_HPP
