@@ -44,6 +44,25 @@ size_t StaticString::count(const char *symbols) const
 	return result;
 }
 
+bool StaticString::ends_with(const StaticString &substring) const
+{
+	if (substring._size > _size)
+	{
+		return false;
+	}
+
+	return !memcmp(&_text[_size - substring._size], substring._text, substring._size);
+}
+
+StaticString StaticString::file_extension() const
+{
+	size_t last_dot = find_last('.');
+
+	return (last_dot != End && last_dot
+		? StaticString(&_text[last_dot], _size - last_dot)
+		: StaticString());
+}
+
 size_t StaticString::find_first(char symbol, size_t offset) const
 {
 	if (offset < _size)

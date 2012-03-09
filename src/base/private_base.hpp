@@ -76,10 +76,13 @@ public:
 		return result;
 	}
 
+protected:
+
+	Allocator  *_allocator;
+
 private:
 
-	Allocator          *_allocator;
-	std::atomic_size_t  _references;
+	std::atomic_size_t _references;
 };
 
 } // namespace Yttrium

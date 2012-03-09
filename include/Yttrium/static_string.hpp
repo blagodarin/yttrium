@@ -70,6 +70,14 @@ public:
 	size_t count(const char *symbols) const noexcept;
 
 	///
+
+	bool ends_with(const StaticString &substring) const noexcept;
+
+	///
+
+	StaticString file_extension() const noexcept;
+
+	///
 	/// \param symbol
 	/// \param offset
 	/// \return
