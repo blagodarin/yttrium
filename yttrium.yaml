@@ -4,9 +4,6 @@ Yttrium:
 - Add GUI (requires renderer).
 - Add Windows port.
 
-    Audio:
-    - Implement playback.
-
     Base:
     - Implement pools.
 
