@@ -32,9 +32,9 @@ class Y_API Document: public Object
 
 public:
 
-	Document(const Document &document) = delete;
+	Document(const Document &) = delete;
 
-	Document& operator =(const Document &document) = delete;
+	Document &operator =(const Document &) = delete;
 
 	///
 

@@ -32,11 +32,6 @@ Application::~Application()
 	}
 }
 
-bool Application::initialize_audio(const StaticString &device)
-{
-	return _private->_audio_manager.initialize(device);
-}
-
 LogManager Application::log_manager()
 {
 	return _private->_log_manager_private.log_manager();

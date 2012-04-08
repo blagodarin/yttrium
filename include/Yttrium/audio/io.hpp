@@ -5,6 +5,7 @@
 #define __Y_AUDIO_IO_HPP
 
 #include <Yttrium/allocator.hpp>
+#include <Yttrium/safe_bool.hpp>
 #include <Yttrium/static_string.hpp>
 
 namespace Yttrium
@@ -46,7 +47,7 @@ struct AudioFormat
 
 /// Read-only audio file access interface.
 
-class AudioReader
+class Y_API AudioReader
 {
 public:
 

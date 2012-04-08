@@ -14,6 +14,10 @@ class PrivateBase
 {
 public:
 
+	PrivateBase(const PrivateBase &) = delete;
+
+	PrivateBase &operator =(const PrivateBase &) = delete;
+
 	PrivateBase(Allocator *allocator)
 		: _allocator(allocator)
 		, _references(allocator ? 1 : 0)
@@ -24,10 +28,6 @@ public:
 	{
 		Y_ASSERT(_references == 0);
 	}
-
-	PrivateBase(const PrivateBase &) = delete;
-
-	PrivateBase &operator =(const PrivateBase &) = delete;
 
 public:
 
@@ -61,9 +61,14 @@ public:
 	{
 		T *object = *object_ptr;
 
-		if (!object || !object->_allocator)
+		if (!object)
 		{
 			return false;
+		}
+
+		if (!object->_allocator)
+		{
+			return true;
 		}
 
 		bool result = !--object->_references;
@@ -78,7 +83,7 @@ public:
 
 protected:
 
-	Allocator  *_allocator;
+	Allocator *_allocator;
 
 private:
 

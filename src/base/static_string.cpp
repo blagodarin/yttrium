@@ -1,9 +1,18 @@
 #include <Yttrium/static_string.hpp>
 
-#include <cmath> // pow
+#include <cmath>   // pow
+#include <cstring> // memcmp, strlen
+
+#include <Yttrium/string.hpp>
 
 namespace Yttrium
 {
+
+StaticString::StaticString(const char *text)
+	: _text(const_cast<char *>(text))
+	, _size(strlen(text))
+{
+}
 
 int StaticString::compare(const StaticString &string) const
 {
@@ -526,6 +535,23 @@ uint64_t StaticString::to_uint64() const
 	}
 
 	return result;
+}
+
+String StaticString::zero_terminated(Allocator *allocator) const noexcept
+{
+	return (_text[_size]
+		? String(*this, allocator)
+		: String(*this, String::Ref, allocator));
+}
+
+bool StaticString::operator ==(const StaticString &string) const
+{
+	return (_size == string._size && !memcmp(_text, string._text, _size));
+}
+
+bool StaticString::operator !=(const StaticString &string) const
+{
+	return (_size != string._size || memcmp(_text, string._text, _size));
 }
 
 const size_t StaticString::End;

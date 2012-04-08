@@ -187,7 +187,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 	}
 }
 
-bool Parser::parse_name(const StaticString& name)
+bool Parser::parse_name(const StaticString &name)
 {
 	Y_LOG_TRACE(_logger, "Token: " << name);
 
@@ -200,7 +200,7 @@ bool Parser::parse_name(const StaticString& name)
 	return true;
 }
 
-bool Parser::parse_value(const StaticString& value)
+bool Parser::parse_value(const StaticString &value)
 {
 	Y_LOG_TRACE(_logger, "Token: \"" << String(value, String::Ref, _document._allocator).escaped("\\\"", '\\') << "\"");
 

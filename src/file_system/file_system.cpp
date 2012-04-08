@@ -3,13 +3,13 @@
 namespace Yttrium
 {
 
-FileSystem::FileSystem() noexcept
+FileSystem::FileSystem()
 	: _order(PackedFirst)
 {
 	_file_system = this;
 }
 
-FileSystem::~FileSystem() noexcept
+FileSystem::~FileSystem()
 {
 	unmount_all();
 	_file_system = nullptr;

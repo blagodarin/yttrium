@@ -1,7 +1,7 @@
 #include <Yttrium/string.hpp>
 
 #include <cstdio>  // sprintf
-#include <cstring> // memcpy, memmove
+#include <cstring> // memcpy, memmove, strlen
 
 #include <Yttrium/assert.hpp>
 #include <Yttrium/utils.hpp>
@@ -106,6 +106,11 @@ String &String::append(const char *text, size_t size)
 	_text[new_size] = '\0';
 	_size = new_size;
 	return *this;
+}
+
+String &String::append(const char *text)
+{
+	return append(text, strlen(text));
 }
 
 String &String::append(char symbol, size_t count)
@@ -393,24 +398,6 @@ void String::truncate(size_t size)
 	}
 }
 
-String &String::set(char symbol)
-{
-	if (_buffer_size)
-	{
-		grow(2);
-	}
-	else
-	{
-		init(2);
-	}
-
-	_text[0] = symbol;
-	_text[1] = '\0';
-	_size = 1;
-
-	return *this;
-}
-
 String &String::set(const char *text, size_t size)
 {
 	size_t buffer_size = size + 1;
@@ -427,6 +414,29 @@ String &String::set(const char *text, size_t size)
 	memcpy(_text, text, size);
 	_text[size] = '\0';
 	_size = size;
+
+	return *this;
+}
+
+String &String::set(const char *text)
+{
+	return set(text, strlen(text));
+}
+
+String &String::set(char symbol)
+{
+	if (_buffer_size)
+	{
+		grow(2);
+	}
+	else
+	{
+		init(2);
+	}
+
+	_text[0] = symbol;
+	_text[1] = '\0';
+	_size = 1;
 
 	return *this;
 }

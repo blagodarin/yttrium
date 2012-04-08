@@ -10,7 +10,9 @@ int main(int argc, char **argv)
 
 	log_manager.open(Y_S("audio.log"), Logger::Rewrite, Logger::All);
 
-	application.initialize_audio();
+	AudioManager audio;
+
+	audio.open();
 
 	return 0;
 }

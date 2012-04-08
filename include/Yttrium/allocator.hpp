@@ -1,13 +1,12 @@
 /// \file
 /// \brief Memory allocators.
 
-#ifndef __Y_ALLOCATORS_HPP
-#define __Y_ALLOCATORS_HPP
+#ifndef __Y_ALLOCATOR_HPP
+#define __Y_ALLOCATOR_HPP
 
 #include <atomic> // atomic_*
 #include <new>    // new
 
-#include <Yttrium/static_string.hpp>
 #include <Yttrium/types.hpp>
 
 namespace Yttrium
@@ -166,7 +165,7 @@ public:
 	///
 
 	template <typename T, typename U>
-	T *new_(const U& source) noexcept
+	T *new_(const U &source) noexcept
 	{
 		T *p = static_cast<T *>(allocate(sizeof(T)));
 		new(p) T(source);
@@ -223,43 +222,6 @@ public:
 	static SystemAllocator *instance() noexcept;
 };
 
-/// Proxy allocator.
-
-class Y_API ProxyAllocator: public Allocator
-{
-public:
-
-	///
-
-	ProxyAllocator(Allocator *allocator, const StaticString &name = StaticString()) noexcept;
-
-	///
-
-	StaticString name() const noexcept
-	{
-		return _name;
-	}
-
-public: // Allocator
-
-	///
-
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept;
-
-	///
-
-	virtual void deallocate(void *pointer, Difference *difference = nullptr) noexcept;
-
-	///
-
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept;
-
-private:
-
-	Allocator    *_allocator;
-	StaticString  _name;
-};
-
 /// An allocator-managed object with overloaded \c new and \c delete operators.
 
 class Y_API Allocatable
@@ -279,4 +241,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __Y_ALLOCATORS_HPP
+#endif // __Y_ALLOCATOR_HPP

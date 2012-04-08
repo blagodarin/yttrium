@@ -44,7 +44,10 @@ public:
 
 private:
 
-	LogManager(Private *private_);
+	LogManager(Private *private_)
+		: _private(private_)
+	{
+	}
 
 private:
 

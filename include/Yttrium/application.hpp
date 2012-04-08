@@ -24,10 +24,6 @@ public:
 	~Application() noexcept;
 
 	///
-
-	bool initialize_audio(const StaticString &device = StaticString());
-
-	///
 	/// \note The log manager can be retrieved before the Application initialization.
 
 	LogManager log_manager() noexcept;

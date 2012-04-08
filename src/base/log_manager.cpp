@@ -112,9 +112,4 @@ void LogManager::set_root_level(Logger::Level level)
 	_private->set_root_level(level);
 }
 
-LogManager::LogManager(Private *private_)
-	: _private(private_)
-{
-}
-
 } // namespace Yttrium

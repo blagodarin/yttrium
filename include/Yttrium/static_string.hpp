@@ -5,9 +5,7 @@
 #ifndef __Y_STATIC_STRING_HPP
 #define __Y_STATIC_STRING_HPP
 
-#include <cstring> // memcmp, strlen
-
-#include <Yttrium/safe_bool.hpp>
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/types.hpp>
 #include <Yttrium/utils.hpp>
 
@@ -16,6 +14,8 @@
 
 namespace Yttrium
 {
+
+class String;
 
 /// Static string wrapper class.
 /// \note Static strings can't implicitly hold \c nullptr and therefore should always be valid.
@@ -38,11 +38,7 @@ public:
 	/// Construct a StaticString from the C-string.
 	/// \param text Source text.
 
-	StaticString(const char *text) noexcept
-		: _text(const_cast<char *>(text))
-		, _size(strlen(text))
-	{
-	}
+	StaticString(const char *text) noexcept;
 
 	/// Construct a StaticString from the \a text of known \a size.
 	/// \param text Source text.
@@ -58,9 +54,16 @@ public:
 
 	/// Compares the string with the specified \a string.
 	/// \param string The string to compare with.
-	/// \return \c memcmp result.
+	/// \return Negative result if the \a string is greater, positive if it is less, zero otherwise.
 
 	int compare(const StaticString &string) const noexcept;
+
+	///
+
+	const char *const_text() const noexcept
+	{
+		return _text;
+	}
 
 	/// Return the number of occurences of any of the specified \a symbols in the string.
 	/// \param symbols The list of symbols to count.
@@ -91,6 +94,13 @@ public:
 
 	size_t find_last(char symbol, size_t offset = End) const noexcept;
 
+	/// Check whether the string is empty.
+
+	bool is_empty() const noexcept
+	{
+		return !_size;
+	}
+
 	///
 
 	StaticString left(size_t size) const noexcept
@@ -103,7 +113,7 @@ public:
 	StaticString mid(size_t offset, size_t size = End) const noexcept
 	{
 		return (offset < _size
-			? StaticString(_text + offset, min(size, _size))
+			? StaticString(&_text[offset], min(size, _size - offset))
 			: StaticString());
 	}
 
@@ -177,22 +187,12 @@ public:
 
 	uint64_t to_uint64() const noexcept;
 
-	/// Check whether the string is zero-terminated.
+	///
 	/// \note Might possibly crash if the string is allocated in the very end of a readable space.
 
-	bool zero_terminated() const noexcept
-	{
-		return !_text[_size];
-	}
+	String zero_terminated(Allocator *allocator = HeapAllocator::instance()) const noexcept;
 
 public:
-
-	///
-
-	operator SafeBool() const noexcept
-	{
-		return Y_SAFE_BOOL(_size);
-	}
 
 	///
 
@@ -231,17 +231,11 @@ public:
 
 	///
 
-	bool operator ==(const StaticString &string) const noexcept
-	{
-		return (_size == string._size && !memcmp(_text, string._text, _size));
-	}
+	bool operator ==(const StaticString &string) const noexcept;
 
 	///
 
-	bool operator !=(const StaticString &string) const noexcept
-	{
-		return (_size != string._size || memcmp(_text, string._text, _size));
-	}
+	bool operator !=(const StaticString &string) const noexcept;
 
 public:
 

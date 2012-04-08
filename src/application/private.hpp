@@ -35,7 +35,6 @@ private:
 	HeapAllocatorImpl   _heap_allocator;
 	FileSystem          _file_system;
 	LogManager::Private _log_manager_private;
-	AudioManager        _audio_manager;
 
 private:
 

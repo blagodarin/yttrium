@@ -23,13 +23,13 @@ public:
 	/// Parse the \a string as an ION document.
 	/// \note The \a string MUST have a zero terminator.
 
-	bool parse(const StaticString& string, const StaticString &source_name);
+	bool parse(const StaticString &string, const StaticString &source_name);
 
 private:
 
-	bool parse_name(const StaticString& name);
+	bool parse_name(const StaticString &name);
 
-	bool parse_value(const StaticString& value);
+	bool parse_value(const StaticString &value);
 
 	bool parse_lbrace();
 

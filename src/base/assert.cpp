@@ -10,7 +10,7 @@ namespace Yttrium
 
 void abort(const StaticString &file, int line, const StaticString &function, const StaticString &message, ...)
 {
-	if (message)
+	if (!message.is_empty())
 	{
 		Allocator *allocator = SystemAllocator::instance();
 

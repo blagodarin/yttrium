@@ -4,8 +4,6 @@
 #ifndef __Y_STRING_HPP
 #define __Y_STRING_HPP
 
-#include <cstring> // strlen
-
 #include <Yttrium/allocator.hpp>
 #include <Yttrium/global.hpp>
 #include <Yttrium/safe_bool.hpp>
@@ -160,10 +158,7 @@ public:
 	* \overload
 	*/
 
-	String &append(const char *text) noexcept
-	{
-		return append(text, strlen(text));
-	}
+	String &append(const char *text) noexcept;
 
 	/// Append the specified \a symbol to the string \a count times.
 
@@ -271,10 +266,7 @@ public:
 	* \overload
 	*/
 
-	String &set(const char *text) noexcept
-	{
-		return set(text, strlen(text));
-	}
+	String &set(const char *text) noexcept;
 
 	/**
 	* \overload

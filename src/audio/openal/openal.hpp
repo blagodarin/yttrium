@@ -1,5 +1,5 @@
-#ifndef __AUDIO_AL_AL_HPP
-#define __AUDIO_AL_AL_HPP
+#ifndef __AUDIO_OPENAL_OPENAL_HPP
+#define __AUDIO_OPENAL_OPENAL_HPP
 
 #include <Yttrium/global.hpp>
 
@@ -10,4 +10,4 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#endif // __AUDIO_AL_AL_HPP
+#endif // __AUDIO_OPENAL_OPENAL_HPP

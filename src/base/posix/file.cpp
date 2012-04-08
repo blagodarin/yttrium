@@ -225,16 +225,7 @@ size_t File::write(const void *buffer, size_t size)
 
 int File::Private::open(const StaticString &name, int flags, Allocator *allocator)
 {
-	if (name.zero_terminated()) // Avoid extra allocation.
-	{
-		return ::open(name.text(), flags, 0644);
-	}
-	else
-	{
-		String fixed_name(name, allocator); // TODO: Think of using a stack (alloca) here.
-
-		return ::open(fixed_name.text(), flags, 0644);
-	}
+	return ::open(name.zero_terminated(allocator).text(), flags, 0644); // TODO: Think of using a stack (alloca) here.
 }
 
 } // namespace Yttrium

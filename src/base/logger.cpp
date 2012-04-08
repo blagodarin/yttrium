@@ -23,7 +23,7 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 		.append_dec(now.second, 2, true)
 		.append(Y_S("] "));
 
-	if (_logger._name)
+	if (!_logger._name.is_empty())
 	{
 		_logger._message << _logger._name << " - ";
 	}
@@ -39,10 +39,10 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 	default:                                            break;
 	}
 
-	if (file)
+	if (!file.is_empty())
 	{
 		_location << Y_S(" {") << file << ':' << line;
-		if (function)
+		if (!function.is_empty())
 		{
 			_location << Y_S(" - ") << function;
 		}
