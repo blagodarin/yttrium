@@ -47,7 +47,7 @@ bool OggVorbisReader::open(const StaticString &name, FileSystem &file_system)
 {
 	_file = file_system.open_file(name);
 
-	if (!_file || ov_open_callbacks(&_file, &_ov_file, nullptr, 0, _ov_callbacks) < 0)
+	if (!_file.is_opened() || ov_open_callbacks(&_file, &_ov_file, nullptr, 0, _ov_callbacks) < 0)
 	{
 		return false;
 	}

@@ -5,7 +5,6 @@
 #define __Y_FILE_HPP
 
 #include <Yttrium/allocator.hpp>
-#include <Yttrium/safe_bool.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/types.hpp>
 
@@ -84,6 +83,10 @@ public:
 
 	bool flush() noexcept;
 
+	///
+
+	bool is_opened() const noexcept;
+
 	/// Return the current file offset.
 	/// \return Current offset.
 
@@ -95,10 +98,6 @@ public:
 	///
 
 	bool open(const StaticString &name, Mode mode, Allocator *allocator = HeapAllocator::instance()) noexcept;
-
-	///
-
-	bool opened() const noexcept;
 
 	/// Read the specified amount of bytes into the buffer.
 	/// \return Number of bytes read or 0 on failure.
@@ -159,10 +158,7 @@ public:
 
 	///
 
-	operator SafeBool() const noexcept
-	{
-		return Y_SAFE_BOOL(opened());
-	}
+	File &operator =(const File &file) noexcept;
 
 public:
 

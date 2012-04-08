@@ -59,6 +59,10 @@ public:
 
 	///
 
+	Mutex(const Mutex &mutex) noexcept;
+
+	///
+
 	~Mutex() noexcept;
 
 public:
@@ -85,6 +89,12 @@ public:
 
 public:
 
+	///
+
+	Mutex &operator =(const Mutex &mutex) noexcept;
+
+public:
+
 	class Private;
 
 protected:
@@ -93,6 +103,10 @@ protected:
 		: _private(private_)
 	{
 	}
+
+private:
+
+	void close();
 
 private:
 

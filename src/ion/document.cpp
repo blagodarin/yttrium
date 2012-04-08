@@ -37,7 +37,7 @@ bool Document::load(const StaticString &filename, FileSystem::Order order, FileS
 	clear();
 
 	File file = fileSystem.open_file(filename, File::Read, order);
-	if (!file)
+	if (!file.is_opened())
 	{
 		return false;
 	}
@@ -56,7 +56,7 @@ void Document::save(const StaticString &filename, int indentation) const
 {
 	StaticFile file(filename, File::Write);
 
-	if (!file)
+	if (!file.is_opened())
 	{
 		// TODO: Log the situation.
 	}

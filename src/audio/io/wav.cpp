@@ -58,7 +58,7 @@ bool WavReader::open(const StaticString &name, FileSystem &file_system)
 
 	_file = file_system.open_file(name);
 
-	if (!_file)
+	if (!_file.is_opened())
 	{
 		return false;
 	}

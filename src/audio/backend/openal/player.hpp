@@ -1,7 +1,7 @@
-#ifndef __AUDIO_OPENAL_PLAYER_HPP
-#define __AUDIO_OPENAL_PLAYER_HPP
+#ifndef __AUDIO_BACKEND_OPENAL_PLAYER_HPP
+#define __AUDIO_BACKEND_OPENAL_PLAYER_HPP
 
-#include "../backend/player.hpp"
+#include "../player.hpp"
 
 #include "openal.hpp"
 
@@ -42,4 +42,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __AUDIO_OPENAL_PLAYER_HPP
+#endif // __AUDIO_BACKEND_OPENAL_PLAYER_HPP

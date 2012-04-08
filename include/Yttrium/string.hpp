@@ -300,6 +300,15 @@ public:
 		return set(string);
 	}
 
+	/**
+	* \overload
+	*/
+
+	String &operator =(const String &string) noexcept
+	{
+		return set(string);
+	}
+
 	///
 
 	String &operator +=(char symbol) noexcept

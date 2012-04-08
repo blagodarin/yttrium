@@ -8,7 +8,7 @@ src = [
 	'application',
 	'audio',
 	'audio/backend',
-	'audio/openal',
+	'audio/backend/openal',
 	'audio/io',
 	'base',
 	'base/memory',

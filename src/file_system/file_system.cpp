@@ -31,7 +31,8 @@ File FileSystem::open_file(const StaticString &name, File::Mode mode, Order orde
 
 	if (order == PackedFirst || order == PackedOnly)
 	{
-		if ((file = open_packed(name)))
+		file = open_packed(name);
+		if (file.is_opened())
 		{
 			return file;
 		}
@@ -87,7 +88,7 @@ File FileSystem::open_packed(const StaticString &name) const
 	for (Packages::const_reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
 		file = (*i)->open_file(name);
-		if (file)
+		if (file.is_opened())
 		{
 			break;
 		}

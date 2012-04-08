@@ -1,9 +1,9 @@
 #ifndef __BASE_POSIX_THREAD_HPP
 #define __BASE_POSIX_THREAD_HPP
 
-#include <atomic>
+#include <atomic> // std::atomic
 
-#include <pthread.h>
+#include <pthread.h> // pthread_*
 
 #include <Yttrium/thread.hpp>
 

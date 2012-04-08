@@ -1,7 +1,7 @@
-#ifndef __AUDIO_OPENAL_MANAGER_HPP
-#define __AUDIO_OPENAL_MANAGER_HPP
+#ifndef __AUDIO_BACKEND_OPENAL_MANAGER_HPP
+#define __AUDIO_BACKEND_OPENAL_MANAGER_HPP
 
-#include "../manager.hpp"
+#include "../../manager.hpp"
 
 #include "player.hpp"
 
@@ -31,4 +31,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __AUDIO_OPENAL_MANAGER_HPP
+#endif // __AUDIO_BACKEND_OPENAL_MANAGER_HPP

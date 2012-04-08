@@ -24,7 +24,11 @@ public:
 
 	///
 
-	~Signal();
+	Signal(const Signal &signal) noexcept;
+
+	///
+
+	~Signal() noexcept;
 
 public:
 
@@ -42,7 +46,13 @@ public:
 
 	///
 
-	void signal();
+	void signal() noexcept;
+
+public:
+
+	///
+
+	Signal &operator =(const Signal &signal) noexcept;
 
 public:
 
@@ -54,6 +64,10 @@ protected:
 		: _private(private_)
 	{
 	}
+
+private:
+
+	void close();
 
 private:
 

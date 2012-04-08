@@ -61,18 +61,28 @@ public:
 
 public:
 
+	///
+
+	Thread &operator =(const Thread &thread) noexcept;
+
+public:
+
 	/// Suspend the execution of the current thread for a given amount of time.
 	/// \param milliseconds Time to suspend the execution for.
 	/// \note Passing zero \a milliseconds will cause the suspension to last for a
 	/// minimal still nonzero amount of time possible. Therefore, it is
-	/// recommended to call \c Thread::sleep(0) in heavy and long-lasting
+	/// recommended to call <tt>Thread::sleep(0)</tt> in heavy and long-lasting
 	/// loops.
 
-	static void sleep(Clock ms) noexcept;
+	static void sleep(Clock milliseconds = 0) noexcept;
 
 public:
 
 	class Private;
+
+private:
+
+	void close();
 
 private:
 
