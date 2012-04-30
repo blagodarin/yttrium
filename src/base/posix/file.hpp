@@ -2,6 +2,7 @@
 #define __BASE_POSIX_FILE_HPP
 
 #include <Yttrium/file.hpp>
+#include <Yttrium/noncopyable.hpp>
 
 #include "../private_base.hpp"
 
@@ -29,7 +30,7 @@ public:
 	static int open(const StaticString &name, int flags, Allocator *allocator);
 };
 
-class StaticFile: public File
+class StaticFile: public File, public Noncopyable
 {
 public:
 
@@ -43,10 +44,6 @@ public:
 	{
 		File::open(name, mode, nullptr);
 	}
-
-	StaticFile(const StaticFile &) = delete;
-
-	StaticFile &operator =(const StaticFile &) = delete;
 
 	bool open(const StaticString &name, Mode mode)
 	{

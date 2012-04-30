@@ -4,10 +4,10 @@
 #ifndef __Y_ION_OBJECT_HPP
 #define __Y_ION_OBJECT_HPP
 
-#include <map>
-#include <vector>
+#include <map>    // std::map
+#include <vector> // std::vector
 
-#include <Yttrium/ion/indentation.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
@@ -24,7 +24,7 @@ class Value;
 
 ///
 
-class Object
+class Object: public Noncopyable
 {
 	friend class Document;
 	friend class Parser;
@@ -49,16 +49,16 @@ public:
 
 		///
 
-		bool empty() const noexcept
+		const Node &first() const noexcept
 		{
-			return !_size;
+			return **_first;
 		}
 
 		///
 
-		const Node &first() const noexcept
+		bool is_empty() const noexcept
 		{
-			return **_first;
+			return !_size;
 		}
 
 		///
@@ -74,23 +74,6 @@ public:
 		size_t size() const noexcept
 		{
 			return _size;
-		}
-
-	public:
-
-		///
-
-		operator SafeBool() const noexcept
-		{
-			return Y_SAFE_BOOL(_size);
-		}
-
-		///
-
-		void operator ++() noexcept
-		{
-			++_first;
-			--_size;
 		}
 
 	private:

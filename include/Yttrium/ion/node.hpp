@@ -4,7 +4,6 @@
 #ifndef __Y_ION_NODE_HPP
 #define __Y_ION_NODE_HPP
 
-#include <Yttrium/ion/indentation.hpp>
 #include <Yttrium/ion/list.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>

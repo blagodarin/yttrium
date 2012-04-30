@@ -262,17 +262,23 @@ private:
 
 } // namespace Yttrium
 
-///
+#if Y_HAVE_USER_LITERALS
 
-#define Y_S(literal) Yttrium::StaticString(literal, sizeof(literal) - 1)
+	///
 
-// TODO: Uncomment this when GCC 4.7 becomes available.
+	Yttrium::StaticString operator "" _y(const char *text, size_t size) noexcept
+	{
+		return StaticString(text, size);
+	}
 
-//Yttrium::StaticString operator "" _y(const char *text, size_t size) noexcept
-//{
-//	return StaticString(text, size);
-//}
-//
-//#define Y_S(literal) literal##_y
+	#define Y_S(literal) literal##_y
+
+#else
+
+	///
+
+	#define Y_S(literal) Yttrium::StaticString(literal, sizeof(literal) - 1)
+
+#endif
 
 #endif // __Y_STATIC_STRING_HPP

@@ -4,13 +4,14 @@
 #ifndef __Y_ION_DOCUMENT_HPP
 #define __Y_ION_DOCUMENT_HPP
 
-#include <list>
+#include <list> // std::list
 
 #include <Yttrium/allocator.hpp>
 #include <Yttrium/file_system.hpp>
 #include <Yttrium/ion/node.hpp>
 #include <Yttrium/ion/object.hpp>
 #include <Yttrium/ion/value.hpp>
+#include <Yttrium/pool.hpp>
 
 namespace Yttrium
 {
@@ -31,10 +32,6 @@ class Y_API Document: public Object
 	friend class Value;
 
 public:
-
-	Document(const Document &) = delete;
-
-	Document &operator =(const Document &) = delete;
 
 	///
 
@@ -77,15 +74,9 @@ private:
 
 private:
 
-	// TODO: Switch these "pools" to the real ones when they become available.
-
-	typedef std::list<Object> Objects;
-	typedef std::list<Node>   Nodes;
-	typedef std::list<Value>  Values;
-
-	//typedef Pool<Object> Objects;
-	//typedef Pool<Node>   Nodes;
-	//typedef Pool<Value>  Values;
+	typedef Pool<Object> Objects;
+	typedef Pool<Node>   Nodes;
+	typedef Pool<Value>  Values;
 
 private:
 

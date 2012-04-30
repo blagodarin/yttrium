@@ -4,7 +4,7 @@
 #ifndef __Y_UTILS_HPP
 #define __Y_UTILS_HPP
 
-#include <algorithm> // max, min
+#include <algorithm> // std::max, std::min
 
 #include <Yttrium/types.hpp>
 

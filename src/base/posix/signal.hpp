@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/signal.hpp>
 
 #include "../private_base.hpp"
@@ -21,7 +22,7 @@ public:
 	Private(Allocator *allocator = nullptr);
 };
 
-class StaticSignal: public Signal
+class StaticSignal: public Signal, public Noncopyable
 {
 public:
 
@@ -29,10 +30,6 @@ public:
 		: Signal(&_private_data)
 	{
 	}
-
-	StaticSignal(const StaticSignal &) = delete;
-
-	StaticSignal &operator =(const StaticSignal &) = delete;
 
 private:
 

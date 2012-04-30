@@ -5,7 +5,6 @@
 #define __Y_AUDIO_IO_HPP
 
 #include <Yttrium/allocator.hpp>
-#include <Yttrium/safe_bool.hpp>
 #include <Yttrium/static_string.hpp>
 
 namespace Yttrium
@@ -100,7 +99,7 @@ public:
 
 	///
 
-	bool opened() const noexcept
+	bool is_opened() const noexcept
 	{
 		return _private;
 	}
@@ -122,15 +121,6 @@ public:
 	/// \return File size in samples.
 
 	UOffset size() const noexcept;
-
-public:
-
-	///
-
-	operator SafeBool() const noexcept
-	{
-		return Y_SAFE_BOOL(_private);
-	}
 
 public:
 

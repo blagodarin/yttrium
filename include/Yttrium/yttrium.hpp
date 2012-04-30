@@ -16,11 +16,11 @@
 #include <Yttrium/log_manager.hpp>
 #include <Yttrium/logger.hpp>
 #include <Yttrium/mutex.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/package.hpp>
 #include <Yttrium/pointer.hpp>
 #include <Yttrium/pool.hpp>
 #include <Yttrium/proxy_allocator.hpp>
-#include <Yttrium/safe_bool.hpp>
 #include <Yttrium/signal.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>

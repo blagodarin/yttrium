@@ -5,18 +5,15 @@
 
 #include <Yttrium/allocator.hpp>
 #include <Yttrium/assert.hpp>
+#include <Yttrium/noncopyable.hpp>
 
 namespace Yttrium
 {
 
 template <typename T>
-class PrivateBase
+class PrivateBase: public Noncopyable
 {
 public:
-
-	PrivateBase(const PrivateBase &) = delete;
-
-	PrivateBase &operator =(const PrivateBase &) = delete;
 
 	PrivateBase(Allocator *allocator)
 		: _allocator(allocator)

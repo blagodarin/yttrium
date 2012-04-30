@@ -4,6 +4,7 @@
 #include <pthread.h>
 
 #include <Yttrium/mutex.hpp>
+#include <Yttrium/noncopyable.hpp>
 
 #include "../private_base.hpp"
 
@@ -21,7 +22,7 @@ public:
 	Private(Allocator *allocator = nullptr);
 };
 
-class StaticMutex: public Mutex
+class StaticMutex: public Mutex, public Noncopyable
 {
 public:
 
@@ -29,10 +30,6 @@ public:
 		: Mutex(&_private_data)
 	{
 	}
-
-	StaticMutex(const StaticMutex &) = delete;
-
-	StaticMutex &operator =(const StaticMutex &) = delete;
 
 private:
 

@@ -4,8 +4,8 @@
 #ifndef __Y_ION_VALUE_HPP
 #define __Y_ION_VALUE_HPP
 
-#include <Yttrium/ion/indentation.hpp>
 #include <Yttrium/ion/list.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
@@ -19,7 +19,7 @@ class Document;
 
 ///
 
-class Y_API Value
+class Y_API Value: public Noncopyable
 {
 	friend class Document;
 	friend class List;
@@ -38,10 +38,6 @@ public:
 	};
 
 public:
-
-	//Value(const Value &) = delete; // TODO: Uncomment on Pool porting.
-
-	Value &operator =(const Value &) = delete;
 
 	///
 

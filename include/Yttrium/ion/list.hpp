@@ -4,7 +4,7 @@
 #ifndef __Y_ION_LIST_HPP
 #define __Y_ION_LIST_HPP
 
-#include <Yttrium/ion/indentation.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
@@ -21,7 +21,7 @@ class Value;
 
 ///
 
-class Y_API List
+class Y_API List: public Noncopyable
 {
 	friend class Parser;
 	friend class Value;
@@ -38,16 +38,16 @@ public:
 
 		///
 
-		bool empty() const noexcept
+		Value &first() const noexcept
 		{
-			return !_size;
+			return *_first;
 		}
 
 		///
 
-		Value &first() const noexcept
+		bool is_empty() const noexcept
 		{
-			return *_first;
+			return !_size;
 		}
 
 		///
@@ -66,22 +66,6 @@ public:
 		size_t size() const noexcept
 		{
 			return _size;
-		}
-
-	public:
-
-		///
-
-		operator SafeBool() const noexcept
-		{
-			return Y_SAFE_BOOL(_size);
-		}
-
-		///
-
-		void operator ++() noexcept
-		{
-			pop_first();
 		}
 
 	private:
@@ -110,16 +94,16 @@ public:
 
 		///
 
-		bool empty() const noexcept
+		const Value &first() const noexcept
 		{
-			return !_size;
+			return *_first;
 		}
 
 		///
 
-		const Value &first() const noexcept
+		bool is_empty() const noexcept
 		{
-			return *_first;
+			return !_size;
 		}
 
 		///
@@ -140,22 +124,6 @@ public:
 			return _size;
 		}
 
-	public:
-
-		///
-
-		operator SafeBool() const noexcept
-		{
-			return Y_SAFE_BOOL(_size);
-		}
-
-		///
-
-		void operator ++() noexcept
-		{
-			pop_first();
-		}
-
 	private:
 
 		ConstRange(const Value *first, const Value *last, size_t size) noexcept
@@ -174,10 +142,6 @@ public:
 
 public:
 
-	//List(const List &) = delete; // TODO: Uncomment on Pool porting.
-
-	List &operator =(const List &) = delete;
-
 	///
 
 	List *append_list() noexcept;
@@ -192,7 +156,7 @@ public:
 
 	///
 
-	bool empty() const noexcept
+	bool is_empty() const noexcept
 	{
 		return !_size;
 	}

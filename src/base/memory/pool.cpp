@@ -1,35 +1,98 @@
-#include <Yttrium/pool.hpp>
-
-#include <Yttrium/assert.hpp>
+#include "pool.hpp"
 
 namespace Yttrium
 {
 
-PoolAllocator::~PoolAllocator()
+PoolBase::Private::~Private()
 {
-	Y_ASSERT(!_pool_status.allocated_items);
+	for (Chunk *chunk = _last_chunk; chunk; )
+	{
+		Chunk *previous_chunk = _last_chunk->_previous;
+		_allocator->delete_(chunk);
+		chunk = previous_chunk;
+	}
 }
 
-void *PoolAllocator::allocate(size_t size, size_t, Difference *difference)
+char *PoolBase::Private::allocate()
 {
-	Y_ASSERT(size <= _item_size);
+	if (!_last_chunk || _last_chunk->is_full())
+	{
+		_last_chunk = new(_allocator->allocate(_chunk_size))
+			Chunk(_item_size, _chunk_items, _last_chunk);
 
-	Y_ABORT("Not implemented");
+		++_status.allocated_chunks;
+		++_status.chunk_allocations;
+	}
 
-	return nullptr;
+	char *pointer = _last_chunk->allocate()->data;
+
+	++_status.allocated_items;
+	++_status.item_allocations;
+
+	return pointer;
 }
 
-void PoolAllocator::deallocate(void *pointer, Difference *difference)
+void PoolBase::Private::deallocate(char *pointer)
+{
+	Chunk::Item *item = Chunk::Item::base(pointer);
+
+	Chunk *chunk = item->chunk;
+
+	chunk->deallocate(item);
+
+	--_status.allocated_items;
+	++_status.item_deallocations;
+
+	if (chunk->is_empty())
+	{
+		if (chunk == _last_chunk)
+		{
+			_last_chunk = chunk->_previous;
+		}
+
+		_allocator->delete_(chunk);
+
+		--_status.allocated_chunks;
+		++_status.chunk_deallocations;
+	}
+}
+
+char *PoolBase::Private::take()
+{
+	return _last_chunk
+		? _last_chunk->_free[_last_chunk->_end]->data
+		: nullptr;
+}
+
+PoolBase::PoolBase(size_t item_size, size_t chunk_size, Allocator *allocator)
+	: _private(new(allocator->allocate<Private>())
+		Private(item_size, chunk_size, allocator))
 {
 }
 
-void *PoolAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
+PoolBase::~PoolBase()
 {
-	Y_ASSERT(size <= _item_size);
+	_private->_allocator->delete_(_private);
+}
 
-	Y_ABORT("Not implemented");
+PoolStatus PoolBase::status() const
+{
+	return _private->_status;
+}
 
-	return nullptr;
+void *PoolBase::allocate()
+{
+	return _private->allocate();
+}
+
+void PoolBase::deallocate(void *pointer)
+{
+	return _private->deallocate(static_cast<char *>(pointer));
+}
+
+void *PoolBase::take()
+{
+	return _private->take();
 }
 
 } // namespace Yttrium

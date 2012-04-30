@@ -64,7 +64,7 @@
 /// \brief
 
 #if defined(__linux__)
-	#define Y_IS_LINUX   1
+	#define Y_IS_LINUX 1
 #else
 	#define Y_IS_LINUX 0
 #endif
@@ -156,7 +156,13 @@
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 
 /******************************************************************************\
-* 4) Provide some globally useful (now-) compiler-independent definitions.
+* 4) Provide some workaroud property macros.
+\******************************************************************************/
+
+#define Y_HAVE_USER_LITERALS (__Y_GCC > 47 || __Y_MSVC > 110)
+
+/******************************************************************************\
+* 5) Provide some globally useful (now-) compiler-independent definitions.
 \******************************************************************************/
 
 /// \def Y_API

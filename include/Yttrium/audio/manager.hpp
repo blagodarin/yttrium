@@ -7,13 +7,14 @@
 #include <set>
 
 #include <Yttrium/audio/player.hpp>
+#include <Yttrium/noncopyable.hpp>
 
 namespace Yttrium
 {
 
 /// Audio manager.
 
-class Y_API AudioManager
+class Y_API AudioManager: public Noncopyable
 {
 public:
 
@@ -26,10 +27,6 @@ public:
 	typedef std::set<StaticString> Devices;
 
 public:
-
-	AudioManager(const AudioManager &) = delete;
-
-	AudioManager &operator =(const AudioManager &) = delete;
 
 	///
 

@@ -5,8 +5,6 @@
 #define __Y_STRING_HPP
 
 #include <Yttrium/allocator.hpp>
-#include <Yttrium/global.hpp>
-#include <Yttrium/safe_bool.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/types.hpp>
 

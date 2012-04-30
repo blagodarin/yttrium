@@ -5,12 +5,13 @@
 #define __Y_THREAD_BUFFER_HPP
 
 #include <Yttrium/allocator.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/time.hpp>
 
 namespace Yttrium
 {
 
-class Y_API ThreadBufferBase
+class Y_API ThreadBufferBase: public Noncopyable
 {
 public:
 
@@ -18,27 +19,23 @@ public:
 
 	~ThreadBufferBase() noexcept;
 
-	ThreadBufferBase(const ThreadBufferBase &) = delete;
-
-	ThreadBufferBase &operator =(const ThreadBufferBase &) = delete;
-
 protected:
 
-	void begin_read();
+	void begin_read() noexcept;
 
-	void begin_write();
+	void begin_write() noexcept;
 
-	void end_read();
+	void end_read() noexcept;
 
-	void end_write();
+	void end_write() noexcept;
 
-	bool try_begin_read();
+	bool try_begin_read() noexcept;
 
-	bool try_begin_read(Clock milliseconds);
+	bool try_begin_read(Clock milliseconds) noexcept;
 
-	bool try_begin_write();
+	bool try_begin_write() noexcept;
 
-	bool try_begin_write(Clock milliseconds);
+	bool try_begin_write(Clock milliseconds) noexcept;
 
 protected:
 

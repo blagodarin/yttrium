@@ -5,7 +5,7 @@ Yttrium:
 - Add Windows port.
 
     Base:
-    - Implement pools.
+    - Redesign logging.
 
     File system:
     - Implement packages.

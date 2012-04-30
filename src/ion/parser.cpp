@@ -117,7 +117,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 							{
 							case '"':  *dst++ = '\"'; break;
 							case '\\': *dst++ = '\\'; break;
-							case 'n':  *dst++ = '\n'; break; // NOTE: It can be easily fixed to say "\r\n".
+							case 'n':  *dst++ = '\n'; break;
 							case 'r':  *dst++ = '\r'; break;
 							case 't':  *dst++ = '\t'; break;
 							default:
@@ -274,7 +274,6 @@ bool Parser::parse_end()
 	Y_LOG_TRACE(_logger, "Token: <end>");
 
 	return _states.size() == 1;
-	return true;
 }
 
 const Parser::CharClass Parser::char_class[256] =

@@ -87,7 +87,7 @@ File FileSystem::open_packed(const StaticString &name) const
 
 	for (Packages::const_reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
-		file = (*i)->open_file(name);
+		file = (*i)->open_file(name); // NOTE: No allocator specified!
 		if (file.is_opened())
 		{
 			break;

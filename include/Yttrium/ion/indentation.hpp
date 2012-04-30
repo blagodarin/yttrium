@@ -1,8 +1,12 @@
 /// \file
 /// \brief
 
+// NOTE: This file is not used by the Yttrium itself, consider removing it.
+
 #ifndef __Y_ION_INDENTATION_HPP
 #define __Y_ION_INDENTATION_HPP
+
+#include <Yttrium/global.hpp>
 
 namespace Yttrium
 {

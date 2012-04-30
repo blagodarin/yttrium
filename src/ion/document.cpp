@@ -18,16 +18,15 @@ Document::Document(Allocator *allocator)
 	: Object(this)
 	, _allocator(allocator)
 	, _buffer(allocator)
+	, _objects(32, allocator)
+	, _nodes(32, allocator)
+	, _values(32, allocator)
 {
 }
 
 void Document::clear()
 {
 	Object::clear();
-
-	_values.clear();
-	_nodes.clear();
-	_objects.clear();
 
 	_buffer.clear();
 }
@@ -74,44 +73,37 @@ void Document::save(const StaticString &filename, int indentation) const
 
 Value *Document::new_list_value()
 {
-	_values.push_back(Value(this));
-	return &_values.back();
+	return new(_values.allocate()) Value(this);
 }
 
 Node *Document::new_node(const StaticString &name)
 {
-	_nodes.push_back(Node(this, name));
-	return &_nodes.back();
+	return new(_nodes.allocate()) Node(this, name);
 }
 
 Node *Document::new_node(const StaticString &name, const String::Reference &)
 {
-	_nodes.push_back(Node(this, name, String::Ref));
-	return &_nodes.back();
+	return new(_nodes.allocate()) Node(this, name, String::Ref);
 }
 
 Object *Document::new_object()
 {
-	_objects.push_back(Object(this));
-	return &_objects.back();
+	return new(_objects.allocate()) Object(this);
 }
 
 Value *Document::new_object_value(Object *object)
 {
-	_values.push_back(Value(this, object));
-	return &_values.back();
+	return new(_values.allocate()) Value(this, object);
 }
 
 Value *Document::new_value(const StaticString &name)
 {
-	_values.push_back(Value(this, name));
-	return &_values.back();
+	return new(_values.allocate()) Value(this, name);
 }
 
 Value *Document::new_value(const StaticString &name, const String::Reference &)
 {
-	_values.push_back(Value(this, name, String::Ref));
-	return &_values.back();
+	return new(_values.allocate()) Value(this, name, String::Ref);
 }
 
 } // namespace Ion
