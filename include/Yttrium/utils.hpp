@@ -24,7 +24,7 @@ using std::min;
 template <typename T>
 const T &clamp(const T &a, const T &lo, const T &hi) noexcept
 {
-	return std::min(std::max(a, lo), hi);
+	return min(max(a, lo), hi);
 }
 
 /// Determine if the specified value is a power of two (POT).

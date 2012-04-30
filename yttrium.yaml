@@ -6,6 +6,7 @@ Yttrium:
 
     Base:
     - Redesign logging.
+    - Make thread class inheritable.
 
     File system:
     - Implement packages.

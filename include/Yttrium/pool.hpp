@@ -44,7 +44,7 @@ public:
 
 	///
 
-	PoolBase(size_t item_size, size_t chunk_size, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	PoolBase(size_t chunk_items, size_t item_size, Allocator *allocator = HeapAllocator::instance()) noexcept;
 
 	///
 
@@ -68,13 +68,18 @@ protected:
 
 	void *take() noexcept;
 
-public:
+private:
 
-	class Private;
+	class Chunk;
 
 private:
 
-	Private *_private;
+	Allocator  *_allocator;
+	size_t      _chunk_items;
+	size_t      _item_size;
+	size_t      _chunk_size;
+	Chunk      *_last_chunk;
+	PoolStatus  _status;
 };
 
 ///
@@ -86,8 +91,8 @@ public:
 
 	///
 
-	Pool(size_t granularity = 32, Allocator *allocator = HeapAllocator::instance()) noexcept
-		: PoolBase(sizeof(T), granularity, allocator)
+	Pool(size_t chunk_items = 32, Allocator *allocator = HeapAllocator::instance()) noexcept
+		: PoolBase(chunk_items, sizeof(T), allocator)
 	{
 	}
 
