@@ -30,7 +30,7 @@ public:
 
 	struct Difference
 	{
-		///<
+		///
 
 		enum Direction
 		{
@@ -150,26 +150,6 @@ public:
 			pointer->T::~T();
 			deallocate(pointer);
 		}
-	}
-
-	///
-
-	template <typename T>
-	T *new_() noexcept
-	{
-		T *pointer = static_cast<T *>(allocate(sizeof(T)));
-		new(pointer) T();
-		return pointer;
-	}
-
-	///
-
-	template <typename T, typename U>
-	T *new_(const U &source) noexcept
-	{
-		T *p = static_cast<T *>(allocate(sizeof(T)));
-		new(p) T(source);
-		return p;
 	}
 
 	///
