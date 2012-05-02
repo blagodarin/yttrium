@@ -88,6 +88,13 @@ public:
 
 	AudioFormat format() const noexcept;
 
+	///
+
+	bool is_opened() const noexcept
+	{
+		return _private;
+	}
+
 	/// Return the current audio offset.
 	/// \return Current offset in samples.
 
@@ -96,13 +103,6 @@ public:
 	///
 
 	bool open(const StaticString &name, AudioType type = AudioType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept;
-
-	///
-
-	bool is_opened() const noexcept
-	{
-		return _private;
-	}
 
 	/// Read at most \a size bytes into \a buffer.
 	/// \param buffer Buffer to read into.
@@ -121,6 +121,12 @@ public:
 	/// \return File size in samples.
 
 	UOffset size() const noexcept;
+
+public:
+
+	///
+
+	AudioReader &operator =(const AudioReader &reader) noexcept;
 
 public:
 

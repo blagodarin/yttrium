@@ -39,12 +39,12 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 	{
 	case AudioType::Wav:
 
-		_private = allocator->new_<WavReader>(allocator);
+		_private = new(allocator->allocate<WavReader>()) WavReader(allocator);
 		break;
 
 	case AudioType::OggVorbis:
 
-		_private = allocator->new_<OggVorbisReader>(allocator);
+		_private = new(allocator->allocate<OggVorbisReader>()) OggVorbisReader(allocator);
 		break;
 
 	default:
@@ -53,11 +53,11 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 			StaticString extension = name.file_extension();
 			if (extension == ".wav")
 			{
-				_private = allocator->new_<WavReader>(allocator);
+				_private = new(allocator->allocate<WavReader>()) WavReader(allocator);
 			}
 			else if (extension == ".ogg")
 			{
-				_private = allocator->new_<OggVorbisReader>(allocator);
+				_private = new(allocator->allocate<OggVorbisReader>()) OggVorbisReader(allocator);
 			}
 		}
 		break;
@@ -104,6 +104,15 @@ bool AudioReader::seek(UOffset offset)
 UOffset AudioReader::size() const
 {
 	return (_private ? _private->_size : 0);
+}
+
+AudioReader &AudioReader::operator =(const AudioReader &reader)
+{
+	close();
+
+	_private = Private::copy(reader._private);
+
+	return *this;
 }
 
 } // namespace Yttrium

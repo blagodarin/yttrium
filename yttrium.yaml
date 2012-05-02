@@ -3,6 +3,7 @@ Yttrium:
 - Add scripting support.
 - Add GUI (requires renderer).
 - Add Windows port.
+- Convert the examples into proper tests.
 
     Base:
     - Redesign logging.
@@ -10,10 +11,6 @@ Yttrium:
 
     File system:
     - Implement packages.
-
-    Images:
-    - Implement reading.
-    - Implement writing.
 
 Tools:
 - Add packer.

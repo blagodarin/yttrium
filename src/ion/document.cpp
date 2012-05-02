@@ -53,7 +53,7 @@ bool Document::load(const StaticString &filename, FileSystem::Order order, FileS
 
 void Document::save(const StaticString &filename, int indentation) const
 {
-	StaticFile file(filename, File::Write);
+	StaticFile file(filename, File::Write, _allocator);
 
 	if (!file.is_opened())
 	{

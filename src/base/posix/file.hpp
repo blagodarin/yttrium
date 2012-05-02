@@ -39,15 +39,10 @@ public:
 	{
 	}
 
-	StaticFile(const StaticString &name, Mode mode)
+	StaticFile(const StaticString &name, Mode mode, Allocator *allocator)
 		: File(&_private_data)
 	{
-		File::open(name, mode, nullptr);
-	}
-
-	bool open(const StaticString &name, Mode mode)
-	{
-		return File::open(name, mode, nullptr);
+		File::open(name, mode, allocator);
 	}
 
 private:
