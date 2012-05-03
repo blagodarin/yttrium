@@ -11,23 +11,23 @@ enum
 };
 
 AudioPlayer::Private::Private(Allocator *allocator)
-	: _allocator(allocator)
+	: _playlist(allocator)
+	, _state(Stopped)
+	, _allocator(allocator)
 	, _backend(AudioPlayerBackend::create(allocator))
-	, _playlist(allocator)
 	, _streamer(_backend, allocator)
-	, _thread(allocator)
 {
-	_thread.start(std::bind(&Private::thread_function, this));
+	start();
 }
 
 AudioPlayer::Private::~Private()
 {
 	_action.write(Exit);
-	_thread.wait();
+	wait();
 	_allocator->delete_(_backend);
 }
 
-void AudioPlayer::Private::thread_function()
+void AudioPlayer::Private::run()
 {
 	for (; ; )
 	{

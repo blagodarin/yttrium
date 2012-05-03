@@ -1,6 +1,3 @@
-/// \file
-/// \brief Generic backend-independent playlist implementation.
-
 #ifndef __AUDIO_PLAYER_HPP
 #define __AUDIO_PLAYER_HPP
 
@@ -15,14 +12,8 @@
 namespace Yttrium
 {
 
-class AudioPlayer::Private
+class AudioPlayer::Private: Thread
 {
-public:
-
-	Private(Allocator *allocator);
-
-	~Private();
-
 public:
 
 	enum State
@@ -42,18 +33,27 @@ public:
 
 	typedef ThreadBuffer<Action> ActionBuffer;
 
-	ActionBuffer _action;
-	State        _state;
+public:
 
-	Allocator          *_allocator;
-	AudioPlayerBackend *_backend;
-	AudioPlaylist       _playlist;
-	AudioStreamer       _streamer;
-	Thread              _thread;
+	AudioPlaylist _playlist;
+	ActionBuffer  _action;
+	State         _state;
+
+public:
+
+	Private(Allocator *allocator);
+
+	~Private() noexcept;
+
+protected:
+
+	virtual void run();
 
 private:
 
-	void thread_function();
+	Allocator          *_allocator;
+	AudioPlayerBackend *_backend;
+	AudioStreamer       _streamer;
 };
 
 } // namespace Yttrium

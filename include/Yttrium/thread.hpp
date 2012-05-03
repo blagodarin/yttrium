@@ -4,9 +4,8 @@
 #ifndef __Y_THREAD_HPP
 #define __Y_THREAD_HPP
 
-#include <functional> // std::function
-
 #include <Yttrium/allocator.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/time.hpp>
 
 namespace Yttrium
@@ -14,14 +13,8 @@ namespace Yttrium
 
 /// %Thread.
 
-class Y_API Thread
+class Y_API Thread: public Noncopyable
 {
-public:
-
-	///
-
-	typedef std::function<void()> Function;
-
 public:
 
 	///
@@ -30,11 +23,7 @@ public:
 
 	///
 
-	Thread(const Thread &thread) noexcept;
-
-	///
-
-	~Thread() noexcept;
+	virtual ~Thread() noexcept;
 
 public:
 
@@ -43,13 +32,10 @@ public:
 
 	bool is_running() noexcept;
 
-	/// Start the execution of the thread for a given function.
-	/// \tparam function Function to execute.
-	/// \note If the function fails while another function is executing for the
-	/// thread object, its execution would not be stopped.
-	/// \note This function is not reentrant.
+	/// Start the thread execution.
+	/// \note The thread must not be running.
 
-	void start(const Function &function) noexcept;
+	void start() noexcept;
 
 	/// Force the thread to stop execution.
 
@@ -59,11 +45,11 @@ public:
 
 	void wait() noexcept;
 
-public:
+protected:
 
 	///
 
-	Thread &operator =(const Thread &thread) noexcept;
+	virtual void run() = 0;
 
 public:
 
@@ -76,17 +62,16 @@ public:
 
 	static void sleep(Clock milliseconds = 0) noexcept;
 
-public:
+private:
 
 	class Private;
 
-private:
-
-	void close();
+	friend class Private;
 
 private:
 
-	Private *_private;
+	Allocator *_allocator;
+	Private   *_private;
 };
 
 } // namespace Yttrium

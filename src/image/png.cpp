@@ -28,14 +28,14 @@ PngWriter::~PngWriter()
 		}
 		else
 		{
-			png_destroy_write_struct(&_png, NULL);
+			png_destroy_write_struct(&_png, nullptr);
 		}
 	}
 }
 
 bool PngWriter::open()
 {
-	_png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	_png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 
 	if (_png)
 	{
@@ -48,7 +48,7 @@ bool PngWriter::open()
 		}
 		else
 		{
-			png_destroy_write_struct(&_png, NULL);
+			png_destroy_write_struct(&_png, nullptr);
 		}
 	}
 
@@ -209,7 +209,7 @@ bool PngWriter::write(const void *buffer, size_t frame_size)
 	}
 
 	png_set_rows(_png, _info, rows);
-	png_write_png(_png, _info, transforms, NULL);
+	png_write_png(_png, _info, transforms, nullptr);
 
 	_allocator->deallocate(rows);
 	_file.truncate();

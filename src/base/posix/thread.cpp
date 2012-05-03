@@ -13,7 +13,7 @@ bool Thread::is_running()
 	return _private->_is_running;
 }
 
-void Thread::start(const Function &function)
+void Thread::start()
 {
 	if (_private->_is_running)
 	{
@@ -21,17 +21,14 @@ void Thread::start(const Function &function)
 		return;
 	}
 
-	pthread_t handle;
+	_private->_is_running = true;
 
-	_private->_function = function;
-	if (pthread_create(&handle, NULL, &Private::entry_point, _private))
+	if (pthread_create(&_private->_handle, nullptr, &Private::entry_point, this))
 	{
 		Y_ABORT("Can't start a thread");
+		_private->_is_running = false;
 		return;
 	}
-
-	_private->_is_running = true;
-	_private->_handle = handle;
 }
 
 void Thread::stop()
@@ -61,11 +58,13 @@ void Thread::wait()
 
 void *Thread::Private::entry_point(void *data)
 {
-	Private *thread_private = static_cast<Private *>(data);
+	Thread *thread = static_cast<Thread *>(data);
 
-	thread_private->_function();
-	thread_private->_is_running = false;
-	return NULL;
+	thread->run();
+
+	thread->_private->_is_running = false;
+
+	return nullptr;
 }
 
 void Thread::sleep(Clock milliseconds)
@@ -94,18 +93,6 @@ void Thread::sleep(Clock milliseconds)
 		{
 			Y_ABORT("Can't sleep for 0 ms");
 		}
-	}
-}
-
-void Thread::close()
-{
-	if (Private::should_free(&_private))
-	{
-		if (_private->_is_running)
-		{
-			Y_ABORT("The thread must be terminated explicitly");
-		}
-		Private::free(&_private);
 	}
 }
 

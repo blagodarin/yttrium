@@ -4,28 +4,20 @@ namespace Yttrium
 {
 
 Thread::Thread(Allocator *allocator)
-	: _private(new(allocator->allocate<Private>())
-		Private(allocator))
-{
-}
-
-Thread::Thread(const Thread &thread)
-	: _private(Private::copy(thread._private))
+	: _allocator(allocator)
+	, _private(new(_allocator->allocate<Private>()) Private())
 {
 }
 
 Thread::~Thread()
 {
-	close();
-}
+	if (_private->_is_running)
+	{
+		Y_ABORT("A thread must be terminated explicitly");
+		stop();
+	}
 
-Thread &Thread::operator =(const Thread &thread)
-{
-	close();
-
-	_private = Private::copy(thread._private);
-
-	return *this;
+	_allocator->delete_(_private);
 }
 
 } // namespace Yttrium

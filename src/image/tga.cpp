@@ -130,7 +130,6 @@ bool TgaReader::open()
 		case tgaBottomRight: _format.orientation = ImageOrientation::XLeftYUp;    break;
 		case tgaTopLeft:     _format.orientation = ImageOrientation::XRightYDown; break;
 		case tgaTopRight:    _format.orientation = ImageOrientation::XLeftYDown;  break;
-//		default: return ReaderPtr(NULL); // Unwarning.
 		}
 
 		if (header.id_length)
