@@ -149,9 +149,9 @@ bool TgaReader::open()
 	return false;
 }
 
-bool TgaReader::read(void *buffer)
+bool TgaReader::read(void *buffer, size_t frame_size)
 {
-	return (_file.read(buffer, _size) == _size);
+	return (_file.read(buffer, frame_size) == frame_size);
 }
 
 ImageFormatFlags TgaWriter::set_format(const ImageFormat &format)
@@ -216,7 +216,7 @@ ImageFormatFlags TgaWriter::set_format(const ImageFormat &format)
 	return result;
 }
 
-bool TgaWriter::write(const void *buffer)
+bool TgaWriter::write(const void *buffer, size_t frame_size)
 {
 	TgaHeader header;
 
@@ -260,7 +260,7 @@ bool TgaWriter::write(const void *buffer)
 	}
 
 	_file.write(header);
-	_file.write(buffer, _size);
+	_file.write(buffer, frame_size);
 	_file.truncate();
 
 	return true;

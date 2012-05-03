@@ -85,14 +85,9 @@ typedef uint_fast8_t ImageFormatFlags;
 
 /// Image format.
 
-struct ImageFormat
+class ImageFormat
 {
-	uint_fast8_t     depth;        ///< Bytes per channel, usually 1.
-	uint_fast8_t     channels;     ///< Channels per pixel.
-	PixelFormat      pixel_format; ///< Pixel format.
-	ImageOrientation orientation;  ///< Image orientation.
-	size_t           width;        ///< Image width.
-	size_t           height;       ///< Image height.
+public:
 
 	enum: ImageFormatFlags
 	{
@@ -108,6 +103,24 @@ struct ImageFormat
 		AllFlags = DepthFlag | ChannelsFlag | PixelFormatFlag
 			| OrientationFlag | WidthFlag | HeightFlag,
 	};
+
+public:
+
+	uint_fast8_t     depth;        ///< Bytes per channel, usually 1.
+	uint_fast8_t     channels;     ///< Channels per pixel.
+	PixelFormat      pixel_format; ///< Pixel format.
+	ImageOrientation orientation;  ///< Image orientation.
+	size_t           width;        ///< Image width.
+	size_t           height;       ///< Image height.
+
+public:
+
+	///
+
+	size_t frame_size() const noexcept
+	{
+		return depth * channels * width * height;
+	}
 };
 
 /// Read-only audio file access interface.
@@ -202,7 +215,7 @@ public:
 
 	///
 
-	ImageWriter(const StaticString &name, ImageType type, Allocator *allocator = HeapAllocator::instance()) noexcept
+	ImageWriter(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept
 		//: ImageWriter() // TODO: Uncomment.
 		: _private(nullptr)
 	{
@@ -235,7 +248,7 @@ public:
 
 	///
 
-	bool open(const StaticString &name, ImageType type, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept;
 
 	/// Set the format for the output image.
 	/// \return Flags for invalid format fields or 0 on success.

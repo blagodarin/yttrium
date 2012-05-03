@@ -1,0 +1,6 @@
+Import('env')
+build = env.Clone(BUILD = '.build')
+build.VariantDir('$BUILD', '.', duplicate = 0)
+example = build.Program('#/bin/examples/image', build.Glob('$BUILD/*.cpp'))
+build.Clean(example, build.Dir('$BUILD'))
+Return('example')

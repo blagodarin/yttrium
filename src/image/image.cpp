@@ -72,7 +72,7 @@ bool ImageReader::read(void *buffer)
 
 	if (_private && !_private->_is_used)
 	{
-		result = _private->read(buffer);
+		result = _private->read(buffer, _private->_format.frame_size());
 		_private->_is_used = true;
 	}
 
@@ -135,7 +135,7 @@ bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allo
 
 	if (_private)
 	{
-		if (_private->_file.open(name, File::Read)
+		if (_private->_file.open(name, File::Write)
 			&& _private->open())
 		{
 			return true;
@@ -160,7 +160,6 @@ ImageFormatFlags ImageWriter::set_format(const ImageFormat &format)
 	{
 		_private->_is_ready = true;
 		_private->_format = format;
-		_private->_size = format.width * format.height * format.channels * format.depth;
 	}
 
 	return result;
@@ -172,7 +171,7 @@ bool ImageWriter::write(const void *buffer)
 
 	if (_private && _private->_is_ready && !_private->_is_used)
 	{
-		result = _private->write(buffer);
+		result = _private->write(buffer, _private->_format.frame_size());
 		_private->_is_used = true;
 	}
 

@@ -25,7 +25,7 @@ public:
 
 	virtual ImageFormatFlags set_format(const ImageFormat &format);
 
-	virtual bool write(const void *buffer);
+	virtual bool write(const void *buffer, size_t frame_size);
 
 private:
 

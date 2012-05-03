@@ -11,7 +11,7 @@ namespace Yttrium
 
 ///
 
-class Buffer
+class Y_API Buffer
 {
 public:
 
