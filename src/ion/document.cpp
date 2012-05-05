@@ -1,5 +1,6 @@
 #include <Yttrium/ion/document.hpp>
 
+#include <Yttrium/file_system.hpp>
 #include <Yttrium/ion/list.hpp>
 #include <Yttrium/ion/node.hpp>
 #include <Yttrium/ion/value.hpp>
@@ -31,29 +32,32 @@ void Document::clear()
 	_buffer.clear();
 }
 
-bool Document::load(const StaticString &filename, FileSystem::Order order, FileSystem &fileSystem)
+bool Document::load(const StaticString &name)
 {
 	clear();
 
-	File file = fileSystem.open_file(filename, File::Read, order);
-	if (!file.is_opened())
 	{
-		return false;
+		File file(name, FileSystem::instance(), _allocator);
+
+		if (!file.is_opened())
+		{
+			return false;
+		}
+
+		_buffer.resize(file.size()); // NOTE: May result in unexpected behavior.
+
+		if (!file.read(_buffer.text(), _buffer.size()))
+		{
+			return false;
+		}
 	}
 
-	_buffer.resize(file.size()); // NOTE: May result in unexpected behavior.
-	if (!file.read(_buffer.text(), _buffer.size()))
-	{
-		return false;
-	}
-	file.close();
-
-	return Parser(this).parse(_buffer, filename);
+	return Parser(this).parse(_buffer, name);
 }
 
-void Document::save(const StaticString &filename, int indentation) const
+void Document::save(const StaticString &name, int indentation) const
 {
-	StaticFile file(filename, File::Write, _allocator);
+	StaticFile file(name, File::Write, _allocator);
 
 	if (!file.is_opened())
 	{
@@ -64,7 +68,6 @@ void Document::save(const StaticString &filename, int indentation) const
 		String buffer(_allocator);
 
 		to_string(&buffer, (indentation > 0 ? 0 : indentation), true);
-		//buffer.append('\n');
 
 		file.truncate();
 		file.write(buffer.text(), buffer.size());

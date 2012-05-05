@@ -43,9 +43,9 @@ OggVorbisReader::~OggVorbisReader()
 	ov_clear(&_ov_file);
 }
 
-bool OggVorbisReader::open(const StaticString &name, FileSystem &file_system)
+bool OggVorbisReader::open(const StaticString &name, FileSystem *file_system)
 {
-	_file = file_system.open_file(name);
+	_file.open(name, file_system, _allocator);
 
 	if (!_file.is_opened() || ov_open_callbacks(&_file, &_ov_file, nullptr, 0, _ov_callbacks) < 0)
 	{

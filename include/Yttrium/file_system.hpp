@@ -4,28 +4,26 @@
 #ifndef __Y_FILE_SYSTEM_HPP
 #define __Y_FILE_SYSTEM_HPP
 
-#include <vector>
+#include <vector> // std::vector
 
+#include <Yttrium/allocator.hpp>
 #include <Yttrium/static_string.hpp>
 #include <Yttrium/file.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/package.hpp>
 
 namespace Yttrium
 {
 
-// TODO: Prohibit custom FileSystem construction.
-
 /// File system manager.
 
-class Y_API FileSystem
+class Y_API FileSystem: public Noncopyable
 {
 public:
 
 	/// File search order.
 
-	// NOTE: 'System' name doesn't look like the best choice.
-
-	enum Order
+	enum Order // NOTE: 'System*' names don't look the best.
 	{
 		PresetOrder, ///< Use the file system defined order.
 		PackedFirst, ///< Try packed, then system file.
@@ -38,7 +36,7 @@ public:
 
 	///
 
-	FileSystem() noexcept;
+	FileSystem(Allocator *allocator = HeapAllocator::instance()) noexcept;
 
 	///
 
@@ -67,7 +65,7 @@ public:
 		}
 	}
 
-	/// Unmount all the mounted packages from the file system.
+	/// Unmount all the mounted packages in the file system.
 
 	void unmount_all() noexcept;
 
@@ -75,7 +73,7 @@ public:
 
 	/// Return the global FileSystem instance.
 
-	static FileSystem &instance() noexcept;
+	static FileSystem *instance() noexcept;
 
 private:
 
@@ -87,8 +85,9 @@ private:
 
 private:
 
-	Packages _packages;
-	Order    _order;
+	Allocator *_allocator;
+	Packages   _packages;
+	Order      _order;
 };
 
 } // namespace Yttrium

@@ -1,5 +1,7 @@
 #include "file.hpp"
 
+#include <Yttrium/file_system.hpp>
+
 namespace Yttrium
 {
 
@@ -14,6 +16,18 @@ File::File(const File &file)
 bool File::is_opened() const
 {
 	return (_private && (_private->mode & ReadWrite));
+}
+
+bool File::open(const StaticString &name, FileSystem *file_system, Allocator *allocator)
+{
+	if (!file_system)
+	{
+		return open(name, File::Read, allocator);
+	}
+
+	*this = file_system->open_file(name);
+
+	return is_opened();
 }
 
 File &File::operator =(const File &file)

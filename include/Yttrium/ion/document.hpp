@@ -7,7 +7,6 @@
 #include <list> // std::list
 
 #include <Yttrium/allocator.hpp>
-#include <Yttrium/file_system.hpp>
 #include <Yttrium/ion/node.hpp>
 #include <Yttrium/ion/object.hpp>
 #include <Yttrium/ion/value.hpp>
@@ -50,11 +49,11 @@ public:
 
 	///
 
-	bool load(const StaticString &filename, FileSystem::Order order = FileSystem::PresetOrder, FileSystem &fileSystem = FileSystem::instance()) noexcept;
+	bool load(const StaticString &name) noexcept;
 
 	///
 
-	void save(const StaticString &filename, int indentation = 0) const noexcept;
+	void save(const StaticString &name, int indentation = 0) const noexcept;
 
 private:
 

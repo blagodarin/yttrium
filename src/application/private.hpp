@@ -4,7 +4,6 @@
 #include <Yttrium/application.hpp>
 #include <Yttrium/types.hpp>
 
-#include "../file_system/file_system.hpp"
 #include "../base/memory/heap_allocator.hpp"
 #include "../base/log_manager.hpp"
 #include "../audio/manager.hpp"
@@ -33,7 +32,6 @@ public:
 private:
 
 	HeapAllocatorImpl   _heap_allocator;
-	FileSystem          _file_system;
 	LogManager::Private _log_manager_private;
 
 private:

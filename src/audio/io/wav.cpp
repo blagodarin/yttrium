@@ -49,14 +49,14 @@ const uint32_t FourccData   = Fourcc<'d', 'a', 't', 'a'>::value;
 
 } // namespace
 
-bool WavReader::open(const StaticString &name, FileSystem &file_system)
+bool WavReader::open(const StaticString &name, FileSystem *file_system)
 {
 	WavFileHeader  file_header;
 	WavChunkHeader chunk_header;
 	WavFormatChunk format_chunk;
 	AudioFormat    format;
 
-	_file = file_system.open_file(name);
+	_file.open(name, file_system, _allocator);
 
 	if (!_file.is_opened())
 	{

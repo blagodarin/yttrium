@@ -1,25 +1,33 @@
-#include "file_system.hpp"
+#include <Yttrium/file_system.hpp>
+
+#include <atomic> // std::atomic
+
+#include "../base/instance_guard.hpp"
 
 namespace Yttrium
 {
 
-FileSystem::FileSystem()
-	: _order(PackedFirst)
+typedef InstanceGuard<FileSystem> FileSystemGuard;
+
+FileSystem::FileSystem(Allocator *allocator)
+	: _allocator(allocator)
+	, _order(PackedFirst)
 {
-	_file_system = this;
+	FileSystemGuard::enter(this, Y_S("Duplicate FileSystem construction"));
 }
 
 FileSystem::~FileSystem()
 {
 	unmount_all();
-	_file_system = nullptr;
+
+	FileSystemGuard::leave(this, Y_S("Unmatched FileSystem destruction"));
 }
 
 File FileSystem::open_file(const StaticString &name, File::Mode mode, Order order)
 {
 	if (mode != File::Read)
 	{
-		return File(name, mode); // NOTE: No allocator specified!
+		return File(name, mode, _allocator);
 	}
 
 	File file;
@@ -40,7 +48,7 @@ File FileSystem::open_file(const StaticString &name, File::Mode mode, Order orde
 
 	if (order != PackedOnly)
 	{
-		if (file.open(name, mode)) // NOTE: No allocator specified!
+		if (file.open(name, mode, _allocator))
 		{
 			return file;
 		}
@@ -76,9 +84,9 @@ void FileSystem::unmount_all()
 	_packages.clear();
 }
 
-FileSystem &FileSystem::instance()
+FileSystem *FileSystem::instance()
 {
-	return *_file_system;
+	return FileSystemGuard::instance;
 }
 
 File FileSystem::open_packed(const StaticString &name) const
@@ -87,7 +95,8 @@ File FileSystem::open_packed(const StaticString &name) const
 
 	for (Packages::const_reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
-		file = (*i)->open_file(name); // NOTE: No allocator specified!
+		file = (*i)->open_file(name, _allocator);
+
 		if (file.is_opened())
 		{
 			break;
@@ -95,7 +104,5 @@ File FileSystem::open_packed(const StaticString &name) const
 	}
 	return file;
 }
-
-FileSystem *_file_system = nullptr;
 
 } // namespace Yttrium

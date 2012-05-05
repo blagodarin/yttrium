@@ -11,6 +11,8 @@
 namespace Yttrium
 {
 
+class FileSystem;
+
 /// File reader.
 
 class Y_API File
@@ -64,6 +66,18 @@ public:
 
 	///
 
+	File(const StaticString &name, FileSystem *file_system, Allocator *allocator = HeapAllocator::instance()) noexcept
+		//: File() // TODO: Uncomment.
+		: _private(nullptr)
+		, _offset(0)
+		, _size(0)
+		, _base(0)
+	{
+		open(name, file_system, allocator);
+	}
+
+	///
+
 	File(const File &file) noexcept;
 
 	///
@@ -98,6 +112,10 @@ public:
 	///
 
 	bool open(const StaticString &name, Mode mode, Allocator *allocator = HeapAllocator::instance()) noexcept;
+
+	///
+
+	bool open(const StaticString &name, FileSystem *file_system, Allocator *allocator = HeapAllocator::instance()) noexcept;
 
 	/// Read the specified amount of bytes into the buffer.
 	/// \return Number of bytes read or 0 on failure.
