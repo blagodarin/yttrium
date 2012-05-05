@@ -4,7 +4,13 @@
 #ifndef __Y_LOG_MANAGER_HPP
 #define __Y_LOG_MANAGER_HPP
 
+#include <functional> // std::greater
+#include <map>        // std::map
+
+#include <Yttrium/allocator.hpp>
+#include <Yttrium/file.hpp>
 #include <Yttrium/logger.hpp>
+#include <Yttrium/noncopyable.hpp>
 #include <Yttrium/static_string.hpp>
 
 namespace Yttrium
@@ -14,6 +20,18 @@ namespace Yttrium
 
 class Y_API LogManager
 {
+	friend class Logger;
+
+public:
+
+	///
+
+	LogManager(const StaticString &file, Logger::OpenMode mode, Allocator *allocator = HeapAllocator::instance()) noexcept;
+
+	///
+
+	~LogManager() noexcept;
+
 public:
 
 	///
@@ -22,11 +40,10 @@ public:
 
 	///
 
-	bool open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level = Logger::Info) noexcept;
-
-	///
-
-	Logger::Level root_level() const noexcept;
+	Logger::Level root_level() const noexcept
+	{
+		return _root_level;
+	}
 
 	///
 
@@ -34,24 +51,27 @@ public:
 
 	///
 
-	void set_root_level(Logger::Level level) noexcept;
+	void set_root_level(Logger::Level level) noexcept
+	{
+		_root_level = level;
+	}
 
 public:
 
-	class Private;
+	///
 
-	friend class Private;
-
-private:
-
-	LogManager(Private *private_)
-		: _private(private_)
-	{
-	}
+	static LogManager *instance() noexcept;
 
 private:
 
-	Private *_private;
+	typedef std::map<String, Logger::Level, std::greater<String>> Levels;
+
+private:
+
+	Allocator     *_allocator;
+	File           _file;
+	Logger::Level  _root_level;
+	Levels         _levels;
 };
 
 } // namespace Yttrium

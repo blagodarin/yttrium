@@ -5,8 +5,6 @@
 #include <Yttrium/types.hpp>
 
 #include "../base/memory/heap_allocator.hpp"
-#include "../base/log_manager.hpp"
-#include "../audio/manager.hpp"
 
 namespace Yttrium
 {
@@ -17,13 +15,6 @@ class Application::Private
 
 public:
 
-	LogManager::Private &log_manager_private()
-	{
-		return _log_manager_private;
-	}
-
-public:
-
 	static Private *pointer()
 	{
 		return reinterpret_cast<Private *>(_buffer);
@@ -31,8 +22,7 @@ public:
 
 private:
 
-	HeapAllocatorImpl   _heap_allocator;
-	LogManager::Private _log_manager_private;
+	HeapAllocatorImpl _heap_allocator;
 
 private:
 

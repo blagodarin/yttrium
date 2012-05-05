@@ -6,9 +6,9 @@ int main(int argc, char **argv)
 {
 	Application application;
 
-	LogManager log_manager = application.log_manager();
+	LogManager log_manager(Y_S("ion.log"), Logger::Rewrite);
 
-	log_manager.open(Y_S("ion.log"), Logger::Rewrite, Logger::All);
+	log_manager.set_root_level(Logger::All);
 
 	Ion::Document document;
 

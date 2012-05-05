@@ -32,9 +32,4 @@ Application::~Application()
 	}
 }
 
-LogManager Application::log_manager()
-{
-	return _private->_log_manager_private.log_manager();
-}
-
 } // namespace Yttrium

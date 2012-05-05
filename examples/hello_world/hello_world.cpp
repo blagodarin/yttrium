@@ -30,10 +30,9 @@ int main(int argc, char **argv)
 
 	// Set up the logging.
 
-	LogManager log_manager = application.log_manager();
+	LogManager log_manager(Y_S("hello_world.log"), Logger::Rewrite);
 
-	log_manager.open(Y_S("hello_world.log"), Logger::Rewrite, Logger::All);
-
+	log_manager.set_root_level(Logger::All);
 	log_manager.set_level(Y_S("hello_universe"), Logger::Fatal);
 	log_manager.set_level(Y_S("hello_world"), Logger::Debug);
 	log_manager.set_level(Y_S("hello_world.bar"), Logger::Info);

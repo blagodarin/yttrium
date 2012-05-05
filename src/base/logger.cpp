@@ -1,9 +1,8 @@
 #include <Yttrium/logger.hpp>
 
 #include <Yttrium/file.hpp>
+#include <Yttrium/log_manager.hpp>
 #include <Yttrium/time.hpp>
-
-#include "log_manager.hpp"
 
 namespace Yttrium
 {
@@ -50,20 +49,40 @@ Logger::Writer::Writer(Logger &logger, Level level, const StaticString &file, in
 	}
 }
 
-Logger::Level Logger::level(const StaticString &name)
+Logger::Logger(Allocator *allocator)
+	: _level(None)
+	, _name(allocator)
+	, _message(allocator)
 {
-	return _log_manager_private->level(name);
+	LogManager *manager = LogManager::instance();
+
+	if (manager)
+	{
+		_level = manager->root_level();
+	}
 }
 
-Logger::Level Logger::root_level()
+Logger::Logger(const StaticString &name, Allocator *allocator)
+	: _level(None)
+	, _name(name, allocator)
+	, _message(allocator)
 {
-	return _log_manager_private->root_level();
+	LogManager *manager = LogManager::instance();
+
+	if (manager)
+	{
+		_level = manager->level(name);
+	}
 }
 
 void Logger::flush()
 {
-	if (_log_manager_private->write(_message.text(), _message.size()))
+	LogManager *manager = LogManager::instance();
+
+	if (manager)
 	{
+		manager->_file.write(_message.text(), _message.size());
+		manager->_file.flush();
 		_message.clear();
 	}
 }

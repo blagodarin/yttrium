@@ -25,7 +25,7 @@ public:
 
 	enum Order // NOTE: 'System*' names don't look the best.
 	{
-		PresetOrder, ///< Use the file system defined order.
+		PresetOrder, ///< Use the FileSystem order.
 		PackedFirst, ///< Try packed, then system file.
 		SystemOnly,  ///< Try system file only.
 		SystemFirst, ///< Try system, then packed file.
@@ -41,6 +41,8 @@ public:
 	///
 
 	~FileSystem() noexcept;
+
+public:
 
 	/// Mount the specified package into the file system.
 	/// \param name The package name.

@@ -6,10 +6,6 @@ int main(int argc, char **argv)
 {
 	Application application;
 
-	LogManager log_manager = application.log_manager();
-
-	log_manager.open(Y_S("image.log"), Logger::Rewrite, Logger::All);
-
 	ImageReader reader("example.tga");
 
 	ImageFormat format = reader.format();

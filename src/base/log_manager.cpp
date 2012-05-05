@@ -1,15 +1,37 @@
-#include "log_manager.hpp"
+#include <Yttrium/log_manager.hpp>
 
 #include <Yttrium/allocator.hpp>
+
+#include "instance_guard.hpp"
 
 namespace Yttrium
 {
 
-LogManager::Private *_log_manager_private = nullptr;
+typedef InstanceGuard<LogManager> LogManagerGuard;
 
-Logger::Level LogManager::Private::level(const StaticString &name) const
+LogManager::LogManager(const StaticString &file, Logger::OpenMode mode, Allocator *allocator)
+	: _allocator(allocator)
+	, _file(file, File::Write, allocator)
+	, _root_level(Logger::Info)
+{
+	LogManagerGuard::enter(this, Y_S("Duplicate LogManager construction"));
+
+	if (mode == Logger::Rewrite)
+	{
+		_file.truncate();
+		_file.flush();
+	}
+}
+
+LogManager::~LogManager()
+{
+	LogManagerGuard::leave(this, Y_S("Unmatched LogManager destruction"));
+}
+
+Logger::Level LogManager::level(const StaticString &name) const
 {
 	size_t prefix_size = name.find_first('.');
+
 	if (prefix_size == StaticString::End)
 	{
 		Levels::const_iterator i = _levels.find(String(name, String::Ref));
@@ -23,7 +45,7 @@ Logger::Level LogManager::Private::level(const StaticString &name) const
 	String prefix(prefix_buffer, 0, String::Ref, nullptr);
 
 	Levels::const_iterator begin = _levels.lower_bound(String(name, String::Ref));
-	Levels::const_iterator end = _levels.upper_bound(prefix.set(name.text(), prefix_size));
+	Levels::const_iterator end   = _levels.upper_bound(prefix.set(name.text(), prefix_size));
 
 	for (Levels::const_iterator i = begin; i != end; ++i)
 	{
@@ -48,68 +70,14 @@ Logger::Level LogManager::Private::level(const StaticString &name) const
 	return _root_level;
 }
 
-bool LogManager::Private::open(const StaticString &file, Logger::OpenMode mode)
-{
-	if (_log.open(file, File::Write))
-	{
-		if (mode == Logger::Rewrite)
-		{
-			_log.truncate();
-			_log.flush();
-		}
-		return true;
-	}
-	return false;
-}
-
-void LogManager::Private::set_level(const StaticString &name, Logger::Level level)
-{
-	_levels.insert(Levels::value_type(String(name), level)); // NOTE: No allocator specified!
-}
-
-void LogManager::Private::set_root_level(Logger::Level level)
-{
-	_root_level = level;
-}
-
-bool LogManager::Private::write(const void *buffer, size_t size)
-{
-	if (_log.write(buffer, size))
-	{
-		_log.flush();
-		return true;
-	}
-	return false;
-}
-
-Logger::Level LogManager::level(const StaticString &name) const
-{
-	return _private->level(name);
-}
-
-bool LogManager::open(const StaticString &file, Logger::OpenMode mode, Logger::Level root_level)
-{
-	if (_private->open(file, mode))
-	{
-		_private->set_root_level(root_level);
-		return true;
-	}
-	return false;
-}
-
-Logger::Level LogManager::root_level() const
-{
-	return _private->root_level();
-}
-
 void LogManager::set_level(const StaticString &name, Logger::Level level)
 {
-	_private->set_level(name, level);
+	_levels.insert(Levels::value_type(String(name, _allocator), level));
 }
 
-void LogManager::set_root_level(Logger::Level level)
+LogManager *LogManager::instance()
 {
-	_private->set_root_level(level);
+	return LogManagerGuard::instance;
 }
 
 } // namespace Yttrium
