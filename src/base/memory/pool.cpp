@@ -104,7 +104,7 @@ PoolStatus PoolBase::status() const
 
 void *PoolBase::allocate()
 {
-	if (!_last_chunk || _last_chunk->is_full())
+	if (Y_UNLIKELY(!_last_chunk || _last_chunk->is_full()))
 	{
 		_last_chunk = new(_allocator->allocate(_chunk_size))
 			Chunk(_chunk_items, _item_size, _last_chunk);
@@ -132,7 +132,7 @@ void PoolBase::deallocate(void *pointer)
 	--_status.allocated_items;
 	++_status.item_deallocations;
 
-	if (chunk->is_empty())
+	if (Y_UNLIKELY(chunk->is_empty()))
 	{
 		if (chunk == _last_chunk)
 		{

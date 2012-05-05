@@ -33,7 +33,7 @@ Y_API void abort(const StaticString &file, int line, const StaticString &functio
 	#define Y_ASSERT(condition) \
 		do \
 		{ \
-			if (!(condition)) \
+			if (Y_UNLIKELY(!(condition))) \
 			{ \
 				Y_ABORT(Y_S("Assertion failed: " #condition)); \
 			} \

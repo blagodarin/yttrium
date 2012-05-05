@@ -17,6 +17,7 @@ void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference
 	{
 		difference = &local_difference;
 	}
+
 	void *pointer = _allocator->allocate(size, align, difference);
 	_status.allocate(*difference);
 
@@ -33,6 +34,7 @@ void ProxyAllocator::deallocate(void *pointer, Difference *difference)
 		{
 			difference = &local_difference;
 		}
+
 		_allocator->deallocate(pointer, difference);
 		_status.deallocate(*difference);
 	}
@@ -46,7 +48,9 @@ void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movabili
 	{
 		difference = &local_difference;
 	}
+
 	void *new_pointer = _allocator->reallocate(pointer, size, movability, difference);
+
 	if (new_pointer)
 	{
 		_status.reallocate(*difference);

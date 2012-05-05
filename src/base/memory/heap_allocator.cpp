@@ -14,7 +14,8 @@ HeapAllocator *_heap_allocator = nullptr;
 void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
 {
 	void *pointer = malloc(size);
-	if (!pointer)
+
+	if (Y_UNLIKELY(!pointer))
 	{
 		Y_ABORT("Out of memory");
 		return nullptr;
@@ -26,6 +27,7 @@ void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *differe
 	{
 		difference = &local_difference;
 	}
+
 	*difference = Difference(0, 0, Difference::Increment);
 	_status.allocate(*difference);
 
@@ -34,7 +36,7 @@ void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *differe
 
 void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference)
 {
-	if (pointer)
+	if (Y_LIKELY(pointer))
 	{
 		free(pointer);
 
@@ -44,6 +46,7 @@ void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference)
 		{
 			difference = &local_difference;
 		}
+
 		*difference = Difference(0, 0, Difference::Decrement);
 		_status.deallocate(*difference);
 	}
@@ -57,7 +60,8 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 	}
 
 	void *result = realloc(pointer, size);
-	if (!result)
+
+	if (Y_UNLIKELY(!result))
 	{
 		Y_ABORT("Out of memory");
 		return nullptr;
@@ -69,6 +73,7 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 	{
 		difference = &local_difference;
 	}
+
 	*difference = Difference(0, 0, Difference::Increment);
 	_status.reallocate(*difference);
 

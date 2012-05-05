@@ -153,6 +153,20 @@
 	#endif
 #endif
 
+/// \def Y_LIKELY
+/// \brief
+
+/// \def Y_UNLIKELY
+/// \brief
+
+#if __Y_GCC
+	#define Y_LIKELY(x)   __builtin_expect(!!(x), 1)
+	#define Y_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+	#define Y_LIKELY(x)   (x)
+	#define Y_UNLIKELY(x) (x)
+#endif
+
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 
 /******************************************************************************\

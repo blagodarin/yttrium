@@ -32,12 +32,11 @@ public:
 
 	bool is_running() noexcept;
 
-	/// Start the thread execution.
-	/// \note The thread must not be running.
+	/// Start the thread.
 
 	void start() noexcept;
 
-	/// Force the thread to stop execution.
+	/// Force the thread to stop.
 
 	void stop() noexcept;
 
