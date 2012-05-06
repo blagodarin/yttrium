@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 
-class File::Private: public PrivateBase<File::Private>
+class Y_PRIVATE File::Private: public PrivateBase<File::Private>
 {
 public:
 

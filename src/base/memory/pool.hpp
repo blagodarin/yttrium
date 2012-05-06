@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 
-class PoolBase::Chunk
+class Y_PRIVATE PoolBase::Chunk
 {
 public:
 

@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 
-class Mutex::Private: public PrivateBase<Mutex::Private>
+class Y_PRIVATE Mutex::Private: public PrivateBase<Mutex::Private>
 {
 public:
 

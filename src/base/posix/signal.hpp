@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 
-class Signal::Private: public PrivateBase<Signal::Private>
+class Y_PRIVATE Signal::Private: public PrivateBase<Signal::Private>
 {
 public:
 

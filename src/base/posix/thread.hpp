@@ -12,7 +12,7 @@
 namespace Yttrium
 {
 
-class Thread::Private
+class Y_PRIVATE Thread::Private
 {
 public:
 

@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 
-class ThreadBufferBase::Private
+class Y_PRIVATE ThreadBufferBase::Private
 {
 public:
 

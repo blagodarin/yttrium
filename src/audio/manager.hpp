@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 
-class AudioManager::Private
+class Y_PRIVATE AudioManager::Private
 {
 public:
 

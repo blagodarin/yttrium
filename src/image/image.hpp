@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 
-class ImageReader::Private: public PrivateBase<ImageReader::Private>
+class Y_PRIVATE ImageReader::Private: public PrivateBase<ImageReader::Private>
 {
 public:
 
@@ -35,7 +35,7 @@ public:
 	File        _file;
 };
 
-class ImageWriter::Private: public PrivateBase<ImageWriter::Private>
+class Y_PRIVATE ImageWriter::Private: public PrivateBase<ImageWriter::Private>
 {
 public:
 
