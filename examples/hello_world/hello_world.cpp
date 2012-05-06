@@ -26,7 +26,7 @@ void bar()
 
 int main(int argc, char **argv)
 {
-	Application application;
+	MemoryManager memory_manager;
 
 	// Set up the logging.
 

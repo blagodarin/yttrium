@@ -59,7 +59,7 @@ public:
 
 	///
 
-	AudioReader(const StaticString &name, AudioType type = AudioType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept
+	AudioReader(const StaticString &name, AudioType type = AudioType::Auto, Allocator *allocator = DefaultAllocator) noexcept
 		//: AudioReader() // TODO: Uncomment.
 		: _private(nullptr)
 	{
@@ -102,7 +102,7 @@ public:
 
 	///
 
-	bool open(const StaticString &name, AudioType type = AudioType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	bool open(const StaticString &name, AudioType type = AudioType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Read at most \a size bytes into \a buffer.
 	/// \param buffer Buffer to read into.

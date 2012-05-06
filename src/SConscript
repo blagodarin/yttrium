@@ -5,7 +5,6 @@ build.Append(CPPFLAGS = ['-fno-exceptions']) # We use GCC/MinGW.
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
 src = [
-	'application',
 	'audio',
 	'audio/backend',
 	'audio/backend/openal',

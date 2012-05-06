@@ -7,8 +7,6 @@ Yttrium:
 
     Base:
     - Redesign logging.
-
-    File system:
     - Implement directory search.
     - Implement packages.
 

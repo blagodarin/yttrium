@@ -30,7 +30,7 @@ public:
 
 	///
 
-	virtual File open_file(const StaticString &name, Allocator *allocator = HeapAllocator::instance()) noexcept = 0;
+	virtual File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept = 0;
 
 public:
 
@@ -51,7 +51,7 @@ public:
 
 	///
 
-	virtual File open_file(const StaticString &name, Allocator *allocator = HeapAllocator::instance()) noexcept = 0;
+	virtual File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept = 0;
 
 public:
 

@@ -190,7 +190,7 @@ public:
 	///
 	/// \note Might possibly crash if the string is allocated in the very end of a readable space.
 
-	String zero_terminated(Allocator *allocator = HeapAllocator::instance()) const noexcept;
+	String zero_terminated(Allocator *allocator = DefaultAllocator) const noexcept;
 
 public:
 

@@ -19,7 +19,7 @@ public:
 
 	///
 
-	Thread(Allocator *allocator = HeapAllocator::instance()) noexcept;
+	Thread(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

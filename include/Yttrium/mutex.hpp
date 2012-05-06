@@ -55,7 +55,7 @@ public:
 
 	///
 
-	Mutex(Allocator *allocator = HeapAllocator::instance()) noexcept;
+	Mutex(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

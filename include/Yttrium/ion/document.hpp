@@ -34,7 +34,7 @@ public:
 
 	///
 
-	Document(Allocator *allocator = HeapAllocator::instance()) noexcept;
+	Document(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

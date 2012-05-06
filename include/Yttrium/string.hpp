@@ -20,7 +20,7 @@ public:
 
 	///
 
-	String(Allocator *allocator = HeapAllocator::instance()) noexcept
+	String(Allocator *allocator = DefaultAllocator) noexcept
 		: _buffer_size(0)
 		, _allocator(allocator)
 	{
@@ -33,42 +33,42 @@ public:
 
 	///
 
-	String(const StaticString &string, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	String(const StaticString &string, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String(const char *text, size_t size, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	String(const char *text, size_t size, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String(const char *text, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	String(const char *text, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Preallocating constructor.
 
-	explicit String(size_t size, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	explicit String(size_t size, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Concatenating constructor.
 	/// \param left The left part.
 	/// \param right The right part.
 	/// \param allocator The allocator to use.
 
-	String(const StaticString &left, const StaticString &right, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	String(const StaticString &left, const StaticString &right, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String(const StaticString &left, char right, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	String(const StaticString &left, char right, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String(char left, const StaticString &right, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	String(char left, const StaticString &right, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Destructor.
 
@@ -101,7 +101,7 @@ public:
 	/// \param size
 	/// \param allocator
 
-	String(const char *text, size_t size, const Reference &, Allocator *allocator = HeapAllocator::instance()) noexcept
+	String(const char *text, size_t size, const Reference &, Allocator *allocator = DefaultAllocator) noexcept
 		: StaticString(text, size)
 		, _buffer_size(0)
 		, _allocator(allocator)
@@ -112,7 +112,7 @@ public:
 	* \overload
 	*/
 
-	String(const StaticString &string, const Reference &, Allocator *allocator = HeapAllocator::instance()) noexcept
+	String(const StaticString &string, const Reference &, Allocator *allocator = DefaultAllocator) noexcept
 		: StaticString(string)
 		, _buffer_size(0)
 		, _allocator(allocator)
@@ -123,7 +123,7 @@ public:
 	* \overload
 	*/
 
-	String(const char *text, const Reference &, Allocator *allocator = HeapAllocator::instance()) noexcept
+	String(const char *text, const Reference &, Allocator *allocator = DefaultAllocator) noexcept
 		: StaticString(text)
 		, _buffer_size(0)
 		, _allocator(allocator)

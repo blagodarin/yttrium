@@ -9,9 +9,7 @@
 namespace Yttrium
 {
 
-HeapAllocator *_heap_allocator = nullptr;
-
-void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
+void *HeapAllocator::allocate(size_t size, size_t align, Difference *difference)
 {
 	void *pointer = malloc(size);
 
@@ -34,7 +32,7 @@ void *HeapAllocatorImpl::allocate(size_t size, size_t align, Difference *differe
 	return pointer;
 }
 
-void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference)
+void HeapAllocator::deallocate(void *pointer, Difference *difference)
 {
 	if (Y_LIKELY(pointer))
 	{
@@ -52,7 +50,7 @@ void HeapAllocatorImpl::deallocate(void *pointer, Difference *difference)
 	}
 }
 
-void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
+void *HeapAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	if (movability == MayNotMove)
 	{
@@ -78,11 +76,6 @@ void *HeapAllocatorImpl::reallocate(void *pointer, size_t size, Movability movab
 	_status.reallocate(*difference);
 
 	return result;
-}
-
-HeapAllocator *HeapAllocator::instance()
-{
-	return _heap_allocator;
 }
 
 } // namespace Yttrium

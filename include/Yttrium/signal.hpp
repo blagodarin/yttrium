@@ -20,7 +20,7 @@ public:
 
 	///
 
-	Signal(Allocator *allocator = HeapAllocator::instance()) noexcept;
+	Signal(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

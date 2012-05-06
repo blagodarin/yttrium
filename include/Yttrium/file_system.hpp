@@ -17,6 +17,8 @@ namespace Yttrium
 
 /// File system manager.
 
+// NOTE: This actually is a package manager.
+
 class Y_API FileSystem: public Noncopyable
 {
 public:
@@ -36,7 +38,7 @@ public:
 
 	///
 
-	FileSystem(Allocator *allocator = HeapAllocator::instance()) noexcept;
+	FileSystem(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

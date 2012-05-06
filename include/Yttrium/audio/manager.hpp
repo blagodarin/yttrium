@@ -30,7 +30,7 @@ public:
 
 	///
 
-	AudioManager(Allocator *allocator = HeapAllocator::instance()) noexcept
+	AudioManager(Allocator *allocator = DefaultAllocator) noexcept
 		: _allocator(allocator)
 		, _private(nullptr)
 	{

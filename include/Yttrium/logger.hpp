@@ -81,16 +81,16 @@ public:
 
 public:
 
-	explicit Logger(Allocator *allocator = HeapAllocator::instance()) noexcept;
+	explicit Logger(Allocator *allocator = DefaultAllocator) noexcept;
 
-	explicit Logger(Level level, Allocator *allocator = HeapAllocator::instance()) noexcept
+	explicit Logger(Level level, Allocator *allocator = DefaultAllocator) noexcept
 		: _level(level)
 		, _name(allocator)
 		, _message(allocator)
 	{
 	}
 
-	explicit Logger(const StaticString &name, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	explicit Logger(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
 
 	Level level() const noexcept
 	{

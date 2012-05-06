@@ -44,7 +44,7 @@ public:
 
 	///
 
-	PoolBase(size_t chunk_items, size_t item_size, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	PoolBase(size_t chunk_items, size_t item_size, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
@@ -91,7 +91,7 @@ public:
 
 	///
 
-	Pool(size_t chunk_items = 32, Allocator *allocator = HeapAllocator::instance()) noexcept
+	Pool(size_t chunk_items = 32, Allocator *allocator = DefaultAllocator) noexcept
 		: PoolBase(chunk_items, sizeof(T), allocator)
 	{
 	}

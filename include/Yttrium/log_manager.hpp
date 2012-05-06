@@ -18,7 +18,7 @@ namespace Yttrium
 
 ///
 
-class Y_API LogManager
+class Y_API LogManager: public Noncopyable
 {
 	friend class Logger;
 
@@ -26,7 +26,7 @@ public:
 
 	///
 
-	LogManager(const StaticString &file, Logger::OpenMode mode, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	LogManager(const StaticString &file, Logger::OpenMode mode, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

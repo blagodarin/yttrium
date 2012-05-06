@@ -15,7 +15,7 @@ class Y_API ThreadBufferBase: public Noncopyable
 {
 public:
 
-	ThreadBufferBase(size_t capacity, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	ThreadBufferBase(size_t capacity, Allocator *allocator = DefaultAllocator) noexcept;
 
 	~ThreadBufferBase() noexcept;
 
@@ -61,7 +61,7 @@ class ThreadBuffer: public ThreadBufferBase
 {
 public:
 
-	ThreadBuffer(Allocator *allocator = HeapAllocator::instance()) noexcept
+	ThreadBuffer(Allocator *allocator = DefaultAllocator) noexcept
 		: ThreadBufferBase(N, allocator)
 	{
 	}

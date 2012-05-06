@@ -23,11 +23,6 @@ public:
 
 	~Application() noexcept;
 
-	///
-	/// \note The log manager can be retrieved before the Application initialization.
-
-	LogManager log_manager() noexcept;
-
 public:
 
 	class Private;

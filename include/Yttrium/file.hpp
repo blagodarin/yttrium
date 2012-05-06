@@ -54,7 +54,7 @@ public:
 
 	///
 
-	File(const StaticString &name, Mode mode, Allocator *allocator = HeapAllocator::instance()) noexcept
+	File(const StaticString &name, Mode mode, Allocator *allocator = DefaultAllocator) noexcept
 		//: File() // TODO: Uncomment.
 		: _private(nullptr)
 		, _offset(0)
@@ -66,7 +66,7 @@ public:
 
 	///
 
-	File(const StaticString &name, FileSystem *file_system, Allocator *allocator = HeapAllocator::instance()) noexcept
+	File(const StaticString &name, FileSystem *file_system, Allocator *allocator = DefaultAllocator) noexcept
 		//: File() // TODO: Uncomment.
 		: _private(nullptr)
 		, _offset(0)
@@ -111,11 +111,11 @@ public:
 
 	///
 
-	bool open(const StaticString &name, Mode mode, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	bool open(const StaticString &name, Mode mode, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
-	bool open(const StaticString &name, FileSystem *file_system, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	bool open(const StaticString &name, FileSystem *file_system, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Read the specified amount of bytes into the buffer.
 	/// \return Number of bytes read or 0 on failure.

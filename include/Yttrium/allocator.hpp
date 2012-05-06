@@ -159,6 +159,12 @@ public:
 		return _status;
 	}
 
+public:
+
+	///
+
+	static Allocator *root() noexcept;
+
 protected:
 
 	///
@@ -170,15 +176,6 @@ protected:
 protected:
 
 	AtomicStatus _status;
-};
-
-/// Heap allocator.
-
-class Y_API HeapAllocator: public Allocator
-{
-public:
-
-	static HeapAllocator *instance() noexcept;
 };
 
 /// System allocator.
@@ -202,22 +199,9 @@ public:
 	static SystemAllocator *instance() noexcept;
 };
 
-/// An allocator-managed object with overloaded \c new and \c delete operators.
+/// Root allocator.
 
-class Y_API Allocatable
-{
-public:
-
-	virtual ~Allocatable() noexcept
-	{
-	}
-
-	static void *operator new(size_t size, Allocator *allocator = HeapAllocator::instance()) noexcept;
-
-	static void operator delete(void *pointer) noexcept;
-
-	Allocator *allocator() noexcept;
-};
+extern Y_API Allocator *const DefaultAllocator;
 
 } // namespace Yttrium
 

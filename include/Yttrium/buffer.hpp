@@ -17,7 +17,7 @@ public:
 
 	///
 
-	Buffer(Allocator* allocator = HeapAllocator::instance()) noexcept
+	Buffer(Allocator* allocator = DefaultAllocator) noexcept
 		: _data(nullptr)
 		, _size(0)
 		, _allocator(allocator)
@@ -26,11 +26,11 @@ public:
 
 	///
 
-	Buffer(const Buffer &buffer, Allocator* allocator = HeapAllocator::instance()) noexcept;
+	Buffer(const Buffer &buffer, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
 
-	Buffer(size_t size, Allocator* allocator = HeapAllocator::instance()) noexcept;
+	Buffer(size_t size, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
 

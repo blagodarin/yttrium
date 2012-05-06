@@ -6,21 +6,16 @@
 namespace Yttrium
 {
 
-extern HeapAllocator *_heap_allocator;
-
-class HeapAllocatorImpl
-	: public HeapAllocator
+class HeapAllocator: public Allocator
 {
 public:
 
-	HeapAllocatorImpl()
+	HeapAllocator(Allocator *parent)
 	{
-		_heap_allocator = this;
 	}
 
-	virtual ~HeapAllocatorImpl() noexcept
+	virtual ~HeapAllocator() noexcept
 	{
-		_heap_allocator = nullptr;
 	}
 
 public: // Allocator

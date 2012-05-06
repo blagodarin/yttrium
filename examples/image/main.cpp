@@ -4,7 +4,7 @@ using namespace Yttrium;
 
 int main(int argc, char **argv)
 {
-	Application application;
+	MemoryManager memory_manager;
 
 	ImageReader reader("example.tga");
 

@@ -138,7 +138,7 @@ public:
 
 	///
 
-	ImageReader(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept
+	ImageReader(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
 		//: ImageReader() // TODO: Uncomment.
 		: _private(nullptr)
 	{
@@ -176,7 +176,7 @@ public:
 
 	///
 
-	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Read an image into \a buffer.
 	/// \param buffer Buffer to read into.
@@ -215,7 +215,7 @@ public:
 
 	///
 
-	ImageWriter(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept
+	ImageWriter(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
 		//: ImageWriter() // TODO: Uncomment.
 		: _private(nullptr)
 	{
@@ -248,7 +248,7 @@ public:
 
 	///
 
-	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = HeapAllocator::instance()) noexcept;
+	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Set the format for the output image.
 	/// \return Flags for invalid format fields or 0 on success.
