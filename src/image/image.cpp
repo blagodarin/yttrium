@@ -1,6 +1,6 @@
 #include "image.hpp"
 
-#include <Yttrium/file_system.hpp>
+#include <Yttrium/package.hpp>
 
 #include "png.hpp"
 #include "tga.hpp"
@@ -53,7 +53,7 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 
 	if (_private)
 	{
-		if (_private->_file.open(name, FileSystem::instance(), allocator)
+		if (_private->_file.open(name, PackageManager::instance(), allocator)
 			&& _private->open())
 		{
 			return true;

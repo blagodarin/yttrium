@@ -1,10 +1,7 @@
 #ifndef __AUDIO_IO_OGG_VORBIS_HPP
 #define __AUDIO_IO_OGG_VORBIS_HPP
 
-// <vorbis/vorbisfile.h> includes <stdint.h> without defining __STDC_LIMIT_MACROS,
-// so we should explicitly include <stdint.h> before it.
-
-#include <Yttrium/types.hpp>
+#define __STDC_LIMIT_MACROS
 
 #include <vorbis/vorbisfile.h>
 
@@ -26,7 +23,7 @@ public:
 
 public: // AudioReader::Private
 
-	virtual bool open(const StaticString &name, FileSystem *file_system);
+	virtual bool open();
 
 	virtual size_t read(void *buffer, size_t bytes_to_read);
 

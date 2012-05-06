@@ -8,8 +8,6 @@
 namespace Yttrium
 {
 
-class FileSystem;
-
 class AudioReader::Private: public PrivateBase<AudioReader::Private>
 {
 public:
@@ -25,7 +23,7 @@ public:
 
 public:
 
-	virtual bool open(const StaticString &name, FileSystem *file_system) = 0;
+	virtual bool open() = 0;
 
 	virtual size_t read(void *buffer, size_t bytes_to_read) = 0;
 

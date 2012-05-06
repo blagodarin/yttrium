@@ -11,9 +11,9 @@ src = [
 	'audio/io',
 	'base',
 	'base/memory',
-	'file_system',
 	'image',
-	'ion']
+	'ion',
+	'package']
 
 if 'posix' in ports:
 	src += ['base/posix']

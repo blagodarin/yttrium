@@ -1,7 +1,5 @@
 #include "wav.hpp"
 
-#include <Yttrium/file_system.hpp>
-
 #include "../../base/fourcc.hpp"
 
 namespace Yttrium
@@ -49,19 +47,12 @@ const uint32_t FourccData   = Fourcc<'d', 'a', 't', 'a'>::value;
 
 } // namespace
 
-bool WavReader::open(const StaticString &name, FileSystem *file_system)
+bool WavReader::open()
 {
 	WavFileHeader  file_header;
 	WavChunkHeader chunk_header;
 	WavFormatChunk format_chunk;
 	AudioFormat    format;
-
-	_file.open(name, file_system, _allocator);
-
-	if (!_file.is_opened())
-	{
-		return false;
-	}
 
 	if (!_file.read(&file_header)
 		|| file_header.riff_fourcc != FourccRiff

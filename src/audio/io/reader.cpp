@@ -1,6 +1,6 @@
 #include "reader.hpp"
 
-#include <Yttrium/file_system.hpp>
+#include <Yttrium/package.hpp>
 
 #include "ogg_vorbis.hpp"
 #include "wav.hpp"
@@ -63,9 +63,15 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 		break;
 	}
 
-	if (_private && _private->open(name, FileSystem::instance()))
+	if (_private)
 	{
-		return true;
+		if (_private->_file.open(name, PackageManager::instance(), allocator)
+			&& _private->open())
+		{
+			return true;
+		}
+
+		close();
 	}
 
 	close();

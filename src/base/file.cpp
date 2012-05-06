@@ -1,6 +1,6 @@
 #include "file.hpp"
 
-#include <Yttrium/file_system.hpp>
+#include <Yttrium/package.hpp>
 
 namespace Yttrium
 {
@@ -18,14 +18,16 @@ bool File::is_opened() const
 	return (_private && (_private->mode & ReadWrite));
 }
 
-bool File::open(const StaticString &name, FileSystem *file_system, Allocator *allocator)
+bool File::open(const StaticString &name, PackageManager *package_manager, Allocator *allocator)
 {
-	if (!file_system)
+	if (!package_manager)
 	{
 		return open(name, File::Read, allocator);
 	}
 
-	*this = file_system->open_file(name);
+	// TODO: Rewrite.
+
+	*this = package_manager->open_file(name);
 
 	return is_opened();
 }

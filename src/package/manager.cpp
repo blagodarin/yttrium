@@ -1,29 +1,27 @@
-#include <Yttrium/file_system.hpp>
-
-#include <atomic> // std::atomic
+#include <Yttrium/package.hpp>
 
 #include "../base/instance_guard.hpp"
 
 namespace Yttrium
 {
 
-typedef InstanceGuard<FileSystem> FileSystemGuard;
+typedef InstanceGuard<PackageManager> PackageManagerGuard;
 
-FileSystem::FileSystem(Allocator *allocator)
+PackageManager::PackageManager(Allocator *allocator)
 	: _allocator(allocator)
 	, _order(PackedFirst)
 {
-	FileSystemGuard::enter(this, Y_S("Duplicate FileSystem construction"));
+	PackageManagerGuard::enter(this, Y_S("Duplicate PackageManager construction"));
 }
 
-FileSystem::~FileSystem()
+PackageManager::~PackageManager()
 {
 	unmount_all();
 
-	FileSystemGuard::leave(this, Y_S("Unmatched FileSystem destruction"));
+	PackageManagerGuard::leave(this, Y_S("Unmatched PackageManager destruction"));
 }
 
-File FileSystem::open_file(const StaticString &name, File::Mode mode, Order order)
+File PackageManager::open_file(const StaticString &name, File::Mode mode, Order order)
 {
 	if (mode != File::Read)
 	{
@@ -62,7 +60,7 @@ File FileSystem::open_file(const StaticString &name, File::Mode mode, Order orde
 	return file;
 }
 
-bool FileSystem::mount(const StaticString &name, PackageFormat format)
+bool PackageManager::mount(const StaticString &name, PackageFormat format)
 {
 	PackageReader *package = PackageReader::open(name, format);
 
@@ -74,7 +72,7 @@ bool FileSystem::mount(const StaticString &name, PackageFormat format)
 	return package;
 }
 
-void FileSystem::unmount_all()
+void PackageManager::unmount_all()
 {
 	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
@@ -84,12 +82,12 @@ void FileSystem::unmount_all()
 	_packages.clear();
 }
 
-FileSystem *FileSystem::instance()
+PackageManager *PackageManager::instance()
 {
-	return FileSystemGuard::instance;
+	return PackageManagerGuard::instance;
 }
 
-File FileSystem::open_packed(const StaticString &name) const
+File PackageManager::open_packed(const StaticString &name) const
 {
 	File file;
 

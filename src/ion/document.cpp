@@ -1,9 +1,9 @@
 #include <Yttrium/ion/document.hpp>
 
-#include <Yttrium/file_system.hpp>
 #include <Yttrium/ion/list.hpp>
 #include <Yttrium/ion/node.hpp>
 #include <Yttrium/ion/value.hpp>
+#include <Yttrium/package.hpp>
 
 #include "../base/file.hpp"
 
@@ -37,7 +37,7 @@ bool Document::load(const StaticString &name)
 	clear();
 
 	{
-		File file(name, FileSystem::instance(), _allocator);
+		File file(name, PackageManager::instance(), _allocator);
 
 		if (!file.is_opened())
 		{

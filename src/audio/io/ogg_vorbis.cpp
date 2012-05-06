@@ -1,7 +1,5 @@
 #include "ogg_vorbis.hpp"
 
-#include <Yttrium/file_system.hpp>
-
 namespace Yttrium
 {
 
@@ -43,11 +41,9 @@ OggVorbisReader::~OggVorbisReader()
 	ov_clear(&_ov_file);
 }
 
-bool OggVorbisReader::open(const StaticString &name, FileSystem *file_system)
+bool OggVorbisReader::open()
 {
-	_file.open(name, file_system, _allocator);
-
-	if (!_file.is_opened() || ov_open_callbacks(&_file, &_ov_file, nullptr, 0, _ov_callbacks) < 0)
+	if (ov_open_callbacks(&_file, &_ov_file, nullptr, 0, _ov_callbacks) < 0)
 	{
 		return false;
 	}

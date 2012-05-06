@@ -19,7 +19,7 @@ public:
 
 public: // AudioReader::Private
 
-	virtual bool open(const StaticString &name, FileSystem *file_system);
+	virtual bool open();
 
 	virtual size_t read(void *buffer, size_t bytes_to_read);
 

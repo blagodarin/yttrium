@@ -9,7 +9,6 @@
 #include <Yttrium/audio.hpp>
 #include <Yttrium/buffer.hpp>
 #include <Yttrium/file.hpp>
-#include <Yttrium/file_system.hpp>
 #include <Yttrium/global.hpp>
 #include <Yttrium/image.hpp>
 #include <Yttrium/ion.hpp>

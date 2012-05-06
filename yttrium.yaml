@@ -9,9 +9,13 @@ Yttrium:
     - Redesign logging.
     - Implement directory search.
     - Implement packages.
+    - Make opening files from packages less clumsy and more inconvenient.
 
     Image:
     - Consider an image reader with an internal buffer.
+
+    ION:
+    - Make the compact format even more compact.
 
 Tools:
 - Add packer.
