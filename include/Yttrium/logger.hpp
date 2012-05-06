@@ -60,7 +60,7 @@ public:
 		///
 
 		template <typename T>
-		Writer &operator <<(const T &value) noexcept
+		Y_PRIVATE Writer &operator <<(const T &value) noexcept
 		{
 			_logger._message << value;
 			return *this;

@@ -135,7 +135,7 @@ public:
 	///
 
 	template <typename T>
-	T *allocate(size_t count = 1) noexcept
+	Y_PRIVATE T *allocate(size_t count = 1) noexcept
 	{
 		return static_cast<T *>(allocate(sizeof(T) * count));
 	}
@@ -158,12 +158,6 @@ public:
 	{
 		return _status;
 	}
-
-public:
-
-	///
-
-	static Allocator *root() noexcept;
 
 protected:
 
