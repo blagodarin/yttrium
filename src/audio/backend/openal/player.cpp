@@ -1,6 +1,6 @@
-#include "player.hpp"
+#include "player.h"
 
-#include <Yttrium/assert.hpp>
+#include <Yttrium/assert.h>
 
 namespace Yttrium
 {

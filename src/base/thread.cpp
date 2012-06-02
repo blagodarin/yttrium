@@ -1,4 +1,4 @@
-#include "thread.hpp"
+#include "thread.h"
 
 namespace Yttrium
 {

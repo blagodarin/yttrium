@@ -1,6 +1,6 @@
-#include <Yttrium/package.hpp>
+#include <Yttrium/package.h>
 
-#include "../base/instance_guard.hpp"
+#include "../base/instance_guard.h"
 
 namespace Yttrium
 {

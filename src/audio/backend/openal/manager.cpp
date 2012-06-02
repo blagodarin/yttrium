@@ -1,4 +1,4 @@
-#include "manager.hpp"
+#include "manager.h"
 
 // TODO: Use script variables.
 

@@ -1,6 +1,6 @@
-#include <Yttrium/ion/object.hpp>
+#include <Yttrium/ion/object.h>
 
-#include <Yttrium/ion/document.hpp>
+#include <Yttrium/ion/document.h>
 
 namespace Yttrium
 {

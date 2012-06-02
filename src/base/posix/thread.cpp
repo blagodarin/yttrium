@@ -1,9 +1,9 @@
-#include "thread.hpp"
+#include "thread.h"
 
 #include <sched.h> // sched_yield
 #include <time.h>  // nanosleep, timespec
 
-#include <Yttrium/assert.hpp>
+#include <Yttrium/assert.h>
 
 namespace Yttrium
 {

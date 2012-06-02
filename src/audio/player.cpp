@@ -1,6 +1,6 @@
-#include "player.hpp"
+#include "player.h"
 
-#include "playlist.hpp"
+#include "playlist.h"
 
 namespace Yttrium
 {

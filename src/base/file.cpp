@@ -1,7 +1,7 @@
-#include "file.hpp"
+#include "file.h"
 
-#include <Yttrium/package.hpp>
-#include <Yttrium/string.hpp>
+#include <Yttrium/package.h>
+#include <Yttrium/string.h>
 
 namespace Yttrium
 {

@@ -1,13 +1,13 @@
 #define _FILE_OFFSET_BITS 64
 //#define _XOPEN_SOURCE 500
 
-#include "file.hpp"
+#include "file.h"
 
 #include <fcntl.h>  // open
 #include <unistd.h> // close, fsync, ftruncate, lseek, pread, pwrite, read, write
 
-#include <Yttrium/assert.hpp>
-#include <Yttrium/string.hpp>
+#include <Yttrium/assert.h>
+#include <Yttrium/string.h>
 
 namespace Yttrium
 {

@@ -1,8 +1,8 @@
-#include <Yttrium/memory_manager.hpp>
+#include <Yttrium/memory_manager.h>
 
-#include "../instance_guard.hpp"
+#include "../instance_guard.h"
 
-#include "heap_allocator.hpp"
+#include "heap_allocator.h"
 
 namespace Yttrium
 {

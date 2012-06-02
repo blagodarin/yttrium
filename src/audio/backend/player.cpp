@@ -1,6 +1,6 @@
-#include "player.hpp"
+#include "player.h"
 
-#include "openal/player.hpp"
+#include "openal/player.h"
 
 namespace Yttrium
 {

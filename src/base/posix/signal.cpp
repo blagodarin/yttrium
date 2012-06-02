@@ -1,10 +1,10 @@
-#include "signal.hpp"
+#include "signal.h"
 
 #include <time.h> // clock_gettime, timespec
 
-#include <Yttrium/assert.hpp>
+#include <Yttrium/assert.h>
 
-#include "mutex.hpp"
+#include "mutex.h"
 
 namespace Yttrium
 {

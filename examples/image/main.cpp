@@ -1,4 +1,4 @@
-#include <Yttrium/yttrium.hpp>
+#include <Yttrium/yttrium.h>
 
 using namespace Yttrium;
 

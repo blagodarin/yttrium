@@ -1,7 +1,7 @@
-#include <Yttrium/ion/list.hpp>
+#include <Yttrium/ion/list.h>
 
-#include <Yttrium/ion/document.hpp>
-#include <Yttrium/ion/value.hpp>
+#include <Yttrium/ion/document.h>
+#include <Yttrium/ion/value.h>
 
 namespace Yttrium
 {

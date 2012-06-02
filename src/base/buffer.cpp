@@ -1,4 +1,4 @@
-#include <Yttrium/buffer.hpp>
+#include <Yttrium/buffer.h>
 
 namespace Yttrium
 {

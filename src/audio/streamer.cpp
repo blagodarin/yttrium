@@ -1,6 +1,6 @@
-#include "streamer.hpp"
+#include "streamer.h"
 
-#include "backend/player.hpp"
+#include "backend/player.h"
 
 namespace Yttrium
 {

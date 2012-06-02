@@ -1,6 +1,6 @@
-#include "wav.hpp"
+#include "wav.h"
 
-#include "../../base/fourcc.hpp"
+#include "../../base/fourcc.h"
 
 namespace Yttrium
 {

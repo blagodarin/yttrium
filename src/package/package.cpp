@@ -1,6 +1,6 @@
-#include <Yttrium/package.hpp>
+#include <Yttrium/package.h>
 
-#include "yttrium_package.hpp"
+#include "yttrium_package.h"
 
 namespace Yttrium
 {

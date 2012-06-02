@@ -1,4 +1,4 @@
-#include "playlist.hpp"
+#include "playlist.h"
 
 #include <cstdlib> // rand
 

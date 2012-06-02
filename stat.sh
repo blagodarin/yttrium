@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: Number of files, number of lines and bytes per file.
-
 print_d1000() {
 	WHOLE=$(($1 / 1000))
 	FRACTION=$(($1 - $WHOLE * 1000))
@@ -19,7 +17,7 @@ stat_init() {
 }
 
 stat_get() {
-	FILES=$(find "$1" -name '*.?pp')
+	FILES=$(find "$1" -name '*.h' -o -name '*.cpp')
 	STAT=$(echo "$FILES" | xargs wc -lc | tail -n1 | sed 's/total//')
 	FCOUNT=$(echo "$FILES" | wc -l)
 	echo $STAT $FCOUNT

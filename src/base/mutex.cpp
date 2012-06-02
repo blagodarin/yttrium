@@ -1,4 +1,4 @@
-#include "mutex.hpp"
+#include "mutex.h"
 
 namespace Yttrium
 {

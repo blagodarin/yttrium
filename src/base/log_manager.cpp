@@ -1,8 +1,8 @@
-#include <Yttrium/log_manager.hpp>
+#include <Yttrium/log_manager.h>
 
-#include <Yttrium/allocator.hpp>
+#include <Yttrium/allocator.h>
 
-#include "instance_guard.hpp"
+#include "instance_guard.h"
 
 namespace Yttrium
 {

@@ -1,4 +1,4 @@
-#include "signal.hpp"
+#include "signal.h"
 
 namespace Yttrium
 {

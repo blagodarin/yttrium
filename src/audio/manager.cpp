@@ -1,6 +1,6 @@
-#include "manager.hpp"
+#include "manager.h"
 
-#include "backend/manager.hpp"
+#include "backend/manager.h"
 
 namespace Yttrium
 {

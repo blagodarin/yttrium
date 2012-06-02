@@ -1,8 +1,8 @@
-#include <Yttrium/time.hpp>
+#include <Yttrium/time.h>
 
 #include <time.h> // clock_gettime, time, time_t, tm, localtime_r
 
-#include <Yttrium/assert.hpp>
+#include <Yttrium/assert.h>
 
 namespace Yttrium
 {

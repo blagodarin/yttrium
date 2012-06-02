@@ -1,6 +1,6 @@
-#include "manager.hpp"
+#include "manager.h"
 
-#include "openal/manager.hpp"
+#include "openal/manager.h"
 
 namespace Yttrium
 {

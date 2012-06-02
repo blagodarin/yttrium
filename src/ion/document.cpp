@@ -1,13 +1,13 @@
-#include <Yttrium/ion/document.hpp>
+#include <Yttrium/ion/document.h>
 
-#include <Yttrium/ion/list.hpp>
-#include <Yttrium/ion/node.hpp>
-#include <Yttrium/ion/value.hpp>
-#include <Yttrium/package.hpp>
+#include <Yttrium/ion/list.h>
+#include <Yttrium/ion/node.h>
+#include <Yttrium/ion/value.h>
+#include <Yttrium/package.h>
 
-#include "../base/file.hpp"
+#include "../base/file.h"
 
-#include "parser.hpp"
+#include "parser.h"
 
 namespace Yttrium
 {

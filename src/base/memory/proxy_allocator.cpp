@@ -1,4 +1,4 @@
-#include <Yttrium/proxy_allocator.hpp>
+#include <Yttrium/proxy_allocator.h>
 
 namespace Yttrium
 {

@@ -1,9 +1,9 @@
-#include "reader.hpp"
+#include "reader.h"
 
-#include <Yttrium/package.hpp>
+#include <Yttrium/package.h>
 
-#include "ogg_vorbis.hpp"
-#include "wav.hpp"
+#include "ogg_vorbis.h"
+#include "wav.h"
 
 namespace Yttrium
 {

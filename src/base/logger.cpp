@@ -1,8 +1,8 @@
-#include <Yttrium/logger.hpp>
+#include <Yttrium/logger.h>
 
-#include <Yttrium/file.hpp>
-#include <Yttrium/log_manager.hpp>
-#include <Yttrium/time.hpp>
+#include <Yttrium/file.h>
+#include <Yttrium/log_manager.h>
+#include <Yttrium/time.h>
 
 namespace Yttrium
 {

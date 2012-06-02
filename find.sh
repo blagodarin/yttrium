@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find . -name '*.?pp' | sort | xargs grep --color=always -n "$1"
+find . -name '*.h' -o -name '*.cpp' | sort | xargs grep --color=always -n "$1"

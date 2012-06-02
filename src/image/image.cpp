@@ -1,9 +1,9 @@
-#include "image.hpp"
+#include "image.h"
 
-#include <Yttrium/package.hpp>
+#include <Yttrium/package.h>
 
-#include "png.hpp"
-#include "tga.hpp"
+#include "png.h"
+#include "tga.h"
 
 namespace Yttrium
 {

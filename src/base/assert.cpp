@@ -1,9 +1,9 @@
-#include <Yttrium/assert.hpp>
+#include <Yttrium/assert.h>
 
 #include <cstdlib> // abort
 
-#include <Yttrium/allocator.hpp>
-#include <Yttrium/logger.hpp>
+#include <Yttrium/allocator.h>
+#include <Yttrium/logger.h>
 
 namespace Yttrium
 {

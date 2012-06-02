@@ -1,4 +1,4 @@
-#include "tga.hpp"
+#include "tga.h"
 
 namespace Yttrium
 {

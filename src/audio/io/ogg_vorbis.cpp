@@ -1,4 +1,4 @@
-#include "ogg_vorbis.hpp"
+#include "ogg_vorbis.h"
 
 namespace Yttrium
 {

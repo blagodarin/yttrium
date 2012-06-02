@@ -1,4 +1,4 @@
-#include "png.hpp"
+#include "png.h"
 
 namespace Yttrium
 {
