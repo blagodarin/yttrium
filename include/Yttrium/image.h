@@ -52,7 +52,7 @@ enum: PixelFormatFlags
 
 enum class ImageType
 {
-	Auto, ///< Automatical format detection (read only).
+	Auto, ///< Automatical detection.
 	Tga,  ///< Truevision TARGA (TGA) file format.
 	Png,  ///< Portable Network Graphics (PNG) file format (write only).
 };

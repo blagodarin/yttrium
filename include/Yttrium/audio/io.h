@@ -14,7 +14,7 @@ namespace Yttrium
 
 enum class AudioType
 {
-	Auto,      ///< Automatical detection (read only).
+	Auto,      ///< Automatical detection.
 	Wav,       ///< PCM waveform audio (WAV) file.
 	OggVorbis, ///< Ogg/Vorbis file.
 };

@@ -43,6 +43,7 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 
 		{
 			StaticString extension = name.file_extension();
+
 			if (extension == ".tga")
 			{
 				_private = new(allocator->allocate<TgaReader>()) TgaReader(allocator);
@@ -120,6 +121,7 @@ bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allo
 
 		{
 			StaticString extension = name.file_extension();
+
 			if (extension == ".tga")
 			{
 				_private = new(allocator->allocate<TgaWriter>()) TgaWriter(allocator);

@@ -9,7 +9,6 @@ Yttrium:
     - Redesign logging.
     - Implement directory search.
     - Implement packages.
-    - Switch packages to Private-based implementation.
 
     Image:
     - Consider an image reader with an internal buffer.

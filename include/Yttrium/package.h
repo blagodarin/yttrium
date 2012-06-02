@@ -14,12 +14,12 @@
 namespace Yttrium
 {
 
-/// Supported package formats.
+/// Package file types.
 
-enum class PackageFormat
+enum class PackageType
 {
-	Auto,    ///< Automatically detect package format.
-	Yttrium, ///< Yttrium packages.
+	Auto, ///< Automatical detection.
+	Ypq,  ///< YPQ package.
 };
 
 /// Package reader class.
@@ -28,19 +28,67 @@ class Y_API PackageReader
 {
 public:
 
-	virtual ~PackageReader() noexcept
+	///
+
+	PackageReader() noexcept
+		: _private(nullptr)
 	{
 	}
 
 	///
 
-	virtual File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept = 0;
+	PackageReader(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
+		//: PackageReader() // TODO: Uncomment.
+		: _private(nullptr)
+	{
+		open(name, type, allocator);
+	}
+
+	///
+
+	PackageReader(const PackageReader &reader) noexcept;
+
+	///
+
+	~PackageReader() noexcept
+	{
+		close();
+	}
 
 public:
 
 	///
 
-	static PackageReader *open(const StaticString &name, PackageFormat format = PackageFormat::Auto) noexcept;
+	void close() noexcept;
+
+	///
+
+	bool is_opened() const noexcept
+	{
+		return _private;
+	}
+
+	///
+
+	bool open(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
+
+	///
+
+	File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+
+public:
+
+	///
+
+	PackageReader &operator =(const PackageReader &reader) noexcept;
+
+public:
+
+	class Private;
+
+private:
+
+	Private *_private;
 };
 
 /// Package writer class.
@@ -49,19 +97,67 @@ class Y_API PackageWriter
 {
 public:
 
-	virtual ~PackageWriter() noexcept
+	///
+
+	PackageWriter() noexcept
+		: _private(nullptr)
 	{
 	}
 
 	///
 
-	virtual File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept = 0;
+	PackageWriter(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
+		//: PackageWriter() // TODO: Uncomment.
+		: _private(nullptr)
+	{
+		open(name, type, allocator);
+	}
+
+	///
+
+	PackageWriter(const PackageWriter &writer) noexcept;
+
+	///
+
+	~PackageWriter() noexcept
+	{
+		close();
+	}
 
 public:
 
 	///
 
-	static PackageWriter *open(const StaticString &name, PackageFormat format) noexcept;
+	void close() noexcept;
+
+	///
+
+	bool is_opened() const noexcept
+	{
+		return _private;
+	}
+
+	///
+
+	bool open(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
+
+	///
+
+	File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+
+public:
+
+	///
+
+	PackageWriter &operator =(const PackageWriter &writer) noexcept;
+
+public:
+
+	class Private;
+
+private:
+
+	Private *_private;
 };
 
 /// Package manager.
@@ -97,7 +193,7 @@ public:
 	/// \param name The package name.
 	/// \param format
 
-	bool mount(const StaticString &name, PackageFormat format = PackageFormat::Auto) noexcept;
+	bool mount(const StaticString &name, PackageType type = PackageType::Auto) noexcept;
 
 	/// Open a file.
 	/// \param name %File name.
@@ -132,13 +228,13 @@ private:
 
 private:
 
-	typedef std::vector<PackageReader *> Packages;
+	typedef std::vector<PackageReader> Packages;
 
 private:
 
-	Allocator *_allocator;
-	Packages   _packages;
-	Order      _order;
+	Allocator        *_allocator;
+	mutable Packages  _packages;
+	Order             _order;
 };
 
 } // namespace Yttrium

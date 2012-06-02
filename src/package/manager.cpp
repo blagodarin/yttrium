@@ -60,25 +60,22 @@ File PackageManager::open_file(const StaticString &name, File::Mode mode, Order 
 	return file;
 }
 
-bool PackageManager::mount(const StaticString &name, PackageFormat format)
+bool PackageManager::mount(const StaticString &name, PackageType type)
 {
-	PackageReader *package = PackageReader::open(name, format);
+	PackageReader package;
 
-	if (package)
+	if (!package.open(name, type, _allocator))
 	{
-		_packages.push_back(package);
+		return false;
 	}
 
-	return package;
+	_packages.push_back(package);
+
+	return true;
 }
 
 void PackageManager::unmount_all()
 {
-	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
-	{
-		delete *i;
-	}
-
 	_packages.clear();
 }
 
@@ -91,15 +88,16 @@ File PackageManager::open_packed(const StaticString &name) const
 {
 	File file;
 
-	for (Packages::const_reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
+	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
-		file = (*i)->open_file(name, _allocator);
+		file = i->open_file(name, _allocator);
 
 		if (file.is_opened())
 		{
 			break;
 		}
 	}
+
 	return file;
 }
 
