@@ -5,7 +5,6 @@
 #define __Y_ION_NODE_HPP
 
 #include <Yttrium/ion/list.hpp>
-#include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
 namespace Yttrium

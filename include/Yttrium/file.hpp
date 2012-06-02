@@ -12,6 +12,7 @@ namespace Yttrium
 {
 
 class PackageManager;
+class String;
 
 /// File reader.
 
@@ -66,14 +67,14 @@ public:
 
 	///
 
-	File(const StaticString &name, PackageManager *package_manager, Allocator *allocator = DefaultAllocator) noexcept
+	File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept
 		//: File() // TODO: Uncomment.
 		: _private(nullptr)
 		, _offset(0)
 		, _size(0)
 		, _base(0)
 	{
-		open(name, package_manager, allocator);
+		open(name, allocator);
 	}
 
 	///
@@ -113,9 +114,9 @@ public:
 
 	bool open(const StaticString &name, Mode mode, Allocator *allocator = DefaultAllocator) noexcept;
 
-	///
+	/// Open a file for reading using the package manager if possible.
 
-	bool open(const StaticString &name, PackageManager *package_manager, Allocator *allocator = DefaultAllocator) noexcept;
+	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Read the specified amount of bytes into the buffer.
 	/// \return Number of bytes read or 0 on failure.
@@ -131,6 +132,8 @@ public:
 	{
 		return (read(buffer, sizeof(T)) == sizeof(T));
 	}
+
+	bool read_all(String *string) noexcept;
 
 	/// Change the size of the file.
 

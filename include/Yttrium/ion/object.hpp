@@ -8,7 +8,6 @@
 #include <vector> // std::vector
 
 #include <Yttrium/noncopyable.hpp>
-#include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
 namespace Yttrium

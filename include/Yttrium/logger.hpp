@@ -5,7 +5,6 @@
 #define __Y_LOGGER_HPP
 
 #include <Yttrium/allocator.hpp>
-#include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
 namespace Yttrium

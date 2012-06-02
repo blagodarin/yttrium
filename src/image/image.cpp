@@ -53,7 +53,7 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 
 	if (_private)
 	{
-		if (_private->_file.open(name, PackageManager::instance(), allocator)
+		if (_private->_file.open(name, allocator)
 			&& _private->open())
 		{
 			return true;

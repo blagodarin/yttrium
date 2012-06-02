@@ -5,7 +5,6 @@
 #define __Y_ION_LIST_HPP
 
 #include <Yttrium/noncopyable.hpp>
-#include <Yttrium/static_string.hpp>
 #include <Yttrium/string.hpp>
 
 namespace Yttrium

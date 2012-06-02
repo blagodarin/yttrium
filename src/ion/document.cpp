@@ -36,23 +36,8 @@ bool Document::load(const StaticString &name)
 {
 	clear();
 
-	{
-		File file(name, PackageManager::instance(), _allocator);
-
-		if (!file.is_opened())
-		{
-			return false;
-		}
-
-		_buffer.resize(file.size()); // NOTE: May result in unexpected behavior.
-
-		if (!file.read(_buffer.text(), _buffer.size()))
-		{
-			return false;
-		}
-	}
-
-	return Parser(this).parse(_buffer, name);
+	return File(name, _allocator).read_all(&_buffer)
+		&& Parser(this).parse(_buffer, name);
 }
 
 void Document::save(const StaticString &name, int indentation) const
