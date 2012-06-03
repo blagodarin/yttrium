@@ -11,13 +11,17 @@
 namespace Yttrium
 {
 
-class PackageManager;
+class PackageReader;
+class PackageWriter;
 class String;
 
 /// File reader.
 
 class Y_API File
 {
+	friend class PackageReader;
+	friend class PackageWriter;
+
 public:
 
 	/// %File access mode.
@@ -67,7 +71,7 @@ public:
 
 	///
 
-	File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept
+	explicit File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept
 		//: File() // TODO: Uncomment.
 		: _private(nullptr)
 		, _offset(0)
@@ -187,11 +191,11 @@ public:
 
 protected:
 
-	File(Private *private_)
+	explicit File(Private *private_, UOffset base = 0, UOffset size = 0)
 		: _private(private_)
 		, _offset(0)
-		, _size(0)
-		, _base(0)
+		, _size(size)
+		, _base(base)
 	{
 	}
 

@@ -56,8 +56,18 @@ bool PackageReader::open(const StaticString &name, PackageType type, Allocator *
 	return false;
 }
 
-File PackageReader::open_file(const StaticString &name, Allocator *allocator)
+File PackageReader::open_file(const StaticString &name)
 {
+	if (_private)
+	{
+		const PackedFile &packed_file = _private->open_file(name);
+
+		if (packed_file.file)
+		{
+			File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
+		}
+	}
+
 	return File();
 }
 
@@ -121,8 +131,18 @@ bool PackageWriter::open(const StaticString &name, PackageType type, Allocator *
 	return false;
 }
 
-File PackageWriter::open_file(const StaticString &name, Allocator *allocator)
+File PackageWriter::open_file(const StaticString &name)
 {
+	if (_private)
+	{
+		const PackedFile &packed_file = _private->open_file(name);
+
+		if (packed_file.file)
+		{
+			File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
+		}
+	}
+
 	return File();
 }
 
@@ -133,6 +153,14 @@ PackageWriter &PackageWriter::operator =(const PackageWriter &writer)
 	_private = Private::copy(writer._private);
 
 	return *this;
+}
+
+PackageReader::Private::~Private()
+{
+}
+
+PackageWriter::Private::~Private()
+{
 }
 
 bool PackageWriter::Private::open()

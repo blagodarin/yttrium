@@ -90,7 +90,7 @@ File PackageManager::open_packed(const StaticString &name) const
 
 	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
 	{
-		file = i->open_file(name, _allocator);
+		file = i->open_file(name);
 
 		if (file.is_opened())
 		{

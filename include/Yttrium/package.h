@@ -74,7 +74,7 @@ public:
 
 	///
 
-	File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+	File open_file(const StaticString &name) noexcept;
 
 public:
 
@@ -143,7 +143,7 @@ public:
 
 	///
 
-	File open_file(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+	File open_file(const StaticString &name) noexcept;
 
 public:
 

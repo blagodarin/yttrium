@@ -8,6 +8,18 @@
 namespace Yttrium
 {
 
+struct PackedFile
+{
+	File    *file;
+	UOffset  size;
+
+	PackedFile(File *file = nullptr, UOffset size = 0)
+		: file(file)
+		, size(size)
+	{
+	}
+};
+
 class Y_PRIVATE PackageReader::Private: public PrivateBase<PackageReader::Private>
 {
 public:
@@ -17,17 +29,17 @@ public:
 	{
 	}
 
-	virtual ~Private()
-	{
-	}
+	virtual ~Private();
 
 public:
 
 	virtual bool open() = 0;
 
+	virtual PackedFile open_file(const StaticString &name) = 0;
+
 public:
 
-	StaticFile _file;
+	File _file;
 };
 
 class Y_PRIVATE PackageWriter::Private: public PrivateBase<PackageWriter::Private>
@@ -39,17 +51,17 @@ public:
 	{
 	}
 
-	virtual ~Private()
-	{
-	}
+	virtual ~Private();
 
 public:
 
 	virtual bool open();
 
+	virtual PackedFile open_file(const StaticString &name) = 0;
+
 public:
 
-	StaticFile _file;
+	File _file;
 };
 
 } // namespace Yttrium
