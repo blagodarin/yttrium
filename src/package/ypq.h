@@ -1,7 +1,8 @@
 #ifndef __PACKAGE_YPQ_H
 #define __PACKAGE_YPQ_H
 
-#include <map> // map
+#include <map>    // map
+#include <vector> // vector
 
 #include <Yttrium/string.h>
 
@@ -27,7 +28,7 @@ public:
 
 private:
 
-	typedef std::map<String, uint64_t> Index;
+	typedef std::map<String, UOffset> Index;
 
 private:
 
@@ -40,6 +41,7 @@ public:
 
 	YpqWriter(Allocator *allocator)
 		: PackageWriter::Private(allocator)
+		, _last_offset(0)
 	{
 	}
 
@@ -48,6 +50,31 @@ public:
 public:
 
 	virtual PackedFile open_file(const StaticString &name);
+
+private:
+
+	struct Entry
+	{
+		UOffset offset;
+		String  name;
+
+		Entry(UOffset offset, const String &name)
+			: offset(offset)
+			, name(name)
+		{
+		}
+	};
+
+	typedef std::vector<Entry> Entries;
+
+private:
+
+	void flush_file();
+
+private:
+
+	UOffset _last_offset;
+	Entries _entries;
 };
 
 } // namespace Yttrium

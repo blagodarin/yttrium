@@ -124,14 +124,89 @@ PackedFile YpqReader::open_file(const StaticString &name)
 
 YpqWriter::~YpqWriter()
 {
-	// TODO: Implement.
+	if (!_entries.empty())
+	{
+		flush_file();
+	}
+
+	_last_offset = _file.offset();
+
+	YpqFileHeader index_file_header;
+
+	index_file_header.signature = YpqFileSignature;
+	index_file_header.size = 0;
+
+	_file.write(index_file_header);
+
+	YpqIndexHeader index_header;
+
+	index_header.signature = YpqIndexSignature;
+	index_header.size = _entries.size();
+
+	_file.write(index_header);
+
+	for (Entries::iterator i = _entries.begin(); i != _entries.end(); ++i)
+	{
+		YpqIndexEntry index_entry;
+
+		index_entry.offset = i->offset;
+		index_entry.name_size = i->name.size();
+
+		_file.write(index_entry);
+		_file.write(i->name.text(), i->name.size());
+	}
+
+	flush_file();
+
+	YpqPackageHeader package_header;
+
+	package_header.signature = YpqPackageSignature;
+	package_header.index_file_offset = _last_offset;
+
+	_file.write(package_header);
+
+	_file.truncate();
 }
 
 PackedFile YpqWriter::open_file(const StaticString &name)
 {
-	// TODO: Implement.
+	YpqFileHeader file_header;
+
+	if (!_entries.empty())
+	{
+		flush_file();
+	}
+
+	_last_offset = _file.offset();
+
+	_entries.push_back(Entry(_last_offset, name));
+
+	file_header.signature = YpqFileSignature;
+	file_header.size = 0;
+
+	if (_file.write(file_header))
+	{
+		return PackedFile(&_file);
+	}
 
 	return PackedFile();
+}
+
+void YpqWriter::flush_file()
+{
+	_file.seek(0, File::Reverse);
+
+	UOffset offset = _file.offset();
+
+	_file.seek(_last_offset + offsetof(YpqFileHeader, size));
+
+	UOffset size = offset - _file.offset();
+
+	// TODO: Check packed file size for uint32_t overflow.
+
+	_file.write(static_cast<uint32_t>(size));
+
+	_file.seek(offset);
 }
 
 } // namespace Yttrium
