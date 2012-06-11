@@ -1,3 +1,3 @@
 #!/bin/sh
 
-LD_LIBRARY_PATH=lib/ gdb $1
+LD_LIBRARY_PATH=lib/ gdb --args "$@"

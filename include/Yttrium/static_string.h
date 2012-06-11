@@ -52,6 +52,22 @@ public:
 
 public:
 
+	///
+
+	char &at(size_t index) noexcept
+	{
+		return _text[index];
+	}
+
+	/**
+	* \overload
+	*/
+
+	char at(size_t index) const noexcept
+	{
+		return _text[index];
+	}
+
 	/// Compares the string with the specified \a string.
 	/// \param string The string to compare with.
 	/// \return Negative result if the \a string is greater, positive if it is less, zero otherwise.
@@ -60,9 +76,23 @@ public:
 
 	///
 
+	char const_at(size_t index) const noexcept
+	{
+		return _text[index];
+	}
+
+	///
+
 	const char *const_text() const noexcept
 	{
 		return _text;
+	}
+
+	///
+
+	const char *const_text_at(size_t index) const noexcept
+	{
+		return _text + index;
 	}
 
 	/// Return the number of occurences of any of the specified \a symbols in the string.
@@ -151,6 +181,22 @@ public:
 		return _text;
 	}
 
+	///
+
+	char *text_at(size_t index) noexcept
+	{
+		return _text + index;
+	}
+
+	/**
+	* \overload
+	*/
+
+	const char *text_at(size_t index) const noexcept
+	{
+		return _text + index;
+	}
+
 	/// Convert to decimal \c double as much of the string as possible.
 	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
 
@@ -196,7 +242,16 @@ public:
 
 	///
 
-	const char &operator [](size_t index) const noexcept
+	char operator [](size_t index) const noexcept
+	{
+		return _text[index];
+	}
+
+	/**
+	* \overload
+	*/
+
+	char &operator [](size_t index) noexcept
 	{
 		return _text[index];
 	}

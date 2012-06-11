@@ -137,7 +137,13 @@ public:
 		return (read(buffer, sizeof(T)) == sizeof(T));
 	}
 
+	///
+
 	bool read_all(String *string) noexcept;
+
+	///
+
+	bool read_line(String *string) noexcept;
 
 	/// Change the size of the file.
 

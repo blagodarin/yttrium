@@ -1,0 +1,6 @@
+Import('env')
+build = env.Clone(BUILD = '.build')
+build.VariantDir('$BUILD', '.', duplicate = 0)
+tool = build.Program('#/bin/ypq', build.Glob('$BUILD/*.cpp'))
+build.Clean(tool, build.Dir('$BUILD'))
+Return('tool')

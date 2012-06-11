@@ -275,14 +275,6 @@ public:
 public:
 
 	///
-	/// \note This operator may be dangerous if misused (on i.e. reference strings).
-
-	char &operator [](size_t index) noexcept
-	{
-		return _text[index];
-	}
-
-	///
 
 	String &operator =(char symbol) noexcept
 	{
