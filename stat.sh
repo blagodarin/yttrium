@@ -18,7 +18,7 @@ stat_init() {
 
 stat_get() {
 	FILES=$(find "$1" -name '*.h' -o -name '*.cpp')
-	STAT=$(echo "$FILES" | xargs wc -lc | tail -n1 | sed 's/total//')
+	STAT=$(echo "$FILES" | xargs wc -lc | tail -n1 | sed -r 's/\s*([0-9]+)\s*([0-9]+).*/\1 \2/')
 	FCOUNT=$(echo "$FILES" | wc -l)
 	echo $STAT $FCOUNT
 }
@@ -49,4 +49,4 @@ src_stat() {
 	stat_print $TOTAL
 }
 
-src_stat include/ src/
+src_stat include/ src/ tools/
