@@ -11,7 +11,7 @@ namespace Yttrium
 
 /// Four character code (FOURCC) construction helper.
 
-template <char c0, char c1, char c2, char c3>
+template <UChar c0, UChar c1, UChar c2, UChar c3>
 class Fourcc
 {
 public:
@@ -24,7 +24,7 @@ public:
 
 /// Eight character code (EIGHTCC) construction helper.
 
-template <char c0, char c1, char c2, char c3, char c4, char c5, char c6, char c7>
+template <UChar c0, UChar c1, UChar c2, UChar c3, UChar c4, UChar c5, UChar c6, UChar c7>
 class Eightcc
 {
 public:

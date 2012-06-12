@@ -64,7 +64,7 @@ File PackageReader::open_file(const StaticString &name)
 
 		if (packed_file.file)
 		{
-			File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
+			return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
 		}
 	}
 
@@ -93,7 +93,7 @@ void PackageWriter::close()
 	}
 }
 
-bool PackageWriter::open(const StaticString &name, PackageType type, Allocator *allocator)
+bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, Allocator *allocator)
 {
 	close();
 
@@ -120,7 +120,7 @@ bool PackageWriter::open(const StaticString &name, PackageType type, Allocator *
 	if (_private)
 	{
 		if (_private->_file.open(name, File::Write)
-			&& _private->open())
+			&& _private->open(mode))
 		{
 			return true;
 		}
@@ -139,7 +139,7 @@ File PackageWriter::open_file(const StaticString &name)
 
 		if (packed_file.file)
 		{
-			File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
+			return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
 		}
 	}
 
@@ -163,8 +163,12 @@ PackageWriter::Private::~Private()
 {
 }
 
-bool PackageWriter::Private::open()
+bool PackageWriter::Private::open(PackageWriter::Mode mode)
 {
+	if (mode == PackageWriter::Append)
+	{
+		_file.seek(0, File::Reverse);
+	}
 	return true;
 }
 

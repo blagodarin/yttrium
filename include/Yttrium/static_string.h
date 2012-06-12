@@ -197,6 +197,10 @@ public:
 		return _text + index;
 	}
 
+	///
+
+	StaticString trimmed() const noexcept;
+
 	/// Convert to decimal \c double as much of the string as possible.
 	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
 

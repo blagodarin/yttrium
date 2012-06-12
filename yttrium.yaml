@@ -8,13 +8,9 @@ Yttrium:
     Base:
     - Redesign logging.
     - Implement directory search.
-    - Implement packages.
 
     Image:
     - Consider an image reader with an internal buffer.
 
     ION:
     - Make the compact format even more compact.
-
-Tools:
-- Add packer.

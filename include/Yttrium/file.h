@@ -197,13 +197,15 @@ public:
 
 protected:
 
-	explicit File(Private *private_, UOffset base = 0, UOffset size = 0)
+	explicit File(Private *private_) noexcept
 		: _private(private_)
 		, _offset(0)
-		, _size(size)
-		, _base(base)
+		, _size(0)
+		, _base(0)
 	{
 	}
+
+	File(Private *private_, UOffset base, UOffset size) noexcept;
 
 private:
 

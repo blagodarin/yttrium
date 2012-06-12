@@ -147,7 +147,7 @@ public:
 	{
 		if (pointer)
 		{
-			pointer->T::~T();
+			pointer->~T();
 			deallocate(pointer);
 		}
 	}

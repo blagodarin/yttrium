@@ -55,7 +55,7 @@ public:
 
 public:
 
-	virtual bool open();
+	virtual bool open(PackageWriter::Mode mode);
 
 	virtual PackedFile open_file(const StaticString &name) = 0;
 

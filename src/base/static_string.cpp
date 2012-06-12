@@ -110,6 +110,42 @@ size_t StaticString::find_last(char symbol, size_t offset) const
 	return End;
 }
 
+StaticString StaticString::trimmed() const
+{
+	if (!_size)
+	{
+		return StaticString();
+	}
+
+	char *left = _text;
+	char *right = _text + _size;
+
+	for (; left < right; ++left)
+	{
+		if (*left > 32)
+		{
+			break;
+		}
+	}
+
+	if (left == right)
+	{
+		return StaticString();
+	}
+
+	--right;
+
+	for (; left < right; --right)
+	{
+		if (*right > 32)
+		{
+			break;
+		}
+	}
+
+	return StaticString(left, right - left + 1);
+}
+
 double StaticString::to_double() const
 {
 	if (!_size)

@@ -184,29 +184,19 @@ PackedFile YpqWriter::open_file(const StaticString &name)
 	file_header.signature = YpqFileSignature;
 	file_header.size = 0;
 
-	if (_file.write(file_header))
-	{
-		return PackedFile(&_file);
-	}
-
-	return PackedFile();
+	return (_file.write(file_header) ? PackedFile(&_file) : PackedFile());
 }
 
 void YpqWriter::flush_file()
 {
 	_file.seek(0, File::Reverse);
 
-	UOffset offset = _file.offset();
+	UOffset begin_offset = _last_offset + sizeof(YpqFileHeader);
+	UOffset end_offset = _file.offset();
 
 	_file.seek(_last_offset + offsetof(YpqFileHeader, size));
-
-	UOffset size = offset - _file.offset();
-
-	// TODO: Check packed file size for uint32_t overflow.
-
-	_file.write(static_cast<uint32_t>(size));
-
-	_file.seek(offset);
+	_file.write(static_cast<uint32_t>(end_offset - begin_offset)); // TODO: Check packed file size for uint32_t overflow.
+	_file.seek(end_offset);
 }
 
 } // namespace Yttrium

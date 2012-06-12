@@ -99,6 +99,16 @@ public:
 
 	///
 
+	enum Mode
+	{
+		Rewrite, ///<
+		Append,  ///<
+	};
+
+public:
+
+	///
+
 	PackageWriter() noexcept
 		: _private(nullptr)
 	{
@@ -106,11 +116,11 @@ public:
 
 	///
 
-	PackageWriter(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
+	PackageWriter(const StaticString &name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator *allocator = DefaultAllocator) noexcept
 		//: PackageWriter() // TODO: Uncomment.
 		: _private(nullptr)
 	{
-		open(name, type, allocator);
+		open(name, type, mode, allocator);
 	}
 
 	///
@@ -139,7 +149,7 @@ public:
 
 	///
 
-	bool open(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
+	bool open(const StaticString &name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

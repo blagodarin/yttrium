@@ -272,6 +272,10 @@ public:
 
 	String &set(char symbol) noexcept;
 
+	///
+
+	String &trim() noexcept;
+
 public:
 
 	///

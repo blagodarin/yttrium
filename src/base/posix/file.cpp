@@ -105,7 +105,7 @@ size_t File::read(void *buffer, size_t size)
 bool File::resize(UOffset size)
 {
 	return (_private && ((_private->mode & (Write | Pipe)) == Write)
-		? !ftruncate(_private->descriptor, size)
+		? !ftruncate(_private->descriptor, _base + size)
 		: false);
 }
 
@@ -148,7 +148,7 @@ bool File::seek(UOffset offset, Whence whence)
 
 				if (off == -1)
 				{
-					return false;
+					return false; // TODO: Y_ABORT.
 				}
 				size = static_cast<UOffset>(off);
 			}
@@ -187,14 +187,15 @@ UOffset File::size() const
 
 			{
 				off_t size = lseek(_private->descriptor, 0, SEEK_END);
-				if (size != -1)
+				if (size == -1)
 				{
-					return size;
+					break; // TODO: Y_ABORT.
 				}
+				return size - _base;
 			}
-			break;
 		}
 	}
+
 	return 0;
 }
 
@@ -212,7 +213,7 @@ size_t File::write(const void *buffer, size_t size)
 		}
 		else
 		{
-			ssize_t result = pwrite(_private->descriptor, buffer, size, _offset);
+			ssize_t result = pwrite(_private->descriptor, buffer, size, _base + _offset);
 			if (result != -1)
 			{
 				_offset += static_cast<size_t>(result);

@@ -441,6 +441,28 @@ String &String::set(char symbol)
 	return *this;
 }
 
+String &String::trim()
+{
+	StaticString trimmed_string = this->trimmed();
+
+	size_t buffer_size = trimmed_string.size() + 1;
+
+	if (_buffer_size)
+	{
+		grow(buffer_size);
+	}
+	else
+	{
+		init(buffer_size);
+	}
+
+	memmove(_text, trimmed_string.text(), trimmed_string.size());
+	_text[trimmed_string.size()] = '\0';
+	_size = trimmed_string.size();
+
+	return *this;
+}
+
 void String::grow(size_t buffer_size)
 {
 	Y_ASSERT(_buffer_size);

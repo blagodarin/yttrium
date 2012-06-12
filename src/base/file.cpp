@@ -124,4 +124,12 @@ File &File::operator =(const File &file)
 	return *this;
 }
 
+File::File(Private *private_, UOffset base, UOffset size)
+	: _private(Private::copy(private_))
+	, _offset(0)
+	, _size(size)
+	, _base(base)
+{
+}
+
 } // namespace Yttrium
