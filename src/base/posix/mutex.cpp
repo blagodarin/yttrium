@@ -1,8 +1,8 @@
 #include "mutex.h"
 
-#include <time.h> // clock_gettime, timespec
-
 #include <Yttrium/assert.h>
+
+#include <time.h> // clock_gettime, timespec
 
 namespace Yttrium
 {

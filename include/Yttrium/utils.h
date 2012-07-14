@@ -4,9 +4,9 @@
 #ifndef __Y_UTILS_H
 #define __Y_UTILS_H
 
-#include <algorithm> // std::max, std::min
-
 #include <Yttrium/types.h>
+
+#include <algorithm> // std::max, std::min
 
 namespace Yttrium
 {

@@ -1,12 +1,10 @@
 #include "system_allocator.h"
 
-#include <new> // bad_alloc
+#include <Yttrium/assert.h>
+#include <Yttrium/types.h>
 
 #include <sys/mman.h> // mmap, mremap, munmap
 #include <unistd.h>   // sysconf
-
-#include <Yttrium/assert.h>
-#include <Yttrium/types.h>
 
 // NOTE: We're using Linux-specific mremap() call here.
 // Perhaps we should preprocess it out in non-Linux-compatible environments.

@@ -4,13 +4,13 @@
 #ifndef __Y_TYPES_H
 #define __Y_TYPES_H
 
+#include <Yttrium/global.h>
+
 #define __STDC_LIMIT_MACROS    // *_MIN, *_MAX
 #define __STDC_CONSTANT_MACROS // INT*_C, UINT*_C
 
 #include <cstddef>  // ptrdiff_t, size_t
 #include <stdint.h> // int*_t, uint*_t, int_fast*_t, uint_fast*_t
-
-#include <Yttrium/global.h>
 
 namespace Yttrium
 {

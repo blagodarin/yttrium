@@ -1,12 +1,12 @@
 #ifndef __PACKAGE_YPQ_H
 #define __PACKAGE_YPQ_H
 
-#include <map>    // map
-#include <vector> // vector
-
 #include <Yttrium/string.h>
 
 #include "package.h"
+
+#include <map>
+#include <vector>
 
 namespace Yttrium
 {

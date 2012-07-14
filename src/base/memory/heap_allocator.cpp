@@ -1,8 +1,8 @@
 #include "heap_allocator.h"
 
-#include <cstdlib> // free, malloc, realloc
-
 #include <Yttrium/assert.h>
+
+#include <cstdlib> // free, malloc, realloc
 
 // NOTE: The current implementation lamely uses CRT memory allocation routines.
 

@@ -6,7 +6,6 @@ Yttrium:
 - Convert the examples into proper tests.
 
     Base:
-    - Redesign logging.
     - Implement directory search.
 
     Image:

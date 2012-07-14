@@ -4,13 +4,13 @@
 #ifndef __Y_ION_DOCUMENT_H
 #define __Y_ION_DOCUMENT_H
 
-#include <list> // std::list
-
 #include <Yttrium/allocator.h>
 #include <Yttrium/ion/node.h>
 #include <Yttrium/ion/object.h>
 #include <Yttrium/ion/value.h>
 #include <Yttrium/pool.h>
+
+#include <list>
 
 namespace Yttrium
 {

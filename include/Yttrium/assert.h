@@ -15,14 +15,14 @@ namespace Yttrium
 /// \param function Source function (usually \c __func__).
 /// \param message The message to output.
 
-Y_API void abort(const StaticString &file, int line, const StaticString &function, const StaticString &message, ...) noexcept;
+Y_API void abort(const StaticString &message, ...) noexcept;
 
 } // namespace Yttrium
 
 /// \def Y_ABORT(condition)
 /// \brief Terminate the program, outputting a message to the log.
 
-#define Y_ABORT(...) Yttrium::abort(Y_S(__FILE__), __LINE__, Y_S(__func__), __VA_ARGS__)
+#define Y_ABORT(...) Yttrium::abort(__VA_ARGS__)
 
 /// \def Y_ASSERT(condition)
 /// \brief Terminate the program if the \a condition isn't met.

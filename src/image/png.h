@@ -1,9 +1,9 @@
 #ifndef __IMAGE_PNG_H
 #define __IMAGE_PNG_H
 
-#include <png.h>
-
 #include "image.h"
+
+#include <png.h>
 
 namespace Yttrium
 {

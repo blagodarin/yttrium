@@ -4,10 +4,10 @@
 #ifndef __Y_AUDIO_MANAGER_H
 #define __Y_AUDIO_MANAGER_H
 
-#include <set>
-
 #include <Yttrium/audio/player.h>
 #include <Yttrium/noncopyable.h>
+
+#include <set>
 
 namespace Yttrium
 {

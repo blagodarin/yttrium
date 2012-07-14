@@ -6,9 +6,7 @@ int main(int argc, char **argv)
 {
 	MemoryManager memory_manager;
 
-	LogManager log_manager(Y_S("ion.log"), Logger::Rewrite);
-
-	log_manager.set_root_level(Logger::All);
+	LogManager log_manager(Y_S("ion.log"));
 
 	Ion::Document document;
 

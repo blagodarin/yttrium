@@ -4,11 +4,11 @@
 #ifndef __Y_ION_OBJECT_H
 #define __Y_ION_OBJECT_H
 
-#include <map>    // std::map
-#include <vector> // std::vector
-
 #include <Yttrium/noncopyable.h>
 #include <Yttrium/string.h>
+
+#include <map>
+#include <vector>
 
 namespace Yttrium
 {

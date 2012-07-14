@@ -1,12 +1,12 @@
 #ifndef __BASE_POSIX_SIGNAL_H
 #define __BASE_POSIX_SIGNAL_H
 
-#include <pthread.h>
-
 #include <Yttrium/noncopyable.h>
 #include <Yttrium/signal.h>
 
 #include "../private_base.h"
+
+#include <pthread.h>
 
 namespace Yttrium
 {

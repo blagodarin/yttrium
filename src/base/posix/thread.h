@@ -1,13 +1,12 @@
 #ifndef __BASE_POSIX_THREAD_H
 #define __BASE_POSIX_THREAD_H
 
-#include <atomic> // std::atomic
-
-#include <pthread.h> // pthread_*
-
 #include <Yttrium/thread.h>
 
 #include "../private_base.h"
+
+#include <atomic>
+#include <pthread.h>
 
 namespace Yttrium
 {

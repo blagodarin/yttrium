@@ -1,9 +1,9 @@
 #include <Yttrium/static_string.h>
 
+#include <Yttrium/string.h>
+
 #include <cmath>   // pow
 #include <cstring> // memcmp, strlen
-
-#include <Yttrium/string.h>
 
 namespace Yttrium
 {

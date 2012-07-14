@@ -1,8 +1,8 @@
 #include "ypq.h"
 
-#include <cstring> // memcmp
-
 #include "../base/fourcc.h"
+
+#include <cstring> // memcmp
 
 namespace Yttrium
 {

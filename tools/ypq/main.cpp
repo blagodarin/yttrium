@@ -1,6 +1,6 @@
-#include <cstdio>
-
 #include <Yttrium/yttrium.h>
+
+#include <cstdio>
 
 using namespace Yttrium;
 

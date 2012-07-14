@@ -1,5 +1,7 @@
 #include "manager.h"
 
+#include "../../logging.h"
+
 // TODO: Use script variables.
 
 namespace Yttrium
@@ -86,7 +88,7 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 
 		if (alc_context)
 		{
-			Y_LOG(Logger(allocator), Y_S("OpenAL device opened: \"") << audio_device << '"'); // TODO: Fix it.
+			Y_LOG(Y_S("OpenAL device opened: \"") << audio_device << '"');
 
 			alcMakeContextCurrent(alc_context);
 

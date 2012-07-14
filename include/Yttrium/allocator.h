@@ -4,10 +4,10 @@
 #ifndef __Y_ALLOCATOR_H
 #define __Y_ALLOCATOR_H
 
-#include <atomic> // atomic_*
-#include <new>    // new
-
 #include <Yttrium/types.h>
+
+#include <atomic>
+#include <new>
 
 namespace Yttrium
 {

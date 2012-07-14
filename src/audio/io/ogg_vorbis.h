@@ -1,11 +1,9 @@
 #ifndef __AUDIO_IO_OGG_VORBIS_H
 #define __AUDIO_IO_OGG_VORBIS_H
 
-#define __STDC_LIMIT_MACROS
+#include "reader.h"
 
 #include <vorbis/vorbisfile.h>
-
-#include "reader.h"
 
 namespace Yttrium
 {

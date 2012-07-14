@@ -1,12 +1,11 @@
 #ifndef __ION_PARSER_H
 #define __ION_PARSER_H
 
-#include <vector>
-
 #include <Yttrium/allocator.h>
 #include <Yttrium/ion/document.h>
-#include <Yttrium/logger.h>
 #include <Yttrium/static_string.h>
+
+#include <vector>
 
 namespace Yttrium
 {
@@ -43,7 +42,6 @@ private:
 
 private:
 
-	Logger    _logger;
 	Document &_document;
 
 private:

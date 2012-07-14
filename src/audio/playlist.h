@@ -1,14 +1,13 @@
 #ifndef __AUDIO_PLAYLIST_H
 #define __AUDIO_PLAYLIST_H
 
-#include <vector> // std::vector
-
-#include <cstdlib> // rand
-
 #include <Yttrium/audio/player.h>
 #include <Yttrium/string.h>
 
 #include "../base/mutex.h"
+
+#include <cstdlib> // rand
+#include <vector>
 
 namespace Yttrium
 {

@@ -1,10 +1,10 @@
 #include <Yttrium/string.h>
 
-#include <cstdio>  // sprintf
-#include <cstring> // memcpy, memmove, strlen
-
 #include <Yttrium/assert.h>
 #include <Yttrium/utils.h>
+
+#include <cstdio>  // sprintf
+#include <cstring> // memcpy, memmove, strlen
 
 namespace Yttrium
 {

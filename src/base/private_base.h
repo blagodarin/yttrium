@@ -1,11 +1,11 @@
 #ifndef __BASE_PRIVATE_BASE_H
 #define __BASE_PRIVATE_BASE_H
 
-#include <atomic>
-
 #include <Yttrium/allocator.h>
 #include <Yttrium/assert.h>
 #include <Yttrium/noncopyable.h>
+
+#include <atomic>
 
 namespace Yttrium
 {

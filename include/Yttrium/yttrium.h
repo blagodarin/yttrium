@@ -12,8 +12,7 @@
 #include <Yttrium/global.h>
 #include <Yttrium/image.h>
 #include <Yttrium/ion.h>
-#include <Yttrium/log_manager.h>
-#include <Yttrium/logger.h>
+#include <Yttrium/log.h>
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/mutex.h>
 #include <Yttrium/noncopyable.h>

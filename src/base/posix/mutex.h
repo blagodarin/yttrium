@@ -1,12 +1,12 @@
 #ifndef __BASE_POSIX_MUTEX_H
 #define __BASE_POSIX_MUTEX_H
 
-#include <pthread.h>
-
 #include <Yttrium/mutex.h>
 #include <Yttrium/noncopyable.h>
 
 #include "../private_base.h"
+
+#include <pthread.h>
 
 namespace Yttrium
 {

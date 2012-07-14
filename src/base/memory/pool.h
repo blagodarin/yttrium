@@ -1,9 +1,9 @@
 #ifndef __BASE_MEMORY_POOL_H
 #define __BASE_MEMORY_POOL_H
 
-#include <cstddef> // offsetof
-
 #include <Yttrium/pool.h>
+
+#include <cstddef> // offsetof
 
 namespace Yttrium
 {
