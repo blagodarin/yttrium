@@ -11,21 +11,9 @@
 namespace Yttrium
 {
 
-void File::close()
+File::Private::~Private()
 {
-	if (Private::should_free(&_private))
-	{
-		if (_private->descriptor != -1)
-		{
-			::close(_private->descriptor);
-			_private->descriptor = -1;
-			_private->mode = 0;
-		}
-		Private::free(&_private);
-	}
-	_offset = 0;
-	_size = 0;
-	_base = 0;
+	::close(descriptor);
 }
 
 bool File::flush()

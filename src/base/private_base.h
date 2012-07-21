@@ -42,40 +42,21 @@ public:
 		return nullptr;
 	}
 
-	static void free(T **object_ptr)
-	{
-		T         *object    = *object_ptr;
-		Allocator *allocator = object->_allocator;
-
-		if (allocator)
-		{
-			allocator->delete_(object);
-			*object_ptr = nullptr;
-		}
-	}
-
-	static bool should_free(T **object_ptr)
+	static void release(T **object_ptr)
 	{
 		T *object = *object_ptr;
 
-		if (!object)
-		{
-			return false;
-		}
-
-		if (!object->_allocator)
-		{
-			return true;
-		}
-
-		bool result = !--object->_references;
-
-		if (!result)
+		if (object)
 		{
 			*object_ptr = nullptr;
-		}
 
-		return result;
+			Allocator *allocator = object->_allocator;
+
+			if (allocator && !--object->_references)
+			{
+				allocator->delete_(object);
+			}
+		}
 	}
 
 protected:

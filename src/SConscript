@@ -11,15 +11,20 @@ src = [
 	'audio/io',
 	'base',
 	'base/memory',
+	'display',
 	'image',
 	'ion',
 	'package']
 
 if 'posix' in ports:
-	src += ['base/posix']
+	src += [
+		'base/posix',
+		'display/x11']
 
 if 'windows' in ports:
-	src += ['base/windows']
+	src += [
+		'base/windows',
+		'display/windows']
 
 yttrium = build.SharedLibrary('#/lib/yttrium', [build.Glob('$BUILD/' + path + '/*.cpp') for path in src])
 build.Clean(yttrium, build.Dir('$BUILD'))

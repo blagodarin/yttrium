@@ -28,7 +28,10 @@ public:
 
 	///
 
-	~Signal() noexcept;
+	~Signal() noexcept
+	{
+		close();
+	}
 
 public:
 
@@ -67,7 +70,7 @@ protected:
 
 private:
 
-	void close();
+	void close() noexcept;
 
 private:
 

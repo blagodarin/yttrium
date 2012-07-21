@@ -15,10 +15,7 @@ AudioReader::AudioReader(const AudioReader &reader)
 
 void AudioReader::close()
 {
-	if (Private::should_free(&_private))
-	{
-		Private::free(&_private);
-	}
+	Private::release(&_private);
 }
 
 AudioFormat AudioReader::format() const

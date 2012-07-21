@@ -12,16 +12,16 @@ namespace Yttrium
 
 class Signal;
 
-/// %Mutex lock.
+/// %Mutex locker.
 
 template <typename T>
-class MutexLock
+class MutexLocker
 {
 public:
 
 	///
 
-	MutexLock(T *mutex) noexcept
+	MutexLocker(T *mutex) noexcept
 		: _mutex(mutex)
 	{
 		_mutex->lock();
@@ -29,7 +29,7 @@ public:
 
 	///
 
-	~MutexLock() noexcept
+	~MutexLocker() noexcept
 	{
 		_mutex->unlock();
 	}
@@ -49,7 +49,7 @@ public:
 
 	/// %Lock type.
 
-	typedef MutexLock<Mutex> Lock;
+	typedef MutexLocker<Mutex> Locker;
 
 public:
 
@@ -63,7 +63,10 @@ public:
 
 	///
 
-	~Mutex() noexcept;
+	~Mutex() noexcept
+	{
+		close();
+	}
 
 public:
 
@@ -106,7 +109,7 @@ protected:
 
 private:
 
-	void close();
+	void close() noexcept;
 
 private:
 

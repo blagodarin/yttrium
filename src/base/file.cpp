@@ -14,6 +14,15 @@ File::File(const File &file)
 {
 }
 
+void File::close()
+{
+	Private::release(&_private);
+
+	_offset = 0;
+	_size = 0;
+	_base = 0;
+}
+
 bool File::is_opened() const
 {
 	return (_private && (_private->mode & ReadWrite));

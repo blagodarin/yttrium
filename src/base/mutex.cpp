@@ -14,9 +14,9 @@ Mutex::Mutex(const Mutex &mutex)
 {
 }
 
-Mutex::~Mutex()
+void Mutex::close()
 {
-	close();
+	Private::release(&_private);
 }
 
 Mutex &Mutex::operator =(const Mutex &mutex)

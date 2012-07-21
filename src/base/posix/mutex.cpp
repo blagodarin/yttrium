@@ -16,6 +16,14 @@ Mutex::Private::Private(Allocator *allocator)
 	}
 }
 
+Mutex::Private::~Private()
+{
+	if (pthread_mutex_destroy(&mutex))
+	{
+		Y_ABORT("Can't destroy mutex");
+	}
+}
+
 void Mutex::lock()
 {
 	if (pthread_mutex_lock(&_private->mutex))
@@ -65,18 +73,6 @@ void Mutex::unlock()
 	if (pthread_mutex_unlock(&_private->mutex))
 	{
 		Y_ABORT("Can't unlock mutex");
-	}
-}
-
-void Mutex::close()
-{
-	if (Private::should_free(&_private))
-	{
-		if (pthread_mutex_destroy(&_private->mutex))
-		{
-			Y_ABORT("Can't destroy mutex");
-		}
-		Private::free(&_private);
 	}
 }
 

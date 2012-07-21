@@ -18,6 +18,14 @@ Signal::Private::Private(Allocator *allocator)
 	}
 }
 
+Signal::Private::~Private()
+{
+	if (pthread_cond_destroy(&cond))
+	{
+		Y_ABORT("Can't destroy signal");
+	}
+}
+
 void Signal::wait(Mutex *mutex)
 {
 	if (pthread_cond_wait(&_private->cond, &mutex->_private->mutex))
@@ -75,18 +83,6 @@ void Signal::signal()
 	if (pthread_cond_signal(&_private->cond))
 	{
 		Y_ABORT("Can't signal");
-	}
-}
-
-void Signal::close()
-{
-	if (Private::should_free(&_private))
-	{
-		if (pthread_cond_destroy(&_private->cond))
-		{
-			Y_ABORT("Can't destroy signal");
-		}
-		Private::free(&_private);
 	}
 }
 

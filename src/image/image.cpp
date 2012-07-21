@@ -15,10 +15,7 @@ ImageReader::ImageReader(const ImageReader &reader)
 
 void ImageReader::close()
 {
-	if (Private::should_free(&_private))
-	{
-		Private::free(&_private);
-	}
+	Private::release(&_private);
 }
 
 ImageFormat ImageReader::format() const
@@ -95,10 +92,7 @@ ImageWriter::ImageWriter(const ImageWriter &reader)
 
 void ImageWriter::close()
 {
-	if (Private::should_free(&_private))
-	{
-		Private::free(&_private);
-	}
+	Private::release(&_private);
 }
 
 bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allocator)

@@ -12,10 +12,7 @@ PackageReader::PackageReader(const PackageReader &reader)
 
 void PackageReader::close()
 {
-	if (Private::should_free(&_private))
-	{
-		Private::free(&_private);
-	}
+	Private::release(&_private);
 }
 
 bool PackageReader::open(const StaticString &name, PackageType type, Allocator *allocator)
@@ -87,10 +84,7 @@ PackageWriter::PackageWriter(const PackageWriter &reader)
 
 void PackageWriter::close()
 {
-	if (Private::should_free(&_private))
-	{
-		Private::free(&_private);
-	}
+	Private::release(&_private);
 }
 
 bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, Allocator *allocator)

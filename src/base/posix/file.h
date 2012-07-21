@@ -25,6 +25,8 @@ public:
 	{
 	}
 
+	~Private();
+
 public:
 
 	static int open(const StaticString &name, int flags, Allocator *allocator);

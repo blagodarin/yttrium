@@ -20,6 +20,8 @@ public:
 public:
 
 	Private(Allocator *allocator = nullptr);
+
+	~Private();
 };
 
 class StaticMutex: public Mutex, public Noncopyable

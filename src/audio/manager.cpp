@@ -14,7 +14,9 @@ void AudioManager::close()
 bool AudioManager::open(const StaticString &backend, const StaticString &device)
 {
 	close();
+
 	_private = open_audio_manager(backend, device, _allocator);
+
 	return _private;
 }
 

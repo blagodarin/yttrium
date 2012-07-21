@@ -20,6 +20,8 @@ public:
 public:
 
 	Private(Allocator *allocator = nullptr);
+
+	~Private();
 };
 
 class StaticSignal: public Signal, public Noncopyable

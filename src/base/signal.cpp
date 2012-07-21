@@ -14,9 +14,9 @@ Signal::Signal(const Signal &signal)
 {
 }
 
-Signal::~Signal()
+void Signal::close()
 {
-	close();
+	Private::release(&_private);
 }
 
 Signal &Signal::operator =(const Signal &signal)
