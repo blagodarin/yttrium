@@ -32,7 +32,7 @@ public:
 
 	void close();
 
-	void set_size(int width, int height);
+	void set_fixed_size(int width, int height);
 
 public:
 

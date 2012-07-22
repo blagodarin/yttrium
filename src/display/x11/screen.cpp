@@ -1,7 +1,5 @@
 #include "screen.h"
 
-#include <X11/Xlib.h>
-//#include <X11/Xutil.h>
 #include <X11/extensions/Xrandr.h>
 
 namespace Yttrium
@@ -19,9 +17,10 @@ Screen::Private::~Private()
 	::XCloseDisplay(_display);
 }
 
-Screen::Screen(Allocator *allocator)
-	: _private(nullptr)
+bool Screen::open(Allocator *allocator)
 {
+	close();
+
 	::Display *display = ::XOpenDisplay(nullptr);
 
 	if (display)
@@ -37,8 +36,11 @@ Screen::Screen(Allocator *allocator)
 		{
 			_private = new(allocator->allocate<Private>())
 				Private(display, DefaultScreen(display), allocator);
+			return true;
 		}
 	}
+
+	return false;
 }
 
 ScreenMode Screen::mode(ModeType type)

@@ -49,7 +49,19 @@ public:
 
 	///
 
-	Screen(Allocator *allocator = DefaultAllocator) noexcept;
+	Screen() noexcept
+		: _private(nullptr)
+	{
+	}
+
+	///
+
+	Screen(Allocator *allocator) noexcept
+		//: Screen() // TODO: Uncomment.
+		: _private(nullptr)
+	{
+		open(allocator);
+	}
 
 	///
 
@@ -66,6 +78,10 @@ public:
 
 	///
 
+	void close() noexcept;
+
+	///
+
 	bool is_opened() const noexcept
 	{
 		return _private;
@@ -75,15 +91,15 @@ public:
 
 	ScreenMode mode(ModeType type = CurrentMode) noexcept;
 
+	///
+
+	bool open(Allocator *allocator = DefaultAllocator) noexcept;
+
 public:
 
 	///
 
 	Screen &operator =(const Screen &screen) noexcept;
-
-private:
-
-	void close() noexcept;
 
 private:
 

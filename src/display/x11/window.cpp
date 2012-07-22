@@ -2,10 +2,6 @@
 
 #include "screen.h"
 
-#include <GL/glxext.h>
-#include <X11/extensions/Xrandr.h>
-#include <X11/Xutil.h>
-
 namespace Yttrium
 {
 
@@ -19,7 +15,7 @@ Window::Private::Private(::Display *display, int screen, ::Window window, ::GLXC
 	, _glx_context(glx_context)
 {
 	::XSetWMProtocols(display, window, &_wm_delete_window, 1);
-	set_size(320, 240); // NOTE: Magic default.
+	set_fixed_size(320, 240); // NOTE: Magic default.
 }
 
 Window::Private::~Private()
@@ -38,7 +34,7 @@ void Window::Private::close()
 	}
 }
 
-void Window::Private::set_size(int width, int height)
+void Window::Private::set_fixed_size(int width, int height)
 {
 	::XSizeHints size_hints;
 
@@ -88,9 +84,9 @@ bool Window::Private::create_window(::Display *display, int screen, ::Window *wi
 
 	if (vi)
 	{
-		screen = vi->screen; // NOTE: ???
+		screen = vi->screen; // NOTE: Why?
 
-		*glx_context = ::glXCreateContext(display, vi, NULL, True);
+		*glx_context = ::glXCreateContext(display, vi, nullptr, True);
 
 		if (*glx_context)
 		{
@@ -286,7 +282,7 @@ bool Window::put(Dim left, Dim top, Dim width, Dim height, PutMode mode)
 	attributes.override_redirect = (mode == NoBorder ? True : False);
 	::XChangeWindowAttributes(_private->_display, _private->_window, CWOverrideRedirect, &attributes);
 	::XMoveResizeWindow(_private->_display, _private->_window, left, top, width, height);
-	_private->set_size(width, height);
+	_private->set_fixed_size(width, height);
 	return true;
 }
 

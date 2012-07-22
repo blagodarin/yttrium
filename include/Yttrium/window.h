@@ -22,11 +22,11 @@ public:
 
 	///
 
-	virtual bool on_focus_event(Window *window, bool is_focused) = 0;
+	virtual void on_focus_event(Window *window, bool is_focused) noexcept = 0;
 
 	///
 
-	virtual bool on_key_event(Window *window, Key key, bool is_pressed) = 0;
+	virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept = 0;
 };
 
 ///
@@ -57,7 +57,7 @@ public:
 
 	///
 
-	Window()
+	Window() noexcept
 		: _private(nullptr)
 		, _callbacks(nullptr)
 	{
