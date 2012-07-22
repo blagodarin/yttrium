@@ -5,6 +5,7 @@ Import('env')
 
 test_env = env.Clone()
 test_env.Append(
+	CPPDEFINES = 'BOOST_TEST_DYN_LINK',
 	LIBS = 'boost_unit_test_framework')
 
 tests = []

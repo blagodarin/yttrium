@@ -4,6 +4,7 @@ Yttrium:
 - Add GUI (requires renderer).
 - Add Windows port.
 - Convert the examples into proper tests.
+- Add static library build.
 
     Base:
     - Implement directory search.

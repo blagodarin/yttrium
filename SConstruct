@@ -128,7 +128,7 @@ Default('yttrium')
 tests = SConscript(dirs = 'tests', exports = {'env': slave_env})
 Alias('tests', tests)
 for test in tests:
-	env.Alias('test', test, '@' + str(test[0]) + ' --log_level=all')
+	env.Alias('test', test, '@LD_LIBRARY_PATH=lib/ ' + str(test[0]) + ' --log_level=all') # Won't go on Windows.
 AlwaysBuild('test')
 
 # Tools.

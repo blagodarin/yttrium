@@ -314,9 +314,9 @@ bool StaticString::to_number(int32_t *value) const
 	// The threshold is the maximum value that can be multiplied by 10
 	// and still fit into int32_t, both positive and negative.
 
-	const uint32_t threshold    = 0x0CCCCCCC; // ... * 10 = 0x7FFFFFF8.
-	const uint32_t max_negative = 0x80000000;
-	const uint32_t max_positive = 0x7FFFFFFF;
+	const uint32_t threshold = 0x0CCCCCCC; // ... * 10 = 0x7FFFFFF8.
+
+	const uint32_t last_digit[2] = {7, 8};
 
 	uint32_t result = 0;
 
@@ -325,11 +325,11 @@ bool StaticString::to_number(int32_t *value) const
 		uint32_t digit = *p++ - '0';
 
 		if (result > threshold
-			&& ((negate_result && (result > (max_negative - digit) / 10))
-				|| result > (max_positive - digit) / 10))
+			|| (result == threshold && digit > last_digit[negate_result]))
 		{
 			return false;
 		}
+
 		result = result * 10 + digit;
 	} while (p != end && *p >= '0' && *p <= '9');
 
