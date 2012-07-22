@@ -5,13 +5,14 @@
 namespace Yttrium
 {
 
-Terminal::Terminal(Allocator* allocator)
+Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	: _allocator(allocator)
 	, _is_opened(false)
 	, _is_active(false)
 	, _is_cursor_locked(false)
 	, _size(320, 240) // NOTE: Magic default.
 	, _mode(Windowed)
+	, _callbacks(callbacks)
 {
 	memset(_keys, 0, sizeof(_keys));
 }
@@ -105,7 +106,9 @@ bool Terminal::process_events()
 		Dim2 cursor = _size / 2;
 
 		_window.get_cursor(&cursor);
-		// TODO: Handle mouse movement: Dim2(_cursor.x - cursor.left, cursor.top - _cursor.y).
+
+		Dim2 movement(_cursor.x - cursor.left, cursor.top - _cursor.y);
+
 		if (!_is_cursor_locked)
 		{
 			_cursor.x = clamp(cursor.left, 0, _size.width - 1);
@@ -114,6 +117,11 @@ bool Terminal::process_events()
 		else
 		{
 			_window.set_cursor(_cursor);
+		}
+
+		if (_callbacks)
+		{
+			_callbacks->on_cursor_movement(this, movement);
 		}
 	}
 
@@ -227,7 +235,22 @@ void Terminal::on_key_event(Window *window, Key key, bool is_pressed)
 		break;
 	}
 
-	// TODO: Notify GUI, custom key handler and scripted bindings (for state <= 1).
+	if (false) // TODO: Notify GUI.
+	{
+		return;
+	}
+
+	if (_callbacks && _callbacks->on_key_event(this, key, state))
+	{
+		return;
+	}
+
+	if (state <= 1 && false) // TODO: Notify scripted bindings.
+	{
+		return;
+	}
+
+	// If we're here, noone wants this key. ='(
 }
 
 } // namespace Yttrium

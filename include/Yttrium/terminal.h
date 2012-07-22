@@ -11,21 +11,39 @@ namespace Yttrium
 
 /// Incapsulation of Screen and Window classes and input management.
 
-class Y_API Terminal: private WindowCallbacks
+class Y_API Terminal: private Window::Callbacks
 {
 public:
 
+	///
+
+	class Callbacks
+	{
+	public:
+
+		///
+
+		virtual void on_cursor_movement(Terminal *terminal, const Dim2& movement) noexcept = 0;
+
+		///
+		/// \return \c true if the key was handled, \c false otherwise.
+
+		virtual bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept = 0;
+	};
+
+	///
+
 	enum Mode
 	{
-		Windowed,
-		Fullscreen,
+		Windowed,   ///<
+		Fullscreen, ///<
 	};
 
 public:
 
 	///
 
-	Terminal(Allocator* allocator = DefaultAllocator) noexcept;
+	Terminal(Callbacks *callbacks = nullptr, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
 
@@ -124,7 +142,7 @@ private: // WindowCallbacks
 
 private:
 
-	Allocator* _allocator;
+	Allocator *_allocator;
 	bool       _is_opened;
 	Screen     _screen;
 	Window     _window;
@@ -134,6 +152,7 @@ private:
 	Dim2       _size;
 	Mode       _mode;
 	KeyState   _keys[KeyType(Key::__Count)];
+	Callbacks *_callbacks;
 };
 
 } // namespace Yttrium

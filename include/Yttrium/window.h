@@ -12,28 +12,26 @@
 namespace Yttrium
 {
 
-class Window;
-
-///
-
-class WindowCallbacks
-{
-public:
-
-	///
-
-	virtual void on_focus_event(Window *window, bool is_focused) noexcept = 0;
-
-	///
-
-	virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept = 0;
-};
-
 ///
 
 class Y_API Window
 {
 public:
+
+	///
+
+	class Callbacks
+	{
+	public:
+
+		///
+
+		virtual void on_focus_event(Window *window, bool is_focused) noexcept = 0;
+
+		///
+
+		virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept = 0;
+	};
 
 	///
 
@@ -158,9 +156,9 @@ private:
 
 	class Private;
 
-	Private         *_private;
-	WindowCallbacks *_callbacks;
-	Screen           _screen;
+	Private   *_private;
+	Callbacks *_callbacks;
+	Screen     _screen;
 };
 
 } // namespace Yttrium
