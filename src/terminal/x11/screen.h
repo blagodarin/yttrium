@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_X11_SCREEN_H
-#define __DISPLAY_X11_SCREEN_H
+#ifndef __TERMINAL_X11_SCREEN_H
+#define __TERMINAL_X11_SCREEN_H
 
 #include <Yttrium/screen.h>
 
@@ -26,4 +26,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __DISPLAY_X11_SCREEN_H
+#endif // __TERMINAL_X11_SCREEN_H

@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_SCREEN_H
-#define __DISPLAY_SCREEN_H
+#ifndef __TERMINAL_SCREEN_H
+#define __TERMINAL_SCREEN_H
 
 #include <Yttrium/global.h>
 
@@ -9,4 +9,4 @@
 	#include "windows/screen.h"
 #endif
 
-#endif // __DISPLAY_SCREEN_H
+#endif // __TERMINAL_SCREEN_H

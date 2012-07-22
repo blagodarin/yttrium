@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_X11_WINDOW_H
-#define __DISPLAY_X11_WINDOW_H
+#ifndef __TERMINAL_X11_WINDOW_H
+#define __TERMINAL_X11_WINDOW_H
 
 #include <Yttrium/window.h>
 
@@ -43,4 +43,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __DISPLAY_X11_WINDOW_H
+#endif // __TERMINAL_X11_WINDOW_H

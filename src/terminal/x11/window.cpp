@@ -246,7 +246,7 @@ bool Window::get_frame_sync(bool *frame_sync)
 	return false;
 }
 
-bool Window::open(const Screen &screen, WindowCallbacks *callbacks, Allocator *allocator)
+bool Window::open(const Screen &screen, Callbacks *callbacks, Allocator *allocator)
 {
 	close();
 

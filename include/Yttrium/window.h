@@ -63,7 +63,7 @@ public:
 
 	///
 
-	Window(const Screen &screen, WindowCallbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept
+	Window(const Screen &screen, Callbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept
 		//: Window() // TODO: Uncomment.
 		: _private(nullptr)
 		, _callbacks(nullptr)
@@ -105,7 +105,7 @@ public:
 
 	///
 
-	bool open(const Screen &screen, WindowCallbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept;
+	bool open(const Screen &screen, Callbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 

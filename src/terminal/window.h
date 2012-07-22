@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_WINDOW_H
-#define __DISPLAY_WINDOW_H
+#ifndef __TERMINAL_WINDOW_H
+#define __TERMINAL_WINDOW_H
 
 #include <Yttrium/global.h>
 
@@ -9,4 +9,4 @@
 	#include "windows/window.h"
 #endif
 
-#endif // __DISPLAY_WINDOW_H
+#endif // __TERMINAL_WINDOW_H
