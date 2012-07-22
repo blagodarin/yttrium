@@ -202,13 +202,13 @@ protected:
 	{
 	}
 
-	void to_string(String *result, int indentation, bool node) const;
+	Y_PRIVATE void to_string(String *result, int indentation, bool node) const;
 
 private:
 
-	Value *append(const StaticString &string, const String::Reference &);
+	Y_PRIVATE Value *append(const StaticString &string, const String::Reference &);
 
-	void append(Value *value);
+	Y_PRIVATE void append(Value *value);
 
 private:
 

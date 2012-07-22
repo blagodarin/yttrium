@@ -48,9 +48,9 @@ public:
 
 private:
 
-	Node(Document *document, const StaticString &name);
+	Y_PRIVATE Node(Document *document, const StaticString &name);
 
-	Node(Document *document, const StaticString &name, const String::Reference &);
+	Y_PRIVATE Node(Document *document, const StaticString &name, const String::Reference &);
 
 private:
 

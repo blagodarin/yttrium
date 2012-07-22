@@ -59,6 +59,10 @@ public:
 
 	bool open() noexcept;
 
+	///
+
+	char printable(Key key) noexcept;
+
 	/// Let the terminal process window events.
 	/// \return \c false if the window was closed, \c true otherwise.
 
@@ -110,13 +114,13 @@ public:
 
 private:
 
-	void set_active(bool active);
+	Y_PRIVATE void set_active(bool active);
 
 private: // WindowCallbacks
 
-	virtual void on_focus_event(Window *window, bool is_focused) noexcept;
+	Y_PRIVATE virtual void on_focus_event(Window *window, bool is_focused) noexcept;
 
-	virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept;
+	Y_PRIVATE virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept;
 
 private:
 
@@ -129,6 +133,7 @@ private:
 	bool       _is_cursor_locked;
 	Dim2       _size;
 	Mode       _mode;
+	KeyState   _keys[KeyType(Key::__Count)];
 };
 
 } // namespace Yttrium

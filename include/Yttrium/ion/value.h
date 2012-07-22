@@ -110,13 +110,13 @@ public:
 
 private:
 
-	Value(Document *document);
+	Y_PRIVATE Value(Document *document);
 
-	Value(Document *document, const StaticString &string);
+	Y_PRIVATE Value(Document *document, const StaticString &string);
 
-	Value(Document *document, const StaticString &string, const String::Reference &);
+	Y_PRIVATE Value(Document *document, const StaticString &string, const String::Reference &);
 
-	Value(Document *document, Object *object);
+	Y_PRIVATE Value(Document *document, Object *object);
 
 private:
 

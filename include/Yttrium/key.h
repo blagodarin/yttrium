@@ -9,9 +9,13 @@
 namespace Yttrium
 {
 
+/// Underlying Key type.
+
+typedef uint_fast8_t KeyType;
+
 /// Input key.
 
-enum class Key: uint_fast8_t
+enum class Key: KeyType
 {
 	// Null key (0x00):
 

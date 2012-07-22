@@ -42,7 +42,7 @@ public:
 
 	private:
 
-		Writer(LogManager *log_manager) noexcept;
+		Y_PRIVATE Writer(LogManager *log_manager) noexcept;
 
 	private:
 

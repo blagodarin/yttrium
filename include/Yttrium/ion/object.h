@@ -23,7 +23,7 @@ class Value;
 
 ///
 
-class Object: public Noncopyable
+class Y_API Object: public Noncopyable
 {
 	friend class Document;
 	friend class Parser;
@@ -132,13 +132,13 @@ public:
 
 private: // TODO: protected:
 
-	Object(Document *document);
+	Y_PRIVATE Object(Document *document);
 
-	Node *append(const StaticString &name, const String::Reference &);
+	Y_PRIVATE Node *append(const StaticString &name, const String::Reference &);
 
-	void clear();
+	Y_PRIVATE void clear();
 
-	void to_string(String *result, int indentation, bool document) const noexcept;
+	Y_PRIVATE void to_string(String *result, int indentation, bool document) const noexcept;
 
 private:
 

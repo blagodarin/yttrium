@@ -57,19 +57,19 @@ public:
 
 private:
 
-	Value *new_list_value();
+	Y_PRIVATE Value *new_list_value();
 
-	Node *new_node(const StaticString &name);
+	Y_PRIVATE Node *new_node(const StaticString &name);
 
-	Node *new_node(const StaticString &name, const String::Reference &);
+	Y_PRIVATE Node *new_node(const StaticString &name, const String::Reference &);
 
-	Object *new_object();
+	Y_PRIVATE Object *new_object();
 
-	Value *new_object_value(Object *object);
+	Y_PRIVATE Value *new_object_value(Object *object);
 
-	Value *new_value(const StaticString &text);
+	Y_PRIVATE Value *new_value(const StaticString &text);
 
-	Value *new_value(const StaticString &name, const String::Reference &);
+	Y_PRIVATE Value *new_value(const StaticString &name, const String::Reference &);
 
 private:
 

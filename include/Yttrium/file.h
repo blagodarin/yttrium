@@ -205,7 +205,7 @@ protected:
 	{
 	}
 
-	File(Private *private_, UOffset base, UOffset size) noexcept;
+	Y_PRIVATE File(Private *private_, UOffset base, UOffset size) noexcept;
 
 private:
 

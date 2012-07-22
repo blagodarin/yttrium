@@ -129,19 +129,19 @@ Key Window::Private::decode_key(::XEvent &event)
 
 	if (key_sym >= XK_0 && key_sym <= XK_9)
 	{
-		return static_cast<Key>(static_cast< ::KeySym>(Key::_0) + key_sym - XK_0);
+		return static_cast<Key>(KeyType(Key::_0) + key_sym - XK_0);
 	}
 	else if (key_sym >= XK_a && key_sym <= XK_z)
 	{
-		return static_cast<Key>(static_cast< ::KeySym>(Key::A) + key_sym - XK_a);
+		return static_cast<Key>(KeyType(Key::A) + key_sym - XK_a);
 	}
 	else if (key_sym >= XK_F1 && key_sym <= XK_F24)
 	{
-		return static_cast<Key>(static_cast< ::KeySym>(Key::F1) + key_sym - XK_F1);
+		return static_cast<Key>(KeyType(Key::F1) + key_sym - XK_F1);
 	}
 	else if (key_sym >= XK_KP_0 && key_sym <= XK_KP_9)
 	{
-		return static_cast<Key>(static_cast< ::KeySym>(Key::Num0) + key_sym - XK_KP_0);
+		return static_cast<Key>(KeyType(Key::Num0) + key_sym - XK_KP_0);
 	}
 	else switch (key_sym)
 	{

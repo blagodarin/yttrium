@@ -360,13 +360,13 @@ public:
 
 private:
 
-	void grow(size_t buffer_size);
+	Y_PRIVATE void grow(size_t buffer_size);
 
-	void init();
+	Y_PRIVATE void init();
 
-	void init(const char *string, size_t size);
+	Y_PRIVATE void init(const char *string, size_t size);
 
-	char *init(size_t buffer_size);
+	Y_PRIVATE char *init(size_t buffer_size);
 
 private:
 

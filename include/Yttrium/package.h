@@ -234,7 +234,7 @@ public:
 
 private:
 
-	File open_packed(const StaticString &name) const;
+	Y_PRIVATE File open_packed(const StaticString &name) const;
 
 private:
 

@@ -1,5 +1,7 @@
 #include <Yttrium/terminal.h>
 
+#include <cstring> // memset
+
 namespace Yttrium
 {
 
@@ -11,6 +13,7 @@ Terminal::Terminal(Allocator* allocator)
 	, _size(320, 240) // NOTE: Magic default.
 	, _mode(Windowed)
 {
+	memset(_keys, 0, sizeof(_keys));
 }
 
 void Terminal::close()
@@ -45,6 +48,49 @@ bool Terminal::open()
 	}
 
 	return false;
+}
+
+char Terminal::printable(Key key)
+{
+	// TODO: Update this dumb English-bound implementation.
+
+	static const char char_count = 0x30;
+
+	static const char lo_map[char_count] =
+	{
+		'0', '1', '2', '3', '4', '5', '6', '7',
+		'8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+		'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+		'w', 'x', 'y', 'z', ',', '.', ';','\'',
+		'/','\\', '[', ']', '-', '=', '`', ' ',
+	};
+
+	static const char hi_map[char_count] =
+	{
+		')', '!', '@', '#', '$', '%', '^', '&',
+		'*', '(', 'A', 'B', 'C', 'D', 'E', 'F',
+		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+		'W', 'X', 'Y', 'Z', '<', '>', ':', '"',
+		'?', '|', '{', '}', '_', '+', '~', ' ',
+	};
+
+	if (key >= Key::_0 && key <= Key::Space)
+	{
+		if (_keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)])
+		{
+			return hi_map[KeyType(key) - KeyType(Key::_0)];
+		}
+		else
+		{
+			return lo_map[KeyType(key) - KeyType(Key::_0)];
+		}
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 bool Terminal::process_events()
@@ -162,7 +208,26 @@ void Terminal::on_focus_event(Window *window, bool is_focused)
 
 void Terminal::on_key_event(Window *window, Key key, bool is_pressed)
 {
-	// TODO: Handle input key.
+	KeyState state;
+
+	switch (key)
+	{
+	case Key::WheelUp:
+	case Key::WheelDown:
+	case Key::WheelLeft:
+	case Key::WheelRight:
+
+		state = (is_pressed ? 1 : 0);
+		break;
+
+	default:
+
+		state = (is_pressed ? _keys[static_cast<KeyType>(key)] + 1 : 0);
+		_keys[static_cast<KeyType>(key)] = state;
+		break;
+	}
+
+	// TODO: Notify GUI, custom key handler and scripted bindings (for state <= 1).
 }
 
 } // namespace Yttrium
