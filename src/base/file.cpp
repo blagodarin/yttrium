@@ -52,7 +52,7 @@ bool File::read_all(String *string)
 		// This way we shall have the same behavior for both files larger
 		// than the free space and files larger than all the allocatable space.
 
-		string->resize(max<UOffset>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
+		string->resize(min<UOffset>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
 		if (read(string->text(), string->size()))
 		{
 			return true;
