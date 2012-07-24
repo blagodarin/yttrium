@@ -14,6 +14,11 @@ namespace Yttrium
 File::Private::~Private()
 {
 	::close(descriptor);
+
+	if (auto_remove)
+	{
+		::unlink(name.const_text());
+	}
 }
 
 bool File::flush()
@@ -46,20 +51,55 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 	if (!_private)
 	{
 		_private = new(allocator->allocate<Private>())
-			Private(descriptor, mode, allocator);
-
-		if ((_private->mode & (Read | Write | Pipe)) == Read)
-		{
-			_size = lseek(descriptor, 0, SEEK_END);
-		}
+			Private(allocator);
 	}
-	else
+
+	_private->descriptor = descriptor;
+	_private->mode = mode;
+
+	if ((_private->mode & (Read | Write | Pipe)) == Read)
 	{
-		_private->descriptor = descriptor;
-		_private->mode = mode;
+		_size = lseek(descriptor, 0, SEEK_END);
 	}
 
 	return true;
+}
+
+bool File::open(Special special, Allocator *allocator)
+{
+	close();
+
+	switch (special)
+	{
+	case Temporary:
+
+		{
+			String name(Y_S("/tmp/XXXXXX"), allocator);
+
+			int descriptor = ::mkstemp(name.text());
+
+			if (descriptor == -1)
+			{
+				break;
+			}
+
+			if (!_private)
+			{
+				_private = new(allocator->allocate<Private>())
+					Private(allocator);
+			}
+
+			_private->descriptor = descriptor;
+			_private->mode = Read | Write;
+			_private->name = name;
+			_private->auto_remove = true;
+
+			return true;
+		}
+		break;
+	}
+
+	return false;
 }
 
 size_t File::read(void *buffer, size_t size)

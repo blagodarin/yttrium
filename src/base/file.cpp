@@ -1,5 +1,6 @@
 #include "file.h"
 
+#include <Yttrium/buffer.h>
 #include <Yttrium/package.h>
 #include <Yttrium/string.h>
 
@@ -17,7 +18,6 @@ File::File(const File &file)
 void File::close()
 {
 	Private::release(&_private);
-
 	_offset = 0;
 	_size = 0;
 	_base = 0;
@@ -26,6 +26,11 @@ void File::close()
 bool File::is_opened() const
 {
 	return (_private && (_private->mode & ReadWrite));
+}
+
+StaticString File::name() const
+{
+	return _private->name;
 }
 
 bool File::open(const StaticString &name, Allocator *allocator)
@@ -42,10 +47,26 @@ bool File::open(const StaticString &name, Allocator *allocator)
 	return (_private && (_private->mode & Read));
 }
 
+bool File::read_all(Buffer *buffer)
+{
+	if (_private && (_private->mode & Read))
+	{
+		// We should unconditionally crash if the file is too large.
+		// This way we shall have the same behavior for both files larger
+		// than the free space and files larger than all the allocatable space.
+
+		buffer->resize(min<UOffset>(size(), SIZE_MAX));
+		if (read(buffer->data(), buffer->size()))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool File::read_all(String *string)
 {
-	bool result = false;
-
 	if (_private && (_private->mode & Read))
 	{
 		// We should unconditionally crash if the file is too large.
@@ -59,7 +80,7 @@ bool File::read_all(String *string)
 		}
 	}
 
-	return result;
+	return false;
 }
 
 bool File::read_line(String *string)
@@ -123,7 +144,7 @@ bool File::read_line(String *string)
 
 File &File::operator =(const File &file)
 {
-	close();
+	Private::release(&_private);
 
 	_private = Private::copy(file._private);
 	_offset  = file._offset;

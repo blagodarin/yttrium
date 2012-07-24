@@ -12,6 +12,8 @@ BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
 
 BOOST_AUTO_TEST_CASE(serialization_test)
 {
+	File file(File::Temporary);
+
 	Ion::Document document;
 
 	String expected;
@@ -19,26 +21,26 @@ BOOST_AUTO_TEST_CASE(serialization_test)
 
 	BOOST_REQUIRE(document.load("tests/ion/original.ion"));
 
-	document.save("tmp.ion");
+	document.save(file.name());
 
 	BOOST_REQUIRE(File("tests/ion/indented.ion").read_all(&expected));
-	BOOST_REQUIRE(File("tmp.ion").read_all(&actual));
+	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 
-	BOOST_REQUIRE(document.load("tmp.ion"));
+	BOOST_REQUIRE(document.load(file.name()));
 
-	document.save("tmp.ion", Ion::DontIndent);
+	document.save(file.name(), Ion::DontIndent);
 
 	BOOST_REQUIRE(File("tests/ion/unindented.ion").read_all(&expected));
-	BOOST_REQUIRE(File("tmp.ion").read_all(&actual));
+	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 
-	BOOST_REQUIRE(document.load("tmp.ion"));
+	BOOST_REQUIRE(document.load(file.name()));
 
-	document.save("tmp.ion");
+	document.save(file.name());
 
 	BOOST_REQUIRE(File("tests/ion/indented.ion").read_all(&expected));
-	BOOST_REQUIRE(File("tmp.ion").read_all(&actual));
+	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }
 

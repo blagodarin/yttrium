@@ -11,6 +11,7 @@
 namespace Yttrium
 {
 
+class Buffer;
 class PackageReader;
 class PackageWriter;
 class String;
@@ -34,6 +35,13 @@ public:
 		Write     = 1 << 1,       ///<
 		ReadWrite = Read | Write, ///<
 		Pipe      = 1 << 2,       ///< The file is a pipe (has no offset and size).
+	};
+
+	///
+
+	enum Special
+	{
+		Temporary, ///<
 	};
 
 	/// Valid "whences" (origins) for the seek function.
@@ -83,6 +91,18 @@ public:
 
 	///
 
+	explicit File(Special special, Allocator *allocator = DefaultAllocator) noexcept
+		//: File() // TODO: Uncomment.
+		: _private(nullptr)
+		, _offset(0)
+		, _size(0)
+		, _base(0)
+	{
+		open(special, allocator);
+	}
+
+	///
+
 	File(const File &file) noexcept;
 
 	///
@@ -106,6 +126,10 @@ public:
 
 	bool is_opened() const noexcept;
 
+	///
+
+	StaticString name() const noexcept; // TODO: Make valid for all files, not just temporaries.
+
 	/// Return the current file offset.
 	/// \return Current offset.
 
@@ -122,6 +146,10 @@ public:
 
 	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
 
+	///
+
+	bool open(Special special, Allocator *allocator = DefaultAllocator) noexcept;
+
 	/// Read the specified amount of bytes into the buffer.
 	/// \return Number of bytes read or 0 on failure.
 
@@ -136,6 +164,10 @@ public:
 	{
 		return (read(buffer, sizeof(T)) == sizeof(T));
 	}
+
+	///
+
+	bool read_all(Buffer *buffer) noexcept;
 
 	///
 

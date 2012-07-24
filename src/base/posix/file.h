@@ -3,6 +3,7 @@
 
 #include <Yttrium/file.h>
 #include <Yttrium/noncopyable.h>
+#include <Yttrium/string.h>
 
 #include "../private_base.h"
 
@@ -13,15 +14,19 @@ class Y_PRIVATE File::Private: public PrivateBase<File::Private>
 {
 public:
 
-	int  descriptor;
-	Mode mode;
+	int    descriptor;
+	Mode   mode;
+	String name;
+	bool   auto_remove;
 
 public:
 
-	Private(int descriptor = -1, Mode mode = 0, Allocator *allocator = nullptr)
+	Private(Allocator *allocator = nullptr)
 		: PrivateBase(allocator)
-		, descriptor(descriptor)
-		, mode(mode)
+		, descriptor(-1)
+		, mode(0)
+		, name(allocator)
+		, auto_remove(false)
 	{
 	}
 
