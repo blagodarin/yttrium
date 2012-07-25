@@ -1,5 +1,7 @@
 #include <Yttrium/buffer.h>
 
+#include <cstring> // memcmp
+
 namespace Yttrium
 {
 
@@ -29,6 +31,16 @@ void Buffer::resize(size_t size)
 		_data = (_data ? _allocator->reallocate(_data, size) : _allocator->allocate(size));
 		_size = size;
 	}
+}
+
+bool Buffer::operator ==(const Buffer& buffer) const
+{
+	return (_size == buffer._size && !memcmp(_data, buffer._data, _size));
+}
+
+bool Buffer::operator !=(const Buffer& buffer) const
+{
+	return (_size != buffer._size || memcmp(_data, buffer._data, _size));
 }
 
 } // namespace Yttrium

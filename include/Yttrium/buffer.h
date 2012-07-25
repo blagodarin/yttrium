@@ -84,6 +84,16 @@ public:
 		return _size;
 	}
 
+public:
+
+	///
+
+	bool operator ==(const Buffer& buffer) const noexcept;
+
+	///
+
+	bool operator !=(const Buffer& buffer) const noexcept;
+
 private:
 
 	void      *_data;

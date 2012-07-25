@@ -14,3 +14,8 @@ Yttrium:
 
     ION:
     - Make the compact form even more compact.
+
+Tests:
+- Merge multiple almost identical test build scripts into one.
+- Add audio test.
+- Add package test.
