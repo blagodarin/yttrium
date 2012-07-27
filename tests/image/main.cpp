@@ -3,7 +3,7 @@
 #include <Yttrium/image.h>
 #include <Yttrium/memory_manager.h>
 
-#define BOOST_TEST_MODULE Image tests
+#define BOOST_TEST_MODULE image
 
 #include <boost/test/unit_test.hpp>
 

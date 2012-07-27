@@ -1,6 +1,0 @@
-Import('env')
-build = env.Clone(BUILD = '.build')
-build.VariantDir('$BUILD', '.', duplicate = 0)
-test = build.Program('#/bin/tests/static_string', build.Glob('$BUILD/*.cpp'))
-build.Clean(test, build.Dir('$BUILD'))
-Return('test')

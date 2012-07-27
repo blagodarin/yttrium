@@ -1,15 +1,25 @@
-import os
-import os.path
-
 Import('env')
 
-test_env = env.Clone()
-test_env.Append(
+build = env.Clone(BUILD = '.build')
+
+build.Append(
 	CPPDEFINES = 'BOOST_TEST_DYN_LINK',
 	LIBS = 'boost_unit_test_framework')
 
+build.VariantDir('$BUILD', '.', duplicate = 0)
+
+# The order is important!
+
+test_paths = [
+	'static_string',
+	'ion',
+	'image']
+
 tests = []
-for test_path in [path for path in os.listdir('.') if os.path.isdir(path) and path[0] != '.']:
-	tests += [test_env.SConscript(dirs = test_path, exports = {'env': test_env})]
+
+for test_path in test_paths:
+	test = build.Program('#/bin/tests/' + test_path, build.Glob('$BUILD/' + test_path + '/*.cpp'))
+	build.Clean(test, build.Dir('$BUILD'))
+	tests += [test]
 
 Return('tests')

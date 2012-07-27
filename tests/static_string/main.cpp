@@ -1,6 +1,6 @@
 #include <Yttrium/static_string.h>
 
-#define BOOST_TEST_MODULE StaticString tests
+#define BOOST_TEST_MODULE static_string
 
 #include <boost/test/unit_test.hpp>
 

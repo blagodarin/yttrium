@@ -2,7 +2,7 @@
 #include <Yttrium/ion.h>
 #include <Yttrium/memory_manager.h>
 
-#define BOOST_TEST_MODULE Ion tests
+#define BOOST_TEST_MODULE ion
 
 #include <boost/test/unit_test.hpp>
 
