@@ -12,6 +12,7 @@ build.VariantDir('$BUILD', '.', duplicate = 0)
 
 test_paths = [
 	'static_string',
+	'file',
 	'ion',
 	'image']
 
