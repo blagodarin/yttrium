@@ -5,18 +5,25 @@
 namespace Yttrium
 {
 
+namespace
+{
+
+StaticString backend_openal = Y_S("openal");
+
+} //
+
 AudioManager::Backends AudioManager::backends()
 {
 	Backends result;
 
-	result.insert(Y_S("openal"));
+	result.insert(backend_openal);
 
 	return result;
 }
 
 AudioManager::Devices AudioManager::backend_devices(const StaticString &backend)
 {
-	if (backend == Y_S("openal"))
+	if (backend == backend_openal)
 	{
 		return OpenAlManager::devices();
 	}
@@ -30,11 +37,19 @@ AudioManager::Private *open_audio_manager(const StaticString &backend, const Sta
 {
 	AudioManager::Private *result = nullptr;
 
-	StaticString backend_used = (!backend.is_empty() ? backend : Y_S("openal"));
+	StaticString backend_used = (!backend.is_empty() ? backend : backend_openal);
 
-	if (backend_used == Y_S("openal"))
+	// Don't assign 'backend_used' to 'result->backend',
+	// it may be 'backend' which may be mutable on the caller side.
+
+	if (backend_used == backend_openal)
 	{
 		result = OpenAlManager::open(device, allocator);
+
+		if (result)
+		{
+			result->_backend_name = backend_openal;
+		}
 	}
 
 	return result;

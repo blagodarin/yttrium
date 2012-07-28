@@ -1,17 +1,16 @@
 #include "manager.h"
 
-#include "../../logging.h"
-
 // TODO: Use script variables.
 
 namespace Yttrium
 {
 
-OpenAlManager::OpenAlManager(ALCdevice *device, ALCcontext *context, Allocator *allocator)
+OpenAlManager::OpenAlManager(ALCdevice *device, ALCcontext *context, const String &device_name, Allocator *allocator)
 	: AudioManager::Private(allocator)
 	, _device(device)
 	, _context(context)
 {
+	_device_name = device_name;
 }
 
 OpenAlManager::~OpenAlManager()
@@ -30,6 +29,7 @@ AudioManager::Devices OpenAlManager::devices()
 	AudioManager::Devices result;
 
 	const ALCchar *devices = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+
 	if (devices)
 	{
 		for (const ALCchar *current = devices; *current; )
@@ -54,7 +54,7 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 
 	if (!audio_device.is_empty())
 	{
-		alc_device = alcOpenDevice(audio_device.text());
+		alc_device = alcOpenDevice(audio_device.const_text());
 	}
 
 	// If no device was specified as a parameter or the specified device failed
@@ -65,7 +65,7 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 //		audio_device = SCRIPT_MANAGER.get("audio_device");
 //		if (audio_device)
 //		{
-//			alc_device = alcOpenDevice(audio_device.text());
+//			alc_device = alcOpenDevice(audio_device.const_text());
 //		}
 //	}
 
@@ -88,12 +88,10 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 
 		if (alc_context)
 		{
-			Y_LOG(Y_S("OpenAL device opened: \"") << audio_device << '"');
-
 			alcMakeContextCurrent(alc_context);
 
 			return new(allocator->allocate<OpenAlManager>())
-				OpenAlManager(alc_device, alc_context, allocator);
+				OpenAlManager(alc_device, alc_context, audio_device, allocator);
 
 			//alcDestroyContext(alc_context);
 		}

@@ -5,10 +5,20 @@
 namespace Yttrium
 {
 
+StaticString AudioManager::backend() const
+{
+	return _private ? _private->_backend_name : StaticString();
+}
+
 void AudioManager::close()
 {
 	_allocator->delete_(_private);
 	_private = nullptr;
+}
+
+StaticString AudioManager::device() const
+{
+	return _private ? _private->_device_name : StaticString();
 }
 
 bool AudioManager::open(const StaticString &backend, const StaticString &device)

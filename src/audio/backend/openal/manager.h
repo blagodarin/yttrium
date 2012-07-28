@@ -12,7 +12,7 @@ class OpenAlManager: public AudioManager::Private
 {
 public:
 
-	OpenAlManager(ALCdevice *device, ALCcontext *context, Allocator *allocator);
+	OpenAlManager(ALCdevice *device, ALCcontext *context, const String &device_name, Allocator *allocator);
 
 	virtual ~OpenAlManager();
 

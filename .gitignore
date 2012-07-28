@@ -1,8 +1,6 @@
-*.log
 *.pyc
 .*
 bin/*
 build.ini
 doc/*
-example*.*
 lib/*

@@ -43,9 +43,23 @@ public:
 		close();
 	}
 
+public:
+
+	/// Get the current backend name.
+	/// \return Audio backend name.
+	/// \note The result is valid through all the library lifetime.
+
+	StaticString backend() const noexcept;
+
 	///
 
 	void close() noexcept;
+
+	/// Get the current backend device name.
+	/// \return Audio output device name.
+	/// \note The result is valid until the manager is closed.
+
+	StaticString device() const noexcept;
 
 	///
 

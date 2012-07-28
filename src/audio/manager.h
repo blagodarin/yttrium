@@ -13,7 +13,8 @@ class Y_PRIVATE AudioManager::Private
 public:
 
 	Private(Allocator *allocator)
-		: _player_private(allocator)
+		: _device_name(allocator)
+		, _player_private(allocator)
 		, _allocator(allocator)
 	{
 	}
@@ -24,6 +25,8 @@ public:
 
 public:
 
+	StaticString         _backend_name;
+	String               _device_name;
 	AudioPlayer::Private _player_private;
 
 protected:
