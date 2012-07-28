@@ -65,22 +65,32 @@ bool YpqReader::open()
 	}
 
 	YpqIndexHeader index_header;
-	YpqIndexEntry  index_entry;
 
 	if (!_file.read(&index_header) || index_header.signature != YpqIndexSignature
-		|| (index_file_header.size - sizeof(index_header)) / sizeof(index_entry) < index_header.size) // TODO: Look for overflows.
+		|| index_file_header.size < sizeof(index_header))
 	{
 		return false;
 	}
 
-	uint32_t index_size = 0;
+	uint32_t index_size = index_file_header.size - sizeof(index_header);
 
 	for (uint32_t i = 0; i < index_header.size; ++i)
 	{
-		if (!_file.read(&index_entry))
+		YpqIndexEntry index_entry;
+
+		if (index_size < sizeof(index_entry))
 		{
 			return false;
 		}
+
+		index_size -= sizeof(index_entry);
+
+		if (!_file.read(&index_entry) || index_size < index_entry.name_size)
+		{
+			return false;
+		}
+
+		index_size -= index_entry.name_size;
 
 		String name(index_entry.name_size, _allocator);
 
@@ -92,13 +102,11 @@ bool YpqReader::open()
 		}
 
 		_index[name] = index_entry.offset;
-
-		index_size += sizeof(index_entry) + index_entry.name_size;
 	}
 
-	if (index_size != sizeof(index_entry) * index_header.size) // TODO: Look for overflows.
+	if (index_size)
 	{
-		return false;
+		return false; // Disallow index padding.
 	}
 
 	return true;

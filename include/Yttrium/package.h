@@ -101,8 +101,8 @@ public:
 
 	enum Mode
 	{
-		Rewrite, ///<
-		Append,  ///<
+		Rewrite, ///< Replace the destination file with the package.
+		Append,  ///< Append the package to the destination file.
 	};
 
 public:

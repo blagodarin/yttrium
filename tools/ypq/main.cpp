@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 		mode = PackageWriter::Append;
 	}
 
-	StaticString index_file_name(argv[argc - 1]);
+	StaticString index_file_name = argv[argc - 1];
 	StaticString index_file_extension = Y_S(".index");
 
 	if (!index_file_name.ends_with(index_file_extension))
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 			continue;
 		}
 
-		String source_name = line.left(separator_index).trimmed();
+		String source_name = line.left(separator_index).trimmed(); // Force zero-terminatedness.
 		StaticString packed_name = line.right(line.size() - separator_index - 1).trimmed();
 
 		if (source_name.is_empty() || packed_name.is_empty())
