@@ -47,21 +47,21 @@ public:
 
 public:
 
-	Vector2(T x = 0, T y = 0)
+	Vector2(T x = 0, T y = 0) noexcept
 		: x(x)
 		, y(y)
 	{
 	}
 
 	template <typename U>
-	Vector2(U x, U y = 0)
+	Vector2(U x, U y = 0) noexcept
 		: x(x)
 		, y(y)
 	{
 	}
 
 	template <typename U>
-	Vector2(const Vector2<U> &v)
+	Vector2(const Vector2<U> &v) noexcept
 		: x(v.x)
 		, y(v.y)
 	{
@@ -69,96 +69,96 @@ public:
 
 public:
 
-	Vector2 operator +(T t) const
+	Vector2 operator +(T t) const noexcept
 	{
 		return Vector2(x + t, y + t);
 	}
 
-	Vector2 &operator +=(T t)
+	Vector2 &operator +=(T t) noexcept
 	{
 		x += t;
 		y += t;
 		return *this;
 	}
 
-	Vector2 operator +(const Vector2 &v) const
+	Vector2 operator +(const Vector2 &v) const noexcept
 	{
 		return Vector2(x + v.x, y + v.y);
 	}
 
-	Vector2 &operator +=(const Vector2 &v)
+	Vector2 &operator +=(const Vector2 &v) noexcept
 	{
 		x += v.x;
 		y += v.y;
 		return *this;
 	}
 
-	Vector2 operator -(T t) const
+	Vector2 operator -(T t) const noexcept
 	{
 		return Vector2(x - t, y - t);
 	}
 
-	Vector2 &operator -=(T t)
+	Vector2 &operator -=(T t) noexcept
 	{
 		x -= t;
 		y -= t;
 		return *this;
 	}
 
-	Vector2 operator -(const Vector2 &v) const
+	Vector2 operator -(const Vector2 &v) const noexcept
 	{
 		return Vector2(x - v.x, y - v.y);
 	}
 
-	Vector2 &operator -=(const Vector2 &v)
+	Vector2 &operator -=(const Vector2 &v) noexcept
 	{
 		x -= v.x;
 		y -= v.y;
 		return *this;
 	}
 
-	Vector2 operator *(T t) const
+	Vector2 operator *(T t) const noexcept
 	{
 		return Vector2(x * t, y * t);
 	}
 
-	Vector2 &operator *=(T t)
+	Vector2 &operator *=(T t) noexcept
 	{
 		x *= t;
 		y *= t;
 		return *this;
 	}
 
-	Vector2 operator *(const Vector2 &v) const
+	Vector2 operator *(const Vector2 &v) const noexcept
 	{
 		return Vector2(x * v.x, y * v.y);
 	}
 
-	Vector2 &operator *=(const Vector2 &v)
+	Vector2 &operator *=(const Vector2 &v) noexcept
 	{
 		x *= v.x;
 		y *= v.y;
 		return *this;
 	}
 
-	Vector2 operator /(T t) const
+	Vector2 operator /(T t) const noexcept
 	{
 		return Vector2(x / t, y / t);
 	}
 
-	Vector2 &operator /=(T t)
+	Vector2 &operator /=(T t) noexcept
 	{
 		x /= t;
 		y /= t;
 		return *this;
 	}
 
-	Vector2 operator /(const Vector2 &v) const
+	Vector2 operator /(const Vector2 &v) const noexcept
 	{
 		return Vector2(x / v.x, y / v.y);
 	}
 
-	Vector2 &operator /=(const Vector2 &v)
+	Vector2 &operator /=(const Vector2 &v) noexcept
 	{
 		x /= v.x;
 		y /= v.y;
@@ -217,7 +217,7 @@ public:
 
 public:
 
-	Vector3(T x = 0, T y = 0, T z = 0)
+	Vector3(T x = 0, T y = 0, T z = 0) noexcept
 		: x(x)
 		, y(y)
 		, z(z)
@@ -225,7 +225,7 @@ public:
 	}
 
 	template <typename U>
-	Vector3(U x, U y = 0, U z = 0)
+	Vector3(U x, U y = 0, U z = 0) noexcept
 		: x(x)
 		, y(y)
 		, z(z)
@@ -233,7 +233,7 @@ public:
 	}
 
 	template <typename U>
-	Vector3(const Vector3<U> &v)
+	Vector3(const Vector3<U> &v) noexcept
 		: x(v.x)
 		, y(v.y)
 		, z(v.z)
@@ -242,12 +242,12 @@ public:
 
 public:
 
-	Vector3 operator +(T t) const
+	Vector3 operator +(T t) const noexcept
 	{
 		return Vector3(x + t, y + t, z + t);
 	}
 
-	Vector3 &operator +=(T t)
+	Vector3 &operator +=(T t) noexcept
 	{
 		x += t;
 		y += t;
@@ -255,12 +255,12 @@ public:
 		return *this;
 	}
 
-	Vector3 operator +(const Vector3 &v) const
+	Vector3 operator +(const Vector3 &v) const noexcept
 	{
 		return Vector3(x + v.x, y + v.y, z + v.z);
 	}
 
-	Vector3 &operator +=(const Vector3 &v)
+	Vector3 &operator +=(const Vector3 &v) noexcept
 	{
 		x += v.x;
 		y += v.y;
@@ -268,12 +268,12 @@ public:
 		return *this;
 	}
 
-	Vector3 operator -(T t) const
+	Vector3 operator -(T t) const noexcept
 	{
 		return Vector3(x - t, y - t, z - t);
 	}
 
-	Vector3 &operator -=(T t)
+	Vector3 &operator -=(T t) noexcept
 	{
 		x -= t;
 		y -= t;
@@ -281,12 +281,12 @@ public:
 		return *this;
 	}
 
-	Vector3 operator -(const Vector3 &v) const
+	Vector3 operator -(const Vector3 &v) const noexcept
 	{
 		return Vector3(x - v.x, y - v.y, z - v.z);
 	}
 
-	Vector3 &operator -=(const Vector3 &v)
+	Vector3 &operator -=(const Vector3 &v) noexcept
 	{
 		x -= v.x;
 		y -= v.y;
@@ -294,12 +294,12 @@ public:
 		return *this;
 	}
 
-	Vector3 operator *(T t) const
+	Vector3 operator *(T t) const noexcept
 	{
 		return Vector3(x * t, y * t, z * t);
 	}
 
-	Vector3 &operator *=(T t)
+	Vector3 &operator *=(T t) noexcept
 	{
 		x *= t;
 		y *= t;
@@ -307,12 +307,12 @@ public:
 		return *this;
 	}
 
-	Vector3 operator *(const Vector3 &v) const
+	Vector3 operator *(const Vector3 &v) const noexcept
 	{
 		return Vector3(x * v.x, y * v.y, z * v.z);
 	}
 
-	Vector3 &operator *=(const Vector3 &v)
+	Vector3 &operator *=(const Vector3 &v) noexcept
 	{
 		x *= v.x;
 		y *= v.y;
@@ -359,7 +359,7 @@ public:
 
 public:
 
-	Vector4(T x = 0, T y = 0, T z = 0, T w = 1)
+	Vector4(T x = 0, T y = 0, T z = 0, T w = 1) noexcept
 		: x(x)
 		, y(y)
 		, z(z)
@@ -368,7 +368,7 @@ public:
 	}
 
 	template <typename U>
-	Vector4(U x, U y = 0, U z = 0, U w = 1)
+	Vector4(U x, U y = 0, U z = 0, U w = 1) noexcept
 		: x(x)
 		, y(y)
 		, z(z)
@@ -377,7 +377,7 @@ public:
 	}
 
 	template <typename U>
-	Vector4(const Vector4<U> &v)
+	Vector4(const Vector4<U> &v) noexcept
 		: x(v.x)
 		, y(v.y)
 		, z(v.z)
@@ -387,12 +387,12 @@ public:
 
 public:
 
-	Vector4 operator +(T t) const
+	Vector4 operator +(T t) const noexcept
 	{
 		return Vector4(x + t, y + t, z + t, w);
 	}
 
-	Vector4 &operator +=(T t)
+	Vector4 &operator +=(T t) noexcept
 	{
 		x += t;
 		y += t;
@@ -400,12 +400,12 @@ public:
 		return *this;
 	}
 
-	Vector4 operator +(const Vector4 &v) const
+	Vector4 operator +(const Vector4 &v) const noexcept
 	{
 		return Vector4(x + v.x, y + v.y, z + v.z, w);
 	}
 
-	Vector4 &operator +=(const Vector4 &v)
+	Vector4 &operator +=(const Vector4 &v) noexcept
 	{
 		x += v.x;
 		y += v.y;
@@ -413,12 +413,12 @@ public:
 		return *this;
 	}
 
-	Vector4 operator -(T t) const
+	Vector4 operator -(T t) const noexcept
 	{
 		return Vector4(x - t, y - t, z - t, w);
 	}
 
-	Vector4 &operator -=(T t)
+	Vector4 &operator -=(T t) noexcept
 	{
 		x -= t;
 		y -= t;
@@ -426,12 +426,12 @@ public:
 		return *this;
 	}
 
-	Vector4 operator -(const Vector4 &v) const
+	Vector4 operator -(const Vector4 &v) const noexcept
 	{
 		return Vector4(x - v.x, y - v.y, z - v.z, w);
 	}
 
-	Vector4 &operator -=(const Vector4 &v)
+	Vector4 &operator -=(const Vector4 &v) noexcept
 	{
 		x -= v.x;
 		y -= v.y;
@@ -439,12 +439,12 @@ public:
 		return *this;
 	}
 
-	Vector4 operator *(T t) const
+	Vector4 operator *(T t) const noexcept
 	{
 		return Vector4(x * t, y * t, z * t, w);
 	}
 
-	Vector4 &operator *=(T t)
+	Vector4 &operator *=(T t) noexcept
 	{
 		x *= t;
 		y *= t;
@@ -452,12 +452,12 @@ public:
 		return *this;
 	}
 
-	Vector4 operator *(const Vector4 &v) const
+	Vector4 operator *(const Vector4 &v) const noexcept
 	{
 		return Vector4(x * v.x, y * v.y, z * v.z, w);
 	}
 
-	Vector4 &operator *=(const Vector4 &v)
+	Vector4 &operator *=(const Vector4 &v) noexcept
 	{
 		x *= v.x;
 		y *= v.y;

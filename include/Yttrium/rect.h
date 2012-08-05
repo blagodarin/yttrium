@@ -16,64 +16,136 @@ class Rect
 {
 public:
 
-	T x;
-	T y;
-	T width;
-	T height;
+	///
 
-public:
-
-	Rect(T x = 0, T y = 0, T width = 0, T height = 0)
-		: x(x)
-		, y(y)
-		, width(width)
-		, height(height)
+	Rect(T x = 0, T y = 0, T width = 0, T height = 0) noexcept
+		: _x1(x)
+		, _y1(y)
+		, _x2(x + width)
+		, _y2(y + height)
 	{
 	}
 
-	Rect(const Vector2<T> &size)
-		: x(0)
-		, y(0)
-		, width(size.width)
-		, height(size.height)
+	///
+
+	Rect(const Vector2<T> &size) noexcept
+		: _x1(0)
+		, _y1(0)
+		, _x2(size.width)
+		, _y2(size.height)
 	{
 	}
 
-	Rect(const Vector2<T> &corner, const Vector2<T> &size)
-		: x(corner.x)
-		, y(corner.y)
-		, width(size.width)
-		, height(size.height)
+	///
+
+	Rect(const Vector2<T> &corner, const Vector2<T> &size) noexcept
+		: _x1(corner.x)
+		, _y1(corner.y)
+		, _x2(corner.x + size.width)
+		, _y2(corner.y + size.height)
 	{
 	}
+
+	///
 
 	template <typename U>
-	Rect(const Rect<U> &r)
-		: x(r.x)
-		, y(r.y)
-		, width(r.width)
-		, height(r.height)
+	Rect(const Rect<U> &rect) noexcept
+		: _x1(rect._x1)
+		, _y1(rect._y1)
+		, _x2(rect._x2)
+		, _y2(rect._y2)
 	{
+	}
+
+	///
+
+	T height() const noexcept
+	{
+		return _y2 - _y1;
+	}
+
+	///
+
+	T width() const noexcept
+	{
+		return _x2 - _x1;
+	}
+
+	///
+
+	T x() const noexcept
+	{
+		return _x1;
+	}
+
+	///
+
+	T x1() const noexcept
+	{
+		return _x1;
+	}
+
+	///
+
+	T x2() const noexcept
+	{
+		return _x2;
+	}
+
+	///
+
+	T y() const noexcept
+	{
+		return _y1;
+	}
+
+	///
+
+	T y1() const noexcept
+	{
+		return _y1;
+	}
+
+	///
+
+	T y2() const noexcept
+	{
+		return _y2;
 	}
 
 public:
 
-	bool contains(const Vector2<T> &v) const
+	///
+
+	bool contains(const Vector2<T> &point) const noexcept
 	{
-		return (x <= v.x && y <= v.y && x + width >= v.x && y + height >= v.y);
+		return _x1 <= point.x && point.x <= _x2
+			&& _y1 <= point.y && point.y <= _y2;
 	}
 
-	bool contains(const Rect &r) const
+	///
+
+	bool contains(const Rect &rect) const noexcept
 	{
-		return (x <= r.x && y <= r.y && x + width >= r.x + r.width && y + height >= r.x + r.height);
+		return _x1 <= rect._x1 && rect._x2 <= _x2
+			&& _y1 <= rect._y1 && rect._y2 <= _y2;
 	}
 
 public:
 
-	static Rect from_coords(const T &x1, const T &y1, const T &x2, const T &y2)
+	///
+
+	static Rect from_coords(const T &x1, const T &y1, const T &x2, const T &y2) noexcept
 	{
 		return Rect(x1, y1, x2 - x1, y2 - y1);
 	}
+
+private:
+
+	T _x1;
+	T _y1;
+	T _x2;
+	T _y2;
 };
 
 /// Rect of \c float.

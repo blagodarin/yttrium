@@ -33,20 +33,20 @@ void Renderer::Private::draw_rectangle(const Rectf &position, const Rectf &textu
 
 	vertex.color = _color;
 
-	vertex.position = Vector2f(position.x, position.y);
-	vertex.texture = Vector2f(texture.x, texture.y);
+	vertex.position = Vector2f(position.x1(), position.y1());
+	vertex.texture = Vector2f(texture.x1(), texture.y1());
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = Vector2f(position.x, position.y + position.height);
-	vertex.texture = Vector2f(texture.x, texture.y + texture.height);
+	vertex.position = Vector2f(position.x1(), position.y2());
+	vertex.texture = Vector2f(texture.x1(), texture.y2());
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = Vector2f(position.x + position.width, position.y + position.height);
-	vertex.texture = Vector2f(texture.x + texture.width, texture.y + texture.height);
+	vertex.position = Vector2f(position.x2(), position.y2());
+	vertex.texture = Vector2f(texture.x2(), texture.y2());
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = Vector2f(position.x + position.width, position.y);
-	vertex.texture = Vector2f(texture.x + texture.width, texture.y);
+	vertex.position = Vector2f(position.x2(), position.y1());
+	vertex.texture = Vector2f(texture.x2(), texture.y1());
 	_vertices_2d.push_back(vertex);
 
 	_indices_2d.push_back(index + 0);

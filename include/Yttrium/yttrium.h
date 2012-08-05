@@ -21,6 +21,7 @@
 #include <Yttrium/pool.h>
 #include <Yttrium/proxy_allocator.h>
 #include <Yttrium/rect.h>
+#include <Yttrium/renderer.h>
 #include <Yttrium/screen.h>
 #include <Yttrium/signal.h>
 #include <Yttrium/static_string.h>
