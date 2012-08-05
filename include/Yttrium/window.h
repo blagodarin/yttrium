@@ -27,6 +27,8 @@ public:
 	{
 	public:
 
+		Callbacks() = default;
+
 		///
 
 		virtual void on_focus_event(Window *window, bool is_focused) noexcept = 0;
@@ -124,6 +126,10 @@ public:
 	///
 
 	bool process_events() noexcept;
+
+	///
+
+	Renderer renderer() noexcept;
 
 	///
 

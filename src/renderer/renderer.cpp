@@ -201,4 +201,9 @@ Renderer::Renderer(Window *window, Backend backend, Allocator *allocator)
 {
 }
 
+Renderer::Renderer(Private *private_)
+	: _private(Private::copy(private_))
+{
+}
+
 } // namespace Yttrium

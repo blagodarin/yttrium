@@ -27,6 +27,11 @@ Renderer Window::create_renderer(Renderer::Backend backend, Allocator *allocator
 	return Renderer(this, backend, allocator ? allocator : _private->_allocator);
 }
 
+Renderer Window::renderer()
+{
+	return Renderer(_private ? _private->_renderer : nullptr);
+}
+
 Window &Window::operator =(const Window &window)
 {
 	close();

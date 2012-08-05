@@ -13,6 +13,8 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	, _size(320, 240) // NOTE: Magic default.
 	, _mode(Windowed)
 	, _callbacks(callbacks)
+	, _console(*this)
+	, _is_console_visible(false)
 {
 	memset(_keys, 0, sizeof(_keys));
 }
@@ -20,6 +22,19 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 void Terminal::close()
 {
 	_window.terminate();
+}
+
+void Terminal::draw_console(RendererBuiltin *renderer)
+{
+	if (_is_console_visible)
+	{
+		const Dim2 &size = renderer->size();
+
+		renderer->set_color(0, 0, 0, 0.5);
+		renderer->draw_image(0, 0, size.width + 1, 1);
+
+		_console.render_input(renderer, 0, 0, size.width);
+	}
 }
 
 void Terminal::lock_cursor(bool lock)
@@ -51,7 +66,7 @@ bool Terminal::open()
 	return false;
 }
 
-char Terminal::printable(Key key)
+char Terminal::printable(Key key) const
 {
 	// TODO: Update this dumb English-bound implementation.
 
@@ -238,6 +253,19 @@ void Terminal::on_key_event(Window *, Key key, bool is_pressed)
 	if (false) // TODO: Notify GUI.
 	{
 		return;
+	}
+
+	if (_is_console_visible && is_pressed)
+	{
+		if (key == Key::Grave)
+		{
+			_is_console_visible = false;
+			return;
+		}
+		else if (_console.process_key(key))
+		{
+			return;
+		}
 	}
 
 	if (_callbacks && _callbacks->on_key_event(this, key, state))

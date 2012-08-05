@@ -40,11 +40,20 @@ public:
 
 	///
 
-	void draw_text(Dim x, Dim y, const StaticString &text, Dim max_size) noexcept;
+	void draw_text(Dim x, Dim y, const StaticString &text, Dim max_size = -1) noexcept;
 
 	/// Set the drawing color to \a color.
 
 	void set_color(const Vector4f &color) noexcept;
+
+	/**
+	* \overload
+	*/
+
+	void set_color(float r, float g, float b, float a = 1) noexcept
+	{
+		set_color(Vector4f(r, g, b, a));
+	}
 
 	///
 

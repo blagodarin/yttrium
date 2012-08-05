@@ -4,10 +4,13 @@
 #ifndef __Y_TERMINAL_H
 #define __Y_TERMINAL_H
 
+#include <Yttrium/terminal/console.h>
 #include <Yttrium/window.h>
 
 namespace Yttrium
 {
+
+class RendererBuiltin;
 
 /// Incapsulation of Screen and Window classes and input management.
 
@@ -64,6 +67,10 @@ public:
 
 	///
 
+	void draw_console(RendererBuiltin *renderer) noexcept;
+
+	///
+
 	bool is_cursor_locked() const noexcept
 	{
 		return _is_cursor_locked;
@@ -79,7 +86,7 @@ public:
 
 	///
 
-	char printable(Key key) noexcept;
+	char printable(Key key) const noexcept;
 
 	/// Let the terminal process window events.
 	/// \return \c false if the window was closed, \c true otherwise.
@@ -104,6 +111,13 @@ public:
 	void resize(Dim width, Dim height) noexcept
 	{
 		resize(Dim2(width, height));
+	}
+
+	///
+
+	void set_console_visible(bool visible) noexcept
+	{
+		_is_console_visible = visible;
 	}
 
 	///
@@ -160,6 +174,8 @@ private:
 	Mode       _mode;
 	KeyState   _keys[KeyType(Key::__Count)];
 	Callbacks *_callbacks;
+	Console    _console;
+	bool       _is_console_visible;
 };
 
 } // namespace Yttrium
