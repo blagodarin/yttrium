@@ -88,6 +88,13 @@ public:
 
 	///
 
+	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept
+	{
+		return _window.create_renderer(backend, allocator ? allocator : _allocator);
+	}
+
+	///
+
 	void resize(const Dim2 &size) noexcept;
 
 	/**
@@ -134,7 +141,7 @@ private:
 
 	Y_PRIVATE void set_active(bool active);
 
-private: // WindowCallbacks
+private: // Window::Callbacks
 
 	Y_PRIVATE virtual void on_focus_event(Window *window, bool is_focused) noexcept;
 

@@ -8,7 +8,7 @@ namespace Yttrium
 namespace Gl
 {
 
-Address address(Window *window, const char *name)
+Address address(Window *, const char *name)
 {
 	return reinterpret_cast<Address>(glXGetProcAddress(reinterpret_cast<const GLubyte *>(name))); // NOTE: Kaboom? (GLX 1.3)
 }

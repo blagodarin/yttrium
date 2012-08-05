@@ -13,6 +13,7 @@ Window::Private::Private(::Display *display, int screen, ::Window window, ::GLXC
 	, _wm_protocols(XInternAtom(display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(XInternAtom(display, "WM_DELETE_WINDOW", True))
 	, _glx_context(glx_context)
+	, _renderer(nullptr)
 {
 	::XSetWMProtocols(display, window, &_wm_delete_window, 1);
 	set_fixed_size(320, 240); // NOTE: Magic default.
@@ -243,6 +244,8 @@ bool Window::get_cursor(Dim2 *cursor)
 
 bool Window::get_frame_sync(bool *frame_sync)
 {
+	Y_UNUSED(frame_sync);
+
 	return false;
 }
 
@@ -406,6 +409,8 @@ bool Window::set_cursor(const Dim2 &cursor)
 
 bool Window::set_frame_sync(bool frame_sync)
 {
+	Y_UNUSED(frame_sync);
+
 	return false;
 }
 

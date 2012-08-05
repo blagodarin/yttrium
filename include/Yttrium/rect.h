@@ -67,6 +67,13 @@ public:
 	{
 		return (x <= r.x && y <= r.y && x + width >= r.x + r.width && y + height >= r.x + r.height);
 	}
+
+public:
+
+	static Rect from_coords(const T &x1, const T &y1, const T &x2, const T &y2)
+	{
+		return Rect(x1, y1, x2 - x1, y2 - y1);
+	}
 };
 
 /// Rect of \c float.

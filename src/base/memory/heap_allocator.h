@@ -12,6 +12,7 @@ public:
 
 	HeapAllocator(Allocator *parent)
 	{
+		Y_UNUSED(parent);
 	}
 
 	virtual ~HeapAllocator() noexcept

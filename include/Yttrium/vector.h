@@ -466,6 +466,8 @@ public:
 	}
 };
 
+typedef Vector4<float> Vector4f; ///<
+
 } // namespace Yttrium
 
 #endif // __Y_VECTOR_H

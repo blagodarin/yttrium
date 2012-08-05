@@ -2,7 +2,7 @@
 
 using namespace Yttrium;
 
-int main(int argc, char **argv)
+int main()
 {
 	MemoryManager memory_manager;
 

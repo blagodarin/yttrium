@@ -19,6 +19,8 @@ SystemAllocatorImpl::SystemAllocatorImpl()
 
 void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
 {
+	Y_UNUSED(align);
+
 	Y_ASSERT(size);
 
 	size_t total_bytes = _page_size * ((reserved_size + size + _page_size - 1) / _page_size);

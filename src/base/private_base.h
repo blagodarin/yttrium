@@ -59,7 +59,7 @@ public:
 		}
 	}
 
-protected:
+public:
 
 	Allocator *_allocator;
 

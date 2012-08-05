@@ -16,7 +16,7 @@ int _ov_seek_callback(void *datasource, ogg_int64_t offset, int whence)
 	return (static_cast<File *>(datasource)->seek(offset, File::Whence(whence)) ? 0 : -1);
 }
 
-int _ov_close_callback(void *datasource)
+int _ov_close_callback(void *)
 {
 	return 0;
 }

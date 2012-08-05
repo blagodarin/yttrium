@@ -22,6 +22,8 @@ public:
 	::Atom      _wm_delete_window;
 	GLXContext  _glx_context;
 
+	Renderer::Private *_renderer; // See Renderer::Private constructor/destructor.
+
 public:
 
 	Private(::Display *display, int screen, ::Window window, ::GLXContext glx_context, Allocator *allocator);

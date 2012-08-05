@@ -209,12 +209,12 @@ void Terminal::set_active(bool active)
 	}
 }
 
-void Terminal::on_focus_event(Window *window, bool is_focused)
+void Terminal::on_focus_event(Window *, bool is_focused)
 {
 	set_active(is_focused);
 }
 
-void Terminal::on_key_event(Window *window, Key key, bool is_pressed)
+void Terminal::on_key_event(Window *, Key key, bool is_pressed)
 {
 	KeyState state;
 

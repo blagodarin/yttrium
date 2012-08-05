@@ -11,6 +11,8 @@ namespace Yttrium
 
 void *HeapAllocator::allocate(size_t size, size_t align, Difference *difference)
 {
+	Y_UNUSED(align);
+
 	void *pointer = malloc(size);
 
 	if (Y_UNLIKELY(!pointer))

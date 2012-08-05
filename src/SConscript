@@ -12,6 +12,8 @@ src = [
 	'base',
 	'base/memory',
 	'renderer',
+	'renderer/builtin',
+	'renderer/gl',
 	'terminal',
 	'image',
 	'ion',

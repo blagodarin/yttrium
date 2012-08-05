@@ -80,7 +80,7 @@ if build_mode == 'debug':
 else:
 	env.Append(CPPDEFINES = ['NDEBUG'])
 
-env.Append(CPPFLAGS = ['-std=gnu++0x', '-Wall']) # We use GCC/MinGW.
+env.Append(CPPFLAGS = ['-std=gnu++0x', '-Wall', '-Wextra']) # We use GCC/MinGW.
 if build_mode == 'release':
 	env.Append(CPPFLAGS = ['-O3']) # We use GCC/MinGW.
 else:

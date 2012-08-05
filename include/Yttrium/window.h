@@ -5,6 +5,7 @@
 #define __Y_WINDOW_H
 
 #include <Yttrium/key.h>
+#include <Yttrium/renderer.h>
 #include <Yttrium/screen.h>
 #include <Yttrium/static_string.h>
 #include <Yttrium/vector.h>
@@ -16,6 +17,8 @@ namespace Yttrium
 
 class Y_API Window
 {
+	friend class Renderer;
+
 public:
 
 	///
@@ -90,6 +93,13 @@ public:
 
 	///
 
+	// NOTE: It may be better to move the backend selection to the Window constructor
+	// because different backends may require different Window internals.
+
+	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept;
+
+	///
+
 	bool get_cursor(Dim2 *cursor) noexcept;
 
 	///
@@ -151,6 +161,12 @@ public:
 	///
 
 	Window &operator =(const Window &window) noexcept;
+
+public:
+
+	///
+
+	static bool is_supported(Renderer::Backend backend) noexcept;
 
 private:
 

@@ -105,7 +105,7 @@
 * 3) Neutralize the supported compilers' differences.
 \******************************************************************************/
 
-// __func__ for MSVC (in MSVC 10.0, __func__ is still not supported).
+// __func__ for MSVC (in MSVC 10.0, __func__ is still unsupported).
 
 #if __Y_MSVC && !defined(__func__)
 	#define __func__ __FUNCTION__
@@ -180,7 +180,7 @@
 \******************************************************************************/
 
 /// \def Y_API
-/// \brief Public API specifier.
+/// \brief Public %Yttrium API specifier.
 
 #if defined(__YTTRIUM)
 	#define Y_API Y_EXPORT
@@ -189,7 +189,7 @@
 #endif
 
 /// \def Y_IS_DEBUG
-/// \brief
+/// \brief Defined to 1 when compiling in the debug mode and to 0 otherwise.
 
 #if defined(_DEBUG) && !defined(NDEBUG)
 	#define Y_IS_DEBUG 1
@@ -200,6 +200,12 @@
 /// Calculate the static \a array length.
 
 #define Y_LENGTH_OF(array) (sizeof(array) / sizeof (array)[0])
+
+/// Mark the specified parameter as unused.
+/// \note Don't use this macro to mark the parameters that are never planned
+/// to be used, prefer the parameter name omission in that case instead.
+
+#define Y_UNUSED(parameter) (void)(parameter)
 
 /// %Yttrium namespace.
 
