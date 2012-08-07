@@ -34,10 +34,7 @@ public:
 
 	///
 
-	Renderer() noexcept
-		: _private(nullptr)
-	{
-	}
+	Renderer() noexcept;
 
 	///
 
@@ -86,10 +83,6 @@ public:
 
 	void set_matrix_2d_width(double width) noexcept;
 
-	///
-
-	void set_viewport(Dim x, Dim y, Dim width, Dim height) noexcept;
-
 	/// Take a screenshot.
 	/// \param name
 	/// \note The screenshot would be actually taken at the end of the frame
@@ -105,10 +98,7 @@ public:
 
 	///
 
-	operator bool() const noexcept
-	{
-		return _private;
-	}
+	operator bool() const noexcept;
 
 	///
 
@@ -128,6 +118,18 @@ private:
 
 	Y_PRIVATE Renderer(Private *private_);
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+inline Renderer::Renderer() noexcept
+	: _private(nullptr)
+{
+}
+
+inline Renderer::operator bool() const noexcept
+{
+	return _private;
+}
 
 } // namespace Yttrium
 

@@ -34,7 +34,7 @@ public:
 
 	virtual void set_matrix_2d(double width, double height) = 0;
 
-	virtual void set_viewport(Dim x, Dim y, Dim width, Dim height) = 0;
+	virtual void set_viewport(const Dim2 &size);
 
 	virtual void take_screenshot() = 0;
 

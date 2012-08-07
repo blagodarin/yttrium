@@ -26,7 +26,7 @@ public: // Renderer::Private
 
 	virtual void set_matrix_2d(double width, double height);
 
-	virtual void set_viewport(Dim x, Dim y, Dim width, Dim height);
+	virtual void set_viewport(const Dim2 &size);
 
 	virtual void take_screenshot();
 

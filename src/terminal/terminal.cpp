@@ -19,6 +19,11 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	memset(_keys, 0, sizeof(_keys));
 }
 
+Terminal::~Terminal()
+{
+	close(); // NOTE: Is this enough?
+}
+
 void Terminal::close()
 {
 	_window.terminate();
@@ -257,7 +262,7 @@ void Terminal::on_key_event(Window *, Key key, bool is_pressed)
 
 	if (_is_console_visible && is_pressed)
 	{
-		if (key == Key::Grave)
+		if (key == Key::Escape)
 		{
 			_is_console_visible = false;
 			return;

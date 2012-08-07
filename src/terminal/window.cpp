@@ -1,6 +1,6 @@
 #include "window.h"
 
-#include <Yttrium/assert.h>
+#include "../renderer/renderer.h"
 
 namespace Yttrium
 {
@@ -24,7 +24,14 @@ Renderer Window::create_renderer(Renderer::Backend backend, Allocator *allocator
 		return Renderer();
 	}
 
-	return Renderer(this, backend, allocator ? allocator : _private->_allocator);
+	Renderer renderer(this, backend, allocator ? allocator : _private->_allocator);
+
+	if (renderer)
+	{
+		renderer._private->set_viewport(_private->_size);
+	}
+
+	return renderer;
 }
 
 Renderer Window::renderer()

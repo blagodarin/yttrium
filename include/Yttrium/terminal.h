@@ -60,6 +60,10 @@ public:
 
 	///
 
+	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept;
+
+	///
+
 	Dim2 cursor() const noexcept
 	{
 		return _cursor;
@@ -92,13 +96,6 @@ public:
 	/// \return \c false if the window was closed, \c true otherwise.
 
 	bool process_events() noexcept;
-
-	///
-
-	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept
-	{
-		return _window.create_renderer(backend, allocator ? allocator : _allocator);
-	}
 
 	///
 
@@ -177,6 +174,13 @@ private:
 	Console    _console;
 	bool       _is_console_visible;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+inline Renderer Terminal::create_renderer(Renderer::Backend backend, Allocator *allocator) noexcept
+{
+	return _window.create_renderer(backend, allocator ? allocator : _allocator);
+}
 
 } // namespace Yttrium
 

@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include "../../renderer/renderer.h"
+
 #include "screen.h"
 
 namespace Yttrium
@@ -286,6 +288,14 @@ bool Window::put(Dim left, Dim top, Dim width, Dim height, PutMode mode)
 	::XChangeWindowAttributes(_private->_display, _private->_window, CWOverrideRedirect, &attributes);
 	::XMoveResizeWindow(_private->_display, _private->_window, left, top, width, height);
 	_private->set_fixed_size(width, height);
+
+	_private->_size = Dim2(width, height);
+
+	if (_private->_renderer)
+	{
+		_private->_renderer->set_viewport(_private->_size);
+	}
+
 	return true;
 }
 

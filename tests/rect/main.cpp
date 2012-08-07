@@ -10,20 +10,15 @@ BOOST_AUTO_TEST_CASE(rect_test)
 {
 	Rect<int> null_rect;
 
-	BOOST_CHECK_EQUAL(null_rect.x1(), 0);
-	BOOST_CHECK_EQUAL(null_rect.y1(), 0);
-	BOOST_CHECK_EQUAL(null_rect.x2(), 0);
-	BOOST_CHECK_EQUAL(null_rect.y2(), 0);
+	BOOST_CHECK_EQUAL(null_rect.left(), 0);
+	BOOST_CHECK_EQUAL(null_rect.top(), 0);
+	BOOST_CHECK_EQUAL(null_rect.right(), -1);
+	BOOST_CHECK_EQUAL(null_rect.bottom(), -1);
 
 	Rect<int> rect(3, 5, 7, 8);
 
-	BOOST_CHECK_EQUAL(rect.x1(), 3);
-	BOOST_CHECK_EQUAL(rect.y1(), 5);
-	BOOST_CHECK_EQUAL(rect.x2(), 3 + 7);
-	BOOST_CHECK_EQUAL(rect.y2(), 5 + 8);
-
-	BOOST_CHECK_EQUAL(rect.x(), 3);
-	BOOST_CHECK_EQUAL(rect.y(), 5);
+	BOOST_CHECK_EQUAL(rect.left(), 3);
+	BOOST_CHECK_EQUAL(rect.top(), 5);
 	BOOST_CHECK_EQUAL(rect.width(), 7);
 	BOOST_CHECK_EQUAL(rect.height(), 8);
 

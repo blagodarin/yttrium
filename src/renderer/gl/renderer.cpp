@@ -94,9 +94,10 @@ void OpenGlRenderer::set_matrix_2d(double width, double height)
 	_gl.LoadIdentity();
 }
 
-void OpenGlRenderer::set_viewport(Dim x, Dim y, Dim width, Dim height)
+void OpenGlRenderer::set_viewport(const Dim2 &size)
 {
-	_gl.Viewport(x, y, width, height);
+	_gl.Viewport(0, 0, size.width, size.height);
+	Private::set_viewport(size);
 }
 
 void OpenGlRenderer::take_screenshot()

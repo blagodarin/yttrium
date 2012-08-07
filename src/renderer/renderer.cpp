@@ -25,6 +25,12 @@ Renderer::Private::~Private()
 	_window._private->_renderer = nullptr;
 }
 
+void Renderer::Private::set_viewport(const Dim2 &size)
+{
+	_viewport_size = size;
+	_screenshot_buffer.resize(size.width * size.height * 3);
+}
+
 void Renderer::Private::draw_rectangle(const Rectf &position, const Rectf &texture)
 {
 	size_t index = _vertices_2d.size();
@@ -33,20 +39,20 @@ void Renderer::Private::draw_rectangle(const Rectf &position, const Rectf &textu
 
 	vertex.color = _color;
 
-	vertex.position = Vector2f(position.x1(), position.y1());
-	vertex.texture = Vector2f(texture.x1(), texture.y1());
+	vertex.position = position.top_left();
+	vertex.texture = texture.top_left();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = Vector2f(position.x1(), position.y2());
-	vertex.texture = Vector2f(texture.x1(), texture.y2());
+	vertex.position = position.outer_bottom_left();
+	vertex.texture = texture.outer_bottom_left();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = Vector2f(position.x2(), position.y2());
-	vertex.texture = Vector2f(texture.x2(), texture.y2());
+	vertex.position = position.outer_bottom_right();
+	vertex.texture = texture.outer_bottom_right();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = Vector2f(position.x2(), position.y1());
-	vertex.texture = Vector2f(texture.x2(), texture.y1());
+	vertex.position = position.outer_top_right();
+	vertex.texture = texture.outer_top_right();
 	_vertices_2d.push_back(vertex);
 
 	_indices_2d.push_back(index + 0);
@@ -97,6 +103,10 @@ void Renderer::begin_frame()
 
 void Renderer::end_frame()
 {
+	flush_2d();
+
+	// TODO: Thread::sleep(0);
+
 	_private->_window.swap_buffers();
 
 	if (!_private->_screenshot_filename.is_empty() && _private->_screenshot_buffer.size())
@@ -163,13 +173,6 @@ void Renderer::set_matrix_2d_height(double height)
 void Renderer::set_matrix_2d_width(double width)
 {
 	set_matrix_2d(width, _private->_viewport_size.height * width / _private->_viewport_size.width);
-}
-
-void Renderer::set_viewport(Dim x, Dim y, Dim width, Dim height)
-{
-	_private->set_viewport(x, y, width, height);
-	_private->_viewport_size = Dim2(width, height);
-	_private->_screenshot_buffer.resize(width * height * 3);
 }
 
 Vector2d Renderer::rendering_size() const

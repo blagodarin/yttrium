@@ -1,10 +1,17 @@
-import os
-import os.path
-
 Import('env')
 
+build = env.Clone(BUILD = '.build')
+build.VariantDir('$BUILD', '.', duplicate = 0)
+
+example_paths = [
+	'audio',
+	'console']
+
 examples = []
-for example_path in [path for path in os.listdir('.') if os.path.isdir(path) and path[0] != '.']:
-	examples += [env.SConscript(dirs = example_path, exports = 'env')]
+
+for example_path in example_paths:
+	example = build.Program('#/bin/examples/' + example_path, build.Glob('$BUILD/' + example_path + '/*.cpp'))
+	build.Clean(example, build.Dir('$BUILD'))
+	examples += [example]
 
 Return('examples')

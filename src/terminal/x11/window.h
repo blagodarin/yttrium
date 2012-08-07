@@ -22,6 +22,7 @@ public:
 	::Atom      _wm_delete_window;
 	GLXContext  _glx_context;
 
+	Dim2               _size;
 	Renderer::Private *_renderer; // See Renderer::Private constructor/destructor.
 
 public:

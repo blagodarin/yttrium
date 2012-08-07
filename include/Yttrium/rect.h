@@ -18,134 +18,109 @@ public:
 
 	///
 
-	Rect(T x = 0, T y = 0, T width = 0, T height = 0) noexcept
-		: _x1(x)
-		, _y1(y)
-		, _x2(x + width)
-		, _y2(y + height)
-	{
-	}
+	Rect(T left = 0, T top = 0, T width = 0, T height = 0) noexcept;
 
 	///
 
-	Rect(const Vector2<T> &size) noexcept
-		: _x1(0)
-		, _y1(0)
-		, _x2(size.width)
-		, _y2(size.height)
-	{
-	}
+	Rect(const Vector2<T> &size) noexcept;
 
 	///
 
-	Rect(const Vector2<T> &corner, const Vector2<T> &size) noexcept
-		: _x1(corner.x)
-		, _y1(corner.y)
-		, _x2(corner.x + size.width)
-		, _y2(corner.y + size.height)
-	{
-	}
+	Rect(const Vector2<T> &corner, const Vector2<T> &size) noexcept;
 
 	///
 
 	template <typename U>
-	Rect(const Rect<U> &rect) noexcept
-		: _x1(rect._x1)
-		, _y1(rect._y1)
-		, _x2(rect._x2)
-		, _y2(rect._y2)
-	{
-	}
-
-	///
-
-	T height() const noexcept
-	{
-		return _y2 - _y1;
-	}
-
-	///
-
-	T width() const noexcept
-	{
-		return _x2 - _x1;
-	}
-
-	///
-
-	T x() const noexcept
-	{
-		return _x1;
-	}
-
-	///
-
-	T x1() const noexcept
-	{
-		return _x1;
-	}
-
-	///
-
-	T x2() const noexcept
-	{
-		return _x2;
-	}
-
-	///
-
-	T y() const noexcept
-	{
-		return _y1;
-	}
-
-	///
-
-	T y1() const noexcept
-	{
-		return _y1;
-	}
-
-	///
-
-	T y2() const noexcept
-	{
-		return _y2;
-	}
+	Rect(const Rect<U> &rect) noexcept;
 
 public:
 
 	///
 
-	bool contains(const Vector2<T> &point) const noexcept
-	{
-		return _x1 <= point.x && point.x <= _x2
-			&& _y1 <= point.y && point.y <= _y2;
-	}
+	T bottom() const noexcept;
 
 	///
 
-	bool contains(const Rect &rect) const noexcept
-	{
-		return _x1 <= rect._x1 && rect._x2 <= _x2
-			&& _y1 <= rect._y1 && rect._y2 <= _y2;
-	}
+	Vector2<T> bottom_left() const noexcept;
+
+	///
+
+	Vector2<T> bottom_right() const noexcept;
+
+	///
+
+	T height() const noexcept;
+
+	///
+
+	T left() const noexcept;
+
+	///
+
+	T outer_bottom() const noexcept;
+
+	///
+
+	Vector2<T> outer_bottom_left() const noexcept;
+
+	///
+
+	Vector2<T> outer_bottom_right() const noexcept;
+
+	///
+
+	T outer_right() const noexcept;
+
+	///
+
+	Vector2<T> outer_top_right() const noexcept;
+
+	///
+
+	T right() const noexcept;
+
+	///
+
+	T top() const noexcept;
+
+	///
+
+	Vector2<T> top_left() const noexcept;
+
+	///
+
+	Vector2<T> top_right() const noexcept;
+
+	///
+
+	T width() const noexcept;
 
 public:
 
 	///
 
-	static Rect from_coords(const T &x1, const T &y1, const T &x2, const T &y2) noexcept
-	{
-		return Rect(x1, y1, x2 - x1, y2 - y1);
-	}
+	bool contains(const Vector2<T> &point) const noexcept;
+
+	///
+
+	bool contains(const Rect &rect) const noexcept;
+
+public:
+
+	///
+
+	static Rect from_coords(const T &left, const T &top, const T &right, const T &bottom) noexcept;
+
+	///
+
+	static Rect from_outer_coords(const T &left, const T &top, const T &outer_right, const T &outer_bottom) noexcept;
 
 private:
 
-	T _x1;
-	T _y1;
-	T _x2;
-	T _y2;
+	T _left;
+	T _top;
+	T _outer_right;
+	T _outer_bottom;
 };
 
 /// Rect of \c float.
@@ -155,6 +130,161 @@ typedef Rect<float> Rectf;
 /// Rect of Dim.
 
 typedef Rect<Dim> Area; // TODO: Find a better name.
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+inline Rect<T>::Rect(T left, T top, T width, T height) noexcept
+	: _left(left)
+	, _top(top)
+	, _outer_right(left + width)
+	, _outer_bottom(top + height)
+{
+}
+
+template <typename T>
+inline Rect<T>::Rect(const Vector2<T> &size) noexcept
+	: _left(0)
+	, _top(0)
+	, _outer_right(size.width)
+	, _outer_bottom(size.height)
+{
+}
+
+template <typename T>
+inline Rect<T>::Rect(const Vector2<T> &corner, const Vector2<T> &size) noexcept
+	: _left(corner.x)
+	, _top(corner.y)
+	, _outer_right(corner.x + size.width)
+	, _outer_bottom(corner.y + size.height)
+{
+}
+
+template <typename T>
+template <typename U>
+inline Rect<T>::Rect(const Rect<U> &rect) noexcept
+	: _left(rect._left)
+	, _top(rect._top)
+	, _outer_right(rect._outer_right)
+	, _outer_bottom(rect._outer_bottom)
+{
+}
+
+template <typename T>
+inline T Rect<T>::bottom() const noexcept
+{
+	return _outer_bottom - 1;
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::bottom_left() const noexcept
+{
+	return Vector2<T>(_left, _outer_bottom - 1);
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::bottom_right() const noexcept
+{
+	return Vector2<T>(_outer_right - 1, _outer_bottom - 1);
+}
+
+template <typename T>
+inline T Rect<T>::height() const noexcept
+{
+	return _outer_bottom - _top;
+}
+
+template <typename T>
+inline T Rect<T>::left() const noexcept
+{
+	return _left;
+}
+
+template <typename T>
+inline T Rect<T>::outer_bottom() const noexcept
+{
+	return _outer_bottom;
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::outer_bottom_left() const noexcept
+{
+	return Vector2<T>(_left, _outer_bottom);
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::outer_bottom_right() const noexcept
+{
+	return Vector2<T>(_outer_right, _outer_bottom);
+}
+
+template <typename T>
+inline T Rect<T>::outer_right() const noexcept
+{
+	return _outer_right;
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::outer_top_right() const noexcept
+{
+	return Vector2<T>(_outer_right, _top);
+}
+
+template <typename T>
+inline T Rect<T>::right() const noexcept
+{
+	return _outer_right - 1;
+}
+
+template <typename T>
+inline T Rect<T>::top() const noexcept
+{
+	return _top;
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::top_left() const noexcept
+{
+	return Vector2<T>(_left, _top);
+}
+
+template <typename T>
+inline Vector2<T> Rect<T>::top_right() const noexcept
+{
+	return Vector2<T>(_outer_right - 1, _top);
+}
+
+template <typename T>
+inline bool Rect<T>::contains(const Vector2<T> &point) const noexcept
+{
+	return _left <= point.x && point.x < _outer_right
+		&& _top <= point.y && point.y < _outer_bottom;
+}
+
+template <typename T>
+inline bool Rect<T>::contains(const Rect &rect) const noexcept
+{
+	return _left <= rect._left && rect._outer_right <= _outer_right
+		&& _top <= rect._top && rect._outer_bottom <= _outer_bottom;
+}
+
+template <typename T>
+inline T Rect<T>::width() const noexcept
+{
+	return _outer_right - _left;
+}
+
+template <typename T>
+inline Rect<T> Rect<T>::from_coords(const T &left, const T &top, const T &right, const T &bottom) noexcept
+{
+	return Rect(left, top, right - left + 1, bottom - top + 1);
+}
+
+template <typename T>
+inline Rect<T> Rect<T>::from_outer_coords(const T &left, const T &top, const T &outer_right, const T &outer_bottom) noexcept
+{
+	return Rect(left, top, outer_right - left, outer_bottom - top);
+}
 
 } // namespace Yttrium
 
