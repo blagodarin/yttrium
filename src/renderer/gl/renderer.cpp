@@ -75,7 +75,7 @@ void OpenGlRenderer::flush_2d()
 	_gl.EnableClientState(GL_VERTEX_ARRAY);
 	_gl.VertexPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].position);
 
-	_gl.DrawElements(GL_QUADS, _indices_2d.size(), GL_UNSIGNED_SHORT, &_indices_2d[0]);
+	_gl.DrawElements(GL_TRIANGLE_STRIP, _indices_2d.size(), GL_UNSIGNED_SHORT, &_indices_2d[0]);
 
 	_gl.DisableClientState(GL_VERTEX_ARRAY);
 	_gl.DisableClientState(GL_COLOR_ARRAY);

@@ -47,15 +47,26 @@ void Renderer::Private::draw_rectangle(const Rectf &position, const Rectf &textu
 	vertex.texture = texture.outer_bottom_left();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = position.outer_bottom_right();
-	vertex.texture = texture.outer_bottom_right();
-	_vertices_2d.push_back(vertex);
-
 	vertex.position = position.outer_top_right();
 	vertex.texture = texture.outer_top_right();
 	_vertices_2d.push_back(vertex);
 
-	_indices_2d.push_back(index + 0);
+	vertex.position = position.outer_bottom_right();
+	vertex.texture = texture.outer_bottom_right();
+	_vertices_2d.push_back(vertex);
+
+	if (index)
+	{
+		_indices_2d.push_back(index - 1);
+		_indices_2d.push_back(index);
+
+		if (_indices_2d.size() & 1)
+		{
+			_indices_2d.push_back(index); // Add an extra degenerate to ensure the correct face ordering.
+		}
+	}
+
+	_indices_2d.push_back(index);
 	_indices_2d.push_back(index + 1);
 	_indices_2d.push_back(index + 2);
 	_indices_2d.push_back(index + 3);

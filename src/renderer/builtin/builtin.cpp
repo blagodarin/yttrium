@@ -62,24 +62,32 @@ void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_
 {
 	_private->bind();
 
-	Vector2f a(x * Builtin::char_width, y * Builtin::char_height);
+	Dim size = min<Dim>(text.size(), max_size);
 
-	for (const UChar *symbol = reinterpret_cast<const UChar *>(text.text()); max_size && *symbol; --max_size, ++symbol)
+	if (size > 0)
 	{
-		if (*symbol >= Builtin::first_char && *symbol <= Builtin::last_char)
-		{
-			if (*symbol != Builtin::first_char) // Don't render spaces.
-			{
-				_private->_renderer->draw_rectangle(
-					Rectf(
-						a.x, a.y,
-						Builtin::char_width, Builtin::char_height),
-					Rectf::from_outer_coords(
-						Builtin::coords[*symbol][0][0], Builtin::coords[*symbol][0][1],
-						Builtin::coords[*symbol][1][0], Builtin::coords[*symbol][1][1]));
-			}
+		// We can't join the text in a single strip because the
+		// adjacent letters may use different texture coordinates.
 
-			a.x += Builtin::char_width;
+		Vector2f a(x * Builtin::char_width, y * Builtin::char_height);
+
+		for (const UChar *symbol = reinterpret_cast<const UChar *>(text.text()); size; --size, ++symbol)
+		{
+			if (*symbol >= Builtin::first_char && *symbol <= Builtin::last_char)
+			{
+				if (*symbol != Builtin::first_char) // Don't render spaces.
+				{
+					_private->_renderer->draw_rectangle(
+						Rectf(
+							a.x, a.y,
+							Builtin::char_width, Builtin::char_height),
+						Rectf::from_outer_coords(
+							Builtin::coords[*symbol][0][0], Builtin::coords[*symbol][0][1],
+							Builtin::coords[*symbol][1][0], Builtin::coords[*symbol][1][1]));
+				}
+
+				a.x += Builtin::char_width;
+			}
 		}
 	}
 }
