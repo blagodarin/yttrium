@@ -99,7 +99,7 @@ char Terminal::printable(Key key) const
 
 	if (key >= Key::_0 && key <= Key::Space)
 	{
-		if (_keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)])
+		if (is_shift_pressed())
 		{
 			return hi_map[KeyType(key) - KeyType(Key::_0)];
 		}

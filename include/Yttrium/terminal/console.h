@@ -21,11 +21,7 @@ public:
 
 	///
 
-	Console(const Terminal &terminal) noexcept
-		: _terminal(terminal)
-		, _cursor(0)
-	{
-	}
+	Console(const Terminal &terminal) noexcept;
 
 	/// Process a \a key from the specified \a terminal.
 	/// \return \c true if the key was handled.
@@ -45,7 +41,19 @@ private:
 
 	String _input;
 	size_t _cursor;
+	size_t _selection_size;
+	size_t _selection_offset;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+inline Console::Console(const Terminal &terminal) noexcept
+	: _terminal(terminal)
+	, _cursor(0)
+	, _selection_size(0)
+	, _selection_offset(0)
+{
+}
 
 } // namespace Yttrium
 

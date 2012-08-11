@@ -82,6 +82,20 @@ public:
 
 	///
 
+	bool is_shift_pressed() const noexcept
+	{
+		return _keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)];
+	}
+
+	///
+
+	KeyState key_state(Key key) const noexcept
+	{
+		return _keys[KeyType(key)];
+	}
+
+	///
+
 	void lock_cursor(bool lock) noexcept;
 
 	///

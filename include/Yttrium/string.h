@@ -231,9 +231,9 @@ public:
 
 	void insert(char symbol, size_t index) noexcept;
 
-	/// Remove a symbol at the specified \a index.
+	/// Remove \a size symbols starting at the specified \a index.
 
-	void remove(size_t index) noexcept;
+	void remove(size_t index, size_t size = 1) noexcept;
 
 	/// Reserve the space in the string for \a len symbols.
 

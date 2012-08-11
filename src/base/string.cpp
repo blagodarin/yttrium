@@ -299,34 +299,40 @@ void String::insert(char symbol, size_t index)
 	_text[_size] = '\0';
 }
 
-void String::remove(size_t index)
+void String::remove(size_t index, size_t size)
 {
-	if (index >= _size)
+	if (!size || index >= _size)
 	{
 		return;
 	}
+
+	size = min(size, _size - index);
 
 	size_t *references = nullptr;
 
 	if (_buffer_size)
 	{
 		references = reinterpret_cast<size_t *>(_text) - 1;
+
 		if (*references == 1)
 		{
-			--_size;
-			memmove(_text + index, _text + index + 1, _size - index);
+			_size -= size;
+			memmove(_text + index, _text + index + size, _size - index);
 			_text[_size] = '\0';
 			return;
 		}
 	}
 
-	char *old_text = init(_size);
+	char *old_text = init(size + 1);
+
 	if (index)
 	{
 		memcpy(_text, old_text, index);
 	}
-	memcpy(_text + index, old_text + index + 1, _size - index);
-	_text[--_size] = '\0';
+
+	_size -= size;
+	memcpy(_text + index, old_text + index + size, _size - index);
+	_text[_size] = '\0';
 
 	if (references)
 	{
