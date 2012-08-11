@@ -17,6 +17,7 @@ src = [
 	'terminal',
 	'image',
 	'ion',
+	'math',
 	'package']
 
 if 'posix' in ports:

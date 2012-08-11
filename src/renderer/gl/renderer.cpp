@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+#include <Yttrium/matrix.h>
+
 #include "../builtin/data.h"
 
 namespace Yttrium
@@ -88,10 +90,10 @@ void OpenGlRenderer::flush_2d()
 void OpenGlRenderer::set_matrix_2d(double width, double height)
 {
 	_gl.MatrixMode(GL_PROJECTION);
-	_gl.LoadIdentity();
-	_gl.Ortho(0, width, height, 0, 0, 1);
+	_gl.LoadMatrixf(Matrix4f::projection_2d(0, 0, width, height).data());
+
 	_gl.MatrixMode(GL_MODELVIEW);
-	_gl.LoadIdentity();
+	_gl.LoadMatrixf(Matrix4f().data());
 }
 
 void OpenGlRenderer::set_viewport(const Dim2 &size)
