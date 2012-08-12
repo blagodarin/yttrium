@@ -11,6 +11,8 @@ src = [
 	'audio/io',
 	'base',
 	'base/memory',
+	'gui',
+	'gui/logic',
 	'renderer',
 	'renderer/builtin',
 	'renderer/gl',

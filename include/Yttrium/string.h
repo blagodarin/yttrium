@@ -227,6 +227,11 @@ public:
 
 	String escaped(const char *symbols, char with) const noexcept;
 
+	///
+	/// \note The \a text must not refer to the current string's data.
+
+	void insert(const StaticString &text, size_t index) noexcept;
+
 	/// Insert a \a symbol at the specified \a index.
 
 	void insert(char symbol, size_t index) noexcept;

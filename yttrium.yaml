@@ -1,5 +1,4 @@
 Yttrium:
-- Add scripting support.
 - Add GUI (requires renderer).
 - Add Windows port.
 - Add static library build.

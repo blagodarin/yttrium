@@ -10,6 +10,7 @@
 #include <Yttrium/buffer.h>
 #include <Yttrium/file.h>
 #include <Yttrium/global.h>
+#include <Yttrium/gui.h>
 #include <Yttrium/image.h>
 #include <Yttrium/ion.h>
 #include <Yttrium/key.h>

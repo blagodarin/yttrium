@@ -4,8 +4,7 @@
 #ifndef __Y_TERMINAL_CONSOLE_H
 #define __Y_TERMINAL_CONSOLE_H
 
-#include <Yttrium/key.h>
-#include <Yttrium/string.h>
+#include <Yttrium/gui/logic/line_editor.h>
 
 namespace Yttrium
 {
@@ -42,20 +41,13 @@ public:
 private:
 
 	const Terminal &_terminal;
-
-	String _input;
-	size_t _cursor;
-	size_t _selection_size;
-	size_t _selection_offset;
+	LineEditor      _line_editor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
 Console::Console(const Terminal &terminal) noexcept
 	: _terminal(terminal)
-	, _cursor(0)
-	, _selection_size(0)
-	, _selection_offset(0)
 {
 }
 

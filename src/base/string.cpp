@@ -265,6 +265,41 @@ String String::escaped(const char *symbols, char with) const
 	return result;
 }
 
+void String::insert(const StaticString &text, size_t index)
+{
+	if (index > _size)
+	{
+		return;
+	}
+
+	size_t buffer_size = _size + text.size() + 1;
+
+	if (_buffer_size)
+	{
+		grow(buffer_size);
+		if (index < _size)
+		{
+			memmove(_text + index + text.size(), _text + index, _size - index);
+		}
+	}
+	else
+	{
+		char *old_text = init(buffer_size);
+		if (index)
+		{
+			memcpy(_text, old_text, index);
+		}
+		if (index < _size)
+		{
+			memcpy(_text + index + text.size(), old_text + index, _size - index);
+		}
+	}
+
+	memcpy(_text + index, text.text(), text.size());
+	_size += text.size();
+	_text[_size] = '\0';
+}
+
 void String::insert(char symbol, size_t index)
 {
 	if (index > _size)
