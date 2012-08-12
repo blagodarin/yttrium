@@ -35,6 +35,14 @@ typedef uint_fast64_t UOffset;
 
 typedef int_fast16_t Dim;
 
+/// Generic integer type.
+
+typedef int_fast32_t Integer;
+
+/// Generic floating point type.
+
+typedef double Real;
+
 } // namespace Yttrium
 
 #endif // __Y_TYPES_H

@@ -23,6 +23,7 @@
 #include <Yttrium/rect.h>
 #include <Yttrium/renderer.h>
 #include <Yttrium/screen.h>
+#include <Yttrium/script.h>
 #include <Yttrium/signal.h>
 #include <Yttrium/static_string.h>
 #include <Yttrium/string.h>

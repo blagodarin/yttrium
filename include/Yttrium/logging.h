@@ -1,5 +1,6 @@
 /// \file
 /// \brief
+/// \note Don't include this file in a common header!
 
 #ifndef __Y_LOGGING_H
 #define __Y_LOGGING_H

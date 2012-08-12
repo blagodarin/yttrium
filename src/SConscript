@@ -14,6 +14,7 @@ src = [
 	'renderer',
 	'renderer/builtin',
 	'renderer/gl',
+	'script',
 	'terminal',
 	'image',
 	'ion',

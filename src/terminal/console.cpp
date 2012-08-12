@@ -1,6 +1,7 @@
 #include <Yttrium/terminal/console.h>
 
 #include <Yttrium/renderer/builtin.h>
+#include <Yttrium/script/manager.h>
 #include <Yttrium/terminal.h>
 
 namespace Yttrium
@@ -65,7 +66,7 @@ bool Console::process_key(Key key)
 
 	case Key::Enter:
 
-		// TODO: Process the input as a script command.
+		ScriptManager::instance()->root_context().execute(_input);
 		_input.clear();
 		_cursor = 0;
 		_selection_size = 0;

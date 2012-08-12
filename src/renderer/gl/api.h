@@ -136,7 +136,6 @@ GLFUNCTION(ClearColor, GLvoid, (GLclampf, GLclampf, GLclampf, GLclampf))
 GLFUNCTION(ClearDepth, GLvoid, (GLclampd))
 GLFUNCTION(ClearStencil, GLvoid, (GLint))
 GLFUNCTION(ColorMask, GLvoid, (GLboolean, GLboolean, GLboolean, GLboolean))
-GLFUNCTION(ColorPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *)) // TODO: Remove.
 GLFUNCTION(CopyTexImage1D, GLvoid, (GLenum, GLint, GLenum, GLint, GLint, GLsizei, GLint))
 GLFUNCTION(CopyTexImage2D, GLvoid, (GLenum, GLint, GLenum, GLint, GLint, GLsizei, GLsizei, GLint))
 GLFUNCTION(CopyTexSubImage1D, GLvoid, (GLenum, GLint, GLint, GLint, GLint, GLsizei))
@@ -147,12 +146,10 @@ GLFUNCTION(DepthFunc, GLvoid, (GLenum))
 GLFUNCTION(DepthMask, GLvoid, (GLboolean))
 GLFUNCTION(DepthRange, GLvoid, (GLclampd, GLclampd))
 GLFUNCTION(Disable, GLvoid, (GLenum))
-GLFUNCTION(DisableClientState, GLvoid, (GLenum)) // TODO: Remove.
 GLFUNCTION(DrawArrays, GLvoid, (GLenum, GLint, GLsizei))
 GLFUNCTION(DrawBuffer, GLvoid, (GLenum))
 GLFUNCTION(DrawElements, GLvoid, (GLenum, GLsizei, GLenum, const GLvoid *))
 GLFUNCTION(Enable, GLvoid, (GLenum))
-GLFUNCTION(EnableClientState, GLvoid, (GLenum)) // TODO: Remove.
 GLFUNCTION(Finish, GLvoid, ())
 GLFUNCTION(Flush, GLvoid, ())
 GLFUNCTION(FrontFace, GLvoid, (GLenum))
@@ -174,25 +171,18 @@ GLFUNCTION(Hint, GLvoid, (GLenum, GLenum))
 GLFUNCTION(IsEnabled, GLboolean, (GLenum))
 GLFUNCTION(IsTexture, GLboolean, (GLuint))
 GLFUNCTION(LineWidth, GLvoid, (GLfloat))
-GLFUNCTION(LoadMatrixf, GLvoid, (const GLfloat *)) // TODO: Remove.
 GLFUNCTION(LogicOp, GLvoid, (GLenum))
-GLFUNCTION(MatrixMode, GLvoid, (GLenum)) // TODO: Remove.
 GLFUNCTION(PixelStoref, GLvoid, (GLenum, GLfloat))
 GLFUNCTION(PixelStorei, GLvoid, (GLenum, GLint))
 GLFUNCTION(PointSize, GLvoid, (GLfloat))
 GLFUNCTION(PolygonMode, GLvoid, (GLenum, GLenum))
 GLFUNCTION(PolygonOffset, GLvoid, (GLfloat, GLfloat))
-GLFUNCTION(PopAttrib, GLvoid, ()) // TODO: Remove.
-GLFUNCTION(PopClientAttrib, GLvoid, ()) // TODO: Remove.
-GLFUNCTION(PushAttrib, GLvoid, (GLbitfield)) // TODO: Remove.
-GLFUNCTION(PushClientAttrib, GLvoid, (GLbitfield)) // TODO: Remove.
 GLFUNCTION(ReadBuffer, GLvoid, (GLenum))
 GLFUNCTION(ReadPixels, GLvoid, (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, GLvoid *))
 GLFUNCTION(Scissor, GLvoid, (GLint, GLint, GLsizei, GLsizei))
 GLFUNCTION(StencilFunc, GLvoid, (GLenum, GLint, GLuint))
 GLFUNCTION(StencilMask, GLvoid, (GLuint))
 GLFUNCTION(StencilOp, GLvoid, (GLenum, GLenum, GLenum))
-GLFUNCTION(TexCoordPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *)) // TODO: Remove.
 GLFUNCTION(TexImage1D, GLvoid, (GLenum, GLint, GLint, GLsizei, GLint, GLenum, GLenum, const GLvoid *))
 GLFUNCTION(TexImage2D, GLvoid, (GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const GLvoid *))
 GLFUNCTION(TexParameterf, GLvoid, (GLenum, GLenum, GLfloat))
@@ -201,8 +191,22 @@ GLFUNCTION(TexParameteri, GLvoid, (GLenum, GLenum, GLint))
 GLFUNCTION(TexParameteriv, GLvoid, (GLenum, GLenum, const GLint *))
 GLFUNCTION(TexSubImage1D, GLvoid, (GLenum, GLint, GLint, GLsizei, GLenum, GLenum, const GLvoid *))
 GLFUNCTION(TexSubImage2D, GLvoid, (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const GLvoid *))
-GLFUNCTION(VertexPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *)) // TODO: Remove.
 GLFUNCTION(Viewport, GLvoid, (GLint, GLint, GLsizei, GLsizei))
+
+// Deprecated API entries still used in our renderer.
+// TODO: Remove.
+
+GLFUNCTION(ColorPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
+GLFUNCTION(DisableClientState, GLvoid, (GLenum))
+GLFUNCTION(EnableClientState, GLvoid, (GLenum))
+GLFUNCTION(LoadMatrixf, GLvoid, (const GLfloat *))
+GLFUNCTION(MatrixMode, GLvoid, (GLenum))
+GLFUNCTION(PopAttrib, GLvoid, ())
+GLFUNCTION(PopClientAttrib, GLvoid, ())
+GLFUNCTION(PushAttrib, GLvoid, (GLbitfield))
+GLFUNCTION(PushClientAttrib, GLvoid, (GLbitfield))
+GLFUNCTION(TexCoordPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
+GLFUNCTION(VertexPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
 
 GLSTRING(EXTENSIONS)
 GLINTEGER(MAX_ATTRIB_STACK_DEPTH)
@@ -228,7 +232,7 @@ GLEXTENSION(ARB_texture_rectangle) // NOTE: Core OpenGL 3.1 and higher.
 	GLINTEGER(MAX_RECTANGLE_TEXTURE_SIZE_ARB)
 	GLEND
 
-GLEXTENSION(ARB_vertex_array_object)
+GLEXTENSION(ARB_vertex_array_object) // NOTE: Core OpenGL 2.0 and higher.
 	GLEXTFUNC(BindVertexArray, GLvoid, (GLuint))
 	GLEXTFUNC(DeleteVertexArrays, GLvoid, (GLsizei, const GLuint *))
 	GLEXTFUNC(GenVertexArrays, GLvoid, (GLsizei, GLuint *))

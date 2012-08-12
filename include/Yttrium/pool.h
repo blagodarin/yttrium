@@ -25,15 +25,7 @@ struct PoolStatus
 
 	///
 
-	PoolStatus() noexcept
-		: allocated_items(0)
-		, allocated_chunks(0)
-		, item_allocations(0)
-		, chunk_allocations(0)
-		, item_deallocations(0)
-		, chunk_deallocations(0)
-	{
-	}
+	PoolStatus() noexcept;
 };
 
 ///
@@ -91,42 +83,78 @@ public:
 
 	///
 
-	Pool(size_t chunk_items = 32, Allocator *allocator = DefaultAllocator) noexcept
-		: PoolBase(chunk_items, sizeof(T), allocator)
-	{
-	}
+	Pool(size_t chunk_items = 32, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
-	~Pool()
-	{
-		for (void *pointer = take(); pointer; pointer = take())
-		{
-			static_cast<T *>(pointer)->T::~T();
-			PoolBase::deallocate(pointer);
-		}
-	}
+	~Pool() noexcept;
 
 public:
 
 	///
 
-	T *allocate() noexcept
-	{
-		return static_cast<T *>(PoolBase::allocate());
-	}
+	T *allocate() noexcept;
 
 	///
 
-	void deallocate(T *pointer) noexcept
-	{
-		if (pointer)
-		{
-			pointer->T::~T();
-			PoolBase::deallocate(pointer);
-		}
-	}
+	void clear() noexcept;
+
+	///
+
+	void deallocate(T *pointer) noexcept;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+inline PoolStatus::PoolStatus() noexcept
+	: allocated_items(0)
+	, allocated_chunks(0)
+	, item_allocations(0)
+	, chunk_allocations(0)
+	, item_deallocations(0)
+	, chunk_deallocations(0)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+inline Pool<T>::Pool(size_t chunk_items, Allocator *allocator) noexcept
+	: PoolBase(chunk_items, sizeof(T), allocator)
+{
+}
+
+template <typename T>
+inline Pool<T>::~Pool() noexcept
+{
+	clear();
+}
+
+template <typename T>
+inline T *Pool<T>::allocate() noexcept
+{
+	return static_cast<T *>(PoolBase::allocate());
+}
+
+template <typename T>
+inline void Pool<T>::clear() noexcept
+{
+	for (void *pointer = take(); pointer; pointer = take())
+	{
+		static_cast<T *>(pointer)->~T();
+		PoolBase::deallocate(pointer);
+	}
+}
+
+template <typename T>
+inline void Pool<T>::deallocate(T *pointer) noexcept
+{
+	if (pointer)
+	{
+		pointer->~T();
+		PoolBase::deallocate(pointer);
+	}
+}
 
 } // namespace Yttrium
 

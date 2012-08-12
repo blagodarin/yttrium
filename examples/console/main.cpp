@@ -2,40 +2,65 @@
 
 using namespace Yttrium;
 
-int main()
+class ConsoleExample
 {
-	MemoryManager memory_manager;
+public:
 
-	LogManager log_manager("console.log");
-
-	Terminal terminal;
-
-	if (terminal.open())
+	ConsoleExample()
+		: _log_manager("console.log")
 	{
-		terminal.resize(800, 600);
-		terminal.show();
+		_script_manager.root_context().define("quit", std::bind(&ConsoleExample::quit, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+	}
 
-		terminal.set_console_visible(true);
-
-		Renderer renderer = terminal.create_renderer(Renderer::OpenGl);
-
-		if (renderer)
+	void run()
+	{
+		if (_terminal.open())
 		{
-			RendererBuiltin renderer_builtin = renderer.renderer_builtin();
+			_terminal.resize(800, 600);
+			_terminal.show();
 
-			for (; ; )
+			_terminal.set_console_visible(true);
+
+			Renderer renderer = _terminal.create_renderer(Renderer::OpenGl);
+
+			if (renderer)
 			{
-				if (!terminal.process_events())
-				{
-					break;
-				}
+				RendererBuiltin renderer_builtin = renderer.renderer_builtin();
 
-				renderer.begin_frame();
-				terminal.draw_console(&renderer_builtin);
-				renderer.end_frame();
+				for (; ; )
+				{
+					if (!_terminal.process_events())
+					{
+						break;
+					}
+
+					renderer.begin_frame();
+					_terminal.draw_console(&renderer_builtin);
+					renderer.end_frame();
+				}
 			}
 		}
 	}
 
+private:
+
+	void quit(const StaticString &, String *, const ScriptArgs &) noexcept
+	{
+		_terminal.close();
+	}
+
+private:
+
+	MemoryManager _memory_manager;
+	LogManager    _log_manager;
+	ScriptManager _script_manager;
+	Terminal      _terminal;
+};
+
+int main()
+{
+	ConsoleExample example;
+
+	example.run();
 	return 0;
 }
