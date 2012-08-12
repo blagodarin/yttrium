@@ -42,6 +42,8 @@ public:
 
 public:
 
+	~ScriptContext() = default;
+
 	///
 
 	ScriptContext(Allocator *allocator = DefaultAllocator) noexcept;
@@ -76,7 +78,7 @@ public:
 	* \overload
 	*/
 
-	void define(const StaticString &name, const Command &command, size_t args = 0) noexcept;
+	inline void define(const StaticString &name, const Command &command, size_t args = 0) noexcept;
 
 	/// Execute the specified script.
 	/// \param script Script text to execute.
@@ -155,7 +157,7 @@ private:
 
 private:
 
-	struct CommandContext
+	struct Y_PRIVATE CommandContext
 	{
 		Command command;
 		size_t  min_args;
@@ -184,7 +186,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline void ScriptContext::define(const StaticString &name, const Command &command, size_t args) noexcept
+void ScriptContext::define(const StaticString &name, const Command &command, size_t args) noexcept
 {
 	define(name, command, args, args);
 }

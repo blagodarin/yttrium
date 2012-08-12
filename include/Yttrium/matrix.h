@@ -17,26 +17,23 @@ public:
 
 	///
 
-	Matrix4f() noexcept;
+	inline Matrix4f() noexcept;
 
 	///
 
-	Matrix4f(float m00, float m01, float m02, float m03, float m10, float m11,
+	inline Matrix4f(float m00, float m01, float m02, float m03, float m10, float m11,
 		float m12, float m13, float m20, float m21, float m22, float m23,
 		float m30, float m31, float m32, float m33) noexcept;
 
 	///
 
-	explicit Matrix4f(const float *data) noexcept;
+	inline explicit Matrix4f(const float *data) noexcept;
 
 public:
 
 	///
 
-	const float *data() const noexcept
-	{
-		return _data[0];
-	}
+	inline const float *data() const noexcept;
 
 public:
 
@@ -46,7 +43,7 @@ public:
 
 private:
 
-	Matrix4f(int) noexcept;
+	inline Matrix4f(int) noexcept;
 
 private:
 
@@ -55,7 +52,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline Matrix4f::Matrix4f()
+Matrix4f::Matrix4f() noexcept
 {
 	_data[0][0] = 1.f;
 	_data[0][1] = 0.f;
@@ -78,9 +75,9 @@ inline Matrix4f::Matrix4f()
 	_data[3][3] = 1.f;
 }
 
-inline Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
+Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
 	float m11, float m12, float m13, float m20, float m21, float m22, float m23,
-	float m30, float m31, float m32, float m33)
+	float m30, float m31, float m32, float m33) noexcept
 {
 	_data[0][0] = m00;
 	_data[0][1] = m10;
@@ -103,7 +100,7 @@ inline Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
 	_data[3][3] = m33;
 }
 
-inline Matrix4f::Matrix4f(const float *data)
+Matrix4f::Matrix4f(const float *data) noexcept
 {
 	_data[0][0] = data[0];
 	_data[0][1] = data[1];
@@ -126,7 +123,12 @@ inline Matrix4f::Matrix4f(const float *data)
 	_data[3][3] = data[15];
 }
 
-inline Matrix4f::Matrix4f(int)
+const float *Matrix4f::data() const noexcept
+{
+	return _data[0];
+}
+
+Matrix4f::Matrix4f(int) noexcept
 {
 }
 

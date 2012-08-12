@@ -34,15 +34,19 @@ public:
 
 public:
 
+	ScriptArgs(const ScriptArgs &) = default;
+
+	~ScriptArgs() = default;
+
 	///
 
-	ScriptArgs(ScriptContext *context) noexcept;
+	inline ScriptArgs(ScriptContext *context) noexcept;
 
 public:
 
 	///
 
-	size_t size() const noexcept;
+	inline size_t size() const noexcept;
 
 	///
 
@@ -51,6 +55,10 @@ public:
 	///
 
 	const ScriptValue *value(size_t index) const noexcept;
+
+public:
+
+	ScriptArgs &operator =(const ScriptArgs &) = default;
 
 private:
 
@@ -64,12 +72,12 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline ScriptArgs::ScriptArgs(ScriptContext *context) noexcept
+ScriptArgs::ScriptArgs(ScriptContext *context) noexcept
 	: _context(context)
 {
 }
 
-inline size_t ScriptArgs::size() const noexcept
+size_t ScriptArgs::size() const noexcept
 {
 	return _values.size();
 }

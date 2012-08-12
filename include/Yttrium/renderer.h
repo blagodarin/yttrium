@@ -34,7 +34,7 @@ public:
 
 	///
 
-	Renderer() noexcept;
+	inline Renderer() noexcept;
 
 	///
 
@@ -98,7 +98,7 @@ public:
 
 	///
 
-	operator bool() const noexcept;
+	inline operator bool() const noexcept;
 
 	///
 
@@ -121,12 +121,12 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline Renderer::Renderer() noexcept
+Renderer::Renderer() noexcept
 	: _private(nullptr)
 {
 }
 
-inline Renderer::operator bool() const noexcept
+Renderer::operator bool() const noexcept
 {
 	return _private;
 }

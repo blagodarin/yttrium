@@ -25,7 +25,7 @@ struct PoolStatus
 
 	///
 
-	PoolStatus() noexcept;
+	inline PoolStatus() noexcept;
 };
 
 ///
@@ -106,7 +106,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline PoolStatus::PoolStatus() noexcept
+PoolStatus::PoolStatus() noexcept
 	: allocated_items(0)
 	, allocated_chunks(0)
 	, item_allocations(0)
@@ -119,25 +119,25 @@ inline PoolStatus::PoolStatus() noexcept
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-inline Pool<T>::Pool(size_t chunk_items, Allocator *allocator) noexcept
+Pool<T>::Pool(size_t chunk_items, Allocator *allocator) noexcept
 	: PoolBase(chunk_items, sizeof(T), allocator)
 {
 }
 
 template <typename T>
-inline Pool<T>::~Pool() noexcept
+Pool<T>::~Pool() noexcept
 {
 	clear();
 }
 
 template <typename T>
-inline T *Pool<T>::allocate() noexcept
+T *Pool<T>::allocate() noexcept
 {
 	return static_cast<T *>(PoolBase::allocate());
 }
 
 template <typename T>
-inline void Pool<T>::clear() noexcept
+void Pool<T>::clear() noexcept
 {
 	for (void *pointer = take(); pointer; pointer = take())
 	{
@@ -147,7 +147,7 @@ inline void Pool<T>::clear() noexcept
 }
 
 template <typename T>
-inline void Pool<T>::deallocate(T *pointer) noexcept
+void Pool<T>::deallocate(T *pointer) noexcept
 {
 	if (pointer)
 	{

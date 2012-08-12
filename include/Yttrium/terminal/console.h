@@ -19,9 +19,13 @@ class Y_API Console
 {
 public:
 
+	~Console() = default;
+
 	///
 
-	Console(const Terminal &terminal) noexcept;
+	inline Console(const Terminal &terminal) noexcept;
+
+public:
 
 	/// Process a \a key from the specified \a terminal.
 	/// \return \c true if the key was handled.
@@ -47,7 +51,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline Console::Console(const Terminal &terminal) noexcept
+Console::Console(const Terminal &terminal) noexcept
 	: _terminal(terminal)
 	, _cursor(0)
 	, _selection_size(0)

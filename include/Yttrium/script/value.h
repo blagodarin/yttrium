@@ -46,21 +46,25 @@ public:
 
 public:
 
-	///
+	~ScriptValue() = default;
 
-	Integer integer() const noexcept;
-
-	///
-
-	Real real() const noexcept;
+public:
 
 	///
 
-	Yttrium::String string() const noexcept;
+	inline Integer integer() const noexcept;
 
 	///
 
-	Type type() const noexcept;
+	inline Real real() const noexcept;
+
+	///
+
+	inline Yttrium::String string() const noexcept;
+
+	///
+
+	inline Type type() const noexcept;
 
 public:
 
@@ -83,39 +87,33 @@ private:
 
 private:
 
-	ScriptValue(Integer value, Allocator *allocator);
+	Y_PRIVATE ScriptValue(Integer value, Allocator *allocator);
 
-	ScriptValue(Real value, Allocator *allocator);
+	Y_PRIVATE ScriptValue(Real value, Allocator *allocator);
 
-	ScriptValue(const StaticString &value, Allocator *allocator);
+	Y_PRIVATE ScriptValue(const StaticString &value, Allocator *allocator);
 
-	ScriptValue(const StaticString &value, Type type, Allocator *allocator);
+	Y_PRIVATE ScriptValue(const StaticString &value, Type type, Allocator *allocator);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline Integer ScriptValue::integer() const noexcept
+Integer ScriptValue::integer() const noexcept
 {
 	return _value.to_int32();
 }
 
-///
-
-inline Real ScriptValue::real() const noexcept
+Real ScriptValue::real() const noexcept
 {
 	return _value.to_double();
 }
 
-///
-
-inline String ScriptValue::string() const noexcept
+String ScriptValue::string() const noexcept
 {
 	return _value;
 }
 
-///
-
-inline ScriptValue::Type ScriptValue::type() const noexcept
+ScriptValue::Type ScriptValue::type() const noexcept
 {
 	return _type;
 }

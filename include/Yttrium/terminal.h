@@ -60,7 +60,7 @@ public:
 
 	///
 
-	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept;
+	inline Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept;
 
 	///
 
@@ -191,7 +191,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline Renderer Terminal::create_renderer(Renderer::Backend backend, Allocator *allocator) noexcept
+Renderer Terminal::create_renderer(Renderer::Backend backend, Allocator *allocator) noexcept
 {
 	return _window.create_renderer(backend, allocator ? allocator : _allocator);
 }

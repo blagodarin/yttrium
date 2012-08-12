@@ -30,7 +30,7 @@ public:
 
 	/// Return the root context reference.
 
-	ScriptContext &root_context() noexcept;
+	inline ScriptContext &root_context() noexcept;
 
 public:
 
@@ -45,7 +45,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-inline ScriptContext &ScriptManager::root_context() noexcept
+ScriptContext &ScriptManager::root_context() noexcept
 {
 	return _root_context;
 }
