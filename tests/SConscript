@@ -4,6 +4,7 @@ build = env.Clone(BUILD = '.build')
 
 build.Append(
 	CPPDEFINES = 'BOOST_TEST_DYN_LINK',
+	CPPPATH = '#',
 	LIBS = 'boost_unit_test_framework')
 
 build.VariantDir('$BUILD', '.', duplicate = 0)
@@ -12,6 +13,7 @@ build.VariantDir('$BUILD', '.', duplicate = 0)
 
 test_paths = [
 	'static_string',
+	'private',
 	'vector',
 	'rect',
 	'file',

@@ -50,10 +50,7 @@ public:
 	* \overload
 	*/
 
-	void set_color(float r, float g, float b, float a = 1) noexcept
-	{
-		set_color(Vector4f(r, g, b, a));
-	}
+	inline void set_color(float r, float g, float b, float a = 1) noexcept;
 
 	///
 
@@ -67,10 +64,7 @@ public:
 
 	///
 
-	operator bool() const noexcept
-	{
-		return _private;
-	}
+	inline operator bool() const noexcept;
 
 	///
 
@@ -88,6 +82,18 @@ private:
 
 	Private *_private;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+RendererBuiltin::operator bool() const noexcept
+{
+	return _private;
+}
+
+void RendererBuiltin::set_color(float r, float g, float b, float a) noexcept
+{
+	set_color(Vector4f(r, g, b, a));
+}
 
 } // namespace Yttrium
 

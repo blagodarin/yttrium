@@ -18,6 +18,7 @@ File::File(const File &file)
 void File::close()
 {
 	Private::release(&_private);
+
 	_offset = 0;
 	_size = 0;
 	_base = 0;
@@ -144,9 +145,8 @@ bool File::read_line(String *string)
 
 File &File::operator =(const File &file)
 {
-	Private::release(&_private);
+	Private::copy(&_private, file._private);
 
-	_private = Private::copy(file._private);
 	_offset  = file._offset;
 	_size    = file._size;
 	_base    = file._base;

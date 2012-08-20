@@ -1,5 +1,5 @@
 Yttrium:
-- Add GUI (requires renderer).
+- Add GUI.
 - Add Windows port.
 - Add static library build.
 - Add more allocator inheritance.

@@ -6,6 +6,7 @@
 
 #include <Yttrium/allocator.h>
 #include <Yttrium/renderer/builtin.h>
+#include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/static_string.h>
 #include <Yttrium/vector.h>
 

@@ -7,10 +7,11 @@
 namespace Yttrium
 {
 
-Window::Private::Private(::Display *display, int screen, ::Window window, ::GLXContext glx_context, Allocator *allocator)
+Window::Private::Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, ::GLXContext glx_context, Allocator *allocator)
 	: PrivateBase(allocator)
-	, _display(display)
 	, _screen(screen)
+	, _display(display)
+	, _x_screen(x_screen)
 	, _window(window)
 	, _wm_protocols(XInternAtom(display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(XInternAtom(display, "WM_DELETE_WINDOW", True))
@@ -265,9 +266,8 @@ bool Window::open(const Screen &screen, Callbacks *callbacks, Allocator *allocat
 		if (Private::create_window(display, x_screen, &window, &glx_context))
 		{
 			_private = new(allocator->allocate<Private>())
-				Private(display, x_screen, window, glx_context, allocator);
+				Private(screen, display, x_screen, window, glx_context, allocator);
 			_callbacks = callbacks;
-			_screen = screen; // To keep the X connection alive.
 			return true;
 		}
 	}

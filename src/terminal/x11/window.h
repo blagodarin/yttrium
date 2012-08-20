@@ -15,8 +15,10 @@ class Y_PRIVATE Window::Private: public PrivateBase<Window::Private>
 {
 public:
 
+	Screen _screen;
+
 	::Display  *_display;
-	int         _screen;
+	int         _x_screen;
 	::Window    _window;
 	::Atom      _wm_protocols;
 	::Atom      _wm_delete_window;
@@ -27,7 +29,7 @@ public:
 
 public:
 
-	Private(::Display *display, int screen, ::Window window, ::GLXContext glx_context, Allocator *allocator);
+	Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, ::GLXContext glx_context, Allocator *allocator);
 
 	~Private();
 

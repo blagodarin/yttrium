@@ -10,7 +10,10 @@ namespace Yttrium
 OpenGlRenderer::OpenGlRenderer(Window *window, Allocator *allocator)
 	: Private(window, allocator)
 	, _builtin_texture(0)
+	, _texture_cache(_gl)
 {
+	_texture_cache._renderer = this;
+
 	_gl.initialize(window);
 
 	if (!check_version(1, 2))

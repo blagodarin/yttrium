@@ -42,6 +42,15 @@ public:
 		return nullptr;
 	}
 
+	static void copy(T **target_ptr, T *source)
+	{
+		if (Y_LIKELY(*target_ptr != source))
+		{
+			release(target_ptr);
+			*target_ptr = copy(source);
+		}
+	}
+
 	static void release(T **object_ptr)
 	{
 		T *object = *object_ptr;
@@ -63,7 +72,7 @@ public:
 
 	Allocator *_allocator;
 
-private:
+public: // TODO: Make it conditionally public (for unit tests only).
 
 	std::atomic_size_t _references;
 };

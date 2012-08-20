@@ -10,6 +10,7 @@
 #include "../base/private_base.h"
 
 #include "builtin/builtin.h"
+#include "texture_cache.h"
 
 #include <vector>
 
@@ -65,9 +66,11 @@ public:
 	Vertices2D _vertices_2d;
 	Indices2D  _indices_2d;
 
-	RendererBuiltin::Private _builtin;
-
 	Vector4f _color;
+
+	// Subinterfaces.
+
+	RendererBuiltin::Private _builtin;
 
 public:
 

@@ -21,9 +21,7 @@ void Mutex::close()
 
 Mutex &Mutex::operator =(const Mutex &mutex)
 {
-	close();
-
-	_private = Private::copy(mutex._private);
+	Private::copy(&_private, mutex._private);
 
 	return *this;
 }

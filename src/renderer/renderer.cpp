@@ -203,9 +203,7 @@ Dim2 Renderer::viewport_size() const
 
 Renderer &Renderer::operator =(const Renderer &renderer)
 {
-	Private::release(&_private);
-
-	_private = Private::copy(renderer._private);
+	Private::copy(&_private, renderer._private);
 
 	return *this;
 }

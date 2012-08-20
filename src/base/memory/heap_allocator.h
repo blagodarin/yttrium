@@ -15,10 +15,6 @@ public:
 		Y_UNUSED(parent);
 	}
 
-	virtual ~HeapAllocator() noexcept
-	{
-	}
-
 public: // Allocator
 
 	virtual void *allocate(size_t size, size_t align, Difference *difference) noexcept;

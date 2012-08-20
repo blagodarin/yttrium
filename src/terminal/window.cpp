@@ -39,11 +39,14 @@ Renderer Window::renderer()
 	return Renderer(_private ? _private->_renderer : nullptr);
 }
 
+Screen Window::screen() const
+{
+	return _private->_screen;
+}
+
 Window &Window::operator =(const Window &window)
 {
-	close();
-
-	_private = Private::copy(window._private);
+	Private::copy(&_private, window._private);
 
 	return *this;
 }

@@ -133,10 +133,7 @@ public:
 
 	///
 
-	Screen screen() const noexcept
-	{
-		return _screen;
-	}
+	Screen screen() const noexcept;
 
 	///
 
@@ -180,7 +177,6 @@ private:
 
 	Private   *_private;
 	Callbacks *_callbacks;
-	Screen     _screen;
 };
 
 } // namespace Yttrium

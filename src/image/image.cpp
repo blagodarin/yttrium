@@ -67,7 +67,7 @@ bool ImageReader::read(void *buffer)
 {
 	bool result = false;
 
-	if (_private && !_private->_is_used)
+	if (Y_LIKELY(_private && !_private->_is_used))
 	{
 		result = _private->read(buffer, _private->_format.frame_size());
 		_private->_is_used = true;
@@ -78,9 +78,7 @@ bool ImageReader::read(void *buffer)
 
 ImageReader &ImageReader::operator =(const ImageReader &reader)
 {
-	close();
-
-	_private = Private::copy(reader._private);
+	Private::copy(&_private, reader._private);
 
 	return *this;
 }
@@ -175,9 +173,7 @@ bool ImageWriter::write(const void *buffer)
 
 ImageWriter &ImageWriter::operator =(const ImageWriter &writer)
 {
-	close();
-
-	_private = Private::copy(writer._private);
+	Private::copy(&_private, writer._private);
 
 	return *this;
 }

@@ -163,7 +163,7 @@ protected:
 
 	///
 
-	virtual ~Allocator() noexcept
+	virtual ~Allocator()
 	{
 	}
 

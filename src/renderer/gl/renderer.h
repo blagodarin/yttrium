@@ -4,6 +4,7 @@
 #include "../renderer.h"
 
 #include "gl.h"
+#include "texture_cache.h"
 
 namespace Yttrium
 {
@@ -39,6 +40,10 @@ private:
 	GlApi _gl;
 
 	GLuint _builtin_texture;
+
+	// Subinterfaces.
+
+	OpenGlTextureCache _texture_cache;
 };
 
 } // namespace Yttrium

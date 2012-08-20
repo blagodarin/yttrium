@@ -29,7 +29,9 @@ public:
 	{
 	}
 
-	virtual ~Private();
+	virtual ~Private()
+	{
+	}
 
 public:
 
@@ -51,7 +53,9 @@ public:
 	{
 	}
 
-	virtual ~Private();
+	virtual ~Private()
+	{
+	}
 
 public:
 

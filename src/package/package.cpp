@@ -70,9 +70,7 @@ File PackageReader::open_file(const StaticString &name)
 
 PackageReader &PackageReader::operator =(const PackageReader &reader)
 {
-	close();
-
-	_private = Private::copy(reader._private);
+	Private::copy(&_private, reader._private);
 
 	return *this;
 }
@@ -142,19 +140,9 @@ File PackageWriter::open_file(const StaticString &name)
 
 PackageWriter &PackageWriter::operator =(const PackageWriter &writer)
 {
-	close();
-
-	_private = Private::copy(writer._private);
+	Private::copy(&_private, writer._private);
 
 	return *this;
-}
-
-PackageReader::Private::~Private()
-{
-}
-
-PackageWriter::Private::~Private()
-{
 }
 
 bool PackageWriter::Private::open(PackageWriter::Mode mode)
@@ -163,6 +151,7 @@ bool PackageWriter::Private::open(PackageWriter::Mode mode)
 	{
 		_file.seek(0, File::Reverse);
 	}
+
 	return true;
 }
 

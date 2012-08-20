@@ -113,10 +113,12 @@ Dim2 RendererBuiltin::text_size(const StaticString &text) const
 
 RendererBuiltin &RendererBuiltin::operator =(const RendererBuiltin &renderer)
 {
-	Renderer::Private::release(&_private->_renderer);
-
-	_private = renderer._private;
-	_private->_renderer = Renderer::Private::copy(_private->_renderer);
+	if (Y_LIKELY(_private != renderer._private))
+	{
+		Renderer::Private::release(&_private->_renderer);
+		_private = renderer._private;
+		_private->_renderer = Renderer::Private::copy(_private->_renderer);
+	}
 
 	return *this;
 }
