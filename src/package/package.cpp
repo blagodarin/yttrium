@@ -70,7 +70,7 @@ File PackageReader::open_file(const StaticString &name)
 
 PackageReader &PackageReader::operator =(const PackageReader &reader)
 {
-	Private::copy(&_private, reader._private);
+	Private::assign(&_private, reader._private);
 
 	return *this;
 }
@@ -140,7 +140,7 @@ File PackageWriter::open_file(const StaticString &name)
 
 PackageWriter &PackageWriter::operator =(const PackageWriter &writer)
 {
-	Private::copy(&_private, writer._private);
+	Private::assign(&_private, writer._private);
 
 	return *this;
 }

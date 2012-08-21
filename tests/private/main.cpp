@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(private_test)
 
 	Public public2(public1);
 
-	BOOST_CHECK_EQUAL(public1._private, public2._private);
+	BOOST_CHECK_EQUAL(public2._private, public1._private);
 	BOOST_CHECK_EQUAL(public1._private->_references, 2);
 
 	{
@@ -31,10 +31,16 @@ BOOST_AUTO_TEST_CASE(private_test)
 
 		BOOST_CHECK(public3._private != public1._private);
 
+		Public public4(public3);
+
+		BOOST_CHECK_EQUAL(public4._private, public3._private);
+		BOOST_CHECK_EQUAL(public3._private->_references, 2);
+
 		public3 = public1;
 
 		BOOST_CHECK_EQUAL(public3._private, public1._private);
 		BOOST_CHECK_EQUAL(public1._private->_references, 3);
+		BOOST_CHECK_EQUAL(public4._private->_references, 1);
 	}
 
 	BOOST_CHECK_EQUAL(public1._private->_references, 2);
@@ -43,7 +49,7 @@ BOOST_AUTO_TEST_CASE(private_test)
 
 	BOOST_CHECK_EQUAL(public1._private->_references, 3);
 
-	public3 = public1; // Self-assignment.
+	public3 = public1;
 
 	BOOST_CHECK_EQUAL(public1._private->_references, 3);
 

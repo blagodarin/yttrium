@@ -35,7 +35,7 @@ Dim2 Texture2D::size() const
 
 Texture2D &Texture2D::operator =(const Texture2D &texture)
 {
-	Private::copy(&_private, texture._private);
+	Private::assign(&_private, texture._private);
 
 	return *this;
 }

@@ -15,7 +15,7 @@ void Screen::close()
 
 Screen &Screen::operator =(const Screen &screen)
 {
-	Private::copy(&_private, screen._private);
+	Private::assign(&_private, screen._private);
 
 	return *this;
 }

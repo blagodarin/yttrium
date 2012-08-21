@@ -46,7 +46,7 @@ Screen Window::screen() const
 
 Window &Window::operator =(const Window &window)
 {
-	Private::copy(&_private, window._private);
+	Private::assign(&_private, window._private);
 
 	return *this;
 }

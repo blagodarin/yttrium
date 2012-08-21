@@ -21,7 +21,7 @@ void Public::open(Yttrium::Allocator *allocator)
 
 Public &Public::operator =(const Public &public_)
 {
-	Private::copy(&_private, public_._private);
+	Private::assign(&_private, public_._private);
 
 	return *this;
 }

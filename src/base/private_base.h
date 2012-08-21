@@ -28,6 +28,15 @@ public:
 
 public:
 
+	static void assign(T **target_ptr, T *source)
+	{
+		if (Y_LIKELY(*target_ptr != source))
+		{
+			release(target_ptr);
+			*target_ptr = copy(source);
+		}
+	}
+
 	static T *copy(T *object)
 	{
 		if (object)
@@ -39,16 +48,8 @@ public:
 				return object;
 			}
 		}
-		return nullptr;
-	}
 
-	static void copy(T **target_ptr, T *source)
-	{
-		if (Y_LIKELY(*target_ptr != source))
-		{
-			release(target_ptr);
-			*target_ptr = copy(source);
-		}
+		return nullptr;
 	}
 
 	static void release(T **object_ptr)

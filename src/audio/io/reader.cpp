@@ -111,7 +111,7 @@ UOffset AudioReader::size() const
 
 AudioReader &AudioReader::operator =(const AudioReader &reader)
 {
-	Private::copy(&_private, reader._private);
+	Private::assign(&_private, reader._private);
 
 	return *this;
 }

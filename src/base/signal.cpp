@@ -21,7 +21,7 @@ void Signal::close()
 
 Signal &Signal::operator =(const Signal &signal)
 {
-	Private::copy(&_private, signal._private);
+	Private::assign(&_private, signal._private);
 
 	return *this;
 }

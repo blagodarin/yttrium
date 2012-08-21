@@ -78,7 +78,7 @@ bool ImageReader::read(void *buffer)
 
 ImageReader &ImageReader::operator =(const ImageReader &reader)
 {
-	Private::copy(&_private, reader._private);
+	Private::assign(&_private, reader._private);
 
 	return *this;
 }
@@ -173,7 +173,7 @@ bool ImageWriter::write(const void *buffer)
 
 ImageWriter &ImageWriter::operator =(const ImageWriter &writer)
 {
-	Private::copy(&_private, writer._private);
+	Private::assign(&_private, writer._private);
 
 	return *this;
 }
