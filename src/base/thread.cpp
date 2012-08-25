@@ -13,7 +13,7 @@ Thread::~Thread()
 {
 	if (_private->_is_running)
 	{
-		Y_ABORT("A thread must be terminated explicitly");
+		Y_ABORT("A thread must be terminated explicitly"); // NOTE: Safe to continue (Y_ASSERT?).
 		stop();
 	}
 

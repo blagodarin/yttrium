@@ -29,7 +29,7 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	void *base = mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (base == MAP_FAILED)
 	{
-		Y_ABORT("Out of memory");
+		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
 		return nullptr;
 	}
 
@@ -97,10 +97,7 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	void *new_base = mremap(base, total_bytes, new_total_bytes, (movability == MayMove ? MREMAP_MAYMOVE : 0));
 	if (new_base == MAP_FAILED)
 	{
-		if (movability == MayMove)
-		{
-			Y_ABORT("Out of memory");
-		}
+		Y_ABORT_IF(movability == MayMove, "Out of memory"); // NOTE: Safe to continue.
 		return nullptr;
 	}
 

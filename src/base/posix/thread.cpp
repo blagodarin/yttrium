@@ -17,7 +17,7 @@ void Thread::start()
 {
 	if (_private->_is_running)
 	{
-		Y_ABORT("The thread has already been started");
+		Y_ABORT("The thread has already been started"); // NOTE: Safe to continue (Y_ASSERT?).
 		return;
 	}
 
@@ -25,7 +25,7 @@ void Thread::start()
 
 	if (pthread_create(&_private->_handle, nullptr, &Private::entry_point, this))
 	{
-		Y_ABORT("Can't start a thread");
+		Y_ABORT("Can't start a thread"); // NOTE: Safe to continue.
 		_private->_is_running = false;
 		return;
 	}
@@ -80,7 +80,7 @@ void Thread::sleep(Clock milliseconds)
 
 		if (nanosleep(&time, nullptr))
 		{
-			Y_ABORT("Can't sleep");
+			Y_ABORT("Can't sleep"); // NOTE: Safe to continue (Y_ASSERT?).
 		}
 	}
 	else
@@ -91,7 +91,7 @@ void Thread::sleep(Clock milliseconds)
 		if (pthread_yield())
 	#endif
 		{
-			Y_ABORT("Can't sleep for 0 ms");
+			Y_ABORT("Can't sleep for 0 ms"); // NOTE: Safe to continue (Y_ASSERT?).
 		}
 	}
 }

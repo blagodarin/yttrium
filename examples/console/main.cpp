@@ -27,6 +27,10 @@ public:
 			{
 				RendererBuiltin renderer_builtin = renderer.renderer_builtin();
 
+				TextureCache texture_cache = renderer.texture_cache();
+
+				Texture2D background = texture_cache.load_texture_2d("tests/image/image.tga");
+
 				for (; ; )
 				{
 					if (!_terminal.process_events())
@@ -35,6 +39,9 @@ public:
 					}
 
 					renderer.begin_frame();
+					renderer.set_matrix_2d(800, 600);
+					renderer.set_texture(background);
+					renderer.draw_rectangle(0, 0, 800, 600);
 					_terminal.draw_console(&renderer_builtin);
 					renderer.end_frame();
 				}

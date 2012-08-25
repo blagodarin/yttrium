@@ -36,7 +36,7 @@ void Terminal::draw_console(RendererBuiltin *renderer)
 		const Dim2 &size = renderer->size();
 
 		renderer->set_color(0, 0, 0, 0.5);
-		renderer->draw_image(0, 0, size.width + 1, 1);
+		renderer->draw_rectangle(0, 0, size.width + 1, 1);
 
 		_console.render_input(renderer, 0, 0, size.width);
 	}
@@ -201,7 +201,6 @@ void Terminal::show(Mode mode)
 
 	_window.put(corner.x, corner.y, _size.width, _size.height, put_mode);
 	_window.show(Window::Focus);
-	// TODO: Update renderer viewport here.
 
 	if (!_is_cursor_locked)
 	{

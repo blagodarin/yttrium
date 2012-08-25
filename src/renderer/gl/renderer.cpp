@@ -30,10 +30,7 @@ OpenGlRenderer::OpenGlRenderer(Window *window, Allocator *allocator)
 
 	_gl.GenTextures(1, &_builtin_texture);
 
-	if (!_builtin_texture)
-	{
-		Y_ABORT("Can't create builtin texture");
-	}
+	Y_ABORT_IF(!_builtin_texture, "Can't create builtin texture");
 
 	_gl.BindTexture(GL_TEXTURE_2D, _builtin_texture);
 	_gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Builtin::texture_width, Builtin::texture_height,
@@ -43,10 +40,7 @@ OpenGlRenderer::OpenGlRenderer(Window *window, Allocator *allocator)
 
 OpenGlRenderer::~OpenGlRenderer()
 {
-	if (_builtin_texture)
-	{
-		_gl.DeleteTextures(1, &_builtin_texture);
-	}
+	_gl.DeleteTextures(1, &_builtin_texture);
 }
 
 void OpenGlRenderer::bind_builtin()
@@ -71,7 +65,7 @@ void OpenGlRenderer::flush_2d()
 	_gl.EnableClientState(GL_COLOR_ARRAY);
 	_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].color);
 
-	if (_builtin._is_bound) // TODO: Check an ordinary texture too.
+	if (_builtin._is_bound || _texture)
 	{
 		_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
 		_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].texture);
@@ -85,9 +79,6 @@ void OpenGlRenderer::flush_2d()
 	_gl.DisableClientState(GL_VERTEX_ARRAY);
 	_gl.DisableClientState(GL_COLOR_ARRAY);
 	_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	_vertices_2d.clear();
-	_indices_2d.clear();
 }
 
 void OpenGlRenderer::set_matrix_2d(double width, double height)
@@ -117,6 +108,11 @@ void OpenGlRenderer::take_screenshot()
 	_gl.ReadPixels(0, 0, _viewport_size.width, _viewport_size.height, GL_RGB, GL_UNSIGNED_BYTE, _screenshot_buffer.data());
 	_gl.PixelStorei(GL_UNPACK_ALIGNMENT, unpack_alignment);
 	_gl.ReadBuffer(read_buffer);
+}
+
+TextureCache::Private *OpenGlRenderer::texture_cache()
+{
+	return &_texture_cache;
 }
 
 bool OpenGlRenderer::check_version(int major, int minor)

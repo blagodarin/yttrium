@@ -21,21 +21,13 @@ public:
 
 	static void enter(T *pointer, const StaticString &message)
 	{
-		if (instance)
-		{
-			Y_ABORT(message);
-		}
-
+		Y_ABORT_IF(instance, message);
 		instance = pointer;
 	}
 
 	static void leave(T *pointer, const StaticString &message)
 	{
-		if (instance != pointer)
-		{
-			Y_ABORT(message);
-		}
-
+		Y_ABORT_IF(instance != pointer, message);
 		instance = nullptr;
 	}
 };

@@ -38,7 +38,7 @@ void Console::render_input(RendererBuiltin *renderer, Dim x, Dim y, Dim max_size
 	if (_line_editor.selection_size())
 	{
 		renderer->set_color(1.0, 1.0, 1.0, 0.5);
-		renderer->draw_image(x + _line_editor.selection_offset(), y, _line_editor.selection_size(), 1);
+		renderer->draw_rectangle(x + _line_editor.selection_offset(), y, _line_editor.selection_size(), 1);
 	}
 
 	renderer->set_color(1.0, 1.0, 1.0);

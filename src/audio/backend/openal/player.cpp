@@ -19,7 +19,7 @@ OpenAlPlayer::OpenAlPlayer()
 		alDeleteBuffers(NumBuffers, _buffers);
 	}
 
-	Y_ABORT("Couldn't create OpenAlPlayer");
+	Y_ABORT("Couldn't create OpenAlPlayer"); // NOTE: Safe to continue.
 
 	_source = 0;
 	for (size_t i = 0; i < NumBuffers; ++i)

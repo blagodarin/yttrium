@@ -7,13 +7,28 @@
 namespace Yttrium
 {
 
+RendererBuiltin::Private::Private()
+	: _renderer(nullptr)
+	, _is_bound(false)
+	, _color(1, 1, 1)
+{
+}
+
 void RendererBuiltin::Private::bind()
 {
 	if (!_is_bound)
 	{
-		_renderer->flush_2d();
+		// NOTE: Copypasted from "renderer/renderer.cpp".
 
-		// TODO: Clean up all texture-dependent resources.
+		if (_renderer->_vertices_2d.size())
+		{
+			_renderer->flush_2d();
+			_renderer->_vertices_2d.clear();
+			_renderer->_indices_2d.clear();
+		}
+
+		_renderer->_texture = Texture2D();
+		// TODO: Reset font.
 
 		_renderer->bind_builtin();
 		_renderer->set_matrix_2d(_renderer->_viewport_size.width, _renderer->_viewport_size.height);
@@ -32,30 +47,47 @@ RendererBuiltin::~RendererBuiltin()
 	Renderer::Private::release(&_private->_renderer);
 }
 
+Vector4f RendererBuiltin::color() const
+{
+	return _private->_color;
+}
+
 void RendererBuiltin::draw_cursor(Dim x, Dim y)
 {
 	_private->bind();
 
+	Vector4f old_color = _private->_renderer->_color;
+
+	_private->_renderer->_color = _private->_color;
+
 	_private->_renderer->draw_rectangle(
-		Rectf(
+		RectF(
 			x * Builtin::char_width, y * Builtin::char_height,
 			Builtin::char_width, Builtin::char_height),
-		Rectf::from_outer_coords(
+		RectF::from_outer_coords(
 			Builtin::coords[0][0][0], Builtin::coords[0][0][1],
 			Builtin::coords[0][1][0], Builtin::coords[0][1][1]));
+
+	_private->_renderer->_color = old_color;
 }
 
-void RendererBuiltin::draw_image(Dim x, Dim y, Dim width, Dim height)
+void RendererBuiltin::draw_rectangle(Dim x, Dim y, Dim width, Dim height)
 {
 	_private->bind();
 
+	Vector4f old_color = _private->_renderer->_color;
+
+	_private->_renderer->_color = _private->_color;
+
 	_private->_renderer->draw_rectangle(
-		Rectf(
+		RectF(
 			x * Builtin::char_width, y * Builtin::char_height,
 			width * Builtin::char_width, height * Builtin::char_height),
-		Rectf::from_outer_coords(
+		RectF::from_outer_coords(
 			Builtin::coords[0][0][0], Builtin::coords[0][0][0],
 			Builtin::coords[0][0][0], Builtin::coords[0][0][0]));
+
+	_private->_renderer->_color = old_color;
 }
 
 void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_size)
@@ -66,6 +98,10 @@ void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_
 
 	if (size > 0)
 	{
+		Vector4f old_color = _private->_renderer->_color;
+
+		_private->_renderer->_color = _private->_color;
+
 		// We can't join the text in a single strip because the
 		// adjacent letters may use different texture coordinates.
 
@@ -78,10 +114,10 @@ void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_
 				if (*symbol != Builtin::first_char) // Don't render spaces.
 				{
 					_private->_renderer->draw_rectangle(
-						Rectf(
+						RectF(
 							a.x, a.y,
 							Builtin::char_width, Builtin::char_height),
-						Rectf::from_outer_coords(
+						RectF::from_outer_coords(
 							Builtin::coords[*symbol][0][0], Builtin::coords[*symbol][0][1],
 							Builtin::coords[*symbol][1][0], Builtin::coords[*symbol][1][1]));
 				}
@@ -89,12 +125,14 @@ void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_
 				a.x += Builtin::char_width;
 			}
 		}
+
+		_private->_renderer->_color = old_color;
 	}
 }
 
 void RendererBuiltin::set_color(const Vector4f &color)
 {
-	_private->_renderer->_color = color;
+	_private->_color = color;
 }
 
 Dim2 RendererBuiltin::size() const

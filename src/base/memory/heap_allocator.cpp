@@ -17,7 +17,7 @@ void *HeapAllocator::allocate(size_t size, size_t align, Difference *difference)
 
 	if (Y_UNLIKELY(!pointer))
 	{
-		Y_ABORT("Out of memory");
+		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
 		return nullptr;
 	}
 
@@ -63,7 +63,7 @@ void *HeapAllocator::reallocate(void *pointer, size_t size, Movability movabilit
 
 	if (Y_UNLIKELY(!result))
 	{
-		Y_ABORT("Out of memory");
+		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
 		return nullptr;
 	}
 

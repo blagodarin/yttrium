@@ -20,7 +20,7 @@ Mutex::Private::~Private()
 {
 	if (pthread_mutex_destroy(&mutex))
 	{
-		Y_ABORT("Can't destroy mutex");
+		Y_ABORT("Can't destroy mutex"); // NOTE: Safe to continue (Y_ASSERT?).
 	}
 }
 
@@ -35,10 +35,9 @@ void Mutex::lock()
 bool Mutex::try_lock()
 {
 	int result = pthread_mutex_trylock(&_private->mutex);
-	if (result && result != EBUSY)
-	{
-		Y_ABORT("Can't try-lock mutex");
-	}
+
+	Y_ABORT_IF(result && result != EBUSY, "Can't try-lock mutex"); // NOTE: Safe to continue.
+
 	return !result;
 }
 
@@ -48,7 +47,7 @@ bool Mutex::try_lock(Clock milliseconds)
 
 	if (clock_gettime(CLOCK_REALTIME, &time))
 	{
-		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed");
+		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed"); // NOTE: Safe to continue (Y_ASSERT?).
 		return false;
 	}
 
@@ -61,10 +60,9 @@ bool Mutex::try_lock(Clock milliseconds)
 	}
 
 	int result = pthread_mutex_timedlock(&_private->mutex, &time);
-	if (result && result != ETIMEDOUT)
-	{
-		Y_ABORT("Can't timed-lock mutex");
-	}
+
+	Y_ABORT_IF(result && result != ETIMEDOUT, "Can't timed-lock mutex"); // NOTE: Safe to continue.
+
 	return !result;
 }
 

@@ -23,6 +23,14 @@ public:
 
 	virtual ~OpenGlTexture2D();
 
+public:
+
+	virtual void bind();
+
+	virtual Vector2f fix_coords(const Vector2f &coords) const;
+
+	virtual void unbind();
+
 private:
 
 	const GlApi &_gl;

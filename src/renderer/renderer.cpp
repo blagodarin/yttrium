@@ -6,12 +6,15 @@
 
 #include "gl/renderer.h"
 
+#include "texture.h"
+
 namespace Yttrium
 {
 
 Renderer::Private::Private(Window *window, Allocator *allocator)
 	: PrivateBase(allocator)
 	, _window(*window)
+	, _color(1, 1, 1)
 {
 	_builtin._renderer = this;
 
@@ -31,7 +34,7 @@ void Renderer::Private::set_viewport(const Dim2 &size)
 	_screenshot_buffer.resize(size.width * size.height * 3);
 }
 
-void Renderer::Private::draw_rectangle(const Rectf &position, const Rectf &texture)
+void Renderer::Private::draw_rectangle(const RectF &position, const RectF &texture)
 {
 	size_t index = _vertices_2d.size();
 
@@ -112,6 +115,16 @@ void Renderer::begin_frame()
 	_private->clear();
 }
 
+void Renderer::draw_rectangle(const RectF &rect)
+{
+	_private->draw_rectangle(rect, _private->_texture_rect);
+}
+
+void Renderer::draw_rectangle(const RectF &rect, const RectF &texture_rect)
+{
+	_private->draw_rectangle(rect, texture_rect);
+}
+
 void Renderer::end_frame()
 {
 	flush_2d();
@@ -186,6 +199,43 @@ void Renderer::set_matrix_2d_width(double width)
 	set_matrix_2d(width, _private->_viewport_size.height * width / _private->_viewport_size.width);
 }
 
+void Renderer::set_texture(const Texture2D &texture)
+{
+	if (_private->_builtin._is_bound || _private->_texture == texture)
+	{
+		return;
+	}
+
+	flush_2d();
+
+	if (_private->_texture)
+	{
+		_private->_texture._private->unbind();
+	}
+
+	_private->_texture = texture;
+
+	if (_private->_texture)
+	{
+		_private->_texture._private->bind();
+		_private->_texture_rect = _private->_texture._private->full_rectangle();
+	}
+
+	// TODO: Reset font.
+}
+
+void Renderer::set_texture_rectangle(const RectF &rect)
+{
+	if (_private->_texture)
+	{
+		const Vector2f &top_left = _private->_texture._private->fix_coords(rect.top_left());
+		const Vector2f &outer_bottom_right = _private->_texture._private->fix_coords(rect.outer_bottom_right());
+
+		_private->_texture_rect.set_outer_coords(top_left.x, top_left.y,
+			outer_bottom_right.x, outer_bottom_right.y);
+	}
+}
+
 Vector2d Renderer::rendering_size() const
 {
 	return _private->_rendering_size;
@@ -194,6 +244,11 @@ Vector2d Renderer::rendering_size() const
 void Renderer::take_screenshot(const StaticString &name)
 {
 	_private->_screenshot_filename = name;
+}
+
+TextureCache Renderer::texture_cache()
+{
+	return TextureCache(_private->texture_cache());
 }
 
 Dim2 Renderer::viewport_size() const

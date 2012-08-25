@@ -22,7 +22,7 @@ Signal::Private::~Private()
 {
 	if (pthread_cond_destroy(&cond))
 	{
-		Y_ABORT("Can't destroy signal");
+		Y_ABORT("Can't destroy signal"); // NOTE: Safe to continue (Y_ASSERT?).
 	}
 }
 
@@ -40,15 +40,14 @@ bool Signal::try_wait(Mutex *mutex)
 
 	if (clock_gettime(CLOCK_REALTIME, &time))
 	{
-		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed");
+		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed"); // NOTE: Safe to continue (Y_ASSERT?).
 		return false;
 	}
 
 	int result = pthread_cond_timedwait(&_private->cond, &mutex->_private->mutex, &time);
-	if (result && result != ETIMEDOUT)
-	{
-		Y_ABORT("Can't try-wait for signal");
-	}
+
+	Y_ABORT_IF(result && result != ETIMEDOUT, "Can't try-wait for signal"); // NOTE: Safe to continue.
+
 	return !result;
 }
 
@@ -58,7 +57,7 @@ bool Signal::try_wait(Mutex *mutex, Clock milliseconds)
 
 	if (clock_gettime(CLOCK_REALTIME, &time))
 	{
-		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed");
+		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed"); // NOTE: Safe to continue (Y_ASSERT?).
 		return false;
 	}
 
@@ -71,10 +70,9 @@ bool Signal::try_wait(Mutex *mutex, Clock milliseconds)
 	}
 
 	int result = pthread_cond_timedwait(&_private->cond, &mutex->_private->mutex, &time);
-	if (result && result != ETIMEDOUT)
-	{
-		Y_ABORT("Can't timed-wait for signal");
-	}
+
+	Y_ABORT_IF(result && result != ETIMEDOUT, "Can't timed-wait for signal"); // NOTE: Safe to continue.
+
 	return !result;
 }
 

@@ -81,6 +81,10 @@ public:
 
 	///
 
+	void set_outer_coords(T left, T top, T outer_right, T outer_bottom) noexcept;
+
+	///
+
 	T top() const noexcept;
 
 	///
@@ -109,11 +113,11 @@ public:
 
 	///
 
-	static Rect from_coords(const T &left, const T &top, const T &right, const T &bottom) noexcept;
+	static Rect from_coords(T left, T top, T right, T bottom) noexcept;
 
 	///
 
-	static Rect from_outer_coords(const T &left, const T &top, const T &outer_right, const T &outer_bottom) noexcept;
+	static Rect from_outer_coords(T left, T top, T outer_right, T outer_bottom) noexcept;
 
 private:
 
@@ -125,7 +129,7 @@ private:
 
 /// Rect of \c float.
 
-typedef Rect<float> Rectf;
+typedef Rect<float> RectF;
 
 /// Rect of Dim.
 
@@ -237,6 +241,15 @@ T Rect<T>::right() const noexcept
 }
 
 template <typename T>
+void Rect<T>::set_outer_coords(T left, T top, T outer_right, T outer_bottom) noexcept
+{
+	_left = left;
+	_top = top;
+	_outer_right = outer_right;
+	_outer_bottom = outer_bottom;
+}
+
+template <typename T>
 T Rect<T>::top() const noexcept
 {
 	return _top;
@@ -275,13 +288,13 @@ T Rect<T>::width() const noexcept
 }
 
 template <typename T>
-Rect<T> Rect<T>::from_coords(const T &left, const T &top, const T &right, const T &bottom) noexcept
+Rect<T> Rect<T>::from_coords(T left, T top, T right, T bottom) noexcept
 {
 	return Rect(left, top, right - left + 1, bottom - top + 1);
 }
 
 template <typename T>
-Rect<T> Rect<T>::from_outer_coords(const T &left, const T &top, const T &outer_right, const T &outer_bottom) noexcept
+Rect<T> Rect<T>::from_outer_coords(T left, T top, T outer_right, T outer_bottom) noexcept
 {
 	return Rect(left, top, outer_right - left, outer_bottom - top);
 }

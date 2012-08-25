@@ -31,6 +31,8 @@ public: // Renderer::Private
 
 	virtual void take_screenshot();
 
+	virtual TextureCache::Private *texture_cache();
+
 private:
 
 	bool check_version(int major, int minor);

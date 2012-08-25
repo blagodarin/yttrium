@@ -15,7 +15,7 @@ DateTime DateTime::now()
 
 	if (time(&unix_time) == -1 || !localtime_r(&unix_time, &local_time))
 	{
-		Y_ABORT("Can't get the current date and time");
+		Y_ABORT("Can't get the current date and time"); // NOTE: Safe to continue (Y_ASSERT?).
 	}
 	else
 	{
@@ -36,7 +36,7 @@ Clock Timer::clock()
 
 	if (clock_gettime(CLOCK_MONOTONIC, &time))
 	{
-		Y_ABORT("clock_gettime(CLOCK_MONOTONIC, ...) failed");
+		Y_ABORT("clock_gettime(CLOCK_MONOTONIC, ...) failed"); // NOTE: Safe to continue (Y_ASSERT?).
 		return 0;
 	}
 

@@ -39,9 +39,11 @@ public:
 
 	virtual void take_screenshot() = 0;
 
+	virtual TextureCache::Private *texture_cache() = 0;
+
 public:
 
-	void draw_rectangle(const Rectf &position, const Rectf &texture);
+	void draw_rectangle(const RectF &position, const RectF &texture);
 
 public:
 
@@ -52,6 +54,10 @@ public:
 
 	String _screenshot_filename;
 	Buffer _screenshot_buffer;
+
+	Vector4f _color;
+
+	// 2D rendering.
 
 	struct Vertex2D
 	{
@@ -66,7 +72,8 @@ public:
 	Vertices2D _vertices_2d;
 	Indices2D  _indices_2d;
 
-	Vector4f _color;
+	Texture2D _texture;
+	RectF     _texture_rect;
 
 	// Subinterfaces.
 

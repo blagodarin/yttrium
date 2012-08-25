@@ -12,14 +12,11 @@ public:
 
 	Renderer::Private *_renderer;
 	bool               _is_bound;
+	Vector4f           _color;
 
 public:
 
-	Private()
-		: _renderer(nullptr)
-		, _is_bound(false)
-	{
-	}
+	Private();
 
 public:
 

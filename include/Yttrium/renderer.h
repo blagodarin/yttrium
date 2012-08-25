@@ -5,10 +5,10 @@
 #define __Y_RENDERER_H
 
 #include <Yttrium/allocator.h>
+#include <Yttrium/rect.h>
 #include <Yttrium/renderer/builtin.h>
 #include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/static_string.h>
-#include <Yttrium/vector.h>
 
 namespace Yttrium
 {
@@ -51,6 +51,18 @@ public:
 
 	void begin_frame() noexcept;
 
+	///
+
+	void draw_rectangle(const RectF &rect) noexcept;
+
+	///
+
+	inline void draw_rectangle(float x, float y, float width, float height) noexcept;
+
+	///
+
+	void draw_rectangle(const RectF &rect, const RectF &texture_rect) noexcept;
+
 	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
 	/// and, if requested, capture a screenshot.
 
@@ -84,12 +96,28 @@ public:
 
 	void set_matrix_2d_width(double width) noexcept;
 
+	///
+
+	void set_texture(const Texture2D &texture) noexcept;
+
+	///
+
+	void set_texture_rectangle(const RectF &rect) noexcept;
+
+	///
+
+	inline void set_texture_rectangle(float x, float y, float width, float height) noexcept;
+
 	/// Take a screenshot.
 	/// \param name
 	/// \note The screenshot would be actually taken at the end of the frame
 	/// and saved in the PNG format.
 
 	void take_screenshot(const StaticString &name) noexcept;
+
+	///
+
+	TextureCache texture_cache() noexcept;
 
 	///
 
@@ -125,6 +153,16 @@ private:
 Renderer::Renderer() noexcept
 	: _private(nullptr)
 {
+}
+
+void Renderer::draw_rectangle(float x, float y, float width, float height) noexcept
+{
+	draw_rectangle(RectF(x, y, width, height));
+}
+
+void Renderer::set_texture_rectangle(float x, float y, float width, float height) noexcept
+{
+	set_texture_rectangle(RectF(x, y, width, height));
 }
 
 Renderer::operator bool() const noexcept

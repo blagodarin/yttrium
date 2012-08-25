@@ -32,11 +32,15 @@ public:
 
 	///
 
+	Vector4f color() const noexcept;
+
+	///
+
 	void draw_cursor(Dim x, Dim y) noexcept;
 
 	///
 
-	void draw_image(Dim x, Dim y, Dim width, Dim height) noexcept;
+	void draw_rectangle(Dim x, Dim y, Dim width, Dim height) noexcept;
 
 	///
 

@@ -9,12 +9,14 @@
 namespace Yttrium
 {
 
+class Renderer;
 class TextureCache;
 
 ///
 
 class Y_API Texture2D
 {
+	friend class Renderer;
 	friend class TextureCache;
 
 public:
@@ -54,7 +56,7 @@ public:
 
 	///
 
-	inline Texture2D() noexcept; // NOTE: This is only required for cache's map.
+	inline Texture2D() noexcept;
 
 	///
 
@@ -86,6 +88,14 @@ public:
 
 	///
 
+	inline bool operator ==(const Texture2D &texture) noexcept;
+
+	///
+
+	inline bool operator !=(const Texture2D &texture) noexcept;
+
+	///
+
 	Texture2D &operator =(const Texture2D &texture) noexcept;
 
 public:
@@ -111,6 +121,16 @@ Texture2D::Texture2D() noexcept
 Texture2D::operator bool() const noexcept
 {
 	return _private;
+}
+
+bool Texture2D::operator ==(const Texture2D &texture) noexcept
+{
+	return _private == texture._private;
+}
+
+bool Texture2D::operator !=(const Texture2D &texture) noexcept
+{
+	return _private != texture._private;
 }
 
 Texture2D::Texture2D(Private *private_)
