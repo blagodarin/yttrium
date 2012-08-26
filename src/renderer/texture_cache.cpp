@@ -18,6 +18,7 @@ TextureCache::~TextureCache()
 
 void TextureCache::clear()
 {
+	_private->_cache_2d.clear();
 }
 
 Texture2D TextureCache::load_texture_2d(const StaticString &name)

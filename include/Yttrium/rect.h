@@ -81,7 +81,19 @@ public:
 
 	///
 
+	void set_height(T height) noexcept;
+
+	///
+
 	void set_outer_coords(T left, T top, T outer_right, T outer_bottom) noexcept;
+
+	///
+
+	void set_top_left(T left, T top) noexcept;
+
+	///
+
+	void set_width(T width) noexcept;
 
 	///
 
@@ -241,12 +253,31 @@ T Rect<T>::right() const noexcept
 }
 
 template <typename T>
+void Rect<T>::set_height(T height) noexcept
+{
+	_outer_bottom = _top + height;
+}
+
+template <typename T>
 void Rect<T>::set_outer_coords(T left, T top, T outer_right, T outer_bottom) noexcept
 {
 	_left = left;
 	_top = top;
 	_outer_right = outer_right;
 	_outer_bottom = outer_bottom;
+}
+
+template <typename T>
+void Rect<T>::set_top_left(T left, T top) noexcept
+{
+	_left = left;
+	_top = top;
+}
+
+template <typename T>
+void Rect<T>::set_width(T width) noexcept
+{
+	_outer_right = _left + width;
 }
 
 template <typename T>
