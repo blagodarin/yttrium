@@ -206,6 +206,11 @@ public:
 
 	double to_double() const noexcept;
 
+	/// Convert to decimal \c float as much of the string as possible.
+	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
+
+	float to_float() const noexcept;
+
 	/// Convert to decimal \c int32_t as much of the string as possible.
 
 	int32_t to_int32() const noexcept;

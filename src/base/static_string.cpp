@@ -8,6 +8,205 @@
 namespace Yttrium
 {
 
+namespace
+{
+
+// The threshold for the checked integer conversions is the maximum value that
+// can be multiplied by 10 and still fit into the specified type, both positive
+// and negative.
+//  - int32_t: 0x0CCCCCCC * 10 == 0x7FFFFFF8.
+//  - int64_t: 0x0CCCCCCCCCCCCCCC * 10 == 0x7FFFFFFFFFFFFFF8.
+
+// We also know the last decimal digit of the minimum and maximum integer values
+// because they posess some interesting mathematical properties:
+//  1) for N > 3, (pow(2, pow(2, N)) - 1) % 10 == 5 (unsigned);
+//  2a) for N > 1, (pow(2, pow(2, N) - 1) - 1) % 10 == 7 (positive signed).
+//  2b) for N > 1, pow(2, pow(2, N) - 1) % 10 == 8 (negative signed).
+
+template <typename T>
+T string_to_int(const char *p, const char *end)
+{
+	if (p == end)
+	{
+		return 0;
+	}
+
+	// Sign.
+
+	bool negate_result = false;
+
+	switch (*p)
+	{
+	case '-': negate_result = true; // Fallthrough.
+	case '+': ++p;
+	}
+
+	// Value.
+
+	T result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
+	{
+		result = result * 10 + (*p - '0');
+	}
+
+	return (negate_result ? -result : result);
+}
+
+template <typename T, T threshold>
+bool string_to_int(const char *p, const char *end, T *value)
+{
+	if (p == end)
+	{
+		return false;
+	}
+
+	// Sign.
+
+	bool negate_result = false;
+
+	switch (*p)
+	{
+	case '-': negate_result = true; // Fallthrough.
+	case '+': ++p;
+	}
+
+	// Value.
+
+	if (p == end || *p < '0' || *p > '9')
+	{
+		return false;
+	}
+
+	T result = 0;
+
+	do
+	{
+		if (result > threshold)
+		{
+			return false;
+		}
+
+		T digit = *p++ - '0';
+
+		if (result == threshold && digit > 7 + negate_result)
+		{
+			return false;
+		}
+
+		result = result * 10 + digit;
+	} while (p != end && *p >= '0' && *p <= '9');
+
+	if (p != end)
+	{
+		return false;
+	}
+
+	*value = (negate_result ? -result : result);
+	return true;
+}
+
+template <typename T>
+T string_to_real(const char *p, const char *end)
+{
+	if (p == end)
+	{
+		return 0;
+	}
+
+	// Sign.
+
+	bool negate_result = false;
+
+	switch (*p)
+	{
+	case '-': negate_result = true; // Fallthrough.
+	case '+': ++p;
+	}
+
+	// Whole.
+
+	T result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
+	{
+		result = result * 10 + (*p - '0');
+	}
+
+	// Fraction.
+
+	if (p != end && *p == '.')
+	{
+		T factor = 1;
+
+		for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
+		{
+			result = result * 10 + (*p - '0');
+			factor *= 10;
+		}
+		result /= factor;
+	}
+
+	// Power.
+
+	if (p != end && (*p == 'E' || *p == 'e'))
+	{
+		++p;
+
+		// Power sign.
+
+		bool negate_power = false;
+
+		switch (*p)
+		{
+		case '-': negate_power = true; // Fallthrough.
+		case '+': ++p;
+		}
+
+		// Power value.
+
+		T power = 0;
+
+		for (; p != end && *p >= '0' && *p <= '9'; ++p)
+		{
+			power = power * 10 + (*p - '0');
+		}
+
+		result *= pow(10, (negate_power ? -power : power));
+	}
+
+	return (negate_result ? -result : result);
+}
+
+template <typename T>
+T string_to_uint(const char *p, const char *end)
+{
+	if (p == end)
+	{
+		return 0;
+	}
+
+	// Sign.
+
+	if (*p == '+')
+	{
+		++p;
+	}
+
+	// Value.
+
+	T result = 0;
+
+	for (; p != end && *p >= '0' && *p <= '9'; ++p)
+	{
+		result = result * 10 + *p - '0';
+	}
+
+	return result;
+}
+
+} // namespace
+
 StaticString::StaticString(const char *text)
 	: _text(const_cast<char *>(text))
 	, _size(strlen(text))
@@ -148,198 +347,27 @@ StaticString StaticString::trimmed() const
 
 double StaticString::to_double() const
 {
-	if (!_size)
-	{
-		return 0;
-	}
+	return string_to_real<double>(_text, _text + _size);
+}
 
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	bool negate_result = false;
-
-	switch (*p)
-	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
-	}
-
-	// Whole.
-
-	double result = 0;
-
-	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
-		result = result * 10 + (*p - '0');
-	}
-
-	// Fraction.
-
-	if (p != end && *p == '.')
-	{
-		double factor = 1;
-
-		for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
-		{
-			result = result * 10 + (*p - '0');
-			factor *= 10;
-		}
-		result /= factor;
-	}
-
-	// Power.
-
-	if (p != end && (*p == 'E' || *p == 'e'))
-	{
-		++p;
-
-		// Power sign.
-
-		bool negate_power = false;
-
-		switch (*p)
-		{
-		case '-': negate_power = true; // Fallthrough.
-		case '+': ++p;
-		}
-
-		// Power value.
-
-		double power = 0;
-
-		for (; p != end && *p >= '0' && *p <= '9'; ++p)
-		{
-			power = power * 10 + (*p - '0');
-		}
-
-		result *= pow(10.0, (negate_power ? -power : power));
-	}
-
-	return (negate_result ? -result : result);
+float StaticString::to_float() const
+{
+	return string_to_real<float>(_text, _text + _size);
 }
 
 int32_t StaticString::to_int32() const
 {
-	if (!_size)
-	{
-		return 0;
-	}
-
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	bool negate_result = false;
-
-	switch (*p)
-	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
-	}
-
-	// Value.
-
-	int32_t result = 0;
-
-	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
-		result = result * 10 + (*p - '0');
-	}
-
-	return (negate_result ? -result : result);
+	return string_to_int<int32_t>(_text, _text + _size);
 }
 
 int64_t StaticString::to_int64() const
 {
-	if (!_size)
-	{
-		return 0;
-	}
-
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	bool negate_result = false;
-
-	switch (*p)
-	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
-	}
-
-	// Value.
-
-	int64_t result = 0;
-
-	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
-		result = result * 10 + (*p - '0');
-	}
-
-	return (negate_result ? -result : result);
+	return string_to_int<int64_t>(_text, _text + _size);
 }
 
 bool StaticString::to_number(int32_t *value) const
 {
-	if (!_size)
-	{
-		return false;
-	}
-
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	bool negate_result = false;
-
-	switch (*p)
-	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
-	}
-
-	// Value.
-
-	if (p == end || *p < '0' || *p > '9')
-	{
-		return false;
-	}
-
-	// The threshold is the maximum value that can be multiplied by 10
-	// and still fit into int32_t, both positive and negative.
-
-	const uint32_t threshold = 0x0CCCCCCC; // ... * 10 = 0x7FFFFFF8.
-
-	const uint32_t last_digit[2] = {7, 8};
-
-	uint32_t result = 0;
-
-	do
-	{
-		uint32_t digit = *p++ - '0';
-
-		if (result > threshold
-			|| (result == threshold && digit > last_digit[negate_result]))
-		{
-			return false;
-		}
-
-		result = result * 10 + digit;
-	} while (p != end && *p >= '0' && *p <= '9');
-
-	if (p != end)
-	{
-		return false;
-	}
-
-	*value = (negate_result ? -result : result);
-	return true;
+	return string_to_int<int32_t, INT32_C(0x0CCCCCCC)>(_text, _text + _size, value);
 }
 
 bool StaticString::to_number(double *value) const
@@ -431,7 +459,7 @@ bool StaticString::to_number(double *value) const
 			power = power * 10 + (*p++ - '0');
 		} while (p != end && *p >= '0' && *p <= '9');
 
-		result *= pow(10.0, (negate_power ? -power : power));
+		result *= pow(10, (negate_power ? -power : power));
 	}
 
 	if (p != end)
@@ -517,60 +545,12 @@ double StaticString::to_time() const
 
 uint32_t StaticString::to_uint32() const
 {
-	if (!_size)
-	{
-		return 0;
-	}
-
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	if (*p == '+')
-	{
-		++p;
-	}
-
-	// Value.
-
-	uint32_t result = 0;
-
-	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
-		result = result * 10 + *p - '0';
-	}
-
-	return result;
+	return string_to_uint<uint32_t>(_text, _text + _size);
 }
 
 uint64_t StaticString::to_uint64() const
 {
-	if (!_size)
-	{
-		return 0;
-	}
-
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	if (*p == '+')
-	{
-		++p;
-	}
-
-	// Value.
-
-	uint64_t result = 0;
-
-	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
-		result = result * 10 + *p - '0';
-	}
-
-	return result;
+	return string_to_uint<uint64_t>(_text, _text + _size);
 }
 
 String StaticString::zero_terminated(Allocator *allocator) const noexcept
