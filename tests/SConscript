@@ -16,6 +16,7 @@ test_paths = [
 	'private',
 	'vector',
 	'rect',
+	'bindings',
 	'file',
 	'package',
 	'ion',

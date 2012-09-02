@@ -18,6 +18,7 @@ src = [
 	'renderer/gl',
 	'script',
 	'terminal',
+	'terminal/bindings',
 	'image',
 	'ion',
 	'math',

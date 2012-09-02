@@ -1,0 +1,128 @@
+struct KeyName {const char *name; Key key; };
+%%
+#
+# Special keys (0x01 - 0x0F).
+#
+lshift^ Key::LShift
+rshift^ Key::RShift
+lctrl^ Key::LControl
+rctrl^ Key::RControl
+lalt^ Key::LAlt
+ralt^ Key::RAlt
+up^ Key::Up
+down^ Key::Down
+left^ Key::Left
+right^ Key::Right
+print^ Key::Print
+pause^ Key::Pause
+esc^ Key::Escape
+#
+# Text-producing keys (0x10 - 0x3F).
+#
+0^ Key::_0
+1^ Key::_1
+2^ Key::_2
+3^ Key::_3
+4^ Key::_4
+5^ Key::_5
+6^ Key::_6
+7^ Key::_7
+8^ Key::_8
+9^ Key::_9
+a^ Key::A
+b^ Key::B
+c^ Key::C
+d^ Key::D
+e^ Key::E
+f^ Key::F
+g^ Key::G
+h^ Key::H
+i^ Key::I
+j^ Key::J
+k^ Key::K
+l^ Key::L
+m^ Key::M
+n^ Key::N
+o^ Key::O
+p^ Key::P
+q^ Key::Q
+r^ Key::R
+s^ Key::S
+t^ Key::T
+u^ Key::U
+v^ Key::V
+w^ Key::W
+x^ Key::X
+y^ Key::Y
+z^ Key::Z
+,^ Key::Comma
+.^ Key::Period
+semicolon^ Key::Semicolon
+'^ Key::Apostrophe
+/^ Key::Slash
+\^ Key::Backslash
+[^ Key::LBracket
+]^ Key::RBracket
+-^ Key::Minus
+=^ Key::Equals
+`^ Key::Grave
+space^ Key::Space
+#
+# Text-editing keys (0x40 - 0x4F).
+#
+tab^ Key::Tab
+enter^ Key::Enter
+back^ Key::Backspace
+ins^ Key::Insert
+del^ Key::Delete
+home^ Key::Home
+end^ Key::End
+pgup^ Key::PageUp
+pgdn^ Key::PageDown
+#
+# Functional keys (0x50 - 0x6F).
+#
+f1^ Key::F1
+f2^ Key::F2
+f3^ Key::F3
+f4^ Key::F4
+f5^ Key::F5
+f6^ Key::F6
+f7^ Key::F7
+f8^ Key::F8
+f9^ Key::F9
+f10^ Key::F10
+f11^ Key::F11
+f12^ Key::F12
+#
+# Numpad keys (0x70 - 0x7F).
+#
+num0^ Key::Num0
+num1^ Key::Num1
+num2^ Key::Num2
+num3^ Key::Num3
+num4^ Key::Num4
+num5^ Key::Num5
+num6^ Key::Num6
+num7^ Key::Num7
+num8^ Key::Num8
+num9^ Key::Num9
+num.^ Key::Decimal
+num+^ Key::Add
+num-^ Key::Subtract
+num*^ Key::Multiply
+num/^ Key::Divide
+numenter^ Key::NumEnter
+#
+# Mouse keys (0x80 - 0x8F).
+#
+mouse1^ Key::Mouse1
+mouse2^ Key::Mouse2
+mouse3^ Key::Mouse3
+mouse4^ Key::Mouse4
+mouse5^ Key::Mouse5
+mwup^ Key::WheelUp
+mwdown^ Key::WheelDown
+mwleft^ Key::WheelLeft
+mwright^ Key::WheelRight
+%%
