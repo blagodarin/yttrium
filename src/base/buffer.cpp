@@ -1,5 +1,7 @@
 #include <Yttrium/buffer.h>
 
+#include <Yttrium/allocator.h>
+
 #include <cstring> // memcmp
 
 namespace Yttrium

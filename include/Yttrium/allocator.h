@@ -193,10 +193,6 @@ public:
 	static SystemAllocator *instance() noexcept;
 };
 
-/// Root allocator.
-
-extern Y_API Allocator *const DefaultAllocator;
-
 } // namespace Yttrium
 
 #endif // __Y_ALLOCATOR_H

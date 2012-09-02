@@ -1,5 +1,7 @@
 #include "pool.h"
 
+#include <Yttrium/allocator.h>
+
 namespace Yttrium
 {
 

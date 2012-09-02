@@ -4,7 +4,6 @@
 #ifndef __Y_SCRIPT_MANAGER_H
 #define __Y_SCRIPT_MANAGER_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/noncopyable.h>
 #include <Yttrium/script/context.h>
 #include <Yttrium/string.h>

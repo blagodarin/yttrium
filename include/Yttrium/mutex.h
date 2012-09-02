@@ -4,7 +4,6 @@
 #ifndef __Y_MUTEX_H
 #define __Y_MUTEX_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/time.h>
 
 namespace Yttrium

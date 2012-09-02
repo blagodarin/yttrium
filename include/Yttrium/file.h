@@ -4,9 +4,7 @@
 #ifndef __Y_FILE_H
 #define __Y_FILE_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/static_string.h>
-#include <Yttrium/types.h>
 
 namespace Yttrium
 {

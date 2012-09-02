@@ -4,9 +4,7 @@
 #ifndef __Y_STRING_H
 #define __Y_STRING_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/static_string.h>
-#include <Yttrium/types.h>
 
 namespace Yttrium
 {
@@ -72,17 +70,7 @@ public:
 
 	/// Destructor.
 
-	~String() noexcept
-	{
-		if (_buffer_size)
-		{
-			size_t *references = reinterpret_cast<size_t *>(_text) - 1;
-			if (!--*references)
-			{
-				_allocator->deallocate(references);
-			}
-		}
-	}
+	~String() noexcept;
 
 public:
 

@@ -211,6 +211,13 @@
 
 namespace Yttrium
 {
+
+class Allocator;
+
+/// The default allocator.
+
+extern Y_API Allocator *const DefaultAllocator;
+
 } // namespace Yttrium
 
 #endif // __Y_GLOBAL_H

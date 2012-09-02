@@ -4,7 +4,6 @@
 #ifndef __Y_AUDIO_IO_H
 #define __Y_AUDIO_IO_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/static_string.h>
 
 namespace Yttrium

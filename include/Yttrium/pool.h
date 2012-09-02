@@ -4,8 +4,8 @@
 #ifndef __Y_POOL_H
 #define __Y_POOL_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/noncopyable.h>
+#include <Yttrium/types.h>
 
 namespace Yttrium
 {

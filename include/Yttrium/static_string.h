@@ -5,8 +5,6 @@
 #ifndef __Y_STATIC_STRING_H
 #define __Y_STATIC_STRING_H
 
-#include <Yttrium/allocator.h>
-#include <Yttrium/types.h>
 #include <Yttrium/utils.h>
 
 // We don't need const char * operations since we can convert the vast majority of strings

@@ -4,7 +4,6 @@
 #ifndef __Y_SIGNAL_H
 #define __Y_SIGNAL_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/time.h>
 
 namespace Yttrium

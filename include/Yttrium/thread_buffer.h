@@ -4,7 +4,6 @@
 #ifndef __Y_THREAD_BUFFER_H
 #define __Y_THREAD_BUFFER_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/noncopyable.h>
 #include <Yttrium/time.h>
 

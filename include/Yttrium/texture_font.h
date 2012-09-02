@@ -4,7 +4,6 @@
 #ifndef __Y_TEXTURE_FONT_H
 #define __Y_TEXTURE_FONT_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/rect.h>
 #include <Yttrium/static_string.h>
 

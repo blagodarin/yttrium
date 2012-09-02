@@ -4,7 +4,7 @@
 #ifndef __Y_BUFFER_H
 #define __Y_BUFFER_H
 
-#include <Yttrium/allocator.h>
+#include <Yttrium/types.h>
 
 namespace Yttrium
 {

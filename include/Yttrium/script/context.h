@@ -4,7 +4,6 @@
 #ifndef __Y_SCRIPT_CONTEXT_H
 #define __Y_SCRIPT_CONTEXT_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/pool.h>
 #include <Yttrium/script/args.h>
 #include <Yttrium/script/value.h>

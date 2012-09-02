@@ -1,9 +1,7 @@
 #ifndef __SCRIPT_PARSER_H
 #define __SCRIPT_PARSER_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/script/context.h>
-#include <Yttrium/static_string.h>
 
 namespace Yttrium
 {

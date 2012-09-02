@@ -1,7 +1,7 @@
 #ifndef __PUBLIC_H
 #define __PUBLIC_H
 
-#include <Yttrium/allocator.h>
+#include <Yttrium/global.h>
 
 class Public
 {

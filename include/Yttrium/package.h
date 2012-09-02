@@ -4,10 +4,8 @@
 #ifndef __Y_PACKAGE_H
 #define __Y_PACKAGE_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/file.h>
 #include <Yttrium/noncopyable.h>
-#include <Yttrium/static_string.h>
 
 #include <vector>
 

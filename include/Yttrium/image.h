@@ -8,7 +8,6 @@
 #ifndef __Y_IMAGE_H
 #define __Y_IMAGE_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/static_string.h>
 
 namespace Yttrium

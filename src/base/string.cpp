@@ -1,5 +1,6 @@
 #include <Yttrium/string.h>
 
+#include <Yttrium/allocator.h>
 #include <Yttrium/assert.h>
 #include <Yttrium/utils.h>
 
@@ -86,6 +87,18 @@ String::String(char left, const StaticString &right, Allocator *allocator)
 	_text[0] = left;
 	memcpy(&_text[1], right._text, right._size);
 	_text[_size] = '\0';
+}
+
+String::~String()
+{
+	if (_buffer_size)
+	{
+		size_t *references = reinterpret_cast<size_t *>(_text) - 1;
+		if (!--*references)
+		{
+			_allocator->deallocate(references);
+		}
+	}
 }
 
 const String::Reference String::Ref = String::Reference();

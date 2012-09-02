@@ -4,7 +4,6 @@
 #ifndef __Y_RENDERER_H
 #define __Y_RENDERER_H
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/rect.h>
 #include <Yttrium/renderer/builtin.h>
 #include <Yttrium/renderer/texture_cache.h>

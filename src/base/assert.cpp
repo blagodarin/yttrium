@@ -1,6 +1,5 @@
 #include <Yttrium/assert.h>
 
-#include <Yttrium/allocator.h>
 #include <Yttrium/log.h>
 
 #include <cstdlib>
