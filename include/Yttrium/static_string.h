@@ -8,7 +8,7 @@
 #include <Yttrium/utils.h>
 
 // We don't need const char * operations since we can convert the vast majority of strings
-// (even the literal ones) to StaticStrings of a specified length.
+// (even the literal ones) to StaticStrings of known length.
 
 namespace Yttrium
 {
@@ -322,25 +322,21 @@ private:
 	static const char Null = '\0';
 };
 
-} // namespace Yttrium
+///
 
-#if Y_HAVE_USER_LITERALS
+class S: public StaticString
+{
+public:
 
 	///
 
-	Yttrium::StaticString operator "" _y(const char *text, size_t size) noexcept
+	template <size_t N>
+	S(const char (&text)[N]) noexcept
+		: StaticString(text, N)
 	{
-		return StaticString(text, size);
 	}
+};
 
-	#define Y_S(literal) literal##_y
-
-#else
-
-	///
-
-	#define Y_S(literal) Yttrium::StaticString(literal, sizeof(literal) - 1)
-
-#endif
+} // namespace Yttrium
 
 #endif // __Y_STATIC_STRING_H

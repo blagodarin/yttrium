@@ -25,7 +25,7 @@ ScriptParser::ScriptParser(ScriptContext *context, Allocator *allocator)
 
 bool ScriptParser::parse(const StaticString &script)
 {
-	Y_LOG_TRACE(Y_S("[ScriptParser] Parsing \"") << script << Y_S("\"..."));
+	Y_LOG_TRACE(S("[ScriptParser] Parsing \"") << script << Y_S("\"..."));
 
 	String mutable_script(script, _allocator);
 
@@ -51,7 +51,7 @@ bool ScriptParser::parse(const StaticString &script)
 			case ScriptScanner::Token::Identifier:
 			case ScriptScanner::Token::XIdentifier:
 
-				Y_LOG_TRACE(Y_S("[ScriptParser]  - identifier \"") << token.string << '\"');
+				Y_LOG_TRACE(S("[ScriptParser]  - identifier \"") << token.string << '\"');
 				_commands.push_back(Command(token.string, _context, _allocator));
 				command = &_commands.back();
 				state = ParserState::Command;
@@ -59,13 +59,13 @@ bool ScriptParser::parse(const StaticString &script)
 
 			case ScriptScanner::Token::Separator:
 
-				Y_LOG_TRACE("[ScriptParser]  - ;");
+				Y_LOG_TRACE(S("[ScriptParser]  - ;"));
 				break;
 
 			default:
 
-				Y_LOG_TRACE(Y_S("[ScriptParser]  - unexpected token type ") << token.type
-					<< Y_S(": \"") << token.string << '\"');
+				Y_LOG_TRACE(S("[ScriptParser]  - unexpected token type ") << token.type
+					<< S(": \"") << token.string << '\"');
 				_commands.clear();
 				return false;
 			}
@@ -77,7 +77,7 @@ bool ScriptParser::parse(const StaticString &script)
 			{
 			case ScriptScanner::Token::Identifier:
 
-				Y_LOG_TRACE(Y_S("[ScriptParser]  - identifier \"") << token.string << '\"');
+				Y_LOG_TRACE(S("[ScriptParser]  - identifier \"") << token.string << '\"');
 				command->args._values.push_back(
 					new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Name, _allocator));
 				break;
@@ -85,14 +85,14 @@ bool ScriptParser::parse(const StaticString &script)
 			case ScriptScanner::Token::XIdentifier:
 			case ScriptScanner::Token::Literal:
 
-				Y_LOG_TRACE(Y_S("[ScriptParser]  - literal \"") << token.string << '\"');
+				Y_LOG_TRACE(S("[ScriptParser]  - literal \"") << token.string << '\"');
 				command->args._values.push_back(
 					new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Literal, _allocator));
 				break;
 
 			case ScriptScanner::Token::String:
 
-				Y_LOG_TRACE(Y_S("[ScriptParser]  - string \"") << token.string << '\"');
+				Y_LOG_TRACE(S("[ScriptParser]  - string \"") << token.string << '\"');
 				command->args._values.push_back(
 					new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::String, _allocator));
 				break;
@@ -104,7 +104,7 @@ bool ScriptParser::parse(const StaticString &script)
 
 			default:
 
-				Y_LOG_TRACE(Y_S("[ScriptParser]  - unexpected token type ") << token.type
+				Y_LOG_TRACE(S("[ScriptParser]  - unexpected token type ") << token.type
 					<< Y_S(": \"") << token.string << '\"');
 				_commands.clear();
 				return false;
@@ -115,12 +115,12 @@ bool ScriptParser::parse(const StaticString &script)
 
 	if (token.type != ScriptScanner::Token::End)
 	{
-		Y_LOG(Y_S("[ScriptParser] Scanner error"));
+		Y_LOG(S("[ScriptParser] Scanner error"));
 		_commands.clear();
 		return false;
 	}
 
-	Y_LOG_TRACE(Y_S("[ScriptParser] Commands parsed: ") << _commands.size());
+	Y_LOG_TRACE(S("[ScriptParser] Commands parsed: ") << _commands.size());
 
 	return true;
 }

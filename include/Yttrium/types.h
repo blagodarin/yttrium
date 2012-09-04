@@ -15,6 +15,8 @@
 namespace Yttrium
 {
 
+class Allocator;
+
 /// Unsigned integer type of \c char size.
 
 typedef unsigned char UChar;
@@ -42,6 +44,10 @@ typedef int_fast32_t Integer;
 /// Generic floating point type.
 
 typedef double Real;
+
+/// The default allocator.
+
+extern Y_API Allocator *const DefaultAllocator;
 
 } // namespace Yttrium
 

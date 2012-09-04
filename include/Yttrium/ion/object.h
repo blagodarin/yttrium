@@ -42,9 +42,11 @@ public:
 
 		ConstRange() noexcept
 			: _first(nullptr)
-			, _size(0)
+			, _last(_first - 1)
 		{
 		}
+
+	public:
 
 		///
 
@@ -57,7 +59,14 @@ public:
 
 		bool is_empty() const noexcept
 		{
-			return !_size;
+			return _first > _last;
+		}
+
+		///
+
+		const Node &last() const noexcept
+		{
+			return **_last;
 		}
 
 		///
@@ -65,28 +74,34 @@ public:
 		void pop_first() noexcept
 		{
 			++_first;
-			--_size;
+		}
+
+		///
+
+		void pop_last() noexcept
+		{
+			--_last;
 		}
 
 		///
 
 		size_t size() const noexcept
 		{
-			return _size;
+			return _last - _first + 1;
 		}
 
 	private:
 
-		ConstRange(const Node *const *first, size_t size)
+		ConstRange(const Node *const *first, const Node *const *last)
 			: _first(first)
-			, _size(size)
+			, _last(last)
 		{
 		}
 
 	private:
 
 		const Node *const *_first;
-		size_t             _size;
+		const Node *const *_last;
 	};
 
 public:
@@ -94,6 +109,14 @@ public:
 	///
 
 	Node *append(const StaticString &name) noexcept;
+
+	///
+
+	Node *append(const Node *node) noexcept;
+
+	///
+
+	bool contains(const StaticString &name) noexcept;
 
 	///
 
@@ -121,14 +144,11 @@ public:
 
 	///
 
-	void to_string(String *result, int indentation = 0) const noexcept
-	{
-		to_string(result, indentation, false);
-	}
+	void to_string(String *result, int indentation = 0) const noexcept;
 
 	///
 
-	String to_string(int indentation = 0) const noexcept; // NOTE: Wrong allocator?
+	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
 
 private: // TODO: protected:
 
@@ -138,7 +158,7 @@ private: // TODO: protected:
 
 	Y_PRIVATE void clear();
 
-	Y_PRIVATE void to_string(String *result, int indentation, bool document) const noexcept;
+	Y_PRIVATE void to_string(String *result, int indentation, bool document) const;
 
 private:
 

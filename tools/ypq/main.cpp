@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	{
 		StaticString options(argv[1]);
 
-		if (options != Y_S("-a"))
+		if (options != S("-a"))
 		{
 			printf("ypq: ERROR: Unknown options \"%s\"\n", options.text());
 			return 1;
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	}
 
 	StaticString index_file_name = argv[argc - 1];
-	StaticString index_file_extension = Y_S(".index");
+	StaticString index_file_extension = S(".index");
 
 	if (!index_file_name.ends_with(index_file_extension))
 	{

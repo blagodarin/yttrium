@@ -14,7 +14,7 @@ typedef InstanceGuard<MemoryManager> MemoryManagerGuard;
 MemoryManager::MemoryManager()
 	: _root_allocator(nullptr)
 {
-	MemoryManagerGuard::enter(this, Y_S("Duplicate MemoryManager construction"));
+	MemoryManagerGuard::enter(this, S("Duplicate MemoryManager construction"));
 
 	_root_allocator = new(DefaultAllocator->allocate<HeapAllocator>())
 		HeapAllocator(DefaultAllocator);
@@ -28,7 +28,7 @@ MemoryManager::~MemoryManager()
 
 	DefaultAllocator->delete_(_root_allocator);
 
-	MemoryManagerGuard::leave(this, Y_S("Duplicate MemoryManager construction"));
+	MemoryManagerGuard::leave(this, S("Duplicate MemoryManager construction"));
 }
 
 MemoryManager *MemoryManager::instance()

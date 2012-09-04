@@ -147,7 +147,15 @@ public:
 
 	///
 
+	List *append_list(const List *list) noexcept;
+
+	///
+
 	Object *append_object() noexcept;
+
+	///
+
+	Object *append_object(const Object *object) noexcept;
 
 	///
 
@@ -155,52 +163,39 @@ public:
 
 	///
 
-	bool is_empty() const noexcept
-	{
-		return !_size;
-	}
+	inline ConstRange const_values() const noexcept;
 
 	///
 
-	size_t size() const noexcept
-	{
-		return _size;
-	}
+	inline bool is_empty() const noexcept;
 
 	///
 
-	void to_string(String *result, int indentation = 0) const noexcept
-	{
-		to_string(result, indentation, false);
-	}
+	inline size_t size() const noexcept;
 
 	///
 
-	String to_string(int indentation = 0) const noexcept; // NOTE: Wrong allocator?
+	inline void to_string(String *result, int indentation = 0) const noexcept;
 
 	///
 
-	Range values() noexcept
-	{
-		return Range(_first, _last, _size);
-	}
+	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
 
 	///
 
-	ConstRange values() const noexcept
-	{
-		return ConstRange(_first, _last, _size);
-	}
+	inline String to_string(Allocator *allocator) const noexcept;
+
+	///
+
+	inline Range values() noexcept;
+
+	///
+
+	inline ConstRange values() const noexcept;
 
 protected:
 
-	List(Document *document)
-		: _document(*document)
-		, _first(nullptr)
-		, _last(nullptr)
-		, _size(0)
-	{
-	}
+	inline List(Document *document) noexcept;
 
 	Y_PRIVATE void to_string(String *result, int indentation, bool node) const;
 
@@ -217,6 +212,51 @@ private:
 	Value    *_last;
 	size_t    _size;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+List::ConstRange List::const_values() const noexcept
+{
+	return ConstRange(_first, _last, _size);
+}
+
+bool List::is_empty() const noexcept
+{
+	return !_size;
+}
+
+size_t List::size() const noexcept
+{
+	return _size;
+}
+
+void List::to_string(String *result, int indentation) const noexcept
+{
+	to_string(result, indentation, false);
+}
+
+String List::to_string(Allocator *allocator) const noexcept
+{
+	return to_string(0, allocator);
+}
+
+List::Range List::values() noexcept
+{
+	return Range(_first, _last, _size);
+}
+
+List::ConstRange List::values() const noexcept
+{
+	return ConstRange(_first, _last, _size);
+}
+
+List::List(Document *document) noexcept
+	: _document(*document)
+	, _first(nullptr)
+	, _last(nullptr)
+	, _size(0)
+{
+}
 
 } // namespace Ion
 

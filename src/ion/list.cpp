@@ -21,6 +21,8 @@ void List::ConstRange::pop_first()
 	--_size;
 }
 
+// TODO: Think about merging append_list() and append_list(const List *).
+
 List *List::append_list()
 {
 	Value *value = _document.new_list_value();
@@ -28,11 +30,57 @@ List *List::append_list()
 	return &value->list();
 }
 
+List *List::append_list(const List *list)
+{
+	List *new_list = append_list();
+
+	// NOTE: This looks way to similar to Object::append(const Node *).
+
+	for (ConstRange r = list->values(); !r.is_empty(); r.pop_first())
+	{
+		const Value &value = r.first();
+
+		switch (value.type())
+		{
+		case Value::ListType:
+
+			new_list->append_list(&value.list());
+			break;
+
+		case Value::ObjectType:
+
+			new_list->append_object(value.object());
+			break;
+
+		default:
+
+			new_list->append(value.string());
+			break;
+		}
+	}
+
+	return new_list;
+}
+
+// TODO: Think about merging append_object() and append_object(const Object *).
+
 Object* List::append_object()
 {
 	Object *object = _document.new_object();
 	append(_document.new_object_value(object));
 	return object;
+}
+
+Object *List::append_object(const Object *object)
+{
+	Object *new_object = append_object();
+
+	for (Object::ConstRange r = object->nodes(); !r.is_empty(); r.pop_first())
+	{
+		new_object->append(&r.first());
+	}
+
+	return new_object;
 }
 
 Value *List::append(const StaticString &string)
@@ -42,9 +90,9 @@ Value *List::append(const StaticString &string)
 	return value;
 }
 
-String List::to_string(int indentation) const
+String List::to_string(int indentation, Allocator *allocator) const
 {
-	String result(_document._allocator);
+	String result(allocator ? allocator : _document._allocator);
 
 	to_string(&result, indentation, false);
 	return result;

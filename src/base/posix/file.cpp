@@ -74,7 +74,7 @@ bool File::open(Special special, Allocator *allocator)
 	case Temporary:
 
 		{
-			String name(Y_S("/tmp/XXXXXX"), allocator);
+			String name(S("/tmp/XXXXXX"), allocator);
 
 			int descriptor = ::mkstemp(name.text());
 

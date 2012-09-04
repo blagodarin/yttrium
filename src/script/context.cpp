@@ -51,7 +51,7 @@ bool ScriptContext::call(const StaticString &name, String *result, const ScriptA
 		return false;
 	}
 
-	Y_LOG_TRACE(Y_S("[ScriptContext] Calling \"") << name << Y_S("\"..."));
+	Y_LOG_TRACE(S("[ScriptContext] Calling \"") << name << S("\"..."));
 
 	StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
@@ -59,13 +59,13 @@ bool ScriptContext::call(const StaticString &name, String *result, const ScriptA
 
 	if (command == _commands.end())
 	{
-		Y_LOG(Y_S("[ScriptContext] Unknown command \"") << id << '\"');
+		Y_LOG(S("[ScriptContext] Unknown command \"") << id << '\"');
 		return false;
 	}
 
 	if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 	{
-		Y_LOG(Y_S("[ScriptContext] Argument number mismatch for command \"") << id << '\"');
+		Y_LOG(S("[ScriptContext] Argument number mismatch for command \"") << id << '\"');
 		return false;
 	}
 

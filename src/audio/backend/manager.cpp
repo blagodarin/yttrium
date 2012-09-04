@@ -8,7 +8,7 @@ namespace Yttrium
 namespace
 {
 
-StaticString backend_openal = Y_S("openal");
+StaticString backend_openal = S("openal");
 
 } //
 

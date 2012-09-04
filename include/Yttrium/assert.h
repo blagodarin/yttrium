@@ -42,7 +42,7 @@ Y_API void abort(const StaticString &message, ...) noexcept;
 		{ \
 			if (Y_UNLIKELY(!(condition))) \
 			{ \
-				Y_ABORT(Y_S("Assertion failed: " #condition)); \
+				Y_ABORT(S("Assertion failed: " #condition)); \
 			} \
 		} while (false)
 #endif

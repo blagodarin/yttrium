@@ -15,7 +15,7 @@ Parser::Parser(Document *document)
 
 bool Parser::parse(const StaticString &string, const StaticString &source_name)
 {
-	Y_LOG_TRACE(Y_S("ion: Parsing:\n") << string);
+	Y_LOG_TRACE(S("ion: Parsing:\n") << string);
 
 	_states.push_back(State(&_document));
 	_state = &_states.back();
@@ -74,7 +74,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 				{
 					if (!*src && src == string.text() + string.size())
 					{
-						Y_LOG(Y_S("ion: Error: ") << source_name << Y_S(": String continues past the end of source"));
+						Y_LOG(S("ion: Error: ") << source_name << S(": String continues past the end of source"));
 						return false;
 					}
 					else if (*src == '\\')
@@ -97,7 +97,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 							}
 							else
 							{
-								Y_LOG(Y_S("ion: Error: ") << source_name << Y_S(": Bad second hex digit '") << c2 << '\'');
+								Y_LOG(S("ion: Error: ") << source_name << S(": Bad second hex digit '") << c2 << '\'');
 								return false;
 							}
 
@@ -123,7 +123,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 							case 't':  *dst++ = '\t'; break;
 							default:
 
-								Y_LOG(Y_S("ion: Error: ") << source_name << Y_S(": Bad escape symbol '") << c1 << '\'');
+								Y_LOG(S("ion: Error: ") << source_name << S(": Bad escape symbol '") << c1 << '\'');
 								return false;
 							}
 						}
@@ -190,7 +190,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 
 bool Parser::parse_name(const StaticString &name)
 {
-	Y_LOG_TRACE(Y_S("ion: Token: ") << name);
+	Y_LOG_TRACE(S("ion: Token: ") << name);
 
 	if (!_state->object)
 	{
@@ -203,7 +203,7 @@ bool Parser::parse_name(const StaticString &name)
 
 bool Parser::parse_value(const StaticString &value)
 {
-	Y_LOG_TRACE(Y_S("ion: Token: \"") << String(value, String::Ref, _document._allocator).escaped(Y_S("\\\""), '\\') << '"');
+	Y_LOG_TRACE(S("ion: Token: \"") << String(value, String::Ref, _document._allocator).escaped(S("\\\""), '\\') << '"');
 
 	if (!_state->list)
 	{
@@ -216,7 +216,7 @@ bool Parser::parse_value(const StaticString &value)
 
 bool Parser::parse_lbrace()
 {
-	Y_LOG_TRACE(Y_S("ion: Token: {"));
+	Y_LOG_TRACE(S("ion: Token: {"));
 
 	if (!_state->list)
 	{
@@ -230,7 +230,7 @@ bool Parser::parse_lbrace()
 
 bool Parser::parse_rbrace()
 {
-	Y_LOG_TRACE(Y_S("ion: Token: }"));
+	Y_LOG_TRACE(S("ion: Token: }"));
 
 	if (!_state->object || _states.size() == 1)
 	{
@@ -244,7 +244,7 @@ bool Parser::parse_rbrace()
 
 bool Parser::parse_lbracket()
 {
-	Y_LOG_TRACE(Y_S("Token: ["));
+	Y_LOG_TRACE(S("Token: ["));
 
 	if (!_state->list)
 	{
@@ -258,7 +258,7 @@ bool Parser::parse_lbracket()
 
 bool Parser::parse_rbracket()
 {
-	Y_LOG_TRACE(Y_S("Token: ]"));
+	Y_LOG_TRACE(S("Token: ]"));
 
 	if (_state->object || _states.size() == 1)
 	{
@@ -272,7 +272,7 @@ bool Parser::parse_rbracket()
 
 bool Parser::parse_end()
 {
-	Y_LOG_TRACE(Y_S("Token: <end>"));
+	Y_LOG_TRACE(S("Token: <end>"));
 
 	return _states.size() == 1;
 }

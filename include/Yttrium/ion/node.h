@@ -27,10 +27,7 @@ public:
 
 	///
 
-	StaticString name() const noexcept
-	{
-		return _name;
-	}
+	inline StaticString name() const noexcept;
 
 	///
 
@@ -38,13 +35,7 @@ public:
 
 	///
 
-	String to_string(int indentation = 0) const noexcept
-	{
-		String result(_name.allocator()); // NOTE: Wrong allocator?
-
-		to_string(&result, indentation);
-		return result;
-	}
+	inline String to_string(int indentation = 0) const noexcept;
 
 private:
 
@@ -57,6 +48,21 @@ private:
 	String  _name;
 	Node   *_next;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+StaticString Node::name() const noexcept
+{
+	return _name;
+}
+
+String Node::to_string(int indentation) const noexcept
+{
+	String result(_name.allocator()); // NOTE: Wrong allocator?
+
+	to_string(&result, indentation);
+	return result;
+}
 
 } // namespace Ion
 

@@ -16,9 +16,44 @@ Node *Object::append(const StaticString &name)
 	return node;
 }
 
+Node *Object::append(const Node *node)
+{
+	Node *new_node = append(node->name());
+
+	for (Node::ConstRange r = node->values(); !r.is_empty(); r.pop_first())
+	{
+		const Value &value = r.first();
+
+		switch (value.type())
+		{
+		case Value::ListType:
+
+			new_node->append_list(&value.list());
+			break;
+
+		case Value::ObjectType:
+
+			new_node->append_object(value.object());
+			break;
+
+		default:
+
+			new_node->append(value.string());
+			break;
+		}
+	}
+
+	return new_node;
+}
+
+bool Object::contains(const StaticString &name)
+{
+	return _node_map.find(String(name, String::Ref)) != _node_map.end();
+}
+
 const Node *Object::first() const
 {
-	return (_nodes.empty() ? nullptr : _nodes.front());
+	return _nodes.empty() ? nullptr : _nodes.front();
 }
 
 const Node *Object::first(const StaticString &name) const
@@ -37,9 +72,12 @@ const Node *Object::first(const StaticString &name) const
 
 Object::ConstRange Object::nodes() const
 {
-	return ConstRange(
-		(_nodes.empty() ? nullptr : &_nodes.front()),
-		_nodes.size());
+	if (_nodes.empty())
+	{
+		return ConstRange();
+	}
+
+	return ConstRange(&_nodes.front(), &_nodes.back());
 }
 
 Object::ConstRange Object::nodes(const StaticString &name) const
@@ -50,7 +88,7 @@ Object::ConstRange Object::nodes(const StaticString &name) const
 		const Nodes &nodes = i->second;
 		if (!nodes.empty())
 		{
-			return ConstRange(&nodes.front(), nodes.size());
+			return ConstRange(&nodes.front(), &nodes.back());
 		}
 	}
 	return ConstRange();
@@ -75,9 +113,14 @@ const Node *Object::last(const StaticString &name) const
 	return nullptr;
 }
 
-String Object::to_string(int indentation) const
+void Object::to_string(String *result, int indentation) const
 {
-	String result(_document._allocator);
+	to_string(result, indentation, false);
+}
+
+String Object::to_string(int indentation, Allocator *allocator) const
+{
+	String result(allocator ? allocator : _document._allocator);
 
 	to_string(&result, indentation);
 	return result;
@@ -129,7 +172,7 @@ void Object::to_string(String *result, int indentation, bool document) const
 	{
 		if (!document)
 		{
-			result->append('\n').append('\t', indentation).append(Y_S("{\n"));
+			result->append('\n').append('\t', indentation).append(S("{\n"));
 		}
 
 		int node_indentation = (document ? indentation : indentation + 1);
