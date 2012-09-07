@@ -55,7 +55,7 @@ bool ScriptContext::call(const StaticString &name, String *result, const ScriptA
 
 	StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
-	Commands::iterator command = _commands.find(String(id, String::Ref, nullptr));
+	Commands::iterator command = _commands.find(String(id, ByReference(), nullptr));
 
 	if (command == _commands.end())
 	{
@@ -100,7 +100,7 @@ bool ScriptContext::execute_file(const StaticString &name)
 
 ScriptValue *ScriptContext::find(const StaticString &name) const
 {
-	Entities::const_iterator i = _entities.find(String(name, String::Ref, nullptr));
+	Entities::const_iterator i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i != _entities.end())
 	{
@@ -122,7 +122,7 @@ ScriptContext *ScriptContext::root()
 
 const ScriptValue *ScriptContext::set(const StaticString &name, Integer value, ScriptValue::Flags flags)
 {
-	Entities::iterator i = _entities.find(String(name, String::Ref, nullptr));
+	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i != _entities.end() && !(flags & ScriptValue::Default))
 	{
@@ -152,7 +152,7 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Integer value, S
 
 const ScriptValue *ScriptContext::set(const StaticString &name, Real value, ScriptValue::Flags flags)
 {
-	Entities::iterator i = _entities.find(String(name, String::Ref, nullptr));
+	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i != _entities.end() && !(flags & ScriptValue::Default))
 	{
@@ -182,7 +182,7 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Real value, Scri
 
 const ScriptValue *ScriptContext::set(const StaticString &name, const StaticString &value, ScriptValue::Flags flags)
 {
-	Entities::iterator i = _entities.find(String(name, String::Ref, nullptr));
+	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i != _entities.end() && !(flags & ScriptValue::Default))
 	{
@@ -255,7 +255,7 @@ String ScriptContext::substitute(const StaticString &string, Allocator *allocato
 
 void ScriptContext::unset(const StaticString &name)
 {
-	Entities::iterator i = _entities.find(String(name, String::Ref, nullptr));
+	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i != _entities.end())
 	{
@@ -272,7 +272,7 @@ void ScriptContext::unset(const StaticString &name)
 
 void ScriptContext::undefine(const StaticString &name)
 {
-	_commands.erase(String(name, String::Ref, nullptr));
+	_commands.erase(String(name, ByReference(), nullptr));
 }
 
 } // namespace Yttrium

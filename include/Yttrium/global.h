@@ -1,6 +1,6 @@
 /// \file
 /// \brief Global definitions.
-/// \note This header is included (directly or indirectly) in all other %Yttrium headers.
+/// \note This header is included (directly or indirectly) by all other %Yttrium headers.
 
 // All the macros that start with __Y are internal to a single header and should
 // only be used in that header. As such, they are pseudo-documented by the ordinary
@@ -10,22 +10,21 @@
 #define __Y_GLOBAL_H
 
 // \def __YTTRIUM
-// \brief %Yttrium compilation "flag".
-// \note This should be defined by the build system when compiling the %Yttrium itself.
+// \brief Yttrium compilation "flag".
+// \note This should be defined by the build system when compiling %Yttrium itself.
 
-/******************************************************************************\
-* 1) Detect the compiler version and filter the unsupported compilers.
-\******************************************************************************/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Detect the compiler version and filter the unsupported compilers.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // \def __Y_GCC
-// \brief GCC version number (e.g. 43 for GCC 4.3).
-// \note The minimal supported GCC version is 4.3.
+// \brief GCC version number (e.g. 46 for GCC 4.6).
 
 #if defined(__GNUC__)
-	#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+	#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
 		#define __Y_GCC (__GNUC__ * 10 + __GNUC_MINOR__)
 	#else
-		#error GCC compilers older than 4.3 are not supported.
+		#error GCC compilers older than 4.6 are not supported.
 	#endif
 #else
 	#define __Y_GCC 0
@@ -33,7 +32,6 @@
 
 // \def __Y_MSVC
 // \brief MSVC version number (e.g. 71 for MSVC 7.1, 100 for MSVC 10.0).
-// \note The minimal supported MSVC version is 10.0.
 
 #if defined(_MSC_VER)
 	#if _MSC_VER >= 1700
@@ -53,15 +51,12 @@
 	#error Only the GCC and MSVC compilers are supported.
 #endif
 
-/******************************************************************************\
-* 2) Detect the target platform.
-\******************************************************************************/
-
-// If it's not Windows, then it's definitely Linux. I do not need Macs,
-// and I need FreeBSD etc. even less. =)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Detect the target platform.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// \def Y_IS_LINUX
-/// \brief
+/// \brief Defined to 1 when compiling for Linux.
 
 #if defined(__linux__)
 	#define Y_IS_LINUX 1
@@ -70,7 +65,7 @@
 #endif
 
 /// \def Y_IS_POSIX
-/// \brief Defined to 1 for a POSIX system, including Linux.
+/// \brief Defined to 1 when compiling for a POSIX system, including Linux.
 
 #if Y_IS_LINUX || defined(__unix__)
 	#define Y_IS_POSIX 1
@@ -79,7 +74,7 @@
 #endif
 
 /// \def Y_WINDOWS
-/// \brief
+/// \brief Defined to 1 when compiling for Windows.
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	#define Y_IS_WINDOWS 1
@@ -88,7 +83,6 @@
 #endif
 
 // Check the correctness of the platform definitions.
-// NOTE: Do we need this really?
 
 #if Y_IS_POSIX && Y_IS_WINDOWS
 	#error Invalid target platform.
@@ -98,12 +92,9 @@
 	#error Unknown target platform.
 #endif
 
-// Actually, Yttrium threats Windows as Windows and Linux as POSIX + X11 combo.
-// NOTE: There is one exception, namely SystemAllocator, which is for Linux.
-
-/******************************************************************************\
-* 3) Neutralize the supported compilers' differences.
-\******************************************************************************/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Neutralize the supported compilers' differences.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // __func__ for MSVC (in MSVC 10.0, __func__ is still unsupported).
 
@@ -111,17 +102,10 @@
 	#define __func__ __FUNCTION__
 #endif
 
-// noexcept for older versions of GCC.
 // MSVC doesn't support noexcept, but treats throw() just the same way.
 
-#if ((__Y_GCC && __Y_GCC < 46) || __Y_MSVC) && !defined(noexcept)
+#if __Y_MSVC && !defined(noexcept)
 	#define noexcept throw()
-#endif
-
-// nullptr for older versions of GCC.
-
-#if __Y_GCC && __Y_GCC < 46 && !defined(nullptr)
-	#define nullptr __null
 #endif
 
 /// \def Y_EXPORT
@@ -169,9 +153,9 @@
 
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 
-/******************************************************************************\
-* 4) Provide some globally useful (now-) compiler-independent definitions.
-\******************************************************************************/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Provide some globally useful (now-) compiler-independent definitions.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// \def Y_API
 /// \brief Public %Yttrium API specifier.
@@ -183,7 +167,7 @@
 #endif
 
 /// \def Y_IS_DEBUG
-/// \brief Defined to 1 when compiling in the debug mode and to 0 otherwise.
+/// \brief Defined to 1 when compiling in the debug mode.
 
 #if defined(_DEBUG) && !defined(NDEBUG)
 	#define Y_IS_DEBUG 1

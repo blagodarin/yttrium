@@ -26,11 +26,11 @@ String::String(const String &string)
 }
 
 String::String(const StaticString &string, Allocator *allocator)
-	: StaticString(string._size)
+	: StaticString(string.size())
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
-	init(string._text, _size);
+	init(string.text(), _size);
 }
 
 String::String(const char *text, size_t size, Allocator *allocator)
@@ -57,35 +57,35 @@ String::String(size_t size, Allocator *allocator)
 }
 
 String::String(const StaticString &left, const StaticString &right, Allocator *allocator)
-	: StaticString(left._size + right._size)
+	: StaticString(left.size() + right.size())
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init();
-	memcpy(_text, left._text, left._size);
-	memcpy(&_text[left._size], right._text, right._size);
+	memcpy(_text, left.text(), left.size());
+	memcpy(&_text[left.size()], right.text(), right.size());
 	_text[_size] = '\0';
 }
 
 String::String(const StaticString &left, char right, Allocator *allocator)
-	: StaticString(left._size + 1)
+	: StaticString(left.size() + 1)
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init();
-	memcpy(_text, left._text, left._size);
-	_text[left._size] = right;
+	memcpy(_text, left.text(), left.size());
+	_text[left.size()] = right;
 	_text[_size] = '\0';
 }
 
 String::String(char left, const StaticString &right, Allocator *allocator)
-	: StaticString(1 + right._size)
+	: StaticString(1 + right.size())
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init();
 	_text[0] = left;
-	memcpy(&_text[1], right._text, right._size);
+	memcpy(&_text[1], right.text(), right.size());
 	_text[_size] = '\0';
 }
 
@@ -100,8 +100,6 @@ String::~String()
 		}
 	}
 }
-
-const String::Reference String::Ref = String::Reference();
 
 String &String::append(const char *text, size_t size)
 {
@@ -255,27 +253,6 @@ String &String::clear()
 	_text = const_cast<char *>(&Null);
 	_size = 0;
 	return *this;
-}
-
-String String::escaped(const char *symbols, char with) const
-{
-	String result(_size); // The best-case assumption.
-
-	const char *end = _text + _size;
-
-	for (const char *i = _text; i != end; ++i)
-	{
-		for (const char *j = symbols; *j; ++j)
-		{
-			if (*i == *j)
-			{
-				result.append(with);
-				break;
-			}
-		}
-		result.append(*i);
-	}
-	return result;
 }
 
 void String::insert(const StaticString &text, size_t index)
@@ -493,6 +470,42 @@ String &String::set(char symbol)
 	_size = 1;
 
 	return *this;
+}
+
+void String::swap(String *string)
+{
+	char *text = _text;
+	size_t size = _size;
+	size_t buffer_size = _buffer_size;
+	Allocator *allocator = _allocator;
+
+	_text = string->_text;
+	_size = string->_size;
+	_buffer_size = string->_buffer_size;
+	_allocator = string->_allocator;
+
+	string->_text = text;
+	string->_size = size;
+	string->_buffer_size = buffer_size;
+	string->_allocator = allocator;
+}
+
+void String::swap(String &&string)
+{
+	char *text = _text;
+	size_t size = _size;
+	size_t buffer_size = _buffer_size;
+	Allocator *allocator = _allocator;
+
+	_text = string._text;
+	_size = string._size;
+	_buffer_size = string._buffer_size;
+	_allocator = string._allocator;
+
+	string._text = text;
+	string._size = size;
+	string._buffer_size = buffer_size;
+	string._allocator = allocator;
 }
 
 String &String::trim()

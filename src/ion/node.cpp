@@ -21,6 +21,14 @@ void Node::to_string(String *result, int indentation) const
 	}
 }
 
+String Node::to_string(int indentation, Allocator *allocator) const noexcept
+{
+	String result(allocator ? allocator : _name.allocator()); // NOTE: Wrong allocator?
+
+	to_string(&result, indentation);
+	return result;
+}
+
 Node::Node(Document *document, const StaticString &name)
 	: List(document)
 	, _name(name, document->_allocator)
@@ -28,9 +36,9 @@ Node::Node(Document *document, const StaticString &name)
 {
 }
 
-Node::Node(Document *document, const StaticString &name, const String::Reference &)
+Node::Node(Document *document, const StaticString &name, const ByReference &)
 	: List(document)
-	, _name(name, String::Ref, document->_allocator)
+	, _name(name, ByReference(), document->_allocator)
 	, _next(nullptr)
 {
 }

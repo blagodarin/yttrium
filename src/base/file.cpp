@@ -3,6 +3,7 @@
 #include <Yttrium/buffer.h>
 #include <Yttrium/package.h>
 #include <Yttrium/string.h>
+#include <Yttrium/utils.h>
 
 namespace Yttrium
 {

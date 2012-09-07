@@ -73,7 +73,11 @@ public:
 
 	Allocator *_allocator;
 
-public: // TODO: Make it conditionally public (for unit tests only).
+#ifndef __YTTRIUM_TEST
+private:
+#else
+public:
+#endif
 
 	std::atomic_size_t _references;
 };

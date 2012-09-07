@@ -5,10 +5,12 @@
 #define __Y_ION_LIST_H
 
 #include <Yttrium/noncopyable.h>
-#include <Yttrium/string.h>
+#include <Yttrium/static_string.h>
 
 namespace Yttrium
 {
+
+class String;
 
 namespace Ion
 {
@@ -37,24 +39,15 @@ public:
 
 		///
 
-		Value &first() const noexcept
-		{
-			return *_first;
-		}
+		inline Value &first() const noexcept;
 
 		///
 
-		bool is_empty() const noexcept
-		{
-			return !_size;
-		}
+		inline bool is_empty() const noexcept;
 
 		///
 
-		Value &last() const noexcept
-		{
-			return *_last;
-		}
+		inline Value &last() const noexcept;
 
 		///
 
@@ -62,19 +55,11 @@ public:
 
 		///
 
-		size_t size() const noexcept
-		{
-			return _size;
-		}
+		inline size_t size() const noexcept;
 
 	private:
 
-		Range(Value *first, Value *last, size_t size) noexcept
-			: _first(first)
-			, _last(last)
-			, _size(size)
-		{
-		}
+		inline Range(Value *first, Value *last, size_t size) noexcept;
 
 	private:
 
@@ -93,24 +78,15 @@ public:
 
 		///
 
-		const Value &first() const noexcept
-		{
-			return *_first;
-		}
+		inline const Value &first() const noexcept;
 
 		///
 
-		bool is_empty() const noexcept
-		{
-			return !_size;
-		}
+		inline bool is_empty() const noexcept;
 
 		///
 
-		const Value &last() const noexcept
-		{
-			return *_last;
-		}
+		inline const Value &last() const noexcept;
 
 		///
 
@@ -118,19 +94,11 @@ public:
 
 		///
 
-		size_t size() const noexcept
-		{
-			return _size;
-		}
+		inline size_t size() const noexcept;
 
 	private:
 
-		ConstRange(const Value *first, const Value *last, size_t size) noexcept
-			: _first(first)
-			, _last(last)
-			, _size(size)
-		{
-		}
+		inline ConstRange(const Value *first, const Value *last, size_t size) noexcept;
 
 	private:
 
@@ -147,7 +115,7 @@ public:
 
 	///
 
-	List *append_list(const List *list) noexcept;
+	List *append_list(const List &list) noexcept;
 
 	///
 
@@ -155,11 +123,15 @@ public:
 
 	///
 
-	Object *append_object(const Object *object) noexcept;
+	Object *append_object(const Object &object) noexcept;
 
 	///
 
 	Value *append(const StaticString &string) noexcept;
+
+	///
+
+	void concatenate(const List &list) noexcept;
 
 	///
 
@@ -183,7 +155,7 @@ public:
 
 	///
 
-	inline String to_string(Allocator *allocator) const noexcept;
+	String to_string(Allocator *allocator) const noexcept;
 
 	///
 
@@ -197,13 +169,12 @@ protected:
 
 	inline List(Document *document) noexcept;
 
-	Y_PRIVATE void to_string(String *result, int indentation, bool node) const;
+	Y_PRIVATE void to_string(String *result, int indentation, bool node) const noexcept;
 
 private:
 
-	Y_PRIVATE Value *append(const StaticString &string, const String::Reference &);
-
-	Y_PRIVATE void append(Value *value);
+	Y_PRIVATE Value *append(const StaticString &string, const ByReference &) noexcept;
+	Y_PRIVATE void append(Value *value) noexcept;
 
 private:
 
@@ -213,7 +184,66 @@ private:
 	size_t    _size;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Value &List::Range::first() const noexcept
+{
+	return *_first;
+}
+
+bool List::Range::is_empty() const noexcept
+{
+	return !_size;
+}
+
+Value &List::Range::last() const noexcept
+{
+	return *_last;
+}
+
+size_t List::Range::size() const noexcept
+{
+	return _size;
+}
+
+List::Range::Range(Value *first, Value *last, size_t size) noexcept
+	: _first(first)
+	, _last(last)
+	, _size(size)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const Value &List::ConstRange::first() const noexcept
+{
+	return *_first;
+}
+
+bool List::ConstRange::is_empty() const noexcept
+{
+	return !_size;
+}
+
+const Value &List::ConstRange::last() const noexcept
+{
+	return *_last;
+}
+
+size_t List::ConstRange::size() const noexcept
+{
+	return _size;
+}
+
+List::ConstRange::ConstRange(const Value *first, const Value *last, size_t size) noexcept
+	: _first(first)
+	, _last(last)
+	, _size(size)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 List::ConstRange List::const_values() const noexcept
 {
@@ -233,11 +263,6 @@ size_t List::size() const noexcept
 void List::to_string(String *result, int indentation) const noexcept
 {
 	to_string(result, indentation, false);
-}
-
-String List::to_string(Allocator *allocator) const noexcept
-{
-	return to_string(0, allocator);
 }
 
 List::Range List::values() noexcept

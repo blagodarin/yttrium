@@ -16,39 +16,24 @@ Node *Object::append(const StaticString &name)
 	return node;
 }
 
-Node *Object::append(const Node *node)
+Node *Object::append(const Node &node)
 {
-	Node *new_node = append(node->name());
-
-	for (Node::ConstRange r = node->values(); !r.is_empty(); r.pop_first())
-	{
-		const Value &value = r.first();
-
-		switch (value.type())
-		{
-		case Value::ListType:
-
-			new_node->append_list(&value.list());
-			break;
-
-		case Value::ObjectType:
-
-			new_node->append_object(value.object());
-			break;
-
-		default:
-
-			new_node->append(value.string());
-			break;
-		}
-	}
-
+	Node *new_node = append(node.name());
+	new_node->concatenate(node);
 	return new_node;
+}
+
+void Object::concatenate(const Object &object)
+{
+	for (Object::ConstRange r = object.nodes(); !r.is_empty(); r.pop_first())
+	{
+		append(r.first());
+	}
 }
 
 bool Object::contains(const StaticString &name)
 {
-	return _node_map.find(String(name, String::Ref)) != _node_map.end();
+	return _node_map.find(String(name, ByReference())) != _node_map.end();
 }
 
 const Node *Object::first() const
@@ -58,7 +43,7 @@ const Node *Object::first() const
 
 const Node *Object::first(const StaticString &name) const
 {
-	NodeMap::const_iterator i = _node_map.find(String(name, String::Ref));
+	NodeMap::const_iterator i = _node_map.find(String(name, ByReference()));
 	if (i != _node_map.end())
 	{
 		const Nodes &nodes = i->second;
@@ -101,7 +86,7 @@ const Node *Object::last() const
 
 const Node *Object::last(const StaticString &name) const
 {
-	NodeMap::const_iterator i = _node_map.find(String(name, String::Ref));
+	NodeMap::const_iterator i = _node_map.find(String(name, ByReference()));
 	if (i != _node_map.end())
 	{
 		const Nodes &nodes = i->second;
@@ -131,9 +116,9 @@ Object::Object(Document *document)
 {
 }
 
-Node *Object::append(const StaticString &name, const String::Reference &)
+Node *Object::append(const StaticString &name, const ByReference &)
 {
-	Node *node = _document.new_node(name, String::Ref);
+	Node *node = _document.new_node(name, ByReference());
 	_nodes.push_back(node);
 	_node_map[node->_name].push_back(node); // NOTE: Possible Allocator-less String construction.
 	return node;

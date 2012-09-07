@@ -11,7 +11,7 @@ enum
 Clock Timer::reset()
 {
 	Clock result = _time;
-	if (_started)
+	if (_is_started)
 	{
 		Clock time = clock();
 		result += time - _start_time;
@@ -25,7 +25,7 @@ Clock Timer::restart()
 {
 	Clock time = clock();
 	Clock result = _time;
-	if (_started)
+	if (_is_started)
 	{
 		result += time - _start_time;
 		_start_time = time;
@@ -33,7 +33,7 @@ Clock Timer::restart()
 	else
 	{
 		_start_time = time;
-		_started = true;
+		_is_started = true;
 	}
 	_time = 0;
 	return result;
@@ -41,19 +41,19 @@ Clock Timer::restart()
 
 void Timer::start()
 {
-	if (!_started)
+	if (!_is_started)
 	{
 		_start_time = clock();
-		_started = true;
+		_is_started = true;
 	}
 }
 
 Clock Timer::stop()
 {
-	if (_started)
+	if (_is_started)
 	{
 		_time += clock() - _start_time;
-		_started = false;
+		_is_started = false;
 	}
 	return _time;
 }

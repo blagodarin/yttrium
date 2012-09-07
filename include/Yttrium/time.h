@@ -38,11 +38,12 @@ public:
 
 	///
 
-	Timer() noexcept
-		: _time(0)
-		, _started(false)
-	{
-	}
+	inline Timer() noexcept;
+
+	/// Return \c true if the timer is started.
+	/// \return \c true for a started timer.
+
+	inline bool is_started() const noexcept;
 
 	/// Reset the timer time without changing any other state.
 	/// \return Timer value on reset.
@@ -57,10 +58,7 @@ public:
 	/// Set the stored time to the specified value.
 	/// \param time Time to set.
 
-	void setTime(Clock time) noexcept
-	{
-		_time = time;
-	}
+	inline void set_time(Clock time) noexcept;
 
 	/// Start the timer if it's not started.
 
@@ -74,18 +72,7 @@ public:
 	/// Get the current timer time.
 	/// \return Timer time.
 
-	Clock time() const noexcept
-	{
-		return (_time + (_started ? clock() - _start_time : 0));
-	}
-
-	/// Return \c true if the timer is started.
-	/// \return \c true for a started timer.
-
-	bool started() const noexcept
-	{
-		return _started;
-	}
+	inline Clock time() const noexcept;
 
 public:
 
@@ -98,20 +85,19 @@ public:
 private:
 
 	Clock _time;
-	bool  _started;
+	bool  _is_started;
 	Clock _start_time;
 };
 
 /// Rate counter.
 
-class Y_API RateCounter // NOTE: Rename.
+class Y_API RateCounter // TODO: Rename.
 {
 public:
 
-	RateCounter() noexcept
-		: _rate(0)
-	{
-	}
+	///
+
+	inline RateCounter() noexcept;
 
 	/// Start the counter.
 	/// \note Should be called just before the beginning of the counted loop.
@@ -126,18 +112,53 @@ public:
 	/// Return the current rate.
 	/// \return Current rate.
 
-	size_t rate() const noexcept
-	{
-		return _rate;
-	}
+	inline Clock rate() const noexcept;
 
 private:
 
-	Clock  _last_time;
-	Clock  _total_time;
-	size_t _ticks; // NOTE: Why size_t?
-	size_t _rate;
+	Clock _last_time;
+	Clock _total_time;
+	Clock _ticks;
+	Clock _rate;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Timer::Timer() noexcept
+	: _time(0)
+	, _is_started(false)
+{
+}
+
+bool Timer::is_started() const noexcept
+{
+	return _is_started;
+}
+
+void Timer::set_time(Clock time) noexcept
+{
+	_time = time;
+}
+
+Clock Timer::time() const noexcept
+{
+	return _is_started
+		? _time + (clock() - _start_time)
+		: _time;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+RateCounter::RateCounter() noexcept
+	: _rate(0)
+{
+}
+
+Clock RateCounter::rate() const noexcept
+{
+	return _rate;
+}
 
 } // namespace Yttrium
 

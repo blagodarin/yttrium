@@ -4,7 +4,8 @@
 
 #include "mutex.h"
 
-#include <time.h> // clock_gettime, timespec
+#include <errno.h> // ETIMEDOUT
+#include <time.h>  // clock_gettime, timespec
 
 namespace Yttrium
 {

@@ -1,5 +1,7 @@
 #include "builtin.h"
 
+#include <Yttrium/utils.h>
+
 #include "../renderer.h"
 
 #include "data.h"

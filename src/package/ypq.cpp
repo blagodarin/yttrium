@@ -114,7 +114,7 @@ bool YpqReader::open()
 
 PackedFile YpqReader::open_file(const StaticString &name)
 {
-	Index::const_iterator i = _index.find(String(name, String::Ref));
+	Index::const_iterator i = _index.find(String(name, ByReference()));
 
 	if (i != _index.end())
 	{

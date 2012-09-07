@@ -21,65 +21,35 @@ void List::ConstRange::pop_first()
 	--_size;
 }
 
-// TODO: Think about merging append_list() and append_list(const List *).
-
 List *List::append_list()
 {
-	Value *value = _document.new_list_value();
-	append(value);
-	return &value->list();
-}
-
-List *List::append_list(const List *list)
-{
-	List *new_list = append_list();
-
-	// NOTE: This looks way to similar to Object::append(const Node *).
-
-	for (ConstRange r = list->values(); !r.is_empty(); r.pop_first())
-	{
-		const Value &value = r.first();
-
-		switch (value.type())
-		{
-		case Value::ListType:
-
-			new_list->append_list(&value.list());
-			break;
-
-		case Value::ObjectType:
-
-			new_list->append_object(value.object());
-			break;
-
-		default:
-
-			new_list->append(value.string());
-			break;
-		}
-	}
-
+	Value *new_value = _document.new_list_value();
+	List *new_list = &new_value->list();
+	append(new_value);
 	return new_list;
 }
 
-// TODO: Think about merging append_object() and append_object(const Object *).
-
-Object* List::append_object()
+List *List::append_list(const List &list)
 {
-	Object *object = _document.new_object();
-	append(_document.new_object_value(object));
-	return object;
+	Value *new_value = _document.new_list_value();
+	List *new_list = &new_value->list();
+	new_list->concatenate(list);
+	append(new_value);
+	return new_list;
 }
 
-Object *List::append_object(const Object *object)
+Object *List::append_object()
 {
-	Object *new_object = append_object();
+	Object *new_object = _document.new_object();
+	append(_document.new_object_value(new_object));
+	return new_object;
+}
 
-	for (Object::ConstRange r = object->nodes(); !r.is_empty(); r.pop_first())
-	{
-		new_object->append(&r.first());
-	}
-
+Object *List::append_object(const Object &object)
+{
+	Object *new_object = _document.new_object();
+	new_object->concatenate(object);
+	append(_document.new_object_value(new_object));
 	return new_object;
 }
 
@@ -90,11 +60,45 @@ Value *List::append(const StaticString &string)
 	return value;
 }
 
+void List::concatenate(const List &list)
+{
+	for (ConstRange r = list.values(); !r.is_empty(); r.pop_first())
+	{
+		const Value &value = r.first();
+
+		switch (value.type())
+		{
+		case Value::ListType:
+
+			append_list(value.list());
+			break;
+
+		case Value::ObjectType:
+
+			append_object(*value.object());
+			break;
+
+		default:
+
+			append(_document.new_value(value.string()));
+			break;
+		}
+	}
+}
+
 String List::to_string(int indentation, Allocator *allocator) const
 {
 	String result(allocator ? allocator : _document._allocator);
 
 	to_string(&result, indentation, false);
+	return result;
+}
+
+String List::to_string(Allocator *allocator) const
+{
+	String result(allocator ? allocator : _document._allocator);
+
+	to_string(&result, 0, false);
 	return result;
 }
 
@@ -135,9 +139,9 @@ void List::to_string(String *result, int indentation, bool node) const
 	}
 }
 
-Value *List::append(const StaticString &string, const String::Reference &)
+Value *List::append(const StaticString &string, const ByReference &)
 {
-	Value *value = _document.new_value(string, String::Ref);
+	Value *value = _document.new_value(string, ByReference());
 	append(value);
 	return value;
 }

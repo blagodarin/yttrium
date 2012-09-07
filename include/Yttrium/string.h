@@ -18,11 +18,7 @@ public:
 
 	///
 
-	String(Allocator *allocator = DefaultAllocator) noexcept
-		: _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
+	inline String(Allocator *allocator = DefaultAllocator) noexcept;
 
 	/// Copy constructor.
 	/// \param string The source string.
@@ -74,58 +70,30 @@ public:
 
 public:
 
-	/// Reference specifier type.
-
-	struct Reference
-	{
-	};
-
-	/// Reference specifier.
-
-	static const Reference Ref;
-
 	/// Reference constructor.
 	/// \param text
 	/// \param size
 	/// \param allocator
 
-	String(const char *text, size_t size, const Reference &, Allocator *allocator = DefaultAllocator) noexcept
-		: StaticString(text, size)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
+	inline String(const char *text, size_t size, const ByReference &, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String(const StaticString &string, const Reference &, Allocator *allocator = DefaultAllocator) noexcept
-		: StaticString(string)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
+	inline String(const StaticString &string, const ByReference &, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String(const char *text, const Reference &, Allocator *allocator = DefaultAllocator) noexcept
-		: StaticString(text)
-		, _buffer_size(0)
-		, _allocator(allocator)
-	{
-	}
+	inline String(const char *text, const ByReference &, Allocator *allocator = DefaultAllocator) noexcept;
 
 public:
 
 	///
 
-	Allocator *allocator() const noexcept
-	{
-		return const_cast<Allocator *>(_allocator);
-	}
+	inline Allocator *allocator() const noexcept;
 
 	/// Append the specified \a string.
 
@@ -135,10 +103,7 @@ public:
 	* \overload
 	*/
 
-	String &append(const StaticString &string) noexcept
-	{
-		return append(string.text(), string.size());
-	}
+	inline String &append(const StaticString &string) noexcept;
 
 	/**
 	* \overload
@@ -155,19 +120,13 @@ public:
 	/// \param width Minimal number width.
 	/// \param zeros Should the value be prepended with zeros instead of spaces to fit \a width?
 
-	String &append_dec(int32_t value, int width = 0, bool zeros = false) noexcept
-	{
-		return append_dec(static_cast<int64_t>(value), width, zeros);
-	}
+	inline String &append_dec(int32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String &append_dec(uint32_t value, int width = 0, bool zeros = false) noexcept
-	{
-		return append_dec(static_cast<uint64_t>(value), width, zeros);
-	}
+	inline String &append_dec(uint32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
@@ -199,21 +158,11 @@ public:
 
 	/// Escape (prepend) all the specified \a symbols with an escape symbol \a with in-place.
 
-	String &escape(const char *symbols, char with) noexcept
-	{
-		String result = escaped(symbols, with);
-		if (result._size != _size)
-		{
-			// NOTE: We can swap the pointers (and allocators) here.
+	inline String &escape(const char *symbols, char with) noexcept;
 
-			set(result);
-		}
-		return *this;
-	}
+	/// \see StaticString::escaped
 
-	/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
-
-	String escaped(const char *symbols, char with) const noexcept;
+	inline String escaped(const char *symbols, char with) const noexcept;
 
 	///
 	/// \note The \a text must not refer to the current string's data.
@@ -248,10 +197,7 @@ public:
 	* \overload
 	*/
 
-	String &set(const StaticString &string) noexcept
-	{
-		return set(string._text, string._size);
-	}
+	inline String &set(const StaticString &string) noexcept;
 
 	/**
 	* \overload
@@ -267,50 +213,45 @@ public:
 
 	///
 
+	void swap(String *string) noexcept;
+
+	/**
+	* \overload
+	*/
+
+	void swap(String &&string) noexcept;
+
+	///
+
 	String &trim() noexcept;
 
 public:
 
 	///
 
-	String &operator =(char symbol) noexcept
-	{
-		return set(symbol);
-	}
+	inline String &operator =(char symbol) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String &operator =(const StaticString &string) noexcept
-	{
-		return set(string);
-	}
+	inline String &operator =(const StaticString &string) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String &operator =(const String &string) noexcept
-	{
-		return set(string);
-	}
+	inline String &operator =(const String &string) noexcept;
 
 	///
 
-	String &operator +=(char symbol) noexcept
-	{
-		return append(symbol);
-	}
+	inline String &operator +=(char symbol) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	String &operator +=(const StaticString &string) noexcept
-	{
-		return append(string);
-	}
+	inline String &operator +=(const StaticString &string) noexcept;
 
 public:
 
@@ -319,46 +260,31 @@ public:
 	/// \param width Minimal number width.
 	/// \param zeros Should the value be prepended with zeros to fit \a width?
 
-	static String from_dec(int32_t value, int width = 0, bool zeros = false) noexcept
-	{
-		return String(11).append_dec(value, width, zeros);
-	}
+	inline static String from_dec(int32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	static String from_dec(uint32_t value, int width = 0, bool zeros = false) noexcept
-	{
-		return String(10).append_dec(value, width, zeros);
-	}
+	inline static String from_dec(uint32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	static String from_dec(int64_t value, int width = 0, bool zeros = false) noexcept
-	{
-		return String(21).append_dec(value, width, zeros);
-	}
+	inline static String from_dec(int64_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	static String from_dec(uint64_t value, int width = 0, bool zeros = false) noexcept
-	{
-		return String(20).append_dec(value, width, zeros);
-	}
+	inline static String from_dec(uint64_t value, int width = 0, bool zeros = false) noexcept;
 
 private:
 
 	Y_PRIVATE void grow(size_t buffer_size);
-
 	Y_PRIVATE void init();
-
 	Y_PRIVATE void init(const char *string, size_t size);
-
 	Y_PRIVATE char *init(size_t buffer_size);
 
 private:
@@ -372,95 +298,230 @@ private:
 
 /// Concatenate the arguments into a single string.
 
+inline String operator +(const StaticString &left, const StaticString &right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String operator +(const StaticString &left, char right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String operator +(char left, const StaticString &right) noexcept;
+
+/// Append the \a right value to the \a left one.
+
+inline String &operator <<(String &left, char right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, const StaticString &right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, int32_t right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, uint32_t right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, int64_t right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, uint64_t right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, float right) noexcept;
+
+/**
+* \overload
+*/
+
+inline String &operator <<(String &left, double right) noexcept;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+String::String(Allocator *allocator) noexcept
+	: _buffer_size(0)
+	, _allocator(allocator)
+{
+}
+
+String::String(const char *text, size_t size, const ByReference &, Allocator *allocator) noexcept
+	: StaticString(text, size)
+	, _buffer_size(0)
+	, _allocator(allocator)
+{
+}
+
+String::String(const StaticString &string, const ByReference &, Allocator *allocator) noexcept
+	: StaticString(string)
+	, _buffer_size(0)
+	, _allocator(allocator)
+{
+}
+
+String::String(const char *text, const ByReference &, Allocator *allocator) noexcept
+	: StaticString(text)
+	, _buffer_size(0)
+	, _allocator(allocator)
+{
+}
+
+Allocator *String::allocator() const noexcept
+{
+	return const_cast<Allocator *>(_allocator);
+}
+
+String &String::append(const StaticString &string) noexcept
+{
+	return append(string.text(), string.size());
+}
+
+String &String::append_dec(int32_t value, int width, bool zeros) noexcept
+{
+	return append_dec(static_cast<int64_t>(value), width, zeros);
+}
+
+String &String::append_dec(uint32_t value, int width, bool zeros) noexcept
+{
+	return append_dec(static_cast<uint64_t>(value), width, zeros);
+}
+
+String &String::escape(const char *symbols, char with) noexcept
+{
+	swap(escaped(symbols, with));
+	return *this;
+}
+
+String String::escaped(const char *symbols, char with) const noexcept
+{
+	return StaticString::escaped(symbols, with, _allocator);
+}
+
+String &String::set(const StaticString &string) noexcept
+{
+	return set(string.text(), string.size());
+}
+
+String &String::operator =(char symbol) noexcept
+{
+	return set(symbol);
+}
+
+String &String::operator =(const StaticString &string) noexcept
+{
+	return set(string);
+}
+
+String &String::operator =(const String &string) noexcept
+{
+	return set(string);
+}
+
+String &String::operator +=(char symbol) noexcept
+{
+	return append(symbol);
+}
+
+String &String::operator +=(const StaticString &string) noexcept
+{
+	return append(string);
+}
+
+String String::from_dec(int32_t value, int width, bool zeros) noexcept
+{
+	return String(11).append_dec(value, width, zeros);
+}
+
+String String::from_dec(uint32_t value, int width, bool zeros) noexcept
+{
+	return String(10).append_dec(value, width, zeros);
+}
+
+String String::from_dec(int64_t value, int width, bool zeros) noexcept
+{
+	return String(21).append_dec(value, width, zeros);
+}
+
+String String::from_dec(uint64_t value, int width, bool zeros) noexcept
+{
+	return String(20).append_dec(value, width, zeros);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 inline String operator +(const StaticString &left, const StaticString &right) noexcept
 {
 	return String(left, right);
 }
 
-/**
-* \overload
-*/
-
-inline String operator +(const StaticString &left, char right) noexcept
+String operator +(const StaticString &left, char right) noexcept
 {
 	return String(left, right);
 }
 
-/**
-* \overload
-*/
-
-inline String operator +(char left, const StaticString &right) noexcept
+String operator +(char left, const StaticString &right) noexcept
 {
 	return String(left, right);
 }
 
-/// Append the \a right value to the \a left one.
-
-inline String &operator <<(String &left, char right) noexcept
+String &operator <<(String &left, char right) noexcept
 {
 	return left.append(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, const StaticString &right) noexcept
+String &operator <<(String &left, const StaticString &right) noexcept
 {
 	return left.append(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, int32_t right) noexcept
+String &operator <<(String &left, int32_t right) noexcept
 {
 	return left.append_dec(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, uint32_t right) noexcept
+String &operator <<(String &left, uint32_t right) noexcept
 {
 	return left.append_dec(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, int64_t right) noexcept
+String &operator <<(String &left, int64_t right) noexcept
 {
 	return left.append_dec(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, uint64_t right) noexcept
+String &operator <<(String &left, uint64_t right) noexcept
 {
 	return left.append_dec(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, float right) noexcept
+String &operator <<(String &left, float right) noexcept
 {
 	return left.append_dec(right);
 }
 
-/**
-* \overload
-*/
-
-inline String &operator <<(String &left, double right) noexcept
+String &operator <<(String &left, double right) noexcept
 {
 	return left.append_dec(right);
 }

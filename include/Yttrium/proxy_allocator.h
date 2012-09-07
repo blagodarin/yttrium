@@ -20,12 +20,11 @@ public:
 
 	ProxyAllocator(Allocator *allocator, const StaticString &name = StaticString()) noexcept;
 
+public:
+
 	///
 
-	StaticString name() const noexcept
-	{
-		return _name;
-	}
+	inline StaticString name() const noexcept;
 
 public: // Allocator
 
@@ -46,6 +45,14 @@ private:
 	Allocator    *_allocator;
 	StaticString  _name;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+StaticString ProxyAllocator::name() const noexcept
+{
+	return _name;
+}
 
 } // namespace Yttrium
 

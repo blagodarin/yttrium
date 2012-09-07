@@ -2,7 +2,8 @@
 
 #include <Yttrium/assert.h>
 
-#include <time.h> // clock_gettime, timespec
+#include <errno.h> // EBUSY, ETIMEDOUT
+#include <time.h>  // clock_gettime, timespec
 
 namespace Yttrium
 {
@@ -12,6 +13,10 @@ Mutex::Private::Private(Allocator *allocator)
 {
 	if (pthread_mutex_init(&mutex, nullptr))
 	{
+		// Either the system is out of resources (EAGAIN or ENOMEM), or there
+		// are no privileges to create a mutex (EPERM). There's nothing we can
+		// do in both cases.
+
 		Y_ABORT("Can't create mutex");
 	}
 }
@@ -20,7 +25,11 @@ Mutex::Private::~Private()
 {
 	if (pthread_mutex_destroy(&mutex))
 	{
-		Y_ABORT("Can't destroy mutex"); // NOTE: Safe to continue (Y_ASSERT?).
+		// Either the mutex is invalid (EINVAL), or it is locked or referenced
+		// (EBUSY). Since it can't be invalid (it should have been aborted in
+		// the constructor), the only remaining option is...
+
+		Y_ABORT("Can't destroy a busy mutex");
 	}
 }
 
@@ -28,6 +37,8 @@ void Mutex::lock()
 {
 	if (pthread_mutex_lock(&_private->mutex))
 	{
+		// This should never happen with our mutexes.
+
 		Y_ABORT("Can't lock mutex");
 	}
 }
@@ -47,7 +58,10 @@ bool Mutex::try_lock(Clock milliseconds)
 
 	if (clock_gettime(CLOCK_REALTIME, &time))
 	{
-		Y_ABORT("clock_gettime(CLOCK_REALTIME, ...) failed"); // NOTE: Safe to continue (Y_ASSERT?).
+		// This must be EINVAL, telling us that there's no CLOCK_REALTIME clock
+		// on this system (is it actually possible?).
+
+		Y_ABORT("Can't query CLOCK_REALTIME time");
 		return false;
 	}
 
@@ -70,6 +84,8 @@ void Mutex::unlock()
 {
 	if (pthread_mutex_unlock(&_private->mutex))
 	{
+		// This must be EPERM, indicating that we don't own the mutex.
+
 		Y_ABORT("Can't unlock mutex");
 	}
 }

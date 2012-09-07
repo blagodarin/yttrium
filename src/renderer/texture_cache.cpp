@@ -23,7 +23,7 @@ void TextureCache::clear()
 
 Texture2D TextureCache::load_texture_2d(const StaticString &name)
 {
-	Private::Cache2D::iterator i = _private->_cache_2d.find(String(name, String::Ref));
+	Private::Cache2D::iterator i = _private->_cache_2d.find(String(name, ByReference()));
 
 	return i != _private->_cache_2d.end()
 		? i->second

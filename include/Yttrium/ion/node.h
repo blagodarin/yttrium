@@ -35,13 +35,12 @@ public:
 
 	///
 
-	inline String to_string(int indentation = 0) const noexcept;
+	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
 
 private:
 
-	Y_PRIVATE Node(Document *document, const StaticString &name);
-
-	Y_PRIVATE Node(Document *document, const StaticString &name, const String::Reference &);
+	Y_PRIVATE Node(Document *document, const StaticString &name) noexcept;
+	Y_PRIVATE Node(Document *document, const StaticString &name, const ByReference &) noexcept;
 
 private:
 
@@ -49,19 +48,12 @@ private:
 	Node   *_next;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 StaticString Node::name() const noexcept
 {
 	return _name;
-}
-
-String Node::to_string(int indentation) const noexcept
-{
-	String result(_name.allocator()); // NOTE: Wrong allocator?
-
-	to_string(&result, indentation);
-	return result;
 }
 
 } // namespace Ion

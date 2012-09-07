@@ -5,10 +5,7 @@
 #ifndef __Y_STATIC_STRING_H
 #define __Y_STATIC_STRING_H
 
-#include <Yttrium/utils.h>
-
-// We don't need const char * operations since we can convert the vast majority of strings
-// (even the literal ones) to StaticStrings of known length.
+#include <Yttrium/types.h>
 
 namespace Yttrium
 {
@@ -21,17 +18,11 @@ class String;
 
 class Y_API StaticString
 {
-	friend class String;
-
 public:
 
 	/// Construct an empty StaticString.
 
-	StaticString() noexcept
-		: _text(const_cast<char *>(&Null))
-		, _size(0)
-	{
-	}
+	inline StaticString() noexcept;
 
 	/// Construct a StaticString from the C-string.
 	/// \param text Source text.
@@ -42,29 +33,19 @@ public:
 	/// \param text Source text.
 	/// \param size Source text size.
 
-	StaticString(const char *text, size_t size) noexcept
-		: _text(const_cast<char *>(text))
-		, _size(size)
-	{
-	}
+	inline StaticString(const char *text, size_t size) noexcept;
 
 public:
 
 	///
 
-	char &at(size_t index) noexcept
-	{
-		return _text[index];
-	}
+	inline char &at(size_t index) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	char at(size_t index) const noexcept
-	{
-		return _text[index];
-	}
+	inline char at(size_t index) const noexcept;
 
 	/// Compares the string with the specified \a string.
 	/// \param string The string to compare with.
@@ -74,24 +55,15 @@ public:
 
 	///
 
-	char const_at(size_t index) const noexcept
-	{
-		return _text[index];
-	}
+	inline char const_at(size_t index) const noexcept;
 
 	///
 
-	const char *const_text() const noexcept
-	{
-		return _text;
-	}
+	inline const char *const_text() const noexcept;
 
 	///
 
-	const char *const_text_at(size_t index) const noexcept
-	{
-		return _text + index;
-	}
+	inline const char *const_text_at(size_t index) const noexcept;
 
 	/// Return the number of occurences of any of the specified \a symbols in the string.
 	/// \param symbols The list of symbols to count.
@@ -103,6 +75,10 @@ public:
 	///
 
 	bool ends_with(const StaticString &substring) const noexcept;
+
+	/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
+
+	String escaped(const char *symbols, char with, Allocator* allocator = DefaultAllocator) const noexcept;
 
 	///
 
@@ -124,76 +100,45 @@ public:
 
 	/// Check whether the string is empty.
 
-	bool is_empty() const noexcept
-	{
-		return !_size;
-	}
+	inline bool is_empty() const noexcept;
 
 	///
 
-	StaticString left(size_t size) const noexcept
-	{
-		return StaticString(_text, min(size, _size));
-	}
+	inline StaticString left(size_t size) const noexcept;
 
 	///
 
-	StaticString mid(size_t offset, size_t size = End) const noexcept
-	{
-		return (offset < _size
-			? StaticString(&_text[offset], min(size, _size - offset))
-			: StaticString());
-	}
+	inline StaticString mid(size_t offset, size_t size = End) const noexcept;
 
 	///
 
-	StaticString right(size_t size) const noexcept
-	{
-		return (size < _size
-			? StaticString(&_text[_size - size], size)
-			: *this);
-	}
+	inline StaticString right(size_t size) const noexcept;
 
 	/// Return the string size.
-	/// \return String size.
+	/// \return %String size.
 
-	size_t size() const noexcept
-	{
-		return _size;
-	}
+	inline size_t size() const noexcept;
 
 	/// Return the string text pointer.
-	/// \return String text pointer.
+	/// \return %String text pointer.
 
-	char *text() noexcept
-	{
-		return _text;
-	}
+	inline char *text() noexcept;
 
 	/**
 	* \overload
 	*/
 
-	const char *text() const noexcept
-	{
-		return _text;
-	}
+	inline const char *text() const noexcept;
 
 	///
 
-	char *text_at(size_t index) noexcept
-	{
-		return _text + index;
-	}
+	inline char *text_at(size_t index) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	const char *text_at(size_t index) const noexcept
-	{
-		return _text + index;
-	}
+	inline const char *text_at(size_t index) const noexcept;
 
 	///
 
@@ -249,47 +194,29 @@ public:
 
 	///
 
-	char operator [](size_t index) const noexcept
-	{
-		return _text[index];
-	}
+	inline char operator [](size_t index) const noexcept;
 
 	/**
 	* \overload
 	*/
 
-	char &operator [](size_t index) noexcept
-	{
-		return _text[index];
-	}
+	inline char &operator [](size_t index) noexcept;
 
 	///
 
-	bool operator <(const StaticString &string) const noexcept
-	{
-		return (compare(string) < 0);
-	}
+	inline bool operator <(const StaticString &string) const noexcept;
 
 	///
 
-	bool operator >(const StaticString &string) const noexcept
-	{
-		return (compare(string) > 0);
-	}
+	inline bool operator >(const StaticString &string) const noexcept;
 
 	///
 
-	bool operator <=(const StaticString &string) const noexcept
-	{
-		return (compare(string) <= 0);
-	}
+	inline bool operator <=(const StaticString &string) const noexcept;
 
 	///
 
-	bool operator >=(const StaticString &string) const noexcept
-	{
-		return (compare(string) >= 0);
-	}
+	inline bool operator >=(const StaticString &string) const noexcept;
 
 	///
 
@@ -305,37 +232,164 @@ public:
 
 	static const size_t End = SIZE_MAX;
 
-private:
+protected:
 
 	char   *_text;
 	size_t  _size;
 
-private:
+protected:
 
-	StaticString(size_t size) noexcept
-		: _size(size)
-	{
-	}
+	inline StaticString(size_t size) noexcept;
 
-private:
+protected:
 
 	static const char Null = '\0';
 };
 
-///
+/// Helper class for building StaticStrings from string literals.
 
 class S: public StaticString
 {
 public:
 
-	///
+	/// Constructor.
+	/// \param text String literal (or any other \c char array).
 
 	template <size_t N>
-	S(const char (&text)[N]) noexcept
-		: StaticString(text, N)
-	{
-	}
+	S(const char (&text)[N]) noexcept;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+StaticString::StaticString() noexcept
+	: _text(const_cast<char *>(&Null))
+	, _size(0)
+{
+}
+
+StaticString::StaticString(const char *text, size_t size) noexcept
+	: _text(const_cast<char *>(text))
+	, _size(size)
+{
+}
+
+char &StaticString::at(size_t index) noexcept
+{
+	return _text[index];
+}
+
+char StaticString::at(size_t index) const noexcept
+{
+	return _text[index];
+}
+
+char StaticString::const_at(size_t index) const noexcept
+{
+	return _text[index];
+}
+
+const char *StaticString::const_text() const noexcept
+{
+	return _text;
+}
+
+const char *StaticString::const_text_at(size_t index) const noexcept
+{
+	return _text + index;
+}
+
+bool StaticString::is_empty() const noexcept
+{
+	return !_size;
+}
+
+StaticString StaticString::left(size_t size) const noexcept
+{
+	return StaticString(_text, (size < _size ? size : _size));
+}
+
+StaticString StaticString::mid(size_t offset, size_t size) const noexcept
+{
+	return offset < _size
+		? StaticString(&_text[offset], _size - offset).left(size)
+		: StaticString();
+}
+
+StaticString StaticString::right(size_t size) const noexcept
+{
+	return size < _size
+		? StaticString(&_text[_size - size], size)
+		: *this;
+}
+
+size_t StaticString::size() const noexcept
+{
+	return _size;
+}
+
+char *StaticString::text() noexcept
+{
+	return _text;
+}
+
+const char *StaticString::text() const noexcept
+{
+	return _text;
+}
+
+char *StaticString::text_at(size_t index) noexcept
+{
+	return _text + index;
+}
+
+const char *StaticString::text_at(size_t index) const noexcept
+{
+	return _text + index;
+}
+
+char StaticString::operator [](size_t index) const noexcept
+{
+	return _text[index];
+}
+
+char &StaticString::operator [](size_t index) noexcept
+{
+	return _text[index];
+}
+
+bool StaticString::operator <(const StaticString &string) const noexcept
+{
+	return (compare(string) < 0);
+}
+
+bool StaticString::operator >(const StaticString &string) const noexcept
+{
+	return (compare(string) > 0);
+}
+
+bool StaticString::operator <=(const StaticString &string) const noexcept
+{
+	return (compare(string) <= 0);
+}
+
+bool StaticString::operator >=(const StaticString &string) const noexcept
+{
+	return (compare(string) >= 0);
+}
+
+StaticString::StaticString(size_t size) noexcept
+	: _size(size)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template <size_t N>
+S::S(const char (&text)[N]) noexcept
+	: StaticString(text, N - 1)
+{
+}
 
 } // namespace Yttrium
 

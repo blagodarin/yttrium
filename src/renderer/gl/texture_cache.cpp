@@ -1,5 +1,7 @@
 #include "texture_cache.h"
 
+#include <Yttrium/utils.h>
+
 #include "texture.h"
 
 namespace Yttrium

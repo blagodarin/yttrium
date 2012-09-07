@@ -252,6 +252,28 @@ size_t StaticString::count(const char *symbols) const
 	return result;
 }
 
+String StaticString::escaped(const char *symbols, char with, Allocator* allocator) const
+{
+	String result(_size, allocator); // Best case assumption.
+
+	const char *end = _text + _size;
+
+	for (const char *i = _text; i != end; ++i)
+	{
+		for (const char *j = symbols; *j; ++j)
+		{
+			if (*i == *j)
+			{
+				result.append(with);
+				break;
+			}
+		}
+		result.append(*i);
+	}
+
+	return result;
+}
+
 bool StaticString::ends_with(const StaticString &substring) const
 {
 	if (substring._size > _size)
@@ -555,9 +577,9 @@ uint64_t StaticString::to_uint64() const
 
 String StaticString::zero_terminated(Allocator *allocator) const noexcept
 {
-	return (_text[_size]
+	return _text[_size]
 		? String(*this, allocator)
-		: String(*this, String::Ref, allocator));
+		: String(*this, ByReference(), allocator);
 }
 
 bool StaticString::operator ==(const StaticString &string) const

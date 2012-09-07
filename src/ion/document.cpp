@@ -25,10 +25,21 @@ Document::Document(Allocator *allocator)
 {
 }
 
+Document::Document(const Document &document, Allocator *allocator)
+	//: Document(allocator ? allocator : document._allocator) // TODO: Uncomment.
+	: Object(this)
+	, _allocator(allocator ? allocator : document._allocator)
+	, _buffer(_allocator)
+	, _objects(32, _allocator)
+	, _nodes(32, _allocator)
+	, _values(32, _allocator)
+{
+	concatenate(document);
+}
+
 void Document::clear()
 {
 	Object::clear();
-
 	_buffer.clear();
 }
 
@@ -69,9 +80,9 @@ Node *Document::new_node(const StaticString &name)
 	return new(_nodes.allocate()) Node(this, name);
 }
 
-Node *Document::new_node(const StaticString &name, const String::Reference &)
+Node *Document::new_node(const StaticString &name, const ByReference &)
 {
-	return new(_nodes.allocate()) Node(this, name, String::Ref);
+	return new(_nodes.allocate()) Node(this, name, ByReference());
 }
 
 Object *Document::new_object()
@@ -89,9 +100,9 @@ Value *Document::new_value(const StaticString &name)
 	return new(_values.allocate()) Value(this, name);
 }
 
-Value *Document::new_value(const StaticString &name, const String::Reference &)
+Value *Document::new_value(const StaticString &name, const ByReference &)
 {
-	return new(_values.allocate()) Value(this, name, String::Ref);
+	return new(_values.allocate()) Value(this, name, ByReference());
 }
 
 } // namespace Ion

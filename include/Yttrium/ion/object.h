@@ -5,13 +5,15 @@
 #define __Y_ION_OBJECT_H
 
 #include <Yttrium/noncopyable.h>
-#include <Yttrium/string.h>
+#include <Yttrium/static_string.h>
 
 #include <map>
 #include <vector>
 
 namespace Yttrium
 {
+
+class String;
 
 namespace Ion
 {
@@ -40,63 +42,37 @@ public:
 
 		///
 
-		ConstRange() noexcept
-			: _first(nullptr)
-			, _last(_first - 1)
-		{
-		}
+		inline ConstRange() noexcept;
 
 	public:
 
 		///
 
-		const Node &first() const noexcept
-		{
-			return **_first;
-		}
+		inline const Node &first() const noexcept;
 
 		///
 
-		bool is_empty() const noexcept
-		{
-			return _first > _last;
-		}
+		inline bool is_empty() const noexcept;
 
 		///
 
-		const Node &last() const noexcept
-		{
-			return **_last;
-		}
+		inline const Node &last() const noexcept;
 
 		///
 
-		void pop_first() noexcept
-		{
-			++_first;
-		}
+		inline void pop_first() noexcept;
 
 		///
 
-		void pop_last() noexcept
-		{
-			--_last;
-		}
+		inline void pop_last() noexcept;
 
 		///
 
-		size_t size() const noexcept
-		{
-			return _last - _first + 1;
-		}
+		inline size_t size() const noexcept;
 
 	private:
 
-		ConstRange(const Node *const *first, const Node *const *last)
-			: _first(first)
-			, _last(last)
-		{
-		}
+		inline ConstRange(const Node *const *first, const Node *const *last) noexcept;
 
 	private:
 
@@ -106,13 +82,19 @@ public:
 
 public:
 
+	Object &operator =(const Object &) = delete;
+
 	///
 
 	Node *append(const StaticString &name) noexcept;
 
 	///
 
-	Node *append(const Node *node) noexcept;
+	Node *append(const Node &node) noexcept;
+
+	///
+
+	void concatenate(const Object &object) noexcept;
 
 	///
 
@@ -125,6 +107,10 @@ public:
 	///
 
 	const Node *first(const StaticString &name) const noexcept;
+
+	///
+
+	inline bool is_empty() const noexcept;
 
 	///
 
@@ -144,21 +130,25 @@ public:
 
 	///
 
+	inline size_t size() const noexcept;
+
+	///
+
 	void to_string(String *result, int indentation = 0) const noexcept;
 
 	///
 
 	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
 
-private: // TODO: protected:
+private:
 
-	Y_PRIVATE Object(Document *document);
+	Y_PRIVATE Object(Document *document) noexcept;
 
-	Y_PRIVATE Node *append(const StaticString &name, const String::Reference &);
+private:
 
-	Y_PRIVATE void clear();
-
-	Y_PRIVATE void to_string(String *result, int indentation, bool document) const;
+	Y_PRIVATE Node *append(const StaticString &name, const ByReference &) noexcept;
+	Y_PRIVATE void clear() noexcept;
+	Y_PRIVATE void to_string(String *result, int indentation, bool document) const noexcept;
 
 private:
 
@@ -171,6 +161,63 @@ private:
 	Nodes     _nodes;
 	NodeMap   _node_map;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Object::ConstRange::ConstRange() noexcept
+	: _first(nullptr)
+	, _last(_first - 1)
+{
+}
+
+const Node &Object::ConstRange::first() const noexcept
+{
+	return **_first;
+}
+
+bool Object::ConstRange::is_empty() const noexcept
+{
+	return _first > _last;
+}
+
+const Node &Object::ConstRange::last() const noexcept
+{
+	return **_last;
+}
+
+void Object::ConstRange::pop_first() noexcept
+{
+	++_first;
+}
+
+void Object::ConstRange::pop_last() noexcept
+{
+	--_last;
+}
+
+size_t Object::ConstRange::size() const noexcept
+{
+	return _last - _first + 1;
+}
+
+Object::ConstRange::ConstRange(const Node *const *first, const Node *const *last) noexcept
+	: _first(first)
+	, _last(last)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Object::is_empty() const noexcept
+{
+	return _nodes.empty();
+}
+
+size_t Object::size() const noexcept
+{
+	return _nodes.size();
+}
 
 } // namespace Ion
 

@@ -197,20 +197,20 @@ bool Parser::parse_name(const StaticString &name)
 		return false;
 	}
 
-	_state->list = _state->object->append(name, String::Ref);
+	_state->list = _state->object->append(name, ByReference());
 	return true;
 }
 
 bool Parser::parse_value(const StaticString &value)
 {
-	Y_LOG_TRACE(S("ion: Token: \"") << String(value, String::Ref, _document._allocator).escaped(S("\\\""), '\\') << '"');
+	Y_LOG_TRACE(S("ion: Token: \"") << String(value, ByReference(), _document._allocator).escaped(S("\\\""), '\\') << '"');
 
 	if (!_state->list)
 	{
 		return false;
 	}
 
-	_state->list->append(value, String::Ref);
+	_state->list->append(value, ByReference());
 	return true;
 }
 

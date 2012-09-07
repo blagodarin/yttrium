@@ -7,6 +7,7 @@
 #include <Yttrium/allocator.h>
 #include <Yttrium/assert.h>
 #include <Yttrium/audio.h>
+#include <Yttrium/bindings.h>
 #include <Yttrium/buffer.h>
 #include <Yttrium/file.h>
 #include <Yttrium/global.h>
@@ -15,6 +16,7 @@
 #include <Yttrium/ion.h>
 #include <Yttrium/key.h>
 #include <Yttrium/log.h>
+#include <Yttrium/matrix.h>
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/mutex.h>
 #include <Yttrium/noncopyable.h>
@@ -29,6 +31,7 @@
 #include <Yttrium/static_string.h>
 #include <Yttrium/string.h>
 #include <Yttrium/terminal.h>
+#include <Yttrium/texture_font.h>
 #include <Yttrium/thread.h>
 #include <Yttrium/thread_buffer.h>
 #include <Yttrium/time.h>

@@ -3,6 +3,7 @@ Yttrium:
 - Add Windows port.
 - Add static library build.
 - Add more allocator inheritance.
+- Make use of rvalue references.
 
     Base:
     - Implement directory search.

@@ -1,5 +1,7 @@
 #include <Yttrium/terminal.h>
 
+#include <Yttrium/utils.h>
+
 #include <cstring> // memset
 
 namespace Yttrium

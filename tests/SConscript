@@ -3,7 +3,7 @@ Import('env')
 build = env.Clone(BUILD = '.build')
 
 build.Append(
-	CPPDEFINES = 'BOOST_TEST_DYN_LINK',
+	CPPDEFINES = ['BOOST_TEST_DYN_LINK', '__YTTRIUM_TEST'],
 	CPPPATH = '#',
 	LIBS = 'boost_unit_test_framework')
 

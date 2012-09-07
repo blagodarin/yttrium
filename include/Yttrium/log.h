@@ -89,4 +89,8 @@ private:
 
 #define Y_LOG(message) do { Yttrium::LogManager::instance()->log() << message; } while (false)
 
+///
+
+#define Y_LOG_IF(condition, message) do { if (condition) Yttrium::LogManager::instance()->log() << message; } while (false)
+
 #endif // __Y_LOG_H

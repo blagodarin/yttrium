@@ -29,6 +29,14 @@ void Value::to_string(String *result, int indentation) const
 	}
 }
 
+String Value::to_string(int indentation, Allocator *allocator) const
+{
+	String result(allocator ? allocator : _string.allocator());
+
+	to_string(&result, indentation);
+	return result;
+}
+
 Value::Value(Document *document)
 	: _type(ListType)
 	, _string(document->_allocator)
@@ -47,9 +55,9 @@ Value::Value(Document *document, const StaticString &string)
 {
 }
 
-Value::Value(Document *document, const StaticString &string, const String::Reference &)
+Value::Value(Document *document, const StaticString &string, const ByReference &)
 	: _type(StringType)
-	, _string(string, String::Ref, document->_allocator)
+	, _string(string, ByReference(), document->_allocator)
 	, _list(document)
 	, _object(nullptr)
 	, _next(nullptr)

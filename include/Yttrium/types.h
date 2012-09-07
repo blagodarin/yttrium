@@ -49,6 +49,12 @@ typedef double Real;
 
 extern Y_API Allocator *const DefaultAllocator;
 
+///
+
+class ByReference
+{
+};
+
 } // namespace Yttrium
 
 #endif // __Y_TYPES_H

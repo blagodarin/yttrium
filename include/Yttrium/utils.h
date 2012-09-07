@@ -6,13 +6,24 @@
 
 #include <Yttrium/types.h>
 
-#include <algorithm> // std::max, std::min
-
 namespace Yttrium
 {
 
-using std::max;
-using std::min;
+///
+
+template <typename T>
+const T &max(const T &a, const T &b) noexcept
+{
+	return a > b ? a : b;
+}
+
+///
+
+template <typename T>
+const T &min(const T &a, const T &b) noexcept
+{
+	return a < b ? a : b;
+}
 
 /// Clamp a value within the specified range.
 /// \param a Source value.
