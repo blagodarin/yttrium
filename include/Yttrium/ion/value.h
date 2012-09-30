@@ -39,7 +39,7 @@ public:
 
 	///
 
-	inline bool get(StaticString *value) const noexcept;
+	inline bool get(const StaticString **value) const noexcept;
 
 	/**
 	* \overload
@@ -118,11 +118,11 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Value::get(StaticString *value) const noexcept
+bool Value::get(const StaticString **value) const noexcept
 {
 	if (_type == StringType)
 	{
-		*value = _string;
+		*value = &_string;
 		return true;
 	}
 	return false;

@@ -130,6 +130,10 @@ public:
 
 	///
 
+	inline bool last(const StaticString &name, const Node **node) const noexcept;
+
+	///
+
 	inline size_t size() const noexcept;
 
 	///
@@ -212,6 +216,17 @@ Object::ConstRange::ConstRange(const Node *const *first, const Node *const *last
 bool Object::is_empty() const noexcept
 {
 	return _nodes.empty();
+}
+
+bool Object::last(const StaticString &name, const Node **node) const noexcept
+{
+	const Node *last_node = last(name);
+	if (last_node)
+	{
+		*node = last_node;
+		return true;
+	}
+	return false;
 }
 
 size_t Object::size() const noexcept

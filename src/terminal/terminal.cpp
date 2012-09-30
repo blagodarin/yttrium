@@ -246,19 +246,14 @@ void Terminal::on_key_event(Window *, Key key, bool is_pressed)
 	case Key::WheelLeft:
 	case Key::WheelRight:
 
-		state = (is_pressed ? 1 : 0);
+		state = is_pressed ? 1 : 0;
 		break;
 
 	default:
 
-		state = (is_pressed ? _keys[static_cast<KeyType>(key)] + 1 : 0);
+		state = is_pressed ? (_keys[static_cast<KeyType>(key)] + 1) : 0;
 		_keys[static_cast<KeyType>(key)] = state;
 		break;
-	}
-
-	if (false) // TODO: Notify GUI.
-	{
-		return;
 	}
 
 	if (_is_console_visible && is_pressed)

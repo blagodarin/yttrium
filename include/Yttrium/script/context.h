@@ -119,12 +119,16 @@ public:
 
 	const ScriptValue *set(const StaticString &name, const StaticString &value, ScriptValue::Flags flags = 0) noexcept;
 
+	///
+
+	void substitute(String *target, const StaticString &source) const noexcept;
+
 	/// Substitute the script variables in a string.
-	/// \param str Source string.
+	/// \param string Source string.
 	/// \return String with substitutions.
 	/// \note Every occurence of the pair of curly braces is threated as a variable name.
 
-	String substitute(const StaticString &string, Allocator *allocator = nullptr) const noexcept;
+	inline String substitute(const StaticString &string, Allocator *allocator = nullptr) const noexcept;
 
 	/// Undefine a command.
 	/// \param name Command name.
@@ -189,6 +193,14 @@ private:
 void ScriptContext::define(const StaticString &name, const Command &command, size_t args) noexcept
 {
 	define(name, command, args, args);
+}
+
+String ScriptContext::substitute(const StaticString &string, Allocator *allocator) const noexcept
+{
+	String result(allocator ? allocator : _allocator);
+
+	substitute(&result, string);
+	return result;
 }
 
 } // namespace Yttrium

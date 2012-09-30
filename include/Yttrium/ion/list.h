@@ -39,6 +39,12 @@ public:
 
 		///
 
+		inline Range() noexcept;
+
+	public:
+
+		///
+
 		inline Value &first() const noexcept;
 
 		///
@@ -73,6 +79,12 @@ public:
 	class ConstRange
 	{
 		friend class List;
+
+	public:
+
+		///
+
+		inline ConstRange() noexcept;
 
 	public:
 
@@ -139,6 +151,14 @@ public:
 
 	///
 
+	inline const Value *first() const noexcept;
+
+	///
+
+	bool first(const StaticString **value) const noexcept;
+
+	///
+
 	inline bool is_empty() const noexcept;
 
 	///
@@ -187,6 +207,14 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+List::Range::Range() noexcept
+	//: Range(nullptr, nullptr, 0) // TODO: Uncomment.
+	: _first(nullptr)
+	, _last(nullptr)
+	, _size(0)
+{
+}
+
 Value &List::Range::first() const noexcept
 {
 	return *_first;
@@ -215,6 +243,14 @@ List::Range::Range(Value *first, Value *last, size_t size) noexcept
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+List::ConstRange::ConstRange() noexcept
+	//: ConstRange(nullptr, nullptr, 0) // TODO: Uncomment.
+	: _first(nullptr)
+	, _last(nullptr)
+	, _size(0)
+{
+}
 
 const Value &List::ConstRange::first() const noexcept
 {
@@ -248,6 +284,11 @@ List::ConstRange::ConstRange(const Value *first, const Value *last, size_t size)
 List::ConstRange List::const_values() const noexcept
 {
 	return ConstRange(_first, _last, _size);
+}
+
+const Value *List::first() const noexcept
+{
+	return _first;
 }
 
 bool List::is_empty() const noexcept

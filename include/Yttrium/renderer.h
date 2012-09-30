@@ -143,7 +143,6 @@ private:
 private:
 
 	Y_PRIVATE Renderer(Window *window, Backend backend, Allocator *allocator);
-
 	Y_PRIVATE Renderer(Private *private_);
 };
 

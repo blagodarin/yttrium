@@ -1,5 +1,7 @@
 #include <Yttrium/script/context.h>
 
+#include <Yttrium/assert.h>
+
 #include "logging.h"
 #include "parser.h"
 
@@ -210,18 +212,18 @@ const ScriptValue *ScriptContext::set(const StaticString &name, const StaticStri
 	return i->second.value;
 }
 
-String ScriptContext::substitute(const StaticString &string, Allocator *allocator) const
+void ScriptContext::substitute(String *target, const StaticString &source) const
 {
-	String result(allocator ? allocator : _allocator);
+	Y_ASSERT(target->text() != source.text());
 
-	for (const char *left = string.text(), *right = left, *end = left + string.size(); ; )
+	for (const char *left = source.text(), *right = left, *end = left + source.size(); ; )
 	{
 		while (right != end && *right != '{')
 		{
 			++right;
 		}
 
-		result.append(left, right - left);
+		target->append(left, right - left);
 
 		if (right == end)
 		{
@@ -244,18 +246,16 @@ String ScriptContext::substitute(const StaticString &string, Allocator *allocato
 
 		if (value)
 		{
-			result.append(value->string());
+			target->append(value->string());
 		}
 
 		left = ++right;
 	}
-
-	return result;
 }
 
 void ScriptContext::unset(const StaticString &name)
 {
-	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
+	Entities::iterator i = _entities.find(String(name, ByReference()));
 
 	if (i != _entities.end())
 	{
@@ -272,7 +272,7 @@ void ScriptContext::unset(const StaticString &name)
 
 void ScriptContext::undefine(const StaticString &name)
 {
-	_commands.erase(String(name, ByReference(), nullptr));
+	_commands.erase(String(name, ByReference()));
 }
 
 } // namespace Yttrium

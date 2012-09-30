@@ -135,7 +135,6 @@ AlwaysBuild('test')
 
 tools = SConscript(dirs = 'tools', exports = {'env': slave_env})
 Alias('tools', tools)
-Default('tools')
 
 # Examples.
 

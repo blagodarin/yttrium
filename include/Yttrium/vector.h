@@ -47,123 +47,98 @@ public:
 
 public:
 
-	Vector2(T x = 0, T y = 0) noexcept
-		: x(x)
-		, y(y)
-	{
-	}
+	///
+
+	Vector2() = default;
+
+	///
+
+	Vector2(int) noexcept;
+
+	///
+
+	Vector2(T x, T y) noexcept;
+
+	///
 
 	template <typename U>
-	Vector2(U x, U y = 0) noexcept
-		: x(x)
-		, y(y)
-	{
-	}
-
-	template <typename U>
-	Vector2(const Vector2<U> &v) noexcept
-		: x(v.x)
-		, y(v.y)
-	{
-	}
+	Vector2(const Vector2<U> &vector) noexcept;
 
 public:
 
-	Vector2 operator +(T t) const noexcept
-	{
-		return Vector2(x + t, y + t);
-	}
+	///
 
-	Vector2 &operator +=(T t) noexcept
-	{
-		x += t;
-		y += t;
-		return *this;
-	}
+	T *data() noexcept;
 
-	Vector2 operator +(const Vector2 &v) const noexcept
-	{
-		return Vector2(x + v.x, y + v.y);
-	}
+	///
 
-	Vector2 &operator +=(const Vector2 &v) noexcept
-	{
-		x += v.x;
-		y += v.y;
-		return *this;
-	}
+	const T *data() const noexcept;
 
-	Vector2 operator -(T t) const noexcept
-	{
-		return Vector2(x - t, y - t);
-	}
+public:
 
-	Vector2 &operator -=(T t) noexcept
-	{
-		x -= t;
-		y -= t;
-		return *this;
-	}
+	///
 
-	Vector2 operator -(const Vector2 &v) const noexcept
-	{
-		return Vector2(x - v.x, y - v.y);
-	}
+	Vector2 operator +(T value) const noexcept;
 
-	Vector2 &operator -=(const Vector2 &v) noexcept
-	{
-		x -= v.x;
-		y -= v.y;
-		return *this;
-	}
+	///
 
-	Vector2 operator *(T t) const noexcept
-	{
-		return Vector2(x * t, y * t);
-	}
+	Vector2 operator +(const Vector2 &vector) const noexcept;
 
-	Vector2 &operator *=(T t) noexcept
-	{
-		x *= t;
-		y *= t;
-		return *this;
-	}
+	///
 
-	Vector2 operator *(const Vector2 &v) const noexcept
-	{
-		return Vector2(x * v.x, y * v.y);
-	}
+	Vector2 &operator +=(T value) noexcept;
 
-	Vector2 &operator *=(const Vector2 &v) noexcept
-	{
-		x *= v.x;
-		y *= v.y;
-		return *this;
-	}
+	///
 
-	Vector2 operator /(T t) const noexcept
-	{
-		return Vector2(x / t, y / t);
-	}
+	Vector2 &operator +=(const Vector2 &vector) noexcept;
 
-	Vector2 &operator /=(T t) noexcept
-	{
-		x /= t;
-		y /= t;
-		return *this;
-	}
+	///
 
-	Vector2 operator /(const Vector2 &v) const noexcept
-	{
-		return Vector2(x / v.x, y / v.y);
-	}
+	Vector2 operator -(T value) const noexcept;
 
-	Vector2 &operator /=(const Vector2 &v) noexcept
-	{
-		x /= v.x;
-		y /= v.y;
-		return *this;
-	}
+	///
+
+	Vector2 operator -(const Vector2 &vector) const noexcept;
+
+	///
+
+	Vector2 &operator -=(T value) noexcept;
+
+	///
+
+	Vector2 &operator -=(const Vector2 &vector) noexcept;
+
+	///
+
+	Vector2 operator *(T value) const noexcept;
+
+	///
+
+	Vector2 operator *(const Vector2 &vector) const noexcept;
+
+	///
+
+	Vector2 &operator *=(T value) noexcept;
+
+	///
+
+	Vector2 &operator *=(const Vector2 &vector) noexcept;
+
+	///
+
+	Vector2 operator /(T value) const noexcept;
+
+	///
+
+	Vector2 operator /(const Vector2 &vector) const noexcept;
+
+	///
+
+	Vector2 &operator /=(T value) noexcept;
+
+	///
+
+	Vector2 &operator /=(const Vector2 &vector) noexcept;
 };
 
 ///
@@ -217,108 +192,86 @@ public:
 
 public:
 
-	Vector3(T x = 0, T y = 0, T z = 0) noexcept
-		: x(x)
-		, y(y)
-		, z(z)
-	{
-	}
+	///
+
+	Vector3() = default;
+
+	///
+
+	Vector3(int) noexcept;
+
+	///
+
+	Vector3(T x, T y, T z) noexcept;
+
+	///
 
 	template <typename U>
-	Vector3(U x, U y = 0, U z = 0) noexcept
-		: x(x)
-		, y(y)
-		, z(z)
-	{
-	}
-
-	template <typename U>
-	Vector3(const Vector3<U> &v) noexcept
-		: x(v.x)
-		, y(v.y)
-		, z(v.z)
-	{
-	}
+	Vector3(const Vector3<U> &vector) noexcept;
 
 public:
 
-	Vector3 operator +(T t) const noexcept
-	{
-		return Vector3(x + t, y + t, z + t);
-	}
+	///
 
-	Vector3 &operator +=(T t) noexcept
-	{
-		x += t;
-		y += t;
-		z += t;
-		return *this;
-	}
+	T *data() noexcept;
 
-	Vector3 operator +(const Vector3 &v) const noexcept
-	{
-		return Vector3(x + v.x, y + v.y, z + v.z);
-	}
+	///
 
-	Vector3 &operator +=(const Vector3 &v) noexcept
-	{
-		x += v.x;
-		y += v.y;
-		z += v.z;
-		return *this;
-	}
+	const T *data() const noexcept;
 
-	Vector3 operator -(T t) const noexcept
-	{
-		return Vector3(x - t, y - t, z - t);
-	}
+	///
 
-	Vector3 &operator -=(T t) noexcept
-	{
-		x -= t;
-		y -= t;
-		z -= t;
-		return *this;
-	}
+	Vector2<T> xy() const noexcept;
 
-	Vector3 operator -(const Vector3 &v) const noexcept
-	{
-		return Vector3(x - v.x, y - v.y, z - v.z);
-	}
+public:
 
-	Vector3 &operator -=(const Vector3 &v) noexcept
-	{
-		x -= v.x;
-		y -= v.y;
-		z -= v.z;
-		return *this;
-	}
+	///
 
-	Vector3 operator *(T t) const noexcept
-	{
-		return Vector3(x * t, y * t, z * t);
-	}
+	Vector3 operator +(T value) const noexcept;
 
-	Vector3 &operator *=(T t) noexcept
-	{
-		x *= t;
-		y *= t;
-		z *= t;
-		return *this;
-	}
+	///
 
-	Vector3 operator *(const Vector3 &v) const noexcept
-	{
-		return Vector3(x * v.x, y * v.y, z * v.z);
-	}
+	Vector3 operator +(const Vector3 &vector) const noexcept;
 
-	Vector3 &operator *=(const Vector3 &v) noexcept
-	{
-		x *= v.x;
-		y *= v.y;
-		z *= v.z;
-		return *this;
-	}
+	///
+
+	Vector3 &operator +=(T value) noexcept;
+
+	///
+
+	Vector3 &operator +=(const Vector3 &vector) noexcept;
+
+	///
+
+	Vector3 operator -(T value) const noexcept;
+
+	///
+
+	Vector3 operator -(const Vector3 &vector) const noexcept;
+
+	///
+
+	Vector3 &operator -=(T value) noexcept;
+
+	///
+
+	Vector3 &operator -=(const Vector3 &vector) noexcept;
+
+	///
+
+	Vector3 operator *(T value) const noexcept;
+
+	///
+
+	Vector3 operator *(const Vector3 &vector) const noexcept;
+
+	///
+
+	Vector3 &operator *=(T value) noexcept;
+
+	///
+
+	Vector3 &operator *=(const Vector3 &vector) noexcept;
 };
 
 typedef Vector3<float> Vector3f; ///<
@@ -359,114 +312,501 @@ public:
 
 public:
 
-	Vector4(T x = 0, T y = 0, T z = 0, T w = 1) noexcept
-		: x(x)
-		, y(y)
-		, z(z)
-		, w(w)
-	{
-	}
+	///
+
+	Vector4() = default;
+
+	///
+
+	Vector4(int) noexcept;
+
+	///
+
+	Vector4(T x, T y, T z, T w = 1) noexcept;
+
+	///
 
 	template <typename U>
-	Vector4(U x, U y = 0, U z = 0, U w = 1) noexcept
-		: x(x)
-		, y(y)
-		, z(z)
-		, w(w)
-	{
-	}
-
-	template <typename U>
-	Vector4(const Vector4<U> &v) noexcept
-		: x(v.x)
-		, y(v.y)
-		, z(v.z)
-		, w(v.w)
-	{
-	}
+	Vector4(const Vector4<U> &vector) noexcept;
 
 public:
 
-	Vector4 operator +(T t) const noexcept
-	{
-		return Vector4(x + t, y + t, z + t, w);
-	}
+	///
 
-	Vector4 &operator +=(T t) noexcept
-	{
-		x += t;
-		y += t;
-		z += t;
-		return *this;
-	}
+	T *data() noexcept;
 
-	Vector4 operator +(const Vector4 &v) const noexcept
-	{
-		return Vector4(x + v.x, y + v.y, z + v.z, w);
-	}
+	///
 
-	Vector4 &operator +=(const Vector4 &v) noexcept
-	{
-		x += v.x;
-		y += v.y;
-		z += v.z;
-		return *this;
-	}
+	const T *data() const noexcept;
 
-	Vector4 operator -(T t) const noexcept
-	{
-		return Vector4(x - t, y - t, z - t, w);
-	}
+public:
 
-	Vector4 &operator -=(T t) noexcept
-	{
-		x -= t;
-		y -= t;
-		z -= t;
-		return *this;
-	}
+	///
 
-	Vector4 operator -(const Vector4 &v) const noexcept
-	{
-		return Vector4(x - v.x, y - v.y, z - v.z, w);
-	}
+	Vector4 operator +(T value) const noexcept;
 
-	Vector4 &operator -=(const Vector4 &v) noexcept
-	{
-		x -= v.x;
-		y -= v.y;
-		z -= v.z;
-		return *this;
-	}
+	///
 
-	Vector4 operator *(T t) const noexcept
-	{
-		return Vector4(x * t, y * t, z * t, w);
-	}
+	Vector4 operator +(const Vector4 &vector) const noexcept;
 
-	Vector4 &operator *=(T t) noexcept
-	{
-		x *= t;
-		y *= t;
-		z *= t;
-		return *this;
-	}
+	///
 
-	Vector4 operator *(const Vector4 &v) const noexcept
-	{
-		return Vector4(x * v.x, y * v.y, z * v.z, w);
-	}
+	Vector4 &operator +=(T value) noexcept;
 
-	Vector4 &operator *=(const Vector4 &v) noexcept
-	{
-		x *= v.x;
-		y *= v.y;
-		z *= v.z;
-		return *this;
-	}
+	///
+
+	Vector4 &operator +=(const Vector4 &vector) noexcept;
+
+	///
+
+	Vector4 operator -(T value) const noexcept;
+
+	///
+
+	Vector4 operator -(const Vector4 &vector) const noexcept;
+
+	///
+
+	Vector4 &operator -=(T value) noexcept;
+
+	///
+
+	Vector4 &operator -=(const Vector4 &vector) noexcept;
+
+	///
+
+	Vector4 operator *(T value) const noexcept;
+
+	///
+
+	Vector4 operator *(const Vector4 &vector) const noexcept;
+
+	///
+
+	Vector4 &operator *=(T value) noexcept;
+
+	///
+
+	Vector4 &operator *=(const Vector4 &vector) noexcept;
 };
 
 typedef Vector4<float> Vector4f; ///<
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+Vector2<T>::Vector2(int) noexcept
+	: x(0)
+	, y(0)
+{
+}
+
+template <typename T>
+Vector2<T>::Vector2(T x, T y) noexcept
+	: x(x)
+	, y(y)
+{
+}
+
+template <typename T>
+template <typename U>
+Vector2<T>::Vector2(const Vector2<U> &vector) noexcept
+	: x(vector.x)
+	, y(vector.y)
+{
+}
+
+template <typename T>
+T *Vector2<T>::data() noexcept
+{
+	return &x;
+}
+
+template <typename T>
+const T *Vector2<T>::data() const noexcept
+{
+	return &x;
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator +(T value) const noexcept
+{
+	return Vector2(x + value, y + value);
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator +(const Vector2 &vector) const noexcept
+{
+	return Vector2(x + vector.x, y + vector.y);
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator +=(T value) noexcept
+{
+	x += value;
+	y += value;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator +=(const Vector2 &vector) noexcept
+{
+	x += vector.x;
+	y += vector.y;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator -(T value) const noexcept
+{
+	return Vector2(x - value, y - value);
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator -(const Vector2 &vector) const noexcept
+{
+	return Vector2(x - vector.x, y - vector.y);
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator -=(T value) noexcept
+{
+	x -= value;
+	y -= value;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator -=(const Vector2 &vector) noexcept
+{
+	x -= vector.x;
+	y -= vector.y;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator *(T value) const noexcept
+{
+	return Vector2(x * value, y * value);
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator *(const Vector2 &vector) const noexcept
+{
+	return Vector2(x * vector.x, y * vector.y);
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator *=(T value) noexcept
+{
+	x *= value;
+	y *= value;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator *=(const Vector2 &vector) noexcept
+{
+	x *= vector.x;
+	y *= vector.y;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator /(T value) const noexcept
+{
+	return Vector2(x / value, y / value);
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::operator /(const Vector2 &vector) const noexcept
+{
+	return Vector2(x / vector.x, y / vector.y);
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator /=(T value) noexcept
+{
+	x /= value;
+	y /= value;
+	return *this;
+}
+
+template <typename T>
+Vector2<T> &Vector2<T>::operator /=(const Vector2 &vector) noexcept
+{
+	x /= vector.x;
+	y /= vector.y;
+	return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+Vector3<T>::Vector3(int) noexcept
+	: x(0)
+	, y(0)
+	, z(0)
+{
+}
+
+template <typename T>
+Vector3<T>::Vector3(T x, T y, T z) noexcept
+	: x(x)
+	, y(y)
+	, z(z)
+{
+}
+
+template <typename T>
+template <typename U>
+Vector3<T>::Vector3(const Vector3<U> &vector) noexcept
+	: x(vector.x)
+	, y(vector.y)
+	, z(vector.z)
+{
+}
+
+template <typename T>
+T *Vector3<T>::data() noexcept
+{
+	return &x;
+}
+
+template <typename T>
+const T *Vector3<T>::data() const noexcept
+{
+	return &x;
+}
+
+template <typename T>
+Vector2<T> Vector3<T>::xy() const noexcept
+{
+	return Vector2<T>(x, y);
+}
+
+template <typename T>
+Vector3<T> Vector3<T>::operator +(T value) const noexcept
+{
+	return Vector3(x + value, y + value, z + value);
+}
+
+template <typename T>
+Vector3<T> Vector3<T>::operator +(const Vector3 &vector) const noexcept
+{
+	return Vector3(x + vector.x, y + vector.y, z + vector.z);
+}
+
+template <typename T>
+Vector3<T> &Vector3<T>::operator +=(T value) noexcept
+{
+	x += value;
+	y += value;
+	z += value;
+	return *this;
+}
+
+template <typename T>
+Vector3<T> &Vector3<T>::operator +=(const Vector3 &vector) noexcept
+{
+	x += vector.x;
+	y += vector.y;
+	z += vector.z;
+	return *this;
+}
+
+template <typename T>
+Vector3<T> Vector3<T>::operator -(T value) const noexcept
+{
+	return Vector3(x - value, y - value, z - value);
+}
+
+template <typename T>
+Vector3<T> Vector3<T>::operator -(const Vector3 &vector) const noexcept
+{
+	return Vector3(x - vector.x, y - vector.y, z - vector.z);
+}
+
+template <typename T>
+Vector3<T> &Vector3<T>::operator -=(T value) noexcept
+{
+	x -= value;
+	y -= value;
+	z -= value;
+	return *this;
+}
+
+template <typename T>
+Vector3<T> &Vector3<T>::operator -=(const Vector3 &vector) noexcept
+{
+	x -= vector.x;
+	y -= vector.y;
+	z -= vector.z;
+	return *this;
+}
+
+template <typename T>
+Vector3<T> Vector3<T>::operator *(T value) const noexcept
+{
+	return Vector3(x * value, y * value, z * value);
+}
+
+template <typename T>
+Vector3<T> Vector3<T>::operator *(const Vector3 &vector) const noexcept
+{
+	return Vector3(x * vector.x, y * vector.y, z * vector.z);
+}
+
+template <typename T>
+Vector3<T> &Vector3<T>::operator *=(T value) noexcept
+{
+	x *= value;
+	y *= value;
+	z *= value;
+	return *this;
+}
+
+template <typename T>
+Vector3<T> &Vector3<T>::operator *=(const Vector3 &vector) noexcept
+{
+	x *= vector.x;
+	y *= vector.y;
+	z *= vector.z;
+	return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+Vector4<T>::Vector4(int) noexcept
+	: x(0)
+	, y(0)
+	, z(0)
+	, w(1)
+{
+}
+
+template <typename T>
+Vector4<T>::Vector4(T x, T y, T z, T w) noexcept
+	: x(x)
+	, y(y)
+	, z(z)
+	, w(w)
+{
+}
+
+template <typename T>
+template <typename U>
+Vector4<T>::Vector4(const Vector4<U> &vector) noexcept
+	: x(vector.x)
+	, y(vector.y)
+	, z(vector.z)
+	, w(vector.w)
+{
+}
+
+template <typename T>
+T *Vector4<T>::data() noexcept
+{
+	return &x;
+}
+
+template <typename T>
+const T *Vector4<T>::data() const noexcept
+{
+	return &x;
+}
+
+template <typename T>
+Vector4<T> Vector4<T>::operator +(T value) const noexcept
+{
+	return Vector4(x + value, y + value, z + value, w);
+}
+
+template <typename T>
+Vector4<T> Vector4<T>::operator +(const Vector4 &vector) const noexcept
+{
+	return Vector4(x + vector.x, y + vector.y, z + vector.z, w);
+}
+
+template <typename T>
+Vector4<T> &Vector4<T>::operator +=(T value) noexcept
+{
+	x += value;
+	y += value;
+	z += value;
+	return *this;
+}
+
+template <typename T>
+Vector4<T> &Vector4<T>::operator +=(const Vector4 &vector) noexcept
+{
+	x += vector.x;
+	y += vector.y;
+	z += vector.z;
+	return *this;
+}
+
+template <typename T>
+Vector4<T> Vector4<T>::operator -(T value) const noexcept
+{
+	return Vector4(x - value, y - value, z - value, w);
+}
+
+template <typename T>
+Vector4<T> Vector4<T>::operator -(const Vector4 &vector) const noexcept
+{
+	return Vector4(x - vector.x, y - vector.y, z - vector.z, w);
+}
+
+template <typename T>
+Vector4<T> &Vector4<T>::operator -=(T value) noexcept
+{
+	x -= value;
+	y -= value;
+	z -= value;
+	return *this;
+}
+
+template <typename T>
+Vector4<T> &Vector4<T>::operator -=(const Vector4 &vector) noexcept
+{
+	x -= vector.x;
+	y -= vector.y;
+	z -= vector.z;
+	return *this;
+}
+
+template <typename T>
+Vector4<T> Vector4<T>::operator *(T value) const noexcept
+{
+	return Vector4(x * value, y * value, z * value, w);
+}
+
+template <typename T>
+Vector4<T> Vector4<T>::operator *(const Vector4 &vector) const noexcept
+{
+	return Vector4(x * vector.x, y * vector.y, z * vector.z, w);
+}
+
+template <typename T>
+Vector4<T> &Vector4<T>::operator *=(T value) noexcept
+{
+	x *= value;
+	y *= value;
+	z *= value;
+	return *this;
+}
+
+template <typename T>
+Vector4<T> &Vector4<T>::operator *=(const Vector4 &vector) noexcept
+{
+	x *= vector.x;
+	y *= vector.y;
+	z *= vector.z;
+	return *this;
+}
 
 } // namespace Yttrium
 

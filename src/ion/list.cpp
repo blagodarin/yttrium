@@ -86,6 +86,16 @@ void List::concatenate(const List &list)
 	}
 }
 
+bool List::first(const StaticString **value) const
+{
+	if (_first && _first->is_string())
+	{
+		*value = &_first->string();
+		return true;
+	}
+	return false;
+}
+
 String List::to_string(int indentation, Allocator *allocator) const
 {
 	String result(allocator ? allocator : _document._allocator);

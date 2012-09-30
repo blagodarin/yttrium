@@ -26,7 +26,7 @@ public:
 
 		///
 
-		virtual void on_cursor_movement(Terminal *terminal, const Dim2& movement) noexcept = 0;
+		virtual void on_cursor_movement(Terminal *terminal, const Dim2 &movement) noexcept = 0;
 
 		///
 		/// \return \c true if the key was handled, \c false otherwise.
@@ -46,7 +46,7 @@ public:
 
 	///
 
-	Terminal(Callbacks *callbacks = nullptr, Allocator* allocator = DefaultAllocator) noexcept;
+	Terminal(Callbacks *callbacks = nullptr, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
@@ -169,7 +169,6 @@ private:
 private: // Window::Callbacks
 
 	Y_PRIVATE virtual void on_focus_event(Window *window, bool is_focused) noexcept;
-
 	Y_PRIVATE virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept;
 
 private:

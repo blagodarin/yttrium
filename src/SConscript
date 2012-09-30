@@ -12,6 +12,7 @@ src = [
 	'base',
 	'base/memory',
 	'gui',
+	'gui/ion',
 	'gui/logic',
 	'renderer',
 	'renderer/builtin',

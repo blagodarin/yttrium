@@ -179,6 +179,105 @@ T string_to_real(const char *p, const char *end)
 }
 
 template <typename T>
+bool string_to_real(const char *p, const char *end, T *value)
+{
+	if (p == end)
+	{
+		return false;
+	}
+
+	// Sign.
+
+	bool negate_result = false;
+
+	switch (*p)
+	{
+	case '-': negate_result = true; // Fallthrough.
+	case '+': ++p;
+	}
+
+	// Whole.
+
+	if (p == end || *p < '0' || *p > '9')
+	{
+		return false;
+	}
+
+	T result = 0;
+
+	do
+	{
+		result = result * 10 + (*p++ - '0');
+	} while (p != end && *p >= '0' && *p <= '9');
+
+	// Fraction.
+
+	if (p != end && *p == '.')
+	{
+		++p;
+
+		if (p == end || *p < '0' || *p > '9')
+		{
+			return false;
+		}
+
+		T factor = 1;
+
+		do
+		{
+			result = result * 10 + (*p++ - '0');
+			factor *= 10;
+		} while (p != end && *p >= '0' && *p <= '9');
+
+		result /= factor;
+	}
+
+	// Power.
+
+	if (p != end && (*p == 'E' || *p == 'e'))
+	{
+		if (++p == end)
+		{
+			return false;
+		}
+
+		// Power sign.
+
+		bool negate_power = false;
+
+		switch (*p)
+		{
+		case '-': negate_power = true; // Fallthrough.
+		case '+': ++p;
+		}
+
+		// Power value.
+
+		if (p == end || *p < '0' || *p > '9')
+		{
+			return false;
+		}
+
+		T power = 0;
+
+		do
+		{
+			power = power * 10 + (*p++ - '0');
+		} while (p != end && *p >= '0' && *p <= '9');
+
+		result *= pow(10, (negate_power ? -power : power));
+	}
+
+	if (p != end)
+	{
+		return false;
+	}
+
+	*value = (negate_result ? -result : result);
+	return true;
+}
+
+template <typename T>
 T string_to_uint(const char *p, const char *end)
 {
 	if (p == end)
@@ -392,105 +491,14 @@ bool StaticString::to_number(int32_t *value) const
 	return string_to_int<int32_t, INT32_C(0x0CCCCCCC)>(_text, _text + _size, value);
 }
 
+bool StaticString::to_number(float *value) const
+{
+	return string_to_real(_text, _text + _size, value);
+}
+
 bool StaticString::to_number(double *value) const
 {
-	if (!_size)
-	{
-		return false;
-	}
-
-	const char *p   = _text;
-	const char *end = _text + _size;
-
-	// Sign.
-
-	bool negate_result = false;
-
-	switch (*p)
-	{
-	case '-': negate_result = true; // Fallthrough.
-	case '+': ++p;
-	}
-
-	// Whole.
-
-	if (p == end || *p < '0' || *p > '9')
-	{
-		return false;
-	}
-
-	double result = 0;
-
-	do
-	{
-		result = result * 10 + (*p++ - '0');
-	} while (p != end && *p >= '0' && *p <= '9');
-
-	// Fraction.
-
-	if (p != end && *p == '.')
-	{
-		++p;
-
-		if (p == end || *p < '0' || *p > '9')
-		{
-			return false;
-		}
-
-		double factor = 1;
-
-		do
-		{
-			result = result * 10 + (*p++ - '0');
-			factor *= 10;
-		} while (p != end && *p >= '0' && *p <= '9');
-
-		result /= factor;
-	}
-
-	// Power.
-
-	if (p != end && (*p == 'E' || *p == 'e'))
-	{
-		if (++p == end)
-		{
-			return false;
-		}
-
-		// Power sign.
-
-		bool negate_power = false;
-
-		switch (*p)
-		{
-		case '-': negate_power = true; // Fallthrough.
-		case '+': ++p;
-		}
-
-		// Power value.
-
-		if (p == end || *p < '0' || *p > '9')
-		{
-			return false;
-		}
-
-		double power = 0;
-
-		do
-		{
-			power = power * 10 + (*p++ - '0');
-		} while (p != end && *p >= '0' && *p <= '9');
-
-		result *= pow(10, (negate_power ? -power : power));
-	}
-
-	if (p != end)
-	{
-		return false;
-	}
-
-	*value = (negate_result ? -result : result);
-	return true;
+	return string_to_real(_text, _text + _size, value);
 }
 
 double StaticString::to_time() const

@@ -170,6 +170,12 @@ public:
 	* \overload
 	*/
 
+	bool to_number(float *value) const noexcept;
+
+	/**
+	* \overload
+	*/
+
 	bool to_number(double *value) const noexcept;
 
 	/// Convert to decimal \c double time as much of the string as possible.
