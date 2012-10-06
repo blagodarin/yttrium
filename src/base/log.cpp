@@ -50,6 +50,11 @@ LogManager::~LogManager()
 	LogManagerGuard::leave(this, S("Unmatched LogManager destruction"));
 }
 
+LogManager::Writer LogManager::log()
+{
+	return Writer(this);
+}
+
 LogManager *LogManager::instance()
 {
 	return LogManagerGuard::instance;

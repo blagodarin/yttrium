@@ -66,10 +66,7 @@ public:
 
 	///
 
-	Writer log() noexcept
-	{
-		return Writer(this);
-	}
+	Writer log() noexcept;
 
 public:
 

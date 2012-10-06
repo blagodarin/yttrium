@@ -4,6 +4,8 @@
 #include <Yttrium/assert.h>
 #include <Yttrium/utils.h>
 
+#include "ieee_float.h"
+
 #include <cstdio>  // sprintf
 #include <cstring> // memcpy, memmove, strlen
 
@@ -216,14 +218,162 @@ String &String::append_dec(uint64_t value, int width, bool zeros)
 	return *this;
 }
 
+namespace
+{
+
+StaticString negative_infinity = S("-INF");
+StaticString positive_infinity = S("INF");
+StaticString negative_nan = S("-NAN");
+StaticString positive_nan = S("NAN");
+StaticString negative_zero = S("-0");
+StaticString positive_zero = S("0");
+
+template <typename T>
+StaticString float_to_string(char *buffer, T value, int max_fraction_digits = -1)
+{
+	// NOTE: This should provide exact float-to-string-to-float conversions.
+	// NOTE: This won't work for non-IEEE floats and may not work on big endian architectures.
+
+	typedef IeeeFloat<T> Float;
+
+	typedef typename Float::FastSigned   FastSigned;
+	typedef typename Float::FastUnsigned FastUnsigned;
+	typedef typename Float::Union        Union;
+
+	Union raw_value;
+
+	raw_value.f = value;
+
+	bool is_negative = raw_value.i & Float::SignMask;
+
+	FastSigned exponent = (raw_value.i & Float::ExponentMask) >> Float::MantissaBits;
+	FastUnsigned mantissa = raw_value.i & Float::MantissaMask;
+
+	if (Y_UNLIKELY(!exponent))
+	{
+		if (Y_LIKELY(!mantissa))
+		{
+			return is_negative ? negative_zero : positive_zero;
+		}
+
+		// Base 2 logarithm calculation trick based on a Sean Eron Anderson snippet:
+		// http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogIEEE64Float
+
+		Union u;
+
+		u.i = mantissa | ((Float::ExponentBias + Float::MantissaBits) << Float::MantissaBits);
+		u.f -= Float::ImplicitOne;
+
+		FastSigned shift = (Float::ExponentBias + Float::MantissaBits) - (u.i >> Float::MantissaBits);
+
+		mantissa <<= shift;
+		exponent = Float::DenormalizedExponent - shift;
+	}
+	else if (Y_UNLIKELY(exponent == Float::BiasedInfinityExponent))
+	{
+		if (Y_LIKELY(!mantissa))
+		{
+			return is_negative ? negative_infinity : positive_infinity;
+		}
+		else
+		{
+			return is_negative ? negative_nan : positive_nan;
+		}
+	}
+	else
+	{
+		exponent -= Float::ExponentBias;
+		mantissa |= Float::ImplicitOne;
+	}
+
+	// At this point, the absolute value is (mantissa / 0x800000) * pow(2, exponent),
+	// with [0x800000, 0xFFFFFF] mantissa range, and [-147, 127] exponent range.
+
+	if (Y_UNLIKELY(exponent > Float::MantissaBits)) // The precision exceeds 1.
+	{
+		// TODO: Implement.
+	}
+	else if (exponent < -1) // The absolute value is in (0; 0.5) range.
+	{
+		// TODO: Implement.
+	}
+	else
+	{
+		FastSigned whole_bits = exponent + 1;
+		FastSigned fraction_bits = Float::MantissaBits - exponent;
+
+		FastSigned whole_value = mantissa >> fraction_bits;
+
+		char *begin = buffer + (10 + 3 * whole_bits) / 10 + 1;
+		char *end = begin;
+
+		do
+		{
+			*--begin = '0' + whole_value % 10;
+			whole_value /= 10;
+		} while (whole_value);
+
+		if (is_negative)
+		{
+			*--begin = '-';
+		}
+
+		FastSigned fraction_value = (mantissa << whole_bits) & Float::ImplicitMantissaMask;
+
+		if (Y_LIKELY(fraction_value && max_fraction_digits))
+		{
+			*end++ = '.';
+
+			FastSigned fraction_limit = (10 + 3 * fraction_bits) / 10;
+
+			char *fraction_end;
+
+			if (max_fraction_digits > 0 && max_fraction_digits < fraction_limit)
+			{
+				fraction_end = end + max_fraction_digits;
+			}
+			else
+			{
+				fraction_end = end + fraction_limit;
+			}
+
+			FastSigned next_value = fraction_value * 10;
+
+			do
+			{
+				*end++ = '0' + (next_value >> (Float::MantissaBits + 1));
+				fraction_value = next_value & Float::ImplicitMantissaMask;
+			} while (fraction_value && end < fraction_end);
+
+			// TODO: Use the next digit to decide whether we should round up or down.
+		}
+
+		return StaticString(begin, end - begin);
+	}
+
+	Y_ASSERT(false);
+
+	return StaticString();
+}
+
+} // namespace
+
 String &String::append_dec(float value) // NOTE: Terrible terrible implementation.
 {
 	char buffer[32];
-	int  size;
+
+#if 0 // TODO: Utilize the advanced fload to string conversion when it's ready.
+
+	return append(float_to_string(buffer, value));
+
+#else
+
+	int size;
 
 	sprintf(buffer, "%f%n", static_cast<double>(value), &size);
-	append(buffer, size);
-	return *this;
+	return append(buffer, size);
+
+#endif
 }
 
 String &String::append_dec(double value) // NOTE: Terrible terrible implementation.
@@ -232,8 +382,7 @@ String &String::append_dec(double value) // NOTE: Terrible terrible implementati
 	int  size;
 
 	sprintf(buffer, "%f%n", value, &size);
-	append(buffer, size);
-	return *this;
+	return append(buffer, size);
 }
 
 String &String::clear()
