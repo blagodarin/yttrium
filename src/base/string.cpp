@@ -362,7 +362,7 @@ String &String::append_dec(float value) // NOTE: Terrible terrible implementatio
 {
 	char buffer[32];
 
-#if 0 // TODO: Utilize the advanced fload to string conversion when it's ready.
+#if 0 // TODO: Utilize the advanced float to string conversion when it's ready.
 
 	return append(float_to_string(buffer, value));
 
@@ -621,7 +621,7 @@ String &String::set(char symbol)
 	return *this;
 }
 
-void String::swap(String *string)
+String &String::swap(String *string)
 {
 	char *text = _text;
 	size_t size = _size;
@@ -637,9 +637,11 @@ void String::swap(String *string)
 	string->_size = size;
 	string->_buffer_size = buffer_size;
 	string->_allocator = allocator;
+
+	return *this;
 }
 
-void String::swap(String &&string)
+String &String::swap(String &&string)
 {
 	char *text = _text;
 	size_t size = _size;
@@ -655,6 +657,8 @@ void String::swap(String &&string)
 	string._size = size;
 	string._buffer_size = buffer_size;
 	string._allocator = allocator;
+
+	return *this;
 }
 
 String &String::trim()

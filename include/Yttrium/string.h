@@ -213,13 +213,13 @@ public:
 
 	///
 
-	void swap(String *string) noexcept;
+	String &swap(String *string) noexcept;
 
 	/**
 	* \overload
 	*/
 
-	void swap(String &&string) noexcept;
+	String &swap(String &&string) noexcept;
 
 	///
 
@@ -230,6 +230,12 @@ public:
 	///
 
 	inline String &operator =(char symbol) noexcept;
+
+	/**
+	* \overload
+	*/
+
+	inline String &operator =(const char *text) noexcept;
 
 	/**
 	* \overload
@@ -410,8 +416,7 @@ String &String::append_dec(uint32_t value, int width, bool zeros) noexcept
 
 String &String::escape(const char *symbols, char with) noexcept
 {
-	swap(escaped(symbols, with));
-	return *this;
+	return swap(escaped(symbols, with));
 }
 
 String String::escaped(const char *symbols, char with) const noexcept
@@ -427,6 +432,11 @@ String &String::set(const StaticString &string) noexcept
 String &String::operator =(char symbol) noexcept
 {
 	return set(symbol);
+}
+
+String &String::operator =(const char *text) noexcept
+{
+	return set(text);
 }
 
 String &String::operator =(const StaticString &string) noexcept
