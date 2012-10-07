@@ -366,22 +366,22 @@ char &StaticString::operator [](size_t index) noexcept
 
 bool StaticString::operator <(const StaticString &string) const noexcept
 {
-	return (compare(string) < 0);
+	return compare(string) < 0;
 }
 
 bool StaticString::operator >(const StaticString &string) const noexcept
 {
-	return (compare(string) > 0);
+	return compare(string) > 0;
 }
 
 bool StaticString::operator <=(const StaticString &string) const noexcept
 {
-	return (compare(string) <= 0);
+	return compare(string) <= 0;
 }
 
 bool StaticString::operator >=(const StaticString &string) const noexcept
 {
-	return (compare(string) >= 0);
+	return compare(string) >= 0;
 }
 
 StaticString::StaticString(size_t size) noexcept

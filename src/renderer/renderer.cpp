@@ -46,16 +46,16 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 	vertex.texture = texture.top_left();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = position.outer_bottom_left();
-	vertex.texture = texture.outer_bottom_left();
+	vertex.position = position.bottom_left();
+	vertex.texture = texture.bottom_left();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = position.outer_top_right();
-	vertex.texture = texture.outer_top_right();
+	vertex.position = position.top_right();
+	vertex.texture = texture.top_right();
 	_vertices_2d.push_back(vertex);
 
-	vertex.position = position.outer_bottom_right();
-	vertex.texture = texture.outer_bottom_right();
+	vertex.position = position.bottom_right();
+	vertex.texture = texture.bottom_right();
 	_vertices_2d.push_back(vertex);
 
 	if (index)
@@ -229,10 +229,9 @@ void Renderer::set_texture_rectangle(const RectF &rect)
 	if (_private->_texture)
 	{
 		const Vector2f &top_left = _private->_texture._private->fix_coords(rect.top_left());
-		const Vector2f &outer_bottom_right = _private->_texture._private->fix_coords(rect.outer_bottom_right());
+		const Vector2f &bottom_right = _private->_texture._private->fix_coords(rect.bottom_right());
 
-		_private->_texture_rect.set_outer_coords(top_left.x, top_left.y,
-			outer_bottom_right.x, outer_bottom_right.y);
+		_private->_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
 	}
 }
 

@@ -12,8 +12,8 @@ BOOST_AUTO_TEST_CASE(rect_test)
 
 	BOOST_CHECK_EQUAL(null_rect.left(), 0);
 	BOOST_CHECK_EQUAL(null_rect.top(), 0);
-	BOOST_CHECK_EQUAL(null_rect.right(), -1);
-	BOOST_CHECK_EQUAL(null_rect.bottom(), -1);
+	BOOST_CHECK_EQUAL(null_rect.right(), 0);
+	BOOST_CHECK_EQUAL(null_rect.bottom(), 0);
 
 	Rect<int> rect(3, 5, 7, 8);
 

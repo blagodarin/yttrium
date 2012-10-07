@@ -36,7 +36,7 @@ bool Image::load(const PropertyLoader &loader)
 	return true;
 }
 
-void Image::render(Renderer *renderer, const RectF &area, const Vector2f &, WidgetState)
+void Image::render(Renderer *renderer, const RectF &area, const Vector2f &, WidgetState) const
 {
 	renderer->set_color(_color);
 	renderer->set_texture(_texture);

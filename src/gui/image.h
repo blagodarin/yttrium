@@ -23,7 +23,7 @@ public: // Widget
 
 	virtual bool load(const PropertyLoader &loader);
 
-	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state);
+	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const;
 
 private:
 

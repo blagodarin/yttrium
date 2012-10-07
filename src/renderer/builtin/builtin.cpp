@@ -66,7 +66,7 @@ void RendererBuiltin::draw_cursor(Dim x, Dim y)
 		RectF(
 			x * Builtin::char_width, y * Builtin::char_height,
 			Builtin::char_width, Builtin::char_height),
-		RectF::from_outer_coords(
+		RectF::from_coords(
 			Builtin::coords[0][0][0], Builtin::coords[0][0][1],
 			Builtin::coords[0][1][0], Builtin::coords[0][1][1]));
 
@@ -85,7 +85,7 @@ void RendererBuiltin::draw_rectangle(Dim x, Dim y, Dim width, Dim height)
 		RectF(
 			x * Builtin::char_width, y * Builtin::char_height,
 			width * Builtin::char_width, height * Builtin::char_height),
-		RectF::from_outer_coords(
+		RectF::from_coords(
 			Builtin::coords[0][0][0], Builtin::coords[0][0][0],
 			Builtin::coords[0][0][0], Builtin::coords[0][0][0]));
 
@@ -119,7 +119,7 @@ void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_
 						RectF(
 							a.x, a.y,
 							Builtin::char_width, Builtin::char_height),
-						RectF::from_outer_coords(
+						RectF::from_coords(
 							Builtin::coords[*symbol][0][0], Builtin::coords[*symbol][0][1],
 							Builtin::coords[*symbol][1][0], Builtin::coords[*symbol][1][1]));
 				}

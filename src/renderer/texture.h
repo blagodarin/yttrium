@@ -46,10 +46,9 @@ public:
 RectF Texture2D::Private::full_rectangle() const
 {
 	const Vector2f &top_left = fix_coords(Vector2f(0, 0));
-	const Vector2f &outer_bottom_right = fix_coords(_size);
+	const Vector2f &bottom_right = fix_coords(_size);
 
-	return RectF::from_outer_coords(top_left.x, top_left.y,
-		outer_bottom_right.x, outer_bottom_right.y);
+	return RectF::from_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
 }
 
 } // namespace Yttrium
