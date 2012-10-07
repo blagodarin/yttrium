@@ -166,85 +166,6 @@ bool load_position(Vector3f *position, const Ion::Node &node, bool inherit)
 	return true;
 }
 
-bool load_scaling(Scaling *scaling, const Ion::Node &node)
-{
-	Ion::Node::ConstRange values = node.values();
-
-	if (values.size() != 1)
-	{
-		return false;
-	}
-
-	const StaticString *value;
-
-	if (!values.first().get(&value))
-	{
-		return false;
-	}
-	else if (*value == S("fit"))
-	{
-		*scaling = Scaling::Fit;
-	}
-	else if (*value == S("max"))
-	{
-		*scaling = Scaling::Max;
-	}
-	else if (*value == S("min"))
-	{
-		*scaling = Scaling::Min;
-	}
-	else if (*value == S("stretch"))
-	{
-		*scaling = Scaling::Stretch;
-	}
-	else
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool load_size(Vector2f *size, const Ion::Node &node, bool inherit)
-{
-	Ion::Node::ConstRange values = node.values();
-
-	if (values.size() == 1)
-	{
-		if (!inherit)
-		{
-			size->y = 1.f;
-		}
-	}
-	else if (values.size() != 2)
-	{
-		return false;
-	}
-
-	for (size_t i = 0; !values.is_empty(); values.pop_first(), ++i)
-	{
-		const StaticString *value;
-
-		if (!values.first().get(&value))
-		{
-			return false;
-		}
-		else if (!value->is_empty())
-		{
-			if (!value->to_number(size->data() + i))
-			{
-				return false;
-			}
-		}
-		else if (!inherit)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
 bool load_texture(Texture2D *texture, const Ion::Node &node, TextureCache *texture_cache, Texture2D::Filter default_filter)
 {
 	Ion::Node::ConstRange values = node.values();
@@ -391,6 +312,85 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *textur
 	// TODO: Implement.
 
 	return false;
+}
+
+bool IonPropertyLoader::load_scaling(Scaling *scaling, const Ion::Node &node)
+{
+	Ion::Node::ConstRange values = node.values();
+
+	if (values.size() != 1)
+	{
+		return false;
+	}
+
+	const StaticString *value;
+
+	if (!values.first().get(&value))
+	{
+		return false;
+	}
+	else if (*value == S("fit"))
+	{
+		*scaling = Scaling::Fit;
+	}
+	else if (*value == S("max"))
+	{
+		*scaling = Scaling::Max;
+	}
+	else if (*value == S("min"))
+	{
+		*scaling = Scaling::Min;
+	}
+	else if (*value == S("stretch"))
+	{
+		*scaling = Scaling::Stretch;
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool IonPropertyLoader::load_size(Vector2f *size, const Ion::Node &node, bool inherit)
+{
+	Ion::Node::ConstRange values = node.values();
+
+	if (values.size() == 1)
+	{
+		if (!inherit)
+		{
+			size->y = 1.f;
+		}
+	}
+	else if (values.size() != 2)
+	{
+		return false;
+	}
+
+	for (size_t i = 0; !values.is_empty(); values.pop_first(), ++i)
+	{
+		const StaticString *value;
+
+		if (!values.first().get(&value))
+		{
+			return false;
+		}
+		else if (!value->is_empty())
+		{
+			if (!value->to_number(size->data() + i))
+			{
+				return false;
+			}
+		}
+		else if (!inherit)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 } // namespace Gui

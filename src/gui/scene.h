@@ -38,6 +38,8 @@ public:
 
 	void render(Renderer *renderer, const Vector2f &scale); // TODO: Make const.
 
+	inline void reserve(size_t capacity);
+
 	inline void set_cursor(const Vector2f &cursor);
 
 	inline void set_scaling(Scaling scaling);
@@ -81,6 +83,11 @@ void Scene::bind(const StaticString &name, const StaticString &action)
 bool Scene::is_transparent() const
 {
 	return _is_transparent;
+}
+
+void Scene::reserve(size_t capacity)
+{
+	_widgets.reserve(capacity);
 }
 
 void Scene::set_cursor(const Vector2f &cursor)

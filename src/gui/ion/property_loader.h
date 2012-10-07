@@ -1,6 +1,8 @@
 #ifndef __GUI_ION_PROPERTY_LOADER_H
 #define __GUI_ION_PROPERTY_LOADER_H
 
+#include <Yttrium/ion/node.h>
+
 #include "../property_loader.h"
 
 namespace Yttrium
@@ -28,6 +30,12 @@ public: // PropertyLoader
 	virtual bool load_size(const StaticString &name, Vector2f *size) const;
 
 	virtual bool load_texture(const StaticString &name, Texture2D *texture) const;
+
+public:
+
+	static bool load_scaling(Scaling *scaling, const Ion::Node &node);
+
+	static bool load_size(Vector2f *size, const Ion::Node &node, bool inherit = false);
 };
 
 } // namespace Gui

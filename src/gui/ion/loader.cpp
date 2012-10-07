@@ -1,7 +1,12 @@
 #include "loader.h"
 
+#include <Yttrium/ion/object.h>
 #include <Yttrium/ion/value.h>
 #include <Yttrium/renderer/texture_cache.h>
+
+#include "../scene.h"
+
+#include "property_loader.h"
 
 namespace Yttrium
 {
@@ -121,6 +126,64 @@ bool IonLoader::load_image(Image *image, const Ion::Node &node) const
 	// TODO: Implement.
 
 	return false;
+}
+
+bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
+{
+	bool result = false;
+
+	scene->reserve(source.size());
+
+	for (Ion::Object::ConstRange r = source.nodes(); !r.is_empty(); r.pop_first())
+	{
+		const Ion::Node &node = r.first();
+
+		if (node.name() == "root")
+		{
+			result = true; // NOTE: The last scene becomes a root one. Is it OK?
+		}
+		else if (node.name() == "size")
+		{
+			Vector2f size;
+
+			if (IonPropertyLoader::load_size(&size, node))
+			{
+				scene->set_size(size);
+			}
+		}
+		else if (node.name() == "scale")
+		{
+			Scaling scaling;
+
+			if (IonPropertyLoader::load_scaling(&scaling, node))
+			{
+				scene->set_scaling(scaling);
+			}
+		}
+		if (node.name() == "transparent")
+		{
+			scene->set_transparent(true);
+		}
+		else if (node.name() == "bind")
+		{
+			Ion::Node::ConstRange s = node.values();
+
+			if (s.size() == 2 && s.first().type() == Ion::Value::StringType
+				&& s.last().type() == Ion::Value::StringType)
+			{
+				scene->bind(s.first().string(), s.last().string());
+			}
+		}
+		else
+		{
+			// TODO: Implement properly.
+
+			IonPropertyLoader loader;
+
+			scene->add_widget(node.name(), StaticString(), loader);
+		}
+	}
+	return result;
 }
 
 } // namespace Gui

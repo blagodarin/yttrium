@@ -11,12 +11,17 @@ namespace Gui
 {
 
 class Image;
+class Scene;
 
 class IonLoader
 {
 public:
 
 	bool load_image(Image *image, const Ion::Node &node) const;
+
+private:
+
+	bool load_scene(Scene *scene, const Ion::Object &source) const;
 };
 
 } // namespace Gui
