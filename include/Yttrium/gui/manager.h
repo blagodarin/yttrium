@@ -69,7 +69,7 @@ public:
 
 	///
 
-	static ManagerPtr create(Renderer &renderer, Allocator *allocator = DefaultAllocator);
+	static ManagerPtr create(Renderer &renderer, Allocator *allocator = DefaultAllocator) noexcept;
 
 protected:
 

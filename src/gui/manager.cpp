@@ -18,7 +18,7 @@ ManagerImpl::ManagerImpl(const Renderer &renderer, Allocator *allocator)
 	: Manager(allocator)
 	, _renderer(renderer)
 	, _has_size(false)
-	, _size(0, 0)
+	, _size(0)
 	, _scaling(Scaling::Stretch)
 	, _has_cursor(false)
 {
@@ -107,7 +107,7 @@ void ManagerImpl::set_scene_change_action(const StaticString &from_scene,
 void ManagerImpl::clear()
 {
 	_has_size = false;
-	_size = Vector2f(0, 0);
+	_size = Vector2f(0);
 	_fonts.clear();
 	_scenes.clear(); // TODO: Delete the scenes!!!
 	_scene_stack.clear();

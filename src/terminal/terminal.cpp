@@ -189,7 +189,7 @@ void Terminal::show(Mode mode)
 		_size.width = screen_mode.width;
 		_size.height = screen_mode.height;
 		put_mode = Window::NoBorder;
-		corner = Dim2(0, 0);
+		corner = Dim2(0);
 	}
 	else
 	{

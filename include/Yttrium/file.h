@@ -14,7 +14,7 @@ class PackageReader;
 class PackageWriter;
 class String;
 
-/// File reader.
+/// %File access class.
 
 class Y_API File
 {

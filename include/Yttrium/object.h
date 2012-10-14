@@ -12,7 +12,7 @@
 namespace Yttrium
 {
 
-/// Reference-counted object that deletes itself when the counter reaches zero.
+/// An object with a reference counter.
 
 class Y_API Object
 	: public Noncopyable
@@ -118,7 +118,7 @@ public:
 
 	///
 
-	explicit ObjectPointer(T *object);
+	explicit ObjectPointer(T *object) noexcept;
 
 public:
 
@@ -171,10 +171,7 @@ Object::Pointer::Pointer(Object *object) noexcept
 
 Object::Pointer::~Pointer() noexcept
 {
-	if (_object) // To make returning smart pointers from functions completely inline.
-	{
-		reset();
-	}
+	reset();
 }
 
 bool Object::Pointer::is_null() const noexcept
@@ -231,13 +228,13 @@ T *ObjectPointer<T>::pointer() const noexcept
 template <typename T>
 T *ObjectPointer<T>::operator ->() const noexcept
 {
-	return pointer();
+	return Object::Pointer::pointer();
 }
 
 template <typename T>
 T &ObjectPointer<T>::operator *() const noexcept
 {
-	return *pointer();
+	return *Object::Pointer::pointer();
 }
 
 } // namespace Yttrium

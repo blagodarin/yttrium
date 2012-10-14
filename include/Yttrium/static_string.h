@@ -196,7 +196,8 @@ public:
 	uint64_t to_uint64() const noexcept;
 
 	///
-	/// \note Might possibly crash if the string is allocated in the very end of a readable space.
+	/// \note Might crash if the string is allocated in the very end of a readable space
+	/// and is not zero terminated.
 
 	String zero_terminated(Allocator *allocator = DefaultAllocator) const noexcept;
 
@@ -263,7 +264,7 @@ class S: public StaticString
 public:
 
 	/// Constructor.
-	/// \param text String literal (or any other \c char array).
+	/// \param text %String literal (or any other \c char array).
 
 	template <size_t N>
 	S(const char (&text)[N]) noexcept;
