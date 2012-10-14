@@ -1,8 +1,7 @@
 #ifndef __GUI_ION_LOADER_H
 #define __GUI_ION_LOADER_H
 
-#include <Yttrium/ion/node.h>
-#include <Yttrium/renderer/texture.h>
+#include "classes.h"
 
 namespace Yttrium
 {
@@ -10,19 +9,37 @@ namespace Yttrium
 namespace Gui
 {
 
-class Image;
+class ManagerImpl;
 class Scene;
 
 class IonLoader
 {
 public:
 
-	bool load_image(Image *image, const Ion::Node &node) const;
+	inline IonLoader(ManagerImpl *manager);
+
+public:
+
+	bool load(const StaticString &source_name, bool is_internal = false);
 
 private:
 
+	void load(const Ion::Object &source);
+
 	bool load_scene(Scene *scene, const Ion::Object &source) const;
+
+private:
+
+	ManagerImpl *_manager;
+	Classes      _classes;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+IonLoader::IonLoader(ManagerImpl *manager)
+	: _manager(manager)
+{
+}
 
 } // namespace Gui
 

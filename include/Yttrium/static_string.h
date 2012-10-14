@@ -2,6 +2,10 @@
 /// \brief Static string.
 /// \note The idea behind the static string with length is that the length of the string is almost always known.
 
+// NOTE: There is a problem with static strings: one can always construct
+// a static string from a constant static string, and the former would point
+// to the latter's data, but it won't be constant anymore,
+
 #ifndef __Y_STATIC_STRING_H
 #define __Y_STATIC_STRING_H
 
@@ -39,7 +43,7 @@ public:
 
 	///
 
-	inline char &at(size_t index) noexcept;
+	inline char &at(size_t index) noexcept; // TODO: Remove as unsafe?
 
 	/**
 	* \overload
@@ -122,7 +126,7 @@ public:
 	/// Return the string text pointer.
 	/// \return %String text pointer.
 
-	inline char *text() noexcept;
+	inline char *text() noexcept; // TODO: Remove as unsafe?
 
 	/**
 	* \overload
@@ -132,7 +136,7 @@ public:
 
 	///
 
-	inline char *text_at(size_t index) noexcept;
+	inline char *text_at(size_t index) noexcept; // TODO: Remove as unsafe?
 
 	/**
 	* \overload
@@ -206,7 +210,7 @@ public:
 	* \overload
 	*/
 
-	inline char &operator [](size_t index) noexcept;
+	inline char &operator [](size_t index) noexcept; // TODO: Remove as unsafe?
 
 	///
 

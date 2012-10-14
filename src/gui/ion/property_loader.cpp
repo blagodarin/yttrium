@@ -1,6 +1,7 @@
 #include "property_loader.h"
 
 #include <Yttrium/ion/node.h>
+#include <Yttrium/ion/object.h>
 #include <Yttrium/ion/value.h>
 #include <Yttrium/renderer/texture_cache.h>
 
@@ -391,6 +392,13 @@ bool IonPropertyLoader::load_size(Vector2f *size, const Ion::Node &node, bool in
 	}
 
 	return true;
+}
+
+bool IonPropertyLoader::load_text(const StaticString **text, const Ion::Object &object, const StaticString &name)
+{
+	const Ion::Node *node = object.last(name);
+
+	return node && node->size() == 1 && node->first()->get(text);
 }
 
 } // namespace Gui

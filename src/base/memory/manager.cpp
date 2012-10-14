@@ -24,6 +24,8 @@ MemoryManager::MemoryManager()
 
 MemoryManager::~MemoryManager()
 {
+	// TODO: Add some memory leak detection here.
+
 	const_cast<Allocator *&>(DefaultAllocator) = SystemAllocator::instance();
 
 	DefaultAllocator->delete_(_root_allocator);

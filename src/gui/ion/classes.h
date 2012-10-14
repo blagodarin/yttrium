@@ -20,7 +20,7 @@ public:
 public:
 
 	bool add(const StaticString &name, const Ion::Object &source,
-		const StaticString &base_class = StaticString());
+		const StaticString *base_class = nullptr);
 
 	void clear();
 

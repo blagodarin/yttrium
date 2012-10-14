@@ -8,7 +8,7 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(vector2_test)
 {
-	Vector2<int> null_vector;
+	Vector2<int> null_vector(0);
 
 	BOOST_CHECK_EQUAL(null_vector.x, 0);
 	BOOST_CHECK_EQUAL(null_vector.y, 0);

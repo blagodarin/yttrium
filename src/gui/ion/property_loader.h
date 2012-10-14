@@ -36,6 +36,8 @@ public:
 	static bool load_scaling(Scaling *scaling, const Ion::Node &node);
 
 	static bool load_size(Vector2f *size, const Ion::Node &node, bool inherit = false);
+
+	static bool load_text(const StaticString **text, const Ion::Object &object, const StaticString &name);
 };
 
 } // namespace Gui

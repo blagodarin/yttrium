@@ -14,8 +14,9 @@ namespace Yttrium
 namespace Gui
 {
 
-Scene::Scene(Allocator *allocator)
+Scene::Scene(const StaticString &name, Allocator *allocator)
 	: _allocator(allocator)
+	, _name(name)
 	, _scaling(Scaling::Stretch)
 	, _is_cursor_set(false)
 	, _focused_widget(nullptr)

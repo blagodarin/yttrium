@@ -22,7 +22,7 @@ class Scene
 {
 public:
 
-	Scene(Allocator *allocator = DefaultAllocator);
+	Scene(const StaticString &name, Allocator *allocator = DefaultAllocator);
 
 	~Scene();
 
@@ -33,6 +33,8 @@ public:
 	inline void bind(const StaticString &name, const StaticString &action);
 
 	inline bool is_transparent() const;
+
+	inline String name() const;
 
 	bool process_key(Key key, KeyState state);
 
@@ -60,6 +62,7 @@ private:
 private:
 
 	Allocator    *_allocator;
+	String        _name;
 	Vector2f      _size;
 	Scaling       _scaling;
 	Widgets       _widgets;
@@ -83,6 +86,11 @@ void Scene::bind(const StaticString &name, const StaticString &action)
 bool Scene::is_transparent() const
 {
 	return _is_transparent;
+}
+
+String Scene::name() const
+{
+	return _name;
 }
 
 void Scene::reserve(size_t capacity)

@@ -1,9 +1,11 @@
+#include "../logging.h"
+
 #include "loader.h"
 
-#include <Yttrium/ion/object.h>
-#include <Yttrium/ion/value.h>
+#include <Yttrium/ion/document.h>
 #include <Yttrium/renderer/texture_cache.h>
 
+#include "../manager.h"
 #include "../scene.h"
 
 #include "property_loader.h"
@@ -112,20 +114,170 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 } // namespace
 
-bool IonLoader::load_image(Image *image, const Ion::Node &node) const
-{
-	const Ion::Object *object;
-	const StaticString *name;
-	const StaticString *class_name;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (!load_object(node, &object, &name, &class_name))
+bool IonLoader::load(const StaticString &source_name, bool is_internal)
+{
+	Ion::Document document(_manager->allocator());
+
+	Y_LOG_DEBUG("[Gui.Manager] Loading \"" << source_name << "\"...");
+
+	if (!document.load(source_name))
 	{
+		Y_LOG("[Gui.Manager] Can't load \"" << source_name << "\"...");
 		return false;
 	}
 
-	// TODO: Implement.
+	if (!is_internal)
+	{
+		const Ion::Node *node;
 
-	return false;
+		if (document.last(S("size"), &node))
+		{
+			Vector2f size;
+
+			if (IonPropertyLoader::load_size(&size, *node))
+			{
+				_manager->set_size(size);
+			}
+		}
+
+		if (document.last(S("scale"), &node))
+		{
+			Scaling scaling;
+
+			if (IonPropertyLoader::load_scaling(&scaling, *node))
+			{
+				_manager->set_scaling(scaling);
+			}
+		}
+	}
+
+	load(document);
+
+	Y_LOG_TRACE("[Gui.Manager] Loaded \"" << source_name << "\"");
+
+	return true;
+}
+
+void IonLoader::load(const Ion::Object &source)
+{
+	for (Ion::Object::ConstRange r = source.nodes(); !r.is_empty(); r.pop_first())
+	{
+		const Ion::Node &node = r.first();
+
+		if (node.name() == S("include"))
+		{
+			const StaticString *include_path;
+
+			if (node.first(&include_path))
+			{
+				load(*include_path, true);
+			}
+		}
+		else if (node.name() == S("class"))
+		{
+			const Ion::Object  *object;
+			const StaticString *object_name;
+			const StaticString *class_name;
+
+			if (!load_object(node, &object, &object_name, &class_name))
+			{
+				continue;
+			}
+
+			Y_LOG_DEBUG("[Gui.Manager] Loading class \"" << *object_name << "\"...");
+
+			if (!_classes.add(*object_name, *object, class_name))
+			{
+				Y_LOG("[Gui.Manager] Can' load class \"" << *object_name << "\"");
+			}
+		}
+		else if (node.name() == S("scene"))
+		{
+			const Ion::Object  *object;
+			const StaticString *object_name;
+			const StaticString *class_name;
+
+			if (!load_object(node, &object, &object_name, &class_name))
+			{
+				continue;
+			}
+
+			if (class_name && *class_name != S("root"))
+			{
+				Y_LOG("[Gui.Manager] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored");
+				class_name = nullptr;
+			}
+
+			Y_LOG_DEBUG("[Gui.Manager] Loading scene \"" << *object_name << "\"...");
+
+			Scene *scene = _manager->create_scene(*object_name);
+
+			if (!scene)
+			{
+				continue;
+			}
+
+			if (!load_scene(scene, *object))
+			{
+				Y_LOG("[Gui.Manager] Can't load scene \"" << *object_name << "\"");
+				_manager->delete_scene(scene);
+				continue;
+			}
+
+			_manager->add_scene(scene, class_name != nullptr);
+		}
+		else if (node.name() == S("on_scene_change"))
+		{
+			Ion::List::ConstRange s = node.values();
+
+			if (s.size() != 2 || !s.first().is_list() || !s.last().is_string())
+			{
+				Y_LOG("[Gui.Manager] Bad 'on_scene_change'");
+				continue;
+			}
+
+			const StaticString *from;
+			const StaticString *to;
+			const StaticString *action;
+
+			Ion::List::ConstRange t = s.first().list().values();
+
+			if (t.size() != 2 || !t.first().get(&from) || !t.last().get(&to)
+				|| !s.last().get(&action))
+			{
+				Y_LOG("[Gui.Manager] Bad 'on_scene_change'");
+				continue;
+			}
+
+			_manager->set_scene_change_action(*from, *to, *action);
+		}
+		else if (node.name() == S("font"))
+		{
+			const Ion::Object  *object;
+			const StaticString *object_name;
+			const StaticString *class_name;
+
+			if (!load_object(node, &object, &object_name, &class_name))
+			{
+				continue;
+			}
+
+			Y_LOG_DEBUG("[Gui.Manager] Loading font \"" << *object_name << "\"...");
+
+			const StaticString *font_name;
+			const StaticString *texture_name;
+
+			if (!(IonPropertyLoader::load_text(&font_name, *object, "file")
+				&& IonPropertyLoader::load_text(&texture_name, *object, "texture")))
+			{
+				continue;
+			}
+
+			_manager->set_font(*object_name, *font_name, *texture_name);
+		}
+	}
 }
 
 bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
@@ -138,11 +290,11 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 	{
 		const Ion::Node &node = r.first();
 
-		if (node.name() == "root")
+		if (node.name() == S("root"))
 		{
 			result = true; // NOTE: The last scene becomes a root one. Is it OK?
 		}
-		else if (node.name() == "size")
+		else if (node.name() == S("size"))
 		{
 			Vector2f size;
 
@@ -151,7 +303,7 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 				scene->set_size(size);
 			}
 		}
-		else if (node.name() == "scale")
+		else if (node.name() == S("scale"))
 		{
 			Scaling scaling;
 
@@ -160,11 +312,11 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 				scene->set_scaling(scaling);
 			}
 		}
-		if (node.name() == "transparent")
+		if (node.name() == S("transparent"))
 		{
 			scene->set_transparent(true);
 		}
-		else if (node.name() == "bind")
+		else if (node.name() == S("bind"))
 		{
 			Ion::Node::ConstRange s = node.values();
 

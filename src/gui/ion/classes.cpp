@@ -23,7 +23,7 @@ void update_document(Ion::Document *target, const Ion::Object &source)
 
 } // namespace
 
-bool Classes::add(const StaticString &name, const Ion::Object &source, const StaticString &base_class)
+bool Classes::add(const StaticString &name, const Ion::Object &source, const StaticString *base_class)
 {
 	if (name.is_empty() || _classes.find(String(name, ByReference())) != _classes.end())
 	{
@@ -32,9 +32,9 @@ bool Classes::add(const StaticString &name, const Ion::Object &source, const Sta
 
 	Ion::Object *base = nullptr;
 
-	if (!base_class.is_empty())
+	if (base_class)
 	{
-		Map::iterator i = _classes.find(String(base_class, ByReference()));
+		Map::iterator i = _classes.find(String(*base_class, ByReference()));
 		if (i == _classes.end())
 		{
 			return false;
