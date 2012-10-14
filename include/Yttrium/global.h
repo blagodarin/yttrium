@@ -73,7 +73,7 @@
 	#define Y_IS_POSIX 0
 #endif
 
-/// \def Y_WINDOWS
+/// \def Y_IS_WINDOWS
 /// \brief Defined to 1 when compiling for Windows.
 
 #if defined(_WIN32) || defined(__CYGWIN__)

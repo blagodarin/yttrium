@@ -95,7 +95,7 @@ class Y_API PackageWriter
 {
 public:
 
-	///
+	/// Package writing mode.
 
 	enum Mode
 	{
@@ -199,13 +199,16 @@ public:
 
 	/// Mount the specified package into the file system.
 	/// \param name The package name.
-	/// \param format
+	/// \param type Package file type.
+	/// \return \c true on success.
 
 	bool mount(const StaticString &name, PackageType type = PackageType::Auto) noexcept;
 
 	/// Open a file.
 	/// \param name %File name.
+	/// \param mode %File access mode.
 	/// \param order The order to look for the file with.
+	/// \return File.
 
 	File open_file(const StaticString &name, File::Mode mode = File::Read, Order order = PresetOrder) noexcept;
 

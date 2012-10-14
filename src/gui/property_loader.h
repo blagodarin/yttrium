@@ -1,9 +1,10 @@
 #ifndef __GUI_PROPERTY_LOADER_H
 #define __GUI_PROPERTY_LOADER_H
 
-#include <Yttrium/gui/types.h>
 #include <Yttrium/renderer/texture.h>
 #include <Yttrium/static_string.h>
+
+#include "types.h"
 
 namespace Yttrium
 {

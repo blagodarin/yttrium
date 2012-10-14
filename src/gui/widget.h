@@ -1,9 +1,10 @@
 #ifndef __GUI_WIDGET_H
 #define __GUI_WIDGET_H
 
-#include <Yttrium/gui/types.h>
 #include <Yttrium/rect.h>
 #include <Yttrium/string.h>
+
+#include "types.h"
 
 namespace Yttrium
 {

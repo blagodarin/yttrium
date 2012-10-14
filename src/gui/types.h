@@ -1,8 +1,5 @@
-/// \file
-/// \brief
-
-#ifndef __Y_GUI_TYPES_H
-#define __Y_GUI_TYPES_H
+#ifndef __GUI_TYPES_H
+#define __GUI_TYPES_H
 
 #include <Yttrium/types.h>
 
@@ -78,4 +75,4 @@ enum: WidgetStateType
 
 } // namespace Yttrium
 
-#endif // __Y_GUI_TYPES_H
+#endif // __GUI_TYPES_H

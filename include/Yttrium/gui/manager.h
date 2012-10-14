@@ -4,11 +4,10 @@
 #ifndef __Y_GUI_MANAGER_H
 #define __Y_GUI_MANAGER_H
 
-#include <Yttrium/gui/types.h>
 #include <Yttrium/key.h>
 #include <Yttrium/object.h>
 #include <Yttrium/static_string.h>
-#include <Yttrium/rect.h>
+#include <Yttrium/vector.h>
 
 namespace Yttrium
 {

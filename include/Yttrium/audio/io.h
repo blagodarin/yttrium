@@ -113,6 +113,7 @@ public:
 
 	/// Move the audio offset to the specified position.
 	/// \param offset %Offset in samples.
+	/// \return \c true on success.
 
 	bool seek(UOffset offset) noexcept;
 

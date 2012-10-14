@@ -52,12 +52,14 @@ public:
 	/// Load an audio file for playback.
 	/// \param name Audio file name.
 	/// \param settings Playback parameters.
-	/// \param format Audio file format.
+	/// \param type Audio file type.
 
 	void load(const StaticString &name, const Settings &settings = Settings(), AudioType type = AudioType::Auto) noexcept;
 
 	/**
 	* \overload
+	* \param name Audio file name.
+	* \param type Audio file type.
 	*/
 
 	void load(const StaticString &name, AudioType type) noexcept

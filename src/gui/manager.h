@@ -5,6 +5,8 @@
 #include <Yttrium/renderer.h>
 #include <Yttrium/texture_font.h>
 
+#include "types.h"
+
 #include <map>
 #include <vector>
 

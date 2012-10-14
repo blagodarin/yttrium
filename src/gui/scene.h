@@ -2,8 +2,9 @@
 #define __GUI_SCENE_H
 
 #include <Yttrium/bindings.h>
-#include <Yttrium/gui/types.h>
 #include <Yttrium/rect.h>
+
+#include "types.h"
 
 namespace Yttrium
 {

@@ -36,17 +36,21 @@ public:
 
 	/**
 	* \overload
+	* \param symbol The symbol to insert.
 	*/
 
 	inline void insert(char symbol) noexcept;
 
 	/// Process a \a key with the specified \a shift state.
+	/// \param key Input key.
+	/// \param shift Should be \c true if a shift key is pressed.
 	/// \return \c true if the key was handled.
 	/// \note This function handles control keys only.
 
 	bool process_key(Key key, bool shift = false) noexcept;
 
 	/// Return the selection offset.
+	/// \return Current selection offset.
 	/// \note This function may return anything if the selection size is zero.
 
 	inline size_t selection_offset() noexcept;

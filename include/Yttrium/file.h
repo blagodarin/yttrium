@@ -27,7 +27,7 @@ public:
 
 	typedef uint_fast8_t Mode;
 
-	enum ModeFlag: Mode
+	enum: Mode
 	{
 		Read      = 1 << 0,       ///<
 		Write     = 1 << 1,       ///<
@@ -148,7 +148,9 @@ public:
 
 	bool open(Special special, Allocator *allocator = DefaultAllocator) noexcept;
 
-	/// Read the specified amount of bytes into the buffer.
+	/// Read a block of data from the file.
+	/// \param buffer The buffer to read into.
+	/// \param size Buffer size.
 	/// \return Number of bytes read or 0 on failure.
 
 	size_t read(void *buffer, size_t size) noexcept;
@@ -202,7 +204,9 @@ public:
 		return resize(_offset);
 	}
 
-	/// Write \a size bytes from the \a buffer.
+	/// Write a buffer to the file.
+	/// \param buffer The buffer to write.
+	/// \param size Buffer size.
 	/// \return Number of bytes written or 0 on failure.
 
 	size_t write(const void *buffer, size_t size) noexcept;
