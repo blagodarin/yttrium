@@ -303,17 +303,26 @@ private:
 };
 
 /// Concatenate the arguments into a single string.
+/// \param left Left operand.
+/// \param right Right operand.
+/// \return Concatenation result.
 
 inline String operator +(const StaticString &left, const StaticString &right) noexcept;
 
 /**
 * \overload
+* \param left Left operand.
+* \param right Right operand.
+* \return Concatenation result.
 */
 
 inline String operator +(const StaticString &left, char right) noexcept;
 
 /**
 * \overload
+* \param left Left operand.
+* \param right Right operand.
+* \return Concatenation result.
 */
 
 inline String operator +(char left, const StaticString &right) noexcept;
@@ -324,42 +333,63 @@ inline String &operator <<(String &left, char right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, const StaticString &right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, int32_t right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, uint32_t right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, int64_t right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, uint64_t right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, float right) noexcept;
 
 /**
 * \overload
+* \param left String to append to.
+* \param right Value to append.
+* \result Source string with the value appended.
 */
 
 inline String &operator <<(String &left, double right) noexcept;

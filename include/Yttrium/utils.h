@@ -49,6 +49,8 @@ inline bool is_power_of_2(int8_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(uint8_t x) noexcept
@@ -58,6 +60,8 @@ inline bool is_power_of_2(uint8_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(int16_t x) noexcept
@@ -67,6 +71,8 @@ inline bool is_power_of_2(int16_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(uint16_t x) noexcept
@@ -76,6 +82,8 @@ inline bool is_power_of_2(uint16_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(int32_t x) noexcept
@@ -85,6 +93,8 @@ inline bool is_power_of_2(int32_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(uint32_t x) noexcept
@@ -94,6 +104,8 @@ inline bool is_power_of_2(uint32_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(int64_t x) noexcept
@@ -103,6 +115,8 @@ inline bool is_power_of_2(int64_t x) noexcept
 
 /**
 * \overload
+* \param x Value to test.
+* \return Power-of-two test result.
 */
 
 inline bool is_power_of_2(uint64_t x) noexcept
@@ -125,6 +139,8 @@ inline int8_t next_power_of_2(int8_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline uint8_t next_power_of_2(uint8_t x) noexcept
@@ -138,6 +154,8 @@ inline uint8_t next_power_of_2(uint8_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline int16_t next_power_of_2(int16_t x) noexcept
@@ -152,6 +170,8 @@ inline int16_t next_power_of_2(int16_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline uint16_t next_power_of_2(uint16_t x) noexcept
@@ -166,6 +186,8 @@ inline uint16_t next_power_of_2(uint16_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline int32_t next_power_of_2(int32_t x) noexcept
@@ -181,6 +203,8 @@ inline int32_t next_power_of_2(int32_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline uint32_t next_power_of_2(uint32_t x) noexcept
@@ -196,6 +220,8 @@ inline uint32_t next_power_of_2(uint32_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline int64_t next_power_of_2(int64_t x) noexcept
@@ -212,6 +238,8 @@ inline int64_t next_power_of_2(int64_t x) noexcept
 
 /**
 * \overload
+* \param x Source value.
+* \return Next power of two.
 */
 
 inline uint64_t next_power_of_2(uint64_t x) noexcept
@@ -240,6 +268,9 @@ inline bool same_sign(int8_t x, int8_t y) noexcept
 
 /**
 * \overload
+* \param x First value.
+* \param y Second value.
+* \return \c true if both values have the same sign.
 */
 
 inline bool same_sign(int16_t x, int16_t y) noexcept
@@ -249,6 +280,9 @@ inline bool same_sign(int16_t x, int16_t y) noexcept
 
 /**
 * \overload
+* \param x First value.
+* \param y Second value.
+* \return \c true if both values have the same sign.
 */
 
 inline bool same_sign(int32_t x, int32_t y) noexcept
@@ -258,6 +292,9 @@ inline bool same_sign(int32_t x, int32_t y) noexcept
 
 /**
 * \overload
+* \param x First value.
+* \param y Second value.
+* \return \c true if both values have the same sign.
 */
 
 inline bool same_sign(int64_t x, int64_t y) noexcept
