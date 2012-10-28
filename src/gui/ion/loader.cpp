@@ -74,7 +74,7 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 	*object = result_object;
 	*name = result_name;
-	*classes = result_classes->values();
+	*classes = result_classes ? result_classes->values() : Ion::List::ConstRange();
 
 	return true;
 }
@@ -282,19 +282,13 @@ void IonLoader::load(const Ion::Object &source)
 
 bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 {
-	bool result = false;
-
 	scene->reserve(source.size());
 
 	for (Ion::Object::ConstRange r = source.nodes(); !r.is_empty(); r.pop_first())
 	{
 		const Ion::Node &node = r.first();
 
-		if (node.name() == S("root"))
-		{
-			result = true; // NOTE: The last scene becomes a root one. Is it OK?
-		}
-		else if (node.name() == S("size"))
+		if (node.name() == S("size"))
 		{
 			Vector2f size;
 
@@ -332,10 +326,11 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 
 			IonPropertyLoader loader;
 
-			scene->add_widget(node.name(), StaticString(), loader);
+			scene->load_widget(node.name(), StaticString(), loader);
 		}
 	}
-	return result;
+
+	return true; // NOTE: Useless result.
 }
 
 } // namespace Gui

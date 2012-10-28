@@ -33,7 +33,7 @@ Scene::~Scene()
 	}
 }
 
-void Scene::add_widget(const StaticString &type, const StaticString &name, const PropertyLoader &loader)
+void Scene::load_widget(const StaticString &type, const StaticString &name, const PropertyLoader &loader)
 {
 	Widget *widget = nullptr;
 

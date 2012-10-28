@@ -106,10 +106,15 @@ void ManagerImpl::set_scene_change_action(const StaticString &from_scene,
 
 void ManagerImpl::clear()
 {
+	for (Scenes::iterator i = _scenes.begin(); i != _scenes.end(); ++i)
+	{
+		delete_scene(i->second);
+	}
+
 	_has_size = false;
 	_size = Vector2f(0);
 	_fonts.clear();
-	_scenes.clear(); // TODO: Delete the scenes!!!
+	_scenes.clear();
 	_scene_stack.clear();
 	_scene_actions.clear();
 	_has_cursor = false;

@@ -286,6 +286,18 @@ public:
 
 	inline static String from_dec(uint64_t value, int width = 0, bool zeros = false) noexcept;
 
+	/**
+	* \overload
+	*/
+
+	inline static String from_dec(float value) noexcept;
+
+	/**
+	* \overload
+	*/
+
+	inline static String from_dec(double value) noexcept;
+
 private:
 
 	Y_PRIVATE void grow(size_t buffer_size);
@@ -507,6 +519,16 @@ String String::from_dec(int64_t value, int width, bool zeros) noexcept
 String String::from_dec(uint64_t value, int width, bool zeros) noexcept
 {
 	return String(20).append_dec(value, width, zeros);
+}
+
+String String::from_dec(float value) noexcept
+{
+	return String(16).append_dec(value); // TODO: Find the exact required reserve size.
+}
+
+String String::from_dec(double value) noexcept
+{
+	return String(32).append_dec(value); // TODO: Find the exact required reserve size.
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

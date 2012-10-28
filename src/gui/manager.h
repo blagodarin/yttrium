@@ -23,11 +23,14 @@ class Object;
 namespace Gui
 {
 
+class IonDumper;
 class Scene;
 
 class ManagerImpl
 	: public Manager
 {
+	friend class IonDumper;
+
 public:
 
 	ManagerImpl(const Renderer &renderer, Allocator *allocator);

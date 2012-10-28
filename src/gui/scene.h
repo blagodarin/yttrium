@@ -14,6 +14,7 @@ class Renderer;
 namespace Gui
 {
 
+class IonDumper;
 class PropertyLoader;
 class Widget;
 
@@ -21,6 +22,8 @@ class Widget;
 
 class Scene
 {
+	friend class IonDumper;
+
 public:
 
 	Scene(const StaticString &name, Allocator *allocator = DefaultAllocator);
@@ -29,13 +32,13 @@ public:
 
 public:
 
-	void add_widget(const StaticString &type, const StaticString &name, const PropertyLoader &loader);
-
 	inline void bind(const StaticString &name, const StaticString &action);
 
 	inline bool is_transparent() const;
 
-	inline String name() const;
+	void load_widget(const StaticString &type, const StaticString &name, const PropertyLoader &loader);
+
+	inline const String &name() const;
 
 	bool process_key(Key key, KeyState state);
 
@@ -89,7 +92,7 @@ bool Scene::is_transparent() const
 	return _is_transparent;
 }
 
-String Scene::name() const
+const String &Scene::name() const
 {
 	return _name;
 }

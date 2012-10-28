@@ -21,7 +21,8 @@ test_paths = [
 	'file',
 	'package',
 	'ion',
-	'image']
+	'image',
+	'gui']
 
 tests = []
 

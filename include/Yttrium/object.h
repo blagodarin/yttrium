@@ -222,19 +222,19 @@ ObjectPointer<T>::ObjectPointer(T *object) noexcept
 template <typename T>
 T *ObjectPointer<T>::pointer() const noexcept
 {
-	return Object::Pointer::pointer();
+	return static_cast<T *>(Object::Pointer::pointer());
 }
 
 template <typename T>
 T *ObjectPointer<T>::operator ->() const noexcept
 {
-	return Object::Pointer::pointer();
+	return static_cast<T *>(Object::Pointer::pointer());
 }
 
 template <typename T>
 T &ObjectPointer<T>::operator *() const noexcept
 {
-	return *Object::Pointer::pointer();
+	return *static_cast<T *>(Object::Pointer::pointer());
 }
 
 } // namespace Yttrium

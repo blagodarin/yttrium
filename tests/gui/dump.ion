@@ -1,0 +1,20 @@
+size "640.000000" "480.000000"
+scale "stretch"
+scene "game"
+{
+	size "640.000000" "480.000000"
+	scale "stretch"
+}
+scene "menu" ["root"]
+{
+	size "100.000000" "100.000000"
+	scale "fit"
+	transparent
+	bind "esc" "exit"
+}
+on_scene_change ["game" "menu"] "game_stop"
+on_scene_change ["game" "over"] "game_stop"
+on_scene_change ["game" "pause"] "game_pause"
+on_scene_change ["menu" "game"] "game_start"
+on_scene_change ["pause" "game"] "game_resume"
+on_scene_change ["pause" "menu"] "game_stop"

@@ -1,0 +1,10 @@
+size "640" "480"
+
+include "tests/gui/scenes.ion"
+
+on_scene_change ["menu"  "game" ] "game_start"
+on_scene_change ["game"  "pause"] "game_pause"
+on_scene_change ["pause" "game" ] "game_resume"
+on_scene_change ["game"  "menu" ] "game_stop"
+on_scene_change ["game"  "over" ] "game_stop"
+on_scene_change ["pause" "menu" ] "game_stop"
