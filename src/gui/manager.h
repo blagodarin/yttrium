@@ -45,6 +45,8 @@ public:
 
 	void delete_scene(Scene *scene);
 
+	inline Renderer renderer() const;
+
 	void set_font(const StaticString &name, const StaticString &font_source, const StaticString &texture_name);
 
 	inline void set_scaling(Scaling scaling);
@@ -58,9 +60,11 @@ public: // Manager.
 
 	virtual void clear() noexcept;
 
+	virtual void dump(const StaticString &filename) const noexcept;
+
 	virtual bool has_scene(const StaticString &name) const noexcept;
 
-	virtual bool load(const StaticString &source) noexcept;
+	virtual bool load(const StaticString &filename) noexcept;
 
 	virtual bool pop_scenes(size_t count) noexcept;
 
@@ -117,6 +121,11 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Renderer ManagerImpl::renderer() const
+{
+	return _renderer;
+}
 
 void ManagerImpl::set_scaling(Scaling scaling)
 {

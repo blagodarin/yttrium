@@ -322,11 +322,19 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 		}
 		else
 		{
-			// TODO: Implement properly.
+			const Ion::Object  *object;
+			const StaticString *object_name;
+			const StaticString *class_name;
 
-			IonPropertyLoader loader;
+			if (!load_object(node, &object, &object_name, &class_name))
+			{
+				continue;
+			}
 
-			scene->load_widget(node.name(), StaticString(), loader);
+			IonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr),
+				_manager->renderer().texture_cache());
+
+			scene->load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
 		}
 	}
 

@@ -3,6 +3,7 @@
 #include "scene.h"
 
 #include <Yttrium/allocator.h>
+#include <Yttrium/assert.h>
 #include <Yttrium/renderer.h>
 #include <Yttrium/script/manager.h>
 
@@ -33,7 +34,7 @@ Scene::~Scene()
 	}
 }
 
-void Scene::load_widget(const StaticString &type, const StaticString &name, const PropertyLoader &loader)
+void Scene::load_widget(const StaticString &type, const StaticString &name, PropertyLoader &loader)
 {
 	Widget *widget = nullptr;
 
@@ -45,10 +46,10 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, cons
 
 	if (widget)
 	{
+		widget->set_scaling(_scaling);
+
 		if (widget->load(loader))
 		{
-			widget->set_scaling(_scaling);
-
 			if (!name.is_empty())
 			{
 				widget->set_name(name);
@@ -206,7 +207,12 @@ RectF Scene::map(const RectF &source, const Vector2f &shift, const Vector2f &sca
 		}
 		break;
 
-	default: // case Scaling::Stretch:
+	default:
+
+		Y_ASSERT(false);
+		// Fallthrough.
+
+	case Scaling::Stretch:
 
 		result.set_left(source.left() * scale.x);
 		result.set_top(source.top() * scale.y);

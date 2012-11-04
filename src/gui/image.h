@@ -21,7 +21,9 @@ public:
 
 public: // Widget
 
-	virtual bool load(const PropertyLoader &loader);
+	virtual void dump(PropertyDumper *dumper) const;
+
+	virtual bool load(PropertyLoader &loader);
 
 	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const;
 

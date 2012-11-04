@@ -41,12 +41,14 @@ void RendererBuiltin::Private::bind()
 RendererBuiltin::RendererBuiltin(const RendererBuiltin &renderer)
 	: _private(renderer._private)
 {
-	_private->_renderer = Renderer::Private::copy(_private->_renderer);
+	Renderer::Private::copy(_private->_renderer);
 }
 
 RendererBuiltin::~RendererBuiltin()
 {
-	Renderer::Private::release(&_private->_renderer);
+	// Don't clean up the renderer pointer, it may be in use by another RendererBuiltin instance.
+
+	Renderer::Private::release(_private->_renderer);
 }
 
 Vector4f RendererBuiltin::color() const

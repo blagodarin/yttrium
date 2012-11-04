@@ -1,16 +1,13 @@
 #include <Yttrium/file.h>
+#include <Yttrium/gui/manager.h>
 #include <Yttrium/log.h>
 #include <Yttrium/memory_manager.h>
+#include <Yttrium/renderer.h>
 #include <Yttrium/string.h>
-
-#include "src/gui/ion/dumper/dumper.h"
-#include "src/gui/manager.h"
 
 #define BOOST_TEST_MODULE gui
 
 #include <boost/test/unit_test.hpp>
-
-#include "src/gui/ion/dumper/dumper.cpp"
 
 using namespace Yttrium;
 
@@ -29,7 +26,7 @@ BOOST_AUTO_TEST_CASE(gui_test)
 		Gui::ManagerPtr manager = Gui::Manager::create(renderer);
 
 		BOOST_REQUIRE(manager->load("tests/gui/gui.ion"));
-		Gui::IonDumper(static_cast<Gui::ManagerImpl *>(manager.pointer())).dump(file.name());
+		manager->dump(file.name());
 	}
 
 	String expected;

@@ -3,6 +3,7 @@
 #include <Yttrium/renderer.h>
 
 #include "image.h"
+#include "property_dumper.h"
 #include "property_loader.h"
 
 namespace Yttrium
@@ -16,7 +17,16 @@ Image::Image()
 {
 }
 
-bool Image::load(const PropertyLoader &loader)
+void Image::dump(PropertyDumper *dumper) const
+{
+	dumper->dump_position("pos", _position);
+	dumper->dump_size("size", _size);
+	dumper->dump_scaling("scale", _scaling);
+	dumper->dump_color("color", _color);
+	dumper->dump_texture("texture", _texture);
+}
+
+bool Image::load(PropertyLoader &loader)
 {
 	Y_LOG_TRACE("[Gui.Image] Loading...");
 

@@ -14,6 +14,7 @@ class Renderer;
 namespace Gui
 {
 
+class PropertyDumper;
 class PropertyLoader;
 
 class Widget
@@ -46,7 +47,9 @@ public:
 
 public:
 
-	virtual bool load(const PropertyLoader &loader) = 0;
+	virtual void dump(PropertyDumper *dumper) const = 0;
+
+	virtual bool load(PropertyLoader &loader) = 0;
 
 	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const = 0;
 
@@ -66,7 +69,8 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Widget::Widget()
-	: _is_enabled(true)
+	: _scaling(Scaling::Stretch)
+	, _is_enabled(true)
 {
 }
 

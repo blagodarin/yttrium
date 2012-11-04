@@ -5,6 +5,7 @@
 #include <Yttrium/allocator.h>
 #include <Yttrium/script/manager.h>
 
+#include "ion/dumper.h"
 #include "ion/loader.h"
 #include "scene.h"
 
@@ -120,18 +121,23 @@ void ManagerImpl::clear()
 	_has_cursor = false;
 }
 
+void ManagerImpl::dump(const StaticString &filename) const
+{
+	IonDumper(this).dump(filename);
+}
+
 bool ManagerImpl::has_scene(const StaticString &name) const
 {
 	return _scenes.find(String(name, ByReference())) != _scenes.end();
 }
 
-bool ManagerImpl::load(const StaticString &file)
+bool ManagerImpl::load(const StaticString &filename)
 {
 	clear();
 
 	IonLoader loader(this);
 
-	if (!loader.load(file))
+	if (!loader.load(filename))
 	{
 		return false;
 	}
@@ -183,7 +189,7 @@ bool ManagerImpl::push_scene(const StaticString &name)
 	return true;
 }
 
-bool ManagerImpl::process_key(Terminal *terminal, Key key, KeyState state)
+bool ManagerImpl::process_key(Terminal *, Key key, KeyState state)
 {
 	if (_scene_stack.empty())
 	{

@@ -2,8 +2,8 @@
 
 #include <Yttrium/ion/document.h>
 
-#include "../../manager.h"
-#include "../../scene.h"
+#include "../manager.h"
+#include "../scene.h"
 
 namespace Yttrium
 {

@@ -1,0 +1,17 @@
+size "640" "480"
+scale "stretch"
+
+scene "main" ["root"]
+{
+	size "10" "10"
+	scale "min"
+
+	bind "esc" "quit"
+
+	image
+	{
+		pos "0" "0"
+		size "10" "10"
+		texture "tests/image/image.tga"
+	}
+}

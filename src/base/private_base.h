@@ -52,6 +52,16 @@ public:
 		return nullptr;
 	}
 
+	static void release(T *object)
+	{
+		Allocator *allocator = object->_allocator;
+
+		if (allocator && !--object->_references)
+		{
+			allocator->delete_(object);
+		}
+	}
+
 	static void release(T **object_ptr)
 	{
 		T *object = *object_ptr;
@@ -59,13 +69,7 @@ public:
 		if (object)
 		{
 			*object_ptr = nullptr;
-
-			Allocator *allocator = object->_allocator;
-
-			if (allocator && !--object->_references)
-			{
-				allocator->delete_(object);
-			}
+			release(object);
 		}
 	}
 

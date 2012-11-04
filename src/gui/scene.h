@@ -36,7 +36,7 @@ public:
 
 	inline bool is_transparent() const;
 
-	void load_widget(const StaticString &type, const StaticString &name, const PropertyLoader &loader);
+	void load_widget(const StaticString &type, const StaticString &name, PropertyLoader &loader);
 
 	inline const String &name() const;
 

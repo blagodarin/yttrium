@@ -1,7 +1,5 @@
-// The dumper is not a part of the library, it is only used in the GUI test.
-
-#ifndef __GUI_ION_DUMPER_DUMPER_H
-#define __GUI_ION_DUMPER_DUMPER_H
+#ifndef __GUI_ION_DUMPER_H
+#define __GUI_ION_DUMPER_H
 
 #include <Yttrium/static_string.h>
 
@@ -51,4 +49,4 @@ IonDumper::IonDumper(const ManagerImpl *manager)
 
 } // namespace Yttrium
 
-#endif // __GUI_ION_DUMPER_DUMPER_H
+#endif // __GUI_ION_DUMPER_H

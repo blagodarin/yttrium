@@ -1,13 +1,15 @@
 #ifndef __GUI_PROPERTY_LOADER_H
 #define __GUI_PROPERTY_LOADER_H
 
-#include <Yttrium/renderer/texture.h>
 #include <Yttrium/static_string.h>
+#include <Yttrium/vector.h>
 
 #include "types.h"
 
 namespace Yttrium
 {
+
+class Texture2D;
 
 namespace Gui
 {
@@ -22,17 +24,17 @@ public:
 
 	// NOTE: These functions MAY modify the data even if they haven't finished successfully.
 
-	virtual bool load_alignment(const StaticString &name, Alignment *alignment) const = 0;
+	virtual bool load_alignment(const StaticString &name, Alignment *alignment) = 0;
 
-	virtual bool load_color(const StaticString &name, Vector4f *color) const = 0;
+	virtual bool load_color(const StaticString &name, Vector4f *color) = 0;
 
-	virtual bool load_position(const StaticString &name, Vector3f *color) const = 0;
+	virtual bool load_position(const StaticString &name, Vector3f *color) = 0;
 
-	virtual bool load_scaling(const StaticString &name, Scaling *scaling) const = 0;
+	virtual bool load_scaling(const StaticString &name, Scaling *scaling) = 0;
 
-	virtual bool load_size(const StaticString &name, Vector2f *size) const = 0;
+	virtual bool load_size(const StaticString &name, Vector2f *size) = 0;
 
-	virtual bool load_texture(const StaticString &name, Texture2D *texture) const = 0;
+	virtual bool load_texture(const StaticString &name, Texture2D *texture) = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

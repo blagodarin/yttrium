@@ -35,7 +35,17 @@ public:
 
 	///
 
+	inline virtual ~Manager() noexcept;
+
+public:
+
+	///
+
 	virtual void clear() noexcept = 0;
+
+	///
+
+	virtual void dump(const StaticString &filename) const noexcept = 0;
 
 	///
 
@@ -43,7 +53,7 @@ public:
 
 	///
 
-	virtual bool load(const StaticString &source) noexcept = 0;
+	virtual bool load(const StaticString &filename) noexcept = 0;
 
 	///
 
@@ -77,6 +87,10 @@ protected:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Manager::~Manager() noexcept
+{
+}
 
 Manager::Manager(Allocator *allocator) noexcept
 	: Object(allocator)

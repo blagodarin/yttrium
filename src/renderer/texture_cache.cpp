@@ -8,12 +8,14 @@ namespace Yttrium
 TextureCache::TextureCache(const TextureCache &cache)
 	: _private(cache._private)
 {
-	_private->_renderer = Renderer::Private::copy(_private->_renderer);
+	Renderer::Private::copy(_private->_renderer);
 }
 
 TextureCache::~TextureCache()
 {
-	Renderer::Private::release(&_private->_renderer);
+	// Don't clean up the renderer pointer, it may be in use by another TextureCache instance.
+
+	Renderer::Private::release(_private->_renderer);
 }
 
 void TextureCache::clear()
