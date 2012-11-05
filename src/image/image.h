@@ -14,6 +14,7 @@ public:
 
 	Private(Allocator *allocator)
 		: PrivateBase(allocator)
+		, _type(ImageType::Auto)
 		, _is_used(false)
 	{
 	}
@@ -30,6 +31,7 @@ public:
 
 public:
 
+	ImageType   _type;
 	bool        _is_used;
 	ImageFormat _format;
 	File        _file;

@@ -8,6 +8,7 @@
 #include <Yttrium/renderer/builtin.h>
 #include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/static_string.h>
+#include <Yttrium/texture_font.h>
 
 namespace Yttrium
 {
@@ -62,6 +63,14 @@ public:
 
 	void draw_rectangle(const RectF &rect, const RectF &texture_rect) noexcept;
 
+	///
+
+	void draw_text(const Vector2f &position, const StaticString &text, Alignment alignment = BottomRightAlignment) noexcept;
+
+	///
+
+	inline void draw_text(float x, float y, const StaticString &text, Alignment alignment = BottomRightAlignment) noexcept;
+
 	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
 	/// and, if requested, capture a screenshot.
 
@@ -82,6 +91,18 @@ public:
 	///
 
 	void set_color(const Vector4f &color) noexcept;
+
+	///
+
+	bool set_font(const TextureFont &font) noexcept;
+
+	///
+
+	void set_font_size(const Vector2f &size) noexcept;
+
+	///
+
+	inline void set_font_size(float y_size, float x_scaling = 1) noexcept;
 
 	///
 
@@ -113,6 +134,10 @@ public:
 	/// and saved in the PNG format.
 
 	void take_screenshot(const StaticString &name) noexcept;
+
+	///
+
+	Vector2f text_size(const StaticString &text) const noexcept;
 
 	///
 
@@ -157,6 +182,16 @@ Renderer::Renderer() noexcept
 void Renderer::draw_rectangle(float x, float y, float width, float height) noexcept
 {
 	draw_rectangle(RectF(x, y, width, height));
+}
+
+void Renderer::draw_text(float x, float y, const StaticString &text, Alignment alignment) noexcept
+{
+	draw_text(Vector2f(x, y), text, alignment);
+}
+
+void Renderer::set_font_size(float y_size, float x_scaling) noexcept
+{
+	set_font_size(Vector2f(x_scaling, y_size));
 }
 
 void Renderer::set_texture_rectangle(float x, float y, float width, float height) noexcept

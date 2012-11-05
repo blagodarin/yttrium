@@ -92,7 +92,7 @@ void OpenGlRenderer::set_matrix_2d(double width, double height)
 
 void OpenGlRenderer::set_viewport(const Dim2 &size)
 {
-	_gl.Viewport(0, 0, size.width, size.height);
+	_gl.Viewport(0, 0, size.x, size.y);
 	Private::set_viewport(size);
 }
 
@@ -105,7 +105,7 @@ void OpenGlRenderer::take_screenshot()
 	_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 	_gl.ReadBuffer(GL_FRONT);
 	_gl.PixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	_gl.ReadPixels(0, 0, _viewport_size.width, _viewport_size.height, GL_RGB, GL_UNSIGNED_BYTE, _screenshot_buffer.data());
+	_gl.ReadPixels(0, 0, _viewport_size.x, _viewport_size.y, GL_RGB, GL_UNSIGNED_BYTE, _screenshot_buffer.data());
 	_gl.PixelStorei(GL_UNPACK_ALIGNMENT, unpack_alignment);
 	_gl.ReadBuffer(read_buffer);
 }

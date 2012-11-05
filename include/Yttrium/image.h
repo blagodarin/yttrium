@@ -184,6 +184,10 @@ public:
 
 	bool read(void *buffer) noexcept;
 
+	///
+
+	ImageType type() const noexcept;
+
 public:
 
 	///

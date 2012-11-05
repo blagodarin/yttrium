@@ -76,6 +76,11 @@ bool ImageReader::read(void *buffer)
 	return result;
 }
 
+ImageType ImageReader::type() const
+{
+	return _private ? _private->_type : ImageType::Auto;
+}
+
 ImageReader &ImageReader::operator =(const ImageReader &reader)
 {
 	Private::assign(&_private, reader._private);

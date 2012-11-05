@@ -145,14 +145,14 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 			_private->_area.set_height(max(_private->_area.height(), char_data.y + char_data.height));
 		}
 
-		if (success)
+		if (success && file.read(&fourcc))
 		{
 			uint16_t kerning_count;
 
-			if (file.read(&fourcc) && fourcc == FourccKern && file.read(&kerning_count))
-			{
-				success = true;
+			success = (fourcc == FourccKern) && file.read(&kerning_count);
 
+			if (success)
+			{
 				for (; kerning_count; --kerning_count)
 				{
 					Ytf1Kerning kerning;
@@ -165,12 +165,12 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 
 					_private->_kernings[Private::CharPair(kerning.first, kerning.second)] = kerning.amount;
 				}
-
-				if (success)
-				{
-					return true;
-				}
 			}
+		}
+
+		if (success)
+		{
+			return true;
 		}
 	}
 

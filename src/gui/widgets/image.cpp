@@ -1,10 +1,11 @@
-#include "logging.h"
+#include "../logging.h"
+
+#include "image.h"
 
 #include <Yttrium/renderer.h>
 
-#include "image.h"
-#include "property_dumper.h"
-#include "property_loader.h"
+#include "../property_dumper.h"
+#include "../property_loader.h"
 
 namespace Yttrium
 {

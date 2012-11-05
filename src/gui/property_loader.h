@@ -10,6 +10,7 @@ namespace Yttrium
 {
 
 class Texture2D;
+class TextureFont;
 
 namespace Gui
 {
@@ -28,11 +29,15 @@ public:
 
 	virtual bool load_color(const StaticString &name, Vector4f *color) = 0;
 
+	virtual bool load_font(const StaticString &name, TextureFont *font, Texture2D *texture) = 0;
+
 	virtual bool load_position(const StaticString &name, Vector3f *color) = 0;
 
 	virtual bool load_scaling(const StaticString &name, Scaling *scaling) = 0;
 
 	virtual bool load_size(const StaticString &name, Vector2f *size) = 0;
+
+	virtual bool load_text(const StaticString &name, String *text) = 0;
 
 	virtual bool load_texture(const StaticString &name, Texture2D *texture) = 0;
 };

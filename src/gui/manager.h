@@ -33,6 +33,22 @@ class ManagerImpl
 
 public:
 
+	struct FontDesc
+	{
+		TextureFont font;
+		Texture2D   texture;
+
+		FontDesc() = default;
+
+		FontDesc(const TextureFont &font, const Texture2D &texture)
+			: font(font)
+			, texture(texture)
+		{
+		}
+	};
+
+public:
+
 	ManagerImpl(const Renderer &renderer, Allocator *allocator);
 
 	virtual ~ManagerImpl() noexcept;
@@ -44,6 +60,8 @@ public:
 	Scene *create_scene(const StaticString &name);
 
 	void delete_scene(Scene *scene);
+
+	const FontDesc *font(const StaticString &name) const;
 
 	inline Renderer renderer() const;
 
@@ -85,20 +103,6 @@ private:
 	void load(const Ion::Object &parent);
 
 private:
-
-	struct FontDesc
-	{
-		TextureFont font;
-		Texture2D   texture;
-
-		FontDesc() = default;
-
-		FontDesc(const TextureFont &font, const Texture2D &texture)
-			: font(font)
-			, texture(texture)
-		{
-		}
-	};
 
 	typedef std::map<String, FontDesc>      Fonts;
 	typedef std::map<StaticString, Scene *> Scenes;

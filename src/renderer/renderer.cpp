@@ -14,7 +14,10 @@ namespace Yttrium
 Renderer::Private::Private(Window *window, Allocator *allocator)
 	: PrivateBase(allocator)
 	, _window(*window)
+	, _viewport_size(0)
+	, _rendering_size(0)
 	, _color(1, 1, 1)
+	, _font_size(1, 1)
 {
 	_builtin._renderer = this;
 
@@ -31,7 +34,7 @@ Renderer::Private::~Private()
 void Renderer::Private::set_viewport(const Dim2 &size)
 {
 	_viewport_size = size;
-	_screenshot_buffer.resize(size.width * size.height * 3);
+	_screenshot_buffer.resize(size.x * size.y * 3);
 }
 
 void Renderer::Private::draw_rectangle(const RectF &position, const RectF &texture)
@@ -75,6 +78,70 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 	_indices_2d.push_back(index + 3);
 }
 
+void Renderer::Private::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment)
+{
+	if (!_font)
+	{
+		return;
+	}
+
+	Vector2f current_position = position;
+	char last_symbol = '\0';
+	float y_scaling = _font_size.y / _font.size();
+	float x_scaling = y_scaling * _font_size.x;
+
+	if (alignment != BottomRightAlignment)
+	{
+		Vector2f size = text_size(text);
+
+		if ((alignment & HorizontalAlignmentMask) != RightAlignment)
+		{
+			current_position.x -= size.x * (alignment & LeftAlignment ? 1.0 : 0.5);
+		}
+
+		if ((alignment & VerticalAlignmentMask) != BottomAlignment)
+		{
+			current_position.y -= size.y * (alignment & TopAlignment ? 1.0 : 0.5);
+		}
+	}
+
+	const char *current_symbol = text.text();
+
+	for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
+	{
+		const TextureFont::CharInfo *info = _font.char_info(*current_symbol);
+
+		if (info)
+		{
+			Vector2f symbol_position(
+				current_position.x + x_scaling * info->offset.x,
+				current_position.y + y_scaling * info->offset.y);
+
+			Vector2f symbol_size(
+				info->area.width() * x_scaling,
+				info->area.height() * y_scaling);
+
+			Vector2f texture_top_left(_texture._private->fix_coords(info->area.top_left()));
+			Vector2f texture_bottom_right(_texture._private->fix_coords(info->area.bottom_right()));
+
+			draw_rectangle(
+				RectF(symbol_position, symbol_size),
+				RectF::from_coords(
+					texture_top_left.x, texture_top_left.y,
+					texture_bottom_right.x, texture_bottom_right.y));
+
+			current_position.x += x_scaling * (info->advance + _font.kerning(last_symbol, *current_symbol));
+		}
+
+		last_symbol = *current_symbol;
+	}
+}
+
+Vector2f Renderer::Private::text_size(const StaticString &text) const
+{
+	return _font ? _font.text_size(text, _font_size) : Vector2f(0);
+}
+
 Renderer::Private *Renderer::Private::create(Window *window, Renderer::Backend backend, Allocator *allocator)
 {
 	Renderer::Private *result = nullptr;
@@ -99,6 +166,8 @@ Renderer::Private *Renderer::Private::create(Window *window, Renderer::Backend b
 
 	return result;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Renderer::Renderer(const Renderer &renderer)
 	: _private(Private::copy(renderer._private))
@@ -125,6 +194,11 @@ void Renderer::draw_rectangle(const RectF &rect, const RectF &texture_rect)
 	_private->draw_rectangle(rect, texture_rect);
 }
 
+void Renderer::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment)
+{
+	_private->draw_text(position, text, alignment);
+}
+
 void Renderer::end_frame()
 {
 	flush_2d();
@@ -143,8 +217,8 @@ void Renderer::end_frame()
 		format.channels = 3;
 		format.pixel_format = PixelFormat::Bgr;
 		format.orientation = ImageOrientation::XRightYUp;
-		format.width = _private->_viewport_size.width;
-		format.height = _private->_viewport_size.height;
+		format.width = _private->_viewport_size.x;
+		format.height = _private->_viewport_size.y;
 
 		ImageWriter image(_private->_screenshot_filename, ImageType::Png);
 
@@ -178,6 +252,22 @@ void Renderer::set_color(const Vector4f &color)
 	_private->_color = color;
 }
 
+bool Renderer::set_font(const TextureFont &font)
+{
+	if (!_private->_texture || (font && !Area(_private->_texture.size()).contains(font.area())))
+	{
+		return false;
+	}
+
+	_private->_font = font;
+	return true;
+}
+
+void Renderer::set_font_size(const Vector2f &size)
+{
+	_private->_font_size = size;
+}
+
 void Renderer::set_matrix_2d(double width, double height)
 {
 	if (!_private->_builtin._is_bound)
@@ -191,12 +281,12 @@ void Renderer::set_matrix_2d(double width, double height)
 
 void Renderer::set_matrix_2d_height(double height)
 {
-	set_matrix_2d(_private->_viewport_size.width * height / _private->_viewport_size.height, height);
+	set_matrix_2d(_private->_viewport_size.x * height / _private->_viewport_size.y, height);
 }
 
 void Renderer::set_matrix_2d_width(double width)
 {
-	set_matrix_2d(width, _private->_viewport_size.height * width / _private->_viewport_size.width);
+	set_matrix_2d(width, _private->_viewport_size.y * width / _private->_viewport_size.x);
 }
 
 void Renderer::set_texture(const Texture2D &texture)
@@ -208,7 +298,7 @@ void Renderer::set_texture(const Texture2D &texture)
 
 	flush_2d();
 
-	if (_private->_texture)
+	if (_private->_texture && !texture)
 	{
 		_private->_texture._private->unbind();
 	}
@@ -221,7 +311,7 @@ void Renderer::set_texture(const Texture2D &texture)
 		_private->_texture_rect = _private->_texture._private->full_rectangle();
 	}
 
-	// TODO: Reset font.
+	_private->_font = TextureFont();
 }
 
 void Renderer::set_texture_rectangle(const RectF &rect)
@@ -243,6 +333,11 @@ Vector2d Renderer::rendering_size() const
 void Renderer::take_screenshot(const StaticString &name)
 {
 	_private->_screenshot_filename = name;
+}
+
+Vector2f Renderer::text_size(const StaticString &text) const
+{
+	return _private->text_size(text);
 }
 
 TextureCache Renderer::texture_cache()

@@ -55,8 +55,8 @@ void OpenGlTexture2D::bind()
 
 Vector2f OpenGlTexture2D::fix_coords(const Vector2f &coords) const
 {
-	float s = coords.s;
-	float t = coords.t;
+	float x = coords.x;
+	float y = coords.y;
 
 	switch (_orientation)
 	{
@@ -66,22 +66,22 @@ Vector2f OpenGlTexture2D::fix_coords(const Vector2f &coords) const
 
 	case ImageOrientation::XRightYUp:
 
-		t = _size.t - t;
+		y = _size.y - y;
 		break;
 
 	case ImageOrientation::XLeftYDown:
 
-		s = _size.s - s;
+		x = _size.x - x;
 		break;
 
 	case ImageOrientation::XLeftYUp:
 
-		s = _size.s - s;
-		t = _size.t - t;
+		x = _size.x - x;
+		y = _size.y - y;
 		break;
 	}
 
-	return (_target == GL_TEXTURE_RECTANGLE_ARB ? Vector2f(s, t) : Vector2f(s / _size.s, t / _size.t));
+	return (_target == GL_TEXTURE_RECTANGLE_ARB ? Vector2f(x, y) : Vector2f(x / _size.x, y / _size.y));
 }
 
 void OpenGlTexture2D::unbind()

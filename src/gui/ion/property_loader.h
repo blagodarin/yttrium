@@ -12,11 +12,13 @@ namespace Yttrium
 namespace Gui
 {
 
+class ManagerImpl;
+
 class IonPropertyLoader: public PropertyLoader
 {
 public:
 
-	IonPropertyLoader(const Ion::Object *object, const Ion::Object *class_, const TextureCache &texture_cache);
+	IonPropertyLoader(const Ion::Object *object, const Ion::Object *class_, ManagerImpl *manager);
 
 public: // PropertyLoader
 
@@ -24,11 +26,15 @@ public: // PropertyLoader
 
 	virtual bool load_color(const StaticString &name, Vector4f *color);
 
+	virtual bool load_font(const StaticString &name, TextureFont *font, Texture2D *texture);
+
 	virtual bool load_position(const StaticString &name, Vector3f *color);
 
 	virtual bool load_scaling(const StaticString &name, Scaling *scaling);
 
 	virtual bool load_size(const StaticString &name, Vector2f *size);
+
+	virtual bool load_text(const StaticString &name, String *text);
 
 	virtual bool load_texture(const StaticString &name, Texture2D *texture);
 
@@ -49,6 +55,7 @@ private:
 
 	const Ion::Object *_object;
 	const Ion::Object *_class;
+	const ManagerImpl *_manager;
 	TextureCache       _texture_cache;
 };
 

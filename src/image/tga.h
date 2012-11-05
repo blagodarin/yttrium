@@ -13,6 +13,7 @@ public:
 	TgaReader(Allocator *allocator)
 		: ImageReader::Private(allocator)
 	{
+		_type = ImageType::Tga;
 	}
 
 public:

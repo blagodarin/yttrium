@@ -67,7 +67,7 @@ Object::ConstRange Object::nodes() const
 
 Object::ConstRange Object::nodes(const StaticString &name) const
 {
-	NodeMap::const_iterator i = _node_map.find(name);
+	NodeMap::const_iterator i = _node_map.find(String(name, ByReference()));
 	if (i != _node_map.end())
 	{
 		const Nodes &nodes = i->second;

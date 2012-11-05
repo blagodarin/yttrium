@@ -1,6 +1,12 @@
 size "640" "480"
 scale "stretch"
 
+font "common"
+{
+	file    "data/font.ytf"
+	texture "data/font.tga"
+}
+
 scene "main" ["root"]
 {
 	size "10" "10"
@@ -13,5 +19,15 @@ scene "main" ["root"]
 		pos "0" "0"
 		size "10" "10"
 		texture "tests/image/image.tga"
+	}
+
+	label
+	{
+		pos "5" "5"
+		size "2"
+		color "1" "1" "0"
+		align "center"
+		font "common"
+		text "{fps} FPS"
 	}
 }

@@ -38,9 +38,9 @@ void Terminal::draw_console(RendererBuiltin *renderer)
 		const Dim2 &size = renderer->size();
 
 		renderer->set_color(0, 0, 0, 0.5);
-		renderer->draw_rectangle(0, 0, size.width + 1, 1);
+		renderer->draw_rectangle(0, 0, size.x + 1, 1);
 
-		_console.render_input(renderer, 0, 0, size.width);
+		_console.render_input(renderer, 0, 0, size.x);
 	}
 }
 
@@ -129,12 +129,12 @@ bool Terminal::process_events()
 
 		_window.get_cursor(&cursor);
 
-		Dim2 movement(_cursor.x - cursor.left, cursor.top - _cursor.y);
+		Dim2 movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
 
 		if (!_is_cursor_locked)
 		{
-			_cursor.x = clamp(cursor.left, 0, _size.width - 1);
-			_cursor.y = clamp(cursor.top, 0, _size.height - 1);
+			_cursor.x = clamp(cursor.x, 0, _size.x - 1);
+			_cursor.y = clamp(cursor.y, 0, _size.y - 1);
 		}
 		else
 		{
@@ -163,8 +163,8 @@ void Terminal::resize(const Dim2 &size)
 bool Terminal::set_cursor(const Dim2 &cursor)
 {
 	if (_is_cursor_locked
-		|| cursor.x < 0 || cursor.x >= _size.width
-		|| cursor.y < 0 || cursor.y >= _size.height
+		|| cursor.x < 0 || cursor.x >= _size.x
+		|| cursor.y < 0 || cursor.y >= _size.y
 		|| !_window.set_cursor(cursor))
 	{
 		return false;
@@ -186,8 +186,8 @@ void Terminal::show(Mode mode)
 	{
 		// TODO: Set display mode here.
 		screen_mode = _screen.mode();
-		_size.width = screen_mode.width;
-		_size.height = screen_mode.height;
+		_size.x = screen_mode.width;
+		_size.y = screen_mode.height;
 		put_mode = Window::NoBorder;
 		corner = Dim2(0);
 	}
@@ -195,13 +195,13 @@ void Terminal::show(Mode mode)
 	{
 		// TODO: restore display mode here.
 		screen_mode = _screen.mode();
-		_size.width = min(_size.width, screen_mode.width);
-		_size.height = min(_size.height, screen_mode.height);
+		_size.x = min(_size.x, screen_mode.width);
+		_size.y = min(_size.y, screen_mode.height);
 		put_mode = Window::OuterBorder;
-		corner = Dim2((screen_mode.width - _size.width) / 2, (screen_mode.height - _size.height) / 2);
+		corner = Dim2((screen_mode.width - _size.x) / 2, (screen_mode.height - _size.y) / 2);
 	}
 
-	_window.put(corner.x, corner.y, _size.width, _size.height, put_mode);
+	_window.put(corner.x, corner.y, _size.x, _size.y, put_mode);
 	_window.show(Window::Focus);
 
 	if (!_is_cursor_locked)
@@ -209,8 +209,8 @@ void Terminal::show(Mode mode)
 		Dim2 cursor = _size / 2;
 
 		_window.get_cursor(&cursor);
-		_cursor.x = clamp(cursor.left, 0, _size.width - 1);
-		_cursor.y = clamp(cursor.top, 0, _size.height - 1);
+		_cursor.x = clamp(cursor.x, 0, _size.x - 1);
+		_cursor.y = clamp(cursor.y, 0, _size.y - 1);
 	}
 	else
 	{

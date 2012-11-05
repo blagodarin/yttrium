@@ -55,6 +55,28 @@ class ByReference
 {
 };
 
+enum
+{
+	CenterAlignment = 0, ///< Center alignment.
+
+	LeftAlignment   = 1 << 0, ///< Left alignment.
+	RightAlignment  = 1 << 1, ///< Right alignment.
+	TopAlignment    = 1 << 2, ///< Top alignment.
+	BottomAlignment = 1 << 3, ///< Bottom alignment.
+
+	TopLeftAlignment     = TopAlignment | LeftAlignment,     ///< Top left alignment.
+	TopRightAlignment    = TopAlignment | RightAlignment,    ///< Top right alignment.
+	BottomLeftAlignment  = BottomAlignment | LeftAlignment,  ///< Bottom left alignment.
+	BottomRightAlignment = BottomAlignment | RightAlignment, ///< Bottom right alignment.
+
+	HorizontalAlignmentMask = LeftAlignment | RightAlignment, ///< Horizontal alignment mask.
+	VerticalAlignmentMask   = TopAlignment | BottomAlignment, ///< Vertical alignment mask.
+};
+
+///
+
+typedef uint_fast8_t Alignment;
+
 } // namespace Yttrium
 
 #endif // __Y_TYPES_H

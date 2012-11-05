@@ -16,34 +16,8 @@ class Vector2
 {
 public:
 
-	union
-	{
-		struct
-		{
-			T x;
-			T y;
-		};
-		struct
-		{
-			T r;
-			T g;
-		};
-		struct
-		{
-			T s;
-			T t;
-		};
-		struct
-		{
-			T width;
-			T height;
-		};
-		struct
-		{
-			T left;
-			T top;
-		};
-	};
+	T x;
+	T y;
 
 public:
 

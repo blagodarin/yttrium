@@ -1,5 +1,5 @@
-#ifndef __GUI_IMAGE_H
-#define __GUI_IMAGE_H
+#ifndef __GUI_WIDGETS_IMAGE_H
+#define __GUI_WIDGETS_IMAGE_H
 
 #include <Yttrium/renderer/texture.h>
 
@@ -39,4 +39,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __GUI_IMAGE_H
+#endif // __GUI_WIDGETS_IMAGE_H

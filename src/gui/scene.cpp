@@ -7,7 +7,8 @@
 #include <Yttrium/renderer.h>
 #include <Yttrium/script/manager.h>
 
-#include "image.h"
+#include "widgets/image.h"
+#include "widgets/label.h"
 
 namespace Yttrium
 {
@@ -42,6 +43,11 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 	{
 		widget = new(_allocator->allocate<Image>())
 			Image();
+	}
+	else if (type == "label")
+	{
+		widget = new(_allocator->allocate<Label>())
+			Label();
 	}
 
 	if (widget)

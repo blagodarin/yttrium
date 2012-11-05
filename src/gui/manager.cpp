@@ -80,6 +80,12 @@ void ManagerImpl::delete_scene(Scene *scene)
 	allocator()->delete_(scene);
 }
 
+const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
+{
+	Fonts::const_iterator i = _fonts.find(String(name, ByReference()));
+	return i != _fonts.end() ? &i->second : nullptr;
+}
+
 void ManagerImpl::set_font(const StaticString &name,
 	const StaticString &font_source, const StaticString &texture_name)
 {
@@ -219,7 +225,7 @@ bool ManagerImpl::render()
 		--i;
 	}
 
-	_renderer.set_matrix_2d(_size.width, _size.height);
+	_renderer.set_matrix_2d(_size.x, _size.y);
 
 	for (; i != _scene_stack.end(); ++i)
 	{

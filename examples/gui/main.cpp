@@ -37,6 +37,10 @@ public:
 			return;
 		}
 
+		RateCounter fps;
+
+		fps.start();
+
 		for (; ; )
 		{
 			if (!_terminal.process_events())
@@ -47,6 +51,9 @@ public:
 			renderer.begin_frame();
 			_gui->render();
 			renderer.end_frame();
+
+			ScriptManager::instance()->root_context().set("fps", fps.rate());
+			fps.tick();
 		}
 	}
 

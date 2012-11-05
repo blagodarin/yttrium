@@ -7,6 +7,8 @@
 #include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/utils.h>
 
+#include "../manager.h"
+
 namespace Yttrium
 {
 
@@ -110,11 +112,11 @@ unsigned read_size(Vector2f *size, const Ion::Node &node, unsigned inherit)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Object *class_,
-	const TextureCache &texture_cache)
+IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Object *class_, ManagerImpl *manager)
 	: _object(object)
 	, _class(class_)
-	, _texture_cache(texture_cache)
+	, _manager(manager)
+	, _texture_cache(manager->renderer().texture_cache())
 {
 }
 
@@ -166,6 +168,41 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 	}
 
 	return loaded == 15;
+}
+
+bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2D *texture)
+{
+	Y_LOG_TRACE("[Gui.Loader] Loading font...");
+
+	const StaticString *font_name;
+
+	const Ion::Node *node = _object->last(name);
+
+	if (!node || node->size() != 1 || !node->first()->get(&font_name))
+	{
+		if (!_class)
+		{
+			return false;
+		}
+
+		node = _class->last(name);
+
+		if (!node || node->size() != 1 || !node->first()->get(&font_name))
+		{
+			return false;
+		}
+	}
+
+	const ManagerImpl::FontDesc *font_desc = _manager->font(*font_name);
+
+	if (!font_desc)
+	{
+		return false;
+	}
+
+	*font = font_desc->font;
+	*texture = font_desc->texture;
+	return true;
 }
 
 bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *position)
@@ -242,6 +279,21 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 	}
 
 	return loaded == 3;
+}
+
+bool IonPropertyLoader::load_text(const StaticString &name, String *text)
+{
+	Y_LOG_TRACE("[Gui.Loader] Loading text...");
+
+	const StaticString *value;
+
+	if (!load_text(&value, *_object, name))
+	{
+		return false;
+	}
+
+	*text = *value;
+	return true;
 }
 
 bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *texture)

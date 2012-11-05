@@ -45,6 +45,10 @@ public:
 
 	void draw_rectangle(const RectF &position, const RectF &texture);
 
+	void draw_text(const Vector2f &position, const StaticString &text, Alignment alignment);
+
+	Vector2f text_size(const StaticString &text) const;
+
 public:
 
 	Window _window; // Don't let the window die too early.
@@ -74,6 +78,9 @@ public:
 
 	Texture2D _texture;
 	RectF     _texture_rect;
+
+	TextureFont _font;
+	Vector2f    _font_size;
 
 	// Subinterfaces.
 

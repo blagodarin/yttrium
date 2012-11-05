@@ -49,6 +49,10 @@ public:
 
 	///
 
+	Vector2<T> center() const noexcept;
+
+	///
+
 	T height() const noexcept;
 
 	///
@@ -73,11 +77,23 @@ public:
 
 	///
 
+	void set_size(T width, T height) noexcept;
+
+	///
+
+	void set_size(const Vector2<T> &size) noexcept;
+
+	///
+
 	void set_top(T top) noexcept;
 
 	///
 
 	void set_top_left(T left, T top) noexcept;
+
+	///
+
+	void set_top_left(const Vector2<T> &top_left) noexcept;
 
 	///
 
@@ -147,8 +163,8 @@ template <typename T>
 Rect<T>::Rect(const Vector2<T> &size) noexcept
 	: _left(0)
 	, _top(0)
-	, _right(size.width)
-	, _bottom(size.height)
+	, _right(size.x)
+	, _bottom(size.y)
 {
 }
 
@@ -156,18 +172,18 @@ template <typename T>
 Rect<T>::Rect(const Vector2<T> &corner, const Vector2<T> &size) noexcept
 	: _left(corner.x)
 	, _top(corner.y)
-	, _right(corner.x + size.width)
-	, _bottom(corner.y + size.height)
+	, _right(corner.x + size.x)
+	, _bottom(corner.y + size.y)
 {
 }
 
 template <typename T>
 template <typename U>
 Rect<T>::Rect(const Rect<U> &rect) noexcept
-	: _left(rect._left)
-	, _top(rect._top)
-	, _right(rect._right)
-	, _bottom(rect._bottom)
+	: _left(rect.left())
+	, _top(rect.top())
+	, _right(rect.right())
+	, _bottom(rect.bottom())
 {
 }
 
@@ -187,6 +203,12 @@ template <typename T>
 Vector2<T> Rect<T>::bottom_right() const noexcept
 {
 	return Vector2<T>(_right, _bottom);
+}
+
+template <typename T>
+Vector2<T> Rect<T>::center() const noexcept
+{
+	return Vector2<T>((_left + _right) / 2, (_top + _bottom) / 2);
 }
 
 template <typename T>
@@ -229,6 +251,20 @@ void Rect<T>::set_left(T left) noexcept
 }
 
 template <typename T>
+void Rect<T>::set_size(T width, T height) noexcept
+{
+	_right = _left + width;
+	_bottom = _top + height;
+}
+
+template <typename T>
+void Rect<T>::set_size(const Vector2<T> &size) noexcept
+{
+	_right = _left + size.x;
+	_bottom = _top + size.y;
+}
+
+template <typename T>
 void Rect<T>::set_top(T top) noexcept
 {
 	_top = top;
@@ -239,6 +275,13 @@ void Rect<T>::set_top_left(T left, T top) noexcept
 {
 	_left = left;
 	_top = top;
+}
+
+template <typename T>
+void Rect<T>::set_top_left(const Vector2<T> &top_left) noexcept
+{
+	_left = top_left.x;
+	_top = top_left.y;
 }
 
 template <typename T>

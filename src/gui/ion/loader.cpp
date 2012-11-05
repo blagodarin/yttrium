@@ -331,8 +331,7 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 				continue;
 			}
 
-			IonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr),
-				_manager->renderer().texture_cache());
+			IonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _manager);
 
 			scene->load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
 		}

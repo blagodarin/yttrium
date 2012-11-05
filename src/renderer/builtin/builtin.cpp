@@ -33,7 +33,7 @@ void RendererBuiltin::Private::bind()
 		// TODO: Reset font.
 
 		_renderer->bind_builtin();
-		_renderer->set_matrix_2d(_renderer->_viewport_size.width, _renderer->_viewport_size.height);
+		_renderer->set_matrix_2d(_renderer->_viewport_size.x, _renderer->_viewport_size.y);
 		_is_bound = true;
 	}
 }
@@ -144,8 +144,8 @@ Dim2 RendererBuiltin::size() const
 	const Dim2 &viewport_size = _private->_renderer->_viewport_size;
 
 	return Dim2(
-		viewport_size.width / Builtin::char_width,
-		viewport_size.height / Builtin::char_height);
+		viewport_size.x / Builtin::char_width,
+		viewport_size.y / Builtin::char_height);
 }
 
 Dim2 RendererBuiltin::text_size(const StaticString &text) const

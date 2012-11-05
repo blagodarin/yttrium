@@ -1,7 +1,7 @@
 #ifndef __GUI_LOGGING_H
 #define __GUI_LOGGING_H
 
-#define Y_LOG_LEVEL Y_LOG_LEVEL_NORMAL
+#define Y_LOG_LEVEL Y_LOG_LEVEL_TRACE
 
 #include <Yttrium/logging.h>
 

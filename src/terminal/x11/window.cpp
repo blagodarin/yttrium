@@ -239,8 +239,8 @@ bool Window::get_cursor(Dim2 *cursor)
 		return false;
 	}
 
-	cursor->left = win_x_return;
-	cursor->top = win_y_return;
+	cursor->x = win_x_return;
+	cursor->y = win_y_return;
 
 	return true;
 }
@@ -413,7 +413,7 @@ bool Window::set_cursor(const Dim2 &cursor)
 		return false;
 	}
 
-	::XWarpPointer(_private->_display, None, _private->_window, 0, 0, 0, 0, cursor.left, cursor.top);
+	::XWarpPointer(_private->_display, None, _private->_window, 0, 0, 0, 0, cursor.x, cursor.y);
 	return true;
 }
 

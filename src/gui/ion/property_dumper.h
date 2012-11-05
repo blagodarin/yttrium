@@ -30,6 +30,8 @@ public: // PropertyDumper
 
 	virtual void dump_size(const StaticString &name, const Vector2f &size);
 
+	virtual void dump_text(const StaticString &name, const StaticString &text);
+
 	virtual void dump_texture(const StaticString &name, const Texture2D &texture);
 
 private:

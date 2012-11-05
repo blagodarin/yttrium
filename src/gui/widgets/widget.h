@@ -1,10 +1,10 @@
-#ifndef __GUI_WIDGET_H
-#define __GUI_WIDGET_H
+#ifndef __GUI_WIDGETS_WIDGET_H
+#define __GUI_WIDGETS_WIDGET_H
 
 #include <Yttrium/rect.h>
 #include <Yttrium/string.h>
 
-#include "types.h"
+#include "../types.h"
 
 namespace Yttrium
 {
@@ -128,4 +128,4 @@ StaticString Widget::text() const
 
 } // namespace Yttrium
 
-#endif // __GUI_WIDGET_H
+#endif // __GUI_WIDGETS_WIDGET_H

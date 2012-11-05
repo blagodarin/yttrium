@@ -114,6 +114,8 @@ public:
 
 	inline Clock rate() const noexcept;
 
+	// TODO: Add was_changed().
+
 private:
 
 	Clock _last_time;
