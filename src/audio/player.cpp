@@ -14,8 +14,8 @@ AudioPlayer::Private::Private(Allocator *allocator)
 	: _playlist(allocator)
 	, _state(Stopped)
 	, _allocator(allocator)
-	, _backend(AudioPlayerBackend::create(allocator))
-	, _streamer(_backend, allocator)
+	, _backend(AudioPlayerBackend::create(_allocator))
+	, _streamer(_backend, _allocator)
 {
 	start();
 }
@@ -24,7 +24,7 @@ AudioPlayer::Private::~Private()
 {
 	_action.write(Exit);
 	wait();
-	_allocator->delete_(_backend);
+	Y_DELETE(_allocator, _backend);
 }
 
 void AudioPlayer::Private::run()

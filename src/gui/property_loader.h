@@ -25,7 +25,7 @@ public:
 
 	// NOTE: The loading functions MAY modify the data even if they haven't finished successfully.
 
-	virtual bool bind(const StaticString &name) = 0;
+	virtual void bind(const StaticString &name) = 0;
 
 	virtual bool load_alignment(const StaticString &name, Alignment *alignment) = 0;
 

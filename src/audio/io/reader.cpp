@@ -37,12 +37,12 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 	{
 	case AudioType::Wav:
 
-		_private = new(allocator->allocate<WavReader>()) WavReader(allocator);
+		_private = Y_NEW(allocator, WavReader)(allocator);
 		break;
 
 	case AudioType::OggVorbis:
 
-		_private = new(allocator->allocate<OggVorbisReader>()) OggVorbisReader(allocator);
+		_private = Y_NEW(allocator, OggVorbisReader)(allocator);
 		break;
 
 	default:
@@ -51,11 +51,11 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 			StaticString extension = name.file_extension();
 			if (extension == ".wav")
 			{
-				_private = new(allocator->allocate<WavReader>()) WavReader(allocator);
+				_private = Y_NEW(allocator, WavReader)(allocator);
 			}
 			else if (extension == ".ogg")
 			{
-				_private = new(allocator->allocate<OggVorbisReader>()) OggVorbisReader(allocator);
+				_private = Y_NEW(allocator, OggVorbisReader)(allocator);
 			}
 		}
 		break;

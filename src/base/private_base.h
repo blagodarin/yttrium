@@ -58,7 +58,7 @@ public:
 
 		if (allocator && !--object->_references)
 		{
-			allocator->delete_(object);
+			Y_DELETE(allocator, object);
 		}
 	}
 

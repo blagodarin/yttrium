@@ -7,14 +7,13 @@ ThreadBufferBase::ThreadBufferBase(size_t capacity, Allocator *allocator)
 	: _capacity(capacity)
 	, _size(0)
 	, _first(0)
-	, _private(new(allocator->allocate<Private>())
-		Private(allocator))
+	, _private(Y_NEW(allocator, Private)(allocator))
 {
 }
 
 ThreadBufferBase::~ThreadBufferBase()
 {
-	_private->allocator->delete_(_private);
+	Y_DELETE(_private->allocator, _private);
 }
 
 void ThreadBufferBase::begin_read()

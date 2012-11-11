@@ -72,8 +72,7 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const TextureCache &cac
 					_gl.Disable(target);
 				}
 
-				return new(allocator->allocate<OpenGlTexture2D>())
-					OpenGlTexture2D(cache, format, allocator, _gl, target, texture);
+				return Y_NEW(allocator, OpenGlTexture2D)(cache, format, allocator, _gl, target, texture);
 			}
 		}
 	}

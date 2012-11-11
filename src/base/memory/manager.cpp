@@ -14,10 +14,11 @@ typedef InstanceGuard<MemoryManager> MemoryManagerGuard;
 MemoryManager::MemoryManager()
 	: _root_allocator(nullptr)
 {
+	// TODO: Store the default allocator to restore it in the destructor.
+
 	MemoryManagerGuard::enter(this, S("Duplicate MemoryManager construction"));
 
-	_root_allocator = new(DefaultAllocator->allocate<HeapAllocator>())
-		HeapAllocator(DefaultAllocator);
+	_root_allocator = Y_NEW(DefaultAllocator, HeapAllocator)(DefaultAllocator);
 
 	const_cast<Allocator *&>(DefaultAllocator) = _root_allocator;
 }
@@ -28,9 +29,9 @@ MemoryManager::~MemoryManager()
 
 	const_cast<Allocator *&>(DefaultAllocator) = SystemAllocator::instance();
 
-	DefaultAllocator->delete_(_root_allocator);
+	Y_DELETE(DefaultAllocator, _root_allocator);
 
-	MemoryManagerGuard::leave(this, S("Duplicate MemoryManager construction"));
+	MemoryManagerGuard::leave(this, S("Duplicate MemoryManager destruction"));
 }
 
 MemoryManager *MemoryManager::instance()

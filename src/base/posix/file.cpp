@@ -51,8 +51,7 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 
 	if (!_private)
 	{
-		_private = new(allocator->allocate<Private>())
-			Private(allocator);
+		_private = Y_NEW(allocator, Private)(allocator);
 	}
 
 	_private->descriptor = descriptor;
@@ -86,8 +85,7 @@ bool File::open(Special special, Allocator *allocator)
 
 			if (!_private)
 			{
-				_private = new(allocator->allocate<Private>())
-					Private(allocator);
+				_private = Y_NEW(allocator, Private)(allocator);
 			}
 
 			_private->descriptor = descriptor;

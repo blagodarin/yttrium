@@ -5,7 +5,7 @@ namespace Yttrium
 
 Thread::Thread(Allocator *allocator)
 	: _allocator(allocator)
-	, _private(new(_allocator->allocate<Private>()) Private())
+	, _private(Y_NEW(_allocator, Private))
 {
 }
 
@@ -17,7 +17,7 @@ Thread::~Thread()
 		stop();
 	}
 
-	_allocator->delete_(_private);
+	Y_DELETE(_allocator, _private);
 }
 
 } // namespace Yttrium

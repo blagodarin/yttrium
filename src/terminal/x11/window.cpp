@@ -265,8 +265,7 @@ bool Window::open(const Screen &screen, Callbacks *callbacks, Allocator *allocat
 
 		if (Private::create_window(display, x_screen, &window, &glx_context))
 		{
-			_private = new(allocator->allocate<Private>())
-				Private(screen, display, x_screen, window, glx_context, allocator);
+			_private = Y_NEW(allocator, Private)(screen, display, x_screen, window, glx_context, allocator);
 			_callbacks = callbacks;
 			return true;
 		}

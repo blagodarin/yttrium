@@ -197,10 +197,10 @@ public:
 
 ///
 
-#define Y_DELETE(allocator, pointer) allocator->delete_(pointer)
+#define Y_DELETE(allocator, pointer) (allocator)->delete_(pointer)
 
 ///
 
-#define Y_NEW(allocator, Class, ...) (new(allocator->allocate<Class>()) Class(__VA_ARGS__))
+#define Y_NEW(allocator, Class) new((allocator)->allocate<Class>()) Class
 
 #endif // __Y_ALLOCATOR_H

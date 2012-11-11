@@ -94,7 +94,7 @@ PoolBase::~PoolBase()
 	for (Chunk *chunk = _last_chunk; chunk; )
 	{
 		Chunk *previous_chunk = _last_chunk->_previous;
-		_allocator->delete_(chunk);
+		Y_DELETE(_allocator, chunk);
 		chunk = previous_chunk;
 	}
 }
@@ -141,7 +141,7 @@ void PoolBase::deallocate(void *pointer)
 			_last_chunk = chunk->_previous;
 		}
 
-		_allocator->delete_(chunk);
+		Y_DELETE(_allocator, chunk);
 
 		--_status.allocated_chunks;
 		++_status.chunk_deallocations;

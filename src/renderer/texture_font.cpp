@@ -113,7 +113,7 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 		return false;
 	}
 
-	_private = new(allocator->allocate<Private>()) Private(allocator);
+	_private = Y_NEW(allocator, Private)(allocator);
 
 	_private->_size = font_section.size;
 	_private->_area.set_top_left(font_section.base_x, font_section.base_y);

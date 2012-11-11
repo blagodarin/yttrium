@@ -22,7 +22,7 @@ public:
 
 public: // PropertyLoader
 
-	virtual bool bind(const StaticString &name);
+	virtual void bind(const StaticString &name);
 
 	virtual bool load_alignment(const StaticString &name, Alignment *alignment);
 

@@ -23,7 +23,7 @@ bool PackageReader::open(const StaticString &name, PackageType type, Allocator *
 	{
 	case PackageType::Ypq:
 
-		_private = new(allocator->allocate<YpqReader>()) YpqReader(allocator);
+		_private = Y_NEW(allocator, YpqReader)(allocator);
 		break;
 
 	default:
@@ -33,7 +33,7 @@ bool PackageReader::open(const StaticString &name, PackageType type, Allocator *
 
 			if (extension == ".ypq")
 			{
-				_private = new(allocator->allocate<YpqReader>()) YpqReader(allocator);
+				_private = Y_NEW(allocator, YpqReader)(allocator);
 			}
 		}
 		break;
@@ -93,7 +93,7 @@ bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, 
 	{
 	case PackageType::Ypq:
 
-		_private = new(allocator->allocate<YpqWriter>()) YpqWriter(allocator);
+		_private = Y_NEW(allocator, YpqWriter)(allocator);
 		break;
 
 	default:
@@ -103,7 +103,7 @@ bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, 
 
 			if (extension == ".ypq")
 			{
-				_private = new(allocator->allocate<YpqWriter>()) YpqWriter(allocator);
+				_private = Y_NEW(allocator, YpqWriter)(allocator);
 			}
 		}
 		break;

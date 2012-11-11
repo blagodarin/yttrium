@@ -68,16 +68,14 @@ Scene *ManagerImpl::create_scene(const StaticString &name)
 		return nullptr;
 	}
 
-	Scene *scene = new(allocator()->allocate<Scene>())
-		Scene(name, allocator());
-
+	Scene *scene = Y_NEW(allocator(), Scene)(name, allocator());
 	scene->set_size(_size);
 	return scene;
 }
 
 void ManagerImpl::delete_scene(Scene *scene)
 {
-	allocator()->delete_(scene);
+	Y_DELETE(allocator(), scene);
 }
 
 const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
@@ -260,7 +258,7 @@ void ManagerImpl::change_scene(const StaticString &old_scene, const StaticString
 
 ManagerPtr Manager::create(Renderer &renderer, Allocator *allocator)
 {
-	return ManagerPtr(new ManagerImpl(renderer, allocator));
+	return ManagerPtr(Y_NEW(allocator, ManagerImpl)(renderer, allocator));
 }
 
 } // namespace Gui

@@ -34,8 +34,7 @@ bool Screen::open(Allocator *allocator)
 		}
 		else
 		{
-			_private = new(allocator->allocate<Private>())
-				Private(display, DefaultScreen(display), allocator);
+			_private = Y_NEW(allocator, Private)(display, DefaultScreen(display), allocator);
 			return true;
 		}
 	}

@@ -4,8 +4,7 @@ namespace Yttrium
 {
 
 Mutex::Mutex(Allocator *allocator)
-	: _private(new(allocator->allocate<Private>())
-		Private(allocator))
+	: _private(Y_NEW(allocator, Private)(allocator))
 {
 }
 

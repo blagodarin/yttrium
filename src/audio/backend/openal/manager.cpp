@@ -89,10 +89,7 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 		if (alc_context)
 		{
 			alcMakeContextCurrent(alc_context);
-
-			return new(allocator->allocate<OpenAlManager>())
-				OpenAlManager(alc_device, alc_context, audio_device, allocator);
-
+			return Y_NEW(allocator, OpenAlManager)(alc_device, alc_context, audio_device, allocator);
 			//alcDestroyContext(alc_context);
 		}
 

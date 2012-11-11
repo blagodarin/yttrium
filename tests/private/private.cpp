@@ -14,8 +14,7 @@ void Public::open(Yttrium::Allocator *allocator)
 {
 	if (!_private)
 	{
-		_private = new(allocator->allocate<Private>())
-			Private(allocator);
+		_private = Y_NEW(allocator, Private)(allocator);
 	}
 }
 

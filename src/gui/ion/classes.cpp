@@ -44,7 +44,7 @@ bool Classes::add(const StaticString &name, const Ion::Object &source, const Sta
 		base = i->second;
 	}
 
-	Ion::Document *document = Y_NEW(_allocator, Ion::Document, _allocator);
+	Ion::Document *document = Y_NEW(_allocator, Ion::Document)(_allocator);
 
 	// Read the object entries in reverse order, ingnoring the duplicates.
 	// The class' own order is only significant for the class being added,

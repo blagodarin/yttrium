@@ -86,43 +86,33 @@ bool Button::load(PropertyLoader &loader)
 
 	loader.load_text("action", &_action);
 
-	Style *style;
+	Style *style = &_styles[WidgetStateType(WidgetState::Active)];
 
-	if (loader.bind("active"))
-	{
-		style = &_styles[WidgetStateType(WidgetState::Active)];
+	loader.bind("active");
+	loader.load_color("color", &style->color);
+	loader.load_texture("texture", &style->texture);
+	loader.load_color("text_color", &style->text_color);
 
-		loader.load_color("color", &style->color);
-		loader.load_texture("texture", &style->texture);
-		loader.load_color("text_color", &style->text_color);
-	}
+	style = &_styles[WidgetStateType(WidgetState::Pressed)];
 
-	if (loader.bind("pressed"))
-	{
-		style = &_styles[WidgetStateType(WidgetState::Pressed)];
+	loader.bind("pressed");
+	loader.load_color("color", &style->color);
+	loader.load_texture("texture", &style->texture);
+	loader.load_color("text_color", &style->text_color);
 
-		loader.load_color("color", &style->color);
-		loader.load_texture("texture", &style->texture);
-		loader.load_color("text_color", &style->text_color);
-	}
+	style = &_styles[WidgetStateType(WidgetState::Checked)];
 
-	if (loader.bind("checked"))
-	{
-		style = &_styles[WidgetStateType(WidgetState::Checked)];
+	loader.bind("checked");
+	loader.load_color("color", &style->color);
+	loader.load_texture("texture", &style->texture);
+	loader.load_color("text_color", &style->text_color);
 
-		loader.load_color("color", &style->color);
-		loader.load_texture("texture", &style->texture);
-		loader.load_color("text_color", &style->text_color);
-	}
+	style = &_styles[WidgetStateType(WidgetState::Disabled)];
 
-	if (loader.bind("disabled"))
-	{
-		style = &_styles[WidgetStateType(WidgetState::Disabled)];
-
-		loader.load_color("color", &style->color);
-		loader.load_texture("texture", &style->texture);
-		loader.load_color("text_color", &style->text_color);
-	}
+	loader.bind("disabled");
+	loader.load_color("color", &style->color);
+	loader.load_texture("texture", &style->texture);
+	loader.load_color("text_color", &style->text_color);
 
 	_area = RectF(_position.xy(), _size);
 

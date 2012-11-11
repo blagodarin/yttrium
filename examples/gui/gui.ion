@@ -9,14 +9,15 @@ font "common"
 
 class "common_button"
 {
-	size "5" "2"
+	size "5" "1.5"
 	color "1" "1" "0" "0.5"
 	font "common"
-	text_size "1.5"
+	text_size "1"
 	text_color "1" "1" "1"
 
 	active { color "1" "1" "0" "0.75" text_color "1" "0.5" "0.5" }
 	pressed { color "1" "1" "0" "0.875" text_color "1" "0" "0" }
+	disabled { color "0" "0" "0" "0.5" text_color "0.5" "0.5" "0.5" }
 }
 
 scene "main" ["root"]
@@ -35,7 +36,7 @@ scene "main" ["root"]
 
 	label
 	{
-		pos "5" "5"
+		pos "5" "3"
 		size "2"
 		color "1" "1" "0"
 		align "center"
@@ -45,23 +46,15 @@ scene "main" ["root"]
 
 	button ["common_button"]
 	{
-		pos "2.5" "7"
+		pos "4" "6"
 		text "Quit"
 		action "quit"
 	}
 
-	button
+	button ["common_button"]
 	{
-		pos "2.5" "7"
-		size "5" "2"
-		color "1" "1" "0" "0.5"
-		font "common"
-		text_size "1.5"
-		text_color "1" "1" "1"
-		text "Quit"
-		action "quit"
-
-		active { color "1" "1" "0" "0.75" text_color "1" "0.5" "0.5" }
-		pressed { color "1" "1" "0" "0.875" text_color "1" "0" "0" }
+		pos "2" "8"
+		text "Don't click me"
+		state "disabled"
 	}
 }

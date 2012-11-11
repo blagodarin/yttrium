@@ -9,7 +9,7 @@ void Object::Pointer::reset(Object *object)
 {
 	if (_object && !--_object->_counter)
 	{
-		_object->_allocator->delete_(_object);
+		Y_DELETE(_object->_allocator, _object);
 	}
 	_object = object;
 }

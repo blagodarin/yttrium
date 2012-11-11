@@ -32,7 +32,7 @@ Scene::~Scene()
 {
 	for (Widgets::iterator i = _widgets.begin(); i != _widgets.end(); ++i)
 	{
-		_allocator->delete_(*i);
+		Y_DELETE(_allocator, *i);
 	}
 }
 
@@ -42,15 +42,15 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 
 	if (type == "button")
 	{
-		widget = Y_NEW(_allocator, Button, _allocator);
+		widget = Y_NEW(_allocator, Button)(_allocator);
 	}
 	else if (type == "image")
 	{
-		widget = Y_NEW(_allocator, Image, _allocator);
+		widget = Y_NEW(_allocator, Image)(_allocator);
 	}
 	else if (type == "label")
 	{
-		widget = Y_NEW(_allocator, Label, _allocator);
+		widget = Y_NEW(_allocator, Label)(_allocator);
 	}
 
 	if (widget)
@@ -69,7 +69,7 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 		}
 		else
 		{
-			_allocator->delete_(widget);
+			Y_DELETE(_allocator, widget);
 		}
 	}
 }

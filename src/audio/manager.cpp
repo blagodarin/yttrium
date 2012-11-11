@@ -12,7 +12,7 @@ StaticString AudioManager::backend() const
 
 void AudioManager::close()
 {
-	_allocator->delete_(_private);
+	Y_DELETE(_allocator, _private);
 	_private = nullptr;
 }
 

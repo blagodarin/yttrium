@@ -33,7 +33,7 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 	{
 	case ImageType::Tga:
 
-		_private = new(allocator->allocate<TgaReader>()) TgaReader(allocator);
+		_private = Y_NEW(allocator, TgaReader)(allocator);
 		break;
 
 	default:
@@ -43,7 +43,7 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 
 			if (extension == ".tga")
 			{
-				_private = new(allocator->allocate<TgaReader>()) TgaReader(allocator);
+				_private = Y_NEW(allocator, TgaReader)(allocator);
 			}
 		}
 		break;
@@ -106,12 +106,12 @@ bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allo
 	{
 	case ImageType::Tga:
 
-		_private = new(allocator->allocate<TgaWriter>()) TgaWriter(allocator);
+		_private = Y_NEW(allocator, TgaWriter)(allocator);
 		break;
 
 	case ImageType::Png:
 
-		_private = new(allocator->allocate<PngWriter>()) PngWriter(allocator);
+		_private = Y_NEW(allocator, PngWriter)(allocator);
 		break;
 
 	default:
@@ -121,11 +121,11 @@ bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allo
 
 			if (extension == ".tga")
 			{
-				_private = new(allocator->allocate<TgaWriter>()) TgaWriter(allocator);
+				_private = Y_NEW(allocator, TgaWriter)(allocator);
 			}
 			else if (extension == ".png")
 			{
-				_private = new(allocator->allocate<PngWriter>()) PngWriter(allocator);
+				_private = Y_NEW(allocator, PngWriter)(allocator);
 			}
 		}
 		break;

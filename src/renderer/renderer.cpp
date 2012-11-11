@@ -150,8 +150,7 @@ Renderer::Private *Renderer::Private::create(Window *window, Renderer::Backend b
 	{
 	case Renderer::OpenGl:
 
-		result = new(allocator->allocate<OpenGlRenderer>())
-			OpenGlRenderer(window, allocator);
+		result = Y_NEW(allocator, OpenGlRenderer)(window, allocator);
 		break;
 
 	default:
