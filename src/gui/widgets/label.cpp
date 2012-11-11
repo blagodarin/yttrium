@@ -14,9 +14,11 @@ namespace Yttrium
 namespace Gui
 {
 
-Label::Label()
-	: _color(1, 1, 1)
+Label::Label(Allocator *allocator)
+	: Widget(allocator)
+	, _color(1, 1, 1)
 	, _alignment(0)
+	, _final_text(allocator)
 {
 }
 
@@ -26,7 +28,6 @@ void Label::dump(PropertyDumper *dumper) const
 	dumper->dump_size("size", _size);
 	dumper->dump_scaling("scale", _scaling);
 	dumper->dump_color("color", _color);
-	dumper->dump_texture("texture", _texture);
 
 	// TODO: Dump font.
 

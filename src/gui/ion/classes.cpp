@@ -1,5 +1,7 @@
 #include "classes.h"
 
+#include <Yttrium/allocator.h>
+
 namespace Yttrium
 {
 
@@ -39,34 +41,41 @@ bool Classes::add(const StaticString &name, const Ion::Object &source, const Sta
 		{
 			return false;
 		}
-		base = &i->second;
+		base = i->second;
 	}
 
-	Ion::Document &document = _classes[String(name, _allocator)];
+	Ion::Document *document = Y_NEW(_allocator, Ion::Document, _allocator);
 
 	// Read the object entries in reverse order, ingnoring the duplicates.
 	// The class' own order is only significant for the class being added,
 	// not its base class.
 
-	update_document(&document, source);
+	update_document(document, source);
 
 	if (base)
 	{
-		update_document(&document, *base);
+		update_document(document, *base);
 	}
+
+	_classes[String(name, _allocator)] = document;
 
 	return true;
 }
 
 void Classes::clear()
 {
+	for (Map::iterator i = _classes.begin(); i != _classes.end(); ++i)
+	{
+		Y_DELETE(_allocator, i->second);
+	}
+
 	_classes.clear();
 }
 
 const Ion::Object *Classes::find(const StaticString &name) const
 {
 	Map::const_iterator i = _classes.find(String(name, ByReference()));
-	return i != _classes.end() ? &i->second : nullptr;
+	return i != _classes.end() ? i->second : nullptr;
 }
 
 } // namespace Gui

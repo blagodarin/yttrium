@@ -28,7 +28,7 @@ public:
 
 private:
 
-	typedef std::map<String, Ion::Document> Map;
+	typedef std::map<String, Ion::Document*> Map;
 
 private:
 

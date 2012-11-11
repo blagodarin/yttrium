@@ -39,6 +39,11 @@ void IonPropertyDumper::dump_size(const StaticString &name, const Vector2f &size
 	// TODO: Implement.
 }
 
+void IonPropertyDumper::dump_state(const StaticString &name, WidgetState state)
+{
+	// TODO: Implement.
+}
+
 void IonPropertyDumper::dump_text(const StaticString &name, const StaticString &text)
 {
 	// TODO: Implement.

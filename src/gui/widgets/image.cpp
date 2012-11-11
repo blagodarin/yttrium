@@ -13,8 +13,9 @@ namespace Yttrium
 namespace Gui
 {
 
-Image::Image()
-	: _color(1, 1, 1)
+Image::Image(Allocator *allocator)
+	: Widget(allocator)
+	, _color(1, 1, 1)
 {
 }
 

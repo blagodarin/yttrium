@@ -22,6 +22,8 @@ public:
 
 public: // PropertyLoader
 
+	virtual bool bind(const StaticString &name);
+
 	virtual bool load_alignment(const StaticString &name, Alignment *alignment);
 
 	virtual bool load_color(const StaticString &name, Vector4f *color);
@@ -34,9 +36,13 @@ public: // PropertyLoader
 
 	virtual bool load_size(const StaticString &name, Vector2f *size);
 
+	virtual bool load_state(const StaticString &name, WidgetState *state);
+
 	virtual bool load_text(const StaticString &name, String *text);
 
 	virtual bool load_texture(const StaticString &name, Texture2D *texture);
+
+	virtual void unbind();
 
 public:
 
@@ -45,6 +51,8 @@ public:
 	static bool load_scaling(Scaling *scaling, const Ion::Node &node);
 
 	static bool load_size(Vector2f *size, const Ion::Node &node);
+
+	static bool load_state(WidgetState *state, const Ion::Node &node);
 
 	static bool load_text(const StaticString **text, const Ion::Object &object, const StaticString &name);
 
@@ -57,6 +65,8 @@ private:
 	const Ion::Object *_class;
 	const ManagerImpl *_manager;
 	TextureCache       _texture_cache;
+	const Ion::Object *_bound_object;
+	const Ion::Object *_bound_class;
 };
 
 } // namespace Gui

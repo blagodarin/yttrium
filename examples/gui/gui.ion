@@ -7,6 +7,18 @@ font "common"
 	texture "data/font.tga"
 }
 
+class "common_button"
+{
+	size "5" "2"
+	color "1" "1" "0" "0.5"
+	font "common"
+	text_size "1.5"
+	text_color "1" "1" "1"
+
+	active { color "1" "1" "0" "0.75" text_color "1" "0.5" "0.5" }
+	pressed { color "1" "1" "0" "0.875" text_color "1" "0" "0" }
+}
+
 scene "main" ["root"]
 {
 	size "10" "10"
@@ -29,5 +41,27 @@ scene "main" ["root"]
 		align "center"
 		font "common"
 		text "{fps} FPS"
+	}
+
+	button ["common_button"]
+	{
+		pos "2.5" "7"
+		text "Quit"
+		action "quit"
+	}
+
+	button
+	{
+		pos "2.5" "7"
+		size "5" "2"
+		color "1" "1" "0" "0.5"
+		font "common"
+		text_size "1.5"
+		text_color "1" "1" "1"
+		text "Quit"
+		action "quit"
+
+		active { color "1" "1" "0" "0.75" text_color "1" "0.5" "0.5" }
+		pressed { color "1" "1" "0" "0.875" text_color "1" "0" "0" }
 	}
 }

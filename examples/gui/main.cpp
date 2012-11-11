@@ -49,6 +49,7 @@ public:
 			}
 
 			renderer.begin_frame();
+			_gui->set_cursor(_terminal.cursor());
 			_gui->render();
 			renderer.end_frame();
 

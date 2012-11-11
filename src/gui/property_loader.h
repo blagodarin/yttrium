@@ -23,7 +23,9 @@ public:
 
 public:
 
-	// NOTE: These functions MAY modify the data even if they haven't finished successfully.
+	// NOTE: The loading functions MAY modify the data even if they haven't finished successfully.
+
+	virtual bool bind(const StaticString &name) = 0;
 
 	virtual bool load_alignment(const StaticString &name, Alignment *alignment) = 0;
 
@@ -37,9 +39,13 @@ public:
 
 	virtual bool load_size(const StaticString &name, Vector2f *size) = 0;
 
+	virtual bool load_state(const StaticString &name, WidgetState *state) = 0;
+
 	virtual bool load_text(const StaticString &name, String *text) = 0;
 
 	virtual bool load_texture(const StaticString &name, Texture2D *texture) = 0;
+
+	virtual void unbind() = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

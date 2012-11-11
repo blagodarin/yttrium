@@ -8,8 +8,6 @@
 namespace Yttrium
 {
 
-class Renderer;
-
 namespace Gui
 {
 
@@ -17,7 +15,7 @@ class Image: public Widget
 {
 public:
 
-	Image();
+	Image(Allocator *allocator);
 
 public: // Widget
 

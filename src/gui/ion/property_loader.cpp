@@ -117,23 +117,48 @@ IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Objec
 	, _class(class_)
 	, _manager(manager)
 	, _texture_cache(manager->renderer().texture_cache())
+	, _bound_object(_object)
+	, _bound_class(_class)
 {
+}
+
+bool IonPropertyLoader::bind(const StaticString &name)
+{
+	const Ion::Node *node = _object->last(name);
+
+	if (!node || node->size() != 1 || !node->first()->get(&_bound_object))
+	{
+		return false;
+	}
+
+	_bound_class = nullptr;
+
+	if (_class)
+	{
+		node = _class->last(name);
+		if (node && node->size() == 1)
+		{
+			node->first()->get(&_bound_class);
+		}
+	}
+
+	return true;
 }
 
 bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alignment)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading alignment...");
 
-	const Ion::Node *node = _object->last(name);
+	const Ion::Node *node = _bound_object->last(name);
 
 	if (node && load_alignment(alignment, *node))
 	{
 		return true;
 	}
 
-	if (_class)
+	if (_bound_class)
 	{
-		node = _class->last(name);
+		node = _bound_class->last(name);
 
 		if (node && load_alignment(alignment, *node))
 		{
@@ -152,16 +177,16 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 
 	const Ion::Node *node;
 
-	if (_class)
+	if (_bound_class)
 	{
-		node = _class->last(name);
+		node = _bound_class->last(name);
 		if (node)
 		{
 			loaded = read_color(color, *node, 0);
 		}
 	}
 
-	node = _object->last(name);
+	node = _bound_object->last(name);
 	if (node)
 	{
 		loaded |= read_color(color, *node, loaded);
@@ -176,16 +201,16 @@ bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, T
 
 	const StaticString *font_name;
 
-	const Ion::Node *node = _object->last(name);
+	const Ion::Node *node = _bound_object->last(name);
 
 	if (!node || node->size() != 1 || !node->first()->get(&font_name))
 	{
-		if (!_class)
+		if (!_bound_class)
 		{
 			return false;
 		}
 
-		node = _class->last(name);
+		node = _bound_class->last(name);
 
 		if (!node || node->size() != 1 || !node->first()->get(&font_name))
 		{
@@ -213,16 +238,16 @@ bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *positi
 
 	const Ion::Node *node;
 
-	if (_class)
+	if (_bound_class)
 	{
-		node = _class->last(name);
+		node = _bound_class->last(name);
 		if (node)
 		{
 			loaded = read_position(position, *node, 0);
 		}
 	}
 
-	node = _object->last(name);
+	node = _bound_object->last(name);
 	if (node)
 	{
 		loaded |= read_position(position, *node, loaded);
@@ -235,16 +260,16 @@ bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading scaling...");
 
-	const Ion::Node *node = _object->last(name);
+	const Ion::Node *node = _bound_object->last(name);
 
 	if (node && load_scaling(scaling, *node))
 	{
 		return true;
 	}
 
-	if (_class)
+	if (_bound_class)
 	{
-		node = _class->last(name);
+		node = _bound_class->last(name);
 
 		if (node && load_scaling(scaling, *node))
 		{
@@ -263,16 +288,16 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 
 	const Ion::Node *node;
 
-	if (_class)
+	if (_bound_class)
 	{
-		node = _class->last(name);
+		node = _bound_class->last(name);
 		if (node)
 		{
 			loaded = read_size(size, *node, 0);
 		}
 	}
 
-	node = _object->last(name);
+	node = _bound_object->last(name);
 	if (node)
 	{
 		loaded |= read_size(size, *node, loaded);
@@ -281,13 +306,37 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 	return loaded == 3;
 }
 
+bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
+{
+	Y_LOG_TRACE("[Gui.Loader] Loading state...");
+
+	const Ion::Node *node = _bound_object->last(name);
+
+	if (node && load_state(state, *node))
+	{
+		return true;
+	}
+
+	if (_bound_class)
+	{
+		node = _bound_class->last(name);
+
+		if (node && load_state(state, *node))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool IonPropertyLoader::load_text(const StaticString &name, String *text)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading text...");
 
 	const StaticString *value;
 
-	if (!load_text(&value, *_object, name))
+	if (!load_text(&value, *_bound_object, name))
 	{
 		return false;
 	}
@@ -300,7 +349,7 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *textur
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading texture...");
 
-	const Ion::Node *node = _object->last(name);
+	const Ion::Node *node = _bound_object->last(name);
 
 	if (node && load_texture(texture, *node, &_texture_cache,
 		Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
@@ -308,9 +357,9 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *textur
 		return true;
 	}
 
-	if (_class)
+	if (_bound_class)
 	{
-		node = _class->last(name);
+		node = _bound_class->last(name);
 
 		if (node && load_texture(texture, *node, &_texture_cache,
 			Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
@@ -320,6 +369,12 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *textur
 	}
 
 	return false;
+}
+
+void IonPropertyLoader::unbind()
+{
+	_bound_object = _object;
+	_bound_class = _class;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -438,6 +493,49 @@ bool IonPropertyLoader::load_scaling(Scaling *scaling, const Ion::Node &node)
 bool IonPropertyLoader::load_size(Vector2f *size, const Ion::Node &node)
 {
 	return read_size(size, node, 0) == 3;
+}
+
+bool IonPropertyLoader::load_state(WidgetState *state, const Ion::Node &node)
+{
+	Ion::Node::ConstRange values = node.values();
+
+	if (values.size() != 1)
+	{
+		return false;
+	}
+
+	const StaticString *value;
+
+	if (!values.first().get(&value))
+	{
+		return false;
+	}
+	else if (*value == S("normal"))
+	{
+		*state = WidgetState::Normal;
+	}
+	else if (*value == S("active"))
+	{
+		*state = WidgetState::Active;
+	}
+	else if (*value == S("pressed"))
+	{
+		*state = WidgetState::Pressed;
+	}
+	else if (*value == S("checked"))
+	{
+		*state = WidgetState::Checked;
+	}
+	else if (*value == S("disabled"))
+	{
+		*state = WidgetState::Disabled;
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
 }
 
 bool IonPropertyLoader::load_text(const StaticString **text, const Ion::Object &object, const StaticString &name)

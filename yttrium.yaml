@@ -7,6 +7,7 @@ Yttrium:
 
     Base:
     - Implement directory search.
+    - Add some way of tracking down the allocations made directly with the default allocator.
 
     Image:
     - Consider an image reader with an internal buffer.

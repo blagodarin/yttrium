@@ -7,6 +7,7 @@
 #include <Yttrium/renderer.h>
 #include <Yttrium/script/manager.h>
 
+#include "widgets/button.h"
 #include "widgets/image.h"
 #include "widgets/label.h"
 
@@ -39,15 +40,17 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 {
 	Widget *widget = nullptr;
 
-	if (type == "image")
+	if (type == "button")
 	{
-		widget = new(_allocator->allocate<Image>())
-			Image();
+		widget = Y_NEW(_allocator, Button, _allocator);
+	}
+	else if (type == "image")
+	{
+		widget = Y_NEW(_allocator, Image, _allocator);
 	}
 	else if (type == "label")
 	{
-		widget = new(_allocator->allocate<Label>())
-			Label();
+		widget = Y_NEW(_allocator, Label, _allocator);
 	}
 
 	if (widget)

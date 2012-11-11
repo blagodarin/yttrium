@@ -1,5 +1,5 @@
-#ifndef __GUI_WIDGETS_LABEL_H
-#define __GUI_WIDGETS_LABEL_H
+#ifndef __GUI_WIDGETS_BUTTON_H
+#define __GUI_WIDGETS_BUTTON_H
 
 #include <Yttrium/renderer/texture.h>
 #include <Yttrium/texture_font.h>
@@ -12,11 +12,11 @@ namespace Yttrium
 namespace Gui
 {
 
-class Label: public Widget
+class Button: public Widget
 {
 public:
 
-	Label(Allocator *allocator);
+	Button(Allocator *allocator);
 
 public: // Widget
 
@@ -26,22 +26,34 @@ public: // Widget
 
 	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const;
 
-	virtual void update();
+private:
+
+	struct Style
+	{
+		Vector4f  color;
+		Texture2D texture;
+		Vector4f  text_color;
+
+		Style()
+			: color(1, 1, 1)
+			, text_color(1, 1, 1)
+		{
+		}
+	};
 
 private:
 
 	Vector3f    _position;
 	Vector2f    _size;
-	Vector4f    _color;
-	Texture2D   _texture;
 	TextureFont _font;
-	Alignment   _alignment;
-
-	String      _final_text;
+	Texture2D   _font_texture;
+	Vector2f    _text_size;
+	WidgetState _state;
+	Style       _styles[WidgetStateCount];
 };
 
 } // namespace Gui
 
 } // namespace Yttrium
 
-#endif // __GUI_WIDGETS_LABEL_H
+#endif // __GUI_WIDGETS_BUTTON_H
