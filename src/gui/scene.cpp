@@ -8,6 +8,7 @@
 #include <Yttrium/script/manager.h>
 
 #include "widgets/button.h"
+#include "widgets/canvas.h"
 #include "widgets/image.h"
 #include "widgets/label.h"
 
@@ -17,8 +18,9 @@ namespace Yttrium
 namespace Gui
 {
 
-Scene::Scene(const StaticString &name, Allocator *allocator)
+Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator)
 	: _allocator(allocator)
+	, _manager(manager)
 	, _name(name)
 	, _scaling(Scaling::Stretch)
 	, _is_cursor_set(false)
@@ -43,6 +45,10 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 	if (type == "button")
 	{
 		widget = Y_NEW(_allocator, Button)(_allocator);
+	}
+	else if (type == "canvas")
+	{
+		widget = Y_NEW(_allocator, Canvas)(_manager, _allocator);
 	}
 	else if (type == "image")
 	{

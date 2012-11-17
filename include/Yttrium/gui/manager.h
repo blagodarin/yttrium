@@ -6,8 +6,8 @@
 
 #include <Yttrium/key.h>
 #include <Yttrium/object.h>
+#include <Yttrium/rect.h>
 #include <Yttrium/static_string.h>
-#include <Yttrium/vector.h>
 
 namespace Yttrium
 {
@@ -31,6 +31,21 @@ typedef ObjectPointer<Manager> ManagerPtr;
 class Y_API Manager
 	: public Object
 {
+public:
+
+	///
+
+	class Callbacks
+	{
+	public:
+
+		Callbacks() = default;
+
+		///
+
+		virtual void on_render_canvas(const StaticString &name, const RectF &rect) noexcept = 0;
+	};
+
 public:
 
 	///
@@ -79,7 +94,8 @@ public:
 
 	///
 
-	static ManagerPtr create(Renderer &renderer, Allocator *allocator = DefaultAllocator) noexcept;
+	static ManagerPtr create(Renderer &renderer, Callbacks *callbacks = nullptr,
+		Allocator *allocator = DefaultAllocator) noexcept;
 
 protected:
 

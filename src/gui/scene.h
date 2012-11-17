@@ -15,6 +15,7 @@ namespace Gui
 {
 
 class IonDumper;
+class ManagerImpl;
 class PropertyLoader;
 class Widget;
 
@@ -26,7 +27,7 @@ class Scene
 
 public:
 
-	Scene(const StaticString &name, Allocator *allocator = DefaultAllocator);
+	Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator = DefaultAllocator);
 
 	~Scene();
 
@@ -66,6 +67,7 @@ private:
 private:
 
 	Allocator    *_allocator;
+	ManagerImpl  *_manager;
 	String        _name;
 	Vector2f      _size;
 	Scaling       _scaling;

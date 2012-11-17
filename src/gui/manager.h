@@ -49,7 +49,7 @@ public:
 
 public:
 
-	ManagerImpl(const Renderer &renderer, Allocator *allocator);
+	ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocator *allocator);
 
 	virtual ~ManagerImpl() noexcept;
 
@@ -62,6 +62,8 @@ public:
 	void delete_scene(Scene *scene);
 
 	const FontDesc *font(const StaticString &name) const;
+
+	inline void render_canvas(const StaticString &name, const RectF &rect) const;
 
 	inline Renderer renderer() const;
 
@@ -112,19 +114,28 @@ private:
 
 private:
 
-	Renderer     _renderer;
-	bool         _has_size;
-	Vector2f     _size;
-	Scaling      _scaling;
-	Fonts        _fonts;
-	Scenes       _scenes;
-	SceneStack   _scene_stack;
-	SceneActions _scene_actions;
-	bool         _has_cursor;
-	Vector2f     _cursor;
+	Renderer      _renderer;
+	Callbacks    *_callbacks;
+	bool          _has_size;
+	Vector2f      _size;
+	Scaling       _scaling;
+	Fonts         _fonts;
+	Scenes        _scenes;
+	SceneStack    _scene_stack;
+	SceneActions  _scene_actions;
+	bool          _has_cursor;
+	Vector2f      _cursor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ManagerImpl::render_canvas(const StaticString &name, const RectF &rect) const
+{
+	if (_callbacks)
+	{
+		_callbacks->on_render_canvas(name, rect);
+	}
+}
 
 Renderer ManagerImpl::renderer() const
 {

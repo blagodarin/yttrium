@@ -15,9 +15,10 @@ namespace Yttrium
 namespace Gui
 {
 
-ManagerImpl::ManagerImpl(const Renderer &renderer, Allocator *allocator)
+ManagerImpl::ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocator *allocator)
 	: Manager(allocator)
 	, _renderer(renderer)
+	, _callbacks(callbacks)
 	, _has_size(false)
 	, _size(0)
 	, _scaling(Scaling::Stretch)
@@ -68,7 +69,7 @@ Scene *ManagerImpl::create_scene(const StaticString &name)
 		return nullptr;
 	}
 
-	Scene *scene = Y_NEW(allocator(), Scene)(name, allocator());
+	Scene *scene = Y_NEW(allocator(), Scene)(this, name, allocator());
 	scene->set_size(_size);
 	return scene;
 }
@@ -256,9 +257,9 @@ void ManagerImpl::change_scene(const StaticString &old_scene, const StaticString
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ManagerPtr Manager::create(Renderer &renderer, Allocator *allocator)
+ManagerPtr Manager::create(Renderer &renderer, Callbacks *callbacks, Allocator *allocator)
 {
-	return ManagerPtr(Y_NEW(allocator, ManagerImpl)(renderer, allocator));
+	return ManagerPtr(Y_NEW(allocator, ManagerImpl)(renderer, callbacks, allocator));
 }
 
 } // namespace Gui
