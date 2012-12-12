@@ -75,6 +75,13 @@ public:
 
 	///
 
+	bool is_console_visible() const noexcept
+	{
+		return _is_console_visible;
+	}
+
+	///
+
 	bool is_cursor_locked() const noexcept
 	{
 		return _is_cursor_locked;

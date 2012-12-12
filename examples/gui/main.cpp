@@ -1,5 +1,6 @@
 #include <Yttrium/yttrium.h>
 
+using namespace std::placeholders;
 using namespace Yttrium;
 
 class GuiExample: public Terminal::Callbacks
@@ -10,7 +11,7 @@ public:
 		: _log_manager("gui.log")
 		, _terminal(this)
 	{
-		_script_manager.root_context().define("quit", std::bind(&GuiExample::quit, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+		_script_manager.root_context().define("quit", std::bind(&GuiExample::quit, this, _1, _2, _3));
 	}
 
 	void run()
@@ -53,7 +54,7 @@ public:
 			_gui->render();
 			renderer.end_frame();
 
-			ScriptManager::instance()->root_context().set("fps", fps.rate());
+			ScriptContext::global().set("fps", fps.rate());
 			fps.tick();
 		}
 	}

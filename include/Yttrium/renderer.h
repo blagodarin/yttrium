@@ -94,6 +94,10 @@ public:
 
 	///
 
+	inline void set_color(float r, float g, float b, float a = 1.f) noexcept;
+
+	///
+
 	bool set_font(const TextureFont &font) noexcept;
 
 	///
@@ -187,6 +191,11 @@ void Renderer::draw_rectangle(float x, float y, float width, float height) noexc
 void Renderer::draw_text(float x, float y, const StaticString &text, Alignment alignment) noexcept
 {
 	draw_text(Vector2f(x, y), text, alignment);
+}
+
+void Renderer::set_color(float r, float g, float b, float a) noexcept
+{
+	set_color(Vector4f(r, g, b, a));
 }
 
 void Renderer::set_font_size(float y_size, float x_scaling) noexcept

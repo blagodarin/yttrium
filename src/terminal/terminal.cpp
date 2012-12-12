@@ -274,11 +274,6 @@ void Terminal::on_key_event(Window *, Key key, bool is_pressed)
 		return;
 	}
 
-	if (state <= 1 && false) // TODO: Notify scripted bindings.
-	{
-		return;
-	}
-
 	// If we're here, noone wants this key. ='(
 }
 

@@ -1,0 +1,63 @@
+class "label_name"
+{
+	size  "1" "1.5"
+	align "center" "right"
+	font  "common"
+}
+
+class "label_value"
+{
+	size  "1" "1.5"
+	align "center" "left"
+	font  "common"
+}
+
+class "background"
+{
+	color "0" "0" "0" "0.5"
+}
+
+scene "game_single"
+{
+	size  "30" "26"
+	scale "min"
+
+	bind "esc" "push_scene game_pause"
+
+	image
+	{
+		pos     "0" "0"
+		size    "30" "26"
+		texture "tests/image/image.tga"
+		scale   "stretch"
+	}
+
+	image ["background"] { pos  "1" "1" size  "6"  "5" } # Next
+	image ["background"] { pos "10" "2" size "10" "22" } # Field
+	image ["background"] { pos "23" "1" size  "6"  "2" } # Score
+	image ["background"] { pos "23" "5" size  "6"  "2" } # Lines
+	image ["background"] { pos "23" "9" size  "6"  "2" } # Level
+
+	label ["label_name"]  { pos  "1.5"  "1.5" text "Next:"   }
+
+	label ["label_name"]  { pos "23.5"  "1.5" text "Score:"  }
+	label ["label_value"] { pos "28.5"  "2.5" text "{score}" }
+
+	label ["label_name"]  { pos "23.5"  "5.5" text "Lines:"  }
+	label ["label_value"] { pos "28.5"  "6.5" text "{lines}" }
+
+	label ["label_name"]  { pos "23.5"  "9.5" text "Level:"  }
+	label ["label_value"] { pos "28.5" "10.5" text "{level}" }
+
+	canvas "next"
+	{
+		pos  "2" "3"
+		size "4" "2"
+	}
+
+	canvas "field"
+	{
+		pos   "9"  "1"
+		size "12" "24"
+	}
+}

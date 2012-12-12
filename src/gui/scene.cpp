@@ -7,6 +7,7 @@
 #include <Yttrium/renderer.h>
 #include <Yttrium/script/manager.h>
 
+#include "manager.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
 #include "widgets/image.h"
@@ -48,7 +49,7 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 	}
 	else if (type == "canvas")
 	{
-		widget = Y_NEW(_allocator, Canvas)(_manager, _allocator);
+		widget = Y_NEW(_allocator, Canvas)(_manager->callbacks(), _allocator);
 	}
 	else if (type == "image")
 	{

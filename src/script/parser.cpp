@@ -25,7 +25,7 @@ ScriptParser::ScriptParser(ScriptContext *context, Allocator *allocator)
 
 bool ScriptParser::parse(const StaticString &script)
 {
-	Y_LOG_TRACE(S("[ScriptParser] Parsing \"") << script << Y_S("\"..."));
+	Y_LOG_TRACE(S("[ScriptParser] Parsing \"") << script << S("\"..."));
 
 	String mutable_script(script, _allocator);
 
@@ -105,7 +105,7 @@ bool ScriptParser::parse(const StaticString &script)
 			default:
 
 				Y_LOG_TRACE(S("[ScriptParser]  - unexpected token type ") << token.type
-					<< Y_S(": \"") << token.string << '\"');
+					<< S(": \"") << token.string << '\"');
 				_commands.clear();
 				return false;
 			}

@@ -1,5 +1,6 @@
 #include <Yttrium/yttrium.h>
 
+using namespace std::placeholders;
 using namespace Yttrium;
 
 class ConsoleExample
@@ -9,7 +10,7 @@ public:
 	ConsoleExample()
 		: _log_manager("console.log")
 	{
-		_script_manager.root_context().define("quit", std::bind(&ConsoleExample::quit, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+		_script_manager.root_context().define("quit", std::bind(&ConsoleExample::quit, this, _1, _2, _3));
 	}
 
 	void run()

@@ -4,7 +4,6 @@
 
 #include <Yttrium/renderer.h>
 
-#include "../manager.h"
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
@@ -14,9 +13,9 @@ namespace Yttrium
 namespace Gui
 {
 
-Canvas::Canvas(ManagerImpl *manager, Allocator *allocator)
+Canvas::Canvas(Manager::Callbacks *manager_callbacks, Allocator *allocator)
 	: Widget(allocator)
-	, _manager(manager)
+	, _manager_callbacks(manager_callbacks)
 {
 }
 
@@ -45,9 +44,12 @@ bool Canvas::load(PropertyLoader &loader)
 	return true;
 }
 
-void Canvas::render(Renderer *, const RectF &area, const Vector2f &, WidgetState) const
+void Canvas::render(Renderer *renderer, const RectF &area, const Vector2f &, WidgetState) const
 {
-	_manager->render_canvas(_name, area);
+	if (_manager_callbacks)
+	{
+		_manager_callbacks->on_render_canvas(renderer, _name, area);
+	}
 }
 
 } // namespace Gui

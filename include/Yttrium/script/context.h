@@ -140,6 +140,11 @@ public:
 
 	void unset(const StaticString &name) noexcept;
 
+public:
+
+	/// Get the root context of global script manager.
+	static ScriptContext &global();
+
 private:
 
 	typedef Pool<ScriptValue> Values;

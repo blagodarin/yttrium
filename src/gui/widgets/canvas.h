@@ -1,6 +1,7 @@
 #ifndef __GUI_WIDGETS_CANVAS_H
 #define __GUI_WIDGETS_CANVAS_H
 
+#include <Yttrium/gui/manager.h>
 #include <Yttrium/renderer/texture.h>
 
 #include "widget.h"
@@ -11,13 +12,11 @@ namespace Yttrium
 namespace Gui
 {
 
-class ManagerImpl;
-
 class Canvas: public Widget
 {
 public:
 
-	Canvas(ManagerImpl *manager, Allocator *allocator);
+	Canvas(Manager::Callbacks *manager_callbacks, Allocator *allocator);
 
 public: // Widget
 
@@ -29,9 +28,9 @@ public: // Widget
 
 private:
 
-	ManagerImpl *_manager;
-	Vector3f     _position;
-	Vector2f     _size;
+	Manager::Callbacks *_manager_callbacks;
+	Vector3f            _position;
+	Vector2f            _size;
 };
 
 } // namespace Gui

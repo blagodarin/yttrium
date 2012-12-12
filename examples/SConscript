@@ -6,7 +6,8 @@ build.VariantDir('$BUILD', '.', duplicate = 0)
 example_paths = [
 	'audio',
 	'console',
-	'gui']
+	'gui',
+	'tetrium']
 
 examples = []
 

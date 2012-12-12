@@ -231,12 +231,12 @@ rescan:
 	case Kind::Newline:
 
 		token->column = cursor - _line_origin;
-		if (*cursor == '\r' && *cursor == '\n') // Treat "\r\n" as a single newline.
+		if (*cursor == '\r' && *(cursor + 1) == '\n') // Treat "\r\n" as a single newline.
 		{
 			++cursor;
 		}
 		++_line;
-		_line_origin = cursor - 1;
+		_line_origin = ++cursor - 1;
 		token->type = Token::Separator;
 		break;
 

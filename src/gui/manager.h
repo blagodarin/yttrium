@@ -57,13 +57,13 @@ public:
 
 	bool add_scene(Scene *scene, bool is_root);
 
+	inline Callbacks *callbacks() const;
+
 	Scene *create_scene(const StaticString &name);
 
 	void delete_scene(Scene *scene);
 
 	const FontDesc *font(const StaticString &name) const;
-
-	inline void render_canvas(const StaticString &name, const RectF &rect) const;
 
 	inline Renderer renderer() const;
 
@@ -129,12 +129,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ManagerImpl::render_canvas(const StaticString &name, const RectF &rect) const
+Manager::Callbacks *ManagerImpl::callbacks() const
 {
-	if (_callbacks)
-	{
-		_callbacks->on_render_canvas(name, rect);
-	}
+	return _callbacks;
 }
 
 Renderer ManagerImpl::renderer() const

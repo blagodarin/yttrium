@@ -57,6 +57,12 @@ public:
 	* \overload
 	*/
 
+	inline bool get(const List **value) const noexcept;
+
+	/**
+	* \overload
+	*/
+
 	inline bool get(const Object **value) const noexcept;
 
 	///
@@ -136,6 +142,16 @@ bool Value::get(Integer *value) const noexcept
 bool Value::get(float *value) const noexcept
 {
 	return _type == StringType && _string.to_number(value);
+}
+
+bool Value::get(const List **value) const noexcept
+{
+	if (_type == ListType)
+	{
+		*value = &_list; // NOTE: Something's wrong here.
+		return true;
+	}
+	return false;
 }
 
 bool Value::get(const Object **value) const noexcept

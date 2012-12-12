@@ -43,7 +43,7 @@ public:
 
 		///
 
-		virtual void on_render_canvas(const StaticString &name, const RectF &rect) noexcept = 0;
+		virtual void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept = 0;
 	};
 
 public:

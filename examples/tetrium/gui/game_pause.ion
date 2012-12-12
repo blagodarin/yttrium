@@ -1,0 +1,51 @@
+class "pause_button" ["button"]
+{
+	pos       "11" ""
+	size      "8" "2"
+	text_size "1.75"
+}
+
+scene "game_pause"
+{
+	size        "30" "26"
+	scale       "min"
+	transparent
+
+	bind "esc" "pop_scene"
+
+	image
+	{
+		pos   "0" "0"
+		size  "30" "26"
+		color "0" "0" "0" "0.5"
+		scale "stretch"
+	}
+
+	button ["pause_button"]
+	{
+		pos    "" "9"
+		text   "Resume"
+		action "pop_scene"
+	}
+
+	button ["pause_button"]
+	{
+		pos    "" "12"
+		text   "Restart"
+		action "pop_scene 2; push_scene game_single"
+	}
+
+	button ["pause_button"]
+	{
+		pos    "" "15"
+		text   "Give up"
+		action "pop_scene 2"
+	}
+
+	button ["pause_button"]
+	{
+		pos    "" "18"
+		text   "Exit game"
+		action "exit"
+	}
+}

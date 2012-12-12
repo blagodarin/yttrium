@@ -247,6 +247,7 @@ void Rect<T>::set_height(T height) noexcept
 template <typename T>
 void Rect<T>::set_left(T left) noexcept
 {
+	_right += left - _left;
 	_left = left;
 }
 
@@ -267,20 +268,25 @@ void Rect<T>::set_size(const Vector2<T> &size) noexcept
 template <typename T>
 void Rect<T>::set_top(T top) noexcept
 {
+	_bottom += top - _top;
 	_top = top;
 }
 
 template <typename T>
 void Rect<T>::set_top_left(T left, T top) noexcept
 {
+	_right += left - _left;
 	_left = left;
+	_bottom += top - _top;
 	_top = top;
 }
 
 template <typename T>
 void Rect<T>::set_top_left(const Vector2<T> &top_left) noexcept
 {
+	_right += top_left.x - _left;
 	_left = top_left.x;
+	_bottom += top_left.y - _top;
 	_top = top_left.y;
 }
 

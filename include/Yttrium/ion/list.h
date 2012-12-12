@@ -163,6 +163,10 @@ public:
 
 	///
 
+	inline const Value *last() const noexcept;
+
+	///
+
 	inline size_t size() const noexcept;
 
 	///
@@ -294,6 +298,11 @@ const Value *List::first() const noexcept
 bool List::is_empty() const noexcept
 {
 	return !_size;
+}
+
+const Value *List::last() const noexcept
+{
+	return _last;
 }
 
 size_t List::size() const noexcept

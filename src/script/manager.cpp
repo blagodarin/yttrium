@@ -23,4 +23,11 @@ ScriptManager *ScriptManager::instance()
 	return ScriptManagerGuard::instance;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ScriptContext &ScriptContext::global()
+{
+	return ScriptManagerGuard::instance->root_context();
+}
+
 } // namespace Yttrium

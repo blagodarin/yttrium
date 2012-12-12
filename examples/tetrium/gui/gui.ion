@@ -1,0 +1,51 @@
+size "640" "480"
+scale "stretch"
+
+font "common"
+{
+	file    "data/font.ytf"
+	texture "data/font.tga"
+}
+
+class "common_button"
+{
+	size "5" "1.5"
+	color "1" "1" "0" "0.5"
+	font "common"
+	text_size "1"
+	text_color "1" "1" "1"
+
+	active { color "1" "1" "0" "0.75" text_color "1" "0.5" "0.5" }
+	pressed { color "1" "1" "0" "0.875" text_color "1" "0" "0" }
+	disabled { color "0" "0" "0" "0.5" text_color "0.5" "0.5" "0.5" }
+}
+
+class "button"
+{
+	pos        "230" ""
+	size       "180" "40"
+	color      "0" "0" "0.25" "0.5"
+	font       "common"
+	text_size  "36"
+	text_color "1" "1" "0.5"
+
+	active { color "0" "0" "0.25" "0.75" text_color "1" "1" "0.4" }
+	pressed { color "0" "0" "0.25" "0.85" text_color "1" "1" "0.4" }
+	checked { color "0" "0" "0.25" "0.85" text_color "1" "1" "0.875" }
+	disabled { text_color "0.6" "0.6" "0.6" }
+}
+
+include "examples/tetrium/gui/menu_main.ion"
+include "examples/tetrium/gui/menu_multi.ion"
+include "examples/tetrium/gui/menu_help.ion"
+
+include "examples/tetrium/gui/game_over.ion"
+include "examples/tetrium/gui/game_pause.ion"
+include "examples/tetrium/gui/game_single.ion"
+
+on_scene_change ["menu_main"   "game_single"] "game_start"
+on_scene_change ["game_single" "game_pause" ] "game_pause"
+on_scene_change ["game_pause"  "game_single"] "game_resume"
+on_scene_change ["game_single" "menu_main"  ] "game_stop"
+on_scene_change ["game_single" "game_over"  ] "game_stop"
+on_scene_change ["game_pause"  "menu_main"  ] "game_stop"

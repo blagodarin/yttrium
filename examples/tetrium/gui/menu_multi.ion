@@ -1,0 +1,47 @@
+scene "menu_multi"
+{
+	bind "esc" "pop_scene"
+
+	image
+	{
+		pos     "0" "0"
+		size    "640" "480"
+		texture "tests/image/image.tga"
+	}
+
+	label
+	{
+		pos   "320" "100"
+		size  "160"
+		font  "common"
+		text  "Tetrium"
+	}
+
+	button ["button"]
+	{
+		pos   "" "260"
+		text  "Multiplayer"
+		state "checked"
+	}
+
+	button ["button"]
+	{
+		pos   "" "310"
+		text  "Host game"
+		state "disabled"
+	}
+
+	button ["button"]
+	{
+		pos   "" "360"
+		text  "Join game"
+		state "disabled"
+	}
+
+	button ["button"]
+	{
+		pos    "" "410"
+		text   "Back"
+		action "pop_scene"
+	}
+}
