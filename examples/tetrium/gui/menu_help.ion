@@ -22,7 +22,7 @@ scene "menu_help"
 	{
 		pos     "0" "0"
 		size    "640" "480"
-		texture "tests/image/image.tga"
+		texture "data/textures/wall.jpeg"
 	}
 
 	image

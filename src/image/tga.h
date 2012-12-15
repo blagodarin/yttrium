@@ -11,9 +11,8 @@ class TgaReader: public ImageReader::Private
 public:
 
 	TgaReader(Allocator *allocator)
-		: ImageReader::Private(allocator)
+		: ImageReader::Private(ImageType::Tga, allocator)
 	{
-		_type = ImageType::Tga;
 	}
 
 public:

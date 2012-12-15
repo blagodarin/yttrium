@@ -28,7 +28,7 @@ scene "game_single"
 	{
 		pos     "0" "0"
 		size    "30" "26"
-		texture "tests/image/image.tga"
+		texture "data/textures/wall.jpeg"
 		scale   "stretch"
 	}
 

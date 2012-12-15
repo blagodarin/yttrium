@@ -86,14 +86,14 @@ if build_mode == 'release':
 else:
 	env.Append(CPPFLAGS = ['-g']) # We use GCC/MinGW.
 
-env.Prepend(LIBS = ['png', 'z', 'vorbisfile', 'vorbis', 'ogg', 'png', 'z'])
+env.Prepend(LIBS = ['jpeg', 'ogg', 'png', 'vorbis', 'vorbisfile', 'z'])
 if 'posix' in ports:
-	env.Append(LIBS = ['pthread', 'openal'])
+	env.Append(LIBS = ['openal', 'pthread'])
 if 'windows' in ports:
 	if build_platform == 'win32':
-		env.Append(LIBS = ['OpenAL32', 'OpenGL32', 'ws2_32', 'winmm', 'gdi32'])
+		env.Append(LIBS = ['gdi32', 'OpenAL32', 'OpenGL32', 'winmm', 'ws2_32'])
 if 'x11' in ports:
-	env.Append(LIBS = ['GL', 'Xrandr', 'X11'])
+	env.Append(LIBS = ['GL', 'X11', 'Xrandr'])
 
 # Slave environment.
 

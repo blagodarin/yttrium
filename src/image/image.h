@@ -12,9 +12,9 @@ class Y_PRIVATE ImageReader::Private: public PrivateBase<ImageReader::Private>
 {
 public:
 
-	Private(Allocator *allocator)
+	Private(ImageType type, Allocator *allocator)
 		: PrivateBase(allocator)
-		, _type(ImageType::Auto)
+		, _type(type)
 		, _is_used(false)
 	{
 	}

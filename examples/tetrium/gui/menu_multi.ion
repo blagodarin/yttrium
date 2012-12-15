@@ -6,7 +6,7 @@ scene "menu_multi"
 	{
 		pos     "0" "0"
 		size    "640" "480"
-		texture "tests/image/image.tga"
+		texture "data/textures/wall.jpeg"
 	}
 
 	label

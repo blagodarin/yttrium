@@ -22,7 +22,7 @@ enum
 
 	// Horizontal movement timing.
 
-	HMoveDelay           =  4, // 100 ms initial delay.
+	HMoveDelay           =  6, // 150 ms initial delay.
 	HMoveInterval        =  2, // 50 ms successive delays.
 };
 

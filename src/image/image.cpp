@@ -2,6 +2,7 @@
 
 #include <Yttrium/package.h>
 
+#include "jpeg.h"
 #include "png.h"
 #include "tga.h"
 
@@ -44,6 +45,10 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 			if (extension == ".tga")
 			{
 				_private = Y_NEW(allocator, TgaReader)(allocator);
+			}
+			else if (extension == ".jpeg" || extension == ".jpg")
+			{
+				_private = Y_NEW(allocator, JpegReader)(allocator);
 			}
 		}
 		break;

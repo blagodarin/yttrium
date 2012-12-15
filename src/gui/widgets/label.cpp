@@ -111,6 +111,8 @@ void Label::update()
 		_area.set_top(_area.top() - size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
 	}
 
+	// NOTE: Left-aligned labels move!
+
 	_area.set_size(size);
 }
 
