@@ -30,6 +30,10 @@ public: // Widget
 
 private:
 
+	void update_area(const StaticString &text);
+
+private:
+
 	Vector3f    _position;
 	Vector2f    _size;
 	Vector4f    _color;

@@ -52,25 +52,7 @@ bool Label::load(PropertyLoader &loader)
 	loader.load_color("color", &_color);
 	loader.load_alignment("align", &_alignment);
 
-	// TODO: Merge the following with update().
-
-	_area.set_top_left(_position.xy());
-
-	Vector2f size = _font.text_size(_text, _size);
-
-	if ((_alignment & HorizontalAlignmentMask) != RightAlignment)
-	{
-		_area.set_left(_area.left() - size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));
-	}
-
-	if ((_alignment & VerticalAlignmentMask) != BottomAlignment)
-	{
-		_area.set_top(_area.top() - size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
-	}
-
-	Vector2f area;
-
-	_area.set_size(loader.load_size("area", &area) ? area : size);
+	update_area(_text);
 
 	return true;
 }
@@ -88,32 +70,34 @@ void Label::render(Renderer *renderer, const RectF &area, const Vector2f &scale,
 	if (renderer->set_font(_font))
 	{
 		renderer->set_font_size(_size.x * scale.y, _size.y);
-		renderer->draw_text(area.center(), _final_text, _alignment);
+		renderer->draw_text(area.center(), _final_text, 0);
 	}
 }
 
 void Label::update()
 {
 	_final_text.clear(); // NOTE: Maybe move this into substitute()?
-	ScriptManager::instance()->root_context().substitute(&_final_text, _text);
+	ScriptContext::global().substitute(&_final_text, _text);
+	update_area(_final_text);
+}
 
+void Label::update_area(const StaticString &text)
+{
 	_area.set_top_left(_position.xy());
 
-	Vector2f size = _font.text_size(_final_text, _size);
+	Vector2f text_size = _font.text_size(text, _size);
 
 	if ((_alignment & HorizontalAlignmentMask) != RightAlignment)
 	{
-		_area.set_left(_area.left() - size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));
+		_area.set_left(_area.left() - text_size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));
 	}
 
 	if ((_alignment & VerticalAlignmentMask) != BottomAlignment)
 	{
-		_area.set_top(_area.top() - size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
+		_area.set_top(_area.top() - text_size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
 	}
 
-	// NOTE: Left-aligned labels move!
-
-	_area.set_size(size);
+	_area.set_size(text_size);
 }
 
 } // namespace Gui
