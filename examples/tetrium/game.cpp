@@ -52,6 +52,8 @@ void Game::run()
 	_terminal.resize(1024, 768);
 	_terminal.show();
 
+	load_music();
+
 	load();
 
 	RendererBuiltin renderer_builtin = _renderer.renderer_builtin();
@@ -161,6 +163,52 @@ bool Game::load()
 	}
 
 	return true;
+}
+
+void Game::load_music()
+{
+	_audio.open(); // NOTE: And what if it fails?
+
+	Ion::Document data;
+
+	if (!data.load("data/music.ion"))
+		return;
+
+	const Ion::Node *music_node = data.last("music");
+
+	if (!music_node || music_node->is_empty())
+		return;
+
+	for (Ion::Node::ConstRange r = music_node->values(); !r.is_empty(); r.pop_first())
+	{
+		const Ion::Object *entry;
+
+		if (!r.first().get(&entry))
+			continue;
+
+		const StaticString *file;
+
+		if (entry->last("file", &file))
+		{
+			const StaticString *begin;
+			const StaticString *end;
+			const StaticString *loop;
+
+			AudioPlayer::Settings settings;
+
+			if (entry->last("begin", &begin))
+				settings.begin = begin->to_time();
+			if (entry->last("end", &end))
+				settings.end = end->to_time();
+			if (entry->last("loop", &loop))
+				settings.loop = loop->to_time();
+
+			_audio.player().load(*file, settings);
+		}
+	}
+
+	_audio.player().set_order(AudioPlayer::Random);
+	_audio.player().play();
 }
 
 void Game::on_cursor_movement(Terminal *, const Dim2 &) noexcept

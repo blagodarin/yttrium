@@ -1,6 +1,7 @@
 #ifndef __TETRIUM_GAME_H
 #define __TETRIUM_GAME_H
 
+#include <Yttrium/audio/manager.h>
 #include <Yttrium/bindings.h>
 #include <Yttrium/gui/manager.h>
 #include <Yttrium/terminal.h>
@@ -31,11 +32,13 @@ public:
 
 private:
 
+	bool load();
+
+	void load_music();
+
 	void load_settings();
 
 	void save_settings();
-
-	bool load();
 
 private: // Terminal::Callbacks.
 
@@ -57,6 +60,7 @@ private:
 
 private:
 
+	AudioManager     _audio;
 	Terminal         _terminal;
 	Renderer         _renderer;
 	Gui::ManagerPtr  _gui;

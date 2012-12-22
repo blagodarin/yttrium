@@ -4,7 +4,6 @@ build = env.Clone(BUILD = '.build')
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
 example_paths = [
-	'audio',
 	'console',
 	'gui',
 	'tetrium']
