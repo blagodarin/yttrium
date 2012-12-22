@@ -151,6 +151,10 @@ public:
 
 	///
 
+	inline bool exists() const noexcept;
+
+	///
+
 	inline const Value *first() const noexcept;
 
 	///
@@ -202,7 +206,7 @@ private:
 
 private:
 
-	Document &_document;
+	Document *_document;
 	Value    *_first;
 	Value    *_last;
 	size_t    _size;
@@ -290,6 +294,11 @@ List::ConstRange List::const_values() const noexcept
 	return ConstRange(_first, _last, _size);
 }
 
+bool List::exists() const noexcept
+{
+	return _document;
+}
+
 const Value *List::first() const noexcept
 {
 	return _first;
@@ -326,7 +335,7 @@ List::ConstRange List::values() const noexcept
 }
 
 List::List(Document *document) noexcept
-	: _document(*document)
+	: _document(document)
 	, _first(nullptr)
 	, _last(nullptr)
 	, _size(0)

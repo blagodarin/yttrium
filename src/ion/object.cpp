@@ -2,6 +2,8 @@
 
 #include <Yttrium/ion/document.h>
 
+#include "node.h"
+
 namespace Yttrium
 {
 
@@ -38,7 +40,7 @@ bool Object::contains(const StaticString &name)
 
 const Node *Object::first() const
 {
-	return _nodes.empty() ? nullptr : _nodes.front();
+	return _nodes.empty() ? &null_node : _nodes.front();
 }
 
 const Node *Object::first(const StaticString &name) const
@@ -52,7 +54,7 @@ const Node *Object::first(const StaticString &name) const
 			return nodes.front();
 		}
 	}
-	return nullptr;
+	return &null_node;
 }
 
 Object::ConstRange Object::nodes() const
@@ -81,7 +83,7 @@ Object::ConstRange Object::nodes(const StaticString &name) const
 
 const Node *Object::last() const
 {
-	return (_nodes.empty() ? nullptr : _nodes.back());
+	return (_nodes.empty() ? &null_node : _nodes.back());
 }
 
 const Node *Object::last(const StaticString &name) const
@@ -95,7 +97,7 @@ const Node *Object::last(const StaticString &name) const
 			return nodes.back();
 		}
 	}
-	return nullptr;
+	return &null_node;
 }
 
 void Object::to_string(String *result, int indentation) const

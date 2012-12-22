@@ -131,7 +131,7 @@ bool Game::load()
 	CHECK(data.load("examples/tetrium/data/tetrium.ion"));
 
 	const Ion::Node *blocks_node = data.last("blocks");
-	CHECK(blocks_node && !blocks_node->is_empty() && blocks_node->first()->is_object());
+	CHECK(!blocks_node->is_empty() && blocks_node->first()->is_object());
 	const Ion::Object *blocks = blocks_node->first()->object();
 
 	const StaticString *block_texture_name;
@@ -145,7 +145,7 @@ bool Game::load()
 	CHECK(block_size->to_number(&_block_size));
 
 	const Ion::Node *block_bases = blocks->last("base");
-	CHECK(block_bases && block_bases->size() == 8);
+	CHECK(block_bases->size() == 8);
 	int index = 0;
 	for (Ion::Node::ConstRange r = block_bases->values(); !r.is_empty(); r.pop_first())
 	{
@@ -174,12 +174,7 @@ void Game::load_music()
 	if (!data.load("data/music.ion"))
 		return;
 
-	const Ion::Node *music_node = data.last("music");
-
-	if (!music_node || music_node->is_empty())
-		return;
-
-	for (Ion::Node::ConstRange r = music_node->values(); !r.is_empty(); r.pop_first())
+	for (Ion::Node::ConstRange r = data.last("music")->values(); !r.is_empty(); r.pop_first())
 	{
 		const Ion::Object *entry;
 

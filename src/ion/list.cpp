@@ -23,7 +23,7 @@ void List::ConstRange::pop_first()
 
 List *List::append_list()
 {
-	Value *new_value = _document.new_list_value();
+	Value *new_value = _document->new_list_value();
 	List *new_list = &new_value->list();
 	append(new_value);
 	return new_list;
@@ -31,7 +31,7 @@ List *List::append_list()
 
 List *List::append_list(const List &list)
 {
-	Value *new_value = _document.new_list_value();
+	Value *new_value = _document->new_list_value();
 	List *new_list = &new_value->list();
 	new_list->concatenate(list);
 	append(new_value);
@@ -40,22 +40,22 @@ List *List::append_list(const List &list)
 
 Object *List::append_object()
 {
-	Object *new_object = _document.new_object();
-	append(_document.new_object_value(new_object));
+	Object *new_object = _document->new_object();
+	append(_document->new_object_value(new_object));
 	return new_object;
 }
 
 Object *List::append_object(const Object &object)
 {
-	Object *new_object = _document.new_object();
+	Object *new_object = _document->new_object();
 	new_object->concatenate(object);
-	append(_document.new_object_value(new_object));
+	append(_document->new_object_value(new_object));
 	return new_object;
 }
 
 Value *List::append(const StaticString &string)
 {
-	Value *value = _document.new_value(string);
+	Value *value = _document->new_value(string);
 	append(value);
 	return value;
 }
@@ -80,7 +80,7 @@ void List::concatenate(const List &list)
 
 		default:
 
-			append(_document.new_value(value.string()));
+			append(_document->new_value(value.string()));
 			break;
 		}
 	}
@@ -98,7 +98,7 @@ bool List::first(const StaticString **value) const
 
 String List::to_string(int indentation, Allocator *allocator) const
 {
-	String result(allocator ? allocator : _document._allocator);
+	String result(allocator ? allocator : _document->_allocator);
 
 	to_string(&result, indentation, false);
 	return result;
@@ -106,7 +106,7 @@ String List::to_string(int indentation, Allocator *allocator) const
 
 String List::to_string(Allocator *allocator) const
 {
-	String result(allocator ? allocator : _document._allocator);
+	String result(allocator ? allocator : _document->_allocator);
 
 	to_string(&result, 0, false);
 	return result;
@@ -151,7 +151,7 @@ void List::to_string(String *result, int indentation, bool node) const
 
 Value *List::append(const StaticString &string, const ByReference &)
 {
-	Value *value = _document.new_value(string, ByReference());
+	Value *value = _document->new_value(string, ByReference());
 	append(value);
 	return value;
 }

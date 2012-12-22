@@ -1,21 +1,24 @@
 class "help_key"
 {
-	pos   "200" ""
-	size  "50"
+	pos   "230" ""
+	size  "40"
 	align "bottom"
 	font  "common"
 }
 
 class "help_text"
 {
-	pos   "240" ""
-	size  "50"
+	pos   "300" ""
+	size  "40"
 	align "bottom" "right"
 	font  "common"
 }
 
 scene "menu_help"
 {
+	size "640" "480"
+	scale "stretch"
+
 	bind "esc" "pop_scene"
 
 	image
@@ -27,32 +30,32 @@ scene "menu_help"
 
 	image
 	{
-		pos   "80" "40"
-		size  "480" "320"
+		pos   "120" "30"
+		size  "400" "300"
 		color "0" "0" "0" "0.5"
 	}
 
-	label ["help_key" ] { pos "" "50" text "[A]" }
-	label ["help_text"] { pos "" "50" text "Move left" }
+	label ["help_key" ] { pos "" "55"  text "[A]" }
+	label ["help_text"] { pos "" "55"  text "Move left" }
 
-	label ["help_key" ] { pos "" "100" text "[D]" }
-	label ["help_text"] { pos "" "100" text "Move right" }
+	label ["help_key" ] { pos "" "105" text "[D]" }
+	label ["help_text"] { pos "" "105" text "Move right" }
 
-	label ["help_key" ] { pos "" "150" text "[S]" }
-	label ["help_text"] { pos "" "150" text "Accelerate" }
+	label ["help_key" ] { pos "" "155" text "[S]" }
+	label ["help_text"] { pos "" "155" text "Accelerate" }
 
-	label ["help_key" ] { pos "" "200" text "[Left]" }
-	label ["help_text"] { pos "" "200" text "Rotate left" }
+	label ["help_key" ] { pos "" "205" text "[Left]" }
+	label ["help_text"] { pos "" "205" text "Rotate left" }
 
-	label ["help_key" ] { pos "" "250" text "[Right]" }
-	label ["help_text"] { pos "" "250" text "Rotate right" }
+	label ["help_key" ] { pos "" "255" text "[Right]" }
+	label ["help_text"] { pos "" "255" text "Rotate right" }
 
-	label ["help_key" ] { pos "" "300" text "[Esc]" }
-	label ["help_text"] { pos "" "300" text "Pause/Exit" }
+	label ["help_key" ] { pos "" "305" text "[Esc]" }
+	label ["help_text"] { pos "" "305" text "Pause/Exit" }
 
 	button ["button"]
 	{
-		pos    "" "410"
+		pos    "" "360"
 		text   "Back"
 		action "pop_scene"
 	}

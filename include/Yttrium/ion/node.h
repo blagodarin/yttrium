@@ -27,6 +27,12 @@ public:
 
 	///
 
+	Node() noexcept;
+
+public:
+
+	///
+
 	inline StaticString name() const noexcept;
 
 	///
@@ -44,8 +50,7 @@ private:
 
 private:
 
-	String  _name;
-	Node   *_next;
+	String _name;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

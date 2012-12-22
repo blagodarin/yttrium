@@ -1,4 +1,4 @@
-#include <Yttrium/ion/node.h>
+#include "node.h"
 
 #include <Yttrium/ion/document.h>
 
@@ -7,6 +7,14 @@ namespace Yttrium
 
 namespace Ion
 {
+
+const Node null_node;
+
+Node::Node()
+	: List(nullptr)
+	, _name(static_cast<Allocator *>(nullptr))
+{
+}
 
 void Node::to_string(String *result, int indentation) const
 {
@@ -32,14 +40,12 @@ String Node::to_string(int indentation, Allocator *allocator) const noexcept
 Node::Node(Document *document, const StaticString &name)
 	: List(document)
 	, _name(name, document->_allocator)
-	, _next(nullptr)
 {
 }
 
 Node::Node(Document *document, const StaticString &name, const ByReference &)
 	: List(document)
 	, _name(name, ByReference(), document->_allocator)
-	, _next(nullptr)
 {
 }
 

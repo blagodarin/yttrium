@@ -227,7 +227,7 @@ bool Object::is_empty() const noexcept
 bool Object::last(const StaticString &name, const Node **node) const noexcept
 {
 	const Node *last_node = last(name);
-	if (last_node)
+	if (last_node->exists())
 	{
 		*node = last_node;
 		return true;
@@ -238,7 +238,7 @@ bool Object::last(const StaticString &name, const Node **node) const noexcept
 bool Object::last(const StaticString &name, const StaticString **string) const noexcept
 {
 	const Node *last_node = last(name);
-	return last_node && !last_node->is_empty() && last_node->first()->get(string);
+	return last_node->exists() && !last_node->is_empty() && last_node->first()->get(string);
 }
 
 size_t Object::size() const noexcept
