@@ -3,6 +3,7 @@
 #include "loader.h"
 
 #include <Yttrium/ion/document.h>
+#include <Yttrium/ion/value.h>
 #include <Yttrium/renderer/texture_cache.h>
 
 #include "../manager.h"

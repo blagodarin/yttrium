@@ -1,7 +1,6 @@
 #include <Yttrium/ion/object.h>
 
-#include <Yttrium/ion/document.h>
-
+#include "document.h"
 #include "node.h"
 
 namespace Yttrium
@@ -12,7 +11,7 @@ namespace Ion
 
 Node *Object::append(const StaticString &name)
 {
-	Node *node = _document->new_node(name);
+	Node *node = _document->_private->new_node(name);
 	_nodes.push_back(node);
 	_node_map[node->_name].push_back(node);
 	return node;
@@ -83,7 +82,7 @@ Object::ConstRange Object::nodes(const StaticString &name) const
 
 const Node *Object::last() const
 {
-	return (_nodes.empty() ? &null_node : _nodes.back());
+	return _nodes.empty() ? &null_node : _nodes.back();
 }
 
 const Node *Object::last(const StaticString &name) const
@@ -98,6 +97,23 @@ const Node *Object::last(const StaticString &name) const
 		}
 	}
 	return &null_node;
+}
+
+bool Object::last(const StaticString &name, const Node **node) const
+{
+	const Node *last_node = last(name);
+	if (last_node->exists())
+	{
+		*node = last_node;
+		return true;
+	}
+	return false;
+}
+
+bool Object::last(const StaticString &name, const StaticString **string) const
+{
+	const Node *last_node = last(name);
+	return last_node->exists() && !last_node->is_empty() && last_node->first()->get(string);
 }
 
 void Object::serialize(String *result, int indentation) const
@@ -120,7 +136,7 @@ Object::Object(Document *document)
 
 Node *Object::append(const StaticString &name, const ByReference &)
 {
-	Node *node = _document->new_node(name, ByReference());
+	Node *node = _document->_private->new_node(name, ByReference());
 	_nodes.push_back(node);
 	_node_map[node->_name].push_back(node); // NOTE: Possible Allocator-less String construction.
 	return node;

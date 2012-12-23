@@ -1,7 +1,7 @@
 #ifndef __ION_PARSER_H
 #define __ION_PARSER_H
 
-#include <Yttrium/ion/document.h>
+#include <Yttrium/static_string.h>
 
 #include <vector>
 
@@ -10,6 +10,10 @@ namespace Yttrium
 
 namespace Ion
 {
+
+class Document;
+class List;
+class Object;
 
 class Parser
 {
@@ -40,7 +44,7 @@ private:
 
 private:
 
-	Document &_document;
+	Document *_document;
 
 private:
 

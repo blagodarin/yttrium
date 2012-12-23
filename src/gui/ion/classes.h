@@ -1,12 +1,20 @@
 #ifndef __GUI_ION_CLASSES_H
 #define __GUI_ION_CLASSES_H
 
-#include <Yttrium/ion/document.h>
+#include <Yttrium/static_string.h>
 
 #include <map>
 
 namespace Yttrium
 {
+
+namespace Ion
+{
+
+class Document;
+class Object;
+
+} // namespace Ion
 
 namespace Gui
 {

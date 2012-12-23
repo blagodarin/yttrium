@@ -1,9 +1,7 @@
-#include <Yttrium/ion/document.h>
+#include "document.h"
 
 #include <Yttrium/ion/list.h>
-#include <Yttrium/ion/node.h>
-#include <Yttrium/ion/value.h>
-#include <Yttrium/package.h>
+//#include <Yttrium/package.h>
 
 #include "../base/file.h"
 
@@ -15,45 +13,86 @@ namespace Yttrium
 namespace Ion
 {
 
+Value *Document::Private::new_list_value()
+{
+	return new(_values.allocate()) Value(_document);
+}
+
+Node *Document::Private::new_node(const StaticString &name)
+{
+	return new(_nodes.allocate()) Node(_document, name);
+}
+
+Node *Document::Private::new_node(const StaticString &name, const ByReference &)
+{
+	return new(_nodes.allocate()) Node(_document, name, ByReference());
+}
+
+Object *Document::Private::new_object()
+{
+	return new(_objects.allocate()) Object(_document);
+}
+
+Value *Document::Private::new_object_value(Object *object)
+{
+	return new(_values.allocate()) Value(_document, object);
+}
+
+Value *Document::Private::new_value(const StaticString &name)
+{
+	return new(_values.allocate()) Value(_document, name);
+}
+
+Value *Document::Private::new_value(const StaticString &name, const ByReference &)
+{
+	return new(_values.allocate()) Value(_document, name, ByReference());
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Document::Document(Allocator *allocator)
 	: Object(this)
-	, _allocator(allocator)
-	, _buffer(allocator)
-	, _objects(32, allocator)
-	, _nodes(32, allocator)
-	, _values(32, allocator)
+	, _private(Y_NEW(allocator, Private)(this, allocator))
 {
 }
 
 Document::Document(const Document &document, Allocator *allocator)
 	//: Document(allocator ? allocator : document._allocator) // TODO: Uncomment.
 	: Object(this)
-	, _allocator(allocator ? allocator : document._allocator)
-	, _buffer(_allocator)
-	, _objects(32, _allocator)
-	, _nodes(32, _allocator)
-	, _values(32, _allocator)
 {
+	if (!allocator)
+		allocator = document._private->_allocator;
+	_private = Y_NEW(allocator, Private)(this, allocator);
 	concatenate(document);
+}
+
+Document::~Document()
+{
+	clear();
+	Y_DELETE(_private->_allocator, _private);
+}
+
+Allocator *Document::allocator() const
+{
+	return _private->_allocator;
 }
 
 void Document::clear()
 {
 	Object::clear();
-	_buffer.clear();
+	_private->_buffer.clear();
 }
 
 bool Document::load(const StaticString &name)
 {
 	clear();
-
-	return File(name, _allocator).read_all(&_buffer)
-		&& Parser(this).parse(_buffer, name);
+	return File(name, _private->_allocator).read_all(&_private->_buffer)
+		&& Parser(this).parse(_private->_buffer, name);
 }
 
 void Document::save(const StaticString &name, int indentation) const
 {
-	StaticFile file(name, File::Write, _allocator);
+	StaticFile file(name, File::Write, _private->_allocator);
 
 	if (!file.is_opened())
 	{
@@ -61,48 +100,13 @@ void Document::save(const StaticString &name, int indentation) const
 	}
 	else
 	{
-		String buffer(_allocator);
+		String buffer(_private->_allocator);
 
 		serialize(&buffer, (indentation > 0 ? 0 : indentation), true);
 
 		file.truncate();
 		file.write(buffer.text(), buffer.size());
 	}
-}
-
-Value *Document::new_list_value()
-{
-	return new(_values.allocate()) Value(this);
-}
-
-Node *Document::new_node(const StaticString &name)
-{
-	return new(_nodes.allocate()) Node(this, name);
-}
-
-Node *Document::new_node(const StaticString &name, const ByReference &)
-{
-	return new(_nodes.allocate()) Node(this, name, ByReference());
-}
-
-Object *Document::new_object()
-{
-	return new(_objects.allocate()) Object(this);
-}
-
-Value *Document::new_object_value(Object *object)
-{
-	return new(_values.allocate()) Value(this, object);
-}
-
-Value *Document::new_value(const StaticString &name)
-{
-	return new(_values.allocate()) Value(this, name);
-}
-
-Value *Document::new_value(const StaticString &name, const ByReference &)
-{
-	return new(_values.allocate()) Value(this, name, ByReference());
 }
 
 } // namespace Ion

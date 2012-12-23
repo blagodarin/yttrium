@@ -1,6 +1,7 @@
 #include "node.h"
 
 #include <Yttrium/ion/document.h>
+#include <Yttrium/ion/value.h>
 
 namespace Yttrium
 {
@@ -45,13 +46,13 @@ StaticString Node::string(const StaticString& default_value) const noexcept
 
 Node::Node(Document *document, const StaticString &name)
 	: List(document)
-	, _name(name, document->_allocator)
+	, _name(name, document->allocator())
 {
 }
 
 Node::Node(Document *document, const StaticString &name, const ByReference &)
 	: List(document)
-	, _name(name, ByReference(), document->_allocator)
+	, _name(name, ByReference(), document->allocator())
 {
 }
 

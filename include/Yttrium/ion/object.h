@@ -4,8 +4,6 @@
 #ifndef __Y_ION_OBJECT_H
 #define __Y_ION_OBJECT_H
 
-#include <Yttrium/ion/node.h> // NOTE: For inlines. =(
-#include <Yttrium/ion/value.h> // NOTE: For inlines. =(
 #include <Yttrium/noncopyable.h>
 #include <Yttrium/static_string.h>
 
@@ -136,11 +134,11 @@ public:
 
 	///
 
-	inline bool last(const StaticString &name, const Node **node) const noexcept;
+	bool last(const StaticString &name, const Node **node) const noexcept;
 
 	///
 
-	inline bool last(const StaticString &name, const StaticString **string) const noexcept;
+	bool last(const StaticString &name, const StaticString **string) const noexcept;
 
 	///
 
@@ -231,23 +229,6 @@ const Document *Object::document() const noexcept
 bool Object::is_empty() const noexcept
 {
 	return _nodes.empty();
-}
-
-bool Object::last(const StaticString &name, const Node **node) const noexcept
-{
-	const Node *last_node = last(name);
-	if (last_node->exists())
-	{
-		*node = last_node;
-		return true;
-	}
-	return false;
-}
-
-bool Object::last(const StaticString &name, const StaticString **string) const noexcept
-{
-	const Node *last_node = last(name);
-	return last_node->exists() && !last_node->is_empty() && last_node->first()->get(string);
 }
 
 size_t Object::size() const noexcept

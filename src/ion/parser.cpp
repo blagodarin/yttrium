@@ -2,6 +2,9 @@
 
 #include "logging.h"
 
+#include <Yttrium/ion/document.h>
+#include <Yttrium/ion/node.h>
+
 namespace Yttrium
 {
 
@@ -9,7 +12,7 @@ namespace Ion
 {
 
 Parser::Parser(Document *document)
-	: _document(*document)
+	: _document(document)
 {
 }
 
@@ -17,7 +20,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 {
 	Y_LOG_TRACE(S("ion: Parsing:\n") << string);
 
-	_states.push_back(State(&_document));
+	_states.push_back(State(_document));
 	_state = &_states.back();
 
 	for (const char *src = string.text(); ; )

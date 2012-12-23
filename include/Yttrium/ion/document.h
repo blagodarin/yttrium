@@ -4,13 +4,7 @@
 #ifndef __Y_ION_DOCUMENT_H
 #define __Y_ION_DOCUMENT_H
 
-#include <Yttrium/ion/node.h>
 #include <Yttrium/ion/object.h>
-#include <Yttrium/ion/value.h>
-#include <Yttrium/pool.h>
-
-// NOTE: We don't need Pool in the interface but are still forced to include it
-// along with Node and Value.
 
 namespace Yttrium
 {
@@ -18,7 +12,7 @@ namespace Yttrium
 namespace Ion
 {
 
-class Parser;
+class List;
 
 ///
 
@@ -42,13 +36,13 @@ public:
 
 	///
 
-	inline ~Document() noexcept;
+	~Document() noexcept;
 
 public:
 
 	///
 
-	inline Allocator *allocator() const noexcept;
+	Allocator *allocator() const noexcept;
 
 	///
 
@@ -70,41 +64,13 @@ public:
 
 private:
 
-	Y_PRIVATE Value *new_list_value() noexcept;
-	Y_PRIVATE Node *new_node(const StaticString &name) noexcept;
-	Y_PRIVATE Node *new_node(const StaticString &name, const ByReference &) noexcept;
-	Y_PRIVATE Object *new_object() noexcept;
-	Y_PRIVATE Value *new_object_value(Object *object) noexcept;
-	Y_PRIVATE Value *new_value(const StaticString &text) noexcept;
-	Y_PRIVATE Value *new_value(const StaticString &name, const ByReference &) noexcept;
+	class Private;
 
-private:
-
-	typedef Pool<Object> Objects;
-	typedef Pool<Node>   Nodes;
-	typedef Pool<Value>  Values;
-
-private:
-
-	Allocator *_allocator;
-	String     _buffer;
-	Objects    _objects;
-	Nodes      _nodes;
-	Values     _values;
+	Private *_private;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Document::~Document() noexcept
-{
-	clear();
-}
-
-Allocator *Document::allocator() const noexcept
-{
-	return _allocator;
-}
 
 Document &Document::operator =(const Document &document) noexcept
 {
