@@ -86,7 +86,10 @@ void Commands::move_right(const StaticString &name, String *, const ScriptArgs &
 
 void Commands::play_music(const StaticString &, String *, const ScriptArgs &) noexcept
 {
-	// TODO: Implement.
+	if (!_game->_audio.player().is_playing())
+		_game->_audio.player().play();
+	else
+		_game->_audio.player().pause();
 }
 
 void Commands::pop_scene(const StaticString &, String *, const ScriptArgs &args) noexcept
@@ -139,7 +142,7 @@ void Commands::snap(const StaticString &, String *, const ScriptArgs &) noexcept
 
 void Commands::stop_music(const StaticString &, String *, const ScriptArgs &) noexcept
 {
-	// TODO: Implement.
+	_game->_audio.player().stop();
 }
 
 void Commands::tgcon(const StaticString &, String *, const ScriptArgs &) noexcept
