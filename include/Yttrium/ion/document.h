@@ -48,6 +48,10 @@ public:
 
 	///
 
+	inline Allocator *allocator() const noexcept;
+
+	///
+
 	void clear() noexcept;
 
 	///
@@ -95,6 +99,11 @@ private:
 Document::~Document() noexcept
 {
 	clear();
+}
+
+Allocator *Document::allocator() const noexcept
+{
+	return _allocator;
 }
 
 Document &Document::operator =(const Document &document) noexcept

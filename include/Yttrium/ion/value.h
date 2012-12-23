@@ -32,7 +32,7 @@ public:
 	{
 		StringType, ///<
 		ListType,   ///<
-		ObjectType  ///<
+		ObjectType, ///<
 	};
 
 public:
@@ -87,6 +87,14 @@ public:
 
 	///
 
+	void serialize(String *result, int indentation = 0) const noexcept;
+
+	///
+
+	String serialize(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+
+	///
+
 	inline const StaticString &string() const noexcept;
 
 	///
@@ -96,14 +104,6 @@ public:
 	///
 
 	inline const Object *object() const noexcept;
-
-	///
-
-	void to_string(String *result, int indentation = 0) const noexcept;
-
-	///
-
-	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
 
 private:
 

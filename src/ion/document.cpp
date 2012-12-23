@@ -63,7 +63,7 @@ void Document::save(const StaticString &name, int indentation) const
 	{
 		String buffer(_allocator);
 
-		to_string(&buffer, (indentation > 0 ? 0 : indentation), true);
+		serialize(&buffer, (indentation > 0 ? 0 : indentation), true);
 
 		file.truncate();
 		file.write(buffer.text(), buffer.size());

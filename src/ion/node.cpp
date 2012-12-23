@@ -16,7 +16,7 @@ Node::Node()
 {
 }
 
-void Node::to_string(String *result, int indentation) const
+void Node::serialize(String *result, int indentation) const
 {
 	if (indentation > 0)
 	{
@@ -25,16 +25,22 @@ void Node::to_string(String *result, int indentation) const
 	result->append(_name);
 	if (!is_empty())
 	{
-		List::to_string(result, indentation, true);
+		List::serialize(result, indentation, true);
 	}
 }
 
-String Node::to_string(int indentation, Allocator *allocator) const noexcept
+String Node::serialize(int indentation, Allocator *allocator) const noexcept
 {
-	String result(allocator ? allocator : _name.allocator()); // NOTE: Wrong allocator?
+	String result(allocator ? allocator : document()->allocator());
 
-	to_string(&result, indentation);
+	serialize(&result, indentation);
 	return result;
+}
+
+StaticString Node::string(const StaticString& default_value) const noexcept
+{
+	const Value *value = first();
+	return (value && value->is_string()) ? value->string() : default_value;
 }
 
 Node::Node(Document *document, const StaticString &name)

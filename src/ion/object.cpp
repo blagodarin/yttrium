@@ -12,7 +12,7 @@ namespace Ion
 
 Node *Object::append(const StaticString &name)
 {
-	Node *node = _document.new_node(name);
+	Node *node = _document->new_node(name);
 	_nodes.push_back(node);
 	_node_map[node->_name].push_back(node);
 	return node;
@@ -100,27 +100,27 @@ const Node *Object::last(const StaticString &name) const
 	return &null_node;
 }
 
-void Object::to_string(String *result, int indentation) const
+void Object::serialize(String *result, int indentation) const
 {
-	to_string(result, indentation, false);
+	serialize(result, indentation, false);
 }
 
-String Object::to_string(int indentation, Allocator *allocator) const
+String Object::serialize(int indentation, Allocator *allocator) const
 {
-	String result(allocator ? allocator : _document._allocator);
+	String result(allocator ? allocator : _document->allocator());
 
-	to_string(&result, indentation);
+	serialize(&result, indentation);
 	return result;
 }
 
 Object::Object(Document *document)
-	: _document(*document)
+	: _document(document)
 {
 }
 
 Node *Object::append(const StaticString &name, const ByReference &)
 {
-	Node *node = _document.new_node(name, ByReference());
+	Node *node = _document->new_node(name, ByReference());
 	_nodes.push_back(node);
 	_node_map[node->_name].push_back(node); // NOTE: Possible Allocator-less String construction.
 	return node;
@@ -132,11 +132,11 @@ void Object::clear()
 	_nodes.clear();
 }
 
-void Object::to_string(String *result, int indentation, bool document) const
+void Object::serialize(String *result, int indentation, bool is_document) const
 {
 	if (indentation < 0)
 	{
-		if (!document)
+		if (!is_document)
 		{
 			result->append('{');
 		}
@@ -147,30 +147,30 @@ void Object::to_string(String *result, int indentation, bool document) const
 			{
 				result->append(' ');
 			}
-			(*i)->to_string(result, indentation);
+			(*i)->serialize(result, indentation);
 		}
 
-		if (!document)
+		if (!is_document)
 		{
 			result->append('}');
 		}
 	}
 	else
 	{
-		if (!document)
+		if (!is_document)
 		{
 			result->append('\n').append('\t', indentation).append(S("{\n"));
 		}
 
-		int node_indentation = (document ? indentation : indentation + 1);
+		int node_indentation = indentation + !is_document;
 
 		for (Nodes::const_iterator i = _nodes.begin(); i != _nodes.end(); ++i)
 		{
-			(*i)->to_string(result, node_indentation);
+			(*i)->serialize(result, node_indentation);
 			result->append('\n');
 		}
 
-		if (!document)
+		if (!is_document)
 		{
 			result->append('\t', indentation).append('}');
 		}

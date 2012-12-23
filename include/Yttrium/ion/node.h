@@ -37,11 +37,15 @@ public:
 
 	///
 
-	void to_string(String *result, int indentation = 0) const noexcept;
+	void serialize(String *result, int indentation = 0) const noexcept;
 
 	///
 
-	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+	String serialize(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+
+	///
+
+	StaticString string(const StaticString& default_value = StaticString()) const noexcept;
 
 private:
 

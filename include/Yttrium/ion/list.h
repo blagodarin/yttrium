@@ -63,6 +63,12 @@ public:
 
 		inline size_t size() const noexcept;
 
+	public:
+
+		///
+
+		inline Value *operator ->() const noexcept;
+
 	private:
 
 		inline Range(Value *first, Value *last, size_t size) noexcept;
@@ -108,6 +114,12 @@ public:
 
 		inline size_t size() const noexcept;
 
+	public:
+
+		///
+
+		inline const Value *operator ->() const noexcept;
+
 	private:
 
 		inline ConstRange(const Value *first, const Value *last, size_t size) noexcept;
@@ -151,6 +163,10 @@ public:
 
 	///
 
+	inline const Document *document() const noexcept;
+
+	///
+
 	inline bool exists() const noexcept;
 
 	///
@@ -171,19 +187,19 @@ public:
 
 	///
 
+	inline void serialize(String *result, int indentation = 0) const noexcept;
+
+	///
+
+	String serialize(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+
+	///
+
+	String serialize(Allocator *allocator) const noexcept;
+
+	///
+
 	inline size_t size() const noexcept;
-
-	///
-
-	inline void to_string(String *result, int indentation = 0) const noexcept;
-
-	///
-
-	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
-
-	///
-
-	String to_string(Allocator *allocator) const noexcept;
 
 	///
 
@@ -197,7 +213,7 @@ protected:
 
 	inline List(Document *document) noexcept;
 
-	Y_PRIVATE void to_string(String *result, int indentation, bool node) const noexcept;
+	Y_PRIVATE void serialize(String *result, int indentation, bool is_node) const noexcept;
 
 private:
 
@@ -243,6 +259,11 @@ size_t List::Range::size() const noexcept
 	return _size;
 }
 
+Value *List::Range::operator ->() const noexcept
+{
+	return _first;
+}
+
 List::Range::Range(Value *first, Value *last, size_t size) noexcept
 	: _first(first)
 	, _last(last)
@@ -280,6 +301,11 @@ size_t List::ConstRange::size() const noexcept
 	return _size;
 }
 
+const Value *List::ConstRange::operator ->() const noexcept
+{
+	return _first;
+}
+
 List::ConstRange::ConstRange(const Value *first, const Value *last, size_t size) noexcept
 	: _first(first)
 	, _last(last)
@@ -292,6 +318,11 @@ List::ConstRange::ConstRange(const Value *first, const Value *last, size_t size)
 List::ConstRange List::const_values() const noexcept
 {
 	return ConstRange(_first, _last, _size);
+}
+
+const Document *List::document() const noexcept
+{
+	return _document;
 }
 
 bool List::exists() const noexcept
@@ -319,9 +350,9 @@ size_t List::size() const noexcept
 	return _size;
 }
 
-void List::to_string(String *result, int indentation) const noexcept
+void List::serialize(String *result, int indentation) const noexcept
 {
-	to_string(result, indentation, false);
+	serialize(result, indentation, false);
 }
 
 List::Range List::values() noexcept

@@ -57,7 +57,7 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 			for (Ion::List::ConstRange s = value.list().values(); !s.is_empty(); s.pop_first())
 			{
-				if (!s.first().is_string())
+				if (!s->is_string())
 				{
 					return false;
 				}
@@ -102,7 +102,7 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 	if (!result_classes.is_empty())
 	{
-		result_classes.first().get(&result_class);
+		result_classes->get(&result_class);
 	}
 
 	*object = result_object;
@@ -232,7 +232,7 @@ void IonLoader::load(const Ion::Object &source)
 		{
 			Ion::List::ConstRange s = node.values();
 
-			if (s.size() != 2 || !s.first().is_list() || !s.last().is_string())
+			if (s.size() != 2 || !s->is_list() || !s.last().is_string())
 			{
 				Y_LOG("[Gui.Manager] Bad 'on_scene_change'");
 				continue;
@@ -242,9 +242,9 @@ void IonLoader::load(const Ion::Object &source)
 			const StaticString *to;
 			const StaticString *action;
 
-			Ion::List::ConstRange t = s.first().list().values();
+			Ion::List::ConstRange t = s->list().values();
 
-			if (t.size() != 2 || !t.first().get(&from) || !t.last().get(&to)
+			if (t.size() != 2 || !t->get(&from) || !t.last().get(&to)
 				|| !s.last().get(&action))
 			{
 				Y_LOG("[Gui.Manager] Bad 'on_scene_change'");
@@ -314,10 +314,10 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 		{
 			Ion::Node::ConstRange s = node.values();
 
-			if (s.size() == 2 && s.first().type() == Ion::Value::StringType
+			if (s.size() == 2 && s->type() == Ion::Value::StringType
 				&& s.last().type() == Ion::Value::StringType)
 			{
-				scene->bind(s.first().string(), s.last().string());
+				scene->bind(s->string(), s.last().string());
 			}
 		}
 		else

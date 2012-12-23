@@ -151,7 +151,7 @@ bool Game::load()
 	{
 		const Ion::List *entry;
 
-		CHECK(r.first().get(&entry) && entry->size() == 2);
+		CHECK(r->get(&entry) && entry->size() == 2);
 
 		float x;
 		float y;
@@ -176,29 +176,22 @@ void Game::load_music()
 
 	for (Ion::Node::ConstRange r = data.last("music")->values(); !r.is_empty(); r.pop_first())
 	{
-		const Ion::Object *entry;
+		const Ion::Object *entry = r->object();
 
-		if (!r.first().get(&entry))
+		if (!entry)
 			continue;
 
-		const StaticString *file;
+		StaticString file = entry->last("file")->string();
 
-		if (entry->last("file", &file))
+		if (!file.is_empty())
 		{
-			const StaticString *begin;
-			const StaticString *end;
-			const StaticString *loop;
-
 			AudioPlayer::Settings settings;
 
-			if (entry->last("begin", &begin))
-				settings.begin = begin->to_time();
-			if (entry->last("end", &end))
-				settings.end = end->to_time();
-			if (entry->last("loop", &loop))
-				settings.loop = loop->to_time();
+			settings.begin = entry->last("begin")->string().to_time();
+			settings.end = entry->last("end")->string().to_time();
+			settings.loop = entry->last("loop")->string().to_time();
 
-			_audio.player().load(*file, settings);
+			_audio.player().load(file, settings);
 		}
 	}
 

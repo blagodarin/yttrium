@@ -96,23 +96,23 @@ bool List::first(const StaticString **value) const
 	return false;
 }
 
-String List::to_string(int indentation, Allocator *allocator) const
+String List::serialize(int indentation, Allocator *allocator) const
 {
-	String result(allocator ? allocator : _document->_allocator);
+	String result(allocator ? allocator : _document->allocator());
 
-	to_string(&result, indentation, false);
+	serialize(&result, indentation, false);
 	return result;
 }
 
-String List::to_string(Allocator *allocator) const
+String List::serialize(Allocator *allocator) const
 {
-	String result(allocator ? allocator : _document->_allocator);
+	String result(allocator ? allocator : _document->allocator());
 
-	to_string(&result, 0, false);
+	serialize(&result, 0, false);
 	return result;
 }
 
-void List::to_string(String *result, int indentation, bool node) const
+void List::serialize(String *result, int indentation, bool node) const
 {
 	if (!node)
 	{
@@ -130,7 +130,7 @@ void List::to_string(String *result, int indentation, bool node) const
 
 		for (; ; )
 		{
-			value->to_string(result, indentation);
+			value->serialize(result, indentation);
 			value = value->_next;
 			if (!value)
 			{

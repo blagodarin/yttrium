@@ -104,6 +104,10 @@ public:
 
 	///
 
+	inline const Document *document() const noexcept;
+
+	///
+
 	const Node *first() const noexcept;
 
 	///
@@ -140,15 +144,15 @@ public:
 
 	///
 
+	void serialize(String *result, int indentation = 0) const noexcept;
+
+	///
+
+	String serialize(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+
+	///
+
 	inline size_t size() const noexcept;
-
-	///
-
-	void to_string(String *result, int indentation = 0) const noexcept;
-
-	///
-
-	String to_string(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
 
 private:
 
@@ -158,7 +162,7 @@ private:
 
 	Y_PRIVATE Node *append(const StaticString &name, const ByReference &) noexcept;
 	Y_PRIVATE void clear() noexcept;
-	Y_PRIVATE void to_string(String *result, int indentation, bool document) const noexcept;
+	Y_PRIVATE void serialize(String *result, int indentation, bool is_document) const noexcept;
 
 private:
 
@@ -167,7 +171,7 @@ private:
 
 private:
 
-	Document &_document;
+	Document *_document;
 	Nodes     _nodes;
 	NodeMap   _node_map;
 };
@@ -218,6 +222,11 @@ Object::ConstRange::ConstRange(const Node *const *first, const Node *const *last
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const Document *Object::document() const noexcept
+{
+	return _document;
+}
 
 bool Object::is_empty() const noexcept
 {

@@ -32,7 +32,7 @@ unsigned read_color(Vector4f *color, const Ion::Node &node, unsigned inherit)
 		{
 			const StaticString *value;
 
-			if (values.first().get(&value) && value->to_number(color->data() + i))
+			if (values->get(&value) && value->to_number(color->data() + i))
 			{
 				result |= 1 << i;
 			}
@@ -62,7 +62,7 @@ unsigned read_position(Vector3f *position, const Ion::Node &node, unsigned inher
 		{
 			const StaticString *value;
 
-			if (values.first().get(&value) && value->to_number(position->data() + i))
+			if (values->get(&value) && value->to_number(position->data() + i))
 			{
 				result |= 1 << i;
 			}
@@ -92,7 +92,7 @@ unsigned read_size(Vector2f *size, const Ion::Node &node, unsigned inherit)
 		{
 			const StaticString *value;
 
-			if (values.first().get(&value) && value->to_number(size->data() + i))
+			if (values->get(&value) && value->to_number(size->data() + i))
 			{
 				result |= 1 << i;
 			}
@@ -421,7 +421,7 @@ bool IonPropertyLoader::load_alignment(Alignment *alignment, const Ion::Node &no
 	{
 		const StaticString *value;
 
-		if (!values.first().get(&value))
+		if (!values->get(&value))
 		{
 			return false;
 		}
@@ -486,7 +486,7 @@ bool IonPropertyLoader::load_scaling(Scaling *scaling, const Ion::Node &node)
 
 	const StaticString *value;
 
-	if (!values.first().get(&value))
+	if (!values->get(&value))
 	{
 		return false;
 	}
@@ -530,7 +530,7 @@ bool IonPropertyLoader::load_state(WidgetState *state, const Ion::Node &node)
 
 	const StaticString *value;
 
-	if (!values.first().get(&value))
+	if (!values->get(&value))
 	{
 		return false;
 	}
@@ -581,7 +581,7 @@ bool IonPropertyLoader::load_texture(Texture2D *texture, const Ion::Node &node,
 
 	const StaticString *texture_name;
 
-	if (!values.first().get(&texture_name))
+	if (!values->get(&texture_name))
 	{
 		return false;
 	}
@@ -599,7 +599,7 @@ bool IonPropertyLoader::load_texture(Texture2D *texture, const Ion::Node &node,
 		{
 			const StaticString *value;
 
-			if (!values.first().get(&value))
+			if (!values->get(&value))
 			{
 				return false;
 			}
