@@ -4,8 +4,6 @@
 
 #include "screen.h"
 
-#include <Yttrium/log.h> // TODO: Remove.
-
 namespace Yttrium
 {
 
