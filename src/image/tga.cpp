@@ -95,15 +95,11 @@ bool TgaReader::open()
 
 			if (!alpha && header.image.pixel_depth == 24)
 			{
-				_format.depth = 1;
-				_format.channels = 3;
-				_format.pixel_format = PixelFormat::Bgr;
+				_format.set_pixel_format(PixelFormat::Bgr, 24);
 			}
 			else if (alpha == 8 && header.image.pixel_depth == 32)
 			{
-				_format.depth = 1;
-				_format.channels = 4;
-				_format.pixel_format = PixelFormat::Bgra;
+				_format.set_pixel_format(PixelFormat::Bgra, 32);
 			}
 			else
 			{
@@ -112,24 +108,22 @@ bool TgaReader::open()
 		}
 		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
 		{
-			_format.depth = 1;
-			_format.channels = 1;
-			_format.pixel_format = PixelFormat::Gray;
+			_format.set_pixel_format(PixelFormat::Gray, 8);
 		}
 		else
 		{
 			break;
 		}
 
-		_format.width = header.image.width;
-		_format.height = header.image.height;
+		_format.set_width(header.image.width);
+		_format.set_height(header.image.height);
 
 		switch (header.image.descriptor & tgaOriginMask)
 		{
-		case tgaBottomLeft:  _format.orientation = ImageOrientation::XRightYUp;   break;
-		case tgaBottomRight: _format.orientation = ImageOrientation::XLeftYUp;    break;
-		case tgaTopLeft:     _format.orientation = ImageOrientation::XRightYDown; break;
-		case tgaTopRight:    _format.orientation = ImageOrientation::XLeftYDown;  break;
+		case tgaBottomLeft:  _format.set_orientation(ImageOrientation::XRightYUp);   break;
+		case tgaBottomRight: _format.set_orientation(ImageOrientation::XLeftYUp);    break;
+		case tgaTopLeft:     _format.set_orientation(ImageOrientation::XRightYDown); break;
+		case tgaTopRight:    _format.set_orientation(ImageOrientation::XLeftYDown);  break;
 		}
 
 		if (header.id_length)
@@ -150,64 +144,52 @@ bool TgaReader::open()
 
 bool TgaReader::read(void *buffer, size_t frame_size)
 {
-	return (_file.read(buffer, frame_size) == frame_size);
+	return _file.read(buffer, frame_size) == frame_size;
 }
 
 ImageFormatFlags TgaWriter::set_format(const ImageFormat &format)
 {
 	ImageFormatFlags result = 0;
 
-	if (format.depth != 1)
+	switch (format.pixel_format())
 	{
-		result |= ImageFormat::DepthFlag;
-	}
+	case PixelFormat::Gray:
 
-	switch (format.channels)
-	{
-	case 1:
-
-		if (format.pixel_format != PixelFormat::Gray)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 8)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
-	case 3:
+	case PixelFormat::Bgr:
 
-		if (format.pixel_format != PixelFormat::Bgr)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 24)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
-	case 4:
+	case PixelFormat::Bgra:
 
-		if (format.pixel_format != PixelFormat::Bgra)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 32)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
 	default:
 
-		result |= ImageFormat::ChannelsFlag | ImageFormat::PixelFormatFlag;
-		break;
+		result |= ImageFormat::PixelFormatFlag;
 	}
 
-	if (format.orientation != ImageOrientation::XRightYDown
-		&& format.orientation != ImageOrientation::XRightYUp
-		&& format.orientation != ImageOrientation::XLeftYDown
-		&& format.orientation != ImageOrientation::XLeftYUp)
+	if (format.orientation() != ImageOrientation::XRightYDown
+		&& format.orientation() != ImageOrientation::XRightYUp
+		&& format.orientation() != ImageOrientation::XLeftYDown
+		&& format.orientation() != ImageOrientation::XLeftYUp)
 	{
 		result |= ImageFormat::OrientationFlag;
 	}
 
-	if (!format.width || format.width > UINT16_MAX)
+	if (!format.width() || format.width() > UINT16_MAX)
 	{
 		result |= ImageFormat::WidthFlag;
 	}
 
-	if (!format.height || format.height > UINT16_MAX)
+	if (!format.height() || format.height() > UINT16_MAX)
 	{
 		result |= ImageFormat::HeightFlag;
 	}
@@ -221,36 +203,18 @@ bool TgaWriter::write(const void *buffer, size_t frame_size)
 
 	header.id_length = 0;
 	header.color_map_type = tgaNoColorMap;
-	header.image_type = (_format.pixel_format == PixelFormat::Gray
-		? tgaBlackAndWhite
-		: tgaTrueColor);
+	header.image_type = (_format.pixel_format() == PixelFormat::Gray) ? tgaBlackAndWhite : tgaTrueColor;
 	header.color_map.first_entry_index = 0;
 	header.color_map.length = 0;
 	header.color_map.entry_size = 0;
 	header.image.x = 0;
 	header.image.y = 0;
-	header.image.width = _format.width;
-	header.image.height = _format.height;
+	header.image.width = _format.width();
+	header.image.height = _format.height();
+	header.image.pixel_depth = _format.bits_per_pixel();
+	header.image.descriptor = (_format.pixel_format() == PixelFormat::Bgra) ? 8 : 0;
 
-	if (_format.pixel_format == PixelFormat::Bgra)
-	{
-		header.image.pixel_depth = 32;
-		header.image.descriptor = 8;
-	}
-	else
-	{
-		if (_format.pixel_format == PixelFormat::Gray)
-		{
-			header.image.pixel_depth = 8;
-		}
-		else
-		{
-			 header.image.pixel_depth = 24;
-		}
-		header.image.descriptor = 0;
-	}
-
-	switch (_format.orientation)
+	switch (_format.orientation())
 	{
 	case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft;     break;
 	case ImageOrientation::XRightYUp:   header.image.descriptor |= tgaBottomLeft;  break;

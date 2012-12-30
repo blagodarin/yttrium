@@ -59,66 +59,55 @@ ImageFormatFlags PngWriter::set_format(const ImageFormat &format)
 {
 	ImageFormatFlags result = 0;
 
-	if (format.depth != 1 && format.depth != 2)
+	switch (format.pixel_format())
 	{
-		result |= ImageFormat::DepthFlag;
-	}
+	case PixelFormat::Gray:
 
-	switch (format.channels)
-	{
-	case 1:
-
-		if (format.pixel_format != PixelFormat::Gray)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
-	case 2:
+	case PixelFormat::GrayAlpha:
+	case PixelFormat::AlphaGray:
 
-		if (format.pixel_format != PixelFormat::GrayAlpha && format.pixel_format != PixelFormat::AlphaGray)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
-	case 3:
+	case PixelFormat::Rgb:
+	case PixelFormat::Bgr:
 
-		if (format.pixel_format != PixelFormat::Rgb && format.pixel_format != PixelFormat::Bgr)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
-	case 4:
+	case PixelFormat::Rgba:
+	case PixelFormat::Bgra:
+	case PixelFormat::Argb:
+	case PixelFormat::Abgr:
 
-		if (format.pixel_format != PixelFormat::Rgba
-			&& format.pixel_format != PixelFormat::Bgra
-			&& format.pixel_format != PixelFormat::Argb
-			&& format.pixel_format != PixelFormat::Abgr)
-		{
-			result |= ImageFormat::PixelFormatFlag;
-		}
+		if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
+			result |= ImageFormat::BitsPerPixelFlag;
 		break;
 
 	default:
 
-		result |= ImageFormat::ChannelsFlag | ImageFormat::PixelFormatFlag;
+		result |= ImageFormat::PixelFormatFlag;
 		break;
 	}
 
-	if (format.orientation != ImageOrientation::XRightYDown
-		&& format.orientation != ImageOrientation::XRightYUp)
+	if (format.orientation() != ImageOrientation::XRightYDown
+		&& format.orientation() != ImageOrientation::XRightYUp)
 	{
 		result |= ImageFormat::OrientationFlag;
 	}
 
-	if (!format.width)
+	if (!format.width())
 	{
 		result |= ImageFormat::WidthFlag;
 	}
 
-	if (!format.height)
+	if (!format.height())
 	{
 		result |= ImageFormat::HeightFlag;
 	}
@@ -130,56 +119,60 @@ bool PngWriter::write(const void *buffer, size_t frame_size)
 {
 	Y_UNUSED(frame_size);
 
-	int color_type;
+	int color_type = 0;
 	int transforms = 0;
 
-	if (_format.depth == 2)
+	if (_format.pixel_format() == PixelFormat::AlphaGray
+		|| _format.pixel_format() == PixelFormat::Argb
+		|| _format.pixel_format() == PixelFormat::Abgr)
 	{
-		transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
+		transforms |= PNG_TRANSFORM_SWAP_ALPHA;
 	}
 
-	switch (_format.channels)
+	if (_format.pixel_format() == PixelFormat::Bgr
+		|| _format.pixel_format() == PixelFormat::Bgra
+		|| _format.pixel_format() == PixelFormat::Abgr)
 	{
-	case 1:
+		transforms |= PNG_TRANSFORM_BGR;
+	}
 
+	switch (_format.pixel_format())
+	{
+	case PixelFormat::Gray:
+
+		if (_format.bits_per_pixel() > 8)
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
 		color_type = PNG_COLOR_TYPE_GRAY;
 		break;
 
-	case 2:
+	case PixelFormat::GrayAlpha:
+	case PixelFormat::AlphaGray:
 
-		if (_format.pixel_format == PixelFormat::AlphaGray)
-		{
-			transforms |= PNG_TRANSFORM_SWAP_ALPHA;
-		}
+		if (_format.bits_per_pixel() > 16)
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
 		color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
 		break;
 
-	case 3:
+	case PixelFormat::Rgb:
+	case PixelFormat::Bgr:
 
-		if (_format.pixel_format == PixelFormat::Bgr)
-		{
-			transforms |= PNG_TRANSFORM_BGR;
-		}
+		if (_format.bits_per_pixel() > 24)
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
 		color_type = PNG_COLOR_TYPE_RGB;
 		break;
 
-	case 4:
+	case PixelFormat::Rgba:
+	case PixelFormat::Bgra:
+	case PixelFormat::Argb:
+	case PixelFormat::Abgr:
 
-		if (_format.pixel_format == PixelFormat::Bgra
-			|| _format.pixel_format == PixelFormat::Abgr)
-		{
-			transforms |= PNG_TRANSFORM_BGR;
-		}
-		if (_format.pixel_format == PixelFormat::Argb
-			|| _format.pixel_format == PixelFormat::Abgr)
-		{
-			transforms |= PNG_TRANSFORM_SWAP_ALPHA;
-		}
+		if (_format.bits_per_pixel() > 32)
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 		break;
 	}
 
-	png_bytepp rows = _allocator->allocate<png_bytep>(_format.height);
+	png_bytepp rows = _allocator->allocate<png_bytep>(_format.height());
 
 	if (setjmp(png_jmpbuf(_png)))
 	{
@@ -188,23 +181,21 @@ bool PngWriter::write(const void *buffer, size_t frame_size)
 	}
 
 	png_set_compression_level(_png, 0);
-	png_set_IHDR(_png, _info, _format.width, _format.height, _format.depth * 8,
+	png_set_IHDR(_png, _info, _format.width(), _format.height(), _format.bits_per_channel(),
 		color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-	size_t row_size = _format.width * _format.channels * _format.depth;
 
 	size_t j = 0;
 
-	if (_format.orientation == ImageOrientation::XRightYDown)
+	if (_format.orientation() == ImageOrientation::XRightYDown)
 	{
-		for (size_t i = 0; i < _format.height; i++, j += row_size)
+		for (size_t i = 0; i < _format.height(); i++, j += _format.row_size())
 		{
 			rows[i] = const_cast<png_bytep>(static_cast<png_const_bytep>(buffer) + j);
 		}
 	}
 	else
 	{
-		for (size_t i = _format.height; i > 0; i--, j += row_size)
+		for (size_t i = _format.height(); i > 0; i--, j += _format.row_size())
 		{
 			rows[i - 1] = const_cast<png_bytep>(static_cast<png_const_bytep>(buffer) + j);
 		}

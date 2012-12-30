@@ -85,49 +85,97 @@ typedef uint_fast8_t ImageFormatFlags;
 
 /// Image format.
 
-class ImageFormat
+class Y_API ImageFormat
 {
 public:
 
 	enum: ImageFormatFlags
 	{
-		DepthFlag       = 1 << 0, ///< Depth flag.
-		ChannelsFlag    = 1 << 1, ///< Channels flag.
-		PixelFormatFlag = 1 << 2, ///< Pixel format flag.
-		OrientationFlag = 1 << 3, ///< Orientation flag.
-		WidthFlag       = 1 << 4, ///< Width flag.
-		HeightFlag      = 1 << 5, ///< Height flag.
+		PixelFormatFlag  = 1 << 0, ///< Pixel format flag.
+		BitsPerPixelFlag = 1 << 1, ///< Bits per pixel flag.
+		OrientationFlag  = 1 << 2, ///< Orientation flag.
+		WidthFlag        = 1 << 3, ///< Width flag.
+		HeightFlag       = 1 << 4, ///< Height flag.
 
 		/// All flags.
 
-		AllFlags = DepthFlag | ChannelsFlag | PixelFormatFlag
-			| OrientationFlag | WidthFlag | HeightFlag,
+		AllFlags = PixelFormatFlag | BitsPerPixelFlag | OrientationFlag | WidthFlag | HeightFlag,
 	};
 
 public:
 
-	uint_fast8_t     depth;        ///< Bytes per channel, usually 1.
-	uint_fast8_t     channels;     ///< Channels per pixel.
-	PixelFormat      pixel_format; ///< Pixel format.
-	ImageOrientation orientation;  ///< Image orientation.
-	size_t           width;        ///< Image width.
-	size_t           height;       ///< Image height.
+	///
+
+	ImageFormat() noexcept;
 
 public:
 
 	///
 
-	size_t frame_size() const noexcept
-	{
-		return depth * channels * width * height;
-	}
+	inline size_t bits_per_channel() const noexcept;
 
 	///
 
-	size_t row_size() const noexcept
-	{
-		return depth * channels * width;
-	}
+	inline size_t bits_per_pixel() const noexcept;
+
+	///
+
+	inline size_t channels() const noexcept;
+
+	///
+
+	inline size_t frame_size() const noexcept;
+
+	///
+
+	inline size_t height() const noexcept;
+
+	///
+
+	inline ImageOrientation orientation() const noexcept;
+
+	///
+
+	inline PixelFormat pixel_format() const noexcept;
+
+	///
+
+	inline size_t row_size() const noexcept;
+
+	///
+
+	inline void set_height(size_t height) noexcept;
+
+	///
+
+	inline void set_orientation(ImageOrientation orientation) noexcept;
+
+	///
+
+	void set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel) noexcept;
+
+	///
+
+	void set_row_alignment(size_t row_alignment) noexcept;
+
+	///
+
+	inline void set_width(size_t width) noexcept;
+
+	///
+
+	inline size_t width() const noexcept;
+
+private:
+
+	PixelFormat      _pixel_format;
+	size_t           _channels;
+	size_t           _bits_per_pixel;
+	ImageOrientation _orientation;
+	size_t           _width;
+	size_t           _row_alignment;
+	size_t           _row_size;
+	size_t           _height;
 };
 
 /// Read-only audio file access interface.
@@ -287,6 +335,70 @@ private:
 
 	Private *_private;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+size_t ImageFormat::bits_per_channel() const noexcept
+{
+	return _bits_per_pixel % _channels ? 0 : _bits_per_pixel / _channels;
+}
+
+size_t ImageFormat::bits_per_pixel() const noexcept
+{
+	return _bits_per_pixel;
+}
+
+size_t ImageFormat::channels() const noexcept
+{
+	return _channels;
+}
+
+size_t ImageFormat::frame_size() const noexcept
+{
+	return _row_size * _height;
+}
+
+size_t ImageFormat::height() const noexcept
+{
+	return _height;
+}
+
+ImageOrientation ImageFormat::orientation() const noexcept
+{
+	return _orientation;
+}
+
+PixelFormat ImageFormat::pixel_format() const noexcept
+{
+	return _pixel_format;
+}
+
+size_t ImageFormat::row_size() const noexcept
+{
+	return _row_size;
+}
+
+void ImageFormat::set_height(size_t height) noexcept
+{
+	_height = height;
+}
+
+void ImageFormat::set_orientation(ImageOrientation orientation) noexcept
+{
+	_orientation = orientation;
+}
+
+void ImageFormat::set_width(size_t width) noexcept
+{
+	_width = width;
+	set_row_alignment(_row_alignment);
+}
+
+size_t ImageFormat::width() const noexcept
+{
+	return _width;
+}
 
 } // namespace Yttrium
 

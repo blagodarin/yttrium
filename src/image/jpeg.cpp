@@ -47,12 +47,11 @@ bool JpegReader::open()
 
 	jpeg_calc_output_dimensions(&_decompressor);
 
-	_format.depth = 1;
-	_format.channels = 3;
-	_format.pixel_format = PixelFormat::Rgb;
-	_format.width = _decompressor.output_width;
-	_format.height = _decompressor.output_height;
-	_format.orientation = ImageOrientation::XRightYDown;
+	_format.set_pixel_format(PixelFormat::Rgb, 24);
+	_format.set_orientation(ImageOrientation::XRightYDown);
+	_format.set_width(_decompressor.output_width);
+	_format.set_height(_decompressor.output_height);
+
 
 	return true;
 }

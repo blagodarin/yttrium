@@ -24,15 +24,9 @@ int main(int argc, char **argv)
 
 	ImageFormat image_format = input.format();
 
-	if (image_format.pixel_format != PixelFormat::Gray)
+	if (image_format.pixel_format() != PixelFormat::Gray || image_format.bits_per_pixel() != 8)
 	{
-		printf("ERROR: Input image \"%s\" is not grayscale\n", argv[1]);
-		return 1;
-	}
-
-	if (image_format.depth != 1)
-	{
-		printf("ERROR: Input image \"%s\" is not 8-bit\n", argv[1]);
+		printf("ERROR: Input image \"%s\" is not grayscale 8-bit\n", argv[1]);
 		return 1;
 	}
 
@@ -52,8 +46,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	image_format.channels = 4;
-	image_format.pixel_format = PixelFormat::Bgra;
+	image_format.set_pixel_format(PixelFormat::Bgra, 32);
 
 	if (output.set_format(image_format))
 	{

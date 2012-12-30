@@ -9,6 +9,50 @@
 namespace Yttrium
 {
 
+ImageFormat::ImageFormat()
+	: _pixel_format(PixelFormat::Gray)
+	, _channels(1)
+	, _bits_per_pixel(1)
+	, _orientation(ImageOrientation::XRightYDown)
+	, _width(0)
+	, _row_alignment(1)
+	, _row_size(0)
+	, _height(0)
+{
+}
+
+void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel)
+{
+	_pixel_format = pixel_format;
+	_bits_per_pixel = bits_per_pixel;
+
+	switch (pixel_format)
+	{
+	case PixelFormat::Gray:      _channels = 1; break;
+	case PixelFormat::GrayAlpha: _channels = 2; break;
+	case PixelFormat::AlphaGray: _channels = 2; break;
+	case PixelFormat::Rgb:       _channels = 3; break;
+	case PixelFormat::Bgr:       _channels = 3; break;
+	case PixelFormat::Rgba:      _channels = 4; break;
+	case PixelFormat::Bgra:      _channels = 4; break;
+	case PixelFormat::Argb:      _channels = 4; break;
+	case PixelFormat::Abgr:      _channels = 4; break;
+	}
+
+	set_row_alignment(_row_alignment);
+}
+
+void ImageFormat::set_row_alignment(size_t row_alignment)
+{
+//	Y_ASSERT(row_alignment >= 1); // TODO: Do!
+
+	_row_alignment = row_alignment;
+	size_t row_bytes = (_width * _bits_per_pixel + 7) / 8;
+	_row_size = (row_bytes + row_alignment - 1) / row_alignment * row_alignment;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ImageReader::ImageReader(const ImageReader &reader)
 	: _private(Private::copy(reader._private))
 {
@@ -21,9 +65,7 @@ void ImageReader::close()
 
 ImageFormat ImageReader::format() const
 {
-	return _private
-		? _private->_format
-		: ImageFormat();
+	return _private ? _private->_format : ImageFormat();
 }
 
 bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allocator)
@@ -93,6 +135,8 @@ ImageReader &ImageReader::operator =(const ImageReader &reader)
 	return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ImageWriter::ImageWriter(const ImageWriter &reader)
 	: _private(Private::copy(reader._private))
 {
@@ -153,11 +197,12 @@ bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allo
 ImageFormatFlags ImageWriter::set_format(const ImageFormat &format)
 {
 	if (!_private || _private->_is_ready || _private->_is_used)
-	{
 		return ImageFormat::AllFlags;
-	}
 
 	ImageFormatFlags result = _private->set_format(format);
+
+	if (result & ImageFormat::PixelFormatFlag)
+		result |= ImageFormat::BitsPerPixelFlag;
 
 	if (!result)
 	{

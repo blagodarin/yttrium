@@ -37,14 +37,14 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const TextureCache &cac
 		0,                  // PixelFormat::Abgr
 	};
 
-	GLenum data_format = formats[size_t(format.pixel_format)];
-	GLint internal_format = internal_formats[size_t(format.pixel_format)];
+	GLenum data_format = formats[size_t(format.pixel_format())];
+	GLint internal_format = internal_formats[size_t(format.pixel_format())];
 
-	if (format.depth == 1 && data_format)
+	if (format.bits_per_channel() == 8 && data_format)
 	{
 		GLenum target = 0;
 
-		if (_gl.ARB_texture_non_power_of_two || (is_power_of_2(format.width) && is_power_of_2(format.height)))
+		if (_gl.ARB_texture_non_power_of_two || (is_power_of_2(format.width()) && is_power_of_2(format.height())))
 		{
 			target = GL_TEXTURE_2D;
 		}
@@ -62,7 +62,7 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const TextureCache &cac
 			{
 				_gl.BindTexture(target, texture);
 				_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-				_gl.TexImage2D(target, 0, internal_format, format.width, format.height, 0, data_format, GL_UNSIGNED_BYTE, data);
+				_gl.TexImage2D(target, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);
 
 				GLboolean is_target_enabled = _gl.IsEnabled(target);
 				_gl.Enable(target); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].

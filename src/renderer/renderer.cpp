@@ -212,12 +212,10 @@ void Renderer::end_frame()
 
 		ImageFormat format;
 
-		format.depth = 1;
-		format.channels = 3;
-		format.pixel_format = PixelFormat::Bgr;
-		format.orientation = ImageOrientation::XRightYUp;
-		format.width = _private->_viewport_size.x;
-		format.height = _private->_viewport_size.y;
+		format.set_pixel_format(PixelFormat::Bgr, 24);
+		format.set_orientation(ImageOrientation::XRightYUp);
+		format.set_width(_private->_viewport_size.x);
+		format.set_height(_private->_viewport_size.y);
 
 		ImageWriter image(_private->_screenshot_filename, ImageType::Png);
 
