@@ -4,8 +4,27 @@
 
 #include "screen.h"
 
+#include <Yttrium/log.h> // TODO: Remove.
+
 namespace Yttrium
 {
+
+namespace
+{
+
+bool check_glx_version(::Display *display, int major, int minor)
+{
+	int glx_major;
+	int glx_minor;
+
+	return glXQueryVersion(display, &glx_major, &glx_minor)
+		&& glx_major == major // GLX 2.0 may be completely different from GLX 1.x.
+		&& glx_minor >= minor;
+}
+
+} // namespace
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Window::Private::Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, ::GLXContext glx_context, Allocator *allocator)
 	: PrivateBase(allocator)
@@ -53,6 +72,9 @@ void Window::Private::set_fixed_size(int width, int height)
 
 bool Window::Private::create_window(::Display *display, int screen, ::Window *window, ::GLXContext *glx_context)
 {
+	if (!check_glx_version(display, 1, 3)) // For GLXFBConfig.
+		return false;
+
 	const int attributes[] =
 	{
 		GLX_CONFIG_CAVEAT, GLX_NONE,
@@ -70,59 +92,70 @@ bool Window::Private::create_window(::Display *display, int screen, ::Window *wi
 		None
 	};
 
-	int fb_count = 0;
+	int fbc_count = 0;
 
-	::GLXFBConfig *fb_config = ::glXChooseFBConfig(display, screen, attributes, &fb_count);
+	::GLXFBConfig *fbc = ::glXChooseFBConfig(display, screen, attributes, &fbc_count);
+	if (!fbc)
+		return false;
 
-	::XVisualInfo *vi = nullptr;
+	int best_fbc_index = -1;
 
-	if (fb_config)
+	for (int i = 0; i < fbc_count; ++i)
 	{
-		if (fb_count)
+		// The official OpenGL example suggest sorting by GLX_SAMPLE_BUFFERS
+		// and GLX_SAMPLES, but we have no successful experience in using it.
+
+		::XVisualInfo *vi = ::glXGetVisualFromFBConfig(display, fbc[i]);
+		if (vi->depth == 24) // A depth of 32 will give us an ugly result.
 		{
-			int best_config = 0; // TODO: Improve.
-			vi = ::glXGetVisualFromFBConfig(display, fb_config[best_config]);
+			best_fbc_index = i;
+			i = fbc_count; // Finish the loop.
 		}
-		::XFree(fb_config);
+		::XFree(vi);
 	}
 
-	if (vi)
+	::XVisualInfo *vi = (best_fbc_index >= 0)
+		? ::glXGetVisualFromFBConfig(display, fbc[best_fbc_index])
+		: nullptr;
+
+	::XFree(fbc);
+
+	if (!vi)
+		return false;
+
+	screen = vi->screen; // NOTE: Why?
+
+	*glx_context = ::glXCreateContext(display, vi, nullptr, True);
+
+	if (*glx_context)
 	{
-		screen = vi->screen; // NOTE: Why?
-
-		*glx_context = ::glXCreateContext(display, vi, nullptr, True);
-
-		if (*glx_context)
+		if (::glXIsDirect(display, *glx_context))
 		{
-			if (::glXIsDirect(display, *glx_context))
+			::XSetWindowAttributes swa;
+
+			swa.colormap = ::XCreateColormap(display, RootWindow(display, screen), vi->visual, AllocNone);
+			swa.background_pixmap = None;
+			swa.border_pixel = 0;
+			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
+
+			*window = ::XCreateWindow(display, RootWindow(display, screen),
+				0, 0, 320, 240, 0, vi->depth, InputOutput, vi->visual, // NOTE: Magic default.
+				CWBorderPixel | CWColormap | CWEventMask, &swa);
+
+			if (*window != None)
 			{
-				::XSetWindowAttributes swa;
-
-				swa.colormap = ::XCreateColormap(display, RootWindow(display, screen), vi->visual, AllocNone);
-				swa.background_pixmap = None;
-				swa.border_pixel = 0;
-				swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
-
-				*window = ::XCreateWindow(display, RootWindow(display, screen),
-					0, 0, 320, 240, 0, vi->depth, InputOutput, vi->visual, // NOTE: Magic default.
-					CWBorderPixel | CWColormap | CWEventMask, &swa);
-
-				if (*window != None)
-				{
-					::glXMakeCurrent(display, *window, *glx_context);
-
-					return true;
-				}
-				else
-				{
-					::XFreeColormap(display, swa.colormap);
-				}
+				::glXMakeCurrent(display, *window, *glx_context);
+				return true;
 			}
 
-			::glXDestroyContext(display, *glx_context);
-			*glx_context = nullptr;
+			::XFreeColormap(display, swa.colormap);
 		}
+
+		::glXDestroyContext(display, *glx_context);
+		*glx_context = nullptr;
 	}
+
+	::XFree(vi);
 
 	return false;
 }
@@ -217,6 +250,8 @@ Key Window::Private::decode_key(::XEvent &event)
 
 	return Key::Null;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool Window::get_cursor(Dim2 *cursor)
 {
