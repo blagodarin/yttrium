@@ -1,6 +1,6 @@
 #include "manager.h"
 
-// TODO: Use script variables.
+#include <Yttrium/script/context.h>
 
 namespace Yttrium
 {
@@ -46,7 +46,7 @@ AudioManager::Devices OpenAlManager::devices()
 
 OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *allocator)
 {
-	String audio_device(device, allocator); // Avoid non-zero-terminated problems.
+	String audio_device(device, allocator); // Avoid non-zero-terminatedness problems.
 
 	ALCdevice *alc_device = nullptr;
 
@@ -60,14 +60,14 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 	// If no device was specified as a parameter or the specified device failed
 	// to open, try to open the device specified in the "audio_device" variable.
 
-//	if (!alc_device)
-//	{
-//		audio_device = SCRIPT_MANAGER.get("audio_device");
-//		if (audio_device)
-//		{
-//			alc_device = alcOpenDevice(audio_device.const_text());
-//		}
-//	}
+	if (!alc_device)
+	{
+		ScriptValue *audio_device = ScriptContext::global().find("audio_device");
+		if (audio_device)
+		{
+			alc_device = alcOpenDevice(audio_device->string().const_text());
+		}
+	}
 
 	// Finally, if nothing is specified or the specified device could be opened,
 	// try to open the default device.
@@ -82,7 +82,7 @@ OpenAlManager *OpenAlManager::open(const StaticString &device, Allocator *alloca
 	if (alc_device)
 	{
 		audio_device.set(alcGetString(alc_device, ALC_DEVICE_SPECIFIER));
-		//SCRIPT_MANAGER.set("audio_device", audio_device, true);
+		ScriptContext::global().set("audio_device", audio_device, ScriptValue::Archived);
 
 		ALCcontext *alc_context = alcCreateContext(alc_device, nullptr);
 

@@ -88,11 +88,8 @@ private:
 private:
 
 	Y_PRIVATE ScriptValue(Integer value, Allocator *allocator);
-
 	Y_PRIVATE ScriptValue(Real value, Allocator *allocator);
-
 	Y_PRIVATE ScriptValue(const StaticString &value, Allocator *allocator);
-
 	Y_PRIVATE ScriptValue(const StaticString &value, Type type, Allocator *allocator);
 };
 
