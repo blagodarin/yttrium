@@ -5,7 +5,6 @@
 #define __Y_BINDINGS_H
 
 #include <Yttrium/key.h>
-#include <Yttrium/script/context.h> // TODO: Remove this dependency.
 #include <Yttrium/string.h>
 
 #include <map> // map
@@ -43,7 +42,7 @@ public:
 
 	///
 
-	bool call(Key key, ScriptContext::ExecutionMode mode = ScriptContext::Do) noexcept;
+	bool call(Key key, ExecutionMode mode = ExecutionMode::Do) noexcept;
 
 	///
 

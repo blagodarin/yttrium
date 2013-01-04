@@ -77,6 +77,14 @@ enum
 
 typedef uint_fast8_t Alignment;
 
+///
+
+enum class ExecutionMode
+{
+	Do,   ///<
+	Undo, ///<
+};
+
 } // namespace Yttrium
 
 #endif // __Y_TYPES_H

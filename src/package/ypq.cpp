@@ -172,8 +172,6 @@ YpqWriter::~YpqWriter()
 	package_header.index_file_offset = _last_offset;
 
 	_file.write(package_header);
-
-	_file.truncate();
 }
 
 PackedFile YpqWriter::open_file(const StaticString &name)

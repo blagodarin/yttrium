@@ -2,6 +2,7 @@
 
 #include <Yttrium/ion.h>
 #include <Yttrium/log.h>
+#include <Yttrium/script/context.h>
 
 #define CHECK(condition) do { if (!(condition)) return false; } while (false)
 
@@ -102,7 +103,7 @@ void Game::save_settings()
 {
 	Y_LOG("Saving settings...");
 
-	File settings_file("tetrium.txt", File::Write);
+	File settings_file("tetrium.txt", File::Write | File::Truncate);
 
 	if (settings_file.is_opened())
 	{
@@ -118,7 +119,6 @@ void Game::save_settings()
 			settings << "seta " << i->first << " " << i->second << "\n";
 
 		settings_file.write(settings.text(), settings.size());
-		settings_file.truncate();
 	}
 }
 
@@ -208,7 +208,7 @@ bool Game::on_key_event(Terminal *terminal, Key key, KeyState state) noexcept
 	if (_gui->process_key(terminal, key, state))
 		return true;
 
-	if (state <= 1 && _bindings.call(key, state ? ScriptContext::Do : ScriptContext::Undo))
+	if (state <= 1 && _bindings.call(key, state ? ExecutionMode::Do : ExecutionMode::Undo))
 		return true;
 
 	return false;

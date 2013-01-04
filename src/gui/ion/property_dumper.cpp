@@ -3,6 +3,8 @@
 #include <Yttrium/ion/object.h>
 #include <Yttrium/ion/value.h>
 
+// TODO: Implement.
+
 namespace Yttrium
 {
 
@@ -14,44 +16,36 @@ IonPropertyDumper::IonPropertyDumper(Ion::Object *object)
 {
 }
 
-void IonPropertyDumper::dump_alignment(const StaticString &name, Alignment alignment)
+void IonPropertyDumper::dump_alignment(const StaticString &, Alignment)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_color(const StaticString &name, const Vector4f &color)
+void IonPropertyDumper::dump_color(const StaticString &, const Vector4f &)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_position(const StaticString &name, const Vector3f &position)
+void IonPropertyDumper::dump_position(const StaticString &, const Vector3f &)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_scaling(const StaticString &name, Scaling scaling)
+void IonPropertyDumper::dump_scaling(const StaticString &, Scaling)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_size(const StaticString &name, const Vector2f &size)
+void IonPropertyDumper::dump_size(const StaticString &, const Vector2f &)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_state(const StaticString &name, WidgetState state)
+void IonPropertyDumper::dump_state(const StaticString &, WidgetState)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_text(const StaticString &name, const StaticString &text)
+void IonPropertyDumper::dump_text(const StaticString &, const StaticString &)
 {
-	// TODO: Implement.
 }
 
-void IonPropertyDumper::dump_texture(const StaticString &name, const Texture2D &texture)
+void IonPropertyDumper::dump_texture(const StaticString &, const Texture2D &)
 {
-	// TODO: Implement.
 }
 
 } // namespace Gui

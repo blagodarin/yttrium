@@ -182,7 +182,7 @@ bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allo
 
 	if (_private)
 	{
-		if (_private->_file.open(name, File::Write)
+		if (_private->_file.open(name, File::Write | File::Truncate)
 			&& _private->open())
 		{
 			return true;

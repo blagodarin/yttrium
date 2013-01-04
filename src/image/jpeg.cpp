@@ -56,7 +56,7 @@ bool JpegReader::open()
 	return true;
 }
 
-bool JpegReader::read(void *buffer, size_t frame_size)
+bool JpegReader::read(void *buffer, size_t) // TODO: Utilize the frame size parameter.
 {
 	if (setjmp(_error_handler.setjmp_buffer))
 	{

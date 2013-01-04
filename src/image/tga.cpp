@@ -224,7 +224,6 @@ bool TgaWriter::write(const void *buffer, size_t frame_size)
 
 	_file.write(header);
 	_file.write(buffer, frame_size);
-	_file.truncate();
 
 	return true;
 }

@@ -24,9 +24,9 @@ File::Private::~Private()
 
 bool File::flush()
 {
-	return (_private && (_private->mode & Write)
+	return _private && (_private->mode & Write)
 		? !fsync(_private->descriptor)
-		: false);
+		: false;
 }
 
 bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
@@ -40,6 +40,11 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 	case Write:     flags |= O_WRONLY | O_CREAT; break;
 	case ReadWrite: flags = O_RDWR | O_CREAT;    break;
 	default:        return false;
+	}
+
+	if ((mode & (Write | Pipe | Truncate)) == (Write | Truncate))
+	{
+		flags |= O_TRUNC;
 	}
 
 	int descriptor = Private::open(name, flags, allocator);

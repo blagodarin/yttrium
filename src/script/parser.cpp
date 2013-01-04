@@ -1,5 +1,8 @@
 #include "parser.h"
 
+#include <Yttrium/script/context.h> // NOTE: Just for execute().
+#include <Yttrium/script/value.h>
+
 #include "logging.h"
 #include "scanner.h"
 
@@ -125,13 +128,13 @@ bool ScriptParser::parse(const StaticString &script)
 	return true;
 }
 
-bool ScriptParser::execute(ScriptContext::ExecutionMode mode)
+bool ScriptParser::execute(ExecutionMode mode)
 {
 	for (Commands::iterator i = _commands.begin(); i != _commands.end(); ++i)
 	{
 		String name = i->name;
 
-		if (mode != ScriptContext::Do)
+		if (mode != ExecutionMode::Do)
 		{
 			if (name[0] != '+')
 			{

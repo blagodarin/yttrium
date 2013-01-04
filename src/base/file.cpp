@@ -27,7 +27,7 @@ void File::close()
 
 bool File::is_opened() const
 {
-	return (_private && (_private->mode & ReadWrite));
+	return _private && (_private->mode & ReadWrite);
 }
 
 StaticString File::name() const
@@ -46,7 +46,7 @@ bool File::open(const StaticString &name, Allocator *allocator)
 
 	*this = package_manager->open_file(name);
 
-	return (_private && (_private->mode & Read));
+	return _private && (_private->mode & Read);
 }
 
 bool File::read_all(Buffer *buffer)

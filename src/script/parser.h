@@ -1,7 +1,8 @@
 #ifndef __SCRIPT_PARSER_H
 #define __SCRIPT_PARSER_H
 
-#include <Yttrium/script/context.h>
+#include <Yttrium/pool.h>
+#include <Yttrium/script/args.h>
 
 namespace Yttrium
 {
@@ -16,7 +17,7 @@ public:
 
 	bool parse(const StaticString &script);
 
-	bool execute(ScriptContext::ExecutionMode mode);
+	bool execute(ExecutionMode mode);
 
 private:
 

@@ -233,7 +233,7 @@ bool Bindings::bind_default(const StaticString &name, const StaticString &action
 	return true;
 }
 
-bool Bindings::call(Key key, ScriptContext::ExecutionMode mode)
+bool Bindings::call(Key key, ExecutionMode mode)
 {
 	const String &action = _actions[KeyType(key)];
 

@@ -205,7 +205,6 @@ bool PngWriter::write(const void *buffer, size_t frame_size)
 	png_write_png(_png, _info, transforms, nullptr);
 
 	_allocator->deallocate(rows);
-	_file.truncate();
 
 	return true;
 }

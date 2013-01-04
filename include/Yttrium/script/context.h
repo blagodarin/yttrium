@@ -31,14 +31,6 @@ public:
 
 	typedef std::function<void (const StaticString &name, String *result, const ScriptArgs &args) noexcept> Command;
 
-	///
-
-	enum ExecutionMode
-	{
-		Do,   ///<
-		Undo, ///<
-	};
-
 public:
 
 	~ScriptContext() = default;
@@ -84,7 +76,7 @@ public:
 	/// \param mode Execution mode.
 	/// \return \c true on success.
 
-	bool execute(const StaticString &script, ExecutionMode mode = Do) noexcept;
+	bool execute(const StaticString &script, ExecutionMode mode = ExecutionMode::Do) noexcept;
 
 	/// Execute the script from the specified file.
 	/// \param name Script file to execute.

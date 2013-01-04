@@ -111,7 +111,7 @@ bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, 
 
 	if (_private)
 	{
-		if (_private->_file.open(name, File::Write)
+		if (_private->_file.open(name, File::Write | (mode & Append ? 0 : File::Truncate))
 			&& _private->open(mode))
 		{
 			return true;

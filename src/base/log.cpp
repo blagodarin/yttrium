@@ -37,12 +37,9 @@ LogManager::Writer::Writer(LogManager *log_manager)
 
 LogManager::LogManager(const StaticString &file, Allocator *allocator)
 	: _allocator(allocator)
-	, _file(file, File::Write, allocator)
+	, _file(file, File::Write | File::Truncate, allocator)
 {
 	LogManagerGuard::enter(this, S("Duplicate LogManager construction"));
-
-	_file.truncate();
-	_file.flush();
 }
 
 LogManager::~LogManager()

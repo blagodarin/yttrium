@@ -33,7 +33,7 @@ public:
 		Write     = 1 << 1,       ///<
 		ReadWrite = Read | Write, ///<
 		Pipe      = 1 << 2,       ///< The file is a pipe (has no offset and size).
-		// TODO: Add 'Truncate' mode.
+		Truncate  = 1 << 3,       ///< Truncate the file after opening.
 	};
 
 	///
