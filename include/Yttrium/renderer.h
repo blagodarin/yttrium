@@ -47,6 +47,10 @@ public:
 
 public:
 
+	///
+
+	Allocator *allocator() const noexcept;
+
 	/// Clear the framebuffer and begin a new frame.
 
 	void begin_frame() noexcept;

@@ -1,7 +1,8 @@
 #include <Yttrium/memory_manager.h>
 
-#include "../instance_guard.h"
+#include <Yttrium/proxy_allocator.h>
 
+#include "../instance_guard.h"
 #include "heap_allocator.h"
 
 #include <iostream>
@@ -15,34 +16,26 @@ typedef InstanceGuard<MemoryManager> MemoryManagerGuard;
 
 MemoryManager::MemoryManager()
 	: _previous_default_allocator(DefaultAllocator)
+	, _default_allocator(Y_NEW(_previous_default_allocator, HeapAllocator)(_previous_default_allocator))
 {
 	MemoryManagerGuard::enter(this, S("Duplicate MemoryManager construction"));
 
 	const_cast<Allocator *&>(DefaultAllocator) =
-		Y_NEW(_previous_default_allocator, HeapAllocator)(_previous_default_allocator);
+		Y_NEW(_default_allocator, ProxyAllocator)("default", _default_allocator);
 }
 
 MemoryManager::~MemoryManager()
 {
-	// NOTE: We can't use Y_ASSERT here because it uses logging which has already been shut down,
-	// so the only remaining way is to write the message to std::cerr.
-
-	const Allocator::Status &status = DefaultAllocator->status();
-
-	if (status.allocated_blocks)
-	{
-		std::cerr << "Memory leak detected: " << status.allocated_blocks << " blocks are still allocated!" << std::endl;
-	}
-
-	Y_DELETE(_previous_default_allocator, DefaultAllocator);
+	Y_DELETE(_default_allocator, DefaultAllocator);
+	Y_DELETE(_previous_default_allocator, _default_allocator);
 	const_cast<Allocator *&>(DefaultAllocator) = _previous_default_allocator;
 
 	MemoryManagerGuard::leave(this, S("Duplicate MemoryManager destruction"));
 }
 
-MemoryManager *MemoryManager::instance()
+Allocator *MemoryManager::default_allocator()
 {
-	return MemoryManagerGuard::instance;
+	return MemoryManagerGuard::instance->_default_allocator;
 }
 
 } // namespace Yttrium

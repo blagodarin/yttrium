@@ -22,7 +22,7 @@ class Game
 
 public:
 
-	Game();
+	Game(Allocator *allocator);
 	~Game();
 
 public:
@@ -60,6 +60,7 @@ private:
 
 private:
 
+	Allocator       *_allocator;
 	AudioManager     _audio;
 	Terminal         _terminal;
 	Renderer         _renderer;

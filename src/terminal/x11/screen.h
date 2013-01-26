@@ -20,7 +20,6 @@ public:
 public:
 
 	Private(::Display *display, int screen, Allocator *allocator);
-
 	~Private();
 };
 

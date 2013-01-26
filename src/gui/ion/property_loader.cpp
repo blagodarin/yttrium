@@ -116,7 +116,7 @@ IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Objec
 	: _object(object)
 	, _class(class_)
 	, _manager(manager)
-	, _texture_cache(manager->renderer().texture_cache())
+	, _texture_cache(manager->renderer()->texture_cache())
 	, _bound_object(_object)
 	, _bound_class(_class)
 {

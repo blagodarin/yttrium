@@ -22,7 +22,7 @@ public:
 
 	///
 
-	inline Console(const Terminal &terminal) noexcept;
+	inline Console(const Terminal &terminal, Allocator *allocator = DefaultAllocator) noexcept;
 
 public:
 
@@ -47,8 +47,9 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Console::Console(const Terminal &terminal) noexcept
+Console::Console(const Terminal &terminal, Allocator *allocator) noexcept
 	: _terminal(terminal)
+	, _line_editor(allocator)
 {
 }
 

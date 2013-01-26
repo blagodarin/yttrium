@@ -1,9 +1,23 @@
 #include "manager.h"
 
+#include <Yttrium/proxy_allocator.h>
+
 #include "backend/manager.h"
 
 namespace Yttrium
 {
+
+AudioManager::AudioManager(Allocator *allocator)
+	: _allocator(Y_NEW(allocator, ProxyAllocator)("audio", allocator))
+	, _private(nullptr)
+{
+}
+
+AudioManager::~AudioManager()
+{
+	close();
+	Y_DELETE(_allocator->allocator(), _allocator);
+}
 
 StaticString AudioManager::backend() const
 {

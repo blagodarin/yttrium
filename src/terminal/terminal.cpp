@@ -15,7 +15,7 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	, _size(320, 240) // NOTE: Magic default.
 	, _mode(Windowed)
 	, _callbacks(callbacks)
-	, _console(*this)
+	, _console(*this, _allocator)
 	, _is_console_visible(false)
 {
 	memset(_keys, 0, sizeof(_keys));

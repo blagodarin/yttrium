@@ -2,6 +2,7 @@
 #define __GUI_MANAGER_H
 
 #include <Yttrium/gui/manager.h>
+#include <Yttrium/proxy_allocator.h>
 #include <Yttrium/renderer.h>
 #include <Yttrium/texture_font.h>
 
@@ -65,7 +66,7 @@ public:
 
 	const FontDesc *font(const StaticString &name) const;
 
-	inline Renderer renderer() const;
+	inline Renderer *renderer();
 
 	void set_font(const StaticString &name, const StaticString &font_source, const StaticString &texture_name);
 
@@ -114,17 +115,18 @@ private:
 
 private:
 
-	Renderer      _renderer;
-	Callbacks    *_callbacks;
-	bool          _has_size;
-	Vector2f      _size;
-	Scaling       _scaling;
-	Fonts         _fonts;
-	Scenes        _scenes;
-	SceneStack    _scene_stack;
-	SceneActions  _scene_actions;
-	bool          _has_cursor;
-	Vector2f      _cursor;
+	ProxyAllocator  _proxy_allocator;
+	Renderer        _renderer;
+	Callbacks      *_callbacks;
+	bool            _has_size;
+	Vector2f        _size;
+	Scaling         _scaling;
+	Fonts           _fonts;
+	Scenes          _scenes;
+	SceneStack      _scene_stack;
+	SceneActions    _scene_actions;
+	bool            _has_cursor;
+	Vector2f        _cursor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,9 +136,9 @@ Manager::Callbacks *ManagerImpl::callbacks() const
 	return _callbacks;
 }
 
-Renderer ManagerImpl::renderer() const
+Renderer *ManagerImpl::renderer()
 {
-	return _renderer;
+	return &_renderer;
 }
 
 void ManagerImpl::set_scaling(Scaling scaling)

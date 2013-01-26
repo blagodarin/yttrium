@@ -178,6 +178,11 @@ Renderer::~Renderer()
 	Private::release(&_private);
 }
 
+Allocator *Renderer::allocator() const
+{
+	return _private->_allocator;
+}
+
 void Renderer::begin_frame()
 {
 	_private->clear();

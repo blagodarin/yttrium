@@ -12,6 +12,8 @@
 namespace Yttrium
 {
 
+class ProxyAllocator;
+
 /// Audio manager.
 
 class Y_API AudioManager: public Noncopyable
@@ -30,18 +32,11 @@ public:
 
 	///
 
-	AudioManager(Allocator *allocator = DefaultAllocator) noexcept
-		: _allocator(allocator)
-		, _private(nullptr)
-	{
-	}
+	AudioManager(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
-	~AudioManager() noexcept
-	{
-		close();
-	}
+	~AudioManager() noexcept;
 
 public:
 
@@ -85,8 +80,8 @@ public:
 
 private:
 
-	Allocator *_allocator;
-	Private   *_private;
+	ProxyAllocator *_allocator;
+	Private        *_private;
 };
 
 } // namespace Yttrium

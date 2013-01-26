@@ -17,6 +17,7 @@ namespace Gui
 
 ManagerImpl::ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocator *allocator)
 	: Manager(allocator)
+	, _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
 	, _callbacks(callbacks)
 	, _has_size(false)
@@ -69,14 +70,14 @@ Scene *ManagerImpl::create_scene(const StaticString &name)
 		return nullptr;
 	}
 
-	Scene *scene = Y_NEW(allocator(), Scene)(this, name, allocator());
+	Scene *scene = Y_NEW(&_proxy_allocator, Scene)(this, name, &_proxy_allocator);
 	scene->set_size(_size);
 	return scene;
 }
 
 void ManagerImpl::delete_scene(Scene *scene)
 {
-	Y_DELETE(allocator(), scene);
+	Y_DELETE(&_proxy_allocator, scene);
 }
 
 const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
@@ -92,7 +93,10 @@ void ManagerImpl::set_font(const StaticString &name,
 
 	if (texture)
 	{
-		TextureFont font(font_source, allocator());
+		// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
+		// when the manager is being cleant up, so we should use the renderer's allocator here.
+
+		TextureFont font(font_source, _renderer.allocator());
 
 		if (font)
 		{

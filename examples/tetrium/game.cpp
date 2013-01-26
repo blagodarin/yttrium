@@ -6,8 +6,9 @@
 
 #define CHECK(condition) do { if (!(condition)) return false; } while (false)
 
-Game::Game()
-	: _terminal(this)
+Game::Game(Allocator *allocator)
+	: _allocator(allocator)
+	, _terminal(this, _allocator)
 	, _commands(this)
 {
 }
@@ -37,7 +38,7 @@ bool Game::setup()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_renderer = _terminal.create_renderer(Renderer::OpenGl);
+	_renderer = _terminal.create_renderer(Renderer::OpenGl, DefaultAllocator);
 	_gui = Gui::Manager::create(_renderer, this);
 
 	_game.set_random_seed(Timer::clock());
@@ -126,7 +127,7 @@ bool Game::load()
 {
 	CHECK(_gui->load("examples/tetrium/gui/gui.ion"));
 
-	Ion::Document data;
+	Ion::Document data(_allocator);
 
 	CHECK(data.load("examples/tetrium/data/tetrium.ion"));
 
@@ -169,7 +170,7 @@ void Game::load_music()
 {
 	_audio.open(); // NOTE: And what if it fails?
 
-	Ion::Document data;
+	Ion::Document data(_allocator);
 
 	if (!data.load("data/music.ion"))
 		return;

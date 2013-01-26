@@ -29,11 +29,12 @@ public:
 
 	///
 
-	static MemoryManager *instance() noexcept;
+	static Allocator *default_allocator() noexcept;
 
 private:
 
 	Allocator *_previous_default_allocator;
+	Allocator *_default_allocator;
 };
 
 } // namespace Yttrium
