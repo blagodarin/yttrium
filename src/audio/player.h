@@ -42,8 +42,7 @@ public:
 public:
 
 	Private(Allocator *allocator);
-
-	~Private() noexcept;
+	virtual ~Private() noexcept;
 
 protected:
 

@@ -14,7 +14,7 @@ class Y_PRIVATE Texture2D::Private: public PrivateBase<Texture2D::Private>
 {
 public:
 
-	Private(const TextureCache &cache, const ImageFormat &format, Allocator *allocator);
+	Private(const Renderer &renderer, const ImageFormat &format, Allocator *allocator);
 
 	virtual ~Private()
 	{
@@ -34,14 +34,14 @@ public:
 
 public:
 
-	TextureCache      _cache;
+	Renderer          _renderer; // Don't let the renderer die before the texture.
 	Dim2              _size;
 	Texture2D::Filter _filter;
 	ImageOrientation  _orientation;
 	bool              _has_mipmaps;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RectF Texture2D::Private::full_rectangle() const
 {

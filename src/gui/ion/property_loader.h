@@ -64,7 +64,7 @@ private:
 	const Ion::Object *_object;
 	const Ion::Object *_class;
 	const ManagerImpl *_manager;
-	TextureCache       _texture_cache;
+	TextureCache      *_texture_cache;
 	const Ion::Object *_bound_object;
 	const Ion::Object *_bound_class;
 };

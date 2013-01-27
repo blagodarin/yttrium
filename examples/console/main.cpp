@@ -28,9 +28,9 @@ public:
 			{
 				RendererBuiltin renderer_builtin = renderer.renderer_builtin();
 
-				TextureCache texture_cache = renderer.texture_cache();
+				TextureCachePtr texture_cache = TextureCache::create(renderer);
 
-				Texture2D background = texture_cache.load_texture_2d("tests/image/image.tga");
+				Texture2D background = texture_cache->load_texture_2d("tests/image/image.tga");
 
 				for (; ; )
 				{

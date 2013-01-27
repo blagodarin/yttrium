@@ -6,19 +6,21 @@
 
 #include <Yttrium/rect.h>
 #include <Yttrium/renderer/builtin.h>
-#include <Yttrium/renderer/texture_cache.h>
+#include <Yttrium/renderer/texture.h>
 #include <Yttrium/static_string.h>
 #include <Yttrium/texture_font.h>
 
 namespace Yttrium
 {
 
+class TextureCache;
 class Window;
 
 ///
 
 class Y_API Renderer
 {
+	friend class TextureCache;
 	friend class Window;
 
 public:
@@ -146,10 +148,6 @@ public:
 	///
 
 	Vector2f text_size(const StaticString &text) const noexcept;
-
-	///
-
-	TextureCache texture_cache() noexcept;
 
 	///
 

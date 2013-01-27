@@ -16,6 +16,8 @@ Renderer::Private::Private(Window *window, Allocator *allocator)
 	, _window(*window)
 	, _viewport_size(0)
 	, _rendering_size(0)
+	, _screenshot_filename(allocator)
+	, _screenshot_buffer(allocator)
 	, _color(1, 1, 1)
 	, _font_size(1, 1)
 {
@@ -222,7 +224,7 @@ void Renderer::end_frame()
 		format.set_width(_private->_viewport_size.x);
 		format.set_height(_private->_viewport_size.y);
 
-		ImageWriter image(_private->_screenshot_filename, ImageType::Png);
+		ImageWriter image(_private->_screenshot_filename, ImageType::Png, _private->_allocator);
 
 		if (image.set_format(format))
 		{
@@ -340,11 +342,6 @@ void Renderer::take_screenshot(const StaticString &name)
 Vector2f Renderer::text_size(const StaticString &text) const
 {
 	return _private->text_size(text);
-}
-
-TextureCache Renderer::texture_cache()
-{
-	return TextureCache(_private->texture_cache());
 }
 
 Dim2 Renderer::viewport_size() const

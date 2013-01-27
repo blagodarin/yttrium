@@ -11,7 +11,9 @@ enum
 };
 
 AudioPlayer::Private::Private(Allocator *allocator)
-	: _playlist(allocator)
+	: Thread(allocator)
+	, _playlist(allocator)
+	, _action(allocator)
 	, _state(Stopped)
 	, _allocator(allocator)
 	, _backend(AudioPlayerBackend::create(_allocator))

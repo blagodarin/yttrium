@@ -14,38 +14,25 @@ class OpenGlRenderer: public Renderer::Private
 public:
 
 	OpenGlRenderer(Window *window, Allocator *allocator);
-
 	virtual ~OpenGlRenderer();
+
+public:
+
+	bool check_version(int major, int minor);
 
 public: // Renderer::Private
 
 	virtual void bind_builtin();
-
 	virtual void clear();
-
 	virtual void flush_2d();
-
 	virtual void set_matrix_2d(double width, double height);
-
 	virtual void set_viewport(const Dim2 &size);
-
 	virtual void take_screenshot();
 
-	virtual TextureCache::Private *texture_cache();
+public:
 
-private:
-
-	bool check_version(int major, int minor);
-
-private:
-
-	GlApi _gl;
-
+	GlApi  _gl;
 	GLuint _builtin_texture;
-
-	// Subinterfaces.
-
-	OpenGlTextureCache _texture_cache;
 };
 
 } // namespace Yttrium

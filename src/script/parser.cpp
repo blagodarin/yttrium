@@ -23,6 +23,7 @@ enum class ParserState
 ScriptParser::ScriptParser(ScriptContext *context, Allocator *allocator)
 	: _context(context)
 	, _allocator(allocator)
+	, _temporaries(32, _allocator) // NOTE: Magic number!
 {
 }
 

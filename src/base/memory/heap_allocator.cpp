@@ -13,7 +13,7 @@ void *HeapAllocator::allocate(size_t size, size_t align, Difference *difference)
 {
 	Y_UNUSED(align);
 
-	void *pointer = malloc(size);
+	void *pointer = ::malloc(size);
 
 	if (Y_UNLIKELY(!pointer))
 	{
@@ -38,7 +38,7 @@ void HeapAllocator::deallocate(void *pointer, Difference *difference)
 {
 	if (Y_LIKELY(pointer))
 	{
-		free(pointer);
+		::free(pointer);
 
 		Difference local_difference;
 
@@ -59,7 +59,7 @@ void *HeapAllocator::reallocate(void *pointer, size_t size, Movability movabilit
 		return nullptr;
 	}
 
-	void *result = realloc(pointer, size);
+	void *result = ::realloc(pointer, size);
 
 	if (Y_UNLIKELY(!result))
 	{

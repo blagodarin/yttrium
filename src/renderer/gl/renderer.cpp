@@ -10,10 +10,7 @@ namespace Yttrium
 OpenGlRenderer::OpenGlRenderer(Window *window, Allocator *allocator)
 	: Private(window, allocator)
 	, _builtin_texture(0)
-	, _texture_cache(_gl)
 {
-	_texture_cache._renderer = this;
-
 	_gl.initialize(window);
 
 	if (!check_version(1, 2))
@@ -42,6 +39,20 @@ OpenGlRenderer::~OpenGlRenderer()
 {
 	_gl.DeleteTextures(1, &_builtin_texture);
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool OpenGlRenderer::check_version(int major, int minor)
+{
+	// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
+
+	int backend_major = _gl.VERSION[0] - '0';
+	int backend_minor = _gl.VERSION[2] - '0';
+
+	return backend_major > major || (backend_major == major && backend_minor >= minor);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void OpenGlRenderer::bind_builtin()
 {
@@ -108,21 +119,6 @@ void OpenGlRenderer::take_screenshot()
 	_gl.ReadPixels(0, 0, _viewport_size.x, _viewport_size.y, GL_RGB, GL_UNSIGNED_BYTE, _screenshot_buffer.data());
 	_gl.PixelStorei(GL_UNPACK_ALIGNMENT, unpack_alignment);
 	_gl.ReadBuffer(read_buffer);
-}
-
-TextureCache::Private *OpenGlRenderer::texture_cache()
-{
-	return &_texture_cache;
-}
-
-bool OpenGlRenderer::check_version(int major, int minor)
-{
-	// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
-
-	int backend_major = _gl.VERSION[0] - '0';
-	int backend_minor = _gl.VERSION[2] - '0';
-
-	return backend_major > major || (backend_major == major && backend_minor >= minor);
 }
 
 } // namespace Yttrium

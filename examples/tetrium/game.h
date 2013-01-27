@@ -4,6 +4,8 @@
 #include <Yttrium/audio/manager.h>
 #include <Yttrium/bindings.h>
 #include <Yttrium/gui/manager.h>
+#include <Yttrium/proxy_allocator.h>
+#include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/terminal.h>
 #include <Yttrium/time.h>
 
@@ -61,9 +63,11 @@ private:
 private:
 
 	Allocator       *_allocator;
+	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
 	Terminal         _terminal;
 	Renderer         _renderer;
+	TextureCachePtr  _texture_cache;
 	Gui::ManagerPtr  _gui;
 	Bindings         _bindings;
 

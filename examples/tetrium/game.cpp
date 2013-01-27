@@ -2,12 +2,15 @@
 
 #include <Yttrium/ion.h>
 #include <Yttrium/log.h>
+#include <Yttrium/memory_manager.h> // TODO: Remove.
 #include <Yttrium/script/context.h>
 
 #define CHECK(condition) do { if (!(condition)) return false; } while (false)
 
 Game::Game(Allocator *allocator)
 	: _allocator(allocator)
+	, _renderer_allocator("renderer", allocator)
+	, _audio(_allocator)
 	, _terminal(this, _allocator)
 	, _commands(this)
 {
@@ -38,8 +41,9 @@ bool Game::setup()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_renderer = _terminal.create_renderer(Renderer::OpenGl, DefaultAllocator);
-	_gui = Gui::Manager::create(_renderer, this);
+	_renderer = _terminal.create_renderer(Renderer::OpenGl, &_renderer_allocator);
+	_texture_cache = TextureCache::create(_renderer);
+	_gui = Gui::Manager::create(_renderer, this, _allocator);
 
 	_game.set_random_seed(Timer::clock());
 
@@ -104,7 +108,7 @@ void Game::save_settings()
 {
 	Y_LOG("Saving settings...");
 
-	File settings_file("tetrium.txt", File::Write | File::Truncate);
+	File settings_file("tetrium.txt", File::Write | File::Truncate, _allocator);
 
 	if (settings_file.is_opened())
 	{
@@ -137,7 +141,7 @@ bool Game::load()
 
 	const StaticString *block_texture_name;
 	CHECK(blocks->last("file", &block_texture_name));
-	_block_texture = _renderer.texture_cache().load_texture_2d(*block_texture_name);
+	_block_texture = _texture_cache->load_texture_2d(*block_texture_name);
 	if (_block_texture)
 		_block_texture.set_filter(Texture2D::TrilinearFilter);
 
@@ -170,7 +174,7 @@ void Game::load_music()
 {
 	_audio.open(); // NOTE: And what if it fails?
 
-	Ion::Document data(_allocator);
+	Ion::Document data(MemoryManager::default_allocator()); // TODO: Fix.
 
 	if (!data.load("data/music.ion"))
 		return;

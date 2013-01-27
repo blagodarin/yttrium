@@ -10,7 +10,6 @@
 #include "../base/private_base.h"
 
 #include "builtin/builtin.h"
-#include "texture_cache.h"
 
 #include <vector>
 
@@ -38,8 +37,6 @@ public:
 	virtual void set_viewport(const Dim2 &size);
 
 	virtual void take_screenshot() = 0;
-
-	virtual TextureCache::Private *texture_cache() = 0;
 
 public:
 

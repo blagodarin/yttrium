@@ -28,8 +28,7 @@ typedef ObjectPointer<Manager> ManagerPtr;
 
 /// GUI widget manager.
 
-class Y_API Manager
-	: public Object
+class Y_API Manager: public Object
 {
 public:
 

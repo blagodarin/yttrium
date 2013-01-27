@@ -26,6 +26,7 @@ public:
 	AudioStreamer(AudioPlayerBackend *backend, Allocator *allocator)
 		: _allocator(allocator)
 		, _backend(backend)
+		, _buffer(_allocator)
 	{
 	}
 

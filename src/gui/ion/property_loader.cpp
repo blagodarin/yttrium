@@ -116,7 +116,7 @@ IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Objec
 	: _object(object)
 	, _class(class_)
 	, _manager(manager)
-	, _texture_cache(manager->renderer()->texture_cache())
+	, _texture_cache(manager->texture_cache())
 	, _bound_object(_object)
 	, _bound_class(_class)
 {
@@ -375,7 +375,7 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *textur
 	if (_bound_object)
 	{
 		node = _bound_object->last(name);
-		if (node->exists() && load_texture(texture, *node, &_texture_cache,
+		if (node->exists() && load_texture(texture, *node, _texture_cache,
 			Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
 		{
 			return true;
@@ -385,7 +385,7 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *textur
 	if (_bound_class)
 	{
 		node = _bound_class->last(name);
-		if (node->exists() && load_texture(texture, *node, &_texture_cache,
+		if (node->exists() && load_texture(texture, *node, _texture_cache,
 			Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
 		{
 			return true;

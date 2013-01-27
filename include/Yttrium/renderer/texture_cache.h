@@ -1,30 +1,46 @@
 /// \file
-/// \brief
+/// \brief Texture cache.
 
 #ifndef __Y_RENDERER_TEXTURE_CACHE_H
 #define __Y_RENDERER_TEXTURE_CACHE_H
 
-#include <Yttrium/renderer/texture.h>
-#include <Yttrium/static_string.h>
+#include <Yttrium/renderer.h>
+#include <Yttrium/object.h>
+
+#include <map>
 
 namespace Yttrium
 {
 
-class Y_API TextureCache
+class ImageFormat;
+class TextureCache;
+
+/// Texture cache pointer.
+
+typedef ObjectPointer<TextureCache> TextureCachePtr;
+
+/// Texture cache.
+
+class Y_API TextureCache: public Object
 {
-	friend class Renderer;
+	TextureCache(const TextureCache &) = delete;
+	TextureCache &operator =(const TextureCache &) = delete;
 
 public:
 
 	///
 
-	TextureCache(const TextureCache &cache) noexcept;
+	TextureCache(const Renderer &renderer) noexcept;
 
 	///
 
-	~TextureCache() noexcept;
+	virtual ~TextureCache() noexcept;
 
 public:
+
+	///
+
+	Texture2D cache_texture_2d(const StaticString &name) noexcept;
 
 	/// Clear the cache.
 
@@ -34,40 +50,26 @@ public:
 
 	Texture2D load_texture_2d(const StaticString &name) noexcept;
 
-	///
-
-	Texture2D cache_texture_2d(const StaticString &name) noexcept;
-
 public:
 
 	///
 
-	inline operator bool() const noexcept;
+	static TextureCachePtr create(const Renderer &renderer) noexcept;
 
-	///
+protected:
 
-	TextureCache &operator =(const TextureCache &cache) noexcept;
+	virtual Texture2D::Private *cache_texture_2d(const ImageFormat &format, const void *data) noexcept = 0;
 
-public:
+protected:
 
-	class Private;
-
-private:
-
-	Y_PRIVATE TextureCache(Private *private_);
+	Renderer _renderer;
 
 private:
 
-	Private *_private;
+	typedef std::map<String, Texture2D> Cache2D;
+
+	Cache2D  _cache_2d;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-TextureCache::operator bool() const noexcept
-{
-	return _private;
-}
 
 } // namespace Yttrium
 

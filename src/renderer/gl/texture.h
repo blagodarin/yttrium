@@ -12,9 +12,9 @@ class OpenGlTexture2D: public Texture2D::Private
 {
 public:
 
-	OpenGlTexture2D(const TextureCache &cache, const ImageFormat &format, Allocator *allocator,
+	OpenGlTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator,
 		const GlApi &gl, GLenum target, GLuint texture)
-		: Private(cache, format, allocator)
+		: Private(renderer, format, allocator)
 		, _gl(gl)
 		, _target(target)
 		, _texture(texture)

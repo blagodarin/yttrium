@@ -2,12 +2,19 @@
 
 #include <Yttrium/utils.h>
 
+#include "renderer.h"
 #include "texture.h"
 
 namespace Yttrium
 {
 
-Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const TextureCache &cache, const ImageFormat &format, const void *data, Allocator *allocator)
+OpenGlTextureCache::OpenGlTextureCache(const Renderer &renderer, const GlApi &gl)
+	: TextureCache(renderer)
+	, _gl(gl)
+{
+}
+
+Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const ImageFormat &format, const void *data)
 {
 	// NOTE: Keep the new pixel formats in sync with these arrays!
 
@@ -72,12 +79,22 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const TextureCache &cac
 					_gl.Disable(target);
 				}
 
-				return Y_NEW(allocator, OpenGlTexture2D)(cache, format, allocator, _gl, target, texture);
+				Allocator *allocator = _renderer.allocator();
+				return Y_NEW(allocator, OpenGlTexture2D)(_renderer, format, allocator, _gl, target, texture);
 			}
 		}
 	}
 
 	return nullptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextureCachePtr TextureCache::create(const Renderer &renderer)
+{
+	Allocator *allocator = renderer.allocator();
+	return TextureCachePtr(Y_NEW(allocator, OpenGlTextureCache)(renderer,
+		static_cast<OpenGlRenderer *>(renderer._private)->_gl));
 }
 
 } // namespace Yttrium

@@ -19,6 +19,7 @@ ManagerImpl::ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocat
 	: Manager(allocator)
 	, _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
+	, _texture_cache(TextureCache::create(_renderer))
 	, _callbacks(callbacks)
 	, _has_size(false)
 	, _size(0)
@@ -89,7 +90,7 @@ const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
 void ManagerImpl::set_font(const StaticString &name,
 	const StaticString &font_source, const StaticString &texture_name)
 {
-	Texture2D texture = _renderer.texture_cache().load_texture_2d(texture_name);
+	Texture2D texture = _texture_cache->load_texture_2d(texture_name);
 
 	if (texture)
 	{

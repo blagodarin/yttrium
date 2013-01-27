@@ -118,6 +118,13 @@ void ProxyAllocator::deallocate(void *pointer, Difference *difference)
 {
 	if (pointer)
 	{
+	#if Y_IS_DEBUG
+		if (_private->_pointers.find(pointer) == _private->_pointers.end())
+		{
+			::abort();
+		}
+	#endif
+
 		Difference local_difference;
 
 		if (!difference)

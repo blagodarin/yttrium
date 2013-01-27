@@ -3,9 +3,9 @@
 namespace Yttrium
 {
 
-Texture2D::Private::Private(const TextureCache &cache, const ImageFormat &format, Allocator *allocator)
+Texture2D::Private::Private(const Renderer &renderer, const ImageFormat &format, Allocator *allocator)
 	: PrivateBase(allocator)
-	, _cache(cache)
+	, _renderer(renderer)
 	, _size(format.width(), format.height())
 	, _filter(Texture2D::NearestFilter)
 	, _orientation(format.orientation())

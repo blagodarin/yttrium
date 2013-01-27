@@ -4,6 +4,7 @@
 #include <Yttrium/gui/manager.h>
 #include <Yttrium/proxy_allocator.h>
 #include <Yttrium/renderer.h>
+#include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/texture_font.h>
 
 #include "types.h"
@@ -77,6 +78,8 @@ public:
 
 	inline void set_size(const Vector2f &size);
 
+	inline TextureCache *texture_cache();
+
 public: // Manager.
 
 	virtual void clear() noexcept;
@@ -115,18 +118,19 @@ private:
 
 private:
 
-	ProxyAllocator  _proxy_allocator;
-	Renderer        _renderer;
-	Callbacks      *_callbacks;
-	bool            _has_size;
-	Vector2f        _size;
-	Scaling         _scaling;
-	Fonts           _fonts;
-	Scenes          _scenes;
-	SceneStack      _scene_stack;
-	SceneActions    _scene_actions;
-	bool            _has_cursor;
-	Vector2f        _cursor;
+	ProxyAllocator   _proxy_allocator;
+	Renderer         _renderer;
+	TextureCachePtr  _texture_cache;
+	Callbacks       *_callbacks;
+	bool             _has_size;
+	Vector2f         _size;
+	Scaling          _scaling;
+	Fonts            _fonts;
+	Scenes           _scenes;
+	SceneStack       _scene_stack;
+	SceneActions     _scene_actions;
+	bool             _has_cursor;
+	Vector2f         _cursor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,6 +154,11 @@ void ManagerImpl::set_size(const Vector2f &size)
 {
 	_size = size;
 	_has_size = true;
+}
+
+TextureCache *ManagerImpl::texture_cache()
+{
+	return _texture_cache.pointer();
 }
 
 } // namespace Gui
