@@ -25,6 +25,8 @@ public:
 
 	inline Classes(Allocator *allocator = DefaultAllocator);
 
+	inline ~Classes();
+
 public:
 
 	bool add(const StaticString &name, const Ion::Object &source,
@@ -50,6 +52,11 @@ private:
 Classes::Classes(Allocator *allocator)
 	: _allocator(allocator)
 {
+}
+
+Classes::~Classes()
+{
+	clear();
 }
 
 } // namespace Gui
