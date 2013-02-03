@@ -100,7 +100,7 @@ void OpenAlPlayer::pause()
 
 void OpenAlPlayer::stop()
 {
-	ALint  processed;
+	ALint  processed = 0; // Suppressing Valgrind warning.
 	ALuint buffers[NumBuffers];
 
 	alSourceStop(_source);

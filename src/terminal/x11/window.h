@@ -37,8 +37,6 @@ public:
 
 	void close();
 
-	void set_fixed_size(int width, int height);
-
 public:
 
 	static bool create_window(::Display *display, int screen, ::Window *window, ::GLXContext *glx_context);

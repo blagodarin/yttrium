@@ -18,7 +18,7 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	, _console(*this, _allocator)
 	, _is_console_visible(false)
 {
-	memset(_keys, 0, sizeof(_keys));
+	::memset(_keys, 0, sizeof(_keys));
 }
 
 Terminal::~Terminal()

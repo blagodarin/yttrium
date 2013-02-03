@@ -20,6 +20,19 @@ bool check_glx_version(::Display *display, int major, int minor)
 		&& glx_minor >= minor;
 }
 
+void fix_window_size(::Display *display, ::Window window, const Dim2& size)
+{
+	::XSizeHints size_hints;
+
+	size_hints.min_width = size.x;
+	size_hints.min_height = size.y;
+	size_hints.max_width = size.x;
+	size_hints.max_height = size.y;
+	size_hints.flags = PMinSize | PMaxSize;
+
+	::XSetWMNormalHints(display, window, &size_hints);
+}
+
 } // namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,10 +46,11 @@ Window::Private::Private(const Screen &screen, ::Display *display, int x_screen,
 	, _wm_protocols(XInternAtom(display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(XInternAtom(display, "WM_DELETE_WINDOW", True))
 	, _glx_context(glx_context)
+	, _size(320, 240) // NOTE: Magic default.
 	, _renderer(nullptr)
 {
 	::XSetWMProtocols(display, window, &_wm_delete_window, 1);
-	set_fixed_size(320, 240); // NOTE: Magic default.
+	fix_window_size(_display, _window, _size);
 }
 
 Window::Private::~Private()
@@ -53,19 +67,6 @@ void Window::Private::close()
 		::XDestroyWindow(_display, _window);
 		_window = None;
 	}
-}
-
-void Window::Private::set_fixed_size(int width, int height)
-{
-	::XSizeHints size_hints;
-
-	size_hints.min_width = width;
-	size_hints.min_height = height;
-	size_hints.max_width = width;
-	size_hints.max_height = height;
-	size_hints.flags = PMinSize | PMaxSize;
-
-	::XSetWMNormalHints(_display, _window, &size_hints);
 }
 
 bool Window::Private::create_window(::Display *display, int screen, ::Window *window, ::GLXContext *glx_context)
@@ -319,9 +320,9 @@ bool Window::put(Dim left, Dim top, Dim width, Dim height, PutMode mode)
 	attributes.override_redirect = (mode == NoBorder ? True : False);
 	::XChangeWindowAttributes(_private->_display, _private->_window, CWOverrideRedirect, &attributes);
 	::XMoveResizeWindow(_private->_display, _private->_window, left, top, width, height);
-	_private->set_fixed_size(width, height);
 
 	_private->_size = Dim2(width, height);
+	fix_window_size(_private->_display, _private->_window, _private->_size);
 
 	if (_private->_renderer)
 	{

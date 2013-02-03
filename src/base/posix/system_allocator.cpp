@@ -13,7 +13,7 @@ namespace Yttrium
 {
 
 SystemAllocatorImpl::SystemAllocatorImpl()
-	: _page_size(sysconf(_SC_PAGE_SIZE))
+	: _page_size(::sysconf(_SC_PAGE_SIZE))
 {
 }
 
@@ -26,7 +26,7 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	size_t total_bytes = _page_size * ((reserved_size + size + _page_size - 1) / _page_size);
 	size_t allocated_bytes = total_bytes - reserved_size;
 
-	void *base = mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *base = ::mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (base == MAP_FAILED)
 	{
 		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
@@ -57,7 +57,7 @@ void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference)
 		size_t total_bytes = static_cast<size_t *>(base)[0];
 		size_t allocated_bytes = static_cast<size_t *>(base)[1];
 
-		munmap(base, total_bytes);
+		::munmap(base, total_bytes);
 
 		Difference local_difference;
 
@@ -94,7 +94,7 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 		return pointer;
 	}
 
-	void *new_base = mremap(base, total_bytes, new_total_bytes, (movability == MayMove ? MREMAP_MAYMOVE : 0));
+	void *new_base = ::mremap(base, total_bytes, new_total_bytes, (movability == MayMove ? MREMAP_MAYMOVE : 0));
 	if (new_base == MAP_FAILED)
 	{
 		Y_ABORT_IF(movability == MayMove, "Out of memory"); // NOTE: Safe to continue.

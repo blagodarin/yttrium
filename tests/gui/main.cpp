@@ -2,7 +2,7 @@
 #include <Yttrium/gui/manager.h>
 #include <Yttrium/log.h>
 #include <Yttrium/memory_manager.h>
-#include <Yttrium/renderer.h>
+#include <Yttrium/window.h>
 #include <Yttrium/string.h>
 
 #define BOOST_TEST_MODULE gui
@@ -22,7 +22,18 @@ BOOST_AUTO_TEST_CASE(gui_test)
 	File file(File::Temporary);
 
 	{
-		Renderer renderer;
+		Screen screen;
+
+		BOOST_REQUIRE(screen.open()); // NOTE: Being run in the test set, it fails for unknown reason.
+
+		Window window;
+
+		BOOST_REQUIRE(window.open(screen, nullptr));
+
+		Renderer renderer = window.create_renderer(Renderer::OpenGl);
+
+		BOOST_REQUIRE(renderer);
+
 		Gui::ManagerPtr manager = Gui::Manager::create(renderer);
 
 		BOOST_REQUIRE(manager->load("tests/gui/gui.ion"));

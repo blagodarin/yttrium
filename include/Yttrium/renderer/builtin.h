@@ -58,7 +58,7 @@ public:
 
 	///
 
-	Dim2 size() const noexcept;
+	Dim2 size() const noexcept; // TODO: Rename.
 
 	/// Calculate the \a text size in builtin units.
 
