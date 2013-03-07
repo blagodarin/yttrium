@@ -19,10 +19,6 @@ EnsureSConsVersion(1, 0)
 env = Environment(
 	CPPFLAGS = [],
 	CPPPATH = ['#/include'],
-	ENV = { # For GCC and colorgcc.
-		'HOME': os.environ['HOME'],
-		'PATH': os.environ['PATH'],
-		'TERM': os.environ['TERM']},
 	LIBS = [],
 	LINKFLAGS = [],
 	TOOLS = [])
@@ -34,6 +30,8 @@ platform = env['PLATFORM']
 if platform == 'posix':
 	platform = 'posix-x11'
 	env.Tool('default') # GCC or GCC-compatible toolkit expected.
+	env.Append(
+		ENV = {'HOME': os.environ['HOME'], 'PATH': os.environ['PATH'], 'TERM': os.environ['TERM']}) # Required by GCC and colorgcc.
 elif platform == 'win32':
 	env.Tool('mingw')
 
@@ -93,7 +91,9 @@ if 'windows' in ports:
 	if build_platform == 'win32':
 		env.Append(LIBS = ['gdi32', 'OpenAL32', 'OpenGL32', 'winmm', 'ws2_32'])
 if 'x11' in ports:
-	env.Append(LIBS = ['GL', 'X11', 'Xrandr'])
+	env.Append(
+		ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')}, # Required by XOpenDisplay in tests.
+		LIBS = ['GL', 'X11', 'Xrandr'])
 
 # Slave environment.
 

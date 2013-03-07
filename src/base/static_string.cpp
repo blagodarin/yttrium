@@ -50,7 +50,7 @@ T string_to_int(const char *p, const char *end)
 		result = result * 10 + (*p - '0');
 	}
 
-	return (negate_result ? -result : result);
+	return negate_result ? -result : result;
 }
 
 template <typename T, T threshold>
@@ -102,7 +102,7 @@ bool string_to_int(const char *p, const char *end, T *value)
 		return false;
 	}
 
-	*value = (negate_result ? -result : result);
+	*value = negate_result ? -result : result;
 	return true;
 }
 
@@ -172,10 +172,10 @@ T string_to_real(const char *p, const char *end)
 			power = power * 10 + (*p - '0');
 		}
 
-		result *= pow(10, (negate_power ? -power : power));
+		result *= ::pow(10, (negate_power ? -power : power));
 	}
 
-	return (negate_result ? -result : result);
+	return negate_result ? -result : result;
 }
 
 template <typename T>
@@ -265,7 +265,7 @@ bool string_to_real(const char *p, const char *end, T *value)
 			power = power * 10 + (*p++ - '0');
 		} while (p != end && *p >= '0' && *p <= '9');
 
-		result *= pow(10, (negate_power ? -power : power));
+		result *= ::pow(10, (negate_power ? -power : power));
 	}
 
 	if (p != end)
@@ -273,7 +273,7 @@ bool string_to_real(const char *p, const char *end, T *value)
 		return false;
 	}
 
-	*value = (negate_result ? -result : result);
+	*value = negate_result ? -result : result;
 	return true;
 }
 
@@ -308,7 +308,7 @@ T string_to_uint(const char *p, const char *end)
 
 StaticString::StaticString(const char *text)
 	: _text(const_cast<char *>(text))
-	, _size(strlen(text))
+	, _size(::strlen(text))
 {
 }
 
@@ -316,17 +316,17 @@ int StaticString::compare(const StaticString &string) const
 {
 	if (_size < string._size)
 	{
-		int result = memcmp(_text, string._text, _size);
+		int result = ::memcmp(_text, string._text, _size);
 		return (result ? result : -1);
 	}
 	else if (_size > string._size)
 	{
-		int result = memcmp(_text, string._text, string._size);
+		int result = ::memcmp(_text, string._text, string._size);
 		return (result ? result : 1);
 	}
 	else
 	{
-		return memcmp(_text, string._text, _size);
+		return ::memcmp(_text, string._text, _size);
 	}
 }
 
@@ -375,21 +375,16 @@ String StaticString::escaped(const char *symbols, char with, Allocator* allocato
 
 bool StaticString::ends_with(const StaticString &substring) const
 {
-	if (substring._size > _size)
-	{
-		return false;
-	}
-
-	return !memcmp(&_text[_size - substring._size], substring._text, substring._size);
+	return (substring._size <= _size) && !::memcmp(&_text[_size - substring._size], substring._text, substring._size);
 }
 
 StaticString StaticString::file_extension() const
 {
 	size_t last_dot = find_last('.');
 
-	return (last_dot != End && last_dot
+	return (last_dot != End) && last_dot
 		? StaticString(&_text[last_dot], _size - last_dot)
-		: StaticString());
+		: StaticString();
 }
 
 size_t StaticString::find_first(char symbol, size_t offset) const
@@ -570,7 +565,7 @@ double StaticString::to_time() const
 		result /= factor;
 	}
 
-	return (negate_result ? -result : result);
+	return negate_result ? -result : result;
 }
 
 uint32_t StaticString::to_uint32() const
@@ -592,12 +587,12 @@ String StaticString::zero_terminated(Allocator *allocator) const noexcept
 
 bool StaticString::operator ==(const StaticString &string) const
 {
-	return (_size == string._size && !memcmp(_text, string._text, _size));
+	return (_size == string._size) && !::memcmp(_text, string._text, _size);
 }
 
 bool StaticString::operator !=(const StaticString &string) const
 {
-	return (_size != string._size || memcmp(_text, string._text, _size));
+	return (_size != string._size) || ::memcmp(_text, string._text, _size);
 }
 
 const size_t StaticString::End;

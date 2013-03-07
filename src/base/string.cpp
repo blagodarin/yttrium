@@ -44,7 +44,7 @@ String::String(const char *text, size_t size, Allocator *allocator)
 }
 
 String::String(const char *text, Allocator *allocator)
-	: StaticString(strlen(text))
+	: StaticString(::strlen(text))
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
@@ -64,8 +64,8 @@ String::String(const StaticString &left, const StaticString &right, Allocator *a
 	, _allocator(allocator)
 {
 	init();
-	memcpy(_text, left.text(), left.size());
-	memcpy(&_text[left.size()], right.text(), right.size());
+	::memcpy(_text, left.text(), left.size());
+	::memcpy(&_text[left.size()], right.text(), right.size());
 	_text[_size] = '\0';
 }
 
@@ -75,7 +75,7 @@ String::String(const StaticString &left, char right, Allocator *allocator)
 	, _allocator(allocator)
 {
 	init();
-	memcpy(_text, left.text(), left.size());
+	::memcpy(_text, left.text(), left.size());
 	_text[left.size()] = right;
 	_text[_size] = '\0';
 }
@@ -87,7 +87,7 @@ String::String(char left, const StaticString &right, Allocator *allocator)
 {
 	init();
 	_text[0] = left;
-	memcpy(&_text[1], right.text(), right.size());
+	::memcpy(&_text[1], right.text(), right.size());
 	_text[_size] = '\0';
 }
 
@@ -113,9 +113,9 @@ String &String::append(const char *text, size_t size)
 	else
 	{
 		char *old_text = init(new_size + 1);
-		memcpy(_text, old_text, _size);
+		::memcpy(_text, old_text, _size);
 	}
-	memcpy(&_text[_size], text, size);
+	::memcpy(&_text[_size], text, size);
 	_text[new_size] = '\0';
 	_size = new_size;
 	return *this;
@@ -123,7 +123,7 @@ String &String::append(const char *text, size_t size)
 
 String &String::append(const char *text)
 {
-	return append(text, strlen(text));
+	return append(text, ::strlen(text));
 }
 
 String &String::append(char symbol, size_t count)
@@ -136,7 +136,7 @@ String &String::append(char symbol, size_t count)
 	else
 	{
 		char *old_text = init(new_size + 1);
-		memcpy(_text, old_text, _size);
+		::memcpy(_text, old_text, _size);
 	}
 	memset(&_text[_size], symbol, count);
 	_text[new_size] = '\0';
@@ -221,12 +221,12 @@ String &String::append_dec(uint64_t value, int width, bool zeros)
 namespace
 {
 
-StaticString negative_infinity = S("-INF");
-StaticString positive_infinity = S("INF");
-StaticString negative_nan = S("-NAN");
-StaticString positive_nan = S("NAN");
-StaticString negative_zero = S("-0");
-StaticString positive_zero = S("0");
+const StaticString negative_infinity = S("-INF");
+const StaticString positive_infinity = S("INF");
+const StaticString negative_nan = S("-NAN");
+const StaticString positive_nan = S("NAN");
+const StaticString negative_zero = S("-0");
+const StaticString positive_zero = S("0");
 
 template <typename T>
 StaticString float_to_string(char *buffer, T value, int max_fraction_digits = -1)
@@ -326,26 +326,46 @@ StaticString float_to_string(char *buffer, T value, int max_fraction_digits = -1
 
 			FastSigned fraction_limit = (10 + 3 * fraction_bits) / 10;
 
-			char *fraction_end;
+			char *fraction_end = end
+				+ (max_fraction_digits > 0 && max_fraction_digits < fraction_limit
+					? max_fraction_digits
+					: fraction_limit);
 
-			if (max_fraction_digits > 0 && max_fraction_digits < fraction_limit)
-			{
-				fraction_end = end + max_fraction_digits;
-			}
-			else
-			{
-				fraction_end = end + fraction_limit;
-			}
-
-			FastSigned next_value = fraction_value * 10;
+			char last_digit;
 
 			do
 			{
-				*end++ = '0' + (next_value >> (Float::MantissaBits + 1));
+				FastSigned next_value = fraction_value * 10;
+				last_digit = '0' + (next_value >> (Float::MantissaBits + 1));
+				*end++ = last_digit;
 				fraction_value = next_value & Float::ImplicitMantissaMask;
 			} while (fraction_value && end < fraction_end);
 
-			// TODO: Use the next digit to decide whether we should round up or down.
+			if (fraction_value)
+			{
+				char extra_digit = '0' + ((fraction_value * 10) >> (Float::MantissaBits + 1));
+
+				if (extra_digit > '5' || Y_UNLIKELY(extra_digit == '5' && ((last_digit - '0') & 1)))
+				{
+					++last_digit;
+					while (last_digit > '9')
+					{
+						--end;
+						last_digit = *(end - 1);
+						if (last_digit == '.')
+						{
+							last_digit = '0';
+							++end;
+							break;
+						}
+						else
+						{
+							++last_digit;
+						}
+					}
+					*(end - 1) = last_digit;
+				}
+			}
 		}
 
 		return StaticString(begin, end - begin);
@@ -358,7 +378,7 @@ StaticString float_to_string(char *buffer, T value, int max_fraction_digits = -1
 
 } // namespace
 
-String &String::append_dec(float value) // NOTE: Terrible terrible implementation.
+String &String::append_dec(float value)
 {
 	char buffer[32];
 
@@ -370,18 +390,18 @@ String &String::append_dec(float value) // NOTE: Terrible terrible implementatio
 
 	int size;
 
-	sprintf(buffer, "%f%n", static_cast<double>(value), &size);
+	::sprintf(buffer, "%f%n", static_cast<double>(value), &size);
 	return append(buffer, size);
 
 #endif
 }
 
-String &String::append_dec(double value) // NOTE: Terrible terrible implementation.
+String &String::append_dec(double value)
 {
 	char buffer[32];
 	int  size;
 
-	sprintf(buffer, "%f%n", value, &size);
+	::sprintf(buffer, "%lf%n", value, &size);
 	return append(buffer, size);
 }
 
@@ -418,7 +438,7 @@ void String::insert(const StaticString &text, size_t index)
 		grow(buffer_size);
 		if (index < _size)
 		{
-			memmove(_text + index + text.size(), _text + index, _size - index);
+			::memmove(_text + index + text.size(), _text + index, _size - index);
 		}
 	}
 	else
@@ -426,15 +446,15 @@ void String::insert(const StaticString &text, size_t index)
 		char *old_text = init(buffer_size);
 		if (index)
 		{
-			memcpy(_text, old_text, index);
+			::memcpy(_text, old_text, index);
 		}
 		if (index < _size)
 		{
-			memcpy(_text + index + text.size(), old_text + index, _size - index);
+			::memcpy(_text + index + text.size(), old_text + index, _size - index);
 		}
 	}
 
-	memcpy(_text + index, text.text(), text.size());
+	::memcpy(_text + index, text.text(), text.size());
 	_size += text.size();
 	_text[_size] = '\0';
 }
@@ -453,7 +473,7 @@ void String::insert(char symbol, size_t index)
 		grow(buffer_size);
 		if (index < _size)
 		{
-			memmove(_text + index + 1, _text + index, _size - index);
+			::memmove(_text + index + 1, _text + index, _size - index);
 		}
 	}
 	else
@@ -461,11 +481,11 @@ void String::insert(char symbol, size_t index)
 		char *old_text = init(buffer_size);
 		if (index)
 		{
-			memcpy(_text, old_text, index);
+			::memcpy(_text, old_text, index);
 		}
 		if (index < _size)
 		{
-			memcpy(_text + index + 1, old_text + index, _size - index);
+			::memcpy(_text + index + 1, old_text + index, _size - index);
 		}
 	}
 	_text[index] = symbol;
@@ -491,7 +511,7 @@ void String::remove(size_t index, size_t size)
 		if (*references == 1)
 		{
 			_size -= size;
-			memmove(_text + index, _text + index + size, _size - index);
+			::memmove(_text + index, _text + index + size, _size - index);
 			_text[_size] = '\0';
 			return;
 		}
@@ -501,11 +521,11 @@ void String::remove(size_t index, size_t size)
 
 	if (index)
 	{
-		memcpy(_text, old_text, index);
+		::memcpy(_text, old_text, index);
 	}
 
 	_size -= size;
-	memcpy(_text + index, old_text + index + size, _size - index);
+	::memcpy(_text + index, old_text + index + size, _size - index);
 	_text[_size] = '\0';
 
 	if (references)
@@ -524,7 +544,7 @@ void String::reserve(size_t size)
 	else
 	{
 		char *old_text = init(max(_size + 1, buffer_size));
-		memcpy(_text, old_text, _size + 1);
+		::memcpy(_text, old_text, _size + 1);
 		_text[_size] = '\0';
 	}
 }
@@ -540,7 +560,7 @@ void String::resize(size_t size)
 	else
 	{
 		char *old_text = init(max(_size + 1, buffer_size));
-		memcpy(_text, old_text, _size + 1);
+		::memcpy(_text, old_text, _size + 1);
 	}
 
 	_text[size] = '\0';
@@ -568,7 +588,7 @@ void String::truncate(size_t size)
 	}
 
 	char *old_text = init(size + 1);
-	memcpy(_text, old_text, size);
+	::memcpy(_text, old_text, size);
 	_text[size] = '\0';
 	_size = size;
 
@@ -591,7 +611,7 @@ String &String::set(const char *text, size_t size)
 		init(buffer_size);
 	}
 
-	memcpy(_text, text, size);
+	::memcpy(_text, text, size);
 	_text[size] = '\0';
 	_size = size;
 
@@ -600,7 +620,7 @@ String &String::set(const char *text, size_t size)
 
 String &String::set(const char *text)
 {
-	return set(text, strlen(text));
+	return set(text, ::strlen(text));
 }
 
 String &String::set(char symbol)
@@ -676,7 +696,7 @@ String &String::trim()
 		init(buffer_size);
 	}
 
-	memmove(_text, trimmed_string.text(), trimmed_string.size());
+	::memmove(_text, trimmed_string.text(), trimmed_string.size());
 	_text[trimmed_string.size()] = '\0';
 	_size = trimmed_string.size();
 
@@ -692,7 +712,7 @@ void String::grow(size_t buffer_size)
 	{
 		const char *old_text = _text;
 		init(buffer_size);
-		memcpy(_text, old_text, _size);
+		::memcpy(_text, old_text, _size);
 		_text[_size] = '\0';
 		--*references;
 	}
@@ -730,7 +750,7 @@ void String::init()
 void String::init(const char *string, size_t size)
 {
 	init();
-	memcpy(_text, string, size);
+	::memcpy(_text, string, size);
 	_text[size] = '\0';
 }
 

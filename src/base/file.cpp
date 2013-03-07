@@ -87,12 +87,17 @@ bool File::read_all(String *string)
 
 bool File::read_line(String *string)
 {
-	static const size_t buffer_step = 32;
-
-	if (!_private || (_private->mode & (Read | Pipe)) != Read)
+	if (!_private || !(_private->mode & Read))
 	{
-		return false; // NOTE: This only works for seekable files for now.
+		return false;
 	}
+
+	if (_private->mode & Pipe)
+	{
+		return false; // TODO: Make it work for pipes too.
+	}
+
+	static const size_t buffer_step = 32;
 
 	UOffset file_offset = _offset;
 
@@ -109,7 +114,7 @@ bool File::read_line(String *string)
 		if (!bytes_read)
 		{
 			seek(file_offset + string->size());
-			return offset;
+			return offset; // Return 'false' if we haven't read anything.
 		}
 
 		size_t r_offset = string->find_first('\r', offset);

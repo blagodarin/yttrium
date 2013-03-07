@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(gui_test)
 	{
 		Screen screen;
 
-		BOOST_REQUIRE(screen.open()); // NOTE: Being run in the test set, it fails for unknown reason.
+		BOOST_REQUIRE(screen.open());
 
 		Window window;
 
