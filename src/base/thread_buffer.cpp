@@ -40,7 +40,7 @@ void ThreadBufferBase::end_read()
 	--_size;
 	if (_size == _capacity - 1)
 	{
-		_private->write.signal();
+		_private->write.notify_one();
 	}
 	_private->mutex.unlock();
 }
@@ -50,7 +50,7 @@ void ThreadBufferBase::end_write()
 	++_size;
 	if (_size == 1)
 	{
-		_private->read.signal();
+		_private->read.notify_one();
 	}
 	_private->mutex.unlock();
 }

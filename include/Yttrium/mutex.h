@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 
-class Signal;
+class Condition;
 
 /// %Mutex locker.
 
@@ -42,7 +42,7 @@ private:
 
 class Y_API Mutex
 {
-	friend Signal;
+	friend Condition;
 
 public:
 

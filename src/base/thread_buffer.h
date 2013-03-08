@@ -3,8 +3,8 @@
 
 #include <Yttrium/thread_buffer.h>
 
+#include "condition.h"
 #include "mutex.h"
-#include "signal.h"
 
 namespace Yttrium
 {
@@ -13,10 +13,10 @@ class Y_PRIVATE ThreadBufferBase::Private
 {
 public:
 
-	Allocator    *allocator;
-	StaticMutex   mutex;
-	StaticSignal  read;
-	StaticSignal  write;
+	Allocator       *allocator;
+	StaticMutex      mutex;
+	StaticCondition  read;
+	StaticCondition  write;
 
 	Private(Allocator *allocator)
 		: allocator(allocator)

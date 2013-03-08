@@ -9,6 +9,7 @@
 #include <Yttrium/audio.h>
 #include <Yttrium/bindings.h>
 #include <Yttrium/buffer.h>
+#include <Yttrium/condition.h>
 #include <Yttrium/file.h>
 #include <Yttrium/global.h>
 #include <Yttrium/gui.h>
@@ -28,7 +29,6 @@
 #include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/screen.h>
 #include <Yttrium/script.h>
-#include <Yttrium/signal.h>
 #include <Yttrium/static_string.h>
 #include <Yttrium/string.h>
 #include <Yttrium/terminal.h>

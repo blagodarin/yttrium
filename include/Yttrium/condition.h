@@ -1,8 +1,8 @@
 /// \file
-/// \brief Cross-thread signals.
+/// \brief
 
-#ifndef __Y_SIGNAL_H
-#define __Y_SIGNAL_H
+#ifndef __Y_CONDITION_H
+#define __Y_CONDITION_H
 
 #include <Yttrium/time.h>
 
@@ -13,21 +13,21 @@ class Mutex;
 
 ///
 
-class Y_API Signal
+class Y_API Condition
 {
 public:
 
 	///
 
-	Signal(Allocator *allocator = DefaultAllocator) noexcept;
+	Condition(Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
-	Signal(const Signal &signal) noexcept;
+	Condition(const Condition &condition) noexcept;
 
 	///
 
-	~Signal() noexcept
+	~Condition() noexcept
 	{
 		close();
 	}
@@ -36,7 +36,11 @@ public:
 
 	///
 
-	void wait(Mutex *mutex) noexcept;
+	void notify_all() noexcept;
+
+	///
+
+	void notify_one() noexcept;
 
 	///
 
@@ -48,13 +52,13 @@ public:
 
 	///
 
-	void signal() noexcept;
+	void wait(Mutex *mutex) noexcept;
 
 public:
 
 	///
 
-	Signal &operator =(const Signal &signal) noexcept;
+	Condition &operator =(const Condition &condition) noexcept;
 
 public:
 
@@ -62,7 +66,7 @@ public:
 
 protected:
 
-	Signal(Private *private_)
+	Condition(Private *private_)
 		: _private(private_)
 	{
 	}
@@ -78,4 +82,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __Y_SIGNAL_H
+#endif // __Y_CONDITION_H
