@@ -26,6 +26,12 @@ public:
 
 	///
 
+	Bindings(Allocator *allocator = DefaultAllocator) noexcept;
+
+public:
+
+	///
+
 	void bind(Key key, const StaticString &action) noexcept;
 
 	///
@@ -62,9 +68,8 @@ public:
 
 private:
 
-	// TODO: Add allocators.
-
-	String _actions[KeyType(Key::__Count)]; // NOTE: Heavy. =(
+	Allocator *_allocator;
+	String     _actions[KeyType(Key::__Count)];
 };
 
 } // namespace Yttrium

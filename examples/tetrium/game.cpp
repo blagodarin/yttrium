@@ -12,6 +12,7 @@ Game::Game(Allocator *allocator)
 	, _renderer_allocator("renderer", allocator)
 	, _audio(_allocator)
 	, _terminal(this, _allocator)
+	, _bindings(allocator)
 	, _commands(this)
 {
 }

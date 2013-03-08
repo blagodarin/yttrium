@@ -186,9 +186,14 @@ const char *bind_names[] =
 
 } // namespace
 
+Bindings::Bindings(Allocator *allocator)
+	: _allocator(allocator)
+{
+}
+
 void Bindings::bind(Key key, const StaticString &action)
 {
-	_actions[KeyType(key)] = action;
+	_actions[KeyType(key)].swap(String(action, _allocator));
 }
 
 bool Bindings::bind(const StaticString &name, const StaticString &action)
@@ -200,7 +205,7 @@ bool Bindings::bind(const StaticString &name, const StaticString &action)
 		return false;
 	}
 
-	_actions[KeyType(key)] = action;
+	_actions[KeyType(key)].swap(String(action, _allocator));
 	return true;
 }
 
@@ -210,7 +215,7 @@ void Bindings::bind_default(Key key, const StaticString &action)
 
 	if (old_action.is_empty())
 	{
-		old_action = action;
+		old_action.swap(String(action, _allocator));
 	}
 }
 
@@ -227,7 +232,7 @@ bool Bindings::bind_default(const StaticString &name, const StaticString &action
 
 	if (old_action.is_empty())
 	{
-		old_action = action;
+		old_action.swap(String(action, _allocator));
 	}
 
 	return true;

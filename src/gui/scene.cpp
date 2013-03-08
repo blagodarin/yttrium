@@ -28,6 +28,7 @@ Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocato
 	, _focused_widget(nullptr)
 	, _left_button_widget(nullptr)
 	, _is_transparent(false)
+	, _bindings(allocator)
 {
 }
 
