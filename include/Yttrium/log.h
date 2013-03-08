@@ -5,7 +5,6 @@
 #define __Y_LOG_H
 
 #include <Yttrium/file.h>
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/string.h>
 
 namespace Yttrium
@@ -13,8 +12,10 @@ namespace Yttrium
 
 ///
 
-class Y_API LogManager: public Noncopyable
+class Y_API LogManager
 {
+	Y_NONCOPYABLE(LogManager);
+
 public:
 
 	///

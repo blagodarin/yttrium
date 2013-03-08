@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 
-class OpenAlPlayer: public AudioPlayerBackend
+class OpenAlPlayer
+	: public AudioPlayerBackend
 {
 public:
 

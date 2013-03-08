@@ -8,7 +8,8 @@ namespace Yttrium
 
 struct WavChunkHeader;
 
-class WavReader: public AudioReader::Private
+class WavReader
+	: public AudioReader::Private
 {
 public:
 

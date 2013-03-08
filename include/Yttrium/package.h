@@ -5,7 +5,6 @@
 #define __Y_PACKAGE_H
 
 #include <Yttrium/file.h>
-#include <Yttrium/noncopyable.h>
 
 #include <vector>
 
@@ -170,8 +169,10 @@ private:
 
 /// Package manager.
 
-class Y_API PackageManager: public Noncopyable
+class Y_API PackageManager
 {
+	Y_NONCOPYABLE(PackageManager);
+
 public:
 
 	/// File search order.

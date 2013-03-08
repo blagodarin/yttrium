@@ -1,7 +1,6 @@
 #ifndef __BASE_POSIX_SIGNAL_H
 #define __BASE_POSIX_SIGNAL_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/signal.h>
 
 #include "../private_base.h"
@@ -11,7 +10,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Signal::Private: public PrivateBase<Signal::Private>
+class Y_PRIVATE Signal::Private
+	: public PrivateBase<Signal::Private>
 {
 public:
 
@@ -24,8 +24,11 @@ public:
 	~Private();
 };
 
-class StaticSignal: public Signal, public Noncopyable
+class StaticSignal
+	: public Signal
 {
+	Y_NONCOPYABLE(StaticSignal);
+
 public:
 
 	StaticSignal()

@@ -16,7 +16,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Renderer::Private: public PrivateBase<Renderer::Private>
+class Y_PRIVATE Renderer::Private
+	: public PrivateBase<Renderer::Private>
 {
 public:
 

@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE AudioReader::Private: public PrivateBase<AudioReader::Private>
+class Y_PRIVATE AudioReader::Private
+	: public PrivateBase<AudioReader::Private>
 {
 public:
 

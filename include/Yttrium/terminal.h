@@ -14,7 +14,8 @@ class RendererBuiltin;
 
 /// Incapsulation of Screen and Window classes and input management.
 
-class Y_API Terminal: private Window::Callbacks
+class Y_API Terminal
+	: private Window::Callbacks
 {
 public:
 

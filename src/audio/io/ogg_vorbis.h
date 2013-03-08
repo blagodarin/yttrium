@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 
-class OggVorbisReader: public AudioReader::Private
+class OggVorbisReader
+	: public AudioReader::Private
 {
 public:
 

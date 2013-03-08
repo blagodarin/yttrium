@@ -4,7 +4,6 @@
 #ifndef __Y_POOL_H
 #define __Y_POOL_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/types.h>
 
 namespace Yttrium
@@ -30,8 +29,10 @@ struct PoolStatus
 
 ///
 
-class Y_API PoolBase: public Noncopyable
+class Y_API PoolBase
 {
+	Y_NONCOPYABLE(PoolBase);
+
 public:
 
 	///
@@ -77,7 +78,8 @@ private:
 ///
 
 template <typename T>
-class Pool: public PoolBase
+class Pool
+	: public PoolBase
 {
 public:
 

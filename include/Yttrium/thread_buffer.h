@@ -4,14 +4,15 @@
 #ifndef __Y_THREAD_BUFFER_H
 #define __Y_THREAD_BUFFER_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/time.h>
 
 namespace Yttrium
 {
 
-class Y_API ThreadBufferBase: public Noncopyable
+class Y_API ThreadBufferBase
 {
+	Y_NONCOPYABLE(ThreadBufferBase);
+
 public:
 
 	ThreadBufferBase(size_t capacity, Allocator *allocator = DefaultAllocator) noexcept;
@@ -56,7 +57,8 @@ private:
 /// \tparam N Buffer size.
 
 template <typename T, size_t N = 1>
-class ThreadBuffer: public ThreadBufferBase
+class ThreadBuffer
+	: public ThreadBufferBase
 {
 public:
 

@@ -8,7 +8,8 @@ namespace Yttrium
 
 struct GlApi;
 
-class OpenGlTextureCache: public TextureCache
+class OpenGlTextureCache
+	: public TextureCache
 {
 public:
 

@@ -10,7 +10,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Texture2D::Private: public PrivateBase<Texture2D::Private>
+class Y_PRIVATE Texture2D::Private
+	: public PrivateBase<Texture2D::Private>
 {
 public:
 

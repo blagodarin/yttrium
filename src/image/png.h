@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 
-class PngWriter: public ImageWriter::Private
+class PngWriter
+	: public ImageWriter::Private
 {
 public:
 

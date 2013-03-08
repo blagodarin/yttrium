@@ -14,7 +14,8 @@ namespace Gui
 
 class ManagerImpl;
 
-class IonPropertyLoader: public PropertyLoader
+class IonPropertyLoader
+	: public PropertyLoader
 {
 public:
 

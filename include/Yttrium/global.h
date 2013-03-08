@@ -179,6 +179,12 @@
 
 #define Y_LENGTH_OF(array) (sizeof(array) / sizeof (array)[0])
 
+/// Make the current class \a Class non-copyable.
+
+#define Y_NONCOPYABLE(Class) \
+	Class(const Class &) = delete; \
+	Class &operator =(const Class &) = delete
+
 /// Mark the specified parameter as unused.
 /// \note Don't use this macro to mark the parameters that are never planned
 /// to be used, prefer the parameter name omission in that case instead.

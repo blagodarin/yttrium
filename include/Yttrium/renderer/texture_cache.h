@@ -21,7 +21,8 @@ typedef ObjectPointer<TextureCache> TextureCachePtr;
 
 /// Texture cache.
 
-class Y_API TextureCache: public Object
+class Y_API TextureCache
+	: public Object
 {
 	TextureCache(const TextureCache &) = delete;
 	TextureCache &operator =(const TextureCache &) = delete;

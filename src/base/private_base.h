@@ -3,7 +3,6 @@
 
 #include <Yttrium/allocator.h>
 #include <Yttrium/assert.h>
-#include <Yttrium/noncopyable.h>
 
 #include <atomic>
 
@@ -11,8 +10,10 @@ namespace Yttrium
 {
 
 template <typename T>
-class PrivateBase: public Noncopyable
+class PrivateBase
 {
+	Y_NONCOPYABLE(PrivateBase);
+
 public:
 
 	PrivateBase(Allocator *allocator)

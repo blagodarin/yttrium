@@ -12,7 +12,8 @@ namespace Yttrium
 
 /// Proxy allocator.
 
-class Y_API ProxyAllocator: public Allocator
+class Y_API ProxyAllocator
+	: public Allocator
 {
 public:
 

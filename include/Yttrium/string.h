@@ -12,7 +12,8 @@ namespace Yttrium
 ///
 /// \note Strings with an allocated storage always store a zero terminator.
 
-class Y_API String: public StaticString
+class Y_API String
+	: public StaticString
 {
 public:
 

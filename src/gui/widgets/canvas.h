@@ -12,7 +12,8 @@ namespace Yttrium
 namespace Gui
 {
 
-class Canvas: public Widget
+class Canvas
+	: public Widget
 {
 public:
 

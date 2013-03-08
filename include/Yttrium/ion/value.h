@@ -17,12 +17,14 @@ class Document;
 
 ///
 
-class Y_API Value: public Noncopyable
+class Y_API Value
 {
 	friend Document;
 	friend List;
 	friend List::ConstRange;
 	friend List::Range;
+
+	Y_NONCOPYABLE(Value);
 
 public:
 

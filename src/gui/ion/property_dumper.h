@@ -12,7 +12,8 @@ namespace Yttrium
 namespace Gui
 {
 
-class IonPropertyDumper: public PropertyDumper
+class IonPropertyDumper
+	: public PropertyDumper
 {
 public:
 

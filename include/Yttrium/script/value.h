@@ -4,7 +4,6 @@
 #ifndef __Y_SCRIPT_VALUE_H
 #define __Y_SCRIPT_VALUE_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/string.h>
 
 namespace Yttrium

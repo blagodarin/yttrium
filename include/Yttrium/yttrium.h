@@ -19,7 +19,7 @@
 #include <Yttrium/matrix.h>
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/mutex.h>
-#include <Yttrium/noncopyable.h>
+#include <Yttrium/object.h>
 #include <Yttrium/package.h>
 #include <Yttrium/pool.h>
 #include <Yttrium/proxy_allocator.h>

@@ -2,7 +2,6 @@
 #define __BASE_POSIX_MUTEX_H
 
 #include <Yttrium/mutex.h>
-#include <Yttrium/noncopyable.h>
 
 #include "../private_base.h"
 
@@ -11,7 +10,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Mutex::Private: public PrivateBase<Mutex::Private>
+class Y_PRIVATE Mutex::Private
+	: public PrivateBase<Mutex::Private>
 {
 public:
 
@@ -24,8 +24,11 @@ public:
 	~Private();
 };
 
-class StaticMutex: public Mutex, public Noncopyable
+class StaticMutex
+	: public Mutex
 {
+	Y_NONCOPYABLE(StaticMutex);
+
 public:
 
 	StaticMutex()

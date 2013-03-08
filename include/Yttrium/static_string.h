@@ -259,7 +259,8 @@ protected:
 
 /// Helper class for building StaticStrings from string literals.
 
-class S: public StaticString
+class S
+	: public StaticString
 {
 public:
 

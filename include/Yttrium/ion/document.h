@@ -16,7 +16,8 @@ class List;
 
 ///
 
-class Y_API Document: public Object
+class Y_API Document
+	: public Object
 {
 	friend List;
 	friend Node;

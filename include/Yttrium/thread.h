@@ -4,7 +4,6 @@
 #ifndef __Y_THREAD_H
 #define __Y_THREAD_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/time.h>
 
 namespace Yttrium
@@ -12,8 +11,10 @@ namespace Yttrium
 
 /// %Thread.
 
-class Y_API Thread: public Noncopyable
+class Y_API Thread
 {
+	Y_NONCOPYABLE(Thread);
+
 public:
 
 	///

@@ -4,7 +4,6 @@
 #ifndef __Y_OBJECT_H
 #define __Y_OBJECT_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/types.h>
 
 #include <atomic>
@@ -15,9 +14,10 @@ namespace Yttrium
 /// An object with a reference counter.
 
 class Y_API Object
-	: public Noncopyable
 {
 	friend Allocator;
+
+	Y_NONCOPYABLE(Object);
 
 public:
 

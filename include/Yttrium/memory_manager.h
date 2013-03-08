@@ -4,7 +4,7 @@
 #ifndef __Y_MEMORY_MANAGER_H
 #define __Y_MEMORY_MANAGER_H
 
-#include <Yttrium/noncopyable.h>
+#include <Yttrium/global.h>
 
 namespace Yttrium
 {
@@ -13,8 +13,10 @@ class Allocator;
 
 ///
 
-class Y_API MemoryManager: public Noncopyable
+class Y_API MemoryManager
 {
+	Y_NONCOPYABLE(MemoryManager);
+
 public:
 
 	///

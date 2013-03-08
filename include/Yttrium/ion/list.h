@@ -4,7 +4,6 @@
 #ifndef __Y_ION_LIST_H
 #define __Y_ION_LIST_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/static_string.h>
 
 namespace Yttrium
@@ -22,10 +21,12 @@ class Value;
 
 ///
 
-class Y_API List: public Noncopyable
+class Y_API List
 {
 	friend Parser;
 	friend Value;
+
+	Y_NONCOPYABLE(List);
 
 public:
 

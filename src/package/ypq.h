@@ -11,7 +11,8 @@
 namespace Yttrium
 {
 
-class YpqReader: public PackageReader::Private
+class YpqReader
+	: public PackageReader::Private
 {
 public:
 
@@ -35,7 +36,8 @@ private:
 	Index _index;
 };
 
-class YpqWriter: public PackageWriter::Private
+class YpqWriter
+	: public PackageWriter::Private
 {
 public:
 

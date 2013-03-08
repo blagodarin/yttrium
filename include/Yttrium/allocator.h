@@ -174,7 +174,8 @@ protected:
 
 /// System allocator.
 
-class Y_API SystemAllocator: public Allocator
+class Y_API SystemAllocator
+	: public Allocator
 {
 public:
 

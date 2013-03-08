@@ -9,7 +9,8 @@
 namespace Yttrium
 {
 
-class OpenGlRenderer: public Renderer::Private
+class OpenGlRenderer
+	: public Renderer::Private
 {
 public:
 

@@ -24,7 +24,8 @@ protected:
 };
 
 template <typename T>
-class IeeeFloat: public IeeeFloatBase<T>
+class IeeeFloat
+	: public IeeeFloatBase<T>
 {
 public:
 

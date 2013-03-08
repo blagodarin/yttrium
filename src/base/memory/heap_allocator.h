@@ -6,7 +6,8 @@
 namespace Yttrium
 {
 
-class HeapAllocator: public Allocator
+class HeapAllocator
+	: public Allocator
 {
 public:
 

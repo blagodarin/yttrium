@@ -10,7 +10,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Screen::Private: public PrivateBase<Screen::Private>
+class Y_PRIVATE Screen::Private
+	: public PrivateBase<Screen::Private>
 {
 public:
 

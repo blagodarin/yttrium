@@ -17,9 +17,11 @@ namespace Yttrium
 
 /// Script context.
 
-class Y_API ScriptContext: public Noncopyable
+class Y_API ScriptContext
 {
 	friend ScriptArgs;
+
+	Y_NONCOPYABLE(ScriptContext);
 
 public:
 

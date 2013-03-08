@@ -4,7 +4,6 @@
 #ifndef __Y_ION_OBJECT_H
 #define __Y_ION_OBJECT_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/static_string.h>
 
 #include <map>
@@ -25,10 +24,12 @@ class Value;
 
 ///
 
-class Y_API Object: public Noncopyable
+class Y_API Object
 {
 	friend Document;
 	friend Parser;
+
+	Y_NONCOPYABLE(Object);
 
 public:
 
@@ -81,8 +82,6 @@ public:
 	};
 
 public:
-
-	Object &operator =(const Object &) = delete;
 
 	///
 

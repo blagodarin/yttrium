@@ -12,7 +12,8 @@ namespace Yttrium
 namespace Gui
 {
 
-class Label: public Widget
+class Label
+	: public Widget
 {
 public:
 

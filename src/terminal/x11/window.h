@@ -11,7 +11,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Window::Private: public PrivateBase<Window::Private>
+class Y_PRIVATE Window::Private
+	: public PrivateBase<Window::Private>
 {
 public:
 

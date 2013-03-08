@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 
-class OpenAlManager: public AudioManager::Private
+class OpenAlManager
+	: public AudioManager::Private
 {
 public:
 

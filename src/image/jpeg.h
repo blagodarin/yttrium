@@ -12,7 +12,8 @@
 namespace Yttrium
 {
 
-class JpegReader: public ImageReader::Private
+class JpegReader
+	: public ImageReader::Private
 {
 public:
 

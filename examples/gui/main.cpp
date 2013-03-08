@@ -3,7 +3,8 @@
 using namespace std::placeholders;
 using namespace Yttrium;
 
-class GuiExample: public Terminal::Callbacks
+class GuiExample
+	: public Terminal::Callbacks
 {
 public:
 

@@ -5,7 +5,8 @@
 
 #include "public.h"
 
-class Public::Private: public Yttrium::PrivateBase<Public::Private>
+class Public::Private
+	: public Yttrium::PrivateBase<Public::Private>
 {
 public:
 

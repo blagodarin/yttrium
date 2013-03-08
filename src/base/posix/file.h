@@ -2,7 +2,6 @@
 #define __BASE_POSIX_FILE_H
 
 #include <Yttrium/file.h>
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/string.h>
 
 #include "../private_base.h"
@@ -10,7 +9,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE File::Private: public PrivateBase<File::Private>
+class Y_PRIVATE File::Private
+	: public PrivateBase<File::Private>
 {
 public:
 
@@ -37,8 +37,11 @@ public:
 	static int open(const StaticString &name, int flags, Allocator *allocator);
 };
 
-class StaticFile: public File, public Noncopyable
+class StaticFile
+	: public File
 {
+	Y_NONCOPYABLE(StaticFile);
+
 public:
 
 	StaticFile()

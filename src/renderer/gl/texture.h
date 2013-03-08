@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 
-class OpenGlTexture2D: public Texture2D::Private
+class OpenGlTexture2D
+	: public Texture2D::Private
 {
 public:
 

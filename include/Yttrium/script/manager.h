@@ -4,7 +4,6 @@
 #ifndef __Y_SCRIPT_MANAGER_H
 #define __Y_SCRIPT_MANAGER_H
 
-#include <Yttrium/noncopyable.h>
 #include <Yttrium/script/context.h>
 #include <Yttrium/string.h>
 
@@ -13,8 +12,10 @@ namespace Yttrium
 
 /// Script manager.
 
-class Y_API ScriptManager: public Noncopyable
+class Y_API ScriptManager
 {
+	Y_NONCOPYABLE(ScriptManager);
+
 public:
 
 	///

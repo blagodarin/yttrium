@@ -12,7 +12,8 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE AudioPlayer::Private: public Thread
+class Y_PRIVATE AudioPlayer::Private
+	: public Thread
 {
 public:
 

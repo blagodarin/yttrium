@@ -6,7 +6,8 @@
 namespace Yttrium
 {
 
-class TgaReader: public ImageReader::Private
+class TgaReader
+	: public ImageReader::Private
 {
 public:
 
@@ -22,7 +23,8 @@ public:
 	bool read(void *buffer, size_t frame_size) override;
 };
 
-class TgaWriter: public ImageWriter::Private
+class TgaWriter
+	: public ImageWriter::Private
 {
 public:
 

@@ -5,7 +5,6 @@
 #define __Y_AUDIO_MANAGER_H
 
 #include <Yttrium/audio/player.h>
-#include <Yttrium/noncopyable.h>
 
 #include <set>
 
@@ -16,8 +15,10 @@ class ProxyAllocator;
 
 /// Audio manager.
 
-class Y_API AudioManager: public Noncopyable
+class Y_API AudioManager
 {
+	Y_NONCOPYABLE(AudioManager);
+
 public:
 
 	///
