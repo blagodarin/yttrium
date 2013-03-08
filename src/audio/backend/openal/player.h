@@ -14,23 +14,23 @@ public:
 
 	OpenAlPlayer();
 
-	virtual ~OpenAlPlayer();
+	~OpenAlPlayer() override;
 
 private: // AudioPlayerBackend
 
-	virtual bool set_format(const AudioFormat &format);
+	bool set_format(const AudioFormat &format) override;
 
-	virtual void fill_buffer(size_t index, void *data, size_t size);
+	void fill_buffer(size_t index, void *data, size_t size) override;
 
-	virtual size_t check_buffers();
+	size_t check_buffers() override;
 
-	virtual void refill_buffer(void *data, size_t size);
+	void refill_buffer(void *data, size_t size) override;
 
-	virtual void play();
+	void play() override;
 
-	virtual void pause();
+	void pause() override;
 
-	virtual void stop();
+	void stop() override;
 
 private:
 

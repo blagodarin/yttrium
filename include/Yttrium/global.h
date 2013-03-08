@@ -18,13 +18,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // \def __Y_GCC
-// \brief GCC version number (e.g. 46 for GCC 4.6).
+// \brief GCC version number (e.g. 47 for GCC 4.7).
 
 #if defined(__GNUC__)
-	#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
+	#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
 		#define __Y_GCC (__GNUC__ * 10 + __GNUC_MINOR__)
 	#else
-		#error GCC compilers older than 4.6 are not supported.
+		#error GCC compilers older than 4.7 are not supported.
 	#endif
 #else
 	#define __Y_GCC 0

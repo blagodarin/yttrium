@@ -20,21 +20,21 @@ public:
 
 public: // PropertyDumper
 
-	virtual void dump_alignment(const StaticString &name, Alignment alignment);
+	void dump_alignment(const StaticString &name, Alignment alignment) override;
 
-	virtual void dump_color(const StaticString &name, const Vector4f &color);
+	void dump_color(const StaticString &name, const Vector4f &color) override;
 
-	virtual void dump_position(const StaticString &name, const Vector3f &color);
+	void dump_position(const StaticString &name, const Vector3f &color) override;
 
-	virtual void dump_scaling(const StaticString &name, Scaling scaling);
+	void dump_scaling(const StaticString &name, Scaling scaling) override;
 
-	virtual void dump_size(const StaticString &name, const Vector2f &size);
+	void dump_size(const StaticString &name, const Vector2f &size) override;
 
-	virtual void dump_state(const StaticString &name, WidgetState state);
+	void dump_state(const StaticString &name, WidgetState state) override;
 
-	virtual void dump_text(const StaticString &name, const StaticString &text);
+	void dump_text(const StaticString &name, const StaticString &text) override;
 
-	virtual void dump_texture(const StaticString &name, const Texture2D &texture);
+	void dump_texture(const StaticString &name, const Texture2D &texture) override;
 
 private:
 

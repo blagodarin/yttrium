@@ -14,7 +14,7 @@ namespace Ion
 
 class Y_PRIVATE Document::Private
 {
-	friend class Document;
+	friend Document;
 
 public:
 

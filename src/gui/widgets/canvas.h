@@ -20,11 +20,11 @@ public:
 
 public: // Widget
 
-	virtual void dump(PropertyDumper *dumper) const;
+	void dump(PropertyDumper *dumper) const override;
 
-	virtual bool load(PropertyLoader &loader);
+	bool load(PropertyLoader &loader) override;
 
-	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const;
+	void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const override;
 
 private:
 

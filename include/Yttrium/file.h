@@ -18,8 +18,8 @@ class String;
 
 class Y_API File
 {
-	friend class PackageReader;
-	friend class PackageWriter;
+	friend PackageReader;
+	friend PackageWriter;
 
 public:
 

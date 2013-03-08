@@ -14,7 +14,7 @@ public:
 
 	OpenAlManager(ALCdevice *device, ALCcontext *context, const String &device_name, Allocator *allocator);
 
-	virtual ~OpenAlManager();
+	~OpenAlManager() override;
 
 public:
 

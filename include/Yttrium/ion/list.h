@@ -24,8 +24,8 @@ class Value;
 
 class Y_API List: public Noncopyable
 {
-	friend class Parser;
-	friend class Value;
+	friend Parser;
+	friend Value;
 
 public:
 
@@ -33,7 +33,7 @@ public:
 
 	class Range
 	{
-		friend class List;
+		friend List;
 
 	public:
 
@@ -84,7 +84,7 @@ public:
 
 	class ConstRange
 	{
-		friend class List;
+		friend List;
 
 	public:
 

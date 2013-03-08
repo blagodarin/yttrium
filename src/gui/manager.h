@@ -31,7 +31,7 @@ class Scene;
 class ManagerImpl
 	: public Manager
 {
-	friend class IonDumper;
+	friend IonDumper;
 
 public:
 
@@ -53,7 +53,7 @@ public:
 
 	ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocator *allocator);
 
-	virtual ~ManagerImpl() noexcept;
+	~ManagerImpl() noexcept override;
 
 public:
 
@@ -82,23 +82,23 @@ public:
 
 public: // Manager.
 
-	virtual void clear() noexcept;
+	void clear() noexcept override;
 
-	virtual void dump(const StaticString &filename) const noexcept;
+	void dump(const StaticString &filename) const noexcept override;
 
-	virtual bool has_scene(const StaticString &name) const noexcept;
+	bool has_scene(const StaticString &name) const noexcept override;
 
-	virtual bool load(const StaticString &filename) noexcept;
+	bool load(const StaticString &filename) noexcept override;
 
-	virtual bool pop_scenes(size_t count) noexcept;
+	bool pop_scenes(size_t count) noexcept override;
 
-	virtual bool push_scene(const StaticString &name) noexcept;
+	bool push_scene(const StaticString &name) noexcept override;
 
-	virtual bool process_key(Terminal *terminal, Key key, KeyState state) noexcept;
+	bool process_key(Terminal *terminal, Key key, KeyState state) noexcept override;
 
-	virtual bool render() noexcept;
+	bool render() noexcept override;
 
-	virtual void set_cursor(const Vector2f &cursor) noexcept;
+	void set_cursor(const Vector2f &cursor) noexcept override;
 
 private:
 

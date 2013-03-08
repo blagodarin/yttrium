@@ -175,8 +175,8 @@ private:
 
 private: // Window::Callbacks
 
-	Y_PRIVATE virtual void on_focus_event(Window *window, bool is_focused) noexcept;
-	Y_PRIVATE virtual void on_key_event(Window *window, Key key, bool is_pressed) noexcept;
+	Y_PRIVATE void on_focus_event(Window *window, bool is_focused) noexcept override;
+	Y_PRIVATE void on_key_event(Window *window, Key key, bool is_pressed) noexcept override;
 
 private:
 

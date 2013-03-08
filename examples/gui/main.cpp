@@ -68,11 +68,11 @@ private:
 
 private: // Terminal::Callbacks
 
-	virtual void on_cursor_movement(Terminal *, const Dim2 &) noexcept
+	void on_cursor_movement(Terminal *, const Dim2 &) noexcept override
 	{
 	}
 
-	virtual bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept
+	bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept override
 	{
 		return _gui->process_key(terminal, key, state);
 	}

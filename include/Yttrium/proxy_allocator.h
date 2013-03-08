@@ -22,7 +22,7 @@ public:
 
 	///
 
-	virtual ~ProxyAllocator() noexcept;
+	~ProxyAllocator() noexcept override;
 
 public:
 
@@ -40,15 +40,15 @@ public: // Allocator.
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept;
+	void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept override;
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = nullptr) noexcept;
+	void deallocate(void *pointer, Difference *difference = nullptr) noexcept override;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept;
+	void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept override;
 
 private:
 

@@ -22,27 +22,27 @@ public:
 
 public: // PropertyLoader
 
-	virtual void bind(const StaticString &name);
+	void bind(const StaticString &name) override;
 
-	virtual bool load_alignment(const StaticString &name, Alignment *alignment);
+	bool load_alignment(const StaticString &name, Alignment *alignment) override;
 
-	virtual bool load_color(const StaticString &name, Vector4f *color);
+	bool load_color(const StaticString &name, Vector4f *color) override;
 
-	virtual bool load_font(const StaticString &name, TextureFont *font, Texture2D *texture);
+	bool load_font(const StaticString &name, TextureFont *font, Texture2D *texture) override;
 
-	virtual bool load_position(const StaticString &name, Vector3f *color);
+	bool load_position(const StaticString &name, Vector3f *color) override;
 
-	virtual bool load_scaling(const StaticString &name, Scaling *scaling);
+	bool load_scaling(const StaticString &name, Scaling *scaling) override;
 
-	virtual bool load_size(const StaticString &name, Vector2f *size);
+	bool load_size(const StaticString &name, Vector2f *size) override;
 
-	virtual bool load_state(const StaticString &name, WidgetState *state);
+	bool load_state(const StaticString &name, WidgetState *state) override;
 
-	virtual bool load_text(const StaticString &name, String *text);
+	bool load_text(const StaticString &name, String *text) override;
 
-	virtual bool load_texture(const StaticString &name, Texture2D *texture);
+	bool load_texture(const StaticString &name, Texture2D *texture) override;
 
-	virtual void unbind();
+	void unbind() override;
 
 public:
 

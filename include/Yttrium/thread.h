@@ -64,9 +64,7 @@ private:
 
 	class Private;
 
-	friend class Private;
-
-private:
+	friend Private;
 
 	Allocator *_allocator; // NOTE: Why store an allocator? Private should already have one.
 	Private   *_private;

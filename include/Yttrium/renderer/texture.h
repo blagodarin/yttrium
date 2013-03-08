@@ -16,8 +16,8 @@ class TextureCache;
 
 class Y_API Texture2D
 {
-	friend class Renderer;
-	friend class TextureCache;
+	friend Renderer;
+	friend TextureCache;
 
 public:
 

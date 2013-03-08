@@ -21,7 +21,7 @@ public:
 
 	class Writer
 	{
-		friend class LogManager;
+		friend LogManager;
 
 	public:
 
@@ -50,7 +50,7 @@ public:
 		String      _message;
 	};
 
-	friend class Writer;
+	friend Writer;
 
 public:
 

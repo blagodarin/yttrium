@@ -17,7 +17,7 @@ namespace Yttrium
 
 class Y_API Window
 {
-	friend class Renderer;
+	friend Renderer;
 
 public:
 

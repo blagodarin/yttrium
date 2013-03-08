@@ -22,9 +22,9 @@ public:
 
 public:
 
-	virtual bool open();
+	bool open() override;
 
-	virtual PackedFile open_file(const StaticString &name);
+	PackedFile open_file(const StaticString &name) override;
 
 private:
 
@@ -45,11 +45,11 @@ public:
 	{
 	}
 
-	virtual ~YpqWriter();
+	~YpqWriter() override;
 
 public:
 
-	virtual PackedFile open_file(const StaticString &name);
+	PackedFile open_file(const StaticString &name) override;
 
 private:
 

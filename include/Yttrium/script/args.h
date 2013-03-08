@@ -19,8 +19,8 @@ class ScriptValue;
 
 class Y_API ScriptArgs
 {
-	friend class ScriptContext;
-	friend class ScriptParser;
+	friend ScriptContext;
+	friend ScriptParser;
 
 public:
 

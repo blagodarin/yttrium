@@ -19,10 +19,10 @@ class Document;
 
 class Y_API Value: public Noncopyable
 {
-	friend class Document;
-	friend class List;
-	friend class List::ConstRange;
-	friend class List::Range;
+	friend Document;
+	friend List;
+	friend List::ConstRange;
+	friend List::Range;
 
 public:
 

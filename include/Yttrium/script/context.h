@@ -19,7 +19,7 @@ namespace Yttrium
 
 class Y_API ScriptContext: public Noncopyable
 {
-	friend class ScriptArgs;
+	friend ScriptArgs;
 
 public:
 
@@ -157,20 +157,26 @@ private:
 
 private:
 
-	struct Y_PRIVATE CommandContext
+	struct CommandContext
 	{
 		Command command;
 		size_t  min_args;
 		size_t  max_args;
 
 		CommandContext() = default;
-
+		
 		CommandContext(Command command, size_t min_args, size_t max_args)
 			: command(command)
 			, min_args(min_args)
 			, max_args(max_args)
 		{
 		}
+
+		// The following declarations are required to keep this struct private to the library without warnings.
+
+		CommandContext(const CommandContext&) = default;
+		~CommandContext() = default;
+		CommandContext &operator =(const CommandContext&) = default;
 	};
 
 	typedef std::map<String, CommandContext> Commands;

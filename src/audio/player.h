@@ -42,11 +42,12 @@ public:
 public:
 
 	Private(Allocator *allocator);
-	virtual ~Private() noexcept;
+
+	~Private() noexcept override;
 
 protected:
 
-	virtual void run();
+	void run() override;
 
 private:
 

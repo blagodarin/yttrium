@@ -14,7 +14,7 @@ class OpenGlRenderer: public Renderer::Private
 public:
 
 	OpenGlRenderer(Window *window, Allocator *allocator);
-	virtual ~OpenGlRenderer();
+	~OpenGlRenderer() override;
 
 public:
 
@@ -22,12 +22,12 @@ public:
 
 public: // Renderer::Private
 
-	virtual void bind_builtin();
-	virtual void clear();
-	virtual void flush_2d();
-	virtual void set_matrix_2d(double width, double height);
-	virtual void set_viewport(const Dim2 &size);
-	virtual void take_screenshot();
+	void bind_builtin() override;
+	void clear() override;
+	void flush_2d() override;
+	void set_matrix_2d(double width, double height) override;
+	void set_viewport(const Dim2 &size) override;
+	void take_screenshot() override;
 
 public:
 

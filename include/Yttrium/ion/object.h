@@ -27,8 +27,8 @@ class Value;
 
 class Y_API Object: public Noncopyable
 {
-	friend class Document;
-	friend class Parser;
+	friend Document;
+	friend Parser;
 
 public:
 
@@ -36,7 +36,7 @@ public:
 
 	class ConstRange
 	{
-		friend class Object;
+		friend Object;
 
 	public:
 

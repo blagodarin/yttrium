@@ -17,7 +17,7 @@ class AudioManager;
 
 class Y_API AudioPlayer
 {
-	friend class AudioManager;
+	friend AudioManager;
 
 public:
 

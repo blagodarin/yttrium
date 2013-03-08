@@ -18,11 +18,11 @@ class List;
 
 class Y_API Document: public Object
 {
-	friend class List;
-	friend class Node;
-	friend class Object;
-	friend class Parser;
-	friend class Value;
+	friend List;
+	friend Node;
+	friend Object;
+	friend Parser;
+	friend Value;
 
 public:
 

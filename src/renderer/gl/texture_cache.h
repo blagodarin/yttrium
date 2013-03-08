@@ -16,7 +16,7 @@ public:
 
 private: // TextureCache.
 
-	virtual Texture2D::Private *cache_texture_2d(const ImageFormat &format, const void *data) noexcept;
+	Texture2D::Private *cache_texture_2d(const ImageFormat &format, const void *data) noexcept override;
 
 private:
 

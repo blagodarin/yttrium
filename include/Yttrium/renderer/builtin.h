@@ -16,7 +16,7 @@ class Renderer;
 
 class Y_API RendererBuiltin
 {
-	friend class Renderer;
+	friend Renderer;
 
 public:
 

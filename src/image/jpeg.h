@@ -17,13 +17,14 @@ class JpegReader: public ImageReader::Private
 public:
 
 	JpegReader(Allocator *allocator);
-	virtual ~JpegReader();
+
+	~JpegReader() override;
 
 public:
 
-	virtual bool open();
+	bool open() override;
 
-	virtual bool read(void *buffer, size_t frame_size);
+	bool read(void *buffer, size_t frame_size) override;
 
 private:
 

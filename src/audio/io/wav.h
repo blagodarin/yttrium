@@ -19,11 +19,11 @@ public:
 
 public: // AudioReader::Private
 
-	virtual bool open();
+	bool open() override;
 
-	virtual size_t read(void *buffer, size_t bytes_to_read);
+	size_t read(void *buffer, size_t bytes_to_read) override;
 
-	virtual void seek(UOffset offset);
+	void seek(UOffset offset) override;
 
 private:
 

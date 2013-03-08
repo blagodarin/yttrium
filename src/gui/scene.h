@@ -25,7 +25,7 @@ class Widget;
 
 class Scene
 {
-	friend class IonDumper;
+	friend IonDumper;
 
 public:
 

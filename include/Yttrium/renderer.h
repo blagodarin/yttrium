@@ -20,8 +20,8 @@ class Window;
 
 class Y_API Renderer
 {
-	friend class TextureCache;
-	friend class Window;
+	friend TextureCache;
+	friend Window;
 
 public:
 

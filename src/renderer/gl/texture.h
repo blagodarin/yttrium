@@ -21,15 +21,15 @@ public:
 	{
 	}
 
-	virtual ~OpenGlTexture2D();
+	~OpenGlTexture2D() override;
 
 public:
 
-	virtual void bind();
+	void bind() override;
 
-	virtual Vector2f fix_coords(const Vector2f &coords) const;
+	Vector2f fix_coords(const Vector2f &coords) const override;
 
-	virtual void unbind();
+	void unbind() override;
 
 private:
 

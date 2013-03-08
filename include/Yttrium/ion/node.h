@@ -20,8 +20,8 @@ class Object;
 
 class Y_API Node: public List
 {
-	friend class Document;
-	friend class Object;
+	friend Document;
+	friend Object;
 
 public:
 

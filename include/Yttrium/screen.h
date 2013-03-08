@@ -35,7 +35,7 @@ struct ScreenMode
 
 class Y_API Screen
 {
-	friend class Window;
+	friend Window;
 
 public:
 

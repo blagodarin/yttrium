@@ -17,7 +17,7 @@ namespace Yttrium
 class Y_API Object
 	: public Noncopyable
 {
-	friend class Allocator;
+	friend Allocator;
 
 public:
 
@@ -80,7 +80,7 @@ public:
 		Object *_object;
 	};
 
-	friend class Pointer;
+	friend Pointer;
 
 public:
 

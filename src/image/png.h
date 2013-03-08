@@ -17,15 +17,15 @@ public:
 	{
 	}
 
-	virtual ~PngWriter();
+	~PngWriter() override;
 
 public:
 
-	virtual bool open();
+	bool open() override;
 
-	virtual ImageFormatFlags set_format(const ImageFormat &format);
+	ImageFormatFlags set_format(const ImageFormat &format) override;
 
-	virtual bool write(const void *buffer, size_t frame_size);
+	bool write(const void *buffer, size_t frame_size) override;
 
 private:
 

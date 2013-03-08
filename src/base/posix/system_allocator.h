@@ -15,17 +15,17 @@ public:
 
 public: // Allocator
 
-	virtual void *allocate(size_t size, size_t align, Difference *difference) noexcept;
+	void *allocate(size_t size, size_t align, Difference *difference) noexcept override;
 
-	virtual void deallocate(void *pointer, Difference *difference) noexcept;
+	void deallocate(void *pointer, Difference *difference) noexcept override;
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept;
+	void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept override;
 
 public: // SystemAllocator
 
-	virtual size_t lower_bound(size_t size) const noexcept;
+	size_t lower_bound(size_t size) const noexcept override;
 
-	virtual size_t upper_bound(size_t size) const noexcept;
+	size_t upper_bound(size_t size) const noexcept override;
 
 private:
 

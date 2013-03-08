@@ -42,7 +42,7 @@ private:
 
 class Y_API Mutex
 {
-	friend class Signal;
+	friend Signal;
 
 public:
 

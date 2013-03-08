@@ -17,9 +17,9 @@ public:
 
 public:
 
-	virtual bool open();
+	bool open() override;
 
-	virtual bool read(void *buffer, size_t frame_size);
+	bool read(void *buffer, size_t frame_size) override;
 };
 
 class TgaWriter: public ImageWriter::Private
@@ -33,9 +33,9 @@ public:
 
 public:
 
-	virtual ImageFormatFlags set_format(const ImageFormat &format);
+	ImageFormatFlags set_format(const ImageFormat &format) override;
 
-	virtual bool write(const void *buffer, size_t frame_size);
+	bool write(const void *buffer, size_t frame_size) override;
 };
 
 } // namespace Yttrium

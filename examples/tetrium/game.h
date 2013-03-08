@@ -20,7 +20,7 @@ class Game
 	: public Terminal::Callbacks
 	, public Gui::Manager::Callbacks
 {
-	friend class Commands;
+	friend Commands;
 
 public:
 
@@ -44,12 +44,12 @@ private:
 
 private: // Terminal::Callbacks.
 
-	virtual void on_cursor_movement(Terminal *terminal, const Dim2 &movement) noexcept;
-	virtual bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept;
+	void on_cursor_movement(Terminal *terminal, const Dim2 &movement) noexcept override;
+	bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept override;
 
 private: // Gui::Manager::Callbacks.
 
-	virtual void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept;
+	void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept override;
 
 private:
 

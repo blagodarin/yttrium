@@ -17,11 +17,11 @@ public:
 
 public: // Allocator
 
-	virtual void *allocate(size_t size, size_t align, Difference *difference) noexcept;
+	void *allocate(size_t size, size_t align, Difference *difference) noexcept override;
 
-	virtual void deallocate(void *pointer, Difference *difference) noexcept;
+	void deallocate(void *pointer, Difference *difference) noexcept override;
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept;
+	void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept override;
 };
 
 } // namespace Yttrium
