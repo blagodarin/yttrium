@@ -1,16 +1,4 @@
-################################################################################
-#
-# Yttrium SConstruct script
-#
-################################################################################
-
-################################################################################
-# Environments.
-################################################################################
-
-import ConfigParser
 import os
-import os.path
 
 EnsureSConsVersion(1, 0)
 
@@ -37,32 +25,19 @@ elif platform == 'win32':
 
 # Create the initial configuration from the command line options.
 
-AddOption('--build-mode',
-	dest = 'build-mode', action = 'store', type = 'choice',
-	choices = ['debug', 'development', 'release'],
-	help = 'If specified, will perform the optimized release build.')
-
-AddOption('--build-platform',
-	dest = 'build-platform', action = 'store', type = 'choice',
-	choices = ['posix-x11', 'win32'],
+AddOption('--platform', dest = 'platform',
+	action = 'store', type = 'choice', choices = ['posix-x11', 'win32'],
 	help = 'If specified, will override the default target platform.')
 
-build_mode = GetOption('build-mode')
-build_platform = GetOption('build-platform')
+AddOption('--release', dest = 'release',
+	action = 'store_true', default = False,
+	help = 'If specified, will perform the optimized release build.')
 
-# Update the configuration with the 'build.ini' settings.
-
-build_ini = ConfigParser.RawConfigParser()
-build_ini.readfp(open('build.default.ini'))
-build_ini.read(['build.ini'])
-
-if build_mode is None:
-	build_mode = build_ini.get('build', 'mode')
+build_release = GetOption('release')
+build_platform = GetOption('platform')
 
 if build_platform is None:
-	build_platform = build_ini.get('build', 'platform')
-	if build_platform == 'default':
-		build_platform = platform
+	build_platform = platform
 
 # Configure the environment.
 
@@ -73,13 +48,13 @@ if build_platform == 'posix-x11':
 elif build_platform == 'win32':
 	ports = ['windows']
 
-if build_mode == 'debug':
-	env.Append(CPPDEFINES = ['_DEBUG'])
-else:
+if build_release:
 	env.Append(CPPDEFINES = ['NDEBUG'])
+else:
+	env.Append(CPPDEFINES = ['_DEBUG'])
 
 env.Append(CPPFLAGS = ['-std=gnu++0x', '-Wall', '-Wextra']) # We use GCC/MinGW.
-if build_mode == 'release':
+if build_release:
 	env.Append(CPPFLAGS = ['-O3']) # We use GCC/MinGW.
 else:
 	env.Append(CPPFLAGS = ['-g']) # We use GCC/MinGW.

@@ -28,13 +28,16 @@ src = [
 
 if 'posix' in ports:
 	src += [
-		'base/posix',
-		'terminal/x11']
+		'base/posix']
 
 if 'windows' in ports:
 	src += [
 		'base/windows',
 		'terminal/windows']
+
+if 'x11' in ports:
+	src += [
+		'terminal/x11']
 
 yttrium = build.SharedLibrary('#/lib/yttrium', [build.Glob('$BUILD/' + path + '/*.cpp') for path in src])
 build.Clean(yttrium, build.Dir('$BUILD'))
