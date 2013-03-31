@@ -9,6 +9,7 @@ Yttrium:
     - Implement directory search.
     - Keep a global track of all ProxyAllocators.
     - Drop statistics from ordinary Allocators.
+    - Separate a single Rect into a raster one and a vector one.
 
     Image:
     - Consider an image reader with an internal buffer.

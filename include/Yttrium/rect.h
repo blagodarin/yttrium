@@ -125,13 +125,21 @@ public:
 
 	bool contains(const Rect &rect) const noexcept;
 
+	///
+
+	bool fast_contains(const Vector2<T> &point) const noexcept;
+
+	/// Find whether the rects intersect.
+
+	bool fast_intersects(const Rect &rect) const noexcept;
+
 	/// Find whether the rects intersect.
 	/// \note This only works for integer rects with <tt>left <= right</tt> and <tt>top <= bottom</tt>.
 	/// It also assumes the subtraction result of any two coordinates along the same axis is valid.
 	/// \note This function reports an intersection of a null rect with itself
 	/// or with a non-null rect if the point of the null rect lies inside the non-null rect.
 
-	bool fast_intersects(const Rect &rect) const noexcept;
+	bool fastest_intersects(const Rect &rect) const noexcept;
 
 	/// Find whether the rects intersect.
 	/// \note This function reports no intersection of a null rect with itself,
@@ -344,7 +352,21 @@ bool Rect<T>::contains(const Rect &rect) const noexcept
 }
 
 template <typename T>
+bool Rect<T>::fast_contains(const Vector2<T> &point) const noexcept
+{
+	return ((point.x - _left) ^ (point.x - _right)) < 0
+		&& ((point.y - _top) ^ (point.y - _bottom)) < 0;
+}
+
+template <typename T>
 bool Rect<T>::fast_intersects(const Rect &rect) const noexcept
+{
+	return (_left - rect._right) * (_right - rect._left) < 0
+		&& (_top - rect._bottom) * (_bottom - rect._top) < 0;
+}
+
+template <typename T>
+bool Rect<T>::fastest_intersects(const Rect &rect) const noexcept
 {
 	return ((_left - rect._right) ^ (rect._left - _right)) >= 0
 		&& ((_top - rect._bottom) ^ (rect._top - _bottom)) >= 0;
