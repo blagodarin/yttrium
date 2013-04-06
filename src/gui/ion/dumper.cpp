@@ -36,30 +36,30 @@ void IonDumper::dump(const StaticString &filename) const
 
 	// TODO: Dump fonts.
 
-	for (ManagerImpl::Scenes::const_iterator i = _manager->_scenes.begin(); i != _manager->_scenes.end(); ++i)
+	for (const ManagerImpl::Scenes::value_type &scene: _manager->_scenes)
 	{
 		Ion::Node *scene_node = document.append("scene");
 
-		scene_node->append(i->first);
+		scene_node->append(scene.first);
 
-		if (i->first == _manager->_scene_stack.front()->name())
+		if (scene.first == _manager->_scene_stack.front()->name())
 		{
 			scene_node->append_list()->append("root");
 		}
 
-		dump_scene(i->second, scene_node);
+		dump_scene(scene.second, scene_node);
 	}
 
-	for (ManagerImpl::SceneActions::const_iterator i = _manager->_scene_actions.begin(); i != _manager->_scene_actions.end(); ++i)
+	for (const ManagerImpl::SceneActions::value_type &action: _manager->_scene_actions)
 	{
 		Ion::Node *on_scene_change_node = document.append("on_scene_change");
 
 		Ion::List *scene_list = on_scene_change_node->append_list();
 
-		scene_list->append(i->first.first);
-		scene_list->append(i->first.second);
+		scene_list->append(action.first.first);
+		scene_list->append(action.first.second);
 
-		on_scene_change_node->append(i->second);
+		on_scene_change_node->append(action.second);
 	}
 
 	document.save(filename);
@@ -89,14 +89,12 @@ void IonDumper::dump_scene(const Scene *scene, Ion::Node *scene_node)
 		scene_object->append("transparent");
 	}
 
-	const Bindings::Map &bindings = scene->_bindings.map();
-
-	for (Bindings::Map::const_iterator i = bindings.begin(); i != bindings.end(); ++i)
+	for (const Bindings::Map::value_type &binding: scene->_bindings.map())
 	{
 		Ion::Node *bind_node = scene_object->append("bind");
 
-		bind_node->append(i->first);
-		bind_node->append(i->second);
+		bind_node->append(binding.first);
+		bind_node->append(binding.second);
 	}
 
 	// TODO: Dump widgets.

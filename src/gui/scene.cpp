@@ -126,12 +126,12 @@ void Scene::render(Renderer *renderer, const Vector2f &size)
 	Vector2f scale = size / _size;
 	Vector2f shift((size.x - _size.x * scale.y) * .5f, (size.y - _size.y * scale.x) * .5f);
 
-	for (Widgets::iterator i = _widgets.begin(); i != _widgets.end(); ++i)
+	for (Widget *widget: _widgets)
 	{
-		(*i)->update();
+		widget->update();
 	}
 
-	Widget *focused_widget = nullptr;
+	const Widget *focused_widget = nullptr;
 
 	if (_is_cursor_set)
 	{
@@ -157,10 +157,10 @@ void Scene::render(Renderer *renderer, const Vector2f &size)
 		state = (_left_button_widget == _focused_widget) ? WidgetState::Pressed : WidgetState::Active;
 	}
 
-	for (Widgets::iterator i = _widgets.begin(); i != _widgets.end(); ++i)
+	for (const Widget *widget: _widgets)
 	{
-		RectF rect = map((*i)->area(), shift, scale, (*i)->scaling());
-		(*i)->render(renderer, rect, scale, (*i == focused_widget) ? state : WidgetState::Normal);
+		RectF rect = map(widget->area(), shift, scale, widget->scaling());
+		widget->render(renderer, rect, scale, (widget == focused_widget) ? state : WidgetState::Normal);
 	}
 
 	_is_cursor_set = false;

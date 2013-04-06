@@ -24,17 +24,27 @@ Node *Object::append(const Node &node)
 	return new_node;
 }
 
+Object::ConstIterator Object::begin() const noexcept
+{
+	return ConstIterator(_nodes.empty() ? nullptr : &_nodes.front());
+}
+
 void Object::concatenate(const Object &object)
 {
-	for (Object::ConstRange r = object.nodes(); !r.is_empty(); r.pop_first())
+	for (const Node &node: object)
 	{
-		append(r.first());
+		append(node);
 	}
 }
 
 bool Object::contains(const StaticString &name)
 {
 	return _node_map.find(String(name, ByReference())) != _node_map.end();
+}
+
+Object::ConstIterator Object::end() const noexcept
+{
+	return ConstIterator(_nodes.empty() ? nullptr : &_nodes.back() + 1);
 }
 
 const Node *Object::first() const
@@ -180,9 +190,9 @@ void Object::serialize(String *result, int indentation, bool is_document) const
 
 		int node_indentation = indentation + !is_document;
 
-		for (Nodes::const_iterator i = _nodes.begin(); i != _nodes.end(); ++i)
+		for (const Node *node: _nodes)
 		{
-			(*i)->serialize(result, node_indentation);
+			node->serialize(result, node_indentation);
 			result->append('\n');
 		}
 

@@ -18,23 +18,23 @@ BOOST_AUTO_TEST_CASE(rewrite_mode_test)
 {
 	uint8_t buffer1[100003];
 
-	for (size_t i = 0; i < Y_LENGTH_OF(buffer1); ++i)
+	for (uint8_t &item: buffer1)
 	{
-		buffer1[i] = rand() % UINT8_MAX;
+		item = rand() % UINT8_MAX;
 	}
 
 	uint8_t buffer2[100019];
 
-	for (size_t i = 0; i < Y_LENGTH_OF(buffer2); ++i)
+	for (uint8_t &item: buffer2)
 	{
-		buffer2[i] = rand() % UINT8_MAX;
+		item = rand() % UINT8_MAX;
 	}
 
 	uint8_t buffer3[100043];
 
-	for (size_t i = 0; i < Y_LENGTH_OF(buffer3); ++i)
+	for (uint8_t &item: buffer3)
 	{
-		buffer3[i] = rand() % UINT8_MAX;
+		item = rand() % UINT8_MAX;
 	}
 
 	File file1(File::Temporary);

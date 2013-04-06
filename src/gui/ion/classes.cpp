@@ -66,9 +66,9 @@ bool Classes::add(const StaticString &name, const Ion::Object &source, const Sta
 
 void Classes::clear()
 {
-	for (Map::iterator i = _classes.begin(); i != _classes.end(); ++i)
+	for (const auto &class_: _classes)
 	{
-		Y_DELETE(_allocator, i->second);
+		Y_DELETE(_allocator, class_.second);
 	}
 
 	_classes.clear();

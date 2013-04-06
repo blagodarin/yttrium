@@ -32,7 +32,7 @@ public:
 
 	///
 
-	class Range
+	class ConstIterator
 	{
 		friend List;
 
@@ -40,45 +40,21 @@ public:
 
 		///
 
-		inline Range() noexcept;
-
-	public:
+		void operator ++() noexcept;
 
 		///
 
-		inline Value &first() const noexcept;
+		inline const Value &operator *() const noexcept;
 
 		///
 
-		inline bool is_empty() const noexcept;
-
-		///
-
-		inline Value &last() const noexcept;
-
-		///
-
-		void pop_first() noexcept;
-
-		///
-
-		inline size_t size() const noexcept;
-
-	public:
-
-		///
-
-		inline Value *operator ->() const noexcept;
+		inline bool operator !=(ConstIterator iterator) const noexcept;
 
 	private:
 
-		inline Range(Value *first, Value *last, size_t size) noexcept;
+		const Value *_value;
 
-	private:
-
-		Value  *_first;
-		Value  *_last;
-		size_t  _size;
+		inline ConstIterator(const Value *value) noexcept;
 	};
 
 	///
@@ -123,13 +99,87 @@ public:
 
 	private:
 
-		inline ConstRange(const Value *first, const Value *last, size_t size) noexcept;
-
-	private:
-
 		const Value *_first;
 		const Value *_last;
 		size_t       _size;
+		
+		inline ConstRange(const Value *first, const Value *last, size_t size) noexcept;
+	};
+
+	///
+
+	class Iterator
+	{
+		friend List;
+
+	public:
+
+		///
+
+		void operator ++() noexcept;
+
+		///
+
+		inline Value &operator *() const noexcept;
+
+		///
+
+		inline bool operator !=(Iterator iterator) const noexcept;
+
+	private:
+
+		Value *_value;
+
+		inline Iterator(Value *value) noexcept;
+	};
+
+	///
+
+	class Range
+	{
+		friend List;
+
+	public:
+
+		///
+
+		inline Range() noexcept;
+
+	public:
+
+		///
+
+		inline Value &first() const noexcept;
+
+		///
+
+		inline bool is_empty() const noexcept;
+
+		///
+
+		inline Value &last() const noexcept;
+
+		///
+
+		void pop_first() noexcept;
+
+		///
+
+		inline size_t size() const noexcept;
+
+	public:
+
+		///
+
+		inline Value *operator ->() const noexcept;
+
+	private:
+
+		Value  *_first;
+		Value  *_last;
+		size_t  _size;
+		
+		inline Range(Value *first, Value *last, size_t size) noexcept;
 	};
 
 public:
@@ -156,6 +206,14 @@ public:
 
 	///
 
+	inline Iterator begin() noexcept;
+
+	///
+
+	inline ConstIterator begin() const noexcept;
+
+	///
+
 	void concatenate(const List &list) noexcept;
 
 	///
@@ -165,6 +223,14 @@ public:
 	///
 
 	inline const Document *document() const noexcept;
+
+	///
+
+	inline Iterator end() noexcept;
+
+	///
+
+	inline ConstIterator end() const noexcept;
 
 	///
 
@@ -232,43 +298,18 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-List::Range::Range() noexcept
-	//: Range(nullptr, nullptr, 0) // TODO: Uncomment.
-	: _first(nullptr)
-	, _last(nullptr)
-	, _size(0)
+const Value &List::ConstIterator::operator *() const noexcept
 {
+	return *_value;
 }
 
-Value &List::Range::first() const noexcept
+bool List::ConstIterator::operator !=(ConstIterator iterator) const noexcept
 {
-	return *_first;
+	return _value != iterator._value;
 }
 
-bool List::Range::is_empty() const noexcept
-{
-	return !_size;
-}
-
-Value &List::Range::last() const noexcept
-{
-	return *_last;
-}
-
-size_t List::Range::size() const noexcept
-{
-	return _size;
-}
-
-Value *List::Range::operator ->() const noexcept
-{
-	return _first;
-}
-
-List::Range::Range(Value *first, Value *last, size_t size) noexcept
-	: _first(first)
-	, _last(last)
-	, _size(size)
+List::ConstIterator::ConstIterator(const Value *value) noexcept
+	: _value(value)
 {
 }
 
@@ -316,6 +357,75 @@ List::ConstRange::ConstRange(const Value *first, const Value *last, size_t size)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Value &List::Iterator::operator *() const noexcept
+{
+	return *_value;
+}
+
+bool List::Iterator::operator !=(Iterator iterator) const noexcept
+{
+	return _value != iterator._value;
+}
+
+List::Iterator::Iterator(Value *value) noexcept
+	: _value(value)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+List::Range::Range() noexcept
+	//: Range(nullptr, nullptr, 0) // TODO: Uncomment.
+	: _first(nullptr)
+	, _last(nullptr)
+	, _size(0)
+{
+}
+
+Value &List::Range::first() const noexcept
+{
+	return *_first;
+}
+
+bool List::Range::is_empty() const noexcept
+{
+	return !_size;
+}
+
+Value &List::Range::last() const noexcept
+{
+	return *_last;
+}
+
+size_t List::Range::size() const noexcept
+{
+	return _size;
+}
+
+Value *List::Range::operator ->() const noexcept
+{
+	return _first;
+}
+
+List::Range::Range(Value *first, Value *last, size_t size) noexcept
+	: _first(first)
+	, _last(last)
+	, _size(size)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+List::Iterator List::begin() noexcept
+{
+	return Iterator(_first);
+}
+
+List::ConstIterator List::begin() const noexcept
+{
+	return ConstIterator(_first);
+}
+
 List::ConstRange List::const_values() const noexcept
 {
 	return ConstRange(_first, _last, _size);
@@ -324,6 +434,16 @@ List::ConstRange List::const_values() const noexcept
 const Document *List::document() const noexcept
 {
 	return _document;
+}
+
+List::Iterator List::end() noexcept
+{
+	return Iterator(nullptr);
+}
+
+List::ConstIterator List::end() const noexcept
+{
+	return ConstIterator(nullptr);
 }
 
 bool List::exists() const noexcept

@@ -35,6 +35,33 @@ public:
 
 	///
 
+	class ConstIterator
+	{
+		friend Object;
+
+	public:
+
+		///
+
+		inline void operator ++() noexcept;
+
+		///
+
+		inline const Node &operator *() const noexcept;
+
+		///
+
+		inline bool operator !=(ConstIterator iterator) const noexcept;
+
+	private:
+
+		const Node *const *_node;
+
+		inline ConstIterator(const Node *const *node) noexcept;
+	};
+
+	///
+
 	class ConstRange
 	{
 		friend Object;
@@ -93,6 +120,10 @@ public:
 
 	///
 
+	ConstIterator begin() const noexcept;
+
+	///
+
 	void concatenate(const Object &object) noexcept;
 
 	///
@@ -102,6 +133,10 @@ public:
 	///
 
 	inline const Document *document() const noexcept;
+
+	///
+
+	ConstIterator end() const noexcept;
 
 	///
 
@@ -174,6 +209,28 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Object::ConstIterator::operator ++() noexcept
+{
+	++_node;
+}
+
+const Node &Object::ConstIterator::operator *() const noexcept
+{
+	return **_node;
+}
+
+bool Object::ConstIterator::operator !=(ConstIterator iterator) const noexcept
+{
+	return _node != iterator._node;
+}
+
+Object::ConstIterator::ConstIterator(const Node *const *node) noexcept
+	: _node(node)
+{
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Object::ConstRange::ConstRange() noexcept

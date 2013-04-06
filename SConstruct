@@ -7,8 +7,12 @@ EnsureSConsVersion(1, 0)
 env = Environment(
 	CPPFLAGS = [],
 	CPPPATH = ['#/include'],
+	CXXCOMSTR = 'CC  $SOURCE',
 	LIBS = [],
+	LINKCOMSTR = 'LL  $TARGET',
 	LINKFLAGS = [],
+	SHCXXCOMSTR = 'CC  $SOURCE',
+	SHLINKCOMSTR = 'LL  $TARGET',
 	TOOLS = [])
 
 env.Decider('MD5-timestamp') # Make the builds a bit faster.
@@ -83,7 +87,7 @@ if build_platform == 'windows':
 
 env.Append(
 	CPPDEFINES = [
-		'__YTTRIUM'],
+		'__YTTRIUM_SHARED'],
 	CPPFLAGS = [
 		'-fvisibility=hidden',
 		'-fvisibility-inlines-hidden'])

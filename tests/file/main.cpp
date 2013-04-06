@@ -18,9 +18,9 @@ BOOST_AUTO_TEST_CASE(read_all_test)
 {
 	uint8_t buffer[100003];
 
-	for (size_t i = 0; i < Y_LENGTH_OF(buffer); ++i)
+	for (uint8_t &item: buffer)
 	{
-		buffer[i] = rand() % UINT8_MAX;
+		item = rand() % UINT8_MAX;
 	}
 
 	File file(File::Temporary);
@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE(file_transfer_test)
 {
 	uint8_t buffer[100003];
 
-	for (size_t i = 0; i < Y_LENGTH_OF(buffer); ++i)
+	for (uint8_t &item: buffer)
 	{
-		buffer[i] = rand() % UINT8_MAX;
+		item = rand() % UINT8_MAX;
 	}
 
 	File input(File::Temporary);

@@ -27,10 +27,8 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 	const StaticString *result_name = nullptr;
 	const Ion::List *result_classes = nullptr;
 
-	for (Ion::List::ConstRange r = source.values(); !r.is_empty(); r.pop_first())
+	for (const Ion::Value &value: source)
 	{
-		const Ion::Value &value = r.first();
-
 		if (value.is_object())
 		{
 			if (result_object)
@@ -56,9 +54,9 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 				return false;
 			}
 
-			for (Ion::List::ConstRange s = value.list().values(); !s.is_empty(); s.pop_first())
+			for (const Ion::Value &class_name: value.list())
 			{
-				if (!s->is_string())
+				if (!class_name.is_string())
 				{
 					return false;
 				}
@@ -163,10 +161,8 @@ bool IonLoader::load(const StaticString &source_name, bool is_internal)
 
 void IonLoader::load(const Ion::Object &source)
 {
-	for (Ion::Object::ConstRange r = source.nodes(); !r.is_empty(); r.pop_first())
+	for (const Ion::Node &node: source)
 	{
-		const Ion::Node &node = r.first();
-
 		if (node.name() == S("include"))
 		{
 			const StaticString *include_path;
@@ -285,10 +281,8 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 {
 	scene->reserve(source.size());
 
-	for (Ion::Object::ConstRange r = source.nodes(); !r.is_empty(); r.pop_first())
+	for (const Ion::Node &node: source)
 	{
-		const Ion::Node &node = r.first();
-
 		if (node.name() == S("size"))
 		{
 			Vector2f size;

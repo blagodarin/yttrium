@@ -10,13 +10,23 @@ namespace Yttrium
 namespace Ion
 {
 
-void List::Range::pop_first()
+void List::ConstIterator::operator ++()
+{
+	_value = _value->_next;
+}
+
+void List::ConstRange::pop_first()
 {
 	_first = _first->_next;
 	--_size;
 }
 
-void List::ConstRange::pop_first()
+void List::Iterator::operator ++()
+{
+	_value = _value->_next;
+}
+
+void List::Range::pop_first()
 {
 	_first = _first->_next;
 	--_size;
@@ -63,10 +73,8 @@ Value *List::append(const StaticString &string)
 
 void List::concatenate(const List &list)
 {
-	for (ConstRange r = list.values(); !r.is_empty(); r.pop_first())
+	for (const Value &value: list)
 	{
-		const Value &value = r.first();
-
 		switch (value.type())
 		{
 		case Value::ListType:

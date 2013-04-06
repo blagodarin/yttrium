@@ -77,8 +77,8 @@ private:
 	NamedWidgets  _named_widgets;
 	bool          _is_cursor_set;
 	Vector2f      _cursor;
-	Widget       *_focused_widget;
-	Widget       *_left_button_widget;
+	const Widget *_focused_widget;
+	const Widget *_left_button_widget;
 	bool          _is_transparent;
 	Bindings      _bindings;
 };

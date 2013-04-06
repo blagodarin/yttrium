@@ -117,9 +117,9 @@ void ManagerImpl::set_scene_change_action(const StaticString &from_scene,
 
 void ManagerImpl::clear()
 {
-	for (Scenes::iterator i = _scenes.begin(); i != _scenes.end(); ++i)
+	for (const Scenes::value_type &scene: _scenes)
 	{
-		delete_scene(i->second);
+		delete_scene(scene.second);
 	}
 
 	_has_size = false;

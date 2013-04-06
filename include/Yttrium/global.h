@@ -2,19 +2,23 @@
 /// \brief Global definitions.
 /// \note This header is included (directly or indirectly) by all other %Yttrium headers.
 
-// All the macros that start with __Y are internal to a single header and should
+// All the macros that start with __Y_ are internal to a single header and should
 // only be used in that header. As such, they are pseudo-documented by the ordinary
 // comments to provide some information about them, but hide them from the doxygen.
 
 #ifndef __Y_GLOBAL_H
 #define __Y_GLOBAL_H
 
-// \def __YTTRIUM
-// \brief Yttrium compilation "flag".
-// \note This should be defined by the build system when compiling %Yttrium itself.
+/// \def __YTTRIUM_SHARED
+/// \brief Yttrium shared library compilation "flag".
+/// \note Must be defined when building %Yttrium as a shared library.
+
+/// \def __YTTRIUM_STATIC
+/// \brief Yttrium static library compilation "flag".
+/// \note Must be defined when building %Yttrium as a static library <strong>or using it as one</strong>.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Detect the compiler version and filter the unsupported compilers.
+// Compilers.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // \def __Y_GCC
@@ -36,10 +40,8 @@
 #if defined(_MSC_VER)
 	#if _MSC_VER >= 1700
 		#define __Y_MSVC 110
-	#elif _MSC_VER >= 1600
-		#define __Y_MSVC 100
 	#else
-		#error MSVC compilers older than 10.0 are not supported.
+		#error MSVC compilers older than 11.0 are not supported.
 	#endif
 #else
 	#define __Y_MSVC 0
@@ -52,7 +54,7 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Detect the target platform.
+// Target platforms.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// \def Y_IS_LINUX
@@ -93,10 +95,10 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Neutralize the supported compilers' differences.
+// Cross-compiler portability.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// __func__ for MSVC (in MSVC 10.0, __func__ is still unsupported).
+// __func__ for MSVC (in MSVC 11.0, __func__ is still unsupported).
 
 #if __Y_MSVC && !defined(__func__)
 	#define __func__ __FUNCTION__
@@ -154,16 +156,20 @@
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Provide some globally useful (now-) compiler-independent definitions.
+// Compiler-independent definitions.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// \def Y_API
 /// \brief Public %Yttrium API specifier.
 
-#if defined(__YTTRIUM)
+#if defined(__YTTRIUM_SHARED)
 	#define Y_API Y_EXPORT
 #else
 	#define Y_API Y_IMPORT
+#endif
+
+#if !defined(Y_API)
+	#define Y_API
 #endif
 
 /// \def Y_IS_DEBUG

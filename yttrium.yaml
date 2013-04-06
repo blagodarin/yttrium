@@ -4,6 +4,7 @@ Yttrium:
 - Add more allocator inheritance.
 - Make use of rvalue references.
 - Refactoring. =(
+- Get rid of defaulted and deleted functions as unsupported by MSVC 11.
 
     Base:
     - Implement directory search.

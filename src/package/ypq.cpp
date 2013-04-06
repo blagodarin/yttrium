@@ -153,15 +153,15 @@ YpqWriter::~YpqWriter()
 
 	_file.write(index_header);
 
-	for (Entries::iterator i = _entries.begin(); i != _entries.end(); ++i)
+	for (const Entry &entry: _entries)
 	{
 		YpqIndexEntry index_entry;
 
-		index_entry.offset = i->offset;
-		index_entry.name_size = i->name.size();
+		index_entry.offset = entry.offset;
+		index_entry.name_size = entry.name.size();
 
 		_file.write(index_entry);
-		_file.write(i->name.text(), i->name.size());
+		_file.write(entry.name.text(), entry.name.size());
 	}
 
 	flush_file();
