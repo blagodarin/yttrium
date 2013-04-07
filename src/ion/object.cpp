@@ -24,14 +24,9 @@ Node *Object::append(const Node &node)
 	return new_node;
 }
 
-Object::ConstIterator Object::begin() const noexcept
-{
-	return ConstIterator(_nodes.empty() ? nullptr : &_nodes.front());
-}
-
 void Object::concatenate(const Object &object)
 {
-	for (const Node &node: object)
+	for (const Node &node: object.nodes())
 	{
 		append(node);
 	}
@@ -42,17 +37,12 @@ bool Object::contains(const StaticString &name)
 	return _node_map.find(String(name, ByReference())) != _node_map.end();
 }
 
-Object::ConstIterator Object::end() const noexcept
+const Node &Object::first() const
 {
-	return ConstIterator(_nodes.empty() ? nullptr : &_nodes.back() + 1);
+	return _nodes.empty() ? null_node : *_nodes.front();
 }
 
-const Node *Object::first() const
-{
-	return _nodes.empty() ? &null_node : _nodes.front();
-}
-
-const Node *Object::first(const StaticString &name) const
+const Node &Object::first(const StaticString &name) const
 {
 	NodeMap::const_iterator i = _node_map.find(String(name, ByReference()));
 	if (i != _node_map.end())
@@ -60,20 +50,20 @@ const Node *Object::first(const StaticString &name) const
 		const Nodes &nodes = i->second;
 		if (!nodes.empty())
 		{
-			return nodes.front();
+			return *nodes.front();
 		}
 	}
-	return &null_node;
+	return null_node;
 }
 
 Object::ConstRange Object::nodes() const
 {
 	if (_nodes.empty())
 	{
-		return ConstRange();
+		return ConstRange(nullptr, nullptr);
 	}
 
-	return ConstRange(&_nodes.front(), &_nodes.back());
+	return ConstRange(&_nodes.front(), &_nodes.back() + 1);
 }
 
 Object::ConstRange Object::nodes(const StaticString &name) const
@@ -84,18 +74,18 @@ Object::ConstRange Object::nodes(const StaticString &name) const
 		const Nodes &nodes = i->second;
 		if (!nodes.empty())
 		{
-			return ConstRange(&nodes.front(), &nodes.back());
+			return ConstRange(&nodes.front(), &nodes.back() + 1);
 		}
 	}
-	return ConstRange();
+	return ConstRange(nullptr, nullptr);
 }
 
-const Node *Object::last() const
+const Node &Object::last() const
 {
-	return _nodes.empty() ? &null_node : _nodes.back();
+	return _nodes.empty() ? null_node : *_nodes.back();
 }
 
-const Node *Object::last(const StaticString &name) const
+const Node &Object::last(const StaticString &name) const
 {
 	NodeMap::const_iterator i = _node_map.find(String(name, ByReference()));
 	if (i != _node_map.end())
@@ -103,18 +93,18 @@ const Node *Object::last(const StaticString &name) const
 		const Nodes &nodes = i->second;
 		if (!nodes.empty())
 		{
-			return nodes.back();
+			return *nodes.back();
 		}
 	}
-	return &null_node;
+	return null_node;
 }
 
 bool Object::last(const StaticString &name, const Node **node) const
 {
-	const Node *last_node = last(name);
-	if (last_node->exists())
+	const Node &last_node = last(name);
+	if (last_node.exists())
 	{
-		*node = last_node;
+		*node = &last_node;
 		return true;
 	}
 	return false;
@@ -122,8 +112,8 @@ bool Object::last(const StaticString &name, const Node **node) const
 
 bool Object::last(const StaticString &name, const StaticString **string) const
 {
-	const Node *last_node = last(name);
-	return last_node->exists() && !last_node->is_empty() && last_node->first()->get(string);
+	const Node &last_node = last(name);
+	return last_node.exists() && !last_node.is_empty() && last_node.first()->get(string);
 }
 
 void Object::serialize(String *result, int indentation) const

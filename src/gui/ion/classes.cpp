@@ -15,9 +15,8 @@ namespace
 
 void update_document(Ion::Document *target, const Ion::Object &source)
 {
-	for (Ion::Object::ConstRange r = source.nodes(); !r.is_empty(); r.pop_last())
+	for (const Ion::Node &node: source.nodes().reverse())
 	{
-		const Ion::Node &node = r.last();
 		if (!target->contains(node.name()))
 		{
 			target->append(node);

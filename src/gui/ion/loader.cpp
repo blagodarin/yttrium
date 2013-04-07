@@ -161,7 +161,7 @@ bool IonLoader::load(const StaticString &source_name, bool is_internal)
 
 void IonLoader::load(const Ion::Object &source)
 {
-	for (const Ion::Node &node: source)
+	for (const Ion::Node &node: source.nodes())
 	{
 		if (node.name() == S("include"))
 		{
@@ -281,7 +281,7 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 {
 	scene->reserve(source.size());
 
-	for (const Ion::Node &node: source)
+	for (const Ion::Node &node: source.nodes())
 	{
 		if (node.name() == S("size"))
 		{

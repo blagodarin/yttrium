@@ -136,9 +136,9 @@ bool Game::load()
 
 	CHECK(data.load("examples/tetrium/data/tetrium.ion"));
 
-	const Ion::Node *blocks_node = data.last("blocks");
-	CHECK(!blocks_node->is_empty() && blocks_node->first()->is_object());
-	const Ion::Object *blocks = blocks_node->first()->object();
+	const Ion::Node &blocks_node = data.last("blocks");
+	CHECK(!blocks_node.is_empty() && blocks_node.first()->is_object());
+	const Ion::Object *blocks = blocks_node.first()->object();
 
 	const StaticString *block_texture_name;
 	CHECK(blocks->last("file", &block_texture_name));
@@ -150,14 +150,14 @@ bool Game::load()
 	CHECK(blocks->last("size", &block_size));
 	CHECK(block_size->to_number(&_block_size));
 
-	const Ion::Node *block_bases = blocks->last("base");
-	CHECK(block_bases->size() == 8);
+	const Ion::Node &block_bases = blocks->last("base");
+	CHECK(block_bases.size() == 8);
 	int index = 0;
-	for (Ion::Node::ConstRange r = block_bases->values(); !r.is_empty(); r.pop_first())
+	for (const Ion::Value &value: block_bases)
 	{
 		const Ion::List *entry;
 
-		CHECK(r->get(&entry) && entry->size() == 2);
+		CHECK(value.get(&entry) && entry->size() == 2);
 
 		float x;
 		float y;
@@ -180,22 +180,22 @@ void Game::load_music()
 	if (!data.load("data/music.ion"))
 		return;
 
-	for (Ion::Node::ConstRange r = data.last("music")->values(); !r.is_empty(); r.pop_first())
+	for (const Ion::Value &value: data.last("music"))
 	{
-		const Ion::Object *entry = r->object();
+		const Ion::Object *entry = value.object();
 
 		if (!entry)
 			continue;
 
-		StaticString file = entry->last("file")->string();
+		StaticString file = entry->last("file").string();
 
 		if (!file.is_empty())
 		{
 			AudioPlayer::Settings settings;
 
-			settings.begin = entry->last("begin")->string().to_time();
-			settings.end = entry->last("end")->string().to_time();
-			settings.loop = entry->last("loop")->string().to_time();
+			settings.begin = entry->last("begin").string().to_time();
+			settings.end = entry->last("end").string().to_time();
+			settings.loop = entry->last("loop").string().to_time();
 
 			_audio.player().load(file, settings);
 		}
