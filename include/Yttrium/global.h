@@ -15,7 +15,13 @@
 
 /// \def __YTTRIUM_STATIC
 /// \brief Yttrium static library compilation "flag".
-/// \note Must be defined when building %Yttrium as a static library <strong>or using it as one</strong>.
+/// \note Must be defined when building %Yttrium as a static library
+/// **or using it as one**.
+
+#ifdef __YTTRIUM_DOXYGEN
+	#define __YTTRIUM_SHARED
+	#define __YTTRIUM_STATIC
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compilers.

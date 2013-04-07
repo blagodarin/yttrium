@@ -119,6 +119,7 @@ public:
 
 	/// Substitute the script variables in a string.
 	/// \param string Source string.
+	/// \param allocator Allocator to use for the result.
 	/// \return String with substitutions.
 	/// \note Every occurence of the pair of curly braces is threated as a variable name.
 
