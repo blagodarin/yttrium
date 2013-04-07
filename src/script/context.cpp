@@ -26,22 +26,22 @@ ScriptContext::Archive ScriptContext::archive() const
 {
 	Archive result;
 
-	for (Entities::const_iterator i = _entities.begin(); i != _entities.end(); ++i)
+	for (const Entities::value_type &entity: _entities)
 	{
-		if (i->second.archived_value)
+		if (entity.second.archived_value)
 		{
 			String value(_allocator);
 
-			if (i->second.archived_value->type() == ScriptValue::String)
+			if (entity.second.archived_value->type() == ScriptValue::String)
 			{
-				value << '"' << i->second.archived_value->string().escaped("\\\"", '\\') << '"';
+				value << '"' << entity.second.archived_value->string().escaped("\\\"", '\\') << '"';
 			}
 			else
 			{
-				value = i->second.archived_value->string();
+				value = entity.second.archived_value->string();
 			}
 
-			result[i->first] = value;
+			result[entity.first] = value;
 		}
 	}
 

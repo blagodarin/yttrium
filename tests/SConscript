@@ -1,6 +1,6 @@
 Import('env')
 
-build = env.Clone(BUILD = '.build')
+build = env.Clone(BUILD = '#/tmp/tests')
 
 build.Append(
 	CPPDEFINES = ['BOOST_TEST_DYN_LINK', '__YTTRIUM_TEST'],

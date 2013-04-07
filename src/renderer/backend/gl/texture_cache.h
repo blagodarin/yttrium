@@ -1,5 +1,5 @@
-#ifndef __RENDERER_GL_TEXTURE_CACHE_H
-#define __RENDERER_GL_TEXTURE_CACHE_H
+#ifndef __RENDERER_BACKEND_GL_TEXTURE_CACHE_H
+#define __RENDERER_BACKEND_GL_TEXTURE_CACHE_H
 
 #include <Yttrium/renderer/texture_cache.h>
 
@@ -26,4 +26,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __RENDERER_GL_TEXTURE_CACHE_H
+#endif // __RENDERER_BACKEND_GL_TEXTURE_CACHE_H

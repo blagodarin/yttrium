@@ -1,5 +1,5 @@
-#ifndef __RENDERER_BUILTIN_BUILTIN_H
-#define __RENDERER_BUILTIN_BUILTIN_H
+#ifndef __RENDERER_BUILTIN_H
+#define __RENDERER_BUILTIN_H
 
 #include <Yttrium/renderer.h>
 
@@ -25,4 +25,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __RENDERER_BUILTIN_BUILTIN_H
+#endif // __RENDERER_BUILTIN_H

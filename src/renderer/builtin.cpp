@@ -2,9 +2,8 @@
 
 #include <Yttrium/utils.h>
 
-#include "../renderer.h"
-
-#include "data.h"
+#include "builtin_data.h"
+#include "renderer.h"
 
 namespace Yttrium
 {

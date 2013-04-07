@@ -4,15 +4,18 @@ EnsureSConsVersion(1, 0)
 
 # Initialize the environment.
 
+CXXCOMSTR  = 'C++   $SOURCE'
+LINKCOMSTR = 'LINK  $TARGET'
+
 env = Environment(
 	CPPFLAGS = [],
 	CPPPATH = ['#/include'],
-	CXXCOMSTR = 'CC  $SOURCE',
+	CXXCOMSTR = CXXCOMSTR,
 	LIBS = [],
-	LINKCOMSTR = 'LL  $TARGET',
+	LINKCOMSTR = LINKCOMSTR,
 	LINKFLAGS = [],
-	SHCXXCOMSTR = 'CC  $SOURCE',
-	SHLINKCOMSTR = 'LL  $TARGET',
+	SHCXXCOMSTR = CXXCOMSTR,
+	SHLINKCOMSTR = LINKCOMSTR,
 	TOOLS = [])
 
 env.Decider('MD5-timestamp') # Make the builds a bit faster.

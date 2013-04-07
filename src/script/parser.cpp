@@ -131,9 +131,9 @@ bool ScriptParser::parse(const StaticString &script)
 
 bool ScriptParser::execute(ExecutionMode mode)
 {
-	for (Commands::iterator i = _commands.begin(); i != _commands.end(); ++i)
+	for (Command &command: _commands)
 	{
-		String name = i->name;
+		String name = command.name;
 
 		if (mode != ExecutionMode::Do)
 		{
@@ -145,7 +145,7 @@ bool ScriptParser::execute(ExecutionMode mode)
 			name[0] = '-';
 		}
 
-		if (!_context->call(name, &i->result, i->args))
+		if (!_context->call(name, &command.result, command.args))
 		{
 			return false;
 		}

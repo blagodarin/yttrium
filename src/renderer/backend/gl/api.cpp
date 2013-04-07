@@ -1,6 +1,6 @@
 #include "api.h"
 
-#include <cstring> // strlen, strstr
+#include <cstring>
 
 namespace Yttrium
 {
@@ -10,9 +10,9 @@ namespace Gl
 
 bool check_extension(const char *list, const char *name)
 {
-	size_t length = strlen(name);
+	size_t length = ::strlen(name);
 
-	while ((list = strstr(list, name)) != 0)
+	while ((list = ::strstr(list, name)) != 0)
 	{
 		list += length;
 		if (*list == ' ' || *list == 0)

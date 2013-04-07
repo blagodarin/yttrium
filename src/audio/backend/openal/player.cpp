@@ -22,9 +22,9 @@ OpenAlPlayer::OpenAlPlayer()
 	Y_ABORT("Couldn't create OpenAlPlayer"); // NOTE: Safe to continue.
 
 	_source = 0;
-	for (size_t i = 0; i < NumBuffers; ++i)
+	for (ALuint &buffer: _buffers)
 	{
-		_buffers[i] = 0;
+		buffer = 0;
 	}
 }
 

@@ -253,9 +253,9 @@ bool Bindings::call(Key key, ExecutionMode mode)
 
 void Bindings::clear()
 {
-	for (KeyType i = 0; i < KeyType(Key::__Count); ++i)
+	for (String &action: _actions)
 	{
-		_actions[i].clear();
+		action.clear();
 	}
 }
 

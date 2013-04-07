@@ -1,6 +1,6 @@
 Import('env', 'ports')
 
-build = env.Clone(BUILD = '.build')
+build = env.Clone(BUILD = '#/tmp/src')
 build.Append(CPPFLAGS = ['-fno-exceptions']) # We use GCC/MinGW.
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
@@ -16,8 +16,9 @@ src = [
 	'gui/logic',
 	'gui/widgets',
 	'renderer',
+	'renderer/backend',
+	'renderer/backend/gl',
 	'renderer/builtin',
-	'renderer/gl',
 	'script',
 	'terminal',
 	'terminal/bindings',

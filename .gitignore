@@ -1,7 +1,6 @@
 *.log
-*.pyc
-.*
+.sconsign.dblite
 bin/*
-build.ini
 doc/*
 lib/*
+tmp/*

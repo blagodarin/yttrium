@@ -1,11 +1,9 @@
 Import('env')
 
-build = env.Clone(BUILD = '.build')
+build = env.Clone(BUILD = '#/tmp/examples')
 build.VariantDir('$BUILD', '.', duplicate = 0)
 
 example_paths = [
-	'console',
-	'gui',
 	'tetrium']
 
 examples = []

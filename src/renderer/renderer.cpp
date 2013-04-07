@@ -4,8 +4,6 @@
 
 #include "../terminal/window.h"
 
-#include "gl/renderer.h"
-
 #include "texture.h"
 
 namespace Yttrium
@@ -144,30 +142,6 @@ Vector2f Renderer::Private::text_size(const StaticString &text) const
 	return _font ? _font.text_size(text, _font_size) : Vector2f(0);
 }
 
-Renderer::Private *Renderer::Private::create(Window *window, Renderer::Backend backend, Allocator *allocator)
-{
-	Renderer::Private *result = nullptr;
-
-	switch (backend)
-	{
-	case Renderer::OpenGl:
-
-		result = Y_NEW(allocator, OpenGlRenderer)(window, allocator);
-		break;
-
-	default:
-
-		break;
-	}
-
-	if (!result)
-	{
-		Y_ABORT("Can't create renderer"); // NOTE: Safe to continue.
-	}
-
-	return result;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Renderer::Renderer(const Renderer &renderer)
@@ -208,8 +182,6 @@ void Renderer::draw_text(const Vector2f &position, const StaticString &text, Ali
 void Renderer::end_frame()
 {
 	flush_2d();
-
-	// TODO: Thread::sleep(0);
 
 	_private->_window.swap_buffers();
 

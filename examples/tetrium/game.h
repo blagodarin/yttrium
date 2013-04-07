@@ -14,8 +14,6 @@
 
 using namespace Yttrium;
 
-class Commands;
-
 class Game
 	: public Terminal::Callbacks
 	, public Gui::Manager::Callbacks

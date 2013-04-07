@@ -8,8 +8,7 @@
 #include <Yttrium/window.h>
 
 #include "../base/private_base.h"
-
-#include "builtin/builtin.h"
+#include "builtin.h"
 
 #include <vector>
 
