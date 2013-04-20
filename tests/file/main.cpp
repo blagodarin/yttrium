@@ -2,6 +2,7 @@
 #include <Yttrium/file.h>
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/string.h>
+#include <Yttrium/utils.h>
 
 #include <cstdlib> // rand
 #include <cstring> // memcmp
@@ -31,14 +32,14 @@ BOOST_AUTO_TEST_CASE(read_all_test)
 	Buffer actual_buffer;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_buffer));
-	BOOST_CHECK_EQUAL(actual_buffer.size(), Y_LENGTH_OF(buffer));
-	BOOST_CHECK(!memcmp(actual_buffer.const_data(), buffer, Y_LENGTH_OF(buffer)));
+	BOOST_CHECK_EQUAL(actual_buffer.size(), countof(buffer));
+	BOOST_CHECK(!memcmp(actual_buffer.const_data(), buffer, countof(buffer)));
 
 	String actual_string;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_string));
-	BOOST_CHECK_EQUAL(actual_string.size(), Y_LENGTH_OF(buffer));
-	BOOST_CHECK(!memcmp(actual_string.const_text(), buffer, Y_LENGTH_OF(buffer)));
+	BOOST_CHECK_EQUAL(actual_string.size(), countof(buffer));
+	BOOST_CHECK(!memcmp(actual_string.const_text(), buffer, countof(buffer)));
 }
 
 BOOST_AUTO_TEST_CASE(file_transfer_test)
@@ -63,8 +64,8 @@ BOOST_AUTO_TEST_CASE(file_transfer_test)
 	Buffer actual;
 
 	BOOST_REQUIRE(File(output.name()).read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), Y_LENGTH_OF(buffer));
-	BOOST_CHECK(!memcmp(actual.const_data(), buffer, Y_LENGTH_OF(buffer)));
+	BOOST_CHECK_EQUAL(actual.size(), countof(buffer));
+	BOOST_CHECK(!memcmp(actual.const_data(), buffer, countof(buffer)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -18,14 +18,14 @@ File::Private::~Private()
 
 	if (auto_remove)
 	{
-		::unlink(name.const_text());
+		::unlink(name.const_text()); // TODO: Verify the result.
 	}
 }
 
 bool File::flush()
 {
 	return _private && (_private->mode & Write)
-		? !fsync(_private->descriptor)
+		? !::fsync(_private->descriptor)
 		: false;
 }
 
@@ -64,7 +64,7 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 
 	if ((_private->mode & (Read | Write | Pipe)) == Read)
 	{
-		_size = lseek(descriptor, 0, SEEK_END);
+		_size = ::lseek(descriptor, 0, SEEK_END);
 	}
 
 	return true;
@@ -122,7 +122,7 @@ size_t File::read(void *buffer, size_t size)
 		}
 		else
 		{
-			result = pread(_private->descriptor, buffer, size, _base + _offset);
+			result = ::pread(_private->descriptor, buffer, size, _base + _offset);
 			if (result != -1)
 			{
 				_offset += static_cast<size_t>(result);
@@ -136,7 +136,7 @@ size_t File::read(void *buffer, size_t size)
 bool File::resize(UOffset size)
 {
 	return (_private && ((_private->mode & (Write | Pipe)) == Write)
-		? !ftruncate(_private->descriptor, _base + size)
+		? !::ftruncate(_private->descriptor, _base + size)
 		: false);
 }
 
@@ -175,7 +175,7 @@ bool File::seek(UOffset offset, Whence whence)
 			}
 			else
 			{
-				off_t off = lseek(_private->descriptor, 0, SEEK_END);
+				off_t off = ::lseek(_private->descriptor, 0, SEEK_END);
 
 				if (off == -1)
 				{
@@ -217,7 +217,7 @@ UOffset File::size() const
 		case ReadWrite:
 
 			{
-				off_t size = lseek(_private->descriptor, 0, SEEK_END);
+				off_t size = ::lseek(_private->descriptor, 0, SEEK_END);
 				if (size == -1)
 				{
 					break; // TODO: Y_ABORT.
@@ -244,7 +244,7 @@ size_t File::write(const void *buffer, size_t size)
 		}
 		else
 		{
-			ssize_t result = pwrite(_private->descriptor, buffer, size, _base + _offset);
+			ssize_t result = ::pwrite(_private->descriptor, buffer, size, _base + _offset);
 			if (result != -1)
 			{
 				_offset += static_cast<size_t>(result);

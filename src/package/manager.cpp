@@ -11,14 +11,14 @@ PackageManager::PackageManager(Allocator *allocator)
 	: _allocator(allocator)
 	, _order(PackedFirst)
 {
-	PackageManagerGuard::enter(this, S("Duplicate PackageManager construction"));
+	PackageManagerGuard::enter(this, "Duplicate PackageManager construction");
 }
 
 PackageManager::~PackageManager()
 {
 	unmount_all();
 
-	PackageManagerGuard::leave(this, S("Unmatched PackageManager destruction"));
+	PackageManagerGuard::leave(this, "Unmatched PackageManager destruction");
 }
 
 File PackageManager::open_file(const StaticString &name, File::Mode mode, Order order)

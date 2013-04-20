@@ -2,7 +2,6 @@
 #define __BASE_INSTANCE_GUARD_H
 
 #include <Yttrium/assert.h>
-#include <Yttrium/static_string.h>
 
 namespace Yttrium
 {
@@ -19,13 +18,13 @@ public:
 
 public:
 
-	static void enter(T *pointer, const StaticString &message)
+	static void enter(T *pointer, const char *message)
 	{
 		Y_ABORT_IF(instance, message);
 		instance = pointer;
 	}
 
-	static void leave(T *pointer, const StaticString &message)
+	static void leave(T *pointer, const char *message)
 	{
 		Y_ABORT_IF(instance != pointer, message);
 		instance = nullptr;

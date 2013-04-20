@@ -160,7 +160,7 @@ String &String::append_dec(int64_t value, int width, bool zeros)
 		--width;
 	}
 
-	int i = Y_LENGTH_OF(buffer);
+	int i = countof(buffer);
 
 	do
 	{
@@ -192,7 +192,7 @@ String &String::append_dec(int64_t value, int width, bool zeros)
 		}
 	}
 
-	append(&buffer[i], Y_LENGTH_OF(buffer) - i);
+	append(&buffer[i], countof(buffer) - i);
 	return *this;
 }
 
@@ -200,7 +200,7 @@ String &String::append_dec(uint64_t value, int width, bool zeros)
 {
 	char buffer[20];
 
-	int i = Y_LENGTH_OF(buffer);
+	int i = countof(buffer);
 
 	do
 	{
@@ -214,7 +214,7 @@ String &String::append_dec(uint64_t value, int width, bool zeros)
 		append(zeros ? '0' : ' ', width);
 	}
 
-	append(&buffer[i], Y_LENGTH_OF(buffer) - i);
+	append(&buffer[i], countof(buffer) - i);
 	return *this;
 }
 

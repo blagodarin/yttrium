@@ -47,6 +47,8 @@ public:
 
 	/**
 	* \overload
+	* \param index
+	* \return
 	*/
 
 	inline char at(size_t index) const noexcept;
@@ -130,6 +132,7 @@ public:
 
 	/**
 	* \overload
+	* \return Constant string text pointer.
 	*/
 
 	inline const char *text() const noexcept;
@@ -140,6 +143,8 @@ public:
 
 	/**
 	* \overload
+	* \param index
+	* \return
 	*/
 
 	inline const char *text_at(size_t index) const noexcept;
@@ -149,11 +154,13 @@ public:
 	StaticString trimmed() const noexcept;
 
 	/// Convert to decimal \c double as much of the string as possible.
+	/// \return
 	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
 
 	double to_double() const noexcept;
 
 	/// Convert to decimal \c float as much of the string as possible.
+	/// \return
 	/// \note The value must be in form "[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]".
 
 	float to_float() const noexcept;
@@ -172,17 +179,22 @@ public:
 
 	/**
 	* \overload
+	* \param value
+	* \return
 	*/
 
 	bool to_number(float *value) const noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \return
 	*/
 
 	bool to_number(double *value) const noexcept;
 
 	/// Convert to decimal \c double time as much of the string as possible.
+	/// \return
 	/// \note The time must be in form "[+|-][[HH:]MM:]SS[.{Z}]".
 
 	double to_time() const noexcept;
@@ -196,6 +208,8 @@ public:
 	uint64_t to_uint64() const noexcept;
 
 	///
+	/// \param allocator
+	/// \return
 	/// \note Might crash if the string is allocated in the very end of a readable space
 	/// and is not zero terminated.
 
@@ -209,6 +223,8 @@ public:
 
 	/**
 	* \overload
+	* \param index
+	* \return
 	*/
 
 	inline char &operator [](size_t index) noexcept; // TODO: Remove as unsafe?

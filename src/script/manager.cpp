@@ -10,12 +10,12 @@ typedef InstanceGuard<ScriptManager> ScriptManagerGuard;
 ScriptManager::ScriptManager(Allocator *allocator)
 	: _root_context(allocator)
 {
-	ScriptManagerGuard::enter(this, S("Duplicate ScriptManager construction"));
+	ScriptManagerGuard::enter(this, "Duplicate ScriptManager construction");
 }
 
 ScriptManager::~ScriptManager()
 {
-	ScriptManagerGuard::leave(this, S("Duplicate ScriptManager construction"));
+	ScriptManagerGuard::leave(this, "Duplicate ScriptManager construction");
 }
 
 ScriptManager *ScriptManager::instance()

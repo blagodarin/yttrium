@@ -69,6 +69,9 @@ public:
 
 	/**
 	* \overload
+	* \param name Command name.
+	* \param command Command handler.
+	* \param args Number of arguments.
 	*/
 
 	inline void define(const StaticString &name, const Command &command, size_t args = 0) noexcept;
@@ -103,12 +106,20 @@ public:
 
 	/**
 	* \overload
+	* \param name
+	* \param value
+	* \param flags
+	* \return
 	*/
 
 	const ScriptValue *set(const StaticString &name, Real value, ScriptValue::Flags flags = 0) noexcept;
 
 	/**
 	* \overload
+	* \param name
+	* \param value
+	* \param flags
+	* \return
 	*/
 
 	const ScriptValue *set(const StaticString &name, const StaticString &value, ScriptValue::Flags flags = 0) noexcept;

@@ -134,6 +134,8 @@ public:
 	bool fast_intersects(const Rect &rect) const noexcept;
 
 	/// Find whether the rects intersect.
+	/// \param rect
+	/// \return \c true if this rect intersects \a rect.
 	/// \note This only works for integer rects with <tt>left <= right</tt> and <tt>top <= bottom</tt>.
 	/// It also assumes the subtraction result of any two coordinates along the same axis is valid.
 	/// \note This function reports an intersection of a null rect with itself
@@ -142,6 +144,8 @@ public:
 	bool fastest_intersects(const Rect &rect) const noexcept;
 
 	/// Find whether the rects intersect.
+	/// \param rect
+	/// \return \c true if this rect intersects \a rect.
 	/// \note This function reports no intersection of a null rect with itself,
 	/// though it does report an intersection for a null rect with a non-null rect
 	/// if the point of the null rect lies inside the non-null rect.

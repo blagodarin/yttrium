@@ -39,12 +39,12 @@ LogManager::LogManager(const StaticString &file, Allocator *allocator)
 	: _allocator(allocator)
 	, _file(file, File::Write | File::Truncate, allocator)
 {
-	LogManagerGuard::enter(this, S("Duplicate LogManager construction"));
+	LogManagerGuard::enter(this, "Duplicate LogManager construction");
 }
 
 LogManager::~LogManager()
 {
-	LogManagerGuard::leave(this, S("Unmatched LogManager destruction"));
+	LogManagerGuard::leave(this, "Unmatched LogManager destruction");
 }
 
 LogManager::Writer LogManager::log()

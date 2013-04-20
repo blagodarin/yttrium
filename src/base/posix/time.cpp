@@ -9,38 +9,49 @@ namespace Yttrium
 
 DateTime DateTime::now()
 {
-	time_t    unix_time;
-	struct tm local_time;
-	DateTime  result;
+	::timespec time;
 
-	if (time(&unix_time) == -1 || !localtime_r(&unix_time, &local_time))
+	if (Y_UNLIKELY(::clock_gettime(CLOCK_REALTIME, &time)))
 	{
-		Y_ABORT("Can't get the current date and time"); // NOTE: Safe to continue (Y_ASSERT?).
+		Y_ABORT("Failed to query CLOCK_REALTIME time");
 	}
 	else
 	{
-		result.year   = local_time.tm_year + 1900;
-		result.month  = local_time.tm_mon + 1;
-		result.day    = local_time.tm_mday;
-		result.hour   = local_time.tm_hour;
-		result.minute = local_time.tm_min;
-		result.second = local_time.tm_sec;
-	}
+		::tm local_time;
 
-	return result;
+		if (Y_UNLIKELY(!::localtime_r(&time.tv_sec, &local_time)))
+		{
+			Y_ABORT("Failed to decompose CLOCK_REALTIME time");
+		}
+		else
+		{
+			DateTime result;
+
+			result.year    = local_time.tm_year + 1900;
+			result.month   = local_time.tm_mon + 1;
+			result.day     = local_time.tm_mday;
+			result.hour    = local_time.tm_hour;
+			result.minute  = local_time.tm_min;
+			result.second  = local_time.tm_sec;
+			result.msecond = time.tv_nsec / (1000 * 1000);
+
+			return result;
+		}
+	}
 }
 
 Clock Timer::clock()
 {
-	struct timespec time;
+	::timespec time;
 
-	if (clock_gettime(CLOCK_MONOTONIC, &time))
+	if (Y_UNLIKELY(::clock_gettime(CLOCK_MONOTONIC, &time)))
 	{
-		Y_ABORT("clock_gettime(CLOCK_MONOTONIC, ...) failed"); // NOTE: Safe to continue (Y_ASSERT?).
-		return 0;
+		Y_ABORT("Failed to query CLOCK_MONOTONIC time");
 	}
-
-	return time.tv_nsec / (1000 * 1000) + time.tv_sec * 1000;
+	else
+	{
+		return time.tv_nsec / (1000 * 1000) + time.tv_sec * 1000;
+	}
 }
 
 } // namespace Yttrium

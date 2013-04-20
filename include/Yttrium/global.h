@@ -18,7 +18,7 @@
 /// \note Must be defined when building %Yttrium as a static library
 /// **or using it as one**.
 
-#ifdef __YTTRIUM_DOXYGEN
+#if defined(__YTTRIUM_DOXYGEN)
 	#define __YTTRIUM_SHARED
 	#define __YTTRIUM_STATIC
 #endif
@@ -31,9 +31,8 @@
 // \brief GCC version number (e.g. 47 for GCC 4.7).
 
 #if defined(__GNUC__)
-	#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
-		#define __Y_GCC (__GNUC__ * 10 + __GNUC_MINOR__)
-	#else
+	#define __Y_GCC (__GNUC__ * 10 + __GNUC_MINOR__)
+	#if __Y_GCC < 47
 		#error GCC compilers older than 4.7 are not supported.
 	#endif
 #else
@@ -44,9 +43,8 @@
 // \brief MSVC version number (e.g. 71 for MSVC 7.1, 100 for MSVC 10.0).
 
 #if defined(_MSC_VER)
-	#if _MSC_VER >= 1700
-		#define __Y_MSVC 110
-	#else
+	#define __Y_MSVC (_MSC_VER / 10 - 60)
+	#if __Y_MSVC < 110
 		#error MSVC compilers older than 11.0 are not supported.
 	#endif
 #else
@@ -159,6 +157,26 @@
 	#define Y_UNLIKELY(x) (x)
 #endif
 
+/// \def Y_HAS_CONSTEXPR
+/// \brief \c constexpr support "flag".
+
+#if !defined(__YTTRIUM_DOXYGEN)
+	#define Y_HAS_CONSTEXPR (__Y_GCC >= 46)
+#else
+	#define Y_HAS_CONSTEXPR 0
+#endif
+
+/// \def Y_NORETURN
+/// \brief
+
+#if __Y_GCC
+	#define Y_NORETURN __attribute__((__noreturn__))
+#elif __Y_MSVC
+	#define Y_NORETURN __declspec(noreturn)
+#else
+	#define Y_NORETURN
+#endif
+
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,10 +186,12 @@
 /// \def Y_API
 /// \brief Public %Yttrium API specifier.
 
-#if defined(__YTTRIUM_SHARED)
-	#define Y_API Y_EXPORT
-#else
-	#define Y_API Y_IMPORT
+#if !defined(__YTTRIUM_DOXYGEN)
+	#if defined(__YTTRIUM_SHARED)
+		#define Y_API Y_EXPORT
+	#elif !defined(__YTTRIUM_STATIC)
+		#define Y_API Y_IMPORT
+	#endif
 #endif
 
 #if !defined(Y_API)
@@ -186,10 +206,6 @@
 #else
 	#define Y_IS_DEBUG 0
 #endif
-
-/// Calculate the static \a array length.
-
-#define Y_LENGTH_OF(array) (sizeof(array) / sizeof (array)[0])
 
 /// Make the current class \a Class non-copyable.
 

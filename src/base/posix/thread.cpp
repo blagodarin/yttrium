@@ -2,6 +2,7 @@
 
 #include <Yttrium/assert.h>
 
+#include <errno.h> // errno
 #include <sched.h> // sched_yield
 #include <time.h>  // nanosleep, timespec
 
@@ -15,19 +16,16 @@ bool Thread::is_running()
 
 void Thread::start()
 {
-	if (_private->_is_running)
-	{
-		Y_ABORT("The thread has already been started"); // NOTE: Safe to continue (Y_ASSERT?).
-		return;
-	}
+	Y_ASSERT(!is_running());
 
-	_private->_is_running = true;
-
-	if (pthread_create(&_private->_handle, nullptr, &Private::entry_point, this))
+	if (Y_LIKELY(!_private->_is_running))
 	{
-		Y_ABORT("Can't start a thread"); // NOTE: Safe to continue.
-		_private->_is_running = false;
-		return;
+		_private->_is_running = true;
+		if (Y_UNLIKELY(::pthread_create(&_private->_handle, nullptr, &Private::entry_point, this)))
+		{
+			_private->_is_running = false;
+			Y_ABORT("Failed to start a thread");
+		}
 	}
 }
 
@@ -35,9 +33,18 @@ void Thread::stop()
 {
 	if (_private->_is_running)
 	{
-		if (pthread_cancel(_private->_handle))
+		if (Y_UNLIKELY(::pthread_cancel(_private->_handle)))
 		{
-			Y_ABORT("Can't stop a thread");
+			Y_ABORT("Failed to stop a thread");
+		}
+		else
+		{
+			void *result;
+
+			if (Y_UNLIKELY(::pthread_join(_private->_handle, &result)))
+			{
+				Y_ABORT("Failed to wait for a stopped thread");
+			}
 		}
 		_private->_is_running = false;
 	}
@@ -45,13 +52,13 @@ void Thread::stop()
 
 void Thread::wait()
 {
-	if (_private->_is_running && !pthread_equal(_private->_handle, pthread_self()))
+	if (_private->_is_running && Y_LIKELY(!::pthread_equal(_private->_handle, ::pthread_self())))
 	{
 		void *result;
 
-		if (pthread_join(_private->_handle, &result))
+		if (Y_UNLIKELY(::pthread_join(_private->_handle, &result)))
 		{
-			Y_ABORT("Can't wait for a thread");
+			Y_ABORT("Failed to wait for a thread");
 		}
 	}
 }
@@ -61,7 +68,6 @@ void *Thread::Private::entry_point(void *data)
 	Thread *thread = static_cast<Thread *>(data);
 
 	thread->run();
-
 	thread->_private->_is_running = false;
 
 	return nullptr;
@@ -71,27 +77,27 @@ void Thread::sleep(Clock milliseconds)
 {
 	Y_ASSERT(milliseconds >= 0);
 
-	if (milliseconds)
+	if (Y_LIKELY(milliseconds > 0))
 	{
-		struct timespec time;
+		::timespec time;
 
 		time.tv_sec = milliseconds / 1000;
 		time.tv_nsec = (milliseconds % 1000) * 1000 * 1000;
 
-		if (nanosleep(&time, nullptr))
+		if (Y_UNLIKELY(::nanosleep(&time, nullptr)))
 		{
-			Y_ABORT("Can't sleep"); // NOTE: Safe to continue (Y_ASSERT?).
+			Y_ABORT("Failed to sleep");
 		}
 	}
 	else
 	{
-	#ifdef _POSIX_PRIORITY_SCHEDULING // Defined for 'sched_yield'.
-		if (sched_yield())
+	#if defined(_POSIX_PRIORITY_SCHEDULING)
+		if (Y_UNLIKELY(::sched_yield()))
 	#else
-		if (pthread_yield())
+		if (Y_UNLIKELY(::pthread_yield()))
 	#endif
 		{
-			Y_ABORT("Can't sleep for 0 ms"); // NOTE: Safe to continue (Y_ASSERT?).
+			Y_ABORT("Failed to yield");
 		}
 	}
 }

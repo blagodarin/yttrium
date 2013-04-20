@@ -18,7 +18,7 @@ MemoryManager::MemoryManager()
 	: _previous_default_allocator(DefaultAllocator)
 	, _default_allocator(Y_NEW(_previous_default_allocator, HeapAllocator)(_previous_default_allocator))
 {
-	MemoryManagerGuard::enter(this, S("Duplicate MemoryManager construction"));
+	MemoryManagerGuard::enter(this, "Duplicate MemoryManager construction");
 
 	const_cast<Allocator *&>(DefaultAllocator) =
 		Y_NEW(_default_allocator, ProxyAllocator)("default", _default_allocator);
@@ -30,7 +30,7 @@ MemoryManager::~MemoryManager()
 	Y_DELETE(_previous_default_allocator, _default_allocator);
 	const_cast<Allocator *&>(DefaultAllocator) = _previous_default_allocator;
 
-	MemoryManagerGuard::leave(this, S("Duplicate MemoryManager destruction"));
+	MemoryManagerGuard::leave(this, "Duplicate MemoryManager destruction");
 }
 
 Allocator *MemoryManager::default_allocator()

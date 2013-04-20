@@ -32,12 +32,17 @@ public:
 
 	/**
 	* \overload
+	* \param text
+	* \param size
+	* \param allocator
 	*/
 
 	String(const char *text, size_t size, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
+	* \param text
+	* \param allocator
 	*/
 
 	String(const char *text, Allocator *allocator = DefaultAllocator) noexcept;
@@ -55,12 +60,18 @@ public:
 
 	/**
 	* \overload
+	* \param left
+	* \param right
+	* \param allocator
 	*/
 
 	String(const StaticString &left, char right, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
+	* \param left
+	* \param right
+	* \param allocator
 	*/
 
 	String(char left, const StaticString &right, Allocator *allocator = DefaultAllocator) noexcept;
@@ -80,12 +91,16 @@ public:
 
 	/**
 	* \overload
+	* \param string
+	* \param allocator
 	*/
 
 	inline String(const StaticString &string, const ByReference &, Allocator *allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
+	* \param text
+	* \param allocator
 	*/
 
 	inline String(const char *text, const ByReference &, Allocator *allocator = DefaultAllocator) noexcept;
@@ -102,15 +117,17 @@ public:
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	inline String &append(const StaticString &string) noexcept;
+	inline String &append(const StaticString &) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	String &append(const char *text) noexcept;
+	String &append(const char *) noexcept;
 
 	/// Append the specified \a symbol to the string \a count times.
 
@@ -120,35 +137,52 @@ public:
 	/// \param value Value to append.
 	/// \param width Minimal number width.
 	/// \param zeros Should the value be prepended with zeros instead of spaces to fit \a width?
+	/// \return
 
 	inline String &append_dec(int32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \param width
+	* \param zeros
+	* \return
 	*/
 
 	inline String &append_dec(uint32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \param width
+	* \param zeros
+	* \return
 	*/
 
 	String &append_dec(int64_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \param width
+	* \param zeros
+	* \return
 	*/
 
 	String &append_dec(uint64_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \return
 	*/
 
 	String &append_dec(float value) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \return
 	*/
 
 	String &append_dec(double value) noexcept;
@@ -161,11 +195,17 @@ public:
 
 	inline String &escape(const char *symbols, char with) noexcept;
 
+	///
+	/// \param symbols
+	/// \param with
+	/// \return
 	/// \see StaticString::escaped
 
 	inline String escaped(const char *symbols, char with) const noexcept;
 
 	///
+	/// \param text
+	/// \param index
 	/// \note The \a text must not refer to the current string's data.
 
 	void insert(const StaticString &text, size_t index) noexcept;
@@ -196,31 +236,35 @@ public:
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	inline String &set(const StaticString &string) noexcept;
+	inline String &set(const StaticString &) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	String &set(const char *text) noexcept;
+	String &set(const char *) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	String &set(char symbol) noexcept;
+	String &set(char) noexcept;
 
 	///
 
-	String &swap(String *string) noexcept;
+	String &swap(String *) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	String &swap(String &&string) noexcept;
+	String &swap(String &&) noexcept;
 
 	///
 
@@ -234,31 +278,35 @@ public:
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	inline String &operator =(const char *text) noexcept;
+	inline String &operator =(const char *) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	inline String &operator =(const StaticString &string) noexcept;
+	inline String &operator =(const StaticString &) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	inline String &operator =(const String &string) noexcept;
+	inline String &operator =(const String &) noexcept;
 
 	///
 
-	inline String &operator +=(char symbol) noexcept;
+	inline String &operator +=(char) noexcept;
 
 	/**
 	* \overload
+	* \return
 	*/
 
-	inline String &operator +=(const StaticString &string) noexcept;
+	inline String &operator +=(const StaticString &) noexcept;
 
 public:
 
@@ -266,35 +314,52 @@ public:
 	/// \param value Value to convert.
 	/// \param width Minimal number width.
 	/// \param zeros Should the value be prepended with zeros to fit \a width?
+	/// \return
 
 	inline static String from_dec(int32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \param width
+	* \param zeros
+	* \return
 	*/
 
 	inline static String from_dec(uint32_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \param width
+	* \param zeros
+	* \return
 	*/
 
 	inline static String from_dec(int64_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \param width
+	* \param zeros
+	* \return
 	*/
 
 	inline static String from_dec(uint64_t value, int width = 0, bool zeros = false) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \return
 	*/
 
 	inline static String from_dec(float value) noexcept;
 
 	/**
 	* \overload
+	* \param value
+	* \return
 	*/
 
 	inline static String from_dec(double value) noexcept;

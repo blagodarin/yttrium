@@ -48,7 +48,7 @@ public:
 
 	///
 
-	bool try_wait(Mutex *mutex, Clock milliseconds) noexcept;
+	bool try_wait(Mutex *mutex, Clock milliseconds = 0) noexcept;
 
 	///
 

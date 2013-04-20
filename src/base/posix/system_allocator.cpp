@@ -27,7 +27,7 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 	size_t allocated_bytes = total_bytes - reserved_size;
 
 	void *base = ::mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (base == MAP_FAILED)
+	if (Y_UNLIKELY(base == MAP_FAILED))
 	{
 		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
 		return nullptr;
@@ -50,7 +50,7 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 
 void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference)
 {
-	if (pointer)
+	if (Y_LIKELY(pointer))
 	{
 		void *base = static_cast<char *>(pointer) - reserved_size;
 
@@ -95,7 +95,7 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	}
 
 	void *new_base = ::mremap(base, total_bytes, new_total_bytes, (movability == MayMove ? MREMAP_MAYMOVE : 0));
-	if (new_base == MAP_FAILED)
+	if (Y_UNLIKELY(new_base == MAP_FAILED))
 	{
 		Y_ABORT_IF(movability == MayMove, "Out of memory"); // NOTE: Safe to continue.
 		return nullptr;

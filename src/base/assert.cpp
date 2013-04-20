@@ -7,15 +7,12 @@
 namespace Yttrium
 {
 
-void abort(const StaticString &message, ...)
+void abort(const char *message, const char *file, int line, const char *function)
 {
-	if (!message.is_empty())
-	{
-		// NOTE: If we're aborting on an out of memory error and the message size
-		// exceeds the allocated string capacity, we'll enter a recursive loop here.
+	// NOTE: If we're aborting on an out of memory error and the message size
+	// exceeds the allocated string capacity, we'll enter a recursive loop here.
 
-		Y_LOG(message);
-	}
+	Y_LOG(message << " {" << file << ":" << line << " | " << function << "}");
 
 	::abort();
 }

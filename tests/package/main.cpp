@@ -2,6 +2,7 @@
 #include <Yttrium/file.h>
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/package.h>
+#include <Yttrium/utils.h>
 
 #include <cstdlib> // rand
 #include <cstring> // memcmp
@@ -98,22 +99,22 @@ BOOST_AUTO_TEST_CASE(rewrite_mode_test)
 
 	BOOST_REQUIRE(packed_file1.is_opened());
 	BOOST_REQUIRE(packed_file1.read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), Y_LENGTH_OF(buffer1));
-	BOOST_CHECK(!memcmp(actual.const_data(), buffer1, Y_LENGTH_OF(buffer1)));
+	BOOST_CHECK_EQUAL(actual.size(), countof(buffer1));
+	BOOST_CHECK(!memcmp(actual.const_data(), buffer1, countof(buffer1)));
 
 	packed_file1.close();
 
 	BOOST_REQUIRE(packed_file2.is_opened());
 	BOOST_REQUIRE(packed_file2.read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), Y_LENGTH_OF(buffer2));
-	BOOST_CHECK(!memcmp(actual.const_data(), buffer2, Y_LENGTH_OF(buffer2)));
+	BOOST_CHECK_EQUAL(actual.size(), countof(buffer2));
+	BOOST_CHECK(!memcmp(actual.const_data(), buffer2, countof(buffer2)));
 
 	packed_file2.close();
 
 	BOOST_REQUIRE(packed_file3.is_opened());
 	BOOST_REQUIRE(packed_file3.read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), Y_LENGTH_OF(buffer3));
-	BOOST_CHECK(!memcmp(actual.const_data(), buffer3, Y_LENGTH_OF(buffer3)));
+	BOOST_CHECK_EQUAL(actual.size(), countof(buffer3));
+	BOOST_CHECK(!memcmp(actual.const_data(), buffer3, countof(buffer3)));
 
 	packed_file3.close();
 }

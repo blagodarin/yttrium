@@ -125,6 +125,8 @@ public:
 
 	/**
 	* \overload
+	* \param width
+	* \param height
 	*/
 
 	void resize(Dim width, Dim height) noexcept
@@ -145,6 +147,9 @@ public:
 
 	/**
 	* \overload
+	* \param left
+	* \param top
+	* \return
 	*/
 
 	bool set_cursor(Dim left, Dim top) noexcept

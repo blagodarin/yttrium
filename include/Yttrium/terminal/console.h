@@ -26,7 +26,8 @@ public:
 
 public:
 
-	/// Process a \a key from the specified \a terminal.
+	/// Process a \a key from the terminal.
+	/// \param key Input key.
 	/// \return \c true if the key was handled.
 
 	bool process_key(Key key) noexcept;
