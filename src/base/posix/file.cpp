@@ -1,7 +1,6 @@
 #include "file.h"
 
 #include <Yttrium/assert.h>
-#include <Yttrium/string.h>
 
 #define _FILE_OFFSET_BITS 64
 
@@ -16,9 +15,11 @@ File::Private::~Private()
 {
 	::close(descriptor);
 
-	if (auto_remove)
+	if (auto_remove && Y_UNLIKELY(::unlink(name.const_text())))
 	{
-		::unlink(name.const_text()); // TODO: Verify the result.
+		// This must be something strange (EIO or ENOMEM).
+		
+		Y_ABORT("Failed to remove a file");
 	}
 }
 
@@ -176,10 +177,12 @@ bool File::seek(UOffset offset, Whence whence)
 			else
 			{
 				off_t off = ::lseek(_private->descriptor, 0, SEEK_END);
-
-				if (off == -1)
+				if (Y_UNLIKELY(off == -1))
 				{
-					return false; // TODO: Y_ABORT.
+					// With a valid descriptor, whence and offset, this must be EOVERFLOW,
+					// indicating that the file size can't be represented in an off_t.
+
+					Y_ABORT("Failed to retrieve the file size");
 				}
 				size = static_cast<UOffset>(off);
 			}
@@ -218,12 +221,19 @@ UOffset File::size() const
 
 			{
 				off_t size = ::lseek(_private->descriptor, 0, SEEK_END);
-				if (size == -1)
+				if (Y_UNLIKELY(size == -1))
 				{
-					break; // TODO: Y_ABORT.
+					// With a valid descriptor, whence and offset, this must be EOVERFLOW,
+					// indicating that the file size can't be represented in an off_t.
+
+					Y_ABORT("Failed to retrieve the file size");
 				}
-				return size - _base;
+				else
+				{
+					return size - _base;
+				}
 			}
+			break;
 		}
 	}
 

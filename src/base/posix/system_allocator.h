@@ -29,7 +29,10 @@ public: // SystemAllocator
 
 private:
 
-	static const size_t reserved_size;
+	enum: size_t
+	{
+		ReservedSize = 32, // This should be sufficient for both 32-bit and 64-bit memory.
+	};
 
 private:
 

@@ -1,5 +1,7 @@
 #include "system_allocator.h"
 
+#include <atomic>
+
 namespace Yttrium
 {
 

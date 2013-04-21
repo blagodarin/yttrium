@@ -3,6 +3,8 @@
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/string.h>
 
+#include "atomic_status.h"
+
 #include <iostream>
 
 #if Y_IS_DEBUG
@@ -25,8 +27,9 @@ public:
 
 public:
 
-	Allocator *_allocator;
-	String     _name;
+	Allocator          *_allocator;
+	String              _name;
+	AtomicMemoryStatus  _status;
 
 #if Y_IS_DEBUG
 	std::map<void *, size_t> _pointers;
@@ -56,7 +59,7 @@ ProxyAllocator::~ProxyAllocator()
 	// so the only remaining way is to write the message to std::cerr.
 
 	const StaticString &name = _private->_name;
-	const Status &status = _status;
+	const MemoryStatus &status = _private->_status;
 
 #if Y_IS_DEBUG
 	std::cerr << "Memory usage statistics for \"" << name.text() << "\":\n"
@@ -105,7 +108,7 @@ void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference
 	}
 
 	void *pointer = _private->_allocator->allocate(size, align, difference);
-	_status.allocate(*difference);
+	_private->_status.allocate(*difference);
 
 #if Y_IS_DEBUG
 	_private->_pointers[pointer] = size;
@@ -116,29 +119,31 @@ void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference
 
 void ProxyAllocator::deallocate(void *pointer, Difference *difference)
 {
-	if (pointer)
+	if (Y_UNLIKELY(!pointer))
 	{
-	#if Y_IS_DEBUG
-		if (_private->_pointers.find(pointer) == _private->_pointers.end())
-		{
-			::abort();
-		}
-	#endif
-
-		Difference local_difference;
-
-		if (!difference)
-		{
-			difference = &local_difference;
-		}
-
-		_private->_allocator->deallocate(pointer, difference);
-		_status.deallocate(*difference);
-
-	#if Y_IS_DEBUG
-		_private->_pointers.erase(pointer);
-	#endif
+		return;
 	}
+
+#if Y_IS_DEBUG
+	if (_private->_pointers.find(pointer) == _private->_pointers.end())
+	{
+		::abort();
+	}
+#endif
+
+	Difference local_difference;
+
+	if (!difference)
+	{
+		difference = &local_difference;
+	}
+
+	_private->_allocator->deallocate(pointer, difference);
+	_private->_status.deallocate(*difference);
+
+#if Y_IS_DEBUG
+	_private->_pointers.erase(pointer);
+#endif
 }
 
 void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
@@ -154,7 +159,7 @@ void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movabili
 
 	if (new_pointer)
 	{
-		_status.reallocate(*difference);
+		_private->_status.reallocate(*difference);
 
 	#if Y_IS_DEBUG
 		_private->_pointers.erase(pointer);

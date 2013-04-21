@@ -21,40 +21,32 @@ void *HeapAllocator::allocate(size_t size, size_t align, Difference *difference)
 		return nullptr;
 	}
 
-	Difference local_difference;
-
-	if (!difference)
+	if (difference)
 	{
-		difference = &local_difference;
+		*difference = Difference(0, 0, Difference::Increment);
 	}
-
-	*difference = Difference(0, 0, Difference::Increment);
-	_status.allocate(*difference);
 
 	return pointer;
 }
 
 void HeapAllocator::deallocate(void *pointer, Difference *difference)
 {
-	if (Y_LIKELY(pointer))
+	if (Y_UNLIKELY(!pointer))
 	{
-		::free(pointer);
+		return;
+	}
 
-		Difference local_difference;
+	::free(pointer);
 
-		if (!difference)
-		{
-			difference = &local_difference;
-		}
-
+	if (difference)
+	{
 		*difference = Difference(0, 0, Difference::Decrement);
-		_status.deallocate(*difference);
 	}
 }
 
 void *HeapAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
-	if (movability == MayNotMove)
+	if (movability != MayMove)
 	{
 		return nullptr;
 	}
@@ -63,19 +55,14 @@ void *HeapAllocator::reallocate(void *pointer, size_t size, Movability movabilit
 
 	if (Y_UNLIKELY(!result))
 	{
-		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
+		Y_ABORT("Out of memory");
 		return nullptr;
 	}
 
-	Difference local_difference;
-
-	if (!difference)
+	if (difference)
 	{
-		difference = &local_difference;
+		*difference = Difference(0, 0, Difference::Increment);
 	}
-
-	*difference = Difference(0, 0, Difference::Increment);
-	_status.reallocate(*difference);
 
 	return result;
 }

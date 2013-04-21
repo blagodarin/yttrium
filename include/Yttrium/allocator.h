@@ -6,7 +6,6 @@
 
 #include <Yttrium/types.h>
 
-#include <atomic>
 #include <new>
 
 namespace Yttrium
@@ -52,70 +51,6 @@ public:
 		}
 	};
 
-	/// %Allocator status.
-
-	struct Status
-	{
-		size_t allocated_blocks; ///< Number of memory blocks allocated.
-		size_t allocated_bytes;  ///< Allocated memory size.
-		size_t total_bytes;      ///< Used memory size.
-
-		size_t allocations;      ///< Lifetime (wrapping) number of allocations.
-		size_t reallocations;    ///< Lifetime (wrapping) number of reallocations.
-		size_t deallocations;    ///< Lifetime (wrapping) number of deallocations.
-
-		///
-
-		Status() noexcept
-			: allocated_blocks(0)
-			, allocated_bytes(0)
-			, total_bytes(0)
-			, allocations(0)
-			, reallocations(0)
-			, deallocations(0)
-		{
-		}
-	};
-
-	/// Atomic allocator status.
-
-	class AtomicStatus
-	{
-	public:
-
-		///
-
-		AtomicStatus() noexcept;
-
-		///
-
-		void allocate(const Difference &difference) noexcept;
-
-		///
-
-		void deallocate(const Difference &difference) noexcept;
-
-		///
-
-		void reallocate(const Difference &difference) noexcept;
-
-	public:
-
-		///
-
-		operator Status() const noexcept;
-
-	private:
-
-		std::atomic<size_t> _allocated_blocks;
-		std::atomic<size_t> _allocated_bytes;
-		std::atomic<size_t> _total_bytes;
-
-		std::atomic<size_t> _allocations;
-		std::atomic<size_t> _reallocations;
-		std::atomic<size_t> _deallocations;
-	};
-
 public:
 
 	///
@@ -152,13 +87,6 @@ public:
 		}
 	}
 
-	///
-
-	Status status() const noexcept
-	{
-		return _status;
-	}
-
 protected:
 
 	///
@@ -166,10 +94,6 @@ protected:
 	virtual ~Allocator()
 	{
 	}
-
-protected:
-
-	AtomicStatus _status;
 };
 
 /// System allocator.

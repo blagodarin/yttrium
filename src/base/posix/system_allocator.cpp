@@ -23,50 +23,50 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 
 	Y_ASSERT(size);
 
-	size_t total_bytes = _page_size * ((reserved_size + size + _page_size - 1) / _page_size);
-	size_t allocated_bytes = total_bytes - reserved_size;
+	size_t total_bytes = _page_size * ((ReservedSize + size + _page_size - 1) / _page_size);
+	size_t allocated_bytes = total_bytes - ReservedSize;
 
 	void *base = ::mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
 	if (Y_UNLIKELY(base == MAP_FAILED))
 	{
-		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
+		Y_ABORT("Out of memory");
 		return nullptr;
 	}
 
 	static_cast<size_t *>(base)[0] = total_bytes;
 	static_cast<size_t *>(base)[1] = allocated_bytes;
 
-	Difference local_difference;
-
-	if (!difference)
+	if (difference)
 	{
-		difference = &local_difference;
+		*difference = Difference(allocated_bytes, total_bytes, Difference::Increment);
 	}
-	*difference = Difference(allocated_bytes, total_bytes, Difference::Increment);
-	_status.deallocate(*difference);
 
-	return static_cast<char *>(base) + reserved_size;
+	return static_cast<char *>(base) + ReservedSize;
 }
 
 void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference)
 {
-	if (Y_LIKELY(pointer))
+	if (Y_UNLIKELY(!pointer))
 	{
-		void *base = static_cast<char *>(pointer) - reserved_size;
+		return;
+	}
 
-		size_t total_bytes = static_cast<size_t *>(base)[0];
-		size_t allocated_bytes = static_cast<size_t *>(base)[1];
+	void *base = static_cast<char *>(pointer) - ReservedSize;
 
-		::munmap(base, total_bytes);
+	size_t total_bytes = static_cast<size_t *>(base)[0];
+	size_t allocated_bytes = static_cast<size_t *>(base)[1];
 
-		Difference local_difference;
+	if (Y_UNLIKELY(::munmap(base, total_bytes)))
+	{
+		// This must be EINVAL, indicating that we've passed something wrong to munmap.
 
-		if (!difference)
-		{
-			difference = &local_difference;
-		}
+		Y_ABORT("Failed to deallocate memory");
+	}
+
+	if (difference)
+	{
 		*difference = Difference(allocated_bytes, total_bytes, Difference::Decrement);
-		_status.deallocate(*difference);
 	}
 }
 
@@ -75,64 +75,63 @@ void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability mov
 	Y_ASSERT(pointer);
 	Y_ASSERT(size);
 
-	void *base = static_cast<char *>(pointer) - reserved_size;
+	void *base = static_cast<char *>(pointer) - ReservedSize;
 
 	size_t total_bytes = static_cast<size_t *>(base)[0];
-
-	size_t new_total_bytes = _page_size * ((reserved_size + size + _page_size - 1) / _page_size);
-
-	Difference local_difference;
-
-	if (!difference)
-	{
-		difference = &local_difference;
-	}
+	size_t new_total_bytes = _page_size * ((ReservedSize + size + _page_size - 1) / _page_size);
 
 	if (new_total_bytes == total_bytes)
 	{
-		*difference = Difference(0, 0, Difference::Increment);
+		if (difference)
+		{
+			*difference = Difference();
+		}
 		return pointer;
 	}
 
 	void *new_base = ::mremap(base, total_bytes, new_total_bytes, (movability == MayMove ? MREMAP_MAYMOVE : 0));
-	if (Y_UNLIKELY(new_base == MAP_FAILED))
+
+	if (Y_LIKELY(new_base == MAP_FAILED))
 	{
-		Y_ABORT_IF(movability == MayMove, "Out of memory"); // NOTE: Safe to continue.
+		if (movability == MayMove)
+		{
+			Y_ABORT("Out of memory");
+		}
 		return nullptr;
 	}
 
 	static_cast<size_t *>(new_base)[0] = new_total_bytes;
-	static_cast<size_t *>(new_base)[1] = new_total_bytes - reserved_size;
+	static_cast<size_t *>(new_base)[1] = new_total_bytes - ReservedSize;
 
-	if (new_total_bytes > total_bytes)
+	if (difference)
 	{
-		size_t shift = new_total_bytes - total_bytes;
-		*difference = Difference(shift, shift, Difference::Increment);
+		if (new_total_bytes > total_bytes)
+		{
+			size_t shift = new_total_bytes - total_bytes;
+			*difference = Difference(shift, shift, Difference::Increment);
+		}
+		else
+		{
+			size_t shift = total_bytes - new_total_bytes;
+			*difference = Difference(shift, shift, Difference::Decrement);
+		}
 	}
-	else
-	{
-		size_t shift = total_bytes - new_total_bytes;
-		*difference = Difference(shift, shift, Difference::Decrement);
-	}
-	_status.deallocate(*difference);
 
-	return static_cast<char *>(new_base) + reserved_size;
+	return static_cast<char *>(new_base) + ReservedSize;
 }
 
 size_t SystemAllocatorImpl::lower_bound(size_t size) const
 {
 	Y_ASSERT(size);
 
-	return _page_size * ((reserved_size + size) / _page_size) - reserved_size;
+	return _page_size * ((ReservedSize + size) / _page_size) - ReservedSize;
 }
 
 size_t SystemAllocatorImpl::upper_bound(size_t size) const
 {
 	Y_ASSERT(size);
 
-	return _page_size * ((reserved_size + size + _page_size - 1) / _page_size) - reserved_size;
+	return _page_size * ((ReservedSize + size + _page_size - 1) / _page_size) - ReservedSize;
 }
-
-const size_t SystemAllocatorImpl::reserved_size = 32; // This should be sufficient for both 32-bit and 64-bit memory.
 
 } // namespace Yttrium
