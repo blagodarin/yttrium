@@ -240,6 +240,9 @@ bool Bindings::bind_default(const StaticString &name, const StaticString &action
 
 bool Bindings::call(Key key, ExecutionMode mode)
 {
+	// TODO: Pre-parse the actions to avoid script rescanning,
+	// memory allocations and other nasty things on every call.
+
 	const String &action = _actions[KeyType(key)];
 
 	if (action.is_empty())

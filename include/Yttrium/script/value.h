@@ -59,7 +59,7 @@ public:
 
 	///
 
-	inline Yttrium::String string() const noexcept;
+	inline StaticString string() const noexcept;
 
 	///
 
@@ -105,7 +105,7 @@ Real ScriptValue::real() const noexcept
 	return _value.to_double();
 }
 
-String ScriptValue::string() const noexcept
+StaticString ScriptValue::string() const noexcept
 {
 	return _value;
 }

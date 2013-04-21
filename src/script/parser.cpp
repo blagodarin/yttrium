@@ -133,19 +133,26 @@ bool ScriptParser::execute(ExecutionMode mode)
 {
 	for (Command &command: _commands)
 	{
-		String name = command.name;
+		bool revert_mode = false;
 
 		if (mode != ExecutionMode::Do)
 		{
-			if (name[0] != '+')
+			if (command.name[0] != '+')
 			{
 				continue;
 			}
-
-			name[0] = '-';
+			command.name[0] = '-'; // TODO: Replace this unsafe anti-allocation trick with a better one.
+			revert_mode = true;
 		}
 
-		if (!_context->call(name, &command.result, command.args))
+		bool result = _context->call(command.name, &command.result, command.args);
+
+		if (revert_mode)
+		{
+			command.name[0] = '+';
+		}
+
+		if (!result)
 		{
 			return false;
 		}

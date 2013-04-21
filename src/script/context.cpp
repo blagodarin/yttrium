@@ -128,26 +128,26 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Integer value, S
 {
 	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
-	if (i != _entities.end() && !(flags & ScriptValue::Default))
-	{
-		*i->second.value = value;
-	}
-	else
+	if (i == _entities.end())
 	{
 		i = _entities.insert(Entities::value_type(
 			String(name, _allocator),
 			Entity(new(_values.allocate()) ScriptValue(value, _allocator)))).first;
 	}
+	else if (!(flags & ScriptValue::Default))
+	{
+		*i->second.value = value;
+	}
 
 	if (flags & ScriptValue::Archived)
 	{
-		if (i->second.archived_value && !(flags & ScriptValue::Default))
-		{
-			*i->second.archived_value = value;
-		}
-		else
+		if (!i->second.archived_value)
 		{
 			i->second.archived_value = new(_values.allocate()) ScriptValue(value, _allocator);
+		}
+		else if (!(flags & ScriptValue::Default))
+		{
+			*i->second.archived_value = value;
 		}
 	}
 
@@ -158,26 +158,26 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Real value, Scri
 {
 	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
-	if (i != _entities.end() && !(flags & ScriptValue::Default))
-	{
-		*i->second.value = value;
-	}
-	else
+	if (i == _entities.end())
 	{
 		i = _entities.insert(Entities::value_type(
 			String(name, _allocator),
 			Entity(new(_values.allocate()) ScriptValue(value, _allocator)))).first;
 	}
+	else if (!(flags & ScriptValue::Default))
+	{
+		*i->second.value = value;
+	}
 
 	if (flags & ScriptValue::Archived)
 	{
-		if (i->second.archived_value && !(flags & ScriptValue::Default))
-		{
-			*i->second.archived_value = value;
-		}
-		else
+		if (!i->second.archived_value)
 		{
 			i->second.archived_value = new(_values.allocate()) ScriptValue(value, _allocator);
+		}
+		else if (!(flags & ScriptValue::Default))
+		{
+			*i->second.archived_value = value;
 		}
 	}
 
@@ -188,26 +188,26 @@ const ScriptValue *ScriptContext::set(const StaticString &name, const StaticStri
 {
 	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
 
-	if (i != _entities.end() && !(flags & ScriptValue::Default))
-	{
-		*i->second.value = value;
-	}
-	else
+	if (i == _entities.end())
 	{
 		i = _entities.insert(Entities::value_type(
 			String(name, _allocator),
 			Entity(new(_values.allocate()) ScriptValue(value, _allocator)))).first;
 	}
+	else if (!(flags & ScriptValue::Default))
+	{
+		*i->second.value = value;
+	}
 
 	if (flags & ScriptValue::Archived)
 	{
-		if (i->second.archived_value && !(flags & ScriptValue::Default))
-		{
-			*i->second.archived_value = value;
-		}
-		else
+		if (!i->second.archived_value)
 		{
 			i->second.archived_value = new(_values.allocate()) ScriptValue(value, _allocator);
+		}
+		else if (!(flags & ScriptValue::Default))
+		{
+			*i->second.archived_value = value;
 		}
 	}
 

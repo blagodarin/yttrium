@@ -20,7 +20,7 @@ ScriptValue &ScriptValue::operator =(Real value)
 ScriptValue &ScriptValue::operator =(const StaticString &value)
 {
 	_type = String;
-	_value.clear().append(value);
+	_value.set(value);
 	return *this;
 }
 

@@ -15,7 +15,7 @@ String ScriptArgs::string(size_t index, NameResolution resolution) const
 
 		if (resolution == Resolve && value->type() == ScriptValue::Name)
 		{
-			value  = _context->find(value->string());
+			value = _context->find(value->string());
 		}
 
 		if (value)

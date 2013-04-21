@@ -23,9 +23,6 @@ Yttrium:
     GUI:
     - Make alignment and area calculation consistent.
 
-    Script:
-    - Investigate script allocations.
-
 Tests:
 - Add audio test.
 - Merge all tests into a single executable (less linking, faster build).
