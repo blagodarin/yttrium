@@ -10,11 +10,11 @@
 #define __Y_GLOBAL_H
 
 /// \def __YTTRIUM_SHARED
-/// \brief Yttrium shared library compilation "flag".
+/// \brief %Yttrium shared library compilation "flag".
 /// \note Must be defined when building %Yttrium as a shared library.
 
 /// \def __YTTRIUM_STATIC
-/// \brief Yttrium static library compilation "flag".
+/// \brief %Yttrium static library compilation "flag".
 /// \note Must be defined when building %Yttrium as a static library
 /// **or using it as one**.
 
@@ -144,21 +144,20 @@
 #endif
 
 /// \def Y_LIKELY
-/// \brief
+/// \brief Hint the compiler that the \a condition is usually \c true.
 
 /// \def Y_UNLIKELY
-/// \brief
+/// \brief Hint the compiler that the \a condition is usually \c false.
 
 #if __Y_GCC
-	#define Y_LIKELY(x)   __builtin_expect(!!(x), 1)
-	#define Y_UNLIKELY(x) __builtin_expect(!!(x), 0)
+	#define Y_LIKELY(condition)   __builtin_expect(!!(condition), 1)
+	#define Y_UNLIKELY(condition) __builtin_expect(!!(condition), 0)
 #else
-	#define Y_LIKELY(x)   (x)
-	#define Y_UNLIKELY(x) (x)
+	#define Y_LIKELY(condition)   (condition)
+	#define Y_UNLIKELY(condition) (condition)
 #endif
 
-/// \def Y_HAS_CONSTEXPR
-/// \brief \c constexpr support "flag".
+/// \c constexpr support "flag".
 
 #if !defined(__YTTRIUM_DOXYGEN)
 	#define Y_HAS_CONSTEXPR (__Y_GCC >= 46)
@@ -166,8 +165,7 @@
 	#define Y_HAS_CONSTEXPR 0
 #endif
 
-/// \def Y_NORETURN
-/// \brief
+/// Non-returning function attribute.
 
 #if __Y_GCC
 	#define Y_NORETURN __attribute__((__noreturn__))
@@ -177,14 +175,25 @@
 	#define Y_NORETURN
 #endif
 
+/// Make the current class \a Class non-copyable.
+
+#if __Y_MSVC
+	#define Y_NONCOPYABLE(Class) \
+		Class(const Class &); \
+		Class &operator =(const Class &)
+#else
+	#define Y_NONCOPYABLE(Class) \
+		Class(const Class &) = delete; \
+		Class &operator =(const Class &) = delete
+#endif
+
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compiler-independent definitions.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// \def Y_API
-/// \brief Public %Yttrium API specifier.
+/// Public %Yttrium API specifier.
 
 #if !defined(__YTTRIUM_DOXYGEN)
 	#if defined(__YTTRIUM_SHARED)
@@ -198,8 +207,7 @@
 	#define Y_API
 #endif
 
-/// \def Y_IS_DEBUG
-/// \brief Defined to 1 when compiling in the debug mode.
+/// Defined to 1 when compiling in the debug mode.
 
 #if defined(_DEBUG) && !defined(NDEBUG)
 	#define Y_IS_DEBUG 1
@@ -207,14 +215,9 @@
 	#define Y_IS_DEBUG 0
 #endif
 
-/// Make the current class \a Class non-copyable.
-
-#define Y_NONCOPYABLE(Class) \
-	Class(const Class &) = delete; \
-	Class &operator =(const Class &) = delete
-
-/// Mark the specified parameter as unused.
-/// \note Don't use this macro to mark the parameters that are never planned
+/// \def Y_UNUSED
+/// \brief Mark the specified parameter as unused.
+/// \note Don't use this macro to mark the parameters that are never going
 /// to be used, prefer the parameter name omission in that case instead.
 
 #define Y_UNUSED(parameter) (void)(parameter)

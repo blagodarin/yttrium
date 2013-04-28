@@ -18,8 +18,6 @@ class Y_API Console
 {
 public:
 
-	~Console() = default;
-
 	///
 
 	inline Console(const Terminal &terminal, Allocator *allocator = DefaultAllocator) noexcept;

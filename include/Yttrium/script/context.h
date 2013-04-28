@@ -35,8 +35,6 @@ public:
 
 public:
 
-	~ScriptContext() = default;
-
 	///
 
 	ScriptContext(Allocator *allocator = DefaultAllocator) noexcept;
@@ -177,7 +175,7 @@ private:
 		size_t  min_args;
 		size_t  max_args;
 
-		CommandContext() = default;
+		CommandContext() {}
 		
 		CommandContext(Command command, size_t min_args, size_t max_args)
 			: command(command)
@@ -185,12 +183,6 @@ private:
 			, max_args(max_args)
 		{
 		}
-
-		// The following declarations are required to keep this struct private to the library without warnings.
-
-		CommandContext(const CommandContext&) = default;
-		~CommandContext() = default;
-		CommandContext &operator =(const CommandContext&) = default;
 	};
 
 	typedef std::map<String, CommandContext> Commands;

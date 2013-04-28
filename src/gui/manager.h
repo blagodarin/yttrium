@@ -40,7 +40,7 @@ public:
 		TextureFont font;
 		Texture2D   texture;
 
-		FontDesc() = default;
+		FontDesc() {}
 
 		FontDesc(const TextureFont &font, const Texture2D &texture)
 			: font(font)

@@ -45,10 +45,6 @@ public:
 
 public:
 
-	~ScriptValue() = default;
-
-public:
-
 	///
 
 	inline Integer integer() const noexcept;

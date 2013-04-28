@@ -114,7 +114,7 @@ public:
 
 	///
 
-	ObjectPointer() = default;
+	ObjectPointer() {}
 
 	///
 

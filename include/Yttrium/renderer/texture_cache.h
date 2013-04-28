@@ -24,8 +24,7 @@ typedef ObjectPointer<TextureCache> TextureCachePtr;
 class Y_API TextureCache
 	: public Object
 {
-	TextureCache(const TextureCache &) = delete;
-	TextureCache &operator =(const TextureCache &) = delete;
+	Y_NONCOPYABLE(TextureCache);
 
 public:
 
@@ -69,7 +68,7 @@ private:
 
 	typedef std::map<String, Texture2D> Cache2D;
 
-	Cache2D  _cache_2d;
+	Cache2D _cache_2d;
 };
 
 } // namespace Yttrium

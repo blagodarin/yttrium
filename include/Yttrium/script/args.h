@@ -34,10 +34,6 @@ public:
 
 public:
 
-	ScriptArgs(const ScriptArgs &) = default;
-
-	~ScriptArgs() = default;
-
 	///
 
 	inline ScriptArgs(ScriptContext *context) noexcept;
@@ -55,10 +51,6 @@ public:
 	///
 
 	const ScriptValue *value(size_t index) const noexcept;
-
-public:
-
-	ScriptArgs &operator =(const ScriptArgs &) = default;
 
 private:
 

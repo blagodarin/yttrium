@@ -23,7 +23,7 @@ public:
 
 	///
 
-	Vector2() = default;
+	Vector2() {}
 
 	///
 
@@ -168,7 +168,7 @@ public:
 
 	///
 
-	Vector3() = default;
+	Vector3() {}
 
 	///
 
@@ -288,7 +288,7 @@ public:
 
 	///
 
-	Vector4() = default;
+	Vector4() {}
 
 	///
 

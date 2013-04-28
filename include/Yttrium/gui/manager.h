@@ -39,8 +39,6 @@ public:
 	{
 	public:
 
-		Callbacks() = default;
-
 		///
 
 		virtual void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept = 0;
