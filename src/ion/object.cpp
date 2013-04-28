@@ -157,13 +157,16 @@ void Object::serialize(String *result, int indentation, bool is_document) const
 			result->append('{');
 		}
 
+		bool need_separator = false;
+
 		for (Nodes::const_iterator i = _nodes.begin(); i != _nodes.end(); ++i)
 		{
-			if (i != _nodes.begin())
+			if (need_separator)
 			{
 				result->append(' ');
 			}
 			(*i)->serialize(result, indentation);
+			need_separator = (*i)->is_empty();
 		}
 
 		if (!is_document)

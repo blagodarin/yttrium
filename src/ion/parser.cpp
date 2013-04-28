@@ -75,12 +75,15 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 
 				while (*src != '"')
 				{
-					if (!*src && src == string.text() + string.size())
+					char c0 = *src;
+
+					if (Y_UNLIKELY(!c0 && src == string.text() + string.size()))
 					{
 						Y_LOG(S("ion: Error: ") << source_name << S(": String continues past the end of source"));
 						return false;
 					}
-					else if (*src == '\\')
+
+					if (Y_UNLIKELY(c0 == '\\'))
 					{
 						char c1 = *++src;
 
@@ -106,7 +109,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 
 							if (c1 <= '9')
 							{
-								hex += 16 * (c1 - '9');
+								hex += 16 * (c1 - '0');
 							}
 							else
 							{
@@ -133,8 +136,10 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 					}
 					else
 					{
-						*dst++ = *src++;
+						*dst++ = c0;
 					}
+
+					++src;
 				}
 				if (!parse_value(StaticString(begin, dst - begin)))
 				{

@@ -16,7 +16,6 @@ Yttrium:
     - Add intensity (grayscale as both color and alpha) image loading support (for fonts).
 
     ION:
-    - Make the compact form even more compact.
     - Make string value retrieval more usable.
 
     GUI:
