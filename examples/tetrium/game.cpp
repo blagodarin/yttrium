@@ -103,6 +103,8 @@ void Game::run()
 	}
 
 	Y_LOG("Terminating...");
+	
+	_renderer.set_texture(Texture2D()); // Otherwise the renderer won't get deleted.
 }
 
 void Game::save_settings()

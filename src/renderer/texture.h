@@ -17,9 +17,7 @@ public:
 
 	Private(const Renderer &renderer, const ImageFormat &format, Allocator *allocator);
 
-	virtual ~Private()
-	{
-	}
+	virtual ~Private() {}
 
 public:
 
