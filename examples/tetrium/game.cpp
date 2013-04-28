@@ -2,7 +2,6 @@
 
 #include <Yttrium/ion.h>
 #include <Yttrium/log.h>
-#include <Yttrium/memory_manager.h> // TODO: Remove.
 #include <Yttrium/script/context.h>
 
 #define CHECK(condition) do { if (!(condition)) return false; } while (false)
@@ -177,7 +176,7 @@ void Game::load_music()
 {
 	_audio.open(); // NOTE: And what if it fails?
 
-	Ion::Document data(MemoryManager::default_allocator()); // TODO: Fix.
+	Ion::Document data(_allocator);
 
 	if (!data.load("data/music.ion"))
 		return;
