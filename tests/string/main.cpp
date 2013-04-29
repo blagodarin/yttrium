@@ -7,8 +7,6 @@
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
 BOOST_AUTO_TEST_CASE(initialization_test)
 {
 	String s1;
@@ -23,6 +21,8 @@ BOOST_AUTO_TEST_CASE(initialization_test)
 
 	BOOST_CHECK(s1 == s2);
 }
+
+BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
 
 BOOST_AUTO_TEST_CASE(assignment_test)
 {

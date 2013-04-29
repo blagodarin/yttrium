@@ -15,10 +15,10 @@ File::Private::~Private()
 {
 	::close(descriptor);
 
-	if (auto_remove && Y_UNLIKELY(::unlink(name.const_text())))
+	if (Y_UNLIKELY(auto_remove) && Y_UNLIKELY(::unlink(name.const_text())))
 	{
 		// This must be something strange (EIO or ENOMEM).
-		
+
 		Y_ABORT("Failed to remove a file");
 	}
 }
@@ -37,9 +37,9 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 	int flags = (Y_IS_LINUX ? O_NOATIME : 0);
 	switch (mode & ReadWrite)
 	{
-	case Read:      flags |= O_RDONLY;           break;
-	case Write:     flags |= O_WRONLY | O_CREAT; break;
-	case ReadWrite: flags = O_RDWR | O_CREAT;    break;
+	case Read:      flags |= O_RDONLY;          break;
+	case Write:     flags = O_WRONLY | O_CREAT; break;
+	case ReadWrite: flags |= O_RDWR | O_CREAT;  break;
 	default:        return false;
 	}
 
@@ -267,7 +267,9 @@ size_t File::write(const void *buffer, size_t size)
 
 int File::Private::open(const StaticString &name, int flags, Allocator *allocator)
 {
-	return ::open(name.zero_terminated(allocator).text(), flags, 0644); // TODO: Think of using a stack (alloca) here.
+	// TODO: Think of using a stack (alloca) here.
+
+	return ::open(name.zero_terminated(allocator).text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 }
 
 } // namespace Yttrium

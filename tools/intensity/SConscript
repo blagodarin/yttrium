@@ -1,6 +1,0 @@
-Import('env')
-build = env.Clone(BUILD = '#/tmp/tools/intensity')
-build.VariantDir('$BUILD', '.', duplicate = 0)
-tool = build.Program('#/bin/intensity', build.Glob('$BUILD/*.cpp'))
-build.Clean(tool, build.Dir('$BUILD'))
-Return('tool')

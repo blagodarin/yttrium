@@ -2,127 +2,268 @@ import os
 
 EnsureSConsVersion(1, 0)
 
-# Initialize the environment.
+################################################################################
+# Environment
+################################################################################
 
-CXXCOMSTR  = 'C++   $SOURCE'
-LINKCOMSTR = 'LINK  $TARGET'
-
-env = Environment(
-	CPPFLAGS = [],
-	CPPPATH = ['#/include'],
-	CXXCOMSTR = CXXCOMSTR,
-	LIBS = [],
-	LINKCOMSTR = LINKCOMSTR,
-	LINKFLAGS = [],
-	SHCXXCOMSTR = CXXCOMSTR,
-	SHLINKCOMSTR = LINKCOMSTR,
-	TOOLS = [])
-
-env.Decider('MD5-timestamp') # Make the builds a bit faster.
-
-platform = env['PLATFORM']
-
-if platform == 'posix':
-	platform = 'posix-x11'
-	env.Tool('default') # GCC or GCC-compatible toolkit expected.
-	env.Append(
-		ENV = {'HOME': os.environ['HOME'], 'PATH': os.environ['PATH'], 'TERM': os.environ['TERM']}) # Required by GCC and colorgcc.
-elif platform == 'win32':
-	env.Tool('mingw')
-
-# Create the initial configuration from the command line options.
+#===============================================================================
+# Command line options
+#===============================================================================
 
 AddOption('--platform', dest = 'platform',
-	action = 'store', type = 'choice', choices = ['posix-x11', 'win32'],
+	action = 'store', type = 'choice', choices = ['posix-x11', 'windows'],
 	help = 'If specified, will override the default target platform.')
 
 AddOption('--release', dest = 'release',
 	action = 'store_true', default = False,
 	help = 'If specified, will perform the optimized release build.')
 
-build_release = GetOption('release')
-build_platform = GetOption('platform')
+AddOption('--static', dest = 'static',
+	action = 'store_true', default = False,
+	help = 'If specified, will build a static library.')
 
-if build_platform is None:
-	build_platform = platform
+option_platform = GetOption('platform')
+option_release = GetOption('release')
+option_static = GetOption('static')
 
-# Configure the environment.
+#===============================================================================
+# Environment initialization
+#===============================================================================
 
-ports = []
+env = Environment(TOOLS = [])
 
-if build_platform == 'posix-x11':
-	ports = ['posix', 'x11']
-elif build_platform == 'win32':
-	ports = ['windows']
+host_platform = env['PLATFORM']
+tool_type = None
 
-if build_release:
+if host_platform == 'posix':
+	tool_type = 'gcc'
+	env.Tool('default') # GCC or GCC-compatible toolchain expected.
+	env.Append(ENV = {'HOME': os.environ['HOME'], 'TERM': os.environ['TERM']}) # Required by GCC and colorgcc.
+elif host_platform == 'win32':
+	tool_type = 'gcc'
+	env.Tool('mingw')
+
+#===============================================================================
+# Environment configuration
+#===============================================================================
+
+CXXCOMSTR  = 'C++   $SOURCE'
+LINKCOMSTR = 'LINK  $TARGET'
+
+env['CXXCOMSTR'] = CXXCOMSTR
+env['LINKCOMSTR'] = LINKCOMSTR
+env['SHCXXCOMSTR'] = CXXCOMSTR
+env['SHLINKCOMSTR'] = LINKCOMSTR
+
+#-------------------------------------------------------------------------------
+# Common configuration
+#-------------------------------------------------------------------------------
+
+env.Append(
+	BUILD = 'tmp',
+	CPPPATH = ['include'])
+
+if option_release:
 	env.Append(CPPDEFINES = ['NDEBUG'])
 else:
 	env.Append(CPPDEFINES = ['_DEBUG'])
 
-env.Append(CPPFLAGS = ['-std=gnu++0x', '-Wall', '-Wextra']) # We use GCC/MinGW.
-if build_release:
-	env.Append(CPPFLAGS = ['-O3']) # We use GCC/MinGW.
+env.Decider('MD5-timestamp')
+
+env.VariantDir('$BUILD', '.', duplicate = 0)
+
+#-------------------------------------------------------------------------------
+# Tool-specific configuration
+#-------------------------------------------------------------------------------
+
+toolchains_flags = {
+	'gcc': {
+		'compile': ['-std=gnu++0x', '-Wall', '-Wextra'],
+		'compile-debug': ['-g'],
+		'compile-release': ['-O3'],
+		'compile-src': ['-fno-exceptions', '-fvisibility=hidden', '-fvisibility-inlines-hidden'],
+		'link-windows': ['-Wl,-subsystem,windows']}}
+
+toolchain_flags = toolchains_flags[tool_type]
+
+env.Append(CPPFLAGS = toolchain_flags['compile'])
+if option_release:
+	env.Append(CPPFLAGS = toolchain_flags['compile-release'])
 else:
-	env.Append(CPPFLAGS = ['-g']) # We use GCC/MinGW.
+	env.Append(CPPFLAGS = toolchain_flags['compile-debug'])
 
-env.Prepend(LIBS = ['jpeg', 'ogg', 'png', 'vorbis', 'vorbisfile', 'z'])
+#===============================================================================
+# Utility functions
+#===============================================================================
+
+def BuildSources(env, subdir, entries):
+	targets = []
+	for entry in entries:
+		path = subdir + '/' + entry
+		target = env.Program('bin/' + path, env.Glob('$BUILD/' + path + '/*.cpp'))
+		env.Clean(target, env.Dir('$BUILD/' + path))
+		targets += [target]
+	return targets
+
+################################################################################
+# Targets
+################################################################################
+
+target_platform = option_platform
+if target_platform is None:
+	if host_platform == 'posix':
+		target_platform = 'posix-x11'
+	elif host_platform == 'win32':
+		target_platform = 'windows'
+
+ports = []
+if target_platform == 'posix-x11':
+	ports = ['posix', 'x11']
+elif target_platform == 'windows':
+	ports = ['windows']
+
+LIBS = ['jpeg', 'ogg', 'png', 'vorbis', 'vorbisfile', 'z']
 if 'posix' in ports:
-	env.Append(LIBS = ['openal', 'pthread'])
+	LIBS += ['openal', 'pthread']
 if 'windows' in ports:
-	if build_platform == 'win32':
-		env.Append(LIBS = ['gdi32', 'OpenAL32', 'OpenGL32', 'winmm', 'ws2_32'])
+	LIBS += ['gdi32', 'OpenAL32', 'OpenGL32', 'winmm', 'ws2_32']
 if 'x11' in ports:
-	env.Append(
-		ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')}, # Required by XOpenDisplay in tests.
-		LIBS = ['GL', 'X11', 'Xrandr'])
+	LIBS += ['GL', 'X11', 'Xrandr']
 
-# Slave environment.
+#===============================================================================
+# Library
+#===============================================================================
 
-slave_env = env.Clone(
-	LIBPATH = ['#/lib'],
-	LIBS = ['yttrium'])
+src_env = env.Clone()
+src_env.Append(
+	CPPFLAGS = toolchain_flags['compile-src'])
 
-if build_platform == 'windows':
-	slave_env.Append(LINKFLAGS = ['-Wl,-subsystem,windows']) # We use GCC/MinGW.
+if option_static:
+	src_env.Append(CPPDEFINES = ['__YTTRIUM_STATIC'])
+else:
+	src_env.Append(CPPDEFINES = ['__YTTRIUM_SHARED'])
+	src_env.Append(LIBS = LIBS)
 
-# Special configuration for the master environment.
+src_paths = [
+	'audio',
+	'audio/backend',
+	'audio/backend/openal',
+	'audio/io',
+	'base',
+	'base/memory',
+	'gui',
+	'gui/ion',
+	'gui/logic',
+	'gui/widgets',
+	'renderer',
+	'renderer/backend',
+	'renderer/backend/gl',
+	'renderer/builtin',
+	'script',
+	'terminal',
+	'terminal/bindings',
+	'image',
+	'ion',
+	'math',
+	'package']
 
-env.Append(
-	CPPDEFINES = [
-		'__YTTRIUM_SHARED'],
-	CPPFLAGS = [
-		'-fvisibility=hidden',
-		'-fvisibility-inlines-hidden'])
+if 'posix' in ports:
+	src_paths += [
+		'base/posix']
 
-################################################################################
-# Targets.
-################################################################################
+if 'windows' in ports:
+	src_paths += [
+		'base/windows',
+		'terminal/windows']
 
-# Library.
+if 'x11' in ports:
+	src_paths += [
+		'terminal/x11']
 
-yttrium = SConscript(dirs = 'src', exports = 'env ports')
+src_target = 'lib/yttrium'
+src_sources = [src_env.Glob('$BUILD/src/' + path + '/*.cpp') for path in src_paths]
+
+if option_static:
+	yttrium = src_env.StaticLibrary(src_target, src_sources)
+else:
+	yttrium = src_env.SharedLibrary(src_target, src_sources)
+
 Alias('yttrium', yttrium)
+Clean('yttrium', Dir('$BUILD/src'))
 Default('yttrium')
 
-# Tests.
+#===============================================================================
+# Library clients
+#===============================================================================
 
-tests = SConscript(dirs = 'tests', exports = {'env': slave_env})
+env.Append(
+	LIBPATH = ['lib'],
+	LIBS = ['yttrium'])
+
+if 'windows' in ports:
+	env.Append(LINKFLAGS = toolchain_flags['link-windows'])
+
+if option_static:
+	env.Append(CPPDEFINES = ['__YTTRIUM_STATIC'])
+	env.Append(LIBS = LIBS)
+
+#-------------------------------------------------------------------------------
+# Tests
+#-------------------------------------------------------------------------------
+
+tests_env = env.Clone()
+tests_env.Append(
+	CPPDEFINES = ['BOOST_TEST_DYN_LINK', '__YTTRIUM_TEST'],
+	CPPPATH = '#',
+	LIBS = 'boost_unit_test_framework')
+
+if 'x11' in ports:
+	tests_env.Append(ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')})
+
+# The order is important!
+
+test_paths = [
+	'static_string',
+	'memory',
+	'string',
+	'private',
+	'vector',
+	'rect',
+	'bindings',
+	'file',
+	'package',
+	'ion',
+	'image',
+	'gui']
+
+tests = BuildSources(tests_env, 'tests', test_paths)
 Alias('tests', tests)
+Clean('tests', Dir(['bin/tests', '$BUILD/tests']))
+
+test_env = Environment(TOOLS = [])
+if 'x11' in ports:
+	test_env.Append(ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')}) # Required by XOpenDisplay at runtime.
 for test in tests:
-	env.Alias('test', test, '@LD_LIBRARY_PATH=lib/ ' + str(test[0]) + ' --log_level=message') # Won't go on Windows.
+	test_env.Alias('test', test, '@LD_LIBRARY_PATH=lib/ ' + str(test[0]) + ' --log_level=message') # Won't go on Windows.
 AlwaysBuild('test')
 
-# Tools.
+#-------------------------------------------------------------------------------
+# Tools
+#-------------------------------------------------------------------------------
 
-tools = SConscript(dirs = 'tools', exports = {'env': slave_env})
-Alias('tools', tools)
+Alias('tools', BuildSources(env, 'tools', ['intensity', 'ypq']))
+Clean('tools', Dir('$BUILD/tools'))
 
-# Examples.
+#-------------------------------------------------------------------------------
+# Examples
+#-------------------------------------------------------------------------------
 
-examples = SConscript(dirs = 'examples', exports = {'env': slave_env})
-Alias('examples', examples)
+Alias('examples', BuildSources(env, 'examples', ['tetrium']))
+Clean('examples', Dir('$BUILD/examples'))
 
-# All targets.
+#===============================================================================
+# All targets
+#===============================================================================
 
-Alias('all', [yttrium, tests, tools, examples])
+Alias('all', ['yttrium', 'tests', 'tools', 'examples'])
+Clean('all', Dir(['bin', 'lib', '$BUILD']))
