@@ -231,6 +231,7 @@ test_paths = [
 	'rect',
 	'bindings',
 	'file',
+	'dir',
 	'package',
 	'ion',
 	'image',

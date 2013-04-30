@@ -5,7 +5,6 @@ Yttrium:
 - Refactoring. =(
 
     Base:
-    - Implement directory search.
     - Keep a global track of all ProxyAllocators.
     - Separate a single Rect into a raster one and a vector one.
 
