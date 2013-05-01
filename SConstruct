@@ -99,9 +99,9 @@ else:
 def BuildSources(env, subdir, entries):
 	targets = []
 	for entry in entries:
-		path = subdir + '/' + entry
-		target = env.Program('bin/' + path, env.Glob('$BUILD/' + path + '/*.cpp'))
-		env.Clean(target, env.Dir('$BUILD/' + path))
+		build_path = '$BUILD/' + subdir + '/' + entry
+		target = env.Program('bin/' + entry, env.Glob(build_path + '/*.cpp'))
+		env.Clean(target, env.Dir(build_path))
 		targets += [target]
 	return targets
 

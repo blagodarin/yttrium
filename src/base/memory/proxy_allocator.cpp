@@ -5,10 +5,9 @@
 
 #include "atomic_status.h"
 
-#include <iostream>
-
 #if Y_IS_DEBUG
 	#include <iomanip>
+	#include <iostream>
 	#include <map>
 #endif
 
@@ -62,18 +61,18 @@ ProxyAllocator::~ProxyAllocator()
 	const MemoryStatus &status = _private->_status;
 
 #if Y_IS_DEBUG
-	std::cerr << "Memory usage statistics for \"" << name.text() << "\":\n"
-		"\tAllocations:   " << status.allocations << "\n"
-		"\tReallocations: " << status.reallocations << "\n"
-		"\tDeallocations: " << status.deallocations << std::endl;
-#endif
+	std::cerr
+		<< std::left
+		<< ":: " << std::setw(16) << name.text()
+		<< std::right
+		<< std::setw(5) << status.allocations << " a "
+		<< std::setw(5) << status.reallocations << " r "
+		<< std::setw(5) << status.deallocations << " d "
+		<< std::setw(5) << status.allocated_blocks << " l"
+		<< std::endl;
 
 	if (status.allocated_blocks)
 	{
-		std::cerr << "Memory leak detected in \"" << name.text() << "\": "
-			<< status.allocated_blocks << " blocks are still allocated!" << std::endl;
-
-	#if Y_IS_DEBUG
 		int column = 0;
 		for (std::map<void *, size_t>::iterator i = _private->_pointers.begin(); i != _private->_pointers.end(); ++i)
 		{
@@ -81,9 +80,8 @@ ProxyAllocator::~ProxyAllocator()
 			column = (column + 1) % 10;
 		}
 		std::cerr << std::endl;
-//		::abort();
-	#endif
 	}
+#endif
 
 	Y_DELETE(_private->_allocator, _private);
 }
