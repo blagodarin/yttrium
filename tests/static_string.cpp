@@ -1,12 +1,10 @@
 #include <Yttrium/static_string.h>
 
-#define BOOST_TEST_MODULE static_string
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(initialization_test)
+BOOST_AUTO_TEST_CASE(static_string_initialization_test)
 {
 	StaticString s1;
 
@@ -23,7 +21,7 @@ BOOST_AUTO_TEST_CASE(initialization_test)
 	BOOST_CHECK_EQUAL(s1.size(), s2.size());
 }
 
-BOOST_AUTO_TEST_CASE(assignment_test)
+BOOST_AUTO_TEST_CASE(static_string_assignment_test)
 {
 	StaticString s1 = "test";
 
@@ -40,7 +38,7 @@ BOOST_AUTO_TEST_CASE(assignment_test)
 	BOOST_CHECK_EQUAL(s1.size(), s2.size());
 }
 
-BOOST_AUTO_TEST_CASE(to_int_test)
+BOOST_AUTO_TEST_CASE(static_string_to_int_test)
 {
 	BOOST_CHECK_EQUAL(StaticString("-2147483648").to_int32(), -2147483647 - 1);
 	BOOST_CHECK_EQUAL(StaticString("2147483647").to_int32(), 2147483647);
@@ -61,7 +59,7 @@ BOOST_AUTO_TEST_CASE(to_int_test)
 	BOOST_CHECK_EQUAL(StaticString("+18446744073709551615").to_uint64(), UINT64_C(18446744073709551615));
 }
 
-BOOST_AUTO_TEST_CASE(to_int32_number_test)
+BOOST_AUTO_TEST_CASE(static_string_to_int32_number_test)
 {
 	int32_t i32;
 
@@ -81,7 +79,7 @@ BOOST_AUTO_TEST_CASE(to_int32_number_test)
 	BOOST_CHECK(!StaticString("-2147483649").to_number(&i32));
 }
 
-BOOST_AUTO_TEST_CASE(to_double_number_test)
+BOOST_AUTO_TEST_CASE(static_string_to_double_number_test)
 {
 	double d;
 

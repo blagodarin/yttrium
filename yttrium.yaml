@@ -2,7 +2,6 @@ Yttrium:
 - Add Windows port.
 - Add more allocator inheritance.
 - Make use of rvalue references.
-- Refactoring. =(
 
     Base:
     - Keep a global track of all ProxyAllocators.
@@ -21,4 +20,3 @@ Yttrium:
 
 Tests:
 - Add audio test.
-- Merge all tests into a single executable (less linking, faster build).

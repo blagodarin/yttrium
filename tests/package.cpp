@@ -7,16 +7,14 @@
 #include <cstdlib> // rand
 #include <cstring> // memcmp
 
-#define BOOST_TEST_MODULE package
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
-BOOST_AUTO_TEST_CASE(rewrite_mode_test)
+BOOST_AUTO_TEST_CASE(package_rewrite_test)
 {
+	MemoryManager memory_manager;
+
 	uint8_t buffer1[100003];
 
 	for (uint8_t &item: buffer1)
@@ -118,5 +116,3 @@ BOOST_AUTO_TEST_CASE(rewrite_mode_test)
 
 	packed_file3.close();
 }
-
-BOOST_AUTO_TEST_SUITE_END()

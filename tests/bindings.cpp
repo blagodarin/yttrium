@@ -1,14 +1,12 @@
 #include "src/terminal/bindings/lookup.h"
 
-#define BOOST_TEST_MODULE bindings
-
 #include <boost/test/unit_test.hpp>
 
 #include "src/terminal/bindings/lookup.cpp"
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(lookup_test)
+BOOST_AUTO_TEST_CASE(bindings_test)
 {
 	BOOST_CHECK(lookup_key(StaticString()) == Key::Null);
 	BOOST_CHECK(lookup_key("invalid_key") == Key::Null);

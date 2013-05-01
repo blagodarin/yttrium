@@ -2,16 +2,14 @@
 #include <Yttrium/ion.h>
 #include <Yttrium/memory_manager.h>
 
-#define BOOST_TEST_MODULE ion
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
-BOOST_AUTO_TEST_CASE(serialization_test)
+BOOST_AUTO_TEST_CASE(ion_serialization_test)
 {
+	MemoryManager memory_manager;
+
 	File file(File::Temporary);
 
 	Ion::Document document;
@@ -43,5 +41,3 @@ BOOST_AUTO_TEST_CASE(serialization_test)
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -1,7 +1,5 @@
 #include <Yttrium/vector.h>
 
-#define BOOST_TEST_MODULE vector
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;

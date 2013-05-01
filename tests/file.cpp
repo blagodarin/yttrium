@@ -7,16 +7,14 @@
 #include <cstdlib> // rand
 #include <cstring> // memcmp
 
-#define BOOST_TEST_MODULE file
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
-BOOST_AUTO_TEST_CASE(read_all_test)
+BOOST_AUTO_TEST_CASE(file_read_all_test)
 {
+	MemoryManager memory_manager;
+
 	uint8_t buffer[100003];
 
 	for (uint8_t &item: buffer)
@@ -44,6 +42,8 @@ BOOST_AUTO_TEST_CASE(read_all_test)
 
 BOOST_AUTO_TEST_CASE(file_transfer_test)
 {
+	MemoryManager memory_manager;
+
 	uint8_t buffer[100003];
 
 	for (uint8_t &item: buffer)
@@ -67,5 +67,3 @@ BOOST_AUTO_TEST_CASE(file_transfer_test)
 	BOOST_CHECK_EQUAL(actual.size(), countof(buffer));
 	BOOST_CHECK(!memcmp(actual.const_data(), buffer, countof(buffer)));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -1,13 +1,11 @@
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/string.h>
 
-#define BOOST_TEST_MODULE string
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(initialization_test)
+BOOST_AUTO_TEST_CASE(string_initialization_test)
 {
 	String s1;
 
@@ -22,10 +20,10 @@ BOOST_AUTO_TEST_CASE(initialization_test)
 	BOOST_CHECK(s1 == s2);
 }
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
-BOOST_AUTO_TEST_CASE(assignment_test)
+BOOST_AUTO_TEST_CASE(string_assignment_test)
 {
+	MemoryManager memory_manager;
+
 	String s1 = "test";
 
 	BOOST_CHECK_EQUAL(s1.size(), 4);
@@ -52,8 +50,10 @@ BOOST_AUTO_TEST_CASE(assignment_test)
 	BOOST_CHECK(s3 == "test");
 }
 
-BOOST_AUTO_TEST_CASE(swap_test)
+BOOST_AUTO_TEST_CASE(string_swap_test)
 {
+	MemoryManager memory_manager;
+
 	String s1 = "test";
 	String s2 = "another test";
 
@@ -67,8 +67,10 @@ BOOST_AUTO_TEST_CASE(swap_test)
 	BOOST_CHECK(s1 == "rvalue test");
 }
 
-BOOST_AUTO_TEST_CASE(insert_test)
+BOOST_AUTO_TEST_CASE(string_insert_test)
 {
+	MemoryManager memory_manager;
+
 	String s1 = "test";
 
 	s1.insert("just ", 0);
@@ -87,5 +89,3 @@ BOOST_AUTO_TEST_CASE(insert_test)
 
 	BOOST_CHECK(s1 == "just another test!");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

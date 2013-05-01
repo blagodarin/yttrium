@@ -5,16 +5,14 @@
 #include <Yttrium/window.h>
 #include <Yttrium/string.h>
 
-#define BOOST_TEST_MODULE gui
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
 BOOST_AUTO_TEST_CASE(gui_test)
 {
+	MemoryManager memory_manager;
+
 	// NOTE: Unfortunately, GUI manager requires log in case something goes wrong.
 
 	LogManager log_manager("test_gui.log");
@@ -47,5 +45,3 @@ BOOST_AUTO_TEST_CASE(gui_test)
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

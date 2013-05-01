@@ -1,12 +1,10 @@
 #include <Yttrium/rect.h>
 
-#define BOOST_TEST_MODULE rect
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(initialization_test)
+BOOST_AUTO_TEST_CASE(rect_initialization_test)
 {
 	Rect<int> null_rect;
 
@@ -26,7 +24,7 @@ BOOST_AUTO_TEST_CASE(initialization_test)
 	BOOST_CHECK_EQUAL(rect.top() + rect.height(), rect.bottom());
 }
 
-BOOST_AUTO_TEST_CASE(containment_test)
+BOOST_AUTO_TEST_CASE(rect_containment_test)
 {
 	Rect<int> rect(0, 0, 10, 10);
 
@@ -63,7 +61,7 @@ BOOST_AUTO_TEST_CASE(containment_test)
 	BOOST_CHECK(!smaller_rect.contains(rect));
 }
 
-BOOST_AUTO_TEST_CASE(intersection_test)
+BOOST_AUTO_TEST_CASE(rect_intersection_test)
 {
 	Rect<int> rect(0, 0, 3, 3);
 
@@ -142,7 +140,7 @@ BOOST_AUTO_TEST_CASE(intersection_test)
 	BOOST_CHECK(!far_rect.fastest_intersects(rect));
 }
 
-BOOST_AUTO_TEST_CASE(null_intersection_test)
+BOOST_AUTO_TEST_CASE(rect_null_intersection_test)
 {
 	// This test case exists only as an implementation reference,
 	// one should not rely on null rect intersection detection!

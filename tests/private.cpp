@@ -1,15 +1,73 @@
 #include <Yttrium/memory_manager.h>
 
-#include "private.h"
-
-#define BOOST_TEST_MODULE private
+#include "src/base/private_base.h"
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, Yttrium::MemoryManager)
+class Public
+{
+public:
+
+	class Private
+		: public Yttrium::PrivateBase<Private>
+	{
+	public:
+
+		Private(Yttrium::Allocator *allocator)
+			: PrivateBase(allocator)
+		{
+		}
+	};
+
+public:
+
+	Public()
+		: _private(nullptr)
+	{
+	}
+
+	Public(const Public &public_)
+		: _private(Private::copy(public_._private))
+	{
+	}
+
+	~Public()
+	{
+		close();
+	}
+
+public:
+
+	void close()
+	{
+		Private::release(&_private);
+	}
+
+	void open(Yttrium::Allocator *allocator = Yttrium::DefaultAllocator)
+	{
+		if (!_private)
+		{
+			_private = Y_NEW(allocator, Private)(allocator);
+		}
+	}
+
+public:
+
+	Public &operator =(const Public &public_)
+	{
+		Private::assign(&_private, public_._private);
+		return *this;
+	}
+
+public:
+
+	Private *_private;
+};
 
 BOOST_AUTO_TEST_CASE(private_test)
 {
+	Yttrium::MemoryManager memory_manager;
+
 	Public public1;
 
 	BOOST_CHECK(!public1._private);
@@ -69,5 +127,3 @@ BOOST_AUTO_TEST_CASE(private_test)
 
 	BOOST_CHECK(!public1._private);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

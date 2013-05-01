@@ -220,32 +220,16 @@ tests_env.Append(
 if 'x11' in ports:
 	tests_env.Append(ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')})
 
-# The order is important!
-
-test_paths = [
-	'static_string',
-	'memory',
-	'string',
-	'private',
-	'vector',
-	'rect',
-	'bindings',
-	'file',
-	'dir',
-	'package',
-	'ion',
-	'image',
-	'gui']
-
-tests = BuildSources(tests_env, 'tests', test_paths)
+tests = tests_env.Program('bin/tests', env.Glob('$BUILD/tests/*.cpp'))
 Alias('tests', tests)
-Clean('tests', Dir(['bin/tests', '$BUILD/tests']))
+Clean('tests', Dir('$BUILD/tests'))
 
 test_env = Environment(TOOLS = [])
+if host_platform == 'posix':
+	test_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
 if 'x11' in ports:
 	test_env.Append(ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')}) # Required by XOpenDisplay at runtime.
-for test in tests:
-	test_env.Alias('test', test, '@LD_LIBRARY_PATH=lib/ ' + str(test[0]) + ' --log_level=message') # Won't go on Windows.
+test_env.Alias('test', tests, str(tests[0]) + ' --log_level=message')
 AlwaysBuild('test')
 
 #-------------------------------------------------------------------------------

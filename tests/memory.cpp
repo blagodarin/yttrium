@@ -1,16 +1,14 @@
 #include <Yttrium/memory_manager.h>
 #include <Yttrium/proxy_allocator.h>
 
-#define BOOST_TEST_MODULE memory
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
 BOOST_AUTO_TEST_CASE(default_allocator_test)
 {
+	MemoryManager memory_manager;
+
 	Allocator *allocator = MemoryManager::default_allocator();
 
 	void *p = allocator->allocate(1);
@@ -24,8 +22,10 @@ BOOST_AUTO_TEST_CASE(default_allocator_test)
 	allocator->deallocate(p);
 }
 
-BOOST_AUTO_TEST_CASE(default_difference_test)
+BOOST_AUTO_TEST_CASE(default_allocator_difference_test)
 {
+	MemoryManager memory_manager;
+
 	Allocator *allocator = MemoryManager::default_allocator();
 
 	Allocator::Difference d;
@@ -54,8 +54,6 @@ BOOST_AUTO_TEST_CASE(default_difference_test)
 	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Decrement);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
 BOOST_AUTO_TEST_CASE(system_allocator_test)
 {
 	SystemAllocator *allocator = SystemAllocator::instance();
@@ -71,7 +69,7 @@ BOOST_AUTO_TEST_CASE(system_allocator_test)
 	allocator->deallocate(p);
 }
 
-BOOST_AUTO_TEST_CASE(system_difference_test)
+BOOST_AUTO_TEST_CASE(system_allocator_difference_test)
 {
 	SystemAllocator *allocator = SystemAllocator::instance();
 

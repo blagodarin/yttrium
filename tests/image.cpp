@@ -3,16 +3,14 @@
 #include <Yttrium/image.h>
 #include <Yttrium/memory_manager.h>
 
-#define BOOST_TEST_MODULE image
-
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_FIXTURE_TEST_SUITE(test_suite_memory_manager, MemoryManager)
-
 BOOST_AUTO_TEST_CASE(tga_test)
 {
+	MemoryManager memory_manager;
+
 	ImageReader reader;
 
 	BOOST_REQUIRE(reader.open("tests/image/image.tga"));
@@ -43,6 +41,8 @@ BOOST_AUTO_TEST_CASE(tga_test)
 
 BOOST_AUTO_TEST_CASE(png_test)
 {
+	MemoryManager memory_manager;
+
 	ImageReader reader;
 
 	BOOST_REQUIRE(reader.open("tests/image/image.tga"));
@@ -68,5 +68,3 @@ BOOST_AUTO_TEST_CASE(png_test)
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
