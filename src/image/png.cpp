@@ -115,10 +115,8 @@ ImageFormatFlags PngWriter::set_format(const ImageFormat &format)
 	return result;
 }
 
-bool PngWriter::write(const void *buffer, size_t frame_size)
+bool PngWriter::write(const void *buffer)
 {
-	Y_UNUSED(frame_size);
-
 	int color_type = 0;
 	int transforms = 0;
 

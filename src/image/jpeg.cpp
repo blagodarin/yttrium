@@ -52,11 +52,10 @@ bool JpegReader::open()
 	_format.set_width(_decompressor.output_width);
 	_format.set_height(_decompressor.output_height);
 
-
 	return true;
 }
 
-bool JpegReader::read(void *buffer, size_t) // TODO: Utilize the frame size parameter.
+bool JpegReader::read(void *buffer)
 {
 	if (setjmp(_error_handler.setjmp_buffer))
 	{

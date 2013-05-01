@@ -94,12 +94,19 @@ public:
 		PixelFormatFlag  = 1 << 0, ///< Pixel format flag.
 		BitsPerPixelFlag = 1 << 1, ///< Bits per pixel flag.
 		OrientationFlag  = 1 << 2, ///< Orientation flag.
-		WidthFlag        = 1 << 3, ///< Width flag.
-		HeightFlag       = 1 << 4, ///< Height flag.
+		RowAlignmentFlag = 1 << 3, ///< Row alignment flag.
+		WidthFlag        = 1 << 4, ///< Width flag.
+		HeightFlag       = 1 << 5, ///< Height flag.
 
 		/// All flags.
 
-		AllFlags = PixelFormatFlag | BitsPerPixelFlag | OrientationFlag | WidthFlag | HeightFlag,
+		AllFlags
+			= PixelFormatFlag
+			| BitsPerPixelFlag
+			| OrientationFlag
+			| RowAlignmentFlag
+			| WidthFlag
+			| HeightFlag,
 	};
 
 public:
@@ -140,6 +147,10 @@ public:
 
 	///
 
+	inline size_t row_alignment() const noexcept;
+
+	///
+
 	inline size_t row_size() const noexcept;
 
 	///
@@ -160,7 +171,7 @@ public:
 
 	///
 
-	inline void set_width(size_t width) noexcept;
+	void set_width(size_t width) noexcept;
 
 	///
 
@@ -374,6 +385,11 @@ PixelFormat ImageFormat::pixel_format() const noexcept
 	return _pixel_format;
 }
 
+size_t ImageFormat::row_alignment() const noexcept
+{
+	return _row_alignment;
+}
+
 size_t ImageFormat::row_size() const noexcept
 {
 	return _row_size;
@@ -387,12 +403,6 @@ void ImageFormat::set_height(size_t height) noexcept
 void ImageFormat::set_orientation(ImageOrientation orientation) noexcept
 {
 	_orientation = orientation;
-}
-
-void ImageFormat::set_width(size_t width) noexcept
-{
-	_width = width;
-	set_row_alignment(_row_alignment);
 }
 
 size_t ImageFormat::width() const noexcept

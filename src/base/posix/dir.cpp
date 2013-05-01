@@ -67,6 +67,7 @@ Dir::Iterator Dir::begin() const
 		Iterator iterator(static_cast<Iterator::Private *>(
 			_private->_allocator->allocate(offsetof(Iterator::Private, dirent) + _private->dirent_size)));
 		iterator._private->allocator = _private->_allocator;
+		::rewinddir(_private->dir);
 		if (!::readdir_r(_private->dir, &iterator._private->dirent, &iterator._private->self))
 		{
 			iterator._private->dir = _private->dir;

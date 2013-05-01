@@ -25,7 +25,7 @@ public:
 
 	bool open() override;
 
-	bool read(void *buffer, size_t frame_size) override;
+	bool read(void *buffer) override;
 
 private:
 

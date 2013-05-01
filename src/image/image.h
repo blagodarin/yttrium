@@ -20,15 +20,13 @@ public:
 	{
 	}
 
-	virtual ~Private()
-	{
-	}
+	virtual ~Private() {}
 
 public:
 
 	virtual bool open() = 0;
 
-	virtual bool read(void *buffer, size_t size) = 0;
+	virtual bool read(void *buffer) = 0;
 
 public:
 
@@ -50,9 +48,7 @@ public:
 	{
 	}
 
-	virtual ~Private()
-	{
-	}
+	virtual ~Private() {}
 
 public:
 
@@ -60,7 +56,7 @@ public:
 
 	virtual ImageFormatFlags set_format(const ImageFormat &format) = 0;
 
-	virtual bool write(const void *buffer, size_t size) = 0;
+	virtual bool write(const void *buffer) = 0;
 
 public:
 

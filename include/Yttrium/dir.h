@@ -39,10 +39,6 @@ public:
 
 	private:
 
-
-
-	private:
-
 		class Private;
 
 		inline Iterator(Private *private_) noexcept;

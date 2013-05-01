@@ -26,7 +26,7 @@ public:
 
 	ImageFormatFlags set_format(const ImageFormat &format) override;
 
-	bool write(const void *buffer, size_t frame_size) override;
+	bool write(const void *buffer) override;
 
 private:
 

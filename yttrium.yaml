@@ -10,8 +10,8 @@ Yttrium:
 
     Image:
     - Consider an image reader with an internal buffer.
-    - Add image stride support.
     - Add intensity (grayscale as both color and alpha) image loading support (for fonts).
+    - Add JPEG test.
 
     ION:
     - Make string value retrieval more usable.

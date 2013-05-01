@@ -9,6 +9,17 @@
 namespace Yttrium
 {
 
+namespace
+{
+
+size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
+{
+	size_t row_size = (width * bits_per_pixel + 7) / 8;
+	return (row_size + row_alignment - 1) / row_alignment * row_alignment;
+}
+
+} // namespace
+
 ImageFormat::ImageFormat()
 	: _pixel_format(PixelFormat::Gray)
 	, _channels(1)
@@ -24,7 +35,6 @@ ImageFormat::ImageFormat()
 void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel)
 {
 	_pixel_format = pixel_format;
-	_bits_per_pixel = bits_per_pixel;
 
 	switch (pixel_format)
 	{
@@ -39,16 +49,22 @@ void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pix
 	case PixelFormat::Abgr:      _channels = 4; break;
 	}
 
-	set_row_alignment(_row_alignment);
+	_bits_per_pixel = bits_per_pixel;
+	_row_size = aligned_row_size(_width, bits_per_pixel, _row_alignment);
 }
 
 void ImageFormat::set_row_alignment(size_t row_alignment)
 {
-//	Y_ASSERT(row_alignment >= 1); // TODO: Do!
+	Y_ASSERT(row_alignment >= 1);
 
 	_row_alignment = row_alignment;
-	size_t row_bytes = (_width * _bits_per_pixel + 7) / 8;
-	_row_size = (row_bytes + row_alignment - 1) / row_alignment * row_alignment;
+	_row_size = aligned_row_size(_width, _bits_per_pixel, row_alignment);
+}
+
+void ImageFormat::set_width(size_t width)
+{
+	_width = width;
+	_row_size = aligned_row_size(width, _bits_per_pixel, _row_alignment);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +132,7 @@ bool ImageReader::read(void *buffer)
 
 	if (Y_LIKELY(_private && !_private->_is_used))
 	{
-		result = _private->read(buffer, _private->_format.frame_size());
+		result = _private->read(buffer);
 		_private->_is_used = true;
 	}
 
@@ -219,7 +235,7 @@ bool ImageWriter::write(const void *buffer)
 
 	if (_private && _private->_is_ready && !_private->_is_used)
 	{
-		result = _private->write(buffer, _private->_format.frame_size());
+		result = _private->write(buffer);
 		_private->_is_used = true;
 	}
 

@@ -19,10 +19,27 @@ BOOST_AUTO_TEST_CASE(dir_test)
 
 	BOOST_CHECK(dir.is_opened());
 
+	size_t count = 0;
+
 	for (const StaticString &entry: dir)
 	{
 		BOOST_CHECK(entry == "." || entry == ".." || entry == "main.cpp");
+		++count;
 	}
+
+	BOOST_CHECK(count == 3);
+
+	// Reiterability check.
+
+	count = 0;
+
+	for (const StaticString &entry: dir)
+	{
+		BOOST_CHECK(entry == "." || entry == ".." || entry == "main.cpp");
+		++count;
+	}
+
+	BOOST_CHECK(count == 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
