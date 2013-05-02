@@ -117,6 +117,7 @@ bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allo
 		if (_private->_file.open(name, allocator)
 			&& _private->open())
 		{
+			_private->_original_format = _private->_format;
 			return true;
 		}
 
@@ -139,9 +140,26 @@ bool ImageReader::read(void *buffer)
 	return result;
 }
 
+bool ImageReader::set_format(const ImageFormat &format)
+{
+	if (Y_UNLIKELY(!_private || _private->_is_used))
+	{
+		return false;
+	}
+
+	if (!_private->set_format(format))
+	{
+		return false;
+	}
+
+	_private->_format = format;
+
+	return true;
+}
+
 ImageType ImageReader::type() const
 {
-	return _private ? _private->_type : ImageType::Auto;
+	return Y_LIKELY(_private) ? _private->_type : ImageType::Auto;
 }
 
 ImageReader &ImageReader::operator =(const ImageReader &reader)

@@ -1,5 +1,7 @@
 #include "tga.h"
 
+#include "processing.h"
+
 namespace Yttrium
 {
 
@@ -74,6 +76,8 @@ enum class TgaRlePacketHeader
 	PixelCountMask = 0x7F,
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool TgaReader::open()
 {
 	TgaHeader header;
@@ -145,8 +149,45 @@ bool TgaReader::open()
 bool TgaReader::read(void *buffer)
 {
 	size_t frame_size = _format.frame_size();
-	return _file.read(buffer, frame_size) == frame_size;
+
+	if (_file.read(buffer, frame_size) != frame_size)
+	{
+		return false;
+	}
+
+	if (_format.pixel_format() != _original_format.pixel_format())
+	{
+		Y_ASSERT(_format.pixel_format() == PixelFormat::Rgb);
+		ImageProcessing::xyz8_to_zyx8(buffer, _format.width(), _format.row_size(), _format.height());
+	}
+
+	return true;
 }
+
+bool TgaReader::set_format(const ImageFormat &format)
+{
+	if (_original_format.channels() != format.channels()
+		|| _original_format.bits_per_pixel() != format.bits_per_pixel()
+		|| _original_format.orientation() != format.orientation()
+		|| _original_format.width() != format.width()
+		|| _original_format.row_alignment() != format.row_alignment()
+		|| _original_format.height() != format.height())
+	{
+		return false;
+	}
+
+	if (format.pixel_format() != _original_format.pixel_format())
+	{
+		if (format.pixel_format() != PixelFormat::Rgb || _original_format.pixel_format() != PixelFormat::Bgr)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ImageFormatFlags TgaWriter::set_format(const ImageFormat &format)
 {

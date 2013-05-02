@@ -28,12 +28,18 @@ public:
 
 	virtual bool read(void *buffer) = 0;
 
+	virtual bool set_format(const ImageFormat &)
+	{
+		return false;
+	}
+
 public:
 
 	ImageType   _type;
 	bool        _is_used;
 	ImageFormat _format;
 	File        _file;
+	ImageFormat _original_format;
 };
 
 class Y_PRIVATE ImageWriter::Private

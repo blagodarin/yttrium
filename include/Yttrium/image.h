@@ -251,6 +251,12 @@ public:
 
 	bool read(void *buffer) noexcept;
 
+	/// Set the format to read the image in.
+	/// \param format The desired format.
+	/// \return Success status.
+
+	bool set_format(const ImageFormat &format) noexcept;
+
 	///
 
 	ImageType type() const noexcept;
