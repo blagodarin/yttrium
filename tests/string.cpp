@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(string_initialization_test)
 
 	BOOST_CHECK_EQUAL(s1.size(), 0);
 	BOOST_CHECK(s1.is_empty());
-	BOOST_CHECK(s1.text() != nullptr);
+	BOOST_CHECK(s1.text());
 	BOOST_CHECK_EQUAL(&s1[0], s1.text());
 	BOOST_CHECK_EQUAL(s1[0], 0);
 
