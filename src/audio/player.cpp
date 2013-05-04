@@ -37,7 +37,7 @@ void AudioPlayer::Private::run()
 
 		if (action == Play)
 		{
-			AudioPlaylist::Item item;
+			AudioPlaylist::Item item(_allocator);
 
 			if (_playlist.next(&item)
 				&& _streamer.open(item.name, item.settings, item.type, _playlist.order()))

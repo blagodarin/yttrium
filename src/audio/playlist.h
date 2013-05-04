@@ -22,7 +22,8 @@ public:
 		AudioPlayer::Settings settings;
 		AudioType             type;
 
-		Item()
+		Item(Allocator *allocator)
+			: name(allocator)
 		{
 		}
 
