@@ -102,15 +102,14 @@ void ManagerImpl::set_font(const StaticString &name,
 		if (font)
 		{
 			texture.set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
-			_fonts[name] = FontDesc(font, texture);
+			_fonts[String(name, &_proxy_allocator)] = FontDesc(font, texture);
 		}
 	}
 }
 
-void ManagerImpl::set_scene_change_action(const StaticString &from_scene,
-	const StaticString &to_scene, const StaticString &action)
+void ManagerImpl::set_scene_change_action(const String &from_scene, const String &to_scene, const String &action)
 {
-	_scene_actions[ScenePair(from_scene, to_scene)] = action;
+	_scene_actions.insert(SceneActions::value_type(ScenePair(from_scene, to_scene), action));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -114,7 +114,7 @@ void Game::save_settings()
 
 	if (settings_file.is_opened())
 	{
-		String settings("# Generated automatically\n\n");
+		String settings("# Generated automatically\n\n", _allocator);
 
 		settings << "unbindall\n";
 		const Bindings::Map &bindings = _bindings.map();

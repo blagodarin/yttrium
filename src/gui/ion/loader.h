@@ -16,7 +16,7 @@ class IonLoader
 {
 public:
 
-	inline IonLoader(ManagerImpl *manager);
+	IonLoader(ManagerImpl *manager);
 
 public:
 
@@ -33,13 +33,6 @@ private:
 	ManagerImpl *_manager;
 	Classes      _classes;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-IonLoader::IonLoader(ManagerImpl *manager)
-	: _manager(manager)
-{
-}
 
 } // namespace Gui
 

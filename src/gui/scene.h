@@ -29,7 +29,7 @@ class Scene
 
 public:
 
-	Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator = DefaultAllocator);
+	Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator);
 
 	~Scene();
 

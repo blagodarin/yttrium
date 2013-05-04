@@ -27,6 +27,14 @@ String::String(const String &string)
 	init(string._text, _size);
 }
 
+String::String(String &&string)
+	: StaticString(string._text, string._size)
+	, _buffer_size(string._buffer_size)
+	, _allocator(string._allocator)
+{
+	string._buffer_size = 0;
+}
+
 String::String(const StaticString &string, Allocator *allocator)
 	: StaticString(string.size())
 	, _buffer_size(max<size_t>(_size + 1, StringReserve))
@@ -736,11 +744,7 @@ void String::grow(size_t buffer_size)
 void String::init()
 {
 	Y_ASSERT(_buffer_size);
-
-	if (!_allocator) // NOTE: Rely on this at your own risk.
-	{
-		return;
-	}
+	Y_ASSERT(_allocator);
 
 	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + _buffer_size));
 	*pointer = 1;
@@ -758,7 +762,7 @@ char *String::init(size_t buffer_size)
 {
 	Y_ASSERT(!_buffer_size);
 
-	if (!_allocator) // NOTE: Rely on this at your own risk.
+	if (Y_UNLIKELY(!_allocator)) // NOTE: Rely on this at your own risk.
 	{
 		return _text;
 	}

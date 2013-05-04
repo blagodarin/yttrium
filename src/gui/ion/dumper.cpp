@@ -14,7 +14,7 @@ namespace Gui
 
 void IonDumper::dump(const StaticString &filename) const
 {
-	Ion::Document document(_manager->allocator());
+	Ion::Document document(_manager->internal_allocator());
 
 	if (_manager->_has_size)
 	{

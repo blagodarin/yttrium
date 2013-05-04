@@ -67,14 +67,15 @@ public:
 
 	const FontDesc *font(const StaticString &name) const;
 
+	inline Allocator *internal_allocator() const;
+
 	inline Renderer *renderer();
 
 	void set_font(const StaticString &name, const StaticString &font_source, const StaticString &texture_name);
 
 	inline void set_scaling(Scaling scaling);
 
-	void set_scene_change_action(const StaticString &from_scene,
-		const StaticString &to_scene, const StaticString &action);
+	void set_scene_change_action(const String &from_scene, const String &to_scene, const String &action);
 
 	inline void set_size(const Vector2f &size);
 
@@ -134,6 +135,11 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Allocator *ManagerImpl::internal_allocator() const
+{
+	return const_cast<ProxyAllocator *>(&_proxy_allocator);
+}
 
 Manager::Callbacks *ManagerImpl::callbacks() const
 {

@@ -270,7 +270,7 @@ Bindings::Map Bindings::map() const
 	{
 		if (bind_names[i][0] && !_actions[i].is_empty())
 		{
-			result[bind_names[i]] = _actions[i];
+			result.insert(Map::value_type(String(bind_names[i], _allocator), _actions[i]));
 		}
 	}
 

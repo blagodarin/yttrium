@@ -22,7 +22,7 @@ namespace Gui
 Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator)
 	: _allocator(allocator)
 	, _manager(manager)
-	, _name(name)
+	, _name(name, allocator)
 	, _scaling(Scaling::Stretch)
 	, _is_cursor_set(false)
 	, _focused_widget(nullptr)
@@ -70,7 +70,7 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 			if (!name.is_empty())
 			{
 				widget->set_name(name);
-				_named_widgets[name] = widget;
+				_named_widgets[String(name, _allocator)] = widget;
 			}
 
 			_widgets.push_back(widget);

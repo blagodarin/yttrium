@@ -23,7 +23,7 @@ class Classes
 {
 public:
 
-	inline Classes(Allocator *allocator = DefaultAllocator);
+	inline Classes(Allocator *allocator);
 
 	inline ~Classes();
 

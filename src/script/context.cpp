@@ -41,7 +41,7 @@ ScriptContext::Archive ScriptContext::archive() const
 				value = entity.second.archived_value->string();
 			}
 
-			result[entity.first] = value;
+			result.insert(Archive::value_type(entity.first, value));
 		}
 	}
 

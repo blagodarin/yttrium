@@ -26,7 +26,7 @@ public:
 		{
 		}
 
-		Item(const StaticString &name, const AudioPlayer::Settings &settings, AudioType type)
+		Item(const String &name, const AudioPlayer::Settings &settings, AudioType type)
 			: name(name)
 			, settings(settings)
 			, type(type)
@@ -54,10 +54,11 @@ private:
 
 	typedef std::vector<Item> Items;
 
-	StaticMutex        _mutex;
-	Items              _items;
-	AudioPlayer::Order _order;
-	size_t             _next;
+	Allocator          *_allocator;
+	StaticMutex         _mutex;
+	Items               _items;
+	AudioPlayer::Order  _order;
+	size_t              _next;
 };
 
 } // namespace Yttrium

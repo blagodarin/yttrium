@@ -27,7 +27,7 @@ public:
 
 	///
 
-	typedef std::map<String, String> Archive;
+	typedef std::map<String, String> Archive; // TODO: Think of keeping StaticStrings here.
 
 	///
 

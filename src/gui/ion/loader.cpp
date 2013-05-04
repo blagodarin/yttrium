@@ -115,6 +115,12 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+IonLoader::IonLoader(ManagerImpl *manager)
+	: _manager(manager)
+	, _classes(_manager->internal_allocator())
+{
+}
+
 bool IonLoader::load(const StaticString &source_name, bool is_internal)
 {
 	Ion::Document document(_manager->allocator());
@@ -248,7 +254,10 @@ void IonLoader::load(const Ion::Object &source)
 				continue;
 			}
 
-			_manager->set_scene_change_action(*from, *to, *action);
+			_manager->set_scene_change_action(
+				String(*from, _manager->internal_allocator()),
+				String(*to, _manager->internal_allocator()),
+				String(*action, _manager->internal_allocator()));
 		}
 		else if (node.name() == S("font"))
 		{

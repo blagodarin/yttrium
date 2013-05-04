@@ -5,8 +5,9 @@
 namespace Yttrium
 {
 
-AudioPlaylist::AudioPlaylist(Allocator *)
-	: _order(AudioPlayer::Loop)
+AudioPlaylist::AudioPlaylist(Allocator *allocator)
+	: _allocator(allocator)
+	, _order(AudioPlayer::Loop)
 	, _next(0)
 {
 }
@@ -23,7 +24,7 @@ void AudioPlaylist::load(const StaticString &name, const AudioPlayer::Settings &
 {
 	Mutex::Locker locker(&_mutex);
 
-	_items.push_back(Item(name, settings, type));
+	_items.push_back(Item(String(name, _allocator), settings, type));
 
 	switch (_order)
 	{

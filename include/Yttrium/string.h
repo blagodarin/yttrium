@@ -26,6 +26,13 @@ public:
 
 	String(const String &string) noexcept;
 
+	/**
+	* \overload
+	* \param string
+	*/
+
+	String(String &&string) noexcept;
+
 	///
 
 	String(const StaticString &string, Allocator *allocator = DefaultAllocator) noexcept;
