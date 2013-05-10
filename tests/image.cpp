@@ -8,90 +8,83 @@
 using namespace Yttrium;
 
 // The TGA test must come first because the TGA format
-// is the most basic one for both reading and writing.
+// is the most basic one for both loading and saving.
 
 BOOST_AUTO_TEST_CASE(tga_test)
 {
 	MemoryManager memory_manager;
 
-	ImageReader reader;
+	Image image;
 
-	BOOST_REQUIRE(reader.open("tests/image/image.tga"));
-
-	Buffer buffer1(reader.format().frame_size());
-
-	BOOST_REQUIRE(reader.read(buffer1.data()));
+	BOOST_REQUIRE(image.load("tests/image/image.tga"));
 
 	File file(File::Temporary);
 
-	ImageWriter writer;
+	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
-	BOOST_REQUIRE(writer.open(file.name(), ImageType::Tga));
-	BOOST_REQUIRE(!writer.set_format(reader.format()));
-	BOOST_REQUIRE(writer.write(buffer1.const_data()));
+	Buffer expected;
+	Buffer actual;
 
-	writer.close();
-
-	BOOST_REQUIRE(reader.open(file.name(), ImageType::Tga));
-
-	Buffer buffer2(reader.format().frame_size());
-
-	BOOST_REQUIRE(reader.read(buffer2.data()));
-	BOOST_CHECK(buffer1 == buffer2);
-
-	reader.close();
+	BOOST_REQUIRE(File("tests/image/image.tga").read_all(&expected));
+	BOOST_REQUIRE(File(file.name()).read_all(&actual));
+	BOOST_CHECK(expected == actual);
 }
 
 BOOST_AUTO_TEST_CASE(jpeg_test)
 {
 	MemoryManager memory_manager;
 
-	ImageReader jpeg_reader;
+	Image jpeg_image;
 
-	BOOST_REQUIRE(jpeg_reader.open("tests/image/jpeg.jpeg"));
+	BOOST_REQUIRE(jpeg_image.load("tests/image/jpeg.jpeg"));
+	BOOST_REQUIRE(jpeg_image.format().pixel_format() == PixelFormat::Rgb);
 
-	Buffer jpeg_buffer(jpeg_reader.format().frame_size());
+	Image tga_image;
 
-	BOOST_REQUIRE(jpeg_reader.read(jpeg_buffer.data()));
+	BOOST_REQUIRE(tga_image.load("tests/image/jpeg.tga"));
+	BOOST_REQUIRE(tga_image.format().pixel_format() == PixelFormat::Bgr);
+	BOOST_REQUIRE(tga_image.swap_channels());
 
-	ImageReader tga_reader;
-
-	BOOST_REQUIRE(tga_reader.open("tests/image/jpeg.tga"));
-	BOOST_REQUIRE(tga_reader.set_format(jpeg_reader.format()));
-
-	Buffer tga_buffer(tga_reader.format().frame_size());
-
-	BOOST_REQUIRE(tga_reader.read(tga_buffer.data()));
-
-	BOOST_CHECK(jpeg_buffer == tga_buffer);
+	BOOST_CHECK(jpeg_image == tga_image);
 }
 
 BOOST_AUTO_TEST_CASE(png_test)
 {
 	MemoryManager memory_manager;
 
-	ImageReader reader;
+	Image image;
 
-	BOOST_REQUIRE(reader.open("tests/image/image.tga"));
-
-	Buffer buffer1(reader.format().frame_size());
-
-	BOOST_REQUIRE(reader.read(buffer1.data()));
+	BOOST_REQUIRE(image.load("tests/image/image.tga"));
 
 	File file(File::Temporary);
 
-	ImageWriter writer;
-
-	BOOST_REQUIRE(writer.open(file.name(), ImageType::Png));
-	BOOST_REQUIRE(!writer.set_format(reader.format()));
-	BOOST_REQUIRE(writer.write(buffer1.const_data()));
-
-	writer.close();
+	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
 
 	Buffer expected;
 	Buffer actual;
 
 	BOOST_REQUIRE(File("tests/image/image.png").read_all(&expected));
+	BOOST_REQUIRE(File(file.name()).read_all(&actual));
+	BOOST_CHECK(expected == actual);
+}
+
+BOOST_AUTO_TEST_CASE(intensity_test)
+{
+	MemoryManager memory_manager;
+
+	Image image;
+
+	BOOST_REQUIRE(image.load("tests/image/gradient8.tga"));
+	BOOST_REQUIRE(image.intensity_to_bgra());
+
+	File file(File::Temporary);
+
+	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
+
+	Buffer expected;
+	Buffer actual;
+
+	BOOST_REQUIRE(File("tests/image/intensity32.tga").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }

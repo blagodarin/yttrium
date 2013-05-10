@@ -8,14 +8,14 @@ Yttrium:
     - Separate a single Rect into a raster one and a vector one.
 
     Image:
-    - Consider an image reader with an internal buffer.
-    - Add intensity (grayscale as both color and alpha) image loading support (for fonts).
+    - Add DDS support.
+    - Add compressed image format support (e.g. compressed textures).
+    - Add multi-level image support (e.g. textures with mipmaps).
+    - Add advanced image loading support (separate header and data loading).
+    - Add image pack support (a list of headers with filenames and raw image data offsets).
 
     ION:
     - Make string value retrieval more usable.
-
-    GUI:
-    - Make alignment and area calculation consistent.
 
 Tests:
 - Add audio test.

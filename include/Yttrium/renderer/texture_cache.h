@@ -34,13 +34,13 @@ public:
 
 	///
 
-	virtual ~TextureCache() noexcept;
+	~TextureCache() noexcept override;
 
 public:
 
 	///
 
-	Texture2D cache_texture_2d(const StaticString &name) noexcept;
+	Texture2D cache_texture_2d(const StaticString &name, bool intensity = false) noexcept;
 
 	/// Clear the cache.
 
@@ -48,7 +48,7 @@ public:
 
 	///
 
-	Texture2D load_texture_2d(const StaticString &name) noexcept;
+	Texture2D load_texture_2d(const StaticString &name, bool intensity = false) noexcept;
 
 public:
 

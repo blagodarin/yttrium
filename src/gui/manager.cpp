@@ -90,7 +90,7 @@ const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
 void ManagerImpl::set_font(const StaticString &name,
 	const StaticString &font_source, const StaticString &texture_name)
 {
-	Texture2D texture = _texture_cache->load_texture_2d(texture_name);
+	Texture2D texture = _texture_cache->load_texture_2d(texture_name, true);
 
 	if (texture)
 	{

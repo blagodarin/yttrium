@@ -35,6 +35,36 @@ void Buffer::resize(size_t size)
 	}
 }
 
+void Buffer::swap(Buffer *buffer)
+{
+	void *data = _data;
+	size_t size = _size;
+	Allocator *allocator = _allocator;
+
+	_data = buffer->_data;
+	_size = buffer->_size;
+	_allocator = buffer->_allocator;
+
+	buffer->_data = data;
+	buffer->_size = size;
+	buffer->_allocator = allocator;
+}
+
+void Buffer::swap(Buffer &&buffer)
+{
+	void *data = _data;
+	size_t size = _size;
+	Allocator *allocator = _allocator;
+
+	_data = buffer._data;
+	_size = buffer._size;
+	_allocator = buffer._allocator;
+
+	buffer._data = data;
+	buffer._size = size;
+	buffer._allocator = allocator;
+}
+
 bool Buffer::operator ==(const Buffer& buffer) const
 {
 	return (_size == buffer._size && !memcmp(_data, buffer._data, _size));

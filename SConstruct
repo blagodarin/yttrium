@@ -236,7 +236,7 @@ AlwaysBuild('test')
 # Tools
 #-------------------------------------------------------------------------------
 
-Alias('tools', BuildSources(env, 'tools', ['intensity', 'ypq']))
+Alias('tools', BuildSources(env, 'tools', ['ypq']))
 Clean('tools', Dir('$BUILD/tools'))
 
 #-------------------------------------------------------------------------------

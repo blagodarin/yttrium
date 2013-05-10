@@ -6,7 +6,7 @@ namespace Yttrium
 {
 
 JpegReader::JpegReader(Allocator *allocator)
-	: ImageReader::Private(ImageType::Jpeg, allocator)
+	: ImageReader(allocator)
 	, _buffer(allocator)
 {
 	_decompressor.err = jpeg_std_error(&_error_handler.pub);
@@ -16,9 +16,7 @@ JpegReader::JpegReader(Allocator *allocator)
 JpegReader::~JpegReader()
 {
 	if (setjmp(_error_handler.setjmp_buffer))
-	{
 		return;
-	}
 
 	jpeg_destroy_decompress(&_decompressor);
 }

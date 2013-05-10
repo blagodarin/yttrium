@@ -67,6 +67,8 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const ImageFormat &form
 			_gl.GenTextures(1, &texture); // TODO: Think of using Y_ABORT if this fails.
 			if (texture)
 			{
+				// TODO: Set pixel row alignment if required.
+
 				_gl.BindTexture(target, texture);
 				_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 				_gl.TexImage2D(target, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);

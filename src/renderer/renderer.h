@@ -1,7 +1,7 @@
 #ifndef __RENDERER_RENDERER_H
 #define __RENDERER_RENDERER_H
 
-#include <Yttrium/buffer.h>
+#include <Yttrium/image.h>
 #include <Yttrium/rect.h>
 #include <Yttrium/renderer.h>
 #include <Yttrium/string.h>
@@ -54,7 +54,7 @@ public:
 	Vector2d _rendering_size;
 
 	String _screenshot_filename;
-	Buffer _screenshot_buffer;
+	Image  _screenshot_image;
 
 	Vector4f _color;
 

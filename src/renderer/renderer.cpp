@@ -1,7 +1,5 @@
 #include "renderer.h"
 
-#include <Yttrium/image.h>
-
 #include "../terminal/window.h"
 
 #include "texture.h"
@@ -15,13 +13,20 @@ Renderer::Private::Private(Window *window, Allocator *allocator)
 	, _viewport_size(0)
 	, _rendering_size(0)
 	, _screenshot_filename(allocator)
-	, _screenshot_buffer(allocator)
+	, _screenshot_image(allocator)
 	, _color(1, 1, 1)
 	, _font_size(1, 1)
 {
 	_builtin._renderer = this;
 
 	_window._private->_renderer = this;
+
+	ImageFormat screenshot_format;
+
+	screenshot_format.set_pixel_format(PixelFormat::Rgb, 24);
+	screenshot_format.set_orientation(ImageOrientation::XRightYUp);
+
+	_screenshot_image.set_format(screenshot_format);
 }
 
 Renderer::Private::~Private()
@@ -34,7 +39,6 @@ Renderer::Private::~Private()
 void Renderer::Private::set_viewport(const Dim2 &size)
 {
 	_viewport_size = size;
-	_screenshot_buffer.resize(size.x * size.y * 3);
 }
 
 void Renderer::Private::draw_rectangle(const RectF &position, const RectF &texture)
@@ -185,23 +189,10 @@ void Renderer::end_frame()
 
 	_private->_window.swap_buffers();
 
-	if (!_private->_screenshot_filename.is_empty() && _private->_screenshot_buffer.size())
+	if (!_private->_screenshot_filename.is_empty())
 	{
 		_private->take_screenshot();
-
-		ImageFormat format;
-
-		format.set_pixel_format(PixelFormat::Bgr, 24);
-		format.set_orientation(ImageOrientation::XRightYUp);
-		format.set_width(_private->_viewport_size.x);
-		format.set_height(_private->_viewport_size.y);
-
-		ImageWriter image(_private->_screenshot_filename, ImageType::Png, _private->_allocator);
-
-		if (image.set_format(format))
-		{
-			image.write(_private->_screenshot_buffer.const_data());
-		}
+		_private->_screenshot_image.save(_private->_screenshot_filename, ImageType::Png);
 	}
 
 	_private->_screenshot_filename.clear();

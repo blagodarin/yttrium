@@ -7,38 +7,28 @@ namespace Yttrium
 {
 
 class TgaReader
-	: public ImageReader::Private
+	: public ImageReader
 {
 public:
 
-	TgaReader(Allocator *allocator)
-		: ImageReader::Private(ImageType::Tga, allocator)
-	{
-	}
+	TgaReader(Allocator *allocator);
 
 public:
 
 	bool open() override;
-
 	bool read(void *buffer) override;
-
-	bool set_format(const ImageFormat &format) override;
 };
 
 class TgaWriter
-	: public ImageWriter::Private
+	: public ImageWriter
 {
 public:
 
-	TgaWriter(Allocator *allocator)
-		: ImageWriter::Private(allocator)
-	{
-	}
+	TgaWriter(Allocator *allocator);
 
 public:
 
-	ImageFormatFlags set_format(const ImageFormat &format) override;
-
+	bool set_format(const ImageFormat &format) override;
 	bool write(const void *buffer) override;
 };
 

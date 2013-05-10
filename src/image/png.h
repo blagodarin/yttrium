@@ -9,23 +9,17 @@ namespace Yttrium
 {
 
 class PngWriter
-	: public ImageWriter::Private
+	: public ImageWriter
 {
 public:
 
-	PngWriter(Allocator *allocator)
-		: ImageWriter::Private(allocator)
-	{
-	}
-
+	PngWriter(Allocator *allocator);
 	~PngWriter() override;
 
 public:
 
 	bool open() override;
-
-	ImageFormatFlags set_format(const ImageFormat &format) override;
-
+	bool set_format(const ImageFormat &format) override;
 	bool write(const void *buffer) override;
 
 private:

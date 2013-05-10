@@ -40,6 +40,13 @@ public:
 
 	///
 
+	Allocator *allocator() const noexcept
+	{
+		return _allocator;
+	}
+
+	///
+
 	const void *const_data() const noexcept
 	{
 		return _data;
@@ -84,15 +91,26 @@ public:
 		return _size;
 	}
 
+	///
+
+	void swap(Buffer *) noexcept;
+
+	/**
+	* \overload
+	* \return
+	*/
+
+	void swap(Buffer &&) noexcept;
+
 public:
 
 	///
 
-	bool operator ==(const Buffer& buffer) const noexcept;
+	bool operator ==(const Buffer &buffer) const noexcept;
 
 	///
 
-	bool operator !=(const Buffer& buffer) const noexcept;
+	bool operator !=(const Buffer &buffer) const noexcept;
 
 private:
 

@@ -8,68 +8,43 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE ImageReader::Private
-	: public PrivateBase<ImageReader::Private>
+class ImageReader
 {
 public:
 
-	Private(ImageType type, Allocator *allocator)
-		: PrivateBase(allocator)
-		, _type(type)
-		, _is_used(false)
-	{
-	}
-
-	virtual ~Private() {}
+	ImageReader(Allocator *allocator);
+	virtual ~ImageReader();
 
 public:
 
 	virtual bool open() = 0;
-
 	virtual bool read(void *buffer) = 0;
-
-	virtual bool set_format(const ImageFormat &)
-	{
-		return false;
-	}
 
 public:
 
-	ImageType   _type;
-	bool        _is_used;
-	ImageFormat _format;
-	File        _file;
-	ImageFormat _original_format;
+	Allocator   *_allocator;
+	ImageFormat  _format;
+	StaticFile   _file;
 };
 
-class Y_PRIVATE ImageWriter::Private
-	: public PrivateBase<ImageWriter::Private>
+class ImageWriter
 {
 public:
 
-	Private(Allocator *allocator)
-		: PrivateBase(allocator)
-		, _is_ready(false)
-		, _is_used(false)
-	{
-	}
-
-	virtual ~Private() {}
+	ImageWriter(Allocator *allocator);
+	virtual ~ImageWriter();
 
 public:
 
 	virtual bool open();
-
-	virtual ImageFormatFlags set_format(const ImageFormat &format) = 0;
-
+	virtual bool set_format(const ImageFormat &format) = 0;
 	virtual bool write(const void *buffer) = 0;
 
 public:
 
-	bool        _is_ready;
-	bool        _is_used;
-	ImageFormat _format;
-	StaticFile  _file;
+	Allocator   *_allocator;
+	ImageFormat  _format;
+	StaticFile   _file;
 };
 
 } // namespace Yttrium

@@ -1,7 +1,5 @@
 #include "tga.h"
 
-#include "processing.h"
-
 namespace Yttrium
 {
 
@@ -78,6 +76,11 @@ enum class TgaRlePacketHeader
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+TgaReader::TgaReader(Allocator *allocator)
+	: ImageReader(allocator)
+{
+}
+
 bool TgaReader::open()
 {
 	TgaHeader header;
@@ -149,94 +152,62 @@ bool TgaReader::open()
 bool TgaReader::read(void *buffer)
 {
 	size_t frame_size = _format.frame_size();
-
-	if (_file.read(buffer, frame_size) != frame_size)
-	{
-		return false;
-	}
-
-	if (_format.pixel_format() != _original_format.pixel_format())
-	{
-		Y_ASSERT(_format.pixel_format() == PixelFormat::Rgb);
-		ImageProcessing::xyz8_to_zyx8(buffer, _format.width(), _format.row_size(), _format.height());
-	}
-
-	return true;
-}
-
-bool TgaReader::set_format(const ImageFormat &format)
-{
-	if (_original_format.channels() != format.channels()
-		|| _original_format.bits_per_pixel() != format.bits_per_pixel()
-		|| _original_format.orientation() != format.orientation()
-		|| _original_format.width() != format.width()
-		|| _original_format.row_alignment() != format.row_alignment()
-		|| _original_format.height() != format.height())
-	{
-		return false;
-	}
-
-	if (format.pixel_format() != _original_format.pixel_format())
-	{
-		if (format.pixel_format() != PixelFormat::Rgb || _original_format.pixel_format() != PixelFormat::Bgr)
-		{
-			return false;
-		}
-	}
-
-	return true;
+	return _file.read(buffer, frame_size) == frame_size;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ImageFormatFlags TgaWriter::set_format(const ImageFormat &format)
+TgaWriter::TgaWriter(Allocator *allocator)
+	: ImageWriter(allocator)
 {
-	ImageFormatFlags result = 0;
+}
 
+bool TgaWriter::set_format(const ImageFormat &format)
+{
 	switch (format.pixel_format())
 	{
 	case PixelFormat::Gray:
 
-		if (format.bits_per_pixel() != 8)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 8))
+			return false;
 		break;
 
 	case PixelFormat::Bgr:
 
-		if (format.bits_per_pixel() != 24)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 24))
+			return false;
 		break;
 
 	case PixelFormat::Bgra:
 
-		if (format.bits_per_pixel() != 32)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 32))
+			return false;
 		break;
 
 	default:
 
-		result |= ImageFormat::PixelFormatFlag;
+		return false;
 	}
 
-	if (format.orientation() != ImageOrientation::XRightYDown
+	if (Y_UNLIKELY(format.orientation() != ImageOrientation::XRightYDown
 		&& format.orientation() != ImageOrientation::XRightYUp
 		&& format.orientation() != ImageOrientation::XLeftYDown
-		&& format.orientation() != ImageOrientation::XLeftYUp)
+		&& format.orientation() != ImageOrientation::XLeftYUp))
 	{
-		result |= ImageFormat::OrientationFlag;
+		return false;
 	}
 
-	if (!format.width() || format.width() > UINT16_MAX)
+	if (Y_UNLIKELY(!format.width() || format.width() > UINT16_MAX))
 	{
-		result |= ImageFormat::WidthFlag;
+		return false;
 	}
 
-	if (!format.height() || format.height() > UINT16_MAX)
+	if (Y_UNLIKELY(!format.height() || format.height() > UINT16_MAX))
 	{
-		result |= ImageFormat::HeightFlag;
+		return false;
 	}
 
-	return result;
+	return true;
 }
 
 bool TgaWriter::write(const void *buffer)
@@ -266,19 +237,12 @@ bool TgaWriter::write(const void *buffer)
 
 	_file.write(header);
 
-	if (_format.row_alignment() == 1)
-	{
-		_file.write(buffer, _format.frame_size());
-	}
-	else
-	{
-		const unsigned char *scanline = static_cast<const unsigned char *>(buffer);
+	const uint8_t *scanline = static_cast<const uint8_t *>(buffer);
 
-		for (size_t row = 0; row < _format.height(); ++row)
-		{
-			_file.write(scanline, _format.row_size());
-			scanline += _format.row_size();
-		}
+	for (size_t row = 0; row < _format.height(); ++row)
+	{
+		_file.write(scanline, _format.row_size());
+		scanline += _format.row_size();
 	}
 
 	return true;

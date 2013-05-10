@@ -1,17 +1,16 @@
 /// \file
 /// \brief %Image input/output facilities.
 
-// TODO: Pixel format flags and image orientation flags are flawed.
-// They are "old" enums which expose their values to the "global" namespace,
-// but they can't also be "new" enums, because all the flags would require explicit integer casts.
-
 #ifndef __Y_IMAGE_H
 #define __Y_IMAGE_H
 
+#include <Yttrium/buffer.h>
 #include <Yttrium/static_string.h>
 
 namespace Yttrium
 {
+
+class Image;
 
 /// Pixel format.
 
@@ -26,25 +25,6 @@ enum class PixelFormat
 	Bgra,      ///< Blue-green-red-alpha (reverse RGB).
 	Argb,      ///< Alpha-red-green-blue (reverse alpha).
 	Abgr,      ///< Alpha-blue-green-red (reverse).
-};
-
-/// Pixel format flags.
-
-typedef uint_fast16_t PixelFormatFlags;
-
-/// Pixel format flag.
-
-enum: PixelFormatFlags
-{
-	GrayFlag      = 1 << 0, ///< Gray flag.
-	GrayAlphaFlag = 1 << 1, ///< Gray-alpha flag.
-	AlphaGrayFlag = 1 << 2, ///< Alpha-gray flag.
-	RgbFlag       = 1 << 3, ///< RGB flag.
-	BgrFlag       = 1 << 4, ///< BGR flag.
-	RgbaFlag      = 1 << 5, ///< RGBA flag.
-	BgraFlag      = 1 << 6, ///< BGRA flag.
-	ArgbFlag      = 1 << 7, ///< ARGB flag.
-	AbgrFlag      = 1 << 8, ///< ABGR flag.
 };
 
 /// Image file type.
@@ -67,47 +47,11 @@ enum class ImageOrientation
 	XLeftYUp,    ///< X right-to-left, Y bottom-to-top.
 };
 
-/// Image orientation flags.
-
-typedef uint_fast8_t ImageOrientationFlags;
-
-enum: ImageOrientationFlags
-{
-	XRightYDownFlag = 1 << 0, ///< X left-to-right, Y top-to-bottom.
-	XRightYUpFlag   = 1 << 1, ///< X left-to-right, Y bottom-to-top.
-	XLeftYDownFlag  = 1 << 2, ///< X right-to-left, Y top-to-bottom.
-	XLeftYUpFlag    = 1 << 3, ///< X right-to-left, Y bottom-to-top.
-};
-
-/// Image format flags.
-
-typedef uint_fast8_t ImageFormatFlags;
-
 /// Image format.
 
 class Y_API ImageFormat
 {
-public:
-
-	enum: ImageFormatFlags
-	{
-		PixelFormatFlag  = 1 << 0, ///< Pixel format flag.
-		BitsPerPixelFlag = 1 << 1, ///< Bits per pixel flag.
-		OrientationFlag  = 1 << 2, ///< Orientation flag.
-		RowAlignmentFlag = 1 << 3, ///< Row alignment flag.
-		WidthFlag        = 1 << 4, ///< Width flag.
-		HeightFlag       = 1 << 5, ///< Height flag.
-
-		/// All flags.
-
-		AllFlags
-			= PixelFormatFlag
-			| BitsPerPixelFlag
-			| OrientationFlag
-			| RowAlignmentFlag
-			| WidthFlag
-			| HeightFlag,
-	};
+	friend Image;
 
 public:
 
@@ -167,7 +111,7 @@ public:
 
 	///
 
-	void set_row_alignment(size_t row_alignment) noexcept;
+	void set_row_alignment(size_t alignment) noexcept;
 
 	///
 
@@ -176,6 +120,16 @@ public:
 	///
 
 	inline size_t width() const noexcept;
+
+public:
+
+	///
+
+	inline bool operator ==(const ImageFormat &format) const noexcept;
+
+	///
+
+	inline bool operator !=(const ImageFormat &format) const noexcept;
 
 private:
 
@@ -189,168 +143,81 @@ private:
 	size_t           _height;
 };
 
-/// Read-only audio file access interface.
+///
 
-class Y_API ImageReader
+class Y_API Image
 {
 public:
 
 	///
 
-	ImageReader() noexcept
-		: _private(nullptr)
-	{
-	}
+	inline Image(Allocator *allocator = DefaultAllocator) noexcept;
 
-	///
+	/// Allocate an image for the specified \a format.
+	/// \param format Image format.
+	/// \param allocator Image allocator.
+	/// \note The image data is left uninitialized.
 
-	ImageReader(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
-		//: ImageReader() // TODO: Uncomment.
-		: _private(nullptr)
-	{
-		open(name, type, allocator);
-	}
-
-	///
-
-	ImageReader(const ImageReader &reader) noexcept;
-
-	///
-
-	~ImageReader() noexcept
-	{
-		close();
-	}
+	Image(const ImageFormat &format, Allocator *allocator = DefaultAllocator) noexcept;
 
 public:
 
 	///
 
-	void close() noexcept;
-
-	/// Return the audio format.
-	/// \return %Audio format.
-
-	ImageFormat format() const noexcept;
+	inline const void *const_data() const noexcept;
 
 	///
 
-	bool is_opened() const noexcept
-	{
-		return _private;
-	}
+	inline void *data() noexcept;
 
 	///
 
-	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
-
-	/// Read an image into \a buffer.
-	/// \param buffer Buffer to read into.
-	/// \return Success status.
-	/// \note An image can only be read once
-
-	bool read(void *buffer) noexcept;
-
-	/// Set the format to read the image in.
-	/// \param format The desired format.
-	/// \return Success status.
-
-	bool set_format(const ImageFormat &format) noexcept;
+	inline const void *data() const noexcept;
 
 	///
 
-	ImageType type() const noexcept;
+	inline ImageFormat format() const noexcept;
+
+	///
+
+	bool intensity_to_bgra() noexcept;
+
+	///
+
+	inline bool is_valid() const noexcept;
+
+	///
+
+	bool load(const StaticString &name, ImageType type = ImageType::Auto) noexcept;
+
+	///
+
+	bool save(const StaticString &name, ImageType type = ImageType::Auto) const noexcept;
+
+	/// Change the format to \a format.
+	/// \param format New image format.
+	/// \note The image data becomes undefined after the call.
+
+	void set_format(const ImageFormat &format) noexcept;
+
+	///
+
+	void set_size(size_t width, size_t height, size_t row_alignment = 0) noexcept;
+
+	///
+
+	bool swap_channels() noexcept;
 
 public:
 
 	///
 
-	ImageReader &operator =(const ImageReader &reader) noexcept;
-
-public:
-
-	class Private;
+	bool operator ==(const Image &image) const noexcept;
 
 private:
 
-	Private *_private;
-};
-
-/// Read-only audio file access interface.
-
-class Y_API ImageWriter
-{
-public:
-
-	///
-
-	ImageWriter() noexcept
-		: _private(nullptr)
-	{
-	}
-
-	///
-
-	ImageWriter(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
-		//: ImageWriter() // TODO: Uncomment.
-		: _private(nullptr)
-	{
-		open(name, type, allocator);
-	}
-
-	///
-
-	ImageWriter(const ImageWriter &writer) noexcept;
-
-	///
-
-	~ImageWriter() noexcept
-	{
-		close();
-	}
-
-public:
-
-	///
-
-	void close() noexcept;
-
-	///
-
-	bool is_opened() const noexcept
-	{
-		return _private;
-	}
-
-	///
-
-	bool open(const StaticString &name, ImageType type = ImageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
-
-	/// Set the format for the output image.
-	/// \param format The desired format.
-	/// \return Flags for invalid format fields or 0 on success.
-
-	ImageFormatFlags set_format(const ImageFormat &format) noexcept;
-
-	/// Write the image from a buffer to the file.
-	/// \param buffer A buffer to write from.
-	/// \return Success status.
-
-	bool write(const void *buffer) noexcept;
-
-public:
-
-	///
-
-	ImageWriter &operator =(const ImageWriter &writer) noexcept;
-
-public:
-
-	class Private;
-
-private:
-
-	Private *_private;
+	ImageFormat _format;
+	Buffer      _buffer;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,6 +281,58 @@ void ImageFormat::set_orientation(ImageOrientation orientation) noexcept
 size_t ImageFormat::width() const noexcept
 {
 	return _width;
+}
+
+bool ImageFormat::operator ==(const ImageFormat &format) const noexcept
+{
+	return _pixel_format == format._pixel_format
+		&& _bits_per_pixel == format._bits_per_pixel
+		&& _orientation == format._orientation
+		&& _width == format._width
+		&& _row_alignment == format._row_alignment
+		&& _height == format._height;
+}
+
+bool ImageFormat::operator !=(const ImageFormat &format) const noexcept
+{
+	return _pixel_format != format._pixel_format
+		|| _bits_per_pixel != format._bits_per_pixel
+		|| _orientation != format._orientation
+		|| _width != format._width
+		|| _row_alignment != format._row_alignment
+		|| _height != format._height;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Image::Image(Allocator *allocator) noexcept
+	: _buffer(allocator)
+{
+}
+
+const void *Image::const_data() const noexcept
+{
+	return _buffer.data();
+}
+
+void *Image::data() noexcept
+{
+	return _buffer.data();
+}
+
+const void *Image::data() const noexcept
+{
+	return _buffer.data();
+}
+
+ImageFormat Image::format() const noexcept
+{
+	return _format;
+}
+
+bool Image::is_valid() const noexcept
+{
+	return _buffer.data();
 }
 
 } // namespace Yttrium

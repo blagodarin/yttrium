@@ -17,21 +17,19 @@ TextureCache::~TextureCache()
 {
 }
 
-Texture2D TextureCache::cache_texture_2d(const StaticString &name)
+Texture2D TextureCache::cache_texture_2d(const StaticString &name, bool intensity)
 {
 	Allocator *allocator = _renderer.allocator();
 
-	ImageReader image(name, ImageType::Auto, allocator);
-	if (!image.is_opened())
+	Image image(allocator);
+
+	if (!image.load(name))
 		return Texture2D();
 
-	const ImageFormat &format = image.format();
+	if (intensity && image.format().pixel_format() == PixelFormat::Gray)
+		image.intensity_to_bgra();
 
-	Buffer buffer(format.frame_size(), allocator);
-	if (!image.read(buffer.data()))
-		return Texture2D();
-
-	Texture2D::Private *texture_private = cache_texture_2d(format, buffer.const_data());
+	Texture2D::Private *texture_private = cache_texture_2d(image.format(), image.const_data());
 	if (!texture_private)
 		return Texture2D();
 
@@ -43,10 +41,10 @@ void TextureCache::clear()
 	_cache_2d.clear();
 }
 
-Texture2D TextureCache::load_texture_2d(const StaticString &name)
+Texture2D TextureCache::load_texture_2d(const StaticString &name, bool intensity)
 {
 	Cache2D::iterator i = _cache_2d.find(String(name, ByReference()));
-	return i != _cache_2d.end() ? i->second : cache_texture_2d(name);
+	return i != _cache_2d.end() ? i->second : cache_texture_2d(name, intensity);
 }
 
 } // namespace Yttrium

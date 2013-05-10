@@ -1,6 +1,7 @@
 #include "image.h"
 
 #include <Yttrium/package.h>
+#include <Yttrium/utils.h>
 
 #include "jpeg.h"
 #include "png.h"
@@ -12,10 +13,14 @@ namespace Yttrium
 namespace
 {
 
+size_t unaligned_row_size(size_t width, size_t bits_per_pixel)
+{
+	return (width * bits_per_pixel + 7) / 8;
+}
+
 size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
 {
-	size_t row_size = (width * bits_per_pixel + 7) / 8;
-	return (row_size + row_alignment - 1) / row_alignment * row_alignment;
+	return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
 }
 
 } // namespace
@@ -53,12 +58,13 @@ void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pix
 	_row_size = aligned_row_size(_width, bits_per_pixel, _row_alignment);
 }
 
-void ImageFormat::set_row_alignment(size_t row_alignment)
+void ImageFormat::set_row_alignment(size_t alignment)
 {
-	Y_ASSERT(row_alignment >= 1);
-
-	_row_alignment = row_alignment;
-	_row_size = aligned_row_size(_width, _bits_per_pixel, row_alignment);
+	if (Y_LIKELY(is_power_of_2(alignment)))
+	{
+		_row_alignment = alignment;
+		_row_size = aligned_row_size(_width, _bits_per_pixel, alignment);
+	}
 }
 
 void ImageFormat::set_width(size_t width)
@@ -69,207 +75,217 @@ void ImageFormat::set_width(size_t width)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ImageReader::ImageReader(const ImageReader &reader)
-	: _private(Private::copy(reader._private))
+ImageReader::ImageReader(Allocator *allocator)
+	: _allocator(allocator)
 {
 }
 
-void ImageReader::close()
+ImageReader::~ImageReader()
 {
-	Private::release(&_private);
 }
 
-ImageFormat ImageReader::format() const
+ImageWriter::ImageWriter(Allocator *allocator)
+	: _allocator(allocator)
 {
-	return _private ? _private->_format : ImageFormat();
 }
 
-bool ImageReader::open(const StaticString &name, ImageType type, Allocator *allocator)
+ImageWriter::~ImageWriter()
 {
-	close();
-
-	switch (type)
-	{
-	case ImageType::Tga:
-
-		_private = Y_NEW(allocator, TgaReader)(allocator);
-		break;
-
-	default:
-
-		{
-			StaticString extension = name.file_extension();
-
-			if (extension == ".tga")
-			{
-				_private = Y_NEW(allocator, TgaReader)(allocator);
-			}
-			else if (extension == ".jpeg" || extension == ".jpg")
-			{
-				_private = Y_NEW(allocator, JpegReader)(allocator);
-			}
-		}
-		break;
-	}
-
-	if (_private)
-	{
-		if (_private->_file.open(name, allocator)
-			&& _private->open())
-		{
-			_private->_original_format = _private->_format;
-			return true;
-		}
-
-		close();
-	}
-
-	return false;
 }
 
-bool ImageReader::read(void *buffer)
+bool ImageWriter::open()
 {
-	bool result = false;
-
-	if (Y_LIKELY(_private && !_private->_is_used))
-	{
-		result = _private->read(buffer);
-		_private->_is_used = true;
-	}
-
-	return result;
-}
-
-bool ImageReader::set_format(const ImageFormat &format)
-{
-	if (Y_UNLIKELY(!_private || _private->_is_used))
-	{
-		return false;
-	}
-
-	if (!_private->set_format(format))
-	{
-		return false;
-	}
-
-	_private->_format = format;
-
 	return true;
-}
-
-ImageType ImageReader::type() const
-{
-	return Y_LIKELY(_private) ? _private->_type : ImageType::Auto;
-}
-
-ImageReader &ImageReader::operator =(const ImageReader &reader)
-{
-	Private::assign(&_private, reader._private);
-
-	return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ImageWriter::ImageWriter(const ImageWriter &reader)
-	: _private(Private::copy(reader._private))
+Image::Image(const ImageFormat &format, Allocator *allocator)
+	: _format(format)
+	, _buffer(_format.frame_size(), allocator)
 {
 }
 
-void ImageWriter::close()
+bool Image::intensity_to_bgra()
 {
-	Private::release(&_private);
+	if (Y_UNLIKELY(_format._pixel_format != PixelFormat::Gray || _format._bits_per_pixel != 8))
+		return false;
+
+	size_t old_row_size = _format._row_size;
+
+	_format._pixel_format = PixelFormat::Bgra;
+	_format._channels = 4;
+	_format._bits_per_pixel = 32;
+	_format._row_alignment = 4;
+	_format._row_size = _format._width * 4;
+
+	Buffer output_buffer(_format.frame_size(), _buffer.allocator());
+
+	const uint8_t *src = static_cast<const uint8_t *>(_buffer.const_data());
+	uint8_t *dst = static_cast<uint8_t *>(output_buffer.data());
+
+	for (size_t i = 0; i < _format._height; ++i)
+	{
+		for (size_t j = 0; j < _format._width; ++j)
+		{
+			*dst++ = *src;
+			*dst++ = *src;
+			*dst++ = *src;
+			*dst++ = *src++;
+		}
+		src += old_row_size - _format._width;
+	}
+
+	_buffer.swap(&output_buffer);
+
+	return true;
 }
 
-bool ImageWriter::open(const StaticString &name, ImageType type, Allocator *allocator)
+bool Image::load(const StaticString &name, ImageType type)
 {
-	close();
+	if (type == ImageType::Auto)
+	{
+		StaticString extension = name.file_extension();
+
+		if (extension == ".tga")
+		{
+			type = ImageType::Tga;
+		}
+		else if (extension == ".jpeg" || extension == ".jpg")
+		{
+			type = ImageType::Jpeg;
+		}
+	}
+
+	ImageReader *reader = nullptr;
 
 	switch (type)
 	{
-	case ImageType::Tga:
+	case ImageType::Tga:  reader = Y_NEW(_buffer.allocator(), TgaReader)(_buffer.allocator()); break;
+	case ImageType::Jpeg: reader = Y_NEW(_buffer.allocator(), JpegReader)(_buffer.allocator()); break;
+	default:              break;
+	}
 
-		_private = Y_NEW(allocator, TgaWriter)(allocator);
-		break;
+	bool result = false;
 
-	case ImageType::Png:
+	if (Y_LIKELY(reader))
+	{
+		if (Y_LIKELY(reader->_file.open(name, reader->_allocator)
+			&& reader->open()))
+		{
+			_format = reader->_format;
+			_buffer.resize(_format.frame_size());
+			result = reader->read(_buffer.data());
+		}
+		Y_DELETE(reader->_allocator, reader);
+	}
 
-		_private = Y_NEW(allocator, PngWriter)(allocator);
+	return result;
+}
+
+bool Image::save(const StaticString &name, ImageType type) const
+{
+	if (type == ImageType::Auto)
+	{
+		StaticString extension = name.file_extension();
+
+		if (extension == ".tga")
+		{
+			type = ImageType::Tga;
+		}
+		else if (extension == ".png")
+		{
+			type = ImageType::Png;
+		}
+	}
+
+	ImageWriter *writer = nullptr;
+
+	switch (type)
+	{
+	case ImageType::Tga: writer = Y_NEW(_buffer.allocator(), TgaWriter)(_buffer.allocator()); break;
+	case ImageType::Png: writer = Y_NEW(_buffer.allocator(), PngWriter)(_buffer.allocator()); break;
+	default:             break;
+	}
+
+	bool result = false;
+
+	if (writer)
+	{
+		if (Y_LIKELY(writer->_file.open(name, File::Write | File::Truncate, writer->_allocator)
+			&& writer->open()
+			&& writer->set_format(_format)))
+		{
+			writer->_format = _format;
+			result = writer->write(_buffer.data());
+		}
+		Y_DELETE(writer->_allocator, writer);
+	}
+
+	return result;
+}
+
+void Image::set_format(const ImageFormat &format)
+{
+	_format = format;
+	_buffer.resize(_format.frame_size());
+}
+
+void Image::set_size(size_t width, size_t height, size_t row_alignment)
+{
+	_format.set_height(height);
+	_format.set_width(width);
+	if (row_alignment)
+		_format.set_row_alignment(row_alignment); // NOTE: This could be merged with the previous call.
+	_buffer.resize(_format.frame_size());
+}
+
+bool Image::swap_channels()
+{
+	switch (_format._pixel_format)
+	{
+	case PixelFormat::Gray:
+
+		return true;
+
+	case PixelFormat::Rgb:
+	case PixelFormat::Bgr:
+
+		if (Y_LIKELY(_format._bits_per_pixel == 24))
+		{
+			uint8_t *scanline = static_cast<uint8_t *>(_buffer.data());
+
+			for (size_t row = 0; row < _format._height; ++row)
+			{
+				for (size_t offset = 0; offset < _format._width * 3; offset += 3)
+				{
+					uint8_t x = scanline[offset];
+					scanline[offset] = scanline[offset + 2];
+					scanline[offset + 2] = x;
+				}
+				scanline += _format.row_size();
+			}
+
+			_format._pixel_format = (_format._pixel_format == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb);
+
+			return true;
+		}
 		break;
 
 	default:
 
-		{
-			StaticString extension = name.file_extension();
-
-			if (extension == ".tga")
-			{
-				_private = Y_NEW(allocator, TgaWriter)(allocator);
-			}
-			else if (extension == ".png")
-			{
-				_private = Y_NEW(allocator, PngWriter)(allocator);
-			}
-		}
 		break;
-	}
-
-	if (_private)
-	{
-		if (_private->_file.open(name, File::Write | File::Truncate)
-			&& _private->open())
-		{
-			return true;
-		}
-
-		close();
 	}
 
 	return false;
 }
 
-ImageFormatFlags ImageWriter::set_format(const ImageFormat &format)
+bool Image::operator ==(const Image &image) const
 {
-	if (!_private || _private->_is_ready || _private->_is_used)
-		return ImageFormat::AllFlags;
+	// NOTE: This implementation relies on equal padding data (if any).
 
-	ImageFormatFlags result = _private->set_format(format);
-
-	if (result & ImageFormat::PixelFormatFlag)
-		result |= ImageFormat::BitsPerPixelFlag;
-
-	if (!result)
-	{
-		_private->_is_ready = true;
-		_private->_format = format;
-	}
-
-	return result;
-}
-
-bool ImageWriter::write(const void *buffer)
-{
-	bool result = false;
-
-	if (_private && _private->_is_ready && !_private->_is_used)
-	{
-		result = _private->write(buffer);
-		_private->_is_used = true;
-	}
-
-	return result;
-}
-
-ImageWriter &ImageWriter::operator =(const ImageWriter &writer)
-{
-	Private::assign(&_private, writer._private);
-
-	return *this;
-}
-
-bool ImageWriter::Private::open()
-{
-	return true;
+	return _format == image._format
+		&& _buffer == image._buffer; // NOTE: That may work wrong for our capacity-less buffers.
 }
 
 } // namespace Yttrium

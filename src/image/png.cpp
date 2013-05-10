@@ -18,6 +18,13 @@ void _png_flush_callback(png_structp png_ptr)
 
 } // namespace
 
+PngWriter::PngWriter(Allocator *allocator)
+	: ImageWriter(allocator)
+	, _png(nullptr)
+	, _info(nullptr)
+{
+}
+
 PngWriter::~PngWriter()
 {
 	if (_png)
@@ -55,30 +62,28 @@ bool PngWriter::open()
 	return false;
 }
 
-ImageFormatFlags PngWriter::set_format(const ImageFormat &format)
+bool PngWriter::set_format(const ImageFormat &format)
 {
-	ImageFormatFlags result = 0;
-
 	switch (format.pixel_format())
 	{
 	case PixelFormat::Gray:
 
-		if (format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16))
+			return false;
 		break;
 
 	case PixelFormat::GrayAlpha:
 	case PixelFormat::AlphaGray:
 
-		if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32))
+			return false;
 		break;
 
 	case PixelFormat::Rgb:
 	case PixelFormat::Bgr:
 
-		if (format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48))
+			return false;
 		break;
 
 	case PixelFormat::Rgba:
@@ -86,33 +91,32 @@ ImageFormatFlags PngWriter::set_format(const ImageFormat &format)
 	case PixelFormat::Argb:
 	case PixelFormat::Abgr:
 
-		if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
-			result |= ImageFormat::BitsPerPixelFlag;
+		if (Y_UNLIKELY(format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64))
+			return false;
 		break;
 
 	default:
 
-		result |= ImageFormat::PixelFormatFlag;
-		break;
+		return false;
 	}
 
-	if (format.orientation() != ImageOrientation::XRightYDown
-		&& format.orientation() != ImageOrientation::XRightYUp)
+	if (Y_UNLIKELY(format.orientation() != ImageOrientation::XRightYDown
+		&& format.orientation() != ImageOrientation::XRightYUp))
 	{
-		result |= ImageFormat::OrientationFlag;
+		return false;
 	}
 
-	if (!format.width())
+	if (Y_UNLIKELY(!format.width()))
 	{
-		result |= ImageFormat::WidthFlag;
+		return false;
 	}
 
-	if (!format.height())
+	if (Y_UNLIKELY(!format.height()))
 	{
-		result |= ImageFormat::HeightFlag;
+		return false;
 	}
 
-	return result;
+	return true;
 }
 
 bool PngWriter::write(const void *buffer)

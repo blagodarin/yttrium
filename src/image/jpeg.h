@@ -1,8 +1,6 @@
 #ifndef __IMAGE_JPEG_H
 #define __IMAGE_JPEG_H
 
-#include <Yttrium/buffer.h>
-
 #include "image.h"
 
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
@@ -13,18 +11,16 @@ namespace Yttrium
 {
 
 class JpegReader
-	: public ImageReader::Private
+	: public ImageReader
 {
 public:
 
 	JpegReader(Allocator *allocator);
-
 	~JpegReader() override;
 
 public:
 
 	bool open() override;
-
 	bool read(void *buffer) override;
 
 private:
