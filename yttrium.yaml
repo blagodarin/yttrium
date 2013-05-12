@@ -8,7 +8,6 @@ Yttrium:
     - Separate a single Rect into a raster one and a vector one.
 
     Image:
-    - Add DDS support.
     - Add compressed image format support (e.g. compressed textures).
     - Add multi-level image support (e.g. textures with mipmaps).
     - Add advanced image loading support (separate header and data loading).

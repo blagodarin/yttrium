@@ -3,6 +3,7 @@
 #include <Yttrium/package.h>
 #include <Yttrium/utils.h>
 
+#include "dds.h"
 #include "jpeg.h"
 #include "png.h"
 #include "tga.h"
@@ -151,6 +152,10 @@ bool Image::load(const StaticString &name, ImageType type)
 		{
 			type = ImageType::Tga;
 		}
+		else if (extension == ".dds")
+		{
+			type = ImageType::Dds;
+		}
 		else if (extension == ".jpeg" || extension == ".jpg")
 		{
 			type = ImageType::Jpeg;
@@ -163,6 +168,7 @@ bool Image::load(const StaticString &name, ImageType type)
 	{
 	case ImageType::Tga:  reader = Y_NEW(_buffer.allocator(), TgaReader)(_buffer.allocator()); break;
 	case ImageType::Jpeg: reader = Y_NEW(_buffer.allocator(), JpegReader)(_buffer.allocator()); break;
+	case ImageType::Dds:  reader = Y_NEW(_buffer.allocator(), DdsReader)(_buffer.allocator()); break;
 	default:              break;
 	}
 

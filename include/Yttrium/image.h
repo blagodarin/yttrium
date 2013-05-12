@@ -35,6 +35,7 @@ enum class ImageType
 	Tga,  ///< Truevision TARGA (TGA) file format.
 	Png,  ///< Portable Network Graphics (PNG) file format (write only).
 	Jpeg, ///< Joint Photographic Experts Group (JPEG) file format (read only).
+	Dds,  ///< DirectDraw Surface (DDS) file format (read only).
 };
 
 /// Image orientation.

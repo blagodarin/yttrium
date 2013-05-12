@@ -30,6 +30,21 @@ BOOST_AUTO_TEST_CASE(tga_test)
 	BOOST_CHECK(expected == actual);
 }
 
+BOOST_AUTO_TEST_CASE(dds_test)
+{
+	MemoryManager memory_manager;
+
+	Image dds_image;
+
+	BOOST_REQUIRE(dds_image.load("tests/image/gradient32.dds"));
+
+	Image tga_image;
+
+	BOOST_REQUIRE(tga_image.load("tests/image/gradient32.tga"));
+
+	BOOST_CHECK(dds_image == tga_image);
+}
+
 BOOST_AUTO_TEST_CASE(jpeg_test)
 {
 	MemoryManager memory_manager;
