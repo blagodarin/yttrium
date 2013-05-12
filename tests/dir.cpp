@@ -21,11 +21,11 @@ BOOST_AUTO_TEST_CASE(dir_test)
 
 	for (const StaticString &entry: dir)
 	{
-		BOOST_CHECK(entry == "." || entry == "..");
+		BOOST_CHECK(entry == "." || entry == ".." || entry == "file");
 		++count;
 	}
 
-	BOOST_CHECK_EQUAL(count, 2);
+	BOOST_CHECK_EQUAL(count, 3);
 
 	// Reiterability check.
 
@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_CASE(dir_test)
 
 	for (const StaticString &entry: dir)
 	{
-		BOOST_CHECK(entry == "." || entry == "..");
+		BOOST_CHECK(entry == "." || entry == ".." || entry == "file");
 		++count;
 	}
 
-	BOOST_CHECK_EQUAL(count, 2);
+	BOOST_CHECK_EQUAL(count, 3);
 }
