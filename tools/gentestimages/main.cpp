@@ -7,22 +7,9 @@
 
 using namespace Yttrium;
 
-void write_gradient8(File *file)
+void write_color_gradient(File *file, bool with_alpha)
 {
-	Buffer buffer(16 * 16);
-
-	uint8_t *data = static_cast<uint8_t *>(buffer.data());
-
-	for (size_t y = 0; y < 16; ++y)
-		for (size_t x = 0; x < 16; ++x)
-			*data++ = y * 16 + x;
-
-	file->write(buffer.data(), buffer.size());
-}
-
-void write_gradient32(File *file)
-{
-	Buffer buffer(16 * 16 * 4);
+	Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
 
 	uint8_t *data = static_cast<uint8_t *>(buffer.data());
 
@@ -33,7 +20,6 @@ void write_gradient32(File *file)
 			uint8_t b = 0;
 			uint8_t g = 0;
 			uint8_t r = 0;
-			uint8_t a = x * 16 + 15;
 
 			if (y < 4)
 			{
@@ -57,14 +43,16 @@ void write_gradient32(File *file)
 			*data++ = b;
 			*data++ = g;
 			*data++ = r;
-			*data++ = a;
+
+			if (with_alpha)
+				*data++ = x * 16 + 15;
 		}
 	}
 
 	file->write(buffer.data(), buffer.size());
 }
 
-void write_intensity32(File *file)
+void write_color_intensity(File *file)
 {
 	Buffer buffer(16 * 16 * 4);
 
@@ -86,25 +74,38 @@ void write_intensity32(File *file)
 	file->write(buffer.data(), buffer.size());
 }
 
+void write_grayscale_intensity(File *file)
+{
+	Buffer buffer(16 * 16);
+
+	uint8_t *data = static_cast<uint8_t *>(buffer.data());
+
+	for (size_t y = 0; y < 16; ++y)
+		for (size_t x = 0; x < 16; ++x)
+			*data++ = y * 16 + x;
+
+	file->write(buffer.data(), buffer.size());
+}
+
 int main(int, char **)
 {
 	MemoryManager memory_manager;
 
 	{
-		File file("tests/image/gradient8.tga", File::Write | File::Truncate);
+		File file("tests/image/gradient24.tga", File::Write | File::Truncate);
 
 		TgaHeader header;
 
 		::memset(&header, 0, sizeof(header));
 
-		header.image_type = tgaBlackAndWhite;
+		header.image_type = tgaTrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
-		header.image.pixel_depth = 8;
+		header.image.pixel_depth = 24;
 		header.image.descriptor = tgaTopLeft;
 
 		if (file.write(header))
-			write_gradient8(&file);
+			write_color_gradient(&file, false);
 	}
 
 	{
@@ -121,7 +122,24 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft | 8;
 
 		if (file.write(header))
-			write_gradient32(&file);
+			write_color_gradient(&file, true);
+	}
+
+	{
+		File file("tests/image/gradient32.tga", File::Write | File::Truncate);
+
+		TgaHeader header;
+
+		::memset(&header, 0, sizeof(header));
+
+		header.image_type = tgaTrueColor;
+		header.image.width = 16;
+		header.image.height = 16;
+		header.image.pixel_depth = 32;
+		header.image.descriptor = tgaTopLeft | 8;
+
+		if (file.write(header))
+			write_color_gradient(&file, true);
 	}
 
 	{
@@ -146,7 +164,24 @@ int main(int, char **)
 		header.dwCaps = DDSCAPS_TEXTURE;
 
 		if (file.write(header))
-			write_gradient32(&file);
+			write_color_gradient(&file, true);
+	}
+
+	{
+		File file("tests/image/intensity8.tga", File::Write | File::Truncate);
+
+		TgaHeader header;
+
+		::memset(&header, 0, sizeof(header));
+
+		header.image_type = tgaBlackAndWhite;
+		header.image.width = 16;
+		header.image.height = 16;
+		header.image.pixel_depth = 8;
+		header.image.descriptor = tgaTopLeft;
+
+		if (file.write(header))
+			write_grayscale_intensity(&file);
 	}
 
 	{
@@ -163,7 +198,7 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft | 8;
 
 		if (file.write(header))
-			write_intensity32(&file);
+			write_color_intensity(&file);
 	}
 
 	return 0;

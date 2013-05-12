@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(tga_test)
 
 	Image image;
 
-	BOOST_REQUIRE(image.load("tests/image/image.tga"));
+	BOOST_REQUIRE(image.load("tests/image/gradient32.tga"));
 
 	File file(File::Temporary);
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(tga_test)
 	Buffer expected;
 	Buffer actual;
 
-	BOOST_REQUIRE(File("tests/image/image.tga").read_all(&expected));
+	BOOST_REQUIRE(File("tests/image/gradient32.tga").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }
@@ -51,12 +51,12 @@ BOOST_AUTO_TEST_CASE(jpeg_test)
 
 	Image jpeg_image;
 
-	BOOST_REQUIRE(jpeg_image.load("tests/image/jpeg.jpeg"));
+	BOOST_REQUIRE(jpeg_image.load("tests/image/gradient24.jpeg"));
 	BOOST_REQUIRE(jpeg_image.format().pixel_format() == PixelFormat::Rgb);
 
 	Image tga_image;
 
-	BOOST_REQUIRE(tga_image.load("tests/image/jpeg.tga"));
+	BOOST_REQUIRE(tga_image.load("tests/image/gradient24.jpeg.tga"));
 	BOOST_REQUIRE(tga_image.format().pixel_format() == PixelFormat::Bgr);
 	BOOST_REQUIRE(tga_image.swap_channels());
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(png_test)
 
 	Image image;
 
-	BOOST_REQUIRE(image.load("tests/image/image.tga"));
+	BOOST_REQUIRE(image.load("tests/image/gradient24.tga"));
 
 	File file(File::Temporary);
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(png_test)
 	Buffer expected;
 	Buffer actual;
 
-	BOOST_REQUIRE(File("tests/image/image.png").read_all(&expected));
+	BOOST_REQUIRE(File("tests/image/gradient24.png").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
 }
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(intensity_test)
 
 	Image image;
 
-	BOOST_REQUIRE(image.load("tests/image/gradient8.tga"));
+	BOOST_REQUIRE(image.load("tests/image/intensity8.tga"));
 	BOOST_REQUIRE(image.intensity_to_bgra());
 
 	File file(File::Temporary);
