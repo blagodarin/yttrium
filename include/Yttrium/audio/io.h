@@ -118,7 +118,7 @@ public:
 	bool seek(UOffset offset) noexcept;
 
 	/// Return the opened audio size.
-	/// \return File size in samples.
+	/// \return File size in bytes.
 
 	UOffset size() const noexcept;
 

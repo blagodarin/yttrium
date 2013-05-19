@@ -2,6 +2,7 @@
 #define __TETRIUM_GAME_H
 
 #include <Yttrium/audio/manager.h>
+#include <Yttrium/audio/sound.h>
 #include <Yttrium/bindings.h>
 #include <Yttrium/gui/manager.h>
 #include <Yttrium/proxy_allocator.h>
@@ -63,6 +64,7 @@ private:
 	Allocator       *_allocator;
 	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
+	Sound            _sound;
 	Terminal         _terminal;
 	Renderer         _renderer;
 	TextureCachePtr  _texture_cache;

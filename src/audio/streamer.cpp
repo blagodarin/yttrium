@@ -7,7 +7,7 @@ namespace Yttrium
 
 enum
 {
-	BufferSize = 1000, ///< 1 s buffer.
+	BufferSize = 1000, // 1 s buffer.
 };
 
 void AudioStreamer::close()

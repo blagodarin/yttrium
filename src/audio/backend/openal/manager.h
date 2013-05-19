@@ -19,6 +19,10 @@ public:
 
 public:
 
+	Sound::Private *create_sound() override;
+
+public:
+
 	static AudioManager::Devices devices();
 
 	static OpenAlManager *open(const StaticString &device, Allocator *allocator);

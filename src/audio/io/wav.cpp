@@ -1,51 +1,9 @@
 #include "wav.h"
 
-#include "../../base/fourcc.h"
+#include "wav_private.h"
 
 namespace Yttrium
 {
-
-enum
-{
-	WAVEFORM_PCM = 1,
-};
-
-#pragma pack(push, 1)
-
-struct WavFileHeader
-{
-	uint32_t riff_fourcc;
-	uint32_t riff_size;
-	uint32_t wave_fourcc;
-};
-
-struct WavChunkHeader
-{
-	uint32_t name_fourcc;
-	uint32_t size;
-};
-
-struct WavFormatChunk
-{
-	uint16_t format;
-	uint16_t channels;
-	uint32_t samples_per_second;
-	uint32_t bytes_per_second;
-	uint16_t block_align;
-	uint16_t bits_per_sample;
-};
-
-#pragma pack(pop)
-
-namespace
-{
-
-const uint32_t FourccRiff   = Fourcc<'R', 'I', 'F', 'F'>::value;
-const uint32_t FourccWave   = Fourcc<'W', 'A', 'V', 'E'>::value;
-const uint32_t FourccFormat = Fourcc<'f', 'm', 't', ' '>::value;
-const uint32_t FourccData   = Fourcc<'d', 'a', 't', 'a'>::value;
-
-} // namespace
 
 bool WavReader::open()
 {
@@ -55,19 +13,19 @@ bool WavReader::open()
 	AudioFormat    format;
 
 	if (!_file.read(&file_header)
-		|| file_header.riff_fourcc != FourccRiff
-		|| file_header.wave_fourcc != FourccWave)
+		|| file_header.riff_fourcc != WavFileHeader::RIFF
+		|| file_header.wave_fourcc != WavFileHeader::WAVE)
 	{
 		return false;
 	}
 
-	if (!find_chunk(FourccFormat, &chunk_header))
+	if (!find_chunk(WavChunkHeader::fmt, &chunk_header))
 	{
 		return false;
 	}
 
 	if (!_file.read(&format_chunk)
-		|| format_chunk.format != WAVEFORM_PCM)
+		|| format_chunk.format != WAVE_FORMAT_PCM)
 	{
 		return false;
 	}
@@ -78,7 +36,7 @@ bool WavReader::open()
 		return false;
 	}
 
-	if (!find_chunk(FourccData, &chunk_header))
+	if (!find_chunk(WavChunkHeader::data, &chunk_header))
 	{
 		return false;
 	}

@@ -12,6 +12,7 @@ namespace Yttrium
 {
 
 class ProxyAllocator;
+class Sound;
 
 /// Audio manager.
 
@@ -56,6 +57,10 @@ public:
 	/// \note The result is valid until the manager is closed.
 
 	StaticString device() const noexcept;
+
+	///
+
+	Sound load_sound(const StaticString &name) noexcept;
 
 	///
 

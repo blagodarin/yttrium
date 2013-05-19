@@ -1,5 +1,6 @@
 #include "commands.h"
 
+#include <Yttrium/audio/sound.h>
 #include <Yttrium/renderer.h>
 #include <Yttrium/script/context.h>
 #include <Yttrium/time.h>
@@ -96,12 +97,14 @@ void Commands::pop_scene(const StaticString &, String *, const ScriptArgs &args)
 {
 	Integer scenes_to_pop = !args.size() ? 1 : args.value(0)->integer();
 
+	_game->_sound.play();
 	if (scenes_to_pop > 0 && !_game->_gui->pop_scenes(scenes_to_pop))
 		_game->_terminal.close();
 }
 
 void Commands::push_scene(const StaticString &, String *, const ScriptArgs &args) noexcept
 {
+	_game->_sound.play();
 	_game->_gui->push_scene(args.string(0));
 }
 

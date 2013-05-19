@@ -2,6 +2,7 @@
 #define __AUDIO_MANAGER_H
 
 #include <Yttrium/audio/manager.h>
+#include <Yttrium/audio/sound.h>
 
 #include "player.h"
 
@@ -10,6 +11,12 @@ namespace Yttrium
 
 class Y_PRIVATE AudioManager::Private
 {
+public:
+
+	StaticString         _backend_name;
+	String               _device_name;
+	AudioPlayer::Private _player_private;
+
 public:
 
 	Private(Allocator *allocator)
@@ -25,9 +32,7 @@ public:
 
 public:
 
-	StaticString         _backend_name;
-	String               _device_name;
-	AudioPlayer::Private _player_private;
+	virtual Sound::Private *create_sound() = 0;
 
 protected:
 

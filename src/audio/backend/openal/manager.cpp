@@ -2,6 +2,8 @@
 
 #include <Yttrium/script/context.h>
 
+#include "sound.h"
+
 namespace Yttrium
 {
 
@@ -22,6 +24,11 @@ OpenAlManager::~OpenAlManager()
 
 	alcDestroyContext(_context);
 	alcCloseDevice(_device);
+}
+
+Sound::Private *OpenAlManager::create_sound()
+{
+	return Y_NEW(_allocator, OpenAlSound)(_allocator);
 }
 
 AudioManager::Devices OpenAlManager::devices()

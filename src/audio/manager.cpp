@@ -3,6 +3,7 @@
 #include <Yttrium/proxy_allocator.h>
 
 #include "backend/manager.h"
+#include "sound.h"
 
 namespace Yttrium
 {
@@ -33,6 +34,24 @@ void AudioManager::close()
 StaticString AudioManager::device() const
 {
 	return _private ? _private->_device_name : StaticString();
+}
+
+Sound AudioManager::load_sound(const StaticString &name)
+{
+	if (Y_LIKELY(_private))
+	{
+		AudioReader reader;
+
+		if (reader.open(name, AudioType::Auto, _allocator))
+		{
+			Sound sound(_private->create_sound());
+
+			if (sound._private->load(&reader))
+				return sound;
+		}
+	}
+
+	return Sound();
 }
 
 bool AudioManager::open(const StaticString &backend, const StaticString &device)

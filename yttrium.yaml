@@ -12,6 +12,7 @@ Yttrium:
     - Add multi-level image support (e.g. textures with mipmaps).
     - Add advanced image loading support (separate header and data loading).
     - Add image pack support (a list of headers with filenames and raw image data offsets).
+    - Make PNG and JPEG support optional.
 
     ION:
     - Make string value retrieval more usable.

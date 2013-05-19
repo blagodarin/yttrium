@@ -4,7 +4,7 @@
 #include <Yttrium/global.h>
 
 #if Y_IS_WINDOWS && !defined(AL_APIENTRY)
-#	define AL_APIENTRY __cdecl
+	#define AL_APIENTRY __cdecl
 #endif
 
 #include <AL/al.h>
