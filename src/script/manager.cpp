@@ -15,7 +15,7 @@ ScriptManager::ScriptManager(Allocator *allocator)
 
 ScriptManager::~ScriptManager()
 {
-	ScriptManagerGuard::leave(this, "Duplicate ScriptManager construction");
+	ScriptManagerGuard::leave(this, "Unmatched ScriptManager destruction");
 }
 
 ScriptManager *ScriptManager::instance()

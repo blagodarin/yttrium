@@ -5,8 +5,8 @@
 namespace Yttrium
 {
 
-OpenAlSound::OpenAlSound(Allocator *allocator)
-	: Private(allocator)
+OpenAlSound::OpenAlSound(const StaticString &name, Allocator *allocator)
+	: Private(name, allocator)
 	, _source(0)
 	, _buffer(0)
 {
@@ -20,10 +20,7 @@ OpenAlSound::~OpenAlSound()
 
 bool OpenAlSound::load(AudioReader *reader)
 {
-	if (Y_UNLIKELY(!reader->is_opened()))
-	{
-		return false;
-	}
+	Y_ASSERT(reader->is_opened());
 
 	const AudioFormat &format = reader->format();
 

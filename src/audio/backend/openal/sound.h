@@ -13,11 +13,11 @@ class OpenAlSound
 {
 public:
 
-	OpenAlSound(Allocator *allocator);
+	OpenAlSound(const StaticString &name, Allocator *allocator);
 
 	~OpenAlSound() override;
 
-private: // Sound::Private
+public: // Sound::Private
 
 	bool load(AudioReader *reader) override;
 

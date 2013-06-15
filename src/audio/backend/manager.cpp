@@ -5,12 +5,7 @@
 namespace Yttrium
 {
 
-namespace
-{
-
-StaticString backend_openal = S("openal");
-
-} //
+const S backend_openal("openal");
 
 AudioManager::Backends AudioManager::backends()
 {

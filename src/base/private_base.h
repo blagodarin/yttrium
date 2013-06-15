@@ -53,14 +53,17 @@ public:
 		return nullptr;
 	}
 
-	static void release(T *object)
+	static bool release(T *object)
 	{
 		Allocator *allocator = object->_allocator;
 
 		if (allocator && !--object->_references)
 		{
 			Y_DELETE(allocator, object);
+			return true;
 		}
+		
+		return false;
 	}
 
 	static void release(T **object_ptr)

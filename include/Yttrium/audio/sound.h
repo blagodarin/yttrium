@@ -9,14 +9,10 @@
 namespace Yttrium
 {
 
-class AudioManager;
-
 /// Sound.
 
 class Y_API Sound
 {
-	friend AudioManager;
-
 public:
 
 	///
@@ -25,17 +21,29 @@ public:
 
 	///
 
+	inline Sound(const StaticString &name, Allocator *allocator = nullptr) noexcept;
+
+	///
+
 	Sound(const Sound &sound) noexcept;
 
 	///
 
-	~Sound() noexcept;
+	inline ~Sound() noexcept;
 
 public:
 
 	///
 
-	inline bool is_valid() const noexcept;
+	void close() noexcept;
+
+	///
+
+	inline bool is_opened() const noexcept;
+
+	///
+
+	bool open(const StaticString &name, Allocator *allocator = nullptr) noexcept;
 
 	///
 
@@ -54,13 +62,6 @@ public:
 private:
 
 	Private *_private;
-
-private:
-
-	Sound(Private *private_)
-		: _private(private_)
-	{
-	}
 };
 
 Sound::Sound() noexcept
@@ -68,7 +69,19 @@ Sound::Sound() noexcept
 {
 }
 
-bool Sound::is_valid() const noexcept
+Sound::Sound(const StaticString &name, Allocator *allocator) noexcept
+	//: Sound() // TODO: Uncomment.
+	: _private(nullptr)
+{
+	open(name, allocator);
+}
+
+Sound::~Sound() noexcept
+{
+	close();
+}
+
+bool Sound::is_opened() const noexcept
 {
 	return _private;
 }

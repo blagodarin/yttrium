@@ -26,9 +26,9 @@ OpenAlManager::~OpenAlManager()
 	alcCloseDevice(_device);
 }
 
-Sound::Private *OpenAlManager::create_sound()
+Sound::Private *OpenAlManager::create_sound(const StaticString &name, Allocator *allocator)
 {
-	return Y_NEW(_allocator, OpenAlSound)(_allocator);
+	return Y_NEW(allocator, OpenAlSound)(name, allocator);
 }
 
 AudioManager::Devices OpenAlManager::devices()

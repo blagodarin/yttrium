@@ -2,11 +2,34 @@
 
 #include <Yttrium/proxy_allocator.h>
 
+#include "../base/instance_guard.h"
 #include "backend/manager.h"
 #include "sound.h"
 
 namespace Yttrium
 {
+
+typedef InstanceGuard<AudioManager::Private> AudioManagerGuard;
+
+AudioManager::Private::Private(Allocator *allocator)
+	: _allocator(allocator)
+	, _device_name(allocator)
+	, _player_private(allocator)
+{
+	AudioManagerGuard::enter(this, "Duplicate AudioManager construction");
+}
+
+AudioManager::Private::~Private()
+{
+	Y_ASSERT(_sounds.empty());
+
+	AudioManagerGuard::leave(this, "Unmatched AudioManager destruction");
+}
+
+AudioManager::Private *AudioManager::Private::instance()
+{
+	return AudioManagerGuard::instance;
+}
 
 AudioManager::AudioManager(Allocator *allocator)
 	: _allocator(Y_NEW(allocator, ProxyAllocator)("audio", allocator))
@@ -34,24 +57,6 @@ void AudioManager::close()
 StaticString AudioManager::device() const
 {
 	return _private ? _private->_device_name : StaticString();
-}
-
-Sound AudioManager::load_sound(const StaticString &name)
-{
-	if (Y_LIKELY(_private))
-	{
-		AudioReader reader;
-
-		if (reader.open(name, AudioType::Auto, _allocator))
-		{
-			Sound sound(_private->create_sound());
-
-			if (sound._private->load(&reader))
-				return sound;
-		}
-	}
-
-	return Sound();
 }
 
 bool AudioManager::open(const StaticString &backend, const StaticString &device)

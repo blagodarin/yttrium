@@ -6,37 +6,36 @@
 
 #include "player.h"
 
+#include <map>
+
 namespace Yttrium
 {
 
 class Y_PRIVATE AudioManager::Private
 {
 public:
+	
+	typedef std::map<String, Sound::Private *> Sounds;
 
-	StaticString         _backend_name;
-	String               _device_name;
-	AudioPlayer::Private _player_private;
-
-public:
-
-	Private(Allocator *allocator)
-		: _device_name(allocator)
-		, _player_private(allocator)
-		, _allocator(allocator)
-	{
-	}
-
-	virtual ~Private()
-	{
-	}
+	Allocator            *_allocator;
+	StaticString          _backend_name;
+	String                _device_name;
+	AudioPlayer::Private  _player_private;
+	Sounds                _sounds;
 
 public:
 
-	virtual Sound::Private *create_sound() = 0;
+	Private(Allocator *allocator);
 
-protected:
+	virtual ~Private();
 
-	Allocator *_allocator;
+public:
+
+	virtual Sound::Private *create_sound(const StaticString &name, Allocator *allocator) = 0;
+
+public:
+
+	static Private *instance();
 };
 
 } // namespace Yttrium
