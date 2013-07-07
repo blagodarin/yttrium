@@ -64,7 +64,6 @@ private:
 	Allocator       *_allocator;
 	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
-	Sound            _sound;
 	Terminal         _terminal;
 	Renderer         _renderer;
 	TextureCachePtr  _texture_cache;

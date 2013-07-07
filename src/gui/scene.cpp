@@ -109,6 +109,7 @@ bool Scene::process_key(Key key, KeyState state)
 
 					if (!action.is_empty())
 					{
+						_focused_widget->play();
 						ScriptManager::instance()->root_context().execute(action);
 					}
 				}

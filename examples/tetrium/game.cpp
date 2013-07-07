@@ -176,8 +176,6 @@ void Game::load_music()
 {
 	_audio.open(); // NOTE: And what if it fails?
 
-	_sound.open("data/sound.wav");
-
 	Ion::Document data(_allocator);
 
 	if (!data.load("data/music.ion"))

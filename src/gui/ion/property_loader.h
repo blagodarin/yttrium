@@ -37,6 +37,8 @@ public: // PropertyLoader
 
 	bool load_size(const StaticString &name, Vector2f *size) override;
 
+	bool load_sound(const StaticString &name, Sound *sound) override;
+
 	bool load_state(const StaticString &name, WidgetState *state) override;
 
 	bool load_text(const StaticString &name, String *text) override;
@@ -52,6 +54,8 @@ public:
 	static bool load_scaling(Scaling *scaling, const Ion::Node &node);
 
 	static bool load_size(Vector2f *size, const Ion::Node &node);
+
+	static bool load_sound(Sound *sound, const Ion::Node &node);
 
 	static bool load_state(WidgetState *state, const Ion::Node &node);
 

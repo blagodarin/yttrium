@@ -1,6 +1,7 @@
 #ifndef __GUI_WIDGETS_BUTTON_H
 #define __GUI_WIDGETS_BUTTON_H
 
+#include <Yttrium/audio/sound.h>
 #include <Yttrium/renderer/texture.h>
 #include <Yttrium/texture_font.h>
 
@@ -24,6 +25,8 @@ public: // Widget
 	void dump(PropertyDumper *dumper) const override;
 
 	bool load(PropertyLoader &loader) override;
+
+	void play() const override;
 
 	void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const override;
 
@@ -49,6 +52,7 @@ private:
 	TextureFont _font;
 	Texture2D   _font_texture;
 	Vector2f    _text_size;
+	Sound       _sound;
 	WidgetState _state;
 	Style       _styles[WidgetStateCount];
 };

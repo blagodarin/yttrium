@@ -6,6 +6,10 @@ namespace Yttrium
 namespace Gui
 {
 
+void Widget::play() const
+{
+}
+
 void Widget::update()
 {
 }

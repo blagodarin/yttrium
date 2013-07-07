@@ -9,6 +9,8 @@
 namespace Yttrium
 {
 
+class Sound;
+
 namespace Gui
 {
 
@@ -29,6 +31,8 @@ public:
 	virtual void dump_scaling(const StaticString &name, Scaling scaling) = 0;
 
 	virtual void dump_size(const StaticString &name, const Vector2f &size) = 0;
+
+	virtual void dump_sound(const StaticString &name, const Sound &sound) = 0;
 
 	virtual void dump_state(const StaticString &name, WidgetState state) = 0;
 

@@ -51,6 +51,8 @@ public:
 
 	virtual bool load(PropertyLoader &loader) = 0;
 
+	virtual void play() const; // TODO: Produce a better solution.
+
 	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const = 0;
 
 	virtual void update();

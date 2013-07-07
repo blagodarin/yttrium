@@ -2,6 +2,7 @@
 
 #include "property_loader.h"
 
+#include <Yttrium/audio/sound.h>
 #include <Yttrium/ion/object.h>
 #include <Yttrium/ion/value.h>
 #include <Yttrium/renderer/texture_cache.h>
@@ -323,6 +324,33 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 	return loaded == 3;
 }
 
+bool IonPropertyLoader::load_sound(const StaticString &name, Sound *sound)
+{
+	Y_LOG_TRACE("[Gui.Loader] Loading sound...");
+
+	const Ion::Node *node;
+
+	if (_bound_object)
+	{
+		node = &_bound_object->last(name);
+		if (node->exists() && load_sound(sound, *node))
+		{
+			return true;
+		}
+	}
+
+	if (_bound_class)
+	{
+		node = &_bound_class->last(name);
+		if (node->exists() && load_sound(sound, *node))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading state...");
@@ -516,6 +544,25 @@ bool IonPropertyLoader::load_scaling(Scaling *scaling, const Ion::Node &node)
 bool IonPropertyLoader::load_size(Vector2f *size, const Ion::Node &node)
 {
 	return read_size(size, node, 0) == 3;
+}
+
+bool IonPropertyLoader::load_sound(Sound *sound, const Ion::Node &node)
+{
+	Ion::Node::ConstRange values = node.values();
+
+	if (values.size() != 1)
+	{
+		return false;
+	}
+
+	const StaticString *value;
+
+	if (!values->get(&value))
+	{
+		return false;
+	}
+
+	return sound->open(*value);
 }
 
 bool IonPropertyLoader::load_state(WidgetState *state, const Ion::Node &node)

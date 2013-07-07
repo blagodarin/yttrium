@@ -36,6 +36,10 @@ void IonPropertyDumper::dump_size(const StaticString &, const Vector2f &)
 {
 }
 
+void IonPropertyDumper::dump_sound(const StaticString &, const Sound &)
+{
+}
+
 void IonPropertyDumper::dump_state(const StaticString &, WidgetState)
 {
 }

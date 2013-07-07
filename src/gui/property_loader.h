@@ -9,6 +9,7 @@
 namespace Yttrium
 {
 
+class Sound;
 class Texture2D;
 class TextureFont;
 
@@ -38,6 +39,8 @@ public:
 	virtual bool load_scaling(const StaticString &name, Scaling *scaling) = 0;
 
 	virtual bool load_size(const StaticString &name, Vector2f *size) = 0;
+
+	virtual bool load_sound(const StaticString &name, Sound *sound) = 0;
 
 	virtual bool load_state(const StaticString &name, WidgetState *state) = 0;
 

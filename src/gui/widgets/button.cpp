@@ -85,6 +85,7 @@ bool Button::load(PropertyLoader &loader)
 	}
 
 	loader.load_text("action", &_action);
+	loader.load_sound("sound", &_sound);
 
 	Style *style = &_styles[WidgetStateType(WidgetState::Active)];
 
@@ -117,6 +118,11 @@ bool Button::load(PropertyLoader &loader)
 	_area = RectF(_position.xy(), _size);
 
 	return true;
+}
+
+void Button::play() const
+{
+	_sound.play();
 }
 
 void Button::render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const

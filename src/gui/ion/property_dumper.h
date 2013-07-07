@@ -31,6 +31,8 @@ public: // PropertyDumper
 
 	void dump_size(const StaticString &name, const Vector2f &size) override;
 
+	void dump_sound(const StaticString &name, const Sound &sound) override;
+
 	void dump_state(const StaticString &name, WidgetState state) override;
 
 	void dump_text(const StaticString &name, const StaticString &text) override;
