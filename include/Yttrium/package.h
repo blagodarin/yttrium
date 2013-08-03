@@ -177,7 +177,7 @@ public:
 
 	/// File search order.
 
-	enum Order // NOTE: 'System*' names don't look the best.
+	enum Order // TODO: Invent better names for 'System*' constants.
 	{
 		PresetOrder, ///< Use the PackageManager order.
 		PackedFirst, ///< Try packed, then system file.

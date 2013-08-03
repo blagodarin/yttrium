@@ -7,6 +7,9 @@
 #include <Yttrium/assert.h>
 #include <Yttrium/types.h>
 
+// TODO: Check whether all functions in this file work with all supported integer representations,
+// documenting the results.
+
 namespace Yttrium
 {
 
@@ -259,8 +262,6 @@ inline uint64_t next_power_of_2(uint64_t x) noexcept
 /// \param x First value.
 /// \param y Second value.
 /// \return \c true if both values have the same sign.
-
-// NOTE: Does it work for all the integer representations? If it does, add a doxy-note about it.
 
 inline bool same_sign(int8_t x, int8_t y) noexcept
 {

@@ -93,7 +93,7 @@ public:
 
 	///
 
-	// NOTE: It may be better to move the backend selection to the Window constructor
+	// TODO: Consider moving the backend selection to Window constructor
 	// because different backends may require different Window internals.
 
 	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept;

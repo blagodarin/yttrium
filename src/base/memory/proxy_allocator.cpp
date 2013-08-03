@@ -54,7 +54,7 @@ ProxyAllocator::ProxyAllocator(const StaticString &name, Allocator *allocator)
 
 ProxyAllocator::~ProxyAllocator()
 {
-	// NOTE: We can't use Y_ASSERT here because it uses logging which may already be shut down,
+	// We can't use Y_ASSERT here because it uses logging which may already be shut down,
 	// so the only remaining way is to write the message to std::cerr.
 
 	const StaticString &name = _private->_name;

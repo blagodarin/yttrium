@@ -217,19 +217,11 @@ void IonLoader::load(const Ion::Object &source)
 
 			Scene *scene = _manager->create_scene(*object_name);
 
-			if (!scene)
+			if (scene)
 			{
-				continue;
+				load_scene(scene, *object);
+				_manager->add_scene(scene, class_name != nullptr);
 			}
-
-			if (!load_scene(scene, *object))
-			{
-				Y_LOG("[Gui.Manager] Can't load scene \"" << *object_name << "\"");
-				_manager->delete_scene(scene);
-				continue;
-			}
-
-			_manager->add_scene(scene, class_name != nullptr);
 		}
 		else if (node.name() == S("on_scene_change"))
 		{
@@ -286,7 +278,7 @@ void IonLoader::load(const Ion::Object &source)
 	}
 }
 
-bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
+void IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 {
 	scene->reserve(source.size());
 
@@ -340,8 +332,6 @@ bool IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 			scene->load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
 		}
 	}
-
-	return true; // NOTE: Useless result.
 }
 
 } // namespace Gui

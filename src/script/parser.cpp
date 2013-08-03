@@ -1,6 +1,6 @@
 #include "parser.h"
 
-#include <Yttrium/script/context.h> // NOTE: Just for execute().
+#include <Yttrium/script/context.h>
 #include <Yttrium/script/value.h>
 
 #include "logging.h"
@@ -23,7 +23,7 @@ enum class ParserState
 ScriptParser::ScriptParser(ScriptContext *context, Allocator *allocator)
 	: _context(context)
 	, _allocator(allocator)
-	, _temporaries(32, _allocator) // NOTE: Magic number!
+	, _temporaries(32, _allocator) // TODO: Get rid of magic numbers.
 {
 }
 

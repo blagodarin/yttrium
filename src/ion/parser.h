@@ -59,12 +59,8 @@ private:
 		RBrace,   // '}'.
 		LBracket, // '['.
 		RBracket, // ']'.
-//		LParen,   // '('.
-//		RParen,   // ')'.
 		Comment,  // '#'.
 	};
-
-	// NOTE: LParen and RParen are reserved for possible future parenthesized string notation.
 
 	static const CharClass char_class[256];
 

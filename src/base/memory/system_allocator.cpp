@@ -5,9 +5,11 @@
 namespace Yttrium
 {
 
+// TODO: Create the SystemAllocator explicitly, in e.g. MemoryManager.
+
 static std::atomic_flag _system_allocator_initialized = ATOMIC_FLAG_INIT;
 
-// NOTE: The SystemAllocator would never be deleted, but this shouldn't be a problem.
+// The SystemAllocator would never be deleted, but this shouldn't be a problem.
 
 static char _system_allocator_buffer[sizeof(SystemAllocatorImpl)];
 

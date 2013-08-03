@@ -138,7 +138,7 @@ Node *Object::append(const StaticString &name, const ByReference &)
 {
 	Node *node = _document->_private->new_node(name, ByReference());
 	_nodes.push_back(node);
-	_node_map[node->_name].push_back(node); // NOTE: Possible Allocator-less String construction.
+	_node_map[node->_name].push_back(node);
 	return node;
 }
 

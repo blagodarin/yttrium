@@ -4,7 +4,7 @@
 
 #include <cstdlib> // free, malloc, realloc
 
-// NOTE: The current implementation lamely uses CRT memory allocation routines.
+// TODO: Consider implementing custom allocator instead of using the standard one.
 
 namespace Yttrium
 {

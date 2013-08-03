@@ -66,6 +66,7 @@ void ImageFormat::set_row_alignment(size_t alignment)
 		_row_alignment = alignment;
 		_row_size = aligned_row_size(_width, _bits_per_pixel, alignment);
 	}
+	// TODO: Think of a better behavior on trying to set an invalid alignment than just ignoring to change anything.
 }
 
 void ImageFormat::set_width(size_t width)
@@ -73,6 +74,8 @@ void ImageFormat::set_width(size_t width)
 	_width = width;
 	_row_size = aligned_row_size(width, _bits_per_pixel, _row_alignment);
 }
+
+// TODO: Add a function to set width and alignment simultaneously (and more efficiently) to use in Image::set_size.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -242,7 +245,7 @@ void Image::set_size(size_t width, size_t height, size_t row_alignment)
 	_format.set_height(height);
 	_format.set_width(width);
 	if (row_alignment)
-		_format.set_row_alignment(row_alignment); // NOTE: This could be merged with the previous call.
+		_format.set_row_alignment(row_alignment);
 	_buffer.resize(_format.frame_size());
 }
 
@@ -288,10 +291,10 @@ bool Image::swap_channels()
 
 bool Image::operator ==(const Image &image) const
 {
-	// NOTE: This implementation relies on equal padding data (if any).
+	// This implementation relies on equal padding data (if any).
 
 	return _format == image._format
-		&& _buffer == image._buffer; // NOTE: That may work wrong for our capacity-less buffers.
+		&& _buffer == image._buffer; // TODO: Fix the capacity-less buffer comparison.
 }
 
 } // namespace Yttrium

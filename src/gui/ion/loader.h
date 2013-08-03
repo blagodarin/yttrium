@@ -26,7 +26,7 @@ private:
 
 	void load(const Ion::Object &source);
 
-	bool load_scene(Scene *scene, const Ion::Object &source) const;
+	void load_scene(Scene *scene, const Ion::Object &source) const;
 
 private:
 

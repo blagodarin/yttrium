@@ -120,7 +120,7 @@ const char *bind_names[] =
 	"f10",
 	"f11",
 	"f12",
-	"f13", // NOTE: Keys kF13 to kF24 currently can't be bound.
+	"f13",
 	"f14",
 	"f15",
 	"f16",

@@ -13,9 +13,7 @@ BOOST_AUTO_TEST_CASE(gui_test)
 {
 	MemoryManager memory_manager;
 
-	// NOTE: Unfortunately, GUI manager requires log in case something goes wrong.
-
-	LogManager log_manager("test_gui.log");
+	LogManager log_manager("test_gui.log"); // Unfortunately, GUI manager requires log in case something goes wrong.
 
 	File file(File::Temporary);
 

@@ -12,7 +12,7 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	, _is_opened(false)
 	, _is_active(false)
 	, _is_cursor_locked(false)
-	, _size(320, 240) // NOTE: Magic default.
+	, _size(320, 240) // TODO: Get rid of magic defaults.
 	, _mode(Windowed)
 	, _callbacks(callbacks)
 	, _console(*this, _allocator)
@@ -23,7 +23,7 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 
 Terminal::~Terminal()
 {
-	close(); // NOTE: Is this enough?
+	close(); // TODO: Find out whether this is enough to terminate everything properly.
 }
 
 void Terminal::close()

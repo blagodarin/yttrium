@@ -11,14 +11,14 @@ namespace Yttrium
 ScriptContext::ScriptContext(Allocator *allocator)
 	: _allocator(allocator)
 	, _parent(nullptr)
-	, _values(32, _allocator) // NOTE: Magic number!
+	, _values(32, _allocator) // TODO: Get rid of magic numbers.
 {
 }
 
 ScriptContext::ScriptContext(ScriptContext *parent, Allocator *allocator)
 	: _allocator(allocator ? allocator : parent->_allocator)
 	, _parent(parent)
-	, _values(32, _allocator) // NOTE: Magic number!
+	, _values(32, _allocator) // TODO: Get rid of magic numbers.
 {
 }
 

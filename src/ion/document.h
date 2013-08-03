@@ -22,10 +22,11 @@ public:
 		: _document(document)
 		, _allocator(allocator)
 		, _buffer(allocator)
-		, _objects(32, allocator) // NOTE: Magic value!
-		, _nodes(32, allocator) // NOTE: Magic value!
-		, _values(32, allocator) // NOTE: Magic value!
+		, _objects(32, allocator)
+		, _nodes(32, allocator)
+		, _values(32, allocator)
 	{
+		// TODO: Get rid of magic numbers above.
 	}
 
 	~Private()

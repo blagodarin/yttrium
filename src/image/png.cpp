@@ -138,12 +138,14 @@ bool PngWriter::write(const void *buffer)
 		transforms |= PNG_TRANSFORM_BGR;
 	}
 
+	// TODO: Don't forget not to swap bytes on a big endian target platform if one appears.
+
 	switch (_format.pixel_format())
 	{
 	case PixelFormat::Gray:
 
 		if (_format.bits_per_pixel() > 8)
-			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 		color_type = PNG_COLOR_TYPE_GRAY;
 		break;
 
@@ -151,7 +153,7 @@ bool PngWriter::write(const void *buffer)
 	case PixelFormat::AlphaGray:
 
 		if (_format.bits_per_pixel() > 16)
-			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 		color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
 		break;
 
@@ -159,7 +161,7 @@ bool PngWriter::write(const void *buffer)
 	case PixelFormat::Bgr:
 
 		if (_format.bits_per_pixel() > 24)
-			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 		color_type = PNG_COLOR_TYPE_RGB;
 		break;
 
@@ -169,7 +171,7 @@ bool PngWriter::write(const void *buffer)
 	case PixelFormat::Abgr:
 
 		if (_format.bits_per_pixel() > 32)
-			transforms |= PNG_TRANSFORM_SWAP_ENDIAN; // NOTE: And if we're Big Endian?
+			transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 		break;
 	}

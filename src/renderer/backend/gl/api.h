@@ -229,21 +229,21 @@ GLFUNCTION(PushClientAttrib, GLvoid, (GLbitfield))
 GLFUNCTION(TexCoordPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
 GLFUNCTION(VertexPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
 
-GLEXTENSION(ARB_texture_non_power_of_two) // NOTE: Core OpenGL 2.0 and higher.
+GLEXTENSION(ARB_texture_non_power_of_two) // Core OpenGL 2.0 and higher.
 	GLEND
 
-GLEXTENSION(ARB_texture_rectangle) // NOTE: Core OpenGL 3.1 and higher.
+GLEXTENSION(ARB_texture_rectangle) // Core OpenGL 3.1 and higher.
 	GLINTEGER(MAX_RECTANGLE_TEXTURE_SIZE_ARB)
 	GLEND
 
-GLEXTENSION(ARB_vertex_array_object) // NOTE: Core OpenGL 2.0 and higher.
+GLEXTENSION(ARB_vertex_array_object) // Core OpenGL 2.0 and higher.
 	GLEXTFUNC(BindVertexArray, GLvoid, (GLuint))
 	GLEXTFUNC(DeleteVertexArrays, GLvoid, (GLsizei, const GLuint *))
 	GLEXTFUNC(GenVertexArrays, GLvoid, (GLsizei, GLuint *))
 	GLEXTFUNC(IsVertexArray, GLboolean, (GLuint))
 	GLEND
 
-GLEXTENSION(ARB_vertex_buffer_object) // NOTE: Core OpenGL 1.5 and higher.
+GLEXTENSION(ARB_vertex_buffer_object) // Core OpenGL 1.5 and higher.
 	GLEXTFUNC(BindBufferARB, GLvoid, (GLenum, GLuint))
 	GLEXTFUNC(BufferDataARB, GLvoid, (GLenum, GLsizeiptrARB, const GLvoid *, GLenum))
 	GLEXTFUNC(BufferSubDataARB, GLvoid, (GLenum, GLintptrARB, GLsizeiptrARB, const GLvoid *))
@@ -257,7 +257,7 @@ GLEXTENSION(ARB_vertex_buffer_object) // NOTE: Core OpenGL 1.5 and higher.
 	GLEXTFUNC(UnmapBufferARB, GLboolean, (GLenum))
 	GLEND
 
-GLEXTENSION(ARB_framebuffer_object) // NOTE: Core OpenGL 3.0 and higher.
+GLEXTENSION(ARB_framebuffer_object) // Core OpenGL 3.0 and higher.
 	GLEXTFUNC(BindFramebuffer, GLvoid, (GLenum, GLuint))
 	GLEXTFUNC(BindRenderbuffer, GLvoid, (GLenum, GLuint))
 	GLEXTFUNC(BlitFramebuffer, GLvoid, (GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLbitfield, GLenum))

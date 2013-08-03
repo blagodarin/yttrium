@@ -76,11 +76,6 @@ Scene *ManagerImpl::create_scene(const StaticString &name)
 	return scene;
 }
 
-void ManagerImpl::delete_scene(Scene *scene)
-{
-	Y_DELETE(&_proxy_allocator, scene);
-}
-
 const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
 {
 	Fonts::const_iterator i = _fonts.find(String(name, ByReference()));
@@ -257,6 +252,11 @@ void ManagerImpl::change_scene(const StaticString &old_scene, const StaticString
 	{
 		ScriptManager::instance()->root_context().execute(i->second);
 	}
+}
+
+void ManagerImpl::delete_scene(Scene *scene)
+{
+	Y_DELETE(&_proxy_allocator, scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -236,14 +236,18 @@ AlwaysBuild('test')
 # Tools
 #-------------------------------------------------------------------------------
 
-Alias('tools', BuildSources(env, 'tools', ['ypq']))
+Alias('tools', BuildSources(env, 'tools', [
+	'generate-sounds',
+	'generate-test-images',
+	'ypq']))
 Clean('tools', Dir('$BUILD/tools'))
 
 #-------------------------------------------------------------------------------
 # Examples
 #-------------------------------------------------------------------------------
 
-Alias('examples', BuildSources(env, 'examples', ['tetrium']))
+Alias('examples', BuildSources(env, 'examples', [
+	'tetrium']))
 Clean('examples', Dir('$BUILD/examples'))
 
 #===============================================================================

@@ -762,7 +762,7 @@ char *String::init(size_t buffer_size)
 {
 	Y_ASSERT(!_buffer_size);
 
-	if (Y_UNLIKELY(!_allocator)) // NOTE: Rely on this at your own risk.
+	if (Y_UNLIKELY(!_allocator)) // Rely on this at your own risk.
 	{
 		return _text;
 	}

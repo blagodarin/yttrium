@@ -76,7 +76,7 @@ void Label::render(Renderer *renderer, const RectF &area, const Vector2f &scale,
 
 void Label::update()
 {
-	_final_text.clear(); // NOTE: Maybe move this into substitute()?
+	_final_text.clear(); // TODO: Consider moving this into substitute().
 	ScriptContext::global().substitute(&_final_text, _text);
 	update_area(_final_text);
 }

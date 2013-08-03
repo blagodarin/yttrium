@@ -9,14 +9,14 @@
 namespace Yttrium
 {
 
+// TODO: Add big endian FOURCC support should a BE target platform appear.
+
 /// Four character code (FOURCC) construction helper.
 
 template <UChar c0, UChar c1, UChar c2, UChar c3>
 class Fourcc
 {
 public:
-
-	// NOTE: This is little-endian only!
 
 	static const uint32_t value = c0 | static_cast<uint32_t>(c1) << 8
 		| static_cast<uint32_t>(c2) << 16 | static_cast<uint32_t>(c3) << 24;
@@ -28,8 +28,6 @@ template <UChar c0, UChar c1, UChar c2, UChar c3, UChar c4, UChar c5, UChar c6, 
 class Eightcc
 {
 public:
-
-	// NOTE: This is little-endian only!
 
 	static const uint64_t value = c0 | static_cast<uint64_t>(c1) << 8
 		| static_cast<uint64_t>(c2) << 16 | static_cast<uint64_t>(c3) << 24

@@ -63,8 +63,6 @@ public:
 
 	Scene *create_scene(const StaticString &name);
 
-	void delete_scene(Scene *scene);
-
 	const FontDesc *font(const StaticString &name) const;
 
 	inline Allocator *internal_allocator() const;
@@ -104,6 +102,8 @@ public: // Manager.
 private:
 
 	void change_scene(const StaticString &old_scene, const StaticString &new_scene);
+
+	void delete_scene(Scene *scene);
 
 	bool load(const StaticString &name, bool internal);
 

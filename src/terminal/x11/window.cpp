@@ -12,8 +12,8 @@ namespace
 
 bool check_glx_version(::Display *display, int major, int minor)
 {
-	int glx_major;
-	int glx_minor;
+	int glx_major = 0;
+	int glx_minor = 0;
 
 	return glXQueryVersion(display, &glx_major, &glx_minor)
 		&& glx_major == major // GLX 2.0 may be completely different from GLX 1.x.
@@ -46,7 +46,7 @@ Window::Private::Private(const Screen &screen, ::Display *display, int x_screen,
 	, _wm_protocols(XInternAtom(display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(XInternAtom(display, "WM_DELETE_WINDOW", True))
 	, _glx_context(glx_context)
-	, _size(320, 240) // NOTE: Magic default.
+	, _size(320, 240) // TODO: Get rid of magic numbers.
 	, _renderer(nullptr)
 {
 	::XSetWMProtocols(display, window, &_wm_delete_window, 1);
@@ -71,7 +71,10 @@ void Window::Private::close()
 
 bool Window::Private::create_window(::Display *display, int screen, ::Window *window, ::GLXContext *glx_context)
 {
-	if (!check_glx_version(display, 1, 3)) // For GLXFBConfig.
+	// GLXFBConfig API requires GLX 1.3.
+	// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
+
+	if (!check_glx_version(display, 1, 4))
 		return false;
 
 	const int attributes[] =
@@ -122,7 +125,7 @@ bool Window::Private::create_window(::Display *display, int screen, ::Window *wi
 	if (!vi)
 		return false;
 
-	screen = vi->screen; // NOTE: Why?
+	screen = vi->screen; // TODO: Understand, why.
 
 	*glx_context = ::glXCreateContext(display, vi, nullptr, True);
 
@@ -138,7 +141,7 @@ bool Window::Private::create_window(::Display *display, int screen, ::Window *wi
 			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
 
 			*window = ::XCreateWindow(display, RootWindow(display, screen),
-				0, 0, 320, 240, 0, vi->depth, InputOutput, vi->visual, // NOTE: Magic default.
+				0, 0, 320, 240, 0, vi->depth, InputOutput, vi->visual, // TODO: Get rid of magic numbers.
 				CWBorderPixel | CWColormap | CWEventMask, &swa);
 
 			if (*window != None)
@@ -259,7 +262,7 @@ bool Window::get_cursor(Dim2 *cursor)
 		return false;
 	}
 
-	// NOTE: Don't know if I need all of these.
+	// TODO: Find out whether all the arguments must be non-nullptr.
 
 	::Window root_return, child_return;
 	int root_x_return, root_y_return;
@@ -474,7 +477,7 @@ void Window::show(ShowMode mode)
 	case Focus:
 
 		::XMapRaised(_private->_display, _private->_window);
-		//::XSetInputFocus(_private->_display, _private->_window, RevertToNone, CurrentTime);
+		//::XSetInputFocus(_private->_display, _private->_window, RevertToNone, CurrentTime); // TODO: Uncomment or remove.
 		break;
 
 	default:
