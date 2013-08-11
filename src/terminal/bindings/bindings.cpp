@@ -266,7 +266,7 @@ Bindings::Map Bindings::map() const
 {
 	Map result;
 
-	for (size_t i = 0; i < KeyType(Key::__Count); ++i)
+	for (size_t i = 0; i < KeyCount; ++i)
 	{
 		if (bind_names[i][0] && !_actions[i].is_empty())
 		{

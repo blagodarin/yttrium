@@ -188,8 +188,12 @@ enum class Key: KeyType
 
 	// - Unassigned keys (0x90 - 0xFF).
 
-	__Last = WheelRight,
 	__Count,
+};
+
+enum: KeyType
+{
+	KeyCount = Key::__Count, ///< Number of keys defined.
 };
 
 /// Input key state.

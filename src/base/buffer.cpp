@@ -7,14 +7,14 @@
 namespace Yttrium
 {
 
-Buffer::Buffer(const Buffer &buffer, Allocator* allocator)
+Buffer::Buffer(const Buffer &buffer, Allocator *allocator)
 	: _data(buffer._size ? allocator->allocate(buffer._size) : nullptr)
 	, _size(buffer._size)
 	, _allocator(allocator)
 {
 }
 
-Buffer::Buffer(size_t size, Allocator* allocator)
+Buffer::Buffer(size_t size, Allocator *allocator)
 	: _data(size ? allocator->allocate(size) : nullptr)
 	, _size(size)
 	, _allocator(allocator)
@@ -65,14 +65,14 @@ void Buffer::swap(Buffer &&buffer)
 	buffer._allocator = allocator;
 }
 
-bool Buffer::operator ==(const Buffer& buffer) const
+bool Buffer::operator ==(const Buffer &buffer) const
 {
-	return (_size == buffer._size && !memcmp(_data, buffer._data, _size));
+	return (_size == buffer._size && !::memcmp(_data, buffer._data, _size));
 }
 
-bool Buffer::operator !=(const Buffer& buffer) const
+bool Buffer::operator !=(const Buffer &buffer) const
 {
-	return (_size != buffer._size || memcmp(_data, buffer._data, _size));
+	return (_size != buffer._size || ::memcmp(_data, buffer._data, _size));
 }
 
 } // namespace Yttrium

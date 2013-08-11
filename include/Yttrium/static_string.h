@@ -84,7 +84,7 @@ public:
 
 	/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
 
-	String escaped(const char *symbols, char with, Allocator* allocator = DefaultAllocator) const noexcept;
+	String escaped(const char *symbols, char with, Allocator *allocator = DefaultAllocator) const noexcept;
 
 	///
 

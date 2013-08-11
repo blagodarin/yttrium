@@ -20,7 +20,7 @@ bool check_glx_version(::Display *display, int major, int minor)
 		&& glx_minor >= minor;
 }
 
-void fix_window_size(::Display *display, ::Window window, const Dim2& size)
+void fix_window_size(::Display *display, ::Window window, const Dim2 &size)
 {
 	::XSizeHints size_hints;
 

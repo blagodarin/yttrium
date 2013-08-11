@@ -46,7 +46,7 @@ public:
 
 	///
 
-	StaticString string(const StaticString& default_value = StaticString()) const noexcept;
+	StaticString string(const StaticString &default_value = StaticString()) const noexcept;
 
 private:
 

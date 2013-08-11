@@ -69,7 +69,7 @@ public:
 private:
 
 	Allocator *_allocator;
-	String     _actions[KeyType(Key::__Count)];
+	String     _actions[KeyCount];
 };
 
 } // namespace Yttrium

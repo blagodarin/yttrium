@@ -10,6 +10,7 @@
 #include <Yttrium/bindings.h>
 #include <Yttrium/buffer.h>
 #include <Yttrium/condition.h>
+#include <Yttrium/dir.h>
 #include <Yttrium/file.h>
 #include <Yttrium/global.h>
 #include <Yttrium/gui.h>

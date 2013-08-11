@@ -195,7 +195,7 @@ private:
 	bool       _is_cursor_locked;
 	Dim2       _size;
 	Mode       _mode;
-	KeyState   _keys[KeyType(Key::__Count)];
+	KeyState   _keys[KeyCount];
 	Callbacks *_callbacks;
 	Console    _console;
 	bool       _is_console_visible;

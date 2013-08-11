@@ -336,9 +336,9 @@ size_t StaticString::count(const char *symbols) const
 
 	const char *end = _text + _size;
 
-	for (const char* i = _text; i != end; ++i)
+	for (const char *i = _text; i != end; ++i)
 	{
-		for (const char* j = symbols; *j; ++j)
+		for (const char *j = symbols; *j; ++j)
 		{
 			if (*i == *j)
 			{
@@ -351,7 +351,7 @@ size_t StaticString::count(const char *symbols) const
 	return result;
 }
 
-String StaticString::escaped(const char *symbols, char with, Allocator* allocator) const
+String StaticString::escaped(const char *symbols, char with, Allocator *allocator) const
 {
 	String result(_size, allocator); // Best case assumption.
 

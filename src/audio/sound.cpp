@@ -16,9 +16,10 @@ void Sound::close()
 	{
 		// NOTE: Lock mutex here for the sound closing to become thread safe.
 
+		const String &name = _private->name();
 		if (Private::release(_private))
 		{
-			AudioManager::Private::instance()->_sounds.erase(_private->name());
+			AudioManager::Private::instance()->_sounds.erase(name);
 		}
 
 		// NOTE: Unlock the thread safety mutex here.
@@ -61,9 +62,8 @@ bool Sound::open(const StaticString &name, Allocator *allocator)
 
 	if (Y_UNLIKELY(!_private->load(&reader)))
 	{
-		// NOTE: Unlock the thread safety mutex here.
-
-		close();
+		Private::release(_private);
+		_private = nullptr;
 		return false;
 	}
 
