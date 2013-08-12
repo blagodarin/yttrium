@@ -8,20 +8,25 @@
 namespace Yttrium
 {
 
+class OpenAlManager;
+
 class OpenAlSound
-	: public Sound::Private
+	: public SoundImpl
 {
+	friend OpenAlManager;
+
 public:
 
-	OpenAlSound(const StaticString &name, Allocator *allocator);
+	void play() const noexcept override;
 
-	~OpenAlSound() override;
+private:
 
-public: // Sound::Private
+	OpenAlSound(const StaticString &name, Allocator *allocator)
+		: SoundImpl(name, allocator), _source(0), _buffer(0) {}
+
+	~OpenAlSound() noexcept override;
 
 	bool load(AudioReader *reader) override;
-
-	void play() override;
 
 private:
 

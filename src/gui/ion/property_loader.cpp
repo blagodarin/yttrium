@@ -324,7 +324,7 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 	return loaded == 3;
 }
 
-bool IonPropertyLoader::load_sound(const StaticString &name, Sound *sound)
+SoundPtr IonPropertyLoader::load_sound(const StaticString &name)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading sound...");
 
@@ -333,22 +333,18 @@ bool IonPropertyLoader::load_sound(const StaticString &name, Sound *sound)
 	if (_bound_object)
 	{
 		node = &_bound_object->last(name);
-		if (node->exists() && load_sound(sound, *node))
-		{
-			return true;
-		}
+		if (node->exists())
+			return load_sound(*node);
 	}
 
 	if (_bound_class)
 	{
 		node = &_bound_class->last(name);
-		if (node->exists() && load_sound(sound, *node))
-		{
-			return true;
-		}
+		if (node->exists())
+			return load_sound(*node);
 	}
 
-	return false;
+	return SoundPtr();
 }
 
 bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
@@ -546,23 +542,19 @@ bool IonPropertyLoader::load_size(Vector2f *size, const Ion::Node &node)
 	return read_size(size, node, 0) == 3;
 }
 
-bool IonPropertyLoader::load_sound(Sound *sound, const Ion::Node &node)
+SoundPtr IonPropertyLoader::load_sound(const Ion::Node &node)
 {
 	Ion::Node::ConstRange values = node.values();
 
 	if (values.size() != 1)
-	{
-		return false;
-	}
+		return SoundPtr();
 
 	const StaticString *value;
 
 	if (!values->get(&value))
-	{
-		return false;
-	}
+		return SoundPtr();
 
-	return sound->open(*value);
+	return Sound::open(*value);
 }
 
 bool IonPropertyLoader::load_state(WidgetState *state, const Ion::Node &node)

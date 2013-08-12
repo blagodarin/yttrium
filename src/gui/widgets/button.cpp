@@ -85,7 +85,7 @@ bool Button::load(PropertyLoader &loader)
 	}
 
 	loader.load_text("action", &_action);
-	loader.load_sound("sound", &_sound);
+	_sound = loader.load_sound("sound");
 
 	Style *style = &_styles[WidgetStateType(WidgetState::Active)];
 
@@ -122,7 +122,10 @@ bool Button::load(PropertyLoader &loader)
 
 void Button::play() const
 {
-	_sound.play();
+	if (Y_LIKELY(!_sound.is_null()))
+	{
+		_sound->play();
+	}
 }
 
 void Button::render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const

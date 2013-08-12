@@ -4,87 +4,53 @@
 #ifndef __Y_AUDIO_SOUND_H
 #define __Y_AUDIO_SOUND_H
 
-#include <Yttrium/static_string.h>
+#include <Yttrium/object.h>
+#include <Yttrium/string.h>
 
 namespace Yttrium
 {
 
+class Sound;
+
+/// Sound pointer.
+
+typedef ObjectPointer<Sound> SoundPtr;
+
 /// Sound.
 
 class Y_API Sound
+	: public Object
 {
 public:
 
-	///
+	/// Return the sound name.
+	/// \return %Sound name.
 
-	inline Sound() noexcept;
+	String name() const noexcept { return _name; }
 
-	///
+	/// Play the sound.
 
-	inline Sound(const StaticString &name, Allocator *allocator = nullptr) noexcept;
-
-	///
-
-	Sound(const Sound &sound) noexcept;
-
-	///
-
-	inline ~Sound() noexcept;
+	virtual void play() const noexcept = 0;
 
 public:
 
-	///
+	/// Open a sound.
+	/// \param name %Sound name.
+	/// \param allocator %Allocator.
+	/// \return %Sound pointer.
 
-	void close() noexcept;
+	static SoundPtr open(const StaticString &name, Allocator *allocator = nullptr) noexcept;
 
-	///
+protected:
 
-	inline bool is_opened() const noexcept;
+	Sound(const StaticString &name, Allocator *allocator) noexcept: Object(allocator), _name(name, allocator) {}
 
-	///
+	virtual ~Sound() noexcept {}
 
-	bool open(const StaticString &name, Allocator *allocator = nullptr) noexcept;
+protected:
 
-	///
-
-	void play() const noexcept;
-
-public:
-
-	///
-
-	Sound &operator =(const Sound &sound) noexcept;
-
-public:
-
-	class Private;
-
-private:
-
-	Private *_private;
+	const String _name;
 };
-
-Sound::Sound() noexcept
-	: _private(nullptr)
-{
-}
-
-Sound::Sound(const StaticString &name, Allocator *allocator) noexcept
-	//: Sound() // TODO: Uncomment.
-	: _private(nullptr)
-{
-	open(name, allocator);
-}
-
-Sound::~Sound() noexcept
-{
-	close();
-}
-
-bool Sound::is_opened() const noexcept
-{
-	return _private;
-}
 
 } // namespace Yttrium
 

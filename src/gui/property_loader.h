@@ -1,7 +1,7 @@
 #ifndef __GUI_PROPERTY_LOADER_H
 #define __GUI_PROPERTY_LOADER_H
 
-#include <Yttrium/static_string.h>
+#include <Yttrium/audio/sound.h>
 #include <Yttrium/vector.h>
 
 #include "types.h"
@@ -40,7 +40,7 @@ public:
 
 	virtual bool load_size(const StaticString &name, Vector2f *size) = 0;
 
-	virtual bool load_sound(const StaticString &name, Sound *sound) = 0;
+	virtual SoundPtr load_sound(const StaticString &name) = 0;
 
 	virtual bool load_state(const StaticString &name, WidgetState *state) = 0;
 

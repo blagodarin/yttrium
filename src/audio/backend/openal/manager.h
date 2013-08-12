@@ -19,7 +19,7 @@ public:
 
 public:
 
-	Sound::Private *create_sound(const StaticString &name, Allocator *allocator) override;
+	SoundImpl *create_sound(const StaticString &name, Allocator *allocator) override;
 
 public:
 

@@ -11,11 +11,13 @@
 namespace Yttrium
 {
 
+class SoundImpl;
+
 class Y_PRIVATE AudioManager::Private
 {
 public:
 	
-	typedef std::map<String, Sound::Private *> Sounds;
+	typedef std::map<String, Sound *> Sounds;
 
 	Allocator            *_allocator;
 	StaticString          _backend_name;
@@ -31,7 +33,7 @@ public:
 
 public:
 
-	virtual Sound::Private *create_sound(const StaticString &name, Allocator *allocator) = 0;
+	virtual SoundImpl *create_sound(const StaticString &name, Allocator *allocator) = 0;
 
 public:
 

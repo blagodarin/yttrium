@@ -52,7 +52,7 @@ private:
 	TextureFont _font;
 	Texture2D   _font_texture;
 	Vector2f    _text_size;
-	Sound       _sound;
+	SoundPtr    _sound;
 	WidgetState _state;
 	Style       _styles[WidgetStateCount];
 };

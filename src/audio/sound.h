@@ -2,45 +2,23 @@
 #define __AUDIO_SOUND_H
 
 #include <Yttrium/audio/sound.h>
-#include <Yttrium/string.h>
-
-#include "../base/private_base.h"
 
 namespace Yttrium
 {
 
 class AudioReader;
 
-class Y_PRIVATE Sound::Private
-	: public PrivateBase<Sound::Private>
+class SoundImpl
+	: public Sound
 {
-public:
-
-	Private(const StaticString &name, Allocator *allocator)
-		: PrivateBase(allocator)
-		, _name(name, allocator)
-	{
-	}
-
-	virtual ~Private() {}
-
 public:
 
 	virtual bool load(AudioReader *reader) = 0;
 
-	inline String name() const;
+protected:
 
-	virtual void play() = 0;
-
-private:
-
-	String _name;
+	SoundImpl(const StaticString &name, Allocator *allocator): Sound(name, allocator) {}
 };
-
-String Sound::Private::name() const
-{
-	return _name;
-}
 
 } // namespace Yttrium
 

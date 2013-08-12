@@ -146,12 +146,11 @@ Object::Pointer::Pointer() noexcept
 }
 
 Object::Pointer::Pointer(const Pointer &pointer) noexcept
+	//: Pointer(pointer._object) // TODO: Uncomment.
 	: _object(pointer._object)
 {
-	if (_object)
-	{
+	if (Y_LIKELY(_object))
 		++_object->_counter;
-	}
 }
 
 Object::Pointer::Pointer(Pointer &&pointer) noexcept
@@ -163,6 +162,8 @@ Object::Pointer::Pointer(Pointer &&pointer) noexcept
 Object::Pointer::Pointer(Object *object) noexcept
 	: _object(object)
 {
+	if (Y_LIKELY(_object))
+		++_object->_counter;
 }
 
 Object::Pointer::~Pointer() noexcept
@@ -199,7 +200,7 @@ Allocator *Object::allocator() const noexcept
 
 Object::Object(Allocator *allocator) noexcept
 	: _allocator(allocator)
-	, _counter(1)
+	, _counter(0)
 {
 }
 
