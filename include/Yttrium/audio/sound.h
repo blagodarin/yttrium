@@ -45,8 +45,6 @@ protected:
 
 	Sound(const StaticString &name, Allocator *allocator) noexcept: Object(allocator), _name(name, allocator) {}
 
-	virtual ~Sound() noexcept {}
-
 protected:
 
 	const String _name;

@@ -15,6 +15,9 @@ public:
 
 	Private(Allocator *allocator)
 		: PrivateBase(allocator)
+		, _offset(0)
+		, _size(0)
+		, _atom_size(0)
 	{
 	}
 

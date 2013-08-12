@@ -147,6 +147,7 @@ bool Window::Private::create_window(::Display *display, int screen, ::Window *wi
 			if (*window != None)
 			{
 				::glXMakeCurrent(display, *window, *glx_context);
+				::XFree(vi);
 				return true;
 			}
 
