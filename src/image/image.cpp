@@ -8,6 +8,8 @@
 #include "png.h"
 #include "tga.h"
 
+#include <Yttrium/log.h>
+
 namespace Yttrium
 {
 
@@ -166,12 +168,13 @@ bool Image::load(const StaticString &name, ImageType type)
 	}
 
 	ImageReader *reader = nullptr;
+	Allocator *const allocator = _buffer.allocator();
 
 	switch (type)
 	{
-	case ImageType::Tga:  reader = Y_NEW(_buffer.allocator(), TgaReader)(_buffer.allocator()); break;
-	case ImageType::Jpeg: reader = Y_NEW(_buffer.allocator(), JpegReader)(_buffer.allocator()); break;
-	case ImageType::Dds:  reader = Y_NEW(_buffer.allocator(), DdsReader)(_buffer.allocator()); break;
+	case ImageType::Tga:  reader = Y_NEW(allocator, TgaReader)(allocator); break;
+	case ImageType::Jpeg: reader = Y_NEW(allocator, JpegReader)(allocator); break;
+	case ImageType::Dds:  reader = Y_NEW(allocator, DdsReader)(allocator); break;
 	default:              break;
 	}
 
@@ -179,14 +182,14 @@ bool Image::load(const StaticString &name, ImageType type)
 
 	if (Y_LIKELY(reader))
 	{
-		if (Y_LIKELY(reader->_file.open(name, reader->_allocator)
+		if (Y_LIKELY(reader->_file.open(name, allocator)
 			&& reader->open()))
 		{
 			_format = reader->_format;
 			_buffer.resize(_format.frame_size());
 			result = reader->read(_buffer.data());
 		}
-		Y_DELETE(reader->_allocator, reader);
+		Y_DELETE(allocator, reader);
 	}
 
 	return result;

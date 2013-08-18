@@ -13,13 +13,16 @@ namespace Yttrium
 
 File::Private::~Private()
 {
-	::close(descriptor);
-
-	if (Y_UNLIKELY(auto_remove) && Y_UNLIKELY(::unlink(name.const_text())))
+	if (descriptor != -1) // The descriptor is invalid for unopen StaticFiles.
 	{
-		// This must be something strange (EIO or ENOMEM).
+		::close(descriptor);
 
-		Y_ABORT("Failed to remove a file");
+		if (Y_UNLIKELY(auto_remove) && Y_UNLIKELY(::unlink(name.const_text())))
+		{
+			// This must be something strange (EIO or ENOMEM).
+
+			Y_ABORT("Failed to remove a file");
+		}
 	}
 }
 
@@ -44,29 +47,20 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 	}
 
 	if ((mode & (Write | Pipe | Truncate)) == (Write | Truncate))
-	{
 		flags |= O_TRUNC;
-	}
 
-	int descriptor = Private::open(name, flags, allocator);
-
+	const int descriptor = Private::open(name, flags, allocator);
 	if (descriptor == -1)
-	{
 		return false;
-	}
 
 	if (!_private)
-	{
 		_private = Y_NEW(allocator, Private)(allocator);
-	}
 
 	_private->descriptor = descriptor;
 	_private->mode = mode;
 
-	if ((_private->mode & (Read | Write | Pipe)) == Read)
-	{
+	if ((mode & (Read | Write | Pipe)) == Read)
 		_size = ::lseek(descriptor, 0, SEEK_END);
-	}
 
 	return true;
 }
@@ -82,17 +76,12 @@ bool File::open(Special special, Allocator *allocator)
 		{
 			String name(S("/tmp/XXXXXX"), allocator);
 
-			int descriptor = ::mkstemp(name.text());
-
+			const int descriptor = ::mkstemp(name.text());
 			if (descriptor == -1)
-			{
 				break;
-			}
 
 			if (!_private)
-			{
 				_private = Y_NEW(allocator, Private)(allocator);
-			}
 
 			_private->descriptor = descriptor;
 			_private->mode = Read | Write;

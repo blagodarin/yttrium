@@ -21,7 +21,7 @@ public:
 
 public:
 
-	Private(Allocator *allocator = nullptr)
+	Private(Allocator *allocator)
 		: PrivateBase(allocator)
 		, descriptor(-1)
 		, mode(0)
@@ -46,11 +46,14 @@ public:
 
 	StaticFile()
 		: File(&_private_data)
+		, _private_data(nullptr)
 	{
 	}
 
 	StaticFile(const StaticString &name, Mode mode, Allocator *allocator)
+		//: StaticFile() // TODO: Uncomment.
 		: File(&_private_data)
+		, _private_data(nullptr)
 	{
 		File::open(name, mode, allocator);
 	}

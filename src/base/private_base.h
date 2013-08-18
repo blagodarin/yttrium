@@ -62,18 +62,22 @@ public:
 			Y_DELETE(allocator, object);
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	static void release(T **object_ptr)
 	{
 		T *object = *object_ptr;
-
 		if (object)
 		{
-			*object_ptr = nullptr;
-			release(object);
+			Allocator *allocator = object->_allocator;
+			if (Y_LIKELY(allocator)) // Otherwise it's an object with static private data.
+			{
+				if (!--object->_references)
+					Y_DELETE(allocator, object);
+				*object_ptr = nullptr;
+			}
 		}
 	}
 
