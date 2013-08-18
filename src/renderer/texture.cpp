@@ -3,51 +3,21 @@
 namespace Yttrium
 {
 
-Texture2D::Private::Private(const Renderer &renderer, const ImageFormat &format, Allocator *allocator)
-	: PrivateBase(allocator)
-	, _renderer(renderer)
+BackendTexture2D::BackendTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator)
+	: Texture2D(allocator)
 	, _size(format.width(), format.height())
-	, _filter(Texture2D::NearestFilter)
 	, _orientation(format.orientation())
 	, _has_mipmaps(true)
+	, _renderer(renderer)
 {
 }
 
-void Texture2D::Private::set_filter(Texture2D::Filter filter)
+RectF BackendTexture2D::full_rectangle() const
 {
-	_filter = filter;
-}
+	const Vector2f &top_left = fix_coords(Vector2f(0));
+	const Vector2f &bottom_right = fix_coords(_size);
 
-Texture2D::Texture2D(const Texture2D &texture)
-	: _private(Private::copy(texture._private))
-{
-}
-
-Texture2D::~Texture2D()
-{
-	Private::release(&_private);
-}
-
-Texture2D::Filter Texture2D::filter() const
-{
-	return _private->_filter;
-}
-
-void Texture2D::set_filter(Filter filter)
-{
-	_private->set_filter(filter);
-}
-
-Dim2 Texture2D::size() const
-{
-	return _private->_size;
-}
-
-Texture2D &Texture2D::operator =(const Texture2D &texture)
-{
-	Private::assign(&_private, texture._private);
-
-	return *this;
+	return RectF::from_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
 }
 
 } // namespace Yttrium

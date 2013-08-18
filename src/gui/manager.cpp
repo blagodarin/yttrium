@@ -3,6 +3,7 @@
 #include "manager.h"
 
 #include <Yttrium/allocator.h>
+#include <Yttrium/renderer/texture.h>
 #include <Yttrium/script/manager.h>
 
 #include "ion/dumper.h"
@@ -85,20 +86,19 @@ const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
 void ManagerImpl::set_font(const StaticString &name,
 	const StaticString &font_source, const StaticString &texture_name)
 {
-	Texture2D texture = _texture_cache->load_texture_2d(texture_name, true);
+	Texture2DPtr texture = _texture_cache->load_texture_2d(texture_name, true);
+	if (texture.is_null())
+		return;
 
-	if (texture)
+	// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
+	// when the manager is being cleant up, so we must use the renderer's allocator here.
+
+	TextureFont font(font_source, _renderer.allocator());
+
+	if (font)
 	{
-		// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
-		// when the manager is being cleant up, so we should use the renderer's allocator here.
-
-		TextureFont font(font_source, _renderer.allocator());
-
-		if (font)
-		{
-			texture.set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
-			_fonts[String(name, &_proxy_allocator)] = FontDesc(font, texture);
-		}
+		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
+		_fonts[String(name, &_proxy_allocator)] = FontDesc(font, texture);
 	}
 }
 

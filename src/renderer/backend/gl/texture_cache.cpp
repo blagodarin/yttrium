@@ -8,13 +8,13 @@
 namespace Yttrium
 {
 
-OpenGlTextureCache::OpenGlTextureCache(const Renderer &renderer, const GlApi &gl)
-	: TextureCache(renderer)
+GlTextureCache::GlTextureCache(const Renderer &renderer, const GlApi &gl)
+	: BackendTextureCache(renderer)
 	, _gl(gl)
 {
 }
 
-Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const ImageFormat &format, const void *data)
+BackendTexture2D *GlTextureCache::cache_texture_2d(const ImageFormat &format, const void *data)
 {
 	// NOTE: Keep the new pixel formats in sync with these arrays!
 
@@ -82,7 +82,7 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const ImageFormat &form
 				}
 
 				Allocator *allocator = _renderer.allocator();
-				return Y_NEW(allocator, OpenGlTexture2D)(_renderer, format, allocator, _gl, target, texture);
+				return Y_NEW(allocator, GlTexture2D)(_renderer, format, allocator, _gl, target, texture);
 			}
 		}
 	}
@@ -94,8 +94,10 @@ Texture2D::Private *OpenGlTextureCache::cache_texture_2d(const ImageFormat &form
 
 TextureCachePtr TextureCache::create(const Renderer &renderer)
 {
+	// TODO: Fix this GL-bound implementation.
+
 	Allocator *allocator = renderer.allocator();
-	return TextureCachePtr(Y_NEW(allocator, OpenGlTextureCache)(renderer,
+	return TextureCachePtr(Y_NEW(allocator, GlTextureCache)(renderer,
 		static_cast<OpenGlRenderer *>(renderer._private)->_gl));
 }
 

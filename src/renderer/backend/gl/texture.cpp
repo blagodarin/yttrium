@@ -3,12 +3,21 @@
 namespace Yttrium
 {
 
-OpenGlTexture2D::~OpenGlTexture2D()
+GlTexture2D::GlTexture2D(const Renderer &renderer, const ImageFormat &format,
+	Allocator *allocator, const GlApi &gl, GLenum target, GLuint texture)
+	: BackendTexture2D(renderer, format, allocator)
+	, _gl(gl)
+	, _target(target)
+	, _texture(texture)
+{
+}
+
+GlTexture2D::~GlTexture2D()
 {
 	_gl.DeleteTextures(1, &_texture);
 }
 
-void OpenGlTexture2D::bind()
+void GlTexture2D::bind()
 {
 	GLenum min_filter;
 	GLenum mag_filter;
@@ -53,7 +62,7 @@ void OpenGlTexture2D::bind()
 	}
 }
 
-Vector2f OpenGlTexture2D::fix_coords(const Vector2f &coords) const
+Vector2f GlTexture2D::fix_coords(const Vector2f &coords) const
 {
 	float x = coords.x;
 	float y = coords.y;
@@ -84,7 +93,7 @@ Vector2f OpenGlTexture2D::fix_coords(const Vector2f &coords) const
 	return (_target == GL_TEXTURE_RECTANGLE_ARB ? Vector2f(x, y) : Vector2f(x / _size.x, y / _size.y));
 }
 
-void OpenGlTexture2D::unbind()
+void GlTexture2D::unbind()
 {
 	_gl.BindTexture(_target, 0);
 }

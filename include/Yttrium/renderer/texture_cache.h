@@ -4,51 +4,31 @@
 #ifndef __Y_RENDERER_TEXTURE_CACHE_H
 #define __Y_RENDERER_TEXTURE_CACHE_H
 
-#include <Yttrium/renderer.h>
-#include <Yttrium/object.h>
-
-#include <map>
+#include <Yttrium/renderer/pointers.h>
 
 namespace Yttrium
 {
 
-class ImageFormat;
-class TextureCache;
-
-/// Texture cache pointer.
-
-typedef ObjectPointer<TextureCache> TextureCachePtr;
+class Renderer;
+class StaticString;
 
 /// Texture cache.
 
-class Y_API TextureCache
-	: public Object
+class Y_API TextureCache: public Object
 {
-	Y_NONCOPYABLE(TextureCache);
-
 public:
 
 	///
 
-	TextureCache(const Renderer &renderer) noexcept;
-
-	///
-
-	~TextureCache() noexcept override;
-
-public:
-
-	///
-
-	Texture2D cache_texture_2d(const StaticString &name, bool intensity = false) noexcept;
+	virtual Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity = false) noexcept = 0;
 
 	/// Clear the cache.
 
-	void clear() noexcept;
+	virtual void clear() noexcept = 0;
 
 	///
 
-	Texture2D load_texture_2d(const StaticString &name, bool intensity = false) noexcept;
+	virtual Texture2DPtr load_texture_2d(const StaticString &name, bool intensity = false) noexcept = 0;
 
 public:
 
@@ -58,17 +38,7 @@ public:
 
 protected:
 
-	virtual Texture2D::Private *cache_texture_2d(const ImageFormat &format, const void *data) noexcept = 0;
-
-protected:
-
-	Renderer _renderer;
-
-private:
-
-	typedef std::map<String, Texture2D> Cache2D;
-
-	Cache2D _cache_2d;
+	TextureCache(Allocator *allocator) noexcept: Object(allocator) {}
 };
 
 } // namespace Yttrium

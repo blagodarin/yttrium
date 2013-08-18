@@ -2,22 +2,23 @@
 #define __RENDERER_TEXTURE_H
 
 #include <Yttrium/image.h>
-#include <Yttrium/rect.h>
-#include <Yttrium/renderer/texture_cache.h>
-
-#include "../base/private_base.h"
+#include <Yttrium/renderer.h>
+#include <Yttrium/renderer/texture.h>
 
 namespace Yttrium
 {
 
-class Y_PRIVATE Texture2D::Private
-	: public PrivateBase<Texture2D::Private>
+class BackendTexture2D: public Texture2D
 {
 public:
 
-	Private(const Renderer &renderer, const ImageFormat &format, Allocator *allocator);
+	BackendTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator);
 
-	virtual ~Private() {}
+public:
+	
+	RectF full_rectangle() const;
+
+	Dim2 size() const { return _size; }
 
 public:
 
@@ -25,30 +26,18 @@ public:
 
 	virtual Vector2f fix_coords(const Vector2f &coords) const = 0; // TODO: fix_rectangle().
 
-	inline RectF full_rectangle() const;
-
-	virtual void set_filter(Texture2D::Filter filter);
-
 	virtual void unbind() = 0;
 
-public:
+protected:
 
-	Renderer          _renderer; // Don't let the renderer die before the texture.
-	Dim2              _size;
-	Texture2D::Filter _filter;
-	ImageOrientation  _orientation;
-	bool              _has_mipmaps;
+	const Dim2             _size;
+	const ImageOrientation _orientation;
+	bool                   _has_mipmaps;
+
+private:
+
+	Renderer _renderer; // Don't let the renderer die before the texture.
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-RectF Texture2D::Private::full_rectangle() const
-{
-	const Vector2f &top_left = fix_coords(Vector2f(0));
-	const Vector2f &bottom_right = fix_coords(_size);
-
-	return RectF::from_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
-}
 
 } // namespace Yttrium
 

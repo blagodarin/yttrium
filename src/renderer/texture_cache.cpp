@@ -1,47 +1,48 @@
-#include <Yttrium/renderer/texture_cache.h>
+#include "texture_cache.h"
 
-#include <Yttrium/buffer.h>
 #include <Yttrium/image.h>
 #include <Yttrium/string.h>
+
+#include "texture.h"
 
 namespace Yttrium
 {
 
-TextureCache::TextureCache(const Renderer &renderer)
-	: Object(renderer.allocator())
+BackendTextureCache::BackendTextureCache(const Renderer &renderer)
+	: TextureCache(renderer.allocator())
 	, _renderer(renderer)
 {
 }
 
-TextureCache::~TextureCache()
+BackendTextureCache::~BackendTextureCache()
 {
 }
 
-Texture2D TextureCache::cache_texture_2d(const StaticString &name, bool intensity)
+Texture2DPtr BackendTextureCache::cache_texture_2d(const StaticString &name, bool intensity)
 {
 	Allocator *allocator = _renderer.allocator();
 
 	Image image(allocator);
 
 	if (!image.load(name))
-		return Texture2D();
+		return Texture2DPtr();
 
 	if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 		image.intensity_to_bgra();
 
-	Texture2D::Private *texture_private = cache_texture_2d(image.format(), image.const_data());
-	if (!texture_private)
-		return Texture2D();
+	BackendTexture2D *backend_texture = cache_texture_2d(image.format(), image.const_data());
+	if (!backend_texture)
+		return Texture2DPtr();
 
-	return _cache_2d.insert(Cache2D::value_type(String(name, allocator), Texture2D(texture_private))).first->second;
+	return _cache_2d.insert(Cache2D::value_type(String(name, allocator), Texture2DPtr(backend_texture))).first->second;
 }
 
-void TextureCache::clear()
+void BackendTextureCache::clear()
 {
 	_cache_2d.clear();
 }
 
-Texture2D TextureCache::load_texture_2d(const StaticString &name, bool intensity)
+Texture2DPtr BackendTextureCache::load_texture_2d(const StaticString &name, bool intensity)
 {
 	Cache2D::iterator i = _cache_2d.find(String(name, ByReference()));
 	return i != _cache_2d.end() ? i->second : cache_texture_2d(name, intensity);

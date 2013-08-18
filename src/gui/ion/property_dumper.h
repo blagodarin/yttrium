@@ -1,19 +1,24 @@
 #ifndef __GUI_ION_PROPERTY_DUMPER_H
 #define __GUI_ION_PROPERTY_DUMPER_H
 
-#include <Yttrium/ion/node.h>
-#include <Yttrium/renderer/texture_cache.h>
+#include <Yttrium/vector.h>
 
 #include "../property_dumper.h"
 
 namespace Yttrium
 {
 
+namespace Ion
+{
+
+class Object;
+
+} // namespace Ion
+
 namespace Gui
 {
 
-class IonPropertyDumper
-	: public PropertyDumper
+class IonPropertyDumper: public PropertyDumper
 {
 public:
 
@@ -37,7 +42,7 @@ public: // PropertyDumper
 
 	void dump_text(const StaticString &name, const StaticString &text) override;
 
-	void dump_texture(const StaticString &name, const Texture2D &texture) override;
+	void dump_texture(const StaticString &name, const Texture2DPtr &texture) override;
 
 private:
 

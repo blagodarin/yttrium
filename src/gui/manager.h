@@ -37,12 +37,12 @@ public:
 
 	struct FontDesc
 	{
-		TextureFont font;
-		Texture2D   texture;
+		TextureFont  font;
+		Texture2DPtr texture;
 
 		FontDesc() {}
 
-		FontDesc(const TextureFont &font, const Texture2D &texture)
+		FontDesc(const TextureFont &font, const Texture2DPtr &texture)
 			: font(font)
 			, texture(texture)
 		{

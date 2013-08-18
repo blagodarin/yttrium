@@ -8,23 +8,16 @@
 namespace Yttrium
 {
 
-class OpenGlTexture2D
-	: public Texture2D::Private
+class GlTexture2D: public BackendTexture2D
 {
 public:
 
-	OpenGlTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator,
-		const GlApi &gl, GLenum target, GLuint texture)
-		: Private(renderer, format, allocator)
-		, _gl(gl)
-		, _target(target)
-		, _texture(texture)
-	{
-	}
+	GlTexture2D(const Renderer &renderer, const ImageFormat &format,
+		Allocator *allocator, const GlApi &gl, GLenum target, GLuint texture);
 
-	~OpenGlTexture2D() override;
+	~GlTexture2D() noexcept override;
 
-public:
+private:
 
 	void bind() override;
 

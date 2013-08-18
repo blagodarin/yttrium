@@ -75,6 +75,10 @@ public:
 
 		Pointer &operator =(const Pointer &pointer) noexcept;
 
+		///
+
+		inline bool operator ==(const Pointer &pointer) const noexcept;
+
 	private:
 
 		Object *_object;
@@ -189,6 +193,11 @@ Object *Object::Pointer::operator ->() const noexcept
 Object &Object::Pointer::operator *() const noexcept
 {
 	return *_object;
+}
+
+bool Object::Pointer::operator ==(const Pointer &pointer) const noexcept
+{
+	return _object == pointer._object;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,8 +1,5 @@
 #include "property_dumper.h"
 
-#include <Yttrium/ion/object.h>
-#include <Yttrium/ion/value.h>
-
 // TODO: Implement.
 
 namespace Yttrium
@@ -48,7 +45,7 @@ void IonPropertyDumper::dump_text(const StaticString &, const StaticString &)
 {
 }
 
-void IonPropertyDumper::dump_texture(const StaticString &, const Texture2D &)
+void IonPropertyDumper::dump_texture(const StaticString &, const Texture2DPtr &)
 {
 }
 

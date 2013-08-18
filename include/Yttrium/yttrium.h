@@ -27,6 +27,9 @@
 #include <Yttrium/proxy_allocator.h>
 #include <Yttrium/rect.h>
 #include <Yttrium/renderer.h>
+#include <Yttrium/renderer/builtin.h>
+#include <Yttrium/renderer/pointers.h>
+#include <Yttrium/renderer/texture.h>
 #include <Yttrium/renderer/texture_cache.h>
 #include <Yttrium/screen.h>
 #include <Yttrium/script.h>

@@ -6,14 +6,13 @@
 
 #include <Yttrium/rect.h>
 #include <Yttrium/renderer/builtin.h>
-#include <Yttrium/renderer/texture.h>
+#include <Yttrium/renderer/pointers.h>
 #include <Yttrium/static_string.h>
 #include <Yttrium/texture_font.h>
 
 namespace Yttrium
 {
 
-class TextureCache;
 class Window;
 
 ///
@@ -128,7 +127,7 @@ public:
 
 	///
 
-	void set_texture(const Texture2D &texture) noexcept;
+	void set_texture(const Texture2DPtr &texture) noexcept;
 
 	///
 

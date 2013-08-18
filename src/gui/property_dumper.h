@@ -1,7 +1,7 @@
 #ifndef __GUI_PROPERTY_DUMPER_H
 #define __GUI_PROPERTY_DUMPER_H
 
-#include <Yttrium/renderer/texture.h>
+#include <Yttrium/renderer/pointers.h>
 #include <Yttrium/static_string.h>
 
 #include "types.h"
@@ -38,7 +38,7 @@ public:
 
 	virtual void dump_text(const StaticString &name, const StaticString &text) = 0;
 
-	virtual void dump_texture(const StaticString &name, const Texture2D &texture) = 0;
+	virtual void dump_texture(const StaticString &name, const Texture2DPtr &texture) = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

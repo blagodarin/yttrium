@@ -1,23 +1,22 @@
 #ifndef __RENDERER_BACKEND_GL_TEXTURE_CACHE_H
 #define __RENDERER_BACKEND_GL_TEXTURE_CACHE_H
 
-#include <Yttrium/renderer/texture_cache.h>
+#include "../../texture_cache.h"
 
 namespace Yttrium
 {
 
 struct GlApi;
 
-class OpenGlTextureCache
-	: public TextureCache
+class GlTextureCache: public BackendTextureCache
 {
 public:
 
-	OpenGlTextureCache(const Renderer &renderer, const GlApi &gl);
+	GlTextureCache(const Renderer &renderer, const GlApi &gl);
 
-private: // TextureCache.
+private:
 
-	Texture2D::Private *cache_texture_2d(const ImageFormat &format, const void *data) noexcept override;
+	BackendTexture2D *cache_texture_2d(const ImageFormat &format, const void *data) noexcept override;
 
 private:
 

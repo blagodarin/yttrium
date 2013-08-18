@@ -24,18 +24,14 @@ JpegReader::~JpegReader()
 bool JpegReader::open()
 {
 	if (setjmp(_error_handler.setjmp_buffer))
-	{
 		return false;
-	}
 
 	jpeg_create_decompress(&_decompressor);
 
 	// TODO: Consider switching to jpeg_source_mgr.
 
 	if (!_file.read_all(&_buffer))
-	{
 		return false;
-	}
 
 	jpeg_mem_src(&_decompressor, static_cast<unsigned char *>(_buffer.data()), _buffer.size());
 
@@ -56,9 +52,7 @@ bool JpegReader::open()
 bool JpegReader::read(void *buffer)
 {
 	if (setjmp(_error_handler.setjmp_buffer))
-	{
 		return false;
-	}
 
 	jpeg_start_decompress(&_decompressor);
 

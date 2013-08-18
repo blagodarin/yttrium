@@ -73,8 +73,8 @@ public:
 	Vertices2D _vertices_2d;
 	Indices2D  _indices_2d;
 
-	Texture2D _texture;
-	RectF     _texture_rect;
+	Texture2DPtr _texture;
+	RectF        _texture_rect;
 
 	TextureFont _font;
 	Vector2f    _font_size;

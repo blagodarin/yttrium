@@ -1,31 +1,25 @@
 /// \file
-/// \brief
+/// \brief Textures.
 
 #ifndef __Y_RENDERER_TEXTURE_H
 #define __Y_RENDERER_TEXTURE_H
 
-#include <Yttrium/vector.h>
+#include <Yttrium/object.h>
 
 namespace Yttrium
 {
 
-class Renderer;
-class TextureCache;
+/// 2D texture.
 
-///
-
-class Y_API Texture2D
+class Y_API Texture2D: public Object
 {
-	friend Renderer;
-	friend TextureCache;
-
 public:
 
 	///
 
 	typedef uint_fast8_t Filter;
 
-	enum
+	enum: Filter
 	{
 		// Base filter flags and masks.
 
@@ -56,88 +50,20 @@ public:
 
 	///
 
-	inline Texture2D() noexcept;
+	Filter filter() const noexcept { return _filter; }
 
 	///
 
-	Texture2D(const Texture2D &texture) noexcept;
+	void set_filter(Filter filter) noexcept { _filter = filter; }
 
-	///
+protected:
 
-	~Texture2D() noexcept;
+	Texture2D(Allocator *allocator) noexcept: Object(allocator), _filter(NearestFilter) {}
 
-public:
+protected:
 
-	///
-
-	Filter filter() const noexcept;
-
-	///
-
-	Dim2 size() const noexcept;
-
-	///
-
-	void set_filter(Filter filter) noexcept;
-
-public:
-
-	///
-
-	inline operator bool() const noexcept;
-
-	///
-
-	inline bool operator ==(const Texture2D &texture) noexcept;
-
-	///
-
-	inline bool operator !=(const Texture2D &texture) noexcept;
-
-	///
-
-	Texture2D &operator =(const Texture2D &texture) noexcept;
-
-public:
-
-	class Private;
-
-private:
-
-	inline Texture2D(Private *private_);
-
-private:
-
-	Private *_private;
+	Filter _filter;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Texture2D::Texture2D() noexcept
-	: _private(nullptr)
-{
-}
-
-Texture2D::operator bool() const noexcept
-{
-	return _private;
-}
-
-bool Texture2D::operator ==(const Texture2D &texture) noexcept
-{
-	return _private == texture._private;
-}
-
-bool Texture2D::operator !=(const Texture2D &texture) noexcept
-{
-	return _private != texture._private;
-}
-
-Texture2D::Texture2D(Private *private_)
-	: _private(private_)
-{
-}
 
 } // namespace Yttrium
 

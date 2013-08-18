@@ -2,6 +2,7 @@
 
 #include <Yttrium/ion.h>
 #include <Yttrium/log.h>
+#include <Yttrium/renderer/texture.h>
 #include <Yttrium/script/context.h>
 
 #define CHECK(condition) do { if (!(condition)) return false; } while (false)
@@ -103,7 +104,7 @@ void Game::run()
 
 	Y_LOG("Terminating...");
 	
-	_renderer.set_texture(Texture2D()); // Otherwise the renderer won't get deleted.
+	_renderer.set_texture(Texture2DPtr()); // Otherwise the renderer won't get deleted.
 }
 
 void Game::save_settings()
@@ -144,8 +145,8 @@ bool Game::load()
 	const StaticString *block_texture_name;
 	CHECK(blocks->last("file", &block_texture_name));
 	_block_texture = _texture_cache->load_texture_2d(*block_texture_name);
-	if (_block_texture)
-		_block_texture.set_filter(Texture2D::TrilinearFilter);
+	if (!_block_texture.is_null())
+		_block_texture->set_filter(Texture2D::TrilinearFilter);
 
 	const StaticString *block_size;
 	CHECK(blocks->last("size", &block_size));

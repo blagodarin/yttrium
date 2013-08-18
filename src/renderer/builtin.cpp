@@ -28,7 +28,7 @@ void RendererBuiltin::Private::bind()
 			_renderer->_indices_2d.clear();
 		}
 
-		_renderer->_texture = Texture2D();
+		_renderer->_texture.reset();
 		// TODO: Reset font.
 
 		_renderer->bind_builtin();

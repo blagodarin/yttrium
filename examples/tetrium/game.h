@@ -70,9 +70,9 @@ private:
 	Gui::ManagerPtr  _gui;
 	Bindings         _bindings;
 
-	Texture2D  _block_texture;
-	float      _block_size;
-	Vector2f   _block_coords[8];
+	Texture2DPtr _block_texture;
+	float        _block_size;
+	Vector2f     _block_coords[8];
 
 	Tetrium::Game _game;
 	Timer         _game_timer;

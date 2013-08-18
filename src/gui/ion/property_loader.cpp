@@ -3,6 +3,7 @@
 #include "property_loader.h"
 
 #include <Yttrium/audio/sound.h>
+#include <Yttrium/ion/node.h>
 #include <Yttrium/ion/object.h>
 #include <Yttrium/ion/value.h>
 #include <Yttrium/renderer/texture_cache.h>
@@ -204,7 +205,7 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 	return loaded == 15;
 }
 
-bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2D *texture)
+bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading font...");
 
@@ -389,7 +390,7 @@ bool IonPropertyLoader::load_text(const StaticString &name, String *text)
 	return true;
 }
 
-bool IonPropertyLoader::load_texture(const StaticString &name, Texture2D *texture)
+bool IonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *texture)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading texture...");
 
@@ -607,7 +608,7 @@ bool IonPropertyLoader::load_text(const StaticString **text, const Ion::Object &
 	return node.size() == 1 && node.first()->get(text);
 }
 
-bool IonPropertyLoader::load_texture(Texture2D *texture, const Ion::Node &node,
+bool IonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &node,
 	TextureCache *texture_cache, Texture2D::Filter default_filter)
 {
 	Ion::Node::ConstRange values = node.values();
@@ -693,15 +694,12 @@ bool IonPropertyLoader::load_texture(Texture2D *texture, const Ion::Node &node,
 		}
 	}
 
-	Texture2D result_texture = texture_cache->load_texture_2d(*texture_name);
-
-	if (!result_texture)
-	{
+	Texture2DPtr result_texture = texture_cache->load_texture_2d(*texture_name);
+	if (result_texture.is_null())
 		return false;
-	}
 
+	result_texture->set_filter(filter);
 	*texture = result_texture;
-	texture->set_filter(filter);
 	return true;
 }
 

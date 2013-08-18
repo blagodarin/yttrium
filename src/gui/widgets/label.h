@@ -1,7 +1,7 @@
 #ifndef __GUI_WIDGETS_LABEL_H
 #define __GUI_WIDGETS_LABEL_H
 
-#include <Yttrium/renderer/texture.h>
+#include <Yttrium/renderer/pointers.h>
 #include <Yttrium/texture_font.h>
 
 #include "widget.h"
@@ -35,12 +35,12 @@ private:
 
 private:
 
-	Vector3f    _position;
-	Vector2f    _size;
-	Vector4f    _color;
-	Texture2D   _texture;
-	TextureFont _font;
-	Alignment   _alignment;
+	Vector3f     _position;
+	Vector2f     _size;
+	Vector4f     _color;
+	Texture2DPtr _texture;
+	TextureFont  _font;
+	Alignment    _alignment;
 
 	String      _final_text;
 };

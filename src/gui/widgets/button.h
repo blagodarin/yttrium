@@ -2,7 +2,7 @@
 #define __GUI_WIDGETS_BUTTON_H
 
 #include <Yttrium/audio/sound.h>
-#include <Yttrium/renderer/texture.h>
+#include <Yttrium/renderer/pointers.h>
 #include <Yttrium/texture_font.h>
 
 #include "widget.h"
@@ -34,9 +34,9 @@ private:
 
 	struct Style
 	{
-		Vector4f  color;
-		Texture2D texture;
-		Vector4f  text_color;
+		Vector4f     color;
+		Texture2DPtr texture;
+		Vector4f     text_color;
 
 		Style()
 			: color(1, 1, 1)
@@ -47,14 +47,14 @@ private:
 
 private:
 
-	Vector3f    _position;
-	Vector2f    _size;
-	TextureFont _font;
-	Texture2D   _font_texture;
-	Vector2f    _text_size;
-	SoundPtr    _sound;
-	WidgetState _state;
-	Style       _styles[WidgetStateCount];
+	Vector3f     _position;
+	Vector2f     _size;
+	TextureFont  _font;
+	Texture2DPtr _font_texture;
+	Vector2f     _text_size;
+	SoundPtr     _sound;
+	WidgetState  _state;
+	Style        _styles[WidgetStateCount];
 };
 
 } // namespace Gui
