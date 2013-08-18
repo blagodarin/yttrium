@@ -68,15 +68,9 @@ public: // Allocator.
 
 	using Allocator::allocate;
 
-	///
-
 	void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept override;
 
-	///
-
 	void deallocate(void *pointer, Difference *difference = nullptr) noexcept override;
-
-	///
 
 	void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept override;
 

@@ -1,5 +1,5 @@
 /// \file
-/// \brief Memory allocators.
+/// \brief %Allocator.
 
 #ifndef __Y_ALLOCATOR_H
 #define __Y_ALLOCATOR_H
@@ -89,33 +89,8 @@ public:
 
 protected:
 
-	///
-
-	virtual ~Allocator()
-	{
-	}
-};
-
-/// System allocator.
-
-class Y_API SystemAllocator
-	: public Allocator
-{
-public:
-
-	///
-
-	virtual size_t lower_bound(size_t size) const noexcept = 0;
-
-	///
-
-	virtual size_t upper_bound(size_t size) const noexcept = 0;
-
-public:
-
-	///
-
-	static SystemAllocator *instance() noexcept;
+	Allocator() {}
+	virtual ~Allocator() noexcept {}
 };
 
 } // namespace Yttrium

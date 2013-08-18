@@ -14,7 +14,7 @@
 namespace Yttrium
 {
 
-class ProxyAllocator::Private
+class Y_PRIVATE ProxyAllocator::Private
 {
 public:
 
@@ -94,6 +94,11 @@ Allocator *ProxyAllocator::allocator() const
 StaticString ProxyAllocator::name() const
 {
 	return _private->_name;
+}
+
+MemoryStatus ProxyAllocator::status() const
+{
+	return _private->_status;
 }
 
 void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference)

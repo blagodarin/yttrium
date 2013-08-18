@@ -1,6 +1,7 @@
 #include <yttrium/memory_manager.h>
 
 #include <yttrium/proxy_allocator.h>
+#include <yttrium/system_allocator.h>
 
 #include "../instance_guard.h"
 #include "heap_allocator.h"

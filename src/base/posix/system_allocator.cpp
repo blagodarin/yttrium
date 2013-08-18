@@ -2,7 +2,9 @@
 
 #include <yttrium/assert.h>
 #include <yttrium/types.h>
+#include <yttrium/utils.h>
 
+#include <errno.h>    // errno
 #include <sys/mman.h> // mmap, mremap, munmap
 #include <unistd.h>   // sysconf
 
@@ -12,21 +14,19 @@
 namespace Yttrium
 {
 
-SystemAllocatorImpl::SystemAllocatorImpl()
+SystemAllocator::Private::Private()
 	: _page_size(::sysconf(_SC_PAGE_SIZE))
 {
 }
 
-void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *difference)
+void *SystemAllocator::allocate(size_t size, size_t align, Difference *difference)
 {
-	Y_UNUSED(align);
+	Y_ASSERT(size > 0);
+	Y_ASSERT(align == 0 || (is_power_of_2(align) && align <= Private::ReservedSize));
 
-	Y_ASSERT(size);
+	const size_t total_size = _private->total_size(size);
 
-	size_t total_bytes = _page_size * ((ReservedSize + size + _page_size - 1) / _page_size);
-	size_t allocated_bytes = total_bytes - ReservedSize;
-
-	void *base = ::mmap(nullptr, total_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *base = ::mmap(nullptr, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
 	if (Y_UNLIKELY(base == MAP_FAILED))
 	{
@@ -34,104 +34,70 @@ void *SystemAllocatorImpl::allocate(size_t size, size_t align, Difference *diffe
 		return nullptr;
 	}
 
-	static_cast<size_t *>(base)[0] = total_bytes;
-	static_cast<size_t *>(base)[1] = allocated_bytes;
+	static_cast<size_t *>(base)[0] = total_size;
+	static_cast<size_t *>(base)[1] = size;
 
 	if (difference)
-	{
-		*difference = Difference(allocated_bytes, total_bytes, Difference::Increment);
-	}
+		*difference = Difference(size, total_size, Difference::Increment);
 
-	return static_cast<char *>(base) + ReservedSize;
+	return static_cast<char *>(base) + Private::ReservedSize;
 }
 
-void SystemAllocatorImpl::deallocate(void *pointer, Difference *difference)
+void SystemAllocator::deallocate(void *pointer, Difference *difference)
 {
 	if (Y_UNLIKELY(!pointer))
-	{
 		return;
-	}
 
-	void *base = static_cast<char *>(pointer) - ReservedSize;
+	void *base = static_cast<char *>(pointer) - Private::ReservedSize;
 
-	size_t total_bytes = static_cast<size_t *>(base)[0];
-	size_t allocated_bytes = static_cast<size_t *>(base)[1];
+	const size_t total_size = static_cast<size_t *>(base)[0];
+	const size_t size = static_cast<size_t *>(base)[1];
 
-	if (Y_UNLIKELY(::munmap(base, total_bytes)))
+	if (Y_UNLIKELY(::munmap(base, total_size)))
 	{
-		// This must be EINVAL, indicating that we've passed something wrong to munmap.
-
+		Y_ASSERT(errno == EINVAL); // This means invalid pointer value, anything else should mean internal system error.
 		Y_ABORT("Failed to deallocate memory");
 	}
 
 	if (difference)
-	{
-		*difference = Difference(allocated_bytes, total_bytes, Difference::Decrement);
-	}
+		*difference = Difference(size, total_size, Difference::Decrement);
 }
 
-void *SystemAllocatorImpl::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
+void *SystemAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
 {
 	Y_ASSERT(pointer);
 	Y_ASSERT(size);
 
-	void *base = static_cast<char *>(pointer) - ReservedSize;
+	void *base = static_cast<char *>(pointer) - Private::ReservedSize;
 
-	size_t total_bytes = static_cast<size_t *>(base)[0];
-	size_t new_total_bytes = _page_size * ((ReservedSize + size + _page_size - 1) / _page_size);
+	const size_t old_total_size = static_cast<size_t *>(base)[0];
+	const size_t old_size = static_cast<size_t *>(base)[1];
+	const size_t total_size = _private->total_size(size);
 
-	if (new_total_bytes == total_bytes)
+	if (total_size != old_total_size)
 	{
-		if (difference)
+		base = ::mremap(base, old_total_size, total_size, (movability == MayMove ? MREMAP_MAYMOVE : 0));
+
+		if (Y_UNLIKELY(base == MAP_FAILED))
 		{
-			*difference = Difference();
+			if (movability == MayMove)
+				Y_ABORT("Out of memory");
+			return nullptr;
 		}
-		return pointer;
+
+		static_cast<size_t *>(base)[0] = total_size;
+		static_cast<size_t *>(base)[1] = size;
 	}
-
-	void *new_base = ::mremap(base, total_bytes, new_total_bytes, (movability == MayMove ? MREMAP_MAYMOVE : 0));
-
-	if (Y_LIKELY(new_base == MAP_FAILED))
-	{
-		if (movability == MayMove)
-		{
-			Y_ABORT("Out of memory");
-		}
-		return nullptr;
-	}
-
-	static_cast<size_t *>(new_base)[0] = new_total_bytes;
-	static_cast<size_t *>(new_base)[1] = new_total_bytes - ReservedSize;
 
 	if (difference)
 	{
-		if (new_total_bytes > total_bytes)
-		{
-			size_t shift = new_total_bytes - total_bytes;
-			*difference = Difference(shift, shift, Difference::Increment);
-		}
+		if (Y_LIKELY(size >= old_size))
+			*difference = Difference(size - old_size, total_size - old_total_size, Difference::Increment);
 		else
-		{
-			size_t shift = total_bytes - new_total_bytes;
-			*difference = Difference(shift, shift, Difference::Decrement);
-		}
+			*difference = Difference(old_size - size, old_total_size - total_size, Difference::Decrement);
 	}
 
-	return static_cast<char *>(new_base) + ReservedSize;
-}
-
-size_t SystemAllocatorImpl::lower_bound(size_t size) const
-{
-	Y_ASSERT(size);
-
-	return _page_size * ((ReservedSize + size) / _page_size) - ReservedSize;
-}
-
-size_t SystemAllocatorImpl::upper_bound(size_t size) const
-{
-	Y_ASSERT(size);
-
-	return _page_size * ((ReservedSize + size + _page_size - 1) / _page_size) - ReservedSize;
+	return static_cast<char *>(base) + Private::ReservedSize;
 }
 
 } // namespace Yttrium

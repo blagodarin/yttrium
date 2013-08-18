@@ -1,38 +1,33 @@
 #ifndef __BASE_POSIX_SYSTEM_ALLOCATOR_H
 #define __BASE_POSIX_SYSTEM_ALLOCATOR_H
 
-#include <yttrium/allocator.h>
+#include <yttrium/system_allocator.h>
 
 namespace Yttrium
 {
 
-class SystemAllocatorImpl
-	: public SystemAllocator
+class Y_PRIVATE SystemAllocator::Private
 {
-public:
-
-	SystemAllocatorImpl();
-
-public: // Allocator
-
-	void *allocate(size_t size, size_t align, Difference *difference) noexcept override;
-
-	void deallocate(void *pointer, Difference *difference) noexcept override;
-
-	void *reallocate(void *pointer, size_t size, Movability movability, Difference *difference) noexcept override;
-
 public: // SystemAllocator
-
-	size_t lower_bound(size_t size) const noexcept override;
-
-	size_t upper_bound(size_t size) const noexcept override;
-
-private:
 
 	enum: size_t
 	{
 		ReservedSize = 32, // This should be sufficient for both 32-bit and 64-bit memory.
 	};
+
+public:
+
+	Private();
+
+	size_t page_size() const
+	{
+		return _page_size;
+	}
+
+	size_t total_size(size_t size) const
+	{
+		return ((size + ReservedSize + _page_size - 1) / _page_size) * _page_size;
+	}
 
 private:
 
