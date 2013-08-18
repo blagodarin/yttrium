@@ -1,9 +1,9 @@
-#include <Yttrium/file.h>
-#include <Yttrium/gui/manager.h>
-#include <Yttrium/log.h>
-#include <Yttrium/memory_manager.h>
-#include <Yttrium/window.h>
-#include <Yttrium/string.h>
+#include <yttrium/file.h>
+#include <yttrium/gui/manager.h>
+#include <yttrium/log.h>
+#include <yttrium/memory_manager.h>
+#include <yttrium/window.h>
+#include <yttrium/string.h>
 
 #include <boost/test/unit_test.hpp>
 

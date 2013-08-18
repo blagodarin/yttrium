@@ -1,5 +1,5 @@
-#include <Yttrium/dir.h>
-#include <Yttrium/memory_manager.h>
+#include <yttrium/dir.h>
+#include <yttrium/memory_manager.h>
 
 #include <boost/test/unit_test.hpp>
 

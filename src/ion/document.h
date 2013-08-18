@@ -1,10 +1,10 @@
 #ifndef __ION_DOCUMENT_H
 #define __ION_DOCUMENT_H
 
-#include <Yttrium/ion/document.h>
-#include <Yttrium/ion/node.h>
-#include <Yttrium/ion/value.h>
-#include <Yttrium/pool.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/node.h>
+#include <yttrium/ion/value.h>
+#include <yttrium/pool.h>
 
 namespace Yttrium
 {

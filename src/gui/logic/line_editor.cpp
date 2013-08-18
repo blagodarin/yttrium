@@ -1,4 +1,4 @@
-#include <Yttrium/gui/logic/line_editor.h>
+#include <yttrium/gui/logic/line_editor.h>
 
 namespace Yttrium
 {

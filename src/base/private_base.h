@@ -1,8 +1,8 @@
 #ifndef __BASE_PRIVATE_BASE_H
 #define __BASE_PRIVATE_BASE_H
 
-#include <Yttrium/allocator.h>
-#include <Yttrium/assert.h>
+#include <yttrium/allocator.h>
+#include <yttrium/assert.h>
 
 #include <atomic>
 

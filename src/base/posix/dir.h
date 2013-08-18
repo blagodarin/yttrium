@@ -1,7 +1,7 @@
 #ifndef __BASE_POSIX_DIR_H
 #define __BASE_POSIX_DIR_H
 
-#include <Yttrium/dir.h>
+#include <yttrium/dir.h>
 
 #include "../private_base.h"
 

@@ -1,9 +1,9 @@
 #ifndef __GUI_PROPERTY_LOADER_H
 #define __GUI_PROPERTY_LOADER_H
 
-#include <Yttrium/audio/sound.h>
-#include <Yttrium/renderer/pointers.h>
-#include <Yttrium/vector.h>
+#include <yttrium/audio/sound.h>
+#include <yttrium/renderer/pointers.h>
+#include <yttrium/vector.h>
 
 #include "types.h"
 

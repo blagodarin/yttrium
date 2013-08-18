@@ -1,4 +1,4 @@
-#include <Yttrium/rect.h>
+#include <yttrium/rect.h>
 
 #include <boost/test/unit_test.hpp>
 

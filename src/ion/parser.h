@@ -1,7 +1,7 @@
 #ifndef __ION_PARSER_H
 #define __ION_PARSER_H
 
-#include <Yttrium/static_string.h>
+#include <yttrium/static_string.h>
 
 #include <vector>
 

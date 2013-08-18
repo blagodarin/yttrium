@@ -1,6 +1,6 @@
 #include "manager.h"
 
-#include <Yttrium/proxy_allocator.h>
+#include <yttrium/proxy_allocator.h>
 
 #include "../base/instance_guard.h"
 #include "backend/manager.h"

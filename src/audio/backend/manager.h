@@ -1,7 +1,7 @@
 #ifndef __AUDIO_BACKEND_MANAGER_H
 #define __AUDIO_BACKEND_MANAGER_H
 
-#include <Yttrium/audio/manager.h>
+#include <yttrium/audio/manager.h>
 
 namespace Yttrium
 {

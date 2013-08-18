@@ -1,4 +1,4 @@
-#include <Yttrium/script/manager.h>
+#include <yttrium/script/manager.h>
 
 #include "../base/instance_guard.h"
 

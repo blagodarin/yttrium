@@ -1,7 +1,7 @@
 #ifndef __BASE_INSTANCE_GUARD_H
 #define __BASE_INSTANCE_GUARD_H
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 namespace Yttrium
 {

@@ -1,7 +1,7 @@
 #include "dumper.h"
 
-#include <Yttrium/ion/document.h>
-#include <Yttrium/ion/node.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/node.h>
 
 #include "../manager.h"
 #include "../scene.h"

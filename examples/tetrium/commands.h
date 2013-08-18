@@ -1,7 +1,7 @@
 #ifndef __TETRIUM_COMMANDS_H
 #define __TETRIUM_COMMANDS_H
 
-#include <Yttrium/script/args.h>
+#include <yttrium/script/args.h>
 
 using namespace Yttrium;
 

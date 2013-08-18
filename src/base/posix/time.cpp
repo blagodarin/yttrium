@@ -1,6 +1,6 @@
-#include <Yttrium/time.h>
+#include <yttrium/time.h>
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #include <time.h>
 

@@ -1,8 +1,8 @@
 #ifndef __GUI_ION_PROPERTY_LOADER_H
 #define __GUI_ION_PROPERTY_LOADER_H
 
-#include <Yttrium/renderer/pointers.h>
-#include <Yttrium/renderer/texture.h>
+#include <yttrium/renderer/pointers.h>
+#include <yttrium/renderer/texture.h>
 
 #include "../property_loader.h"
 

@@ -1,8 +1,8 @@
 #include "classes.h"
 
-#include <Yttrium/allocator.h>
-#include <Yttrium/ion/document.h>
-#include <Yttrium/ion/node.h>
+#include <yttrium/allocator.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/node.h>
 
 namespace Yttrium
 {

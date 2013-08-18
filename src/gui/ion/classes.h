@@ -1,7 +1,7 @@
 #ifndef __GUI_ION_CLASSES_H
 #define __GUI_ION_CLASSES_H
 
-#include <Yttrium/static_string.h>
+#include <yttrium/static_string.h>
 
 #include <map>
 

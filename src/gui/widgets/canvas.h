@@ -1,8 +1,8 @@
 #ifndef __GUI_WIDGETS_CANVAS_H
 #define __GUI_WIDGETS_CANVAS_H
 
-#include <Yttrium/gui/manager.h>
-#include <Yttrium/renderer/texture.h>
+#include <yttrium/gui/manager.h>
+#include <yttrium/renderer/texture.h>
 
 #include "widget.h"
 

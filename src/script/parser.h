@@ -1,8 +1,8 @@
 #ifndef __SCRIPT_PARSER_H
 #define __SCRIPT_PARSER_H
 
-#include <Yttrium/pool.h>
-#include <Yttrium/script/args.h>
+#include <yttrium/pool.h>
+#include <yttrium/script/args.h>
 
 namespace Yttrium
 {

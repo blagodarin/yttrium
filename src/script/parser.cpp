@@ -1,7 +1,7 @@
 #include "parser.h"
 
-#include <Yttrium/script/context.h>
-#include <Yttrium/script/value.h>
+#include <yttrium/script/context.h>
+#include <yttrium/script/value.h>
 
 #include "logging.h"
 #include "scanner.h"

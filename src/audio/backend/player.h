@@ -1,7 +1,7 @@
 #ifndef __AUDIO_BACKEND_PLAYER_H
 #define __AUDIO_BACKEND_PLAYER_H
 
-#include <Yttrium/audio/player.h>
+#include <yttrium/audio/player.h>
 
 namespace Yttrium
 {

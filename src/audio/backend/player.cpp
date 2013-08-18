@@ -1,6 +1,6 @@
 #include "player.h"
 
-#include <Yttrium/allocator.h>
+#include <yttrium/allocator.h>
 
 #include "openal/player.h"
 

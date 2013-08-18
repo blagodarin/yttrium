@@ -1,7 +1,7 @@
 #ifndef __BASE_POSIX_THREAD_H
 #define __BASE_POSIX_THREAD_H
 
-#include <Yttrium/thread.h>
+#include <yttrium/thread.h>
 
 #include "../private_base.h"
 

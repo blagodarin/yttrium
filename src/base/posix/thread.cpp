@@ -1,6 +1,6 @@
 #include "thread.h"
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #include <errno.h> // errno
 #include <sched.h> // sched_yield

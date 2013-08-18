@@ -1,8 +1,8 @@
-#include <Yttrium/terminal/console.h>
+#include <yttrium/terminal/console.h>
 
-#include <Yttrium/renderer/builtin.h>
-#include <Yttrium/script/manager.h>
-#include <Yttrium/terminal.h>
+#include <yttrium/renderer/builtin.h>
+#include <yttrium/script/manager.h>
+#include <yttrium/terminal.h>
 
 namespace Yttrium
 {

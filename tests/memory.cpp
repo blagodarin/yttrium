@@ -1,5 +1,5 @@
-#include <Yttrium/memory_manager.h>
-#include <Yttrium/proxy_allocator.h>
+#include <yttrium/memory_manager.h>
+#include <yttrium/proxy_allocator.h>
 
 #include <boost/test/unit_test.hpp>
 

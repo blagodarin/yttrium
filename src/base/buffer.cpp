@@ -1,6 +1,6 @@
-#include <Yttrium/buffer.h>
+#include <yttrium/buffer.h>
 
-#include <Yttrium/allocator.h>
+#include <yttrium/allocator.h>
 
 #include <cstring> // memcmp
 

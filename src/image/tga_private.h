@@ -1,7 +1,7 @@
 #ifndef __IMAGE_TGA_PRIVATE_H
 #define __IMAGE_TGA_PRIVATE_H
 
-#include <Yttrium/types.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {

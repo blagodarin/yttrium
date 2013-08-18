@@ -1,4 +1,6 @@
-#include <Yttrium/yttrium.h>
+#include <yttrium/buffer.h>
+#include <yttrium/file.h>
+#include <yttrium/memory_manager.h>
 
 #include "../../src/image/dds_private.h"
 #include "../../src/image/tga_private.h"

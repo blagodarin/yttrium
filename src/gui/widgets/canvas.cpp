@@ -2,7 +2,7 @@
 
 #include "canvas.h"
 
-#include <Yttrium/renderer.h>
+#include <yttrium/renderer.h>
 
 #include "../property_dumper.h"
 #include "../property_loader.h"

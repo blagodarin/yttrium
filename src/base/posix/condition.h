@@ -1,7 +1,7 @@
 #ifndef __BASE_POSIX_CONDITION_H
 #define __BASE_POSIX_CONDITION_H
 
-#include <Yttrium/condition.h>
+#include <yttrium/condition.h>
 
 #include "../private_base.h"
 

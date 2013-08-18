@@ -1,8 +1,8 @@
-#include <Yttrium/string.h>
+#include <yttrium/string.h>
 
-#include <Yttrium/allocator.h>
-#include <Yttrium/assert.h>
-#include <Yttrium/utils.h>
+#include <yttrium/allocator.h>
+#include <yttrium/assert.h>
+#include <yttrium/utils.h>
 
 #include "ieee_float.h"
 

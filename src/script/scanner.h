@@ -1,7 +1,7 @@
 #ifndef __SCRIPT_SCANNER_H
 #define __SCRIPT_SCANNER_H
 
-#include <Yttrium/static_string.h>
+#include <yttrium/static_string.h>
 
 namespace Yttrium
 {

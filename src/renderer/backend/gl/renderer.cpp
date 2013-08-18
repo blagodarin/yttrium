@@ -1,6 +1,6 @@
 #include "renderer.h"
 
-#include <Yttrium/matrix.h>
+#include <yttrium/matrix.h>
 
 #include "../../builtin_data.h"
 

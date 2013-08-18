@@ -4,7 +4,7 @@
 #ifndef __BASE_FOURCC_H
 #define __BASE_FOURCC_H
 
-#include <Yttrium/types.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {

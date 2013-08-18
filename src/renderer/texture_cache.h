@@ -1,9 +1,9 @@
 #ifndef __RENDERER_TEXTURE_CACHE_H
 #define __RENDERER_TEXTURE_CACHE_H
 
-#include <Yttrium/image.h>
-#include <Yttrium/renderer.h>
-#include <Yttrium/renderer/texture_cache.h>
+#include <yttrium/image.h>
+#include <yttrium/renderer.h>
+#include <yttrium/renderer/texture_cache.h>
 
 #include <map>
 

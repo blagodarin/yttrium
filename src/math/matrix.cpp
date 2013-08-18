@@ -1,6 +1,6 @@
-#include <Yttrium/matrix.h>
+#include <yttrium/matrix.h>
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 namespace Yttrium
 {

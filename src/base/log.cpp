@@ -1,6 +1,6 @@
-#include <Yttrium/log.h>
+#include <yttrium/log.h>
 
-#include <Yttrium/time.h>
+#include <yttrium/time.h>
 
 #include "instance_guard.h"
 

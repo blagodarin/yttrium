@@ -1,7 +1,7 @@
 #ifndef __GUI_TYPES_H
 #define __GUI_TYPES_H
 
-#include <Yttrium/types.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {

@@ -1,6 +1,6 @@
-#include <Yttrium/ion/list.h>
+#include <yttrium/ion/list.h>
 
-#include <Yttrium/ion/value.h>
+#include <yttrium/ion/value.h>
 
 #include "document.h"
 

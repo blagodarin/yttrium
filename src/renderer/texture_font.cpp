@@ -1,7 +1,7 @@
 #include "texture_font.h"
 
-#include <Yttrium/file.h>
-#include <Yttrium/utils.h>
+#include <yttrium/file.h>
+#include <yttrium/utils.h>
 
 #include "../base/fourcc.h"
 

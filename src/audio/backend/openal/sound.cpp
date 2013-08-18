@@ -1,6 +1,6 @@
 #include "sound.h"
 
-#include <Yttrium/buffer.h>
+#include <yttrium/buffer.h>
 
 #include "../../manager.h"
 

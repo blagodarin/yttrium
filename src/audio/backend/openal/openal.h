@@ -1,7 +1,7 @@
 #ifndef __AUDIO_BACKEND_OPENAL_OPENAL_H
 #define __AUDIO_BACKEND_OPENAL_OPENAL_H
 
-#include <Yttrium/global.h>
+#include <yttrium/global.h>
 
 #if Y_IS_WINDOWS && !defined(AL_APIENTRY)
 	#define AL_APIENTRY __cdecl

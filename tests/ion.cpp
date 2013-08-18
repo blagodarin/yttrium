@@ -1,6 +1,6 @@
-#include <Yttrium/file.h>
-#include <Yttrium/ion.h>
-#include <Yttrium/memory_manager.h>
+#include <yttrium/file.h>
+#include <yttrium/ion.h>
+#include <yttrium/memory_manager.h>
 
 #include <boost/test/unit_test.hpp>
 

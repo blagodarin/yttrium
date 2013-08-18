@@ -1,14 +1,14 @@
 #ifndef __TETRIUM_GAME_H
 #define __TETRIUM_GAME_H
 
-#include <Yttrium/audio/manager.h>
-#include <Yttrium/audio/sound.h>
-#include <Yttrium/bindings.h>
-#include <Yttrium/gui/manager.h>
-#include <Yttrium/proxy_allocator.h>
-#include <Yttrium/renderer/texture_cache.h>
-#include <Yttrium/terminal.h>
-#include <Yttrium/time.h>
+#include <yttrium/audio/manager.h>
+#include <yttrium/audio/sound.h>
+#include <yttrium/bindings.h>
+#include <yttrium/gui/manager.h>
+#include <yttrium/proxy_allocator.h>
+#include <yttrium/renderer/texture_cache.h>
+#include <yttrium/terminal.h>
+#include <yttrium/time.h>
 
 #include "commands.h"
 #include "tetrium.h"

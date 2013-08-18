@@ -1,6 +1,6 @@
-#include <Yttrium/terminal.h>
+#include <yttrium/terminal.h>
 
-#include <Yttrium/utils.h>
+#include <yttrium/utils.h>
 
 #include <cstring> // memset
 

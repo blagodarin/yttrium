@@ -1,6 +1,6 @@
 #include "condition.h"
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #include "mutex.h"
 #include "time.h"

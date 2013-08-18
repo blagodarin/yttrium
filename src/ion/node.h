@@ -1,7 +1,7 @@
 #ifndef __ION_NODE_H
 #define __ION_NODE_H
 
-#include <Yttrium/ion/node.h>
+#include <yttrium/ion/node.h>
 
 namespace Yttrium
 {

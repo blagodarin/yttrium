@@ -2,12 +2,12 @@
 
 #include "property_loader.h"
 
-#include <Yttrium/audio/sound.h>
-#include <Yttrium/ion/node.h>
-#include <Yttrium/ion/object.h>
-#include <Yttrium/ion/value.h>
-#include <Yttrium/renderer/texture_cache.h>
-#include <Yttrium/utils.h>
+#include <yttrium/audio/sound.h>
+#include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
+#include <yttrium/ion/value.h>
+#include <yttrium/renderer/texture_cache.h>
+#include <yttrium/utils.h>
 
 #include "../manager.h"
 

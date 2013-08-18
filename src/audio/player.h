@@ -1,9 +1,9 @@
 #ifndef __AUDIO_PLAYER_H
 #define __AUDIO_PLAYER_H
 
-#include <Yttrium/audio/player.h>
-#include <Yttrium/thread.h>
-#include <Yttrium/thread_buffer.h>
+#include <yttrium/audio/player.h>
+#include <yttrium/thread.h>
+#include <yttrium/thread_buffer.h>
 
 #include "backend/player.h"
 #include "playlist.h"

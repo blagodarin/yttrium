@@ -1,9 +1,9 @@
 #include "game.h"
 
-#include <Yttrium/ion.h>
-#include <Yttrium/log.h>
-#include <Yttrium/renderer/texture.h>
-#include <Yttrium/script/context.h>
+#include <yttrium/ion.h>
+#include <yttrium/log.h>
+#include <yttrium/renderer/texture.h>
+#include <yttrium/script/context.h>
 
 #define CHECK(condition) do { if (!(condition)) return false; } while (false)
 

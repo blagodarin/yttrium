@@ -1,6 +1,6 @@
-#include <Yttrium/script/context.h>
+#include <yttrium/script/context.h>
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #include "logging.h"
 #include "parser.h"

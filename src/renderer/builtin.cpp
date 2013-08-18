@@ -1,6 +1,6 @@
 #include "builtin.h"
 
-#include <Yttrium/utils.h>
+#include <yttrium/utils.h>
 
 #include "builtin_data.h"
 #include "renderer.h"

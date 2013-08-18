@@ -1,7 +1,7 @@
 #ifndef __RENDERER_TEXTURE_FONT_H
 #define __RENDERER_TEXTURE_FONT_H
 
-#include <Yttrium/texture_font.h>
+#include <yttrium/texture_font.h>
 
 #include "../base/private_base.h"
 

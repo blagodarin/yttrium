@@ -1,7 +1,7 @@
 #ifndef __AUDIO_IO_READER_H
 #define __AUDIO_IO_READER_H
 
-#include <Yttrium/audio/io.h>
+#include <yttrium/audio/io.h>
 
 #include "../../base/file.h"
 

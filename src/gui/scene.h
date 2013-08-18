@@ -1,8 +1,8 @@
 #ifndef __GUI_SCENE_H
 #define __GUI_SCENE_H
 
-#include <Yttrium/bindings.h>
-#include <Yttrium/rect.h>
+#include <yttrium/bindings.h>
+#include <yttrium/rect.h>
 
 #include "types.h"
 

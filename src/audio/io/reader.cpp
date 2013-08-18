@@ -1,7 +1,7 @@
 #include "reader.h"
 
-#include <Yttrium/package.h>
-#include <Yttrium/utils.h>
+#include <yttrium/package.h>
+#include <yttrium/utils.h>
 
 #include "ogg_vorbis.h"
 #include "wav.h"

@@ -1,8 +1,8 @@
 #ifndef __AUDIO_MANAGER_H
 #define __AUDIO_MANAGER_H
 
-#include <Yttrium/audio/manager.h>
-#include <Yttrium/audio/sound.h>
+#include <yttrium/audio/manager.h>
+#include <yttrium/audio/sound.h>
 
 #include "player.h"
 

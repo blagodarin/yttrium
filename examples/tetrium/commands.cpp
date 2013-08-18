@@ -1,9 +1,9 @@
 #include "commands.h"
 
-#include <Yttrium/audio/sound.h>
-#include <Yttrium/renderer.h>
-#include <Yttrium/script/context.h>
-#include <Yttrium/time.h>
+#include <yttrium/audio/sound.h>
+#include <yttrium/renderer.h>
+#include <yttrium/script/context.h>
+#include <yttrium/time.h>
 
 #include "game.h"
 

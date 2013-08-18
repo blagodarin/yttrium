@@ -1,7 +1,7 @@
 #ifndef __RENDERER_BUILTIN_DATA_H
 #define __RENDERER_BUILTIN_DATA_H
 
-#include <Yttrium/types.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {

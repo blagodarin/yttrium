@@ -1,8 +1,8 @@
 #ifndef __BASE_POSIX_FILE_H
 #define __BASE_POSIX_FILE_H
 
-#include <Yttrium/file.h>
-#include <Yttrium/string.h>
+#include <yttrium/file.h>
+#include <yttrium/string.h>
 
 #include "../private_base.h"
 

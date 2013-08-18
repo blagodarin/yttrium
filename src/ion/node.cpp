@@ -1,7 +1,7 @@
 #include "node.h"
 
-#include <Yttrium/ion/document.h>
-#include <Yttrium/ion/value.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/value.h>
 
 namespace Yttrium
 {

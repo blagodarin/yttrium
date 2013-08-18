@@ -1,7 +1,7 @@
 #include "texture_cache.h"
 
-#include <Yttrium/image.h>
-#include <Yttrium/string.h>
+#include <yttrium/image.h>
+#include <yttrium/string.h>
 
 #include "texture.h"
 

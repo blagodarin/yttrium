@@ -1,7 +1,7 @@
 #include "system_allocator.h"
 
-#include <Yttrium/assert.h>
-#include <Yttrium/types.h>
+#include <yttrium/assert.h>
+#include <yttrium/types.h>
 
 #include <sys/mman.h> // mmap, mremap, munmap
 #include <unistd.h>   // sysconf

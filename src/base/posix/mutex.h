@@ -1,7 +1,7 @@
 #ifndef __BASE_POSIX_MUTEX_H
 #define __BASE_POSIX_MUTEX_H
 
-#include <Yttrium/mutex.h>
+#include <yttrium/mutex.h>
 
 #include "../private_base.h"
 

@@ -1,7 +1,7 @@
 #ifndef __GUI_ION_DUMPER_H
 #define __GUI_ION_DUMPER_H
 
-#include <Yttrium/static_string.h>
+#include <yttrium/static_string.h>
 
 namespace Yttrium
 {

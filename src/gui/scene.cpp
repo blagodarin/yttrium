@@ -2,10 +2,10 @@
 
 #include "scene.h"
 
-#include <Yttrium/allocator.h>
-#include <Yttrium/assert.h>
-#include <Yttrium/renderer.h>
-#include <Yttrium/script/manager.h>
+#include <yttrium/allocator.h>
+#include <yttrium/assert.h>
+#include <yttrium/renderer.h>
+#include <yttrium/script/manager.h>
 
 #include "manager.h"
 #include "widgets/button.h"

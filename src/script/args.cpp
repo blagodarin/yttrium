@@ -1,6 +1,6 @@
-#include <Yttrium/script/args.h>
+#include <yttrium/script/args.h>
 
-#include <Yttrium/script/context.h>
+#include <yttrium/script/context.h>
 
 namespace Yttrium
 {

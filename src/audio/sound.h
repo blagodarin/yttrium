@@ -1,7 +1,7 @@
 #ifndef __AUDIO_SOUND_H
 #define __AUDIO_SOUND_H
 
-#include <Yttrium/audio/sound.h>
+#include <yttrium/audio/sound.h>
 
 namespace Yttrium
 {

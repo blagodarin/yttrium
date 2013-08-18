@@ -1,11 +1,11 @@
 #ifndef __GUI_MANAGER_H
 #define __GUI_MANAGER_H
 
-#include <Yttrium/gui/manager.h>
-#include <Yttrium/proxy_allocator.h>
-#include <Yttrium/renderer.h>
-#include <Yttrium/renderer/texture_cache.h>
-#include <Yttrium/texture_font.h>
+#include <yttrium/gui/manager.h>
+#include <yttrium/proxy_allocator.h>
+#include <yttrium/renderer.h>
+#include <yttrium/renderer/texture_cache.h>
+#include <yttrium/texture_font.h>
 
 #include "types.h"
 

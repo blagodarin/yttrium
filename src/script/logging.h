@@ -3,6 +3,6 @@
 
 #define Y_LOG_LEVEL Y_LOG_LEVEL_NORMAL
 
-#include <Yttrium/logging.h>
+#include <yttrium/logging.h>
 
 #endif // __SCRIPT_LOGGING_H

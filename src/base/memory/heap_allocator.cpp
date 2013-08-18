@@ -1,6 +1,6 @@
 #include "heap_allocator.h"
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #include <cstdlib> // free, malloc, realloc
 

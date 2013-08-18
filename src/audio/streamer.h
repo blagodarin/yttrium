@@ -1,9 +1,9 @@
 #ifndef __AUDIO_STREAMER_H
 #define __AUDIO_STREAMER_H
 
-#include <Yttrium/audio/io.h>
-#include <Yttrium/audio/player.h>
-#include <Yttrium/buffer.h>
+#include <yttrium/audio/io.h>
+#include <yttrium/audio/player.h>
+#include <yttrium/buffer.h>
 
 namespace Yttrium
 {

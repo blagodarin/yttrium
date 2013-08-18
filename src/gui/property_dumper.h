@@ -1,8 +1,8 @@
 #ifndef __GUI_PROPERTY_DUMPER_H
 #define __GUI_PROPERTY_DUMPER_H
 
-#include <Yttrium/renderer/pointers.h>
-#include <Yttrium/static_string.h>
+#include <yttrium/renderer/pointers.h>
+#include <yttrium/static_string.h>
 
 #include "types.h"
 

@@ -1,7 +1,7 @@
 #ifndef __TERMINAL_X11_SCREEN_H
 #define __TERMINAL_X11_SCREEN_H
 
-#include <Yttrium/screen.h>
+#include <yttrium/screen.h>
 
 #include "../../base/private_base.h"
 

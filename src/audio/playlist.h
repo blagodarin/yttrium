@@ -1,8 +1,8 @@
 #ifndef __AUDIO_PLAYLIST_H
 #define __AUDIO_PLAYLIST_H
 
-#include <Yttrium/audio/player.h>
-#include <Yttrium/string.h>
+#include <yttrium/audio/player.h>
+#include <yttrium/string.h>
 
 #include "../base/mutex.h"
 

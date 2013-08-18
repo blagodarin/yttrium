@@ -2,9 +2,9 @@
 
 #include "manager.h"
 
-#include <Yttrium/allocator.h>
-#include <Yttrium/renderer/texture.h>
-#include <Yttrium/script/manager.h>
+#include <yttrium/allocator.h>
+#include <yttrium/renderer/texture.h>
+#include <yttrium/script/manager.h>
 
 #include "ion/dumper.h"
 #include "ion/loader.h"

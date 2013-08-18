@@ -1,7 +1,7 @@
 #ifndef __BASE_POSIX_TIME_H
 #define __BASE_POSIX_TIME_H
 
-#include <Yttrium/time.h>
+#include <yttrium/time.h>
 
 #include <time.h>
 

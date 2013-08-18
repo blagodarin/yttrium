@@ -1,7 +1,7 @@
 #ifndef __GUI_WIDGETS_IMAGE_H
 #define __GUI_WIDGETS_IMAGE_H
 
-#include <Yttrium/renderer/pointers.h>
+#include <yttrium/renderer/pointers.h>
 
 #include "widget.h"
 

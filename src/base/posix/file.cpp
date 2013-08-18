@@ -1,6 +1,6 @@
 #include "file.h"
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #define _FILE_OFFSET_BITS 64
 

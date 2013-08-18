@@ -1,7 +1,7 @@
 #ifndef __GUI_ION_PROPERTY_DUMPER_H
 #define __GUI_ION_PROPERTY_DUMPER_H
 
-#include <Yttrium/vector.h>
+#include <yttrium/vector.h>
 
 #include "../property_dumper.h"
 

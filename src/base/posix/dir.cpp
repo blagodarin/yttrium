@@ -1,7 +1,7 @@
 #include "dir.h"
 
-#include <Yttrium/assert.h>
-#include <Yttrium/string.h>
+#include <yttrium/assert.h>
+#include <yttrium/string.h>
 
 #include <cstdio>
 

@@ -1,7 +1,7 @@
 #ifndef __IMAGE_IMAGE_H
 #define __IMAGE_IMAGE_H
 
-#include <Yttrium/image.h>
+#include <yttrium/image.h>
 
 #include "../base/file.h"
 

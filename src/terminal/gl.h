@@ -1,7 +1,7 @@
 #ifndef __TERMINAL_GL_H
 #define __TERMINAL_GL_H
 
-#include <Yttrium/global.h>
+#include <yttrium/global.h>
 
 #if Y_IS_POSIX
 	#include "x11/gl.h"

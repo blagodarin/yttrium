@@ -1,7 +1,7 @@
-#include <Yttrium/log.h>
-#include <Yttrium/memory_manager.h>
-#include <Yttrium/proxy_allocator.h>
-#include <Yttrium/script/manager.h>
+#include <yttrium/log.h>
+#include <yttrium/memory_manager.h>
+#include <yttrium/proxy_allocator.h>
+#include <yttrium/script/manager.h>
 
 #include "game.h"
 

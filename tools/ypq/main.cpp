@@ -1,4 +1,6 @@
-#include <Yttrium/yttrium.h>
+#include <yttrium/memory_manager.h>
+#include <yttrium/package.h>
+#include <yttrium/string.h>
 
 #include <cstdio>
 

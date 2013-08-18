@@ -1,7 +1,7 @@
 #ifndef __PACKAGE_PACKAGE_H
 #define __PACKAGE_PACKAGE_H
 
-#include <Yttrium/package.h>
+#include <yttrium/package.h>
 
 #include "../base/file.h"
 

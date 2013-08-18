@@ -1,8 +1,8 @@
 #ifndef __GUI_WIDGETS_WIDGET_H
 #define __GUI_WIDGETS_WIDGET_H
 
-#include <Yttrium/rect.h>
-#include <Yttrium/string.h>
+#include <yttrium/rect.h>
+#include <yttrium/string.h>
 
 #include "../types.h"
 

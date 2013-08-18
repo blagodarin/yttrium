@@ -1,9 +1,9 @@
 #include "file.h"
 
-#include <Yttrium/buffer.h>
-#include <Yttrium/package.h>
-#include <Yttrium/string.h>
-#include <Yttrium/utils.h>
+#include <yttrium/buffer.h>
+#include <yttrium/package.h>
+#include <yttrium/string.h>
+#include <yttrium/utils.h>
 
 namespace Yttrium
 {

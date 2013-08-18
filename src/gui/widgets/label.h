@@ -1,8 +1,8 @@
 #ifndef __GUI_WIDGETS_LABEL_H
 #define __GUI_WIDGETS_LABEL_H
 
-#include <Yttrium/renderer/pointers.h>
-#include <Yttrium/texture_font.h>
+#include <yttrium/renderer/pointers.h>
+#include <yttrium/texture_font.h>
 
 #include "widget.h"
 

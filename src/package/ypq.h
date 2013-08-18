@@ -1,7 +1,7 @@
 #ifndef __PACKAGE_YPQ_H
 #define __PACKAGE_YPQ_H
 
-#include <Yttrium/string.h>
+#include <yttrium/string.h>
 
 #include "package.h"
 

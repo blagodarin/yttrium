@@ -1,8 +1,8 @@
-#include <Yttrium/buffer.h>
-#include <Yttrium/file.h>
-#include <Yttrium/memory_manager.h>
-#include <Yttrium/package.h>
-#include <Yttrium/utils.h>
+#include <yttrium/buffer.h>
+#include <yttrium/file.h>
+#include <yttrium/memory_manager.h>
+#include <yttrium/package.h>
+#include <yttrium/utils.h>
 
 #include <cstdlib> // rand
 #include <cstring> // memcmp

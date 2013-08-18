@@ -1,6 +1,6 @@
 #include "manager.h"
 
-#include <Yttrium/script/context.h>
+#include <yttrium/script/context.h>
 
 #include "sound.h"
 

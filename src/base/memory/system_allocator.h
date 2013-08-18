@@ -1,7 +1,7 @@
 #ifndef __BASE_MEMORY_SYSTEM_ALLOCATOR_H
 #define __BASE_MEMORY_SYSTEM_ALLOCATOR_H
 
-#include <Yttrium/global.h>
+#include <yttrium/global.h>
 
 #if Y_IS_POSIX
 	#include "../posix/system_allocator.h"

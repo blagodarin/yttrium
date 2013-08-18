@@ -1,6 +1,6 @@
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
-#include <Yttrium/log.h>
+#include <yttrium/log.h>
 
 #include <cstdlib>
 

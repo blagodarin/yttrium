@@ -1,14 +1,12 @@
 #include "image.h"
 
-#include <Yttrium/package.h>
-#include <Yttrium/utils.h>
+#include <yttrium/package.h>
+#include <yttrium/utils.h>
 
 #include "dds.h"
 #include "jpeg.h"
 #include "png.h"
 #include "tga.h"
-
-#include <Yttrium/log.h>
 
 namespace Yttrium
 {

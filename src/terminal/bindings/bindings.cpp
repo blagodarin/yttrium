@@ -1,6 +1,6 @@
-#include <Yttrium/bindings.h>
+#include <yttrium/bindings.h>
 
-#include <Yttrium/script/manager.h>
+#include <yttrium/script/manager.h>
 
 #include "lookup.h"
 

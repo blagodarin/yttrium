@@ -1,7 +1,7 @@
-#include <Yttrium/proxy_allocator.h>
+#include <yttrium/proxy_allocator.h>
 
-#include <Yttrium/memory_manager.h>
-#include <Yttrium/string.h>
+#include <yttrium/memory_manager.h>
+#include <yttrium/string.h>
 
 #include "atomic_status.h"
 

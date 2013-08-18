@@ -1,11 +1,11 @@
 #ifndef __RENDERER_RENDERER_H
 #define __RENDERER_RENDERER_H
 
-#include <Yttrium/image.h>
-#include <Yttrium/rect.h>
-#include <Yttrium/renderer.h>
-#include <Yttrium/string.h>
-#include <Yttrium/window.h>
+#include <yttrium/image.h>
+#include <yttrium/rect.h>
+#include <yttrium/renderer.h>
+#include <yttrium/string.h>
+#include <yttrium/window.h>
 
 #include "../base/private_base.h"
 #include "builtin.h"

@@ -1,9 +1,9 @@
 #include "parser.h"
 
-#include "logging.h"
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/node.h>
 
-#include <Yttrium/ion/document.h>
-#include <Yttrium/ion/node.h>
+#include "logging.h"
 
 namespace Yttrium
 {

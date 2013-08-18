@@ -1,7 +1,7 @@
 #ifndef __TERMINAL_X11_WINDOW_H
 #define __TERMINAL_X11_WINDOW_H
 
-#include <Yttrium/window.h>
+#include <yttrium/window.h>
 
 #include "../../base/private_base.h"
 

@@ -1,9 +1,9 @@
 #ifndef __GUI_WIDGETS_BUTTON_H
 #define __GUI_WIDGETS_BUTTON_H
 
-#include <Yttrium/audio/sound.h>
-#include <Yttrium/renderer/pointers.h>
-#include <Yttrium/texture_font.h>
+#include <yttrium/audio/sound.h>
+#include <yttrium/renderer/pointers.h>
+#include <yttrium/texture_font.h>
 
 #include "widget.h"
 

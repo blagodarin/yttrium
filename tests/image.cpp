@@ -1,7 +1,7 @@
-#include <Yttrium/buffer.h>
-#include <Yttrium/file.h>
-#include <Yttrium/image.h>
-#include <Yttrium/memory_manager.h>
+#include <yttrium/buffer.h>
+#include <yttrium/file.h>
+#include <yttrium/image.h>
+#include <yttrium/memory_manager.h>
 
 #include <boost/test/unit_test.hpp>
 

@@ -1,7 +1,7 @@
 #ifndef __BASE_MEMORY_ATOMIC_STATUS_H
 #define __BASE_MEMORY_ATOMIC_STATUS_H
 
-#include <Yttrium/proxy_allocator.h>
+#include <yttrium/proxy_allocator.h>
 
 #include <atomic>
 

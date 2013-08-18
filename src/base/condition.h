@@ -1,7 +1,7 @@
 #ifndef __BASE_CONDITION_H
 #define __BASE_CONDITION_H
 
-#include <Yttrium/global.h>
+#include <yttrium/global.h>
 
 #if Y_IS_POSIX
 	#include "posix/condition.h"

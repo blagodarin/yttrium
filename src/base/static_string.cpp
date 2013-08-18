@@ -1,6 +1,6 @@
-#include <Yttrium/static_string.h>
+#include <yttrium/static_string.h>
 
-#include <Yttrium/string.h>
+#include <yttrium/string.h>
 
 #include <cmath>   // pow
 #include <cstring> // memcmp, strlen

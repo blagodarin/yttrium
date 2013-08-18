@@ -1,7 +1,7 @@
 #ifndef __AUDIO_BACKEND_OPENAL_FORMAT_H
 #define __AUDIO_BACKEND_OPENAL_FORMAT_H
 
-#include <Yttrium/audio/io.h>
+#include <yttrium/audio/io.h>
 
 #include "openal.h"
 

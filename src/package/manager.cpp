@@ -1,4 +1,4 @@
-#include <Yttrium/package.h>
+#include <yttrium/package.h>
 
 #include "../base/instance_guard.h"
 

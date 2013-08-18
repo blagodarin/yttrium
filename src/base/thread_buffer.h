@@ -1,7 +1,7 @@
 #ifndef __BASE_THREAD_BUFFER_H
 #define __BASE_THREAD_BUFFER_H
 
-#include <Yttrium/thread_buffer.h>
+#include <yttrium/thread_buffer.h>
 
 #include "condition.h"
 #include "mutex.h"

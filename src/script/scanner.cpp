@@ -1,6 +1,6 @@
 #include "scanner.h"
 
-#include <Yttrium/assert.h>
+#include <yttrium/assert.h>
 
 #include "logging.h"
 

@@ -1,8 +1,8 @@
 #ifndef __TERMINAL_BINDINGS_LOOKUP_H
 #define __TERMINAL_BINDINGS_LOOKUP_H
 
-#include <Yttrium/key.h>
-#include <Yttrium/static_string.h>
+#include <yttrium/key.h>
+#include <yttrium/static_string.h>
 
 namespace Yttrium
 {

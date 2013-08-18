@@ -1,4 +1,4 @@
-#include <Yttrium/static_string.h>
+#include <yttrium/static_string.h>
 
 #include <boost/test/unit_test.hpp>
 
