@@ -89,10 +89,6 @@ struct Margins
 	}
 };
 
-/// Margins of <tt>int</tt>s.
-
-typedef Margins<int> MarginsI;
-
 } // namespace Yttrium
 
 #endif // __Y_MARGIN_H

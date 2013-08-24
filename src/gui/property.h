@@ -11,11 +11,17 @@ namespace Yttrium
 namespace Gui
 {
 
+class PropertyDumper;
+class PropertyLoader;
+
 struct TextureProperty
 {
 	Texture2DPtr texture;
-	Area         rect;
+	RectI        rect;
 	MarginsI     borders;
+
+	void dump(PropertyDumper *dumper) const;
+	bool load(PropertyLoader &loader);
 };
 
 } // namespace Gui

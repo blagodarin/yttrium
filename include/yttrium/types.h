@@ -17,6 +17,21 @@ namespace Yttrium
 
 class Allocator;
 
+template <typename T>
+class Margins;
+
+template <typename T>
+class Rect;
+
+template <typename T>
+class Vector2;
+
+template <typename T>
+class Vector3;
+
+template <typename T>
+class Vector4;
+
 /// Unsigned integer type of \c char size.
 
 typedef unsigned char UChar;
@@ -84,6 +99,24 @@ enum class ExecutionMode
 	Do,   ///<
 	Undo, ///<
 };
+
+// TODO: Find a better name for Area.
+
+typedef Margins<Integer> MarginsI;  ///< Integer Margins.
+
+typedef Rect<Integer>    RectI;     ///< Integer Rect.
+typedef Rect<float>      RectF;     ///< \c float Rect.
+typedef Rect<Dim>        Area;      ///< Dim Rect.
+
+typedef Vector2<int8_t>  Vector2i8; ///< \c int8_t Vector2.
+typedef Vector2<uint8_t> Vector2u8; ///< \c uint8_t Vector2.
+typedef Vector2<float>   Vector2f;  ///< \c float Vector2.
+typedef Vector2<double>  Vector2d;  ///< \c double Vector2.
+typedef Vector2<Dim>     Dim2;      ///< Dim Vector2.
+
+typedef Vector3<float>   Vector3f;  ///< \c float Vector3.
+
+typedef Vector4<float>   Vector4f;  ///< \c float Vector4.
 
 } // namespace Yttrium
 

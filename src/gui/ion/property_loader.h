@@ -38,7 +38,11 @@ public: // PropertyLoader
 
 	bool load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) override;
 
+	bool load_margins(const StaticString &name, MarginsI *margins) override;
+
 	bool load_position(const StaticString &name, Vector3f *color) override;
+
+	bool load_rect(const StaticString &name, RectI *rect) override;
 
 	bool load_scaling(const StaticString &name, Scaling *scaling) override;
 
@@ -50,13 +54,17 @@ public: // PropertyLoader
 
 	bool load_text(const StaticString &name, String *text) override;
 
-	bool load_texture(const StaticString &name, TextureProperty *texture) override;
+	bool load_texture(const StaticString &name, Texture2DPtr *texture) override;
 
 	void unbind() override;
 
 public:
 
 	static bool load_alignment(Alignment *alignment, const Ion::Node &node);
+
+	static bool load_margins(MarginsI *margins, const Ion::Node &node);
+
+	static bool load_rect(RectI *rect, const Ion::Node &node);
 
 	static bool load_scaling(Scaling *scaling, const Ion::Node &node);
 
@@ -68,7 +76,7 @@ public:
 
 	static bool load_text(const StaticString **text, const Ion::Object &object, const StaticString &name);
 
-	static bool load_texture(TextureProperty *texture, const Ion::Node &node,
+	static bool load_texture(Texture2DPtr *texture, const Ion::Node &node,
 		TextureCache *texture_cache, Texture2D::Filter default_filter);
 
 private:

@@ -25,7 +25,7 @@ void Image::dump(PropertyDumper *dumper) const
 	dumper->dump_size("size", _size);
 	dumper->dump_scaling("scale", _scaling);
 	dumper->dump_color("color", _color);
-	dumper->dump_texture("texture", _texture);
+	_texture.dump(dumper);
 }
 
 bool Image::load(PropertyLoader &loader)
@@ -41,7 +41,7 @@ bool Image::load(PropertyLoader &loader)
 
 	loader.load_scaling("scale", &_scaling);
 	loader.load_color("color", &_color);
-	loader.load_texture("texture", &_texture);
+	_texture.load(loader);
 
 	_area = RectF(_position.xy(), _size);
 

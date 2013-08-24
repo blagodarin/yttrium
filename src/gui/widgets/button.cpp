@@ -63,7 +63,7 @@ bool Button::load(PropertyLoader &loader)
 		}
 	}
 
-	if (loader.load_texture("texture", &_styles[0].texture))
+	if (_styles[0].texture.load(loader))
 	{
 		for (WidgetStateType i = 1; i < WidgetStateCount; ++i)
 		{
@@ -91,29 +91,29 @@ bool Button::load(PropertyLoader &loader)
 
 	loader.bind("active");
 	loader.load_color("color", &style->color);
-	loader.load_texture("texture", &style->texture);
 	loader.load_color("text_color", &style->text_color);
+	style->texture.load(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Pressed)];
 
 	loader.bind("pressed");
 	loader.load_color("color", &style->color);
-	loader.load_texture("texture", &style->texture);
 	loader.load_color("text_color", &style->text_color);
+	style->texture.load(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Checked)];
 
 	loader.bind("checked");
 	loader.load_color("color", &style->color);
-	loader.load_texture("texture", &style->texture);
 	loader.load_color("text_color", &style->text_color);
+	style->texture.load(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Disabled)];
 
 	loader.bind("disabled");
 	loader.load_color("color", &style->color);
-	loader.load_texture("texture", &style->texture);
 	loader.load_color("text_color", &style->text_color);
+	style->texture.load(loader);
 
 	_area = RectF(_position.xy(), _size);
 

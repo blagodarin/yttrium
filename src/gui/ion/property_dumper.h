@@ -28,7 +28,11 @@ public: // PropertyDumper
 
 	void dump_color(const StaticString &name, const Vector4f &color) override;
 
+	void dump_margins(const StaticString &name, const MarginsI &margins) override;
+
 	void dump_position(const StaticString &name, const Vector3f &color) override;
+
+	void dump_rect(const StaticString &name, const RectI &rect) override;
 
 	void dump_scaling(const StaticString &name, Scaling scaling) override;
 
@@ -40,7 +44,7 @@ public: // PropertyDumper
 
 	void dump_text(const StaticString &name, const StaticString &text) override;
 
-	void dump_texture(const StaticString &name, const TextureProperty &texture) override;
+	void dump_texture(const StaticString &name, const Texture2DPtr &texture) override;
 
 private:
 

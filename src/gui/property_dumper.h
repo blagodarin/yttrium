@@ -1,9 +1,9 @@
 #ifndef __GUI_PROPERTY_DUMPER_H
 #define __GUI_PROPERTY_DUMPER_H
 
+#include <yttrium/renderer/pointers.h>
 #include <yttrium/static_string.h>
 
-#include "property.h"
 #include "types.h"
 
 namespace Yttrium
@@ -26,7 +26,11 @@ public:
 
 	virtual void dump_color(const StaticString &name, const Vector4f &color) = 0;
 
+	virtual void dump_margins(const StaticString &name, const MarginsI &margins) = 0;
+
 	virtual void dump_position(const StaticString &name, const Vector3f &color) = 0;
+
+	virtual void dump_rect(const StaticString &name, const RectI &rect) = 0;
 
 	virtual void dump_scaling(const StaticString &name, Scaling scaling) = 0;
 
@@ -38,7 +42,7 @@ public:
 
 	virtual void dump_text(const StaticString &name, const StaticString &text) = 0;
 
-	virtual void dump_texture(const StaticString &name, const TextureProperty &texture) = 0;
+	virtual void dump_texture(const StaticString &name, const Texture2DPtr &texture) = 0;
 };
 
 } // namespace Gui

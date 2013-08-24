@@ -115,26 +115,6 @@ public:
 	Vector2 &operator /=(const Vector2 &vector) noexcept;
 };
 
-///
-
-typedef Vector2<int8_t>  Vector2i8;
-
-///
-
-typedef Vector2<uint8_t> Vector2u8;
-
-///
-
-typedef Vector2<float>  Vector2f;
-
-///
-
-typedef Vector2<double> Vector2d;
-
-///
-
-typedef Vector2<Dim> Dim2;
-
 /// 3-component vector.
 
 template <typename T>
@@ -247,8 +227,6 @@ public:
 
 	Vector3 &operator *=(const Vector3 &vector) noexcept;
 };
-
-typedef Vector3<float> Vector3f; ///<
 
 /// 4-component vector.
 
@@ -363,8 +341,6 @@ public:
 
 	Vector4 &operator *=(const Vector4 &vector) noexcept;
 };
-
-typedef Vector4<float> Vector4f; ///<
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

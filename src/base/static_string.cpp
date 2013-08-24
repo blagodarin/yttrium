@@ -306,6 +306,8 @@ T string_to_uint(const char *p, const char *end)
 
 } // namespace
 
+const char StringNull = '\0';
+
 StaticString::StaticString(const char *text)
 	: _text(const_cast<char *>(text))
 	, _size(::strlen(text))
@@ -594,9 +596,5 @@ bool StaticString::operator !=(const StaticString &string) const
 {
 	return (_size != string._size) || ::memcmp(_text, string._text, _size);
 }
-
-const size_t StaticString::End;
-
-const char StaticString::Null;
 
 } // namespace Yttrium

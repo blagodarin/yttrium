@@ -16,6 +16,8 @@ namespace Yttrium
 
 class String;
 
+extern Y_API const char StringNull;
+
 /// Static string wrapper class.
 /// \note Static strings can't implicitly hold \c nullptr and therefore should always be valid.
 /// \note Static strings may have no zero terminator.
@@ -255,9 +257,10 @@ public:
 
 public:
 
-	///
-
-	static const size_t End = SIZE_MAX;
+	enum: size_t
+	{
+		End = SIZE_MAX, ///<
+	};
 
 protected:
 
@@ -267,10 +270,6 @@ protected:
 protected:
 
 	inline StaticString(size_t size) noexcept;
-
-protected:
-
-	static const char Null = '\0';
 };
 
 /// Helper class for building StaticStrings from string literals.
@@ -291,7 +290,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 StaticString::StaticString() noexcept
-	: _text(const_cast<char *>(&Null))
+	: _text(const_cast<char *>(&StringNull))
 	, _size(0)
 {
 }

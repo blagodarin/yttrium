@@ -21,7 +21,15 @@ void IonPropertyDumper::dump_color(const StaticString &, const Vector4f &)
 {
 }
 
+void IonPropertyDumper::dump_margins(const StaticString &, const MarginsI &)
+{
+}
+
 void IonPropertyDumper::dump_position(const StaticString &, const Vector3f &)
+{
+}
+
+void IonPropertyDumper::dump_rect(const StaticString &, const RectI &)
 {
 }
 
@@ -45,7 +53,7 @@ void IonPropertyDumper::dump_text(const StaticString &, const StaticString &)
 {
 }
 
-void IonPropertyDumper::dump_texture(const StaticString &, const TextureProperty &)
+void IonPropertyDumper::dump_texture(const StaticString &, const Texture2DPtr &)
 {
 }
 

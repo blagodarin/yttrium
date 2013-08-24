@@ -63,7 +63,7 @@ String::String(size_t size, Allocator *allocator)
 	: _buffer_size(max<size_t>(size, StringReserve))
 	, _allocator(allocator)
 {
-	init(&Null, 0);
+	init(&StringNull, 0);
 }
 
 String::String(const StaticString &left, const StaticString &right, Allocator *allocator)
@@ -427,7 +427,7 @@ String &String::clear()
 		--*references;
 		_buffer_size = 0;
 	}
-	_text = const_cast<char *>(&Null);
+	_text = const_cast<char *>(&StringNull);
 	_size = 0;
 	return *this;
 }

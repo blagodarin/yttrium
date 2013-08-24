@@ -2,8 +2,8 @@
 #define __GUI_PROPERTY_LOADER_H
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/renderer/pointers.h>
 
-#include "property.h"
 #include "types.h"
 
 namespace Yttrium
@@ -32,7 +32,11 @@ public:
 
 	virtual bool load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) = 0;
 
+	virtual bool load_margins(const StaticString &name, MarginsI *margins) = 0;
+
 	virtual bool load_position(const StaticString &name, Vector3f *color) = 0;
+
+	virtual bool load_rect(const StaticString &name, RectI *rect) = 0;
 
 	virtual bool load_scaling(const StaticString &name, Scaling *scaling) = 0;
 
@@ -44,7 +48,7 @@ public:
 
 	virtual bool load_text(const StaticString &name, String *text) = 0;
 
-	virtual bool load_texture(const StaticString &name, TextureProperty *texture) = 0;
+	virtual bool load_texture(const StaticString &name, Texture2DPtr *texture) = 0;
 
 	virtual void unbind() = 0;
 };

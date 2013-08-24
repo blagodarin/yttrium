@@ -9,29 +9,30 @@ font "common"
 
 class "button"
 {
-	pos       "230" ""
-	size      "180" "40"
-	font      "common"
-	text_size "36"
-	texture   "examples/tetrium/data/blocks.tga" { rect "65" "33" "24" "24" }
-	sound     "data/sound.wav"
+	pos          "230" ""
+	size         "180" "40"
+	texture      "examples/tetrium/data/blocks.tga"
+	texture_rect "65" "33" "24" "24"
+	font         "common"
+	text_size    "36"
+	sound        "data/sound.wav"
 
 	active
 	{
-		texture "examples/tetrium/data/blocks.tga" { rect "33" "33" "24" "24" }
+		texture_rect "33" "33" "24" "24"
 	}
 
 	pressed
 	{
-		texture    "examples/tetrium/data/blocks.tga" { rect "33" "33" "24" "24" }
-		color      "0.9" "0.9" "0.9"
-		text_color "1" "1" "0"
+		texture_rect "33" "33" "24" "24"
+		color        "0.9" "0.9" "0.9"
+		text_color   "1" "1" "0"
 	}
 
 	checked
 	{
-		texture    "examples/tetrium/data/blocks.tga" { rect "33" "1" "24" "24" }
-		text_color "1" "1" "0"
+		texture_rect "33" "1" "24" "24"
+		text_color   "1" "1" "0"
 	}
 
 	disabled
