@@ -25,7 +25,7 @@ void IonPropertyDumper::dump_margins(const StaticString &, const MarginsI &)
 {
 }
 
-void IonPropertyDumper::dump_position(const StaticString &, const Vector3f &)
+void IonPropertyDumper::dump_position(const StaticString &, const Vector2f &)
 {
 }
 

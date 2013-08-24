@@ -51,7 +51,7 @@ unsigned read_color(Vector4f *color, const Ion::Node &node, unsigned inherit)
 	return result;
 }
 
-unsigned read_position(Vector3f *position, const Ion::Node &node, unsigned inherit)
+unsigned read_position(Vector2f *position, const Ion::Node &node)
 {
 	unsigned result = 0;
 
@@ -59,29 +59,20 @@ unsigned read_position(Vector3f *position, const Ion::Node &node, unsigned inher
 
 	if (!values.is_empty())
 	{
-		size_t items = min<size_t>(values.size(), 3);
+		size_t items = min<size_t>(values.size(), 2);
 
 		for (size_t i = 0; i < items; values.pop_first(), ++i)
 		{
 			const StaticString *value;
-
 			if (values->get(&value) && value->to_number(position->data() + i))
-			{
 				result |= 1 << i;
-			}
-		}
-
-		if (items < 3 && !(inherit & (1 << 2)))
-		{
-			position->z = 1.f;
-			result |= 1 << 2;
 		}
 	}
 
 	return result;
 }
 
-void read_rect(const Ion::Node &node, Integer elements[4])
+void read_rect(Integer elements[4], const Ion::Node &node)
 {
 	Ion::Node::ConstRange values = node.values();
 
@@ -259,7 +250,7 @@ bool IonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins
 	return false;
 }
 
-bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *position) const
+bool IonPropertyLoader::load_position(const StaticString &name, Vector2f *position) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading position...");
 
@@ -269,17 +260,17 @@ bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *positi
 	{
 		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists())
-			loaded = read_position(position, *node, 0x0);
+			loaded = read_position(position, *node);
 	}
 
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists())
-			loaded |= read_position(position, *node, loaded);
+			loaded |= read_position(position, *node);
 	}
 
-	return loaded == 0x7;
+	return loaded == 0x3;
 }
 
 bool IonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool update) const
@@ -300,17 +291,17 @@ bool IonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool up
 	{
 		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists())
-			read_rect(*node, elements);
+			read_rect(elements, *node);
 	}
 
 	if (_bound_class)
 	{
 		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists())
-			read_rect(*node, elements);
+			read_rect(elements, *node);
 	}
 
-	if (Y_UNLIKELY(elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
+	if (!update && Y_UNLIKELY(elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
 		return false;
 
 	*rect = RectI(elements[0], elements[1], elements[2], elements[3]);

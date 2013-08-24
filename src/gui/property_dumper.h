@@ -28,7 +28,7 @@ public:
 
 	virtual void dump_margins(const StaticString &name, const MarginsI &margins) = 0;
 
-	virtual void dump_position(const StaticString &name, const Vector3f &color) = 0;
+	virtual void dump_position(const StaticString &name, const Vector2f &position) = 0;
 
 	virtual void dump_rect(const StaticString &name, const RectI &rect) = 0;
 

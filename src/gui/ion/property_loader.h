@@ -40,7 +40,7 @@ public: // PropertyLoader
 
 	bool load_margins(const StaticString &name, MarginsI *margins) const override;
 
-	bool load_position(const StaticString &name, Vector3f *color) const override;
+	bool load_position(const StaticString &name, Vector2f *position) const override;
 
 	bool load_rect(const StaticString &name, RectI *rect, bool update) const override;
 

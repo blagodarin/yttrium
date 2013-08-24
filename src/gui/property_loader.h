@@ -34,7 +34,7 @@ public:
 
 	virtual bool load_margins(const StaticString &name, MarginsI *margins) const = 0;
 
-	virtual bool load_position(const StaticString &name, Vector3f *color) const = 0;
+	virtual bool load_position(const StaticString &name, Vector2f *position) const = 0;
 
 	virtual bool load_rect(const StaticString &name, RectI *rect, bool update = false) const = 0;
 

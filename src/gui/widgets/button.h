@@ -47,8 +47,7 @@ private:
 
 private:
 
-	Vector3f     _position;
-	Vector2f     _size;
+	RectI        _position;
 	TextureFont  _font;
 	Texture2DPtr _font_texture;
 	Vector2f     _text_size;

@@ -24,7 +24,7 @@ Label::Label(Allocator *allocator)
 
 void Label::dump(PropertyDumper *dumper) const
 {
-	dumper->dump_position("pos", _position);
+	dumper->dump_position("position", _position);
 	dumper->dump_size("size", _size);
 	dumper->dump_scaling("scale", _scaling);
 	dumper->dump_color("color", _color);
@@ -39,7 +39,7 @@ bool Label::load(PropertyLoader &loader)
 {
 	Y_LOG_TRACE("[Gui.Label] Loading...");
 
-	if (!(loader.load_position("pos", &_position)
+	if (!(loader.load_position("position", &_position)
 		&& loader.load_size("size", &_size)
 		&& loader.load_font("font", &_font, &_texture)
 		&& loader.load_text("text", &_text)))
@@ -83,7 +83,7 @@ void Label::update()
 
 void Label::update_area(const StaticString &text)
 {
-	_area.set_top_left(_position.xy());
+	_area.set_top_left(_position);
 
 	Vector2f text_size = _font.text_size(text, _size);
 

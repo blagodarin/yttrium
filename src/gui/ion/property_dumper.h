@@ -30,7 +30,7 @@ public: // PropertyDumper
 
 	void dump_margins(const StaticString &name, const MarginsI &margins) override;
 
-	void dump_position(const StaticString &name, const Vector3f &color) override;
+	void dump_position(const StaticString &name, const Vector2f &position) override;
 
 	void dump_rect(const StaticString &name, const RectI &rect) override;
 

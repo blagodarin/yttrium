@@ -4,44 +4,43 @@ scene "menu_multi"
 
 	image
 	{
-		pos     "0" "0"
-		size    "640" "480"
-		texture "data/textures/wall.jpeg"
+		position "0" "0" "640" "480"
+		texture  "data/textures/wall.jpeg"
 	}
 
 	label
 	{
-		pos  "320" "100"
-		size "160"
-		font "common"
-		text "Tetrium"
+		position "320" "100"
+		size     "160"
+		font     "common"
+		text     "Tetrium"
 	}
 
 	button ["button"]
 	{
-		pos   "" "210"
-		text  "Multiplayer"
-		state "checked"
+		position "" "210"
+		text     "Multiplayer"
+		state    "checked"
 	}
 
 	button ["button"]
 	{
-		pos    "" "260"
-		text   "Back"
-		action "pop_scene"
+		position "" "260"
+		text     "Back"
+		action   "pop_scene"
 	}
 
 	button ["button"]
 	{
-		pos   "" "310"
-		text  "Host game"
-		state "disabled"
+		position "" "310"
+		text     "Host game"
+		state    "disabled"
 	}
 
 	button ["button"]
 	{
-		pos   "" "360"
-		text  "Join game"
-		state "disabled"
+		position "" "360"
+		text     "Join game"
+		state    "disabled"
 	}
 }

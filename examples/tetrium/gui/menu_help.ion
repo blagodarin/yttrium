@@ -1,17 +1,17 @@
 class "help_key"
 {
-	pos   "230" ""
-	size  "40"
-	align "bottom"
-	font  "common"
+	position "230" ""
+	size     "40"
+	align    "bottom"
+	font     "common"
 }
 
 class "help_text"
 {
-	pos   "300" ""
-	size  "40"
-	align "bottom" "right"
-	font  "common"
+	position "300" ""
+	size     "40"
+	align    "bottom" "right"
+	font     "common"
 }
 
 scene "menu_help"
@@ -23,40 +23,38 @@ scene "menu_help"
 
 	image
 	{
-		pos     "0" "0"
-		size    "640" "480"
-		texture "data/textures/wall.jpeg"
+		position "0" "0" "640" "480"
+		texture  "data/textures/wall.jpeg"
 	}
 
 	image
 	{
-		pos   "120" "30"
-		size  "400" "300"
-		color "0" "0" "0" "0.5"
+		position "120" "30" "400" "300"
+		color    "0" "0" "0" "0.5"
 	}
 
-	label ["help_key" ] { pos "" "55"  text "[A]" }
-	label ["help_text"] { pos "" "55"  text "Move left" }
+	label ["help_key" ] { position "" "55"  text "[A]" }
+	label ["help_text"] { position "" "55"  text "Move left" }
 
-	label ["help_key" ] { pos "" "105" text "[D]" }
-	label ["help_text"] { pos "" "105" text "Move right" }
+	label ["help_key" ] { position "" "105" text "[D]" }
+	label ["help_text"] { position "" "105" text "Move right" }
 
-	label ["help_key" ] { pos "" "155" text "[S]" }
-	label ["help_text"] { pos "" "155" text "Accelerate" }
+	label ["help_key" ] { position "" "155" text "[S]" }
+	label ["help_text"] { position "" "155" text "Accelerate" }
 
-	label ["help_key" ] { pos "" "205" text "[Left]" }
-	label ["help_text"] { pos "" "205" text "Rotate left" }
+	label ["help_key" ] { position "" "205" text "[Left]" }
+	label ["help_text"] { position "" "205" text "Rotate left" }
 
-	label ["help_key" ] { pos "" "255" text "[Right]" }
-	label ["help_text"] { pos "" "255" text "Rotate right" }
+	label ["help_key" ] { position "" "255" text "[Right]" }
+	label ["help_text"] { position "" "255" text "Rotate right" }
 
-	label ["help_key" ] { pos "" "305" text "[Esc]" }
-	label ["help_text"] { pos "" "305" text "Pause/Exit" }
+	label ["help_key" ] { position "" "305" text "[Esc]" }
+	label ["help_text"] { position "" "305" text "Pause/Exit" }
 
 	button ["button"]
 	{
-		pos    "" "360"
-		text   "Back"
-		action "pop_scene"
+		position "" "360"
+		text     "Back"
+		action   "pop_scene"
 	}
 }

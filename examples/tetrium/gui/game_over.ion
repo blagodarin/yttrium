@@ -8,18 +8,17 @@ scene "game_over"
 
 	image
 	{
-		pos   "0" "0"
-		size  "30" "26"
-		color "0" "0" "0" "0.5"
-		scale "stretch"
+		position "0" "0" "30" "26"
+		color    "0" "0" "0" "0.5"
+		scale    "stretch"
 	}
 
 	label
 	{
-		pos   "15" "13"
-		size  "8"
-		font  "common"
-		color "0.75" "0" "0"
-		text  "Game over"
+		position "15" "13"
+		size     "8"
+		font     "common"
+		color    "0.75" "0" "0"
+		text     "Game over"
 	}
 }

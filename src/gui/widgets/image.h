@@ -27,8 +27,7 @@ public: // Widget
 
 private:
 
-	Vector3f        _position;
-	Vector2f        _size;
+	RectI           _position;
 	Vector4f        _color;
 	TextureProperty _texture;
 };

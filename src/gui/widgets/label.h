@@ -35,7 +35,7 @@ private:
 
 private:
 
-	Vector3f     _position;
+	Vector2f     _position;
 	Vector2f     _size;
 	Vector4f     _color;
 	Texture2DPtr _texture;

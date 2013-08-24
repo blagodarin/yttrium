@@ -22,8 +22,7 @@ Button::Button(Allocator *allocator)
 
 void Button::dump(PropertyDumper *dumper) const
 {
-	dumper->dump_position("pos", _position);
-	dumper->dump_size("size", _size);
+	dumper->dump_rect("position", _position);
 	dumper->dump_scaling("scale", _scaling);
 
 	// TODO: Dump font.
@@ -43,8 +42,7 @@ bool Button::load(PropertyLoader &loader)
 {
 	Y_LOG_TRACE("[Gui.Button] Loading...");
 
-	if (!(loader.load_position("pos", &_position)
-		&& loader.load_size("size", &_size)
+	if (!(loader.load_rect("position", &_position)
 		&& loader.load_font("font", &_font, &_font_texture)
 		&& loader.load_size("text_size", &_text_size)))
 	{
@@ -115,7 +113,7 @@ bool Button::load(PropertyLoader &loader)
 	loader.load_color("text_color", &style->text_color);
 	style->texture.update(loader);
 
-	_area = RectF(_position.xy(), _size);
+	_area = _position;
 
 	return true;
 }

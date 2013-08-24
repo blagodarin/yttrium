@@ -4,51 +4,50 @@ scene "menu_main" ["root"]
 
 	image
 	{
-		pos     "0" "0"
-		size    "640" "480"
-		texture "data/textures/wall.jpeg"
+		position "0" "0" "640" "480"
+		texture  "data/textures/wall.jpeg"
 	}
 
 	label
 	{
-		pos   "320" "100"
-		size  "160"
-		font  "common"
-		text  "Tetrium"
+		position "320" "100"
+		size     "160"
+		font     "common"
+		text     "Tetrium"
 	}
 
 	button ["button"]
 	{
-		pos    "" "210"
-		text   "Single player"
-		action "push_scene game_single"
+		position "" "210"
+		text     "Single player"
+		action   "push_scene game_single"
 	}
 
 	button ["button"]
 	{
-		pos    "" "260"
-		text   "Multiplayer"
-		action "push_scene menu_multi"
+		position "" "260"
+		text     "Multiplayer"
+		action   "push_scene menu_multi"
 	}
 
 	button ["button"]
 	{
-		pos   "" "310"
-		text  "Statistics"
-		state "disabled"
+		position "" "310"
+		text     "Statistics"
+		state    "disabled"
 	}
 
 	button ["button"]
 	{
-		pos    "" "360"
-		text   "Help"
-		action "push_scene menu_help"
+		position "" "360"
+		text     "Help"
+		action   "push_scene menu_help"
 	}
 
 	button ["button"]
 	{
-		pos    "" "410"
-		text   "Exit"
-		action "exit"
+		position "" "410"
+		text     "Exit"
+		action   "exit"
 	}
 }

@@ -9,8 +9,7 @@ font "common"
 
 class "button"
 {
-	pos          "230" ""
-	size         "180" "40"
+	position     "230" "" "180" "40"
 	texture      "examples/tetrium/data/blocks.tga"
 	texture_rect "65" "33" "24" "24"
 	font         "common"

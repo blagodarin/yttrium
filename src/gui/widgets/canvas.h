@@ -29,9 +29,8 @@ public: // Widget
 
 private:
 
+	RectI               _position;
 	Manager::Callbacks *_manager_callbacks;
-	Vector3f            _position;
-	Vector2f            _size;
 };
 
 } // namespace Gui

@@ -21,8 +21,7 @@ Image::Image(Allocator *allocator)
 
 void Image::dump(PropertyDumper *dumper) const
 {
-	dumper->dump_position("pos", _position);
-	dumper->dump_size("size", _size);
+	dumper->dump_rect("position", _position);
 	dumper->dump_scaling("scale", _scaling);
 	dumper->dump_color("color", _color);
 	_texture.dump(dumper);
@@ -32,8 +31,7 @@ bool Image::load(PropertyLoader &loader)
 {
 	Y_LOG_TRACE("[Gui.Image] Loading...");
 
-	if (!(loader.load_position("pos", &_position)
-		&& loader.load_size("size", &_size)))
+	if (!loader.load_rect("position", &_position))
 	{
 		Y_LOG_DEBUG("[Gui.Image] Unable to load");
 		return false;
@@ -43,7 +41,7 @@ bool Image::load(PropertyLoader &loader)
 	loader.load_color("color", &_color);
 	_texture.load(loader);
 
-	_area = RectF(_position.xy(), _size);
+	_area = _position;
 
 	return true;
 }
