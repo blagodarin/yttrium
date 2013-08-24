@@ -92,28 +92,28 @@ bool Button::load(PropertyLoader &loader)
 	loader.bind("active");
 	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.load(loader);
+	style->texture.update(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Pressed)];
 
 	loader.bind("pressed");
 	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.load(loader);
+	style->texture.update(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Checked)];
 
 	loader.bind("checked");
 	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.load(loader);
+	style->texture.update(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Disabled)];
 
 	loader.bind("disabled");
 	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.load(loader);
+	style->texture.update(loader);
 
 	_area = RectF(_position.xy(), _size);
 

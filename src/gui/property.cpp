@@ -21,17 +21,24 @@ void TextureProperty::dump(PropertyDumper *dumper) const
 	}
 }
 
-bool TextureProperty::load(PropertyLoader &loader)
+bool TextureProperty::load(const PropertyLoader &loader)
 {
-	if (!loader.load_texture("texture", &texture) && texture.is_null())
+	if (!loader.load_texture("texture", &texture))
 		return false;
 
-	if (!loader.load_rect("texture_rect", &rect) && rect.is_empty())
+	if (!loader.load_rect("texture_rect", &rect))
 		rect = texture->rect();
 
 	loader.load_margins("texture_borders", &borders);
 
 	return true;
+}
+
+void TextureProperty::update(const PropertyLoader &loader)
+{
+	loader.load_texture("texture", &texture);
+	loader.load_rect("texture_rect", &rect, true);
+	loader.load_margins("texture_borders", &borders);
 }
 
 } // namespace Gui

@@ -19,19 +19,19 @@ class "button"
 
 	active
 	{
-		texture_rect "33" "33" "24" "24"
+		texture_rect "33" "33"
 	}
 
 	pressed
 	{
-		texture_rect "33" "33" "24" "24"
+		texture_rect "33" "33"
 		color        "0.9" "0.9" "0.9"
 		text_color   "1" "1" "0"
 	}
 
 	checked
 	{
-		texture_rect "33" "1" "24" "24"
+		texture_rect "33" "1"
 		text_color   "1" "1" "0"
 	}
 

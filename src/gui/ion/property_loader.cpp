@@ -81,6 +81,27 @@ unsigned read_position(Vector3f *position, const Ion::Node &node, unsigned inher
 	return result;
 }
 
+void read_rect(const Ion::Node &node, Integer elements[4])
+{
+	Ion::Node::ConstRange values = node.values();
+
+	for (Integer i = 0; i < 4; ++i)
+	{
+		if (values.is_empty())
+			break;
+
+		const StaticString *value;
+		if (Y_LIKELY(values->get(&value)))
+		{
+			Integer number;
+			if (value->to_number(&number) && Y_LIKELY(number >= i >> 1)) // 'number' must be not less than {0, 0, 1, 1}.
+				elements[i] = number;
+		}
+		
+		values.pop_first();
+	}
+}
+
 unsigned read_size(Vector2f *size, const Ion::Node &node, unsigned inherit)
 {
 	unsigned result = 0;
@@ -128,27 +149,22 @@ IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Objec
 void IonPropertyLoader::bind(const StaticString &name)
 {
 	_bound_object = nullptr;
-	if (_object) // NOTE: Should always yield 'true'.
-	{
-		const Ion::Node *node = &_object->last(name);
-		if (node->exists() && node->size() != 1)
-		{
-			node->first()->get(&_bound_object);
-		}
-	}
+
+	const Ion::Node *node = &_object->last(name);
+	if (node->exists() && node->size() != 1)
+		node->first()->get(&_bound_object);
 
 	_bound_class = nullptr;
+
 	if (_class)
 	{
 		const Ion::Node *node = &_class->last(name);
 		if (node->size() == 1)
-		{
 			node->first()->get(&_bound_class);
-		}
 	}
 }
 
-bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alignment)
+bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alignment) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading alignment...");
 
@@ -169,7 +185,7 @@ bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alig
 	return false;
 }
 
-bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
+bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading color...");
 
@@ -192,7 +208,7 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 	return loaded == 0xF;
 }
 
-bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture)
+bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading font...");
 
@@ -222,7 +238,7 @@ bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, T
 	return true;
 }
 
-bool IonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins)
+bool IonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading margins...");
 
@@ -243,7 +259,7 @@ bool IonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins
 	return false;
 }
 
-bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *position)
+bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *position) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading position...");
 
@@ -266,28 +282,43 @@ bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *positi
 	return loaded == 0x7;
 }
 
-bool IonPropertyLoader::load_rect(const StaticString &name, RectI *rect)
+bool IonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool update) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading rect...");
+
+	Integer elements[4] = {-1, -1, -1, -1};
+
+	if (update)
+	{
+		elements[0] = rect->left();
+		elements[1] = rect->top();
+		elements[2] = rect->width();
+		elements[3] = rect->height();
+	}
 
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
-		if (node->exists() && load_rect(rect, *node))
-			return true;
+		if (node->exists())
+			read_rect(*node, elements);
 	}
 
 	if (_bound_class)
 	{
 		const Ion::Node *node = &_bound_class->last(name);
-		if (node->exists() && load_rect(rect, *node))
-			return true;
+		if (node->exists())
+			read_rect(*node, elements);
 	}
 
-	return false;
+	if (Y_UNLIKELY(elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
+		return false;
+
+	*rect = RectI(elements[0], elements[1], elements[2], elements[3]);
+
+	return true;
 }
 
-bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling)
+bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading scaling...");
 
@@ -308,7 +339,7 @@ bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling)
 	return false;
 }
 
-bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
+bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading size...");
 
@@ -331,7 +362,7 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 	return loaded == 0x3;
 }
 
-SoundPtr IonPropertyLoader::load_sound(const StaticString &name)
+SoundPtr IonPropertyLoader::load_sound(const StaticString &name) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading sound...");
 
@@ -352,7 +383,7 @@ SoundPtr IonPropertyLoader::load_sound(const StaticString &name)
 	return SoundPtr();
 }
 
-bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
+bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading state...");
 
@@ -373,7 +404,7 @@ bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
 	return false;
 }
 
-bool IonPropertyLoader::load_text(const StaticString &name, String *text)
+bool IonPropertyLoader::load_text(const StaticString &name, String *text) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading text...");
 
@@ -388,7 +419,7 @@ bool IonPropertyLoader::load_text(const StaticString &name, String *text)
 	return true;
 }
 
-bool IonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *texture)
+bool IonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *texture) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading texture...");
 
@@ -547,39 +578,6 @@ bool IonPropertyLoader::load_margins(MarginsI *margins, const Ion::Node &node)
 		left = right;
 
 	*margins = MarginsI(top, right, bottom, left);
-
-	return true;
-}
-
-bool IonPropertyLoader::load_rect(RectI *rect, const Ion::Node &node)
-{
-	Ion::List::ConstRange values = node.const_values();
-	if (Y_UNLIKELY(values.size() != 4))
-		return false;
-
-	Integer left = -1;
-	if (Y_UNLIKELY(!values->get(&left) || left < 0))
-		return false;
-
-	values.pop_first();
-
-	Integer top = -1;
-	if (Y_UNLIKELY(!values->get(&top) || top < 0))
-		return false;
-
-	values.pop_first();
-
-	Integer width = -1;
-	if (Y_UNLIKELY(!values->get(&width) || width <= 0))
-		return false;
-
-	values.pop_first();
-
-	Integer height = -1;
-	if (Y_UNLIKELY(!values->get(&height) || height <= 0))
-		return false;
-
-	*rect = RectI(left, top, width, height);
 
 	return true;
 }

@@ -32,29 +32,29 @@ public: // PropertyLoader
 
 	void bind(const StaticString &name) override;
 
-	bool load_alignment(const StaticString &name, Alignment *alignment) override;
+	bool load_alignment(const StaticString &name, Alignment *alignment) const override;
 
-	bool load_color(const StaticString &name, Vector4f *color) override;
+	bool load_color(const StaticString &name, Vector4f *color) const override;
 
-	bool load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) override;
+	bool load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) const override;
 
-	bool load_margins(const StaticString &name, MarginsI *margins) override;
+	bool load_margins(const StaticString &name, MarginsI *margins) const override;
 
-	bool load_position(const StaticString &name, Vector3f *color) override;
+	bool load_position(const StaticString &name, Vector3f *color) const override;
 
-	bool load_rect(const StaticString &name, RectI *rect) override;
+	bool load_rect(const StaticString &name, RectI *rect, bool update) const override;
 
-	bool load_scaling(const StaticString &name, Scaling *scaling) override;
+	bool load_scaling(const StaticString &name, Scaling *scaling) const override;
 
-	bool load_size(const StaticString &name, Vector2f *size) override;
+	bool load_size(const StaticString &name, Vector2f *size) const override;
 
-	SoundPtr load_sound(const StaticString &name) override;
+	SoundPtr load_sound(const StaticString &name) const override;
 
-	bool load_state(const StaticString &name, WidgetState *state) override;
+	bool load_state(const StaticString &name, WidgetState *state) const override;
 
-	bool load_text(const StaticString &name, String *text) override;
+	bool load_text(const StaticString &name, String *text) const override;
 
-	bool load_texture(const StaticString &name, Texture2DPtr *texture) override;
+	bool load_texture(const StaticString &name, Texture2DPtr *texture) const override;
 
 	void unbind() override;
 
@@ -63,8 +63,6 @@ public:
 	static bool load_alignment(Alignment *alignment, const Ion::Node &node);
 
 	static bool load_margins(MarginsI *margins, const Ion::Node &node);
-
-	static bool load_rect(RectI *rect, const Ion::Node &node);
 
 	static bool load_scaling(Scaling *scaling, const Ion::Node &node);
 

@@ -26,29 +26,29 @@ public:
 
 	virtual void bind(const StaticString &name) = 0;
 
-	virtual bool load_alignment(const StaticString &name, Alignment *alignment) = 0;
+	virtual bool load_alignment(const StaticString &name, Alignment *alignment) const = 0;
 
-	virtual bool load_color(const StaticString &name, Vector4f *color) = 0;
+	virtual bool load_color(const StaticString &name, Vector4f *color) const = 0;
 
-	virtual bool load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) = 0;
+	virtual bool load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) const = 0;
 
-	virtual bool load_margins(const StaticString &name, MarginsI *margins) = 0;
+	virtual bool load_margins(const StaticString &name, MarginsI *margins) const = 0;
 
-	virtual bool load_position(const StaticString &name, Vector3f *color) = 0;
+	virtual bool load_position(const StaticString &name, Vector3f *color) const = 0;
 
-	virtual bool load_rect(const StaticString &name, RectI *rect) = 0;
+	virtual bool load_rect(const StaticString &name, RectI *rect, bool update = false) const = 0;
 
-	virtual bool load_scaling(const StaticString &name, Scaling *scaling) = 0;
+	virtual bool load_scaling(const StaticString &name, Scaling *scaling) const = 0;
 
-	virtual bool load_size(const StaticString &name, Vector2f *size) = 0;
+	virtual bool load_size(const StaticString &name, Vector2f *size) const = 0;
 
-	virtual SoundPtr load_sound(const StaticString &name) = 0;
+	virtual SoundPtr load_sound(const StaticString &name) const = 0;
 
-	virtual bool load_state(const StaticString &name, WidgetState *state) = 0;
+	virtual bool load_state(const StaticString &name, WidgetState *state) const = 0;
 
-	virtual bool load_text(const StaticString &name, String *text) = 0;
+	virtual bool load_text(const StaticString &name, String *text) const = 0;
 
-	virtual bool load_texture(const StaticString &name, Texture2DPtr *texture) = 0;
+	virtual bool load_texture(const StaticString &name, Texture2DPtr *texture) const = 0;
 
 	virtual void unbind() = 0;
 };

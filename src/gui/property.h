@@ -21,7 +21,8 @@ struct TextureProperty
 	MarginsI     borders;
 
 	void dump(PropertyDumper *dumper) const;
-	bool load(PropertyLoader &loader);
+	bool load(const PropertyLoader &loader);
+	void update(const PropertyLoader &loader);
 };
 
 } // namespace Gui
