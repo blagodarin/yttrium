@@ -20,6 +20,62 @@ namespace Gui
 namespace
 {
 
+bool read_borders(MarginsI *borders, const Ion::List &source)
+{
+	Integer top    = -1;
+	Integer right  = -1;
+	Integer bottom = -1;
+	Integer left   = -1;
+
+	Ion::List::ConstRange r = source.const_values();
+	switch (r.size())
+	{
+	case 4:
+
+		if (Y_UNLIKELY(!r.last().get(&left) || left < 0))
+			return false;
+		r.pop_last();
+		// Fallthrough.
+
+	case 3:
+
+		if (Y_UNLIKELY(!r.last().get(&bottom) || bottom < 0))
+			return false;
+		r.pop_last();
+		// Fallthrough.
+
+	case 2:
+
+		if (Y_UNLIKELY(!r.last().get(&right) || right < 0))
+			return false;
+		r.pop_last();
+		// Fallthrough.
+
+	case 1:
+
+		if (Y_UNLIKELY(!r.last().get(&top) || top < 0))
+			return false;
+		break;
+
+	default:
+
+		return false;
+	}
+
+	if (right < 0)
+		right = top;
+
+	if (bottom < 0)
+		bottom = top;
+
+	if (left < 0)
+		left = right;
+
+	*borders = MarginsI(top, right, bottom, left);
+
+	return true;
+}
+
 unsigned read_color(Vector4f *color, const Ion::Node &node, unsigned inherit)
 {
 	unsigned result = 0;
@@ -80,6 +136,39 @@ unsigned read_position(Vector3f *position, const Ion::Node &node, unsigned inher
 	return result;
 }
 
+bool read_rect(Area *rect, const Ion::List &source)
+{
+	Ion::List::ConstRange r = source.const_values();
+	if (Y_UNLIKELY(r.size() != 4))
+		return false;
+
+	Integer left = -1;
+	if (Y_UNLIKELY(!r->get(&left) || left < 0))
+		return false;
+
+	r.pop_first();
+
+	Integer top = -1;
+	if (Y_UNLIKELY(!r->get(&top) || top < 0))
+		return false;
+
+	r.pop_first();
+
+	Integer width = -1;
+	if (Y_UNLIKELY(!r->get(&width) || width <= 0))
+		return false;
+
+	r.pop_first();
+
+	Integer height = -1;
+	if (Y_UNLIKELY(!r->get(&height) || height <= 0))
+		return false;
+
+	*rect = Area(left, top, width, height);
+
+	return true;
+}
+
 unsigned read_size(Vector2f *size, const Ion::Node &node, unsigned inherit)
 {
 	unsigned result = 0;
@@ -126,12 +215,10 @@ IonPropertyLoader::IonPropertyLoader(const Ion::Object *object, const Ion::Objec
 
 void IonPropertyLoader::bind(const StaticString &name)
 {
-	const Ion::Node *node;
-
 	_bound_object = nullptr;
 	if (_object) // NOTE: Should always yield 'true'.
 	{
-		node = &_object->last(name);
+		const Ion::Node *node = &_object->last(name);
 		if (node->exists() && node->size() != 1)
 		{
 			node->first()->get(&_bound_object);
@@ -141,7 +228,7 @@ void IonPropertyLoader::bind(const StaticString &name)
 	_bound_class = nullptr;
 	if (_class)
 	{
-		node = &_class->last(name);
+		const Ion::Node *node = &_class->last(name);
 		if (node->size() == 1)
 		{
 			node->first()->get(&_bound_class);
@@ -153,11 +240,9 @@ bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alig
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading alignment...");
 
-	const Ion::Node *node;
-
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists() && load_alignment(alignment, *node))
 		{
 			return true;
@@ -166,7 +251,7 @@ bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alig
 
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists() && load_alignment(alignment, *node))
 		{
 			return true;
@@ -182,11 +267,9 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 
 	unsigned loaded = 0;
 
-	const Ion::Node *node;
-
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists())
 		{
 			loaded = read_color(color, *node, 0);
@@ -195,7 +278,7 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists())
 		{
 			loaded |= read_color(color, *node, loaded);
@@ -246,11 +329,9 @@ bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *positi
 
 	unsigned loaded = 0;
 
-	const Ion::Node *node;
-
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists())
 		{
 			loaded = read_position(position, *node, 0);
@@ -259,7 +340,7 @@ bool IonPropertyLoader::load_position(const StaticString &name, Vector3f *positi
 
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists())
 		{
 			loaded |= read_position(position, *node, loaded);
@@ -273,11 +354,9 @@ bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading scaling...");
 
-	const Ion::Node *node;
-
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists() && load_scaling(scaling, *node))
 		{
 			return true;
@@ -286,7 +365,7 @@ bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling)
 
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists() && load_scaling(scaling, *node))
 		{
 			return true;
@@ -302,11 +381,9 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 
 	unsigned loaded = 0;
 
-	const Ion::Node *node;
-
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists())
 		{
 			loaded = read_size(size, *node, 0);
@@ -315,7 +392,7 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size)
 
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists())
 		{
 			loaded |= read_size(size, *node, loaded);
@@ -329,18 +406,16 @@ SoundPtr IonPropertyLoader::load_sound(const StaticString &name)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading sound...");
 
-	const Ion::Node *node;
-
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists())
 			return load_sound(*node);
 	}
 
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists())
 			return load_sound(*node);
 	}
@@ -352,11 +427,9 @@ bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading state...");
 
-	const Ion::Node *node;
-
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists() && load_state(state, *node))
 		{
 			return true;
@@ -365,7 +438,7 @@ bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
 
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists() && load_state(state, *node))
 		{
 			return true;
@@ -390,15 +463,13 @@ bool IonPropertyLoader::load_text(const StaticString &name, String *text)
 	return true;
 }
 
-bool IonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *texture)
+bool IonPropertyLoader::load_texture(const StaticString &name, TextureProperty *texture)
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading texture...");
 
-	const Ion::Node *node;
-
 	if (_bound_object)
 	{
-		node = &_bound_object->last(name);
+		const Ion::Node *node = &_bound_object->last(name);
 		if (node->exists() && load_texture(texture, *node, _texture_cache,
 			Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
 		{
@@ -408,7 +479,7 @@ bool IonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *tex
 
 	if (_bound_class)
 	{
-		node = &_bound_class->last(name);
+		const Ion::Node *node = &_bound_class->last(name);
 		if (node->exists() && load_texture(texture, *node, _texture_cache,
 			Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
 		{
@@ -608,12 +679,12 @@ bool IonPropertyLoader::load_text(const StaticString **text, const Ion::Object &
 	return node.size() == 1 && node.first()->get(text);
 }
 
-bool IonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &node,
+bool IonPropertyLoader::load_texture(TextureProperty *texture, const Ion::Node &node,
 	TextureCache *texture_cache, Texture2D::Filter default_filter)
 {
 	Ion::Node::ConstRange values = node.values();
 
-	if (values.is_empty() || values.size() > 3)
+	if (values.is_empty() || values.size() > 4)
 	{
 		return false;
 	}
@@ -629,10 +700,14 @@ bool IonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &nod
 
 	Texture2D::Filter filter = default_filter;
 
+	Area     rect;
+	MarginsI borders;
+
 	if (!values.is_empty())
 	{
 		bool has_interpolation = false;
 		bool has_anisotropy = false;
+		bool has_properties = false;
 
 		for (; !values.is_empty(); values.pop_first())
 		{
@@ -640,50 +715,70 @@ bool IonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &nod
 
 			if (!values->get(&value))
 			{
-				return false;
+				if (Y_UNLIKELY(has_properties))
+					return false;
+
+				const Ion::Object *properties = nullptr;
+				if (Y_UNLIKELY(!values->get(&properties)))
+					return false;
+
+				bool has_rect = false;
+				bool has_borders = false;
+
+				for (const Ion::Node &node: properties->nodes())
+				{
+					if (node.name() == S("rect"))
+					{
+						if (has_rect || !read_rect(&rect, node))
+							return false;
+						has_rect = true;
+					}
+					else if (node.name() == S("borders"))
+					{
+						if (has_borders || !read_borders(&borders, node))
+							return false;
+						has_borders = true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+
+				has_properties = true;
 			}
 			else if (*value == S("nearest"))
 			{
 				if (has_interpolation)
-				{
 					return false;
-				}
 				filter = Texture2D::NearestFilter | (filter & Texture2D::AnisotropicFilter);
 				has_interpolation = true;
 			}
 			else if (*value == S("linear"))
 			{
 				if (has_interpolation)
-				{
 					return false;
-				}
 				filter = Texture2D::LinearFilter | (filter & Texture2D::AnisotropicFilter);
 				has_interpolation = true;
 			}
 			else if (*value == S("bilinear"))
 			{
 				if (has_interpolation)
-				{
 					return false;
-				}
 				filter = Texture2D::BilinearFilter | (filter & Texture2D::AnisotropicFilter);
 				has_interpolation = true;
 			}
 			else if (*value == S("trilinear"))
 			{
 				if (has_interpolation)
-				{
 					return false;
-				}
 				filter = Texture2D::TrilinearFilter | (filter & Texture2D::AnisotropicFilter);
 				has_interpolation = true;
 			}
 			else if (*value == S("anisotropic"))
 			{
 				if (has_anisotropy)
-				{
 					return false;
-				}
 				filter = (filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter;
 				has_anisotropy = true;
 			}
@@ -699,7 +794,9 @@ bool IonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &nod
 		return false;
 
 	result_texture->set_filter(filter);
-	*texture = result_texture;
+	texture->texture = result_texture;
+	texture->rect = rect.is_empty() ? result_texture->rect() : rect;
+	texture->borders = borders;
 	return true;
 }
 

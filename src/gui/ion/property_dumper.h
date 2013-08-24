@@ -1,8 +1,6 @@
 #ifndef __GUI_ION_PROPERTY_DUMPER_H
 #define __GUI_ION_PROPERTY_DUMPER_H
 
-#include <yttrium/vector.h>
-
 #include "../property_dumper.h"
 
 namespace Yttrium
@@ -42,7 +40,7 @@ public: // PropertyDumper
 
 	void dump_text(const StaticString &name, const StaticString &text) override;
 
-	void dump_texture(const StaticString &name, const Texture2DPtr &texture) override;
+	void dump_texture(const StaticString &name, const TextureProperty &texture) override;
 
 private:
 

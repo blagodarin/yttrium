@@ -7,33 +7,38 @@ font "common"
 	texture "data/font.tga"
 }
 
-class "common_button"
-{
-	size "5" "1.5"
-	color "1" "1" "0" "0.5"
-	font "common"
-	text_size "1"
-	text_color "1" "1" "1"
-
-	active { color "1" "1" "0" "0.75" text_color "1" "0.5" "0.5" }
-	pressed { color "1" "1" "0" "0.875" text_color "1" "0" "0" }
-	disabled { color "0" "0" "0" "0.5" text_color "0.5" "0.5" "0.5" }
-}
-
 class "button"
 {
-	pos        "230" ""
-	size       "180" "40"
-	color      "0" "0" "0.25" "0.5"
-	font       "common"
-	text_size  "36"
-	text_color "1" "1" "0.5"
-	sound      "data/sound.wav"
+	pos       "230" ""
+	size      "180" "40"
+	font      "common"
+	text_size "36"
+	texture   "examples/tetrium/data/blocks.tga" { rect "65" "33" "24" "24" }
+	sound     "data/sound.wav"
 
-	active { color "0" "0" "0.25" "0.75" text_color "1" "1" "0.4" }
-	pressed { color "0" "0" "0.25" "0.85" text_color "1" "1" "0.4" }
-	checked { color "0" "0" "0.25" "0.85" text_color "1" "1" "0.875" }
-	disabled { text_color "0.6" "0.6" "0.6" }
+	active
+	{
+		texture "examples/tetrium/data/blocks.tga" { rect "33" "33" "24" "24" }
+	}
+
+	pressed
+	{
+		texture    "examples/tetrium/data/blocks.tga" { rect "33" "33" "24" "24" }
+		color      "0.9" "0.9" "0.9"
+		text_color "1" "1" "0"
+	}
+
+	checked
+	{
+		texture    "examples/tetrium/data/blocks.tga" { rect "33" "1" "24" "24" }
+		text_color "1" "1" "0"
+	}
+
+	disabled
+	{
+		color      "0.5" "0.5" "0.5" "0.75"
+		text_color "0.75" "0.75" "0.75"
+	}
 }
 
 include "examples/tetrium/gui/menu_main.ion"

@@ -21,6 +21,12 @@ void List::ConstRange::pop_first()
 	--_size;
 }
 
+void List::ConstRange::pop_last()
+{
+	_last = _last->_previous;
+	--_size;
+}
+
 void List::Iterator::operator ++()
 {
 	_value = _value->_next;
@@ -29,6 +35,12 @@ void List::Iterator::operator ++()
 void List::Range::pop_first()
 {
 	_first = _first->_next;
+	--_size;
+}
+
+void List::Range::pop_last()
+{
+	_last = _last->_previous;
 	--_size;
 }
 
@@ -174,6 +186,7 @@ void List::append(Value *value)
 	else
 	{
 		_last->_next = value;
+		value->_previous = _last;
 	}
 	_last = value;
 	++_size;

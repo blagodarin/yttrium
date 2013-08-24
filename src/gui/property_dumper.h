@@ -1,9 +1,9 @@
 #ifndef __GUI_PROPERTY_DUMPER_H
 #define __GUI_PROPERTY_DUMPER_H
 
-#include <yttrium/renderer/pointers.h>
 #include <yttrium/static_string.h>
 
+#include "property.h"
 #include "types.h"
 
 namespace Yttrium
@@ -18,7 +18,7 @@ class PropertyDumper
 {
 public:
 
-	inline virtual ~PropertyDumper();
+	virtual ~PropertyDumper() {}
 
 public:
 
@@ -38,15 +38,8 @@ public:
 
 	virtual void dump_text(const StaticString &name, const StaticString &text) = 0;
 
-	virtual void dump_texture(const StaticString &name, const Texture2DPtr &texture) = 0;
+	virtual void dump_texture(const StaticString &name, const TextureProperty &texture) = 0;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-PropertyDumper::~PropertyDumper()
-{
-}
 
 } // namespace Gui
 

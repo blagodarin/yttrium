@@ -2,9 +2,9 @@
 #define __GUI_WIDGETS_BUTTON_H
 
 #include <yttrium/audio/sound.h>
-#include <yttrium/renderer/pointers.h>
 #include <yttrium/texture_font.h>
 
+#include "../property.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -34,9 +34,9 @@ private:
 
 	struct Style
 	{
-		Vector4f     color;
-		Texture2DPtr texture;
-		Vector4f     text_color;
+		Vector4f        color;
+		TextureProperty texture;
+		Vector4f        text_color;
 
 		Style()
 			: color(1, 1, 1)

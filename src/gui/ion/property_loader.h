@@ -1,7 +1,6 @@
 #ifndef __GUI_ION_PROPERTY_LOADER_H
 #define __GUI_ION_PROPERTY_LOADER_H
 
-#include <yttrium/renderer/pointers.h>
 #include <yttrium/renderer/texture.h>
 
 #include "../property_loader.h"
@@ -51,7 +50,7 @@ public: // PropertyLoader
 
 	bool load_text(const StaticString &name, String *text) override;
 
-	bool load_texture(const StaticString &name, Texture2DPtr *texture) override;
+	bool load_texture(const StaticString &name, TextureProperty *texture) override;
 
 	void unbind() override;
 
@@ -69,7 +68,7 @@ public:
 
 	static bool load_text(const StaticString **text, const Ion::Object &object, const StaticString &name);
 
-	static bool load_texture(Texture2DPtr *texture, const Ion::Node &node,
+	static bool load_texture(TextureProperty *texture, const Ion::Node &node,
 		TextureCache *texture_cache, Texture2D::Filter default_filter);
 
 private:

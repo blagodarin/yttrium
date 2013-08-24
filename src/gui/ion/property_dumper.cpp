@@ -45,7 +45,7 @@ void IonPropertyDumper::dump_text(const StaticString &, const StaticString &)
 {
 }
 
-void IonPropertyDumper::dump_texture(const StaticString &, const Texture2DPtr &)
+void IonPropertyDumper::dump_texture(const StaticString &, const TextureProperty &)
 {
 }
 

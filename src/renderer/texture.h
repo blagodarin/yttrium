@@ -18,8 +18,6 @@ public:
 	
 	RectF full_rectangle() const;
 
-	Dim2 size() const { return _size; }
-
 public:
 
 	virtual void bind() = 0;
@@ -30,7 +28,6 @@ public:
 
 protected:
 
-	const Dim2             _size;
 	const ImageOrientation _orientation;
 	bool                   _has_mipmaps;
 

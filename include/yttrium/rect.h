@@ -57,6 +57,10 @@ public:
 
 	///
 
+	bool is_empty() const noexcept { return _left >= _right || _top >= _bottom; }
+
+	///
+
 	T left() const noexcept;
 
 	///
@@ -166,7 +170,7 @@ private:
 	T _bottom;
 };
 
-/// Rect of \c float.
+/// Rect of <tt>float</tt>s.
 
 typedef Rect<float> RectF;
 

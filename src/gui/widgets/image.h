@@ -1,8 +1,7 @@
 #ifndef __GUI_WIDGETS_IMAGE_H
 #define __GUI_WIDGETS_IMAGE_H
 
-#include <yttrium/renderer/pointers.h>
-
+#include "../property.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -28,10 +27,10 @@ public: // Widget
 
 private:
 
-	Vector3f     _position;
-	Vector2f     _size;
-	Vector4f     _color;
-	Texture2DPtr _texture;
+	Vector3f        _position;
+	Vector2f        _size;
+	Vector4f        _color;
+	TextureProperty _texture;
 };
 
 } // namespace Gui

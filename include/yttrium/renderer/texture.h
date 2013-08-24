@@ -5,6 +5,7 @@
 #define __Y_RENDERER_TEXTURE_H
 
 #include <yttrium/object.h>
+#include <yttrium/rect.h>
 
 namespace Yttrium
 {
@@ -54,15 +55,24 @@ public:
 
 	///
 
+	Area rect() const noexcept { return Area(0, 0, _size.x, _size.y); }
+
+	///
+
 	void set_filter(Filter filter) noexcept { _filter = filter; }
 
+	///
+
+	Dim2 size() const noexcept { return _size; }
+
 protected:
 
-	Texture2D(Allocator *allocator) noexcept: Object(allocator), _filter(NearestFilter) {}
+	Texture2D(const Dim2 &size, Allocator *allocator) noexcept: Object(allocator), _size(size), _filter(NearestFilter) {}
 
 protected:
 
-	Filter _filter;
+	const Dim2 _size;
+	Filter     _filter;
 };
 
 } // namespace Yttrium

@@ -89,6 +89,10 @@ public:
 
 		///
 
+		void pop_last() noexcept;
+
+		///
+
 		inline size_t size() const noexcept;
 
 	public:
@@ -162,6 +166,10 @@ public:
 		///
 
 		void pop_first() noexcept;
+
+		///
+
+		void pop_last() noexcept;
 
 		///
 

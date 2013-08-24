@@ -2,15 +2,13 @@
 #define __GUI_PROPERTY_LOADER_H
 
 #include <yttrium/audio/sound.h>
-#include <yttrium/renderer/pointers.h>
-#include <yttrium/vector.h>
 
+#include "property.h"
 #include "types.h"
 
 namespace Yttrium
 {
 
-class Sound;
 class TextureFont;
 
 namespace Gui
@@ -20,7 +18,7 @@ class PropertyLoader
 {
 public:
 
-	inline virtual ~PropertyLoader();
+	virtual ~PropertyLoader() {}
 
 public:
 
@@ -46,17 +44,10 @@ public:
 
 	virtual bool load_text(const StaticString &name, String *text) = 0;
 
-	virtual bool load_texture(const StaticString &name, Texture2DPtr *texture) = 0;
+	virtual bool load_texture(const StaticString &name, TextureProperty *texture) = 0;
 
 	virtual void unbind() = 0;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-PropertyLoader::~PropertyLoader()
-{
-}
 
 } // namespace Gui
 

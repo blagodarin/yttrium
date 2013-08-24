@@ -43,6 +43,7 @@ Value::Value(Document *document)
 	, _list(document)
 	, _object(nullptr)
 	, _next(nullptr)
+	, _previous(nullptr)
 {
 }
 
@@ -52,6 +53,7 @@ Value::Value(Document *document, const StaticString &string)
 	, _list(document)
 	, _object(nullptr)
 	, _next(nullptr)
+	, _previous(nullptr)
 {
 }
 
@@ -61,6 +63,7 @@ Value::Value(Document *document, const StaticString &string, const ByReference &
 	, _list(document)
 	, _object(nullptr)
 	, _next(nullptr)
+	, _previous(nullptr)
 {
 }
 
@@ -70,6 +73,7 @@ Value::Value(Document *document, Object *object)
 	, _list(document)
 	, _object(object)
 	, _next(nullptr)
+	, _previous(nullptr)
 {
 }
 

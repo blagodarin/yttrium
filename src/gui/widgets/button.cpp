@@ -136,7 +136,9 @@ void Button::render(Renderer *renderer, const RectF &area, const Vector2f &scale
 	}
 
 	renderer->set_color(_styles[WidgetStateType(state)].color);
-	renderer->set_texture(_styles[WidgetStateType(state)].texture);
+	renderer->set_texture(_styles[WidgetStateType(state)].texture.texture);
+	renderer->set_texture_rectangle(_styles[WidgetStateType(state)].texture.rect);
+	// TODO: Use texture border.
 	renderer->draw_rectangle(area.left(), area.top(), area.width(), area.height());
 
 	if (_text.is_empty())

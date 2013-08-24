@@ -10,6 +10,7 @@ Yttrium:
 
     GUI:
     - Implement button frames (a la CSS border-image).
+    - Implement line editor widget.
 
     Image:
     - Add compressed image format support (e.g. compressed textures).
@@ -20,6 +21,3 @@ Yttrium:
 
     ION:
     - Make string value retrieval more usable.
-
-Tests:
-- Add audio test.
