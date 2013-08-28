@@ -105,6 +105,10 @@ public:
 
 	///
 
+	Vector2<T> size() const noexcept;
+
+	///
+
 	T top() const noexcept;
 
 	///
@@ -317,6 +321,12 @@ template <typename T>
 void Rect<T>::set_width(T width) noexcept
 {
 	_right = _left + width;
+}
+
+template <typename T>
+Vector2<T> Rect<T>::size() const noexcept
+{
+	return Vector2<T>(_right - _left, _bottom - _top);
 }
 
 template <typename T>

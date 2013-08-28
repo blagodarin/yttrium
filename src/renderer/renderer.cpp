@@ -41,29 +41,9 @@ void Renderer::Private::set_viewport(const Dim2 &size)
 	_viewport_size = size;
 }
 
-void Renderer::Private::draw_rectangle(const RectF &position, const RectF &texture)
+void Renderer::Private::draw_rectangle(const RectF &position, const RectF &texture, const MarginsI &borders)
 {
 	size_t index = _vertices_2d.size();
-
-	Vertex2D vertex;
-
-	vertex.color = _color;
-
-	vertex.position = position.top_left();
-	vertex.texture = texture.top_left();
-	_vertices_2d.push_back(vertex);
-
-	vertex.position = position.bottom_left();
-	vertex.texture = texture.bottom_left();
-	_vertices_2d.push_back(vertex);
-
-	vertex.position = position.top_right();
-	vertex.texture = texture.top_right();
-	_vertices_2d.push_back(vertex);
-
-	vertex.position = position.bottom_right();
-	vertex.texture = texture.bottom_right();
-	_vertices_2d.push_back(vertex);
 
 	if (index)
 	{
@@ -76,10 +56,146 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 		}
 	}
 
-	_indices_2d.push_back(index);
-	_indices_2d.push_back(index + 1);
-	_indices_2d.push_back(index + 2);
-	_indices_2d.push_back(index + 3);
+	Vertex2D vertex;
+	vertex.color = _color;
+
+	// Outer top vertex row.
+
+	vertex.position = position.top_left();
+	vertex.texture = texture.top_left();
+	_vertices_2d.push_back(vertex);
+
+	if (borders.left > 0)
+	{
+		vertex.position = position.top_left() + Vector2f(borders.left, 0);
+		vertex.texture = texture.top_left() + Vector2f(borders.left, 0);
+		_vertices_2d.push_back(vertex);
+	}
+
+	if (borders.right > 0)
+	{
+		vertex.position = position.top_right() - Vector2f(borders.right, 0);
+		vertex.texture = texture.top_right() - Vector2f(borders.right, 0);
+		_vertices_2d.push_back(vertex);
+	}
+
+	vertex.position = position.top_right();
+	vertex.texture = texture.top_right();
+	_vertices_2d.push_back(vertex);
+
+	// Top/only part indices.
+
+	const size_t row_vertices = _vertices_2d.size() - index;
+
+	for (size_t i = 0; i < row_vertices; ++i)
+	{
+		_indices_2d.push_back(index + i);
+		_indices_2d.push_back(index + i + row_vertices);
+	}
+
+	if (borders.top > 0)
+	{
+		// Inner top vertex row.
+
+		vertex.position = position.top_left() + Vector2f(0, borders.top);
+		vertex.texture = texture.top_left() + Vector2f(0, borders.top);
+		_vertices_2d.push_back(vertex);
+
+		if (borders.left > 0)
+		{
+			vertex.position = position.top_left() + Vector2f(borders.left, borders.top);
+			vertex.texture = texture.top_left() + Vector2f(borders.left, borders.top);
+			_vertices_2d.push_back(vertex);
+		}
+
+		if (borders.right > 0)
+		{
+			vertex.position = position.top_right() + Vector2f(-borders.right, borders.top);
+			vertex.texture = texture.top_right() + Vector2f(-borders.right, borders.top);
+			_vertices_2d.push_back(vertex);
+		}
+
+		vertex.position = position.top_right() + Vector2f(0, borders.top);
+		vertex.texture = texture.top_right() + Vector2f(0, borders.top);
+		_vertices_2d.push_back(vertex);
+
+		// Middle/bottom part indices.
+
+		index += row_vertices;
+
+		_indices_2d.push_back(index + row_vertices - 1);
+		_indices_2d.push_back(index);
+
+		for (size_t i = 0; i < row_vertices; ++i)
+		{
+			_indices_2d.push_back(index + i);
+			_indices_2d.push_back(index + i + row_vertices);
+		}
+	}
+
+	if (borders.bottom > 0)
+	{
+		// Inner bottom vertex row.
+
+		vertex.position = position.bottom_left() + Vector2f(0, -borders.bottom);
+		vertex.texture = texture.bottom_left() + Vector2f(0, -borders.bottom);
+		_vertices_2d.push_back(vertex);
+
+		if (borders.left > 0)
+		{
+			vertex.position = position.bottom_left() + Vector2f(borders.left, -borders.bottom);
+			vertex.texture = texture.bottom_left() + Vector2f(borders.left, -borders.bottom);
+			_vertices_2d.push_back(vertex);
+		}
+
+		if (borders.right > 0)
+		{
+			vertex.position = position.bottom_right() + Vector2f(-borders.right, -borders.bottom);
+			vertex.texture = texture.bottom_right() + Vector2f(-borders.right, -borders.bottom);
+			_vertices_2d.push_back(vertex);
+		}
+
+		vertex.position = position.bottom_right() + Vector2f(0, -borders.bottom);
+		vertex.texture = texture.bottom_right() + Vector2f(0, -borders.bottom);
+		_vertices_2d.push_back(vertex);
+
+		// Bottom part indices.
+
+		index += row_vertices;
+
+		_indices_2d.push_back(index + row_vertices - 1);
+		_indices_2d.push_back(index);
+
+		for (size_t i = 0; i < row_vertices; ++i)
+		{
+			_indices_2d.push_back(index + i);
+			_indices_2d.push_back(index + i + row_vertices);
+		}
+	}
+
+	// Outer bottom vertex row.
+
+	vertex.position = position.bottom_left();
+	vertex.texture = texture.bottom_left();
+	_vertices_2d.push_back(vertex);
+
+	if (borders.left > 0)
+	{
+		vertex.position = position.bottom_left() + Vector2f(borders.left, 0);
+		vertex.texture = texture.bottom_left() + Vector2f(borders.left, 0);
+		_vertices_2d.push_back(vertex);
+	}
+
+	if (borders.right > 0)
+	{
+		vertex.position = position.bottom_right() + Vector2f(-borders.right, 0);
+		vertex.texture = texture.bottom_right() + Vector2f(-borders.right, 0);
+		_vertices_2d.push_back(vertex);
+	}
+
+	vertex.position = position.bottom_right();
+	vertex.texture = texture.bottom_right();
+	_vertices_2d.push_back(vertex);
 }
 
 void Renderer::Private::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment)
@@ -171,12 +287,12 @@ void Renderer::begin_frame()
 
 void Renderer::draw_rectangle(const RectF &rect)
 {
-	_private->draw_rectangle(rect, _private->_texture_rect);
+	_private->draw_rectangle(rect, _private->_texture_rect, _private->_texture_borders);
 }
 
 void Renderer::draw_rectangle(const RectF &rect, const RectF &texture_rect)
 {
-	_private->draw_rectangle(rect, texture_rect);
+	_private->draw_rectangle(rect, texture_rect, _private->_texture_borders);
 }
 
 void Renderer::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment)
@@ -273,6 +389,7 @@ void Renderer::set_texture(const Texture2DPtr &texture)
 	}
 
 	_private->_texture = texture;
+	_private->_texture_borders = MarginsI();
 
 	BackendTexture2D *new_backend_texture = static_cast<BackendTexture2D *>(_private->_texture.pointer());
 	if (new_backend_texture)
@@ -280,8 +397,26 @@ void Renderer::set_texture(const Texture2DPtr &texture)
 		new_backend_texture->bind();
 		_private->_texture_rect = new_backend_texture->full_rectangle();
 	}
+	else
+	{
+		_private->_texture_rect = RectF();
+	}
 
 	_private->_font = TextureFont();
+}
+
+bool Renderer::set_texture_borders(const MarginsI &borders)
+{
+	if (_private->_texture.is_null())
+		return false;
+
+	const Vector2f texture_size = _private->_texture_rect.size();
+	if (texture_size.x < borders.min_width() || texture_size.y < borders.min_height())
+		return false;
+
+	_private->_texture_borders = borders;
+
+	return true;
 }
 
 void Renderer::set_texture_rectangle(const RectF &rect)
@@ -293,6 +428,7 @@ void Renderer::set_texture_rectangle(const RectF &rect)
 		const Vector2f &bottom_right = backend_texture->fix_coords(rect.bottom_right());
 
 		_private->_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
+		_private->_texture_borders = MarginsI();
 	}
 }
 

@@ -15,7 +15,7 @@ public:
 	BackendTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator);
 
 public:
-	
+
 	RectF full_rectangle() const;
 
 public:

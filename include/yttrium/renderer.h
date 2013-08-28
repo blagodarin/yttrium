@@ -131,6 +131,10 @@ public:
 
 	///
 
+	bool set_texture_borders(const MarginsI &borders) noexcept;
+
+	///
+
 	void set_texture_rectangle(const RectF &rect) noexcept;
 
 	///

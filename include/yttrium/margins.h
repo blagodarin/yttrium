@@ -87,6 +87,20 @@ struct Margins
 	{
 		return !(left || top || right || bottom);
 	}
+
+	///
+
+	T min_height() const noexcept
+	{
+		return top + 1 + bottom;
+	}
+
+	///
+
+	T min_width() const noexcept
+	{
+		return left + 1 + right;
+	}
 };
 
 } // namespace Yttrium

@@ -157,7 +157,7 @@ void IonPropertyLoader::bind(const StaticString &name)
 
 bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alignment) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading alignment...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	if (_bound_object)
 	{
@@ -178,7 +178,7 @@ bool IonPropertyLoader::load_alignment(const StaticString &name, Alignment *alig
 
 bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading color...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	unsigned loaded = 0x0;
 
@@ -201,7 +201,7 @@ bool IonPropertyLoader::load_color(const StaticString &name, Vector4f *color) co
 
 bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading font...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	const StaticString *font_name;
 
@@ -231,7 +231,7 @@ bool IonPropertyLoader::load_font(const StaticString &name, TextureFont *font, T
 
 bool IonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading margins...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	if (_bound_object)
 	{
@@ -252,7 +252,7 @@ bool IonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins
 
 bool IonPropertyLoader::load_position(const StaticString &name, Vector2f *position) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading position...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	unsigned loaded = 0x0;
 
@@ -275,7 +275,7 @@ bool IonPropertyLoader::load_position(const StaticString &name, Vector2f *positi
 
 bool IonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool update) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading rect...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	Integer elements[4] = {-1, -1, -1, -1};
 
@@ -311,7 +311,7 @@ bool IonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool up
 
 bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading scaling...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	if (_bound_object)
 	{
@@ -332,7 +332,7 @@ bool IonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling)
 
 bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading size...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	unsigned loaded = 0x0;
 
@@ -355,7 +355,7 @@ bool IonPropertyLoader::load_size(const StaticString &name, Vector2f *size) cons
 
 SoundPtr IonPropertyLoader::load_sound(const StaticString &name) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading sound...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	if (_bound_object)
 	{
@@ -376,7 +376,7 @@ SoundPtr IonPropertyLoader::load_sound(const StaticString &name) const
 
 bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading state...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	if (_bound_object)
 	{
@@ -397,7 +397,7 @@ bool IonPropertyLoader::load_state(const StaticString &name, WidgetState *state)
 
 bool IonPropertyLoader::load_text(const StaticString &name, String *text) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading text...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	const StaticString *value;
 
@@ -412,7 +412,7 @@ bool IonPropertyLoader::load_text(const StaticString &name, String *text) const
 
 bool IonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *texture) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading texture...");
+	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
 	if (_bound_object)
 	{
