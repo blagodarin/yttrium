@@ -48,6 +48,11 @@ public:
 
 	const T *data() const noexcept;
 
+	///
+
+	template <typename U>
+	Vector2<U> to() const noexcept;
+
 public:
 
 	///
@@ -377,6 +382,13 @@ template <typename T>
 const T *Vector2<T>::data() const noexcept
 {
 	return &x;
+}
+
+template <typename T>
+template <typename U>
+Vector2<U> Vector2<T>::to() const noexcept
+{
+	return Vector2<U>(x, y);
 }
 
 template <typename T>

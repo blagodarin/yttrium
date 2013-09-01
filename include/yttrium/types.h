@@ -103,6 +103,7 @@ enum class ExecutionMode
 // TODO: Find a better name for Area.
 
 typedef Margins<Integer> MarginsI;  ///< Integer Margins.
+typedef Margins<float>   MarginsF;  ///< \c float Margins.
 
 typedef Rect<Integer>    RectI;     ///< Integer Rect.
 typedef Rect<float>      RectF;     ///< \c float Rect.

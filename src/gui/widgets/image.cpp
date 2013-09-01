@@ -51,7 +51,7 @@ void Image::render(Renderer *renderer, const RectF &area, const Vector2f &, Widg
 	renderer->set_color(_color);
 	renderer->set_texture(_texture.texture);
 	renderer->set_texture_rectangle(_texture.rect);
-	// TODO: Use texture border.
+	renderer->set_texture_borders(_texture.borders);
 	renderer->draw_rectangle(area.left(), area.top(), area.width(), area.height());
 }
 

@@ -4,7 +4,7 @@
 #ifndef __Y_MARGINS_H
 #define __Y_MARGINS_H
 
-#include <yttrium/global.h>
+#include <yttrium/vector.h>
 
 namespace Yttrium
 {
@@ -93,6 +93,13 @@ struct Margins
 	T min_height() const noexcept
 	{
 		return top + 1 + bottom;
+	}
+
+	///
+
+	Vector2<T> min_size() const noexcept
+	{
+		return Vector2<T>(min_width(), min_height());
 	}
 
 	///

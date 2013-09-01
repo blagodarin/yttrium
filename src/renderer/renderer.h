@@ -41,7 +41,7 @@ public:
 
 public:
 
-	void draw_rectangle(const RectF &position, const RectF &texture, const MarginsI &borders = MarginsI());
+	void draw_rectangle(const RectF &position, const RectF &texture, const MarginsF &borders = MarginsF());
 
 	void draw_text(const Vector2f &position, const StaticString &text, Alignment alignment);
 
@@ -76,7 +76,7 @@ public:
 
 	Texture2DPtr _texture;
 	RectF        _texture_rect;
-	MarginsI     _texture_borders;
+	MarginsF     _texture_borders;
 
 	TextureFont _font;
 	Vector2f    _font_size;
