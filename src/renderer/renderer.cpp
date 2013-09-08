@@ -64,16 +64,19 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 
 	// Outer top vertex row.
 
-	vertex.position = position.top_left();
-	vertex.texture = texture.top_left();
+	vertex.position.y = position.top();
+	vertex.texture.y = texture.top();
+
+	vertex.position.x = position.left();
+	vertex.texture.x = texture.left();
 	_vertices_2d.push_back(vertex);
 
 	if (borders.left > 0)
 	{
 		left_offset = borders.left * _texture->size().x * _rendering_size.x / _viewport_size.x;
 
-		vertex.position = position.top_left() + Vector2f(left_offset, 0);
-		vertex.texture = texture.top_left() + Vector2f(borders.left, 0);
+		vertex.position.x = position.left() + left_offset;
+		vertex.texture.x = texture.left() + borders.left;
 		_vertices_2d.push_back(vertex);
 	}
 
@@ -81,13 +84,13 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 	{
 		right_offset = borders.right * _texture->size().x * _rendering_size.x / _viewport_size.x;
 
-		vertex.position = position.top_right() - Vector2f(right_offset, 0);
-		vertex.texture = texture.top_right() - Vector2f(borders.right, 0);
+		vertex.position.x = position.right() - right_offset;
+		vertex.texture.x = texture.right() - borders.right;
 		_vertices_2d.push_back(vertex);
 	}
 
-	vertex.position = position.top_right();
-	vertex.texture = texture.top_right();
+	vertex.position.x = position.right();
+	vertex.texture.x = texture.right();
 	_vertices_2d.push_back(vertex);
 
 	// Top/only part indices.
@@ -106,26 +109,29 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 
 		// Inner top vertex row.
 
-		vertex.position = position.top_left() + Vector2f(0, top_offset);
-		vertex.texture = texture.top_left() + Vector2f(0, borders.top);
+		vertex.position.y = position.top() + top_offset;
+		vertex.texture.y = texture.top() + borders.top;
+
+		vertex.position.x = position.left();
+		vertex.texture.x = texture.left();
 		_vertices_2d.push_back(vertex);
 
 		if (borders.left > 0)
 		{
-			vertex.position = position.top_left() + Vector2f(left_offset, top_offset);
-			vertex.texture = texture.top_left() + Vector2f(borders.left, borders.top);
+			vertex.position.x = position.left() + left_offset;
+			vertex.texture.x = texture.left() + borders.left;
 			_vertices_2d.push_back(vertex);
 		}
 
 		if (borders.right > 0)
 		{
-			vertex.position = position.top_right() + Vector2f(-right_offset, top_offset);
-			vertex.texture = texture.top_right() + Vector2f(-borders.right, borders.top);
+			vertex.position.x = position.right() - right_offset;
+			vertex.texture.x = texture.right() - borders.right;
 			_vertices_2d.push_back(vertex);
 		}
 
-		vertex.position = position.top_right() + Vector2f(0, top_offset);
-		vertex.texture = texture.top_right() + Vector2f(0, borders.top);
+		vertex.position.x = position.right();
+		vertex.texture.x = texture.right();
 		_vertices_2d.push_back(vertex);
 
 		// Middle/bottom part indices.
@@ -148,26 +154,29 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 
 		// Inner bottom vertex row.
 
-		vertex.position = position.bottom_left() + Vector2f(0, -bottom_offset);
-		vertex.texture = texture.bottom_left() + Vector2f(0, -borders.bottom);
+		vertex.position.y = position.bottom() - bottom_offset;
+		vertex.texture.y = texture.bottom() - borders.bottom;
+
+		vertex.position.x = position.left();
+		vertex.texture.x = texture.left();
 		_vertices_2d.push_back(vertex);
 
 		if (borders.left > 0)
 		{
-			vertex.position = position.bottom_left() + Vector2f(left_offset, -bottom_offset);
-			vertex.texture = texture.bottom_left() + Vector2f(borders.left, -borders.bottom);
+			vertex.position.x = position.left() + left_offset;
+			vertex.texture.x = texture.left() + borders.left;
 			_vertices_2d.push_back(vertex);
 		}
 
 		if (borders.right > 0)
 		{
-			vertex.position = position.bottom_right() + Vector2f(-right_offset, -bottom_offset);
-			vertex.texture = texture.bottom_right() + Vector2f(-borders.right, -borders.bottom);
+			vertex.position.x = position.right() - right_offset;
+			vertex.texture.x = texture.right() - borders.right;
 			_vertices_2d.push_back(vertex);
 		}
 
-		vertex.position = position.bottom_right() + Vector2f(0, -bottom_offset);
-		vertex.texture = texture.bottom_right() + Vector2f(0, -borders.bottom);
+		vertex.position.x = position.right();
+		vertex.texture.x = texture.right();
 		_vertices_2d.push_back(vertex);
 
 		// Bottom part indices.
@@ -186,26 +195,29 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 
 	// Outer bottom vertex row.
 
-	vertex.position = position.bottom_left();
-	vertex.texture = texture.bottom_left();
+	vertex.position.y = position.bottom();
+	vertex.texture.y = texture.bottom();
+
+	vertex.position.x = position.left();
+	vertex.texture.x = texture.left();
 	_vertices_2d.push_back(vertex);
 
 	if (borders.left > 0)
 	{
-		vertex.position = position.bottom_left() + Vector2f(left_offset, 0);
-		vertex.texture = texture.bottom_left() + Vector2f(borders.left, 0);
+		vertex.position.x = position.left() + left_offset;
+		vertex.texture.x = texture.left() + borders.left;
 		_vertices_2d.push_back(vertex);
 	}
 
 	if (borders.right > 0)
 	{
-		vertex.position = position.bottom_right() + Vector2f(-right_offset, 0);
-		vertex.texture = texture.bottom_right() + Vector2f(-borders.right, 0);
+		vertex.position.x = position.right() - right_offset;
+		vertex.texture.x = texture.right() - borders.right;
 		_vertices_2d.push_back(vertex);
 	}
 
-	vertex.position = position.bottom_right();
-	vertex.texture = texture.bottom_right();
+	vertex.position.x = position.right();
+	vertex.texture.x = texture.right();
 	_vertices_2d.push_back(vertex);
 }
 
