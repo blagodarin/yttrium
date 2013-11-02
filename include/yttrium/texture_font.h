@@ -105,8 +105,7 @@ TextureFont::TextureFont() noexcept
 }
 
 TextureFont::TextureFont(const StaticString &name, Allocator *allocator) noexcept
-	//: TextureFont() // TODO: Uncomment.
-	: _private(nullptr)
+	: TextureFont()
 {
 	open(name, allocator);
 }

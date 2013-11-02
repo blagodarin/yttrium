@@ -44,8 +44,8 @@
 
 #if defined(_MSC_VER)
 	#define __Y_MSVC (_MSC_VER / 10 - 60)
-	#if __Y_MSVC < 110
-		#error MSVC compilers older than 11.0 are not supported.
+	#if __Y_MSVC < 120
+		#error MSVC compilers older than 12.0 are not supported.
 	#endif
 #else
 	#define __Y_MSVC 0
@@ -102,7 +102,7 @@
 // Cross-compiler portability.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// __func__ for MSVC (in MSVC 11.0, __func__ is still unsupported).
+// __func__ for MSVC (in MSVC 12.0, __func__ is still unsupported).
 
 #if __Y_MSVC && !defined(__func__)
 	#define __func__ __FUNCTION__
@@ -177,15 +177,9 @@
 
 /// Make the current class \a Class non-copyable.
 
-#if __Y_MSVC
-	#define Y_NONCOPYABLE(Class) \
-		Class(const Class &); \
-		Class &operator =(const Class &)
-#else
-	#define Y_NONCOPYABLE(Class) \
-		Class(const Class &) = delete; \
-		Class &operator =(const Class &) = delete
-#endif
+#define Y_NONCOPYABLE(Class) \
+	Class(const Class &) = delete; \
+	Class &operator =(const Class &) = delete
 
 // Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
 

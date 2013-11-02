@@ -57,8 +57,7 @@ public:
 	///
 
 	Screen(Allocator *allocator) noexcept
-		//: Screen() // TODO: Uncomment.
-		: _private(nullptr)
+		: Screen()
 	{
 		open(allocator);
 	}

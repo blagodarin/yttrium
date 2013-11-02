@@ -23,7 +23,7 @@ AudioManager::Private::~Private()
 {
 	Y_ASSERT(_sounds.empty());
 
-	AudioManagerGuard::leave(this, "Unmatched AudioManager destruction");
+	AudioManagerGuard::leave(this);
 }
 
 AudioManager::Private *AudioManager::Private::instance()

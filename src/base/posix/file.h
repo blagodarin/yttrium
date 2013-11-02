@@ -51,9 +51,7 @@ public:
 	}
 
 	StaticFile(const StaticString &name, Mode mode, Allocator *allocator)
-		//: StaticFile() // TODO: Uncomment.
-		: File(&_private_data)
-		, _private_data(nullptr)
+		: StaticFile()
 	{
 		File::open(name, mode, allocator);
 	}

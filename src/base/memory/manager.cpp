@@ -6,8 +6,6 @@
 #include "../instance_guard.h"
 #include "heap_allocator.h"
 
-#include <iostream>
-
 namespace Yttrium
 {
 
@@ -31,7 +29,7 @@ MemoryManager::~MemoryManager()
 	Y_DELETE(_previous_default_allocator, _default_allocator);
 	const_cast<Allocator *&>(DefaultAllocator) = _previous_default_allocator;
 
-	MemoryManagerGuard::leave(this, "Duplicate MemoryManager destruction");
+	MemoryManagerGuard::leave(this);
 }
 
 Allocator *MemoryManager::default_allocator()

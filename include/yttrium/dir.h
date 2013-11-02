@@ -120,8 +120,7 @@ Dir::Dir() noexcept
 }
 
 Dir::Dir(const StaticString &name, Allocator *allocator) noexcept
-	//: Dir() // TODO: Uncomment.
-	: _private(nullptr)
+	: Dir()
 {
 	open(name, allocator);
 }

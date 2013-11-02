@@ -150,8 +150,7 @@ Object::Pointer::Pointer() noexcept
 }
 
 Object::Pointer::Pointer(const Pointer &pointer) noexcept
-	//: Pointer(pointer._object) // TODO: Uncomment.
-	: _object(pointer._object)
+	: Pointer(pointer._object)
 {
 	if (Y_LIKELY(_object))
 		++_object->_counter;

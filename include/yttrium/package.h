@@ -35,8 +35,7 @@ public:
 	///
 
 	PackageReader(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
-		//: PackageReader() // TODO: Uncomment.
-		: _private(nullptr)
+		: PackageReader()
 	{
 		open(name, type, allocator);
 	}
@@ -114,8 +113,7 @@ public:
 	///
 
 	PackageWriter(const StaticString &name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator *allocator = DefaultAllocator) noexcept
-		//: PackageWriter() // TODO: Uncomment.
-		: _private(nullptr)
+		: PackageWriter()
 	{
 		open(name, type, mode, allocator);
 	}
@@ -216,13 +214,7 @@ public:
 	/// Set the default file system search order.
 	/// \param order The order to be set.
 
-	void set_order(Order order) noexcept
-	{
-		if (order != PresetOrder)
-		{
-			_order = order;
-		}
-	}
+	void set_order(Order order) noexcept;
 
 	/// Unmount all the mounted packages in the file system.
 

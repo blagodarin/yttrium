@@ -59,8 +59,7 @@ public:
 	///
 
 	AudioReader(const StaticString &name, AudioType type = AudioType::Auto, Allocator *allocator = DefaultAllocator) noexcept
-		//: AudioReader() // TODO: Uncomment.
-		: _private(nullptr)
+		: AudioReader()
 	{
 		open(name, type, allocator);
 	}

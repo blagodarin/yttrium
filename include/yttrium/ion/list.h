@@ -324,10 +324,7 @@ List::ConstIterator::ConstIterator(const Value *value) noexcept
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 List::ConstRange::ConstRange() noexcept
-	//: ConstRange(nullptr, nullptr, 0) // TODO: Uncomment.
-	: _first(nullptr)
-	, _last(nullptr)
-	, _size(0)
+	: ConstRange(nullptr, nullptr, 0)
 {
 }
 
@@ -383,10 +380,7 @@ List::Iterator::Iterator(Value *value) noexcept
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 List::Range::Range() noexcept
-	//: Range(nullptr, nullptr, 0) // TODO: Uncomment.
-	: _first(nullptr)
-	, _last(nullptr)
-	, _size(0)
+	: Range(nullptr, nullptr, 0)
 {
 }
 

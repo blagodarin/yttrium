@@ -24,9 +24,9 @@ public:
 		instance = pointer;
 	}
 
-	static void leave(T *pointer, const char *message)
+	static void leave(T *pointer)
 	{
-		Y_ABORT_IF(instance != pointer, message);
+		Y_ASSERT(instance == pointer);
 		instance = nullptr;
 	}
 };

@@ -44,7 +44,7 @@ LogManager::LogManager(const StaticString &file, Allocator *allocator)
 
 LogManager::~LogManager()
 {
-	LogManagerGuard::leave(this, "Unmatched LogManager destruction");
+	LogManagerGuard::leave(this);
 }
 
 LogManager::Writer LogManager::log()

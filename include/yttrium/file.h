@@ -67,11 +67,7 @@ public:
 	///
 
 	File(const StaticString &name, Mode mode, Allocator *allocator = DefaultAllocator) noexcept
-		//: File() // TODO: Uncomment.
-		: _private(nullptr)
-		, _offset(0)
-		, _size(0)
-		, _base(0)
+		: File()
 	{
 		open(name, mode, allocator);
 	}
@@ -79,11 +75,7 @@ public:
 	///
 
 	explicit File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept
-		//: File() // TODO: Uncomment.
-		: _private(nullptr)
-		, _offset(0)
-		, _size(0)
-		, _base(0)
+		: File()
 	{
 		open(name, allocator);
 	}
@@ -91,11 +83,7 @@ public:
 	///
 
 	explicit File(Special special, Allocator *allocator = DefaultAllocator) noexcept
-		//: File() // TODO: Uncomment.
-		: _private(nullptr)
-		, _offset(0)
-		, _size(0)
-		, _base(0)
+		: File()
 	{
 		open(special, allocator);
 	}

@@ -18,7 +18,19 @@ PackageManager::~PackageManager()
 {
 	unmount_all();
 
-	PackageManagerGuard::leave(this, "Unmatched PackageManager destruction");
+	PackageManagerGuard::leave(this);
+}
+
+bool PackageManager::mount(const StaticString &name, PackageType type)
+{
+	PackageReader package;
+
+	if (!package.open(name, type, _allocator))
+		return false;
+
+	_packages.push_back(package);
+
+	return true;
 }
 
 File PackageManager::open_file(const StaticString &name, File::Mode mode, Order order)
@@ -60,18 +72,10 @@ File PackageManager::open_file(const StaticString &name, File::Mode mode, Order 
 	return file;
 }
 
-bool PackageManager::mount(const StaticString &name, PackageType type)
+void PackageManager::set_order(Order order) noexcept
 {
-	PackageReader package;
-
-	if (!package.open(name, type, _allocator))
-	{
-		return false;
-	}
-
-	_packages.push_back(package);
-
-	return true;
+	if (order != PresetOrder)
+		_order = order;
 }
 
 void PackageManager::unmount_all()
