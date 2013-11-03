@@ -4,7 +4,7 @@
 #ifndef __Y_RENDERER_POINTERS_H
 #define __Y_RENDERER_POINTERS_H
 
-#include <yttrium/object.h>
+#include <yttrium/pointer.h>
 
 namespace Yttrium
 {
@@ -14,11 +14,11 @@ class TextureCache;
 
 /// 2D texture pointer.
 
-typedef ObjectPointer<Texture2D> Texture2DPtr;
+typedef Pointer<Texture2D> Texture2DPtr;
 
 /// Texture cache pointer.
 
-typedef ObjectPointer<TextureCache> TextureCachePtr;
+typedef Pointer<TextureCache> TextureCachePtr;
 
 } // namespace Yttrium
 

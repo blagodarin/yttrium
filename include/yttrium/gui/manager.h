@@ -5,7 +5,7 @@
 #define __Y_GUI_MANAGER_H
 
 #include <yttrium/key.h>
-#include <yttrium/object.h>
+#include <yttrium/pointer.h>
 #include <yttrium/rect.h>
 #include <yttrium/static_string.h>
 
@@ -24,12 +24,11 @@ class Manager;
 
 /// Manager pointer.
 
-typedef ObjectPointer<Manager> ManagerPtr;
+typedef Pointer<Manager> ManagerPtr;
 
 /// GUI widget manager.
 
-class Y_API Manager
-	: public Object
+class Y_API Manager: public Pointable
 {
 public:
 
@@ -48,7 +47,9 @@ public:
 
 	///
 
-	inline virtual ~Manager() noexcept;
+	virtual ~Manager() noexcept
+	{
+	}
 
 public:
 
@@ -97,19 +98,11 @@ public:
 
 protected:
 
-	inline Manager(Allocator *allocator) noexcept;
+	Manager(Allocator *allocator) noexcept
+		: Pointable(allocator)
+	{
+	}
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Manager::~Manager() noexcept
-{
-}
-
-Manager::Manager(Allocator *allocator) noexcept
-	: Object(allocator)
-{
-}
 
 } // namespace Gui
 

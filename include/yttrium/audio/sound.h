@@ -4,7 +4,7 @@
 #ifndef __Y_AUDIO_SOUND_H
 #define __Y_AUDIO_SOUND_H
 
-#include <yttrium/object.h>
+#include <yttrium/pointer.h>
 #include <yttrium/string.h>
 
 namespace Yttrium
@@ -14,19 +14,21 @@ class Sound;
 
 /// Sound pointer.
 
-typedef ObjectPointer<Sound> SoundPtr;
+typedef Pointer<Sound> SoundPtr;
 
 /// Sound.
 
-class Y_API Sound
-	: public Object
+class Y_API Sound: public Pointable
 {
 public:
 
 	/// Return the sound name.
 	/// \return %Sound name.
 
-	String name() const noexcept { return _name; }
+	String name() const noexcept
+	{
+		return _name;
+	}
 
 	/// Play the sound.
 
@@ -43,7 +45,11 @@ public:
 
 protected:
 
-	Sound(const StaticString &name, Allocator *allocator) noexcept: Object(allocator), _name(name, allocator) {}
+	Sound(const StaticString &name, Allocator *allocator) noexcept
+		: Pointable(allocator)
+		, _name(name, allocator)
+	{
+	}
 
 protected:
 

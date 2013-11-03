@@ -4,7 +4,7 @@
 #ifndef __Y_RENDERER_TEXTURE_H
 #define __Y_RENDERER_TEXTURE_H
 
-#include <yttrium/object.h>
+#include <yttrium/pointer.h>
 #include <yttrium/rect.h>
 
 namespace Yttrium
@@ -12,7 +12,7 @@ namespace Yttrium
 
 /// 2D texture.
 
-class Y_API Texture2D: public Object
+class Y_API Texture2D: public Pointable
 {
 public:
 
@@ -51,23 +51,40 @@ public:
 
 	///
 
-	Filter filter() const noexcept { return _filter; }
+	Filter filter() const noexcept
+	{
+		return _filter;
+	}
 
 	///
 
-	Area rect() const noexcept { return Area(0, 0, _size.x, _size.y); }
+	Area rect() const noexcept
+	{
+		return Area(0, 0, _size.x, _size.y);
+	}
 
 	///
 
-	void set_filter(Filter filter) noexcept { _filter = filter; }
+	void set_filter(Filter filter) noexcept
+	{
+		_filter = filter;
+	}
 
 	///
 
-	Dim2 size() const noexcept { return _size; }
+	Dim2 size() const noexcept
+	{
+		return _size;
+	}
 
 protected:
 
-	Texture2D(const Dim2 &size, Allocator *allocator) noexcept: Object(allocator), _size(size), _filter(NearestFilter) {}
+	Texture2D(const Dim2 &size, Allocator *allocator) noexcept
+		: Pointable(allocator)
+		, _size(size)
+		, _filter(NearestFilter)
+	{
+	}
 
 protected:
 

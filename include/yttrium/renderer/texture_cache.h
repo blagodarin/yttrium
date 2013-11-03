@@ -14,7 +14,7 @@ class StaticString;
 
 /// Texture cache.
 
-class Y_API TextureCache: public Object
+class Y_API TextureCache: public Pointable
 {
 public:
 
@@ -38,7 +38,10 @@ public:
 
 protected:
 
-	TextureCache(Allocator *allocator) noexcept: Object(allocator) {}
+	TextureCache(Allocator *allocator) noexcept
+		: Pointable(allocator)
+	{
+	}
 };
 
 } // namespace Yttrium
