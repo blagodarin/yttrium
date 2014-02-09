@@ -1,5 +1,5 @@
-#ifndef __THREAD_BUFFER_H
-#define __THREAD_BUFFER_H
+#ifndef __BASE_THREAD_BUFFER_H
+#define __BASE_THREAD_BUFFER_H
 
 #include <yttrium/time.h>
 
@@ -140,4 +140,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __Y_THREAD_BUFFER_H
+#endif // __BASE_THREAD_BUFFER_H

@@ -10,7 +10,7 @@ namespace Yttrium
 
 typedef InstanceGuard<ScriptManager> ScriptManagerGuard;
 
-class ScriptManager::Private
+class Y_PRIVATE ScriptManager::Private
 {
 public:
 

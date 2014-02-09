@@ -11,7 +11,7 @@ namespace Yttrium
 
 typedef InstanceGuard<LogManager> LogManagerGuard;
 
-class LogManager::Private
+class Y_PRIVATE LogManager::Private
 {
 public:
 
