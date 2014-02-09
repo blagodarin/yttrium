@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef __BASE_FOURCC_H
 #define __BASE_FOURCC_H
 
@@ -11,8 +8,6 @@ namespace Yttrium
 
 // TODO: Add big endian FOURCC support should a BE target platform appear.
 
-/// Four character code (FOURCC) construction helper.
-
 template <UChar c0, UChar c1, UChar c2, UChar c3>
 class Fourcc
 {
@@ -21,8 +16,6 @@ public:
 	static const uint32_t value = c0 | static_cast<uint32_t>(c1) << 8
 		| static_cast<uint32_t>(c2) << 16 | static_cast<uint32_t>(c3) << 24;
 };
-
-/// Eight character code (EIGHTCC) construction helper.
 
 template <UChar c0, UChar c1, UChar c2, UChar c3, UChar c4, UChar c5, UChar c6, UChar c7>
 class Eightcc

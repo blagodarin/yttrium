@@ -2,7 +2,6 @@
 #define __RENDERER_BACKEND_GL_GL_H
 
 #include "../../../terminal/gl.h"
-
 #include "api.h"
 
 namespace Yttrium

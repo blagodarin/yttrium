@@ -2,7 +2,6 @@
 #define __RENDERER_BACKEND_GL_RENDERER_H
 
 #include "../../renderer.h"
-
 #include "gl.h"
 #include "texture_cache.h"
 

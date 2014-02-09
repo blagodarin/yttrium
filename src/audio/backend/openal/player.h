@@ -2,7 +2,6 @@
 #define __AUDIO_BACKEND_OPENAL_PLAYER_H
 
 #include "../player.h"
-
 #include "openal.h"
 
 namespace Yttrium

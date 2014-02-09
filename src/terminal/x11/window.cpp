@@ -1,7 +1,6 @@
 #include "window.h"
 
 #include "../../renderer/renderer.h"
-
 #include "screen.h"
 
 namespace Yttrium

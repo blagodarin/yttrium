@@ -2,7 +2,6 @@
 #define __RENDERER_BACKEND_GL_TEXTURE_H
 
 #include "../../texture.h"
-
 #include "gl.h"
 
 namespace Yttrium

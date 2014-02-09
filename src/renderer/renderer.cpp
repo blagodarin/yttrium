@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include "../terminal/window.h"
-
 #include "texture.h"
 
 namespace Yttrium

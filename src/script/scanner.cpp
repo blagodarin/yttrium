@@ -1,8 +1,8 @@
+#include "logging.h"
+
 #include "scanner.h"
 
 #include <yttrium/assert.h>
-
-#include "logging.h"
 
 namespace Yttrium
 {

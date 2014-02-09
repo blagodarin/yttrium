@@ -1,9 +1,10 @@
+#include "logging.h"
+
 #include <yttrium/script/context.h>
 
 #include <yttrium/assert.h>
 #include <yttrium/file.h>
 
-#include "logging.h"
 #include "parser.h"
 
 namespace Yttrium

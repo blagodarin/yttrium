@@ -2,7 +2,6 @@
 #define __AUDIO_BACKEND_OPENAL_MANAGER_H
 
 #include "../../manager.h"
-
 #include "player.h"
 
 namespace Yttrium

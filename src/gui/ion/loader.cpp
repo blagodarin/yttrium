@@ -9,7 +9,6 @@
 
 #include "../manager.h"
 #include "../scene.h"
-
 #include "property_loader.h"
 
 namespace Yttrium

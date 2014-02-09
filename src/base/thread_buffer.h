@@ -1,8 +1,5 @@
-/// \file
-/// \brief Multithreading buffer.
-
-#ifndef __Y_THREAD_BUFFER_H
-#define __Y_THREAD_BUFFER_H
+#ifndef __THREAD_BUFFER_H
+#define __THREAD_BUFFER_H
 
 #include <yttrium/time.h>
 
@@ -12,7 +9,7 @@
 namespace Yttrium
 {
 
-class Y_API ThreadBufferBase
+class ThreadBufferBase
 {
 	Y_NONCOPYABLE(ThreadBufferBase);
 
@@ -53,10 +50,6 @@ private:
 	std::condition_variable _write;
 };
 
-/// Cross-thread communication buffer.
-/// \tparam T Element type.
-/// \tparam N Buffer size.
-
 template <typename T, size_t N = 1>
 class ThreadBuffer
 	: public ThreadBufferBase
@@ -70,8 +63,6 @@ public:
 
 public:
 
-	///
-
 	T read() noexcept
 	{
 		begin_read();
@@ -79,8 +70,6 @@ public:
 		end_read();
 		return result;
 	}
-
-	///
 
 	T read(Clock milliseconds, const T &default_value = T()) noexcept
 	{
@@ -93,8 +82,6 @@ public:
 		return result;
 	}
 
-	///
-
 	bool try_read(T *value) noexcept
 	{
 		if (!try_begin_read())
@@ -105,8 +92,6 @@ public:
 		end_read();
 		return true;
 	}
-
-	///
 
 	bool try_read(T *value, Clock milliseconds) noexcept
 	{
@@ -119,8 +104,6 @@ public:
 		return true;
 	}
 
-	///
-
 	bool try_write(const T &value) noexcept
 	{
 		if (!try_begin_write())
@@ -132,8 +115,6 @@ public:
 		return true;
 	}
 
-	///
-
 	bool try_write(const T &value, Clock milliseconds) noexcept
 	{
 		if (!try_begin_write(milliseconds))
@@ -144,8 +125,6 @@ public:
 		end_write();
 		return true;
 	}
-
-	///
 
 	void write(const T &value) noexcept
 	{

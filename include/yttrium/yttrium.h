@@ -9,7 +9,6 @@
 #include <yttrium/audio.h>
 #include <yttrium/bindings.h>
 #include <yttrium/buffer.h>
-#include <yttrium/condition.h>
 #include <yttrium/dir.h>
 #include <yttrium/file.h>
 #include <yttrium/global.h>
@@ -18,11 +17,11 @@
 #include <yttrium/ion.h>
 #include <yttrium/key.h>
 #include <yttrium/log.h>
+#include <yttrium/margins.h>
 #include <yttrium/matrix.h>
 #include <yttrium/memory_manager.h>
-#include <yttrium/mutex.h>
-#include <yttrium/object.h>
 #include <yttrium/package.h>
+#include <yttrium/pointer.h>
 #include <yttrium/pool.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/rect.h>
@@ -35,10 +34,10 @@
 #include <yttrium/script.h>
 #include <yttrium/static_string.h>
 #include <yttrium/string.h>
+#include <yttrium/system_allocator.h>
 #include <yttrium/terminal.h>
 #include <yttrium/texture_font.h>
 #include <yttrium/thread.h>
-#include <yttrium/thread_buffer.h>
 #include <yttrium/time.h>
 #include <yttrium/types.h>
 #include <yttrium/utils.h>

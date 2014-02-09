@@ -2,7 +2,6 @@
 #define __AUDIO_BACKEND_OPENAL_SOUND_H
 
 #include "../../sound.h"
-
 #include "format.h"
 
 namespace Yttrium

@@ -3,8 +3,8 @@
 
 #include <yttrium/audio/player.h>
 #include <yttrium/thread.h>
-#include <yttrium/thread_buffer.h>
 
+#include "../base/thread_buffer.h"
 #include "backend/player.h"
 #include "playlist.h"
 #include "streamer.h"
@@ -32,13 +32,9 @@ public:
 		Exit,
 	};
 
-	typedef ThreadBuffer<Action> ActionBuffer;
-
-public:
-
-	AudioPlaylist _playlist;
-	ActionBuffer  _action;
-	State         _state;
+	AudioPlaylist        _playlist;
+	ThreadBuffer<Action> _action;
+	State                _state;
 
 public:
 
