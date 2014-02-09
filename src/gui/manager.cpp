@@ -4,7 +4,7 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/script/manager.h>
+#include <yttrium/script/context.h>
 
 #include "ion/dumper.h"
 #include "ion/loader.h"
@@ -46,7 +46,7 @@ bool ManagerImpl::add_scene(Scene *scene, bool is_root)
 		return false;
 	}
 
-	_scenes.insert(Scenes::value_type(scene_name, scene));
+	_scenes.emplace(scene_name, scene);
 
 	if (is_root)
 	{
@@ -104,17 +104,15 @@ void ManagerImpl::set_font(const StaticString &name,
 
 void ManagerImpl::set_scene_change_action(const String &from_scene, const String &to_scene, const String &action)
 {
-	_scene_actions.insert(SceneActions::value_type(ScenePair(from_scene, to_scene), action));
+	_scene_actions.emplace(ScenePair(from_scene, to_scene), action);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ManagerImpl::clear()
 {
-	for (const Scenes::value_type &scene: _scenes)
-	{
+	for (const auto &scene: _scenes)
 		delete_scene(scene.second);
-	}
 
 	_has_size = false;
 	_size = Vector2f(0);
@@ -250,7 +248,7 @@ void ManagerImpl::change_scene(const StaticString &old_scene, const StaticString
 
 	if (i != _scene_actions.end())
 	{
-		ScriptManager::instance()->root_context().execute(i->second);
+		ScriptContext::global().execute(i->second);
 	}
 }
 

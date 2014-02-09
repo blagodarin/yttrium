@@ -228,17 +228,9 @@ public:
 
 private:
 
-	Y_PRIVATE File open_packed(const StaticString &name) const;
+	class Private;
 
-private:
-
-	typedef std::vector<PackageReader> Packages;
-
-private:
-
-	Allocator        *_allocator;
-	mutable Packages  _packages;
-	Order             _order;
+	Private *_private;
 };
 
 } // namespace Yttrium

@@ -1,6 +1,7 @@
 #include <yttrium/script/context.h>
 
 #include <yttrium/assert.h>
+#include <yttrium/file.h>
 
 #include "logging.h"
 #include "parser.h"
@@ -26,7 +27,7 @@ ScriptContext::Archive ScriptContext::archive() const
 {
 	Archive result;
 
-	for (const Entities::value_type &entity: _entities)
+	for (const auto &entity: _entities)
 	{
 		if (entity.second.archived_value)
 		{
@@ -41,7 +42,7 @@ ScriptContext::Archive ScriptContext::archive() const
 				value = entity.second.archived_value->string();
 			}
 
-			result.insert(Archive::value_type(entity.first, value));
+			result.emplace(entity.first, value);
 		}
 	}
 
@@ -130,9 +131,8 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Integer value, S
 
 	if (i == _entities.end())
 	{
-		i = _entities.insert(Entities::value_type(
-			String(name, _allocator),
-			Entity(new(_values.allocate()) ScriptValue(value, _allocator)))).first;
+		i = _entities.emplace(String(name, _allocator),
+			Entity(new(_values.allocate()) ScriptValue(value, _allocator))).first;
 	}
 	else if (!(flags & ScriptValue::Default))
 	{
@@ -160,9 +160,8 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Real value, Scri
 
 	if (i == _entities.end())
 	{
-		i = _entities.insert(Entities::value_type(
-			String(name, _allocator),
-			Entity(new(_values.allocate()) ScriptValue(value, _allocator)))).first;
+		i = _entities.emplace(String(name, _allocator),
+			Entity(new(_values.allocate()) ScriptValue(value, _allocator))).first;
 	}
 	else if (!(flags & ScriptValue::Default))
 	{
@@ -190,9 +189,8 @@ const ScriptValue *ScriptContext::set(const StaticString &name, const StaticStri
 
 	if (i == _entities.end())
 	{
-		i = _entities.insert(Entities::value_type(
-			String(name, _allocator),
-			Entity(new(_values.allocate()) ScriptValue(value, _allocator)))).first;
+		i = _entities.emplace(String(name, _allocator),
+			Entity(new(_values.allocate()) ScriptValue(value, _allocator))).first;
 	}
 	else if (!(flags & ScriptValue::Default))
 	{

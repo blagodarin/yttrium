@@ -4,7 +4,7 @@
 #ifndef __Y_MEMORY_MANAGER_H
 #define __Y_MEMORY_MANAGER_H
 
-#include <yttrium/global.h>
+#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
@@ -21,7 +21,7 @@ public:
 
 	///
 
-	MemoryManager() noexcept;
+	MemoryManager(const StaticString &default_name = S("default")) noexcept;
 
 	///
 
@@ -33,10 +33,13 @@ public:
 
 	static Allocator *default_allocator() noexcept;
 
+public:
+
+	class Private;
+
 private:
 
-	Allocator *_previous_default_allocator;
-	Allocator *_default_allocator;
+	Private *_private;
 };
 
 } // namespace Yttrium

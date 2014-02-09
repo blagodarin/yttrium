@@ -15,7 +15,7 @@ SoundPtr Sound::open(const StaticString &name, Allocator *allocator)
 
 	// Lock mutex here for the sound opening to become thread safe.
 
-	AudioManager::Private::Sounds::iterator i = audio_manager->_sounds.find(String(name, ByReference()));
+	auto i = audio_manager->_sounds.find(String(name, ByReference()));
 	if (i != audio_manager->_sounds.end())
 		return SoundPtr(i->second);
 
@@ -31,7 +31,7 @@ SoundPtr Sound::open(const StaticString &name, Allocator *allocator)
 		return SoundPtr();
 	}
 
-	audio_manager->_sounds.insert(AudioManager::Private::Sounds::value_type(sound->_name, sound));
+	audio_manager->_sounds.emplace(sound->_name, sound);
 
 	return SoundPtr(sound);
 }

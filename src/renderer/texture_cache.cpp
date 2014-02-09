@@ -34,7 +34,7 @@ Texture2DPtr BackendTextureCache::cache_texture_2d(const StaticString &name, boo
 	if (!backend_texture)
 		return Texture2DPtr();
 
-	return _cache_2d.insert(Cache2D::value_type(String(name, allocator), Texture2DPtr(backend_texture))).first->second;
+	return _cache_2d.emplace(String(name, allocator), Texture2DPtr(backend_texture)).first->second;
 }
 
 void BackendTextureCache::clear()

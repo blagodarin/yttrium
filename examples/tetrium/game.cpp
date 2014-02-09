@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <yttrium/file.h>
 #include <yttrium/ion.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>

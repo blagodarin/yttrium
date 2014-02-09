@@ -1,27 +1,47 @@
 #include <yttrium/log.h>
 
+#include <yttrium/file.h>
 #include <yttrium/time.h>
 
 #include "instance_guard.h"
+#include "memory/private_allocator.h"
 
 namespace Yttrium
 {
 
 typedef InstanceGuard<LogManager> LogManagerGuard;
 
+class LogManager::Private
+{
+public:
+
+	Private(LogManager *public_, const StaticString &file, Allocator *allocator)
+		: _instance_guard(public_, "Duplicate LogManager construction")
+		, _allocator(allocator, "log")
+		, _file(file, File::Write | File::Truncate, _allocator)
+	{
+	}
+
+public:
+
+	LogManagerGuard  _instance_guard;
+	PrivateAllocator _allocator;
+	File             _file;
+};
+
 LogManager::Writer::~Writer()
 {
 	if (_log_manager)
 	{
 		_message << S("\r\n");
-		_log_manager->_file.write(_message.text(), _message.size());
-		_log_manager->_file.flush();
+		_log_manager->_private->_file.write(_message.text(), _message.size());
+		_log_manager->_private->_file.flush();
 	}
 }
 
 LogManager::Writer::Writer(LogManager *log_manager)
 	: _log_manager(log_manager)
-	, _message(64, log_manager->_allocator)
+	, _message(64, log_manager->_private->_allocator)
 {
 	DateTime now = DateTime::now();
 
@@ -36,15 +56,13 @@ LogManager::Writer::Writer(LogManager *log_manager)
 }
 
 LogManager::LogManager(const StaticString &file, Allocator *allocator)
-	: _allocator(allocator)
-	, _file(file, File::Write | File::Truncate, allocator)
+	: _private(Y_NEW(allocator, LogManager::Private)(this, file, allocator))
 {
-	LogManagerGuard::enter(this, "Duplicate LogManager construction");
 }
 
 LogManager::~LogManager()
 {
-	LogManagerGuard::leave(this);
+	_private->_allocator.delete_private(_private);
 }
 
 LogManager::Writer LogManager::log()

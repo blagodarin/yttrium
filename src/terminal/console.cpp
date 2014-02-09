@@ -1,7 +1,7 @@
 #include <yttrium/terminal/console.h>
 
 #include <yttrium/renderer/builtin.h>
-#include <yttrium/script/manager.h>
+#include <yttrium/script/context.h>
 #include <yttrium/terminal.h>
 
 namespace Yttrium
@@ -11,7 +11,7 @@ bool Console::process_key(Key key)
 {
 	if (key == Key::Enter)
 	{
-		ScriptManager::instance()->root_context().execute(_line_editor.text());
+		ScriptContext::global().execute(_line_editor.text());
 		_line_editor.clear();
 		return true;
 	}

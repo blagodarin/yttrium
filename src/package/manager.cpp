@@ -1,34 +1,62 @@
 #include <yttrium/package.h>
 
 #include "../base/instance_guard.h"
+#include "../base/memory/private_allocator.h"
 
 namespace Yttrium
 {
 
 typedef InstanceGuard<PackageManager> PackageManagerGuard;
 
-PackageManager::PackageManager(Allocator *allocator)
-	: _allocator(allocator)
-	, _order(PackedFirst)
+class Y_PRIVATE PackageManager::Private
 {
-	PackageManagerGuard::enter(this, "Duplicate PackageManager construction");
+public:
+
+	Private(PackageManager *public_, Allocator *allocator)
+		: _instance_guard(public_, "Duplicate PackageManager construction")
+		, _allocator(allocator)
+		, _order(PackageManager::PackedFirst)
+	{
+	}
+
+	File open_packed(const StaticString &name)
+	{
+		File file;
+		for (auto i = _packages.rbegin(); i != _packages.rend(); ++i)
+		{
+			file = i->open_file(name);
+			if (file.is_opened())
+				break;
+		}
+		return file;
+	}
+
+public:
+
+	PackageManagerGuard        _instance_guard;
+	PrivateAllocator           _allocator;
+	std::vector<PackageReader> _packages;
+	Order                      _order;
+};
+
+PackageManager::PackageManager(Allocator *allocator)
+	: _private(Y_NEW(allocator, PackageManager::Private)(this, allocator))
+{
 }
 
 PackageManager::~PackageManager()
 {
-	unmount_all();
-
-	PackageManagerGuard::leave(this);
+	_private->_allocator.delete_private(_private);
 }
 
 bool PackageManager::mount(const StaticString &name, PackageType type)
 {
 	PackageReader package;
 
-	if (!package.open(name, type, _allocator))
+	if (!package.open(name, type, _private->_allocator))
 		return false;
 
-	_packages.push_back(package);
+	_private->_packages.emplace_back(package);
 
 	return true;
 }
@@ -36,37 +64,27 @@ bool PackageManager::mount(const StaticString &name, PackageType type)
 File PackageManager::open_file(const StaticString &name, File::Mode mode, Order order)
 {
 	if (mode != File::Read)
-	{
-		return File(name, mode, _allocator);
-	}
+		return File(name, mode, _private->_allocator);
+
+	if (order == PresetOrder)
+		order = _private->_order;
 
 	File file;
 
-	if (order == PresetOrder)
-	{
-		order = _order;
-	}
-
 	if (order == PackedFirst || order == PackedOnly)
 	{
-		file = open_packed(name);
+		file = _private->open_packed(name);
 		if (file.is_opened())
-		{
 			return file;
-		}
 	}
 
 	if (order != PackedOnly)
 	{
-		if (file.open(name, mode, _allocator))
-		{
+		if (file.open(name, mode, _private->_allocator))
 			return file;
-		}
 
 		if (order != SystemOnly)
-		{
-			return open_packed(name);
-		}
+			return _private->open_packed(name);
 	}
 
 	return file;
@@ -75,34 +93,17 @@ File PackageManager::open_file(const StaticString &name, File::Mode mode, Order 
 void PackageManager::set_order(Order order) noexcept
 {
 	if (order != PresetOrder)
-		_order = order;
+		_private->_order = order;
 }
 
 void PackageManager::unmount_all()
 {
-	_packages.clear();
+	_private->_packages.clear();
 }
 
 PackageManager *PackageManager::instance()
 {
 	return PackageManagerGuard::instance;
-}
-
-File PackageManager::open_packed(const StaticString &name) const
-{
-	File file;
-
-	for (Packages::reverse_iterator i = _packages.rbegin(); i != _packages.rend(); ++i)
-	{
-		file = i->open_file(name);
-
-		if (file.is_opened())
-		{
-			break;
-		}
-	}
-
-	return file;
 }
 
 } // namespace Yttrium

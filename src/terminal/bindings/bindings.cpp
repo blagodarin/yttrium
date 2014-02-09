@@ -1,6 +1,6 @@
 #include <yttrium/bindings.h>
 
-#include <yttrium/script/manager.h>
+#include <yttrium/script/context.h>
 
 #include "lookup.h"
 
@@ -250,7 +250,7 @@ bool Bindings::call(Key key, ExecutionMode mode)
 		return false;
 	}
 
-	ScriptManager::instance()->root_context().execute(action, mode);
+	ScriptContext::global().execute(action, mode);
 	return true;
 }
 
@@ -270,7 +270,7 @@ Bindings::Map Bindings::map() const
 	{
 		if (bind_names[i][0] && !_actions[i].is_empty())
 		{
-			result.insert(Map::value_type(String(bind_names[i], _allocator), _actions[i]));
+			result.emplace(String(bind_names[i], _allocator), _actions[i]);
 		}
 	}
 

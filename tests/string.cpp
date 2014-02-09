@@ -1,7 +1,6 @@
-#include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
@@ -22,7 +21,7 @@ BOOST_AUTO_TEST_CASE(string_initialization_test)
 
 BOOST_AUTO_TEST_CASE(string_assignment_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	String s1 = "test";
 
@@ -52,7 +51,7 @@ BOOST_AUTO_TEST_CASE(string_assignment_test)
 
 BOOST_AUTO_TEST_CASE(string_swap_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	String s1 = "test";
 	String s2 = "another test";
@@ -69,7 +68,7 @@ BOOST_AUTO_TEST_CASE(string_swap_test)
 
 BOOST_AUTO_TEST_CASE(string_insert_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	String s1 = "test";
 

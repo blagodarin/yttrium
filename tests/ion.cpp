@@ -1,14 +1,13 @@
 #include <yttrium/file.h>
 #include <yttrium/ion.h>
-#include <yttrium/memory_manager.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(ion_serialization_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	File file(File::Temporary);
 

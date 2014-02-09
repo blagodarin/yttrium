@@ -2,13 +2,13 @@
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/system_allocator.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(default_allocator_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Allocator *allocator = MemoryManager::default_allocator();
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(default_allocator_test)
 
 BOOST_AUTO_TEST_CASE(default_allocator_difference_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Allocator *allocator = MemoryManager::default_allocator();
 

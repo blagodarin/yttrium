@@ -1,19 +1,18 @@
 #include <yttrium/buffer.h>
 #include <yttrium/file.h>
-#include <yttrium/memory_manager.h>
 #include <yttrium/package.h>
 #include <yttrium/utils.h>
 
 #include <cstdlib> // rand
 #include <cstring> // memcmp
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(package_rewrite_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	uint8_t buffer1[100003];
 

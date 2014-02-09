@@ -1,9 +1,8 @@
 #include <yttrium/buffer.h>
 #include <yttrium/file.h>
 #include <yttrium/image.h>
-#include <yttrium/memory_manager.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
@@ -12,7 +11,7 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(tga_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Image image;
 
@@ -32,7 +31,7 @@ BOOST_AUTO_TEST_CASE(tga_test)
 
 BOOST_AUTO_TEST_CASE(dds_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Image dds_image;
 
@@ -47,7 +46,7 @@ BOOST_AUTO_TEST_CASE(dds_test)
 
 BOOST_AUTO_TEST_CASE(jpeg_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Image jpeg_image;
 
@@ -65,7 +64,7 @@ BOOST_AUTO_TEST_CASE(jpeg_test)
 
 BOOST_AUTO_TEST_CASE(png_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Image image;
 
@@ -85,7 +84,7 @@ BOOST_AUTO_TEST_CASE(png_test)
 
 BOOST_AUTO_TEST_CASE(intensity_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Image image;
 

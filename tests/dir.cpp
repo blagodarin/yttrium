@@ -1,13 +1,12 @@
 #include <yttrium/dir.h>
-#include <yttrium/memory_manager.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(dir_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Dir dir;
 

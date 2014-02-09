@@ -4,7 +4,6 @@
 #ifndef __Y_LOG_H
 #define __Y_LOG_H
 
-#include <yttrium/file.h>
 #include <yttrium/string.h>
 
 namespace Yttrium
@@ -77,8 +76,9 @@ public:
 
 private:
 
-	Allocator *_allocator;
-	File       _file;
+	class Private;
+
+	Private *_private;
 };
 
 } // namespace Yttrium

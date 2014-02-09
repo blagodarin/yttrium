@@ -1,6 +1,6 @@
 #include <yttrium/static_string.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 

@@ -63,12 +63,13 @@ ProxyAllocator::~ProxyAllocator()
 #if Y_IS_DEBUG
 	std::cerr
 		<< std::left
-		<< ":: " << std::setw(16) << name.text()
+		<< ":: "
 		<< std::right
 		<< std::setw(5) << status.allocations << " a "
 		<< std::setw(5) << status.reallocations << " r "
 		<< std::setw(5) << status.deallocations << " d "
-		<< std::setw(5) << status.allocated_blocks << " l"
+		<< std::setw(5) << status.allocated_blocks << " l ::  "
+		<< name.text()
 		<< std::endl;
 
 	if (status.allocated_blocks)

@@ -4,16 +4,19 @@
 #ifndef __Y_SCRIPT_MANAGER_H
 #define __Y_SCRIPT_MANAGER_H
 
-#include <yttrium/script/context.h>
-#include <yttrium/string.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
+
+class ScriptContext;
 
 /// Script manager.
 
 class Y_API ScriptManager
 {
+	friend ScriptContext;
+
 	Y_NONCOPYABLE(ScriptManager);
 
 public:
@@ -26,30 +29,12 @@ public:
 
 	~ScriptManager() noexcept;
 
-public:
-
-	/// Return the root context reference.
-
-	inline ScriptContext &root_context() noexcept;
-
-public:
-
-	/// Return the global ScriptManager instance.
-
-	static ScriptManager *instance() noexcept;
-
 private:
 
-	ScriptContext _root_context;
+	class Private;
+
+	Private *_private;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ScriptContext &ScriptManager::root_context() noexcept
-{
-	return _root_context;
-}
 
 } // namespace Yttrium
 

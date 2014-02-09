@@ -8,12 +8,8 @@
 int main(int, char **)
 {
 	MemoryManager memory_manager;
-
-	ProxyAllocator log_manager_allocator("log");
-	LogManager log_manager("tetrium.log", &log_manager_allocator);
-
-	ProxyAllocator script_manager_allocator("script");
-	ScriptManager script_manager(&script_manager_allocator);
+	LogManager log_manager("tetrium.log");
+	ScriptManager script_manager;
 
 	ProxyAllocator game_allocator("game");
 	Game game(&game_allocator);

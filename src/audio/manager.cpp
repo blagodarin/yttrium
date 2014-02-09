@@ -2,28 +2,23 @@
 
 #include <yttrium/proxy_allocator.h>
 
-#include "../base/instance_guard.h"
 #include "backend/manager.h"
 #include "sound.h"
 
 namespace Yttrium
 {
 
-typedef InstanceGuard<AudioManager::Private> AudioManagerGuard;
-
 AudioManager::Private::Private(Allocator *allocator)
-	: _allocator(allocator)
+	: _instance_guard(this, "Duplicate AudioManager construction")
+	, _allocator(allocator)
 	, _device_name(allocator)
 	, _player_private(allocator)
 {
-	AudioManagerGuard::enter(this, "Duplicate AudioManager construction");
 }
 
 AudioManager::Private::~Private()
 {
 	Y_ASSERT(_sounds.empty());
-
-	AudioManagerGuard::leave(this);
 }
 
 AudioManager::Private *AudioManager::Private::instance()

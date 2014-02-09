@@ -15,7 +15,7 @@ namespace Yttrium
 
 class Y_API Pointable
 {
-	friend Allocator;
+	friend Allocator; // To make Pointable::~Pointable available.
 
 	Y_NONCOPYABLE(Pointable);
 

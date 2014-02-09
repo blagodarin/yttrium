@@ -3,7 +3,6 @@
 #include "button.h"
 
 #include <yttrium/renderer.h>
-#include <yttrium/script/manager.h>
 
 #include "../property_dumper.h"
 #include "../property_loader.h"

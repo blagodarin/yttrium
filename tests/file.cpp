@@ -7,13 +7,13 @@
 #include <cstdlib> // rand
 #include <cstring> // memcmp
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(file_read_all_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	uint8_t buffer[100003];
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(file_read_all_test)
 
 BOOST_AUTO_TEST_CASE(file_transfer_test)
 {
-	MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	uint8_t buffer[100003];
 

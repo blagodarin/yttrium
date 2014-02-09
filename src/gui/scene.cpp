@@ -5,7 +5,7 @@
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
 #include <yttrium/renderer.h>
-#include <yttrium/script/manager.h>
+#include <yttrium/script/context.h>
 
 #include "manager.h"
 #include "widgets/button.h"
@@ -110,7 +110,7 @@ bool Scene::process_key(Key key, KeyState state)
 					if (!action.is_empty())
 					{
 						_focused_widget->play();
-						ScriptManager::instance()->root_context().execute(action);
+						ScriptContext::global().execute(action);
 					}
 				}
 				result = true;

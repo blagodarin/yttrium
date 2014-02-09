@@ -1,8 +1,7 @@
 #include <yttrium/allocator.h>
-#include <yttrium/memory_manager.h>
 #include <yttrium/pointer.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 class Pointable: public Yttrium::Pointable
 {
@@ -29,7 +28,7 @@ typedef Yttrium::Pointer<Pointable> Pointer;
 
 BOOST_AUTO_TEST_CASE(pointer_test)
 {
-	Yttrium::MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Yttrium::Allocator* allocator = Yttrium::DefaultAllocator;
 

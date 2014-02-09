@@ -1,8 +1,6 @@
-#include <yttrium/memory_manager.h>
-
 #include "src/base/private_base.h"
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 class Public
 {
@@ -66,7 +64,7 @@ public:
 
 BOOST_AUTO_TEST_CASE(private_test)
 {
-	Yttrium::MemoryManager memory_manager;
+	DECLARE_MEMORY_MANAGER;
 
 	Public public1;
 

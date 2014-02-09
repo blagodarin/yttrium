@@ -4,6 +4,7 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 
+#include "../base/instance_guard.h"
 #include "player.h"
 
 #include <map>
@@ -13,17 +14,18 @@ namespace Yttrium
 
 class SoundImpl;
 
+typedef InstanceGuard<AudioManager::Private> AudioManagerGuard;
+
 class Y_PRIVATE AudioManager::Private
 {
 public:
-	
-	typedef std::map<String, Sound *> Sounds;
 
-	Allocator            *_allocator;
-	StaticString          _backend_name;
-	String                _device_name;
-	AudioPlayer::Private  _player_private;
-	Sounds                _sounds;
+	AudioManagerGuard          _instance_guard;
+	Allocator                 *_allocator;
+	StaticString               _backend_name;
+	String                     _device_name;
+	AudioPlayer::Private       _player_private;
+	std::map<String, Sound *>  _sounds;
 
 public:
 

@@ -16,17 +16,14 @@ public:
 
 	static T *instance;
 
-public:
-
-	static void enter(T *pointer, const char *message)
+	InstanceGuard(T *pointer, const char *message)
 	{
 		Y_ABORT_IF(instance, message);
 		instance = pointer;
 	}
 
-	static void leave(T *pointer)
+	~InstanceGuard()
 	{
-		Y_ASSERT(instance == pointer);
 		instance = nullptr;
 	}
 };

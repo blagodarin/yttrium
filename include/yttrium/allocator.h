@@ -101,6 +101,6 @@ protected:
 
 ///
 
-#define Y_NEW(allocator, Class) new((allocator)->allocate<Class>()) Class
+#define Y_NEW(allocator, Class) new(static_cast<Yttrium::Allocator *>(allocator)->allocate<Class>()) Class
 
 #endif // __Y_ALLOCATOR_H

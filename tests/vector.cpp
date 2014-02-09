@@ -1,6 +1,6 @@
 #include <yttrium/vector.h>
 
-#include <boost/test/unit_test.hpp>
+#include "common.h"
 
 using namespace Yttrium;
 

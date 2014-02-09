@@ -36,7 +36,7 @@ void IonDumper::dump(const StaticString &filename) const
 
 	// TODO: Dump fonts.
 
-	for (const ManagerImpl::Scenes::value_type &scene: _manager->_scenes)
+	for (const auto &scene: _manager->_scenes)
 	{
 		Ion::Node *scene_node = document.append("scene");
 
@@ -50,7 +50,7 @@ void IonDumper::dump(const StaticString &filename) const
 		dump_scene(scene.second, scene_node);
 	}
 
-	for (const ManagerImpl::SceneActions::value_type &action: _manager->_scene_actions)
+	for (const auto &action: _manager->_scene_actions)
 	{
 		Ion::Node *on_scene_change_node = document.append("on_scene_change");
 
@@ -89,7 +89,7 @@ void IonDumper::dump_scene(const Scene *scene, Ion::Node *scene_node)
 		scene_object->append("transparent");
 	}
 
-	for (const Bindings::Map::value_type &binding: scene->_bindings.map())
+	for (const auto &binding: scene->_bindings.map())
 	{
 		Ion::Node *bind_node = scene_object->append("bind");
 
