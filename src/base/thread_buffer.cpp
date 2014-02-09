@@ -1,101 +1,83 @@
-#include "thread_buffer.h"
+#include <yttrium/thread_buffer.h>
 
 namespace Yttrium
 {
 
-ThreadBufferBase::ThreadBufferBase(size_t capacity, Allocator *allocator)
+ThreadBufferBase::ThreadBufferBase(size_t capacity)
 	: _capacity(capacity)
 	, _size(0)
 	, _first(0)
-	, _private(Y_NEW(allocator, Private)(allocator))
 {
 }
 
 ThreadBufferBase::~ThreadBufferBase()
 {
-	Y_DELETE(_private->allocator, _private);
 }
 
 void ThreadBufferBase::begin_read()
 {
-	_private->mutex.lock();
-	if (!_size)
-	{
-		_private->read.wait(&_private->mutex);
-	}
+	std::unique_lock<std::mutex> lock(_mutex);
+	_read.wait(lock, [this]{ return _size > 0; });
+	lock.release();
 }
 
 void ThreadBufferBase::begin_write()
 {
-	_private->mutex.lock();
-	if (_size == _capacity)
-	{
-		_private->write.wait(&_private->mutex);
-	}
+	std::unique_lock<std::mutex> lock(_mutex);
+	_write.wait(lock, [this]{ return _size < _capacity; });
+	lock.release();
 }
 
 void ThreadBufferBase::end_read()
 {
+	std::lock_guard<std::mutex> lock(_mutex, std::adopt_lock);
 	_first = (_first + 1) % _capacity;
 	--_size;
 	if (_size == _capacity - 1)
-	{
-		_private->write.notify_one();
-	}
-	_private->mutex.unlock();
+		_write.notify_one();
 }
 
 void ThreadBufferBase::end_write()
 {
+	std::lock_guard<std::mutex> lock(_mutex, std::adopt_lock);
 	++_size;
 	if (_size == 1)
-	{
-		_private->read.notify_one();
-	}
-	_private->mutex.unlock();
+		_read.notify_one();
 }
 
 bool ThreadBufferBase::try_begin_read()
 {
-	_private->mutex.lock();
+	std::unique_lock<std::mutex> lock(_mutex);
 	if (!_size)
-	{
-		_private->mutex.unlock();
 		return false;
-	}
+	lock.release();
 	return true;
 }
 
 bool ThreadBufferBase::try_begin_read(Clock milliseconds)
 {
-	_private->mutex.lock();
-	if (!_size && !_private->read.try_wait(&_private->mutex, milliseconds))
-	{
-		_private->mutex.unlock();
+	std::unique_lock<std::mutex> lock(_mutex);
+	if (!_read.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]{ return _size > 0; }))
 		return false;
-	}
+	lock.release();
 	return true;
 }
 
 bool ThreadBufferBase::try_begin_write()
 {
-	_private->mutex.lock();
+	std::unique_lock<std::mutex> lock(_mutex);
 	if (_size == _capacity)
-	{
-		_private->mutex.unlock();
 		return false;
-	}
+	lock.release();
 	return true;
 }
 
 bool ThreadBufferBase::try_begin_write(Clock milliseconds)
 {
-	_private->mutex.lock();
-	if (_size == _capacity && !_private->write.try_wait(&_private->mutex, milliseconds))
-	{
-		_private->mutex.unlock();
+	std::unique_lock<std::mutex> lock(_mutex);
+	if (!_write.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]{ return _size < _capacity; }))
 		return false;
-	}
+	lock.release();
 	return true;
 }
 

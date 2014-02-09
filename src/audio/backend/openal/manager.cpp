@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <yttrium/allocator.h>
 #include <yttrium/script/context.h>
 
 #include "sound.h"

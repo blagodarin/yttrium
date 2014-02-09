@@ -6,6 +6,9 @@
 
 #include <yttrium/time.h>
 
+#include <condition_variable>
+#include <mutex>
+
 namespace Yttrium
 {
 
@@ -15,7 +18,7 @@ class Y_API ThreadBufferBase
 
 public:
 
-	ThreadBufferBase(size_t capacity, Allocator *allocator = DefaultAllocator) noexcept;
+	ThreadBufferBase(size_t capacity) noexcept;
 
 	~ThreadBufferBase() noexcept;
 
@@ -43,13 +46,11 @@ protected:
 	size_t _size;
 	size_t _first;
 
-public:
-
-	class Private;
-
 private:
 
-	Private *_private;
+	std::mutex              _mutex;
+	std::condition_variable _read;
+	std::condition_variable _write;
 };
 
 /// Cross-thread communication buffer.
@@ -62,8 +63,8 @@ class ThreadBuffer
 {
 public:
 
-	ThreadBuffer(Allocator *allocator = DefaultAllocator) noexcept
-		: ThreadBufferBase(N, allocator)
+	ThreadBuffer() noexcept
+		: ThreadBufferBase(N)
 	{
 	}
 

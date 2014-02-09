@@ -4,9 +4,8 @@
 #include <yttrium/audio/player.h>
 #include <yttrium/string.h>
 
-#include "../base/mutex.h"
-
 #include <cstdlib> // rand
+#include <mutex>
 #include <vector>
 
 namespace Yttrium
@@ -56,7 +55,7 @@ private:
 	typedef std::vector<Item> Items;
 
 	Allocator          *_allocator;
-	StaticMutex         _mutex;
+	std::mutex          _mutex;
 	Items               _items;
 	AudioPlayer::Order  _order;
 	size_t              _next;

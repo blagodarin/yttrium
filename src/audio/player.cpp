@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include <yttrium/allocator.h>
+
 #include "playlist.h"
 
 namespace Yttrium
@@ -13,7 +15,6 @@ enum
 AudioPlayer::Private::Private(Allocator *allocator)
 	: Thread(allocator)
 	, _playlist(allocator)
-	, _action(allocator)
 	, _state(Stopped)
 	, _allocator(allocator)
 	, _backend(AudioPlayerBackend::create(_allocator))

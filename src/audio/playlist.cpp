@@ -14,7 +14,7 @@ AudioPlaylist::AudioPlaylist(Allocator *allocator)
 
 void AudioPlaylist::clear()
 {
-	Mutex::Locker locker(&_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_items.clear();
 	_next = 0;
@@ -22,7 +22,7 @@ void AudioPlaylist::clear()
 
 void AudioPlaylist::load(const StaticString &name, const AudioPlayer::Settings &settings, AudioType type)
 {
-	Mutex::Locker locker(&_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_items.push_back(Item(String(name, _allocator), settings, type));
 
@@ -41,7 +41,7 @@ void AudioPlaylist::load(const StaticString &name, const AudioPlayer::Settings &
 
 bool AudioPlaylist::next(Item *item)
 {
-	Mutex::Locker locker(&_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if (_items.empty())
 	{
@@ -69,14 +69,14 @@ bool AudioPlaylist::next(Item *item)
 
 AudioPlayer::Order AudioPlaylist::order()
 {
-	Mutex::Locker locker(&_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	return _order;
 }
 
 void AudioPlaylist::set_order(AudioPlayer::Order order)
 {
-	Mutex::Locker locker(&_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	_order = order;
 }
