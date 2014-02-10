@@ -2,18 +2,18 @@
 #define __AUDIO_PLAYER_H
 
 #include <yttrium/audio/player.h>
-#include <yttrium/thread.h>
 
 #include "../base/thread_buffer.h"
 #include "backend/player.h"
 #include "playlist.h"
 #include "streamer.h"
 
+#include <thread>
+
 namespace Yttrium
 {
 
 class Y_PRIVATE AudioPlayer::Private
-	: public Thread
 {
 public:
 
@@ -39,18 +39,18 @@ public:
 public:
 
 	Private(Allocator *allocator);
+	~Private();
 
-	~Private() noexcept override;
+private:
 
-protected:
-
-	void run() override;
+	void run();
 
 private:
 
 	Allocator          *_allocator;
 	AudioPlayerBackend *_backend;
 	AudioStreamer       _streamer;
+	std::thread         _thread;
 };
 
 } // namespace Yttrium

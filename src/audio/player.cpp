@@ -13,20 +13,19 @@ enum
 };
 
 AudioPlayer::Private::Private(Allocator *allocator)
-	: Thread(allocator)
-	, _playlist(allocator)
+	: _playlist(allocator)
 	, _state(Stopped)
 	, _allocator(allocator)
 	, _backend(AudioPlayerBackend::create(_allocator))
 	, _streamer(_backend, _allocator)
+	, _thread(&Private::run, this)
 {
-	start();
 }
 
 AudioPlayer::Private::~Private()
 {
 	_action.write(Exit);
-	wait();
+	_thread.join();
 	Y_DELETE(_allocator, _backend);
 }
 

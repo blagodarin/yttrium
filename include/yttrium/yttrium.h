@@ -37,7 +37,6 @@
 #include <yttrium/system_allocator.h>
 #include <yttrium/terminal.h>
 #include <yttrium/texture_font.h>
-#include <yttrium/thread.h>
 #include <yttrium/time.h>
 #include <yttrium/types.h>
 #include <yttrium/utils.h>
