@@ -40,18 +40,4 @@ DateTime DateTime::now()
 	}
 }
 
-Clock Timer::clock()
-{
-	::timespec time;
-
-	if (Y_UNLIKELY(::clock_gettime(CLOCK_MONOTONIC, &time)))
-	{
-		Y_ABORT("Failed to query CLOCK_MONOTONIC time");
-	}
-	else
-	{
-		return time.tv_nsec / (1000 * 1000) + time.tv_sec * 1000;
-	}
-}
-
 } // namespace Yttrium
