@@ -1,5 +1,6 @@
 #include <yttrium/script/manager.h>
 
+#include <yttrium/memory_manager.h>
 #include <yttrium/script/context.h>
 
 #include "../base/instance_guard.h"
@@ -29,8 +30,11 @@ public:
 };
 
 ScriptManager::ScriptManager(Allocator *allocator)
-	: _private(Y_NEW(allocator, ScriptManager::Private)(this, allocator))
+	: _private(nullptr)
 {
+	if (!allocator)
+		allocator = MemoryManager::default_allocator();
+	_private = Y_NEW(allocator, ScriptManager::Private)(this, allocator);
 }
 
 ScriptManager::~ScriptManager()

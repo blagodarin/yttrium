@@ -4,11 +4,12 @@
 #ifndef __Y_SCRIPT_MANAGER_H
 #define __Y_SCRIPT_MANAGER_H
 
-#include <yttrium/types.h>
+#include <yttrium/global.h>
 
 namespace Yttrium
 {
 
+class Allocator;
 class ScriptContext;
 
 /// Script manager.
@@ -23,7 +24,7 @@ public:
 
 	///
 
-	ScriptManager(Allocator *allocator = DefaultAllocator) noexcept;
+	ScriptManager(Allocator *allocator = nullptr) noexcept;
 
 	///
 

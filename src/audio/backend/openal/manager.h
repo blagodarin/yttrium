@@ -12,7 +12,7 @@ class OpenAlManager
 {
 public:
 
-	OpenAlManager(ALCdevice *device, ALCcontext *context, const String &device_name, Allocator *allocator);
+	OpenAlManager(ALCdevice *device, ALCcontext *context, const StaticString &device_name, Allocator *allocator);
 
 	~OpenAlManager() override;
 

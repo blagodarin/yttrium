@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 
-OpenAlManager::OpenAlManager(ALCdevice *device, ALCcontext *context, const String &device_name, Allocator *allocator)
+OpenAlManager::OpenAlManager(ALCdevice *device, ALCcontext *context, const StaticString &device_name, Allocator *allocator)
 	: AudioManager::Private(allocator)
 	, _device(device)
 	, _context(context)

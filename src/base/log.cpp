@@ -1,6 +1,7 @@
 #include <yttrium/log.h>
 
 #include <yttrium/file.h>
+#include <yttrium/memory_manager.h>
 #include <yttrium/time.h>
 
 #include "instance_guard.h"
@@ -56,8 +57,11 @@ LogManager::Writer::Writer(LogManager *log_manager)
 }
 
 LogManager::LogManager(const StaticString &file, Allocator *allocator)
-	: _private(Y_NEW(allocator, LogManager::Private)(this, file, allocator))
+	: _private(nullptr)
 {
+	if (!allocator)
+		allocator = MemoryManager::default_allocator();
+	_private = Y_NEW(allocator, LogManager::Private)(this, file, allocator);
 }
 
 LogManager::~LogManager()

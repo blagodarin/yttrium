@@ -56,7 +56,7 @@ public:
 
 	///
 
-	LogManager(const StaticString &file, Allocator *allocator = DefaultAllocator) noexcept;
+	LogManager(const StaticString &file, Allocator *allocator = nullptr) noexcept;
 
 	///
 
