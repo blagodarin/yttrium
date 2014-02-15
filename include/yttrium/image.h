@@ -152,7 +152,10 @@ public:
 
 	///
 
-	inline Image(Allocator *allocator = DefaultAllocator) noexcept;
+	Image(Allocator *allocator = DefaultAllocator) noexcept
+		: _buffer(allocator)
+	{
+	}
 
 	/// Allocate an image for the specified \a format.
 	/// \param format Image format.
@@ -165,19 +168,31 @@ public:
 
 	///
 
-	inline const void *const_data() const noexcept;
+	const void *const_data() const noexcept
+	{
+		return _buffer.data();
+	}
 
 	///
 
-	inline void *data() noexcept;
+	void *data() noexcept
+	{
+		return _buffer.data();
+	}
 
 	///
 
-	inline const void *data() const noexcept;
+	const void *data() const noexcept
+	{
+		return _buffer.data();
+	}
 
 	///
 
-	inline ImageFormat format() const noexcept;
+	ImageFormat format() const noexcept
+	{
+		return _format;
+	}
 
 	///
 
@@ -185,7 +200,10 @@ public:
 
 	///
 
-	inline bool is_valid() const noexcept;
+	bool is_valid() const noexcept
+	{
+		return _buffer.data();
+	}
 
 	///
 
@@ -302,38 +320,6 @@ bool ImageFormat::operator !=(const ImageFormat &format) const noexcept
 		|| _width != format._width
 		|| _row_alignment != format._row_alignment
 		|| _height != format._height;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Image::Image(Allocator *allocator) noexcept
-	: _buffer(allocator)
-{
-}
-
-const void *Image::const_data() const noexcept
-{
-	return _buffer.data();
-}
-
-void *Image::data() noexcept
-{
-	return _buffer.data();
-}
-
-const void *Image::data() const noexcept
-{
-	return _buffer.data();
-}
-
-ImageFormat Image::format() const noexcept
-{
-	return _format;
-}
-
-bool Image::is_valid() const noexcept
-{
-	return _buffer.data();
 }
 
 } // namespace Yttrium

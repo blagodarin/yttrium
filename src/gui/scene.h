@@ -21,8 +21,6 @@ class ManagerImpl;
 class PropertyLoader;
 class Widget;
 
-///
-
 class Scene
 {
 	friend IonDumper;
@@ -35,27 +33,52 @@ public:
 
 public:
 
-	inline void bind(const StaticString &name, const StaticString &action);
+	void bind(const StaticString &name, const StaticString &action)
+	{
+		_bindings.bind(name, action);
+	}
 
-	inline bool is_transparent() const;
+	bool is_transparent() const
+	{
+		return _is_transparent;
+	}
 
 	void load_widget(const StaticString &type, const StaticString &name, PropertyLoader &loader);
 
-	inline const String &name() const;
+	const String &name() const
+	{
+		return _name;
+	}
 
-	bool process_key(Key key, KeyState state);
+	bool process_key(Key key, unsigned pressed);
 
 	void render(Renderer *renderer, const Vector2f &scale); // TODO: Make const.
 
-	inline void reserve(size_t capacity);
+	void reserve(size_t capacity)
+	{
+		_widgets.reserve(capacity);
+	}
 
-	inline void set_cursor(const Vector2f &cursor);
+	void set_cursor(const Vector2f &cursor)
+	{
+		_is_cursor_set = true;
+		_cursor = cursor;
+	}
 
-	inline void set_scaling(Scaling scaling);
+	void set_scaling(Scaling scaling)
+	{
+		_scaling = scaling;
+	}
 
-	inline void set_size(const Vector2f &size);
+	void set_size(const Vector2f &size)
+	{
+		_size = size;
+	}
 
-	inline void set_transparent(bool transparent);
+	void set_transparent(bool transparent)
+	{
+		_is_transparent = transparent;
+	}
 
 private:
 
@@ -63,69 +86,20 @@ private:
 
 private:
 
-	typedef std::vector<Widget *>      Widgets;
-	typedef std::map<String, Widget *> NamedWidgets;
-
-private:
-
-	Allocator    *_allocator;
-	ManagerImpl  *_manager;
-	String        _name;
-	Vector2f      _size;
-	Scaling       _scaling;
-	Widgets       _widgets;
-	NamedWidgets  _named_widgets;
-	bool          _is_cursor_set;
-	Vector2f      _cursor;
-	const Widget *_focused_widget;
-	const Widget *_left_button_widget;
-	bool          _is_transparent;
-	Bindings      _bindings;
+	Allocator*                _allocator;
+	ManagerImpl*              _manager;
+	String                    _name;
+	Vector2f                  _size;
+	Scaling                   _scaling;
+	std::vector<Widget*>      _widgets;
+	std::map<String, Widget*> _named_widgets;
+	bool                      _is_cursor_set;
+	Vector2f                  _cursor;
+	const Widget*             _mouse_widget;
+	const Widget*             _left_click_widget;
+	bool                      _is_transparent;
+	Bindings                  _bindings;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void Scene::bind(const StaticString &name, const StaticString &action)
-{
-	_bindings.bind(name, action);
-}
-
-bool Scene::is_transparent() const
-{
-	return _is_transparent;
-}
-
-const String &Scene::name() const
-{
-	return _name;
-}
-
-void Scene::reserve(size_t capacity)
-{
-	_widgets.reserve(capacity);
-}
-
-void Scene::set_cursor(const Vector2f &cursor)
-{
-	_is_cursor_set = true;
-	_cursor = cursor;
-}
-
-void Scene::set_scaling(Scaling scaling)
-{
-	_scaling = scaling;
-}
-
-void Scene::set_size(const Vector2f &size)
-{
-	_size = size;
-}
-
-void Scene::set_transparent(bool transparent)
-{
-	_is_transparent = transparent;
-}
 
 } // namespace Gui
 

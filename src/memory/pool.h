@@ -1,5 +1,5 @@
-#ifndef __BASE_MEMORY_POOL_H
-#define __BASE_MEMORY_POOL_H
+#ifndef __MEMORY_POOL_H
+#define __MEMORY_POOL_H
 
 #include <yttrium/pool.h>
 
@@ -58,4 +58,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __BASE_MEMORY_POOL_H
+#endif // __MEMORY_POOL_H

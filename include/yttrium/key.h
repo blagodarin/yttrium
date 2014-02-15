@@ -196,10 +196,6 @@ enum: KeyType
 	KeyCount = Key::__Count, ///< Number of keys defined.
 };
 
-/// Input key state.
-
-typedef uint_fast16_t KeyState;
-
 } // namespace Yttrium
 
 #endif // __Y_KEY_H

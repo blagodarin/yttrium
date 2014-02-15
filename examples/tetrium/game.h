@@ -44,7 +44,7 @@ private:
 private: // Terminal::Callbacks.
 
 	void on_cursor_movement(Terminal *terminal, const Dim2 &movement) noexcept override;
-	bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept override;
+	bool on_key_event(Terminal *terminal, Key key, unsigned pressed) noexcept override;
 
 private: // Gui::Manager::Callbacks.
 

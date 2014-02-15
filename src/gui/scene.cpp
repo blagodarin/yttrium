@@ -7,6 +7,7 @@
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
 
+#include "../memory/allocatable.h"
 #include "manager.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
@@ -25,8 +26,8 @@ Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocato
 	, _name(name, allocator)
 	, _scaling(Scaling::Stretch)
 	, _is_cursor_set(false)
-	, _focused_widget(nullptr)
-	, _left_button_widget(nullptr)
+	, _mouse_widget(nullptr)
+	, _left_click_widget(nullptr)
 	, _is_transparent(false)
 	, _bindings(allocator)
 {
@@ -34,92 +35,70 @@ Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocato
 
 Scene::~Scene()
 {
-	for (Widgets::iterator i = _widgets.begin(); i != _widgets.end(); ++i)
-	{
-		Y_DELETE(_allocator, *i);
-	}
+	for (Widget *widget: _widgets)
+		Y_DELETE(_allocator, widget);
 }
 
 void Scene::load_widget(const StaticString &type, const StaticString &name, PropertyLoader &loader)
 {
-	Widget *widget = nullptr;
+	Allocatable<Widget> widget(_allocator);
 
 	if (type == "button")
-	{
-		widget = Y_NEW(_allocator, Button)(_allocator);
-	}
+		widget.reset<Button>();
 	else if (type == "canvas")
-	{
-		widget = Y_NEW(_allocator, Canvas)(_manager->callbacks(), _allocator);
-	}
+		widget.reset<Canvas>(_manager->callbacks());
 	else if (type == "image")
-	{
-		widget = Y_NEW(_allocator, Image)(_allocator);
-	}
+		widget.reset<Image>();
 	else if (type == "label")
+		widget.reset<Label>();
+
+	if (!widget)
+		return;
+
+	widget->set_scaling(_scaling);
+
+	if (!widget->load(loader))
+		return;
+
+	if (!name.is_empty())
 	{
-		widget = Y_NEW(_allocator, Label)(_allocator);
+		widget->set_name(name);
+		_named_widgets[String(name, _allocator)] = widget.pointer();
 	}
 
-	if (widget)
-	{
-		widget->set_scaling(_scaling);
-
-		if (widget->load(loader))
-		{
-			if (!name.is_empty())
-			{
-				widget->set_name(name);
-				_named_widgets[String(name, _allocator)] = widget;
-			}
-
-			_widgets.push_back(widget);
-		}
-		else
-		{
-			Y_DELETE(_allocator, widget);
-		}
-	}
+	_widgets.push_back(widget.release());
 }
 
-bool Scene::process_key(Key key, KeyState state)
+bool Scene::process_key(Key key, unsigned pressed)
 {
 	bool result = false;
 
 	if (key == Key::Mouse1)
 	{
-		if (state)
+		if (_mouse_widget)
 		{
-			if (_focused_widget)
+			if (pressed)
 			{
-				if (_focused_widget->is_enabled())
-				{
-					_left_button_widget = _focused_widget;
-				}
-				result = true;
+				if (_mouse_widget->is_enabled())
+					_left_click_widget = _mouse_widget;
 			}
-		}
-		else
-		{
-			if (_focused_widget)
+			else if (_mouse_widget == _left_click_widget)
 			{
-				if (_focused_widget == _left_button_widget)
+				StaticString action = _mouse_widget->action();
+				if (!action.is_empty())
 				{
-					StaticString action = _focused_widget->action();
+					_mouse_widget->play();
+					ScriptContext::global().execute(action);
+				}
+			}
+			result = true;
+		}
 
-					if (!action.is_empty())
-					{
-						_focused_widget->play();
-						ScriptContext::global().execute(action);
-					}
-				}
-				result = true;
-			}
-			_left_button_widget = nullptr;
-		}
+		if (!pressed)
+			_left_click_widget = nullptr;
 	}
 
-	return state ? _bindings.call(key) : result;
+	return pressed ? _bindings.call(key) : result;
 }
 
 void Scene::render(Renderer *renderer, const Vector2f &size)
@@ -128,40 +107,30 @@ void Scene::render(Renderer *renderer, const Vector2f &size)
 	Vector2f shift((size.x - _size.x * scale.y) * .5f, (size.y - _size.y * scale.x) * .5f);
 
 	for (Widget *widget: _widgets)
-	{
 		widget->update();
-	}
 
-	const Widget *focused_widget = nullptr;
+	const Widget *mouse_widget = nullptr;
 
 	if (_is_cursor_set)
 	{
-		for (Widgets::reverse_iterator i = _widgets.rbegin(); i != _widgets.rend(); ++i)
+		for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
 		{
 			if (map((*i)->area(), shift, scale, (*i)->scaling()).contains(_cursor))
 			{
-				focused_widget = *i;
+				mouse_widget = *i;
 				break;
 			}
 		}
 	}
 
-	WidgetState state;
-
-	if (focused_widget != _focused_widget)
-	{
-		_focused_widget = focused_widget;
-		state = WidgetState::Active;
-	}
-	else
-	{
-		state = (_left_button_widget == _focused_widget) ? WidgetState::Pressed : WidgetState::Active;
-	}
+	_mouse_widget = mouse_widget;
 
 	for (const Widget *widget: _widgets)
 	{
-		RectF rect = map(widget->area(), shift, scale, widget->scaling());
-		widget->render(renderer, rect, scale, (widget == focused_widget) ? state : WidgetState::Normal);
+		WidgetState state = WidgetState::Normal;
+		if (widget == _mouse_widget)
+			state = (widget == _left_click_widget) ? WidgetState::Pressed : WidgetState::Active;
+		widget->render(renderer, map(widget->area(), shift, scale, widget->scaling()), scale, state);
 	}
 
 	_is_cursor_set = false;

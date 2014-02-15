@@ -3,7 +3,7 @@
 #include <yttrium/package.h>
 #include <yttrium/utils.h>
 
-#include "../base/allocatable.h"
+#include "../memory/allocatable.h"
 #include "dds.h"
 #include "tga.h"
 

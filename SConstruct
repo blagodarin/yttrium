@@ -180,22 +180,22 @@ src_paths = [
 	'audio/backend/openal',
 	'audio/io',
 	'base',
-	'base/memory',
 	'gui',
 	'gui/ion',
 	'gui/logic',
 	'gui/widgets',
+	'image',
+	'ion',
+	'math',
+	'memory',
+	'package',
 	'renderer',
 	'renderer/backend',
 	'renderer/backend/gl',
 	'renderer/builtin',
 	'script',
 	'terminal',
-	'terminal/bindings',
-	'image',
-	'ion',
-	'math',
-	'package']
+	'terminal/bindings']
 
 if not option_no_jpeg:
 	src_paths += ['image/jpeg']
@@ -206,11 +206,13 @@ if not option_no_png:
 
 if 'posix' in ports:
 	src_paths += [
-		'base/posix']
+		'base/posix',
+		'memory/posix']
 
 if 'windows' in ports:
 	src_paths += [
 		'base/windows',
+		'memory/windows',
 		'terminal/windows']
 
 if 'x11' in ports:
@@ -224,6 +226,10 @@ if option_static:
 	yttrium = src_env.StaticLibrary(src_target, src_sources)
 else:
 	yttrium = src_env.SharedLibrary(src_target, src_sources)
+
+Depends(yttrium, Value(option_no_jpeg))
+Depends(yttrium, Value(option_no_ogg_vorbis))
+Depends(yttrium, Value(option_no_png))
 
 Alias('yttrium', yttrium)
 Clean('yttrium', Dir('$BUILD/src'))

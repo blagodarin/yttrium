@@ -4,7 +4,7 @@
 #include <yttrium/script/context.h>
 
 #include "../base/instance_guard.h"
-#include "../base/memory/private_allocator.h"
+#include "../memory/private_allocator.h"
 
 namespace Yttrium
 {

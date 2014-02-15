@@ -6,6 +6,7 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/script/context.h>
 
+#include "../memory/allocatable.h"
 #include "ion/dumper.h"
 #include "ion/loader.h"
 #include "scene.h"
@@ -16,7 +17,7 @@ namespace Yttrium
 namespace Gui
 {
 
-ManagerImpl::ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocator *allocator)
+ManagerImpl::ManagerImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
 	: Manager(allocator)
 	, _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
@@ -36,9 +37,9 @@ ManagerImpl::~ManagerImpl()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ManagerImpl::add_scene(Scene *scene, bool is_root)
+bool ManagerImpl::add_scene(Scene* scene, bool is_root)
 {
-	const String &scene_name = scene->name();
+	const String& scene_name = scene->name();
 
 	if (_scenes.find(scene_name) != _scenes.end())
 	{
@@ -64,7 +65,7 @@ bool ManagerImpl::add_scene(Scene *scene, bool is_root)
 	return true;
 }
 
-Scene *ManagerImpl::create_scene(const StaticString &name)
+Scene* ManagerImpl::create_scene(const StaticString& name)
 {
 	if (!_has_size)
 	{
@@ -72,19 +73,20 @@ Scene *ManagerImpl::create_scene(const StaticString &name)
 		return nullptr;
 	}
 
-	Scene *scene = Y_NEW(&_proxy_allocator, Scene)(this, name, &_proxy_allocator);
+	Allocatable<Scene> scene(&_proxy_allocator);
+	scene.reset(this, name);
 	scene->set_size(_size);
-	return scene;
+	return scene.release();
 }
 
-const ManagerImpl::FontDesc *ManagerImpl::font(const StaticString &name) const
+const ManagerImpl::FontDesc* ManagerImpl::font(const StaticString &name) const
 {
-	Fonts::const_iterator i = _fonts.find(String(name, ByReference()));
+	auto i = _fonts.find(String(name, ByReference()));
 	return i != _fonts.end() ? &i->second : nullptr;
 }
 
-void ManagerImpl::set_font(const StaticString &name,
-	const StaticString &font_source, const StaticString &texture_name)
+void ManagerImpl::set_font(const StaticString& name,
+	const StaticString& font_source, const StaticString& texture_name)
 {
 	Texture2DPtr texture = _texture_cache->load_texture_2d(texture_name, true);
 	if (texture.is_null())
@@ -102,7 +104,7 @@ void ManagerImpl::set_font(const StaticString &name,
 	}
 }
 
-void ManagerImpl::set_scene_change_action(const String &from_scene, const String &to_scene, const String &action)
+void ManagerImpl::set_scene_change_action(const String& from_scene, const String& to_scene, const String& action)
 {
 	_scene_actions.emplace(ScenePair(from_scene, to_scene), action);
 }
@@ -111,7 +113,7 @@ void ManagerImpl::set_scene_change_action(const String &from_scene, const String
 
 void ManagerImpl::clear()
 {
-	for (const auto &scene: _scenes)
+	for (const auto& scene: _scenes)
 		delete_scene(scene.second);
 
 	_has_size = false;
@@ -123,26 +125,23 @@ void ManagerImpl::clear()
 	_has_cursor = false;
 }
 
-void ManagerImpl::dump(const StaticString &filename) const
+void ManagerImpl::dump(const StaticString& filename) const
 {
 	IonDumper(this).dump(filename);
 }
 
-bool ManagerImpl::has_scene(const StaticString &name) const
+bool ManagerImpl::has_scene(const StaticString& name) const
 {
 	return _scenes.find(String(name, ByReference())) != _scenes.end();
 }
 
-bool ManagerImpl::load(const StaticString &filename)
+bool ManagerImpl::load(const StaticString& filename)
 {
 	clear();
 
 	IonLoader loader(this);
-
 	if (!loader.load(filename))
-	{
 		return false;
-	}
 
 	if (_scene_stack.empty())
 	{
@@ -157,11 +156,9 @@ bool ManagerImpl::load(const StaticString &filename)
 bool ManagerImpl::pop_scenes(size_t count)
 {
 	if (_scene_stack.empty())
-	{
 		return false;
-	}
 
-	Scene *old_scene = _scene_stack.back();
+	const Scene* old_scene = _scene_stack.back();
 
 	if (count >= _scene_stack.size())
 	{
@@ -175,30 +172,23 @@ bool ManagerImpl::pop_scenes(size_t count)
 	return true;
 }
 
-bool ManagerImpl::push_scene(const StaticString &name)
+bool ManagerImpl::push_scene(const StaticString& name)
 {
-	Scenes::iterator i = _scenes.find(String(name, ByReference()));
-
+	auto i = _scenes.find(String(name, ByReference()));
 	if (i == _scenes.end())
-	{
 		return false;
-	}
 
-	Scene *old_scene = _scene_stack.back();
-
+	const Scene* old_scene = _scene_stack.back();
 	_scene_stack.push_back(i->second);
 	change_scene(old_scene->name(), name);
 	return true;
 }
 
-bool ManagerImpl::process_key(Terminal *, Key key, KeyState state)
+bool ManagerImpl::process_key(Terminal*, Key key, unsigned pressed)
 {
-	if (_scene_stack.empty())
-	{
-		return false;
-	}
-
-	return _scene_stack.back()->process_key(key, state);
+	return _scene_stack.empty()
+		? false
+		: _scene_stack.back()->process_key(key, pressed);
 }
 
 bool ManagerImpl::render()
@@ -208,7 +198,7 @@ bool ManagerImpl::render()
 		return false;
 	}
 
-	SceneStack::iterator i = _scene_stack.begin() + (_scene_stack.size() - 1);
+	auto i = _scene_stack.begin() + (_scene_stack.size() - 1);
 
 	if (_has_cursor)
 	{
@@ -231,7 +221,7 @@ bool ManagerImpl::render()
 	return true;
 }
 
-void ManagerImpl::set_cursor(const Vector2f &cursor)
+void ManagerImpl::set_cursor(const Vector2f& cursor)
 {
 	_cursor = cursor * _size / Vector2f(_renderer.viewport_size());
 	_has_cursor = true;
@@ -239,27 +229,23 @@ void ManagerImpl::set_cursor(const Vector2f &cursor)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ManagerImpl::change_scene(const StaticString &old_scene, const StaticString &new_scene)
+void ManagerImpl::change_scene(const StaticString& old_scene, const StaticString& new_scene)
 {
 	Y_LOG_DEBUG("[Gui.Manager] Changing scene from \"" << old_scene << "\" to \"" << new_scene << "\"...");
 
-	SceneActions::iterator i = _scene_actions.find(
-		ScenePair(String(old_scene, ByReference()), String(new_scene, ByReference())));
-
+	auto i = _scene_actions.find(ScenePair(String(old_scene, ByReference()), String(new_scene, ByReference())));
 	if (i != _scene_actions.end())
-	{
 		ScriptContext::global().execute(i->second);
-	}
 }
 
-void ManagerImpl::delete_scene(Scene *scene)
+void ManagerImpl::delete_scene(Scene* scene)
 {
 	Y_DELETE(&_proxy_allocator, scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ManagerPtr Manager::create(Renderer &renderer, Callbacks *callbacks, Allocator *allocator)
+ManagerPtr Manager::create(Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
 {
 	return ManagerPtr(Y_NEW(allocator, ManagerImpl)(renderer, callbacks, allocator));
 }

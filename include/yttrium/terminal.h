@@ -32,7 +32,7 @@ public:
 		///
 		/// \return \c true if the key was handled, \c false otherwise.
 
-		virtual bool on_key_event(Terminal *terminal, Key key, KeyState state) noexcept = 0;
+		virtual bool on_key_event(Terminal *terminal, Key key, unsigned pressed) noexcept = 0;
 	};
 
 	///
@@ -61,7 +61,10 @@ public:
 
 	///
 
-	inline Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept;
+	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept
+	{
+		return _window.create_renderer(backend, allocator ? allocator : _allocator);
+	}
 
 	///
 
@@ -93,13 +96,6 @@ public:
 	bool is_shift_pressed() const noexcept
 	{
 		return _keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)];
-	}
-
-	///
-
-	KeyState key_state(Key key) const noexcept
-	{
-		return _keys[KeyType(key)];
 	}
 
 	///
@@ -195,19 +191,11 @@ private:
 	bool       _is_cursor_locked;
 	Dim2       _size;
 	Mode       _mode;
-	KeyState   _keys[KeyCount];
+	unsigned   _keys[KeyCount];
 	Callbacks *_callbacks;
 	Console    _console;
 	bool       _is_console_visible;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Renderer Terminal::create_renderer(Renderer::Backend backend, Allocator *allocator) noexcept
-{
-	return _window.create_renderer(backend, allocator ? allocator : _allocator);
-}
 
 } // namespace Yttrium
 

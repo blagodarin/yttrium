@@ -1,5 +1,5 @@
-#ifndef __BASE_MEMORY_PRIVATE_ALLOCATOR_H
-#define __BASE_MEMORY_PRIVATE_ALLOCATOR_H
+#ifndef __MEMORY_PRIVATE_ALLOCATOR_H
+#define __MEMORY_PRIVATE_ALLOCATOR_H
 
 #include <yttrium/proxy_allocator.h>
 
@@ -43,4 +43,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __BASE_MEMORY_PRIVATE_ALLOCATOR_H
+#endif // __MEMORY_PRIVATE_ALLOCATOR_H

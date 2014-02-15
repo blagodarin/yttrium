@@ -212,12 +212,12 @@ void Game::on_cursor_movement(Terminal *, const Dim2 &) noexcept
 {
 }
 
-bool Game::on_key_event(Terminal *terminal, Key key, KeyState state) noexcept
+bool Game::on_key_event(Terminal *terminal, Key key, unsigned pressed) noexcept
 {
-	if (_gui->process_key(terminal, key, state))
+	if (_gui->process_key(terminal, key, pressed))
 		return true;
 
-	if (state <= 1 && _bindings.call(key, state ? ExecutionMode::Do : ExecutionMode::Undo))
+	if (pressed <= 1 && _bindings.call(key, pressed ? ExecutionMode::Do : ExecutionMode::Undo))
 		return true;
 
 	return false;

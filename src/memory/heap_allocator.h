@@ -1,5 +1,5 @@
-#ifndef __BASE_MEMORY_HEAP_ALLOCATOR_H
-#define __BASE_MEMORY_HEAP_ALLOCATOR_H
+#ifndef __MEMORY_HEAP_ALLOCATOR_H
+#define __MEMORY_HEAP_ALLOCATOR_H
 
 #include <yttrium/allocator.h>
 
@@ -27,4 +27,4 @@ public: // Allocator
 
 } // namespace Yttrium
 
-#endif // __BASE_MEMORY_HEAP_ALLOCATOR_H
+#endif // __MEMORY_HEAP_ALLOCATOR_H

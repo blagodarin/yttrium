@@ -1,9 +1,9 @@
 #include <yttrium/global.h>
 
 #if Y_IS_POSIX
-	#include "../posix/system_allocator.h"
+	#include "posix/system_allocator.h"
 #elif Y_IS_WINDOWS
-	#include "../windows/system_allocator.h"
+	#include "windows/system_allocator.h"
 #endif
 
 #include <yttrium/assert.h>

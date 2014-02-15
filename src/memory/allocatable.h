@@ -1,5 +1,5 @@
-#ifndef __BASE_ALLOCATABLE_H
-#define __BASE_ALLOCATABLE_H
+#ifndef __MEMORY_ALLOCATABLE_H
+#define __MEMORY_ALLOCATABLE_H
 
 #include <yttrium/allocator.h>
 
@@ -26,13 +26,6 @@ public:
 		allocatable._pointer = nullptr;
 	}
 
-	template <typename... Args>
-	Allocatable(Args&&... args, Allocator* allocator)
-		: _allocator(allocator)
-		, _pointer(Y_NEW(_allocator, T)(std::forward<Args>(args)..., _allocator))
-	{
-	}
-
 	~Allocatable()
 	{
 		clear();
@@ -49,6 +42,23 @@ public:
 		_pointer = nullptr;
 	}
 
+	T* pointer()
+	{
+		return _pointer;
+	}
+
+	const T* pointer() const
+	{
+		return _pointer;
+	}
+
+	T* release()
+	{
+		T* result = _pointer;
+		_pointer = nullptr;
+		return result;
+	}
+
 	template <typename... Args>
 	void reset(Args&&... args)
 	{
@@ -63,12 +73,22 @@ public:
 		_pointer = Y_NEW(_allocator, U)(std::forward<Args>(args)..., _allocator);
 	}
 
-	T* operator ->()
+	operator bool() const
 	{
 		return _pointer;
 	}
 
-	const T* operator ->() const
+	bool operator!() const
+	{
+		return !_pointer;
+	}
+
+	T* operator->()
+	{
+		return _pointer;
+	}
+
+	const T* operator->() const
 	{
 		return _pointer;
 	}
@@ -81,4 +101,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __BASE_ALLOCATABLE_H
+#endif // __MEMORY_ALLOCATABLE_H

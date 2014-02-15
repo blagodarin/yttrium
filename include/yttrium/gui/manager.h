@@ -79,7 +79,7 @@ public:
 
 	///
 
-	virtual bool process_key(Terminal *terminal, Key key, KeyState state) noexcept = 0;
+	virtual bool process_key(Terminal *terminal, Key key, unsigned pressed) noexcept = 0;
 
 	///
 

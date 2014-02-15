@@ -28,8 +28,7 @@ namespace Gui
 class IonDumper;
 class Scene;
 
-class ManagerImpl
-	: public Manager
+class ManagerImpl: public Manager
 {
 	friend IonDumper;
 
@@ -42,7 +41,7 @@ public:
 
 		FontDesc() {}
 
-		FontDesc(const TextureFont &font, const Texture2DPtr &texture)
+		FontDesc(const TextureFont& font, const Texture2DPtr& texture)
 			: font(font)
 			, texture(texture)
 		{
@@ -51,121 +50,88 @@ public:
 
 public:
 
-	ManagerImpl(const Renderer &renderer, Callbacks *callbacks, Allocator *allocator);
+	ManagerImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator);
 
 	~ManagerImpl() noexcept override;
 
 public:
 
-	bool add_scene(Scene *scene, bool is_root);
+	bool add_scene(Scene* scene, bool is_root);
 
-	inline Callbacks *callbacks() const;
+	Callbacks* callbacks() const
+	{
+		return _callbacks;
+	}
 
-	Scene *create_scene(const StaticString &name);
+	Scene* create_scene(const StaticString& name);
 
-	const FontDesc *font(const StaticString &name) const;
+	const FontDesc* font(const StaticString& name) const;
 
-	inline Allocator *internal_allocator() const;
+	Allocator* internal_allocator() const
+	{
+		return const_cast<ProxyAllocator*>(&_proxy_allocator);
+	}
 
-	inline Renderer *renderer();
+	Renderer* renderer()
+	{
+		return &_renderer;
+	}
 
-	void set_font(const StaticString &name, const StaticString &font_source, const StaticString &texture_name);
+	void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 
-	inline void set_scaling(Scaling scaling);
+	void set_scaling(Scaling scaling)
+	{
+		_scaling = scaling;
+	}
 
-	void set_scene_change_action(const String &from_scene, const String &to_scene, const String &action);
+	void set_scene_change_action(const String& from_scene, const String& to_scene, const String& action);
 
-	inline void set_size(const Vector2f &size);
+	void set_size(const Vector2f& size)
+	{
+		_size = size;
+		_has_size = true;
+	}
 
-	inline TextureCache *texture_cache();
+	TextureCache* texture_cache()
+	{
+		return _texture_cache.pointer();
+	}
 
-public: // Manager.
+public: // Manager
 
 	void clear() noexcept override;
-
-	void dump(const StaticString &filename) const noexcept override;
-
-	bool has_scene(const StaticString &name) const noexcept override;
-
-	bool load(const StaticString &filename) noexcept override;
-
+	void dump(const StaticString& filename) const noexcept override;
+	bool has_scene(const StaticString& name) const noexcept override;
+	bool load(const StaticString& filename) noexcept override;
 	bool pop_scenes(size_t count) noexcept override;
-
-	bool push_scene(const StaticString &name) noexcept override;
-
-	bool process_key(Terminal *terminal, Key key, KeyState state) noexcept override;
-
+	bool push_scene(const StaticString& name) noexcept override;
+	bool process_key(Terminal* terminal, Key key, unsigned pressed) noexcept override;
 	bool render() noexcept override;
-
-	void set_cursor(const Vector2f &cursor) noexcept override;
-
-private:
-
-	void change_scene(const StaticString &old_scene, const StaticString &new_scene);
-
-	void delete_scene(Scene *scene);
-
-	bool load(const StaticString &name, bool internal);
-
-	void load(const Ion::Object &parent);
+	void set_cursor(const Vector2f& cursor) noexcept override;
 
 private:
 
-	typedef std::map<String, FontDesc>      Fonts;
-	typedef std::map<StaticString, Scene *> Scenes;
-	typedef std::vector<Scene *>            SceneStack;
-	typedef std::pair<String, String>       ScenePair;
-	typedef std::map<ScenePair, String>     SceneActions;
+	void change_scene(const StaticString& old_scene, const StaticString& new_scene);
+	void delete_scene(Scene* scene);
 
 private:
 
-	ProxyAllocator   _proxy_allocator;
-	Renderer         _renderer;
-	TextureCachePtr  _texture_cache;
-	Callbacks       *_callbacks;
-	bool             _has_size;
-	Vector2f         _size;
-	Scaling          _scaling;
-	Fonts            _fonts;
-	Scenes           _scenes;
-	SceneStack       _scene_stack;
-	SceneActions     _scene_actions;
-	bool             _has_cursor;
-	Vector2f         _cursor;
+	typedef std::pair<String, String> ScenePair;
+
+	ProxyAllocator                 _proxy_allocator;
+	Renderer                       _renderer;
+	TextureCachePtr                _texture_cache;
+	Callbacks*                     _callbacks;
+	bool                           _has_size;
+	Vector2f                       _size;
+	Scaling                        _scaling;
+	std::map<String, FontDesc>     _fonts;
+	std::map<StaticString, Scene*> _scenes;
+	std::vector<Scene*>            _scene_stack;
+	std::map<ScenePair, String>    _scene_actions;
+	bool                           _has_cursor;
+	Vector2f                       _cursor;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Allocator *ManagerImpl::internal_allocator() const
-{
-	return const_cast<ProxyAllocator *>(&_proxy_allocator);
-}
-
-Manager::Callbacks *ManagerImpl::callbacks() const
-{
-	return _callbacks;
-}
-
-Renderer *ManagerImpl::renderer()
-{
-	return &_renderer;
-}
-
-void ManagerImpl::set_scaling(Scaling scaling)
-{
-	_scaling = scaling;
-}
-
-void ManagerImpl::set_size(const Vector2f &size)
-{
-	_size = size;
-	_has_size = true;
-}
-
-TextureCache *ManagerImpl::texture_cache()
-{
-	return _texture_cache.pointer();
-}
 
 } // namespace Gui
 

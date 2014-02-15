@@ -5,7 +5,7 @@
 #include <yttrium/time.h>
 
 #include "instance_guard.h"
-#include "memory/private_allocator.h"
+#include "../memory/private_allocator.h"
 
 namespace Yttrium
 {

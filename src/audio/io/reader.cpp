@@ -36,7 +36,7 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 {
 	close();
 
-	if (type == AudioType::Auto)
+	if (Y_LIKELY(type == AudioType::Auto))
 	{
 		StaticString extension = name.file_extension();
 		if (extension == ".wav")
