@@ -1,7 +1,7 @@
-#ifndef __IMAGE_PNG_H
-#define __IMAGE_PNG_H
+#ifndef __IMAGE_PNG_PNG_H
+#define __IMAGE_PNG_PNG_H
 
-#include "image.h"
+#include "../image.h"
 
 #include <png.h>
 
@@ -30,4 +30,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __IMAGE_PNG_H
+#endif // __IMAGE_PNG_PNG_H

@@ -1,7 +1,7 @@
-#ifndef __IMAGE_JPEG_H
-#define __IMAGE_JPEG_H
+#ifndef __IMAGE_JPEG_JPEG_H
+#define __IMAGE_JPEG_JPEG_H
 
-#include "image.h"
+#include "../image.h"
 
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <jpeglib.h>
@@ -44,4 +44,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __IMAGE_JPEG_H
+#endif // __IMAGE_JPEG_JPEG_H

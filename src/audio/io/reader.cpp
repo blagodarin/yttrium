@@ -3,8 +3,11 @@
 #include <yttrium/package.h>
 #include <yttrium/utils.h>
 
-#include "ogg_vorbis.h"
 #include "wav.h"
+
+#ifndef Y_NO_OGG_VORBIS
+	#include "ogg_vorbis/ogg_vorbis.h"
+#endif
 
 namespace Yttrium
 {
@@ -33,47 +36,32 @@ bool AudioReader::open(const StaticString &name, AudioType type, Allocator *allo
 {
 	close();
 
+	if (type == AudioType::Auto)
+	{
+		StaticString extension = name.file_extension();
+		if (extension == ".wav")
+			type = AudioType::Wav;
+#ifndef Y_NO_OGG_VORBIS
+		else if (extension == ".ogg")
+			type = AudioType::OggVorbis;
+#endif
+		else
+			return false;
+	}
+
 	switch (type)
 	{
-	case AudioType::Wav:
-
-		_private = Y_NEW(allocator, WavReader)(allocator);
-		break;
-
-	case AudioType::OggVorbis:
-
-		_private = Y_NEW(allocator, OggVorbisReader)(allocator);
-		break;
-
-	default:
-
-		{
-			StaticString extension = name.file_extension();
-			if (extension == ".wav")
-			{
-				_private = Y_NEW(allocator, WavReader)(allocator);
-			}
-			else if (extension == ".ogg")
-			{
-				_private = Y_NEW(allocator, OggVorbisReader)(allocator);
-			}
-		}
-		break;
+	case AudioType::Wav:       _private = Y_NEW(allocator, WavReader)(allocator); break;
+#ifndef Y_NO_OGG_VORBIS
+	case AudioType::OggVorbis: _private = Y_NEW(allocator, OggVorbisReader)(allocator); break;
+#endif
+	default:                   return false;
 	}
 
-	if (_private)
-	{
-		if (_private->_file.open(name, allocator)
-			&& _private->open())
-		{
-			return true;
-		}
-
-		close();
-	}
+	if (Y_LIKELY(_private->_file.open(name, allocator) && _private->open()))
+		return true;
 
 	close();
-
 	return false;
 }
 

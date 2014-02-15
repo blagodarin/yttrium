@@ -1,7 +1,7 @@
 #ifndef __AUDIO_IO_OGG_VORBIS_H
 #define __AUDIO_IO_OGG_VORBIS_H
 
-#include "reader.h"
+#include "../reader.h"
 
 #include <vorbis/vorbisfile.h>
 

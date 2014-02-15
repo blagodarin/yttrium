@@ -3,10 +3,17 @@
 #include <yttrium/package.h>
 #include <yttrium/utils.h>
 
+#include "../base/allocatable.h"
 #include "dds.h"
-#include "jpeg.h"
-#include "png.h"
 #include "tga.h"
+
+#ifndef Y_NO_JPEG
+	#include "jpeg/jpeg.h"
+#endif
+
+#ifndef Y_NO_PNG
+	#include "png/png.h"
+#endif
 
 namespace Yttrium
 {
@@ -147,50 +154,42 @@ bool Image::intensity_to_bgra()
 
 bool Image::load(const StaticString &name, ImageType type)
 {
-	if (type == ImageType::Auto)
+	if (Y_LIKELY(type == ImageType::Auto))
 	{
 		StaticString extension = name.file_extension();
-
 		if (extension == ".tga")
-		{
 			type = ImageType::Tga;
-		}
 		else if (extension == ".dds")
-		{
 			type = ImageType::Dds;
-		}
+#ifndef Y_NO_JPEG
 		else if (extension == ".jpeg" || extension == ".jpg")
-		{
 			type = ImageType::Jpeg;
-		}
+#endif
+		else
+			return false;
 	}
 
-	ImageReader *reader = nullptr;
-	Allocator *const allocator = _buffer.allocator();
+	Allocatable<ImageReader> reader(_buffer.allocator());
 
 	switch (type)
 	{
-	case ImageType::Tga:  reader = Y_NEW(allocator, TgaReader)(allocator); break;
-	case ImageType::Jpeg: reader = Y_NEW(allocator, JpegReader)(allocator); break;
-	case ImageType::Dds:  reader = Y_NEW(allocator, DdsReader)(allocator); break;
-	default:              break;
+	case ImageType::Tga:  reader.reset<TgaReader>(); break;
+#ifndef Y_NO_JPEG
+	case ImageType::Jpeg: reader.reset<JpegReader>(); break;
+#endif
+	case ImageType::Dds:  reader.reset<DdsReader>(); break;
+	default:              return false;
 	}
 
-	bool result = false;
+	if (Y_UNLIKELY(!reader->_file.open(name, reader.allocator())))
+		return false;
 
-	if (Y_LIKELY(reader))
-	{
-		if (Y_LIKELY(reader->_file.open(name, allocator)
-			&& reader->open()))
-		{
-			_format = reader->_format;
-			_buffer.resize(_format.frame_size());
-			result = reader->read(_buffer.data());
-		}
-		Y_DELETE(allocator, reader);
-	}
+	if (Y_UNLIKELY(!reader->open()))
+		return false;
 
-	return result;
+	_format = reader->_format;
+	_buffer.resize(_format.frame_size());
+	return reader->read(_buffer.data());
 }
 
 bool Image::save(const StaticString &name, ImageType type) const
@@ -198,41 +197,35 @@ bool Image::save(const StaticString &name, ImageType type) const
 	if (type == ImageType::Auto)
 	{
 		StaticString extension = name.file_extension();
-
 		if (extension == ".tga")
-		{
 			type = ImageType::Tga;
-		}
+#ifndef Y_NO_PNG
 		else if (extension == ".png")
-		{
 			type = ImageType::Png;
-		}
+#endif
+		else
+			return false;
 	}
 
-	ImageWriter *writer = nullptr;
+	Allocatable<ImageWriter> writer(_buffer.allocator());
 
 	switch (type)
 	{
-	case ImageType::Tga: writer = Y_NEW(_buffer.allocator(), TgaWriter)(_buffer.allocator()); break;
-	case ImageType::Png: writer = Y_NEW(_buffer.allocator(), PngWriter)(_buffer.allocator()); break;
-	default:             break;
+	case ImageType::Tga: writer.reset<TgaWriter>(); break;
+#ifndef Y_NO_PNG
+	case ImageType::Png: writer.reset<PngWriter>(); break;
+#endif
+	default:             return false;
 	}
 
-	bool result = false;
+	if (Y_UNLIKELY(!writer->_file.open(name, File::Write | File::Truncate, writer.allocator())))
+		return false;
 
-	if (writer)
-	{
-		if (Y_LIKELY(writer->_file.open(name, File::Write | File::Truncate, writer->_allocator)
-			&& writer->open()
-			&& writer->set_format(_format)))
-		{
-			writer->_format = _format;
-			result = writer->write(_buffer.data());
-		}
-		Y_DELETE(writer->_allocator, writer);
-	}
+	if (Y_UNLIKELY(!writer->open() || !writer->set_format(_format)))
+		return false;
 
-	return result;
+	writer->_format = _format;
+	return writer->write(_buffer.data());
 }
 
 void Image::set_format(const ImageFormat &format)

@@ -10,6 +10,18 @@ EnsureSConsVersion(1, 0)
 # Command line options
 #===============================================================================
 
+AddOption('--no-jpeg', dest = 'no_jpeg',
+	action = 'store_true', default = False,
+	help = 'Exclude JPEG support')
+
+AddOption('--no-ogg-vorbis', dest = 'no_ogg_vorbis',
+	action = 'store_true', default = False,
+	help = 'Exclude Ogg Vorbis support')
+
+AddOption('--no-png', dest = 'no_png',
+	action = 'store_true', default = False,
+	help = 'Exclude PNG support')
+
 AddOption('--platform', dest = 'platform',
 	action = 'store', type = 'choice', choices = ['posix-x11', 'windows'],
 	help = 'If specified, will override the default target platform.')
@@ -22,6 +34,9 @@ AddOption('--static', dest = 'static',
 	action = 'store_true', default = False,
 	help = 'If specified, will build a static library.')
 
+option_no_jpeg = GetOption('no_jpeg')
+option_no_ogg_vorbis = GetOption('no_ogg_vorbis')
+option_no_png = GetOption('no_png')
 option_platform = GetOption('platform')
 option_release = GetOption('release')
 option_static = GetOption('static')
@@ -122,7 +137,15 @@ if target_platform == 'posix-x11':
 elif target_platform == 'windows':
 	ports = ['windows']
 
-LIBS = ['jpeg', 'ogg', 'png', 'vorbis', 'vorbisfile', 'z']
+LIBS = []
+
+if not option_no_jpeg:
+	LIBS += ['jpeg']
+if not option_no_ogg_vorbis:
+	LIBS += ['ogg', 'vorbis', 'vorbisfile']
+if not option_no_png:
+	LIBS += ['png', 'z']
+
 if 'posix' in ports:
 	LIBS += ['openal', 'pthread']
 if 'windows' in ports:
@@ -143,6 +166,13 @@ if option_static:
 else:
 	src_env.Append(CPPDEFINES = ['__YTTRIUM_SHARED'])
 	src_env.Append(LIBS = LIBS)
+
+if option_no_jpeg:
+	src_env.Append(CPPDEFINES = ['Y_NO_JPEG'])
+if option_no_ogg_vorbis:
+	src_env.Append(CPPDEFINES = ['Y_NO_OGG_VORBIS'])
+if option_no_png:
+	src_env.Append(CPPDEFINES = ['Y_NO_PNG'])
 
 src_paths = [
 	'audio',
@@ -166,6 +196,13 @@ src_paths = [
 	'ion',
 	'math',
 	'package']
+
+if not option_no_jpeg:
+	src_paths += ['image/jpeg']
+if not option_no_ogg_vorbis:
+	src_paths += ['audio/io/ogg_vorbis']
+if not option_no_png:
+	src_paths += ['image/png']
 
 if 'posix' in ports:
 	src_paths += [
