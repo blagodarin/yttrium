@@ -4,7 +4,7 @@ scene "game_over"
 	scale       "min"
 	transparent
 
-	bind "esc" "pop_scene 2"
+	bind "esc" "pop_scene 3"
 
 	image
 	{

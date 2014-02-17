@@ -506,7 +506,7 @@ void Game::set_right_movement(bool move)
 	}
 }
 
-void Game::start()
+void Game::start(int start_level)
 {
 	_field.clear();
 	_next_figure.set_type(random_figure_type());
@@ -523,7 +523,7 @@ void Game::start()
 
 	_score = 0;
 	_lines = 0;
-	_level = 1;
+	_level = start_level;
 	_speed = BaseSpeed * _level;
 
 	_state = Waiting;
@@ -639,7 +639,7 @@ void Game::update_score()
 	int lines = _field.collapse_full_rows();
 	_score += score_table[lines] * _level;
 	_lines += lines;
-	_level = _lines / Field::Width + 1;
+	_level += _lines / Field::Width - (_lines - lines) / Field::Width;
 }
 
 int Game::process_horizontal_movement(int frames)

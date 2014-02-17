@@ -43,6 +43,7 @@ class "button"
 }
 
 include "examples/tetrium/gui/menu_main.ion"
+include "examples/tetrium/gui/menu_single.ion"
 include "examples/tetrium/gui/menu_multi.ion"
 include "examples/tetrium/gui/menu_help.ion"
 
@@ -50,7 +51,7 @@ include "examples/tetrium/gui/game_over.ion"
 include "examples/tetrium/gui/game_pause.ion"
 include "examples/tetrium/gui/game_single.ion"
 
-on_scene_change ["menu_main"   "game_single"] "game_start"
+on_scene_change ["menu_single" "game_single"] "game_start"
 on_scene_change ["game_single" "game_pause" ] "game_pause"
 on_scene_change ["game_pause"  "game_single"] "game_resume"
 on_scene_change ["game_single" "menu_main"  ] "game_stop"

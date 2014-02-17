@@ -18,16 +18,9 @@ scene "menu_multi"
 
 	button ["button"]
 	{
-		position "" "210"
+		position "" "260"
 		text     "Multiplayer"
 		state    "checked"
-	}
-
-	button ["button"]
-	{
-		position "" "260"
-		text     "Back"
-		action   "pop_scene"
 	}
 
 	button ["button"]
@@ -42,5 +35,12 @@ scene "menu_multi"
 		position "" "360"
 		text     "Join game"
 		state    "disabled"
+	}
+
+	button ["button"]
+	{
+		position "" "410"
+		text     "Back"
+		action   "pop_scene"
 	}
 }

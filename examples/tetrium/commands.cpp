@@ -52,7 +52,9 @@ void Commands::game_pause(const StaticString &, String *, const ScriptArgs &) no
 
 void Commands::game_start(const StaticString &, String *, const ScriptArgs &) noexcept
 {
-	_game->_game.start();
+	ScriptValue *start_level_value = ScriptContext::global().find("start_level");
+	int start_level = start_level_value ? start_level_value->integer() : 1;
+	_game->_game.start(start_level);
 	_game->_game_timer.start();
 }
 

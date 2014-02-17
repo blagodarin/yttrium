@@ -207,7 +207,7 @@ public:
 	void set_right_movement(bool move);
 
 	/// Start the game.
-	void start();
+	void start(int start_level = 1);
 
 	/// Turn the current figure left (counterclockwise) if possible.
 	/// \return \c true on successful turn.

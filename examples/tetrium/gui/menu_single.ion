@@ -1,6 +1,6 @@
-scene "menu_main" ["root"]
+scene "menu_single"
 {
-	bind "esc" "exit"
+	bind "esc" "pop_scene"
 
 	image
 	{
@@ -20,34 +20,34 @@ scene "menu_main" ["root"]
 	{
 		position "" "210"
 		text     "Single player"
-		action   "push_scene menu_single"
+		state    "checked"
 	}
 
 	button ["button"]
 	{
 		position "" "260"
-		text     "Multiplayer"
-		action   "push_scene menu_multi"
+		text     "Easy"
+		action   "set start_level 1; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
-		text     "Statistics"
-		state    "disabled"
+		text     "Normal"
+		action   "set start_level 10; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
-		text     "Help"
-		action   "push_scene menu_help"
+		text     "Hard"
+		action   "set start_level 20; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
-		text     "Exit"
-		action   "exit"
+		text     "Back"
+		action   "pop_scene"
 	}
 }

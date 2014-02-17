@@ -37,7 +37,7 @@ scene "game_pause"
 	{
 		position "" "15"
 		text     "Give up"
-		action   "pop_scene 2"
+		action   "pop_scene 3"
 	}
 
 	button ["pause_button"]
