@@ -8,13 +8,14 @@ BOOST_AUTO_TEST_CASE(dir_test)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	Dir dir;
+	BOOST_CHECK(Dir::exists("tests/dir"));
+	BOOST_CHECK(!Dir::exists("tests/void"));
 
-	BOOST_CHECK(!dir.is_opened());
+	BOOST_CHECK(!Dir("tests/void").exists());
 
-	BOOST_REQUIRE(dir.open("tests/dir"));
+	Dir dir("tests/dir");
 
-	BOOST_CHECK(dir.is_opened());
+	BOOST_REQUIRE(dir.exists());
 
 	size_t count = 0;
 

@@ -20,12 +20,14 @@ Game::Game(Allocator *allocator)
 
 Game::~Game()
 {
+	Y_LOG("Terminating...");
 	save_settings();
+	_renderer.set_texture(Texture2DPtr()); // Otherwise the renderer won't get deleted.
 }
 
 bool Game::setup()
 {
-	Y_LOG("Setting up...");
+	Y_LOG("Loading...");
 
 	if (!_terminal.open())
 		return false;
@@ -49,13 +51,6 @@ bool Game::setup()
 
 	_game.set_random_seed(Timer::clock());
 
-	return true;
-}
-
-void Game::run()
-{
-	Y_LOG("Starting...");
-
 	_terminal.set_name("Tetrium");
 	_terminal.resize(1024, 768);
 	_terminal.show();
@@ -63,6 +58,13 @@ void Game::run()
 	load_music();
 
 	load();
+
+	return true;
+}
+
+void Game::run()
+{
+	Y_LOG("Starting...");
 
 	RendererBuiltin renderer_builtin = _renderer.renderer_builtin();
 
@@ -89,7 +91,7 @@ void Game::run()
 				_gui->push_scene("game_over");
 		}
 
-		// Begin frame.
+		// Draw frame.
 
 		_renderer.begin_frame();
 		_gui->set_cursor(_terminal.cursor());
@@ -102,10 +104,6 @@ void Game::run()
 		ScriptContext::global().set("fps", fps.rate());
 		fps.tick();
 	}
-
-	Y_LOG("Terminating...");
-	
-	_renderer.set_texture(Texture2DPtr()); // Otherwise the renderer won't get deleted.
 }
 
 void Game::save_settings()

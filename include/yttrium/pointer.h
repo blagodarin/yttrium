@@ -152,11 +152,12 @@ class Pointer: public Pointable::Pointer
 {
 public:
 
-	///
+	Pointer() noexcept = default;
+	Pointer(const Pointer&) noexcept = default;
+	Pointer(Pointer&&) noexcept = default;
 
-	Pointer() noexcept
-	{
-	}
+	Pointer& operator=(const Pointer&) noexcept = default;
+	Pointer& operator=(Pointer&&) noexcept = default;
 
 	///
 

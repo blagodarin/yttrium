@@ -13,6 +13,8 @@ namespace Yttrium
 
 class Y_API Dir
 {
+	Y_NONCOPYABLE(Dir);
+
 public:
 
 	///
@@ -21,48 +23,47 @@ public:
 	{
 		friend Dir;
 
-		Iterator &operator =(Iterator) noexcept;
+		Iterator& operator=(const Iterator&) = delete;
 
 	public:
 
-		inline Iterator(const Iterator &iterator) noexcept;
+		Iterator(const Iterator& iterator) noexcept
+			: _private(iterator._private)
+		{
+			const_cast<Iterator&>(iterator)._private = nullptr;
+		}
 
 		~Iterator() noexcept;
 
 	public:
 
-		void operator ++() noexcept;
+		void operator++() noexcept;
 
-		StaticString operator *() const noexcept;
+		StaticString operator*() const noexcept;
 
-		bool operator !=(Iterator iterator) const noexcept;
+		bool operator!=(Iterator iterator) const noexcept;
 
 	private:
 
 		class Private;
 
-		inline Iterator(Private *private_) noexcept;
+		Private* _private;
 
-		Private *_private;
+		Iterator(Private *private_) noexcept
+			: _private(private_)
+		{
+		}
 	};
 
 public:
 
 	///
 
-	inline Dir() noexcept;
+	explicit Dir(const StaticString &name, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
 
-	inline explicit Dir(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
-
-	///
-
-	Dir(const Dir &dir) noexcept;
-
-	///
-
-	inline ~Dir() noexcept;
+	~Dir() noexcept;
 
 public:
 
@@ -72,73 +73,30 @@ public:
 
 	///
 
-	void close() noexcept;
+	Iterator end() const noexcept
+	{
+		return Iterator(nullptr);
+	}
 
 	///
 
-	inline Iterator end() const noexcept;
-
-	///
-
-	inline bool is_opened() const noexcept;
-
-	/// Open a directory.
-
-	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+	bool exists() noexcept
+	{
+		return _private;
+	}
 
 public:
 
 	///
 
-	Dir &operator =(const Dir &dir) noexcept;
-
-public:
-
-	class Private;
+	static bool exists(const StaticString &name, Allocator* allocator = DefaultAllocator) noexcept;
 
 private:
 
-	Private *_private;
+	class Private;
+
+	Private* _private;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Dir::Iterator::Iterator(const Iterator &iterator) noexcept
-	: _private(iterator._private)
-{
-	const_cast<Iterator &>(iterator)._private = nullptr;
-}
-
-Dir::Iterator::Iterator(Private *private_) noexcept
-	: _private(private_)
-{
-}
-
-Dir::Dir() noexcept
-	: _private(nullptr)
-{
-}
-
-Dir::Dir(const StaticString &name, Allocator *allocator) noexcept
-	: Dir()
-{
-	open(name, allocator);
-}
-
-Dir::~Dir() noexcept
-{
-	close();
-}
-
-Dir::Iterator Dir::end() const noexcept
-{
-	return Iterator(nullptr);
-}
-
-bool Dir::is_opened() const noexcept
-{
-	return _private;
-}
 
 } // namespace Yttrium
 

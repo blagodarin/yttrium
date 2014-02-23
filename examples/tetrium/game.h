@@ -34,11 +34,7 @@ public:
 private:
 
 	bool load();
-
 	void load_music();
-
-	void load_settings();
-
 	void save_settings();
 
 private: // Terminal::Callbacks.

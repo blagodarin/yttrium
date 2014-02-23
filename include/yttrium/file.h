@@ -151,7 +151,7 @@ public:
 	template <typename T>
 	bool read(T *buffer) noexcept
 	{
-		return (read(buffer, sizeof(T)) == sizeof(T));
+		return read(buffer, sizeof(T)) == sizeof(T);
 	}
 
 	///
