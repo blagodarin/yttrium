@@ -29,6 +29,7 @@ bool Game::setup()
 {
 	Y_LOG("Loading...");
 
+	_terminal.resize(1024, 768);
 	if (!_terminal.open())
 		return false;
 
@@ -52,7 +53,6 @@ bool Game::setup()
 	_game.set_random_seed(Timer::clock());
 
 	_terminal.set_name("Tetrium");
-	_terminal.resize(1024, 768);
 	_terminal.show();
 
 	load_music();

@@ -66,10 +66,10 @@ public:
 
 	///
 
-	Window(const Screen &screen, Callbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept
+	Window(const Screen &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept
 		: Window()
 	{
-		open(screen, callbacks, allocator);
+		open(screen, size, callbacks, allocator);
 	}
 
 	///
@@ -113,11 +113,11 @@ public:
 
 	///
 
-	bool open(const Screen &screen, Callbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept;
+	bool open(const Screen &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
 
-	bool put(Dim left, Dim top, Dim width, Dim height, PutMode mode) noexcept;
+	bool put(int left, int top, int width, int height, PutMode mode) noexcept;
 
 	///
 

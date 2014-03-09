@@ -36,7 +36,7 @@ public:
 	/// \param y Top offset.
 	/// \param max_size Maximum text line size to be rendered.
 
-	void render_input(RendererBuiltin *renderer, Dim x, Dim y, Dim max_size = -1) noexcept;
+	void render_input(RendererBuiltin *renderer, int x, int y, int max_size = -1) noexcept;
 
 private:
 

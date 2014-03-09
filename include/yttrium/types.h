@@ -48,10 +48,6 @@ typedef int_fast64_t Offset;
 
 typedef uint_fast64_t UOffset;
 
-/// Integer type for representing graphical dimensions.
-
-typedef int_fast16_t Dim;
-
 /// Generic integer type.
 
 typedef int_fast32_t Integer;
@@ -107,13 +103,13 @@ typedef Margins<float>   MarginsF;  ///< \c float Margins.
 
 typedef Rect<Integer>    RectI;     ///< Integer Rect.
 typedef Rect<float>      RectF;     ///< \c float Rect.
-typedef Rect<Dim>        Area;      ///< Dim Rect.
+typedef Rect<int>        Area;      ///< \c int Rect.
 
 typedef Vector2<int8_t>  Vector2i8; ///< \c int8_t Vector2.
 typedef Vector2<uint8_t> Vector2u8; ///< \c uint8_t Vector2.
 typedef Vector2<float>   Vector2f;  ///< \c float Vector2.
 typedef Vector2<double>  Vector2d;  ///< \c double Vector2.
-typedef Vector2<Dim>     Dim2;      ///< Dim Vector2.
+typedef Vector2<int>     Dim2;      ///< \c int Vector2.
 
 typedef Vector3<float>   Vector3f;  ///< \c float Vector3.
 

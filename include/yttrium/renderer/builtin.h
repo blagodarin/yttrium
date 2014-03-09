@@ -36,15 +36,15 @@ public:
 
 	///
 
-	void draw_cursor(Dim x, Dim y) noexcept;
+	void draw_cursor(int x, int y) noexcept;
 
 	///
 
-	void draw_rectangle(Dim x, Dim y, Dim width, Dim height) noexcept;
+	void draw_rectangle(int x, int y, int width, int height) noexcept;
 
 	///
 
-	void draw_text(Dim x, Dim y, const StaticString &text, Dim max_size = -1) noexcept;
+	void draw_text(int x, int y, const StaticString &text, int max_size = -1) noexcept;
 
 	/// Set the drawing color to \a color.
 
@@ -54,7 +54,10 @@ public:
 	* \overload
 	*/
 
-	inline void set_color(float r, float g, float b, float a = 1) noexcept;
+	void set_color(float r, float g, float b, float a = 1) noexcept
+	{
+		set_color(Vector4f(r, g, b, a));
+	}
 
 	///
 
@@ -68,7 +71,10 @@ public:
 
 	///
 
-	inline operator bool() const noexcept;
+	inline operator bool() const noexcept
+	{
+		return _private;
+	}
 
 	///
 
@@ -78,27 +84,11 @@ private:
 
 	class Private;
 
-private:
+	Private *_private;
 
 	Y_PRIVATE RendererBuiltin(Private *private_);
-
-private:
-
-	Private *_private;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-RendererBuiltin::operator bool() const noexcept
-{
-	return _private;
-}
-
-void RendererBuiltin::set_color(float r, float g, float b, float a) noexcept
-{
-	set_color(Vector4f(r, g, b, a));
-}
 
 } // namespace Yttrium
 

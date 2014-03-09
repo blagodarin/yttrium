@@ -22,11 +22,11 @@ public:
 	typedef std::map<char, TextureFont::CharInfo> Chars;
 
 	typedef std::pair<char, char>   CharPair;
-	typedef std::map<CharPair, Dim> Kernings;
+	typedef std::map<CharPair, int> Kernings;
 
 public:
 
-	Dim      _size;
+	int      _size;
 	Chars    _chars;
 	Kernings _kernings;
 	Area     _area;

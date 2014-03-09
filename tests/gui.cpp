@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(gui_test)
 
 		Window window;
 
-		BOOST_REQUIRE(window.open(screen, nullptr));
+		BOOST_REQUIRE(window.open(screen, Dim2(320, 240), nullptr));
 
 		Renderer renderer = window.create_renderer(Renderer::OpenGl);
 

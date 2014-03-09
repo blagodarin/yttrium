@@ -12,7 +12,7 @@ Terminal::Terminal(Callbacks *callbacks, Allocator *allocator)
 	, _is_opened(false)
 	, _is_active(false)
 	, _is_cursor_locked(false)
-	, _size(320, 240) // TODO: Get rid of magic defaults.
+	, _size(0)
 	, _mode(Windowed)
 	, _callbacks(callbacks)
 	, _console(*this, _allocator)
@@ -57,17 +57,17 @@ void Terminal::lock_cursor(bool lock)
 
 bool Terminal::open()
 {
-	if (!_is_opened)
+	if (_is_opened || _size.x <= 0 || _size.y <= 0)
+		return false;
+
+	if (_screen.open(_allocator))
 	{
-		if (_screen.open(_allocator))
+		if (_window.open(_screen, _size, this, _allocator))
 		{
-			if (_window.open(_screen, this, _allocator))
-			{
-				_is_opened = true;
-				return true;
-			}
-			_screen.close();
+			_is_opened = true;
+			return true;
 		}
+		_screen.close();
 	}
 
 	return false;
@@ -153,11 +153,8 @@ bool Terminal::process_events()
 void Terminal::resize(const Dim2 &size)
 {
 	_size = size;
-
-	if (_is_active)
-	{
+	if (_is_opened && _is_active)
 		show(_mode);
-	}
 }
 
 bool Terminal::set_cursor(const Dim2 &cursor)

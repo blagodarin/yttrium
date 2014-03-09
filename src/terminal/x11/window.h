@@ -30,7 +30,7 @@ public:
 
 public:
 
-	Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, ::GLXContext glx_context, Allocator *allocator);
+	Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, const Dim2 &size, ::GLXContext glx_context, Allocator *allocator);
 
 	~Private();
 
@@ -40,7 +40,7 @@ public:
 
 public:
 
-	static bool create_window(::Display *display, int screen, ::Window *window, ::GLXContext *glx_context);
+	static bool create_window(::Display *display, int screen, const Dim2 &size, ::Window *window, ::GLXContext *glx_context);
 
 	static Key decode_key(::XEvent &event);
 };

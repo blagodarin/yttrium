@@ -22,7 +22,7 @@ public:
 	{
 		Area area;    ///< The rectangle a character occupies in the texture.
 		Dim2 offset;  ///< The offset to apply before rendering a character.
-		Dim  advance; ///< The horizontal advance.
+		int  advance; ///< The horizontal advance.
 	};
 
 public:
@@ -59,7 +59,7 @@ public:
 
 	///
 
-	Dim kerning(char left, char right) const noexcept;
+	int kerning(char left, char right) const noexcept;
 
 	///
 
@@ -67,7 +67,7 @@ public:
 
 	///
 
-	Dim size() const noexcept;
+	int size() const noexcept;
 
 	///
 

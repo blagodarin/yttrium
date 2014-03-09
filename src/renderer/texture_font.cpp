@@ -82,7 +82,7 @@ void TextureFont::close()
 	Private::release(&_private);
 }
 
-Dim TextureFont::kerning(char left, char right) const
+int TextureFont::kerning(char left, char right) const
 {
 	Private::Kernings::const_iterator i = _private->_kernings.find(Private::CharPair(left, right));
 	return i != _private->_kernings.end() ? i->second : 0;
@@ -179,7 +179,7 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 	return false;
 }
 
-Dim TextureFont::size() const
+int TextureFont::size() const
 {
 	return _private->_size;
 }

@@ -15,10 +15,10 @@ class Window;
 
 struct ScreenMode
 {
-	Dim          width;          ///<
-	Dim          height;         ///<
-	uint_fast8_t bits_per_pixel; ///<
-	uint_fast8_t frequency;      ///<
+	int      width;          ///<
+	int      height;         ///<
+	unsigned bits_per_pixel; ///<
+	unsigned frequency;      ///<
 
 	///
 
@@ -103,8 +103,6 @@ public:
 private:
 
 	class Private;
-
-private:
 
 	Private *_private;
 };

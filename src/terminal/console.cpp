@@ -33,7 +33,7 @@ bool Console::process_key(Key key)
 	return true;
 }
 
-void Console::render_input(RendererBuiltin *renderer, Dim x, Dim y, Dim max_size)
+void Console::render_input(RendererBuiltin *renderer, int x, int y, int max_size)
 {
 	if (_line_editor.selection_size())
 	{

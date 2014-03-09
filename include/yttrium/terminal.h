@@ -14,8 +14,7 @@ class RendererBuiltin;
 
 /// Incapsulation of Screen and Window classes and input management.
 
-class Y_API Terminal
-	: private Window::Callbacks
+class Y_API Terminal: private Window::Callbacks
 {
 public:
 
@@ -125,7 +124,7 @@ public:
 	* \param height
 	*/
 
-	void resize(Dim width, Dim height) noexcept
+	void resize(int width, int height) noexcept
 	{
 		resize(Dim2(width, height));
 	}
@@ -148,7 +147,7 @@ public:
 	* \return
 	*/
 
-	bool set_cursor(Dim left, Dim top) noexcept
+	bool set_cursor(int left, int top) noexcept
 	{
 		return set_cursor(Dim2(left, top));
 	}

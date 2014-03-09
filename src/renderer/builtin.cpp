@@ -55,7 +55,7 @@ Vector4f RendererBuiltin::color() const
 	return _private->_color;
 }
 
-void RendererBuiltin::draw_cursor(Dim x, Dim y)
+void RendererBuiltin::draw_cursor(int x, int y)
 {
 	_private->bind();
 
@@ -74,7 +74,7 @@ void RendererBuiltin::draw_cursor(Dim x, Dim y)
 	_private->_renderer->_color = old_color;
 }
 
-void RendererBuiltin::draw_rectangle(Dim x, Dim y, Dim width, Dim height)
+void RendererBuiltin::draw_rectangle(int x, int y, int width, int height)
 {
 	_private->bind();
 
@@ -93,11 +93,11 @@ void RendererBuiltin::draw_rectangle(Dim x, Dim y, Dim width, Dim height)
 	_private->_renderer->_color = old_color;
 }
 
-void RendererBuiltin::draw_text(Dim x, Dim y, const StaticString &text, Dim max_size)
+void RendererBuiltin::draw_text(int x, int y, const StaticString &text, int max_size)
 {
 	_private->bind();
 
-	Dim size = min<Dim>(text.size(), max_size);
+	int size = min<int>(text.size(), max_size);
 
 	if (size > 0)
 	{

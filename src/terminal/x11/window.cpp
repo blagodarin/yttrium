@@ -36,7 +36,7 @@ void fix_window_size(::Display *display, ::Window window, const Dim2 &size)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Window::Private::Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, ::GLXContext glx_context, Allocator *allocator)
+Window::Private::Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, const Dim2 &size, ::GLXContext glx_context, Allocator *allocator)
 	: PrivateBase(allocator)
 	, _screen(screen)
 	, _display(display)
@@ -45,7 +45,7 @@ Window::Private::Private(const Screen &screen, ::Display *display, int x_screen,
 	, _wm_protocols(XInternAtom(display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(XInternAtom(display, "WM_DELETE_WINDOW", True))
 	, _glx_context(glx_context)
-	, _size(320, 240) // TODO: Get rid of magic numbers.
+	, _size(size)
 	, _renderer(nullptr)
 {
 	::XSetWMProtocols(display, window, &_wm_delete_window, 1);
@@ -68,7 +68,7 @@ void Window::Private::close()
 	}
 }
 
-bool Window::Private::create_window(::Display *display, int screen, ::Window *window, ::GLXContext *glx_context)
+bool Window::Private::create_window(::Display *display, int screen, const Dim2 &size, ::Window *window, ::GLXContext *glx_context)
 {
 	// GLXFBConfig API requires GLX 1.3.
 	// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
@@ -140,7 +140,7 @@ bool Window::Private::create_window(::Display *display, int screen, ::Window *wi
 			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
 
 			*window = ::XCreateWindow(display, RootWindow(display, screen),
-				0, 0, 320, 240, 0, vi->depth, InputOutput, vi->visual, // TODO: Get rid of magic numbers.
+				0, 0, size.x, size.y, 0, vi->depth, InputOutput, vi->visual,
 				CWBorderPixel | CWColormap | CWEventMask, &swa);
 
 			if (*window != None)
@@ -289,7 +289,7 @@ bool Window::get_frame_sync(bool *frame_sync)
 	return false;
 }
 
-bool Window::open(const Screen &screen, Callbacks *callbacks, Allocator *allocator)
+bool Window::open(const Screen &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
 {
 	close();
 
@@ -300,9 +300,9 @@ bool Window::open(const Screen &screen, Callbacks *callbacks, Allocator *allocat
 		::Window      window;
 		::GLXContext  glx_context;
 
-		if (Private::create_window(display, x_screen, &window, &glx_context))
+		if (Private::create_window(display, x_screen, size, &window, &glx_context))
 		{
-			_private = Y_NEW(allocator, Private)(screen, display, x_screen, window, glx_context, allocator);
+			_private = Y_NEW(allocator, Private)(screen, display, x_screen, window, size, glx_context, allocator);
 			_callbacks = callbacks;
 			return true;
 		}
@@ -311,12 +311,10 @@ bool Window::open(const Screen &screen, Callbacks *callbacks, Allocator *allocat
 	return false;
 }
 
-bool Window::put(Dim left, Dim top, Dim width, Dim height, PutMode mode)
+bool Window::put(int left, int top, int width, int height, PutMode mode)
 {
 	if (_private->_window == None)
-	{
 		return false;
-	}
 
 	::XSetWindowAttributes attributes;
 
