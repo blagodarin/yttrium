@@ -60,7 +60,7 @@ private:
 	Allocator       *_allocator;
 	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
-	Terminal         _terminal;
+	TerminalPtr      _terminal;
 	Renderer         _renderer;
 	TextureCachePtr  _texture_cache;
 	Gui::ManagerPtr  _gui;

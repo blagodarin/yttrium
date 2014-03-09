@@ -41,6 +41,5 @@
 #include <yttrium/types.h>
 #include <yttrium/utils.h>
 #include <yttrium/vector.h>
-#include <yttrium/window.h>
 
 #endif // __Y_YTTRIUM_H

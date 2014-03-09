@@ -12,7 +12,6 @@ Game::Game(Allocator *allocator)
 	: _allocator(allocator)
 	, _renderer_allocator("renderer", allocator)
 	, _audio(_allocator)
-	, _terminal(this, _allocator)
 	, _bindings(allocator)
 	, _commands(this)
 {
@@ -29,8 +28,8 @@ bool Game::setup()
 {
 	Y_LOG("Loading...");
 
-	_terminal.resize(1024, 768);
-	if (!_terminal.open())
+	_terminal = Terminal::open(Dim2(1024, 768), this, _allocator);
+	if (_terminal.is_null())
 		return false;
 
 	ScriptContext::global().execute_file("tetrium.txt");
@@ -46,14 +45,14 @@ bool Game::setup()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_renderer = _terminal.create_renderer(Renderer::OpenGl, &_renderer_allocator);
+	_renderer = _terminal->create_renderer(Renderer::OpenGl, &_renderer_allocator);
 	_texture_cache = TextureCache::create(_renderer);
 	_gui = Gui::Manager::create(_renderer, this, _allocator);
 
 	_game.set_random_seed(Timer::clock());
 
-	_terminal.set_name("Tetrium");
-	_terminal.show();
+	_terminal->set_name("Tetrium");
+	_terminal->show();
 
 	load_music();
 
@@ -76,7 +75,7 @@ void Game::run()
 	{
 		// Process terminal events.
 
-		if (!_terminal.process_events())
+		if (!_terminal->process_events())
 			break;
 
 		// Process game events.
@@ -94,9 +93,9 @@ void Game::run()
 		// Draw frame.
 
 		_renderer.begin_frame();
-		_gui->set_cursor(_terminal.cursor());
+		_gui->set_cursor(_terminal->cursor());
 		_gui->render();
-		_terminal.draw_console(&renderer_builtin);
+		_terminal->draw_console(&renderer_builtin);
 		_renderer.end_frame();
 
 		// Update FPS.

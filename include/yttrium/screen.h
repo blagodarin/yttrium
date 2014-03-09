@@ -1,18 +1,15 @@
 /// \file
-/// \brief
+/// \brief %Screen management.
 
 #ifndef __Y_SCREEN_H
 #define __Y_SCREEN_H
 
-#include <yttrium/types.h>
+#include <yttrium/pointer.h>
 
 namespace Yttrium
 {
 
-class Window;
-
 ///
-
 struct ScreenMode
 {
 	int      width;          ///<
@@ -21,7 +18,6 @@ struct ScreenMode
 	unsigned frequency;      ///<
 
 	///
-
 	ScreenMode()
 		: width(0)
 		, height(0)
@@ -31,80 +27,38 @@ struct ScreenMode
 	}
 };
 
+class Screen;
+
+/// Screen pointer.
+typedef Pointer<Screen> ScreenPtr;
+
 ///
-
-class Y_API Screen
+class Y_API Screen: public Pointable
 {
-	friend Window;
-
 public:
 
+	///
 	enum ModeType
 	{
-		CurrentMode,
-		DefaultMode,
+		CurrentMode, ///<
+		DefaultMode, ///<
 	};
 
 public:
 
-	///
-
-	Screen() noexcept
-		: _private(nullptr)
-	{
-	}
+	virtual ~Screen() {}
 
 	///
-
-	Screen(Allocator *allocator) noexcept
-		: Screen()
-	{
-		open(allocator);
-	}
-
-	///
-
-	Screen(const Screen &screen) noexcept;
-
-	///
-
-	~Screen() noexcept
-	{
-		close();
-	}
+	virtual ScreenMode mode(ModeType type = CurrentMode) noexcept = 0;
 
 public:
 
 	///
+	static ScreenPtr open(Allocator* allocator = DefaultAllocator) noexcept;
 
-	void close() noexcept;
+protected:
 
-	///
-
-	bool is_opened() const noexcept
-	{
-		return _private;
-	}
-
-	///
-
-	ScreenMode mode(ModeType type = CurrentMode) noexcept;
-
-	///
-
-	bool open(Allocator *allocator = DefaultAllocator) noexcept;
-
-public:
-
-	///
-
-	Screen &operator =(const Screen &screen) noexcept;
-
-private:
-
-	class Private;
-
-	Private *_private;
+	Screen(Allocator* allocator) noexcept: Pointable(allocator) {}
 };
 
 } // namespace Yttrium

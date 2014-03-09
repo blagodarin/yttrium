@@ -98,10 +98,7 @@ public:
 
 protected:
 
-	Manager(Allocator *allocator) noexcept
-		: Pointable(allocator)
-	{
-	}
+	Manager(Allocator *allocator) noexcept: Pointable(allocator) {}
 };
 
 } // namespace Gui

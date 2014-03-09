@@ -4,17 +4,22 @@
 #ifndef __Y_TERMINAL_H
 #define __Y_TERMINAL_H
 
-#include <yttrium/terminal/console.h>
-#include <yttrium/window.h>
+#include <yttrium/key.h>
+#include <yttrium/renderer.h>
 
 namespace Yttrium
 {
 
+class Terminal;
 class RendererBuiltin;
+
+/// Terminal pointer.
+
+typedef Pointer<Terminal> TerminalPtr;
 
 /// Incapsulation of Screen and Window classes and input management.
 
-class Y_API Terminal: private Window::Callbacks
+class Y_API Terminal: public Pointable
 {
 public:
 
@@ -44,79 +49,52 @@ public:
 
 public:
 
-	///
-
-	Terminal(Callbacks *callbacks = nullptr, Allocator *allocator = DefaultAllocator) noexcept;
+	virtual ~Terminal() {}
 
 	///
 
-	~Terminal() noexcept;
-
-public:
+	virtual void close() noexcept = 0;
 
 	///
 
-	void close() noexcept;
+	virtual Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept = 0;
 
 	///
 
-	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept
-	{
-		return _window.create_renderer(backend, allocator ? allocator : _allocator);
-	}
+	virtual Dim2 cursor() const noexcept = 0;
 
 	///
 
-	Dim2 cursor() const noexcept
-	{
-		return _cursor;
-	}
+	virtual void draw_console(RendererBuiltin *renderer) noexcept = 0;
 
 	///
 
-	void draw_console(RendererBuiltin *renderer) noexcept;
+	virtual bool is_console_visible() const noexcept = 0;
 
 	///
 
-	bool is_console_visible() const noexcept
-	{
-		return _is_console_visible;
-	}
+	virtual bool is_cursor_locked() const noexcept = 0;
 
 	///
 
-	bool is_cursor_locked() const noexcept
-	{
-		return _is_cursor_locked;
-	}
+	virtual bool is_shift_pressed() const noexcept = 0;
 
 	///
 
-	bool is_shift_pressed() const noexcept
-	{
-		return _keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)];
-	}
+	virtual void lock_cursor(bool lock) noexcept = 0;
 
 	///
 
-	void lock_cursor(bool lock) noexcept;
-
-	///
-
-	bool open() noexcept;
-
-	///
-
-	char printable(Key key) const noexcept;
+	virtual char printable(Key key) const noexcept = 0;
 
 	/// Let the terminal process window events.
 	/// \return \c false if the window was closed, \c true otherwise.
 
-	bool process_events() noexcept;
+	virtual bool process_events() noexcept = 0;
 
 	///
 
-	void resize(const Dim2 &size) noexcept;
+	virtual void resize(const Dim2 &size) noexcept = 0;
 
 	/**
 	* \overload
@@ -131,14 +109,11 @@ public:
 
 	///
 
-	void set_console_visible(bool visible) noexcept
-	{
-		_is_console_visible = visible;
-	}
+	virtual void set_console_visible(bool visible) noexcept = 0;
 
 	///
 
-	bool set_cursor(const Dim2 &cursor) noexcept;
+	virtual bool set_cursor(const Dim2 &cursor) noexcept = 0;
 
 	/**
 	* \overload
@@ -154,46 +129,26 @@ public:
 
 	///
 
-	void set_name(const StaticString &name) noexcept
-	{
-		_window.set_name(name);
-	}
+	virtual void set_name(const StaticString &name) noexcept = 0;
 
 	///
 
-	void show(Mode mode = Windowed) noexcept;
+	virtual void show(Mode mode = Windowed) noexcept = 0;
 
 	///
 
-	Dim2 size() const noexcept
-	{
-		return _size;
-	}
+	virtual Dim2 size() const noexcept = 0;
 
-private:
+public:
 
-	Y_PRIVATE void set_active(bool active);
+	///
 
-private: // Window::Callbacks
+	static TerminalPtr open(const Dim2 &size, Callbacks *callbacks = nullptr,
+		Allocator *allocator = DefaultAllocator) noexcept;
 
-	Y_PRIVATE void on_focus_event(Window *window, bool is_focused) noexcept override;
-	Y_PRIVATE void on_key_event(Window *window, Key key, bool is_pressed) noexcept override;
+protected:
 
-private:
-
-	Allocator *_allocator;
-	bool       _is_opened;
-	Screen     _screen;
-	Window     _window;
-	bool       _is_active;
-	Dim2       _cursor;
-	bool       _is_cursor_locked;
-	Dim2       _size;
-	Mode       _mode;
-	unsigned   _keys[KeyCount];
-	Callbacks *_callbacks;
-	Console    _console;
-	bool       _is_console_visible;
+	Terminal(Allocator *allocator) noexcept: Pointable(allocator) {}
 };
 
 } // namespace Yttrium

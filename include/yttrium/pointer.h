@@ -98,7 +98,15 @@ public:
 
 		///
 
-		Pointer& operator=(const Pointer& pointer) noexcept;
+		Pointer& operator=(const Pointer& pointer) noexcept
+		{
+			reset(pointer._pointable);
+			return *this;
+		}
+
+		///
+
+		Pointer& operator=(Pointer&& pointer) noexcept;
 
 		///
 

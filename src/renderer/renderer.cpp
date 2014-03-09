@@ -8,7 +8,7 @@ namespace Yttrium
 
 Renderer::Private::Private(Window *window, Allocator *allocator)
 	: PrivateBase(allocator)
-	, _window(*window)
+	, _window(window)
 	, _viewport_size(0)
 	, _rendering_size(0)
 	, _screenshot_filename(allocator)
@@ -18,7 +18,7 @@ Renderer::Private::Private(Window *window, Allocator *allocator)
 {
 	_builtin._renderer = this;
 
-	_window._private->_renderer = this;
+	_window->_renderer = this;
 
 	ImageFormat screenshot_format;
 
@@ -30,9 +30,8 @@ Renderer::Private::Private(Window *window, Allocator *allocator)
 
 Renderer::Private::~Private()
 {
-	Y_ASSERT(_window._private->_renderer == this);
-
-	_window._private->_renderer = nullptr;
+	Y_ASSERT(_window->_renderer == this);
+	_window->_renderer = nullptr;
 }
 
 void Renderer::Private::set_viewport(const Dim2 &size)
@@ -328,7 +327,7 @@ void Renderer::end_frame()
 {
 	flush_2d();
 
-	_private->_window.swap_buffers();
+	_private->_window->swap_buffers();
 
 	if (!_private->_screenshot_filename.is_empty())
 	{

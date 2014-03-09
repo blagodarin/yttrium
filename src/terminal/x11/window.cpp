@@ -32,43 +32,7 @@ void fix_window_size(::Display *display, ::Window window, const Dim2 &size)
 	::XSetWMNormalHints(display, window, &size_hints);
 }
 
-} // namespace
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Window::Private::Private(const Screen &screen, ::Display *display, int x_screen, ::Window window, const Dim2 &size, ::GLXContext glx_context, Allocator *allocator)
-	: PrivateBase(allocator)
-	, _screen(screen)
-	, _display(display)
-	, _x_screen(x_screen)
-	, _window(window)
-	, _wm_protocols(XInternAtom(display, "WM_PROTOCOLS", True))
-	, _wm_delete_window(XInternAtom(display, "WM_DELETE_WINDOW", True))
-	, _glx_context(glx_context)
-	, _size(size)
-	, _renderer(nullptr)
-{
-	::XSetWMProtocols(display, window, &_wm_delete_window, 1);
-	fix_window_size(_display, _window, _size);
-}
-
-Window::Private::~Private()
-{
-	close();
-	::glXDestroyContext(_display, _glx_context);
-}
-
-void Window::Private::close()
-{
-	if (_window != None)
-	{
-		::glXMakeCurrent(_display, None, nullptr);
-		::XDestroyWindow(_display, _window);
-		_window = None;
-	}
-}
-
-bool Window::Private::create_window(::Display *display, int screen, const Dim2 &size, ::Window *window, ::GLXContext *glx_context)
+bool initialize_window(::Display *display, int screen, const Dim2 &size, ::Window *window, ::GLXContext *glx_context)
 {
 	// GLXFBConfig API requires GLX 1.3.
 	// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
@@ -132,14 +96,16 @@ bool Window::Private::create_window(::Display *display, int screen, const Dim2 &
 	{
 		if (::glXIsDirect(display, *glx_context))
 		{
+			::Window root_window = RootWindow(display, screen);
+
 			::XSetWindowAttributes swa;
 
-			swa.colormap = ::XCreateColormap(display, RootWindow(display, screen), vi->visual, AllocNone);
+			swa.colormap = ::XCreateColormap(display, root_window, vi->visual, AllocNone);
 			swa.background_pixmap = None;
 			swa.border_pixel = 0;
 			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
 
-			*window = ::XCreateWindow(display, RootWindow(display, screen),
+			*window = ::XCreateWindow(display, root_window,
 				0, 0, size.x, size.y, 0, vi->depth, InputOutput, vi->visual,
 				CWBorderPixel | CWColormap | CWEventMask, &swa);
 
@@ -162,7 +128,7 @@ bool Window::Private::create_window(::Display *display, int screen, const Dim2 &
 	return false;
 }
 
-Key Window::Private::decode_key(::XEvent &event)
+Key key_from_event(::XEvent& event)
 {
 	::KeySym key_sym = ::XLookupKeysym(&event.xkey, 0);
 
@@ -253,14 +219,59 @@ Key Window::Private::decode_key(::XEvent &event)
 	return Key::Null;
 }
 
+} // namespace
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Window::Window(const ScreenPtr &screen, ::Window window,
+	const Dim2 &size, ::GLXContext glx_context, Callbacks* callbacks, Allocator *allocator)
+	: Pointable(allocator)
+	, _screen(screen)
+	, _display(static_cast<ScreenX11*>(screen.pointer())->_display)
+	, _window(window)
+	, _wm_protocols(XInternAtom(_display, "WM_PROTOCOLS", True))
+	, _wm_delete_window(XInternAtom(_display, "WM_DELETE_WINDOW", True))
+	, _glx_context(glx_context)
+	, _size(size)
+	, _renderer(nullptr)
+	, _callbacks(callbacks)
+{
+	::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
+	fix_window_size(_display, _window, _size);
+}
+
+Window::~Window()
+{
+	close();
+	::glXDestroyContext(_display, _glx_context);
+}
+
+void Window::close()
+{
+	if (_window != None)
+	{
+		::glXMakeCurrent(_display, None, nullptr);
+		::XDestroyWindow(_display, _window);
+		_window = None;
+	}
+}
+
+Renderer Window::create_renderer(Renderer::Backend backend, Allocator *allocator)
+{
+	if (backend != Renderer::OpenGl || _renderer)
+		return Renderer();
+
+	Renderer renderer(this, backend, allocator);
+	if (renderer)
+		renderer._private->set_viewport(_size);
+
+	return renderer;
+}
 
 bool Window::get_cursor(Dim2 *cursor)
 {
-	if (!_private || _private->_window == None)
-	{
+	if (_window == None)
 		return false;
-	}
 
 	// TODO: Find out whether all the arguments must be non-nullptr.
 
@@ -269,9 +280,8 @@ bool Window::get_cursor(Dim2 *cursor)
 	int win_x_return, win_y_return;
 	unsigned int mask_return;
 
-	if (!::XQueryPointer(_private->_display, _private->_window,
-		&root_return, &child_return, &root_x_return, &root_y_return,
-		&win_x_return, &win_y_return, &mask_return))
+	if (!::XQueryPointer(_display, _window, &root_return, &child_return,
+		&root_x_return, &root_y_return, &win_x_return, &win_y_return, &mask_return))
 	{
 		return false;
 	}
@@ -285,72 +295,44 @@ bool Window::get_cursor(Dim2 *cursor)
 bool Window::get_frame_sync(bool *frame_sync)
 {
 	Y_UNUSED(frame_sync);
-
 	return false;
 }
 
-bool Window::open(const Screen &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
+bool Window::put(int left, int top, int width, int height, bool border)
 {
-	close();
-
-	if (screen.is_opened())
-	{
-		::Display    *display  = screen._private->_display;
-		int           x_screen = screen._private->_screen;
-		::Window      window;
-		::GLXContext  glx_context;
-
-		if (Private::create_window(display, x_screen, size, &window, &glx_context))
-		{
-			_private = Y_NEW(allocator, Private)(screen, display, x_screen, window, size, glx_context, allocator);
-			_callbacks = callbacks;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Window::put(int left, int top, int width, int height, PutMode mode)
-{
-	if (_private->_window == None)
+	if (_window == None)
 		return false;
 
 	::XSetWindowAttributes attributes;
+	attributes.override_redirect = border ? False : True;
 
-	attributes.override_redirect = (mode == NoBorder ? True : False);
-	::XChangeWindowAttributes(_private->_display, _private->_window, CWOverrideRedirect, &attributes);
-	::XMoveResizeWindow(_private->_display, _private->_window, left, top, width, height);
+	::XChangeWindowAttributes(_display, _window, CWOverrideRedirect, &attributes);
+	::XMoveResizeWindow(_display, _window, left, top, width, height);
 
-	_private->_size = Dim2(width, height);
-	fix_window_size(_private->_display, _private->_window, _private->_size);
+	_size = Dim2(width, height);
+	fix_window_size(_display, _window, _size);
 
-	if (_private->_renderer)
-	{
-		_private->_renderer->set_viewport(_private->_size);
-	}
+	if (_renderer)
+		_renderer->set_viewport(_size);
 
 	return true;
 }
 
 bool Window::process_events()
 {
-	if (!_private || _private->_window == None)
-	{
+	if (_window == None)
 		return false;
-	}
 
-	while (::XPending(_private->_display))
+	while (::XPending(_display))
 	{
 		::XEvent event;
 
-		::XNextEvent(_private->_display, &event);
+		::XNextEvent(_display, &event);
 		if (event.type == ClientMessage)
 		{
-			if (event.xclient.message_type == _private->_wm_protocols
-				&& ::Atom(event.xclient.data.l[0]) == _private->_wm_delete_window)
+			if (event.xclient.message_type == _wm_protocols && ::Atom(event.xclient.data.l[0]) == _wm_delete_window)
 			{
-				_private->close();
+				close();
 				return false;
 			}
 		}
@@ -360,35 +342,35 @@ bool Window::process_events()
 			{
 			case KeyPress:
 
-				_callbacks->on_key_event(this, Private::decode_key(event), true);
+				_callbacks->on_key_event(key_from_event(event), true);
 				break;
 
 			case KeyRelease:
 
-				_callbacks->on_key_event(this, Private::decode_key(event), false);
+				_callbacks->on_key_event(key_from_event(event), false);
 				break;
 
 			case ButtonPress:
 
 				if (event.xbutton.button == Button1)
 				{
-					_callbacks->on_key_event(this, Key::Mouse1, true);
+					_callbacks->on_key_event(Key::Mouse1, true);
 				}
 				else if (event.xbutton.button == Button2)
 				{
-					_callbacks->on_key_event(this, Key::Mouse2, true);
+					_callbacks->on_key_event(Key::Mouse2, true);
 				}
 				else if (event.xbutton.button == Button3)
 				{
-					_callbacks->on_key_event(this, Key::Mouse3, true);
+					_callbacks->on_key_event(Key::Mouse3, true);
 				}
 				else if (event.xbutton.button == Button4)
 				{
-					_callbacks->on_key_event(this, Key::Mouse4, true);
+					_callbacks->on_key_event(Key::Mouse4, true);
 				}
 				else if (event.xbutton.button == Button5)
 				{
-					_callbacks->on_key_event(this, Key::Mouse5, true);
+					_callbacks->on_key_event(Key::Mouse5, true);
 				}
 				break;
 
@@ -396,34 +378,34 @@ bool Window::process_events()
 
 				if (event.xbutton.button == Button1)
 				{
-					_callbacks->on_key_event(this, Key::Mouse1, false);
+					_callbacks->on_key_event(Key::Mouse1, false);
 				}
 				else if (event.xbutton.button == Button2)
 				{
-					_callbacks->on_key_event(this, Key::Mouse2, false);
+					_callbacks->on_key_event(Key::Mouse2, false);
 				}
 				else if (event.xbutton.button == Button3)
 				{
-					_callbacks->on_key_event(this, Key::Mouse3, false);
+					_callbacks->on_key_event(Key::Mouse3, false);
 				}
 				else if (event.xbutton.button == Button4)
 				{
-					_callbacks->on_key_event(this, Key::Mouse4, false);
+					_callbacks->on_key_event(Key::Mouse4, false);
 				}
 				else if (event.xbutton.button == Button5)
 				{
-					_callbacks->on_key_event(this, Key::Mouse5, false);
+					_callbacks->on_key_event(Key::Mouse5, false);
 				}
 				break;
 
 			case FocusIn:
 
-				_callbacks->on_focus_event(this, true);
+				_callbacks->on_focus_event(true);
 				break;
 
 			case FocusOut:
 
-				_callbacks->on_focus_event(this, false);
+				_callbacks->on_focus_event(false);
 				break;
 			}
 		}
@@ -432,73 +414,66 @@ bool Window::process_events()
 	return true;
 }
 
+Renderer Window::renderer()
+{
+	return _renderer;
+}
+
+ScreenPtr Window::screen() const
+{
+	return _screen;
+}
+
 void Window::set_name(const StaticString &name)
 {
-	if (_private && _private->_window != None)
-	{
-		::XStoreName(_private->_display, _private->_window, name.text());
-	}
+	if (_window == None)
+		return;
+	::XStoreName(_display, _window, name.text());
 }
 
 bool Window::set_cursor(const Dim2 &cursor)
 {
-	if (!_private || _private->_window == None)
-	{
+	if (_window == None)
 		return false;
-	}
-
-	::XWarpPointer(_private->_display, None, _private->_window, 0, 0, 0, 0, cursor.x, cursor.y);
+	::XWarpPointer(_display, None, _window, 0, 0, 0, 0, cursor.x, cursor.y);
 	return true;
 }
 
 bool Window::set_frame_sync(bool frame_sync)
 {
 	Y_UNUSED(frame_sync);
-
 	return false;
 }
 
-void Window::show(ShowMode mode)
+void Window::show()
 {
-	if (_private->_window == None)
-	{
+	if (_window == None)
 		return;
-	}
-
-	switch (mode)
-	{
-	case Show:
-
-		::XMapWindow(_private->_display, _private->_window);
-		break;
-
-	case Focus:
-
-		::XMapRaised(_private->_display, _private->_window);
-		//::XSetInputFocus(_private->_display, _private->_window, RevertToNone, CurrentTime); // TODO: Uncomment or remove.
-		break;
-
-	default:
-
-		::XUnmapWindow(_private->_display, _private->_window);
-		break;
-	}
+	::XMapRaised(_display, _window);
+	//::XSetInputFocus(_display, _window, RevertToNone, CurrentTime); // TODO: Uncomment or remove.
 }
 
 void Window::swap_buffers()
 {
-	if (_private && _private->_window != None)
-	{
-		::glXSwapBuffers(_private->_display, _private->_window);
-	}
+	if (_window == None)
+		return;
+	::glXSwapBuffers(_display, _window);
 }
 
-void Window::terminate()
+WindowPtr Window::open(const ScreenPtr &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
 {
-	if (_private)
-	{
-		_private->close();
-	}
+	ScreenX11 *screen_x11 = static_cast<ScreenX11*>(screen.pointer());
+	if (!screen_x11)
+		return WindowPtr();
+
+	::Display*   display = screen_x11->_display;
+	::Window     window;
+	::GLXContext glx_context;
+
+	if (!initialize_window(display, screen_x11->_screen, size, &window, &glx_context))
+		return WindowPtr();
+
+	return WindowPtr(Y_NEW(allocator, Window)(screen, window, size, glx_context, callbacks, allocator));
 }
 
 } // namespace Yttrium

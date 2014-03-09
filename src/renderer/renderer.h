@@ -6,9 +6,9 @@
 #include <yttrium/rect.h>
 #include <yttrium/renderer.h>
 #include <yttrium/string.h>
-#include <yttrium/window.h>
 
 #include "../base/private_base.h"
+#include "../terminal/window.h"
 #include "builtin.h"
 
 #include <vector>
@@ -16,8 +16,7 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Renderer::Private
-	: public PrivateBase<Renderer::Private>
+class Y_PRIVATE Renderer::Private: public PrivateBase<Renderer::Private>
 {
 public:
 
@@ -49,7 +48,7 @@ public:
 
 public:
 
-	Window _window; // Don't let the window die too early.
+	WindowPtr _window; // Don't let the window die too early.
 
 	Dim2     _viewport_size;
 	Vector2d _rendering_size;

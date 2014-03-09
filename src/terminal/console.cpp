@@ -1,4 +1,4 @@
-#include <yttrium/terminal/console.h>
+#include "console.h"
 
 #include <yttrium/renderer/builtin.h>
 #include <yttrium/script/context.h>

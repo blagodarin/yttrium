@@ -10,18 +10,23 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE Screen::Private
-	: public PrivateBase<Screen::Private>
+class Window;
+
+class ScreenX11: public Screen
 {
+	friend Window;
+
 public:
 
-	::Display *_display;
+	ScreenX11(::Display* display, int screen, Allocator* allocator);
+	~ScreenX11() override;
+
+	ScreenMode mode(ModeType type) noexcept override;
+
+private:
+
+	::Display* _display;
 	int        _screen;
-
-public:
-
-	Private(::Display *display, int screen, Allocator *allocator);
-	~Private();
 };
 
 } // namespace Yttrium
