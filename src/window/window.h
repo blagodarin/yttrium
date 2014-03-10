@@ -1,7 +1,7 @@
-#ifndef __TERMINAL_TERMINAL_H
-#define __TERMINAL_TERMINAL_H
+#ifndef __WINDOW_WINDOW_H
+#define __WINDOW_WINDOW_H
 
-#include <yttrium/terminal.h>
+#include <yttrium/window.h>
 
 #include <yttrium/screen.h>
 
@@ -11,16 +11,16 @@
 namespace Yttrium
 {
 
-class TerminalImpl: public Terminal, private WindowBackend::Callbacks
+class WindowImpl: public Window, private WindowBackend::Callbacks
 {
 public:
 
-	TerminalImpl(const Dim2 &size, Terminal::Callbacks *callbacks, Allocator *allocator) noexcept;
-	~TerminalImpl() noexcept override;
+	WindowImpl(const Dim2 &size, Window::Callbacks *callbacks, Allocator *allocator) noexcept;
+	~WindowImpl() noexcept override;
 
 	bool initialize();
 
-public: // Terminal
+public: // Window
 
 	void close() noexcept override;
 	Renderer create_renderer(Allocator *allocator) noexcept override;
@@ -50,19 +50,19 @@ private:
 
 private:
 
-	ScreenPtr            _screen;
-	WindowBackendPtr     _backend;
-	bool                 _is_active;
-	Dim2                 _cursor;
-	bool                 _is_cursor_locked;
-	Dim2                 _size;
-	Mode                 _mode;
-	unsigned             _keys[KeyCount];
-	Terminal::Callbacks *_callbacks;
-	Console              _console;
-	bool                 _is_console_visible;
+	ScreenPtr          _screen;
+	WindowBackendPtr   _backend;
+	bool               _is_active;
+	Dim2               _cursor;
+	bool               _is_cursor_locked;
+	Dim2               _size;
+	Mode               _mode;
+	unsigned           _keys[KeyCount];
+	Window::Callbacks *_callbacks;
+	Console            _console;
+	bool               _is_console_visible;
 };
 
 } // namespace Yttrium
 
-#endif // __TERMINAL_TERMINAL_H
+#endif // __WINDOW_WINDOW_H

@@ -44,7 +44,7 @@ void BackendTextureCache::clear()
 
 Texture2DPtr BackendTextureCache::load_texture_2d(const StaticString &name, bool intensity)
 {
-	Cache2D::iterator i = _cache_2d.find(String(name, ByReference()));
+	auto i = _cache_2d.find(String(name, ByReference()));
 	return i != _cache_2d.end() ? i->second : cache_texture_2d(name, intensity);
 }
 

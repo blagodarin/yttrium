@@ -8,7 +8,7 @@
 #include <yttrium/string.h>
 
 #include "../base/private_base.h"
-#include "../terminal/backend.h"
+#include "../window/backend.h"
 #include "builtin.h"
 
 #include <vector>

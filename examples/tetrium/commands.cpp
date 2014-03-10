@@ -42,7 +42,7 @@ void Commands::bind(const StaticString &, String *, const ScriptArgs &args) noex
 
 void Commands::exit(const StaticString &, String *, const ScriptArgs &) noexcept
 {
-	_game->_terminal->close();
+	_game->_window->close();
 }
 
 void Commands::game_pause(const StaticString &, String *, const ScriptArgs &) noexcept
@@ -100,7 +100,7 @@ void Commands::pop_scene(const StaticString &, String *, const ScriptArgs &args)
 	Integer scenes_to_pop = !args.size() ? 1 : args.value(0)->integer();
 
 	if (scenes_to_pop > 0 && !_game->_gui->pop_scenes(scenes_to_pop))
-		_game->_terminal->close();
+		_game->_window->close();
 }
 
 void Commands::push_scene(const StaticString &, String *, const ScriptArgs &args) noexcept
@@ -150,7 +150,7 @@ void Commands::stop_music(const StaticString &, String *, const ScriptArgs &) no
 
 void Commands::tgcon(const StaticString &, String *, const ScriptArgs &) noexcept
 {
-	_game->_terminal->set_console_visible(!_game->_terminal->is_console_visible());
+	_game->_window->set_console_visible(!_game->_window->is_console_visible());
 }
 
 void Commands::turn_left(const StaticString &, String *, const ScriptArgs &) noexcept

@@ -192,8 +192,8 @@ src_paths = [
 	'renderer',
 	'renderer/gl',
 	'script',
-	'terminal',
-	'terminal/bindings']
+	'window',
+	'window/bindings']
 
 if not option_no_jpeg:
 	src_paths += ['image/jpeg']
@@ -211,11 +211,11 @@ if 'windows' in ports:
 	src_paths += [
 		'base/windows',
 		'memory/windows',
-		'terminal/windows']
+		'window/windows']
 
 if 'x11' in ports:
 	src_paths += [
-		'terminal/x11']
+		'window/x11']
 
 src_target = 'lib/yttrium'
 src_sources = [src_env.Glob('$BUILD/src/' + path + '/*.cpp') for path in src_paths]

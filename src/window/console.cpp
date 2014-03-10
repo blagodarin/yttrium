@@ -2,7 +2,7 @@
 
 #include <yttrium/renderer/builtin.h>
 #include <yttrium/script/context.h>
-#include <yttrium/terminal.h>
+#include <yttrium/window.h>
 
 namespace Yttrium
 {
@@ -16,12 +16,12 @@ bool Console::process_key(Key key)
 		return true;
 	}
 
-	if (_line_editor.process_key(key, _terminal.is_shift_pressed()))
+	if (_line_editor.process_key(key, _window.is_shift_pressed()))
 	{
 		return true;
 	}
 
-	char symbol = _terminal.printable(key);
+	char symbol = _window.printable(key);
 
 	if (!symbol)
 	{

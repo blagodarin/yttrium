@@ -1,15 +1,17 @@
-#include "terminal.h"
+#include "window.h"
 
 #include <yttrium/allocator.h>
 #include <yttrium/utils.h>
+
+#include "../memory/allocatable.h"
 
 #include <cstring> // memset
 
 namespace Yttrium
 {
 
-TerminalImpl::TerminalImpl(const Dim2 &size, Terminal::Callbacks *callbacks, Allocator *allocator)
-	: Terminal(allocator)
+WindowImpl::WindowImpl(const Dim2 &size, Window::Callbacks *callbacks, Allocator *allocator)
+	: Window(allocator)
 	, _is_active(false)
 	, _is_cursor_locked(false)
 	, _size(size)
@@ -21,11 +23,11 @@ TerminalImpl::TerminalImpl(const Dim2 &size, Terminal::Callbacks *callbacks, All
 	::memset(_keys, 0, sizeof(_keys));
 }
 
-TerminalImpl::~TerminalImpl()
+WindowImpl::~WindowImpl()
 {
 }
 
-bool TerminalImpl::initialize()
+bool WindowImpl::initialize()
 {
 	_screen = Screen::open(allocator());
 	if (_screen.is_null())
@@ -38,22 +40,22 @@ bool TerminalImpl::initialize()
 	return true;
 }
 
-void TerminalImpl::close()
+void WindowImpl::close()
 {
 	_backend->close();
 }
 
-Renderer TerminalImpl::create_renderer(Allocator *allocator)
+Renderer WindowImpl::create_renderer(Allocator *allocator)
 {
 	return _backend->create_renderer(allocator ? allocator : this->allocator());
 }
 
-Dim2 TerminalImpl::cursor() const
+Dim2 WindowImpl::cursor() const
 {
 	return _cursor;
 }
 
-void TerminalImpl::draw_console(RendererBuiltin *renderer)
+void WindowImpl::draw_console(RendererBuiltin *renderer)
 {
 	if (_is_console_visible)
 	{
@@ -66,22 +68,22 @@ void TerminalImpl::draw_console(RendererBuiltin *renderer)
 	}
 }
 
-bool TerminalImpl::is_console_visible() const
+bool WindowImpl::is_console_visible() const
 {
 	return _is_console_visible;
 }
 
-bool TerminalImpl::is_cursor_locked() const
+bool WindowImpl::is_cursor_locked() const
 {
 	return _is_cursor_locked;
 }
 
-bool TerminalImpl::is_shift_pressed() const
+bool WindowImpl::is_shift_pressed() const
 {
 	return _keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)];
 }
 
-void TerminalImpl::lock_cursor(bool lock)
+void WindowImpl::lock_cursor(bool lock)
 {
 	_is_cursor_locked = lock;
 
@@ -92,7 +94,7 @@ void TerminalImpl::lock_cursor(bool lock)
 	}
 }
 
-char TerminalImpl::printable(Key key) const
+char WindowImpl::printable(Key key) const
 {
 	// TODO: Update this dumb English-bound implementation.
 
@@ -135,7 +137,7 @@ char TerminalImpl::printable(Key key) const
 	}
 }
 
-bool TerminalImpl::process_events()
+bool WindowImpl::process_events()
 {
 	if (!_backend->process_events())
 	{
@@ -169,19 +171,19 @@ bool TerminalImpl::process_events()
 	return true;
 }
 
-void TerminalImpl::resize(const Dim2 &size)
+void WindowImpl::resize(const Dim2 &size)
 {
 	_size = size;
 	if (_is_active)
 		show(_mode);
 }
 
-void TerminalImpl::set_console_visible(bool visible)
+void WindowImpl::set_console_visible(bool visible)
 {
 	_is_console_visible = visible;
 }
 
-bool TerminalImpl::set_cursor(const Dim2 &cursor)
+bool WindowImpl::set_cursor(const Dim2 &cursor)
 {
 	if (_is_cursor_locked
 		|| cursor.x < 0 || cursor.x >= _size.x
@@ -195,12 +197,12 @@ bool TerminalImpl::set_cursor(const Dim2 &cursor)
 	return true;
 }
 
-void TerminalImpl::set_name(const StaticString &name)
+void WindowImpl::set_name(const StaticString &name)
 {
 	_backend->set_name(name);
 }
 
-void TerminalImpl::show(Mode mode)
+void WindowImpl::show(Mode mode)
 {
 	Dim2 corner;
 
@@ -242,17 +244,17 @@ void TerminalImpl::show(Mode mode)
 	set_active(true);
 }
 
-Dim2 TerminalImpl::size() const
+Dim2 WindowImpl::size() const
 {
 	return _size;
 }
 
-void TerminalImpl::on_focus_event(bool is_focused)
+void WindowImpl::on_focus_event(bool is_focused)
 {
 	set_active(is_focused);
 }
 
-void TerminalImpl::on_key_event(Key key, bool is_pressed)
+void WindowImpl::on_key_event(Key key, bool is_pressed)
 {
 	unsigned pressed = 0;
 
@@ -292,23 +294,23 @@ void TerminalImpl::on_key_event(Key key, bool is_pressed)
 		_callbacks->on_key_event(this, key, pressed);
 }
 
-void TerminalImpl::set_active(bool active)
+void WindowImpl::set_active(bool active)
 {
 	_is_active = active;
 	if (active)
 		lock_cursor(_is_cursor_locked);
 }
 
-TerminalPtr Terminal::open(const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
+WindowPtr Window::open(const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
 {
 	if (size.x > 0 && size.y > 0)
 	{
-		TerminalImpl *terminal = Y_NEW(allocator, TerminalImpl)(size, callbacks, allocator);
-		if (terminal->initialize())
-			return TerminalPtr(terminal);
-		delete terminal;
+		Allocatable<WindowImpl> window(allocator);
+		window.reset(size, callbacks);
+		if (window->initialize())
+			return WindowPtr(window.release());
 	}
-	return TerminalPtr();
+	return WindowPtr();
 }
 
 } // namespace Yttrium

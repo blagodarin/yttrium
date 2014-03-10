@@ -3,6 +3,8 @@
 
 #include <yttrium/allocator.h>
 
+#include <utility> // std::forward
+
 namespace Yttrium
 {
 

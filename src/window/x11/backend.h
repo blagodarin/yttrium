@@ -1,5 +1,5 @@
-#ifndef __TERMINAL_X11_BACKEND_H
-#define __TERMINAL_X11_BACKEND_H
+#ifndef __WINDOW_X11_BACKEND_H
+#define __WINDOW_X11_BACKEND_H
 
 #include <yttrium/key.h>
 #include <yttrium/renderer.h>
@@ -81,4 +81,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __TERMINAL_X11_BACKEND_H
+#endif // __WINDOW_X11_BACKEND_H

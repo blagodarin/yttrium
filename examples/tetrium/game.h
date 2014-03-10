@@ -7,7 +7,7 @@
 #include <yttrium/gui/manager.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/renderer/texture_cache.h>
-#include <yttrium/terminal.h>
+#include <yttrium/window.h>
 #include <yttrium/time.h>
 
 #include "commands.h"
@@ -15,9 +15,7 @@
 
 using namespace Yttrium;
 
-class Game
-	: public Terminal::Callbacks
-	, public Gui::Manager::Callbacks
+class Game: public Window::Callbacks, public Gui::Manager::Callbacks
 {
 	friend Commands;
 
@@ -37,12 +35,12 @@ private:
 	void load_music();
 	void save_settings();
 
-private: // Terminal::Callbacks.
+private: // Window::Callbacks
 
-	void on_cursor_movement(Terminal *terminal, const Dim2 &movement) noexcept override;
-	bool on_key_event(Terminal *terminal, Key key, unsigned pressed) noexcept override;
+	void on_cursor_movement(Window *window, const Dim2 &movement) noexcept override;
+	bool on_key_event(Window *window, Key key, unsigned pressed) noexcept override;
 
-private: // Gui::Manager::Callbacks.
+private: // Gui::Manager::Callbacks
 
 	void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept override;
 
@@ -60,7 +58,7 @@ private:
 	Allocator       *_allocator;
 	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
-	TerminalPtr      _terminal;
+	WindowPtr        _window;
 	Renderer         _renderer;
 	TextureCachePtr  _texture_cache;
 	Gui::ManagerPtr  _gui;

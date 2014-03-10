@@ -184,7 +184,7 @@ bool ManagerImpl::push_scene(const StaticString& name)
 	return true;
 }
 
-bool ManagerImpl::process_key(Terminal*, Key key, unsigned pressed)
+bool ManagerImpl::process_key(Window*, Key key, unsigned pressed)
 {
 	return _scene_stack.empty()
 		? false

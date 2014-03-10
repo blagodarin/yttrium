@@ -1,7 +1,7 @@
 #ifndef __RENDERER_GL_GL_H
 #define __RENDERER_GL_GL_H
 
-#include "../../terminal/gl.h"
+#include "../../window/gl.h"
 #include "api.h"
 
 namespace Yttrium

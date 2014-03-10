@@ -1,8 +1,8 @@
-#include "src/terminal/bindings/lookup.h"
+#include "src/window/bindings/lookup.h"
 
 #include "common.h"
 
-#include "src/terminal/bindings/lookup.cpp"
+#include "src/window/bindings/lookup.cpp"
 
 using namespace Yttrium;
 

@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include "../memory/allocatable.h"
-#include "../terminal/backend.h"
 #include "gl/renderer.h"
 #include "texture.h"
 

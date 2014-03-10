@@ -1,5 +1,5 @@
-#ifndef __TERMINAL_GL_H
-#define __TERMINAL_GL_H
+#ifndef __WINDOW_GL_H
+#define __WINDOW_GL_H
 
 #include <yttrium/global.h>
 
@@ -23,4 +23,4 @@ Address address(WindowBackend* backend, const char* name);
 
 } // namespace Yttrium
 
-#endif // __TERMINAL_GL_H
+#endif // __WINDOW_GL_H

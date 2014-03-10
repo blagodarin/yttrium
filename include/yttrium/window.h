@@ -1,8 +1,8 @@
 /// \file
-/// \brief Terminal combining user input and visual output.
+/// \brief
 
-#ifndef __Y_TERMINAL_H
-#define __Y_TERMINAL_H
+#ifndef __Y_WINDOW_H
+#define __Y_WINDOW_H
 
 #include <yttrium/key.h>
 #include <yttrium/renderer.h>
@@ -10,16 +10,16 @@
 namespace Yttrium
 {
 
-class Terminal;
+class Window;
 class RendererBuiltin;
 
-/// Terminal pointer.
+/// Window pointer.
 
-typedef Pointer<Terminal> TerminalPtr;
+typedef Pointer<Window> WindowPtr;
 
-/// Incapsulation of Screen and Window classes and input management.
+///
 
-class Y_API Terminal: public Pointable
+class Y_API Window: public Pointable
 {
 public:
 
@@ -31,12 +31,12 @@ public:
 
 		///
 
-		virtual void on_cursor_movement(Terminal *terminal, const Dim2 &movement) noexcept = 0;
+		virtual void on_cursor_movement(Window *window, const Dim2 &movement) noexcept = 0;
 
 		///
 		/// \return \c true if the key was handled, \c false otherwise.
 
-		virtual bool on_key_event(Terminal *terminal, Key key, unsigned pressed) noexcept = 0;
+		virtual bool on_key_event(Window *window, Key key, unsigned pressed) noexcept = 0;
 	};
 
 	///
@@ -48,8 +48,6 @@ public:
 	};
 
 public:
-
-	virtual ~Terminal() {}
 
 	///
 
@@ -87,7 +85,7 @@ public:
 
 	virtual char printable(Key key) const noexcept = 0;
 
-	/// Let the terminal process window events.
+	/// Process window events.
 	/// \return \c false if the window was closed, \c true otherwise.
 
 	virtual bool process_events() noexcept = 0;
@@ -143,14 +141,14 @@ public:
 
 	///
 
-	static TerminalPtr open(const Dim2 &size, Callbacks *callbacks = nullptr,
+	static WindowPtr open(const Dim2 &size, Callbacks *callbacks = nullptr,
 		Allocator *allocator = DefaultAllocator) noexcept;
 
 protected:
 
-	Terminal(Allocator *allocator) noexcept: Pointable(allocator) {}
+	Window(Allocator *allocator) noexcept: Pointable(allocator) {}
 };
 
 } // namespace Yttrium
 
-#endif // __Y_TERMINAL_H
+#endif // __Y_WINDOW_H

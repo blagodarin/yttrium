@@ -35,11 +35,11 @@
 #include <yttrium/static_string.h>
 #include <yttrium/string.h>
 #include <yttrium/system_allocator.h>
-#include <yttrium/terminal.h>
 #include <yttrium/texture_font.h>
 #include <yttrium/time.h>
 #include <yttrium/types.h>
 #include <yttrium/utils.h>
 #include <yttrium/vector.h>
+#include <yttrium/window.h>
 
 #endif // __Y_YTTRIUM_H

@@ -38,9 +38,7 @@ private:
 
 private:
 
-	typedef std::map<String, Texture2DPtr> Cache2D;
-
-	Cache2D _cache_2d;
+	std::map<String, Texture2DPtr> _cache_2d;
 };
 
 } // namespace Yttrium

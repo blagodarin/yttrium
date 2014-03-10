@@ -2,7 +2,7 @@
 #include <yttrium/gui/manager.h>
 #include <yttrium/log.h>
 #include <yttrium/string.h>
-#include <yttrium/terminal.h>
+#include <yttrium/window.h>
 
 #include "common.h"
 
@@ -18,10 +18,10 @@ BOOST_AUTO_TEST_CASE(gui_test)
 	File file(File::Temporary);
 
 	{
-		TerminalPtr terminal = Terminal::open(Dim2(320, 240), nullptr);
-		BOOST_REQUIRE(!terminal.is_null());
+		WindowPtr window = Window::open(Dim2(320, 240), nullptr);
+		BOOST_REQUIRE(!window.is_null());
 
-		Renderer renderer = terminal->create_renderer();
+		Renderer renderer = window->create_renderer();
 		BOOST_REQUIRE(renderer);
 
 		Gui::ManagerPtr manager = Gui::Manager::create(renderer);
