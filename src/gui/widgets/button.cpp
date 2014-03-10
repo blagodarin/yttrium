@@ -10,16 +10,13 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-Button::Button(Allocator *allocator)
+Button::Button(Allocator* allocator)
 	: Widget(allocator)
 	, _state(WidgetState::None)
 {
 }
 
-void Button::dump(PropertyDumper *dumper) const
+void Button::dump(GuiPropertyDumper* dumper) const
 {
 	dumper->dump_rect("position", _position);
 	dumper->dump_scaling("scale", _scaling);
@@ -37,7 +34,7 @@ void Button::dump(PropertyDumper *dumper) const
 	// TODO: Dump styles.
 }
 
-bool Button::load(PropertyLoader &loader)
+bool Button::load(GuiPropertyLoader& loader)
 {
 	Y_LOG_TRACE("[Gui.Button] Loading...");
 
@@ -84,7 +81,7 @@ bool Button::load(PropertyLoader &loader)
 	loader.load_text("action", &_action);
 	_sound = loader.load_sound("sound");
 
-	Style *style = &_styles[WidgetStateType(WidgetState::Active)];
+	Style* style = &_styles[WidgetStateType(WidgetState::Active)];
 
 	loader.bind("active");
 	loader.load_color("color", &style->color);
@@ -125,7 +122,7 @@ void Button::play() const
 	}
 }
 
-void Button::render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const
+void Button::render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState state) const
 {
 	if (_state != WidgetState::None)
 	{
@@ -152,7 +149,5 @@ void Button::render(Renderer *renderer, const RectF &area, const Vector2f &scale
 		renderer->draw_text(area.center(), _text, CenterAlignment);
 	}
 }
-
-} // namespace Gui
 
 } // namespace Yttrium

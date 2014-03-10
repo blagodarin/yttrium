@@ -7,23 +7,19 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-class Image
-	: public Widget
+class GuiImage: public Widget
 {
 public:
 
-	Image(Allocator *allocator);
+	GuiImage(Allocator* allocator);
 
 public: // Widget
 
-	void dump(PropertyDumper *dumper) const override;
+	void dump(GuiPropertyDumper* dumper) const override;
 
-	bool load(PropertyLoader &loader) override;
+	bool load(GuiPropertyLoader& loader) override;
 
-	void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const override;
+	void render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState state) const override;
 
 private:
 
@@ -31,8 +27,6 @@ private:
 	Vector4f        _color;
 	TextureProperty _texture;
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

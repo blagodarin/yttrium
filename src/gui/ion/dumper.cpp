@@ -3,30 +3,27 @@
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 
-#include "../manager.h"
+#include "../gui.h"
 #include "../scene.h"
 
 namespace Yttrium
 {
 
-namespace Gui
+void GuiIonDumper::dump(const StaticString& filename) const
 {
+	Ion::Document document(_gui->internal_allocator());
 
-void IonDumper::dump(const StaticString &filename) const
-{
-	Ion::Document document(_manager->internal_allocator());
-
-	if (_manager->_has_size)
+	if (_gui->_has_size)
 	{
-		Ion::Node *size_node = document.append("size");
+		Ion::Node* size_node = document.append("size");
 
-		size_node->append(String::from_dec(_manager->_size.x));
-		size_node->append(String::from_dec(_manager->_size.y));
+		size_node->append(String::from_dec(_gui->_size.x));
+		size_node->append(String::from_dec(_gui->_size.y));
 	}
 
-	Ion::Node *scale_node = document.append("scale");
+	Ion::Node* scale_node = document.append("scale");
 
-	switch (_manager->_scaling)
+	switch (_gui->_scaling)
 	{
 	case Scaling::Stretch: scale_node->append("stretch"); break;
 	case Scaling::Min:     scale_node->append("min");     break;
@@ -36,13 +33,13 @@ void IonDumper::dump(const StaticString &filename) const
 
 	// TODO: Dump fonts.
 
-	for (const auto &scene: _manager->_scenes)
+	for (const auto& scene: _gui->_scenes)
 	{
-		Ion::Node *scene_node = document.append("scene");
+		Ion::Node* scene_node = document.append("scene");
 
 		scene_node->append(scene.first);
 
-		if (scene.first == _manager->_scene_stack.front()->name())
+		if (scene.first == _gui->_scene_stack.front()->name())
 		{
 			scene_node->append_list()->append("root");
 		}
@@ -50,11 +47,11 @@ void IonDumper::dump(const StaticString &filename) const
 		dump_scene(scene.second, scene_node);
 	}
 
-	for (const auto &action: _manager->_scene_actions)
+	for (const auto& action: _gui->_scene_actions)
 	{
-		Ion::Node *on_scene_change_node = document.append("on_scene_change");
+		Ion::Node* on_scene_change_node = document.append("on_scene_change");
 
-		Ion::List *scene_list = on_scene_change_node->append_list();
+		Ion::List* scene_list = on_scene_change_node->append_list();
 
 		scene_list->append(action.first.first);
 		scene_list->append(action.first.second);
@@ -65,16 +62,16 @@ void IonDumper::dump(const StaticString &filename) const
 	document.save(filename);
 }
 
-void IonDumper::dump_scene(const Scene *scene, Ion::Node *scene_node)
+void GuiIonDumper::dump_scene(const GuiScene* scene, Ion::Node* scene_node)
 {
-	Ion::Object *scene_object = scene_node->append_object();
+	Ion::Object* scene_object = scene_node->append_object();
 
-	Ion::Node *size_node = scene_object->append("size");
+	Ion::Node* size_node = scene_object->append("size");
 
 	size_node->append(String::from_dec(scene->_size.x));
 	size_node->append(String::from_dec(scene->_size.y));
 
-	Ion::Node *scale_node = scene_object->append("scale");
+	Ion::Node* scale_node = scene_object->append("scale");
 
 	switch (scene->_scaling)
 	{
@@ -89,9 +86,9 @@ void IonDumper::dump_scene(const Scene *scene, Ion::Node *scene_node)
 		scene_object->append("transparent");
 	}
 
-	for (const auto &binding: scene->_bindings.map())
+	for (const auto& binding: scene->_bindings.map())
 	{
-		Ion::Node *bind_node = scene_object->append("bind");
+		Ion::Node* bind_node = scene_object->append("bind");
 
 		bind_node->append(binding.first);
 		bind_node->append(binding.second);
@@ -99,7 +96,5 @@ void IonDumper::dump_scene(const Scene *scene, Ion::Node *scene_node)
 
 	// TODO: Dump widgets.
 }
-
-} // namespace Gui
 
 } // namespace Yttrium

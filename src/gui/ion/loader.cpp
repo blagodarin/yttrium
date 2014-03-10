@@ -7,14 +7,11 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/renderer/texture_cache.h>
 
-#include "../manager.h"
+#include "../gui.h"
 #include "../scene.h"
 #include "property_loader.h"
 
 namespace Yttrium
-{
-
-namespace Gui
 {
 
 namespace
@@ -115,21 +112,21 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IonLoader::IonLoader(ManagerImpl *manager)
-	: _manager(manager)
-	, _classes(_manager->internal_allocator())
+GuiIonLoader::GuiIonLoader(GuiImpl *gui)
+	: _gui(gui)
+	, _classes(_gui->internal_allocator())
 {
 }
 
-bool IonLoader::load(const StaticString &source_name, bool is_internal)
+bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 {
-	Ion::Document document(_manager->allocator());
+	Ion::Document document(_gui->allocator());
 
-	Y_LOG_DEBUG("[Gui.Manager] Loading \"" << source_name << "\"...");
+	Y_LOG_DEBUG("[Gui] Loading \"" << source_name << "\"...");
 
 	if (!document.load(source_name))
 	{
-		Y_LOG("[Gui.Manager] Can't load \"" << source_name << "\"...");
+		Y_LOG("[Gui] Can't load \"" << source_name << "\"...");
 		return false;
 	}
 
@@ -141,9 +138,9 @@ bool IonLoader::load(const StaticString &source_name, bool is_internal)
 		{
 			Vector2f size;
 
-			if (IonPropertyLoader::load_size(&size, *node))
+			if (GuiIonPropertyLoader::load_size(&size, *node))
 			{
-				_manager->set_size(size);
+				_gui->set_size(size);
 			}
 		}
 
@@ -151,21 +148,21 @@ bool IonLoader::load(const StaticString &source_name, bool is_internal)
 		{
 			Scaling scaling;
 
-			if (IonPropertyLoader::load_scaling(&scaling, *node))
+			if (GuiIonPropertyLoader::load_scaling(&scaling, *node))
 			{
-				_manager->set_scaling(scaling);
+				_gui->set_scaling(scaling);
 			}
 		}
 	}
 
 	load(document);
 
-	Y_LOG_TRACE("[Gui.Manager] Loaded \"" << source_name << "\"");
+	Y_LOG_TRACE("[Gui] Loaded \"" << source_name << "\"");
 
 	return true;
 }
 
-void IonLoader::load(const Ion::Object &source)
+void GuiIonLoader::load(const Ion::Object &source)
 {
 	for (const Ion::Node &node: source.nodes())
 	{
@@ -189,11 +186,11 @@ void IonLoader::load(const Ion::Object &source)
 				continue;
 			}
 
-			Y_LOG_DEBUG("[Gui.Manager] Loading class \"" << *object_name << "\"...");
+			Y_LOG_DEBUG("[Gui] Loading class \"" << *object_name << "\"...");
 
 			if (!_classes.add(*object_name, *object, class_name))
 			{
-				Y_LOG("[Gui.Manager] Can' load class \"" << *object_name << "\"");
+				Y_LOG("[Gui] Can' load class \"" << *object_name << "\"");
 			}
 		}
 		else if (node.name() == S("scene"))
@@ -209,18 +206,18 @@ void IonLoader::load(const Ion::Object &source)
 
 			if (class_name && *class_name != S("root"))
 			{
-				Y_LOG("[Gui.Manager] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored");
+				Y_LOG("[Gui] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored");
 				class_name = nullptr;
 			}
 
-			Y_LOG_DEBUG("[Gui.Manager] Loading scene \"" << *object_name << "\"...");
+			Y_LOG_DEBUG("[Gui] Loading scene \"" << *object_name << "\"...");
 
-			Scene *scene = _manager->create_scene(*object_name);
+			GuiScene *scene = _gui->create_scene(*object_name);
 
 			if (scene)
 			{
 				load_scene(scene, *object);
-				_manager->add_scene(scene, class_name != nullptr);
+				_gui->add_scene(scene, class_name != nullptr);
 			}
 		}
 		else if (node.name() == S("on_scene_change"))
@@ -229,7 +226,7 @@ void IonLoader::load(const Ion::Object &source)
 
 			if (s.size() != 2 || !s->is_list() || !s.last().is_string())
 			{
-				Y_LOG("[Gui.Manager] Bad 'on_scene_change'");
+				Y_LOG("[Gui] Bad 'on_scene_change'");
 				continue;
 			}
 
@@ -242,14 +239,14 @@ void IonLoader::load(const Ion::Object &source)
 			if (t.size() != 2 || !t->get(&from) || !t.last().get(&to)
 				|| !s.last().get(&action))
 			{
-				Y_LOG("[Gui.Manager] Bad 'on_scene_change'");
+				Y_LOG("[Gui] Bad 'on_scene_change'");
 				continue;
 			}
 
-			_manager->set_scene_change_action(
-				String(*from, _manager->internal_allocator()),
-				String(*to, _manager->internal_allocator()),
-				String(*action, _manager->internal_allocator()));
+			_gui->set_scene_change_action(
+				String(*from, _gui->internal_allocator()),
+				String(*to, _gui->internal_allocator()),
+				String(*action, _gui->internal_allocator()));
 		}
 		else if (node.name() == S("font"))
 		{
@@ -262,23 +259,23 @@ void IonLoader::load(const Ion::Object &source)
 				continue;
 			}
 
-			Y_LOG_DEBUG("[Gui.Manager] Loading font \"" << *object_name << "\"...");
+			Y_LOG_DEBUG("[Gui] Loading font \"" << *object_name << "\"...");
 
 			const StaticString *font_name;
 			const StaticString *texture_name;
 
-			if (!(IonPropertyLoader::load_text(&font_name, *object, "file")
-				&& IonPropertyLoader::load_text(&texture_name, *object, "texture")))
+			if (!(GuiIonPropertyLoader::load_text(&font_name, *object, "file")
+				&& GuiIonPropertyLoader::load_text(&texture_name, *object, "texture")))
 			{
 				continue;
 			}
 
-			_manager->set_font(*object_name, *font_name, *texture_name);
+			_gui->set_font(*object_name, *font_name, *texture_name);
 		}
 	}
 }
 
-void IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
+void GuiIonLoader::load_scene(GuiScene *scene, const Ion::Object &source) const
 {
 	scene->reserve(source.size());
 
@@ -288,7 +285,7 @@ void IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 		{
 			Vector2f size;
 
-			if (IonPropertyLoader::load_size(&size, node))
+			if (GuiIonPropertyLoader::load_size(&size, node))
 			{
 				scene->set_size(size);
 			}
@@ -297,7 +294,7 @@ void IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 		{
 			Scaling scaling;
 
-			if (IonPropertyLoader::load_scaling(&scaling, node))
+			if (GuiIonPropertyLoader::load_scaling(&scaling, node))
 			{
 				scene->set_scaling(scaling);
 			}
@@ -327,13 +324,11 @@ void IonLoader::load_scene(Scene *scene, const Ion::Object &source) const
 				continue;
 			}
 
-			IonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _manager);
+			GuiIonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _gui);
 
 			scene->load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
 		}
 	}
 }
-
-} // namespace Gui
 
 } // namespace Yttrium

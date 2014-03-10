@@ -13,39 +13,30 @@ class Node;
 
 } // namespace Ion
 
-namespace Gui
-{
+class GuiImpl;
+class GuiScene;
 
-class ManagerImpl;
-class Scene;
-
-class IonDumper
+class GuiIonDumper
 {
 public:
 
-	inline IonDumper(const ManagerImpl *manager);
+	GuiIonDumper(const GuiImpl* gui)
+		: _gui(gui)
+	{
+	}
 
 public:
 
-	void dump(const StaticString &filename) const;
+	void dump(const StaticString& filename) const;
 
 private:
 
-	static void dump_scene(const Scene *scene, Ion::Node *node);
+	static void dump_scene(const GuiScene* scene, Ion::Node* node);
 
 private:
 
-	const ManagerImpl *_manager;
+	const GuiImpl* _gui;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-IonDumper::IonDumper(const ManagerImpl *manager)
-	: _manager(manager)
-{
-}
-
-} // namespace Gui
 
 } // namespace Yttrium
 

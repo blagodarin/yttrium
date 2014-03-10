@@ -11,25 +11,20 @@
 namespace Yttrium
 {
 
+class GuiImpl;
+class GuiIonDumper;
+class GuiPropertyLoader;
 class Renderer;
-
-namespace Gui
-{
-
-class IonDumper;
-class ManagerImpl;
-class PropertyLoader;
 class Widget;
 
-class Scene
+class GuiScene
 {
-	friend IonDumper;
+	friend GuiIonDumper;
 
 public:
 
-	Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator);
-
-	~Scene();
+	GuiScene(GuiImpl *gui, const StaticString &name, Allocator *allocator);
+	~GuiScene();
 
 public:
 
@@ -43,7 +38,7 @@ public:
 		return _is_transparent;
 	}
 
-	void load_widget(const StaticString &type, const StaticString &name, PropertyLoader &loader);
+	void load_widget(const StaticString &type, const StaticString &name, GuiPropertyLoader &loader);
 
 	const String &name() const
 	{
@@ -87,7 +82,7 @@ private:
 private:
 
 	Allocator*                _allocator;
-	ManagerImpl*              _manager;
+	GuiImpl*                  _gui;
 	String                    _name;
 	Vector2f                  _size;
 	Scaling                   _scaling;
@@ -100,8 +95,6 @@ private:
 	bool                      _is_transparent;
 	Bindings                  _bindings;
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

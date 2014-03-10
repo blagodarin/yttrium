@@ -1,5 +1,5 @@
-#ifndef __GUI_PROPERTY_DUMPER_H
-#define __GUI_PROPERTY_DUMPER_H
+#ifndef __GUI_DUMPER_H
+#define __GUI_DUMPER_H
 
 #include <yttrium/renderer/pointers.h>
 #include <yttrium/static_string.h>
@@ -11,14 +11,11 @@ namespace Yttrium
 
 class Sound;
 
-namespace Gui
-{
-
-class PropertyDumper
+class GuiPropertyDumper
 {
 public:
 
-	virtual ~PropertyDumper() {}
+	virtual ~GuiPropertyDumper() {}
 
 public:
 
@@ -45,8 +42,6 @@ public:
 	virtual void dump_texture(const StaticString &name, const Texture2DPtr &texture) = 0;
 };
 
-} // namespace Gui
-
 } // namespace Yttrium
 
-#endif // __GUI_PROPERTY_DUMPER_H
+#endif // __GUI_DUMPER_H

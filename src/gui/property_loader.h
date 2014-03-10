@@ -1,5 +1,5 @@
-#ifndef __GUI_PROPERTY_LOADER_H
-#define __GUI_PROPERTY_LOADER_H
+#ifndef __GUI_LOADER_H
+#define __GUI_LOADER_H
 
 #include <yttrium/audio/sound.h>
 #include <yttrium/renderer/pointers.h>
@@ -11,14 +11,11 @@ namespace Yttrium
 
 class TextureFont;
 
-namespace Gui
-{
-
-class PropertyLoader
+class GuiPropertyLoader
 {
 public:
 
-	virtual ~PropertyLoader() {}
+	virtual ~GuiPropertyLoader() {}
 
 public:
 
@@ -53,8 +50,6 @@ public:
 	virtual void unbind() = 0;
 };
 
-} // namespace Gui
-
 } // namespace Yttrium
 
-#endif // __GUI_PROPERTY_LOADER_H
+#endif // __GUI_LOADER_H

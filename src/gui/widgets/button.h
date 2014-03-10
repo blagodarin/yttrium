@@ -10,25 +10,18 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-class Button
-	: public Widget
+class Button: public Widget
 {
 public:
 
-	Button(Allocator *allocator);
+	Button(Allocator* allocator);
 
 public: // Widget
 
-	void dump(PropertyDumper *dumper) const override;
-
-	bool load(PropertyLoader &loader) override;
-
+	void dump(GuiPropertyDumper* dumper) const override;
+	bool load(GuiPropertyLoader& loader) override;
 	void play() const override;
-
-	void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const override;
+	void render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState state) const override;
 
 private:
 
@@ -55,8 +48,6 @@ private:
 	WidgetState  _state;
 	Style        _styles[WidgetStateCount];
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

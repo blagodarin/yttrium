@@ -8,10 +8,7 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-void TextureProperty::dump(PropertyDumper *dumper) const
+void TextureProperty::dump(GuiPropertyDumper* dumper) const
 {
 	if (!texture.is_null())
 	{
@@ -21,7 +18,7 @@ void TextureProperty::dump(PropertyDumper *dumper) const
 	}
 }
 
-bool TextureProperty::load(const PropertyLoader &loader)
+bool TextureProperty::load(const GuiPropertyLoader& loader)
 {
 	if (!loader.load_texture("texture", &texture))
 		return false;
@@ -34,13 +31,11 @@ bool TextureProperty::load(const PropertyLoader &loader)
 	return true;
 }
 
-void TextureProperty::update(const PropertyLoader &loader)
+void TextureProperty::update(const GuiPropertyLoader& loader)
 {
 	loader.load_texture("texture", &texture);
 	loader.load_rect("texture_rect", &rect, true);
 	loader.load_margins("borders", &borders);
 }
-
-} // namespace Gui
 
 } // namespace Yttrium

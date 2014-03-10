@@ -11,10 +11,7 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-Label::Label(Allocator *allocator)
+Label::Label(Allocator* allocator)
 	: Widget(allocator)
 	, _color(1, 1, 1)
 	, _alignment(0)
@@ -22,7 +19,7 @@ Label::Label(Allocator *allocator)
 {
 }
 
-void Label::dump(PropertyDumper *dumper) const
+void Label::dump(GuiPropertyDumper* dumper) const
 {
 	dumper->dump_position("position", _position);
 	dumper->dump_size("size", _size);
@@ -35,7 +32,7 @@ void Label::dump(PropertyDumper *dumper) const
 	dumper->dump_text("text", _text);
 }
 
-bool Label::load(PropertyLoader &loader)
+bool Label::load(GuiPropertyLoader& loader)
 {
 	Y_LOG_TRACE("[Gui.Label] Loading...");
 
@@ -57,7 +54,7 @@ bool Label::load(PropertyLoader &loader)
 	return true;
 }
 
-void Label::render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState) const
+void Label::render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState) const
 {
 	if (_text.is_empty())
 	{
@@ -81,7 +78,7 @@ void Label::update()
 	update_area(_final_text);
 }
 
-void Label::update_area(const StaticString &text)
+void Label::update_area(const StaticString& text)
 {
 	_area.set_top_left(_position);
 
@@ -99,7 +96,5 @@ void Label::update_area(const StaticString &text)
 
 	_area.set_size(text_size);
 }
-
-} // namespace Gui
 
 } // namespace Yttrium

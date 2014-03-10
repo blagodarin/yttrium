@@ -6,35 +6,29 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
+class GuiImpl;
+class GuiScene;
 
-class ManagerImpl;
-class Scene;
-
-class IonLoader
+class GuiIonLoader
 {
 public:
 
-	IonLoader(ManagerImpl *manager);
+	GuiIonLoader(GuiImpl* gui);
 
 public:
 
-	bool load(const StaticString &source_name, bool is_internal = false);
+	bool load(const StaticString& source_name, bool is_internal = false);
 
 private:
 
-	void load(const Ion::Object &source);
-
-	void load_scene(Scene *scene, const Ion::Object &source) const;
+	void load(const Ion::Object& source);
+	void load_scene(GuiScene* scene, const Ion::Object& source) const;
 
 private:
 
-	ManagerImpl *_manager;
-	Classes      _classes;
+	GuiImpl*   _gui;
+	GuiClasses _classes;
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

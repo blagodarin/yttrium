@@ -8,7 +8,7 @@
 #include <yttrium/script/context.h>
 
 #include "../memory/allocatable.h"
-#include "manager.h"
+#include "gui.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
 #include "widgets/image.h"
@@ -17,12 +17,9 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocator)
+GuiScene::GuiScene(GuiImpl *gui, const StaticString &name, Allocator *allocator)
 	: _allocator(allocator)
-	, _manager(manager)
+	, _gui(gui)
 	, _name(name, allocator)
 	, _scaling(Scaling::Stretch)
 	, _is_cursor_set(false)
@@ -33,22 +30,22 @@ Scene::Scene(ManagerImpl *manager, const StaticString &name, Allocator *allocato
 {
 }
 
-Scene::~Scene()
+GuiScene::~GuiScene()
 {
 	for (Widget *widget: _widgets)
 		Y_DELETE(_allocator, widget);
 }
 
-void Scene::load_widget(const StaticString &type, const StaticString &name, PropertyLoader &loader)
+void GuiScene::load_widget(const StaticString &type, const StaticString &name, GuiPropertyLoader &loader)
 {
 	Allocatable<Widget> widget(_allocator);
 
 	if (type == "button")
 		widget.reset<Button>();
 	else if (type == "canvas")
-		widget.reset<Canvas>(_manager->callbacks());
+		widget.reset<Canvas>(_gui->callbacks());
 	else if (type == "image")
-		widget.reset<Image>();
+		widget.reset<GuiImage>();
 	else if (type == "label")
 		widget.reset<Label>();
 
@@ -69,7 +66,7 @@ void Scene::load_widget(const StaticString &type, const StaticString &name, Prop
 	_widgets.push_back(widget.release());
 }
 
-bool Scene::process_key(Key key, unsigned pressed)
+bool GuiScene::process_key(Key key, unsigned pressed)
 {
 	bool result = false;
 
@@ -101,7 +98,7 @@ bool Scene::process_key(Key key, unsigned pressed)
 	return pressed ? _bindings.call(key) : result;
 }
 
-void Scene::render(Renderer *renderer, const Vector2f &size)
+void GuiScene::render(Renderer *renderer, const Vector2f &size)
 {
 	Vector2f scale = size / _size;
 	Vector2f shift((size.x - _size.x * scale.y) * .5f, (size.y - _size.y * scale.x) * .5f);
@@ -136,7 +133,7 @@ void Scene::render(Renderer *renderer, const Vector2f &size)
 	_is_cursor_set = false;
 }
 
-RectF Scene::map(const RectF &source, const Vector2f &shift, const Vector2f &scale, Scaling scaling) const
+RectF GuiScene::map(const RectF &source, const Vector2f &shift, const Vector2f &scale, Scaling scaling) const
 {
 	RectF result;
 
@@ -210,7 +207,5 @@ RectF Scene::map(const RectF &source, const Vector2f &shift, const Vector2f &sca
 
 	return result;
 }
-
-} // namespace Gui
 
 } // namespace Yttrium

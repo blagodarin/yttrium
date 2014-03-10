@@ -1,9 +1,9 @@
-#include <yttrium/gui/logic/line_editor.h>
+#include "line_editor.h"
 
 namespace Yttrium
 {
 
-LineEditor::LineEditor(Allocator *allocator)
+LineEditor::LineEditor(Allocator* allocator)
 	: _text(allocator)
 	, _cursor(0)
 	, _selection_size(0)
@@ -18,7 +18,7 @@ void LineEditor::clear()
 	_selection_size = 0;
 }
 
-void LineEditor::insert(const StaticString &text)
+void LineEditor::insert(const StaticString& text)
 {
 	if (_selection_size)
 	{

@@ -47,7 +47,7 @@ bool Game::setup()
 
 	_renderer = _window->create_renderer(&_renderer_allocator);
 	_texture_cache = TextureCache::create(_renderer);
-	_gui = Gui::Manager::create(_renderer, this, _allocator);
+	_gui = Gui::create(_renderer, this, _allocator);
 
 	_game.set_random_seed(Timer::clock());
 

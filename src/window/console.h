@@ -1,7 +1,7 @@
 #ifndef __WINDOW_CONSOLE_H
 #define __WINDOW_CONSOLE_H
 
-#include <yttrium/gui/logic/line_editor.h>
+#include "../gui/logic/line_editor.h"
 
 namespace Yttrium
 {

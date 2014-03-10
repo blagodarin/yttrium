@@ -9,13 +9,9 @@
 namespace Yttrium
 {
 
+class GuiPropertyDumper;
+class GuiPropertyLoader;
 class Renderer;
-
-namespace Gui
-{
-
-class PropertyDumper;
-class PropertyLoader;
 
 class Widget
 {
@@ -47,9 +43,9 @@ public:
 
 public:
 
-	virtual void dump(PropertyDumper *dumper) const = 0;
+	virtual void dump(GuiPropertyDumper* dumper) const = 0;
 
-	virtual bool load(PropertyLoader &loader) = 0;
+	virtual bool load(GuiPropertyLoader& loader) = 0;
 
 	virtual void play() const; // TODO: Produce a better solution.
 
@@ -128,8 +124,6 @@ StaticString Widget::text() const
 {
 	return _text;
 }
-
-} // namespace Gui
 
 } // namespace Yttrium
 

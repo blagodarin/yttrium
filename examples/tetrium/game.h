@@ -4,7 +4,7 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
-#include <yttrium/gui/manager.h>
+#include <yttrium/gui.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/renderer/texture_cache.h>
 #include <yttrium/window.h>
@@ -15,7 +15,7 @@
 
 using namespace Yttrium;
 
-class Game: public Window::Callbacks, public Gui::Manager::Callbacks
+class Game: public Window::Callbacks, public Gui::Callbacks
 {
 	friend Commands;
 
@@ -40,7 +40,7 @@ private: // Window::Callbacks
 	void on_cursor_movement(Window *window, const Dim2 &movement) noexcept override;
 	bool on_key_event(Window *window, Key key, unsigned pressed) noexcept override;
 
-private: // Gui::Manager::Callbacks
+private: // GuiManager::Callbacks
 
 	void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept override;
 
@@ -61,7 +61,7 @@ private:
 	WindowPtr        _window;
 	Renderer         _renderer;
 	TextureCachePtr  _texture_cache;
-	Gui::ManagerPtr  _gui;
+	GuiPtr           _gui;
 	Bindings         _bindings;
 
 	Texture2DPtr _block_texture;

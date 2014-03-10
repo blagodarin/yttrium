@@ -13,16 +13,13 @@ class Object;
 
 } // namespace Ion
 
-namespace Gui
-{
-
-class IonPropertyDumper: public PropertyDumper
+class GuiIonPropertyDumper: public GuiPropertyDumper
 {
 public:
 
-	IonPropertyDumper(Ion::Object *object);
+	GuiIonPropertyDumper(Ion::Object *object);
 
-public: // PropertyDumper
+public: // GuiPropertyDumper
 
 	void dump_alignment(const StaticString &name, Alignment alignment) override;
 
@@ -50,8 +47,6 @@ private:
 
 	Ion::Object *_object;
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

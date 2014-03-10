@@ -1,7 +1,7 @@
-#ifndef __GUI_MANAGER_H
-#define __GUI_MANAGER_H
+#ifndef __GUI_GUI_H
+#define __GUI_GUI_H
 
-#include <yttrium/gui/manager.h>
+#include <yttrium/gui.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/renderer.h>
 #include <yttrium/renderer/texture_cache.h>
@@ -22,15 +22,12 @@ class Object;
 
 } // namespace Ion
 
-namespace Gui
-{
+class GuiIonDumper;
+class GuiScene;
 
-class IonDumper;
-class Scene;
-
-class ManagerImpl: public Manager
+class GuiImpl: public Gui
 {
-	friend IonDumper;
+	friend GuiIonDumper;
 
 public:
 
@@ -50,20 +47,20 @@ public:
 
 public:
 
-	ManagerImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator);
+	GuiImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator);
 
-	~ManagerImpl() noexcept override;
+	~GuiImpl() noexcept override;
 
 public:
 
-	bool add_scene(Scene* scene, bool is_root);
+	bool add_scene(GuiScene* scene, bool is_root);
 
 	Callbacks* callbacks() const
 	{
 		return _callbacks;
 	}
 
-	Scene* create_scene(const StaticString& name);
+	GuiScene* create_scene(const StaticString& name);
 
 	const FontDesc* font(const StaticString& name) const;
 
@@ -97,7 +94,7 @@ public:
 		return _texture_cache.pointer();
 	}
 
-public: // Manager
+public: // Gui
 
 	void clear() noexcept override;
 	void dump(const StaticString& filename) const noexcept override;
@@ -112,29 +109,27 @@ public: // Manager
 private:
 
 	void change_scene(const StaticString& old_scene, const StaticString& new_scene);
-	void delete_scene(Scene* scene);
+	void delete_scene(GuiScene* scene);
 
 private:
 
 	typedef std::pair<String, String> ScenePair;
 
-	ProxyAllocator                 _proxy_allocator;
-	Renderer                       _renderer;
-	TextureCachePtr                _texture_cache;
-	Callbacks*                     _callbacks;
-	bool                           _has_size;
-	Vector2f                       _size;
-	Scaling                        _scaling;
-	std::map<String, FontDesc>     _fonts;
-	std::map<StaticString, Scene*> _scenes;
-	std::vector<Scene*>            _scene_stack;
-	std::map<ScenePair, String>    _scene_actions;
-	bool                           _has_cursor;
-	Vector2f                       _cursor;
+	ProxyAllocator                    _proxy_allocator;
+	Renderer                          _renderer;
+	TextureCachePtr                   _texture_cache;
+	Callbacks*                        _callbacks;
+	bool                              _has_size;
+	Vector2f                          _size;
+	Scaling                           _scaling;
+	std::map<String, FontDesc>        _fonts;
+	std::map<StaticString, GuiScene*> _scenes;
+	std::vector<GuiScene*>            _scene_stack;
+	std::map<ScenePair, String>       _scene_actions;
+	bool                              _has_cursor;
+	Vector2f                          _cursor;
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 
-#endif // __GUI_MANAGER_H
+#endif // __GUI_GUI_H

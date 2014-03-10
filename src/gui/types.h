@@ -6,9 +6,6 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
 /// Widget scaling mode.
 
 enum class Scaling
@@ -48,8 +45,6 @@ enum: WidgetStateType
 {
 	WidgetStateCount = WidgetStateType(WidgetState::Count), ///< Number of widget states.
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

@@ -8,11 +8,8 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-class PropertyDumper;
-class PropertyLoader;
+class GuiPropertyDumper;
+class GuiPropertyLoader;
 
 struct TextureProperty
 {
@@ -20,12 +17,10 @@ struct TextureProperty
 	RectI        rect;
 	MarginsI     borders;
 
-	void dump(PropertyDumper *dumper) const;
-	bool load(const PropertyLoader &loader);
-	void update(const PropertyLoader &loader);
+	void dump(GuiPropertyDumper* dumper) const;
+	bool load(const GuiPropertyLoader& loader);
+	void update(const GuiPropertyLoader& loader);
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

@@ -16,19 +16,15 @@ class Object;
 
 } // namespace Ion
 
-namespace Gui
-{
+class GuiImpl;
 
-class ManagerImpl;
-
-class IonPropertyLoader
-	: public PropertyLoader
+class GuiIonPropertyLoader: public GuiPropertyLoader
 {
 public:
 
-	IonPropertyLoader(const Ion::Object *object, const Ion::Object *class_, ManagerImpl *manager);
+	GuiIonPropertyLoader(const Ion::Object *object, const Ion::Object *class_, GuiImpl *gui);
 
-public: // PropertyLoader
+public: // GuiPropertyLoader
 
 	void bind(const StaticString &name) override;
 
@@ -81,13 +77,11 @@ private:
 
 	const Ion::Object *_object;
 	const Ion::Object *_class;
-	const ManagerImpl *_manager;
+	const GuiImpl     *_gui;
 	TextureCache      *_texture_cache;
 	const Ion::Object *_bound_object;
 	const Ion::Object *_bound_class;
 };
-
-} // namespace Gui
 
 } // namespace Yttrium
 

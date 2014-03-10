@@ -1,6 +1,5 @@
 #include "logging.h"
-
-#include "manager.h"
+#include "gui.h"
 
 #include <yttrium/allocator.h>
 #include <yttrium/renderer/texture.h>
@@ -14,11 +13,8 @@
 namespace Yttrium
 {
 
-namespace Gui
-{
-
-ManagerImpl::ManagerImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
-	: Manager(allocator)
+GuiImpl::GuiImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
+	: Gui(allocator)
 	, _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
 	, _texture_cache(TextureCache::create(_renderer))
@@ -30,20 +26,20 @@ ManagerImpl::ManagerImpl(const Renderer& renderer, Callbacks* callbacks, Allocat
 {
 }
 
-ManagerImpl::~ManagerImpl()
+GuiImpl::~GuiImpl()
 {
 	clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ManagerImpl::add_scene(Scene* scene, bool is_root)
+bool GuiImpl::add_scene(GuiScene* scene, bool is_root)
 {
 	const String& scene_name = scene->name();
 
 	if (_scenes.find(scene_name) != _scenes.end())
 	{
-		Y_LOG("[Gui.Manager] Scene \"" << scene_name << "\" has already been added");
+		Y_LOG("[Gui] Scene \"" << scene_name << "\" has already been added");
 		return false;
 	}
 
@@ -53,7 +49,7 @@ bool ManagerImpl::add_scene(Scene* scene, bool is_root)
 	{
 		if (!_scene_stack.empty())
 		{
-			Y_LOG("[Gui.Manager] Scene \"" << scene_name << "\" \"root\" option ignored");
+			Y_LOG("[Gui] Scene \"" << scene_name << "\" \"root\" option ignored");
 			// TODO: Print the existing root scene name.
 		}
 		else
@@ -65,27 +61,27 @@ bool ManagerImpl::add_scene(Scene* scene, bool is_root)
 	return true;
 }
 
-Scene* ManagerImpl::create_scene(const StaticString& name)
+GuiScene* GuiImpl::create_scene(const StaticString& name)
 {
 	if (!_has_size)
 	{
-		Y_LOG("[Gui.Manager] Can't load scene \"" << name << "\": GUI size has not been set");
+		Y_LOG("[Gui] Can't load scene \"" << name << "\": GUI size has not been set");
 		return nullptr;
 	}
 
-	Allocatable<Scene> scene(&_proxy_allocator);
+	Allocatable<GuiScene> scene(&_proxy_allocator);
 	scene.reset(this, name);
 	scene->set_size(_size);
 	return scene.release();
 }
 
-const ManagerImpl::FontDesc* ManagerImpl::font(const StaticString &name) const
+const GuiImpl::FontDesc* GuiImpl::font(const StaticString &name) const
 {
 	auto i = _fonts.find(String(name, ByReference()));
 	return i != _fonts.end() ? &i->second : nullptr;
 }
 
-void ManagerImpl::set_font(const StaticString& name,
+void GuiImpl::set_font(const StaticString& name,
 	const StaticString& font_source, const StaticString& texture_name)
 {
 	Texture2DPtr texture = _texture_cache->load_texture_2d(texture_name, true);
@@ -104,14 +100,14 @@ void ManagerImpl::set_font(const StaticString& name,
 	}
 }
 
-void ManagerImpl::set_scene_change_action(const String& from_scene, const String& to_scene, const String& action)
+void GuiImpl::set_scene_change_action(const String& from_scene, const String& to_scene, const String& action)
 {
 	_scene_actions.emplace(ScenePair(from_scene, to_scene), action);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ManagerImpl::clear()
+void GuiImpl::clear()
 {
 	for (const auto& scene: _scenes)
 		delete_scene(scene.second);
@@ -125,27 +121,27 @@ void ManagerImpl::clear()
 	_has_cursor = false;
 }
 
-void ManagerImpl::dump(const StaticString& filename) const
+void GuiImpl::dump(const StaticString& filename) const
 {
-	IonDumper(this).dump(filename);
+	GuiIonDumper(this).dump(filename);
 }
 
-bool ManagerImpl::has_scene(const StaticString& name) const
+bool GuiImpl::has_scene(const StaticString& name) const
 {
 	return _scenes.find(String(name, ByReference())) != _scenes.end();
 }
 
-bool ManagerImpl::load(const StaticString& filename)
+bool GuiImpl::load(const StaticString& filename)
 {
 	clear();
 
-	IonLoader loader(this);
+	GuiIonLoader loader(this);
 	if (!loader.load(filename))
 		return false;
 
 	if (_scene_stack.empty())
 	{
-		Y_LOG("[Gui.Manager] No root scene has been added");
+		Y_LOG("[Gui] No root scene has been added");
 		clear();
 		return false;
 	}
@@ -153,12 +149,12 @@ bool ManagerImpl::load(const StaticString& filename)
 	return true;
 }
 
-bool ManagerImpl::pop_scenes(size_t count)
+bool GuiImpl::pop_scenes(size_t count)
 {
 	if (_scene_stack.empty())
 		return false;
 
-	const Scene* old_scene = _scene_stack.back();
+	const GuiScene* old_scene = _scene_stack.back();
 
 	if (count >= _scene_stack.size())
 	{
@@ -172,26 +168,26 @@ bool ManagerImpl::pop_scenes(size_t count)
 	return true;
 }
 
-bool ManagerImpl::push_scene(const StaticString& name)
+bool GuiImpl::push_scene(const StaticString& name)
 {
 	auto i = _scenes.find(String(name, ByReference()));
 	if (i == _scenes.end())
 		return false;
 
-	const Scene* old_scene = _scene_stack.back();
+	const GuiScene* old_scene = _scene_stack.back();
 	_scene_stack.push_back(i->second);
 	change_scene(old_scene->name(), name);
 	return true;
 }
 
-bool ManagerImpl::process_key(Window*, Key key, unsigned pressed)
+bool GuiImpl::process_key(Window*, Key key, unsigned pressed)
 {
 	return _scene_stack.empty()
 		? false
 		: _scene_stack.back()->process_key(key, pressed);
 }
 
-bool ManagerImpl::render()
+bool GuiImpl::render()
 {
 	if (!_renderer || !_has_size || _scene_stack.empty())
 	{
@@ -221,7 +217,7 @@ bool ManagerImpl::render()
 	return true;
 }
 
-void ManagerImpl::set_cursor(const Vector2f& cursor)
+void GuiImpl::set_cursor(const Vector2f& cursor)
 {
 	_cursor = cursor * _size / Vector2f(_renderer.viewport_size());
 	_has_cursor = true;
@@ -229,27 +225,25 @@ void ManagerImpl::set_cursor(const Vector2f& cursor)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ManagerImpl::change_scene(const StaticString& old_scene, const StaticString& new_scene)
+void GuiImpl::change_scene(const StaticString& old_scene, const StaticString& new_scene)
 {
-	Y_LOG_DEBUG("[Gui.Manager] Changing scene from \"" << old_scene << "\" to \"" << new_scene << "\"...");
+	Y_LOG_DEBUG("[Gui] Changing scene from \"" << old_scene << "\" to \"" << new_scene << "\"...");
 
 	auto i = _scene_actions.find(ScenePair(String(old_scene, ByReference()), String(new_scene, ByReference())));
 	if (i != _scene_actions.end())
 		ScriptContext::global().execute(i->second);
 }
 
-void ManagerImpl::delete_scene(Scene* scene)
+void GuiImpl::delete_scene(GuiScene* scene)
 {
 	Y_DELETE(&_proxy_allocator, scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ManagerPtr Manager::create(Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
+GuiPtr Gui::create(Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
 {
-	return ManagerPtr(Y_NEW(allocator, ManagerImpl)(renderer, callbacks, allocator));
+	return GuiPtr(Y_NEW(allocator, GuiImpl)(renderer, callbacks, allocator));
 }
-
-} // namespace Gui
 
 } // namespace Yttrium
