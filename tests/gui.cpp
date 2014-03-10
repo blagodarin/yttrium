@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(gui_test)
 		TerminalPtr terminal = Terminal::open(Dim2(320, 240), nullptr);
 		BOOST_REQUIRE(!terminal.is_null());
 
-		Renderer renderer = terminal->create_renderer(Renderer::OpenGl);
+		Renderer renderer = terminal->create_renderer();
 		BOOST_REQUIRE(renderer);
 
 		Gui::ManagerPtr manager = Gui::Manager::create(renderer);

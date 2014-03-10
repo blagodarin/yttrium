@@ -23,7 +23,7 @@ public:
 public: // Terminal
 
 	void close() noexcept override;
-	Renderer create_renderer(Renderer::Backend backend, Allocator *allocator) noexcept override;
+	Renderer create_renderer(Allocator *allocator) noexcept override;
 	Dim2 cursor() const noexcept override;
 	void draw_console(RendererBuiltin *renderer) noexcept override;
 	bool is_console_visible() const noexcept override;

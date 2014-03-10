@@ -190,9 +190,7 @@ src_paths = [
 	'memory',
 	'package',
 	'renderer',
-	'renderer/backend',
-	'renderer/backend/gl',
-	'renderer/builtin',
+	'renderer/gl',
 	'script',
 	'terminal',
 	'terminal/bindings']

@@ -45,7 +45,7 @@ bool Game::setup()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_renderer = _terminal->create_renderer(Renderer::OpenGl, &_renderer_allocator);
+	_renderer = _terminal->create_renderer(&_renderer_allocator);
 	_texture_cache = TextureCache::create(_renderer);
 	_gui = Gui::Manager::create(_renderer, this, _allocator);
 

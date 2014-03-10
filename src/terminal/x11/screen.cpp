@@ -5,19 +5,19 @@
 namespace Yttrium
 {
 
-ScreenX11::ScreenX11(::Display* display, int screen, Allocator* allocator)
+ScreenImpl::ScreenImpl(::Display* display, int screen, Allocator* allocator)
 	: Screen(allocator)
 	, _display(display)
 	, _screen(screen)
 {
 }
 
-ScreenX11::~ScreenX11()
+ScreenImpl::~ScreenImpl()
 {
 	::XCloseDisplay(_display);
 }
 
-ScreenMode ScreenX11::mode(ModeType type)
+ScreenMode ScreenImpl::mode(ModeType type)
 {
 	::XRRScreenConfiguration* config = ::XRRGetScreenInfo(_display, RootWindow(_display, _screen));
 
@@ -59,7 +59,7 @@ ScreenPtr Screen::open(Allocator* allocator)
 		int event_base;
 		int error_base;
 		if (::XRRQueryExtension(display, &event_base, &error_base))
-			return ScreenPtr(Y_NEW(allocator, ScreenX11)(display, DefaultScreen(display), allocator));
+			return ScreenPtr(Y_NEW(allocator, ScreenImpl)(display, DefaultScreen(display), allocator));
 		::XCloseDisplay(display);
 	}
 	return ScreenPtr();

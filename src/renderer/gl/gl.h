@@ -1,7 +1,7 @@
-#ifndef __RENDERER_BACKEND_GL_GL_H
-#define __RENDERER_BACKEND_GL_GL_H
+#ifndef __RENDERER_GL_GL_H
+#define __RENDERER_GL_GL_H
 
-#include "../../../terminal/gl.h"
+#include "../../terminal/gl.h"
 #include "api.h"
 
 namespace Yttrium
@@ -17,4 +17,4 @@ struct GlApi
 
 } // namespace Yttrium
 
-#endif // __RENDERER_BACKEND_GL_GL_H
+#endif // __RENDERER_GL_GL_H

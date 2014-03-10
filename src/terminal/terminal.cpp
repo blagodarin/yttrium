@@ -43,9 +43,9 @@ void TerminalImpl::close()
 	_window->close();
 }
 
-Renderer TerminalImpl::create_renderer(Renderer::Backend backend, Allocator *allocator)
+Renderer TerminalImpl::create_renderer(Allocator *allocator)
 {
-	return _window->create_renderer(backend, allocator ? allocator : this->allocator());
+	return _window->create_renderer(allocator ? allocator : this->allocator());
 }
 
 Dim2 TerminalImpl::cursor() const

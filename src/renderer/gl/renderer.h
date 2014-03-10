@@ -1,7 +1,7 @@
-#ifndef __RENDERER_BACKEND_GL_RENDERER_H
-#define __RENDERER_BACKEND_GL_RENDERER_H
+#ifndef __RENDERER_GL_RENDERER_H
+#define __RENDERER_GL_RENDERER_H
 
-#include "../../renderer.h"
+#include "../renderer.h"
 #include "gl.h"
 #include "texture_cache.h"
 
@@ -37,4 +37,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __RENDERER_BACKEND_GL_RENDERER_H
+#endif // __RENDERER_GL_RENDERER_H

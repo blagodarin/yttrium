@@ -1,7 +1,7 @@
-#ifndef __RENDERER_BACKEND_GL_TEXTURE_H
-#define __RENDERER_BACKEND_GL_TEXTURE_H
+#ifndef __RENDERER_GL_TEXTURE_H
+#define __RENDERER_GL_TEXTURE_H
 
-#include "../../texture.h"
+#include "../texture.h"
 #include "gl.h"
 
 namespace Yttrium
@@ -33,4 +33,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __RENDERER_BACKEND_GL_TEXTURE_H
+#endif // __RENDERER_GL_TEXTURE_H

@@ -1,6 +1,8 @@
 #include "renderer.h"
 
+#include "../memory/allocatable.h"
 #include "../terminal/window.h"
+#include "gl/renderer.h"
 #include "texture.h"
 
 namespace Yttrium
@@ -284,6 +286,13 @@ Vector2f Renderer::Private::text_size(const StaticString &text) const
 	return _font ? _font.text_size(text, _font_size) : Vector2f(0);
 }
 
+Renderer::Private *Renderer::Private::create(Window *window, Allocator *allocator)
+{
+	Allocatable<Renderer::Private> renderer(allocator);
+	renderer.reset<OpenGlRenderer>(window);
+	return renderer.release();
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Renderer::Renderer(const Renderer &renderer)
@@ -485,8 +494,8 @@ Renderer &Renderer::operator =(const Renderer &renderer)
 	return *this;
 }
 
-Renderer::Renderer(Window *window, Backend backend, Allocator *allocator)
-	: _private(Private::create(window, backend, allocator))
+Renderer::Renderer(Window *window, Allocator *allocator)
+	: _private(Private::create(window, allocator))
 {
 }
 

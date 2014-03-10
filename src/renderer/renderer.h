@@ -86,7 +86,7 @@ public:
 
 public:
 
-	static Private *create(Window *window, Renderer::Backend backend, Allocator *allocator);
+	static Private *create(Window *window, Allocator *allocator);
 };
 
 } // namespace Yttrium

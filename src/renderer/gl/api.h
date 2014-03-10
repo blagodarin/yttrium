@@ -1,5 +1,5 @@
-#ifndef __RENDERER_BACKEND_GL_API_H
-#define __RENDERER_BACKEND_GL_API_H
+#ifndef __RENDERER_GL_API_H
+#define __RENDERER_GL_API_H
 
 namespace Yttrium
 {
@@ -13,7 +13,7 @@ bool check_extension(const char *list, const char *name);
 
 } // namespace Yttrium
 
-#endif // __RENDERER_BACKEND_GL_API_H
+#endif // __RENDERER_GL_API_H
 
 #if defined(GLAPI_DECLARE) || defined(GLAPI_INIT) || defined(GLAPI_DROP)
 #	define __GLAPI_API

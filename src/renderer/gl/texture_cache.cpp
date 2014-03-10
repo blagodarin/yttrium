@@ -90,8 +90,6 @@ BackendTexture2D *GlTextureCache::cache_texture_2d(const ImageFormat &format, co
 	return nullptr;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 TextureCachePtr TextureCache::create(const Renderer &renderer)
 {
 	// TODO: Fix this GL-bound implementation.

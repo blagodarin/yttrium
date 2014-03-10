@@ -19,8 +19,6 @@ class Window: public Pointable
 {
 	friend Renderer;
 
-	Y_NONCOPYABLE(Window);
-
 public:
 
 	class Callbacks
@@ -33,18 +31,15 @@ public:
 
 public:
 
-	Window(const ScreenPtr &screen, ::Window window, const Dim2& size,
-		::GLXContext glx_context, Callbacks* callbacks, Allocator* allocator);
+	Window(::Display* display, ::Window window, ::GLXContext glx_context,
+		const Dim2& size, Callbacks* callbacks, Allocator* allocator);
 	~Window() override;
 
 public:
 
 	void close();
 
-	// TODO: Consider moving the backend selection to Window constructor
-	// because different backends may require different Window internals.
-
-	Renderer create_renderer(Renderer::Backend backend, Allocator* allocator);
+	Renderer create_renderer(Allocator* allocator);
 
 	bool get_cursor(Dim2* cursor);
 
@@ -56,13 +51,11 @@ public:
 
 	Renderer renderer();
 
-	ScreenPtr screen() const;
-
-	bool set_cursor(const Dim2 &cursor);
+	bool set_cursor(const Dim2& cursor);
 
 	bool set_frame_sync(bool frame_sync);
 
-	void set_name(const StaticString &name);
+	void set_name(const StaticString& name);
 
 	void show();
 
@@ -70,22 +63,18 @@ public:
 
 public:
 
-	static WindowPtr open(const ScreenPtr &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator);
+	static WindowPtr open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator);
 
 private:
 
-	ScreenPtr _screen;
-
-	::Display  *_display;
-	::Window    _window;
-	::Atom      _wm_protocols;
-	::Atom      _wm_delete_window;
-	GLXContext  _glx_context;
-
+	::Display*         _display;
+	::Window           _window;
+	::Atom             _wm_protocols;
+	::Atom             _wm_delete_window;
+	::GLXContext       _glx_context;
 	Dim2               _size;
-	Renderer::Private *_renderer; // See Renderer::Private constructor/destructor.
-
-	Callbacks *_callbacks;
+	Renderer::Private* _renderer; // See Renderer::Private constructor/destructor.
+	Callbacks*         _callbacks;
 };
 
 } // namespace Yttrium

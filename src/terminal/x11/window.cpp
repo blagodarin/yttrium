@@ -9,7 +9,7 @@ namespace Yttrium
 namespace
 {
 
-bool check_glx_version(::Display *display, int major, int minor)
+bool check_glx_version(::Display* display, int major, int minor)
 {
 	int glx_major = 0;
 	int glx_minor = 0;
@@ -19,7 +19,7 @@ bool check_glx_version(::Display *display, int major, int minor)
 		&& glx_minor >= minor;
 }
 
-void fix_window_size(::Display *display, ::Window window, const Dim2 &size)
+void fix_window_size(::Display* display, ::Window window, const Dim2& size)
 {
 	::XSizeHints size_hints;
 
@@ -32,7 +32,7 @@ void fix_window_size(::Display *display, ::Window window, const Dim2 &size)
 	::XSetWMNormalHints(display, window, &size_hints);
 }
 
-bool initialize_window(::Display *display, int screen, const Dim2 &size, ::Window *window, ::GLXContext *glx_context)
+bool initialize_window(::Display* display, int screen, const Dim2& size, ::Window* window, ::GLXContext* glx_context)
 {
 	// GLXFBConfig API requires GLX 1.3.
 	// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
@@ -59,7 +59,7 @@ bool initialize_window(::Display *display, int screen, const Dim2 &size, ::Windo
 
 	int fbc_count = 0;
 
-	::GLXFBConfig *fbc = ::glXChooseFBConfig(display, screen, attributes, &fbc_count);
+	::GLXFBConfig* fbc = ::glXChooseFBConfig(display, screen, attributes, &fbc_count);
 	if (!fbc)
 		return false;
 
@@ -70,7 +70,7 @@ bool initialize_window(::Display *display, int screen, const Dim2 &size, ::Windo
 		// The official OpenGL example suggest sorting by GLX_SAMPLE_BUFFERS
 		// and GLX_SAMPLES, but we have no successful experience in using it.
 
-		::XVisualInfo *vi = ::glXGetVisualFromFBConfig(display, fbc[i]);
+		::XVisualInfo* vi = ::glXGetVisualFromFBConfig(display, fbc[i]);
 		if (vi->depth == 24) // A depth of 32 will give us an ugly result.
 		{
 			best_fbc_index = i;
@@ -79,7 +79,7 @@ bool initialize_window(::Display *display, int screen, const Dim2 &size, ::Windo
 		::XFree(vi);
 	}
 
-	::XVisualInfo *vi = (best_fbc_index >= 0)
+	::XVisualInfo* vi = (best_fbc_index >= 0)
 		? ::glXGetVisualFromFBConfig(display, fbc[best_fbc_index])
 		: nullptr;
 
@@ -223,11 +223,10 @@ Key key_from_event(::XEvent& event)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Window::Window(const ScreenPtr &screen, ::Window window,
-	const Dim2 &size, ::GLXContext glx_context, Callbacks* callbacks, Allocator *allocator)
+Window::Window(::Display* display, ::Window window, ::GLXContext glx_context,
+	const Dim2& size, Callbacks* callbacks, Allocator* allocator)
 	: Pointable(allocator)
-	, _screen(screen)
-	, _display(static_cast<ScreenX11*>(screen.pointer())->_display)
+	, _display(display)
 	, _window(window)
 	, _wm_protocols(XInternAtom(_display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(XInternAtom(_display, "WM_DELETE_WINDOW", True))
@@ -256,19 +255,19 @@ void Window::close()
 	}
 }
 
-Renderer Window::create_renderer(Renderer::Backend backend, Allocator *allocator)
+Renderer Window::create_renderer(Allocator* allocator)
 {
-	if (backend != Renderer::OpenGl || _renderer)
+	if (_renderer)
 		return Renderer();
 
-	Renderer renderer(this, backend, allocator);
+	Renderer renderer(this, allocator);
 	if (renderer)
 		renderer._private->set_viewport(_size);
 
 	return renderer;
 }
 
-bool Window::get_cursor(Dim2 *cursor)
+bool Window::get_cursor(Dim2* cursor)
 {
 	if (_window == None)
 		return false;
@@ -292,7 +291,7 @@ bool Window::get_cursor(Dim2 *cursor)
 	return true;
 }
 
-bool Window::get_frame_sync(bool *frame_sync)
+bool Window::get_frame_sync(bool* frame_sync)
 {
 	Y_UNUSED(frame_sync);
 	return false;
@@ -419,19 +418,14 @@ Renderer Window::renderer()
 	return _renderer;
 }
 
-ScreenPtr Window::screen() const
-{
-	return _screen;
-}
-
-void Window::set_name(const StaticString &name)
+void Window::set_name(const StaticString& name)
 {
 	if (_window == None)
 		return;
 	::XStoreName(_display, _window, name.text());
 }
 
-bool Window::set_cursor(const Dim2 &cursor)
+bool Window::set_cursor(const Dim2& cursor)
 {
 	if (_window == None)
 		return false;
@@ -460,20 +454,18 @@ void Window::swap_buffers()
 	::glXSwapBuffers(_display, _window);
 }
 
-WindowPtr Window::open(const ScreenPtr &screen, const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
+WindowPtr Window::open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
 {
-	ScreenX11 *screen_x11 = static_cast<ScreenX11*>(screen.pointer());
-	if (!screen_x11)
+	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.pointer());
+	if (!screen_impl)
 		return WindowPtr();
 
-	::Display*   display = screen_x11->_display;
-	::Window     window;
+	::Window window;
 	::GLXContext glx_context;
-
-	if (!initialize_window(display, screen_x11->_screen, size, &window, &glx_context))
+	if (!initialize_window(screen_impl->_display, screen_impl->_screen, size, &window, &glx_context))
 		return WindowPtr();
 
-	return WindowPtr(Y_NEW(allocator, Window)(screen, window, size, glx_context, callbacks, allocator));
+	return WindowPtr(Y_NEW(allocator, Window)(screen_impl->_display, window, glx_context, size, callbacks, allocator));
 }
 
 } // namespace Yttrium

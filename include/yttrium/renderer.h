@@ -26,16 +26,6 @@ public:
 
 	///
 
-	enum Backend
-	{
-		Software, ///< Software backend.
-		OpenGl,   ///< OpenGL backend.
-	};
-
-public:
-
-	///
-
 	inline Renderer() noexcept;
 
 	///
@@ -176,7 +166,7 @@ private:
 
 private:
 
-	Y_PRIVATE Renderer(Window *window, Backend backend, Allocator *allocator);
+	Y_PRIVATE Renderer(Window *window, Allocator *allocator);
 	Y_PRIVATE Renderer(Private *private_);
 };
 

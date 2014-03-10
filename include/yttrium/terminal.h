@@ -57,7 +57,7 @@ public:
 
 	///
 
-	virtual Renderer create_renderer(Renderer::Backend backend, Allocator *allocator = nullptr) noexcept = 0;
+	virtual Renderer create_renderer(Allocator *allocator = nullptr) noexcept = 0;
 
 	///
 

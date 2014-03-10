@@ -12,14 +12,14 @@ namespace Yttrium
 
 class Window;
 
-class ScreenX11: public Screen
+class ScreenImpl: public Screen
 {
 	friend Window;
 
 public:
 
-	ScreenX11(::Display* display, int screen, Allocator* allocator);
-	~ScreenX11() override;
+	ScreenImpl(::Display* display, int screen, Allocator* allocator);
+	~ScreenImpl() override;
 
 	ScreenMode mode(ModeType type) noexcept override;
 
