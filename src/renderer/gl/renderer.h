@@ -13,7 +13,7 @@ class OpenGlRenderer
 {
 public:
 
-	OpenGlRenderer(Window *window, Allocator *allocator);
+	OpenGlRenderer(WindowBackend *window, Allocator *allocator);
 	~OpenGlRenderer() override;
 
 public:

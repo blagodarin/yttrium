@@ -1,5 +1,5 @@
-#ifndef __TERMINAL_X11_WINDOW_H
-#define __TERMINAL_X11_WINDOW_H
+#ifndef __TERMINAL_X11_BACKEND_H
+#define __TERMINAL_X11_BACKEND_H
 
 #include <yttrium/key.h>
 #include <yttrium/renderer.h>
@@ -13,9 +13,11 @@
 namespace Yttrium
 {
 
-typedef Pointer<Window> WindowPtr;
+class WindowBackend;
 
-class Window: public Pointable
+typedef Pointer<WindowBackend> WindowBackendPtr;
+
+class WindowBackend: public Pointable
 {
 	friend Renderer;
 
@@ -31,9 +33,9 @@ public:
 
 public:
 
-	Window(::Display* display, ::Window window, ::GLXContext glx_context,
+	WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context,
 		const Dim2& size, Callbacks* callbacks, Allocator* allocator);
-	~Window() override;
+	~WindowBackend() override;
 
 public:
 
@@ -63,7 +65,7 @@ public:
 
 public:
 
-	static WindowPtr open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator);
+	static WindowBackendPtr open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator);
 
 private:
 
@@ -79,4 +81,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __TERMINAL_X11_WINDOW_H
+#endif // __TERMINAL_X11_BACKEND_H

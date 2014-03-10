@@ -7,7 +7,7 @@
 namespace Yttrium
 {
 
-OpenGlRenderer::OpenGlRenderer(Window *window, Allocator *allocator)
+OpenGlRenderer::OpenGlRenderer(WindowBackend *window, Allocator *allocator)
 	: Private(window, allocator)
 	, _builtin_texture(0)
 {

@@ -1,4 +1,4 @@
-#include "window.h"
+#include "backend.h"
 
 #include "../../renderer/renderer.h"
 #include "screen.h"
@@ -223,7 +223,7 @@ Key key_from_event(::XEvent& event)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Window::Window(::Display* display, ::Window window, ::GLXContext glx_context,
+WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context,
 	const Dim2& size, Callbacks* callbacks, Allocator* allocator)
 	: Pointable(allocator)
 	, _display(display)
@@ -239,13 +239,13 @@ Window::Window(::Display* display, ::Window window, ::GLXContext glx_context,
 	fix_window_size(_display, _window, _size);
 }
 
-Window::~Window()
+WindowBackend::~WindowBackend()
 {
 	close();
 	::glXDestroyContext(_display, _glx_context);
 }
 
-void Window::close()
+void WindowBackend::close()
 {
 	if (_window != None)
 	{
@@ -255,7 +255,7 @@ void Window::close()
 	}
 }
 
-Renderer Window::create_renderer(Allocator* allocator)
+Renderer WindowBackend::create_renderer(Allocator* allocator)
 {
 	if (_renderer)
 		return Renderer();
@@ -267,7 +267,7 @@ Renderer Window::create_renderer(Allocator* allocator)
 	return renderer;
 }
 
-bool Window::get_cursor(Dim2* cursor)
+bool WindowBackend::get_cursor(Dim2* cursor)
 {
 	if (_window == None)
 		return false;
@@ -291,13 +291,13 @@ bool Window::get_cursor(Dim2* cursor)
 	return true;
 }
 
-bool Window::get_frame_sync(bool* frame_sync)
+bool WindowBackend::get_frame_sync(bool* frame_sync)
 {
 	Y_UNUSED(frame_sync);
 	return false;
 }
 
-bool Window::put(int left, int top, int width, int height, bool border)
+bool WindowBackend::put(int left, int top, int width, int height, bool border)
 {
 	if (_window == None)
 		return false;
@@ -317,7 +317,7 @@ bool Window::put(int left, int top, int width, int height, bool border)
 	return true;
 }
 
-bool Window::process_events()
+bool WindowBackend::process_events()
 {
 	if (_window == None)
 		return false;
@@ -413,19 +413,19 @@ bool Window::process_events()
 	return true;
 }
 
-Renderer Window::renderer()
+Renderer WindowBackend::renderer()
 {
 	return _renderer;
 }
 
-void Window::set_name(const StaticString& name)
+void WindowBackend::set_name(const StaticString& name)
 {
 	if (_window == None)
 		return;
 	::XStoreName(_display, _window, name.text());
 }
 
-bool Window::set_cursor(const Dim2& cursor)
+bool WindowBackend::set_cursor(const Dim2& cursor)
 {
 	if (_window == None)
 		return false;
@@ -433,13 +433,13 @@ bool Window::set_cursor(const Dim2& cursor)
 	return true;
 }
 
-bool Window::set_frame_sync(bool frame_sync)
+bool WindowBackend::set_frame_sync(bool frame_sync)
 {
 	Y_UNUSED(frame_sync);
 	return false;
 }
 
-void Window::show()
+void WindowBackend::show()
 {
 	if (_window == None)
 		return;
@@ -447,25 +447,25 @@ void Window::show()
 	//::XSetInputFocus(_display, _window, RevertToNone, CurrentTime); // TODO: Uncomment or remove.
 }
 
-void Window::swap_buffers()
+void WindowBackend::swap_buffers()
 {
 	if (_window == None)
 		return;
 	::glXSwapBuffers(_display, _window);
 }
 
-WindowPtr Window::open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
+WindowBackendPtr WindowBackend::open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
 {
 	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.pointer());
 	if (!screen_impl)
-		return WindowPtr();
+		return WindowBackendPtr();
 
 	::Window window;
 	::GLXContext glx_context;
 	if (!initialize_window(screen_impl->_display, screen_impl->_screen, size, &window, &glx_context))
-		return WindowPtr();
+		return WindowBackendPtr();
 
-	return WindowPtr(Y_NEW(allocator, Window)(screen_impl->_display, window, glx_context, size, callbacks, allocator));
+	return WindowBackendPtr(Y_NEW(allocator, WindowBackend)(screen_impl->_display, window, glx_context, size, callbacks, allocator));
 }
 
 } // namespace Yttrium

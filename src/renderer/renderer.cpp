@@ -1,14 +1,14 @@
 #include "renderer.h"
 
 #include "../memory/allocatable.h"
-#include "../terminal/window.h"
+#include "../terminal/backend.h"
 #include "gl/renderer.h"
 #include "texture.h"
 
 namespace Yttrium
 {
 
-Renderer::Private::Private(Window *window, Allocator *allocator)
+Renderer::Private::Private(WindowBackend *window, Allocator *allocator)
 	: PrivateBase(allocator)
 	, _window(window)
 	, _viewport_size(0)
@@ -286,7 +286,7 @@ Vector2f Renderer::Private::text_size(const StaticString &text) const
 	return _font ? _font.text_size(text, _font_size) : Vector2f(0);
 }
 
-Renderer::Private *Renderer::Private::create(Window *window, Allocator *allocator)
+Renderer::Private *Renderer::Private::create(WindowBackend *window, Allocator *allocator)
 {
 	Allocatable<Renderer::Private> renderer(allocator);
 	renderer.reset<OpenGlRenderer>(window);
@@ -494,7 +494,7 @@ Renderer &Renderer::operator =(const Renderer &renderer)
 	return *this;
 }
 
-Renderer::Renderer(Window *window, Allocator *allocator)
+Renderer::Renderer(WindowBackend *window, Allocator *allocator)
 	: _private(Private::create(window, allocator))
 {
 }

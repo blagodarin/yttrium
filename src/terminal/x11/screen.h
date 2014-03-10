@@ -10,11 +10,11 @@
 namespace Yttrium
 {
 
-class Window;
+class WindowBackend;
 
 class ScreenImpl: public Screen
 {
-	friend Window;
+	friend WindowBackend;
 
 public:
 

@@ -5,13 +5,13 @@
 
 #include <yttrium/screen.h>
 
+#include "backend.h"
 #include "console.h"
-#include "window.h"
 
 namespace Yttrium
 {
 
-class TerminalImpl: public Terminal, private Window::Callbacks
+class TerminalImpl: public Terminal, private WindowBackend::Callbacks
 {
 public:
 
@@ -39,7 +39,7 @@ public: // Terminal
 	void show(Mode mode) noexcept override;
 	Dim2 size() const noexcept override;
 
-private: // Window::Callbacks
+private: // WindowBackend::Callbacks
 
 	void on_focus_event(bool is_focused) noexcept override;
 	void on_key_event(Key key, bool is_pressed) noexcept override;
@@ -51,7 +51,7 @@ private:
 private:
 
 	ScreenPtr            _screen;
-	WindowPtr            _window;
+	WindowBackendPtr     _backend;
 	bool                 _is_active;
 	Dim2                 _cursor;
 	bool                 _is_cursor_locked;

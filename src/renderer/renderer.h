@@ -8,7 +8,7 @@
 #include <yttrium/string.h>
 
 #include "../base/private_base.h"
-#include "../terminal/window.h"
+#include "../terminal/backend.h"
 #include "builtin.h"
 
 #include <vector>
@@ -20,7 +20,7 @@ class Y_PRIVATE Renderer::Private: public PrivateBase<Renderer::Private>
 {
 public:
 
-	Private(Window *window, Allocator *allocator);
+	Private(WindowBackend *window, Allocator *allocator);
 
 	virtual ~Private();
 
@@ -48,7 +48,7 @@ public:
 
 public:
 
-	WindowPtr _window; // Don't let the window die too early.
+	WindowBackendPtr _window; // Don't let the window die too early.
 
 	Dim2     _viewport_size;
 	Vector2d _rendering_size;
@@ -86,7 +86,7 @@ public:
 
 public:
 
-	static Private *create(Window *window, Allocator *allocator);
+	static Private *create(WindowBackend *window, Allocator *allocator);
 };
 
 } // namespace Yttrium

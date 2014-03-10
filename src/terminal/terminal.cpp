@@ -31,8 +31,8 @@ bool TerminalImpl::initialize()
 	if (_screen.is_null())
 		return false;
 
-	_window = Window::open(_screen, _size, this, allocator());
-	if (_window.is_null())
+	_backend = WindowBackend::open(_screen, _size, this, allocator());
+	if (_backend.is_null())
 		return false;
 
 	return true;
@@ -40,12 +40,12 @@ bool TerminalImpl::initialize()
 
 void TerminalImpl::close()
 {
-	_window->close();
+	_backend->close();
 }
 
 Renderer TerminalImpl::create_renderer(Allocator *allocator)
 {
-	return _window->create_renderer(allocator ? allocator : this->allocator());
+	return _backend->create_renderer(allocator ? allocator : this->allocator());
 }
 
 Dim2 TerminalImpl::cursor() const
@@ -88,7 +88,7 @@ void TerminalImpl::lock_cursor(bool lock)
 	if (lock && _is_active)
 	{
 		_cursor = _size / 2;
-		_window->set_cursor(_cursor);
+		_backend->set_cursor(_cursor);
 	}
 }
 
@@ -137,7 +137,7 @@ char TerminalImpl::printable(Key key) const
 
 bool TerminalImpl::process_events()
 {
-	if (!_window->process_events())
+	if (!_backend->process_events())
 	{
 		return false;
 	}
@@ -146,7 +146,7 @@ bool TerminalImpl::process_events()
 	{
 		Dim2 cursor = _size / 2;
 
-		_window->get_cursor(&cursor);
+		_backend->get_cursor(&cursor);
 
 		Dim2 movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
 
@@ -157,7 +157,7 @@ bool TerminalImpl::process_events()
 		}
 		else
 		{
-			_window->set_cursor(_cursor);
+			_backend->set_cursor(_cursor);
 		}
 
 		if (_callbacks)
@@ -186,7 +186,7 @@ bool TerminalImpl::set_cursor(const Dim2 &cursor)
 	if (_is_cursor_locked
 		|| cursor.x < 0 || cursor.x >= _size.x
 		|| cursor.y < 0 || cursor.y >= _size.y
-		|| !_window->set_cursor(cursor))
+		|| !_backend->set_cursor(cursor))
 	{
 		return false;
 	}
@@ -197,7 +197,7 @@ bool TerminalImpl::set_cursor(const Dim2 &cursor)
 
 void TerminalImpl::set_name(const StaticString &name)
 {
-	_window->set_name(name);
+	_backend->set_name(name);
 }
 
 void TerminalImpl::show(Mode mode)
@@ -223,14 +223,14 @@ void TerminalImpl::show(Mode mode)
 		corner = Dim2((screen_mode.width - _size.x) / 2, (screen_mode.height - _size.y) / 2);
 	}
 
-	_window->put(corner.x, corner.y, _size.x, _size.y, _mode != Fullscreen);
-	_window->show();
+	_backend->put(corner.x, corner.y, _size.x, _size.y, _mode != Fullscreen);
+	_backend->show();
 
 	if (!_is_cursor_locked)
 	{
 		Dim2 cursor = _size / 2;
 
-		_window->get_cursor(&cursor);
+		_backend->get_cursor(&cursor);
 		_cursor.x = clamp(cursor.x, 0, _size.x - 1);
 		_cursor.y = clamp(cursor.y, 0, _size.y - 1);
 	}

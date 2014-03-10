@@ -9,7 +9,7 @@ namespace Yttrium
 
 struct GlApi
 {
-	void initialize(Window *window);
+	void initialize(WindowBackend *window);
 
 	#define GLAPI_DECLARE
 	#include "api.h"

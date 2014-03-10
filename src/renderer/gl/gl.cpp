@@ -3,7 +3,7 @@
 namespace Yttrium
 {
 
-void GlApi::initialize(Window *window)
+void GlApi::initialize(WindowBackend *window)
 {
 	Y_UNUSED(window);
 

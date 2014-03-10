@@ -13,14 +13,14 @@
 namespace Yttrium
 {
 
-class Window;
+class WindowBackend;
 
 ///
 
 class Y_API Renderer
 {
 	friend TextureCache;
-	friend Window;
+	friend WindowBackend;
 
 public:
 
@@ -166,7 +166,7 @@ private:
 
 private:
 
-	Y_PRIVATE Renderer(Window *window, Allocator *allocator);
+	Y_PRIVATE Renderer(WindowBackend *window, Allocator *allocator);
 	Y_PRIVATE Renderer(Private *private_);
 };
 
