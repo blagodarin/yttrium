@@ -49,6 +49,8 @@ public:
 
 public:
 
+	~Texture2D() = default;
+
 	///
 
 	Filter filter() const noexcept

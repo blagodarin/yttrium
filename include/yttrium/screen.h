@@ -46,7 +46,7 @@ public:
 
 public:
 
-	virtual ~Screen() {}
+	~Screen() = default;
 
 	///
 	virtual ScreenMode mode(ModeType type = CurrentMode) noexcept = 0;

@@ -40,6 +40,8 @@ public:
 
 public:
 
+	~Gui() override {}
+
 	///
 
 	virtual void clear() noexcept = 0;

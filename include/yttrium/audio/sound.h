@@ -22,6 +22,8 @@ class Y_API Sound: public Pointable
 {
 public:
 
+	~Sound() = default;
+
 	/// Return the sound name.
 	/// \return %Sound name.
 

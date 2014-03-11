@@ -49,6 +49,8 @@ public:
 
 public:
 
+	~Window() = default;
+
 	///
 
 	virtual void close() noexcept = 0;

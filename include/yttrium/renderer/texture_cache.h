@@ -18,6 +18,8 @@ class Y_API TextureCache: public Pointable
 {
 public:
 
+	~TextureCache() = default;
+
 	///
 
 	virtual Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity = false) noexcept = 0;
@@ -38,10 +40,7 @@ public:
 
 protected:
 
-	TextureCache(Allocator *allocator) noexcept
-		: Pointable(allocator)
-	{
-	}
+	TextureCache(Allocator *allocator) noexcept: Pointable(allocator) {}
 };
 
 } // namespace Yttrium
