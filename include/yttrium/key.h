@@ -197,7 +197,7 @@ enum: KeyType
 };
 
 /// %Key event.
-struct KeyEvent
+struct Y_API KeyEvent
 {
 	enum
 	{
