@@ -38,7 +38,7 @@ private:
 private: // Window::Callbacks
 
 	void on_cursor_movement(Window *window, const Dim2 &movement) noexcept override;
-	bool on_key_event(Window *window, Key key, unsigned pressed) noexcept override;
+	bool on_key_event(const KeyEvent &event) noexcept override;
 
 private: // GuiManager::Callbacks
 

@@ -94,49 +94,6 @@ void WindowImpl::lock_cursor(bool lock)
 	}
 }
 
-char WindowImpl::printable(Key key) const
-{
-	// TODO: Update this dumb English-bound implementation.
-
-	static const char char_count = 0x30;
-
-	static const char lo_map[char_count] =
-	{
-		'0', '1', '2', '3', '4', '5', '6', '7',
-		'8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
-		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-		'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-		'w', 'x', 'y', 'z', ',', '.', ';','\'',
-		'/','\\', '[', ']', '-', '=', '`', ' ',
-	};
-
-	static const char hi_map[char_count] =
-	{
-		')', '!', '@', '#', '$', '%', '^', '&',
-		'*', '(', 'A', 'B', 'C', 'D', 'E', 'F',
-		'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-		'W', 'X', 'Y', 'Z', '<', '>', ':', '"',
-		'?', '|', '{', '}', '_', '+', '~', ' ',
-	};
-
-	if (key >= Key::_0 && key <= Key::Space)
-	{
-		if (is_shift_pressed())
-		{
-			return hi_map[KeyType(key) - KeyType(Key::_0)];
-		}
-		else
-		{
-			return lo_map[KeyType(key) - KeyType(Key::_0)];
-		}
-	}
-	else
-	{
-		return 0;
-	}
-}
-
 bool WindowImpl::process_events()
 {
 	if (!_backend->process_events())
@@ -256,7 +213,7 @@ void WindowImpl::on_focus_event(bool is_focused)
 
 void WindowImpl::on_key_event(Key key, bool is_pressed)
 {
-	unsigned pressed = 0;
+	KeyEvent event(key);
 
 	switch (key)
 	{
@@ -266,16 +223,25 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 	case Key::WheelRight:
 
 		if (is_pressed)
-			pressed = 1;
+			event.pressed = 1;
 		break;
 
 	default:
 
 		if (is_pressed)
-			pressed = _keys[static_cast<KeyType>(key)] + 1;
-		_keys[static_cast<KeyType>(key)] = pressed;
+			event.pressed = _keys[static_cast<KeyType>(key)] + 1;
+		_keys[static_cast<KeyType>(key)] = event.pressed;
 		break;
 	}
+
+	if (_keys[static_cast<KeyType>(Key::LShift)] || _keys[static_cast<KeyType>(Key::RShift)])
+		event.modifiers |= KeyEvent::Shift;
+
+	if (_keys[static_cast<KeyType>(Key::LControl)] || _keys[static_cast<KeyType>(Key::RControl)])
+		event.modifiers |= KeyEvent::Control;
+
+	if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
+		event.modifiers |= KeyEvent::Alt;
 
 	if (_is_console_visible && is_pressed)
 	{
@@ -284,14 +250,14 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 			_is_console_visible = false;
 			return;
 		}
-		else if (_console.process_key(key))
+		else if (_console.process_key(event))
 		{
 			return;
 		}
 	}
 
 	if (_callbacks)
-		_callbacks->on_key_event(this, key, pressed);
+		_callbacks->on_key_event(event);
 }
 
 void WindowImpl::set_active(bool active)

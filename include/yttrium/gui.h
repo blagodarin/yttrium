@@ -68,7 +68,7 @@ public:
 
 	///
 
-	virtual bool process_key(Window *window, Key key, unsigned pressed) noexcept = 0;
+	virtual bool process_key(const KeyEvent& event) noexcept = 0;
 
 	///
 

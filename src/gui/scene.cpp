@@ -66,15 +66,15 @@ void GuiScene::load_widget(const StaticString &type, const StaticString &name, G
 	_widgets.push_back(widget.release());
 }
 
-bool GuiScene::process_key(Key key, unsigned pressed)
+bool GuiScene::process_key(const KeyEvent &event)
 {
 	bool result = false;
 
-	if (key == Key::Mouse1)
+	if (event.key == Key::Mouse1)
 	{
 		if (_mouse_widget)
 		{
-			if (pressed)
+			if (event.pressed)
 			{
 				if (_mouse_widget->is_enabled())
 					_left_click_widget = _mouse_widget;
@@ -91,11 +91,11 @@ bool GuiScene::process_key(Key key, unsigned pressed)
 			result = true;
 		}
 
-		if (!pressed)
+		if (!event.pressed)
 			_left_click_widget = nullptr;
 	}
 
-	return pressed ? _bindings.call(key) : result;
+	return event.pressed ? _bindings.call(event.key) : result;
 }
 
 void GuiScene::render(Renderer *renderer, const Vector2f &size)

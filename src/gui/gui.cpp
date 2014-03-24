@@ -180,11 +180,11 @@ bool GuiImpl::push_scene(const StaticString& name)
 	return true;
 }
 
-bool GuiImpl::process_key(Window*, Key key, unsigned pressed)
+bool GuiImpl::process_key(const KeyEvent& event)
 {
 	return _scene_stack.empty()
 		? false
-		: _scene_stack.back()->process_key(key, pressed);
+		: _scene_stack.back()->process_key(event);
 }
 
 bool GuiImpl::render()

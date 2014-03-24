@@ -36,7 +36,7 @@ public:
 		///
 		/// \return \c true if the key was handled, \c false otherwise.
 
-		virtual bool on_key_event(Window *window, Key key, unsigned pressed) noexcept = 0;
+		virtual bool on_key_event(const KeyEvent& event) noexcept = 0;
 	};
 
 	///
@@ -82,10 +82,6 @@ public:
 	///
 
 	virtual void lock_cursor(bool lock) noexcept = 0;
-
-	///
-
-	virtual char printable(Key key) const noexcept = 0;
 
 	/// Process window events.
 	/// \return \c false if the window was closed, \c true otherwise.

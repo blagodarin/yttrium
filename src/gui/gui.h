@@ -102,7 +102,7 @@ public: // Gui
 	bool load(const StaticString& filename) noexcept override;
 	bool pop_scenes(size_t count) noexcept override;
 	bool push_scene(const StaticString& name) noexcept override;
-	bool process_key(Window *window, Key key, unsigned pressed) noexcept override;
+	bool process_key(const KeyEvent& event) noexcept override;
 	bool render() noexcept override;
 	void set_cursor(const Vector2f& cursor) noexcept override;
 

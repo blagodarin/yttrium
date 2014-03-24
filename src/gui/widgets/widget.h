@@ -1,6 +1,7 @@
 #ifndef __GUI_WIDGETS_WIDGET_H
 #define __GUI_WIDGETS_WIDGET_H
 
+#include <yttrium/key.h>
 #include <yttrium/rect.h>
 #include <yttrium/string.h>
 
@@ -48,6 +49,8 @@ public:
 	virtual bool load(GuiPropertyLoader& loader) = 0;
 
 	virtual void play() const; // TODO: Produce a better solution.
+
+	virtual bool process_key(const KeyEvent& event);
 
 	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const = 0;
 

@@ -209,12 +209,12 @@ void Game::on_cursor_movement(Window *, const Dim2 &) noexcept
 {
 }
 
-bool Game::on_key_event(Window *window, Key key, unsigned pressed) noexcept
+bool Game::on_key_event(const KeyEvent &event) noexcept
 {
-	if (_gui->process_key(window, key, pressed))
+	if (_gui->process_key(event))
 		return true;
 
-	if (pressed <= 1 && _bindings.call(key, pressed ? ExecutionMode::Do : ExecutionMode::Undo))
+	if (event.pressed <= 1 && _bindings.call(event.key, event.pressed ? ExecutionMode::Do : ExecutionMode::Undo))
 		return true;
 
 	return false;

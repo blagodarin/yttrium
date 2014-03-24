@@ -30,7 +30,6 @@ public: // Window
 	bool is_cursor_locked() const noexcept override;
 	bool is_shift_pressed() const noexcept override;
 	void lock_cursor(bool lock) noexcept override;
-	char printable(Key key) const noexcept override;
 	bool process_events() noexcept override;
 	void resize(const Dim2 &size) noexcept override;
 	void set_console_visible(bool visible) noexcept override;

@@ -45,7 +45,7 @@ public:
 		return _name;
 	}
 
-	bool process_key(Key key, unsigned pressed);
+	bool process_key(const KeyEvent &event);
 
 	void render(Renderer *renderer, const Vector2f &scale); // TODO: Make const.
 

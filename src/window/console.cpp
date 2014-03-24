@@ -7,30 +7,16 @@
 namespace Yttrium
 {
 
-bool Console::process_key(Key key)
+bool Console::process_key(const KeyEvent& event)
 {
-	if (key == Key::Enter)
+	if (event.key == Key::Enter)
 	{
 		ScriptContext::global().execute(_line_editor.text());
 		_line_editor.clear();
 		return true;
 	}
 
-	if (_line_editor.process_key(key, _window.is_shift_pressed()))
-	{
-		return true;
-	}
-
-	char symbol = _window.printable(key);
-
-	if (!symbol)
-	{
-		return false;
-	}
-
-	_line_editor.insert(symbol);
-
-	return true;
+	return _line_editor.process_key(event);
 }
 
 void Console::render_input(RendererBuiltin *renderer, int x, int y, int max_size)

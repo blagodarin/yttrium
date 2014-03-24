@@ -196,6 +196,36 @@ enum: KeyType
 	KeyCount = Key::__Count, ///< Number of keys defined.
 };
 
+/// %Key event.
+struct KeyEvent
+{
+	enum
+	{
+		Shift   = 1 << 0, ///< Key::LShift or Key::RShift is pressed.
+		Control = 1 << 1, ///< Key::LControl or Key::RControl is pressed.
+		Alt     = 1 << 2, ///< Key::LAlt or Key::RAlt is pressed.
+	};
+
+	Key      key;       ///< Key.
+	unsigned pressed;   ///< Press count.
+	unsigned modifiers; ///< Modifier mask.
+
+	///
+	/// \param key Key.
+	/// \param pressed Press count.
+	/// \param modifiers Modifier mask.
+	explicit KeyEvent(Key key = Key::Null, unsigned pressed = 0, unsigned modifiers = 0)
+		: key(key)
+		, pressed(pressed)
+		, modifiers(modifiers)
+	{
+	}
+
+	///
+	/// \return
+	char to_char() const;
+};
+
 } // namespace Yttrium
 
 #endif // __Y_KEY_H
