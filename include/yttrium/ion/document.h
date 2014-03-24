@@ -15,9 +15,7 @@ namespace Ion
 class List;
 
 ///
-
-class Y_API Document
-	: public Object
+class Y_API Document: public Object
 {
 	friend List;
 	friend Node;
@@ -28,57 +26,44 @@ class Y_API Document
 public:
 
 	///
-
-	Document(Allocator *allocator = DefaultAllocator) noexcept;
-
-	///
-
-	Document(const Document &document, Allocator *allocator = nullptr) noexcept;
+	Document(Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
+	Document(const Document& document, Allocator* allocator = nullptr) noexcept;
 
+	///
 	~Document() noexcept;
 
 public:
 
 	///
-
 	Allocator *allocator() const noexcept;
 
 	///
-
 	void clear() noexcept;
 
 	///
-
 	bool load(const StaticString &name) noexcept;
 
 	///
-
-	void save(const StaticString &name, int indentation = 0) const noexcept;
+	bool save(const StaticString &name, int indentation = 0) const noexcept;
 
 public:
 
 	///
-
-	inline Document &operator =(const Document &document) noexcept;
+	Document& operator =(const Document& document) noexcept
+	{
+		clear();
+		concatenate(document);
+		return *this;
+	}
 
 private:
 
 	class Private;
 
-	Private *_private;
+	Private* _private;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Document &Document::operator =(const Document &document) noexcept
-{
-	clear();
-	concatenate(document);
-	return *this;
-}
 
 } // namespace Ion
 

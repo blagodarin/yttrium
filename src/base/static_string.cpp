@@ -24,17 +24,14 @@ namespace
 //  2b) for N > 1, pow(2, pow(2, N) - 1) % 10 == 8 (negative signed).
 
 template <typename T>
-T string_to_int(const char *p, const char *end)
+T string_to_int(const char* p, const char* end)
 {
 	if (p == end)
-	{
 		return 0;
-	}
 
 	// Sign.
 
 	bool negate_result = false;
-
 	switch (*p)
 	{
 	case '-': negate_result = true; // Fallthrough.
@@ -44,27 +41,21 @@ T string_to_int(const char *p, const char *end)
 	// Value.
 
 	T result = 0;
-
 	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
 		result = result * 10 + (*p - '0');
-	}
 
 	return negate_result ? -result : result;
 }
 
 template <typename T, T threshold>
-bool string_to_int(const char *p, const char *end, T *value)
+bool string_to_int(const char* p, const char* end, T* value)
 {
 	if (p == end)
-	{
 		return false;
-	}
 
 	// Sign.
 
 	bool negate_result = false;
-
 	switch (*p)
 	{
 	case '-': negate_result = true; // Fallthrough.
@@ -74,33 +65,25 @@ bool string_to_int(const char *p, const char *end, T *value)
 	// Value.
 
 	if (p == end || *p < '0' || *p > '9')
-	{
 		return false;
-	}
 
 	T result = 0;
 
 	do
 	{
 		if (result > threshold)
-		{
 			return false;
-		}
 
 		T digit = *p++ - '0';
 
 		if (result == threshold && digit > 7 + negate_result)
-		{
 			return false;
-		}
 
 		result = result * 10 + digit;
 	} while (p != end && *p >= '0' && *p <= '9');
 
 	if (p != end)
-	{
 		return false;
-	}
 
 	*value = negate_result ? -result : result;
 	return true;
@@ -278,28 +261,21 @@ bool string_to_real(const char *p, const char *end, T *value)
 }
 
 template <typename T>
-T string_to_uint(const char *p, const char *end)
+T string_to_uint(const char* p, const char* end)
 {
 	if (p == end)
-	{
 		return 0;
-	}
 
 	// Sign.
 
 	if (*p == '+')
-	{
 		++p;
-	}
 
 	// Value.
 
 	T result = 0;
-
 	for (; p != end && *p >= '0' && *p <= '9'; ++p)
-	{
 		result = result * 10 + *p - '0';
-	}
 
 	return result;
 }
@@ -382,9 +358,8 @@ bool StaticString::ends_with(const StaticString &substring) const
 
 StaticString StaticString::file_extension() const
 {
-	size_t last_dot = find_last('.');
-
-	return (last_dot != End) && last_dot
+	const size_t last_dot = find_last('.');
+	return (last_dot != End) && last_dot > 0
 		? StaticString(&_text[last_dot], _size - last_dot)
 		: StaticString();
 }
@@ -393,35 +368,26 @@ size_t StaticString::find_first(char symbol, size_t offset) const
 {
 	if (offset < _size)
 	{
-		const char *end = _text + _size;
-
-		for (const char *c = _text + offset; c != end; ++c)
+		const char* end = _text + _size;
+		for (const char* c = _text + offset; c != end; ++c)
 		{
 			if (*c == symbol)
-			{
 				return c - _text;
-			}
 		}
 	}
-
 	return End;
 }
 
 size_t StaticString::find_last(char symbol, size_t offset) const
 {
 	if (offset > _size)
-	{
 		offset = _size;
-	}
 
-	const char *end = _text - 1;
-
-	for (const char *c = _text + offset - 1; c != end; --c)
+	const char* end = _text - 1;
+	for (const char* c = _text + offset - 1; c != end; --c)
 	{
 		if (*c == symbol)
-		{
 			return c - _text;
-		}
 	}
 
 	return End;
@@ -430,34 +396,26 @@ size_t StaticString::find_last(char symbol, size_t offset) const
 StaticString StaticString::trimmed() const
 {
 	if (!_size)
-	{
 		return StaticString();
-	}
 
-	char *left = _text;
-	char *right = _text + _size;
+	char* left = _text;
+	char* right = _text + _size;
 
 	for (; left < right; ++left)
 	{
-		if (*left > 32)
-		{
+		if (*left > 32) // Assuming ASCII.
 			break;
-		}
 	}
 
 	if (left == right)
-	{
 		return StaticString();
-	}
 
 	--right;
 
 	for (; left < right; --right)
 	{
-		if (*right > 32)
-		{
+		if (*right > 32) // Assuming ASCII.
 			break;
-		}
 	}
 
 	return StaticString(left, right - left + 1);
@@ -483,17 +441,17 @@ int64_t StaticString::to_int64() const
 	return string_to_int<int64_t>(_text, _text + _size);
 }
 
-bool StaticString::to_number(int32_t *value) const
+bool StaticString::to_number(int32_t* value) const
 {
 	return string_to_int<int32_t, INT32_C(0x0CCCCCCC)>(_text, _text + _size, value);
 }
 
-bool StaticString::to_number(float *value) const
+bool StaticString::to_number(float* value) const
 {
 	return string_to_real(_text, _text + _size, value);
 }
 
-bool StaticString::to_number(double *value) const
+bool StaticString::to_number(double* value) const
 {
 	return string_to_real(_text, _text + _size, value);
 }
@@ -501,9 +459,7 @@ bool StaticString::to_number(double *value) const
 double StaticString::to_time() const
 {
 	if (!_size)
-	{
 		return 0;
-	}
 
 	const char *p   = _text;
 	const char *end = _text + _size;
@@ -580,19 +536,19 @@ uint64_t StaticString::to_uint64() const
 	return string_to_uint<uint64_t>(_text, _text + _size);
 }
 
-String StaticString::zero_terminated(Allocator *allocator) const noexcept
+String StaticString::zero_terminated(Allocator* allocator) const noexcept
 {
 	return _text[_size]
 		? String(*this, allocator)
 		: String(*this, ByReference(), allocator);
 }
 
-bool StaticString::operator ==(const StaticString &string) const
+bool StaticString::operator ==(const StaticString& string) const
 {
 	return (_size == string._size) && !::memcmp(_text, string._text, _size);
 }
 
-bool StaticString::operator !=(const StaticString &string) const
+bool StaticString::operator !=(const StaticString& string) const
 {
 	return (_size != string._size) || ::memcmp(_text, string._text, _size);
 }

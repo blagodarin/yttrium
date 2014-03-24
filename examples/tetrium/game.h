@@ -21,7 +21,7 @@ class Game: public Window::Callbacks, public Gui::Callbacks
 
 public:
 
-	Game(Allocator *allocator);
+	Game(Allocator* allocator);
 	~Game();
 
 public:
@@ -37,25 +37,25 @@ private:
 
 private: // Window::Callbacks
 
-	void on_cursor_movement(Window *window, const Dim2 &movement) noexcept override;
-	bool on_key_event(const KeyEvent &event) noexcept override;
+	void on_cursor_movement(Window& window, const Dim2& movement) noexcept override;
+	bool on_key_event(const KeyEvent& event) noexcept override;
 
 private: // GuiManager::Callbacks
 
-	void on_render_canvas(Renderer *renderer, const StaticString &name, const RectF &rect) noexcept override;
+	void on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) noexcept override;
 
 private:
 
-	void draw_field(Renderer *renderer, const RectF &rect);
-	void draw_field_blocks(Renderer *renderer, const RectF &rect, const Vector2f &block_size);
-	void draw_field_figure(Renderer *renderer, const RectF &rect, const Vector2f &block_size);
-	void draw_field_frame(Renderer *renderer, const RectF &rect, const Vector2f &block_size);
-	void draw_next_figure(Renderer *renderer, const RectF &rect);
-	void set_texture_rectangle(Renderer *renderer, Tetrium::Figure::Type figure_type);
+	void draw_field(Renderer& renderer, const RectF& rect);
+	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
+	void draw_field_figure(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
+	void draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
+	void draw_next_figure(Renderer& renderer, const RectF& rect);
+	void set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type);
 
 private:
 
-	Allocator       *_allocator;
+	Allocator*       _allocator;
 	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
 	WindowPtr        _window;

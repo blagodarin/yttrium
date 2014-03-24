@@ -10,7 +10,7 @@
 namespace Yttrium
 {
 
-Canvas::Canvas(Gui::Callbacks* gui_callbacks, Allocator* allocator)
+Canvas::Canvas(Gui::Callbacks& gui_callbacks, Allocator* allocator)
 	: Widget(allocator)
 	, _gui_callbacks(gui_callbacks)
 {
@@ -34,15 +34,14 @@ bool Canvas::load(GuiPropertyLoader& loader)
 
 	loader.load_scaling("scale", &_scaling);
 
-	_area = _position;
+	_rect = RectF(_position);
 
 	return true;
 }
 
-void Canvas::render(Renderer* renderer, const RectF& area, const Vector2f&, WidgetState) const
+void Canvas::render(Renderer& renderer, const RectF& rect, const Vector2f&, WidgetState) const
 {
-	if (_gui_callbacks)
-		_gui_callbacks->on_render_canvas(renderer, _name, area);
+	_gui_callbacks.on_render_canvas(renderer, _name, rect);
 }
 
 } // namespace Yttrium

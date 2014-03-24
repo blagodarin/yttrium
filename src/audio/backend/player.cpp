@@ -7,7 +7,7 @@
 namespace Yttrium
 {
 
-AudioPlayerBackend *AudioPlayerBackend::create(Allocator *allocator)
+AudioPlayerBackend* AudioPlayerBackend::create(Allocator* allocator)
 {
 	return Y_NEW(allocator, OpenAlPlayer);
 }

@@ -23,12 +23,12 @@ class GuiScene
 
 public:
 
-	GuiScene(GuiImpl *gui, const StaticString &name, Allocator *allocator);
+	GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator);
 	~GuiScene();
 
 public:
 
-	void bind(const StaticString &name, const StaticString &action)
+	void bind(const StaticString& name, const StaticString& action)
 	{
 		_bindings.bind(name, action);
 	}
@@ -38,23 +38,23 @@ public:
 		return _is_transparent;
 	}
 
-	void load_widget(const StaticString &type, const StaticString &name, GuiPropertyLoader &loader);
+	void load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader);
 
-	const String &name() const
+	const String& name() const
 	{
 		return _name;
 	}
 
-	bool process_key(const KeyEvent &event);
+	bool process_key(const KeyEvent& event);
 
-	void render(Renderer *renderer, const Vector2f &scale); // TODO: Make const.
+	void render(Renderer& renderer, const Vector2f& scale); // TODO: Make const.
 
 	void reserve(size_t capacity)
 	{
 		_widgets.reserve(capacity);
 	}
 
-	void set_cursor(const Vector2f &cursor)
+	void set_cursor(const Vector2f& cursor)
 	{
 		_is_cursor_set = true;
 		_cursor = cursor;
@@ -65,7 +65,7 @@ public:
 		_scaling = scaling;
 	}
 
-	void set_size(const Vector2f &size)
+	void set_size(const Vector2f& size)
 	{
 		_size = size;
 	}
@@ -77,12 +77,12 @@ public:
 
 private:
 
-	RectF map(const RectF &source, const Vector2f &shift, const Vector2f &scale, Scaling scaling) const;
+	RectF map(const RectF& source, const Vector2f& shift, const Vector2f& scale, Scaling scaling) const;
 
 private:
 
 	Allocator*                _allocator;
-	GuiImpl*                  _gui;
+	GuiImpl&                  _gui;
 	String                    _name;
 	Vector2f                  _size;
 	Scaling                   _scaling;

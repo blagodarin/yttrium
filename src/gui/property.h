@@ -14,7 +14,7 @@ class GuiPropertyLoader;
 struct TextureProperty
 {
 	Texture2DPtr texture;
-	RectI        rect;
+	Rect         rect;
 	MarginsI     borders;
 
 	void dump(GuiPropertyDumper* dumper) const;

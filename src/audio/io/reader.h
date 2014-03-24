@@ -8,38 +8,19 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE AudioReader::Private
-	: public PrivateBase<AudioReader::Private>
+class AudioReaderImpl: public AudioReader
 {
-public:
+	friend AudioReader;
 
-	Private(Allocator *allocator)
-		: PrivateBase(allocator)
-		, _offset(0)
-		, _size(0)
-		, _atom_size(0)
-	{
-	}
-
-	virtual ~Private()
-	{
-	}
-
-public:
+protected:
 
 	virtual bool open() = 0;
 
-	virtual size_t read(void *buffer, size_t bytes_to_read) = 0;
+protected:
 
-	virtual void seek(UOffset offset) = 0;
+	File _file;
 
-public:
-
-	File        _file;
-	AudioFormat _format;
-	UOffset     _offset;
-	UOffset     _size;
-	UOffset     _atom_size;
+	AudioReaderImpl(Allocator* allocator): AudioReader(allocator) {}
 };
 
 } // namespace Yttrium

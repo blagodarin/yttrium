@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 
-AudioManager::Private::Private(Allocator *allocator)
+AudioManager::Private::Private(Allocator* allocator)
 	: _instance_guard(this, "Duplicate AudioManager construction")
 	, _allocator(allocator)
 	, _device_name(allocator)
@@ -21,12 +21,12 @@ AudioManager::Private::~Private()
 	Y_ASSERT(_sounds.empty());
 }
 
-AudioManager::Private *AudioManager::Private::instance()
+AudioManager::Private* AudioManager::Private::instance()
 {
 	return AudioManagerGuard::instance;
 }
 
-AudioManager::AudioManager(Allocator *allocator)
+AudioManager::AudioManager(Allocator* allocator)
 	: _allocator(Y_NEW(allocator, ProxyAllocator)("audio", allocator))
 	, _private(nullptr)
 {
@@ -54,7 +54,7 @@ StaticString AudioManager::device() const
 	return _private ? _private->_device_name : StaticString();
 }
 
-bool AudioManager::open(const StaticString &backend, const StaticString &device)
+bool AudioManager::open(const StaticString& backend, const StaticString& device)
 {
 	close();
 

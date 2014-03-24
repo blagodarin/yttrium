@@ -13,17 +13,13 @@ public:
 
 	GuiImage(Allocator* allocator);
 
-public: // Widget
-
-	void dump(GuiPropertyDumper* dumper) const override;
-
-	bool load(GuiPropertyLoader& loader) override;
-
-	void render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState state) const override;
+	void dump(GuiPropertyDumper*) const override;
+	bool load(GuiPropertyLoader&) override;
+	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
 
 private:
 
-	RectI           _position;
+	Rect            _position;
 	Vector4f        _color;
 	TextureProperty _texture;
 };

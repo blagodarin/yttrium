@@ -1,9 +1,9 @@
 #include "builtin.h"
 
-#include <yttrium/utils.h>
-
 #include "builtin_data.h"
 #include "renderer.h"
+
+#include <algorithm> // min
 
 namespace Yttrium
 {
@@ -97,7 +97,7 @@ void RendererBuiltin::draw_text(int x, int y, const StaticString &text, int max_
 {
 	_private->bind();
 
-	int size = min<int>(text.size(), max_size);
+	int size = std::min<int>(text.size(), max_size);
 
 	if (size > 0)
 	{

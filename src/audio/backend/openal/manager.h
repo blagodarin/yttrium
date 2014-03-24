@@ -7,30 +7,28 @@
 namespace Yttrium
 {
 
-class OpenAlManager
-	: public AudioManager::Private
+class OpenAlManager: public AudioManager::Private
 {
 public:
 
-	OpenAlManager(ALCdevice *device, ALCcontext *context, const StaticString &device_name, Allocator *allocator);
-
+	OpenAlManager(ALCdevice* device, ALCcontext* context, const StaticString& device_name, Allocator* allocator);
 	~OpenAlManager() override;
 
 public:
 
-	SoundImpl *create_sound(const StaticString &name, Allocator *allocator) override;
+	SoundImpl* create_sound(const StaticString& name, Allocator* allocator) override;
 
 public:
 
-	static AudioManager::Devices devices();
+	static std::vector<StaticString> devices();
 
-	static OpenAlManager *open(const StaticString &device, Allocator *allocator);
+	static OpenAlManager* open(const StaticString &device, Allocator *allocator);
 
 private:
 
-	ALCdevice    *_device;
-	ALCcontext   *_context;
-	OpenAlPlayer  _player;
+	ALCdevice*   _device;
+	ALCcontext*  _context;
+	OpenAlPlayer _player;
 };
 
 } // namespace Yttrium

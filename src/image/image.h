@@ -12,39 +12,41 @@ class ImageReader
 {
 public:
 
-	ImageReader(Allocator *allocator);
 	virtual ~ImageReader();
 
-public:
-
 	virtual bool open() = 0;
-	virtual bool read(void *buffer) = 0;
+	virtual bool read(void* buffer) = 0;
 
 public:
 
-	Allocator   *_allocator;
-	ImageFormat  _format;
-	StaticFile   _file;
+	Allocator*  _allocator;
+	ImageFormat _format;
+	StaticFile  _file;
+
+protected:
+
+	ImageReader(Allocator* allocator): _allocator(allocator) {}
 };
 
 class ImageWriter
 {
 public:
 
-	ImageWriter(Allocator *allocator);
 	virtual ~ImageWriter();
 
-public:
-
 	virtual bool open();
-	virtual bool set_format(const ImageFormat &format) = 0;
-	virtual bool write(const void *buffer) = 0;
+	virtual bool set_format(const ImageFormat& format) = 0;
+	virtual bool write(const void* buffer) = 0;
 
 public:
 
-	Allocator   *_allocator;
-	ImageFormat  _format;
-	StaticFile   _file;
+	Allocator*  _allocator;
+	ImageFormat _format;
+	StaticFile  _file;
+
+protected:
+
+	ImageWriter(Allocator* allocator): _allocator(allocator) {}
 };
 
 } // namespace Yttrium

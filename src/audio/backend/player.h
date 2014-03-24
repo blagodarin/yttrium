@@ -17,19 +17,17 @@ public:
 
 public:
 
-	virtual ~AudioPlayerBackend()
-	{
-	}
+	virtual ~AudioPlayerBackend() {}
 
 public:
 
-	virtual bool set_format(const AudioFormat &format) = 0;
+	virtual bool set_format(const AudioFormat& format) = 0;
 
-	virtual void fill_buffer(size_t index, void *data, size_t size) = 0;
+	virtual void fill_buffer(size_t index, void* data, size_t size) = 0;
 
 	virtual size_t check_buffers() = 0;
 
-	virtual void refill_buffer(void *data, size_t size) = 0;
+	virtual void refill_buffer(void* data, size_t size) = 0;
 
 	virtual void play() = 0;
 
@@ -39,7 +37,7 @@ public:
 
 public:
 
-	static AudioPlayerBackend *create(Allocator *allocator);
+	static AudioPlayerBackend* create(Allocator* allocator);
 };
 
 } // namespace Yttrium

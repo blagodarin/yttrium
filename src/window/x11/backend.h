@@ -51,8 +51,6 @@ public:
 
 	bool process_events();
 
-	Renderer renderer();
-
 	bool set_cursor(const Dim2& cursor);
 
 	bool set_frame_sync(bool frame_sync);

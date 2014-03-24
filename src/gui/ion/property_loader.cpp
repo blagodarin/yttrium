@@ -7,9 +7,10 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/margins.h>
 #include <yttrium/renderer/texture_cache.h>
-#include <yttrium/utils.h>
 
 #include "../gui.h"
+
+#include <algorithm> // min
 
 namespace Yttrium
 {
@@ -25,7 +26,7 @@ unsigned read_color(Vector4f *color, const Ion::Node &node, unsigned inherit)
 
 	if (!values.is_empty())
 	{
-		size_t items = min<size_t>(values.size(), 4);
+		const size_t items = std::min<size_t>(values.size(), 4);
 
 		for (size_t i = 0; i < items; values.pop_first(), ++i)
 		{
@@ -55,7 +56,7 @@ unsigned read_position(Vector2f *position, const Ion::Node &node)
 
 	if (!values.is_empty())
 	{
-		size_t items = min<size_t>(values.size(), 2);
+		const size_t items = std::min<size_t>(values.size(), 2);
 
 		for (size_t i = 0; i < items; values.pop_first(), ++i)
 		{
@@ -78,10 +79,10 @@ void read_rect(Integer elements[4], const Ion::Node &node)
 			break;
 
 		const StaticString *value;
-		if (Y_LIKELY(values->get(&value)))
+		if (values->get(&value))
 		{
 			Integer number;
-			if (value->to_number(&number) && Y_LIKELY(number >= i >> 1)) // 'number' must be not less than {0, 0, 1, 1}.
+			if (value->to_number(&number) && number >= i >> 1) // 'number' must be not less than {0, 0, 1, 1}.
 				elements[i] = number;
 		}
 		
@@ -97,7 +98,7 @@ unsigned read_size(Vector2f *size, const Ion::Node &node, unsigned inherit)
 
 	if (!values.is_empty())
 	{
-		size_t items = min<size_t>(values.size(), 2);
+		const size_t items = std::min<size_t>(values.size(), 2);
 
 		for (size_t i = 0; i < items; values.pop_first(), ++i)
 		{
@@ -269,7 +270,7 @@ bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2f *pos
 	return loaded == 0x3;
 }
 
-bool GuiIonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool update) const
+bool GuiIonPropertyLoader::load_rect(const StaticString &name, Rect *rect, bool update) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
@@ -300,7 +301,7 @@ bool GuiIonPropertyLoader::load_rect(const StaticString &name, RectI *rect, bool
 	if (!update && Y_UNLIKELY(elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
 		return false;
 
-	*rect = RectI(elements[0], elements[1], elements[2], elements[3]);
+	*rect = Rect(elements[0], elements[1], elements[2], elements[3]);
 
 	return true;
 }
@@ -699,7 +700,7 @@ bool GuiIonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &
 
 	Texture2D::Filter filter = default_filter;
 
-	Area     rect;
+	Rect     rect;
 	MarginsI borders;
 
 	if (!values.is_empty())

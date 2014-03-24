@@ -57,80 +57,62 @@ class Y_API ImageFormat
 public:
 
 	///
-
 	ImageFormat() noexcept;
 
 public:
 
 	///
-
 	inline size_t bits_per_channel() const noexcept;
 
 	///
-
 	inline size_t bits_per_pixel() const noexcept;
 
 	///
-
 	inline size_t channels() const noexcept;
 
 	///
-
 	inline size_t frame_size() const noexcept;
 
 	///
-
 	inline size_t height() const noexcept;
 
 	///
-
 	inline ImageOrientation orientation() const noexcept;
 
 	///
-
 	inline PixelFormat pixel_format() const noexcept;
 
 	///
-
 	inline size_t row_alignment() const noexcept;
 
 	///
-
 	inline size_t row_size() const noexcept;
 
 	///
-
 	inline void set_height(size_t height) noexcept;
 
 	///
-
 	inline void set_orientation(ImageOrientation orientation) noexcept;
 
 	///
-
 	void set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel) noexcept;
 
 	///
-
 	void set_row_alignment(size_t alignment) noexcept;
 
 	///
-
 	void set_width(size_t width) noexcept;
 
 	///
-
 	inline size_t width() const noexcept;
 
 public:
 
 	///
-
-	inline bool operator ==(const ImageFormat &format) const noexcept;
+	inline bool operator ==(const ImageFormat& format) const noexcept;
 
 	///
-
-	inline bool operator !=(const ImageFormat &format) const noexcept;
+	inline bool operator !=(const ImageFormat& format) const noexcept;
 
 private:
 
@@ -152,7 +134,7 @@ public:
 
 	///
 
-	Image(Allocator *allocator = DefaultAllocator) noexcept
+	Image(Allocator* allocator = DefaultAllocator) noexcept
 		: _buffer(allocator)
 	{
 	}
@@ -162,76 +144,65 @@ public:
 	/// \param allocator Image allocator.
 	/// \note The image data is left uninitialized.
 
-	Image(const ImageFormat &format, Allocator *allocator = DefaultAllocator) noexcept;
+	Image(const ImageFormat& format, Allocator* allocator = DefaultAllocator) noexcept;
 
 public:
 
 	///
-
-	const void *const_data() const noexcept
+	const void* const_data() const noexcept
 	{
 		return _buffer.data();
 	}
 
 	///
-
-	void *data() noexcept
+	void* data() noexcept
 	{
 		return _buffer.data();
 	}
 
 	///
-
-	const void *data() const noexcept
+	const void* data() const noexcept
 	{
 		return _buffer.data();
 	}
 
 	///
-
 	ImageFormat format() const noexcept
 	{
 		return _format;
 	}
 
 	///
-
 	bool intensity_to_bgra() noexcept;
 
 	///
-
 	bool is_valid() const noexcept
 	{
 		return _buffer.data();
 	}
 
 	///
-
-	bool load(const StaticString &name, ImageType type = ImageType::Auto) noexcept;
+	bool load(const StaticString& name, ImageType type = ImageType::Auto) noexcept;
 
 	///
-
-	bool save(const StaticString &name, ImageType type = ImageType::Auto) const noexcept;
+	bool save(const StaticString& name, ImageType type = ImageType::Auto) const noexcept;
 
 	/// Change the format to \a format.
 	/// \param format New image format.
 	/// \note The image data becomes undefined after the call.
-
-	void set_format(const ImageFormat &format) noexcept;
+	void set_format(const ImageFormat& format) noexcept;
 
 	///
-
 	void set_size(size_t width, size_t height, size_t row_alignment = 0) noexcept;
 
 	///
-
 	bool swap_channels() noexcept;
 
 public:
 
 	///
 
-	bool operator ==(const Image &image) const noexcept;
+	bool operator ==(const Image& image) const noexcept;
 
 private:
 
@@ -302,7 +273,7 @@ size_t ImageFormat::width() const noexcept
 	return _width;
 }
 
-bool ImageFormat::operator ==(const ImageFormat &format) const noexcept
+bool ImageFormat::operator ==(const ImageFormat& format) const noexcept
 {
 	return _pixel_format == format._pixel_format
 		&& _bits_per_pixel == format._bits_per_pixel
@@ -312,7 +283,7 @@ bool ImageFormat::operator ==(const ImageFormat &format) const noexcept
 		&& _height == format._height;
 }
 
-bool ImageFormat::operator !=(const ImageFormat &format) const noexcept
+bool ImageFormat::operator !=(const ImageFormat& format) const noexcept
 {
 	return _pixel_format != format._pixel_format
 		|| _bits_per_pixel != format._bits_per_pixel

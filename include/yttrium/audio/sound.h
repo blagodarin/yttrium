@@ -13,11 +13,9 @@ namespace Yttrium
 class Sound;
 
 /// Sound pointer.
-
 typedef Pointer<Sound> SoundPtr;
 
 /// Sound.
-
 class Y_API Sound: public Pointable
 {
 public:
@@ -26,14 +24,9 @@ public:
 
 	/// Return the sound name.
 	/// \return %Sound name.
-
-	String name() const noexcept
-	{
-		return _name;
-	}
+	String name() const noexcept { return _name; }
 
 	/// Play the sound.
-
 	virtual void play() const noexcept = 0;
 
 public:
@@ -42,20 +35,17 @@ public:
 	/// \param name %Sound name.
 	/// \param allocator %Allocator.
 	/// \return %Sound pointer.
-
-	static SoundPtr open(const StaticString &name, Allocator *allocator = nullptr) noexcept;
+	static SoundPtr open(const StaticString& name, Allocator* allocator = nullptr) noexcept;
 
 protected:
+
+	const String _name;
 
 	Sound(const StaticString &name, Allocator *allocator) noexcept
 		: Pointable(allocator)
 		, _name(name, allocator)
 	{
 	}
-
-protected:
-
-	const String _name;
 };
 
 } // namespace Yttrium

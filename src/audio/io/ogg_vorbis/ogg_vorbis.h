@@ -8,25 +8,16 @@
 namespace Yttrium
 {
 
-class OggVorbisReader
-	: public AudioReader::Private
+class OggVorbisReader: public AudioReaderImpl
 {
 public:
 
-	OggVorbisReader(Allocator *allocator)
-		: AudioReader::Private(allocator)
-	{
-	}
-
+	OggVorbisReader(Allocator* allocator);
 	~OggVorbisReader() override;
 
-public: // AudioReader::Private
-
 	bool open() override;
-
-	size_t read(void *buffer, size_t bytes_to_read) override;
-
-	void seek(UOffset offset) override;
+	size_t read(void* buffer, size_t bytes_to_read) noexcept override;
+	bool seek(UOffset offset) noexcept override;
 
 private:
 

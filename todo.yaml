@@ -10,6 +10,7 @@ Yttrium:
 
     GUI:
     - Implement line editor widget.
+    - Implement layouts.
 
     Image:
     - Add compressed image format support (e.g. compressed textures).
@@ -19,3 +20,6 @@ Yttrium:
 
     ION:
     - Make string value retrieval more usable.
+
+    Scripts:
+    - Implement parsed script objects, ready for execution.

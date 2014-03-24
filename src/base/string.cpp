@@ -2,32 +2,29 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
-#include <yttrium/utils.h>
 
 #include "ieee_float.h"
 
+#include <algorithm> // max, min
 #include <cstdio>  // sprintf
 #include <cstring> // memcpy, memmove, strlen
 
 namespace Yttrium
 {
 
-enum
-{
-	StringReserve   =  16, ///< Minimal memory block size allocated by the String.
-	StringGrowBound = 256, ///< The boundary until String size will double.
-	StringGrowStep  = 256, ///< Linear String grow step after the boundary.
-};
+const size_t StringReserve   =  16; ///< Minimal memory block size allocated by the String.
+const size_t StringGrowBound = 256; ///< The boundary until String size will double.
+const size_t StringGrowStep  = 256; ///< Linear String grow step after the boundary.
 
-String::String(const String &string)
+String::String(const String& string)
 	: StaticString(string._size)
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(string._allocator)
 {
 	init(string._text, _size);
 }
 
-String::String(String &&string)
+String::String(String&& string)
 	: StaticString(string._text, string._size)
 	, _buffer_size(string._buffer_size)
 	, _allocator(string._allocator)
@@ -35,40 +32,40 @@ String::String(String &&string)
 	string._buffer_size = 0;
 }
 
-String::String(const StaticString &string, Allocator *allocator)
+String::String(const StaticString& string, Allocator* allocator)
 	: StaticString(string.size())
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init(string.text(), _size);
 }
 
-String::String(const char *text, size_t size, Allocator *allocator)
+String::String(const char* text, size_t size, Allocator* allocator)
 	: StaticString(size)
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init(text, size);
 }
 
-String::String(const char *text, Allocator *allocator)
+String::String(const char* text, Allocator* allocator)
 	: StaticString(::strlen(text))
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init(text, _size);
 }
 
-String::String(size_t size, Allocator *allocator)
-	: _buffer_size(max<size_t>(size, StringReserve))
+String::String(size_t size, Allocator* allocator)
+	: _buffer_size(std::max(size, StringReserve))
 	, _allocator(allocator)
 {
 	init(&StringNull, 0);
 }
 
-String::String(const StaticString &left, const StaticString &right, Allocator *allocator)
+String::String(const StaticString& left, const StaticString& right, Allocator* allocator)
 	: StaticString(left.size() + right.size())
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init();
@@ -77,9 +74,9 @@ String::String(const StaticString &left, const StaticString &right, Allocator *a
 	_text[_size] = '\0';
 }
 
-String::String(const StaticString &left, char right, Allocator *allocator)
+String::String(const StaticString& left, char right, Allocator* allocator)
 	: StaticString(left.size() + 1)
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init();
@@ -88,9 +85,9 @@ String::String(const StaticString &left, char right, Allocator *allocator)
 	_text[_size] = '\0';
 }
 
-String::String(char left, const StaticString &right, Allocator *allocator)
+String::String(char left, const StaticString& right, Allocator* allocator)
 	: StaticString(1 + right.size())
-	, _buffer_size(max<size_t>(_size + 1, StringReserve))
+	, _buffer_size(std::max(_size + 1, StringReserve))
 	, _allocator(allocator)
 {
 	init();
@@ -103,15 +100,13 @@ String::~String()
 {
 	if (_buffer_size)
 	{
-		size_t *references = reinterpret_cast<size_t *>(_text) - 1;
+		size_t* references = reinterpret_cast<size_t*>(_text) - 1;
 		if (!--*references)
-		{
 			_allocator->deallocate(references);
-		}
 	}
 }
 
-String &String::append(const char *text, size_t size)
+String& String::append(const char* text, size_t size)
 {
 	size_t new_size = _size + size;
 	if (_buffer_size)
@@ -120,7 +115,7 @@ String &String::append(const char *text, size_t size)
 	}
 	else
 	{
-		char *old_text = init(new_size + 1);
+		const char* old_text = init(new_size + 1);
 		::memcpy(_text, old_text, _size);
 	}
 	::memcpy(&_text[_size], text, size);
@@ -129,21 +124,21 @@ String &String::append(const char *text, size_t size)
 	return *this;
 }
 
-String &String::append(const char *text)
+String& String::append(const char* text)
 {
 	return append(text, ::strlen(text));
 }
 
-String &String::append(char symbol, size_t count)
+String& String::append(char symbol, size_t count)
 {
-	size_t new_size = _size + count;
+	const size_t new_size = _size + count;
 	if (_buffer_size)
 	{
 		grow(new_size + 1);
 	}
 	else
 	{
-		char *old_text = init(new_size + 1);
+		const char* old_text = init(new_size + 1);
 		::memcpy(_text, old_text, _size);
 	}
 	memset(&_text[_size], symbol, count);
@@ -152,12 +147,11 @@ String &String::append(char symbol, size_t count)
 	return *this;
 }
 
-String &String::append_dec(int64_t value, int width, bool zeros)
+String& String::append_dec(int64_t value, int width, bool zeros)
 {
-	char buffer[20];
+	std::array<char, 20> buffer;
 
 	uint64_t uvalue;
-
 	if (value >= 0)
 	{
 		uvalue = value;
@@ -168,8 +162,7 @@ String &String::append_dec(int64_t value, int width, bool zeros)
 		--width;
 	}
 
-	int i = countof(buffer);
-
+	size_t i = buffer.size();
 	do
 	{
 		buffer[--i] = uvalue % 10 + '0';
@@ -180,36 +173,27 @@ String &String::append_dec(int64_t value, int width, bool zeros)
 	if (zeros)
 	{
 		if (value < 0)
-		{
 			append('-');
-		}
 		if (width > 0)
-		{
 			append('0', width);
-		}
 	}
 	else
 	{
 		if (width > 0)
-		{
 			append(' ', width);
-		}
 		if (value < 0)
-		{
 			append('-');
-		}
 	}
 
-	append(&buffer[i], countof(buffer) - i);
+	append(&buffer[i], buffer.size() - i);
 	return *this;
 }
 
-String &String::append_dec(uint64_t value, int width, bool zeros)
+String& String::append_dec(uint64_t value, int width, bool zeros)
 {
-	char buffer[20];
+	std::array<char, 20> buffer;
 
-	int i = countof(buffer);
-
+	size_t i = buffer.size();
 	do
 	{
 		buffer[--i] = value % 10 + '0';
@@ -222,22 +206,22 @@ String &String::append_dec(uint64_t value, int width, bool zeros)
 		append(zeros ? '0' : ' ', width);
 	}
 
-	append(&buffer[i], countof(buffer) - i);
+	append(&buffer[i], buffer.size() - i);
 	return *this;
 }
 
 namespace
 {
 
-const StaticString negative_infinity = S("-INF");
-const StaticString positive_infinity = S("INF");
-const StaticString negative_nan = S("-NAN");
-const StaticString positive_nan = S("NAN");
-const StaticString negative_zero = S("-0");
-const StaticString positive_zero = S("0");
+const S negative_infinity("-INF");
+const S positive_infinity("INF");
+const S negative_nan("-NAN");
+const S positive_nan("NAN");
+const S negative_zero("-0");
+const S positive_zero("0");
 
 template <typename T>
-StaticString float_to_string(char *buffer, T value, int max_fraction_digits = -1)
+StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1)
 {
 	// NOTE: This should provide exact float-to-string-to-float conversions.
 	// NOTE: This won't work for non-IEEE floats and may not work on big endian architectures.
@@ -386,38 +370,31 @@ StaticString float_to_string(char *buffer, T value, int max_fraction_digits = -1
 
 } // namespace
 
-String &String::append_dec(float value)
+String& String::append_dec(float value)
 {
 	char buffer[32];
-
 #if 0 // TODO: Utilize the advanced float to string conversion when it's ready.
-
 	return append(float_to_string(buffer, value));
-
 #else
-
-	int size;
-
+	int size = 0;
 	::sprintf(buffer, "%f%n", static_cast<double>(value), &size);
 	return append(buffer, size);
-
 #endif
 }
 
-String &String::append_dec(double value)
+String& String::append_dec(double value)
 {
 	char buffer[32];
-	int  size;
-
+	int size = 0;
 	::sprintf(buffer, "%lf%n", value, &size);
 	return append(buffer, size);
 }
 
-String &String::clear()
+String& String::clear()
 {
 	if (_buffer_size)
 	{
-		size_t *references = reinterpret_cast<size_t *>(_text) - 1;
+		size_t* references = reinterpret_cast<size_t*>(_text) - 1;
 		if (*references == 1)
 		{
 			_text[0] = '\0';
@@ -427,39 +404,31 @@ String &String::clear()
 		--*references;
 		_buffer_size = 0;
 	}
-	_text = const_cast<char *>(&StringNull);
+	_text = const_cast<char*>(&StringNull);
 	_size = 0;
 	return *this;
 }
 
-void String::insert(const StaticString &text, size_t index)
+void String::insert(const StaticString& text, size_t index)
 {
 	if (index > _size)
-	{
 		return;
-	}
 
-	size_t buffer_size = _size + text.size() + 1;
+	const size_t buffer_size = _size + text.size() + 1;
 
-	if (_buffer_size)
+	if (_buffer_size > 0)
 	{
 		grow(buffer_size);
 		if (index < _size)
-		{
 			::memmove(_text + index + text.size(), _text + index, _size - index);
-		}
 	}
 	else
 	{
-		char *old_text = init(buffer_size);
-		if (index)
-		{
+		const char* old_text = init(buffer_size);
+		if (index > 0)
 			::memcpy(_text, old_text, index);
-		}
 		if (index < _size)
-		{
 			::memcpy(_text + index + text.size(), old_text + index, _size - index);
-		}
 	}
 
 	::memcpy(_text + index, text.text(), text.size());
@@ -470,32 +439,25 @@ void String::insert(const StaticString &text, size_t index)
 void String::insert(char symbol, size_t index)
 {
 	if (index > _size)
-	{
 		return;
-	}
 
-	size_t buffer_size = _size + 2;
+	const size_t buffer_size = _size + 2;
 
-	if (_buffer_size)
+	if (_buffer_size > 0)
 	{
 		grow(buffer_size);
 		if (index < _size)
-		{
 			::memmove(_text + index + 1, _text + index, _size - index);
-		}
 	}
 	else
 	{
-		char *old_text = init(buffer_size);
+		const char* old_text = init(buffer_size);
 		if (index)
-		{
 			::memcpy(_text, old_text, index);
-		}
 		if (index < _size)
-		{
 			::memcpy(_text + index + 1, old_text + index, _size - index);
-		}
 	}
+
 	_text[index] = symbol;
 	++_size;
 	_text[_size] = '\0';
@@ -504,18 +466,15 @@ void String::insert(char symbol, size_t index)
 void String::remove(size_t index, size_t size)
 {
 	if (!size || index >= _size)
-	{
 		return;
-	}
 
-	size = min(size, _size - index);
+	size = std::min(size, _size - index);
 
-	size_t *references = nullptr;
+	size_t* references = nullptr;
 
 	if (_buffer_size)
 	{
-		references = reinterpret_cast<size_t *>(_text) - 1;
-
+		references = reinterpret_cast<size_t*>(_text) - 1;
 		if (*references == 1)
 		{
 			_size -= size;
@@ -525,33 +484,29 @@ void String::remove(size_t index, size_t size)
 		}
 	}
 
-	char *old_text = init(size + 1);
+	const char* old_text = init(size + 1);
 
 	if (index)
-	{
 		::memcpy(_text, old_text, index);
-	}
 
 	_size -= size;
 	::memcpy(_text + index, old_text + index + size, _size - index);
 	_text[_size] = '\0';
 
 	if (references)
-	{
 		--*references;
-	}
 }
 
 void String::reserve(size_t size)
 {
 	size_t buffer_size = size + 1;
-	if (_buffer_size)
+	if (_buffer_size > 0)
 	{
 		grow(buffer_size);
 	}
 	else
 	{
-		char *old_text = init(max(_size + 1, buffer_size));
+		const char* old_text = init(std::max(_size + 1, buffer_size));
 		::memcpy(_text, old_text, _size + 1);
 		_text[_size] = '\0';
 	}
@@ -559,15 +514,14 @@ void String::reserve(size_t size)
 
 void String::resize(size_t size)
 {
-	size_t buffer_size = size + 1;
-
-	if (_buffer_size)
+	const size_t buffer_size = size + 1;
+	if (_buffer_size > 0)
 	{
 		grow(buffer_size);
 	}
 	else
 	{
-		char *old_text = init(max(_size + 1, buffer_size));
+		const char* old_text = init(std::max(_size + 1, buffer_size));
 		::memcpy(_text, old_text, _size + 1);
 	}
 
@@ -578,15 +532,13 @@ void String::resize(size_t size)
 void String::truncate(size_t size)
 {
 	if (size >= _size)
-	{
 		return;
-	}
 
-	size_t *references = nullptr;
+	size_t* references = nullptr;
 
-	if (_buffer_size)
+	if (_buffer_size > 0)
 	{
-		references = reinterpret_cast<size_t *>(_text) - 1;
+		references = reinterpret_cast<size_t*>(_text) - 1;
 		if (*references == 1)
 		{
 			_text[size] = '\0';
@@ -595,29 +547,22 @@ void String::truncate(size_t size)
 		}
 	}
 
-	char *old_text = init(size + 1);
+	const char* old_text = init(size + 1);
 	::memcpy(_text, old_text, size);
 	_text[size] = '\0';
 	_size = size;
 
 	if (references)
-	{
 		--*references;
-	}
 }
 
-String &String::set(const char *text, size_t size)
+String& String::set(const char* text, size_t size)
 {
-	size_t buffer_size = size + 1;
-
-	if (_buffer_size)
-	{
+	const size_t buffer_size = size + 1;
+	if (_buffer_size > 0)
 		grow(buffer_size);
-	}
 	else
-	{
 		init(buffer_size);
-	}
 
 	::memcpy(_text, text, size);
 	_text[size] = '\0';
@@ -626,21 +571,17 @@ String &String::set(const char *text, size_t size)
 	return *this;
 }
 
-String &String::set(const char *text)
+String& String::set(const char* text)
 {
 	return set(text, ::strlen(text));
 }
 
-String &String::set(char symbol)
+String& String::set(char symbol)
 {
-	if (_buffer_size)
-	{
+	if (_buffer_size > 0)
 		grow(2);
-	}
 	else
-	{
 		init(2);
-	}
 
 	_text[0] = symbol;
 	_text[1] = '\0';
@@ -649,12 +590,12 @@ String &String::set(char symbol)
 	return *this;
 }
 
-String &String::swap(String *string)
+String& String::swap(String* string)
 {
-	char *text = _text;
-	size_t size = _size;
-	size_t buffer_size = _buffer_size;
-	Allocator *allocator = _allocator;
+	auto text = _text;
+	auto size = _size;
+	auto buffer_size = _buffer_size;
+	auto allocator = _allocator;
 
 	_text = string->_text;
 	_size = string->_size;
@@ -669,12 +610,12 @@ String &String::swap(String *string)
 	return *this;
 }
 
-String &String::swap(String &&string)
+String& String::swap(String &&string)
 {
-	char *text = _text;
-	size_t size = _size;
-	size_t buffer_size = _buffer_size;
-	Allocator *allocator = _allocator;
+	auto text = _text;
+	auto size = _size;
+	auto buffer_size = _buffer_size;
+	auto allocator = _allocator;
 
 	_text = string._text;
 	_size = string._size;
@@ -689,25 +630,21 @@ String &String::swap(String &&string)
 	return *this;
 }
 
-String &String::trim()
+String& String::trim()
 {
-	StaticString trimmed_string = this->trimmed();
-
-	size_t buffer_size = trimmed_string.size() + 1;
-
-	if (_buffer_size)
+	const StaticString& trimmed_string = this->trimmed();
+	if (trimmed_string.size() < _size)
 	{
-		grow(buffer_size);
-	}
-	else
-	{
-		init(buffer_size);
-	}
+		const size_t buffer_size = trimmed_string.size() + 1;
+		if (_buffer_size)
+			grow(buffer_size);
+		else
+			init(buffer_size);
 
-	::memmove(_text, trimmed_string.text(), trimmed_string.size());
-	_text[trimmed_string.size()] = '\0';
-	_size = trimmed_string.size();
-
+		::memmove(_text, trimmed_string.text(), trimmed_string.size());
+		_text[trimmed_string.size()] = '\0';
+		_size = trimmed_string.size();
+	}
 	return *this;
 }
 
@@ -715,10 +652,10 @@ void String::grow(size_t buffer_size)
 {
 	Y_ASSERT(_buffer_size);
 
-	size_t *references = reinterpret_cast<size_t *>(_text) - 1;
+	size_t* references = reinterpret_cast<size_t*>(_text) - 1;
 	if (*references != 1)
 	{
-		const char *old_text = _text;
+		const char* old_text = _text;
 		init(buffer_size);
 		::memcpy(_text, old_text, _size);
 		_text[_size] = '\0';
@@ -726,17 +663,17 @@ void String::grow(size_t buffer_size)
 	}
 	else if (_buffer_size < buffer_size)
 	{
-		size_t adjusted_size = max(buffer_size,
+		size_t adjusted_size = std::max(buffer_size,
 			(_buffer_size < StringGrowBound
 				? _buffer_size * 2
 				: _buffer_size + StringGrowStep));
 
-		size_t *pointer = static_cast<size_t *>(
+		size_t* pointer = static_cast<size_t*>(
 			_allocator->reallocate(
-				reinterpret_cast<size_t *>(_text) - 1,
+				reinterpret_cast<size_t*>(_text) - 1,
 				sizeof(size_t) + adjusted_size));
 
-		_text = reinterpret_cast<char *>(pointer + 1);
+		_text = reinterpret_cast<char*>(pointer + 1);
 		_buffer_size = adjusted_size;
 	}
 }
@@ -746,32 +683,30 @@ void String::init()
 	Y_ASSERT(_buffer_size);
 	Y_ASSERT(_allocator);
 
-	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + _buffer_size));
+	size_t* pointer = static_cast<size_t*>(_allocator->allocate(sizeof(size_t) + _buffer_size));
 	*pointer = 1;
-	_text = reinterpret_cast<char *>(pointer + 1);
+	_text = reinterpret_cast<char*>(pointer + 1);
 }
 
-void String::init(const char *string, size_t size)
+void String::init(const char* string, size_t size)
 {
 	init();
 	::memcpy(_text, string, size);
 	_text[size] = '\0';
 }
 
-char *String::init(size_t buffer_size)
+const char* String::init(size_t buffer_size)
 {
 	Y_ASSERT(!_buffer_size);
 
-	if (Y_UNLIKELY(!_allocator)) // Rely on this at your own risk.
-	{
+	if (!_allocator) // Rely on this at your own risk.
 		return _text;
-	}
 
-	size_t adjusted_size = max<size_t>(buffer_size, StringReserve);
-	size_t *pointer = static_cast<size_t *>(_allocator->allocate(sizeof(size_t) + adjusted_size));
+	const size_t adjusted_size = std::max(buffer_size, StringReserve);
+	size_t* pointer = static_cast<size_t*>(_allocator->allocate(sizeof(size_t) + adjusted_size));
 	*pointer = 1;
-	char *old_text = _text;
-	_text = reinterpret_cast<char *>(pointer + 1);
+	const char* old_text = _text;
+	_text = reinterpret_cast<char*>(pointer + 1);
 	_buffer_size = adjusted_size;
 	return old_text;
 }

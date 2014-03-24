@@ -6,11 +6,8 @@
 
 #include <yttrium/global.h>
 
-#define __STDC_LIMIT_MACROS    // *_MIN, *_MAX
-#define __STDC_CONSTANT_MACROS // INT*_C, UINT*_C
-
-#include <cstddef>  // ptrdiff_t, size_t
-#include <stdint.h> // int*_t, uint*_t, int_fast*_t, uint_fast*_t
+#include <cstddef> // ptrdiff_t, size_t
+#include <cstdint> // int*_t, uint*_t, int_fast*_t, uint_fast*_t
 
 namespace Yttrium
 {
@@ -20,14 +17,13 @@ class Allocator;
 template <typename T>
 class Margins;
 
-template <typename T>
 class Rect;
 
 template <typename T>
-class Vector2;
+class Rect_;
 
 template <typename T>
-class Vector3;
+class Vector2;
 
 template <typename T>
 class Vector4;
@@ -35,10 +31,6 @@ class Vector4;
 /// Unsigned integer type of \c char size.
 
 typedef unsigned char UChar;
-
-/// Signed integer type of \c char size.
-
-typedef signed char SChar;
 
 /// Signed file offset type.
 
@@ -96,22 +88,14 @@ enum class ExecutionMode
 	Undo, ///<
 };
 
-// TODO: Find a better name for Area.
-
 typedef Margins<Integer> MarginsI;  ///< Integer Margins.
 typedef Margins<float>   MarginsF;  ///< \c float Margins.
 
-typedef Rect<Integer>    RectI;     ///< Integer Rect.
-typedef Rect<float>      RectF;     ///< \c float Rect.
-typedef Rect<int>        Area;      ///< \c int Rect.
+typedef Rect_<float>     RectF;     ///< \c float Rect.
 
-typedef Vector2<int8_t>  Vector2i8; ///< \c int8_t Vector2.
-typedef Vector2<uint8_t> Vector2u8; ///< \c uint8_t Vector2.
 typedef Vector2<float>   Vector2f;  ///< \c float Vector2.
 typedef Vector2<double>  Vector2d;  ///< \c double Vector2.
 typedef Vector2<int>     Dim2;      ///< \c int Vector2.
-
-typedef Vector3<float>   Vector3f;  ///< \c float Vector3.
 
 typedef Vector4<float>   Vector4f;  ///< \c float Vector4.
 

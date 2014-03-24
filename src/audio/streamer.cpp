@@ -12,105 +12,87 @@ enum
 
 void AudioStreamer::close()
 {
-	_source.close();
+	_source.reset();
 }
 
 AudioStreamer::FetchResult AudioStreamer::fetch()
 {
-	size_t size = read();
-
+	const size_t size = read();
 	if (!size)
-	{
 		return NoMoreData;
-	}
-
 	_backend->refill_buffer(_buffer.data(), size);
-
-	return (size < _buffer.size())
-		? NotEnoughData
-		: Ok;
+	return size < _buffer.size() ? NotEnoughData : Ok;
 }
 
-bool AudioStreamer::open(const StaticString &name, const AudioPlayer::Settings &settings, AudioType type, AudioPlayer::Order order)
+bool AudioStreamer::open(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type, AudioPlayer::Order order)
 {
-	if (_source.open(name, type, _allocator))
+	_source = AudioReader::open(name, type, _allocator);
+	if (_source.is_null())
+		return false;
+
+	const AudioFormat& format = _source->format();
+
+	_buffer_units = format.frequency * BufferSize / 1000;
+
+	// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
+	// I have no idea whether this is a real bug.
+
+	const UOffset source_units = _source->size() / format.unit_size();
+
+	if (source_units >= _buffer_units * AudioPlayerBackend::NumBuffers)
 	{
-		AudioFormat format = _source.format();
+		// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
 
-		_buffer_length = format.frequency * BufferSize / 1000;
+		_begin_sample = static_cast<UOffset>(settings.begin * format.frequency);
+		_end_sample = static_cast<UOffset>(settings.end * format.frequency);
 
-		// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
-		// I have no idea whether this is a real bug.
+		if (_end_sample == 0 || _end_sample > source_units)
+			_end_sample = source_units;
 
-		UOffset source_size = _source.size();
-
-		if (source_size >= _buffer_length * AudioPlayerBackend::NumBuffers)
+		if (_begin_sample < _end_sample && _end_sample - _begin_sample >= _buffer_units)
 		{
-			// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
-
-			_begin_sample = static_cast<UOffset>(settings.begin * format.frequency);
-			_end_sample   = static_cast<UOffset>(settings.end   * format.frequency);
-
-			if (!_end_sample || _end_sample > source_size)
+			if (order == AudioPlayer::Random)
 			{
-				_end_sample = source_size;
+				_loop_sample = static_cast<UOffset>(settings.loop * format.frequency);
+				_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_units);
+			}
+			else
+			{
+				_is_looping = false;
 			}
 
-			if (_begin_sample < _end_sample && _end_sample - _begin_sample >= _buffer_length)
+			if (_backend->set_format(format))
 			{
-				if (order == AudioPlayer::Random)
-				{
-					_loop_sample = static_cast<UOffset>(settings.loop * format.frequency);
-					_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_length);
-				}
-				else
-				{
-					_is_looping = false;
-				}
-
-				if (_backend->set_format(format))
-				{
-					_atom = format.atom_size();
-					_buffer.resize(_buffer_length * _atom);
-					_source.seek(_begin_sample);
-					return true;
-				}
+				_unit_size = format.unit_size();
+				_buffer.resize(_buffer_units * _unit_size);
+				_source->seek(_begin_sample);
+				return true;
 			}
 		}
-
-		_source.close();
 	}
 
+	_source.reset();
 	return false;
 }
 
 void AudioStreamer::prefetch()
 {
 	for (size_t i = 0; i < AudioPlayerBackend::NumBuffers; ++i)
-	{
 		_backend->fill_buffer(i, _buffer.data(), read());
-	}
 }
 
 size_t AudioStreamer::read()
 {
-	size_t size;
+	if (_end_sample - _source->offset() >= _buffer_units)
+		return _source->read(_buffer.data(), _buffer.size());
 
-	if (_end_sample - _source.offset() >= _buffer_length)
+	const size_t tail = (_end_sample - _source->offset()) * _unit_size;
+	size_t size = _source->read(_buffer.data(), tail);
+	if (_is_looping)
 	{
-		size = _source.read(_buffer.data(), _buffer.size());
+		_source->seek(_loop_sample);
+		size += _source->read(_buffer.data(size), _buffer.size() - tail);
 	}
-	else
-	{
-		size_t tail = (_end_sample - _source.offset()) * _atom;
-		size = _source.read(_buffer.data(), tail);
-		if (_is_looping)
-		{
-			_source.seek(_loop_sample);
-			size += _source.read(_buffer.data(size), _buffer.size() - tail);
-		}
-	}
-
 	return size;
 }
 

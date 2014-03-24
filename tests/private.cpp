@@ -2,64 +2,40 @@
 
 #include "common.h"
 
-class Public
+struct Public
 {
-public:
-
-	class Private
-		: public Yttrium::PrivateBase<Private>
+	struct Private: public Yttrium::PrivateBase<Private>
 	{
-	public:
-
-		Private(Yttrium::Allocator *allocator)
-			: PrivateBase(allocator)
-		{
-		}
+		Private(Yttrium::Allocator* allocator): PrivateBase(allocator) {}
 	};
 
-public:
+	Private* _private;
 
-	Public()
-		: _private(nullptr)
-	{
-	}
+	Public(): _private(nullptr) {}
 
-	Public(const Public &public_)
-		: _private(Private::copy(public_._private))
-	{
-	}
+	Public(const Public& public_): _private(Private::copy(public_._private)) {}
 
 	~Public()
 	{
 		close();
 	}
 
-public:
-
 	void close()
 	{
 		Private::release(&_private);
 	}
 
-	void open(Yttrium::Allocator *allocator = Yttrium::DefaultAllocator)
+	void open()
 	{
 		if (!_private)
-		{
-			_private = Y_NEW(allocator, Private)(allocator);
-		}
+			_private = Y_NEW(Yttrium::DefaultAllocator, Private)(Yttrium::DefaultAllocator);
 	}
 
-public:
-
-	Public &operator =(const Public &public_)
+	Public& operator =(const Public& public_)
 	{
 		Private::assign(&_private, public_._private);
 		return *this;
 	}
-
-public:
-
-	Private *_private;
 };
 
 BOOST_AUTO_TEST_CASE(private_test)

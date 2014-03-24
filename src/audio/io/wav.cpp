@@ -2,90 +2,81 @@
 
 #include "wav_private.h"
 
+#include <algorithm> // min
+
 namespace Yttrium
 {
+
+WavReader::WavReader(Allocator* allocator)
+	: AudioReaderImpl(allocator)
+	, _data_offset(0)
+{
+}
 
 bool WavReader::open()
 {
 	WavFileHeader  file_header;
 	WavChunkHeader chunk_header;
 	WavFormatChunk format_chunk;
-	AudioFormat    format;
 
 	if (!_file.read(&file_header)
 		|| file_header.riff_fourcc != WavFileHeader::RIFF
 		|| file_header.wave_fourcc != WavFileHeader::WAVE)
-	{
 		return false;
-	}
 
 	if (!find_chunk(WavChunkHeader::fmt, &chunk_header))
-	{
 		return false;
-	}
 
 	if (!_file.read(&format_chunk)
 		|| format_chunk.format != WAVE_FORMAT_PCM)
-	{
 		return false;
-	}
 
-	if (chunk_header.size > sizeof(format_chunk)
-		&& !_file.skip(chunk_header.size - sizeof(format_chunk)))
-	{
+	if (chunk_header.size > sizeof format_chunk
+		&& !_file.skip(chunk_header.size - sizeof format_chunk))
 		return false;
-	}
 
 	if (!find_chunk(WavChunkHeader::data, &chunk_header))
-	{
 		return false;
-	}
 
-	_format.depth     = format_chunk.bits_per_sample / 8;
-	_format.channels  = format_chunk.channels;
+	_format.bytes_per_sample = format_chunk.bits_per_sample / 8;
+	_format.channels = format_chunk.channels;
 	_format.frequency = format_chunk.samples_per_second;
-
-	UOffset size = _file.size() - _file.offset();
-	if (size > chunk_header.size)
-	{
-		size = chunk_header.size;
-	}
-
-	_size = size;
-	_atom_size = _format.atom_size();
+	_total_units = std::min<UOffset>(_file.size() - _file.offset(), chunk_header.size) / _format.unit_size();
 
 	_data_offset = _file.offset();
 
 	return true;
 }
 
-size_t WavReader::read(void *buffer, size_t bytes_to_read)
+size_t WavReader::read(void* buffer, size_t bytes_to_read)
 {
-	return _file.read(buffer, bytes_to_read);
+	const size_t unit_size = _format.unit_size();
+	bytes_to_read = std::min<UOffset>(bytes_to_read / unit_size, _total_units - _offset_units) * unit_size;
+	const size_t bytes_read = _file.read(buffer, bytes_to_read);
+	_offset_units += bytes_read / unit_size;
+	return bytes_read;
 }
 
-void WavReader::seek(UOffset offset)
+bool WavReader::seek(UOffset offset_units)
 {
-	_file.seek(_data_offset + offset * _atom_size);
+	if (offset_units > _total_units)
+		return false;
+	if (!_file.seek(_data_offset + offset_units * _format.unit_size()))
+		return false;
+	_offset_units = offset_units;
+	return true;
 }
 
-bool WavReader::find_chunk(uint32_t fourcc, WavChunkHeader *header)
+bool WavReader::find_chunk(uint32_t fourcc, WavChunkHeader* header)
 {
 	for (; ; )
 	{
 		if (!_file.read(header))
-		{
 			return false;
-		}
-
-		if (header->name_fourcc == fourcc)
-		{
+		else if (header->name_fourcc == fourcc)
 			break;
-		}
 		else if (!_file.skip(header->size))
-		{
 			return false;
-		}
 	}
 	return true;
 }

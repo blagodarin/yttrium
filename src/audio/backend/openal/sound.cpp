@@ -26,34 +26,27 @@ OpenAlSound::~OpenAlSound()
 	::alDeleteBuffers(1, &_buffer);
 }
 
-bool OpenAlSound::load(AudioReader *reader)
+bool OpenAlSound::load(AudioReader* reader)
 {
-	Y_ASSERT(reader->is_opened());
-
-	const AudioFormat &format = reader->format();
-
-	if (Y_UNLIKELY(format.channels != 1 || !_format.set(format)))
-	{
+	const AudioFormat& format = reader->format();
+	if (format.channels != 1 || !_format.set(format))
 		return false;
-	}
 	
 	::alGenBuffers(1, &_buffer);
-	if (Y_UNLIKELY(::alGetError() != AL_NO_ERROR))
-	{
+	if (::alGetError() != AL_NO_ERROR)
 		return false;
-	}
 
 	::alGenSources(1, &_source);
-	if (Y_LIKELY(::alGetError() == AL_NO_ERROR))
+	if (::alGetError() == AL_NO_ERROR)
 	{
 		::alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
 
 		Buffer buffer(reader->size(), allocator()); // NOTE: This might be troublesome with 4+ GB files.
 
-		if (Y_LIKELY(reader->read(buffer.data(), buffer.size()) == buffer.size()))
+		if (reader->read(buffer.data(), buffer.size()) == buffer.size())
 		{
 			::alBufferData(_buffer, _format._format, buffer.data(), buffer.size(), _format._frequency);
-			if (Y_LIKELY(::alGetError() == AL_NO_ERROR))
+			if (::alGetError() == AL_NO_ERROR)
 			{
 				::alSourcei(_source, AL_BUFFER, _buffer); // This must be done after alBufferData.
 				return true;

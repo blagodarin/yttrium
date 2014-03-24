@@ -3,7 +3,8 @@
 #include <yttrium/buffer.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
-#include <yttrium/utils.h>
+
+#include <algorithm> // min
 
 namespace Yttrium
 {
@@ -35,21 +36,19 @@ StaticString File::name() const
 	return _private->name;
 }
 
-bool File::open(const StaticString &name, Allocator *allocator)
+bool File::open(const StaticString& name, Allocator* allocator)
 {
 	PackageManager *package_manager = PackageManager::instance();
 
 	if (!package_manager)
-	{
 		return open(name, File::Read, allocator);
-	}
 
 	*this = package_manager->open_file(name);
 
 	return _private && (_private->mode & Read);
 }
 
-bool File::read_all(Buffer *buffer)
+bool File::read_all(Buffer* buffer)
 {
 	if (_private && (_private->mode & Read))
 	{
@@ -57,7 +56,7 @@ bool File::read_all(Buffer *buffer)
 		// This way we shall have the same behavior for both files larger
 		// than the free space and files larger than all the allocatable space.
 
-		buffer->resize(min<UOffset>(size(), SIZE_MAX));
+		buffer->resize(std::min<UOffset>(size(), SIZE_MAX));
 		if (read(buffer->data(), buffer->size()))
 		{
 			return true;
@@ -67,7 +66,7 @@ bool File::read_all(Buffer *buffer)
 	return false;
 }
 
-bool File::read_all(String *string)
+bool File::read_all(String* string)
 {
 	if (_private && (_private->mode & Read))
 	{
@@ -75,27 +74,21 @@ bool File::read_all(String *string)
 		// This way we shall have the same behavior for both files larger
 		// than the free space and files larger than all the allocatable space.
 
-		string->resize(min<UOffset>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
+		string->resize(std::min<UOffset>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
 		if (read(string->text(), string->size()))
-		{
 			return true;
-		}
 	}
 
 	return false;
 }
 
-bool File::read_line(String *string)
+bool File::read_line(String* string)
 {
 	if (!_private || !(_private->mode & Read))
-	{
 		return false;
-	}
 
 	if (_private->mode & Pipe)
-	{
 		return false; // TODO: Make it work for pipes too.
-	}
 
 	static const size_t buffer_step = 32;
 
@@ -149,7 +142,7 @@ bool File::read_line(String *string)
 	return true;
 }
 
-File &File::operator =(const File &file)
+File& File::operator =(const File& file)
 {
 	Private::assign(&_private, file._private);
 
@@ -160,7 +153,7 @@ File &File::operator =(const File &file)
 	return *this;
 }
 
-File::File(Private *private_, UOffset base, UOffset size)
+File::File(Private* private_, UOffset base, UOffset size)
 	: _private(Private::copy(private_))
 	, _offset(0)
 	, _size(size)

@@ -20,26 +20,26 @@ class Y_PRIVATE AudioManager::Private
 {
 public:
 
-	AudioManagerGuard          _instance_guard;
-	Allocator                 *_allocator;
-	StaticString               _backend_name;
-	String                     _device_name;
-	AudioPlayer::Private       _player_private;
-	std::map<String, Sound *>  _sounds;
+	AudioManagerGuard        _instance_guard;
+	Allocator*               _allocator;
+	StaticString             _backend_name;
+	String                   _device_name;
+	AudioPlayer::Private     _player_private;
+	std::map<String, Sound*> _sounds;
 
 public:
 
-	Private(Allocator *allocator);
+	Private(Allocator* allocator);
 
 	virtual ~Private();
 
 public:
 
-	virtual SoundImpl *create_sound(const StaticString &name, Allocator *allocator) = 0;
+	virtual SoundImpl* create_sound(const StaticString& name, Allocator* allocator) = 0;
 
 public:
 
-	static Private *instance();
+	static Private* instance();
 };
 
 } // namespace Yttrium

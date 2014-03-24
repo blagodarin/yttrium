@@ -8,16 +8,15 @@ namespace Yttrium
 
 class AudioReader;
 
-class SoundImpl
-	: public Sound
+class SoundImpl: public Sound
 {
 public:
 
-	virtual bool load(AudioReader *reader) = 0;
+	virtual bool load(AudioReader* reader) = 0;
 
 protected:
 
-	SoundImpl(const StaticString &name, Allocator *allocator): Sound(name, allocator) {}
+	SoundImpl(const StaticString& name, Allocator* allocator): Sound(name, allocator) {}
 };
 
 } // namespace Yttrium

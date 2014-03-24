@@ -109,44 +109,38 @@ bool Button::load(GuiPropertyLoader& loader)
 	loader.load_color("text_color", &style->text_color);
 	style->texture.update(loader);
 
-	_area = _position;
+	_rect = RectF(_position);
 
 	return true;
 }
 
 void Button::play() const
 {
-	if (Y_LIKELY(!_sound.is_null()))
-	{
+	if (!_sound.is_null())
 		_sound->play();
-	}
 }
 
-void Button::render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState state) const
+void Button::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const
 {
 	if (_state != WidgetState::None)
-	{
 		state = _state;
-	}
 
-	renderer->set_color(_styles[WidgetStateType(state)].color);
-	renderer->set_texture(_styles[WidgetStateType(state)].texture.texture);
-	renderer->set_texture_rectangle(_styles[WidgetStateType(state)].texture.rect);
-	renderer->set_texture_borders(_styles[WidgetStateType(state)].texture.borders);
-	renderer->draw_rectangle(area.left(), area.top(), area.width(), area.height());
+	renderer.set_color(_styles[WidgetStateType(state)].color);
+	renderer.set_texture(_styles[WidgetStateType(state)].texture.texture);
+	renderer.set_texture_rectangle(RectF(_styles[WidgetStateType(state)].texture.rect));
+	renderer.set_texture_borders(_styles[WidgetStateType(state)].texture.borders);
+	renderer.draw_rectangle(rect.left(), rect.top(), rect.width(), rect.height());
 
 	if (_text.is_empty())
-	{
 		return;
-	}
 
-	renderer->set_color(_styles[WidgetStateType(state)].text_color);
-	renderer->set_texture(_font_texture);
+	renderer.set_color(_styles[WidgetStateType(state)].text_color);
+	renderer.set_texture(_font_texture);
 
-	if (renderer->set_font(_font))
+	if (renderer.set_font(_font))
 	{
-		renderer->set_font_size(_text_size.x * scale.y, _text_size.y);
-		renderer->draw_text(area.center(), _text, CenterAlignment);
+		renderer.set_font_size(_text_size.x * scale.y, _text_size.y);
+		renderer.draw_text(rect.center(), _text, CenterAlignment);
 	}
 }
 

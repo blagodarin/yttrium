@@ -5,12 +5,13 @@
 
 #include "../memory/allocatable.h"
 
+#include <algorithm> // min
 #include <cstring> // memset
 
 namespace Yttrium
 {
 
-WindowImpl::WindowImpl(const Dim2 &size, Window::Callbacks *callbacks, Allocator *allocator)
+WindowImpl::WindowImpl(const Dim2& size, Window::Callbacks& callbacks, Allocator* allocator)
 	: Window(allocator)
 	, _is_active(false)
 	, _is_cursor_locked(false)
@@ -45,7 +46,7 @@ void WindowImpl::close()
 	_backend->close();
 }
 
-Renderer WindowImpl::create_renderer(Allocator *allocator)
+Renderer WindowImpl::create_renderer(Allocator* allocator)
 {
 	return _backend->create_renderer(allocator ? allocator : this->allocator());
 }
@@ -55,14 +56,14 @@ Dim2 WindowImpl::cursor() const
 	return _cursor;
 }
 
-void WindowImpl::draw_console(RendererBuiltin *renderer)
+void WindowImpl::draw_console(RendererBuiltin& renderer)
 {
 	if (_is_console_visible)
 	{
-		const Dim2 &size = renderer->size();
+		const Dim2 &size = renderer.size();
 
-		renderer->set_color(0, 0, 0, 0.5);
-		renderer->draw_rectangle(0, 0, size.x + 1, 1);
+		renderer.set_color(0, 0, 0, 0.5);
+		renderer.draw_rectangle(0, 0, size.x + 1, 1);
 
 		_console.render_input(renderer, 0, 0, size.x);
 	}
@@ -97,38 +98,33 @@ void WindowImpl::lock_cursor(bool lock)
 bool WindowImpl::process_events()
 {
 	if (!_backend->process_events())
-	{
 		return false;
-	}
 
-	if (_is_active)
+	if (!_is_active)
+		return true;
+
+	Dim2 cursor = _size / 2;
+
+	_backend->get_cursor(&cursor);
+
+	Dim2 movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
+
+	if (!_is_cursor_locked)
 	{
-		Dim2 cursor = _size / 2;
-
-		_backend->get_cursor(&cursor);
-
-		Dim2 movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
-
-		if (!_is_cursor_locked)
-		{
-			_cursor.x = clamp(cursor.x, 0, _size.x - 1);
-			_cursor.y = clamp(cursor.y, 0, _size.y - 1);
-		}
-		else
-		{
-			_backend->set_cursor(_cursor);
-		}
-
-		if (_callbacks)
-		{
-			_callbacks->on_cursor_movement(this, movement);
-		}
+		_cursor.x = std::min(std::max(cursor.x, 0), _size.x - 1);
+		_cursor.y = std::min(std::max(cursor.y, 0), _size.y - 1);
 	}
+	else
+	{
+		_backend->set_cursor(_cursor);
+	}
+
+	_callbacks.on_cursor_movement(*this, movement);
 
 	return true;
 }
 
-void WindowImpl::resize(const Dim2 &size)
+void WindowImpl::resize(const Dim2& size)
 {
 	_size = size;
 	if (_is_active)
@@ -140,7 +136,7 @@ void WindowImpl::set_console_visible(bool visible)
 	_is_console_visible = visible;
 }
 
-bool WindowImpl::set_cursor(const Dim2 &cursor)
+bool WindowImpl::set_cursor(const Dim2& cursor)
 {
 	if (_is_cursor_locked
 		|| cursor.x < 0 || cursor.x >= _size.x
@@ -154,7 +150,7 @@ bool WindowImpl::set_cursor(const Dim2 &cursor)
 	return true;
 }
 
-void WindowImpl::set_name(const StaticString &name)
+void WindowImpl::set_name(const StaticString& name)
 {
 	_backend->set_name(name);
 }
@@ -177,8 +173,8 @@ void WindowImpl::show(Mode mode)
 	{
 		// TODO: Restore display mode here.
 		ScreenMode screen_mode = _screen->mode();
-		_size.x = min(_size.x, screen_mode.width);
-		_size.y = min(_size.y, screen_mode.height);
+		_size.x = std::min(_size.x, screen_mode.width);
+		_size.y = std::min(_size.y, screen_mode.height);
 		corner = Dim2((screen_mode.width - _size.x) / 2, (screen_mode.height - _size.y) / 2);
 	}
 
@@ -188,10 +184,9 @@ void WindowImpl::show(Mode mode)
 	if (!_is_cursor_locked)
 	{
 		Dim2 cursor = _size / 2;
-
 		_backend->get_cursor(&cursor);
-		_cursor.x = clamp(cursor.x, 0, _size.x - 1);
-		_cursor.y = clamp(cursor.y, 0, _size.y - 1);
+		_cursor.x = std::min(std::max(cursor.x, 0), _size.x - 1);
+		_cursor.y = std::min(std::max(cursor.y, 0), _size.y - 1);
 	}
 	else
 	{
@@ -256,8 +251,7 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 		}
 	}
 
-	if (_callbacks)
-		_callbacks->on_key_event(event);
+	_callbacks.on_key_event(event);
 }
 
 void WindowImpl::set_active(bool active)
@@ -267,7 +261,7 @@ void WindowImpl::set_active(bool active)
 		lock_cursor(_is_cursor_locked);
 }
 
-WindowPtr Window::open(const Dim2 &size, Callbacks *callbacks, Allocator *allocator)
+WindowPtr Window::open(const Dim2& size, Callbacks& callbacks, Allocator* allocator)
 {
 	if (size.x > 0 && size.y > 0)
 	{

@@ -60,9 +60,9 @@ public:
 
 	///
 
-	Area rect() const noexcept
+	Rect rect() const noexcept
 	{
-		return Area(0, 0, _size.x, _size.y);
+		return Rect(0, 0, _size.x, _size.y);
 	}
 
 	///

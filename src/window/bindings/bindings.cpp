@@ -10,7 +10,7 @@ namespace Yttrium
 namespace
 {
 
-const char *bind_names[] =
+const char* bind_names[] =
 {
 	// Null key (0x00):
 
@@ -186,55 +186,40 @@ const char *bind_names[] =
 
 } // namespace
 
-Bindings::Bindings(Allocator *allocator)
+Bindings::Bindings(Allocator* allocator)
 	: _allocator(allocator)
 {
 }
 
-void Bindings::bind(Key key, const StaticString &action)
+void Bindings::bind(Key key, const StaticString& action)
 {
 	_actions[KeyType(key)].swap(String(action, _allocator));
 }
 
-bool Bindings::bind(const StaticString &name, const StaticString &action)
+bool Bindings::bind(const StaticString& name, const StaticString& action)
 {
-	Key key = lookup_key(name);
-
+	const Key key = lookup_key(name);
 	if (key == Key::Null)
-	{
 		return false;
-	}
-
 	_actions[KeyType(key)].swap(String(action, _allocator));
 	return true;
 }
 
-void Bindings::bind_default(Key key, const StaticString &action)
+void Bindings::bind_default(Key key, const StaticString& action)
 {
-	String &old_action = _actions[KeyType(key)];
-
+	String& old_action = _actions[KeyType(key)];
 	if (old_action.is_empty())
-	{
 		old_action.swap(String(action, _allocator));
-	}
 }
 
-bool Bindings::bind_default(const StaticString &name, const StaticString &action)
+bool Bindings::bind_default(const StaticString& name, const StaticString& action)
 {
-	Key key = lookup_key(name);
-
+	const Key key = lookup_key(name);
 	if (key == Key::Null)
-	{
 		return false;
-	}
-
-	String &old_action = _actions[KeyType(key)];
-
+	String& old_action = _actions[KeyType(key)];
 	if (old_action.is_empty())
-	{
 		old_action.swap(String(action, _allocator));
-	}
-
 	return true;
 }
 
@@ -242,38 +227,27 @@ bool Bindings::call(Key key, ExecutionMode mode)
 {
 	// TODO: Pre-parse the actions to avoid script rescanning,
 	// memory allocations and other nasty things on every call.
-
-	const String &action = _actions[KeyType(key)];
-
+	const String& action = _actions[KeyType(key)];
 	if (action.is_empty())
-	{
 		return false;
-	}
-
 	ScriptContext::global().execute(action, mode);
 	return true;
 }
 
 void Bindings::clear()
 {
-	for (String &action: _actions)
-	{
+	for (String& action: _actions)
 		action.clear();
-	}
 }
 
 Bindings::Map Bindings::map() const
 {
 	Map result;
-
 	for (size_t i = 0; i < KeyCount; ++i)
 	{
 		if (bind_names[i][0] && !_actions[i].is_empty())
-		{
 			result.emplace(String(bind_names[i], _allocator), _actions[i]);
-		}
 	}
-
 	return result;
 }
 
@@ -282,15 +256,11 @@ void Bindings::unbind(Key key)
 	_actions[KeyType(key)].clear();
 }
 
-bool Bindings::unbind(const StaticString &name)
+bool Bindings::unbind(const StaticString& name)
 {
-	Key key = lookup_key(name);
-
+	const Key key = lookup_key(name);
 	if (key == Key::Null)
-	{
 		return false;
-	}
-
 	_actions[KeyType(key)].clear();
 	return true;
 }

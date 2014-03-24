@@ -29,7 +29,6 @@
 
 // \def __Y_GCC
 // \brief GCC version number (e.g. 47 for GCC 4.7).
-
 #if defined(__GNUC__)
 	#define __Y_GCC (__GNUC__ * 10 + __GNUC_MINOR__)
 	#if __Y_GCC < 47
@@ -41,7 +40,6 @@
 
 // \def __Y_MSVC
 // \brief MSVC version number (e.g. 71 for MSVC 7.1, 100 for MSVC 10.0).
-
 #if defined(_MSC_VER)
 	#define __Y_MSVC (_MSC_VER / 10 - 60)
 	#if __Y_MSVC < 120

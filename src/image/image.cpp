@@ -68,7 +68,7 @@ void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pix
 
 void ImageFormat::set_row_alignment(size_t alignment)
 {
-	if (Y_LIKELY(is_power_of_2(alignment)))
+	if (is_power_of_2(alignment))
 	{
 		_row_alignment = alignment;
 		_row_size = aligned_row_size(_width, _bits_per_pixel, alignment);
@@ -84,19 +84,7 @@ void ImageFormat::set_width(size_t width)
 
 // TODO: Add a function to set width and alignment simultaneously (and more efficiently) to use in Image::set_size.
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ImageReader::ImageReader(Allocator *allocator)
-	: _allocator(allocator)
-{
-}
-
 ImageReader::~ImageReader()
-{
-}
-
-ImageWriter::ImageWriter(Allocator *allocator)
-	: _allocator(allocator)
 {
 }
 
@@ -109,9 +97,7 @@ bool ImageWriter::open()
 	return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Image::Image(const ImageFormat &format, Allocator *allocator)
+Image::Image(const ImageFormat& format, Allocator* allocator)
 	: _format(format)
 	, _buffer(_format.frame_size(), allocator)
 {
@@ -119,10 +105,10 @@ Image::Image(const ImageFormat &format, Allocator *allocator)
 
 bool Image::intensity_to_bgra()
 {
-	if (Y_UNLIKELY(_format._pixel_format != PixelFormat::Gray || _format._bits_per_pixel != 8))
+	if (_format._pixel_format != PixelFormat::Gray || _format._bits_per_pixel != 8)
 		return false;
 
-	size_t old_row_size = _format._row_size;
+	const size_t old_row_size = _format._row_size;
 
 	_format._pixel_format = PixelFormat::Bgra;
 	_format._channels = 4;
@@ -132,8 +118,8 @@ bool Image::intensity_to_bgra()
 
 	Buffer output_buffer(_format.frame_size(), _buffer.allocator());
 
-	const uint8_t *src = static_cast<const uint8_t *>(_buffer.const_data());
-	uint8_t *dst = static_cast<uint8_t *>(output_buffer.data());
+	const uint8_t* src = static_cast<const uint8_t*>(_buffer.const_data());
+	uint8_t* dst = static_cast<uint8_t*>(output_buffer.data());
 
 	for (size_t i = 0; i < _format._height; ++i)
 	{
@@ -152,17 +138,17 @@ bool Image::intensity_to_bgra()
 	return true;
 }
 
-bool Image::load(const StaticString &name, ImageType type)
+bool Image::load(const StaticString& name, ImageType type)
 {
-	if (Y_LIKELY(type == ImageType::Auto))
+	if (type == ImageType::Auto)
 	{
-		StaticString extension = name.file_extension();
-		if (extension == ".tga")
+		const StaticString& extension = name.file_extension();
+		if (extension == S(".tga"))
 			type = ImageType::Tga;
-		else if (extension == ".dds")
+		else if (extension == S(".dds"))
 			type = ImageType::Dds;
 #ifndef Y_NO_JPEG
-		else if (extension == ".jpeg" || extension == ".jpg")
+		else if (extension == S(".jpeg") || extension == S(".jpg"))
 			type = ImageType::Jpeg;
 #endif
 		else
@@ -170,7 +156,6 @@ bool Image::load(const StaticString &name, ImageType type)
 	}
 
 	Allocatable<ImageReader> reader(_buffer.allocator());
-
 	switch (type)
 	{
 	case ImageType::Tga:  reader.reset<TgaReader>(); break;
@@ -181,10 +166,10 @@ bool Image::load(const StaticString &name, ImageType type)
 	default:              return false;
 	}
 
-	if (Y_UNLIKELY(!reader->_file.open(name, reader.allocator())))
+	if (!reader->_file.open(name, reader.allocator()))
 		return false;
 
-	if (Y_UNLIKELY(!reader->open()))
+	if (!reader->open())
 		return false;
 
 	_format = reader->_format;
@@ -192,15 +177,15 @@ bool Image::load(const StaticString &name, ImageType type)
 	return reader->read(_buffer.data());
 }
 
-bool Image::save(const StaticString &name, ImageType type) const
+bool Image::save(const StaticString& name, ImageType type) const
 {
 	if (type == ImageType::Auto)
 	{
-		StaticString extension = name.file_extension();
-		if (extension == ".tga")
+		const StaticString& extension = name.file_extension();
+		if (extension == S(".tga"))
 			type = ImageType::Tga;
 #ifndef Y_NO_PNG
-		else if (extension == ".png")
+		else if (extension == S(".png"))
 			type = ImageType::Png;
 #endif
 		else
@@ -208,7 +193,6 @@ bool Image::save(const StaticString &name, ImageType type) const
 	}
 
 	Allocatable<ImageWriter> writer(_buffer.allocator());
-
 	switch (type)
 	{
 	case ImageType::Tga: writer.reset<TgaWriter>(); break;
@@ -218,17 +202,17 @@ bool Image::save(const StaticString &name, ImageType type) const
 	default:             return false;
 	}
 
-	if (Y_UNLIKELY(!writer->_file.open(name, File::Write | File::Truncate, writer.allocator())))
+	if (!writer->_file.open(name, File::Write | File::Truncate, writer.allocator()))
 		return false;
 
-	if (Y_UNLIKELY(!writer->open() || !writer->set_format(_format)))
+	if (!writer->open() || !writer->set_format(_format))
 		return false;
 
 	writer->_format = _format;
 	return writer->write(_buffer.data());
 }
 
-void Image::set_format(const ImageFormat &format)
+void Image::set_format(const ImageFormat& format)
 {
 	_format = format;
 	_buffer.resize(_format.frame_size());
@@ -254,9 +238,9 @@ bool Image::swap_channels()
 	case PixelFormat::Rgb:
 	case PixelFormat::Bgr:
 
-		if (Y_LIKELY(_format._bits_per_pixel == 24))
+		if (_format._bits_per_pixel == 24)
 		{
-			uint8_t *scanline = static_cast<uint8_t *>(_buffer.data());
+			uint8_t* scanline = static_cast<uint8_t*>(_buffer.data());
 
 			for (size_t row = 0; row < _format._height; ++row)
 			{
@@ -283,7 +267,7 @@ bool Image::swap_channels()
 	return false;
 }
 
-bool Image::operator ==(const Image &image) const
+bool Image::operator ==(const Image& image) const
 {
 	// This implementation relies on equal padding data (if any).
 

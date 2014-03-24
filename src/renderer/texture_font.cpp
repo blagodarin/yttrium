@@ -1,9 +1,10 @@
 #include "texture_font.h"
 
 #include <yttrium/file.h>
-#include <yttrium/utils.h>
 
 #include "../base/fourcc.h"
+
+#include <algorithm> // max
 
 namespace Yttrium
 {
@@ -66,11 +67,6 @@ TextureFont::TextureFont(const TextureFont &font)
 {
 }
 
-Area TextureFont::area() const
-{
-	return _private->_area;
-}
-
 const TextureFont::CharInfo *TextureFont::char_info(char symbol) const
 {
 	Private::Chars::const_iterator i = _private->_chars.find(symbol);
@@ -116,7 +112,7 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 	_private = Y_NEW(allocator, Private)(allocator);
 
 	_private->_size = font_section.size;
-	_private->_area.set_top_left(font_section.base_x, font_section.base_y);
+	_private->_rect.set_top_left(font_section.base_x, font_section.base_y);
 
 	uint8_t char_count;
 
@@ -136,13 +132,13 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 
 			CharInfo info;
 
-			info.area = Area(font_section.base_x + char_data.x, font_section.base_y + char_data.y, char_data.width, char_data.height);
+			info.rect = Rect(font_section.base_x + char_data.x, font_section.base_y + char_data.y, char_data.width, char_data.height);
 			info.offset = Dim2(char_data.x_offset, char_data.y_offset);
 			info.advance = char_data.advance;
 
 			_private->_chars[char_data.id] = info;
-			_private->_area.set_width(max(_private->_area.width(), char_data.x + char_data.width));
-			_private->_area.set_height(max(_private->_area.height(), char_data.y + char_data.height));
+			_private->_rect.set_width(std::max(_private->_rect.width(), char_data.x + char_data.width));
+			_private->_rect.set_height(std::max(_private->_rect.height(), char_data.y + char_data.height));
 		}
 
 		if (success && file.read(&fourcc))
@@ -177,6 +173,11 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 	close();
 
 	return false;
+}
+
+Rect TextureFont::rect() const
+{
+	return _private->_rect;
 }
 
 int TextureFont::size() const

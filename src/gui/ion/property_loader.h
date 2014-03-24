@@ -38,7 +38,7 @@ public: // GuiPropertyLoader
 
 	bool load_position(const StaticString &name, Vector2f *position) const override;
 
-	bool load_rect(const StaticString &name, RectI *rect, bool update) const override;
+	bool load_rect(const StaticString &name, Rect *rect, bool update) const override;
 
 	bool load_scaling(const StaticString &name, Scaling *scaling) const override;
 

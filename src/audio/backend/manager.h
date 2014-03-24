@@ -6,7 +6,7 @@
 namespace Yttrium
 {
 
-AudioManager::Private *open_audio_manager(const StaticString &backend, const StaticString &device, Allocator *allocator);
+AudioManager::Private* open_audio_manager(const StaticString& backend, const StaticString& device, Allocator* allocator);
 
 } // namespace Yttrium
 

@@ -7,12 +7,11 @@
 namespace Yttrium
 {
 
-SoundPtr Sound::open(const StaticString &name, Allocator *allocator)
+SoundPtr Sound::open(const StaticString& name, Allocator* allocator)
 {
-	AudioManager::Private *audio_manager = AudioManager::Private::instance();
-	Y_ASSERT(audio_manager);
+	AudioManager::Private* audio_manager = AudioManager::Private::instance();
 
-	if (Y_LIKELY(!allocator))
+	if (!allocator)
 		allocator = audio_manager->_allocator;
 
 	// Lock mutex here for the sound opening to become thread safe.
@@ -21,12 +20,12 @@ SoundPtr Sound::open(const StaticString &name, Allocator *allocator)
 	if (i != audio_manager->_sounds.end())
 		return SoundPtr(i->second);
 
-	AudioReader reader;
-	if (Y_UNLIKELY(!reader.open(name, AudioType::Auto, allocator)))
+	auto&& reader = AudioReader::open(name, AudioType::Auto, allocator);
+	if (reader.is_null())
 		return SoundPtr();
 
-	SoundImpl *sound = audio_manager->create_sound(name, allocator);
-	if (Y_UNLIKELY(!sound->load(&reader)))
+	SoundImpl* sound = audio_manager->create_sound(name, allocator);
+	if (!sound->load(reader.pointer()))
 	{
 		// Unlock the mutex here for the sound opening to become thread safe.
 		Y_DELETE(allocator, sound);

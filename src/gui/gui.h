@@ -47,18 +47,14 @@ public:
 
 public:
 
-	GuiImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator);
-
+	GuiImpl(const Renderer& renderer, Callbacks& callbacks, Allocator* allocator);
 	~GuiImpl() noexcept override;
 
 public:
 
 	bool add_scene(GuiScene* scene, bool is_root);
 
-	Callbacks* callbacks() const
-	{
-		return _callbacks;
-	}
+	Callbacks& callbacks() const { return _callbacks; }
 
 	GuiScene* create_scene(const StaticString& name);
 
@@ -67,11 +63,6 @@ public:
 	Allocator* internal_allocator() const
 	{
 		return const_cast<ProxyAllocator*>(&_proxy_allocator);
-	}
-
-	Renderer* renderer()
-	{
-		return &_renderer;
 	}
 
 	void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
@@ -118,7 +109,7 @@ private:
 	ProxyAllocator                    _proxy_allocator;
 	Renderer                          _renderer;
 	TextureCachePtr                   _texture_cache;
-	Callbacks*                        _callbacks;
+	Callbacks&                        _callbacks;
 	bool                              _has_size;
 	Vector2f                          _size;
 	Scaling                           _scaling;

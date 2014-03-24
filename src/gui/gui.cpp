@@ -13,7 +13,7 @@
 namespace Yttrium
 {
 
-GuiImpl::GuiImpl(const Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
+GuiImpl::GuiImpl(const Renderer& renderer, Callbacks& callbacks, Allocator* allocator)
 	: Gui(allocator)
 	, _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
@@ -30,8 +30,6 @@ GuiImpl::~GuiImpl()
 {
 	clear();
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool GuiImpl::add_scene(GuiScene* scene, bool is_root)
 {
@@ -70,12 +68,12 @@ GuiScene* GuiImpl::create_scene(const StaticString& name)
 	}
 
 	Allocatable<GuiScene> scene(&_proxy_allocator);
-	scene.reset(this, name);
+	scene.reset(*this, name);
 	scene->set_size(_size);
 	return scene.release();
 }
 
-const GuiImpl::FontDesc* GuiImpl::font(const StaticString &name) const
+const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
 {
 	auto i = _fonts.find(String(name, ByReference()));
 	return i != _fonts.end() ? &i->second : nullptr;
@@ -104,8 +102,6 @@ void GuiImpl::set_scene_change_action(const String& from_scene, const String& to
 {
 	_scene_actions.emplace(ScenePair(from_scene, to_scene), action);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GuiImpl::clear()
 {
@@ -190,9 +186,7 @@ bool GuiImpl::process_key(const KeyEvent& event)
 bool GuiImpl::render()
 {
 	if (!_renderer || !_has_size || _scene_stack.empty())
-	{
 		return false;
-	}
 
 	auto i = _scene_stack.begin() + (_scene_stack.size() - 1);
 
@@ -203,16 +197,12 @@ bool GuiImpl::render()
 	}
 
 	while (i != _scene_stack.begin() && (*i)->is_transparent())
-	{
 		--i;
-	}
 
 	_renderer.set_matrix_2d(_size.x, _size.y);
 
 	for (; i != _scene_stack.end(); ++i)
-	{
-		(*i)->render(&_renderer, _size);
-	}
+		(*i)->render(_renderer, _size);
 
 	return true;
 }
@@ -222,8 +212,6 @@ void GuiImpl::set_cursor(const Vector2f& cursor)
 	_cursor = cursor * _size / Vector2f(_renderer.viewport_size());
 	_has_cursor = true;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GuiImpl::change_scene(const StaticString& old_scene, const StaticString& new_scene)
 {
@@ -239,9 +227,7 @@ void GuiImpl::delete_scene(GuiScene* scene)
 	Y_DELETE(&_proxy_allocator, scene);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-GuiPtr Gui::create(Renderer& renderer, Callbacks* callbacks, Allocator* allocator)
+GuiPtr Gui::create(Renderer& renderer, Callbacks& callbacks, Allocator* allocator)
 {
 	return GuiPtr(Y_NEW(allocator, GuiImpl)(renderer, callbacks, allocator));
 }

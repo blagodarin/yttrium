@@ -15,7 +15,7 @@ class WindowImpl: public Window, private WindowBackend::Callbacks
 {
 public:
 
-	WindowImpl(const Dim2 &size, Window::Callbacks *callbacks, Allocator *allocator) noexcept;
+	WindowImpl(const Dim2& size, Window::Callbacks& callbacks, Allocator* allocator) noexcept;
 	~WindowImpl() noexcept override;
 
 	bool initialize();
@@ -23,18 +23,18 @@ public:
 public: // Window
 
 	void close() noexcept override;
-	Renderer create_renderer(Allocator *allocator) noexcept override;
+	Renderer create_renderer(Allocator* allocator) noexcept override;
 	Dim2 cursor() const noexcept override;
-	void draw_console(RendererBuiltin *renderer) noexcept override;
+	void draw_console(RendererBuiltin& renderer) noexcept override;
 	bool is_console_visible() const noexcept override;
 	bool is_cursor_locked() const noexcept override;
 	bool is_shift_pressed() const noexcept override;
 	void lock_cursor(bool lock) noexcept override;
 	bool process_events() noexcept override;
-	void resize(const Dim2 &size) noexcept override;
+	void resize(const Dim2& size) noexcept override;
 	void set_console_visible(bool visible) noexcept override;
-	bool set_cursor(const Dim2 &cursor) noexcept override;
-	void set_name(const StaticString &name) noexcept override;
+	bool set_cursor(const Dim2& cursor) noexcept override;
+	void set_name(const StaticString& name) noexcept override;
 	void show(Mode mode) noexcept override;
 	Dim2 size() const noexcept override;
 
@@ -57,7 +57,7 @@ private:
 	Dim2               _size;
 	Mode               _mode;
 	unsigned           _keys[KeyCount];
-	Window::Callbacks *_callbacks;
+	Window::Callbacks& _callbacks;
 	Console            _console;
 	bool               _is_console_visible;
 };

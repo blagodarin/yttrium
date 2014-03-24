@@ -413,11 +413,6 @@ bool WindowBackend::process_events()
 	return true;
 }
 
-Renderer WindowBackend::renderer()
-{
-	return _renderer;
-}
-
 void WindowBackend::set_name(const StaticString& name)
 {
 	if (_window == None)

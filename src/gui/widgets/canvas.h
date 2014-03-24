@@ -13,18 +13,16 @@ class Canvas: public Widget
 {
 public:
 
-	Canvas(Gui::Callbacks* gui_callbacks, Allocator* allocator);
+	Canvas(Gui::Callbacks& gui_callbacks, Allocator* allocator);
 
-public: // Widget
-
-	void dump(GuiPropertyDumper* dumper) const override;
-	bool load(GuiPropertyLoader& loader) override;
-	void render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState state) const override;
+	void dump(GuiPropertyDumper*) const override;
+	bool load(GuiPropertyLoader&) override;
+	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
 
 private:
 
-	RectI           _position;
-	Gui::Callbacks* _gui_callbacks;
+	Rect            _position;
+	Gui::Callbacks& _gui_callbacks;
 };
 
 } // namespace Yttrium

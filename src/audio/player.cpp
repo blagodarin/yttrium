@@ -116,7 +116,7 @@ void AudioPlayer::Private::run()
 	}
 }
 
-void AudioPlayer::load(const StaticString &name, const Settings &settings, AudioType type)
+void AudioPlayer::load(const StaticString& name, const Settings& settings, AudioType type)
 {
 	_private->_playlist.load(name, settings, type);
 }

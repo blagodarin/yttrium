@@ -6,14 +6,14 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(rect_initialization_test)
 {
-	Rect<int> null_rect;
+	Rect null_rect;
 
 	BOOST_CHECK_EQUAL(null_rect.left(), 0);
 	BOOST_CHECK_EQUAL(null_rect.top(), 0);
 	BOOST_CHECK_EQUAL(null_rect.right(), 0);
 	BOOST_CHECK_EQUAL(null_rect.bottom(), 0);
 
-	Rect<int> rect(3, 5, 7, 8);
+	Rect rect(3, 5, 7, 8);
 
 	BOOST_CHECK_EQUAL(rect.left(), 3);
 	BOOST_CHECK_EQUAL(rect.top(), 5);
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(rect_initialization_test)
 
 BOOST_AUTO_TEST_CASE(rect_containment_test)
 {
-	Rect<int> rect(0, 0, 10, 10);
+	Rect rect(0, 0, 10, 10);
 
 	BOOST_CHECK(rect.contains(rect));
 
@@ -48,13 +48,13 @@ BOOST_AUTO_TEST_CASE(rect_containment_test)
 	BOOST_CHECK(!rect.contains(Vector2<int>(9, 10)));
 	BOOST_CHECK(!rect.fast_contains(Vector2<int>(9, 10)));
 
-	Rect<int> smaller_rect(1, 1, 9, 9);
+	Rect smaller_rect(1, 1, 9, 9);
 
 	BOOST_CHECK(rect.contains(smaller_rect));
 
 	BOOST_CHECK(!smaller_rect.contains(rect));
 
-	smaller_rect = Rect<int>(0, 0, 9, 9);
+	smaller_rect = Rect(0, 0, 9, 9);
 
 	BOOST_CHECK(rect.contains(smaller_rect));
 
@@ -63,13 +63,13 @@ BOOST_AUTO_TEST_CASE(rect_containment_test)
 
 BOOST_AUTO_TEST_CASE(rect_intersection_test)
 {
-	Rect<int> rect(0, 0, 3, 3);
+	Rect rect(0, 0, 3, 3);
 
 	BOOST_CHECK(rect.intersects(rect));
 	BOOST_CHECK(rect.fast_intersects(rect));
 	BOOST_CHECK(rect.fastest_intersects(rect));
 
-	Rect<int> another_rect(1, 1, 3, 3);
+	Rect another_rect(1, 1, 3, 3);
 
 	BOOST_CHECK(rect.intersects(another_rect));
 	BOOST_CHECK(rect.fast_intersects(another_rect));
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(another_rect.fast_intersects(rect));
 	BOOST_CHECK(another_rect.fastest_intersects(rect));
 
-	Rect<int> inner_rect(1, 1, 1, 1); // So that (L1 - R2 == L2 - R1).
+	Rect inner_rect(1, 1, 1, 1); // So that (L1 - R2 == L2 - R1).
 
 	BOOST_CHECK(rect.intersects(inner_rect));
 	BOOST_CHECK(rect.fast_intersects(inner_rect));
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(inner_rect.fast_intersects(rect));
 	BOOST_CHECK(inner_rect.fastest_intersects(rect));
 
-	Rect<int> right_border_rect(2, 0, 3, 3);
+	Rect right_border_rect(2, 0, 3, 3);
 
 	BOOST_CHECK(rect.intersects(right_border_rect));
 	BOOST_CHECK(rect.fast_intersects(right_border_rect));
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(right_border_rect.fast_intersects(rect));
 	BOOST_CHECK(right_border_rect.fastest_intersects(rect));
 
-	Rect<int> right_rect(3, 0, 3, 3);
+	Rect right_rect(3, 0, 3, 3);
 
 	BOOST_CHECK(!rect.intersects(right_rect));
 	BOOST_CHECK(!rect.fast_intersects(right_rect));
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(!right_rect.fast_intersects(rect));
 	BOOST_CHECK(!right_rect.fastest_intersects(rect));
 
-	Rect<int> bottom_border_rect(0, 2, 3, 3);
+	Rect bottom_border_rect(0, 2, 3, 3);
 
 	BOOST_CHECK(rect.intersects(bottom_border_rect));
 	BOOST_CHECK(rect.fast_intersects(bottom_border_rect));
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(bottom_border_rect.fast_intersects(rect));
 	BOOST_CHECK(bottom_border_rect.fastest_intersects(rect));
 
-	Rect<int> bottom_rect(0, 3, 3, 3);
+	Rect bottom_rect(0, 3, 3, 3);
 
 	BOOST_CHECK(!rect.intersects(bottom_rect));
 	BOOST_CHECK(!rect.fast_intersects(bottom_rect));
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(!bottom_rect.fast_intersects(rect));
 	BOOST_CHECK(!bottom_rect.fastest_intersects(rect));
 
-	Rect<int> far_rect(4, 4, 3, 3);
+	Rect far_rect(4, 4, 3, 3);
 
 	BOOST_CHECK(!rect.intersects(far_rect));
 	BOOST_CHECK(!rect.fast_intersects(far_rect));
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(rect_null_intersection_test)
 	// This test case exists only as an implementation reference,
 	// one should not rely on null rect intersection detection!
 
-	Rect<int> null_rect;
+	Rect null_rect;
 
 	BOOST_CHECK(!null_rect.intersects(null_rect));
 	BOOST_CHECK(!null_rect.fast_intersects(null_rect));
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(rect_null_intersection_test)
 	// null rect lies within the non-null rect (and not on its zero-width border).
 	// Note that a point is equivalent to the rect with width and height set to one, not zero!
 
-	Rect<int> rect(0, 0, 2, 2);
+	Rect rect(0, 0, 2, 2);
 
 	BOOST_CHECK(!null_rect.intersects(rect));
 	BOOST_CHECK(!null_rect.fast_intersects(rect));
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(rect_null_intersection_test)
 	BOOST_CHECK(!rect.fast_intersects(null_rect));
 	BOOST_CHECK(!rect.fastest_intersects(null_rect));
 
-	null_rect = Rect<int>(1, 1, 0, 0);
+	null_rect = Rect(1, 1, 0, 0);
 
 	BOOST_CHECK(null_rect.intersects(rect));
 	BOOST_CHECK(null_rect.fast_intersects(rect));
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(rect_null_intersection_test)
 	BOOST_CHECK(rect.fast_intersects(null_rect));
 	BOOST_CHECK(rect.fastest_intersects(null_rect));
 
-	null_rect = Rect<int>(2, 2, 0, 0);
+	null_rect = Rect(2, 2, 0, 0);
 
 	BOOST_CHECK(!null_rect.intersects(rect));
 	BOOST_CHECK(!null_rect.fast_intersects(rect));

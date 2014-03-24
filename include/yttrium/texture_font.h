@@ -20,7 +20,7 @@ public:
 
 	struct CharInfo
 	{
-		Area area;    ///< The rectangle a character occupies in the texture.
+		Rect rect;    ///< The rectangle a character occupies in the texture.
 		Dim2 offset;  ///< The offset to apply before rendering a character.
 		int  advance; ///< The horizontal advance.
 	};
@@ -47,10 +47,6 @@ public:
 
 	///
 
-	Area area() const noexcept;
-
-	///
-
 	const CharInfo *char_info(char symbol) const noexcept;
 
 	///
@@ -64,6 +60,10 @@ public:
 	///
 
 	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+
+	///
+
+	Rect rect() const noexcept;
 
 	///
 

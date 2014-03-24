@@ -76,7 +76,6 @@ bool LineEditor::process_key(const KeyEvent& event)
 					++_selection_size;
 				}
 			}
-
 			++_cursor;
 		}
 		if (!shift)

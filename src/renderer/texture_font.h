@@ -10,8 +10,7 @@
 namespace Yttrium
 {
 
-class Y_PRIVATE TextureFont::Private
-	: public PrivateBase<TextureFont::Private>
+class Y_PRIVATE TextureFont::Private: public PrivateBase<TextureFont::Private>
 {
 public:
 
@@ -29,7 +28,7 @@ public:
 	int      _size;
 	Chars    _chars;
 	Kernings _kernings;
-	Area     _area;
+	Rect     _rect;
 };
 
 } // namespace Yttrium

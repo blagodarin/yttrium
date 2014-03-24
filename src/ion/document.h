@@ -18,7 +18,7 @@ class Y_PRIVATE Document::Private
 
 public:
 
-	Private(Document *document, Allocator *allocator)
+	Private(Document* document, Allocator* allocator)
 		: _document(document)
 		, _allocator(allocator)
 		, _buffer(allocator)
@@ -29,34 +29,22 @@ public:
 		// TODO: Get rid of magic numbers above.
 	}
 
-	~Private()
-	{
-	}
-
-public:
-
-	Value *new_list_value();
-	Node *new_node(const StaticString &name);
-	Node *new_node(const StaticString &name, const ByReference &);
-	Object *new_object();
-	Value *new_object_value(Object *object);
-	Value *new_value(const StaticString &text);
-	Value *new_value(const StaticString &name, const ByReference &);
+	Value* new_list_value();
+	Node* new_node(const StaticString& name);
+	Node* new_node(const StaticString& name, const ByReference&);
+	Object* new_object();
+	Value* new_object_value(Object* object);
+	Value* new_value(const StaticString& text);
+	Value* new_value(const StaticString& name, const ByReference&);
 
 private:
 
-	typedef Pool<Object> Objects;
-	typedef Pool<Node>   Nodes;
-	typedef Pool<Value>  Values;
-
-private:
-
-	Document  *_document;
-	Allocator *_allocator;
-	String     _buffer;
-	Objects    _objects;
-	Nodes      _nodes;
-	Values     _values;
+	Document*    _document;
+	Allocator*   _allocator;
+	String       _buffer;
+	Pool<Object> _objects;
+	Pool<Node>   _nodes;
+	Pool<Value>  _values;
 };
 
 } // namespace Ion

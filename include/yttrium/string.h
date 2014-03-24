@@ -12,8 +12,7 @@ namespace Yttrium
 ///
 /// \note Strings with an allocated storage always store a zero terminator.
 
-class Y_API String
-	: public StaticString
+class Y_API String: public StaticString
 {
 public:
 
@@ -375,8 +374,8 @@ private:
 
 	Y_PRIVATE void grow(size_t buffer_size);
 	Y_PRIVATE void init();
-	Y_PRIVATE void init(const char *string, size_t size);
-	Y_PRIVATE char *init(size_t buffer_size);
+	Y_PRIVATE void init(const char* string, size_t size);
+	Y_PRIVATE const char* init(size_t buffer_size);
 
 private:
 

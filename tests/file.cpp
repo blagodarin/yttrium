@@ -2,7 +2,6 @@
 #include <yttrium/file.h>
 #include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
-#include <yttrium/utils.h>
 
 #include <cstdlib> // rand
 #include <cstring> // memcmp
@@ -15,45 +14,39 @@ BOOST_AUTO_TEST_CASE(file_read_all_test)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	uint8_t buffer[100003];
-
-	for (uint8_t &item: buffer)
-	{
+	std::array<uint8_t, 100003> buffer;
+	for (uint8_t& item: buffer)
 		item = rand() % UINT8_MAX;
-	}
 
 	File file(File::Temporary);
 
-	file.write(buffer, sizeof(buffer));
+	file.write(buffer.data(), buffer.size());
 	file.flush();
 
 	Buffer actual_buffer;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_buffer));
-	BOOST_CHECK_EQUAL(actual_buffer.size(), countof(buffer));
-	BOOST_CHECK(!memcmp(actual_buffer.const_data(), buffer, countof(buffer)));
+	BOOST_CHECK_EQUAL(actual_buffer.size(), buffer.size());
+	BOOST_CHECK(!::memcmp(actual_buffer.const_data(), buffer.data(), buffer.size()));
 
 	String actual_string;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_string));
-	BOOST_CHECK_EQUAL(actual_string.size(), countof(buffer));
-	BOOST_CHECK(!memcmp(actual_string.const_text(), buffer, countof(buffer)));
+	BOOST_CHECK_EQUAL(actual_string.size(), buffer.size());
+	BOOST_CHECK(!::memcmp(actual_string.const_text(), buffer.data(), buffer.size()));
 }
 
 BOOST_AUTO_TEST_CASE(file_transfer_test)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	uint8_t buffer[100003];
-
-	for (uint8_t &item: buffer)
-	{
+	std::array<uint8_t, 100003> buffer;
+	for (uint8_t& item: buffer)
 		item = rand() % UINT8_MAX;
-	}
 
 	File input(File::Temporary);
 
-	input.write(buffer, sizeof(buffer));
+	input.write(buffer.data(), buffer.size());
 	input.flush();
 	input.seek(0);
 
@@ -64,6 +57,6 @@ BOOST_AUTO_TEST_CASE(file_transfer_test)
 	Buffer actual;
 
 	BOOST_REQUIRE(File(output.name()).read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), countof(buffer));
-	BOOST_CHECK(!memcmp(actual.const_data(), buffer, countof(buffer)));
+	BOOST_CHECK_EQUAL(actual.size(), buffer.size());
+	BOOST_CHECK(!::memcmp(actual.const_data(), buffer.data(), buffer.size()));
 }

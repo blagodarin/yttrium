@@ -17,7 +17,7 @@
 namespace Yttrium
 {
 
-GuiScene::GuiScene(GuiImpl *gui, const StaticString &name, Allocator *allocator)
+GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator)
 	: _allocator(allocator)
 	, _gui(gui)
 	, _name(name, allocator)
@@ -32,18 +32,18 @@ GuiScene::GuiScene(GuiImpl *gui, const StaticString &name, Allocator *allocator)
 
 GuiScene::~GuiScene()
 {
-	for (Widget *widget: _widgets)
+	for (Widget* widget: _widgets)
 		Y_DELETE(_allocator, widget);
 }
 
-void GuiScene::load_widget(const StaticString &type, const StaticString &name, GuiPropertyLoader &loader)
+void GuiScene::load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader)
 {
 	Allocatable<Widget> widget(_allocator);
 
 	if (type == "button")
 		widget.reset<Button>();
 	else if (type == "canvas")
-		widget.reset<Canvas>(_gui->callbacks());
+		widget.reset<Canvas>(_gui.callbacks());
 	else if (type == "image")
 		widget.reset<GuiImage>();
 	else if (type == "label")
@@ -66,7 +66,7 @@ void GuiScene::load_widget(const StaticString &type, const StaticString &name, G
 	_widgets.push_back(widget.release());
 }
 
-bool GuiScene::process_key(const KeyEvent &event)
+bool GuiScene::process_key(const KeyEvent& event)
 {
 	bool result = false;
 
@@ -98,21 +98,21 @@ bool GuiScene::process_key(const KeyEvent &event)
 	return event.pressed ? _bindings.call(event.key) : result;
 }
 
-void GuiScene::render(Renderer *renderer, const Vector2f &size)
+void GuiScene::render(Renderer& renderer, const Vector2f& size)
 {
 	Vector2f scale = size / _size;
 	Vector2f shift((size.x - _size.x * scale.y) * .5f, (size.y - _size.y * scale.x) * .5f);
 
-	for (Widget *widget: _widgets)
+	for (Widget* widget: _widgets)
 		widget->update();
 
-	const Widget *mouse_widget = nullptr;
+	const Widget* mouse_widget = nullptr;
 
 	if (_is_cursor_set)
 	{
 		for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
 		{
-			if (map((*i)->area(), shift, scale, (*i)->scaling()).contains(_cursor))
+			if (map((*i)->rect(), shift, scale, (*i)->scaling()).contains(_cursor))
 			{
 				mouse_widget = *i;
 				break;
@@ -122,18 +122,18 @@ void GuiScene::render(Renderer *renderer, const Vector2f &size)
 
 	_mouse_widget = mouse_widget;
 
-	for (const Widget *widget: _widgets)
+	for (const Widget* widget: _widgets)
 	{
 		WidgetState state = WidgetState::Normal;
 		if (widget == _mouse_widget)
 			state = (widget == _left_click_widget) ? WidgetState::Pressed : WidgetState::Active;
-		widget->render(renderer, map(widget->area(), shift, scale, widget->scaling()), scale, state);
+		widget->render(renderer, map(widget->rect(), shift, scale, widget->scaling()), scale, state);
 	}
 
 	_is_cursor_set = false;
 }
 
-RectF GuiScene::map(const RectF &source, const Vector2f &shift, const Vector2f &scale, Scaling scaling) const
+RectF GuiScene::map(const RectF& source, const Vector2f& shift, const Vector2f& scale, Scaling scaling) const
 {
 	RectF result;
 

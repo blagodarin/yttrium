@@ -8,27 +8,19 @@ namespace Yttrium
 
 struct WavChunkHeader;
 
-class WavReader
-	: public AudioReader::Private
+class WavReader: public AudioReaderImpl
 {
 public:
 
-	WavReader(Allocator *allocator)
-		: AudioReader::Private(allocator)
-	{
-	}
-
-public: // AudioReader::Private
+	WavReader(Allocator* allocator);
 
 	bool open() override;
-
-	size_t read(void *buffer, size_t bytes_to_read) override;
-
-	void seek(UOffset offset) override;
+	size_t read(void* buffer, size_t bytes_to_read) noexcept override;
+	bool seek(UOffset offset) noexcept override;
 
 private:
 
-	bool find_chunk(uint32_t fourcc, WavChunkHeader *header);
+	bool find_chunk(uint32_t fourcc, WavChunkHeader* header);
 
 private:
 

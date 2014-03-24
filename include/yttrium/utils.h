@@ -4,7 +4,6 @@
 #ifndef __Y_UTILS_H
 #define __Y_UTILS_H
 
-#include <yttrium/assert.h>
 #include <yttrium/types.h>
 
 // TODO: Check whether all functions in this file work with all supported integer representations,
@@ -12,35 +11,6 @@
 
 namespace Yttrium
 {
-
-///
-
-template <typename T>
-const T &max(const T &a, const T &b) noexcept
-{
-	return a > b ? a : b;
-}
-
-///
-
-template <typename T>
-const T &min(const T &a, const T &b) noexcept
-{
-	return a < b ? a : b;
-}
-
-/// Clamp a value within the specified range.
-/// \param a Source value.
-/// \param lo Minimum value.
-/// \param hi Maximum value.
-/// \return Clamped value.
-
-template <typename T>
-const T &clamp(const T &a, const T &lo, const T &hi) noexcept
-{
-	Y_ASSERT(lo <= hi);
-	return a > hi ? hi : (a < lo ? lo : a);
-}
 
 /// Determine if the specified value is a power of two (POT).
 /// \param x Value to test.
@@ -303,25 +273,6 @@ inline bool same_sign(int64_t x, int64_t y) noexcept
 {
 	return (x ^ y) >= 0;
 }
-
-#if Y_HAS_CONSTEXPR || defined(__YTTRIUM_DOXYGEN)
-
-/// Returns the number of elements in the array.
-
-template <typename T, size_t N>
-constexpr size_t countof(T (&)[N])
-{
-	return N;
-}
-
-#elif !defined(countof)
-
-template <typename T, size_t N>
-char (&_countof_helper(T (&)[N]))[N];
-
-#define countof(array) (sizeof(_countof_helper(array)))
-
-#endif
 
 } // namespace Yttrium
 

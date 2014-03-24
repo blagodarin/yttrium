@@ -13,38 +13,14 @@ public:
 
 	LineEditor(Allocator* allocator);
 
-public:
-
 	void clear();
-
-	size_t cursor() const
-	{
-		return _cursor;
-	}
-
+	size_t cursor() const { return _cursor; }
 	void insert(const StaticString& text);
-
-	void insert(char symbol)
-	{
-		insert(StaticString(&symbol, 1));
-	}
-
+	void insert(char symbol) { insert(StaticString(&symbol, 1)); }
 	bool process_key(const KeyEvent& event);
-
-	size_t selection_offset()
-	{
-		return _selection_offset;
-	}
-
-	size_t selection_size() const
-	{
-		return _selection_size;
-	}
-
-	String text() const
-	{
-		return _text;
-	}
+	size_t selection_offset() { return _selection_offset; }
+	size_t selection_size() const { return _selection_size; }
+	String text() const { return _text; }
 
 private:
 

@@ -18,29 +18,36 @@ class Widget
 {
 public:
 
-	inline Widget(Allocator *allocator);
+	Widget(Allocator* allocator)
+		: _scaling(Scaling::Stretch)
+		, _is_enabled(true)
+		, _action(allocator)
+		, _text(allocator)
+		, _name(allocator)
+	{
+	}
 
-	inline virtual ~Widget();
+	virtual ~Widget() = default;
 
 public:
 
-	inline StaticString action() const;
+	StaticString action() const { return _action; }
 
-	inline RectF area() const;
+	bool is_enabled() const { return _is_enabled; }
 
-	inline bool is_enabled() const;
+	StaticString name() const { return _name; }
 
-	inline StaticString name() const;
+	RectF rect() const { return _rect; }
 
-	inline Scaling scaling() const;
+	Scaling scaling() const { return _scaling; }
 
-	inline void set_name(const StaticString &name);
+	void set_name(const StaticString& name) { _name = name; }
 
-	inline void set_scaling(Scaling scaling);
+	void set_scaling(Scaling scaling) { _scaling = scaling; }
 
-	inline void set_text(const StaticString &name);
+	void set_text(const StaticString& text) { _text = text; } // TODO: Update the widget.
 
-	inline StaticString text() const;
+	StaticString text() const { return _text; }
 
 public:
 
@@ -52,81 +59,19 @@ public:
 
 	virtual bool process_key(const KeyEvent& event);
 
-	virtual void render(Renderer *renderer, const RectF &area, const Vector2f &scale, WidgetState state) const = 0;
+	virtual void render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const = 0;
 
 	virtual void update();
 
 protected:
 
-	RectF   _area;
+	RectF   _rect;
 	Scaling _scaling;
 	bool    _is_enabled;
 	String  _action;
 	String  _text;
 	String  _name;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Widget::Widget(Allocator *allocator)
-	: _scaling(Scaling::Stretch)
-	, _is_enabled(true)
-	, _action(allocator)
-	, _text(allocator)
-	, _name(allocator)
-{
-}
-
-Widget::~Widget()
-{
-}
-
-StaticString Widget::action() const
-{
-	return _action;
-}
-
-RectF Widget::area() const
-{
-	return _area;
-}
-
-bool Widget::is_enabled() const
-{
-	return _is_enabled;
-}
-
-StaticString Widget::name() const
-{
-	return _name;
-}
-
-Scaling Widget::scaling() const
-{
-	return _scaling;
-}
-
-void Widget::set_name(const StaticString &name)
-{
-	_name = name;
-}
-
-void Widget::set_scaling(Scaling scaling)
-{
-	_scaling = scaling;
-}
-
-void Widget::set_text(const StaticString &text)
-{
-	_text = text;
-	// TODO: Update.
-}
-
-StaticString Widget::text() const
-{
-	return _text;
-}
 
 } // namespace Yttrium
 

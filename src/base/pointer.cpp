@@ -8,7 +8,7 @@ namespace Yttrium
 Pointable::Pointer::Pointer(Pointable* pointable)
 	: _pointable(pointable)
 {
-	if (Y_LIKELY(_pointable))
+	if (_pointable)
 		++_pointable->_counter;
 }
 

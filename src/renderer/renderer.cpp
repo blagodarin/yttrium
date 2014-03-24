@@ -260,12 +260,12 @@ void Renderer::Private::draw_text(const Vector2f &position, const StaticString &
 				current_position.y + y_scaling * info->offset.y);
 
 			Vector2f symbol_size(
-				info->area.width() * x_scaling,
-				info->area.height() * y_scaling);
+				info->rect.width() * x_scaling,
+				info->rect.height() * y_scaling);
 
 			BackendTexture2D *backend_texture = static_cast<BackendTexture2D *>(_texture.pointer());
-			Vector2f texture_top_left(backend_texture->fix_coords(info->area.top_left()));
-			Vector2f texture_bottom_right(backend_texture->fix_coords(info->area.bottom_right()));
+			Vector2f texture_top_left(backend_texture->fix_coords(info->rect.top_left()));
+			Vector2f texture_bottom_right(backend_texture->fix_coords(info->rect.bottom_right()));
 
 			draw_rectangle(
 				RectF(symbol_position, symbol_size),
@@ -370,7 +370,7 @@ void Renderer::set_color(const Vector4f &color)
 bool Renderer::set_font(const TextureFont &font)
 {
 	BackendTexture2D *backend_texture = static_cast<BackendTexture2D *>(_private->_texture.pointer());
-	if (!backend_texture || (font && !Area(backend_texture->size()).contains(font.area())))
+	if (!backend_texture || (font && !Rect(backend_texture->size()).contains(font.rect())))
 		return false;
 
 	_private->_font = font;

@@ -19,10 +19,8 @@ public:
 	{
 	}
 
-public:
-
 	bool process_key(const KeyEvent& event);
-	void render_input(RendererBuiltin* renderer, int x, int y, int max_size);
+	void render_input(RendererBuiltin& renderer, int x, int y, int max_size);
 
 private:
 

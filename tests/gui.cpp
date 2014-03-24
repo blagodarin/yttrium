@@ -8,6 +8,21 @@
 
 using namespace Yttrium;
 
+class WindowCallbacks: public Window::Callbacks
+{
+public:
+
+	void on_cursor_movement(Window&, const Dim2&) noexcept override {}
+	bool on_key_event(const KeyEvent&) noexcept override { return true; }
+};
+
+class GuiCallbacks: public Gui::Callbacks
+{
+public:
+
+	void on_render_canvas(Renderer&, const StaticString&, const RectF&) noexcept override {}
+};
+
 BOOST_AUTO_TEST_CASE(gui_test)
 {
 	DECLARE_MEMORY_MANAGER;
@@ -18,13 +33,15 @@ BOOST_AUTO_TEST_CASE(gui_test)
 	File file(File::Temporary);
 
 	{
-		WindowPtr window = Window::open(Dim2(320, 240), nullptr);
+		WindowCallbacks window_callbacks;
+		WindowPtr window = Window::open(Dim2(320, 240), window_callbacks);
 		BOOST_REQUIRE(!window.is_null());
 
 		Renderer renderer = window->create_renderer();
 		BOOST_REQUIRE(renderer);
 
-		GuiPtr gui = Gui::create(renderer);
+		GuiCallbacks gui_callbacks;
+		GuiPtr gui = Gui::create(renderer, gui_callbacks);
 
 		BOOST_REQUIRE(gui->load("tests/gui/gui.ion"));
 		gui->dump(file.name());

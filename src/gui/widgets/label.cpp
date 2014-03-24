@@ -49,25 +49,23 @@ bool Label::load(GuiPropertyLoader& loader)
 	loader.load_color("color", &_color);
 	loader.load_alignment("align", &_alignment);
 
-	update_area(_text);
+	update_rect(_text);
 
 	return true;
 }
 
-void Label::render(Renderer* renderer, const RectF& area, const Vector2f& scale, WidgetState) const
+void Label::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState) const
 {
 	if (_text.is_empty())
-	{
 		return;
-	}
 
-	renderer->set_color(_color);
-	renderer->set_texture(_texture);
+	renderer.set_color(_color);
+	renderer.set_texture(_texture);
 
-	if (renderer->set_font(_font))
+	if (renderer.set_font(_font))
 	{
-		renderer->set_font_size(_size.x * scale.y, _size.y);
-		renderer->draw_text(area.center(), _final_text, 0);
+		renderer.set_font_size(_size.x * scale.y, _size.y);
+		renderer.draw_text(rect.center(), _final_text, 0);
 	}
 }
 
@@ -75,26 +73,22 @@ void Label::update()
 {
 	_final_text.clear(); // TODO: Consider moving this into substitute().
 	ScriptContext::global().substitute(&_final_text, _text);
-	update_area(_final_text);
+	update_rect(_final_text);
 }
 
-void Label::update_area(const StaticString& text)
+void Label::update_rect(const StaticString& text)
 {
-	_area.set_top_left(_position);
+	_rect.set_top_left(_position);
 
-	Vector2f text_size = _font.text_size(text, _size);
+	const Vector2f& text_size = _font.text_size(text, _size);
 
 	if ((_alignment & HorizontalAlignmentMask) != RightAlignment)
-	{
-		_area.set_left(_area.left() - text_size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));
-	}
+		_rect.set_left(_rect.left() - text_size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));
 
 	if ((_alignment & VerticalAlignmentMask) != BottomAlignment)
-	{
-		_area.set_top(_area.top() - text_size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
-	}
+		_rect.set_top(_rect.top() - text_size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
 
-	_area.set_size(text_size);
+	_rect.set_size(text_size);
 }
 
 } // namespace Yttrium
