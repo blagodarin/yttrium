@@ -14,16 +14,14 @@ namespace Yttrium
 
 GuiImage::GuiImage(Allocator* allocator)
 	: Widget(allocator)
-	, _color(1, 1, 1)
 {
 }
 
-void GuiImage::dump(GuiPropertyDumper* dumper) const
+void GuiImage::dump(GuiPropertyDumper& dumper) const
 {
-	dumper->dump_rect("position", _position);
-	dumper->dump_scaling("scale", _scaling);
-	dumper->dump_color("color", _color);
-	_texture.dump(dumper);
+	dumper.dump_rect("position", _position);
+	dumper.dump_scaling("scale", _scaling);
+	_background.dump(dumper);
 }
 
 bool GuiImage::load(GuiPropertyLoader& loader)
@@ -37,8 +35,7 @@ bool GuiImage::load(GuiPropertyLoader& loader)
 	}
 
 	loader.load_scaling("scale", &_scaling);
-	loader.load_color("color", &_color);
-	_texture.load(loader);
+	_background.load(loader);
 
 	_rect = RectF(_position);
 
@@ -47,11 +44,7 @@ bool GuiImage::load(GuiPropertyLoader& loader)
 
 void GuiImage::render(Renderer& renderer, const RectF& rect, const Vector2f&, WidgetState) const
 {
-	renderer.set_color(_color);
-	renderer.set_texture(_texture.texture);
-	renderer.set_texture_rectangle(RectF(_texture.rect));
-	renderer.set_texture_borders(_texture.borders);
-	renderer.draw_rectangle(rect.left(), rect.top(), rect.width(), rect.height());
+	_background.render(renderer, rect);
 }
 
 } // namespace Yttrium

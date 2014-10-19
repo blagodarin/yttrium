@@ -1,17 +1,17 @@
 class "help_key"
 {
-	position "230" ""
-	size     "40"
-	align    "bottom"
-	font     "common"
+	position  "230" ""
+	text_size "40"
+	font      "common"
+	align     "bottom"
 }
 
 class "help_text"
 {
-	position "300" ""
-	size     "40"
-	align    "bottom" "right"
-	font     "common"
+	position  "300" ""
+	text_size "40"
+	font      "common"
+	align     "bottom" "right"
 }
 
 scene "menu_help"

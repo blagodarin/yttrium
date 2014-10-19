@@ -18,18 +18,18 @@ Button::Button(Allocator* allocator)
 {
 }
 
-void Button::dump(GuiPropertyDumper* dumper) const
+void Button::dump(GuiPropertyDumper& dumper) const
 {
-	dumper->dump_rect("position", _position);
-	dumper->dump_scaling("scale", _scaling);
+	dumper.dump_rect("position", _position);
+	dumper.dump_scaling("scale", _scaling);
 
 	// TODO: Dump font.
 
-	dumper->dump_size("text_size", _text_size);
-	dumper->dump_text("text", _text);
+	dumper.dump_size("text_size", _text_size);
+	dumper.dump_text("text", _text);
 
 	if (_state != WidgetState::None)
-		dumper->dump_state("state", _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
+		dumper.dump_state("state", _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
 
 	// TODO: Dump styles.
 }
@@ -49,28 +49,16 @@ bool Button::load(GuiPropertyLoader& loader)
 	loader.load_scaling("scale", &_scaling);
 	loader.load_text("text", &_text);
 
-	if (loader.load_color("color", &_styles[0].color))
+	if (_styles[0].background.load(loader))
 	{
 		for (WidgetStateType i = 1; i < WidgetStateCount; ++i)
-		{
-			_styles[i].color = _styles[0].color;
-		}
-	}
-
-	if (_styles[0].texture.load(loader))
-	{
-		for (WidgetStateType i = 1; i < WidgetStateCount; ++i)
-		{
-			_styles[i].texture = _styles[0].texture;
-		}
+			_styles[i].background = _styles[0].background;
 	}
 
 	if (loader.load_color("text_color", &_styles[0].text_color))
 	{
 		for (WidgetStateType i = 1; i < WidgetStateCount; ++i)
-		{
 			_styles[i].text_color = _styles[0].text_color;
-		}
 	}
 
 	if (loader.load_state("state", &_state)) // Fixed state button.
@@ -84,30 +72,26 @@ bool Button::load(GuiPropertyLoader& loader)
 	Style* style = &_styles[WidgetStateType(WidgetState::Active)];
 
 	loader.bind("active");
-	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.update(loader);
+	style->background.update(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Pressed)];
 
 	loader.bind("pressed");
-	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.update(loader);
+	style->background.update(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Checked)];
 
 	loader.bind("checked");
-	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.update(loader);
+	style->background.update(loader);
 
 	style = &_styles[WidgetStateType(WidgetState::Disabled)];
 
 	loader.bind("disabled");
-	loader.load_color("color", &style->color);
 	loader.load_color("text_color", &style->text_color);
-	style->texture.update(loader);
+	style->background.update(loader);
 
 	_rect = RectF(_position);
 
@@ -138,11 +122,7 @@ void Button::render(Renderer& renderer, const RectF& rect, const Vector2f& scale
 	if (_state != WidgetState::None)
 		state = _state;
 
-	renderer.set_color(_styles[WidgetStateType(state)].color);
-	renderer.set_texture(_styles[WidgetStateType(state)].texture.texture);
-	renderer.set_texture_rectangle(RectF(_styles[WidgetStateType(state)].texture.rect));
-	renderer.set_texture_borders(_styles[WidgetStateType(state)].texture.borders);
-	renderer.draw_rectangle(rect.left(), rect.top(), rect.width(), rect.height());
+	_styles[WidgetStateType(state)].background.render(renderer, rect);
 
 	if (_text.is_empty())
 		return;

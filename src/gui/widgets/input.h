@@ -16,7 +16,7 @@ public:
 
 	GuiInput(Allocator* allocator);
 
-	void dump(GuiPropertyDumper*) const override;
+	void dump(GuiPropertyDumper&) const override;
 	bool load(GuiPropertyLoader&) override;
 	bool process_key(const KeyEvent&) override;
 	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
@@ -27,14 +27,10 @@ private:
 
 private:
 
-	Rect            _position;
-	Vector4f        _color;
-	TextureProperty _texture;
-	TextureFont     _font;
-	Texture2DPtr    _font_texture;
-	Vector2f        _text_size;
-	Vector4f        _text_color;
-	LineEditor      _logic;
+	Rect               _position;
+	BackgroundProperty _background;
+	ForegroundProperty _foreground;
+	LineEditor         _logic;
 };
 
 } // namespace Yttrium

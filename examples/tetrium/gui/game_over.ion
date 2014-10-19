@@ -15,19 +15,19 @@ scene "game_over"
 
 	label
 	{
-		position "15" "13"
-		size     "8"
-		font     "common"
-		color    "0.75" "0" "0"
-		text     "Game over"
+		position   "15" "13"
+		text_size  "8"
+		font       "common"
+		text_color "0.75" "0" "0"
+		text       "Game over"
 	}
 
 	input
 	{
 		position   "5" "18" "20" "4"
 		color      "1" "1" "1" "0.5"
-		font       "common"
 		text_size  "3"
+		font       "common"
 		text_color "0" "0" "0"
 	}
 }

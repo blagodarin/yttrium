@@ -119,7 +119,7 @@ void GuiImpl::clear()
 
 void GuiImpl::dump(const StaticString& filename) const
 {
-	GuiIonDumper(this).dump(filename);
+	GuiIonDumper(*this).dump(filename);
 }
 
 bool GuiImpl::has_scene(const StaticString& name) const

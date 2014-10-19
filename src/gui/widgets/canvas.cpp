@@ -16,10 +16,10 @@ Canvas::Canvas(Gui::Callbacks& gui_callbacks, Allocator* allocator)
 {
 }
 
-void Canvas::dump(GuiPropertyDumper* dumper) const
+void Canvas::dump(GuiPropertyDumper& dumper) const
 {
-	dumper->dump_rect("position", _position);
-	dumper->dump_scaling("scale", _scaling);
+	dumper.dump_rect("position", _position);
+	dumper.dump_scaling("scale", _scaling);
 }
 
 bool Canvas::load(GuiPropertyLoader& loader)

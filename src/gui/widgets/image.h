@@ -13,15 +13,14 @@ public:
 
 	GuiImage(Allocator* allocator);
 
-	void dump(GuiPropertyDumper*) const override;
+	void dump(GuiPropertyDumper&) const override;
 	bool load(GuiPropertyLoader&) override;
 	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
 
 private:
 
-	Rect            _position;
-	Vector4f        _color;
-	TextureProperty _texture;
+	Rect               _position;
+	BackgroundProperty _background;
 };
 
 } // namespace Yttrium

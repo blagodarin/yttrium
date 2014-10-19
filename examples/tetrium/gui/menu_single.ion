@@ -10,10 +10,10 @@ scene "menu_single"
 
 	label
 	{
-		position "320" "100"
-		size     "160"
-		font     "common"
-		text     "Tetrium"
+		position  "320" "100"
+		text_size "160"
+		font      "common"
+		text      "Tetrium"
 	}
 
 	button ["button"]

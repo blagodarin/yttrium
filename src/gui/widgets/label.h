@@ -1,9 +1,7 @@
 #ifndef __GUI_WIDGETS_LABEL_H
 #define __GUI_WIDGETS_LABEL_H
 
-#include <yttrium/renderer/pointers.h>
-#include <yttrium/texture_font.h>
-
+#include "../property.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -15,7 +13,7 @@ public:
 
 	Label(Allocator* allocator);
 
-	void dump(GuiPropertyDumper*) const override;
+	void dump(GuiPropertyDumper&) const override;
 	bool load(GuiPropertyLoader&) override;
 	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
 	void update() override;
@@ -26,13 +24,10 @@ private:
 
 private:
 
-	Vector2f     _position;
-	Vector2f     _size;
-	Vector4f     _color;
-	Texture2DPtr _texture;
-	TextureFont  _font;
-	Alignment    _alignment;
-	String       _final_text;
+	Vector2f           _position;
+	ForegroundProperty _foreground;
+	Alignment          _alignment;
+	String             _final_text;
 };
 
 } // namespace Yttrium

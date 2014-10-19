@@ -4,26 +4,43 @@
 #include <yttrium/margins.h>
 #include <yttrium/rect.h>
 #include <yttrium/renderer/pointers.h>
+#include <yttrium/texture_font.h>
 
 namespace Yttrium
 {
 
 class GuiPropertyDumper;
 class GuiPropertyLoader;
+class Renderer;
 
-struct TextureProperty
+struct BackgroundProperty
 {
+	Vector4f     color;
 	Texture2DPtr texture;
-	Rect         rect;
+	Rect         texture_rect;
 	MarginsI     borders;
-	// TODO: Add color property value.
 
-	void dump(GuiPropertyDumper* dumper) const;
+	BackgroundProperty(): color(1, 1, 1) {}
+
+	void dump(GuiPropertyDumper& dumper) const;
 	bool load(const GuiPropertyLoader& loader);
+	void render(Renderer& renderer, const RectF& rect) const;
 	void update(const GuiPropertyLoader& loader);
 };
 
-// TODO: Add font property (font, text size, text color).
+struct ForegroundProperty
+{
+	TextureFont  font;
+	Texture2DPtr font_texture;
+	Vector2f     size;
+	Vector4f     color;
+
+	ForegroundProperty(): color(1, 1, 1) {}
+
+	void dump(GuiPropertyDumper& dumper) const;
+	bool load(const GuiPropertyLoader& loader);
+	void update(const GuiPropertyLoader& loader);
+};
 
 } // namespace Yttrium
 

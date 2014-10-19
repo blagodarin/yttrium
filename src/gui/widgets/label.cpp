@@ -13,23 +13,18 @@ namespace Yttrium
 
 Label::Label(Allocator* allocator)
 	: Widget(allocator)
-	, _color(1, 1, 1)
 	, _alignment(0)
 	, _final_text(allocator)
 {
 }
 
-void Label::dump(GuiPropertyDumper* dumper) const
+void Label::dump(GuiPropertyDumper& dumper) const
 {
-	dumper->dump_position("position", _position);
-	dumper->dump_size("size", _size);
-	dumper->dump_scaling("scale", _scaling);
-	dumper->dump_color("color", _color);
-
-	// TODO: Dump font.
-
-	dumper->dump_alignment("align", _alignment);
-	dumper->dump_text("text", _text);
+	dumper.dump_position("position", _position);
+	dumper.dump_scaling("scale", _scaling);
+	_foreground.dump(dumper);
+	dumper.dump_alignment("align", _alignment);
+	dumper.dump_text("text", _text);
 }
 
 bool Label::load(GuiPropertyLoader& loader)
@@ -37,8 +32,7 @@ bool Label::load(GuiPropertyLoader& loader)
 	Y_LOG_TRACE("[Gui.Label] Loading...");
 
 	if (!(loader.load_position("position", &_position)
-		&& loader.load_size("size", &_size)
-		&& loader.load_font("font", &_font, &_texture)
+		&& _foreground.load(loader)
 		&& loader.load_text("text", &_text)))
 	{
 		Y_LOG_DEBUG("[Gui.Label] Unable to load");
@@ -46,7 +40,6 @@ bool Label::load(GuiPropertyLoader& loader)
 	}
 
 	loader.load_scaling("scale", &_scaling);
-	loader.load_color("color", &_color);
 	loader.load_alignment("align", &_alignment);
 
 	update_rect(_text);
@@ -59,12 +52,11 @@ void Label::render(Renderer& renderer, const RectF& rect, const Vector2f& scale,
 	if (_text.is_empty())
 		return;
 
-	renderer.set_color(_color);
-	renderer.set_texture(_texture);
-
-	if (renderer.set_font(_font))
+	renderer.set_color(_foreground.color);
+	renderer.set_texture(_foreground.font_texture);
+	if (renderer.set_font(_foreground.font))
 	{
-		renderer.set_font_size(_size.x * scale.y, _size.y);
+		renderer.set_font_size(_foreground.size.x * scale.y, _foreground.size.y);
 		renderer.draw_text(rect.center(), _final_text, 0);
 	}
 }
@@ -80,7 +72,7 @@ void Label::update_rect(const StaticString& text)
 {
 	_rect.set_top_left(_position);
 
-	const Vector2f& text_size = _font.text_size(text, _size);
+	const Vector2f& text_size = _foreground.font.text_size(text, _foreground.size);
 
 	if ((_alignment & HorizontalAlignmentMask) != RightAlignment)
 		_rect.set_left(_rect.left() - text_size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));

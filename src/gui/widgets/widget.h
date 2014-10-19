@@ -61,7 +61,7 @@ public:
 
 public:
 
-	virtual void dump(GuiPropertyDumper* dumper) const = 0;
+	virtual void dump(GuiPropertyDumper& dumper) const = 0;
 
 	virtual bool load(GuiPropertyLoader& loader) = 0;
 

@@ -1,15 +1,15 @@
 class "label_name"
 {
-	size  "1" "1.5"
-	align "center" "right"
-	font  "common"
+	text_size "1" "1.5"
+	font      "common"
+	align     "center" "right"
 }
 
 class "label_value"
 {
-	size  "1" "1.5"
-	align "center" "left"
-	font  "common"
+	text_size "1" "1.5"
+	font      "common"
+	align     "center" "left"
 }
 
 class "background"
