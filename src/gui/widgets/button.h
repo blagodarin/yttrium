@@ -18,7 +18,7 @@ public:
 
 	void dump(GuiPropertyDumper*) const override;
 	bool load(GuiPropertyLoader&) override;
-	void play() const override;
+	bool process_key(const KeyEvent&) override;
 	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
 
 private:
@@ -43,6 +43,7 @@ private:
 	Texture2DPtr _font_texture;
 	Vector2f     _text_size;
 	SoundPtr     _sound;
+	String       _action;
 	WidgetState  _state;
 	Style        _styles[WidgetStateCount];
 };

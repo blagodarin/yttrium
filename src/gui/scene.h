@@ -90,8 +90,9 @@ private:
 	std::map<String, Widget*> _named_widgets;
 	bool                      _is_cursor_set;
 	Vector2f                  _cursor;
-	const Widget*             _mouse_widget;
+	Widget*                   _mouse_widget;
 	const Widget*             _left_click_widget;
+	Widget*                   _focus_widget;
 	bool                      _is_transparent;
 	Bindings                  _bindings;
 };

@@ -3,6 +3,7 @@
 #include "button.h"
 
 #include <yttrium/renderer.h>
+#include <yttrium/script/context.h>
 
 #include "../property_dumper.h"
 #include "../property_loader.h"
@@ -12,6 +13,7 @@ namespace Yttrium
 
 Button::Button(Allocator* allocator)
 	: Widget(allocator)
+	, _action(allocator)
 	, _state(WidgetState::None)
 {
 }
@@ -27,9 +29,7 @@ void Button::dump(GuiPropertyDumper* dumper) const
 	dumper->dump_text("text", _text);
 
 	if (_state != WidgetState::None)
-	{
 		dumper->dump_state("state", _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
-	}
 
 	// TODO: Dump styles.
 }
@@ -114,10 +114,23 @@ bool Button::load(GuiPropertyLoader& loader)
 	return true;
 }
 
-void Button::play() const
+bool Button::process_key(const KeyEvent& event)
 {
+	if (event.key != Key::Mouse1)
+		return false;
+
+	if (event.pressed)
+		return true;
+
 	if (!_sound.is_null())
 		_sound->play();
+	if (!_action.is_empty())
+	{
+		// TODO: Pre-parse the action to avoid script rescanning,
+		// memory allocations and other nasty things on every call.
+		ScriptContext::global().execute(_action);
+	}
+	return true;
 }
 
 void Button::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const

@@ -5,13 +5,13 @@
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
 #include <yttrium/renderer.h>
-#include <yttrium/script/context.h>
 
 #include "../memory/allocatable.h"
 #include "gui.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
 #include "widgets/image.h"
+#include "widgets/input.h"
 #include "widgets/label.h"
 
 namespace Yttrium
@@ -25,6 +25,7 @@ GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator)
 	, _is_cursor_set(false)
 	, _mouse_widget(nullptr)
 	, _left_click_widget(nullptr)
+	, _focus_widget(nullptr)
 	, _is_transparent(false)
 	, _bindings(allocator)
 {
@@ -46,6 +47,8 @@ void GuiScene::load_widget(const StaticString& type, const StaticString& name, G
 		widget.reset<Canvas>(_gui.callbacks());
 	else if (type == "image")
 		widget.reset<GuiImage>();
+	else if (type == "input")
+		widget.reset<GuiInput>();
 	else if (type == "label")
 		widget.reset<Label>();
 
@@ -68,7 +71,14 @@ void GuiScene::load_widget(const StaticString& type, const StaticString& name, G
 
 bool GuiScene::process_key(const KeyEvent& event)
 {
-	bool result = false;
+	if (event.pressed && event.key >= Key::Mouse1 && event.key <= Key::Mouse5
+		&& _focus_widget && _focus_widget != _mouse_widget)
+	{
+		_focus_widget->set_focused(false);
+		_focus_widget = nullptr;
+	}
+
+	bool processed = false;
 
 	if (event.key == Key::Mouse1)
 	{
@@ -76,26 +86,46 @@ bool GuiScene::process_key(const KeyEvent& event)
 		{
 			if (event.pressed)
 			{
-				if (_mouse_widget->is_enabled())
+				processed = _mouse_widget->process_key(event);
+				if (processed)
+				{
 					_left_click_widget = _mouse_widget;
+					if (_mouse_widget->flags() & Widget::CanHaveFocus && _mouse_widget != _focus_widget)
+					{
+						Y_ASSERT(!_focus_widget);
+						_focus_widget = _mouse_widget;
+						_focus_widget->set_focused(true);
+					}
+				}
 			}
 			else if (_mouse_widget == _left_click_widget)
 			{
-				StaticString action = _mouse_widget->action();
-				if (!action.is_empty())
-				{
-					_mouse_widget->play();
-					ScriptContext::global().execute(action);
-				}
+				processed = _mouse_widget->process_key(event);
 			}
-			result = true;
 		}
 
 		if (!event.pressed)
 			_left_click_widget = nullptr;
 	}
+	else if (_focus_widget)
+	{
+		processed = _focus_widget->process_key(event);
+	}
 
-	return event.pressed ? _bindings.call(event.key) : result;
+	if (processed)
+		return true;
+
+	if (event.pressed && _bindings.call(event.key))
+	{
+		if (_focus_widget)
+		{
+			_focus_widget->set_focused(false);
+			_focus_widget = nullptr;
+		}
+		return true;
+	}
+
+	return false;
 }
 
 void GuiScene::render(Renderer& renderer, const Vector2f& size)
@@ -106,7 +136,7 @@ void GuiScene::render(Renderer& renderer, const Vector2f& size)
 	for (Widget* widget: _widgets)
 		widget->update();
 
-	const Widget* mouse_widget = nullptr;
+	Widget* mouse_widget = nullptr;
 
 	if (_is_cursor_set)
 	{

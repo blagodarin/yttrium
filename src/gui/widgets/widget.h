@@ -18,12 +18,18 @@ class Widget
 {
 public:
 
-	Widget(Allocator* allocator)
+	enum
+	{
+		CanHaveFocus = 1 << 0,
+	};
+
+	Widget(Allocator* allocator, unsigned flags = 0)
 		: _scaling(Scaling::Stretch)
 		, _is_enabled(true)
-		, _action(allocator)
 		, _text(allocator)
 		, _name(allocator)
+		, _flags(flags)
+		, _is_focused(false)
 	{
 	}
 
@@ -31,15 +37,19 @@ public:
 
 public:
 
-	StaticString action() const { return _action; }
+	unsigned flags() const { return _flags; }
 
 	bool is_enabled() const { return _is_enabled; }
+
+	bool is_focused() const { return _is_focused; }
 
 	StaticString name() const { return _name; }
 
 	RectF rect() const { return _rect; }
 
 	Scaling scaling() const { return _scaling; }
+
+	void set_focused(bool focused) { _is_focused = focused; }
 
 	void set_name(const StaticString& name) { _name = name; }
 
@@ -55,8 +65,6 @@ public:
 
 	virtual bool load(GuiPropertyLoader& loader) = 0;
 
-	virtual void play() const; // TODO: Produce a better solution.
-
 	virtual bool process_key(const KeyEvent& event);
 
 	virtual void render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const = 0;
@@ -65,12 +73,13 @@ public:
 
 protected:
 
-	RectF   _rect;
-	Scaling _scaling;
-	bool    _is_enabled;
-	String  _action;
-	String  _text;
-	String  _name;
+	RectF          _rect;
+	Scaling        _scaling;
+	bool           _is_enabled;
+	String         _text;
+	String         _name;
+	const unsigned _flags;
+	bool           _is_focused;
 };
 
 } // namespace Yttrium

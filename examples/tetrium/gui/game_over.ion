@@ -21,4 +21,13 @@ scene "game_over"
 		color    "0.75" "0" "0"
 		text     "Game over"
 	}
+
+	input
+	{
+		position   "5" "18" "20" "4"
+		color      "1" "1" "1" "0.5"
+		font       "common"
+		text_size  "3"
+		text_color "0" "0" "0"
+	}
 }
