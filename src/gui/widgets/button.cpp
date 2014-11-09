@@ -122,7 +122,7 @@ void Button::render(Renderer& renderer, const RectF& rect, const Vector2f& scale
 	if (_state != WidgetState::None)
 		state = _state;
 
-	_styles[WidgetStateType(state)].background.render(renderer, rect);
+	_styles[WidgetStateType(state)].background.draw(renderer, rect);
 
 	if (_text.is_empty())
 		return;

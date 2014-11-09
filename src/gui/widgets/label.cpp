@@ -49,16 +49,7 @@ bool Label::load(GuiPropertyLoader& loader)
 
 void Label::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState) const
 {
-	if (_text.is_empty())
-		return;
-
-	renderer.set_color(_foreground.color);
-	renderer.set_texture(_foreground.font_texture);
-	if (renderer.set_font(_foreground.font))
-	{
-		renderer.set_font_size(_foreground.size.x * scale.y, _foreground.size.y);
-		renderer.draw_text(rect.center(), _final_text, 0);
-	}
+	_foreground.draw(renderer, _final_text, rect.center(), 0, scale.y);
 }
 
 void Label::update()

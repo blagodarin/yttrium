@@ -121,9 +121,9 @@ public:
 
 	enum
 	{
-		Height        = 22, ///< Field width.
+		Height        = 22, ///< Field height.
 		HeightPadding =  4, ///< Invisible field part height.
-		Width         = 10, ///< Field height.
+		Width         = 10, ///< Field width.
 	};
 
 public:

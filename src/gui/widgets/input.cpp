@@ -14,6 +14,7 @@ namespace Yttrium
 GuiInput::GuiInput(Allocator* allocator)
 	: Widget(allocator, CanHaveFocus)
 	, _logic(allocator)
+	, _cursor_mark(0)
 {
 }
 
@@ -46,28 +47,49 @@ bool GuiInput::load(GuiPropertyLoader& loader)
 
 bool GuiInput::process_key(const KeyEvent& event)
 {
-	return event.key == Key::Mouse1 && event.pressed;
+	if (event.key == Key::Mouse1)
+	{
+		if (event.pressed > 0)
+		{
+			_cursor_mark = Timer::clock();
+			return true;
+		}
+	}
+
+	if (event.pressed > 0)
+	{
+		if (_logic.process_key(event))
+		{
+			_cursor_mark = Timer::clock();
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void GuiInput::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState) const
 {
-	_background.render(renderer, rect);
+	_background.draw(renderer, rect);
 
-	const String& text = _logic.text();
-	if (!text.is_empty())
+	Renderer::TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
+	_foreground.draw(renderer, _logic.text(), rect.center(), CenterAlignment, scale.y, &capture);
+
+	if (_is_focused && capture.has_cursor && (Timer::clock() - _cursor_mark) % 1000 < 500)
 	{
+		// TODO: Force a cursor symbol to be included in every font.
 		renderer.set_color(_foreground.color);
-		renderer.set_texture(_foreground.font_texture);
-		if (renderer.set_font(_foreground.font))
-		{
-			renderer.set_font_size(_foreground.size.x * scale.y, _foreground.size.y);
-			renderer.draw_text(rect.center(), text, CenterAlignment);
-		}
+		renderer.set_texture(Texture2DPtr());
+		renderer.draw_rectangle(capture.cursor_rect);
 	}
 
-	if (_is_focused)
+	if (capture.has_selection)
 	{
-		// TODO: Draw cursor.
+		auto selection_color(_foreground.color);
+		selection_color.a *= .25f;
+		renderer.set_color(selection_color);
+		renderer.set_texture(Texture2DPtr());
+		renderer.draw_rectangle(capture.selection_rect);
 	}
 }
 

@@ -24,6 +24,29 @@ class Y_API Renderer
 
 public:
 
+	struct TextCapture
+	{
+		const unsigned cursor_pos;
+		bool           has_cursor;
+		RectF          cursor_rect;
+
+		const unsigned selection_begin;
+		const unsigned selection_end;
+		bool           has_selection;
+		RectF          selection_rect;
+
+		TextCapture(unsigned cursor_pos, unsigned selection_begin, unsigned selection_size)
+			: cursor_pos(cursor_pos)
+			, has_cursor(false)
+			, selection_begin(selection_begin)
+			, selection_end(selection_begin + selection_size)
+			, has_selection(false)
+		{
+		}
+	};
+
+public:
+
 	///
 
 	inline Renderer() noexcept;
@@ -60,11 +83,8 @@ public:
 
 	///
 
-	void draw_text(const Vector2f &position, const StaticString &text, Alignment alignment = BottomRightAlignment) noexcept;
-
-	///
-
-	inline void draw_text(float x, float y, const StaticString &text, Alignment alignment = BottomRightAlignment) noexcept;
+	void draw_text(const Vector2f &position, const StaticString &text,
+		Alignment alignment = BottomRightAlignment, TextCapture* capture = nullptr) noexcept;
 
 	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
 	/// and, if requested, capture a screenshot.
@@ -86,10 +106,6 @@ public:
 	///
 
 	void set_color(const Vector4f &color) noexcept;
-
-	///
-
-	inline void set_color(float r, float g, float b, float a = 1.f) noexcept;
 
 	///
 
@@ -181,16 +197,6 @@ Renderer::Renderer() noexcept
 void Renderer::draw_rectangle(float x, float y, float width, float height) noexcept
 {
 	draw_rectangle(RectF(x, y, width, height));
-}
-
-void Renderer::draw_text(float x, float y, const StaticString &text, Alignment alignment) noexcept
-{
-	draw_text(Vector2f(x, y), text, alignment);
-}
-
-void Renderer::set_color(float r, float g, float b, float a) noexcept
-{
-	set_color(Vector4f(r, g, b, a));
 }
 
 void Renderer::set_font_size(float y_size, float x_scaling) noexcept

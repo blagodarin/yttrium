@@ -3,7 +3,7 @@
 
 #include <yttrium/margins.h>
 #include <yttrium/rect.h>
-#include <yttrium/renderer/pointers.h>
+#include <yttrium/renderer.h>
 #include <yttrium/texture_font.h>
 
 namespace Yttrium
@@ -22,9 +22,9 @@ struct BackgroundProperty
 
 	BackgroundProperty(): color(1, 1, 1) {}
 
+	void draw(Renderer& renderer, const RectF& rect) const;
 	void dump(GuiPropertyDumper& dumper) const;
 	bool load(const GuiPropertyLoader& loader);
-	void render(Renderer& renderer, const RectF& rect) const;
 	void update(const GuiPropertyLoader& loader);
 };
 
@@ -37,6 +37,8 @@ struct ForegroundProperty
 
 	ForegroundProperty(): color(1, 1, 1) {}
 
+	void draw(Renderer& renderer, const String& text, const Vector2f& origin,
+		unsigned alignment, float scale, Renderer::TextCapture* capture = nullptr) const;
 	void dump(GuiPropertyDumper& dumper) const;
 	bool load(const GuiPropertyLoader& loader);
 	void update(const GuiPropertyLoader& loader);

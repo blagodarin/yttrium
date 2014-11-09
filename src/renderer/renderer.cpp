@@ -220,12 +220,10 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 	_vertices_2d.push_back(vertex);
 }
 
-void Renderer::Private::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment)
+void Renderer::Private::draw_text(const Vector2f& position, const StaticString& text, Alignment alignment, TextCapture* capture)
 {
 	if (!_font)
-	{
 		return;
-	}
 
 	Vector2f current_position = position;
 	char last_symbol = '\0';
@@ -234,7 +232,7 @@ void Renderer::Private::draw_text(const Vector2f &position, const StaticString &
 
 	if (alignment != BottomRightAlignment)
 	{
-		Vector2f size = text_size(text);
+		const Vector2f size = text_size(text);
 
 		if ((alignment & HorizontalAlignmentMask) != RightAlignment)
 		{
@@ -247,19 +245,46 @@ void Renderer::Private::draw_text(const Vector2f &position, const StaticString &
 		}
 	}
 
-	const char *current_symbol = text.text();
+	float selection_left = 0.f;
+	const auto do_capture = [&](unsigned index)
+	{
+		if (!capture)
+			return;
+
+		if (capture->cursor_pos == index)
+		{
+			const auto two_pixels_wide = 2 * _rendering_size.x / _viewport_size.x;
+			capture->cursor_rect.set_coords(current_position.x, current_position.y,
+				current_position.x + two_pixels_wide, current_position.y + _font_size.y);
+			capture->has_cursor = true;
+		}
+
+		if (capture->selection_begin < capture->selection_end)
+		{
+			if (index == capture->selection_begin)
+			{
+				selection_left = current_position.x;
+			}
+			else if (index == capture->selection_end)
+			{
+				capture->selection_rect.set_coords(selection_left, current_position.y,
+					current_position.x, current_position.y + _font_size.y);
+				capture->has_selection = true;
+			}
+		}
+	};
+
+	const char* current_symbol = text.text();
 
 	for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
 	{
-		const TextureFont::CharInfo *info = _font.char_info(*current_symbol);
+		const TextureFont::CharInfo* info = _font.char_info(*current_symbol);
 
 		if (info)
 		{
-			Vector2f symbol_position(
+			const RectF symbol_rect(
 				current_position.x + x_scaling * info->offset.x,
-				current_position.y + y_scaling * info->offset.y);
-
-			Vector2f symbol_size(
+				current_position.y + y_scaling * info->offset.y,
 				info->rect.width() * x_scaling,
 				info->rect.height() * y_scaling);
 
@@ -267,17 +292,19 @@ void Renderer::Private::draw_text(const Vector2f &position, const StaticString &
 			Vector2f texture_top_left(backend_texture->fix_coords(info->rect.top_left()));
 			Vector2f texture_bottom_right(backend_texture->fix_coords(info->rect.bottom_right()));
 
-			draw_rectangle(
-				RectF(symbol_position, symbol_size),
-				RectF::from_coords(
-					texture_top_left.x, texture_top_left.y,
-					texture_bottom_right.x, texture_bottom_right.y));
+			draw_rectangle(symbol_rect, RectF::from_coords(
+				texture_top_left.x, texture_top_left.y,
+				texture_bottom_right.x, texture_bottom_right.y));
+
+			do_capture(i);
 
 			current_position.x += x_scaling * (info->advance + _font.kerning(last_symbol, *current_symbol));
 		}
 
 		last_symbol = *current_symbol;
 	}
+
+	do_capture(text.size());
 }
 
 Vector2f Renderer::Private::text_size(const StaticString &text) const
@@ -326,9 +353,9 @@ void Renderer::draw_rectangle(const RectF &rect, const RectF &texture_rect)
 		_private->_texture.is_null() ? MarginsF() : _private->_texture_borders);
 }
 
-void Renderer::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment)
+void Renderer::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment, TextCapture* capture)
 {
-	_private->draw_text(position, text, alignment);
+	_private->draw_text(position, text, alignment, capture);
 }
 
 void Renderer::end_frame()
@@ -403,18 +430,16 @@ void Renderer::set_matrix_2d_width(double width)
 	set_matrix_2d(width, _private->_viewport_size.y * width / _private->_viewport_size.x);
 }
 
-void Renderer::set_texture(const Texture2DPtr &texture)
+void Renderer::set_texture(const Texture2DPtr& texture)
 {
 	if (_private->_builtin._is_bound || _private->_texture == texture)
-	{
 		return;
-	}
 
 	flush_2d();
 
 	if (texture.is_null())
 	{
-		BackendTexture2D *old_backend_texture = static_cast<BackendTexture2D *>(_private->_texture.pointer());
+		BackendTexture2D* old_backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
 		if (old_backend_texture)
 			old_backend_texture->unbind();
 	}
@@ -422,7 +447,7 @@ void Renderer::set_texture(const Texture2DPtr &texture)
 	_private->_texture = texture;
 	_private->_texture_borders = MarginsF();
 
-	BackendTexture2D *new_backend_texture = static_cast<BackendTexture2D *>(_private->_texture.pointer());
+	BackendTexture2D* new_backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
 	if (new_backend_texture)
 	{
 		new_backend_texture->bind();
@@ -453,13 +478,13 @@ bool Renderer::set_texture_borders(const MarginsI &borders)
 	return true;
 }
 
-void Renderer::set_texture_rectangle(const RectF &rect)
+void Renderer::set_texture_rectangle(const RectF& rect)
 {
-	BackendTexture2D *backend_texture = static_cast<BackendTexture2D *>(_private->_texture.pointer());
+	BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
 	if (backend_texture)
 	{
-		const Vector2f &top_left = backend_texture->fix_coords(rect.top_left());
-		const Vector2f &bottom_right = backend_texture->fix_coords(rect.bottom_right());
+		const Vector2f& top_left = backend_texture->fix_coords(rect.top_left());
+		const Vector2f& bottom_right = backend_texture->fix_coords(rect.bottom_right());
 
 		_private->_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
 		_private->_texture_borders = MarginsF();

@@ -9,6 +9,15 @@
 namespace Yttrium
 {
 
+void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
+{
+	renderer.set_color(color);
+	renderer.set_texture(texture);
+	renderer.set_texture_rectangle(RectF(texture_rect));
+	renderer.set_texture_borders(borders);
+	renderer.draw_rectangle(rect);
+}
+
 void BackgroundProperty::dump(GuiPropertyDumper& dumper) const
 {
 	dumper.dump_color("color", color);
@@ -32,20 +41,22 @@ bool BackgroundProperty::load(const GuiPropertyLoader& loader)
 	return true;
 }
 
-void BackgroundProperty::render(Renderer& renderer, const RectF& rect) const
-{
-	renderer.set_color(color);
-	renderer.set_texture(texture);
-	renderer.set_texture_rectangle(RectF(texture_rect));
-	renderer.set_texture_borders(borders);
-	renderer.draw_rectangle(rect);
-}
-
 void BackgroundProperty::update(const GuiPropertyLoader& loader)
 {
 	loader.load_texture("texture", &texture);
 	loader.load_rect("texture_rect", &texture_rect, true);
 	loader.load_margins("borders", &borders);
+}
+
+void ForegroundProperty::draw(Renderer& renderer, const String& text,
+	const Vector2f& origin, unsigned alignment, float scale, Renderer::TextCapture* capture) const
+{
+	renderer.set_texture(font_texture);
+	if (!renderer.set_font(font))
+		return;
+	renderer.set_color(color);
+	renderer.set_font_size(size.x * scale, size.y);
+	renderer.draw_text(origin, text, alignment, capture);
 }
 
 void ForegroundProperty::dump(GuiPropertyDumper& dumper) const

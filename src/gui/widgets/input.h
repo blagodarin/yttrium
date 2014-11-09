@@ -2,6 +2,7 @@
 #define __GUI_WIDGETS_INPUT_H
 
 #include <yttrium/texture_font.h>
+#include <yttrium/time.h>
 
 #include "../logic/line_editor.h"
 #include "../property.h"
@@ -31,6 +32,7 @@ private:
 	BackgroundProperty _background;
 	ForegroundProperty _foreground;
 	LineEditor         _logic;
+	Clock              _cursor_mark;
 };
 
 } // namespace Yttrium

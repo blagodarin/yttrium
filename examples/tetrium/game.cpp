@@ -294,7 +294,7 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const Vector
 
 void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2f& block_size)
 {
-	renderer.set_color(1, 1, 1, 1);
+	renderer.set_color(Vector4f(1, 1, 1, 1));
 	set_texture_rectangle(renderer, Tetrium::Figure::None);
 
 	int total_width = 1 + Tetrium::Field::Width + 1;

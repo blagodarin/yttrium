@@ -44,7 +44,7 @@ bool GuiImage::load(GuiPropertyLoader& loader)
 
 void GuiImage::render(Renderer& renderer, const RectF& rect, const Vector2f&, WidgetState) const
 {
-	_background.render(renderer, rect);
+	_background.draw(renderer, rect);
 }
 
 } // namespace Yttrium
