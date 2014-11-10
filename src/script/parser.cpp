@@ -21,7 +21,7 @@ enum class ParserState
 
 } // namespace
 
-ScriptParser::ScriptParser(ScriptContext *context, Allocator *allocator)
+ScriptParser::ScriptParser(ScriptContext& context, Allocator* allocator)
 	: _context(context)
 	, _allocator(allocator)
 	, _temporaries(32, _allocator) // TODO: Get rid of magic numbers.
@@ -45,7 +45,7 @@ bool ScriptParser::parse(const StaticString &script)
 
 	ParserState state = ParserState::Initial;
 
-	while (scanner.read(&token) && token.type != ScriptScanner::Token::End)
+	while (scanner.read(token) && token.type != ScriptScanner::Token::End)
 	{
 		switch (state)
 		{
@@ -132,31 +132,25 @@ bool ScriptParser::parse(const StaticString &script)
 
 bool ScriptParser::execute(ExecutionMode mode)
 {
-	for (Command &command: _commands)
+	for (Command& command: _commands)
 	{
 		bool revert_mode = false;
 
 		if (mode != ExecutionMode::Do)
 		{
 			if (command.name[0] != '+')
-			{
 				continue;
-			}
 			command.name[0] = '-'; // TODO: Replace this unsafe anti-allocation trick with a better one.
 			revert_mode = true;
 		}
 
-		bool result = _context->call(command.name, &command.result, command.args);
+		bool result = _context.call(command.name, &command.result, command.args);
 
 		if (revert_mode)
-		{
 			command.name[0] = '+';
-		}
 
 		if (!result)
-		{
 			return false;
-		}
 	}
 
 	return true;

@@ -11,11 +11,11 @@ class ScriptParser
 {
 public:
 
-	ScriptParser(ScriptContext *context, Allocator *allocator);
+	ScriptParser(ScriptContext& context, Allocator* allocator);
 
 public:
 
-	bool parse(const StaticString &script);
+	bool parse(const StaticString& script);
 
 	bool execute(ExecutionMode mode);
 
@@ -29,7 +29,7 @@ private:
 		String     result;
 		ScriptArgs args;
 
-		Command(const StaticString &name, ScriptContext *context, Allocator *allocator)
+		Command(const StaticString& name, ScriptContext& context, Allocator* allocator)
 			: name(name, allocator)
 			, result(allocator)
 			, args(context)
@@ -37,16 +37,12 @@ private:
 		}
 	};
 
-	typedef std::vector<Command> Commands;
-
-	typedef Pool<ScriptValue> Temporaries;
-
 private:
 
-	ScriptContext *_context;
-	Allocator     *_allocator;
-	Commands       _commands;
-	Temporaries    _temporaries;
+	ScriptContext&       _context;
+	Allocator*           _allocator;
+	std::vector<Command> _commands;
+	Pool<ScriptValue>    _temporaries;
 };
 
 } // namespace Yttrium

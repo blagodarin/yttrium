@@ -36,13 +36,13 @@ public:
 
 	///
 
-	inline ScriptArgs(ScriptContext *context) noexcept;
+	ScriptArgs(ScriptContext& context) noexcept: _context(context) {}
 
 public:
 
 	///
 
-	inline size_t size() const noexcept;
+	size_t size() const noexcept { return _values.size(); }
 
 	///
 
@@ -54,26 +54,9 @@ public:
 
 private:
 
-	typedef std::vector<ScriptValue *> Values;
-
-private:
-
-	ScriptContext *_context;
-	Values         _values;
+	ScriptContext&            _context;
+	std::vector<ScriptValue*> _values;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ScriptArgs::ScriptArgs(ScriptContext *context) noexcept
-	: _context(context)
-{
-}
-
-size_t ScriptArgs::size() const noexcept
-{
-	return _values.size();
-}
 
 } // namespace Yttrium
 

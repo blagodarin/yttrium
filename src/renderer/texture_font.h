@@ -18,17 +18,10 @@ public:
 
 public:
 
-	typedef std::map<char, TextureFont::CharInfo> Chars;
-
-	typedef std::pair<char, char>   CharPair;
-	typedef std::map<CharPair, int> Kernings;
-
-public:
-
-	int      _size;
-	Chars    _chars;
-	Kernings _kernings;
-	Rect     _rect;
+	int                                   _size;
+	std::map<char, TextureFont::CharInfo> _chars;
+	std::map<std::pair<char, char>, int>  _kernings;
+	Rect                                  _rect;
 };
 
 } // namespace Yttrium

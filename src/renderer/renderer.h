@@ -67,11 +67,8 @@ public:
 		Vector2f texture;
 	};
 
-	typedef std::vector<Vertex2D> Vertices2D;
-	typedef std::vector<int16_t>  Indices2D;
-
-	Vertices2D _vertices_2d;
-	Indices2D  _indices_2d;
+	std::vector<Vertex2D> _vertices_2d;
+	std::vector<int16_t>  _indices_2d;
 
 	Texture2DPtr _texture;
 	RectF        _texture_rect;

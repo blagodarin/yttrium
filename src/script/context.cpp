@@ -92,7 +92,7 @@ bool ScriptContext::execute(const StaticString &text, ExecutionMode mode)
 		return true; // NOTE: Why true?
 	}
 
-	ScriptParser parser(this, _allocator);
+	ScriptParser parser(*this, _allocator);
 
 	return parser.parse(text) && parser.execute(mode);
 }

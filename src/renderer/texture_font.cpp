@@ -69,7 +69,7 @@ TextureFont::TextureFont(const TextureFont &font)
 
 const TextureFont::CharInfo *TextureFont::char_info(char symbol) const
 {
-	Private::Chars::const_iterator i = _private->_chars.find(symbol);
+	const auto i = _private->_chars.find(symbol);
 	return i == _private->_chars.end() ? nullptr : &i->second;
 }
 
@@ -80,7 +80,7 @@ void TextureFont::close()
 
 int TextureFont::kerning(char left, char right) const
 {
-	Private::Kernings::const_iterator i = _private->_kernings.find(Private::CharPair(left, right));
+	const auto i = _private->_kernings.find(std::make_pair(left, right));
 	return i != _private->_kernings.end() ? i->second : 0;
 }
 
@@ -159,7 +159,7 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 						break;
 					}
 
-					_private->_kernings[Private::CharPair(kerning.first, kerning.second)] = kerning.amount;
+					_private->_kernings[std::make_pair(kerning.first, kerning.second)] = kerning.amount;
 				}
 			}
 		}

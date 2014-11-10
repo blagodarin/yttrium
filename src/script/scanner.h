@@ -36,7 +36,7 @@ public:
 
 	ScriptScanner(const StaticString &text);
 
-	bool read(Token *token);
+	bool read(Token& token);
 
 private:
 

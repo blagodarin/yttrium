@@ -99,19 +99,19 @@ const Kind kind_of[256] =
 
 } // namespace
 
-ScriptScanner::ScriptScanner(const StaticString &text)
-	: _cursor(const_cast<char *>(text.text()))
+ScriptScanner::ScriptScanner(const StaticString& text)
+	: _cursor(const_cast<char*>(text.text()))
 	, _end(text.text() + text.size())
 	, _line_origin(_cursor - 1)
 	, _line(1)
 {
 }
 
-bool ScriptScanner::read(Token *token)
+bool ScriptScanner::read(Token& token)
 {
-	char *cursor = _cursor;
+	char* cursor = _cursor;
 
-	token->line = _line;
+	token.line = _line;
 
 rescan:
 
@@ -120,10 +120,10 @@ rescan:
 	case Kind::Other:
 
 		{
-			token->column = cursor - _line_origin;
-			token->type = Token::Literal;
+			token.column = cursor - _line_origin;
+			token.type = Token::Literal;
 
-			char *begin = cursor;
+			char* begin = cursor;
 
 			bool has_sigil = (*cursor == '+' || *cursor == '-');
 
@@ -135,7 +135,7 @@ rescan:
 			if ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
 				|| (*cursor >= 'A' && *cursor <= 'Z'))
 			{
-				token->type = Token::Identifier;
+				token.type = Token::Identifier;
 				while ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
 					|| (*cursor >= '0' && *cursor <= '9') || (*cursor >= 'A' && *cursor <= 'Z'))
 				{
@@ -145,16 +145,14 @@ rescan:
 
 			if (kind_of[static_cast<UChar>(*cursor)] == Kind::Other)
 			{
-				token->type = Token::Literal;
+				token.type = Token::Literal;
 				do ++cursor; while (kind_of[static_cast<UChar>(*cursor)] == Kind::Other);
 			}
 
-			if (token->type == Token::Identifier && has_sigil)
-			{
-				token->type = Token::XIdentifier;
-			}
+			if (token.type == Token::Identifier && has_sigil)
+				token.type = Token::XIdentifier;
 
-			token->string = StaticString(begin, cursor - begin);
+			token.string = StaticString(begin, cursor - begin);
 		}
 		break;
 
@@ -171,10 +169,10 @@ rescan:
 	case Kind::Quote:
 
 		{
-			token->column = cursor - _line_origin;
+			token.column = cursor - _line_origin;
 
-			char *begin = ++cursor;
-			char *end   = begin;
+			char* begin = ++cursor;
+			char* end = begin;
 
 			for (; ; )
 			{
@@ -195,7 +193,7 @@ rescan:
 					default:
 
 						Y_LOG(S("[ScriptScanner] Invalid escape sequence \"") << *cursor
-							<< S("\" (") << token->line << ':' << cursor - _line_origin << ')');
+							<< S("\" (") << token.line << ':' << cursor - _line_origin << ')');
 						return false;
 					}
 					++cursor;
@@ -203,7 +201,7 @@ rescan:
 				else if (*cursor == '\n' || *cursor == '\r')
 				{
 					Y_LOG(S("[ScriptScanner] Unexpected end of line (")
-						<< token->line << ':' << cursor - _line_origin << ')');
+						<< token.line << ':' << cursor - _line_origin << ')');
 					return false;
 				}
 				else if (cursor != _end)
@@ -218,32 +216,30 @@ rescan:
 				else
 				{
 					Y_LOG(S("[ScriptScanner] Unexpected end of script (")
-						<< token->line << ':' << cursor - _line_origin << ')');
+						<< token.line << ':' << cursor - _line_origin << ')');
 					return false;
 				}
 			}
 
-			token->type = Token::String;
-			token->string = StaticString(begin, end - begin);
+			token.type = Token::String;
+			token.string = StaticString(begin, end - begin);
 		}
 		break;
 
 	case Kind::Newline:
 
-		token->column = cursor - _line_origin;
+		token.column = cursor - _line_origin;
 		if (*cursor == '\r' && *(cursor + 1) == '\n') // Treat "\r\n" as a single newline.
-		{
 			++cursor;
-		}
 		++_line;
 		_line_origin = ++cursor - 1;
-		token->type = Token::Separator;
+		token.type = Token::Separator;
 		break;
 
 	case Kind::Semicolon:
 
-		token->column = cursor++ - _line_origin;
-		token->type = Token::Separator;
+		token.column = cursor++ - _line_origin;
+		token.type = Token::Separator;
 		break;
 
 	case Kind::End:
@@ -253,14 +249,14 @@ rescan:
 			++cursor;
 			goto rescan;
 		}
-		token->column = cursor - _line_origin;
-		token->type = Token::End;
+		token.column = cursor - _line_origin;
+		token.type = Token::End;
 		break;
 
 	case Kind::Error:
 
 		Y_LOG(S("[ScriptScanner] Invalid script character (")
-			<< token->line << ':' << cursor - _line_origin << ')');
+			<< token.line << ':' << cursor - _line_origin << ')');
 		return false;
 	}
 

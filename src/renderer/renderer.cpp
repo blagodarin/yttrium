@@ -50,9 +50,7 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 		_indices_2d.push_back(index);
 
 		if (_indices_2d.size() & 1)
-		{
 			_indices_2d.push_back(index); // Add an extra degenerate to ensure the correct face ordering.
-		}
 	}
 
 	Vertex2D vertex;
@@ -232,17 +230,13 @@ void Renderer::Private::draw_text(const Vector2f& position, const StaticString& 
 
 	if (alignment != BottomRightAlignment)
 	{
-		const Vector2f size = text_size(text);
+		const Vector2f& size = text_size(text);
 
 		if ((alignment & HorizontalAlignmentMask) != RightAlignment)
-		{
 			current_position.x -= size.x * (alignment & LeftAlignment ? 1.0 : 0.5);
-		}
 
 		if ((alignment & VerticalAlignmentMask) != BottomAlignment)
-		{
 			current_position.y -= size.y * (alignment & TopAlignment ? 1.0 : 0.5);
-		}
 	}
 
 	float selection_left = 0.f;
@@ -288,7 +282,7 @@ void Renderer::Private::draw_text(const Vector2f& position, const StaticString& 
 				info->rect.width() * x_scaling,
 				info->rect.height() * y_scaling);
 
-			BackendTexture2D *backend_texture = static_cast<BackendTexture2D *>(_texture.pointer());
+			BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.pointer());
 			Vector2f texture_top_left(backend_texture->fix_coords(info->rect.top_left()));
 			Vector2f texture_bottom_right(backend_texture->fix_coords(info->rect.bottom_right()));
 
