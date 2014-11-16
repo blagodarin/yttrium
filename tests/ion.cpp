@@ -5,7 +5,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(ion_serialization_test)
+BOOST_AUTO_TEST_CASE(test_ion_serialization)
 {
 	DECLARE_MEMORY_MANAGER;
 

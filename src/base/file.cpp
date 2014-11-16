@@ -144,7 +144,7 @@ bool File::read_line(String* string)
 
 File& File::operator =(const File& file)
 {
-	Private::assign(&_private, file._private);
+	Private::copy(_private, file._private);
 
 	_offset  = file._offset;
 	_size    = file._size;

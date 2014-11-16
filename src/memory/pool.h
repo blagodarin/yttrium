@@ -12,31 +12,26 @@ class Y_PRIVATE PoolBase::Chunk
 {
 public:
 
-	class Item
+	struct Item
 	{
-	public:
-
-		Chunk *chunk;
+		Chunk* chunk;
 		char   data[0];
 
-	public:
-
-		static Item *base(void *pointer);
-
+		static Item* base(void* pointer);
 		static size_t size(size_t item_size);
 	};
 
 public:
 
-	Chunk(size_t chunk_items, size_t item_size, Chunk *previous);
+	Chunk(size_t chunk_items, size_t item_size, Chunk* previous);
 
 	~Chunk();
 
 public:
 
-	Item *allocate();
+	Item* allocate();
 
-	void deallocate(Item *item);
+	void deallocate(Item* item);
 
 	bool is_empty() const;
 
@@ -48,12 +43,12 @@ public:
 
 public:
 
-	Chunk   *_previous;
-	Chunk   *_next;
-	size_t   _size;
-	size_t   _end;
-	Item   **_free;
-	char    *_items;
+	Chunk* _previous;
+	Chunk* _next;
+	size_t _size;
+	size_t _end;
+	Item** _free;
+	char*  _items;
 };
 
 } // namespace Yttrium

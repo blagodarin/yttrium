@@ -10,10 +10,8 @@ class ScriptScanner
 {
 public:
 
-	class Token
+	struct Token
 	{
-	public:
-
 		enum Type
 		{
 			Identifier,
@@ -24,8 +22,6 @@ public:
 			End,
 		};
 
-	public:
-
 		size_t       line;
 		size_t       column;
 		Type         type;
@@ -34,15 +30,15 @@ public:
 
 public:
 
-	ScriptScanner(const StaticString &text);
+	ScriptScanner(const StaticString& text);
 
 	bool read(Token& token);
 
 private:
 
-	char       *_cursor;
-	const char *_end;
-	char       *_line_origin;
+	char*       _cursor;
+	const char* _end;
+	char*       _line_origin;
 	size_t      _line;
 };
 

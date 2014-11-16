@@ -54,7 +54,7 @@ void GuiIonDumper::dump(const StaticString& filename) const
 		scene_list->append(action.first.first);
 		scene_list->append(action.first.second);
 
-		on_scene_change_node->append(action.second);
+		on_scene_change_node->append(action.second.first);
 	}
 
 	document.save(filename);

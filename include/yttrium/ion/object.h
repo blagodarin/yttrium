@@ -232,14 +232,9 @@ private:
 
 private:
 
-	typedef std::vector<Node *>     Nodes;
-	typedef std::map<String, Nodes> NodeMap;
-
-private:
-
-	Document *_document;
-	Nodes     _nodes;
-	NodeMap   _node_map;
+	Document* _document;
+	std::vector<Node*> _nodes;
+	std::map<String, std::vector<Node*>> _node_map;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

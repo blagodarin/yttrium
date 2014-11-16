@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 
-PackageReader::PackageReader(const PackageReader &reader)
+PackageReader::PackageReader(const PackageReader& reader)
 	: _private(Private::copy(reader._private))
 {
 }
@@ -15,11 +15,11 @@ void PackageReader::close()
 	Private::release(&_private);
 }
 
-bool PackageReader::open(const StaticString &name, PackageType type, Allocator *allocator)
+bool PackageReader::open(const StaticString& name, PackageType type, Allocator* allocator)
 {
 	close();
 
-	if (Y_LIKELY(type == PackageType::Auto))
+	if (type == PackageType::Auto)
 	{
 		StaticString extension = name.file_extension();
 		if (extension == ".ypq")
@@ -34,31 +34,31 @@ bool PackageReader::open(const StaticString &name, PackageType type, Allocator *
 	default:               return false;
 	}
 
-	if (Y_LIKELY(_private->_file.open(name, allocator) && _private->open()))
+	if (_private->_file.open(name, allocator) && _private->open())
 		return true;
 
 	close();
 	return false;
 }
 
-File PackageReader::open_file(const StaticString &name)
+File PackageReader::open_file(const StaticString& name)
 {
-	if (Y_LIKELY(_private))
+	if (_private)
 	{
-		const PackedFile &packed_file = _private->open_file(name);
-		if (Y_LIKELY(packed_file.file))
+		const PackedFile& packed_file = _private->open_file(name);
+		if (packed_file.file)
 			return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
 	}
 	return File();
 }
 
-PackageReader &PackageReader::operator =(const PackageReader &reader)
+PackageReader& PackageReader::operator=(const PackageReader& reader)
 {
-	Private::assign(&_private, reader._private);
+	Private::copy(_private, reader._private);
 	return *this;
 }
 
-PackageWriter::PackageWriter(const PackageWriter &reader)
+PackageWriter::PackageWriter(const PackageWriter& reader)
 	: _private(Private::copy(reader._private))
 {
 }
@@ -68,11 +68,11 @@ void PackageWriter::close()
 	Private::release(&_private);
 }
 
-bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, Allocator *allocator)
+bool PackageWriter::open(const StaticString& name, PackageType type, Mode mode, Allocator* allocator)
 {
 	close();
 
-	if (Y_LIKELY(type == PackageType::Auto))
+	if (type == PackageType::Auto)
 	{
 		StaticString extension = name.file_extension();
 		if (extension == ".ypq")
@@ -87,27 +87,27 @@ bool PackageWriter::open(const StaticString &name, PackageType type, Mode mode, 
 	default:               return false;
 	}
 
-	if (Y_LIKELY(_private->_file.open(name, File::Write | (mode & Append ? 0 : File::Truncate)) && _private->open(mode)))
+	if (_private->_file.open(name, File::Write | (mode & Append ? 0 : File::Truncate)) && _private->open(mode))
 		return true;
 
 	close();
 	return false;
 }
 
-File PackageWriter::open_file(const StaticString &name)
+File PackageWriter::open_file(const StaticString& name)
 {
-	if (Y_LIKELY(_private))
+	if (_private)
 	{
 		const PackedFile &packed_file = _private->open_file(name);
-		if (Y_LIKELY(packed_file.file))
+		if (packed_file.file)
 			return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
 	}
 	return File();
 }
 
-PackageWriter &PackageWriter::operator =(const PackageWriter &writer)
+PackageWriter& PackageWriter::operator=(const PackageWriter& writer)
 {
-	Private::assign(&_private, writer._private);
+	Private::copy(_private, writer._private);
 	return *this;
 }
 

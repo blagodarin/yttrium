@@ -4,7 +4,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(rect_initialization_test)
+BOOST_AUTO_TEST_CASE(test_rect_initialization)
 {
 	Rect null_rect;
 
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(rect_initialization_test)
 	BOOST_CHECK_EQUAL(rect.top() + rect.height(), rect.bottom());
 }
 
-BOOST_AUTO_TEST_CASE(rect_containment_test)
+BOOST_AUTO_TEST_CASE(test_rect_containment)
 {
 	Rect rect(0, 0, 10, 10);
 
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(rect_containment_test)
 	BOOST_CHECK(!smaller_rect.contains(rect));
 }
 
-BOOST_AUTO_TEST_CASE(rect_intersection_test)
+BOOST_AUTO_TEST_CASE(test_rect_intersection)
 {
 	Rect rect(0, 0, 3, 3);
 
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(rect_intersection_test)
 	BOOST_CHECK(!far_rect.fastest_intersects(rect));
 }
 
-BOOST_AUTO_TEST_CASE(rect_null_intersection_test)
+BOOST_AUTO_TEST_CASE(test_rect_null_intersection)
 {
 	// This test case exists only as an implementation reference,
 	// one should not rely on null rect intersection detection!

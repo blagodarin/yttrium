@@ -1,11 +1,10 @@
 #include "logging.h"
 
+#include <yttrium/script/code.h>
 #include <yttrium/script/context.h>
 
 #include <yttrium/assert.h>
 #include <yttrium/file.h>
-
-#include "parser.h"
 
 namespace Yttrium
 {
@@ -61,7 +60,7 @@ bool ScriptContext::call(const StaticString &name, String *result, const ScriptA
 
 	StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
-	Commands::iterator command = _commands.find(String(id, ByReference(), nullptr));
+	const auto command = _commands.find(String(id, ByReference(), nullptr));
 
 	if (command == _commands.end())
 	{
@@ -80,55 +79,49 @@ bool ScriptContext::call(const StaticString &name, String *result, const ScriptA
 	return true;
 }
 
-void ScriptContext::define(const StaticString &name, const Command &command, size_t min_args, size_t max_args)
+void ScriptContext::define(const StaticString& name, const Command& command, size_t min_args, size_t max_args)
 {
 	_commands[String(name, _allocator)] = CommandContext(command, min_args, max_args);
 }
 
-bool ScriptContext::execute(const StaticString &text, ExecutionMode mode)
+bool ScriptContext::execute(const StaticString& text, ExecutionMode mode)
 {
-	if (text.is_empty())
-	{
-		return true; // NOTE: Why true?
-	}
-
-	ScriptParser parser(*this, _allocator);
-
-	return parser.parse(text) && parser.execute(mode);
+	const ScriptCode& code = ScriptCode(text);
+	if (!code)
+		return false;
+	code.execute(this, mode);
+	return true;
 }
 
-bool ScriptContext::execute_file(const StaticString &name)
+bool ScriptContext::execute_file(const StaticString& name)
 {
-	String buffer(_allocator);
-
-	return File(name, _allocator).read_all(&buffer) && execute(buffer, ExecutionMode::Do);
+	const ScriptCode& code = ScriptCode::load(name);
+	if (!code)
+		return false;
+	code.execute(this, ExecutionMode::Do);
+	return true;
 }
 
-ScriptValue *ScriptContext::find(const StaticString &name) const
+ScriptValue* ScriptContext::find(const StaticString& name) const
 {
-	Entities::const_iterator i = _entities.find(String(name, ByReference(), nullptr));
-
+	const auto i = _entities.find(String(name, ByReference(), nullptr));
 	if (i != _entities.end())
-	{
 		return i->second.value;
-	}
 
 	if (_parent)
-	{
 		return _parent->find(name);
-	}
 
 	return nullptr;
 }
 
-ScriptContext *ScriptContext::root()
+ScriptContext* ScriptContext::root()
 {
-	return (_parent ? _parent->root() : this);
+	return _parent ? _parent->root() : this;
 }
 
-const ScriptValue *ScriptContext::set(const StaticString &name, Integer value, ScriptValue::Flags flags)
+const ScriptValue* ScriptContext::set(const StaticString &name, Integer value, ScriptValue::Flags flags)
 {
-	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
+	auto i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i == _entities.end())
 	{
@@ -155,9 +148,9 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Integer value, S
 	return i->second.value;
 }
 
-const ScriptValue *ScriptContext::set(const StaticString &name, Real value, ScriptValue::Flags flags)
+const ScriptValue* ScriptContext::set(const StaticString& name, Real value, ScriptValue::Flags flags)
 {
-	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
+	auto i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i == _entities.end())
 	{
@@ -184,9 +177,9 @@ const ScriptValue *ScriptContext::set(const StaticString &name, Real value, Scri
 	return i->second.value;
 }
 
-const ScriptValue *ScriptContext::set(const StaticString &name, const StaticString &value, ScriptValue::Flags flags)
+const ScriptValue* ScriptContext::set(const StaticString& name, const StaticString& value, ScriptValue::Flags flags)
 {
-	Entities::iterator i = _entities.find(String(name, ByReference(), nullptr));
+	auto i = _entities.find(String(name, ByReference(), nullptr));
 
 	if (i == _entities.end())
 	{
@@ -213,65 +206,49 @@ const ScriptValue *ScriptContext::set(const StaticString &name, const StaticStri
 	return i->second.value;
 }
 
-void ScriptContext::substitute(String *target, const StaticString &source) const
+void ScriptContext::substitute(String* target, const StaticString& source) const
 {
 	Y_ASSERT(target->text() != source.text());
 
-	for (const char *left = source.text(), *right = left, *end = left + source.size(); ; )
+	for (auto left = source.text(), right = left, end = left + source.size(); ; )
 	{
 		while (right != end && *right != '{')
-		{
 			++right;
-		}
 
 		target->append(left, right - left);
 
 		if (right == end)
-		{
 			break;
-		}
 
 		left = ++right;
 
 		while (right != end && *right != '}')
-		{
 			++right;
-		}
 
 		if (right == end)
-		{
 			break;
-		}
 
-		ScriptValue *value = find(StaticString(left, right - left));
-
+		ScriptValue* value = find(StaticString(left, right - left));
 		if (value)
-		{
 			target->append(value->string());
-		}
 
 		left = ++right;
 	}
 }
 
-void ScriptContext::unset(const StaticString &name)
+void ScriptContext::unset(const StaticString& name)
 {
-	Entities::iterator i = _entities.find(String(name, ByReference()));
+	const auto i = _entities.find(String(name, ByReference()));
+	if (i == _entities.end())
+		return;
 
-	if (i != _entities.end())
-	{
-		_values.deallocate(i->second.value);
-
-		if (i->second.archived_value)
-		{
-			_values.deallocate(i->second.archived_value);
-		}
-
-		_entities.erase(i);
-	}
+	_values.deallocate(i->second.value);
+	if (i->second.archived_value)
+		_values.deallocate(i->second.archived_value);
+	_entities.erase(i);
 }
 
-void ScriptContext::undefine(const StaticString &name)
+void ScriptContext::undefine(const StaticString& name)
 {
 	_commands.erase(String(name, ByReference()));
 }

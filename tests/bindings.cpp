@@ -6,7 +6,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(bindings_test)
+BOOST_AUTO_TEST_CASE(test_bindings)
 {
 	BOOST_CHECK(lookup_key(StaticString()) == Key::Null);
 	BOOST_CHECK(lookup_key("invalid_key") == Key::Null);

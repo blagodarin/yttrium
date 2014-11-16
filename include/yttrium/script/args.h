@@ -11,21 +11,21 @@
 namespace Yttrium
 {
 
+class ScriptCode;
 class ScriptContext;
 class ScriptParser;
 class ScriptValue;
 
 /// Script command arguments.
-
 class Y_API ScriptArgs
 {
+	friend ScriptCode;
 	friend ScriptContext;
 	friend ScriptParser;
 
 public:
 
 	///
-
 	enum NameResolution
 	{
 		DontResolve, ///<
@@ -35,27 +35,29 @@ public:
 public:
 
 	///
-
 	ScriptArgs(ScriptContext& context) noexcept: _context(context) {}
 
 public:
 
 	///
-
 	size_t size() const noexcept { return _values.size(); }
 
 	///
-
 	String string(size_t index, NameResolution resolution = DontResolve) const noexcept;
 
 	///
-
-	const ScriptValue *value(size_t index) const noexcept;
+	const ScriptValue* value(size_t index) const noexcept;
 
 private:
 
 	ScriptContext&            _context;
 	std::vector<ScriptValue*> _values;
+
+	ScriptArgs(ScriptContext& context, const std::vector<ScriptValue*>& values)
+		: _context(context)
+		, _values(values)
+	{
+	}
 };
 
 } // namespace Yttrium

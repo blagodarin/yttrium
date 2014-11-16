@@ -100,7 +100,7 @@ void GuiImpl::set_font(const StaticString& name,
 
 void GuiImpl::set_scene_change_action(const String& from_scene, const String& to_scene, const String& action)
 {
-	_scene_actions.emplace(ScenePair(from_scene, to_scene), action);
+	_scene_actions.emplace(std::make_pair(from_scene, to_scene), std::make_pair(action, ScriptCode(action)));
 }
 
 void GuiImpl::clear()
@@ -217,9 +217,9 @@ void GuiImpl::change_scene(const StaticString& old_scene, const StaticString& ne
 {
 	Y_LOG_DEBUG("[Gui] Changing scene from \"" << old_scene << "\" to \"" << new_scene << "\"...");
 
-	auto i = _scene_actions.find(ScenePair(String(old_scene, ByReference()), String(new_scene, ByReference())));
+	auto i = _scene_actions.find(std::make_pair(String(old_scene, ByReference()), String(new_scene, ByReference())));
 	if (i != _scene_actions.end())
-		ScriptContext::global().execute(i->second);
+		i->second.second.execute();
 }
 
 void GuiImpl::delete_scene(GuiScene* scene)

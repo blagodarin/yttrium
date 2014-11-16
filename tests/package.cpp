@@ -9,7 +9,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(package_rewrite_test)
+BOOST_AUTO_TEST_CASE(test_package_rewrite)
 {
 	DECLARE_MEMORY_MANAGER;
 

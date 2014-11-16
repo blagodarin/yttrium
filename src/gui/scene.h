@@ -6,6 +6,7 @@
 
 #include "types.h"
 
+#include <map>
 #include <vector>
 
 namespace Yttrium

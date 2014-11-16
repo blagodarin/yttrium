@@ -4,7 +4,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(vector2_test)
+BOOST_AUTO_TEST_CASE(test_vector2)
 {
 	Vector2<int> null_vector(0);
 

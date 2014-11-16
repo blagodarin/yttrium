@@ -15,6 +15,8 @@ struct Public
 
 	Public(const Public& public_): _private(Private::copy(public_._private)) {}
 
+	Public(Public&& public_): _private(public_._private) { public_._private = nullptr; }
+
 	~Public()
 	{
 		close();
@@ -33,12 +35,18 @@ struct Public
 
 	Public& operator =(const Public& public_)
 	{
-		Private::assign(&_private, public_._private);
+		Private::copy(_private, public_._private);
+		return *this;
+	}
+
+	Public& operator =(Public&& public_)
+	{
+		Private::move(_private, public_._private);
 		return *this;
 	}
 };
 
-BOOST_AUTO_TEST_CASE(private_test)
+BOOST_AUTO_TEST_CASE(test_private)
 {
 	DECLARE_MEMORY_MANAGER;
 

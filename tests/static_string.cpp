@@ -4,7 +4,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(static_string_initialization_test)
+BOOST_AUTO_TEST_CASE(test_static_string_initialization)
 {
 	StaticString s1;
 
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(static_string_initialization_test)
 	BOOST_CHECK_EQUAL(s1.size(), s2.size());
 }
 
-BOOST_AUTO_TEST_CASE(static_string_assignment_test)
+BOOST_AUTO_TEST_CASE(test_static_string_assignment)
 {
 	StaticString s1 = "test";
 
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(static_string_assignment_test)
 	BOOST_CHECK_EQUAL(s1.size(), s2.size());
 }
 
-BOOST_AUTO_TEST_CASE(static_string_to_int_test)
+BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 {
 	BOOST_CHECK_EQUAL(S("-2147483648").to_int32(), -2147483647 - 1);
 	BOOST_CHECK_EQUAL(S("2147483647").to_int32(), 2147483647);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(static_string_to_int_test)
 	BOOST_CHECK_EQUAL(S("+18446744073709551615").to_uint64(), UINT64_C(18446744073709551615));
 }
 
-BOOST_AUTO_TEST_CASE(static_string_to_int32_number_test)
+BOOST_AUTO_TEST_CASE(test_static_string_to_int32_number)
 {
 	int32_t i32;
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(static_string_to_int32_number_test)
 	BOOST_CHECK(!S("-2147483649").to_number(&i32));
 }
 
-BOOST_AUTO_TEST_CASE(static_string_to_double_number_test)
+BOOST_AUTO_TEST_CASE(test_static_string_to_double_number)
 {
 	double d;
 

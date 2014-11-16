@@ -26,7 +26,7 @@ private:
 
 typedef Yttrium::Pointer<Pointable> Pointer;
 
-BOOST_AUTO_TEST_CASE(pointer_test)
+BOOST_AUTO_TEST_CASE(test_pointer)
 {
 	DECLARE_MEMORY_MANAGER;
 

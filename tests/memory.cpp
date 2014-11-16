@@ -6,7 +6,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(default_allocator_test)
+BOOST_AUTO_TEST_CASE(test_default_allocator)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(default_allocator_test)
 	allocator->deallocate(p);
 }
 
-BOOST_AUTO_TEST_CASE(default_allocator_difference_test)
+BOOST_AUTO_TEST_CASE(test_default_allocator_difference)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(default_allocator_difference_test)
 	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Decrement);
 }
 
-BOOST_AUTO_TEST_CASE(system_allocator_test)
+BOOST_AUTO_TEST_CASE(test_system_allocator)
 {
 	SystemAllocator *allocator = SystemAllocator::instance();
 

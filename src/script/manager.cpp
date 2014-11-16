@@ -1,4 +1,5 @@
 #include <yttrium/script/manager.h>
+#include "manager.h"
 
 #include <yttrium/memory_manager.h>
 #include <yttrium/script/context.h>
@@ -9,13 +10,15 @@
 namespace Yttrium
 {
 
+Allocator* script_manager_allocator = nullptr;
+
 typedef InstanceGuard<ScriptManager> ScriptManagerGuard;
 
 class Y_PRIVATE ScriptManager::Private
 {
 public:
 
-	Private(ScriptManager *public_, Allocator *allocator)
+	Private(ScriptManager* public_, Allocator* allocator)
 		: _instance_guard(public_, "Duplicate ScriptManager construction")
 		, _allocator(allocator, "script")
 		, _root_context(_allocator)
@@ -29,20 +32,22 @@ public:
 	ScriptContext      _root_context;
 };
 
-ScriptManager::ScriptManager(Allocator *allocator)
+ScriptManager::ScriptManager(Allocator* allocator)
 	: _private(nullptr)
 {
 	if (!allocator)
 		allocator = MemoryManager::default_allocator();
 	_private = Y_NEW(allocator, ScriptManager::Private)(this, allocator);
+	script_manager_allocator = _private->_allocator;
 }
 
 ScriptManager::~ScriptManager()
 {
+	script_manager_allocator = nullptr;
 	_private->_allocator.delete_private(_private);
 }
 
-ScriptContext &ScriptContext::global()
+ScriptContext& ScriptContext::global()
 {
 	return ScriptManagerGuard::instance->_private->_root_context;
 }

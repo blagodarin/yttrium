@@ -1,7 +1,5 @@
 Yttrium:
 - Add Windows port.
-- Add more allocator inheritance.
-- Make use of rvalue references.
 - Implement error manager capable to output errors from e.g. Y_ASSERT to stderr as well as log.
 
     Base:
@@ -20,6 +18,3 @@ Yttrium:
 
     ION:
     - Make string value retrieval more usable.
-
-    Scripts:
-    - Implement parsed script objects, ready for execution.

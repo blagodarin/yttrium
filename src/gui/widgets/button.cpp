@@ -8,12 +8,13 @@
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
+#include <utility> // move
+
 namespace Yttrium
 {
 
 Button::Button(Allocator* allocator)
 	: Widget(allocator)
-	, _action(allocator)
 	, _state(WidgetState::None)
 {
 }
@@ -66,7 +67,10 @@ bool Button::load(GuiPropertyLoader& loader)
 		_is_enabled = false;
 	}
 
-	loader.load_text("action", &_action);
+	String action_script(_name.allocator());
+	loader.load_text("action", &action_script);
+	_action = ScriptCode(std::move(action_script));
+
 	_sound = loader.load_sound("sound");
 
 	Style* style = &_styles[WidgetStateType(WidgetState::Active)];
@@ -108,12 +112,7 @@ bool Button::process_key(const KeyEvent& event)
 
 	if (!_sound.is_null())
 		_sound->play();
-	if (!_action.is_empty())
-	{
-		// TODO: Pre-parse the action to avoid script rescanning,
-		// memory allocations and other nasty things on every call.
-		ScriptContext::global().execute(_action);
-	}
+	_action.execute();
 	return true;
 }
 

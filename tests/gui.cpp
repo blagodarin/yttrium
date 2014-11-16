@@ -1,6 +1,7 @@
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
 #include <yttrium/log.h>
+#include <yttrium/script/manager.h>
 #include <yttrium/string.h>
 #include <yttrium/window.h>
 
@@ -23,12 +24,9 @@ public:
 	void on_render_canvas(Renderer&, const StaticString&, const RectF&) noexcept override {}
 };
 
-BOOST_AUTO_TEST_CASE(gui_test)
+BOOST_AUTO_TEST_CASE(test_gui)
 {
 	DECLARE_MEMORY_MANAGER;
-
-	// Unfortunately, GUI manager requires log in case something goes wrong.
-	LogManager log_manager("test_gui.log", DefaultAllocator);
 
 	File file(File::Temporary);
 
@@ -39,6 +37,11 @@ BOOST_AUTO_TEST_CASE(gui_test)
 
 		Renderer renderer = window->create_renderer();
 		BOOST_REQUIRE(renderer);
+
+		// Unfortunately, GUI requires log in case something goes wrong.
+		LogManager log_manager("test_gui.log", DefaultAllocator);
+
+		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 
 		GuiCallbacks gui_callbacks;
 		GuiPtr gui = Gui::create(renderer, gui_callbacks);

@@ -1,7 +1,7 @@
 #include "console.h"
 
 #include <yttrium/renderer/builtin.h>
-#include <yttrium/script/context.h>
+#include <yttrium/script/code.h>
 #include <yttrium/window.h>
 
 namespace Yttrium
@@ -11,7 +11,7 @@ bool Console::process_key(const KeyEvent& event)
 {
 	if (event.key == Key::Enter)
 	{
-		ScriptContext::global().execute(_line_editor.text());
+		ScriptCode(_line_editor.text()).execute();
 		_line_editor.clear();
 		return true;
 	}

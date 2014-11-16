@@ -10,7 +10,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(file_read_all_test)
+BOOST_AUTO_TEST_CASE(test_file_read_all)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(file_read_all_test)
 	BOOST_CHECK(!::memcmp(actual_string.const_text(), buffer.data(), buffer.size()));
 }
 
-BOOST_AUTO_TEST_CASE(file_transfer_test)
+BOOST_AUTO_TEST_CASE(test_file_transfer)
 {
 	DECLARE_MEMORY_MANAGER;
 

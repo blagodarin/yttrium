@@ -315,7 +315,7 @@ Renderer::Private *Renderer::Private::create(WindowBackend *window, Allocator *a
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Renderer::Renderer(const Renderer &renderer)
+Renderer::Renderer(const Renderer& renderer)
 	: _private(Private::copy(renderer._private))
 {
 }
@@ -325,7 +325,7 @@ Renderer::~Renderer()
 	Private::release(&_private);
 }
 
-Allocator *Renderer::allocator() const
+Allocator* Renderer::allocator() const
 {
 	return _private->_allocator;
 }
@@ -335,19 +335,19 @@ void Renderer::begin_frame()
 	_private->clear();
 }
 
-void Renderer::draw_rectangle(const RectF &rect)
+void Renderer::draw_rectangle(const RectF& rect)
 {
 	_private->draw_rectangle(rect, _private->_texture_rect,
 		_private->_texture.is_null() ? MarginsF() : _private->_texture_borders);
 }
 
-void Renderer::draw_rectangle(const RectF &rect, const RectF &texture_rect)
+void Renderer::draw_rectangle(const RectF& rect, const RectF& texture_rect)
 {
 	_private->draw_rectangle(rect, texture_rect,
 		_private->_texture.is_null() ? MarginsF() : _private->_texture_borders);
 }
 
-void Renderer::draw_text(const Vector2f &position, const StaticString &text, Alignment alignment, TextCapture* capture)
+void Renderer::draw_text(const Vector2f& position, const StaticString& text, Alignment alignment, TextCapture* capture)
 {
 	_private->draw_text(position, text, alignment, capture);
 }
@@ -383,14 +383,14 @@ RendererBuiltin Renderer::renderer_builtin()
 	return RendererBuiltin(&_private->_builtin);
 }
 
-void Renderer::set_color(const Vector4f &color)
+void Renderer::set_color(const Vector4f& color)
 {
 	_private->_color = color;
 }
 
-bool Renderer::set_font(const TextureFont &font)
+bool Renderer::set_font(const TextureFont& font)
 {
-	BackendTexture2D *backend_texture = static_cast<BackendTexture2D *>(_private->_texture.pointer());
+	BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
 	if (!backend_texture || (font && !Rect(backend_texture->size()).contains(font.rect())))
 		return false;
 
@@ -398,7 +398,7 @@ bool Renderer::set_font(const TextureFont &font)
 	return true;
 }
 
-void Renderer::set_font_size(const Vector2f &size)
+void Renderer::set_font_size(const Vector2f& size)
 {
 	_private->_font_size = size;
 }
@@ -455,14 +455,14 @@ void Renderer::set_texture(const Texture2DPtr& texture)
 	_private->_font = TextureFont();
 }
 
-bool Renderer::set_texture_borders(const MarginsI &borders)
+bool Renderer::set_texture_borders(const MarginsI& borders)
 {
 	if (_private->_texture.is_null())
 		return false;
 
-	Vector2f&& texture_size = _private->_texture->size().to<float>();
-	Vector2f&& texture_rect_size = _private->_texture_rect.size();
-	Vector2f&& min_size = borders.min_size().to<float>() / texture_size;
+	const Vector2f& texture_size = _private->_texture->size().to<float>();
+	const Vector2f& texture_rect_size = _private->_texture_rect.size();
+	const Vector2f& min_size = borders.min_size().to<float>() / texture_size;
 	if (texture_rect_size.x < min_size.x || texture_rect_size.y < min_size.y)
 		return false;
 
@@ -490,12 +490,12 @@ Vector2d Renderer::rendering_size() const
 	return _private->_rendering_size;
 }
 
-void Renderer::take_screenshot(const StaticString &name)
+void Renderer::take_screenshot(const StaticString& name)
 {
 	_private->_screenshot_filename = name;
 }
 
-Vector2f Renderer::text_size(const StaticString &text) const
+Vector2f Renderer::text_size(const StaticString& text) const
 {
 	return _private->text_size(text);
 }
@@ -505,19 +505,18 @@ Dim2 Renderer::viewport_size() const
 	return _private->_viewport_size;
 }
 
-Renderer &Renderer::operator =(const Renderer &renderer)
+Renderer& Renderer::operator=(const Renderer& renderer)
 {
-	Private::assign(&_private, renderer._private);
-
+	Private::copy(_private, renderer._private);
 	return *this;
 }
 
-Renderer::Renderer(WindowBackend *window, Allocator *allocator)
+Renderer::Renderer(WindowBackend* window, Allocator* allocator)
 	: _private(Private::create(window, allocator))
 {
 }
 
-Renderer::Renderer(Private *private_)
+Renderer::Renderer(Private* private_)
 	: _private(Private::copy(private_))
 {
 }

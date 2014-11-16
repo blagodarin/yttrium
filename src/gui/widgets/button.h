@@ -2,6 +2,7 @@
 #define __GUI_WIDGETS_BUTTON_H
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/script/code.h>
 
 #include "../property.h"
 #include "widget.h"
@@ -37,7 +38,7 @@ private:
 	Texture2DPtr _font_texture;
 	Vector2f     _text_size;
 	SoundPtr     _sound;
-	String       _action;
+	ScriptCode   _action;
 	WidgetState  _state;
 	Style        _styles[WidgetStateCount];
 };

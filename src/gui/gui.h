@@ -5,6 +5,7 @@
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/renderer.h>
 #include <yttrium/renderer/texture_cache.h>
+#include <yttrium/script/code.h>
 #include <yttrium/texture_font.h>
 
 #include "types.h"
@@ -104,8 +105,6 @@ private:
 
 private:
 
-	typedef std::pair<String, String> ScenePair;
-
 	ProxyAllocator                    _proxy_allocator;
 	Renderer                          _renderer;
 	TextureCachePtr                   _texture_cache;
@@ -116,7 +115,7 @@ private:
 	std::map<String, FontDesc>        _fonts;
 	std::map<StaticString, GuiScene*> _scenes;
 	std::vector<GuiScene*>            _scene_stack;
-	std::map<ScenePair, String>       _scene_actions;
+	std::map<std::pair<String, String>, std::pair<String, ScriptCode>> _scene_actions;
 	bool                              _has_cursor;
 	Vector2f                          _cursor;
 };

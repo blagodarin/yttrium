@@ -6,7 +6,10 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
-#include <yttrium/audio.h>
+#include <yttrium/audio/io.h>
+#include <yttrium/audio/manager.h>
+#include <yttrium/audio/player.h>
+#include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
 #include <yttrium/buffer.h>
 #include <yttrium/dir.h>
@@ -31,7 +34,11 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_cache.h>
 #include <yttrium/screen.h>
-#include <yttrium/script.h>
+#include <yttrium/script/args.h>
+#include <yttrium/script/code.h>
+#include <yttrium/script/context.h>
+#include <yttrium/script/manager.h>
+#include <yttrium/script/value.h>
 #include <yttrium/static_string.h>
 #include <yttrium/string.h>
 #include <yttrium/system_allocator.h>

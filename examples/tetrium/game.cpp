@@ -32,7 +32,7 @@ bool Game::setup()
 	if (_window.is_null())
 		return false;
 
-	ScriptContext::global().execute_file("tetrium.txt");
+	ScriptCode::load("tetrium.txt").execute();
 
 	_bindings.bind_default(Key::_1, "play_music");
 	_bindings.bind_default(Key::_2, "stop_music");
@@ -116,12 +116,12 @@ void Game::save_settings()
 		String settings("# Generated automatically\n\n", _allocator);
 
 		settings << "unbindall\n";
-		const Bindings::Map &bindings = _bindings.map();
-		for (Bindings::Map::const_iterator i = bindings.begin(); i != bindings.end(); ++i)
+		const auto& bindings = _bindings.map();
+		for (auto i = bindings.begin(); i != bindings.end(); ++i)
 			settings << "bind " << i->first << " \"" << i->second.escaped("\\\"", '\\') << "\"\n";
 
-		const ScriptContext::Archive &archive = ScriptContext::global().archive();
-		for (ScriptContext::Archive::const_iterator i = archive.begin(); i != archive.end(); ++i)
+		const auto& archive = ScriptContext::global().archive();
+		for (auto i = archive.begin(); i != archive.end(); ++i)
 			settings << "seta " << i->first << " " << i->second << "\n";
 
 		settings_file.write(settings.text(), settings.size());

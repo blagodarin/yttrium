@@ -13,7 +13,6 @@ class Allocator;
 class ScriptContext;
 
 /// Script manager.
-
 class Y_API ScriptManager
 {
 	friend ScriptContext;
@@ -23,11 +22,9 @@ class Y_API ScriptManager
 public:
 
 	///
-
-	ScriptManager(Allocator *allocator = nullptr) noexcept;
+	ScriptManager(Allocator* allocator = nullptr) noexcept;
 
 	///
-
 	~ScriptManager() noexcept;
 
 private:

@@ -10,14 +10,15 @@ namespace Yttrium
 {
 
 class ScriptArgs;
+class ScriptCode;
 class ScriptContext;
 class ScriptParser;
 
 /// Script value data.
-
 class Y_API ScriptValue
 {
 	friend ScriptArgs;
+	friend ScriptCode;
 	friend ScriptContext;
 	friend ScriptParser;
 
@@ -35,7 +36,6 @@ public:
 
 	/// Value type.
 	/// \note Every Name is a Literal, and every Literal is a String, but not visa versa.
-
 	enum Type
 	{
 		String,  ///< String value.
@@ -46,34 +46,30 @@ public:
 public:
 
 	///
-
-	inline Integer integer() const noexcept;
-
-	///
-
-	inline Real real() const noexcept;
+	Integer integer() const noexcept { return _value.to_int32(); }
 
 	///
-
-	inline Yttrium::String string() const noexcept;
+	Real real() const noexcept { return _value.to_double(); }
 
 	///
+	Yttrium::String string() const noexcept { return _value; }
 
-	inline Type type() const noexcept;
+	///
+	Type type() const noexcept { return _type; }
 
 public:
 
 	///
 
-	ScriptValue &operator =(Integer value) noexcept;
+	ScriptValue& operator=(Integer value) noexcept;
 
 	///
 
-	ScriptValue &operator =(Real value) noexcept;
+	ScriptValue& operator=(Real value) noexcept;
 
 	///
 
-	ScriptValue &operator =(const StaticString &value) noexcept;
+	ScriptValue& operator=(const StaticString& value) noexcept;
 
 private:
 
@@ -82,34 +78,11 @@ private:
 
 private:
 
-	Y_PRIVATE ScriptValue(Integer value, Allocator *allocator);
-	Y_PRIVATE ScriptValue(Real value, Allocator *allocator);
-	Y_PRIVATE ScriptValue(const StaticString &value, Allocator *allocator);
-	Y_PRIVATE ScriptValue(const StaticString &value, Type type, Allocator *allocator);
+	Y_PRIVATE ScriptValue(Integer value, Allocator* allocator);
+	Y_PRIVATE ScriptValue(Real value, Allocator* allocator);
+	Y_PRIVATE ScriptValue(const StaticString& value, Allocator* allocator);
+	Y_PRIVATE ScriptValue(const StaticString& value, Type type, Allocator* allocator);
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Integer ScriptValue::integer() const noexcept
-{
-	return _value.to_int32();
-}
-
-Real ScriptValue::real() const noexcept
-{
-	return _value.to_double();
-}
-
-String ScriptValue::string() const noexcept
-{
-	return _value;
-}
-
-ScriptValue::Type ScriptValue::type() const noexcept
-{
-	return _type;
-}
 
 } // namespace Yttrium
 

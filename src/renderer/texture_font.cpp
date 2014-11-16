@@ -57,17 +57,17 @@ const uint32_t FourccGvf1 = Fourcc<'G', 'V', 'F', '1'>::value;
 
 } // namespace
 
-TextureFont::Private::Private(Allocator *allocator)
+TextureFont::Private::Private(Allocator* allocator)
 	: PrivateBase(allocator)
 {
 }
 
-TextureFont::TextureFont(const TextureFont &font)
+TextureFont::TextureFont(const TextureFont& font)
 	: _private(Private::copy(font._private))
 {
 }
 
-const TextureFont::CharInfo *TextureFont::char_info(char symbol) const
+const TextureFont::CharInfo* TextureFont::char_info(char symbol) const
 {
 	const auto i = _private->_chars.find(symbol);
 	return i == _private->_chars.end() ? nullptr : &i->second;
@@ -91,16 +91,12 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 	File file(name, allocator);
 
 	if (!file.is_opened())
-	{
 		return false;
-	}
 
 	uint32_t fourcc;
 
-	if (!(file.read(&fourcc) && (fourcc == FourccYtf1 || fourcc == FourccGvf1 || fourcc == FourccEtf1)))
-	{
+	if (!file.read(&fourcc) || (fourcc != FourccYtf1 && fourcc != FourccGvf1 && fourcc != FourccEtf1))
 		return false;
-	}
 
 	Ytf1Font font_section;
 
@@ -185,7 +181,7 @@ int TextureFont::size() const
 	return _private->_size;
 }
 
-Dim2 TextureFont::text_size(const StaticString &text) const
+Dim2 TextureFont::text_size(const StaticString& text) const
 {
 	Dim2 result(0, _private->_size);
 
@@ -194,20 +190,16 @@ Dim2 TextureFont::text_size(const StaticString &text) const
 		// TODO: Rewrite.
 
 		char previous = text[0];
-		const CharInfo *info = char_info(previous);
+		const CharInfo* info = char_info(previous);
 		if (info)
-		{
 			result.x += info->advance;
-		}
 
 		for (size_t i = 1; i < text.size(); ++i)
 		{
 			char current = text[i];
 			const CharInfo *info = char_info(current);
 			if (info)
-			{
 				result.x += info->advance + kerning(previous, current);
-			}
 			previous = current;
 		}
 	}
@@ -215,10 +207,9 @@ Dim2 TextureFont::text_size(const StaticString &text) const
 	return result;
 }
 
-TextureFont &TextureFont::operator =(const TextureFont &font)
+TextureFont& TextureFont::operator=(const TextureFont& font)
 {
-	Private::assign(&_private, font._private);
-
+	Private::copy(_private, font._private);
 	return *this;
 }
 

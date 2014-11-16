@@ -4,7 +4,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(string_initialization_test)
+BOOST_AUTO_TEST_CASE(test_string_initialization)
 {
 	String s1;
 
@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(string_initialization_test)
 	BOOST_CHECK(s1 == s2);
 }
 
-BOOST_AUTO_TEST_CASE(string_assignment_test)
+BOOST_AUTO_TEST_CASE(test_string_assignment)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(string_assignment_test)
 	BOOST_CHECK(s3 == "test");
 }
 
-BOOST_AUTO_TEST_CASE(string_swap_test)
+BOOST_AUTO_TEST_CASE(test_string_swap)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(string_swap_test)
 	BOOST_CHECK(s1 == "rvalue test");
 }
 
-BOOST_AUTO_TEST_CASE(string_insert_test)
+BOOST_AUTO_TEST_CASE(test_string_insert)
 {
 	DECLARE_MEMORY_MANAGER;
 

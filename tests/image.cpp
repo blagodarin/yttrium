@@ -9,7 +9,7 @@ using namespace Yttrium;
 // The TGA test must come first because the TGA format
 // is the most basic one for both loading and saving.
 
-BOOST_AUTO_TEST_CASE(tga_test)
+BOOST_AUTO_TEST_CASE(test_tga)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(tga_test)
 	BOOST_CHECK(expected == actual);
 }
 
-BOOST_AUTO_TEST_CASE(dds_test)
+BOOST_AUTO_TEST_CASE(test_dds)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(dds_test)
 	BOOST_CHECK(dds_image == tga_image);
 }
 
-BOOST_AUTO_TEST_CASE(jpeg_test)
+BOOST_AUTO_TEST_CASE(test_jpeg)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(jpeg_test)
 	BOOST_CHECK(jpeg_image == tga_image);
 }
 
-BOOST_AUTO_TEST_CASE(png_test)
+BOOST_AUTO_TEST_CASE(test_png)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(png_test)
 	BOOST_CHECK(expected == actual);
 }
 
-BOOST_AUTO_TEST_CASE(intensity_test)
+BOOST_AUTO_TEST_CASE(test_intensity)
 {
 	DECLARE_MEMORY_MANAGER;
 

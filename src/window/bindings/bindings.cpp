@@ -193,7 +193,9 @@ Bindings::Bindings(Allocator* allocator)
 
 void Bindings::bind(Key key, const StaticString& action)
 {
-	_actions[KeyType(key)].swap(String(action, _allocator));
+	auto& binding = _actions[KeyType(key)];
+	binding.first.swap(String(action, _allocator));
+	binding.second = ScriptCode(binding.first);
 }
 
 bool Bindings::bind(const StaticString& name, const StaticString& action)
@@ -201,15 +203,18 @@ bool Bindings::bind(const StaticString& name, const StaticString& action)
 	const Key key = lookup_key(name);
 	if (key == Key::Null)
 		return false;
-	_actions[KeyType(key)].swap(String(action, _allocator));
+	bind(key, action);
 	return true;
 }
 
 void Bindings::bind_default(Key key, const StaticString& action)
 {
-	String& old_action = _actions[KeyType(key)];
-	if (old_action.is_empty())
-		old_action.swap(String(action, _allocator));
+	auto& binding = _actions[KeyType(key)];
+	if (binding.first.is_empty())
+	{
+		binding.first.swap(String(action, _allocator));
+		binding.second = ScriptCode(binding.first);
+	}
 }
 
 bool Bindings::bind_default(const StaticString& name, const StaticString& action)
@@ -217,43 +222,44 @@ bool Bindings::bind_default(const StaticString& name, const StaticString& action
 	const Key key = lookup_key(name);
 	if (key == Key::Null)
 		return false;
-	String& old_action = _actions[KeyType(key)];
-	if (old_action.is_empty())
-		old_action.swap(String(action, _allocator));
+	bind_default(key, action);
 	return true;
 }
 
 bool Bindings::call(Key key, ExecutionMode mode)
 {
-	// TODO: Pre-parse the actions to avoid script rescanning,
-	// memory allocations and other nasty things on every call.
-	const String& action = _actions[KeyType(key)];
-	if (action.is_empty())
+	const auto& binding = _actions[KeyType(key)];
+	if (binding.first.is_empty())
 		return false;
-	ScriptContext::global().execute(action, mode);
+	binding.second.execute(nullptr, mode);
 	return true;
 }
 
 void Bindings::clear()
 {
-	for (String& action: _actions)
-		action.clear();
+	for (auto& binding: _actions)
+	{
+		binding.first.clear();
+		binding.second = ScriptCode();
+	}
 }
 
-Bindings::Map Bindings::map() const
+std::map<String, String> Bindings::map() const
 {
-	Map result;
-	for (size_t i = 0; i < KeyCount; ++i)
+	std::map<String, String> result;
+	for (size_t i = 0; i < _actions.size(); ++i)
 	{
-		if (bind_names[i][0] && !_actions[i].is_empty())
-			result.emplace(String(bind_names[i], _allocator), _actions[i]);
+		if (bind_names[i][0] && !_actions[i].first.is_empty())
+			result.emplace(String(bind_names[i], _allocator), _actions[i].first);
 	}
 	return result;
 }
 
 void Bindings::unbind(Key key)
 {
-	_actions[KeyType(key)].clear();
+	auto& binding = _actions[KeyType(key)];
+	binding.first.clear();
+	binding.second = ScriptCode();
 }
 
 bool Bindings::unbind(const StaticString& name)
@@ -261,7 +267,7 @@ bool Bindings::unbind(const StaticString& name)
 	const Key key = lookup_key(name);
 	if (key == Key::Null)
 		return false;
-	_actions[KeyType(key)].clear();
+	unbind(key);
 	return true;
 }
 
