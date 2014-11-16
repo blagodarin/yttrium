@@ -9,60 +9,50 @@
 namespace Yttrium
 {
 
-void *HeapAllocator::allocate(size_t size, size_t align, Difference *difference)
+void *HeapAllocator::allocate(size_t size, size_t align, Difference* difference)
 {
 	Y_UNUSED(align);
 
 	void *pointer = ::malloc(size);
 
-	if (Y_UNLIKELY(!pointer))
+	if (!pointer)
 	{
 		Y_ABORT("Out of memory"); // NOTE: Safe to continue.
 		return nullptr;
 	}
 
 	if (difference)
-	{
 		*difference = Difference(0, 0, Difference::Increment);
-	}
 
 	return pointer;
 }
 
-void HeapAllocator::deallocate(void *pointer, Difference *difference)
+void HeapAllocator::deallocate(void* pointer, Difference* difference)
 {
-	if (Y_UNLIKELY(!pointer))
-	{
+	if (!pointer)
 		return;
-	}
 
 	::free(pointer);
 
 	if (difference)
-	{
 		*difference = Difference(0, 0, Difference::Decrement);
-	}
 }
 
-void *HeapAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
+void* HeapAllocator::reallocate(void* pointer, size_t size, Movability movability, Difference* difference)
 {
 	if (movability != MayMove)
-	{
 		return nullptr;
-	}
 
-	void *result = ::realloc(pointer, size);
+	void* result = ::realloc(pointer, size);
 
-	if (Y_UNLIKELY(!result))
+	if (!result)
 	{
 		Y_ABORT("Out of memory");
 		return nullptr;
 	}
 
 	if (difference)
-	{
 		*difference = Difference(0, 0, Difference::Increment);
-	}
 
 	return result;
 }

@@ -8,17 +8,17 @@ namespace
 
 void _png_write_callback(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-	reinterpret_cast<File *>(png_get_io_ptr(png_ptr))->write(data, length);
+	reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->write(data, length);
 }
 
 void _png_flush_callback(png_structp png_ptr)
 {
-	reinterpret_cast<File *>(png_get_io_ptr(png_ptr))->flush();
+	reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->flush();
 }
 
 } // namespace
 
-PngWriter::PngWriter(Allocator *allocator)
+PngWriter::PngWriter(Allocator* allocator)
 	: ImageWriter(allocator)
 	, _png(nullptr)
 	, _info(nullptr)
@@ -30,13 +30,9 @@ PngWriter::~PngWriter()
 	if (_png)
 	{
 		if (_info)
-		{
 			png_destroy_write_struct(&_png, &_info);
-		}
 		else
-		{
 			png_destroy_write_struct(&_png, nullptr);
-		}
 	}
 }
 
@@ -68,21 +64,21 @@ bool PngWriter::set_format(const ImageFormat &format)
 	{
 	case PixelFormat::Gray:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16))
+		if (format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16)
 			return false;
 		break;
 
 	case PixelFormat::GrayAlpha:
 	case PixelFormat::AlphaGray:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32))
+		if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
 			return false;
 		break;
 
 	case PixelFormat::Rgb:
 	case PixelFormat::Bgr:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48))
+		if (format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48)
 			return false;
 		break;
 
@@ -91,7 +87,7 @@ bool PngWriter::set_format(const ImageFormat &format)
 	case PixelFormat::Argb:
 	case PixelFormat::Abgr:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64))
+		if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
 			return false;
 		break;
 
@@ -100,26 +96,22 @@ bool PngWriter::set_format(const ImageFormat &format)
 		return false;
 	}
 
-	if (Y_UNLIKELY(format.orientation() != ImageOrientation::XRightYDown
-		&& format.orientation() != ImageOrientation::XRightYUp))
+	if (format.orientation() != ImageOrientation::XRightYDown
+		&& format.orientation() != ImageOrientation::XRightYUp)
 	{
 		return false;
 	}
 
-	if (Y_UNLIKELY(!format.width()))
-	{
+	if (format.width() <= 0 || format.width() > UINT32_MAX)
 		return false;
-	}
 
-	if (Y_UNLIKELY(!format.height()))
-	{
+	if (format.height() <= 0 || format.height() > UINT32_MAX)
 		return false;
-	}
 
 	return true;
 }
 
-bool PngWriter::write(const void *buffer)
+bool PngWriter::write(const void* buffer)
 {
 	int color_type = 0;
 	int transforms = 0;
@@ -193,16 +185,12 @@ bool PngWriter::write(const void *buffer)
 	if (_format.orientation() == ImageOrientation::XRightYDown)
 	{
 		for (size_t i = 0; i < _format.height(); i++, j += _format.row_size())
-		{
 			rows[i] = const_cast<png_bytep>(static_cast<png_const_bytep>(buffer) + j);
-		}
 	}
 	else
 	{
 		for (size_t i = _format.height(); i > 0; i--, j += _format.row_size())
-		{
 			rows[i - 1] = const_cast<png_bytep>(static_cast<png_const_bytep>(buffer) + j);
-		}
 	}
 
 	png_set_rows(_png, _info, rows);

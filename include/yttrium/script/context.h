@@ -109,20 +109,11 @@ public:
 	*/
 	const ScriptValue* set(const StaticString& name, const StaticString& value, ScriptValue::Flags flags = 0) noexcept;
 
-	///
-	void substitute(String* target, const StaticString& source) const noexcept;
-
-	/// Substitute the script variables in a string.
-	/// \param string Source string.
-	/// \param allocator Allocator to use for the result.
-	/// \return String with substitutions.
+	/// Substitute script variables in a string.
+	/// \param target
+	/// \param source
 	/// \note Every occurence of the pair of curly braces is threated as a variable name.
-	String substitute(const StaticString& string, Allocator* allocator = nullptr) const noexcept
-	{
-		String result(allocator ? allocator : _allocator);
-		substitute(&result, string);
-		return result;
-	}
+	void substitute(String& target, const StaticString& source) const noexcept;
 
 	/// Undefine a command.
 	/// \param name Command name.

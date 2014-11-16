@@ -241,9 +241,9 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 	FastSigned exponent = (raw_value.i & Float::ExponentMask) >> Float::MantissaBits;
 	FastUnsigned mantissa = raw_value.i & Float::MantissaMask;
 
-	if (Y_UNLIKELY(!exponent))
+	if (!exponent)
 	{
-		if (Y_LIKELY(!mantissa))
+		if (!mantissa)
 		{
 			return is_negative ? negative_zero : positive_zero;
 		}
@@ -261,9 +261,9 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 		mantissa <<= shift;
 		exponent = Float::DenormalizedExponent - shift;
 	}
-	else if (Y_UNLIKELY(exponent == Float::BiasedInfinityExponent))
+	else if (exponent == Float::BiasedInfinityExponent)
 	{
-		if (Y_LIKELY(!mantissa))
+		if (!mantissa)
 		{
 			return is_negative ? negative_infinity : positive_infinity;
 		}
@@ -281,7 +281,7 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 	// At this point, the absolute value is (mantissa / 0x800000) * pow(2, exponent),
 	// with [0x800000, 0xFFFFFF] mantissa range, and [-147, 127] exponent range.
 
-	if (Y_UNLIKELY(exponent > Float::MantissaBits)) // The precision exceeds 1.
+	if (exponent > Float::MantissaBits) // The precision exceeds 1.
 	{
 		// TODO: Implement.
 	}
@@ -312,7 +312,7 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 
 		FastSigned fraction_value = (mantissa << whole_bits) & Float::ImplicitMantissaMask;
 
-		if (Y_LIKELY(fraction_value && max_fraction_digits))
+		if (fraction_value && max_fraction_digits)
 		{
 			*end++ = '.';
 
@@ -337,7 +337,7 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 			{
 				char extra_digit = '0' + ((fraction_value * 10) >> (Float::MantissaBits + 1));
 
-				if (extra_digit > '5' || Y_UNLIKELY(extra_digit == '5' && ((last_digit - '0') & 1)))
+				if (extra_digit > '5' || (extra_digit == '5' && ((last_digit - '0') & 1)))
 				{
 					++last_digit;
 					while (last_digit > '9')

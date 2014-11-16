@@ -27,7 +27,7 @@ Y_API Y_NORETURN void abort(const char *message, const char *file, int line, con
 /// Terminate the program if \a condition is true, outputting a message to the log.
 
 #define Y_ABORT_IF(condition, message) \
-	do { if (Y_UNLIKELY(condition)) Y_ABORT(message); } while (false)
+	do { if (condition) Y_ABORT(message); } while (false)
 
 /// \def Y_ASSERT(condition)
 /// \brief Terminate the program if the \a condition isn't met.
@@ -36,7 +36,7 @@ Y_API Y_NORETURN void abort(const char *message, const char *file, int line, con
 	#define Y_ASSERT(condition)
 #else
 	#define Y_ASSERT(condition) \
-		do { if (Y_UNLIKELY(!(condition))) Y_ABORT("Assertion failed: " #condition); } while (false)
+		do { if (!(condition)) Y_ABORT("Assertion failed: " #condition); } while (false)
 #endif
 
 #endif // __Y_ASSERT_H

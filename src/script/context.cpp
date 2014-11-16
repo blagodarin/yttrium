@@ -206,16 +206,17 @@ const ScriptValue* ScriptContext::set(const StaticString& name, const StaticStri
 	return i->second.value;
 }
 
-void ScriptContext::substitute(String* target, const StaticString& source) const
+void ScriptContext::substitute(String& target, const StaticString& source) const
 {
-	Y_ASSERT(target->text() != source.text());
+	Y_ASSERT(target.text() != source.text());
 
+	target.clear();
 	for (auto left = source.text(), right = left, end = left + source.size(); ; )
 	{
 		while (right != end && *right != '{')
 			++right;
 
-		target->append(left, right - left);
+		target.append(left, right - left);
 
 		if (right == end)
 			break;
@@ -230,7 +231,7 @@ void ScriptContext::substitute(String* target, const StaticString& source) const
 
 		ScriptValue* value = find(StaticString(left, right - left));
 		if (value)
-			target->append(value->string());
+			target.append(value->string());
 
 		left = ++right;
 	}

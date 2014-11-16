@@ -30,17 +30,11 @@ bool TgaReader::open()
 			uint_fast8_t alpha = header.image.descriptor & tgaAlphaMask;
 
 			if (!alpha && header.image.pixel_depth == 24)
-			{
 				_format.set_pixel_format(PixelFormat::Bgr, 24);
-			}
 			else if (alpha == 8 && header.image.pixel_depth == 32)
-			{
 				_format.set_pixel_format(PixelFormat::Bgra, 32);
-			}
 			else
-			{
 				break;
-			}
 		}
 		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
 		{
@@ -63,14 +57,10 @@ bool TgaReader::open()
 		}
 
 		if (header.id_length)
-		{
 			_file.skip(header.id_length);
-		}
 
 		if (header.color_map.length)
-		{
 			_file.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8));
-		}
 
 		return true;
 	} while (false);
@@ -95,19 +85,19 @@ bool TgaWriter::set_format(const ImageFormat &format)
 	{
 	case PixelFormat::Gray:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 8))
+		if (format.bits_per_pixel() != 8)
 			return false;
 		break;
 
 	case PixelFormat::Bgr:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 24))
+		if (format.bits_per_pixel() != 24)
 			return false;
 		break;
 
 	case PixelFormat::Bgra:
 
-		if (Y_UNLIKELY(format.bits_per_pixel() != 32))
+		if (format.bits_per_pixel() != 32)
 			return false;
 		break;
 
@@ -116,23 +106,19 @@ bool TgaWriter::set_format(const ImageFormat &format)
 		return false;
 	}
 
-	if (Y_UNLIKELY(format.orientation() != ImageOrientation::XRightYDown
+	if (format.orientation() != ImageOrientation::XRightYDown
 		&& format.orientation() != ImageOrientation::XRightYUp
 		&& format.orientation() != ImageOrientation::XLeftYDown
-		&& format.orientation() != ImageOrientation::XLeftYUp))
+		&& format.orientation() != ImageOrientation::XLeftYUp)
 	{
 		return false;
 	}
 
-	if (Y_UNLIKELY(!format.width() || format.width() > UINT16_MAX))
-	{
+	if (format.width() <= 0 || format.width() > UINT16_MAX)
 		return false;
-	}
 
-	if (Y_UNLIKELY(!format.height() || format.height() > UINT16_MAX))
-	{
+	if (format.height() <= 0 || format.height() > UINT16_MAX)
 		return false;
-	}
 
 	return true;
 }

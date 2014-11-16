@@ -39,20 +39,20 @@ bool DdsReader::open()
 	{
 	case DDPF_RGB:
 
-		if (Y_UNLIKELY(header.ddspf.dwRGBBitCount != 24))
+		if (header.ddspf.dwRGBBitCount != 24)
 			return false;
 
-		if (Y_LIKELY(header.ddspf.dwRBitMask == 0x00FF0000
+		if (header.ddspf.dwRBitMask == 0x00FF0000
 			&& header.ddspf.dwGBitMask == 0x0000FF00
 			&& header.ddspf.dwBBitMask == 0x000000FF
-			&& !header.ddspf.dwABitMask))
+			&& !header.ddspf.dwABitMask)
 		{
 			_format.set_pixel_format(PixelFormat::Bgr, 24);
 		}
-		else if (Y_LIKELY(header.ddspf.dwRBitMask == 0x000000FF
+		else if (header.ddspf.dwRBitMask == 0x000000FF
 			&& header.ddspf.dwGBitMask == 0x0000FF00
 			&& header.ddspf.dwBBitMask == 0x00FF0000
-			&& !header.ddspf.dwABitMask))
+			&& !header.ddspf.dwABitMask)
 		{
 			_format.set_pixel_format(PixelFormat::Rgb, 24);
 		}
@@ -64,20 +64,20 @@ bool DdsReader::open()
 
 	case DDPF_RGB | DDPF_ALPHAPIXELS:
 
-		if (Y_UNLIKELY(header.ddspf.dwRGBBitCount != 32))
+		if (header.ddspf.dwRGBBitCount != 32)
 			return false;
 
-		if (Y_LIKELY(header.ddspf.dwRBitMask == 0x00FF0000
+		if (header.ddspf.dwRBitMask == 0x00FF0000
 			&& header.ddspf.dwGBitMask == 0x0000FF00
 			&& header.ddspf.dwBBitMask == 0x000000FF
-			&& header.ddspf.dwABitMask == 0xFF000000))
+			&& header.ddspf.dwABitMask == 0xFF000000)
 		{
 			_format.set_pixel_format(PixelFormat::Bgra, 32);
 		}
-		else if (Y_LIKELY(header.ddspf.dwRBitMask == 0x000000FF
+		else if (header.ddspf.dwRBitMask == 0x000000FF
 			&& header.ddspf.dwGBitMask == 0x0000FF00
 			&& header.ddspf.dwBBitMask == 0x00FF0000
-			&& header.ddspf.dwABitMask == 0xFF000000))
+			&& header.ddspf.dwABitMask == 0xFF000000)
 		{
 			_format.set_pixel_format(PixelFormat::Rgba, 32);
 		}
@@ -92,13 +92,13 @@ bool DdsReader::open()
 
 	case DDPF_LUMINANCE:
 
-		if (Y_UNLIKELY(header.ddspf.dwRGBBitCount != 8))
+		if (header.ddspf.dwRGBBitCount != 8)
 			return false;
 
-		if (Y_LIKELY(header.ddspf.dwRBitMask == 0x000000FF
+		if (header.ddspf.dwRBitMask == 0x000000FF
 			&& !header.ddspf.dwGBitMask
 			&& !header.ddspf.dwBBitMask
-			&& !header.ddspf.dwABitMask))
+			&& !header.ddspf.dwABitMask)
 		{
 			_format.set_pixel_format(PixelFormat::Gray, 8);
 		}
@@ -110,13 +110,13 @@ bool DdsReader::open()
 
 	case DDPF_LUMINANCE | DDPF_ALPHAPIXELS:
 
-		if (Y_UNLIKELY(header.ddspf.dwRGBBitCount != 16))
+		if (header.ddspf.dwRGBBitCount != 16)
 			return false;
 
-		if (Y_LIKELY(header.ddspf.dwRBitMask == 0x000000FF
+		if (header.ddspf.dwRBitMask == 0x000000FF
 			&& !header.ddspf.dwGBitMask
 			&& !header.ddspf.dwBBitMask
-			&& header.ddspf.dwABitMask == 0x0000FF00))
+			&& header.ddspf.dwABitMask == 0x0000FF00)
 		{
 			_format.set_pixel_format(PixelFormat::GrayAlpha, 16);
 		}

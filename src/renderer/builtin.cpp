@@ -37,7 +37,7 @@ void RendererBuiltin::Private::bind()
 	}
 }
 
-RendererBuiltin::RendererBuiltin(const RendererBuiltin &renderer)
+RendererBuiltin::RendererBuiltin(const RendererBuiltin& renderer)
 	: _private(renderer._private)
 {
 	Renderer::Private::copy(_private->_renderer);
@@ -93,7 +93,7 @@ void RendererBuiltin::draw_rectangle(int x, int y, int width, int height)
 	_private->_renderer->_color = old_color;
 }
 
-void RendererBuiltin::draw_text(int x, int y, const StaticString &text, int max_size)
+void RendererBuiltin::draw_text(int x, int y, const StaticString& text, int max_size)
 {
 	_private->bind();
 
@@ -133,7 +133,7 @@ void RendererBuiltin::draw_text(int x, int y, const StaticString &text, int max_
 	}
 }
 
-void RendererBuiltin::set_color(const Vector4f &color)
+void RendererBuiltin::set_color(const Vector4f& color)
 {
 	_private->_color = color;
 }
@@ -147,14 +147,14 @@ Dim2 RendererBuiltin::size() const
 		viewport_size.y / Builtin::char_height);
 }
 
-Dim2 RendererBuiltin::text_size(const StaticString &text) const
+Dim2 RendererBuiltin::text_size(const StaticString& text) const
 {
 	return Dim2(Builtin::char_width * text.size(), Builtin::char_height);
 }
 
-RendererBuiltin &RendererBuiltin::operator =(const RendererBuiltin &renderer)
+RendererBuiltin& RendererBuiltin::operator=(const RendererBuiltin& renderer)
 {
-	if (Y_LIKELY(_private != renderer._private))
+	if (_private != renderer._private)
 	{
 		Renderer::Private::release(&_private->_renderer);
 		_private = renderer._private;
@@ -164,7 +164,7 @@ RendererBuiltin &RendererBuiltin::operator =(const RendererBuiltin &renderer)
 	return *this;
 }
 
-RendererBuiltin::RendererBuiltin(Private *private_)
+RendererBuiltin::RendererBuiltin(Private* private_)
 	: _private(private_)
 {
 	_private->_renderer = Renderer::Private::copy(_private->_renderer);

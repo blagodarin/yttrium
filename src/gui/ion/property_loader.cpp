@@ -298,7 +298,7 @@ bool GuiIonPropertyLoader::load_rect(const StaticString &name, Rect *rect, bool 
 			read_rect(elements, *node);
 	}
 
-	if (!update && Y_UNLIKELY(elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
+	if (!update && (elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
 		return false;
 
 	*rect = Rect(elements[0], elements[1], elements[2], elements[3]);
@@ -442,16 +442,14 @@ void GuiIonPropertyLoader::unbind()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool GuiIonPropertyLoader::load_alignment(Alignment *alignment, const Ion::Node &node)
+bool GuiIonPropertyLoader::load_alignment(Alignment* alignment, const Ion::Node& node)
 {
 	// TODO: Inheritance.
 
 	Ion::Node::ConstRange values = node.values();
 
 	if (values.is_empty() || values.size() > 2)
-	{
 		return false;
-	}
 
 	Alignment result = CenterAlignment;
 	bool is_centered = false;
@@ -467,41 +465,31 @@ bool GuiIonPropertyLoader::load_alignment(Alignment *alignment, const Ion::Node 
 		else if (*value == S("center"))
 		{
 			if (is_centered)
-			{
 				return false;
-			}
 			is_centered = true;
 		}
 		else if (*value == S("left"))
 		{
 			if (result & HorizontalAlignmentMask)
-			{
 				return false;
-			}
 			result |= LeftAlignment;
 		}
 		else if (*value == S("right"))
 		{
 			if (result & HorizontalAlignmentMask)
-			{
 				return false;
-			}
 			result |= RightAlignment;
 		}
 		else if (*value == S("top"))
 		{
 			if (result & VerticalAlignmentMask)
-			{
 				return false;
-			}
 			result |= TopAlignment;
 		}
 		else if (*value == S("bottom"))
 		{
 			if (result & VerticalAlignmentMask)
-			{
 				return false;
-			}
 			result |= BottomAlignment;
 		}
 		else
@@ -514,7 +502,7 @@ bool GuiIonPropertyLoader::load_alignment(Alignment *alignment, const Ion::Node 
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_margins(MarginsI *margins, const Ion::Node &node)
+bool GuiIonPropertyLoader::load_margins(MarginsI* margins, const Ion::Node& node)
 {
 	Integer top    = -1;
 	Integer right  = -1;
@@ -526,28 +514,28 @@ bool GuiIonPropertyLoader::load_margins(MarginsI *margins, const Ion::Node &node
 	{
 	case 4:
 
-		if (Y_UNLIKELY(!values.last().get(&left) || left < 0))
+		if (!values.last().get(&left) || left < 0)
 			return false;
 		values.pop_last();
 		// Fallthrough.
 
 	case 3:
 
-		if (Y_UNLIKELY(!values.last().get(&bottom) || bottom < 0))
+		if (!values.last().get(&bottom) || bottom < 0)
 			return false;
 		values.pop_last();
 		// Fallthrough.
 
 	case 2:
 
-		if (Y_UNLIKELY(!values.last().get(&right) || right < 0))
+		if (!values.last().get(&right) || right < 0)
 			return false;
 		values.pop_last();
 		// Fallthrough.
 
 	case 1:
 
-		if (Y_UNLIKELY(!values.last().get(&top) || top < 0))
+		if (!values.last().get(&top) || top < 0)
 			return false;
 		break;
 
@@ -570,51 +558,37 @@ bool GuiIonPropertyLoader::load_margins(MarginsI *margins, const Ion::Node &node
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_scaling(Scaling *scaling, const Ion::Node &node)
+bool GuiIonPropertyLoader::load_scaling(Scaling* scaling, const Ion::Node& node)
 {
 	Ion::Node::ConstRange values = node.values();
 
 	if (values.size() != 1)
-	{
 		return false;
-	}
 
-	const StaticString *value;
-
+	const StaticString* value;
 	if (!values->get(&value))
-	{
 		return false;
-	}
-	else if (*value == S("fit"))
-	{
+
+	if (*value == S("fit"))
 		*scaling = Scaling::Fit;
-	}
 	else if (*value == S("max"))
-	{
 		*scaling = Scaling::Max;
-	}
 	else if (*value == S("min"))
-	{
 		*scaling = Scaling::Min;
-	}
 	else if (*value == S("stretch"))
-	{
 		*scaling = Scaling::Stretch;
-	}
 	else
-	{
 		return false;
-	}
 
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_size(Vector2f *size, const Ion::Node &node)
+bool GuiIonPropertyLoader::load_size(Vector2f* size, const Ion::Node& node)
 {
 	return read_size(size, node, 0) == 3;
 }
 
-SoundPtr GuiIonPropertyLoader::load_sound(const Ion::Node &node)
+SoundPtr GuiIonPropertyLoader::load_sound(const Ion::Node& node)
 {
 	Ion::Node::ConstRange values = node.values();
 
@@ -629,72 +603,50 @@ SoundPtr GuiIonPropertyLoader::load_sound(const Ion::Node &node)
 	return Sound::open(*value);
 }
 
-bool GuiIonPropertyLoader::load_state(WidgetState *state, const Ion::Node &node)
+bool GuiIonPropertyLoader::load_state(WidgetState* state, const Ion::Node &node)
 {
 	Ion::Node::ConstRange values = node.values();
 
 	if (values.size() != 1)
-	{
 		return false;
-	}
 
-	const StaticString *value;
-
+	const StaticString* value;
 	if (!values->get(&value))
-	{
 		return false;
-	}
-	else if (*value == S("normal"))
-	{
+
+	if (*value == S("normal"))
 		*state = WidgetState::Normal;
-	}
 	else if (*value == S("active"))
-	{
 		*state = WidgetState::Active;
-	}
 	else if (*value == S("pressed"))
-	{
 		*state = WidgetState::Pressed;
-	}
 	else if (*value == S("checked"))
-	{
 		*state = WidgetState::Checked;
-	}
 	else if (*value == S("disabled"))
-	{
 		*state = WidgetState::Disabled;
-	}
 	else
-	{
 		return false;
-	}
 
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_text(const StaticString **text, const Ion::Object &object, const StaticString &name)
+bool GuiIonPropertyLoader::load_text(const StaticString** text, const Ion::Object& object, const StaticString& name)
 {
-	const Ion::Node &node = object.last(name);
-
+	const Ion::Node& node = object.last(name);
 	return node.size() == 1 && node.first()->get(text);
 }
 
-bool GuiIonPropertyLoader::load_texture(Texture2DPtr *texture, const Ion::Node &node,
-	TextureCache *texture_cache, Texture2D::Filter default_filter)
+bool GuiIonPropertyLoader::load_texture(Texture2DPtr* texture, const Ion::Node& node,
+	TextureCache* texture_cache, Texture2D::Filter default_filter)
 {
 	Ion::Node::ConstRange values = node.values();
 
 	if (values.is_empty() || values.size() > 4)
-	{
 		return false;
-	}
 
-	const StaticString *texture_name;
-
+	const StaticString* texture_name;
 	if (!values->get(&texture_name))
-	{
 		return false;
-	}
 
 	values.pop_first();
 

@@ -141,20 +141,6 @@
 	#endif
 #endif
 
-/// \def Y_LIKELY
-/// \brief Hint the compiler that the \a condition is usually \c true.
-
-/// \def Y_UNLIKELY
-/// \brief Hint the compiler that the \a condition is usually \c false.
-
-#if __Y_GCC
-	#define Y_LIKELY(condition)   __builtin_expect(!!(condition), 1)
-	#define Y_UNLIKELY(condition) __builtin_expect(!!(condition), 0)
-#else
-	#define Y_LIKELY(condition)   (condition)
-	#define Y_UNLIKELY(condition) (condition)
-#endif
-
 /// \c constexpr support "flag".
 
 #if !defined(__YTTRIUM_DOXYGEN)

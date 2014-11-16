@@ -16,11 +16,9 @@ File::Private::~Private()
 	if (descriptor != -1) // The descriptor is invalid for unopen StaticFiles.
 	{
 		::close(descriptor);
-
-		if (Y_UNLIKELY(auto_remove) && Y_UNLIKELY(::unlink(name.const_text())))
+		if (auto_remove && ::unlink(name.const_text()))
 		{
 			// This must be something strange (EIO or ENOMEM).
-
 			Y_ABORT("Failed to remove a file");
 		}
 	}
@@ -133,9 +131,7 @@ bool File::resize(UOffset size)
 bool File::seek(UOffset offset, Whence whence)
 {
 	if (!_private || (_private->mode & Pipe))
-	{
 		return false;
-	}
 
 	bool read_only = ((_private->mode & ReadWrite) == Read);
 
@@ -166,7 +162,7 @@ bool File::seek(UOffset offset, Whence whence)
 			else
 			{
 				off_t off = ::lseek(_private->descriptor, 0, SEEK_END);
-				if (Y_UNLIKELY(off == -1))
+				if (off == -1)
 				{
 					// With a valid descriptor, whence and offset, this must be EOVERFLOW,
 					// indicating that the file size can't be represented in an off_t.
@@ -197,33 +193,33 @@ bool File::seek(UOffset offset, Whence whence)
 
 UOffset File::size() const
 {
-	if (_private)
+	if (!_private)
+		return 0;
+
+	switch (_private->mode & (ReadWrite | Pipe))
 	{
-		switch (_private->mode & (ReadWrite | Pipe))
+	case Read:
+
+		return _size;
+
+	case Write:
+	case ReadWrite:
+
 		{
-		case Read:
-
-			return _size;
-
-		case Write:
-		case ReadWrite:
-
+			off_t size = ::lseek(_private->descriptor, 0, SEEK_END);
+			if (size == -1)
 			{
-				off_t size = ::lseek(_private->descriptor, 0, SEEK_END);
-				if (Y_UNLIKELY(size == -1))
-				{
-					// With a valid descriptor, whence and offset, this must be EOVERFLOW,
-					// indicating that the file size can't be represented in an off_t.
+				// With a valid descriptor, whence and offset, this must be EOVERFLOW,
+				// indicating that the file size can't be represented in an off_t.
 
-					Y_ABORT("Failed to retrieve the file size");
-				}
-				else
-				{
-					return size - _base;
-				}
+				Y_ABORT("Failed to retrieve the file size");
 			}
-			break;
+			else
+			{
+				return size - _base;
+			}
 		}
+		break;
 	}
 
 	return 0;

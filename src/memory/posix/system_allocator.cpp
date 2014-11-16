@@ -28,7 +28,7 @@ void *SystemAllocator::allocate(size_t size, size_t align, Difference *differenc
 
 	void *base = ::mmap(nullptr, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
-	if (Y_UNLIKELY(base == MAP_FAILED))
+	if (base == MAP_FAILED)
 	{
 		Y_ABORT("Out of memory");
 		return nullptr;
@@ -45,7 +45,7 @@ void *SystemAllocator::allocate(size_t size, size_t align, Difference *differenc
 
 void SystemAllocator::deallocate(void *pointer, Difference *difference)
 {
-	if (Y_UNLIKELY(!pointer))
+	if (!pointer)
 		return;
 
 	void *base = static_cast<char *>(pointer) - Private::ReservedSize;
@@ -53,7 +53,7 @@ void SystemAllocator::deallocate(void *pointer, Difference *difference)
 	const size_t total_size = static_cast<size_t *>(base)[0];
 	const size_t size = static_cast<size_t *>(base)[1];
 
-	if (Y_UNLIKELY(::munmap(base, total_size)))
+	if (::munmap(base, total_size))
 	{
 		Y_ASSERT(errno == EINVAL); // This means invalid pointer value, anything else should mean internal system error.
 		Y_ABORT("Failed to deallocate memory");
@@ -78,7 +78,7 @@ void *SystemAllocator::reallocate(void *pointer, size_t size, Movability movabil
 	{
 		base = ::mremap(base, old_total_size, total_size, (movability == MayMove ? MREMAP_MAYMOVE : 0));
 
-		if (Y_UNLIKELY(base == MAP_FAILED))
+		if (base == MAP_FAILED)
 		{
 			if (movability == MayMove)
 				Y_ABORT("Out of memory");
@@ -91,7 +91,7 @@ void *SystemAllocator::reallocate(void *pointer, size_t size, Movability movabil
 
 	if (difference)
 	{
-		if (Y_LIKELY(size >= old_size))
+		if (size >= old_size)
 			*difference = Difference(size - old_size, total_size - old_total_size, Difference::Increment);
 		else
 			*difference = Difference(old_size - size, old_total_size - total_size, Difference::Decrement);

@@ -18,7 +18,7 @@ class Y_PRIVATE ProxyAllocator::Private
 {
 public:
 
-	Private(const String &name, Allocator *allocator)
+	Private(const String& name, Allocator* allocator)
 		: _allocator(allocator)
 		, _name(name)
 	{
@@ -26,24 +26,22 @@ public:
 
 public:
 
-	Allocator          *_allocator;
-	String              _name;
-	AtomicMemoryStatus  _status;
+	Allocator*         _allocator;
+	String             _name;
+	AtomicMemoryStatus _status;
 
 #if Y_IS_DEBUG
-	std::map<void *, size_t> _pointers;
+	std::map<void*, size_t> _pointers;
 #endif
 };
 
-ProxyAllocator::ProxyAllocator(const StaticString &name, Allocator *allocator)
+ProxyAllocator::ProxyAllocator(const StaticString& name, Allocator* allocator)
 	: _private(nullptr)
 {
 	if (!allocator)
-	{
 		allocator = MemoryManager::default_allocator();
-	}
 
-	ProxyAllocator *proxy_allocator = dynamic_cast<ProxyAllocator *>(allocator);
+	ProxyAllocator* proxy_allocator = dynamic_cast<ProxyAllocator*>(allocator);
 
 	const String &final_name = proxy_allocator
 		? String(proxy_allocator->name(), allocator).append('.').append(name)
@@ -75,7 +73,7 @@ ProxyAllocator::~ProxyAllocator()
 	if (status.allocated_blocks)
 	{
 		int column = 0;
-		for (std::map<void *, size_t>::iterator i = _private->_pointers.begin(); i != _private->_pointers.end(); ++i)
+		for (std::map<void*, size_t>::iterator i = _private->_pointers.begin(); i != _private->_pointers.end(); ++i)
 		{
 			std::cerr << (column ? "  " : "\n\t") << std::setw(10) << i->first << "," << i->second;
 			column = (column + 1) % 10;
@@ -87,7 +85,7 @@ ProxyAllocator::~ProxyAllocator()
 	Y_DELETE(_private->_allocator, _private);
 }
 
-Allocator *ProxyAllocator::allocator() const
+Allocator* ProxyAllocator::allocator() const
 {
 	return _private->_allocator;
 }
@@ -102,16 +100,14 @@ MemoryStatus ProxyAllocator::status() const
 	return _private->_status;
 }
 
-void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference)
+void* ProxyAllocator::allocate(size_t size, size_t align, Difference* difference)
 {
 	Difference local_difference;
 
 	if (!difference)
-	{
 		difference = &local_difference;
-	}
 
-	void *pointer = _private->_allocator->allocate(size, align, difference);
+	void* pointer = _private->_allocator->allocate(size, align, difference);
 	_private->_status.allocate(*difference);
 
 #if Y_IS_DEBUG
@@ -121,18 +117,14 @@ void *ProxyAllocator::allocate(size_t size, size_t align, Difference *difference
 	return pointer;
 }
 
-void ProxyAllocator::deallocate(void *pointer, Difference *difference)
+void ProxyAllocator::deallocate(void* pointer, Difference* difference)
 {
-	if (Y_UNLIKELY(!pointer))
-	{
+	if (!pointer)
 		return;
-	}
 
 #if Y_IS_DEBUG
 	if (_private->_pointers.find(pointer) == _private->_pointers.end())
-	{
 		::abort();
-	}
 #endif
 
 	Difference local_difference;
@@ -150,16 +142,14 @@ void ProxyAllocator::deallocate(void *pointer, Difference *difference)
 #endif
 }
 
-void *ProxyAllocator::reallocate(void *pointer, size_t size, Movability movability, Difference *difference)
+void* ProxyAllocator::reallocate(void* pointer, size_t size, Movability movability, Difference* difference)
 {
 	Difference local_difference;
 
 	if (!difference)
-	{
 		difference = &local_difference;
-	}
 
-	void *new_pointer = _private->_allocator->reallocate(pointer, size, movability, difference);
+	void* new_pointer = _private->_allocator->reallocate(pointer, size, movability, difference);
 
 	if (new_pointer)
 	{

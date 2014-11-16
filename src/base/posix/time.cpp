@@ -11,7 +11,7 @@ DateTime DateTime::now()
 {
 	::timespec time;
 
-	if (Y_UNLIKELY(::clock_gettime(CLOCK_REALTIME, &time)))
+	if (::clock_gettime(CLOCK_REALTIME, &time))
 	{
 		Y_ABORT("Failed to query CLOCK_REALTIME time");
 	}
@@ -19,7 +19,7 @@ DateTime DateTime::now()
 	{
 		::tm local_time;
 
-		if (Y_UNLIKELY(!::localtime_r(&time.tv_sec, &local_time)))
+		if (!::localtime_r(&time.tv_sec, &local_time))
 		{
 			Y_ABORT("Failed to decompose CLOCK_REALTIME time");
 		}

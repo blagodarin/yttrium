@@ -77,13 +77,13 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 				{
 					char c0 = *src;
 
-					if (Y_UNLIKELY(!c0 && src == string.text() + string.size()))
+					if (!c0 && src == string.text() + string.size())
 					{
 						Y_LOG(S("ion: Error: ") << source_name << S(": String continues past the end of source"));
 						return false;
 					}
 
-					if (Y_UNLIKELY(c0 == '\\'))
+					if (c0 == '\\')
 					{
 						char c1 = *++src;
 

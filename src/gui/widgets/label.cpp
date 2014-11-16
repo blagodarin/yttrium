@@ -54,8 +54,7 @@ void Label::render(Renderer& renderer, const RectF& rect, const Vector2f& scale,
 
 void Label::update()
 {
-	_final_text.clear(); // TODO: Consider moving this into substitute().
-	ScriptContext::global().substitute(&_final_text, _text);
+	ScriptContext::global().substitute(_final_text, _text);
 	update_rect(_final_text);
 }
 
