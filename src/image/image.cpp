@@ -158,18 +158,15 @@ bool Image::load(const StaticString& name, ImageType type)
 	Allocatable<ImageReader> reader(_buffer.allocator());
 	switch (type)
 	{
-	case ImageType::Tga:  reader.reset<TgaReader>(); break;
+	case ImageType::Tga:  reader.reset<TgaReader>(name); break;
 #ifndef Y_NO_JPEG
-	case ImageType::Jpeg: reader.reset<JpegReader>(); break;
+	case ImageType::Jpeg: reader.reset<JpegReader>(name); break;
 #endif
-	case ImageType::Dds:  reader.reset<DdsReader>(); break;
+	case ImageType::Dds:  reader.reset<DdsReader>(name); break;
 	default:              return false;
 	}
 
-	if (!reader->_file.open(name, reader.allocator()))
-		return false;
-
-	if (!reader->open())
+	if (!reader->_file || !reader->open())
 		return false;
 
 	_format = reader->_format;
@@ -195,17 +192,14 @@ bool Image::save(const StaticString& name, ImageType type) const
 	Allocatable<ImageWriter> writer(_buffer.allocator());
 	switch (type)
 	{
-	case ImageType::Tga: writer.reset<TgaWriter>(); break;
+	case ImageType::Tga: writer.reset<TgaWriter>(name); break;
 #ifndef Y_NO_PNG
-	case ImageType::Png: writer.reset<PngWriter>(); break;
+	case ImageType::Png: writer.reset<PngWriter>(name); break;
 #endif
 	default:             return false;
 	}
 
-	if (!writer->_file.open(name, File::Write | File::Truncate, writer.allocator()))
-		return false;
-
-	if (!writer->open() || !writer->set_format(_format))
+	if (!writer->_file || !writer->open() || !writer->set_format(_format))
 		return false;
 
 	writer->_format = _format;

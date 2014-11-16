@@ -244,9 +244,7 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 	if (!exponent)
 	{
 		if (!mantissa)
-		{
 			return is_negative ? negative_zero : positive_zero;
-		}
 
 		// Base 2 logarithm calculation trick based on a Sean Eron Anderson snippet:
 		// http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogIEEE64Float
@@ -264,13 +262,9 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 	else if (exponent == Float::BiasedInfinityExponent)
 	{
 		if (!mantissa)
-		{
 			return is_negative ? negative_infinity : positive_infinity;
-		}
 		else
-		{
 			return is_negative ? negative_nan : positive_nan;
-		}
 	}
 	else
 	{
@@ -306,9 +300,7 @@ StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1
 		} while (whole_value);
 
 		if (is_negative)
-		{
 			*--begin = '-';
-		}
 
 		FastSigned fraction_value = (mantissa << whole_bits) & Float::ImplicitMantissaMask;
 

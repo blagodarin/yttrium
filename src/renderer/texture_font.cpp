@@ -49,12 +49,6 @@ const uint32_t FourccFont = Fourcc<'f', 'o', 'n', 't'>::value;
 const uint32_t FourccChar = Fourcc<'c', 'h', 'a', 'r'>::value;
 const uint32_t FourccKern = Fourcc<'k', 'e', 'r', 'n'>::value;
 
-// Font FOURCCs from the past generations required by the present tests and examples.
-// TODO: Remove.
-
-const uint32_t FourccEtf1 = Fourcc<'E', 'T', 'F', '1'>::value;
-const uint32_t FourccGvf1 = Fourcc<'G', 'V', 'F', '1'>::value;
-
 } // namespace
 
 TextureFont::Private::Private(Allocator* allocator)
@@ -62,20 +56,12 @@ TextureFont::Private::Private(Allocator* allocator)
 {
 }
 
-TextureFont::TextureFont(const TextureFont& font)
-	: _private(Private::copy(font._private))
-{
-}
+Y_IMPLEMENT_PRIVATE(TextureFont);
 
 const TextureFont::CharInfo* TextureFont::char_info(char symbol) const
 {
 	const auto i = _private->_chars.find(symbol);
 	return i == _private->_chars.end() ? nullptr : &i->second;
-}
-
-void TextureFont::close()
-{
-	Private::release(&_private);
 }
 
 int TextureFont::kerning(char left, char right) const
@@ -86,24 +72,22 @@ int TextureFont::kerning(char left, char right) const
 
 bool TextureFont::open(const StaticString &name, Allocator *allocator)
 {
-	close();
+	*this = TextureFont();
 
 	File file(name, allocator);
 
-	if (!file.is_opened())
+	if (!file)
 		return false;
 
 	uint32_t fourcc;
 
-	if (!file.read(&fourcc) || (fourcc != FourccYtf1 && fourcc != FourccGvf1 && fourcc != FourccEtf1))
+	if (!file.read(&fourcc) || fourcc != FourccYtf1)
 		return false;
 
 	Ytf1Font font_section;
 
 	if (!(file.read(&fourcc) && fourcc == FourccFont && file.read(&font_section)))
-	{
 		return false;
-	}
 
 	_private = Y_NEW(allocator, Private)(allocator);
 
@@ -166,7 +150,7 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 		}
 	}
 
-	close();
+	*this = TextureFont();
 
 	return false;
 }
@@ -205,12 +189,6 @@ Dim2 TextureFont::text_size(const StaticString& text) const
 	}
 
 	return result;
-}
-
-TextureFont& TextureFont::operator=(const TextureFont& font)
-{
-	Private::copy(_private, font._private);
-	return *this;
 }
 
 } // namespace Yttrium

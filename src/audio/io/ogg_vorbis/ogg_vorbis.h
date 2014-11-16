@@ -12,7 +12,7 @@ class OggVorbisReader: public AudioReaderImpl
 {
 public:
 
-	OggVorbisReader(Allocator* allocator);
+	OggVorbisReader(const StaticString& name, Allocator* allocator);
 	~OggVorbisReader() override;
 
 	bool open() override;

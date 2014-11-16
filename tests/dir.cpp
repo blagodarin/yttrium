@@ -11,11 +11,11 @@ BOOST_AUTO_TEST_CASE(test_dir)
 	BOOST_CHECK(Dir::exists("tests/dir"));
 	BOOST_CHECK(!Dir::exists("tests/void"));
 
-	BOOST_CHECK(!Dir("tests/void").exists());
+	BOOST_CHECK(!Dir("tests/void"));
 
 	Dir dir("tests/dir");
 
-	BOOST_REQUIRE(dir.exists());
+	BOOST_REQUIRE(dir);
 
 	size_t count = 0;
 

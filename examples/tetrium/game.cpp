@@ -13,7 +13,7 @@ Game::Game(Allocator* allocator)
 	, _renderer_allocator("renderer", allocator)
 	, _audio(_allocator)
 	, _bindings(allocator)
-	, _commands(this)
+	, _commands(*this)
 {
 }
 
@@ -110,22 +110,21 @@ void Game::save_settings()
 	Y_LOG("Saving settings...");
 
 	File settings_file("tetrium.txt", File::Write | File::Truncate, _allocator);
+	if (!settings_file)
+		return;
 
-	if (settings_file.is_opened())
-	{
-		String settings("# Generated automatically\n\n", _allocator);
+	String settings("# Generated automatically\n\n", _allocator);
 
-		settings << "unbindall\n";
-		const auto& bindings = _bindings.map();
-		for (auto i = bindings.begin(); i != bindings.end(); ++i)
-			settings << "bind " << i->first << " \"" << i->second.escaped("\\\"", '\\') << "\"\n";
+	settings << "unbindall\n";
+	const auto& bindings = _bindings.map();
+	for (auto i = bindings.begin(); i != bindings.end(); ++i)
+		settings << "bind " << i->first << " \"" << i->second.escaped("\\\"", '\\') << "\"\n";
 
-		const auto& archive = ScriptContext::global().archive();
-		for (auto i = archive.begin(); i != archive.end(); ++i)
-			settings << "seta " << i->first << " " << i->second << "\n";
+	const auto& archive = ScriptContext::global().archive();
+	for (auto i = archive.begin(); i != archive.end(); ++i)
+		settings << "seta " << i->first << " " << i->second << "\n";
 
-		settings_file.write(settings.text(), settings.size());
-	}
+	settings_file.write(settings.text(), settings.size());
 }
 
 bool Game::load()

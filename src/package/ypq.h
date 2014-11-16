@@ -11,13 +11,12 @@
 namespace Yttrium
 {
 
-class YpqReader
-	: public PackageReader::Private
+class YpqReader: public PackageReader::Private
 {
 public:
 
-	YpqReader(Allocator *allocator)
-		: PackageReader::Private(allocator)
+	YpqReader(const StaticString& name, Allocator *allocator)
+		: PackageReader::Private(name, allocator)
 	{
 	}
 
@@ -36,13 +35,12 @@ private:
 	Index _index;
 };
 
-class YpqWriter
-	: public PackageWriter::Private
+class YpqWriter: public PackageWriter::Private
 {
 public:
 
-	YpqWriter(Allocator *allocator)
-		: PackageWriter::Private(allocator)
+	YpqWriter(const StaticString& name, unsigned mode, Allocator *allocator)
+		: PackageWriter::Private(name, mode, allocator)
 		, _last_offset(0)
 	{
 	}

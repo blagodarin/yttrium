@@ -18,8 +18,8 @@ void _png_flush_callback(png_structp png_ptr)
 
 } // namespace
 
-PngWriter::PngWriter(Allocator* allocator)
-	: ImageWriter(allocator)
+PngWriter::PngWriter(const StaticString& name, Allocator* allocator)
+	: ImageWriter(name, allocator)
 	, _png(nullptr)
 	, _info(nullptr)
 {

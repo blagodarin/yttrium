@@ -12,7 +12,6 @@ namespace Yttrium
 {
 
 /// Package file types.
-
 enum class PackageType
 {
 	Auto, ///< Automatical detection.
@@ -20,153 +19,41 @@ enum class PackageType
 };
 
 /// Package reader class.
-
 class Y_API PackageReader
 {
-public:
-
-	///
-
-	PackageReader() noexcept
-		: _private(nullptr)
-	{
-	}
-
-	///
-
-	PackageReader(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept
-		: PackageReader()
-	{
-		open(name, type, allocator);
-	}
-
-	///
-
-	PackageReader(const PackageReader &reader) noexcept;
-
-	///
-
-	~PackageReader() noexcept
-	{
-		close();
-	}
+	Y_DECLARE_PRIVATE(PackageReader);
 
 public:
 
 	///
-
-	void close() noexcept;
-
-	///
-
-	bool is_opened() const noexcept
-	{
-		return _private;
-	}
+	PackageReader(const StaticString& name, PackageType type = PackageType::Auto, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
-
-	bool open(const StaticString &name, PackageType type = PackageType::Auto, Allocator *allocator = DefaultAllocator) noexcept;
-
-	///
-
-	File open_file(const StaticString &name) noexcept;
-
-public:
-
-	///
-
-	PackageReader &operator =(const PackageReader &reader) noexcept;
-
-public:
-
-	class Private;
-
-private:
-
-	Private *_private;
+	File open_file(const StaticString& name) noexcept;
 };
 
 /// Package writer class.
-
 class Y_API PackageWriter
 {
+	Y_DECLARE_PRIVATE(PackageWriter);
+
 public:
 
 	/// Package writing mode.
-
 	enum Mode
 	{
 		Rewrite, ///< Replace the destination file with the package.
 		Append,  ///< Append the package to the destination file.
 	};
 
-public:
+	///
+	PackageWriter(const StaticString& name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
-
-	PackageWriter() noexcept
-		: _private(nullptr)
-	{
-	}
-
-	///
-
-	PackageWriter(const StaticString &name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator *allocator = DefaultAllocator) noexcept
-		: PackageWriter()
-	{
-		open(name, type, mode, allocator);
-	}
-
-	///
-
-	PackageWriter(const PackageWriter &writer) noexcept;
-
-	///
-
-	~PackageWriter() noexcept
-	{
-		close();
-	}
-
-public:
-
-	///
-
-	void close() noexcept;
-
-	///
-
-	bool is_opened() const noexcept
-	{
-		return _private;
-	}
-
-	///
-
-	bool open(const StaticString &name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator *allocator = DefaultAllocator) noexcept;
-
-	///
-
-	File open_file(const StaticString &name) noexcept;
-
-public:
-
-	///
-
-	PackageWriter &operator =(const PackageWriter &writer) noexcept;
-
-public:
-
-	class Private;
-
-private:
-
-	Private *_private;
+	File open_file(const StaticString& name) noexcept;
 };
 
 /// Package manager.
-
 class Y_API PackageManager
 {
 	Y_NONCOPYABLE(PackageManager);
@@ -174,7 +61,6 @@ class Y_API PackageManager
 public:
 
 	/// File search order.
-
 	enum Order // TODO: Invent better names for 'System*' constants.
 	{
 		PresetOrder, ///< Use the PackageManager order.
@@ -187,11 +73,9 @@ public:
 public:
 
 	///
-
-	PackageManager(Allocator *allocator = DefaultAllocator) noexcept;
+	PackageManager(Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
-
 	~PackageManager() noexcept;
 
 public:
@@ -200,31 +84,26 @@ public:
 	/// \param name The package name.
 	/// \param type Package file type.
 	/// \return \c true on success.
-
-	bool mount(const StaticString &name, PackageType type = PackageType::Auto) noexcept;
+	bool mount(const StaticString& name, PackageType type = PackageType::Auto) noexcept;
 
 	/// Open a file.
 	/// \param name %File name.
 	/// \param mode %File access mode.
 	/// \param order The order to look for the file with.
 	/// \return File.
-
-	File open_file(const StaticString &name, File::Mode mode = File::Read, Order order = PresetOrder) noexcept;
+	File open_file(const StaticString& name, unsigned mode = File::Read, Order order = PresetOrder) noexcept;
 
 	/// Set the default file system search order.
 	/// \param order The order to be set.
-
 	void set_order(Order order) noexcept;
 
 	/// Unmount all the mounted packages in the file system.
-
 	void unmount_all() noexcept;
 
 public:
 
 	/// Return the global PackageManager instance.
-
-	static PackageManager *instance() noexcept;
+	static PackageManager* instance() noexcept;
 
 private:
 

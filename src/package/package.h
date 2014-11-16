@@ -20,13 +20,13 @@ struct PackedFile
 	}
 };
 
-class Y_PRIVATE PackageReader::Private
-	: public PrivateBase<PackageReader::Private>
+class Y_PRIVATE PackageReader::Private: public PrivateBase<PackageReader::Private>
 {
 public:
 
-	Private(Allocator *allocator)
+	Private(const StaticString& name, Allocator *allocator)
 		: PrivateBase(allocator)
+		, _file(name, File::Read, allocator)
 	{
 	}
 
@@ -45,13 +45,13 @@ public:
 	File _file;
 };
 
-class Y_PRIVATE PackageWriter::Private
-	: public PrivateBase<PackageWriter::Private>
+class Y_PRIVATE PackageWriter::Private: public PrivateBase<PackageWriter::Private>
 {
 public:
 
-	Private(Allocator *allocator)
+	Private(const StaticString& name, unsigned mode, Allocator *allocator)
 		: PrivateBase(allocator)
+		, _file(name, mode, allocator)
 	{
 	}
 

@@ -12,7 +12,7 @@ class WavReader: public AudioReaderImpl
 {
 public:
 
-	WavReader(Allocator* allocator);
+	WavReader(const StaticString& name, Allocator* allocator);
 
 	bool open() override;
 	size_t read(void* buffer, size_t bytes_to_read) noexcept override;

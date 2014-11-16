@@ -200,8 +200,39 @@
 
 #define Y_UNUSED(parameter) (void)(parameter)
 
-/// %Yttrium namespace.
+///
+#define Y_DECLARE_PRIVATE(Class) \
+	public: \
+		class Private; \
+		Class() noexcept: _private(nullptr) {} \
+		Class(const Class&) noexcept; \
+		Class(Class&& class_) noexcept: _private(class_._private) { class_._private = nullptr; } \
+		~Class() noexcept; \
+		Class& operator=(const Class&) noexcept; \
+		Class& operator=(Class&&) noexcept; \
+		explicit operator bool() const noexcept { return _private; } \
+	protected: \
+		Class(Private* private_) noexcept: _private(private_) {} \
+	private: \
+		Private* _private \
 
+///
+#define Y_DECLARE_PRIVATE_NONCOPYABLE(Class) \
+	public: \
+		class Private; \
+		Class() noexcept: _private(nullptr) {} \
+		Class(const Class&) = delete; \
+		Class(Class&& class_) noexcept: _private(class_._private) { class_._private = nullptr; } \
+		~Class() noexcept; \
+		Class& operator=(const Class&) = delete; \
+		Class& operator=(Class&&) noexcept; \
+		explicit operator bool() const noexcept { return _private; } \
+	protected: \
+		Class(Private* private_) noexcept: _private(private_) {} \
+	private: \
+		Private* _private \
+
+/// %Yttrium namespace.
 namespace Yttrium
 {
 

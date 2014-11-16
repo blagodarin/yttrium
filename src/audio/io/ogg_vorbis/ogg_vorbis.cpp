@@ -39,8 +39,8 @@ const ov_callbacks _ov_callbacks =
 
 } // namespace
 
-OggVorbisReader::OggVorbisReader(Allocator* allocator)
-	: AudioReaderImpl(allocator)
+OggVorbisReader::OggVorbisReader(const StaticString& name, Allocator* allocator)
+	: AudioReaderImpl(name, allocator)
 {
 	::memset(&_ov_file, 0, sizeof _ov_file);
 }

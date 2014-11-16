@@ -3,6 +3,7 @@
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
 #include <yttrium/string.h>
+#include "../private_base.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -57,35 +58,43 @@ bool Dir::Iterator::operator!=(Iterator iterator) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Dir::Private
+class Dir::Private: public PrivateBase<Dir::Private>
 {
 public:
 
-	Allocator* _allocator;
-	DIR*       _dir;
-	size_t     _iterator_private_size;
-
 	Private(DIR* dir, long max_name_size, Allocator* allocator)
-		: _allocator(allocator)
+		: PrivateBase(allocator)
 		, _dir(dir)
 		, _iterator_private_size(offsetof(Iterator::Private, _dirent)
 			+ offsetof(::dirent, d_name) + max_name_size + 1)
 	{
 	}
+
+	~Private()
+	{
+		::closedir(_dir);
+	}
+
+public:
+
+	DIR*   _dir;
+	size_t _iterator_private_size;
 };
 
+Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Dir);
+
 Dir::Dir(const StaticString& name, Allocator* allocator)
-	: _private(nullptr)
+	: Dir()
 {
 	const String& final_name = name.zero_terminated(allocator);
 
-	DIR* dir = ::opendir(final_name.text());
+	const auto dir = ::opendir(final_name.text());
 	if (!dir)
 		return;
 
 	long max_name_size = -1;
 
-	int dir_descriptor = ::dirfd(dir);
+	const auto dir_descriptor = ::dirfd(dir);
 	if (dir_descriptor < 0)
 	{
 		Y_ASSERT(errno == ENOTSUP);
@@ -104,15 +113,6 @@ Dir::Dir(const StaticString& name, Allocator* allocator)
 	}
 
 	_private = Y_NEW(allocator, Private)(dir, max_name_size, allocator);
-}
-
-Dir::~Dir()
-{
-	if (_private)
-	{
-		::closedir(_private->_dir);
-		Y_DELETE(_private->_allocator, _private);
-	}
 }
 
 Dir::Iterator Dir::begin() const

@@ -27,14 +27,14 @@ AudioReaderPtr AudioReader::open(const StaticString& name, AudioType type, Alloc
 	AudioReaderImpl* reader = nullptr;
 	switch (type)
 	{
-	case AudioType::Wav:       reader = Y_NEW(allocator, WavReader)(allocator); break;
+	case AudioType::Wav:       reader = Y_NEW(allocator, WavReader)(name, allocator); break;
 #ifndef Y_NO_OGG_VORBIS
-	case AudioType::OggVorbis: reader = Y_NEW(allocator, OggVorbisReader)(allocator); break;
+	case AudioType::OggVorbis: reader = Y_NEW(allocator, OggVorbisReader)(name, allocator); break;
 #endif
 	default:                   return AudioReaderPtr();
 	}
 
-	if (!reader->_file.open(name, allocator) || !reader->open())
+	if (!reader->_file || !reader->open())
 	{
 		Y_DELETE(allocator, reader);
 		return AudioReaderPtr();

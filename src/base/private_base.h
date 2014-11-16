@@ -110,6 +110,11 @@ class PrivateHolder
 
 public:
 
+	PrivateHolder()
+		: _pointer(nullptr)
+	{
+	}
+
 	template <typename... Args>
 	PrivateHolder(Args&&... args, Allocator* allocator)
 		: _pointer(Y_NEW(allocator, T)(std::forward<Args>(args)..., allocator))
@@ -133,10 +138,26 @@ public:
 		return result;
 	}
 
+	template <typename U, typename... Args>
+	void reset(Allocator* allocator, Args&&... args)
+	{
+		Y_ASSERT(!_pointer);
+		_pointer = Y_NEW(allocator, U)(std::forward<Args>(args)..., allocator);
+	}
+
 private:
 
 	T* _pointer;
 };
+
+#define Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Class) \
+	Class::~Class() noexcept { Private::release(&_private); } \
+	Class& Class::operator=(Class&& x) noexcept { Private::move(_private, x._private); return *this; } \
+
+#define Y_IMPLEMENT_PRIVATE(Class) \
+	Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Class) \
+	Class::Class(const Class& x) noexcept: _private(Private::copy(x._private)) {} \
+	Class& Class::operator=(const Class& x) noexcept { Private::copy(_private, x._private); return *this; } \
 
 } // namespace Yttrium
 

@@ -21,11 +21,15 @@ public:
 
 	Allocator*  _allocator;
 	ImageFormat _format;
-	StaticFile  _file;
+	File        _file;
 
 protected:
 
-	ImageReader(Allocator* allocator): _allocator(allocator) {}
+	ImageReader(const StaticString& name, Allocator* allocator)
+		: _allocator(allocator)
+		, _file(name, allocator)
+	{
+	}
 };
 
 class ImageWriter
@@ -42,11 +46,15 @@ public:
 
 	Allocator*  _allocator;
 	ImageFormat _format;
-	StaticFile  _file;
+	File        _file;
 
 protected:
 
-	ImageWriter(Allocator* allocator): _allocator(allocator) {}
+	ImageWriter(const StaticString& name, Allocator* allocator)
+		: _allocator(allocator)
+		, _file(name, File::Write | File::Truncate, allocator)
+	{
+	}
 };
 
 } // namespace Yttrium

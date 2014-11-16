@@ -13,7 +13,7 @@
 namespace Yttrium
 {
 
-class ScriptCode::Private: public PrivateBase<ScriptCode::Private>
+class Y_PRIVATE ScriptCode::Private: public PrivateBase<ScriptCode::Private>
 {
 public:
 
@@ -41,38 +41,7 @@ public:
 	String               _last_result;
 };
 
-ScriptCode::ScriptCode()
-	: _private(nullptr)
-{
-}
-
-ScriptCode::ScriptCode(const ScriptCode& code)
-	: _private(Private::copy(code._private))
-{
-}
-
-ScriptCode::ScriptCode(ScriptCode&& code)
-	: _private(code._private)
-{
-	code._private = nullptr;
-}
-
-ScriptCode::~ScriptCode()
-{
-	Private::release(&_private);
-}
-
-ScriptCode& ScriptCode::operator=(const ScriptCode& code)
-{
-	Private::copy(_private, code._private);
-	return *this;
-}
-
-ScriptCode& ScriptCode::operator=(ScriptCode&& code)
-{
-	Private::move(_private, code._private);
-	return *this;
-}
+Y_IMPLEMENT_PRIVATE(ScriptCode);
 
 ScriptCode::ScriptCode(String&& text)
 	: ScriptCode()

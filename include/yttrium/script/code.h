@@ -16,24 +16,15 @@ class String;
 /// Script code.
 class Y_API ScriptCode
 {
+	Y_DECLARE_PRIVATE(ScriptCode);
+
 public:
-
-	ScriptCode() noexcept;
-	ScriptCode(const ScriptCode&) noexcept;
-	ScriptCode(ScriptCode&&) noexcept;
-	~ScriptCode() noexcept;
-
-	ScriptCode& operator=(const ScriptCode&) noexcept;
-	ScriptCode& operator=(ScriptCode&&) noexcept;
 
 	///
 	explicit ScriptCode(String&& text) noexcept;
 
 	///
 	explicit ScriptCode(const StaticString& text) noexcept;
-
-	///
-	explicit operator bool() const noexcept { return _private; }
 
 	/// Execute the script.
 	/// \param context Context to execute the script in, or \c nullptr for the global context.
@@ -42,14 +33,6 @@ public:
 
 	///
 	static ScriptCode load(const StaticString& filename) noexcept;
-
-private:
-
-	class Private;
-
-	Private* _private;
-
-	explicit ScriptCode(Private* private_): _private(private_) {}
 };
 
 } // namespace Yttrium

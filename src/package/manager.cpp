@@ -12,20 +12,20 @@ class Y_PRIVATE PackageManager::Private
 {
 public:
 
-	Private(PackageManager *public_, Allocator *allocator)
+	Private(PackageManager* public_, Allocator* allocator)
 		: _instance_guard(public_, "Duplicate PackageManager construction")
 		, _allocator(allocator)
 		, _order(PackageManager::PackedFirst)
 	{
 	}
 
-	File open_packed(const StaticString &name)
+	File open_packed(const StaticString& name)
 	{
 		File file;
 		for (auto i = _packages.rbegin(); i != _packages.rend(); ++i)
 		{
 			file = i->open_file(name);
-			if (file.is_opened())
+			if (file)
 				break;
 		}
 		return file;
@@ -39,7 +39,7 @@ public:
 	Order                      _order;
 };
 
-PackageManager::PackageManager(Allocator *allocator)
+PackageManager::PackageManager(Allocator* allocator)
 	: _private(Y_NEW(allocator, PackageManager::Private)(this, allocator))
 {
 }
@@ -49,19 +49,16 @@ PackageManager::~PackageManager()
 	_private->_allocator.delete_private(_private);
 }
 
-bool PackageManager::mount(const StaticString &name, PackageType type)
+bool PackageManager::mount(const StaticString& name, PackageType type)
 {
-	PackageReader package;
-
-	if (!package.open(name, type, _private->_allocator))
+	PackageReader package(name, type, _private->_allocator);
+	if (!package)
 		return false;
-
 	_private->_packages.emplace_back(package);
-
 	return true;
 }
 
-File PackageManager::open_file(const StaticString &name, File::Mode mode, Order order)
+File PackageManager::open_file(const StaticString& name, unsigned mode, Order order)
 {
 	if (mode != File::Read)
 		return File(name, mode, _private->_allocator);
@@ -69,25 +66,24 @@ File PackageManager::open_file(const StaticString &name, File::Mode mode, Order 
 	if (order == PresetOrder)
 		order = _private->_order;
 
-	File file;
-
 	if (order == PackedFirst || order == PackedOnly)
 	{
-		file = _private->open_packed(name);
-		if (file.is_opened())
+		File&& file = _private->open_packed(name);
+		if (file)
 			return file;
 	}
 
 	if (order != PackedOnly)
 	{
-		if (file.open(name, mode, _private->_allocator))
+		File file(name, mode, _private->_allocator);
+		if (file)
 			return file;
 
 		if (order != SystemOnly)
 			return _private->open_packed(name);
 	}
 
-	return file;
+	return File();
 }
 
 void PackageManager::set_order(Order order) noexcept
@@ -101,7 +97,7 @@ void PackageManager::unmount_all()
 	_private->_packages.clear();
 }
 
-PackageManager *PackageManager::instance()
+PackageManager* PackageManager::instance()
 {
 	return PackageManagerGuard::instance;
 }

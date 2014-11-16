@@ -84,8 +84,8 @@ bool Document::load(const StaticString& name)
 
 bool Document::save(const StaticString& name, int indentation) const
 {
-	StaticFile file(name, File::Write | File::Truncate, _private->_allocator);
-	if (!file.is_opened())
+	File file(name, File::Write | File::Truncate, _private->_allocator);
+	if (!file)
 		return false;
 	String buffer(_private->_allocator);
 	serialize(&buffer, (indentation > 0 ? 0 : indentation), true);

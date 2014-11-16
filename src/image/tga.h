@@ -6,30 +6,24 @@
 namespace Yttrium
 {
 
-class TgaReader
-	: public ImageReader
+class TgaReader: public ImageReader
 {
 public:
 
-	TgaReader(Allocator *allocator);
-
-public:
+	TgaReader(const StaticString& name, Allocator* allocator);
 
 	bool open() override;
-	bool read(void *buffer) override;
+	bool read(void* buffer) override;
 };
 
-class TgaWriter
-	: public ImageWriter
+class TgaWriter: public ImageWriter
 {
 public:
 
-	TgaWriter(Allocator *allocator);
+	TgaWriter(const StaticString& name, Allocator* allocator);
 
-public:
-
-	bool set_format(const ImageFormat &format) override;
-	bool write(const void *buffer) override;
+	bool set_format(const ImageFormat& format) override;
+	bool write(const void* buffer) override;
 };
 
 } // namespace Yttrium

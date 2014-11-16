@@ -10,15 +10,13 @@ namespace Yttrium
 {
 
 /// Directory access class.
-
 class Y_API Dir
 {
-	Y_NONCOPYABLE(Dir);
+	Y_DECLARE_PRIVATE_NONCOPYABLE(Dir);
 
 public:
 
 	///
-
 	class Iterator
 	{
 		friend Dir;
@@ -55,47 +53,17 @@ public:
 		}
 	};
 
-public:
+	///
+	explicit Dir(const StaticString& name, Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
-
-	explicit Dir(const StaticString &name, Allocator* allocator = DefaultAllocator) noexcept;
-
-	///
-
-	~Dir() noexcept;
-
-public:
-
-	///
-
 	Iterator begin() const noexcept;
 
 	///
-
-	Iterator end() const noexcept
-	{
-		return Iterator(nullptr);
-	}
+	Iterator end() const noexcept { return Iterator(nullptr); }
 
 	///
-
-	bool exists() noexcept
-	{
-		return _private;
-	}
-
-public:
-
-	///
-
-	static bool exists(const StaticString &name, Allocator* allocator = DefaultAllocator) noexcept;
-
-private:
-
-	class Private;
-
-	Private* _private;
+	static bool exists(const StaticString& name, Allocator* allocator = DefaultAllocator) noexcept;
 };
 
 } // namespace Yttrium

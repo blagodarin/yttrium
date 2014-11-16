@@ -5,8 +5,8 @@
 namespace Yttrium
 {
 
-TgaReader::TgaReader(Allocator *allocator)
-	: ImageReader(allocator)
+TgaReader::TgaReader(const StaticString& name, Allocator* allocator)
+	: ImageReader(name, allocator)
 {
 }
 
@@ -68,18 +68,18 @@ bool TgaReader::open()
 	return false;
 }
 
-bool TgaReader::read(void *buffer)
+bool TgaReader::read(void* buffer)
 {
 	size_t frame_size = _format.frame_size();
 	return _file.read(buffer, frame_size) == frame_size;
 }
 
-TgaWriter::TgaWriter(Allocator *allocator)
-	: ImageWriter(allocator)
+TgaWriter::TgaWriter(const StaticString& name, Allocator* allocator)
+	: ImageWriter(name, allocator)
 {
 }
 
-bool TgaWriter::set_format(const ImageFormat &format)
+bool TgaWriter::set_format(const ImageFormat& format)
 {
 	switch (format.pixel_format())
 	{
@@ -123,7 +123,7 @@ bool TgaWriter::set_format(const ImageFormat &format)
 	return true;
 }
 
-bool TgaWriter::write(const void *buffer)
+bool TgaWriter::write(const void* buffer)
 {
 	TgaHeader header;
 
@@ -150,7 +150,7 @@ bool TgaWriter::write(const void *buffer)
 
 	_file.write(header);
 
-	const uint8_t *scanline = static_cast<const uint8_t *>(buffer);
+	const uint8_t* scanline = static_cast<const uint8_t*>(buffer);
 
 	for (size_t row = 0; row < _format.height(); ++row)
 	{

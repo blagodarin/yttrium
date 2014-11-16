@@ -114,9 +114,9 @@ ScriptValue* ScriptContext::find(const StaticString& name) const
 	return nullptr;
 }
 
-ScriptContext* ScriptContext::root()
+ScriptContext& ScriptContext::root()
 {
-	return _parent ? _parent->root() : this;
+	return _parent ? _parent->root() : *this;
 }
 
 const ScriptValue* ScriptContext::set(const StaticString &name, Integer value, ScriptValue::Flags flags)

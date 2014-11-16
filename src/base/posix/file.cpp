@@ -24,24 +24,22 @@ File::Private::~Private()
 	}
 }
 
-bool File::flush()
+int File::Private::open(const StaticString& name, int flags, Allocator* allocator)
 {
-	return _private && (_private->mode & Write)
-		? !::fsync(_private->descriptor)
-		: false;
+	// TODO: Think of using a stack (alloca) here.
+	return ::open(name.zero_terminated(allocator).text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 }
 
-bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
+File::File(const StaticString& name, unsigned mode, Allocator* allocator)
+	: File()
 {
-	close();
-
-	int flags = (Y_IS_LINUX ? O_NOATIME : 0);
+	int flags = Y_IS_LINUX ? O_NOATIME : 0;
 	switch (mode & ReadWrite)
 	{
 	case Read:      flags |= O_RDONLY;          break;
 	case Write:     flags = O_WRONLY | O_CREAT; break;
 	case ReadWrite: flags |= O_RDWR | O_CREAT;  break;
-	default:        return false;
+	default:        return;
 	}
 
 	if ((mode & (Write | Pipe | Truncate)) == (Write | Truncate))
@@ -49,24 +47,19 @@ bool File::open(const StaticString &name, Mode mode, Allocator *allocator)
 
 	const int descriptor = Private::open(name, flags, allocator);
 	if (descriptor == -1)
-		return false;
+		return;
 
-	if (!_private)
-		_private = Y_NEW(allocator, Private)(allocator);
-
+	_private = Y_NEW(allocator, Private)(allocator);
 	_private->descriptor = descriptor;
 	_private->mode = mode;
 
 	if ((mode & (Read | Write | Pipe)) == Read)
 		_size = ::lseek(descriptor, 0, SEEK_END);
-
-	return true;
 }
 
-bool File::open(Special special, Allocator *allocator)
+File::File(Special special, Allocator* allocator)
+	: File()
 {
-	close();
-
 	switch (special)
 	{
 	case Temporary:
@@ -78,23 +71,24 @@ bool File::open(Special special, Allocator *allocator)
 			if (descriptor == -1)
 				break;
 
-			if (!_private)
-				_private = Y_NEW(allocator, Private)(allocator);
-
+			_private = Y_NEW(allocator, Private)(allocator);
 			_private->descriptor = descriptor;
 			_private->mode = Read | Write;
-			_private->name = name;
+			_private->name = std::move(name);
 			_private->auto_remove = true;
-
-			return true;
 		}
 		break;
 	}
-
-	return false;
 }
 
-size_t File::read(void *buffer, size_t size)
+bool File::flush()
+{
+	return _private && (_private->mode & Write)
+		? !::fsync(_private->descriptor)
+		: false;
+}
+
+size_t File::read(void* buffer, size_t size)
 {
 	if (_private && (_private->mode & Read))
 	{
@@ -143,9 +137,7 @@ bool File::seek(UOffset offset, Whence whence)
 			UOffset limit = (read_only ? _size : UINT64_MAX); // NOTE: Hack: we don't exactly know the UOffset's size.
 
 			if (limit - _offset < offset)
-			{
 				return false;
-			}
 			_offset += offset;
 		}
 		break;
@@ -166,7 +158,6 @@ bool File::seek(UOffset offset, Whence whence)
 				{
 					// With a valid descriptor, whence and offset, this must be EOVERFLOW,
 					// indicating that the file size can't be represented in an off_t.
-
 					Y_ABORT("Failed to retrieve the file size");
 				}
 				size = static_cast<UOffset>(off);
@@ -182,9 +173,7 @@ bool File::seek(UOffset offset, Whence whence)
 	default:
 
 		if (read_only && offset > _size)
-		{
 			return false;
-		}
 		_offset = offset;
 		break;
 	}
@@ -225,7 +214,7 @@ UOffset File::size() const
 	return 0;
 }
 
-size_t File::write(const void *buffer, size_t size)
+size_t File::write(const void* buffer, size_t size)
 {
 	if (_private && (_private->mode & Write))
 	{
@@ -233,9 +222,7 @@ size_t File::write(const void *buffer, size_t size)
 		{
 			ssize_t result = ::write(_private->descriptor, buffer, size);
 			if (result != -1)
-			{
 				return result;
-			}
 		}
 		else
 		{
@@ -248,13 +235,6 @@ size_t File::write(const void *buffer, size_t size)
 		}
 	}
 	return 0;
-}
-
-int File::Private::open(const StaticString &name, int flags, Allocator *allocator)
-{
-	// TODO: Think of using a stack (alloca) here.
-
-	return ::open(name.zero_terminated(allocator).text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 }
 
 } // namespace Yttrium

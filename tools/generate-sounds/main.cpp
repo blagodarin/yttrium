@@ -8,7 +8,7 @@
 
 using namespace Yttrium;
 
-int main(int, char **)
+int main(int, char**)
 {
 	MemoryManager memory_manager;
 
@@ -49,7 +49,7 @@ int main(int, char **)
 		{
 			Buffer buffer(data_chunk_header.size);
 
-			int16_t *data = static_cast<int16_t *>(buffer.data());
+			int16_t* data = static_cast<int16_t*>(buffer.data());
 
 			double time_step = 440.0 / frequency;
 

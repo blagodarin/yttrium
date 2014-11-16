@@ -10,7 +10,6 @@ namespace Yttrium
 {
 
 ///
-
 class Y_API LogManager
 {
 	Y_NONCOPYABLE(LogManager);
@@ -18,7 +17,6 @@ class Y_API LogManager
 public:
 
 	///
-
 	class Writer
 	{
 		friend LogManager;
@@ -26,15 +24,13 @@ public:
 	public:
 
 		///
-
 		~Writer() noexcept;
 
 	public:
 
 		///
-
 		template <typename T>
-		Y_PRIVATE Writer &operator <<(const T &value) noexcept
+		Y_PRIVATE Writer& operator<<(const T& value) noexcept
 		{
 			_message << value;
 			return *this;
@@ -46,7 +42,7 @@ public:
 
 	private:
 
-		LogManager *_log_manager;
+		LogManager* _log_manager;
 		String      _message;
 	};
 
@@ -55,24 +51,20 @@ public:
 public:
 
 	///
-
-	LogManager(const StaticString &file, Allocator *allocator = nullptr) noexcept;
+	LogManager(const StaticString& file, Allocator* allocator = nullptr) noexcept;
 
 	///
-
 	~LogManager() noexcept;
 
 public:
 
 	///
-
 	Writer log() noexcept;
 
 public:
 
 	///
-
-	static LogManager *instance() noexcept;
+	static LogManager* instance() noexcept;
 
 private:
 

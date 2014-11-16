@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 
-File::File(const File &file)
+File::File(const File& file)
 	: _private(Private::copy(file._private))
 	, _offset(file._offset)
 	, _size(file._size)
@@ -17,35 +17,44 @@ File::File(const File &file)
 {
 }
 
-void File::close()
+File::~File()
 {
 	Private::release(&_private);
-
-	_offset = 0;
-	_size = 0;
-	_base = 0;
 }
 
-bool File::is_opened() const
+File& File::operator =(const File& file)
+{
+	Private::copy(_private, file._private);
+	_offset = file._offset;
+	_size = file._size;
+	_base = file._base;
+	return *this;
+}
+
+File& File::operator=(File&& file) noexcept
+{
+	Private::move(_private, file._private);
+	_offset = file._offset;
+	_size = file._size;
+	_base = file._base;
+	return *this;
+}
+
+File::operator bool() const
 {
 	return _private && (_private->mode & ReadWrite);
+}
+
+File::File(const StaticString& name, Allocator* allocator)
+	: File()
+{
+	PackageManager* package_manager = PackageManager::instance();
+	*this = package_manager ? package_manager->open_file(name) : File(name, File::Read, allocator);
 }
 
 StaticString File::name() const
 {
 	return _private->name;
-}
-
-bool File::open(const StaticString& name, Allocator* allocator)
-{
-	PackageManager *package_manager = PackageManager::instance();
-
-	if (!package_manager)
-		return open(name, File::Read, allocator);
-
-	*this = package_manager->open_file(name);
-
-	return _private && (_private->mode & Read);
 }
 
 bool File::read_all(Buffer* buffer)
@@ -62,7 +71,6 @@ bool File::read_all(Buffer* buffer)
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -78,7 +86,6 @@ bool File::read_all(String* string)
 		if (read(string->text(), string->size()))
 			return true;
 	}
-
 	return false;
 }
 
@@ -140,17 +147,6 @@ bool File::read_line(String* string)
 	}
 
 	return true;
-}
-
-File& File::operator =(const File& file)
-{
-	Private::copy(_private, file._private);
-
-	_offset  = file._offset;
-	_size    = file._size;
-	_base    = file._base;
-
-	return *this;
 }
 
 File::File(Private* private_, UOffset base, UOffset size)

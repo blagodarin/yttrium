@@ -9,11 +9,11 @@
 
 using namespace Yttrium;
 
-void write_color_gradient(File *file, bool with_alpha)
+void write_color_gradient(File& file, bool with_alpha)
 {
 	Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
 
-	uint8_t *data = static_cast<uint8_t *>(buffer.data());
+	uint8_t* data = static_cast<uint8_t*>(buffer.data());
 
 	for (size_t y = 0; y < 16; ++y)
 	{
@@ -51,14 +51,14 @@ void write_color_gradient(File *file, bool with_alpha)
 		}
 	}
 
-	file->write(buffer.data(), buffer.size());
+	file.write(buffer.data(), buffer.size());
 }
 
-void write_color_intensity(File *file)
+void write_color_intensity(File& file)
 {
 	Buffer buffer(16 * 16 * 4);
 
-	uint8_t *data = static_cast<uint8_t *>(buffer.data());
+	uint8_t* data = static_cast<uint8_t*>(buffer.data());
 
 	for (size_t y = 0; y < 16; ++y)
 	{
@@ -73,23 +73,23 @@ void write_color_intensity(File *file)
 		}
 	}
 
-	file->write(buffer.data(), buffer.size());
+	file.write(buffer.data(), buffer.size());
 }
 
-void write_grayscale_intensity(File *file)
+void write_grayscale_intensity(File& file)
 {
 	Buffer buffer(16 * 16);
 
-	uint8_t *data = static_cast<uint8_t *>(buffer.data());
+	uint8_t* data = static_cast<uint8_t *>(buffer.data());
 
 	for (size_t y = 0; y < 16; ++y)
 		for (size_t x = 0; x < 16; ++x)
 			*data++ = y * 16 + x;
 
-	file->write(buffer.data(), buffer.size());
+	file.write(buffer.data(), buffer.size());
 }
 
-int main(int, char **)
+int main(int, char**)
 {
 	MemoryManager memory_manager;
 
@@ -107,7 +107,7 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft;
 
 		if (file.write(header))
-			write_color_gradient(&file, false);
+			write_color_gradient(file, false);
 	}
 
 	{
@@ -124,7 +124,7 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft | 8;
 
 		if (file.write(header))
-			write_color_gradient(&file, true);
+			write_color_gradient(file, true);
 	}
 
 	{
@@ -141,7 +141,7 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft | 8;
 
 		if (file.write(header))
-			write_color_gradient(&file, true);
+			write_color_gradient(file, true);
 	}
 
 	{
@@ -166,7 +166,7 @@ int main(int, char **)
 		header.dwCaps = DDSCAPS_TEXTURE;
 
 		if (file.write(header))
-			write_color_gradient(&file, true);
+			write_color_gradient(file, true);
 	}
 
 	{
@@ -183,7 +183,7 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft;
 
 		if (file.write(header))
-			write_grayscale_intensity(&file);
+			write_grayscale_intensity(file);
 	}
 
 	{
@@ -200,7 +200,7 @@ int main(int, char **)
 		header.image.descriptor = tgaTopLeft | 8;
 
 		if (file.write(header))
-			write_color_intensity(&file);
+			write_color_intensity(file);
 	}
 
 	return 0;

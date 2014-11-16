@@ -86,7 +86,7 @@ public:
 
 	/// Get the root context.
 	/// \return Root context.
-	ScriptContext* root() noexcept;
+	ScriptContext& root() noexcept;
 
 	///
 	const ScriptValue* set(const StaticString& name, Integer value, ScriptValue::Flags flags = 0) noexcept;

@@ -5,8 +5,8 @@
 namespace Yttrium
 {
 
-DdsReader::DdsReader(Allocator *allocator)
-	: ImageReader(allocator)
+DdsReader::DdsReader(const StaticString& name, Allocator* allocator)
+	: ImageReader(name, allocator)
 {
 }
 
@@ -138,7 +138,7 @@ bool DdsReader::open()
 	return true;
 }
 
-bool DdsReader::read(void *buffer)
+bool DdsReader::read(void* buffer)
 {
 	size_t frame_size = _format.frame_size();
 	return _file.read(buffer, frame_size) == frame_size;

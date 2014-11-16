@@ -15,7 +15,6 @@ class PackageWriter;
 class String;
 
 /// %File access class.
-
 class Y_API File
 {
 	friend PackageReader;
@@ -23,11 +22,7 @@ class Y_API File
 
 public:
 
-	/// %File access mode.
-
-	typedef uint_fast8_t Mode;
-
-	enum: Mode
+	enum
 	{
 		Read      = 1 << 0,       ///<
 		Write     = 1 << 1,       ///<
@@ -37,14 +32,12 @@ public:
 	};
 
 	///
-
 	enum Special
 	{
 		Temporary, ///<
 	};
 
 	/// Valid "whences" (origins) for the seek function.
-
 	enum Whence
 	{
 		Absolute, ///< Offset from the beginning of file.
@@ -54,165 +47,86 @@ public:
 
 public:
 
-	///
+	File() noexcept: _private(nullptr), _offset(0), _size(0), _base(0) {}
+	File(const File&) noexcept;
+	File(File&& file) noexcept: _private(file._private), _offset(file._offset), _size(file._size), _base(file._base) { file._private = nullptr; }
+	~File() noexcept;
 
-	File() noexcept
-		: _private(nullptr)
-		, _offset(0)
-		, _size(0)
-		, _base(0)
-	{
-	}
+	File& operator=(const File&) noexcept;
+	File& operator=(File&&) noexcept;
 
-	///
-
-	File(const StaticString &name, Mode mode, Allocator *allocator = DefaultAllocator) noexcept
-		: File()
-	{
-		open(name, mode, allocator);
-	}
+	explicit operator bool() const noexcept;
 
 	///
+	File(const StaticString &name, unsigned mode, Allocator *allocator = DefaultAllocator) noexcept;
 
-	explicit File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept
-		: File()
-	{
-		open(name, allocator);
-	}
+	/// Open a file for reading using the package manager if possible.
+	explicit File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
-
-	explicit File(Special special, Allocator *allocator = DefaultAllocator) noexcept
-		: File()
-	{
-		open(special, allocator);
-	}
-
-	///
-
-	File(const File &file) noexcept;
-
-	///
-
-	~File() noexcept
-	{
-		close();
-	}
+	explicit File(Special special, Allocator *allocator = DefaultAllocator) noexcept;
 
 public:
 
-	///
-
-	void close() noexcept;
-
 	/// Flush all written data to the storage media.
-
 	bool flush() noexcept;
 
 	///
-
-	bool is_opened() const noexcept;
-
-	///
-
 	StaticString name() const noexcept; // TODO: Make valid for all files, not just temporaries.
 
 	/// Return the current file offset.
 	/// \return Current offset.
-
-	UOffset offset() const noexcept
-	{
-		return _offset;
-	}
-
-	///
-
-	bool open(const StaticString &name, Mode mode, Allocator *allocator = DefaultAllocator) noexcept;
-
-	/// Open a file for reading using the package manager if possible.
-
-	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
-
-	///
-
-	bool open(Special special, Allocator *allocator = DefaultAllocator) noexcept;
+	UOffset offset() const noexcept { return _offset; }
 
 	/// Read a block of data from the file.
 	/// \param buffer The buffer to read into.
 	/// \param size Buffer size.
 	/// \return Number of bytes read or 0 on failure.
-
 	size_t read(void *buffer, size_t size) noexcept;
 
 	/// Read the buffer from the file.
 	/// \param buffer Buffer to read.
 	/// \return \c true on success.
-
 	template <typename T>
-	bool read(T *buffer) noexcept
+	bool read(T* buffer) noexcept
 	{
 		return read(buffer, sizeof(T)) == sizeof(T);
 	}
 
 	///
-
-	bool read_all(Buffer *buffer) noexcept;
-
-	///
-
-	bool read_all(String *string) noexcept;
+	bool read_all(Buffer* buffer) noexcept;
 
 	///
+	bool read_all(String* string) noexcept;
 
-	bool read_line(String *string) noexcept;
+	///
+	bool read_line(String* string) noexcept;
 
 	/// Change the size of the file.
-
 	bool resize(UOffset size) noexcept;
 
 	/// Set the file offset to the specified position.
-
 	bool seek(UOffset offset, Whence whence = Absolute) noexcept;
 
 	/// Return the file size.
 	/// \return File size.
-
 	UOffset size() const noexcept;
 
 	///
-
-	bool skip(UOffset size) noexcept
-	{
-		return seek(size, Relative);
-	}
+	bool skip(UOffset size) noexcept { return seek(size, Relative); }
 
 	/// Truncate the file past the current pointer.
-
-	bool truncate() noexcept
-	{
-		return resize(_offset);
-	}
+	bool truncate() noexcept { return resize(_offset); }
 
 	/// Write a buffer to the file.
 	/// \param buffer The buffer to write.
 	/// \param size Buffer size.
 	/// \return Number of bytes written or 0 on failure.
-
-	size_t write(const void *buffer, size_t size) noexcept;
+	size_t write(const void* buffer, size_t size) noexcept;
 
 	/// Write the \a buffer to the file.
-
 	template <typename T>
-	bool write(const T &buffer) noexcept
-	{
-		return write(&buffer, sizeof buffer) == sizeof buffer;
-	}
-
-public:
-
-	///
-
-	File &operator =(const File &file) noexcept;
+	bool write(const T& buffer) noexcept { return write(&buffer, sizeof buffer) == sizeof buffer; }
 
 public:
 
@@ -220,7 +134,7 @@ public:
 
 protected:
 
-	explicit File(Private *private_) noexcept
+	explicit File(Private* private_) noexcept
 		: _private(private_)
 		, _offset(0)
 		, _size(0)
@@ -228,11 +142,12 @@ protected:
 	{
 	}
 
+	Y_PRIVATE File(Private *private_, const StaticString &name) noexcept;
 	Y_PRIVATE File(Private *private_, UOffset base, UOffset size) noexcept;
 
 private:
 
-	Private *_private;
+	Private* _private;
 	UOffset  _offset;
 	UOffset  _size;
 	UOffset  _base;

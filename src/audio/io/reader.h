@@ -20,7 +20,11 @@ protected:
 
 	File _file;
 
-	AudioReaderImpl(Allocator* allocator): AudioReader(allocator) {}
+	AudioReaderImpl(const StaticString& name, Allocator* allocator)
+		: AudioReader(allocator)
+		, _file(name, allocator)
+	{
+	}
 };
 
 } // namespace Yttrium

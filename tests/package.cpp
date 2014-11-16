@@ -42,63 +42,58 @@ BOOST_AUTO_TEST_CASE(test_package_rewrite)
 
 	File package_file(File::Temporary);
 
-	PackageWriter package_writer;
+	{
+		PackageWriter package_writer(package_file.name(), PackageType::Ypq, PackageWriter::Rewrite);
+		BOOST_REQUIRE(package_writer);
 
-	BOOST_REQUIRE(package_writer.open(package_file.name(), PackageType::Ypq, PackageWriter::Rewrite));
+		{
+			File packed_file1 = package_writer.open_file(file1.name());
+			BOOST_REQUIRE(packed_file1);
+			FileTransfer<8192>(&packed_file1, &file1);
+		}
 
-	File packed_file1 = package_writer.open_file(file1.name());
+		{
+			File packed_file2 = package_writer.open_file(file2.name());
+			BOOST_REQUIRE(packed_file2);
+			FileTransfer<8192>(&packed_file2, &file2);
+		}
 
-	BOOST_REQUIRE(packed_file1.is_opened());
-	FileTransfer<8192>(&packed_file1, &file1);
+		{
+			File packed_file3 = package_writer.open_file(file3.name());
+			BOOST_REQUIRE(packed_file3);
+			FileTransfer<8192>(&packed_file3, &file3);
+		}
+	}
 
-	packed_file1.close();
+	PackageReader package_reader(package_file.name(), PackageType::Ypq);
+	BOOST_REQUIRE(package_reader);
 
-	File packed_file2 = package_writer.open_file(file2.name());
+	File packed_file3 = package_reader.open_file(file3.name());
+	File packed_file1 = package_reader.open_file(file1.name());
+	File packed_file2 = package_reader.open_file(file2.name());
 
-	BOOST_REQUIRE(packed_file2.is_opened());
-	FileTransfer<8192>(&packed_file2, &file2);
-
-	packed_file2.close();
-
-	File packed_file3 = package_writer.open_file(file3.name());
-
-	BOOST_REQUIRE(packed_file3.is_opened());
-	FileTransfer<8192>(&packed_file3, &file3);
-
-	packed_file3.close();
-
-	package_writer.close();
-
-	PackageReader package_reader;
-
-	BOOST_REQUIRE(package_reader.open(package_file.name(), PackageType::Ypq));
+	package_reader = PackageReader();
 
 	Buffer actual;
 
-	packed_file3 = package_reader.open_file(file3.name());
-	packed_file1 = package_reader.open_file(file1.name());
-	packed_file2 = package_reader.open_file(file2.name());
-
-	package_reader.close();
-
-	BOOST_REQUIRE(packed_file1.is_opened());
+	BOOST_REQUIRE(packed_file1);
 	BOOST_REQUIRE(packed_file1.read_all(&actual));
 	BOOST_CHECK_EQUAL(actual.size(), buffer1.size());
 	BOOST_CHECK(!::memcmp(actual.const_data(), buffer1.data(), buffer1.size()));
 
-	packed_file1.close();
+	packed_file1 = File();
 
-	BOOST_REQUIRE(packed_file2.is_opened());
+	BOOST_REQUIRE(packed_file2);
 	BOOST_REQUIRE(packed_file2.read_all(&actual));
 	BOOST_CHECK_EQUAL(actual.size(), buffer2.size());
 	BOOST_CHECK(!::memcmp(actual.const_data(), buffer2.data(), buffer2.size()));
 
-	packed_file2.close();
+	packed_file2 = File();
 
-	BOOST_REQUIRE(packed_file3.is_opened());
+	BOOST_REQUIRE(packed_file3);
 	BOOST_REQUIRE(packed_file3.read_all(&actual));
 	BOOST_CHECK_EQUAL(actual.size(), buffer3.size());
 	BOOST_CHECK(!::memcmp(actual.const_data(), buffer3.data(), buffer3.size()));
 
-	packed_file3.close();
+	packed_file3 = File();
 }

@@ -10,18 +10,15 @@
 namespace Yttrium
 {
 
-class JpegReader
-	: public ImageReader
+class JpegReader: public ImageReader
 {
 public:
 
-	JpegReader(Allocator *allocator);
+	JpegReader(const StaticString& name, Allocator* allocator);
 	~JpegReader() override;
 
-public:
-
 	bool open() override;
-	bool read(void *buffer) override;
+	bool read(void* buffer) override;
 
 private:
 
@@ -33,7 +30,7 @@ private:
 
 private:
 
-	static void error_callback(jpeg_common_struct *cinfo);
+	static void error_callback(jpeg_common_struct* cinfo);
 
 private:
 

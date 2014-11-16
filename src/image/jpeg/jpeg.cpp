@@ -5,8 +5,8 @@
 namespace Yttrium
 {
 
-JpegReader::JpegReader(Allocator *allocator)
-	: ImageReader(allocator)
+JpegReader::JpegReader(const StaticString& name, Allocator* allocator)
+	: ImageReader(name, allocator)
 	, _buffer(allocator)
 {
 	_decompressor.err = jpeg_std_error(&_error_handler.pub);
@@ -49,14 +49,14 @@ bool JpegReader::open()
 	return true;
 }
 
-bool JpegReader::read(void *buffer)
+bool JpegReader::read(void* buffer)
 {
 	if (setjmp(_error_handler.setjmp_buffer))
 		return false;
 
 	jpeg_start_decompress(&_decompressor);
 
-	for (unsigned char *scanline = static_cast<unsigned char *>(buffer);
+	for (unsigned char* scanline = static_cast<unsigned char*>(buffer);
 		_decompressor.output_scanline < _decompressor.output_height;
 		scanline += _format.row_size())
 	{
@@ -68,9 +68,9 @@ bool JpegReader::read(void *buffer)
 	return true;
 }
 
-void JpegReader::error_callback(jpeg_common_struct *cinfo)
+void JpegReader::error_callback(jpeg_common_struct* cinfo)
 {
-	JpegErrorHandler *error_handler = (JpegErrorHandler *)cinfo->err;
+	JpegErrorHandler* error_handler = (JpegErrorHandler*)cinfo->err;
 	//(*cinfo->err->output_message)(cinfo); // TODO: Do some error notification.
 	longjmp(error_handler->setjmp_buffer, 1);
 }
