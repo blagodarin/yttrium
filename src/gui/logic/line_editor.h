@@ -20,6 +20,7 @@ public:
 	bool process_key(const KeyEvent& event);
 	unsigned selection_offset() const { return _selection_offset; }
 	unsigned selection_size() const { return _selection_size; }
+	void set_max_size(unsigned max_size);
 	String text() const { return _text; }
 
 private:
@@ -28,6 +29,7 @@ private:
 	unsigned _cursor;
 	unsigned _selection_size;
 	unsigned _selection_offset;
+	unsigned _max_size;
 };
 
 } // namespace Yttrium

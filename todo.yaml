@@ -18,3 +18,6 @@ Yttrium:
 
     ION:
     - Make string value retrieval more usable.
+
+    Renderer:
+    - Implement pre-rendered text (i.e. pre-built geometry).

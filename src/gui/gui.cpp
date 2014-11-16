@@ -3,7 +3,6 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/script/context.h>
 
 #include "../memory/allocatable.h"
 #include "ion/dumper.h"

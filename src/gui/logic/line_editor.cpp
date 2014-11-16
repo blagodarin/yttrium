@@ -1,5 +1,7 @@
 #include "line_editor.h"
 
+#include <climits> // UINT_MAX
+
 namespace Yttrium
 {
 
@@ -8,6 +10,7 @@ LineEditor::LineEditor(Allocator* allocator)
 	, _cursor(0)
 	, _selection_size(0)
 	, _selection_offset(0)
+	, _max_size(UINT_MAX)
 {
 }
 
@@ -20,15 +23,18 @@ void LineEditor::clear()
 
 void LineEditor::insert(const StaticString& text)
 {
-	if (_selection_size)
+	if (_selection_size > 0)
 	{
 		_text.remove(_selection_offset, _selection_size);
 		_cursor = _selection_offset;
 		_selection_size = 0;
 	}
 
-	_text.insert(text, _cursor);
-	_cursor += text.size();
+	if (text.size() <= _max_size - _text.size())
+	{
+		_text.insert(text, _cursor);
+		_cursor += text.size();
+	}
 }
 
 bool LineEditor::process_key(const KeyEvent& event)
@@ -39,7 +45,7 @@ bool LineEditor::process_key(const KeyEvent& event)
 	{
 	case Key::Left:
 
-		if (_cursor)
+		if (_cursor > 0)
 		{
 			--_cursor;
 			if (shift)
@@ -113,13 +119,13 @@ bool LineEditor::process_key(const KeyEvent& event)
 
 	case Key::Backspace:
 
-		if (_selection_size)
+		if (_selection_size > 0)
 		{
 			_text.remove(_selection_offset, _selection_size);
 			_cursor = _selection_offset;
 			_selection_size = 0;
 		}
-		else if (_cursor)
+		else if (_cursor > 0)
 		{
 			_text.remove(--_cursor);
 		}
@@ -135,6 +141,18 @@ bool LineEditor::process_key(const KeyEvent& event)
 	}
 
 	return true;
+}
+
+void LineEditor::set_max_size(unsigned max_size)
+{
+	_max_size = max_size;
+	_text.truncate(_max_size);
+	if (_cursor > _max_size)
+		_cursor = _max_size;
+	if (_selection_offset > _max_size)
+		_selection_offset = _max_size;
+	if (_selection_offset + _selection_size > _max_size)
+		_selection_size = _max_size - _selection_size;
 }
 
 } // namespace Yttrium

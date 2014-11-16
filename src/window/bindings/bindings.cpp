@@ -1,7 +1,5 @@
 #include <yttrium/bindings.h>
 
-#include <yttrium/script/context.h>
-
 #include "lookup.h"
 
 namespace Yttrium
