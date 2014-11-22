@@ -137,7 +137,7 @@ void ScriptCode::execute(ScriptContext* context, ExecutionMode mode) const
 	{
 		bool revert_mode = false;
 
-		if (mode != ExecutionMode::Do)
+		if (mode == Undo)
 		{
 			if (command.name[0] != '+')
 				continue;

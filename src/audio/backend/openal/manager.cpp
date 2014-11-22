@@ -60,7 +60,7 @@ OpenAlManager* OpenAlManager::open(const StaticString& device, Allocator* alloca
 	{
 		ScriptValue* stored_device = ScriptContext::global().find("audio_device");
 		if (stored_device)
-			alc_device = ::alcOpenDevice(stored_device->string().const_text());
+			alc_device = ::alcOpenDevice(stored_device->to_string().const_text());
 	}
 
 	if (!alc_device)

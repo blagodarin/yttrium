@@ -1,7 +1,7 @@
-#include "logging.h"
 #include "gui.h"
 
 #include <yttrium/allocator.h>
+#include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
 
 #include "../memory/allocatable.h"
@@ -214,8 +214,6 @@ void GuiImpl::set_cursor(const Vector2f& cursor)
 
 void GuiImpl::change_scene(const StaticString& old_scene, const StaticString& new_scene)
 {
-	Y_LOG_DEBUG("[Gui] Changing scene from \"" << old_scene << "\" to \"" << new_scene << "\"...");
-
 	auto i = _scene_actions.find(std::make_pair(String(old_scene, ByReference()), String(new_scene, ByReference())));
 	if (i != _scene_actions.end())
 		i->second.second.execute();

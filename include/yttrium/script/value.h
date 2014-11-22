@@ -24,11 +24,7 @@ class Y_API ScriptValue
 
 public:
 
-	/// Value flags.
-
-	typedef uint_fast8_t Flags;
-
-	enum: Flags
+	enum
 	{
 		Default  = 1 << 0, ///< Default value flag.
 		Archived = 1 << 1, ///< Archived value flag.
@@ -46,13 +42,13 @@ public:
 public:
 
 	///
-	Integer integer() const noexcept { return _value.to_int32(); }
+	int32_t to_int32() const noexcept { return _value.to_int32(); }
 
 	///
-	Real real() const noexcept { return _value.to_double(); }
+	double to_double() const noexcept { return _value.to_double(); }
 
 	///
-	Yttrium::String string() const noexcept { return _value; }
+	Yttrium::String to_string() const noexcept { return _value; }
 
 	///
 	Type type() const noexcept { return _type; }
@@ -60,12 +56,11 @@ public:
 public:
 
 	///
-
-	ScriptValue& operator=(Integer value) noexcept;
+	ScriptValue& operator=(int32_t value) noexcept;
 
 	///
 
-	ScriptValue& operator=(Real value) noexcept;
+	ScriptValue& operator=(double value) noexcept;
 
 	///
 
@@ -78,8 +73,8 @@ private:
 
 private:
 
-	Y_PRIVATE ScriptValue(Integer value, Allocator* allocator);
-	Y_PRIVATE ScriptValue(Real value, Allocator* allocator);
+	Y_PRIVATE ScriptValue(int32_t value, Allocator* allocator);
+	Y_PRIVATE ScriptValue(double value, Allocator* allocator);
 	Y_PRIVATE ScriptValue(const StaticString& value, Allocator* allocator);
 	Y_PRIVATE ScriptValue(const StaticString& value, Type type, Allocator* allocator);
 };

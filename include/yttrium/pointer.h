@@ -7,6 +7,7 @@
 #include <yttrium/types.h>
 
 #include <atomic>
+#include <cstddef>
 
 namespace Yttrium
 {

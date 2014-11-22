@@ -14,10 +14,10 @@ String ScriptArgs::string(size_t index, NameResolution resolution) const
 		const ScriptValue* value = _values[index];
 
 		if (resolution == Resolve && value->type() == ScriptValue::Name)
-			value = _context.find(value->string());
+			value = _context.find(value->to_string());
 
 		if (value)
-			result = value->string();
+			result = value->to_string();
 	}
 
 	return result;

@@ -1,10 +1,8 @@
-#include "logging.h"
-
-#include <yttrium/script/code.h>
 #include <yttrium/script/context.h>
 
 #include <yttrium/assert.h>
 #include <yttrium/file.h>
+#include <yttrium/log.h>
 
 namespace Yttrium
 {
@@ -35,11 +33,11 @@ ScriptContext::Archive ScriptContext::archive() const
 
 			if (entity.second.archived_value->type() == ScriptValue::String)
 			{
-				value << '"' << entity.second.archived_value->string().escaped("\\\"", '\\') << '"';
+				value << '"' << entity.second.archived_value->to_string().escaped("\\\"", '\\') << '"';
 			}
 			else
 			{
-				value = entity.second.archived_value->string();
+				value = entity.second.archived_value->to_string();
 			}
 
 			result.emplace(entity.first, value);
@@ -55,8 +53,6 @@ bool ScriptContext::call(const StaticString &name, String *result, const ScriptA
 	{
 		return false;
 	}
-
-	Y_LOG_TRACE(S("[Script.Context] Calling \"") << name << S("\"..."));
 
 	StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
@@ -84,7 +80,7 @@ void ScriptContext::define(const StaticString& name, const Command& command, siz
 	_commands[String(name, _allocator)] = CommandContext(command, min_args, max_args);
 }
 
-bool ScriptContext::execute(const StaticString& text, ExecutionMode mode)
+bool ScriptContext::execute(const StaticString& text, ScriptCode::ExecutionMode mode)
 {
 	const ScriptCode& code = ScriptCode(text);
 	if (!code)
@@ -98,7 +94,7 @@ bool ScriptContext::execute_file(const StaticString& name)
 	const ScriptCode& code = ScriptCode::load(name);
 	if (!code)
 		return false;
-	code.execute(this, ExecutionMode::Do);
+	code.execute(this, ScriptCode::Do);
 	return true;
 }
 
@@ -119,7 +115,7 @@ ScriptContext& ScriptContext::root()
 	return _parent ? _parent->root() : *this;
 }
 
-const ScriptValue* ScriptContext::set(const StaticString &name, Integer value, ScriptValue::Flags flags)
+const ScriptValue* ScriptContext::set(const StaticString &name, int32_t value, unsigned flags)
 {
 	auto i = _entities.find(String(name, ByReference(), nullptr));
 
@@ -148,7 +144,7 @@ const ScriptValue* ScriptContext::set(const StaticString &name, Integer value, S
 	return i->second.value;
 }
 
-const ScriptValue* ScriptContext::set(const StaticString& name, Real value, ScriptValue::Flags flags)
+const ScriptValue* ScriptContext::set(const StaticString& name, double value, unsigned flags)
 {
 	auto i = _entities.find(String(name, ByReference(), nullptr));
 
@@ -177,7 +173,7 @@ const ScriptValue* ScriptContext::set(const StaticString& name, Real value, Scri
 	return i->second.value;
 }
 
-const ScriptValue* ScriptContext::set(const StaticString& name, const StaticString& value, ScriptValue::Flags flags)
+const ScriptValue* ScriptContext::set(const StaticString& name, const StaticString& value, unsigned flags)
 {
 	auto i = _entities.find(String(name, ByReference(), nullptr));
 
@@ -231,7 +227,7 @@ void ScriptContext::substitute(String& target, const StaticString& source) const
 
 		ScriptValue* value = find(StaticString(left, right - left));
 		if (value)
-			target.append(value->string());
+			target.append(value->to_string());
 
 		left = ++right;
 	}

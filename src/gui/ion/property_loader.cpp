@@ -1,4 +1,3 @@
-#include "../logging.h"
 #include "property_loader.h"
 
 #include <yttrium/audio/sound.h>
@@ -69,19 +68,19 @@ unsigned read_position(Vector2f *position, const Ion::Node &node)
 	return result;
 }
 
-void read_rect(Integer elements[4], const Ion::Node &node)
+void read_rect(int32_t elements[4], const Ion::Node& node)
 {
 	Ion::Node::ConstRange values = node.values();
 
-	for (Integer i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		if (values.is_empty())
 			break;
 
-		const StaticString *value;
+		const StaticString* value;
 		if (values->get(&value))
 		{
-			Integer number;
+			int32_t number;
 			if (value->to_number(&number) && number >= i >> 1) // 'number' must be not less than {0, 0, 1, 1}.
 				elements[i] = number;
 		}
@@ -154,8 +153,6 @@ void GuiIonPropertyLoader::bind(const StaticString &name)
 
 bool GuiIonPropertyLoader::load_alignment(const StaticString &name, unsigned *alignment) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
@@ -175,8 +172,6 @@ bool GuiIonPropertyLoader::load_alignment(const StaticString &name, unsigned *al
 
 bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4f *color) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	unsigned loaded = 0x0;
 
 	if (_bound_class)
@@ -198,8 +193,6 @@ bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4f *color)
 
 bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Texture2DPtr *texture) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	const StaticString *font_name;
 
 	const Ion::Node *node = _bound_object ? &_bound_object->last(name) : nullptr;
@@ -228,8 +221,6 @@ bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font
 
 bool GuiIonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
@@ -249,8 +240,6 @@ bool GuiIonPropertyLoader::load_margins(const StaticString &name, MarginsI *marg
 
 bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2f *position) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	unsigned loaded = 0x0;
 
 	if (_bound_class)
@@ -272,9 +261,7 @@ bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2f *pos
 
 bool GuiIonPropertyLoader::load_rect(const StaticString &name, Rect *rect, bool update) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
-	Integer elements[4] = {-1, -1, -1, -1};
+	int32_t elements[4] = {-1, -1, -1, -1};
 
 	if (update)
 	{
@@ -308,8 +295,6 @@ bool GuiIonPropertyLoader::load_rect(const StaticString &name, Rect *rect, bool 
 
 bool GuiIonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
@@ -329,8 +314,6 @@ bool GuiIonPropertyLoader::load_scaling(const StaticString &name, Scaling *scali
 
 bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2f *size) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	unsigned loaded = 0x0;
 
 	if (_bound_class)
@@ -352,8 +335,6 @@ bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2f *size) c
 
 SoundPtr GuiIonPropertyLoader::load_sound(const StaticString &name) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
@@ -373,8 +354,6 @@ SoundPtr GuiIonPropertyLoader::load_sound(const StaticString &name) const
 
 bool GuiIonPropertyLoader::load_state(const StaticString &name, WidgetState *state) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
@@ -394,8 +373,6 @@ bool GuiIonPropertyLoader::load_state(const StaticString &name, WidgetState *sta
 
 bool GuiIonPropertyLoader::load_text(const StaticString &name, String *text) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	const StaticString *value;
 
 	if (!_bound_object || !load_text(&value, *_bound_object, name))
@@ -409,8 +386,6 @@ bool GuiIonPropertyLoader::load_text(const StaticString &name, String *text) con
 
 bool GuiIonPropertyLoader::load_texture(const StaticString &name, Texture2DPtr *texture) const
 {
-	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
-
 	if (_bound_object)
 	{
 		const Ion::Node *node = &_bound_object->last(name);
@@ -504,10 +479,10 @@ bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const Ion::Node& 
 
 bool GuiIonPropertyLoader::load_margins(MarginsI* margins, const Ion::Node& node)
 {
-	Integer top    = -1;
-	Integer right  = -1;
-	Integer bottom = -1;
-	Integer left   = -1;
+	int32_t top    = -1;
+	int32_t right  = -1;
+	int32_t bottom = -1;
+	int32_t left   = -1;
 
 	Ion::Node::ConstRange values = node.const_values();
 	switch (values.size())

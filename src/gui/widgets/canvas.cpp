@@ -1,7 +1,6 @@
-#include "../logging.h"
-
 #include "canvas.h"
 
+#include <yttrium/log.h>
 #include <yttrium/renderer.h>
 
 #include "../property_dumper.h"
@@ -24,11 +23,9 @@ void Canvas::dump(GuiPropertyDumper& dumper) const
 
 bool Canvas::load(GuiPropertyLoader& loader)
 {
-	Y_LOG_TRACE("[Gui.Canvas] Loading...");
-
 	if (!loader.load_rect("position", &_position))
 	{
-		Y_LOG_DEBUG("[Gui.Canvas] Unable to load");
+		Y_LOG("[Gui.Canvas] Unable to load");
 		return false;
 	}
 

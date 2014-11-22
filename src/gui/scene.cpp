@@ -1,5 +1,3 @@
-#include "logging.h"
-
 #include "scene.h"
 
 #include <yttrium/allocator.h>

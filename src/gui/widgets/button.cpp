@@ -1,7 +1,6 @@
-#include "../logging.h"
-
 #include "button.h"
 
+#include <yttrium/log.h>
 #include <yttrium/renderer.h>
 
 #include "../property_dumper.h"
@@ -36,13 +35,11 @@ void Button::dump(GuiPropertyDumper& dumper) const
 
 bool Button::load(GuiPropertyLoader& loader)
 {
-	Y_LOG_TRACE("[Gui.Button] Loading...");
-
 	if (!(loader.load_rect("position", &_position)
 		&& loader.load_font("font", &_font, &_font_texture)
 		&& loader.load_size("text_size", &_text_size)))
 	{
-		Y_LOG_DEBUG("[Gui.Button] Unable to load");
+		Y_LOG("[Gui.Button] Unable to load");
 		return false;
 	}
 

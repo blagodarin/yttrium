@@ -1,10 +1,9 @@
-#include "../logging.h"
-
 #include "loader.h"
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/log.h>
 #include <yttrium/renderer/texture_cache.h>
 
 #include "../gui.h"
@@ -122,8 +121,6 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 {
 	Ion::Document document(_gui->allocator());
 
-	Y_LOG_DEBUG("[Gui] Loading \"" << source_name << "\"...");
-
 	if (!document.load(source_name))
 	{
 		Y_LOG("[Gui] Can't load \"" << source_name << "\"...");
@@ -157,8 +154,6 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 
 	load(document);
 
-	Y_LOG_TRACE("[Gui] Loaded \"" << source_name << "\"");
-
 	return true;
 }
 
@@ -186,8 +181,6 @@ void GuiIonLoader::load(const Ion::Object &source)
 				continue;
 			}
 
-			Y_LOG_DEBUG("[Gui] Loading class \"" << *object_name << "\"...");
-
 			if (!_classes.add(*object_name, *object, class_name))
 			{
 				Y_LOG("[Gui] Can' load class \"" << *object_name << "\"");
@@ -209,8 +202,6 @@ void GuiIonLoader::load(const Ion::Object &source)
 				Y_LOG("[Gui] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored");
 				class_name = nullptr;
 			}
-
-			Y_LOG_DEBUG("[Gui] Loading scene \"" << *object_name << "\"...");
 
 			GuiScene *scene = _gui->create_scene(*object_name);
 
@@ -258,8 +249,6 @@ void GuiIonLoader::load(const Ion::Object &source)
 			{
 				continue;
 			}
-
-			Y_LOG_DEBUG("[Gui] Loading font \"" << *object_name << "\"...");
 
 			const StaticString *font_name;
 			const StaticString *texture_name;

@@ -6,6 +6,8 @@
 
 #include <yttrium/types.h>
 
+#include <cstdint>
+
 namespace Yttrium
 {
 

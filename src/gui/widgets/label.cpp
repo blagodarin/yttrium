@@ -1,7 +1,6 @@
-#include "../logging.h"
-
 #include "label.h"
 
+#include <yttrium/log.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
 
@@ -29,13 +28,11 @@ void Label::dump(GuiPropertyDumper& dumper) const
 
 bool Label::load(GuiPropertyLoader& loader)
 {
-	Y_LOG_TRACE("[Gui.Label] Loading...");
-
 	if (!(loader.load_position("position", &_position)
 		&& _foreground.load(loader)
 		&& loader.load_text("text", &_text)))
 	{
-		Y_LOG_DEBUG("[Gui.Label] Unable to load");
+		Y_LOG("[Gui.Label] Unable to load");
 		return false;
 	}
 

@@ -6,6 +6,7 @@
 
 #include <yttrium/types.h>
 
+#include <cstddef>
 #include <new>
 
 namespace Yttrium

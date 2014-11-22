@@ -2,8 +2,7 @@
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
-
-#include "logging.h"
+#include <yttrium/log.h>
 
 namespace Yttrium
 {
@@ -18,8 +17,6 @@ Parser::Parser(Document *document)
 
 bool Parser::parse(const StaticString &string, const StaticString &source_name)
 {
-	Y_LOG_TRACE(S("ion: Parsing:\n") << string);
-
 	_states.push_back(State(_document));
 	_state = &_states.back();
 
@@ -198,39 +195,24 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 
 bool Parser::parse_name(const StaticString &name)
 {
-	Y_LOG_TRACE(S("ion: Token: ") << name);
-
 	if (!_state->object)
-	{
 		return false;
-	}
-
 	_state->list = _state->object->append(name, ByReference());
 	return true;
 }
 
 bool Parser::parse_value(const StaticString &value)
 {
-	Y_LOG_TRACE(S("ion: Token: \"") << String(value, ByReference(), _document._allocator).escaped(S("\\\""), '\\') << '"');
-
 	if (!_state->list)
-	{
 		return false;
-	}
-
 	_state->list->append(value, ByReference());
 	return true;
 }
 
 bool Parser::parse_lbrace()
 {
-	Y_LOG_TRACE(S("ion: Token: {"));
-
 	if (!_state->list)
-	{
 		return false;
-	}
-
 	_states.push_back(State(_state->list->append_object()));
 	_state = &_states.back();
 	return true;
@@ -238,13 +220,8 @@ bool Parser::parse_lbrace()
 
 bool Parser::parse_rbrace()
 {
-	Y_LOG_TRACE(S("ion: Token: }"));
-
 	if (!_state->object || _states.size() == 1)
-	{
 		return false;
-	}
-
 	_states.pop_back();
 	_state = &_states.back();
 	return true;
@@ -252,13 +229,8 @@ bool Parser::parse_rbrace()
 
 bool Parser::parse_lbracket()
 {
-	Y_LOG_TRACE(S("Token: ["));
-
 	if (!_state->list)
-	{
 		return false;
-	}
-
 	_states.push_back(State(_state->list->append_list()));
 	_state = &_states.back();
 	return true;
@@ -266,13 +238,8 @@ bool Parser::parse_lbracket()
 
 bool Parser::parse_rbracket()
 {
-	Y_LOG_TRACE(S("Token: ]"));
-
 	if (_state->object || _states.size() == 1)
-	{
 		return false;
-	}
-
 	_states.pop_back();
 	_state = &_states.back();
 	return true;
@@ -280,8 +247,6 @@ bool Parser::parse_rbracket()
 
 bool Parser::parse_end()
 {
-	Y_LOG_TRACE(S("Token: <end>"));
-
 	return _states.size() == 1;
 }
 

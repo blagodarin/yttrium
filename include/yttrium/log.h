@@ -38,7 +38,7 @@ public:
 
 	private:
 
-		Y_PRIVATE Writer(LogManager *log_manager) noexcept;
+		Y_PRIVATE Writer(LogManager* log_manager) noexcept;
 
 	private:
 
@@ -70,7 +70,7 @@ private:
 
 	class Private;
 
-	Private *_private;
+	Private* _private;
 };
 
 } // namespace Yttrium

@@ -224,7 +224,7 @@ bool Bindings::bind_default(const StaticString& name, const StaticString& action
 	return true;
 }
 
-bool Bindings::call(Key key, ExecutionMode mode)
+bool Bindings::call(Key key, ScriptCode::ExecutionMode mode)
 {
 	const auto& binding = _actions[KeyType(key)];
 	if (binding.first.is_empty())

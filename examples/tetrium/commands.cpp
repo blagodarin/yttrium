@@ -53,7 +53,7 @@ void Commands::game_pause(const StaticString&, String*, const ScriptArgs&) noexc
 void Commands::game_start(const StaticString&, String*, const ScriptArgs&) noexcept
 {
 	ScriptValue* start_level_value = ScriptContext::global().find("start_level");
-	int start_level = start_level_value ? start_level_value->integer() : 1;
+	int32_t start_level = start_level_value ? start_level_value->to_int32() : 1;
 	_game._game.start(start_level);
 	_game._game_timer.start();
 }
@@ -97,7 +97,7 @@ void Commands::play_music(const StaticString&, String*, const ScriptArgs&) noexc
 
 void Commands::pop_scene(const StaticString&, String*, const ScriptArgs& args) noexcept
 {
-	Integer scenes_to_pop = !args.size() ? 1 : args.value(0)->integer();
+	int32_t scenes_to_pop = !args.size() ? 1 : args.value(0)->to_int32();
 	if (scenes_to_pop > 0 && !_game._gui->pop_scenes(scenes_to_pop))
 		_game._window->close();
 }
@@ -111,14 +111,14 @@ void Commands::set(const StaticString&, String*, const ScriptArgs& args) noexcep
 {
 	const ScriptValue* value = args.value(0);
 	if (value->type() == ScriptValue::Name)
-		ScriptContext::global().set(value->string(), args.string(1, ScriptArgs::Resolve));
+		ScriptContext::global().set(value->to_string(), args.string(1, ScriptArgs::Resolve));
 }
 
 void Commands::seta(const StaticString&, String*, const ScriptArgs& args) noexcept
 {
 	const ScriptValue* value = args.value(0);
 	if (value->type() == ScriptValue::Name)
-		ScriptContext::global().set(value->string(), args.string(1, ScriptArgs::Resolve), ScriptValue::Archived);
+		ScriptContext::global().set(value->to_string(), args.string(1, ScriptArgs::Resolve), ScriptValue::Archived);
 }
 
 void Commands::snap(const StaticString&, String*, const ScriptArgs&) noexcept
@@ -173,5 +173,5 @@ void Commands::unset(const StaticString&, String*, const ScriptArgs& args) noexc
 {
 	const ScriptValue* value = args.value(0);
 	if (value->type() == ScriptValue::Name)
-		ScriptContext::global().unset(value->string());
+		ScriptContext::global().unset(value->to_string());
 }

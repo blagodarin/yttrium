@@ -213,7 +213,7 @@ bool Game::on_key_event(const KeyEvent& event) noexcept
 	if (_gui->process_key(event))
 		return true;
 
-	if (event.pressed <= 1 && _bindings.call(event.key, event.pressed ? ExecutionMode::Do : ExecutionMode::Undo))
+	if (event.pressed <= 1 && _bindings.call(event.key, event.pressed ? ScriptCode::Do : ScriptCode::Undo))
 		return true;
 
 	return false;

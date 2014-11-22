@@ -11,6 +11,9 @@
 
 #include <yttrium/types.h>
 
+#include <cstddef>
+#include <cstdint>
+
 namespace Yttrium
 {
 

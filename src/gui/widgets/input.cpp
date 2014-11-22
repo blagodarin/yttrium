@@ -1,7 +1,6 @@
-#include "../logging.h"
-
 #include "input.h"
 
+#include <yttrium/log.h>
 #include <yttrium/renderer.h>
 
 #include "../property_dumper.h"
@@ -27,12 +26,10 @@ void GuiInput::dump(GuiPropertyDumper& dumper) const
 
 bool GuiInput::load(GuiPropertyLoader& loader)
 {
-	Y_LOG_TRACE("[Gui.Input] Loading...");
-
 	if (!(loader.load_rect("position", &_position)
 		&& _foreground.load(loader)))
 	{
-		Y_LOG_DEBUG("[Gui.Input] Unable to load");
+		Y_LOG("[Gui.Input] Unable to load");
 		return false;
 	}
 

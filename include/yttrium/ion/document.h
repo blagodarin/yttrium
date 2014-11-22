@@ -37,21 +37,21 @@ public:
 public:
 
 	///
-	Allocator *allocator() const noexcept;
+	Allocator* allocator() const noexcept;
 
 	///
 	void clear() noexcept;
 
 	///
-	bool load(const StaticString &name) noexcept;
+	bool load(const StaticString& name) noexcept;
 
 	///
-	bool save(const StaticString &name, int indentation = 0) const noexcept;
+	bool save(const StaticString& name, int indentation = 0) const noexcept;
 
 public:
 
 	///
-	Document& operator =(const Document& document) noexcept
+	Document& operator=(const Document& document) noexcept
 	{
 		clear();
 		concatenate(document);

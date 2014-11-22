@@ -1,7 +1,6 @@
-#include "../logging.h"
-
 #include "image.h"
 
+#include <yttrium/log.h>
 #include <yttrium/renderer.h>
 
 #include "../property_dumper.h"
@@ -26,11 +25,9 @@ void GuiImage::dump(GuiPropertyDumper& dumper) const
 
 bool GuiImage::load(GuiPropertyLoader& loader)
 {
-	Y_LOG_TRACE("[Gui.Image] Loading...");
-
 	if (!loader.load_rect("position", &_position))
 	{
-		Y_LOG_DEBUG("[Gui.Image] Unable to load");
+		Y_LOG("[Gui.Image] Unable to load");
 		return false;
 	}
 

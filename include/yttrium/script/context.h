@@ -6,6 +6,7 @@
 
 #include <yttrium/pool.h>
 #include <yttrium/script/args.h>
+#include <yttrium/script/code.h>
 #include <yttrium/script/value.h>
 #include <yttrium/string.h>
 
@@ -72,7 +73,7 @@ public:
 	/// \param script Script text to execute.
 	/// \param mode Execution mode.
 	/// \return \c true on success.
-	bool execute(const StaticString& script, ExecutionMode mode = ExecutionMode::Do) noexcept;
+	bool execute(const StaticString& script, ScriptCode::ExecutionMode mode = ScriptCode::Do) noexcept;
 
 	/// Execute the script from the specified file.
 	/// \param name Script file to execute.
@@ -89,7 +90,7 @@ public:
 	ScriptContext& root() noexcept;
 
 	///
-	const ScriptValue* set(const StaticString& name, Integer value, ScriptValue::Flags flags = 0) noexcept;
+	const ScriptValue* set(const StaticString& name, int32_t value, unsigned flags = 0) noexcept;
 
 	/**
 	* \overload
@@ -98,7 +99,7 @@ public:
 	* \param flags
 	* \return
 	*/
-	const ScriptValue* set(const StaticString& name, Real value, ScriptValue::Flags flags = 0) noexcept;
+	const ScriptValue* set(const StaticString& name, double value, unsigned flags = 0) noexcept;
 
 	/**
 	* \overload
@@ -107,7 +108,7 @@ public:
 	* \param flags
 	* \return
 	*/
-	const ScriptValue* set(const StaticString& name, const StaticString& value, ScriptValue::Flags flags = 0) noexcept;
+	const ScriptValue* set(const StaticString& name, const StaticString& value, unsigned flags = 0) noexcept;
 
 	/// Substitute script variables in a string.
 	/// \param target

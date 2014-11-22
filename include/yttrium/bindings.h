@@ -35,7 +35,7 @@ public:
 	bool bind_default(const StaticString& name, const StaticString& action) noexcept;
 
 	///
-	bool call(Key key, ExecutionMode mode = ExecutionMode::Do) noexcept;
+	bool call(Key key, ScriptCode::ExecutionMode mode = ScriptCode::Do) noexcept;
 
 	///
 	void clear() noexcept;
