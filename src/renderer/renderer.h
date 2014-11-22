@@ -42,7 +42,7 @@ public:
 
 	void draw_rectangle(const RectF &position, const RectF &texture, const MarginsF &borders = MarginsF());
 
-	void draw_text(const Vector2f &position, const StaticString &text, Alignment alignment, TextCapture* capture);
+	void draw_text(const Vector2f &position, const StaticString &text, unsigned alignment, TextCapture* capture);
 
 	Vector2f text_size(const StaticString &text) const;
 

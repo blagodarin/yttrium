@@ -18,23 +18,23 @@ public:
 
 	///
 
-	inline String(Allocator *allocator = DefaultAllocator) noexcept;
+	inline String(Allocator* allocator = DefaultAllocator) noexcept;
 
 	/// Copy constructor.
 	/// \param string The source string.
 
-	String(const String &string) noexcept;
+	String(const String& string) noexcept;
 
 	/**
 	* \overload
 	* \param string
 	*/
 
-	String(String &&string) noexcept;
+	String(String&& string) noexcept;
 
 	///
 
-	String(const StaticString &string, Allocator *allocator = DefaultAllocator) noexcept;
+	String(const StaticString& string, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
@@ -43,7 +43,7 @@ public:
 	* \param allocator
 	*/
 
-	String(const char *text, size_t size, Allocator *allocator = DefaultAllocator) noexcept;
+	String(const char* text, size_t size, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
@@ -51,18 +51,18 @@ public:
 	* \param allocator
 	*/
 
-	String(const char *text, Allocator *allocator = DefaultAllocator) noexcept;
+	String(const char* text, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/// Preallocating constructor.
 
-	explicit String(size_t size, Allocator *allocator = DefaultAllocator) noexcept;
+	explicit String(size_t size, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/// Concatenating constructor.
 	/// \param left The left part.
 	/// \param right The right part.
 	/// \param allocator The allocator to use.
 
-	String(const StaticString &left, const StaticString &right, Allocator *allocator = DefaultAllocator) noexcept;
+	String(const StaticString& left, const StaticString& right, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
@@ -71,7 +71,7 @@ public:
 	* \param allocator
 	*/
 
-	String(const StaticString &left, char right, Allocator *allocator = DefaultAllocator) noexcept;
+	String(const StaticString& left, char right, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/**
 	* \overload
@@ -80,7 +80,7 @@ public:
 	* \param allocator
 	*/
 
-	String(char left, const StaticString &right, Allocator *allocator = DefaultAllocator) noexcept;
+	String(char left, const StaticString& right, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/// Destructor.
 

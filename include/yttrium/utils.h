@@ -4,7 +4,9 @@
 #ifndef __Y_UTILS_H
 #define __Y_UTILS_H
 
-#include <yttrium/types.h>
+#include <yttrium/global.h>
+
+#include <cstdint>
 
 // TODO: Check whether all functions in this file work with all supported integer representations,
 // documenting the results.

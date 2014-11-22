@@ -47,10 +47,10 @@ private:
 	Allocator*          _allocator;
 	AudioPlayerBackend* _backend;
 	AudioReaderPtr      _source;
-	UOffset             _begin_sample;
-	UOffset             _end_sample;
+	uint64_t            _begin_sample;
+	uint64_t            _end_sample;
 	bool                _is_looping;
-	UOffset             _loop_sample;
+	uint64_t            _loop_sample;
 	Buffer              _buffer;
 	size_t              _unit_size;
 	size_t              _buffer_units;

@@ -115,7 +115,7 @@ bool ScriptScanner::read(Token& token)
 
 rescan:
 
-	switch (kind_of[static_cast<UChar>(*cursor)])
+	switch (kind_of[static_cast<unsigned char>(*cursor)])
 	{
 	case Kind::Other:
 
@@ -143,10 +143,10 @@ rescan:
 				}
 			}
 
-			if (kind_of[static_cast<UChar>(*cursor)] == Kind::Other)
+			if (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other)
 			{
 				token.type = Token::Literal;
-				do ++cursor; while (kind_of[static_cast<UChar>(*cursor)] == Kind::Other);
+				do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other);
 			}
 
 			if (token.type == Token::Identifier && has_sigil)
@@ -158,7 +158,7 @@ rescan:
 
 	case Kind::Space:
 
-		do ++cursor; while (kind_of[static_cast<UChar>(*cursor)] == Kind::Space);
+		do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Space);
 		goto rescan;
 
 	case Kind::Comment:

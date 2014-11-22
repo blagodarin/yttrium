@@ -4,7 +4,7 @@
 #ifndef __Y_MATRIX_H
 #define __Y_MATRIX_H
 
-#include <yttrium/vector.h>
+#include <yttrium/global.h>
 
 namespace Yttrium
 {

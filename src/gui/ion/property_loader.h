@@ -28,7 +28,7 @@ public: // GuiPropertyLoader
 
 	void bind(const StaticString &name) override;
 
-	bool load_alignment(const StaticString &name, Alignment *alignment) const override;
+	bool load_alignment(const StaticString &name, unsigned *alignment) const override;
 
 	bool load_color(const StaticString &name, Vector4f *color) const override;
 
@@ -56,7 +56,7 @@ public: // GuiPropertyLoader
 
 public:
 
-	static bool load_alignment(Alignment *alignment, const Ion::Node &node);
+	static bool load_alignment(unsigned *alignment, const Ion::Node &node);
 
 	static bool load_margins(MarginsI *margins, const Ion::Node &node);
 

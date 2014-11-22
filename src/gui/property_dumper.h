@@ -19,7 +19,7 @@ public:
 
 public:
 
-	virtual void dump_alignment(const StaticString& name, Alignment alignment) = 0;
+	virtual void dump_alignment(const StaticString& name, unsigned alignment) = 0;
 
 	virtual void dump_color(const StaticString& name, const Vector4f& color) = 0;
 

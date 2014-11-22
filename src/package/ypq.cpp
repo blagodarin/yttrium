@@ -79,16 +79,12 @@ bool YpqReader::open()
 		YpqIndexEntry index_entry;
 
 		if (index_size < sizeof(index_entry))
-		{
 			return false;
-		}
 
 		index_size -= sizeof(index_entry);
 
 		if (!_file.read(&index_entry) || index_size < index_entry.name_size)
-		{
 			return false;
-		}
 
 		index_size -= index_entry.name_size;
 
@@ -97,45 +93,36 @@ bool YpqReader::open()
 		name.resize(index_entry.name_size);
 
 		if (!_file.read(name.text(), index_entry.name_size))
-		{
 			return false;
-		}
 
 		_index[name] = index_entry.offset;
 	}
 
 	if (index_size)
-	{
 		return false; // Disallow index padding.
-	}
 
 	return true;
 }
 
-PackedFile YpqReader::open_file(const StaticString &name)
+PackedFile YpqReader::open_file(const StaticString& name)
 {
-	Index::const_iterator i = _index.find(String(name, ByReference()));
-
+	const auto i = _index.find(String(name, ByReference()));
 	if (i != _index.end())
 	{
 		YpqFileHeader file_header;
-
 		if (_file.seek(i->second) && _file.read(&file_header)
 			&& file_header.signature == YpqFileSignature) // TODO: Check file size.
 		{
 			return PackedFile(&_file, file_header.size);
 		}
 	}
-
 	return PackedFile();
 }
 
 YpqWriter::~YpqWriter()
 {
 	if (!_entries.empty())
-	{
 		flush_file();
-	}
 
 	_last_offset = _file.offset();
 
@@ -179,9 +166,7 @@ PackedFile YpqWriter::open_file(const StaticString &name)
 	YpqFileHeader file_header;
 
 	if (!_entries.empty())
-	{
 		flush_file();
-	}
 
 	_last_offset = _file.offset();
 
@@ -190,15 +175,15 @@ PackedFile YpqWriter::open_file(const StaticString &name)
 	file_header.signature = YpqFileSignature;
 	file_header.size = 0;
 
-	return (_file.write(file_header) ? PackedFile(&_file) : PackedFile());
+	return _file.write(file_header) ? PackedFile(&_file) : PackedFile();
 }
 
 void YpqWriter::flush_file()
 {
 	_file.seek(0, File::Reverse);
 
-	UOffset begin_offset = _last_offset + sizeof(YpqFileHeader);
-	UOffset end_offset = _file.offset();
+	uint64_t begin_offset = _last_offset + sizeof(YpqFileHeader);
+	uint64_t end_offset = _file.offset();
 
 	_file.seek(_last_offset + offsetof(YpqFileHeader, size));
 	_file.write(static_cast<uint32_t>(end_offset - begin_offset)); // TODO: Check packed file size for uint32_t overflow.

@@ -68,7 +68,7 @@ bool OggVorbisReader::open()
 size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)
 {
 	const size_t unit_size = _format.unit_size();
-	bytes_to_read = std::min<UOffset>(bytes_to_read / unit_size, _total_units - _offset_units) * unit_size;
+	bytes_to_read = std::min<uint64_t>(bytes_to_read / unit_size, _total_units - _offset_units) * unit_size;
 	size_t bytes_read = 0;
 	for (int bitstream = 0; bytes_read <= bytes_to_read; )
 	{
@@ -81,7 +81,7 @@ size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)
 	return bytes_read;
 }
 
-bool OggVorbisReader::seek(UOffset offset_units)
+bool OggVorbisReader::seek(uint64_t offset_units)
 {
 	if (offset_units > _total_units)
 		return false;

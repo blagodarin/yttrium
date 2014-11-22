@@ -25,7 +25,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 
 	for (const char *src = string.text(); ; )
 	{
-		switch (char_class[static_cast<UChar>(*src)])
+		switch (char_class[static_cast<unsigned char>(*src)])
 		{
 		case Other:
 
@@ -41,7 +41,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 			do
 			{
 				++src;
-			} while (char_class[static_cast<UChar>(*src)] == Space);
+			} while (char_class[static_cast<unsigned char>(*src)] == Space);
 			break;
 
 		case Name:
@@ -52,7 +52,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 				do
 				{
 					++src;
-				} while (char_class[static_cast<UChar>(*src)] == Name);
+				} while (char_class[static_cast<unsigned char>(*src)] == Name);
 
 				if (!parse_name(StaticString(begin, src - begin)))
 				{
@@ -89,7 +89,7 @@ bool Parser::parse(const StaticString &string, const StaticString &source_name)
 
 						if ((c1 >= '0' && c1 <= '9') || (c1 >= 'A' && c1 <= 'F'))
 						{
-							UChar hex;
+							unsigned char hex;
 
 							char c2 = *++src;
 

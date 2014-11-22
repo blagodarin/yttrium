@@ -20,19 +20,19 @@ class Y_API Bindings
 public:
 
 	///
-	Bindings(Allocator *allocator = DefaultAllocator) noexcept;
+	Bindings(Allocator* allocator = DefaultAllocator) noexcept;
 
 	///
-	void bind(Key key, const StaticString &action) noexcept;
+	void bind(Key key, const StaticString& action) noexcept;
 
 	///
-	bool bind(const StaticString &name, const StaticString &action) noexcept;
+	bool bind(const StaticString &name, const StaticString& action) noexcept;
 
 	///
-	void bind_default(Key key, const StaticString &action) noexcept;
+	void bind_default(Key key, const StaticString& action) noexcept;
 
 	///
-	bool bind_default(const StaticString &name, const StaticString &action) noexcept;
+	bool bind_default(const StaticString& name, const StaticString& action) noexcept;
 
 	///
 	bool call(Key key, ExecutionMode mode = ExecutionMode::Do) noexcept;

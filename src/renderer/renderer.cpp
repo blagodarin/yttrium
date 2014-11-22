@@ -218,7 +218,7 @@ void Renderer::Private::draw_rectangle(const RectF &position, const RectF &textu
 	_vertices_2d.push_back(vertex);
 }
 
-void Renderer::Private::draw_text(const Vector2f& position, const StaticString& text, Alignment alignment, TextCapture* capture)
+void Renderer::Private::draw_text(const Vector2f& position, const StaticString& text, unsigned alignment, TextCapture* capture)
 {
 	if (!_font)
 		return;
@@ -347,7 +347,7 @@ void Renderer::draw_rectangle(const RectF& rect, const RectF& texture_rect)
 		_private->_texture.is_null() ? MarginsF() : _private->_texture_borders);
 }
 
-void Renderer::draw_text(const Vector2f& position, const StaticString& text, Alignment alignment, TextCapture* capture)
+void Renderer::draw_text(const Vector2f& position, const StaticString& text, unsigned alignment, TextCapture* capture)
 {
 	_private->draw_text(position, text, alignment, capture);
 }

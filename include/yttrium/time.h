@@ -4,7 +4,9 @@
 #ifndef __Y_TIME_H
 #define __Y_TIME_H
 
-#include <yttrium/types.h>
+#include <yttrium/global.h>
+
+#include <cstdint>
 
 namespace Yttrium
 {

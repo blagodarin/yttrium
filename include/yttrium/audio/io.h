@@ -58,7 +58,7 @@ public:
 
 	/// Return the current audio offset.
 	/// \return Current offset in samples.
-	UOffset offset() noexcept { return _offset_units; }
+	uint64_t offset() noexcept { return _offset_units; }
 
 	/// Read at most \a size bytes into \a buffer.
 	/// \param buffer Buffer to read into.
@@ -68,13 +68,13 @@ public:
 	virtual size_t read(void* buffer, size_t bytes_to_read) noexcept = 0;
 
 	/// Move the audio offset to the specified position.
-	/// \param offset %Offset in samples.
+	/// \param offset Offset in samples.
 	/// \return \c true on success.
-	virtual bool seek(UOffset offset) noexcept = 0;
+	virtual bool seek(uint64_t offset) noexcept = 0;
 
 	/// Return the opened audio size.
 	/// \return File size in bytes.
-	UOffset size() const noexcept { return _total_units * _format.unit_size(); }
+	uint64_t size() const noexcept { return _total_units * _format.unit_size(); }
 
 public:
 
@@ -84,8 +84,8 @@ public:
 protected:
 
 	AudioFormat _format;
-	UOffset     _total_units;
-	UOffset     _offset_units;
+	uint64_t    _total_units;
+	uint64_t    _offset_units;
 
 	AudioReader(Allocator* allocator) noexcept
 		: Pointable(allocator)

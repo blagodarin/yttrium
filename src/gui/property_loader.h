@@ -23,7 +23,7 @@ public:
 
 	virtual void bind(const StaticString& name) = 0;
 
-	virtual bool load_alignment(const StaticString& name, Alignment* alignment) const = 0;
+	virtual bool load_alignment(const StaticString& name, unsigned* alignment) const = 0;
 
 	virtual bool load_color(const StaticString& name, Vector4f* color) const = 0;
 

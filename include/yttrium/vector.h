@@ -4,7 +4,7 @@
 #ifndef __Y_VECTOR_H
 #define __Y_VECTOR_H
 
-#include <yttrium/types.h>
+#include <yttrium/global.h>
 
 namespace Yttrium
 {

@@ -1,7 +1,6 @@
 #include "system_allocator.h"
 
 #include <yttrium/assert.h>
-#include <yttrium/types.h>
 #include <yttrium/utils.h>
 
 #include <errno.h>    // errno

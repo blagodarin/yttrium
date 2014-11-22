@@ -28,18 +28,6 @@ class Vector2;
 template <typename T>
 class Vector4;
 
-/// Unsigned integer type of \c char size.
-
-typedef unsigned char UChar;
-
-/// Signed file offset type.
-
-typedef int_fast64_t Offset;
-
-/// Unsigned file offset type.
-
-typedef uint_fast64_t UOffset;
-
 /// Generic integer type.
 
 typedef int_fast32_t Integer;
@@ -50,7 +38,7 @@ typedef double Real;
 
 /// The default allocator.
 
-extern Y_API Allocator *const DefaultAllocator;
+extern Y_API Allocator* const DefaultAllocator;
 
 ///
 
@@ -77,27 +65,22 @@ enum
 };
 
 ///
-
-typedef uint_fast8_t Alignment;
-
-///
-
 enum class ExecutionMode
 {
 	Do,   ///<
 	Undo, ///<
 };
 
-typedef Margins<Integer> MarginsI;  ///< Integer Margins.
-typedef Margins<float>   MarginsF;  ///< \c float Margins.
+typedef Margins<int>    MarginsI;  ///< \c int Margins.
+typedef Margins<float>  MarginsF;  ///< \c float Margins.
 
-typedef Rect_<float>     RectF;     ///< \c float Rect.
+typedef Rect_<float>    RectF;     ///< \c float Rect.
 
-typedef Vector2<float>   Vector2f;  ///< \c float Vector2.
-typedef Vector2<double>  Vector2d;  ///< \c double Vector2.
-typedef Vector2<int>     Dim2;      ///< \c int Vector2.
+typedef Vector2<float>  Vector2f;  ///< \c float Vector2.
+typedef Vector2<double> Vector2d;  ///< \c double Vector2.
+typedef Vector2<int>    Dim2;      ///< \c int Vector2.
 
-typedef Vector4<float>   Vector4f;  ///< \c float Vector4.
+typedef Vector4<float>  Vector4f;  ///< \c float Vector4.
 
 } // namespace Yttrium
 

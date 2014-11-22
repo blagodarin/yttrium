@@ -17,7 +17,7 @@ public:
 
 	bool open() override;
 	size_t read(void* buffer, size_t bytes_to_read) noexcept override;
-	bool seek(UOffset offset) noexcept override;
+	bool seek(uint64_t offset) noexcept override;
 
 private:
 

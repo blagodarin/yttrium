@@ -35,6 +35,7 @@ public:
 	enum Special
 	{
 		Temporary, ///<
+		StdErr,    ///< Standard error output stream.
 	};
 
 	/// Valid "whences" (origins) for the seek function.
@@ -58,13 +59,13 @@ public:
 	explicit operator bool() const noexcept;
 
 	///
-	File(const StaticString &name, unsigned mode, Allocator *allocator = DefaultAllocator) noexcept;
+	File(const StaticString& name, unsigned mode, Allocator* allocator = DefaultAllocator) noexcept;
 
 	/// Open a file for reading using the package manager if possible.
-	explicit File(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+	explicit File(const StaticString& name, Allocator *allocator = DefaultAllocator) noexcept;
 
 	///
-	explicit File(Special special, Allocator *allocator = DefaultAllocator) noexcept;
+	explicit File(Special special, Allocator* allocator = DefaultAllocator) noexcept;
 
 public:
 
@@ -76,13 +77,13 @@ public:
 
 	/// Return the current file offset.
 	/// \return Current offset.
-	UOffset offset() const noexcept { return _offset; }
+	uint64_t offset() const noexcept { return _offset; }
 
 	/// Read a block of data from the file.
 	/// \param buffer The buffer to read into.
 	/// \param size Buffer size.
 	/// \return Number of bytes read or 0 on failure.
-	size_t read(void *buffer, size_t size) noexcept;
+	size_t read(void* buffer, size_t size) noexcept;
 
 	/// Read the buffer from the file.
 	/// \param buffer Buffer to read.
@@ -103,17 +104,17 @@ public:
 	bool read_line(String* string) noexcept;
 
 	/// Change the size of the file.
-	bool resize(UOffset size) noexcept;
+	bool resize(uint64_t size) noexcept;
 
 	/// Set the file offset to the specified position.
-	bool seek(UOffset offset, Whence whence = Absolute) noexcept;
+	bool seek(uint64_t offset, Whence whence = Absolute) noexcept;
 
 	/// Return the file size.
 	/// \return File size.
-	UOffset size() const noexcept;
+	uint64_t size() const noexcept;
 
 	///
-	bool skip(UOffset size) noexcept { return seek(size, Relative); }
+	bool skip(uint64_t size) noexcept { return seek(size, Relative); }
 
 	/// Truncate the file past the current pointer.
 	bool truncate() noexcept { return resize(_offset); }
@@ -142,35 +143,29 @@ protected:
 	{
 	}
 
-	Y_PRIVATE File(Private *private_, const StaticString &name) noexcept;
-	Y_PRIVATE File(Private *private_, UOffset base, UOffset size) noexcept;
+	Y_PRIVATE File(Private* private_, uint64_t base, uint64_t size) noexcept;
 
 private:
 
 	Private* _private;
-	UOffset  _offset;
-	UOffset  _size;
-	UOffset  _base;
+	uint64_t _offset;
+	uint64_t _size;
+	uint64_t _base;
 };
 
 /// Utility class for data transfer between files.
 /// \tparam buffer_size Size of a buffer to use.
-
 template <size_t buffer_size>
 class FileTransfer
 {
 public:
 
 	/// Performs the transfer till the \a reader 's end, then truncate the \a writer.
-
-	FileTransfer(File *writer, File *reader) noexcept
+	FileTransfer(File* writer, File* reader) noexcept
 	{
 		size_t size;
-
 		while ((size = reader->read(_buffer, buffer_size)))
-		{
 			writer->write(_buffer, size);
-		}
 		writer->truncate();
 	}
 

@@ -152,7 +152,7 @@ void GuiIonPropertyLoader::bind(const StaticString &name)
 	}
 }
 
-bool GuiIonPropertyLoader::load_alignment(const StaticString &name, Alignment *alignment) const
+bool GuiIonPropertyLoader::load_alignment(const StaticString &name, unsigned *alignment) const
 {
 	Y_LOG_TRACE("[Gui.Loader] Loading \"" << name << "\"...");
 
@@ -442,7 +442,7 @@ void GuiIonPropertyLoader::unbind()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool GuiIonPropertyLoader::load_alignment(Alignment* alignment, const Ion::Node& node)
+bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const Ion::Node& node)
 {
 	// TODO: Inheritance.
 
@@ -451,7 +451,7 @@ bool GuiIonPropertyLoader::load_alignment(Alignment* alignment, const Ion::Node&
 	if (values.is_empty() || values.size() > 2)
 		return false;
 
-	Alignment result = CenterAlignment;
+	unsigned result = CenterAlignment;
 	bool is_centered = false;
 
 	for (; !values.is_empty(); values.pop_first())

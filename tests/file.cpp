@@ -10,6 +10,17 @@
 
 using namespace Yttrium;
 
+BOOST_AUTO_TEST_CASE(test_file_special)
+{
+	DECLARE_MEMORY_MANAGER;
+
+	File file(File::StdErr);
+	BOOST_REQUIRE(file);
+
+	const S text("Standard error output test.\n");
+	BOOST_CHECK(file.write(text.text(), text.size()));
+}
+
 BOOST_AUTO_TEST_CASE(test_file_read_all)
 {
 	DECLARE_MEMORY_MANAGER;

@@ -9,10 +9,7 @@
 namespace Yttrium
 {
 
-class Allocator;
-
 ///
-
 class Y_API MemoryManager
 {
 	Y_NONCOPYABLE(MemoryManager);
@@ -20,17 +17,14 @@ class Y_API MemoryManager
 public:
 
 	///
-
-	MemoryManager(const StaticString &default_name = S("default")) noexcept;
+	MemoryManager(const StaticString& default_name = S("default")) noexcept;
 
 	///
-
 	~MemoryManager() noexcept;
 
 public:
 
 	///
-
 	static Allocator *default_allocator() noexcept;
 
 public:

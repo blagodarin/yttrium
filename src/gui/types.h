@@ -1,13 +1,14 @@
 #ifndef __GUI_TYPES_H
 #define __GUI_TYPES_H
 
-#include <yttrium/types.h>
+#include <yttrium/global.h>
+
+#include <cstdint>
 
 namespace Yttrium
 {
 
 /// Widget scaling mode.
-
 enum class Scaling
 {
 	Stretch, ///< Scale the widget into the region.
@@ -17,11 +18,9 @@ enum class Scaling
 };
 
 ///
-
 typedef uint_fast8_t WidgetStateType;
 
 ///
-
 enum class WidgetState: WidgetStateType
 {
 	// States that can be set by the manager.

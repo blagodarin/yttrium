@@ -63,7 +63,7 @@ public:
 
 	///
 
-	Allocator *allocator() const noexcept;
+	Allocator* allocator() const noexcept;
 
 	/// Clear the framebuffer and begin a new frame.
 
@@ -71,7 +71,7 @@ public:
 
 	///
 
-	void draw_rectangle(const RectF &rect) noexcept;
+	void draw_rectangle(const RectF& rect) noexcept;
 
 	///
 
@@ -79,12 +79,12 @@ public:
 
 	///
 
-	void draw_rectangle(const RectF &rect, const RectF &texture_rect) noexcept;
+	void draw_rectangle(const RectF& rect, const RectF& texture_rect) noexcept;
 
 	///
 
-	void draw_text(const Vector2f &position, const StaticString &text,
-		Alignment alignment = BottomRightAlignment, TextCapture* capture = nullptr) noexcept;
+	void draw_text(const Vector2f& position, const StaticString& text,
+		unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) noexcept;
 
 	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
 	/// and, if requested, capture a screenshot.
@@ -105,15 +105,15 @@ public:
 
 	///
 
-	void set_color(const Vector4f &color) noexcept;
+	void set_color(const Vector4f& color) noexcept;
 
 	///
 
-	bool set_font(const TextureFont &font) noexcept;
+	bool set_font(const TextureFont& font) noexcept;
 
 	///
 
-	void set_font_size(const Vector2f &size) noexcept;
+	void set_font_size(const Vector2f& size) noexcept;
 
 	///
 
@@ -133,15 +133,15 @@ public:
 
 	///
 
-	void set_texture(const Texture2DPtr &texture) noexcept;
+	void set_texture(const Texture2DPtr& texture) noexcept;
 
 	///
 
-	bool set_texture_borders(const MarginsI &borders) noexcept;
+	bool set_texture_borders(const MarginsI& borders) noexcept;
 
 	///
 
-	void set_texture_rectangle(const RectF &rect) noexcept;
+	void set_texture_rectangle(const RectF& rect) noexcept;
 
 	///
 
@@ -152,11 +152,11 @@ public:
 	/// \note The screenshot would be actually taken at the end of the frame
 	/// and saved in the PNG format.
 
-	void take_screenshot(const StaticString &name) noexcept;
+	void take_screenshot(const StaticString& name) noexcept;
 
 	///
 
-	Vector2f text_size(const StaticString &text) const noexcept;
+	Vector2f text_size(const StaticString& text) const noexcept;
 
 	///
 
@@ -170,7 +170,7 @@ public:
 
 	///
 
-	Renderer &operator =(const Renderer &renderer) noexcept;
+	Renderer& operator=(const Renderer& renderer) noexcept;
 
 public:
 
@@ -178,12 +178,12 @@ public:
 
 private:
 
-	Private *_private;
+	Private* _private;
 
 private:
 
-	Y_PRIVATE Renderer(WindowBackend *window, Allocator *allocator);
-	Y_PRIVATE Renderer(Private *private_);
+	Y_PRIVATE Renderer(WindowBackend* window, Allocator* allocator);
+	Y_PRIVATE Renderer(Private* private_);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

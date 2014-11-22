@@ -10,7 +10,7 @@ GuiIonPropertyDumper::GuiIonPropertyDumper(Ion::Object* object)
 {
 }
 
-void GuiIonPropertyDumper::dump_alignment(const StaticString&, Alignment)
+void GuiIonPropertyDumper::dump_alignment(const StaticString&, unsigned)
 {
 }
 

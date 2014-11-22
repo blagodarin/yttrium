@@ -26,7 +26,7 @@ private:
 
 	Vector2f           _position;
 	ForegroundProperty _foreground;
-	Alignment          _alignment;
+	unsigned           _alignment;
 	String             _final_text;
 };
 

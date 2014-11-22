@@ -49,16 +49,16 @@ size_t hash(const StaticString text)
 	{
 	default:
 
-		result += asso_values[static_cast<UChar>(text[1])];
+		result += asso_values[static_cast<unsigned char>(text[1])];
 		// Fallthrough.
 
 	case 1:
 
-		result += asso_values[static_cast<UChar>(text[0])];
+		result += asso_values[static_cast<unsigned char>(text[0])];
 		break;
 	}
 
-	return result + asso_values[static_cast<UChar>(text[text.size() - 1])];
+	return result + asso_values[static_cast<unsigned char>(text[text.size() - 1])];
 }
 
 } // namespace

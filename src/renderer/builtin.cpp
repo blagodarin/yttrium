@@ -110,7 +110,7 @@ void RendererBuiltin::draw_text(int x, int y, const StaticString& text, int max_
 
 		Vector2f a(x * Builtin::char_width, y * Builtin::char_height);
 
-		for (const UChar *symbol = reinterpret_cast<const UChar *>(text.text()); size; --size, ++symbol)
+		for (const unsigned char* symbol = reinterpret_cast<const unsigned char*>(text.text()); size; --size, ++symbol)
 		{
 			if (*symbol >= Builtin::first_char && *symbol <= Builtin::last_char)
 			{

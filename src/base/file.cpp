@@ -22,7 +22,7 @@ File::~File()
 	Private::release(&_private);
 }
 
-File& File::operator =(const File& file)
+File& File::operator=(const File& file)
 {
 	Private::copy(_private, file._private);
 	_offset = file._offset;
@@ -31,7 +31,7 @@ File& File::operator =(const File& file)
 	return *this;
 }
 
-File& File::operator=(File&& file) noexcept
+File& File::operator=(File&& file)
 {
 	Private::move(_private, file._private);
 	_offset = file._offset;
@@ -42,7 +42,7 @@ File& File::operator=(File&& file) noexcept
 
 File::operator bool() const
 {
-	return _private && (_private->mode & ReadWrite);
+	return _private && (_private->_mode & ReadWrite);
 }
 
 File::File(const StaticString& name, Allocator* allocator)
@@ -54,35 +54,32 @@ File::File(const StaticString& name, Allocator* allocator)
 
 StaticString File::name() const
 {
-	return _private->name;
+	return _private->_name;
 }
 
 bool File::read_all(Buffer* buffer)
 {
-	if (_private && (_private->mode & Read))
+	if (_private && (_private->_mode & Read))
 	{
 		// We should unconditionally crash if the file is too large.
 		// This way we shall have the same behavior for both files larger
 		// than the free space and files larger than all the allocatable space.
-
-		buffer->resize(std::min<UOffset>(size(), SIZE_MAX));
+		buffer->resize(std::min<uint64_t>(size(), SIZE_MAX));
 		if (read(buffer->data(), buffer->size()))
-		{
 			return true;
-		}
 	}
 	return false;
 }
 
 bool File::read_all(String* string)
 {
-	if (_private && (_private->mode & Read))
+	if (_private && (_private->_mode & Read))
 	{
 		// We should unconditionally crash if the file is too large.
 		// This way we shall have the same behavior for both files larger
 		// than the free space and files larger than all the allocatable space.
 
-		string->resize(std::min<UOffset>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
+		string->resize(std::min<uint64_t>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
 		if (read(string->text(), string->size()))
 			return true;
 	}
@@ -91,15 +88,15 @@ bool File::read_all(String* string)
 
 bool File::read_line(String* string)
 {
-	if (!_private || !(_private->mode & Read))
+	if (!_private || !(_private->_mode & Read))
 		return false;
 
-	if (_private->mode & Pipe)
+	if (_private->_mode & Pipe)
 		return false; // TODO: Make it work for pipes too.
 
 	static const size_t buffer_step = 32;
 
-	UOffset file_offset = _offset;
+	uint64_t file_offset = _offset;
 
 	string->clear();
 
@@ -149,7 +146,7 @@ bool File::read_line(String* string)
 	return true;
 }
 
-File::File(Private* private_, UOffset base, UOffset size)
+File::File(Private* private_, uint64_t base, uint64_t size)
 	: _private(Private::copy(private_))
 	, _offset(0)
 	, _size(size)

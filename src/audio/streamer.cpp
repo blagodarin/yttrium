@@ -37,14 +37,14 @@ bool AudioStreamer::open(const StaticString& name, const AudioPlayer::Settings& 
 	// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
 	// I have no idea whether this is a real bug.
 
-	const UOffset source_units = _source->size() / format.unit_size();
+	const uint64_t source_units = _source->size() / format.unit_size();
 
 	if (source_units >= _buffer_units * AudioPlayerBackend::NumBuffers)
 	{
 		// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
 
-		_begin_sample = static_cast<UOffset>(settings.begin * format.frequency);
-		_end_sample = static_cast<UOffset>(settings.end * format.frequency);
+		_begin_sample = static_cast<uint64_t>(settings.begin * format.frequency);
+		_end_sample = static_cast<uint64_t>(settings.end * format.frequency);
 
 		if (_end_sample == 0 || _end_sample > source_units)
 			_end_sample = source_units;
@@ -53,7 +53,7 @@ bool AudioStreamer::open(const StaticString& name, const AudioPlayer::Settings& 
 		{
 			if (order == AudioPlayer::Random)
 			{
-				_loop_sample = static_cast<UOffset>(settings.loop * format.frequency);
+				_loop_sample = static_cast<uint64_t>(settings.loop * format.frequency);
 				_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_units);
 			}
 			else

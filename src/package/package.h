@@ -10,10 +10,10 @@ namespace Yttrium
 
 struct PackedFile
 {
-	File    *file;
-	UOffset  size;
+	File*    file;
+	uint64_t size;
 
-	PackedFile(File *file = nullptr, UOffset size = 0)
+	PackedFile(File* file = nullptr, uint64_t size = 0)
 		: file(file)
 		, size(size)
 	{
@@ -24,21 +24,16 @@ class Y_PRIVATE PackageReader::Private: public PrivateBase<PackageReader::Privat
 {
 public:
 
-	Private(const StaticString& name, Allocator *allocator)
+	Private(const StaticString& name, Allocator* allocator)
 		: PrivateBase(allocator)
 		, _file(name, File::Read, allocator)
 	{
 	}
 
-	virtual ~Private()
-	{
-	}
-
-public:
+	virtual ~Private() {}
 
 	virtual bool open() = 0;
-
-	virtual PackedFile open_file(const StaticString &name) = 0;
+	virtual PackedFile open_file(const StaticString& name) = 0;
 
 public:
 
@@ -49,21 +44,16 @@ class Y_PRIVATE PackageWriter::Private: public PrivateBase<PackageWriter::Privat
 {
 public:
 
-	Private(const StaticString& name, unsigned mode, Allocator *allocator)
+	Private(const StaticString& name, unsigned mode, Allocator* allocator)
 		: PrivateBase(allocator)
 		, _file(name, mode, allocator)
 	{
 	}
 
-	virtual ~Private()
-	{
-	}
-
-public:
+	virtual ~Private() {}
 
 	virtual bool open(PackageWriter::Mode mode);
-
-	virtual PackedFile open_file(const StaticString &name) = 0;
+	virtual PackedFile open_file(const StaticString& name) = 0;
 
 public:
 
