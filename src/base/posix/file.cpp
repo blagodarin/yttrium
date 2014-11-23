@@ -11,11 +11,11 @@
 namespace Yttrium
 {
 
-File::Private::Private(int descriptor, unsigned mode, Allocator* allocator)
+File::Private::Private(String&& name, int descriptor, unsigned mode, Allocator* allocator)
 	: PrivateBase(allocator)
 	, _descriptor(descriptor)
 	, _mode(mode)
-	, _name(allocator)
+	, _name(name)
 	, _auto_close(true)
 	, _auto_remove(false)
 {
@@ -45,7 +45,7 @@ int File::Private::open(const StaticString& name, int flags, Allocator* allocato
 File::File(const StaticString& name, unsigned mode, Allocator* allocator)
 	: File()
 {
-	int flags = Y_IS_LINUX ? O_NOATIME : 0;
+	int flags = Y_PLATFORM_LINUX ? O_NOATIME : 0;
 	switch (mode & ReadWrite)
 	{
 	case Read:      flags |= O_RDONLY;          break;
@@ -61,7 +61,7 @@ File::File(const StaticString& name, unsigned mode, Allocator* allocator)
 	if (descriptor == -1)
 		return;
 
-	_private = Y_NEW(allocator, Private)(descriptor, mode, allocator);
+	_private = Y_NEW(allocator, Private)(String(name, allocator), descriptor, mode, allocator);
 	if ((mode & (Read | Write | Pipe)) == Read)
 		_size = ::lseek(descriptor, 0, SEEK_END);
 }
@@ -79,14 +79,13 @@ File::File(Special special, Allocator* allocator)
 			if (descriptor == -1)
 				break;
 
-			_private = Y_NEW(allocator, Private)(descriptor, ReadWrite, allocator);
-			_private->_name = std::move(name);
+			_private = Y_NEW(allocator, Private)(std::move(name), descriptor, ReadWrite, allocator);
 			_private->_auto_remove = true;
 		}
 		break;
 
 	case StdErr:
-		_private = Y_NEW(allocator, Private)(STDERR_FILENO, Write | Pipe, allocator);
+		_private = Y_NEW(allocator, Private)(String(allocator), STDERR_FILENO, Write | Pipe, allocator);
 		_private->_auto_close = false;
 		break;
 	}

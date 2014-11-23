@@ -5,6 +5,9 @@ Yttrium:
     - Keep a global track of all ProxyAllocators.
     - Separate a single Rect into a raster one and a vector one.
     - Replace allocator objects with allocation tags.
+    - Kill SystemAllocator.
+    - Per-thread logging buffer.
+    - Thread-safe logging.
 
     GUI:
     - Implement line editor widget.

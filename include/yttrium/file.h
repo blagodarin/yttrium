@@ -73,7 +73,7 @@ public:
 	bool flush() noexcept;
 
 	///
-	StaticString name() const noexcept; // TODO: Make valid for all files, not just temporaries.
+	StaticString name() const noexcept;
 
 	/// Return the current file offset.
 	/// \return Current offset.

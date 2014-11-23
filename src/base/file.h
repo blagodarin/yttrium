@@ -3,9 +3,9 @@
 
 #include <yttrium/global.h>
 
-#if Y_IS_POSIX
+#if Y_PLATFORM_POSIX
 	#include "posix/file.h"
-#elif Y_IS_WINDOWS
+#elif Y_PLATFORM_WINDOWS
 	#include "windows/file.h"
 #endif
 

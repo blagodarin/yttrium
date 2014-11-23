@@ -15,14 +15,14 @@ namespace Yttrium
 /// \param line Source line.
 /// \param function Source function.
 
-Y_API Y_NORETURN void abort(const char *message, const char *file, int line, const char *function) noexcept;
+Y_API Y_NORETURN void abort(const char* message, const char* file, int line) noexcept;
 
 } // namespace Yttrium
 
 /// Terminate the program, outputting a message to the log.
 
 #define Y_ABORT(message) \
-	Yttrium::abort(message, __FILE__, __LINE__, __func__)
+	Yttrium::abort(message, __FILE__, __LINE__)
 
 /// Terminate the program if \a condition is true, outputting a message to the log.
 

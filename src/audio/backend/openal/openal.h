@@ -3,7 +3,7 @@
 
 #include <yttrium/global.h>
 
-#if Y_IS_WINDOWS && !defined(AL_APIENTRY)
+#if Y_PLATFORM_WINDOWS && !defined(AL_APIENTRY)
 	#define AL_APIENTRY __cdecl
 #endif
 

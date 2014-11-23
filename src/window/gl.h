@@ -3,7 +3,7 @@
 
 #include <yttrium/global.h>
 
-#if Y_IS_POSIX
+#if Y_PLATFORM_POSIX
 	#include "x11/gl.h"
 #endif
 

@@ -16,6 +16,7 @@ BOOST_AUTO_TEST_CASE(test_file_special)
 
 	File file(File::StdErr);
 	BOOST_REQUIRE(file);
+	BOOST_CHECK(file.name().is_empty());
 
 	const S text("Standard error output test.\n");
 	BOOST_CHECK(file.write(text.text(), text.size()));

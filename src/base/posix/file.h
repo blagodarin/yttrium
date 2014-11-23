@@ -13,15 +13,15 @@ class Y_PRIVATE File::Private: public PrivateBase<File::Private>
 {
 public:
 
-	int      _descriptor;
-	unsigned _mode;
-	String   _name;
-	bool     _auto_close;
-	bool     _auto_remove;
+	const int      _descriptor;
+	const unsigned _mode;
+	const String   _name;
+	bool           _auto_close;
+	bool           _auto_remove;
 
 public:
 
-	Private(int descriptor, unsigned mode, Allocator* allocator);
+	Private(String&& name, int descriptor, unsigned mode, Allocator* allocator);
 	~Private();
 
 public:

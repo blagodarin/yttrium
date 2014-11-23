@@ -14,9 +14,9 @@ class InstanceGuard
 {
 public:
 
-	static T *instance;
+	static T* instance;
 
-	InstanceGuard(T *pointer, const char *message)
+	InstanceGuard(T* pointer, const char* message)
 	{
 		Y_ABORT_IF(instance, message);
 		instance = pointer;
@@ -29,7 +29,7 @@ public:
 };
 
 template <typename T>
-T *InstanceGuard<T>::instance = nullptr;
+T* InstanceGuard<T>::instance = nullptr;
 
 } // namespace Yttrium
 
