@@ -16,17 +16,25 @@ class Y_PRIVATE LogManager::Private
 {
 public:
 
-	Private(LogManager *public_, const StaticString &file, Allocator *allocator)
+	Private(LogManager* public_, Allocator* allocator)
 		: _instance_guard(public_, "Duplicate LogManager construction")
 		, _allocator(allocator, "log")
-		, _file(file, File::Write | File::Truncate, _allocator)
+		, _std_err(File::StdErr, _allocator)
 	{
+	}
+
+	void write(const String& string)
+	{
+		_std_err.write(string.text(), string.size());
+		_file.write(string.text(), string.size());
+		_file.flush();
 	}
 
 public:
 
 	LogManagerGuard  _instance_guard;
 	PrivateAllocator _allocator;
+	File             _std_err;
 	File             _file;
 };
 
@@ -35,12 +43,11 @@ LogManager::Writer::~Writer()
 	if (_log_manager)
 	{
 		_message << S("\r\n");
-		_log_manager->_private->_file.write(_message.text(), _message.size());
-		_log_manager->_private->_file.flush();
+		_log_manager->_private->write(_message);
 	}
 }
 
-LogManager::Writer::Writer(LogManager *log_manager)
+LogManager::Writer::Writer(LogManager* log_manager)
 	: _log_manager(log_manager)
 	, _message(64, log_manager->_private->_allocator)
 {
@@ -56,12 +63,18 @@ LogManager::Writer::Writer(LogManager *log_manager)
 		.append(S("] "));
 }
 
-LogManager::LogManager(const StaticString &file, Allocator *allocator)
+LogManager::LogManager(Allocator* allocator)
 	: _private(nullptr)
 {
 	if (!allocator)
 		allocator = MemoryManager::default_allocator();
-	_private = Y_NEW(allocator, LogManager::Private)(this, file, allocator);
+	_private = Y_NEW(allocator, LogManager::Private)(this, allocator);
+}
+
+LogManager::LogManager(const StaticString& file, Allocator* allocator)
+	: LogManager(allocator)
+{
+	_private->_file = File(file, File::Write | File::Truncate, _private->_allocator);
 }
 
 LogManager::~LogManager()
@@ -74,7 +87,7 @@ LogManager::Writer LogManager::log()
 	return Writer(this);
 }
 
-LogManager *LogManager::instance()
+LogManager* LogManager::instance()
 {
 	return LogManagerGuard::instance;
 }

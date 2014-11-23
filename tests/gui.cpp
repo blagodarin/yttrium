@@ -38,8 +38,7 @@ BOOST_AUTO_TEST_CASE(test_gui)
 		Renderer renderer = window->create_renderer();
 		BOOST_REQUIRE(renderer);
 
-		// Unfortunately, GUI requires log in case something goes wrong.
-		LogManager log_manager("test_gui.log", DefaultAllocator);
+		LogManager log_manager(DefaultAllocator); // For error reporting.
 
 		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 

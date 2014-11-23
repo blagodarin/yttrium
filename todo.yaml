@@ -1,10 +1,10 @@
 Yttrium:
 - Add Windows port.
-- Implement error manager capable to output errors from e.g. Y_ASSERT to stderr as well as log.
 
     Base:
     - Keep a global track of all ProxyAllocators.
     - Separate a single Rect into a raster one and a vector one.
+    - Replace allocator objects with allocation tags.
 
     GUI:
     - Implement line editor widget.
