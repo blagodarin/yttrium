@@ -54,7 +54,10 @@ OpenAlManager* OpenAlManager::open(const StaticString& device, Allocator* alloca
 	ALCdevice* alc_device = nullptr;
 
 	if (!device.is_empty())
-		alc_device = ::alcOpenDevice(device.zero_terminated(allocator).const_text());
+	{
+		Y_ZERO_TERMINATED(device_z, device);
+		alc_device = ::alcOpenDevice(device_z);
+	}
 
 	if (!alc_device)
 	{

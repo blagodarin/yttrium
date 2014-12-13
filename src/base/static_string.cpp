@@ -536,13 +536,6 @@ uint64_t StaticString::to_uint64() const
 	return string_to_uint<uint64_t>(_text, _text + _size);
 }
 
-String StaticString::zero_terminated(Allocator* allocator) const noexcept
-{
-	return _text[_size]
-		? String(*this, allocator)
-		: String(*this, ByReference(), allocator);
-}
-
 bool StaticString::operator ==(const StaticString& string) const
 {
 	return (_size == string._size) && !::memcmp(_text, string._text, _size);

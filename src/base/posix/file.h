@@ -26,7 +26,7 @@ public:
 
 public:
 
-	static int open(const StaticString& name, int flags, Allocator* allocator);
+	static int open(const StaticString& name, int flags);
 };
 
 } // namespace Yttrium

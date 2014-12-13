@@ -86,9 +86,9 @@ Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Dir);
 Dir::Dir(const StaticString& name, Allocator* allocator)
 	: Dir()
 {
-	const String& final_name = name.zero_terminated(allocator);
+	Y_ZERO_TERMINATED(name_z, name);
 
-	const auto dir = ::opendir(final_name.text());
+	const auto dir = ::opendir(name_z);
 	if (!dir)
 		return;
 
@@ -98,7 +98,7 @@ Dir::Dir(const StaticString& name, Allocator* allocator)
 	if (dir_descriptor < 0)
 	{
 		Y_ASSERT(errno == ENOTSUP);
-		max_name_size = ::pathconf(final_name.text(), _PC_NAME_MAX);
+		max_name_size = ::pathconf(name_z, _PC_NAME_MAX);
 	}
 	else
 	{
@@ -127,12 +127,12 @@ Dir::Iterator Dir::begin() const
 	return iterator;
 }
 
-bool Dir::exists(const StaticString& name, Allocator* allocator)
+bool Dir::exists(const StaticString& name)
 {
-	const String& final_name = name.zero_terminated(allocator);
+	Y_ZERO_TERMINATED(name_z, name);
 
 	struct stat stat_buffer;
-	if (::stat(final_name.text(), &stat_buffer))
+	if (::stat(name_z, &stat_buffer))
 		return false;
 
 	return S_ISDIR(stat_buffer.st_mode);

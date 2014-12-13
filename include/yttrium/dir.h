@@ -63,7 +63,7 @@ public:
 	Iterator end() const noexcept { return Iterator(nullptr); }
 
 	///
-	static bool exists(const StaticString& name, Allocator* allocator = DefaultAllocator) noexcept;
+	static bool exists(const StaticString& name) noexcept;
 };
 
 } // namespace Yttrium

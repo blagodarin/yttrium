@@ -9,10 +9,12 @@
 #ifndef __Y_STATIC_STRING_H
 #define __Y_STATIC_STRING_H
 
+#include <yttrium/alloca.h>
 #include <yttrium/types.h>
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring> // memcpy
 
 namespace Yttrium
 {
@@ -212,14 +214,6 @@ public:
 
 	uint64_t to_uint64() const noexcept;
 
-	///
-	/// \param allocator
-	/// \return
-	/// \note Might crash if the string is allocated in the very end of a readable space
-	/// and is not zero terminated.
-
-	String zero_terminated(Allocator *allocator = DefaultAllocator) const noexcept;
-
 public:
 
 	///
@@ -273,20 +267,6 @@ protected:
 protected:
 
 	inline StaticString(size_t size) noexcept;
-};
-
-/// Helper class for building StaticStrings from string literals.
-
-class S
-	: public StaticString
-{
-public:
-
-	/// Constructor.
-	/// \param text %String literal (or any other \c char array).
-
-	template <size_t N>
-	S(const char (&text)[N]) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -415,11 +395,31 @@ StaticString::StaticString(size_t size) noexcept
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <size_t N>
-S::S(const char (&text)[N]) noexcept
-	: StaticString(text, N - 1)
+/// Helper class for building StaticStrings from string literals.
+class S: public StaticString
 {
-}
+public:
+
+	/// Constructor.
+	/// \param text %String literal (or any other \c char array).
+	template <size_t N>
+	S(const char (&text)[N]) noexcept
+		: StaticString(text, N - 1)
+	{
+	}
+};
+
+///
+/// \note Might crash if the string is allocated in the very end of a readable space
+/// and is not zero terminated.
+#define Y_ZERO_TERMINATED(result, string) \
+	const char* const result = string.text(); \
+	if (result[string.size()] != '\0') \
+	{ \
+		const_cast<const char*&>(result) = static_cast<char*>(Y_ALLOCA(string.size() + 1));\
+		::memcpy(const_cast<char*>(result), string.text(), string.size()); \
+		const_cast<char*>(result)[string.size()] = '\0'; \
+	} \
 
 } // namespace Yttrium
 

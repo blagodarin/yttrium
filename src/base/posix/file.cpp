@@ -36,10 +36,10 @@ File::Private::~Private()
 	}
 }
 
-int File::Private::open(const StaticString& name, int flags, Allocator* allocator)
+int File::Private::open(const StaticString& name, int flags)
 {
-	// TODO: Think of using a stack (alloca) here.
-	return ::open(name.zero_terminated(allocator).text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	Y_ZERO_TERMINATED(name_z, name);
+	return ::open(name_z, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 }
 
 File::File(const StaticString& name, unsigned mode, Allocator* allocator)
@@ -57,7 +57,7 @@ File::File(const StaticString& name, unsigned mode, Allocator* allocator)
 	if ((mode & (Write | Pipe | Truncate)) == (Write | Truncate))
 		flags |= O_TRUNC;
 
-	const int descriptor = Private::open(name, flags, allocator);
+	const int descriptor = Private::open(name, flags);
 	if (descriptor == -1)
 		return;
 
