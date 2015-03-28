@@ -14,7 +14,7 @@ class WindowCallbacks: public Window::Callbacks
 public:
 
 	void on_cursor_movement(Window&, const Dim2&) noexcept override {}
-	bool on_key_event(const KeyEvent&) noexcept override { return true; }
+	void on_key_event(const KeyEvent&) noexcept override {}
 };
 
 class GuiCallbacks: public Gui::Callbacks
@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE(test_gui)
 
 	{
 		WindowCallbacks window_callbacks;
-		WindowPtr window = Window::open(Dim2(320, 240), window_callbacks);
-		BOOST_REQUIRE(!window.is_null());
+		WindowPtr window = Window::create(Dim2(320, 240), window_callbacks);
+		BOOST_REQUIRE(window);
 
 		Renderer renderer = window->create_renderer();
 		BOOST_REQUIRE(renderer);

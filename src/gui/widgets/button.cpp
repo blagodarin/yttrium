@@ -106,7 +106,7 @@ bool Button::process_key(const KeyEvent& event)
 	if (event.pressed)
 		return true;
 
-	if (!_sound.is_null())
+	if (_sound)
 		_sound->play();
 	_action.execute();
 	return true;

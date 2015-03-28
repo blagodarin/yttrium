@@ -21,15 +21,15 @@ SoundPtr Sound::open(const StaticString& name, Allocator* allocator)
 		return SoundPtr(i->second);
 
 	auto&& reader = AudioReader::open(name, AudioType::Auto, allocator);
-	if (reader.is_null())
-		return SoundPtr();
+	if (!reader)
+		return {};
 
 	SoundImpl* sound = audio_manager->create_sound(name, allocator);
-	if (!sound->load(reader.pointer()))
+	if (!sound->load(reader.get()))
 	{
 		// Unlock the mutex here for the sound opening to become thread safe.
 		Y_DELETE(allocator, sound);
-		return SoundPtr();
+		return {};
 	}
 
 	audio_manager->_sounds.emplace(sound->_name, sound);

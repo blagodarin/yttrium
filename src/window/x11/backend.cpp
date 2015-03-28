@@ -451,7 +451,7 @@ void WindowBackend::swap_buffers()
 
 WindowBackendPtr WindowBackend::open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
 {
-	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.pointer());
+	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.get());
 	if (!screen_impl)
 		return WindowBackendPtr();
 

@@ -1,6 +1,7 @@
 #include "line_editor.h"
 
-#include <climits> // UINT_MAX
+#include <cassert>
+#include <limits>
 
 namespace Yttrium
 {
@@ -10,7 +11,7 @@ LineEditor::LineEditor(Allocator* allocator)
 	, _cursor(0)
 	, _selection_size(0)
 	, _selection_offset(0)
-	, _max_size(UINT_MAX)
+	, _max_size(std::numeric_limits<decltype(_max_size)>::max())
 {
 }
 
@@ -39,6 +40,8 @@ void LineEditor::insert(const StaticString& text)
 
 bool LineEditor::process_key(const KeyEvent& event)
 {
+	assert(event.pressed);
+
 	const bool shift = event.modifiers & KeyEvent::Shift;
 
 	switch (event.key)

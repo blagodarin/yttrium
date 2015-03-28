@@ -686,7 +686,7 @@ bool GuiIonPropertyLoader::load_texture(Texture2DPtr* texture, const Ion::Node& 
 	}
 
 	Texture2DPtr result_texture = texture_cache->load_texture_2d(*texture_name);
-	if (result_texture.is_null())
+	if (!result_texture)
 		return false;
 
 	result_texture->set_filter(filter);

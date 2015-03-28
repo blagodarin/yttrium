@@ -30,8 +30,7 @@ public:
 		virtual void on_cursor_movement(Window& window, const Dim2& movement) noexcept = 0;
 
 		///
-		/// \return \c true if the key was handled, \c false otherwise.
-		virtual bool on_key_event(const KeyEvent& event) noexcept = 0;
+		virtual void on_key_event(const KeyEvent& event) noexcept = 0;
 	};
 
 	///
@@ -115,7 +114,7 @@ public:
 public:
 
 	///
-	static WindowPtr open(const Dim2& size, Callbacks& callbacks, Allocator* allocator = DefaultAllocator) noexcept;
+	static WindowPtr create(const Dim2& size, Callbacks& callbacks, Allocator* allocator = DefaultAllocator) noexcept;
 
 protected:
 

@@ -208,18 +208,20 @@ struct Y_API KeyEvent
 		Alt     = 1 << 2, ///< Key::LAlt or Key::RAlt is pressed.
 	};
 
-	Key      key;       ///< Key.
-	unsigned pressed;   ///< Press count.
-	unsigned modifiers; ///< Modifier mask.
+	Key      key;        ///< Key.
+	bool     pressed;    ///< Is the key pressed?
+	bool     autorepeat; ///< Is it an autorepeat event?
+	unsigned modifiers;  ///< Modifier mask.
 
 	///
 	/// \param key Key.
 	/// \param pressed Press count.
 	/// \param modifiers Modifier mask.
-	explicit KeyEvent(Key key = Key::Null, unsigned pressed = 0, unsigned modifiers = 0)
+	explicit KeyEvent(Key key, bool pressed, bool autorepeat)
 		: key(key)
 		, pressed(pressed)
-		, modifiers(modifiers)
+		, autorepeat(autorepeat)
+		, modifiers(0)
 	{
 	}
 

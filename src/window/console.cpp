@@ -4,11 +4,15 @@
 #include <yttrium/script/code.h>
 #include <yttrium/window.h>
 
+#include <cassert>
+
 namespace Yttrium
 {
 
 bool Console::process_key(const KeyEvent& event)
 {
+	assert(event.pressed);
+
 	if (event.key == Key::Enter)
 	{
 		ScriptCode(_line_editor.text()).execute();

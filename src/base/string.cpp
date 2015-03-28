@@ -6,7 +6,8 @@
 #include "ieee_float.h"
 
 #include <algorithm> // max, min
-#include <cstdio>  // sprintf
+#include <array>
+#include <cstdio> // sprintf
 #include <cstring> // memcpy, memmove, strlen
 
 namespace Yttrium

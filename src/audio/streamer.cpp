@@ -27,7 +27,7 @@ AudioStreamer::FetchResult AudioStreamer::fetch()
 bool AudioStreamer::open(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type, AudioPlayer::Order order)
 {
 	_source = AudioReader::open(name, type, _allocator);
-	if (_source.is_null())
+	if (!_source)
 		return false;
 
 	const AudioFormat& format = _source->format();

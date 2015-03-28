@@ -82,7 +82,7 @@ void GuiImpl::set_font(const StaticString& name,
 	const StaticString& font_source, const StaticString& texture_name)
 {
 	Texture2DPtr texture = _texture_cache->load_texture_2d(texture_name, true);
-	if (texture.is_null())
+	if (!texture)
 		return;
 
 	// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there

@@ -56,7 +56,7 @@ private:
 	bool               _is_cursor_locked;
 	Dim2               _size;
 	Mode               _mode;
-	unsigned           _keys[KeyCount];
+	bool               _keys[KeyCount];
 	Window::Callbacks& _callbacks;
 	Console            _console;
 	bool               _is_console_visible;

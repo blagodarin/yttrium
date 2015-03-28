@@ -44,12 +44,12 @@ public:
 		_pointer = nullptr;
 	}
 
-	T* pointer()
+	T* get()
 	{
 		return _pointer;
 	}
 
-	const T* pointer() const
+	const T* get() const
 	{
 		return _pointer;
 	}

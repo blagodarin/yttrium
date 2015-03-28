@@ -28,8 +28,8 @@ bool Game::setup()
 {
 	Y_LOG("Loading...");
 
-	_window = Window::open(Dim2(1024, 768), *this, _allocator);
-	if (_window.is_null())
+	_window = Window::create(Dim2(1024, 768), *this, _allocator);
+	if (!_window)
 		return false;
 
 	ScriptCode::load("tetrium.txt").execute();
@@ -142,7 +142,7 @@ bool Game::load()
 	const StaticString* block_texture_name;
 	CHECK(blocks->last("file", &block_texture_name));
 	_block_texture = _texture_cache->load_texture_2d(*block_texture_name);
-	if (!_block_texture.is_null())
+	if (_block_texture)
 		_block_texture->set_filter(Texture2D::TrilinearFilter);
 
 	const StaticString* block_size;
@@ -208,15 +208,13 @@ void Game::on_cursor_movement(Window&, const Dim2&) noexcept
 {
 }
 
-bool Game::on_key_event(const KeyEvent& event) noexcept
+void Game::on_key_event(const KeyEvent& event) noexcept
 {
 	if (_gui->process_key(event))
-		return true;
+		return;
 
-	if (event.pressed <= 1 && _bindings.call(event.key, event.pressed ? ScriptCode::Do : ScriptCode::Undo))
-		return true;
-
-	return false;
+	if (!event.autorepeat)
+		_bindings.call(event.key, event.pressed ? ScriptCode::Do : ScriptCode::Undo);
 }
 
 void Game::on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) noexcept

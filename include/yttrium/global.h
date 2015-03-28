@@ -215,7 +215,6 @@
 /// %Yttrium namespace.
 namespace Yttrium
 {
-
-} // namespace Yttrium
+}
 
 #endif // __Y_GLOBAL_H

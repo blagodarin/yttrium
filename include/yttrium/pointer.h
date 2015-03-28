@@ -65,14 +65,14 @@ public:
 
 		///
 
-		bool is_null() const noexcept
+		explicit operator bool() const noexcept
 		{
-			return !_pointable;
+			return _pointable;
 		}
 
 		///
 
-		Pointable* pointer() const noexcept
+		Pointable* get() const noexcept
 		{
 			return _pointable;
 		}
@@ -179,9 +179,9 @@ public:
 
 	///
 
-	T* pointer() const noexcept
+	T* get() const noexcept
 	{
-		return static_cast<T*>(Pointable::Pointer::pointer());
+		return static_cast<T*>(Pointable::Pointer::get());
 	}
 
 public:
@@ -190,14 +190,14 @@ public:
 
 	T* operator->() const noexcept
 	{
-		return static_cast<T*>(Pointable::Pointer::pointer());
+		return static_cast<T*>(Pointable::Pointer::get());
 	}
 
 	///
 
 	T& operator*() const noexcept
 	{
-		return *static_cast<T*>(Pointable::Pointer::pointer());
+		return *static_cast<T*>(Pointable::Pointer::get());
 	}
 };
 

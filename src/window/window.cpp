@@ -6,7 +6,6 @@
 #include "../memory/allocatable.h"
 
 #include <algorithm> // min
-#include <cstring> // memset
 
 namespace Yttrium
 {
@@ -21,7 +20,8 @@ WindowImpl::WindowImpl(const Dim2& size, Window::Callbacks& callbacks, Allocator
 	, _console(*this, allocator)
 	, _is_console_visible(false)
 {
-	::memset(_keys, 0, sizeof(_keys));
+	for (bool& pressed : _keys)
+		pressed = false;
 }
 
 WindowImpl::~WindowImpl()
@@ -31,11 +31,11 @@ WindowImpl::~WindowImpl()
 bool WindowImpl::initialize()
 {
 	_screen = Screen::open(allocator());
-	if (_screen.is_null())
+	if (!_screen)
 		return false;
 
 	_backend = WindowBackend::open(_screen, _size, this, allocator());
-	if (_backend.is_null())
+	if (!_backend)
 		return false;
 
 	return true;
@@ -208,26 +208,12 @@ void WindowImpl::on_focus_event(bool is_focused)
 
 void WindowImpl::on_key_event(Key key, bool is_pressed)
 {
-	KeyEvent event(key);
+	bool& was_pressed = _keys[static_cast<KeyType>(key)];
 
-	switch (key)
-	{
-	case Key::WheelUp:
-	case Key::WheelDown:
-	case Key::WheelLeft:
-	case Key::WheelRight:
+	KeyEvent event(key, is_pressed, was_pressed);
 
-		if (is_pressed)
-			event.pressed = 1;
-		break;
-
-	default:
-
-		if (is_pressed)
-			event.pressed = _keys[static_cast<KeyType>(key)] + 1;
-		_keys[static_cast<KeyType>(key)] = event.pressed;
-		break;
-	}
+	if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
+		was_pressed = is_pressed;
 
 	if (_keys[static_cast<KeyType>(Key::LShift)] || _keys[static_cast<KeyType>(Key::RShift)])
 		event.modifiers |= KeyEvent::Shift;
@@ -261,7 +247,7 @@ void WindowImpl::set_active(bool active)
 		lock_cursor(_is_cursor_locked);
 }
 
-WindowPtr Window::open(const Dim2& size, Callbacks& callbacks, Allocator* allocator)
+WindowPtr Window::create(const Dim2& size, Callbacks& callbacks, Allocator* allocator)
 {
 	if (size.x > 0 && size.y > 0)
 	{

@@ -61,7 +61,7 @@ void GuiScene::load_widget(const StaticString& type, const StaticString& name, G
 	if (!name.is_empty())
 	{
 		widget->set_name(name);
-		_named_widgets[String(name, _allocator)] = widget.pointer();
+		_named_widgets[String(name, _allocator)] = widget.get();
 	}
 
 	_widgets.push_back(widget.release());

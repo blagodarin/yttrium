@@ -76,7 +76,7 @@ void OpenGlRenderer::flush_2d()
 	_gl.EnableClientState(GL_COLOR_ARRAY);
 	_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].color);
 
-	if (_builtin._is_bound || !_texture.is_null())
+	if (_builtin._is_bound || _texture)
 	{
 		_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
 		_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].texture);

@@ -18,10 +18,8 @@ namespace Yttrium
 
 namespace Ion
 {
-
-class Object;
-
-} // namespace Ion
+	class Object;
+}
 
 class GuiIonDumper;
 class GuiScene;
@@ -83,7 +81,7 @@ public:
 
 	TextureCache* texture_cache()
 	{
-		return _texture_cache.pointer();
+		return _texture_cache.get();
 	}
 
 public: // Gui

@@ -21,7 +21,7 @@ void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 void BackgroundProperty::dump(GuiPropertyDumper& dumper) const
 {
 	dumper.dump_color("color", color);
-	if (!texture.is_null())
+	if (texture)
 	{
 		dumper.dump_texture("texture", texture);
 		dumper.dump_rect("texture_rect", texture_rect);
@@ -61,7 +61,7 @@ void ForegroundProperty::draw(Renderer& renderer, const String& text,
 
 void ForegroundProperty::dump(GuiPropertyDumper& dumper) const
 {
-	if (font_texture.is_null())
+	if (!font_texture)
 		return;
 	// TODO: Dump font.
 	dumper.dump_size("text_size", size);

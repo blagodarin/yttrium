@@ -282,7 +282,7 @@ void Renderer::Private::draw_text(const Vector2f& position, const StaticString& 
 				info->rect.width() * x_scaling,
 				info->rect.height() * y_scaling);
 
-			BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.pointer());
+			BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.get());
 			Vector2f texture_top_left(backend_texture->fix_coords(info->rect.top_left()));
 			Vector2f texture_bottom_right(backend_texture->fix_coords(info->rect.bottom_right()));
 
@@ -337,14 +337,12 @@ void Renderer::begin_frame()
 
 void Renderer::draw_rectangle(const RectF& rect)
 {
-	_private->draw_rectangle(rect, _private->_texture_rect,
-		_private->_texture.is_null() ? MarginsF() : _private->_texture_borders);
+	_private->draw_rectangle(rect, _private->_texture_rect, _private->_texture ? _private->_texture_borders : MarginsF());
 }
 
 void Renderer::draw_rectangle(const RectF& rect, const RectF& texture_rect)
 {
-	_private->draw_rectangle(rect, texture_rect,
-		_private->_texture.is_null() ? MarginsF() : _private->_texture_borders);
+	_private->draw_rectangle(rect, texture_rect, _private->_texture ? _private->_texture_borders : MarginsF());
 }
 
 void Renderer::draw_text(const Vector2f& position, const StaticString& text, unsigned alignment, TextCapture* capture)
@@ -390,7 +388,7 @@ void Renderer::set_color(const Vector4f& color)
 
 bool Renderer::set_font(const TextureFont& font)
 {
-	BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
+	BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_private->_texture.get());
 	if (!backend_texture || (font && !Rect(backend_texture->size()).contains(font.rect())))
 		return false;
 
@@ -431,9 +429,9 @@ void Renderer::set_texture(const Texture2DPtr& texture)
 
 	flush_2d();
 
-	if (texture.is_null())
+	if (!texture)
 	{
-		BackendTexture2D* old_backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
+		BackendTexture2D* old_backend_texture = static_cast<BackendTexture2D*>(_private->_texture.get());
 		if (old_backend_texture)
 			old_backend_texture->unbind();
 	}
@@ -441,7 +439,7 @@ void Renderer::set_texture(const Texture2DPtr& texture)
 	_private->_texture = texture;
 	_private->_texture_borders = MarginsF();
 
-	BackendTexture2D* new_backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
+	BackendTexture2D* new_backend_texture = static_cast<BackendTexture2D*>(_private->_texture.get());
 	if (new_backend_texture)
 	{
 		new_backend_texture->bind();
@@ -457,7 +455,7 @@ void Renderer::set_texture(const Texture2DPtr& texture)
 
 bool Renderer::set_texture_borders(const MarginsI& borders)
 {
-	if (_private->_texture.is_null())
+	if (!_private->_texture)
 		return false;
 
 	const Vector2f& texture_size = _private->_texture->size().to<float>();
@@ -474,7 +472,7 @@ bool Renderer::set_texture_borders(const MarginsI& borders)
 
 void Renderer::set_texture_rectangle(const RectF& rect)
 {
-	BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_private->_texture.pointer());
+	BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_private->_texture.get());
 	if (backend_texture)
 	{
 		const Vector2f& top_left = backend_texture->fix_coords(rect.top_left());

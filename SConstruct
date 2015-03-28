@@ -258,9 +258,6 @@ tests_env.Append(
 	CPPPATH = '#',
 	LIBS = 'boost_unit_test_framework')
 
-if 'x11' in ports:
-	tests_env.Append(ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')})
-
 tests = tests_env.Program('bin/tests', env.Glob('$BUILD/tests/*.cpp'))
 Alias('tests', tests)
 Clean('tests', Dir('$BUILD/tests'))
@@ -269,7 +266,8 @@ test_env = Environment(TOOLS = [])
 if host_platform == 'posix':
 	test_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
 if 'x11' in ports:
-	test_env.Append(ENV = {'DISPLAY': os.environ.get('DISPLAY', ':0')}) # Required by XOpenDisplay at runtime.
+	test_env.Append(ENV = {'DISPLAY': os.environ['DISPLAY']}) # Required by XOpenDisplay at runtime.
+	test_env.Append(ENV = {'HOME': os.environ['HOME']}) # Required for X authentication to succeed.
 test_env.Alias('test', tests, str(tests[0]) + ' --log_level=message')
 AlwaysBuild('test')
 
