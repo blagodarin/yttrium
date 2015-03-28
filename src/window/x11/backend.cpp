@@ -228,12 +228,12 @@ WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext g
 	: Pointable(allocator)
 	, _display(display)
 	, _window(window)
-	, _wm_protocols(XInternAtom(_display, "WM_PROTOCOLS", True))
-	, _wm_delete_window(XInternAtom(_display, "WM_DELETE_WINDOW", True))
+	, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
+	, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
 	, _glx_context(glx_context)
 	, _size(size)
-	, _renderer(nullptr)
 	, _callbacks(callbacks)
+	, _renderer(*this, allocator)
 {
 	::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
 	fix_window_size(_display, _window, _size);
@@ -253,18 +253,6 @@ void WindowBackend::close()
 		::XDestroyWindow(_display, _window);
 		_window = None;
 	}
-}
-
-Renderer WindowBackend::create_renderer(Allocator* allocator)
-{
-	if (_renderer)
-		return Renderer();
-
-	Renderer renderer(this, allocator);
-	if (renderer)
-		renderer._private->set_viewport(_size);
-
-	return renderer;
 }
 
 bool WindowBackend::get_cursor(Dim2* cursor)
@@ -311,8 +299,7 @@ bool WindowBackend::put(int left, int top, int width, int height, bool border)
 	_size = Dim2(width, height);
 	fix_window_size(_display, _window, _size);
 
-	if (_renderer)
-		_renderer->set_viewport(_size);
+	_renderer._private->set_viewport(_size);
 
 	return true;
 }
@@ -453,14 +440,26 @@ WindowBackendPtr WindowBackend::open(const ScreenPtr& screen, const Dim2& size, 
 {
 	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.get());
 	if (!screen_impl)
-		return WindowBackendPtr();
+		return {};
 
-	::Window window;
+	::Window window_handle;
 	::GLXContext glx_context;
-	if (!initialize_window(screen_impl->_display, screen_impl->_screen, size, &window, &glx_context))
-		return WindowBackendPtr();
+	if (!initialize_window(screen_impl->_display, screen_impl->_screen, size, &window_handle, &glx_context))
+		return {};
 
-	return WindowBackendPtr(Y_NEW(allocator, WindowBackend)(screen_impl->_display, window, glx_context, size, callbacks, allocator));
+	WindowBackendPtr result(Y_NEW(allocator, WindowBackend)(screen_impl->_display, window_handle, glx_context, size, callbacks, allocator));
+	if (!result->initialize_renderer())
+		return {};
+
+	return result;
+}
+
+bool WindowBackend::initialize_renderer()
+{
+	if (!_renderer._private->initialize())
+		return false;
+	_renderer._private->set_viewport(_size);
+	return true;
 }
 
 } // namespace Yttrium

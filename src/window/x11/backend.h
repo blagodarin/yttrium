@@ -41,8 +41,6 @@ public:
 
 	void close();
 
-	Renderer create_renderer(Allocator* allocator);
-
 	bool get_cursor(Dim2* cursor);
 
 	bool get_frame_sync(bool* frame_sync);
@@ -50,6 +48,8 @@ public:
 	bool put(int left, int top, int width, int height, bool border);
 
 	bool process_events();
+
+	Renderer& renderer() { return _renderer; }
 
 	bool set_cursor(const Dim2& cursor);
 
@@ -67,14 +67,18 @@ public:
 
 private:
 
-	::Display*         _display;
-	::Window           _window;
-	::Atom             _wm_protocols;
-	::Atom             _wm_delete_window;
-	::GLXContext       _glx_context;
-	Dim2               _size;
-	Renderer::Private* _renderer; // See Renderer::Private constructor/destructor.
-	Callbacks*         _callbacks;
+	bool initialize_renderer();
+
+private:
+
+	::Display*   _display;
+	::Window     _window;
+	::Atom       _wm_protocols;
+	::Atom       _wm_delete_window;
+	::GLXContext _glx_context;
+	Dim2         _size;
+	Callbacks*   _callbacks;
+	Renderer     _renderer;
 };
 
 } // namespace Yttrium

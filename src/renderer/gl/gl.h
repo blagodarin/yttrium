@@ -6,15 +6,13 @@
 
 namespace Yttrium
 {
+	struct GlApi
+	{
+		void initialize(WindowBackend& window);
 
-struct GlApi
-{
-	void initialize(WindowBackend *window);
-
-	#define GLAPI_DECLARE
-	#include "api.h"
-};
-
-} // namespace Yttrium
+		#define GLAPI_DECLARE
+		#include "api.h"
+	};
+}
 
 #endif // __RENDERER_GL_GL_H

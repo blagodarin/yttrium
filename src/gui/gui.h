@@ -46,7 +46,7 @@ public:
 
 public:
 
-	GuiImpl(const Renderer& renderer, Callbacks& callbacks, Allocator* allocator);
+	GuiImpl(Renderer& renderer, Callbacks& callbacks, Allocator* allocator);
 	~GuiImpl() override;
 
 public:
@@ -104,8 +104,8 @@ private:
 private:
 
 	ProxyAllocator                    _proxy_allocator;
-	Renderer                          _renderer;
-	TextureCachePtr                   _texture_cache;
+	Renderer&                         _renderer;
+	std::unique_ptr<TextureCache>     _texture_cache;
 	Callbacks&                        _callbacks;
 	bool                              _has_size;
 	Vector2f                          _size;

@@ -3,15 +3,11 @@
 
 namespace Yttrium
 {
-
-namespace Gl
-{
-
-bool check_extension(const char *list, const char *name);
-
-} // namespace Gl
-
-} // namespace Yttrium
+	namespace Gl
+	{
+		bool check_extension(const char *list, const char *name);
+	}
+}
 
 #endif // __RENDERER_GL_API_H
 

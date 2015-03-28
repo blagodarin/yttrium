@@ -4,26 +4,18 @@
 
 namespace Yttrium
 {
-
-namespace Gl
-{
-
-bool check_extension(const char *list, const char *name)
-{
-	size_t length = ::strlen(name);
-
-	while ((list = ::strstr(list, name)) != 0)
+	namespace Gl
 	{
-		list += length;
-		if (*list == ' ' || *list == 0)
+		bool check_extension(const char* list, const char* name)
 		{
-			return true;
+			const size_t name_size = ::strlen(name);
+			while ((list = ::strstr(list, name)))
+			{
+				list += name_size;
+				if (*list == ' ' || *list == 0)
+					return true;
+			}
+			return false;
 		}
 	}
-
-	return false;
 }
-
-} // namespace Gl
-
-} // namespace Yttrium

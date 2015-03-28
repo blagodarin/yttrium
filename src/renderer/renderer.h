@@ -20,22 +20,18 @@ class Y_PRIVATE Renderer::Private: public PrivateBase<Renderer::Private>
 {
 public:
 
-	Private(WindowBackend *window, Allocator *allocator);
-
+	Private(WindowBackend& window, Allocator* allocator);
 	virtual ~Private();
 
 public:
 
+	virtual bool initialize() = 0;
 	virtual void bind_builtin() = 0;
-
 	virtual void clear() = 0;
-
+	virtual std::unique_ptr<TextureCache> create_texture_cache(Renderer&) = 0;
 	virtual void flush_2d() = 0;
-
 	virtual void set_matrix_2d(double width, double height) = 0;
-
 	virtual void set_viewport(const Dim2 &size);
-
 	virtual void take_screenshot() = 0;
 
 public:
@@ -48,7 +44,7 @@ public:
 
 public:
 
-	WindowBackendPtr _window; // Don't let the window die too early.
+	WindowBackend& _window;
 
 	Dim2     _viewport_size;
 	Vector2d _rendering_size;
@@ -83,7 +79,7 @@ public:
 
 public:
 
-	static Private *create(WindowBackend *window, Allocator *allocator);
+	static Private* create(WindowBackend& window, Allocator* allocator);
 };
 
 } // namespace Yttrium

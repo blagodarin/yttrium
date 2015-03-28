@@ -3,9 +3,8 @@
 namespace Yttrium
 {
 
-GlTexture2D::GlTexture2D(const Renderer &renderer, const ImageFormat &format,
-	Allocator *allocator, const GlApi &gl, GLenum target, GLuint texture)
-	: BackendTexture2D(renderer, format, allocator)
+GlTexture2D::GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi& gl, GLenum target, GLuint texture)
+	: BackendTexture2D(format, allocator)
 	, _gl(gl)
 	, _target(target)
 	, _texture(texture)

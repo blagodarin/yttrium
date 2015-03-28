@@ -23,7 +23,6 @@ public:
 public: // Window
 
 	void close() override;
-	Renderer create_renderer(Allocator* allocator) override;
 	Dim2 cursor() const override;
 	void draw_console(RendererBuiltin& renderer) override;
 	bool is_console_visible() const override;
@@ -31,6 +30,7 @@ public: // Window
 	bool is_shift_pressed() const override;
 	void lock_cursor(bool lock) override;
 	bool process_events() override;
+	Renderer& renderer() override;
 	void resize(const Dim2& size) override;
 	void set_console_visible(bool visible) override;
 	bool set_cursor(const Dim2& cursor) override;

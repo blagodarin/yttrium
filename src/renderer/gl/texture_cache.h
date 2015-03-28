@@ -12,7 +12,7 @@ class GlTextureCache: public BackendTextureCache
 {
 public:
 
-	GlTextureCache(const Renderer &renderer, const GlApi &gl);
+	GlTextureCache(Renderer& renderer, const GlApi &gl);
 
 private:
 

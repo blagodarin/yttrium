@@ -10,13 +10,14 @@
 #include <yttrium/static_string.h>
 #include <yttrium/texture_font.h>
 
+#include <memory> // unique_ptr
+
 namespace Yttrium
 {
 
 class WindowBackend;
 
 ///
-
 class Y_API Renderer
 {
 	friend TextureCache;
@@ -49,128 +50,103 @@ public:
 
 	///
 
-	inline Renderer();
-
-	///
-
-	Renderer(const Renderer &renderer);
-
-	///
-
 	~Renderer();
 
-public:
-
 	///
-
 	Allocator* allocator() const;
 
 	/// Clear the framebuffer and begin a new frame.
-
 	void begin_frame();
 
 	///
+	/// \note Texture cache lifetime must not exceed its renderer lifetime.
+	std::unique_ptr<TextureCache> create_texture_cache();
 
+	///
 	void draw_rectangle(const RectF& rect);
 
 	///
-
-	inline void draw_rectangle(float x, float y, float width, float height);
+	void draw_rectangle(float x, float y, float width, float height)
+	{
+		draw_rectangle(RectF(x, y, width, height));
+	}
 
 	///
-
 	void draw_rectangle(const RectF& rect, const RectF& texture_rect);
 
 	///
-
 	void draw_text(const Vector2f& position, const StaticString& text,
 		unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr);
 
 	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
 	/// and, if requested, capture a screenshot.
-
 	void end_frame();
 
 	///
-
 	void flush_2d();
 
 	///
-
 	RendererBuiltin renderer_builtin();
 
 	///
-
 	Vector2d rendering_size() const;
 
 	///
-
 	void set_color(const Vector4f& color);
 
 	///
-
 	bool set_font(const TextureFont& font);
 
 	///
-
 	void set_font_size(const Vector2f& size);
 
 	///
-
-	inline void set_font_size(float y_size, float x_scaling = 1);
+	void set_font_size(float y_size, float x_scaling = 1)
+	{
+		set_font_size(Vector2f(x_scaling, y_size));
+	}
 
 	///
-
 	void set_matrix_2d(double width, double height);
 
 	///
-
 	void set_matrix_2d_height(double height);
 
 	///
-
 	void set_matrix_2d_width(double width);
 
 	///
-
 	void set_texture(const Texture2DPtr& texture);
 
 	///
-
 	bool set_texture_borders(const MarginsI& borders);
 
 	///
-
 	void set_texture_rectangle(const RectF& rect);
 
 	///
-
-	inline void set_texture_rectangle(float x, float y, float width, float height);
+	void set_texture_rectangle(float x, float y, float width, float height)
+	{
+		set_texture_rectangle(RectF(x, y, width, height));
+	}
 
 	/// Take a screenshot.
 	/// \param name
 	/// \note The screenshot would be actually taken at the end of the frame
 	/// and saved in the PNG format.
-
 	void take_screenshot(const StaticString& name);
 
 	///
-
 	Vector2f text_size(const StaticString& text) const;
 
 	///
-
 	Dim2 viewport_size() const;
 
-public:
-
-	///
-
-	inline operator bool() const;
-
-	///
-
-	Renderer& operator=(const Renderer& renderer);
+	Renderer() = delete;
+	Renderer(const Renderer&) = delete;
+	Renderer(Renderer&&) = delete;
+	Renderer& operator=(const Renderer&) = delete;
+	Renderer& operator=(Renderer&&) = delete;
 
 public:
 
@@ -182,37 +158,9 @@ private:
 
 private:
 
-	Y_PRIVATE Renderer(WindowBackend* window, Allocator* allocator);
+	Y_PRIVATE Renderer(WindowBackend& window, Allocator* allocator);
 	Y_PRIVATE Renderer(Private* private_);
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Renderer::Renderer()
-	: _private(nullptr)
-{
-}
-
-void Renderer::draw_rectangle(float x, float y, float width, float height)
-{
-	draw_rectangle(RectF(x, y, width, height));
-}
-
-void Renderer::set_font_size(float y_size, float x_scaling)
-{
-	set_font_size(Vector2f(x_scaling, y_size));
-}
-
-void Renderer::set_texture_rectangle(float x, float y, float width, float height)
-{
-	set_texture_rectangle(RectF(x, y, width, height));
-}
-
-Renderer::operator bool() const
-{
-	return _private;
-}
 
 } // namespace Yttrium
 

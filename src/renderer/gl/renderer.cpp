@@ -3,36 +3,16 @@
 #include <yttrium/matrix.h>
 
 #include "../builtin_data.h"
+#include "texture_cache.h"
 
 namespace Yttrium
 {
 
-OpenGlRenderer::OpenGlRenderer(WindowBackend *window, Allocator *allocator)
+OpenGlRenderer::OpenGlRenderer(WindowBackend& window, Allocator* allocator)
 	: Private(window, allocator)
 	, _builtin_texture(0)
 {
 	_gl.initialize(window);
-
-	if (!check_version(1, 2))
-	{
-		Y_ABORT("Invalid OpenGL version, expected 1.2 or higher"); // TODO: Be more polite.
-	}
-
-	_gl.Enable(GL_TEXTURE_2D);
-	_gl.Enable(GL_BLEND);
-	_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	_gl.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	// TODO: Make builtin texture initialization more gentle.
-
-	_gl.GenTextures(1, &_builtin_texture);
-
-	Y_ABORT_IF(!_builtin_texture, "Can't create builtin texture");
-
-	_gl.BindTexture(GL_TEXTURE_2D, _builtin_texture);
-	_gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Builtin::texture_width, Builtin::texture_height,
-		0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, Builtin::texture);
-	_gl.BindTexture(GL_TEXTURE_2D, 0);
 }
 
 OpenGlRenderer::~OpenGlRenderer()
@@ -40,19 +20,26 @@ OpenGlRenderer::~OpenGlRenderer()
 	_gl.DeleteTextures(1, &_builtin_texture);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool OpenGlRenderer::check_version(int major, int minor)
+bool OpenGlRenderer::initialize()
 {
-	// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
+	if (!check_min_version(1, 2))
+		return false; // TODO: Report error.
 
-	int backend_major = _gl.VERSION[0] - '0';
-	int backend_minor = _gl.VERSION[2] - '0';
+	_gl.Enable(GL_TEXTURE_2D);
+	_gl.Enable(GL_BLEND);
+	_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	_gl.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	return backend_major > major || (backend_major == major && backend_minor >= minor);
+	_gl.GenTextures(1, &_builtin_texture);
+	if (!_builtin_texture)
+		return false; // TODO: Report error.
+	_gl.BindTexture(GL_TEXTURE_2D, _builtin_texture);
+	_gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Builtin::texture_width, Builtin::texture_height,
+		0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, Builtin::texture);
+	_gl.BindTexture(GL_TEXTURE_2D, 0);
+
+	return true;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void OpenGlRenderer::bind_builtin()
 {
@@ -69,6 +56,11 @@ void OpenGlRenderer::clear()
 	_gl.ClearColor(0.5, 0.5, 0.5, 0);
 	_gl.ClearDepth(1);
 	_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache(Renderer& renderer)
+{
+	return std::unique_ptr<TextureCache>(new GlTextureCache(renderer, _gl));
 }
 
 void OpenGlRenderer::flush_2d()
@@ -120,6 +112,14 @@ void OpenGlRenderer::take_screenshot()
 	_gl.ReadBuffer(GL_FRONT);
 	_gl.ReadPixels(0, 0, _viewport_size.x, _viewport_size.y, GL_RGB, GL_UNSIGNED_BYTE, _screenshot_image.data());
 	_gl.ReadBuffer(read_buffer);
+}
+
+bool OpenGlRenderer::check_min_version(int major, int minor)
+{
+	// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
+	const int actual_major = _gl.VERSION[0] - '0';
+	const int actual_minor = _gl.VERSION[2] - '0';
+	return actual_major > major || (actual_major == major && actual_minor >= minor);
 }
 
 } // namespace Yttrium

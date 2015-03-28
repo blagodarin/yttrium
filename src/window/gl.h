@@ -9,18 +9,14 @@
 
 namespace Yttrium
 {
+	class WindowBackend;
 
-class WindowBackend;
+	namespace Gl
+	{
+		typedef void (__Y_GLAPI *Address)();
 
-namespace Gl
-{
-
-typedef void (__Y_GLAPI *Address)();
-
-Address address(WindowBackend* backend, const char* name);
-
-} // namespace Gl
-
-} // namespace Yttrium
+		Address address(WindowBackend& backend, const char* name);
+	}
+}
 
 #endif // __WINDOW_GL_H

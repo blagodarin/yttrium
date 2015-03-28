@@ -127,7 +127,7 @@ void Commands::snap(const StaticString&, String*, const ScriptArgs&)
 	// but do we need such a feature?
 
 	const DateTime now = DateTime::now();
-	_game._renderer.take_screenshot(String(24, _game._allocator)
+	_game._window->renderer().take_screenshot(String(24, _game._allocator)
 		.append_dec(now.year, 4, true)
 		.append('-')
 		.append_dec(now.month, 2, true)

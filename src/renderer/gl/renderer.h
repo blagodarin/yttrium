@@ -3,31 +3,30 @@
 
 #include "../renderer.h"
 #include "gl.h"
-#include "texture_cache.h"
 
 namespace Yttrium
 {
 
-class OpenGlRenderer
-	: public Renderer::Private
+class OpenGlRenderer: public Renderer::Private
 {
 public:
 
-	OpenGlRenderer(WindowBackend *window, Allocator *allocator);
+	OpenGlRenderer(WindowBackend& window, Allocator* allocator);
 	~OpenGlRenderer() override;
 
-public:
-
-	bool check_version(int major, int minor);
-
-public: // Renderer::Private
-
+	// Renderer::Private
+	bool initialize() override;
 	void bind_builtin() override;
 	void clear() override;
+	std::unique_ptr<TextureCache> create_texture_cache(Renderer&) override;
 	void flush_2d() override;
 	void set_matrix_2d(double width, double height) override;
 	void set_viewport(const Dim2 &size) override;
 	void take_screenshot() override;
+
+private:
+
+	bool check_min_version(int major, int minor);
 
 public:
 

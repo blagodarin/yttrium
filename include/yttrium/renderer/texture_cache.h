@@ -9,38 +9,23 @@
 namespace Yttrium
 {
 
-class Renderer;
 class StaticString;
 
 /// Texture cache.
-
-class Y_API TextureCache: public Pointable
+class Y_API TextureCache
 {
 public:
 
-	~TextureCache() = default;
+	virtual ~TextureCache() = default;
 
 	///
-
 	virtual Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity = false) = 0;
 
 	/// Clear the cache.
-
 	virtual void clear() = 0;
 
 	///
-
 	virtual Texture2DPtr load_texture_2d(const StaticString &name, bool intensity = false) = 0;
-
-public:
-
-	///
-
-	static TextureCachePtr create(const Renderer &renderer);
-
-protected:
-
-	TextureCache(Allocator *allocator): Pointable(allocator) {}
 };
 
 } // namespace Yttrium

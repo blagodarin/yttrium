@@ -5,12 +5,15 @@
 #define __Y_WINDOW_H
 
 #include <yttrium/key.h>
-#include <yttrium/renderer.h>
+#include <yttrium/pointer.h>
+#include <yttrium/vector.h>
 
 namespace Yttrium
 {
 
+class Renderer;
 class RendererBuiltin;
+class StaticString;
 class Window;
 
 /// Window pointer.
@@ -48,9 +51,6 @@ public:
 	virtual void close() = 0;
 
 	///
-	virtual Renderer create_renderer(Allocator* allocator = nullptr) = 0;
-
-	///
 	virtual Dim2 cursor() const = 0;
 
 	///
@@ -71,6 +71,9 @@ public:
 	/// Process window events.
 	/// \return \c false if the window was closed, \c true otherwise.
 	virtual bool process_events() = 0;
+
+	///
+	virtual Renderer& renderer() = 0;
 
 	///
 	virtual void resize(const Dim2& size) = 0;

@@ -11,8 +11,7 @@ class GlTexture2D: public BackendTexture2D
 {
 public:
 
-	GlTexture2D(const Renderer &renderer, const ImageFormat &format,
-		Allocator *allocator, const GlApi &gl, GLenum target, GLuint texture);
+	GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi &gl, GLenum target, GLuint texture);
 
 	~GlTexture2D() override;
 

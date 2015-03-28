@@ -3,11 +3,10 @@
 namespace Yttrium
 {
 
-BackendTexture2D::BackendTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator)
+BackendTexture2D::BackendTexture2D(const ImageFormat &format, Allocator *allocator)
 	: Texture2D(Dim2(format.width(), format.height()), allocator)
 	, _orientation(format.orientation())
 	, _has_mipmaps(true)
-	, _renderer(renderer)
 {
 }
 

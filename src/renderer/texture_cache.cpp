@@ -8,9 +8,8 @@
 namespace Yttrium
 {
 
-BackendTextureCache::BackendTextureCache(const Renderer &renderer)
-	: TextureCache(renderer.allocator())
-	, _renderer(renderer)
+BackendTextureCache::BackendTextureCache(Renderer& renderer)
+	: _renderer(renderer)
 {
 }
 
@@ -30,7 +29,7 @@ Texture2DPtr BackendTextureCache::cache_texture_2d(const StaticString &name, boo
 	if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 		image.intensity_to_bgra();
 
-	BackendTexture2D *backend_texture = cache_texture_2d(image.format(), image.const_data());
+	BackendTexture2D* backend_texture = cache_texture_2d(image.format(), image.const_data());
 	if (!backend_texture)
 		return Texture2DPtr();
 
@@ -42,9 +41,9 @@ void BackendTextureCache::clear()
 	_cache_2d.clear();
 }
 
-Texture2DPtr BackendTextureCache::load_texture_2d(const StaticString &name, bool intensity)
+Texture2DPtr BackendTextureCache::load_texture_2d(const StaticString& name, bool intensity)
 {
-	auto i = _cache_2d.find(String(name, ByReference()));
+	const auto i = _cache_2d.find(String(name, ByReference()));
 	return i != _cache_2d.end() ? i->second : cache_texture_2d(name, intensity);
 }
 

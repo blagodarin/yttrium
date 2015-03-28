@@ -16,8 +16,7 @@ class BackendTextureCache: public TextureCache
 {
 protected:
 
-	BackendTextureCache(const Renderer &renderer);
-
+	BackendTextureCache(Renderer& renderer);
 	~BackendTextureCache() override;
 
 protected:
@@ -26,7 +25,7 @@ protected:
 
 protected:
 
-	Renderer _renderer;
+	Renderer& _renderer;
 
 private:
 

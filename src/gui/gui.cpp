@@ -12,11 +12,11 @@
 namespace Yttrium
 {
 
-GuiImpl::GuiImpl(const Renderer& renderer, Callbacks& callbacks, Allocator* allocator)
+GuiImpl::GuiImpl(Renderer& renderer, Callbacks& callbacks, Allocator* allocator)
 	: Gui(allocator)
 	, _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
-	, _texture_cache(TextureCache::create(_renderer))
+	, _texture_cache(_renderer.create_texture_cache())
 	, _callbacks(callbacks)
 	, _has_size(false)
 	, _size(0)
@@ -184,7 +184,7 @@ bool GuiImpl::process_key(const KeyEvent& event)
 
 bool GuiImpl::render()
 {
-	if (!_renderer || !_has_size || _scene_stack.empty())
+	if (!_has_size || _scene_stack.empty())
 		return false;
 
 	auto i = _scene_stack.begin() + (_scene_stack.size() - 1);

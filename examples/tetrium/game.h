@@ -10,6 +10,8 @@
 #include <yttrium/window.h>
 #include <yttrium/time.h>
 
+#include <memory>
+
 #include "commands.h"
 #include "tetrium.h"
 
@@ -59,8 +61,7 @@ private:
 	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
 	WindowPtr        _window;
-	Renderer         _renderer;
-	TextureCachePtr  _texture_cache;
+	std::unique_ptr<TextureCache> _texture_cache;
 	GuiPtr           _gui;
 	Bindings         _bindings;
 

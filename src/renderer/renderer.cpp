@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+#include <yttrium/renderer/texture_cache.h>
+
 #include "../memory/allocatable.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -7,7 +9,7 @@
 namespace Yttrium
 {
 
-Renderer::Private::Private(WindowBackend *window, Allocator *allocator)
+Renderer::Private::Private(WindowBackend& window, Allocator *allocator)
 	: PrivateBase(allocator)
 	, _window(window)
 	, _viewport_size(0)
@@ -19,20 +21,14 @@ Renderer::Private::Private(WindowBackend *window, Allocator *allocator)
 {
 	_builtin._renderer = this;
 
-	_window->_renderer = this;
-
 	ImageFormat screenshot_format;
-
 	screenshot_format.set_pixel_format(PixelFormat::Rgb, 24);
 	screenshot_format.set_orientation(ImageOrientation::XRightYUp);
-
 	_screenshot_image.set_format(screenshot_format);
 }
 
 Renderer::Private::~Private()
 {
-	Y_ASSERT(_window->_renderer == this);
-	_window->_renderer = nullptr;
 }
 
 void Renderer::Private::set_viewport(const Dim2 &size)
@@ -306,7 +302,7 @@ Vector2f Renderer::Private::text_size(const StaticString &text) const
 	return _font ? _font.text_size(text, _font_size) : Vector2f(0);
 }
 
-Renderer::Private *Renderer::Private::create(WindowBackend *window, Allocator *allocator)
+Renderer::Private* Renderer::Private::create(WindowBackend& window, Allocator* allocator)
 {
 	Allocatable<Renderer::Private> renderer(allocator);
 	renderer.reset<OpenGlRenderer>(window);
@@ -314,11 +310,6 @@ Renderer::Private *Renderer::Private::create(WindowBackend *window, Allocator *a
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Renderer::Renderer(const Renderer& renderer)
-	: _private(Private::copy(renderer._private))
-{
-}
 
 Renderer::~Renderer()
 {
@@ -333,6 +324,11 @@ Allocator* Renderer::allocator() const
 void Renderer::begin_frame()
 {
 	_private->clear();
+}
+
+std::unique_ptr<TextureCache> Renderer::create_texture_cache()
+{
+	return _private->create_texture_cache(*this);
 }
 
 void Renderer::draw_rectangle(const RectF& rect)
@@ -354,7 +350,7 @@ void Renderer::end_frame()
 {
 	flush_2d();
 
-	_private->_window->swap_buffers();
+	_private->_window.swap_buffers();
 
 	if (!_private->_screenshot_filename.is_empty())
 	{
@@ -503,13 +499,7 @@ Dim2 Renderer::viewport_size() const
 	return _private->_viewport_size;
 }
 
-Renderer& Renderer::operator=(const Renderer& renderer)
-{
-	Private::copy(_private, renderer._private);
-	return *this;
-}
-
-Renderer::Renderer(WindowBackend* window, Allocator* allocator)
+Renderer::Renderer(WindowBackend& window, Allocator* allocator)
 	: _private(Private::create(window, allocator))
 {
 }

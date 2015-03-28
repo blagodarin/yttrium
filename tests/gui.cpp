@@ -35,15 +35,12 @@ BOOST_AUTO_TEST_CASE(test_gui)
 		WindowPtr window = Window::create(Dim2(320, 240), window_callbacks);
 		BOOST_REQUIRE(window);
 
-		Renderer renderer = window->create_renderer();
-		BOOST_REQUIRE(renderer);
-
 		LogManager log_manager(DefaultAllocator); // For error reporting.
 
 		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 
 		GuiCallbacks gui_callbacks;
-		GuiPtr gui = Gui::create(renderer, gui_callbacks);
+		GuiPtr gui = Gui::create(window->renderer(), gui_callbacks);
 
 		BOOST_REQUIRE(gui->load("tests/gui/gui.ion"));
 		gui->dump(file.name());

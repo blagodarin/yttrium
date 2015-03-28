@@ -46,11 +46,6 @@ void WindowImpl::close()
 	_backend->close();
 }
 
-Renderer WindowImpl::create_renderer(Allocator* allocator)
-{
-	return _backend->create_renderer(allocator ? allocator : this->allocator());
-}
-
 Dim2 WindowImpl::cursor() const
 {
 	return _cursor;
@@ -122,6 +117,11 @@ bool WindowImpl::process_events()
 	_callbacks.on_cursor_movement(*this, movement);
 
 	return true;
+}
+
+Renderer& WindowImpl::renderer()
+{
+	return _backend->renderer();
 }
 
 void WindowImpl::resize(const Dim2& size)
@@ -210,7 +210,7 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 {
 	bool& was_pressed = _keys[static_cast<KeyType>(key)];
 
-	KeyEvent event(key, is_pressed, was_pressed);
+	KeyEvent event(key, is_pressed, is_pressed && was_pressed);
 
 	if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
 		was_pressed = is_pressed;

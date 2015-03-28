@@ -12,7 +12,7 @@ class BackendTexture2D: public Texture2D
 {
 public:
 
-	BackendTexture2D(const Renderer &renderer, const ImageFormat &format, Allocator *allocator);
+	BackendTexture2D(const ImageFormat& format, Allocator* allocator);
 
 public:
 
@@ -30,10 +30,6 @@ protected:
 
 	const ImageOrientation _orientation;
 	bool                   _has_mipmaps;
-
-private:
-
-	Renderer _renderer; // Don't let the renderer die before the texture.
 };
 
 } // namespace Yttrium

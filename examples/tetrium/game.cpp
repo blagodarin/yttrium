@@ -3,6 +3,7 @@
 #include <yttrium/file.h>
 #include <yttrium/ion.h>
 #include <yttrium/log.h>
+#include <yttrium/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/script/context.h>
 
@@ -21,7 +22,6 @@ Game::~Game()
 {
 	Y_LOG("Terminating...");
 	save_settings();
-	_renderer.set_texture(Texture2DPtr()); // Otherwise the renderer won't get deleted.
 }
 
 bool Game::setup()
@@ -45,9 +45,8 @@ bool Game::setup()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_renderer = _window->create_renderer(&_renderer_allocator);
-	_texture_cache = TextureCache::create(_renderer);
-	_gui = Gui::create(_renderer, *this, _allocator);
+	_texture_cache = _window->renderer().create_texture_cache();
+	_gui = Gui::create(_window->renderer(), *this, _allocator);
 
 	_game.set_random_seed(Timer::clock());
 
@@ -65,7 +64,7 @@ void Game::run()
 {
 	Y_LOG("Starting...");
 
-	RendererBuiltin renderer_builtin = _renderer.renderer_builtin();
+	RendererBuiltin renderer_builtin = _window->renderer().renderer_builtin();
 
 	RateCounter fps;
 
@@ -92,11 +91,11 @@ void Game::run()
 
 		// Draw frame.
 
-		_renderer.begin_frame();
+		_window->renderer().begin_frame();
 		_gui->set_cursor(_window->cursor());
 		_gui->render();
 		_window->draw_console(renderer_builtin);
-		_renderer.end_frame();
+		_window->renderer().end_frame();
 
 		// Update FPS.
 
@@ -327,8 +326,6 @@ void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2
 
 void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 {
-	// TODO: Simplify the conditions.
-
 	if (_game_timer.is_started() || _game.has_finished())
 	{
 		const Tetrium::Figure& figure = _game.next_figure();
