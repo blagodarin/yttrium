@@ -15,13 +15,7 @@ public:
 
 	void on_cursor_movement(Window&, const Dim2&) override {}
 	void on_key_event(const KeyEvent&) override {}
-};
-
-class GuiCallbacks: public Gui::Callbacks
-{
-public:
-
-	void on_render_canvas(Renderer&, const StaticString&, const RectF&) override {}
+	void on_render_canvas(Renderer&, const RectF&, const StaticString&) override {}
 };
 
 BOOST_AUTO_TEST_CASE(test_gui)
@@ -31,19 +25,15 @@ BOOST_AUTO_TEST_CASE(test_gui)
 	File file(File::Temporary);
 
 	{
-		WindowCallbacks window_callbacks;
-		WindowPtr window = Window::create(Dim2(320, 240), window_callbacks);
-		BOOST_REQUIRE(window);
-
 		LogManager log_manager(DefaultAllocator); // For error reporting.
 
 		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 
-		GuiCallbacks gui_callbacks;
-		GuiPtr gui = Gui::create(window->renderer(), gui_callbacks);
-
-		BOOST_REQUIRE(gui->load("tests/gui/gui.ion"));
-		gui->dump(file.name());
+		WindowCallbacks window_callbacks;
+		WindowPtr window = Window::create(Dim2(320, 240), window_callbacks);
+		BOOST_REQUIRE(window);
+		BOOST_REQUIRE(window->gui().load("tests/gui/gui.ion"));
+		window->gui().dump(file.name());
 	}
 
 	String expected;

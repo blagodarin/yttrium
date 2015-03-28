@@ -3,6 +3,7 @@
 #include <yttrium/allocator.h>
 #include <yttrium/utils.h>
 
+#include "../gui/gui.h"
 #include "../memory/allocatable.h"
 
 #include <algorithm> // min
@@ -38,6 +39,7 @@ bool WindowImpl::initialize()
 	if (!_backend)
 		return false;
 
+	_gui.reset(new GuiImpl(renderer(), _callbacks, allocator()));
 	return true;
 }
 
@@ -62,6 +64,11 @@ void WindowImpl::draw_console(RendererBuiltin& renderer)
 
 		_console.render_input(renderer, 0, 0, size.x);
 	}
+}
+
+Gui& WindowImpl::gui()
+{
+	return *_gui.get();
 }
 
 bool WindowImpl::is_console_visible() const
@@ -236,6 +243,9 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 			return;
 		}
 	}
+
+	if (_gui->process_key_event(event))
+		return;
 
 	_callbacks.on_key_event(event);
 }

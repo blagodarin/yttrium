@@ -13,7 +13,7 @@ namespace Yttrium
 
 Button::Button(Allocator* allocator)
 	: Widget(allocator)
-	, _state(WidgetState::None)
+	, _state(WidgetState::NotSet)
 {
 }
 
@@ -27,7 +27,7 @@ void Button::dump(GuiPropertyDumper& dumper) const
 	dumper.dump_size("text_size", _text_size);
 	dumper.dump_text("text", _text);
 
-	if (_state != WidgetState::None)
+	if (_state != WidgetState::NotSet)
 		dumper.dump_state("state", _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
 
 	// TODO: Dump styles.
@@ -114,7 +114,7 @@ bool Button::process_key(const KeyEvent& event)
 
 void Button::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const
 {
-	if (_state != WidgetState::None)
+	if (_state != WidgetState::NotSet)
 		state = _state;
 
 	_styles[WidgetStateType(state)].background.draw(renderer, rect);

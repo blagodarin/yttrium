@@ -3,6 +3,8 @@
 
 #include <yttrium/window.h>
 
+#include <memory>
+
 #include <yttrium/screen.h>
 
 #include "backend.h"
@@ -10,6 +12,8 @@
 
 namespace Yttrium
 {
+
+class GuiImpl;
 
 class WindowImpl: public Window, private WindowBackend::Callbacks
 {
@@ -25,6 +29,7 @@ public: // Window
 	void close() override;
 	Dim2 cursor() const override;
 	void draw_console(RendererBuiltin& renderer) override;
+	Gui& gui() override;
 	bool is_console_visible() const override;
 	bool is_cursor_locked() const override;
 	bool is_shift_pressed() const override;
@@ -60,6 +65,7 @@ private:
 	Window::Callbacks& _callbacks;
 	Console            _console;
 	bool               _is_console_visible;
+	std::unique_ptr<GuiImpl> _gui;
 };
 
 } // namespace Yttrium

@@ -3,6 +3,7 @@
 
 #include <yttrium/gui.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/window.h>
 
 #include "widget.h"
 
@@ -13,7 +14,7 @@ class Canvas: public Widget
 {
 public:
 
-	Canvas(Gui::Callbacks& gui_callbacks, Allocator* allocator);
+	Canvas(Window::Callbacks& window_callbacks, Allocator* allocator);
 
 	void dump(GuiPropertyDumper&) const override;
 	bool load(GuiPropertyLoader&) override;
@@ -21,8 +22,8 @@ public:
 
 private:
 
-	Rect            _position;
-	Gui::Callbacks& _gui_callbacks;
+	Rect               _position;
+	Window::Callbacks& _window_callbacks;
 };
 
 } // namespace Yttrium

@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <yttrium/file.h>
+#include <yttrium/gui.h>
 #include <yttrium/ion.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
@@ -11,7 +12,6 @@
 
 Game::Game(Allocator* allocator)
 	: _allocator(allocator)
-	, _renderer_allocator("renderer", allocator)
 	, _audio(_allocator)
 	, _bindings(allocator)
 	, _commands(*this)
@@ -46,7 +46,6 @@ bool Game::setup()
 	_bindings.bind_default(Key::Right, "turn_right");
 
 	_texture_cache = _window->renderer().create_texture_cache();
-	_gui = Gui::create(_window->renderer(), *this, _allocator);
 
 	_game.set_random_seed(Timer::clock());
 
@@ -86,14 +85,14 @@ void Game::run()
 			ScriptContext::global().set("lines", _game.lines());
 			ScriptContext::global().set("level", _game.level());
 			if (_game.has_finished())
-				_gui->push_scene("game_over");
+				_window->gui().push_scene("game_over");
 		}
 
 		// Draw frame.
 
 		_window->renderer().begin_frame();
-		_gui->set_cursor(_window->cursor());
-		_gui->render();
+		_window->gui().set_cursor(_window->cursor());
+		_window->gui().render();
 		_window->draw_console(renderer_builtin);
 		_window->renderer().end_frame();
 
@@ -128,7 +127,7 @@ void Game::save_settings()
 
 bool Game::load()
 {
-	CHECK(_gui->load("examples/tetrium/gui/gui.ion"));
+	CHECK(_window->gui().load("examples/tetrium/gui/gui.ion"));
 
 	Ion::Document data(_allocator);
 
@@ -209,20 +208,17 @@ void Game::on_cursor_movement(Window&, const Dim2&)
 
 void Game::on_key_event(const KeyEvent& event)
 {
-	if (_gui->process_key(event))
-		return;
-
 	if (!event.autorepeat)
 		_bindings.call(event.key, event.pressed ? ScriptCode::Do : ScriptCode::Undo);
 }
 
-void Game::on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect)
+void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
 {
 	renderer.set_texture(_block_texture);
 
-	if (name == S("field"))
+	if (canvas_name == S("field"))
 		draw_field(renderer, rect);
-	else if (name == S("next"))
+	else if (canvas_name == S("next"))
 		draw_next_figure(renderer, rect);
 }
 

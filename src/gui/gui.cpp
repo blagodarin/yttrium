@@ -12,9 +12,8 @@
 namespace Yttrium
 {
 
-GuiImpl::GuiImpl(Renderer& renderer, Callbacks& callbacks, Allocator* allocator)
-	: Gui(allocator)
-	, _proxy_allocator("gui", allocator)
+GuiImpl::GuiImpl(Renderer& renderer, Window::Callbacks& callbacks, Allocator* allocator)
+	: _proxy_allocator("gui", allocator)
 	, _renderer(renderer)
 	, _texture_cache(_renderer.create_texture_cache())
 	, _callbacks(callbacks)
@@ -76,6 +75,13 @@ const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
 {
 	auto i = _fonts.find(String(name, ByReference()));
 	return i != _fonts.end() ? &i->second : nullptr;
+}
+
+bool GuiImpl::process_key_event(const KeyEvent& event)
+{
+	if (_scene_stack.empty())
+		return false;
+	return _scene_stack.back()->process_key(event);
 }
 
 void GuiImpl::set_font(const StaticString& name,
@@ -175,13 +181,6 @@ bool GuiImpl::push_scene(const StaticString& name)
 	return true;
 }
 
-bool GuiImpl::process_key(const KeyEvent& event)
-{
-	return _scene_stack.empty()
-		? false
-		: _scene_stack.back()->process_key(event);
-}
-
 bool GuiImpl::render()
 {
 	if (!_has_size || _scene_stack.empty())
@@ -222,11 +221,6 @@ void GuiImpl::change_scene(const StaticString& old_scene, const StaticString& ne
 void GuiImpl::delete_scene(GuiScene* scene)
 {
 	Y_DELETE(&_proxy_allocator, scene);
-}
-
-GuiPtr Gui::create(Renderer& renderer, Callbacks& callbacks, Allocator* allocator)
-{
-	return GuiPtr(Y_NEW(allocator, GuiImpl)(renderer, callbacks, allocator));
 }
 
 } // namespace Yttrium

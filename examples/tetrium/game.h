@@ -4,7 +4,6 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
-#include <yttrium/gui.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/renderer/texture_cache.h>
 #include <yttrium/window.h>
@@ -17,7 +16,7 @@
 
 using namespace Yttrium;
 
-class Game: public Window::Callbacks, public Gui::Callbacks
+class Game: public Window::Callbacks
 {
 	friend Commands;
 
@@ -37,16 +36,10 @@ private:
 	void load_music();
 	void save_settings();
 
-private: // Window::Callbacks
-
+	// Window::Callbacks
 	void on_cursor_movement(Window& window, const Dim2& movement) override;
 	void on_key_event(const KeyEvent& event) override;
-
-private: // GuiManager::Callbacks
-
-	void on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) override;
-
-private:
+	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
 
 	void draw_field(Renderer& renderer, const RectF& rect);
 	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
@@ -58,11 +51,9 @@ private:
 private:
 
 	Allocator*       _allocator;
-	ProxyAllocator   _renderer_allocator;
 	AudioManager     _audio;
 	WindowPtr        _window;
 	std::unique_ptr<TextureCache> _texture_cache;
-	GuiPtr           _gui;
 	Bindings         _bindings;
 
 	Texture2DPtr _block_texture;

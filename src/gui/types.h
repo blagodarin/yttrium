@@ -37,7 +37,7 @@ enum class WidgetState: WidgetStateType
 	// Special states.
 
 	Count, ///< Number of displayed states.
-	None,  ///< An unset state.
+	NotSet,  ///< An unset state.
 };
 
 enum: WidgetStateType

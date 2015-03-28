@@ -11,6 +11,7 @@
 namespace Yttrium
 {
 
+class Gui;
 class Renderer;
 class RendererBuiltin;
 class StaticString;
@@ -34,6 +35,9 @@ public:
 
 		///
 		virtual void on_key_event(const KeyEvent& event) = 0;
+
+		///
+		virtual void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) = 0;
 	};
 
 	///
@@ -55,6 +59,9 @@ public:
 
 	///
 	virtual void draw_console(RendererBuiltin& renderer) = 0;
+
+	///
+	virtual Gui& gui() = 0;
 
 	///
 	virtual bool is_console_visible() const = 0;

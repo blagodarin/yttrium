@@ -7,6 +7,7 @@
 #include <yttrium/renderer/texture_cache.h>
 #include <yttrium/script/code.h>
 #include <yttrium/texture_font.h>
+#include <yttrium/window.h>
 
 #include "types.h"
 
@@ -46,14 +47,14 @@ public:
 
 public:
 
-	GuiImpl(Renderer& renderer, Callbacks& callbacks, Allocator* allocator);
+	GuiImpl(Renderer& renderer, Window::Callbacks& callbacks, Allocator* allocator);
 	~GuiImpl() override;
 
 public:
 
 	bool add_scene(GuiScene* scene, bool is_root);
 
-	Callbacks& callbacks() const { return _callbacks; }
+	Window::Callbacks& callbacks() const { return _callbacks; }
 
 	GuiScene* create_scene(const StaticString& name);
 
@@ -63,6 +64,8 @@ public:
 	{
 		return const_cast<ProxyAllocator*>(&_proxy_allocator);
 	}
+
+	bool process_key_event(const KeyEvent& event);
 
 	void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 
@@ -92,7 +95,6 @@ public: // Gui
 	bool load(const StaticString& filename) override;
 	bool pop_scenes(size_t count) override;
 	bool push_scene(const StaticString& name) override;
-	bool process_key(const KeyEvent& event) override;
 	bool render() override;
 	void set_cursor(const Vector2f& cursor) override;
 
@@ -106,7 +108,7 @@ private:
 	ProxyAllocator                    _proxy_allocator;
 	Renderer&                         _renderer;
 	std::unique_ptr<TextureCache>     _texture_cache;
-	Callbacks&                        _callbacks;
+	Window::Callbacks&                _callbacks;
 	bool                              _has_size;
 	Vector2f                          _size;
 	Scaling                           _scaling;

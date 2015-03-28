@@ -9,9 +9,9 @@
 namespace Yttrium
 {
 
-Canvas::Canvas(Gui::Callbacks& gui_callbacks, Allocator* allocator)
+Canvas::Canvas(Window::Callbacks& window_callbacks, Allocator* allocator)
 	: Widget(allocator)
-	, _gui_callbacks(gui_callbacks)
+	, _window_callbacks(window_callbacks)
 {
 }
 
@@ -38,7 +38,7 @@ bool Canvas::load(GuiPropertyLoader& loader)
 
 void Canvas::render(Renderer& renderer, const RectF& rect, const Vector2f&, WidgetState) const
 {
-	_gui_callbacks.on_render_canvas(renderer, _name, rect);
+	_window_callbacks.on_render_canvas(renderer, rect, _name);
 }
 
 } // namespace Yttrium

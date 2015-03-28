@@ -119,7 +119,7 @@ GuiIonLoader::GuiIonLoader(GuiImpl *gui)
 
 bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 {
-	Ion::Document document(_gui->allocator());
+	Ion::Document document(_gui->internal_allocator());
 
 	if (!document.load(source_name))
 	{
