@@ -21,7 +21,7 @@ void Pointable::Pointer::reset(Pointable* pointable)
 		++_pointable->_counter;
 }
 
-Pointable::Pointer& Pointable::Pointer::operator=(Pointer&& pointer) noexcept
+Pointable::Pointer& Pointable::Pointer::operator=(Pointer&& pointer)
 {
 	if (_pointable && !--_pointable->_counter)
 		Y_DELETE(_pointable->_allocator, _pointable);

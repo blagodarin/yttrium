@@ -22,63 +22,63 @@ public:
 
 	///
 
-	RendererBuiltin(const RendererBuiltin &renderer) noexcept;
+	RendererBuiltin(const RendererBuiltin &renderer);
 
 	///
 
-	~RendererBuiltin() noexcept;
+	~RendererBuiltin();
 
 public:
 
 	///
 
-	Vector4f color() const noexcept;
+	Vector4f color() const;
 
 	///
 
-	void draw_cursor(int x, int y) noexcept;
+	void draw_cursor(int x, int y);
 
 	///
 
-	void draw_rectangle(int x, int y, int width, int height) noexcept;
+	void draw_rectangle(int x, int y, int width, int height);
 
 	///
 
-	void draw_text(int x, int y, const StaticString &text, int max_size = -1) noexcept;
+	void draw_text(int x, int y, const StaticString &text, int max_size = -1);
 
 	/// Set the drawing color to \a color.
 
-	void set_color(const Vector4f &color) noexcept;
+	void set_color(const Vector4f &color);
 
 	/**
 	* \overload
 	*/
 
-	void set_color(float r, float g, float b, float a = 1) noexcept
+	void set_color(float r, float g, float b, float a = 1)
 	{
 		set_color(Vector4f(r, g, b, a));
 	}
 
 	///
 
-	Dim2 size() const noexcept; // TODO: Rename.
+	Dim2 size() const; // TODO: Rename.
 
 	/// Calculate the \a text size in builtin units.
 
-	Dim2 text_size(const StaticString &text) const noexcept;
+	Dim2 text_size(const StaticString &text) const;
 
 public:
 
 	///
 
-	inline operator bool() const noexcept
+	inline operator bool() const
 	{
 		return _private;
 	}
 
 	///
 
-	RendererBuiltin &operator =(const RendererBuiltin &renderer) noexcept;
+	RendererBuiltin &operator =(const RendererBuiltin &renderer);
 
 private:
 

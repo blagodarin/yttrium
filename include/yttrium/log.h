@@ -24,13 +24,13 @@ public:
 	public:
 
 		///
-		~Writer() noexcept;
+		~Writer();
 
 	public:
 
 		///
 		template <typename T>
-		Y_PRIVATE Writer& operator<<(const T& value) noexcept
+		Y_PRIVATE Writer& operator<<(const T& value)
 		{
 			_message << value;
 			return *this;
@@ -38,7 +38,7 @@ public:
 
 	private:
 
-		Y_PRIVATE Writer(LogManager* log_manager) noexcept;
+		Y_PRIVATE Writer(LogManager* log_manager);
 
 	private:
 
@@ -51,23 +51,23 @@ public:
 public:
 
 	///
-	LogManager(Allocator* allocator = nullptr) noexcept;
+	LogManager(Allocator* allocator = nullptr);
 
 	///
-	LogManager(const StaticString& file, Allocator* allocator = nullptr) noexcept;
+	LogManager(const StaticString& file, Allocator* allocator = nullptr);
 
 	///
-	~LogManager() noexcept;
+	~LogManager();
 
 public:
 
 	///
-	Writer log() noexcept;
+	Writer log();
 
 public:
 
 	///
-	static LogManager* instance() noexcept;
+	static LogManager* instance();
 
 private:
 

@@ -26,31 +26,31 @@ public:
 	};
 
 	///
-	explicit TextureFont(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept
+	explicit TextureFont(const StaticString &name, Allocator *allocator = DefaultAllocator)
 	{
 		open(name, allocator);
 	}
 
 	///
-	const CharInfo *char_info(char symbol) const noexcept;
+	const CharInfo *char_info(char symbol) const;
 
 	///
-	int kerning(char left, char right) const noexcept;
+	int kerning(char left, char right) const;
 
 	///
-	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator) noexcept;
+	bool open(const StaticString &name, Allocator *allocator = DefaultAllocator);
 
 	///
-	Rect rect() const noexcept;
+	Rect rect() const;
 
 	///
-	int size() const noexcept;
+	int size() const;
 
 	///
-	Dim2 text_size(const StaticString &text) const noexcept;
+	Dim2 text_size(const StaticString &text) const;
 
 	///
-	Vector2f text_size(const StaticString &text, const Vector2f &font_size) const noexcept
+	Vector2f text_size(const StaticString &text, const Vector2f &font_size) const
 	{
 		const Dim2& size = text_size(text);
 		return Vector2f(font_size.x * (size.x * font_size.y / size.y), font_size.y);

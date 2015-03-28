@@ -37,12 +37,12 @@ private:
 
 private: // Window::Callbacks
 
-	void on_cursor_movement(Window& window, const Dim2& movement) noexcept override;
-	void on_key_event(const KeyEvent& event) noexcept override;
+	void on_cursor_movement(Window& window, const Dim2& movement) override;
+	void on_key_event(const KeyEvent& event) override;
 
 private: // GuiManager::Callbacks
 
-	void on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) noexcept override;
+	void on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) override;
 
 private:
 

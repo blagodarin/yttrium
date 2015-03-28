@@ -35,18 +35,18 @@ public:
 public:
 
 	///
-	ScriptArgs(ScriptContext& context) noexcept: _context(context) {}
+	ScriptArgs(ScriptContext& context): _context(context) {}
 
 public:
 
 	///
-	size_t size() const noexcept { return _values.size(); }
+	size_t size() const { return _values.size(); }
 
 	///
-	String string(size_t index, NameResolution resolution = DontResolve) const noexcept;
+	String string(size_t index, NameResolution resolution = DontResolve) const;
 
 	///
-	const ScriptValue* value(size_t index) const noexcept;
+	const ScriptValue* value(size_t index) const;
 
 private:
 

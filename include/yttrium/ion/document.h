@@ -26,32 +26,32 @@ class Y_API Document: public Object
 public:
 
 	///
-	Document(Allocator* allocator = DefaultAllocator) noexcept;
+	Document(Allocator* allocator = DefaultAllocator);
 
 	///
-	Document(const Document& document, Allocator* allocator = nullptr) noexcept;
+	Document(const Document& document, Allocator* allocator = nullptr);
 
 	///
-	~Document() noexcept;
+	~Document();
 
 public:
 
 	///
-	Allocator* allocator() const noexcept;
+	Allocator* allocator() const;
 
 	///
-	void clear() noexcept;
+	void clear();
 
 	///
-	bool load(const StaticString& name) noexcept;
+	bool load(const StaticString& name);
 
 	///
-	bool save(const StaticString& name, int indentation = 0) const noexcept;
+	bool save(const StaticString& name, int indentation = 0) const;
 
 public:
 
 	///
-	Document& operator=(const Document& document) noexcept
+	Document& operator=(const Document& document)
 	{
 		clear();
 		concatenate(document);

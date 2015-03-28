@@ -15,8 +15,8 @@ public:
 	WavReader(const StaticString& name, Allocator* allocator);
 
 	bool open() override;
-	size_t read(void* buffer, size_t bytes_to_read) noexcept override;
-	bool seek(uint64_t offset) noexcept override;
+	size_t read(void* buffer, size_t bytes_to_read) override;
+	bool seek(uint64_t offset) override;
 
 private:
 

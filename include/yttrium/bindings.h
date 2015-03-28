@@ -20,34 +20,34 @@ class Y_API Bindings
 public:
 
 	///
-	Bindings(Allocator* allocator = DefaultAllocator) noexcept;
+	Bindings(Allocator* allocator = DefaultAllocator);
 
 	///
-	void bind(Key key, const StaticString& action) noexcept;
+	void bind(Key key, const StaticString& action);
 
 	///
-	bool bind(const StaticString &name, const StaticString& action) noexcept;
+	bool bind(const StaticString &name, const StaticString& action);
 
 	///
-	void bind_default(Key key, const StaticString& action) noexcept;
+	void bind_default(Key key, const StaticString& action);
 
 	///
-	bool bind_default(const StaticString& name, const StaticString& action) noexcept;
+	bool bind_default(const StaticString& name, const StaticString& action);
 
 	///
-	bool call(Key key, ScriptCode::ExecutionMode mode = ScriptCode::Do) noexcept;
+	bool call(Key key, ScriptCode::ExecutionMode mode = ScriptCode::Do);
 
 	///
-	void clear() noexcept;
+	void clear();
 
 	///
-	std::map<String, String> map() const noexcept;
+	std::map<String, String> map() const;
 
 	///
-	void unbind(Key key) noexcept;
+	void unbind(Key key);
 
 	///
-	bool unbind(const StaticString &name) noexcept;
+	bool unbind(const StaticString &name);
 
 private:
 

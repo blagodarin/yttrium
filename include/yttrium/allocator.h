@@ -44,7 +44,7 @@ public:
 
 		///
 
-		Difference(size_t allocated = 0, size_t total = 0, Direction direction = Increment) noexcept
+		Difference(size_t allocated = 0, size_t total = 0, Direction direction = Increment)
 			: allocated(allocated)
 			, total(total)
 			, direction(direction)
@@ -56,22 +56,22 @@ public:
 
 	///
 
-	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept = 0;
+	virtual void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) = 0;
 
 	///
 
-	virtual void deallocate(void *pointer, Difference *difference = nullptr) noexcept = 0;
+	virtual void deallocate(void *pointer, Difference *difference = nullptr) = 0;
 
 	///
 
-	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept = 0;
+	virtual void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) = 0;
 
 public:
 
 	///
 
 	template <typename T>
-	Y_PRIVATE T *allocate(size_t count = 1) noexcept
+	Y_PRIVATE T *allocate(size_t count = 1)
 	{
 		return static_cast<T *>(allocate(sizeof(T) * count));
 	}
@@ -79,7 +79,7 @@ public:
 	///
 
 	template <typename T>
-	void delete_(T *pointer) noexcept
+	void delete_(T *pointer)
 	{
 		if (pointer)
 		{
@@ -91,7 +91,7 @@ public:
 protected:
 
 	Allocator() {}
-	virtual ~Allocator() noexcept {}
+	virtual ~Allocator() {}
 };
 
 } // namespace Yttrium

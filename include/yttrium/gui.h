@@ -29,7 +29,7 @@ public:
 	public:
 
 		///
-		virtual void on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) noexcept = 0;
+		virtual void on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) = 0;
 	};
 
 public:
@@ -37,40 +37,40 @@ public:
 	~Gui() = default;
 
 	///
-	virtual void clear() noexcept = 0;
+	virtual void clear() = 0;
 
 	///
-	virtual void dump(const StaticString& filename) const noexcept = 0;
+	virtual void dump(const StaticString& filename) const = 0;
 
 	///
-	virtual bool has_scene(const StaticString& name) const noexcept = 0;
+	virtual bool has_scene(const StaticString& name) const = 0;
 
 	///
-	virtual bool load(const StaticString& filename) noexcept = 0;
+	virtual bool load(const StaticString& filename) = 0;
 
 	///
-	virtual bool pop_scenes(size_t count) noexcept = 0;
+	virtual bool pop_scenes(size_t count) = 0;
 
 	///
-	virtual bool push_scene(const StaticString& name) noexcept = 0;
+	virtual bool push_scene(const StaticString& name) = 0;
 
 	///
-	virtual bool process_key(const KeyEvent& event) noexcept = 0;
+	virtual bool process_key(const KeyEvent& event) = 0;
 
 	///
-	virtual bool render() noexcept = 0; // TODO: 'const'.
+	virtual bool render() = 0; // TODO: 'const'.
 
 	///
-	virtual void set_cursor(const Vector2f& cursor) noexcept = 0;
+	virtual void set_cursor(const Vector2f& cursor) = 0;
 
 public:
 
 	///
-	static GuiPtr create(Renderer& renderer, Callbacks& callbacks, Allocator* allocator = DefaultAllocator) noexcept;
+	static GuiPtr create(Renderer& renderer, Callbacks& callbacks, Allocator* allocator = DefaultAllocator);
 
 protected:
 
-	Gui(Allocator* allocator) noexcept: Pointable(allocator) {}
+	Gui(Allocator* allocator): Pointable(allocator) {}
 };
 
 } // namespace Yttrium

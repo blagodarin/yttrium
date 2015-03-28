@@ -15,27 +15,27 @@ class ThreadBufferBase
 
 public:
 
-	ThreadBufferBase(size_t capacity) noexcept;
+	ThreadBufferBase(size_t capacity);
 
-	~ThreadBufferBase() noexcept;
+	~ThreadBufferBase();
 
 protected:
 
-	void begin_read() noexcept;
+	void begin_read();
 
-	void begin_write() noexcept;
+	void begin_write();
 
-	void end_read() noexcept;
+	void end_read();
 
-	void end_write() noexcept;
+	void end_write();
 
-	bool try_begin_read() noexcept;
+	bool try_begin_read();
 
-	bool try_begin_read(Clock milliseconds) noexcept;
+	bool try_begin_read(Clock milliseconds);
 
-	bool try_begin_write() noexcept;
+	bool try_begin_write();
 
-	bool try_begin_write(Clock milliseconds) noexcept;
+	bool try_begin_write(Clock milliseconds);
 
 protected:
 
@@ -56,14 +56,14 @@ class ThreadBuffer
 {
 public:
 
-	ThreadBuffer() noexcept
+	ThreadBuffer()
 		: ThreadBufferBase(N)
 	{
 	}
 
 public:
 
-	T read() noexcept
+	T read()
 	{
 		begin_read();
 		const T &result = _buffer[_first];
@@ -71,7 +71,7 @@ public:
 		return result;
 	}
 
-	T read(Clock milliseconds, const T &default_value = T()) noexcept
+	T read(Clock milliseconds, const T &default_value = T())
 	{
 		if (!try_begin_read(milliseconds))
 		{
@@ -82,7 +82,7 @@ public:
 		return result;
 	}
 
-	bool try_read(T *value) noexcept
+	bool try_read(T *value)
 	{
 		if (!try_begin_read())
 		{
@@ -93,7 +93,7 @@ public:
 		return true;
 	}
 
-	bool try_read(T *value, Clock milliseconds) noexcept
+	bool try_read(T *value, Clock milliseconds)
 	{
 		if (!try_begin_read(milliseconds))
 		{
@@ -104,7 +104,7 @@ public:
 		return true;
 	}
 
-	bool try_write(const T &value) noexcept
+	bool try_write(const T &value)
 	{
 		if (!try_begin_write())
 		{
@@ -115,7 +115,7 @@ public:
 		return true;
 	}
 
-	bool try_write(const T &value, Clock milliseconds) noexcept
+	bool try_write(const T &value, Clock milliseconds)
 	{
 		if (!try_begin_write(milliseconds))
 		{
@@ -126,7 +126,7 @@ public:
 		return true;
 	}
 
-	void write(const T &value) noexcept
+	void write(const T &value)
 	{
 		begin_write();
 		_buffer[(_first + _size) % _capacity] = value;

@@ -49,16 +49,16 @@ public:
 	~Screen() = default;
 
 	///
-	virtual ScreenMode mode(ModeType type = CurrentMode) noexcept = 0;
+	virtual ScreenMode mode(ModeType type = CurrentMode) = 0;
 
 public:
 
 	///
-	static ScreenPtr open(Allocator* allocator = DefaultAllocator) noexcept;
+	static ScreenPtr open(Allocator* allocator = DefaultAllocator);
 
 protected:
 
-	Screen(Allocator* allocator) noexcept: Pointable(allocator) {}
+	Screen(Allocator* allocator): Pointable(allocator) {}
 };
 
 } // namespace Yttrium

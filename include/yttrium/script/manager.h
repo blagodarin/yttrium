@@ -22,10 +22,10 @@ class Y_API ScriptManager
 public:
 
 	///
-	ScriptManager(Allocator* allocator = nullptr) noexcept;
+	ScriptManager(Allocator* allocator = nullptr);
 
 	///
-	~ScriptManager() noexcept;
+	~ScriptManager();
 
 private:
 

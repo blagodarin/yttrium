@@ -57,62 +57,62 @@ class Y_API ImageFormat
 public:
 
 	///
-	ImageFormat() noexcept;
+	ImageFormat();
 
 public:
 
 	///
-	inline size_t bits_per_channel() const noexcept;
+	inline size_t bits_per_channel() const;
 
 	///
-	inline size_t bits_per_pixel() const noexcept;
+	inline size_t bits_per_pixel() const;
 
 	///
-	inline size_t channels() const noexcept;
+	inline size_t channels() const;
 
 	///
-	inline size_t frame_size() const noexcept;
+	inline size_t frame_size() const;
 
 	///
-	inline size_t height() const noexcept;
+	inline size_t height() const;
 
 	///
-	inline ImageOrientation orientation() const noexcept;
+	inline ImageOrientation orientation() const;
 
 	///
-	inline PixelFormat pixel_format() const noexcept;
+	inline PixelFormat pixel_format() const;
 
 	///
-	inline size_t row_alignment() const noexcept;
+	inline size_t row_alignment() const;
 
 	///
-	inline size_t row_size() const noexcept;
+	inline size_t row_size() const;
 
 	///
-	inline void set_height(size_t height) noexcept;
+	inline void set_height(size_t height);
 
 	///
-	inline void set_orientation(ImageOrientation orientation) noexcept;
+	inline void set_orientation(ImageOrientation orientation);
 
 	///
-	void set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel) noexcept;
+	void set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel);
 
 	///
-	void set_row_alignment(size_t alignment) noexcept;
+	void set_row_alignment(size_t alignment);
 
 	///
-	void set_width(size_t width) noexcept;
+	void set_width(size_t width);
 
 	///
-	inline size_t width() const noexcept;
+	inline size_t width() const;
 
 public:
 
 	///
-	inline bool operator ==(const ImageFormat& format) const noexcept;
+	inline bool operator ==(const ImageFormat& format) const;
 
 	///
-	inline bool operator !=(const ImageFormat& format) const noexcept;
+	inline bool operator !=(const ImageFormat& format) const;
 
 private:
 
@@ -134,7 +134,7 @@ public:
 
 	///
 
-	Image(Allocator* allocator = DefaultAllocator) noexcept
+	Image(Allocator* allocator = DefaultAllocator)
 		: _buffer(allocator)
 	{
 	}
@@ -144,65 +144,65 @@ public:
 	/// \param allocator Image allocator.
 	/// \note The image data is left uninitialized.
 
-	Image(const ImageFormat& format, Allocator* allocator = DefaultAllocator) noexcept;
+	Image(const ImageFormat& format, Allocator* allocator = DefaultAllocator);
 
 public:
 
 	///
-	const void* const_data() const noexcept
+	const void* const_data() const
 	{
 		return _buffer.data();
 	}
 
 	///
-	void* data() noexcept
+	void* data()
 	{
 		return _buffer.data();
 	}
 
 	///
-	const void* data() const noexcept
+	const void* data() const
 	{
 		return _buffer.data();
 	}
 
 	///
-	ImageFormat format() const noexcept
+	ImageFormat format() const
 	{
 		return _format;
 	}
 
 	///
-	bool intensity_to_bgra() noexcept;
+	bool intensity_to_bgra();
 
 	///
-	bool is_valid() const noexcept
+	bool is_valid() const
 	{
 		return _buffer.data();
 	}
 
 	///
-	bool load(const StaticString& name, ImageType type = ImageType::Auto) noexcept;
+	bool load(const StaticString& name, ImageType type = ImageType::Auto);
 
 	///
-	bool save(const StaticString& name, ImageType type = ImageType::Auto) const noexcept;
+	bool save(const StaticString& name, ImageType type = ImageType::Auto) const;
 
 	/// Change the format to \a format.
 	/// \param format New image format.
 	/// \note The image data becomes undefined after the call.
-	void set_format(const ImageFormat& format) noexcept;
+	void set_format(const ImageFormat& format);
 
 	///
-	void set_size(size_t width, size_t height, size_t row_alignment = 0) noexcept;
+	void set_size(size_t width, size_t height, size_t row_alignment = 0);
 
 	///
-	bool swap_channels() noexcept;
+	bool swap_channels();
 
 public:
 
 	///
 
-	bool operator ==(const Image& image) const noexcept;
+	bool operator ==(const Image& image) const;
 
 private:
 
@@ -213,67 +213,67 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-size_t ImageFormat::bits_per_channel() const noexcept
+size_t ImageFormat::bits_per_channel() const
 {
 	return _bits_per_pixel % _channels ? 0 : _bits_per_pixel / _channels;
 }
 
-size_t ImageFormat::bits_per_pixel() const noexcept
+size_t ImageFormat::bits_per_pixel() const
 {
 	return _bits_per_pixel;
 }
 
-size_t ImageFormat::channels() const noexcept
+size_t ImageFormat::channels() const
 {
 	return _channels;
 }
 
-size_t ImageFormat::frame_size() const noexcept
+size_t ImageFormat::frame_size() const
 {
 	return _row_size * _height;
 }
 
-size_t ImageFormat::height() const noexcept
+size_t ImageFormat::height() const
 {
 	return _height;
 }
 
-ImageOrientation ImageFormat::orientation() const noexcept
+ImageOrientation ImageFormat::orientation() const
 {
 	return _orientation;
 }
 
-PixelFormat ImageFormat::pixel_format() const noexcept
+PixelFormat ImageFormat::pixel_format() const
 {
 	return _pixel_format;
 }
 
-size_t ImageFormat::row_alignment() const noexcept
+size_t ImageFormat::row_alignment() const
 {
 	return _row_alignment;
 }
 
-size_t ImageFormat::row_size() const noexcept
+size_t ImageFormat::row_size() const
 {
 	return _row_size;
 }
 
-void ImageFormat::set_height(size_t height) noexcept
+void ImageFormat::set_height(size_t height)
 {
 	_height = height;
 }
 
-void ImageFormat::set_orientation(ImageOrientation orientation) noexcept
+void ImageFormat::set_orientation(ImageOrientation orientation)
 {
 	_orientation = orientation;
 }
 
-size_t ImageFormat::width() const noexcept
+size_t ImageFormat::width() const
 {
 	return _width;
 }
 
-bool ImageFormat::operator ==(const ImageFormat& format) const noexcept
+bool ImageFormat::operator ==(const ImageFormat& format) const
 {
 	return _pixel_format == format._pixel_format
 		&& _bits_per_pixel == format._bits_per_pixel
@@ -283,7 +283,7 @@ bool ImageFormat::operator ==(const ImageFormat& format) const noexcept
 		&& _height == format._height;
 }
 
-bool ImageFormat::operator !=(const ImageFormat& format) const noexcept
+bool ImageFormat::operator !=(const ImageFormat& format) const
 {
 	return _pixel_format != format._pixel_format
 		|| _bits_per_pixel != format._bits_per_pixel

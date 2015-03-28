@@ -86,7 +86,7 @@ File PackageManager::open_file(const StaticString& name, unsigned mode, Order or
 	return File();
 }
 
-void PackageManager::set_order(Order order) noexcept
+void PackageManager::set_order(Order order)
 {
 	if (order != PresetOrder)
 		_private->_order = order;

@@ -18,11 +18,11 @@ protected:
 
 	BackendTextureCache(const Renderer &renderer);
 
-	~BackendTextureCache() noexcept override;
+	~BackendTextureCache() override;
 
 protected:
 
-	virtual BackendTexture2D *cache_texture_2d(const ImageFormat &format, const void *data) noexcept = 0;
+	virtual BackendTexture2D *cache_texture_2d(const ImageFormat &format, const void *data) = 0;
 
 protected:
 
@@ -30,11 +30,11 @@ protected:
 
 private:
 
-	Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity) noexcept override;
+	Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity) override;
 
-	void clear() noexcept override;
+	void clear() override;
 
-	Texture2DPtr load_texture_2d(const StaticString &name, bool intensity) noexcept override;
+	Texture2DPtr load_texture_2d(const StaticString &name, bool intensity) override;
 
 private:
 

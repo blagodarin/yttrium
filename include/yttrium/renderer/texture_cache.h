@@ -22,25 +22,25 @@ public:
 
 	///
 
-	virtual Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity = false) noexcept = 0;
+	virtual Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity = false) = 0;
 
 	/// Clear the cache.
 
-	virtual void clear() noexcept = 0;
+	virtual void clear() = 0;
 
 	///
 
-	virtual Texture2DPtr load_texture_2d(const StaticString &name, bool intensity = false) noexcept = 0;
+	virtual Texture2DPtr load_texture_2d(const StaticString &name, bool intensity = false) = 0;
 
 public:
 
 	///
 
-	static TextureCachePtr create(const Renderer &renderer) noexcept;
+	static TextureCachePtr create(const Renderer &renderer);
 
 protected:
 
-	TextureCache(Allocator *allocator) noexcept: Pointable(allocator) {}
+	TextureCache(Allocator *allocator): Pointable(allocator) {}
 };
 
 } // namespace Yttrium

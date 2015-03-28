@@ -16,7 +16,7 @@ public:
 
 private:
 
-	BackendTexture2D *cache_texture_2d(const ImageFormat &format, const void *data) noexcept override;
+	BackendTexture2D *cache_texture_2d(const ImageFormat &format, const void *data) override;
 
 private:
 

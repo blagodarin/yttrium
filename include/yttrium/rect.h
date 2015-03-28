@@ -18,7 +18,7 @@ public:
 
 	///
 
-	explicit Rect_(T left = 0, T top = 0, T width = 0, T height = 0) noexcept
+	explicit Rect_(T left = 0, T top = 0, T width = 0, T height = 0)
 		: _left(left)
 		, _top(top)
 		, _right(left + width)
@@ -28,7 +28,7 @@ public:
 
 	///
 
-	explicit Rect_(const Vector2<T>& size) noexcept
+	explicit Rect_(const Vector2<T>& size)
 		: _left(0)
 		, _top(0)
 		, _right(size.x)
@@ -38,7 +38,7 @@ public:
 
 	///
 
-	Rect_(const Vector2<T>& corner, const Vector2<T>& size) noexcept
+	Rect_(const Vector2<T>& corner, const Vector2<T>& size)
 		: _left(corner.x)
 		, _top(corner.y)
 		, _right(corner.x + size.x)
@@ -49,7 +49,7 @@ public:
 	///
 
 	template <typename U>
-	explicit Rect_(const Rect_<U>& rect) noexcept
+	explicit Rect_(const Rect_<U>& rect)
 		: _left(rect.left())
 		, _top(rect.top())
 		, _right(rect.right())
@@ -61,63 +61,63 @@ public:
 
 	///
 
-	T bottom() const noexcept
+	T bottom() const
 	{
 		return _bottom;
 	}
 
 	///
 
-	Vector2<T> bottom_left() const noexcept
+	Vector2<T> bottom_left() const
 	{
 		return Vector2<T>(_left, _bottom);
 	}
 
 	///
 
-	Vector2<T> bottom_right() const noexcept
+	Vector2<T> bottom_right() const
 	{
 		return Vector2<T>(_right, _bottom);
 	}
 
 	///
 
-	Vector2<T> center() const noexcept
+	Vector2<T> center() const
 	{
 		return Vector2<T>((_left + _right) / 2, (_top + _bottom) / 2);
 	}
 
 	///
 
-	T height() const noexcept
+	T height() const
 	{
 		return _bottom - _top;
 	}
 
 	///
 
-	bool is_empty() const noexcept
+	bool is_empty() const
 	{
 		return _left >= _right || _top >= _bottom;
 	}
 
 	///
 
-	T left() const noexcept
+	T left() const
 	{
 		return _left;
 	}
 
 	///
 
-	T right() const noexcept
+	T right() const
 	{
 		return _right;
 	}
 
 	///
 
-	void set_coords(T left, T top, T right, T bottom) noexcept
+	void set_coords(T left, T top, T right, T bottom)
 	{
 		_left = left;
 		_top = top;
@@ -127,14 +127,14 @@ public:
 
 	///
 
-	void set_height(T height) noexcept
+	void set_height(T height)
 	{
 		_bottom = _top + height;
 	}
 
 	///
 
-	void set_left(T left) noexcept
+	void set_left(T left)
 	{
 		_right += left - _left;
 		_left = left;
@@ -142,7 +142,7 @@ public:
 
 	///
 
-	void set_size(T width, T height) noexcept
+	void set_size(T width, T height)
 	{
 		_right = _left + width;
 		_bottom = _top + height;
@@ -150,7 +150,7 @@ public:
 
 	///
 
-	void set_size(const Vector2<T>& size) noexcept
+	void set_size(const Vector2<T>& size)
 	{
 		_right = _left + size.x;
 		_bottom = _top + size.y;
@@ -158,7 +158,7 @@ public:
 
 	///
 
-	void set_top(T top) noexcept
+	void set_top(T top)
 	{
 		_bottom += top - _top;
 		_top = top;
@@ -166,7 +166,7 @@ public:
 
 	///
 
-	void set_top_left(T left, T top) noexcept
+	void set_top_left(T left, T top)
 	{
 		_right += left - _left;
 		_left = left;
@@ -176,7 +176,7 @@ public:
 
 	///
 
-	void set_top_left(const Vector2<T>& top_left) noexcept
+	void set_top_left(const Vector2<T>& top_left)
 	{
 		_right += top_left.x - _left;
 		_left = top_left.x;
@@ -186,42 +186,42 @@ public:
 
 	///
 
-	void set_width(T width) noexcept
+	void set_width(T width)
 	{
 		_right = _left + width;
 	}
 
 	///
 
-	Vector2<T> size() const noexcept
+	Vector2<T> size() const
 	{
 		return Vector2<T>(_right - _left, _bottom - _top);
 	}
 
 	///
 
-	T top() const noexcept
+	T top() const
 	{
 		return _top;
 	}
 
 	///
 
-	Vector2<T> top_left() const noexcept
+	Vector2<T> top_left() const
 	{
 		return Vector2<T>(_left, _top);
 	}
 
 	///
 
-	Vector2<T> top_right() const noexcept
+	Vector2<T> top_right() const
 	{
 		return Vector2<T>(_right, _top);
 	}
 
 	///
 
-	T width() const noexcept
+	T width() const
 	{
 		return _right - _left;
 	}
@@ -230,7 +230,7 @@ public:
 
 	///
 
-	bool contains(const Vector2<T>& point) const noexcept
+	bool contains(const Vector2<T>& point) const
 	{
 		return _left <= point.x && point.x < _right
 			&& _top <= point.y && point.y < _bottom;
@@ -238,7 +238,7 @@ public:
 
 	///
 
-	bool contains(const Rect_& rect) const noexcept
+	bool contains(const Rect_& rect) const
 	{
 		return _left <= rect._left && rect._right <= _right
 			&& _top <= rect._top && rect._bottom <= _bottom;
@@ -246,7 +246,7 @@ public:
 
 	/// Find whether the rects intersect.
 
-	bool fast_intersects(const Rect_& rect) const noexcept
+	bool fast_intersects(const Rect_& rect) const
 	{
 		return (_left - rect._right) * (_right - rect._left) < 0
 			&& (_top - rect._bottom) * (_bottom - rect._top) < 0;
@@ -259,7 +259,7 @@ public:
 	/// though it does report an intersection for a null rect with a non-null rect
 	/// if the point of the null rect lies inside the non-null rect.
 
-	bool intersects(const Rect_& rect) const noexcept
+	bool intersects(const Rect_& rect) const
 	{
 		return _left < rect._right && rect._left < _right
 			&& _top < rect._bottom && rect._top < _bottom;
@@ -269,7 +269,7 @@ public:
 
 	///
 
-	static Rect_ from_coords(T left, T top, T right, T bottom) noexcept
+	static Rect_ from_coords(T left, T top, T right, T bottom)
 	{
 		return Rect_(left, top, right - left, bottom - top);
 	}
@@ -290,21 +290,21 @@ public:
 
 	///
 
-	explicit Rect(int left = 0, int top = 0, int width = 0, int height = 0) noexcept
+	explicit Rect(int left = 0, int top = 0, int width = 0, int height = 0)
 		: Rect_(left, top, width, height)
 	{
 	}
 
 	///
 
-	explicit Rect(const Vector2<int>& size) noexcept
+	explicit Rect(const Vector2<int>& size)
 		: Rect_(size)
 	{
 	}
 
 	///
 
-	Rect(const Vector2<int> &corner, const Vector2<int> &size) noexcept
+	Rect(const Vector2<int> &corner, const Vector2<int> &size)
 		: Rect_(corner, size)
 	{
 	}
@@ -312,7 +312,7 @@ public:
 	///
 
 	template <typename U>
-	explicit Rect(const Rect_<U> &rect) noexcept
+	explicit Rect(const Rect_<U> &rect)
 		: Rect_(rect)
 	{
 	}
@@ -321,7 +321,7 @@ public:
 
 	///
 
-	bool fast_contains(const Vector2<int>& point) const noexcept
+	bool fast_contains(const Vector2<int>& point) const
 	{
 		return ((point.x - _left) ^ (point.x - _right)) < 0
 			&& ((point.y - _top) ^ (point.y - _bottom)) < 0;
@@ -335,7 +335,7 @@ public:
 	/// \note The function reports an intersection of a null rect with itself
 	/// or with a non-null rect if the point of the null rect lies inside the non-null rect.
 
-	bool fastest_intersects(const Rect& rect) const noexcept
+	bool fastest_intersects(const Rect& rect) const
 	{
 		return ((_left - rect._right) ^ (rect._left - _right)) >= 0
 			&& ((_top - rect._bottom) ^ (rect._top - _bottom)) >= 0;

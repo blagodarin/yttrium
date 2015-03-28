@@ -29,34 +29,34 @@ public:
 	typedef std::map<String, String> Archive; // TODO: Think of keeping StaticStrings here.
 
 	///
-	typedef std::function<void (const StaticString& name, String* result, const ScriptArgs& args) noexcept> Command;
+	typedef std::function<void (const StaticString& name, String* result, const ScriptArgs& args)> Command;
 
 public:
 
 	///
-	ScriptContext(Allocator* allocator = DefaultAllocator) noexcept;
+	ScriptContext(Allocator* allocator = DefaultAllocator);
 
 	///
-	ScriptContext(ScriptContext* parent, Allocator* allocator = nullptr) noexcept;
+	ScriptContext(ScriptContext* parent, Allocator* allocator = nullptr);
 
 public:
 
 	///
-	Archive archive() const noexcept;
+	Archive archive() const;
 
 	/// Call a command.
 	/// \param name Command name.
 	/// \param result Command result.
 	/// \param args Command arguments.
 	/// \return \c true if the command was succesfully called.
-	bool call(const StaticString& name, String* result, const ScriptArgs &args) noexcept;
+	bool call(const StaticString& name, String* result, const ScriptArgs &args);
 
 	/// Define a command.
 	/// \param name Command name.
 	/// \param command Command handler.
 	/// \param min_args Minimum number of arguments.
 	/// \param max_args Maximum number of arguments.
-	void define(const StaticString& name, const Command& command, size_t min_args, size_t max_args) noexcept;
+	void define(const StaticString& name, const Command& command, size_t min_args, size_t max_args);
 
 	/**
 	* \overload
@@ -64,7 +64,7 @@ public:
 	* \param command Command handler.
 	* \param args Number of arguments.
 	*/
-	void define(const StaticString &name, const Command &command, size_t args = 0) noexcept
+	void define(const StaticString &name, const Command &command, size_t args = 0)
 	{
 		define(name, command, args, args);
 	}
@@ -73,24 +73,24 @@ public:
 	/// \param script Script text to execute.
 	/// \param mode Execution mode.
 	/// \return \c true on success.
-	bool execute(const StaticString& script, ScriptCode::ExecutionMode mode = ScriptCode::Do) noexcept;
+	bool execute(const StaticString& script, ScriptCode::ExecutionMode mode = ScriptCode::Do);
 
 	/// Execute the script from the specified file.
 	/// \param name Script file to execute.
 	/// \return \c true on success.
-	bool execute_file(const StaticString& name) noexcept;
+	bool execute_file(const StaticString& name);
 
 	/// Find a value by name.
 	/// \param name Value name.
 	/// \return Value pointer or \c nullptr if no such value exist.
-	ScriptValue* find(const StaticString& name) const noexcept;
+	ScriptValue* find(const StaticString& name) const;
 
 	/// Get the root context.
 	/// \return Root context.
-	ScriptContext& root() noexcept;
+	ScriptContext& root();
 
 	///
-	const ScriptValue* set(const StaticString& name, int32_t value, unsigned flags = 0) noexcept;
+	const ScriptValue* set(const StaticString& name, int32_t value, unsigned flags = 0);
 
 	/**
 	* \overload
@@ -99,7 +99,7 @@ public:
 	* \param flags
 	* \return
 	*/
-	const ScriptValue* set(const StaticString& name, double value, unsigned flags = 0) noexcept;
+	const ScriptValue* set(const StaticString& name, double value, unsigned flags = 0);
 
 	/**
 	* \overload
@@ -108,21 +108,21 @@ public:
 	* \param flags
 	* \return
 	*/
-	const ScriptValue* set(const StaticString& name, const StaticString& value, unsigned flags = 0) noexcept;
+	const ScriptValue* set(const StaticString& name, const StaticString& value, unsigned flags = 0);
 
 	/// Substitute script variables in a string.
 	/// \param target
 	/// \param source
 	/// \note Every occurence of the pair of curly braces is threated as a variable name.
-	void substitute(String& target, const StaticString& source) const noexcept;
+	void substitute(String& target, const StaticString& source) const;
 
 	/// Undefine a command.
 	/// \param name Command name.
-	void undefine(const StaticString& name) noexcept;
+	void undefine(const StaticString& name);
 
 	/// Unset a variable.
 	/// \param name Variable name.
-	void unset(const StaticString& name) noexcept;
+	void unset(const StaticString& name);
 
 public:
 

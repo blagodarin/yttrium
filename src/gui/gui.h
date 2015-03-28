@@ -47,7 +47,7 @@ public:
 public:
 
 	GuiImpl(const Renderer& renderer, Callbacks& callbacks, Allocator* allocator);
-	~GuiImpl() noexcept override;
+	~GuiImpl() override;
 
 public:
 
@@ -86,15 +86,15 @@ public:
 
 public: // Gui
 
-	void clear() noexcept override;
-	void dump(const StaticString& filename) const noexcept override;
-	bool has_scene(const StaticString& name) const noexcept override;
-	bool load(const StaticString& filename) noexcept override;
-	bool pop_scenes(size_t count) noexcept override;
-	bool push_scene(const StaticString& name) noexcept override;
-	bool process_key(const KeyEvent& event) noexcept override;
-	bool render() noexcept override;
-	void set_cursor(const Vector2f& cursor) noexcept override;
+	void clear() override;
+	void dump(const StaticString& filename) const override;
+	bool has_scene(const StaticString& name) const override;
+	bool load(const StaticString& filename) override;
+	bool pop_scenes(size_t count) override;
+	bool push_scene(const StaticString& name) override;
+	bool process_key(const KeyEvent& event) override;
+	bool render() override;
+	void set_cursor(const Vector2f& cursor) override;
 
 private:
 

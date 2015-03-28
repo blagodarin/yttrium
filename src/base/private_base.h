@@ -151,13 +151,13 @@ private:
 };
 
 #define Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Class) \
-	Class::~Class() noexcept { Private::release(&_private); } \
-	Class& Class::operator=(Class&& x) noexcept { Private::move(_private, x._private); return *this; } \
+	Class::~Class() { Private::release(&_private); } \
+	Class& Class::operator=(Class&& x) { Private::move(_private, x._private); return *this; } \
 
 #define Y_IMPLEMENT_PRIVATE(Class) \
 	Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Class) \
-	Class::Class(const Class& x) noexcept: _private(Private::copy(x._private)) {} \
-	Class& Class::operator=(const Class& x) noexcept { Private::copy(_private, x._private); return *this; } \
+	Class::Class(const Class& x): _private(Private::copy(x._private)) {} \
+	Class& Class::operator=(const Class& x) { Private::copy(_private, x._private); return *this; } \
 
 } // namespace Yttrium
 

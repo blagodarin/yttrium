@@ -28,30 +28,30 @@ public:
 
 	///
 
-	Node() noexcept;
+	Node();
 
 public:
 
 	///
 
-	inline StaticString name() const noexcept { return _name; }
+	inline StaticString name() const { return _name; }
 
 	///
 
-	void serialize(String *result, int indentation = 0) const noexcept;
+	void serialize(String *result, int indentation = 0) const;
 
 	///
 
-	String serialize(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+	String serialize(int indentation = 0, Allocator *allocator = nullptr) const;
 
 	///
 
-	StaticString string(const StaticString &default_value = StaticString()) const noexcept;
+	StaticString string(const StaticString &default_value = StaticString()) const;
 
 private:
 
-	Y_PRIVATE Node(Document *document, const StaticString &name) noexcept;
-	Y_PRIVATE Node(Document *document, const StaticString &name, const ByReference &) noexcept;
+	Y_PRIVATE Node(Document *document, const StaticString &name);
+	Y_PRIVATE Node(Document *document, const StaticString &name, const ByReference &);
 
 private:
 

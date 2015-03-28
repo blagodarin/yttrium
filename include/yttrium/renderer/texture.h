@@ -53,35 +53,35 @@ public:
 
 	///
 
-	Filter filter() const noexcept
+	Filter filter() const
 	{
 		return _filter;
 	}
 
 	///
 
-	Rect rect() const noexcept
+	Rect rect() const
 	{
 		return Rect(0, 0, _size.x, _size.y);
 	}
 
 	///
 
-	void set_filter(Filter filter) noexcept
+	void set_filter(Filter filter)
 	{
 		_filter = filter;
 	}
 
 	///
 
-	Dim2 size() const noexcept
+	Dim2 size() const
 	{
 		return _size;
 	}
 
 protected:
 
-	Texture2D(const Dim2 &size, Allocator *allocator) noexcept
+	Texture2D(const Dim2 &size, Allocator *allocator)
 		: Pointable(allocator)
 		, _size(size)
 		, _filter(NearestFilter)

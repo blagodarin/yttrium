@@ -204,11 +204,11 @@ void Game::load_music()
 	_audio.player().play();
 }
 
-void Game::on_cursor_movement(Window&, const Dim2&) noexcept
+void Game::on_cursor_movement(Window&, const Dim2&)
 {
 }
 
-void Game::on_key_event(const KeyEvent& event) noexcept
+void Game::on_key_event(const KeyEvent& event)
 {
 	if (_gui->process_key(event))
 		return;
@@ -217,7 +217,7 @@ void Game::on_key_event(const KeyEvent& event) noexcept
 		_bindings.call(event.key, event.pressed ? ScriptCode::Do : ScriptCode::Undo);
 }
 
-void Game::on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) noexcept
+void Game::on_render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect)
 {
 	renderer.set_texture(_block_texture);
 

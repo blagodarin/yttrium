@@ -18,7 +18,7 @@ class Y_API Buffer
 public:
 
 	///
-	Buffer(Allocator* allocator = DefaultAllocator) noexcept
+	Buffer(Allocator* allocator = DefaultAllocator)
 		: _data(nullptr)
 		, _size(0)
 		, _allocator(allocator)
@@ -26,95 +26,95 @@ public:
 	}
 
 	///
-	Buffer(const Buffer& buffer, Allocator* allocator = DefaultAllocator) noexcept;
+	Buffer(const Buffer& buffer, Allocator* allocator = DefaultAllocator);
 
 	///
-	Buffer(size_t size, Allocator* allocator = DefaultAllocator) noexcept;
+	Buffer(size_t size, Allocator* allocator = DefaultAllocator);
 
 	///
-	~Buffer() noexcept;
+	~Buffer();
 
 public:
 
 	///
 
-	Allocator *allocator() const noexcept
+	Allocator* allocator() const
 	{
 		return _allocator;
 	}
 
 	///
 
-	const void *const_data() const noexcept
+	const void* const_data() const
 	{
 		return _data;
 	}
 
 	///
 
-	const void *const_data(size_t offset) noexcept
+	const void* const_data(size_t offset)
 	{
-		return static_cast<const char *>(_data) + offset;
+		return static_cast<const char*>(_data) + offset;
 	}
 
 	///
 
-	void *data() noexcept
-	{
-		return _data;
-	}
-
-	///
-
-	void *data(size_t offset) noexcept
-	{
-		return static_cast<char *>(_data) + offset;
-	}
-
-	///
-
-	const void *data() const noexcept
+	void* data()
 	{
 		return _data;
 	}
 
 	///
 
-	void resize(size_t size) noexcept;
+	void* data(size_t offset)
+	{
+		return static_cast<char*>(_data) + offset;
+	}
 
 	///
 
-	size_t size() const noexcept
+	const void* data() const
+	{
+		return _data;
+	}
+
+	///
+
+	void resize(size_t size);
+
+	///
+
+	size_t size() const
 	{
 		return _size;
 	}
 
 	///
 
-	void swap(Buffer *) noexcept;
+	void swap(Buffer*);
 
 	/**
 	* \overload
 	* \return
 	*/
 
-	void swap(Buffer &&) noexcept;
+	void swap(Buffer&&);
 
 public:
 
 	///
 
-	bool operator ==(const Buffer &buffer) const noexcept;
+	bool operator ==(const Buffer& buffer) const;
 
 	///
 
-	bool operator !=(const Buffer &buffer) const noexcept;
+	bool operator !=(const Buffer& buffer) const;
 
 private:
 
-	void      *_data;
+	void*      _data;
 	size_t     _size;
-	Allocator *_allocator;
+	Allocator* _allocator;
 };
 
 } // namespace Yttrium

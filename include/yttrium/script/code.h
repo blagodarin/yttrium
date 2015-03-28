@@ -28,18 +28,18 @@ public:
 	};
 
 	///
-	explicit ScriptCode(String&& text) noexcept;
+	explicit ScriptCode(String&& text);
 
 	///
-	explicit ScriptCode(const StaticString& text) noexcept;
+	explicit ScriptCode(const StaticString& text);
 
 	/// Execute the script.
 	/// \param context Context to execute the script in, or \c nullptr for the global context.
 	/// \param mode Execution mode.
-	void execute(ScriptContext* context = nullptr, ExecutionMode mode = Do) const noexcept;
+	void execute(ScriptContext* context = nullptr, ExecutionMode mode = Do) const;
 
 	///
-	static ScriptCode load(const StaticString& filename) noexcept;
+	static ScriptCode load(const StaticString& filename);
 };
 
 } // namespace Yttrium

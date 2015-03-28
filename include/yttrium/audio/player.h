@@ -50,37 +50,37 @@ public:
 	/// \param name Audio file name.
 	/// \param settings Playback parameters.
 	/// \param type Audio file type.
-	void load(const StaticString& name, const Settings& settings = Settings(), AudioType type = AudioType::Auto) noexcept;
+	void load(const StaticString& name, const Settings& settings = Settings(), AudioType type = AudioType::Auto);
 
 	/**
 	* \overload
 	* \param name Audio file name.
 	* \param type Audio file type.
 	*/
-	void load(const StaticString& name, AudioType type) noexcept
+	void load(const StaticString& name, AudioType type)
 	{
 		load(name, Settings(), type);
 	}
 
 	/// Clear the playlist.
-	void clear() noexcept;
+	void clear();
 
 	/// Set the playback order.
 	/// \param order Playback order.
-	void set_order(Order order) noexcept;
+	void set_order(Order order);
 
 	/// Start or resume the playback.
-	void play() noexcept;
+	void play();
 
 	/// Pause the playback.
-	void pause() noexcept;
+	void pause();
 
 	/// Stop the playback.
-	void stop() noexcept;
+	void stop();
 
 	/// Check if music is currently playing.
 	/// \return Playback status.
-	bool is_playing() const noexcept;
+	bool is_playing() const;
 
 public:
 

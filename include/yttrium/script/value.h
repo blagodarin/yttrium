@@ -42,29 +42,29 @@ public:
 public:
 
 	///
-	int32_t to_int32() const noexcept { return _value.to_int32(); }
+	int32_t to_int32() const { return _value.to_int32(); }
 
 	///
-	double to_double() const noexcept { return _value.to_double(); }
+	double to_double() const { return _value.to_double(); }
 
 	///
-	Yttrium::String to_string() const noexcept { return _value; }
+	Yttrium::String to_string() const { return _value; }
 
 	///
-	Type type() const noexcept { return _type; }
+	Type type() const { return _type; }
 
 public:
 
 	///
-	ScriptValue& operator=(int32_t value) noexcept;
+	ScriptValue& operator=(int32_t value);
 
 	///
 
-	ScriptValue& operator=(double value) noexcept;
+	ScriptValue& operator=(double value);
 
 	///
 
-	ScriptValue& operator=(const StaticString& value) noexcept;
+	ScriptValue& operator=(const StaticString& value);
 
 private:
 

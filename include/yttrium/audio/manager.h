@@ -21,39 +21,39 @@ class Y_API AudioManager
 public:
 
 	///
-	AudioManager(Allocator* allocator = DefaultAllocator) noexcept;
+	AudioManager(Allocator* allocator = DefaultAllocator);
 
 	///
-	~AudioManager() noexcept;
+	~AudioManager();
 
 public:
 
 	/// Get the current backend name.
 	/// \return Audio backend name.
 	/// \note The result is valid through all the library lifetime.
-	StaticString backend() const noexcept;
+	StaticString backend() const;
 
 	///
-	void close() noexcept;
+	void close();
 
 	/// Get the current backend device name.
 	/// \return Audio output device name.
 	/// \note The result is valid until the manager is closed.
-	StaticString device() const noexcept;
+	StaticString device() const;
 
 	///
-	bool open(const StaticString& backend = StaticString(), const StaticString& device = StaticString()) noexcept;
+	bool open(const StaticString& backend = StaticString(), const StaticString& device = StaticString());
 
 	///
-	AudioPlayer player() noexcept;
+	AudioPlayer player();
 
 public:
 
 	///
-	static std::vector<StaticString> backends() noexcept;
+	static std::vector<StaticString> backends();
 
 	///
-	static std::vector<StaticString> backend_devices(const StaticString& backend) noexcept;
+	static std::vector<StaticString> backend_devices(const StaticString& backend);
 
 public:
 

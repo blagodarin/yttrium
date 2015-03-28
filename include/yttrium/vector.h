@@ -27,97 +27,97 @@ public:
 
 	///
 
-	Vector2(int) noexcept;
+	Vector2(int);
 
 	///
 
-	Vector2(T x, T y) noexcept;
+	Vector2(T x, T y);
 
 	///
 
 	template <typename U>
-	Vector2(const Vector2<U> &vector) noexcept;
+	Vector2(const Vector2<U> &vector);
 
 public:
 
 	///
 
-	T *data() noexcept;
+	T *data();
 
 	///
 
-	const T *data() const noexcept;
+	const T *data() const;
 
 	///
 
 	template <typename U>
-	Vector2<U> to() const noexcept;
+	Vector2<U> to() const;
 
 public:
 
 	///
 
-	Vector2 operator +(T value) const noexcept;
+	Vector2 operator +(T value) const;
 
 	///
 
-	Vector2 operator +(const Vector2 &vector) const noexcept;
+	Vector2 operator +(const Vector2 &vector) const;
 
 	///
 
-	Vector2 &operator +=(T value) noexcept;
+	Vector2 &operator +=(T value);
 
 	///
 
-	Vector2 &operator +=(const Vector2 &vector) noexcept;
+	Vector2 &operator +=(const Vector2 &vector);
 
 	///
 
-	Vector2 operator -(T value) const noexcept;
+	Vector2 operator -(T value) const;
 
 	///
 
-	Vector2 operator -(const Vector2 &vector) const noexcept;
+	Vector2 operator -(const Vector2 &vector) const;
 
 	///
 
-	Vector2 &operator -=(T value) noexcept;
+	Vector2 &operator -=(T value);
 
 	///
 
-	Vector2 &operator -=(const Vector2 &vector) noexcept;
+	Vector2 &operator -=(const Vector2 &vector);
 
 	///
 
-	Vector2 operator *(T value) const noexcept;
+	Vector2 operator *(T value) const;
 
 	///
 
-	Vector2 operator *(const Vector2 &vector) const noexcept;
+	Vector2 operator *(const Vector2 &vector) const;
 
 	///
 
-	Vector2 &operator *=(T value) noexcept;
+	Vector2 &operator *=(T value);
 
 	///
 
-	Vector2 &operator *=(const Vector2 &vector) noexcept;
+	Vector2 &operator *=(const Vector2 &vector);
 
 	///
 
-	Vector2 operator /(T value) const noexcept;
+	Vector2 operator /(T value) const;
 
 	///
 
-	Vector2 operator /(const Vector2 &vector) const noexcept;
+	Vector2 operator /(const Vector2 &vector) const;
 
 	///
 
-	Vector2 &operator /=(T value) noexcept;
+	Vector2 &operator /=(T value);
 
 	///
 
-	Vector2 &operator /=(const Vector2 &vector) noexcept;
+	Vector2 &operator /=(const Vector2 &vector);
 };
 
 /// 4-component vector.
@@ -162,90 +162,90 @@ public:
 
 	///
 
-	Vector4(int) noexcept;
+	Vector4(int);
 
 	///
 
-	Vector4(T x, T y, T z, T w = 1) noexcept;
+	Vector4(T x, T y, T z, T w = 1);
 
 	///
 
 	template <typename U>
-	Vector4(const Vector4<U> &vector) noexcept;
+	Vector4(const Vector4<U> &vector);
 
 public:
 
 	///
 
-	T *data() noexcept;
+	T *data();
 
 	///
 
-	const T *data() const noexcept;
+	const T *data() const;
 
 public:
 
 	///
 
-	Vector4 operator +(T value) const noexcept;
+	Vector4 operator +(T value) const;
 
 	///
 
-	Vector4 operator +(const Vector4 &vector) const noexcept;
+	Vector4 operator +(const Vector4 &vector) const;
 
 	///
 
-	Vector4 &operator +=(T value) noexcept;
+	Vector4 &operator +=(T value);
 
 	///
 
-	Vector4 &operator +=(const Vector4 &vector) noexcept;
+	Vector4 &operator +=(const Vector4 &vector);
 
 	///
 
-	Vector4 operator -(T value) const noexcept;
+	Vector4 operator -(T value) const;
 
 	///
 
-	Vector4 operator -(const Vector4 &vector) const noexcept;
+	Vector4 operator -(const Vector4 &vector) const;
 
 	///
 
-	Vector4 &operator -=(T value) noexcept;
+	Vector4 &operator -=(T value);
 
 	///
 
-	Vector4 &operator -=(const Vector4 &vector) noexcept;
+	Vector4 &operator -=(const Vector4 &vector);
 
 	///
 
-	Vector4 operator *(T value) const noexcept;
+	Vector4 operator *(T value) const;
 
 	///
 
-	Vector4 operator *(const Vector4 &vector) const noexcept;
+	Vector4 operator *(const Vector4 &vector) const;
 
 	///
 
-	Vector4 &operator *=(T value) noexcept;
+	Vector4 &operator *=(T value);
 
 	///
 
-	Vector4 &operator *=(const Vector4 &vector) noexcept;
+	Vector4 &operator *=(const Vector4 &vector);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-Vector2<T>::Vector2(int) noexcept
+Vector2<T>::Vector2(int)
 	: x(0)
 	, y(0)
 {
 }
 
 template <typename T>
-Vector2<T>::Vector2(T x, T y) noexcept
+Vector2<T>::Vector2(T x, T y)
 	: x(x)
 	, y(y)
 {
@@ -253,45 +253,45 @@ Vector2<T>::Vector2(T x, T y) noexcept
 
 template <typename T>
 template <typename U>
-Vector2<T>::Vector2(const Vector2<U> &vector) noexcept
+Vector2<T>::Vector2(const Vector2<U> &vector)
 	: x(vector.x)
 	, y(vector.y)
 {
 }
 
 template <typename T>
-T *Vector2<T>::data() noexcept
+T *Vector2<T>::data()
 {
 	return &x;
 }
 
 template <typename T>
-const T *Vector2<T>::data() const noexcept
+const T *Vector2<T>::data() const
 {
 	return &x;
 }
 
 template <typename T>
 template <typename U>
-Vector2<U> Vector2<T>::to() const noexcept
+Vector2<U> Vector2<T>::to() const
 {
 	return Vector2<U>(x, y);
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator +(T value) const noexcept
+Vector2<T> Vector2<T>::operator +(T value) const
 {
 	return Vector2(x + value, y + value);
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator +(const Vector2 &vector) const noexcept
+Vector2<T> Vector2<T>::operator +(const Vector2 &vector) const
 {
 	return Vector2(x + vector.x, y + vector.y);
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator +=(T value) noexcept
+Vector2<T> &Vector2<T>::operator +=(T value)
 {
 	x += value;
 	y += value;
@@ -299,7 +299,7 @@ Vector2<T> &Vector2<T>::operator +=(T value) noexcept
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator +=(const Vector2 &vector) noexcept
+Vector2<T> &Vector2<T>::operator +=(const Vector2 &vector)
 {
 	x += vector.x;
 	y += vector.y;
@@ -307,19 +307,19 @@ Vector2<T> &Vector2<T>::operator +=(const Vector2 &vector) noexcept
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator -(T value) const noexcept
+Vector2<T> Vector2<T>::operator -(T value) const
 {
 	return Vector2(x - value, y - value);
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator -(const Vector2 &vector) const noexcept
+Vector2<T> Vector2<T>::operator -(const Vector2 &vector) const
 {
 	return Vector2(x - vector.x, y - vector.y);
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator -=(T value) noexcept
+Vector2<T> &Vector2<T>::operator -=(T value)
 {
 	x -= value;
 	y -= value;
@@ -327,7 +327,7 @@ Vector2<T> &Vector2<T>::operator -=(T value) noexcept
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator -=(const Vector2 &vector) noexcept
+Vector2<T> &Vector2<T>::operator -=(const Vector2 &vector)
 {
 	x -= vector.x;
 	y -= vector.y;
@@ -335,19 +335,19 @@ Vector2<T> &Vector2<T>::operator -=(const Vector2 &vector) noexcept
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator *(T value) const noexcept
+Vector2<T> Vector2<T>::operator *(T value) const
 {
 	return Vector2(x * value, y * value);
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator *(const Vector2 &vector) const noexcept
+Vector2<T> Vector2<T>::operator *(const Vector2 &vector) const
 {
 	return Vector2(x * vector.x, y * vector.y);
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator *=(T value) noexcept
+Vector2<T> &Vector2<T>::operator *=(T value)
 {
 	x *= value;
 	y *= value;
@@ -355,7 +355,7 @@ Vector2<T> &Vector2<T>::operator *=(T value) noexcept
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator *=(const Vector2 &vector) noexcept
+Vector2<T> &Vector2<T>::operator *=(const Vector2 &vector)
 {
 	x *= vector.x;
 	y *= vector.y;
@@ -363,19 +363,19 @@ Vector2<T> &Vector2<T>::operator *=(const Vector2 &vector) noexcept
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator /(T value) const noexcept
+Vector2<T> Vector2<T>::operator /(T value) const
 {
 	return Vector2(x / value, y / value);
 }
 
 template <typename T>
-Vector2<T> Vector2<T>::operator /(const Vector2 &vector) const noexcept
+Vector2<T> Vector2<T>::operator /(const Vector2 &vector) const
 {
 	return Vector2(x / vector.x, y / vector.y);
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator /=(T value) noexcept
+Vector2<T> &Vector2<T>::operator /=(T value)
 {
 	x /= value;
 	y /= value;
@@ -383,7 +383,7 @@ Vector2<T> &Vector2<T>::operator /=(T value) noexcept
 }
 
 template <typename T>
-Vector2<T> &Vector2<T>::operator /=(const Vector2 &vector) noexcept
+Vector2<T> &Vector2<T>::operator /=(const Vector2 &vector)
 {
 	x /= vector.x;
 	y /= vector.y;
@@ -393,7 +393,7 @@ Vector2<T> &Vector2<T>::operator /=(const Vector2 &vector) noexcept
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-Vector4<T>::Vector4(int) noexcept
+Vector4<T>::Vector4(int)
 	: x(0)
 	, y(0)
 	, z(0)
@@ -402,7 +402,7 @@ Vector4<T>::Vector4(int) noexcept
 }
 
 template <typename T>
-Vector4<T>::Vector4(T x, T y, T z, T w) noexcept
+Vector4<T>::Vector4(T x, T y, T z, T w)
 	: x(x)
 	, y(y)
 	, z(z)
@@ -412,7 +412,7 @@ Vector4<T>::Vector4(T x, T y, T z, T w) noexcept
 
 template <typename T>
 template <typename U>
-Vector4<T>::Vector4(const Vector4<U> &vector) noexcept
+Vector4<T>::Vector4(const Vector4<U> &vector)
 	: x(vector.x)
 	, y(vector.y)
 	, z(vector.z)
@@ -421,31 +421,31 @@ Vector4<T>::Vector4(const Vector4<U> &vector) noexcept
 }
 
 template <typename T>
-T *Vector4<T>::data() noexcept
+T *Vector4<T>::data()
 {
 	return &x;
 }
 
 template <typename T>
-const T *Vector4<T>::data() const noexcept
+const T *Vector4<T>::data() const
 {
 	return &x;
 }
 
 template <typename T>
-Vector4<T> Vector4<T>::operator +(T value) const noexcept
+Vector4<T> Vector4<T>::operator +(T value) const
 {
 	return Vector4(x + value, y + value, z + value, w);
 }
 
 template <typename T>
-Vector4<T> Vector4<T>::operator +(const Vector4 &vector) const noexcept
+Vector4<T> Vector4<T>::operator +(const Vector4 &vector) const
 {
 	return Vector4(x + vector.x, y + vector.y, z + vector.z, w);
 }
 
 template <typename T>
-Vector4<T> &Vector4<T>::operator +=(T value) noexcept
+Vector4<T> &Vector4<T>::operator +=(T value)
 {
 	x += value;
 	y += value;
@@ -454,7 +454,7 @@ Vector4<T> &Vector4<T>::operator +=(T value) noexcept
 }
 
 template <typename T>
-Vector4<T> &Vector4<T>::operator +=(const Vector4 &vector) noexcept
+Vector4<T> &Vector4<T>::operator +=(const Vector4 &vector)
 {
 	x += vector.x;
 	y += vector.y;
@@ -463,19 +463,19 @@ Vector4<T> &Vector4<T>::operator +=(const Vector4 &vector) noexcept
 }
 
 template <typename T>
-Vector4<T> Vector4<T>::operator -(T value) const noexcept
+Vector4<T> Vector4<T>::operator -(T value) const
 {
 	return Vector4(x - value, y - value, z - value, w);
 }
 
 template <typename T>
-Vector4<T> Vector4<T>::operator -(const Vector4 &vector) const noexcept
+Vector4<T> Vector4<T>::operator -(const Vector4 &vector) const
 {
 	return Vector4(x - vector.x, y - vector.y, z - vector.z, w);
 }
 
 template <typename T>
-Vector4<T> &Vector4<T>::operator -=(T value) noexcept
+Vector4<T> &Vector4<T>::operator -=(T value)
 {
 	x -= value;
 	y -= value;
@@ -484,7 +484,7 @@ Vector4<T> &Vector4<T>::operator -=(T value) noexcept
 }
 
 template <typename T>
-Vector4<T> &Vector4<T>::operator -=(const Vector4 &vector) noexcept
+Vector4<T> &Vector4<T>::operator -=(const Vector4 &vector)
 {
 	x -= vector.x;
 	y -= vector.y;
@@ -493,19 +493,19 @@ Vector4<T> &Vector4<T>::operator -=(const Vector4 &vector) noexcept
 }
 
 template <typename T>
-Vector4<T> Vector4<T>::operator *(T value) const noexcept
+Vector4<T> Vector4<T>::operator *(T value) const
 {
 	return Vector4(x * value, y * value, z * value, w);
 }
 
 template <typename T>
-Vector4<T> Vector4<T>::operator *(const Vector4 &vector) const noexcept
+Vector4<T> Vector4<T>::operator *(const Vector4 &vector) const
 {
 	return Vector4(x * vector.x, y * vector.y, z * vector.z, w);
 }
 
 template <typename T>
-Vector4<T> &Vector4<T>::operator *=(T value) noexcept
+Vector4<T> &Vector4<T>::operator *=(T value)
 {
 	x *= value;
 	y *= value;
@@ -514,7 +514,7 @@ Vector4<T> &Vector4<T>::operator *=(T value) noexcept
 }
 
 template <typename T>
-Vector4<T> &Vector4<T>::operator *=(const Vector4 &vector) noexcept
+Vector4<T> &Vector4<T>::operator *=(const Vector4 &vector)
 {
 	x *= vector.x;
 	y *= vector.y;

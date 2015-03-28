@@ -16,27 +16,27 @@ public:
 
 	///
 
-	AtomicMemoryStatus() noexcept;
+	AtomicMemoryStatus();
 
 public:
 
 	///
 
-	void allocate(const Allocator::Difference &difference) noexcept;
+	void allocate(const Allocator::Difference &difference);
 
 	///
 
-	void deallocate(const Allocator::Difference &difference) noexcept;
+	void deallocate(const Allocator::Difference &difference);
 
 	///
 
-	void reallocate(const Allocator::Difference &difference) noexcept;
+	void reallocate(const Allocator::Difference &difference);
 
 public:
 
 	///
 
-	operator MemoryStatus() const noexcept;
+	operator MemoryStatus() const;
 
 private:
 

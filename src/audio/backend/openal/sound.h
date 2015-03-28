@@ -15,7 +15,7 @@ class OpenAlSound: public SoundImpl
 
 public:
 
-	void play() const noexcept override;
+	void play() const override;
 
 private:
 
@@ -26,7 +26,7 @@ private:
 	{
 	}
 
-	~OpenAlSound() noexcept override;
+	~OpenAlSound() override;
 
 	bool load(AudioReader* reader) override;
 

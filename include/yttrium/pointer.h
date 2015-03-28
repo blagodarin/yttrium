@@ -30,21 +30,21 @@ public:
 
 		///
 
-		Pointer() noexcept
+		Pointer()
 			: _pointable(nullptr)
 		{
 		}
 
 		///
 
-		Pointer(const Pointer& pointer) noexcept
+		Pointer(const Pointer& pointer)
 			: Pointer(pointer._pointable)
 		{
 		}
 
 		///
 
-		Pointer(Pointer&& pointer) noexcept
+		Pointer(Pointer&& pointer)
 			: _pointable(pointer._pointable)
 		{
 			pointer._pointable = nullptr;
@@ -52,11 +52,11 @@ public:
 
 		///
 
-		explicit Pointer(Pointable* pointable) noexcept;
+		explicit Pointer(Pointable* pointable);
 
 		///
 
-		~Pointer() noexcept
+		~Pointer()
 		{
 			reset();
 		}
@@ -65,41 +65,41 @@ public:
 
 		///
 
-		explicit operator bool() const noexcept
+		explicit operator bool() const
 		{
 			return _pointable;
 		}
 
 		///
 
-		Pointable* get() const noexcept
+		Pointable* get() const
 		{
 			return _pointable;
 		}
 
 		///
 
-		void reset(Pointable* pointable = nullptr) noexcept;
+		void reset(Pointable* pointable = nullptr);
 
 	public:
 
 		///
 
-		Pointable* operator->() const noexcept
+		Pointable* operator->() const
 		{
 			return _pointable;
 		}
 
 		///
 
-		Pointable& operator*() const noexcept
+		Pointable& operator*() const
 		{
 			return *_pointable;
 		}
 
 		///
 
-		Pointer& operator=(const Pointer& pointer) noexcept
+		Pointer& operator=(const Pointer& pointer)
 		{
 			reset(pointer._pointable);
 			return *this;
@@ -107,11 +107,11 @@ public:
 
 		///
 
-		Pointer& operator=(Pointer&& pointer) noexcept;
+		Pointer& operator=(Pointer&& pointer);
 
 		///
 
-		bool operator==(const Pointer& pointer) const noexcept
+		bool operator==(const Pointer& pointer) const
 		{
 			return _pointable == pointer._pointable;
 		}
@@ -127,7 +127,7 @@ public:
 
 	///
 
-	Allocator* allocator() const noexcept
+	Allocator* allocator() const
 	{
 		return _allocator;
 	}
@@ -136,7 +136,7 @@ protected:
 
 	///
 
-	explicit Pointable(Allocator* allocator) noexcept
+	explicit Pointable(Allocator* allocator)
 		: _allocator(allocator)
 		, _counter(0)
 	{
@@ -144,7 +144,7 @@ protected:
 
 	///
 
-	virtual ~Pointable() noexcept
+	virtual ~Pointable()
 	{
 	}
 
@@ -161,16 +161,16 @@ class Pointer: public Pointable::Pointer
 {
 public:
 
-	Pointer() noexcept = default;
-	Pointer(const Pointer&) noexcept = default;
-	Pointer(Pointer&&) noexcept = default;
+	Pointer() = default;
+	Pointer(const Pointer&) = default;
+	Pointer(Pointer&&) = default;
 
-	Pointer& operator=(const Pointer&) noexcept = default;
-	Pointer& operator=(Pointer&&) noexcept = default;
+	Pointer& operator=(const Pointer&) = default;
+	Pointer& operator=(Pointer&&) = default;
 
 	///
 
-	explicit Pointer(T* pointable) noexcept
+	explicit Pointer(T* pointable)
 		: Pointable::Pointer(pointable)
 	{
 	}
@@ -179,7 +179,7 @@ public:
 
 	///
 
-	T* get() const noexcept
+	T* get() const
 	{
 		return static_cast<T*>(Pointable::Pointer::get());
 	}
@@ -188,14 +188,14 @@ public:
 
 	///
 
-	T* operator->() const noexcept
+	T* operator->() const
 	{
 		return static_cast<T*>(Pointable::Pointer::get());
 	}
 
 	///
 
-	T& operator*() const noexcept
+	T& operator*() const
 	{
 		return *static_cast<T*>(Pointable::Pointer::get());
 	}

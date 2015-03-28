@@ -35,22 +35,22 @@ Commands::Commands(Game& game)
 	ScriptContext::global().define("unset", std::bind(&Commands::unset, this, _1, _2, _3), 1);
 }
 
-void Commands::bind(const StaticString&, String*, const ScriptArgs& args) noexcept
+void Commands::bind(const StaticString&, String*, const ScriptArgs& args)
 {
 	_game._bindings.bind(args.string(0), args.string(1));
 }
 
-void Commands::exit(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::exit(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._window->close();
 }
 
-void Commands::game_pause(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::game_pause(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._game_timer.stop();
 }
 
-void Commands::game_start(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::game_start(const StaticString&, String*, const ScriptArgs&)
 {
 	ScriptValue* start_level_value = ScriptContext::global().find("start_level");
 	int32_t start_level = start_level_value ? start_level_value->to_int32() : 1;
@@ -58,36 +58,36 @@ void Commands::game_start(const StaticString&, String*, const ScriptArgs&) noexc
 	_game._game_timer.start();
 }
 
-void Commands::game_stop(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::game_stop(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._game_timer.stop();
 	_game._game_timer.reset();
 }
 
-void Commands::game_resume(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::game_resume(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._game_timer.start();
 }
 
-void Commands::move_down(const StaticString& name, String*, const ScriptArgs&) noexcept
+void Commands::move_down(const StaticString& name, String*, const ScriptArgs&)
 {
 	if (_game._game_timer.is_started())
 		_game._game.set_acceleration(name[0] == '+');
 }
 
-void Commands::move_left(const StaticString& name, String*, const ScriptArgs&) noexcept
+void Commands::move_left(const StaticString& name, String*, const ScriptArgs&)
 {
 	if (_game._game_timer.is_started())
 		_game._game.set_left_movement(name[0] == '+');
 }
 
-void Commands::move_right(const StaticString& name, String*, const ScriptArgs&) noexcept
+void Commands::move_right(const StaticString& name, String*, const ScriptArgs&)
 {
 	if (_game._game_timer.is_started())
 		_game._game.set_right_movement(name[0] == '+');
 }
 
-void Commands::play_music(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::play_music(const StaticString&, String*, const ScriptArgs&)
 {
 	if (!_game._audio.player().is_playing())
 		_game._audio.player().play();
@@ -95,33 +95,33 @@ void Commands::play_music(const StaticString&, String*, const ScriptArgs&) noexc
 		_game._audio.player().pause();
 }
 
-void Commands::pop_scene(const StaticString&, String*, const ScriptArgs& args) noexcept
+void Commands::pop_scene(const StaticString&, String*, const ScriptArgs& args)
 {
 	int32_t scenes_to_pop = !args.size() ? 1 : args.value(0)->to_int32();
 	if (scenes_to_pop > 0 && !_game._gui->pop_scenes(scenes_to_pop))
 		_game._window->close();
 }
 
-void Commands::push_scene(const StaticString&, String*, const ScriptArgs& args) noexcept
+void Commands::push_scene(const StaticString&, String*, const ScriptArgs& args)
 {
 	_game._gui->push_scene(args.string(0));
 }
 
-void Commands::set(const StaticString&, String*, const ScriptArgs& args) noexcept
+void Commands::set(const StaticString&, String*, const ScriptArgs& args)
 {
 	const ScriptValue* value = args.value(0);
 	if (value->type() == ScriptValue::Name)
 		ScriptContext::global().set(value->to_string(), args.string(1, ScriptArgs::Resolve));
 }
 
-void Commands::seta(const StaticString&, String*, const ScriptArgs& args) noexcept
+void Commands::seta(const StaticString&, String*, const ScriptArgs& args)
 {
 	const ScriptValue* value = args.value(0);
 	if (value->type() == ScriptValue::Name)
 		ScriptContext::global().set(value->to_string(), args.string(1, ScriptArgs::Resolve), ScriptValue::Archived);
 }
 
-void Commands::snap(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::snap(const StaticString&, String*, const ScriptArgs&)
 {
 	// NOTE: This won't allow us to take more than one screenshot per second,
 	// but do we need such a feature?
@@ -142,34 +142,34 @@ void Commands::snap(const StaticString&, String*, const ScriptArgs&) noexcept
 		.append(".png"));
 }
 
-void Commands::stop_music(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::stop_music(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._audio.player().stop();
 }
 
-void Commands::tgcon(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::tgcon(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._window->set_console_visible(!_game._window->is_console_visible());
 }
 
-void Commands::turn_left(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::turn_left(const StaticString&, String*, const ScriptArgs&)
 {
 	if (_game._game_timer.is_started())
 		_game._game.turn_left();
 }
 
-void Commands::turn_right(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::turn_right(const StaticString&, String*, const ScriptArgs&)
 {
 	if (_game._game_timer.is_started())
 		_game._game.turn_right();
 }
 
-void Commands::unbindall(const StaticString&, String*, const ScriptArgs&) noexcept
+void Commands::unbindall(const StaticString&, String*, const ScriptArgs&)
 {
 	_game._bindings.clear();
 }
 
-void Commands::unset(const StaticString&, String*, const ScriptArgs& args) noexcept
+void Commands::unset(const StaticString&, String*, const ScriptArgs& args)
 {
 	const ScriptValue* value = args.value(0);
 	if (value->type() == ScriptValue::Name)

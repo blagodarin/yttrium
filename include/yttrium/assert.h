@@ -15,7 +15,7 @@ namespace Yttrium
 /// \param line Source line.
 /// \param function Source function.
 
-Y_API Y_NORETURN void abort(const char* message, const char* file, int line) noexcept;
+Y_API Y_NORETURN void abort(const char* message, const char* file, int line);
 
 } // namespace Yttrium
 

@@ -26,7 +26,7 @@ struct AudioFormat
 	uint_fast32_t frequency;        ///< Sampling rate.
 
 	///
-	AudioFormat() noexcept
+	AudioFormat()
 		: bytes_per_sample(0)
 		, channels(0)
 		, frequency(0)
@@ -34,7 +34,7 @@ struct AudioFormat
 	}
 
 	///
-	uint_fast16_t unit_size() const noexcept
+	uint_fast16_t unit_size() const
 	{
 		return bytes_per_sample * channels;
 	}
@@ -54,32 +54,32 @@ public:
 
 	/// Return the audio format.
 	/// \return %Audio format.
-	AudioFormat format() const noexcept { return _format; }
+	AudioFormat format() const { return _format; }
 
 	/// Return the current audio offset.
 	/// \return Current offset in samples.
-	uint64_t offset() noexcept { return _offset_units; }
+	uint64_t offset() { return _offset_units; }
 
 	/// Read at most \a size bytes into \a buffer.
 	/// \param buffer Buffer to read into.
 	/// \param bytes_to_read Number of bytes to read.
 	/// \return Number of bytes read or 0 on failure.
 	/// \note The passed \a size is rounded down to the sample scale before the actual reading.
-	virtual size_t read(void* buffer, size_t bytes_to_read) noexcept = 0;
+	virtual size_t read(void* buffer, size_t bytes_to_read) = 0;
 
 	/// Move the audio offset to the specified position.
 	/// \param offset Offset in samples.
 	/// \return \c true on success.
-	virtual bool seek(uint64_t offset) noexcept = 0;
+	virtual bool seek(uint64_t offset) = 0;
 
 	/// Return the opened audio size.
 	/// \return File size in bytes.
-	uint64_t size() const noexcept { return _total_units * _format.unit_size(); }
+	uint64_t size() const { return _total_units * _format.unit_size(); }
 
 public:
 
 	///
-	static AudioReaderPtr open(const StaticString& name, AudioType type = AudioType::Auto, Allocator* allocator = DefaultAllocator) noexcept;
+	static AudioReaderPtr open(const StaticString& name, AudioType type = AudioType::Auto, Allocator* allocator = DefaultAllocator);
 
 protected:
 
@@ -87,7 +87,7 @@ protected:
 	uint64_t    _total_units;
 	uint64_t    _offset_units;
 
-	AudioReader(Allocator* allocator) noexcept
+	AudioReader(Allocator* allocator)
 		: Pointable(allocator)
 		, _total_units(0)
 		, _offset_units(0)

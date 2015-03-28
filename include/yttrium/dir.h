@@ -25,21 +25,21 @@ public:
 
 	public:
 
-		Iterator(const Iterator& iterator) noexcept
+		Iterator(const Iterator& iterator)
 			: _private(iterator._private)
 		{
 			const_cast<Iterator&>(iterator)._private = nullptr;
 		}
 
-		~Iterator() noexcept;
+		~Iterator();
 
 	public:
 
-		void operator++() noexcept;
+		void operator++();
 
-		StaticString operator*() const noexcept;
+		StaticString operator*() const;
 
-		bool operator!=(Iterator iterator) const noexcept;
+		bool operator!=(Iterator iterator) const;
 
 	private:
 
@@ -47,23 +47,23 @@ public:
 
 		Private* _private;
 
-		Iterator(Private *private_) noexcept
+		Iterator(Private *private_)
 			: _private(private_)
 		{
 		}
 	};
 
 	///
-	explicit Dir(const StaticString& name, Allocator* allocator = DefaultAllocator) noexcept;
+	explicit Dir(const StaticString& name, Allocator* allocator = DefaultAllocator);
 
 	///
-	Iterator begin() const noexcept;
+	Iterator begin() const;
 
 	///
-	Iterator end() const noexcept { return Iterator(nullptr); }
+	Iterator end() const { return Iterator(nullptr); }
 
 	///
-	static bool exists(const StaticString& name) noexcept;
+	static bool exists(const StaticString& name);
 };
 
 } // namespace Yttrium

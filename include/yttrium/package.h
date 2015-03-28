@@ -26,10 +26,10 @@ class Y_API PackageReader
 public:
 
 	///
-	PackageReader(const StaticString& name, PackageType type = PackageType::Auto, Allocator* allocator = DefaultAllocator) noexcept;
+	PackageReader(const StaticString& name, PackageType type = PackageType::Auto, Allocator* allocator = DefaultAllocator);
 
 	///
-	File open_file(const StaticString& name) noexcept;
+	File open_file(const StaticString& name);
 };
 
 /// Package writer class.
@@ -47,10 +47,10 @@ public:
 	};
 
 	///
-	PackageWriter(const StaticString& name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator* allocator = DefaultAllocator) noexcept;
+	PackageWriter(const StaticString& name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator* allocator = DefaultAllocator);
 
 	///
-	File open_file(const StaticString& name) noexcept;
+	File open_file(const StaticString& name);
 };
 
 /// Package manager.
@@ -73,10 +73,10 @@ public:
 public:
 
 	///
-	PackageManager(Allocator* allocator = DefaultAllocator) noexcept;
+	PackageManager(Allocator* allocator = DefaultAllocator);
 
 	///
-	~PackageManager() noexcept;
+	~PackageManager();
 
 public:
 
@@ -84,26 +84,26 @@ public:
 	/// \param name The package name.
 	/// \param type Package file type.
 	/// \return \c true on success.
-	bool mount(const StaticString& name, PackageType type = PackageType::Auto) noexcept;
+	bool mount(const StaticString& name, PackageType type = PackageType::Auto);
 
 	/// Open a file.
 	/// \param name %File name.
 	/// \param mode %File access mode.
 	/// \param order The order to look for the file with.
 	/// \return File.
-	File open_file(const StaticString& name, unsigned mode = File::Read, Order order = PresetOrder) noexcept;
+	File open_file(const StaticString& name, unsigned mode = File::Read, Order order = PresetOrder);
 
 	/// Set the default file system search order.
 	/// \param order The order to be set.
-	void set_order(Order order) noexcept;
+	void set_order(Order order);
 
 	/// Unmount all the mounted packages in the file system.
-	void unmount_all() noexcept;
+	void unmount_all();
 
 public:
 
 	/// Return the global PackageManager instance.
-	static PackageManager* instance() noexcept;
+	static PackageManager* instance();
 
 private:
 

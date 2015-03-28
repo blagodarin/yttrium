@@ -30,7 +30,7 @@ void Node::serialize(String *result, int indentation) const
 	}
 }
 
-String Node::serialize(int indentation, Allocator *allocator) const noexcept
+String Node::serialize(int indentation, Allocator *allocator) const
 {
 	String result(allocator ? allocator : document()->allocator());
 
@@ -38,7 +38,7 @@ String Node::serialize(int indentation, Allocator *allocator) const noexcept
 	return result;
 }
 
-StaticString Node::string(const StaticString &default_value) const noexcept
+StaticString Node::string(const StaticString &default_value) const
 {
 	const Value *value = first();
 	return (value && value->is_string()) ? value->string() : default_value;

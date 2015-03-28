@@ -17,33 +17,33 @@ public:
 
 	///
 
-	inline Matrix4f() noexcept;
+	inline Matrix4f();
 
 	///
 
 	inline Matrix4f(float m00, float m01, float m02, float m03, float m10, float m11,
 		float m12, float m13, float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33) noexcept;
+		float m30, float m31, float m32, float m33);
 
 	///
 
-	inline explicit Matrix4f(const float *data) noexcept;
+	inline explicit Matrix4f(const float *data);
 
 public:
 
 	///
 
-	inline const float *data() const noexcept;
+	inline const float *data() const;
 
 public:
 
 	///
 
-	static Matrix4f projection_2d(float left, float top, float width, float height, float near = -1.f, float far = 1.f) noexcept;
+	static Matrix4f projection_2d(float left, float top, float width, float height, float near = -1.f, float far = 1.f);
 
 private:
 
-	inline Matrix4f(int) noexcept;
+	inline Matrix4f(int);
 
 private:
 
@@ -53,7 +53,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Matrix4f::Matrix4f() noexcept
+Matrix4f::Matrix4f()
 {
 	_data[0][0] = 1.f;
 	_data[0][1] = 0.f;
@@ -78,7 +78,7 @@ Matrix4f::Matrix4f() noexcept
 
 Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
 	float m11, float m12, float m13, float m20, float m21, float m22, float m23,
-	float m30, float m31, float m32, float m33) noexcept
+	float m30, float m31, float m32, float m33)
 {
 	_data[0][0] = m00;
 	_data[0][1] = m10;
@@ -101,7 +101,7 @@ Matrix4f::Matrix4f(float m00, float m01, float m02, float m03, float m10,
 	_data[3][3] = m33;
 }
 
-Matrix4f::Matrix4f(const float *data) noexcept
+Matrix4f::Matrix4f(const float *data)
 {
 	_data[0][0] = data[0];
 	_data[0][1] = data[1];
@@ -124,12 +124,12 @@ Matrix4f::Matrix4f(const float *data) noexcept
 	_data[3][3] = data[15];
 }
 
-const float *Matrix4f::data() const noexcept
+const float *Matrix4f::data() const
 {
 	return _data[0];
 }
 
-Matrix4f::Matrix4f(int) noexcept
+Matrix4f::Matrix4f(int)
 {
 }
 

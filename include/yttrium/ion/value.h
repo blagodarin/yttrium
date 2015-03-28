@@ -38,7 +38,7 @@ public:
 public:
 
 	///
-	bool get(const StaticString** value) const noexcept
+	bool get(const StaticString** value) const
 	{
 		if (_type != StringType)
 			return false;
@@ -49,18 +49,18 @@ public:
 	/**
 	* \overload
 	*/
-	bool get(int32_t* value) const noexcept { return _type == StringType && _string.to_number(value); }
+	bool get(int32_t* value) const { return _type == StringType && _string.to_number(value); }
 
 	/**
 	* \overload
 	*/
-	bool get(float* value) const noexcept { return _type == StringType && _string.to_number(value); }
+	bool get(float* value) const { return _type == StringType && _string.to_number(value); }
 
 	/**
 	* \overload
 	*/
 
-	 bool get(const List** value) const noexcept
+	 bool get(const List** value) const
 	{
 		if (_type != ListType)
 			return false;
@@ -71,7 +71,7 @@ public:
 	/**
 	* \overload
 	*/
-	bool get(const Object** value) const noexcept
+	bool get(const Object** value) const
 	{
 		if (_type != ObjectType)
 			return false;
@@ -80,41 +80,41 @@ public:
 	}
 
 	///
-	bool is_list() const noexcept { return _type == ListType; }
+	bool is_list() const { return _type == ListType; }
 
 	///
-	bool is_object() const noexcept { return _type == ObjectType; }
+	bool is_object() const { return _type == ObjectType; }
 
 	///
-	bool is_string() const noexcept { return _type == StringType; }
+	bool is_string() const { return _type == StringType; }
 
 	///
-	List &list() noexcept { return _list; }
+	List &list() { return _list; }
 
 	///
-	const List& list() const noexcept { return _list; }
+	const List& list() const { return _list; }
 
 	///
-	void serialize(String* result, int indentation = 0) const noexcept;
+	void serialize(String* result, int indentation = 0) const;
 
 	///
-	String serialize(int indentation = 0, Allocator* allocator = nullptr) const noexcept;
+	String serialize(int indentation = 0, Allocator* allocator = nullptr) const;
 
 	///
-	const StaticString& string() const noexcept { return _string; }
+	const StaticString& string() const { return _string; }
 
 	///
-	Type type() const noexcept { return _type; }
+	Type type() const { return _type; }
 
 	///
-	const Object* object() const noexcept { return _object; }
+	const Object* object() const { return _object; }
 
 private:
 
-	Y_PRIVATE Value(Document* document) noexcept;
-	Y_PRIVATE Value(Document* document, const StaticString& string) noexcept;
-	Y_PRIVATE Value(Document* document, const StaticString& string, const ByReference&) noexcept;
-	Y_PRIVATE Value(Document* document, Object* object) noexcept;
+	Y_PRIVATE Value(Document* document);
+	Y_PRIVATE Value(Document* document, const StaticString& string);
+	Y_PRIVATE Value(Document* document, const StaticString& string, const ByReference&);
+	Y_PRIVATE Value(Document* document, Object* object);
 
 private:
 

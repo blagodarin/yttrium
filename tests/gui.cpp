@@ -13,15 +13,15 @@ class WindowCallbacks: public Window::Callbacks
 {
 public:
 
-	void on_cursor_movement(Window&, const Dim2&) noexcept override {}
-	void on_key_event(const KeyEvent&) noexcept override {}
+	void on_cursor_movement(Window&, const Dim2&) override {}
+	void on_key_event(const KeyEvent&) override {}
 };
 
 class GuiCallbacks: public Gui::Callbacks
 {
 public:
 
-	void on_render_canvas(Renderer&, const StaticString&, const RectF&) noexcept override {}
+	void on_render_canvas(Renderer&, const StaticString&, const RectF&) override {}
 };
 
 BOOST_AUTO_TEST_CASE(test_gui)

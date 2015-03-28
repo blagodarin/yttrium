@@ -24,7 +24,7 @@ struct PoolStatus
 	size_t chunk_deallocations; ///< Lifetime (wrapping) number of chunk deallocations.
 
 	///
-	PoolStatus() noexcept
+	PoolStatus()
 		: allocated_items(0)
 		, allocated_chunks(0)
 		, item_allocations(0)
@@ -43,24 +43,24 @@ class Y_API PoolBase
 public:
 
 	///
-	PoolBase(size_t chunk_items, size_t item_size, Allocator* allocator = DefaultAllocator) noexcept;
+	PoolBase(size_t chunk_items, size_t item_size, Allocator* allocator = DefaultAllocator);
 
 	///
-	~PoolBase() noexcept;
+	~PoolBase();
 
 	///
-	PoolStatus status() const noexcept;
+	PoolStatus status() const;
 
 protected:
 
 	///
-	void* allocate() noexcept;
+	void* allocate();
 
 	///
-	void deallocate(void* pointer) noexcept;
+	void deallocate(void* pointer);
 
 	///
-	void* take() noexcept;
+	void* take();
 
 private:
 
@@ -82,25 +82,25 @@ class Pool: public PoolBase
 public:
 
 	///
-	Pool(size_t chunk_items = 32, Allocator* allocator = DefaultAllocator) noexcept
+	Pool(size_t chunk_items = 32, Allocator* allocator = DefaultAllocator)
 		: PoolBase(chunk_items, sizeof(T), allocator)
 	{
 	}
 
 	///
-	~Pool() noexcept
+	~Pool()
 	{
 		clear();
 	}
 
 	///
-	T* allocate() noexcept
+	T* allocate()
 	{
 		return static_cast<T*>(PoolBase::allocate());
 	}
 
 	///
-	void clear() noexcept
+	void clear()
 	{
 		for (void* pointer = take(); pointer; pointer = take())
 		{
@@ -110,7 +110,7 @@ public:
 	}
 
 	///
-	void deallocate(T* pointer) noexcept
+	void deallocate(T* pointer)
 	{
 		if (pointer)
 		{

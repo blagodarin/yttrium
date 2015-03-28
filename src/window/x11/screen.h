@@ -21,7 +21,7 @@ public:
 	ScreenImpl(::Display* display, int screen, Allocator* allocator);
 	~ScreenImpl() override;
 
-	ScreenMode mode(ModeType type) noexcept override;
+	ScreenMode mode(ModeType type) override;
 
 private:
 

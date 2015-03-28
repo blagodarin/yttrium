@@ -24,10 +24,10 @@ public:
 
 	/// Return the sound name.
 	/// \return %Sound name.
-	String name() const noexcept { return _name; }
+	String name() const { return _name; }
 
 	/// Play the sound.
-	virtual void play() const noexcept = 0;
+	virtual void play() const = 0;
 
 public:
 
@@ -35,13 +35,13 @@ public:
 	/// \param name %Sound name.
 	/// \param allocator %Allocator.
 	/// \return %Sound pointer.
-	static SoundPtr open(const StaticString& name, Allocator* allocator = nullptr) noexcept;
+	static SoundPtr open(const StaticString& name, Allocator* allocator = nullptr);
 
 protected:
 
 	const String _name;
 
-	Sound(const StaticString &name, Allocator *allocator) noexcept
+	Sound(const StaticString &name, Allocator *allocator)
 		: Pointable(allocator)
 		, _name(name, allocator)
 	{

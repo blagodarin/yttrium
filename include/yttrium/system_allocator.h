@@ -17,21 +17,21 @@ public:
 
 	///
 
-	static SystemAllocator *instance() noexcept;
+	static SystemAllocator *instance();
 
 	///
 
-	static size_t upper_bound(size_t size) noexcept;
+	static size_t upper_bound(size_t size);
 
 public: // Allocator
 
 	using Allocator::allocate;
 
-	void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) noexcept override;
+	void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) override;
 
-	void deallocate(void *pointer, Difference *difference = nullptr) noexcept override;
+	void deallocate(void *pointer, Difference *difference = nullptr) override;
 
-	void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) noexcept override;
+	void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) override;
 
 public:
 
@@ -42,7 +42,7 @@ private:
 	Private *_private;
 
 	Y_PRIVATE SystemAllocator();
-	Y_PRIVATE ~SystemAllocator() noexcept override;
+	Y_PRIVATE ~SystemAllocator() override;
 };
 
 } // namespace Yttrium

@@ -46,21 +46,21 @@ public:
 
 		///
 
-		inline void operator ++() noexcept;
+		inline void operator ++();
 
 		///
 
-		inline const Node &operator *() const noexcept;
+		inline const Node &operator *() const;
 
 		///
 
-		inline bool operator !=(ConstIterator iterator) const noexcept;
+		inline bool operator !=(ConstIterator iterator) const;
 
 	private:
 
 		const Node *const *_node;
 
-		inline ConstIterator(const Node *const *node) noexcept;
+		inline ConstIterator(const Node *const *node);
 	};
 
 	///
@@ -73,26 +73,26 @@ public:
 
 		///
 
-		inline ConstIterator begin() const noexcept;
+		inline ConstIterator begin() const;
 
 		///
 
-		inline ConstIterator end() const noexcept;
+		inline ConstIterator end() const;
 
 		///
 
-		inline size_t size() const noexcept;
+		inline size_t size() const;
 
 		///
 
-		inline ConstReverseRange reverse() noexcept;
+		inline ConstReverseRange reverse();
 
 	private:
 
 		const Node *const *_begin;
 		const Node *const *_end;
 
-		inline ConstRange(const Node *const *begin, const Node *const *end) noexcept;
+		inline ConstRange(const Node *const *begin, const Node *const *end);
 	};
 
 	///
@@ -105,21 +105,21 @@ public:
 
 		///
 
-		inline void operator ++() noexcept;
+		inline void operator ++();
 
 		///
 
-		inline const Node &operator *() const noexcept;
+		inline const Node &operator *() const;
 
 		///
 
-		inline bool operator !=(ConstReverseIterator iterator) const noexcept;
+		inline bool operator !=(ConstReverseIterator iterator) const;
 
 	private:
 
 		const Node *const *_node;
 
-		inline ConstReverseIterator(const Node *const *node) noexcept;
+		inline ConstReverseIterator(const Node *const *node);
 	};
 
 	///
@@ -132,103 +132,103 @@ public:
 
 		///
 
-		inline ConstReverseIterator begin() const noexcept;
+		inline ConstReverseIterator begin() const;
 
 		///
 
-		inline ConstReverseIterator end() const noexcept;
+		inline ConstReverseIterator end() const;
 
 		///
 
-		inline size_t size() const noexcept;
+		inline size_t size() const;
 
 	private:
 
 		const Node *const *_begin;
 		const Node *const *_end;
 
-		inline ConstReverseRange(const Node *const *begin, const Node *const *end) noexcept;
+		inline ConstReverseRange(const Node *const *begin, const Node *const *end);
 	};
 
 public:
 
 	///
 
-	Node *append(const StaticString &name) noexcept;
+	Node *append(const StaticString &name);
 
 	///
 
-	Node *append(const Node &node) noexcept;
+	Node *append(const Node &node);
 
 	///
 
-	void concatenate(const Object &object) noexcept;
+	void concatenate(const Object &object);
 
 	///
 
-	bool contains(const StaticString &name) noexcept;
+	bool contains(const StaticString &name);
 
 	///
 
-	inline const Document *document() const noexcept;
+	inline const Document *document() const;
 
 	///
 
-	const Node &first() const noexcept;
+	const Node &first() const;
 
 	///
 
-	const Node &first(const StaticString &name) const noexcept;
+	const Node &first(const StaticString &name) const;
 
 	///
 
-	inline bool is_empty() const noexcept;
+	inline bool is_empty() const;
 
 	///
 
-	ConstRange nodes() const noexcept;
+	ConstRange nodes() const;
 
 	///
 
-	ConstRange nodes(const StaticString &name) const noexcept;
+	ConstRange nodes(const StaticString &name) const;
 
 	///
 
-	const Node &last() const noexcept;
+	const Node &last() const;
 
 	///
 
-	const Node &last(const StaticString &name) const noexcept;
+	const Node &last(const StaticString &name) const;
 
 	///
 
-	bool last(const StaticString &name, const Node **node) const noexcept;
+	bool last(const StaticString &name, const Node **node) const;
 
 	///
 
-	bool last(const StaticString &name, const StaticString **string) const noexcept;
+	bool last(const StaticString &name, const StaticString **string) const;
 
 	///
 
-	void serialize(String *result, int indentation = 0) const noexcept;
+	void serialize(String *result, int indentation = 0) const;
 
 	///
 
-	String serialize(int indentation = 0, Allocator *allocator = nullptr) const noexcept;
+	String serialize(int indentation = 0, Allocator *allocator = nullptr) const;
 
 	///
 
-	inline size_t size() const noexcept;
+	inline size_t size() const;
 
 private:
 
-	Y_PRIVATE Object(Document *document) noexcept;
+	Y_PRIVATE Object(Document *document);
 
 private:
 
-	Y_PRIVATE Node *append(const StaticString &name, const ByReference &) noexcept;
-	Y_PRIVATE void clear() noexcept;
-	Y_PRIVATE void serialize(String *result, int indentation, bool is_document) const noexcept;
+	Y_PRIVATE Node *append(const StaticString &name, const ByReference &);
+	Y_PRIVATE void clear();
+	Y_PRIVATE void serialize(String *result, int indentation, bool is_document) const;
 
 private:
 
@@ -240,49 +240,49 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Object::ConstIterator::operator ++() noexcept
+void Object::ConstIterator::operator ++()
 {
 	++_node;
 }
 
-const Node &Object::ConstIterator::operator *() const noexcept
+const Node &Object::ConstIterator::operator *() const
 {
 	return **_node;
 }
 
-bool Object::ConstIterator::operator !=(ConstIterator iterator) const noexcept
+bool Object::ConstIterator::operator !=(ConstIterator iterator) const
 {
 	return _node != iterator._node;
 }
 
-Object::ConstIterator::ConstIterator(const Node *const *node) noexcept
+Object::ConstIterator::ConstIterator(const Node *const *node)
 	: _node(node)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Object::ConstIterator Object::ConstRange::begin() const noexcept
+Object::ConstIterator Object::ConstRange::begin() const
 {
 	return ConstIterator(_begin);
 }
 
-Object::ConstIterator Object::ConstRange::end() const noexcept
+Object::ConstIterator Object::ConstRange::end() const
 {
 	return ConstIterator(_end);
 }
 
-size_t Object::ConstRange::size() const noexcept
+size_t Object::ConstRange::size() const
 {
 	return _end - _begin;
 }
 
-Object::ConstReverseRange Object::ConstRange::reverse() noexcept
+Object::ConstReverseRange Object::ConstRange::reverse()
 {
 	return ConstReverseRange(_end - 1, _begin - 1);
 }
 
-Object::ConstRange::ConstRange(const Node *const *begin, const Node *const *end) noexcept
+Object::ConstRange::ConstRange(const Node *const *begin, const Node *const *end)
 	: _begin(begin)
 	, _end(end)
 {
@@ -290,44 +290,44 @@ Object::ConstRange::ConstRange(const Node *const *begin, const Node *const *end)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Object::ConstReverseIterator::operator ++() noexcept
+void Object::ConstReverseIterator::operator ++()
 {
 	--_node;
 }
 
-const Node &Object::ConstReverseIterator::operator *() const noexcept
+const Node &Object::ConstReverseIterator::operator *() const
 {
 	return **_node;
 }
 
-bool Object::ConstReverseIterator::operator !=(ConstReverseIterator iterator) const noexcept
+bool Object::ConstReverseIterator::operator !=(ConstReverseIterator iterator) const
 {
 	return _node != iterator._node;
 }
 
-Object::ConstReverseIterator::ConstReverseIterator(const Node *const *node) noexcept
+Object::ConstReverseIterator::ConstReverseIterator(const Node *const *node)
 	: _node(node)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Object::ConstReverseIterator Object::ConstReverseRange::begin() const noexcept
+Object::ConstReverseIterator Object::ConstReverseRange::begin() const
 {
 	return _begin;
 }
 
-Object::ConstReverseIterator Object::ConstReverseRange::end() const noexcept
+Object::ConstReverseIterator Object::ConstReverseRange::end() const
 {
 	return _end;
 }
 
-size_t Object::ConstReverseRange::size() const noexcept
+size_t Object::ConstReverseRange::size() const
 {
 	return _begin - _end;
 }
 
-Object::ConstReverseRange::ConstReverseRange(const Node *const *begin, const Node *const *end) noexcept
+Object::ConstReverseRange::ConstReverseRange(const Node *const *begin, const Node *const *end)
 	: _begin(begin)
 	, _end(end)
 {
@@ -335,17 +335,17 @@ Object::ConstReverseRange::ConstReverseRange(const Node *const *begin, const Nod
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const Document *Object::document() const noexcept
+const Document *Object::document() const
 {
 	return _document;
 }
 
-bool Object::is_empty() const noexcept
+bool Object::is_empty() const
 {
 	return _nodes.empty();
 }
 
-size_t Object::size() const noexcept
+size_t Object::size() const
 {
 	return _nodes.size();
 }

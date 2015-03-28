@@ -90,11 +90,6 @@
 // Compiler portability.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// MSVC doesn't support noexcept, but treats throw() just the same way.
-#if Y_COMPILER_MSVC && !defined(noexcept)
-	#define noexcept throw()
-#endif
-
 /// \def Y_EXPORT
 /// \brief Shared library exported declaration specifier.
 #if Y_PLATFORM_WINDOWS
@@ -184,15 +179,15 @@
 #define Y_DECLARE_PRIVATE(Class) \
 	public: \
 		class Private; \
-		Class() noexcept: _private(nullptr) {} \
-		Class(const Class&) noexcept; \
-		Class(Class&& class_) noexcept: _private(class_._private) { class_._private = nullptr; } \
-		~Class() noexcept; \
-		Class& operator=(const Class&) noexcept; \
-		Class& operator=(Class&&) noexcept; \
-		explicit operator bool() const noexcept { return _private; } \
+		Class(): _private(nullptr) {} \
+		Class(const Class&); \
+		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
+		~Class(); \
+		Class& operator=(const Class&); \
+		Class& operator=(Class&&); \
+		explicit operator bool() const { return _private; } \
 	protected: \
-		Class(Private* private_) noexcept: _private(private_) {} \
+		Class(Private* private_): _private(private_) {} \
 	private: \
 		Private* _private \
 
@@ -200,15 +195,15 @@
 #define Y_DECLARE_PRIVATE_NONCOPYABLE(Class) \
 	public: \
 		class Private; \
-		Class() noexcept: _private(nullptr) {} \
+		Class(): _private(nullptr) {} \
 		Class(const Class&) = delete; \
-		Class(Class&& class_) noexcept: _private(class_._private) { class_._private = nullptr; } \
-		~Class() noexcept; \
+		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
+		~Class(); \
 		Class& operator=(const Class&) = delete; \
-		Class& operator=(Class&&) noexcept; \
-		explicit operator bool() const noexcept { return _private; } \
+		Class& operator=(Class&&); \
+		explicit operator bool() const { return _private; } \
 	protected: \
-		Class(Private* private_) noexcept: _private(private_) {} \
+		Class(Private* private_): _private(private_) {} \
 	private: \
 		Private* _private \
 

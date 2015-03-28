@@ -25,7 +25,7 @@ struct Y_API DateTime
 
 	/// Get the current date and time.
 
-	static DateTime now() noexcept;
+	static DateTime now();
 };
 
 /// Integer value representing timer time.
@@ -41,41 +41,41 @@ public:
 
 	///
 
-	inline Timer() noexcept;
+	inline Timer();
 
 	/// Return \c true if the timer is started.
 	/// \return \c true for a started timer.
 
-	inline bool is_started() const noexcept;
+	inline bool is_started() const;
 
 	/// Reset the timer time without changing any other state.
 	/// \return Timer value on reset.
 
-	Clock reset() noexcept;
+	Clock reset();
 
 	/// Reset the timer and start it.
 	/// \return Timer value on restart.
 
-	Clock restart() noexcept;
+	Clock restart();
 
 	/// Set the stored time to the specified value.
 	/// \param time Time to set.
 
-	inline void set_time(Clock time) noexcept;
+	inline void set_time(Clock time);
 
 	/// Start the timer if it's not started.
 
-	void start() noexcept;
+	void start();
 
 	/// Stop the timer.
 	/// \return Timer value on stop.
 
-	Clock stop() noexcept;
+	Clock stop();
 
 	/// Get the current timer time.
 	/// \return Timer time.
 
-	inline Clock time() const noexcept;
+	inline Clock time() const;
 
 public:
 
@@ -83,7 +83,7 @@ public:
 	/// \return Clock counter value in milliseconds.
 	/// \note Timer functionality is based on this function.
 
-	static Clock clock() noexcept;
+	static Clock clock();
 
 private:
 
@@ -100,22 +100,22 @@ public:
 
 	///
 
-	inline RateCounter() noexcept;
+	inline RateCounter();
 
 	/// Start the counter.
 	/// \note Should be called just before the beginning of the counted loop.
 
-	void start() noexcept;
+	void start();
 
 	/// Mark a tick.
 	/// \note Should be called in the very end of the counted loop.
 
-	void tick() noexcept;
+	void tick();
 
 	/// Return the current rate.
 	/// \return Current rate.
 
-	inline Clock rate() const noexcept;
+	inline Clock rate() const;
 
 	// TODO: Add was_changed().
 
@@ -130,23 +130,23 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Timer::Timer() noexcept
+Timer::Timer()
 	: _time(0)
 	, _is_started(false)
 {
 }
 
-bool Timer::is_started() const noexcept
+bool Timer::is_started() const
 {
 	return _is_started;
 }
 
-void Timer::set_time(Clock time) noexcept
+void Timer::set_time(Clock time)
 {
 	_time = time;
 }
 
-Clock Timer::time() const noexcept
+Clock Timer::time() const
 {
 	return _is_started
 		? _time + (clock() - _start_time)
@@ -155,12 +155,12 @@ Clock Timer::time() const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RateCounter::RateCounter() noexcept
+RateCounter::RateCounter()
 	: _rate(0)
 {
 }
 
-Clock RateCounter::rate() const noexcept
+Clock RateCounter::rate() const
 {
 	return _rate;
 }

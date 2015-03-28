@@ -27,10 +27,10 @@ public:
 	public:
 
 		///
-		virtual void on_cursor_movement(Window& window, const Dim2& movement) noexcept = 0;
+		virtual void on_cursor_movement(Window& window, const Dim2& movement) = 0;
 
 		///
-		virtual void on_key_event(const KeyEvent& event) noexcept = 0;
+		virtual void on_key_event(const KeyEvent& event) = 0;
 	};
 
 	///
@@ -45,51 +45,51 @@ public:
 	~Window() = default;
 
 	///
-	virtual void close() noexcept = 0;
+	virtual void close() = 0;
 
 	///
-	virtual Renderer create_renderer(Allocator* allocator = nullptr) noexcept = 0;
+	virtual Renderer create_renderer(Allocator* allocator = nullptr) = 0;
 
 	///
-	virtual Dim2 cursor() const noexcept = 0;
+	virtual Dim2 cursor() const = 0;
 
 	///
-	virtual void draw_console(RendererBuiltin& renderer) noexcept = 0;
+	virtual void draw_console(RendererBuiltin& renderer) = 0;
 
 	///
-	virtual bool is_console_visible() const noexcept = 0;
+	virtual bool is_console_visible() const = 0;
 
 	///
-	virtual bool is_cursor_locked() const noexcept = 0;
+	virtual bool is_cursor_locked() const = 0;
 
 	///
-	virtual bool is_shift_pressed() const noexcept = 0;
+	virtual bool is_shift_pressed() const = 0;
 
 	///
-	virtual void lock_cursor(bool lock) noexcept = 0;
+	virtual void lock_cursor(bool lock) = 0;
 
 	/// Process window events.
 	/// \return \c false if the window was closed, \c true otherwise.
-	virtual bool process_events() noexcept = 0;
+	virtual bool process_events() = 0;
 
 	///
-	virtual void resize(const Dim2& size) noexcept = 0;
+	virtual void resize(const Dim2& size) = 0;
 
 	/**
 	* \overload
 	* \param width
 	* \param height
 	*/
-	void resize(int width, int height) noexcept
+	void resize(int width, int height)
 	{
 		resize(Dim2(width, height));
 	}
 
 	///
-	virtual void set_console_visible(bool visible) noexcept = 0;
+	virtual void set_console_visible(bool visible) = 0;
 
 	///
-	virtual bool set_cursor(const Dim2& cursor) noexcept = 0;
+	virtual bool set_cursor(const Dim2& cursor) = 0;
 
 	/**
 	* \overload
@@ -97,28 +97,28 @@ public:
 	* \param top
 	* \return
 	*/
-	bool set_cursor(int left, int top) noexcept
+	bool set_cursor(int left, int top)
 	{
 		return set_cursor(Dim2(left, top));
 	}
 
 	///
-	virtual void set_name(const StaticString& name) noexcept = 0;
+	virtual void set_name(const StaticString& name) = 0;
 
 	///
-	virtual void show(Mode mode = Windowed) noexcept = 0;
+	virtual void show(Mode mode = Windowed) = 0;
 
 	///
-	virtual Dim2 size() const noexcept = 0;
+	virtual Dim2 size() const = 0;
 
 public:
 
 	///
-	static WindowPtr create(const Dim2& size, Callbacks& callbacks, Allocator* allocator = DefaultAllocator) noexcept;
+	static WindowPtr create(const Dim2& size, Callbacks& callbacks, Allocator* allocator = DefaultAllocator);
 
 protected:
 
-	Window(Allocator* allocator) noexcept: Pointable(allocator) {}
+	Window(Allocator* allocator): Pointable(allocator) {}
 };
 
 } // namespace Yttrium

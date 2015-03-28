@@ -49,128 +49,128 @@ public:
 
 	///
 
-	inline Renderer() noexcept;
+	inline Renderer();
 
 	///
 
-	Renderer(const Renderer &renderer) noexcept;
+	Renderer(const Renderer &renderer);
 
 	///
 
-	~Renderer() noexcept;
+	~Renderer();
 
 public:
 
 	///
 
-	Allocator* allocator() const noexcept;
+	Allocator* allocator() const;
 
 	/// Clear the framebuffer and begin a new frame.
 
-	void begin_frame() noexcept;
+	void begin_frame();
 
 	///
 
-	void draw_rectangle(const RectF& rect) noexcept;
+	void draw_rectangle(const RectF& rect);
 
 	///
 
-	inline void draw_rectangle(float x, float y, float width, float height) noexcept;
+	inline void draw_rectangle(float x, float y, float width, float height);
 
 	///
 
-	void draw_rectangle(const RectF& rect, const RectF& texture_rect) noexcept;
+	void draw_rectangle(const RectF& rect, const RectF& texture_rect);
 
 	///
 
 	void draw_text(const Vector2f& position, const StaticString& text,
-		unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) noexcept;
+		unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr);
 
 	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
 	/// and, if requested, capture a screenshot.
 
-	void end_frame() noexcept;
+	void end_frame();
 
 	///
 
-	void flush_2d() noexcept;
+	void flush_2d();
 
 	///
 
-	RendererBuiltin renderer_builtin() noexcept;
+	RendererBuiltin renderer_builtin();
 
 	///
 
-	Vector2d rendering_size() const noexcept;
+	Vector2d rendering_size() const;
 
 	///
 
-	void set_color(const Vector4f& color) noexcept;
+	void set_color(const Vector4f& color);
 
 	///
 
-	bool set_font(const TextureFont& font) noexcept;
+	bool set_font(const TextureFont& font);
 
 	///
 
-	void set_font_size(const Vector2f& size) noexcept;
+	void set_font_size(const Vector2f& size);
 
 	///
 
-	inline void set_font_size(float y_size, float x_scaling = 1) noexcept;
+	inline void set_font_size(float y_size, float x_scaling = 1);
 
 	///
 
-	void set_matrix_2d(double width, double height) noexcept;
+	void set_matrix_2d(double width, double height);
 
 	///
 
-	void set_matrix_2d_height(double height) noexcept;
+	void set_matrix_2d_height(double height);
 
 	///
 
-	void set_matrix_2d_width(double width) noexcept;
+	void set_matrix_2d_width(double width);
 
 	///
 
-	void set_texture(const Texture2DPtr& texture) noexcept;
+	void set_texture(const Texture2DPtr& texture);
 
 	///
 
-	bool set_texture_borders(const MarginsI& borders) noexcept;
+	bool set_texture_borders(const MarginsI& borders);
 
 	///
 
-	void set_texture_rectangle(const RectF& rect) noexcept;
+	void set_texture_rectangle(const RectF& rect);
 
 	///
 
-	inline void set_texture_rectangle(float x, float y, float width, float height) noexcept;
+	inline void set_texture_rectangle(float x, float y, float width, float height);
 
 	/// Take a screenshot.
 	/// \param name
 	/// \note The screenshot would be actually taken at the end of the frame
 	/// and saved in the PNG format.
 
-	void take_screenshot(const StaticString& name) noexcept;
+	void take_screenshot(const StaticString& name);
 
 	///
 
-	Vector2f text_size(const StaticString& text) const noexcept;
+	Vector2f text_size(const StaticString& text) const;
 
 	///
 
-	Dim2 viewport_size() const noexcept;
+	Dim2 viewport_size() const;
 
 public:
 
 	///
 
-	inline operator bool() const noexcept;
+	inline operator bool() const;
 
 	///
 
-	Renderer& operator=(const Renderer& renderer) noexcept;
+	Renderer& operator=(const Renderer& renderer);
 
 public:
 
@@ -189,27 +189,27 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Renderer::Renderer() noexcept
+Renderer::Renderer()
 	: _private(nullptr)
 {
 }
 
-void Renderer::draw_rectangle(float x, float y, float width, float height) noexcept
+void Renderer::draw_rectangle(float x, float y, float width, float height)
 {
 	draw_rectangle(RectF(x, y, width, height));
 }
 
-void Renderer::set_font_size(float y_size, float x_scaling) noexcept
+void Renderer::set_font_size(float y_size, float x_scaling)
 {
 	set_font_size(Vector2f(x_scaling, y_size));
 }
 
-void Renderer::set_texture_rectangle(float x, float y, float width, float height) noexcept
+void Renderer::set_texture_rectangle(float x, float y, float width, float height)
 {
 	set_texture_rectangle(RectF(x, y, width, height));
 }
 
-Renderer::operator bool() const noexcept
+Renderer::operator bool() const
 {
 	return _private;
 }

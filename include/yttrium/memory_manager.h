@@ -17,15 +17,15 @@ class Y_API MemoryManager
 public:
 
 	///
-	MemoryManager(const StaticString& default_name = S("default")) noexcept;
+	MemoryManager(const StaticString& default_name = S("default"));
 
 	///
-	~MemoryManager() noexcept;
+	~MemoryManager();
 
 public:
 
 	///
-	static Allocator *default_allocator() noexcept;
+	static Allocator *default_allocator();
 
 public:
 

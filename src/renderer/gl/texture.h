@@ -14,7 +14,7 @@ public:
 	GlTexture2D(const Renderer &renderer, const ImageFormat &format,
 		Allocator *allocator, const GlApi &gl, GLenum target, GLuint texture);
 
-	~GlTexture2D() noexcept override;
+	~GlTexture2D() override;
 
 private:
 
