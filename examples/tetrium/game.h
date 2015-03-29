@@ -37,9 +37,9 @@ private:
 	void save_settings();
 
 	// Window::Callbacks
-	void on_cursor_movement(Window& window, const Dim2& movement) override;
 	void on_key_event(const KeyEvent& event) override;
 	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
+	void on_update() override;
 
 	void draw_field(Renderer& renderer, const RectF& rect);
 	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
@@ -52,7 +52,7 @@ private:
 
 	Allocator*       _allocator;
 	AudioManager     _audio;
-	WindowPtr        _window;
+	std::unique_ptr<Window> _window;
 	std::unique_ptr<TextureCache> _texture_cache;
 	Bindings         _bindings;
 

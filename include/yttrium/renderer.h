@@ -15,6 +15,7 @@
 namespace Yttrium
 {
 
+class TextureCache;
 class WindowBackend;
 
 ///

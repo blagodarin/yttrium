@@ -62,45 +62,7 @@ bool Game::setup()
 void Game::run()
 {
 	Y_LOG("Starting...");
-
-	RendererBuiltin renderer_builtin = _window->renderer().renderer_builtin();
-
-	RateCounter fps;
-
-	fps.start();
-
-	for (; ; )
-	{
-		// Process window events.
-
-		if (!_window->process_events())
-			break;
-
-		// Process game events.
-
-		if (_game_timer.is_started())
-		{
-			_game.advance(_game_timer.reset());
-			ScriptContext::global().set("score", _game.score());
-			ScriptContext::global().set("lines", _game.lines());
-			ScriptContext::global().set("level", _game.level());
-			if (_game.has_finished())
-				_window->gui().push_scene("game_over");
-		}
-
-		// Draw frame.
-
-		_window->renderer().begin_frame();
-		_window->gui().set_cursor(_window->cursor());
-		_window->gui().render();
-		_window->draw_console(renderer_builtin);
-		_window->renderer().end_frame();
-
-		// Update FPS.
-
-		ScriptContext::global().set("fps", fps.rate());
-		fps.tick();
-	}
+	_window->run();
 }
 
 void Game::save_settings()
@@ -202,10 +164,6 @@ void Game::load_music()
 	_audio.player().play();
 }
 
-void Game::on_cursor_movement(Window&, const Dim2&)
-{
-}
-
 void Game::on_key_event(const KeyEvent& event)
 {
 	if (!event.autorepeat)
@@ -220,6 +178,19 @@ void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticS
 		draw_field(renderer, rect);
 	else if (canvas_name == S("next"))
 		draw_next_figure(renderer, rect);
+}
+
+void Game::on_update()
+{
+	if (_game_timer.is_started())
+	{
+		_game.advance(_game_timer.reset());
+		ScriptContext::global().set("score", _game.score());
+		ScriptContext::global().set("lines", _game.lines());
+		ScriptContext::global().set("level", _game.level());
+		if (_game.has_finished())
+			_window->gui().push_scene("game_over");
+	}
 }
 
 void Game::draw_field(Renderer& renderer, const RectF& rect)

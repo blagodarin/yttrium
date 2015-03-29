@@ -3,8 +3,6 @@
 
 #include <yttrium/window.h>
 
-#include <memory>
-
 #include <yttrium/screen.h>
 
 #include "backend.h"
@@ -24,18 +22,16 @@ public:
 
 	bool initialize();
 
-public: // Window
-
+	// Window
 	void close() override;
 	Dim2 cursor() const override;
-	void draw_console(RendererBuiltin& renderer) override;
 	Gui& gui() override;
 	bool is_console_visible() const override;
 	bool is_cursor_locked() const override;
 	bool is_shift_pressed() const override;
 	void lock_cursor(bool lock) override;
-	bool process_events() override;
 	Renderer& renderer() override;
+	void run() override;
 	void resize(const Dim2& size) override;
 	void set_console_visible(bool visible) override;
 	bool set_cursor(const Dim2& cursor) override;
@@ -43,17 +39,19 @@ public: // Window
 	void show(Mode mode) override;
 	Dim2 size() const override;
 
-private: // WindowBackend::Callbacks
+private:
 
+	// WindowBackend::Callbacks
 	void on_focus_event(bool is_focused) override;
 	void on_key_event(Key key, bool is_pressed) override;
 
-private:
-
+	void draw_console(RendererBuiltin& renderer);
+	bool process_events();
 	void set_active(bool active);
 
 private:
 
+	Allocator* const   _allocator;
 	ScreenPtr          _screen;
 	WindowBackendPtr   _backend;
 	bool               _is_active;

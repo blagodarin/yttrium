@@ -9,15 +9,6 @@
 
 using namespace Yttrium;
 
-class WindowCallbacks: public Window::Callbacks
-{
-public:
-
-	void on_cursor_movement(Window&, const Dim2&) override {}
-	void on_key_event(const KeyEvent&) override {}
-	void on_render_canvas(Renderer&, const RectF&, const StaticString&) override {}
-};
-
 BOOST_AUTO_TEST_CASE(test_gui)
 {
 	DECLARE_MEMORY_MANAGER;
@@ -29,8 +20,8 @@ BOOST_AUTO_TEST_CASE(test_gui)
 
 		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 
-		WindowCallbacks window_callbacks;
-		WindowPtr window = Window::create(Dim2(320, 240), window_callbacks);
+		Window::Callbacks window_callbacks;
+		const auto window = Window::create(Dim2(320, 240), window_callbacks);
 		BOOST_REQUIRE(window);
 		BOOST_REQUIRE(window->gui().load("tests/gui/gui.ion"));
 		window->gui().dump(file.name());

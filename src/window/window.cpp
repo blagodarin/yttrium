@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include <yttrium/allocator.h>
+#include <yttrium/time.h> // RateCounter
 #include <yttrium/utils.h>
 
 #include "../gui/gui.h"
@@ -11,8 +12,34 @@
 namespace Yttrium
 {
 
+void Window::Callbacks::on_cursor_movement(const Dim2&)
+{
+}
+
+void Window::Callbacks::on_key_event(const KeyEvent&)
+{
+}
+
+void Window::Callbacks::on_render_canvas(Renderer&, const RectF&, const StaticString&)
+{
+}
+
+void Window::Callbacks::on_update()
+{
+}
+
+std::unique_ptr<Window> Window::create(const Dim2& size, Callbacks& callbacks, Allocator* allocator)
+{
+	if (size.x <= 0 && size.y <= 0)
+		return {};
+	auto window = std::make_unique<WindowImpl>(size, callbacks, allocator);
+	if (!window->initialize())
+		return {};
+	return std::move(window);
+}
+
 WindowImpl::WindowImpl(const Dim2& size, Window::Callbacks& callbacks, Allocator* allocator)
-	: Window(allocator)
+	: _allocator(allocator)
 	, _is_active(false)
 	, _is_cursor_locked(false)
 	, _size(size)
@@ -31,15 +58,15 @@ WindowImpl::~WindowImpl()
 
 bool WindowImpl::initialize()
 {
-	_screen = Screen::open(allocator());
+	_screen = Screen::open(_allocator);
 	if (!_screen)
 		return false;
 
-	_backend = WindowBackend::open(_screen, _size, this, allocator());
+	_backend = WindowBackend::open(_screen, _size, this, _allocator);
 	if (!_backend)
 		return false;
 
-	_gui.reset(new GuiImpl(renderer(), _callbacks, allocator()));
+	_gui.reset(new GuiImpl(renderer(), _callbacks, _allocator));
 	return true;
 }
 
@@ -51,19 +78,6 @@ void WindowImpl::close()
 Dim2 WindowImpl::cursor() const
 {
 	return _cursor;
-}
-
-void WindowImpl::draw_console(RendererBuiltin& renderer)
-{
-	if (_is_console_visible)
-	{
-		const Dim2 &size = renderer.size();
-
-		renderer.set_color(0, 0, 0, 0.5);
-		renderer.draw_rectangle(0, 0, size.x + 1, 1);
-
-		_console.render_input(renderer, 0, 0, size.x);
-	}
 }
 
 Gui& WindowImpl::gui()
@@ -97,35 +111,6 @@ void WindowImpl::lock_cursor(bool lock)
 	}
 }
 
-bool WindowImpl::process_events()
-{
-	if (!_backend->process_events())
-		return false;
-
-	if (!_is_active)
-		return true;
-
-	Dim2 cursor = _size / 2;
-
-	_backend->get_cursor(&cursor);
-
-	Dim2 movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
-
-	if (!_is_cursor_locked)
-	{
-		_cursor.x = std::min(std::max(cursor.x, 0), _size.x - 1);
-		_cursor.y = std::min(std::max(cursor.y, 0), _size.y - 1);
-	}
-	else
-	{
-		_backend->set_cursor(_cursor);
-	}
-
-	_callbacks.on_cursor_movement(*this, movement);
-
-	return true;
-}
-
 Renderer& WindowImpl::renderer()
 {
 	return _backend->renderer();
@@ -136,6 +121,28 @@ void WindowImpl::resize(const Dim2& size)
 	_size = size;
 	if (_is_active)
 		show(_mode);
+}
+
+void WindowImpl::run()
+{
+	RendererBuiltin renderer_builtin = renderer().renderer_builtin();
+
+	RateCounter fps;
+
+	fps.start();
+
+	while (process_events())
+	{
+		_callbacks.on_update();
+
+		renderer().begin_frame();
+		_gui->set_cursor(cursor());
+		_gui->render();
+		draw_console(renderer_builtin);
+		renderer().end_frame();
+
+		fps.tick();
+	}
 }
 
 void WindowImpl::set_console_visible(bool visible)
@@ -250,23 +257,53 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 	_callbacks.on_key_event(event);
 }
 
+void WindowImpl::draw_console(RendererBuiltin& renderer)
+{
+	if (_is_console_visible)
+	{
+		const Dim2 &size = renderer.size();
+
+		renderer.set_color(0, 0, 0, 0.5);
+		renderer.draw_rectangle(0, 0, size.x + 1, 1);
+
+		_console.render_input(renderer, 0, 0, size.x);
+	}
+}
+
+bool WindowImpl::process_events()
+{
+	if (!_backend->process_events())
+		return false;
+
+	if (!_is_active)
+		return true;
+
+	Dim2 cursor = _size / 2;
+
+	_backend->get_cursor(&cursor);
+
+	Dim2 movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
+
+	if (!_is_cursor_locked)
+	{
+		_cursor.x = std::min(std::max(cursor.x, 0), _size.x - 1);
+		_cursor.y = std::min(std::max(cursor.y, 0), _size.y - 1);
+	}
+	else
+	{
+		_backend->set_cursor(_cursor);
+	}
+
+	_callbacks.on_cursor_movement(movement);
+
+	return true;
+}
+
 void WindowImpl::set_active(bool active)
 {
 	_is_active = active;
 	if (active)
 		lock_cursor(_is_cursor_locked);
-}
-
-WindowPtr Window::create(const Dim2& size, Callbacks& callbacks, Allocator* allocator)
-{
-	if (size.x > 0 && size.y > 0)
-	{
-		Allocatable<WindowImpl> window(allocator);
-		window.reset(size, callbacks);
-		if (window->initialize())
-			return WindowPtr(window.release());
-	}
-	return WindowPtr();
 }
 
 } // namespace Yttrium

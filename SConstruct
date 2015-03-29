@@ -93,7 +93,7 @@ env.VariantDir('$BUILD', '.', duplicate = 0)
 
 toolchains_flags = {
 	'gcc': {
-		'compile': ['-std=gnu++0x', '-Wall', '-Wextra'],
+		'compile': ['-std=gnu++1y', '-Wall', '-Wextra'],
 		'compile-debug': ['-g'],
 		'compile-release': ['-O3'],
 		'compile-src': ['-fno-exceptions', '-fvisibility=hidden', '-fvisibility-inlines-hidden'],

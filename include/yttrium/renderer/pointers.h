@@ -8,18 +8,10 @@
 
 namespace Yttrium
 {
+	class Texture2D;
 
-class Texture2D;
-class TextureCache;
-
-/// 2D texture pointer.
-
-typedef Pointer<Texture2D> Texture2DPtr;
-
-/// Texture cache pointer.
-
-typedef Pointer<TextureCache> TextureCachePtr;
-
-} // namespace Yttrium
+	/// 2D texture pointer.
+	typedef Pointer<Texture2D> Texture2DPtr;
+}
 
 #endif // __Y_RENDERER_POINTERS_H

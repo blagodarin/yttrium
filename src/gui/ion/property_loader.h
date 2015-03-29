@@ -10,13 +10,12 @@ namespace Yttrium
 
 namespace Ion
 {
-
-class Node;
-class Object;
-
-} // namespace Ion
+	class Node;
+	class Object;
+}
 
 class GuiImpl;
+class TextureCache;
 
 class GuiIonPropertyLoader: public GuiPropertyLoader
 {
