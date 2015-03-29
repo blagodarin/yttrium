@@ -61,7 +61,7 @@ void GlTexture2D::bind()
 	}
 }
 
-Vector2f GlTexture2D::fix_coords(const Vector2f &coords) const
+Vector2f GlTexture2D::fix_coords(const Vector2f& coords) const
 {
 	float x = coords.x;
 	float y = coords.y;

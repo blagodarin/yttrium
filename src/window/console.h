@@ -5,29 +5,24 @@
 
 namespace Yttrium
 {
+	class DebugRenderer;
 
-class RendererBuiltin;
-class Window;
-
-class Console
-{
-public:
-
-	Console(const Window& window, Allocator* allocator)
-		: _window(window)
-		, _line_editor(allocator)
+	class Console
 	{
-	}
+	public:
 
-	bool process_key(const KeyEvent& event);
-	void render_input(RendererBuiltin& renderer, int x, int y, int max_size);
+		Console(Allocator* allocator)
+			: _line_editor(allocator)
+		{
+		}
 
-private:
+		bool process_key(const KeyEvent& event);
+		void draw_input(DebugRenderer& renderer, int x, int y, int max_size);
 
-	const Window& _window;
-	LineEditor    _line_editor;
-};
+	private:
 
-} // namespace Yttrium
+		LineEditor _line_editor;
+	};
+}
 
 #endif // __WINDOW_CONSOLE_H

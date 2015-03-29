@@ -5,24 +5,22 @@
 
 namespace Yttrium
 {
+	struct GlApi;
 
-struct GlApi;
+	class GlTextureCache: public BackendTextureCache
+	{
+	public:
 
-class GlTextureCache: public BackendTextureCache
-{
-public:
+		GlTextureCache(Renderer& renderer, const GlApi& gl);
 
-	GlTextureCache(Renderer& renderer, const GlApi &gl);
+	private:
 
-private:
+		BackendTexture2D* cache_texture_2d(const ImageFormat& format, const void* data) override;
 
-	BackendTexture2D *cache_texture_2d(const ImageFormat &format, const void *data) override;
+	private:
 
-private:
-
-	const GlApi &_gl;
-};
-
-} // namespace Yttrium
+		const GlApi &_gl;
+	};
+}
 
 #endif // __RENDERER_GL_TEXTURE_CACHE_H

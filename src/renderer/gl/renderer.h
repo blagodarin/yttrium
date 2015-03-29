@@ -6,34 +6,32 @@
 
 namespace Yttrium
 {
+	class OpenGlRenderer: public Renderer::Private
+	{
+	public:
 
-class OpenGlRenderer: public Renderer::Private
-{
-public:
+		OpenGlRenderer(WindowBackend& window, Allocator* allocator);
+		~OpenGlRenderer() override;
 
-	OpenGlRenderer(WindowBackend& window, Allocator* allocator);
-	~OpenGlRenderer() override;
+		// Renderer::Private
+		bool initialize() override;
+		void bind_debug_texture() override;
+		void clear() override;
+		std::unique_ptr<TextureCache> create_texture_cache(Renderer&) override;
+		void flush_2d() override;
+		void set_matrix_2d(double width, double height) override;
+		void set_viewport(const Dim2 &size) override;
+		void take_screenshot() override;
 
-	// Renderer::Private
-	bool initialize() override;
-	void bind_builtin() override;
-	void clear() override;
-	std::unique_ptr<TextureCache> create_texture_cache(Renderer&) override;
-	void flush_2d() override;
-	void set_matrix_2d(double width, double height) override;
-	void set_viewport(const Dim2 &size) override;
-	void take_screenshot() override;
+	private:
 
-private:
+		bool check_min_version(int major, int minor);
 
-	bool check_min_version(int major, int minor);
+	public:
 
-public:
-
-	GlApi  _gl;
-	GLuint _builtin_texture;
-};
-
-} // namespace Yttrium
+		GlApi  _gl;
+		GLuint _debug_texture = 0;
+	};
+}
 
 #endif // __RENDERER_GL_RENDERER_H

@@ -5,7 +5,6 @@
 #define __Y_RENDERER_H
 
 #include <yttrium/rect.h>
-#include <yttrium/renderer/builtin.h>
 #include <yttrium/renderer/pointers.h>
 #include <yttrium/static_string.h>
 #include <yttrium/texture_font.h>
@@ -50,14 +49,13 @@ public:
 public:
 
 	///
-
 	~Renderer();
 
 	///
 	Allocator* allocator() const;
 
-	/// Clear the framebuffer and begin a new frame.
-	void begin_frame();
+	///
+	void begin_frame(); // TODO: Remove.
 
 	///
 	/// \note Texture cache lifetime must not exceed its renderer lifetime.
@@ -79,15 +77,11 @@ public:
 	void draw_text(const Vector2f& position, const StaticString& text,
 		unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr);
 
-	/// Finish the rendering frame, swap the framebuffers, reset the rendering mode
-	/// and, if requested, capture a screenshot.
-	void end_frame();
+	///
+	void end_frame(); // TODO: Remove.
 
 	///
 	void flush_2d();
-
-	///
-	RendererBuiltin renderer_builtin();
 
 	///
 	Vector2d rendering_size() const;

@@ -9,15 +9,18 @@
 
 #include "../base/private_base.h"
 #include "../window/backend.h"
-#include "builtin.h"
 
 #include <vector>
 
 namespace Yttrium
 {
 
+class DebugRenderer;
+
 class Y_PRIVATE Renderer::Private: public PrivateBase<Renderer::Private>
 {
+	friend DebugRenderer;
+
 public:
 
 	Private(WindowBackend& window, Allocator* allocator);
@@ -26,7 +29,7 @@ public:
 public:
 
 	virtual bool initialize() = 0;
-	virtual void bind_builtin() = 0;
+	virtual void bind_debug_texture() = 0;
 	virtual void clear() = 0;
 	virtual std::unique_ptr<TextureCache> create_texture_cache(Renderer&) = 0;
 	virtual void flush_2d() = 0;
@@ -73,13 +76,18 @@ public:
 	TextureFont _font;
 	Vector2f    _font_size;
 
-	// Subinterfaces.
-
-	RendererBuiltin::Private _builtin;
+	bool _debug_rendering = false;
 
 public:
 
 	static Private* create(WindowBackend& window, Allocator* allocator);
+
+private:
+
+	static Private& get(Renderer& renderer)
+	{
+		return *renderer._private;
+	}
 };
 
 } // namespace Yttrium

@@ -10,14 +10,13 @@ namespace Yttrium
 
 OpenGlRenderer::OpenGlRenderer(WindowBackend& window, Allocator* allocator)
 	: Private(window, allocator)
-	, _builtin_texture(0)
 {
 	_gl.initialize(window);
 }
 
 OpenGlRenderer::~OpenGlRenderer()
 {
-	_gl.DeleteTextures(1, &_builtin_texture);
+	_gl.DeleteTextures(1, &_debug_texture);
 }
 
 bool OpenGlRenderer::initialize()
@@ -30,10 +29,10 @@ bool OpenGlRenderer::initialize()
 	_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	_gl.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	_gl.GenTextures(1, &_builtin_texture);
-	if (!_builtin_texture)
+	_gl.GenTextures(1, &_debug_texture);
+	if (!_debug_texture)
 		return false; // TODO: Report error.
-	_gl.BindTexture(GL_TEXTURE_2D, _builtin_texture);
+	_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
 	_gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Builtin::texture_width, Builtin::texture_height,
 		0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, Builtin::texture);
 	_gl.BindTexture(GL_TEXTURE_2D, 0);
@@ -41,10 +40,9 @@ bool OpenGlRenderer::initialize()
 	return true;
 }
 
-void OpenGlRenderer::bind_builtin()
+void OpenGlRenderer::bind_debug_texture()
 {
-	_gl.BindTexture(GL_TEXTURE_2D, _builtin_texture);
-
+	_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
 	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -60,7 +58,7 @@ void OpenGlRenderer::clear()
 
 std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache(Renderer& renderer)
 {
-	return std::unique_ptr<TextureCache>(new GlTextureCache(renderer, _gl));
+	return std::make_unique<GlTextureCache>(renderer, _gl);
 }
 
 void OpenGlRenderer::flush_2d()
@@ -68,7 +66,7 @@ void OpenGlRenderer::flush_2d()
 	_gl.EnableClientState(GL_COLOR_ARRAY);
 	_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].color);
 
-	if (_builtin._is_bound || _texture)
+	if (_debug_rendering || _texture)
 	{
 		_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
 		_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].texture);

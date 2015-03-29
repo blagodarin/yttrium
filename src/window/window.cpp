@@ -6,6 +6,7 @@
 
 #include "../gui/gui.h"
 #include "../memory/allocatable.h"
+#include "../renderer/debug_renderer.h"
 
 #include <algorithm> // min
 
@@ -45,7 +46,7 @@ WindowImpl::WindowImpl(const Dim2& size, Window::Callbacks& callbacks, Allocator
 	, _size(size)
 	, _mode(Windowed)
 	, _callbacks(callbacks)
-	, _console(*this, allocator)
+	, _console(allocator)
 	, _is_console_visible(false)
 {
 	for (bool& pressed : _keys)
@@ -125,8 +126,6 @@ void WindowImpl::resize(const Dim2& size)
 
 void WindowImpl::run()
 {
-	RendererBuiltin renderer_builtin = renderer().renderer_builtin();
-
 	RateCounter fps;
 
 	fps.start();
@@ -134,13 +133,10 @@ void WindowImpl::run()
 	while (process_events())
 	{
 		_callbacks.on_update();
-
 		renderer().begin_frame();
-		_gui->set_cursor(cursor());
-		_gui->render();
-		draw_console(renderer_builtin);
+		draw_gui();
+		draw_debug();
 		renderer().end_frame();
-
 		fps.tick();
 	}
 }
@@ -257,17 +253,24 @@ void WindowImpl::on_key_event(Key key, bool is_pressed)
 	_callbacks.on_key_event(event);
 }
 
-void WindowImpl::draw_console(RendererBuiltin& renderer)
+void WindowImpl::draw_debug()
 {
-	if (_is_console_visible)
-	{
-		const Dim2 &size = renderer.size();
+	if (!_is_console_visible)
+		return;
 
-		renderer.set_color(0, 0, 0, 0.5);
-		renderer.draw_rectangle(0, 0, size.x + 1, 1);
+	DebugRenderer debug_renderer(renderer());
 
-		_console.render_input(renderer, 0, 0, size.x);
-	}
+	const Dim2 &size = debug_renderer.size();
+
+	debug_renderer.set_color(0, 0, 0, 0.5);
+	debug_renderer.draw_rectangle(0, 0, size.x + 1, 1);
+	_console.draw_input(debug_renderer, 0, 0, size.x);
+}
+
+void WindowImpl::draw_gui()
+{
+	_gui->set_cursor(cursor());
+	_gui->render();
 }
 
 bool WindowImpl::process_events()

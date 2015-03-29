@@ -19,8 +19,6 @@ Renderer::Private::Private(WindowBackend& window, Allocator *allocator)
 	, _color(1, 1, 1)
 	, _font_size(1, 1)
 {
-	_builtin._renderer = this;
-
 	ImageFormat screenshot_format;
 	screenshot_format.set_pixel_format(PixelFormat::Rgb, 24);
 	screenshot_format.set_orientation(ImageOrientation::XRightYUp);
@@ -359,7 +357,6 @@ void Renderer::end_frame()
 	}
 
 	_private->_screenshot_filename.clear();
-	_private->_builtin._is_bound = false;
 }
 
 void Renderer::flush_2d()
@@ -370,11 +367,6 @@ void Renderer::flush_2d()
 		_private->_vertices_2d.clear();
 		_private->_indices_2d.clear();
 	}
-}
-
-RendererBuiltin Renderer::renderer_builtin()
-{
-	return RendererBuiltin(&_private->_builtin);
 }
 
 void Renderer::set_color(const Vector4f& color)
@@ -399,13 +391,10 @@ void Renderer::set_font_size(const Vector2f& size)
 
 void Renderer::set_matrix_2d(double width, double height)
 {
-	if (!_private->_builtin._is_bound)
-	{
-		_private->set_matrix_2d(width, height);
-		_private->_vertices_2d.clear();
-		_private->_indices_2d.clear();
-		_private->_rendering_size = Vector2d(width, height);
-	}
+	_private->set_matrix_2d(width, height);
+	_private->_vertices_2d.clear();
+	_private->_indices_2d.clear();
+	_private->_rendering_size = Vector2d(width, height);
 }
 
 void Renderer::set_matrix_2d_height(double height)
@@ -420,7 +409,7 @@ void Renderer::set_matrix_2d_width(double width)
 
 void Renderer::set_texture(const Texture2DPtr& texture)
 {
-	if (_private->_builtin._is_bound || _private->_texture == texture)
+	if (_private->_texture == texture)
 		return;
 
 	flush_2d();
