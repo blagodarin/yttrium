@@ -7,6 +7,7 @@
 #include "../gui/gui.h"
 #include "../memory/allocatable.h"
 #include "../renderer/debug_renderer.h"
+#include "../renderer/renderer.h"
 
 #include <algorithm> // min
 
@@ -63,11 +64,15 @@ bool WindowImpl::initialize()
 	if (!_screen)
 		return false;
 
-	_backend = WindowBackend::open(_screen, _size, this, _allocator);
+	_backend = WindowBackend::create(_screen, _size, this, _allocator);
 	if (!_backend)
 		return false;
 
-	_gui.reset(new GuiImpl(renderer(), _callbacks, _allocator));
+	_renderer = RendererImpl::create(*_backend, _allocator);
+	if (!_renderer)
+		return false;
+
+	_gui.reset(new GuiImpl(*_renderer, _callbacks, _allocator));
 	return true;
 }
 
@@ -83,7 +88,7 @@ Dim2 WindowImpl::cursor() const
 
 Gui& WindowImpl::gui()
 {
-	return *_gui.get();
+	return *_gui;
 }
 
 bool WindowImpl::is_console_visible() const
@@ -114,7 +119,7 @@ void WindowImpl::lock_cursor(bool lock)
 
 Renderer& WindowImpl::renderer()
 {
-	return _backend->renderer();
+	return *_renderer;
 }
 
 void WindowImpl::resize(const Dim2& size)
@@ -133,10 +138,10 @@ void WindowImpl::run()
 	while (process_events())
 	{
 		_callbacks.on_update();
-		renderer().begin_frame();
+		_renderer->clear();
 		draw_gui();
 		draw_debug();
-		renderer().end_frame();
+		_renderer->end_frame();
 		fps.tick();
 	}
 }
@@ -189,6 +194,7 @@ void WindowImpl::show(Mode mode)
 	}
 
 	_backend->put(corner.x, corner.y, _size.x, _size.y, _mode != Fullscreen);
+	_renderer->set_viewport(_size);
 	_backend->show();
 
 	if (!_is_cursor_locked)
@@ -258,13 +264,13 @@ void WindowImpl::draw_debug()
 	if (!_is_console_visible)
 		return;
 
-	DebugRenderer debug_renderer(renderer());
+	DebugRenderer renderer(*_renderer);
 
-	const Dim2 &size = debug_renderer.size();
+	const Dim2& size = renderer.size();
 
-	debug_renderer.set_color(0, 0, 0, 0.5);
-	debug_renderer.draw_rectangle(0, 0, size.x + 1, 1);
-	_console.draw_input(debug_renderer, 0, 0, size.x);
+	renderer.set_color(0, 0, 0, 0.5);
+	renderer.draw_rectangle(0, 0, size.x + 1, 1);
+	_console.draw_input(renderer, 0, 0, size.x);
 }
 
 void WindowImpl::draw_gui()

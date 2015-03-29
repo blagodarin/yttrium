@@ -2,7 +2,6 @@
 #define __WINDOW_X11_BACKEND_H
 
 #include <yttrium/key.h>
-#include <yttrium/renderer.h>
 #include <yttrium/screen.h>
 #include <yttrium/static_string.h>
 #include <yttrium/vector.h>
@@ -13,13 +12,14 @@
 namespace Yttrium
 {
 
+class RendererImpl;
 class WindowBackend;
 
 typedef Pointer<WindowBackend> WindowBackendPtr;
 
 class WindowBackend: public Pointable
 {
-	friend Renderer;
+	friend RendererImpl;
 
 public:
 
@@ -49,8 +49,6 @@ public:
 
 	bool process_events();
 
-	Renderer& renderer() { return _renderer; }
-
 	bool set_cursor(const Dim2& cursor);
 
 	bool set_frame_sync(bool frame_sync);
@@ -63,7 +61,7 @@ public:
 
 public:
 
-	static WindowBackendPtr open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator);
+	static WindowBackendPtr create(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator);
 
 private:
 
@@ -78,7 +76,6 @@ private:
 	::GLXContext _glx_context;
 	Dim2         _size;
 	Callbacks*   _callbacks;
-	Renderer     _renderer;
 };
 
 } // namespace Yttrium

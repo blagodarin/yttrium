@@ -6,22 +6,24 @@
 
 namespace Yttrium
 {
-	class OpenGlRenderer: public Renderer::Private
+	class OpenGlRenderer: public RendererImpl
 	{
 	public:
 
 		OpenGlRenderer(WindowBackend& window, Allocator* allocator);
 		~OpenGlRenderer() override;
 
-		// Renderer::Private
+		// Renderer
+		std::unique_ptr<TextureCache> create_texture_cache() override;
+
+		// RendererImpl
 		bool initialize() override;
-		void bind_debug_texture() override;
 		void clear() override;
-		std::unique_ptr<TextureCache> create_texture_cache(Renderer&) override;
-		void flush_2d() override;
-		void set_matrix_2d(double width, double height) override;
+		void do_flush_2d() override;
+		void do_set_matrix_2d(double width, double height) override;
 		void set_viewport(const Dim2 &size) override;
 		void take_screenshot() override;
+		void bind_debug_texture() override;
 
 	private:
 

@@ -5,31 +5,22 @@
 
 namespace Yttrium
 {
-	DebugRenderer::DebugRenderer(Renderer& renderer)
-		: _renderer(Renderer::Private::get(renderer))
+	DebugRenderer::DebugRenderer(RendererImpl& renderer)
+		: _renderer(renderer)
 		, _color(1, 1, 1)
 	{
-		// NOTE: Copypasted from "renderer/renderer.cpp".
-
-		if (_renderer._vertices_2d.size())
-		{
-			_renderer.flush_2d();
-			_renderer._vertices_2d.clear();
-			_renderer._indices_2d.clear();
-		}
-
+		_renderer.flush_2d();
 		_renderer._texture.reset();
 		// TODO: Reset font.
-
 		_renderer.bind_debug_texture();
 		_renderer.set_matrix_2d(_renderer._viewport_size.x, _renderer._viewport_size.y);
-
 		_renderer._debug_rendering = true;
 	}
 
 	DebugRenderer::~DebugRenderer()
 	{
-		_renderer._debug_rendering = true;
+		_renderer.flush_2d();
+		_renderer._debug_rendering = false;
 	}
 
 	void DebugRenderer::draw_cursor(int x, int y)

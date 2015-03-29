@@ -233,7 +233,6 @@ WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext g
 	, _glx_context(glx_context)
 	, _size(size)
 	, _callbacks(callbacks)
-	, _renderer(*this, allocator)
 {
 	::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
 	fix_window_size(_display, _window, _size);
@@ -298,8 +297,6 @@ bool WindowBackend::put(int left, int top, int width, int height, bool border)
 
 	_size = Dim2(width, height);
 	fix_window_size(_display, _window, _size);
-
-	_renderer._private->set_viewport(_size);
 
 	return true;
 }
@@ -436,7 +433,7 @@ void WindowBackend::swap_buffers()
 	::glXSwapBuffers(_display, _window);
 }
 
-WindowBackendPtr WindowBackend::open(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
+WindowBackendPtr WindowBackend::create(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
 {
 	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.get());
 	if (!screen_impl)
@@ -447,19 +444,7 @@ WindowBackendPtr WindowBackend::open(const ScreenPtr& screen, const Dim2& size, 
 	if (!initialize_window(screen_impl->_display, screen_impl->_screen, size, &window_handle, &glx_context))
 		return {};
 
-	WindowBackendPtr result(Y_NEW(allocator, WindowBackend)(screen_impl->_display, window_handle, glx_context, size, callbacks, allocator));
-	if (!result->initialize_renderer())
-		return {};
-
-	return result;
-}
-
-bool WindowBackend::initialize_renderer()
-{
-	if (!_renderer._private->initialize())
-		return false;
-	_renderer._private->set_viewport(_size);
-	return true;
+	return WindowBackendPtr(Y_NEW(allocator, WindowBackend)(screen_impl->_display, window_handle, glx_context, size, callbacks, allocator));
 }
 
 } // namespace Yttrium

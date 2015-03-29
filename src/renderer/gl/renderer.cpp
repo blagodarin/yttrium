@@ -9,7 +9,7 @@ namespace Yttrium
 {
 
 OpenGlRenderer::OpenGlRenderer(WindowBackend& window, Allocator* allocator)
-	: Private(window, allocator)
+	: RendererImpl(window, allocator)
 {
 	_gl.initialize(window);
 }
@@ -17,6 +17,11 @@ OpenGlRenderer::OpenGlRenderer(WindowBackend& window, Allocator* allocator)
 OpenGlRenderer::~OpenGlRenderer()
 {
 	_gl.DeleteTextures(1, &_debug_texture);
+}
+
+std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache()
+{
+	return std::make_unique<GlTextureCache>(*this, _gl);
 }
 
 bool OpenGlRenderer::initialize()
@@ -40,15 +45,6 @@ bool OpenGlRenderer::initialize()
 	return true;
 }
 
-void OpenGlRenderer::bind_debug_texture()
-{
-	_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
-	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-}
-
 void OpenGlRenderer::clear()
 {
 	_gl.ClearColor(0.5, 0.5, 0.5, 0);
@@ -56,12 +52,7 @@ void OpenGlRenderer::clear()
 	_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache(Renderer& renderer)
-{
-	return std::make_unique<GlTextureCache>(renderer, _gl);
-}
-
-void OpenGlRenderer::flush_2d()
+void OpenGlRenderer::do_flush_2d()
 {
 	_gl.EnableClientState(GL_COLOR_ARRAY);
 	_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].color);
@@ -82,7 +73,7 @@ void OpenGlRenderer::flush_2d()
 	_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void OpenGlRenderer::set_matrix_2d(double width, double height)
+void OpenGlRenderer::do_set_matrix_2d(double width, double height)
 {
 	_gl.MatrixMode(GL_PROJECTION);
 	_gl.LoadMatrixf(Matrix4f::projection_2d(0, 0, width, height).data());
@@ -98,7 +89,7 @@ void OpenGlRenderer::set_viewport(const Dim2 &size)
 	_gl.Viewport(0, 0, size.x, size.y);
 	_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 
-	Private::set_viewport(size);
+	RendererImpl::set_viewport(size);
 	_screenshot_image.set_size(size.x, size.y, unpack_alignment);
 }
 
@@ -110,6 +101,15 @@ void OpenGlRenderer::take_screenshot()
 	_gl.ReadBuffer(GL_FRONT);
 	_gl.ReadPixels(0, 0, _viewport_size.x, _viewport_size.y, GL_RGB, GL_UNSIGNED_BYTE, _screenshot_image.data());
 	_gl.ReadBuffer(read_buffer);
+}
+
+void OpenGlRenderer::bind_debug_texture()
+{
+	_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
+	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 bool OpenGlRenderer::check_min_version(int major, int minor)

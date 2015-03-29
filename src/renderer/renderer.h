@@ -17,36 +17,55 @@ namespace Yttrium
 
 class DebugRenderer;
 
-class Y_PRIVATE Renderer::Private: public PrivateBase<Renderer::Private>
+class RendererImpl: public Renderer
 {
 	friend DebugRenderer;
 
 public:
 
-	Private(WindowBackend& window, Allocator* allocator);
-	virtual ~Private();
+	static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
 
-public:
+	RendererImpl(WindowBackend& window, Allocator* allocator);
+
+	Allocator* allocator() const override;
+	void draw_rectangle(const RectF& rect) override;
+	void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
+	void draw_text(const Vector2f& position, const StaticString& text, unsigned alignment, TextCapture* capture) override;
+	void end_frame() override;
+	void flush_2d() override;
+	Vector2d rendering_size() const override;
+	void set_color(const Vector4f& color) override;
+	bool set_font(const TextureFont& font) override;
+	void set_font_size(const Vector2f& size) override;
+	void set_matrix_2d(double width, double height) override;
+	void set_matrix_2d_height(double height) override;
+	void set_matrix_2d_width(double width) override;
+	void set_texture(const Texture2DPtr& texture) override;
+	bool set_texture_borders(const MarginsI& borders) override;
+	void set_texture_rectangle(const RectF& rect) override;
+	void take_screenshot(const StaticString& name) override;
+	Vector2f text_size(const StaticString& text) const override;
+	Dim2 viewport_size() const override;
 
 	virtual bool initialize() = 0;
-	virtual void bind_debug_texture() = 0;
+
 	virtual void clear() = 0;
-	virtual std::unique_ptr<TextureCache> create_texture_cache(Renderer&) = 0;
-	virtual void flush_2d() = 0;
-	virtual void set_matrix_2d(double width, double height) = 0;
+	virtual void do_flush_2d() = 0;
+	virtual void do_set_matrix_2d(double width, double height) = 0;
 	virtual void set_viewport(const Dim2 &size);
 	virtual void take_screenshot() = 0;
 
-public:
+protected:
 
-	void draw_rectangle(const RectF &position, const RectF &texture, const MarginsF &borders = MarginsF());
-
-	void draw_text(const Vector2f &position, const StaticString &text, unsigned alignment, TextCapture* capture);
-
-	Vector2f text_size(const StaticString &text) const;
+	virtual void bind_debug_texture() = 0;
 
 public:
 
+	void draw_rectangle(const RectF &position, const RectF &texture, const MarginsF &borders);
+
+public:
+
+	Allocator* const _allocator;
 	WindowBackend& _window;
 
 	Dim2     _viewport_size;
@@ -77,17 +96,6 @@ public:
 	Vector2f    _font_size;
 
 	bool _debug_rendering = false;
-
-public:
-
-	static Private* create(WindowBackend& window, Allocator* allocator);
-
-private:
-
-	static Private& get(Renderer& renderer)
-	{
-		return *renderer._private;
-	}
 };
 
 } // namespace Yttrium

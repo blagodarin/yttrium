@@ -219,11 +219,11 @@ void Game::draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector
 				if (figure_type != Tetrium::Figure::None)
 				{
 					set_texture_rectangle(renderer, figure_type);
-					renderer.draw_rectangle(
+					renderer.draw_rectangle(RectF(
 						rect.left() + (1 + x) * block_size.x,
 						rect.top() + (Tetrium::Field::Height - y) * block_size.y,
 						block_size.x,
-						block_size.y);
+						block_size.y));
 				}
 			}
 		}
@@ -246,11 +246,11 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const Vector
 	{
 		if (figure.blocks[i].y < Tetrium::Field::Height * Tetrium::PointsPerRow)
 		{
-			renderer.draw_rectangle(
+			renderer.draw_rectangle(RectF(
 				rect.left() + (frame_offset.x + figure.blocks[i].x) * block_size.x,
 				rect.top() + (frame_offset.y - float(figure.blocks[i].y) / Tetrium::PointsPerRow) * block_size.y,
 				block_size.x,
-				block_size.y);
+				block_size.y));
 		}
 	}
 }
@@ -306,10 +306,10 @@ void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 
 			for (int i = 0; i < Tetrium::Figure::Blocks; ++i)
 			{
-				renderer.draw_rectangle(
+				renderer.draw_rectangle(RectF(
 					rect.left() + figure.blocks[i].x * block_width,
 					rect.top() + (1 - figure.blocks[i].y / Tetrium::PointsPerRow) * block_height,
-					block_width, block_height);
+					block_width, block_height));
 			}
 		}
 	}

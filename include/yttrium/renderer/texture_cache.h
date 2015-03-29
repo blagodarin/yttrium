@@ -15,6 +15,9 @@ namespace Yttrium
 	{
 	public:
 
+		TextureCache() = default;
+		virtual ~TextureCache() = default;
+
 		///
 		virtual Texture2DPtr cache_texture_2d(const StaticString &name, bool intensity = false) = 0;
 
@@ -23,9 +26,6 @@ namespace Yttrium
 
 		///
 		virtual Texture2DPtr load_texture_2d(const StaticString &name, bool intensity = false) = 0;
-
-		TextureCache() = default;
-		virtual ~TextureCache() = default;
 	};
 }
 
