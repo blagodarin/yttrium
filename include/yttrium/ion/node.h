@@ -9,57 +9,41 @@
 
 namespace Yttrium
 {
-
-namespace Ion
-{
-
-class Document;
-class Object;
-
-///
-
-class Y_API Node
-	: public List
-{
-	friend Document;
-	friend Object;
-
-public:
+	class IonDocument;
+	class IonObject;
 
 	///
+	class Y_API IonNode: public IonList
+	{
+		friend IonDocument;
+		friend IonObject;
 
-	Node();
+	public:
 
-public:
+		///
+		IonNode();
 
-	///
+		///
+		StaticString name() const { return _name; }
 
-	inline StaticString name() const { return _name; }
+		///
+		void serialize(String* result, int indentation = 0) const;
 
-	///
+		///
+		String serialize(int indentation = 0, Allocator* allocator = nullptr) const;
 
-	void serialize(String *result, int indentation = 0) const;
+		///
+		StaticString string(const StaticString& default_value = StaticString()) const;
 
-	///
+	private:
 
-	String serialize(int indentation = 0, Allocator *allocator = nullptr) const;
+		Y_PRIVATE IonNode(IonDocument* document, const StaticString& name);
+		Y_PRIVATE IonNode(IonDocument* document, const StaticString& name, const ByReference&);
 
-	///
+	private:
 
-	StaticString string(const StaticString &default_value = StaticString()) const;
-
-private:
-
-	Y_PRIVATE Node(Document *document, const StaticString &name);
-	Y_PRIVATE Node(Document *document, const StaticString &name, const ByReference &);
-
-private:
-
-	String _name;
-};
-
-} // namespace Ion
-
-} // namespace Yttrium
+		String _name;
+	};
+}
 
 #endif // __Y_ION_NODE_H

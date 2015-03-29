@@ -4,8 +4,6 @@
 #ifndef __Y_GUI_H
 #define __Y_GUI_H
 
-#include <yttrium/key.h>
-
 #include <cstddef>
 
 namespace Yttrium
@@ -13,7 +11,7 @@ namespace Yttrium
 	class StaticString;
 
 	/// GUI manager.
-	class Y_API Gui
+	class Gui
 	{
 	public:
 
@@ -36,12 +34,6 @@ namespace Yttrium
 
 		///
 		virtual bool push_scene(const StaticString& name) = 0;
-
-		///
-		virtual bool render() = 0; // TODO: 'const'.
-
-		///
-		virtual void set_cursor(const Vector2f& cursor) = 0;
 	};
 }
 

@@ -4,7 +4,7 @@
 #ifndef __Y_VECTOR_H
 #define __Y_VECTOR_H
 
-#include <yttrium/global.h>
+#include <yttrium/size.h>
 
 namespace Yttrium
 {
@@ -22,21 +22,20 @@ public:
 public:
 
 	///
-
 	Vector2() {}
 
 	///
-
-	Vector2(int);
-
-	///
-
-	Vector2(T x, T y);
+	explicit Vector2(int): x(0), y(0) {}
 
 	///
+	Vector2(T x, T y): x(x), y(y) {}
 
+	///
+	explicit Vector2(const Size& size): x(size.width), y(size.height) {}
+
+	///
 	template <typename U>
-	Vector2(const Vector2<U> &vector);
+	Vector2(const Vector2<U>& vector): x(vector.x), y(vector.y) {}
 
 public:
 
@@ -236,28 +235,6 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-Vector2<T>::Vector2(int)
-	: x(0)
-	, y(0)
-{
-}
-
-template <typename T>
-Vector2<T>::Vector2(T x, T y)
-	: x(x)
-	, y(y)
-{
-}
-
-template <typename T>
-template <typename U>
-Vector2<T>::Vector2(const Vector2<U> &vector)
-	: x(vector.x)
-	, y(vector.y)
-{
-}
 
 template <typename T>
 T *Vector2<T>::data()

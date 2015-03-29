@@ -2,14 +2,8 @@
 
 namespace Yttrium
 {
-
-bool Widget::process_key(const KeyEvent&)
-{
-	return false;
+	bool Widget::process_key(const KeyEvent&)
+	{
+		return false;
+	}
 }
-
-void Widget::update()
-{
-}
-
-} // namespace Yttrium

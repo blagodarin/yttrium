@@ -2,13 +2,12 @@
 #define __WINDOW_BINDINGS_LOOKUP_H
 
 #include <yttrium/key.h>
-#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
+	class StaticString;
 
-Key lookup_key(const StaticString name);
-
-} // namespace Yttrium
+	Key lookup_key(const StaticString& name);
+}
 
 #endif // __WINDOW_BINDINGS_LOOKUP_H

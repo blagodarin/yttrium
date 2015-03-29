@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(test_ion_serialization)
 
 	File file(File::Temporary);
 
-	Ion::Document document;
+	IonDocument document;
 
 	String expected;
 	String actual;

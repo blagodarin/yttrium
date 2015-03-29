@@ -1,6 +1,5 @@
 /// \file
 /// \brief Global definitions.
-/// \note This header is included (directly or indirectly) by all other %Yttrium headers.
 
 #ifndef __Y_GLOBAL_H
 #define __Y_GLOBAL_H
@@ -172,14 +171,14 @@
 /// Make the current class \a Class non-copyable.
 
 #define Y_NONCOPYABLE(Class) \
-	Class(const Class &) = delete; \
-	Class &operator =(const Class &) = delete
+	Class(const Class&) = delete; \
+	Class& operator=(const Class&) = delete
 
 ///
 #define Y_DECLARE_PRIVATE(Class) \
 	public: \
 		class Private; \
-		Class(): _private(nullptr) {} \
+		Class() = default; \
 		Class(const Class&); \
 		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
 		~Class(); \
@@ -189,13 +188,13 @@
 	protected: \
 		Class(Private* private_): _private(private_) {} \
 	private: \
-		Private* _private \
+		Private* _private = nullptr \
 
 ///
 #define Y_DECLARE_PRIVATE_NONCOPYABLE(Class) \
 	public: \
 		class Private; \
-		Class(): _private(nullptr) {} \
+		Class() = default; \
 		Class(const Class&) = delete; \
 		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
 		~Class(); \
@@ -205,7 +204,7 @@
 	protected: \
 		Class(Private* private_): _private(private_) {} \
 	private: \
-		Private* _private \
+		Private* _private = nullptr \
 
 /// %Yttrium namespace.
 namespace Yttrium

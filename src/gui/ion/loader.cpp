@@ -4,7 +4,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
-#include <yttrium/renderer/texture_cache.h>
+#include <yttrium/texture_cache.h>
 
 #include "../gui.h"
 #include "../scene.h"
@@ -16,14 +16,14 @@ namespace Yttrium
 namespace
 {
 
-bool load_object(const Ion::List &source, const Ion::Object **object,
-	const StaticString **name, Ion::List::ConstRange *classes)
+bool load_object(const IonList &source, const IonObject **object,
+	const StaticString **name, IonList::ConstRange *classes)
 {
-	const Ion::Object *result_object = nullptr;
+	const IonObject *result_object = nullptr;
 	const StaticString *result_name = nullptr;
-	const Ion::List *result_classes = nullptr;
+	const IonList *result_classes = nullptr;
 
-	for (const Ion::Value &value: source)
+	for (const IonValue &value: source)
 	{
 		if (value.is_object())
 		{
@@ -50,7 +50,7 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 				return false;
 			}
 
-			for (const Ion::Value &class_name: value.list())
+			for (const IonValue &class_name: value.list())
 			{
 				if (!class_name.is_string())
 				{
@@ -69,17 +69,17 @@ bool load_object(const Ion::List &source, const Ion::Object **object,
 
 	*object = result_object;
 	*name = result_name;
-	*classes = result_classes ? result_classes->values() : Ion::List::ConstRange();
+	*classes = result_classes ? result_classes->values() : IonList::ConstRange();
 
 	return true;
 }
 
-bool load_object(const Ion::List &source, const Ion::Object **object,
+bool load_object(const IonList &source, const IonObject **object,
 	const StaticString **name, const StaticString **class_name)
 {
-	const Ion::Object *result_object;
+	const IonObject *result_object;
 	const StaticString *result_name;
-	Ion::List::ConstRange result_classes;
+	IonList::ConstRange result_classes;
 
 	if (!load_object(source, &result_object, &result_name, &result_classes))
 	{
@@ -119,7 +119,7 @@ GuiIonLoader::GuiIonLoader(GuiImpl *gui)
 
 bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 {
-	Ion::Document document(_gui->internal_allocator());
+	IonDocument document(_gui->internal_allocator());
 
 	if (!document.load(source_name))
 	{
@@ -129,7 +129,7 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 
 	if (!is_internal)
 	{
-		const Ion::Node *node;
+		const IonNode *node;
 
 		if (document.last(S("size"), &node))
 		{
@@ -157,9 +157,9 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 	return true;
 }
 
-void GuiIonLoader::load(const Ion::Object &source)
+void GuiIonLoader::load(const IonObject &source)
 {
-	for (const Ion::Node &node: source.nodes())
+	for (const IonNode &node: source.nodes())
 	{
 		if (node.name() == S("include"))
 		{
@@ -172,7 +172,7 @@ void GuiIonLoader::load(const Ion::Object &source)
 		}
 		else if (node.name() == S("class"))
 		{
-			const Ion::Object  *object;
+			const IonObject  *object;
 			const StaticString *object_name;
 			const StaticString *class_name;
 
@@ -188,7 +188,7 @@ void GuiIonLoader::load(const Ion::Object &source)
 		}
 		else if (node.name() == S("scene"))
 		{
-			const Ion::Object  *object;
+			const IonObject  *object;
 			const StaticString *object_name;
 			const StaticString *class_name;
 
@@ -213,7 +213,7 @@ void GuiIonLoader::load(const Ion::Object &source)
 		}
 		else if (node.name() == S("on_scene_change"))
 		{
-			Ion::List::ConstRange s = node.values();
+			IonList::ConstRange s = node.values();
 
 			if (s.size() != 2 || !s->is_list() || !s.last().is_string())
 			{
@@ -225,7 +225,7 @@ void GuiIonLoader::load(const Ion::Object &source)
 			const StaticString *to;
 			const StaticString *action;
 
-			Ion::List::ConstRange t = s->list().values();
+			IonList::ConstRange t = s->list().values();
 
 			if (t.size() != 2 || !t->get(&from) || !t.last().get(&to)
 				|| !s.last().get(&action))
@@ -241,7 +241,7 @@ void GuiIonLoader::load(const Ion::Object &source)
 		}
 		else if (node.name() == S("font"))
 		{
-			const Ion::Object  *object;
+			const IonObject  *object;
 			const StaticString *object_name;
 			const StaticString *class_name;
 
@@ -264,11 +264,11 @@ void GuiIonLoader::load(const Ion::Object &source)
 	}
 }
 
-void GuiIonLoader::load_scene(GuiScene *scene, const Ion::Object &source) const
+void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
 {
 	scene->reserve(source.size());
 
-	for (const Ion::Node &node: source.nodes())
+	for (const IonNode &node: source.nodes())
 	{
 		if (node.name() == S("size"))
 		{
@@ -294,17 +294,17 @@ void GuiIonLoader::load_scene(GuiScene *scene, const Ion::Object &source) const
 		}
 		else if (node.name() == S("bind"))
 		{
-			Ion::Node::ConstRange s = node.values();
+			IonNode::ConstRange s = node.values();
 
-			if (s.size() == 2 && s->type() == Ion::Value::StringType
-				&& s.last().type() == Ion::Value::StringType)
+			if (s.size() == 2 && s->type() == IonValue::StringType
+				&& s.last().type() == IonValue::StringType)
 			{
 				scene->bind(s->string(), s.last().string());
 			}
 		}
 		else
 		{
-			const Ion::Object  *object;
+			const IonObject  *object;
 			const StaticString *object_name;
 			const StaticString *class_name;
 

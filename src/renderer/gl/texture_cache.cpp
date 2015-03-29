@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 
-GlTextureCache::GlTextureCache(Renderer& renderer, const GlApi& gl)
+GlTextureCache::GlTextureCache(RendererImpl& renderer, const GlApi& gl)
 	: BackendTextureCache(renderer)
 	, _gl(gl)
 {

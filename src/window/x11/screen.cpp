@@ -4,65 +4,70 @@
 
 namespace Yttrium
 {
-
-ScreenImpl::ScreenImpl(::Display* display, int screen, Allocator* allocator)
-	: Screen(allocator)
-	, _display(display)
-	, _screen(screen)
-{
-}
-
-ScreenImpl::~ScreenImpl()
-{
-	::XCloseDisplay(_display);
-}
-
-ScreenMode ScreenImpl::mode(ModeType type)
-{
-	::XRRScreenConfiguration* config = ::XRRGetScreenInfo(_display, RootWindow(_display, _screen));
-
-	int nsizes = 0;
-	::XRRScreenSize* sizes = ::XRRConfigSizes(config, &nsizes);
-
-	ScreenMode result;
-
-	if (type != DefaultMode)
+	std::unique_ptr<ScreenImpl> ScreenImpl::open()
 	{
-		::Rotation rotation;
-		::SizeID size_id = ::XRRConfigCurrentConfiguration(config, &rotation);
-		result.width = sizes[size_id].width;
-		result.height = sizes[size_id].height;
-
-		result.frequency = ::XRRConfigCurrentRate(config);
+		::Display* display = ::XOpenDisplay(nullptr);
+		if (display)
+		{
+			int event_base;
+			int error_base;
+			if (::XRRQueryExtension(display, &event_base, &error_base))
+				return std::make_unique<ScreenImpl>(display);
+			::XCloseDisplay(display);
+		}
+		return {};
 	}
-	else
+
+	ScreenImpl::ScreenImpl(::Display* display)
+		: _display(display)
+		, _screen(DefaultScreen(display))
 	{
-		result.width = sizes[0].width;
-		result.height = sizes[0].height;
+	}
+
+	ScreenImpl::~ScreenImpl()
+	{
+		::XCloseDisplay(_display);
+	}
+
+	ScreenMode ScreenImpl::current_mode() const
+	{
+		::XRRScreenConfiguration* config = ::XRRGetScreenInfo(_display, RootWindow(_display, _screen));
+
+		int nsizes = 0;
+		::XRRScreenSize* sizes = ::XRRConfigSizes(config, &nsizes);
+
+		::Rotation rotation;
+		const int size_index = ::XRRConfigCurrentConfiguration(config, &rotation);
+
+		ScreenMode mode;
+		mode.width = sizes[size_index].width;
+		mode.height = sizes[size_index].height;
+		mode.frequency = ::XRRConfigCurrentRate(config);
+
+		::XRRFreeScreenConfigInfo(config);
+
+		return mode;
+	}
+
+	ScreenMode ScreenImpl::default_mode() const
+	{
+		::XRRScreenConfiguration* config = ::XRRGetScreenInfo(_display, RootWindow(_display, _screen));
+
+		int nsizes = 0;
+		::XRRScreenSize* sizes = ::XRRConfigSizes(config, &nsizes);
+
+		const int size_index = 0;
 
 		int nrates = 0;
-		result.frequency = ::XRRConfigRates(config, 0, &nrates)[0];
+		short* rates = ::XRRConfigRates(config, size_index, &nrates);
+
+		ScreenMode mode;
+		mode.width = sizes[size_index].width;
+		mode.height = sizes[size_index].height;
+		mode.frequency = rates[0];
+
+		::XRRFreeScreenConfigInfo(config);
+
+		return mode;
 	}
-
-	result.bits_per_pixel = 0;
-
-	::XRRFreeScreenConfigInfo(config);
-
-	return result;
 }
-
-ScreenPtr Screen::open(Allocator* allocator)
-{
-	::Display* display = ::XOpenDisplay(nullptr);
-	if (display)
-	{
-		int event_base;
-		int error_base;
-		if (::XRRQueryExtension(display, &event_base, &error_base))
-			return ScreenPtr(Y_NEW(allocator, ScreenImpl)(display, DefaultScreen(display), allocator));
-		::XCloseDisplay(display);
-	}
-	return ScreenPtr();
-}
-
-} // namespace Yttrium

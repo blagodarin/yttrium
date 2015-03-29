@@ -35,7 +35,6 @@ class Vector2;
 
 typedef Vector2<float>  Vector2f;  ///< \c float Vector2.
 typedef Vector2<double> Vector2d;  ///< \c double Vector2.
-typedef Vector2<int>    Dim2;      ///< \c int Vector2.
 
 template <typename T>
 class Vector4;

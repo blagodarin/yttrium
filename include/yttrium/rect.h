@@ -4,6 +4,8 @@
 #ifndef __Y_RECT_H
 #define __Y_RECT_H
 
+#include <yttrium/point.h>
+#include <yttrium/size.h>
 #include <yttrium/vector.h>
 
 namespace Yttrium
@@ -17,7 +19,6 @@ class Rect_
 public:
 
 	///
-
 	explicit Rect_(T left = 0, T top = 0, T width = 0, T height = 0)
 		: _left(left)
 		, _top(top)
@@ -27,7 +28,6 @@ public:
 	}
 
 	///
-
 	explicit Rect_(const Vector2<T>& size)
 		: _left(0)
 		, _top(0)
@@ -37,7 +37,6 @@ public:
 	}
 
 	///
-
 	Rect_(const Vector2<T>& corner, const Vector2<T>& size)
 		: _left(corner.x)
 		, _top(corner.y)
@@ -47,7 +46,6 @@ public:
 	}
 
 	///
-
 	template <typename U>
 	explicit Rect_(const Rect_<U>& rect)
 		: _left(rect.left())
@@ -283,34 +281,41 @@ protected:
 };
 
 ///
-
 class Rect: public Rect_<int>
 {
 public:
 
 	///
-
 	explicit Rect(int left = 0, int top = 0, int width = 0, int height = 0)
 		: Rect_(left, top, width, height)
 	{
 	}
 
 	///
+	Rect(const Point& top_left, const Size& size)
+		: Rect_(top_left.x, top_left.y, size.width, size.height)
+	{
+	}
 
+	///
+	explicit Rect(const Size& size)
+		: Rect_(0, 0, size.width, size.height)
+	{
+	}
+
+	///
 	explicit Rect(const Vector2<int>& size)
 		: Rect_(size)
 	{
 	}
 
 	///
-
 	Rect(const Vector2<int> &corner, const Vector2<int> &size)
 		: Rect_(corner, size)
 	{
 	}
 
 	///
-
 	template <typename U>
 	explicit Rect(const Rect_<U> &rect)
 		: Rect_(rect)

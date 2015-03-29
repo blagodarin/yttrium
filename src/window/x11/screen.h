@@ -9,26 +9,26 @@
 
 namespace Yttrium
 {
+	class ScreenImpl: public Screen
+	{
+	public:
 
-class WindowBackend;
+		static std::unique_ptr<ScreenImpl> open();
 
-class ScreenImpl: public Screen
-{
-	friend WindowBackend;
+		ScreenImpl(::Display* display);
+		~ScreenImpl() override;
 
-public:
+		ScreenMode current_mode() const override;
+		ScreenMode default_mode() const override;
 
-	ScreenImpl(::Display* display, int screen, Allocator* allocator);
-	~ScreenImpl() override;
+		::Display* display() const { return _display; }
+		int screen() const { return _screen; }
 
-	ScreenMode mode(ModeType type) override;
+	private:
 
-private:
-
-	::Display* _display;
-	int        _screen;
-};
-
-} // namespace Yttrium
+		::Display* _display;
+		int        _screen;
+	};
+}
 
 #endif // __WINDOW_X11_SCREEN_H

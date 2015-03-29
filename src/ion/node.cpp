@@ -5,57 +5,48 @@
 
 namespace Yttrium
 {
-
-namespace Ion
-{
-
-const Node null_node;
-
-Node::Node()
-	: List(nullptr)
-	, _name(static_cast<Allocator *>(nullptr))
-{
-}
-
-void Node::serialize(String *result, int indentation) const
-{
-	if (indentation > 0)
+	namespace Ion
 	{
-		result->append('\t', indentation);
+		const IonNode null_node;
 	}
-	result->append(_name);
-	if (!is_empty())
+
+	IonNode::IonNode()
+		: IonList(nullptr)
+		, _name(static_cast<Allocator*>(nullptr))
 	{
-		List::serialize(result, indentation, true);
+	}
+
+	void IonNode::serialize(String* result, int indentation) const
+	{
+		if (indentation > 0)
+			result->append('\t', indentation);
+		result->append(_name);
+		if (!is_empty())
+			IonList::serialize(result, indentation, true);
+	}
+
+	String IonNode::serialize(int indentation, Allocator* allocator) const
+	{
+		String result(allocator ? allocator : document()->allocator());
+		serialize(&result, indentation);
+		return std::move(result);
+	}
+
+	StaticString IonNode::string(const StaticString& default_value) const
+	{
+		const IonValue* value = first();
+		return value && value->is_string() ? value->string() : default_value;
+	}
+
+	IonNode::IonNode(IonDocument* document, const StaticString& name)
+		: IonList(document)
+		, _name(name, document->allocator())
+	{
+	}
+
+	IonNode::IonNode(IonDocument* document, const StaticString& name, const ByReference&)
+		: IonList(document)
+		, _name(name, ByReference(), document->allocator())
+	{
 	}
 }
-
-String Node::serialize(int indentation, Allocator *allocator) const
-{
-	String result(allocator ? allocator : document()->allocator());
-
-	serialize(&result, indentation);
-	return result;
-}
-
-StaticString Node::string(const StaticString &default_value) const
-{
-	const Value *value = first();
-	return (value && value->is_string()) ? value->string() : default_value;
-}
-
-Node::Node(Document *document, const StaticString &name)
-	: List(document)
-	, _name(name, document->allocator())
-{
-}
-
-Node::Node(Document *document, const StaticString &name, const ByReference &)
-	: List(document)
-	, _name(name, ByReference(), document->allocator())
-{
-}
-
-} // namespace Ion
-
-} // namespace Yttrium

@@ -1,6 +1,8 @@
-#include "backend.h"
+#include "window.h"
 
-#include "../../renderer/renderer.h"
+#include <yttrium/point.h>
+#include <yttrium/static_string.h>
+
 #include "screen.h"
 
 namespace Yttrium
@@ -19,20 +21,19 @@ bool check_glx_version(::Display* display, int major, int minor)
 		&& glx_minor >= minor;
 }
 
-void fix_window_size(::Display* display, ::Window window, const Dim2& size)
+void fix_window_size(::Display* display, ::Window window, const Size& size)
 {
 	::XSizeHints size_hints;
-
-	size_hints.min_width = size.x;
-	size_hints.min_height = size.y;
-	size_hints.max_width = size.x;
-	size_hints.max_height = size.y;
+	::memset(&size_hints, 0, sizeof size_hints);
+	size_hints.min_width = size.width;
+	size_hints.min_height = size.height;
+	size_hints.max_width = size.width;
+	size_hints.max_height = size.height;
 	size_hints.flags = PMinSize | PMaxSize;
-
 	::XSetWMNormalHints(display, window, &size_hints);
 }
 
-bool initialize_window(::Display* display, int screen, const Dim2& size, ::Window* window, ::GLXContext* glx_context)
+bool initialize_window(::Display* display, int screen, const Size& size, ::Window* window, ::GLXContext* glx_context)
 {
 	// GLXFBConfig API requires GLX 1.3.
 	// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
@@ -106,7 +107,7 @@ bool initialize_window(::Display* display, int screen, const Dim2& size, ::Windo
 			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
 
 			*window = ::XCreateWindow(display, root_window,
-				0, 0, size.x, size.y, 0, vi->depth, InputOutput, vi->visual,
+				0, 0, size.width, size.height, 0, vi->depth, InputOutput, vi->visual,
 				CWBorderPixel | CWColormap | CWEventMask, &swa);
 
 			if (*window != None)
@@ -223,10 +224,8 @@ Key key_from_event(::XEvent& event)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context,
-	const Dim2& size, Callbacks* callbacks, Allocator* allocator)
-	: Pointable(allocator)
-	, _display(display)
+WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, const Size& size, Callbacks& callbacks)
+	: _display(display)
 	, _window(window)
 	, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 	, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
@@ -254,7 +253,7 @@ void WindowBackend::close()
 	}
 }
 
-bool WindowBackend::get_cursor(Dim2* cursor)
+bool WindowBackend::get_cursor(Point& cursor)
 {
 	if (_window == None)
 		return false;
@@ -272,13 +271,13 @@ bool WindowBackend::get_cursor(Dim2* cursor)
 		return false;
 	}
 
-	cursor->x = win_x_return;
-	cursor->y = win_y_return;
+	cursor.x = win_x_return;
+	cursor.y = win_y_return;
 
 	return true;
 }
 
-bool WindowBackend::get_frame_sync(bool* frame_sync)
+bool WindowBackend::get_frame_sync(bool& frame_sync)
 {
 	Y_UNUSED(frame_sync);
 	return false;
@@ -295,7 +294,7 @@ bool WindowBackend::put(int left, int top, int width, int height, bool border)
 	::XChangeWindowAttributes(_display, _window, CWOverrideRedirect, &attributes);
 	::XMoveResizeWindow(_display, _window, left, top, width, height);
 
-	_size = Dim2(width, height);
+	_size = Size(width, height);
 	fix_window_size(_display, _window, _size);
 
 	return true;
@@ -319,41 +318,41 @@ bool WindowBackend::process_events()
 				return false;
 			}
 		}
-		else if (_callbacks)
+		else
 		{
 			switch (event.type)
 			{
 			case KeyPress:
 
-				_callbacks->on_key_event(key_from_event(event), true);
+				_callbacks.on_key_event(key_from_event(event), true);
 				break;
 
 			case KeyRelease:
 
-				_callbacks->on_key_event(key_from_event(event), false);
+				_callbacks.on_key_event(key_from_event(event), false);
 				break;
 
 			case ButtonPress:
 
 				if (event.xbutton.button == Button1)
 				{
-					_callbacks->on_key_event(Key::Mouse1, true);
+					_callbacks.on_key_event(Key::Mouse1, true);
 				}
 				else if (event.xbutton.button == Button2)
 				{
-					_callbacks->on_key_event(Key::Mouse2, true);
+					_callbacks.on_key_event(Key::Mouse2, true);
 				}
 				else if (event.xbutton.button == Button3)
 				{
-					_callbacks->on_key_event(Key::Mouse3, true);
+					_callbacks.on_key_event(Key::Mouse3, true);
 				}
 				else if (event.xbutton.button == Button4)
 				{
-					_callbacks->on_key_event(Key::Mouse4, true);
+					_callbacks.on_key_event(Key::Mouse4, true);
 				}
 				else if (event.xbutton.button == Button5)
 				{
-					_callbacks->on_key_event(Key::Mouse5, true);
+					_callbacks.on_key_event(Key::Mouse5, true);
 				}
 				break;
 
@@ -361,34 +360,34 @@ bool WindowBackend::process_events()
 
 				if (event.xbutton.button == Button1)
 				{
-					_callbacks->on_key_event(Key::Mouse1, false);
+					_callbacks.on_key_event(Key::Mouse1, false);
 				}
 				else if (event.xbutton.button == Button2)
 				{
-					_callbacks->on_key_event(Key::Mouse2, false);
+					_callbacks.on_key_event(Key::Mouse2, false);
 				}
 				else if (event.xbutton.button == Button3)
 				{
-					_callbacks->on_key_event(Key::Mouse3, false);
+					_callbacks.on_key_event(Key::Mouse3, false);
 				}
 				else if (event.xbutton.button == Button4)
 				{
-					_callbacks->on_key_event(Key::Mouse4, false);
+					_callbacks.on_key_event(Key::Mouse4, false);
 				}
 				else if (event.xbutton.button == Button5)
 				{
-					_callbacks->on_key_event(Key::Mouse5, false);
+					_callbacks.on_key_event(Key::Mouse5, false);
 				}
 				break;
 
 			case FocusIn:
 
-				_callbacks->on_focus_event(true);
+				_callbacks.on_focus_event(true);
 				break;
 
 			case FocusOut:
 
-				_callbacks->on_focus_event(false);
+				_callbacks.on_focus_event(false);
 				break;
 			}
 		}
@@ -404,7 +403,7 @@ void WindowBackend::set_name(const StaticString& name)
 	::XStoreName(_display, _window, name.text());
 }
 
-bool WindowBackend::set_cursor(const Dim2& cursor)
+bool WindowBackend::set_cursor(const Point& cursor)
 {
 	if (_window == None)
 		return false;
@@ -433,18 +432,13 @@ void WindowBackend::swap_buffers()
 	::glXSwapBuffers(_display, _window);
 }
 
-WindowBackendPtr WindowBackend::create(const ScreenPtr& screen, const Dim2& size, Callbacks* callbacks, Allocator* allocator)
+std::unique_ptr<WindowBackend> WindowBackend::create(const ScreenImpl& screen, const Size& size, Callbacks& callbacks)
 {
-	ScreenImpl* screen_impl = static_cast<ScreenImpl*>(screen.get());
-	if (!screen_impl)
-		return {};
-
 	::Window window_handle;
 	::GLXContext glx_context;
-	if (!initialize_window(screen_impl->_display, screen_impl->_screen, size, &window_handle, &glx_context))
+	if (!initialize_window(screen.display(), screen.screen(), size, &window_handle, &glx_context))
 		return {};
-
-	return WindowBackendPtr(Y_NEW(allocator, WindowBackend)(screen_impl->_display, window_handle, glx_context, size, callbacks, allocator));
+	return std::make_unique<WindowBackend>(screen.display(), window_handle, glx_context, size, callbacks);
 }
 
 } // namespace Yttrium

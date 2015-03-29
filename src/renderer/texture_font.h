@@ -9,21 +9,19 @@
 
 namespace Yttrium
 {
+	class Y_PRIVATE TextureFont::Private: public PrivateBase<TextureFont::Private>
+	{
+	public:
 
-class Y_PRIVATE TextureFont::Private: public PrivateBase<TextureFont::Private>
-{
-public:
+		Private(Allocator *allocator);
 
-	Private(Allocator *allocator);
+	public:
 
-public:
-
-	int                                   _size;
-	std::map<char, TextureFont::CharInfo> _chars;
-	std::map<std::pair<char, char>, int>  _kernings;
-	Rect                                  _rect;
-};
-
-} // namespace Yttrium
+		int                                   _size;
+		std::map<char, TextureFont::CharInfo> _chars;
+		std::map<std::pair<char, char>, int>  _kernings;
+		Rect                                  _rect;
+	};
+}
 
 #endif // __RENDERER_TEXTURE_FONT_H

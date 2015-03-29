@@ -6,74 +6,59 @@
 
 namespace Yttrium
 {
-
-namespace
-{
-
-void update_document(Ion::Document* target, const Ion::Object& source)
-{
-	for (const Ion::Node& node: source.nodes().reverse())
+	namespace
 	{
-		if (!target->contains(node.name()))
+		void update_document(IonDocument* target, const IonObject& source)
 		{
-			target->append(node);
+			for (const IonNode& node : source.nodes().reverse())
+			{
+				if (!target->contains(node.name()))
+					target->append(node);
+			}
 		}
 	}
-}
 
-} // namespace
-
-bool GuiClasses::add(const StaticString& name, const Ion::Object& source, const StaticString* base_class)
-{
-	if (name.is_empty() || _classes.find(String(name, ByReference())) != _classes.end())
+	bool GuiClasses::add(const StaticString& name, const IonObject& source, const StaticString* base_class)
 	{
-		return false;
-	}
-
-	Ion::Object* base = nullptr;
-
-	if (base_class)
-	{
-		auto i = _classes.find(String(*base_class, ByReference()));
-		if (i == _classes.end())
-		{
+		if (name.is_empty() || _classes.find(String(name, ByReference())) != _classes.end())
 			return false;
+
+		IonObject* base = nullptr;
+
+		if (base_class)
+		{
+			auto i = _classes.find(String(*base_class, ByReference()));
+			if (i == _classes.end())
+				return false;
+			base = i->second;
 		}
-		base = i->second;
+
+		IonDocument* document = Y_NEW(_allocator, IonDocument)(_allocator);
+
+		// Read the object entries in reverse order, ingnoring the duplicates.
+		// The class' own order is only significant for the class being added,
+		// not its base class.
+
+		update_document(document, source);
+
+		if (base)
+			update_document(document, *base);
+
+		_classes[String(name, _allocator)] = document;
+
+		return true;
 	}
 
-	Ion::Document* document = Y_NEW(_allocator, Ion::Document)(_allocator);
-
-	// Read the object entries in reverse order, ingnoring the duplicates.
-	// The class' own order is only significant for the class being added,
-	// not its base class.
-
-	update_document(document, source);
-
-	if (base)
+	void GuiClasses::clear()
 	{
-		update_document(document, *base);
+		for (const auto& class_ : _classes)
+			Y_DELETE(_allocator, class_.second);
+		_classes.clear();
 	}
 
-	_classes[String(name, _allocator)] = document;
-
-	return true;
-}
-
-void GuiClasses::clear()
-{
- 	for (const auto& class_: _classes)
+	const IonObject* GuiClasses::find(const StaticString& name) const
 	{
-		Y_DELETE(_allocator, class_.second);
+		auto i = _classes.find(String(name, ByReference()));
+		return i != _classes.end() ? i->second : nullptr;
 	}
-
-	_classes.clear();
 }
-
-const Ion::Object* GuiClasses::find(const StaticString& name) const
-{
-	auto i = _classes.find(String(name, ByReference()));
-	return i != _classes.end() ? i->second : nullptr;
-}
-
-} // namespace Yttrium

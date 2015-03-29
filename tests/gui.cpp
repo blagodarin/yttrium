@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_CASE(test_gui)
 
 		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 
-		Window::Callbacks window_callbacks;
-		const auto window = Window::create(Dim2(320, 240), window_callbacks);
+		WindowCallbacks window_callbacks;
+		const auto window = Window::create(window_callbacks);
 		BOOST_REQUIRE(window);
 		BOOST_REQUIRE(window->gui().load("tests/gui/gui.ion"));
 		window->gui().dump(file.name());

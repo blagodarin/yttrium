@@ -5,14 +5,10 @@
 
 namespace Yttrium
 {
-
-namespace Ion
-{
-
-extern const Node null_node;
-
-} // namespace Ion
-
-} // namespace Yttrium
+	namespace Ion
+	{
+		extern const IonNode null_node;
+	}
+}
 
 #endif // __ION_NODE_H

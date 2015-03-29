@@ -74,22 +74,22 @@ Vector2f GlTexture2D::fix_coords(const Vector2f& coords) const
 
 	case ImageOrientation::XRightYUp:
 
-		y = _size.y - y;
+		y = _size.height - y;
 		break;
 
 	case ImageOrientation::XLeftYDown:
 
-		x = _size.x - x;
+		x = _size.width - x;
 		break;
 
 	case ImageOrientation::XLeftYUp:
 
-		x = _size.x - x;
-		y = _size.y - y;
+		x = _size.width - x;
+		y = _size.height - y;
 		break;
 	}
 
-	return (_target == GL_TEXTURE_RECTANGLE_ARB ? Vector2f(x, y) : Vector2f(x / _size.x, y / _size.y));
+	return (_target == GL_TEXTURE_RECTANGLE_ARB ? Vector2f(x, y) : Vector2f(x / _size.width, y / _size.height));
 }
 
 void GlTexture2D::unbind()

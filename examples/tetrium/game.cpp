@@ -3,40 +3,166 @@
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
 #include <yttrium/ion.h>
-#include <yttrium/log.h>
 #include <yttrium/renderer.h>
-#include <yttrium/renderer/texture.h>
 #include <yttrium/script/context.h>
+#include <yttrium/texture.h>
 
-#define CHECK(condition) do { if (!(condition)) return false; } while (false)
-
-Game::Game(Allocator* allocator)
-	: _allocator(allocator)
-	, _audio(_allocator)
-	, _bindings(allocator)
-	, _commands(*this)
+Game::Game()
+	: _log_manager("tetrium.log")
+	, _allocator("game")
+	, _audio(&_allocator)
+	, _bindings(&_allocator)
 {
+	ScriptContext::global().define("bind", 2, [this](const ScriptCall& call)
+	{
+		_bindings.bind(call.args.string(0), call.args.string(1));
+	});
+
+	ScriptContext::global().define("exit", [this](const ScriptCall&)
+	{
+		_window->close();
+	});
+
+	ScriptContext::global().define("game_pause", [this](const ScriptCall&)
+	{
+		_game_running = false;
+	});
+
+	ScriptContext::global().define("game_start", [this](const ScriptCall& call)
+	{
+		ScriptValue* start_level_value = call.context.find("start_level");
+		const auto start_level = start_level_value ? start_level_value->to_int() : 1;
+		_game.start(start_level);
+		_game_running = true;
+	});
+
+	ScriptContext::global().define("game_stop", [this](const ScriptCall&)
+	{
+		_game_running = false;
+	});
+
+	ScriptContext::global().define("game_resume", [this](const ScriptCall&)
+	{
+		_game_running = true;
+	});
+
+	ScriptContext::global().define("move_down", [this](const ScriptCall& call)
+	{
+		if (_game_running)
+			_game.set_acceleration(call.function[0] == '+');
+	});
+
+	ScriptContext::global().define("move_left", [this](const ScriptCall& call)
+	{
+		if (_game_running)
+			_game.set_left_movement(call.function[0] == '+');
+	});
+
+	ScriptContext::global().define("move_right", [this](const ScriptCall& call)
+	{
+		if (_game_running)
+			_game.set_right_movement(call.function[0] == '+');
+	});
+
+	ScriptContext::global().define("play_music", [this](const ScriptCall&)
+	{
+		if (!_audio.player().is_playing())
+			_audio.player().play();
+		else
+			_audio.player().pause();
+	});
+
+	ScriptContext::global().define("pop_scene", 0, 1, [this](const ScriptCall& call)
+	{
+		const auto scenes_to_pop = !call.args.size() ? 1 : call.args.value(0)->to_int();
+		if (scenes_to_pop > 0 && !_window->gui().pop_scenes(scenes_to_pop))
+			_window->close();
+	});
+
+	ScriptContext::global().define("push_scene", 1, [this](const ScriptCall& call)
+	{
+		_window->gui().push_scene(call.args.string(0));
+	});
+
+	ScriptContext::global().define("set", 2, [this](const ScriptCall& call)
+	{
+		const ScriptValue* value = call.args.value(0);
+		if (value->type() == ScriptValue::Name)
+			call.context.set(value->to_string(), call.args.string(1, ScriptArgs::Resolve));
+	});
+
+	ScriptContext::global().define("screenshot", [this](const ScriptCall&)
+	{
+		const DateTime& now = DateTime::now();
+		_window->take_screenshot(String(24, &_allocator)
+			.append_dec(now.year, 4, true)
+			.append('-')
+			.append_dec(now.month, 2, true)
+			.append('-')
+			.append_dec(now.day, 2, true)
+			.append('_')
+			.append_dec(now.hour, 2, true)
+			.append('-')
+			.append_dec(now.minute, 2, true)
+			.append('-')
+			.append_dec(now.second, 2, true)
+			.append(".png"));
+	});
+
+	ScriptContext::global().define("stop_music", [this](const ScriptCall&)
+	{
+		_audio.player().stop();
+	});
+
+	ScriptContext::global().define("tgcon", [this](const ScriptCall&)
+	{
+		_window->set_console_visible(!_window->is_console_visible());
+	});
+
+	ScriptContext::global().define("toggle_debug", [this](const ScriptCall&)
+	{
+		_window->set_debug_text_visible(!_window->is_debug_text_visible());
+	});
+
+	ScriptContext::global().define("turn_left", [this](const ScriptCall&)
+	{
+		if (_game_running)
+			_game.turn_left();
+	});
+
+	ScriptContext::global().define("turn_right", [this](const ScriptCall&)
+	{
+		if (_game_running)
+			_game.turn_right();
+	});
+
+	ScriptContext::global().define("unbindall", [this](const ScriptCall&)
+	{
+		_bindings.clear();
+	});
+
+	ScriptContext::global().define("unset", 1, [this](const ScriptCall& call)
+	{
+		const ScriptValue* value = call.args.value(0);
+		if (value->type() == ScriptValue::Name)
+			call.context.unset(value->to_string());
+	});
 }
 
-Game::~Game()
+void Game::run()
 {
-	Y_LOG("Terminating...");
-	save_settings();
-}
+	Y_LOG("Loading");
 
-bool Game::setup()
-{
-	Y_LOG("Loading...");
-
-	_window = Window::create(Dim2(1024, 768), *this, _allocator);
+	_window = Window::create(*this, &_allocator);
 	if (!_window)
-		return false;
+		return;
 
 	ScriptCode::load("tetrium.txt").execute();
 
 	_bindings.bind_default(Key::_1, "play_music");
 	_bindings.bind_default(Key::_2, "stop_music");
-	_bindings.bind_default(Key::F10, "snap"); // KDE grabs Key::Print. =(
+	_bindings.bind_default(Key::F1, "toggle_debug");
+	_bindings.bind_default(Key::F10, "screenshot"); // KDE grabs Key::Print. =(
 	_bindings.bind_default(Key::Grave, "tgcon");
 
 	_bindings.bind_default(Key::A, "+move_left");
@@ -50,118 +176,90 @@ bool Game::setup()
 	_game.set_random_seed(Timer::clock());
 
 	_window->set_name("Tetrium");
+	_window->set_size(Size(1024, 768));
 	_window->show();
 
-	load_music();
-
-	load();
-
-	return true;
-}
-
-void Game::run()
-{
-	Y_LOG("Starting...");
-	_window->run();
-}
-
-void Game::save_settings()
-{
-	Y_LOG("Saving settings...");
-
-	File settings_file("tetrium.txt", File::Write | File::Truncate, _allocator);
-	if (!settings_file)
+	if (!load_blocks())
 		return;
 
-	String settings("# Generated automatically\n\n", _allocator);
+	if (_audio.open())
+	{
+		IonDocument data(&_allocator);
+		if (data.load("data/music.ion"))
+		{
+			for (const IonValue& value : data.last("music"))
+			{
+				const IonObject* entry = value.object();
+				if (!entry)
+					continue;
 
-	settings << "unbindall\n";
-	const auto& bindings = _bindings.map();
-	for (auto i = bindings.begin(); i != bindings.end(); ++i)
-		settings << "bind " << i->first << " \"" << i->second.escaped("\\\"", '\\') << "\"\n";
+				StaticString file = entry->last("file").string();
+				if (file.is_empty())
+					continue;
 
-	const auto& archive = ScriptContext::global().archive();
-	for (auto i = archive.begin(); i != archive.end(); ++i)
-		settings << "seta " << i->first << " " << i->second << "\n";
+				AudioPlayer::Settings settings;
+				settings.begin = entry->last("begin").string().to_time();
+				settings.end = entry->last("end").string().to_time();
+				settings.loop = entry->last("loop").string().to_time();
+				_audio.player().load(file, settings);
+			}
+			_audio.player().set_order(AudioPlayer::Random);
+			_audio.player().play();
+		}
+	}
 
-	settings_file.write(settings.text(), settings.size());
+	if (!_window->gui().load("examples/tetrium/gui/gui.ion"))
+		return;
+
+	Y_LOG("Starting");
+
+	_window->run();
+
+	Y_LOG("Saving settings");
+
+	File settings_file("tetrium.txt", File::Write | File::Truncate, &_allocator);
+	if (settings_file)
+	{
+		String settings(&_allocator);
+		settings << "unbindall\n";
+		for (const auto& binding : _bindings.map())
+			settings << "bind " << binding.first << " \"" << binding.second.escaped("\\\"", '\\') << "\"\n";
+		settings_file.write(settings.text(), settings.size());
+	}
 }
 
-bool Game::load()
+bool Game::load_blocks()
 {
-	CHECK(_window->gui().load("examples/tetrium/gui/gui.ion"));
+	IonDocument data(&_allocator);
+	if (!data.load("examples/tetrium/data/tetrium.ion"))
+		return false;
 
-	Ion::Document data(_allocator);
-
-	CHECK(data.load("examples/tetrium/data/tetrium.ion"));
-
-	const Ion::Node& blocks_node = data.last("blocks");
-	CHECK(!blocks_node.is_empty() && blocks_node.first()->is_object());
-	const Ion::Object* blocks = blocks_node.first()->object();
+	const IonObject* blocks;
+	if (!Ion::read(data, "blocks", blocks))
+		return false;
 
 	const StaticString* block_texture_name;
-	CHECK(blocks->last("file", &block_texture_name));
+	if (!blocks->last("file", &block_texture_name))
+		return false;
 	_block_texture = _texture_cache->load_texture_2d(*block_texture_name);
 	if (_block_texture)
 		_block_texture->set_filter(Texture2D::TrilinearFilter);
 
-	const StaticString* block_size;
-	CHECK(blocks->last("size", &block_size));
-	CHECK(block_size->to_number(&_block_size));
+	if (!Ion::read(*blocks, "size", _block_size))
+		return false;
 
-	const Ion::Node &block_bases = blocks->last("base");
-	CHECK(block_bases.size() == 8);
+	const IonNode& block_bases = blocks->last("base");
+	if (block_bases.size() != 8)
+		return false;
+
 	int index = 0;
-	for (const Ion::Value& value: block_bases)
+	for (const IonValue& value : block_bases)
 	{
-		const Ion::List* entry;
-
-		CHECK(value.get(&entry) && entry->size() == 2);
-
-		float x;
-		float y;
-
-		CHECK(entry->first()->string().to_number(&x));
-		CHECK(entry->last()->string().to_number(&y));
-
-		_block_coords[index++] = Vector2f(x, y);
+		if (!Ion::read(value, _block_coords[index++]))
+			return false;
 	}
 
 	return true;
-}
-
-void Game::load_music()
-{
-	_audio.open(); // NOTE: And what if it fails?
-
-	Ion::Document data(_allocator);
-
-	if (!data.load("data/music.ion"))
-		return;
-
-	for (const Ion::Value& value: data.last("music"))
-	{
-		const Ion::Object* entry = value.object();
-
-		if (!entry)
-			continue;
-
-		StaticString file = entry->last("file").string();
-
-		if (!file.is_empty())
-		{
-			AudioPlayer::Settings settings;
-
-			settings.begin = entry->last("begin").string().to_time();
-			settings.end = entry->last("end").string().to_time();
-			settings.loop = entry->last("loop").string().to_time();
-
-			_audio.player().load(file, settings);
-		}
-	}
-
-	_audio.player().set_order(AudioPlayer::Random);
-	_audio.player().play();
 }
 
 void Game::on_key_event(const KeyEvent& event)
@@ -173,33 +271,37 @@ void Game::on_key_event(const KeyEvent& event)
 void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
 {
 	renderer.set_texture(_block_texture);
-
 	if (canvas_name == S("field"))
 		draw_field(renderer, rect);
 	else if (canvas_name == S("next"))
 		draw_next_figure(renderer, rect);
 }
 
-void Game::on_update()
+void Game::on_update(const UpdateEvent& update)
 {
-	if (_game_timer.is_started())
+	_window->debug_text().clear()
+		<< "FPS: " << update.fps << "\n"
+		<< "MaxFrameTime: " << update.max_frame_time;
+
+	if (_game_running)
 	{
-		_game.advance(_game_timer.reset());
+		_game.advance(update.milliseconds);
 		ScriptContext::global().set("score", _game.score());
 		ScriptContext::global().set("lines", _game.lines());
 		ScriptContext::global().set("level", _game.level());
 		if (_game.has_finished())
+		{
+			_game_running = false;
 			_window->gui().push_scene("game_over");
+		}
 	}
 }
 
 void Game::draw_field(Renderer& renderer, const RectF& rect)
 {
-	int total_width = 1 + Tetrium::Field::Width + 1;
-	int total_height = 1 + Tetrium::Field::Height + 1;
-
-	Vector2f block_size(rect.width() / total_width, rect.height() / total_height);
-
+	const int total_width = 1 + Tetrium::Field::Width + 1;
+	const int total_height = 1 + Tetrium::Field::Height + 1;
+	const Vector2f block_size(rect.width() / total_width, rect.height() / total_height);
 	draw_field_blocks(renderer, rect, block_size);
 	draw_field_figure(renderer, rect, block_size);
 	draw_field_frame(renderer, rect, block_size);
@@ -207,15 +309,14 @@ void Game::draw_field(Renderer& renderer, const RectF& rect)
 
 void Game::draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size)
 {
-	if (_game_timer.is_started() || _game.has_finished())
+	if (_game_running || _game.has_finished())
 	{
-		const Tetrium::Field& field = _game.field();
-
+		const auto& field = _game.field();
 		for (int y = 0; y < Tetrium::Field::Height; ++y)
 		{
 			for (int x = 0; x < Tetrium::Field::Width; ++x)
 			{
-				Tetrium::Figure::Type figure_type = field.blocks[y][x];
+				const auto figure_type = field.blocks[y][x];
 				if (figure_type != Tetrium::Figure::None)
 				{
 					set_texture_rectangle(renderer, figure_type);
@@ -234,7 +335,7 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const Vector
 {
 	static const Vector2f frame_offset(1, Tetrium::Field::Height);
 
-	if (!_game_timer.is_started())
+	if (!_game_running)
 		return;
 
 	const Tetrium::Figure& figure = _game.current_figure();
@@ -260,8 +361,8 @@ void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2
 	renderer.set_color(Vector4f(1, 1, 1, 1));
 	set_texture_rectangle(renderer, Tetrium::Figure::None);
 
-	int total_width = 1 + Tetrium::Field::Width + 1;
-	int total_height = 1 + Tetrium::Field::Height + 1;
+	const int total_width = 1 + Tetrium::Field::Width + 1;
+	const int total_height = 1 + Tetrium::Field::Height + 1;
 
 	RectF block(0, 0, block_size.x, block_size.y);
 
@@ -293,7 +394,7 @@ void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2
 
 void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 {
-	if (_game_timer.is_started() || _game.has_finished())
+	if (_game_running || _game.has_finished())
 	{
 		const Tetrium::Figure& figure = _game.next_figure();
 
@@ -317,6 +418,6 @@ void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 
 void Game::set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type)
 {
-	int figure_index = (figure_type == Tetrium::Figure::None) ? 0 : figure_type + 1;
+	const int figure_index = (figure_type == Tetrium::Figure::None) ? 0 : figure_type + 1;
 	renderer.set_texture_rectangle(_block_coords[figure_index].x, _block_coords[figure_index].y, _block_size, _block_size);
 }

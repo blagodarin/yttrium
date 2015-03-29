@@ -4,63 +4,34 @@
 #ifndef __Y_SCREEN_H
 #define __Y_SCREEN_H
 
-#include <yttrium/pointer.h>
+#include <yttrium/global.h>
+
+#include <memory>
 
 namespace Yttrium
 {
-
-///
-struct ScreenMode
-{
-	int      width;          ///<
-	int      height;         ///<
-	unsigned bits_per_pixel; ///<
-	unsigned frequency;      ///<
-
 	///
-	ScreenMode()
-		: width(0)
-		, height(0)
-		, bits_per_pixel(0)
-		, frequency(0)
+	struct ScreenMode
 	{
-	}
-};
-
-class Screen;
-
-/// Screen pointer.
-typedef Pointer<Screen> ScreenPtr;
-
-///
-class Y_API Screen: public Pointable
-{
-public:
-
-	///
-	enum ModeType
-	{
-		CurrentMode, ///<
-		DefaultMode, ///<
+		int      width = 0;          ///<
+		int      height = 0;         ///<
+		unsigned bits_per_pixel = 0; ///<
+		unsigned frequency = 0;      ///<
 	};
 
-public:
-
-	~Screen() = default;
-
 	///
-	virtual ScreenMode mode(ModeType type = CurrentMode) = 0;
+	class Screen
+	{
+	public:
 
-public:
+		virtual ~Screen() = default;
 
-	///
-	static ScreenPtr open(Allocator* allocator = DefaultAllocator);
+		///
+		virtual ScreenMode current_mode() const = 0;
 
-protected:
-
-	Screen(Allocator* allocator): Pointable(allocator) {}
-};
-
-} // namespace Yttrium
+		///
+		virtual ScreenMode default_mode() const = 0;
+	};
+}
 
 #endif // __Y_SCREEN_H

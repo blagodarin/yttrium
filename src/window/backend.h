@@ -4,7 +4,8 @@
 #include <yttrium/global.h>
 
 #if Y_PLATFORM_POSIX
-	#include "x11/backend.h"
+	#include "x11/screen.h"
+	#include "x11/window.h"
 #endif
 
 #endif // __WINDOW_BACKEND_H

@@ -6,23 +6,21 @@
 
 namespace Yttrium
 {
+	class GuiImage: public Widget
+	{
+	public:
 
-class GuiImage: public Widget
-{
-public:
+		GuiImage(Allocator* allocator);
 
-	GuiImage(Allocator* allocator);
+		void dump(GuiPropertyDumper&) const override;
+		bool load(GuiPropertyLoader&) override;
+		void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
 
-	void dump(GuiPropertyDumper&) const override;
-	bool load(GuiPropertyLoader&) override;
-	void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
+	private:
 
-private:
-
-	Rect               _position;
-	BackgroundProperty _background;
-};
-
-} // namespace Yttrium
+		Rect               _position;
+		BackgroundProperty _background;
+	};
+}
 
 #endif // __GUI_WIDGETS_IMAGE_H

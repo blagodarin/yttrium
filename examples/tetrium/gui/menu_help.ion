@@ -16,9 +16,6 @@ class "help_text"
 
 scene "menu_help"
 {
-	size "640" "480"
-	scale "stretch"
-
 	bind "esc" "pop_scene"
 
 	image

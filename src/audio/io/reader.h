@@ -7,26 +7,24 @@
 
 namespace Yttrium
 {
-
-class AudioReaderImpl: public AudioReader
-{
-	friend AudioReader;
-
-protected:
-
-	virtual bool open() = 0;
-
-protected:
-
-	File _file;
-
-	AudioReaderImpl(const StaticString& name, Allocator* allocator)
-		: AudioReader(allocator)
-		, _file(name, allocator)
+	class AudioReaderImpl: public AudioReader
 	{
-	}
-};
+		friend AudioReader;
 
-} // namespace Yttrium
+	protected:
+
+		virtual bool open() = 0;
+
+	protected:
+
+		File _file;
+
+		AudioReaderImpl(const StaticString& name, Allocator* allocator)
+			: AudioReader(allocator)
+			, _file(name, allocator)
+		{
+		}
+	};
+}
 
 #endif // __AUDIO_IO_READER_H

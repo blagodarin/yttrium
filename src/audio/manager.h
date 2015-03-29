@@ -11,37 +11,34 @@
 
 namespace Yttrium
 {
+	class SoundImpl;
 
-class SoundImpl;
+	typedef InstanceGuard<AudioManager::Private> AudioManagerGuard;
 
-typedef InstanceGuard<AudioManager::Private> AudioManagerGuard;
+	class Y_PRIVATE AudioManager::Private
+	{
+	public:
 
-class Y_PRIVATE AudioManager::Private
-{
-public:
+		AudioManagerGuard        _instance_guard;
+		Allocator*               _allocator;
+		StaticString             _backend_name;
+		String                   _device_name;
+		AudioPlayer::Private     _player_private;
+		std::map<String, Sound*> _sounds;
 
-	AudioManagerGuard        _instance_guard;
-	Allocator*               _allocator;
-	StaticString             _backend_name;
-	String                   _device_name;
-	AudioPlayer::Private     _player_private;
-	std::map<String, Sound*> _sounds;
+	public:
 
-public:
+		Private(Allocator* allocator, const StaticString& device_name);
+		virtual ~Private();
 
-	Private(Allocator* allocator);
+	public:
 
-	virtual ~Private();
+		virtual SoundImpl* create_sound(const StaticString& name, Allocator* allocator) = 0;
 
-public:
+	public:
 
-	virtual SoundImpl* create_sound(const StaticString& name, Allocator* allocator) = 0;
-
-public:
-
-	static Private* instance();
-};
-
-} // namespace Yttrium
+		static Private* instance();
+	};
+}
 
 #endif // __AUDIO_MANAGER_H

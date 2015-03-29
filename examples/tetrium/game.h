@@ -4,42 +4,37 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
+#include <yttrium/log.h>
+#include <yttrium/memory_manager.h>
 #include <yttrium/proxy_allocator.h>
-#include <yttrium/renderer/texture_cache.h>
-#include <yttrium/window.h>
+#include <yttrium/script/manager.h>
+#include <yttrium/texture_cache.h>
 #include <yttrium/time.h>
+#include <yttrium/vector.h>
+#include <yttrium/window.h>
 
 #include <memory>
 
-#include "commands.h"
 #include "tetrium.h"
 
 using namespace Yttrium;
 
-class Game: public Window::Callbacks
+class Game: public WindowCallbacks
 {
-	friend Commands;
-
 public:
 
-	Game(Allocator* allocator);
-	~Game();
+	Game();
 
-public:
-
-	bool setup();
 	void run();
 
 private:
 
-	bool load();
-	void load_music();
-	void save_settings();
+	bool load_blocks();
 
-	// Window::Callbacks
+	// WindowCallbacks
 	void on_key_event(const KeyEvent& event) override;
 	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
-	void on_update() override;
+	void on_update(const UpdateEvent& update) override;
 
 	void draw_field(Renderer& renderer, const RectF& rect);
 	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
@@ -50,20 +45,22 @@ private:
 
 private:
 
-	Allocator*       _allocator;
+	MemoryManager _memory_manager;
+	LogManager _log_manager;
+	ScriptManager _script_manager;
+	ProxyAllocator _allocator;
+
 	AudioManager     _audio;
 	std::unique_ptr<Window> _window;
 	std::unique_ptr<TextureCache> _texture_cache;
 	Bindings         _bindings;
 
-	Texture2DPtr _block_texture;
-	float        _block_size;
-	Vector2f     _block_coords[8];
+	Pointer<Texture2D> _block_texture;
+	float              _block_size;
+	Vector2f           _block_coords[8];
 
 	Tetrium::Game _game;
-	Timer         _game_timer;
-
-	Commands _commands;
+	bool          _game_running = false;
 };
 
 #endif // __TETRIUM_GAME_H

@@ -3,12 +3,10 @@
 
 namespace Yttrium
 {
+	class Allocator;
 
-class Allocator;
-
-// NOTE: It should be const, bun unfortunally constness leads to sigsegv.
-extern Allocator* script_manager_allocator;
-
-} // namespace Yttrium
+	// NOTE: It should be const, bun unfortunally constness leads to sigsegv.
+	extern Allocator* script_manager_allocator;
+}
 
 #endif // __SCRIPT_MANAGER_H

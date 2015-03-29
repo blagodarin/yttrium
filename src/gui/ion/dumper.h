@@ -5,34 +5,26 @@
 
 namespace Yttrium
 {
+	class GuiImpl;
+	class GuiScene;
+	class IonNode;
 
-namespace Ion
-{
+	class GuiIonDumper
+	{
+	public:
 
-class Node;
+		GuiIonDumper(const GuiImpl& gui): _gui(gui) {}
 
-} // namespace Ion
+		void dump(const StaticString& filename) const;
 
-class GuiImpl;
-class GuiScene;
+	private:
 
-class GuiIonDumper
-{
-public:
+		static void dump_scene(const GuiScene& scene, IonNode* node);
 
-	GuiIonDumper(const GuiImpl& gui): _gui(gui) {}
+	private:
 
-	void dump(const StaticString& filename) const;
-
-private:
-
-	static void dump_scene(const GuiScene& scene, Ion::Node* node);
-
-private:
-
-	const GuiImpl& _gui;
-};
-
-} // namespace Yttrium
+		const GuiImpl& _gui;
+	};
+}
 
 #endif // __GUI_ION_DUMPER_H

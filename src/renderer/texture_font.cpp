@@ -113,7 +113,7 @@ bool TextureFont::open(const StaticString &name, Allocator *allocator)
 			CharInfo info;
 
 			info.rect = Rect(font_section.base_x + char_data.x, font_section.base_y + char_data.y, char_data.width, char_data.height);
-			info.offset = Dim2(char_data.x_offset, char_data.y_offset);
+			info.offset = Point(char_data.x_offset, char_data.y_offset);
 			info.advance = char_data.advance;
 
 			_private->_chars[char_data.id] = info;
@@ -165,9 +165,9 @@ int TextureFont::size() const
 	return _private->_size;
 }
 
-Dim2 TextureFont::text_size(const StaticString& text) const
+Size TextureFont::text_size(const StaticString& text) const
 {
-	Dim2 result(0, _private->_size);
+	Size result(0, _private->_size);
 
 	if (!text.is_empty())
 	{
@@ -176,14 +176,14 @@ Dim2 TextureFont::text_size(const StaticString& text) const
 		char previous = text[0];
 		const CharInfo* info = char_info(previous);
 		if (info)
-			result.x += info->advance;
+			result.width += info->advance;
 
 		for (size_t i = 1; i < text.size(); ++i)
 		{
 			char current = text[i];
 			const CharInfo *info = char_info(current);
 			if (info)
-				result.x += info->advance + kerning(previous, current);
+				result.width += info->advance + kerning(previous, current);
 			previous = current;
 		}
 	}

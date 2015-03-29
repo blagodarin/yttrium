@@ -3,41 +3,47 @@
 
 #include <yttrium/window.h>
 
-#include <yttrium/screen.h>
+#include <yttrium/image.h>
 
 #include "backend.h"
 #include "console.h"
 
 namespace Yttrium
 {
-	class RendererImpl;
 	class GuiImpl;
+	class RendererImpl;
+	class Screen;
 
 	class WindowImpl: public Window, private WindowBackend::Callbacks
 	{
 	public:
 
-		WindowImpl(const Dim2& size, Window::Callbacks& callbacks, Allocator* allocator);
+		WindowImpl(WindowCallbacks& callbacks, Allocator* allocator);
 		~WindowImpl() override;
 
 		bool initialize();
 
 		// Window
 		void close() override;
-		Dim2 cursor() const override;
+		Point cursor() const override;
+		String& debug_text() override;
 		Gui& gui() override;
 		bool is_console_visible() const override;
 		bool is_cursor_locked() const override;
+		bool is_debug_text_visible() const override;
 		bool is_shift_pressed() const override;
 		void lock_cursor(bool lock) override;
 		Renderer& renderer() override;
 		void run() override;
-		void resize(const Dim2& size) override;
+		Screen& screen() override;
 		void set_console_visible(bool visible) override;
-		bool set_cursor(const Dim2& cursor) override;
+		bool set_cursor(const Point& cursor) override;
+		void set_debug_text_visible(bool visible) override;
 		void set_name(const StaticString& name) override;
+		void set_size(const Size& size) override;
 		void show(Mode mode) override;
-		Dim2 size() const override;
+		Size size() const override;
+		void take_screenshot(const StaticString& name) override;
 
 	private:
 
@@ -53,19 +59,23 @@ namespace Yttrium
 	private:
 
 		Allocator* const   _allocator;
-		ScreenPtr          _screen;
-		WindowBackendPtr   _backend;
+		std::unique_ptr<ScreenImpl> _screen;
+		std::unique_ptr<WindowBackend> _backend;
 		std::unique_ptr<RendererImpl> _renderer;
 		bool               _is_active;
-		Dim2               _cursor;
+		Point              _cursor;
 		bool               _is_cursor_locked;
-		Dim2               _size;
+		Size               _size;
 		Mode               _mode;
 		bool               _keys[KeyCount];
-		Window::Callbacks& _callbacks;
+		WindowCallbacks&   _callbacks;
 		Console            _console;
-		bool               _is_console_visible;
+		bool               _console_visible = false;
 		std::unique_ptr<GuiImpl> _gui;
+		String             _screenshot_filename;
+		Image              _screenshot_image;
+		String             _debug_text;
+		bool               _debug_text_visible = false;
 	};
 }
 

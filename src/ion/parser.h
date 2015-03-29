@@ -1,97 +1,80 @@
 #ifndef __ION_PARSER_H
 #define __ION_PARSER_H
 
-#include <yttrium/static_string.h>
-
 #include <vector>
 
 namespace Yttrium
 {
+	class IonDocument;
+	class IonList;
+	class IonObject;
+	class StaticString;
 
-namespace Ion
-{
-
-class Document;
-class List;
-class Object;
-
-class Parser
-{
-public:
-
-	Parser(Document *document);
-
-	/// Parse the \a string as an ION document.
-	/// \note The \a string MUST have a zero terminator.
-
-	bool parse(const StaticString &string, const StaticString &source_name);
-
-private:
-
-	bool parse_name(const StaticString &name);
-
-	bool parse_value(const StaticString &value);
-
-	bool parse_lbrace();
-
-	bool parse_rbrace();
-
-	bool parse_lbracket();
-
-	bool parse_rbracket();
-
-	bool parse_end();
-
-private:
-
-	Document *_document;
-
-private:
-
-	enum CharClass
+	class IonParser
 	{
-		Other,    // Any character not mentioned below.
-		End,      // '\0'.
-		Space,    // '\t', '\n', '\v', '\f', '\r' or ' '.
-		Name,     // 'A'-'Z', 'a'-'z', '0'-'9' or '_'.
-		Quote,    // '"'.
-		LBrace,   // '{'.
-		RBrace,   // '}'.
-		LBracket, // '['.
-		RBracket, // ']'.
-		Comment,  // '#'.
-	};
+	public:
 
-	static const CharClass char_class[256];
+		IonParser(IonDocument* document);
 
-private:
+		/// Parse the \a string as an ION document.
+		/// \note The \a string MUST have a zero terminator.
+		bool parse(const StaticString& string, const StaticString& source_name);
 
-	struct State
-	{
-		Object *object;
-		List   *list;
+	private:
 
-		State(Object *object)
-			: object(object)
-			, list(nullptr)
+		bool parse_name(const StaticString &name);
+		bool parse_value(const StaticString &value);
+		bool parse_lbrace();
+		bool parse_rbrace();
+		bool parse_lbracket();
+		bool parse_rbracket();
+		bool parse_end();
+
+	private:
+
+		IonDocument* _document;
+
+	private:
+
+		enum CharClass
 		{
-		}
+			Other,    // Any character not mentioned below.
+			End,      // '\0'.
+			Space,    // '\t', '\n', '\v', '\f', '\r' or ' '.
+			Name,     // 'A'-'Z', 'a'-'z', '0'-'9' or '_'.
+			Quote,    // '"'.
+			LBrace,   // '{'.
+			RBrace,   // '}'.
+			LBracket, // '['.
+			RBracket, // ']'.
+			Comment,  // '#'.
+		};
 
-		State(List *list)
-			: object(nullptr)
-			, list(list)
+		static const CharClass char_class[256];
+
+	private:
+
+		struct State
 		{
-		}
+			IonObject* object;
+			IonList*   list;
+
+			State(IonObject* object)
+				: object(object)
+				, list(nullptr)
+			{
+			}
+
+			State(IonList* list)
+				: object(nullptr)
+				, list(list)
+			{
+			}
+		};
+
+		std::vector<State> _states;
+		State*             _state;
 	};
-
-	typedef std::vector<State> States;
-
-	States  _states;
-	State  *_state;
-};
-
-} // namespace Ion
-
-} // namespace Yttrium
+}
 
 #endif // __ION_PARSER_H

@@ -1,5 +1,7 @@
 #include "line_editor.h"
 
+#include <yttrium/key.h>
+
 #include <cassert>
 #include <limits>
 

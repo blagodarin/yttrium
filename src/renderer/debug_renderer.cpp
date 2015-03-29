@@ -1,92 +1,64 @@
 #include "debug_renderer.h"
 
-#include "builtin_data.h"
+#include "debug_texture.h"
 #include "renderer.h"
 
 namespace Yttrium
 {
+	namespace
+	{
+		void draw_debug_char(Renderer& renderer, int x, int y, int width, int height, uint8_t value)
+		{
+			renderer.draw_rectangle(
+				RectF(
+					x * DebugTexture::char_width, y * DebugTexture::char_height,
+					width * DebugTexture::char_width, height * DebugTexture::char_height),
+				RectF::from_coords(
+					DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1],
+					DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1]));
+		}
+	}
+
 	DebugRenderer::DebugRenderer(RendererImpl& renderer)
 		: _renderer(renderer)
-		, _color(1, 1, 1)
 	{
-		_renderer.flush_2d();
-		_renderer._texture.reset();
-		// TODO: Reset font.
-		_renderer.bind_debug_texture();
-		_renderer.set_matrix_2d(_renderer._viewport_size.x, _renderer._viewport_size.y);
-		_renderer._debug_rendering = true;
+		_renderer.set_debug_rendering(true);
+		set_color(1, 1, 1);
 	}
 
 	DebugRenderer::~DebugRenderer()
 	{
-		_renderer.flush_2d();
-		_renderer._debug_rendering = false;
+		_renderer.set_debug_rendering(false);
 	}
 
 	void DebugRenderer::draw_cursor(int x, int y)
 	{
-		_renderer._color = _color;
-		_renderer.draw_rectangle(
-			RectF(
-				x * Builtin::char_width, y * Builtin::char_height,
-				Builtin::char_width, Builtin::char_height),
-			RectF::from_coords(
-				Builtin::coords[0][0][0], Builtin::coords[0][0][1],
-				Builtin::coords[0][1][0], Builtin::coords[0][1][1]));
+		draw_debug_char(_renderer, x, y, 1, 1, DebugTexture::cursor_index);
 	}
 
 	void DebugRenderer::draw_rectangle(int x, int y, int width, int height)
 	{
-		_renderer._color = _color;
-		_renderer.draw_rectangle(
-			RectF(
-				x * Builtin::char_width, y * Builtin::char_height,
-				width * Builtin::char_width, height * Builtin::char_height),
-			RectF::from_coords(
-				Builtin::coords[0][0][0], Builtin::coords[0][0][0],
-				Builtin::coords[0][0][0], Builtin::coords[0][0][0]));
+		draw_debug_char(_renderer, x, y, width, height, DebugTexture::rect_index);
 	}
 
 	void DebugRenderer::draw_text(int x, int y, const StaticString& text, int max_size)
 	{
-		int size = std::min<int>(text.size(), max_size);
-		if (size <= 0)
-			return;
-
-		_renderer._color = _color;
-
-		// We can't join the text in a single strip because the
-		// adjacent letters may use different texture coordinates.
-
-		Vector2f a(x * Builtin::char_width, y * Builtin::char_height);
-
-		for (const unsigned char* symbol = reinterpret_cast<const unsigned char*>(text.text()); size; --size, ++symbol)
+		const int size = max_size < 0 ? text.size() : std::min<int>(text.size(), max_size);
+		for (int i = 0; i < size; ++i)
 		{
-			if (*symbol >= Builtin::first_char && *symbol <= Builtin::last_char)
-			{
-				if (*symbol != Builtin::first_char) // Don't render spaces.
-				{
-					_renderer.draw_rectangle(
-						RectF(
-							a.x, a.y,
-							Builtin::char_width, Builtin::char_height),
-						RectF::from_coords(
-							Builtin::coords[*symbol][0][0], Builtin::coords[*symbol][0][1],
-							Builtin::coords[*symbol][1][0], Builtin::coords[*symbol][1][1]));
-				}
-				a.x += Builtin::char_width;
-			}
+			const uint8_t symbol = text[i];
+			if (symbol >= DebugTexture::first_char && symbol <= DebugTexture::last_char)
+				draw_debug_char(_renderer, x + i, y, 1, 1, symbol);
 		}
 	}
 
-	Dim2 DebugRenderer::size() const
+	int DebugRenderer::max_width() const
 	{
-		const Dim2& viewport_size = _renderer._viewport_size;
-		return Dim2(viewport_size.x / Builtin::char_width, viewport_size.y / Builtin::char_height);
+		return _renderer.window_size().width / DebugTexture::char_width;
 	}
 
-	Dim2 DebugRenderer::text_size(const StaticString& text) const
+	void DebugRenderer::set_color(float r, float g, float b, float a)
 	{
-		return Dim2(Builtin::char_width * text.size(), Builtin::char_height);
+		_renderer.set_color(Vector4f(r, g, b, a));
 	}
 }

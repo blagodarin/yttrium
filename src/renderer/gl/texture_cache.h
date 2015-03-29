@@ -11,7 +11,7 @@ namespace Yttrium
 	{
 	public:
 
-		GlTextureCache(Renderer& renderer, const GlApi& gl);
+		GlTextureCache(RendererImpl& renderer, const GlApi& gl);
 
 	private:
 

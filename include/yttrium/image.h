@@ -5,6 +5,7 @@
 #define __Y_IMAGE_H
 
 #include <yttrium/buffer.h>
+#include <yttrium/size.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium
@@ -102,6 +103,9 @@ public:
 
 	///
 	void set_width(size_t width);
+
+	///
+	Size size() const { return Size(_width, _height); }
 
 	///
 	inline size_t width() const;

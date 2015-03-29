@@ -8,32 +8,30 @@
 
 namespace Yttrium
 {
+	class Allocator;
+	class ScriptContext;
 
-class Allocator;
-class ScriptContext;
+	/// Script manager.
+	class Y_API ScriptManager
+	{
+		friend ScriptContext;
 
-/// Script manager.
-class Y_API ScriptManager
-{
-	friend ScriptContext;
+		Y_NONCOPYABLE(ScriptManager);
 
-	Y_NONCOPYABLE(ScriptManager);
+	public:
 
-public:
+		///
+		ScriptManager(Allocator* allocator = nullptr);
 
-	///
-	ScriptManager(Allocator* allocator = nullptr);
+		///
+		~ScriptManager();
 
-	///
-	~ScriptManager();
+	private:
 
-private:
+		class Private;
 
-	class Private;
-
-	Private *_private;
-};
-
-} // namespace Yttrium
+		Private *_private;
+	};
+}
 
 #endif // __Y_SCRIPT_MANAGER_H

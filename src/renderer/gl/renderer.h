@@ -17,19 +17,19 @@ namespace Yttrium
 		std::unique_ptr<TextureCache> create_texture_cache() override;
 
 		// RendererImpl
-		bool initialize() override;
 		void clear() override;
-		void do_flush_2d() override;
-		void do_set_matrix_2d(double width, double height) override;
-		void set_viewport(const Dim2 &size) override;
-		void take_screenshot() override;
+		void set_2d_matrix() override;
+		void take_screenshot(Image& image) override;
 		void bind_debug_texture() override;
+		void flush_2d_impl() override;
+		bool initialize() override;
+		void update_window_size() override;
 
 	private:
 
 		bool check_min_version(int major, int minor);
 
-	public:
+	private:
 
 		GlApi  _gl;
 		GLuint _debug_texture = 0;

@@ -5,15 +5,18 @@
 #define __Y_RENDERER_H
 
 #include <yttrium/rect.h>
-#include <yttrium/renderer/pointers.h>
-#include <yttrium/static_string.h>
-#include <yttrium/texture_font.h>
 
 #include <memory>
 
 namespace Yttrium
 {
+	class StaticString;
+	class Texture2D;
 	class TextureCache;
+	class TextureFont;
+
+	template <typename T>
+	class Pointer;
 
 	///
 	class Renderer
@@ -46,9 +49,6 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual Allocator* allocator() const = 0;
-
-		///
 		/// \note Texture cache lifetime must not exceed its renderer lifetime.
 		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
 
@@ -61,15 +61,6 @@ namespace Yttrium
 		///
 		virtual void draw_text(const Vector2f& position, const StaticString& text,
 			unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) = 0;
-
-		///
-		virtual void end_frame() = 0; // TODO: Remove.
-
-		///
-		virtual void flush_2d() = 0;
-
-		///
-		virtual Vector2d rendering_size() const = 0;
 
 		///
 		virtual void set_color(const Vector4f& color) = 0;
@@ -87,16 +78,7 @@ namespace Yttrium
 		}
 
 		///
-		virtual void set_matrix_2d(double width, double height) = 0;
-
-		///
-		virtual void set_matrix_2d_height(double height) = 0;
-
-		///
-		virtual void set_matrix_2d_width(double width) = 0;
-
-		///
-		virtual void set_texture(const Texture2DPtr& texture) = 0;
+		virtual void set_texture(const Pointer<Texture2D>& texture) = 0;
 
 		///
 		virtual bool set_texture_borders(const MarginsI& borders) = 0;
@@ -110,17 +92,11 @@ namespace Yttrium
 			set_texture_rectangle(RectF(x, y, width, height));
 		}
 
-		/// Take a screenshot.
-		/// \param name
-		/// \note The screenshot would be actually taken at the end of the frame
-		/// and saved in the PNG format.
-		virtual void take_screenshot(const StaticString& name) = 0;
-
 		///
 		virtual Vector2f text_size(const StaticString& text) const = 0;
 
 		///
-		virtual Dim2 viewport_size() const = 0; // TODO: Remove, that's the window size.
+		virtual Size window_size() const = 0;
 	};
 }
 

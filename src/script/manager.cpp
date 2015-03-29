@@ -9,47 +9,45 @@
 
 namespace Yttrium
 {
+	Allocator* script_manager_allocator = nullptr;
 
-Allocator* script_manager_allocator = nullptr;
+	typedef InstanceGuard<ScriptManager> ScriptManagerGuard;
 
-typedef InstanceGuard<ScriptManager> ScriptManagerGuard;
-
-class Y_PRIVATE ScriptManager::Private
-{
-public:
-
-	Private(ScriptManager* public_, Allocator* allocator)
-		: _instance_guard(public_, "Duplicate ScriptManager construction")
-		, _allocator(allocator, "script")
-		, _root_context(_allocator)
+	class Y_PRIVATE ScriptManager::Private
 	{
+	public:
+
+		Private(ScriptManager* public_, Allocator* allocator)
+			: _instance_guard(public_, "Duplicate ScriptManager construction")
+			, _allocator(allocator, "script")
+			, _root_context(_allocator)
+		{
+		}
+
+	public:
+
+		ScriptManagerGuard _instance_guard;
+		PrivateAllocator   _allocator;
+		ScriptContext      _root_context;
+	};
+
+	ScriptManager::ScriptManager(Allocator* allocator)
+		: _private(nullptr)
+	{
+		if (!allocator)
+			allocator = MemoryManager::default_allocator();
+		_private = Y_NEW(allocator, ScriptManager::Private)(this, allocator);
+		script_manager_allocator = _private->_allocator;
 	}
 
-public:
+	ScriptManager::~ScriptManager()
+	{
+		script_manager_allocator = nullptr;
+		_private->_allocator.delete_private(_private);
+	}
 
-	ScriptManagerGuard _instance_guard;
-	PrivateAllocator   _allocator;
-	ScriptContext      _root_context;
-};
-
-ScriptManager::ScriptManager(Allocator* allocator)
-	: _private(nullptr)
-{
-	if (!allocator)
-		allocator = MemoryManager::default_allocator();
-	_private = Y_NEW(allocator, ScriptManager::Private)(this, allocator);
-	script_manager_allocator = _private->_allocator;
+	ScriptContext& ScriptContext::global()
+	{
+		return ScriptManagerGuard::instance->_private->_root_context;
+	}
 }
-
-ScriptManager::~ScriptManager()
-{
-	script_manager_allocator = nullptr;
-	_private->_allocator.delete_private(_private);
-}
-
-ScriptContext& ScriptContext::global()
-{
-	return ScriptManagerGuard::instance->_private->_root_context;
-}
-
-} // namespace Yttrium

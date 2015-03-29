@@ -5,68 +5,58 @@
 #define __Y_ION_DOCUMENT_H
 
 #include <yttrium/ion/object.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
-
-namespace Ion
-{
-
-class List;
-
-///
-class Y_API Document: public Object
-{
-	friend List;
-	friend Node;
-	friend Object;
-	friend Parser;
-	friend Value;
-
-public:
+	class IonList;
 
 	///
-	Document(Allocator* allocator = DefaultAllocator);
-
-	///
-	Document(const Document& document, Allocator* allocator = nullptr);
-
-	///
-	~Document();
-
-public:
-
-	///
-	Allocator* allocator() const;
-
-	///
-	void clear();
-
-	///
-	bool load(const StaticString& name);
-
-	///
-	bool save(const StaticString& name, int indentation = 0) const;
-
-public:
-
-	///
-	Document& operator=(const Document& document)
+	class Y_API IonDocument: public IonObject
 	{
-		clear();
-		concatenate(document);
-		return *this;
-	}
+		friend IonList;
+		friend IonNode;
+		friend IonObject;
+		friend IonParser;
+		friend IonValue;
 
-private:
+	public:
 
-	class Private;
+		///
+		IonDocument(Allocator* allocator = DefaultAllocator);
 
-	Private* _private;
-};
+		///
+		IonDocument(const IonDocument& document, Allocator* allocator = nullptr);
 
-} // namespace Ion
+		///
+		~IonDocument();
 
-} // namespace Yttrium
+		///
+		Allocator* allocator() const;
+
+		///
+		void clear();
+
+		///
+		bool load(const StaticString& name);
+
+		///
+		bool save(const StaticString& name, int indentation = 0) const;
+
+		///
+		IonDocument& operator=(const IonDocument& document)
+		{
+			clear();
+			concatenate(document);
+			return *this;
+		}
+
+	private:
+
+		class Private;
+
+		Private* _private;
+	};
+}
 
 #endif // __Y_ION_DOCUMENT_H

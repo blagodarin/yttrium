@@ -4,79 +4,68 @@
 
 namespace Yttrium
 {
-
-namespace Ion
-{
-
-void Value::serialize(String *result, int indentation) const
-{
-	switch (_type)
+	void IonValue::serialize(String* result, int indentation) const
 	{
-	case ListType:
+		switch (_type)
+		{
+		case ListType:
+			_list.serialize(result, indentation + (indentation >= 0));
+			break;
 
-		_list.serialize(result, indentation + (indentation >= 0));
-		break;
+		case ObjectType:
+			_object->serialize(result, indentation);
+			break;
 
-	case ObjectType:
+		default:
+			result->append('"').append(_string.escaped("\\\"", '\\')).append('"');
+			break;
+		}
+	}
 
-		_object->serialize(result, indentation);
-		break;
+	String IonValue::serialize(int indentation, Allocator* allocator) const
+	{
+		String result(allocator ? allocator : _string.allocator());
+		serialize(&result, indentation);
+		return std::move(result);
+	}
 
-	default:
+	IonValue::IonValue(IonDocument* document)
+		: _type(ListType)
+		, _string(document->allocator())
+		, _list(document)
+		, _object(nullptr)
+		, _next(nullptr)
+		, _previous(nullptr)
+	{
+	}
 
-		result->append('"').append(_string.escaped("\\\"", '\\')).append('"');
-		break;
+	IonValue::IonValue(IonDocument* document, const StaticString& string)
+		: _type(StringType)
+		, _string(string, document->allocator())
+		, _list(document)
+		, _object(nullptr)
+		, _next(nullptr)
+		, _previous(nullptr)
+	{
+	}
+
+	IonValue::IonValue(IonDocument* document, const StaticString& string, const ByReference&)
+		: _type(StringType)
+		, _string(string, ByReference(), document->allocator())
+		, _list(document)
+		, _object(nullptr)
+		, _next(nullptr)
+		, _previous(nullptr)
+	{
+	}
+
+	IonValue::IonValue(IonDocument* document, IonObject* object)
+		: _type(ObjectType)
+		, _string(document->allocator())
+		, _list(document)
+		, _object(object)
+		, _next(nullptr)
+		, _previous(nullptr)
+	{
 	}
 }
-
-String Value::serialize(int indentation, Allocator *allocator) const
-{
-	String result(allocator ? allocator : _string.allocator());
-
-	serialize(&result, indentation);
-	return result;
-}
-
-Value::Value(Document *document)
-	: _type(ListType)
-	, _string(document->allocator())
-	, _list(document)
-	, _object(nullptr)
-	, _next(nullptr)
-	, _previous(nullptr)
-{
-}
-
-Value::Value(Document *document, const StaticString &string)
-	: _type(StringType)
-	, _string(string, document->allocator())
-	, _list(document)
-	, _object(nullptr)
-	, _next(nullptr)
-	, _previous(nullptr)
-{
-}
-
-Value::Value(Document *document, const StaticString &string, const ByReference &)
-	: _type(StringType)
-	, _string(string, ByReference(), document->allocator())
-	, _list(document)
-	, _object(nullptr)
-	, _next(nullptr)
-	, _previous(nullptr)
-{
-}
-
-Value::Value(Document *document, Object *object)
-	: _type(ObjectType)
-	, _string(document->allocator())
-	, _list(document)
-	, _object(object)
-	, _next(nullptr)
-	, _previous(nullptr)
-{
-}
-
-} // namespace Ion
-
-} // namespace Yttrium

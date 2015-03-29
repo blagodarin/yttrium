@@ -48,7 +48,7 @@ public:
 
 	bool process_key(const KeyEvent& event);
 
-	void render(Renderer& renderer, const Vector2f& scale); // TODO: Make const.
+	void render(Renderer& renderer); // TODO: Make const.
 
 	void reserve(size_t capacity)
 	{

@@ -1,47 +1,32 @@
 #ifndef __GUI_ION_CLASSES_H
 #define __GUI_ION_CLASSES_H
 
-#include <yttrium/static_string.h>
-
 #include <map>
 
 namespace Yttrium
 {
+	class Allocator;
+	class IonDocument;
+	class IonObject;
+	class StaticString;
+	class String;
 
-namespace Ion
-{
-
-class Document;
-class Object;
-
-} // namespace Ion
-
-class GuiClasses
-{
-public:
-
-	GuiClasses(Allocator* allocator)
-		: _allocator(allocator)
+	class GuiClasses
 	{
-	}
+	public:
 
-	~GuiClasses()
-	{
-		clear();
-	}
+		GuiClasses(Allocator* allocator): _allocator(allocator) {}
+		~GuiClasses() { clear(); }
 
-public:
+		bool add(const StaticString& name, const IonObject& source, const StaticString* base_class = nullptr);
+		void clear();
+		const IonObject* find(const StaticString& name) const;
 
-	bool add(const StaticString& name, const Ion::Object& source, const StaticString* base_class = nullptr);
-	void clear();
-	const Ion::Object* find(const StaticString& name) const;
+	private:
 
-private:
-
-	Allocator*                       _allocator;
-	std::map<String, Ion::Document*> _classes;
-};
-
-} // namespace Yttrium
+		Allocator*                     _allocator;
+		std::map<String, IonDocument*> _classes;
+	};
+}
 
 #endif // __GUI_ION_CLASSES_H
