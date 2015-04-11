@@ -38,19 +38,21 @@ namespace Yttrium
 		Size window_size() const override;
 
 		virtual void clear() = 0;
-		virtual void set_2d_matrix() = 0;
 		virtual void take_screenshot(Image& image) = 0;
 
 		Allocator* allocator() const { return _allocator; }
 		void flush_2d();
-		void set_debug_rendering(bool enable);
+		void pop_projection();
+		void push_projection(const Matrix4f& matrix);
+		void set_debug_texture();
 		void set_window_size(const Size& size);
 
 	protected:
 
-		virtual void bind_debug_texture() = 0;
 		virtual void flush_2d_impl() = 0;
 		virtual bool initialize() = 0;
+		virtual void set_debug_texture_impl() = 0;
+		virtual void set_projection(const Matrix4f& matrix) = 0;
 		virtual void update_window_size() = 0;
 
 	public:
@@ -86,6 +88,8 @@ namespace Yttrium
 		Vector2f    _font_size;
 
 		bool _debug_rendering = false;
+
+		std::vector<Matrix4f> _projection;
 	};
 }
 

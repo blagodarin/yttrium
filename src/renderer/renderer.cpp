@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include <yttrium/matrix.h>
 #include "../memory/allocatable.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -216,24 +217,30 @@ namespace Yttrium
 		}
 	}
 
-	void RendererImpl::set_debug_rendering(bool enable)
+	void RendererImpl::pop_projection()
 	{
-		assert(_debug_rendering != enable);
-		if (enable)
-		{
-			flush_2d();
-			_texture = {}; // No need to unbind it, we're going to bind the debug texture right now.
-			_texture_rect = RectF();
-			_texture_borders = {};
-			_font = {};
-			bind_debug_texture();
-		}
+		flush_2d();
+		_projection.pop_back();
+		if (!_projection.empty())
+			set_projection(_projection.back());
 		else
-		{
-			flush_2d();
-			// TODO: unbind_debug_texture(); // It's better to finish with no texture bound.
-		}
-		_debug_rendering = enable;
+			_debug_rendering = false;
+	}
+
+	void RendererImpl::push_projection(const Matrix4f& matrix)
+	{
+		assert(!_debug_rendering);
+		flush_2d();
+		_projection.emplace_back(matrix);
+		set_projection(matrix);
+	}
+
+	void RendererImpl::set_debug_texture()
+	{
+		assert(_projection.size() == 1 && !_debug_rendering);
+		set_texture({});
+		set_debug_texture_impl();
+		_debug_rendering = true;
 	}
 
 	void RendererImpl::set_window_size(const Size& size)
@@ -418,5 +425,16 @@ namespace Yttrium
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
 		_vertices_2d.push_back(vertex);
+	}
+
+	PushProjection::PushProjection(Renderer& renderer, const Matrix4f& matrix)
+		: _renderer(renderer)
+	{
+		static_cast<RendererImpl&>(_renderer).push_projection(matrix);
+	}
+
+	PushProjection::~PushProjection()
+	{
+		static_cast<RendererImpl&>(_renderer).pop_projection();
 	}
 }

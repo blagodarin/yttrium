@@ -93,7 +93,6 @@ namespace Yttrium
 		while (i != _scene_stack.begin() && (*i)->is_transparent())
 			--i;
 
-		_renderer.set_2d_matrix();
 		for (; i != _scene_stack.end(); ++i)
 			(*i)->render(_renderer);
 	}

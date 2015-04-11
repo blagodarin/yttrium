@@ -10,6 +10,7 @@
 
 namespace Yttrium
 {
+	class Matrix4f;
 	class StaticString;
 	class Texture2D;
 	class TextureCache;
@@ -97,6 +98,26 @@ namespace Yttrium
 
 		///
 		virtual Size window_size() const = 0;
+	};
+
+	///
+	class Y_API PushProjection
+	{
+	public:
+
+		///
+		PushProjection(Renderer& renderer, const Matrix4f& matrix);
+
+		~PushProjection();
+
+		PushProjection(const PushProjection&) = delete;
+		PushProjection(PushProjection&&) = delete;
+		PushProjection& operator=(const PushProjection&) = delete;
+		PushProjection& operator=(PushProjection&&) = delete;
+
+	private:
+
+		Renderer& _renderer;
 	};
 }
 

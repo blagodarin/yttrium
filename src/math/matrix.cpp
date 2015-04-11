@@ -1,6 +1,9 @@
 #include <yttrium/matrix.h>
 
+#include <yttrium/size.h>
+
 #include <cassert>
+#include <cmath>
 
 namespace Yttrium
 {
@@ -26,20 +29,37 @@ namespace Yttrium
 	{
 	}
 
-	Matrix4f Matrix4f::projection_2d(float left, float top, float width, float height, float near, float far)
+	Matrix4f Matrix4f::projection_2d(const Size& size, float near, float far)
 	{
-		assert(width > 0.f && height > 0.f && far > near);
+		assert(size.width > 0 && size.height > 0 && far > near);
 
-		const float inverse_depth = near - far;
+		const auto left = 0.f;
+		const auto top = 0.f;
 
-		const float m00 = 2 / width;
-		const float m11 = -2 / height;
-		const float m22 = 2 / inverse_depth;
-
-		const float m03 = -1 - m00 * left;
-		const float m13 = 1 - m11 * top;
-		const float m23 = (near + far) / inverse_depth;
+		const auto m00 = 2.f / size.width;
+		const auto m11 = -2.f / size.height;
+		const auto m22 = 2 / (near - far);
+		const auto m03 = -1 - m00 * left;
+		const auto m13 = 1 - m11 * top;
+		const auto m23 = (near + far) / (near - far);
 
 		return Matrix4f(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
+	}
+
+	Matrix4f Matrix4f::perspective_3d(float aspect, float vertical_fov, float near, float far)
+	{
+		assert(aspect > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
+
+		const auto fov_radians = vertical_fov / 180 * M_PI;
+
+		const auto f = 1 / ::tan(fov_radians / 2);
+
+		const auto m00 = f / aspect;
+		const auto m11 = f;
+		const auto m22 = (near + far) / (near - far);
+		const auto m23 = 2 * near * far / (near - far);
+		const auto m32 = -1.f;
+
+		return Matrix4f(m00, 0, 0, 0, 0, m11, 0, 0, 0, 0, m22, m23, 0, 0, m32, 0);
 	}
 }

@@ -18,11 +18,11 @@ namespace Yttrium
 
 		// RendererImpl
 		void clear() override;
-		void set_2d_matrix() override;
-		void take_screenshot(Image& image) override;
-		void bind_debug_texture() override;
+		void take_screenshot(Image&) override;
 		void flush_2d_impl() override;
 		bool initialize() override;
+		void set_debug_texture_impl() override;
+		void set_projection(const Matrix4f&) override;
 		void update_window_size() override;
 
 	private:

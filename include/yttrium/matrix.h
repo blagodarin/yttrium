@@ -8,6 +8,8 @@
 
 namespace Yttrium
 {
+	class Size;
+
 	///
 	class Matrix4f
 	{
@@ -27,7 +29,10 @@ namespace Yttrium
 		const float *data() const { return _data[0]; }
 
 		///
-		static Matrix4f projection_2d(float left, float top, float width, float height, float near = -1.f, float far = 1.f);
+		static Matrix4f projection_2d(const Size& size, float near = -1.f, float far = 1.f);
+
+		///
+		static Matrix4f perspective_3d(float aspect, float vertical_fov, float near, float far);
 
 	private:
 

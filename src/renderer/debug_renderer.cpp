@@ -22,13 +22,8 @@ namespace Yttrium
 	DebugRenderer::DebugRenderer(RendererImpl& renderer)
 		: _renderer(renderer)
 	{
-		_renderer.set_debug_rendering(true);
+		_renderer.set_debug_texture();
 		set_color(1, 1, 1);
-	}
-
-	DebugRenderer::~DebugRenderer()
-	{
-		_renderer.set_debug_rendering(false);
 	}
 
 	void DebugRenderer::draw_cursor(int x, int y)

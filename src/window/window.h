@@ -52,7 +52,6 @@ namespace Yttrium
 		void on_key_event(Key key, bool is_pressed) override;
 
 		void draw_debug();
-		void draw_gui();
 		bool process_events();
 		void set_active(bool active);
 

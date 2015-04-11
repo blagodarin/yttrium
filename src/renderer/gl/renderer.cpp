@@ -32,17 +32,6 @@ namespace Yttrium
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	void OpenGlRenderer::set_2d_matrix()
-	{
-		assert(_vertices_2d.empty());
-
-		_gl.MatrixMode(GL_PROJECTION);
-		_gl.LoadMatrixf(Matrix4f::projection_2d(0, 0, _window_size.width, _window_size.height).data());
-
-		_gl.MatrixMode(GL_MODELVIEW);
-		_gl.LoadMatrixf(Matrix4f().data());
-	}
-
 	void OpenGlRenderer::take_screenshot(Image& image)
 	{
 		GLint unpack_alignment;
@@ -54,15 +43,6 @@ namespace Yttrium
 		_gl.ReadBuffer(GL_FRONT);
 		_gl.ReadPixels(0, 0, _window_size.width, _window_size.height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
 		_gl.ReadBuffer(read_buffer);
-	}
-
-	void OpenGlRenderer::bind_debug_texture()
-	{
-		_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
 	bool OpenGlRenderer::initialize()
@@ -106,6 +86,23 @@ namespace Yttrium
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		_gl.DisableClientState(GL_COLOR_ARRAY);
 		_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+
+	void OpenGlRenderer::set_debug_texture_impl()
+	{
+		_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+
+	void OpenGlRenderer::set_projection(const Matrix4f& matrix)
+	{
+		_gl.MatrixMode(GL_PROJECTION);
+		_gl.LoadMatrixf(matrix.data());
+		_gl.MatrixMode(GL_MODELVIEW);
+		_gl.LoadMatrixf(Matrix4f().data());
 	}
 
 	void OpenGlRenderer::update_window_size()

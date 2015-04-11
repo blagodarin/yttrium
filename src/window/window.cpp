@@ -1,9 +1,9 @@
 #include "window.h"
 
 #include <yttrium/allocator.h>
-#include <yttrium/time.h> // RateCounter
+#include <yttrium/matrix.h>
+#include <yttrium/time.h>
 #include <yttrium/utils.h>
-
 #include "../gui/gui.h"
 #include "../memory/allocatable.h"
 #include "../renderer/debug_renderer.h"
@@ -145,10 +145,12 @@ namespace Yttrium
 		while (process_events())
 		{
 			_callbacks.on_update(update);
-			_renderer->clear();
-			draw_gui();
-			draw_debug();
-			_renderer->flush_2d();
+			{
+				_renderer->clear();
+				PushProjection projection(*_renderer, Matrix4f::projection_2d(_size));
+				_gui->render(_cursor);
+				draw_debug();
+			}
 			_backend->swap_buffers();
 			if (!_screenshot_filename.is_empty())
 			{
@@ -341,11 +343,6 @@ namespace Yttrium
 			}
 			renderer.draw_text(0, debug_text_top, _debug_text.mid(line_begin));
 		}
-	}
-
-	void WindowImpl::draw_gui()
-	{
-		_gui->render(_cursor);
 	}
 
 	bool WindowImpl::process_events()
