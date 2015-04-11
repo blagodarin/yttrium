@@ -286,6 +286,7 @@ Clean('tools', Dir('$BUILD/tools'))
 #-------------------------------------------------------------------------------
 
 Alias('examples', BuildSources(env, 'examples', [
+	'rts',
 	'tetrium']))
 Clean('examples', Dir('$BUILD/examples'))
 

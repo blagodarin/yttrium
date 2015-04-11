@@ -1,0 +1,31 @@
+font "common"
+{
+	file    "data/font.ytf"
+	texture "data/font.tga"
+}
+
+scene "main" ["root"]
+{
+	size "100" "800"
+	scale "stretch"
+
+	canvas "main"
+	{
+		position "0" "0" "100" "700"
+	}
+
+	image
+	{
+		position "0" "700" "100" "100"
+		texture  "data/textures/wall.jpeg"
+		scale    "stretch"
+	}
+
+	label
+	{
+		position  "50" "750"
+		text_size "40"
+		font      "common"
+		text      "Control panel and minimap..."
+	}
+}

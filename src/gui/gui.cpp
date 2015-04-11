@@ -57,15 +57,10 @@ namespace Yttrium
 
 	GuiScene* GuiImpl::create_scene(const StaticString& name)
 	{
-		if (!_has_size)
-		{
-			Y_LOG("[Gui] Can't load scene \"" << name << "\": GUI size has not been set");
-			return nullptr;
-		}
-
 		Allocatable<GuiScene> scene(&_proxy_allocator);
 		scene.reset(*this, name);
-		scene->set_size(_size);
+		if (_has_size)
+			scene->set_size(_size);
 		return scene.release();
 	}
 
@@ -84,7 +79,7 @@ namespace Yttrium
 
 	void GuiImpl::render(const Point& cursor)
 	{
-		if (!_has_size || _scene_stack.empty())
+		if (_scene_stack.empty())
 			return;
 
 		auto i = _scene_stack.begin() + (_scene_stack.size() - 1);

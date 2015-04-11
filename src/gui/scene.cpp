@@ -126,9 +126,15 @@ namespace Yttrium
 
 	void GuiScene::render(Renderer& renderer)
 	{
-		const auto& size = renderer.window_size();
-		const Vector2f scale(size.width / _size.x, size.height / _size.y);
-		const Vector2f shift((size.width - _size.x * scale.y) * .5f, (size.height - _size.y * scale.x) * .5f);
+		const auto& window_size = renderer.window_size();
+		const Vector2f& scene_size = _has_size ? _size : Vector2f(window_size);
+
+		const Vector2f scale(
+			window_size.width / scene_size.x,
+			window_size.height / scene_size.y);
+		const Vector2f shift(
+			(window_size.width - scene_size.x * scale.y) * .5f,
+			(window_size.height - scene_size.y * scale.x) * .5f);
 
 		Widget* mouse_widget = nullptr;
 

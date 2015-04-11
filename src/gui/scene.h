@@ -68,6 +68,7 @@ public:
 	void set_size(const Vector2f& size)
 	{
 		_size = size;
+		_has_size = true;
 	}
 
 	void set_transparent(bool transparent)
@@ -85,6 +86,7 @@ private:
 	GuiImpl&                  _gui;
 	String                    _name;
 	Vector2f                  _size;
+	bool                      _has_size = false;
 	Scaling                   _scaling;
 	std::vector<Widget*>      _widgets;
 	std::map<String, Widget*> _named_widgets;

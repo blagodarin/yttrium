@@ -46,7 +46,7 @@ namespace Yttrium
 		return Matrix4f(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
 	}
 
-	Matrix4f Matrix4f::perspective_3d(float aspect, float vertical_fov, float near, float far)
+	Matrix4f Matrix4f::perspective(float aspect, float vertical_fov, float near, float far)
 	{
 		assert(aspect > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
 

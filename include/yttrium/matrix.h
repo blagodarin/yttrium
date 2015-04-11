@@ -11,7 +11,7 @@ namespace Yttrium
 	class Size;
 
 	///
-	class Matrix4f
+	class Y_API Matrix4f
 	{
 	public:
 
@@ -32,7 +32,7 @@ namespace Yttrium
 		static Matrix4f projection_2d(const Size& size, float near = -1.f, float far = 1.f);
 
 		///
-		static Matrix4f perspective_3d(float aspect, float vertical_fov, float near, float far);
+		static Matrix4f perspective(float aspect, float vertical_fov, float near, float far);
 
 	private:
 
@@ -40,4 +40,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_MATRIX_H
+#endif
