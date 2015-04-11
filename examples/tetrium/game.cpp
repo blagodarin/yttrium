@@ -93,20 +93,7 @@ Game::Game()
 
 	ScriptContext::global().define("screenshot", [this](const ScriptCall&)
 	{
-		const DateTime& now = DateTime::now();
-		_window->take_screenshot(String(24, &_allocator)
-			.append_dec(now.year, 4, true)
-			.append('-')
-			.append_dec(now.month, 2, true)
-			.append('-')
-			.append_dec(now.day, 2, true)
-			.append('_')
-			.append_dec(now.hour, 2, true)
-			.append('-')
-			.append_dec(now.minute, 2, true)
-			.append('-')
-			.append_dec(now.second, 2, true)
-			.append(".png"));
+		_window->take_screenshot(String::format(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png", &_allocator));
 	});
 
 	ScriptContext::global().define("stop_music", [this](const ScriptCall&)

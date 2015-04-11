@@ -31,6 +31,9 @@ void Game::run()
 
 void Game::on_key_event(const KeyEvent& event)
 {
+	if (!event.pressed)
+		return;
+
 	switch (event.key)
 	{
 	case Key::Escape:
@@ -46,22 +49,7 @@ void Game::on_key_event(const KeyEvent& event)
 		break;
 
 	case Key::F10: // KDE grabs Key::Print. =(
-		{
-			const DateTime& now = DateTime::now();
-			_window->take_screenshot(String(24, &_allocator)
-				.append_dec(now.year, 4, true)
-				.append('-')
-				.append_dec(now.month, 2, true)
-				.append('-')
-				.append_dec(now.day, 2, true)
-				.append('_')
-				.append_dec(now.hour, 2, true)
-				.append('-')
-				.append_dec(now.minute, 2, true)
-				.append('-')
-				.append_dec(now.second, 2, true)
-				.append(".png"));
-		}
+		_window->take_screenshot(String::format(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png", &_allocator));
 		break;
 
 	default:

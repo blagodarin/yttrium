@@ -2,6 +2,7 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
+#include <yttrium/time.h>
 #include "ieee_float.h"
 
 #include <algorithm> // max, min
@@ -638,6 +639,100 @@ String& String::trim()
 		_size = trimmed_string.size();
 	}
 	return *this;
+}
+
+String String::format(const DateTime& date_time, const char* format, Allocator* allocator)
+{
+	String result(::strlen(format) + 1, allocator);
+	while (*format != '\0')
+	{
+		if (*format != '%')
+		{
+			result += *format++;
+			continue;
+		}
+		switch (*++format)
+		{
+		case '%':
+			result += '%';
+			++format;
+			break;
+
+		case 'D':
+			if (*++format == 'D')
+			{
+				result.append_dec(date_time.day, 2, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.day);
+			break;
+
+		case 'M':
+			if (*++format == 'M')
+			{
+				result.append_dec(date_time.month, 2, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.month);
+			break;
+
+		case 'Y':
+			if (*++format == 'Y')
+			{
+				result.append_dec(date_time.year, 4, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.year);
+			break;
+
+		case 'h':
+			if (*++format == 'h')
+			{
+				result.append_dec(date_time.hour, 2, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.hour);
+			break;
+
+		case 'm':
+			if (*++format == 'm')
+			{
+				result.append_dec(date_time.minute, 2, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.minute);
+			break;
+
+		case 's':
+			if (*++format == 's')
+			{
+				result.append_dec(date_time.second, 2, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.second);
+			break;
+
+		case 'z':
+			if (*++format == 'z')
+			{
+				result.append_dec(date_time.msecond, 3, true);
+				++format;
+			}
+			else
+				result.append_dec(date_time.msecond);
+			break;
+
+		default:
+			result.append('%');
+		}
+	}
+	return std::move(result);
 }
 
 void String::grow(size_t buffer_size)

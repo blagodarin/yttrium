@@ -9,6 +9,8 @@
 namespace Yttrium
 {
 
+struct DateTime;
+
 ///
 /// \note Strings with an allocated storage always store a zero terminator.
 
@@ -321,54 +323,16 @@ public:
 	/// \param width Minimal number width.
 	/// \param zeros Should the value be prepended with zeros to fit \a width?
 	/// \return
-
 	inline static String from_dec(int32_t value, int width = 0, bool zeros = false);
-
-	/**
-	* \overload
-	* \param value
-	* \param width
-	* \param zeros
-	* \return
-	*/
-
 	inline static String from_dec(uint32_t value, int width = 0, bool zeros = false);
-
-	/**
-	* \overload
-	* \param value
-	* \param width
-	* \param zeros
-	* \return
-	*/
-
 	inline static String from_dec(int64_t value, int width = 0, bool zeros = false);
-
-	/**
-	* \overload
-	* \param value
-	* \param width
-	* \param zeros
-	* \return
-	*/
-
 	inline static String from_dec(uint64_t value, int width = 0, bool zeros = false);
 
-	/**
-	* \overload
-	* \param value
-	* \return
-	*/
-
 	inline static String from_dec(float value);
-
-	/**
-	* \overload
-	* \param value
-	* \return
-	*/
-
 	inline static String from_dec(double value);
+
+	///
+	static String format(const DateTime& date_time, const char* format, Allocator* allocator = DefaultAllocator);
 
 private:
 
