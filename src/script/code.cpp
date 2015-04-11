@@ -5,7 +5,6 @@
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
-
 #include "../base/private_base.h"
 #include "manager.h"
 #include "scanner.h"

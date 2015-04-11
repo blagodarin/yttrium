@@ -2,7 +2,6 @@
 
 #include <yttrium/log.h>
 #include <yttrium/window.h>
-
 #include "../property_dumper.h"
 #include "../property_loader.h"
 

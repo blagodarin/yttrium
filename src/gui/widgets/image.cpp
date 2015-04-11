@@ -1,7 +1,6 @@
 #include "image.h"
 
 #include <yttrium/log.h>
-
 #include "../property_dumper.h"
 #include "../property_loader.h"
 

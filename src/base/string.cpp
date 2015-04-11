@@ -2,7 +2,6 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
-
 #include "ieee_float.h"
 
 #include <algorithm> // max, min

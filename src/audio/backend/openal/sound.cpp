@@ -1,7 +1,6 @@
 #include "sound.h"
 
 #include <yttrium/buffer.h>
-
 #include "../../manager.h"
 
 namespace Yttrium

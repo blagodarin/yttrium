@@ -3,7 +3,6 @@
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
 #include <yttrium/renderer.h>
-
 #include "../memory/allocatable.h"
 #include "gui.h"
 #include "widgets/button.h"

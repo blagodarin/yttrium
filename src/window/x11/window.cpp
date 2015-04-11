@@ -2,7 +2,6 @@
 
 #include <yttrium/point.h>
 #include <yttrium/static_string.h>
-
 #include "screen.h"
 
 namespace Yttrium

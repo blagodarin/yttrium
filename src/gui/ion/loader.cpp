@@ -5,7 +5,6 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
 #include <yttrium/texture_cache.h>
-
 #include "../gui.h"
 #include "../scene.h"
 #include "property_loader.h"

@@ -1,7 +1,6 @@
 #include "texture_font.h"
 
 #include <yttrium/file.h>
-
 #include "../base/fourcc.h"
 
 #include <algorithm> // max

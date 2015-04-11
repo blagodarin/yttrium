@@ -4,7 +4,6 @@
 #include <yttrium/window.h>
 
 #include <yttrium/image.h>
-
 #include "backend.h"
 #include "console.h"
 

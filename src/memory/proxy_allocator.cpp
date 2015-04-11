@@ -2,7 +2,6 @@
 
 #include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
-
 #include "atomic_status.h"
 
 #if Y_IS_DEBUG

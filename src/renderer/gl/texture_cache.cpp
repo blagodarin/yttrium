@@ -1,7 +1,6 @@
 #include "texture_cache.h"
 
 #include <yttrium/utils.h>
-
 #include "renderer.h"
 #include "texture.h"
 

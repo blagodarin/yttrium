@@ -2,7 +2,6 @@
 
 #include <yttrium/script/code.h>
 #include <yttrium/window.h>
-
 #include "../renderer/debug_renderer.h"
 
 #include <cassert>

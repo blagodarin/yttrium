@@ -1,7 +1,6 @@
 #include "manager.h"
 
 #include <yttrium/proxy_allocator.h>
-
 #include "backend/manager.h"
 #include "sound.h"
 

@@ -1,7 +1,6 @@
 #include "player.h"
 
 #include <yttrium/allocator.h>
-
 #include "playlist.h"
 
 namespace Yttrium

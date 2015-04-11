@@ -2,8 +2,8 @@
 #define __AUDIO_MANAGER_H
 
 #include <yttrium/audio/manager.h>
-#include <yttrium/audio/sound.h>
 
+#include <yttrium/audio/sound.h>
 #include "../base/instance_guard.h"
 #include "player.h"
 

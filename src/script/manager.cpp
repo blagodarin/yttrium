@@ -3,7 +3,6 @@
 
 #include <yttrium/memory_manager.h>
 #include <yttrium/script/context.h>
-
 #include "../base/instance_guard.h"
 #include "../memory/private_allocator.h"
 

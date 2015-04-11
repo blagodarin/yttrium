@@ -2,7 +2,6 @@
 #define __GUI_WIDGETS_INPUT_H
 
 #include <yttrium/time.h>
-
 #include "../logic/line_editor.h"
 #include "../property.h"
 #include "widget.h"

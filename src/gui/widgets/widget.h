@@ -4,7 +4,6 @@
 #include <yttrium/key.h>
 #include <yttrium/rect.h>
 #include <yttrium/string.h>
-
 #include "../types.h"
 
 namespace Yttrium

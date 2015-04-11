@@ -3,7 +3,6 @@
 #include <yttrium/log.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
-
 #include "../memory/allocatable.h"
 #include "../renderer/renderer.h"
 #include "ion/dumper.h"

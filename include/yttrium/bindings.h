@@ -12,49 +12,46 @@
 
 namespace Yttrium
 {
-
-///
-
-class Y_API Bindings
-{
-public:
-
 	///
-	Bindings(Allocator* allocator = DefaultAllocator);
+	class Y_API Bindings
+	{
+	public:
 
-	///
-	void bind(Key key, const StaticString& action);
+		///
+		Bindings(Allocator* allocator = DefaultAllocator);
 
-	///
-	bool bind(const StaticString &name, const StaticString& action);
+		///
+		void bind(Key key, const StaticString& action);
 
-	///
-	void bind_default(Key key, const StaticString& action);
+		///
+		bool bind(const StaticString &name, const StaticString& action);
 
-	///
-	bool bind_default(const StaticString& name, const StaticString& action);
+		///
+		void bind_default(Key key, const StaticString& action);
 
-	///
-	bool call(Key key, ScriptCode::ExecutionMode mode = ScriptCode::Do);
+		///
+		bool bind_default(const StaticString& name, const StaticString& action);
 
-	///
-	void clear();
+		///
+		bool call(Key key, ScriptCode::ExecutionMode mode = ScriptCode::Do);
 
-	///
-	std::map<String, String> map() const;
+		///
+		void clear();
 
-	///
-	void unbind(Key key);
+		///
+		std::map<String, String> map() const;
 
-	///
-	bool unbind(const StaticString &name);
+		///
+		void unbind(Key key);
 
-private:
+		///
+		bool unbind(const StaticString &name);
 
-	Allocator* _allocator;
-	std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
-};
+	private:
 
-} // namespace Yttrium
+		Allocator* _allocator;
+		std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
+	};
+}
 
 #endif // __Y_BINDINGS_H

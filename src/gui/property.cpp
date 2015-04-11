@@ -3,7 +3,6 @@
 #include <yttrium/renderer.h>
 #include <yttrium/string.h>
 #include <yttrium/texture.h>
-
 #include "property_dumper.h"
 #include "property_loader.h"
 

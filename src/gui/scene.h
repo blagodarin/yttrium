@@ -3,7 +3,6 @@
 
 #include <yttrium/bindings.h>
 #include <yttrium/rect.h>
-
 #include "types.h"
 
 #include <map>

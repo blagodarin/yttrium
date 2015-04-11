@@ -1,5 +1,5 @@
-#ifndef __IMAGE_IMAGE_H
-#define __IMAGE_IMAGE_H
+#ifndef SRC_IMAGE_IMAGE_H
+#define SRC_IMAGE_IMAGE_H
 
 #include <yttrium/image.h>
 
@@ -7,56 +7,54 @@
 
 namespace Yttrium
 {
-
-class ImageReader
-{
-public:
-
-	virtual ~ImageReader();
-
-	virtual bool open() = 0;
-	virtual bool read(void* buffer) = 0;
-
-public:
-
-	Allocator*  _allocator;
-	ImageFormat _format;
-	File        _file;
-
-protected:
-
-	ImageReader(const StaticString& name, Allocator* allocator)
-		: _allocator(allocator)
-		, _file(name, allocator)
+	class ImageReader
 	{
-	}
-};
+	public:
 
-class ImageWriter
-{
-public:
+		virtual ~ImageReader() = default;
 
-	virtual ~ImageWriter();
+		virtual bool open() = 0;
+		virtual bool read(void* buffer) = 0;
 
-	virtual bool open();
-	virtual bool set_format(const ImageFormat& format) = 0;
-	virtual bool write(const void* buffer) = 0;
+	public:
 
-public:
+		Allocator*  _allocator;
+		ImageFormat _format;
+		File        _file;
 
-	Allocator*  _allocator;
-	ImageFormat _format;
-	File        _file;
+	protected:
 
-protected:
+		ImageReader(const StaticString& name, Allocator* allocator)
+			: _allocator(allocator)
+			, _file(name, allocator)
+		{
+		}
+	};
 
-	ImageWriter(const StaticString& name, Allocator* allocator)
-		: _allocator(allocator)
-		, _file(name, File::Write | File::Truncate, allocator)
+	class ImageWriter
 	{
-	}
-};
+	public:
 
-} // namespace Yttrium
+		virtual ~ImageWriter() = default;
 
-#endif // __IMAGE_IMAGE_H
+		virtual bool open();
+		virtual bool set_format(const ImageFormat& format) = 0;
+		virtual bool write(const void* buffer) = 0;
+
+	public:
+
+		Allocator*  _allocator;
+		ImageFormat _format;
+		File        _file;
+
+	protected:
+
+		ImageWriter(const StaticString& name, Allocator* allocator)
+			: _allocator(allocator)
+			, _file(name, File::Write | File::Truncate, allocator)
+		{
+		}
+	};
+}
+
+#endif

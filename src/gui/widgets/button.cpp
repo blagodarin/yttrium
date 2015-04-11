@@ -3,7 +3,6 @@
 #include <yttrium/audio/sound.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
-
 #include "../property_dumper.h"
 #include "../property_loader.h"
 

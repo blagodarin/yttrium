@@ -2,7 +2,6 @@
 #define __GUI_WIDGETS_BUTTON_H
 
 #include <yttrium/script/code.h>
-
 #include "../property.h"
 #include "widget.h"
 

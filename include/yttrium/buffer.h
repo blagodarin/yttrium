@@ -10,113 +10,67 @@
 
 namespace Yttrium
 {
-
-///
-
-class Y_API Buffer
-{
-public:
-
 	///
-	Buffer(Allocator* allocator = DefaultAllocator)
-		: _data(nullptr)
-		, _size(0)
-		, _allocator(allocator)
+	class Y_API Buffer
 	{
-	}
+	public:
 
-	///
-	Buffer(const Buffer& buffer, Allocator* allocator = DefaultAllocator);
+		///
+		Buffer(Allocator* allocator = DefaultAllocator): _allocator(allocator) {}
 
-	///
-	Buffer(size_t size, Allocator* allocator = DefaultAllocator);
+		///
+		Buffer(const Buffer& buffer, Allocator* allocator = nullptr);
 
-	///
-	~Buffer();
+		///
+		explicit Buffer(size_t size, Allocator* allocator = DefaultAllocator);
 
-public:
+		///
+		~Buffer();
 
-	///
+	public:
 
-	Allocator* allocator() const
-	{
-		return _allocator;
-	}
+		///
+		Allocator* allocator() const { return _allocator; }
 
-	///
+		///
+		const void* const_data() const { return _data; }
 
-	const void* const_data() const
-	{
-		return _data;
-	}
+		///
+		const void* const_data(size_t offset) { return static_cast<const char*>(_data) + offset; }
 
-	///
+		///
+		void* data() { return _data; }
 
-	const void* const_data(size_t offset)
-	{
-		return static_cast<const char*>(_data) + offset;
-	}
+		///
+		void* data(size_t offset) { return static_cast<char*>(_data) + offset; }
 
-	///
+		///
+		const void* data() const { return _data; }
 
-	void* data()
-	{
-		return _data;
-	}
+		///
+		void resize(size_t size);
 
-	///
+		///
+		size_t size() const { return _size; }
 
-	void* data(size_t offset)
-	{
-		return static_cast<char*>(_data) + offset;
-	}
+		///
+		void swap(Buffer&);
+		void swap(Buffer&&);
 
-	///
+	public:
 
-	const void* data() const
-	{
-		return _data;
-	}
+		///
+		bool operator ==(const Buffer& buffer) const;
 
-	///
+		///
+		bool operator !=(const Buffer& buffer) const;
 
-	void resize(size_t size);
+	private:
 
-	///
-
-	size_t size() const
-	{
-		return _size;
-	}
-
-	///
-
-	void swap(Buffer*);
-
-	/**
-	* \overload
-	* \return
-	*/
-
-	void swap(Buffer&&);
-
-public:
-
-	///
-
-	bool operator ==(const Buffer& buffer) const;
-
-	///
-
-	bool operator !=(const Buffer& buffer) const;
-
-private:
-
-	void*      _data;
-	size_t     _size;
-	Allocator* _allocator;
-};
-
-} // namespace Yttrium
+		Allocator* _allocator = DefaultAllocator;
+		void*      _data = nullptr;
+		size_t     _size = 0;
+	};
+}
 
 #endif // __Y_BUFFER_H

@@ -5,6 +5,7 @@
 #define __Y_RENDERER_H
 
 #include <yttrium/rect.h>
+#include <yttrium/types.h>
 
 #include <memory>
 

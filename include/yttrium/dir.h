@@ -8,64 +8,62 @@
 
 namespace Yttrium
 {
-
-/// Directory access class.
-class Y_API Dir
-{
-	Y_DECLARE_PRIVATE_NONCOPYABLE(Dir);
-
-public:
-
-	///
-	class Iterator
+	/// Directory access class.
+	class Y_API Dir
 	{
-		friend Dir;
-
-		Iterator& operator=(const Iterator&) = delete;
+		Y_DECLARE_PRIVATE_NONCOPYABLE(Dir);
 
 	public:
 
-		Iterator(const Iterator& iterator)
-			: _private(iterator._private)
+		///
+		class Iterator
 		{
-			const_cast<Iterator&>(iterator)._private = nullptr;
-		}
+			friend Dir;
 
-		~Iterator();
+			Iterator& operator=(const Iterator&) = delete;
 
-	public:
+		public:
 
-		void operator++();
+			Iterator(const Iterator& iterator)
+				: _private(iterator._private)
+			{
+				const_cast<Iterator&>(iterator)._private = nullptr;
+			}
 
-		StaticString operator*() const;
+			~Iterator();
 
-		bool operator!=(Iterator iterator) const;
+		public:
 
-	private:
+			void operator++();
 
-		class Private;
+			StaticString operator*() const;
 
-		Private* _private;
+			bool operator!=(Iterator iterator) const;
 
-		Iterator(Private *private_)
-			: _private(private_)
-		{
-		}
+		private:
+
+			class Private;
+
+			Private* _private;
+
+			Iterator(Private *private_)
+				: _private(private_)
+			{
+			}
+		};
+
+		///
+		explicit Dir(const StaticString& name, Allocator* allocator = DefaultAllocator);
+
+		///
+		Iterator begin() const;
+
+		///
+		Iterator end() const { return Iterator(nullptr); }
+
+		///
+		static bool exists(const StaticString& name);
 	};
-
-	///
-	explicit Dir(const StaticString& name, Allocator* allocator = DefaultAllocator);
-
-	///
-	Iterator begin() const;
-
-	///
-	Iterator end() const { return Iterator(nullptr); }
-
-	///
-	static bool exists(const StaticString& name);
-};
-
-} // namespace Yttrium
+}
 
 #endif // __Y_DIR_H

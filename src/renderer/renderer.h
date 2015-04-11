@@ -1,13 +1,12 @@
 #ifndef __RENDERER_RENDERER_H
 #define __RENDERER_RENDERER_H
 
+#include <yttrium/renderer.h>
+
 #include <yttrium/margins.h>
 #include <yttrium/pointer.h>
-#include <yttrium/rect.h>
-#include <yttrium/renderer.h>
 #include <yttrium/string.h>
 #include <yttrium/texture_font.h>
-
 #include "../base/private_base.h"
 
 #include <vector>

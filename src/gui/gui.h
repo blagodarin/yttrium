@@ -2,11 +2,11 @@
 #define __GUI_GUI_H
 
 #include <yttrium/gui.h>
+
 #include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/code.h>
 #include <yttrium/texture_font.h>
-
 #include "types.h"
 
 #include <map>

@@ -1,7 +1,6 @@
 #include <yttrium/ion/list.h>
 
 #include <yttrium/ion/value.h>
-
 #include "document.h"
 
 namespace Yttrium

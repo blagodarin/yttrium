@@ -3,9 +3,8 @@
 #include <yttrium/file.h>
 #include <yttrium/memory_manager.h>
 #include <yttrium/time.h>
-
-#include "instance_guard.h"
 #include "../memory/private_allocator.h"
+#include "instance_guard.h"
 
 namespace Yttrium
 {

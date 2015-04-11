@@ -2,8 +2,8 @@
 #define __BASE_POSIX_FILE_H
 
 #include <yttrium/file.h>
-#include <yttrium/string.h>
 
+#include <yttrium/string.h>
 #include "../private_base.h"
 
 namespace Yttrium

@@ -2,7 +2,6 @@
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
-
 #include "../gui.h"
 #include "../scene.h"
 

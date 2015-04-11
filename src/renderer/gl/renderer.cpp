@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include <yttrium/matrix.h>
-
 #include "../debug_texture.h"
 #include "texture_cache.h"
 

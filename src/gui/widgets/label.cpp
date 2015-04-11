@@ -3,7 +3,6 @@
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
-
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
