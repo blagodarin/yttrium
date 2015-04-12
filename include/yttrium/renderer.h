@@ -54,6 +54,9 @@ namespace Yttrium
 		/// \note Texture cache lifetime must not exceed its renderer lifetime.
 		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
 
+		// NOTE: Temporary!
+		virtual void draw_cube(const Vector4f& center, float size) = 0;
+
 		///
 		virtual void draw_rectangle(const RectF& rect) = 0;
 

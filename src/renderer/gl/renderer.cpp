@@ -24,6 +24,84 @@ namespace Yttrium
 		return std::make_unique<GlTextureCache>(*this, _gl);
 	}
 
+	void OpenGlRenderer::draw_cube(const Vector4f& center, float size)
+	{
+		struct Vertex3D
+		{
+			Vector4f position;
+			Vector4f color;
+
+			Vertex3D(const Vector4f& position, const Vector4f& color)
+				: position(position)
+				, color(color)
+			{
+			}
+		};
+
+		const auto radius = size / 2;
+
+		const std::array<Vertex3D, 8> vertices =
+		{
+			Vertex3D(Vector4f(center.x - radius, center.y - radius, center.z - radius), Vector4f(0, 0, 0)),
+			Vertex3D(Vector4f(center.x + radius, center.y - radius, center.z - radius), Vector4f(0, 0, 1)),
+			Vertex3D(Vector4f(center.x - radius, center.y + radius, center.z - radius), Vector4f(0, 1, 0)),
+			Vertex3D(Vector4f(center.x + radius, center.y + radius, center.z - radius), Vector4f(0, 1, 1)),
+			Vertex3D(Vector4f(center.x - radius, center.y - radius, center.z + radius), Vector4f(1, 0, 0)),
+			Vertex3D(Vector4f(center.x + radius, center.y - radius, center.z + radius), Vector4f(1, 0, 1)),
+			Vertex3D(Vector4f(center.x - radius, center.y + radius, center.z + radius), Vector4f(1, 1, 0)),
+			Vertex3D(Vector4f(center.x + radius, center.y + radius, center.z + radius), Vector4f(1, 1, 1)),
+		};
+
+		const std::array<int16_t, 36> indices =
+		{
+			// Bottom.
+			0, 2, 1,
+			1, 2, 3,
+
+			// Front.
+			0, 1, 4,
+			4, 1, 5,
+
+			// Top.
+			4, 5, 6,
+			6, 5, 7,
+
+			// Back.
+			2, 6, 3,
+			3, 6, 7,
+
+			// Right.
+			5, 1, 7,
+			7, 1, 3,
+
+			// Left.
+			2, 0, 6,
+			6, 0, 4,
+		};
+
+		_gl.Enable(GL_DEPTH_TEST);
+		_gl.DepthFunc(GL_LESS);
+
+		_gl.EnableClientState(GL_COLOR_ARRAY);
+		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex3D), &vertices[0].color);
+
+		if (_debug_rendering || _texture)
+			_gl.Disable(GL_TEXTURE_2D);
+
+		_gl.EnableClientState(GL_VERTEX_ARRAY);
+		_gl.VertexPointer(4, GL_FLOAT, sizeof(Vertex3D), &vertices[0].position);
+
+		_gl.DrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, &indices[0]);
+
+		_gl.DisableClientState(GL_VERTEX_ARRAY);
+		_gl.DisableClientState(GL_COLOR_ARRAY);
+
+		if (_debug_rendering || _texture)
+			_gl.Enable(GL_TEXTURE_2D);
+
+		_gl.Disable(GL_DEPTH_TEST);
+	}
+
 	void OpenGlRenderer::clear()
 	{
 		_gl.ClearColor(0.5, 0.5, 0.5, 0);

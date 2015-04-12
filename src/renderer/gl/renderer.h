@@ -15,6 +15,7 @@ namespace Yttrium
 
 		// Renderer
 		std::unique_ptr<TextureCache> create_texture_cache() override;
+		void draw_cube(const Vector4f& center, float size) override;
 
 		// RendererImpl
 		void clear() override;
