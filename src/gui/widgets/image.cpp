@@ -36,7 +36,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void GuiImage::render(Renderer& renderer, const RectF& rect, const Vector2f&, WidgetState) const
+	void GuiImage::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 	}

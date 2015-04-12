@@ -14,7 +14,7 @@ namespace Yttrium
 		BackendTexture2D(const ImageFormat& format, Allocator* allocator);
 
 		virtual void bind() = 0;
-		virtual Vector2f fix_coords(const Vector2f& coords) const = 0; // TODO: fix_rectangle().
+		virtual Vector2 fix_coords(const Vector2& coords) const = 0; // TODO: fix_rectangle().
 		virtual void unbind() = 0;
 
 		RectF full_rectangle() const;

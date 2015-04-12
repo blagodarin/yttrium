@@ -15,7 +15,7 @@ namespace Yttrium
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
+		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
 

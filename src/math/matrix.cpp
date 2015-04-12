@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	Matrix4f::Matrix4f()
+	Matrix4::Matrix4()
 		: _data{
 			{1, 0, 0, 0},
 			{0, 1, 0, 0},
@@ -16,7 +16,7 @@ namespace Yttrium
 	{
 	}
 
-	Matrix4f::Matrix4f(
+	Matrix4::Matrix4(
 		float m00, float m01, float m02, float m03,
 		float m10, float m11, float m12, float m13,
 		float m20, float m21, float m22, float m23,
@@ -29,7 +29,7 @@ namespace Yttrium
 	{
 	}
 
-	Matrix4f Matrix4f::projection_2d(const Size& size, float near, float far)
+	Matrix4 Matrix4::projection_2d(const Size& size, float near, float far)
 	{
 		assert(size.width > 0 && size.height > 0 && far > near);
 
@@ -43,10 +43,10 @@ namespace Yttrium
 		const auto m13 = 1 - m11 * top;
 		const auto m23 = (near + far) / (near - far);
 
-		return Matrix4f(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
+		return Matrix4(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
 	}
 
-	Matrix4f Matrix4f::perspective(float aspect, float vertical_fov, float near, float far)
+	Matrix4 Matrix4::perspective(float aspect, float vertical_fov, float near, float far)
 	{
 		assert(aspect > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
 
@@ -60,6 +60,6 @@ namespace Yttrium
 		const auto m23 = 2 * near * far / (near - far);
 		const auto m32 = -1.f;
 
-		return Matrix4f(m00, 0, 0, 0, 0, m11, 0, 0, 0, 0, m22, m23, 0, 0, m32, 0);
+		return Matrix4(m00, 0, 0, 0, 0, m11, 0, 0, 0, 0, m22, m23, 0, 0, m32, 0);
 	}
 }

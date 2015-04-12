@@ -190,4 +190,10 @@ Size TextureFont::text_size(const StaticString& text) const
 	return result;
 }
 
+Vector2 TextureFont::text_size(const StaticString& text, const Vector2& font_size) const
+{
+	const Size& size = text_size(text);
+	return Vector2(font_size.x * (size.width * font_size.y / size.height), font_size.y);
+}
+
 } // namespace Yttrium

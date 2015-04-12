@@ -16,7 +16,7 @@ namespace Yttrium
 namespace
 {
 
-unsigned read_color(Vector4f *color, const IonNode &node, unsigned inherit)
+unsigned read_color(Vector4 *color, const IonNode &node, unsigned inherit)
 {
 	unsigned result = 0;
 
@@ -46,7 +46,7 @@ unsigned read_color(Vector4f *color, const IonNode &node, unsigned inherit)
 	return result;
 }
 
-unsigned read_position(Vector2f *position, const IonNode &node)
+unsigned read_position(Vector2 *position, const IonNode &node)
 {
 	unsigned result = 0;
 
@@ -88,7 +88,7 @@ void read_rect(int32_t elements[4], const IonNode& node)
 	}
 }
 
-unsigned read_size(Vector2f *size, const IonNode &node, unsigned inherit)
+unsigned read_size(Vector2 *size, const IonNode &node, unsigned inherit)
 {
 	unsigned result = 0;
 
@@ -169,7 +169,7 @@ bool GuiIonPropertyLoader::load_alignment(const StaticString &name, unsigned *al
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4f *color) const
+bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4 *color) const
 {
 	unsigned loaded = 0x0;
 
@@ -218,7 +218,7 @@ bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_margins(const StaticString &name, MarginsI *margins) const
+bool GuiIonPropertyLoader::load_margins(const StaticString &name, Margins *margins) const
 {
 	if (_bound_object)
 	{
@@ -237,7 +237,7 @@ bool GuiIonPropertyLoader::load_margins(const StaticString &name, MarginsI *marg
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2f *position) const
+bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2 *position) const
 {
 	unsigned loaded = 0x0;
 
@@ -311,7 +311,7 @@ bool GuiIonPropertyLoader::load_scaling(const StaticString &name, Scaling *scali
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2f *size) const
+bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2 *size) const
 {
 	unsigned loaded = 0x0;
 
@@ -476,7 +476,7 @@ bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const IonNode& no
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_margins(MarginsI* margins, const IonNode& node)
+bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
 {
 	int32_t top    = -1;
 	int32_t right  = -1;
@@ -527,7 +527,7 @@ bool GuiIonPropertyLoader::load_margins(MarginsI* margins, const IonNode& node)
 	if (left < 0)
 		left = right;
 
-	*margins = MarginsI(top, right, bottom, left);
+	*margins = Margins(top, right, bottom, left);
 
 	return true;
 }
@@ -557,7 +557,7 @@ bool GuiIonPropertyLoader::load_scaling(Scaling* scaling, const IonNode& node)
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_size(Vector2f* size, const IonNode& node)
+bool GuiIonPropertyLoader::load_size(Vector2* size, const IonNode& node)
 {
 	return read_size(size, node, 0) == 3;
 }
@@ -627,7 +627,7 @@ bool GuiIonPropertyLoader::load_texture(Pointer<Texture2D>* texture, const IonNo
 	Texture2D::Filter filter = default_filter;
 
 	Rect     rect;
-	MarginsI borders;
+	Margins borders;
 
 	if (!values.is_empty())
 	{

@@ -35,19 +35,19 @@ namespace Yttrium
 		draw_rectangle(rect, texture_rect, _texture ? _texture_borders : MarginsF());
 	}
 
-	void RendererImpl::draw_text(const Vector2f& position, const StaticString& text, unsigned alignment, TextCapture* capture)
+	void RendererImpl::draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture)
 	{
 		if (!_font)
 			return;
 
-		Vector2f current_position = position;
+		Vector2 current_position = position;
 		char last_symbol = '\0';
 		float y_scaling = _font_size.y / _font.size();
 		float x_scaling = y_scaling * _font_size.x;
 
 		if (alignment != BottomRightAlignment)
 		{
-			const Vector2f& size = text_size(text);
+			const Vector2& size = text_size(text);
 
 			if ((alignment & HorizontalAlignmentMask) != RightAlignment)
 				current_position.x -= size.x * (alignment & LeftAlignment ? 1.0 : 0.5);
@@ -98,8 +98,8 @@ namespace Yttrium
 					info->rect.height() * y_scaling);
 
 				BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.get());
-				Vector2f texture_top_left(backend_texture->fix_coords(info->rect.top_left()));
-				Vector2f texture_bottom_right(backend_texture->fix_coords(info->rect.bottom_right()));
+				Vector2 texture_top_left(backend_texture->fix_coords(Vector2(info->rect.top_left())));
+				Vector2 texture_bottom_right(backend_texture->fix_coords(Vector2(info->rect.bottom_right())));
 
 				draw_rectangle(symbol_rect,
 					RectF::from_coords(texture_top_left.x, texture_top_left.y, texture_bottom_right.x, texture_bottom_right.y),
@@ -116,7 +116,7 @@ namespace Yttrium
 		do_capture(text.size());
 	}
 
-	void RendererImpl::set_color(const Vector4f& color)
+	void RendererImpl::set_color(const Vector4& color)
 	{
 		_color = color;
 	}
@@ -131,7 +131,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void RendererImpl::set_font_size(const Vector2f& size)
+	void RendererImpl::set_font_size(const Vector2& size)
 	{
 		_font_size = size;
 	}
@@ -167,14 +167,14 @@ namespace Yttrium
 		_font = TextureFont();
 	}
 
-	bool RendererImpl::set_texture_borders(const MarginsI& borders)
+	bool RendererImpl::set_texture_borders(const Margins& borders)
 	{
 		if (!_texture)
 			return false;
 
-		const Vector2f texture_size(_texture->size());
-		const Vector2f& texture_rect_size = _texture_rect.size();
-		const Vector2f& min_size = borders.min_size().to<float>() / texture_size;
+		const Vector2 texture_size(_texture->size());
+		const Vector2& texture_rect_size = _texture_rect.size();
+		const Vector2& min_size = Vector2(borders.min_size()) / texture_size;
 		if (texture_rect_size.x < min_size.x || texture_rect_size.y < min_size.y)
 			return false;
 
@@ -189,17 +189,17 @@ namespace Yttrium
 		BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.get());
 		if (backend_texture)
 		{
-			const Vector2f& top_left = backend_texture->fix_coords(rect.top_left());
-			const Vector2f& bottom_right = backend_texture->fix_coords(rect.bottom_right());
+			const Vector2& top_left = backend_texture->fix_coords(rect.top_left());
+			const Vector2& bottom_right = backend_texture->fix_coords(rect.bottom_right());
 
 			_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
 			_texture_borders = MarginsF();
 		}
 	}
 
-	Vector2f RendererImpl::text_size(const StaticString& text) const
+	Vector2 RendererImpl::text_size(const StaticString& text) const
 	{
-		return _font ? _font.text_size(text, _font_size) : Vector2f(0);
+		return _font ? _font.text_size(text, _font_size) : Vector2(0, 0);
 	}
 
 	Size RendererImpl::window_size() const
@@ -227,7 +227,7 @@ namespace Yttrium
 			_debug_rendering = false;
 	}
 
-	void RendererImpl::push_projection(const Matrix4f& matrix)
+	void RendererImpl::push_projection(const Matrix4& matrix)
 	{
 		assert(!_debug_rendering);
 		flush_2d();
@@ -249,7 +249,7 @@ namespace Yttrium
 		update_window_size();
 	}
 
-	void RendererImpl::draw_rectangle(const RectF &position, const RectF &texture, const MarginsF &borders)
+	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
 	{
 		size_t index = _vertices_2d.size();
 
@@ -427,7 +427,7 @@ namespace Yttrium
 		_vertices_2d.push_back(vertex);
 	}
 
-	PushProjection::PushProjection(Renderer& renderer, const Matrix4f& matrix)
+	PushProjection::PushProjection(Renderer& renderer, const Matrix4& matrix)
 		: _renderer(renderer)
 	{
 		static_cast<RendererImpl&>(_renderer).push_projection(matrix);

@@ -288,13 +288,13 @@ void Game::draw_field(Renderer& renderer, const RectF& rect)
 {
 	const int total_width = 1 + Tetrium::Field::Width + 1;
 	const int total_height = 1 + Tetrium::Field::Height + 1;
-	const Vector2f block_size(rect.width() / total_width, rect.height() / total_height);
+	const Vector2 block_size(rect.width() / total_width, rect.height() / total_height);
 	draw_field_blocks(renderer, rect, block_size);
 	draw_field_figure(renderer, rect, block_size);
 	draw_field_frame(renderer, rect, block_size);
 }
 
-void Game::draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size)
+void Game::draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2& block_size)
 {
 	if (_game_running || _game.has_finished())
 	{
@@ -318,9 +318,9 @@ void Game::draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector
 	}
 }
 
-void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const Vector2f& block_size)
+void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const Vector2& block_size)
 {
-	static const Vector2f frame_offset(1, Tetrium::Field::Height);
+	static const Vector2 frame_offset(1, Tetrium::Field::Height);
 
 	if (!_game_running)
 		return;
@@ -343,9 +343,9 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const Vector
 	}
 }
 
-void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2f& block_size)
+void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2& block_size)
 {
-	renderer.set_color(Vector4f(1, 1, 1, 1));
+	renderer.set_color(Vector4(1, 1, 1, 1));
 	set_texture_rectangle(renderer, Tetrium::Figure::None);
 
 	const int total_width = 1 + Tetrium::Field::Width + 1;

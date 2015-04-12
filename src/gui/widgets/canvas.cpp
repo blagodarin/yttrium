@@ -34,7 +34,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void Canvas::render(Renderer& renderer, const RectF& rect, const Vector2f&, WidgetState) const
+	void Canvas::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
 	{
 		_window_callbacks.on_render_canvas(renderer, rect, _name);
 	}

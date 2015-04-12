@@ -4,501 +4,310 @@
 #ifndef __Y_VECTOR_H
 #define __Y_VECTOR_H
 
+#include <yttrium/point.h>
 #include <yttrium/size.h>
 
 namespace Yttrium
 {
-
-/// 2-component vector.
-
-template <typename T>
-class Vector2
-{
-public:
-
-	T x;
-	T y;
-
-public:
-
-	///
-	Vector2() {}
-
-	///
-	explicit Vector2(int): x(0), y(0) {}
-
-	///
-	Vector2(T x, T y): x(x), y(y) {}
-
-	///
-	explicit Vector2(const Size& size): x(size.width), y(size.height) {}
-
-	///
-	template <typename U>
-	Vector2(const Vector2<U>& vector): x(vector.x), y(vector.y) {}
-
-public:
-
-	///
-
-	T *data();
-
-	///
-
-	const T *data() const;
-
-	///
-
-	template <typename U>
-	Vector2<U> to() const;
-
-public:
-
-	///
-
-	Vector2 operator +(T value) const;
-
-	///
-
-	Vector2 operator +(const Vector2 &vector) const;
-
-	///
-
-	Vector2 &operator +=(T value);
-
-	///
-
-	Vector2 &operator +=(const Vector2 &vector);
-
-	///
-
-	Vector2 operator -(T value) const;
-
-	///
-
-	Vector2 operator -(const Vector2 &vector) const;
-
-	///
-
-	Vector2 &operator -=(T value);
-
-	///
-
-	Vector2 &operator -=(const Vector2 &vector);
-
-	///
-
-	Vector2 operator *(T value) const;
-
-	///
-
-	Vector2 operator *(const Vector2 &vector) const;
-
-	///
-
-	Vector2 &operator *=(T value);
-
-	///
-
-	Vector2 &operator *=(const Vector2 &vector);
-
-	///
-
-	Vector2 operator /(T value) const;
-
-	///
-
-	Vector2 operator /(const Vector2 &vector) const;
-
-	///
-
-	Vector2 &operator /=(T value);
-
-	///
-
-	Vector2 &operator /=(const Vector2 &vector);
-};
-
-/// 4-component vector.
-
-// NOTE: The w component is now unaffected by +'s and -'s. Is it right?
-
-template <typename T>
-class Vector4
-{
-public:
-
-	union
+	/// 2-component 2D vector.
+	class Vector2
 	{
-		struct
+	public:
+
+		float x; ///<
+		float y; ///<
+
+		///
+		Vector2() = default;
+
+		///
+		Vector2(float x, float y): x(x), y(y) {}
+
+		///
+		explicit Vector2(const Point& point)
+			: x(point.x)
+			, y(point.y)
 		{
-			T x;
-			T y;
-			T z;
-			T w;
-		};
-		struct
+		}
+
+		///
+		explicit Vector2(const Size& size)
+			: x(size.width)
+			, y(size.height)
 		{
-			T r;
-			T g;
-			T b;
-			T a;
-		};
-		struct
+		}
+
+		///
+		float* data() { return &x; }
+
+		///
+		const float* data() const { return &x; }
+
+		///
+		Vector2& operator+=(float scalar)
 		{
-			T s;
-			T t;
-			T p;
-			T q;
-		};
+			x += scalar;
+			y += scalar;
+			return *this;
+		}
+
+		///
+		Vector2& operator+=(const Vector2& vector)
+		{
+			x += vector.x;
+			y += vector.y;
+			return *this;
+		}
+
+		///
+		Vector2& operator-=(float scalar)
+		{
+			x -= scalar;
+			y -= scalar;
+			return *this;
+		}
+
+		///
+		Vector2& operator-=(const Vector2& vector)
+		{
+			x -= vector.x;
+			y -= vector.y;
+			return *this;
+		}
+
+		///
+		Vector2& operator*=(float scalar)
+		{
+			x *= scalar;
+			y *= scalar;
+			return *this;
+		}
+
+		///
+		Vector2& operator*=(const Vector2& vector)
+		{
+			x *= vector.x;
+			y *= vector.y;
+			return *this;
+		}
+
+		///
+		Vector2& operator/=(float scalar)
+		{
+			x /= scalar;
+			y /= scalar;
+			return *this;
+		}
+
+		///
+		Vector2& operator/=(const Vector2& vector)
+		{
+			x /= vector.x;
+			y /= vector.y;
+			return *this;
+		}
 	};
 
-public:
+	/// 4-component 3D vector.
+	class Vector4
+	{
+	public:
 
-	///
+		union
+		{
+			struct
+			{
+				float x;
+				float y;
+				float z;
+				float w;
+			};
+			struct
+			{
+				float r;
+				float g;
+				float b;
+				float a;
+			};
+			struct
+			{
+				float s;
+				float t;
+				float p;
+				float q;
+			};
+		};
 
-	Vector4() {}
+		///
+		Vector4() = default;
 
-	///
+		///
+		Vector4(float x, float y, float z, float w = 1): x(x), y(y), z(z), w(w) {}
 
-	Vector4(int);
+		///
+		float* data() { return &x; }
 
-	///
+		///
+		const float* data() const { return &x; }
 
-	Vector4(T x, T y, T z, T w = 1);
+		///
+		Vector4& operator+=(float scalar)
+		{
+			x += scalar;
+			y += scalar;
+			z += scalar;
+			return *this;
+		}
 
-	///
+		///
+		Vector4& operator+=(const Vector4& vector)
+		{
+			x += vector.x;
+			y += vector.y;
+			z += vector.z;
+			return *this;
+		}
 
-	template <typename U>
-	Vector4(const Vector4<U> &vector);
+		///
+		Vector4& operator-=(float scalar)
+		{
+			x -= scalar;
+			y -= scalar;
+			z -= scalar;
+			return *this;
+		}
 
-public:
+		///
+		Vector4& operator-=(const Vector4& vector)
+		{
+			x -= vector.x;
+			y -= vector.y;
+			z -= vector.z;
+			return *this;
+		}
 
-	///
+		///
+		Vector4& operator*=(float scalar)
+		{
+			x *= scalar;
+			y *= scalar;
+			z *= scalar;
+			return *this;
+		}
 
-	T *data();
+		///
+		Vector4& operator*=(const Vector4& vector)
+		{
+			x *= vector.x;
+			y *= vector.y;
+			z *= vector.z;
+			return *this;
+		}
 
-	///
+		///
+		Vector4& operator/=(float scalar)
+		{
+			x /= scalar;
+			y /= scalar;
+			z /= scalar;
+			return *this;
+		}
 
-	const T *data() const;
+		///
+		Vector4& operator/=(const Vector4& vector)
+		{
+			x /= vector.x;
+			y /= vector.y;
+			z /= vector.z;
+			return *this;
+		}
+	};
 
-public:
+	inline Vector2 operator+(Vector2 left, const Vector2& right) { return left += right; }
+	inline Vector2 operator+(Vector2 left, float right) { return left += right; }
+	inline Vector2 operator+(float left, Vector2 right) { return right += left; }
 
-	///
+	inline Vector2 operator-(Vector2 left, const Vector2& right) { return left -= right; }
+	inline Vector2 operator-(Vector2 left, float right) { return left -= right; }
+	inline Vector2 operator-(float left, const Vector2& right) { return Vector2(left - right.x, left - right.y); }
 
-	Vector4 operator +(T value) const;
+	inline Vector2 operator*(Vector2 left, const Vector2& right) { return left *= right; }
+	inline Vector2 operator*(Vector2 left, float right) { return left *= right; }
+	inline Vector2 operator*(float left, Vector2 right) { return right *= left; }
 
-	///
+	inline Vector2 operator/(Vector2 left, const Vector2& right) { return left /= right; }
+	inline Vector2 operator/(Vector2 left, float right) { return left /= right; }
+	inline Vector2 operator/(float left, const Vector2& right) { return Vector2(left / right.x, left / right.y); }
 
-	Vector4 operator +(const Vector4 &vector) const;
+	inline bool operator==(const Vector2& left, const Vector2& right)
+	{
+		return left.x == right.x && left.y == right.y;
+	}
 
-	///
+	inline Vector4 operator+(const Vector4& left, const Vector4& right)
+	{
+		return Vector4(left.x + right.x, left.y + right.y, left.z + right.z);
+	}
 
-	Vector4 &operator +=(T value);
+	inline Vector4 operator+(const Vector4& left, float right)
+	{
+		return Vector4(left.x + right, left.y + right, left.z + right);
+	}
 
-	///
+	inline Vector4 operator+(float left, const Vector4& right)
+	{
+		return Vector4(left + right.x, left + right.y, left + right.z);
+	}
 
-	Vector4 &operator +=(const Vector4 &vector);
+	inline Vector4 operator-(const Vector4& left, const Vector4& right)
+	{
+		return Vector4(left.x - right.x, left.y - right.y, left.z - right.z);
+	}
 
-	///
+	inline Vector4 operator-(const Vector4& left, float right)
+	{
+		return Vector4(left.x - right, left.y - right, left.z - right);
+	}
 
-	Vector4 operator -(T value) const;
+	inline Vector4 operator-(float left, const Vector4& right)
+	{
+		return Vector4(left - right.x, left - right.y, left - right.z);
+	}
 
-	///
+	inline Vector4 operator*(const Vector4& left, const Vector4& right)
+	{
+		return Vector4(left.x * right.x, left.y * right.y, left.z * right.z);
+	}
 
-	Vector4 operator -(const Vector4 &vector) const;
+	inline Vector4 operator*(const Vector4& left, float right)
+	{
+		return Vector4(left.x * right, left.y * right, left.z * right);
+	}
 
-	///
+	inline Vector4 operator*(float left, const Vector4& right)
+	{
+		return Vector4(left * right.x, left * right.y, left * right.z);
+	}
 
-	Vector4 &operator -=(T value);
+	inline Vector4 operator/(const Vector4& left, const Vector4& right)
+	{
+		return Vector4(left.x / right.x, left.y / right.y, left.z / right.z);
+	}
 
-	///
+	inline Vector4 operator/(const Vector4& left, float right)
+	{
+		return Vector4(left.x / right, left.y / right, left.z / right);
+	}
 
-	Vector4 &operator -=(const Vector4 &vector);
+	inline Vector4 operator/(float left, const Vector4& right)
+	{
+		return Vector4(left / right.x, left / right.y, left / right.z);
+	}
 
-	///
-
-	Vector4 operator *(T value) const;
-
-	///
-
-	Vector4 operator *(const Vector4 &vector) const;
-
-	///
-
-	Vector4 &operator *=(T value);
-
-	///
-
-	Vector4 &operator *=(const Vector4 &vector);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-T *Vector2<T>::data()
-{
-	return &x;
+	inline bool operator==(const Vector4& left, const Vector4& right)
+	{
+		return left.x == right.x && left.y == right.y && left.z == right.z;
+	}
 }
-
-template <typename T>
-const T *Vector2<T>::data() const
-{
-	return &x;
-}
-
-template <typename T>
-template <typename U>
-Vector2<U> Vector2<T>::to() const
-{
-	return Vector2<U>(x, y);
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator +(T value) const
-{
-	return Vector2(x + value, y + value);
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator +(const Vector2 &vector) const
-{
-	return Vector2(x + vector.x, y + vector.y);
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator +=(T value)
-{
-	x += value;
-	y += value;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator +=(const Vector2 &vector)
-{
-	x += vector.x;
-	y += vector.y;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator -(T value) const
-{
-	return Vector2(x - value, y - value);
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator -(const Vector2 &vector) const
-{
-	return Vector2(x - vector.x, y - vector.y);
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator -=(T value)
-{
-	x -= value;
-	y -= value;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator -=(const Vector2 &vector)
-{
-	x -= vector.x;
-	y -= vector.y;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator *(T value) const
-{
-	return Vector2(x * value, y * value);
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator *(const Vector2 &vector) const
-{
-	return Vector2(x * vector.x, y * vector.y);
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator *=(T value)
-{
-	x *= value;
-	y *= value;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator *=(const Vector2 &vector)
-{
-	x *= vector.x;
-	y *= vector.y;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator /(T value) const
-{
-	return Vector2(x / value, y / value);
-}
-
-template <typename T>
-Vector2<T> Vector2<T>::operator /(const Vector2 &vector) const
-{
-	return Vector2(x / vector.x, y / vector.y);
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator /=(T value)
-{
-	x /= value;
-	y /= value;
-	return *this;
-}
-
-template <typename T>
-Vector2<T> &Vector2<T>::operator /=(const Vector2 &vector)
-{
-	x /= vector.x;
-	y /= vector.y;
-	return *this;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-Vector4<T>::Vector4(int)
-	: x(0)
-	, y(0)
-	, z(0)
-	, w(1)
-{
-}
-
-template <typename T>
-Vector4<T>::Vector4(T x, T y, T z, T w)
-	: x(x)
-	, y(y)
-	, z(z)
-	, w(w)
-{
-}
-
-template <typename T>
-template <typename U>
-Vector4<T>::Vector4(const Vector4<U> &vector)
-	: x(vector.x)
-	, y(vector.y)
-	, z(vector.z)
-	, w(vector.w)
-{
-}
-
-template <typename T>
-T *Vector4<T>::data()
-{
-	return &x;
-}
-
-template <typename T>
-const T *Vector4<T>::data() const
-{
-	return &x;
-}
-
-template <typename T>
-Vector4<T> Vector4<T>::operator +(T value) const
-{
-	return Vector4(x + value, y + value, z + value, w);
-}
-
-template <typename T>
-Vector4<T> Vector4<T>::operator +(const Vector4 &vector) const
-{
-	return Vector4(x + vector.x, y + vector.y, z + vector.z, w);
-}
-
-template <typename T>
-Vector4<T> &Vector4<T>::operator +=(T value)
-{
-	x += value;
-	y += value;
-	z += value;
-	return *this;
-}
-
-template <typename T>
-Vector4<T> &Vector4<T>::operator +=(const Vector4 &vector)
-{
-	x += vector.x;
-	y += vector.y;
-	z += vector.z;
-	return *this;
-}
-
-template <typename T>
-Vector4<T> Vector4<T>::operator -(T value) const
-{
-	return Vector4(x - value, y - value, z - value, w);
-}
-
-template <typename T>
-Vector4<T> Vector4<T>::operator -(const Vector4 &vector) const
-{
-	return Vector4(x - vector.x, y - vector.y, z - vector.z, w);
-}
-
-template <typename T>
-Vector4<T> &Vector4<T>::operator -=(T value)
-{
-	x -= value;
-	y -= value;
-	z -= value;
-	return *this;
-}
-
-template <typename T>
-Vector4<T> &Vector4<T>::operator -=(const Vector4 &vector)
-{
-	x -= vector.x;
-	y -= vector.y;
-	z -= vector.z;
-	return *this;
-}
-
-template <typename T>
-Vector4<T> Vector4<T>::operator *(T value) const
-{
-	return Vector4(x * value, y * value, z * value, w);
-}
-
-template <typename T>
-Vector4<T> Vector4<T>::operator *(const Vector4 &vector) const
-{
-	return Vector4(x * vector.x, y * vector.y, z * vector.z, w);
-}
-
-template <typename T>
-Vector4<T> &Vector4<T>::operator *=(T value)
-{
-	x *= value;
-	y *= value;
-	z *= value;
-	return *this;
-}
-
-template <typename T>
-Vector4<T> &Vector4<T>::operator *=(const Vector4 &vector)
-{
-	x *= vector.x;
-	y *= vector.y;
-	z *= vector.z;
-	return *this;
-}
-
-} // namespace Yttrium
 
 #endif // __Y_VECTOR_H

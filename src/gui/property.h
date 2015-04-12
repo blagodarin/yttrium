@@ -16,10 +16,10 @@ namespace Yttrium
 
 	struct BackgroundProperty
 	{
-		Vector4f           color;
+		Vector4            color;
 		Pointer<Texture2D> texture;
 		Rect               texture_rect;
-		MarginsI           borders;
+		Margins            borders;
 
 		BackgroundProperty(): color(1, 1, 1) {}
 
@@ -33,12 +33,12 @@ namespace Yttrium
 	{
 		TextureFont        font;
 		Pointer<Texture2D> font_texture;
-		Vector2f           size;
-		Vector4f           color;
+		Vector2            size;
+		Vector4            color;
 
 		ForegroundProperty(): color(1, 1, 1) {}
 
-		void draw(Renderer& renderer, const String& text, const Vector2f& origin,
+		void draw(Renderer& renderer, const String& text, const Vector2& origin,
 			unsigned alignment, float scale, Renderer::TextCapture* capture = nullptr) const;
 		void dump(GuiPropertyDumper& dumper) const;
 		bool load(const GuiPropertyLoader& loader);

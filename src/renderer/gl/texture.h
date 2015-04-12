@@ -16,7 +16,7 @@ namespace Yttrium
 	private:
 
 		void bind() override;
-		Vector2f fix_coords(const Vector2f& coords) const override;
+		Vector2 fix_coords(const Vector2& coords) const override;
 		void unbind() override;
 
 	private:

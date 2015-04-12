@@ -24,14 +24,14 @@ namespace Yttrium
 		return std::make_unique<GlTextureCache>(*this, _gl);
 	}
 
-	void OpenGlRenderer::draw_cube(const Vector4f& center, float size)
+	void OpenGlRenderer::draw_cube(const Vector4& center, float size)
 	{
 		struct Vertex3D
 		{
-			Vector4f position;
-			Vector4f color;
+			Vector4 position;
+			Vector4 color;
 
-			Vertex3D(const Vector4f& position, const Vector4f& color)
+			Vertex3D(const Vector4& position, const Vector4& color)
 				: position(position)
 				, color(color)
 			{
@@ -42,14 +42,14 @@ namespace Yttrium
 
 		const std::array<Vertex3D, 8> vertices =
 		{
-			Vertex3D(Vector4f(center.x - radius, center.y - radius, center.z - radius), Vector4f(0, 0, 0)),
-			Vertex3D(Vector4f(center.x + radius, center.y - radius, center.z - radius), Vector4f(0, 0, 1)),
-			Vertex3D(Vector4f(center.x - radius, center.y + radius, center.z - radius), Vector4f(0, 1, 0)),
-			Vertex3D(Vector4f(center.x + radius, center.y + radius, center.z - radius), Vector4f(0, 1, 1)),
-			Vertex3D(Vector4f(center.x - radius, center.y - radius, center.z + radius), Vector4f(1, 0, 0)),
-			Vertex3D(Vector4f(center.x + radius, center.y - radius, center.z + radius), Vector4f(1, 0, 1)),
-			Vertex3D(Vector4f(center.x - radius, center.y + radius, center.z + radius), Vector4f(1, 1, 0)),
-			Vertex3D(Vector4f(center.x + radius, center.y + radius, center.z + radius), Vector4f(1, 1, 1)),
+			Vertex3D(Vector4(center.x - radius, center.y - radius, center.z - radius), Vector4(0, 0, 0)),
+			Vertex3D(Vector4(center.x + radius, center.y - radius, center.z - radius), Vector4(0, 0, 1)),
+			Vertex3D(Vector4(center.x - radius, center.y + radius, center.z - radius), Vector4(0, 1, 0)),
+			Vertex3D(Vector4(center.x + radius, center.y + radius, center.z - radius), Vector4(0, 1, 1)),
+			Vertex3D(Vector4(center.x - radius, center.y - radius, center.z + radius), Vector4(1, 0, 0)),
+			Vertex3D(Vector4(center.x + radius, center.y - radius, center.z + radius), Vector4(1, 0, 1)),
+			Vertex3D(Vector4(center.x - radius, center.y + radius, center.z + radius), Vector4(1, 1, 0)),
+			Vertex3D(Vector4(center.x + radius, center.y + radius, center.z + radius), Vector4(1, 1, 1)),
 		};
 
 		const std::array<int16_t, 36> indices =
@@ -174,12 +174,12 @@ namespace Yttrium
 		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
-	void OpenGlRenderer::set_projection(const Matrix4f& matrix)
+	void OpenGlRenderer::set_projection(const Matrix4& matrix)
 	{
 		_gl.MatrixMode(GL_PROJECTION);
 		_gl.LoadMatrixf(matrix.data());
 		_gl.MatrixMode(GL_MODELVIEW);
-		_gl.LoadMatrixf(Matrix4f().data());
+		_gl.LoadMatrixf(Matrix4().data());
 	}
 
 	void OpenGlRenderer::update_window_size()

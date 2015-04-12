@@ -30,23 +30,23 @@ BOOST_AUTO_TEST_CASE(test_rect_containment)
 
 	BOOST_CHECK(rect.contains(rect));
 
-	BOOST_CHECK(rect.contains(Vector2<int>(0, 0)));
-	BOOST_CHECK(rect.fast_contains(Vector2<int>(0, 0)));
+	BOOST_CHECK(rect.contains(Point(0, 0)));
+	BOOST_CHECK(rect.contains_fast(Point(0, 0)));
 
-	BOOST_CHECK(!rect.contains(Vector2<int>(-1, 0)));
-	BOOST_CHECK(!rect.fast_contains(Vector2<int>(-1, 0)));
+	BOOST_CHECK(!rect.contains(Point(-1, 0)));
+	BOOST_CHECK(!rect.contains_fast(Point(-1, 0)));
 
-	BOOST_CHECK(!rect.contains(Vector2<int>(0, -1)));
-	BOOST_CHECK(!rect.fast_contains(Vector2<int>(0, -1)));
+	BOOST_CHECK(!rect.contains(Point(0, -1)));
+	BOOST_CHECK(!rect.contains_fast(Point(0, -1)));
 
-	BOOST_CHECK(rect.contains(Vector2<int>(9, 9)));
-	BOOST_CHECK(rect.fast_contains(Vector2<int>(9, 9)));
+	BOOST_CHECK(rect.contains(Point(9, 9)));
+	BOOST_CHECK(rect.contains_fast(Point(9, 9)));
 
-	BOOST_CHECK(!rect.contains(Vector2<int>(10, 9)));
-	BOOST_CHECK(!rect.fast_contains(Vector2<int>(10, 9)));
+	BOOST_CHECK(!rect.contains(Point(10, 9)));
+	BOOST_CHECK(!rect.contains_fast(Point(10, 9)));
 
-	BOOST_CHECK(!rect.contains(Vector2<int>(9, 10)));
-	BOOST_CHECK(!rect.fast_contains(Vector2<int>(9, 10)));
+	BOOST_CHECK(!rect.contains(Point(9, 10)));
+	BOOST_CHECK(!rect.contains_fast(Point(9, 10)));
 
 	Rect smaller_rect(1, 1, 9, 9);
 
@@ -66,78 +66,78 @@ BOOST_AUTO_TEST_CASE(test_rect_intersection)
 	Rect rect(0, 0, 3, 3);
 
 	BOOST_CHECK(rect.intersects(rect));
-	BOOST_CHECK(rect.fast_intersects(rect));
-	BOOST_CHECK(rect.fastest_intersects(rect));
+	BOOST_CHECK(rect.intersects_fast(rect));
+	BOOST_CHECK(rect.intersects_fastest(rect));
 
 	Rect another_rect(1, 1, 3, 3);
 
 	BOOST_CHECK(rect.intersects(another_rect));
-	BOOST_CHECK(rect.fast_intersects(another_rect));
-	BOOST_CHECK(rect.fastest_intersects(another_rect));
+	BOOST_CHECK(rect.intersects_fast(another_rect));
+	BOOST_CHECK(rect.intersects_fastest(another_rect));
 
 	BOOST_CHECK(another_rect.intersects(rect));
-	BOOST_CHECK(another_rect.fast_intersects(rect));
-	BOOST_CHECK(another_rect.fastest_intersects(rect));
+	BOOST_CHECK(another_rect.intersects_fast(rect));
+	BOOST_CHECK(another_rect.intersects_fastest(rect));
 
 	Rect inner_rect(1, 1, 1, 1); // So that (L1 - R2 == L2 - R1).
 
 	BOOST_CHECK(rect.intersects(inner_rect));
-	BOOST_CHECK(rect.fast_intersects(inner_rect));
-	BOOST_CHECK(rect.fastest_intersects(inner_rect));
+	BOOST_CHECK(rect.intersects_fast(inner_rect));
+	BOOST_CHECK(rect.intersects_fastest(inner_rect));
 
 	BOOST_CHECK(inner_rect.intersects(rect));
-	BOOST_CHECK(inner_rect.fast_intersects(rect));
-	BOOST_CHECK(inner_rect.fastest_intersects(rect));
+	BOOST_CHECK(inner_rect.intersects_fast(rect));
+	BOOST_CHECK(inner_rect.intersects_fastest(rect));
 
 	Rect right_border_rect(2, 0, 3, 3);
 
 	BOOST_CHECK(rect.intersects(right_border_rect));
-	BOOST_CHECK(rect.fast_intersects(right_border_rect));
-	BOOST_CHECK(rect.fastest_intersects(right_border_rect));
+	BOOST_CHECK(rect.intersects_fast(right_border_rect));
+	BOOST_CHECK(rect.intersects_fastest(right_border_rect));
 
 	BOOST_CHECK(right_border_rect.intersects(rect));
-	BOOST_CHECK(right_border_rect.fast_intersects(rect));
-	BOOST_CHECK(right_border_rect.fastest_intersects(rect));
+	BOOST_CHECK(right_border_rect.intersects_fast(rect));
+	BOOST_CHECK(right_border_rect.intersects_fastest(rect));
 
 	Rect right_rect(3, 0, 3, 3);
 
 	BOOST_CHECK(!rect.intersects(right_rect));
-	BOOST_CHECK(!rect.fast_intersects(right_rect));
-	BOOST_CHECK(!rect.fastest_intersects(right_rect));
+	BOOST_CHECK(!rect.intersects_fast(right_rect));
+	BOOST_CHECK(!rect.intersects_fastest(right_rect));
 
 	BOOST_CHECK(!right_rect.intersects(rect));
-	BOOST_CHECK(!right_rect.fast_intersects(rect));
-	BOOST_CHECK(!right_rect.fastest_intersects(rect));
+	BOOST_CHECK(!right_rect.intersects_fast(rect));
+	BOOST_CHECK(!right_rect.intersects_fastest(rect));
 
 	Rect bottom_border_rect(0, 2, 3, 3);
 
 	BOOST_CHECK(rect.intersects(bottom_border_rect));
-	BOOST_CHECK(rect.fast_intersects(bottom_border_rect));
-	BOOST_CHECK(rect.fastest_intersects(bottom_border_rect));
+	BOOST_CHECK(rect.intersects_fast(bottom_border_rect));
+	BOOST_CHECK(rect.intersects_fastest(bottom_border_rect));
 
 	BOOST_CHECK(bottom_border_rect.intersects(rect));
-	BOOST_CHECK(bottom_border_rect.fast_intersects(rect));
-	BOOST_CHECK(bottom_border_rect.fastest_intersects(rect));
+	BOOST_CHECK(bottom_border_rect.intersects_fast(rect));
+	BOOST_CHECK(bottom_border_rect.intersects_fastest(rect));
 
 	Rect bottom_rect(0, 3, 3, 3);
 
 	BOOST_CHECK(!rect.intersects(bottom_rect));
-	BOOST_CHECK(!rect.fast_intersects(bottom_rect));
-	BOOST_CHECK(!rect.fastest_intersects(bottom_rect));
+	BOOST_CHECK(!rect.intersects_fast(bottom_rect));
+	BOOST_CHECK(!rect.intersects_fastest(bottom_rect));
 
 	BOOST_CHECK(!bottom_rect.intersects(rect));
-	BOOST_CHECK(!bottom_rect.fast_intersects(rect));
-	BOOST_CHECK(!bottom_rect.fastest_intersects(rect));
+	BOOST_CHECK(!bottom_rect.intersects_fast(rect));
+	BOOST_CHECK(!bottom_rect.intersects_fastest(rect));
 
 	Rect far_rect(4, 4, 3, 3);
 
 	BOOST_CHECK(!rect.intersects(far_rect));
-	BOOST_CHECK(!rect.fast_intersects(far_rect));
-	BOOST_CHECK(!rect.fastest_intersects(far_rect));
+	BOOST_CHECK(!rect.intersects_fast(far_rect));
+	BOOST_CHECK(!rect.intersects_fastest(far_rect));
 
 	BOOST_CHECK(!far_rect.intersects(rect));
-	BOOST_CHECK(!far_rect.fast_intersects(rect));
-	BOOST_CHECK(!far_rect.fastest_intersects(rect));
+	BOOST_CHECK(!far_rect.intersects_fast(rect));
+	BOOST_CHECK(!far_rect.intersects_fastest(rect));
 }
 
 BOOST_AUTO_TEST_CASE(test_rect_null_intersection)
@@ -148,8 +148,8 @@ BOOST_AUTO_TEST_CASE(test_rect_null_intersection)
 	Rect null_rect;
 
 	BOOST_CHECK(!null_rect.intersects(null_rect));
-	BOOST_CHECK(!null_rect.fast_intersects(null_rect));
-	BOOST_CHECK(null_rect.fastest_intersects(null_rect)); // Note the difference.
+	BOOST_CHECK(!null_rect.intersects_fast(null_rect));
+	BOOST_CHECK(null_rect.intersects_fastest(null_rect)); // Note the difference.
 
 	// A null rect intersects with a non-null rect if the top left coordinate of the
 	// null rect lies within the non-null rect (and not on its zero-width border).
@@ -158,30 +158,30 @@ BOOST_AUTO_TEST_CASE(test_rect_null_intersection)
 	Rect rect(0, 0, 2, 2);
 
 	BOOST_CHECK(!null_rect.intersects(rect));
-	BOOST_CHECK(!null_rect.fast_intersects(rect));
-	BOOST_CHECK(!null_rect.fastest_intersects(rect));
+	BOOST_CHECK(!null_rect.intersects_fast(rect));
+	BOOST_CHECK(!null_rect.intersects_fastest(rect));
 
 	BOOST_CHECK(!rect.intersects(null_rect));
-	BOOST_CHECK(!rect.fast_intersects(null_rect));
-	BOOST_CHECK(!rect.fastest_intersects(null_rect));
+	BOOST_CHECK(!rect.intersects_fast(null_rect));
+	BOOST_CHECK(!rect.intersects_fastest(null_rect));
 
 	null_rect = Rect(1, 1, 0, 0);
 
 	BOOST_CHECK(null_rect.intersects(rect));
-	BOOST_CHECK(null_rect.fast_intersects(rect));
-	BOOST_CHECK(null_rect.fastest_intersects(rect));
+	BOOST_CHECK(null_rect.intersects_fast(rect));
+	BOOST_CHECK(null_rect.intersects_fastest(rect));
 
 	BOOST_CHECK(rect.intersects(null_rect));
-	BOOST_CHECK(rect.fast_intersects(null_rect));
-	BOOST_CHECK(rect.fastest_intersects(null_rect));
+	BOOST_CHECK(rect.intersects_fast(null_rect));
+	BOOST_CHECK(rect.intersects_fastest(null_rect));
 
 	null_rect = Rect(2, 2, 0, 0);
 
 	BOOST_CHECK(!null_rect.intersects(rect));
-	BOOST_CHECK(!null_rect.fast_intersects(rect));
-	BOOST_CHECK(!null_rect.fastest_intersects(rect));
+	BOOST_CHECK(!null_rect.intersects_fast(rect));
+	BOOST_CHECK(!null_rect.intersects_fastest(rect));
 
 	BOOST_CHECK(!rect.intersects(null_rect));
-	BOOST_CHECK(!rect.fast_intersects(null_rect));
-	BOOST_CHECK(!rect.fastest_intersects(null_rect));
+	BOOST_CHECK(!rect.intersects_fast(null_rect));
+	BOOST_CHECK(!rect.intersects_fastest(null_rect));
 }

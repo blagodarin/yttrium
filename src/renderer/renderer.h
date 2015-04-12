@@ -26,14 +26,14 @@ namespace Yttrium
 
 		void draw_rectangle(const RectF& rect) override;
 		void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
-		void draw_text(const Vector2f& position, const StaticString& text, unsigned alignment, TextCapture* capture) override;
-		void set_color(const Vector4f& color) override;
+		void draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture) override;
+		void set_color(const Vector4& color) override;
 		bool set_font(const TextureFont& font) override;
-		void set_font_size(const Vector2f& size) override;
+		void set_font_size(const Vector2& size) override;
 		void set_texture(const Pointer<Texture2D>& texture) override;
-		bool set_texture_borders(const MarginsI& borders) override;
+		bool set_texture_borders(const Margins& borders) override;
 		void set_texture_rectangle(const RectF& rect) override;
-		Vector2f text_size(const StaticString& text) const override;
+		Vector2 text_size(const StaticString& text) const override;
 		Size window_size() const override;
 
 		virtual void clear() = 0;
@@ -42,7 +42,7 @@ namespace Yttrium
 		Allocator* allocator() const { return _allocator; }
 		void flush_2d();
 		void pop_projection();
-		void push_projection(const Matrix4f& matrix);
+		void push_projection(const Matrix4& matrix);
 		void set_debug_texture();
 		void set_window_size(const Size& size);
 
@@ -51,29 +51,29 @@ namespace Yttrium
 		virtual void flush_2d_impl() = 0;
 		virtual bool initialize() = 0;
 		virtual void set_debug_texture_impl() = 0;
-		virtual void set_projection(const Matrix4f& matrix) = 0;
+		virtual void set_projection(const Matrix4& matrix) = 0;
 		virtual void update_window_size() = 0;
 
 	public:
 
-		void draw_rectangle(const RectF &position, const RectF &texture, const MarginsF &borders);
+		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
 
 	public:
 
 		Allocator* const _allocator;
 		WindowBackend& _window;
 
-		Size     _window_size;
+		Size _window_size;
 
-		Vector4f _color;
+		Vector4 _color;
 
 		// 2D rendering.
 
 		struct Vertex2D
 		{
-			Vector2f position;
-			Vector4f color;
-			Vector2f texture;
+			Vector2 position;
+			Vector4 color;
+			Vector2 texture;
 		};
 
 		std::vector<Vertex2D> _vertices_2d;
@@ -84,11 +84,11 @@ namespace Yttrium
 		MarginsF           _texture_borders;
 
 		TextureFont _font;
-		Vector2f    _font_size;
+		Vector2     _font_size;
 
 		bool _debug_rendering = false;
 
-		std::vector<Matrix4f> _projection;
+		std::vector<Matrix4> _projection;
 	};
 }
 

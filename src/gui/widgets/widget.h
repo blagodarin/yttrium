@@ -48,7 +48,7 @@ namespace Yttrium
 		virtual void dump(GuiPropertyDumper& dumper) const = 0;
 		virtual bool load(GuiPropertyLoader& loader) = 0;
 		virtual bool process_key(const KeyEvent& event);
-		virtual void render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const = 0;
+		virtual void render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const = 0;
 
 	protected:
 

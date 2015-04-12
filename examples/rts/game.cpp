@@ -64,17 +64,17 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 
 	const auto& window_size = renderer.window_size();
 	PushProjection projection(renderer,
-		Matrix4f::perspective(static_cast<float>(window_size.width) / window_size.height,
+		Matrix4::perspective(static_cast<float>(window_size.width) / window_size.height,
 			90,      // Vertical FOV angle in degrees.
 			1, 30)); // Near/far plane distance.
 
 	for (int i = 0; i < 10; ++i)
 	{
 		const auto z = -4 - 2 * i;
-		renderer.draw_cube(Vector4f( 2, -2, z), 1);
-		renderer.draw_cube(Vector4f(-2, -2, z), 1);
-		renderer.draw_cube(Vector4f( 2,  2, z), 1);
-		renderer.draw_cube(Vector4f(-2,  2, z), 1);
+		renderer.draw_cube(Vector4( 2, -2, z), 1);
+		renderer.draw_cube(Vector4(-2, -2, z), 1);
+		renderer.draw_cube(Vector4( 2,  2, z), 1);
+		renderer.draw_cube(Vector4(-2,  2, z), 1);
 	}
 }
 

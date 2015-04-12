@@ -111,7 +111,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void Button::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState state) const
+	void Button::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const
 	{
 		if (_state != WidgetState::NotSet)
 			state = _state;

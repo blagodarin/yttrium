@@ -10,95 +10,93 @@
 
 namespace Yttrium
 {
+	class GuiImpl;
+	class GuiIonDumper;
+	class GuiPropertyLoader;
+	class Renderer;
+	class Widget;
 
-class GuiImpl;
-class GuiIonDumper;
-class GuiPropertyLoader;
-class Renderer;
-class Widget;
-
-class GuiScene
-{
-	friend GuiIonDumper;
-
-public:
-
-	GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator);
-	~GuiScene();
-
-public:
-
-	void bind(const StaticString& name, const StaticString& action)
+	class GuiScene
 	{
-		_bindings.bind(name, action);
-	}
+		friend GuiIonDumper;
 
-	bool is_transparent() const
-	{
-		return _is_transparent;
-	}
+	public:
 
-	void load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader);
+		GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator);
+		~GuiScene();
 
-	const String& name() const
-	{
-		return _name;
-	}
+	public:
 
-	bool process_key(const KeyEvent& event);
+		void bind(const StaticString& name, const StaticString& action)
+		{
+			_bindings.bind(name, action);
+		}
 
-	void render(Renderer& renderer); // TODO: Make const.
+		bool is_transparent() const
+		{
+			return _is_transparent;
+		}
 
-	void reserve(size_t capacity)
-	{
-		_widgets.reserve(capacity);
-	}
+		void load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader);
 
-	void set_cursor(const Vector2f& cursor)
-	{
-		_is_cursor_set = true;
-		_cursor = cursor;
-	}
+		const String& name() const
+		{
+			return _name;
+		}
 
-	void set_scaling(Scaling scaling)
-	{
-		_scaling = scaling;
-	}
+		bool process_key(const KeyEvent& event);
 
-	void set_size(const Vector2f& size)
-	{
-		_size = size;
-		_has_size = true;
-	}
+		void render(Renderer& renderer); // TODO: Make const.
 
-	void set_transparent(bool transparent)
-	{
-		_is_transparent = transparent;
-	}
+		void reserve(size_t capacity)
+		{
+			_widgets.reserve(capacity);
+		}
 
-private:
+		void set_cursor(const Vector2& cursor)
+		{
+			_is_cursor_set = true;
+			_cursor = cursor;
+		}
 
-	RectF map(const RectF& source, const Vector2f& shift, const Vector2f& scale, Scaling scaling) const;
+		void set_scaling(Scaling scaling)
+		{
+			_scaling = scaling;
+		}
 
-private:
+		void set_size(const Vector2& size)
+		{
+			_size = size;
+			_has_size = true;
+		}
 
-	Allocator*                _allocator;
-	GuiImpl&                  _gui;
-	String                    _name;
-	Vector2f                  _size;
-	bool                      _has_size = false;
-	Scaling                   _scaling;
-	std::vector<Widget*>      _widgets;
-	std::map<String, Widget*> _named_widgets;
-	bool                      _is_cursor_set;
-	Vector2f                  _cursor;
-	Widget*                   _mouse_widget;
-	const Widget*             _left_click_widget;
-	Widget*                   _focus_widget;
-	bool                      _is_transparent;
-	Bindings                  _bindings;
-};
+		void set_transparent(bool transparent)
+		{
+			_is_transparent = transparent;
+		}
 
-} // namespace Yttrium
+	private:
+
+		RectF map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const;
+
+	private:
+
+		Allocator*                _allocator;
+		GuiImpl&                  _gui;
+		String                    _name;
+		Vector2                   _size;
+		bool                      _has_size = false;
+		Scaling                   _scaling;
+		std::vector<Widget*>      _widgets;
+		std::map<String, Widget*> _named_widgets;
+		bool                      _is_cursor_set;
+		Vector2                   _cursor;
+		Widget*                   _mouse_widget;
+		const Widget*             _left_click_widget;
+		Widget*                   _focus_widget;
+		bool                      _is_transparent;
+		Bindings                  _bindings;
+	};
+}
 
 #endif // __GUI_SCENE_H

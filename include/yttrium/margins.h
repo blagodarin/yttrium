@@ -1,115 +1,132 @@
 /// \file
-/// \brief Margins.
+/// \brief %Margins.
+/// \note %Margins[F] constructor parameter order mimics that of CSS border-image-width property.
 
 #ifndef __Y_MARGINS_H
 #define __Y_MARGINS_H
 
-#include <yttrium/vector.h>
+#include <yttrium/global.h>
 
 namespace Yttrium
 {
+	class Size;
 
-/// %Margins.
-/// \note %Margins constructor parameter order mimics that of CSS border-image-width property.
-
-template <typename T>
-struct Margins
-{
-	T left;   ///< Left margin.
-	T top;    ///< Top margin.
-	T right;  ///< Right margin.
-	T bottom; ///< Bottom margin.
-
-	/// Initialize all margins with the same value.
-	/// \param margin Value for all margins.
-
-	Margins(T margin = 0)
-		: left(margin)
-		, top(margin)
-		, right(margin)
-		, bottom(margin)
+	/// %Margins.
+	class Margins
 	{
-	}
+	public:
 
-	/// Initialize margins.
-	/// \param top_and_bottom Top and bottom margin.
-	/// \param left_and_right Left and right margins.
+		int left;   ///< Left margin.
+		int top;    ///< Top margin.
+		int right;  ///< Right margin.
+		int bottom; ///< Bottom margin.
 
-	Margins(T top_and_bottom, T left_and_right)
-		: left(left_and_right)
-		, top(top_and_bottom)
-		, right(left_and_right)
-		, bottom(top_and_bottom)
+		/// Initialize all margins with the same value.
+		/// \param all Value for all margins.
+		Margins(int all = 0)
+			: left(all)
+			, top(all)
+			, right(all)
+			, bottom(all)
+		{
+		}
+
+		/// Initialize margins.
+		/// \param top_and_bottom Top and bottom margin.
+		/// \param left_and_right Left and right margins.
+		Margins(int top_and_bottom, int left_and_right)
+			: left(left_and_right)
+			, top(top_and_bottom)
+			, right(left_and_right)
+			, bottom(top_and_bottom)
+		{
+		}
+
+		/// Initialize margins.
+		/// \param top Top margin.
+		/// \param left_and_right Left and right margins.
+		/// \param bottom Bottom margin.
+		Margins(int top, int left_and_right, int bottom)
+			: left(left_and_right)
+			, top(top)
+			, right(left_and_right)
+			, bottom(bottom)
+		{
+		}
+
+		/// Initialize margins.
+		/// \param top Top margin.
+		/// \param right Right margin.
+		/// \param bottom Bottom margin.
+		/// \param left Left margin.
+		Margins(int top, int right, int bottom, int left)
+			: left(left)
+			, top(top)
+			, right(right)
+			, bottom(bottom)
+		{
+		}
+
+		///
+		Size min_size() const;
+	};
+
+	/// %Margins.
+	class Y_API MarginsF
 	{
-	}
+	public:
 
-	/// Initialize margins.
-	/// \param top Top margin.
-	/// \param left_and_right Left and right margins.
-	/// \param bottom Bottom margin.
+		float left;   ///< Left margin.
+		float top;    ///< Top margin.
+		float right;  ///< Right margin.
+		float bottom; ///< Bottom margin.
 
-	Margins(T top, T left_and_right, T bottom)
-		: left(left_and_right)
-		, top(top)
-		, right(left_and_right)
-		, bottom(bottom)
-	{
-	}
+		/// Initialize all margins with the same value.
+		/// \param all Value for all margins.
+		MarginsF(float all = 0)
+			: left(all)
+			, top(all)
+			, right(all)
+			, bottom(all)
+		{
+		}
 
-	/// Initialize margins.
-	/// \param top Top margin.
-	/// \param right Right margin.
-	/// \param bottom Bottom margin.
-	/// \param left Left margin.
+		/// Initialize margins.
+		/// \param top_and_bottom Top and bottom margin.
+		/// \param left_and_right Left and right margins.
+		MarginsF(float top_and_bottom, float left_and_right)
+			: left(left_and_right)
+			, top(top_and_bottom)
+			, right(left_and_right)
+			, bottom(top_and_bottom)
+		{
+		}
 
-	Margins(T top, T right, T bottom, T left)
-		: left(left)
-		, top(top)
-		, right(right)
-		, bottom(bottom)
-	{
-	}
+		/// Initialize margins.
+		/// \param top Top margin.
+		/// \param left_and_right Left and right margins.
+		/// \param bottom Bottom margin.
+		MarginsF(float top, float left_and_right, float bottom)
+			: left(left_and_right)
+			, top(top)
+			, right(left_and_right)
+			, bottom(bottom)
+		{
+		}
 
-	///
-
-	template <typename U>
-	Margins(const Margins<U> &margins)
-		: left(margins.left)
-		, top(margins.top)
-		, right(margins.right)
-		, bottom(margins.bottom)
-	{
-	}
-
-	///
-
-	bool is_empty() const
-	{
-		return !(left || top || right || bottom);
-	}
-
-	///
-
-	T min_height() const
-	{
-		return top + 1 + bottom;
-	}
-
-	///
-
-	Vector2<T> min_size() const
-	{
-		return Vector2<T>(min_width(), min_height());
-	}
-
-	///
-
-	T min_width() const
-	{
-		return left + 1 + right;
-	}
-};
-
-} // namespace Yttrium
+		/// Initialize margins.
+		/// \param top Top margin.
+		/// \param right Right margin.
+		/// \param bottom Bottom margin.
+		/// \param left Left margin.
+		MarginsF(float top, float right, float bottom, float left)
+			: left(left)
+			, top(top)
+			, right(right)
+			, bottom(bottom)
+		{
+		}
+	};
+}
 
 #endif // __Y_MARGIN_H

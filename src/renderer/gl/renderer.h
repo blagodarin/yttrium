@@ -15,7 +15,7 @@ namespace Yttrium
 
 		// Renderer
 		std::unique_ptr<TextureCache> create_texture_cache() override;
-		void draw_cube(const Vector4f& center, float size) override;
+		void draw_cube(const Vector4& center, float size) override;
 
 		// RendererImpl
 		void clear() override;
@@ -23,7 +23,7 @@ namespace Yttrium
 		void flush_2d_impl() override;
 		bool initialize() override;
 		void set_debug_texture_impl() override;
-		void set_projection(const Matrix4f&) override;
+		void set_projection(const Matrix4&) override;
 		void update_window_size() override;
 
 	private:

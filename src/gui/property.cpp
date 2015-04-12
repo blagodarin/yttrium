@@ -48,7 +48,7 @@ namespace Yttrium
 	}
 
 	void ForegroundProperty::draw(Renderer& renderer, const String& text,
-		const Vector2f& origin, unsigned alignment, float scale, Renderer::TextCapture* capture) const
+		const Vector2& origin, unsigned alignment, float scale, Renderer::TextCapture* capture) const
 	{
 		renderer.set_texture(font_texture);
 		if (!renderer.set_font(font))

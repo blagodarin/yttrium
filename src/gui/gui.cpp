@@ -17,7 +17,7 @@ namespace Yttrium
 		, _texture_cache(_renderer.create_texture_cache())
 		, _callbacks(callbacks)
 		, _has_size(false)
-		, _size(0)
+		, _size(0, 0)
 		, _scaling(Scaling::Stretch)
 	{
 	}
@@ -83,7 +83,7 @@ namespace Yttrium
 			return;
 
 		auto i = _scene_stack.begin() + (_scene_stack.size() - 1);
-		(*i)->set_cursor(Vector2f(cursor.x, cursor.y));
+		(*i)->set_cursor(Vector2(cursor.x, cursor.y));
 		while (i != _scene_stack.begin() && (*i)->is_transparent())
 			--i;
 
@@ -120,7 +120,7 @@ namespace Yttrium
 			delete_scene(scene.second);
 
 		_has_size = false;
-		_size = Vector2f(0);
+		_size = Vector2(0, 0);
 		_fonts.clear();
 		_scenes.clear();
 		_scene_stack.clear();

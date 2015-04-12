@@ -62,7 +62,7 @@ namespace Yttrium
 		return false;
 	}
 
-	void GuiInput::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState) const
+	void GuiInput::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 

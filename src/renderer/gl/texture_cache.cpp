@@ -13,7 +13,7 @@ GlTextureCache::GlTextureCache(RendererImpl& renderer, const GlApi& gl)
 {
 }
 
-BackendTexture2D* GlTextureCache::cache_texture_2d(const ImageFormat &format, const void *data)
+BackendTexture2D* GlTextureCache::cache_texture_2d(const ImageFormat& format, const void* data)
 {
 	// NOTE: Keep the new pixel formats in sync with these arrays!
 

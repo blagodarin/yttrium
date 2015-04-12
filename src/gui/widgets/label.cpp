@@ -44,7 +44,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void Label::render(Renderer& renderer, const RectF& rect, const Vector2f& scale, WidgetState) const
+	void Label::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
 	{
 		ScriptContext::global().substitute(_final_text, _text);
 

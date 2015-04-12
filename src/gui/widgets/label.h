@@ -14,11 +14,11 @@ namespace Yttrium
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, const Vector2f&, WidgetState) const override;
+		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
 
-		Vector2f           _position;
+		Vector2            _position;
 		ForegroundProperty _foreground;
 		unsigned           _alignment;
 		mutable String     _final_text;

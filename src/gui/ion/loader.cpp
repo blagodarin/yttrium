@@ -132,7 +132,7 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 
 		if (document.last(S("size"), &node))
 		{
-			Vector2f size;
+			Vector2 size;
 
 			if (GuiIonPropertyLoader::load_size(&size, *node))
 			{
@@ -271,7 +271,7 @@ void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
 	{
 		if (node.name() == S("size"))
 		{
-			Vector2f size;
+			Vector2 size;
 
 			if (GuiIonPropertyLoader::load_size(&size, node))
 			{

@@ -127,12 +127,12 @@ namespace Yttrium
 	void GuiScene::render(Renderer& renderer)
 	{
 		const auto& window_size = renderer.window_size();
-		const Vector2f& scene_size = _has_size ? _size : Vector2f(window_size);
+		const Vector2& scene_size = _has_size ? _size : Vector2(window_size);
 
-		const Vector2f scale(
+		const Vector2 scale(
 			window_size.width / scene_size.x,
 			window_size.height / scene_size.y);
-		const Vector2f shift(
+		const Vector2 shift(
 			(window_size.width - scene_size.x * scale.y) * .5f,
 			(window_size.height - scene_size.y * scale.x) * .5f);
 
@@ -163,7 +163,7 @@ namespace Yttrium
 		_is_cursor_set = false;
 	}
 
-	RectF GuiScene::map(const RectF& source, const Vector2f& shift, const Vector2f& scale, Scaling scaling) const
+	RectF GuiScene::map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const
 	{
 		RectF result;
 

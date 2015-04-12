@@ -13,6 +13,7 @@
 namespace Yttrium
 {
 	class Gui;
+	class RectF;
 	class Renderer;
 	class Screen;
 	class StaticString;

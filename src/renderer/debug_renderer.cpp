@@ -54,6 +54,6 @@ namespace Yttrium
 
 	void DebugRenderer::set_color(float r, float g, float b, float a)
 	{
-		_renderer.set_color(Vector4f(r, g, b, a));
+		_renderer.set_color(Vector4(r, g, b, a));
 	}
 }

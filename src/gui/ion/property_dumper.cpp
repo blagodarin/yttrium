@@ -13,15 +13,15 @@ namespace Yttrium
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_color(const StaticString&, const Vector4f&)
+	void GuiIonPropertyDumper::dump_color(const StaticString&, const Vector4&)
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_margins(const StaticString&, const MarginsI&)
+	void GuiIonPropertyDumper::dump_margins(const StaticString&, const Margins&)
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_position(const StaticString&, const Vector2f&)
+	void GuiIonPropertyDumper::dump_position(const StaticString&, const Vector2&)
 	{
 	}
 
@@ -33,7 +33,7 @@ namespace Yttrium
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_size(const StaticString&, const Vector2f&)
+	void GuiIonPropertyDumper::dump_size(const StaticString&, const Vector2&)
 	{
 	}
 

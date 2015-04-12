@@ -16,29 +16,6 @@ namespace Yttrium
 	///
 	class ByReference {};
 
-	template <typename T>
-	class Margins;
-
-	typedef Margins<int> MarginsI; ///< \c int Margins.
-	typedef Margins<float> MarginsF; ///< \c float Margins.
-
-	class Rect;
-
-	template <typename T>
-	class Rect_;
-
-	typedef Rect_<float> RectF; ///< \c float Rect.
-
-	template <typename T>
-	class Vector2;
-
-	typedef Vector2<float> Vector2f; ///< \c float Vector2.
-
-	template <typename T>
-	class Vector4;
-
-	typedef Vector4<float> Vector4f; ///< \c float Vector4.
-
 	enum
 	{
 		CenterAlignment = 0, ///< Center alignment.

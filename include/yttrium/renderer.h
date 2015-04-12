@@ -11,11 +11,13 @@
 
 namespace Yttrium
 {
-	class Matrix4f;
+	class Margins;
+	class Matrix4;
 	class StaticString;
 	class Texture2D;
 	class TextureCache;
 	class TextureFont;
+	class Vector4;
 
 	template <typename T>
 	class Pointer;
@@ -55,7 +57,7 @@ namespace Yttrium
 		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
 
 		// NOTE: Temporary!
-		virtual void draw_cube(const Vector4f& center, float size) = 0;
+		virtual void draw_cube(const Vector4& center, float size) = 0;
 
 		///
 		virtual void draw_rectangle(const RectF& rect) = 0;
@@ -64,29 +66,29 @@ namespace Yttrium
 		virtual void draw_rectangle(const RectF& rect, const RectF& texture_rect) = 0;
 
 		///
-		virtual void draw_text(const Vector2f& position, const StaticString& text,
+		virtual void draw_text(const Vector2& position, const StaticString& text,
 			unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) = 0;
 
 		///
-		virtual void set_color(const Vector4f& color) = 0;
+		virtual void set_color(const Vector4& color) = 0;
 
 		///
 		virtual bool set_font(const TextureFont& font) = 0;
 
 		///
-		virtual void set_font_size(const Vector2f& size) = 0;
+		virtual void set_font_size(const Vector2& size) = 0;
 
 		///
 		void set_font_size(float y_size, float x_scaling = 1)
 		{
-			set_font_size(Vector2f(x_scaling, y_size));
+			set_font_size(Vector2(x_scaling, y_size));
 		}
 
 		///
 		virtual void set_texture(const Pointer<Texture2D>& texture) = 0;
 
 		///
-		virtual bool set_texture_borders(const MarginsI& borders) = 0;
+		virtual bool set_texture_borders(const Margins& borders) = 0;
 
 		///
 		virtual void set_texture_rectangle(const RectF& rect) = 0;
@@ -98,7 +100,7 @@ namespace Yttrium
 		}
 
 		///
-		virtual Vector2f text_size(const StaticString& text) const = 0;
+		virtual Vector2 text_size(const StaticString& text) const = 0;
 
 		///
 		virtual Size window_size() const = 0;
@@ -110,7 +112,7 @@ namespace Yttrium
 	public:
 
 		///
-		PushProjection(Renderer& renderer, const Matrix4f& matrix);
+		PushProjection(Renderer& renderer, const Matrix4& matrix);
 
 		~PushProjection();
 

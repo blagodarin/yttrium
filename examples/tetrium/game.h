@@ -37,9 +37,9 @@ private:
 	void on_update(const UpdateEvent& update) override;
 
 	void draw_field(Renderer& renderer, const RectF& rect);
-	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
-	void draw_field_figure(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
-	void draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2f& block_size);
+	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2& block_size);
+	void draw_field_figure(Renderer& renderer, const RectF& rect, const Vector2& block_size);
+	void draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2& block_size);
 	void draw_next_figure(Renderer& renderer, const RectF& rect);
 	void set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type);
 
@@ -57,7 +57,7 @@ private:
 
 	Pointer<Texture2D> _block_texture;
 	float              _block_size;
-	Vector2f           _block_coords[8];
+	Vector2            _block_coords[8];
 
 	Tetrium::Game _game;
 	bool          _game_running = false;

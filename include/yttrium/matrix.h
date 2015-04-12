@@ -11,15 +11,15 @@ namespace Yttrium
 	class Size;
 
 	///
-	class Y_API Matrix4f
+	class Y_API Matrix4
 	{
 	public:
 
 		///
-		Matrix4f();
+		Matrix4();
 
 		///
-		Matrix4f(
+		Matrix4(
 			float m00, float m01, float m02, float m03,
 			float m10, float m11, float m12, float m13,
 			float m20, float m21, float m22, float m23,
@@ -29,10 +29,10 @@ namespace Yttrium
 		const float *data() const { return _data[0]; }
 
 		///
-		static Matrix4f projection_2d(const Size& size, float near = -1.f, float far = 1.f);
+		static Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f);
 
 		///
-		static Matrix4f perspective(float aspect, float vertical_fov, float near, float far);
+		static Matrix4 perspective(float aspect, float vertical_fov, float near, float far);
 
 	private:
 

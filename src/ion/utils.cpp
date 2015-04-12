@@ -9,7 +9,7 @@ namespace Yttrium
 {
 	namespace Ion
 	{
-		bool read(const IonValue& source, Vector2f& value)
+		bool read(const IonValue& source, Vector2& value)
 		{
 			const IonList* list;
 			if (!source.get(&list) || list->size() != 2)

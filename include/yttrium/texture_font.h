@@ -33,13 +33,13 @@ namespace Yttrium
 		}
 
 		///
-		const CharInfo *char_info(char symbol) const;
+		const CharInfo* char_info(char symbol) const;
 
 		///
 		int kerning(char left, char right) const;
 
 		///
-		bool open(const StaticString &name, Allocator *allocator = DefaultAllocator);
+		bool open(const StaticString& name, Allocator* allocator = DefaultAllocator);
 
 		///
 		Rect rect() const;
@@ -51,11 +51,7 @@ namespace Yttrium
 		Size text_size(const StaticString &text) const;
 
 		///
-		Vector2f text_size(const StaticString &text, const Vector2f &font_size) const
-		{
-			const Size& size = text_size(text);
-			return Vector2f(font_size.x * (size.width * font_size.y / size.height), font_size.y);
-		}
+		Vector2 text_size(const StaticString& text, const Vector2& font_size) const;
 	};
 }
 
