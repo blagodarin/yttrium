@@ -227,12 +227,24 @@ namespace Yttrium
 			_debug_rendering = false;
 	}
 
+	void RendererImpl::pop_transformation()
+	{
+		_transformation.pop_back();
+		set_transformation(_transformation.empty() ? Matrix4() : _transformation.back());
+	}
+
 	void RendererImpl::push_projection(const Matrix4& matrix)
 	{
 		assert(!_debug_rendering);
 		flush_2d();
 		_projection.emplace_back(matrix);
 		set_projection(matrix);
+	}
+
+	void RendererImpl::push_transformation(const Matrix4& matrix)
+	{
+		_transformation.emplace_back(_transformation.empty() ? matrix : _transformation.back() * matrix);
+		set_transformation(_transformation.back());
 	}
 
 	void RendererImpl::set_debug_texture()
@@ -436,5 +448,16 @@ namespace Yttrium
 	PushProjection::~PushProjection()
 	{
 		static_cast<RendererImpl&>(_renderer).pop_projection();
+	}
+
+	PushTransformation::PushTransformation(Renderer& renderer, const Matrix4& matrix)
+		: _renderer(renderer)
+	{
+		static_cast<RendererImpl&>(_renderer).push_transformation(matrix);
+	}
+
+	PushTransformation::~PushTransformation()
+	{
+		static_cast<RendererImpl&>(_renderer).pop_transformation();
 	}
 }

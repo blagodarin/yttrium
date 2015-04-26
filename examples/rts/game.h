@@ -6,6 +6,7 @@
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/manager.h>
 #include <yttrium/texture_cache.h>
+#include <yttrium/vector.h>
 #include <yttrium/window.h>
 
 #include <memory>
@@ -36,6 +37,11 @@ private:
 
 	std::unique_ptr<Window> _window;
 	std::unique_ptr<TextureCache> _texture_cache;
+
+	Vector4 _position = Vector4(0, 5, 20);
+	int _pitch = 0;
+	int _yaw = 0;
+	int _roll = 0;
 };
 
 #endif // __TETRIUM_GAME_H

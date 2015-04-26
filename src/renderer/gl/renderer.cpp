@@ -182,6 +182,12 @@ namespace Yttrium
 		_gl.LoadMatrixf(Matrix4().data());
 	}
 
+	void OpenGlRenderer::set_transformation(const Matrix4& matrix)
+	{
+		_gl.MatrixMode(GL_MODELVIEW);
+		_gl.LoadMatrixf(matrix.data());
+	}
+
 	void OpenGlRenderer::update_window_size()
 	{
 		_gl.Viewport(0, 0, _window_size.width, _window_size.height);

@@ -1,6 +1,7 @@
 #include <yttrium/matrix.h>
 
 #include <yttrium/size.h>
+#include <yttrium/vector.h>
 
 #include <cassert>
 #include <cmath>
@@ -29,6 +30,14 @@ namespace Yttrium
 	{
 	}
 
+	Matrix4 Matrix4::camera(const Vector4& position, float pitch, float yaw, float roll)
+	{
+		return Matrix4::rotation(roll, Vector4(0, 0, 1))
+			* Matrix4::rotation(pitch, Vector4(-1, 0, 0))
+			* Matrix4::rotation(yaw, Vector4(0, 1, 0))
+			* Matrix4::translation(-position);
+	}
+
 	Matrix4 Matrix4::projection_2d(const Size& size, float near, float far)
 	{
 		assert(size.width > 0 && size.height > 0 && far > near);
@@ -50,7 +59,7 @@ namespace Yttrium
 	{
 		assert(aspect > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
 
-		const auto fov_radians = vertical_fov / 180 * M_PI;
+		const float fov_radians = vertical_fov / 180 * M_PI;
 
 		const auto f = 1 / ::tan(fov_radians / 2);
 
@@ -61,5 +70,56 @@ namespace Yttrium
 		const auto m32 = -1.f;
 
 		return Matrix4(m00, 0, 0, 0, 0, m11, 0, 0, 0, 0, m22, m23, 0, 0, m32, 0);
+	}
+
+	Matrix4 Matrix4::rotation(float angle, const Vector4& axis)
+	{
+		const auto& v = axis.normalized();
+		const float angle_radians = angle / 180 * M_PI;
+		const auto c = ::cos(angle_radians);
+		const auto s = ::sin(angle_radians);
+
+		return Matrix4(
+			v.x * v.x * (1 - c) + c,       v.y * v.x * (1 - c) - s * v.z, v.z * v.x * (1 - c) + s * v.y, 0,
+			v.x * v.y * (1 - c) + s * v.z, v.y * v.y * (1 - c) + c,       v.z * v.y * (1 - c) - s * v.x, 0,
+			v.x * v.z * (1 - c) - s * v.y, v.y * v.z * (1 - c) + s * v.x, v.z * v.z * (1 - c) + c,       0,
+			0,                             0,                             0,                             1);
+	}
+
+	Matrix4 Matrix4::translation(const Vector4& point)
+	{
+		return Matrix4
+		(
+			1, 0, 0, point.x,
+			0, 1, 0, point.y,
+			0, 0, 1, point.z,
+			0, 0, 0, 1
+		);
+	}
+
+	Matrix4 operator*(const Matrix4& a, const Matrix4& b)
+	{
+		return Matrix4
+		(
+			a(0,0) * b(0,0) + a(0,1) * b(1,0) + a(0,2) * b(2,0) + a(0,3) * b(3,0),
+			a(0,0) * b(0,1) + a(0,1) * b(1,1) + a(0,2) * b(2,1) + a(0,3) * b(3,1),
+			a(0,0) * b(0,2) + a(0,1) * b(1,2) + a(0,2) * b(2,2) + a(0,3) * b(3,2),
+			a(0,0) * b(0,3) + a(0,1) * b(1,3) + a(0,2) * b(2,3) + a(0,3) * b(3,3),
+
+			a(1,0) * b(0,0) + a(1,1) * b(1,0) + a(1,2) * b(2,0) + a(1,3) * b(3,0),
+			a(1,0) * b(0,1) + a(1,1) * b(1,1) + a(1,2) * b(2,1) + a(1,3) * b(3,1),
+			a(1,0) * b(0,2) + a(1,1) * b(1,2) + a(1,2) * b(2,2) + a(1,3) * b(3,2),
+			a(1,0) * b(0,3) + a(1,1) * b(1,3) + a(1,2) * b(2,3) + a(1,3) * b(3,3),
+
+			a(2,0) * b(0,0) + a(2,1) * b(1,0) + a(2,2) * b(2,0) + a(2,3) * b(3,0),
+			a(2,0) * b(0,1) + a(2,1) * b(1,1) + a(2,2) * b(2,1) + a(2,3) * b(3,1),
+			a(2,0) * b(0,2) + a(2,1) * b(1,2) + a(2,2) * b(2,2) + a(2,3) * b(3,2),
+			a(2,0) * b(0,3) + a(2,1) * b(1,3) + a(2,2) * b(2,3) + a(2,3) * b(3,3),
+
+			a(3,0) * b(0,0) + a(3,1) * b(1,0) + a(3,2) * b(2,0) + a(3,3) * b(3,0),
+			a(3,0) * b(0,1) + a(3,1) * b(1,1) + a(3,2) * b(2,1) + a(3,3) * b(3,1),
+			a(3,0) * b(0,2) + a(3,1) * b(1,2) + a(3,2) * b(2,2) + a(3,3) * b(3,2),
+			a(3,0) * b(0,3) + a(3,1) * b(1,3) + a(3,2) * b(2,3) + a(3,3) * b(3,3)
+		);
 	}
 }

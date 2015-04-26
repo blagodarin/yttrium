@@ -23,6 +23,12 @@ BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
 	BOOST_CHECK(6 / Vector2(2, 3) == Vector2(3, 2));
 }
 
+BOOST_AUTO_TEST_CASE(test_vector4)
+{
+	BOOST_CHECK_EQUAL(Vector4(1, 4, 8).length(), 9);
+	BOOST_CHECK_EQUAL(Vector4(1, 4, 8).normalized().length(), 1);
+}
+
 BOOST_AUTO_TEST_CASE(test_vector4_arithmetics)
 {
 	BOOST_CHECK(Vector4(1, 2, 3) + Vector4(4, 5, 6) == Vector4(5, 7, 9));

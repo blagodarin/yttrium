@@ -9,6 +9,7 @@
 namespace Yttrium
 {
 	class Size;
+	class Vector4;
 
 	///
 	class Y_API Matrix4
@@ -29,15 +30,29 @@ namespace Yttrium
 		const float *data() const { return _data[0]; }
 
 		///
+		float operator()(int row, int column) const { return _data[column][row]; }
+
+		///
+		static Matrix4 camera(const Vector4& position, float pitch, float yaw, float roll);
+
+		///
 		static Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f);
 
 		///
 		static Matrix4 perspective(float aspect, float vertical_fov, float near, float far);
 
+		///
+		static Matrix4 rotation(float angle, const Vector4& axis);
+
+		///
+		static Matrix4 translation(const Vector4& point);
+
 	private:
 
 		float _data[4][4];
 	};
+
+	Y_API Matrix4 operator*(const Matrix4&, const Matrix4&);
 }
 
 #endif

@@ -24,6 +24,7 @@ namespace Yttrium
 		bool initialize() override;
 		void set_debug_texture_impl() override;
 		void set_projection(const Matrix4&) override;
+		void set_transformation(const Matrix4&) override;
 		void update_window_size() override;
 
 	private:

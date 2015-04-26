@@ -4,6 +4,7 @@
 #ifndef __Y_VECTOR_H
 #define __Y_VECTOR_H
 
+#include <yttrium/global.h>
 #include <yttrium/point.h>
 #include <yttrium/size.h>
 
@@ -109,7 +110,7 @@ namespace Yttrium
 	};
 
 	/// 4-component 3D vector.
-	class Vector4
+	class Y_API Vector4
 	{
 	public:
 
@@ -146,9 +147,13 @@ namespace Yttrium
 
 		///
 		float* data() { return &x; }
+		const float* data() const { return &x; }
 
 		///
-		const float* data() const { return &x; }
+		float length() const;
+
+		///
+		Vector4 normalized() const;
 
 		///
 		Vector4& operator+=(float scalar)
@@ -242,6 +247,11 @@ namespace Yttrium
 	inline bool operator==(const Vector2& left, const Vector2& right)
 	{
 		return left.x == right.x && left.y == right.y;
+	}
+
+	inline Vector4 operator-(const Vector4& vector)
+	{
+		return Vector4(-vector.x, -vector.y, -vector.z);
 	}
 
 	inline Vector4 operator+(const Vector4& left, const Vector4& right)

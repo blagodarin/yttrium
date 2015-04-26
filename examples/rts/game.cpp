@@ -36,9 +36,23 @@ void Game::on_key_event(const KeyEvent& event)
 
 	switch (event.key)
 	{
+	case Key::Up: _pitch += 5; break;
+	case Key::Down: _pitch -= 5; break;
+	case Key::Left: _yaw -= 5; break;
+	case Key::Right: _yaw += 5; break;
+
 	case Key::Escape:
 		_window->close();
 		break;
+
+	case Key::A: _position.x -= 1; break;
+	case Key::D: _position.x += 1; break;
+	case Key::E: _roll += 5; break;
+	case Key::F: _position.y -= 1; break;
+	case Key::Q: _roll -= 5; break;
+	case Key::R: _position.y += 1; break;
+	case Key::S: _position.z += 1; break;
+	case Key::W: _position.z -= 1; break;
 
 	case Key::Grave:
 		_window->set_console_visible(!_window->is_console_visible());
@@ -70,11 +84,45 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 
 	for (int i = 0; i < 10; ++i)
 	{
+		PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
+
+		// Center.
+		renderer.draw_cube(Vector4(0, 0, 0), 1);
+
+		// X direction -- one cube.
+		renderer.draw_cube(Vector4(2, 0, 0), 1);
+
+		// Y direction -- two cubes.
+		renderer.draw_cube(Vector4(0, 2, 0), 1);
+		renderer.draw_cube(Vector4(0, 4, 0), 1);
+
+		// Z direction -- three cubes.
+		renderer.draw_cube(Vector4(0, 0, 2), 1);
+		renderer.draw_cube(Vector4(0, 0, 4), 1);
+		renderer.draw_cube(Vector4(0, 0, 6), 1);
+
 		const auto z = -4 - 2 * i;
-		renderer.draw_cube(Vector4( 2, -2, z), 1);
-		renderer.draw_cube(Vector4(-2, -2, z), 1);
-		renderer.draw_cube(Vector4( 2,  2, z), 1);
-		renderer.draw_cube(Vector4(-2,  2, z), 1);
+		const auto angle = Timer::clock() / 5 % 360;
+		{
+			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, 1, 0)));
+			renderer.draw_cube(Vector4( 2, -2,  z), 1);
+			renderer.draw_cube(Vector4( 2, -2, -z), 1);
+		}
+		{
+			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(1, 0, 0)));
+			renderer.draw_cube(Vector4(-2, -2,  z), 1);
+			renderer.draw_cube(Vector4(-2, -2, -z), 1);
+		}
+		{
+			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(-1, 0, 0)));
+			renderer.draw_cube(Vector4( 2,  2,  z), 1);
+			renderer.draw_cube(Vector4( 2,  2, -z), 1);
+		}
+		{
+			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, -1, 0)));
+			renderer.draw_cube(Vector4(-2,  2,  z), 1);
+			renderer.draw_cube(Vector4(-2,  2, -z), 1);
+		}
 	}
 }
 

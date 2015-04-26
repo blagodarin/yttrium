@@ -125,6 +125,28 @@ namespace Yttrium
 
 		Renderer& _renderer;
 	};
+
+	///
+	class Y_API PushTransformation
+	{
+	public:
+
+		/// Multiplies the current transformation matrix by the specified one,
+		/// pushes it to the transformation stack and applies the resulting transformation.
+		PushTransformation(Renderer& renderer, const Matrix4& matrix);
+
+		/// Pops a matrix from the transformation stack and applies the next matrix.
+		~PushTransformation();
+
+		PushTransformation(const PushTransformation&) = delete;
+		PushTransformation(PushTransformation&&) = delete;
+		PushTransformation& operator=(const PushTransformation&) = delete;
+		PushTransformation& operator=(PushTransformation&&) = delete;
+
+	private:
+
+		Renderer& _renderer;
+	};
 }
 
 #endif // __Y_RENDERER_H

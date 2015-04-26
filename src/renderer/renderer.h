@@ -42,7 +42,9 @@ namespace Yttrium
 		Allocator* allocator() const { return _allocator; }
 		void flush_2d();
 		void pop_projection();
+		void pop_transformation();
 		void push_projection(const Matrix4& matrix);
+		void push_transformation(const Matrix4& matrix);
 		void set_debug_texture();
 		void set_window_size(const Size& size);
 
@@ -52,6 +54,7 @@ namespace Yttrium
 		virtual bool initialize() = 0;
 		virtual void set_debug_texture_impl() = 0;
 		virtual void set_projection(const Matrix4& matrix) = 0;
+		virtual void set_transformation(const Matrix4& matrix) = 0;
 		virtual void update_window_size() = 0;
 
 	public:
@@ -89,6 +92,7 @@ namespace Yttrium
 		bool _debug_rendering = false;
 
 		std::vector<Matrix4> _projection;
+		std::vector<Matrix4> _transformation;
 	};
 }
 
