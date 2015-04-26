@@ -79,30 +79,31 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	const auto& window_size = renderer.window_size();
 	PushProjection projection(renderer,
 		Matrix4::perspective(static_cast<float>(window_size.width) / window_size.height,
-			90,      // Vertical FOV angle in degrees.
-			1, 30)); // Near/far plane distance.
+			90,       // Vertical FOV angle in degrees.
+			1, 100)); // Near/far plane distance.
+
+	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
+
+	// Center.
+	renderer.draw_cube(Vector4(0, 0, 0), 1);
+
+	// X direction -- one cube.
+	renderer.draw_cube(Vector4(2, 0, 0), 1);
+
+	// Y direction -- two cubes.
+	renderer.draw_cube(Vector4(0, 2, 0), 1);
+	renderer.draw_cube(Vector4(0, 4, 0), 1);
+
+	// Z direction -- three cubes.
+	renderer.draw_cube(Vector4(0, 0, 2), 1);
+	renderer.draw_cube(Vector4(0, 0, 4), 1);
+	renderer.draw_cube(Vector4(0, 0, 6), 1);
+
+	const auto angle = Timer::clock() / 5 % 360;
 
 	for (int i = 0; i < 10; ++i)
 	{
-		PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
-
-		// Center.
-		renderer.draw_cube(Vector4(0, 0, 0), 1);
-
-		// X direction -- one cube.
-		renderer.draw_cube(Vector4(2, 0, 0), 1);
-
-		// Y direction -- two cubes.
-		renderer.draw_cube(Vector4(0, 2, 0), 1);
-		renderer.draw_cube(Vector4(0, 4, 0), 1);
-
-		// Z direction -- three cubes.
-		renderer.draw_cube(Vector4(0, 0, 2), 1);
-		renderer.draw_cube(Vector4(0, 0, 4), 1);
-		renderer.draw_cube(Vector4(0, 0, 6), 1);
-
 		const auto z = -4 - 2 * i;
-		const auto angle = Timer::clock() / 5 % 360;
 		{
 			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, 1, 0)));
 			renderer.draw_cube(Vector4( 2, -2,  z), 1);
@@ -130,5 +131,7 @@ void Game::on_update(const UpdateEvent& update)
 {
 	_window->debug_text().clear()
 		<< "FPS: " << update.fps << "\n"
-		<< "MaxFrameTime: " << update.max_frame_time;
+		<< "MaxFrameTime: " << update.max_frame_time << "\n"
+		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
+		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll;
 }

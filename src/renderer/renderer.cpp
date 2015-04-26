@@ -229,6 +229,7 @@ namespace Yttrium
 
 	void RendererImpl::pop_transformation()
 	{
+		assert(!_debug_rendering);
 		_transformation.pop_back();
 		set_transformation(_transformation.empty() ? Matrix4() : _transformation.back());
 	}
@@ -243,6 +244,7 @@ namespace Yttrium
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
 	{
+		assert(!_debug_rendering);
 		_transformation.emplace_back(_transformation.empty() ? matrix : _transformation.back() * matrix);
 		set_transformation(_transformation.back());
 	}

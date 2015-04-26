@@ -38,9 +38,9 @@ private:
 	std::unique_ptr<Window> _window;
 	std::unique_ptr<TextureCache> _texture_cache;
 
-	Vector4 _position = Vector4(0, 5, 20);
-	int _pitch = 0;
-	int _yaw = 0;
+	Vector4 _position = Vector4(-15, 10, 30);
+	int _pitch = -15;
+	int _yaw = 30;
 	int _roll = 0;
 };
 

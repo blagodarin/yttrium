@@ -26,6 +26,8 @@ namespace Yttrium
 
 	void OpenGlRenderer::draw_cube(const Vector4& center, float size)
 	{
+		assert(!_debug_rendering);
+
 		struct Vertex3D
 		{
 			Vector4 position;
@@ -79,14 +81,12 @@ namespace Yttrium
 			6, 0, 4,
 		};
 
+		_gl.Disable(GL_TEXTURE_2D);
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
 
 		_gl.EnableClientState(GL_COLOR_ARRAY);
 		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex3D), &vertices[0].color);
-
-		if (_debug_rendering || _texture)
-			_gl.Disable(GL_TEXTURE_2D);
 
 		_gl.EnableClientState(GL_VERTEX_ARRAY);
 		_gl.VertexPointer(4, GL_FLOAT, sizeof(Vertex3D), &vertices[0].position);
@@ -96,10 +96,8 @@ namespace Yttrium
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		_gl.DisableClientState(GL_COLOR_ARRAY);
 
-		if (_debug_rendering || _texture)
-			_gl.Enable(GL_TEXTURE_2D);
-
 		_gl.Disable(GL_DEPTH_TEST);
+		_gl.Enable(GL_TEXTURE_2D);
 	}
 
 	void OpenGlRenderer::clear()
