@@ -4,7 +4,6 @@
 #include "../memory/allocatable.h"
 #include "gl/renderer.h"
 #include "texture.h"
-#include "texture_cache.h"
 
 #include <cassert>
 
@@ -24,11 +23,6 @@ namespace Yttrium
 		, _color(1, 1, 1)
 		, _font_size(1, 1)
 	{
-	}
-
-	std::unique_ptr<TextureCache> RendererImpl::create_texture_cache()
-	{
-		return std::make_unique<TextureCacheImpl>(*this);
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& rect)

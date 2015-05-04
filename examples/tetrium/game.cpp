@@ -158,7 +158,7 @@ void Game::run()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_texture_cache = _window->renderer().create_texture_cache();
+	_texture_cache = TextureCache::create(_window->renderer());
 
 	_game.set_random_seed(Timer::clock());
 

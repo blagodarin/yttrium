@@ -17,7 +17,6 @@ namespace Yttrium
 	class Matrix4;
 	class StaticString;
 	class Texture2D;
-	class TextureCache;
 	class TextureFont;
 	class Vector4;
 	class VertexBuffer;
@@ -61,9 +60,6 @@ namespace Yttrium
 
 		///
 		virtual Pointer<Texture2D> create_texture_2d(const ImageFormat& format, const void* data) = 0;
-
-		///
-		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
 
 		///
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;

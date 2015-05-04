@@ -3,13 +3,12 @@
 
 #include <yttrium/texture_cache.h>
 
-#include <yttrium/image.h>
-
 #include <map>
 
 namespace Yttrium
 {
 	class RendererImpl;
+	class String;
 
 	class TextureCacheImpl: public TextureCache
 	{
@@ -17,9 +16,6 @@ namespace Yttrium
 
 		TextureCacheImpl(RendererImpl& renderer);
 
-	private:
-
-		Pointer<Texture2D> cache_texture_2d(const StaticString& name, bool intensity) override;
 		void clear() override;
 		Pointer<Texture2D> load_texture_2d(const StaticString& name, bool intensity) override;
 

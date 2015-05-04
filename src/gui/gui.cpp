@@ -14,7 +14,7 @@ namespace Yttrium
 	GuiImpl::GuiImpl(RendererImpl& renderer, WindowCallbacks& callbacks, Allocator* allocator)
 		: _proxy_allocator("gui", allocator)
 		, _renderer(renderer)
-		, _texture_cache(_renderer.create_texture_cache())
+		, _texture_cache(TextureCache::create(_renderer))
 		, _callbacks(callbacks)
 		, _has_size(false)
 		, _size(0, 0)

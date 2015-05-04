@@ -24,7 +24,6 @@ namespace Yttrium
 
 		RendererImpl(WindowBackend& window, Allocator* allocator);
 
-		std::unique_ptr<TextureCache> create_texture_cache() override;
 		void draw_rectangle(const RectF& rect) override;
 		void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
 		void draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture) override;

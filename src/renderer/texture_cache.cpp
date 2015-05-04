@@ -1,21 +1,35 @@
 #include "texture_cache.h"
 
+#include <yttrium/image.h>
 #include <yttrium/string.h>
 #include "renderer.h"
 
 namespace Yttrium
 {
+	std::unique_ptr<TextureCache> TextureCache::create(Renderer& renderer)
+	{
+		return std::make_unique<TextureCacheImpl>(static_cast<RendererImpl&>(renderer));
+	}
+
 	TextureCacheImpl::TextureCacheImpl(RendererImpl& renderer)
 		: _renderer(renderer)
 	{
 	}
 
-	Pointer<Texture2D> TextureCacheImpl::cache_texture_2d(const StaticString &name, bool intensity)
+	void TextureCacheImpl::clear()
 	{
+		_cache_2d.clear();
+	}
+
+	Pointer<Texture2D> TextureCacheImpl::load_texture_2d(const StaticString& name, bool intensity)
+	{
+		const auto i = _cache_2d.find(String(name, ByReference()));
+		if (i != _cache_2d.end())
+			return i->second;
+
 		Allocator* allocator = _renderer.allocator();
 
 		Image image(allocator);
-
 		if (!image.load(name))
 			return {};
 
@@ -27,16 +41,5 @@ namespace Yttrium
 			return {};
 
 		return _cache_2d.emplace(String(name, allocator), backend_texture).first->second;
-	}
-
-	void TextureCacheImpl::clear()
-	{
-		_cache_2d.clear();
-	}
-
-	Pointer<Texture2D> TextureCacheImpl::load_texture_2d(const StaticString& name, bool intensity)
-	{
-		const auto i = _cache_2d.find(String(name, ByReference()));
-		return i != _cache_2d.end() ? i->second : cache_texture_2d(name, intensity);
 	}
 }

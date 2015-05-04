@@ -17,7 +17,7 @@ void Game::run()
 	if (!_window)
 		return;
 
-	_texture_cache = _window->renderer().create_texture_cache();
+	_texture_cache = TextureCache::create(_window->renderer());
 
 	_window->set_name("Yttrium RTS example");
 	_window->set_size(Size(1024, 768));
