@@ -1,6 +1,7 @@
 #ifndef __RENDERER_GL_BUFFER_H
 #define __RENDERER_GL_BUFFER_H
 
+#include "../buffer.h"
 #include "gl.h"
 
 namespace Yttrium
@@ -9,52 +10,16 @@ namespace Yttrium
 	{
 	public:
 
-		GLBufferHandle(const GlApi& gl, GLenum target)
-			: _gl(gl)
-			, _target(target)
-		{
-			_gl.GenBuffersARB(1, &_handle);
-			// TODO: Throw some nasty exception if it fails.
-		}
+		GLBufferHandle(const GlApi& gl, GLenum target);
+		GLBufferHandle(GLBufferHandle&& handle);
+		~GLBufferHandle();
 
-		GLBufferHandle(GLBufferHandle&& handle)
-			: _gl(handle._gl)
-			, _target(handle._target)
-			, _handle(handle._handle)
-		{
-			handle._handle = 0;
-		}
+		explicit operator bool() const { return _handle != 0; }
 
-		~GLBufferHandle()
-		{
-			if (_handle != 0)
-				_gl.DeleteBuffersARB(1, &_handle);
-		}
-
-		explicit operator bool() const
-		{
-			return _handle != 0;
-		}
-
-		void bind() const
-		{
-			_gl.BindBufferARB(_target, _handle);
-		}
-
-		void initialize(GLenum usage, size_t size, const void* data) const
-		{
-			_gl.BufferDataARB(_target, size, data, usage);
-		}
-
-		void unbind() const
-		{
-			_gl.BindBufferARB(_target, 0);
-		}
-
-		void write(size_t offset, size_t size, const void* data) const
-		{
-			_gl.BufferSubDataARB(_target, offset, size, data);
-		}
+		void bind() const;
+		void initialize(GLenum usage, size_t size, const void* data) const;
+		void unbind() const;
+		void write(size_t offset, size_t size, const void* data) const;
 
 		GLBufferHandle(const GLBufferHandle&) = delete;
 		GLBufferHandle& operator=(const GLBufferHandle&) = delete;
@@ -65,6 +30,29 @@ namespace Yttrium
 		const GlApi& _gl;
 		const GLenum _target;
 		GLuint _handle = 0;
+	};
+
+	class GLIndexBuffer: public IndexBufferImpl
+	{
+	public:
+
+		const GLBufferHandle _buffer;
+		const GLenum _gl_format;
+
+		GLIndexBuffer(Format format, size_t size, size_t element_size, GLBufferHandle&& buffer, GLenum gl_format);
+
+		void write(size_t offset, size_t size, const void* data) override;
+	};
+
+	class GLVertexBuffer: public VertexBufferImpl
+	{
+	public:
+
+		const GLBufferHandle _buffer;
+
+		GLVertexBuffer(unsigned format, size_t size, size_t element_size, GLBufferHandle&& buffer);
+
+		void write(size_t offset, size_t size, const void* data) override;
 	};
 }
 

@@ -2,9 +2,8 @@
 
 #include <yttrium/matrix.h>
 #include "../debug_texture.h"
-#include "index_buffer.h"
+#include "buffer.h"
 #include "texture_cache.h"
-#include "vertex_buffer.h"
 
 #include <cassert>
 
@@ -30,7 +29,8 @@ namespace Yttrium
 		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		return std::make_unique<GlIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
+		buffer.unbind();
+		return std::make_unique<GLIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
 	}
 
 	std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache()
@@ -50,13 +50,14 @@ namespace Yttrium
 			element_size += sizeof(float) * 2;
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		return std::make_unique<GlVertexBuffer>(format, size, element_size, std::move(buffer));
+		buffer.unbind();
+		return std::make_unique<GLVertexBuffer>(format, size, element_size, std::move(buffer));
 	}
 
 	void OpenGlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
 	{
-		const auto& vertices = static_cast<const GlVertexBuffer&>(vertex_buffer);
-		const auto& indices = static_cast<const GlIndexBuffer&>(index_buffer);
+		const auto& vertices = static_cast<const GLVertexBuffer&>(vertex_buffer);
+		const auto& indices = static_cast<const GLIndexBuffer&>(index_buffer);
 
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
