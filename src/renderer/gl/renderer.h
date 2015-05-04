@@ -16,6 +16,7 @@ namespace Yttrium
 		// Renderer
 		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t) override;
 		std::unique_ptr<TextureCache> create_texture_cache() override;
+		std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size) override;
 		void draw_cube(const Vector4& center, float size) override;
 
 		// RendererImpl

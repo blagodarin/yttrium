@@ -4,6 +4,7 @@
 #include "../debug_texture.h"
 #include "index_buffer.h"
 #include "texture_cache.h"
+#include "vertex_buffer.h"
 
 #include <cassert>
 
@@ -22,19 +23,33 @@ namespace Yttrium
 
 	std::unique_ptr<IndexBuffer> OpenGlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size)
 	{
-		GLuint buffer = 0;
-		_gl.GenTextures(1, &buffer); // TODO: Think of using Y_ABORT if this fails.
-		if (buffer == 0)
+		GLBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
+		if (!buffer)
 			return {};
-		_gl.BindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, buffer);
-		_gl.BufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, size * (format == IndexBuffer::Format::U16 ? 2 : 4), nullptr, GL_STATIC_DRAW_ARB);
-		// NOTE: If the next line throws, nothing will release the allocated buffer.
-		return std::make_unique<GlIndexBuffer>(format, size, _gl, buffer);
+		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
+		buffer.bind();
+		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, nullptr);
+		return std::make_unique<GlIndexBuffer>(format, size, element_size, std::move(buffer));
 	}
 
 	std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache()
 	{
 		return std::make_unique<GlTextureCache>(*this, _gl);
+	}
+
+	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size)
+	{
+		GLBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
+		if (!buffer)
+			return {};
+		size_t element_size = sizeof(float) * 4; // Geometry data.
+		if (format & VertexBuffer::Rgba4F)
+			element_size += sizeof(float) * 4;
+		if (format & VertexBuffer::Uv2F)
+			element_size += sizeof(float) * 2;
+		buffer.bind();
+		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, nullptr);
+		return std::make_unique<GlVertexBuffer>(format, size, element_size, std::move(buffer));
 	}
 
 	void OpenGlRenderer::draw_cube(const Vector4& center, float size)

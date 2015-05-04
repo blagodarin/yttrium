@@ -19,6 +19,7 @@ namespace Yttrium
 	class TextureCache;
 	class TextureFont;
 	class Vector4;
+	class VertexBuffer;
 
 	template <typename T>
 	class Pointer;
@@ -59,6 +60,9 @@ namespace Yttrium
 		///
 		/// \note Texture cache lifetime must not exceed its renderer lifetime.
 		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
+
+		///
+		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size) = 0;
 
 		// NOTE: Temporary!
 		virtual void draw_cube(const Vector4& center, float size) = 0;

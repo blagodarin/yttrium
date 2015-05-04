@@ -9,18 +9,21 @@ namespace Yttrium
 	{
 	public:
 
-		IndexBufferImpl(Format format, size_t size): _format(format), _size(size) {}
-		~IndexBufferImpl() override = default;
+		IndexBufferImpl(Format format, size_t size, size_t element_size)
+			: _format(format)
+			, _size(size)
+			, _element_size(element_size)
+		{
+		}
 
 		Format format() const override { return _format; }
 		size_t size() const override { return _size; }
 
-		size_t element_size() const { return _format == Format::U16 ? 2 : 4; }
+	protected:
 
-	private:
-
-		Format _format;
-		size_t _size;
+		const Format _format;
+		const size_t _size;
+		const size_t _element_size;
 	};
 }
 
