@@ -9,21 +9,13 @@
 
 namespace Yttrium
 {
-	class BackendTexture2D;
 	class RendererImpl;
 
-	class BackendTextureCache: public TextureCache
+	class TextureCacheImpl: public TextureCache
 	{
-	protected:
+	public:
 
-		BackendTextureCache(RendererImpl& renderer);
-		~BackendTextureCache() override;
-
-		virtual BackendTexture2D* cache_texture_2d(const ImageFormat& format, const void* data) = 0;
-
-	protected:
-
-		RendererImpl& _renderer;
+		TextureCacheImpl(RendererImpl& renderer);
 
 	private:
 
@@ -33,6 +25,7 @@ namespace Yttrium
 
 	private:
 
+		RendererImpl& _renderer;
 		std::map<String, Pointer<Texture2D>> _cache_2d;
 	};
 }

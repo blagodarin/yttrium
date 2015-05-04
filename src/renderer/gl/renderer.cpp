@@ -1,9 +1,10 @@
 #include "renderer.h"
 
 #include <yttrium/matrix.h>
+#include <yttrium/utils.h>
 #include "../debug_texture.h"
 #include "buffer.h"
-#include "texture_cache.h"
+#include "texture.h"
 
 #include <cassert>
 
@@ -33,9 +34,74 @@ namespace Yttrium
 		return std::make_unique<GLIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
 	}
 
-	std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache()
+	Pointer<Texture2D> OpenGlRenderer::create_texture_2d(const ImageFormat& format, const void* data)
 	{
-		return std::make_unique<GlTextureCache>(*this, _gl);
+		// NOTE: Keep the new pixel formats in sync with these arrays!
+
+		static const GLenum formats[] =
+		{
+			GL_LUMINANCE,       // PixelFormat::Gray
+			GL_LUMINANCE_ALPHA, // PixelFormat::GrayAlpha
+			0,                  // PixelFormat::AlphaGray
+			GL_RGB,             // PixelFormat::Rgb
+			GL_BGR,             // PixelFormat::Bgr
+			GL_RGBA,            // PixelFormat::Rgba
+			GL_BGRA,            // PixelFormat::Bgra
+			0,                  // PixelFormat::Argb
+			0,                  // PixelFormat::Abgr
+		};
+
+		static const GLint internal_formats[] =
+		{
+			GL_LUMINANCE8,        // PixelFormat::Gray
+			GL_LUMINANCE8_ALPHA8, // PixelFormat::GrayAlpha
+			GL_LUMINANCE8_ALPHA8, // PixelFormat::AlphaGray
+			GL_RGB8,              // PixelFormat::Rgb
+			GL_RGB8,              // PixelFormat::Bgr
+			GL_RGBA8,             // PixelFormat::Rgba
+			GL_RGBA8,             // PixelFormat::Bgra
+			GL_RGBA8,             // PixelFormat::Argb
+			GL_RGBA8,             // PixelFormat::Abgr
+		};
+
+		if (format.bits_per_channel() != 8)
+			return {};
+
+		const auto data_format = formats[static_cast<size_t>(format.pixel_format())];
+		if (!data_format)
+			return {};
+
+		const auto internal_format = internal_formats[static_cast<size_t>(format.pixel_format())];
+
+		GLenum target = 0;
+		if (_gl.ARB_texture_non_power_of_two || (is_power_of_2(format.width()) && is_power_of_2(format.height())))
+			target = GL_TEXTURE_2D;
+		else if (_gl.ARB_texture_rectangle)
+			target = GL_TEXTURE_RECTANGLE_ARB;
+		if (!target)
+			return {};
+
+		// NOTE: The following code is not exception-safe:
+		// the texture handle won't be released if  an exception is generated.
+
+		GLuint texture = 0;
+		_gl.GenTextures(1, &texture); // TODO: Think of using Y_ABORT if this fails.
+		if (!texture)
+			return {};
+
+		// TODO: Set pixel row alignment if required.
+
+		_gl.BindTexture(target, texture);
+		_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
+		_gl.TexImage2D(target, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);
+
+		const auto is_target_enabled = _gl.IsEnabled(target);
+		_gl.Enable(target); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].
+		_gl.GenerateMipmap(target);
+		if (!is_target_enabled)
+			_gl.Disable(target);
+
+		return Pointer<Texture2D>(Y_NEW(_allocator, GlTexture2D)(format, _allocator, _gl, target, texture));
 	}
 
 	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)

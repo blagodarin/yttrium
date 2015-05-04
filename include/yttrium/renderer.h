@@ -12,6 +12,7 @@
 
 namespace Yttrium
 {
+	class ImageFormat;
 	class Margins;
 	class Matrix4;
 	class StaticString;
@@ -25,6 +26,7 @@ namespace Yttrium
 	class Pointer;
 
 	///
+	/// \note Lifetimes of entities created by a renderer must not exceed the lifetime of the renderer.
 	class Renderer
 	{
 	public:
@@ -58,7 +60,9 @@ namespace Yttrium
 		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
 
 		///
-		/// \note Texture cache lifetime must not exceed its renderer lifetime.
+		virtual Pointer<Texture2D> create_texture_2d(const ImageFormat& format, const void* data) = 0;
+
+		///
 		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
 
 		///
