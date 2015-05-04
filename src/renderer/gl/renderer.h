@@ -14,6 +14,7 @@ namespace Yttrium
 		~OpenGlRenderer() override;
 
 		// Renderer
+		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t) override;
 		std::unique_ptr<TextureCache> create_texture_cache() override;
 		void draw_cube(const Vector4& center, float size) override;
 

@@ -2,6 +2,7 @@
 
 #include <yttrium/matrix.h>
 #include "../debug_texture.h"
+#include "index_buffer.h"
 #include "texture_cache.h"
 
 #include <cassert>
@@ -17,6 +18,18 @@ namespace Yttrium
 	OpenGlRenderer::~OpenGlRenderer()
 	{
 		_gl.DeleteTextures(1, &_debug_texture);
+	}
+
+	std::unique_ptr<IndexBuffer> OpenGlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size)
+	{
+		GLuint buffer = 0;
+		_gl.GenTextures(1, &buffer); // TODO: Think of using Y_ABORT if this fails.
+		if (buffer == 0)
+			return {};
+		_gl.BindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, buffer);
+		_gl.BufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, size * (format == IndexBuffer::Format::U16 ? 2 : 4), nullptr, GL_STATIC_DRAW_ARB);
+		// NOTE: If the next line throws, nothing will release the allocated buffer.
+		return std::make_unique<GlIndexBuffer>(format, size, _gl, buffer);
 	}
 
 	std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache()
@@ -54,7 +67,7 @@ namespace Yttrium
 			Vertex3D(Vector4(center.x + radius, center.y + radius, center.z + radius), Vector4(1, 1, 1)),
 		};
 
-		const std::array<int16_t, 36> indices =
+		const std::array<uint16_t, 36> indices =
 		{
 			// Bottom.
 			0, 2, 1,

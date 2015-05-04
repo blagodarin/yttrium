@@ -1,8 +1,8 @@
 /// \file
 /// \brief Textures.
 
-#ifndef __Y_RENDERER_TEXTURE_H
-#define __Y_RENDERER_TEXTURE_H
+#ifndef __Y_TEXTURE_H
+#define __Y_TEXTURE_H
 
 #include <yttrium/pointer.h>
 #include <yttrium/rect.h>
@@ -46,7 +46,7 @@ namespace Yttrium
 
 	public:
 
-		~Texture2D() = default;
+		~Texture2D() override = default;
 
 		///
 		Filter filter() const { return _filter; }
@@ -76,4 +76,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_RENDERER_TEXTURE_H
+#endif // __Y_TEXTURE_H

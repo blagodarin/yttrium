@@ -1,0 +1,36 @@
+/// \file
+/// \brief Index buffers.
+
+#ifndef __Y_INDEX_BUFFER_H
+#define __Y_INDEX_BUFFER_H
+
+#include <cstddef> // size_t
+
+namespace Yttrium
+{
+	/// Index buffer.
+	class IndexBuffer
+	{
+	public:
+
+		/// Index format.
+		enum class Format
+		{
+			U16, ///< Unsigned 16-bit indices.
+			U32, ///< Unsigned 32-bit indices.
+		};
+
+		virtual ~IndexBuffer() = default;
+
+		/// Returns the index format.
+		virtual Format format() const = 0;
+
+		/// Returns the number of elements in the buffer.
+		virtual size_t size() const = 0;
+
+		/// Updates the buffer contents.
+		virtual void write(const void* data, size_t size, size_t offset) = 0;
+	};
+}
+
+#endif // __Y_INDEX_BUFFER_H

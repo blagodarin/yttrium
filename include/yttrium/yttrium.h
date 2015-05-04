@@ -18,6 +18,7 @@
 #include <yttrium/global.h>
 #include <yttrium/gui.h>
 #include <yttrium/image.h>
+#include <yttrium/index_buffer.h>
 #include <yttrium/ion.h>
 #include <yttrium/key.h>
 #include <yttrium/log.h>

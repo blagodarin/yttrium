@@ -4,6 +4,7 @@
 #ifndef __Y_RENDERER_H
 #define __Y_RENDERER_H
 
+#include <yttrium/index_buffer.h>
 #include <yttrium/rect.h>
 #include <yttrium/types.h>
 
@@ -51,6 +52,9 @@ namespace Yttrium
 
 		Renderer() = default;
 		virtual ~Renderer() = default;
+
+		///
+		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size) = 0;
 
 		///
 		/// \note Texture cache lifetime must not exceed its renderer lifetime.
