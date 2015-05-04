@@ -55,17 +55,14 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size) = 0;
+		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
 
 		///
 		/// \note Texture cache lifetime must not exceed its renderer lifetime.
 		virtual std::unique_ptr<TextureCache> create_texture_cache() = 0;
 
 		///
-		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size) = 0;
-
-		// NOTE: Temporary!
-		virtual void draw_cube(const Vector4& center, float size) = 0;
+		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;
 
 		///
 		virtual void draw_rectangle(const RectF& rect) = 0;
@@ -76,6 +73,9 @@ namespace Yttrium
 		///
 		virtual void draw_text(const Vector2& position, const StaticString& text,
 			unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) = 0;
+
+		///
+		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;
 
 		///
 		virtual void set_color(const Vector4& color) = 0;

@@ -21,11 +21,13 @@ void Game::run()
 
 	_window->set_name("Yttrium RTS example");
 	_window->set_size(Size(1024, 768));
-	_window->show();
 
 	if (!_window->gui().load("examples/rts/gui.ion"))
 		return;
 
+	create_cube();
+
+	_window->show();
 	_window->run();
 }
 
@@ -85,19 +87,19 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
 
 	// Center.
-	renderer.draw_cube(Vector4(0, 0, 0), 1);
+	draw_cube(renderer, Vector4(0, 0, 0));
 
 	// X direction -- one cube.
-	renderer.draw_cube(Vector4(2, 0, 0), 1);
+	draw_cube(renderer, Vector4(2, 0, 0));
 
 	// Y direction -- two cubes.
-	renderer.draw_cube(Vector4(0, 2, 0), 1);
-	renderer.draw_cube(Vector4(0, 4, 0), 1);
+	draw_cube(renderer, Vector4(0, 2, 0));
+	draw_cube(renderer, Vector4(0, 4, 0));
 
 	// Z direction -- three cubes.
-	renderer.draw_cube(Vector4(0, 0, 2), 1);
-	renderer.draw_cube(Vector4(0, 0, 4), 1);
-	renderer.draw_cube(Vector4(0, 0, 6), 1);
+	draw_cube(renderer, Vector4(0, 0, 2));
+	draw_cube(renderer, Vector4(0, 0, 4));
+	draw_cube(renderer, Vector4(0, 0, 6));
 
 	const auto angle = Timer::clock() / 5 % 360;
 
@@ -106,23 +108,23 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 		const auto z = -4 - 2 * i;
 		{
 			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, 1, 0)));
-			renderer.draw_cube(Vector4( 2, -2,  z), 1);
-			renderer.draw_cube(Vector4( 2, -2, -z), 1);
+			draw_cube(renderer, Vector4( 2, -2,  z));
+			draw_cube(renderer, Vector4( 2, -2, -z));
 		}
 		{
 			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(1, 0, 0)));
-			renderer.draw_cube(Vector4(-2, -2,  z), 1);
-			renderer.draw_cube(Vector4(-2, -2, -z), 1);
+			draw_cube(renderer, Vector4(-2, -2,  z));
+			draw_cube(renderer, Vector4(-2, -2, -z));
 		}
 		{
 			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(-1, 0, 0)));
-			renderer.draw_cube(Vector4( 2,  2,  z), 1);
-			renderer.draw_cube(Vector4( 2,  2, -z), 1);
+			draw_cube(renderer, Vector4( 2,  2,  z));
+			draw_cube(renderer, Vector4( 2,  2, -z));
 		}
 		{
 			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, -1, 0)));
-			renderer.draw_cube(Vector4(-2,  2,  z), 1);
-			renderer.draw_cube(Vector4(-2,  2, -z), 1);
+			draw_cube(renderer, Vector4(-2,  2,  z));
+			draw_cube(renderer, Vector4(-2,  2, -z));
 		}
 	}
 }
@@ -134,4 +136,67 @@ void Game::on_update(const UpdateEvent& update)
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
 		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll;
+}
+
+void Game::create_cube()
+{
+	struct Vertex3D
+	{
+		Vector4 position;
+		Vector4 color;
+
+		Vertex3D(const Vector4& position, const Vector4& color)
+			: position(position)
+			, color(color)
+		{
+		}
+	};
+
+	const std::array<Vertex3D, 8> vertices =
+	{
+		Vertex3D(Vector4(-0.5, -0.5, -0.5), Vector4(0, 0, 0)),
+		Vertex3D(Vector4(+0.5, -0.5, -0.5), Vector4(0, 0, 1)),
+		Vertex3D(Vector4(-0.5, +0.5, -0.5), Vector4(0, 1, 0)),
+		Vertex3D(Vector4(+0.5, +0.5, -0.5), Vector4(0, 1, 1)),
+		Vertex3D(Vector4(-0.5, -0.5, +0.5), Vector4(1, 0, 0)),
+		Vertex3D(Vector4(+0.5, -0.5, +0.5), Vector4(1, 0, 1)),
+		Vertex3D(Vector4(-0.5, +0.5, +0.5), Vector4(1, 1, 0)),
+		Vertex3D(Vector4(+0.5, +0.5, +0.5), Vector4(1, 1, 1)),
+	};
+
+	const std::array<uint16_t, 36> indices =
+	{
+		// Bottom.
+		0, 2, 1,
+		1, 2, 3,
+
+		// Front.
+		0, 1, 4,
+		4, 1, 5,
+
+		// Top.
+		4, 5, 6,
+		6, 5, 7,
+
+		// Back.
+		2, 6, 3,
+		3, 6, 7,
+
+		// Right.
+		5, 1, 7,
+		7, 1, 3,
+
+		// Left.
+		2, 0, 6,
+		6, 0, 4,
+	};
+
+	_cube_vertices = _window->renderer().create_vertex_buffer(VertexBuffer::Rgba4F, vertices.size(), &vertices[0]);
+	_cube_indices = _window->renderer().create_index_buffer(IndexBuffer::Format::U16, indices.size(), &indices[0]);
+}
+
+void Game::draw_cube(Renderer& renderer, const Vector4& center)
+{
+	PushTransformation transformation(renderer, Matrix4::translation(center));
+	renderer.draw_triangles(*_cube_vertices, *_cube_indices);
 }

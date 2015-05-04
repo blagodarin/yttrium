@@ -12,13 +12,12 @@ namespace Yttrium
 	{
 	public:
 
-		GlIndexBuffer(Format format, size_t size, size_t element_size, GLBufferHandle&& buffer);
-
-		void write(const void* data, size_t size, size_t offset) override;
-
-	private:
-
 		const GLBufferHandle _buffer;
+		const GLenum _gl_format;
+
+		GlIndexBuffer(Format format, size_t size, size_t element_size, GLBufferHandle&& buffer, GLenum gl_format);
+
+		void write(size_t offset, size_t size, const void* data) override;
 	};
 }
 

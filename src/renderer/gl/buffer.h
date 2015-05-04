@@ -19,6 +19,7 @@ namespace Yttrium
 
 		GLBufferHandle(GLBufferHandle&& handle)
 			: _gl(handle._gl)
+			, _target(handle._target)
 			, _handle(handle._handle)
 		{
 			handle._handle = 0;
@@ -45,6 +46,11 @@ namespace Yttrium
 			_gl.BufferDataARB(_target, size, data, usage);
 		}
 
+		void unbind() const
+		{
+			_gl.BindBufferARB(_target, 0);
+		}
+
 		void write(size_t offset, size_t size, const void* data) const
 		{
 			_gl.BufferSubDataARB(_target, offset, size, data);
@@ -57,7 +63,7 @@ namespace Yttrium
 	private:
 
 		const GlApi& _gl;
-		GLenum _target = 0;
+		const GLenum _target;
 		GLuint _handle = 0;
 	};
 }

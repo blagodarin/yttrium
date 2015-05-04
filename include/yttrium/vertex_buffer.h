@@ -23,14 +23,14 @@ namespace Yttrium
 
 		virtual ~VertexBuffer() = default;
 
-		/// Returns the vertex format flags.
+		/// Return the vertex format flags.
 		virtual unsigned format() const = 0;
 
-		/// Returns the number of elements in the buffer.
+		/// Return the number of elements in the buffer.
 		virtual size_t size() const = 0;
 
-		/// Updates the buffer contents.
-		virtual void write(const void* data, size_t size, size_t offset) = 0;
+		/// Update the buffer contents.
+		virtual void write(size_t offset, size_t size, const void* data) = 0;
 	};
 }
 

@@ -14,10 +14,10 @@ namespace Yttrium
 		~OpenGlRenderer() override;
 
 		// Renderer
-		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t) override;
+		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
 		std::unique_ptr<TextureCache> create_texture_cache() override;
-		std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size) override;
-		void draw_cube(const Vector4& center, float size) override;
+		std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t, const void*) override;
+		void draw_triangles(const VertexBuffer&, const IndexBuffer&) override;
 
 		// RendererImpl
 		void clear() override;

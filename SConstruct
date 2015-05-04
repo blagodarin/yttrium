@@ -96,7 +96,7 @@ toolchains_flags = {
 		'compile': ['-std=gnu++1y', '-Wall', '-Wextra'],
 		'compile-debug': ['-g'],
 		'compile-release': ['-O3'],
-		'compile-src': ['-fno-exceptions', '-fvisibility=hidden', '-fvisibility-inlines-hidden'],
+		'compile-src': ['-fvisibility=hidden', '-fvisibility-inlines-hidden'],
 		'link-windows': ['-Wl,-subsystem,windows']}}
 
 toolchain_flags = toolchains_flags[tool_type]

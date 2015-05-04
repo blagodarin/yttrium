@@ -21,15 +21,16 @@ namespace Yttrium
 		_gl.DeleteTextures(1, &_debug_texture);
 	}
 
-	std::unique_ptr<IndexBuffer> OpenGlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size)
+	std::unique_ptr<IndexBuffer> OpenGlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
 	{
 		GLBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
 		if (!buffer)
 			return {};
 		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
+		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 		buffer.bind();
-		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, nullptr);
-		return std::make_unique<GlIndexBuffer>(format, size, element_size, std::move(buffer));
+		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
+		return std::make_unique<GlIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
 	}
 
 	std::unique_ptr<TextureCache> OpenGlRenderer::create_texture_cache()
@@ -37,7 +38,7 @@ namespace Yttrium
 		return std::make_unique<GlTextureCache>(*this, _gl);
 	}
 
-	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size)
+	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
 	{
 		GLBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		if (!buffer)
@@ -48,84 +49,55 @@ namespace Yttrium
 		if (format & VertexBuffer::Uv2F)
 			element_size += sizeof(float) * 2;
 		buffer.bind();
-		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, nullptr);
+		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		return std::make_unique<GlVertexBuffer>(format, size, element_size, std::move(buffer));
 	}
 
-	void OpenGlRenderer::draw_cube(const Vector4& center, float size)
+	void OpenGlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
 	{
-		assert(!_debug_rendering);
+		const auto& vertices = static_cast<const GlVertexBuffer&>(vertex_buffer);
+		const auto& indices = static_cast<const GlIndexBuffer&>(index_buffer);
 
-		struct Vertex3D
-		{
-			Vector4 position;
-			Vector4 color;
-
-			Vertex3D(const Vector4& position, const Vector4& color)
-				: position(position)
-				, color(color)
-			{
-			}
-		};
-
-		const auto radius = size / 2;
-
-		const std::array<Vertex3D, 8> vertices =
-		{
-			Vertex3D(Vector4(center.x - radius, center.y - radius, center.z - radius), Vector4(0, 0, 0)),
-			Vertex3D(Vector4(center.x + radius, center.y - radius, center.z - radius), Vector4(0, 0, 1)),
-			Vertex3D(Vector4(center.x - radius, center.y + radius, center.z - radius), Vector4(0, 1, 0)),
-			Vertex3D(Vector4(center.x + radius, center.y + radius, center.z - radius), Vector4(0, 1, 1)),
-			Vertex3D(Vector4(center.x - radius, center.y - radius, center.z + radius), Vector4(1, 0, 0)),
-			Vertex3D(Vector4(center.x + radius, center.y - radius, center.z + radius), Vector4(1, 0, 1)),
-			Vertex3D(Vector4(center.x - radius, center.y + radius, center.z + radius), Vector4(1, 1, 0)),
-			Vertex3D(Vector4(center.x + radius, center.y + radius, center.z + radius), Vector4(1, 1, 1)),
-		};
-
-		const std::array<uint16_t, 36> indices =
-		{
-			// Bottom.
-			0, 2, 1,
-			1, 2, 3,
-
-			// Front.
-			0, 1, 4,
-			4, 1, 5,
-
-			// Top.
-			4, 5, 6,
-			6, 5, 7,
-
-			// Back.
-			2, 6, 3,
-			3, 6, 7,
-
-			// Right.
-			5, 1, 7,
-			7, 1, 3,
-
-			// Left.
-			2, 0, 6,
-			6, 0, 4,
-		};
-
-		_gl.Disable(GL_TEXTURE_2D);
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
 
-		_gl.EnableClientState(GL_COLOR_ARRAY);
-		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex3D), &vertices[0].color);
+		size_t data_offset = 0;
+		vertices._buffer.bind();
+
+		if (vertices.format() & VertexBuffer::Rgba4F)
+		{
+			_gl.EnableClientState(GL_COLOR_ARRAY);
+			data_offset += sizeof(float) * 4;
+			_gl.ColorPointer(4, GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
+		}
+
+		if (vertices.format() & VertexBuffer::Uv2F)
+		{
+			_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
+			data_offset += sizeof(float) * 2;
+			_gl.TexCoordPointer(2, GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
+		}
+		else
+			_gl.Disable(GL_TEXTURE_2D);
 
 		_gl.EnableClientState(GL_VERTEX_ARRAY);
-		_gl.VertexPointer(4, GL_FLOAT, sizeof(Vertex3D), &vertices[0].position);
+		_gl.VertexPointer(4, GL_FLOAT, vertices.element_size(), 0);
 
-		_gl.DrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, &indices[0]);
+		indices._buffer.bind();
+		_gl.DrawElements(GL_TRIANGLES, indices.size(), indices._gl_format, 0);
+		indices._buffer.unbind();
 
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
-		_gl.DisableClientState(GL_COLOR_ARRAY);
+		if (vertices.format() & VertexBuffer::Rgba4F)
+			_gl.DisableClientState(GL_COLOR_ARRAY);
+		if (vertices.format() & VertexBuffer::Uv2F)
+			_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
+		else
+			_gl.Enable(GL_TEXTURE_2D);
+
+		vertices._buffer.unbind();
 
 		_gl.Disable(GL_DEPTH_TEST);
-		_gl.Enable(GL_TEXTURE_2D);
 	}
 
 	void OpenGlRenderer::clear()

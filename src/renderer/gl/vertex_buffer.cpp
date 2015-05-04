@@ -10,9 +10,10 @@ namespace Yttrium
 	{
 	}
 
-	void GlVertexBuffer::write(const void* data, size_t size, size_t offset)
+	void GlVertexBuffer::write(size_t offset, size_t size, const void* data)
 	{
 		_buffer.bind();
 		_buffer.write(_element_size * offset, _element_size * size, data);
+		_buffer.unbind();
 	}
 }

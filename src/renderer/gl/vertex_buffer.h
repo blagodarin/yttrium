@@ -12,13 +12,11 @@ namespace Yttrium
 	{
 	public:
 
+		const GLBufferHandle _buffer;
+
 		GlVertexBuffer(unsigned format, size_t size, size_t element_size, GLBufferHandle&& buffer);
 
-		void write(const void* data, size_t size, size_t offset) override;
-
-	private:
-
-		const GLBufferHandle _buffer;
+		void write(size_t offset, size_t size, const void* data) override;
 	};
 }
 
