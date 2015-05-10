@@ -93,9 +93,6 @@ namespace Yttrium
 		}
 
 		///
-		virtual void set_texture(const Pointer<Texture2D>& texture) = 0;
-
-		///
 		virtual bool set_texture_borders(const Margins& borders) = 0;
 
 		///
@@ -122,12 +119,34 @@ namespace Yttrium
 		///
 		PushProjection(Renderer& renderer, const Matrix4& matrix);
 
+		///
 		~PushProjection();
 
 		PushProjection(const PushProjection&) = delete;
 		PushProjection(PushProjection&&) = delete;
 		PushProjection& operator=(const PushProjection&) = delete;
 		PushProjection& operator=(PushProjection&&) = delete;
+
+	private:
+
+		Renderer& _renderer;
+	};
+
+	///
+	class Y_API PushTexture
+	{
+	public:
+
+		///
+		PushTexture(Renderer& renderer, const Pointer<Texture2D>& texture);
+
+		///
+		~PushTexture();
+
+		PushTexture(const PushTexture&) = delete;
+		PushTexture(PushTexture&&) = delete;
+		PushTexture& operator=(const PushTexture&) = delete;
+		PushTexture& operator=(PushTexture&&) = delete;
 
 	private:
 

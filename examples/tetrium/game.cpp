@@ -257,7 +257,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
 {
-	renderer.set_texture(_block_texture);
+	PushTexture push_texture(renderer, _block_texture);
 	if (canvas_name == S("field"))
 		draw_field(renderer, rect);
 	else if (canvas_name == S("next"))

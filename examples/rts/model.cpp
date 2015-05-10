@@ -13,10 +13,9 @@ Model::Model(Renderer& renderer)
 
 void Model::draw(const Vector4& translation)
 {
-	_renderer.set_texture(_texture);
-	PushTransformation transformation(_renderer, Matrix4::translation(translation));
+	PushTexture push_texture(_renderer, _texture);
+	PushTransformation push_transformation(_renderer, Matrix4::translation(translation));
 	_renderer.draw_triangles(*_vertices, *_indices);
-	_renderer.set_texture({});
 }
 
 CubeModel::CubeModel(Renderer& renderer)

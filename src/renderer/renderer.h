@@ -13,6 +13,7 @@
 
 namespace Yttrium
 {
+	class BackendTexture2D;
 	class Image;
 	class WindowBackend;
 
@@ -30,7 +31,6 @@ namespace Yttrium
 		void set_color(const Vector4& color) override;
 		bool set_font(const TextureFont& font) override;
 		void set_font_size(const Vector2& size) override;
-		void set_texture(const Pointer<Texture2D>& texture) override;
 		bool set_texture_borders(const Margins& borders) override;
 		void set_texture_rectangle(const RectF& rect) override;
 		Vector2 text_size(const StaticString& text) const override;
@@ -42,8 +42,10 @@ namespace Yttrium
 		Allocator* allocator() const { return _allocator; }
 		void flush_2d();
 		void pop_projection();
+		void pop_texture();
 		void pop_transformation();
 		void push_projection(const Matrix4& matrix);
+		void push_texture(const Pointer<Texture2D>& texture);
 		void push_transformation(const Matrix4& matrix);
 		void set_debug_texture();
 		void set_window_size(const Size& size);
@@ -59,6 +61,8 @@ namespace Yttrium
 
 	public:
 
+		void change_texture(const Pointer<Texture2D>& old_texture, const Pointer<Texture2D>& new_texture);
+		BackendTexture2D* current_texture_2d() const;
 		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
 
 	public:
@@ -82,9 +86,8 @@ namespace Yttrium
 		std::vector<Vertex2D> _vertices_2d;
 		std::vector<int16_t>  _indices_2d;
 
-		Pointer<Texture2D> _texture;
-		RectF              _texture_rect;
-		MarginsF           _texture_borders;
+		RectF    _texture_rect;
+		MarginsF _texture_borders;
 
 		TextureFont _font;
 		Vector2     _font_size;
@@ -92,6 +95,7 @@ namespace Yttrium
 		bool _debug_rendering = false;
 
 		std::vector<Matrix4> _projection;
+		std::vector<std::pair<Pointer<Texture2D>, int>> _texture_stack;
 		std::vector<Matrix4> _transformation;
 	};
 }

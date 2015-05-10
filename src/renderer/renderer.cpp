@@ -23,16 +23,17 @@ namespace Yttrium
 		, _color(1, 1, 1)
 		, _font_size(1, 1)
 	{
+		_texture_stack.emplace_back(Pointer<Texture2D>(), 1);
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& rect)
 	{
-		draw_rectangle(rect, _texture_rect, _texture ? _texture_borders : MarginsF());
+		draw_rectangle(rect, _texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& rect, const RectF& texture_rect)
 	{
-		draw_rectangle(rect, texture_rect, _texture ? _texture_borders : MarginsF());
+		draw_rectangle(rect, texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
 	}
 
 	void RendererImpl::draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture)
@@ -97,9 +98,9 @@ namespace Yttrium
 					info->rect.width() * x_scaling,
 					info->rect.height() * y_scaling);
 
-				BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.get());
-				Vector2 texture_top_left(backend_texture->fix_coords(Vector2(info->rect.top_left())));
-				Vector2 texture_bottom_right(backend_texture->fix_coords(Vector2(info->rect.bottom_right())));
+				const auto current_texture = current_texture_2d();
+				Vector2 texture_top_left(current_texture->fix_coords(Vector2(info->rect.top_left())));
+				Vector2 texture_bottom_right(current_texture->fix_coords(Vector2(info->rect.bottom_right())));
 
 				draw_rectangle(symbol_rect,
 					RectF::from_coords(texture_top_left.x, texture_top_left.y, texture_bottom_right.x, texture_bottom_right.y),
@@ -123,8 +124,8 @@ namespace Yttrium
 
 	bool RendererImpl::set_font(const TextureFont& font)
 	{
-		BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.get());
-		if (!backend_texture || (font && !Rect(backend_texture->size()).contains(font.rect())))
+		const auto current_texture = current_texture_2d();
+		if (!current_texture || (font && !Rect(current_texture->size()).contains(font.rect())))
 			return false;
 
 		_font = font;
@@ -136,43 +137,13 @@ namespace Yttrium
 		_font_size = size;
 	}
 
-	void RendererImpl::set_texture(const Pointer<Texture2D>& texture)
-	{
-		if (_texture == texture)
-			return;
-
-		flush_2d();
-
-		if (!texture)
-		{
-			BackendTexture2D* old_backend_texture = static_cast<BackendTexture2D*>(_texture.get());
-			if (old_backend_texture)
-				old_backend_texture->unbind();
-		}
-
-		_texture = texture;
-		_texture_borders = MarginsF();
-
-		BackendTexture2D* new_backend_texture = static_cast<BackendTexture2D*>(_texture.get());
-		if (new_backend_texture)
-		{
-			new_backend_texture->bind();
-			_texture_rect = new_backend_texture->full_rectangle();
-		}
-		else
-		{
-			_texture_rect = RectF();
-		}
-
-		_font = TextureFont();
-	}
-
 	bool RendererImpl::set_texture_borders(const Margins& borders)
 	{
-		if (!_texture)
+		const auto current_texture = current_texture_2d();
+		if (!current_texture)
 			return false;
 
-		const Vector2 texture_size(_texture->size());
+		const Vector2 texture_size(current_texture->size());
 		const Vector2& texture_rect_size = _texture_rect.size();
 		const Vector2& min_size = Vector2(borders.min_size()) / texture_size;
 		if (texture_rect_size.x < min_size.x || texture_rect_size.y < min_size.y)
@@ -186,15 +157,15 @@ namespace Yttrium
 
 	void RendererImpl::set_texture_rectangle(const RectF& rect)
 	{
-		BackendTexture2D* backend_texture = static_cast<BackendTexture2D*>(_texture.get());
-		if (backend_texture)
-		{
-			const Vector2& top_left = backend_texture->fix_coords(rect.top_left());
-			const Vector2& bottom_right = backend_texture->fix_coords(rect.bottom_right());
+		const auto current_texture = current_texture_2d();
+		if (!current_texture)
+			return;
 
-			_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
-			_texture_borders = MarginsF();
-		}
+		const Vector2& top_left = current_texture->fix_coords(rect.top_left());
+		const Vector2& bottom_right = current_texture->fix_coords(rect.bottom_right());
+
+		_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
+		_texture_borders = MarginsF();
 	}
 
 	Vector2 RendererImpl::text_size(const StaticString& text) const
@@ -227,9 +198,23 @@ namespace Yttrium
 			_debug_rendering = false;
 	}
 
+	void RendererImpl::pop_texture()
+	{
+		assert(!_debug_rendering);
+		assert(_texture_stack.size() > 1 || (_texture_stack.size() == 1 && _texture_stack.back().second > 1));
+		if (_texture_stack.back().second > 1)
+		{
+			--_texture_stack.back().second;
+			return;
+		}
+		change_texture(_texture_stack.back().first, _texture_stack[_texture_stack.size() - 2].first);
+		_texture_stack.pop_back();
+	}
+
 	void RendererImpl::pop_transformation()
 	{
 		assert(!_debug_rendering);
+		flush_2d();
 		_transformation.pop_back();
 		set_transformation(_transformation.empty() ? Matrix4() : _transformation.back());
 	}
@@ -242,6 +227,21 @@ namespace Yttrium
 		set_projection(matrix);
 	}
 
+	void RendererImpl::push_texture(const Pointer<Texture2D>& texture)
+	{
+		assert(!_debug_rendering);
+		assert(!_texture_stack.empty());
+		if (_texture_stack.back().first == texture)
+		{
+			++_texture_stack.back().second;
+			return;
+		}
+		_texture_stack.emplace_back(texture, 1);
+		// TODO: Lazy texture assignment (i.e. before actual rendering) to eliminate texture changes
+		// when drawing differently textured geometry with another texture (e.g. GUI) on the stack.
+		change_texture(_texture_stack[_texture_stack.size() - 2].first, _texture_stack.back().first);
+	}
+
 	void RendererImpl::push_transformation(const Matrix4& matrix)
 	{
 		assert(!_debug_rendering);
@@ -251,8 +251,9 @@ namespace Yttrium
 
 	void RendererImpl::set_debug_texture()
 	{
-		assert(_projection.size() == 1 && !_debug_rendering);
-		set_texture({});
+		assert(_projection.size() == 1
+			&& _texture_stack.size() == 1 && _texture_stack.back().second == 1
+			&& !_debug_rendering);
 		set_debug_texture_impl();
 		_debug_rendering = true;
 	}
@@ -261,6 +262,31 @@ namespace Yttrium
 	{
 		_window_size = size;
 		update_window_size();
+	}
+
+	void RendererImpl::change_texture(const Pointer<Texture2D>& old_texture, const Pointer<Texture2D>& new_texture)
+	{
+		assert(old_texture != new_texture);
+		flush_2d();
+		if (new_texture)
+		{
+			BackendTexture2D& new_texture_backend = static_cast<BackendTexture2D&>(*new_texture);
+			new_texture_backend.bind();
+			_texture_rect = new_texture_backend.full_rectangle();
+		}
+		else
+		{
+			BackendTexture2D& old_texture_backend = static_cast<BackendTexture2D&>(*old_texture);
+			old_texture_backend.unbind();
+			_texture_rect = RectF();
+		}
+		_texture_borders = MarginsF();
+		_font = TextureFont();
+	}
+
+	BackendTexture2D* RendererImpl::current_texture_2d() const
+	{
+		return static_cast<BackendTexture2D*>(_texture_stack.back().first.get());
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
@@ -293,7 +319,7 @@ namespace Yttrium
 
 		if (borders.left > 0)
 		{
-			left_offset = borders.left * _texture->size().width;
+			left_offset = borders.left * current_texture_2d()->size().width;
 
 			vertex.position.x = position.left() + left_offset;
 			vertex.texture.x = texture.left() + borders.left;
@@ -302,7 +328,7 @@ namespace Yttrium
 
 		if (borders.right > 0)
 		{
-			right_offset = borders.right * _texture->size().width;
+			right_offset = borders.right * current_texture_2d()->size().width;
 
 			vertex.position.x = position.right() - right_offset;
 			vertex.texture.x = texture.right() - borders.right;
@@ -325,7 +351,7 @@ namespace Yttrium
 
 		if (borders.top > 0)
 		{
-			float top_offset = borders.top * _texture->size().height;
+			float top_offset = borders.top * current_texture_2d()->size().height;
 
 			// Inner top vertex row.
 
@@ -370,7 +396,7 @@ namespace Yttrium
 
 		if (borders.bottom > 0)
 		{
-			float bottom_offset = borders.bottom * _texture->size().height;
+			float bottom_offset = borders.bottom * current_texture_2d()->size().height;
 
 			// Inner bottom vertex row.
 
@@ -450,6 +476,17 @@ namespace Yttrium
 	PushProjection::~PushProjection()
 	{
 		static_cast<RendererImpl&>(_renderer).pop_projection();
+	}
+
+	PushTexture::PushTexture(Renderer& renderer, const Pointer<Texture2D>& texture)
+		: _renderer(renderer)
+	{
+		static_cast<RendererImpl&>(_renderer).push_texture(texture);
+	}
+
+	PushTexture::~PushTexture()
+	{
+		static_cast<RendererImpl&>(_renderer).pop_texture();
 	}
 
 	PushTransformation::PushTransformation(Renderer& renderer, const Matrix4& matrix)

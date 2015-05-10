@@ -122,7 +122,8 @@ namespace Yttrium
 			return;
 
 		renderer.set_color(_styles[WidgetStateType(state)].text_color);
-		renderer.set_texture(_font_texture);
+
+		PushTexture push_texture(renderer, _font_texture);
 
 		if (renderer.set_font(_font))
 		{

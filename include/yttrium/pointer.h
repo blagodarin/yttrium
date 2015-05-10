@@ -116,6 +116,13 @@ public:
 			return _pointable == pointer._pointable;
 		}
 
+		///
+
+		bool operator!=(const Pointer& pointer) const
+		{
+			return _pointable != pointer._pointable;
+		}
+
 	private:
 
 		Pointable* _pointable;
