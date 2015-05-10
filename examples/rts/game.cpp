@@ -137,6 +137,9 @@ void Game::on_update(const UpdateEvent& update)
 	_window->debug_text().clear()
 		<< "FPS: " << update.fps << "\n"
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
+		<< "Triangles: " << update.triangles << "\n"
+		<< "DrawCalls: " << update.draw_calls << "\n"
+		<< "TextureChanges: " << update.texture_changes << "\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
 		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll;
 }

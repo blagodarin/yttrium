@@ -249,6 +249,13 @@ namespace Yttrium
 		set_transformation(_transformation.back());
 	}
 
+	RendererImpl::Statistics RendererImpl::reset_statistics()
+	{
+		const auto result = _statistics;
+		_statistics = {};
+		return result;
+	}
+
 	void RendererImpl::set_debug_texture()
 	{
 		assert(_projection.size() == 1
@@ -282,6 +289,7 @@ namespace Yttrium
 		}
 		_texture_borders = MarginsF();
 		_font = TextureFont();
+		++_statistics._texture_changes;
 	}
 
 	BackendTexture2D* RendererImpl::current_texture_2d() const

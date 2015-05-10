@@ -30,6 +30,15 @@ namespace Yttrium
 
 		/// Maximum frame time in milliseconds.
 		int max_frame_time = 0;
+
+		/// Number of triangles rendered.
+		int triangles = 0;
+
+		/// Number of draw calls issued.
+		int draw_calls = 0;
+
+		/// Number of texture changes.
+		int texture_changes = 0;
 	};
 
 	///

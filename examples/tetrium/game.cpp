@@ -268,7 +268,10 @@ void Game::on_update(const UpdateEvent& update)
 {
 	_window->debug_text().clear()
 		<< "FPS: " << update.fps << "\n"
-		<< "MaxFrameTime: " << update.max_frame_time;
+		<< "MaxFrameTime: " << update.max_frame_time << "\n"
+		<< "Triangles: " << update.triangles << "\n"
+		<< "DrawCalls: " << update.draw_calls << "\n"
+		<< "TextureChanges: " << update.texture_changes;
 
 	if (_game_running)
 	{

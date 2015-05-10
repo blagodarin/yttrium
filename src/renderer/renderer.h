@@ -21,6 +21,13 @@ namespace Yttrium
 	{
 	public:
 
+		struct Statistics
+		{
+			int _triangles = 0;
+			int _draw_calls = 0;
+			int _texture_changes = 0;
+		};
+
 		static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
 
 		RendererImpl(WindowBackend& window, Allocator* allocator);
@@ -47,6 +54,7 @@ namespace Yttrium
 		void push_projection(const Matrix4& matrix);
 		void push_texture(const Pointer<Texture2D>& texture);
 		void push_transformation(const Matrix4& matrix);
+		Statistics reset_statistics();
 		void set_debug_texture();
 		void set_window_size(const Size& size);
 
@@ -97,6 +105,8 @@ namespace Yttrium
 		std::vector<Matrix4> _projection;
 		std::vector<std::pair<Pointer<Texture2D>, int>> _texture_stack;
 		std::vector<Matrix4> _transformation;
+
+		Statistics _statistics;
 	};
 }
 

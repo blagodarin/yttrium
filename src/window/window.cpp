@@ -171,6 +171,10 @@ namespace Yttrium
 				frames = 0;
 				max_frame_time = 0;
 			}
+			const auto renderer_statistics = _renderer->reset_statistics();
+			update.triangles = renderer_statistics._triangles;
+			update.draw_calls = renderer_statistics._draw_calls;
+			update.texture_changes = renderer_statistics._texture_changes;
 		}
 	}
 

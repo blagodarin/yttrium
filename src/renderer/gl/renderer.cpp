@@ -156,7 +156,11 @@ namespace Yttrium
 		_gl.VertexPointer(4, GL_FLOAT, vertices.element_size(), 0);
 
 		indices._buffer.bind();
+
 		_gl.DrawElements(GL_TRIANGLES, indices.size(), indices._gl_format, 0);
+		++_statistics._draw_calls;
+		_statistics._triangles += indices.size() / 3;
+
 		indices._buffer.unbind();
 
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
@@ -172,8 +176,6 @@ namespace Yttrium
 
 	void OpenGlRenderer::clear()
 	{
-		_gl.ClearColor(0.5, 0.5, 0.5, 0);
-		_gl.ClearDepth(1);
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
@@ -218,6 +220,9 @@ namespace Yttrium
 		_gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, DebugTexture::width, DebugTexture::height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, DebugTexture::data);
 		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
+		_gl.ClearColor(0.5, 0.5, 0.5, 0);
+		_gl.ClearDepth(1);
+
 		return true;
 	}
 
@@ -237,7 +242,9 @@ namespace Yttrium
 		_gl.EnableClientState(GL_VERTEX_ARRAY);
 		_gl.VertexPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].position);
 
-		_gl.DrawElements(GL_TRIANGLE_STRIP, _indices_2d.size(), GL_UNSIGNED_SHORT, &_indices_2d[0]);
+		_gl.DrawElements(GL_TRIANGLE_STRIP, _indices_2d.size(), GL_UNSIGNED_SHORT, _indices_2d.data());
+		++_statistics._draw_calls;
+		_statistics._triangles += _indices_2d.size() - 2;
 
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		_gl.DisableClientState(GL_COLOR_ARRAY);
