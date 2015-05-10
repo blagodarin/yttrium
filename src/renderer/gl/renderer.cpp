@@ -8,6 +8,10 @@
 
 #include <cassert>
 
+#if Y_IS_DEBUG
+	#include <iostream>
+#endif
+
 namespace Yttrium
 {
 	OpenGlRenderer::OpenGlRenderer(WindowBackend& window, Allocator* allocator)
@@ -101,6 +105,8 @@ namespace Yttrium
 		if (!is_target_enabled)
 			_gl.Disable(target);
 
+		_gl.BindTexture(target, 0);
+
 		return Pointer<Texture2D>(Y_NEW(_allocator, GlTexture2D)(format, _allocator, _gl, target, texture));
 	}
 
@@ -128,24 +134,23 @@ namespace Yttrium
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
 
-		size_t data_offset = 0;
 		vertices._buffer.bind();
+
+		size_t data_offset = sizeof(float) * 4;
 
 		if (vertices.format() & VertexBuffer::Rgba4F)
 		{
 			_gl.EnableClientState(GL_COLOR_ARRAY);
-			data_offset += sizeof(float) * 4;
 			_gl.ColorPointer(4, GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
+			data_offset += sizeof(float) * 4;
 		}
 
 		if (vertices.format() & VertexBuffer::Uv2F)
 		{
 			_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
-			data_offset += sizeof(float) * 2;
 			_gl.TexCoordPointer(2, GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
+			data_offset += sizeof(float) * 2;
 		}
-		else
-			_gl.Disable(GL_TEXTURE_2D);
 
 		_gl.EnableClientState(GL_VERTEX_ARRAY);
 		_gl.VertexPointer(4, GL_FLOAT, vertices.element_size(), 0);
@@ -159,8 +164,6 @@ namespace Yttrium
 			_gl.DisableClientState(GL_COLOR_ARRAY);
 		if (vertices.format() & VertexBuffer::Uv2F)
 			_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
-		else
-			_gl.Enable(GL_TEXTURE_2D);
 
 		vertices._buffer.unbind();
 
@@ -189,6 +192,17 @@ namespace Yttrium
 
 	bool OpenGlRenderer::initialize()
 	{
+#if Y_IS_DEBUG
+		if (_gl.KHR_debug)
+		{
+			_gl.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			_gl.DebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* opaque)
+			{
+				static_cast<const OpenGlRenderer*>(opaque)->debug_callback(source, type, id, severity, length, message);
+			}, this);
+		}
+#endif
+
 		if (!check_min_version(1, 2))
 			return false; // TODO: Report error.
 
@@ -265,4 +279,11 @@ namespace Yttrium
 		const int actual_minor = _gl.VERSION[2] - '0';
 		return actual_major > major || (actual_major == major && actual_minor >= minor);
 	}
+
+#if Y_IS_DEBUG
+	void OpenGlRenderer::debug_callback(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar* message) const
+	{
+		std::cerr << message << std::endl;
+	}
+#endif
 }

@@ -11,9 +11,9 @@ namespace Yttrium
 	public:
 
 		IndexBufferImpl(Format format, size_t size, size_t element_size)
-			: _format(format)
-			, _size(size)
+			: _size(size)
 			, _element_size(element_size)
+			, _format(format)
 		{
 		}
 
@@ -22,9 +22,9 @@ namespace Yttrium
 
 	protected:
 
-		const Format _format;
 		const size_t _size;
 		const size_t _element_size;
+		const Format _format;
 	};
 
 	class VertexBufferImpl : public VertexBuffer
@@ -32,9 +32,9 @@ namespace Yttrium
 	public:
 
 		VertexBufferImpl(unsigned format, size_t size, size_t element_size)
-			: _format(format)
-			, _size(size)
+			: _size(size)
 			, _element_size(element_size)
+			, _format(format)
 		{
 		}
 
@@ -45,9 +45,9 @@ namespace Yttrium
 
 	protected:
 
-		const unsigned _format;
 		const size_t _size;
 		const size_t _element_size;
+		const unsigned _format;
 	};
 }
 

@@ -32,6 +32,9 @@ namespace Yttrium
 	private:
 
 		bool check_min_version(int major, int minor);
+#if Y_IS_DEBUG
+		void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message) const;
+#endif
 
 	private:
 

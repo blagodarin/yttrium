@@ -276,6 +276,20 @@ GLEXTENSION(EXT_texture_filter_anisotropic)
 	GLFLOAT(MAX_TEXTURE_MAX_ANISOTROPY_EXT)
 	GLEND
 
+GLEXTENSION(KHR_debug)
+	GLEXTFUNC(DebugMessageCallback, GLvoid, (GLDEBUGPROC, const GLvoid*))
+	GLEXTFUNC(DebugMessageControl, GLvoid, (GLenum, GLenum, GLenum, GLsizei, const GLuint*, GLboolean))
+	GLEXTFUNC(DebugMessageInsert, GLvoid, (GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar*))
+	GLEXTFUNC(GetDebugMessageLog, GLuint, (GLuint, GLsizei, GLenum*, GLenum*, GLuint*, GLenum*, GLsizei*, GLchar*))
+	GLEXTFUNC(GetObjectLabel, GLvoid, (GLenum, GLuint, GLsizei, GLsizei*, GLchar*))
+	GLEXTFUNC(GetObjectPtrLabel, GLvoid, (GLvoid*, GLsizei, GLsizei*, GLchar*))
+	GLEXTFUNC(GetPointerv, GLvoid, (GLenum, GLvoid**))
+	GLEXTFUNC(ObjectLabel, GLvoid, (GLenum, GLuint, GLsizei, const GLchar*))
+	GLEXTFUNC(ObjectPtrLabel, GLvoid, (GLvoid*, GLsizei, const GLchar*))
+	GLEXTFUNC(PopDebugGroup, GLvoid, ())
+	GLEXTFUNC(PushDebugGroup, GLvoid, (GLenum, GLuint, GLsizei, const GLchar*))
+	GLEND
+
 #endif // __GLAPI_API
 
 // After all, clear all the definitions (inluding the input ones).

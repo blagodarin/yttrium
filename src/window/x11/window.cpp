@@ -4,21 +4,21 @@
 #include <yttrium/static_string.h>
 #include "screen.h"
 
+typedef ::GLXContext (*glXCreateContextAttribsARBProc)(::Display*, ::GLXFBConfig, ::GLXContext, Bool, const int*);
+
 namespace Yttrium
 {
 
 namespace
 {
 
-bool check_glx_version(::Display* display, int major, int minor)
+struct XDeleter
 {
-	int glx_major = 0;
-	int glx_minor = 0;
-
-	return glXQueryVersion(display, &glx_major, &glx_minor)
-		&& glx_major == major // GLX 2.0 may be completely different from GLX 1.x.
-		&& glx_minor >= minor;
-}
+	void operator()(void* ptr)
+	{
+		::XFree(ptr);
+	}
+};
 
 void fix_window_size(::Display* display, ::Window window, const Size& size)
 {
@@ -32,12 +32,23 @@ void fix_window_size(::Display* display, ::Window window, const Size& size)
 	::XSetWMNormalHints(display, window, &size_hints);
 }
 
-bool initialize_window(::Display* display, int screen, const Size& size, ::Window* window, ::GLXContext* glx_context)
+// X error handling (see below).
+bool error_occurred = false;
+int error_handler(::Display*, ::XErrorEvent*)
+{
+	error_occurred = true;
+	return 0;
+}
+
+bool initialize_window(::Display* display, int screen, const Size& size, ::Window& window, ::GLXContext& glx_context)
 {
 	// GLXFBConfig API requires GLX 1.3.
 	// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
-
-	if (!check_glx_version(display, 1, 4))
+	int glx_version_major = 0;
+	int glx_version_minor = 0;
+	if (!::glXQueryVersion(display, &glx_version_major, &glx_version_minor)
+		|| glx_version_major != 1 // GLX 2.0 may be completely different from GLX 1.x.
+		|| glx_version_minor < 4)
 		return false;
 
 	const int attributes[] =
@@ -58,72 +69,99 @@ bool initialize_window(::Display* display, int screen, const Size& size, ::Windo
 	};
 
 	int fbc_count = 0;
-
-	::GLXFBConfig* fbc = ::glXChooseFBConfig(display, screen, attributes, &fbc_count);
+	std::unique_ptr<::GLXFBConfig[], XDeleter> fbc(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
 	if (!fbc)
 		return false;
 
-	int best_fbc_index = -1;
+	std::unique_ptr<::XVisualInfo, XDeleter> best_vi;
+	::GLXFBConfig best_fbc = {};
 
 	for (int i = 0; i < fbc_count; ++i)
 	{
 		// The official OpenGL example suggest sorting by GLX_SAMPLE_BUFFERS
 		// and GLX_SAMPLES, but we have no successful experience in using it.
-
-		::XVisualInfo* vi = ::glXGetVisualFromFBConfig(display, fbc[i]);
+		std::unique_ptr<::XVisualInfo, XDeleter> vi(::glXGetVisualFromFBConfig(display, fbc[i]));
 		if (vi->depth == 24) // A depth of 32 will give us an ugly result.
 		{
-			best_fbc_index = i;
-			i = fbc_count; // Finish the loop.
+			best_vi = std::move(vi);
+			best_fbc = fbc[i];
+			break;
 		}
-		::XFree(vi);
 	}
 
-	::XVisualInfo* vi = (best_fbc_index >= 0)
-		? ::glXGetVisualFromFBConfig(display, fbc[best_fbc_index])
-		: nullptr;
-
-	::XFree(fbc);
-
-	if (!vi)
+	if (!best_vi)
 		return false;
 
-	screen = vi->screen; // TODO: Understand, why.
+	fbc.reset();
 
-	*glx_context = ::glXCreateContext(display, vi, nullptr, True);
+	screen = best_vi->screen; // TODO: Understand, why.
 
-	if (*glx_context)
+	const auto check_extension = [](const char* list, const char* name)
 	{
-		if (::glXIsDirect(display, *glx_context))
+		const size_t name_size = ::strlen(name);
+		while ((list = ::strstr(list, name)))
 		{
-			::Window root_window = RootWindow(display, screen);
-
-			::XSetWindowAttributes swa;
-
-			swa.colormap = ::XCreateColormap(display, root_window, vi->visual, AllocNone);
-			swa.background_pixmap = None;
-			swa.border_pixel = 0;
-			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
-
-			*window = ::XCreateWindow(display, root_window,
-				0, 0, size.width, size.height, 0, vi->depth, InputOutput, vi->visual,
-				CWBorderPixel | CWColormap | CWEventMask, &swa);
-
-			if (*window != None)
-			{
-				::glXMakeCurrent(display, *window, *glx_context);
-				::XFree(vi);
+			list += name_size;
+			if (*list == ' ' || *list == 0)
 				return true;
-			}
+		}
+		return false;
+	};
 
-			::XFreeColormap(display, swa.colormap);
+	const char* glx_extensions = ::glXQueryExtensionsString(display, screen);
+	if (!check_extension(glx_extensions, "GLX_ARB_create_context"))
+		return false;
+
+	::glXCreateContextAttribsARBProc glXCreateContextAttribsARB = reinterpret_cast<glXCreateContextAttribsARBProc>(::glXGetProcAddress(reinterpret_cast<const GLubyte*>("glXCreateContextAttribsARB")));
+	if (!glXCreateContextAttribsARB)
+		return false;
+
+	const int context_attributes[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 1,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+#if Y_IS_DEBUG
+		GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+#endif
+		None
+	};
+
+	// The actual context creation is wrapped in error handling code as advised
+	// by the official OpenGL context creation tutorial. The tutorial also warns
+	// that X error handling is global and not thread-safe.
+	const auto old_error_handler = ::XSetErrorHandler(error_handler);
+	glx_context = glXCreateContextAttribsARB(display, best_fbc, nullptr, True, context_attributes);
+	::XSync(display, False); // To ensure any errors generated are processed.
+	::XSetErrorHandler(old_error_handler);
+	if (error_occurred || !glx_context)
+		return false;
+
+	if (::glXIsDirect(display, glx_context))
+	{
+		::Window root_window = RootWindow(display, screen);
+
+		::XSetWindowAttributes swa;
+
+		swa.colormap = ::XCreateColormap(display, root_window, best_vi->visual, AllocNone);
+		swa.background_pixmap = None;
+		swa.border_pixel = 0;
+		swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
+
+		window = ::XCreateWindow(display, root_window,
+			0, 0, size.width, size.height, 0, best_vi->depth, InputOutput, best_vi->visual,
+			CWBorderPixel | CWColormap | CWEventMask, &swa);
+
+		if (window != None)
+		{
+			::glXMakeCurrent(display, window, glx_context);
+			return true;
 		}
 
-		::glXDestroyContext(display, *glx_context);
-		*glx_context = nullptr;
+		::XFreeColormap(display, swa.colormap);
 	}
 
-	::XFree(vi);
+	::glXDestroyContext(display, glx_context);
+	glx_context = nullptr;
 
 	return false;
 }
@@ -435,7 +473,7 @@ std::unique_ptr<WindowBackend> WindowBackend::create(const ScreenImpl& screen, c
 {
 	::Window window_handle;
 	::GLXContext glx_context;
-	if (!initialize_window(screen.display(), screen.screen(), size, &window_handle, &glx_context))
+	if (!initialize_window(screen.display(), screen.screen(), size, window_handle, glx_context))
 		return {};
 	return std::make_unique<WindowBackend>(screen.display(), window_handle, glx_context, size, callbacks);
 }
