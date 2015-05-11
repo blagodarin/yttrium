@@ -209,6 +209,16 @@
 /// %Yttrium namespace.
 namespace Yttrium
 {
+	///
+	struct Immovable
+	{
+		Immovable() = default;
+		Immovable(const Immovable&) = delete;
+		Immovable(Immovable&&) = delete;
+		~Immovable() = default;
+		Immovable& operator=(const Immovable&) = delete;
+		Immovable& operator=(Immovable&&) = delete;
+	};
 }
 
 #endif // __Y_GLOBAL_H

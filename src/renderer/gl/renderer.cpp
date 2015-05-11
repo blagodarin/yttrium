@@ -236,8 +236,6 @@ namespace Yttrium
 	{
 		_gl.MatrixMode(GL_PROJECTION);
 		_gl.LoadMatrixf(matrix.data());
-		_gl.MatrixMode(GL_MODELVIEW);
-		_gl.LoadMatrixf(Matrix4().data());
 	}
 
 	void OpenGlRenderer::set_texture(const BackendTexture2D* texture)

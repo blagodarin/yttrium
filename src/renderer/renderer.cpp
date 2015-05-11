@@ -206,9 +206,19 @@ namespace Yttrium
 	void RendererImpl::pop_projection()
 	{
 		flush_2d();
-		_projection.pop_back();
-		if (!_projection.empty())
-			set_projection(_projection.back());
+		assert(_matrix_stack.size() >= 2);
+		assert(_matrix_stack.back().second == MatrixType::Transformation);
+		_matrix_stack.pop_back();
+		assert(_matrix_stack.back().second == MatrixType::Projection);
+		_matrix_stack.pop_back();
+		if (_matrix_stack.empty())
+			return;
+		assert(_matrix_stack.back().second == MatrixType::Transformation);
+		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
+			[](const std::pair<Matrix4, MatrixType>& matrix) { return matrix.second == MatrixType::Projection; });
+		assert(last_projection != _matrix_stack.rend());
+		set_projection(last_projection->first);
+		set_transformation(_matrix_stack.back().first);
 	}
 
 	void RendererImpl::pop_texture()
@@ -227,15 +237,34 @@ namespace Yttrium
 	void RendererImpl::pop_transformation()
 	{
 		flush_2d();
-		_transformation.pop_back();
-		set_transformation(_transformation.empty() ? Matrix4() : _transformation.back());
+		assert(_matrix_stack.size() >= 3); // Projection, default transformation, transformation to pop.
+		assert(_matrix_stack.back().second == MatrixType::Transformation);
+		_matrix_stack.pop_back();
+		assert(_matrix_stack.back().second == MatrixType::Transformation);
+		set_transformation(_matrix_stack.back().first);
 	}
 
-	void RendererImpl::push_projection(const Matrix4& matrix)
+	void RendererImpl::push_projection_2d(const Matrix4& matrix)
 	{
 		flush_2d();
-		_projection.emplace_back(matrix);
-		set_projection(matrix);
+		_matrix_stack.emplace_back(matrix, MatrixType::Projection);
+		set_projection(_matrix_stack.back().first);
+		_matrix_stack.emplace_back(Matrix4(), MatrixType::Transformation);
+		set_transformation(_matrix_stack.back().first);
+	}
+
+	void RendererImpl::push_projection_3d(const Matrix4& matrix)
+	{
+		flush_2d();
+		_matrix_stack.emplace_back(matrix, MatrixType::Projection);
+		set_projection(_matrix_stack.back().first);
+		// Make Y point forward and Z point up.
+		_matrix_stack.emplace_back(Matrix4(
+			1,  0,  0,  0,
+			0,  0,  1,  0,
+			0, -1,  0,  0,
+			0,  0,  0,  1), MatrixType::Transformation);
+		set_transformation(_matrix_stack.back().first);
 	}
 
 	void RendererImpl::push_texture(const Pointer<Texture2D>& texture)
@@ -253,13 +282,9 @@ namespace Yttrium
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
 	{
-		const Matrix4 initial_transformation(
-			1,  0,  0,  0,
-			0,  0,  1,  0,
-			0, -1,  0,  0,
-			0,  0,  0,  1);
-		_transformation.emplace_back((_transformation.empty() ? initial_transformation : _transformation.back()) * matrix);
-		set_transformation(_transformation.back());
+		assert(_matrix_stack.size() >= 2 && _matrix_stack.back().second == MatrixType::Transformation);
+		_matrix_stack.emplace_back(_matrix_stack.back().first * matrix, MatrixType::Transformation);
+		set_transformation(_matrix_stack.back().first);
 	}
 
 	RendererImpl::Statistics RendererImpl::reset_statistics()
@@ -478,13 +503,24 @@ namespace Yttrium
 #endif
 	}
 
-	PushProjection::PushProjection(Renderer& renderer, const Matrix4& matrix)
+	Push2D::Push2D(Renderer& renderer)
 		: _renderer(renderer)
 	{
-		static_cast<RendererImpl&>(_renderer).push_projection(matrix);
+		static_cast<RendererImpl&>(_renderer).push_projection_2d(Matrix4::projection_2d(_renderer.window_size()));
 	}
 
-	PushProjection::~PushProjection()
+	Push2D::~Push2D()
+	{
+		static_cast<RendererImpl&>(_renderer).pop_projection();
+	}
+
+	Push3D::Push3D(Renderer& renderer, const Matrix4& matrix)
+		: _renderer(renderer)
+	{
+		static_cast<RendererImpl&>(_renderer).push_projection_3d(matrix);
+	}
+
+	Push3D::~Push3D()
 	{
 		static_cast<RendererImpl&>(_renderer).pop_projection();
 	}

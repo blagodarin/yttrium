@@ -53,7 +53,8 @@ namespace Yttrium
 		void pop_projection();
 		void pop_texture();
 		void pop_transformation();
-		void push_projection(const Matrix4& matrix);
+		void push_projection_2d(const Matrix4& matrix);
+		void push_projection_3d(const Matrix4& matrix);
 		void push_texture(const Pointer<Texture2D>& texture);
 		void push_transformation(const Matrix4& matrix);
 		Statistics reset_statistics();
@@ -104,13 +105,23 @@ namespace Yttrium
 		TextureFont _font;
 		Vector2     _font_size;
 
-		Pointer<Texture2D> _debug_texture;
-
-		std::vector<Matrix4> _projection;
-		std::vector<std::pair<Pointer<Texture2D>, int>> _texture_stack;
-		std::vector<Matrix4> _transformation;
+	protected:
 
 		Statistics _statistics;
+
+	private:
+
+		Pointer<Texture2D> _debug_texture;
+
+		enum class MatrixType
+		{
+			Projection,
+			Transformation,
+		};
+
+		std::vector<std::pair<Matrix4, MatrixType>> _matrix_stack;
+		std::vector<std::pair<Pointer<Texture2D>, int>> _texture_stack;
+
 #if Y_IS_DEBUG
 		std::vector<const BackendTexture2D*> _seen_textures; // For redundancy statistics.
 #endif

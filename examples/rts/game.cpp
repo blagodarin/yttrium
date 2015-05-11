@@ -99,7 +99,7 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 		return;
 
 	const auto& window_size = renderer.window_size();
-	PushProjection projection(renderer,
+	Push3D projection(renderer,
 		Matrix4::perspective(static_cast<float>(window_size.width) / window_size.height,
 			90,       // Vertical FOV angle in degrees.
 			1, 100)); // Near/far plane distance.

@@ -147,7 +147,7 @@ namespace Yttrium
 			_callbacks.on_update(update);
 			{
 				_renderer->clear();
-				PushProjection projection(*_renderer, Matrix4::projection_2d(_size));
+				Push2D projection(*_renderer);
 				_gui->render(_cursor);
 				draw_debug();
 			}

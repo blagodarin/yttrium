@@ -112,20 +112,15 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushProjection
+	class Y_API Push2D : public Immovable
 	{
 	public:
 
 		///
-		PushProjection(Renderer& renderer, const Matrix4& matrix);
+		Push2D(Renderer& renderer);
 
 		///
-		~PushProjection();
-
-		PushProjection(const PushProjection&) = delete;
-		PushProjection(PushProjection&&) = delete;
-		PushProjection& operator=(const PushProjection&) = delete;
-		PushProjection& operator=(PushProjection&&) = delete;
+		~Push2D();
 
 	private:
 
@@ -133,7 +128,23 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushTexture
+	class Y_API Push3D : public Immovable
+	{
+	public:
+
+		///
+		Push3D(Renderer& renderer, const Matrix4& projection);
+
+		///
+		~Push3D();
+
+	private:
+
+		Renderer& _renderer;
+	};
+
+	///
+	class Y_API PushTexture : public Immovable
 	{
 	public:
 
@@ -143,18 +154,13 @@ namespace Yttrium
 		///
 		~PushTexture();
 
-		PushTexture(const PushTexture&) = delete;
-		PushTexture(PushTexture&&) = delete;
-		PushTexture& operator=(const PushTexture&) = delete;
-		PushTexture& operator=(PushTexture&&) = delete;
-
 	private:
 
 		Renderer& _renderer;
 	};
 
 	///
-	class Y_API PushTransformation
+	class Y_API PushTransformation : public Immovable
 	{
 	public:
 
@@ -164,11 +170,6 @@ namespace Yttrium
 
 		/// Pops a matrix from the transformation stack and applies the next matrix.
 		~PushTransformation();
-
-		PushTransformation(const PushTransformation&) = delete;
-		PushTransformation(PushTransformation&&) = delete;
-		PushTransformation& operator=(const PushTransformation&) = delete;
-		PushTransformation& operator=(PushTransformation&&) = delete;
 
 	private:
 
