@@ -2,6 +2,7 @@
 
 #include <yttrium/matrix.h>
 #include "../memory/allocatable.h"
+#include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
 
@@ -14,6 +15,16 @@ namespace Yttrium
 		auto renderer = std::make_unique<OpenGlRenderer>(window, allocator);
 		if (!renderer->initialize())
 			return {};
+		ImageFormat debug_texture_format;
+		debug_texture_format.set_width(DebugTexture::width);
+		debug_texture_format.set_height(DebugTexture::height);
+		debug_texture_format.set_orientation(ImageOrientation::XRightYDown);
+		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
+		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data);
+		if (!renderer->_debug_texture)
+			return {};
+		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
+		// TODO: No mipmapping for the debug texture.
 		return std::move(renderer);
 	}
 
@@ -194,13 +205,10 @@ namespace Yttrium
 		_projection.pop_back();
 		if (!_projection.empty())
 			set_projection(_projection.back());
-		else
-			_debug_rendering = false;
 	}
 
 	void RendererImpl::pop_texture()
 	{
-		assert(!_debug_rendering);
 		assert(_texture_stack.size() > 1 || (_texture_stack.size() == 1 && _texture_stack.back().second > 1));
 		if (_texture_stack.back().second > 1)
 		{
@@ -213,7 +221,6 @@ namespace Yttrium
 
 	void RendererImpl::pop_transformation()
 	{
-		assert(!_debug_rendering);
 		flush_2d();
 		_transformation.pop_back();
 		set_transformation(_transformation.empty() ? Matrix4() : _transformation.back());
@@ -221,7 +228,6 @@ namespace Yttrium
 
 	void RendererImpl::push_projection(const Matrix4& matrix)
 	{
-		assert(!_debug_rendering);
 		flush_2d();
 		_projection.emplace_back(matrix);
 		set_projection(matrix);
@@ -229,7 +235,6 @@ namespace Yttrium
 
 	void RendererImpl::push_texture(const Pointer<Texture2D>& texture)
 	{
-		assert(!_debug_rendering);
 		assert(!_texture_stack.empty());
 		if (_texture_stack.back().first == texture)
 		{
@@ -244,7 +249,6 @@ namespace Yttrium
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
 	{
-		assert(!_debug_rendering);
 		_transformation.emplace_back(_transformation.empty() ? matrix : _transformation.back() * matrix);
 		set_transformation(_transformation.back());
 	}
@@ -254,15 +258,6 @@ namespace Yttrium
 		const auto result = _statistics;
 		_statistics = {};
 		return result;
-	}
-
-	void RendererImpl::set_debug_texture()
-	{
-		assert(_projection.size() == 1
-			&& _texture_stack.size() == 1 && _texture_stack.back().second == 1
-			&& !_debug_rendering);
-		set_debug_texture_impl();
-		_debug_rendering = true;
 	}
 
 	void RendererImpl::set_window_size(const Size& size)

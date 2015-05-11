@@ -1,11 +1,11 @@
 #ifndef __RENDERER_DEBUG_RENDERER_H
 #define __RENDERER_DEBUG_RENDERER_H
 
+#include <yttrium/renderer.h>
+
 namespace Yttrium
 {
 	class RendererImpl;
-	class Size;
-	class StaticString;
 
 	class DebugRenderer
 	{
@@ -22,6 +22,7 @@ namespace Yttrium
 	private:
 
 		RendererImpl& _renderer;
+		PushTexture _debug_texture;
 	};
 }
 

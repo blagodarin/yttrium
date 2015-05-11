@@ -47,6 +47,7 @@ namespace Yttrium
 		virtual void take_screenshot(Image& image) = 0;
 
 		Allocator* allocator() const { return _allocator; }
+		Pointer<Texture2D> debug_texture() const { return _debug_texture; }
 		void flush_2d();
 		void pop_projection();
 		void pop_texture();
@@ -55,14 +56,12 @@ namespace Yttrium
 		void push_texture(const Pointer<Texture2D>& texture);
 		void push_transformation(const Matrix4& matrix);
 		Statistics reset_statistics();
-		void set_debug_texture();
 		void set_window_size(const Size& size);
 
 	protected:
 
 		virtual void flush_2d_impl() = 0;
 		virtual bool initialize() = 0;
-		virtual void set_debug_texture_impl() = 0;
 		virtual void set_projection(const Matrix4& matrix) = 0;
 		virtual void set_transformation(const Matrix4& matrix) = 0;
 		virtual void update_window_size() = 0;
@@ -100,7 +99,7 @@ namespace Yttrium
 		TextureFont _font;
 		Vector2     _font_size;
 
-		bool _debug_rendering = false;
+		Pointer<Texture2D> _debug_texture;
 
 		std::vector<Matrix4> _projection;
 		std::vector<std::pair<Pointer<Texture2D>, int>> _texture_stack;

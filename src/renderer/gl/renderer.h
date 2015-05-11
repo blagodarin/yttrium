@@ -11,7 +11,6 @@ namespace Yttrium
 	public:
 
 		OpenGlRenderer(WindowBackend& window, Allocator* allocator);
-		~OpenGlRenderer() override;
 
 		// Renderer
 		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
@@ -24,7 +23,6 @@ namespace Yttrium
 		void take_screenshot(Image&) override;
 		void flush_2d_impl() override;
 		bool initialize() override;
-		void set_debug_texture_impl() override;
 		void set_projection(const Matrix4&) override;
 		void set_transformation(const Matrix4&) override;
 		void update_window_size() override;
@@ -38,8 +36,7 @@ namespace Yttrium
 
 	private:
 
-		GlApi  _gl;
-		GLuint _debug_texture = 0;
+		GlApi _gl;
 	};
 }
 

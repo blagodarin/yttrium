@@ -21,8 +21,8 @@ namespace Yttrium
 
 	DebugRenderer::DebugRenderer(RendererImpl& renderer)
 		: _renderer(renderer)
+		, _debug_texture(_renderer, _renderer.debug_texture())
 	{
-		_renderer.set_debug_texture();
 		set_color(1, 1, 1);
 	}
 

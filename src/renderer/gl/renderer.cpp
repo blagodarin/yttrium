@@ -2,7 +2,6 @@
 
 #include <yttrium/matrix.h>
 #include <yttrium/utils.h>
-#include "../debug_texture.h"
 #include "buffer.h"
 #include "texture.h"
 
@@ -18,11 +17,6 @@ namespace Yttrium
 		: RendererImpl(window, allocator)
 	{
 		_gl.initialize(window);
-	}
-
-	OpenGlRenderer::~OpenGlRenderer()
-	{
-		_gl.DeleteTextures(1, &_debug_texture);
 	}
 
 	std::unique_ptr<IndexBuffer> OpenGlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
@@ -212,14 +206,6 @@ namespace Yttrium
 		_gl.Enable(GL_BLEND);
 		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		_gl.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-		_gl.GenTextures(1, &_debug_texture);
-		if (!_debug_texture)
-			return false; // TODO: Report error.
-		_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
-		_gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, DebugTexture::width, DebugTexture::height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, DebugTexture::data);
-		_gl.BindTexture(GL_TEXTURE_2D, 0);
-
 		_gl.ClearColor(0.5, 0.5, 0.5, 0);
 		_gl.ClearDepth(1);
 
@@ -233,7 +219,7 @@ namespace Yttrium
 		_gl.EnableClientState(GL_COLOR_ARRAY);
 		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].color);
 
-		if (_debug_rendering || current_texture_2d())
+		if (current_texture_2d())
 		{
 			_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
 			_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].texture);
@@ -249,15 +235,6 @@ namespace Yttrium
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		_gl.DisableClientState(GL_COLOR_ARRAY);
 		_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
-	}
-
-	void OpenGlRenderer::set_debug_texture_impl()
-	{
-		_gl.BindTexture(GL_TEXTURE_2D, _debug_texture);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
 	void OpenGlRenderer::set_projection(const Matrix4& matrix)
