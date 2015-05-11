@@ -39,10 +39,29 @@ void Game::on_key_event(const KeyEvent& event)
 
 	switch (event.key)
 	{
-	case Key::Up: _pitch += 5; break;
-	case Key::Down: _pitch -= 5; break;
-	case Key::Left: _yaw -= 5; break;
-	case Key::Right: _yaw += 5; break;
+	case Key::Up:
+		if (_pitch < 90)
+			_pitch += 5;
+		break;
+
+	case Key::Down:
+		if (_pitch > -90)
+			_pitch -= 5;
+		break;
+
+	case Key::Left:
+		if (_yaw > -180)
+			_yaw -= 5;
+		else
+			_yaw = 175;
+		break;
+
+	case Key::Right:
+		if (_yaw < 175)
+			_yaw += 5;
+		else
+			_yaw = -180;
+		break;
 
 	case Key::Escape:
 		_window->close();
@@ -51,11 +70,11 @@ void Game::on_key_event(const KeyEvent& event)
 	case Key::A: _position.x -= 1; break;
 	case Key::D: _position.x += 1; break;
 	case Key::E: _roll += 5; break;
-	case Key::F: _position.y -= 1; break;
+	case Key::F: _position.z -= 1; break;
 	case Key::Q: _roll -= 5; break;
-	case Key::R: _position.y += 1; break;
-	case Key::S: _position.z += 1; break;
-	case Key::W: _position.z -= 1; break;
+	case Key::R: _position.z += 1; break;
+	case Key::S: _position.y -= 1; break;
+	case Key::W: _position.y += 1; break;
 
 	case Key::Grave:
 		_window->set_console_visible(!_window->is_console_visible());
@@ -103,33 +122,6 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	_cube->draw(Vector4(0, 0, 2));
 	_cube->draw(Vector4(0, 0, 4));
 	_cube->draw(Vector4(0, 0, 6));
-
-	const auto angle = Timer::clock() / 5 % 360;
-
-	for (int i = 0; i < 10; ++i)
-	{
-		const auto z = -4 - 2 * i;
-		{
-			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, 1, 0)));
-			_cube->draw(Vector4( 2, -2,  z));
-			_cube->draw(Vector4( 2, -2, -z));
-		}
-		{
-			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(1, 0, 0)));
-			_cube->draw(Vector4(-2, -2,  z));
-			_cube->draw(Vector4(-2, -2, -z));
-		}
-		{
-			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(-1, 0, 0)));
-			_cube->draw(Vector4( 2,  2,  z));
-			_cube->draw(Vector4( 2,  2, -z));
-		}
-		{
-			PushTransformation transformation(renderer, Matrix4::rotation(angle, Vector4(0, -1, 0)));
-			_cube->draw(Vector4(-2,  2,  z));
-			_cube->draw(Vector4(-2,  2, -z));
-		}
-	}
 }
 
 void Game::on_update(const UpdateEvent& update)

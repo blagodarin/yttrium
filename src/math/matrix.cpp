@@ -32,9 +32,9 @@ namespace Yttrium
 
 	Matrix4 Matrix4::camera(const Vector4& position, float pitch, float yaw, float roll)
 	{
-		return Matrix4::rotation(roll, Vector4(0, 0, 1))
+		return Matrix4::rotation(roll, Vector4(0, -1, 0))
 			* Matrix4::rotation(pitch, Vector4(-1, 0, 0))
-			* Matrix4::rotation(yaw, Vector4(0, 1, 0))
+			* Matrix4::rotation(yaw, Vector4(0, 0, 1))
 			* Matrix4::translation(-position);
 	}
 

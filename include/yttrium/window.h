@@ -40,7 +40,7 @@ namespace Yttrium
 		/// Number of texture switches.
 		int texture_switches = 0;
 
-		/// Number of redundant texture switches, i.e. those which set a texture that has already been set in that frame.
+		/// Number of redundant texture switches, i.e. those which set a texture that had already been set in that frame.
 		/// \note Works only in debug mode.
 		int redundant_texture_switches = 0;
 	};

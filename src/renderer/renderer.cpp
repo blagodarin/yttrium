@@ -253,7 +253,12 @@ namespace Yttrium
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
 	{
-		_transformation.emplace_back(_transformation.empty() ? matrix : _transformation.back() * matrix);
+		const Matrix4 initial_transformation(
+			1,  0,  0,  0,
+			0,  0,  1,  0,
+			0, -1,  0,  0,
+			0,  0,  0,  1);
+		_transformation.emplace_back((_transformation.empty() ? initial_transformation : _transformation.back()) * matrix);
 		set_transformation(_transformation.back());
 	}
 

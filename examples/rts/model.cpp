@@ -80,7 +80,7 @@ CubeModel::CubeModel(Renderer& renderer)
 ChessboardModel::ChessboardModel(Renderer& renderer)
 	: Model(renderer)
 {
-	const int size = 8;
+	const int size = 128;
 
 	struct Vertex
 	{
@@ -127,7 +127,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 		for (int x = 0; x < size; ++x)
 		{
 			const bool black = (x ^ y) & 1;
-			pixels.emplace_back(black ? 0xff000000 : 0xffffffff);
+			pixels.emplace_back(black ? 0xff000000 : 0xffdddddd);
 		}
 	}
 
