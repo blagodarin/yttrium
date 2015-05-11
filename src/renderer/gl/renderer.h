@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	class OpenGlRenderer: public RendererImpl
+	class OpenGlRenderer : public RendererImpl
 	{
 	public:
 
@@ -14,7 +14,7 @@ namespace Yttrium
 
 		// Renderer
 		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
-		Pointer<Texture2D> create_texture_2d(const ImageFormat&, const void*) override;
+		Pointer<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
 		std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t, const void*) override;
 		void draw_triangles(const VertexBuffer&, const IndexBuffer&) override;
 

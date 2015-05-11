@@ -59,7 +59,7 @@ namespace Yttrium
 		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
 
 		///
-		virtual Pointer<Texture2D> create_texture_2d(const ImageFormat& format, const void* data) = 0;
+		virtual Pointer<Texture2D> create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps = false) = 0;
 
 		///
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;

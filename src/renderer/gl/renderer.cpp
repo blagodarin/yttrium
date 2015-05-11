@@ -32,7 +32,7 @@ namespace Yttrium
 		return std::make_unique<GLIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
 	}
 
-	Pointer<Texture2D> OpenGlRenderer::create_texture_2d(const ImageFormat& format, const void* data)
+	Pointer<Texture2D> OpenGlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
 		// NOTE: Keep the new pixel formats in sync with these arrays!
 
@@ -82,18 +82,18 @@ namespace Yttrium
 		// TODO: Set pixel row alignment if required.
 
 		_gl.BindTexture(GL_TEXTURE_2D, texture);
-		_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 		_gl.TexImage2D(GL_TEXTURE_2D, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);
-
-		const auto is_target_enabled = _gl.IsEnabled(GL_TEXTURE_2D);
-		_gl.Enable(GL_TEXTURE_2D); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].
-		_gl.GenerateMipmap(GL_TEXTURE_2D);
-		if (!is_target_enabled)
-			_gl.Disable(GL_TEXTURE_2D);
-
+		if (!no_mipmaps)
+		{
+			const auto is_target_enabled = _gl.IsEnabled(GL_TEXTURE_2D);
+			_gl.Enable(GL_TEXTURE_2D); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].
+			_gl.GenerateMipmap(GL_TEXTURE_2D);
+			if (!is_target_enabled)
+				_gl.Disable(GL_TEXTURE_2D);
+		}
 		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
-		return Pointer<Texture2D>(Y_NEW(_allocator, GlTexture2D)(format, _allocator, _gl, texture));
+		return Pointer<Texture2D>(Y_NEW(_allocator, GLTexture2D)(_allocator, format, !no_mipmaps, _gl, texture));
 	}
 
 	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
@@ -200,6 +200,7 @@ namespace Yttrium
 		_gl.Enable(GL_TEXTURE_2D);
 		_gl.Enable(GL_BLEND);
 		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 		_gl.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 		_gl.ClearColor(0.5, 0.5, 0.5, 0);
 		_gl.ClearDepth(1);
@@ -245,7 +246,7 @@ namespace Yttrium
 			_gl.BindTexture(GL_TEXTURE_2D, 0);
 			return;
 		}
-		static_cast<const GlTexture2D*>(texture)->bind();
+		static_cast<const GLTexture2D*>(texture)->bind();
 	}
 
 	void OpenGlRenderer::set_transformation(const Matrix4& matrix)

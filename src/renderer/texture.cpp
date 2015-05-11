@@ -2,10 +2,10 @@
 
 namespace Yttrium
 {
-	BackendTexture2D::BackendTexture2D(const ImageFormat& format, Allocator* allocator)
+	BackendTexture2D::BackendTexture2D(Allocator* allocator, const ImageFormat& format, bool has_mipmaps)
 		: Texture2D(format.size(), allocator)
 		, _orientation(format.orientation())
-		, _has_mipmaps(true)
+		, _has_mipmaps(has_mipmaps)
 	{
 	}
 

@@ -6,12 +6,12 @@
 
 namespace Yttrium
 {
-	class GlTexture2D: public BackendTexture2D
+	class GLTexture2D : public BackendTexture2D
 	{
 	public:
 
-		GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi& gl, GLuint texture);
-		~GlTexture2D() override;
+		GLTexture2D(Allocator* allocator, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture);
+		~GLTexture2D() override;
 
 		void bind() const;
 

@@ -24,11 +24,10 @@ namespace Yttrium
 		debug_texture_format.set_height(DebugTexture::height);
 		debug_texture_format.set_orientation(ImageOrientation::XRightYDown);
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
-		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data);
+		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
 			return {};
 		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
-		// TODO: No mipmapping for the debug texture.
 		return std::move(renderer);
 	}
 
