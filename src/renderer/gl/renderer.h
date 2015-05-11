@@ -24,6 +24,7 @@ namespace Yttrium
 		void flush_2d_impl() override;
 		bool initialize() override;
 		void set_projection(const Matrix4&) override;
+		void set_texture(const BackendTexture2D*) override;
 		void set_transformation(const Matrix4&) override;
 		void update_window_size() override;
 

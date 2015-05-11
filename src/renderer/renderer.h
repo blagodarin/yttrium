@@ -25,7 +25,7 @@ namespace Yttrium
 		{
 			int _triangles = 0;
 			int _draw_calls = 0;
-			int _texture_changes = 0;
+			int _texture_switches = 0;
 		};
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
@@ -62,15 +62,19 @@ namespace Yttrium
 
 		virtual void flush_2d_impl() = 0;
 		virtual bool initialize() = 0;
-		virtual void set_projection(const Matrix4& matrix) = 0;
-		virtual void set_transformation(const Matrix4& matrix) = 0;
+		virtual void set_projection(const Matrix4&) = 0;
+		virtual void set_texture(const BackendTexture2D*) = 0;
+		virtual void set_transformation(const Matrix4&) = 0;
 		virtual void update_window_size() = 0;
 
 	public:
 
-		void change_texture(const Pointer<Texture2D>& old_texture, const Pointer<Texture2D>& new_texture);
 		BackendTexture2D* current_texture_2d() const;
 		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
+
+	private:
+
+		void update_current_texture();
 
 	public:
 

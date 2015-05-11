@@ -215,8 +215,9 @@ namespace Yttrium
 			--_texture_stack.back().second;
 			return;
 		}
-		change_texture(_texture_stack.back().first, _texture_stack[_texture_stack.size() - 2].first);
+		flush_2d();
 		_texture_stack.pop_back();
+		update_current_texture();
 	}
 
 	void RendererImpl::pop_transformation()
@@ -241,10 +242,9 @@ namespace Yttrium
 			++_texture_stack.back().second;
 			return;
 		}
+		flush_2d();
 		_texture_stack.emplace_back(texture, 1);
-		// TODO: Lazy texture assignment (i.e. before actual rendering) to eliminate texture changes
-		// when drawing differently textured geometry with another texture (e.g. GUI) on the stack.
-		change_texture(_texture_stack[_texture_stack.size() - 2].first, _texture_stack.back().first);
+		update_current_texture();
 	}
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
@@ -264,27 +264,6 @@ namespace Yttrium
 	{
 		_window_size = size;
 		update_window_size();
-	}
-
-	void RendererImpl::change_texture(const Pointer<Texture2D>& old_texture, const Pointer<Texture2D>& new_texture)
-	{
-		assert(old_texture != new_texture);
-		flush_2d();
-		if (new_texture)
-		{
-			BackendTexture2D& new_texture_backend = static_cast<BackendTexture2D&>(*new_texture);
-			new_texture_backend.bind();
-			_texture_rect = new_texture_backend.full_rectangle();
-		}
-		else
-		{
-			BackendTexture2D& old_texture_backend = static_cast<BackendTexture2D&>(*old_texture);
-			old_texture_backend.unbind();
-			_texture_rect = RectF();
-		}
-		_texture_borders = MarginsF();
-		_font = TextureFont();
-		++_statistics._texture_changes;
 	}
 
 	BackendTexture2D* RendererImpl::current_texture_2d() const
@@ -468,6 +447,18 @@ namespace Yttrium
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
 		_vertices_2d.push_back(vertex);
+	}
+
+	void RendererImpl::update_current_texture()
+	{
+		const auto* texture = current_texture_2d();
+		// TODO: Lazy texture assignment (i.e. before actual rendering) to eliminate texture changes
+		// when drawing differently textured geometry with another texture (e.g. GUI) on the stack.
+		set_texture(texture);
+		_texture_rect = texture ? texture->full_rectangle() : RectF();
+		_texture_borders = MarginsF();
+		_font = TextureFont();
+		++_statistics._texture_switches;
 	}
 
 	PushProjection::PushProjection(Renderer& renderer, const Matrix4& matrix)

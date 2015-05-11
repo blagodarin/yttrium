@@ -174,7 +174,7 @@ namespace Yttrium
 			const auto renderer_statistics = _renderer->reset_statistics();
 			update.triangles = renderer_statistics._triangles;
 			update.draw_calls = renderer_statistics._draw_calls;
-			update.texture_changes = renderer_statistics._texture_changes;
+			update.texture_switches = renderer_statistics._texture_switches;
 		}
 	}
 

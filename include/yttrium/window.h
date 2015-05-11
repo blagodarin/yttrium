@@ -37,8 +37,8 @@ namespace Yttrium
 		/// Number of draw calls issued.
 		int draw_calls = 0;
 
-		/// Number of texture changes.
-		int texture_changes = 0;
+		/// Number of texture switches.
+		int texture_switches = 0;
 	};
 
 	///

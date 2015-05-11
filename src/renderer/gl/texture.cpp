@@ -2,10 +2,9 @@
 
 namespace Yttrium
 {
-	GlTexture2D::GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi& gl, GLenum target, GLuint texture)
+	GlTexture2D::GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi& gl, GLuint texture)
 		: BackendTexture2D(format, allocator)
 		, _gl(gl)
-		, _target(target)
 		, _texture(texture)
 	{
 	}
@@ -15,7 +14,7 @@ namespace Yttrium
 		_gl.DeleteTextures(1, &_texture);
 	}
 
-	void GlTexture2D::bind()
+	void GlTexture2D::bind() const
 	{
 		GLenum min_filter;
 		GLenum mag_filter;
@@ -47,15 +46,15 @@ namespace Yttrium
 			break;
 		}
 
-		_gl.BindTexture(_target, _texture);
-		_gl.TexParameteri(_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		_gl.TexParameteri(_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		_gl.TexParameteri(_target, GL_TEXTURE_MIN_FILTER, min_filter);
-		_gl.TexParameteri(_target, GL_TEXTURE_MAG_FILTER, mag_filter);
+		_gl.BindTexture(GL_TEXTURE_2D, _texture);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+		_gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
 
 		if (_gl.EXT_texture_filter_anisotropic)
 		{
-			_gl.TexParameterf(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+			_gl.TexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
 				(_filter & Texture2D::AnisotropicFilter ? _gl.MAX_TEXTURE_MAX_ANISOTROPY_EXT : 1.f));
 		}
 	}
@@ -88,11 +87,6 @@ namespace Yttrium
 			break;
 		}
 
-		return _target == GL_TEXTURE_RECTANGLE_ARB ? Vector2(x, y) : Vector2(x / _size.width, y / _size.height);
-	}
-
-	void GlTexture2D::unbind()
-	{
-		_gl.BindTexture(_target, 0);
+		return Vector2(x / _size.width, y / _size.height);
 	}
 }

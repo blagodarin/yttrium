@@ -71,14 +71,6 @@ namespace Yttrium
 
 		const auto internal_format = internal_formats[static_cast<size_t>(format.pixel_format())];
 
-		GLenum target = 0;
-		if (_gl.ARB_texture_non_power_of_two || (is_power_of_2(format.width()) && is_power_of_2(format.height())))
-			target = GL_TEXTURE_2D;
-		else if (_gl.ARB_texture_rectangle)
-			target = GL_TEXTURE_RECTANGLE_ARB;
-		if (!target)
-			return {};
-
 		// NOTE: The following code is not exception-safe:
 		// the texture handle won't be released if  an exception is generated.
 
@@ -89,19 +81,19 @@ namespace Yttrium
 
 		// TODO: Set pixel row alignment if required.
 
-		_gl.BindTexture(target, texture);
+		_gl.BindTexture(GL_TEXTURE_2D, texture);
 		_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-		_gl.TexImage2D(target, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);
+		_gl.TexImage2D(GL_TEXTURE_2D, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);
 
-		const auto is_target_enabled = _gl.IsEnabled(target);
-		_gl.Enable(target); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].
-		_gl.GenerateMipmap(target);
+		const auto is_target_enabled = _gl.IsEnabled(GL_TEXTURE_2D);
+		_gl.Enable(GL_TEXTURE_2D); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].
+		_gl.GenerateMipmap(GL_TEXTURE_2D);
 		if (!is_target_enabled)
-			_gl.Disable(target);
+			_gl.Disable(GL_TEXTURE_2D);
 
-		_gl.BindTexture(target, 0);
+		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
-		return Pointer<Texture2D>(Y_NEW(_allocator, GlTexture2D)(format, _allocator, _gl, target, texture));
+		return Pointer<Texture2D>(Y_NEW(_allocator, GlTexture2D)(format, _allocator, _gl, texture));
 	}
 
 	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
@@ -202,6 +194,9 @@ namespace Yttrium
 		if (!check_min_version(1, 2))
 			return false; // TODO: Report error.
 
+		if (!_gl.ARB_texture_non_power_of_two)
+			return false; // TODO: Report error.
+
 		_gl.Enable(GL_TEXTURE_2D);
 		_gl.Enable(GL_BLEND);
 		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -243,6 +238,16 @@ namespace Yttrium
 		_gl.LoadMatrixf(matrix.data());
 		_gl.MatrixMode(GL_MODELVIEW);
 		_gl.LoadMatrixf(Matrix4().data());
+	}
+
+	void OpenGlRenderer::set_texture(const BackendTexture2D* texture)
+	{
+		if (!texture)
+		{
+			_gl.BindTexture(GL_TEXTURE_2D, 0);
+			return;
+		}
+		static_cast<const GlTexture2D*>(texture)->bind();
 	}
 
 	void OpenGlRenderer::set_transformation(const Matrix4& matrix)

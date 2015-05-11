@@ -10,19 +10,18 @@ namespace Yttrium
 	{
 	public:
 
-		GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi& gl, GLenum target, GLuint texture);
+		GlTexture2D(const ImageFormat& format, Allocator* allocator, const GlApi& gl, GLuint texture);
 		~GlTexture2D() override;
+
+		void bind() const;
 
 	private:
 
-		void bind() override;
 		Vector2 fix_coords(const Vector2& coords) const override;
-		void unbind() override;
 
 	private:
 
 		const GlApi& _gl;
-		GLenum       _target;
 		GLuint       _texture;
 	};
 }
