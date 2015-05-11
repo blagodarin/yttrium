@@ -132,4 +132,5 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	}
 
 	_texture = _renderer.create_texture_2d(image_format, pixels.data());
+	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 }

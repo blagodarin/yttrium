@@ -34,6 +34,8 @@ void Game::run()
 
 void Game::on_key_event(const KeyEvent& event)
 {
+	static const int rotation_step = 1;
+
 	if (!event.pressed)
 		return;
 
@@ -41,24 +43,24 @@ void Game::on_key_event(const KeyEvent& event)
 	{
 	case Key::Up:
 		if (_pitch < 90)
-			_pitch += 5;
+			_pitch += rotation_step;
 		break;
 
 	case Key::Down:
 		if (_pitch > -90)
-			_pitch -= 5;
+			_pitch -= rotation_step;
 		break;
 
 	case Key::Left:
 		if (_yaw > -180)
-			_yaw -= 5;
+			_yaw -= rotation_step;
 		else
-			_yaw = 175;
+			_yaw = 180 - rotation_step;
 		break;
 
 	case Key::Right:
-		if (_yaw < 175)
-			_yaw += 5;
+		if (_yaw < 180 - rotation_step)
+			_yaw += rotation_step;
 		else
 			_yaw = -180;
 		break;
@@ -67,14 +69,43 @@ void Game::on_key_event(const KeyEvent& event)
 		_window->close();
 		break;
 
-	case Key::A: _position.x -= 1; break;
-	case Key::D: _position.x += 1; break;
-	case Key::E: _roll += 5; break;
-	case Key::F: _position.z -= 1; break;
-	case Key::Q: _roll -= 5; break;
-	case Key::R: _position.z += 1; break;
-	case Key::S: _position.y -= 1; break;
-	case Key::W: _position.y += 1; break;
+	case Key::A:
+		_position.x -= 1;
+		break;
+
+	case Key::D:
+		_position.x += 1;
+		break;
+
+	case Key::E:
+		if (_roll < 180 - rotation_step)
+			_roll += rotation_step;
+		else
+			_roll = -180;
+		break;
+
+	case Key::F:
+		_position.z -= 1;
+		break;
+
+	case Key::Q:
+		if (_roll > -180)
+			_roll -= rotation_step;
+		else
+			_roll = 180 - rotation_step;
+		break;
+
+	case Key::R:
+		_position.z += 1;
+		break;
+
+	case Key::S:
+		_position.y -= 1;
+		break;
+
+	case Key::W:
+		_position.y += 1;
+		break;
 
 	case Key::Grave:
 		_window->set_console_visible(!_window->is_console_visible());
