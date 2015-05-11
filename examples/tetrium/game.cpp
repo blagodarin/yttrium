@@ -271,7 +271,7 @@ void Game::on_update(const UpdateEvent& update)
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
 		<< "Triangles: " << update.triangles << "\n"
 		<< "DrawCalls: " << update.draw_calls << "\n"
-		<< "TextureSwitches: " << update.texture_switches;
+		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")";
 
 	if (_game_running)
 	{

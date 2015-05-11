@@ -8,6 +8,10 @@
 
 #include <cassert>
 
+#if Y_IS_DEBUG
+	#include <algorithm>
+#endif
+
 namespace Yttrium
 {
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
@@ -257,6 +261,7 @@ namespace Yttrium
 	{
 		const auto result = _statistics;
 		_statistics = {};
+		_seen_textures.clear();
 		return result;
 	}
 
@@ -459,6 +464,13 @@ namespace Yttrium
 		_texture_borders = MarginsF();
 		_font = TextureFont();
 		++_statistics._texture_switches;
+#if Y_IS_DEBUG
+		const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
+		if (i == _seen_textures.end())
+			_seen_textures.emplace_back(texture);
+		else
+			++_statistics._redundant_texture_switches;
+#endif
 	}
 
 	PushProjection::PushProjection(Renderer& renderer, const Matrix4& matrix)

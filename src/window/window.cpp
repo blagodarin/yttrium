@@ -175,6 +175,7 @@ namespace Yttrium
 			update.triangles = renderer_statistics._triangles;
 			update.draw_calls = renderer_statistics._draw_calls;
 			update.texture_switches = renderer_statistics._texture_switches;
+			update.redundant_texture_switches = renderer_statistics._redundant_texture_switches;
 		}
 	}
 

@@ -139,7 +139,7 @@ void Game::on_update(const UpdateEvent& update)
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
 		<< "Triangles: " << update.triangles << "\n"
 		<< "DrawCalls: " << update.draw_calls << "\n"
-		<< "TextureSwitches: " << update.texture_switches << "\n"
+		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
 		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll;
 }

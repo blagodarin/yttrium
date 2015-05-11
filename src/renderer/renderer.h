@@ -26,6 +26,7 @@ namespace Yttrium
 			int _triangles = 0;
 			int _draw_calls = 0;
 			int _texture_switches = 0;
+			int _redundant_texture_switches = 0;
 		};
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
@@ -110,6 +111,9 @@ namespace Yttrium
 		std::vector<Matrix4> _transformation;
 
 		Statistics _statistics;
+#if Y_IS_DEBUG
+		std::vector<const BackendTexture2D*> _seen_textures; // For redundancy statistics.
+#endif
 	};
 }
 
