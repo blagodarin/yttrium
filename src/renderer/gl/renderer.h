@@ -6,11 +6,11 @@
 
 namespace Yttrium
 {
-	class OpenGlRenderer : public RendererImpl
+	class GLRenderer : public RendererImpl
 	{
 	public:
 
-		OpenGlRenderer(WindowBackend& window, Allocator* allocator);
+		GLRenderer(WindowBackend& window, Allocator* allocator);
 
 		// Renderer
 		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
@@ -21,12 +21,12 @@ namespace Yttrium
 		// RendererImpl
 		void clear() override;
 		void take_screenshot(Image&) override;
-		void flush_2d_impl() override;
+		void flush_2d_impl(const std::vector<Vertex2D>&, const std::vector<uint16_t>&) override;
 		bool initialize() override;
 		void set_projection(const Matrix4&) override;
 		void set_texture(const BackendTexture2D*) override;
 		void set_transformation(const Matrix4&) override;
-		void update_window_size() override;
+		void set_window_size_impl(const Size&) override;
 
 	private:
 

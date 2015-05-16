@@ -70,11 +70,11 @@ void Game::on_key_event(const KeyEvent& event)
 		break;
 
 	case Key::A:
-		_position.x -= 1;
+		_position.x -= .1;
 		break;
 
 	case Key::D:
-		_position.x += 1;
+		_position.x += .1;
 		break;
 
 	case Key::E:
@@ -85,7 +85,7 @@ void Game::on_key_event(const KeyEvent& event)
 		break;
 
 	case Key::F:
-		_position.z -= 1;
+		_position.z -= .1;
 		break;
 
 	case Key::Q:
@@ -96,15 +96,15 @@ void Game::on_key_event(const KeyEvent& event)
 		break;
 
 	case Key::R:
-		_position.z += 1;
+		_position.z += .1;
 		break;
 
 	case Key::S:
-		_position.y -= 1;
+		_position.y -= .1;
 		break;
 
 	case Key::W:
-		_position.y += 1;
+		_position.y += .1;
 		break;
 
 	case Key::Grave:

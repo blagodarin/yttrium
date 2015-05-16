@@ -17,7 +17,7 @@ namespace Yttrium
 	class Image;
 	class WindowBackend;
 
-	class RendererImpl: public Renderer
+	class RendererImpl : public Renderer
 	{
 	public:
 
@@ -31,7 +31,7 @@ namespace Yttrium
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
 
-		RendererImpl(WindowBackend& window, Allocator* allocator);
+		RendererImpl(Allocator* allocator);
 
 		void draw_rectangle(const RectF& rect) override;
 		void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
@@ -42,14 +42,13 @@ namespace Yttrium
 		bool set_texture_borders(const Margins& borders) override;
 		void set_texture_rectangle(const RectF& rect) override;
 		Vector2 text_size(const StaticString& text) const override;
-		Size window_size() const override;
+		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
 		virtual void take_screenshot(Image& image) = 0;
 
 		Allocator* allocator() const { return _allocator; }
 		Pointer<Texture2D> debug_texture() const { return _debug_texture; }
-		void flush_2d();
 		void pop_projection();
 		void pop_texture();
 		void pop_transformation();
@@ -62,33 +61,6 @@ namespace Yttrium
 
 	protected:
 
-		virtual void flush_2d_impl() = 0;
-		virtual bool initialize() = 0;
-		virtual void set_projection(const Matrix4&) = 0;
-		virtual void set_texture(const BackendTexture2D*) = 0;
-		virtual void set_transformation(const Matrix4&) = 0;
-		virtual void update_window_size() = 0;
-
-	public:
-
-		BackendTexture2D* current_texture_2d() const;
-		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
-
-	private:
-
-		void update_current_texture();
-
-	public:
-
-		Allocator* const _allocator;
-		WindowBackend& _window;
-
-		Size _window_size;
-
-		Vector4 _color;
-
-		// 2D rendering.
-
 		struct Vertex2D
 		{
 			Vector2 position;
@@ -96,20 +68,40 @@ namespace Yttrium
 			Vector2 texture;
 		};
 
+		virtual void flush_2d_impl(const std::vector<Vertex2D>& vertices, const std::vector<uint16_t>& indices) = 0;
+		virtual bool initialize() = 0;
+		virtual void set_projection(const Matrix4&) = 0;
+		virtual void set_texture(const BackendTexture2D*) = 0;
+		virtual void set_transformation(const Matrix4&) = 0;
+		virtual void set_window_size_impl(const Size& size) = 0;
+
+		BackendTexture2D* current_texture_2d() const;
+
+	private:
+
+		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
+		void flush_2d();
+		void update_current_texture();
+
+	protected:
+
+		Allocator* const _allocator;
+		Statistics _statistics;
+
+	private:
+
+		Size _window_size;
+
+		Vector4 _color;
+
 		std::vector<Vertex2D> _vertices_2d;
-		std::vector<int16_t>  _indices_2d;
+		std::vector<uint16_t> _indices_2d;
 
 		RectF    _texture_rect;
 		MarginsF _texture_borders;
 
 		TextureFont _font;
 		Vector2     _font_size;
-
-	protected:
-
-		Statistics _statistics;
-
-	private:
 
 		Pointer<Texture2D> _debug_texture;
 

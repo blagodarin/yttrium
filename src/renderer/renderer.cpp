@@ -16,7 +16,7 @@ namespace Yttrium
 {
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
 	{
-		auto renderer = std::make_unique<OpenGlRenderer>(window, allocator);
+		auto renderer = std::make_unique<GLRenderer>(window, allocator);
 		if (!renderer->initialize())
 			return {};
 		ImageFormat debug_texture_format;
@@ -31,9 +31,8 @@ namespace Yttrium
 		return std::move(renderer);
 	}
 
-	RendererImpl::RendererImpl(WindowBackend& window, Allocator* allocator)
+	RendererImpl::RendererImpl(Allocator* allocator)
 		: _allocator(allocator)
-		, _window(window)
 		, _color(1, 1, 1)
 		, _font_size(1, 1)
 	{
@@ -187,21 +186,6 @@ namespace Yttrium
 		return _font ? _font.text_size(text, _font_size) : Vector2(0, 0);
 	}
 
-	Size RendererImpl::window_size() const
-	{
-		return _window_size;
-	}
-
-	void RendererImpl::flush_2d()
-	{
-		if (!_vertices_2d.empty())
-		{
-			flush_2d_impl();
-			_vertices_2d.clear();
-			_indices_2d.clear();
-		}
-	}
-
 	void RendererImpl::pop_projection()
 	{
 		flush_2d();
@@ -297,7 +281,7 @@ namespace Yttrium
 	void RendererImpl::set_window_size(const Size& size)
 	{
 		_window_size = size;
-		update_window_size();
+		set_window_size_impl(_window_size);
 	}
 
 	BackendTexture2D* RendererImpl::current_texture_2d() const
@@ -307,9 +291,9 @@ namespace Yttrium
 
 	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
 	{
-		size_t index = _vertices_2d.size();
+		uint16_t index = _vertices_2d.size();
 
-		if (index)
+		if (index > 0)
 		{
 			_indices_2d.push_back(index - 1);
 			_indices_2d.push_back(index);
@@ -481,6 +465,16 @@ namespace Yttrium
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
 		_vertices_2d.push_back(vertex);
+	}
+
+	void RendererImpl::flush_2d()
+	{
+		if (!_vertices_2d.empty())
+		{
+			flush_2d_impl(_vertices_2d, _indices_2d);
+			_vertices_2d.clear();
+			_indices_2d.clear();
+		}
 	}
 
 	void RendererImpl::update_current_texture()

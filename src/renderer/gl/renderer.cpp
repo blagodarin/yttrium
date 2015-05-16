@@ -13,13 +13,13 @@
 
 namespace Yttrium
 {
-	OpenGlRenderer::OpenGlRenderer(WindowBackend& window, Allocator* allocator)
-		: RendererImpl(window, allocator)
+	GLRenderer::GLRenderer(WindowBackend& window, Allocator* allocator)
+		: RendererImpl(allocator)
 	{
 		_gl.initialize(window);
 	}
 
-	std::unique_ptr<IndexBuffer> OpenGlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
+	std::unique_ptr<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
 	{
 		GLBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
 		if (!buffer)
@@ -32,7 +32,7 @@ namespace Yttrium
 		return std::make_unique<GLIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
 	}
 
-	Pointer<Texture2D> OpenGlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
+	Pointer<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
 		// NOTE: Keep the new pixel formats in sync with these arrays!
 
@@ -96,7 +96,7 @@ namespace Yttrium
 		return Pointer<Texture2D>(Y_NEW(_allocator, GLTexture2D)(_allocator, format, !no_mipmaps, _gl, texture));
 	}
 
-	std::unique_ptr<VertexBuffer> OpenGlRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
+	std::unique_ptr<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
 	{
 		GLBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		if (!buffer)
@@ -112,7 +112,7 @@ namespace Yttrium
 		return std::make_unique<GLVertexBuffer>(format, size, element_size, std::move(buffer));
 	}
 
-	void OpenGlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
+	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
 	{
 		const auto& vertices = static_cast<const GLVertexBuffer&>(vertex_buffer);
 		const auto& indices = static_cast<const GLIndexBuffer&>(index_buffer);
@@ -160,25 +160,27 @@ namespace Yttrium
 		_gl.Disable(GL_DEPTH_TEST);
 	}
 
-	void OpenGlRenderer::clear()
+	void GLRenderer::clear()
 	{
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	void OpenGlRenderer::take_screenshot(Image& image)
+	void GLRenderer::take_screenshot(Image& image)
 	{
+		const auto& size = window_size();
+
 		GLint unpack_alignment;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
-		image.set_size(_window_size.width, _window_size.height, unpack_alignment);
+		image.set_size(size.width, size.height, unpack_alignment);
 
 		GLint read_buffer;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
-		_gl.ReadPixels(0, 0, _window_size.width, _window_size.height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+		_gl.ReadPixels(0, 0, size.width, size.height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
 		_gl.ReadBuffer(read_buffer);
 	}
 
-	bool OpenGlRenderer::initialize()
+	bool GLRenderer::initialize()
 	{
 #if Y_IS_DEBUG
 		if (_gl.KHR_debug)
@@ -186,7 +188,7 @@ namespace Yttrium
 			_gl.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			_gl.DebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* opaque)
 			{
-				static_cast<const OpenGlRenderer*>(opaque)->debug_callback(source, type, id, severity, length, message);
+				static_cast<const GLRenderer*>(opaque)->debug_callback(source, type, id, severity, length, message);
 			}, this);
 		}
 #endif
@@ -197,6 +199,7 @@ namespace Yttrium
 		if (!_gl.ARB_texture_non_power_of_two)
 			return false; // TODO: Report error.
 
+		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
 		_gl.Enable(GL_TEXTURE_2D);
 		_gl.Enable(GL_BLEND);
 		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -208,38 +211,36 @@ namespace Yttrium
 		return true;
 	}
 
-	void OpenGlRenderer::flush_2d_impl()
+	void GLRenderer::flush_2d_impl(const std::vector<Vertex2D>& vertices, const std::vector<uint16_t>& indices)
 	{
-		assert(!_vertices_2d.empty());
-
 		_gl.EnableClientState(GL_COLOR_ARRAY);
-		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].color);
+		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &vertices[0].color);
 
 		if (current_texture_2d())
 		{
 			_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
-			_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].texture);
+			_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &vertices[0].texture);
 		}
 
 		_gl.EnableClientState(GL_VERTEX_ARRAY);
-		_gl.VertexPointer(2, GL_FLOAT, sizeof(Vertex2D), &_vertices_2d[0].position);
+		_gl.VertexPointer(2, GL_FLOAT, sizeof(Vertex2D), &vertices[0].position);
 
-		_gl.DrawElements(GL_TRIANGLE_STRIP, _indices_2d.size(), GL_UNSIGNED_SHORT, _indices_2d.data());
+		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, indices.data());
 		++_statistics._draw_calls;
-		_statistics._triangles += _indices_2d.size() - 2;
+		_statistics._triangles += indices.size() - 2;
 
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		_gl.DisableClientState(GL_COLOR_ARRAY);
 		_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 
-	void OpenGlRenderer::set_projection(const Matrix4& matrix)
+	void GLRenderer::set_projection(const Matrix4& matrix)
 	{
 		_gl.MatrixMode(GL_PROJECTION);
 		_gl.LoadMatrixf(matrix.data());
 	}
 
-	void OpenGlRenderer::set_texture(const BackendTexture2D* texture)
+	void GLRenderer::set_texture(const BackendTexture2D* texture)
 	{
 		if (!texture)
 		{
@@ -249,18 +250,18 @@ namespace Yttrium
 		static_cast<const GLTexture2D*>(texture)->bind();
 	}
 
-	void OpenGlRenderer::set_transformation(const Matrix4& matrix)
+	void GLRenderer::set_transformation(const Matrix4& matrix)
 	{
 		_gl.MatrixMode(GL_MODELVIEW);
 		_gl.LoadMatrixf(matrix.data());
 	}
 
-	void OpenGlRenderer::update_window_size()
+	void GLRenderer::set_window_size_impl(const Size& size)
 	{
-		_gl.Viewport(0, 0, _window_size.width, _window_size.height);
+		_gl.Viewport(0, 0, size.width, size.height);
 	}
 
-	bool OpenGlRenderer::check_min_version(int major, int minor)
+	bool GLRenderer::check_min_version(int major, int minor)
 	{
 		// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
 		const int actual_major = _gl.VERSION[0] - '0';
@@ -269,7 +270,7 @@ namespace Yttrium
 	}
 
 #if Y_IS_DEBUG
-	void OpenGlRenderer::debug_callback(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar* message) const
+	void GLRenderer::debug_callback(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar* message) const
 	{
 		std::cerr << message << std::endl;
 	}
