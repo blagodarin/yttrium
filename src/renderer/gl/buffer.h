@@ -6,13 +6,13 @@
 
 namespace Yttrium
 {
-	class GLBufferHandle
+	class GlBufferHandle
 	{
 	public:
 
-		GLBufferHandle(const GlApi& gl, GLenum target);
-		GLBufferHandle(GLBufferHandle&& handle);
-		~GLBufferHandle();
+		GlBufferHandle(const GlApi& gl, GLenum target);
+		GlBufferHandle(GlBufferHandle&& handle);
+		~GlBufferHandle();
 
 		explicit operator bool() const { return _handle != 0; }
 
@@ -21,9 +21,9 @@ namespace Yttrium
 		void unbind() const;
 		void write(size_t offset, size_t size, const void* data) const;
 
-		GLBufferHandle(const GLBufferHandle&) = delete;
-		GLBufferHandle& operator=(const GLBufferHandle&) = delete;
-		GLBufferHandle& operator=(GLBufferHandle&&) = delete;
+		GlBufferHandle(const GlBufferHandle&) = delete;
+		GlBufferHandle& operator=(const GlBufferHandle&) = delete;
+		GlBufferHandle& operator=(GlBufferHandle&&) = delete;
 
 	private:
 
@@ -32,25 +32,25 @@ namespace Yttrium
 		GLuint _handle = 0;
 	};
 
-	class GLIndexBuffer: public IndexBufferImpl
+	class GlIndexBuffer: public IndexBufferImpl
 	{
 	public:
 
-		const GLBufferHandle _buffer;
+		const GlBufferHandle _buffer;
 		const GLenum _gl_format;
 
-		GLIndexBuffer(Format format, size_t size, size_t element_size, GLBufferHandle&& buffer, GLenum gl_format);
+		GlIndexBuffer(Format format, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format);
 
 		void write(size_t offset, size_t size, const void* data) override;
 	};
 
-	class GLVertexBuffer: public VertexBufferImpl
+	class GlVertexBuffer: public VertexBufferImpl
 	{
 	public:
 
-		const GLBufferHandle _buffer;
+		const GlBufferHandle _buffer;
 
-		GLVertexBuffer(unsigned format, size_t size, size_t element_size, GLBufferHandle&& buffer);
+		GlVertexBuffer(unsigned format, size_t size, size_t element_size, GlBufferHandle&& buffer);
 
 		void write(size_t offset, size_t size, const void* data) override;
 	};

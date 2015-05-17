@@ -259,13 +259,14 @@ GLFUNCTION(UseProgram, void, (GLuint))
 // Deprecated API entries still used in our renderer.
 // TODO: Remove.
 
-GLFUNCTION(ColorPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
-GLFUNCTION(DisableClientState, GLvoid, (GLenum))
-GLFUNCTION(EnableClientState, GLvoid, (GLenum))
-GLFUNCTION(LoadMatrixf, GLvoid, (const GLfloat *))
-GLFUNCTION(MatrixMode, GLvoid, (GLenum))
-GLFUNCTION(TexCoordPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
-GLFUNCTION(VertexPointer, GLvoid, (GLint, GLenum, GLsizei, const GLvoid *))
+GLFUNCTION(ColorPointer, void, (GLint, GLenum, GLsizei, const void*))
+GLFUNCTION(DisableClientState, void, (GLenum))
+GLFUNCTION(EnableClientState, void, (GLenum))
+GLFUNCTION(LoadMatrixf, void, (const GLfloat*))
+GLFUNCTION(MatrixMode, void, (GLenum))
+GLFUNCTION(NormalPointer, void, (GLenum, GLsizei, const void*))
+GLFUNCTION(TexCoordPointer, void, (GLint, GLenum, GLsizei, const void*))
+GLFUNCTION(VertexPointer, void, (GLint, GLenum, GLsizei, const void*))
 
 GLEXTENSION(ARB_texture_non_power_of_two) // Core OpenGL 2.0 and higher.
 	GLEND

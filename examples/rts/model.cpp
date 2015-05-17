@@ -85,12 +85,14 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 
 	struct Vertex
 	{
-		Vector4 position;
-		Vector2 texture;
+		float x, y, z, w;
+		float u, v;
+		float nx, ny, nz, nw;
 
 		Vertex(float x, float y, float u, float v)
-			: position(x, y, 0)
-			, texture(u, v)
+			: x(x), y(y), z(0), w(1)
+			, u(u), v(v)
+			, nx(0), ny(0), nz(1), nw(1)
 		{
 		}
 	};
@@ -103,7 +105,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 		Vertex( size / 2,  size / 2, 1, 1),
 	};
 
-	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Uv2F, vertices.size(), vertices.data());
+	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Uv2F | VertexBuffer::Normal4F, vertices.size(), vertices.data());
 
 	const std::array<uint16_t, 6> indices =
 	{
@@ -139,10 +141,12 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 		"#version 110\n"
 		""
 		"varying vec3 view_direction;"
+		"varying vec3 n;"
 		""
 		"void main()"
 		"{"
 			"view_direction = vec3(gl_ModelViewMatrix * gl_Vertex);"
+			"n = normalize(gl_NormalMatrix * gl_Normal);"
 			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
 			"gl_TexCoord[0] = gl_MultiTexCoord0;"
 		"}"
@@ -150,21 +154,30 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_program->set_fragment_shader(GpuProgram::Language::Glsl, S
 	(
 		"#version 110\n"
-		""
-		"varying vec3 view_direction;"
-		""
-		"uniform sampler2D surface_texture;"
-		""
-		"void main()"
+		"\n"
+		"varying vec3 view_direction;\n"
+		"varying vec3 n;\n"
+		"\n"
+		"uniform sampler2D surface_texture;\n"
+		"\n"
+		"void main()\n"
 		"{"
-			"vec4 surface_color = texture2D(surface_texture, gl_TexCoord[0].xy);"
-			"if (view_direction.x < 0.0)"
-			"{"
-				"float gray = dot(surface_color.xyz, vec3(1.0, 1.0, 1.0));"
-				"surface_color = vec4(gray, gray, gray, surface_color.a * 0.25);"
-			"}"
-			"gl_FragColor = surface_color;"
-		"}"
+			"vec4 c = texture2D(surface_texture, gl_TexCoord[0].xy);\n"
+			"if (view_direction.x < 0.0)\n"
+			"{\n"
+				"float gray = dot(c.xyz, vec3(1.0, 1.0, 1.0));\n"
+				"gl_FragColor = vec4(gray, gray, gray, c.a * 0.25);\n"
+			"}\n"
+			"else\n"
+			"{\n"
+				"vec3 l = normalize(-view_direction);\n"
+				"vec3 e = normalize(-view_direction);\n"
+				"vec3 r = normalize(-reflect(l, n));\n"
+				"vec3 diffuse = c.rgb * clamp(dot(n, l), 0.0, 1.0);\n"
+				"vec3 specular = vec3(1.0, 1.0, 1.0) * clamp(dot(r, e), 0.0, 1.0);\n"
+				"gl_FragColor = vec4(diffuse + specular, c.a);\n"
+			"}\n"
+		"}\n"
 	));
 	_program->link();
 }

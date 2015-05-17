@@ -5,6 +5,10 @@
 
 #include <cassert>
 
+#if Y_IS_DEBUG
+	#include <iostream>
+#endif
+
 namespace Yttrium
 {
 	GlGpuProgram::GlGpuProgram(RendererImpl& renderer, const GlApi& gl)
@@ -76,6 +80,12 @@ namespace Yttrium
 		_gl.GetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 		if (!compile_status)
 		{
+#if Y_IS_DEBUG
+			char buffer[1024] = {};
+			GLsizei length = 0;
+			_gl.GetShaderInfoLog(shader, sizeof buffer, &length, buffer);
+			std::cerr << buffer << std::endl;
+#endif
 			_gl.DeleteShader(shader);
 			return false; // TODO: _gl.GetShaderInfoLog.
 		}

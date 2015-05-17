@@ -17,8 +17,9 @@ namespace Yttrium
 		/// A buffer vertex always start with geometry data (X, Y, Z, W floats).
 		enum
 		{
-			Rgba4F = 1 << 0, ///< Followed by color data (R, G, B, A floats).
-			Uv2F   = 1 << 1, ///< Followed by 2D texture coordinates (U, V floats).
+			Rgba4F   = 1 << 0, ///< Followed by color data (R, G, B, A floats).
+			Uv2F     = 1 << 1, ///< Followed by 2D texture coordinates (U, V floats).
+			Normal4F = 1 << 2, ///< Followed by 3D normal vector (X, Y, Z, W floats, W is ignored).
 		};
 
 		virtual ~VertexBuffer() = default;

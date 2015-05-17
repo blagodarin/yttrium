@@ -27,7 +27,7 @@ namespace Yttrium
 
 	std::unique_ptr<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
 	{
-		GLBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
+		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
 		if (!buffer)
 			return {};
 		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
@@ -35,7 +35,7 @@ namespace Yttrium
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
-		return std::make_unique<GLIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
+		return std::make_unique<GlIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
 	}
 
 	Pointer<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
@@ -99,12 +99,12 @@ namespace Yttrium
 		}
 		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
-		return Pointer<Texture2D>(Y_NEW(allocator(), GLTexture2D)(*this, format, !no_mipmaps, _gl, texture));
+		return Pointer<Texture2D>(Y_NEW(allocator(), GlTexture2D)(*this, format, !no_mipmaps, _gl, texture));
 	}
 
 	std::unique_ptr<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
 	{
-		GLBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
+		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		if (!buffer)
 			return {};
 		size_t element_size = sizeof(float) * 4; // Geometry data.
@@ -112,18 +112,20 @@ namespace Yttrium
 			element_size += sizeof(float) * 4;
 		if (format & VertexBuffer::Uv2F)
 			element_size += sizeof(float) * 2;
+		if (format & VertexBuffer::Normal4F)
+			element_size += sizeof(float) * 4;
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
-		return std::make_unique<GLVertexBuffer>(format, size, element_size, std::move(buffer));
+		return std::make_unique<GlVertexBuffer>(format, size, element_size, std::move(buffer));
 	}
 
 	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
 	{
 		update_state();
 
-		const auto& vertices = static_cast<const GLVertexBuffer&>(vertex_buffer);
-		const auto& indices = static_cast<const GLIndexBuffer&>(index_buffer);
+		const auto& vertices = static_cast<const GlVertexBuffer&>(vertex_buffer);
+		const auto& indices = static_cast<const GlIndexBuffer&>(index_buffer);
 
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
@@ -146,6 +148,13 @@ namespace Yttrium
 			data_offset += sizeof(float) * 2;
 		}
 
+		if (vertices.format() & VertexBuffer::Normal4F)
+		{
+			_gl.EnableClientState(GL_NORMAL_ARRAY);
+			_gl.NormalPointer(GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
+			data_offset += sizeof(float) * 4;
+		}
+
 		_gl.EnableClientState(GL_VERTEX_ARRAY);
 		_gl.VertexPointer(4, GL_FLOAT, vertices.element_size(), 0);
 
@@ -162,6 +171,8 @@ namespace Yttrium
 			_gl.DisableClientState(GL_COLOR_ARRAY);
 		if (vertices.format() & VertexBuffer::Uv2F)
 			_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
+		if (vertices.format() & VertexBuffer::Normal4F)
+			_gl.DisableClientState(GL_NORMAL_ARRAY);
 
 		vertices._buffer.unbind();
 
@@ -262,7 +273,7 @@ namespace Yttrium
 			_gl.BindTexture(GL_TEXTURE_2D, 0);
 			return;
 		}
-		static_cast<const GLTexture2D*>(texture)->bind();
+		static_cast<const GlTexture2D*>(texture)->bind();
 	}
 
 	void GLRenderer::set_transformation(const Matrix4& matrix)

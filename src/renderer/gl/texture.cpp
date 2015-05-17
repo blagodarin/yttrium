@@ -2,19 +2,19 @@
 
 namespace Yttrium
 {
-	GLTexture2D::GLTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture)
+	GlTexture2D::GlTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture)
 		: BackendTexture2D(renderer, format, has_mipmaps)
 		, _gl(gl)
 		, _texture(texture)
 	{
 	}
 
-	GLTexture2D::~GLTexture2D()
+	GlTexture2D::~GlTexture2D()
 	{
 		_gl.DeleteTextures(1, &_texture);
 	}
 
-	void GLTexture2D::bind() const
+	void GlTexture2D::bind() const
 	{
 		GLenum min_filter = GL_NEAREST;
 		GLenum mag_filter = GL_NEAREST;
@@ -54,7 +54,7 @@ namespace Yttrium
 		}
 	}
 
-	Vector2 GLTexture2D::fix_coords(const Vector2& coords) const
+	Vector2 GlTexture2D::fix_coords(const Vector2& coords) const
 	{
 		float x = coords.x;
 		float y = coords.y;
