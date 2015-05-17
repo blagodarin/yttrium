@@ -44,8 +44,8 @@ private:
 	std::unique_ptr<CubeModel> _cube;
 	std::unique_ptr<ChessboardModel> _chessboard;
 
-	Vector4 _position = Vector4(0, -5, 10);
-	int _pitch = -70;
+	Vector4 _position = Vector4(0, -6, 12);
+	int _pitch = -60;
 	int _yaw = 0;
 	int _roll = 0;
 };

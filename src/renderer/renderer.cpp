@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include <yttrium/gpu_program.h>
 #include <yttrium/matrix.h>
 #include "../memory/allocatable.h"
 #include "debug_texture.h"
@@ -14,11 +15,36 @@
 
 namespace Yttrium
 {
+	const S _vertex_shader_2d
+	(
+		"#version 110\n"
+		""
+		"void main()"
+		"{"
+			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
+			"gl_FrontColor = gl_Color;"
+			"gl_TexCoord[0] = gl_MultiTexCoord0;"
+		"}"
+	);
+
+	const S _fragment_shader_2d
+	(
+		"#version 110\n"
+		""
+		"uniform sampler2D surface_texture;"
+		""
+		"void main()"
+		"{"
+			"gl_FragColor = gl_Color * texture2D(surface_texture, gl_TexCoord[0].xy);"
+		"}"
+	);
+
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
 	{
 		auto renderer = std::make_unique<GLRenderer>(window, allocator);
 		if (!renderer->initialize())
 			return {};
+
 		ImageFormat debug_texture_format;
 		debug_texture_format.set_width(DebugTexture::width);
 		debug_texture_format.set_height(DebugTexture::height);
@@ -28,6 +54,17 @@ namespace Yttrium
 		if (!renderer->_debug_texture)
 			return {};
 		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
+
+		renderer->_program_2d = renderer->create_gpu_program();
+		if (!renderer->_program_2d)
+			return {};
+		if (!renderer->_program_2d->set_vertex_shader(GpuProgram::Language::Glsl, _vertex_shader_2d))
+			return {};
+		if (!renderer->_program_2d->set_fragment_shader(GpuProgram::Language::Glsl, _fragment_shader_2d))
+			return {};
+		if (!renderer->_program_2d->link())
+			return {};
+
 		return std::move(renderer);
 	}
 
@@ -36,7 +73,12 @@ namespace Yttrium
 		, _color(1, 1, 1)
 		, _font_size(1, 1)
 	{
-		_texture_stack.emplace_back(Pointer<Texture2D>(), 1);
+		_texture_stack.emplace_back(nullptr, 1);
+		_program_stack.emplace_back(nullptr, 1);
+	}
+
+	RendererImpl::~RendererImpl()
+	{
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& rect)
@@ -186,6 +228,24 @@ namespace Yttrium
 		return _font ? _font.text_size(text, _font_size) : Vector2(0, 0);
 	}
 
+	const Texture2D* RendererImpl::debug_texture() const
+	{
+		return _debug_texture.get();
+	}
+
+	void RendererImpl::pop_program()
+	{
+		assert(_program_stack.size() > 1 || (_program_stack.size() == 1 && _program_stack.back().second > 1));
+		if (_program_stack.back().second > 1)
+		{
+			--_program_stack.back().second;
+			return;
+		}
+		flush_2d();
+		_program_stack.pop_back();
+		update_current_program();
+	}
+
 	void RendererImpl::pop_projection()
 	{
 		flush_2d();
@@ -227,6 +287,21 @@ namespace Yttrium
 		set_transformation(_matrix_stack.back().first);
 	}
 
+	void RendererImpl::push_program(const GpuProgram* program)
+	{
+		if (program && !program->is_linked())
+			program = nullptr; // TODO: Throw?
+		assert(!_program_stack.empty());
+		if (_program_stack.back().first == program)
+		{
+			++_program_stack.back().second;
+			return;
+		}
+		flush_2d();
+		_program_stack.emplace_back(program, 1);
+		update_current_program();
+	}
+
 	void RendererImpl::push_projection_2d(const Matrix4& matrix)
 	{
 		flush_2d();
@@ -250,7 +325,7 @@ namespace Yttrium
 		set_transformation(_matrix_stack.back().first);
 	}
 
-	void RendererImpl::push_texture(const Pointer<Texture2D>& texture)
+	void RendererImpl::push_texture(const Texture2D* texture)
 	{
 		assert(!_texture_stack.empty());
 		if (_texture_stack.back().first == texture)
@@ -275,6 +350,7 @@ namespace Yttrium
 		const auto result = _statistics;
 		_statistics = {};
 		_seen_textures.clear();
+		_seen_programs.clear();
 		return result;
 	}
 
@@ -284,9 +360,9 @@ namespace Yttrium
 		set_window_size_impl(_window_size);
 	}
 
-	BackendTexture2D* RendererImpl::current_texture_2d() const
+	const BackendTexture2D* RendererImpl::current_texture_2d() const
 	{
-		return static_cast<BackendTexture2D*>(_texture_stack.back().first.get());
+		return static_cast<const BackendTexture2D*>(_texture_stack.back().first);
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
@@ -477,6 +553,22 @@ namespace Yttrium
 		}
 	}
 
+	void RendererImpl::update_current_program()
+	{
+		const auto program = _program_stack.back().first;
+		// TODO: Lazy program assignment (i.e. before actual rendering) to eliminate program changes
+		// when drawing differently programmed geometry with another program (e.g. GUI) on the stack.
+		set_program(program);
+		++_statistics._shader_switches;
+#if Y_IS_DEBUG
+		const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
+		if (i == _seen_programs.end())
+			_seen_programs.emplace_back(program);
+		else
+			++_statistics._redundant_shader_switches;
+#endif
+	}
+
 	void RendererImpl::update_current_texture()
 	{
 		const auto* texture = current_texture_2d();
@@ -518,7 +610,18 @@ namespace Yttrium
 		static_cast<RendererImpl&>(_renderer).pop_projection();
 	}
 
-	PushTexture::PushTexture(Renderer& renderer, const Pointer<Texture2D>& texture)
+	PushGpuProgram::PushGpuProgram(Renderer& renderer, const GpuProgram* program)
+		: _renderer(renderer)
+	{
+		static_cast<RendererImpl&>(_renderer).push_program(program);
+	}
+
+	PushGpuProgram::~PushGpuProgram()
+	{
+		static_cast<RendererImpl&>(_renderer).pop_program();
+	}
+
+	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture)
 		: _renderer(renderer)
 	{
 		static_cast<RendererImpl&>(_renderer).push_texture(texture);

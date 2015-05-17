@@ -13,6 +13,7 @@ namespace Yttrium
 		GLRenderer(WindowBackend& window, Allocator* allocator);
 
 		// Renderer
+		std::unique_ptr<GpuProgram> create_gpu_program() override;
 		std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
 		Pointer<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
 		std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t, const void*) override;
@@ -23,6 +24,7 @@ namespace Yttrium
 		void take_screenshot(Image&) override;
 		void flush_2d_impl(const std::vector<Vertex2D>&, const std::vector<uint16_t>&) override;
 		bool initialize() override;
+		void set_program(const GpuProgram*) override;
 		void set_projection(const Matrix4&) override;
 		void set_texture(const BackendTexture2D*) override;
 		void set_transformation(const Matrix4&) override;

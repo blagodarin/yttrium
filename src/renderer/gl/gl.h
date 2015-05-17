@@ -11,6 +11,7 @@ namespace Yttrium
 		void initialize(WindowBackend& window);
 
 		#define GLAPI_DECLARE
+		#define GLAPI_DYNAMIC_GL
 		#include "api.h"
 	};
 }

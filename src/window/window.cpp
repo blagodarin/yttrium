@@ -147,6 +147,7 @@ namespace Yttrium
 			_callbacks.on_update(update);
 			{
 				_renderer->clear();
+				PushGpuProgram gpu_program(*_renderer, _renderer->program_2d());
 				Push2D projection(*_renderer);
 				_gui->render(_cursor);
 				draw_debug();
@@ -171,11 +172,13 @@ namespace Yttrium
 				frames = 0;
 				max_frame_time = 0;
 			}
-			const auto renderer_statistics = _renderer->reset_statistics();
+			const auto& renderer_statistics = _renderer->reset_statistics();
 			update.triangles = renderer_statistics._triangles;
 			update.draw_calls = renderer_statistics._draw_calls;
 			update.texture_switches = renderer_statistics._texture_switches;
 			update.redundant_texture_switches = renderer_statistics._redundant_texture_switches;
+			update.shader_switches = renderer_statistics._shader_switches;
+			update.redundant_shader_switches = renderer_statistics._redundant_shader_switches;
 		}
 	}
 

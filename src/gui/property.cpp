@@ -11,7 +11,7 @@ namespace Yttrium
 	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 	{
 		renderer.set_color(color);
-		PushTexture push_texture(renderer, texture);
+		PushTexture push_texture(renderer, texture.get());
 		renderer.set_texture_rectangle(RectF(texture_rect));
 		renderer.set_texture_borders(borders);
 		renderer.draw_rectangle(rect);
@@ -50,7 +50,7 @@ namespace Yttrium
 	void ForegroundProperty::draw(Renderer& renderer, const String& text,
 		const Vector2& origin, unsigned alignment, float scale, Renderer::TextCapture* capture) const
 	{
-		PushTexture push_texture(renderer, font_texture);
+		PushTexture push_texture(renderer, font_texture.get());
 		if (!renderer.set_font(font))
 			return;
 		renderer.set_color(color);

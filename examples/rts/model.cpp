@@ -13,7 +13,7 @@ Model::Model(Renderer& renderer)
 
 void Model::draw(const Vector4& translation)
 {
-	PushTexture push_texture(_renderer, _texture);
+	PushTexture push_texture(_renderer, _texture.get());
 	PushTransformation push_transformation(_renderer, Matrix4::translation(translation));
 	_renderer.draw_triangles(*_vertices, *_indices);
 }

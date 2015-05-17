@@ -43,6 +43,13 @@ namespace Yttrium
 		/// Number of redundant texture switches, i.e. those which set a texture that had already been set in that frame.
 		/// \note Works only in debug mode.
 		int redundant_texture_switches = 0;
+
+		/// Number of shader switches.
+		int shader_switches = 0;
+
+		/// Number of redundant shader switches, i.e. those which set a GPU program that had already been set in that frame.
+		/// \note Works only in debug mode.
+		int redundant_shader_switches = 0;
 	};
 
 	///

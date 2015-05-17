@@ -257,7 +257,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
 {
-	PushTexture push_texture(renderer, _block_texture);
+	PushTexture push_texture(renderer, _block_texture.get());
 	if (canvas_name == S("field"))
 		draw_field(renderer, rect);
 	else if (canvas_name == S("next"))
@@ -271,7 +271,9 @@ void Game::on_update(const UpdateEvent& update)
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
 		<< "Triangles: " << update.triangles << "\n"
 		<< "DrawCalls: " << update.draw_calls << "\n"
-		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")";
+		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
+		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
+		;
 
 	if (_game_running)
 	{

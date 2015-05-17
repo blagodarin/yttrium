@@ -3,6 +3,7 @@
 #include <yttrium/matrix.h>
 #include <yttrium/utils.h>
 #include "buffer.h"
+#include "gpu_program.h"
 #include "texture.h"
 
 #include <cassert>
@@ -17,6 +18,11 @@ namespace Yttrium
 		: RendererImpl(allocator)
 	{
 		_gl.initialize(window);
+	}
+
+	std::unique_ptr<GpuProgram> GLRenderer::create_gpu_program()
+	{
+		return std::make_unique<GlGpuProgram>(_gl);
 	}
 
 	std::unique_ptr<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
@@ -193,7 +199,7 @@ namespace Yttrium
 		}
 #endif
 
-		if (!check_min_version(1, 2))
+		if (!check_min_version(2, 0))
 			return false; // TODO: Report error.
 
 		if (!_gl.ARB_texture_non_power_of_two)
@@ -232,6 +238,11 @@ namespace Yttrium
 		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		_gl.DisableClientState(GL_COLOR_ARRAY);
 		_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+
+	void GLRenderer::set_program(const GpuProgram* program)
+	{
+		_gl.UseProgram(program ? static_cast<const GlGpuProgram*>(program)->handle() : 0);
 	}
 
 	void GLRenderer::set_projection(const Matrix4& matrix)

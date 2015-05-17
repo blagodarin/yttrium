@@ -12,6 +12,7 @@
 
 namespace Yttrium
 {
+	class GpuProgram;
 	class ImageFormat;
 	class Margins;
 	class Matrix4;
@@ -54,6 +55,9 @@ namespace Yttrium
 
 		Renderer() = default;
 		virtual ~Renderer() = default;
+
+		///
+		virtual std::unique_ptr<GpuProgram> create_gpu_program() = 0;
 
 		///
 		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
@@ -144,14 +148,24 @@ namespace Yttrium
 	};
 
 	///
+	class Y_API PushGpuProgram : public Immovable
+	{
+	public:
+
+		PushGpuProgram(Renderer&, const GpuProgram*);
+		~PushGpuProgram();
+
+	private:
+
+		Renderer& _renderer;
+	};
+
+	///
 	class Y_API PushTexture : public Immovable
 	{
 	public:
 
-		///
-		PushTexture(Renderer& renderer, const Pointer<Texture2D>& texture);
-
-		///
+		PushTexture(Renderer& renderer, const Texture2D* texture);
 		~PushTexture();
 
 	private:

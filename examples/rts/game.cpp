@@ -132,12 +132,14 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	const auto& window_size = renderer.window_size();
 	Push3D projection(renderer,
 		Matrix4::perspective(static_cast<float>(window_size.width) / window_size.height,
-			90,       // Vertical FOV angle in degrees.
+			60,       // Vertical FOV angle in degrees.
 			1, 100)); // Near/far plane distance.
 
 	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
 
 	_chessboard->draw(Vector4(0, 0, 0));
+
+	PushGpuProgram ffp_program(renderer, nullptr);
 
 	// Center.
 	_cube->draw(Vector4(0, 0, 0));
@@ -163,6 +165,8 @@ void Game::on_update(const UpdateEvent& update)
 		<< "Triangles: " << update.triangles << "\n"
 		<< "DrawCalls: " << update.draw_calls << "\n"
 		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
+		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
-		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll;
+		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll << "\n"
+		;
 }

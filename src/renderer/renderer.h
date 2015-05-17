@@ -27,11 +27,14 @@ namespace Yttrium
 			int _draw_calls = 0;
 			int _texture_switches = 0;
 			int _redundant_texture_switches = 0;
+			int _shader_switches = 0;
+			int _redundant_shader_switches = 0;
 		};
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
 
 		RendererImpl(Allocator* allocator);
+		~RendererImpl() override;
 
 		void draw_rectangle(const RectF& rect) override;
 		void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
@@ -48,13 +51,16 @@ namespace Yttrium
 		virtual void take_screenshot(Image& image) = 0;
 
 		Allocator* allocator() const { return _allocator; }
-		Pointer<Texture2D> debug_texture() const { return _debug_texture; }
+		const Texture2D* debug_texture() const;
+		void pop_program();
 		void pop_projection();
 		void pop_texture();
 		void pop_transformation();
+		const GpuProgram* program_2d() const { return _program_2d.get(); }
+		void push_program(const GpuProgram* program);
 		void push_projection_2d(const Matrix4& matrix);
 		void push_projection_3d(const Matrix4& matrix);
-		void push_texture(const Pointer<Texture2D>& texture);
+		void push_texture(const Texture2D* texture);
 		void push_transformation(const Matrix4& matrix);
 		Statistics reset_statistics();
 		void set_window_size(const Size& size);
@@ -70,17 +76,19 @@ namespace Yttrium
 
 		virtual void flush_2d_impl(const std::vector<Vertex2D>& vertices, const std::vector<uint16_t>& indices) = 0;
 		virtual bool initialize() = 0;
+		virtual void set_program(const GpuProgram*) = 0;
 		virtual void set_projection(const Matrix4&) = 0;
 		virtual void set_texture(const BackendTexture2D*) = 0;
 		virtual void set_transformation(const Matrix4&) = 0;
 		virtual void set_window_size_impl(const Size& size) = 0;
 
-		BackendTexture2D* current_texture_2d() const;
+		const BackendTexture2D* current_texture_2d() const;
 
 	private:
 
 		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
+		void update_current_program();
 		void update_current_texture();
 
 	protected:
@@ -104,6 +112,7 @@ namespace Yttrium
 		Vector2     _font_size;
 
 		Pointer<Texture2D> _debug_texture;
+		std::unique_ptr<GpuProgram> _program_2d;
 
 		enum class MatrixType
 		{
@@ -112,10 +121,12 @@ namespace Yttrium
 		};
 
 		std::vector<std::pair<Matrix4, MatrixType>> _matrix_stack;
-		std::vector<std::pair<Pointer<Texture2D>, int>> _texture_stack;
+		std::vector<std::pair<const Texture2D*, int>> _texture_stack;
+		std::vector<std::pair<const GpuProgram*, int>> _program_stack;
 
 #if Y_IS_DEBUG
 		std::vector<const BackendTexture2D*> _seen_textures; // For redundancy statistics.
+		std::vector<const GpuProgram*> _seen_programs; // For redundancy statistics.
 #endif
 	};
 }

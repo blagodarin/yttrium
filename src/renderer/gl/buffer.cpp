@@ -8,7 +8,7 @@ namespace Yttrium
 		: _gl(gl)
 		, _target(target)
 	{
-		_gl.GenBuffersARB(1, &_handle);
+		_gl.GenBuffers(1, &_handle);
 		// TODO: Throw some nasty exception if it fails.
 	}
 
@@ -23,27 +23,27 @@ namespace Yttrium
 	GLBufferHandle::~GLBufferHandle()
 	{
 		if (_handle != 0)
-			_gl.DeleteBuffersARB(1, &_handle);
+			_gl.DeleteBuffers(1, &_handle);
 	}
 
 	void GLBufferHandle::bind() const
 	{
-		_gl.BindBufferARB(_target, _handle);
+		_gl.BindBuffer(_target, _handle);
 	}
 
 	void GLBufferHandle::initialize(GLenum usage, size_t size, const void* data) const
 	{
-		_gl.BufferDataARB(_target, size, data, usage);
+		_gl.BufferData(_target, size, data, usage);
 	}
 
 	void GLBufferHandle::unbind() const
 	{
-		_gl.BindBufferARB(_target, 0);
+		_gl.BindBuffer(_target, 0);
 	}
 
 	void GLBufferHandle::write(size_t offset, size_t size, const void* data) const
 	{
-		_gl.BufferSubDataARB(_target, offset, size, data);
+		_gl.BufferSubData(_target, offset, size, data);
 	}
 
 	GLIndexBuffer::GLIndexBuffer(Format format, size_t size, size_t element_size, GLBufferHandle&& buffer, GLenum gl_format)

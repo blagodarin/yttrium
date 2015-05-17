@@ -3,6 +3,7 @@
 #include <yttrium/audio/sound.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
+#include <yttrium/texture.h>
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
@@ -123,7 +124,7 @@ namespace Yttrium
 
 		renderer.set_color(_styles[WidgetStateType(state)].text_color);
 
-		PushTexture push_texture(renderer, _font_texture);
+		PushTexture push_texture(renderer, _font_texture.get());
 
 		if (renderer.set_font(_font))
 		{
