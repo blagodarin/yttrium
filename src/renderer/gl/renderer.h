@@ -26,7 +26,7 @@ namespace Yttrium
 		bool initialize() override;
 		void set_program(const GpuProgram*) override;
 		void set_projection(const Matrix4&) override;
-		void set_texture(const BackendTexture2D*) override;
+		void set_texture(const Texture2D*) override;
 		void set_transformation(const Matrix4&) override;
 		void set_window_size_impl(const Size&) override;
 

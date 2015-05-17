@@ -10,7 +10,7 @@ namespace Yttrium
 	{
 	public:
 
-		GLTexture2D(Allocator* allocator, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture);
+		GLTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture);
 		~GLTexture2D() override;
 
 		void bind() const;

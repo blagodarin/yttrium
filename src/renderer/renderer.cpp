@@ -73,8 +73,6 @@ namespace Yttrium
 		, _color(1, 1, 1)
 		, _font_size(1, 1)
 	{
-		_texture_stack.emplace_back(nullptr, 1);
-		_program_stack.emplace_back(nullptr, 1);
 	}
 
 	RendererImpl::~RendererImpl()
@@ -233,6 +231,18 @@ namespace Yttrium
 		return _debug_texture.get();
 	}
 
+	void RendererImpl::forget_program(const GpuProgram* program)
+	{
+		if (program == _current_program)
+			_current_program = nullptr;
+	}
+
+	void RendererImpl::forget_texture(const Texture2D* texture)
+	{
+		if (texture == _current_texture)
+			_current_texture = nullptr;
+	}
+
 	void RendererImpl::pop_program()
 	{
 		assert(_program_stack.size() > 1 || (_program_stack.size() == 1 && _program_stack.back().second > 1));
@@ -243,7 +253,7 @@ namespace Yttrium
 		}
 		flush_2d();
 		_program_stack.pop_back();
-		update_current_program();
+		_reset_program = true;
 	}
 
 	void RendererImpl::pop_projection()
@@ -274,7 +284,8 @@ namespace Yttrium
 		}
 		flush_2d();
 		_texture_stack.pop_back();
-		update_current_texture();
+		_reset_texture = true;
+		reset_texture_state();
 	}
 
 	void RendererImpl::pop_transformation()
@@ -299,7 +310,7 @@ namespace Yttrium
 		}
 		flush_2d();
 		_program_stack.emplace_back(program, 1);
-		update_current_program();
+		_reset_program = true;
 	}
 
 	void RendererImpl::push_projection_2d(const Matrix4& matrix)
@@ -335,7 +346,8 @@ namespace Yttrium
 		}
 		flush_2d();
 		_texture_stack.emplace_back(texture, 1);
-		update_current_texture();
+		_reset_texture = true;
+		reset_texture_state();
 	}
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
@@ -363,6 +375,47 @@ namespace Yttrium
 	const BackendTexture2D* RendererImpl::current_texture_2d() const
 	{
 		return static_cast<const BackendTexture2D*>(_texture_stack.back().first);
+	}
+
+	void RendererImpl::update_state()
+	{
+		if (_reset_program)
+		{
+			_reset_program = false;
+			const auto program = _program_stack.back().first;
+			if (program != _current_program)
+			{
+				_current_program = program;
+				set_program(program);
+				++_statistics._shader_switches;
+#if Y_IS_DEBUG
+				const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
+				if (i == _seen_programs.end())
+					_seen_programs.emplace_back(program);
+				else
+					++_statistics._redundant_shader_switches;
+#endif
+			}
+		}
+
+		if (_reset_texture)
+		{
+			_reset_texture = false;
+			const auto texture = _texture_stack.back().first;
+			if (texture != _current_texture)
+			{
+				_current_texture = texture;
+				set_texture(texture);
+				++_statistics._texture_switches;
+#if Y_IS_DEBUG
+				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
+				if (i == _seen_textures.end())
+					_seen_textures.emplace_back(texture);
+				else
+					++_statistics._redundant_texture_switches;
+#endif
+			}
+		}
 	}
 
 	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
@@ -553,39 +606,12 @@ namespace Yttrium
 		}
 	}
 
-	void RendererImpl::update_current_program()
-	{
-		const auto program = _program_stack.back().first;
-		// TODO: Lazy program assignment (i.e. before actual rendering) to eliminate program changes
-		// when drawing differently programmed geometry with another program (e.g. GUI) on the stack.
-		set_program(program);
-		++_statistics._shader_switches;
-#if Y_IS_DEBUG
-		const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
-		if (i == _seen_programs.end())
-			_seen_programs.emplace_back(program);
-		else
-			++_statistics._redundant_shader_switches;
-#endif
-	}
-
-	void RendererImpl::update_current_texture()
+	void RendererImpl::reset_texture_state()
 	{
 		const auto* texture = current_texture_2d();
-		// TODO: Lazy texture assignment (i.e. before actual rendering) to eliminate texture changes
-		// when drawing differently textured geometry with another texture (e.g. GUI) on the stack.
-		set_texture(texture);
 		_texture_rect = texture ? texture->full_rectangle() : RectF();
 		_texture_borders = MarginsF();
 		_font = TextureFont();
-		++_statistics._texture_switches;
-#if Y_IS_DEBUG
-		const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
-		if (i == _seen_textures.end())
-			_seen_textures.emplace_back(texture);
-		else
-			++_statistics._redundant_texture_switches;
-#endif
 	}
 
 	Push2D::Push2D(Renderer& renderer)

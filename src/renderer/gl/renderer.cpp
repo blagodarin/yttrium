@@ -22,7 +22,7 @@ namespace Yttrium
 
 	std::unique_ptr<GpuProgram> GLRenderer::create_gpu_program()
 	{
-		return std::make_unique<GlGpuProgram>(_gl);
+		return std::make_unique<GlGpuProgram>(*this, _gl);
 	}
 
 	std::unique_ptr<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
@@ -78,7 +78,7 @@ namespace Yttrium
 		const auto internal_format = internal_formats[static_cast<size_t>(format.pixel_format())];
 
 		// NOTE: The following code is not exception-safe:
-		// the texture handle won't be released if  an exception is generated.
+		// the texture handle won't be released if an exception is generated.
 
 		GLuint texture = 0;
 		_gl.GenTextures(1, &texture); // TODO: Think of using Y_ABORT if this fails.
@@ -99,7 +99,7 @@ namespace Yttrium
 		}
 		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
-		return Pointer<Texture2D>(Y_NEW(_allocator, GLTexture2D)(_allocator, format, !no_mipmaps, _gl, texture));
+		return Pointer<Texture2D>(Y_NEW(allocator(), GLTexture2D)(*this, format, !no_mipmaps, _gl, texture));
 	}
 
 	std::unique_ptr<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
@@ -120,6 +120,8 @@ namespace Yttrium
 
 	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
 	{
+		update_state();
+
 		const auto& vertices = static_cast<const GLVertexBuffer&>(vertex_buffer);
 		const auto& indices = static_cast<const GLIndexBuffer&>(index_buffer);
 
@@ -219,6 +221,8 @@ namespace Yttrium
 
 	void GLRenderer::flush_2d_impl(const std::vector<Vertex2D>& vertices, const std::vector<uint16_t>& indices)
 	{
+		update_state();
+
 		_gl.EnableClientState(GL_COLOR_ARRAY);
 		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &vertices[0].color);
 
@@ -251,7 +255,7 @@ namespace Yttrium
 		_gl.LoadMatrixf(matrix.data());
 	}
 
-	void GLRenderer::set_texture(const BackendTexture2D* texture)
+	void GLRenderer::set_texture(const Texture2D* texture)
 	{
 		if (!texture)
 		{

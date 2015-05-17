@@ -1,13 +1,15 @@
 #include "gpu_program.h"
 
 #include <yttrium/static_string.h>
+#include "renderer.h"
 
 #include <cassert>
 
 namespace Yttrium
 {
-	GlGpuProgram::GlGpuProgram(const GlApi& gl)
-		: _gl(gl)
+	GlGpuProgram::GlGpuProgram(RendererImpl& renderer, const GlApi& gl)
+		: _renderer(renderer)
+		, _gl(gl)
 		, _program(_gl.CreateProgram())
 	{
 		assert(_program); // TODO: Throw.
@@ -20,6 +22,7 @@ namespace Yttrium
 			_gl.DeleteShader(_fragment_shader);
 		if (_vertex_shader)
 			_gl.DeleteShader(_vertex_shader);
+		_renderer.forget_program(this);
 	}
 
 	bool GlGpuProgram::link()

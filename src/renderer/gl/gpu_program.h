@@ -5,15 +5,18 @@
 #define __RENDERER_GL_GPU_PROGRAM_H
 
 #include <yttrium/gpu_program.h>
+
 #include "gl.h"
 
 namespace Yttrium
 {
+	class RendererImpl;
+
 	class GlGpuProgram : public GpuProgram
 	{
 	public:
 
-		GlGpuProgram(const GlApi& gl);
+		GlGpuProgram(RendererImpl& renderer, const GlApi& gl);
 		~GlGpuProgram() override;
 
 		bool is_linked() const override { return _linked; }
@@ -29,6 +32,7 @@ namespace Yttrium
 
 	private:
 
+		RendererImpl& _renderer;
 		const GlApi& _gl;
 		GLuint _program = 0;
 		GLuint _vertex_shader = 0;

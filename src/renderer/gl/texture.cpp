@@ -2,8 +2,8 @@
 
 namespace Yttrium
 {
-	GLTexture2D::GLTexture2D(Allocator* allocator, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture)
-		: BackendTexture2D(allocator, format, has_mipmaps)
+	GLTexture2D::GLTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture)
+		: BackendTexture2D(renderer, format, has_mipmaps)
 		, _gl(gl)
 		, _texture(texture)
 	{

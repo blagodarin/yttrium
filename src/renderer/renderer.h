@@ -52,6 +52,8 @@ namespace Yttrium
 
 		Allocator* allocator() const { return _allocator; }
 		const Texture2D* debug_texture() const;
+		void forget_program(const GpuProgram* program);
+		void forget_texture(const Texture2D* texture);
 		void pop_program();
 		void pop_projection();
 		void pop_texture();
@@ -78,25 +80,26 @@ namespace Yttrium
 		virtual bool initialize() = 0;
 		virtual void set_program(const GpuProgram*) = 0;
 		virtual void set_projection(const Matrix4&) = 0;
-		virtual void set_texture(const BackendTexture2D*) = 0;
+		virtual void set_texture(const Texture2D*) = 0;
 		virtual void set_transformation(const Matrix4&) = 0;
 		virtual void set_window_size_impl(const Size& size) = 0;
 
 		const BackendTexture2D* current_texture_2d() const;
+		void update_state();
 
 	private:
 
 		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
-		void update_current_program();
-		void update_current_texture();
+		void reset_texture_state();
 
 	protected:
 
-		Allocator* const _allocator;
 		Statistics _statistics;
 
 	private:
+
+		Allocator* const _allocator;
 
 		Size _window_size;
 
@@ -112,7 +115,7 @@ namespace Yttrium
 		Vector2     _font_size;
 
 		Pointer<Texture2D> _debug_texture;
-		std::unique_ptr<GpuProgram> _program_2d;
+		std::shared_ptr<GpuProgram> _program_2d;
 
 		enum class MatrixType
 		{
@@ -121,11 +124,18 @@ namespace Yttrium
 		};
 
 		std::vector<std::pair<Matrix4, MatrixType>> _matrix_stack;
-		std::vector<std::pair<const Texture2D*, int>> _texture_stack;
-		std::vector<std::pair<const GpuProgram*, int>> _program_stack;
 
+		std::vector<std::pair<const Texture2D*, int>> _texture_stack = {{nullptr, 1}};
+		const Texture2D* _current_texture = nullptr;
+		bool _reset_texture = false;
 #if Y_IS_DEBUG
-		std::vector<const BackendTexture2D*> _seen_textures; // For redundancy statistics.
+		std::vector<const Texture2D*> _seen_textures; // For redundancy statistics.
+#endif
+
+		std::vector<std::pair<const GpuProgram*, int>> _program_stack = {{nullptr, 1}};
+		const GpuProgram* _current_program = nullptr;
+		bool _reset_program = false;
+#if Y_IS_DEBUG
 		std::vector<const GpuProgram*> _seen_programs; // For redundancy statistics.
 #endif
 	};

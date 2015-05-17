@@ -7,11 +7,14 @@
 
 namespace Yttrium
 {
+	class RendererImpl;
+
 	class BackendTexture2D: public Texture2D
 	{
 	public:
 
-		BackendTexture2D(Allocator* allocator, const ImageFormat& format, bool has_mipmaps);
+		BackendTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps);
+		~BackendTexture2D() override;
 
 		virtual Vector2 fix_coords(const Vector2& coords) const = 0; // TODO: fix_rectangle().
 
@@ -19,6 +22,7 @@ namespace Yttrium
 
 	protected:
 
+		RendererImpl&          _renderer;
 		const ImageOrientation _orientation;
 		bool                   _has_mipmaps;
 	};
