@@ -137,10 +137,6 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 
 	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
 
-	_chessboard->draw(Vector4(0, 0, 0));
-
-	PushGpuProgram ffp_program(renderer, nullptr);
-
 	// Center.
 	_cube->draw(Vector4(0, 0, 0));
 
@@ -155,6 +151,8 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	_cube->draw(Vector4(0, 0, 2));
 	_cube->draw(Vector4(0, 0, 4));
 	_cube->draw(Vector4(0, 0, 6));
+
+	_chessboard->draw(Vector4(0, 0, 0));
 }
 
 void Game::on_update(const UpdateEvent& update)

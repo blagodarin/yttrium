@@ -13,6 +13,7 @@ Model::Model(Renderer& renderer)
 
 void Model::draw(const Vector4& translation)
 {
+	PushGpuProgram push_gpu_program(_renderer, _program.get());
 	PushTexture push_texture(_renderer, _texture.get());
 	PushTransformation push_transformation(_renderer, Matrix4::translation(translation));
 	_renderer.draw_triangles(*_vertices, *_indices);
@@ -85,12 +86,10 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	struct Vertex
 	{
 		Vector4 position;
-		Vector4 color;
 		Vector2 texture;
 
 		Vertex(float x, float y, float u, float v)
 			: position(x, y, 0)
-			, color(1, 1, 1)
 			, texture(u, v)
 		{
 		}
@@ -104,7 +103,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 		Vertex( size / 2,  size / 2, 1, 1),
 	};
 
-	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Rgba4F | VertexBuffer::Uv2F, vertices.size(), vertices.data());
+	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Uv2F, vertices.size(), vertices.data());
 
 	const std::array<uint16_t, 6> indices =
 	{
@@ -133,4 +132,39 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 
 	_texture = _renderer.create_texture_2d(image_format, pixels.data(), false);
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
+
+	_program = _renderer.create_gpu_program();
+	_program->set_vertex_shader(GpuProgram::Language::Glsl, S
+	(
+		"#version 110\n"
+		""
+		"varying vec3 view_direction;"
+		""
+		"void main()"
+		"{"
+			"view_direction = vec3(gl_ModelViewMatrix * gl_Vertex);"
+			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
+			"gl_TexCoord[0] = gl_MultiTexCoord0;"
+		"}"
+	));
+	_program->set_fragment_shader(GpuProgram::Language::Glsl, S
+	(
+		"#version 110\n"
+		""
+		"varying vec3 view_direction;"
+		""
+		"uniform sampler2D surface_texture;"
+		""
+		"void main()"
+		"{"
+			"vec4 surface_color = texture2D(surface_texture, gl_TexCoord[0].xy);"
+			"if (view_direction.x < 0.0)"
+			"{"
+				"float gray = dot(surface_color.xyz, vec3(1.0, 1.0, 1.0));"
+				"surface_color = vec4(gray, gray, gray, surface_color.a * 0.25);"
+			"}"
+			"gl_FragColor = surface_color;"
+		"}"
+	));
+	_program->link();
 }
