@@ -202,12 +202,11 @@ void GuiIonLoader::load(const IonObject &source)
 				class_name = nullptr;
 			}
 
-			GuiScene *scene = _gui->create_scene(*object_name);
-
+			auto scene = _gui->create_scene(*object_name);
 			if (scene)
 			{
-				load_scene(scene, *object);
-				_gui->add_scene(scene, class_name != nullptr);
+				load_scene(*scene, *object);
+				_gui->add_scene(std::move(scene), class_name != nullptr);
 			}
 		}
 		else if (node.name() == S("on_scene_change"))
@@ -263,9 +262,9 @@ void GuiIonLoader::load(const IonObject &source)
 	}
 }
 
-void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
+void GuiIonLoader::load_scene(GuiScene& scene, const IonObject& source) const
 {
-	scene->reserve(source.size());
+	scene.reserve(source.size());
 
 	for (const IonNode &node: source.nodes())
 	{
@@ -275,7 +274,7 @@ void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
 
 			if (GuiIonPropertyLoader::load_size(&size, node))
 			{
-				scene->set_size(size);
+				scene.set_size(size);
 			}
 		}
 		else if (node.name() == S("scale"))
@@ -284,12 +283,12 @@ void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
 
 			if (GuiIonPropertyLoader::load_scaling(&scaling, node))
 			{
-				scene->set_scaling(scaling);
+				scene.set_scaling(scaling);
 			}
 		}
 		if (node.name() == S("transparent"))
 		{
-			scene->set_transparent(true);
+			scene.set_transparent(true);
 		}
 		else if (node.name() == S("bind"))
 		{
@@ -298,7 +297,7 @@ void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
 			if (s.size() == 2 && s->type() == IonValue::StringType
 				&& s.last().type() == IonValue::StringType)
 			{
-				scene->bind(s->string(), s.last().string());
+				scene.bind(s->string(), s.last().string());
 			}
 		}
 		else
@@ -314,7 +313,7 @@ void GuiIonLoader::load_scene(GuiScene *scene, const IonObject &source) const
 
 			GuiIonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _gui);
 
-			scene->load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
+			scene.load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
 		}
 	}
 }

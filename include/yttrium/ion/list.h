@@ -4,9 +4,10 @@
 #ifndef __Y_ION_LIST_H
 #define __Y_ION_LIST_H
 
+#include <yttrium/base.h>
 #include <yttrium/global.h>
 
-#include <cstddef> // size_t
+#include <cstddef>
 
 namespace Yttrium
 {

@@ -6,37 +6,33 @@
 
 namespace Yttrium
 {
+	class OpenAlBackend;
 
-class OpenAlManager;
-
-class OpenAlSound: public SoundImpl
-{
-	friend OpenAlManager;
-
-public:
-
-	void play() const override;
-
-private:
-
-	OpenAlSound(const StaticString& name, Allocator* allocator)
-		: SoundImpl(name, allocator)
-		, _source(0)
-		, _buffer(0)
+	class OpenAlSound: public SoundImpl
 	{
-	}
+		friend OpenAlBackend;
 
-	~OpenAlSound() override;
+	public:
 
-	bool load(AudioReader* reader) override;
+		void play() const override;
 
-private:
+	private:
 
-	ALuint       _source;
-	ALuint       _buffer;
-	OpenAlFormat _format;
-};
+		OpenAlSound(const StaticString& name, Allocator* allocator)
+			: SoundImpl(name, allocator)
+		{
+		}
 
-} // namespace Yttrium
+		~OpenAlSound() override;
+
+		bool load(AudioReader&) override;
+
+	private:
+
+		ALuint       _source = 0;
+		ALuint       _buffer = 0;
+		OpenAlFormat _format;
+	};
+}
 
 #endif // __AUDIO_BACKEND_OPENAL_SOUND_H

@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include <yttrium/point.h>
+#include <yttrium/pointer.h>
 #include <yttrium/static_string.h>
 #include "screen.h"
 
@@ -469,13 +470,13 @@ void WindowBackend::swap_buffers()
 	::glXSwapBuffers(_display, _window);
 }
 
-std::unique_ptr<WindowBackend> WindowBackend::create(const ScreenImpl& screen, const Size& size, Callbacks& callbacks)
+Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, const Size& size, Callbacks& callbacks)
 {
 	::Window window_handle;
 	::GLXContext glx_context;
 	if (!initialize_window(screen.display(), screen.screen(), size, window_handle, glx_context))
 		return {};
-	return std::make_unique<WindowBackend>(screen.display(), window_handle, glx_context, size, callbacks);
+	return make_pointer<WindowBackend>(allocator, screen.display(), window_handle, glx_context, size, callbacks);
 }
 
 } // namespace Yttrium

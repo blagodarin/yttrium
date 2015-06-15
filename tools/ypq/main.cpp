@@ -61,8 +61,7 @@ int main(int argc, char** argv)
 		index_file_name.text(), package_file_name.text());
 
 	String line;
-
-	for (size_t line_index = 1; index_file.read_line(&line); ++line_index)
+	for (size_t line_index = 1; index_file.read_line(line); ++line_index)
 	{
 		line.trim();
 		if (line.is_empty() || line[0] == '#')

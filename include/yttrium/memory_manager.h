@@ -4,38 +4,28 @@
 #ifndef __Y_MEMORY_MANAGER_H
 #define __Y_MEMORY_MANAGER_H
 
+#include <yttrium/base.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium
 {
-
-///
-class Y_API MemoryManager
-{
-	Y_NONCOPYABLE(MemoryManager);
-
-public:
-
 	///
-	MemoryManager(const StaticString& default_name = S("default"));
+	class Y_API MemoryManager
+	{
+	public:
 
-	///
-	~MemoryManager();
+		///
+		MemoryManager(const StaticString& default_name = S("default"));
 
-public:
+		///
+		~MemoryManager();
 
-	///
-	static Allocator *default_allocator();
+		///
+		static Allocator* default_allocator();
 
-public:
-
-	class Private;
-
-private:
-
-	Private *_private;
-};
-
-} // namespace Yttrium
+	private:
+		Y_MANAGER_PRIVATE(MemoryManager);
+	};
+}
 
 #endif // __Y_MEMORY_MANAGER_H

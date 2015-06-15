@@ -23,7 +23,7 @@ namespace Yttrium
 		void dump_sound(const StaticString& name, const Sound& sound) override;
 		void dump_state(const StaticString& name, WidgetState state) override;
 		void dump_text(const StaticString& name, const StaticString& text) override;
-		void dump_texture(const StaticString& name, const Pointer<Texture2D>& texture) override;
+		void dump_texture(const StaticString& name, const SharedPtr<Texture2D>& texture) override;
 
 	private:
 

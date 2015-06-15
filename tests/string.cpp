@@ -1,5 +1,5 @@
 #include <yttrium/string.h>
-#include <yttrium/time.h>
+#include <yttrium/date_time.h>
 
 #include "common.h"
 
@@ -39,13 +39,11 @@ BOOST_AUTO_TEST_CASE(test_string_assignment)
 	String s3 = s2;
 
 	s2 = "another test";
-
 	BOOST_CHECK(s1 == "test");
 	BOOST_CHECK(s2 == "another test");
 	BOOST_CHECK(s3 == s1);
 
 	s1 += "!";
-
 	BOOST_CHECK(s1 == "test!");
 	BOOST_CHECK(s3 == "test");
 }
@@ -58,12 +56,10 @@ BOOST_AUTO_TEST_CASE(test_string_swap)
 	String s2 = "another test";
 
 	s2.swap(&s1);
-
 	BOOST_CHECK(s1 == "another test");
 	BOOST_CHECK(s2 == "test");
 
 	s1.swap("rvalue test");
-
 	BOOST_CHECK(s1 == "rvalue test");
 }
 
@@ -74,19 +70,15 @@ BOOST_AUTO_TEST_CASE(test_string_insert)
 	String s1 = "test";
 
 	s1.insert("just ", 0);
-
 	BOOST_CHECK(s1 == "just test");
 
 	s1.insert("another ", 5);
-
 	BOOST_CHECK(s1 == "just another test");
 
 	s1.insert('!', s1.size());
-
 	BOOST_CHECK(s1 == "just another test!");
 
 	s1.insert('!', s1.size() + 1);
-
 	BOOST_CHECK(s1 == "just another test!");
 }
 

@@ -1,53 +1,33 @@
-#include <yttrium/allocator.h>
 #include <yttrium/pointer.h>
 
 #include "common.h"
 
-class Pointable: public Yttrium::Pointable
-{
-public:
-
-	Pointable(int& counter, Yttrium::Allocator* allocator)
-		: Yttrium::Pointable(allocator)
-		, _counter(counter)
-	{
-		++_counter;
-	}
-
-	~Pointable() override
-	{
-		--_counter;
-	}
-
-private:
-
-	int& _counter;
-};
-
-typedef Yttrium::Pointer<Pointable> Pointer;
+using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_pointer)
 {
+	struct Object
+	{
+		int& _counter;
+
+		Object(int& counter) : _counter(counter) { ++_counter; }
+		~Object() { --_counter; }
+	};
+
 	DECLARE_MEMORY_MANAGER;
 
-	Yttrium::Allocator* allocator = Yttrium::DefaultAllocator;
-
 	int counter = 0;
-
 	{
-		Pointer p1(Y_NEW(allocator, Pointable)(counter, allocator));
+		const auto p1 = make_pointer<Object>(*DefaultAllocator, counter);
 		BOOST_CHECK_EQUAL(counter, 1);
-
 		{
-			Pointer p2(Y_NEW(allocator, Pointable)(counter, allocator));
+			auto p2 = make_pointer<Object>(*DefaultAllocator, counter);
 			BOOST_CHECK_EQUAL(counter, 2);
-
-			Pointer p3 = p2;
+			auto p3 = std::move(p2);
+			BOOST_CHECK(!p2);
 			BOOST_CHECK_EQUAL(counter, 2);
 		}
-
 		BOOST_CHECK_EQUAL(counter, 1);
 	}
-
 	BOOST_CHECK_EQUAL(counter, 0);
 }

@@ -4,30 +4,35 @@
 #include <yttrium/screen.h>
 
 #include "../../base/private_base.h"
+#include "../../base/utils.h"
 
 #include <X11/Xlib.h>
 
 namespace Yttrium
 {
-	class ScreenImpl: public Screen
+	template <typename> class Pointer;
+
+	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);
+
+	class ScreenImpl : public Screen
 	{
 	public:
 
-		static std::unique_ptr<ScreenImpl> open();
+		static Pointer<ScreenImpl> open(Allocator&);
 
-		ScreenImpl(::Display* display);
+		ScreenImpl(P_Display display);
 		~ScreenImpl() override;
 
 		ScreenMode current_mode() const override;
 		ScreenMode default_mode() const override;
 
-		::Display* display() const { return _display; }
+		::Display* display() const { return _display.get(); }
 		int screen() const { return _screen; }
 
 	private:
 
-		::Display* _display;
-		int        _screen;
+		const P_Display _display;
+		const int _screen;
 	};
 }
 

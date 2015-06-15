@@ -5,32 +5,30 @@
 
 namespace Yttrium
 {
+	// We don't want to exhibit something like this to the unfriendly outsideness,
+	// but want to duplicate our code even less. So, here we are.
 
-// We don't want to exhibit something like this to the unfriendly outsideness,
-// but want to duplicate our code even less. So, here we are.
-
-template <typename T>
-class InstanceGuard
-{
-public:
-
-	static T* instance;
-
-	InstanceGuard(T* pointer, const char* message)
+	template <typename T>
+	class InstanceGuard
 	{
-		Y_ABORT_IF(instance, message);
-		instance = pointer;
-	}
+	public:
 
-	~InstanceGuard()
-	{
-		instance = nullptr;
-	}
-};
+		static T* instance;
 
-template <typename T>
-T* InstanceGuard<T>::instance = nullptr;
+		InstanceGuard(T* pointer, const char* message)
+		{
+			Y_ABORT_IF(instance, message);
+			instance = pointer;
+		}
 
-} // namespace Yttrium
+		~InstanceGuard()
+		{
+			instance = nullptr;
+		}
+	};
+
+	template <typename T>
+	T* InstanceGuard<T>::instance = nullptr;
+}
 
 #endif // __BASE_INSTANCE_GUARD_H

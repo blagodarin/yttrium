@@ -3,7 +3,6 @@
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
 #include <yttrium/renderer.h>
-#include "../memory/allocatable.h"
 #include "gui.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
@@ -29,24 +28,21 @@ namespace Yttrium
 
 	GuiScene::~GuiScene()
 	{
-		for (Widget* widget: _widgets)
-			Y_DELETE(_allocator, widget);
 	}
 
 	void GuiScene::load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader)
 	{
-		Allocatable<Widget> widget(_allocator);
-
+		Pointer<Widget> widget;
 		if (type == S("button"))
-			widget.reset<Button>();
+			widget = make_pointer<Button>(*_allocator, _allocator);
 		else if (type == S("canvas"))
-			widget.reset<Canvas>(_gui.callbacks());
+			widget = make_pointer<Canvas>(*_allocator, _gui.callbacks(), _allocator);
 		else if (type == S("image"))
-			widget.reset<GuiImage>();
+			widget = make_pointer<GuiImage>(*_allocator, _allocator);
 		else if (type == S("input"))
-			widget.reset<GuiInput>();
+			widget = make_pointer<GuiInput>(*_allocator, _allocator);
 		else if (type == S("label"))
-			widget.reset<Label>();
+			widget = make_pointer<Label>(*_allocator, _allocator);
 
 		if (!widget)
 			return;
@@ -62,7 +58,7 @@ namespace Yttrium
 			_named_widgets[String(name, _allocator)] = widget.get();
 		}
 
-		_widgets.push_back(widget.release());
+		_widgets.emplace_back(std::move(widget));
 	}
 
 	bool GuiScene::process_key(const KeyEvent& event)
@@ -144,7 +140,7 @@ namespace Yttrium
 			{
 				if (map((*i)->rect(), shift, scale, (*i)->scaling()).contains(_cursor))
 				{
-					mouse_widget = *i;
+					mouse_widget = i->get();
 					break;
 				}
 			}
@@ -152,15 +148,20 @@ namespace Yttrium
 
 		_mouse_widget = mouse_widget;
 
-		for (const Widget* widget: _widgets)
+		for (const auto& widget : _widgets)
 		{
 			WidgetState state = WidgetState::Normal;
-			if (widget == _mouse_widget)
-				state = (widget == _left_click_widget) ? WidgetState::Pressed : WidgetState::Active;
+			if (widget.get() == _mouse_widget)
+				state = (widget.get() == _left_click_widget) ? WidgetState::Pressed : WidgetState::Active;
 			widget->render(renderer, map(widget->rect(), shift, scale, widget->scaling()), scale, state);
 		}
 
 		_is_cursor_set = false;
+	}
+
+	void GuiScene::reserve(size_t capacity)
+	{
+		_widgets.reserve(capacity);
 	}
 
 	RectF GuiScene::map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const

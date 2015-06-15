@@ -168,57 +168,9 @@
 
 #define Y_UNUSED(parameter) (void)(parameter)
 
-/// Make the current class \a Class non-copyable.
-
-#define Y_NONCOPYABLE(Class) \
-	Class(const Class&) = delete; \
-	Class& operator=(const Class&) = delete
-
-///
-#define Y_DECLARE_PRIVATE(Class) \
-	public: \
-		class Private; \
-		Class() = default; \
-		Class(const Class&); \
-		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
-		~Class(); \
-		Class& operator=(const Class&); \
-		Class& operator=(Class&&); \
-		explicit operator bool() const { return _private; } \
-	protected: \
-		Class(Private* private_): _private(private_) {} \
-	private: \
-		Private* _private = nullptr \
-
-///
-#define Y_DECLARE_PRIVATE_NONCOPYABLE(Class) \
-	public: \
-		class Private; \
-		Class() = default; \
-		Class(const Class&) = delete; \
-		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
-		~Class(); \
-		Class& operator=(const Class&) = delete; \
-		Class& operator=(Class&&); \
-		explicit operator bool() const { return _private; } \
-	protected: \
-		Class(Private* private_): _private(private_) {} \
-	private: \
-		Private* _private = nullptr \
-
 /// %Yttrium namespace.
 namespace Yttrium
 {
-	///
-	struct Immovable
-	{
-		Immovable() = default;
-		Immovable(const Immovable&) = delete;
-		Immovable(Immovable&&) = delete;
-		~Immovable() = default;
-		Immovable& operator=(const Immovable&) = delete;
-		Immovable& operator=(Immovable&&) = delete;
-	};
 }
 
 #endif // __Y_GLOBAL_H

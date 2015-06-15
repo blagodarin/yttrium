@@ -4,6 +4,7 @@
 #ifndef __Y_DIR_H
 #define __Y_DIR_H
 
+#include <yttrium/base.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium
@@ -11,8 +12,6 @@ namespace Yttrium
 	/// Directory access class.
 	class Y_API Dir
 	{
-		Y_DECLARE_PRIVATE_NONCOPYABLE(Dir);
-
 	public:
 
 		///
@@ -63,6 +62,10 @@ namespace Yttrium
 
 		///
 		static bool exists(const StaticString& name);
+
+	private:
+		Y_UNIQUE_PRIVATE(Dir);
+		Dir() = delete;
 	};
 }
 

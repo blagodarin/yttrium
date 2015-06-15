@@ -19,7 +19,6 @@ BOOST_AUTO_TEST_CASE(test_ion_serialization)
 	BOOST_REQUIRE(document.load("tests/ion/original.ion"));
 
 	document.save(file.name());
-
 	BOOST_REQUIRE(File("tests/ion/indented.ion").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
@@ -27,7 +26,6 @@ BOOST_AUTO_TEST_CASE(test_ion_serialization)
 	BOOST_REQUIRE(document.load(file.name()));
 
 	document.save(file.name(), Ion::DontIndent);
-
 	BOOST_REQUIRE(File("tests/ion/unindented.ion").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);
@@ -35,7 +33,6 @@ BOOST_AUTO_TEST_CASE(test_ion_serialization)
 	BOOST_REQUIRE(document.load(file.name()));
 
 	document.save(file.name());
-
 	BOOST_REQUIRE(File("tests/ion/indented.ion").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);

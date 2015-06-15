@@ -1,8 +1,8 @@
 #include "image.h"
 
 #include <yttrium/package.h>
+#include <yttrium/pointer.h>
 #include <yttrium/utils.h>
-#include "../memory/allocatable.h"
 #include "dds.h"
 #include "tga.h"
 
@@ -143,14 +143,16 @@ namespace Yttrium
 				return false;
 		}
 
-		Allocatable<ImageReader> reader(_buffer.allocator());
+		Allocator& allocator = *_buffer.allocator();
+
+		Pointer<ImageReader> reader;
 		switch (type)
 		{
-		case ImageType::Tga:  reader.reset<TgaReader>(name); break;
+		case ImageType::Tga:  reader = make_pointer<TgaReader>(allocator, name, &allocator); break;
 	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: reader.reset<JpegReader>(name); break;
+		case ImageType::Jpeg: reader = make_pointer<JpegReader>(allocator, name, &allocator); break;
 	#endif
-		case ImageType::Dds:  reader.reset<DdsReader>(name); break;
+		case ImageType::Dds:  reader = make_pointer<DdsReader>(allocator, name, &allocator); break;
 		default:              return false;
 		}
 
@@ -177,12 +179,14 @@ namespace Yttrium
 				return false;
 		}
 
-		Allocatable<ImageWriter> writer(_buffer.allocator());
+		Allocator& allocator = *_buffer.allocator();
+
+		Pointer<ImageWriter> writer;
 		switch (type)
 		{
-		case ImageType::Tga: writer.reset<TgaWriter>(name); break;
+		case ImageType::Tga: writer = make_pointer<TgaWriter>(allocator, name, &allocator); break;
 	#ifndef Y_NO_PNG
-		case ImageType::Png: writer.reset<PngWriter>(name); break;
+		case ImageType::Png: writer = make_pointer<PngWriter>(allocator, name, &allocator); break;
 	#endif
 		default:             return false;
 		}

@@ -1,68 +1,98 @@
 #include "manager.h"
 
-#include <yttrium/proxy_allocator.h>
-#include "backend/manager.h"
+#include <yttrium/memory_manager.h>
 #include "sound.h"
+
+#include "backend/openal/backend.h"
 
 namespace Yttrium
 {
-	AudioManager::Private::Private(Allocator* allocator, const StaticString& device_name)
-		: _instance_guard(this, "Duplicate AudioManager construction")
-		, _allocator(allocator)
-		, _device_name(device_name, allocator)
-		, _player_private(allocator)
+	std::vector<StaticString> AudioManager::backends()
 	{
+		std::vector<StaticString> result;
+		result.emplace_back(AudioBackend::OpenAL);
+		return result;
 	}
 
-	AudioManager::Private::~Private()
+	std::vector<StaticString> AudioManager::backend_devices(const StaticString& backend)
 	{
-		Y_ASSERT(_sounds.empty());
+		if (backend == AudioBackend::OpenAL)
+			return OpenAlBackend::devices();
+		else
+			return {};
 	}
 
-	AudioManager::Private* AudioManager::Private::instance()
+	Pointer<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator* allocator)
+	{
+		if (!allocator)
+			allocator = MemoryManager::default_allocator();
+		try
+		{
+			return make_pointer<AudioManagerImpl>(*allocator, backend, device, allocator);
+		}
+		catch (const std::runtime_error&)
+		{
+			// TODO: Log.
+			return {};
+		}
+	}
+
+	AudioManagerImpl* AudioManagerImpl::instance()
 	{
 		return AudioManagerGuard::instance;
 	}
 
-	AudioManager::AudioManager(Allocator* allocator)
-		: _allocator(Y_NEW(allocator, ProxyAllocator)("audio", allocator))
-		, _private(nullptr)
+	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator* allocator)
+		: _instance_guard(this, "Duplicate AudioManager construction")
+		, _allocator("audio", allocator)
+		, _backend(AudioBackend::create(backend, device, &_allocator))
+		, _player(_backend->create_player(), &_allocator)
 	{
 	}
 
-	AudioManager::~AudioManager()
+	AudioManagerImpl::~AudioManagerImpl()
 	{
-		close();
-		Y_DELETE(_allocator->allocator(), _allocator);
+		Y_ASSERT(_sounds.empty());
 	}
 
-	StaticString AudioManager::backend() const
+	StaticString AudioManagerImpl::backend() const
 	{
-		return _private ? _private->_backend_name : StaticString();
+		return _backend->backend();
 	}
 
-	void AudioManager::close()
+	StaticString AudioManagerImpl::device() const
 	{
-		Y_DELETE(_allocator, _private);
-		_private = nullptr;
+		return _backend->device();
 	}
 
-	StaticString AudioManager::device() const
+	SharedPtr<Sound> AudioManagerImpl::create_sound(const StaticString& name, Allocator* allocator)
 	{
-		return _private ? _private->_device_name : StaticString();
+		if (!allocator)
+			allocator = &_allocator;
+
+		// Lock mutex here for the sound opening to become thread safe.
+
+		const auto i = _sounds.find(String(name, ByReference()));
+		if (i != _sounds.end())
+			return SharedPtr<Sound>(i->second);
+
+		const auto reader = AudioReader::open(name, AudioType::Auto, allocator);
+		if (!reader)
+			return {};
+
+		auto sound = _backend->create_sound(name, allocator);
+		if (!sound->load(*reader))
+		{
+			// Unlock the mutex here for the sound opening to become thread safe.
+			return {};
+		}
+
+		_sounds.emplace(sound->name(), sound.get());
+		return std::move(sound);
 	}
 
-	bool AudioManager::open(const StaticString& backend, const StaticString& device)
+	void AudioManagerImpl::delete_sound(const StaticString& name)
 	{
-		close();
-
-		_private = open_audio_manager(backend, device, _allocator);
-
-		return _private;
-	}
-
-	AudioPlayer AudioManager::player()
-	{
-		return AudioPlayer(&_private->_player_private);
+		_sounds.erase(String(name, ByReference()));
 	}
 }

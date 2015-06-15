@@ -2,7 +2,7 @@
 
 #include "wav_private.h"
 
-#include <algorithm> // min
+#include <algorithm>
 
 namespace Yttrium
 {

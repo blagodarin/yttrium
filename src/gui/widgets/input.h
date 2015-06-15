@@ -1,7 +1,7 @@
 #ifndef __GUI_WIDGETS_INPUT_H
 #define __GUI_WIDGETS_INPUT_H
 
-#include <yttrium/time.h>
+#include <yttrium/timer.h>
 #include "../logic/line_editor.h"
 #include "../property.h"
 #include "widget.h"
@@ -12,7 +12,7 @@ namespace Yttrium
 	{
 	public:
 
-		GuiInput(Allocator* allocator);
+		GuiInput(Allocator* allocator) : Widget(allocator, CanHaveFocus), _logic(allocator) {}
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
@@ -25,7 +25,7 @@ namespace Yttrium
 		BackgroundProperty _background;
 		ForegroundProperty _foreground;
 		LineEditor         _logic;
-		Clock              _cursor_mark;
+		Clock              _cursor_mark = 0;
 	};
 }
 

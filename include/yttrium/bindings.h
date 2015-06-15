@@ -8,7 +8,7 @@
 #include <yttrium/script/code.h>
 #include <yttrium/string.h>
 
-#include <map>
+#include <utility>
 
 namespace Yttrium
 {
@@ -18,7 +18,25 @@ namespace Yttrium
 	public:
 
 		///
+		class Iterator
+		{
+		public:
+			bool operator!=(Iterator iterator) const { return _index != iterator._index; }
+			std::pair<StaticString, StaticString> operator*() const;
+			void operator++();
+		private:
+			friend Bindings;
+			const Bindings& _bindings;
+			size_t _index;
+			Iterator(const Bindings& bindings, size_t index): _bindings(bindings), _index(index) {}
+		};
+		friend Iterator;
+
+		///
 		Bindings(Allocator* allocator = DefaultAllocator);
+
+		///
+		Iterator begin() const;
 
 		///
 		void bind(Key key, const StaticString& action);
@@ -39,7 +57,7 @@ namespace Yttrium
 		void clear();
 
 		///
-		std::map<String, String> map() const;
+		Iterator end() const;
 
 		///
 		void unbind(Key key);
@@ -48,9 +66,7 @@ namespace Yttrium
 		bool unbind(const StaticString &name);
 
 	private:
-
-		Allocator* _allocator;
-		std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
+		Y_UNIQUE_PRIVATE(Bindings);
 	};
 }
 

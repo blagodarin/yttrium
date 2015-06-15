@@ -4,7 +4,7 @@
 #ifndef __Y_INDEX_BUFFER_H
 #define __Y_INDEX_BUFFER_H
 
-#include <cstddef> // size_t
+#include <cstddef>
 
 namespace Yttrium
 {

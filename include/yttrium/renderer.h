@@ -4,11 +4,10 @@
 #ifndef __Y_RENDERER_H
 #define __Y_RENDERER_H
 
+#include <yttrium/base.h>
 #include <yttrium/index_buffer.h>
 #include <yttrium/rect.h>
 #include <yttrium/types.h>
-
-#include <memory>
 
 namespace Yttrium
 {
@@ -22,8 +21,8 @@ namespace Yttrium
 	class Vector4;
 	class VertexBuffer;
 
-	template <typename T>
-	class Pointer;
+	template <typename> class Pointer;
+	template <typename> class SharedPtr;
 
 	///
 	/// \note Lifetimes of entities created by a renderer must not exceed the lifetime of the renderer.
@@ -57,16 +56,16 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual std::unique_ptr<GpuProgram> create_gpu_program() = 0;
+		virtual Pointer<GpuProgram> create_gpu_program() = 0;
 
 		///
-		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
+		virtual Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
 
 		///
-		virtual Pointer<Texture2D> create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps = false) = 0;
+		virtual SharedPtr<Texture2D> create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps = false) = 0;
 
 		///
-		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;
+		virtual Pointer<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;
 
 		///
 		virtual void draw_rectangle(const RectF& rect) = 0;

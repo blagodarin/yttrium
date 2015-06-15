@@ -4,13 +4,13 @@
 #ifndef __Y_TEXTURE_H
 #define __Y_TEXTURE_H
 
-#include <yttrium/pointer.h>
+#include <yttrium/object.h>
 #include <yttrium/rect.h>
 
 namespace Yttrium
 {
 	/// 2D texture.
-	class Y_API Texture2D: public Pointable
+	class Y_API Texture2D : public Object
 	{
 	public:
 
@@ -62,8 +62,8 @@ namespace Yttrium
 
 	protected:
 
-		Texture2D(const Size &size, Allocator *allocator)
-			: Pointable(allocator)
+		Texture2D(const Size& size, Allocator* allocator)
+			: Object(allocator)
 			, _size(size)
 			, _filter(NearestFilter)
 		{

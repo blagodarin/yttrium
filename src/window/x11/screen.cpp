@@ -1,72 +1,71 @@
 #include "screen.h"
 
+#include <yttrium/pointer.h>
+
 #include <X11/extensions/Xrandr.h>
 
 namespace Yttrium
 {
-	std::unique_ptr<ScreenImpl> ScreenImpl::open()
+	using P_XRRScreenConfiguration = Y_UNIQUE_PTR(::XRRScreenConfiguration, ::XRRFreeScreenConfigInfo);
+
+	Pointer<ScreenImpl> ScreenImpl::open(Allocator& allocator)
 	{
-		::Display* display = ::XOpenDisplay(nullptr);
-		if (display)
-		{
-			int event_base;
-			int error_base;
-			if (::XRRQueryExtension(display, &event_base, &error_base))
-				return std::make_unique<ScreenImpl>(display);
-			::XCloseDisplay(display);
-		}
-		return {};
+		P_Display display(::XOpenDisplay(nullptr));
+		if (!display)
+			return {};
+
+		int event_base = 0;
+		int error_base = 0;
+		if (!::XRRQueryExtension(display.get(), &event_base, &error_base))
+			return {};
+
+		return make_pointer<ScreenImpl>(allocator, std::move(display));
 	}
 
-	ScreenImpl::ScreenImpl(::Display* display)
-		: _display(display)
-		, _screen(DefaultScreen(display))
+	ScreenImpl::ScreenImpl(P_Display display)
+		: _display(std::move(display))
+		, _screen(DefaultScreen(_display.get()))
 	{
 	}
 
 	ScreenImpl::~ScreenImpl()
 	{
-		::XCloseDisplay(_display);
 	}
 
 	ScreenMode ScreenImpl::current_mode() const
 	{
-		::XRRScreenConfiguration* config = ::XRRGetScreenInfo(_display, RootWindow(_display, _screen));
+		P_XRRScreenConfiguration config(::XRRGetScreenInfo(_display.get(), RootWindow(_display.get(), _screen)));
 
 		int nsizes = 0;
-		::XRRScreenSize* sizes = ::XRRConfigSizes(config, &nsizes);
+		::XRRScreenSize* sizes = ::XRRConfigSizes(config.get(), &nsizes);
 
 		::Rotation rotation;
-		const int size_index = ::XRRConfigCurrentConfiguration(config, &rotation);
+		const int size_index = ::XRRConfigCurrentConfiguration(config.get(), &rotation);
 
 		ScreenMode mode;
 		mode.width = sizes[size_index].width;
 		mode.height = sizes[size_index].height;
-		mode.frequency = ::XRRConfigCurrentRate(config);
-
-		::XRRFreeScreenConfigInfo(config);
+		mode.frequency = ::XRRConfigCurrentRate(config.get());
 
 		return mode;
 	}
 
 	ScreenMode ScreenImpl::default_mode() const
 	{
-		::XRRScreenConfiguration* config = ::XRRGetScreenInfo(_display, RootWindow(_display, _screen));
+		P_XRRScreenConfiguration config(::XRRGetScreenInfo(_display.get(), RootWindow(_display.get(), _screen)));
 
 		int nsizes = 0;
-		::XRRScreenSize* sizes = ::XRRConfigSizes(config, &nsizes);
+		::XRRScreenSize* sizes = ::XRRConfigSizes(config.get(), &nsizes);
 
 		const int size_index = 0;
 
 		int nrates = 0;
-		short* rates = ::XRRConfigRates(config, size_index, &nrates);
+		short* rates = ::XRRConfigRates(config.get(), size_index, &nrates);
 
 		ScreenMode mode;
 		mode.width = sizes[size_index].width;
 		mode.height = sizes[size_index].height;
 		mode.frequency = rates[0];
-
-		::XRRFreeScreenConfigInfo(config);
 
 		return mode;
 	}

@@ -39,7 +39,7 @@ namespace Yttrium
 		String               _last_result;
 	};
 
-	Y_IMPLEMENT_PRIVATE(ScriptCode);
+	Y_IMPLEMENT_SHARED(ScriptCode);
 
 	ScriptCode::ScriptCode(String&& text)
 		: ScriptCode()

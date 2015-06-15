@@ -101,7 +101,7 @@ public:
 	bool read_all(String* string);
 
 	///
-	bool read_line(String* string);
+	bool read_line(String& string);
 
 	/// Change the size of the file.
 	bool resize(uint64_t size);

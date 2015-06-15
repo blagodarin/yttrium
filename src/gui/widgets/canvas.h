@@ -7,7 +7,7 @@ namespace Yttrium
 {
 	class WindowCallbacks;
 
-	class Canvas: public Widget
+	class Canvas : public Widget
 	{
 	public:
 

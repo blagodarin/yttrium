@@ -1,6 +1,7 @@
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
 #include <yttrium/log.h>
+#include <yttrium/pointer.h>
 #include <yttrium/script/manager.h>
 #include <yttrium/string.h>
 #include <yttrium/window.h>

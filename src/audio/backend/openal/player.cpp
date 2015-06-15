@@ -21,7 +21,6 @@ OpenAlPlayer::OpenAlPlayer()
 
 	Y_ABORT("Couldn't create OpenAlPlayer"); // NOTE: Safe to continue.
 
-	_source = 0;
 	for (ALuint& buffer: _buffers)
 		buffer = 0;
 }
@@ -52,8 +51,7 @@ size_t OpenAlPlayer::check_buffers()
 
 void OpenAlPlayer::refill_buffer(void* data, size_t size)
 {
-	ALuint buffer;
-
+	ALuint buffer = 0;
 	::alSourceUnqueueBuffers(_source, 1, &buffer);
 	::alBufferData(buffer, _format._format, data, size, _format._frequency);
 	::alSourceQueueBuffers(_source, 1, &buffer);

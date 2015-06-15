@@ -4,6 +4,7 @@
 #ifndef __Y_TEXTURE_FONT_H
 #define __Y_TEXTURE_FONT_H
 
+#include <yttrium/base.h>
 #include <yttrium/rect.h>
 #include <yttrium/types.h>
 
@@ -14,8 +15,6 @@ namespace Yttrium
 	/// Texture font markup.
 	class Y_API TextureFont
 	{
-		Y_DECLARE_PRIVATE(TextureFont);
-
 	public:
 
 		/// Font character information.
@@ -27,10 +26,7 @@ namespace Yttrium
 		};
 
 		///
-		explicit TextureFont(const StaticString& name, Allocator* allocator = DefaultAllocator)
-		{
-			open(name, allocator);
-		}
+		explicit TextureFont(const StaticString& name, Allocator* allocator = DefaultAllocator);
 
 		///
 		const CharInfo* char_info(char symbol) const;
@@ -39,19 +35,19 @@ namespace Yttrium
 		int kerning(char left, char right) const;
 
 		///
-		bool open(const StaticString& name, Allocator* allocator = DefaultAllocator);
-
-		///
 		Rect rect() const;
 
 		///
 		int size() const;
 
 		///
-		Size text_size(const StaticString &text) const;
+		Size text_size(const StaticString& text) const;
 
 		///
 		Vector2 text_size(const StaticString& text, const Vector2& font_size) const;
+
+	private:
+		Y_SHARED_PRIVATE(TextureFont);
 	};
 }
 

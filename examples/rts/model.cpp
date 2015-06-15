@@ -4,6 +4,7 @@
 #include <yttrium/matrix.h>
 #include <yttrium/vertex_buffer.h>
 
+#include <array>
 #include <vector>
 
 Model::Model(Renderer& renderer)

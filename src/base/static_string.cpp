@@ -2,8 +2,8 @@
 
 #include <yttrium/string.h>
 
-#include <cmath>   // pow
-#include <cstring> // memcmp, strlen
+#include <cmath>
+#include <cstring>
 
 namespace Yttrium
 {

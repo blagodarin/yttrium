@@ -1,15 +1,13 @@
 #include "window.h"
 
-#include <yttrium/allocator.h>
 #include <yttrium/matrix.h>
-#include <yttrium/time.h>
+#include <yttrium/timer.h>
 #include <yttrium/utils.h>
 #include "../gui/gui.h"
-#include "../memory/allocatable.h"
 #include "../renderer/debug_renderer.h"
 #include "../renderer/renderer.h"
 
-#include <algorithm> // min
+#include <algorithm>
 
 namespace Yttrium
 {
@@ -29,9 +27,9 @@ namespace Yttrium
 	{
 	}
 
-	std::unique_ptr<Window> Window::create(WindowCallbacks& callbacks, Allocator* allocator)
+	Pointer<Window> Window::create(WindowCallbacks& callbacks, Allocator* allocator)
 	{
-		auto window = std::make_unique<WindowImpl>(callbacks, allocator);
+		auto window = make_pointer<WindowImpl>(*allocator, callbacks, allocator);
 		if (!window->initialize())
 			return {};
 		return std::move(window);
@@ -64,11 +62,11 @@ namespace Yttrium
 
 	bool WindowImpl::initialize()
 	{
-		_screen = ScreenImpl::open();
+		_screen = ScreenImpl::open(*_allocator);
 		if (!_screen)
 			return false;
 
-		_backend = WindowBackend::create(*_screen, _size, *this);
+		_backend = WindowBackend::create(*_allocator, *_screen, _size, *this);
 		if (!_backend)
 			return false;
 
@@ -76,7 +74,7 @@ namespace Yttrium
 		if (!_renderer)
 			return false;
 
-		_gui.reset(new GuiImpl(*_renderer, _callbacks, _allocator));
+		_gui = make_pointer<GuiImpl>(*_allocator, *_renderer, _callbacks, _allocator);
 		return true;
 	}
 

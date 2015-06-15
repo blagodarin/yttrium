@@ -23,6 +23,11 @@ namespace Yttrium
 		{
 		}
 
+		static Private* instance()
+		{
+			return ScriptManagerGuard::instance->_private;
+		}
+
 	public:
 
 		ScriptManagerGuard _instance_guard;
@@ -31,7 +36,6 @@ namespace Yttrium
 	};
 
 	ScriptManager::ScriptManager(Allocator* allocator)
-		: _private(nullptr)
 	{
 		if (!allocator)
 			allocator = MemoryManager::default_allocator();
@@ -47,6 +51,6 @@ namespace Yttrium
 
 	ScriptContext& ScriptContext::global()
 	{
-		return ScriptManagerGuard::instance->_private->_root_context;
+		return ScriptManager::Private::instance()->_root_context;
 	}
 }

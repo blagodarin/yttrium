@@ -52,9 +52,7 @@ namespace Yttrium
 		}
 
 	private:
-
 		class Private;
-
 		Private* _private;
 	};
 }

@@ -3,7 +3,7 @@
 #include <yttrium/gui.h>
 #include <yttrium/matrix.h>
 #include <yttrium/renderer.h>
-#include <yttrium/time.h>
+#include <yttrium/date_time.h>
 
 Game::Game()
 	: _log_manager("rts.log")

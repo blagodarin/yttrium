@@ -5,24 +5,14 @@
 
 namespace Yttrium
 {
-
-class HeapAllocator
-	: public Allocator
-{
-public:
-
-	HeapAllocator(Allocator *parent)
+	class HeapAllocator : public Allocator
 	{
-		Y_UNUSED(parent);
-	}
+	public:
 
-public: // Allocator
-
-	void* allocate(size_t size, size_t align, Difference* difference) override;
-	void deallocate(void *pointer, Difference *difference) override;
-	void* reallocate(void *pointer, size_t size, Movability movability, Difference* difference) override;
-};
-
-} // namespace Yttrium
+		void* allocate(size_t size, size_t align, Difference* difference) override;
+		void deallocate(void* pointer, Difference* difference) override;
+		void* reallocate(void* pointer, size_t size, Movability movability, Difference* difference) override;
+	};
+}
 
 #endif // __MEMORY_HEAP_ALLOCATOR_H

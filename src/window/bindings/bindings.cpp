@@ -1,6 +1,9 @@
 #include <yttrium/bindings.h>
 
+#include "../../base/private_base.h"
 #include "lookup.h"
+
+#include <array>
 
 namespace Yttrium
 {
@@ -184,15 +187,54 @@ const char* bind_names[] =
 
 } // namespace
 
-Bindings::Bindings(Allocator* allocator)
-	: _allocator(allocator)
+struct Bindings::Private: public PrivateBase<Bindings::Private>
 {
+	std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
+
+	Private(Allocator* allocator): PrivateBase(allocator) {}
+
+	bool is_valid_index(size_t index) const
+	{
+		return bind_names[index][0] && !_actions[index].first.is_empty();
+	}
+};
+
+std::pair<StaticString, StaticString> Bindings::Iterator::operator*() const
+{
+	return std::make_pair(bind_names[_index], StaticString(_bindings._private->_actions[_index].first));
+}
+
+void Bindings::Iterator::operator++()
+{
+	if (_index == _bindings._private->_actions.size())
+		return;
+	do
+	{
+		++_index;
+		if (_bindings._private->is_valid_index(_index))
+			break;
+	} while (_index < _bindings._private->_actions.size());
+}
+
+Y_IMPLEMENT_UNIQUE(Bindings);
+
+Bindings::Bindings(Allocator* allocator)
+	: _private(Y_NEW(allocator, Private)(allocator))
+{
+}
+
+Bindings::Iterator Bindings::begin() const
+{
+	size_t index = 0;
+	while (index < _private->_actions.size() && !_private->is_valid_index(index))
+		++index;
+	return Iterator(*this, index);
 }
 
 void Bindings::bind(Key key, const StaticString& action)
 {
-	auto& binding = _actions[KeyType(key)];
-	binding.first.swap(String(action, _allocator));
+	auto& binding = _private->_actions[KeyType(key)];
+	binding.first.swap(String(action, _private->_allocator));
 	binding.second = ScriptCode(binding.first);
 }
 
@@ -207,10 +249,10 @@ bool Bindings::bind(const StaticString& name, const StaticString& action)
 
 void Bindings::bind_default(Key key, const StaticString& action)
 {
-	auto& binding = _actions[KeyType(key)];
+	auto& binding = _private->_actions[KeyType(key)];
 	if (binding.first.is_empty())
 	{
-		binding.first.swap(String(action, _allocator));
+		binding.first.swap(String(action, _private->_allocator));
 		binding.second = ScriptCode(binding.first);
 	}
 }
@@ -226,7 +268,7 @@ bool Bindings::bind_default(const StaticString& name, const StaticString& action
 
 bool Bindings::call(Key key, ScriptCode::ExecutionMode mode)
 {
-	const auto& binding = _actions[KeyType(key)];
+	const auto& binding = _private->_actions[KeyType(key)];
 	if (binding.first.is_empty())
 		return false;
 	binding.second.execute(nullptr, mode);
@@ -235,27 +277,21 @@ bool Bindings::call(Key key, ScriptCode::ExecutionMode mode)
 
 void Bindings::clear()
 {
-	for (auto& binding: _actions)
+	for (auto& binding : _private->_actions)
 	{
 		binding.first.clear();
-		binding.second = ScriptCode();
+		binding.second = {};
 	}
 }
 
-std::map<String, String> Bindings::map() const
+Bindings::Iterator Bindings::end() const
 {
-	std::map<String, String> result;
-	for (size_t i = 0; i < _actions.size(); ++i)
-	{
-		if (bind_names[i][0] && !_actions[i].first.is_empty())
-			result.emplace(String(bind_names[i], _allocator), _actions[i].first);
-	}
-	return result;
+	return Iterator(*this, _private->_actions.size());
 }
 
 void Bindings::unbind(Key key)
 {
-	auto& binding = _actions[KeyType(key)];
+	auto& binding = _private->_actions[KeyType(key)];
 	binding.first.clear();
 	binding.second = ScriptCode();
 }

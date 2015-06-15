@@ -28,10 +28,10 @@ namespace Yttrium
 		virtual bool link() = 0;
 
 		///
-		virtual bool set_vertex_shader(Language language, const StaticString& source) = 0;
+		virtual bool set_fragment_shader(Language language, const StaticString& source) = 0;
 
 		///
-		virtual bool set_fragment_shader(Language language, const StaticString& source) = 0;
+		virtual bool set_vertex_shader(Language language, const StaticString& source) = 0;
 	};
 }
 

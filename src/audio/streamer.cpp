@@ -1,6 +1,6 @@
 #include "streamer.h"
 
-#include "backend/player.h"
+#include "backend.h"
 
 namespace Yttrium
 {
@@ -12,7 +12,7 @@ enum
 
 void AudioStreamer::close()
 {
-	_source.reset();
+	_source = {};
 }
 
 AudioStreamer::FetchResult AudioStreamer::fetch()
@@ -20,7 +20,7 @@ AudioStreamer::FetchResult AudioStreamer::fetch()
 	const size_t size = read();
 	if (!size)
 		return NoMoreData;
-	_backend->refill_buffer(_buffer.data(), size);
+	_backend.refill_buffer(_buffer.data(), size);
 	return size < _buffer.size() ? NotEnoughData : Ok;
 }
 
@@ -61,7 +61,7 @@ bool AudioStreamer::open(const StaticString& name, const AudioPlayer::Settings& 
 				_is_looping = false;
 			}
 
-			if (_backend->set_format(format))
+			if (_backend.set_format(format))
 			{
 				_unit_size = format.unit_size();
 				_buffer.resize(_buffer_units * _unit_size);
@@ -71,14 +71,14 @@ bool AudioStreamer::open(const StaticString& name, const AudioPlayer::Settings& 
 		}
 	}
 
-	_source.reset();
+	_source = {};
 	return false;
 }
 
 void AudioStreamer::prefetch()
 {
 	for (size_t i = 0; i < AudioPlayerBackend::NumBuffers; ++i)
-		_backend->fill_buffer(i, _buffer.data(), read());
+		_backend.fill_buffer(i, _buffer.data(), read());
 }
 
 size_t AudioStreamer::read()

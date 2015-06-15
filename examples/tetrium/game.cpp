@@ -1,16 +1,18 @@
 #include "game.h"
 
+#include <yttrium/audio/player.h>
+#include <yttrium/date_time.h>
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
 #include <yttrium/ion.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
 #include <yttrium/texture.h>
+#include <yttrium/timer.h>
 
 Game::Game()
 	: _log_manager("tetrium.log")
 	, _allocator("game")
-	, _audio(&_allocator)
 	, _bindings(&_allocator)
 {
 	ScriptContext::global().define("bind", 2, [this](const ScriptCall& call)
@@ -66,10 +68,13 @@ Game::Game()
 
 	ScriptContext::global().define("play_music", [this](const ScriptCall&)
 	{
-		if (!_audio.player().is_playing())
-			_audio.player().play();
-		else
-			_audio.player().pause();
+		if (_audio)
+		{
+			if (!_audio->player().is_playing())
+				_audio->player().play();
+			else
+				_audio->player().pause();
+		}
 	});
 
 	ScriptContext::global().define("pop_scene", 0, 1, [this](const ScriptCall& call)
@@ -98,7 +103,8 @@ Game::Game()
 
 	ScriptContext::global().define("stop_music", [this](const ScriptCall&)
 	{
-		_audio.player().stop();
+		if (_audio)
+			_audio->player().stop();
 	});
 
 	ScriptContext::global().define("tgcon", [this](const ScriptCall&)
@@ -163,13 +169,14 @@ void Game::run()
 	_game.set_random_seed(Timer::clock());
 
 	_window->set_name("Tetrium");
-	_window->set_size(Size(1024, 768));
+	_window->set_size({1024, 768});
 	_window->show();
 
 	if (!load_blocks())
 		return;
 
-	if (_audio.open())
+	_audio = AudioManager::create();
+	if (_audio)
 	{
 		IonDocument data(&_allocator);
 		if (data.load("data/music.ion"))
@@ -188,10 +195,10 @@ void Game::run()
 				settings.begin = entry->last("begin").string().to_time();
 				settings.end = entry->last("end").string().to_time();
 				settings.loop = entry->last("loop").string().to_time();
-				_audio.player().load(file, settings);
+				_audio->player().load(file, settings);
 			}
-			_audio.player().set_order(AudioPlayer::Random);
-			_audio.player().play();
+			_audio->player().set_order(AudioPlayer::Random);
+			_audio->player().play();
 		}
 	}
 
@@ -209,8 +216,8 @@ void Game::run()
 	{
 		String settings(&_allocator);
 		settings << "unbindall\n";
-		for (const auto& binding : _bindings.map())
-			settings << "bind " << binding.first << " \"" << binding.second.escaped("\\\"", '\\') << "\"\n";
+		for (const auto& binding : _bindings)
+			settings << "bind " << binding.first << " \"" << binding.second.escaped("\\\"", '\\', &_allocator) << "\"\n";
 		settings_file.write(settings.text(), settings.size());
 	}
 }

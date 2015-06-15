@@ -4,6 +4,7 @@
 #include <yttrium/window.h>
 
 #include <yttrium/image.h>
+#include <yttrium/pointer.h>
 #include "backend.h"
 #include "console.h"
 
@@ -56,24 +57,24 @@ namespace Yttrium
 
 	private:
 
-		Allocator* const   _allocator;
-		std::unique_ptr<ScreenImpl> _screen;
-		std::unique_ptr<WindowBackend> _backend;
-		std::unique_ptr<RendererImpl> _renderer;
-		bool               _is_active;
-		Point              _cursor;
-		bool               _is_cursor_locked;
-		Size               _size;
-		Mode               _mode;
-		bool               _keys[KeyCount];
-		WindowCallbacks&   _callbacks;
-		Console            _console;
-		bool               _console_visible = false;
-		std::unique_ptr<GuiImpl> _gui;
-		String             _screenshot_filename;
-		Image              _screenshot_image;
-		String             _debug_text;
-		bool               _debug_text_visible = false;
+		Allocator* const       _allocator;
+		Pointer<ScreenImpl>    _screen;
+		Pointer<WindowBackend> _backend;
+		Pointer<RendererImpl>  _renderer;
+		bool                   _is_active;
+		Point                  _cursor;
+		bool                   _is_cursor_locked;
+		Size                   _size;
+		Mode                   _mode;
+		bool                   _keys[KeyCount];
+		WindowCallbacks&       _callbacks;
+		Console                _console;
+		bool                   _console_visible = false;
+		Pointer<GuiImpl>       _gui;
+		String                 _screenshot_filename;
+		Image                  _screenshot_image;
+		String                 _debug_text;
+		bool                   _debug_text_visible = false;
 	};
 }
 

@@ -3,9 +3,10 @@
 
 #include <yttrium/allocator.h>
 #include <yttrium/assert.h>
+#include <yttrium/base.h>
 
 #include <atomic>
-#include <utility> // std::forward
+#include <utility>
 
 namespace Yttrium
 {
@@ -150,15 +151,15 @@ private:
 	T* _pointer;
 };
 
-#define Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Class) \
+} // namespace Yttrium
+
+#define Y_IMPLEMENT_UNIQUE(Class) \
 	Class::~Class() { Private::release(&_private); } \
 	Class& Class::operator=(Class&& x) { Private::move(_private, x._private); return *this; } \
 
-#define Y_IMPLEMENT_PRIVATE(Class) \
-	Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Class) \
+#define Y_IMPLEMENT_SHARED(Class) \
+	Y_IMPLEMENT_UNIQUE(Class) \
 	Class::Class(const Class& x): _private(Private::copy(x._private)) {} \
 	Class& Class::operator=(const Class& x) { Private::copy(_private, x._private); return *this; } \
-
-} // namespace Yttrium
 
 #endif // __BASE_PRIVATE_BASE_H

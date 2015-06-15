@@ -2,10 +2,10 @@
 #include <yttrium/file.h>
 #include <yttrium/package.h>
 
-#include <cstdlib> // rand
-#include <cstring> // memcmp
-
 #include "common.h"
+
+#include <cstdlib>
+#include <cstring>
 
 using namespace Yttrium;
 

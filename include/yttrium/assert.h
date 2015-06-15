@@ -33,4 +33,8 @@ namespace Yttrium
 		do { if (!(condition)) Y_ABORT("Assertion failed: " #condition); } while (false)
 #endif
 
+/// Terminate the program if the values differ.
+#define Y_VERIFY(expected, actual) \
+	do { if ((expected) != (actual)) Y_ABORT(#expected" != "#actual); } while (false)
+
 #endif // __Y_ASSERT_H

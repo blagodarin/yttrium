@@ -3,6 +3,7 @@
 
 #include <yttrium/gui.h>
 
+#include <yttrium/object.h>
 #include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/code.h>
@@ -10,7 +11,6 @@
 #include "types.h"
 
 #include <map>
-#include <memory>
 #include <vector>
 
 namespace Yttrium
@@ -23,7 +23,7 @@ namespace Yttrium
 	class TextureCache;
 	class WindowCallbacks;
 
-	class GuiImpl: public Gui
+	class GuiImpl : public Gui
 	{
 		friend GuiIonDumper;
 
@@ -32,11 +32,11 @@ namespace Yttrium
 		struct FontDesc
 		{
 			TextureFont        font;
-			Pointer<Texture2D> texture;
+			SharedPtr<Texture2D> texture;
 
 			FontDesc() = default;
 
-			FontDesc(const TextureFont& font, const Pointer<Texture2D>& texture)
+			FontDesc(const TextureFont& font, const SharedPtr<Texture2D>& texture)
 				: font(font)
 				, texture(texture)
 			{
@@ -50,11 +50,11 @@ namespace Yttrium
 
 	public:
 
-		bool add_scene(GuiScene* scene, bool is_root);
+		bool add_scene(Pointer<GuiScene>&& scene, bool is_root);
 
 		WindowCallbacks& callbacks() const { return _callbacks; }
 
-		GuiScene* create_scene(const StaticString& name);
+		Pointer<GuiScene> create_scene(const StaticString& name);
 
 		const FontDesc* font(const StaticString& name) const;
 
@@ -99,19 +99,18 @@ namespace Yttrium
 	private:
 
 		void change_scene(const StaticString& old_scene, const StaticString& new_scene);
-		void delete_scene(GuiScene* scene);
 
 	private:
 
 		ProxyAllocator                    _proxy_allocator;
 		RendererImpl&                     _renderer;
-		std::unique_ptr<TextureCache>     _texture_cache;
+		Pointer<TextureCache>             _texture_cache;
 		WindowCallbacks&                  _callbacks;
 		bool                              _has_size;
 		Vector2                           _size;
 		Scaling                           _scaling;
 		std::map<String, FontDesc>        _fonts;
-		std::map<StaticString, GuiScene*> _scenes;
+		std::map<StaticString, Pointer<GuiScene>> _scenes;
 		std::vector<GuiScene*>            _scene_stack;
 		std::map<std::pair<String, String>, std::pair<String, ScriptCode>> _scene_actions;
 	};

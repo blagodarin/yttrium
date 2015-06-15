@@ -9,11 +9,11 @@ namespace Yttrium
 	/// 2D point.
 	struct Point
 	{
-		int x = 0; ///<
-		int y = 0; ///<
+		int x = 0; ///< X coordinate.
+		int y = 0; ///< Y coordinate.
 
 		Point() = default;
-		Point(int x, int y): x(x), y(y) {}
+		Point(int x, int y) : x(x), y(y) {}
 	};
 }
 

@@ -30,6 +30,6 @@ namespace Yttrium
 			return '\0';
 
 		const char* map = (modifiers & Shift) ? hi_map : lo_map;
-		return map[KeyType(key) - KeyType(Key::_0)];
+		return map[static_cast<KeyType>(key) - static_cast<KeyType>(Key::_0)];
 	}
 }

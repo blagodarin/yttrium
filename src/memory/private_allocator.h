@@ -5,42 +5,40 @@
 
 namespace Yttrium
 {
-
-class PrivateAllocator
-{
-public:
-
-	PrivateAllocator(Allocator* allocator, const StaticString& proxy_name = StaticString())
-		: _parent_allocator(allocator)
-		, _allocator(proxy_name.is_empty()
-			? _parent_allocator
-			: Y_NEW(_parent_allocator, ProxyAllocator)(proxy_name, _parent_allocator))
+	class PrivateAllocator
 	{
-	}
+	public:
 
-	~PrivateAllocator()
-	{
-		if (_allocator != _parent_allocator)
-			Y_DELETE(_parent_allocator, _allocator);
-	}
+		PrivateAllocator(Allocator* allocator, const StaticString& proxy_name = StaticString())
+			: _parent_allocator(allocator)
+			, _allocator(proxy_name.is_empty()
+				? _parent_allocator
+				: Y_NEW(_parent_allocator, ProxyAllocator)(proxy_name, _parent_allocator))
+		{
+		}
 
-	template <typename T>
-	void delete_private(T* private_)
-	{
-		Y_DELETE(_parent_allocator, private_);
-	}
+		~PrivateAllocator()
+		{
+			if (_allocator != _parent_allocator)
+				Y_DELETE(_parent_allocator, _allocator);
+		}
 
-	operator Allocator*() const
-	{
-		return _allocator;
-	}
+		template <typename T>
+		void delete_private(T* private_)
+		{
+			Y_DELETE(_parent_allocator, private_);
+		}
 
-private:
+		operator Allocator*() const
+		{
+			return _allocator;
+		}
 
-	Allocator* _parent_allocator;
-	Allocator* _allocator;
-};
+	private:
 
-} // namespace Yttrium
+		Allocator* _parent_allocator;
+		Allocator* _allocator;
+	};
+}
 
 #endif // __MEMORY_PRIVATE_ALLOCATOR_H

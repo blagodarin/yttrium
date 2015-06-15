@@ -1,5 +1,6 @@
 #include "reader.h"
 
+#include <yttrium/pointer.h>
 #include "wav.h"
 
 #ifndef Y_NO_OGG_VORBIS
@@ -8,39 +9,37 @@
 
 namespace Yttrium
 {
-
-AudioReaderPtr AudioReader::open(const StaticString& name, AudioType type, Allocator* allocator)
-{
-	if (type == AudioType::Auto)
+	Pointer<AudioReader> AudioReader::open(const StaticString& name, AudioType type, Allocator* allocator)
 	{
-		StaticString extension = name.file_extension();
-		if (extension == S(".wav"))
-			type = AudioType::Wav;
+		if (type == AudioType::Auto)
+		{
+			const StaticString extension = name.file_extension();
+			if (extension == S(".wav"))
+				type = AudioType::Wav;
 #ifndef Y_NO_OGG_VORBIS
-		else if (extension == S(".ogg"))
-			type = AudioType::OggVorbis;
+			else if (extension == S(".ogg"))
+				type = AudioType::OggVorbis;
 #endif
-		else
-			return AudioReaderPtr();
-	}
+			else
+				return {};
+		}
 
-	AudioReaderImpl* reader = nullptr;
-	switch (type)
-	{
-	case AudioType::Wav:       reader = Y_NEW(allocator, WavReader)(name, allocator); break;
+		if (!allocator)
+			allocator = DefaultAllocator;
+
+		Pointer<AudioReaderImpl> reader;
+		switch (type)
+		{
+		case AudioType::Wav: reader = make_pointer<WavReader>(*allocator, name, allocator); break;
 #ifndef Y_NO_OGG_VORBIS
-	case AudioType::OggVorbis: reader = Y_NEW(allocator, OggVorbisReader)(name, allocator); break;
+		case AudioType::OggVorbis: reader = make_pointer<OggVorbisReader>(*allocator, name, allocator); break;
 #endif
-	default:                   return AudioReaderPtr();
-	}
+		default: return {};
+		}
 
-	if (!reader->_file || !reader->open())
-	{
-		Y_DELETE(allocator, reader);
-		return AudioReaderPtr();
-	}
+		if (!reader->_file || !reader->open())
+			return {};
 
-	return AudioReaderPtr(reader);
+		return std::move(reader);
+	}
 }
-
-} // namespace Yttrium

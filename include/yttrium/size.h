@@ -13,7 +13,7 @@ namespace Yttrium
 		int height = 0; ///<
 
 		Size() = default;
-		Size(int width, int height): width(width), height(height) {}
+		Size(int width, int height) : width(width), height(height) {}
 	};
 }
 

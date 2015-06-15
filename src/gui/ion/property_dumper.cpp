@@ -49,7 +49,7 @@ namespace Yttrium
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_texture(const StaticString&, const Pointer<Texture2D>&)
+	void GuiIonPropertyDumper::dump_texture(const StaticString&, const SharedPtr<Texture2D>&)
 	{
 	}
 }

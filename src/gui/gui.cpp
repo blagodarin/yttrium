@@ -3,7 +3,6 @@
 #include <yttrium/log.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
-#include "../memory/allocatable.h"
 #include "../renderer/renderer.h"
 #include "ion/dumper.h"
 #include "ion/loader.h"
@@ -27,7 +26,7 @@ namespace Yttrium
 		clear();
 	}
 
-	bool GuiImpl::add_scene(GuiScene* scene, bool is_root)
+	bool GuiImpl::add_scene(Pointer<GuiScene>&& scene, bool is_root)
 	{
 		const String& scene_name = scene->name();
 
@@ -36,8 +35,6 @@ namespace Yttrium
 			Y_LOG("[Gui] Scene \"" << scene_name << "\" has already been added");
 			return false;
 		}
-
-		_scenes.emplace(scene_name, scene);
 
 		if (is_root)
 		{
@@ -48,20 +45,21 @@ namespace Yttrium
 			}
 			else
 			{
-				_scene_stack.push_back(scene);
+				_scene_stack.push_back(scene.get());
 			}
 		}
+
+		_scenes.emplace(scene_name, std::move(scene));
 
 		return true;
 	}
 
-	GuiScene* GuiImpl::create_scene(const StaticString& name)
+	Pointer<GuiScene> GuiImpl::create_scene(const StaticString& name)
 	{
-		Allocatable<GuiScene> scene(&_proxy_allocator);
-		scene.reset(*this, name);
+		auto scene = make_pointer<GuiScene>(_proxy_allocator, *this, name, &_proxy_allocator);
 		if (_has_size)
 			scene->set_size(_size);
-		return scene.release();
+		return scene;
 	}
 
 	const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
@@ -116,9 +114,6 @@ namespace Yttrium
 
 	void GuiImpl::clear()
 	{
-		for (const auto& scene: _scenes)
-			delete_scene(scene.second);
-
 		_has_size = false;
 		_size = Vector2(0, 0);
 		_fonts.clear();
@@ -181,7 +176,7 @@ namespace Yttrium
 			return false;
 
 		const GuiScene* old_scene = _scene_stack.back();
-		_scene_stack.push_back(i->second);
+		_scene_stack.push_back(i->second.get());
 		change_scene(old_scene->name(), name);
 		return true;
 	}
@@ -191,10 +186,5 @@ namespace Yttrium
 		auto i = _scene_actions.find(std::make_pair(String(old_scene, ByReference()), String(new_scene, ByReference())));
 		if (i != _scene_actions.end())
 			i->second.second.execute();
-	}
-
-	void GuiImpl::delete_scene(GuiScene* scene)
-	{
-		Y_DELETE(&_proxy_allocator, scene);
 	}
 }

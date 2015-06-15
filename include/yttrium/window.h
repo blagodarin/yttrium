@@ -8,8 +8,6 @@
 #include <yttrium/point.h>
 #include <yttrium/size.h>
 
-#include <memory>
-
 namespace Yttrium
 {
 	class Gui;
@@ -18,6 +16,7 @@ namespace Yttrium
 	class Screen;
 	class StaticString;
 	class String;
+	template <typename> class Pointer;
 
 	///
 	struct UpdateEvent
@@ -83,7 +82,7 @@ namespace Yttrium
 		};
 
 		///
-		static std::unique_ptr<Window> create(WindowCallbacks& callbacks, Allocator* allocator = DefaultAllocator);
+		static Pointer<Window> create(WindowCallbacks& callbacks, Allocator* allocator = DefaultAllocator);
 
 		Window() = default;
 		virtual ~Window() = default;

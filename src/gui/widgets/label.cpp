@@ -10,13 +10,6 @@
 
 namespace Yttrium
 {
-	Label::Label(Allocator* allocator)
-		: Widget(allocator)
-		, _alignment(0)
-		, _final_text(allocator)
-	{
-	}
-
 	void Label::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_position("position", _position);

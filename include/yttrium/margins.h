@@ -12,7 +12,7 @@ namespace Yttrium
 	class Size;
 
 	/// %Margins.
-	class Margins
+	class Y_API Margins
 	{
 	public:
 
@@ -72,7 +72,7 @@ namespace Yttrium
 	};
 
 	/// %Margins.
-	class Y_API MarginsF
+	class MarginsF
 	{
 	public:
 

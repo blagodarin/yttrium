@@ -22,12 +22,9 @@ namespace Yttrium
 		};
 
 		Widget(Allocator* allocator, unsigned flags = 0)
-			: _scaling(Scaling::Stretch)
-			, _is_enabled(true)
-			, _text(allocator)
+			: _text(allocator)
 			, _name(allocator)
 			, _flags(flags)
-			, _is_focused(false)
 		{
 		}
 
@@ -53,12 +50,12 @@ namespace Yttrium
 	protected:
 
 		RectF          _rect;
-		Scaling        _scaling;
-		bool           _is_enabled;
+		Scaling        _scaling = Scaling::Stretch;
+		bool           _is_enabled = true;
 		String         _text;
 		String         _name;
 		const unsigned _flags;
-		bool           _is_focused;
+		bool           _is_focused = false;
 	};
 }
 

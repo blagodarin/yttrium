@@ -1,213 +1,99 @@
 /// \file
-/// \brief Reference-counted objects.
+/// \brief Smart pointers.
 
 #ifndef __Y_POINTER_H
 #define __Y_POINTER_H
 
-#include <yttrium/types.h>
+#include <yttrium/allocator.h>
 
-#include <atomic>
-#include <cstddef>
+#include <utility>
+#include <type_traits>
 
 namespace Yttrium
 {
-
-/// An object with a reference counter.
-
-class Y_API Pointable
-{
-	friend Allocator; // To make Pointable::~Pointable available.
-
-	Y_NONCOPYABLE(Pointable);
-
-public:
-
-	///
-
+	/// Unique pointer.
+	template <typename T>
 	class Pointer
 	{
+		template <typename> friend class Pointer;
 	public:
 
-		///
+		Pointer() = default;
 
-		Pointer()
-			: _pointable(nullptr)
+		Pointer(const Pointer&) = delete;
+
+		Pointer(Pointer&& p)
+			: _pointer(p._pointer)
+			, _allocator(p._allocator)
 		{
+			p._pointer = nullptr;
 		}
 
-		///
-
-		Pointer(const Pointer& pointer)
-			: Pointer(pointer._pointable)
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
+		Pointer(Pointer<U>&& p)
+			: _pointer(p._pointer)
+			, _allocator(p._allocator)
 		{
+			p._pointer = nullptr;
 		}
 
-		///
-
-		Pointer(Pointer&& pointer)
-			: _pointable(pointer._pointable)
+		Pointer(T* p, Allocator& allocator)
+			: _pointer(p)
+			, _allocator(&allocator)
 		{
-			pointer._pointable = nullptr;
 		}
-
-		///
-
-		explicit Pointer(Pointable* pointable);
-
-		///
 
 		~Pointer()
 		{
-			reset();
+			Y_DELETE(_allocator, _pointer);
 		}
 
-	public:
+		Pointer& operator=(const Pointer&) = delete;
 
-		///
-
-		explicit operator bool() const
+		Pointer& operator=(Pointer&& p)
 		{
-			return _pointable;
-		}
-
-		///
-
-		Pointable* get() const
-		{
-			return _pointable;
-		}
-
-		///
-
-		void reset(Pointable* pointable = nullptr);
-
-	public:
-
-		///
-
-		Pointable* operator->() const
-		{
-			return _pointable;
-		}
-
-		///
-
-		Pointable& operator*() const
-		{
-			return *_pointable;
-		}
-
-		///
-
-		Pointer& operator=(const Pointer& pointer)
-		{
-			reset(pointer._pointable);
+			Y_DELETE(_allocator, _pointer);
+			_pointer = p._pointer;
+			_allocator = p._allocator;
+			p._pointer = nullptr;
 			return *this;
 		}
 
-		///
-
-		Pointer& operator=(Pointer&& pointer);
-
-		///
-
-		bool operator==(const Pointer& pointer) const
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
+		Pointer& operator=(Pointer<U>&& p)
 		{
-			return _pointable == pointer._pointable;
+			Y_DELETE(_allocator, _pointer);
+			_pointer = p._pointer;
+			_allocator = p._allocator;
+			p._pointer = nullptr;
+			return *this;
 		}
 
-		///
+		explicit operator bool() const { return _pointer; }
 
-		bool operator!=(const Pointer& pointer) const
-		{
-			return _pointable != pointer._pointable;
-		}
+		T* get() const { return _pointer; }
+
+		T* operator->() const { return _pointer; }
+
+		T& operator*() const { return *_pointer; }
+
+		template <typename U>
+		bool operator==(const Pointer<U>& p) const { return _pointer == p._pointer; }
+
+		template <typename U>
+		bool operator!=(const Pointer<U>& p) const { return _pointer != p._pointer; }
 
 	private:
-
-		Pointable* _pointable;
+		T* _pointer = nullptr;
+		Allocator* _allocator = nullptr;
 	};
 
-	friend Pointer;
-
-public:
-
 	///
-
-	Allocator* allocator() const
+	template <typename T, typename... Args>
+	Pointer<T> make_pointer(Allocator& allocator, Args&&... args)
 	{
-		return _allocator;
+		return Pointer<T>(Y_NEW(&allocator, T)(std::forward<Args>(args)...), allocator);
 	}
-
-protected:
-
-	///
-
-	explicit Pointable(Allocator* allocator)
-		: _allocator(allocator)
-		, _counter(0)
-	{
-	}
-
-	///
-
-	virtual ~Pointable()
-	{
-	}
-
-private:
-
-	Allocator*          _allocator;
-	std::atomic<size_t> _counter;
-};
-
-/// Smart pointer to a Pointable descendant.
-
-template <typename T>
-class Pointer: public Pointable::Pointer
-{
-public:
-
-	Pointer() = default;
-	Pointer(const Pointer&) = default;
-	Pointer(Pointer&&) = default;
-
-	Pointer& operator=(const Pointer&) = default;
-	Pointer& operator=(Pointer&&) = default;
-
-	///
-
-	explicit Pointer(T* pointable)
-		: Pointable::Pointer(pointable)
-	{
-	}
-
-public:
-
-	///
-
-	T* get() const
-	{
-		return static_cast<T*>(Pointable::Pointer::get());
-	}
-
-public:
-
-	///
-
-	T* operator->() const
-	{
-		return static_cast<T*>(Pointable::Pointer::get());
-	}
-
-	///
-
-	T& operator*() const
-	{
-		return *static_cast<T*>(Pointable::Pointer::get());
-	}
-};
-
-} // namespace Yttrium
+}
 
 #endif // __Y_POINTER_H

@@ -4,63 +4,50 @@
 #include <yttrium/audio/player.h>
 #include <yttrium/string.h>
 
-#include <cstdlib> // rand
 #include <mutex>
 #include <vector>
 
 namespace Yttrium
 {
-
-class AudioPlaylist
-{
-public:
-
-	struct Item
+	class AudioPlaylist
 	{
-		String                name;
-		AudioPlayer::Settings settings;
-		AudioType             type;
+	public:
 
-		Item(Allocator *allocator)
-			: name(allocator)
+		struct Item
 		{
-		}
+			String                name;
+			AudioPlayer::Settings settings;
+			AudioType             type;
 
-		Item(const String &name, const AudioPlayer::Settings &settings, AudioType type)
-			: name(name)
-			, settings(settings)
-			, type(type)
-		{
-		}
+			Item(Allocator* allocator)
+				: name(allocator)
+			{
+			}
+
+			Item(const String& name, const AudioPlayer::Settings& settings, AudioType type)
+				: name(name)
+				, settings(settings)
+				, type(type)
+			{
+			}
+		};
+
+		AudioPlaylist(Allocator* allocator);
+
+		void clear();
+		void load(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type);
+		bool next(Item* item);
+		AudioPlayer::Order order();
+		void set_order(AudioPlayer::Order order);
+
+	private:
+
+		Allocator*         _allocator;
+		std::mutex         _mutex;
+		std::vector<Item>  _items;
+		AudioPlayer::Order _order;
+		size_t             _next;
 	};
-
-public:
-
-	AudioPlaylist(Allocator *allocator);
-
-public:
-
-	void clear();
-
-	void load(const StaticString &name, const AudioPlayer::Settings &settings, AudioType type);
-
-	bool next(Item *item);
-
-	AudioPlayer::Order order();
-
-	void set_order(AudioPlayer::Order order);
-
-private:
-
-	typedef std::vector<Item> Items;
-
-	Allocator          *_allocator;
-	std::mutex          _mutex;
-	Items               _items;
-	AudioPlayer::Order  _order;
-	size_t              _next;
-};
-
-} // namespace Yttrium
+}
 
 #endif // __AUDIO_PLAYLIST_H

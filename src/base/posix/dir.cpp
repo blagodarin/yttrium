@@ -81,10 +81,9 @@ public:
 	size_t _iterator_private_size;
 };
 
-Y_IMPLEMENT_PRIVATE_NONCOPYABLE(Dir);
+Y_IMPLEMENT_UNIQUE(Dir);
 
 Dir::Dir(const StaticString& name, Allocator* allocator)
-	: Dir()
 {
 	Y_ZERO_TERMINATED(name_z, name);
 

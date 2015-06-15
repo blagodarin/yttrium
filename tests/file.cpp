@@ -3,10 +3,10 @@
 #include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
 
-#include <cstdlib> // rand
-#include <cstring> // memcmp
-
 #include "common.h"
+
+#include <cstdlib>
+#include <cstring>
 
 using namespace Yttrium;
 

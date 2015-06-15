@@ -4,9 +4,9 @@
 
 #define _FILE_OFFSET_BITS 64
 
-#include <cstdlib>  // mkstemp
-#include <fcntl.h>  // open
-#include <unistd.h> // close, fsync, ftruncate, lseek, pread, pwrite, read, write
+#include <cstdlib>
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace Yttrium
 {

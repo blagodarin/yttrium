@@ -4,6 +4,7 @@
 #ifndef __Y_ION_OBJECT_H
 #define __Y_ION_OBJECT_H
 
+#include <yttrium/base.h>
 #include <yttrium/global.h>
 
 #include <map>

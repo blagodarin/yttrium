@@ -8,7 +8,7 @@
 #include <yttrium/texture_cache.h>
 #include "../gui.h"
 
-#include <algorithm> // min
+#include <algorithm>
 
 namespace Yttrium
 {
@@ -190,7 +190,7 @@ bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4 *color) 
 	return loaded == 0xF;
 }
 
-bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font, Pointer<Texture2D> *texture) const
+bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font, SharedPtr<Texture2D> *texture) const
 {
 	const StaticString *font_name;
 
@@ -332,7 +332,7 @@ bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2 *size) co
 	return loaded == 0x3;
 }
 
-SoundPtr GuiIonPropertyLoader::load_sound(const StaticString &name) const
+SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString &name) const
 {
 	if (_bound_object)
 	{
@@ -348,7 +348,7 @@ SoundPtr GuiIonPropertyLoader::load_sound(const StaticString &name) const
 			return load_sound(*node);
 	}
 
-	return SoundPtr();
+	return {};
 }
 
 bool GuiIonPropertyLoader::load_state(const StaticString &name, WidgetState *state) const
@@ -383,7 +383,7 @@ bool GuiIonPropertyLoader::load_text(const StaticString &name, String *text) con
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_texture(const StaticString &name, Pointer<Texture2D> *texture) const
+bool GuiIonPropertyLoader::load_texture(const StaticString &name, SharedPtr<Texture2D> *texture) const
 {
 	if (_bound_object)
 	{
@@ -562,19 +562,19 @@ bool GuiIonPropertyLoader::load_size(Vector2* size, const IonNode& node)
 	return read_size(size, node, 0) == 3;
 }
 
-SoundPtr GuiIonPropertyLoader::load_sound(const IonNode& node)
+SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const IonNode& node)
 {
 	IonNode::ConstRange values = node.values();
 
 	if (values.size() != 1)
-		return SoundPtr();
+		return {};
 
 	const StaticString *value;
 
 	if (!values->get(&value))
-		return SoundPtr();
+		return {};
 
-	return Sound::open(*value);
+	return Sound::create(*value);
 }
 
 bool GuiIonPropertyLoader::load_state(WidgetState* state, const IonNode &node)
@@ -610,7 +610,7 @@ bool GuiIonPropertyLoader::load_text(const StaticString** text, const IonObject&
 	return node.size() == 1 && node.first()->get(text);
 }
 
-bool GuiIonPropertyLoader::load_texture(Pointer<Texture2D>* texture, const IonNode& node,
+bool GuiIonPropertyLoader::load_texture(SharedPtr<Texture2D>* texture, const IonNode& node,
 	TextureCache* texture_cache, Texture2D::Filter default_filter)
 {
 	IonNode::ConstRange values = node.values();

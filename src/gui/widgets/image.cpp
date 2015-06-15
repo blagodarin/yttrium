@@ -8,11 +8,6 @@
 
 namespace Yttrium
 {
-	GuiImage::GuiImage(Allocator* allocator)
-		: Widget(allocator)
-	{
-	}
-
 	void GuiImage::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position", _position);

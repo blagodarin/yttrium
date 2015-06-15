@@ -79,7 +79,7 @@ namespace Yttrium
 		if (scene._is_transparent)
 			scene_object->append("transparent");
 
-		for (const auto& binding : scene._bindings.map())
+		for (const auto& binding : scene._bindings)
 		{
 			const auto bound_node = scene_object->append("bind");
 			bound_node->append(binding.first);

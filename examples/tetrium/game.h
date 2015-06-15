@@ -6,14 +6,12 @@
 #include <yttrium/bindings.h>
 #include <yttrium/log.h>
 #include <yttrium/memory_manager.h>
+#include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/manager.h>
 #include <yttrium/texture_cache.h>
-#include <yttrium/time.h>
 #include <yttrium/vector.h>
 #include <yttrium/window.h>
-
-#include <memory>
 
 #include "tetrium.h"
 
@@ -50,14 +48,14 @@ private:
 	ScriptManager _script_manager;
 	ProxyAllocator _allocator;
 
-	AudioManager     _audio;
-	std::unique_ptr<Window> _window;
-	std::unique_ptr<TextureCache> _texture_cache;
+	Pointer<AudioManager> _audio;
+	Pointer<Window> _window;
+	Pointer<TextureCache> _texture_cache;
 	Bindings         _bindings;
 
-	Pointer<Texture2D> _block_texture;
-	float              _block_size;
-	Vector2            _block_coords[8];
+	SharedPtr<Texture2D> _block_texture;
+	float                _block_size;
+	Vector2              _block_coords[8];
 
 	Tetrium::Game _game;
 	bool          _game_running = false;

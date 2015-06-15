@@ -1,7 +1,6 @@
 #include <yttrium/buffer.h>
 #include <yttrium/file.h>
 #include <yttrium/memory_manager.h>
-
 #include "../../src/audio/io/wav_private.h"
 
 #include <cmath>

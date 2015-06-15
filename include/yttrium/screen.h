@@ -6,17 +6,14 @@
 
 #include <yttrium/global.h>
 
-#include <memory>
-
 namespace Yttrium
 {
 	///
 	struct ScreenMode
 	{
-		int      width = 0;          ///<
-		int      height = 0;         ///<
-		unsigned bits_per_pixel = 0; ///<
-		unsigned frequency = 0;      ///<
+		int      width = 0;     ///<
+		int      height = 0;    ///<
+		unsigned frequency = 0; ///<
 	};
 
 	///

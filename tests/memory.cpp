@@ -1,6 +1,5 @@
 #include <yttrium/memory_manager.h>
 #include <yttrium/proxy_allocator.h>
-#include <yttrium/system_allocator.h>
 
 #include "common.h"
 
@@ -52,49 +51,5 @@ BOOST_AUTO_TEST_CASE(test_default_allocator_difference)
 	allocator->deallocate(p, &d);
 
 //	BOOST_CHECK_GE(d.allocated, 2);
-	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Decrement);
-}
-
-BOOST_AUTO_TEST_CASE(test_system_allocator)
-{
-	SystemAllocator *allocator = SystemAllocator::instance();
-
-	size_t small = 1;
-	size_t medium = allocator->upper_bound(small) + 1;
-	size_t big = allocator->upper_bound(medium) + 1;
-
-	size_t page_size = big - medium;
-	size_t reserved_size = page_size - allocator->upper_bound(0);
-
-	BOOST_CHECK_GT(medium, small);
-	BOOST_CHECK_GT(big, medium);
-
-	Allocator::Difference d;
-
-	void *p = allocator->allocate(small, 0, &d);
-
-	BOOST_REQUIRE(p);
-	BOOST_CHECK_EQUAL(d.allocated, small);
-	BOOST_CHECK_GE(d.total, allocator->upper_bound(small) + reserved_size);
-	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Increment);
-
-	p = allocator->reallocate(p, big, Allocator::MayMove, &d);
-
-	BOOST_REQUIRE(p);
-	BOOST_CHECK_EQUAL(d.allocated, big - small);
-	BOOST_CHECK_GE(d.total, allocator->upper_bound(big) - allocator->upper_bound(small));
-	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Increment);
-
-	p = allocator->reallocate(p, medium, Allocator::MayMove, &d);
-
-	BOOST_REQUIRE(p);
-	BOOST_CHECK_EQUAL(d.allocated, big - medium);
-	BOOST_CHECK_GE(d.total, allocator->upper_bound(big) - allocator->upper_bound(medium));
-	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Decrement);
-
-	allocator->deallocate(p, &d);
-
-	BOOST_CHECK_EQUAL(d.allocated, medium);
-	BOOST_CHECK_GE(d.total, allocator->upper_bound(medium) + reserved_size);
 	BOOST_CHECK_EQUAL(d.direction, Allocator::Difference::Decrement);
 }

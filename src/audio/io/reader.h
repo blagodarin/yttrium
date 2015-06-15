@@ -7,9 +7,15 @@
 
 namespace Yttrium
 {
-	class AudioReaderImpl: public AudioReader
+	class AudioReaderImpl : public AudioReader
 	{
 		friend AudioReader;
+
+	public:
+
+		AudioFormat format() const override { return _format; }
+		uint64_t offset() const override { return _offset_units; }
+		uint64_t size() const override { return _total_units * _format.unit_size(); }
 
 	protected:
 
@@ -17,11 +23,13 @@ namespace Yttrium
 
 	protected:
 
+		AudioFormat _format;
+		uint64_t _total_units = 0;
+		uint64_t _offset_units = 0;
 		File _file;
 
 		AudioReaderImpl(const StaticString& name, Allocator* allocator)
-			: AudioReader(allocator)
-			, _file(name, allocator)
+			: _file(name, allocator)
 		{
 		}
 	};

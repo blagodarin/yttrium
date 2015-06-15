@@ -4,7 +4,7 @@
 #include <yttrium/package.h>
 #include <yttrium/string.h>
 
-#include <algorithm> // min
+#include <algorithm>
 
 namespace Yttrium
 {
@@ -86,7 +86,7 @@ bool File::read_all(String* string)
 	return false;
 }
 
-bool File::read_line(String* string)
+bool File::read_line(String& string)
 {
 	if (!_private || !(_private->_mode & Read))
 		return false;
@@ -98,45 +98,45 @@ bool File::read_line(String* string)
 
 	uint64_t file_offset = _offset;
 
-	string->clear();
+	string.clear();
 
 	for (size_t offset = 0, bytes_read; ; offset += bytes_read)
 	{
-		string->resize(offset + buffer_step);
+		string.resize(offset + buffer_step);
 
-		bytes_read = read(string->text_at(offset), buffer_step);
+		bytes_read = read(string.text_at(offset), buffer_step);
 
-		string->resize(offset + bytes_read);
+		string.resize(offset + bytes_read);
 
 		if (!bytes_read)
 		{
-			seek(file_offset + string->size());
+			seek(file_offset + string.size());
 			return offset; // Return 'false' if we haven't read anything.
 		}
 
-		size_t r_offset = string->find_first('\r', offset);
+		size_t r_offset = string.find_first('\r', offset);
 
 		if (r_offset != String::End)
 		{
-			size_t string_size = string->size();
+			size_t string_size = string.size();
 
 			if (r_offset == string_size - 1)
 			{
-				string->resize(string_size + 1);
-				bytes_read += read(string->text_at(string_size), 1);
+				string.resize(string_size + 1);
+				bytes_read += read(string.text_at(string_size), 1);
 			}
 
-			string->resize(r_offset);
-			seek(file_offset + r_offset + 1 + (string->const_at(r_offset + 1) == '\n'));
+			string.resize(r_offset);
+			seek(file_offset + r_offset + 1 + (string[r_offset + 1] == '\n'));
 			break;
 		}
 		else
 		{
-			size_t n_offset = string->find_first('\n', offset);
+			size_t n_offset = string.find_first('\n', offset);
 
 			if (n_offset != String::End)
 			{
-				string->resize(n_offset);
+				string.resize(n_offset);
 				seek(file_offset + n_offset + 1);
 				break;
 			}

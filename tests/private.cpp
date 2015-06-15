@@ -4,8 +4,6 @@
 
 class Public
 {
-	Y_DECLARE_PRIVATE(Public);
-
 public:
 
 	class Private: public Yttrium::PrivateBase<Private>
@@ -25,9 +23,12 @@ public:
 	{
 		return _private;
 	}
+
+private:
+	Y_SHARED_PRIVATE(Public);
 };
 
-Y_IMPLEMENT_PRIVATE(Public);
+Y_IMPLEMENT_SHARED(Public);
 
 BOOST_AUTO_TEST_CASE(test_private)
 {

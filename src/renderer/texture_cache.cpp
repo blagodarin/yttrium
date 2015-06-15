@@ -6,9 +6,10 @@
 
 namespace Yttrium
 {
-	std::unique_ptr<TextureCache> TextureCache::create(Renderer& renderer)
+	Pointer<TextureCache> TextureCache::create(Renderer& renderer)
 	{
-		return std::make_unique<TextureCacheImpl>(static_cast<RendererImpl&>(renderer));
+		RendererImpl& renderer_impl = static_cast<RendererImpl&>(renderer);
+		return make_pointer<TextureCacheImpl>(*renderer_impl.allocator(), static_cast<RendererImpl&>(renderer));
 	}
 
 	TextureCacheImpl::TextureCacheImpl(RendererImpl& renderer)
@@ -21,7 +22,7 @@ namespace Yttrium
 		_cache_2d.clear();
 	}
 
-	Pointer<Texture2D> TextureCacheImpl::load_texture_2d(const StaticString& name, bool intensity)
+	SharedPtr<Texture2D> TextureCacheImpl::load_texture_2d(const StaticString& name, bool intensity)
 	{
 		const auto i = _cache_2d.find(String(name, ByReference()));
 		if (i != _cache_2d.end())

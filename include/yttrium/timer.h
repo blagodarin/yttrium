@@ -1,8 +1,8 @@
 /// \file
-/// \brief Time-related facilities.
+/// \brief Timer.
 
-#ifndef __Y_TIME_H
-#define __Y_TIME_H
+#ifndef __Y_TIMER_H
+#define __Y_TIMER_H
 
 #include <yttrium/global.h>
 
@@ -10,21 +10,6 @@
 
 namespace Yttrium
 {
-	/// Date and time representation.
-	struct Y_API DateTime
-	{
-		uint_fast16_t year;    ///< Year.
-		uint_fast8_t  month;   ///< Month (1 - 12).
-		uint_fast8_t  day;     ///< Day (1 - 31).
-		uint_fast8_t  hour;    ///< Hour (0 - 23).
-		uint_fast8_t  minute;  ///< Minute.
-		uint_fast8_t  second;  ///< Second.
-		uint_fast16_t msecond; ///< Millisecond.
-
-		/// Get the current date and time.
-		static DateTime now();
-	};
-
 	/// Integer value representing timer time.
 	/// \note Passing negative clock values to functions results in undefined behavior.
 	typedef int_fast32_t Clock;
@@ -76,4 +61,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_TIME_H
+#endif // __Y_TIMER_H

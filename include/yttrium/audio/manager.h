@@ -4,67 +4,45 @@
 #ifndef __Y_AUDIO_MANAGER_H
 #define __Y_AUDIO_MANAGER_H
 
-#include <yttrium/audio/player.h>
+#include <yttrium/static_string.h>
 
 #include <vector>
 
 namespace Yttrium
 {
+	class AudioPlayer;
+	template <typename> class Pointer;
 
-class ProxyAllocator;
+	/// Audio manager.
+	class Y_API AudioManager
+	{
+	public:
 
-/// Audio manager.
-class Y_API AudioManager
-{
-	Y_NONCOPYABLE(AudioManager);
+		///
+		static std::vector<StaticString> backends();
 
-public:
+		///
+		static std::vector<StaticString> backend_devices(const StaticString& backend);
 
-	///
-	AudioManager(Allocator* allocator = DefaultAllocator);
+		///
+		static Pointer<AudioManager> create(const StaticString& backend = StaticString(),
+			const StaticString& device = StaticString(), Allocator* allocator = nullptr);
 
-	///
-	~AudioManager();
+		AudioManager() = default;
+		virtual ~AudioManager() = default;
 
-public:
+		///
+		/// Get the current backend name.
+		/// \return Audio backend name.
+		virtual StaticString backend() const = 0;
 
-	/// Get the current backend name.
-	/// \return Audio backend name.
-	/// \note The result is valid through all the library lifetime.
-	StaticString backend() const;
+		/// Get the current backend device name.
+		/// \return Audio output device name.
+		virtual StaticString device() const = 0;
 
-	///
-	void close();
-
-	/// Get the current backend device name.
-	/// \return Audio output device name.
-	/// \note The result is valid until the manager is closed.
-	StaticString device() const;
-
-	///
-	bool open(const StaticString& backend = StaticString(), const StaticString& device = StaticString());
-
-	///
-	AudioPlayer player();
-
-public:
-
-	///
-	static std::vector<StaticString> backends();
-
-	///
-	static std::vector<StaticString> backend_devices(const StaticString& backend);
-
-public:
-
-	class Private;
-
-private:
-
-	ProxyAllocator* _allocator;
-	Private*        _private;
-};
-
-} // namespace Yttrium
+		///
+		virtual AudioPlayer& player() = 0;
+	};
+}
 
 #endif // __Y_AUDIO_MANAGER_H

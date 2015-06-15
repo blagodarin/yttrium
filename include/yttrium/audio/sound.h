@@ -4,50 +4,28 @@
 #ifndef __Y_AUDIO_SOUND_H
 #define __Y_AUDIO_SOUND_H
 
-#include <yttrium/pointer.h>
-#include <yttrium/string.h>
+#include <yttrium/object.h>
 
 namespace Yttrium
 {
+	class StaticString;
 
-class Sound;
-
-/// Sound pointer.
-typedef Pointer<Sound> SoundPtr;
-
-/// Sound.
-class Y_API Sound: public Pointable
-{
-public:
-
-	~Sound() = default;
-
-	/// Return the sound name.
-	/// \return %Sound name.
-	String name() const { return _name; }
-
-	/// Play the sound.
-	virtual void play() const = 0;
-
-public:
-
-	/// Open a sound.
-	/// \param name %Sound name.
-	/// \param allocator %Allocator.
-	/// \return %Sound pointer.
-	static SoundPtr open(const StaticString& name, Allocator* allocator = nullptr);
-
-protected:
-
-	const String _name;
-
-	Sound(const StaticString &name, Allocator *allocator)
-		: Pointable(allocator)
-		, _name(name, allocator)
+	/// Sound.
+	class Y_API Sound : public Object
 	{
-	}
-};
+	public:
 
-} // namespace Yttrium
+		/// Creates a sound.
+		static SharedPtr<Sound> create(const StaticString& name, Allocator* allocator = nullptr);
+
+		~Sound() override = default;
+
+		/// Plays the sound asynchronously.
+		virtual void play() const = 0;
+
+	protected:
+		Sound(Allocator* allocator) : Object(allocator) {}
+	};
+}
 
 #endif // __Y_AUDIO_SOUND_H

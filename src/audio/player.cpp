@@ -1,153 +1,148 @@
 #include "player.h"
 
 #include <yttrium/allocator.h>
+#include "backend.h"
 #include "playlist.h"
 
 namespace Yttrium
 {
-
-enum
-{
-	FetchDelay = 300, ///< 300 ms interval between the successive fetches.
-};
-
-AudioPlayer::Private::Private(Allocator *allocator)
-	: _playlist(allocator)
-	, _state(Stopped)
-	, _allocator(allocator)
-	, _backend(AudioPlayerBackend::create(_allocator))
-	, _streamer(_backend, _allocator)
-	, _thread(&Private::run, this)
-{
-}
-
-AudioPlayer::Private::~Private()
-{
-	_action.write(Exit);
-	_thread.join();
-	Y_DELETE(_allocator, _backend);
-}
-
-void AudioPlayer::Private::run()
-{
-	for (; ; )
+	enum
 	{
-		Action action = _action.read();
+		FetchDelay = 300, ///< 300 ms interval between the successive fetches.
+	};
 
-		if (action == Play)
+	AudioPlayerImpl::AudioPlayerImpl(Pointer<AudioPlayerBackend> backend, Allocator* allocator)
+		: _allocator(allocator)
+		, _playlist(_allocator)
+		, _backend(std::move(backend))
+		, _streamer(*_backend, _allocator)
+		, _thread(&AudioPlayerImpl::run, this)
+	{
+	}
+
+	AudioPlayerImpl::~AudioPlayerImpl()
+	{
+		_action.write(Exit);
+		_thread.join();
+	}
+
+	void AudioPlayerImpl::load(const StaticString& name, const Settings& settings, AudioType type)
+	{
+		_playlist.load(name, settings, type);
+	}
+
+	void AudioPlayerImpl::clear()
+	{
+		_playlist.clear();
+	}
+
+	void AudioPlayerImpl::set_order(Order order)
+	{
+		_playlist.set_order(order);
+	}
+
+	void AudioPlayerImpl::play()
+	{
+		_action.write(Play);
+	}
+
+	void AudioPlayerImpl::pause()
+	{
+		_action.write(Pause);
+	}
+
+	void AudioPlayerImpl::stop()
+	{
+		_action.write(Stop);
+	}
+
+	bool AudioPlayerImpl::is_playing() const
+	{
+		return _state == Playing;
+	}
+
+	void AudioPlayerImpl::run()
+	{
+		for (;;)
 		{
-			AudioPlaylist::Item item(_allocator);
+			Action action = _action.read();
 
-			if (_playlist.next(&item)
-				&& _streamer.open(item.name, item.settings, item.type, _playlist.order()))
+			if (action == Play)
 			{
-				_streamer.prefetch();
-				_backend->play();
-				_state = Playing;
+				AudioPlaylist::Item item(_allocator);
 
-				while (action == Play)
+				if (_playlist.next(&item)
+					&& _streamer.open(item.name, item.settings, item.type, _playlist.order()))
 				{
-					action = _action.read(FetchDelay, Play);
+					_streamer.prefetch();
+					_backend->play();
+					_state = Playing;
 
-					switch (action)
+					while (action == Play)
 					{
-					case Play:
+						action = _action.read(FetchDelay, Play);
 
-						for (size_t i = _backend->check_buffers(); i; --i)
+						switch (action)
 						{
-							AudioStreamer::FetchResult fetch_result = _streamer.fetch();
+						case Play:
 
-							if (fetch_result != AudioStreamer::Ok)
+							for (size_t i = _backend->check_buffers(); i > 0; --i)
 							{
-								if (_playlist.next(&item)
-									&& _streamer.open(item.name, item.settings, item.type, _playlist.order()))
-								{
-									if (fetch_result == AudioStreamer::NoMoreData)
-									{
-										// NOTE: Since audio shorter than a buffer can't be loaded into a playlist,
-										// we can check nothing here.
+								AudioStreamer::FetchResult fetch_result = _streamer.fetch();
 
-										_streamer.fetch();
+								if (fetch_result != AudioStreamer::Ok)
+								{
+									if (_playlist.next(&item)
+										&& _streamer.open(item.name, item.settings, item.type, _playlist.order()))
+									{
+										if (fetch_result == AudioStreamer::NoMoreData)
+										{
+											// NOTE: Since audio shorter than a buffer can't be loaded into a playlist,
+											// we can check nothing here.
+
+											_streamer.fetch();
+										}
+									}
+									else
+									{
+										action = Stop;
+										break;
 									}
 								}
-								else
-								{
-									action = Stop;
-									break;
-								}
 							}
-						}
-						break;
+							break;
 
-					case Pause:
+						case Pause:
 
-						_state = Paused;
-						_backend->pause();
-						do action = _action.read(); while (action == Pause);
-						if (action == Play)
-						{
-							_backend->play();
-							_state = Playing;
+							_state = Paused;
+							_backend->pause();
+							do action = _action.read(); while (action == Pause);
+							if (action == Play)
+							{
+								_backend->play();
+								_state = Playing;
+								break;
+							}
+							// Fallthrough.
+
+						case Stop:
+						case Exit:
+
 							break;
 						}
-						// Fallthrough.
+					}
 
-					case Stop:
-					case Exit:
-
-						break;
+					if (action == Stop || action == Exit)
+					{
+						_state = Stopped;
+						_backend->stop();
+						_streamer.close();
 					}
 				}
-
-				if (action == Stop || action == Exit)
-				{
-					_state = Stopped;
-					_backend->stop();
-					_streamer.close();
-				}
 			}
-		}
 
-		if (action == Exit)
-		{
-			break;
+			if (action == Exit)
+				break;
 		}
 	}
 }
-
-void AudioPlayer::load(const StaticString& name, const Settings& settings, AudioType type)
-{
-	_private->_playlist.load(name, settings, type);
-}
-
-void AudioPlayer::clear()
-{
-	_private->_playlist.clear();
-}
-
-void AudioPlayer::set_order(Order order)
-{
-	_private->_playlist.set_order(order);
-}
-
-void AudioPlayer::play()
-{
-	_private->_action.write(Private::Play);
-}
-
-void AudioPlayer::pause()
-{
-	_private->_action.write(Private::Pause);
-}
-
-void AudioPlayer::stop()
-{
-	_private->_action.write(Private::Stop);
-}
-
-bool AudioPlayer::is_playing() const
-{
-	return (_private->_state == Private::Playing);
-}
-
-} // namespace Yttrium

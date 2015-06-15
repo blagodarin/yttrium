@@ -12,10 +12,8 @@ namespace Yttrium
 	{
 	public:
 
-		ALuint  _format;
-		ALsizei _frequency;
-
-		OpenAlFormat(): _format(0), _frequency(0) {}
+		ALuint _format = 0;
+		ALsizei _frequency = 0;
 
 		bool set(const AudioFormat& format);
 	};

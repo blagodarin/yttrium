@@ -1,7 +1,7 @@
 #include "ogg_vorbis.h"
 
-#include <algorithm> // min
-#include <cstring> // memset
+#include <algorithm>
+#include <cstring>
 
 namespace Yttrium
 {

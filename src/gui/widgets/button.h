@@ -9,11 +9,11 @@ namespace Yttrium
 {
 	class Sound;
 
-	class Button: public Widget
+	class Button : public Widget
 	{
 	public:
 
-		Button(Allocator* allocator);
+		Button(Allocator* allocator) : Widget(allocator) {}
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
@@ -30,14 +30,14 @@ namespace Yttrium
 			Style(): text_color(1, 1, 1) {}
 		};
 
-		Rect               _position;
-		TextureFont        _font;
-		Pointer<Texture2D> _font_texture;
-		Vector2            _text_size;
-		Pointer<Sound>     _sound;
-		ScriptCode         _action;
-		WidgetState        _state;
-		Style              _styles[WidgetStateCount];
+		Rect                 _position;
+		TextureFont          _font;
+		SharedPtr<Texture2D> _font_texture;
+		Vector2              _text_size;
+		SharedPtr<Sound>     _sound;
+		ScriptCode           _action;
+		WidgetState          _state = WidgetState::NotSet;
+		Style                _styles[WidgetStateCount];
 	};
 }
 

@@ -14,7 +14,7 @@ namespace Yttrium
 	class Vector4;
 
 	template <typename T>
-	class Pointer;
+	class SharedPtr;
 
 	class GuiPropertyDumper
 	{
@@ -32,7 +32,7 @@ namespace Yttrium
 		virtual void dump_sound(const StaticString& name, const Sound& sound) = 0;
 		virtual void dump_state(const StaticString& name, WidgetState state) = 0;
 		virtual void dump_text(const StaticString& name, const StaticString& text) = 0;
-		virtual void dump_texture(const StaticString& name, const Pointer<Texture2D>& texture) = 0;
+		virtual void dump_texture(const StaticString& name, const SharedPtr<Texture2D>& texture) = 0;
 	};
 }
 

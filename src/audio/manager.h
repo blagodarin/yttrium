@@ -4,6 +4,7 @@
 #include <yttrium/audio/manager.h>
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/proxy_allocator.h>
 #include "../base/instance_guard.h"
 #include "player.h"
 
@@ -11,33 +12,34 @@
 
 namespace Yttrium
 {
-	class SoundImpl;
+	class AudioBackend;
+	class AudioManagerImpl;
 
-	typedef InstanceGuard<AudioManager::Private> AudioManagerGuard;
+	using AudioManagerGuard = InstanceGuard<AudioManagerImpl>;
 
-	class Y_PRIVATE AudioManager::Private
+	class AudioManagerImpl : public AudioManager
 	{
 	public:
 
-		AudioManagerGuard        _instance_guard;
-		Allocator*               _allocator;
-		StaticString             _backend_name;
-		String                   _device_name;
-		AudioPlayer::Private     _player_private;
+		static AudioManagerImpl* instance();
+
+		AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator*);
+		~AudioManagerImpl() override;
+
+		StaticString backend() const override;
+		StaticString device() const override;
+		AudioPlayer& player() override { return _player; }
+
+		SharedPtr<Sound> create_sound(const StaticString& name, Allocator*);
+		void delete_sound(const StaticString& name);
+
+	private:
+
+		AudioManagerGuard _instance_guard;
+		ProxyAllocator _allocator;
+		const Pointer<AudioBackend> _backend;
+		AudioPlayerImpl _player;
 		std::map<String, Sound*> _sounds;
-
-	public:
-
-		Private(Allocator* allocator, const StaticString& device_name);
-		virtual ~Private();
-
-	public:
-
-		virtual SoundImpl* create_sound(const StaticString& name, Allocator* allocator) = 0;
-
-	public:
-
-		static Private* instance();
 	};
 }
 

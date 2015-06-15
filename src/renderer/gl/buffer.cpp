@@ -1,6 +1,6 @@
 #include "buffer.h"
 
-#include <utility> // std::move
+#include <utility>
 
 namespace Yttrium
 {

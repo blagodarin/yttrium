@@ -10,7 +10,7 @@ namespace Yttrium
 	{
 	public:
 
-		GuiImage(Allocator* allocator);
+		GuiImage(Allocator* allocator) : Widget(allocator) {}
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;

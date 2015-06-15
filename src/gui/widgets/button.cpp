@@ -7,16 +7,10 @@
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
-#include <utility> // move
+#include <utility>
 
 namespace Yttrium
 {
-	Button::Button(Allocator* allocator)
-		: Widget(allocator)
-		, _state(WidgetState::NotSet)
-	{
-	}
-
 	void Button::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position", _position);

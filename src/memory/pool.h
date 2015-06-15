@@ -3,7 +3,7 @@
 
 #include <yttrium/pool.h>
 
-#include <cstddef> // offsetof
+#include <cstddef>
 
 namespace Yttrium
 {

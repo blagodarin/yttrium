@@ -20,12 +20,12 @@ namespace Yttrium
 		_gl.initialize(window);
 	}
 
-	std::unique_ptr<GpuProgram> GLRenderer::create_gpu_program()
+	Pointer<GpuProgram> GLRenderer::create_gpu_program()
 	{
-		return std::make_unique<GlGpuProgram>(*this, _gl);
+		return make_pointer<GlGpuProgram>(*allocator(), *this, _gl);
 	}
 
-	std::unique_ptr<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
+	Pointer<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
 	{
 		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
 		if (!buffer)
@@ -35,10 +35,10 @@ namespace Yttrium
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
-		return std::make_unique<GlIndexBuffer>(format, size, element_size, std::move(buffer), gl_format);
+		return make_pointer<GlIndexBuffer>(*allocator(), format, size, element_size, std::move(buffer), gl_format);
 	}
 
-	Pointer<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
+	SharedPtr<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
 		// NOTE: Keep the new pixel formats in sync with these arrays!
 
@@ -99,10 +99,10 @@ namespace Yttrium
 		}
 		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
-		return Pointer<Texture2D>(Y_NEW(allocator(), GlTexture2D)(*this, format, !no_mipmaps, _gl, texture));
+		return SharedPtr<Texture2D>(Y_NEW(allocator(), GlTexture2D)(*this, format, !no_mipmaps, _gl, texture));
 	}
 
-	std::unique_ptr<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
+	Pointer<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
 	{
 		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		if (!buffer)
@@ -117,7 +117,7 @@ namespace Yttrium
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
-		return std::make_unique<GlVertexBuffer>(format, size, element_size, std::move(buffer));
+		return make_pointer<GlVertexBuffer>(*allocator(), format, size, element_size, std::move(buffer));
 	}
 
 	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)

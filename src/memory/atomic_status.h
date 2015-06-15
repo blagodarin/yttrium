@@ -7,48 +7,28 @@
 
 namespace Yttrium
 {
+	class AtomicMemoryStatus
+	{
+	public:
 
-/// Atomic memory status.
+		AtomicMemoryStatus();
 
-class AtomicMemoryStatus
-{
-public:
+		void allocate(const Allocator::Difference& difference);
+		void deallocate(const Allocator::Difference& difference);
+		void reallocate(const Allocator::Difference& difference);
 
-	///
+		operator MemoryStatus() const;
 
-	AtomicMemoryStatus();
+	private:
 
-public:
+		std::atomic<size_t> _allocated_blocks;
+		std::atomic<size_t> _allocated_bytes;
+		std::atomic<size_t> _total_bytes;
 
-	///
-
-	void allocate(const Allocator::Difference &difference);
-
-	///
-
-	void deallocate(const Allocator::Difference &difference);
-
-	///
-
-	void reallocate(const Allocator::Difference &difference);
-
-public:
-
-	///
-
-	operator MemoryStatus() const;
-
-private:
-
-	std::atomic<size_t> _allocated_blocks;
-	std::atomic<size_t> _allocated_bytes;
-	std::atomic<size_t> _total_bytes;
-
-	std::atomic<size_t> _allocations;
-	std::atomic<size_t> _reallocations;
-	std::atomic<size_t> _deallocations;
-};
-
-} // namespace Yttrium
+		std::atomic<size_t> _allocations;
+		std::atomic<size_t> _reallocations;
+		std::atomic<size_t> _deallocations;
+	};
+}
 
 #endif // __BASE_MEMORY_ATOMIC_STATUS_H

@@ -39,8 +39,8 @@ private:
 	ScriptManager _script_manager;
 	ProxyAllocator _allocator;
 
-	std::unique_ptr<Window> _window;
-	std::unique_ptr<TextureCache> _texture_cache;
+	Pointer<Window> _window;
+	Pointer<TextureCache> _texture_cache;
 	std::unique_ptr<CubeModel> _cube;
 	std::unique_ptr<ChessboardModel> _chessboard;
 

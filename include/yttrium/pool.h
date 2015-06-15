@@ -4,6 +4,7 @@
 #ifndef __Y_POOL_H
 #define __Y_POOL_H
 
+#include <yttrium/base.h>
 #include <yttrium/types.h>
 
 #include <cstddef>

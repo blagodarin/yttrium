@@ -4,20 +4,16 @@
 #ifndef __Y_SCRIPT_MANAGER_H
 #define __Y_SCRIPT_MANAGER_H
 
+#include <yttrium/base.h>
 #include <yttrium/global.h>
 
 namespace Yttrium
 {
 	class Allocator;
-	class ScriptContext;
 
 	/// Script manager.
 	class Y_API ScriptManager
 	{
-		friend ScriptContext;
-
-		Y_NONCOPYABLE(ScriptManager);
-
 	public:
 
 		///
@@ -27,10 +23,7 @@ namespace Yttrium
 		~ScriptManager();
 
 	private:
-
-		class Private;
-
-		Private *_private;
+		Y_MANAGER_PRIVATE(ScriptManager);
 	};
 }
 

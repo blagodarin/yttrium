@@ -9,78 +9,68 @@
 
 namespace Yttrium
 {
-
-/// Memory status.
-
-struct MemoryStatus
-{
-	size_t allocated_blocks; ///< Number of memory blocks allocated.
-	size_t allocated_bytes;  ///< Allocated memory size.
-	size_t total_bytes;      ///< Used memory size.
-
-	size_t allocations;      ///< Lifetime (wrapping) number of allocations.
-	size_t reallocations;    ///< Lifetime (wrapping) number of reallocations.
-	size_t deallocations;    ///< Lifetime (wrapping) number of deallocations.
-
-	///
-
-	MemoryStatus()
-		: allocated_blocks(0)
-		, allocated_bytes(0)
-		, total_bytes(0)
-		, allocations(0)
-		, reallocations(0)
-		, deallocations(0)
+	/// Memory status.
+	struct MemoryStatus
 	{
-	}
-};
+		size_t allocated_blocks; ///< Number of memory blocks allocated.
+		size_t allocated_bytes;  ///< Allocated memory size.
+		size_t total_bytes;      ///< Used memory size.
 
-/// Proxy allocator.
+		size_t allocations;      ///< Lifetime (wrapping) number of allocations.
+		size_t reallocations;    ///< Lifetime (wrapping) number of reallocations.
+		size_t deallocations;    ///< Lifetime (wrapping) number of deallocations.
 
-class Y_API ProxyAllocator
-	: public Allocator
-{
-public:
+		///
 
-	///
+		MemoryStatus()
+			: allocated_blocks(0)
+			, allocated_bytes(0)
+			, total_bytes(0)
+			, allocations(0)
+			, reallocations(0)
+			, deallocations(0)
+		{
+		}
+	};
 
-	ProxyAllocator(const StaticString &name, Allocator *allocator = nullptr);
+	/// Proxy allocator.
+	class Y_API ProxyAllocator : public Allocator
+	{
+	public:
 
-	///
+		///
+		ProxyAllocator(const StaticString& name, Allocator* allocator = nullptr);
 
-	~ProxyAllocator() override;
+		///
+		~ProxyAllocator() override;
 
-public:
+	public:
 
-	///
+		///
+		Allocator* allocator() const;
 
-	Allocator *allocator() const;
+		///
+		StaticString name() const;
 
-	///
+		///
+		MemoryStatus status() const;
 
-	StaticString name() const;
+	public: // Allocator.
 
-	///
+		using Allocator::allocate;
 
-	MemoryStatus status() const;
+		void* allocate(size_t size, size_t align = 0, Difference* difference = nullptr) override;
 
-public: // Allocator.
+		void deallocate(void* pointer, Difference* difference = nullptr) override;
 
-	using Allocator::allocate;
+		void* reallocate(void* pointer, size_t size, Movability movability = MayMove, Difference* difference = nullptr) override;
 
-	void *allocate(size_t size, size_t align = 0, Difference *difference = nullptr) override;
+	private:
 
-	void deallocate(void *pointer, Difference *difference = nullptr) override;
+		class Private;
 
-	void *reallocate(void *pointer, size_t size, Movability movability = MayMove, Difference *difference = nullptr) override;
-
-private:
-
-	class Private;
-
-	Private *_private;
-};
-
-} // namespace Yttrium
+		Private* _private;
+	};
+}
 
 #endif // __Y_PROXY_ALLOCATOR_H

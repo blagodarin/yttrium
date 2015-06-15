@@ -7,13 +7,6 @@
 
 namespace Yttrium
 {
-	GuiInput::GuiInput(Allocator* allocator)
-		: Widget(allocator, CanHaveFocus)
-		, _logic(allocator)
-		, _cursor_mark(0)
-	{
-	}
-
 	void GuiInput::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position", _position);

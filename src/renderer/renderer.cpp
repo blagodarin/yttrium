@@ -2,7 +2,6 @@
 
 #include <yttrium/gpu_program.h>
 #include <yttrium/matrix.h>
-#include "../memory/allocatable.h"
 #include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -39,9 +38,9 @@ namespace Yttrium
 		"}"
 	);
 
-	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
+	Pointer<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
 	{
-		auto renderer = std::make_unique<GLRenderer>(window, allocator);
+		auto renderer = make_pointer<GLRenderer>(*allocator, window, allocator);
 		if (!renderer->initialize())
 			return {};
 
@@ -610,8 +609,8 @@ namespace Yttrium
 	{
 		const auto* texture = current_texture_2d();
 		_texture_rect = texture ? texture->full_rectangle() : RectF();
-		_texture_borders = MarginsF();
-		_font = TextureFont();
+		_texture_borders = {};
+		_font = {};
 	}
 
 	Push2D::Push2D(Renderer& renderer)

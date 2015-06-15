@@ -15,6 +15,7 @@ namespace Yttrium
 	class GuiPropertyLoader;
 	class Renderer;
 	class Widget;
+	template <typename> class Pointer;
 
 	class GuiScene
 	{
@@ -48,10 +49,7 @@ namespace Yttrium
 
 		void render(Renderer& renderer); // TODO: Make const.
 
-		void reserve(size_t capacity)
-		{
-			_widgets.reserve(capacity);
-		}
+		void reserve(size_t capacity);
 
 		void set_cursor(const Vector2& cursor)
 		{
@@ -87,7 +85,7 @@ namespace Yttrium
 		Vector2                   _size;
 		bool                      _has_size = false;
 		Scaling                   _scaling;
-		std::vector<Widget*>      _widgets;
+		std::vector<Pointer<Widget>> _widgets;
 		std::map<String, Widget*> _named_widgets;
 		bool                      _is_cursor_set;
 		Vector2                   _cursor;

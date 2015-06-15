@@ -4,6 +4,7 @@
 #ifndef __Y_SCRIPT_CODE_H
 #define __Y_SCRIPT_CODE_H
 
+#include <yttrium/base.h>
 #include <yttrium/global.h>
 
 namespace Yttrium
@@ -15,8 +16,6 @@ namespace Yttrium
 	/// Script code.
 	class Y_API ScriptCode
 	{
-		Y_DECLARE_PRIVATE(ScriptCode);
-
 	public:
 
 		///
@@ -39,6 +38,9 @@ namespace Yttrium
 
 		///
 		static ScriptCode load(const StaticString& filename);
+
+	private:
+		Y_SHARED_PRIVATE(ScriptCode);
 	};
 }
 

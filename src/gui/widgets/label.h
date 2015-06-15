@@ -10,7 +10,7 @@ namespace Yttrium
 	{
 	public:
 
-		Label(Allocator* allocator);
+		Label(Allocator* allocator) : Widget(allocator), _final_text(allocator) {}
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
@@ -20,7 +20,7 @@ namespace Yttrium
 
 		Vector2            _position;
 		ForegroundProperty _foreground;
-		unsigned           _alignment;
+		unsigned           _alignment = 0;
 		mutable String     _final_text;
 	};
 }

@@ -5,8 +5,6 @@
 #include <yttrium/size.h>
 #include <yttrium/vector.h>
 
-#include <memory>
-
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 
@@ -15,6 +13,7 @@ namespace Yttrium
 	class Point;
 	class ScreenImpl;
 	class StaticString;
+	template <typename> class Pointer;
 
 	class WindowBackend
 	{
@@ -48,7 +47,7 @@ namespace Yttrium
 
 	public:
 
-		static std::unique_ptr<WindowBackend> create(const ScreenImpl& screen, const Size& size, Callbacks& callbacks);
+		static Pointer<WindowBackend> create(Allocator& allocator, const ScreenImpl& screen, const Size& size, Callbacks& callbacks);
 
 	private:
 

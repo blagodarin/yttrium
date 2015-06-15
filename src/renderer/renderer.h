@@ -4,6 +4,7 @@
 #include <yttrium/renderer.h>
 
 #include <yttrium/margins.h>
+#include <yttrium/object.h>
 #include <yttrium/pointer.h>
 #include <yttrium/string.h>
 #include <yttrium/texture_font.h>
@@ -31,7 +32,7 @@ namespace Yttrium
 			int _redundant_shader_switches = 0;
 		};
 
-		static std::unique_ptr<RendererImpl> create(WindowBackend& window, Allocator* allocator);
+		static Pointer<RendererImpl> create(WindowBackend& window, Allocator* allocator);
 
 		RendererImpl(Allocator* allocator);
 		~RendererImpl() override;
@@ -114,8 +115,8 @@ namespace Yttrium
 		TextureFont _font;
 		Vector2     _font_size;
 
-		Pointer<Texture2D> _debug_texture;
-		std::shared_ptr<GpuProgram> _program_2d;
+		SharedPtr<Texture2D> _debug_texture;
+		Pointer<GpuProgram> _program_2d;
 
 		enum class MatrixType
 		{

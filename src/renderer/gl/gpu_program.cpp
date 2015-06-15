@@ -49,14 +49,14 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GlGpuProgram::set_vertex_shader(Language language, const StaticString& source)
-	{
-		return set_shader(_vertex_shader, GL_VERTEX_SHADER, language, source);
-	}
-
 	bool GlGpuProgram::set_fragment_shader(Language language, const StaticString& source)
 	{
 		return set_shader(_fragment_shader, GL_FRAGMENT_SHADER, language, source);
+	}
+
+	bool GlGpuProgram::set_vertex_shader(Language language, const StaticString& source)
+	{
+		return set_shader(_vertex_shader, GL_VERTEX_SHADER, language, source);
 	}
 
 	bool GlGpuProgram::set_shader(GLuint& result, GLenum type, Language language, const StaticString& source) const

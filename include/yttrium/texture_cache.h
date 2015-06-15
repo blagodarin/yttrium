@@ -6,16 +6,13 @@
 
 #include <yttrium/global.h>
 
-#include <memory>
-
 namespace Yttrium
 {
 	class Renderer;
 	class StaticString;
 	class Texture2D;
-
-	template <typename T>
-	class Pointer;
+	template <typename> class Pointer;
+	template <typename> class SharedPtr;
 
 	/// Texture cache.
 	class Y_API TextureCache
@@ -23,7 +20,7 @@ namespace Yttrium
 	public:
 
 		///
-		static std::unique_ptr<TextureCache> create(Renderer& renderer);
+		static Pointer<TextureCache> create(Renderer& renderer);
 
 		TextureCache() = default;
 		virtual ~TextureCache() = default;
@@ -32,7 +29,7 @@ namespace Yttrium
 		virtual void clear() = 0;
 
 		///
-		virtual Pointer<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false) = 0;
+		virtual SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false) = 0;
 	};
 }
 

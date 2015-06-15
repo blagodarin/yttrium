@@ -21,8 +21,8 @@ namespace Yttrium
 
 		bool is_linked() const override { return _linked; }
 		bool link() override;
-		bool set_vertex_shader(Language, const StaticString&) override;
 		bool set_fragment_shader(Language, const StaticString&) override;
+		bool set_vertex_shader(Language, const StaticString&) override;
 
 		GLuint handle() const { return _program; }
 
