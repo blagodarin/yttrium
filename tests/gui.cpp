@@ -17,8 +17,6 @@ BOOST_AUTO_TEST_CASE(test_gui)
 	File file(File::Temporary);
 
 	{
-		LogManager log_manager(DefaultAllocator); // For error reporting.
-
 		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
 
 		WindowCallbacks window_callbacks;

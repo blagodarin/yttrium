@@ -19,7 +19,7 @@ namespace Yttrium
 	{
 		if (!loader.load_rect("position", &_position))
 		{
-			Y_LOG("[Gui.Image] Unable to load");
+			Log() << "[Gui.Image] Unable to load";
 			return false;
 		}
 

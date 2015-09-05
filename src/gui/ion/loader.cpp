@@ -122,7 +122,7 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 
 	if (!document.load(source_name))
 	{
-		Y_LOG("[Gui] Can't load \"" << source_name << "\"...");
+		Log() << "[Gui] Can't load \"" << source_name << "\"...";
 		return false;
 	}
 
@@ -182,7 +182,7 @@ void GuiIonLoader::load(const IonObject &source)
 
 			if (!_classes.add(*object_name, *object, class_name))
 			{
-				Y_LOG("[Gui] Can' load class \"" << *object_name << "\"");
+				Log() << "[Gui] Can' load class \"" << *object_name << "\"";
 			}
 		}
 		else if (node.name() == S("scene"))
@@ -198,7 +198,7 @@ void GuiIonLoader::load(const IonObject &source)
 
 			if (class_name && *class_name != S("root"))
 			{
-				Y_LOG("[Gui] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored");
+				Log() << "[Gui] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored";
 				class_name = nullptr;
 			}
 
@@ -215,7 +215,7 @@ void GuiIonLoader::load(const IonObject &source)
 
 			if (s.size() != 2 || !s->is_list() || !s.last().is_string())
 			{
-				Y_LOG("[Gui] Bad 'on_scene_change'");
+				Log() << "[Gui] Bad 'on_scene_change'";
 				continue;
 			}
 
@@ -228,7 +228,7 @@ void GuiIonLoader::load(const IonObject &source)
 			if (t.size() != 2 || !t->get(&from) || !t.last().get(&to)
 				|| !s.last().get(&action))
 			{
-				Y_LOG("[Gui] Bad 'on_scene_change'");
+				Log() << "[Gui] Bad 'on_scene_change'";
 				continue;
 			}
 

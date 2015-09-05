@@ -7,19 +7,39 @@ namespace Yttrium
 {
 	namespace _
 	{
-		template <typename T, typename R, R (*d)(T*)>
-		struct UniquePtrDeleter
+		template <typename T, typename R, typename P, R (*deleter)(P*)>
+		struct UniquePtr
 		{
 			void operator()(T* p)
 			{
 				if (p)
-					d(p);
+					deleter(p);
 			}
+
+			using Type = std::unique_ptr<T, UniquePtr>;
 		};
+
+		template <typename T, typename R, typename P, R (*deleter)(P*)>
+		struct UniquePtr<T[], R, P, deleter>
+		{
+			void operator()(T* p)
+			{
+				if (p)
+					deleter(p);
+			}
+
+			using Type = std::unique_ptr<T[], UniquePtr>;
+		};
+
+		template <typename R, typename P>
+		R result(R (*)(P*));
+
+		template <typename R, typename P>
+		P param(R (*)(P*));
 	}
 }
 
 #define Y_UNIQUE_PTR(type, deleter) \
-	std::unique_ptr<type, Yttrium::_::UniquePtrDeleter<type, std::result_of_t<decltype(&deleter)(type*)>, deleter>>
+	Yttrium::_::UniquePtr<type, decltype(Yttrium::_::result(deleter)), decltype(Yttrium::_::param(deleter)), deleter>::Type
 
 #endif

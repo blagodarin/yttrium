@@ -4,8 +4,6 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
-#include <yttrium/log.h>
-#include <yttrium/memory_manager.h>
 #include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/manager.h>
@@ -43,8 +41,6 @@ private:
 
 private:
 
-	MemoryManager _memory_manager;
-	LogManager _log_manager;
 	ScriptManager _script_manager;
 	ProxyAllocator _allocator;
 

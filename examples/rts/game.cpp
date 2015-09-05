@@ -1,13 +1,13 @@
 #include "game.h"
 
+#include <yttrium/date_time.h>
 #include <yttrium/gui.h>
 #include <yttrium/matrix.h>
 #include <yttrium/renderer.h>
-#include <yttrium/date_time.h>
+#include <yttrium/string.h>
 
 Game::Game()
-	: _log_manager("rts.log")
-	, _allocator("game")
+	: _allocator("game")
 {
 }
 

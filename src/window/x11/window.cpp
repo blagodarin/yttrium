@@ -69,31 +69,30 @@ bool initialize_window(::Display* display, int screen, const Size& size, ::Windo
 		None
 	};
 
-	int fbc_count = 0;
-	std::unique_ptr<::GLXFBConfig[], XDeleter> fbc(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
-	if (!fbc)
-		return false;
-
-	std::unique_ptr<::XVisualInfo, XDeleter> best_vi;
+	Y_UNIQUE_PTR(::XVisualInfo, ::XFree) best_vi;
 	::GLXFBConfig best_fbc = {};
-
-	for (int i = 0; i < fbc_count; ++i)
 	{
-		// The official OpenGL example suggest sorting by GLX_SAMPLE_BUFFERS
-		// and GLX_SAMPLES, but we have no successful experience in using it.
-		std::unique_ptr<::XVisualInfo, XDeleter> vi(::glXGetVisualFromFBConfig(display, fbc[i]));
-		if (vi->depth == 24) // A depth of 32 will give us an ugly result.
+		int fbc_count = 0;
+		const Y_UNIQUE_PTR(::GLXFBConfig[], ::XFree) fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
+		if (!fbcs)
+			return false;
+
+		for (int i = 0; i < fbc_count; ++i)
 		{
-			best_vi = std::move(vi);
-			best_fbc = fbc[i];
-			break;
+			// The official OpenGL example suggest sorting by GLX_SAMPLE_BUFFERS
+			// and GLX_SAMPLES, but we have no successful experience in using it.
+			Y_UNIQUE_PTR(::XVisualInfo, ::XFree) vi(::glXGetVisualFromFBConfig(display, fbcs[i]));
+			if (vi->depth == 24) // A depth of 32 will give us an ugly result.
+			{
+				best_vi = std::move(vi);
+				best_fbc = fbcs[i];
+				break;
+			}
 		}
+
+		if (!best_vi)
+			return false;
 	}
-
-	if (!best_vi)
-		return false;
-
-	fbc.reset();
 
 	screen = best_vi->screen; // TODO: Understand, why.
 

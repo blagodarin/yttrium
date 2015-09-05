@@ -191,16 +191,16 @@ rescan:
 					case 'r':  *end++ = '\r'; break;
 					default:
 
-						Y_LOG(S("[ScriptScanner] Invalid escape sequence \"") << *cursor
-							<< S("\" (") << token.line << ':' << cursor - _line_origin << ')');
+						Log() << S("[ScriptScanner] Invalid escape sequence \"") << *cursor
+							<< S("\" (") << token.line << ':' << cursor - _line_origin << ')';
 						return false;
 					}
 					++cursor;
 				}
 				else if (*cursor == '\n' || *cursor == '\r')
 				{
-					Y_LOG(S("[ScriptScanner] Unexpected end of line (")
-						<< token.line << ':' << cursor - _line_origin << ')');
+					Log() << S("[ScriptScanner] Unexpected end of line (")
+						<< token.line << ':' << cursor - _line_origin << ')';
 					return false;
 				}
 				else if (cursor != _end)
@@ -214,8 +214,8 @@ rescan:
 				}
 				else
 				{
-					Y_LOG(S("[ScriptScanner] Unexpected end of script (")
-						<< token.line << ':' << cursor - _line_origin << ')');
+					Log() << S("[ScriptScanner] Unexpected end of script (")
+						<< token.line << ':' << cursor - _line_origin << ')';
 					return false;
 				}
 			}
@@ -254,8 +254,8 @@ rescan:
 
 	case Kind::Error:
 
-		Y_LOG(S("[ScriptScanner] Invalid script character (")
-			<< token.line << ':' << cursor - _line_origin << ')');
+		Log() << S("[ScriptScanner] Invalid script character (")
+			<< token.line << ':' << cursor - _line_origin << ')';
 		return false;
 	}
 

@@ -33,7 +33,7 @@ namespace Yttrium
 			&& loader.load_font("font", &_font, &_font_texture)
 			&& loader.load_size("text_size", &_text_size)))
 		{
-			Y_LOG("[Gui.Button] Unable to load");
+			Log() << "[Gui.Button] Unable to load";
 			return false;
 		}
 

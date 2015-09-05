@@ -25,7 +25,7 @@ namespace Yttrium
 			&& _foreground.load(loader)
 			&& loader.load_text("text", &_text)))
 		{
-			Y_LOG("[Gui.Label] Unable to load");
+			Log() << "[Gui.Label] Unable to load";
 			return false;
 		}
 

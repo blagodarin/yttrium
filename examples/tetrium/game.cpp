@@ -5,14 +5,14 @@
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
 #include <yttrium/ion.h>
+#include <yttrium/log.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
 #include <yttrium/texture.h>
 #include <yttrium/timer.h>
 
 Game::Game()
-	: _log_manager("tetrium.log")
-	, _allocator("game")
+	: _allocator("game")
 	, _bindings(&_allocator)
 {
 	ScriptContext::global().define("bind", 2, [this](const ScriptCall& call)
@@ -144,7 +144,7 @@ Game::Game()
 
 void Game::run()
 {
-	Y_LOG("Loading");
+	Log() << "Loading";
 
 	_window = Window::create(*this, &_allocator);
 	if (!_window)
@@ -205,11 +205,11 @@ void Game::run()
 	if (!_window->gui().load("examples/tetrium/gui/gui.ion"))
 		return;
 
-	Y_LOG("Starting");
+	Log() << "Starting";
 
 	_window->run();
 
-	Y_LOG("Saving settings");
+	Log() << "Saving settings";
 
 	File settings_file("tetrium.txt", File::Write | File::Truncate, &_allocator);
 	if (settings_file)

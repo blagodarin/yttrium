@@ -31,13 +31,13 @@ namespace Yttrium
 
 		if (command == _commands.end())
 		{
-			Y_LOG(S("[Script.Context] Unknown command \"") << id << '\"');
+			Log() << S("[Script.Context] Unknown command \"") << id << '\"';
 			return false;
 		}
 
 		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 		{
-			Y_LOG(S("[Script.Context] Argument number mismatch for command \"") << id << '\"');
+			Log() << S("[Script.Context] Argument number mismatch for command \"") << id << '\"';
 			return false;
 		}
 

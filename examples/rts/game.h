@@ -2,8 +2,6 @@
 #define __EXAMPLES_RTS_GAME_H
 
 #include <yttrium/index_buffer.h>
-#include <yttrium/log.h>
-#include <yttrium/memory_manager.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/manager.h>
 #include <yttrium/texture_cache.h>
@@ -34,8 +32,6 @@ private:
 
 private:
 
-	MemoryManager _memory_manager;
-	LogManager _log_manager;
 	ScriptManager _script_manager;
 	ProxyAllocator _allocator;
 

@@ -34,7 +34,7 @@ namespace Yttrium
 
 	ScreenMode ScreenImpl::current_mode() const
 	{
-		P_XRRScreenConfiguration config(::XRRGetScreenInfo(_display.get(), RootWindow(_display.get(), _screen)));
+		const P_XRRScreenConfiguration config(::XRRGetScreenInfo(_display.get(), RootWindow(_display.get(), _screen)));
 
 		int nsizes = 0;
 		::XRRScreenSize* sizes = ::XRRConfigSizes(config.get(), &nsizes);
@@ -52,7 +52,7 @@ namespace Yttrium
 
 	ScreenMode ScreenImpl::default_mode() const
 	{
-		P_XRRScreenConfiguration config(::XRRGetScreenInfo(_display.get(), RootWindow(_display.get(), _screen)));
+		const P_XRRScreenConfiguration config(::XRRGetScreenInfo(_display.get(), RootWindow(_display.get(), _screen)));
 
 		int nsizes = 0;
 		::XRRScreenSize* sizes = ::XRRConfigSizes(config.get(), &nsizes);

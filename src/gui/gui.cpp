@@ -32,7 +32,7 @@ namespace Yttrium
 
 		if (_scenes.find(scene_name) != _scenes.end())
 		{
-			Y_LOG("[Gui] Scene \"" << scene_name << "\" has already been added");
+			Log() << "[Gui] Scene \"" << scene_name << "\" has already been added";
 			return false;
 		}
 
@@ -40,7 +40,7 @@ namespace Yttrium
 		{
 			if (!_scene_stack.empty())
 			{
-				Y_LOG("[Gui] Scene \"" << scene_name << "\" \"root\" option ignored");
+				Log() << "[Gui] Scene \"" << scene_name << "\" \"root\" option ignored";
 				// TODO: Print the existing root scene name.
 			}
 			else
@@ -142,7 +142,7 @@ namespace Yttrium
 
 		if (_scene_stack.empty())
 		{
-			Y_LOG("[Gui] No root scene has been added");
+			Log() << "[Gui] No root scene has been added";
 			clear();
 			return false;
 		}

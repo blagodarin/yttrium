@@ -23,7 +23,7 @@ namespace Yttrium
 	{
 		if (!loader.load_rect("position", &_position))
 		{
-			Y_LOG("[Gui.Canvas] Unable to load");
+			Log() << "[Gui.Canvas] Unable to load";
 			return false;
 		}
 

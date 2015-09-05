@@ -20,7 +20,7 @@ namespace Yttrium
 		if (!(loader.load_rect("position", &_position)
 			&& _foreground.load(loader)))
 		{
-			Y_LOG("[Gui.Input] Unable to load");
+			Log() << "[Gui.Input] Unable to load";
 			return false;
 		}
 

@@ -10,7 +10,7 @@ namespace Yttrium
 	{
 		// NOTE: If we're aborting on an out of memory error and the message size
 		// exceeds the allocated string capacity, we'll enter a recursive loop here.
-		Y_LOG(message << " {" << file << ":" << line << "}");
+		Log() << message << " {" << file << ":" << line << "}";
 		::abort();
 	}
 }

@@ -25,6 +25,7 @@
 #include <yttrium/ion.h>
 #include <yttrium/key.h>
 #include <yttrium/log.h>
+#include <yttrium/log_manager.h>
 #include <yttrium/margins.h>
 #include <yttrium/matrix.h>
 #include <yttrium/memory_manager.h>

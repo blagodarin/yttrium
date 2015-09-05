@@ -4,6 +4,7 @@
 #include <yttrium/assert.h>
 #include <yttrium/string.h>
 #include "../private_base.h"
+#include "../utils.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -58,27 +59,24 @@ bool Dir::Iterator::operator!=(Iterator iterator) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Dir::Private: public PrivateBase<Dir::Private>
+using P_DIR = Y_UNIQUE_PTR(DIR, ::closedir);
+
+class Dir::Private : public PrivateBase<Dir::Private>
 {
 public:
 
-	Private(DIR* dir, long max_name_size, Allocator* allocator)
+	Private(P_DIR&& dir, long max_name_size, Allocator* allocator)
 		: PrivateBase(allocator)
-		, _dir(dir)
+		, _dir(std::move(dir))
 		, _iterator_private_size(offsetof(Iterator::Private, _dirent)
 			+ offsetof(::dirent, d_name) + max_name_size + 1)
 	{
 	}
 
-	~Private()
-	{
-		::closedir(_dir);
-	}
-
 public:
 
-	DIR*   _dir;
-	size_t _iterator_private_size;
+	P_DIR _dir;
+	const size_t _iterator_private_size;
 };
 
 Y_IMPLEMENT_UNIQUE(Dir);
@@ -87,13 +85,13 @@ Dir::Dir(const StaticString& name, Allocator* allocator)
 {
 	Y_ZERO_TERMINATED(name_z, name);
 
-	const auto dir = ::opendir(name_z);
+	P_DIR dir(::opendir(name_z));
 	if (!dir)
 		return;
 
 	long max_name_size = -1;
 
-	const auto dir_descriptor = ::dirfd(dir);
+	const auto dir_descriptor = ::dirfd(dir.get());
 	if (dir_descriptor < 0)
 	{
 		Y_ASSERT(errno == ENOTSUP);
@@ -111,7 +109,7 @@ Dir::Dir(const StaticString& name, Allocator* allocator)
 		max_name_size = 255;
 	}
 
-	_private = Y_NEW(allocator, Private)(dir, max_name_size, allocator);
+	_private = Y_NEW(allocator, Private)(std::move(dir), max_name_size, allocator);
 }
 
 Dir::Iterator Dir::begin() const
@@ -120,8 +118,8 @@ Dir::Iterator Dir::begin() const
 		return end();
 
 	Iterator iterator(new(_private->_allocator->allocate(_private->_iterator_private_size))
-		Iterator::Private(_private->_dir, _private->_allocator));
-	::rewinddir(_private->_dir);
+		Iterator::Private(_private->_dir.get(), _private->_allocator));
+	::rewinddir(_private->_dir.get());
 	++iterator;
 	return iterator;
 }
