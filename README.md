@@ -1,19 +1,17 @@
 # Yttrium
 
 Originated in an attempt to create a game engine, Yttrium has currently become
-an attic of code and a programming playground due to the lack of free time
-to maintain and develop it properly.
+an attic of code and a programming playground due to the lack of time required
+for proper maintenance and development.
 
-Check the LICENSE, then use it if you like.
+## FAQ
 
-# FAQ
+### Why not Google Test?
 
-## Why not Google Test?
-
-Google Test generates a lot of output for every test, all of which goes to one
-output stream (stdout). Yttrium contains dozens of tests, which leads to huge
-amounts of output for all the tests. It is pointless, it is hard to find which
-tests failed and why, and it is impossible to turn the useless output off.
+Google Test generates some mandatory output for every test case and every test,
+and all that output goes to one output stream (stdout). Yttrium contains dozens
+of tests, testing it produces an unreadable amount of output, making it hard to
+find which tests have failed and why.
 
 It does compile a bit faster than Boost Test, however, but the difference is
 not very noticeable, and fast builds aren't the primary property of unit tests.
