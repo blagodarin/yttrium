@@ -19,9 +19,9 @@ namespace Yttrium
 	public:
 
 		LogManagerImpl(const StaticString& file, Allocator* allocator)
-			: _instance_guard(this, "Duplicate LogManager construction")
-			, _allocator("log", allocator)
+			: _allocator("log", allocator)
 			, _std_err(File::StdErr, &_allocator)
+			, _instance_guard(this, "Duplicate LogManager construction")
 		{
 			if (!file.is_empty())
 				_file = File(file, File::Write | File::Truncate, &_allocator);
@@ -41,10 +41,10 @@ namespace Yttrium
 
 	private:
 
-		LogManagerGuard _instance_guard;
 		ProxyAllocator  _allocator;
 		File            _std_err;
 		File            _file;
+		LogManagerGuard _instance_guard;
 	};
 
 	Pointer<LogManager> LogManager::create(const StaticString& file, Allocator* allocator)
@@ -55,7 +55,7 @@ namespace Yttrium
 	}
 
 	Log::Log()
-		: _message(LogManagerGuard::instance ? LogManagerGuard::instance->allocator() : DefaultAllocator)
+		: _message(64, LogManagerGuard::instance ? LogManagerGuard::instance->allocator() : DefaultAllocator)
 	{
 		const auto& now = DateTime::now();
 		_message
@@ -71,7 +71,7 @@ namespace Yttrium
 	Log::~Log()
 	{
 		_message << S("\r\n");
-		// TODO: std::lock_guard<std::mutex> lock(LogManagerGuard::instance_mutex);
+		std::lock_guard<std::mutex> lock(LogManagerGuard::instance_mutex);
 		if (LogManagerGuard::instance)
 			LogManagerGuard::instance->write(_message);
 	}

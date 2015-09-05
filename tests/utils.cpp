@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE(test_same_sign)
 	BOOST_CHECK(same_sign<intmax_t>(-1, -1));
 	BOOST_CHECK(!same_sign<intmax_t>(0, -1));
 	BOOST_CHECK(!same_sign<intmax_t>(-1, 0));
-	BOOST_CHECK(same_sign<intmax_t>(INTMAX_MAX, INTMAX_MAX));
-	BOOST_CHECK(same_sign<intmax_t>(INTMAX_MIN, INTMAX_MIN));
-	BOOST_CHECK(!same_sign<intmax_t>(INTMAX_MAX, INTMAX_MIN));
-	BOOST_CHECK(!same_sign<intmax_t>(INTMAX_MIN, INTMAX_MAX));
+	BOOST_CHECK(same_sign(INTMAX_MAX, INTMAX_MAX));
+	BOOST_CHECK(same_sign(INTMAX_MIN, INTMAX_MIN));
+	BOOST_CHECK(!same_sign(INTMAX_MAX, INTMAX_MIN));
+	BOOST_CHECK(!same_sign(INTMAX_MIN, INTMAX_MAX));
 }

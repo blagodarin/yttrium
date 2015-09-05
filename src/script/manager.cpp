@@ -10,16 +10,16 @@ namespace Yttrium
 {
 	Allocator* script_manager_allocator = nullptr;
 
-	typedef InstanceGuard<ScriptManager> ScriptManagerGuard;
+	using ScriptManagerGuard = InstanceGuard<ScriptManager>;
 
 	class Y_PRIVATE ScriptManager::Private
 	{
 	public:
 
 		Private(ScriptManager* public_, Allocator* allocator)
-			: _instance_guard(public_, "Duplicate ScriptManager construction")
-			, _allocator(allocator, "script")
+			: _allocator(allocator, "script")
 			, _root_context(_allocator)
+			, _instance_guard(public_, "Duplicate ScriptManager construction")
 		{
 		}
 
@@ -30,9 +30,9 @@ namespace Yttrium
 
 	public:
 
-		ScriptManagerGuard _instance_guard;
 		PrivateAllocator   _allocator;
 		ScriptContext      _root_context;
+		ScriptManagerGuard _instance_guard;
 	};
 
 	ScriptManager::ScriptManager(Allocator* allocator)

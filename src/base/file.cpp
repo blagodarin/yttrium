@@ -3,6 +3,7 @@
 #include <yttrium/buffer.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
+#include "../package/manager.h"
 
 #include <algorithm>
 
@@ -46,10 +47,8 @@ File::operator bool() const
 }
 
 File::File(const StaticString& name, Allocator* allocator)
-	: File()
+	: File(open_file_for_reading(name, allocator))
 {
-	PackageManager* package_manager = PackageManager::instance();
-	*this = package_manager ? package_manager->open_file(name) : File(name, File::Read, allocator);
 }
 
 StaticString File::name() const

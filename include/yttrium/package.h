@@ -76,8 +76,6 @@ namespace Yttrium
 		///
 		~PackageManager();
 
-	public:
-
 		/// Mount the specified package into the file system.
 		/// \param name The package name.
 		/// \param type Package file type.
@@ -97,11 +95,6 @@ namespace Yttrium
 
 		/// Unmount all the mounted packages in the file system.
 		void unmount_all();
-
-	public:
-
-		/// Return the global PackageManager instance.
-		static PackageManager* instance();
 
 	private:
 		Y_MANAGER_PRIVATE(PackageManager);

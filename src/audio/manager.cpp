@@ -43,10 +43,10 @@ namespace Yttrium
 	}
 
 	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator* allocator)
-		: _instance_guard(this, "Duplicate AudioManager construction")
-		, _allocator("audio", allocator)
+		: _allocator("audio", allocator)
 		, _backend(AudioBackend::create(backend, device, &_allocator))
 		, _player(_backend->create_player(), &_allocator)
+		, _instance_guard(this, "Duplicate AudioManager construction")
 	{
 	}
 
@@ -65,12 +65,14 @@ namespace Yttrium
 		return _backend->device();
 	}
 
+	// TODO: Lock the instance mutex outside these functions.
+
 	SharedPtr<Sound> AudioManagerImpl::create_sound(const StaticString& name, Allocator* allocator)
 	{
 		if (!allocator)
 			allocator = &_allocator;
 
-		// Lock mutex here for the sound opening to become thread safe.
+		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
 
 		const auto i = _sounds.find(String(name, ByReference()));
 		if (i != _sounds.end())
@@ -82,10 +84,7 @@ namespace Yttrium
 
 		auto sound = _backend->create_sound(name, allocator);
 		if (!sound->load(*reader))
-		{
-			// Unlock the mutex here for the sound opening to become thread safe.
 			return {};
-		}
 
 		_sounds.emplace(sound->name(), sound.get());
 		return std::move(sound);
@@ -93,6 +92,7 @@ namespace Yttrium
 
 	void AudioManagerImpl::delete_sound(const StaticString& name)
 	{
+		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
 		_sounds.erase(String(name, ByReference()));
 	}
 }

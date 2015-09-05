@@ -4,8 +4,6 @@ Yttrium:
     Base:
     - Keep a global track of all ProxyAllocators.
     - Replace allocator objects with allocation tags.
-    - Per-thread logging buffer.
-    - Thread-safe logging.
 
     GUI:
     - Implement line editor widget.

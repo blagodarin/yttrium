@@ -1,21 +1,24 @@
 #include <yttrium/package.h>
+#include "manager.h"
 
 #include "../base/instance_guard.h"
 #include "../memory/private_allocator.h"
 
 #include <vector>
 
+// TODO: Proper mutex protection.
+
 namespace Yttrium
 {
-	typedef InstanceGuard<PackageManager> PackageManagerGuard;
+	using PackageManagerGuard = InstanceGuard<PackageManager>;
 
 	class Y_PRIVATE PackageManager::Private
 	{
 	public:
 
 		Private(PackageManager* public_, Allocator* allocator)
-			: _instance_guard(public_, "Duplicate PackageManager construction")
-			, _allocator(allocator)
+			: _allocator(allocator)
+			, _instance_guard(public_, "Duplicate PackageManager construction")
 		{
 		}
 
@@ -33,10 +36,10 @@ namespace Yttrium
 
 	public:
 
-		PackageManagerGuard        _instance_guard;
 		PrivateAllocator           _allocator;
 		std::vector<PackageReader> _packages;
 		Order                      _order = PackageManager::Order::PackedFirst;
+		PackageManagerGuard        _instance_guard;
 	};
 
 	PackageManager::PackageManager(Allocator* allocator)
@@ -97,8 +100,13 @@ namespace Yttrium
 		_private->_packages.clear();
 	}
 
-	PackageManager* PackageManager::instance()
+	File open_file_for_reading(const StaticString& name, Allocator* allocator)
 	{
-		return PackageManagerGuard::instance;
+		{
+			std::lock_guard<std::mutex> lock(PackageManagerGuard::instance_mutex);
+			if (PackageManagerGuard::instance)
+				return PackageManagerGuard::instance->open_file(name);
+		}
+		return File(name, File::Read, allocator);
 	}
 }

@@ -15,7 +15,7 @@ namespace Yttrium
 	// Such initialization prevents compiler from placing the "constant" into read-only memory.
 	Allocator* const DefaultAllocator = [](){ return DefaultDefaultAllocator; }();
 
-	typedef InstanceGuard<MemoryManager> MemoryManagerGuard;
+	using MemoryManagerGuard = InstanceGuard<MemoryManager>;
 
 	class MemoryManager::Private
 	{
@@ -47,8 +47,8 @@ namespace Yttrium
 
 	private:
 
-		MemoryManagerGuard _instance_guard;
 		HeapAllocator      _default_allocator;
+		MemoryManagerGuard _instance_guard;
 	};
 
 	static char _memory_manager_private[sizeof(MemoryManager::Private)];

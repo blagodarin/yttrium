@@ -35,11 +35,11 @@ namespace Yttrium
 
 	private:
 
-		AudioManagerGuard _instance_guard;
 		ProxyAllocator _allocator;
 		const Pointer<AudioBackend> _backend;
 		AudioPlayerImpl _player;
 		std::map<String, Sound*> _sounds;
+		AudioManagerGuard _instance_guard;
 	};
 }
 
