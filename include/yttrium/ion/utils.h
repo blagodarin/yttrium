@@ -26,4 +26,4 @@ namespace Yttrium
 	}
 }
 
-#endif // __Y_ION_UTILS_H
+#endif

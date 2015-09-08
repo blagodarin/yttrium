@@ -17,8 +17,6 @@ namespace Yttrium
 		friend IonDocument;
 		friend IonList;
 
-		Y_NONCOPYABLE(IonValue);
-
 	public:
 
 		///
@@ -101,6 +99,9 @@ namespace Yttrium
 		///
 		const IonObject* object() const { return _object; }
 
+		IonValue(const IonValue&) = delete;
+		IonValue& operator=(const IonValue&) = delete;
+
 	private:
 
 		Y_PRIVATE IonValue(IonDocument* document);
@@ -119,4 +120,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_ION_VALUE_H
+#endif

@@ -13,7 +13,7 @@ namespace Yttrium
 	class IonObject;
 
 	///
-	class Y_API IonNode: public IonList
+	class Y_API IonNode : public IonList
 	{
 		friend IonDocument;
 		friend IonObject;
@@ -46,4 +46,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_ION_NODE_H
+#endif

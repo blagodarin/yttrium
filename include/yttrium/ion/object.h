@@ -4,7 +4,6 @@
 #ifndef __Y_ION_OBJECT_H
 #define __Y_ION_OBJECT_H
 
-#include <yttrium/base.h>
 #include <yttrium/global.h>
 
 #include <map>
@@ -26,8 +25,6 @@ namespace Yttrium
 	{
 		friend IonDocument;
 		friend IonParser;
-
-		Y_NONCOPYABLE(IonObject);
 
 	public:
 
@@ -124,16 +121,10 @@ namespace Yttrium
 		bool contains(const StaticString& name);
 
 		///
-		const IonDocument* document() const { return _document; }
-
-		///
 		const IonNode& first() const;
 
 		///
 		const IonNode& first(const StaticString& name) const;
-
-		///
-		bool is_empty() const { return _nodes.empty(); }
 
 		///
 		ConstRange nodes() const;
@@ -162,6 +153,9 @@ namespace Yttrium
 		///
 		size_t size() const { return _nodes.size(); }
 
+		IonObject(const IonObject&) = delete;
+		IonObject& operator=(const IonObject&) = delete;
+
 	private:
 
 		Y_PRIVATE IonObject(IonDocument* document);
@@ -178,4 +172,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_ION_OBJECT_H
+#endif

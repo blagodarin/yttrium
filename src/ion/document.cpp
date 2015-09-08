@@ -47,27 +47,16 @@ namespace Yttrium
 	{
 	}
 
-	IonDocument::IonDocument(const IonDocument& document, Allocator* allocator)
-		: IonDocument(allocator ? allocator : document._private->_allocator)
-	{
-		concatenate(document);
-	}
-
 	IonDocument::~IonDocument()
 	{
-		clear();
+		IonObject::clear();
+		_private->_buffer.clear();
 		Y_DELETE(_private->_allocator, _private);
 	}
 
 	Allocator* IonDocument::allocator() const
 	{
 		return _private->_allocator;
-	}
-
-	void IonDocument::clear()
-	{
-		IonObject::clear();
-		_private->_buffer.clear();
 	}
 
 	bool IonDocument::load(const StaticString& name)

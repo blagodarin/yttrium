@@ -4,7 +4,6 @@
 #ifndef __Y_ION_LIST_H
 #define __Y_ION_LIST_H
 
-#include <yttrium/base.h>
 #include <yttrium/global.h>
 
 #include <cstddef>
@@ -25,8 +24,6 @@ namespace Yttrium
 	{
 		friend IonParser;
 		friend IonValue;
-
-		Y_NONCOPYABLE(IonList);
 
 	public:
 
@@ -76,51 +73,6 @@ namespace Yttrium
 		};
 
 		///
-		class Iterator
-		{
-			friend IonList;
-
-		public:
-
-			void operator++();
-			IonValue& operator*() const { return *_value; }
-			bool operator!=(Iterator iterator) const { return _value != iterator._value; }
-
-		private:
-
-			IonValue* _value;
-
-			Iterator(IonValue *value): _value(value) {}
-		};
-
-		///
-		class Range
-		{
-			friend IonList;
-
-		public:
-
-			Range() = default;
-
-			IonValue& first() const { return *_first; }
-			bool is_empty() const { return !_size; }
-			IonValue& last() const { return *_last; }
-			void pop_first();
-			void pop_last();
-			size_t size() const { return _size; }
-
-			IonValue* operator->() const { return _first; }
-
-		private:
-
-			IonValue* _first = nullptr;
-			IonValue* _last = nullptr;
-			size_t    _size = 0;
-
-			Range(IonValue *first, IonValue *last, size_t size): _first(first), _last(last), _size(size) {}
-		};
-
-		///
 		IonList* append_list();
 
 		///
@@ -136,22 +88,13 @@ namespace Yttrium
 		IonValue* append(const StaticString& string);
 
 		///
-		Iterator begin() { return Iterator(_first); }
-
-		///
 		ConstIterator begin() const { return ConstIterator(_first); }
 
 		///
 		void concatenate(const IonList& list);
 
 		///
-		ConstRange const_values() const { return ConstRange(_first, _last, _size); }
-
-		///
 		const IonDocument* document() const { return _document; }
-
-		///
-		Iterator end() { return Iterator(nullptr); }
 
 		///
 		ConstIterator end() const { return ConstIterator(nullptr); }
@@ -178,16 +121,13 @@ namespace Yttrium
 		String serialize(int indentation = 0, Allocator* allocator = nullptr) const;
 
 		///
-		String serialize(Allocator* allocator) const;
-
-		///
 		size_t size() const { return _size; }
 
 		///
-		Range values() { return Range(_first, _last, _size); }
-
-		///
 		ConstRange values() const { return ConstRange(_first, _last, _size); }
+
+		IonList(const IonList&) = delete;
+		IonList& operator=(const IonList&) = delete;
 
 	protected:
 
@@ -209,4 +149,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_ION_LIST_H
+#endif

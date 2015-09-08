@@ -483,7 +483,7 @@ bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
 	int32_t bottom = -1;
 	int32_t left   = -1;
 
-	IonNode::ConstRange values = node.const_values();
+	IonNode::ConstRange values = node.values();
 	switch (values.size())
 	{
 	case 4:

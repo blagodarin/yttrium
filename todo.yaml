@@ -16,7 +16,7 @@ Yttrium:
     - Add image pack support (a list of headers with filenames and raw image data offsets).
 
     ION:
-    - Make string value retrieval more usable.
+    - Refactoring.
 
     Renderer:
     - Implement pre-rendered text (i.e. pre-built geometry).

@@ -22,23 +22,6 @@ namespace Yttrium
 		--_size;
 	}
 
-	void IonList::Iterator::operator ++()
-	{
-		_value = _value->_next;
-	}
-
-	void IonList::Range::pop_first()
-	{
-		_first = _first->_next;
-		--_size;
-	}
-
-	void IonList::Range::pop_last()
-	{
-		_last = _last->_previous;
-		--_size;
-	}
-
 	IonList* IonList::append_list()
 	{
 		IonValue* new_value = _document->_private->new_list_value();
@@ -113,13 +96,6 @@ namespace Yttrium
 	{
 		String result(allocator ? allocator : _document->allocator());
 		serialize(&result, indentation, false);
-		return std::move(result);
-	}
-
-	String IonList::serialize(Allocator* allocator) const
-	{
-		String result(allocator ? allocator : _document->allocator());
-		serialize(&result, 0, false);
 		return std::move(result);
 	}
 
