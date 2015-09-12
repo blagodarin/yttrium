@@ -1,11 +1,10 @@
 /// \file
 /// \brief %Tetrium logic.
 
-#ifndef __TETRIUM_H
-#define __TETRIUM_H
+#ifndef YTTRIUM_EXAMPLES_TETRIUM_TETRIUM_H
+#define YTTRIUM_EXAMPLES_TETRIUM_TETRIUM_H
 
 /// %Tetrium logic.
-
 namespace Tetrium
 {
 
@@ -268,4 +267,4 @@ private:
 
 } // namespace Tetrium
 
-#endif // __TETRIUM_H
+#endif

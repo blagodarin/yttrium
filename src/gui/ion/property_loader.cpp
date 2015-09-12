@@ -20,7 +20,7 @@ unsigned read_color(Vector4 *color, const IonNode &node, unsigned inherit)
 {
 	unsigned result = 0;
 
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 
 	if (!values.is_empty())
 	{
@@ -50,7 +50,7 @@ unsigned read_position(Vector2 *position, const IonNode &node)
 {
 	unsigned result = 0;
 
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 
 	if (!values.is_empty())
 	{
@@ -69,7 +69,7 @@ unsigned read_position(Vector2 *position, const IonNode &node)
 
 void read_rect(int32_t elements[4], const IonNode& node)
 {
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 
 	for (int i = 0; i < 4; ++i)
 	{
@@ -92,7 +92,7 @@ unsigned read_size(Vector2 *size, const IonNode &node, unsigned inherit)
 {
 	unsigned result = 0;
 
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 
 	if (!values.is_empty())
 	{
@@ -122,11 +122,11 @@ unsigned read_size(Vector2 *size, const IonNode &node, unsigned inherit)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject *object, const IonObject *class_, GuiImpl *gui)
+GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject *object, const IonObject *class_, GuiImpl& gui)
 	: _object(object)
 	, _class(class_)
 	, _gui(gui)
-	, _texture_cache(gui->texture_cache())
+	, _texture_cache(gui.texture_cache())
 	, _bound_object(_object)
 	, _bound_class(_class)
 {
@@ -207,7 +207,7 @@ bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font
 			return false;
 	}
 
-	const GuiImpl::FontDesc *font_desc = _gui->font(*font_name);
+	const GuiImpl::FontDesc *font_desc = _gui.font(*font_name);
 
 	if (!font_desc)
 		return false;
@@ -420,7 +420,7 @@ bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const IonNode& no
 {
 	// TODO: Inheritance.
 
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 
 	if (values.is_empty() || values.size() > 2)
 		return false;
@@ -483,7 +483,7 @@ bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
 	int32_t bottom = -1;
 	int32_t left   = -1;
 
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 	switch (values.size())
 	{
 	case 4:
@@ -534,7 +534,7 @@ bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
 
 bool GuiIonPropertyLoader::load_scaling(Scaling* scaling, const IonNode& node)
 {
-	IonNode::ConstRange values = node.values();
+	const auto& values = node.values();
 
 	if (values.size() != 1)
 		return false;
@@ -564,7 +564,7 @@ bool GuiIonPropertyLoader::load_size(Vector2* size, const IonNode& node)
 
 SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const IonNode& node)
 {
-	IonNode::ConstRange values = node.values();
+	const auto& values = node.values();
 
 	if (values.size() != 1)
 		return {};
@@ -579,7 +579,7 @@ SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const IonNode& node)
 
 bool GuiIonPropertyLoader::load_state(WidgetState* state, const IonNode &node)
 {
-	IonNode::ConstRange values = node.values();
+	const auto& values = node.values();
 
 	if (values.size() != 1)
 		return false;
@@ -611,9 +611,9 @@ bool GuiIonPropertyLoader::load_text(const StaticString** text, const IonObject&
 }
 
 bool GuiIonPropertyLoader::load_texture(SharedPtr<Texture2D>* texture, const IonNode& node,
-	TextureCache* texture_cache, Texture2D::Filter default_filter)
+	TextureCache& texture_cache, Texture2D::Filter default_filter)
 {
-	IonNode::ConstRange values = node.values();
+	auto&& values = node.values();
 
 	if (values.is_empty() || values.size() > 4)
 		return false;
@@ -684,7 +684,7 @@ bool GuiIonPropertyLoader::load_texture(SharedPtr<Texture2D>* texture, const Ion
 		}
 	}
 
-	const auto result_texture = texture_cache->load_texture_2d(*texture_name);
+	const auto result_texture = texture_cache.load_texture_2d(*texture_name);
 	if (!result_texture)
 		return false;
 

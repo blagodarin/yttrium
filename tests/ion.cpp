@@ -1,5 +1,6 @@
 #include <yttrium/file.h>
-#include <yttrium/ion.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/string.h>
 
 #include "common.h"
 
@@ -25,7 +26,7 @@ BOOST_AUTO_TEST_CASE(test_ion_serialization)
 
 	BOOST_REQUIRE(document.load(file.name()));
 
-	document.save(file.name(), Ion::DontIndent);
+	document.save(file.name(), IonDocument::Formatting::Compact);
 	BOOST_REQUIRE(File("tests/ion/unindented.ion").read_all(&expected));
 	BOOST_REQUIRE(File(file.name()).read_all(&actual));
 	BOOST_CHECK(expected == actual);

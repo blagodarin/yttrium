@@ -1,5 +1,5 @@
-#ifndef __EXAMPLES_RTS_GAME_H
-#define __EXAMPLES_RTS_GAME_H
+#ifndef YTTRIUM_EXAMPLES_RTS_GAME_H
+#define YTTRIUM_EXAMPLES_RTS_GAME_H
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/proxy_allocator.h>
@@ -40,7 +40,7 @@ private:
 	std::unique_ptr<CubeModel> _cube;
 	std::unique_ptr<ChessboardModel> _chessboard;
 
-	Vector4 _position = Vector4(0, -6, 12);
+	Vector4 _position = {0, -6, 12};
 	int _pitch = -60;
 	int _yaw = 0;
 	int _roll = 0;

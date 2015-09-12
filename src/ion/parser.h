@@ -14,7 +14,7 @@ namespace Yttrium
 	{
 	public:
 
-		IonParser(IonDocument* document);
+		IonParser(IonDocument& document) : _document(document) {}
 
 		/// Parse the \a string as an ION document.
 		/// \note The \a string MUST have a zero terminator.
@@ -22,8 +22,8 @@ namespace Yttrium
 
 	private:
 
-		bool parse_name(const StaticString &name);
-		bool parse_value(const StaticString &value);
+		bool parse_name(const StaticString& name);
+		bool parse_value(const StaticString& value);
 		bool parse_lbrace();
 		bool parse_rbrace();
 		bool parse_lbracket();
@@ -32,7 +32,7 @@ namespace Yttrium
 
 	private:
 
-		IonDocument* _document;
+		IonDocument& _document;
 
 	private:
 
@@ -56,25 +56,16 @@ namespace Yttrium
 
 		struct State
 		{
-			IonObject* object;
-			IonList*   list;
+			IonObject* object = nullptr;
+			IonList* list = nullptr;
 
-			State(IonObject* object)
-				: object(object)
-				, list(nullptr)
-			{
-			}
-
-			State(IonList* list)
-				: object(nullptr)
-				, list(list)
-			{
-			}
+			State(IonObject* object) : object(object) {}
+			State(IonList* list) : list(list) {}
 		};
 
 		std::vector<State> _states;
-		State*             _state;
+		State* _state = nullptr;
 	};
 }
 
-#endif // __ION_PARSER_H
+#endif

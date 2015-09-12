@@ -2,6 +2,8 @@
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
+#include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
 #include <yttrium/texture_cache.h>
@@ -9,95 +11,76 @@
 #include "../scene.h"
 #include "property_loader.h"
 
+#include <cassert>
+
 namespace Yttrium
 {
 
 namespace
 {
 
-bool load_object(const IonList &source, const IonObject **object,
-	const StaticString **name, IonList::ConstRange *classes)
+bool load_object(const IonList& source, const IonObject** object, const StaticString** name, IonListRange* classes)
 {
-	const IonObject *result_object = nullptr;
-	const StaticString *result_name = nullptr;
-	const IonList *result_classes = nullptr;
+	const IonObject* result_object = nullptr;
+	const StaticString* result_name = nullptr;
+	const IonList* result_classes = nullptr;
 
-	for (const IonValue &value: source)
+	for (const IonValue& value : source)
 	{
-		if (value.is_object())
+		switch (value.type())
 		{
-			if (result_object)
-			{
-				return false;
-			}
-
-			result_object = value.object();
-		}
-		else if (value.is_string())
-		{
-			if (result_name)
-			{
-				return false;
-			}
-
-			value.get(&result_name);
-		}
-		else if (value.is_list())
-		{
+		case IonValue::Type::List:
 			if (result_classes)
-			{
 				return false;
-			}
-
-			for (const IonValue &class_name: value.list())
-			{
-				if (!class_name.is_string())
-				{
+			for (const IonValue& class_name : value.list())
+				if (class_name.type() != IonValue::Type::String)
 					return false;
-				}
-			}
-
 			result_classes = &value.list();
+			break;
+
+		case IonValue::Type::Object:
+			if (result_object)
+				return false;
+			result_object = value.object();
+			break;
+
+		default:
+			assert(value.type() == IonValue::Type::String);
+			if (result_name)
+				return false;
+			value.get(&result_name);
+			break;
 		}
 	}
 
 	if (!result_object)
-	{
 		return false;
-	}
 
 	*object = result_object;
 	*name = result_name;
-	*classes = result_classes ? result_classes->values() : IonList::ConstRange();
+	*classes = result_classes ? result_classes->values() : IonListRange();
 
 	return true;
 }
 
-bool load_object(const IonList &source, const IonObject **object,
-	const StaticString **name, const StaticString **class_name)
+bool load_object(const IonList& source, const IonObject** object, const StaticString** name, const StaticString** class_name)
 {
-	const IonObject *result_object;
-	const StaticString *result_name;
-	IonList::ConstRange result_classes;
+	const IonObject* result_object;
+	const StaticString* result_name;
+	IonListRange result_classes;
 
 	if (!load_object(source, &result_object, &result_name, &result_classes))
-	{
 		return false;
-	}
 
 	// TODO: Make use of multiple classes.
 
 	if (result_classes.size() > 1)
-	{
 		return false;
-	}
 
 	const StaticString *result_class = nullptr;
 
 	if (!result_classes.is_empty())
-	{
 		result_classes->get(&result_class);
-	}
 
 	*object = result_object;
 	*name = result_name;
@@ -110,15 +93,15 @@ bool load_object(const IonList &source, const IonObject **object,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GuiIonLoader::GuiIonLoader(GuiImpl *gui)
+GuiIonLoader::GuiIonLoader(GuiImpl& gui)
 	: _gui(gui)
-	, _classes(_gui->internal_allocator())
+	, _classes(_gui.internal_allocator())
 {
 }
 
-bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
+bool GuiIonLoader::load(const StaticString& source_name, bool is_internal)
 {
-	IonDocument document(_gui->internal_allocator());
+	IonDocument document(_gui.internal_allocator());
 
 	if (!document.load(source_name))
 	{
@@ -126,54 +109,39 @@ bool GuiIonLoader::load(const StaticString &source_name, bool is_internal)
 		return false;
 	}
 
+	const auto& document_root = document.root();
+
 	if (!is_internal)
 	{
-		const IonNode *node;
+		Vector2 size;
+		if (GuiIonPropertyLoader::load_size(&size, document_root.last("size")))
+			_gui.set_size(size);
 
-		if (document.last(S("size"), &node))
-		{
-			Vector2 size;
-
-			if (GuiIonPropertyLoader::load_size(&size, *node))
-			{
-				_gui->set_size(size);
-			}
-		}
-
-		if (document.last(S("scale"), &node))
-		{
-			Scaling scaling;
-
-			if (GuiIonPropertyLoader::load_scaling(&scaling, *node))
-			{
-				_gui->set_scaling(scaling);
-			}
-		}
+		Scaling scaling;
+		if (GuiIonPropertyLoader::load_scaling(&scaling, document_root.last("scale")))
+			_gui.set_scaling(scaling);
 	}
 
-	load(document);
+	load(document_root);
 
 	return true;
 }
 
-void GuiIonLoader::load(const IonObject &source)
+void GuiIonLoader::load(const IonObject& source)
 {
-	for (const IonNode &node: source.nodes())
+	for (const auto& node : source)
 	{
 		if (node.name() == S("include"))
 		{
-			const StaticString *include_path;
-
-			if (node.first(&include_path))
-			{
+			const StaticString* include_path;
+			if (Ion::get(node, include_path))
 				load(*include_path, true);
-			}
 		}
 		else if (node.name() == S("class"))
 		{
-			const IonObject  *object;
-			const StaticString *object_name;
-			const StaticString *class_name;
+			const IonObject* object;
+			const StaticString* object_name;
+			const StaticString* class_name;
 
 			if (!load_object(node, &object, &object_name, &class_name))
 			{
@@ -187,9 +155,9 @@ void GuiIonLoader::load(const IonObject &source)
 		}
 		else if (node.name() == S("scene"))
 		{
-			const IonObject  *object;
-			const StaticString *object_name;
-			const StaticString *class_name;
+			const IonObject* object;
+			const StaticString* object_name;
+			const StaticString* class_name;
 
 			if (!load_object(node, &object, &object_name, &class_name))
 			{
@@ -202,18 +170,18 @@ void GuiIonLoader::load(const IonObject &source)
 				class_name = nullptr;
 			}
 
-			auto scene = _gui->create_scene(*object_name);
+			auto scene = _gui.create_scene(*object_name);
 			if (scene)
 			{
 				load_scene(*scene, *object);
-				_gui->add_scene(std::move(scene), class_name != nullptr);
+				_gui.add_scene(std::move(scene), class_name != nullptr);
 			}
 		}
 		else if (node.name() == S("on_scene_change"))
 		{
-			IonList::ConstRange s = node.values();
+			const auto& s = node.values();
 
-			if (s.size() != 2 || !s->is_list() || !s.last().is_string())
+			if (s.size() != 2 || s->type() != IonValue::Type::List || s.last().type() != IonValue::Type::String)
 			{
 				Log() << "[Gui] Bad 'on_scene_change'";
 				continue;
@@ -223,19 +191,18 @@ void GuiIonLoader::load(const IonObject &source)
 			const StaticString *to;
 			const StaticString *action;
 
-			IonList::ConstRange t = s->list().values();
+			const auto& t = s->list().values();
 
-			if (t.size() != 2 || !t->get(&from) || !t.last().get(&to)
-				|| !s.last().get(&action))
+			if (t.size() != 2 || !t->get(&from) || !t.last().get(&to) || !s.last().get(&action))
 			{
 				Log() << "[Gui] Bad 'on_scene_change'";
 				continue;
 			}
 
-			_gui->set_scene_change_action(
-				String(*from, _gui->internal_allocator()),
-				String(*to, _gui->internal_allocator()),
-				String(*action, _gui->internal_allocator()));
+			_gui.set_scene_change_action(
+				String(*from, _gui.internal_allocator()),
+				String(*to, _gui.internal_allocator()),
+				String(*action, _gui.internal_allocator()));
 		}
 		else if (node.name() == S("font"))
 		{
@@ -257,7 +224,7 @@ void GuiIonLoader::load(const IonObject &source)
 				continue;
 			}
 
-			_gui->set_font(*object_name, *font_name, *texture_name);
+			_gui.set_font(*object_name, *font_name, *texture_name);
 		}
 	}
 }
@@ -266,25 +233,19 @@ void GuiIonLoader::load_scene(GuiScene& scene, const IonObject& source) const
 {
 	scene.reserve(source.size());
 
-	for (const IonNode &node: source.nodes())
+	for (const auto& node : source)
 	{
 		if (node.name() == S("size"))
 		{
 			Vector2 size;
-
 			if (GuiIonPropertyLoader::load_size(&size, node))
-			{
 				scene.set_size(size);
-			}
 		}
 		else if (node.name() == S("scale"))
 		{
 			Scaling scaling;
-
 			if (GuiIonPropertyLoader::load_scaling(&scaling, node))
-			{
 				scene.set_scaling(scaling);
-			}
 		}
 		if (node.name() == S("transparent"))
 		{
@@ -292,13 +253,9 @@ void GuiIonLoader::load_scene(GuiScene& scene, const IonObject& source) const
 		}
 		else if (node.name() == S("bind"))
 		{
-			IonNode::ConstRange s = node.values();
-
-			if (s.size() == 2 && s->type() == IonValue::StringType
-				&& s.last().type() == IonValue::StringType)
-			{
+			const auto s = node.values();
+			if (s.size() == 2 && s->type() == IonValue::Type::String && s.last().type() == IonValue::Type::String)
 				scene.bind(s->string(), s.last().string());
-			}
 		}
 		else
 		{
@@ -307,9 +264,7 @@ void GuiIonLoader::load_scene(GuiScene& scene, const IonObject& source) const
 			const StaticString *class_name;
 
 			if (!load_object(node, &object, &object_name, &class_name))
-			{
 				continue;
-			}
 
 			GuiIonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _gui);
 

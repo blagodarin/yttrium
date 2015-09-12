@@ -38,7 +38,8 @@ namespace Yttrium
 		///
 		ScriptArgs(ScriptContext& context): _context(context) {}
 
-	public:
+		///
+		int get_int(size_t index, int default_value) const;
 
 		///
 		size_t size() const { return _values.size(); }
@@ -62,4 +63,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_SCRIPT_ARGS_H
+#endif

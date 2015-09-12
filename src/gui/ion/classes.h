@@ -1,8 +1,6 @@
 #ifndef __GUI_ION_CLASSES_H
 #define __GUI_ION_CLASSES_H
 
-#include <yttrium/pointer.h>
-
 #include <map>
 
 namespace Yttrium
@@ -27,8 +25,8 @@ namespace Yttrium
 	private:
 
 		Allocator* _allocator;
-		std::map<String, Pointer<IonDocument>> _classes;
+		std::map<String, IonDocument> _classes;
 	};
 }
 
-#endif // __GUI_ION_CLASSES_H
+#endif

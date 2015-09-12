@@ -2,7 +2,6 @@ blocks
 {
 	file "examples/tetrium/data/blocks.tga"
 	size "24"
-
 	base
 		[ "1"  "1"] # Border (gray)
 		["33"  "1"] # I (red)

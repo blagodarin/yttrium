@@ -7,11 +7,11 @@ namespace Yttrium
 {
 	class IonObject;
 
-	class GuiIonPropertyDumper: public GuiPropertyDumper
+	class GuiIonPropertyDumper : public GuiPropertyDumper
 	{
 	public:
 
-		GuiIonPropertyDumper(IonObject* object);
+		GuiIonPropertyDumper(IonObject& object);
 
 		void dump_alignment(const StaticString& name, unsigned alignment) override;
 		void dump_color(const StaticString& name, const Vector4& color) override;
@@ -27,8 +27,8 @@ namespace Yttrium
 
 	private:
 
-		IonObject* _object;
+		IonObject& _object;
 	};
 }
 
-#endif // __GUI_ION_PROPERTY_DUMPER_H
+#endif

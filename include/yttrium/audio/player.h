@@ -70,4 +70,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_AUDIO_PLAYER_H
+#endif

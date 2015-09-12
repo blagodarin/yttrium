@@ -79,12 +79,16 @@ namespace Yttrium
 		return nullptr;
 	}
 
+	int ScriptContext::get_int(const StaticString& name, int default_value)
+	{
+		const auto value = find(name);
+		return value ? value->to_int() : default_value;
+	}
+
 	ScriptContext& ScriptContext::root()
 	{
 		return _parent ? _parent->root() : *this;
 	}
-
-	// TODO: Merge the following three functions.
 
 	const ScriptValue* ScriptContext::set(const StaticString& name, int value)
 	{

@@ -2,18 +2,14 @@
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
 #include <yttrium/log.h>
 
 namespace Yttrium
 {
-	IonParser::IonParser(IonDocument* document)
-		: _document(document)
-	{
-	}
-
 	bool IonParser::parse(const StaticString& string, const StaticString& source_name)
 	{
-		_states.push_back(State(_document));
+		_states.push_back(State(&_document.root()));
 		_state = &_states.back();
 
 		for (const char* src = string.text(); ; )

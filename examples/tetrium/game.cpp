@@ -4,7 +4,11 @@
 #include <yttrium/date_time.h>
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
-#include <yttrium/ion.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
+#include <yttrium/ion/utils.h>
+#include <yttrium/ion/value.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
@@ -32,9 +36,7 @@ Game::Game()
 
 	ScriptContext::global().define("game_start", [this](const ScriptCall& call)
 	{
-		ScriptValue* start_level_value = call.context.find("start_level");
-		const auto start_level = start_level_value ? start_level_value->to_int() : 1;
-		_game.start(start_level);
+		_game.start(call.context.get_int("start_level", 1));
 		_game_running = true;
 	});
 
@@ -79,7 +81,7 @@ Game::Game()
 
 	ScriptContext::global().define("pop_scene", 0, 1, [this](const ScriptCall& call)
 	{
-		const auto scenes_to_pop = !call.args.size() ? 1 : call.args.value(0)->to_int();
+		const auto scenes_to_pop = call.args.get_int(0, 1);
 		if (scenes_to_pop > 0 && !_window->gui().pop_scenes(scenes_to_pop))
 			_window->close();
 	});
@@ -92,7 +94,7 @@ Game::Game()
 	ScriptContext::global().define("set", 2, [this](const ScriptCall& call)
 	{
 		const ScriptValue* value = call.args.value(0);
-		if (value->type() == ScriptValue::Name)
+		if (value->type() == ScriptValue::Type::Name)
 			call.context.set(value->to_string(), call.args.string(1, ScriptArgs::Resolve));
 	});
 
@@ -137,7 +139,7 @@ Game::Game()
 	ScriptContext::global().define("unset", 1, [this](const ScriptCall& call)
 	{
 		const ScriptValue* value = call.args.value(0);
-		if (value->type() == ScriptValue::Name)
+		if (value->type() == ScriptValue::Type::Name)
 			call.context.unset(value->to_string());
 	});
 }
@@ -181,21 +183,21 @@ void Game::run()
 		IonDocument data(&_allocator);
 		if (data.load("data/music.ion"))
 		{
-			for (const IonValue& value : data.last("music"))
+			for (const IonValue& value : data.root().last("music"))
 			{
 				const IonObject* entry = value.object();
 				if (!entry)
 					continue;
 
-				StaticString file = entry->last("file").string();
-				if (file.is_empty())
+				const auto& file_name = Ion::to_string(*entry, "file");
+				if (file_name.is_empty())
 					continue;
 
 				AudioPlayer::Settings settings;
-				settings.begin = entry->last("begin").string().to_time();
-				settings.end = entry->last("end").string().to_time();
-				settings.loop = entry->last("loop").string().to_time();
-				_audio->player().load(file, settings);
+				settings.begin = Ion::to_string(*entry, "begin").to_time();
+				settings.end = Ion::to_string(*entry, "end").to_time();
+				settings.loop = Ion::to_string(*entry, "loop").to_time();
+				_audio->player().load(file_name, settings);
 			}
 			_audio->player().set_order(AudioPlayer::Random);
 			_audio->player().play();
@@ -229,17 +231,17 @@ bool Game::load_blocks()
 		return false;
 
 	const IonObject* blocks;
-	if (!Ion::read(data, "blocks", blocks))
+	if (!Ion::get(data.root(), "blocks", blocks))
 		return false;
 
 	const StaticString* block_texture_name;
-	if (!blocks->last("file", &block_texture_name))
+	if (!Ion::get(*blocks, "file", block_texture_name))
 		return false;
 	_block_texture = _texture_cache->load_texture_2d(*block_texture_name);
 	if (_block_texture)
 		_block_texture->set_filter(Texture2D::TrilinearFilter);
 
-	if (!Ion::read(*blocks, "size", _block_size))
+	if (!Ion::get(*blocks, "size", _block_size))
 		return false;
 
 	const IonNode& block_bases = blocks->last("base");
@@ -249,7 +251,7 @@ bool Game::load_blocks()
 	int index = 0;
 	for (const IonValue& value : block_bases)
 	{
-		if (!Ion::read(value, _block_coords[index++]))
+		if (!Ion::get(value, _block_coords[index++]))
 			return false;
 	}
 

@@ -20,7 +20,7 @@ void Game::run()
 	_texture_cache = TextureCache::create(_window->renderer());
 
 	_window->set_name("Yttrium RTS example");
-	_window->set_size(Size(1024, 768));
+	_window->set_size({1024, 768});
 
 	if (!_window->gui().load("examples/rts/gui.ion"))
 		return;
@@ -138,21 +138,21 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
 
 	// Center.
-	_cube->draw(Vector4(0, 0, 0));
+	_cube->draw({0, 0, 0});
 
 	// X direction -- one cube.
-	_cube->draw(Vector4(2, 0, 0));
+	_cube->draw({2, 0, 0});
 
 	// Y direction -- two cubes.
-	_cube->draw(Vector4(0, 2, 0));
-	_cube->draw(Vector4(0, 4, 0));
+	_cube->draw({0, 2, 0});
+	_cube->draw({0, 4, 0});
 
 	// Z direction -- three cubes.
-	_cube->draw(Vector4(0, 0, 2));
-	_cube->draw(Vector4(0, 0, 4));
-	_cube->draw(Vector4(0, 0, 6));
+	_cube->draw({0, 0, 2});
+	_cube->draw({0, 0, 4});
+	_cube->draw({0, 0, 6});
 
-	_chessboard->draw(Vector4(0, 0, 0));
+	_chessboard->draw({0, 0, 0});
 }
 
 void Game::on_update(const UpdateEvent& update)

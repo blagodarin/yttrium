@@ -1,52 +1,29 @@
-#include "node.h"
+#include <yttrium/ion/node.h>
 
-#include <yttrium/ion/document.h>
-#include <yttrium/ion/value.h>
+#include "document.h"
 
 namespace Yttrium
 {
-	namespace Ion
+	bool IonNode::exists() const
 	{
-		const IonNode null_node;
+		return _name.allocator();
 	}
 
-	IonNode::IonNode()
-		: IonList(nullptr)
+	IonNode::IonNode(IonDocumentPrivate& document)
+		: IonList(document)
 		, _name(static_cast<Allocator*>(nullptr))
 	{
 	}
 
-	void IonNode::serialize(String* result, int indentation) const
-	{
-		if (indentation > 0)
-			result->append('\t', indentation);
-		result->append(_name);
-		if (!is_empty())
-			IonList::serialize(result, indentation, true);
-	}
-
-	String IonNode::serialize(int indentation, Allocator* allocator) const
-	{
-		String result(allocator ? allocator : document()->allocator());
-		serialize(&result, indentation);
-		return std::move(result);
-	}
-
-	StaticString IonNode::string(const StaticString& default_value) const
-	{
-		const IonValue* value = first();
-		return value && value->is_string() ? value->string() : default_value;
-	}
-
-	IonNode::IonNode(IonDocument* document, const StaticString& name)
+	IonNode::IonNode(IonDocumentPrivate& document, const StaticString& name)
 		: IonList(document)
-		, _name(name, document->allocator())
+		, _name(name, document.allocator())
 	{
 	}
 
-	IonNode::IonNode(IonDocument* document, const StaticString& name, const ByReference&)
+	IonNode::IonNode(IonDocumentPrivate& document, const StaticString& name, const ByReference&)
 		: IonList(document)
-		, _name(name, ByReference(), document->allocator())
+		, _name(name, ByReference(), document.allocator())
 	{
 	}
 }

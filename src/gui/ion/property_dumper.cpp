@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	GuiIonPropertyDumper::GuiIonPropertyDumper(IonObject* object)
+	GuiIonPropertyDumper::GuiIonPropertyDumper(IonObject& object)
 		: _object(object)
 	{
 	}

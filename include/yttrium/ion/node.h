@@ -9,40 +9,29 @@
 
 namespace Yttrium
 {
-	class IonDocument;
-	class IonObject;
-
 	///
 	class Y_API IonNode : public IonList
 	{
-		friend IonDocument;
+		friend IonDocumentPrivate;
 		friend IonObject;
 
 	public:
 
 		///
-		IonNode();
+		bool exists() const;
 
 		///
 		StaticString name() const { return _name; }
 
-		///
-		void serialize(String* result, int indentation = 0) const;
+	private:
 
-		///
-		String serialize(int indentation = 0, Allocator* allocator = nullptr) const;
-
-		///
-		StaticString string(const StaticString& default_value = StaticString()) const;
+		Y_PRIVATE IonNode(IonDocumentPrivate& document);
+		Y_PRIVATE IonNode(IonDocumentPrivate& document, const StaticString& name);
+		Y_PRIVATE IonNode(IonDocumentPrivate& document, const StaticString& name, const ByReference&);
 
 	private:
 
-		Y_PRIVATE IonNode(IonDocument* document, const StaticString& name);
-		Y_PRIVATE IonNode(IonDocument* document, const StaticString& name, const ByReference&);
-
-	private:
-
-		String _name;
+		const String _name;
 	};
 }
 

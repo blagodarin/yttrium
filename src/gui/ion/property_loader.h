@@ -12,11 +12,11 @@ namespace Yttrium
 	class IonObject;
 	class TextureCache;
 
-	class GuiIonPropertyLoader: public GuiPropertyLoader
+	class GuiIonPropertyLoader : public GuiPropertyLoader
 	{
 	public:
 
-		GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiImpl* gui);
+		GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiImpl& gui);
 
 		void bind(const StaticString& name) override;
 		bool load_alignment(const StaticString& name, unsigned* alignment) const override;
@@ -40,17 +40,17 @@ namespace Yttrium
 		static SharedPtr<Sound> load_sound(const IonNode& node);
 		static bool load_state(WidgetState* state, const IonNode& node);
 		static bool load_text(const StaticString** text, const IonObject& object, const StaticString& name);
-		static bool load_texture(SharedPtr<Texture2D>* texture, const IonNode& node, TextureCache* texture_cache, Texture2D::Filter default_filter);
+		static bool load_texture(SharedPtr<Texture2D>* texture, const IonNode& node, TextureCache& texture_cache, Texture2D::Filter default_filter);
 
 	private:
 
 		const IonObject* _object;
 		const IonObject* _class;
-		const GuiImpl*   _gui;
-		TextureCache*    _texture_cache;
+		const GuiImpl&   _gui;
+		TextureCache&    _texture_cache;
 		const IonObject* _bound_object;
 		const IonObject* _bound_class;
 	};
 }
 
-#endif // __GUI_ION_PROPERTY_LOADER_H
+#endif

@@ -25,7 +25,7 @@ namespace Yttrium
 
 		/// Value type.
 		/// \note Every Name is a Literal, and every Literal is a String, but not visa versa.
-		enum Type
+		enum class Type
 		{
 			String,  ///< String value.
 			Literal, ///< Literal value (e.g. integer).
@@ -41,7 +41,7 @@ namespace Yttrium
 		double to_double() const { return _value.to_double(); }
 
 		///
-		Yttrium::String to_string() const { return _value; }
+		String to_string() const { return _value; }
 
 		///
 		Type type() const { return _type; }
@@ -61,8 +61,8 @@ namespace Yttrium
 
 	private:
 
-		Type            _type;
-		Yttrium::String _value;
+		Type _type;
+		String _value;
 
 	private:
 
@@ -73,4 +73,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_SCRIPT_VALUE_H
+#endif

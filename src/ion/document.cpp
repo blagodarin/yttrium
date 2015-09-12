@@ -3,55 +3,56 @@
 #include <yttrium/ion/list.h>
 #include "../base/file.h"
 #include "parser.h"
+#include "utils.h"
 
 namespace Yttrium
 {
-	IonValue* IonDocument::Private::new_list_value()
+	IonDocumentPrivate IonDocumentPrivate::null(nullptr);
+	const IonNode IonDocumentPrivate::null_node(null);
+
+	void IonDocumentPrivate::clear()
 	{
-		return new(_values.allocate()) IonValue(_document);
+		_root.clear();
 	}
 
-	IonNode* IonDocument::Private::new_node(const StaticString& name)
+	IonValue* IonDocumentPrivate::new_list_value()
 	{
-		return new(_nodes.allocate()) IonNode(_document, name);
+		return new(_values.allocate()) IonValue(*this);
 	}
 
-	IonNode* IonDocument::Private::new_node(const StaticString& name, const ByReference&)
+	IonNode* IonDocumentPrivate::new_node(const StaticString& name)
 	{
-		return new(_nodes.allocate()) IonNode(_document, name, ByReference());
+		return new(_nodes.allocate()) IonNode(*this, name);
 	}
 
-	IonObject* IonDocument::Private::new_object()
+	IonNode* IonDocumentPrivate::new_node(const StaticString& name, const ByReference&)
 	{
-		return new(_objects.allocate()) IonObject(_document);
+		return new(_nodes.allocate()) IonNode(*this, name, ByReference());
 	}
 
-	IonValue* IonDocument::Private::new_object_value(IonObject* object)
+	IonObject* IonDocumentPrivate::new_object()
 	{
-		return new(_values.allocate()) IonValue(_document, object);
+		return new(_objects.allocate()) IonObject(*this);
 	}
 
-	IonValue* IonDocument::Private::new_value(const StaticString& name)
+	IonValue* IonDocumentPrivate::new_object_value(IonObject* object)
 	{
-		return new(_values.allocate()) IonValue(_document, name);
+		return new(_values.allocate()) IonValue(*this, object);
 	}
 
-	IonValue* IonDocument::Private::new_value(const StaticString& name, const ByReference&)
+	IonValue* IonDocumentPrivate::new_value(const StaticString& name)
 	{
-		return new(_values.allocate()) IonValue(_document, name, ByReference());
+		return new(_values.allocate()) IonValue(*this, name);
+	}
+
+	IonValue* IonDocumentPrivate::new_value(const StaticString& name, const ByReference&)
+	{
+		return new(_values.allocate()) IonValue(*this, name, ByReference());
 	}
 
 	IonDocument::IonDocument(Allocator* allocator)
-		: IonObject(this)
-		, _private(Y_NEW(allocator, Private)(this, allocator))
+		: _private(Y_NEW(allocator, IonDocumentPrivate)(allocator))
 	{
-	}
-
-	IonDocument::~IonDocument()
-	{
-		IonObject::clear();
-		_private->_buffer.clear();
-		Y_DELETE(_private->_allocator, _private);
 	}
 
 	Allocator* IonDocument::allocator() const
@@ -59,22 +60,44 @@ namespace Yttrium
 		return _private->_allocator;
 	}
 
-	bool IonDocument::load(const StaticString& name)
+	bool IonDocument::load(const StaticString& file_name)
 	{
-		clear();
-		return File(name, _private->_allocator).read_all(&_private->_buffer)
-			&& IonParser(this).parse(_private->_buffer, name);
+		_private->clear();
+		return File(file_name, _private->_allocator).read_all(&_private->_buffer)
+			&& IonParser(*this).parse(_private->_buffer, file_name);
 	}
 
-	bool IonDocument::save(const StaticString& name, int indentation) const
+	IonObject& IonDocument::root()
 	{
-		File file(name, File::Write | File::Truncate, _private->_allocator);
+		return _private->_root;
+	}
+
+	const IonObject& IonDocument::root() const
+	{
+		return _private->_root;
+	}
+
+	bool IonDocument::save(const StaticString& file_name, Formatting formatting) const
+	{
+		File file(file_name, File::Write | File::Truncate, _private->_allocator);
 		if (!file)
 			return false;
-		String buffer(_private->_allocator);
-		serialize(&buffer, (indentation > 0 ? 0 : indentation), true);
-		if (file.write(buffer.text(), buffer.size()) != buffer.size())
-			return false;
-		return file.flush();
+		const auto& buffer = Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, _private->_allocator);
+		return file.write(buffer.text(), buffer.size()) == buffer.size() && file.flush();
+	}
+
+	IonDocument& IonDocument::operator=(IonDocument&& document)
+	{
+		if (_private)
+			Y_DELETE(_private->_allocator, _private);
+		_private = document._private;
+		document._private = nullptr;
+		return *this;
+	}
+
+	IonDocument::~IonDocument()
+	{
+		if (_private)
+			Y_DELETE(_private->_allocator, _private);
 	}
 }

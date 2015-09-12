@@ -4,6 +4,7 @@ Yttrium:
     Base:
     - Keep a global track of all ProxyAllocators.
     - Replace allocator objects with allocation tags.
+    - Try defaulting pool granularity to memory page size.
 
     GUI:
     - Implement line editor widget.
@@ -14,9 +15,6 @@ Yttrium:
     - Add multi-level image support (e.g. textures with mipmaps).
     - Add advanced image loading support (separate header and data loading).
     - Add image pack support (a list of headers with filenames and raw image data offsets).
-
-    ION:
-    - Refactoring.
 
     Renderer:
     - Implement pre-rendered text (i.e. pre-built geometry).

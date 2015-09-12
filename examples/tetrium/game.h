@@ -1,5 +1,5 @@
-#ifndef __TETRIUM_GAME_H
-#define __TETRIUM_GAME_H
+#ifndef YTTRIUM_EXAMPLES_TETRIUM_GAME_H
+#define YTTRIUM_EXAMPLES_TETRIUM_GAME_H
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
@@ -57,4 +57,4 @@ private:
 	bool          _game_running = false;
 };
 
-#endif // __TETRIUM_GAME_H
+#endif

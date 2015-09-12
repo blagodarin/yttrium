@@ -12,7 +12,7 @@ namespace Yttrium
 	{
 	public:
 
-		GuiIonLoader(GuiImpl* gui);
+		GuiIonLoader(GuiImpl& gui);
 
 		bool load(const StaticString& source_name, bool is_internal = false);
 
@@ -23,9 +23,9 @@ namespace Yttrium
 
 	private:
 
-		GuiImpl*   _gui;
+		GuiImpl& _gui;
 		GuiClasses _classes;
 	};
 }
 
-#endif // __GUI_ION_LOADER_H
+#endif

@@ -27,4 +27,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __GUI_ION_DUMPER_H
+#endif

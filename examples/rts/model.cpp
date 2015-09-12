@@ -37,14 +37,14 @@ CubeModel::CubeModel(Renderer& renderer)
 
 	const std::array<Vertex, 8> vertices =
 	{
-		Vertex(Vector4(-0.5, -0.5, -0.5), Vector4(0, 0, 0)),
-		Vertex(Vector4(+0.5, -0.5, -0.5), Vector4(0, 0, 1)),
-		Vertex(Vector4(-0.5, +0.5, -0.5), Vector4(0, 1, 0)),
-		Vertex(Vector4(+0.5, +0.5, -0.5), Vector4(0, 1, 1)),
-		Vertex(Vector4(-0.5, -0.5, +0.5), Vector4(1, 0, 0)),
-		Vertex(Vector4(+0.5, -0.5, +0.5), Vector4(1, 0, 1)),
-		Vertex(Vector4(-0.5, +0.5, +0.5), Vector4(1, 1, 0)),
-		Vertex(Vector4(+0.5, +0.5, +0.5), Vector4(1, 1, 1)),
+		Vertex({-0.5, -0.5, -0.5}, {0, 0, 0}),
+		Vertex({+0.5, -0.5, -0.5}, {0, 0, 1}),
+		Vertex({-0.5, +0.5, -0.5}, {0, 1, 0}),
+		Vertex({+0.5, +0.5, -0.5}, {0, 1, 1}),
+		Vertex({-0.5, -0.5, +0.5}, {1, 0, 0}),
+		Vertex({+0.5, -0.5, +0.5}, {1, 0, 1}),
+		Vertex({-0.5, +0.5, +0.5}, {1, 1, 0}),
+		Vertex({+0.5, +0.5, +0.5}, {1, 1, 1}),
 	};
 
 	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Rgba4F, vertices.size(), vertices.data());

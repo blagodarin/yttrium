@@ -87,18 +87,18 @@ namespace Yttrium
 				{
 				case ScriptScanner::Token::Identifier:
 					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Name, script_manager_allocator));
+						ScriptValue(token.string, ScriptValue::Type::Name, script_manager_allocator));
 					break;
 
 				case ScriptScanner::Token::XIdentifier:
 				case ScriptScanner::Token::Literal:
 					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Literal, script_manager_allocator));
+						ScriptValue(token.string, ScriptValue::Type::Literal, script_manager_allocator));
 					break;
 
 				case ScriptScanner::Token::String:
 					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::String, script_manager_allocator));
+						ScriptValue(token.string, ScriptValue::Type::String, script_manager_allocator));
 					break;
 
 				case ScriptScanner::Token::Separator:

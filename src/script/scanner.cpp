@@ -5,263 +5,259 @@
 
 namespace Yttrium
 {
-
-namespace
-{
-
-enum class Kind
-{
-	Other,
-	Space,
-	Comment,
-	Quote,
-	Newline,
-	Semicolon,
-	End,
-	Error,
-};
-
-const Kind kind_of[256] =
-{
-	Kind::End,     Kind::Error,   Kind::Error,   Kind::Error,     // 0
-	Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-	Kind::Error,   Kind::Space,   Kind::Newline, Kind::Space,     //   t n v
-	Kind::Space,   Kind::Newline, Kind::Error,   Kind::Error,     // f r
-	Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-	Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-	Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-	Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-
-	Kind::Space,   Kind::Other,   Kind::Quote,   Kind::Comment,   //   ! " #
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // $ % & '
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ( ) * +
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // , - . /
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 0 1 2 3
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 4 5 6 7
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Semicolon, // 8 9 : ;
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // < = > ?
-
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // @ A B C
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // D E F G
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // H I J K
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // L M N O
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // P Q R S
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // T U V W
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // X Y Z [
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // \ ] ^ _
-
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ` a b c
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // d e f g
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // h i j k
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // l m n o
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // p q r s
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // t u v w
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // x y z {
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Error,     // | } ~
-
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-	Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-};
-
-} // namespace
-
-ScriptScanner::ScriptScanner(const StaticString& text)
-	: _cursor(const_cast<char*>(text.text()))
-	, _end(text.text() + text.size())
-	, _line_origin(_cursor - 1)
-	, _line(1)
-{
-}
-
-bool ScriptScanner::read(Token& token)
-{
-	char* cursor = _cursor;
-
-	token.line = _line;
-
-rescan:
-
-	switch (kind_of[static_cast<unsigned char>(*cursor)])
+	namespace
 	{
-	case Kind::Other:
-
+		enum class Kind
 		{
-			token.column = cursor - _line_origin;
-			token.type = Token::Literal;
+			Other,
+			Space,
+			Comment,
+			Quote,
+			Newline,
+			Semicolon,
+			End,
+			Error,
+		};
 
-			char* begin = cursor;
-
-			bool has_sigil = (*cursor == '+' || *cursor == '-');
-
-			if (has_sigil)
-			{
-				++cursor;
-			}
-
-			if ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
-				|| (*cursor >= 'A' && *cursor <= 'Z'))
-			{
-				token.type = Token::Identifier;
-				while ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
-					|| (*cursor >= '0' && *cursor <= '9') || (*cursor >= 'A' && *cursor <= 'Z'))
-				{
-					++cursor;
-				}
-			}
-
-			if (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other)
-			{
-				token.type = Token::Literal;
-				do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other);
-			}
-
-			if (token.type == Token::Identifier && has_sigil)
-				token.type = Token::XIdentifier;
-
-			token.string = StaticString(begin, cursor - begin);
-		}
-		break;
-
-	case Kind::Space:
-
-		do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Space);
-		goto rescan;
-
-	case Kind::Comment:
-
-		do ++cursor; while (cursor != _end && *cursor != '\r' && *cursor != '\n');
-		goto rescan;
-
-	case Kind::Quote:
-
+		const Kind kind_of[256] =
 		{
-			token.column = cursor - _line_origin;
+			Kind::End,     Kind::Error,   Kind::Error,   Kind::Error,     // 0
+			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+			Kind::Error,   Kind::Space,   Kind::Newline, Kind::Space,     //   t n v
+			Kind::Space,   Kind::Newline, Kind::Error,   Kind::Error,     // f r
+			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
 
-			char* begin = ++cursor;
-			char* end = begin;
+			Kind::Space,   Kind::Other,   Kind::Quote,   Kind::Comment,   //   ! " #
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // $ % & '
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ( ) * +
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // , - . /
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 0 1 2 3
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 4 5 6 7
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Semicolon, // 8 9 : ;
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // < = > ?
 
-			for (; ; )
-			{
-				if (*cursor == '"')
-				{
-					++cursor;
-					break;
-				}
-				else if (*cursor == '\\')
-				{
-					switch (*++cursor)
-					{
-					case '\\': *end++ = '\\'; break;
-					case '"':  *end++ = '"';  break;
-					case '\'': *end++ = '\''; break;
-					case 'n':  *end++ = '\n'; break;
-					case 'r':  *end++ = '\r'; break;
-					default:
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // @ A B C
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // D E F G
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // H I J K
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // L M N O
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // P Q R S
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // T U V W
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // X Y Z [
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // \ ] ^ _
 
-						Log() << S("[ScriptScanner] Invalid escape sequence \"") << *cursor
-							<< S("\" (") << token.line << ':' << cursor - _line_origin << ')';
-						return false;
-					}
-					++cursor;
-				}
-				else if (*cursor == '\n' || *cursor == '\r')
-				{
-					Log() << S("[ScriptScanner] Unexpected end of line (")
-						<< token.line << ':' << cursor - _line_origin << ')';
-					return false;
-				}
-				else if (cursor != _end)
-				{
-					if (end != cursor)
-					{
-						*end = *cursor;
-					}
-					++cursor;
-					++end;
-				}
-				else
-				{
-					Log() << S("[ScriptScanner] Unexpected end of script (")
-						<< token.line << ':' << cursor - _line_origin << ')';
-					return false;
-				}
-			}
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ` a b c
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // d e f g
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // h i j k
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // l m n o
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // p q r s
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // t u v w
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // x y z {
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Error,     // | } ~
 
-			token.type = Token::String;
-			token.string = StaticString(begin, end - begin);
-		}
-		break;
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
 
-	case Kind::Newline:
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
 
-		token.column = cursor - _line_origin;
-		if (*cursor == '\r' && *(cursor + 1) == '\n') // Treat "\r\n" as a single newline.
-			++cursor;
-		++_line;
-		_line_origin = ++cursor - 1;
-		token.type = Token::Separator;
-		break;
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
 
-	case Kind::Semicolon:
-
-		token.column = cursor++ - _line_origin;
-		token.type = Token::Separator;
-		break;
-
-	case Kind::End:
-
-		if (cursor != _end)
-		{
-			++cursor;
-			goto rescan;
-		}
-		token.column = cursor - _line_origin;
-		token.type = Token::End;
-		break;
-
-	case Kind::Error:
-
-		Log() << S("[ScriptScanner] Invalid script character (")
-			<< token.line << ':' << cursor - _line_origin << ')';
-		return false;
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		};
 	}
 
-	_cursor = cursor;
+	ScriptScanner::ScriptScanner(const StaticString& text)
+		: _cursor(const_cast<char*>(text.text()))
+		, _end(text.text() + text.size())
+		, _line_origin(_cursor - 1)
+		, _line(1)
+	{
+	}
 
-	return true;
+	bool ScriptScanner::read(Token& token)
+	{
+		char* cursor = _cursor;
+
+		token.line = _line;
+
+	rescan:
+
+		switch (kind_of[static_cast<unsigned char>(*cursor)])
+		{
+		case Kind::Other:
+
+			{
+				token.column = cursor - _line_origin;
+				token.type = Token::Literal;
+
+				char* begin = cursor;
+
+				bool has_sigil = (*cursor == '+' || *cursor == '-');
+
+				if (has_sigil)
+				{
+					++cursor;
+				}
+
+				if ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
+					|| (*cursor >= 'A' && *cursor <= 'Z'))
+				{
+					token.type = Token::Identifier;
+					while ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
+						|| (*cursor >= '0' && *cursor <= '9') || (*cursor >= 'A' && *cursor <= 'Z'))
+					{
+						++cursor;
+					}
+				}
+
+				if (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other)
+				{
+					token.type = Token::Literal;
+					do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other);
+				}
+
+				if (token.type == Token::Identifier && has_sigil)
+					token.type = Token::XIdentifier;
+
+				token.string = StaticString(begin, cursor - begin);
+			}
+			break;
+
+		case Kind::Space:
+
+			do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Space);
+			goto rescan;
+
+		case Kind::Comment:
+
+			do ++cursor; while (cursor != _end && *cursor != '\r' && *cursor != '\n');
+			goto rescan;
+
+		case Kind::Quote:
+
+			{
+				token.column = cursor - _line_origin;
+
+				char* begin = ++cursor;
+				char* end = begin;
+
+				for (; ; )
+				{
+					if (*cursor == '"')
+					{
+						++cursor;
+						break;
+					}
+					else if (*cursor == '\\')
+					{
+						switch (*++cursor)
+						{
+						case '\\': *end++ = '\\'; break;
+						case '"':  *end++ = '"';  break;
+						case '\'': *end++ = '\''; break;
+						case 'n':  *end++ = '\n'; break;
+						case 'r':  *end++ = '\r'; break;
+						default:
+
+							Log() << S("[ScriptScanner] Invalid escape sequence \"") << *cursor
+								<< S("\" (") << token.line << ':' << cursor - _line_origin << ')';
+							return false;
+						}
+						++cursor;
+					}
+					else if (*cursor == '\n' || *cursor == '\r')
+					{
+						Log() << S("[ScriptScanner] Unexpected end of line (")
+							<< token.line << ':' << cursor - _line_origin << ')';
+						return false;
+					}
+					else if (cursor != _end)
+					{
+						if (end != cursor)
+						{
+							*end = *cursor;
+						}
+						++cursor;
+						++end;
+					}
+					else
+					{
+						Log() << S("[ScriptScanner] Unexpected end of script (")
+							<< token.line << ':' << cursor - _line_origin << ')';
+						return false;
+					}
+				}
+
+				token.type = Token::String;
+				token.string = StaticString(begin, end - begin);
+			}
+			break;
+
+		case Kind::Newline:
+
+			token.column = cursor - _line_origin;
+			if (*cursor == '\r' && *(cursor + 1) == '\n') // Treat "\r\n" as a single newline.
+				++cursor;
+			++_line;
+			_line_origin = ++cursor - 1;
+			token.type = Token::Separator;
+			break;
+
+		case Kind::Semicolon:
+
+			token.column = cursor++ - _line_origin;
+			token.type = Token::Separator;
+			break;
+
+		case Kind::End:
+
+			if (cursor != _end)
+			{
+				++cursor;
+				goto rescan;
+			}
+			token.column = cursor - _line_origin;
+			token.type = Token::End;
+			break;
+
+		case Kind::Error:
+
+			Log() << S("[ScriptScanner] Invalid script character (")
+				<< token.line << ':' << cursor - _line_origin << ')';
+			return false;
+		}
+
+		_cursor = cursor;
+
+		return true;
+	}
 }
-
-} // namespace Yttrium

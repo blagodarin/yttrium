@@ -2,6 +2,7 @@
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
 #include "../gui.h"
 #include "../scene.h"
 
@@ -13,12 +14,12 @@ namespace Yttrium
 
 		if (_gui._has_size)
 		{
-			IonNode* size_node = document.append("size");
+			IonNode* size_node = document.root().append("size");
 			size_node->append(String::from_dec(_gui._size.x));
 			size_node->append(String::from_dec(_gui._size.y));
 		}
 
-		IonNode* scale_node = document.append("scale");
+		IonNode* scale_node = document.root().append("scale");
 
 		switch (_gui._scaling)
 		{
@@ -32,7 +33,7 @@ namespace Yttrium
 
 		for (const auto& scene : _gui._scenes)
 		{
-			IonNode* scene_node = document.append("scene");
+			IonNode* scene_node = document.root().append("scene");
 
 			scene_node->append(scene.first);
 
@@ -42,9 +43,9 @@ namespace Yttrium
 			dump_scene(*scene.second, scene_node);
 		}
 
-		for (const auto& action: _gui._scene_actions)
+		for (const auto& action : _gui._scene_actions)
 		{
-			IonNode* on_scene_change_node = document.append("on_scene_change");
+			IonNode* on_scene_change_node = document.root().append("on_scene_change");
 
 			IonList* scene_list = on_scene_change_node->append_list();
 

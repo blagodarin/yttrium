@@ -4,6 +4,11 @@
 
 namespace Yttrium
 {
+	int ScriptArgs::get_int(size_t index, int default_value) const
+	{
+		return index <= _values.size() ? _values[index]->to_int() : default_value;
+	}
+
 	String ScriptArgs::string(size_t index, NameResolution resolution) const
 	{
 		String result(_context._allocator);
@@ -12,7 +17,7 @@ namespace Yttrium
 		{
 			const ScriptValue* value = _values[index];
 
-			if (resolution == Resolve && value->type() == ScriptValue::Name)
+			if (resolution == Resolve && value->type() == ScriptValue::Type::Name)
 				value = _context.find(value->to_string());
 
 			if (value)

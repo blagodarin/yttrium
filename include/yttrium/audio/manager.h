@@ -45,4 +45,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_AUDIO_MANAGER_H
+#endif

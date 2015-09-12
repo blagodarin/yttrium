@@ -136,7 +136,7 @@ namespace Yttrium
 	{
 		clear();
 
-		GuiIonLoader loader(this);
+		GuiIonLoader loader(*this);
 		if (!loader.load(filename))
 			return false;
 

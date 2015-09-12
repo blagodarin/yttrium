@@ -4,21 +4,25 @@
 #include <yttrium/ion/document.h>
 
 #include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/pool.h>
 
 namespace Yttrium
 {
-	class Y_PRIVATE IonDocument::Private
+	class IonDocumentPrivate
 	{
 		friend IonDocument;
 
 	public:
 
-		Private(IonDocument* document, Allocator* allocator)
-			: _document(document)
-			, _allocator(allocator)
+		static IonDocumentPrivate null;
+		static const IonNode null_node;
+
+		IonDocumentPrivate(Allocator* allocator)
+			: _allocator(allocator)
 			, _buffer(allocator)
+			, _root(*this)
 			, _objects(32, allocator)
 			, _nodes(32, allocator)
 			, _values(32, allocator)
@@ -26,6 +30,8 @@ namespace Yttrium
 			// TODO: Get rid of the magic numbers above.
 		}
 
+		Allocator* allocator() const { return _allocator; }
+		void clear();
 		IonValue* new_list_value();
 		IonNode* new_node(const StaticString& name);
 		IonNode* new_node(const StaticString& name, const ByReference&);
@@ -36,13 +42,13 @@ namespace Yttrium
 
 	private:
 
-		IonDocument*    _document;
-		Allocator*      _allocator;
-		String          _buffer;
+		Allocator* const _allocator;
+		String _buffer;
+		IonObject _root;
 		Pool<IonObject> _objects;
-		Pool<IonNode>   _nodes;
-		Pool<IonValue>  _values;
+		Pool<IonNode> _nodes;
+		Pool<IonValue> _values;
 	};
 }
 
-#endif // __ION_DOCUMENT_H
+#endif

@@ -28,4 +28,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_AUDIO_SOUND_H
+#endif

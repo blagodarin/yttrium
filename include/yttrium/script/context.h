@@ -104,6 +104,9 @@ namespace Yttrium
 		/// \return Value pointer or \c nullptr if no such value exist.
 		ScriptValue* find(const StaticString& name) const;
 
+		///
+		int get_int(const StaticString& name, int default_value);
+
 		/// Get the root context.
 		/// \return Root context.
 		ScriptContext& root();
@@ -172,4 +175,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_SCRIPT_CONTEXT_H
+#endif

@@ -1,5 +1,5 @@
-#ifndef __EXAMPLES_RTS_MODEL_H
-#define __EXAMPLES_RTS_MODEL_H
+#ifndef YTTRIUM_EXAMPLES_RTS_MODEL_H
+#define YTTRIUM_EXAMPLES_RTS_MODEL_H
 
 #include <yttrium/gpu_program.h>
 #include <yttrium/pointer.h>
@@ -25,14 +25,14 @@ protected:
 	Pointer<GpuProgram> _program;
 };
 
-class CubeModel : public Model
+class CubeModel: public Model
 {
 public:
 
 	CubeModel(Renderer&);
 };
 
-class ChessboardModel : public Model
+class ChessboardModel: public Model
 {
 public:
 

@@ -9,28 +9,28 @@
 
 namespace Yttrium
 {
-	class IonDocument;
-
 	///
 	class Y_API IonValue
 	{
-		friend IonDocument;
+		friend IonDocumentPrivate;
 		friend IonList;
+		friend IonListIterator;
+		friend IonListRange;
 
 	public:
 
 		///
-		enum Type
+		enum class Type
 		{
-			StringType, ///<
-			ListType,   ///<
-			ObjectType, ///<
+			String, ///<
+			List,   ///<
+			Object, ///<
 		};
 
 		///
 		bool get(const StaticString** value) const
 		{
-			if (_type != StringType)
+			if (_type != Type::String)
 				return false;
 			*value = &_string;
 			return true;
@@ -39,12 +39,12 @@ namespace Yttrium
 		/**
 		* \overload
 		*/
-		bool get(int32_t* value) const { return _type == StringType && _string.to_number(value); }
+		bool get(int32_t* value) const { return _type == Type::String && _string.to_number(value); }
 
 		/**
 		* \overload
 		*/
-		bool get(float* value) const { return _type == StringType && _string.to_number(value); }
+		bool get(float* value) const { return _type == Type::String && _string.to_number(value); }
 
 		/**
 		* \overload
@@ -52,7 +52,7 @@ namespace Yttrium
 
 		bool get(const IonList** value) const
 		{
-			if (_type != ListType)
+			if (_type != Type::List)
 				return false;
 			*value = &_list; // NOTE: Something's wrong here.
 			return true;
@@ -63,32 +63,17 @@ namespace Yttrium
 		*/
 		bool get(const IonObject** value) const
 		{
-			if (_type != ObjectType)
+			if (_type != Type::Object)
 				return false;
 			*value = _object;
 			return true;
 		}
 
 		///
-		bool is_list() const { return _type == ListType; }
-
-		///
-		bool is_object() const { return _type == ObjectType; }
-
-		///
-		bool is_string() const { return _type == StringType; }
-
-		///
 		IonList& list() { return _list; }
 
 		///
 		const IonList& list() const { return _list; }
-
-		///
-		void serialize(String* result, int indentation = 0) const;
-
-		///
-		String serialize(int indentation = 0, Allocator* allocator = nullptr) const;
 
 		///
 		const StaticString& string() const { return _string; }
@@ -104,19 +89,19 @@ namespace Yttrium
 
 	private:
 
-		Y_PRIVATE IonValue(IonDocument* document);
-		Y_PRIVATE IonValue(IonDocument* document, const StaticString& string);
-		Y_PRIVATE IonValue(IonDocument* document, const StaticString& string, const ByReference&);
-		Y_PRIVATE IonValue(IonDocument* document, IonObject* object);
+		Y_PRIVATE IonValue(IonDocumentPrivate& document);
+		Y_PRIVATE IonValue(IonDocumentPrivate& document, const StaticString& string);
+		Y_PRIVATE IonValue(IonDocumentPrivate& document, const StaticString& string, const ByReference&);
+		Y_PRIVATE IonValue(IonDocumentPrivate& document, IonObject* object);
 
 	private:
 
-		Type       _type;
-		String     _string;
-		IonList    _list;
-		IonObject* _object;
-		IonValue*  _next;
-		IonValue*  _previous;
+		const Type _type;
+		String _string;
+		IonList _list;
+		IonObject* const _object = nullptr;
+		IonValue* _next = nullptr;
+		IonValue* _previous = nullptr;
 	};
 }
 

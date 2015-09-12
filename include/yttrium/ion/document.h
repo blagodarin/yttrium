@@ -4,42 +4,49 @@
 #ifndef __Y_ION_DOCUMENT_H
 #define __Y_ION_DOCUMENT_H
 
-#include <yttrium/ion/object.h>
 #include <yttrium/types.h>
 
 namespace Yttrium
 {
-	class IonList;
+	class IonDocumentPrivate;
+	class IonObject;
+	class StaticString;
 
 	///
-	class Y_API IonDocument : public IonObject
+	class Y_API IonDocument
 	{
-		friend IonList;
-		friend IonNode;
-		friend IonObject;
-		friend IonParser;
-		friend IonValue;
-
 	public:
+
+		///
+		enum class Formatting
+		{
+			Pretty,  ///<
+			Compact, ///<
+		};
 
 		///
 		IonDocument(Allocator* allocator = DefaultAllocator);
 
 		///
-		~IonDocument();
-
-		///
 		Allocator* allocator() const;
 
 		///
-		bool load(const StaticString& name);
+		bool load(const StaticString& file_name);
 
 		///
-		bool save(const StaticString& name, int indentation = 0) const;
+		IonObject& root();
+		const IonObject& root() const;
 
+		///
+		bool save(const StaticString& file_name, Formatting formatting = Formatting::Pretty) const;
+
+		IonDocument(const IonDocument&) = delete;
+		IonDocument(IonDocument&& document): _private(document._private) { document._private = nullptr; }
+		~IonDocument();
+		IonDocument& operator=(const IonDocument&) = delete;
+		IonDocument& operator=(IonDocument&&);
 	private:
-		class Private;
-		Private* _private;
+		IonDocumentPrivate* _private = nullptr;
 	};
 }
 

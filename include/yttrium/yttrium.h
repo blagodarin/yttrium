@@ -22,7 +22,12 @@
 #include <yttrium/gui.h>
 #include <yttrium/image.h>
 #include <yttrium/index_buffer.h>
-#include <yttrium/ion.h>
+#include <yttrium/ion/document.h>
+#include <yttrium/ion/list.h>
+#include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
+#include <yttrium/ion/utils.h>
+#include <yttrium/ion/value.h>
 #include <yttrium/key.h>
 #include <yttrium/log.h>
 #include <yttrium/log_manager.h>

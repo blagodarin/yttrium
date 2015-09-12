@@ -82,9 +82,9 @@ namespace Yttrium
 			_has_size = true;
 		}
 
-		TextureCache* texture_cache()
+		TextureCache& texture_cache()
 		{
-			return _texture_cache.get();
+			return *_texture_cache;
 		}
 
 	public: // Gui
