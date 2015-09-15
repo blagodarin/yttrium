@@ -44,6 +44,18 @@ namespace Yttrium
 		if (!renderer->initialize())
 			return {};
 
+		static const int32_t white_texture_data = -1;
+
+		ImageFormat white_texture_format;
+		white_texture_format.set_width(1);
+		white_texture_format.set_height(1);
+		white_texture_format.set_orientation(ImageOrientation::XRightYDown);
+		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
+		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
+		if (!renderer->_white_texture)
+			return {};
+		renderer->_white_texture->set_filter(Texture2D::NearestFilter);
+
 		ImageFormat debug_texture_format;
 		debug_texture_format.set_width(DebugTexture::width);
 		debug_texture_format.set_height(DebugTexture::height);
@@ -338,6 +350,8 @@ namespace Yttrium
 	void RendererImpl::push_texture(const Texture2D* texture)
 	{
 		assert(!_texture_stack.empty());
+		if (!texture)
+			texture = _white_texture.get();
 		if (_texture_stack.back().first == texture)
 		{
 			++_texture_stack.back().second;

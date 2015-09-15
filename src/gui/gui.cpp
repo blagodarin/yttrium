@@ -64,7 +64,7 @@ namespace Yttrium
 
 	const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
 	{
-		auto i = _fonts.find(String(name, ByReference()));
+		const auto i = _fonts.find(String(name, ByReference()));
 		return i != _fonts.end() ? &i->second : nullptr;
 	}
 

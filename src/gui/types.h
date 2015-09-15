@@ -43,4 +43,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __GUI_TYPES_H
+#endif

@@ -115,6 +115,7 @@ namespace Yttrium
 		TextureFont _font;
 		Vector2     _font_size;
 
+		SharedPtr<Texture2D> _white_texture;
 		SharedPtr<Texture2D> _debug_texture;
 		Pointer<GpuProgram> _program_2d;
 

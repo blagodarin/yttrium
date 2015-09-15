@@ -1,5 +1,5 @@
-#ifndef __GUI_DUMPER_H
-#define __GUI_DUMPER_H
+#ifndef __GUI_PROPERTY_DUMPER_H
+#define __GUI_PROPERTY_DUMPER_H
 
 #include "types.h"
 
@@ -36,4 +36,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __GUI_DUMPER_H
+#endif

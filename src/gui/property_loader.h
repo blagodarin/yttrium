@@ -1,5 +1,5 @@
-#ifndef __GUI_LOADER_H
-#define __GUI_LOADER_H
+#ifndef __GUI_PROPERTY_LOADER_H
+#define __GUI_PROPERTY_LOADER_H
 
 #include "types.h"
 
@@ -42,4 +42,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __GUI_LOADER_H
+#endif
