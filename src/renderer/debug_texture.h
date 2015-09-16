@@ -25,4 +25,4 @@ namespace Yttrium
 	}
 }
 
-#endif // __RENDERER_DEBUG_TEXTURE_H
+#endif

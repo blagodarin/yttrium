@@ -9,7 +9,7 @@ namespace Yttrium
 	}
 }
 
-#endif // __RENDERER_GL_API_H
+#endif
 
 #if defined(GLAPI_DECLARE) || defined(GLAPI_INIT) || defined(GLAPI_DROP)
 #	define __GLAPI_API
@@ -41,7 +41,7 @@ namespace Yttrium
 #	define GLEND
 #	define GLEXTFUNC(name, ret, attr) ret (__Y_GLAPI *name)attr;
 #
-#endif // GLA_DECLARE
+#endif
 
 // Mode: GLAPI_INIT.
 // Initializes the [extension] functions and persistent state data.
@@ -95,7 +95,7 @@ namespace Yttrium
 #	define GLEND }
 #	define GLEXTFUNC(name, ret, attr) *(Gl::Address *)(&GLAPI_CONTEXT name) = GLAPI_EXTFUNC("gl"#name);
 #
-#endif // GLAPI_INIT
+#endif
 
 // Mode: GLAPI_DROP.
 // Invalidates all the extensions.
@@ -118,7 +118,7 @@ namespace Yttrium
 #	define GLEND
 #	define GLEXTFUNC(name, ret, param)
 #
-#endif // GLAPI_DROP
+#endif
 
 // Now, after all the preparations, we are able to include
 // the requested GLAPI "script".
@@ -323,7 +323,7 @@ GLEXTENSION(KHR_debug)
 	GLEXTFUNC(PushDebugGroup, GLvoid, (GLenum, GLuint, GLsizei, const GLchar*))
 	GLEND
 
-#endif // __GLAPI_API
+#endif
 
 // After all, clear all the definitions (inluding the input ones).
 
@@ -352,4 +352,4 @@ GLEXTENSION(KHR_debug)
 #	undef GLAPI_INIT
 #	undef GLAPI_DECLARE
 #
-#endif // __GLAPI_API
+#endif

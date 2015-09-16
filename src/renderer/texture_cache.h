@@ -26,4 +26,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __RENDERER_TEXTURE_CACHE_H
+#endif

@@ -43,4 +43,4 @@ namespace Yttrium
 	const uint32_t FourccKern = Fourcc<'k', 'e', 'r', 'n'>::value;
 }
 
-#endif // __RENDERER_TEXTURE_FONT_H
+#endif
