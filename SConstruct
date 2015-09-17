@@ -276,7 +276,8 @@ AlwaysBuild('test')
 Alias('tools', BuildSources(env, 'tools', [
 	'generate-sounds',
 	'generate-test-images',
-	'ypq']))
+	'ypq',
+	'ytr']))
 Clean('tools', Dir('$BUILD/tools'))
 
 #-------------------------------------------------------------------------------

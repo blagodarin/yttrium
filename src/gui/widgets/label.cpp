@@ -23,7 +23,7 @@ namespace Yttrium
 	{
 		if (!(loader.load_position("position", &_position)
 			&& _foreground.load(loader)
-			&& loader.load_text("text", &_text)))
+			&& loader.load_translatable("text", &_text)))
 		{
 			Log() << "[Gui.Label] Unable to load";
 			return false;

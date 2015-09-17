@@ -37,16 +37,16 @@ scene "game_single"
 	image ["background"] { position "23" "5"  "6"  "2" } # Lines
 	image ["background"] { position "23" "9"  "6"  "2" } # Level
 
-	label ["label_name"]  { position  "1.5"  "1.5" text "Next:"   }
+	label ["label_name"]  { position  "1.5"  "1.5" text {tr"Next:"}  }
 
-	label ["label_name"]  { position "23.5"  "1.5" text "Score:"  }
-	label ["label_value"] { position "28.5"  "2.5" text "{score}" }
+	label ["label_name"]  { position "23.5"  "1.5" text {tr"Score:"} }
+	label ["label_value"] { position "28.5"  "2.5" text "{score}"    }
 
-	label ["label_name"]  { position "23.5"  "5.5" text "Lines:"  }
-	label ["label_value"] { position "28.5"  "6.5" text "{lines}" }
+	label ["label_name"]  { position "23.5"  "5.5" text {tr"Lines:"} }
+	label ["label_value"] { position "28.5"  "6.5" text "{lines}"    }
 
-	label ["label_name"]  { position "23.5"  "9.5" text "Level:"  }
-	label ["label_value"] { position "28.5" "10.5" text "{level}" }
+	label ["label_name"]  { position "23.5"  "9.5" text {tr"Level:"} }
+	label ["label_value"] { position "28.5" "10.5" text "{level}"    }
 
 	canvas "next" { position "2" "3" "4" "2" }
 

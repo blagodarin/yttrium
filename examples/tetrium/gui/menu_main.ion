@@ -13,41 +13,41 @@ scene "menu_main" ["root"]
 		position  "320" "100"
 		text_size "160"
 		font      "common"
-		text      "Tetrium"
+		text      {tr"Tetrium"}
 	}
 
 	button ["button"]
 	{
 		position "" "210"
-		text     "Single player"
+		text     {tr"Single player"}
 		action   "push_scene menu_single"
 	}
 
 	button ["button"]
 	{
 		position "" "260"
-		text     "Multiplayer"
+		text     {tr"Multiplayer"}
 		action   "push_scene menu_multi"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
-		text     "Statistics"
+		text     {tr"Statistics"}
 		state    "disabled"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
-		text     "Help"
+		text     {tr"Help"}
 		action   "push_scene menu_help"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
-		text     "Exit"
+		text     {tr"Exit"}
 		action   "exit"
 	}
 }

@@ -38,7 +38,7 @@ namespace Yttrium
 		}
 
 		loader.load_scaling("scale", &_scaling);
-		loader.load_text("text", &_text);
+		loader.load_translatable("text", &_text);
 
 		if (_styles[0].background.load(loader))
 		{

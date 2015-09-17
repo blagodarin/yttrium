@@ -31,6 +31,7 @@ namespace Yttrium
 		bool load_state(const StaticString& name, WidgetState* state) const override;
 		bool load_text(const StaticString& name, String* text) const override;
 		bool load_texture(const StaticString& name, SharedPtr<Texture2D>* texture) const override;
+		bool load_translatable(const StaticString& name, String* text) const override;
 		void unbind() override;
 
 		static bool load_alignment(unsigned* alignment, const IonNode& node);

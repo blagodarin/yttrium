@@ -13,34 +13,34 @@ scene "menu_multi"
 		position  "320" "100"
 		text_size "160"
 		font      "common"
-		text      "Tetrium"
+		text      {tr"Tetrium"}
 	}
 
 	button ["button"]
 	{
 		position "" "260"
-		text     "Multiplayer"
+		text     {tr"Multiplayer"}
 		state    "checked"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
-		text     "Host game"
+		text     {tr"Host game"}
 		state    "disabled"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
-		text     "Join game"
+		text     {tr"Join game"}
 		state    "disabled"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
-		text     "Back"
+		text     {tr"Back"}
 		action   "pop_scene"
 	}
 }

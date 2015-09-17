@@ -19,7 +19,7 @@ scene "game_over"
 		text_size  "8"
 		font       "common"
 		text_color "0.75" "0" "0"
-		text       "Game over"
+		text       {tr"Game over"}
 	}
 
 	input

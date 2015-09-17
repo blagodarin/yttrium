@@ -31,27 +31,27 @@ scene "menu_help"
 	}
 
 	label ["help_key" ] { position "" "55"  text "[A]" }
-	label ["help_text"] { position "" "55"  text "Move left" }
+	label ["help_text"] { position "" "55"  text {tr"Move left"} }
 
 	label ["help_key" ] { position "" "105" text "[D]" }
-	label ["help_text"] { position "" "105" text "Move right" }
+	label ["help_text"] { position "" "105" text {tr"Move right"} }
 
 	label ["help_key" ] { position "" "155" text "[S]" }
-	label ["help_text"] { position "" "155" text "Accelerate" }
+	label ["help_text"] { position "" "155" text {tr"Accelerate"} }
 
 	label ["help_key" ] { position "" "205" text "[Left]" }
-	label ["help_text"] { position "" "205" text "Rotate left" }
+	label ["help_text"] { position "" "205" text {tr"Rotate left"} }
 
 	label ["help_key" ] { position "" "255" text "[Right]" }
-	label ["help_text"] { position "" "255" text "Rotate right" }
+	label ["help_text"] { position "" "255" text {tr"Rotate right"} }
 
 	label ["help_key" ] { position "" "305" text "[Esc]" }
-	label ["help_text"] { position "" "305" text "Pause/Exit" }
+	label ["help_text"] { position "" "305" text {tr"Pause/Exit"} }
 
 	button ["button"]
 	{
 		position "" "360"
-		text     "Back"
+		text     {tr"Back"}
 		action   "pop_scene"
 	}
 }

@@ -38,6 +38,7 @@ namespace Yttrium
 		virtual bool load_state(const StaticString& name, WidgetState* state) const = 0;
 		virtual bool load_text(const StaticString& name, String* text) const = 0;
 		virtual bool load_texture(const StaticString& name, SharedPtr<Texture2D>* texture) const = 0;
+		virtual bool load_translatable(const StaticString& name, String* text) const = 0;
 		virtual void unbind() = 0;
 	};
 }

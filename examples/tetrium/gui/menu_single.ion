@@ -13,41 +13,41 @@ scene "menu_single"
 		position  "320" "100"
 		text_size "160"
 		font      "common"
-		text      "Tetrium"
+		text      {tr"Tetrium"}
 	}
 
 	button ["button"]
 	{
 		position "" "210"
-		text     "Single player"
+		text     {tr"Single player"}
 		state    "checked"
 	}
 
 	button ["button"]
 	{
 		position "" "260"
-		text     "Easy"
+		text     {tr"Easy"}
 		action   "set start_level 1; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
-		text     "Normal"
+		text     {tr"Normal"}
 		action   "set start_level 10; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
-		text     "Hard"
+		text     {tr"Hard"}
 		action   "set start_level 20; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
-		text     "Back"
+		text     {tr"Back"}
 		action   "pop_scene"
 	}
 }

@@ -122,7 +122,7 @@ unsigned read_size(Vector2 *size, const IonNode &node, unsigned inherit)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject *object, const IonObject *class_, GuiImpl& gui)
+GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiImpl& gui)
 	: _object(object)
 	, _class(class_)
 	, _gui(gui)
@@ -132,7 +132,7 @@ GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject *object, const IonObj
 {
 }
 
-void GuiIonPropertyLoader::bind(const StaticString &name)
+void GuiIonPropertyLoader::bind(const StaticString& name)
 {
 	_bound_object = nullptr;
 
@@ -150,7 +150,7 @@ void GuiIonPropertyLoader::bind(const StaticString &name)
 	}
 }
 
-bool GuiIonPropertyLoader::load_alignment(const StaticString &name, unsigned *alignment) const
+bool GuiIonPropertyLoader::load_alignment(const StaticString& name, unsigned* alignment) const
 {
 	if (_bound_object)
 	{
@@ -169,7 +169,7 @@ bool GuiIonPropertyLoader::load_alignment(const StaticString &name, unsigned *al
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4 *color) const
+bool GuiIonPropertyLoader::load_color(const StaticString& name, Vector4* color) const
 {
 	unsigned loaded = 0x0;
 
@@ -190,7 +190,7 @@ bool GuiIonPropertyLoader::load_color(const StaticString &name, Vector4 *color) 
 	return loaded == 0xF;
 }
 
-bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font, SharedPtr<Texture2D> *texture) const
+bool GuiIonPropertyLoader::load_font(const StaticString& name, TextureFont* font, SharedPtr<Texture2D>* texture) const
 {
 	const StaticString *font_name;
 
@@ -218,7 +218,7 @@ bool GuiIonPropertyLoader::load_font(const StaticString &name, TextureFont *font
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_margins(const StaticString &name, Margins *margins) const
+bool GuiIonPropertyLoader::load_margins(const StaticString& name, Margins* margins) const
 {
 	if (_bound_object)
 	{
@@ -237,7 +237,7 @@ bool GuiIonPropertyLoader::load_margins(const StaticString &name, Margins *margi
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2 *position) const
+bool GuiIonPropertyLoader::load_position(const StaticString& name, Vector2* position) const
 {
 	unsigned loaded = 0x0;
 
@@ -258,7 +258,7 @@ bool GuiIonPropertyLoader::load_position(const StaticString &name, Vector2 *posi
 	return loaded == 0x3;
 }
 
-bool GuiIonPropertyLoader::load_rect(const StaticString &name, Rect *rect, bool update) const
+bool GuiIonPropertyLoader::load_rect(const StaticString& name, Rect* rect, bool update) const
 {
 	int32_t elements[4] = {-1, -1, -1, -1};
 
@@ -292,7 +292,7 @@ bool GuiIonPropertyLoader::load_rect(const StaticString &name, Rect *rect, bool 
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_scaling(const StaticString &name, Scaling *scaling) const
+bool GuiIonPropertyLoader::load_scaling(const StaticString& name, Scaling* scaling) const
 {
 	if (_bound_object)
 	{
@@ -311,7 +311,7 @@ bool GuiIonPropertyLoader::load_scaling(const StaticString &name, Scaling *scali
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2 *size) const
+bool GuiIonPropertyLoader::load_size(const StaticString& name, Vector2* size) const
 {
 	unsigned loaded = 0x0;
 
@@ -332,7 +332,7 @@ bool GuiIonPropertyLoader::load_size(const StaticString &name, Vector2 *size) co
 	return loaded == 0x3;
 }
 
-SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString &name) const
+SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
 {
 	if (_bound_object)
 	{
@@ -351,7 +351,7 @@ SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString &name) cons
 	return {};
 }
 
-bool GuiIonPropertyLoader::load_state(const StaticString &name, WidgetState *state) const
+bool GuiIonPropertyLoader::load_state(const StaticString& name, WidgetState* state) const
 {
 	if (_bound_object)
 	{
@@ -370,7 +370,7 @@ bool GuiIonPropertyLoader::load_state(const StaticString &name, WidgetState *sta
 	return false;
 }
 
-bool GuiIonPropertyLoader::load_text(const StaticString &name, String *text) const
+bool GuiIonPropertyLoader::load_text(const StaticString& name, String* text) const
 {
 	const StaticString *value;
 
@@ -383,7 +383,7 @@ bool GuiIonPropertyLoader::load_text(const StaticString &name, String *text) con
 	return true;
 }
 
-bool GuiIonPropertyLoader::load_texture(const StaticString &name, SharedPtr<Texture2D> *texture) const
+bool GuiIonPropertyLoader::load_texture(const StaticString& name, SharedPtr<Texture2D>* texture) const
 {
 	if (_bound_object)
 	{
@@ -406,6 +406,41 @@ bool GuiIonPropertyLoader::load_texture(const StaticString &name, SharedPtr<Text
 	}
 
 	return false;
+}
+
+bool GuiIonPropertyLoader::load_translatable(const StaticString& name, String* text) const
+{
+	if (!_bound_object)
+		return false;
+
+	const auto& node = _bound_object->last(name);
+	if (node.size() != 1)
+		return false;
+
+	const auto& value = *node.first();
+	if (value.type() == IonValue::Type::String)
+	{
+		*text = value.string();
+		return true;
+	}
+
+	if (value.type() != IonValue::Type::Object)
+		return false;
+
+	const auto& tr_object = *value.object();
+	if (tr_object.size() != 1)
+		return false;
+
+	const auto& tr_node = *tr_object.begin();
+	if (tr_node.name() != S("tr") || tr_node.size() != 1)
+		return false;
+
+	const auto& tr_value = *tr_node.first();
+	if (tr_value.type() != IonValue::Type::String)
+		return false;
+
+	*text = tr_value.string(); // TODO: Load translation.
+	return true;
 }
 
 void GuiIonPropertyLoader::unbind()
