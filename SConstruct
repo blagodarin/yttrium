@@ -120,6 +120,16 @@ def BuildSources(env, subdir, entries):
 		targets += [target]
 	return targets
 
+def BuildTranslation(env, target, source_dir):
+	i18n_env = Environment(TOOLS = [])
+	if host_platform == 'posix':
+		i18n_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
+	i18n = i18n_env.Command(target, env.Glob('$BUILD/' + source_dir + '/*.ion'), 'bin/ytr $TARGET $SOURCES')
+	Depends(i18n, 'bin/ytr')
+	Precious(i18n)
+	NoClean(i18n)
+	Alias('i18n', i18n)
+
 ################################################################################
 # Targets
 ################################################################################
@@ -289,9 +299,11 @@ Alias('examples', BuildSources(env, 'examples', [
 	'tetrium']))
 Clean('examples', Dir('$BUILD/examples'))
 
+BuildTranslation(env, 'examples/tetrium/i18n/en.ion', 'examples/tetrium/gui')
+
 #===============================================================================
 # All targets
 #===============================================================================
 
-Alias('all', ['yttrium', 'tests', 'tools', 'examples'])
+Alias('all', ['yttrium', 'tests', 'tools', 'examples', 'i18n'])
 Clean('all', Dir(['bin', 'lib', '$BUILD']))
