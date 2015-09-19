@@ -6,8 +6,7 @@
 #include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
 
-#include <cstdio>
-#include <map>
+#include <iostream>
 
 using namespace Yttrium;
 
@@ -60,7 +59,7 @@ int main(int argc, char** argv)
 
 	if (argc < 3)
 	{
-		printf("Usage: ytr TRANSLATION SOURCES...\n");
+		std::cerr << "Usage: ytr TRANSLATION SOURCES..." << std::endl;
 		return 1;
 	}
 
@@ -71,7 +70,7 @@ int main(int argc, char** argv)
 		IonDocument document;
 		if (!document.load(argv[i]))
 		{
-			printf("ERROR: Failed to load source file \"%s\"\n", argv[i]);
+			std::cerr << "ERROR: Failed to load source file \"" << argv[i] << "\"" << std::endl;
 			return 1;
 		}
 		update_translation(translation, document.root());
@@ -79,7 +78,7 @@ int main(int argc, char** argv)
 
 	if (!translation.save(argv[1]))
 	{
-		printf("ERROR: Failed to save translation file \"%s\"\n", argv[1]);
+		std::cerr << "ERROR: Failed to save translation file \"" << argv[1] << "\"" << std::endl;
 		return 1;
 	}
 
