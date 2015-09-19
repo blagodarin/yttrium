@@ -1,8 +1,8 @@
 /// \file
 /// \brief 2D size.
 
-#ifndef __Y_SIZE_H
-#define __Y_SIZE_H
+#ifndef _include_yttrium_size_h_
+#define _include_yttrium_size_h_
 
 namespace Yttrium
 {

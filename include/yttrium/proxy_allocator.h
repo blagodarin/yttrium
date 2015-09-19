@@ -1,8 +1,8 @@
 /// \file
 /// \brief Proxy allocator.
 
-#ifndef __Y_PROXY_ALLOCATOR_H
-#define __Y_PROXY_ALLOCATOR_H
+#ifndef _include_yttrium_proxy_allocator_h_
+#define _include_yttrium_proxy_allocator_h_
 
 #include <yttrium/allocator.h>
 #include <yttrium/static_string.h>

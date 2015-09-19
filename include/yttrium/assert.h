@@ -1,8 +1,8 @@
 /// \file
 /// \brief Run-time assertions.
 
-#ifndef __Y_ASSERT_H
-#define __Y_ASSERT_H
+#ifndef _include_yttrium_assert_h_
+#define _include_yttrium_assert_h_
 
 #include <yttrium/global.h>
 
@@ -37,4 +37,4 @@ namespace Yttrium
 #define Y_VERIFY(expected, actual) \
 	do { if ((expected) != (actual)) Y_ABORT(#expected" != "#actual); } while (false)
 
-#endif // __Y_ASSERT_H
+#endif

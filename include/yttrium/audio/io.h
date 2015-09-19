@@ -1,8 +1,8 @@
 /// \file
 /// \brief Audio input/output facilities.
 
-#ifndef __Y_AUDIO_IO_H
-#define __Y_AUDIO_IO_H
+#ifndef _include_yttrium_audio_io_h_
+#define _include_yttrium_audio_io_h_
 
 #include <yttrium/global.h>
 

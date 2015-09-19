@@ -1,8 +1,8 @@
 /// \file
 /// \brief 2D point.
 
-#ifndef __Y_POINT_H
-#define __Y_POINT_H
+#ifndef _include_yttrium_point_h_
+#define _include_yttrium_point_h_
 
 namespace Yttrium
 {

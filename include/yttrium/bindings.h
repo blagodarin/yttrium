@@ -1,8 +1,8 @@
 /// \file
 /// \brief Input key bindings.
 
-#ifndef __Y_BINDINGS_H
-#define __Y_BINDINGS_H
+#ifndef _include_yttrium_bindings_h_
+#define _include_yttrium_bindings_h_
 
 #include <yttrium/key.h>
 #include <yttrium/script/code.h>

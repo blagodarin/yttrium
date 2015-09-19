@@ -1,5 +1,5 @@
-#ifndef YTTRIUM_EXAMPLES_TETRIUM_GAME_H
-#define YTTRIUM_EXAMPLES_TETRIUM_GAME_H
+#ifndef _examples_tetrium_game_h_
+#define _examples_tetrium_game_h_
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>

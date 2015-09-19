@@ -1,8 +1,8 @@
 /// \file
 /// \brief Rectangles.
 
-#ifndef __Y_RECT_H
-#define __Y_RECT_H
+#ifndef _include_yttrium_rect_h_
+#define _include_yttrium_rect_h_
 
 #include <yttrium/point.h>
 #include <yttrium/size.h>
@@ -354,4 +354,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_RECT_H
+#endif

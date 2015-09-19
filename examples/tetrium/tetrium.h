@@ -1,8 +1,8 @@
 /// \file
 /// \brief %Tetrium logic.
 
-#ifndef YTTRIUM_EXAMPLES_TETRIUM_TETRIUM_H
-#define YTTRIUM_EXAMPLES_TETRIUM_TETRIUM_H
+#ifndef _examples_tetrium_tetrium_h_
+#define _examples_tetrium_tetrium_h_
 
 /// %Tetrium logic.
 namespace Tetrium

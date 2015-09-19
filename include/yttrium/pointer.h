@@ -1,8 +1,8 @@
 /// \file
 /// \brief Smart pointers.
 
-#ifndef __Y_POINTER_H
-#define __Y_POINTER_H
+#ifndef _include_yttrium_pointer_h_
+#define _include_yttrium_pointer_h_
 
 #include <yttrium/allocator.h>
 
@@ -96,4 +96,4 @@ namespace Yttrium
 	}
 }
 
-#endif // __Y_POINTER_H
+#endif

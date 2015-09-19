@@ -1,8 +1,8 @@
 /// \file
 /// \brief %Screen management.
 
-#ifndef __Y_SCREEN_H
-#define __Y_SCREEN_H
+#ifndef _include_yttrium_screen_h_
+#define _include_yttrium_screen_h_
 
 #include <yttrium/global.h>
 
@@ -31,4 +31,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_SCREEN_H
+#endif

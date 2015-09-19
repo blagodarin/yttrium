@@ -1,8 +1,8 @@
 /// \file
 /// \brief Input key declarations.
 
-#ifndef __Y_KEY_H
-#define __Y_KEY_H
+#ifndef _include_yttrium_key_h_
+#define _include_yttrium_key_h_
 
 #include <yttrium/types.h>
 
@@ -228,4 +228,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_KEY_H
+#endif

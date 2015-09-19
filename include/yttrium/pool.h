@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_POOL_H
-#define __Y_POOL_H
+#ifndef _include_yttrium_pool_h_
+#define _include_yttrium_pool_h_
 
 #include <yttrium/base.h>
 #include <yttrium/types.h>
@@ -123,4 +123,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __Y_POOL_H
+#endif

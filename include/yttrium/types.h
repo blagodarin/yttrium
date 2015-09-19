@@ -1,8 +1,8 @@
 /// \file
 /// \brief Basic types.
 
-#ifndef __Y_TYPES_H
-#define __Y_TYPES_H
+#ifndef _include_yttrium_types_h_
+#define _include_yttrium_types_h_
 
 #include <yttrium/global.h>
 
@@ -35,4 +35,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_TYPES_H
+#endif

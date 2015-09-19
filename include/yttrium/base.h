@@ -1,8 +1,8 @@
 /// \file
 /// \brief Base class definitions.
 
-#ifndef __Y_BASE_H
-#define __Y_BASE_H
+#ifndef _include_yttrium_base_h_
+#define _include_yttrium_base_h_
 
 namespace Yttrium
 {

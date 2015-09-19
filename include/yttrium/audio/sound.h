@@ -1,8 +1,8 @@
 /// \file
 /// \brief Sounds.
 
-#ifndef __Y_AUDIO_SOUND_H
-#define __Y_AUDIO_SOUND_H
+#ifndef _include_yttrium_audio_sound_h_
+#define _include_yttrium_audio_sound_h_
 
 #include <yttrium/object.h>
 

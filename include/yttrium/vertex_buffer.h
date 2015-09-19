@@ -1,8 +1,8 @@
 /// \file
 /// \brief Vertex buffers.
 
-#ifndef __Y_VERTEX_BUFFER_H
-#define __Y_VERTEX_BUFFER_H
+#ifndef _include_yttrium_vertex_buffer_h_
+#define _include_yttrium_vertex_buffer_h_
 
 #include <cstddef>
 
@@ -35,4 +35,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_VERTEX_BUFFER_H
+#endif

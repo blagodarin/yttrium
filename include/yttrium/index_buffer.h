@@ -1,8 +1,8 @@
 /// \file
 /// \brief Index buffers.
 
-#ifndef __Y_INDEX_BUFFER_H
-#define __Y_INDEX_BUFFER_H
+#ifndef _include_yttrium_index_buffer_h_
+#define _include_yttrium_index_buffer_h_
 
 #include <cstddef>
 
@@ -33,4 +33,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_INDEX_BUFFER_H
+#endif

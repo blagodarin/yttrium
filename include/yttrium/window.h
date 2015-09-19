@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_WINDOW_H
-#define __Y_WINDOW_H
+#ifndef _include_yttrium_window_h_
+#define _include_yttrium_window_h_
 
 #include <yttrium/key.h>
 #include <yttrium/point.h>

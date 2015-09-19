@@ -1,8 +1,8 @@
 /// \file
 /// \brief Texture font markup.
 
-#ifndef __Y_TEXTURE_FONT_H
-#define __Y_TEXTURE_FONT_H
+#ifndef _include_yttrium_texture_font_h_
+#define _include_yttrium_texture_font_h_
 
 #include <yttrium/base.h>
 #include <yttrium/rect.h>
@@ -51,4 +51,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_TEXTURE_FONT_H
+#endif

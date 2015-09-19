@@ -1,8 +1,8 @@
 /// \file
 /// \brief Global definitions.
 
-#ifndef __Y_GLOBAL_H
-#define __Y_GLOBAL_H
+#ifndef _include_yttrium_global_h_
+#define _include_yttrium_global_h_
 
 /// \def __YTTRIUM_SHARED
 /// \brief %Yttrium shared library compilation "flag".
@@ -173,4 +173,4 @@ namespace Yttrium
 {
 }
 
-#endif // __Y_GLOBAL_H
+#endif

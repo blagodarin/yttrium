@@ -1,8 +1,8 @@
 /// \file
 /// \brief Translation file.
 
-#ifndef __Y_I18N_TRANSLATION_H
-#define __Y_I18N_TRANSLATION_H
+#ifndef _include_yttrium_i18n_translation_h_
+#define _include_yttrium_i18n_translation_h_
 
 #include <yttrium/base.h>
 #include <yttrium/types.h>

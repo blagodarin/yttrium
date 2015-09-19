@@ -1,8 +1,8 @@
 /// \file
 /// \brief %File facilities.
 
-#ifndef __Y_FILE_H
-#define __Y_FILE_H
+#ifndef _include_yttrium_file_h_
+#define _include_yttrium_file_h_
 
 #include <yttrium/static_string.h>
 
@@ -176,4 +176,4 @@ private:
 
 } // namespace Yttrium
 
-#endif // __Y_FILE_H
+#endif

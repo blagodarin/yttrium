@@ -1,8 +1,8 @@
 /// \file
 /// \brief Log manager.
 
-#ifndef __Y_LOG_MANAGER_H
-#define __Y_LOG_MANAGER_H
+#ifndef _include_yttrium_log_manager_h_
+#define _include_yttrium_log_manager_h_
 
 #include <yttrium/global.h>
 

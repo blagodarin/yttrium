@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_BUFFER_H
-#define __Y_BUFFER_H
+#ifndef _include_yttrium_buffer_h_
+#define _include_yttrium_buffer_h_
 
 #include <yttrium/types.h>
 

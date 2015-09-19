@@ -1,8 +1,8 @@
 /// \file
 /// \brief Directory facilities.
 
-#ifndef __Y_DIR_H
-#define __Y_DIR_H
+#ifndef _include_yttrium_dir_h_
+#define _include_yttrium_dir_h_
 
 #include <yttrium/base.h>
 #include <yttrium/static_string.h>
@@ -69,4 +69,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_DIR_H
+#endif

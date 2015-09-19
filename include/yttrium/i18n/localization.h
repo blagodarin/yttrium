@@ -1,8 +1,8 @@
 /// \file
 /// \brief Localization.
 
-#ifndef __Y_I18N_LOCALIZATION_H
-#define __Y_I18N_LOCALIZATION_H
+#ifndef _include_yttrium_i18n_localization_h_
+#define _include_yttrium_i18n_localization_h_
 
 #include <yttrium/global.h>
 

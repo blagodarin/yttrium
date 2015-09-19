@@ -1,8 +1,8 @@
 /// \file
 /// \brief %Allocator.
 
-#ifndef __Y_ALLOCATOR_H
-#define __Y_ALLOCATOR_H
+#ifndef _include_yttrium_allocator_h_
+#define _include_yttrium_allocator_h_
 
 #include <yttrium/global.h>
 
@@ -92,4 +92,4 @@ namespace Yttrium
 
 #define Y_NEW(allocator, Class) new(static_cast<Yttrium::Allocator*>(allocator)->allocate<Class>()) Class
 
-#endif // __Y_ALLOCATOR_H
+#endif

@@ -1,5 +1,5 @@
-#ifndef YTTRIUM_EXAMPLES_RTS_GAME_H
-#define YTTRIUM_EXAMPLES_RTS_GAME_H
+#ifndef _examples_rts_game_h_
+#define _examples_rts_game_h_
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/proxy_allocator.h>

@@ -1,8 +1,8 @@
 /// \file
 /// \brief Log writer.
 
-#ifndef __Y_LOG_H
-#define __Y_LOG_H
+#ifndef _include_yttrium_log_h_
+#define _include_yttrium_log_h_
 
 #include <yttrium/string.h>
 

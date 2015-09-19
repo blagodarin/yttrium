@@ -1,8 +1,8 @@
 /// \file
 /// \brief GUI.
 
-#ifndef __Y_GUI_H
-#define __Y_GUI_H
+#ifndef _include_yttrium_gui_h_
+#define _include_yttrium_gui_h_
 
 #include <cstddef>
 

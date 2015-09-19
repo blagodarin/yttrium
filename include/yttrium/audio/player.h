@@ -1,8 +1,8 @@
 /// \file
 /// \brief Audio player.
 
-#ifndef __Y_AUDIO_PLAYER_H
-#define __Y_AUDIO_PLAYER_H
+#ifndef _include_yttrium_audio_player_h_
+#define _include_yttrium_audio_player_h_
 
 #include <yttrium/audio/io.h>
 

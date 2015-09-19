@@ -1,8 +1,8 @@
 /// \file
 /// \brief Text strings.
 
-#ifndef __Y_STRING_H
-#define __Y_STRING_H
+#ifndef _include_yttrium_string_h_
+#define _include_yttrium_string_h_
 
 #include <yttrium/static_string.h>
 
@@ -626,4 +626,4 @@ String &operator <<(String &left, double right)
 
 } // namespace Yttrium
 
-#endif // __Y_STRING_H
+#endif

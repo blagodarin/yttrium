@@ -1,8 +1,8 @@
 /// \file
 /// \brief %Image input/output facilities.
 
-#ifndef __Y_IMAGE_H
-#define __Y_IMAGE_H
+#ifndef _include_yttrium_image_h_
+#define _include_yttrium_image_h_
 
 #include <yttrium/buffer.h>
 #include <yttrium/size.h>

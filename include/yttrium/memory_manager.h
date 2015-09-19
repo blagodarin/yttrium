@@ -1,8 +1,8 @@
 /// \file
 /// \brief Memory manager.
 
-#ifndef __Y_MEMORY_MANAGER_H
-#define __Y_MEMORY_MANAGER_H
+#ifndef _include_yttrium_memory_manager_h_
+#define _include_yttrium_memory_manager_h_
 
 #include <yttrium/base.h>
 #include <yttrium/static_string.h>
@@ -28,4 +28,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_MEMORY_MANAGER_H
+#endif

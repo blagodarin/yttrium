@@ -1,8 +1,8 @@
 /// \file
 /// \brief Stack memory allocation.
 
-#ifndef __Y_ALLOCA_H
-#define __Y_ALLOCA_H
+#ifndef _include_yttrium_alloca_h_
+#define _include_yttrium_alloca_h_
 
 #include <yttrium/global.h>
 

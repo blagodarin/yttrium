@@ -1,8 +1,8 @@
 /// \file
 /// \brief Date and time.
 
-#ifndef __Y_DATE_TIME_H
-#define __Y_DATE_TIME_H
+#ifndef _include_yttrium_date_time_h_
+#define _include_yttrium_date_time_h_
 
 #include <yttrium/global.h>
 
@@ -26,4 +26,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_DATE_TIME_H
+#endif

@@ -1,8 +1,8 @@
 /// \file
 /// \brief Geometry/color vectors.
 
-#ifndef __Y_VECTOR_H
-#define __Y_VECTOR_H
+#ifndef _include_yttrium_vector_h_
+#define _include_yttrium_vector_h_
 
 #include <yttrium/global.h>
 #include <yttrium/point.h>
@@ -320,4 +320,4 @@ namespace Yttrium
 	}
 }
 
-#endif // __Y_VECTOR_H
+#endif

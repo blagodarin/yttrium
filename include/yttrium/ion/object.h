@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_ION_OBJECT_H
-#define __Y_ION_OBJECT_H
+#ifndef _include_yttrium_ion_object_h_
+#define _include_yttrium_ion_object_h_
 
 #include <yttrium/global.h>
 

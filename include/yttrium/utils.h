@@ -1,8 +1,8 @@
 /// \file
 /// \brief Miscellaneous facilities.
 
-#ifndef __Y_UTILS_H
-#define __Y_UTILS_H
+#ifndef _include_yttrium_utils_h_
+#define _include_yttrium_utils_h_
 
 #include <yttrium/global.h>
 
@@ -43,4 +43,4 @@ namespace Yttrium
 	}
 }
 
-#endif // __Y_UTILS_H
+#endif

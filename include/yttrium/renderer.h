@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_RENDERER_H
-#define __Y_RENDERER_H
+#ifndef _include_yttrium_renderer_h_
+#define _include_yttrium_renderer_h_
 
 #include <yttrium/base.h>
 #include <yttrium/index_buffer.h>
@@ -190,4 +190,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_RENDERER_H
+#endif

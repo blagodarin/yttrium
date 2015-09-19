@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_MATRIX_H
-#define __Y_MATRIX_H
+#ifndef _include_yttrium_matrix_h_
+#define _include_yttrium_matrix_h_
 
 #include <yttrium/global.h>
 

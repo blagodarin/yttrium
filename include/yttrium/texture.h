@@ -1,8 +1,8 @@
 /// \file
 /// \brief Textures.
 
-#ifndef __Y_TEXTURE_H
-#define __Y_TEXTURE_H
+#ifndef _include_yttrium_texture_h_
+#define _include_yttrium_texture_h_
 
 #include <yttrium/object.h>
 #include <yttrium/rect.h>
@@ -76,4 +76,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_TEXTURE_H
+#endif

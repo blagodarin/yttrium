@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_ION_NODE_H
-#define __Y_ION_NODE_H
+#ifndef _include_yttrium_ion_node_h_
+#define _include_yttrium_ion_node_h_
 
 #include <yttrium/ion/list.h>
 #include <yttrium/string.h>

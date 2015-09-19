@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef __Y_PACKAGE_H
-#define __Y_PACKAGE_H
+#ifndef _include_yttrium_package_h_
+#define _include_yttrium_package_h_
 
 #include <yttrium/base.h>
 #include <yttrium/file.h>
@@ -101,4 +101,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_PACKAGE_H
+#endif

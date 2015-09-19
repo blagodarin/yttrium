@@ -2,8 +2,8 @@
 /// \brief %Margins.
 /// \note %Margins[F] constructor parameter order mimics that of CSS border-image-width property.
 
-#ifndef __Y_MARGINS_H
-#define __Y_MARGINS_H
+#ifndef _include_yttrium_margins_h_
+#define _include_yttrium_margins_h_
 
 #include <yttrium/global.h>
 
@@ -129,4 +129,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_MARGIN_H
+#endif

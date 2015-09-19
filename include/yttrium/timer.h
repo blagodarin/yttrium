@@ -1,8 +1,8 @@
 /// \file
 /// \brief Timer.
 
-#ifndef __Y_TIMER_H
-#define __Y_TIMER_H
+#ifndef _include_yttrium_timer_h_
+#define _include_yttrium_timer_h_
 
 #include <yttrium/global.h>
 
@@ -61,4 +61,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_TIMER_H
+#endif

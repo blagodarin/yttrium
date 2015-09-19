@@ -6,8 +6,8 @@
 // a static string from a constant static string, and the former would point
 // to the latter's data, but it won't be constant anymore,
 
-#ifndef __Y_STATIC_STRING_H
-#define __Y_STATIC_STRING_H
+#ifndef _include_yttrium_static_string_h_
+#define _include_yttrium_static_string_h_
 
 #include <yttrium/alloca.h>
 #include <yttrium/types.h>
@@ -249,4 +249,4 @@ public:
 
 } // namespace Yttrium
 
-#endif // __Y_STATIC_STRING_H
+#endif

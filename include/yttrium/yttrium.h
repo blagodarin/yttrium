@@ -1,8 +1,8 @@
 /// \file
 /// \brief Universal header.
 
-#ifndef __Y_YTTRIUM_H
-#define __Y_YTTRIUM_H
+#ifndef _include_yttrium_yttrium_h_
+#define _include_yttrium_yttrium_h_
 
 #include <yttrium/alloca.h>
 #include <yttrium/allocator.h>
@@ -20,6 +20,8 @@
 #include <yttrium/global.h>
 #include <yttrium/gpu_program.h>
 #include <yttrium/gui.h>
+#include <yttrium/i18n/localization.h>
+#include <yttrium/i18n/translation.h>
 #include <yttrium/image.h>
 #include <yttrium/index_buffer.h>
 #include <yttrium/ion/document.h>
