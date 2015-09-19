@@ -1,8 +1,8 @@
 /// \file
 /// \brief Script context.
 
-#ifndef __Y_SCRIPT_CONTEXT_H
-#define __Y_SCRIPT_CONTEXT_H
+#ifndef _include_yttrium_script_context_h_
+#define _include_yttrium_script_context_h_
 
 #include <yttrium/pool.h>
 #include <yttrium/script/args.h>
@@ -67,7 +67,7 @@ namespace Yttrium
 		/// \param result Command result.
 		/// \param args Command arguments.
 		/// \return \c true if the command was succesfully called.
-		bool call(const StaticString& name, String* result, const ScriptArgs &args);
+		bool call(const StaticString& name, String* result, const ScriptArgs& args);
 
 		/// Define a command.
 		/// \param name Command name.
@@ -77,13 +77,13 @@ namespace Yttrium
 		void define(const StaticString& name, size_t min_args, size_t max_args, const Command& command);
 
 		///
-		void define(const StaticString &name, size_t args, const Command& command)
+		void define(const StaticString& name, size_t args, const Command& command)
 		{
 			define(name, args, args, command);
 		}
 
 		///
-		void define(const StaticString &name, const Command& command)
+		void define(const StaticString& name, const Command& command)
 		{
 			define(name, 0, 0, command);
 		}

@@ -45,7 +45,7 @@ namespace Yttrium
 
 			Private* _private;
 
-			Iterator(Private *private_)
+			Iterator(Private* private_)
 				: _private(private_)
 			{
 			}

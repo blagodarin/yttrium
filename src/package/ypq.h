@@ -1,5 +1,5 @@
-#ifndef __PACKAGE_YPQ_H
-#define __PACKAGE_YPQ_H
+#ifndef _src_package_ypq_h_
+#define _src_package_ypq_h_
 
 #include <yttrium/string.h>
 
@@ -24,11 +24,7 @@ namespace Yttrium
 
 	private:
 
-		typedef std::map<String, uint64_t> Index;
-
-	private:
-
-		Index _index;
+		std::map<String, uint64_t> _index;
 	};
 
 	class YpqWriter: public PackageWriter::Private
@@ -54,14 +50,12 @@ namespace Yttrium
 			uint64_t offset;
 			String   name;
 
-			Entry(uint64_t offset, const String &name)
+			Entry(uint64_t offset, const String& name)
 				: offset(offset)
 				, name(name)
 			{
 			}
 		};
-
-		typedef std::vector<Entry> Entries;
 
 	private:
 
@@ -70,8 +64,8 @@ namespace Yttrium
 	private:
 
 		uint64_t _last_offset;
-		Entries  _entries;
+		std::vector<Entry> _entries;
 	};
 }
 
-#endif // __PACKAGE_YPQ_H
+#endif

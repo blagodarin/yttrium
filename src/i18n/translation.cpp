@@ -51,10 +51,10 @@ namespace Yttrium
 		return document.save(file_name);
 	}
 
-	String Translation::Private::translate(const String& source) const
+	String Translation::Private::translate(const StaticString& source) const
 	{
-		const auto i = _translations.find(source);
-		return i != _translations.end() && !i->second.is_empty() ? i->second : source;
+		const auto i = _translations.find(String(source, ByReference(), _allocator));
+		return i != _translations.end() && !i->second.is_empty() ? i->second : String(source, _allocator);
 	}
 
 	Y_IMPLEMENT_UNIQUE(Translation);

@@ -204,7 +204,7 @@ void Game::run()
 		}
 	}
 
-	if (!_window->gui().load("examples/tetrium/gui/gui.ion"))
+	if (!_window->gui().load("examples/tetrium/data/gui.ion"))
 		return;
 
 	Log() << "Starting";

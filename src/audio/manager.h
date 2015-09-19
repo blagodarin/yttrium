@@ -1,5 +1,5 @@
-#ifndef __AUDIO_MANAGER_H
-#define __AUDIO_MANAGER_H
+#ifndef _src_audio_manager_h_
+#define _src_audio_manager_h_
 
 #include <yttrium/audio/manager.h>
 
@@ -43,4 +43,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_MANAGER_H
+#endif

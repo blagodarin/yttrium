@@ -1,5 +1,5 @@
-#ifndef SRC_IMAGE_DDS_H
-#define SRC_IMAGE_DDS_H
+#ifndef _src_image_dds_h_
+#define _src_image_dds_h_
 
 #include "image.h"
 

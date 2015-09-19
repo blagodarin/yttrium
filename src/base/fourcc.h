@@ -1,5 +1,5 @@
-#ifndef __BASE_FOURCC_H
-#define __BASE_FOURCC_H
+#ifndef _src_base_fourcc_h_
+#define _src_base_fourcc_h_
 
 #include <cstdint>
 
@@ -32,4 +32,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __BASE_FOURCC_H
+#endif

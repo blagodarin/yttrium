@@ -111,6 +111,12 @@ else:
 # Utility functions
 #===============================================================================
 
+def BuildExample(env, name):
+	build_path = '$BUILD/examples/' + name
+	target = env.Program('bin/' + name, env.Glob(build_path + '/src/*.cpp'))
+	env.Clean(target, env.Dir(build_path))
+	return target
+
 def BuildSources(env, subdir, entries):
 	targets = []
 	for entry in entries:
@@ -120,15 +126,15 @@ def BuildSources(env, subdir, entries):
 		targets += [target]
 	return targets
 
-def BuildTranslation(env, target, source_dir):
-	i18n_env = Environment(TOOLS = [])
+def BuildTranslation(env, translation, source_dir):
+	target_env = Environment(TOOLS = [])
 	if host_platform == 'posix':
-		i18n_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
-	i18n = i18n_env.Command(target, env.Glob('$BUILD/' + source_dir + '/*.ion'), 'bin/ytr $TARGET $SOURCES')
-	Depends(i18n, ['bin/ytr', 'yttrium'])
-	Precious(i18n)
-	NoClean(i18n)
-	Alias('i18n', i18n)
+		target_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
+	target = target_env.Command(translation, env.Glob('$BUILD/' + source_dir + '/*.ion'), 'bin/ytr $TARGET $SOURCES')
+	Depends(target, ['bin/ytr', 'yttrium'])
+	Precious(target)
+	NoClean(target)
+	return target
 
 ################################################################################
 # Targets
@@ -295,16 +301,17 @@ Clean('tools', Dir('$BUILD/tools'))
 # Examples
 #-------------------------------------------------------------------------------
 
-Alias('examples', BuildSources(env, 'examples', [
-	'rts',
-	'tetrium']))
-Clean('examples', Dir('$BUILD/examples'))
+rts = BuildExample(env, 'rts')
 
-BuildTranslation(env, 'examples/tetrium/i18n/en.ion', 'examples/tetrium/gui')
+tetrium = BuildExample(env, 'tetrium')
+Depends(tetrium, BuildTranslation(env, 'examples/tetrium/data/i18n/en.ion', 'examples/tetrium/data/gui'))
+
+Alias('examples', [rts, tetrium])
+Clean('examples', Dir('$BUILD/examples'))
 
 #===============================================================================
 # All targets
 #===============================================================================
 
-Alias('all', ['yttrium', 'tests', 'tools', 'examples', 'i18n'])
+Alias('all', ['yttrium', 'tests', 'tools', 'examples'])
 Clean('all', Dir(['bin', 'lib', '$BUILD']))

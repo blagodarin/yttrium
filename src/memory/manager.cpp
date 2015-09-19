@@ -53,7 +53,7 @@ namespace Yttrium
 
 	static char _memory_manager_private[sizeof(MemoryManager::Private)];
 
-	MemoryManager::MemoryManager(const StaticString &default_name)
+	MemoryManager::MemoryManager(const StaticString& default_name)
 		: _private(new(_memory_manager_private) Private(this, default_name))
 	{
 	}

@@ -1,8 +1,8 @@
 /// \file
 /// \brief Script value.
 
-#ifndef __Y_SCRIPT_VALUE_H
-#define __Y_SCRIPT_VALUE_H
+#ifndef _include_yttrium_script_value_h_
+#define _include_yttrium_script_value_h_
 
 #include <yttrium/string.h>
 

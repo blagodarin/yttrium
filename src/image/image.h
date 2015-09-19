@@ -1,5 +1,5 @@
-#ifndef SRC_IMAGE_IMAGE_H
-#define SRC_IMAGE_IMAGE_H
+#ifndef _src_image_image_h_
+#define _src_image_image_h_
 
 #include <yttrium/image.h>
 

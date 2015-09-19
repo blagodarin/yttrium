@@ -1,5 +1,5 @@
-#ifndef __ION_DOCUMENT_H
-#define __ION_DOCUMENT_H
+#ifndef _src_ion_document_h_
+#define _src_ion_document_h_
 
 #include <yttrium/ion/document.h>
 

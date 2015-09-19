@@ -1,8 +1,5 @@
-/// \file
-/// \brief
-
-#ifndef __RENDERER_GL_GPU_PROGRAM_H
-#define __RENDERER_GL_GPU_PROGRAM_H
+#ifndef _src_renderer_gl_gpu_program_h_
+#define _src_renderer_gl_gpu_program_h_
 
 #include <yttrium/gpu_program.h>
 

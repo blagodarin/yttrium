@@ -15,7 +15,7 @@
 
 using namespace Yttrium;
 
-class Game: public WindowCallbacks
+class Game : public WindowCallbacks
 {
 public:
 

@@ -1,5 +1,5 @@
-#ifndef SRC_IMAGE_TGA_H
-#define SRC_IMAGE_TGA_H
+#ifndef _src_image_tga_h_
+#define _src_image_tga_h_
 
 #include "image.h"
 

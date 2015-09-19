@@ -12,7 +12,7 @@ void write_color_gradient(File& file, bool with_alpha)
 {
 	Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
 
-	uint8_t* data = static_cast<uint8_t*>(buffer.data());
+	auto data = static_cast<uint8_t*>(buffer.data());
 
 	for (size_t y = 0; y < 16; ++y)
 	{
@@ -57,7 +57,7 @@ void write_color_intensity(File& file)
 {
 	Buffer buffer(16 * 16 * 4);
 
-	uint8_t* data = static_cast<uint8_t*>(buffer.data());
+	auto data = static_cast<uint8_t*>(buffer.data());
 
 	for (size_t y = 0; y < 16; ++y)
 	{
@@ -79,7 +79,7 @@ void write_grayscale_intensity(File& file)
 {
 	Buffer buffer(16 * 16);
 
-	uint8_t* data = static_cast<uint8_t *>(buffer.data());
+	auto data = static_cast<uint8_t*>(buffer.data());
 
 	for (size_t y = 0; y < 16; ++y)
 		for (size_t x = 0; x < 16; ++x)

@@ -1,12 +1,12 @@
-#ifndef __GUI_WIDGETS_LABEL_H
-#define __GUI_WIDGETS_LABEL_H
+#ifndef _src_gui_widgets_label_h_
+#define _src_gui_widgets_label_h_
 
 #include "../property.h"
 #include "widget.h"
 
 namespace Yttrium
 {
-	class Label: public Widget
+	class Label : public Widget
 	{
 	public:
 

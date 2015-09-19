@@ -86,7 +86,7 @@ namespace Yttrium
 		return file.write(buffer.text(), buffer.size()) == buffer.size() && file.flush();
 	}
 
-	IonDocument& IonDocument::operator=(IonDocument&& document)
+	IonDocument& IonDocument::operator=(IonDocument&& document) noexcept
 	{
 		if (_private)
 			Y_DELETE(_private->_allocator, _private);

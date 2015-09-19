@@ -1,7 +1,6 @@
 #include "scene.h"
 
 #include <yttrium/allocator.h>
-#include <yttrium/assert.h>
 #include <yttrium/renderer.h>
 #include "gui.h"
 #include "widgets/button.h"
@@ -9,6 +8,8 @@
 #include "widgets/image.h"
 #include "widgets/input.h"
 #include "widgets/label.h"
+
+#include <cassert>
 
 namespace Yttrium
 {
@@ -84,7 +85,7 @@ namespace Yttrium
 						_left_click_widget = _mouse_widget;
 						if (_mouse_widget->flags() & Widget::CanHaveFocus && _mouse_widget != _focus_widget)
 						{
-							Y_ASSERT(!_focus_widget);
+							assert(!_focus_widget);
 							_focus_widget = _mouse_widget;
 							_focus_widget->set_focused(true);
 						}
@@ -224,7 +225,7 @@ namespace Yttrium
 
 		default:
 
-			Y_ASSERT(false);
+			assert(false);
 			// Fallthrough.
 
 		case Scaling::Stretch:

@@ -1,5 +1,5 @@
-#ifndef __RENDERER_GL_RENDERER_H
-#define __RENDERER_GL_RENDERER_H
+#ifndef _src_renderer_gl_renderer_h_
+#define _src_renderer_gl_renderer_h_
 
 #include "../renderer.h"
 #include "gl.h"

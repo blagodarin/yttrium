@@ -1,5 +1,5 @@
-#ifndef __AUDIO_SOUND_H
-#define __AUDIO_SOUND_H
+#ifndef _src_audio_sound_h_
+#define _src_audio_sound_h_
 
 #include <yttrium/audio/sound.h>
 
@@ -27,4 +27,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_SOUND_H
+#endif

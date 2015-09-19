@@ -5,6 +5,8 @@
 
 #include "backend/openal/backend.h"
 
+#include <cassert>
+
 namespace Yttrium
 {
 	std::vector<StaticString> AudioManager::backends()
@@ -52,7 +54,7 @@ namespace Yttrium
 
 	AudioManagerImpl::~AudioManagerImpl()
 	{
-		Y_ASSERT(_sounds.empty());
+		assert(_sounds.empty());
 	}
 
 	StaticString AudioManagerImpl::backend() const

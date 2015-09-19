@@ -1,5 +1,5 @@
-#ifndef __PACKAGE_PACKAGE_H
-#define __PACKAGE_PACKAGE_H
+#ifndef _src_package_package_h_
+#define _src_package_package_h_
 
 #include <yttrium/package.h>
 
@@ -7,59 +7,57 @@
 
 namespace Yttrium
 {
-
-struct PackedFile
-{
-	File*    file;
-	uint64_t size;
-
-	PackedFile(File* file = nullptr, uint64_t size = 0)
-		: file(file)
-		, size(size)
+	struct PackedFile
 	{
-	}
-};
+		File*    file;
+		uint64_t size;
 
-class Y_PRIVATE PackageReader::Private: public PrivateBase<PackageReader::Private>
-{
-public:
+		PackedFile(File* file = nullptr, uint64_t size = 0)
+			: file(file)
+			, size(size)
+		{
+		}
+	};
 
-	Private(const StaticString& name, Allocator* allocator)
-		: PrivateBase(allocator)
-		, _file(name, File::Read, allocator)
+	class Y_PRIVATE PackageReader::Private: public PrivateBase<PackageReader::Private>
 	{
-	}
+	public:
 
-	virtual ~Private() {}
+		Private(const StaticString& name, Allocator* allocator)
+			: PrivateBase(allocator)
+			, _file(name, File::Read, allocator)
+		{
+		}
 
-	virtual bool open() = 0;
-	virtual PackedFile open_file(const StaticString& name) = 0;
+		virtual ~Private() {}
 
-public:
+		virtual bool open() = 0;
+		virtual PackedFile open_file(const StaticString& name) = 0;
 
-	File _file;
-};
+	public:
 
-class Y_PRIVATE PackageWriter::Private: public PrivateBase<PackageWriter::Private>
-{
-public:
+		File _file;
+	};
 
-	Private(const StaticString& name, unsigned mode, Allocator* allocator)
-		: PrivateBase(allocator)
-		, _file(name, mode, allocator)
+	class Y_PRIVATE PackageWriter::Private: public PrivateBase<PackageWriter::Private>
 	{
-	}
+	public:
 
-	virtual ~Private() {}
+		Private(const StaticString& name, unsigned mode, Allocator* allocator)
+			: PrivateBase(allocator)
+			, _file(name, mode, allocator)
+		{
+		}
 
-	virtual bool open(PackageWriter::Mode mode);
-	virtual PackedFile open_file(const StaticString& name) = 0;
+		virtual ~Private() {}
 
-public:
+		virtual bool open(PackageWriter::Mode mode);
+		virtual PackedFile open_file(const StaticString& name) = 0;
 
-	File _file;
-};
+	public:
 
-} // namespace Yttrium
+		File _file;
+	};
+}
 
-#endif // __PACKAGE_PACKAGE_H
+#endif

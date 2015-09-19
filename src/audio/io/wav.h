@@ -1,5 +1,5 @@
-#ifndef __AUDIO_IO_WAV_H
-#define __AUDIO_IO_WAV_H
+#ifndef _src_audio_io_wav_h_
+#define _src_audio_io_wav_h_
 
 #include "reader.h"
 
@@ -7,7 +7,7 @@ namespace Yttrium
 {
 	struct WavChunkHeader;
 
-	class WavReader: public AudioReaderImpl
+	class WavReader : public AudioReaderImpl
 	{
 	public:
 
@@ -27,4 +27,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_IO_WAV_H
+#endif

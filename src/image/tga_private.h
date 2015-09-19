@@ -1,5 +1,5 @@
-#ifndef SRC_IMAGE_TGAPRIVATE_H
-#define SRC_IMAGE_TGAPRIVATE_H
+#ifndef _src_image_tga_private_h_
+#define _src_image_tga_private_h_
 
 #include <cstdint>
 

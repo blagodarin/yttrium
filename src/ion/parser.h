@@ -1,5 +1,5 @@
-#ifndef __ION_PARSER_H
-#define __ION_PARSER_H
+#ifndef _src_ion_parser_h_
+#define _src_ion_parser_h_
 
 #include <vector>
 

@@ -20,6 +20,7 @@ namespace Yttrium
 		///
 		static Pointer<LogManager> create(const StaticString& file_name, Allocator* allocator = nullptr);
 
+		LogManager() = default;
 		virtual ~LogManager() = default;
 	};
 }

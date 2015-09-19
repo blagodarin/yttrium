@@ -11,7 +11,7 @@ namespace Yttrium
 {
 	class String;
 
-	class Translation::Private : public PrivateBase<Translation::Private>
+	class Y_PRIVATE Translation::Private : public PrivateBase<Translation::Private>
 	{
 	public:
 
@@ -20,7 +20,7 @@ namespace Yttrium
 		void add(const StaticString& source);
 		bool load(const StaticString& file_name);
 		bool save(const StaticString& file_name) const;
-		String translate(const String& source) const;
+		String translate(const StaticString& source) const;
 
 	private:
 

@@ -1,7 +1,5 @@
-#ifndef __BASE_INSTANCE_GUARD_H
-#define __BASE_INSTANCE_GUARD_H
-
-#include <yttrium/assert.h>
+#ifndef _src_base_instance_guard_h_
+#define _src_base_instance_guard_h_
 
 #include <mutex>
 
@@ -24,7 +22,8 @@ namespace Yttrium
 		InstanceGuard(T* pointer, const char* message)
 		{
 			std::lock_guard<std::mutex> lock(instance_mutex);
-			Y_ABORT_IF(instance, message);
+			if (instance)
+				throw std::logic_error(message);
 			instance = pointer;
 		}
 
@@ -42,4 +41,4 @@ namespace Yttrium
 	T* InstanceGuard<T>::instance = nullptr;
 }
 
-#endif // __BASE_INSTANCE_GUARD_H
+#endif

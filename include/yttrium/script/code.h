@@ -1,8 +1,8 @@
 /// \file
 /// \brief Parsed script code.
 
-#ifndef __Y_SCRIPT_CODE_H
-#define __Y_SCRIPT_CODE_H
+#ifndef _include_yttrium_script_code_h_
+#define _include_yttrium_script_code_h_
 
 #include <yttrium/base.h>
 #include <yttrium/global.h>

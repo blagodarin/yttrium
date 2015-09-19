@@ -1,5 +1,5 @@
-#ifndef SRC_IMAGE_PNG_PNG_H
-#define SRC_IMAGE_PNG_PNG_H
+#ifndef _src_image_png_png_h_
+#define _src_image_png_png_h_
 
 #include "../image.h"
 

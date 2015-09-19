@@ -1,5 +1,5 @@
-#ifndef __GUI_WIDGETS_BUTTON_H
-#define __GUI_WIDGETS_BUTTON_H
+#ifndef _src_gui_widgets_button_h_
+#define _src_gui_widgets_button_h_
 
 #include <yttrium/script/code.h>
 #include "../property.h"

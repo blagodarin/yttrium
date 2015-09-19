@@ -1,5 +1,5 @@
-#ifndef __GUI_PROPERTY_LOADER_H
-#define __GUI_PROPERTY_LOADER_H
+#ifndef _src_gui_property_loader_h_
+#define _src_gui_property_loader_h_
 
 #include "types.h"
 

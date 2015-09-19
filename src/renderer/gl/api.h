@@ -1,11 +1,11 @@
-#ifndef __RENDERER_GL_API_H
-#define __RENDERER_GL_API_H
+#ifndef _src_renderer_gl_api_h_
+#define _src_renderer_gl_api_h_
 
 namespace Yttrium
 {
 	namespace Gl
 	{
-		bool check_extension(const char *list, const char *name);
+		bool check_extension(const char* list, const char* name);
 	}
 }
 
@@ -29,7 +29,7 @@ namespace Yttrium
 #		define GLINTEGERV(name, count) GLint name[count];
 #		define GLFLOAT(name) GLfloat name;
 #		define GLFLOATV(name, count) GLfloat name[count];
-#		define GLSTRING(name) const GLubyte *name;
+#		define GLSTRING(name) const GLubyte* name;
 #	else
 #		define GLINTEGER(name)
 #		define GLINTEGERV(name, count)
@@ -74,7 +74,7 @@ namespace Yttrium
 #	ifndef GLAPI_DYNAMIC_GL
 #		define GLFUNCTION(name, ret, attr) GLAPI_CONTEXT name = gl##name;
 #	else
-#		define GLFUNCTION(name, ret, attr) *(Gl::Address *)(&GLAPI_CONTEXT name) = GLAPI_FUNCTION("gl"#name);
+#		define GLFUNCTION(name, ret, attr) *(Gl::Address*)(&GLAPI_CONTEXT name) = GLAPI_FUNCTION("gl"#name);
 #	endif
 #	ifndef GLAPI_NO_DATA
 #		ifndef GLAPI_DYNAMIC_GL
@@ -91,9 +91,9 @@ namespace Yttrium
 #			define GLSTRING(name) GLAPI_CONTEXT name = GLAPI_CONTEXT GetString(GL_##name);
 #		endif
 #	endif
-#	define GLEXTENSION(name) if ((GLAPI_CONTEXT name = GLAPI_CHECK_EXTENSION((const char *) GLAPI_CONTEXT EXTENSIONS, "GL_"#name))) {
+#	define GLEXTENSION(name) if ((GLAPI_CONTEXT name = GLAPI_CHECK_EXTENSION((const char*) GLAPI_CONTEXT EXTENSIONS, "GL_"#name))) {
 #	define GLEND }
-#	define GLEXTFUNC(name, ret, attr) *(Gl::Address *)(&GLAPI_CONTEXT name) = GLAPI_EXTFUNC("gl"#name);
+#	define GLEXTFUNC(name, ret, attr) *(Gl::Address*)(&GLAPI_CONTEXT name) = GLAPI_EXTFUNC("gl"#name);
 #
 #endif
 
@@ -277,8 +277,8 @@ GLEXTENSION(ARB_texture_rectangle) // Core OpenGL 3.1 and higher.
 
 GLEXTENSION(ARB_vertex_array_object) // Core OpenGL 2.0 and higher.
 	GLEXTFUNC(BindVertexArray, GLvoid, (GLuint))
-	GLEXTFUNC(DeleteVertexArrays, GLvoid, (GLsizei, const GLuint *))
-	GLEXTFUNC(GenVertexArrays, GLvoid, (GLsizei, GLuint *))
+	GLEXTFUNC(DeleteVertexArrays, GLvoid, (GLsizei, const GLuint*))
+	GLEXTFUNC(GenVertexArrays, GLvoid, (GLsizei, GLuint*))
 	GLEXTFUNC(IsVertexArray, GLboolean, (GLuint))
 	GLEND
 
@@ -287,18 +287,18 @@ GLEXTENSION(ARB_framebuffer_object) // Core OpenGL 3.0 and higher.
 	GLEXTFUNC(BindRenderbuffer, GLvoid, (GLenum, GLuint))
 	GLEXTFUNC(BlitFramebuffer, GLvoid, (GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLbitfield, GLenum))
 	GLEXTFUNC(CheckFramebufferStatus, GLenum, (GLenum))
-	GLEXTFUNC(DeleteFramebuffers, GLvoid, (GLsizei, const GLuint *))
-	GLEXTFUNC(DeleteRenderbuffers, GLvoid, (GLsizei, const GLuint *))
+	GLEXTFUNC(DeleteFramebuffers, GLvoid, (GLsizei, const GLuint*))
+	GLEXTFUNC(DeleteRenderbuffers, GLvoid, (GLsizei, const GLuint*))
 	GLEXTFUNC(FramebufferRenderbuffer, GLvoid, (GLenum, GLenum, GLenum, GLuint))
 	GLEXTFUNC(FramebufferTexture1D, GLvoid, (GLenum, GLenum, GLenum, GLuint, GLint))
 	GLEXTFUNC(FramebufferTexture2D, GLvoid, (GLenum, GLenum, GLenum, GLuint, GLint))
 	GLEXTFUNC(FramebufferTexture3D, GLvoid, (GLenum, GLenum, GLenum, GLuint, GLint, GLint))
 	GLEXTFUNC(FramebufferTextureLayer, GLvoid, (GLenum, GLenum, GLuint, GLint, GLint))
-	GLEXTFUNC(GenFramebuffers, GLvoid, (GLsizei, GLuint *))
-	GLEXTFUNC(GenRenderbuffers, GLvoid, (GLsizei, GLuint *))
+	GLEXTFUNC(GenFramebuffers, GLvoid, (GLsizei, GLuint*))
+	GLEXTFUNC(GenRenderbuffers, GLvoid, (GLsizei, GLuint*))
 	GLEXTFUNC(GenerateMipmap, GLvoid, (GLenum))
-	GLEXTFUNC(GetFramebufferAttachmentParameteriv, GLvoid, (GLenum, GLenum, GLenum, GLint *))
-	GLEXTFUNC(GetRenderbufferParameteriv, GLvoid, (GLenum, GLenum, GLint *))
+	GLEXTFUNC(GetFramebufferAttachmentParameteriv, GLvoid, (GLenum, GLenum, GLenum, GLint*))
+	GLEXTFUNC(GetRenderbufferParameteriv, GLvoid, (GLenum, GLenum, GLint*))
 	GLEXTFUNC(IsFramebuffer, GLboolean, (GLuint))
 	GLEXTFUNC(IsRenderbuffer, GLboolean, (GLuint))
 	GLEXTFUNC(RenderbufferStorage, GLvoid, (GLenum, GLenum, GLsizei, GLsizei))

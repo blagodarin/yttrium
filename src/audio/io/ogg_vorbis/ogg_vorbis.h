@@ -1,5 +1,5 @@
-#ifndef __AUDIO_IO_OGG_VORBIS_H
-#define __AUDIO_IO_OGG_VORBIS_H
+#ifndef _src_audio_io_ogg_vorbis_h_
+#define _src_audio_io_ogg_vorbis_h_
 
 #include "../reader.h"
 
@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	class OggVorbisReader: public AudioReaderImpl
+	class OggVorbisReader : public AudioReaderImpl
 	{
 	public:
 
@@ -24,4 +24,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_IO_OGG_VORBIS_H
+#endif

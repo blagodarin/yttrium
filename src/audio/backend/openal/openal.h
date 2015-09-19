@@ -1,5 +1,5 @@
-#ifndef __AUDIO_BACKEND_OPENAL_OPENAL_H
-#define __AUDIO_BACKEND_OPENAL_OPENAL_H
+#ifndef _src_audio_backend_openal_openal_h_
+#define _src_audio_backend_openal_openal_h_
 
 #include <yttrium/global.h>
 
@@ -10,4 +10,4 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#endif // __AUDIO_BACKEND_OPENAL_OPENAL_H
+#endif

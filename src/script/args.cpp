@@ -6,7 +6,7 @@ namespace Yttrium
 {
 	int ScriptArgs::get_int(size_t index, int default_value) const
 	{
-		return index <= _values.size() ? _values[index]->to_int() : default_value;
+		return index < _values.size() ? _values[index]->to_int() : default_value;
 	}
 
 	String ScriptArgs::string(size_t index, NameResolution resolution) const
@@ -29,6 +29,6 @@ namespace Yttrium
 
 	const ScriptValue* ScriptArgs::value(size_t index) const
 	{
-		return index <= _values.size() ? _values[index] : nullptr;
+		return index < _values.size() ? _values[index] : nullptr;
 	}
 }

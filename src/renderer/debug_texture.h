@@ -1,5 +1,5 @@
-#ifndef __RENDERER_DEBUG_TEXTURE_H
-#define __RENDERER_DEBUG_TEXTURE_H
+#ifndef _src_renderer_debug_texture_h_
+#define _src_renderer_debug_texture_h_
 
 #include <cstdint>
 

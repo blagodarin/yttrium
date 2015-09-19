@@ -42,7 +42,7 @@ namespace Yttrium
 		void bind(Key key, const StaticString& action);
 
 		///
-		bool bind(const StaticString &name, const StaticString& action);
+		bool bind(const StaticString& name, const StaticString& action);
 
 		///
 		void bind_default(Key key, const StaticString& action);
@@ -63,7 +63,7 @@ namespace Yttrium
 		void unbind(Key key);
 
 		///
-		bool unbind(const StaticString &name);
+		bool unbind(const StaticString& name);
 
 	private:
 		Y_UNIQUE_PRIVATE(Bindings);

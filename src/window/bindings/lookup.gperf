@@ -1,4 +1,4 @@
-struct KeyName {const char *name; Key key; };
+struct KeyName {const char* name; Key key; };
 %%
 #
 # Special keys (0x01 - 0x0F).

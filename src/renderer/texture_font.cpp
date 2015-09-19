@@ -116,20 +116,13 @@ namespace Yttrium
 
 		if (!text.is_empty())
 		{
-			// TODO: Rewrite.
-
-			char previous = text[0];
-			const CharInfo* info = char_info(previous);
-			if (info)
-				result.width += info->advance;
-
-			for (size_t i = 1; i < text.size(); ++i)
+			for (size_t i = 0; i < text.size(); ++i)
 			{
-				char current = text[i];
-				const CharInfo *info = char_info(current);
+				const auto info = char_info(text[i]);
 				if (info)
-					result.width += info->advance + kerning(previous, current);
-				previous = current;
+					result.width += info->advance;
+				if (i > 0)
+					result.width += kerning(text[i - 1], text[i]);
 			}
 		}
 

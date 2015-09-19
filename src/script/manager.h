@@ -1,5 +1,5 @@
-#ifndef __SCRIPT_MANAGER_H
-#define __SCRIPT_MANAGER_H
+#ifndef _src_script_manager_h_
+#define _src_script_manager_h_
 
 namespace Yttrium
 {

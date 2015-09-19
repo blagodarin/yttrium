@@ -25,7 +25,7 @@ protected:
 	Pointer<GpuProgram> _program;
 };
 
-class CubeModel: public Model
+class CubeModel : public Model
 {
 public:
 

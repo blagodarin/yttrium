@@ -1,5 +1,5 @@
-#ifndef __RENDERER_TEXTURE_FONT_H
-#define __RENDERER_TEXTURE_FONT_H
+#ifndef _src_renderer_texture_font_h_
+#define _src_renderer_texture_font_h_
 
 #include "../base/fourcc.h"
 

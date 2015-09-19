@@ -1,5 +1,5 @@
-#ifndef __RENDERER_GL_TEXTURE_H
-#define __RENDERER_GL_TEXTURE_H
+#ifndef _src_renderer_gl_texture_h_
+#define _src_renderer_gl_texture_h_
 
 #include "../texture.h"
 #include "gl.h"

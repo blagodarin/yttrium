@@ -38,9 +38,11 @@ namespace Yttrium
 		return make_pointer<LocalizationImpl>(*allocator, file_name, allocator);
 	}
 
-	String Localization::localize(const String& source)
+	String Localization::localize(const StaticString& source)
 	{
 		std::lock_guard<std::mutex> lock(LocalizationGuard::instance_mutex);
-		return LocalizationGuard::instance ? LocalizationGuard::instance->_translation._private->translate(source) : source;
+		return LocalizationGuard::instance
+			? LocalizationGuard::instance->_translation._private->translate(source)
+			: String(source);
 	}
 }

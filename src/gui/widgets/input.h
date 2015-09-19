@@ -1,5 +1,5 @@
-#ifndef __GUI_WIDGETS_INPUT_H
-#define __GUI_WIDGETS_INPUT_H
+#ifndef _src_gui_widgets_input_h_
+#define _src_gui_widgets_input_h_
 
 #include <yttrium/timer.h>
 #include "../logic/line_editor.h"
@@ -8,7 +8,7 @@
 
 namespace Yttrium
 {
-	class GuiInput: public Widget
+	class GuiInput : public Widget
 	{
 	public:
 

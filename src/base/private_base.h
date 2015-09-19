@@ -1,165 +1,161 @@
-#ifndef __BASE_PRIVATE_BASE_H
-#define __BASE_PRIVATE_BASE_H
+#ifndef _src_base_private_base_h_
+#define _src_base_private_base_h_
 
 #include <yttrium/allocator.h>
-#include <yttrium/assert.h>
 #include <yttrium/base.h>
 
 #include <atomic>
+#include <cassert>
 #include <utility>
 
 namespace Yttrium
 {
-
-template <typename T>
-class PrivateBase
-{
-	Y_NONCOPYABLE(PrivateBase);
-
-public:
-
-	PrivateBase(Allocator* allocator)
-		: _allocator(allocator)
-		, _references(allocator ? 1 : 0)
+	template <typename T>
+	class PrivateBase
 	{
-	}
+		Y_NONCOPYABLE(PrivateBase);
 
-	~PrivateBase()
-	{
-		Y_ASSERT(_references == 0);
-	}
+	public:
 
-public:
-
-	static T* copy(T* object)
-	{
-		if (!object)
-			return nullptr;
-		Y_ASSERT(object->_allocator);
-		// NOTE: The check should work well if a thread is trying to copy an object
-		// which is being destroyed, but with two or more copying threads only one
-		// will end up with nullptr with others having an invalid pointer.
-		if (object->_references++ == 0)
-			return nullptr;
-		return object;
-	}
-
-	static void copy(T*& target, T* const source)
-	{
-		// The source's reference count should be incremented before the target's is decremented;
-		// this transparently solves the (rare) problem of assigning an object to itself.
-		if (source)
-			++source->_references;
-		if (target && !--target->_references)
-			Y_DELETE(target->_allocator, target);
-		target = source;
-	}
-
-	static void move(T*& target, T*& source)
-	{
-		if (target && !--target->_references)
-			Y_DELETE(target->_allocator, target);
-		target = source;
-		source = nullptr;
-	}
-
-	static bool release(T* object)
-	{
-		Allocator *allocator = object->_allocator;
-
-		if (allocator && !--object->_references)
+		PrivateBase(Allocator* allocator)
+			: _allocator(allocator)
+			, _references(allocator ? 1 : 0)
 		{
-			Y_DELETE(allocator, object);
-			return true;
 		}
 
-		return false;
-	}
+		~PrivateBase()
+		{
+			assert(_references == 0);
+		}
 
-	static void release(T** object_ptr)
-	{
-		T* object = *object_ptr;
-		if (object)
+	public:
+
+		static T* copy(T* object)
+		{
+			if (!object)
+				return nullptr;
+			assert(object->_allocator);
+			// NOTE: The check should work well if a thread is trying to copy an object
+			// which is being destroyed, but with two or more copying threads only one
+			// will end up with nullptr with others having an invalid pointer.
+			if (object->_references++ == 0)
+				return nullptr;
+			return object;
+		}
+
+		static void copy(T*& target, T* const source)
+		{
+			// The source's reference count should be incremented before the target's is decremented;
+			// this transparently solves the (rare) problem of assigning an object to itself.
+			if (source)
+				++source->_references;
+			if (target && !--target->_references)
+				Y_DELETE(target->_allocator, target);
+			target = source;
+		}
+
+		static void move(T*& target, T*& source)
+		{
+			if (target && !--target->_references)
+				Y_DELETE(target->_allocator, target);
+			target = source;
+			source = nullptr;
+		}
+
+		static bool release(T* object)
 		{
 			Allocator* allocator = object->_allocator;
-			if (allocator) // Otherwise it's an object with static private data.
+			if (allocator && !--object->_references)
 			{
-				if (!--object->_references)
-					Y_DELETE(allocator, object);
-				*object_ptr = nullptr;
+				Y_DELETE(allocator, object);
+				return true;
+			}
+			return false;
+		}
+
+		static void release(T** object_ptr)
+		{
+			T* object = *object_ptr;
+			if (object)
+			{
+				Allocator* allocator = object->_allocator;
+				if (allocator) // Otherwise it's an object with static private data.
+				{
+					if (!--object->_references)
+						Y_DELETE(allocator, object);
+					*object_ptr = nullptr;
+				}
 			}
 		}
-	}
 
-public:
+	public:
 
-	Allocator* const _allocator;
+		Allocator* const _allocator;
 
 #ifndef __YTTRIUM_TEST
-private:
+	private:
 #else
-public:
+	public:
 #endif
 
-	std::atomic_size_t _references;
-};
+		std::atomic_size_t _references;
+	};
 
-template <typename T>
-class PrivateHolder
-{
-	Y_NONCOPYABLE(PrivateHolder);
-
-public:
-
-	PrivateHolder()
-		: _pointer(nullptr)
+	template <typename T>
+	class PrivateHolder
 	{
-	}
+		Y_NONCOPYABLE(PrivateHolder);
 
-	template <typename... Args>
-	PrivateHolder(Args&&... args, Allocator* allocator)
-		: _pointer(Y_NEW(allocator, T)(std::forward<Args>(args)..., allocator))
-	{
-	}
+	public:
 
-	~PrivateHolder()
-	{
-		PrivateBase<T>::release(&_pointer);
-	}
+		PrivateHolder()
+			: _pointer(nullptr)
+		{
+		}
 
-	T* operator->() const
-	{
-		return _pointer;
-	}
+		template <typename... Args>
+		PrivateHolder(Args&&... args, Allocator* allocator)
+			: _pointer(Y_NEW(allocator, T)(std::forward<Args>(args)..., allocator))
+		{
+		}
 
-	T* release()
-	{
-		const auto result = _pointer;
-		_pointer = nullptr;
-		return result;
-	}
+		~PrivateHolder()
+		{
+			PrivateBase<T>::release(&_pointer);
+		}
 
-	template <typename U, typename... Args>
-	void reset(Allocator* allocator, Args&&... args)
-	{
-		Y_ASSERT(!_pointer);
-		_pointer = Y_NEW(allocator, U)(std::forward<Args>(args)..., allocator);
-	}
+		T* operator->() const
+		{
+			return _pointer;
+		}
 
-private:
+		T* release()
+		{
+			const auto result = _pointer;
+			_pointer = nullptr;
+			return result;
+		}
 
-	T* _pointer;
-};
+		template <typename U, typename... Args>
+		void reset(Allocator* allocator, Args&&... args)
+		{
+			assert(!_pointer);
+			_pointer = Y_NEW(allocator, U)(std::forward<Args>(args)..., allocator);
+		}
 
-} // namespace Yttrium
+	private:
+
+		T* _pointer;
+	};
+}
 
 #define Y_IMPLEMENT_UNIQUE(Class) \
 	Class::~Class() { Private::release(&_private); } \
-	Class& Class::operator=(Class&& x) { Private::move(_private, x._private); return *this; } \
+	Class& Class::operator=(Class&& x) noexcept { Private::move(_private, x._private); return *this; } \
 
 #define Y_IMPLEMENT_SHARED(Class) \
 	Y_IMPLEMENT_UNIQUE(Class) \
 	Class::Class(const Class& x): _private(Private::copy(x._private)) {} \
 	Class& Class::operator=(const Class& x) { Private::copy(_private, x._private); return *this; } \
 
-#endif // __BASE_PRIVATE_BASE_H
+#endif

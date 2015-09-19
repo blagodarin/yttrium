@@ -27,7 +27,7 @@ namespace Yttrium
 			float m30, float m31, float m32, float m33);
 
 		///
-		const float *data() const { return _data[0]; }
+		const float* data() const { return _data[0]; }
 
 		///
 		float operator()(int row, int column) const { return _data[column][row]; }

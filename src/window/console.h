@@ -1,5 +1,5 @@
-#ifndef __WINDOW_CONSOLE_H
-#define __WINDOW_CONSOLE_H
+#ifndef _src_window_console_h_
+#define _src_window_console_h_
 
 #include "../gui/logic/line_editor.h"
 
@@ -25,4 +25,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __WINDOW_CONSOLE_H
+#endif

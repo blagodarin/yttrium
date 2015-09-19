@@ -9,9 +9,9 @@ BOOST_AUTO_TEST_CASE(test_default_allocator)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	Allocator *allocator = MemoryManager::default_allocator();
+	const auto allocator = MemoryManager::default_allocator();
 
-	void *p = allocator->allocate(1);
+	auto p = allocator->allocate(1);
 
 	BOOST_REQUIRE(p);
 
@@ -26,11 +26,11 @@ BOOST_AUTO_TEST_CASE(test_default_allocator_difference)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	Allocator *allocator = MemoryManager::default_allocator();
+	const auto allocator = MemoryManager::default_allocator();
 
 	Allocator::Difference d;
 
-	void *p = allocator->allocate(1, 0, &d);
+	auto p = allocator->allocate(1, 0, &d);
 
 	BOOST_REQUIRE(p);
 //	BOOST_CHECK_GE(d.allocated, 1);

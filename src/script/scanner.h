@@ -1,5 +1,5 @@
-#ifndef __SCRIPT_SCANNER_H
-#define __SCRIPT_SCANNER_H
+#ifndef _src_script_scanner_h_
+#define _src_script_scanner_h_
 
 #include <yttrium/static_string.h>
 

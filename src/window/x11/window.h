@@ -1,5 +1,5 @@
-#ifndef __WINDOW_X11_BACKEND_H
-#define __WINDOW_X11_BACKEND_H
+#ifndef _src_window_x11_window_h_
+#define _src_window_x11_window_h_
 
 #include <yttrium/key.h>
 #include <yttrium/size.h>
@@ -61,4 +61,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __WINDOW_X11_BACKEND_H
+#endif

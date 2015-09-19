@@ -2,7 +2,7 @@
 #include <yttrium/package.h>
 #include <yttrium/string.h>
 
-#include <cstdio>
+#include <iostream>
 
 using namespace Yttrium;
 
@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
 	if (argc < 2 || argc > 3)
 	{
-		printf("Usage: ypq [-a] INDEXFILE\n");
+		std::cerr << "Usage: ypq [-a] INDEXFILE" << std::endl;
 		return 1;
 	}
 
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
 		if (options != S("-a"))
 		{
-			printf("ypq: ERROR: Unknown options \"%s\"\n", options.text());
+			std::cerr << "ERROR: Unknown options \"" << options << "\"" << std::endl;
 			return 1;
 		}
 
@@ -36,29 +36,28 @@ int main(int argc, char** argv)
 	const StaticString index_file_name = argv[argc - 1];
 	if (!index_file_name.ends_with(index_file_extension))
 	{
-		printf("ypq: ERROR: Bad index file name \"%s\"\n", index_file_name.text());
-		printf("ypq: Index file names should end with \"%s\"\n", index_file_extension.text());
+		std::cerr << "ERROR: Bad index file name \"" << index_file_name << "\"" << std::endl;
+		std::cerr << "Index file names should end with \"" << index_file_extension << "\"" << std::endl;
 		return 1;
 	}
 
 	File index_file(index_file_name);
 	if (!index_file)
 	{
-		printf("ypq: ERROR: Can't open index file \"%s\"\n", index_file_name.text());
+		std::cerr << "ERROR: Can't open index file \"" << index_file_name << "\"" << std::endl;
 		return 1;
 	}
 
-	const String package_file_name = index_file_name.left(index_file_name.size() - index_file_extension.size());
+	const String package_file_name(index_file_name.left(index_file_name.size() - index_file_extension.size()));
 
 	PackageWriter package_file(package_file_name, PackageType::Ypq, mode);
 	if (!package_file)
 	{
-		printf("ypq: ERROR: Can't open package file \"%s\"\n", package_file_name.text());
+		std::cerr << "ERROR: Can't open package file \"" << package_file_name << "\"" << std::endl;
 		return 1;
 	}
 
-	printf("ypq: Packing files from \"%s\" into \"%s\"...\n",
-		index_file_name.text(), package_file_name.text());
+	std::cout << "Packing files from \"" << index_file_name << "\" into \"" << package_file_name << "\"..." << std::endl;
 
 	String line;
 	for (size_t line_index = 1; index_file.read_line(line); ++line_index)
@@ -70,21 +69,19 @@ int main(int argc, char** argv)
 		const size_t separator_index = line.find_first('=');
 		if (separator_index == String::End)
 		{
-			printf("ypq: WARNING: Unrecognized line skipped (%s:%d)\n",
-				index_file_name.text(), line_index);
+			std::cerr << "WARNING: Unrecognized line skipped (" << index_file_name << ":" << line_index << ")" << std::endl;
 			continue;
 		}
 
-		const String source_name = line.left(separator_index).trimmed(); // Force zero-terminatedness.
-		const StaticString packed_name = line.right(line.size() - separator_index - 1).trimmed();
+		const String source_name(line.left(separator_index).trimmed()); // Force zero-terminatedness.
+		const auto& packed_name = line.right(line.size() - separator_index - 1).trimmed();
 		if (source_name.is_empty() || packed_name.is_empty())
 		{
-			printf("ypq: WARNING: File with an empty name skipped (%s:%d)\n",
-				index_file_name.text(), line_index);
+			std::cerr << "WARNING: File with an empty name skipped (" << index_file_name << ":" << line_index << ")" << std::endl;
 			continue;
 		}
 
-		printf("ypq: Packing \"%s\" to \"%s\"...\n", source_name.text(), packed_name.text());
+		std::cout << "Packing \"" << source_name << "\" to \"" << packed_name << "\"..." << std::endl;
 
 		File source_file(source_name);
 		File packed_file = package_file.open_file(packed_name);

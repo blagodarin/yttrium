@@ -1,6 +1,6 @@
 #include <yttrium/date_time.h>
 
-#include <yttrium/assert.h>
+#include <system_error>
 
 #include <time.h>
 
@@ -9,10 +9,12 @@ namespace Yttrium
 	DateTime DateTime::now()
 	{
 		::timespec time;
-		Y_VERIFY(0, ::clock_gettime(CLOCK_REALTIME, &time));
+		if (0 != ::clock_gettime(CLOCK_REALTIME, &time))
+			throw std::system_error(errno, std::generic_category());
 
 		::tm local_time;
-		Y_VERIFY(&local_time, ::localtime_r(&time.tv_sec, &local_time));
+		if (&local_time != ::localtime_r(&time.tv_sec, &local_time))
+			throw std::system_error(EINVAL, std::generic_category());
 
 		DateTime result;
 		result.year = local_time.tm_year + 1900;

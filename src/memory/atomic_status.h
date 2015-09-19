@@ -1,5 +1,5 @@
-#ifndef __MEMORY_ATOMIC_STATUS_H
-#define __MEMORY_ATOMIC_STATUS_H
+#ifndef _src_memory_atomic_status_h_
+#define _src_memory_atomic_status_h_
 
 #include <yttrium/proxy_allocator.h>
 
@@ -31,4 +31,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __BASE_MEMORY_ATOMIC_STATUS_H
+#endif

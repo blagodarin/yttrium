@@ -55,26 +55,23 @@ namespace Yttrium
 		return false;
 	}
 
-	bool PngWriter::set_format(const ImageFormat &format)
+	bool PngWriter::set_format(const ImageFormat& format)
 	{
 		switch (format.pixel_format())
 		{
 		case PixelFormat::Gray:
-
 			if (format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16)
 				return false;
 			break;
 
 		case PixelFormat::GrayAlpha:
 		case PixelFormat::AlphaGray:
-
 			if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
 				return false;
 			break;
 
 		case PixelFormat::Rgb:
 		case PixelFormat::Bgr:
-
 			if (format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48)
 				return false;
 			break;
@@ -83,21 +80,16 @@ namespace Yttrium
 		case PixelFormat::Bgra:
 		case PixelFormat::Argb:
 		case PixelFormat::Abgr:
-
 			if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
 				return false;
 			break;
 
 		default:
-
 			return false;
 		}
 
-		if (format.orientation() != ImageOrientation::XRightYDown
-			&& format.orientation() != ImageOrientation::XRightYUp)
-		{
+		if (format.orientation() != ImageOrientation::XRightYDown && format.orientation() != ImageOrientation::XRightYUp)
 			return false;
-		}
 
 		if (format.width() <= 0 || format.width() > UINT32_MAX)
 			return false;

@@ -6,7 +6,6 @@
 
 #include <yttrium/alloca.h>
 #include <yttrium/allocator.h>
-#include <yttrium/assert.h>
 #include <yttrium/audio/io.h>
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>

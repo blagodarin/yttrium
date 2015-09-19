@@ -1,5 +1,5 @@
-#ifndef __WINDOW_WINDOW_H
-#define __WINDOW_WINDOW_H
+#ifndef _src_window_window_h_
+#define _src_window_window_h_
 
 #include <yttrium/window.h>
 
@@ -78,4 +78,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __WINDOW_WINDOW_H
+#endif

@@ -61,14 +61,14 @@ namespace Yttrium
 
 		///
 		template <typename T>
-		Y_PRIVATE T *allocate(size_t count = 1)
+		Y_PRIVATE T* allocate(size_t count = 1)
 		{
-			return static_cast<T *>(allocate(sizeof(T) * count));
+			return static_cast<T*>(allocate(sizeof(T) * count));
 		}
 
 		///
 		template <typename T>
-		void delete_(T *pointer)
+		void delete_(T* pointer)
 		{
 			if (pointer)
 			{
@@ -85,11 +85,9 @@ namespace Yttrium
 }
 
 ///
-
 #define Y_DELETE(allocator, pointer) (allocator)->delete_(pointer)
 
 ///
-
 #define Y_NEW(allocator, Class) new(static_cast<Yttrium::Allocator*>(allocator)->allocate<Class>()) Class
 
 #endif

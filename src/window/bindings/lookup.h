@@ -1,5 +1,5 @@
-#ifndef __WINDOW_BINDINGS_LOOKUP_H
-#define __WINDOW_BINDINGS_LOOKUP_H
+#ifndef _src_window_bindings_lookup_h_
+#define _src_window_bindings_lookup_h_
 
 #include <yttrium/key.h>
 
@@ -10,4 +10,4 @@ namespace Yttrium
 	Key lookup_key(const StaticString& name);
 }
 
-#endif // __WINDOW_BINDINGS_LOOKUP_H
+#endif

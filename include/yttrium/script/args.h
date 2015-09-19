@@ -1,8 +1,8 @@
 /// \file
 /// \brief Script command arguments.
 
-#ifndef __Y_SCRIPT_ARGS_H
-#define __Y_SCRIPT_ARGS_H
+#ifndef _include_yttrium_script_args_h_
+#define _include_yttrium_script_args_h_
 
 #include <yttrium/global.h>
 

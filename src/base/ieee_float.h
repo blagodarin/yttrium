@@ -1,5 +1,5 @@
-#ifndef __BASE_IEEE_FLOAT_H
-#define __BASE_IEEE_FLOAT_H
+#ifndef _src_base_ieee_float_h_
+#define _src_base_ieee_float_h_
 
 namespace Yttrium
 {
@@ -62,4 +62,4 @@ namespace Yttrium
 	// To iterate over all finite positive floats, run an Unsigned counter from 1 to ExponentMask.
 }
 
-#endif // __BASE_IEEE_FLOAT_H
+#endif

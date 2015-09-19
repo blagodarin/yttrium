@@ -136,7 +136,7 @@ namespace Yttrium
 
 		_file.write(index_header);
 
-		for (const Entry &entry: _entries)
+		for (const auto& entry : _entries)
 		{
 			YpqIndexEntry index_entry;
 
@@ -157,7 +157,7 @@ namespace Yttrium
 		_file.write(package_header);
 	}
 
-	PackedFile YpqWriter::open_file(const StaticString &name)
+	PackedFile YpqWriter::open_file(const StaticString& name)
 	{
 		YpqFileHeader file_header;
 
@@ -166,7 +166,7 @@ namespace Yttrium
 
 		_last_offset = _file.offset();
 
-		_entries.push_back(Entry(_last_offset, name));
+		_entries.push_back(Entry(_last_offset, String(name, _allocator)));
 
 		file_header.signature = YpqFileSignature;
 		file_header.size = 0;
@@ -178,8 +178,8 @@ namespace Yttrium
 	{
 		_file.seek(0, File::Reverse);
 
-		uint64_t begin_offset = _last_offset + sizeof(YpqFileHeader);
-		uint64_t end_offset = _file.offset();
+		const auto begin_offset = _last_offset + sizeof(YpqFileHeader);
+		const auto end_offset = _file.offset();
 
 		_file.seek(_last_offset + offsetof(YpqFileHeader, size));
 		_file.write(static_cast<uint32_t>(end_offset - begin_offset)); // TODO: Check packed file size for uint32_t overflow.

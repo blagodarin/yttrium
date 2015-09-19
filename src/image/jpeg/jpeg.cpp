@@ -32,7 +32,7 @@ namespace Yttrium
 		if (!_file.read_all(&_buffer))
 			return false;
 
-		jpeg_mem_src(&_decompressor, static_cast<unsigned char *>(_buffer.data()), _buffer.size());
+		jpeg_mem_src(&_decompressor, static_cast<unsigned char*>(_buffer.data()), _buffer.size());
 
 		jpeg_read_header(&_decompressor, TRUE);
 
@@ -55,7 +55,7 @@ namespace Yttrium
 
 		jpeg_start_decompress(&_decompressor);
 
-		for (unsigned char* scanline = static_cast<unsigned char*>(buffer);
+		for (auto scanline = static_cast<unsigned char*>(buffer);
 			_decompressor.output_scanline < _decompressor.output_height;
 			scanline += _format.row_size())
 		{

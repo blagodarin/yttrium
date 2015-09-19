@@ -34,7 +34,7 @@ namespace Yttrium
 	{
 		if (_private)
 		{
-			const PackedFile& packed_file = _private->open_file(name);
+			const auto& packed_file = _private->open_file(name);
 			if (packed_file.file)
 				return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
 		}
@@ -54,7 +54,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			const StaticString extension = name.file_extension();
+			const auto& extension = name.file_extension();
 			if (extension == S(".ypq"))
 				type = PackageType::Ypq;
 			else
@@ -78,7 +78,7 @@ namespace Yttrium
 	{
 		if (_private)
 		{
-			const PackedFile &packed_file = _private->open_file(name);
+			const auto& packed_file = _private->open_file(name);
 			if (packed_file.file)
 				return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
 		}

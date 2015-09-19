@@ -1,8 +1,9 @@
 #include <yttrium/script/context.h>
 
-#include <yttrium/assert.h>
 #include <yttrium/file.h>
 #include <yttrium/log.h>
+
+#include <cassert>
 
 namespace Yttrium
 {
@@ -122,7 +123,7 @@ namespace Yttrium
 
 	void ScriptContext::substitute(String& target, const StaticString& source) const
 	{
-		Y_ASSERT(target.text() != source.text());
+		assert(target.text() != source.text());
 
 		target.clear();
 		for (auto left = source.text(), right = left, end = left + source.size(); ; )

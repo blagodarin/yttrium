@@ -1,12 +1,12 @@
-#ifndef __GUI_WIDGETS_IMAGE_H
-#define __GUI_WIDGETS_IMAGE_H
+#ifndef _src_gui_widgets_image_h_
+#define _src_gui_widgets_image_h_
 
 #include "../property.h"
 #include "widget.h"
 
 namespace Yttrium
 {
-	class GuiImage: public Widget
+	class GuiImage : public Widget // TODO: Find a better class name.
 	{
 	public:
 

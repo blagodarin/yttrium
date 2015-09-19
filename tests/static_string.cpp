@@ -11,8 +11,7 @@ BOOST_AUTO_TEST_CASE(test_static_string_initialization)
 	BOOST_CHECK_EQUAL(s1.size(), 0);
 	BOOST_CHECK(s1.is_empty());
 	BOOST_CHECK(s1.text());
-	BOOST_CHECK_EQUAL(&s1[0], s1.text());
-	BOOST_CHECK_EQUAL(s1[0], 0);
+	BOOST_CHECK_EQUAL(s1[0], '\0');
 
 	StaticString s2;
 
@@ -26,7 +25,6 @@ BOOST_AUTO_TEST_CASE(test_static_string_assignment)
 	StaticString s1 = "test";
 
 	BOOST_CHECK_EQUAL(s1.size(), 4);
-	BOOST_CHECK_EQUAL(&s1[0], s1.text());
 	BOOST_CHECK_EQUAL(s1[0], 't');
 	BOOST_CHECK_EQUAL(s1[2], 's');
 	BOOST_CHECK(s1 == "test");

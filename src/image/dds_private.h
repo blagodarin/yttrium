@@ -1,5 +1,5 @@
-#ifndef SRC_IMAGE_DDSPRIVATE_H
-#define SRC_IMAGE_DDSPRIVATE_H
+#ifndef _src_image_dds_private_h_
+#define _src_image_dds_private_h_
 
 #include "../base/fourcc.h"
 

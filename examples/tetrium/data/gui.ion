@@ -42,14 +42,14 @@ class "button"
 	}
 }
 
-include "examples/tetrium/gui/menu_main.ion"
-include "examples/tetrium/gui/menu_single.ion"
-include "examples/tetrium/gui/menu_multi.ion"
-include "examples/tetrium/gui/menu_help.ion"
+include "examples/tetrium/data/gui/menu_main.ion"
+include "examples/tetrium/data/gui/menu_single.ion"
+include "examples/tetrium/data/gui/menu_multi.ion"
+include "examples/tetrium/data/gui/menu_help.ion"
 
-include "examples/tetrium/gui/game_over.ion"
-include "examples/tetrium/gui/game_pause.ion"
-include "examples/tetrium/gui/game_single.ion"
+include "examples/tetrium/data/gui/game_over.ion"
+include "examples/tetrium/data/gui/game_pause.ion"
+include "examples/tetrium/data/gui/game_single.ion"
 
 on_scene_change ["menu_single" "game_single"] "game_start"
 on_scene_change ["game_single" "game_pause" ] "game_pause"

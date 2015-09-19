@@ -1,5 +1,5 @@
-#ifndef __BASE_UTILS_H
-#define __BASE_UTILS_H
+#ifndef _src_base_utils_h_
+#define _src_base_utils_h_
 
 #include <memory>
 

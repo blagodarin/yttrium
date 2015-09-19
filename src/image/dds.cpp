@@ -82,9 +82,8 @@ namespace Yttrium
 			}
 			else
 			{
-				// We can also load ARGB/ABGR data, but that's rarely needed.
+				// We could also load ARGB/ABGR data, but that's rarely needed.
 				// Also, is there a DDS with such data layout?
-
 				return false;
 			}
 			break;

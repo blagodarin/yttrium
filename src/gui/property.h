@@ -1,5 +1,5 @@
-#ifndef __GUI_PROPERTY_H
-#define __GUI_PROPERTY_H
+#ifndef _src_gui_property_h_
+#define _src_gui_property_h_
 
 #include <yttrium/margins.h>
 #include <yttrium/object.h>

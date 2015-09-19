@@ -81,7 +81,7 @@ namespace Yttrium
 		// the texture handle won't be released if an exception is generated.
 
 		GLuint texture = 0;
-		_gl.GenTextures(1, &texture); // TODO: Think of using Y_ABORT if this fails.
+		_gl.GenTextures(1, &texture); // TODO: Think of throwing an exception if this fails.
 		if (!texture)
 			return {};
 

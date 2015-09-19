@@ -1,5 +1,5 @@
-#ifndef __AUDIO_BACKEND_OPENAL_PLAYER_H
-#define __AUDIO_BACKEND_OPENAL_PLAYER_H
+#ifndef _src_audio_backend_openal_player_h_
+#define _src_audio_backend_openal_player_h_
 
 #include "../../backend.h"
 #include "format.h"
@@ -32,4 +32,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_BACKEND_OPENAL_PLAYER_H
+#endif

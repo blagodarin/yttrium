@@ -30,13 +30,13 @@ namespace Yttrium
 		class Private; \
 		Class() = default; \
 		Class(const Class&); \
-		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
+		Class(Class&& class_) noexcept : _private(class_._private) { class_._private = nullptr; } \
 		~Class(); \
 		Class& operator=(const Class&); \
-		Class& operator=(Class&&); \
-		explicit operator bool() const { return _private; } \
+		Class& operator=(Class&&) noexcept; \
+		explicit operator bool() const noexcept { return _private; } \
 	protected: \
-		Class(Private* private_): _private(private_) {} \
+		Class(Private* private_) noexcept : _private(private_) {} \
 	private: \
 		Private* _private = nullptr \
 
@@ -45,13 +45,13 @@ namespace Yttrium
 	public: \
 		class Private; \
 		Class(const Class&) = delete; \
-		Class(Class&& class_): _private(class_._private) { class_._private = nullptr; } \
+		Class(Class&& class_) noexcept : _private(class_._private) { class_._private = nullptr; } \
 		~Class(); \
 		Class& operator=(const Class&) = delete; \
-		Class& operator=(Class&&); \
-		explicit operator bool() const { return _private; } \
+		Class& operator=(Class&&) noexcept; \
+		explicit operator bool() const noexcept { return _private; } \
 	protected: \
-		Class(Private* private_): _private(private_) {} \
+		Class(Private* private_) noexcept : _private(private_) {} \
 	private: \
 		Private* _private = nullptr \
 

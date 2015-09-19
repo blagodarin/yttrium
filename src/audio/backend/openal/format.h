@@ -1,5 +1,5 @@
-#ifndef __AUDIO_BACKEND_OPENAL_FORMAT_H
-#define __AUDIO_BACKEND_OPENAL_FORMAT_H
+#ifndef _src_audio_backend_openal_format_h_
+#define _src_audio_backend_openal_format_h_
 
 #include <yttrium/audio/io.h>
 #include "openal.h"
@@ -19,4 +19,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_BACKEND_OPENAL_FORMAT_H
+#endif

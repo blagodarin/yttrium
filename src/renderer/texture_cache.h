@@ -1,5 +1,5 @@
-#ifndef __RENDERER_TEXTURE_CACHE_H
-#define __RENDERER_TEXTURE_CACHE_H
+#ifndef _src_renderer_texture_cache_h_
+#define _src_renderer_texture_cache_h_
 
 #include <yttrium/texture_cache.h>
 

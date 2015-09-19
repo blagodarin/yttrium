@@ -1,5 +1,5 @@
-#ifndef __GUI_GUI_H
-#define __GUI_GUI_H
+#ifndef _src_gui_gui_h_
+#define _src_gui_gui_h_
 
 #include <yttrium/gui.h>
 

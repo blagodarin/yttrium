@@ -1,5 +1,5 @@
-#ifndef __GUI_ION_PROPERTY_DUMPER_H
-#define __GUI_ION_PROPERTY_DUMPER_H
+#ifndef _src_gui_ion_property_dumper_h_
+#define _src_gui_ion_property_dumper_h_
 
 #include "../property_dumper.h"
 

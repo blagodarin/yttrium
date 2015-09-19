@@ -1,5 +1,5 @@
-#ifndef __AUDIO_IO_READER_H
-#define __AUDIO_IO_READER_H
+#ifndef _src_audio_io_reader_h_
+#define _src_audio_io_reader_h_
 
 #include <yttrium/audio/io.h>
 
@@ -35,4 +35,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_IO_READER_H
+#endif

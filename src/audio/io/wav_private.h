@@ -1,5 +1,5 @@
-#ifndef __AUDIO_IO_WAV_PRIVATE_H
-#define __AUDIO_IO_WAV_PRIVATE_H
+#ifndef _src_audio_io_wav_private_h_
+#define _src_audio_io_wav_private_h_
 
 #include "../../base/fourcc.h"
 
@@ -50,4 +50,4 @@ namespace Yttrium
 #pragma pack(pop)
 }
 
-#endif // __AUDIO_IO_WAV_PRIVATE_H
+#endif

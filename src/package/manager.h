@@ -1,5 +1,5 @@
-#ifndef __PACKAGE_MANAGER_H
-#define __PACKAGE_MANAGER_H
+#ifndef _src_package_manager_h_
+#define _src_package_manager_h_
 
 namespace Yttrium
 {

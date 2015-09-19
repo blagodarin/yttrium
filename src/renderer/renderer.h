@@ -1,5 +1,5 @@
-#ifndef __RENDERER_RENDERER_H
-#define __RENDERER_RENDERER_H
+#ifndef _src_renderer_renderer_h_
+#define _src_renderer_renderer_h_
 
 #include <yttrium/renderer.h>
 

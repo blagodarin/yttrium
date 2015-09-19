@@ -1,5 +1,5 @@
-#ifndef __GUI_WIDGETS_CANVAS_H
-#define __GUI_WIDGETS_CANVAS_H
+#ifndef _src_gui_widgets_canvas_h_
+#define _src_gui_widgets_canvas_h_
 
 #include "widget.h"
 

@@ -1,6 +1,5 @@
 #include "scanner.h"
 
-#include <yttrium/assert.h>
 #include <yttrium/log.h>
 
 namespace Yttrium

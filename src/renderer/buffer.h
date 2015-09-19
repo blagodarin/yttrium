@@ -1,5 +1,5 @@
-#ifndef __RENDERER_BUFFER_H
-#define __RENDERER_BUFFER_H
+#ifndef _src_renderer_buffer_h_
+#define _src_renderer_buffer_h_
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/vertex_buffer.h>

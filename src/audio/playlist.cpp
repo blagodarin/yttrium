@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	AudioPlaylist::AudioPlaylist(Allocator *allocator)
+	AudioPlaylist::AudioPlaylist(Allocator* allocator)
 		: _allocator(allocator)
 		, _order(AudioPlayer::Loop)
 		, _next(0)
@@ -18,7 +18,7 @@ namespace Yttrium
 		_next = 0;
 	}
 
-	void AudioPlaylist::load(const StaticString &name, const AudioPlayer::Settings &settings, AudioType type)
+	void AudioPlaylist::load(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
@@ -38,7 +38,7 @@ namespace Yttrium
 		}
 	}
 
-	bool AudioPlaylist::next(Item *item)
+	bool AudioPlaylist::next(Item* item)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 

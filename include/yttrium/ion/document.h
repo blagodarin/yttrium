@@ -41,10 +41,10 @@ namespace Yttrium
 		bool save(const StaticString& file_name, Formatting formatting = Formatting::Pretty) const;
 
 		IonDocument(const IonDocument&) = delete;
-		IonDocument(IonDocument&& document): _private(document._private) { document._private = nullptr; }
+		IonDocument(IonDocument&& document) noexcept : _private(document._private) { document._private = nullptr; }
 		~IonDocument();
 		IonDocument& operator=(const IonDocument&) = delete;
-		IonDocument& operator=(IonDocument&&);
+		IonDocument& operator=(IonDocument&&) noexcept;
 	private:
 		IonDocumentPrivate* _private = nullptr;
 	};

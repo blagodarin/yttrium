@@ -1,5 +1,5 @@
-#ifndef __WINDOW_GL_H
-#define __WINDOW_GL_H
+#ifndef _src_window_gl_h_
+#define _src_window_gl_h_
 
 #include <yttrium/global.h>
 
@@ -19,4 +19,4 @@ namespace Yttrium
 	}
 }
 
-#endif // __WINDOW_GL_H
+#endif

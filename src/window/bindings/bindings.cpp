@@ -7,302 +7,298 @@
 
 namespace Yttrium
 {
-
-namespace
-{
-
-const char* bind_names[] =
-{
-	// Null key (0x00):
-
-	"",
-
-	// Keyboard keys (0x01 - 0x7F):
-
-	// - Special keys (0x01 - 0x0F);
-
-	"lshift",
-	"rshift",
-	"lctrl",
-	"rctrl",
-	"lalt",
-	"ralt",
-	"up",
-	"down",
-	"left",
-	"right",
-	"",
-	"",
-	"print",
-	"pause",
-	"esc",
-
-	// - Text-producing keys (0x10 - 0x3F);
-
-	"0",
-	"1",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"a",
-	"b",
-	"c",
-	"d",
-	"e",
-	"f",
-	"g",
-	"h",
-	"i",
-	"j",
-	"k",
-	"l",
-	"m",
-	"n",
-	"o",
-	"p",
-	"q",
-	"r",
-	"s",
-	"t",
-	"u",
-	"v",
-	"w",
-	"x",
-	"y",
-	"z",
-	",",
-	".",
-	"semicolon",
-	"'",
-	"/",
-	"\\",
-	"[",
-	"]",
-	"-",
-	"=",
-	"`",
-	"space",
-
-	// Text-editing keys (0x40 - 0x4F);
-
-	"tab",
-	"enter",
-	"back",
-	"ins",
-	"del",
-	"home",
-	"end",
-	"pgup",
-	"pgdn",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-
-	// - Functional keys (0x50 - 0x6F);
-
-	"f1",
-	"f2",
-	"f3",
-	"f4",
-	"f5",
-	"f6",
-	"f7",
-	"f8",
-	"f9",
-	"f10",
-	"f11",
-	"f12",
-	"f13",
-	"f14",
-	"f15",
-	"f16",
-	"f17",
-	"f18",
-	"f19",
-	"f20",
-	"f21",
-	"f22",
-	"f23",
-	"f24",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-
-	// - Numpad keys (0x70 - 0x7F).
-
-	"num0",
-	"num1",
-	"num2",
-	"num3",
-	"num4",
-	"num5",
-	"num6",
-	"num7",
-	"num8",
-	"num9",
-	"num.",
-	"num+",
-	"num-",
-	"num*",
-	"num/",
-	"numenter",
-
-	// Non-keyboard keys (0x80 - 0xFF):
-
-	// - Mouse keys (0x80 - 0x8F);
-
-	"mouse1",
-	"mouse2",
-	"mouse3",
-	"mouse4",
-	"mouse5",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"mwup",
-	"mwdown",
-	"mwleft",
-	"mwright",
-
-	// - Unassigned keys (0x90 - 0xFF).
-};
-
-} // namespace
-
-struct Bindings::Private: public PrivateBase<Bindings::Private>
-{
-	std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
-
-	Private(Allocator* allocator): PrivateBase(allocator) {}
-
-	bool is_valid_index(size_t index) const
+	namespace
 	{
-		return bind_names[index][0] && !_actions[index].first.is_empty();
+		const char* bind_names[] =
+		{
+			// Null key (0x00):
+
+			"",
+
+			// Keyboard keys (0x01 - 0x7F):
+
+			// - Special keys (0x01 - 0x0F);
+
+			"lshift",
+			"rshift",
+			"lctrl",
+			"rctrl",
+			"lalt",
+			"ralt",
+			"up",
+			"down",
+			"left",
+			"right",
+			"",
+			"",
+			"print",
+			"pause",
+			"esc",
+
+			// - Text-producing keys (0x10 - 0x3F);
+
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+			"6",
+			"7",
+			"8",
+			"9",
+			"a",
+			"b",
+			"c",
+			"d",
+			"e",
+			"f",
+			"g",
+			"h",
+			"i",
+			"j",
+			"k",
+			"l",
+			"m",
+			"n",
+			"o",
+			"p",
+			"q",
+			"r",
+			"s",
+			"t",
+			"u",
+			"v",
+			"w",
+			"x",
+			"y",
+			"z",
+			",",
+			".",
+			"semicolon",
+			"'",
+			"/",
+			"\\",
+			"[",
+			"]",
+			"-",
+			"=",
+			"`",
+			"space",
+
+			// Text-editing keys (0x40 - 0x4F);
+
+			"tab",
+			"enter",
+			"back",
+			"ins",
+			"del",
+			"home",
+			"end",
+			"pgup",
+			"pgdn",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+
+			// - Functional keys (0x50 - 0x6F);
+
+			"f1",
+			"f2",
+			"f3",
+			"f4",
+			"f5",
+			"f6",
+			"f7",
+			"f8",
+			"f9",
+			"f10",
+			"f11",
+			"f12",
+			"f13",
+			"f14",
+			"f15",
+			"f16",
+			"f17",
+			"f18",
+			"f19",
+			"f20",
+			"f21",
+			"f22",
+			"f23",
+			"f24",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+
+			// - Numpad keys (0x70 - 0x7F).
+
+			"num0",
+			"num1",
+			"num2",
+			"num3",
+			"num4",
+			"num5",
+			"num6",
+			"num7",
+			"num8",
+			"num9",
+			"num.",
+			"num+",
+			"num-",
+			"num*",
+			"num/",
+			"numenter",
+
+			// Non-keyboard keys (0x80 - 0xFF):
+
+			// - Mouse keys (0x80 - 0x8F);
+
+			"mouse1",
+			"mouse2",
+			"mouse3",
+			"mouse4",
+			"mouse5",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"mwup",
+			"mwdown",
+			"mwleft",
+			"mwright",
+
+			// - Unassigned keys (0x90 - 0xFF).
+		};
 	}
-};
 
-std::pair<StaticString, StaticString> Bindings::Iterator::operator*() const
-{
-	return std::make_pair(bind_names[_index], StaticString(_bindings._private->_actions[_index].first));
-}
-
-void Bindings::Iterator::operator++()
-{
-	if (_index == _bindings._private->_actions.size())
-		return;
-	do
+	struct Y_PRIVATE Bindings::Private : public PrivateBase<Bindings::Private>
 	{
-		++_index;
-		if (_bindings._private->is_valid_index(_index))
-			break;
-	} while (_index < _bindings._private->_actions.size());
-}
+		std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
 
-Y_IMPLEMENT_UNIQUE(Bindings);
+		Private(Allocator* allocator): PrivateBase(allocator) {}
 
-Bindings::Bindings(Allocator* allocator)
-	: _private(Y_NEW(allocator, Private)(allocator))
-{
-}
+		bool is_valid_index(size_t index) const
+		{
+			return bind_names[index][0] && !_actions[index].first.is_empty();
+		}
+	};
 
-Bindings::Iterator Bindings::begin() const
-{
-	size_t index = 0;
-	while (index < _private->_actions.size() && !_private->is_valid_index(index))
-		++index;
-	return Iterator(*this, index);
-}
-
-void Bindings::bind(Key key, const StaticString& action)
-{
-	auto& binding = _private->_actions[KeyType(key)];
-	binding.first.swap(String(action, _private->_allocator));
-	binding.second = ScriptCode(binding.first);
-}
-
-bool Bindings::bind(const StaticString& name, const StaticString& action)
-{
-	const Key key = lookup_key(name);
-	if (key == Key::Null)
-		return false;
-	bind(key, action);
-	return true;
-}
-
-void Bindings::bind_default(Key key, const StaticString& action)
-{
-	auto& binding = _private->_actions[KeyType(key)];
-	if (binding.first.is_empty())
+	std::pair<StaticString, StaticString> Bindings::Iterator::operator*() const
 	{
+		return std::make_pair(bind_names[_index], StaticString(_bindings._private->_actions[_index].first));
+	}
+
+	void Bindings::Iterator::operator++()
+	{
+		if (_index == _bindings._private->_actions.size())
+			return;
+		do
+		{
+			++_index;
+			if (_bindings._private->is_valid_index(_index))
+				break;
+		} while (_index < _bindings._private->_actions.size());
+	}
+
+	Y_IMPLEMENT_UNIQUE(Bindings);
+
+	Bindings::Bindings(Allocator* allocator)
+		: _private(Y_NEW(allocator, Private)(allocator))
+	{
+	}
+
+	Bindings::Iterator Bindings::begin() const
+	{
+		size_t index = 0;
+		while (index < _private->_actions.size() && !_private->is_valid_index(index))
+			++index;
+		return Iterator(*this, index);
+	}
+
+	void Bindings::bind(Key key, const StaticString& action)
+	{
+		auto& binding = _private->_actions[KeyType(key)];
 		binding.first.swap(String(action, _private->_allocator));
 		binding.second = ScriptCode(binding.first);
 	}
-}
 
-bool Bindings::bind_default(const StaticString& name, const StaticString& action)
-{
-	const Key key = lookup_key(name);
-	if (key == Key::Null)
-		return false;
-	bind_default(key, action);
-	return true;
-}
-
-bool Bindings::call(Key key, ScriptCode::ExecutionMode mode)
-{
-	const auto& binding = _private->_actions[KeyType(key)];
-	if (binding.first.is_empty())
-		return false;
-	binding.second.execute(nullptr, mode);
-	return true;
-}
-
-void Bindings::clear()
-{
-	for (auto& binding : _private->_actions)
+	bool Bindings::bind(const StaticString& name, const StaticString& action)
 	{
+		const Key key = lookup_key(name);
+		if (key == Key::Null)
+			return false;
+		bind(key, action);
+		return true;
+	}
+
+	void Bindings::bind_default(Key key, const StaticString& action)
+	{
+		auto& binding = _private->_actions[KeyType(key)];
+		if (binding.first.is_empty())
+		{
+			binding.first.swap(String(action, _private->_allocator));
+			binding.second = ScriptCode(binding.first);
+		}
+	}
+
+	bool Bindings::bind_default(const StaticString& name, const StaticString& action)
+	{
+		const Key key = lookup_key(name);
+		if (key == Key::Null)
+			return false;
+		bind_default(key, action);
+		return true;
+	}
+
+	bool Bindings::call(Key key, ScriptCode::ExecutionMode mode)
+	{
+		const auto& binding = _private->_actions[KeyType(key)];
+		if (binding.first.is_empty())
+			return false;
+		binding.second.execute(nullptr, mode);
+		return true;
+	}
+
+	void Bindings::clear()
+	{
+		for (auto& binding : _private->_actions)
+		{
+			binding.first.clear();
+			binding.second = {};
+		}
+	}
+
+	Bindings::Iterator Bindings::end() const
+	{
+		return Iterator(*this, _private->_actions.size());
+	}
+
+	void Bindings::unbind(Key key)
+	{
+		auto& binding = _private->_actions[KeyType(key)];
 		binding.first.clear();
-		binding.second = {};
+		binding.second = ScriptCode();
+	}
+
+	bool Bindings::unbind(const StaticString& name)
+	{
+		const Key key = lookup_key(name);
+		if (key == Key::Null)
+			return false;
+		unbind(key);
+		return true;
 	}
 }
-
-Bindings::Iterator Bindings::end() const
-{
-	return Iterator(*this, _private->_actions.size());
-}
-
-void Bindings::unbind(Key key)
-{
-	auto& binding = _private->_actions[KeyType(key)];
-	binding.first.clear();
-	binding.second = ScriptCode();
-}
-
-bool Bindings::unbind(const StaticString& name)
-{
-	const Key key = lookup_key(name);
-	if (key == Key::Null)
-		return false;
-	unbind(key);
-	return true;
-}
-
-} // namespace Yttrium

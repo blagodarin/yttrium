@@ -1,5 +1,5 @@
-#ifndef __GUI_PROPERTY_DUMPER_H
-#define __GUI_PROPERTY_DUMPER_H
+#ifndef _src_gui_property_dumper_h_
+#define _src_gui_property_dumper_h_
 
 #include "types.h"
 

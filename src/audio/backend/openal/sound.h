@@ -1,5 +1,5 @@
-#ifndef __AUDIO_BACKEND_OPENAL_SOUND_H
-#define __AUDIO_BACKEND_OPENAL_SOUND_H
+#ifndef _src_audio_backend_openal_sound_h_
+#define _src_audio_backend_openal_sound_h_
 
 #include "../../sound.h"
 #include "format.h"
@@ -8,7 +8,7 @@ namespace Yttrium
 {
 	class OpenAlBackend;
 
-	class OpenAlSound: public SoundImpl
+	class OpenAlSound : public SoundImpl
 	{
 		friend OpenAlBackend;
 
@@ -35,4 +35,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_BACKEND_OPENAL_SOUND_H
+#endif

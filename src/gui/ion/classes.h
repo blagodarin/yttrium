@@ -1,5 +1,5 @@
-#ifndef __GUI_ION_CLASSES_H
-#define __GUI_ION_CLASSES_H
+#ifndef _src_gui_ion_classes_h_
+#define _src_gui_ion_classes_h_
 
 #include <map>
 

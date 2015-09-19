@@ -1,5 +1,5 @@
-#ifndef __WINDOW_BACKEND_H
-#define __WINDOW_BACKEND_H
+#ifndef _src_window_backend_h_
+#define _src_window_backend_h_
 
 #include <yttrium/global.h>
 
@@ -8,4 +8,4 @@
 	#include "x11/window.h"
 #endif
 
-#endif // __WINDOW_BACKEND_H
+#endif

@@ -1,5 +1,5 @@
-#ifndef __GUI_SCENE_H
-#define __GUI_SCENE_H
+#ifndef _src_gui_scene_h_
+#define _src_gui_scene_h_
 
 #include <yttrium/bindings.h>
 #include <yttrium/rect.h>

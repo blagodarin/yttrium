@@ -1,5 +1,5 @@
-#ifndef __ION_UTILS_H
-#define __ION_UTILS_H
+#ifndef _src_ion_utils_h_
+#define _src_ion_utils_h_
 
 #include <yttrium/ion/utils.h>
 

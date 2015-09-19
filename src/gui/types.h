@@ -1,23 +1,21 @@
-#ifndef __GUI_TYPES_H
-#define __GUI_TYPES_H
+#ifndef _src_gui_types_h_
+#define _src_gui_types_h_
 
 #include <cstdint>
 
 namespace Yttrium
 {
-	/// Widget scaling mode.
+	// Widget scaling mode.
 	enum class Scaling
 	{
-		Stretch, ///< Scale the widget into the region.
-		Min,     ///< Scale the widget proportionally until it fits the region.
-		Max,     ///< Scale the widget proportionally until it covers the region.
-		Fit,     ///< Stretch for position, Min for size.
+		Stretch, // Scale the widget into the region.
+		Min,     // Scale the widget proportionally until it fits the region.
+		Max,     // Scale the widget proportionally until it covers the region.
+		Fit,     // Stretch for position, Min for size.
 	};
 
-	///
 	typedef uint_fast8_t WidgetStateType;
 
-	///
 	enum class WidgetState: WidgetStateType
 	{
 		// States that can be set by the manager.
@@ -33,13 +31,13 @@ namespace Yttrium
 
 		// Special states.
 
-		Count, ///< Number of displayed states.
-		NotSet,  ///< An unset state.
+		Count,  // Number of displayed states.
+		NotSet, // An unset state.
 	};
 
 	enum: WidgetStateType
 	{
-		WidgetStateCount = WidgetStateType(WidgetState::Count), ///< Number of widget states.
+		WidgetStateCount = WidgetStateType(WidgetState::Count), // Number of widget states.
 	};
 }
 

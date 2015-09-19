@@ -39,9 +39,9 @@ namespace Yttrium
 		if (!allocator)
 			allocator = MemoryManager::default_allocator();
 
-		ProxyAllocator* proxy_allocator = dynamic_cast<ProxyAllocator*>(allocator);
+		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(allocator);
 
-		const String &final_name = proxy_allocator
+		const auto& final_name = proxy_allocator
 			? String(proxy_allocator->name(), allocator).append('.').append(name)
 			: String(name, allocator);
 
@@ -50,13 +50,9 @@ namespace Yttrium
 
 	ProxyAllocator::~ProxyAllocator()
 	{
-		// We can't use Y_ASSERT here because it uses logging which may already be shut down,
-		// so the only remaining way is to write the message to std::cerr.
-
-		const StaticString &name = _private->_name;
-		const MemoryStatus &status = _private->_status;
-
 	#if Y_IS_DEBUG
+		const MemoryStatus status = _private->_status;
+
 		std::cerr
 			<< std::left
 			<< ":: "
@@ -65,7 +61,7 @@ namespace Yttrium
 			<< std::setw(5) << status.reallocations << " r "
 			<< std::setw(5) << status.deallocations << " d "
 			<< std::setw(5) << status.allocated_blocks << " l ::  "
-			<< name.text()
+			<< _private->_name
 			<< std::endl;
 
 		if (status.allocated_blocks)

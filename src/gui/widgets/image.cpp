@@ -4,8 +4,6 @@
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
-// TODO: Find a better class name.
-
 namespace Yttrium
 {
 	void GuiImage::dump(GuiPropertyDumper& dumper) const

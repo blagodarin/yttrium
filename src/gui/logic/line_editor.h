@@ -1,5 +1,5 @@
-#ifndef __GUI_LOGIC_LINE_EDITOR_H
-#define __GUI_LOGIC_LINE_EDITOR_H
+#ifndef _src_gui_logic_line_editor_h_
+#define _src_gui_logic_line_editor_h_
 
 #include <yttrium/string.h>
 
@@ -33,4 +33,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __GUI_LOGIC_LINE_EDITOR_H
+#endif

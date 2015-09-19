@@ -89,7 +89,7 @@ namespace Yttrium
 
 		static const struct
 		{
-			const char *name;
+			const char* name;
 			Key key;
 		}
 		wordlist[] =

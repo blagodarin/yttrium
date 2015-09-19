@@ -22,8 +22,9 @@ namespace Yttrium
 		static Pointer<Localization> create(const StaticString& file_name, Allocator* allocator = nullptr);
 
 		///
-		static String localize(const String& source);
+		static String localize(const StaticString& source);
 
+		Localization() = default;
 		virtual ~Localization() = default;
 	};
 }

@@ -1,5 +1,5 @@
-#ifndef __BASE_FILE_H
-#define __BASE_FILE_H
+#ifndef _src_base_file_h_
+#define _src_base_file_h_
 
 #include <yttrium/global.h>
 
@@ -9,4 +9,4 @@
 	#include "windows/file.h"
 #endif
 
-#endif // __BASE_FILE_H
+#endif

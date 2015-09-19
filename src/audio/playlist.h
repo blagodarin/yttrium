@@ -1,5 +1,5 @@
-#ifndef __AUDIO_PLAYLIST_H
-#define __AUDIO_PLAYLIST_H
+#ifndef _src_audio_playlist_h_
+#define _src_audio_playlist_h_
 
 #include <yttrium/audio/player.h>
 #include <yttrium/string.h>
@@ -50,4 +50,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __AUDIO_PLAYLIST_H
+#endif

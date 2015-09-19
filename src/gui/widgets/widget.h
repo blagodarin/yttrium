@@ -1,5 +1,5 @@
-#ifndef __GUI_WIDGETS_WIDGET_H
-#define __GUI_WIDGETS_WIDGET_H
+#ifndef _src_gui_widgets_widget_h_
+#define _src_gui_widgets_widget_h_
 
 #include <yttrium/key.h>
 #include <yttrium/rect.h>

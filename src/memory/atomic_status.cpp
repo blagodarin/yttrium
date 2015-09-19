@@ -12,7 +12,7 @@ namespace Yttrium
 	{
 	}
 
-	void AtomicMemoryStatus::allocate(const Allocator::Difference &difference)
+	void AtomicMemoryStatus::allocate(const Allocator::Difference& difference)
 	{
 		std::atomic_fetch_add(&_total_bytes, difference.total);
 		std::atomic_fetch_add(&_allocated_bytes, difference.allocated);
@@ -21,7 +21,7 @@ namespace Yttrium
 		std::atomic_fetch_add(&_allocations, 1u);
 	}
 
-	void AtomicMemoryStatus::deallocate(const Allocator::Difference &difference)
+	void AtomicMemoryStatus::deallocate(const Allocator::Difference& difference)
 	{
 		std::atomic_fetch_sub(&_allocated_blocks, 1u);
 		std::atomic_fetch_sub(&_allocated_bytes, difference.allocated);
@@ -30,7 +30,7 @@ namespace Yttrium
 		std::atomic_fetch_add(&_deallocations, 1u);
 	}
 
-	void AtomicMemoryStatus::reallocate(const Allocator::Difference &difference)
+	void AtomicMemoryStatus::reallocate(const Allocator::Difference& difference)
 	{
 		if (difference.direction == Allocator::Difference::Increment)
 		{
