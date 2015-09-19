@@ -125,7 +125,7 @@ def BuildTranslation(env, target, source_dir):
 	if host_platform == 'posix':
 		i18n_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
 	i18n = i18n_env.Command(target, env.Glob('$BUILD/' + source_dir + '/*.ion'), 'bin/ytr $TARGET $SOURCES')
-	Depends(i18n, 'bin/ytr')
+	Depends(i18n, ['bin/ytr', 'yttrium'])
 	Precious(i18n)
 	NoClean(i18n)
 	Alias('i18n', i18n)
@@ -194,6 +194,7 @@ src_paths = [
 	'gui/ion',
 	'gui/logic',
 	'gui/widgets',
+	'i18n',
 	'image',
 	'ion',
 	'math',

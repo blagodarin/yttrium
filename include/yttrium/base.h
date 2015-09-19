@@ -66,4 +66,4 @@ namespace Yttrium
 	private: \
 		Private* _private = nullptr \
 
-#endif // __Y_BASE_H
+#endif

@@ -152,4 +152,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_WINDOW_H
+#endif

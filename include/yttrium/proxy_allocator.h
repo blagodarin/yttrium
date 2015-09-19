@@ -73,4 +73,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_PROXY_ALLOCATOR_H
+#endif

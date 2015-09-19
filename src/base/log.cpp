@@ -18,13 +18,13 @@ namespace Yttrium
 	{
 	public:
 
-		LogManagerImpl(const StaticString& file, Allocator* allocator)
+		LogManagerImpl(const StaticString& file_name, Allocator* allocator)
 			: _allocator("log", allocator)
 			, _std_err(File::StdErr, &_allocator)
 			, _instance_guard(this, "Duplicate LogManager construction")
 		{
-			if (!file.is_empty())
-				_file = File(file, File::Write | File::Truncate, &_allocator);
+			if (!file_name.is_empty())
+				_file = File(file_name, File::Write | File::Truncate, &_allocator);
 		}
 
 		Allocator* allocator()
@@ -47,11 +47,11 @@ namespace Yttrium
 		LogManagerGuard _instance_guard;
 	};
 
-	Pointer<LogManager> LogManager::create(const StaticString& file, Allocator* allocator)
+	Pointer<LogManager> LogManager::create(const StaticString& file_name, Allocator* allocator)
 	{
 		if (!allocator)
 			allocator = MemoryManager::default_allocator();
-		return make_pointer<LogManagerImpl>(*allocator, file, allocator);
+		return make_pointer<LogManagerImpl>(*allocator, file_name, allocator);
 	}
 
 	Log::Log()

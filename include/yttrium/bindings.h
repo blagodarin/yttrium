@@ -70,4 +70,4 @@ namespace Yttrium
 	};
 }
 
-#endif // __Y_BINDINGS_H
+#endif
