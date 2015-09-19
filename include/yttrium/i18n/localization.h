@@ -10,6 +10,7 @@ namespace Yttrium
 {
 	class Allocator;
 	class StaticString;
+	class String;
 	template <typename> class Pointer;
 
 	///
@@ -19,6 +20,9 @@ namespace Yttrium
 
 		///
 		static Pointer<Localization> create(const StaticString& file_name, Allocator* allocator = nullptr);
+
+		///
+		static String localize(const String& source);
 
 		virtual ~Localization() = default;
 	};

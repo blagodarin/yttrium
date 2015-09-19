@@ -1,10 +1,11 @@
 #include <yttrium/i18n/localization.h>
 
-#include <yttrium/i18n/translation.h>
 #include <yttrium/memory_manager.h>
 #include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
+#include <yttrium/string.h>
 #include "../base/instance_guard.h"
+#include "translation.h"
 
 namespace Yttrium
 {
@@ -23,7 +24,7 @@ namespace Yttrium
 		{
 		}
 
-	private:
+	public:
 
 		ProxyAllocator _allocator;
 		Translation _translation;
@@ -35,5 +36,11 @@ namespace Yttrium
 		if (!allocator)
 			allocator = MemoryManager::default_allocator();
 		return make_pointer<LocalizationImpl>(*allocator, file_name, allocator);
+	}
+
+	String Localization::localize(const String& source)
+	{
+		std::lock_guard<std::mutex> lock(LocalizationGuard::instance_mutex);
+		return LocalizationGuard::instance ? LocalizationGuard::instance->_translation._private->translate(source) : source;
 	}
 }

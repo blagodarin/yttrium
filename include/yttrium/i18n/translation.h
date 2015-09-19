@@ -9,11 +9,13 @@
 
 namespace Yttrium
 {
+	class Localization;
 	class StaticString;
 
 	///
 	class Y_API Translation
 	{
+		friend Localization;
 	public:
 
 		///

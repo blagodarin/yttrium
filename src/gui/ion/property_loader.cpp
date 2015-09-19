@@ -1,6 +1,7 @@
 #include "property_loader.h"
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/i18n/localization.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
@@ -439,7 +440,7 @@ bool GuiIonPropertyLoader::load_translatable(const StaticString& name, String* t
 	if (tr_value.type() != IonValue::Type::String)
 		return false;
 
-	*text = tr_value.string(); // TODO: Load translation.
+	*text = Localization::localize(String(tr_value.string(), text->allocator())); // TODO: Get rid of useless allocation.
 	return true;
 }
 
