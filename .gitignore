@@ -1,8 +1,8 @@
 *.log
 *.sh
 .sconsign.dblite
-bin/*
-doc/*
-lib/*
+bin
+doc/html
+lib
 tetrium.txt
-tmp/*
+tmp
