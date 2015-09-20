@@ -94,6 +94,9 @@ namespace Yttrium
 
 	bool Button::process_key(const KeyEvent& event)
 	{
+		if (_state == WidgetState::Disabled)
+			return false;
+
 		if (event.key != Key::Mouse1)
 			return false;
 

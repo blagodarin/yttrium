@@ -15,11 +15,20 @@ scene "game_over"
 
 	label
 	{
-		position   "15" "13"
+		position   "15" "8"
 		text_size  "8"
 		font       "common"
-		text_color "0.75" "0" "0"
+		text_color "1" "1" "0"
 		text       {tr"Game over"}
+	}
+
+	label
+	{
+		position   "15" "15"
+		text_size  "3"
+		font       "common"
+		text_color "1" "1" "1"
+		text       {tr"Enter your name:"}
 	}
 
 	input

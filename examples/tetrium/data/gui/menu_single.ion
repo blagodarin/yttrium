@@ -41,7 +41,7 @@ scene "menu_single"
 	{
 		position "" "360"
 		text     {tr"Hard"}
-		action   "set start_level 20; push_scene game_single"
+		action   "set start_level 30; push_scene game_single"
 	}
 
 	button ["button"]

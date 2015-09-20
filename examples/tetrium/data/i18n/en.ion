@@ -1,6 +1,7 @@
 tr "Accelerate" ""
 tr "Back" ""
 tr "Easy" ""
+tr "Enter your name:" ""
 tr "Exit" ""
 tr "Exit game" ""
 tr "Game over" ""

@@ -42,6 +42,7 @@ namespace Yttrium
 
 	void BackgroundProperty::update(const GuiPropertyLoader& loader)
 	{
+		loader.load_color("color", &color);
 		loader.load_texture("texture", &texture);
 		loader.load_rect("texture_rect", &texture_rect, true);
 		loader.load_margins("borders", &borders);
