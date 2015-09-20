@@ -76,6 +76,8 @@ int main(int argc, char** argv)
 		update_translation(translation, document.root());
 	}
 
+	translation.remove_obsolete();
+
 	if (!translation.save(argv[1]))
 	{
 		std::cerr << "ERROR: Failed to save translation file \"" << argv[1] << "\"" << std::endl;

@@ -11,7 +11,6 @@
 		- Separate image header/data loading support.
 		- Image pack support (a list of headers with filenames and raw image data offsets).
 	* Internationalization:
-		- Clean outdated translations.
 		- Unicode font support.
 	* Memory:
 		- Keep a global track of all ProxyAllocators.

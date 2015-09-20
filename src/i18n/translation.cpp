@@ -4,7 +4,6 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/string.h>
 
 namespace Yttrium
 {
@@ -15,7 +14,10 @@ namespace Yttrium
 
 	void Translation::Private::add(const StaticString& source)
 	{
-		_translations[String(source, _allocator)];
+		auto i = _translations.find(String(source, ByReference(), _allocator));
+		if (i == _translations.end())
+			i = _translations.emplace(String(source, _allocator), String(_allocator)).first;
+		i->second.added = true;
 	}
 
 	bool Translation::Private::load(const StaticString& file_name)
@@ -39,6 +41,15 @@ namespace Yttrium
 		return true;
 	}
 
+	void Translation::Private::remove_obsolete()
+	{
+		for (auto i = _translations.begin(); i != _translations.end(); )
+			if (i->second.added)
+				++i;
+			else
+				i = _translations.erase(i);
+	}
+
 	bool Translation::Private::save(const StaticString& file_name) const
 	{
 		IonDocument document(_allocator);
@@ -46,7 +57,7 @@ namespace Yttrium
 		{
 			auto& node = *document.root().append(S("tr"));
 			node.append(translation.first);
-			node.append(translation.second);
+			node.append(translation.second.text);
 		}
 		return document.save(file_name);
 	}
@@ -54,7 +65,7 @@ namespace Yttrium
 	String Translation::Private::translate(const StaticString& source) const
 	{
 		const auto i = _translations.find(String(source, ByReference(), _allocator));
-		return i != _translations.end() && !i->second.is_empty() ? i->second : String(source, _allocator);
+		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, _allocator);
 	}
 
 	Y_IMPLEMENT_UNIQUE(Translation);
@@ -69,6 +80,11 @@ namespace Yttrium
 	void Translation::add(const StaticString& source)
 	{
 		_private->add(source);
+	}
+
+	void Translation::remove_obsolete()
+	{
+		_private->remove_obsolete();
 	}
 
 	bool Translation::save(const StaticString& file_name) const

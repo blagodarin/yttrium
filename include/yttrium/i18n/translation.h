@@ -25,6 +25,9 @@ namespace Yttrium
 		void add(const StaticString& source);
 
 		///
+		void remove_obsolete();
+
+		///
 		bool save(const StaticString& file_name) const;
 
 	private:

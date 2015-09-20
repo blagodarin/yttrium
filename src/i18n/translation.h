@@ -3,6 +3,7 @@
 
 #include <yttrium/i18n/translation.h>
 
+#include <yttrium/string.h>
 #include "../base/private_base.h"
 
 #include <map>
@@ -19,12 +20,21 @@ namespace Yttrium
 
 		void add(const StaticString& source);
 		bool load(const StaticString& file_name);
+		void remove_obsolete();
 		bool save(const StaticString& file_name) const;
 		String translate(const StaticString& source) const;
 
 	private:
 
-		std::map<String, String> _translations;
+		struct Entry
+		{
+			String text;
+			bool added = false;
+
+			Entry(String&& text) : text(std::move(text)) {}
+		};
+
+		std::map<String, Entry> _translations;
 	};
 }
 
