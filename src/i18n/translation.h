@@ -4,24 +4,22 @@
 #include <yttrium/i18n/translation.h>
 
 #include <yttrium/string.h>
-#include "../base/private_base.h"
 
 #include <map>
 
 namespace Yttrium
 {
-	class String;
-
-	class Y_PRIVATE Translation::Private : public PrivateBase<Translation::Private>
+	class TranslationImpl : public Translation
 	{
 	public:
 
-		Private(Allocator* allocator);
+		TranslationImpl(Allocator* allocator);
 
-		void add(const StaticString& source);
+		void add(const StaticString& source) override;
+		void remove_obsolete() override;
+		bool save(const StaticString& file_name) const override;
+
 		bool load(const StaticString& file_name);
-		void remove_obsolete();
-		bool save(const StaticString& file_name) const;
 		String translate(const StaticString& source) const;
 
 	private:
@@ -34,6 +32,7 @@ namespace Yttrium
 			Entry(String&& text) : text(std::move(text)) {}
 		};
 
+		Allocator* const _allocator;
 		std::map<String, Entry> _translations;
 	};
 }

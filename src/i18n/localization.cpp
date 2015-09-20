@@ -19,7 +19,7 @@ namespace Yttrium
 
 		LocalizationImpl(const StaticString& file_name, Allocator* allocator)
 			: _allocator("i18n", allocator)
-			, _translation(file_name, &_allocator)
+			, _translation(Translation::open(file_name, &_allocator))
 			, _instance_guard(this, "Duplicate Localization construction")
 		{
 		}
@@ -27,7 +27,7 @@ namespace Yttrium
 	public:
 
 		ProxyAllocator _allocator;
-		Translation _translation;
+		Pointer<Translation> _translation;
 		LocalizationGuard _instance_guard;
 	};
 
@@ -42,7 +42,7 @@ namespace Yttrium
 	{
 		std::lock_guard<std::mutex> lock(LocalizationGuard::instance_mutex);
 		return LocalizationGuard::instance
-			? LocalizationGuard::instance->_translation._private->translate(source)
+			? static_cast<TranslationImpl*>(LocalizationGuard::instance->_translation.get())->translate(source)
 			: String(source);
 	}
 }

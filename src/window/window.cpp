@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include <yttrium/matrix.h>
+#include <yttrium/memory_manager.h>
 #include <yttrium/timer.h>
 #include <yttrium/utils.h>
 #include "../gui/gui.h"
@@ -29,6 +30,8 @@ namespace Yttrium
 
 	Pointer<Window> Window::create(WindowCallbacks& callbacks, Allocator* allocator)
 	{
+		if (!allocator)
+			allocator = MemoryManager::default_allocator();
 		auto window = make_pointer<WindowImpl>(*allocator, callbacks, allocator);
 		if (!window->initialize())
 			return {};
@@ -36,16 +39,16 @@ namespace Yttrium
 	}
 
 	WindowImpl::WindowImpl(WindowCallbacks& callbacks, Allocator* allocator)
-		: _allocator(allocator)
+		: _allocator("window", allocator)
 		, _is_active(false)
 		, _is_cursor_locked(false)
 		, _size(640, 480)
 		, _mode(Windowed)
 		, _callbacks(callbacks)
 		, _console(allocator)
-		, _screenshot_filename(_allocator)
-		, _screenshot_image(_allocator)
-		, _debug_text(_allocator)
+		, _screenshot_filename(&_allocator)
+		, _screenshot_image(&_allocator)
+		, _debug_text(&_allocator)
 	{
 		for (bool& pressed : _keys)
 			pressed = false;
@@ -62,19 +65,19 @@ namespace Yttrium
 
 	bool WindowImpl::initialize()
 	{
-		_screen = ScreenImpl::open(*_allocator);
+		_screen = ScreenImpl::open(_allocator);
 		if (!_screen)
 			return false;
 
-		_backend = WindowBackend::create(*_allocator, *_screen, _size, *this);
+		_backend = WindowBackend::create(_allocator, *_screen, _size, *this);
 		if (!_backend)
 			return false;
 
-		_renderer = RendererImpl::create(*_backend, _allocator);
+		_renderer = RendererImpl::create(*_backend, &_allocator);
 		if (!_renderer)
 			return false;
 
-		_gui = make_pointer<GuiImpl>(*_allocator, *_renderer, _callbacks, _allocator);
+		_gui = make_pointer<GuiImpl>(_allocator, *_renderer, _callbacks, &_allocator);
 		return true;
 	}
 

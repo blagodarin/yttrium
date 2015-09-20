@@ -4,15 +4,16 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/pointer.h>
 
 namespace Yttrium
 {
-	Translation::Private::Private(Allocator* allocator)
-		: PrivateBase(allocator)
+	TranslationImpl::TranslationImpl(Allocator* allocator)
+		: _allocator(allocator)
 	{
 	}
 
-	void Translation::Private::add(const StaticString& source)
+	void TranslationImpl::add(const StaticString& source)
 	{
 		auto i = _translations.find(String(source, ByReference(), _allocator));
 		if (i == _translations.end())
@@ -20,7 +21,28 @@ namespace Yttrium
 		i->second.added = true;
 	}
 
-	bool Translation::Private::load(const StaticString& file_name)
+	void TranslationImpl::remove_obsolete()
+	{
+		for (auto i = _translations.begin(); i != _translations.end(); )
+			if (i->second.added)
+				++i;
+			else
+				i = _translations.erase(i);
+	}
+
+	bool TranslationImpl::save(const StaticString& file_name) const
+	{
+		IonDocument document(_allocator);
+		for (const auto& translation : _translations)
+		{
+			auto& node = *document.root().append(S("tr"));
+			node.append(translation.first);
+			node.append(translation.second.text);
+		}
+		return document.save(file_name);
+	}
+
+	bool TranslationImpl::load(const StaticString& file_name)
 	{
 		IonDocument document(_allocator);
 		if (!document.load(file_name))
@@ -41,54 +63,16 @@ namespace Yttrium
 		return true;
 	}
 
-	void Translation::Private::remove_obsolete()
-	{
-		for (auto i = _translations.begin(); i != _translations.end(); )
-			if (i->second.added)
-				++i;
-			else
-				i = _translations.erase(i);
-	}
-
-	bool Translation::Private::save(const StaticString& file_name) const
-	{
-		IonDocument document(_allocator);
-		for (const auto& translation : _translations)
-		{
-			auto& node = *document.root().append(S("tr"));
-			node.append(translation.first);
-			node.append(translation.second.text);
-		}
-		return document.save(file_name);
-	}
-
-	String Translation::Private::translate(const StaticString& source) const
+	String TranslationImpl::translate(const StaticString& source) const
 	{
 		const auto i = _translations.find(String(source, ByReference(), _allocator));
 		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, _allocator);
 	}
 
-	Y_IMPLEMENT_UNIQUE(Translation);
-
-	Translation::Translation(const StaticString& file_name, Allocator* allocator)
+	Pointer<Translation> Translation::open(const StaticString& file_name, Allocator* allocator)
 	{
-		PrivateHolder<Translation::Private> translation(allocator);
+		auto translation = make_pointer<TranslationImpl>(*allocator, allocator);
 		translation->load(file_name);
-		_private = translation.release();
-	}
-
-	void Translation::add(const StaticString& source)
-	{
-		_private->add(source);
-	}
-
-	void Translation::remove_obsolete()
-	{
-		_private->remove_obsolete();
-	}
-
-	bool Translation::save(const StaticString& file_name) const
-	{
-		return _private->save(file_name);
+		return std::move(translation);
 	}
 }

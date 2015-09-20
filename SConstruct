@@ -107,35 +107,6 @@ if option_release:
 else:
 	env.Append(CPPFLAGS = toolchain_flags['compile-debug'])
 
-#===============================================================================
-# Utility functions
-#===============================================================================
-
-def BuildExample(env, name):
-	build_path = '$BUILD/examples/' + name
-	target = env.Program('bin/' + name, env.Glob(build_path + '/src/*.cpp'))
-	env.Clean(target, env.Dir(build_path))
-	return target
-
-def BuildSources(env, subdir, entries):
-	targets = []
-	for entry in entries:
-		build_path = '$BUILD/' + subdir + '/' + entry
-		target = env.Program('bin/' + entry, env.Glob(build_path + '/*.cpp'))
-		env.Clean(target, env.Dir(build_path))
-		targets += [target]
-	return targets
-
-def BuildTranslation(env, translation, source_dir):
-	target_env = Environment(TOOLS = [])
-	if host_platform == 'posix':
-		target_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
-	target = target_env.Command(translation, env.Glob('$BUILD/' + source_dir + '/*.ion'), 'bin/ytr $TARGET $SOURCES')
-	Depends(target, ['bin/ytr', 'yttrium'])
-	Precious(target)
-	NoClean(target)
-	return target
-
 ################################################################################
 # Targets
 ################################################################################
@@ -290,23 +261,49 @@ AlwaysBuild('test')
 # Tools
 #-------------------------------------------------------------------------------
 
-Alias('tools', BuildSources(env, 'tools', [
-	'generate-sounds',
-	'generate-test-images',
-	'ypq',
-	'ytr']))
+def YttriumTool(env, name):
+	build_path = '$BUILD/tools/' + name
+	target = env.Program('bin/' + name, env.Glob(build_path + '/*.cpp'))
+	env.Clean(target, env.Dir(build_path))
+	Alias('tools', target)
+	return target
+
+YttriumTool(env, 'generate-sounds')
+YttriumTool(env, 'generate-test-images')
+YttriumTool(env, 'ypq')
+ytr = YttriumTool(env, 'ytr')
+
 Clean('tools', Dir('$BUILD/tools'))
+
+#-------------------------------------------------------------------------------
+# Utility functions
+#-------------------------------------------------------------------------------
+
+def YttriumTranslation(env, translation, source_dir):
+	ytr_env = Environment(TOOLS = [])
+	if host_platform == 'posix':
+		ytr_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
+	target = ytr_env.Command(translation, env.Glob('$BUILD/' + source_dir + '/*.ion'), str(ytr[0]) + ' $TARGET $SOURCES')
+	Depends(target, [ytr, yttrium]) # Changing i18n code in dynamically-linked yttrium may leave ytr unchanged.
+	Precious(target)
+	NoClean(target)
+	return target
 
 #-------------------------------------------------------------------------------
 # Examples
 #-------------------------------------------------------------------------------
 
-rts = BuildExample(env, 'rts')
+def YttriumExample(env, name):
+	build_path = '$BUILD/examples/' + name
+	target = env.Program('bin/' + name, env.Glob(build_path + '/src/*.cpp'))
+	env.Clean(target, env.Dir(build_path))
+	Alias('examples', target)
+	return target
 
-tetrium = BuildExample(env, 'tetrium')
-Depends(tetrium, BuildTranslation(env, 'examples/tetrium/data/i18n/en.ion', 'examples/tetrium/data/gui'))
+YttriumExample(env, 'rts')
+tetrium = YttriumExample(env, 'tetrium')
+Depends(tetrium, YttriumTranslation(env, 'examples/tetrium/data/i18n/en.ion', 'examples/tetrium/data/gui'))
 
-Alias('examples', [rts, tetrium])
 Clean('examples', Dir('$BUILD/examples'))
 
 #===============================================================================

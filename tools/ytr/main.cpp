@@ -4,6 +4,7 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/memory_manager.h>
+#include <yttrium/pointer.h>
 #include <yttrium/string.h>
 
 #include <iostream>
@@ -63,7 +64,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	Translation translation(argv[1]);
+	const auto& translation = Translation::open(argv[1]);
 
 	for (int i = 2; i < argc; ++i)
 	{
@@ -73,12 +74,12 @@ int main(int argc, char** argv)
 			std::cerr << "ERROR: Failed to load source file \"" << argv[i] << "\"" << std::endl;
 			return 1;
 		}
-		update_translation(translation, document.root());
+		update_translation(*translation, document.root());
 	}
 
-	translation.remove_obsolete();
+	translation->remove_obsolete();
 
-	if (!translation.save(argv[1]))
+	if (!translation->save(argv[1]))
 	{
 		std::cerr << "ERROR: Failed to save translation file \"" << argv[1] << "\"" << std::endl;
 		return 1;

@@ -82,7 +82,7 @@ namespace Yttrium
 		};
 
 		///
-		static Pointer<Window> create(WindowCallbacks& callbacks, Allocator* allocator = DefaultAllocator);
+		static Pointer<Window> create(WindowCallbacks& callbacks, Allocator* allocator = nullptr);
 
 		Window() = default;
 		virtual ~Window() = default;

@@ -148,7 +148,7 @@ void Game::run()
 {
 	Log() << "Loading";
 
-	_window = Window::create(*this, &_allocator);
+	_window = Window::create(*this);
 	if (!_window)
 		return;
 
@@ -216,7 +216,7 @@ void Game::run()
 	File settings_file("tetrium.txt", File::Write | File::Truncate, &_allocator);
 	if (settings_file)
 	{
-		String settings(&_allocator);
+		String settings(1024, &_allocator);
 		settings << "unbindall\n";
 		for (const auto& binding : _bindings)
 			settings << "bind " << binding.first << " \"" << binding.second.escaped("\\\"", '\\', &_allocator) << "\"\n";
@@ -275,6 +275,7 @@ void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticS
 
 void Game::on_update(const UpdateEvent& update)
 {
+	_window->debug_text().reserve(1024);
 	_window->debug_text().clear()
 		<< "FPS: " << update.fps << "\n"
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"

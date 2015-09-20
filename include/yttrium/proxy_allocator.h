@@ -12,25 +12,13 @@ namespace Yttrium
 	/// Memory status.
 	struct MemoryStatus
 	{
-		size_t allocated_blocks; ///< Number of memory blocks allocated.
-		size_t allocated_bytes;  ///< Allocated memory size.
-		size_t total_bytes;      ///< Used memory size.
+		size_t allocated_blocks = 0; ///< Number of memory blocks allocated.
+		size_t allocated_bytes = 0;  ///< Allocated memory size.
+		size_t total_bytes = 0;      ///< Used memory size.
 
-		size_t allocations;      ///< Lifetime (wrapping) number of allocations.
-		size_t reallocations;    ///< Lifetime (wrapping) number of reallocations.
-		size_t deallocations;    ///< Lifetime (wrapping) number of deallocations.
-
-		///
-
-		MemoryStatus()
-			: allocated_blocks(0)
-			, allocated_bytes(0)
-			, total_bytes(0)
-			, allocations(0)
-			, reallocations(0)
-			, deallocations(0)
-		{
-		}
+		size_t allocations = 0;      ///< Lifetime (wrapping) number of allocations.
+		size_t reallocations = 0;    ///< Lifetime (wrapping) number of reallocations.
+		size_t deallocations = 0;    ///< Lifetime (wrapping) number of deallocations.
 	};
 
 	/// Proxy allocator.

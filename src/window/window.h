@@ -5,6 +5,7 @@
 
 #include <yttrium/image.h>
 #include <yttrium/pointer.h>
+#include <yttrium/proxy_allocator.h>
 #include "backend.h"
 #include "console.h"
 
@@ -57,7 +58,7 @@ namespace Yttrium
 
 	private:
 
-		Allocator* const       _allocator;
+		ProxyAllocator         _allocator;
 		Pointer<ScreenImpl>    _screen;
 		Pointer<WindowBackend> _backend;
 		Pointer<RendererImpl>  _renderer;
