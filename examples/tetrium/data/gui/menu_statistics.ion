@@ -1,0 +1,67 @@
+class "statistics_index"
+{
+	position  "60" ""
+	text_size "40"
+	font      "common"
+	align     "left"
+}
+
+class "statistics_name"
+{
+	position  "70" ""
+	text_size "40"
+	font      "common"
+	align     "right"
+}
+
+class "statistics_score"
+{
+	position  "600" ""
+	text_size "40"
+	font      "common"
+	align     "left"
+}
+
+scene "menu_statistics"
+{
+	bind "esc" "pop_scene"
+
+	image
+	{
+		position "0" "0" "640" "480"
+		texture  "data/textures/wall.jpeg"
+	}
+
+	image
+	{
+		position "20" "30" "600" "250"
+		color    "0" "0" "0" "0.5"
+	}
+
+	label ["statistics_index"] { position ""  "55" text "1."       }
+	label ["statistics_name" ] { position ""  "55" text "{name1}"  }
+	label ["statistics_score"] { position ""  "55" text "{score1}" }
+
+	label ["statistics_index"] { position "" "105" text "2."       }
+	label ["statistics_name" ] { position "" "105" text "{name2}"  }
+	label ["statistics_score"] { position "" "105" text "{score2}" }
+
+	label ["statistics_index"] { position "" "155" text "3."       }
+	label ["statistics_name" ] { position "" "155" text "{name3}"  }
+	label ["statistics_score"] { position "" "155" text "{score3}" }
+
+	label ["statistics_index"] { position "" "205" text "4."       }
+	label ["statistics_name" ] { position "" "205" text "{name4}"  }
+	label ["statistics_score"] { position "" "205" text "{score4}" }
+
+	label ["statistics_index"] { position "" "255" text "5."       }
+	label ["statistics_name" ] { position "" "255" text "{name5}"  }
+	label ["statistics_score"] { position "" "255" text "{score5}" }
+
+	button ["button"]
+	{
+		position "" "310"
+		text     {tr"Back"}
+		on_click "pop_scene"
+	}
+}

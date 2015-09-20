@@ -35,9 +35,9 @@ namespace Yttrium
 		SharedPtr<Texture2D> _font_texture;
 		Vector2              _text_size;
 		SharedPtr<Sound>     _sound;
-		ScriptCode           _action;
 		WidgetState          _state = WidgetState::NotSet;
 		Style                _styles[WidgetStateCount];
+		ScriptCode           _on_click;
 	};
 }
 

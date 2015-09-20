@@ -27,27 +27,27 @@ scene "menu_single"
 	{
 		position "" "260"
 		text     {tr"Easy"}
-		action   "set start_level 1; push_scene game_single"
+		on_click "set start_level 1; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
 		text     {tr"Normal"}
-		action   "set start_level 10; push_scene game_single"
+		on_click "set start_level 10; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
 		text     {tr"Hard"}
-		action   "set start_level 30; push_scene game_single"
+		on_click "set start_level 30; push_scene game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
 		text     {tr"Back"}
-		action   "pop_scene"
+		on_click "pop_scene"
 	}
 }

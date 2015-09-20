@@ -5,6 +5,8 @@
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
+#include <utility>
+
 namespace Yttrium
 {
 	void GuiInput::dump(GuiPropertyDumper& dumper) const
@@ -29,29 +31,35 @@ namespace Yttrium
 
 		_rect = RectF(_position);
 
+		String on_enter(_name.allocator());
+		loader.load_text("on_enter", &on_enter);
+		_on_enter = ScriptCode(std::move(on_enter));
+
 		return true;
 	}
 
 	bool GuiInput::process_key(const KeyEvent& event)
 	{
-		if (event.key == Key::Mouse1)
-		{
-			if (event.pressed > 0)
-			{
-				_cursor_mark = Timer::clock();
-				return true;
-			}
-		}
-
 		if (event.pressed > 0)
 		{
-			if (_logic.process_key(event))
+			switch (event.key)
 			{
+			case Key::Enter:
+				_on_enter.execute();
+				return true;
+
+			case Key::Mouse1:
 				_cursor_mark = Timer::clock();
 				return true;
+
+			default:
+				if (_logic.process_key(event))
+				{
+					_cursor_mark = Timer::clock();
+					return true;
+				}
 			}
 		}
-
 		return false;
 	}
 

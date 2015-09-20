@@ -13,6 +13,8 @@
 
 #include "tetrium.h"
 
+#include <map>
+
 using namespace Yttrium;
 
 class Game : public WindowCallbacks
@@ -39,6 +41,8 @@ private:
 	void draw_next_figure(Renderer& renderer, const RectF& rect);
 	void set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type);
 
+	void update_statistics();
+
 private:
 
 	ScriptManager _script_manager;
@@ -55,6 +59,8 @@ private:
 
 	Tetrium::Game _game;
 	bool          _game_running = false;
+
+	std::multimap<int, String> _statistics;
 };
 
 #endif

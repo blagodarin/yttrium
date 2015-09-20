@@ -57,10 +57,6 @@ namespace Yttrium
 			_is_enabled = false;
 		}
 
-		String action_script(_name.allocator());
-		loader.load_text("action", &action_script);
-		_action = ScriptCode(std::move(action_script));
-
 		_sound = loader.load_sound("sound");
 
 		Style* style = &_styles[WidgetStateType(WidgetState::Active)];
@@ -87,14 +83,20 @@ namespace Yttrium
 		loader.load_color("text_color", &style->text_color);
 		style->background.update(loader);
 
+		loader.unbind();
+
 		_rect = RectF(_position);
+
+		String on_click(_name.allocator());
+		loader.load_text("on_click", &on_click);
+		_on_click = ScriptCode(std::move(on_click));
 
 		return true;
 	}
 
 	bool Button::process_key(const KeyEvent& event)
 	{
-		if (_state == WidgetState::Disabled)
+		if (_state == WidgetState::Checked || _state == WidgetState::Disabled)
 			return false;
 
 		if (event.key != Key::Mouse1)
@@ -105,7 +107,7 @@ namespace Yttrium
 
 		if (_sound)
 			_sound->play();
-		_action.execute();
+		_on_click.execute();
 		return true;
 	}
 

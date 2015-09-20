@@ -2,6 +2,8 @@
 * Library:
 	* Overall:
 		- Windows port.
+	* Base:
+		- Convenient string formatting.
 	* GUI:
 		- Line editor widget.
 		- Layouts.
@@ -21,3 +23,4 @@
 * Examples:
 	* Tetrium:
 		- Pack the data at build time.
+		- Runtime block texture generation.

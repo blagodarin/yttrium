@@ -38,5 +38,6 @@ scene "game_over"
 		text_size  "3"
 		font       "common"
 		text_color "0" "0" "0"
+		on_enter   "save_score; pop_scene 3; push_scene menu_statistics"
 	}
 }

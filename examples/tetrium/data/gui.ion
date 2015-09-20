@@ -45,6 +45,7 @@ class "button"
 include "examples/tetrium/data/gui/menu_main.ion"
 include "examples/tetrium/data/gui/menu_single.ion"
 include "examples/tetrium/data/gui/menu_multi.ion"
+include "examples/tetrium/data/gui/menu_statistics.ion"
 include "examples/tetrium/data/gui/menu_help.ion"
 
 include "examples/tetrium/data/gui/game_over.ion"

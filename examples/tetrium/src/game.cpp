@@ -18,6 +18,13 @@
 Game::Game()
 	: _allocator("game")
 	, _bindings(&_allocator)
+	, _statistics{
+		{10000, String("John Placeholder", &_allocator)},
+		{5000, String("John Placeholder", &_allocator)},
+		{1000, String("John Placeholder", &_allocator)},
+		{500, String("John Placeholder", &_allocator)},
+		{100, String("John Placeholder", &_allocator)},
+	}
 {
 	ScriptContext::global().define("bind", 2, [this](const ScriptCall& call)
 	{
@@ -91,6 +98,13 @@ Game::Game()
 		_window->gui().push_scene(call.args.string(0));
 	});
 
+	ScriptContext::global().define("save_score", [this](const ScriptCall&)
+	{
+		_statistics.emplace(_game.score(), String("John Placeholder", &_allocator));
+		_statistics.erase(_statistics.begin());
+		update_statistics();
+	});
+
 	ScriptContext::global().define("set", 2, [this](const ScriptCall& call)
 	{
 		const ScriptValue* value = call.args.value(0);
@@ -142,6 +156,8 @@ Game::Game()
 		if (value->type() == ScriptValue::Type::Name)
 			call.context.unset(value->to_string());
 	});
+
+	update_statistics();
 }
 
 void Game::run()
@@ -422,4 +438,21 @@ void Game::set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figur
 {
 	const int figure_index = (figure_type == Tetrium::Figure::None) ? 0 : figure_type + 1;
 	renderer.set_texture_rectangle(_block_coords[figure_index].x, _block_coords[figure_index].y, _block_size, _block_size);
+}
+
+void Game::update_statistics()
+{
+	int index = 0;
+	for (auto i = _statistics.rbegin(); i != _statistics.rend(); ++i)
+	{
+		++index;
+
+		String name("name", &_allocator);
+		name << index;
+		ScriptContext::global().set(name, i->second);
+
+		String score("score", &_allocator);
+		score << index;
+		ScriptContext::global().set(score, i->first);
+	}
 }

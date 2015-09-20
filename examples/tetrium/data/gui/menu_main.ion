@@ -20,34 +20,34 @@ scene "menu_main" ["root"]
 	{
 		position "" "210"
 		text     {tr"Single player"}
-		action   "push_scene menu_single"
+		on_click "push_scene menu_single"
 	}
 
 	button ["button"]
 	{
 		position "" "260"
 		text     {tr"Multiplayer"}
-		action   "push_scene menu_multi"
+		on_click "push_scene menu_multi"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
 		text     {tr"Statistics"}
-		state    "disabled"
+		on_click "push_scene menu_statistics"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
 		text     {tr"Help"}
-		action   "push_scene menu_help"
+		on_click "push_scene menu_help"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
 		text     {tr"Exit"}
-		action   "exit"
+		on_click "exit"
 	}
 }

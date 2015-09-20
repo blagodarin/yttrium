@@ -52,6 +52,6 @@ scene "menu_help"
 	{
 		position "" "360"
 		text     {tr"Back"}
-		action   "pop_scene"
+		on_click "pop_scene"
 	}
 }

@@ -1,6 +1,7 @@
 #ifndef _src_gui_widgets_input_h_
 #define _src_gui_widgets_input_h_
 
+#include <yttrium/script/code.h>
 #include <yttrium/timer.h>
 #include "../logic/line_editor.h"
 #include "../property.h"
@@ -26,6 +27,7 @@ namespace Yttrium
 		ForegroundProperty _foreground;
 		LineEditor         _logic;
 		Clock              _cursor_mark = 0;
+		ScriptCode         _on_enter;
 	};
 }
 

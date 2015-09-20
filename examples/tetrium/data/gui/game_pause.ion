@@ -23,27 +23,27 @@ scene "game_pause"
 	{
 		position "" "9"
 		text     {tr"Resume"}
-		action   "pop_scene"
+		on_click "pop_scene"
 	}
 
 	button ["pause_button"]
 	{
 		position "" "12"
 		text     {tr"Restart"}
-		action   "pop_scene 2; push_scene game_single"
+		on_click "pop_scene 2; push_scene game_single"
 	}
 
 	button ["pause_button"]
 	{
 		position "" "15"
 		text     {tr"Give up"}
-		action   "pop_scene 3"
+		on_click "pop_scene 3"
 	}
 
 	button ["pause_button"]
 	{
 		position "" "18"
 		text     {tr"Exit game"}
-		action   "exit"
+		on_click "exit"
 	}
 }

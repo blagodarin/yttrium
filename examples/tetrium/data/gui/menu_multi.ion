@@ -41,6 +41,6 @@ scene "menu_multi"
 	{
 		position "" "410"
 		text     {tr"Back"}
-		action   "pop_scene"
+		on_click "pop_scene"
 	}
 }
