@@ -1,35 +1,33 @@
 #ifndef _src_base_fourcc_h_
 #define _src_base_fourcc_h_
 
+#include <cstddef>
 #include <cstdint>
 
 namespace Yttrium
 {
-	template <uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3>
-	class Fourcc
+	constexpr uint32_t operator"" _fourcc(const char* text, size_t)
 	{
-	public:
+		return static_cast<uint32_t>(text[0])
+			| static_cast<uint32_t>(text[1]) << 8
+			| static_cast<uint32_t>(text[2]) << 16
+			| static_cast<uint32_t>(text[3]) << 24;
+	}
 
-		static const uint32_t value = c0
-			| uint32_t{c1} << 8
-			| uint32_t{c2} << 16
-			| uint32_t{c3} << 24;
-	};
-
-	template <uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4, uint8_t c5, uint8_t c6, uint8_t c7>
-	class Eightcc
+	constexpr uint64_t operator"" _eightcc(const char* text, size_t)
 	{
-	public:
+		return static_cast<uint64_t>(text[0])
+			| static_cast<uint64_t>(text[1]) << 8
+			| static_cast<uint64_t>(text[2]) << 16
+			| static_cast<uint64_t>(text[3]) << 24
+			| static_cast<uint64_t>(text[4]) << 32
+			| static_cast<uint64_t>(text[5]) << 40
+			| static_cast<uint64_t>(text[6]) << 48
+			| static_cast<uint64_t>(text[7]) << 56;
+	}
 
-		static const uint64_t value = c0
-			| uint64_t{c1} << 8
-			| uint64_t{c2} << 16
-			| uint64_t{c3} << 24
-			| uint64_t{c4} << 32
-			| uint64_t{c5} << 40
-			| uint64_t{c6} << 48
-			| uint64_t{c7} << 56;
-	};
+	static_assert("ABCD"_fourcc == 0x44434241, "FOURCC compile time test failed");
+	static_assert("ABCDEFGH"_eightcc == 0x4847464544434241, "EIGHTCC compile time test failed");
 }
 
 #endif

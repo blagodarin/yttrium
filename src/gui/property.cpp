@@ -19,33 +19,33 @@ namespace Yttrium
 
 	void BackgroundProperty::dump(GuiPropertyDumper& dumper) const
 	{
-		dumper.dump_color("color", color);
+		dumper.dump_color("color"_s, color);
 		if (texture)
 		{
-			dumper.dump_texture("texture", texture);
-			dumper.dump_rect("texture_rect", texture_rect);
-			dumper.dump_margins("borders", borders);
+			dumper.dump_texture("texture"_s, texture);
+			dumper.dump_rect("texture_rect"_s, texture_rect);
+			dumper.dump_margins("borders"_s, borders);
 		}
 	}
 
 	bool BackgroundProperty::load(const GuiPropertyLoader& loader)
 	{
-		loader.load_color("color", &color);
-		if (loader.load_texture("texture", &texture))
+		loader.load_color("color"_s, &color);
+		if (loader.load_texture("texture"_s, &texture))
 		{
-			if (!loader.load_rect("texture_rect", &texture_rect))
+			if (!loader.load_rect("texture_rect"_s, &texture_rect))
 				texture_rect = texture->rect();
-			loader.load_margins("borders", &borders);
+			loader.load_margins("borders"_s, &borders);
 		}
 		return true;
 	}
 
 	void BackgroundProperty::update(const GuiPropertyLoader& loader)
 	{
-		loader.load_color("color", &color);
-		loader.load_texture("texture", &texture);
-		loader.load_rect("texture_rect", &texture_rect, true);
-		loader.load_margins("borders", &borders);
+		loader.load_color("color"_s, &color);
+		loader.load_texture("texture"_s, &texture);
+		loader.load_rect("texture_rect"_s, &texture_rect, true);
+		loader.load_margins("borders"_s, &borders);
 	}
 
 	void ForegroundProperty::draw(Renderer& renderer, const String& text,
@@ -64,17 +64,17 @@ namespace Yttrium
 		if (!font_texture)
 			return;
 		// TODO: Dump font.
-		dumper.dump_size("text_size", size);
-		dumper.dump_color("text_color", color);
+		dumper.dump_size("text_size"_s, size);
+		dumper.dump_color("text_color"_s, color);
 	}
 
 	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
 	{
-		if (!loader.load_font("font", &font, &font_texture))
+		if (!loader.load_font("font"_s, &font, &font_texture))
 			return false;
-		if (!loader.load_size("text_size", &size))
+		if (!loader.load_size("text_size"_s, &size))
 			return false;
-		loader.load_color("text_color", &color);
+		loader.load_color("text_color"_s, &color);
 		return true;
 	}
 }

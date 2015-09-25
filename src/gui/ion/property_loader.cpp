@@ -7,9 +7,8 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/margins.h>
 #include <yttrium/texture_cache.h>
+#include <yttrium/utils.h>
 #include "../gui.h"
-
-#include <algorithm>
 
 namespace Yttrium
 {
@@ -23,7 +22,7 @@ namespace Yttrium
 
 			if (!values.is_empty())
 			{
-				const size_t items = std::min<size_t>(values.size(), 4);
+				const size_t items = min<size_t>(values.size(), 4);
 
 				for (size_t i = 0; i < items; values.pop_first(), ++i)
 				{
@@ -50,7 +49,7 @@ namespace Yttrium
 
 			if (!values.is_empty())
 			{
-				const size_t items = std::min<size_t>(values.size(), 2);
+				const size_t items = min<size_t>(values.size(), 2);
 
 				for (size_t i = 0; i < items; values.pop_first(), ++i)
 				{
@@ -92,7 +91,7 @@ namespace Yttrium
 
 			if (!values.is_empty())
 			{
-				const size_t items = std::min<size_t>(values.size(), 2);
+				const size_t items = min<size_t>(values.size(), 2);
 
 				for (size_t i = 0; i < items; values.pop_first(), ++i)
 				{
@@ -415,7 +414,7 @@ namespace Yttrium
 			return false;
 
 		const auto& tr_node = *tr_object.begin();
-		if (tr_node.name() != S("tr") || tr_node.size() != 1)
+		if (tr_node.name() != "tr"_s || tr_node.size() != 1)
 			return false;
 
 		const auto& tr_value = *tr_node.first();
@@ -452,31 +451,31 @@ namespace Yttrium
 			{
 				return false;
 			}
-			else if (*value == S("center"))
+			else if (*value == "center"_s)
 			{
 				if (is_centered)
 					return false;
 				is_centered = true;
 			}
-			else if (*value == S("left"))
+			else if (*value == "left"_s)
 			{
 				if (result & HorizontalAlignmentMask)
 					return false;
 				result |= LeftAlignment;
 			}
-			else if (*value == S("right"))
+			else if (*value == "right"_s)
 			{
 				if (result & HorizontalAlignmentMask)
 					return false;
 				result |= RightAlignment;
 			}
-			else if (*value == S("top"))
+			else if (*value == "top"_s)
 			{
 				if (result & VerticalAlignmentMask)
 					return false;
 				result |= TopAlignment;
 			}
-			else if (*value == S("bottom"))
+			else if (*value == "bottom"_s)
 			{
 				if (result & VerticalAlignmentMask)
 					return false;
@@ -554,13 +553,13 @@ namespace Yttrium
 		if (!values->get(&value))
 			return false;
 
-		if (*value == S("fit"))
+		if (*value == "fit"_s)
 			*scaling = Scaling::Fit;
-		else if (*value == S("max"))
+		else if (*value == "max"_s)
 			*scaling = Scaling::Max;
-		else if (*value == S("min"))
+		else if (*value == "min"_s)
 			*scaling = Scaling::Min;
-		else if (*value == S("stretch"))
+		else if (*value == "stretch"_s)
 			*scaling = Scaling::Stretch;
 		else
 			return false;
@@ -598,15 +597,15 @@ namespace Yttrium
 		if (!values->get(&value))
 			return false;
 
-		if (*value == S("normal"))
+		if (*value == "normal"_s)
 			*state = WidgetState::Normal;
-		else if (*value == S("active"))
+		else if (*value == "active"_s)
 			*state = WidgetState::Active;
-		else if (*value == S("pressed"))
+		else if (*value == "pressed"_s)
 			*state = WidgetState::Pressed;
-		else if (*value == S("checked"))
+		else if (*value == "checked"_s)
 			*state = WidgetState::Checked;
-		else if (*value == S("disabled"))
+		else if (*value == "disabled"_s)
 			*state = WidgetState::Disabled;
 		else
 			return false;
@@ -650,35 +649,35 @@ namespace Yttrium
 				if (!values->get(&value))
 					return false;
 
-				if (*value == S("nearest"))
+				if (*value == "nearest"_s)
 				{
 					if (has_interpolation)
 						return false;
 					filter = Texture2D::NearestFilter | (filter & Texture2D::AnisotropicFilter);
 					has_interpolation = true;
 				}
-				else if (*value == S("linear"))
+				else if (*value == "linear"_s)
 				{
 					if (has_interpolation)
 						return false;
 					filter = Texture2D::LinearFilter | (filter & Texture2D::AnisotropicFilter);
 					has_interpolation = true;
 				}
-				else if (*value == S("bilinear"))
+				else if (*value == "bilinear"_s)
 				{
 					if (has_interpolation)
 						return false;
 					filter = Texture2D::BilinearFilter | (filter & Texture2D::AnisotropicFilter);
 					has_interpolation = true;
 				}
-				else if (*value == S("trilinear"))
+				else if (*value == "trilinear"_s)
 				{
 					if (has_interpolation)
 						return false;
 					filter = Texture2D::TrilinearFilter | (filter & Texture2D::AnisotropicFilter);
 					has_interpolation = true;
 				}
-				else if (*value == S("anisotropic"))
+				else if (*value == "anisotropic"_s)
 				{
 					if (!has_interpolation || has_anisotropy)
 						return false;

@@ -16,8 +16,8 @@ namespace Yttrium
 	{
 		enum: uint32_t
 		{
-			RIFF = Fourcc<'R', 'I', 'F', 'F'>::value,
-			WAVE = Fourcc<'W', 'A', 'V', 'E'>::value,
+			RIFF = "RIFF"_fourcc,
+			WAVE = "WAVE"_fourcc,
 		};
 
 		uint32_t riff_fourcc;
@@ -29,8 +29,8 @@ namespace Yttrium
 	{
 		enum: uint32_t
 		{
-			fmt = Fourcc<'f', 'm', 't', ' '>::value,
-			data = Fourcc<'d', 'a', 't', 'a'>::value,
+			fmt = "fmt "_fourcc,
+			data = "data"_fourcc,
 		};
 
 		uint32_t name_fourcc;

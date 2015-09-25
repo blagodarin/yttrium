@@ -1,13 +1,9 @@
 #include <yttrium/string.h>
 
 #include <yttrium/allocator.h>
-#include <yttrium/date_time.h>
-#include "ieee_float.h"
+#include <yttrium/utils.h>
 
-#include <algorithm>
-#include <array>
 #include <cassert>
-#include <cstdio>
 #include <cstring>
 
 namespace Yttrium
@@ -16,15 +12,27 @@ namespace Yttrium
 	const size_t StringGrowBound = 256; // The boundary until String size will double.
 	const size_t StringGrowStep  = 256; // Linear String grow step after the boundary.
 
+	struct String::Private
+	{
+		static void deallocate(String& string)
+		{
+			if (string._buffer_size == 0)
+				return;
+			const auto references = reinterpret_cast<size_t*>(string.text()) - 1;
+			if (!--*references)
+				string._allocator->deallocate(references);
+		}
+	};
+
 	String::String(const String& string)
 		: StaticString(string._size)
-		, _buffer_size(std::max(_size + 1, StringReserve))
+		, _buffer_size(max(_size + 1, StringReserve))
 		, _allocator(string._allocator)
 	{
 		init(string._text, _size);
 	}
 
-	String::String(String&& string)
+	String::String(String&& string) noexcept
 		: StaticString(string._text, string._size)
 		, _buffer_size(string._buffer_size)
 		, _allocator(string._allocator)
@@ -34,355 +42,35 @@ namespace Yttrium
 
 	String::String(const StaticString& string, Allocator* allocator)
 		: StaticString(string.size())
-		, _buffer_size(std::max(_size + 1, StringReserve))
+		, _buffer_size(max(_size + 1, StringReserve))
 		, _allocator(allocator)
 	{
 		init(string.text(), _size);
 	}
 
-	String::String(const char* text, size_t size, Allocator* allocator)
-		: StaticString(size)
-		, _buffer_size(std::max(_size + 1, StringReserve))
-		, _allocator(allocator)
-	{
-		init(text, size);
-	}
-
 	String::String(const char* text, Allocator* allocator)
 		: StaticString(::strlen(text))
-		, _buffer_size(std::max(_size + 1, StringReserve))
+		, _buffer_size(max(_size + 1, StringReserve))
 		, _allocator(allocator)
 	{
 		init(text, _size);
 	}
 
 	String::String(size_t size, Allocator* allocator)
-		: _buffer_size(std::max(size, StringReserve))
+		: _buffer_size(max(size, StringReserve))
 		, _allocator(allocator)
 	{
 		init(&StringNull, 0);
 	}
 
-	String::String(const StaticString& left, const StaticString& right, Allocator* allocator)
-		: StaticString(left.size() + right.size())
-		, _buffer_size(std::max(_size + 1, StringReserve))
-		, _allocator(allocator)
-	{
-		init();
-		::memcpy(const_cast<char*>(_text), left.text(), left.size());
-		::memcpy(const_cast<char*>(_text) + left.size(), right.text(), right.size());
-		const_cast<char*>(_text)[_size] = '\0';
-	}
-
-	String::String(const StaticString& left, char right, Allocator* allocator)
-		: StaticString(left.size() + 1)
-		, _buffer_size(std::max(_size + 1, StringReserve))
-		, _allocator(allocator)
-	{
-		init();
-		::memcpy(const_cast<char*>(_text), left.text(), left.size());
-		const_cast<char*>(_text)[left.size()] = right;
-		const_cast<char*>(_text)[_size] = '\0';
-	}
-
-	String::String(char left, const StaticString& right, Allocator* allocator)
-		: StaticString(1 + right.size())
-		, _buffer_size(std::max(_size + 1, StringReserve))
-		, _allocator(allocator)
-	{
-		init();
-		const_cast<char*>(_text)[0] = left;
-		::memcpy(const_cast<char*>(_text) + 1, right.text(), right.size());
-		const_cast<char*>(_text)[_size] = '\0';
-	}
-
 	String::~String()
 	{
-		if (_buffer_size)
-		{
-			size_t* references = reinterpret_cast<size_t*>(const_cast<char*>(_text)) - 1;
-			if (!--*references)
-				_allocator->deallocate(references);
-		}
+		Private::deallocate(*this);
 	}
 
-	String& String::append(const char* text, size_t size)
+	String& String::clear() noexcept
 	{
-		size_t new_size = _size + size;
-		if (_buffer_size)
-		{
-			grow(new_size + 1);
-		}
-		else
-		{
-			const char* old_text = init(new_size + 1);
-			::memcpy(const_cast<char*>(_text), old_text, _size);
-		}
-		::memcpy(const_cast<char*>(_text) + _size, text, size);
-		const_cast<char*>(_text)[new_size] = '\0';
-		_size = new_size;
-		return *this;
-	}
-
-	String& String::append(const char* text)
-	{
-		return append(text, ::strlen(text));
-	}
-
-	String& String::append(char symbol, size_t count)
-	{
-		const size_t new_size = _size + count;
-		if (_buffer_size)
-		{
-			grow(new_size + 1);
-		}
-		else
-		{
-			const char* old_text = init(new_size + 1);
-			::memcpy(const_cast<char*>(_text), old_text, _size);
-		}
-		memset(const_cast<char*>(_text) + _size, symbol, count);
-		const_cast<char*>(_text)[new_size] = '\0';
-		_size = new_size;
-		return *this;
-	}
-
-	String& String::append_dec(int64_t value, int width, bool zeros)
-	{
-		std::array<char, 20> buffer;
-
-		uint64_t uvalue;
-		if (value >= 0)
-		{
-			uvalue = value;
-		}
-		else
-		{
-			uvalue = -value;
-			--width;
-		}
-
-		size_t i = buffer.size();
-		do
-		{
-			buffer[--i] = uvalue % 10 + '0';
-			uvalue /= 10;
-			--width;
-		} while (uvalue);
-
-		if (zeros)
-		{
-			if (value < 0)
-				append('-');
-			if (width > 0)
-				append('0', width);
-		}
-		else
-		{
-			if (width > 0)
-				append(' ', width);
-			if (value < 0)
-				append('-');
-		}
-
-		append(&buffer[i], buffer.size() - i);
-		return *this;
-	}
-
-	String& String::append_dec(uint64_t value, int width, bool zeros)
-	{
-		std::array<char, 20> buffer;
-
-		size_t i = buffer.size();
-		do
-		{
-			buffer[--i] = value % 10 + '0';
-			value /= 10;
-			--width;
-		} while (value);
-
-		if (width > 0)
-		{
-			append(zeros ? '0' : ' ', width);
-		}
-
-		append(&buffer[i], buffer.size() - i);
-		return *this;
-	}
-
-	namespace
-	{
-		const S negative_infinity("-INF");
-		const S positive_infinity("INF");
-		const S negative_nan("-NAN");
-		const S positive_nan("NAN");
-		const S negative_zero("-0");
-		const S positive_zero("0");
-
-		template <typename T>
-		StaticString float_to_string(char* buffer, T value, int max_fraction_digits = -1)
-		{
-			// NOTE: This should provide exact float-to-string-to-float conversions.
-			// NOTE: This won't work for non-IEEE floats and may not work on big endian architectures.
-
-			typedef IeeeFloat<T> Float;
-
-			typedef typename Float::FastSigned   FastSigned;
-			typedef typename Float::FastUnsigned FastUnsigned;
-			typedef typename Float::Union        Union;
-
-			Union raw_value;
-
-			raw_value.f = value;
-
-			bool is_negative = raw_value.i & Float::SignMask;
-
-			FastSigned exponent = (raw_value.i & Float::ExponentMask) >> Float::MantissaBits;
-			FastUnsigned mantissa = raw_value.i & Float::MantissaMask;
-
-			if (!exponent)
-			{
-				if (!mantissa)
-					return is_negative ? negative_zero : positive_zero;
-
-				// Base 2 logarithm calculation trick based on a Sean Eron Anderson snippet:
-				// http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogIEEE64Float
-
-				Union u;
-
-				u.i = mantissa | ((Float::ExponentBias + Float::MantissaBits) << Float::MantissaBits);
-				u.f -= Float::ImplicitOne;
-
-				FastSigned shift = (Float::ExponentBias + Float::MantissaBits) - (u.i >> Float::MantissaBits);
-
-				mantissa <<= shift;
-				exponent = Float::DenormalizedExponent - shift;
-			}
-			else if (exponent == Float::BiasedInfinityExponent)
-			{
-				if (!mantissa)
-					return is_negative ? negative_infinity : positive_infinity;
-				else
-					return is_negative ? negative_nan : positive_nan;
-			}
-			else
-			{
-				exponent -= Float::ExponentBias;
-				mantissa |= Float::ImplicitOne;
-			}
-
-			// At this point, the absolute value is (mantissa / 0x800000) * pow(2, exponent),
-			// with [0x800000, 0xFFFFFF] mantissa range, and [-147, 127] exponent range.
-
-			if (exponent > Float::MantissaBits) // The precision exceeds 1.
-			{
-				// TODO: Implement.
-			}
-			else if (exponent < -1) // The absolute value is in (0; 0.5) range.
-			{
-				// TODO: Implement.
-			}
-			else
-			{
-				FastSigned whole_bits = exponent + 1;
-				FastSigned fraction_bits = Float::MantissaBits - exponent;
-
-				FastSigned whole_value = mantissa >> fraction_bits;
-
-				auto begin = buffer + (10 + 3 * whole_bits) / 10 + 1;
-				auto end = begin;
-
-				do
-				{
-					*--begin = '0' + whole_value % 10;
-					whole_value /= 10;
-				} while (whole_value);
-
-				if (is_negative)
-					*--begin = '-';
-
-				FastSigned fraction_value = (mantissa << whole_bits) & Float::ImplicitMantissaMask;
-
-				if (fraction_value && max_fraction_digits)
-				{
-					*end++ = '.';
-
-					FastSigned fraction_limit = (10 + 3 * fraction_bits) / 10;
-
-					auto fraction_end = end
-						+ (max_fraction_digits > 0 && max_fraction_digits < fraction_limit
-							? max_fraction_digits
-							: fraction_limit);
-
-					char last_digit;
-
-					do
-					{
-						FastSigned next_value = fraction_value * 10;
-						last_digit = '0' + (next_value >> (Float::MantissaBits + 1));
-						*end++ = last_digit;
-						fraction_value = next_value & Float::ImplicitMantissaMask;
-					} while (fraction_value && end < fraction_end);
-
-					if (fraction_value)
-					{
-						char extra_digit = '0' + ((fraction_value * 10) >> (Float::MantissaBits + 1));
-
-						if (extra_digit > '5' || (extra_digit == '5' && ((last_digit - '0') & 1)))
-						{
-							++last_digit;
-							while (last_digit > '9')
-							{
-								--end;
-								last_digit = *(end - 1);
-								if (last_digit == '.')
-								{
-									last_digit = '0';
-									++end;
-									break;
-								}
-								else
-								{
-									++last_digit;
-								}
-							}
-							*(end - 1) = last_digit;
-						}
-					}
-				}
-
-				return StaticString(begin, end - begin);
-			}
-
-			assert(false);
-
-			return StaticString();
-		}
-	}
-
-	String& String::append_dec(float value)
-	{
-		char buffer[32];
-	#if 0 // TODO: Utilize the advanced float to string conversion when it's ready.
-		return append(float_to_string(buffer, value));
-	#else
-		int size = 0;
-		::sprintf(buffer, "%f%n", static_cast<double>(value), &size);
-		return append(buffer, size);
-	#endif
-	}
-
-	String& String::append_dec(double value)
-	{
-		char buffer[32];
-		int size = 0;
-		::sprintf(buffer, "%lf%n", value, &size);
-		return append(buffer, size);
-	}
-
-	String& String::clear()
-	{
-		if (_buffer_size)
+		if (_buffer_size > 0)
 		{
 			size_t* references = reinterpret_cast<size_t*>(const_cast<char*>(_text)) - 1;
 			if (*references == 1)
@@ -458,11 +146,11 @@ namespace Yttrium
 		if (!size || index >= _size)
 			return;
 
-		size = std::min(size, _size - index);
+		size = min(size, _size - index);
 
 		size_t* references = nullptr;
 
-		if (_buffer_size)
+		if (_buffer_size > 0)
 		{
 			references = reinterpret_cast<size_t*>(const_cast<char*>(_text)) - 1;
 			if (*references == 1)
@@ -496,7 +184,7 @@ namespace Yttrium
 		}
 		else
 		{
-			const char* old_text = init(std::max(_size + 1, buffer_size));
+			const char* old_text = init(max(_size + 1, buffer_size));
 			::memcpy(const_cast<char*>(_text), old_text, _size + 1);
 			const_cast<char*>(_text)[_size] = '\0';
 		}
@@ -511,7 +199,7 @@ namespace Yttrium
 		}
 		else
 		{
-			const char* old_text = init(std::max(_size + 1, buffer_size));
+			const char* old_text = init(max(_size + 1, buffer_size));
 			::memcpy(const_cast<char*>(_text), old_text, _size + 1);
 		}
 
@@ -546,41 +234,7 @@ namespace Yttrium
 			--*references;
 	}
 
-	String& String::set(const char* text, size_t size)
-	{
-		const size_t buffer_size = size + 1;
-		if (_buffer_size > 0)
-			grow(buffer_size);
-		else
-			init(buffer_size);
-
-		::memcpy(const_cast<char*>(_text), text, size);
-		const_cast<char*>(_text)[size] = '\0';
-		_size = size;
-
-		return *this;
-	}
-
-	String& String::set(const char* text)
-	{
-		return set(text, ::strlen(text));
-	}
-
-	String& String::set(char symbol)
-	{
-		if (_buffer_size > 0)
-			grow(2);
-		else
-			init(2);
-
-		const_cast<char*>(_text)[0] = symbol;
-		const_cast<char*>(_text)[1] = '\0';
-		_size = 1;
-
-		return *this;
-	}
-
-	String& String::swap(String* string)
+	String& String::swap(String* string) noexcept
 	{
 		const auto text = _text;
 		const auto size = _size;
@@ -600,7 +254,7 @@ namespace Yttrium
 		return *this;
 	}
 
-	String& String::swap(String&& string)
+	String& String::swap(String&& string) noexcept
 	{
 		const auto text = _text;
 		const auto size = _size;
@@ -626,7 +280,7 @@ namespace Yttrium
 		if (trimmed_string.size() < _size)
 		{
 			const size_t buffer_size = trimmed_string.size() + 1;
-			if (_buffer_size)
+			if (_buffer_size > 0)
 				grow(buffer_size);
 			else
 				init(buffer_size);
@@ -638,103 +292,35 @@ namespace Yttrium
 		return *this;
 	}
 
-	String String::format(const DateTime& date_time, const char* format, Allocator* allocator)
+	String& String::operator=(const StaticString& string)
 	{
-		String result(::strlen(format) + 1, allocator);
-		while (*format != '\0')
-		{
-			if (*format != '%')
-			{
-				result += *format++;
-				continue;
-			}
-			switch (*++format)
-			{
-			case '%':
-				result += '%';
-				++format;
-				break;
+		const auto buffer_size = string.size() + 1;
+		if (_buffer_size > 0)
+			grow(buffer_size);
+		else
+			init(buffer_size);
 
-			case 'D':
-				if (*++format == 'D')
-				{
-					result.append_dec(date_time.day, 2, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.day);
-				break;
+		::memcpy(const_cast<char*>(_text), string.text(), string.size());
+		const_cast<char*>(_text)[string.size()] = '\0';
+		_size = string.size();
 
-			case 'M':
-				if (*++format == 'M')
-				{
-					result.append_dec(date_time.month, 2, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.month);
-				break;
+		return *this;
+	}
 
-			case 'Y':
-				if (*++format == 'Y')
-				{
-					result.append_dec(date_time.year, 4, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.year);
-				break;
-
-			case 'h':
-				if (*++format == 'h')
-				{
-					result.append_dec(date_time.hour, 2, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.hour);
-				break;
-
-			case 'm':
-				if (*++format == 'm')
-				{
-					result.append_dec(date_time.minute, 2, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.minute);
-				break;
-
-			case 's':
-				if (*++format == 's')
-				{
-					result.append_dec(date_time.second, 2, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.second);
-				break;
-
-			case 'z':
-				if (*++format == 'z')
-				{
-					result.append_dec(date_time.msecond, 3, true);
-					++format;
-				}
-				else
-					result.append_dec(date_time.msecond);
-				break;
-
-			default:
-				result.append('%');
-			}
-		}
-		return std::move(result);
+	String& String::operator=(String&& string) noexcept
+	{
+		Private::deallocate(*this);
+		_text = string._text;
+		_size = string._size;
+		_buffer_size = string._buffer_size;
+		_allocator = string._allocator;
+		string._buffer_size = 0;
+		return *this;
 	}
 
 	void String::grow(size_t buffer_size)
 	{
-		assert(_buffer_size);
+		assert(_buffer_size > 0);
 
 		size_t* references = reinterpret_cast<size_t*>(const_cast<char*>(_text)) - 1;
 		if (*references != 1)
@@ -747,7 +333,7 @@ namespace Yttrium
 		}
 		else if (_buffer_size < buffer_size)
 		{
-			size_t adjusted_size = std::max(buffer_size,
+			size_t adjusted_size = max(buffer_size,
 				(_buffer_size < StringGrowBound
 					? _buffer_size * 2
 					: _buffer_size + StringGrowStep));
@@ -764,7 +350,7 @@ namespace Yttrium
 
 	void String::init()
 	{
-		assert(_buffer_size);
+		assert(_buffer_size > 0);
 		assert(_allocator);
 
 		size_t* pointer = static_cast<size_t*>(_allocator->allocate(sizeof(size_t) + _buffer_size));
@@ -781,12 +367,12 @@ namespace Yttrium
 
 	const char* String::init(size_t buffer_size)
 	{
-		assert(!_buffer_size);
+		assert(_buffer_size == 0);
 
 		if (!_allocator) // Rely on this at your own risk.
 			return _text;
 
-		const size_t adjusted_size = std::max(buffer_size, StringReserve);
+		const size_t adjusted_size = max(buffer_size, StringReserve);
 		size_t* pointer = static_cast<size_t*>(_allocator->allocate(sizeof(size_t) + adjusted_size));
 		*pointer = 1;
 		const char* old_text = _text;

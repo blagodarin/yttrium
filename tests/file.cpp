@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(test_file_special)
 	BOOST_REQUIRE(file);
 	BOOST_CHECK(file.name().is_empty());
 
-	const S text("Standard error output test.\n");
+	const auto text = "Standard error output test.\n"_s;
 	BOOST_CHECK(file.write(text.text(), text.size()));
 }
 

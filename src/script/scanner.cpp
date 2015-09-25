@@ -187,15 +187,15 @@ namespace Yttrium
 						case 'r':  *end++ = '\r'; break;
 						default:
 
-							Log() << S("[ScriptScanner] Invalid escape sequence \"") << *cursor
-								<< S("\" (") << token.line << ':' << cursor - _line_origin << ')';
+							Log() << "[ScriptScanner] Invalid escape sequence \""_s << *cursor
+								<< "\" ("_s << token.line << ':' << cursor - _line_origin << ')';
 							return false;
 						}
 						++cursor;
 					}
 					else if (*cursor == '\n' || *cursor == '\r')
 					{
-						Log() << S("[ScriptScanner] Unexpected end of line (")
+						Log() << "[ScriptScanner] Unexpected end of line ("_s
 							<< token.line << ':' << cursor - _line_origin << ')';
 						return false;
 					}
@@ -210,7 +210,7 @@ namespace Yttrium
 					}
 					else
 					{
-						Log() << S("[ScriptScanner] Unexpected end of script (")
+						Log() << "[ScriptScanner] Unexpected end of script ("_s
 							<< token.line << ':' << cursor - _line_origin << ')';
 						return false;
 					}
@@ -250,7 +250,7 @@ namespace Yttrium
 
 		case Kind::Error:
 
-			Log() << S("[ScriptScanner] Invalid script character (")
+			Log() << "[ScriptScanner] Invalid script character ("_s
 				<< token.line << ':' << cursor - _line_origin << ')';
 			return false;
 		}

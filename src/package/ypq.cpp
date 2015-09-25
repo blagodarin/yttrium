@@ -36,10 +36,9 @@ namespace Yttrium
 
 	#pragma pack(pop)
 
-		// NOTE: It should be stated explicitly that the signatures are little endian.
-		const uint64_t YpqPackageSignature = Eightcc<0xDA, 0xBD, 'Y', 'P', 'Q', 'A', 0xED, 0xDE>::value;
-		const uint64_t YpqFileSignature    = Eightcc<0xDA, 0xBD, 'Y', 'P', 'Q', 'F', 0xED, 0xDE>::value;
-		const uint64_t YpqIndexSignature   = Eightcc<0xDA, 0xBD, 'Y', 'P', 'Q', 'I', 0xED, 0xDE>::value;
+		const uint64_t YpqPackageSignature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
+		const uint64_t YpqFileSignature    = "\xDA\xBDYPQF\xED\xDE"_eightcc;
+		const uint64_t YpqIndexSignature   = "\xDA\xBDYPQI\xED\xDE"_eightcc;
 	}
 
 	bool YpqReader::open()

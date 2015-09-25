@@ -8,8 +8,6 @@
 
 namespace Yttrium
 {
-	struct DateTime;
-
 	///
 	/// \note Strings with allocated storage always store a zero terminator.
 	class Y_API String : public StaticString
@@ -20,17 +18,13 @@ namespace Yttrium
 		String(Allocator* allocator = DefaultAllocator) : _allocator(allocator) {}
 
 		/// Copy constructor.
-		/// \param string The source string.
-		String(const String& string);
+		String(const String&);
 
-		///
-		String(String&& string);
+		/// Move constructor.
+		String(String&&) noexcept;
 
 		///
 		explicit String(const StaticString& string, Allocator* allocator = DefaultAllocator);
-
-		///
-		String(const char* text, size_t size, Allocator* allocator = DefaultAllocator);
 
 		///
 		String(const char* text, Allocator* allocator = DefaultAllocator);
@@ -38,23 +32,10 @@ namespace Yttrium
 		/// Preallocating constructor.
 		explicit String(size_t size, Allocator* allocator = DefaultAllocator);
 
-		/// Concatenating constructor.
-		String(const StaticString& left, const StaticString& right, Allocator* allocator = DefaultAllocator);
-
-		///
-		String(const StaticString& left, char right, Allocator* allocator = DefaultAllocator);
-
-		///
-		String(char left, const StaticString& right, Allocator* allocator = DefaultAllocator);
-
 		/// Destructor.
 		~String();
 
 	public:
-
-		/// Reference constructor.
-		String(const char* text, size_t size, const ByReference&, Allocator* allocator = DefaultAllocator)
-			: StaticString(text, size), _allocator(allocator) {}
 
 		///
 		String(const StaticString& string, const ByReference&, Allocator* allocator = DefaultAllocator)
@@ -69,42 +50,8 @@ namespace Yttrium
 		///
 		Allocator* allocator() const { return _allocator; }
 
-		/// Append the specified \a string.
-		String& append(const char* text, size_t size);
-
-		///
-		String& append(const StaticString& string) { return append(string.text(), string.size()); }
-
-		///
-		String& append(const char*);
-
-		/// Append the specified \a symbol to the string \a count times.
-		String& append(char symbol, size_t count = 1);
-
-		/// Append decimal \a value to the string.
-		/// \param value Value to append.
-		/// \param width Minimal number width.
-		/// \param zeros Should the value be prepended with zeros instead of spaces to fit \a width?
-		/// \return
-		String& append_dec(int32_t value, int width = 0, bool zeros = false) { return append_dec(int64_t{value}, width, zeros); }
-
-		///
-		String& append_dec(uint32_t value, int width = 0, bool zeros = false) { return append_dec(uint64_t{value}, width, zeros); }
-
-		///
-		String& append_dec(int64_t value, int width = 0, bool zeros = false);
-
-		///
-		String& append_dec(uint64_t value, int width = 0, bool zeros = false);
-
-		///
-		String& append_dec(float value);
-
-		///
-		String& append_dec(double value);
-
 		/// Clear the string.
-		String& clear();
+		String& clear() noexcept;
 
 		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with in-place.
 		String& escape(const char* symbols, char with) { return swap(escaped(symbols, with)); }
@@ -124,7 +71,7 @@ namespace Yttrium
 		/// Remove \a size symbols starting at the specified \a index.
 		void remove(size_t index, size_t size = 1);
 
-		/// Reserve the space in the string for \a len symbols.
+		/// Reserve the space in the string for \a size symbols.
 		void reserve(size_t size);
 
 		/// Resize the string, filling the new part with random data.
@@ -133,90 +80,26 @@ namespace Yttrium
 		/// Truncate the string to the specified \a size.
 		void truncate(size_t size);
 
-		/// Set the string to the specified \a string.
-		String& set(const char* text, size_t size);
+		///
+		String& swap(String*) noexcept;
 
 		///
-		String& set(const StaticString& string) { return set(string.text(), string.size()); }
-
-		///
-		String& set(const char*);
-
-		///
-		String& set(char);
-
-		///
-		String& swap(String*);
-
-		///
-		String& swap(String&&);
+		String& swap(String&&) noexcept;
 
 		///
 		char* text() { return const_cast<char*>(_text); }
 		using StaticString::text;
 
 		///
-		char* text_at(size_t index) { return const_cast<char*>(_text) + index; }
-		using StaticString::text_at;
-
-		///
 		String& trim();
 
-		String& operator=(char s) { return set(s); }
-		String& operator=(const char* s) { return set(s); }
-		String& operator=(const StaticString& s) { return set(s); }
-		String& operator=(const String& s) { return set(s); }
-
-		String& operator+=(char s) { return append(s); }
-		String& operator+=(const StaticString& s) { return append(s); }
+		String& operator=(const char* string) { return *this = StaticString(string); }
+		String& operator=(const StaticString&);
+		String& operator=(const String& string) { return *this = StaticString(string); }
+		String& operator=(String&&) noexcept;
 
 		char& operator[](size_t offset) { return const_cast<char*>(_text)[offset]; }
 		using StaticString::operator[];
-
-	public:
-
-		/// Convert a decimal value to the string.
-		/// \param value Value to convert.
-		/// \param width Minimal number width.
-		/// \param zeros Should the value be prepended with zeros to fit \a width?
-		/// \return
-		static String from_dec(int32_t value, Allocator* allocator = DefaultAllocator)
-		{
-			return String(11, allocator).append_dec(value);
-		}
-
-		///
-		static String from_dec(uint32_t value, Allocator* allocator = DefaultAllocator)
-		{
-			return String(10, allocator).append_dec(value);
-		}
-
-		///
-		static String from_dec(int64_t value, Allocator* allocator = DefaultAllocator)
-		{
-			return String(21, allocator).append_dec(value);
-		}
-
-		///
-		static String from_dec(uint64_t value, Allocator* allocator = DefaultAllocator)
-		{
-			return String(20, allocator).append_dec(value);
-		}
-
-		///
-		static String from_dec(float value, Allocator* allocator = DefaultAllocator)
-		{
-			return String(16, allocator).append_dec(value); // TODO: Find the exact required reserve size.
-		}
-
-		///
-		static String from_dec(double value, Allocator* allocator = DefaultAllocator)
-		{
-			return String(32, allocator).append_dec(value); // TODO: Find the exact required reserve size.
-		}
-
-		///
-		static String format(const DateTime& date_time, const char* format, Allocator* allocator = DefaultAllocator);
 
 	private:
 
@@ -232,55 +115,10 @@ namespace Yttrium
 
 		size_t _buffer_size = 0;
 		Allocator* _allocator = nullptr;
+
+		struct Private;
+		friend Private;
 	};
-
-	///
-	inline String& operator<<(String& lhs, char rhs)
-	{
-		return lhs.append(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, const StaticString& rhs)
-	{
-		return lhs.append(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, int32_t rhs)
-	{
-		return lhs.append_dec(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, uint32_t rhs)
-	{
-		return lhs.append_dec(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, int64_t rhs)
-	{
-		return lhs.append_dec(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, uint64_t rhs)
-	{
-		return lhs.append_dec(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, float rhs)
-	{
-		return lhs.append_dec(rhs);
-	}
-
-	///
-	inline String& operator<<(String& lhs, double rhs)
-	{
-		return lhs.append_dec(rhs);
-	}
 }
 
 #endif

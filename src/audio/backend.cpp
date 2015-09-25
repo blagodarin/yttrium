@@ -5,7 +5,7 @@
 
 namespace Yttrium
 {
-	const S AudioBackend::OpenAL("openal");
+	const StaticString AudioBackend::OpenAL = "openal"_s;
 
 	Pointer<AudioBackend> AudioBackend::create(const StaticString& backend, const StaticString& device, Allocator* allocator)
 	{

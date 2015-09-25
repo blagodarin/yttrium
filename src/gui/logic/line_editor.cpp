@@ -9,9 +9,6 @@ namespace Yttrium
 {
 	LineEditor::LineEditor(Allocator* allocator)
 		: _text(allocator)
-		, _cursor(0)
-		, _selection_size(0)
-		, _selection_offset(0)
 		, _max_size(std::numeric_limits<decltype(_max_size)>::max())
 	{
 	}

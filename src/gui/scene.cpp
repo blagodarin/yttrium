@@ -34,15 +34,15 @@ namespace Yttrium
 	void GuiScene::load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader)
 	{
 		Pointer<Widget> widget;
-		if (type == S("button"))
+		if (type == "button"_s)
 			widget = make_pointer<Button>(*_allocator, _allocator);
-		else if (type == S("canvas"))
+		else if (type == "canvas"_s)
 			widget = make_pointer<Canvas>(*_allocator, _gui.callbacks(), _allocator);
-		else if (type == S("image"))
+		else if (type == "image"_s)
 			widget = make_pointer<GuiImage>(*_allocator, _allocator);
-		else if (type == S("input"))
+		else if (type == "input"_s)
 			widget = make_pointer<GuiInput>(*_allocator, _allocator);
-		else if (type == S("label"))
+		else if (type == "label"_s)
 			widget = make_pointer<Label>(*_allocator, _allocator);
 
 		if (!widget)

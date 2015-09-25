@@ -32,13 +32,13 @@ namespace Yttrium
 
 		if (command == _commands.end())
 		{
-			Log() << S("[Script.Context] Unknown command \"") << id << '\"';
+			Log() << "[Script.Context] Unknown command \""_s << id << '\"';
 			return false;
 		}
 
 		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 		{
-			Log() << S("[Script.Context] Argument number mismatch for command \"") << id << '\"';
+			Log() << "[Script.Context] Argument number mismatch for command \""_s << id << '\"';
 			return false;
 		}
 
@@ -131,7 +131,7 @@ namespace Yttrium
 			while (right != end && *right != '{')
 				++right;
 
-			target.append(left, right - left);
+			target << StaticString(left, right - left);
 
 			if (right == end)
 				break;
@@ -146,7 +146,7 @@ namespace Yttrium
 
 			ScriptValue* value = find(StaticString(left, right - left));
 			if (value)
-				target.append(value->to_string());
+				target << value->to_string();
 
 			left = ++right;
 		}

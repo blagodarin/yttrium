@@ -3,7 +3,7 @@
 
 #include "../../../base/utils.h"
 #include "../../backend.h"
-#include "player.h"
+#include "openal.h"
 
 #include <vector>
 
@@ -29,7 +29,6 @@ namespace Yttrium
 
 		const P_ALCdevice _device;
 		const P_ALCcontext _context;
-		OpenAlPlayer _player;
 	};
 }
 

@@ -18,7 +18,7 @@ namespace Yttrium
 			::alDeleteBuffers(NumBuffers, _buffers);
 		}
 
-		Log() << S("Unable to initialize OpenAlPlayer");
+		Log() << "Unable to initialize OpenAlPlayer"_s;
 
 		for (ALuint& buffer: _buffers)
 			buffer = 0;

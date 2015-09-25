@@ -1,8 +1,7 @@
 #include "wav.h"
 
+#include <yttrium/utils.h>
 #include "wav_private.h"
-
-#include <algorithm>
 
 namespace Yttrium
 {
@@ -40,7 +39,7 @@ namespace Yttrium
 		_format.bytes_per_sample = format_chunk.bits_per_sample / 8;
 		_format.channels = format_chunk.channels;
 		_format.frequency = format_chunk.samples_per_second;
-		_total_units = std::min<uint64_t>(_file.size() - _file.offset(), chunk_header.size) / _format.unit_size();
+		_total_units = min<uint64_t>(_file.size() - _file.offset(), chunk_header.size) / _format.unit_size();
 
 		_data_offset = _file.offset();
 
@@ -50,7 +49,7 @@ namespace Yttrium
 	size_t WavReader::read(void* buffer, size_t bytes_to_read)
 	{
 		const size_t unit_size = _format.unit_size();
-		bytes_to_read = std::min<uint64_t>(bytes_to_read / unit_size, _total_units - _offset_units) * unit_size;
+		bytes_to_read = min<uint64_t>(bytes_to_read / unit_size, _total_units - _offset_units) * unit_size;
 		const size_t bytes_read = _file.read(buffer, bytes_to_read);
 		_offset_units += bytes_read / unit_size;
 		return bytes_read;

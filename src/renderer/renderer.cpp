@@ -14,8 +14,7 @@
 
 namespace Yttrium
 {
-	const S _vertex_shader_2d
-	(
+	const auto _vertex_shader_2d =
 		"#version 110\n"
 		""
 		"void main()"
@@ -23,11 +22,9 @@ namespace Yttrium
 			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
 			"gl_FrontColor = gl_Color;"
 			"gl_TexCoord[0] = gl_MultiTexCoord0;"
-		"}"
-	);
+		"}"_s;
 
-	const S _fragment_shader_2d
-	(
+	const auto _fragment_shader_2d =
 		"#version 110\n"
 		""
 		"uniform sampler2D surface_texture;"
@@ -35,8 +32,7 @@ namespace Yttrium
 		"void main()"
 		"{"
 			"gl_FragColor = gl_Color * texture2D(surface_texture, gl_TexCoord[0].xy);"
-		"}"
-	);
+		"}"_s;
 
 	Pointer<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
 	{

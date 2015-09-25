@@ -12,25 +12,25 @@ namespace Yttrium
 {
 	void Label::dump(GuiPropertyDumper& dumper) const
 	{
-		dumper.dump_position("position", _position);
-		dumper.dump_scaling("scale", _scaling);
+		dumper.dump_position("position"_s, _position);
+		dumper.dump_scaling("scale"_s, _scaling);
 		_foreground.dump(dumper);
-		dumper.dump_alignment("align", _alignment);
-		dumper.dump_text("text", _text);
+		dumper.dump_alignment("align"_s, _alignment);
+		dumper.dump_text("text"_s, _text);
 	}
 
 	bool Label::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_position("position", &_position)
+		if (!(loader.load_position("position"_s, &_position)
 			&& _foreground.load(loader)
-			&& loader.load_translatable("text", &_text)))
+			&& loader.load_translatable("text"_s, &_text)))
 		{
-			Log() << "[Gui.Label] Unable to load";
+			Log() << "[Gui.Label] Unable to load"_s;
 			return false;
 		}
 
-		loader.load_scaling("scale", &_scaling);
-		loader.load_alignment("align", &_alignment);
+		loader.load_scaling("scale"_s, &_scaling);
+		loader.load_alignment("align"_s, &_alignment);
 
 		_rect = RectF(_position, {});
 

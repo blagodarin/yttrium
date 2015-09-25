@@ -100,7 +100,7 @@ namespace Yttrium
 
 		if (!document.load(source_name))
 		{
-			Log() << "[Gui] Can't load \"" << source_name << "\"...";
+			Log() << "[Gui] Can't load \""_s << source_name << "\"..."_s;
 			return false;
 		}
 
@@ -109,11 +109,11 @@ namespace Yttrium
 		if (!is_internal)
 		{
 			Vector2 size;
-			if (GuiIonPropertyLoader::load_size(&size, document_root.last("size")))
+			if (GuiIonPropertyLoader::load_size(&size, document_root.last("size"_s)))
 				_gui.set_size(size);
 
 			Scaling scaling;
-			if (GuiIonPropertyLoader::load_scaling(&scaling, document_root.last("scale")))
+			if (GuiIonPropertyLoader::load_scaling(&scaling, document_root.last("scale"_s)))
 				_gui.set_scaling(scaling);
 		}
 
@@ -126,13 +126,13 @@ namespace Yttrium
 	{
 		for (const auto& node : source)
 		{
-			if (node.name() == S("include"))
+			if (node.name() == "include"_s)
 			{
 				const StaticString* include_path;
 				if (Ion::get(node, include_path))
 					load(*include_path, true);
 			}
-			else if (node.name() == S("class"))
+			else if (node.name() == "class"_s)
 			{
 				const IonObject* object;
 				const StaticString* object_name;
@@ -144,11 +144,9 @@ namespace Yttrium
 				}
 
 				if (!_classes.add(*object_name, *object, class_name))
-				{
-					Log() << "[Gui] Can' load class \"" << *object_name << "\"";
-				}
+					Log() << "[Gui] Can' load class \""_s << *object_name << "\""_s;
 			}
-			else if (node.name() == S("scene"))
+			else if (node.name() == "scene"_s)
 			{
 				const IonObject* object;
 				const StaticString* object_name;
@@ -159,9 +157,9 @@ namespace Yttrium
 					continue;
 				}
 
-				if (class_name && *class_name != S("root"))
+				if (class_name && *class_name != "root"_s)
 				{
-					Log() << "[Gui] Unknown scene \"" << *object_name << "\" option \"" << *class_name << "\" ignored";
+					Log() << "[Gui] Unknown scene \""_s << *object_name << "\" option \""_s << *class_name << "\" ignored"_s;
 					class_name = nullptr;
 				}
 
@@ -172,13 +170,13 @@ namespace Yttrium
 					_gui.add_scene(std::move(scene), class_name != nullptr);
 				}
 			}
-			else if (node.name() == S("on_scene_change"))
+			else if (node.name() == "on_scene_change"_s)
 			{
 				const auto& s = node.values();
 
 				if (s.size() != 2 || s->type() != IonValue::Type::List || s.last().type() != IonValue::Type::String)
 				{
-					Log() << "[Gui] Bad 'on_scene_change'";
+					Log() << "[Gui] Bad 'on_scene_change'"_s;
 					continue;
 				}
 
@@ -190,7 +188,7 @@ namespace Yttrium
 
 				if (t.size() != 2 || !t->get(&from) || !t.last().get(&to) || !s.last().get(&action))
 				{
-					Log() << "[Gui] Bad 'on_scene_change'";
+					Log() << "[Gui] Bad 'on_scene_change'"_s;
 					continue;
 				}
 
@@ -199,7 +197,7 @@ namespace Yttrium
 					String(*to, _gui.internal_allocator()),
 					String(*action, _gui.internal_allocator()));
 			}
-			else if (node.name() == S("font"))
+			else if (node.name() == "font"_s)
 			{
 				const IonObject* object;
 				const StaticString* object_name;
@@ -211,8 +209,8 @@ namespace Yttrium
 				const StaticString* font_name;
 				const StaticString* texture_name;
 
-				if (!(GuiIonPropertyLoader::load_text(&font_name, *object, "file")
-					&& GuiIonPropertyLoader::load_text(&texture_name, *object, "texture")))
+				if (!(GuiIonPropertyLoader::load_text(&font_name, *object, "file"_s)
+					&& GuiIonPropertyLoader::load_text(&texture_name, *object, "texture"_s)))
 				{
 					continue;
 				}
@@ -228,23 +226,23 @@ namespace Yttrium
 
 		for (const auto& node : source)
 		{
-			if (node.name() == S("size"))
+			if (node.name() == "size"_s)
 			{
 				Vector2 size;
 				if (GuiIonPropertyLoader::load_size(&size, node))
 					scene.set_size(size);
 			}
-			else if (node.name() == S("scale"))
+			else if (node.name() == "scale"_s)
 			{
 				Scaling scaling;
 				if (GuiIonPropertyLoader::load_scaling(&scaling, node))
 					scene.set_scaling(scaling);
 			}
-			if (node.name() == S("transparent"))
+			if (node.name() == "transparent"_s)
 			{
 				scene.set_transparent(true);
 			}
-			else if (node.name() == S("bind"))
+			else if (node.name() == "bind"_s)
 			{
 				const auto s = node.values();
 				if (s.size() == 2 && s->type() == IonValue::Type::String && s.last().type() == IonValue::Type::String)

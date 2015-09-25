@@ -3,6 +3,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/string_format.h>
 #include <yttrium/vector.h>
 
 namespace Yttrium
@@ -94,7 +95,7 @@ namespace Yttrium
 					serialize_object(result, *value.object(), false, indentation);
 					break;
 				default:
-					result.append('"').append(value.string().escaped("\\\"", '\\', result.allocator())).append('"');
+					result << '"' << value.string().escaped("\\\"", '\\', result.allocator()) << '"';
 					break;
 				}
 			}
@@ -102,12 +103,12 @@ namespace Yttrium
 			void serialize_list(String& result, const IonList& list, bool is_node, int indentation)
 			{
 				if (!is_node)
-					result.append('[');
+					result << '[';
 				auto value = list.begin();
 				if (value != list.end())
 				{
 					if (is_node && indentation >= 0 && value->type() != IonValue::Type::Object)
-						result.append(' ');
+						result << ' ';
 					for (;;)
 					{
 						serialize_value(result, *value, indentation);
@@ -115,18 +116,18 @@ namespace Yttrium
 						if (value == list.end())
 							break;
 						if (indentation >= 0 && value->type() != IonValue::Type::Object)
-							result.append(' ');
+							result << ' ';
 					}
 				}
 				if (!is_node)
-					result.append(']');
+					result << ']';
 			}
 
 			void serialize_node(String& result, const IonNode& node, int indentation)
 			{
 				if (indentation > 0)
-					result.append('\t', indentation);
-				result.append(node.name());
+					result << rep('\t', indentation);
+				result << node.name();
 				if (!node.is_empty())
 					serialize_list(result, node, true, indentation);
 			}
@@ -136,30 +137,30 @@ namespace Yttrium
 				if (indentation < 0)
 				{
 					if (!is_root)
-						result.append('{');
+						result << '{';
 					bool need_separator = false;
 					for (const auto& node : object)
 					{
 						if (need_separator)
-							result.append(' ');
+							result << ' ';
 						serialize_node(result, node, indentation);
 						need_separator = node.is_empty();
 					}
 					if (!is_root)
-						result.append('}');
+						result << '}';
 				}
 				else
 				{
 					if (!is_root)
-						result.append('\n').append('\t', indentation).append(S("{\n"));
+						result << '\n' << rep('\t', indentation) << "{\n"_s;
 					const auto node_indentation = indentation + !is_root;
 					for (const auto& node : object)
 					{
 						serialize_node(result, node, node_indentation);
-						result.append('\n');
+						result << '\n';
 					}
 					if (!is_root)
-						result.append('\t', indentation).append('}');
+						result << rep('\t', indentation) << '}';
 				}
 			}
 		}

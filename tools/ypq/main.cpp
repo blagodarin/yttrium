@@ -6,7 +6,7 @@
 
 using namespace Yttrium;
 
-const S index_file_extension(".index");
+const auto index_file_extension = ".index"_s;
 
 int main(int argc, char** argv)
 {
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	{
 		StaticString options(argv[1]);
 
-		if (options != S("-a"))
+		if (options != "-a")
 		{
 			std::cerr << "ERROR: Unknown options \"" << options << "\"" << std::endl;
 			return 1;

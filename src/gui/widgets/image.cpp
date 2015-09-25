@@ -8,16 +8,16 @@ namespace Yttrium
 {
 	void GuiImage::dump(GuiPropertyDumper& dumper) const
 	{
-		dumper.dump_rect("position", _position);
-		dumper.dump_scaling("scale", _scaling);
+		dumper.dump_rect("position"_s, _position);
+		dumper.dump_scaling("scale"_s, _scaling);
 		_background.dump(dumper);
 	}
 
 	bool GuiImage::load(GuiPropertyLoader& loader)
 	{
-		if (!loader.load_rect("position", &_position))
+		if (!loader.load_rect("position"_s, &_position))
 		{
-			Log() << "[Gui.Image] Unable to load";
+			Log() << "[Gui.Image] Unable to load"_s;
 			return false;
 		}
 

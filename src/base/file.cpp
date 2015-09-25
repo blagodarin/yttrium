@@ -3,9 +3,8 @@
 #include <yttrium/buffer.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
+#include <yttrium/utils.h>
 #include "../package/manager.h"
-
-#include <algorithm>
 
 namespace Yttrium
 {
@@ -62,7 +61,7 @@ namespace Yttrium
 			// We should unconditionally crash if the file is too large.
 			// This way we shall have the same behavior for both files larger
 			// than the free space and files larger than all the allocatable space.
-			buffer->resize(std::min<uint64_t>(size(), SIZE_MAX));
+			buffer->resize(min<uint64_t>(size(), SIZE_MAX));
 			if (read(buffer->data(), buffer->size()))
 				return true;
 		}
@@ -77,7 +76,7 @@ namespace Yttrium
 			// This way we shall have the same behavior for both files larger
 			// than the free space and files larger than all the allocatable space.
 
-			string->resize(std::min<uint64_t>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
+			string->resize(min<uint64_t>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
 			if (read(string->text(), string->size()))
 				return true;
 		}
@@ -102,7 +101,7 @@ namespace Yttrium
 		{
 			string.resize(offset + buffer_step);
 
-			bytes_read = read(string.text_at(offset), buffer_step);
+			bytes_read = read(string.text() + offset, buffer_step);
 
 			string.resize(offset + bytes_read);
 
@@ -121,7 +120,7 @@ namespace Yttrium
 				if (r_offset == string_size - 1)
 				{
 					string.resize(string_size + 1);
-					bytes_read += read(string.text_at(string_size), 1);
+					bytes_read += read(string.text() + string_size, 1);
 				}
 
 				string.resize(r_offset);

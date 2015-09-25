@@ -219,12 +219,12 @@ namespace Yttrium
 
 		enum: uint32_t
 		{
-			DXT1 = Fourcc<'D', 'X', 'T', '1'>::value,
-			DXT2 = Fourcc<'D', 'X', 'T', '2'>::value,
-			DXT3 = Fourcc<'D', 'X', 'T', '3'>::value,
-			DXT4 = Fourcc<'D', 'X', 'T', '4'>::value,
-			DXT5 = Fourcc<'D', 'X', 'T', '5'>::value,
-			DX10 = Fourcc<'D', 'X', '1', '0'>::value,
+			DXT1 = "DXT1"_fourcc,
+			DXT2 = "DXT2"_fourcc,
+			DXT3 = "DXT3"_fourcc,
+			DXT4 = "DXT4"_fourcc,
+			DXT5 = "DXT5"_fourcc,
+			DX10 = "DX10"_fourcc,
 		};
 
 		uint32_t dwSize;
@@ -241,7 +241,7 @@ namespace Yttrium
 	{
 		enum: uint32_t
 		{
-			MAGIC = Fourcc<'D', 'D', 'S', ' '>::value,
+			MAGIC = "DDS "_fourcc,
 			SIZE = 124,
 		};
 

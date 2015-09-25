@@ -2,6 +2,7 @@
 
 #include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
+#include <yttrium/string_format.h>
 #include "atomic_status.h"
 
 #if Y_IS_DEBUG
@@ -16,16 +17,16 @@ namespace Yttrium
 	{
 	public:
 
-		Private(const String& name, Allocator* allocator)
+		Private(String&& name, Allocator* allocator)
 			: _allocator(allocator)
-			, _name(name)
+			, _name(std::move(name))
 		{
 		}
 
 	public:
 
-		Allocator*         _allocator;
-		String             _name;
+		Allocator* const   _allocator;
+		const String       _name;
 		AtomicMemoryStatus _status;
 
 	#if Y_IS_DEBUG
@@ -40,12 +41,17 @@ namespace Yttrium
 			allocator = MemoryManager::default_allocator();
 
 		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(allocator);
-
-		const auto& final_name = proxy_allocator
-			? String(proxy_allocator->name(), allocator).append('.').append(name)
-			: String(name, allocator);
-
-		_private = Y_NEW(allocator, Private)(final_name, allocator);
+		if (!proxy_allocator)
+		{
+			_private = Y_NEW(allocator, Private)(String(name, allocator), allocator);
+		}
+		else
+		{
+			const auto& proxy_name = proxy_allocator->name();
+			_private = Y_NEW(allocator, Private)(
+				String(proxy_name.size() + 1 + name.size(), allocator) << proxy_name << '.' << name,
+				allocator);
+		}
 	}
 
 	ProxyAllocator::~ProxyAllocator()

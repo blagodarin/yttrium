@@ -45,7 +45,7 @@ namespace Yttrium
 	}
 
 	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator* allocator)
-		: _allocator("audio", allocator)
+		: _allocator("audio"_s, allocator)
 		, _backend(AudioBackend::create(backend, device, &_allocator))
 		, _player(_backend->create_player(), &_allocator)
 		, _instance_guard(this, "Duplicate AudioManager construction")

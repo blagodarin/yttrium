@@ -11,28 +11,28 @@ namespace Yttrium
 {
 	void GuiInput::dump(GuiPropertyDumper& dumper) const
 	{
-		dumper.dump_rect("position", _position);
-		dumper.dump_scaling("scale", _scaling);
+		dumper.dump_rect("position"_s, _position);
+		dumper.dump_scaling("scale"_s, _scaling);
 		_background.dump(dumper);
 		_foreground.dump(dumper);
 	}
 
 	bool GuiInput::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_rect("position", &_position)
+		if (!(loader.load_rect("position"_s, &_position)
 			&& _foreground.load(loader)))
 		{
-			Log() << "[Gui.Input] Unable to load";
+			Log() << "[Gui.Input] Unable to load"_s;
 			return false;
 		}
 
-		loader.load_scaling("scale", &_scaling);
+		loader.load_scaling("scale"_s, &_scaling);
 		_background.load(loader);
 
 		_rect = RectF(_position);
 
 		String on_enter(_name.allocator());
-		loader.load_text("on_enter", &on_enter);
+		loader.load_text("on_enter"_s, &on_enter);
 		_on_enter = ScriptCode(std::move(on_enter));
 
 		return true;

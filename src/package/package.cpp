@@ -12,7 +12,7 @@ namespace Yttrium
 		if (type == PackageType::Auto)
 		{
 			const StaticString extension = name.file_extension();
-			if (extension == S(".ypq"))
+			if (extension == ".ypq"_s)
 				type = PackageType::Ypq;
 			else
 				return;
@@ -55,7 +55,7 @@ namespace Yttrium
 		if (type == PackageType::Auto)
 		{
 			const auto& extension = name.file_extension();
-			if (extension == S(".ypq"))
+			if (extension == ".ypq"_s)
 				type = PackageType::Ypq;
 			else
 				return;

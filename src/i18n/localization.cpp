@@ -18,7 +18,7 @@ namespace Yttrium
 	public:
 
 		LocalizationImpl(const StaticString& file_name, Allocator* allocator)
-			: _allocator("i18n", allocator)
+			: _allocator("i18n"_s, allocator)
 			, _translation(Translation::open(file_name, &_allocator))
 			, _instance_guard(this, "Duplicate Localization construction")
 		{

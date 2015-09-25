@@ -15,7 +15,7 @@ namespace Yttrium
 	public:
 
 		///
-		MemoryManager(const StaticString& default_name = S("default"));
+		MemoryManager(const StaticString& default_name = "default"_s);
 
 		///
 		~MemoryManager();

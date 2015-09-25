@@ -88,7 +88,6 @@ namespace Yttrium
 #define Y_DELETE(allocator, pointer) (allocator)->delete_(pointer)
 
 ///
-
 #define Y_NEW(allocator, Class) new(static_cast<Yttrium::Allocator*>(allocator)->allocate<Class>()) Class
 
 #endif

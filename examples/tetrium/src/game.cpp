@@ -19,11 +19,11 @@ Game::Game()
 	: _allocator("game")
 	, _bindings(&_allocator)
 	, _statistics{
+		{100000, String("John Placeholder", &_allocator)},
+		{50000, String("John Placeholder", &_allocator)},
 		{10000, String("John Placeholder", &_allocator)},
 		{5000, String("John Placeholder", &_allocator)},
 		{1000, String("John Placeholder", &_allocator)},
-		{500, String("John Placeholder", &_allocator)},
-		{100, String("John Placeholder", &_allocator)},
 	}
 {
 	ScriptContext::global().define("bind", 2, [this](const ScriptCall& call)
@@ -114,7 +114,7 @@ Game::Game()
 
 	ScriptContext::global().define("screenshot", [this](const ScriptCall&)
 	{
-		_window->take_screenshot(String::format(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png", &_allocator));
+		_window->take_screenshot(String(&_allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 	});
 
 	ScriptContext::global().define("stop_music", [this](const ScriptCall&)
@@ -283,9 +283,9 @@ void Game::on_key_event(const KeyEvent& event)
 void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
 {
 	PushTexture push_texture(renderer, _block_texture.get());
-	if (canvas_name == S("field"))
+	if (canvas_name == "field")
 		draw_field(renderer, rect);
-	else if (canvas_name == S("next"))
+	else if (canvas_name == "next")
 		draw_next_figure(renderer, rect);
 }
 
@@ -446,13 +446,7 @@ void Game::update_statistics()
 	for (auto i = _statistics.rbegin(); i != _statistics.rend(); ++i)
 	{
 		++index;
-
-		String name("name", &_allocator);
-		name << index;
-		ScriptContext::global().set(name, i->second);
-
-		String score("score", &_allocator);
-		score << index;
-		ScriptContext::global().set(score, i->first);
+		ScriptContext::global().set(String(&_allocator) << "name" << index, i->second);
+		ScriptContext::global().set(String(&_allocator) << "score" << index, i->first);
 	}
 }

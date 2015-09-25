@@ -69,9 +69,9 @@ namespace Yttrium
 		{
 		case Temporary:
 			{
-				String name(S("/tmp/XXXXXX"), allocator);
+				String name("/tmp/XXXXXX"_s, allocator);
 
-				const int descriptor = ::mkstemp(name.text());
+				const auto descriptor = ::mkstemp(name.text());
 				if (descriptor == -1)
 					break;
 

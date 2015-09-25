@@ -35,7 +35,7 @@ namespace Yttrium
 		IonDocument document(_allocator);
 		for (const auto& translation : _translations)
 		{
-			auto& node = *document.root().append(S("tr"));
+			auto& node = *document.root().append("tr"_s);
 			node.append(translation.first);
 			node.append(translation.second.text);
 		}
@@ -51,7 +51,7 @@ namespace Yttrium
 		const auto& root = document.root();
 		for (const auto& node : root)
 		{
-			if (node.name() != S("tr") || node.size() != 2)
+			if (node.name() != "tr"_s || node.size() != 2)
 				return false;
 			const StaticString* source = nullptr;
 			const StaticString* translation = nullptr;

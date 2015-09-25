@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 	GuiImpl::GuiImpl(RendererImpl& renderer, WindowCallbacks& callbacks, Allocator* allocator)
-		: _proxy_allocator("gui", allocator)
+		: _proxy_allocator("gui"_s, allocator)
 		, _renderer(renderer)
 		, _texture_cache(TextureCache::create(_renderer))
 		, _callbacks(callbacks)
@@ -32,7 +32,7 @@ namespace Yttrium
 
 		if (_scenes.find(scene_name) != _scenes.end())
 		{
-			Log() << "[Gui] Scene \"" << scene_name << "\" has already been added";
+			Log() << "[Gui] Scene \""_s << scene_name << "\" has already been added"_s;
 			return false;
 		}
 
@@ -40,7 +40,7 @@ namespace Yttrium
 		{
 			if (!_scene_stack.empty())
 			{
-				Log() << "[Gui] Scene \"" << scene_name << "\" \"root\" option ignored";
+				Log() << "[Gui] Scene \""_s << scene_name << "\" \"root\" option ignored"_s;
 				// TODO: Print the existing root scene name.
 			}
 			else
@@ -142,7 +142,7 @@ namespace Yttrium
 
 		if (_scene_stack.empty())
 		{
-			Log() << "[Gui] No root scene has been added";
+			Log() << "[Gui] No root scene has been added"_s;
 			clear();
 			return false;
 		}

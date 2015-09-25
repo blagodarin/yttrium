@@ -5,6 +5,7 @@
 #include <yttrium/matrix.h>
 #include <yttrium/renderer.h>
 #include <yttrium/string.h>
+#include <yttrium/string_format.h>
 
 Game::Game()
 	: _allocator("game")
@@ -22,7 +23,7 @@ void Game::run()
 	_window->set_name("Yttrium RTS example");
 	_window->set_size({1024, 768});
 
-	if (!_window->gui().load("examples/rts/gui.ion"))
+	if (!_window->gui().load("examples/rts/data/gui.ion"))
 		return;
 
 	_cube = std::make_unique<CubeModel>(_window->renderer());
@@ -116,7 +117,7 @@ void Game::on_key_event(const KeyEvent& event)
 		break;
 
 	case Key::F10: // KDE grabs Key::Print. =(
-		_window->take_screenshot(String::format(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png", &_allocator));
+		_window->take_screenshot(String(&_allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 		break;
 
 	default:
@@ -126,7 +127,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString& name)
 {
-	if (name != S("main"))
+	if (name != "main")
 		return;
 
 	const auto& window_size = renderer.window_size();

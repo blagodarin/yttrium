@@ -15,19 +15,19 @@ namespace Yttrium
 
 	void Canvas::dump(GuiPropertyDumper& dumper) const
 	{
-		dumper.dump_rect("position", _position);
-		dumper.dump_scaling("scale", _scaling);
+		dumper.dump_rect("position"_s, _position);
+		dumper.dump_scaling("scale"_s, _scaling);
 	}
 
 	bool Canvas::load(GuiPropertyLoader& loader)
 	{
-		if (!loader.load_rect("position", &_position))
+		if (!loader.load_rect("position"_s, &_position))
 		{
-			Log() << "[Gui.Canvas] Unable to load";
+			Log() << "[Gui.Canvas] Unable to load"_s;
 			return false;
 		}
 
-		loader.load_scaling("scale", &_scaling);
+		loader.load_scaling("scale"_s, &_scaling);
 
 		_rect = RectF(_position);
 

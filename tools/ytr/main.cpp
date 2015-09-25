@@ -19,7 +19,7 @@ bool update_tr(Translation& translation, const IonObject& tr_object)
 		return false;
 
 	const auto& tr_node = *tr_object.begin();
-	if (tr_node.name() != S("tr") || tr_node.size() != 1)
+	if (tr_node.name() != "tr" || tr_node.size() != 1)
 		return false;
 
 	const auto& tr_value = *tr_node.first();

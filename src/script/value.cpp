@@ -1,25 +1,27 @@
 #include <yttrium/script/value.h>
 
+#include <yttrium/string_format.h>
+
 namespace Yttrium
 {
 	ScriptValue& ScriptValue::operator=(int value)
 	{
 		_type = Type::Literal;
-		_value.clear().append_dec(value);
+		_value.clear() << value;
 		return *this;
 	}
 
 	ScriptValue& ScriptValue::operator=(double value)
 	{
 		_type = Type::Literal;
-		_value.clear().append_dec(value);
+		_value.clear() << value;
 		return *this;
 	}
 
 	ScriptValue& ScriptValue::operator=(const StaticString& value)
 	{
 		_type = Type::String;
-		_value.set(value);
+		_value = value;
 		return *this;
 	}
 
@@ -27,14 +29,14 @@ namespace Yttrium
 		: _type(Type::Literal)
 		, _value(allocator)
 	{
-		_value.append_dec(value);
+		_value << value;
 	}
 
 	ScriptValue::ScriptValue(double value, Allocator* allocator)
 		: _type(Type::Literal)
 		, _value(allocator)
 	{
-		_value.append_dec(value);
+		_value << value;
 	}
 
 	ScriptValue::ScriptValue(const StaticString& value, Allocator* allocator)

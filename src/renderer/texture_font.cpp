@@ -1,10 +1,10 @@
 #include <yttrium/texture_font.h>
 
 #include <yttrium/file.h>
+#include <yttrium/utils.h>
 #include "../base/private_base.h"
 #include "texture_font.h"
 
-#include <algorithm>
 #include <map>
 
 namespace Yttrium
@@ -63,8 +63,8 @@ namespace Yttrium
 			info.advance = char_data.advance;
 
 			font->_chars[char_data.id] = info;
-			font->_rect.set_width(std::max(font->_rect.width(), char_data.x + char_data.width));
-			font->_rect.set_height(std::max(font->_rect.height(), char_data.y + char_data.height));
+			font->_rect.set_width(max(font->_rect.width(), char_data.x + char_data.width));
+			font->_rect.set_height(max(font->_rect.height(), char_data.y + char_data.height));
 		}
 
 		if (file.read(&fourcc))

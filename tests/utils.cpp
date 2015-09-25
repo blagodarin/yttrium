@@ -24,6 +24,18 @@ BOOST_AUTO_TEST_CASE(test_is_power_of_2)
 		BOOST_CHECK_EQUAL(is_power_of_2(i), table[i]);
 }
 
+BOOST_AUTO_TEST_CASE(test_max)
+{
+	BOOST_CHECK_EQUAL(max(INTMAX_MIN, INTMAX_MAX), INTMAX_MAX);
+	BOOST_CHECK_EQUAL(max(uintmax_t{0}, UINTMAX_MAX), UINTMAX_MAX);
+}
+
+BOOST_AUTO_TEST_CASE(test_min)
+{
+	BOOST_CHECK_EQUAL(min(INTMAX_MIN, INTMAX_MAX), INTMAX_MIN);
+	BOOST_CHECK_EQUAL(min(uintmax_t{0}, UINTMAX_MAX), 0);
+}
+
 BOOST_AUTO_TEST_CASE(test_next_power_of_2)
 {
 	static const uint8_t table[INT8_MAX + 1] =

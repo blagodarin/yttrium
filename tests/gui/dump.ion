@@ -1,13 +1,13 @@
-size "640.000000" "480.000000"
+size "640" "480"
 scale "stretch"
 scene "game"
 {
-	size "640.000000" "480.000000"
+	size "640" "480"
 	scale "stretch"
 }
 scene "menu" ["root"]
 {
-	size "100.000000" "100.000000"
+	size "100" "100"
 	scale "fit"
 	transparent
 	bind "esc" "exit"

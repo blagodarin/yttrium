@@ -19,7 +19,7 @@ namespace Yttrium
 
 	private:
 
-		static void dump_scene(const GuiScene& scene, IonNode* node);
+		void dump_scene(const GuiScene& scene, IonNode* node) const;
 
 	private:
 

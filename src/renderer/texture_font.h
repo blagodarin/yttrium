@@ -37,10 +37,10 @@ namespace Yttrium
 
 #pragma pack(pop)
 
-	const uint32_t FourccYtf1 = Fourcc<'Y', 'T', 'F', '1'>::value;
-	const uint32_t FourccFont = Fourcc<'f', 'o', 'n', 't'>::value;
-	const uint32_t FourccChar = Fourcc<'c', 'h', 'a', 'r'>::value;
-	const uint32_t FourccKern = Fourcc<'k', 'e', 'r', 'n'>::value;
+	const uint32_t FourccYtf1 = "YTF1"_fourcc;
+	const uint32_t FourccFont = "font"_fourcc;
+	const uint32_t FourccChar = "char"_fourcc;
+	const uint32_t FourccKern = "kern"_fourcc;
 }
 
 #endif

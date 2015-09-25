@@ -26,10 +26,10 @@ namespace Yttrium
 	private:
 
 		String   _text;
-		unsigned _cursor;
-		unsigned _selection_size;
-		unsigned _selection_offset;
-		unsigned _max_size;
+		unsigned _cursor = 0;
+		unsigned _selection_size = 0;
+		unsigned _selection_offset = 0;
+		unsigned _max_size = 0;
 	};
 }
 

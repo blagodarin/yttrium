@@ -34,7 +34,7 @@ namespace Yttrium
 	{
 	public:
 
-		static const S OpenAL;
+		static const StaticString OpenAL;
 
 		static Pointer<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator*);
 

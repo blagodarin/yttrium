@@ -2,8 +2,6 @@
 * Library:
 	* Overall:
 		- Windows port.
-	* Base:
-		- Convenient string formatting.
 	* GUI:
 		- Line editor widget.
 		- Layouts.

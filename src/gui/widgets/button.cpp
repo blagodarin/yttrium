@@ -13,32 +13,32 @@ namespace Yttrium
 {
 	void Button::dump(GuiPropertyDumper& dumper) const
 	{
-		dumper.dump_rect("position", _position);
-		dumper.dump_scaling("scale", _scaling);
+		dumper.dump_rect("position"_s, _position);
+		dumper.dump_scaling("scale"_s, _scaling);
 
 		// TODO: Dump font.
 
-		dumper.dump_size("text_size", _text_size);
-		dumper.dump_text("text", _text);
+		dumper.dump_size("text_size"_s, _text_size);
+		dumper.dump_text("text"_s, _text);
 
 		if (_state != WidgetState::NotSet)
-			dumper.dump_state("state", _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
+			dumper.dump_state("state"_s, _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
 
 		// TODO: Dump styles.
 	}
 
 	bool Button::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_rect("position", &_position)
-			&& loader.load_font("font", &_font, &_font_texture)
-			&& loader.load_size("text_size", &_text_size)))
+		if (!(loader.load_rect("position"_s, &_position)
+			&& loader.load_font("font"_s, &_font, &_font_texture)
+			&& loader.load_size("text_size"_s, &_text_size)))
 		{
-			Log() << "[Gui.Button] Unable to load";
+			Log() << "[Gui.Button] Unable to load"_s;
 			return false;
 		}
 
-		loader.load_scaling("scale", &_scaling);
-		loader.load_translatable("text", &_text);
+		loader.load_scaling("scale"_s, &_scaling);
+		loader.load_translatable("text"_s, &_text);
 
 		if (_styles[0].background.load(loader))
 		{
@@ -46,41 +46,41 @@ namespace Yttrium
 				_styles[i].background = _styles[0].background;
 		}
 
-		if (loader.load_color("text_color", &_styles[0].text_color))
+		if (loader.load_color("text_color"_s, &_styles[0].text_color))
 		{
 			for (WidgetStateType i = 1; i < WidgetStateCount; ++i)
 				_styles[i].text_color = _styles[0].text_color;
 		}
 
-		if (loader.load_state("state", &_state)) // Fixed state button.
+		if (loader.load_state("state"_s, &_state)) // Fixed state button.
 		{
 			_is_enabled = false;
 		}
 
-		_sound = loader.load_sound("sound");
+		_sound = loader.load_sound("sound"_s);
 
 		Style* style = &_styles[WidgetStateType(WidgetState::Active)];
 
-		loader.bind("active");
-		loader.load_color("text_color", &style->text_color);
+		loader.bind("active"_s);
+		loader.load_color("text_color"_s, &style->text_color);
 		style->background.update(loader);
 
 		style = &_styles[WidgetStateType(WidgetState::Pressed)];
 
-		loader.bind("pressed");
-		loader.load_color("text_color", &style->text_color);
+		loader.bind("pressed"_s);
+		loader.load_color("text_color"_s, &style->text_color);
 		style->background.update(loader);
 
 		style = &_styles[WidgetStateType(WidgetState::Checked)];
 
-		loader.bind("checked");
-		loader.load_color("text_color", &style->text_color);
+		loader.bind("checked"_s);
+		loader.load_color("text_color"_s, &style->text_color);
 		style->background.update(loader);
 
 		style = &_styles[WidgetStateType(WidgetState::Disabled)];
 
-		loader.bind("disabled");
-		loader.load_color("text_color", &style->text_color);
+		loader.bind("disabled"_s);
+		loader.load_color("text_color"_s, &style->text_color);
 		style->background.update(loader);
 
 		loader.unbind();
@@ -88,7 +88,7 @@ namespace Yttrium
 		_rect = RectF(_position);
 
 		String on_click(_name.allocator());
-		loader.load_text("on_click", &on_click);
+		loader.load_text("on_click"_s, &on_click);
 		_on_click = ScriptCode(std::move(on_click));
 
 		return true;

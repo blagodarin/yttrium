@@ -8,8 +8,6 @@
 #include "../renderer/debug_renderer.h"
 #include "../renderer/renderer.h"
 
-#include <algorithm>
-
 namespace Yttrium
 {
 	void WindowCallbacks::on_cursor_movement(const Point&)
@@ -39,7 +37,7 @@ namespace Yttrium
 	}
 
 	WindowImpl::WindowImpl(WindowCallbacks& callbacks, Allocator* allocator)
-		: _allocator("window", allocator)
+		: _allocator("window"_s, allocator)
 		, _is_active(false)
 		, _is_cursor_locked(false)
 		, _size(640, 480)
@@ -164,7 +162,7 @@ namespace Yttrium
 			update.milliseconds = Timer::clock() - clock;
 			clock += update.milliseconds;
 			fps_time += update.milliseconds;
-			max_frame_time = std::max(max_frame_time, update.milliseconds);
+			max_frame_time = max(max_frame_time, update.milliseconds);
 			if (fps_time >= 1000)
 			{
 				update.fps = frames * 1000 / fps_time;
@@ -242,8 +240,8 @@ namespace Yttrium
 		{
 			// TODO: Restore display mode here.
 			const ScreenMode& screen_mode = _screen->current_mode();
-			_size.width = std::min(_size.width, screen_mode.width);
-			_size.height = std::min(_size.height, screen_mode.height);
+			_size.width = min(_size.width, screen_mode.width);
+			_size.height = min(_size.height, screen_mode.height);
 			top_left = Point((screen_mode.width - _size.width) / 2, (screen_mode.height - _size.height) / 2);
 		}
 
@@ -255,8 +253,8 @@ namespace Yttrium
 		{
 			Point cursor(_size.width / 2, _size.height / 2);
 			_backend->get_cursor(cursor);
-			_cursor.x = std::min(std::max(cursor.x, 0), _size.width - 1);
-			_cursor.y = std::min(std::max(cursor.y, 0), _size.height - 1);
+			_cursor.x = min(max(cursor.x, 0), _size.width - 1);
+			_cursor.y = min(max(cursor.y, 0), _size.height - 1);
 		}
 		else
 		{
@@ -369,8 +367,8 @@ namespace Yttrium
 
 		if (!_is_cursor_locked)
 		{
-			_cursor.x = std::min(std::max(cursor.x, 0), _size.width - 1);
-			_cursor.y = std::min(std::max(cursor.y, 0), _size.height - 1);
+			_cursor.x = min(max(cursor.x, 0), _size.width - 1);
+			_cursor.y = min(max(cursor.y, 0), _size.height - 1);
 		}
 		else
 		{

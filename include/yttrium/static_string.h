@@ -33,14 +33,14 @@ namespace Yttrium
 		/// Construct an empty StaticString.
 		StaticString() = default;
 
-		/// Construct a StaticString from the C-string.
+		/// Construct a StaticString from a C-string.
 		/// \param text Source text.
 		StaticString(const char* text);
 
 		/// Construct a StaticString from the \a text of known \a size.
 		/// \param text Source text.
 		/// \param size Source text size.
-		StaticString(const char* text, size_t size) : _text(const_cast<char*>(text)), _size(size) {}
+		constexpr StaticString(const char* text, size_t size) : _text(text), _size(size) {}
 
 		/// Compares the string with the specified \a string.
 		/// \param string The string to compare with.
@@ -95,9 +95,6 @@ namespace Yttrium
 
 		///
 		const char* text() const { return _text; }
-
-		///
-		const char* text_at(size_t index) const { return _text + index; }
 
 		///
 		StaticString trimmed() const;
@@ -182,19 +179,11 @@ namespace Yttrium
 
 	Y_API std::ostream& operator<<(std::ostream&, const StaticString&);
 
-	/// Helper class for building StaticStrings from string literals.
-	class S : public StaticString
+	///
+	constexpr StaticString operator"" _s(const char* text, size_t size)
 	{
-	public:
-
-		/// Constructor.
-		/// \param text %String literal (or any other \c char array).
-		template <size_t N>
-		S(const char (&text)[N])
-			: StaticString(text, N - 1)
-		{
-		}
-	};
+		return {text, size};
+	}
 }
 
 ///

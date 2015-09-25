@@ -1,6 +1,7 @@
 #include <yttrium/static_string.h>
 
 #include <yttrium/string.h>
+#include <yttrium/string_format.h>
 
 #include <cmath>
 #include <cstring>
@@ -335,11 +336,11 @@ namespace Yttrium
 			{
 				if (*i == *j)
 				{
-					result.append(with);
+					result << with;
 					break;
 				}
 			}
-			result.append(*i);
+			result << *i;
 		}
 
 		return result;

@@ -117,13 +117,6 @@
 	#define Y_PRIVATE
 #endif
 
-/// \c constexpr support "flag".
-#if !defined(__YTTRIUM_DOXYGEN)
-	#define Y_HAS_CONSTEXPR (Y_COMPILER_GCC >= 46)
-#else
-	#define Y_HAS_CONSTEXPR 0
-#endif
-
 /// Non-returning function attribute.
 #if Y_COMPILER_GCC
 	#define Y_NORETURN __attribute__((__noreturn__))

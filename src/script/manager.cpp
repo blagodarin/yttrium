@@ -17,7 +17,7 @@ namespace Yttrium
 	public:
 
 		Private(ScriptManager* public_, Allocator* allocator)
-			: _allocator(allocator, "script")
+			: _allocator(allocator, "script"_s)
 			, _root_context(_allocator)
 			, _instance_guard(public_, "Duplicate ScriptManager construction")
 		{
