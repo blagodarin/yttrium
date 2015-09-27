@@ -9,9 +9,8 @@ namespace Yttrium
 	{
 	private:
 
-		void* do_allocate(size_t, size_t, Difference*) override;
-		void do_deallocate(void*, Difference*) override;
-		void* do_reallocate(void*, size_t, Movability, Difference*) override;
+		void* do_allocate(size_t, size_t) override;
+		void do_deallocate(void*, bool) override;
 	};
 }
 

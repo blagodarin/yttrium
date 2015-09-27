@@ -27,11 +27,16 @@ namespace Yttrium
 
 	void Buffer::resize(size_t size)
 	{
-		if (_size < size)
+		if (size <= _size)
+			return;
+		const auto new_data = _allocator->allocate(size);
+		if (_data)
 		{
-			_data = (_data ? _allocator->reallocate(_data, size) : _allocator->allocate(size));
-			_size = size;
+			::memcpy(new_data, _data, _size);
+			_allocator->deallocate(_data, true);
 		}
+		_data = new_data;
+		_size = size;
 	}
 
 	void Buffer::swap(Buffer& buffer)

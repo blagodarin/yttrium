@@ -53,6 +53,7 @@
 #include <yttrium/static_string.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
+#include <yttrium/temporary_allocator.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/texture_font.h>

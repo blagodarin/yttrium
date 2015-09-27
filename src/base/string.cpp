@@ -333,18 +333,16 @@ namespace Yttrium
 		}
 		else if (_buffer_size < buffer_size)
 		{
-			size_t adjusted_size = max(buffer_size,
+			size_t new_buffer_size = max(buffer_size,
 				(_buffer_size < StringGrowBound
 					? _buffer_size * 2
 					: _buffer_size + StringGrowStep));
 
-			size_t* pointer = static_cast<size_t*>(
-				_allocator->reallocate(
-					reinterpret_cast<size_t*>(const_cast<char*>(_text)) - 1,
-					sizeof(size_t) + adjusted_size));
-
-			_text = reinterpret_cast<char*>(pointer + 1);
-			_buffer_size = adjusted_size;
+			const auto new_pointer = static_cast<size_t*>(_allocator->allocate(sizeof(size_t) + new_buffer_size));
+			::memcpy(new_pointer, references, sizeof(size_t) + _size);
+			_allocator->deallocate(references, true);
+			_text = reinterpret_cast<char*>(new_pointer + 1);
+			_buffer_size = new_buffer_size;
 		}
 	}
 
