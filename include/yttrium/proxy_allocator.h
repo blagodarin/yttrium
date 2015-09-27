@@ -43,20 +43,15 @@ namespace Yttrium
 		///
 		MemoryStatus status() const;
 
-	public: // Allocator.
+	private:
 
-		using Allocator::allocate;
-
-		void* allocate(size_t size, size_t align = 0, Difference* difference = nullptr) override;
-
-		void deallocate(void* pointer, Difference* difference = nullptr) override;
-
-		void* reallocate(void* pointer, size_t size, Movability movability = MayMove, Difference* difference = nullptr) override;
+		void* do_allocate(size_t, size_t, Difference*) override;
+		void do_deallocate(void*, Difference*) override;
+		void* do_reallocate(void*, size_t, Movability, Difference*) override;
 
 	private:
 
 		class Private;
-
 		Private* _private;
 	};
 }

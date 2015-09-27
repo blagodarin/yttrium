@@ -12,6 +12,7 @@
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
+#include <yttrium/temporary_allocator.h>
 #include <yttrium/texture.h>
 #include <yttrium/timer.h>
 
@@ -114,7 +115,8 @@ Game::Game()
 
 	ScriptContext::global().define("screenshot", [this](const ScriptCall&)
 	{
-		_window->take_screenshot(String(&_allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+		TemporaryAllocator<32> allocator(nullptr);
+		_window->take_screenshot(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 	});
 
 	ScriptContext::global().define("stop_music", [this](const ScriptCall&)
@@ -446,7 +448,8 @@ void Game::update_statistics()
 	for (auto i = _statistics.rbegin(); i != _statistics.rend(); ++i)
 	{
 		++index;
-		ScriptContext::global().set(String(&_allocator) << "name" << index, i->second);
-		ScriptContext::global().set(String(&_allocator) << "score" << index, i->first);
+		TemporaryAllocator<40> allocator(nullptr);
+		ScriptContext::global().set(String(&allocator) << "name" << index, i->second);
+		ScriptContext::global().set(String(&allocator) << "score" << index, i->first);
 	}
 }

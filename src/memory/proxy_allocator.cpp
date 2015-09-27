@@ -100,67 +100,53 @@ namespace Yttrium
 		return _private->_status;
 	}
 
-	void* ProxyAllocator::allocate(size_t size, size_t align, Difference* difference)
+	void* ProxyAllocator::do_allocate(size_t size, size_t alignment, Difference* difference)
 	{
-		Difference local_difference;
-
+		Difference dummy_difference;
 		if (!difference)
-			difference = &local_difference;
+			difference = &dummy_difference;
 
-		void* pointer = _private->_allocator->allocate(size, align, difference);
+		const auto pointer = _private->_allocator->allocate(size, alignment, difference);
 		_private->_status.allocate(*difference);
-
 	#if Y_IS_DEBUG
 		_private->_pointers[pointer] = size;
 	#endif
-
 		return pointer;
 	}
 
-	void ProxyAllocator::deallocate(void* pointer, Difference* difference)
+	void ProxyAllocator::do_deallocate(void* pointer, Difference* difference)
 	{
-		if (!pointer)
-			return;
-
 	#if Y_IS_DEBUG
 		if (_private->_pointers.find(pointer) == _private->_pointers.end())
 			::abort();
 	#endif
 
-		Difference local_difference;
-
+		Difference dummy_difference;
 		if (!difference)
-		{
-			difference = &local_difference;
-		}
+			difference = &dummy_difference;
 
 		_private->_allocator->deallocate(pointer, difference);
 		_private->_status.deallocate(*difference);
-
 	#if Y_IS_DEBUG
 		_private->_pointers.erase(pointer);
 	#endif
 	}
 
-	void* ProxyAllocator::reallocate(void* pointer, size_t size, Movability movability, Difference* difference)
+	void* ProxyAllocator::do_reallocate(void* pointer, size_t size, Movability movability, Difference* difference)
 	{
-		Difference local_difference;
-
+		Difference dummy_difference;
 		if (!difference)
-			difference = &local_difference;
+			difference = &dummy_difference;
 
-		void* new_pointer = _private->_allocator->reallocate(pointer, size, movability, difference);
-
+		const auto new_pointer = _private->_allocator->reallocate(pointer, size, movability, difference);
 		if (new_pointer)
 		{
 			_private->_status.reallocate(*difference);
-
 		#if Y_IS_DEBUG
 			_private->_pointers.erase(pointer);
 			_private->_pointers[new_pointer] = size;
 		#endif
 		}
-
 		return new_pointer;
 	}
 }

@@ -49,15 +49,23 @@ namespace Yttrium
 	public:
 
 		///
-		virtual void* allocate(size_t size, size_t align = 0, Difference* difference = nullptr) = 0;
+		void* allocate(size_t size, size_t alignment = 0, Difference* difference = nullptr)
+		{
+			return do_allocate(size, alignment, difference);
+		}
 
 		///
-		virtual void deallocate(void* pointer, Difference* difference = nullptr) = 0;
+		void deallocate(void* pointer, Difference* difference = nullptr)
+		{
+			if (pointer)
+				do_deallocate(pointer, difference);
+		}
 
 		///
-		virtual void* reallocate(void* pointer, size_t size, Movability movability = MayMove, Difference* difference = nullptr) = 0;
-
-	public:
+		void* reallocate(void* pointer, size_t size, Movability movability = MayMove, Difference* difference = nullptr)
+		{
+			return do_reallocate(pointer, size, movability, difference);
+		}
 
 		///
 		template <typename T>
@@ -73,7 +81,7 @@ namespace Yttrium
 			if (pointer)
 			{
 				pointer->~T();
-				deallocate(pointer);
+				do_deallocate(pointer, nullptr);
 			}
 		}
 
@@ -81,6 +89,10 @@ namespace Yttrium
 
 		Allocator() = default;
 		virtual ~Allocator() = default;
+
+		virtual void* do_allocate(size_t, size_t, Difference*) = 0;
+		virtual void do_deallocate(void*, Difference*) = 0;
+		virtual void* do_reallocate(void*, size_t, Movability, Difference*) = 0;
 	};
 }
 
