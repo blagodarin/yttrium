@@ -13,8 +13,7 @@
 	* Internationalization:
 		- Unicode font support.
 	* Memory:
-		- Keep a global track of all ProxyAllocators.
-		- Replace allocator objects with allocation tags.
+		- Keep a global track of all ProxyAllocators for realtime memory activity tracking.
 		- Try defaulting pool granularity to memory page size.
 	* Renderer:
 		- Pre-rendered text (i.e. pre-built geometry).

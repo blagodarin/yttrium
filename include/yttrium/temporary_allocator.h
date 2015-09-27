@@ -13,12 +13,9 @@ namespace Yttrium
 	T* align_forward(T* pointer, size_t alignment)
 	{
 		auto offset = reinterpret_cast<uintptr_t>(pointer);
-		if (alignment)
-		{
-			const auto remainder = offset % alignment;
-			if (remainder)
-				offset += (alignment - remainder);
-		}
+		const auto remainder = offset % alignment;
+		if (remainder)
+			offset += (alignment - remainder);
 		return reinterpret_cast<T*>(offset);
 	}
 

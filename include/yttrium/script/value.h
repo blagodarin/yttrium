@@ -41,7 +41,7 @@ namespace Yttrium
 		double to_double() const { return _value.to_double(); }
 
 		///
-		String to_string() const { return _value; }
+		StaticString to_string() const { return _value; }
 
 		///
 		Type type() const { return _type; }
