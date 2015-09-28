@@ -29,7 +29,7 @@ namespace Yttrium
 		const AudioFormat& format = reader.format();
 		if (format.channels != 1 || !_format.set(format))
 			return false;
-		
+
 		::alGenBuffers(1, &_buffer);
 		if (::alGetError() != AL_NO_ERROR)
 			return false;

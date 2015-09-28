@@ -150,8 +150,6 @@ namespace Yttrium
 
 		const char* _text = &StringNull;
 		size_t _size = 0;
-
-		StaticString(size_t size) : _size(size) {}
 	};
 
 	Y_API bool operator==(const StaticString&, const StaticString&);

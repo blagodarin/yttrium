@@ -92,9 +92,9 @@ namespace Yttrium
 		return std::move(sound);
 	}
 
-	void AudioManagerImpl::delete_sound(const StaticString& name)
+	void AudioManagerImpl::delete_sound(const String& name)
 	{
 		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
-		_sounds.erase(String(name, ByReference()));
+		_sounds.erase(name);
 	}
 }

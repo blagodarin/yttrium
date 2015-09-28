@@ -26,9 +26,6 @@ namespace Yttrium
 		///
 		explicit String(const StaticString& string, Allocator* allocator = DefaultAllocator);
 
-		///
-		String(const char* text, Allocator* allocator = DefaultAllocator);
-
 		/// Preallocating constructor.
 		explicit String(size_t size, Allocator* allocator = DefaultAllocator);
 
@@ -40,10 +37,6 @@ namespace Yttrium
 		///
 		String(const StaticString& string, const ByReference&, Allocator* allocator = DefaultAllocator)
 			: StaticString(string), _allocator(allocator) {}
-
-		///
-		String(const char* text, const ByReference&, Allocator* allocator = DefaultAllocator)
-			: StaticString(text), _allocator(allocator) {}
 
 	public:
 
@@ -61,15 +54,15 @@ namespace Yttrium
 
 		///
 		/// \param text
-		/// \param index
+		/// \param offset
 		/// \note The \a text must not refer to the current string's data.
-		void insert(const StaticString& text, size_t index);
+		void insert(const StaticString& text, size_t offset);
 
-		/// Insert a \a symbol at the specified \a index.
-		void insert(char symbol, size_t index);
+		/// Insert a \a symbol at the specified \a offset.
+		void insert(char symbol, size_t offset) { insert(StaticString(&symbol, 1), offset); }
 
-		/// Remove \a size symbols starting at the specified \a index.
-		void remove(size_t index, size_t size = 1);
+		/// Remove \a size symbols starting at the specified \a offset.
+		void remove(size_t offset, size_t size = 1);
 
 		/// Reserve the space in the string for \a size symbols.
 		void reserve(size_t size);
@@ -93,7 +86,6 @@ namespace Yttrium
 		///
 		String& trim();
 
-		String& operator=(const char* string) { return *this = StaticString(string); }
 		String& operator=(const StaticString&);
 		String& operator=(const String& string) { return *this = StaticString(string); }
 		String& operator=(String&&) noexcept;
@@ -102,20 +94,8 @@ namespace Yttrium
 		using StaticString::operator[];
 
 	private:
-
-		Y_PRIVATE void grow(size_t buffer_size);
-		Y_PRIVATE void init();
-		Y_PRIVATE void init(const char* string, size_t size);
-		Y_PRIVATE const char* init(size_t buffer_size);
-
-	private:
-
-		// (_buffer_size  > 0) => dynamic string; ref_counter = *reinterpret_cast<size_t*>(_text - sizeof(size_t))
-		// (_buffer_size == 0) => static string
-
-		size_t _buffer_size = 0;
+		size_t _capacity = 0;
 		Allocator* _allocator = nullptr;
-
 		struct Private;
 		friend Private;
 	};

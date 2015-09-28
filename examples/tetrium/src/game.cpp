@@ -115,7 +115,7 @@ Game::Game()
 
 	ScriptContext::global().define("screenshot", [this](const ScriptCall&)
 	{
-		TemporaryAllocator<32> allocator(nullptr);
+		TemporaryAllocator<28> allocator(nullptr);
 		_window->take_screenshot(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 	});
 
@@ -448,7 +448,7 @@ void Game::update_statistics()
 	for (auto i = _statistics.rbegin(); i != _statistics.rend(); ++i)
 	{
 		++index;
-		TemporaryAllocator<40> allocator(nullptr);
+		TemporaryAllocator<32> allocator(nullptr);
 		ScriptContext::global().set(String(&allocator) << "name" << index, i->second);
 		ScriptContext::global().set(String(&allocator) << "score" << index, i->first);
 	}

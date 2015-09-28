@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 	public:
 
-		String name() const { return _name; }
+		const String& name() const { return _name; }
 
 		virtual bool load(AudioReader& reader) = 0;
 

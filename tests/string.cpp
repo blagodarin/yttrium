@@ -57,14 +57,14 @@ BOOST_AUTO_TEST_CASE(test_string_swap)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	String s1 = "test";
-	String s2 = "another test";
+	String s1("test");
+	String s2("another test");
 
 	s2.swap(&s1);
 	BOOST_CHECK_EQUAL(s1, "another test");
 	BOOST_CHECK_EQUAL(s2, "test");
 
-	s1.swap("rvalue test");
+	s1.swap(String("rvalue test"));
 	BOOST_CHECK_EQUAL(s1, "rvalue test");
 }
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(test_string_insert)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	String s1 = "test";
+	String s1("test");
 
 	s1.insert("just ", 0);
 	BOOST_CHECK_EQUAL(s1, "just test");

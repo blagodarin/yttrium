@@ -31,7 +31,7 @@ namespace Yttrium
 		AudioPlayer& player() override { return _player; }
 
 		SharedPtr<Sound> create_sound(const StaticString& name, Allocator*);
-		void delete_sound(const StaticString& name);
+		void delete_sound(const String& name);
 
 	private:
 
