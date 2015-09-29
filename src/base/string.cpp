@@ -18,7 +18,7 @@ namespace Yttrium
 			if (capacity <= s._capacity)
 				return;
 			const auto old_text = const_cast<char*>(s._text);
-			const auto new_capacity = max(capacity, next_power_of_2(s._capacity + 1));
+			const auto new_capacity = next_power_of_2(capacity);
 			const auto new_text = static_cast<char*>(s._allocator->allocate(new_capacity));
 			::memcpy(new_text, old_text, s._size); // Don't copy the '\0', it will be written to the string later.
 			s._allocator->deallocate(old_text, true);
@@ -31,7 +31,7 @@ namespace Yttrium
 			assert(s._capacity == 0);
 			if (!s._allocator)
 				return; // Rely on this at your own risk.
-			const auto actual_capacity = max(capacity, MinCapacity);
+			const auto actual_capacity = next_power_of_2(max(capacity, MinCapacity));
 			s._text = static_cast<char*>(s._allocator->allocate(actual_capacity));
 			s._capacity = actual_capacity;
 		}
@@ -51,7 +51,7 @@ namespace Yttrium
 
 	String::String(const String& string)
 		: StaticString(nullptr, string._size)
-		, _capacity(max(_size + 1, Private::MinCapacity))
+		, _capacity(next_power_of_2(max(_size + 1, Private::MinCapacity)))
 		, _allocator(string._allocator)
 	{
 		Private::initialize_copy(*this, string);
@@ -67,7 +67,7 @@ namespace Yttrium
 
 	String::String(const StaticString& string, Allocator* allocator)
 		: StaticString(nullptr, string.size())
-		, _capacity(max(_size + 1, Private::MinCapacity))
+		, _capacity(next_power_of_2(max(_size + 1, Private::MinCapacity)))
 		, _allocator(allocator)
 	{
 		Private::initialize_copy(*this, string);
@@ -75,7 +75,7 @@ namespace Yttrium
 
 	String::String(size_t size, Allocator* allocator)
 		: StaticString(nullptr, 0)
-		, _capacity(max(size + 1, Private::MinCapacity))
+		, _capacity(next_power_of_2(max(size + 1, Private::MinCapacity)))
 		, _allocator(allocator)
 	{
 		Private::initialize_copy(*this, {});
@@ -153,7 +153,7 @@ namespace Yttrium
 
 	void String::reserve(size_t size)
 	{
-		size_t capacity = size + 1;
+		const auto capacity = size + 1;
 		if (_capacity > 0)
 		{
 			Private::grow(*this, capacity);
@@ -169,7 +169,7 @@ namespace Yttrium
 
 	void String::resize(size_t size)
 	{
-		const size_t capacity = size + 1;
+		const auto capacity = size + 1;
 		if (_capacity > 0)
 		{
 			Private::grow(*this, capacity);
