@@ -1,4 +1,4 @@
-font "common" ["default"]
+font ["default"]
 {
 	file    "data/font.ytf"
 	texture "data/font.tga"

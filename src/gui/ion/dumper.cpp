@@ -40,6 +40,8 @@ namespace Yttrium
 
 			if (scene.first == _gui._scene_stack.front()->name())
 				scene_node->append_list()->append("root"_s);
+			else if (scene.second->is_transparent())
+				scene_node->append_list()->append("transparent"_s);
 
 			dump_scene(*scene.second, scene_node);
 		}
@@ -77,9 +79,6 @@ namespace Yttrium
 		case Scaling::Max:     scale_node->append("max"_s);     break;
 		case Scaling::Fit:     scale_node->append("fit"_s);     break;
 		}
-
-		if (scene._is_transparent)
-			scene_object->append("transparent"_s);
 
 		for (const auto& binding : scene._bindings)
 		{

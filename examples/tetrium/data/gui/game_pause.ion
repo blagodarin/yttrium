@@ -4,11 +4,10 @@ class "pause_button" ["button"]
 	text_size "1.75"
 }
 
-scene "game_pause"
+scene "game_pause" ["transparent"]
 {
 	size        "30" "26"
 	scale       "min"
-	transparent
 
 	bind "esc" "pop_scene"
 

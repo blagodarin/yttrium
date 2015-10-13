@@ -54,9 +54,9 @@ namespace Yttrium
 		return true;
 	}
 
-	Pointer<GuiScene> GuiImpl::create_scene(const StaticString& name)
+	Pointer<GuiScene> GuiImpl::create_scene(const StaticString& name, bool is_transparent)
 	{
-		auto scene = make_pointer<GuiScene>(_proxy_allocator, *this, name, &_proxy_allocator);
+		auto scene = make_pointer<GuiScene>(_proxy_allocator, *this, name, is_transparent, &_proxy_allocator);
 		if (_has_size)
 			scene->set_size(_size);
 		return scene;

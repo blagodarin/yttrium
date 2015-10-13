@@ -2,11 +2,10 @@ scene "menu" ["root"]
 {
 	size "100" "100"
 	scale "fit"
-	transparent
 	bind "esc" "exit"
 }
 
-scene "game"
+scene "game" ["transparent"]
 {
 	scale "stretch"
 }

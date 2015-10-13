@@ -1,8 +1,7 @@
-scene "game_over"
+scene "game_over" ["transparent"]
 {
-	size        "30" "26"
-	scale       "min"
-	transparent
+	size  "30" "26"
+	scale "min"
 
 	bind "esc" "pop_scene 3"
 

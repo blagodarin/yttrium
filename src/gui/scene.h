@@ -23,7 +23,7 @@ namespace Yttrium
 
 	public:
 
-		GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator);
+		GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent, Allocator* allocator);
 		~GuiScene();
 
 	public:
@@ -68,11 +68,6 @@ namespace Yttrium
 			_has_size = true;
 		}
 
-		void set_transparent(bool transparent)
-		{
-			_is_transparent = transparent;
-		}
-
 	private:
 
 		RectF map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const;
@@ -92,7 +87,7 @@ namespace Yttrium
 		Widget*                   _mouse_widget;
 		const Widget*             _left_click_widget;
 		Widget*                   _focus_widget;
-		bool                      _is_transparent;
+		const bool                _is_transparent;
 		Bindings                  _bindings;
 	};
 }

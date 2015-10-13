@@ -54,7 +54,7 @@ namespace Yttrium
 
 		WindowCallbacks& callbacks() const { return _callbacks; }
 
-		Pointer<GuiScene> create_scene(const StaticString& name);
+		Pointer<GuiScene> create_scene(const StaticString& name, bool is_transparent);
 
 		const FontDesc* font(const StaticString& name) const;
 

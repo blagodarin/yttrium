@@ -11,80 +11,53 @@
 #include "../scene.h"
 #include "property_loader.h"
 
-#include <cassert>
-
 namespace Yttrium
 {
 	namespace
 	{
-		bool load_object(const IonList& source, const IonObject** object, const StaticString** name, IonListRange* classes)
+		struct GuiElement
 		{
-			const IonObject* result_object = nullptr;
-			const StaticString* result_name = nullptr;
-			const IonList* result_classes = nullptr;
+			const IonObject* object = nullptr;
+			const StaticString* name = nullptr;
+			const StaticString* attribute = nullptr;
+		};
 
-			for (const IonValue& value : source)
+		GuiElement load_element(const IonList& source)
+		{
+			GuiElement result;
+
+			auto value = source.begin();
+			if (value == source.end())
+				return {};
+
+			if (value->type() == IonValue::Type::String)
 			{
-				switch (value.type())
-				{
-				case IonValue::Type::List:
-					if (result_classes)
-						return false;
-					for (const IonValue& class_name : value.list())
-						if (class_name.type() != IonValue::Type::String)
-							return false;
-					result_classes = &value.list();
-					break;
-
-				case IonValue::Type::Object:
-					if (result_object)
-						return false;
-					result_object = value.object();
-					break;
-
-				default:
-					assert(value.type() == IonValue::Type::String);
-					if (result_name)
-						return false;
-					value.get(&result_name);
-					break;
-				}
+				value->get(&result.name);
+				++value;
+				if (value == source.end())
+					return {};
 			}
 
-			if (!result_object)
-				return false;
+			if (value->type() == IonValue::Type::List)
+			{
+				const auto& list = value->list();
+				if (list.size() != 1 || !list.first()->get(&result.attribute))
+					return {};
+				++value;
+				if (value == source.end())
+					return {};
+			}
 
-			*object = result_object;
-			*name = result_name;
-			*classes = result_classes ? result_classes->values() : IonListRange();
+			if (value->type() != IonValue::Type::Object)
+				return {};
 
-			return true;
-		}
+			result.object = value->object();
 
-		bool load_object(const IonList& source, const IonObject** object, const StaticString** name, const StaticString** class_name)
-		{
-			const IonObject* result_object;
-			const StaticString* result_name;
-			IonListRange result_classes;
+			++value;
+			if (value != source.end())
+				return {};
 
-			if (!load_object(source, &result_object, &result_name, &result_classes))
-				return false;
-
-			// TODO: Make use of multiple classes.
-
-			if (result_classes.size() > 1)
-				return false;
-
-			const StaticString* result_class = nullptr;
-
-			if (!result_classes.is_empty())
-				result_classes->get(&result_class);
-
-			*object = result_object;
-			*name = result_name;
-			*class_name = result_class;
-
-			return true;
+			return result;
 		}
 	}
 
@@ -135,36 +108,35 @@ namespace Yttrium
 			}
 			else if (node.name() == "class"_s)
 			{
-				const IonObject* object;
-				const StaticString* object_name;
-				const StaticString* class_name;
-
-				if (!load_object(node, &object, &object_name, &class_name))
+				const auto& element = load_element(node);
+				if (!element.object || !element.name)
 					continue;
-
-				if (!_classes.add(*object_name, *object, class_name))
-					Log() << "[Gui] Can' load class \""_s << *object_name << "\""_s;
+				if (!_classes.add(*element.name, *element.object, element.attribute))
+					Log() << "[Gui] Can' load class \""_s << *element.name << "\""_s;
 			}
 			else if (node.name() == "scene"_s)
 			{
-				const IonObject* object;
-				const StaticString* object_name;
-				const StaticString* class_name;
-
-				if (!load_object(node, &object, &object_name, &class_name))
+				const auto& element = load_element(node);
+				if (!element.object || !element.name)
 					continue;
 
-				if (class_name && *class_name != "root"_s)
+				bool is_root = false;
+				bool is_transparent = false;
+				if (element.attribute)
 				{
-					Log() << "[Gui] Unknown scene \""_s << *object_name << "\" option \""_s << *class_name << "\" ignored"_s;
-					class_name = nullptr;
+					if (*element.attribute == "root"_s)
+						is_root = true;
+					else if (*element.attribute == "transparent"_s)
+						is_transparent = true;
+					else
+						Log() << "[Gui] Unknown scene \""_s << *element.name << "\" attribute \""_s << *element.attribute << "\" ignored"_s;
 				}
 
-				auto scene = _gui.create_scene(*object_name);
+				auto scene = _gui.create_scene(*element.name, is_transparent);
 				if (scene)
 				{
-					load_scene(*scene, *object);
-					_gui.add_scene(std::move(scene), class_name != nullptr);
+					load_scene(*scene, *element.object);
+					_gui.add_scene(std::move(scene), is_root);
 				}
 			}
 			else if (node.name() == "on_scene_change"_s)
@@ -196,37 +168,43 @@ namespace Yttrium
 			}
 			else if (node.name() == "font"_s)
 			{
-				const IonObject* object;
-				const StaticString* object_name;
-				const StaticString* class_name;
-
-				if (!load_object(node, &object, &object_name, &class_name))
+				auto element = load_element(node);
+				if (!element.object)
 					continue;
 
-				if (class_name)
+				const auto& default_name = "default"_s;
+				if (!element.name)
+					element.name = &default_name;
+
+				if (element.attribute)
 				{
-					if (*class_name != "default")
-						Log() << "[Gui] Unknown font option \""_s << *class_name << "\" ignored"_s;
+					if (*element.attribute != "default"_s)
+					{
+						Log() << "[Gui] Unknown font attribute \""_s << *element.attribute << "\" ignored"_s;
+						element.attribute = nullptr;
+					}
 					else if (_has_default_font)
+					{
 						Log() << "[Gui] Default font redefinition ignored"_s;
+						element.attribute = nullptr;
+					}
 					else
 					{
 						_has_default_font = true;
-						_default_font_name = *object_name;
+						_default_font_name = *element.name;
 					}
-					class_name = nullptr;
 				}
 
 				const StaticString* font_name;
 				const StaticString* texture_name;
 
-				if (!(GuiIonPropertyLoader::load_text(&font_name, *object, "file"_s)
-					&& GuiIonPropertyLoader::load_text(&texture_name, *object, "texture"_s)))
+				if (!(GuiIonPropertyLoader::load_text(&font_name, *element.object, "file"_s)
+					&& GuiIonPropertyLoader::load_text(&texture_name, *element.object, "texture"_s)))
 				{
 					continue;
 				}
 
-				_gui.set_font(*object_name, *font_name, *texture_name);
+				_gui.set_font(*element.name, *font_name, *texture_name);
 			}
 		}
 	}
@@ -249,10 +227,6 @@ namespace Yttrium
 				if (GuiIonPropertyLoader::load_scaling(&scaling, node))
 					scene.set_scaling(scaling);
 			}
-			if (node.name() == "transparent"_s)
-			{
-				scene.set_transparent(true);
-			}
 			else if (node.name() == "bind"_s)
 			{
 				const auto s = node.values();
@@ -261,18 +235,15 @@ namespace Yttrium
 			}
 			else
 			{
-				const IonObject* object;
-				const StaticString* object_name;
-				const StaticString* class_name;
-
-				if (!load_object(node, &object, &object_name, &class_name))
+				const auto& element = load_element(node);
+				if (!element.object)
 					continue;
 
-				GuiIonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _gui);
+				GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(*element.attribute) : nullptr), _gui);
 				if (_has_default_font)
 					loader.set_default_font_name(&_default_font_name);
 
-				scene.load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
+				scene.load_widget(node.name(), (element.name ? *element.name : StaticString()), loader);
 			}
 		}
 	}

@@ -13,7 +13,7 @@
 
 namespace Yttrium
 {
-	GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, Allocator* allocator)
+	GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent, Allocator* allocator)
 		: _allocator(allocator)
 		, _gui(gui)
 		, _name(name, allocator)
@@ -22,7 +22,7 @@ namespace Yttrium
 		, _mouse_widget(nullptr)
 		, _left_click_widget(nullptr)
 		, _focus_widget(nullptr)
-		, _is_transparent(false)
+		, _is_transparent(is_transparent)
 		, _bindings(allocator)
 	{
 	}
