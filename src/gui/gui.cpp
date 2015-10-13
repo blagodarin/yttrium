@@ -1,6 +1,7 @@
 #include "gui.h"
 
 #include <yttrium/log.h>
+#include <yttrium/script/context.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
 #include "../renderer/renderer.h"
@@ -10,11 +11,12 @@
 
 namespace Yttrium
 {
-	GuiImpl::GuiImpl(RendererImpl& renderer, WindowCallbacks& callbacks, Allocator* allocator)
-		: _proxy_allocator("gui"_s, allocator)
+	GuiImpl::GuiImpl(ScriptContext& script_context, RendererImpl& renderer, WindowCallbacks& callbacks, Allocator& allocator)
+		: _script_context(script_context)
 		, _renderer(renderer)
-		, _texture_cache(TextureCache::create(_renderer))
 		, _callbacks(callbacks)
+		, _proxy_allocator("gui"_s, allocator)
+		, _texture_cache(TextureCache::create(_renderer))
 		, _has_size(false)
 		, _size(0, 0)
 		, _scaling(Scaling::Stretch)
@@ -32,7 +34,7 @@ namespace Yttrium
 
 		if (_scenes.find(scene_name) != _scenes.end())
 		{
-			Log() << "[Gui] Scene \""_s << scene_name << "\" has already been added"_s;
+			Log() << "(gui) Scene \""_s << scene_name << "\" has already been added"_s;
 			return false;
 		}
 
@@ -40,7 +42,7 @@ namespace Yttrium
 		{
 			if (!_scene_stack.empty())
 			{
-				Log() << "[Gui] Scene \""_s << scene_name << "\" \"root\" option ignored"_s;
+				Log() << "(gui) Scene \""_s << scene_name << "\" \"root\" option ignored"_s;
 				// TODO: Print the existing root scene name.
 			}
 			else
@@ -56,7 +58,7 @@ namespace Yttrium
 
 	Pointer<GuiScene> GuiImpl::create_scene(const StaticString& name, bool is_transparent)
 	{
-		auto scene = make_pointer<GuiScene>(_proxy_allocator, *this, name, is_transparent, &_proxy_allocator);
+		auto scene = make_pointer<GuiScene>(_proxy_allocator, *this, name, is_transparent);
 		if (_has_size)
 			scene->set_size(_size);
 		return scene;
@@ -103,13 +105,13 @@ namespace Yttrium
 		if (font)
 		{
 			texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
-			_fonts[String(name, &_proxy_allocator)] = FontDesc(font, texture);
+			_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), texture);
 		}
 	}
 
 	void GuiImpl::set_scene_change_action(const String& from_scene, const String& to_scene, const String& action)
 	{
-		_scene_actions.emplace(std::make_pair(from_scene, to_scene), std::make_pair(action, ScriptCode(action)));
+		_scene_actions[std::make_pair(from_scene, to_scene)] = std::make_pair(action, ScriptCode(action, &_script_context.allocator()));
 	}
 
 	void GuiImpl::clear()
@@ -142,7 +144,7 @@ namespace Yttrium
 
 		if (_scene_stack.empty())
 		{
-			Log() << "[Gui] No root scene has been added"_s;
+			Log() << "(gui) No root scene has been added"_s;
 			clear();
 			return false;
 		}
@@ -185,6 +187,6 @@ namespace Yttrium
 	{
 		auto i = _scene_actions.find(std::make_pair(String(old_scene, ByReference()), String(new_scene, ByReference())));
 		if (i != _scene_actions.end())
-			i->second.second.execute();
+			i->second.second.execute(script_context());
 	}
 }

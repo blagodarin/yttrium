@@ -5,6 +5,8 @@
 #include <yttrium/static_string.h>
 #include "screen.h"
 
+#include <cstring>
+
 namespace Yttrium
 {
 	namespace
@@ -81,8 +83,6 @@ namespace Yttrium
 				if (!best_vi)
 					return false;
 			}
-
-			screen = best_vi->screen; // TODO: Understand, why.
 
 			const auto check_extension = [](const char* list, const char* name)
 			{
@@ -247,8 +247,6 @@ namespace Yttrium
 		}
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, const Size& size, Callbacks& callbacks)
 		: _display(display)
 		, _window(window)
@@ -283,21 +281,19 @@ namespace Yttrium
 		if (_window == None)
 			return false;
 
-		// TODO: Find out whether all the arguments must be non-nullptr.
+		::Window root = None;
+		::Window child = None;
+		int root_x = 0;
+		int root_y = 0;
+		int window_x = 0;
+		int window_y = 0;
+		unsigned mask = 0;
 
-		::Window root_return, child_return;
-		int root_x_return, root_y_return;
-		int win_x_return, win_y_return;
-		unsigned int mask_return;
-
-		if (!::XQueryPointer(_display, _window, &root_return, &child_return,
-			&root_x_return, &root_y_return, &win_x_return, &win_y_return, &mask_return))
-		{
+		if (!::XQueryPointer(_display, _window, &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
-		}
 
-		cursor.x = win_x_return;
-		cursor.y = win_y_return;
+		cursor.x = window_x;
+		cursor.y = window_y;
 
 		return true;
 	}
@@ -447,7 +443,6 @@ namespace Yttrium
 		if (_window == None)
 			return;
 		::XMapRaised(_display, _window);
-		//::XSetInputFocus(_display, _window, RevertToNone, CurrentTime); // TODO: Uncomment or remove.
 	}
 
 	void WindowBackend::swap_buffers()

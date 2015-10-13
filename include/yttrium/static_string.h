@@ -5,12 +5,10 @@
 #ifndef _include_yttrium_static_string_h_
 #define _include_yttrium_static_string_h_
 
-#include <yttrium/alloca.h>
 #include <yttrium/types.h>
 
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <iosfwd>
 
 namespace Yttrium
@@ -183,16 +181,5 @@ namespace Yttrium
 		return {text, size};
 	}
 }
-
-///
-/// \note Might crash if the string is allocated in the very end of readable space and is not zero terminated.
-#define Y_ZERO_TERMINATED(result, string) \
-	const char* const result = string.text(); \
-	if (result[string.size()] != '\0') \
-	{ \
-		const_cast<const char*&>(result) = static_cast<char*>(Y_ALLOCA(string.size() + 1));\
-		::memcpy(const_cast<char*>(result), string.text(), string.size()); \
-		const_cast<char*>(result)[string.size()] = '\0'; \
-	} \
 
 #endif

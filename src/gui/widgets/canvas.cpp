@@ -2,28 +2,29 @@
 
 #include <yttrium/log.h>
 #include <yttrium/window.h>
+#include "../gui.h"
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
 namespace Yttrium
 {
-	Canvas::Canvas(WindowCallbacks& window_callbacks, Allocator* allocator)
-		: Widget(allocator)
-		, _window_callbacks(window_callbacks)
+	CanvasWidget::CanvasWidget(const GuiImpl& gui)
+		: Widget(gui)
+		, _window_callbacks(gui.callbacks())
 	{
 	}
 
-	void Canvas::dump(GuiPropertyDumper& dumper) const
+	void CanvasWidget::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position"_s, _position);
 		dumper.dump_scaling("scale"_s, _scaling);
 	}
 
-	bool Canvas::load(GuiPropertyLoader& loader)
+	bool CanvasWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!loader.load_rect("position"_s, &_position))
 		{
-			Log() << "[Gui.Canvas] Unable to load"_s;
+			Log() << "(gui/canvas) Unable to load"_s;
 			return false;
 		}
 
@@ -34,7 +35,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void Canvas::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
+	void CanvasWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
 	{
 		_window_callbacks.on_render_canvas(renderer, rect, _name);
 	}

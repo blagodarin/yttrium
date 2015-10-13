@@ -1,6 +1,7 @@
 #include <yttrium/script/args.h>
 
-#include <yttrium/script/context.h>
+#include <yttrium/script/value.h>
+#include "context.h"
 
 namespace Yttrium
 {
@@ -11,7 +12,7 @@ namespace Yttrium
 
 	String ScriptArgs::string(size_t index, NameResolution resolution) const
 	{
-		String result(_context._allocator);
+		String result(_context._private->_allocator);
 
 		if (index < _values.size())
 		{

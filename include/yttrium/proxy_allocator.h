@@ -5,25 +5,21 @@
 #define _include_yttrium_proxy_allocator_h_
 
 #include <yttrium/allocator.h>
-#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
+	class StaticString;
+
 	/// Proxy allocator.
 	class Y_API ProxyAllocator : public Allocator
 	{
 	public:
 
 		///
-		ProxyAllocator(const StaticString& name, Allocator* allocator = nullptr);
+		ProxyAllocator(const StaticString& name, Allocator& allocator);
 
 		///
 		~ProxyAllocator() override;
-
-	public:
-
-		///
-		Allocator* allocator() const;
 
 		///
 		StaticString name() const;

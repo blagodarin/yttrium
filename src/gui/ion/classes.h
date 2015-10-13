@@ -15,7 +15,7 @@ namespace Yttrium
 	{
 	public:
 
-		GuiClasses(Allocator* allocator);
+		GuiClasses(Allocator& allocator);
 		~GuiClasses();
 
 		bool add(const StaticString& name, const IonObject& source, const StaticString* base_class = nullptr);
@@ -24,7 +24,7 @@ namespace Yttrium
 
 	private:
 
-		Allocator* _allocator;
+		Allocator& _allocator;
 		std::map<String, IonDocument> _classes;
 	};
 }

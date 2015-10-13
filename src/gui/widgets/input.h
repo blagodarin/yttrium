@@ -9,11 +9,11 @@
 
 namespace Yttrium
 {
-	class GuiInput : public Widget
+	class InputWidget : public Widget
 	{
 	public:
 
-		GuiInput(Allocator* allocator) : Widget(allocator, CanHaveFocus), _logic(allocator) {}
+		InputWidget(const GuiImpl&);
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;

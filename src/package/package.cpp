@@ -1,87 +1,69 @@
 #include "package.h"
 
+#include <yttrium/log.h>
 #include "ypq.h"
 
 namespace Yttrium
 {
-	Y_IMPLEMENT_SHARED(PackageReader);
-
-	PackageReader::PackageReader(const StaticString& name, PackageType type, Allocator* allocator)
-		: PackageReader()
+	Pointer<PackageReader> PackageReader::create(const StaticString& package, PackageType type, Allocator& allocator)
 	{
 		if (type == PackageType::Auto)
 		{
-			const StaticString extension = name.file_extension();
-			if (extension == ".ypq"_s)
+			if (package.file_extension() == ".ypq"_s)
 				type = PackageType::Ypq;
 			else
-				return;
+				return {};
 		}
 
-		PrivateHolder<PackageReader::Private> reader;
+		File file(package, File::Read, &allocator);
+		if (!file)
+			return {};
 
-		switch (type)
+		try
 		{
-		case PackageType::Ypq: reader.reset<YpqReader>(allocator, name); break;
-		default: return;
+			switch (type)
+			{
+			case PackageType::Ypq: return make_pointer<YpqReader>(allocator, std::move(file), allocator);
+			default: return {};
+			}
 		}
-
-		if (reader->_file && reader->open())
-			_private = reader.release();
-	}
-
-	File PackageReader::open_file(const StaticString& name)
-	{
-		if (_private)
+		catch (const BadPackage& e)
 		{
-			const auto& packed_file = _private->open_file(name);
-			if (packed_file.file)
-				return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
+			Log() << e.what();
+			return {};
 		}
-		return File();
 	}
 
-	Y_IMPLEMENT_SHARED(PackageWriter);
-
-	bool PackageWriter::Private::open(PackageWriter::Mode mode)
+	File PackageReaderImpl::open_file(const StaticString& name)
 	{
-		if (mode == PackageWriter::Append)
-			_file.seek(0, File::Reverse);
-		return true;
+		const auto& packed_file = do_open_file(name);
+		return packed_file.file ? File(packed_file.file->_private, packed_file.file->_offset, packed_file.size) : File();
 	}
 
-	PackageWriter::PackageWriter(const StaticString& name, PackageType type, Mode mode, Allocator* allocator)
+	Pointer<PackageWriter> PackageWriter::create(const StaticString& package, PackageType type, Allocator& allocator)
 	{
 		if (type == PackageType::Auto)
 		{
-			const auto& extension = name.file_extension();
-			if (extension == ".ypq"_s)
+			if (package.file_extension() == ".ypq"_s)
 				type = PackageType::Ypq;
 			else
-				return;
+				return {};
 		}
 
-		PrivateHolder<PackageWriter::Private> writer;
+		File file(package, File::Write | File::Truncate, &allocator);
+		if (!file)
+			return {};
 
-		const unsigned file_mode = File::Write | (mode & Append ? 0 : File::Truncate);
 		switch (type)
 		{
-		case PackageType::Ypq: writer.reset<YpqWriter>(allocator, name, file_mode); break;
-		default: return;
+		case PackageType::Ypq: return make_pointer<YpqWriter>(allocator, std::move(file), allocator);
+		default: return {};
 		}
-
-		if (writer->_file && writer->open(mode))
-			_private = writer.release();
 	}
 
-	File PackageWriter::open_file(const StaticString& name)
+	File PackageWriterImpl::open_file(const StaticString& name)
 	{
-		if (_private)
-		{
-			const auto& packed_file = _private->open_file(name);
-			if (packed_file.file)
-				return File(packed_file.file->_private, packed_file.file->_offset, packed_file.size);
-		}
-		return File();
+		const auto& packed_file = do_open_file(name);
+		return packed_file.file ? File(packed_file.file->_private, packed_file.file->_offset, packed_file.size) : File();
 	}
 }

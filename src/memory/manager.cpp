@@ -17,22 +17,21 @@ namespace Yttrium
 
 	using MemoryManagerGuard = InstanceGuard<MemoryManager>;
 
-	class MemoryManager::Private
+	class MemoryManagerPrivate
 	{
 	public:
 
-		Private(MemoryManager* public_, const StaticString& default_name)
+		MemoryManagerPrivate(MemoryManager* public_, const StaticString& default_name)
 			: _instance_guard(public_, "Duplicate MemoryManager construction")
 		{
 		#if !__Y_CATCH_DEFAULT_ALLOCATOR
-			const_cast<Allocator*&>(DefaultAllocator) =
-				Y_NEW(&_default_allocator, ProxyAllocator)(default_name, &_default_allocator);
+			const_cast<Allocator*&>(DefaultAllocator) = Y_NEW(&_default_allocator, ProxyAllocator)(default_name, _default_allocator);
 		#else
 			Y_UNUSED(default_name);
 		#endif
 		}
 
-		~Private()
+		~MemoryManagerPrivate()
 		{
 		#if !__Y_CATCH_DEFAULT_ALLOCATOR
 			Y_DELETE(&_default_allocator, DefaultAllocator);
@@ -47,20 +46,20 @@ namespace Yttrium
 
 	private:
 
-		HeapAllocator      _default_allocator;
+		HeapAllocator _default_allocator;
 		MemoryManagerGuard _instance_guard;
 	};
 
-	static char _memory_manager_private[sizeof(MemoryManager::Private)];
+	static char _memory_manager_private[sizeof(MemoryManagerPrivate)];
 
 	MemoryManager::MemoryManager(const StaticString& default_name)
-		: _private(new(_memory_manager_private) Private(this, default_name))
+		: _private(new(_memory_manager_private) MemoryManagerPrivate(this, default_name))
 	{
 	}
 
 	MemoryManager::~MemoryManager()
 	{
-		_private->~Private();
+		_private->~MemoryManagerPrivate();
 	}
 
 	Allocator* MemoryManager::default_allocator()

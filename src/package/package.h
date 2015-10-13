@@ -3,7 +3,8 @@
 
 #include <yttrium/package.h>
 
-#include "../base/file.h"
+#include <yttrium/file.h>
+#include <yttrium/string.h>
 
 namespace Yttrium
 {
@@ -19,43 +20,48 @@ namespace Yttrium
 		}
 	};
 
-	class Y_PRIVATE PackageReader::Private: public PrivateBase<PackageReader::Private>
+	class BadPackage
+	{
+	public:
+		BadPackage(String&& what) : _what(std::move(what)) {}
+		StaticString what() const { return _what; }
+	private:
+		const String _what;
+	};
+
+	class PackageReaderImpl : public PackageReader
 	{
 	public:
 
-		Private(const StaticString& name, Allocator* allocator)
-			: PrivateBase(allocator)
-			, _file(name, File::Read, allocator)
-		{
-		}
+		PackageReaderImpl(File&& file, Allocator& allocator) : _allocator(allocator), _file(std::move(file)) {}
 
-		virtual ~Private() {}
+		File open_file(const StaticString& name) override;
 
-		virtual bool open() = 0;
-		virtual PackedFile open_file(const StaticString& name) = 0;
+	protected:
 
-	public:
+		virtual PackedFile do_open_file(const StaticString& name) = 0;
 
+	protected:
+
+		Allocator& _allocator;
 		File _file;
 	};
 
-	class Y_PRIVATE PackageWriter::Private: public PrivateBase<PackageWriter::Private>
+	class PackageWriterImpl : public PackageWriter
 	{
 	public:
 
-		Private(const StaticString& name, unsigned mode, Allocator* allocator)
-			: PrivateBase(allocator)
-			, _file(name, mode, allocator)
-		{
-		}
+		PackageWriterImpl(File&& file, Allocator& allocator) : _allocator(allocator), _file(std::move(file)) {}
 
-		virtual ~Private() {}
+		File open_file(const StaticString& name) override;
 
-		virtual bool open(PackageWriter::Mode mode);
-		virtual PackedFile open_file(const StaticString& name) = 0;
+	protected:
 
-	public:
+		virtual PackedFile do_open_file(const StaticString& name) = 0;
 
+	protected:
+
+		Allocator& _allocator;
 		File _file;
 	};
 }

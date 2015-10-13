@@ -14,6 +14,7 @@ namespace Yttrium
 	class RectF;
 	class Renderer;
 	class Screen;
+	class ScriptContext;
 	class StaticString;
 	class String;
 	template <typename> class Pointer;
@@ -81,8 +82,11 @@ namespace Yttrium
 			Fullscreen, ///<
 		};
 
-		///
-		static Pointer<Window> create(WindowCallbacks& callbacks, Allocator* allocator = nullptr);
+		/// Creates a Window.
+		/// \param script_context ScriptContext for console and GUI.
+		/// \param callbacks
+		/// \param allocator
+		static Pointer<Window> create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator = *DefaultAllocator);
 
 		Window() = default;
 		virtual ~Window() = default;

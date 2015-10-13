@@ -23,7 +23,7 @@ namespace Yttrium
 
 	public:
 
-		GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent, Allocator* allocator);
+		GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent);
 		~GuiScene();
 
 	public:
@@ -74,7 +74,6 @@ namespace Yttrium
 
 	private:
 
-		Allocator*                _allocator;
 		GuiImpl&                  _gui;
 		String                    _name;
 		Vector2                   _size;

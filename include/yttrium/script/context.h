@@ -4,18 +4,18 @@
 #ifndef _include_yttrium_script_context_h_
 #define _include_yttrium_script_context_h_
 
-#include <yttrium/pool.h>
-#include <yttrium/script/args.h>
-#include <yttrium/script/code.h>
-#include <yttrium/script/value.h>
-#include <yttrium/string.h>
+#include <yttrium/base.h>
+#include <yttrium/types.h>
 
 #include <functional>
-#include <map>
 
 namespace Yttrium
 {
+	class ScriptArgs;
 	class ScriptContext;
+	class ScriptValue;
+	class StaticString;
+	class String;
 
 	/// Script call description.
 	class ScriptCall
@@ -45,12 +45,10 @@ namespace Yttrium
 	{
 		friend ScriptArgs;
 
-		Y_NONCOPYABLE(ScriptContext);
-
 	public:
 
 		///
-		typedef std::function<void(const ScriptCall&)> Command;
+		using Command = std::function<void(const ScriptCall&)>;
 
 	public:
 
@@ -60,7 +58,8 @@ namespace Yttrium
 		///
 		ScriptContext(ScriptContext* parent, Allocator* allocator = nullptr);
 
-	public:
+		///
+		Allocator& allocator() const;
 
 		/// Call a command.
 		/// \param name Command name.
@@ -87,17 +86,6 @@ namespace Yttrium
 		{
 			define(name, 0, 0, command);
 		}
-
-		/// Execute the specified script.
-		/// \param script Script text to execute.
-		/// \param mode Execution mode.
-		/// \return \c true on success.
-		bool execute(const StaticString& script, ScriptCode::ExecutionMode mode = ScriptCode::Do);
-
-		/// Execute the script from the specified file.
-		/// \param name Script file to execute.
-		/// \return \c true on success.
-		bool execute_file(const StaticString& name);
 
 		/// Find a value by name.
 		/// \param name Value name.
@@ -144,34 +132,8 @@ namespace Yttrium
 		/// \param name Variable name.
 		void unset(const StaticString& name);
 
-	public:
-
-		/// Get the root context of global script manager.
-		static ScriptContext& global();
-
 	private:
-
-		struct CommandContext
-		{
-			Command command;
-			size_t  min_args;
-			size_t  max_args;
-
-			CommandContext() {}
-			
-			CommandContext(Command command, size_t min_args, size_t max_args)
-				: command(command)
-				, min_args(min_args)
-				, max_args(max_args)
-			{
-			}
-		};
-
-		Allocator*                       _allocator;
-		ScriptContext*                   _parent;
-		Pool<ScriptValue>                _value_pool;
-		std::map<String, ScriptValue*>   _values;
-		std::map<String, CommandContext> _commands;
+		Y_UNIQUE_PRIVATE(ScriptContext);
 	};
 }
 

@@ -119,12 +119,10 @@ namespace Yttrium
 			transforms |= PNG_TRANSFORM_BGR;
 		}
 
-		// TODO: Don't forget not to swap bytes on a big endian target platform if one appears.
-
+		// NOTE: Remove PNG_TRANSFORM_SWAP_ENDIAN for a big endian platform.
 		switch (_format.pixel_format())
 		{
 		case PixelFormat::Gray:
-
 			if (_format.bits_per_pixel() > 8)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_GRAY;
@@ -132,7 +130,6 @@ namespace Yttrium
 
 		case PixelFormat::GrayAlpha:
 		case PixelFormat::AlphaGray:
-
 			if (_format.bits_per_pixel() > 16)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
@@ -140,7 +137,6 @@ namespace Yttrium
 
 		case PixelFormat::Rgb:
 		case PixelFormat::Bgr:
-
 			if (_format.bits_per_pixel() > 24)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_RGB;
@@ -150,7 +146,6 @@ namespace Yttrium
 		case PixelFormat::Bgra:
 		case PixelFormat::Argb:
 		case PixelFormat::Abgr:
-
 			if (_format.bits_per_pixel() > 32)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_RGB_ALPHA;

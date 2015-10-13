@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_i18n_localization_h_
 #define _include_yttrium_i18n_localization_h_
 
-#include <yttrium/global.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
@@ -19,7 +19,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<Localization> create(const StaticString& file_name, Allocator* allocator = nullptr);
+		static Pointer<Localization> create(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
 
 		///
 		static String localize(const StaticString& source);

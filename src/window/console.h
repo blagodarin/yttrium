@@ -6,21 +6,20 @@
 namespace Yttrium
 {
 	class DebugRenderer;
+	class ScriptContext;
 
 	class Console
 	{
 	public:
 
-		Console(Allocator* allocator)
-			: _line_editor(allocator)
-		{
-		}
+		Console(ScriptContext&, Allocator&);
 
-		bool process_key(const KeyEvent& event);
-		void draw_input(DebugRenderer& renderer, int x, int y, int max_size);
+		bool process_key(const KeyEvent&);
+		void draw_input(DebugRenderer&, int x, int y, int max_size);
 
 	private:
 
+		ScriptContext& _script_context;
 		LineEditor _line_editor;
 	};
 }

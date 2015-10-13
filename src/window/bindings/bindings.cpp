@@ -1,5 +1,6 @@
 #include <yttrium/bindings.h>
 
+#include <yttrium/script/context.h>
 #include "../../base/private_base.h"
 #include "lookup.h"
 
@@ -186,9 +187,14 @@ namespace Yttrium
 
 	struct Y_PRIVATE Bindings::Private : public PrivateBase<Bindings::Private>
 	{
+		ScriptContext& _script_context;
 		std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
 
-		Private(Allocator* allocator): PrivateBase(allocator) {}
+		Private(ScriptContext& script_context, Allocator* allocator)
+			: PrivateBase(allocator)
+			, _script_context(script_context)
+		{
+		}
 
 		bool is_valid_index(size_t index) const
 		{
@@ -215,8 +221,8 @@ namespace Yttrium
 
 	Y_IMPLEMENT_UNIQUE(Bindings);
 
-	Bindings::Bindings(Allocator* allocator)
-		: _private(Y_NEW(allocator, Private)(allocator))
+	Bindings::Bindings(ScriptContext& script_context, Allocator* allocator)
+		: _private(Y_NEW(allocator, Private)(script_context, allocator))
 	{
 	}
 
@@ -232,7 +238,7 @@ namespace Yttrium
 	{
 		auto& binding = _private->_actions[KeyType(key)];
 		binding.first.swap(String(action, _private->_allocator));
-		binding.second = ScriptCode(binding.first);
+		binding.second = ScriptCode(binding.first, &_private->_script_context.allocator());
 	}
 
 	bool Bindings::bind(const StaticString& name, const StaticString& action)
@@ -250,7 +256,7 @@ namespace Yttrium
 		if (binding.first.is_empty())
 		{
 			binding.first.swap(String(action, _private->_allocator));
-			binding.second = ScriptCode(binding.first);
+			binding.second = ScriptCode(binding.first, &_private->_script_context.allocator());
 		}
 	}
 
@@ -268,7 +274,7 @@ namespace Yttrium
 		const auto& binding = _private->_actions[KeyType(key)];
 		if (binding.first.is_empty())
 			return false;
-		binding.second.execute(nullptr, mode);
+		binding.second.execute(_private->_script_context, mode);
 		return true;
 	}
 

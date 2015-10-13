@@ -1,7 +1,6 @@
 #include "window.h"
 
 #include <yttrium/matrix.h>
-#include <yttrium/memory_manager.h>
 #include <yttrium/timer.h>
 #include <yttrium/utils.h>
 #include "../gui/gui.h"
@@ -26,24 +25,23 @@ namespace Yttrium
 	{
 	}
 
-	Pointer<Window> Window::create(WindowCallbacks& callbacks, Allocator* allocator)
+	Pointer<Window> Window::create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
 	{
-		if (!allocator)
-			allocator = MemoryManager::default_allocator();
-		auto window = make_pointer<WindowImpl>(*allocator, callbacks, allocator);
+		auto window = make_pointer<WindowImpl>(allocator, script_context, callbacks, allocator);
 		if (!window->initialize())
 			return {};
 		return std::move(window);
 	}
 
-	WindowImpl::WindowImpl(WindowCallbacks& callbacks, Allocator* allocator)
-		: _allocator("window"_s, allocator)
+	WindowImpl::WindowImpl(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
+		: _script_context(script_context)
+		, _callbacks(callbacks)
+		, _allocator(allocator)
 		, _is_active(false)
 		, _is_cursor_locked(false)
 		, _size(640, 480)
 		, _mode(Windowed)
-		, _callbacks(callbacks)
-		, _console(allocator)
+		, _console(_script_context, _allocator)
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(&_allocator)
 		, _debug_text(&_allocator)
@@ -75,7 +73,7 @@ namespace Yttrium
 		if (!_renderer)
 			return false;
 
-		_gui = make_pointer<GuiImpl>(_allocator, *_renderer, _callbacks, &_allocator);
+		_gui = make_pointer<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator);
 		return true;
 	}
 

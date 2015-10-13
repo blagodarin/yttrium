@@ -2,6 +2,8 @@
 
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
+#include <yttrium/script/context.h>
+#include "../gui.h"
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
@@ -9,7 +11,13 @@
 
 namespace Yttrium
 {
-	void GuiInput::dump(GuiPropertyDumper& dumper) const
+	InputWidget::InputWidget(const GuiImpl& gui)
+		: Widget(gui, CanHaveFocus)
+		, _logic(gui.allocator())
+	{
+	}
+
+	void InputWidget::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position"_s, _position);
 		dumper.dump_scaling("scale"_s, _scaling);
@@ -17,12 +25,12 @@ namespace Yttrium
 		_foreground.dump(dumper);
 	}
 
-	bool GuiInput::load(GuiPropertyLoader& loader)
+	bool InputWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!(loader.load_rect("position"_s, &_position)
 			&& _foreground.load(loader)))
 		{
-			Log() << "[Gui.Input] Unable to load"_s;
+			Log() << "(gui/input) Unable to load"_s;
 			return false;
 		}
 
@@ -33,19 +41,19 @@ namespace Yttrium
 
 		String on_enter(_name.allocator());
 		loader.load_text("on_enter"_s, &on_enter);
-		_on_enter = ScriptCode(std::move(on_enter));
+		_on_enter = ScriptCode(std::move(on_enter), &_gui.script_context().allocator());
 
 		return true;
 	}
 
-	bool GuiInput::process_key(const KeyEvent& event)
+	bool InputWidget::process_key(const KeyEvent& event)
 	{
 		if (event.pressed > 0)
 		{
 			switch (event.key)
 			{
 			case Key::Enter:
-				_on_enter.execute();
+				_on_enter.execute(_gui.script_context());
 				return true;
 
 			case Key::Mouse1:
@@ -63,7 +71,7 @@ namespace Yttrium
 		return false;
 	}
 
-	void GuiInput::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
+	void InputWidget::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 

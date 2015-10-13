@@ -1,9 +1,9 @@
 #include <yttrium/dir.h>
 
 #include <yttrium/allocator.h>
-#include <yttrium/string.h>
+#include "../../utils/unique_ptr.h"
+#include "../../utils/zero_terminated.h"
 #include "../private_base.h"
-#include "../utils.h"
 
 #include <system_error>
 

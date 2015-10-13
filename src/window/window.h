@@ -5,7 +5,6 @@
 
 #include <yttrium/image.h>
 #include <yttrium/pointer.h>
-#include <yttrium/proxy_allocator.h>
 #include "backend.h"
 #include "console.h"
 
@@ -15,11 +14,11 @@ namespace Yttrium
 	class RendererImpl;
 	class Screen;
 
-	class WindowImpl: public Window, private WindowBackend::Callbacks
+	class WindowImpl : public Window, private WindowBackend::Callbacks
 	{
 	public:
 
-		WindowImpl(WindowCallbacks& callbacks, Allocator* allocator);
+		WindowImpl(ScriptContext&, WindowCallbacks&, Allocator& allocator);
 		~WindowImpl() override;
 
 		bool initialize();
@@ -58,7 +57,9 @@ namespace Yttrium
 
 	private:
 
-		ProxyAllocator         _allocator;
+		ScriptContext&         _script_context;
+		WindowCallbacks&       _callbacks;
+		Allocator&             _allocator;
 		Pointer<ScreenImpl>    _screen;
 		Pointer<WindowBackend> _backend;
 		Pointer<RendererImpl>  _renderer;
@@ -68,7 +69,6 @@ namespace Yttrium
 		Size                   _size;
 		Mode                   _mode;
 		bool                   _keys[KeyCount];
-		WindowCallbacks&       _callbacks;
 		Console                _console;
 		bool                   _console_visible = false;
 		Pointer<GuiImpl>       _gui;

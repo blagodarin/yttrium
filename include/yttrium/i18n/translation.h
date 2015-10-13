@@ -18,7 +18,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<Translation> open(const StaticString& file_name, Allocator* allocator = DefaultAllocator);
+		static Pointer<Translation> open(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
 
 		Translation() = default;
 		virtual ~Translation() = default;

@@ -4,7 +4,6 @@
 #ifndef _include_yttrium_renderer_h_
 #define _include_yttrium_renderer_h_
 
-#include <yttrium/base.h>
 #include <yttrium/index_buffer.h>
 #include <yttrium/rect.h>
 #include <yttrium/types.h>
@@ -115,7 +114,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API Push2D : public Immovable
+	class Y_API Push2D
 	{
 	public:
 
@@ -125,13 +124,14 @@ namespace Yttrium
 		///
 		~Push2D();
 
+		Push2D(const Push2D&) = delete;
+		Push2D& operator=(const Push2D&) = delete;
 	private:
-
 		Renderer& _renderer;
 	};
 
 	///
-	class Y_API Push3D : public Immovable
+	class Y_API Push3D
 	{
 	public:
 
@@ -141,39 +141,48 @@ namespace Yttrium
 		///
 		~Push3D();
 
+		Push3D(const Push3D&) = delete;
+		Push3D& operator=(const Push3D&) = delete;
 	private:
-
 		Renderer& _renderer;
 	};
 
 	///
-	class Y_API PushGpuProgram : public Immovable
+	class Y_API PushGpuProgram
 	{
 	public:
 
+		///
 		PushGpuProgram(Renderer&, const GpuProgram*);
+
+		///
 		~PushGpuProgram();
 
+		PushGpuProgram(const PushGpuProgram&) = delete;
+		PushGpuProgram& operator=(const PushGpuProgram&) = delete;
 	private:
-
 		Renderer& _renderer;
 	};
 
 	///
-	class Y_API PushTexture : public Immovable
+	class Y_API PushTexture
 	{
 	public:
 
+		///
 		PushTexture(Renderer& renderer, const Texture2D* texture);
+
+		///
 		~PushTexture();
 
+		PushTexture(const PushTexture&) = delete;
+		PushTexture& operator=(const PushTexture&) = delete;
 	private:
-
 		Renderer& _renderer;
 	};
 
 	///
-	class Y_API PushTransformation : public Immovable
+	class Y_API PushTransformation
 	{
 	public:
 
@@ -184,8 +193,9 @@ namespace Yttrium
 		/// Pops a matrix from the transformation stack and applies the next matrix.
 		~PushTransformation();
 
+		PushTransformation(const PushTransformation&) = delete;
+		PushTransformation& operator=(const PushTransformation&) = delete;
 	private:
-
 		Renderer& _renderer;
 	};
 }

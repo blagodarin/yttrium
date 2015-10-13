@@ -6,7 +6,6 @@
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 #include "../base/private_base.h"
-#include "manager.h"
 #include "scanner.h"
 
 namespace Yttrium
@@ -39,12 +38,11 @@ namespace Yttrium
 		String               _last_result;
 	};
 
-	Y_IMPLEMENT_SHARED(ScriptCode);
+	Y_IMPLEMENT_UNIQUE(ScriptCode);
 
-	ScriptCode::ScriptCode(String&& text)
-		: ScriptCode()
+	ScriptCode::ScriptCode(String&& text, Allocator* allocator)
 	{
-		PrivateHolder<ScriptCode::Private> code(script_manager_allocator);
+		PrivateHolder<ScriptCode::Private> code(allocator);
 
 		ScriptScanner scanner(text);
 
@@ -69,7 +67,7 @@ namespace Yttrium
 				{
 				case ScriptScanner::Token::Identifier:
 				case ScriptScanner::Token::XIdentifier:
-					code->_commands.emplace_back(token.string, script_manager_allocator);
+					code->_commands.emplace_back(token.string, allocator);
 					command = &code->_commands.back();
 					state = ParserState::Command;
 					break;
@@ -87,18 +85,18 @@ namespace Yttrium
 				{
 				case ScriptScanner::Token::Identifier:
 					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Type::Name, script_manager_allocator));
+						ScriptValue(token.string, ScriptValue::Type::Name, allocator));
 					break;
 
 				case ScriptScanner::Token::XIdentifier:
 				case ScriptScanner::Token::Literal:
 					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Type::Literal, script_manager_allocator));
+						ScriptValue(token.string, ScriptValue::Type::Literal, allocator));
 					break;
 
 				case ScriptScanner::Token::String:
 					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Type::String, script_manager_allocator));
+						ScriptValue(token.string, ScriptValue::Type::String, allocator));
 					break;
 
 				case ScriptScanner::Token::Separator:
@@ -118,18 +116,15 @@ namespace Yttrium
 		_private = code.release();
 	}
 
-	ScriptCode::ScriptCode(const StaticString& text)
-		: ScriptCode(String(text, script_manager_allocator)) // The script text must be mutable for in-place parsing.
+	ScriptCode::ScriptCode(const StaticString& text, Allocator* allocator)
+		: ScriptCode(String(text, allocator), allocator) // The script text must be mutable for in-place parsing.
 	{
 	}
 
-	void ScriptCode::execute(ScriptContext* context, ExecutionMode mode) const
+	void ScriptCode::execute(ScriptContext& context, ExecutionMode mode) const
 	{
 		if (!_private)
 			return;
-
-		if (!context)
-			context = &ScriptContext::global();
 
 		for (auto& command: _private->_commands)
 		{
@@ -143,7 +138,7 @@ namespace Yttrium
 				revert_mode = true;
 			}
 
-			const bool result = context->call(command.name, &_private->_last_result, ScriptArgs(*context, command.args));
+			const bool result = context.call(command.name, &_private->_last_result, ScriptArgs(context, command.args));
 
 			if (revert_mode)
 				command.name[0] = '+';
@@ -153,9 +148,9 @@ namespace Yttrium
 		}
 	}
 
-	ScriptCode ScriptCode::load(const StaticString& filename)
+	ScriptCode ScriptCode::load(const StaticString& filename, Allocator* allocator)
 	{
-		String text(script_manager_allocator);
-		return File(filename, script_manager_allocator).read_all(&text) ? ScriptCode(text) : ScriptCode();
+		String text(allocator);
+		return File(filename, allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
 	}
 }

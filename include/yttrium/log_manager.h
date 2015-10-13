@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_log_manager_h_
 #define _include_yttrium_log_manager_h_
 
-#include <yttrium/global.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
@@ -12,16 +12,20 @@ namespace Yttrium
 	class StaticString;
 	template <typename> class Pointer;
 
-	///
+	/// Log manager.
 	class Y_API LogManager
 	{
 	public:
 
 		///
-		static Pointer<LogManager> create(const StaticString& file_name, Allocator* allocator = nullptr);
+		static Pointer<LogManager> create(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
 
-		LogManager() = default;
 		virtual ~LogManager() = default;
+
+	protected:
+		LogManager() = default;
+		LogManager(const LogManager&) = default;
+		LogManager& operator=(const LogManager&) = default;
 	};
 }
 

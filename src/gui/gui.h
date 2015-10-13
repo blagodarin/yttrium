@@ -31,13 +31,13 @@ namespace Yttrium
 
 		struct FontDesc
 		{
-			TextureFont        font;
+			TextureFont font;
 			SharedPtr<Texture2D> texture;
 
 			FontDesc() = default;
 
-			FontDesc(const TextureFont& font, const SharedPtr<Texture2D>& texture)
-				: font(font)
+			FontDesc(TextureFont&& font, const SharedPtr<Texture2D>& texture)
+				: font(std::move(font))
 				, texture(texture)
 			{
 			}
@@ -45,12 +45,14 @@ namespace Yttrium
 
 	public:
 
-		GuiImpl(RendererImpl& renderer, WindowCallbacks& callbacks, Allocator* allocator);
+		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&, Allocator& allocator);
 		~GuiImpl() override;
 
 	public:
 
 		bool add_scene(Pointer<GuiScene>&& scene, bool is_root);
+
+		Allocator& allocator() const { return const_cast<ProxyAllocator&>(_proxy_allocator); }
 
 		WindowCallbacks& callbacks() const { return _callbacks; }
 
@@ -58,14 +60,11 @@ namespace Yttrium
 
 		const FontDesc* font(const StaticString& name) const;
 
-		Allocator* internal_allocator() const
-		{
-			return const_cast<ProxyAllocator*>(&_proxy_allocator);
-		}
-
 		bool process_key_event(const KeyEvent& event);
 
 		void render(const Point& cursor);
+
+		ScriptContext& script_context() const { return _script_context; }
 
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 
@@ -82,10 +81,7 @@ namespace Yttrium
 			_has_size = true;
 		}
 
-		TextureCache& texture_cache()
-		{
-			return *_texture_cache;
-		}
+		TextureCache& texture_cache() { return *_texture_cache; }
 
 	public: // Gui
 
@@ -102,10 +98,11 @@ namespace Yttrium
 
 	private:
 
-		ProxyAllocator                    _proxy_allocator;
+		ScriptContext&                    _script_context;
 		RendererImpl&                     _renderer;
-		Pointer<TextureCache>             _texture_cache;
 		WindowCallbacks&                  _callbacks;
+		ProxyAllocator                    _proxy_allocator;
+		Pointer<TextureCache>             _texture_cache;
 		bool                              _has_size;
 		Vector2                           _size;
 		Scaling                           _scaling;

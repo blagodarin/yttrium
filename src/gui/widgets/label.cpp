@@ -3,6 +3,7 @@
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
+#include "../gui.h"
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
@@ -10,7 +11,13 @@
 
 namespace Yttrium
 {
-	void Label::dump(GuiPropertyDumper& dumper) const
+	LabelWidget::LabelWidget(const GuiImpl& gui)
+		: Widget(gui)
+		, _final_text(&gui.allocator())
+	{
+	}
+
+	void LabelWidget::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_position("position"_s, _position);
 		dumper.dump_scaling("scale"_s, _scaling);
@@ -19,13 +26,13 @@ namespace Yttrium
 		dumper.dump_text("text"_s, _text);
 	}
 
-	bool Label::load(GuiPropertyLoader& loader)
+	bool LabelWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!(loader.load_position("position"_s, &_position)
 			&& _foreground.load(loader)
 			&& loader.load_translatable("text"_s, &_text)))
 		{
-			Log() << "[Gui.Label] Unable to load"_s;
+			Log() << "(gui/label) Unable to load"_s;
 			return false;
 		}
 
@@ -37,9 +44,9 @@ namespace Yttrium
 		return true;
 	}
 
-	void Label::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
+	void LabelWidget::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
 	{
-		ScriptContext::global().substitute(_final_text, _text);
+		_gui.script_context().substitute(_final_text, _text);
 
 		const auto& text_size = _foreground.font.text_size(_final_text, _foreground.size) * scale;
 

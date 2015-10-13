@@ -4,7 +4,6 @@
 #include <yttrium/audio/manager.h>
 
 #include <yttrium/audio/sound.h>
-#include <yttrium/proxy_allocator.h>
 #include "../base/instance_guard.h"
 #include "player.h"
 
@@ -23,7 +22,7 @@ namespace Yttrium
 
 		static AudioManagerImpl* instance();
 
-		AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator*);
+		AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator&);
 		~AudioManagerImpl() override;
 
 		StaticString backend() const override;
@@ -35,7 +34,7 @@ namespace Yttrium
 
 	private:
 
-		ProxyAllocator _allocator;
+		Allocator& _allocator;
 		const Pointer<AudioBackend> _backend;
 		AudioPlayerImpl _player;
 		std::map<String, Sound*> _sounds;

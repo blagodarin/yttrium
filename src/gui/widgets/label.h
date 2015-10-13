@@ -6,11 +6,11 @@
 
 namespace Yttrium
 {
-	class Label : public Widget
+	class LabelWidget : public Widget
 	{
 	public:
 
-		Label(Allocator* allocator) : Widget(allocator), _final_text(allocator) {}
+		LabelWidget(const GuiImpl&);
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;

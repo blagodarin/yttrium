@@ -1,112 +1,96 @@
 #include <yttrium/package.h>
 #include "manager.h"
 
+#include <yttrium/file.h>
 #include "../base/instance_guard.h"
-#include "../memory/private_allocator.h"
 
 #include <vector>
 
-// TODO: Proper mutex protection.
-
 namespace Yttrium
 {
-	using PackageManagerGuard = InstanceGuard<PackageManager>;
+	class PackageManagerImpl;
 
-	class Y_PRIVATE PackageManager::Private
+	using PackageManagerGuard = InstanceGuard<PackageManagerImpl>;
+
+	class PackageManagerImpl : public PackageManager
 	{
 	public:
 
-		Private(PackageManager* public_, Allocator* allocator)
+		PackageManagerImpl(Order order, Allocator& allocator)
 			: _allocator(allocator)
-			, _instance_guard(public_, "Duplicate PackageManager construction")
+			, _order(order)
+			, _instance_guard(this, "Duplicate PackageManager construction")
 		{
 		}
 
-		File open_packed(const StaticString& name)
+		bool mount(const StaticString& name, PackageType type) override
 		{
-			File file;
-			for (auto i = _packages.rbegin(); i != _packages.rend(); ++i)
+			auto&& package = PackageReader::create(name, type, _allocator);
+			if (!package)
+				return false;
+			_packages.emplace(_packages.begin(), std::move(package));
+			return true;
+		}
+
+		File open_file(const StaticString& name) const
+		{
+			const auto open_packed = [this](const StaticString& name) -> File
 			{
-				file = i->open_file(name);
-				if (file)
-					break;
+				for (const auto& package : _packages)
+				{
+					File&& file = package->open_file(name);
+					if (file)
+						return std::move(file);
+				}
+				return {};
+			};
+
+			switch (_order)
+			{
+			case PackageManager::Order::PackedOnly:
+				return open_packed(name);
+
+			case PackageManager::Order::PackedFirst:
+				{
+					auto&& file = open_packed(name);
+					if (file)
+						return std::move(file);
+				}
+				return File(name, File::Read, &_allocator);
+
+			case PackageManager::Order::SystemFirst:
+				{
+					File file(name, File::Read, &_allocator);
+					if (file)
+						return std::move(file);
+				}
+				return open_packed(name);
+
+			default:
+				return {};
 			}
-			return file;
 		}
 
-	public:
+	private:
 
-		PrivateAllocator           _allocator;
-		std::vector<PackageReader> _packages;
-		Order                      _order = PackageManager::Order::PackedFirst;
-		PackageManagerGuard        _instance_guard;
+		Allocator& _allocator;
+		std::vector<Pointer<PackageReader>> _packages;
+		const Order _order = PackageManager::Order::PackedFirst;
+		PackageManagerGuard _instance_guard;
 	};
 
-	PackageManager::PackageManager(Allocator* allocator)
-		: _private(Y_NEW(allocator, PackageManager::Private)(this, allocator))
+	Pointer<PackageManager> PackageManager::create(Order order, Allocator& allocator)
 	{
+		return make_pointer<PackageManagerImpl>(allocator, order, allocator);
 	}
 
-	PackageManager::~PackageManager()
-	{
-		_private->_allocator.delete_private(_private);
-	}
-
-	bool PackageManager::mount(const StaticString& name, PackageType type)
-	{
-		PackageReader package(name, type, _private->_allocator);
-		if (!package)
-			return false;
-		_private->_packages.emplace_back(package);
-		return true;
-	}
-
-	File PackageManager::open_file(const StaticString& name, unsigned mode, Order order)
-	{
-		if (mode != File::Read)
-			return File(name, mode, _private->_allocator);
-
-		if (order == Order::Preset)
-			order = _private->_order;
-
-		if (order == Order::PackedFirst || order == Order::PackedOnly)
-		{
-			File&& file = _private->open_packed(name);
-			if (file)
-				return file;
-		}
-
-		if (order != Order::PackedOnly)
-		{
-			File file(name, mode, _private->_allocator);
-			if (file)
-				return file;
-
-			if (order != Order::SystemOnly)
-				return _private->open_packed(name);
-		}
-
-		return {};
-	}
-
-	void PackageManager::set_order(Order order)
-	{
-		if (order != Order::Preset)
-			_private->_order = order;
-	}
-
-	void PackageManager::unmount_all()
-	{
-		_private->_packages.clear();
-	}
-
-	File open_file_for_reading(const StaticString& name, Allocator* allocator)
+	File open_file_for_reading(const StaticString& name, Allocator& allocator)
 	{
 		{
 			std::lock_guard<std::mutex> lock(PackageManagerGuard::instance_mutex);
 			if (PackageManagerGuard::instance)
 				return PackageManagerGuard::instance->open_file(name);
 		}
-		return File(name, File::Read, allocator);
+		return File(name, File::Read, &allocator);
 	}
 }

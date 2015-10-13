@@ -5,7 +5,7 @@
 #define _include_yttrium_script_code_h_
 
 #include <yttrium/base.h>
-#include <yttrium/global.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
@@ -25,22 +25,24 @@ namespace Yttrium
 			Undo, ///<
 		};
 
-		///
-		explicit ScriptCode(String&& text);
+		ScriptCode() = default;
 
 		///
-		explicit ScriptCode(const StaticString& text);
+		explicit ScriptCode(String&& text, Allocator* allocator = DefaultAllocator);
+
+		///
+		explicit ScriptCode(const StaticString& text, Allocator* allocator = DefaultAllocator);
 
 		/// Execute the script.
-		/// \param context Context to execute the script in, or \c nullptr for the global context.
+		/// \param context Context to execute the script in.
 		/// \param mode Execution mode.
-		void execute(ScriptContext* context = nullptr, ExecutionMode mode = Do) const;
+		void execute(ScriptContext& context, ExecutionMode mode = Do) const;
 
 		///
-		static ScriptCode load(const StaticString& filename);
+		static ScriptCode load(const StaticString& filename, Allocator* allocator = DefaultAllocator);
 
 	private:
-		Y_SHARED_PRIVATE(ScriptCode);
+		Y_UNIQUE_PRIVATE(ScriptCode);
 	};
 }
 

@@ -13,8 +13,6 @@ namespace Yttrium
 	template <typename T>
 	class PrivateBase
 	{
-		Y_NONCOPYABLE(PrivateBase);
-
 	public:
 
 		PrivateBase(Allocator* allocator)
@@ -27,6 +25,9 @@ namespace Yttrium
 		{
 			assert(_references == 0);
 		}
+
+		PrivateBase(const PrivateBase&) = delete;
+		PrivateBase& operator=(const PrivateBase&) = delete;
 
 	public:
 
@@ -104,8 +105,6 @@ namespace Yttrium
 	template <typename T>
 	class PrivateHolder
 	{
-		Y_NONCOPYABLE(PrivateHolder);
-
 	public:
 
 		PrivateHolder()
@@ -142,6 +141,9 @@ namespace Yttrium
 			assert(!_pointer);
 			_pointer = Y_NEW(allocator, U)(std::forward<Args>(args)..., allocator);
 		}
+
+		PrivateHolder(const PrivateHolder&) = delete;
+		PrivateHolder& operator=(const PrivateHolder&) = delete;
 
 	private:
 

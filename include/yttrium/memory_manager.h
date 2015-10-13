@@ -9,6 +9,8 @@
 
 namespace Yttrium
 {
+	class MemoryManagerPrivate;
+
 	///
 	class Y_API MemoryManager
 	{
@@ -23,8 +25,12 @@ namespace Yttrium
 		///
 		static Allocator* default_allocator();
 
+		MemoryManager(const MemoryManager&) = delete;
+		MemoryManager(MemoryManager&&) = delete;
+		MemoryManager& operator=(const MemoryManager&) = delete;
+		MemoryManager& operator=(MemoryManager&&) = delete;
 	private:
-		Y_MANAGER_PRIVATE(MemoryManager);
+		MemoryManagerPrivate* const _private;
 	};
 }
 

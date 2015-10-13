@@ -7,11 +7,11 @@ namespace Yttrium
 {
 	class WindowCallbacks;
 
-	class Canvas : public Widget
+	class CanvasWidget : public Widget
 	{
 	public:
 
-		Canvas(WindowCallbacks& window_callbacks, Allocator* allocator);
+		CanvasWidget(const GuiImpl&);
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
@@ -19,7 +19,7 @@ namespace Yttrium
 
 	private:
 
-		Rect             _position;
+		Rect _position;
 		WindowCallbacks& _window_callbacks;
 	};
 }

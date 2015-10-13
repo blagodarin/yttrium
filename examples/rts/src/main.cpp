@@ -7,9 +7,10 @@ int main(int, char**)
 {
 	MemoryManager memory_manager;
 
-	const auto& log_manager = LogManager::create("rts.log");
+	ProxyAllocator log_allocator("log"_s, *memory_manager.default_allocator());
+	const auto& log_manager = LogManager::create("rts.log", log_allocator);
 
-	Game game;
+	Game game(*memory_manager.default_allocator());
 	game.run();
 	return 0;
 }

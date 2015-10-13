@@ -63,18 +63,18 @@ namespace Yttrium
 
 	GuiIonLoader::GuiIonLoader(GuiImpl& gui)
 		: _gui(gui)
-		, _classes(_gui.internal_allocator())
-		, _default_font_name(_gui.internal_allocator())
+		, _classes(_gui.allocator())
+		, _default_font_name(&_gui.allocator())
 	{
 	}
 
 	bool GuiIonLoader::load(const StaticString& source_name, bool is_internal)
 	{
-		IonDocument document(_gui.internal_allocator());
+		IonDocument document(&_gui.allocator());
 
 		if (!document.load(source_name))
 		{
-			Log() << "[Gui] Can't load \""_s << source_name << "\"..."_s;
+			Log() << "(gui) Can't load \""_s << source_name << "\"..."_s;
 			return false;
 		}
 
@@ -112,7 +112,7 @@ namespace Yttrium
 				if (!element.object || !element.name)
 					continue;
 				if (!_classes.add(*element.name, *element.object, element.attribute))
-					Log() << "[Gui] Can' load class \""_s << *element.name << "\""_s;
+					Log() << "(gui) Can' load class \""_s << *element.name << "\""_s;
 			}
 			else if (node.name() == "scene"_s)
 			{
@@ -129,7 +129,7 @@ namespace Yttrium
 					else if (*element.attribute == "transparent"_s)
 						is_transparent = true;
 					else
-						Log() << "[Gui] Unknown scene \""_s << *element.name << "\" attribute \""_s << *element.attribute << "\" ignored"_s;
+						Log() << "(gui) Unknown scene \""_s << *element.name << "\" attribute \""_s << *element.attribute << "\" ignored"_s;
 				}
 
 				auto scene = _gui.create_scene(*element.name, is_transparent);
@@ -145,7 +145,7 @@ namespace Yttrium
 
 				if (s.size() != 2 || s->type() != IonValue::Type::List || s.last().type() != IonValue::Type::String)
 				{
-					Log() << "[Gui] Bad 'on_scene_change'"_s;
+					Log() << "(gui) Bad 'on_scene_change'"_s;
 					continue;
 				}
 
@@ -157,14 +157,14 @@ namespace Yttrium
 
 				if (t.size() != 2 || !t->get(&from) || !t.last().get(&to) || !s.last().get(&action))
 				{
-					Log() << "[Gui] Bad 'on_scene_change'"_s;
+					Log() << "(gui) Bad 'on_scene_change'"_s;
 					continue;
 				}
 
 				_gui.set_scene_change_action(
-					String(*from, _gui.internal_allocator()),
-					String(*to, _gui.internal_allocator()),
-					String(*action, _gui.internal_allocator()));
+					String(*from, &_gui.allocator()),
+					String(*to, &_gui.allocator()),
+					String(*action, &_gui.allocator()));
 			}
 			else if (node.name() == "font"_s)
 			{
@@ -180,12 +180,12 @@ namespace Yttrium
 				{
 					if (*element.attribute != "default"_s)
 					{
-						Log() << "[Gui] Unknown font attribute \""_s << *element.attribute << "\" ignored"_s;
+						Log() << "(gui) Unknown font attribute \""_s << *element.attribute << "\" ignored"_s;
 						element.attribute = nullptr;
 					}
 					else if (_has_default_font)
 					{
-						Log() << "[Gui] Default font redefinition ignored"_s;
+						Log() << "(gui) Default font redefinition ignored"_s;
 						element.attribute = nullptr;
 					}
 					else

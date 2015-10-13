@@ -4,7 +4,7 @@
 #include <yttrium/screen.h>
 
 #include "../../base/private_base.h"
-#include "../../base/utils.h"
+#include "../../utils/unique_ptr.h"
 
 #include <X11/Xlib.h>
 

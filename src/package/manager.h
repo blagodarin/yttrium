@@ -7,7 +7,7 @@ namespace Yttrium
 	class File;
 	class StaticString;
 
-	File open_file_for_reading(const StaticString& name, Allocator* allocator);
+	File open_file_for_reading(const StaticString& name, Allocator& allocator);
 }
 
 #endif

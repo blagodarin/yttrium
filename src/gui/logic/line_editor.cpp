@@ -7,8 +7,8 @@
 
 namespace Yttrium
 {
-	LineEditor::LineEditor(Allocator* allocator)
-		: _text(allocator)
+	LineEditor::LineEditor(Allocator& allocator)
+		: _text(&allocator)
 		, _max_size(std::numeric_limits<decltype(_max_size)>::max())
 	{
 	}

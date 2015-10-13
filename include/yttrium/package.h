@@ -4,11 +4,14 @@
 #ifndef _include_yttrium_package_h_
 #define _include_yttrium_package_h_
 
-#include <yttrium/base.h>
-#include <yttrium/file.h>
+#include <yttrium/pointer.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
+	class File;
+	class StaticString;
+
 	/// Package file types.
 	enum class PackageType
 	{
@@ -22,13 +25,13 @@ namespace Yttrium
 	public:
 
 		///
-		PackageReader(const StaticString& name, PackageType type = PackageType::Auto, Allocator* allocator = DefaultAllocator);
+		static Pointer<PackageReader> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
+
+		PackageReader() = default;
+		virtual ~PackageReader() = default;
 
 		///
-		File open_file(const StaticString& name);
-
-	private:
-		Y_SHARED_PRIVATE(PackageReader);
+		virtual File open_file(const StaticString& name) = 0;
 	};
 
 	/// Package writer class.
@@ -36,21 +39,14 @@ namespace Yttrium
 	{
 	public:
 
-		/// Package writing mode.
-		enum Mode
-		{
-			Rewrite, ///< Replace the destination file with the package.
-			Append,  ///< Append the package to the destination file.
-		};
+		///
+		static Pointer<PackageWriter> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
+
+		PackageWriter() = default;
+		virtual ~PackageWriter() = default;
 
 		///
-		PackageWriter(const StaticString& name, PackageType type = PackageType::Auto, Mode mode = Rewrite, Allocator* allocator = DefaultAllocator);
-
-		///
-		File open_file(const StaticString& name);
-
-	private:
-		Y_SHARED_PRIVATE(PackageWriter);
+		virtual File open_file(const StaticString& name) = 0;
 	};
 
 	/// Package manager.
@@ -61,43 +57,22 @@ namespace Yttrium
 		/// File search order.
 		enum class Order
 		{
-			Preset,      ///< Use the PackageManager order.
 			PackedFirst, ///< Try packed, then system file.
-			SystemOnly,  ///< Try system file only.
 			SystemFirst, ///< Try system, then packed file.
 			PackedOnly,  ///< Try packed file only.
 		};
 
-	public:
-
 		///
-		PackageManager(Allocator* allocator = DefaultAllocator);
+		static Pointer<PackageManager> create(Order order, Allocator& allocator = *DefaultAllocator);
 
-		///
-		~PackageManager();
+		PackageManager() = default;
+		virtual ~PackageManager() = default;
 
 		/// Mount the specified package into the file system.
 		/// \param name The package name.
 		/// \param type Package file type.
 		/// \return \c true on success.
-		bool mount(const StaticString& name, PackageType type = PackageType::Auto);
-
-		/// Open a file.
-		/// \param name %File name.
-		/// \param mode %File access mode.
-		/// \param order The order to look for the file with.
-		/// \return File.
-		File open_file(const StaticString& name, unsigned mode = File::Read, Order order = Order::Preset);
-
-		/// Set the default file system search order.
-		/// \param order The order to be set.
-		void set_order(Order order);
-
-		/// Unmount all the mounted packages in the file system.
-		void unmount_all();
-
-	private:
-		Y_MANAGER_PRIVATE(PackageManager);
+		virtual bool mount(const StaticString& name, PackageType type = PackageType::Auto) = 0;
 	};
 }
 

@@ -1,6 +1,5 @@
 #include <yttrium/proxy_allocator.h>
 
-#include <yttrium/memory_manager.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
 
@@ -18,7 +17,7 @@ namespace Yttrium
 	{
 	public:
 
-		Private(String&& name, Allocator* allocator)
+		Private(String&& name, Allocator& allocator)
 			: _allocator(allocator)
 			, _name(std::move(name))
 		{
@@ -26,8 +25,8 @@ namespace Yttrium
 
 	public:
 
-		Allocator* const    _allocator;
-		const String        _name;
+		Allocator& _allocator;
+		const String _name;
 		std::atomic<size_t> _allocations{0};
 		std::atomic<size_t> _reallocations{0};
 		std::atomic<size_t> _allocated_blocks{0};
@@ -36,22 +35,19 @@ namespace Yttrium
 	#endif
 	};
 
-	ProxyAllocator::ProxyAllocator(const StaticString& name, Allocator* allocator)
+	ProxyAllocator::ProxyAllocator(const StaticString& name, Allocator& allocator)
 		: _private(nullptr)
 	{
-		if (!allocator)
-			allocator = MemoryManager::default_allocator();
-
-		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(allocator);
+		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(&allocator);
 		if (!proxy_allocator)
 		{
-			_private = Y_NEW(allocator, Private)(String(name, allocator), allocator);
+			_private = Y_NEW(&allocator, Private)(String(name, &allocator), allocator);
 		}
 		else
 		{
 			const auto& proxy_name = proxy_allocator->name();
-			_private = Y_NEW(allocator, Private)(
-				String(proxy_name.size() + 1 + name.size(), allocator) << proxy_name << '.' << name,
+			_private = Y_NEW(&allocator, Private)(
+				String(proxy_name.size() + 1 + name.size(), &allocator) << proxy_name << '.' << name,
 				allocator);
 		}
 	}
@@ -85,12 +81,7 @@ namespace Yttrium
 		}
 	#endif
 
-		Y_DELETE(_private->_allocator, _private);
-	}
-
-	Allocator* ProxyAllocator::allocator() const
-	{
-		return _private->_allocator;
+		Y_DELETE(&_private->_allocator, _private);
 	}
 
 	StaticString ProxyAllocator::name() const
@@ -100,7 +91,7 @@ namespace Yttrium
 
 	void* ProxyAllocator::do_allocate(size_t size, size_t alignment)
 	{
-		const auto pointer = _private->_allocator->allocate(size, alignment);
+		const auto pointer = _private->_allocator.allocate(size, alignment);
 		++_private->_allocated_blocks;
 		++_private->_allocations;
 	#if Y_IS_DEBUG
@@ -115,7 +106,7 @@ namespace Yttrium
 		if (_private->_pointers.find(pointer) == _private->_pointers.end())
 			::abort();
 	#endif
-		_private->_allocator->deallocate(pointer);
+		_private->_allocator.deallocate(pointer);
 		--_private->_allocated_blocks;
 		if (reallocation)
 			++_private->_reallocations;

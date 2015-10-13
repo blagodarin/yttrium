@@ -8,6 +8,7 @@
 
 namespace Yttrium
 {
+	class GuiImpl;
 	class GuiPropertyDumper;
 	class GuiPropertyLoader;
 	class Renderer;
@@ -21,13 +22,7 @@ namespace Yttrium
 			CanHaveFocus = 1 << 0,
 		};
 
-		Widget(Allocator* allocator, unsigned flags = 0)
-			: _text(allocator)
-			, _name(allocator)
-			, _flags(flags)
-		{
-		}
-
+		Widget(const GuiImpl&, unsigned flags = 0);
 		virtual ~Widget() = default;
 
 		unsigned flags() const { return _flags; }
@@ -49,6 +44,7 @@ namespace Yttrium
 
 	protected:
 
+		const GuiImpl& _gui;
 		RectF          _rect;
 		Scaling        _scaling = Scaling::Stretch;
 		bool           _is_enabled = true;

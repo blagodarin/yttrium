@@ -3,7 +3,9 @@
 #include <yttrium/audio/sound.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
+#include <yttrium/script/context.h>
 #include <yttrium/texture.h>
+#include "../gui.h"
 #include "../property_dumper.h"
 #include "../property_loader.h"
 
@@ -11,7 +13,7 @@
 
 namespace Yttrium
 {
-	void Button::dump(GuiPropertyDumper& dumper) const
+	void ButtonWidget::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position"_s, _position);
 		dumper.dump_scaling("scale"_s, _scaling);
@@ -27,13 +29,13 @@ namespace Yttrium
 		// TODO: Dump styles.
 	}
 
-	bool Button::load(GuiPropertyLoader& loader)
+	bool ButtonWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!(loader.load_rect("position"_s, &_position)
 			&& loader.load_font("font"_s, &_font, &_font_texture)
 			&& loader.load_size("text_size"_s, &_text_size)))
 		{
-			Log() << "[Gui.Button] Unable to load"_s;
+			Log() << "(gui/button) Unable to load"_s;
 			return false;
 		}
 
@@ -87,14 +89,14 @@ namespace Yttrium
 
 		_rect = RectF(_position);
 
-		String on_click(_name.allocator());
+		String on_click(&_gui.allocator());
 		loader.load_text("on_click"_s, &on_click);
-		_on_click = ScriptCode(std::move(on_click));
+		_on_click = ScriptCode(std::move(on_click), &_gui.script_context().allocator());
 
 		return true;
 	}
 
-	bool Button::process_key(const KeyEvent& event)
+	bool ButtonWidget::process_key(const KeyEvent& event)
 	{
 		if (_state == WidgetState::Checked || _state == WidgetState::Disabled)
 			return false;
@@ -107,11 +109,11 @@ namespace Yttrium
 
 		if (_sound)
 			_sound->play();
-		_on_click.execute();
+		_on_click.execute(_gui.script_context());
 		return true;
 	}
 
-	void Button::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const
+	void ButtonWidget::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const
 	{
 		if (_state != WidgetState::NotSet)
 			state = _state;

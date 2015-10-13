@@ -3,7 +3,7 @@
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/proxy_allocator.h>
-#include <yttrium/script/manager.h>
+#include <yttrium/script/context.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/vector.h>
 #include <yttrium/vertex_buffer.h>
@@ -19,7 +19,7 @@ class Game : public WindowCallbacks
 {
 public:
 
-	Game();
+	Game(Allocator&);
 
 	void run();
 
@@ -32,9 +32,9 @@ private:
 
 private:
 
-	ScriptManager _script_manager;
 	ProxyAllocator _allocator;
-
+	ScriptContext _script;
+	ProxyAllocator _window_allocator;
 	Pointer<Window> _window;
 	Pointer<TextureCache> _texture_cache;
 	std::unique_ptr<CubeModel> _cube;

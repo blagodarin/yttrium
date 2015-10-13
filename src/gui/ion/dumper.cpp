@@ -11,13 +11,13 @@ namespace Yttrium
 {
 	void GuiIonDumper::dump(const StaticString& filename) const
 	{
-		IonDocument document(_gui.internal_allocator());
+		IonDocument document(&_gui.allocator());
 
 		if (_gui._has_size)
 		{
 			IonNode* size_node = document.root().append("size"_s);
-			size_node->append(String(_gui.internal_allocator()) << _gui._size.x);
-			size_node->append(String(_gui.internal_allocator()) << _gui._size.y);
+			size_node->append(String(&_gui.allocator()) << _gui._size.x);
+			size_node->append(String(&_gui.allocator()) << _gui._size.y);
 		}
 
 		IonNode* scale_node = document.root().append("scale"_s);
@@ -67,8 +67,8 @@ namespace Yttrium
 
 		IonNode* size_node = scene_object->append("size"_s);
 
-		size_node->append(String(_gui.internal_allocator()) << scene._size.x);
-		size_node->append(String(_gui.internal_allocator()) << scene._size.y);
+		size_node->append(String(&_gui.allocator()) << scene._size.x);
+		size_node->append(String(&_gui.allocator()) << scene._size.y);
 
 		IonNode* scale_node = scene_object->append("scale"_s);
 

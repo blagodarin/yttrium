@@ -4,7 +4,6 @@
 #ifndef _include_yttrium_yttrium_h_
 #define _include_yttrium_yttrium_h_
 
-#include <yttrium/alloca.h>
 #include <yttrium/allocator.h>
 #include <yttrium/audio/io.h>
 #include <yttrium/audio/manager.h>
@@ -47,7 +46,6 @@
 #include <yttrium/script/args.h>
 #include <yttrium/script/code.h>
 #include <yttrium/script/context.h>
-#include <yttrium/script/manager.h>
 #include <yttrium/script/value.h>
 #include <yttrium/size.h>
 #include <yttrium/static_string.h>

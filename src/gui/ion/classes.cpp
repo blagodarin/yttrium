@@ -19,7 +19,7 @@ namespace Yttrium
 		}
 	}
 
-	GuiClasses::GuiClasses(Allocator* allocator)
+	GuiClasses::GuiClasses(Allocator& allocator)
 		: _allocator(allocator)
 	{
 	}
@@ -42,12 +42,12 @@ namespace Yttrium
 			base = &i->second.root();
 		}
 
-		IonDocument document(_allocator);
+		IonDocument document(&_allocator);
 		update_document(document.root(), source);
 		if (base)
 			update_document(document.root(), *base);
 
-		_classes.emplace(String(name, _allocator), std::move(document));
+		_classes.emplace(String(name, &_allocator), std::move(document));
 
 		return true;
 	}

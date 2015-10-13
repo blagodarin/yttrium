@@ -9,7 +9,7 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(test_package_rewrite)
+BOOST_AUTO_TEST_CASE(test_package)
 {
 	DECLARE_MEMORY_MANAGER;
 
@@ -43,36 +43,40 @@ BOOST_AUTO_TEST_CASE(test_package_rewrite)
 	File package_file(File::Temporary);
 
 	{
-		PackageWriter package_writer(package_file.name(), PackageType::Ypq, PackageWriter::Rewrite);
+		const auto& package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
 
 		{
-			File packed_file1 = package_writer.open_file(file1.name());
+			File packed_file1 = package_writer->open_file(file1.name());
 			BOOST_REQUIRE(packed_file1);
 			FileTransfer<8192>(&packed_file1, &file1);
 		}
 
 		{
-			File packed_file2 = package_writer.open_file(file2.name());
+			File packed_file2 = package_writer->open_file(file2.name());
 			BOOST_REQUIRE(packed_file2);
 			FileTransfer<8192>(&packed_file2, &file2);
 		}
 
 		{
-			File packed_file3 = package_writer.open_file(file3.name());
+			File packed_file3 = package_writer->open_file(file3.name());
 			BOOST_REQUIRE(packed_file3);
 			FileTransfer<8192>(&packed_file3, &file3);
 		}
 	}
 
-	PackageReader package_reader(package_file.name(), PackageType::Ypq);
-	BOOST_REQUIRE(package_reader);
+	File packed_file1;
+	File packed_file2;
+	File packed_file3;
 
-	File packed_file3 = package_reader.open_file(file3.name());
-	File packed_file1 = package_reader.open_file(file1.name());
-	File packed_file2 = package_reader.open_file(file2.name());
+	{
+		const auto& package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
+		BOOST_REQUIRE(package_reader);
 
-	package_reader = PackageReader();
+		packed_file3 = package_reader->open_file(file3.name());
+		packed_file1 = package_reader->open_file(file1.name());
+		packed_file2 = package_reader->open_file(file2.name());
+	}
 
 	Buffer actual;
 
@@ -97,3 +101,5 @@ BOOST_AUTO_TEST_CASE(test_package_rewrite)
 
 	packed_file3 = File();
 }
+
+// TODO: Test PackageManager.

@@ -1,8 +1,6 @@
 #ifndef _src_package_ypq_h_
 #define _src_package_ypq_h_
 
-#include <yttrium/string.h>
-
 #include "package.h"
 
 #include <map>
@@ -10,38 +8,27 @@
 
 namespace Yttrium
 {
-	class YpqReader: public PackageReader::Private
+	class YpqReader : public PackageReaderImpl
 	{
 	public:
 
-		YpqReader(const StaticString& name, Allocator* allocator)
-			: PackageReader::Private(name, allocator)
-		{
-		}
+		YpqReader(File&& file, Allocator& allocator);
 
-		bool open() override;
-		PackedFile open_file(const StaticString& name) override;
+		PackedFile do_open_file(const StaticString& name) override;
 
 	private:
 
 		std::map<String, uint64_t> _index;
 	};
 
-	class YpqWriter: public PackageWriter::Private
+	class YpqWriter : public PackageWriterImpl
 	{
 	public:
 
-		YpqWriter(const StaticString& name, unsigned mode, Allocator* allocator)
-			: PackageWriter::Private(name, mode, allocator)
-			, _last_offset(0)
-		{
-		}
-
+		YpqWriter(File&& file, Allocator& allocator) : PackageWriterImpl(std::move(file), allocator) {}
 		~YpqWriter() override;
 
-	public:
-
-		PackedFile open_file(const StaticString& name) override;
+		PackedFile do_open_file(const StaticString& name) override;
 
 	private:
 
@@ -63,7 +50,7 @@ namespace Yttrium
 
 	private:
 
-		uint64_t _last_offset;
+		uint64_t _last_offset = 0;
 		std::vector<Entry> _entries;
 	};
 }

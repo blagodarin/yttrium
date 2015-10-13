@@ -7,14 +7,16 @@
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
 
-Game::Game()
-	: _allocator("game")
+Game::Game(Allocator& allocator)
+	: _allocator("game", allocator)
+	, _script(&_allocator)
+	, _window_allocator("window", allocator)
 {
 }
 
 void Game::run()
 {
-	_window = Window::create(*this, &_allocator);
+	_window = Window::create(_script, *this, _window_allocator);
 	if (!_window)
 		return;
 

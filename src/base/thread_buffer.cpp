@@ -2,17 +2,6 @@
 
 namespace Yttrium
 {
-	ThreadBufferBase::ThreadBufferBase(size_t capacity)
-		: _capacity(capacity)
-		, _size(0)
-		, _first(0)
-	{
-	}
-
-	ThreadBufferBase::~ThreadBufferBase()
-	{
-	}
-
 	void ThreadBufferBase::begin_read()
 	{
 		std::unique_lock<std::mutex> lock(_mutex);

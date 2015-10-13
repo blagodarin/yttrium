@@ -33,7 +33,7 @@ namespace Yttrium
 		friend Iterator;
 
 		///
-		Bindings(Allocator* allocator = DefaultAllocator);
+		Bindings(ScriptContext& script_context, Allocator* allocator = DefaultAllocator);
 
 		///
 		Iterator begin() const;

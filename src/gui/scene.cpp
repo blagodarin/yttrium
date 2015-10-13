@@ -13,17 +13,16 @@
 
 namespace Yttrium
 {
-	GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent, Allocator* allocator)
-		: _allocator(allocator)
-		, _gui(gui)
-		, _name(name, allocator)
+	GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent)
+		: _gui(gui)
+		, _name(name, &_gui.allocator())
 		, _scaling(Scaling::Stretch)
 		, _is_cursor_set(false)
 		, _mouse_widget(nullptr)
 		, _left_click_widget(nullptr)
 		, _focus_widget(nullptr)
 		, _is_transparent(is_transparent)
-		, _bindings(allocator)
+		, _bindings(_gui.script_context(), &_gui.allocator())
 	{
 	}
 
@@ -35,15 +34,15 @@ namespace Yttrium
 	{
 		Pointer<Widget> widget;
 		if (type == "button"_s)
-			widget = make_pointer<Button>(*_allocator, _allocator);
+			widget = make_pointer<ButtonWidget>(_gui.allocator(), _gui);
 		else if (type == "canvas"_s)
-			widget = make_pointer<Canvas>(*_allocator, _gui.callbacks(), _allocator);
+			widget = make_pointer<CanvasWidget>(_gui.allocator(), _gui);
 		else if (type == "image"_s)
-			widget = make_pointer<GuiImage>(*_allocator, _allocator);
+			widget = make_pointer<ImageWidget>(_gui.allocator(), _gui);
 		else if (type == "input"_s)
-			widget = make_pointer<GuiInput>(*_allocator, _allocator);
+			widget = make_pointer<InputWidget>(_gui.allocator(), _gui);
 		else if (type == "label"_s)
-			widget = make_pointer<Label>(*_allocator, _allocator);
+			widget = make_pointer<LabelWidget>(_gui.allocator(), _gui);
 
 		if (!widget)
 			return;
@@ -56,7 +55,7 @@ namespace Yttrium
 		if (!name.is_empty())
 		{
 			widget->set_name(name);
-			_named_widgets[String(name, _allocator)] = widget.get();
+			_named_widgets[String(name, &_gui.allocator())] = widget.get();
 		}
 
 		_widgets.emplace_back(std::move(widget));

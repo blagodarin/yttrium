@@ -1,5 +1,6 @@
 #define _FILE_OFFSET_BITS 64
 
+#include "../../utils/zero_terminated.h"
 #include "file.h"
 
 #include <system_error>

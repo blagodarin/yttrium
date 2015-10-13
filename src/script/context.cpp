@@ -1,24 +1,29 @@
-#include <yttrium/script/context.h>
+#include "context.h"
 
 #include <yttrium/file.h>
 #include <yttrium/log.h>
+#include <yttrium/script/args.h>
+#include <yttrium/script/value.h>
 
 #include <cassert>
 
 namespace Yttrium
 {
+	Y_IMPLEMENT_UNIQUE(ScriptContext);
+
 	ScriptContext::ScriptContext(Allocator* allocator)
-		: _allocator(allocator)
-		, _parent(nullptr)
-		, _value_pool(32, _allocator) // TODO: Get rid of magic numbers.
+		: _private(Y_NEW(allocator, Private)(nullptr, allocator))
 	{
 	}
 
 	ScriptContext::ScriptContext(ScriptContext* parent, Allocator* allocator)
-		: _allocator(allocator ? allocator : parent->_allocator)
-		, _parent(parent)
-		, _value_pool(32, _allocator) // TODO: Get rid of magic numbers.
+		: _private(Y_NEW(allocator, Private)(parent, allocator))
 	{
+	}
+
+	Allocator& ScriptContext::allocator() const
+	{
+		return *_private->_allocator;
 	}
 
 	bool ScriptContext::call(const StaticString& name, String* result, const ScriptArgs& args)
@@ -28,9 +33,9 @@ namespace Yttrium
 
 		StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
-		const auto command = _commands.find(String(id, ByReference(), nullptr));
+		const auto command = _private->_commands.find(String(id, ByReference(), nullptr));
 
-		if (command == _commands.end())
+		if (command == _private->_commands.end())
 		{
 			Log() << "[Script.Context] Unknown command \""_s << id << '\"';
 			return false;
@@ -49,34 +54,16 @@ namespace Yttrium
 
 	void ScriptContext::define(const StaticString& name, size_t min_args, size_t max_args, const Command& command)
 	{
-		_commands[String(name, _allocator)] = CommandContext(command, min_args, max_args);
-	}
-
-	bool ScriptContext::execute(const StaticString& text, ScriptCode::ExecutionMode mode)
-	{
-		const ScriptCode& code = ScriptCode(text);
-		if (!code)
-			return false;
-		code.execute(this, mode);
-		return true;
-	}
-
-	bool ScriptContext::execute_file(const StaticString& name)
-	{
-		const ScriptCode& code = ScriptCode::load(name);
-		if (!code)
-			return false;
-		code.execute(this, ScriptCode::Do);
-		return true;
+		_private->_commands[String(name, _private->_allocator)] = Private::CommandContext(command, min_args, max_args);
 	}
 
 	ScriptValue* ScriptContext::find(const StaticString& name) const
 	{
-		const auto i = _values.find(String(name, ByReference(), nullptr));
-		if (i != _values.end())
+		const auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		if (i != _private->_values.end())
 			return i->second;
-		if (_parent)
-			return _parent->find(name);
+		if (_private->_parent)
+			return _private->_parent->find(name);
 		return nullptr;
 	}
 
@@ -88,14 +75,15 @@ namespace Yttrium
 
 	ScriptContext& ScriptContext::root()
 	{
-		return _parent ? _parent->root() : *this;
+		return _private->_parent ? _private->_parent->root() : *this;
 	}
 
 	const ScriptValue* ScriptContext::set(const StaticString& name, int value)
 	{
-		auto i = _values.find(String(name, ByReference(), nullptr));
-		if (i == _values.end())
-			i = _values.emplace(String(name, _allocator), new(_value_pool.allocate()) ScriptValue(value, _allocator)).first;
+		auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		if (i == _private->_values.end())
+			i = _private->_values.emplace(String(name, _private->_allocator),
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -103,9 +91,10 @@ namespace Yttrium
 
 	const ScriptValue* ScriptContext::set(const StaticString& name, double value)
 	{
-		auto i = _values.find(String(name, ByReference(), nullptr));
-		if (i == _values.end())
-			i = _values.emplace(String(name, _allocator), new(_value_pool.allocate()) ScriptValue(value, _allocator)).first;
+		auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		if (i == _private->_values.end())
+			i = _private->_values.emplace(String(name, _private->_allocator),
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -113,9 +102,10 @@ namespace Yttrium
 
 	const ScriptValue* ScriptContext::set(const StaticString& name, const StaticString& value)
 	{
-		auto i = _values.find(String(name, ByReference(), nullptr));
-		if (i == _values.end())
-			i = _values.emplace(String(name, _allocator), new(_value_pool.allocate()) ScriptValue(value, _allocator)).first;
+		auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		if (i == _private->_values.end())
+			i = _private->_values.emplace(String(name, _private->_allocator),
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -154,15 +144,15 @@ namespace Yttrium
 
 	void ScriptContext::unset(const StaticString& name)
 	{
-		const auto i = _values.find(String(name, ByReference()));
-		if (i == _values.end())
+		const auto i = _private->_values.find(String(name, ByReference()));
+		if (i == _private->_values.end())
 			return;
-		_value_pool.deallocate(i->second);
-		_values.erase(i);
+		_private->_value_pool.deallocate(i->second);
+		_private->_values.erase(i);
 	}
 
 	void ScriptContext::undefine(const StaticString& name)
 	{
-		_commands.erase(String(name, ByReference()));
+		_private->_commands.erase(String(name, ByReference()));
 	}
 }

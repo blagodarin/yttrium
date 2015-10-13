@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 	public:
 
-		TranslationImpl(Allocator* allocator);
+		TranslationImpl(Allocator&);
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
@@ -32,7 +32,7 @@ namespace Yttrium
 			Entry(String&& text) : text(std::move(text)) {}
 		};
 
-		Allocator* const _allocator;
+		Allocator& _allocator;
 		std::map<String, Entry> _translations;
 	};
 }

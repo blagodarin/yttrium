@@ -1,5 +1,4 @@
-#include <yttrium/memory_manager.h>
-#include <yttrium/proxy_allocator.h>
+#include <yttrium/allocator.h>
 
 #include "common.h"
 

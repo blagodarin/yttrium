@@ -1,6 +1,7 @@
 #include "console.h"
 
 #include <yttrium/script/code.h>
+#include <yttrium/script/context.h>
 #include <yttrium/window.h>
 #include "../renderer/debug_renderer.h"
 
@@ -8,13 +9,19 @@
 
 namespace Yttrium
 {
+	Console::Console(ScriptContext& script_context, Allocator& allocator)
+		: _script_context(script_context)
+		, _line_editor(allocator)
+	{
+	}
+
 	bool Console::process_key(const KeyEvent& event)
 	{
 		assert(event.pressed);
 
 		if (event.key == Key::Enter)
 		{
-			ScriptCode(_line_editor.text()).execute();
+			ScriptCode(_line_editor.text(), &_script_context.allocator()).execute(_script_context);
 			_line_editor.clear();
 			return true;
 		}

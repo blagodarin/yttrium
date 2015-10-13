@@ -6,11 +6,11 @@
 
 namespace Yttrium
 {
-	class GuiImage : public Widget // TODO: Find a better class name.
+	class ImageWidget : public Widget
 	{
 	public:
 
-		GuiImage(Allocator* allocator) : Widget(allocator) {}
+		ImageWidget(const GuiImpl& gui) : Widget(gui) {}
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
@@ -18,7 +18,7 @@ namespace Yttrium
 
 	private:
 
-		Rect               _position;
+		Rect _position;
 		BackgroundProperty _background;
 	};
 }

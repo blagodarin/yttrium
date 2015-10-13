@@ -3,6 +3,8 @@
 
 #include <yttrium/string.h>
 
+#include <utility>
+
 namespace Yttrium
 {
 	class AudioFormat;
@@ -34,6 +36,15 @@ namespace Yttrium
 	{
 	public:
 
+		class UnableToCreate
+		{
+		public:
+			UnableToCreate(String&& what) : _what(std::move(what)) {}
+			StaticString what() const { return _what; }
+		private:
+			const String _what;
+		};
+
 		static const StaticString OpenAL;
 
 		static Pointer<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator*);
@@ -48,16 +59,9 @@ namespace Yttrium
 
 	protected:
 
-		AudioBackend(const StaticString& backend, const StaticString& device, Allocator* allocator)
-			: _backend(backend, allocator)
-			, _device(device, allocator)
-		{
-		}
+		AudioBackend(const StaticString& backend, const StaticString& device, Allocator* allocator);
 
-		Allocator& allocator() const
-		{
-			return *_backend.allocator();
-		}
+		Allocator& allocator() const { return *_backend.allocator(); }
 
 	private:
 

@@ -11,7 +11,7 @@ namespace Yttrium
 	{
 	public:
 
-		LineEditor(Allocator* allocator);
+		LineEditor(Allocator& allocator);
 
 		void clear();
 		unsigned cursor() const { return _cursor; }

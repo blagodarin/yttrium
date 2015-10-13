@@ -11,12 +11,12 @@ namespace Yttrium
 {
 	class ThreadBufferBase
 	{
-		Y_NONCOPYABLE(ThreadBufferBase);
-
 	public:
 
-		ThreadBufferBase(size_t capacity);
-		~ThreadBufferBase();
+		ThreadBufferBase(size_t capacity) : _capacity(capacity) {}
+
+		ThreadBufferBase(const ThreadBufferBase&) = delete;
+		ThreadBufferBase& operator=(const ThreadBufferBase&) = delete;
 
 	protected:
 
@@ -31,9 +31,9 @@ namespace Yttrium
 
 	protected:
 
-		size_t _capacity;
-		size_t _size;
-		size_t _first;
+		const size_t _capacity;
+		size_t _size = 0;
+		size_t _first = 0;
 
 	private:
 

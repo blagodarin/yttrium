@@ -8,16 +8,16 @@
 
 namespace Yttrium
 {
-	TranslationImpl::TranslationImpl(Allocator* allocator)
+	TranslationImpl::TranslationImpl(Allocator& allocator)
 		: _allocator(allocator)
 	{
 	}
 
 	void TranslationImpl::add(const StaticString& source)
 	{
-		auto i = _translations.find(String(source, ByReference(), _allocator));
+		auto i = _translations.find(String(source, ByReference(), &_allocator));
 		if (i == _translations.end())
-			i = _translations.emplace(String(source, _allocator), String(_allocator)).first;
+			i = _translations.emplace(String(source, &_allocator), String(&_allocator)).first;
 		i->second.added = true;
 	}
 
@@ -32,7 +32,7 @@ namespace Yttrium
 
 	bool TranslationImpl::save(const StaticString& file_name) const
 	{
-		IonDocument document(_allocator);
+		IonDocument document(&_allocator);
 		for (const auto& translation : _translations)
 		{
 			auto& node = *document.root().append("tr"_s);
@@ -44,7 +44,7 @@ namespace Yttrium
 
 	bool TranslationImpl::load(const StaticString& file_name)
 	{
-		IonDocument document(_allocator);
+		IonDocument document(&_allocator);
 		if (!document.load(file_name))
 			return false;
 		decltype(_translations) translations;
@@ -57,7 +57,7 @@ namespace Yttrium
 			const StaticString* translation = nullptr;
 			if (!node.first()->get(&source) || !node.last()->get(&translation))
 				return false;
-			translations.emplace(String(*source, _allocator), String(*translation, _allocator));
+			translations.emplace(String(*source, &_allocator), String(*translation, &_allocator));
 		}
 		_translations = std::move(translations);
 		return true;
@@ -65,13 +65,13 @@ namespace Yttrium
 
 	String TranslationImpl::translate(const StaticString& source) const
 	{
-		const auto i = _translations.find(String(source, ByReference(), _allocator));
-		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, _allocator);
+		const auto i = _translations.find(String(source, ByReference(), &_allocator));
+		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, &_allocator);
 	}
 
-	Pointer<Translation> Translation::open(const StaticString& file_name, Allocator* allocator)
+	Pointer<Translation> Translation::open(const StaticString& file_name, Allocator& allocator)
 	{
-		auto translation = make_pointer<TranslationImpl>(*allocator, allocator);
+		auto translation = make_pointer<TranslationImpl>(allocator, allocator);
 		translation->load(file_name);
 		return std::move(translation);
 	}

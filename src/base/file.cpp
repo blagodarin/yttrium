@@ -8,26 +8,9 @@
 
 namespace Yttrium
 {
-	File::File(const File& file)
-		: _private(Private::copy(file._private))
-		, _offset(file._offset)
-		, _size(file._size)
-		, _base(file._base)
-	{
-	}
-
 	File::~File()
 	{
 		Private::release(&_private);
-	}
-
-	File& File::operator=(const File& file)
-	{
-		Private::copy(_private, file._private);
-		_offset = file._offset;
-		_size = file._size;
-		_base = file._base;
-		return *this;
 	}
 
 	File& File::operator=(File&& file)
@@ -45,7 +28,7 @@ namespace Yttrium
 	}
 
 	File::File(const StaticString& name, Allocator* allocator)
-		: File(open_file_for_reading(name, allocator))
+		: File(open_file_for_reading(name, *allocator))
 	{
 	}
 

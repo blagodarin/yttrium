@@ -2,7 +2,7 @@
 #include <yttrium/gui.h>
 #include <yttrium/log.h>
 #include <yttrium/pointer.h>
-#include <yttrium/script/manager.h>
+#include <yttrium/script/context.h>
 #include <yttrium/string.h>
 #include <yttrium/window.h>
 
@@ -17,10 +17,9 @@ BOOST_AUTO_TEST_CASE(test_gui)
 	File file(File::Temporary);
 
 	{
-		ScriptManager script_manager(DefaultAllocator); // For scripted actions.
-
+		ScriptContext script_context;
 		WindowCallbacks window_callbacks;
-		const auto window = Window::create(window_callbacks);
+		const auto& window = Window::create(script_context, window_callbacks);
 		BOOST_REQUIRE(window);
 		BOOST_REQUIRE(window->gui().load("tests/gui/gui.ion"));
 		window->gui().dump(file.name());

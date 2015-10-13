@@ -9,15 +9,15 @@
 namespace Yttrium
 {
 	class Buffer;
-	class PackageReader;
-	class PackageWriter;
+	class PackageReaderImpl; // TODO: Remove references to internal classes.
+	class PackageWriterImpl;
 	class String;
 
 	/// %File access class.
 	class Y_API File
 	{
-		friend PackageReader;
-		friend PackageWriter;
+		friend PackageReaderImpl;
+		friend PackageWriterImpl;
 
 	public:
 
@@ -47,12 +47,12 @@ namespace Yttrium
 
 	public:
 
-		File(): _private(nullptr), _offset(0), _size(0), _base(0) {}
-		File(const File&);
+		File() = default;
+		File(const File&) = delete;
 		File(File&& file): _private(file._private), _offset(file._offset), _size(file._size), _base(file._base) { file._private = nullptr; }
 		~File();
 
-		File& operator=(const File&);
+		File& operator=(const File&) = delete;
 		File& operator=(File&&);
 
 		explicit operator bool() const;
@@ -134,22 +134,16 @@ namespace Yttrium
 
 	protected:
 
-		explicit File(Private* private_)
-			: _private(private_)
-			, _offset(0)
-			, _size(0)
-			, _base(0)
-		{
-		}
+		explicit File(Private* private_) : _private(private_) {}
 
 		Y_PRIVATE File(Private* private_, uint64_t base, uint64_t size);
 
 	private:
 
-		Private* _private;
-		uint64_t _offset;
-		uint64_t _size;
-		uint64_t _base;
+		Private* _private = nullptr;
+		uint64_t _offset = 0;
+		uint64_t _size = 0;
+		uint64_t _base = 0;
 	};
 
 	/// Utility class for data transfer between files.

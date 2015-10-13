@@ -11,14 +11,19 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
-#include <yttrium/script/context.h>
+#include <yttrium/script/args.h>
+#include <yttrium/script/value.h>
 #include <yttrium/temporary_allocator.h>
 #include <yttrium/texture.h>
 #include <yttrium/timer.h>
 
-Game::Game()
-	: _allocator("game")
-	, _bindings(&_allocator)
+Game::Game(Allocator& allocator)
+	: _allocator("game", allocator)
+	, _script_allocator("script", allocator)
+	, _script(&_script_allocator)
+	, _audio_allocator("audio", allocator)
+	, _window_allocator("window", allocator)
+	, _bindings(_script, &_allocator)
 	, _statistics{
 		{100000, String("John Placeholder", &_allocator)},
 		{50000, String("John Placeholder", &_allocator)},
@@ -27,56 +32,56 @@ Game::Game()
 		{1000, String("John Placeholder", &_allocator)},
 	}
 {
-	ScriptContext::global().define("bind", 2, [this](const ScriptCall& call)
+	_script.define("bind", 2, [this](const ScriptCall& call)
 	{
 		_bindings.bind(call.args.string(0), call.args.string(1));
 	});
 
-	ScriptContext::global().define("exit", [this](const ScriptCall&)
+	_script.define("exit", [this](const ScriptCall&)
 	{
 		_window->close();
 	});
 
-	ScriptContext::global().define("game_pause", [this](const ScriptCall&)
+	_script.define("game_pause", [this](const ScriptCall&)
 	{
 		_game_running = false;
 	});
 
-	ScriptContext::global().define("game_start", [this](const ScriptCall& call)
+	_script.define("game_start", [this](const ScriptCall& call)
 	{
 		_game.start(call.context.get_int("start_level", 1));
 		_game_running = true;
 	});
 
-	ScriptContext::global().define("game_stop", [this](const ScriptCall&)
+	_script.define("game_stop", [this](const ScriptCall&)
 	{
 		_game_running = false;
 	});
 
-	ScriptContext::global().define("game_resume", [this](const ScriptCall&)
+	_script.define("game_resume", [this](const ScriptCall&)
 	{
 		_game_running = true;
 	});
 
-	ScriptContext::global().define("move_down", [this](const ScriptCall& call)
+	_script.define("move_down", [this](const ScriptCall& call)
 	{
 		if (_game_running)
 			_game.set_acceleration(call.function[0] == '+');
 	});
 
-	ScriptContext::global().define("move_left", [this](const ScriptCall& call)
+	_script.define("move_left", [this](const ScriptCall& call)
 	{
 		if (_game_running)
 			_game.set_left_movement(call.function[0] == '+');
 	});
 
-	ScriptContext::global().define("move_right", [this](const ScriptCall& call)
+	_script.define("move_right", [this](const ScriptCall& call)
 	{
 		if (_game_running)
 			_game.set_right_movement(call.function[0] == '+');
 	});
 
-	ScriptContext::global().define("play_music", [this](const ScriptCall&)
+	_script.define("play_music", [this](const ScriptCall&)
 	{
 		if (_audio)
 		{
@@ -87,72 +92,72 @@ Game::Game()
 		}
 	});
 
-	ScriptContext::global().define("pop_scene", 0, 1, [this](const ScriptCall& call)
+	_script.define("pop_scene", 0, 1, [this](const ScriptCall& call)
 	{
 		const auto scenes_to_pop = call.args.get_int(0, 1);
 		if (scenes_to_pop > 0 && !_window->gui().pop_scenes(scenes_to_pop))
 			_window->close();
 	});
 
-	ScriptContext::global().define("push_scene", 1, [this](const ScriptCall& call)
+	_script.define("push_scene", 1, [this](const ScriptCall& call)
 	{
 		_window->gui().push_scene(call.args.string(0));
 	});
 
-	ScriptContext::global().define("save_score", [this](const ScriptCall&)
+	_script.define("save_score", [this](const ScriptCall&)
 	{
 		_statistics.emplace(_game.score(), String("John Placeholder", &_allocator));
 		_statistics.erase(_statistics.begin());
 		update_statistics();
 	});
 
-	ScriptContext::global().define("set", 2, [this](const ScriptCall& call)
+	_script.define("set", 2, [this](const ScriptCall& call)
 	{
 		const ScriptValue* value = call.args.value(0);
 		if (value->type() == ScriptValue::Type::Name)
 			call.context.set(value->to_string(), call.args.string(1, ScriptArgs::Resolve));
 	});
 
-	ScriptContext::global().define("screenshot", [this](const ScriptCall&)
+	_script.define("screenshot", [this](const ScriptCall&)
 	{
 		TemporaryAllocator<28> allocator(nullptr);
 		_window->take_screenshot(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 	});
 
-	ScriptContext::global().define("stop_music", [this](const ScriptCall&)
+	_script.define("stop_music", [this](const ScriptCall&)
 	{
 		if (_audio)
 			_audio->player().stop();
 	});
 
-	ScriptContext::global().define("tgcon", [this](const ScriptCall&)
+	_script.define("tgcon", [this](const ScriptCall&)
 	{
 		_window->set_console_visible(!_window->is_console_visible());
 	});
 
-	ScriptContext::global().define("toggle_debug", [this](const ScriptCall&)
+	_script.define("toggle_debug", [this](const ScriptCall&)
 	{
 		_window->set_debug_text_visible(!_window->is_debug_text_visible());
 	});
 
-	ScriptContext::global().define("turn_left", [this](const ScriptCall&)
+	_script.define("turn_left", [this](const ScriptCall&)
 	{
 		if (_game_running)
 			_game.turn_left();
 	});
 
-	ScriptContext::global().define("turn_right", [this](const ScriptCall&)
+	_script.define("turn_right", [this](const ScriptCall&)
 	{
 		if (_game_running)
 			_game.turn_right();
 	});
 
-	ScriptContext::global().define("unbindall", [this](const ScriptCall&)
+	_script.define("unbindall", [this](const ScriptCall&)
 	{
 		_bindings.clear();
 	});
 
-	ScriptContext::global().define("unset", 1, [this](const ScriptCall& call)
+	_script.define("unset", 1, [this](const ScriptCall& call)
 	{
 		const ScriptValue* value = call.args.value(0);
 		if (value->type() == ScriptValue::Type::Name)
@@ -166,11 +171,11 @@ void Game::run()
 {
 	Log() << "Loading";
 
-	_window = Window::create(*this);
+	_window = Window::create(_script, *this, _window_allocator);
 	if (!_window)
 		return;
 
-	ScriptCode::load("tetrium.txt").execute();
+	ScriptCode::load("tetrium.txt", &_script.allocator()).execute(_script);
 
 	_bindings.bind_default(Key::_1, "play_music");
 	_bindings.bind_default(Key::_2, "stop_music");
@@ -195,7 +200,7 @@ void Game::run()
 	if (!load_blocks())
 		return;
 
-	_audio = AudioManager::create();
+	_audio = AudioManager::create({}, {}, _audio_allocator);
 	if (_audio)
 	{
 		IonDocument data(&_allocator);
@@ -306,9 +311,9 @@ void Game::on_update(const UpdateEvent& update)
 	if (_game_running)
 	{
 		_game.advance(update.milliseconds);
-		ScriptContext::global().set("score", _game.score());
-		ScriptContext::global().set("lines", _game.lines());
-		ScriptContext::global().set("level", _game.level());
+		_script.set("score", _game.score());
+		_script.set("lines", _game.lines());
+		_script.set("level", _game.level());
 		if (_game.has_finished())
 		{
 			_game_running = false;
@@ -449,7 +454,7 @@ void Game::update_statistics()
 	{
 		++index;
 		TemporaryAllocator<32> allocator(nullptr);
-		ScriptContext::global().set(String(&allocator) << "name" << index, i->second);
-		ScriptContext::global().set(String(&allocator) << "score" << index, i->first);
+		_script.set(String(&allocator) << "name" << index, i->second);
+		_script.set(String(&allocator) << "score" << index, i->first);
 	}
 }

@@ -6,18 +6,18 @@
 
 namespace Yttrium
 {
-	void GuiImage::dump(GuiPropertyDumper& dumper) const
+	void ImageWidget::dump(GuiPropertyDumper& dumper) const
 	{
 		dumper.dump_rect("position"_s, _position);
 		dumper.dump_scaling("scale"_s, _scaling);
 		_background.dump(dumper);
 	}
 
-	bool GuiImage::load(GuiPropertyLoader& loader)
+	bool ImageWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!loader.load_rect("position"_s, &_position))
 		{
-			Log() << "[Gui.Image] Unable to load"_s;
+			Log() << "(gui/image) Unable to load"_s;
 			return false;
 		}
 
@@ -29,7 +29,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void GuiImage::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
+	void ImageWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 	}

@@ -9,11 +9,11 @@ namespace Yttrium
 {
 	class Sound;
 
-	class Button : public Widget
+	class ButtonWidget : public Widget
 	{
 	public:
 
-		Button(Allocator* allocator) : Widget(allocator) {}
+		ButtonWidget(const GuiImpl& gui) : Widget(gui) {}
 
 		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;

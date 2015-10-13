@@ -1,6 +1,8 @@
 #include "backend.h"
 
+#include <yttrium/log.h>
 #include <yttrium/pointer.h>
+#include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"
 
@@ -57,18 +59,19 @@ namespace Yttrium
 		{
 			Y_ZERO_TERMINATED(device_z, device);
 			alc_device.reset(::alcOpenDevice(device_z));
-			// TODO: Log that we failed to open the specified device.
+			if (!alc_device)
+				Log() << "(audio/openal) Unable to open device \""_s << device << "\""_s;
 		}
 
 		if (!alc_device)
 			alc_device.reset(::alcOpenDevice(nullptr));
 
 		if (!alc_device)
-			throw std::runtime_error("Audio/OpenAL: Failed to create device");
+			throw UnableToCreate(String("(audio/openal) Failed to create device"_s, allocator));
 
 		P_ALCcontext alc_context(::alcCreateContext(alc_device.get(), nullptr));
 		if (!alc_context)
-			throw std::runtime_error("Audio/OpenAL: Failed to create context");
+			throw UnableToCreate(String("(audio/openal) Failed to create context"_s, allocator));
 
 		::alcMakeContextCurrent(alc_context.get());
 		return make_pointer<OpenAlBackend>(*allocator, std::move(alc_device), std::move(alc_context), allocator);

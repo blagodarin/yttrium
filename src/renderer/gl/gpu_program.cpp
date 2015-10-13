@@ -6,7 +6,7 @@
 #include <cassert>
 
 #if Y_IS_DEBUG
-	#include <iostream>
+	#include <yttrium/log.h>
 #endif
 
 namespace Yttrium
@@ -84,7 +84,7 @@ namespace Yttrium
 			char buffer[1024] = {};
 			GLsizei length = 0;
 			_gl.GetShaderInfoLog(shader, sizeof buffer, &length, buffer);
-			std::cerr << buffer << std::endl;
+			Log() << buffer;
 #endif
 			_gl.DeleteShader(shader);
 			return false; // TODO: _gl.GetShaderInfoLog.

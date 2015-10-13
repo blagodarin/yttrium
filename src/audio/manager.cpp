@@ -1,6 +1,6 @@
 #include "manager.h"
 
-#include <yttrium/memory_manager.h>
+#include <yttrium/log.h>
 #include "sound.h"
 
 #include "backend/openal/backend.h"
@@ -24,17 +24,15 @@ namespace Yttrium
 			return {};
 	}
 
-	Pointer<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator* allocator)
+	Pointer<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
 	{
-		if (!allocator)
-			allocator = MemoryManager::default_allocator();
 		try
 		{
-			return make_pointer<AudioManagerImpl>(*allocator, backend, device, allocator);
+			return make_pointer<AudioManagerImpl>(allocator, backend, device, allocator);
 		}
-		catch (const std::runtime_error&)
+		catch (const AudioBackend::UnableToCreate& e)
 		{
-			// TODO: Log.
+			Log() << e.what();
 			return {};
 		}
 	}
@@ -44,8 +42,8 @@ namespace Yttrium
 		return AudioManagerGuard::instance;
 	}
 
-	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator* allocator)
-		: _allocator("audio"_s, allocator)
+	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator& allocator)
+		: _allocator(allocator)
 		, _backend(AudioBackend::create(backend, device, &_allocator))
 		, _player(_backend->create_player(), &_allocator)
 		, _instance_guard(this, "Duplicate AudioManager construction")

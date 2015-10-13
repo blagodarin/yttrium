@@ -26,7 +26,7 @@ namespace Yttrium
 
 		///
 		static Pointer<AudioManager> create(const StaticString& backend = StaticString(),
-			const StaticString& device = StaticString(), Allocator* allocator = nullptr);
+			const StaticString& device = StaticString(), Allocator& allocator = *DefaultAllocator);
 
 		AudioManager() = default;
 		virtual ~AudioManager() = default;
