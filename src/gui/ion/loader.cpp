@@ -91,6 +91,7 @@ namespace Yttrium
 	GuiIonLoader::GuiIonLoader(GuiImpl& gui)
 		: _gui(gui)
 		, _classes(_gui.internal_allocator())
+		, _default_font_name(_gui.internal_allocator())
 	{
 	}
 
@@ -139,9 +140,7 @@ namespace Yttrium
 				const StaticString* class_name;
 
 				if (!load_object(node, &object, &object_name, &class_name))
-				{
 					continue;
-				}
 
 				if (!_classes.add(*object_name, *object, class_name))
 					Log() << "[Gui] Can' load class \""_s << *object_name << "\""_s;
@@ -153,9 +152,7 @@ namespace Yttrium
 				const StaticString* class_name;
 
 				if (!load_object(node, &object, &object_name, &class_name))
-				{
 					continue;
-				}
 
 				if (class_name && *class_name != "root"_s)
 				{
@@ -205,6 +202,20 @@ namespace Yttrium
 
 				if (!load_object(node, &object, &object_name, &class_name))
 					continue;
+
+				if (class_name)
+				{
+					if (*class_name != "default")
+						Log() << "[Gui] Unknown font option \""_s << *class_name << "\" ignored"_s;
+					else if (_has_default_font)
+						Log() << "[Gui] Default font redefinition ignored"_s;
+					else
+					{
+						_has_default_font = true;
+						_default_font_name = *object_name;
+					}
+					class_name = nullptr;
+				}
 
 				const StaticString* font_name;
 				const StaticString* texture_name;
@@ -258,6 +269,8 @@ namespace Yttrium
 					continue;
 
 				GuiIonPropertyLoader loader(object, (class_name ? _classes.find(*class_name) : nullptr), _gui);
+				if (_has_default_font)
+					loader.set_default_font_name(&_default_font_name);
 
 				scene.load_widget(node.name(), (object_name ? *object_name : StaticString()), loader);
 			}

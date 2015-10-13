@@ -1,14 +1,12 @@
 class "label_name"
 {
 	text_size "1" "1.5"
-	font      "common"
 	align     "center" "right"
 }
 
 class "label_value"
 {
 	text_size "1" "1.5"
-	font      "common"
 	align     "center" "left"
 }
 

@@ -121,6 +121,11 @@ namespace Yttrium
 	{
 	}
 
+	void GuiIonPropertyLoader::set_default_font_name(const String* name)
+	{
+		_default_font_name = name;
+	}
+
 	void GuiIonPropertyLoader::bind(const StaticString& name)
 	{
 		_bound_object = nullptr;
@@ -181,20 +186,27 @@ namespace Yttrium
 
 	bool GuiIonPropertyLoader::load_font(const StaticString& name, TextureFont* font, SharedPtr<Texture2D>* texture) const
 	{
-		const StaticString* font_name;
+		const StaticString* font_name = nullptr;
 
-		const IonNode* node = _bound_object ? &_bound_object->last(name) : nullptr;
-
-		if (!node->exists() || node->size() != 1 || !node->first()->get(&font_name))
+		if (_bound_object)
 		{
-			if (!_bound_class)
-				return false;
-
-			node = &_bound_class->last(name);
-
-			if (!node->exists() || node->size() != 1 || !node->first()->get(&font_name))
-				return false;
+			const IonNode& node = _bound_object->last(name);
+			if (node.exists() && node.size() == 1)
+				node.first()->get(&font_name);
 		}
+
+		if (!font_name && _bound_class)
+		{
+			const IonNode& node = _bound_class->last(name);
+			if (node.exists() && node.size() == 1)
+				node.first()->get(&font_name);
+		}
+
+		if (!font_name && _default_font_name)
+			font_name = _default_font_name;
+
+		if (!font_name)
+			return false;
 
 		const auto font_desc = _gui.font(*font_name);
 		if (!font_desc)

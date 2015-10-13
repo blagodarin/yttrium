@@ -1,7 +1,7 @@
 size "640" "480"
 scale "stretch"
 
-font "common"
+font "common" ["default"]
 {
 	file    "data/font.ytf"
 	texture "data/font.tga"
@@ -14,7 +14,6 @@ class "button"
 	texture_rect "65" "33" "24" "24"
 	borders      "4" "4" "4" "4"
 	text_size    "36"
-	font         "common"
 	sound        "data/sound.wav"
 
 	active

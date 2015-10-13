@@ -1,4 +1,4 @@
-font "common"
+font "common" ["default"]
 {
 	file    "data/font.ytf"
 	texture "data/font.tga"
@@ -25,7 +25,6 @@ scene "main" ["root"]
 	{
 		position  "50" "750"
 		text_size "40"
-		font      "common"
 		text      "Control panel and minimap..."
 	}
 }

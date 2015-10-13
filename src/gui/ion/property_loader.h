@@ -18,6 +18,8 @@ namespace Yttrium
 
 		GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiImpl& gui);
 
+		void set_default_font_name(const String*);
+
 		void bind(const StaticString& name) override;
 		bool load_alignment(const StaticString& name, unsigned* alignment) const override;
 		bool load_color(const StaticString& name, Vector4* color) const override;
@@ -51,6 +53,7 @@ namespace Yttrium
 		TextureCache&    _texture_cache;
 		const IonObject* _bound_object;
 		const IonObject* _bound_class;
+		const String*    _default_font_name = nullptr;
 	};
 }
 

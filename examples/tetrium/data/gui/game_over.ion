@@ -17,7 +17,6 @@ scene "game_over"
 	{
 		position   "15" "8"
 		text_size  "8"
-		font       "common"
 		text_color "1" "1" "0"
 		text       {tr"Game over"}
 	}
@@ -26,7 +25,6 @@ scene "game_over"
 	{
 		position   "15" "15"
 		text_size  "3"
-		font       "common"
 		text_color "1" "1" "1"
 		text       {tr"Enter your name:"}
 	}
@@ -36,7 +34,6 @@ scene "game_over"
 		position   "5" "18" "20" "4"
 		color      "1" "1" "1" "0.5"
 		text_size  "3"
-		font       "common"
 		text_color "0" "0" "0"
 		on_enter   "save_score; pop_scene 3; push_scene menu_statistics"
 	}

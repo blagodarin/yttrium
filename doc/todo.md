@@ -12,6 +12,8 @@
 		- Image pack support (a list of headers with filenames and raw image data offsets).
 	* Internationalization:
 		- Unicode font support.
+	* ION:
+		- Location information support.
 	* Memory:
 		- Keep a global track of all ProxyAllocators for realtime memory activity tracking.
 		- Try defaulting pool granularity to memory page size.

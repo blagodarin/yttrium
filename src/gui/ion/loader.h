@@ -1,6 +1,7 @@
 #ifndef _src_gui_ion_loader_h_
 #define _src_gui_ion_loader_h_
 
+#include <yttrium/string.h>
 #include "classes.h"
 
 namespace Yttrium
@@ -25,6 +26,8 @@ namespace Yttrium
 
 		GuiImpl& _gui;
 		GuiClasses _classes;
+		bool _has_default_font = false;
+		String _default_font_name;
 	};
 }
 

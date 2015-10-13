@@ -2,7 +2,6 @@ class "statistics_index"
 {
 	position  "60" ""
 	text_size "40"
-	font      "common"
 	align     "left"
 }
 
@@ -10,7 +9,6 @@ class "statistics_name"
 {
 	position  "70" ""
 	text_size "40"
-	font      "common"
 	align     "right"
 }
 
@@ -18,7 +16,6 @@ class "statistics_score"
 {
 	position  "600" ""
 	text_size "40"
-	font      "common"
 	align     "left"
 }
 

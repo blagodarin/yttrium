@@ -12,7 +12,6 @@ scene "menu_multi"
 	{
 		position  "320" "100"
 		text_size "160"
-		font      "common"
 		text      {tr"Tetrium"}
 	}
 
