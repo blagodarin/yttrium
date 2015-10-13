@@ -1,7 +1,9 @@
 # Yttrium
 
-Yttrium is a programming playground trying to become a game development toolkit.
+Yttrium is a game development toolkit.
 
-Further reading:
-* [FAQ](doc/faq.md);
+It is far from production use (and may never become near to it).
+
+Further information:
+* [FAQ](doc/faq.md) (nobody has really asked them, of course);
 * [TODO list](doc/todo.md).
