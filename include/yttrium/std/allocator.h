@@ -1,5 +1,5 @@
 /// \file
-/// \brief
+/// \brief %Yttrium allocator for standard containers.
 
 #ifndef _include_yttrium_std_allocator_h_
 #define _include_yttrium_std_allocator_h_

@@ -1,5 +1,5 @@
 /// \file
-/// \brief
+/// \brief <tt>&lt;vector&gt;</tt> containers with %Yttrium allocators.
 
 #ifndef _include_yttrium_std_vector_h_
 #define _include_yttrium_std_vector_h_

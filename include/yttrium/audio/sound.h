@@ -10,7 +10,7 @@ namespace Yttrium
 {
 	class StaticString;
 
-	/// Sound.
+	/// %Sound.
 	class Y_API Sound : public Object
 	{
 	public:
