@@ -3,7 +3,7 @@
 
 #include <yttrium/texture_cache.h>
 
-#include <map>
+#include <yttrium/std/map.h>
 
 namespace Yttrium
 {
@@ -22,7 +22,7 @@ namespace Yttrium
 	private:
 
 		RendererImpl& _renderer;
-		std::map<String, SharedPtr<Texture2D>> _cache_2d;
+		StdMap<String, SharedPtr<Texture2D>> _cache_2d;
 	};
 }
 

@@ -4,9 +4,8 @@
 #include <yttrium/script/context.h>
 
 #include <yttrium/pool.h>
+#include <yttrium/std/map.h>
 #include "../base/private_base.h"
-
-#include <map>
 
 namespace Yttrium
 {
@@ -28,15 +27,17 @@ namespace Yttrium
 			}
 		};
 
-		ScriptContext* const             _parent;
-		Pool<ScriptValue>                _value_pool;
-		std::map<String, ScriptValue*>   _values;
-		std::map<String, CommandContext> _commands;
+		ScriptContext* const           _parent;
+		Pool<ScriptValue>              _value_pool;
+		StdMap<String, ScriptValue*>   _values;
+		StdMap<String, CommandContext> _commands;
 
-		Private(ScriptContext* parent, Allocator* allocator)
-			: PrivateBase(allocator)
+		Private(ScriptContext* parent, Allocator& allocator)
+			: PrivateBase(&allocator)
 			, _parent(parent)
 			, _value_pool(32, _allocator) // TODO: Get rid of magic numbers.
+			, _values(allocator)
+			, _commands(allocator)
 		{
 		}
 	};

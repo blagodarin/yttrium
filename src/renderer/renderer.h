@@ -6,11 +6,10 @@
 #include <yttrium/margins.h>
 #include <yttrium/object.h>
 #include <yttrium/pointer.h>
+#include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 #include <yttrium/texture_font.h>
 #include "../base/private_base.h"
-
-#include <vector>
 
 namespace Yttrium
 {
@@ -32,9 +31,9 @@ namespace Yttrium
 			int _redundant_shader_switches = 0;
 		};
 
-		static Pointer<RendererImpl> create(WindowBackend& window, Allocator* allocator);
+		static Pointer<RendererImpl> create(WindowBackend& window, Allocator& allocator);
 
-		RendererImpl(Allocator* allocator);
+		RendererImpl(Allocator& allocator);
 		~RendererImpl() override;
 
 		void draw_rectangle(const RectF& rect) override;
@@ -51,7 +50,7 @@ namespace Yttrium
 		virtual void clear() = 0;
 		virtual void take_screenshot(Image& image) = 0;
 
-		Allocator* allocator() const { return _allocator; }
+		Allocator& allocator() const { return _allocator; }
 		const Texture2D* debug_texture() const;
 		void forget_program(const GpuProgram* program);
 		void forget_texture(const Texture2D* texture);
@@ -77,7 +76,7 @@ namespace Yttrium
 			Vector2 texture;
 		};
 
-		virtual void flush_2d_impl(const std::vector<Vertex2D>& vertices, const std::vector<uint16_t>& indices) = 0;
+		virtual void flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices) = 0;
 		virtual bool initialize() = 0;
 		virtual void set_program(const GpuProgram*) = 0;
 		virtual void set_projection(const Matrix4&) = 0;
@@ -100,14 +99,14 @@ namespace Yttrium
 
 	private:
 
-		Allocator* const _allocator;
+		Allocator& _allocator;
 
 		Size _window_size;
 
 		Vector4 _color;
 
-		std::vector<Vertex2D> _vertices_2d;
-		std::vector<uint16_t> _indices_2d;
+		StdVector<Vertex2D> _vertices_2d;
+		StdVector<uint16_t> _indices_2d;
 
 		RectF    _texture_rect;
 		MarginsF _texture_borders;
@@ -125,20 +124,20 @@ namespace Yttrium
 			Transformation,
 		};
 
-		std::vector<std::pair<Matrix4, MatrixType>> _matrix_stack;
+		StdVector<std::pair<Matrix4, MatrixType>> _matrix_stack;
 
-		std::vector<std::pair<const Texture2D*, int>> _texture_stack = {{nullptr, 1}};
+		StdVector<std::pair<const Texture2D*, int>> _texture_stack;
 		const Texture2D* _current_texture = nullptr;
 		bool _reset_texture = false;
 #if Y_IS_DEBUG
-		std::vector<const Texture2D*> _seen_textures; // For redundancy statistics.
+		StdVector<const Texture2D*> _seen_textures; // For redundancy statistics.
 #endif
 
-		std::vector<std::pair<const GpuProgram*, int>> _program_stack = {{nullptr, 1}};
+		StdVector<std::pair<const GpuProgram*, int>> _program_stack;
 		const GpuProgram* _current_program = nullptr;
 		bool _reset_program = false;
 #if Y_IS_DEBUG
-		std::vector<const GpuProgram*> _seen_programs; // For redundancy statistics.
+		StdVector<const GpuProgram*> _seen_programs; // For redundancy statistics.
 #endif
 	};
 }

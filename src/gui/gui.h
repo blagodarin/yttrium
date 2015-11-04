@@ -7,11 +7,10 @@
 #include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/code.h>
+#include <yttrium/std/map.h>
+#include <yttrium/std/vector.h>
 #include <yttrium/texture_font.h>
 #include "types.h"
-
-#include <map>
-#include <vector>
 
 namespace Yttrium
 {
@@ -103,13 +102,13 @@ namespace Yttrium
 		WindowCallbacks&                  _callbacks;
 		ProxyAllocator                    _proxy_allocator;
 		Pointer<TextureCache>             _texture_cache;
-		bool                              _has_size;
-		Vector2                           _size;
-		Scaling                           _scaling;
-		std::map<String, FontDesc>        _fonts;
-		std::map<StaticString, Pointer<GuiScene>> _scenes;
-		std::vector<GuiScene*>            _scene_stack;
-		std::map<std::pair<String, String>, std::pair<String, ScriptCode>> _scene_actions;
+		bool                              _has_size = false;
+		Vector2                           _size{0, 0};
+		Scaling                           _scaling = Scaling::Stretch;
+		StdMap<String, FontDesc>          _fonts;
+		StdMap<StaticString, Pointer<GuiScene>> _scenes;
+		StdVector<GuiScene*>              _scene_stack;
+		StdMap<std::pair<String, String>, std::pair<String, ScriptCode>> _scene_actions;
 	};
 }
 

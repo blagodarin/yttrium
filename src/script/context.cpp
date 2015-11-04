@@ -12,12 +12,12 @@ namespace Yttrium
 	Y_IMPLEMENT_UNIQUE(ScriptContext);
 
 	ScriptContext::ScriptContext(Allocator* allocator)
-		: _private(Y_NEW(allocator, Private)(nullptr, allocator))
+		: _private(Y_NEW(allocator, Private)(nullptr, *allocator))
 	{
 	}
 
 	ScriptContext::ScriptContext(ScriptContext* parent, Allocator* allocator)
-		: _private(Y_NEW(allocator, Private)(parent, allocator))
+		: _private(Y_NEW(allocator, Private)(parent, *allocator))
 	{
 	}
 

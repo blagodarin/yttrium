@@ -16,6 +16,7 @@ namespace Yttrium
 
 		Private(Allocator* allocator)
 			: PrivateBase(allocator)
+			, _commands(*allocator)
 			, _temporaries(32, allocator) // TODO: Get rid of magic numbers.
 			, _last_result(allocator)
 		{
@@ -28,14 +29,18 @@ namespace Yttrium
 		struct Command
 		{
 			String name;
-			std::vector<ScriptValue*> args;
+			StdVector<ScriptValue*> args;
 
-			Command(const StaticString& name, Allocator* allocator): name(name, allocator) {}
+			Command(const StaticString& name, Allocator* allocator)
+				: name(name, allocator)
+				, args(*allocator)
+			{
+			}
 		};
 
-		std::vector<Command> _commands;
-		Pool<ScriptValue>    _temporaries;
-		String               _last_result;
+		StdVector<Command> _commands;
+		Pool<ScriptValue>  _temporaries;
+		String             _last_result;
 	};
 
 	Y_IMPLEMENT_UNIQUE(ScriptCode);

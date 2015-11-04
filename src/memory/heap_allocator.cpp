@@ -13,7 +13,7 @@ namespace Yttrium
 		return pointer;
 	}
 
-	void HeapAllocator::do_deallocate(void* pointer, bool)
+	void HeapAllocator::do_deallocate(void* pointer, bool) noexcept
 	{
 		::free(pointer);
 	}

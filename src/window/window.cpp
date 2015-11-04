@@ -69,7 +69,7 @@ namespace Yttrium
 		if (!_backend)
 			return false;
 
-		_renderer = RendererImpl::create(*_backend, &_allocator);
+		_renderer = RendererImpl::create(*_backend, _allocator);
 		if (!_renderer)
 			return false;
 

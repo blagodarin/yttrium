@@ -24,13 +24,13 @@ Game::Game(Allocator& allocator)
 	, _audio_allocator("audio", allocator)
 	, _window_allocator("window", allocator)
 	, _bindings(_script, &_allocator)
-	, _statistics{
-		{100000, String("John Placeholder", &_allocator)},
-		{50000, String("John Placeholder", &_allocator)},
-		{10000, String("John Placeholder", &_allocator)},
-		{5000, String("John Placeholder", &_allocator)},
-		{1000, String("John Placeholder", &_allocator)},
-	}
+	, _statistics({
+			{100000, String("John Placeholder", &_allocator)},
+			{50000, String("John Placeholder", &_allocator)},
+			{10000, String("John Placeholder", &_allocator)},
+			{5000, String("John Placeholder", &_allocator)},
+			{1000, String("John Placeholder", &_allocator)},
+		}, _allocator)
 {
 	_script.define("bind", 2, [this](const ScriptCall& call)
 	{

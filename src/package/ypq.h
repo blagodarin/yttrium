@@ -1,10 +1,9 @@
 #ifndef _src_package_ypq_h_
 #define _src_package_ypq_h_
 
+#include <yttrium/std/map.h>
+#include <yttrium/std/vector.h>
 #include "package.h"
-
-#include <map>
-#include <vector>
 
 namespace Yttrium
 {
@@ -18,14 +17,14 @@ namespace Yttrium
 
 	private:
 
-		std::map<String, uint64_t> _index;
+		StdMap<String, uint64_t> _index;
 	};
 
 	class YpqWriter : public PackageWriterImpl
 	{
 	public:
 
-		YpqWriter(File&& file, Allocator& allocator) : PackageWriterImpl(std::move(file), allocator) {}
+		YpqWriter(File&& file, Allocator& allocator) : PackageWriterImpl(std::move(file), allocator), _entries(allocator) {}
 		~YpqWriter() override;
 
 		PackedFile do_open_file(const StaticString& name) override;
@@ -51,7 +50,7 @@ namespace Yttrium
 	private:
 
 		uint64_t _last_offset = 0;
-		std::vector<Entry> _entries;
+		StdVector<Entry> _entries;
 	};
 }
 

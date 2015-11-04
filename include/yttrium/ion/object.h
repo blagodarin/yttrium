@@ -4,10 +4,8 @@
 #ifndef _include_yttrium_ion_object_h_
 #define _include_yttrium_ion_object_h_
 
-#include <yttrium/global.h>
-
-#include <map>
-#include <vector>
+#include <yttrium/std/map.h>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
@@ -61,7 +59,7 @@ namespace Yttrium
 
 	private:
 
-		IonObject(IonDocumentPrivate& document) : _document(document) {}
+		IonObject(IonDocumentPrivate& document);
 
 		Y_PRIVATE IonNode* append(const StaticString& name, const ByReference&);
 		Y_PRIVATE void clear();
@@ -69,8 +67,8 @@ namespace Yttrium
 	private:
 
 		IonDocumentPrivate& _document;
-		std::vector<IonNode*> _nodes;
-		std::map<String, std::vector<IonNode*>> _node_map;
+		StdVector<IonNode*> _nodes;
+		StdMap<String, StdVector<IonNode*>> _node_map;
 	};
 
 	class IonObjectIterator

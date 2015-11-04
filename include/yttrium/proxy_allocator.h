@@ -27,7 +27,7 @@ namespace Yttrium
 	private:
 
 		void* do_allocate(size_t, size_t) override;
-		void do_deallocate(void*, bool) override;
+		void do_deallocate(void*, bool) noexcept override;
 
 	private:
 

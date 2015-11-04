@@ -1,11 +1,10 @@
 #ifndef _src_audio_backend_openal_backend_h_
 #define _src_audio_backend_openal_backend_h_
 
+#include <yttrium/std/vector.h>
 #include "../../../utils/unique_ptr.h"
 #include "../../backend.h"
 #include "openal.h"
-
-#include <vector>
 
 namespace Yttrium
 {
@@ -16,14 +15,14 @@ namespace Yttrium
 	{
 	public:
 
-		OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator*);
+		OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator&);
 		~OpenAlBackend() override;
 
 		Pointer<AudioPlayerBackend> create_player() override;
-		UniquePtr<SoundImpl> create_sound(const StaticString& name, Allocator*) override;
+		UniquePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) override;
 
-		static std::vector<StaticString> devices();
-		static Pointer<OpenAlBackend> create(const StaticString& device, Allocator*);
+		static StdVector<StaticString> devices(Allocator&);
+		static Pointer<OpenAlBackend> create(const StaticString& device, Allocator&);
 
 	private:
 

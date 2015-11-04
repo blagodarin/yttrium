@@ -1,7 +1,7 @@
 #ifndef _src_ion_parser_h_
 #define _src_ion_parser_h_
 
-#include <vector>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
@@ -14,7 +14,7 @@ namespace Yttrium
 	{
 	public:
 
-		IonParser(IonDocument& document) : _document(document) {}
+		IonParser(IonDocument& document);
 
 		/// Parse the \a string as an ION document.
 		/// \note The \a string MUST have a zero terminator.
@@ -63,7 +63,7 @@ namespace Yttrium
 			State(IonList* list) : list(list) {}
 		};
 
-		std::vector<State> _states;
+		StdVector<State> _states;
 		State* _state = nullptr;
 	};
 }

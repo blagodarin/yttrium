@@ -1,11 +1,10 @@
 #ifndef _src_gui_ion_classes_h_
 #define _src_gui_ion_classes_h_
 
-#include <map>
+#include <yttrium/std/map.h>
 
 namespace Yttrium
 {
-	class Allocator;
 	class IonDocument;
 	class IonObject;
 	class StaticString;
@@ -25,7 +24,7 @@ namespace Yttrium
 	private:
 
 		Allocator& _allocator;
-		std::map<String, IonDocument> _classes;
+		StdMap<String, IonDocument> _classes;
 	};
 }
 

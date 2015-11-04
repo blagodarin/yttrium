@@ -3,10 +3,9 @@
 
 #include <yttrium/bindings.h>
 #include <yttrium/rect.h>
+#include <yttrium/std/map.h>
+#include <yttrium/std/vector.h>
 #include "types.h"
-
-#include <map>
-#include <vector>
 
 namespace Yttrium
 {
@@ -74,20 +73,20 @@ namespace Yttrium
 
 	private:
 
-		GuiImpl&                  _gui;
-		String                    _name;
-		Vector2                   _size;
-		bool                      _has_size = false;
-		Scaling                   _scaling;
-		std::vector<Pointer<Widget>> _widgets;
-		std::map<String, Widget*> _named_widgets;
-		bool                      _is_cursor_set;
-		Vector2                   _cursor;
-		Widget*                   _mouse_widget;
-		const Widget*             _left_click_widget;
-		Widget*                   _focus_widget;
-		const bool                _is_transparent;
-		Bindings                  _bindings;
+		GuiImpl&                   _gui;
+		String                     _name;
+		Vector2                    _size;
+		bool                       _has_size = false;
+		Scaling                    _scaling = Scaling::Stretch;
+		StdVector<Pointer<Widget>> _widgets;
+		StdMap<String, Widget*>    _named_widgets;
+		bool                       _is_cursor_set = false;
+		Vector2                    _cursor;
+		Widget*                    _mouse_widget = nullptr;
+		const Widget*              _left_click_widget = nullptr;
+		Widget*                    _focus_widget = nullptr;
+		const bool                 _is_transparent;
+		Bindings                   _bindings;
 	};
 }
 

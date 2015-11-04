@@ -1,11 +1,10 @@
 #include <yttrium/texture_font.h>
 
 #include <yttrium/file.h>
+#include <yttrium/std/map.h>
 #include <yttrium/utils.h>
 #include "../base/private_base.h"
 #include "texture_font.h"
-
-#include <map>
 
 namespace Yttrium
 {
@@ -14,11 +13,16 @@ namespace Yttrium
 	public:
 
 		int _size = 0;
-		std::map<char, TextureFont::CharInfo> _chars;
-		std::map<std::pair<char, char>, int> _kernings;
+		StdMap<char, TextureFont::CharInfo> _chars;
+		StdMap<std::pair<char, char>, int> _kernings;
 		Rect _rect;
 
-		Private(Allocator* allocator): PrivateBase(allocator) {}
+		Private(Allocator* allocator)
+			: PrivateBase(allocator)
+			, _chars(*allocator)
+			, _kernings(*allocator)
+		{
+		}
 	};
 
 	Y_IMPLEMENT_SHARED(TextureFont);

@@ -7,8 +7,8 @@ namespace Yttrium
 	IonNode* IonObject::append(const StaticString& name)
 	{
 		IonNode* node = _document.new_node(name);
-		_nodes.push_back(node);
-		_node_map[node->_name].push_back(node);
+		_nodes.emplace_back(node);
+		_node_map.emplace(node->_name, StdVector<IonNode*>(*_document.allocator())).first->second.emplace_back(node);
 		return node;
 	}
 
@@ -61,11 +61,18 @@ namespace Yttrium
 		return IonObjectReverseIterator(_nodes.empty() ? nullptr : &_nodes.front() - 1);
 	}
 
+	IonObject::IonObject(IonDocumentPrivate& document)
+		: _document(document)
+		, _nodes(*_document.allocator())
+		, _node_map(*_document.allocator())
+	{
+	}
+
 	IonNode* IonObject::append(const StaticString& name, const ByReference&)
 	{
 		IonNode* node = _document.new_node(name, ByReference());
-		_nodes.push_back(node);
-		_node_map[node->_name].push_back(node);
+		_nodes.emplace_back(node);
+		_node_map.emplace(node->_name, StdVector<IonNode*>(*_document.allocator())).first->second.emplace_back(node);
 		return node;
 	}
 

@@ -4,10 +4,9 @@
 #include <yttrium/audio/manager.h>
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/std/map.h>
 #include "../base/instance_guard.h"
 #include "player.h"
-
-#include <map>
 
 namespace Yttrium
 {
@@ -37,7 +36,7 @@ namespace Yttrium
 		Allocator& _allocator;
 		const Pointer<AudioBackend> _backend;
 		AudioPlayerImpl _player;
-		std::map<String, Sound*> _sounds;
+		StdMap<String, Sound*> _sounds;
 		AudioManagerGuard _instance_guard;
 	};
 }

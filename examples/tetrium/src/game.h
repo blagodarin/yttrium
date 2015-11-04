@@ -7,13 +7,12 @@
 #include <yttrium/pointer.h>
 #include <yttrium/proxy_allocator.h>
 #include <yttrium/script/context.h>
+#include <yttrium/std/map.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/vector.h>
 #include <yttrium/window.h>
 
 #include "tetrium.h"
-
-#include <map>
 
 using namespace Yttrium;
 
@@ -62,7 +61,7 @@ private:
 	Tetrium::Game _game;
 	bool          _game_running = false;
 
-	std::multimap<int, String> _statistics;
+	StdMultimap<int, String> _statistics;
 };
 
 #endif

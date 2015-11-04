@@ -5,6 +5,12 @@
 
 namespace Yttrium
 {
+	ScriptArgs::ScriptArgs(ScriptContext& context)
+		: _context(context)
+		, _values(context.allocator())
+	{
+	}
+
 	int ScriptArgs::get_int(size_t index, int default_value) const
 	{
 		return index < _values.size() ? _values[index]->to_int() : default_value;
@@ -31,5 +37,11 @@ namespace Yttrium
 	const ScriptValue* ScriptArgs::value(size_t index) const
 	{
 		return index < _values.size() ? _values[index] : nullptr;
+	}
+
+	ScriptArgs::ScriptArgs(ScriptContext& context, const StdVector<ScriptValue*>& values)
+		: _context(context)
+		, _values(values, context.allocator())
+	{
 	}
 }

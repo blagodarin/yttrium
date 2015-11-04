@@ -5,9 +5,7 @@
 #define _include_yttrium_script_args_h_
 
 #include <yttrium/global.h>
-
-#include <cstddef>
-#include <vector>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
@@ -36,7 +34,7 @@ namespace Yttrium
 	public:
 
 		///
-		ScriptArgs(ScriptContext& context): _context(context) {}
+		ScriptArgs(ScriptContext& context);
 
 		///
 		int get_int(size_t index, int default_value) const;
@@ -52,14 +50,10 @@ namespace Yttrium
 
 	private:
 
-		ScriptContext&            _context;
-		std::vector<ScriptValue*> _values;
+		ScriptContext& _context;
+		StdVector<ScriptValue*> _values;
 
-		ScriptArgs(ScriptContext& context, const std::vector<ScriptValue*>& values)
-			: _context(context)
-			, _values(values)
-		{
-		}
+		ScriptArgs(ScriptContext& context, const StdVector<ScriptValue*>& values);
 	};
 }
 

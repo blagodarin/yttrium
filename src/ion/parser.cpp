@@ -7,6 +7,12 @@
 
 namespace Yttrium
 {
+	IonParser::IonParser(IonDocument& document)
+		: _document(document)
+		, _states(*_document.allocator())
+	{
+	}
+
 	bool IonParser::parse(const StaticString& string, const StaticString& source_name)
 	{
 		_states.push_back(State(&_document.root()));

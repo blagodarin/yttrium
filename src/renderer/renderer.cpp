@@ -34,9 +34,9 @@ namespace Yttrium
 			"gl_FragColor = gl_Color * texture2D(surface_texture, gl_TexCoord[0].xy);"
 		"}"_s;
 
-	Pointer<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator* allocator)
+	Pointer<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator& allocator)
 	{
-		auto renderer = make_pointer<GLRenderer>(*allocator, window, allocator);
+		auto renderer = make_pointer<GLRenderer>(allocator, window, allocator);
 		if (!renderer->initialize())
 			return {};
 
@@ -75,10 +75,21 @@ namespace Yttrium
 		return std::move(renderer);
 	}
 
-	RendererImpl::RendererImpl(Allocator* allocator)
+	RendererImpl::RendererImpl(Allocator& allocator)
 		: _allocator(allocator)
 		, _color(1, 1, 1)
+		, _vertices_2d(_allocator)
+		, _indices_2d(_allocator)
 		, _font_size(1, 1)
+		, _matrix_stack(_allocator)
+		, _texture_stack({{nullptr, 1}}, _allocator)
+#if Y_IS_DEBUG
+		, _seen_textures(_allocator)
+#endif
+		, _program_stack({{nullptr, 1}}, _allocator)
+#if Y_IS_DEBUG
+		, _seen_programs(_allocator)
+#endif
 	{
 	}
 

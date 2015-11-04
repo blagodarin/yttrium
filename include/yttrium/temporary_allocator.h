@@ -46,7 +46,7 @@ namespace Yttrium
 			return pointer;
 		}
 
-		void do_deallocate(void* pointer, bool reallocation) override
+		void do_deallocate(void* pointer, bool reallocation) noexcept override
 		{
 			if (pointer < &_buffer[0] || pointer >= &_buffer[Size])
 				_parent->deallocate(pointer, reallocation);

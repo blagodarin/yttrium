@@ -32,7 +32,7 @@ namespace Yttrium
 		/// Deallocates an allocated memory block.
 		/// \param pointer Pointer to the allocated memory (may be \c nullptr).
 		/// \param reallocation \c true if this deallocation terminates memory reallocation.
-		void deallocate(void* pointer, bool reallocation = false)
+		void deallocate(void* pointer, bool reallocation = false) noexcept
 		{
 			if (pointer)
 				do_deallocate(pointer, reallocation);
@@ -40,7 +40,7 @@ namespace Yttrium
 
 		///
 		template <typename T>
-		void delete_(T* pointer)
+		void delete_(T* pointer) noexcept
 		{
 			if (pointer)
 			{
@@ -55,7 +55,7 @@ namespace Yttrium
 		virtual ~Allocator() = default;
 
 		virtual void* do_allocate(size_t, size_t) = 0;
-		virtual void do_deallocate(void*, bool) = 0;
+		virtual void do_deallocate(void*, bool) noexcept = 0;
 	};
 }
 

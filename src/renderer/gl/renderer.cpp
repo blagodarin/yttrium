@@ -14,7 +14,7 @@
 
 namespace Yttrium
 {
-	GLRenderer::GLRenderer(WindowBackend& window, Allocator* allocator)
+	GLRenderer::GLRenderer(WindowBackend& window, Allocator& allocator)
 		: RendererImpl(allocator)
 	{
 		_gl.initialize(window);
@@ -22,7 +22,7 @@ namespace Yttrium
 
 	Pointer<GpuProgram> GLRenderer::create_gpu_program()
 	{
-		return make_pointer<GlGpuProgram>(*allocator(), *this, _gl);
+		return make_pointer<GlGpuProgram>(allocator(), *this, _gl);
 	}
 
 	Pointer<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
@@ -35,7 +35,7 @@ namespace Yttrium
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
-		return make_pointer<GlIndexBuffer>(*allocator(), format, size, element_size, std::move(buffer), gl_format);
+		return make_pointer<GlIndexBuffer>(allocator(), format, size, element_size, std::move(buffer), gl_format);
 	}
 
 	SharedPtr<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
@@ -99,7 +99,7 @@ namespace Yttrium
 		}
 		_gl.BindTexture(GL_TEXTURE_2D, 0);
 
-		return SharedPtr<Texture2D>(Y_NEW(allocator(), GlTexture2D)(*this, format, !no_mipmaps, _gl, texture));
+		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, _gl, texture));
 	}
 
 	Pointer<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
@@ -117,7 +117,7 @@ namespace Yttrium
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
-		return make_pointer<GlVertexBuffer>(*allocator(), format, size, element_size, std::move(buffer));
+		return make_pointer<GlVertexBuffer>(allocator(), format, size, element_size, std::move(buffer));
 	}
 
 	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
@@ -230,7 +230,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void GLRenderer::flush_2d_impl(const std::vector<Vertex2D>& vertices, const std::vector<uint16_t>& indices)
+	void GLRenderer::flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices)
 	{
 		update_state();
 

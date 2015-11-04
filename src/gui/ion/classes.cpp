@@ -21,6 +21,7 @@ namespace Yttrium
 
 	GuiClasses::GuiClasses(Allocator& allocator)
 		: _allocator(allocator)
+		, _classes(_allocator)
 	{
 	}
 

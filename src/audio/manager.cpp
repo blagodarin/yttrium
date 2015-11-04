@@ -9,19 +9,19 @@
 
 namespace Yttrium
 {
-	std::vector<StaticString> AudioManager::backends()
+	StdVector<StaticString> AudioManager::backends(Allocator& allocator)
 	{
-		std::vector<StaticString> result;
+		StdVector<StaticString> result(allocator);
 		result.emplace_back(AudioBackend::OpenAL);
 		return result;
 	}
 
-	std::vector<StaticString> AudioManager::backend_devices(const StaticString& backend)
+	StdVector<StaticString> AudioManager::backend_devices(const StaticString& backend, Allocator& allocator)
 	{
 		if (backend == AudioBackend::OpenAL)
-			return OpenAlBackend::devices();
+			return OpenAlBackend::devices(allocator);
 		else
-			return {};
+			return StdVector<StaticString>(allocator);
 	}
 
 	Pointer<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
@@ -44,8 +44,9 @@ namespace Yttrium
 
 	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator& allocator)
 		: _allocator(allocator)
-		, _backend(AudioBackend::create(backend, device, &_allocator))
-		, _player(_backend->create_player(), &_allocator)
+		, _backend(AudioBackend::create(backend, device, _allocator))
+		, _player(_backend->create_player(), _allocator)
+		, _sounds(_allocator)
 		, _instance_guard(this, "Duplicate AudioManager construction")
 	{
 	}
@@ -82,7 +83,7 @@ namespace Yttrium
 		if (!reader)
 			return {};
 
-		auto sound = _backend->create_sound(name, allocator);
+		auto sound = _backend->create_sound(name, *allocator);
 		if (!sound->load(*reader))
 			return {};
 

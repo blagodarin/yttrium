@@ -5,8 +5,7 @@
 #define _include_yttrium_audio_manager_h_
 
 #include <yttrium/static_string.h>
-
-#include <vector>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
@@ -19,10 +18,10 @@ namespace Yttrium
 	public:
 
 		///
-		static std::vector<StaticString> backends();
+		static StdVector<StaticString> backends(Allocator& allocator = *DefaultAllocator);
 
 		///
-		static std::vector<StaticString> backend_devices(const StaticString& backend);
+		static StdVector<StaticString> backend_devices(const StaticString& backend, Allocator& allocator = *DefaultAllocator);
 
 		///
 		static Pointer<AudioManager> create(const StaticString& backend = StaticString(),

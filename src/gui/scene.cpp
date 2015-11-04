@@ -16,11 +16,8 @@ namespace Yttrium
 	GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent)
 		: _gui(gui)
 		, _name(name, &_gui.allocator())
-		, _scaling(Scaling::Stretch)
-		, _is_cursor_set(false)
-		, _mouse_widget(nullptr)
-		, _left_click_widget(nullptr)
-		, _focus_widget(nullptr)
+		, _widgets(_gui.allocator())
+		, _named_widgets(_gui.allocator())
 		, _is_transparent(is_transparent)
 		, _bindings(_gui.script_context(), &_gui.allocator())
 	{

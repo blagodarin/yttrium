@@ -4,10 +4,9 @@
 
 namespace Yttrium
 {
-	AudioPlaylist::AudioPlaylist(Allocator* allocator)
+	AudioPlaylist::AudioPlaylist(Allocator& allocator)
 		: _allocator(allocator)
-		, _order(AudioPlayer::Loop)
-		, _next(0)
+		, _items(_allocator)
 	{
 	}
 
@@ -22,7 +21,7 @@ namespace Yttrium
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
-		_items.push_back(Item(String(name, _allocator), settings, type));
+		_items.emplace_back(String(name, &_allocator), settings, type);
 
 		switch (_order)
 		{

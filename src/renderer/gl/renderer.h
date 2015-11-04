@@ -10,7 +10,7 @@ namespace Yttrium
 	{
 	public:
 
-		GLRenderer(WindowBackend& window, Allocator* allocator);
+		GLRenderer(WindowBackend& window, Allocator& allocator);
 
 		// Renderer
 		Pointer<GpuProgram> create_gpu_program() override;
@@ -22,7 +22,7 @@ namespace Yttrium
 		// RendererImpl
 		void clear() override;
 		void take_screenshot(Image&) override;
-		void flush_2d_impl(const std::vector<Vertex2D>&, const std::vector<uint16_t>&) override;
+		void flush_2d_impl(const StdVector<Vertex2D>&, const StdVector<uint16_t>&) override;
 		bool initialize() override;
 		void set_program(const GpuProgram*) override;
 		void set_projection(const Matrix4&) override;

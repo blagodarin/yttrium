@@ -44,6 +44,7 @@ namespace Yttrium
 
 	YpqReader::YpqReader(File&& file, Allocator& allocator)
 		: PackageReaderImpl(std::move(file), allocator)
+		, _index(allocator)
 	{
 		YpqPackageHeader package_header;
 

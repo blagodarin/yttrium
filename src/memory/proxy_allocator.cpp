@@ -6,9 +6,9 @@
 #include <atomic>
 
 #if Y_IS_DEBUG
+	#include <yttrium/std/unordered_map.h>
 	#include <iomanip>
 	#include <iostream>
-	#include <map>
 #endif
 
 namespace Yttrium
@@ -20,6 +20,7 @@ namespace Yttrium
 		Private(String&& name, Allocator& allocator)
 			: _allocator(allocator)
 			, _name(std::move(name))
+			, _pointers(_allocator)
 		{
 		}
 
@@ -31,7 +32,7 @@ namespace Yttrium
 		std::atomic<size_t> _reallocations{0};
 		std::atomic<size_t> _allocated_blocks{0};
 	#if Y_IS_DEBUG
-		std::map<void*, size_t> _pointers;
+		StdUnorderedMap<void*, size_t> _pointers;
 	#endif
 	};
 
@@ -46,9 +47,9 @@ namespace Yttrium
 		else
 		{
 			const auto& proxy_name = proxy_allocator->name();
-			_private = Y_NEW(&allocator, Private)(
+			_private = Y_NEW(&proxy_allocator->_private->_allocator, Private)(
 				String(proxy_name.size() + 1 + name.size(), &allocator) << proxy_name << '.' << name,
-				allocator);
+				proxy_allocator->_private->_allocator);
 		}
 	}
 
@@ -100,7 +101,7 @@ namespace Yttrium
 		return pointer;
 	}
 
-	void ProxyAllocator::do_deallocate(void* pointer, bool reallocation)
+	void ProxyAllocator::do_deallocate(void* pointer, bool reallocation) noexcept
 	{
 	#if Y_IS_DEBUG
 		if (_private->_pointers.find(pointer) == _private->_pointers.end())

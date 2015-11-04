@@ -9,11 +9,12 @@ namespace Yttrium
 	Pointer<TextureCache> TextureCache::create(Renderer& renderer)
 	{
 		RendererImpl& renderer_impl = static_cast<RendererImpl&>(renderer);
-		return make_pointer<TextureCacheImpl>(*renderer_impl.allocator(), static_cast<RendererImpl&>(renderer));
+		return make_pointer<TextureCacheImpl>(renderer_impl.allocator(), static_cast<RendererImpl&>(renderer));
 	}
 
 	TextureCacheImpl::TextureCacheImpl(RendererImpl& renderer)
 		: _renderer(renderer)
+		, _cache_2d(_renderer.allocator())
 	{
 	}
 
@@ -28,9 +29,9 @@ namespace Yttrium
 		if (i != _cache_2d.end())
 			return i->second;
 
-		Allocator* allocator = _renderer.allocator();
+		Allocator& allocator = _renderer.allocator();
 
-		Image image(allocator);
+		Image image(&allocator);
 		if (!image.load(name))
 			return {};
 
@@ -41,6 +42,6 @@ namespace Yttrium
 		if (!backend_texture)
 			return {};
 
-		return _cache_2d.emplace(String(name, allocator), backend_texture).first->second;
+		return _cache_2d.emplace(String(name, &allocator), backend_texture).first->second;
 	}
 }

@@ -8,7 +8,7 @@
 
 namespace Yttrium
 {
-	OpenAlBackend::OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator* allocator)
+	OpenAlBackend::OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator& allocator)
 		: AudioBackend(OpenAL, ::alcGetString(device.get(), ALC_DEVICE_SPECIFIER), allocator)
 		, _device(std::move(device))
 		, _context(std::move(context))
@@ -26,14 +26,14 @@ namespace Yttrium
 		return make_pointer<OpenAlPlayer>(allocator());
 	}
 
-	UniquePtr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator* allocator)
+	UniquePtr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
 	{
-		return UniquePtr<SoundImpl>(Y_NEW(allocator, OpenAlSound)(name, allocator));
+		return UniquePtr<SoundImpl>(Y_NEW(&allocator, OpenAlSound)(name, &allocator));
 	}
 
-	std::vector<StaticString> OpenAlBackend::devices()
+	StdVector<StaticString> OpenAlBackend::devices(Allocator& allocator)
 	{
-		std::vector<StaticString> result;
+		StdVector<StaticString> result(allocator);
 
 		const ALCchar* devices = ::alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
 
@@ -51,7 +51,7 @@ namespace Yttrium
 		return result;
 	}
 
-	Pointer<OpenAlBackend> OpenAlBackend::create(const StaticString& device, Allocator* allocator)
+	Pointer<OpenAlBackend> OpenAlBackend::create(const StaticString& device, Allocator& allocator)
 	{
 		P_ALCdevice alc_device;
 
@@ -67,13 +67,13 @@ namespace Yttrium
 			alc_device.reset(::alcOpenDevice(nullptr));
 
 		if (!alc_device)
-			throw UnableToCreate(String("(audio/openal) Failed to create device"_s, allocator));
+			throw UnableToCreate(String("(audio/openal) Failed to create device"_s, &allocator));
 
 		P_ALCcontext alc_context(::alcCreateContext(alc_device.get(), nullptr));
 		if (!alc_context)
-			throw UnableToCreate(String("(audio/openal) Failed to create context"_s, allocator));
+			throw UnableToCreate(String("(audio/openal) Failed to create context"_s, &allocator));
 
 		::alcMakeContextCurrent(alc_context.get());
-		return make_pointer<OpenAlBackend>(*allocator, std::move(alc_device), std::move(alc_context), allocator);
+		return make_pointer<OpenAlBackend>(allocator, std::move(alc_device), std::move(alc_context), allocator);
 	}
 }

@@ -17,9 +17,10 @@ namespace Yttrium
 		, _callbacks(callbacks)
 		, _proxy_allocator("gui"_s, allocator)
 		, _texture_cache(TextureCache::create(_renderer))
-		, _has_size(false)
-		, _size(0, 0)
-		, _scaling(Scaling::Stretch)
+		, _fonts(_proxy_allocator)
+		, _scenes(_proxy_allocator)
+		, _scene_stack(_proxy_allocator)
+		, _scene_actions(_proxy_allocator)
 	{
 	}
 
@@ -100,7 +101,7 @@ namespace Yttrium
 		// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
 		// when the manager is being cleant up, so we must use the renderer's allocator here.
 
-		TextureFont font(font_source, _renderer.allocator());
+		TextureFont font(font_source, &_renderer.allocator());
 
 		if (font)
 		{

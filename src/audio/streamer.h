@@ -23,10 +23,10 @@ namespace Yttrium
 
 	public:
 
-		AudioStreamer(AudioPlayerBackend& backend, Allocator* allocator)
+		AudioStreamer(AudioPlayerBackend& backend, Allocator& allocator)
 			: _allocator(allocator)
 			, _backend(backend)
-			, _buffer(_allocator)
+			, _buffer(&_allocator)
 		{
 		}
 
@@ -44,7 +44,7 @@ namespace Yttrium
 
 	private:
 
-		Allocator*           _allocator;
+		Allocator&           _allocator;
 		AudioPlayerBackend&  _backend;
 		Pointer<AudioReader> _source;
 		uint64_t             _begin_sample;

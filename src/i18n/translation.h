@@ -3,9 +3,8 @@
 
 #include <yttrium/i18n/translation.h>
 
+#include <yttrium/std/map.h>
 #include <yttrium/string.h>
-
-#include <map>
 
 namespace Yttrium
 {
@@ -33,7 +32,7 @@ namespace Yttrium
 		};
 
 		Allocator& _allocator;
-		std::map<String, Entry> _translations;
+		StdMap<String, Entry> _translations;
 	};
 }
 

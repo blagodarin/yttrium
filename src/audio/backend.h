@@ -47,19 +47,19 @@ namespace Yttrium
 
 		static const StaticString OpenAL;
 
-		static Pointer<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator*);
+		static Pointer<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator&);
 
 		virtual ~AudioBackend() = default;
 
 		virtual Pointer<AudioPlayerBackend> create_player() = 0;
-		virtual UniquePtr<SoundImpl> create_sound(const StaticString& name, Allocator*) = 0;
+		virtual UniquePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) = 0;
 
 		StaticString backend() const { return _backend; }
 		StaticString device() const { return _device; }
 
 	protected:
 
-		AudioBackend(const StaticString& backend, const StaticString& device, Allocator* allocator);
+		AudioBackend(const StaticString& backend, const StaticString& device, Allocator& allocator);
 
 		Allocator& allocator() const { return *_backend.allocator(); }
 

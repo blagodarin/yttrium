@@ -10,6 +10,7 @@ namespace Yttrium
 {
 	TranslationImpl::TranslationImpl(Allocator& allocator)
 		: _allocator(allocator)
+		, _translations(_allocator)
 	{
 	}
 
@@ -47,7 +48,7 @@ namespace Yttrium
 		IonDocument document(&_allocator);
 		if (!document.load(file_name))
 			return false;
-		decltype(_translations) translations;
+		decltype(_translations) translations(_allocator);
 		const auto& root = document.root();
 		for (const auto& node : root)
 		{

@@ -2,10 +2,10 @@
 #define _src_audio_playlist_h_
 
 #include <yttrium/audio/player.h>
+#include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 
 #include <mutex>
-#include <vector>
 
 namespace Yttrium
 {
@@ -19,8 +19,8 @@ namespace Yttrium
 			AudioPlayer::Settings settings;
 			AudioType             type;
 
-			Item(Allocator* allocator)
-				: name(allocator)
+			Item(Allocator& allocator)
+				: name(&allocator)
 			{
 			}
 
@@ -32,7 +32,7 @@ namespace Yttrium
 			}
 		};
 
-		AudioPlaylist(Allocator* allocator);
+		AudioPlaylist(Allocator& allocator);
 
 		void clear();
 		void load(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type);
@@ -42,11 +42,11 @@ namespace Yttrium
 
 	private:
 
-		Allocator*         _allocator;
+		Allocator&         _allocator;
 		std::mutex         _mutex;
-		std::vector<Item>  _items;
-		AudioPlayer::Order _order;
-		size_t             _next;
+		StdVector<Item>    _items;
+		AudioPlayer::Order _order = AudioPlayer::Loop;
+		size_t             _next = 0;
 	};
 }
 

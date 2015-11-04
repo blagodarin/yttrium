@@ -2,9 +2,8 @@
 #include "manager.h"
 
 #include <yttrium/file.h>
+#include <yttrium/std/vector.h>
 #include "../base/instance_guard.h"
-
-#include <vector>
 
 namespace Yttrium
 {
@@ -18,6 +17,7 @@ namespace Yttrium
 
 		PackageManagerImpl(Order order, Allocator& allocator)
 			: _allocator(allocator)
+			, _packages(_allocator)
 			, _order(order)
 			, _instance_guard(this, "Duplicate PackageManager construction")
 		{
@@ -74,8 +74,8 @@ namespace Yttrium
 	private:
 
 		Allocator& _allocator;
-		std::vector<Pointer<PackageReader>> _packages;
-		const Order _order = PackageManager::Order::PackedFirst;
+		StdVector<Pointer<PackageReader>> _packages;
+		const Order _order;
 		PackageManagerGuard _instance_guard;
 	};
 
