@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include <yttrium/log.h>
 #include <yttrium/matrix.h>
 #include <yttrium/utils.h>
 #include "buffer.h"
@@ -20,18 +21,35 @@ namespace Yttrium
 		_gl.initialize(window);
 	}
 
-	Pointer<GpuProgram> GLRenderer::create_gpu_program()
+	Pointer<GpuProgram> GLRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
 	{
-		return make_pointer<GlGpuProgram>(allocator(), *this, _gl);
+		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
+		if (!vertex.compile(vertex_shader))
+		{
+			Log() << vertex.info_log(allocator());
+			return {};
+		}
+
+		GlShaderHandle fragment(_gl, GL_FRAGMENT_SHADER);
+		if (!fragment.compile(fragment_shader))
+		{
+			Log() << fragment.info_log(allocator());
+			return {};
+		}
+
+		auto result = make_pointer<GlGpuProgram>(allocator(), *this, std::move(vertex), std::move(fragment), _gl);
+		if (!result->link())
+			return {};
+
+		return std::move(result);
 	}
 
 	Pointer<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
 	{
-		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
-		if (!buffer)
-			return {};
 		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
 		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
@@ -40,55 +58,53 @@ namespace Yttrium
 
 	SharedPtr<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
-		// NOTE: Keep the new pixel formats in sync with these arrays!
-
-		static const GLenum formats[] =
-		{
-			GL_LUMINANCE,       // PixelFormat::Gray
-			GL_LUMINANCE_ALPHA, // PixelFormat::GrayAlpha
-			0,                  // PixelFormat::AlphaGray
-			GL_RGB,             // PixelFormat::Rgb
-			GL_BGR,             // PixelFormat::Bgr
-			GL_RGBA,            // PixelFormat::Rgba
-			GL_BGRA,            // PixelFormat::Bgra
-			0,                  // PixelFormat::Argb
-			0,                  // PixelFormat::Abgr
-		};
-
-		static const GLint internal_formats[] =
-		{
-			GL_LUMINANCE8,        // PixelFormat::Gray
-			GL_LUMINANCE8_ALPHA8, // PixelFormat::GrayAlpha
-			GL_LUMINANCE8_ALPHA8, // PixelFormat::AlphaGray
-			GL_RGB8,              // PixelFormat::Rgb
-			GL_RGB8,              // PixelFormat::Bgr
-			GL_RGBA8,             // PixelFormat::Rgba
-			GL_RGBA8,             // PixelFormat::Bgra
-			GL_RGBA8,             // PixelFormat::Argb
-			GL_RGBA8,             // PixelFormat::Abgr
-		};
-
 		if (format.bits_per_channel() != 8)
 			return {};
 
-		const auto data_format = formats[static_cast<size_t>(format.pixel_format())];
-		if (!data_format)
+		GLenum internal_format = 0;
+		GLenum data_format = 0;
+		GLenum data_type = 0;
+		switch (format.pixel_format())
+		{
+		case PixelFormat::Gray:
+			internal_format = GL_LUMINANCE8;
+			data_format = GL_LUMINANCE;
+			data_type = GL_UNSIGNED_BYTE;
+			break;
+		case PixelFormat::GrayAlpha:
+			internal_format = GL_LUMINANCE8_ALPHA8;
+			data_format = GL_LUMINANCE_ALPHA;
+			data_type = GL_UNSIGNED_BYTE;
+			break;
+		case PixelFormat::Rgb:
+			internal_format = GL_RGB8;
+			data_format = GL_RGB;
+			data_type = GL_UNSIGNED_BYTE;
+			break;
+		case PixelFormat::Bgr:
+			internal_format = GL_RGB8;
+			data_format = GL_BGR;
+			data_type = GL_UNSIGNED_BYTE;
+			break;
+		case PixelFormat::Rgba:
+			internal_format = GL_RGBA8;
+			data_format = GL_RGBA;
+			data_type = GL_UNSIGNED_BYTE;
+			break;
+		case PixelFormat::Bgra:
+			internal_format = GL_RGBA8;
+			data_format = GL_BGRA;
+			data_type = GL_UNSIGNED_BYTE;
+			break;
+		default:
 			return {};
+		}
 
-		const auto internal_format = internal_formats[static_cast<size_t>(format.pixel_format())];
-
-		// NOTE: The following code is not exception-safe:
-		// the texture handle won't be released if an exception is generated.
-
-		GLuint texture = 0;
-		_gl.GenTextures(1, &texture); // TODO: Think of throwing an exception if this fails.
-		if (!texture)
-			return {};
-
-		// TODO: Set pixel row alignment if required.
-
-		_gl.BindTexture(GL_TEXTURE_2D, texture);
-		_gl.TexImage2D(GL_TEXTURE_2D, 0, internal_format, format.width(), format.height(), 0, data_format, GL_UNSIGNED_BYTE, data);
+		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
+		texture.bind();
+		assert(is_power_of_2(format.row_alignment()) && format.row_alignment() <= 8); // OpenGL requirements.
+		_gl.PixelStorei(GL_PACK_ALIGNMENT, format.row_alignment());
+		_gl.TexImage2D(GL_TEXTURE_2D, 0, internal_format, format.width(), format.height(), 0, data_format, data_type, data);
 		if (!no_mipmaps)
 		{
 			const auto is_target_enabled = _gl.IsEnabled(GL_TEXTURE_2D);
@@ -97,16 +113,13 @@ namespace Yttrium
 			if (!is_target_enabled)
 				_gl.Disable(GL_TEXTURE_2D);
 		}
-		_gl.BindTexture(GL_TEXTURE_2D, 0);
+		texture.unbind();
 
-		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, _gl, texture));
+		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, std::move(texture)));
 	}
 
 	Pointer<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
 	{
-		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
-		if (!buffer)
-			return {};
 		size_t element_size = sizeof(float) * 4; // Geometry data.
 		if (format & VertexBuffer::Rgba4F)
 			element_size += sizeof(float) * 4;
@@ -114,6 +127,8 @@ namespace Yttrium
 			element_size += sizeof(float) * 2;
 		if (format & VertexBuffer::Normal4F)
 			element_size += sizeof(float) * 4;
+
+		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		buffer.unbind();
@@ -213,10 +228,7 @@ namespace Yttrium
 #endif
 
 		if (!check_min_version(2, 0))
-			return false; // TODO: Report error.
-
-		if (!_gl.ARB_texture_non_power_of_two)
-			return false; // TODO: Report error.
+			return false;
 
 		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
 		_gl.Enable(GL_TEXTURE_2D);
@@ -292,7 +304,11 @@ namespace Yttrium
 		// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
 		const int actual_major = _gl.VERSION[0] - '0';
 		const int actual_minor = _gl.VERSION[2] - '0';
-		return actual_major > major || (actual_major == major && actual_minor >= minor);
+		if (actual_major > major || (actual_major == major && actual_minor >= minor))
+			return true;
+		Log() << "OpenGL "_s << dec(major) << "."_s << dec(minor) << " is required, but only OpenGL "_s
+			<< dec(actual_major) << "."_s << dec(actual_minor) << " is supported"_s;
+		return false;
 	}
 
 #if Y_IS_DEBUG

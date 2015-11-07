@@ -55,7 +55,7 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual Pointer<GpuProgram> create_gpu_program() = 0;
+		virtual Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
 
 		///
 		virtual Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;

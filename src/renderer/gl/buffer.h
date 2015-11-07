@@ -14,8 +14,6 @@ namespace Yttrium
 		GlBufferHandle(GlBufferHandle&& handle);
 		~GlBufferHandle();
 
-		explicit operator bool() const { return _handle != 0; }
-
 		void bind() const;
 		void initialize(GLenum usage, size_t size, const void* data) const;
 		void unbind() const;
@@ -32,7 +30,7 @@ namespace Yttrium
 		GLuint _handle = 0;
 	};
 
-	class GlIndexBuffer: public IndexBufferImpl
+	class GlIndexBuffer : public IndexBufferImpl
 	{
 	public:
 
@@ -44,7 +42,7 @@ namespace Yttrium
 		void write(size_t offset, size_t size, const void* data) override;
 	};
 
-	class GlVertexBuffer: public VertexBufferImpl
+	class GlVertexBuffer : public VertexBufferImpl
 	{
 	public:
 

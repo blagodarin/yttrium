@@ -17,7 +17,7 @@ namespace Yttrium
 		Private(Allocator* allocator)
 			: PrivateBase(allocator)
 			, _commands(*allocator)
-			, _temporaries(32, allocator) // TODO: Get rid of magic numbers.
+			, _temporaries(32, allocator)
 			, _last_result(allocator)
 		{
 		}

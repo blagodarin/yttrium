@@ -35,7 +35,7 @@ namespace Yttrium
 		Private(ScriptContext* parent, Allocator& allocator)
 			: PrivateBase(&allocator)
 			, _parent(parent)
-			, _value_pool(32, _allocator) // TODO: Get rid of magic numbers.
+			, _value_pool(32, _allocator)
 			, _values(allocator)
 			, _commands(allocator)
 		{

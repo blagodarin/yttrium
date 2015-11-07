@@ -19,9 +19,9 @@ namespace Yttrium
 
 		///
 		template <typename T>
-		Log& operator<<(const T& value)
+		Log& operator<<(T&& value)
 		{
-			_message << value;
+			_message << std::forward<T>(value);
 			return *this;
 		}
 

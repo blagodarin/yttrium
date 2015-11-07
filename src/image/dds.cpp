@@ -22,7 +22,9 @@ namespace Yttrium
 			|| !header.dwWidth
 			|| header.dwDepth
 			|| header.dwMipMapCount
-			// TODO: Check 'header.dwReserved1'.
+			|| header.dwReserved1[0] || header.dwReserved1[1] || header.dwReserved1[2] || header.dwReserved1[3]
+			|| header.dwReserved1[4] || header.dwReserved1[5] || header.dwReserved1[6] || header.dwReserved1[7]
+			|| header.dwReserved1[8] || header.dwReserved1[9] || header.dwReserved1[10]
 			|| header.ddspf.dwSize != DDS_PIXELFORMAT::SIZE
 			|| (header.ddspf.dwFlags & (DDPF_ALPHA | DDPF_FOURCC | DDPF_YUV))
 			|| (header.dwCaps & (DDSCAPS_COMPLEX | DDSCAPS_MIPMAP))

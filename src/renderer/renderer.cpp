@@ -7,6 +7,7 @@
 #include "texture.h"
 
 #include <cassert>
+#include <stdexcept>
 
 #if Y_IS_DEBUG
 	#include <algorithm>
@@ -49,7 +50,7 @@ namespace Yttrium
 		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
 		if (!renderer->_white_texture)
-			return {};
+			throw std::logic_error("Failed to initialize an internal texture");
 		renderer->_white_texture->set_filter(Texture2D::NearestFilter);
 
 		ImageFormat debug_texture_format;
@@ -59,18 +60,12 @@ namespace Yttrium
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
-			return {};
+			throw std::logic_error("Failed to initialize an internal texture");
 		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
 
-		renderer->_program_2d = renderer->create_gpu_program();
+		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
 		if (!renderer->_program_2d)
-			return {};
-		if (!renderer->_program_2d->set_vertex_shader(GpuProgram::Language::Glsl, _vertex_shader_2d))
-			return {};
-		if (!renderer->_program_2d->set_fragment_shader(GpuProgram::Language::Glsl, _fragment_shader_2d))
-			return {};
-		if (!renderer->_program_2d->link())
-			return {};
+			throw std::logic_error("Failed to initialize an internal GPU program");
 
 		return std::move(renderer);
 	}
@@ -169,13 +164,7 @@ namespace Yttrium
 					info->rect.width() * x_scaling,
 					info->rect.height() * y_scaling);
 
-				const auto current_texture = current_texture_2d();
-				Vector2 texture_top_left(current_texture->fix_coords(Vector2(info->rect.top_left())));
-				Vector2 texture_bottom_right(current_texture->fix_coords(Vector2(info->rect.bottom_right())));
-
-				draw_rectangle(symbol_rect,
-					RectF::from_coords(texture_top_left.x, texture_top_left.y, texture_bottom_right.x, texture_bottom_right.y),
-					MarginsF());
+				draw_rectangle(symbol_rect, current_texture_2d()->map(RectF(info->rect)), {});
 
 				do_capture(i);
 
@@ -231,11 +220,7 @@ namespace Yttrium
 		const auto current_texture = current_texture_2d();
 		if (!current_texture)
 			return;
-
-		const Vector2& top_left = current_texture->fix_coords(rect.top_left());
-		const Vector2& bottom_right = current_texture->fix_coords(rect.bottom_right());
-
-		_texture_rect.set_coords(top_left.x, top_left.y, bottom_right.x, bottom_right.y);
+		_texture_rect = current_texture->map(rect);
 		_texture_borders = MarginsF();
 	}
 
@@ -318,8 +303,6 @@ namespace Yttrium
 
 	void RendererImpl::push_program(const GpuProgram* program)
 	{
-		if (program && !program->is_linked())
-			program = nullptr; // TODO: Throw?
 		assert(!_program_stack.empty());
 		if (_program_stack.back().first == program)
 		{

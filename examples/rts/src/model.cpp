@@ -136,8 +136,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_texture = _renderer.create_texture_2d(image_format, pixels.data(), false);
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
-	_program = _renderer.create_gpu_program();
-	_program->set_vertex_shader(GpuProgram::Language::Glsl,
+	_program = _renderer.create_gpu_program(
 		"#version 110\n"
 		""
 		"varying vec3 view_direction;"
@@ -149,9 +148,8 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 			"n = normalize(gl_NormalMatrix * gl_Normal);"
 			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
 			"gl_TexCoord[0] = gl_MultiTexCoord0;"
-		"}\n"
-	);
-	_program->set_fragment_shader(GpuProgram::Language::Glsl,
+		"}\n",
+
 		"#version 110\n"
 		"\n"
 		"varying vec3 view_direction;\n"
@@ -178,5 +176,4 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 			"}\n"
 		"}\n"
 	);
-	_program->link();
 }

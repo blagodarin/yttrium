@@ -257,7 +257,7 @@ GLFUNCTION(ShaderSource, void, (GLuint, GLsizei, const GLchar**, const GLint*))
 GLFUNCTION(UseProgram, void, (GLuint))
 
 // Deprecated API entries still used in our renderer.
-// TODO: Remove.
+// TODO: Remove deprecated OpenGL API entries.
 
 GLFUNCTION(ColorPointer, void, (GLint, GLenum, GLsizei, const void*))
 GLFUNCTION(DisableClientState, void, (GLenum))
@@ -267,9 +267,6 @@ GLFUNCTION(MatrixMode, void, (GLenum))
 GLFUNCTION(NormalPointer, void, (GLenum, GLsizei, const void*))
 GLFUNCTION(TexCoordPointer, void, (GLint, GLenum, GLsizei, const void*))
 GLFUNCTION(VertexPointer, void, (GLint, GLenum, GLsizei, const void*))
-
-GLEXTENSION(ARB_texture_non_power_of_two) // Core OpenGL 2.0 and higher.
-	GLEND
 
 GLEXTENSION(ARB_texture_rectangle) // Core OpenGL 3.1 and higher.
 	GLINTEGER(MAX_RECTANGLE_TEXTURE_SIZE_ARB)

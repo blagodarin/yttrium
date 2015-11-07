@@ -27,7 +27,6 @@ namespace Yttrium
 			, _nodes(32, allocator)
 			, _values(32, allocator)
 		{
-			// TODO: Get rid of the magic numbers above.
 		}
 
 		Allocator* allocator() const { return _allocator; }

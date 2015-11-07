@@ -1,5 +1,6 @@
 #include "buffer.h"
 
+#include <stdexcept>
 #include <utility>
 
 namespace Yttrium
@@ -9,7 +10,8 @@ namespace Yttrium
 		, _target(target)
 	{
 		_gl.GenBuffers(1, &_handle);
-		// TODO: Throw some nasty exception if it fails.
+		if (!_handle)
+			throw std::runtime_error("glGenBuffers failed");
 	}
 
 	GlBufferHandle::GlBufferHandle(GlBufferHandle&& handle)
@@ -22,7 +24,7 @@ namespace Yttrium
 
 	GlBufferHandle::~GlBufferHandle()
 	{
-		if (_handle != 0)
+		if (_handle)
 			_gl.DeleteBuffers(1, &_handle);
 	}
 

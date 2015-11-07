@@ -13,7 +13,7 @@ namespace Yttrium
 		GLRenderer(WindowBackend& window, Allocator& allocator);
 
 		// Renderer
-		Pointer<GpuProgram> create_gpu_program() override;
+		Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
 		Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
 		SharedPtr<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
 		Pointer<VertexBuffer> create_vertex_buffer(unsigned format, size_t, const void*) override;

@@ -6,23 +6,45 @@
 
 namespace Yttrium
 {
+	class GlTextureHandle
+	{
+	public:
+
+		GlTextureHandle(const GlApi& gl, GLenum target);
+		GlTextureHandle(GlTextureHandle&&);
+		~GlTextureHandle();
+
+		void bind() const;
+		void set_anisotropy_enabled(bool) const;
+		void set_parameter(GLenum, GLint) const;
+		void unbind() const;
+
+		GlTextureHandle(const GlTextureHandle&) = delete;
+		GlTextureHandle& operator=(const GlTextureHandle&) = delete;
+		GlTextureHandle& operator=(GlTextureHandle&&) = delete;
+
+	private:
+
+		const GlApi& _gl;
+		const GLenum _target;
+		GLuint _handle = 0;
+	};
+
 	class GlTexture2D : public BackendTexture2D
 	{
 	public:
 
-		GlTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, const GlApi& gl, GLuint texture);
-		~GlTexture2D() override;
+		GlTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, GlTextureHandle&& texture);
 
 		void bind() const;
 
 	private:
 
-		Vector2 fix_coords(const Vector2& coords) const override;
+		Vector2 map(const Vector2&) const override;
 
 	private:
 
-		const GlApi& _gl;
-		GLuint       _texture;
+		const GlTextureHandle _texture;
 	};
 }
 
