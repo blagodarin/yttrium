@@ -1,6 +1,6 @@
 #include <yttrium/buffer.h>
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 #include <cstring>
 

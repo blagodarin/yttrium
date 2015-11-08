@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_object_h_
 #define _include_yttrium_object_h_
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 #include <atomic>
 #include <type_traits>

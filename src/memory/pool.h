@@ -1,7 +1,7 @@
 #ifndef _src_memory_pool_h_
 #define _src_memory_pool_h_
 
-#include <yttrium/pool.h>
+#include <yttrium/memory/pool.h>
 
 #include <cstddef>
 

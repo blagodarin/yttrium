@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_std_allocator_h_
 #define _include_yttrium_std_allocator_h_
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 namespace Yttrium
 {

@@ -1,10 +1,10 @@
 /// \file
 /// \brief Proxy allocator.
 
-#ifndef _include_yttrium_proxy_allocator_h_
-#define _include_yttrium_proxy_allocator_h_
+#ifndef _include_yttrium_memory_proxy_allocator_h_
+#define _include_yttrium_memory_proxy_allocator_h_
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 namespace Yttrium
 {

@@ -1,4 +1,4 @@
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 #include "common.h"
 

@@ -1,5 +1,5 @@
 #include <yttrium/file.h>
-#include <yttrium/memory_manager.h>
+#include <yttrium/memory/manager.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
 

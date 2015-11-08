@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_pointer_h_
 #define _include_yttrium_pointer_h_
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 #include <utility>
 #include <type_traits>

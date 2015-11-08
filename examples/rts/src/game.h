@@ -2,7 +2,7 @@
 #define _examples_rts_game_h_
 
 #include <yttrium/index_buffer.h>
-#include <yttrium/proxy_allocator.h>
+#include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/script/context.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/vector.h>

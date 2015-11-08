@@ -1,10 +1,10 @@
 /// \file
 /// \brief Temporary memory allocator.
 
-#ifndef _include_yttrium_temporary_allocator_h_
-#define _include_yttrium_temporary_allocator_h_
+#ifndef _include_yttrium_memory_temporary_allocator_h_
+#define _include_yttrium_memory_temporary_allocator_h_
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 namespace Yttrium
 {

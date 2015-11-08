@@ -6,7 +6,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/pool.h>
+#include <yttrium/memory/pool.h>
 
 namespace Yttrium
 {

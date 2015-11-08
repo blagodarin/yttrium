@@ -1,7 +1,7 @@
 #ifndef _src_memory_private_allocator_h_
 #define _src_memory_private_allocator_h_
 
-#include <yttrium/proxy_allocator.h>
+#include <yttrium/memory/proxy_allocator.h>
 
 namespace Yttrium
 {

@@ -1,6 +1,5 @@
 #include "scene.h"
 
-#include <yttrium/allocator.h>
 #include <yttrium/renderer.h>
 #include "gui.h"
 #include "widgets/button.h"

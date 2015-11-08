@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_pool_h_
-#define _include_yttrium_pool_h_
+#ifndef _include_yttrium_memory_pool_h_
+#define _include_yttrium_memory_pool_h_
 
 #include <yttrium/base.h>
 #include <yttrium/types.h>

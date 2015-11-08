@@ -1,8 +1,8 @@
 #ifndef _src_base_private_base_h_
 #define _src_base_private_base_h_
 
-#include <yttrium/allocator.h>
 #include <yttrium/base.h>
+#include <yttrium/memory/allocator.h>
 
 #include <atomic>
 #include <cassert>

@@ -1,6 +1,6 @@
 #include <yttrium/string.h>
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 #include <yttrium/utils.h>
 
 #include <cassert>

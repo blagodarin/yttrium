@@ -4,8 +4,8 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
+#include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/pointer.h>
-#include <yttrium/proxy_allocator.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
 #include <yttrium/texture_cache.h>

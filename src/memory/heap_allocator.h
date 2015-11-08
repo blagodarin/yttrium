@@ -1,7 +1,7 @@
 #ifndef _src_memory_heap_allocator_h_
 #define _src_memory_heap_allocator_h_
 
-#include <yttrium/allocator.h>
+#include <yttrium/memory/allocator.h>
 
 namespace Yttrium
 {

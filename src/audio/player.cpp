@@ -1,6 +1,5 @@
 #include "player.h"
 
-#include <yttrium/allocator.h>
 #include "backend.h"
 #include "playlist.h"
 

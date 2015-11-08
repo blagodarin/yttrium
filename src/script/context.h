@@ -3,7 +3,7 @@
 
 #include <yttrium/script/context.h>
 
-#include <yttrium/pool.h>
+#include <yttrium/memory/pool.h>
 #include <yttrium/std/map.h>
 #include "../base/private_base.h"
 

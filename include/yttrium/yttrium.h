@@ -4,7 +4,6 @@
 #ifndef _include_yttrium_yttrium_h_
 #define _include_yttrium_yttrium_h_
 
-#include <yttrium/allocator.h>
 #include <yttrium/audio/io.h>
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
@@ -33,13 +32,16 @@
 #include <yttrium/log_manager.h>
 #include <yttrium/margins.h>
 #include <yttrium/matrix.h>
-#include <yttrium/memory_manager.h>
+#include <yttrium/memory/allocator.h>
+#include <yttrium/memory/manager.h>
+#include <yttrium/memory/pages.h>
+#include <yttrium/memory/pool.h>
+#include <yttrium/memory/proxy_allocator.h>
+#include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/object.h>
 #include <yttrium/package.h>
 #include <yttrium/point.h>
 #include <yttrium/pointer.h>
-#include <yttrium/pool.h>
-#include <yttrium/proxy_allocator.h>
 #include <yttrium/rect.h>
 #include <yttrium/renderer.h>
 #include <yttrium/screen.h>
@@ -51,7 +53,6 @@
 #include <yttrium/static_string.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
-#include <yttrium/temporary_allocator.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/texture_font.h>

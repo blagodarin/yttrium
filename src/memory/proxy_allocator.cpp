@@ -1,4 +1,4 @@
-#include <yttrium/proxy_allocator.h>
+#include <yttrium/memory/proxy_allocator.h>
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>

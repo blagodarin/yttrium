@@ -1,6 +1,5 @@
 #include <yttrium/dir.h>
 
-#include <yttrium/allocator.h>
 #include "../../utils/unique_ptr.h"
 #include "../../utils/zero_terminated.h"
 #include "../private_base.h"

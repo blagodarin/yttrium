@@ -2,7 +2,7 @@
 
 #include <yttrium/i18n/localization.h>
 #include <yttrium/log_manager.h>
-#include <yttrium/memory_manager.h>
+#include <yttrium/memory/manager.h>
 
 int main(int, char**)
 {

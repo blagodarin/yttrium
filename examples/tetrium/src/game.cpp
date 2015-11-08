@@ -10,10 +10,10 @@
 #include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
+#include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/renderer.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/temporary_allocator.h>
 #include <yttrium/texture.h>
 #include <yttrium/timer.h>
 
