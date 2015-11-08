@@ -192,11 +192,13 @@ if not option_no_png:
 
 if 'posix' in ports:
 	src_paths += [
-		'base/posix']
+		'base/posix',
+		'memory/posix']
 
 if 'windows' in ports:
 	src_paths += [
 		'base/windows',
+		'memory/windows',
 		'window/windows']
 
 if 'x11' in ports:
