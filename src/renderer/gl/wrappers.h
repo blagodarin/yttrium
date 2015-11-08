@@ -13,8 +13,8 @@ namespace Yttrium
 	{
 	public:
 
-		GlBufferHandle(const GlApi& gl, GLenum target);
-		GlBufferHandle(GlBufferHandle&& handle);
+		GlBufferHandle(const GlApi&, GLenum target);
+		GlBufferHandle(GlBufferHandle&&);
 		~GlBufferHandle();
 
 		void bind() const;
@@ -36,7 +36,7 @@ namespace Yttrium
 	{
 	public:
 
-		GlProgramHandle(const GlApi& gl);
+		GlProgramHandle(const GlApi&);
 		GlProgramHandle(GlProgramHandle&&);
 		~GlProgramHandle();
 
@@ -58,7 +58,7 @@ namespace Yttrium
 	{
 	public:
 
-		GlShaderHandle(const GlApi& gl, GLenum type);
+		GlShaderHandle(const GlApi&, GLenum type);
 		GlShaderHandle(GlShaderHandle&&);
 		~GlShaderHandle();
 
@@ -80,7 +80,7 @@ namespace Yttrium
 	{
 	public:
 
-		GlTextureHandle(const GlApi& gl, GLenum target);
+		GlTextureHandle(const GlApi&, GLenum target);
 		GlTextureHandle(GlTextureHandle&&);
 		~GlTextureHandle();
 
@@ -97,6 +97,23 @@ namespace Yttrium
 	private:
 		const GlApi& _gl;
 		const GLenum _target;
+		GLuint _handle = 0;
+	};
+
+	class GlVertexArrayHandle
+	{
+	public:
+
+		GlVertexArrayHandle(const GlApi&);
+		GlVertexArrayHandle(GlVertexArrayHandle&&);
+		~GlVertexArrayHandle();
+
+		GlVertexArrayHandle(const GlVertexArrayHandle&) = delete;
+		GlVertexArrayHandle& operator=(const GlVertexArrayHandle&) = delete;
+		GlVertexArrayHandle& operator=(GlVertexArrayHandle&&) = delete;
+
+	private:
+		const GlApi& _gl;
 		GLuint _handle = 0;
 	};
 }

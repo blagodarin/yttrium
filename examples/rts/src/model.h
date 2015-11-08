@@ -32,7 +32,7 @@ public:
 	CubeModel(Renderer&);
 };
 
-class ChessboardModel: public Model
+class ChessboardModel : public Model
 {
 public:
 

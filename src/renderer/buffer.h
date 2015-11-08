@@ -38,10 +38,10 @@ namespace Yttrium
 		{
 		}
 
-		unsigned format() const override { return _format; }
 		size_t size() const override { return _size; }
 
 		size_t element_size() const { return _element_size; }
+		unsigned format() const { return _format; }
 
 	protected:
 

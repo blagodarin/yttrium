@@ -196,4 +196,24 @@ namespace Yttrium
 	{
 		_gl.TextureParameteriEXT(_handle, _target, name, value);
 	}
+
+	GlVertexArrayHandle::GlVertexArrayHandle(const GlApi& gl)
+		: _gl(gl)
+	{
+		_gl.GenVertexArrays(1, &_handle);
+		if (!_handle)
+			throw std::runtime_error("glGenVertexArrays failed");
+	}
+
+	GlVertexArrayHandle::GlVertexArrayHandle(GlVertexArrayHandle&& vertex_array)
+		: _gl(vertex_array._gl)
+		, _handle(vertex_array._handle)
+	{
+	}
+
+	GlVertexArrayHandle::~GlVertexArrayHandle()
+	{
+		if (_handle)
+			_gl.DeleteVertexArrays(1, &_handle);
+	}
 }

@@ -24,9 +24,6 @@ namespace Yttrium
 
 		virtual ~VertexBuffer() = default;
 
-		/// Return the vertex format flags.
-		virtual unsigned format() const = 0;
-
 		/// Return the number of elements in the buffer.
 		virtual size_t size() const = 0;
 

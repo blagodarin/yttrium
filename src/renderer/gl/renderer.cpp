@@ -217,6 +217,12 @@ namespace Yttrium
 		if (!check_min_version(2, 0))
 			return false;
 
+		if (!_gl.ARB_framebuffer_object) // For glGenerateMipmap.
+		{
+			Log() << "OpenGL ARB_framebuffer_object extension must be present";
+			return false;
+		}
+
 		if (!_gl.EXT_direct_state_access)
 		{
 			Log() << "OpenGL EXT_direct_state_access extension must be present";
