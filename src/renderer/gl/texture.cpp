@@ -1,53 +1,9 @@
 #include "texture.h"
 
-#include <stdexcept>
+#include <utility>
 
 namespace Yttrium
 {
-	GlTextureHandle::GlTextureHandle(const GlApi& gl, GLenum target)
-		: _gl(gl)
-		, _target(target)
-	{
-		_gl.GenTextures(1, &_handle);
-		if (!_handle)
-			throw std::runtime_error("glGenTextures failed");
-	}
-
-	GlTextureHandle::GlTextureHandle(GlTextureHandle&& handle)
-		: _gl(handle._gl)
-		, _target(handle._target)
-		, _handle(handle._handle)
-	{
-		handle._handle = 0;
-	}
-
-	GlTextureHandle::~GlTextureHandle()
-	{
-		if (_handle)
-			_gl.DeleteTextures(1, &_handle);
-	}
-
-	void GlTextureHandle::bind() const
-	{
-		_gl.BindTexture(_target, _handle);
-	}
-
-	void GlTextureHandle::set_anisotropy_enabled(bool enabled) const
-	{
-		if (_gl.EXT_texture_filter_anisotropic)
-			_gl.TexParameterf(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, enabled ? _gl.MAX_TEXTURE_MAX_ANISOTROPY_EXT : 1.f);
-	}
-
-	void GlTextureHandle::set_parameter(GLenum name, GLint value) const
-	{
-		_gl.TexParameteri(_target, name, value);
-	}
-
-	void GlTextureHandle::unbind() const
-	{
-		_gl.BindTexture(_target, 0);
-	}
-
 	GlTexture2D::GlTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, GlTextureHandle&& texture)
 		: BackendTexture2D(renderer, format, has_mipmaps)
 		, _texture(std::move(texture))

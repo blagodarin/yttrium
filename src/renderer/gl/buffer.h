@@ -2,34 +2,10 @@
 #define _src_renderer_gl_buffer_h_
 
 #include "../buffer.h"
-#include "gl.h"
+#include "wrappers.h"
 
 namespace Yttrium
 {
-	class GlBufferHandle
-	{
-	public:
-
-		GlBufferHandle(const GlApi& gl, GLenum target);
-		GlBufferHandle(GlBufferHandle&& handle);
-		~GlBufferHandle();
-
-		void bind() const;
-		void initialize(GLenum usage, size_t size, const void* data) const;
-		void unbind() const;
-		void write(size_t offset, size_t size, const void* data) const;
-
-		GlBufferHandle(const GlBufferHandle&) = delete;
-		GlBufferHandle& operator=(const GlBufferHandle&) = delete;
-		GlBufferHandle& operator=(GlBufferHandle&&) = delete;
-
-	private:
-
-		const GlApi& _gl;
-		const GLenum _target;
-		GLuint _handle = 0;
-	};
-
 	class GlIndexBuffer : public IndexBufferImpl
 	{
 	public:

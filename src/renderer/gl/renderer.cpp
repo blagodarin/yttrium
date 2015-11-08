@@ -50,9 +50,7 @@ namespace Yttrium
 		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
-		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		buffer.unbind();
 		return make_pointer<GlIndexBuffer>(allocator(), format, size, element_size, std::move(buffer), gl_format);
 	}
 
@@ -101,20 +99,11 @@ namespace Yttrium
 		}
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
-		texture.bind();
 		assert(is_power_of_2(format.row_alignment()) && format.row_alignment() <= 8); // OpenGL requirements.
 		_gl.PixelStorei(GL_PACK_ALIGNMENT, format.row_alignment());
-		_gl.TexImage2D(GL_TEXTURE_2D, 0, internal_format, format.width(), format.height(), 0, data_format, data_type, data);
+		texture.set_data(0, internal_format, format.width(), format.height(), data_format, data_type, data);
 		if (!no_mipmaps)
-		{
-			const auto is_target_enabled = _gl.IsEnabled(GL_TEXTURE_2D);
-			_gl.Enable(GL_TEXTURE_2D); // ATI bug workaround, see [http://www.opengl.org/wiki/Common_Mistakes#Automatic_mipmap_generation].
-			_gl.GenerateMipmap(GL_TEXTURE_2D);
-			if (!is_target_enabled)
-				_gl.Disable(GL_TEXTURE_2D);
-		}
-		texture.unbind();
-
+			texture.generate_mipmaps();
 		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, std::move(texture)));
 	}
 
@@ -129,9 +118,7 @@ namespace Yttrium
 			element_size += sizeof(float) * 4;
 
 		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
-		buffer.bind();
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		buffer.unbind();
 		return make_pointer<GlVertexBuffer>(allocator(), format, size, element_size, std::move(buffer));
 	}
 
@@ -229,6 +216,12 @@ namespace Yttrium
 
 		if (!check_min_version(2, 0))
 			return false;
+
+		if (!_gl.EXT_direct_state_access)
+		{
+			Log() << "OpenGL EXT_direct_state_access extension must be present";
+			return false;
+		}
 
 		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
 		_gl.Enable(GL_TEXTURE_2D);

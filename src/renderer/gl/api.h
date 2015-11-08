@@ -279,6 +279,22 @@ GLEXTENSION(ARB_vertex_array_object) // Core OpenGL 2.0 and higher.
 	GLEXTFUNC(IsVertexArray, GLboolean, (GLuint))
 	GLEND
 
+GLEXTENSION(ARB_vertex_attrib_binding) // Core OpenGL 4.3 and higher.
+	GLEXTFUNC(BindVertexBuffer, void, (GLuint, GLuint, GLintptr, GLsizei))
+	GLEXTFUNC(VertexAttribFormat, void, (GLuint, GLint, GLenum, GLboolean, GLuint))
+	GLEXTFUNC(VertexAttribIFormat, void, (GLuint, GLint, GLenum, GLuint))
+	GLEXTFUNC(VertexAttribLFormat, void, (GLuint, GLint, GLenum, GLuint))
+	GLEXTFUNC(VertexAttribBinding, void, (GLuint, GLuint))
+	GLEXTFUNC(VertexBindingDivisor, void, (GLuint, GLuint))
+// NOTE: EXT_direct_state_access must be present for the following functions to exist.
+	GLEXTFUNC(VertexArrayBindVertexBufferEXT, void, (GLuint, GLuint, GLuint, GLintptr, GLsizei))
+	GLEXTFUNC(VertexArrayVertexAttribFormatEXT, void, (GLuint, GLuint, GLint, GLenum, GLboolean, GLuint))
+	GLEXTFUNC(VertexArrayVertexAttribIFormatEXT, void, (GLuint, GLuint, GLint, GLenum, GLuint))
+	GLEXTFUNC(VertexArrayVertexAttribLFormatEXT, void, (GLuint, GLuint, GLint, GLenum, GLuint))
+	GLEXTFUNC(VertexArrayVertexAttribBindingEXT, void, (GLuint, GLuint, GLuint))
+	GLEXTFUNC(VertexArrayVertexBindingDivisorEXT, void, (GLuint, GLuint, GLuint))
+	GLEND
+
 GLEXTENSION(ARB_framebuffer_object) // Core OpenGL 3.0 and higher.
 	GLEXTFUNC(BindFramebuffer, GLvoid, (GLenum, GLuint))
 	GLEXTFUNC(BindRenderbuffer, GLvoid, (GLenum, GLuint))
@@ -300,6 +316,16 @@ GLEXTENSION(ARB_framebuffer_object) // Core OpenGL 3.0 and higher.
 	GLEXTFUNC(IsRenderbuffer, GLboolean, (GLuint))
 	GLEXTFUNC(RenderbufferStorage, GLvoid, (GLenum, GLenum, GLsizei, GLsizei))
 	GLEXTFUNC(RenderbufferStorageMultisample, GLvoid, (GLenum, GLsizei, GLenum, GLsizei, GLsizei))
+	GLEND
+
+GLEXTENSION(EXT_direct_state_access)
+	GLEXTFUNC(GenerateTextureMipmapEXT, void, (GLuint, GLenum))
+	GLEXTFUNC(NamedBufferDataEXT, void, (GLuint, GLsizeiptr, const void*, GLenum))
+	GLEXTFUNC(NamedBufferSubDataEXT, void, (GLuint, GLintptr, GLsizeiptr, const void*))
+	GLEXTFUNC(TextureImage2DEXT, void, (GLuint, GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void*))
+	GLEXTFUNC(TextureParameterfEXT, void, (GLuint, GLenum, GLenum, GLfloat))
+	GLEXTFUNC(TextureParameteriEXT, void, (GLuint, GLenum, GLenum, GLint))
+// NOTE: This extension is intentionally incomplete due to its size and the fact that most its functions are not used.
 	GLEND
 
 GLEXTENSION(EXT_texture_filter_anisotropic)
