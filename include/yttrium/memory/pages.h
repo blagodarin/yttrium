@@ -1,5 +1,5 @@
 /// \file
-/// \brief
+/// \brief Page memory allocation support.
 
 #ifndef _include_yttrium_memory_pages_h_
 #define _include_yttrium_memory_pages_h_
@@ -24,6 +24,9 @@ namespace Yttrium
 
 		/// Returns the actual size of the allocation.
 		size_t size() const noexcept { return _size; }
+
+		/// Returns the size of a memory page.
+		static size_t granularity() noexcept;
 
 		PageAllocation(const PageAllocation&) = delete;
 		PageAllocation(PageAllocation&&) noexcept;

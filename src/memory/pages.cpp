@@ -4,6 +4,8 @@
 
 #include <new>
 
+// TODO: Make PageAllocations accountable in ProxyAllocator statistics.
+
 namespace Yttrium
 {
 	PageAllocation::PageAllocation(size_t min_size)
@@ -12,6 +14,11 @@ namespace Yttrium
 	{
 		if (!_data)
 			throw std::bad_alloc();
+	}
+
+	size_t PageAllocation::granularity() noexcept
+	{
+		return pages_size(1);
 	}
 
 	PageAllocation::PageAllocation(PageAllocation&& allocation) noexcept
