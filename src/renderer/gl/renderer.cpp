@@ -134,31 +134,37 @@ namespace Yttrium
 
 		vertices._buffer.bind();
 
-		size_t data_offset = sizeof(float) * 4;
+		GLuint index = 0;
+		size_t offset = 0;
+
+		_gl.EnableVertexAttribArray(index);
+		_gl.VertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
+		index += 1;
+		offset += sizeof(float) * 4;
 
 		if (vertices.format() & VertexBuffer::Rgba4F)
 		{
-			_gl.EnableClientState(GL_COLOR_ARRAY);
-			_gl.ColorPointer(4, GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
-			data_offset += sizeof(float) * 4;
+			_gl.EnableVertexAttribArray(index);
+			_gl.VertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
+			index += 1;
+			offset += sizeof(float) * 4;
 		}
 
 		if (vertices.format() & VertexBuffer::Uv2F)
 		{
-			_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
-			_gl.TexCoordPointer(2, GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
-			data_offset += sizeof(float) * 2;
+			_gl.EnableVertexAttribArray(index);
+			_gl.VertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
+			index += 1;
+			offset += sizeof(float) * 2;
 		}
 
 		if (vertices.format() & VertexBuffer::Normal4F)
 		{
-			_gl.EnableClientState(GL_NORMAL_ARRAY);
-			_gl.NormalPointer(GL_FLOAT, vertices.element_size(), reinterpret_cast<void*>(data_offset));
-			data_offset += sizeof(float) * 4;
+			_gl.EnableVertexAttribArray(index);
+			_gl.VertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
+			index += 1;
+			offset += sizeof(float) * 2;
 		}
-
-		_gl.EnableClientState(GL_VERTEX_ARRAY);
-		_gl.VertexPointer(4, GL_FLOAT, vertices.element_size(), 0);
 
 		indices._buffer.bind();
 
@@ -168,13 +174,13 @@ namespace Yttrium
 
 		indices._buffer.unbind();
 
-		_gl.DisableClientState(GL_VERTEX_ARRAY);
 		if (vertices.format() & VertexBuffer::Rgba4F)
-			_gl.DisableClientState(GL_COLOR_ARRAY);
+			_gl.DisableVertexAttribArray(--index);
 		if (vertices.format() & VertexBuffer::Uv2F)
-			_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
+			_gl.DisableVertexAttribArray(--index);
 		if (vertices.format() & VertexBuffer::Normal4F)
-			_gl.DisableClientState(GL_NORMAL_ARRAY);
+			_gl.DisableVertexAttribArray(--index);
+		_gl.DisableVertexAttribArray(--index);
 
 		vertices._buffer.unbind();
 
@@ -217,6 +223,12 @@ namespace Yttrium
 		if (!check_min_version(2, 0))
 			return false;
 
+		if (!_gl.ARB_explicit_attrib_location)
+		{
+			Log() << "OpenGL ARB_explicit_attrib_location extension must be present";
+			return false;
+		}
+
 		if (!_gl.ARB_framebuffer_object) // For glGenerateMipmap.
 		{
 			Log() << "OpenGL ARB_framebuffer_object extension must be present";
@@ -245,25 +257,25 @@ namespace Yttrium
 	{
 		update_state();
 
-		_gl.EnableClientState(GL_COLOR_ARRAY);
-		_gl.ColorPointer(4, GL_FLOAT, sizeof(Vertex2D), &vertices[0].color);
+		_gl.EnableVertexAttribArray(0);
+		_gl.VertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), &vertices[0].position);
+
+		_gl.EnableVertexAttribArray(1);
+		_gl.VertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), &vertices[0].color);
 
 		if (current_texture_2d())
 		{
-			_gl.EnableClientState(GL_TEXTURE_COORD_ARRAY);
-			_gl.TexCoordPointer(2, GL_FLOAT, sizeof(Vertex2D), &vertices[0].texture);
+			_gl.EnableVertexAttribArray(2);
+			_gl.VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), &vertices[0].texture);
 		}
-
-		_gl.EnableClientState(GL_VERTEX_ARRAY);
-		_gl.VertexPointer(2, GL_FLOAT, sizeof(Vertex2D), &vertices[0].position);
 
 		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, indices.data());
 		++_statistics._draw_calls;
 		_statistics._triangles += indices.size() - 2;
 
-		_gl.DisableClientState(GL_VERTEX_ARRAY);
-		_gl.DisableClientState(GL_COLOR_ARRAY);
-		_gl.DisableClientState(GL_TEXTURE_COORD_ARRAY);
+		_gl.DisableVertexAttribArray(2);
+		_gl.DisableVertexAttribArray(1);
+		_gl.DisableVertexAttribArray(0);
 	}
 
 	void GLRenderer::set_program(const GpuProgram* program)
@@ -271,26 +283,9 @@ namespace Yttrium
 		_gl.UseProgram(program ? static_cast<const GlGpuProgram*>(program)->handle() : 0);
 	}
 
-	void GLRenderer::set_projection(const Matrix4& matrix)
+	void GLRenderer::set_texture(const Texture2D& texture)
 	{
-		_gl.MatrixMode(GL_PROJECTION);
-		_gl.LoadMatrixf(matrix.data());
-	}
-
-	void GLRenderer::set_texture(const Texture2D* texture)
-	{
-		if (!texture)
-		{
-			_gl.BindTexture(GL_TEXTURE_2D, 0);
-			return;
-		}
-		static_cast<const GlTexture2D*>(texture)->bind();
-	}
-
-	void GLRenderer::set_transformation(const Matrix4& matrix)
-	{
-		_gl.MatrixMode(GL_MODELVIEW);
-		_gl.LoadMatrixf(matrix.data());
+		static_cast<const GlTexture2D&>(texture).bind();
 	}
 
 	void GLRenderer::set_window_size_impl(const Size& size)

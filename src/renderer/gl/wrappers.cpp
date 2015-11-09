@@ -1,5 +1,6 @@
 #include "wrappers.h"
 
+#include <yttrium/matrix.h>
 #include <yttrium/string.h>
 
 #include <cassert>
@@ -97,6 +98,11 @@ namespace Yttrium
 		GLint link_status = GL_FALSE;
 		_gl.GetProgramiv(_handle, GL_LINK_STATUS, &link_status);
 		return GL_TRUE == link_status;
+	}
+
+	void GlProgramHandle::set_uniform(const char* name, const Matrix4& value) const
+	{
+		_gl.ProgramUniformMatrix4fvEXT(_handle, _gl.GetUniformLocation(_handle, name), 1, GL_FALSE, value.data());
 	}
 
 	GlShaderHandle::GlShaderHandle(const GlApi& gl, GLenum type)

@@ -17,6 +17,8 @@ void Model::draw(const Vector4& translation)
 	PushGpuProgram push_gpu_program(_renderer, _program.get());
 	PushTexture push_texture(_renderer, _texture.get());
 	PushTransformation push_transformation(_renderer, Matrix4::translation(translation));
+	_program->set_uniform("u_modelview", _renderer.current_transformation());
+	_program->set_uniform("u_projection", _renderer.current_projection());
 	_renderer.draw_triangles(*_vertices, *_indices);
 }
 
@@ -77,6 +79,34 @@ CubeModel::CubeModel(Renderer& renderer)
 	};
 
 	_indices = _renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data());
+
+	_program = _renderer.create_gpu_program(
+		"#version 150\n"
+		"#extension GL_ARB_explicit_attrib_location : enable\n" // TODO: Remove at #version 330.
+		"\n"
+		"layout(location = 0) in vec4 in_position;\n"
+		"layout(location = 1) in vec4 in_color;\n"
+		"\n"
+		"uniform mat4 u_modelview;\n"
+		"uniform mat4 u_projection;\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+			"gl_Position = u_projection * u_modelview * in_position;\n"
+			"color = in_color;\n"
+		"}\n",
+
+		"#version 150\n"
+		"\n"
+		"in vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+			"gl_FragColor = color;\n"
+		"}\n"
+	);
 }
 
 ChessboardModel::ChessboardModel(Renderer& renderer)
@@ -137,29 +167,39 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
 	_program = _renderer.create_gpu_program(
-		"#version 110\n"
-		""
-		"varying vec3 view_direction;"
-		"varying vec3 n;"
-		""
-		"void main()"
-		"{"
-			"view_direction = vec3(gl_ModelViewMatrix * gl_Vertex);"
-			"n = normalize(gl_NormalMatrix * gl_Normal);"
-			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
-			"gl_TexCoord[0] = gl_MultiTexCoord0;"
+		"#version 150\n"
+		"#extension GL_ARB_explicit_attrib_location : enable\n" // TODO: Remove at #version 330.
+		"\n"
+		"layout(location = 0) in vec4 in_position;\n"
+		"layout(location = 1) in vec2 in_texcoord;\n"
+		"layout(location = 2) in vec4 in_normal;\n"
+		"\n"
+		"uniform mat4 u_modelview;\n"
+		"uniform mat4 u_projection;\n"
+		"\n"
+		"out vec2 texcoord;\n"
+		"out vec3 view_direction;\n"
+		"out vec3 n;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+			"view_direction = vec3(u_modelview * in_position);\n"
+			"n = normalize(transpose(inverse(mat3(u_modelview))) * vec3(in_normal));\n"
+			"gl_Position = u_projection * u_modelview * in_position;\n"
+			"texcoord = in_texcoord;\n"
 		"}\n",
 
-		"#version 110\n"
+		"#version 150\n"
 		"\n"
-		"varying vec3 view_direction;\n"
-		"varying vec3 n;\n"
+		"in vec2 texcoord;\n"
+		"in vec3 view_direction;\n"
+		"in vec3 n;\n"
 		"\n"
 		"uniform sampler2D surface_texture;\n"
 		"\n"
 		"void main()\n"
 		"{"
-			"vec4 c = texture2D(surface_texture, gl_TexCoord[0].xy);\n"
+			"vec4 c = texture2D(surface_texture, texcoord.xy);\n"
 			"if (view_direction.x < 0.0)\n"
 			"{\n"
 				"float gray = dot(c.xyz, vec3(1.0, 1.0, 1.0));\n"

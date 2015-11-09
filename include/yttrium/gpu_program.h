@@ -6,12 +6,18 @@
 
 namespace Yttrium
 {
+	class Matrix4;
+	class StaticString;
+
 	/// GPU program.
 	class GpuProgram
 	{
 	public:
 
 		virtual ~GpuProgram() = default;
+
+		///
+		virtual void set_uniform(const StaticString& name, const Matrix4& value) = 0;
 	};
 }
 

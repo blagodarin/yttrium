@@ -38,7 +38,7 @@ namespace Yttrium
 			break;
 		}
 
-		_texture.bind();
+		_texture.bind(); // TODO: Separate texture binding and parameter modification.
 		_texture.set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		_texture.set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		_texture.set_parameter(GL_TEXTURE_MIN_FILTER, min_filter);

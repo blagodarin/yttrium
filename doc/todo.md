@@ -20,7 +20,6 @@
 		- Don't use ProxyAllocators inside the library except for the default allocator.
 	* Renderer:
 		- Pre-rendered text (i.e. pre-built geometry).
-		- Vertex attribute arrays.
 * Examples:
 	* Tetrium:
 		- Pack the data at build time.

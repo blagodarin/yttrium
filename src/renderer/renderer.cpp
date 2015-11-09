@@ -16,23 +16,36 @@
 namespace Yttrium
 {
 	const auto _vertex_shader_2d =
-		"#version 110\n"
+		"#version 150\n"
+		"#extension GL_ARB_explicit_attrib_location : enable\n" // TODO: Remove at #version 330.
+		""
+		"layout(location = 0) in vec2 in_position;"
+		"layout(location = 1) in vec4 in_color;"
+		"layout(location = 2) in vec2 in_texcoord;"
+		""
+		"uniform mat4 mvp;"
+		""
+		"out vec4 io_color;"
+		"out vec2 io_texcoord;"
 		""
 		"void main()"
 		"{"
-			"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
-			"gl_FrontColor = gl_Color;"
-			"gl_TexCoord[0] = gl_MultiTexCoord0;"
+			"gl_Position = mvp * vec4(in_position, 0, 1);"
+			"io_color = in_color;"
+			"io_texcoord = in_texcoord;"
 		"}"_s;
 
 	const auto _fragment_shader_2d =
-		"#version 110\n"
+		"#version 150\n"
+		""
+		"in vec4 io_color;"
+		"in vec2 io_texcoord;"
 		""
 		"uniform sampler2D surface_texture;"
 		""
 		"void main()"
 		"{"
-			"gl_FragColor = gl_Color * texture2D(surface_texture, gl_TexCoord[0].xy);"
+			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);"
 		"}"_s;
 
 	Pointer<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator& allocator)
@@ -177,6 +190,21 @@ namespace Yttrium
 		do_capture(text.size());
 	}
 
+	Matrix4 RendererImpl::current_projection() const
+	{
+		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
+			[](const auto& matrix) { return matrix.second == MatrixType::Projection; });
+		assert(last_projection != _matrix_stack.rend());
+		return last_projection->first;
+	}
+
+	Matrix4 RendererImpl::current_transformation() const
+	{
+		assert(!_matrix_stack.empty());
+		assert(_matrix_stack.back().second == MatrixType::Transformation);
+		return _matrix_stack.back().first;
+	}
+
 	void RendererImpl::set_color(const Vector4& color)
 	{
 		_color = color;
@@ -271,10 +299,8 @@ namespace Yttrium
 			return;
 		assert(_matrix_stack.back().second == MatrixType::Transformation);
 		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
-			[](const std::pair<Matrix4, MatrixType>& matrix) { return matrix.second == MatrixType::Projection; });
+			[](const auto& matrix) { return matrix.second == MatrixType::Projection; });
 		assert(last_projection != _matrix_stack.rend());
-		set_projection(last_projection->first);
-		set_transformation(_matrix_stack.back().first);
 	}
 
 	void RendererImpl::pop_texture()
@@ -298,7 +324,6 @@ namespace Yttrium
 		assert(_matrix_stack.back().second == MatrixType::Transformation);
 		_matrix_stack.pop_back();
 		assert(_matrix_stack.back().second == MatrixType::Transformation);
-		set_transformation(_matrix_stack.back().first);
 	}
 
 	void RendererImpl::push_program(const GpuProgram* program)
@@ -318,23 +343,19 @@ namespace Yttrium
 	{
 		flush_2d();
 		_matrix_stack.emplace_back(matrix, MatrixType::Projection);
-		set_projection(_matrix_stack.back().first);
 		_matrix_stack.emplace_back(Matrix4(), MatrixType::Transformation);
-		set_transformation(_matrix_stack.back().first);
 	}
 
 	void RendererImpl::push_projection_3d(const Matrix4& matrix)
 	{
 		flush_2d();
 		_matrix_stack.emplace_back(matrix, MatrixType::Projection);
-		set_projection(_matrix_stack.back().first);
 		// Make Y point forward and Z point up.
 		_matrix_stack.emplace_back(Matrix4(
 			1,  0,  0,  0,
 			0,  0,  1,  0,
 			0, -1,  0,  0,
 			0,  0,  0,  1), MatrixType::Transformation);
-		set_transformation(_matrix_stack.back().first);
 	}
 
 	void RendererImpl::push_texture(const Texture2D* texture)
@@ -357,7 +378,6 @@ namespace Yttrium
 	{
 		assert(_matrix_stack.size() >= 2 && _matrix_stack.back().second == MatrixType::Transformation);
 		_matrix_stack.emplace_back(_matrix_stack.back().first * matrix, MatrixType::Transformation);
-		set_transformation(_matrix_stack.back().first);
 	}
 
 	RendererImpl::Statistics RendererImpl::reset_statistics()
@@ -408,7 +428,7 @@ namespace Yttrium
 			if (texture != _current_texture)
 			{
 				_current_texture = texture;
-				set_texture(texture);
+				set_texture(*texture);
 				++_statistics._texture_switches;
 #if Y_IS_DEBUG
 				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
@@ -603,6 +623,7 @@ namespace Yttrium
 	{
 		if (!_vertices_2d.empty())
 		{
+			_program_2d->set_uniform("mvp", current_projection() * current_transformation());
 			flush_2d_impl(_vertices_2d, _indices_2d);
 			_vertices_2d.clear();
 			_indices_2d.clear();

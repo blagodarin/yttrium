@@ -25,11 +25,11 @@ namespace Yttrium
 #
 #	define GLFUNCTION(name, ret, attr) ret (__Y_GLAPI *name)attr;
 #	ifndef GLAPI_NO_DATA
-#		define GLINTEGER(name) GLint name;
+#		define GLINTEGER(name) GLint name = 0;
 #		define GLINTEGERV(name, count) GLint name[count];
-#		define GLFLOAT(name) GLfloat name;
+#		define GLFLOAT(name) GLfloat name = 0;
 #		define GLFLOATV(name, count) GLfloat name[count];
-#		define GLSTRING(name) const GLubyte* name;
+#		define GLSTRING(name) const GLubyte* name = nullptr;
 #	else
 #		define GLINTEGER(name)
 #		define GLINTEGERV(name, count)
@@ -37,7 +37,7 @@ namespace Yttrium
 #		define GLFLOATV(name, count)
 #		define GLSTRING(name)
 #	endif
-#	define GLEXTENSION(name) bool name;
+#	define GLEXTENSION(name) bool name = false;
 #	define GLEND
 #	define GLEXTFUNC(name, ret, attr) ret (__Y_GLAPI *name)attr;
 #
@@ -175,6 +175,10 @@ GLFUNCTION(TexParameterfv, GLvoid, (GLenum, GLenum, const GLfloat*))
 GLFUNCTION(TexParameteri, GLvoid, (GLenum, GLenum, GLint))
 GLFUNCTION(TexParameteriv, GLvoid, (GLenum, GLenum, const GLint*))
 GLFUNCTION(Viewport, GLvoid, (GLint, GLint, GLsizei, GLsizei))
+// EXT_direct_state_access
+GLFUNCTION(TextureImage2DEXT, void, (GLuint, GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void*))
+GLFUNCTION(TextureParameterfEXT, void, (GLuint, GLenum, GLenum, GLfloat))
+GLFUNCTION(TextureParameteriEXT, void, (GLuint, GLenum, GLenum, GLint))
 
 GLSTRING(EXTENSIONS)
 GLINTEGER(MAX_TEXTURE_SIZE)
@@ -239,6 +243,9 @@ GLFUNCTION(GetBufferSubData, void, (GLenum, GLintptr, GLsizeiptr, void*))
 GLFUNCTION(IsBuffer, GLboolean, (GLuint))
 GLFUNCTION(MapBuffer, void*, (GLenum, GLenum))
 GLFUNCTION(UnmapBuffer, GLboolean, (GLenum))
+// EXT_direct_state_access
+GLFUNCTION(NamedBufferDataEXT, void, (GLuint, GLsizeiptr, const void*, GLenum))
+GLFUNCTION(NamedBufferSubDataEXT, void, (GLuint, GLintptr, GLsizeiptr, const void*))
 
 // Non-deprecated OpenGL 2.0 API (partial).
 
@@ -248,28 +255,48 @@ GLFUNCTION(CreateProgram, GLuint, ())
 GLFUNCTION(CreateShader, GLuint, (GLenum))
 GLFUNCTION(DeleteProgram, void, (GLuint))
 GLFUNCTION(DeleteShader, void, (GLuint))
+GLFUNCTION(DisableVertexAttribArray, void, (GLuint))
+GLFUNCTION(EnableVertexAttribArray, void, (GLuint))
 GLFUNCTION(GetProgramiv, void, (GLuint, GLenum, GLint*))
 GLFUNCTION(GetProgramInfoLog, void, (GLuint, GLsizei, GLsizei*, GLchar*))
 GLFUNCTION(GetShaderiv, void, (GLuint, GLenum, GLint*))
 GLFUNCTION(GetShaderInfoLog, void, (GLuint, GLsizei, GLsizei*, GLchar*))
+GLFUNCTION(GetUniformLocation, GLint, (GLuint, const GLchar*))
 GLFUNCTION(LinkProgram, void, (GLuint))
 GLFUNCTION(ShaderSource, void, (GLuint, GLsizei, const GLchar**, const GLint*))
 GLFUNCTION(UseProgram, void, (GLuint))
+GLFUNCTION(VertexAttribPointer, void, (GLuint, GLint, GLenum, GLboolean, GLsizei, const void*))
+// EXT_direct_state_access
+GLFUNCTION(ProgramUniform1fEXT, void, (GLuint, GLint, GLfloat))
+GLFUNCTION(ProgramUniform2fEXT, void, (GLuint, GLint, GLfloat, GLfloat))
+GLFUNCTION(ProgramUniform3fEXT, void, (GLuint, GLint, GLfloat, GLfloat, GLfloat))
+GLFUNCTION(ProgramUniform4fEXT, void, (GLuint, GLint, GLfloat, GLfloat, GLfloat, GLfloat))
+GLFUNCTION(ProgramUniform1iEXT, void, (GLuint, GLint, GLint))
+GLFUNCTION(ProgramUniform2iEXT, void, (GLuint, GLint, GLint, GLint))
+GLFUNCTION(ProgramUniform3iEXT, void, (GLuint, GLint, GLint, GLint, GLint))
+GLFUNCTION(ProgramUniform4iEXT, void, (GLuint, GLint, GLint, GLint, GLint, GLint))
+GLFUNCTION(ProgramUniform1fvEXT, void, (GLuint, GLint, GLsizei, const GLfloat*))
+GLFUNCTION(ProgramUniform2fvEXT, void, (GLuint, GLint, GLsizei, const GLfloat*))
+GLFUNCTION(ProgramUniform3fvEXT, void, (GLuint, GLint, GLsizei, const GLfloat*))
+GLFUNCTION(ProgramUniform4fvEXT, void, (GLuint, GLint, GLsizei, const GLfloat*))
+GLFUNCTION(ProgramUniform1ivEXT, void, (GLuint, GLint, GLsizei, const GLint*))
+GLFUNCTION(ProgramUniform2ivEXT, void, (GLuint, GLint, GLsizei, const GLint*))
+GLFUNCTION(ProgramUniform3ivEXT, void, (GLuint, GLint, GLsizei, const GLint*))
+GLFUNCTION(ProgramUniform4ivEXT, void, (GLuint, GLint, GLsizei, const GLint*))
+GLFUNCTION(ProgramUniformMatrix2fvEXT, void, (GLuint, GLint, GLsizei, GLboolean, const GLfloat*))
+GLFUNCTION(ProgramUniformMatrix3fvEXT, void, (GLuint, GLint, GLsizei, GLboolean, const GLfloat*))
+GLFUNCTION(ProgramUniformMatrix4fvEXT, void, (GLuint, GLint, GLsizei, GLboolean, const GLfloat*))
 
-// Deprecated API entries still used in our renderer.
-// TODO: Remove deprecated OpenGL API entries.
+// Non-deprecated OpenGL 3.0 API (partial).
 
-GLFUNCTION(ColorPointer, void, (GLint, GLenum, GLsizei, const void*))
-GLFUNCTION(DisableClientState, void, (GLenum))
-GLFUNCTION(EnableClientState, void, (GLenum))
-GLFUNCTION(LoadMatrixf, void, (const GLfloat*))
-GLFUNCTION(MatrixMode, void, (GLenum))
-GLFUNCTION(NormalPointer, void, (GLenum, GLsizei, const void*))
-GLFUNCTION(TexCoordPointer, void, (GLint, GLenum, GLsizei, const void*))
-GLFUNCTION(VertexPointer, void, (GLint, GLenum, GLsizei, const void*))
+// EXT_direct_state_access
+GLFUNCTION(GenerateTextureMipmapEXT, void, (GLuint, GLenum))
 
 GLEXTENSION(ARB_texture_rectangle) // Core OpenGL 3.1 and higher.
 	GLINTEGER(MAX_RECTANGLE_TEXTURE_SIZE_ARB)
+	GLEND
+
+GLEXTENSION(ARB_explicit_attrib_location) // Core OpenGL 3.3 and higher.
 	GLEND
 
 GLEXTENSION(ARB_vertex_array_object) // Core OpenGL 2.0 and higher.
@@ -286,7 +313,7 @@ GLEXTENSION(ARB_vertex_attrib_binding) // Core OpenGL 4.3 and higher.
 	GLEXTFUNC(VertexAttribLFormat, void, (GLuint, GLint, GLenum, GLuint))
 	GLEXTFUNC(VertexAttribBinding, void, (GLuint, GLuint))
 	GLEXTFUNC(VertexBindingDivisor, void, (GLuint, GLuint))
-// NOTE: EXT_direct_state_access must be present for the following functions to exist.
+	// EXT_direct_state_access
 	GLEXTFUNC(VertexArrayBindVertexBufferEXT, void, (GLuint, GLuint, GLuint, GLintptr, GLsizei))
 	GLEXTFUNC(VertexArrayVertexAttribFormatEXT, void, (GLuint, GLuint, GLint, GLenum, GLboolean, GLuint))
 	GLEXTFUNC(VertexArrayVertexAttribIFormatEXT, void, (GLuint, GLuint, GLint, GLenum, GLuint))
@@ -319,13 +346,7 @@ GLEXTENSION(ARB_framebuffer_object) // Core OpenGL 3.0 and higher.
 	GLEND
 
 GLEXTENSION(EXT_direct_state_access)
-	GLEXTFUNC(GenerateTextureMipmapEXT, void, (GLuint, GLenum))
-	GLEXTFUNC(NamedBufferDataEXT, void, (GLuint, GLsizeiptr, const void*, GLenum))
-	GLEXTFUNC(NamedBufferSubDataEXT, void, (GLuint, GLintptr, GLsizeiptr, const void*))
-	GLEXTFUNC(TextureImage2DEXT, void, (GLuint, GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void*))
-	GLEXTFUNC(TextureParameterfEXT, void, (GLuint, GLenum, GLenum, GLfloat))
-	GLEXTFUNC(TextureParameteriEXT, void, (GLuint, GLenum, GLenum, GLint))
-// NOTE: This extension is intentionally incomplete due to its size and the fact that most its functions are not used.
+	// ...
 	GLEND
 
 GLEXTENSION(EXT_texture_filter_anisotropic)

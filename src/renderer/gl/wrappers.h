@@ -6,6 +6,7 @@
 namespace Yttrium
 {
 	class Allocator;
+	class Matrix4;
 	class StaticString;
 	class String;
 
@@ -44,6 +45,7 @@ namespace Yttrium
 		GLuint get() const { return _handle; }
 		String info_log(Allocator&) const;
 		bool link() const;
+		void set_uniform(const char*, const Matrix4&) const;
 
 		GlProgramHandle(const GlProgramHandle&) = delete;
 		GlProgramHandle& operator=(const GlProgramHandle&) = delete;

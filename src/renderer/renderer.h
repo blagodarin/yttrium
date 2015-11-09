@@ -36,6 +36,8 @@ namespace Yttrium
 		RendererImpl(Allocator& allocator);
 		~RendererImpl() override;
 
+		Matrix4 current_projection() const override;
+		Matrix4 current_transformation() const override;
 		void draw_rectangle(const RectF& rect) override;
 		void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
 		void draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture) override;
@@ -79,10 +81,8 @@ namespace Yttrium
 		virtual void flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices) = 0;
 		virtual bool initialize() = 0;
 		virtual void set_program(const GpuProgram*) = 0;
-		virtual void set_projection(const Matrix4&) = 0;
-		virtual void set_texture(const Texture2D*) = 0;
-		virtual void set_transformation(const Matrix4&) = 0;
-		virtual void set_window_size_impl(const Size& size) = 0;
+		virtual void set_texture(const Texture2D&) = 0;
+		virtual void set_window_size_impl(const Size&) = 0;
 
 		const BackendTexture2D* current_texture_2d() const;
 		void update_state();

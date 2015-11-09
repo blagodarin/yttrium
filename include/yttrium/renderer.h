@@ -67,6 +67,12 @@ namespace Yttrium
 		virtual Pointer<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;
 
 		///
+		virtual Matrix4 current_projection() const = 0;
+
+		///
+		virtual Matrix4 current_transformation() const = 0;
+
+		///
 		virtual void draw_rectangle(const RectF& rect) = 0;
 
 		///

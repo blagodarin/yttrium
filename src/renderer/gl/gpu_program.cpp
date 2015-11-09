@@ -1,6 +1,7 @@
 #include "gpu_program.h"
 
 #include <yttrium/log.h>
+#include "../../utils/zero_terminated.h"
 #include "renderer.h"
 
 namespace Yttrium
@@ -18,6 +19,12 @@ namespace Yttrium
 	GlGpuProgram::~GlGpuProgram()
 	{
 		_renderer.forget_program(this);
+	}
+
+	void GlGpuProgram::set_uniform(const StaticString& name, const Matrix4& value)
+	{
+		Y_ZERO_TERMINATED(name_z, name);
+		_program.set_uniform(name_z, value);
 	}
 
 	bool GlGpuProgram::link()

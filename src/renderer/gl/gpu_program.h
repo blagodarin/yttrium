@@ -19,6 +19,8 @@ namespace Yttrium
 		GlGpuProgram(RendererImpl& renderer, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl);
 		~GlGpuProgram() override;
 
+		void set_uniform(const StaticString&, const Matrix4&) override;
+
 		GLuint handle() const { return _program.get(); }
 		bool link();
 
