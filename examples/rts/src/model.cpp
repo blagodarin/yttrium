@@ -81,8 +81,7 @@ CubeModel::CubeModel(Renderer& renderer)
 	_indices = _renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data());
 
 	_program = _renderer.create_gpu_program(
-		"#version 150\n"
-		"#extension GL_ARB_explicit_attrib_location : enable\n" // TODO: Remove at #version 330.
+		"#version 330\n"
 		"\n"
 		"layout(location = 0) in vec4 in_position;\n"
 		"layout(location = 1) in vec4 in_color;\n"
@@ -167,8 +166,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
 	_program = _renderer.create_gpu_program(
-		"#version 150\n"
-		"#extension GL_ARB_explicit_attrib_location : enable\n" // TODO: Remove at #version 330.
+		"#version 330\n"
 		"\n"
 		"layout(location = 0) in vec4 in_position;\n"
 		"layout(location = 1) in vec2 in_texcoord;\n"

@@ -20,6 +20,7 @@ namespace Yttrium
 		: VertexBufferImpl(format, size, element_size, allocator)
 		, _buffer(std::move(buffer))
 	{
+		// TODO: Check for format support.
 	}
 
 	void GlVertexBuffer::write(size_t offset, size_t size, const void* data)

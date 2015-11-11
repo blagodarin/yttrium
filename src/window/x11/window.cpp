@@ -3,6 +3,8 @@
 #include <yttrium/point.h>
 #include <yttrium/pointer.h>
 #include <yttrium/static_string.h>
+#include "../../renderer/gl/version.h"
+#include "../gl.h"
 #include "screen.h"
 
 #include <cstring>
@@ -107,8 +109,8 @@ namespace Yttrium
 
 			const int context_attributes[] =
 			{
-				GLX_CONTEXT_MAJOR_VERSION_ARB, 1,
-				GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+				GLX_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
+				GLX_CONTEXT_MINOR_VERSION_ARB, Gl::required_minor,
 		#if Y_IS_DEBUG
 				GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 		#endif

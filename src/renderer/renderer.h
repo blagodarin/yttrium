@@ -31,7 +31,7 @@ namespace Yttrium
 			int _redundant_shader_switches = 0;
 		};
 
-		static Pointer<RendererImpl> create(WindowBackend& window, Allocator& allocator);
+		static Pointer<RendererImpl> create(WindowBackend&, Allocator&);
 
 		RendererImpl(Allocator& allocator);
 		~RendererImpl() override;
@@ -79,7 +79,6 @@ namespace Yttrium
 		};
 
 		virtual void flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices) = 0;
-		virtual bool initialize() = 0;
 		virtual void set_program(const GpuProgram*) = 0;
 		virtual void set_texture(const Texture2D&) = 0;
 		virtual void set_window_size_impl(const Size&) = 0;

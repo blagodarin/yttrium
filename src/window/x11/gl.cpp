@@ -4,11 +4,8 @@
 
 namespace Yttrium
 {
-	namespace Gl
+	GlAddress gl_address(const char* name)
 	{
-		Address address(WindowBackend&, const char* name)
-		{
-			return reinterpret_cast<Address>(::glXGetProcAddress(reinterpret_cast<const GLubyte*>(name)));
-		}
+		return ::glXGetProcAddress(reinterpret_cast<const GLubyte*>(name));
 	}
 }

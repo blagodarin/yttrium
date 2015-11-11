@@ -2,6 +2,7 @@
 * Library:
 	* Overall:
 		- Windows port.
+		- Get rid of exception-unsafe Y_NEW.
 	* GUI:
 		- Line editor widget.
 		- Layouts.
@@ -20,6 +21,7 @@
 		- Don't use ProxyAllocators inside the library except for the default allocator.
 	* Renderer:
 		- Pre-rendered text (i.e. pre-built geometry).
+		- OpenGL 3.3 compliance.
 * Examples:
 	* Tetrium:
 		- Pack the data at build time.

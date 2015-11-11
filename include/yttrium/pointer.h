@@ -92,7 +92,16 @@ namespace Yttrium
 	template <typename T, typename... Args>
 	Pointer<T> make_pointer(Allocator& allocator, Args&&... args)
 	{
-		return Pointer<T>(Y_NEW(&allocator, T)(std::forward<Args>(args)...), allocator);
+		const auto raw_pointer = allocator.allocate<T>();
+		try
+		{
+			return Pointer<T>(new(raw_pointer) T(std::forward<Args>(args)...), allocator);
+		}
+		catch (...)
+		{
+			allocator.deallocate(raw_pointer);
+			throw;
+		}
 	}
 }
 

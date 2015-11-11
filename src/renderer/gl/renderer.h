@@ -6,11 +6,11 @@
 
 namespace Yttrium
 {
-	class GLRenderer : public RendererImpl
+	class GlRenderer : public RendererImpl
 	{
 	public:
 
-		GLRenderer(WindowBackend& window, Allocator& allocator);
+		GlRenderer(Allocator& allocator);
 
 		// Renderer
 		Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
@@ -23,21 +23,19 @@ namespace Yttrium
 		void clear() override;
 		void take_screenshot(Image&) override;
 		void flush_2d_impl(const StdVector<Vertex2D>&, const StdVector<uint16_t>&) override;
-		bool initialize() override;
 		void set_program(const GpuProgram*) override;
 		void set_texture(const Texture2D&) override;
 		void set_window_size_impl(const Size&) override;
 
 	private:
 
-		bool check_min_version(int major, int minor);
 #if Y_IS_DEBUG
 		void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message) const;
 #endif
 
 	private:
 
-		GlApi _gl;
+		const GlApi _gl;
 	};
 }
 

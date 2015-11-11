@@ -1,10 +1,12 @@
 #include "window.h"
 
+#include <yttrium/log.h>
 #include <yttrium/matrix.h>
 #include <yttrium/timer.h>
 #include <yttrium/utils.h>
 #include "../gui/gui.h"
 #include "../renderer/debug_renderer.h"
+#include "../renderer/exception.h"
 #include "../renderer/renderer.h"
 
 namespace Yttrium
@@ -69,9 +71,15 @@ namespace Yttrium
 		if (!_backend)
 			return false;
 
-		_renderer = RendererImpl::create(*_backend, _allocator);
-		if (!_renderer)
+		try
+		{
+			_renderer = RendererImpl::create(*_backend, _allocator);
+		}
+		catch (const RendererError& e)
+		{
+			Log() << e.what();
 			return false;
+		}
 
 		_gui = make_pointer<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator);
 		return true;

@@ -15,13 +15,28 @@
 
 namespace Yttrium
 {
-	GLRenderer::GLRenderer(WindowBackend& window, Allocator& allocator)
+	GlRenderer::GlRenderer(Allocator& allocator)
 		: RendererImpl(allocator)
+		, _gl(allocator)
 	{
-		_gl.initialize(window);
+#if Y_IS_DEBUG
+		if (_gl.KHR_debug)
+		{
+			_gl.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			_gl.DebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* opaque)
+			{
+				static_cast<const GlRenderer*>(opaque)->debug_callback(source, type, id, severity, length, message);
+			}, this);
+		}
+#endif
+		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
+		_gl.Enable(GL_BLEND);
+		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		_gl.ClearColor(0.5, 0.5, 0.5, 0);
+		_gl.ClearDepth(1);
 	}
 
-	Pointer<GpuProgram> GLRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
+	Pointer<GpuProgram> GlRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
 	{
 		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
 		if (!vertex.compile(vertex_shader))
@@ -44,7 +59,7 @@ namespace Yttrium
 		return std::move(result);
 	}
 
-	Pointer<IndexBuffer> GLRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
+	Pointer<IndexBuffer> GlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
 	{
 		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
 		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
@@ -54,7 +69,7 @@ namespace Yttrium
 		return make_pointer<GlIndexBuffer>(allocator(), format, size, element_size, std::move(buffer), gl_format);
 	}
 
-	SharedPtr<Texture2D> GLRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
+	SharedPtr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
 		if (format.bits_per_channel() != 8)
 			return {};
@@ -97,6 +112,7 @@ namespace Yttrium
 		default:
 			return {};
 		}
+		// TODO: Remove deprecated LUMINANCE formats.
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
 		assert(is_power_of_2(format.row_alignment()) && format.row_alignment() <= 8); // OpenGL requirements.
@@ -107,15 +123,16 @@ namespace Yttrium
 		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, std::move(texture)));
 	}
 
-	Pointer<VertexBuffer> GLRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t size, const void* data)
+	Pointer<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t size, const void* data)
 	{
 		const auto element_size = VertexBufferImpl::element_size(format);
+		assert(element_size > 0);
 		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
 		return make_pointer<GlVertexBuffer>(allocator(), format, size, element_size, std::move(buffer), allocator());
 	}
 
-	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
+	void GlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
 	{
 		update_state();
 
@@ -172,12 +189,12 @@ namespace Yttrium
 		_gl.Disable(GL_DEPTH_TEST);
 	}
 
-	void GLRenderer::clear()
+	void GlRenderer::clear()
 	{
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	void GLRenderer::take_screenshot(Image& image)
+	void GlRenderer::take_screenshot(Image& image)
 	{
 		const auto& size = window_size();
 
@@ -192,53 +209,7 @@ namespace Yttrium
 		_gl.ReadBuffer(read_buffer);
 	}
 
-	bool GLRenderer::initialize()
-	{
-#if Y_IS_DEBUG
-		if (_gl.KHR_debug)
-		{
-			_gl.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			_gl.DebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* opaque)
-			{
-				static_cast<const GLRenderer*>(opaque)->debug_callback(source, type, id, severity, length, message);
-			}, this);
-		}
-#endif
-
-		if (!check_min_version(2, 0))
-			return false;
-
-		if (!_gl.ARB_explicit_attrib_location)
-		{
-			Log() << "OpenGL ARB_explicit_attrib_location extension must be present";
-			return false;
-		}
-
-		if (!_gl.ARB_framebuffer_object) // For glGenerateMipmap.
-		{
-			Log() << "OpenGL ARB_framebuffer_object extension must be present";
-			return false;
-		}
-
-		if (!_gl.EXT_direct_state_access)
-		{
-			Log() << "OpenGL EXT_direct_state_access extension must be present";
-			return false;
-		}
-
-		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
-		_gl.Enable(GL_TEXTURE_2D);
-		_gl.Enable(GL_BLEND);
-		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		_gl.Hint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-		_gl.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-		_gl.ClearColor(0.5, 0.5, 0.5, 0);
-		_gl.ClearDepth(1);
-
-		return true;
-	}
-
-	void GLRenderer::flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices)
+	void GlRenderer::flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices)
 	{
 		update_state();
 
@@ -263,35 +234,23 @@ namespace Yttrium
 		_gl.DisableVertexAttribArray(0);
 	}
 
-	void GLRenderer::set_program(const GpuProgram* program)
+	void GlRenderer::set_program(const GpuProgram* program)
 	{
 		_gl.UseProgram(program ? static_cast<const GlGpuProgram*>(program)->handle() : 0);
 	}
 
-	void GLRenderer::set_texture(const Texture2D& texture)
+	void GlRenderer::set_texture(const Texture2D& texture)
 	{
 		static_cast<const GlTexture2D&>(texture).bind();
 	}
 
-	void GLRenderer::set_window_size_impl(const Size& size)
+	void GlRenderer::set_window_size_impl(const Size& size)
 	{
 		_gl.Viewport(0, 0, size.width, size.height);
 	}
 
-	bool GLRenderer::check_min_version(int major, int minor)
-	{
-		// NOTE: I believe that the version number is in form "<one digit>.<one digit><anything>".
-		const int actual_major = _gl.VERSION[0] - '0';
-		const int actual_minor = _gl.VERSION[2] - '0';
-		if (actual_major > major || (actual_major == major && actual_minor >= minor))
-			return true;
-		Log() << "OpenGL "_s << dec(major) << "."_s << dec(minor) << " is required, but only OpenGL "_s
-			<< dec(actual_major) << "."_s << dec(actual_minor) << " is supported"_s;
-		return false;
-	}
-
 #if Y_IS_DEBUG
-	void GLRenderer::debug_callback(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar* message) const
+	void GlRenderer::debug_callback(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar* message) const
 	{
 		std::cerr << message << std::endl;
 	}

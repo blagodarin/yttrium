@@ -3,20 +3,16 @@
 
 #include <yttrium/global.h>
 
-#if Y_PLATFORM_POSIX
-	#include "x11/gl.h"
+#if Y_PLATFORM_WINDOWS
+	#error Not implemented.
+#else
+	#define __Y_GLAPI
 #endif
 
 namespace Yttrium
 {
-	class WindowBackend;
-
-	namespace Gl
-	{
-		typedef void (__Y_GLAPI *Address)();
-
-		Address address(WindowBackend& backend, const char* name);
-	}
+	using GlAddress = void(*)();
+	GlAddress gl_address(const char* name);
 }
 
 #endif

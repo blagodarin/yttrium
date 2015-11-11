@@ -3,56 +3,50 @@
 #include <yttrium/gpu_program.h>
 #include <yttrium/matrix.h>
 #include "debug_texture.h"
+#include "exception.h"
 #include "gl/renderer.h"
 #include "texture.h"
 
+#include <algorithm>
 #include <cassert>
-#include <stdexcept>
-
-#if Y_IS_DEBUG
-	#include <algorithm>
-#endif
 
 namespace Yttrium
 {
 	const auto _vertex_shader_2d =
-		"#version 150\n"
-		"#extension GL_ARB_explicit_attrib_location : enable\n" // TODO: Remove at #version 330.
-		""
-		"layout(location = 0) in vec2 in_position;"
-		"layout(location = 1) in vec4 in_color;"
-		"layout(location = 2) in vec2 in_texcoord;"
-		""
-		"uniform mat4 mvp;"
-		""
-		"out vec4 io_color;"
-		"out vec2 io_texcoord;"
-		""
-		"void main()"
-		"{"
-			"gl_Position = mvp * vec4(in_position, 0, 1);"
-			"io_color = in_color;"
-			"io_texcoord = in_texcoord;"
-		"}"_s;
+		"#version 330\n"
+		"\n"
+		"layout(location = 0) in vec2 in_position;\n"
+		"layout(location = 1) in vec4 in_color;\n"
+		"layout(location = 2) in vec2 in_texcoord;\n"
+		"\n"
+		"uniform mat4 mvp;\n"
+		"\n"
+		"out vec4 io_color;\n"
+		"out vec2 io_texcoord;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+			"gl_Position = mvp * vec4(in_position, 0, 1);\n"
+			"io_color = in_color;\n"
+			"io_texcoord = in_texcoord;\n"
+		"}\n"_s;
 
 	const auto _fragment_shader_2d =
-		"#version 150\n"
-		""
-		"in vec4 io_color;"
-		"in vec2 io_texcoord;"
-		""
-		"uniform sampler2D surface_texture;"
-		""
-		"void main()"
-		"{"
-			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);"
-		"}"_s;
+		"#version 330\n"
+		"\n"
+		"in vec4 io_color;\n"
+		"in vec2 io_texcoord;\n"
+		"\n"
+		"uniform sampler2D surface_texture;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
+		"}\n"_s;
 
-	Pointer<RendererImpl> RendererImpl::create(WindowBackend& window, Allocator& allocator)
+	Pointer<RendererImpl> RendererImpl::create(WindowBackend&, Allocator& allocator)
 	{
-		auto renderer = make_pointer<GLRenderer>(allocator, window, allocator);
-		if (!renderer->initialize())
-			return {};
+		auto renderer = make_pointer<GlRenderer>(allocator, allocator);
 
 		static const int32_t white_texture_data = -1;
 
@@ -63,7 +57,7 @@ namespace Yttrium
 		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
 		if (!renderer->_white_texture)
-			throw std::logic_error("Failed to initialize an internal texture");
+			throw RendererError("Failed to initialize an internal texture");
 		renderer->_white_texture->set_filter(Texture2D::NearestFilter);
 
 		ImageFormat debug_texture_format;
@@ -73,12 +67,12 @@ namespace Yttrium
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
-			throw std::logic_error("Failed to initialize an internal texture");
+			throw RendererError("Failed to initialize an internal texture");
 		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
 
 		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
 		if (!renderer->_program_2d)
-			throw std::logic_error("Failed to initialize an internal GPU program");
+			throw RendererError("Failed to initialize an internal GPU program");
 
 		return std::move(renderer);
 	}
