@@ -16,7 +16,7 @@ namespace Yttrium
 		Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
 		Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format, size_t, const void*) override;
 		SharedPtr<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
-		Pointer<VertexBuffer> create_vertex_buffer(unsigned format, size_t, const void*) override;
+		Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t, const void*) override;
 		void draw_triangles(const VertexBuffer&, const IndexBuffer&) override;
 
 		// RendererImpl

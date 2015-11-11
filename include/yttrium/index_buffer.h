@@ -1,5 +1,5 @@
 /// \file
-/// \brief Index buffers.
+/// \brief Index buffer.
 
 #ifndef _include_yttrium_index_buffer_h_
 #define _include_yttrium_index_buffer_h_
@@ -22,13 +22,13 @@ namespace Yttrium
 
 		virtual ~IndexBuffer() = default;
 
-		/// Return the index format.
+		/// Returns the index format.
 		virtual Format format() const = 0;
 
-		/// Return the number of elements in the buffer.
+		/// Returns the number of indices in the buffer.
 		virtual size_t size() const = 0;
 
-		/// Update the buffer contents.
+		/// Updates the buffer contents.
 		virtual void write(size_t offset, size_t size, const void* data) = 0;
 	};
 }

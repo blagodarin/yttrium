@@ -24,7 +24,7 @@ namespace Yttrium
 
 		const GlBufferHandle _buffer;
 
-		GlVertexBuffer(unsigned format, size_t size, size_t element_size, GlBufferHandle&& buffer);
+		GlVertexBuffer(std::initializer_list<VA>, size_t size, size_t element_size, GlBufferHandle&&, Allocator&);
 
 		void write(size_t offset, size_t size, const void* data) override;
 	};

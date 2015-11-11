@@ -8,6 +8,8 @@
 #include <yttrium/rect.h>
 #include <yttrium/types.h>
 
+#include <initializer_list>
+
 namespace Yttrium
 {
 	class GpuProgram;
@@ -22,6 +24,8 @@ namespace Yttrium
 
 	template <typename> class Pointer;
 	template <typename> class SharedPtr;
+
+	enum class VA;
 
 	///
 	/// \note Lifetimes of entities created by a renderer must not exceed the lifetime of the renderer.
@@ -64,7 +68,7 @@ namespace Yttrium
 		virtual SharedPtr<Texture2D> create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps = false) = 0;
 
 		///
-		virtual Pointer<VertexBuffer> create_vertex_buffer(unsigned format, size_t size, const void* data = nullptr) = 0;
+		virtual Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t size, const void* data = nullptr) = 0;
 
 		///
 		virtual Matrix4 current_projection() const = 0;

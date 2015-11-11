@@ -107,19 +107,12 @@ namespace Yttrium
 		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, std::move(texture)));
 	}
 
-	Pointer<VertexBuffer> GLRenderer::create_vertex_buffer(unsigned format, size_t size, const void* data)
+	Pointer<VertexBuffer> GLRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t size, const void* data)
 	{
-		size_t element_size = sizeof(float) * 4; // Geometry data.
-		if (format & VertexBuffer::Rgba4F)
-			element_size += sizeof(float) * 4;
-		if (format & VertexBuffer::Uv2F)
-			element_size += sizeof(float) * 2;
-		if (format & VertexBuffer::Normal4F)
-			element_size += sizeof(float) * 4;
-
+		const auto element_size = VertexBufferImpl::element_size(format);
 		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
 		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		return make_pointer<GlVertexBuffer>(allocator(), format, size, element_size, std::move(buffer));
+		return make_pointer<GlVertexBuffer>(allocator(), format, size, element_size, std::move(buffer), allocator());
 	}
 
 	void GLRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
@@ -134,37 +127,34 @@ namespace Yttrium
 
 		vertices._buffer.bind();
 
-		GLuint index = 0;
-		size_t offset = 0;
+		GLuint attribute_index = 0;
+		size_t attribute_offset = 0;
 
-		_gl.EnableVertexAttribArray(index);
-		_gl.VertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
-		index += 1;
-		offset += sizeof(float) * 4;
-
-		if (vertices.format() & VertexBuffer::Rgba4F)
+		while (attribute_index < vertices.format().size())
 		{
-			_gl.EnableVertexAttribArray(index);
-			_gl.VertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
-			index += 1;
-			offset += sizeof(float) * 4;
+			_gl.EnableVertexAttribArray(attribute_index);
+			switch (vertices.format()[attribute_index])
+			{
+			case VA::f:
+				_gl.VertexAttribPointer(attribute_index, 1, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
+				attribute_offset += sizeof(float);
+				break;
+			case VA::f2:
+				_gl.VertexAttribPointer(attribute_index, 2, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
+				attribute_offset += sizeof(float) * 2;
+				break;
+			case VA::f3:
+				_gl.VertexAttribPointer(attribute_index, 3, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
+				attribute_offset += sizeof(float) * 3;
+				break;
+			case VA::f4:
+				_gl.VertexAttribPointer(attribute_index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
+				attribute_offset += sizeof(float) * 4;
+				break;
+			}
+			++attribute_index;
 		}
-
-		if (vertices.format() & VertexBuffer::Uv2F)
-		{
-			_gl.EnableVertexAttribArray(index);
-			_gl.VertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
-			index += 1;
-			offset += sizeof(float) * 2;
-		}
-
-		if (vertices.format() & VertexBuffer::Normal4F)
-		{
-			_gl.EnableVertexAttribArray(index);
-			_gl.VertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(offset));
-			index += 1;
-			offset += sizeof(float) * 2;
-		}
+		assert(attribute_offset == vertices.element_size());
 
 		indices._buffer.bind();
 
@@ -174,13 +164,8 @@ namespace Yttrium
 
 		indices._buffer.unbind();
 
-		if (vertices.format() & VertexBuffer::Rgba4F)
-			_gl.DisableVertexAttribArray(--index);
-		if (vertices.format() & VertexBuffer::Uv2F)
-			_gl.DisableVertexAttribArray(--index);
-		if (vertices.format() & VertexBuffer::Normal4F)
-			_gl.DisableVertexAttribArray(--index);
-		_gl.DisableVertexAttribArray(--index);
+		while (attribute_index > 0)
+			_gl.DisableVertexAttribArray(--attribute_index);
 
 		vertices._buffer.unbind();
 

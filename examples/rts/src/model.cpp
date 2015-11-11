@@ -49,7 +49,7 @@ CubeModel::CubeModel(Renderer& renderer)
 		Vertex({+0.5, +0.5, +0.5}, {1, 1, 1}),
 	};
 
-	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Rgba4F, vertices.size(), vertices.data());
+	_vertices = _renderer.create_vertex_buffer({VA::f4, VA::f4}, vertices.size(), vertices.data());
 
 	const std::array<uint16_t, 36> indices =
 	{
@@ -136,7 +136,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 		Vertex( size / 2,  size / 2, 1, 1),
 	};
 
-	_vertices = _renderer.create_vertex_buffer(VertexBuffer::Uv2F | VertexBuffer::Normal4F, vertices.size(), vertices.data());
+	_vertices = _renderer.create_vertex_buffer({VA::f4, VA::f2, VA::f4}, vertices.size(), vertices.data());
 
 	const std::array<uint16_t, 6> indices =
 	{
