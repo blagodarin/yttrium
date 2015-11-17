@@ -16,15 +16,15 @@ namespace Yttrium
 		_buffer.write(_element_size * offset, _element_size * size, data);
 	}
 
-	GlVertexBuffer::GlVertexBuffer(std::initializer_list<VA> format, size_t size, size_t element_size, GlBufferHandle&& buffer, Allocator& allocator)
-		: VertexBufferImpl(format, size, element_size, allocator)
+	GlVertexBuffer::GlVertexBuffer(size_t count, size_t element_size, GlBufferHandle&& buffer, GlVertexArrayHandle&& vertex_array)
+		: VertexBufferImpl(count, element_size)
 		, _buffer(std::move(buffer))
+		, _vertex_array(std::move(vertex_array))
 	{
-		// TODO: Check for format support.
 	}
 
-	void GlVertexBuffer::write(size_t offset, size_t size, const void* data)
+	void GlVertexBuffer::write(size_t first, size_t count, const void* data)
 	{
-		_buffer.write(_element_size * offset, _element_size * size, data);
+		_buffer.write(_element_size * first, _element_size * count, data);
 	}
 }

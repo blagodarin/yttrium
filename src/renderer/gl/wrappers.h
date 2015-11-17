@@ -19,7 +19,9 @@ namespace Yttrium
 		~GlBufferHandle();
 
 		void bind() const;
-		void initialize(GLenum usage, size_t size, const void* data) const;
+		GLuint get() const { return _handle; }
+		void initialize(GLenum usage, size_t size, const void* data);
+		GLuint size() const { return _size; }
 		void unbind() const;
 		void write(size_t offset, size_t size, const void* data) const;
 
@@ -31,6 +33,7 @@ namespace Yttrium
 		const GlApi& _gl;
 		const GLenum _target;
 		GLuint _handle = 0;
+		GLuint _size = 0;
 	};
 
 	class GlProgramHandle
@@ -110,6 +113,13 @@ namespace Yttrium
 		GlVertexArrayHandle(GlVertexArrayHandle&&);
 		~GlVertexArrayHandle();
 
+		void bind() const;
+		void bind_vertex_buffer(GLuint binding, GLuint buffer, GLintptr offset, GLintptr stride);
+		void disable_vertex_attrib_arrays() const;
+		void enable_vertex_attrib_arrays() const;
+		void vertex_attrib_binding(GLuint attrib, GLuint binding);
+		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, GLuint offset);
+
 		GlVertexArrayHandle(const GlVertexArrayHandle&) = delete;
 		GlVertexArrayHandle& operator=(const GlVertexArrayHandle&) = delete;
 		GlVertexArrayHandle& operator=(GlVertexArrayHandle&&) = delete;
@@ -117,6 +127,7 @@ namespace Yttrium
 	private:
 		const GlApi& _gl;
 		GLuint _handle = 0;
+		uint32_t _attributes = 0;
 	};
 }
 

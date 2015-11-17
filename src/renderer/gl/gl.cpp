@@ -20,8 +20,11 @@ namespace Yttrium
 
 		Log() << "Renderer backend: OpenGL " << VERSION;
 
+		if (!ARB_vertex_attrib_binding)
+			throw RendererError("GL_ARB_vertex_attrib_binding extension must be present");
+
 		if (!EXT_direct_state_access)
-			throw RendererError("OpenGL EXT_direct_state_access extension must be present");
+			throw RendererError("GL_EXT_direct_state_access extension must be present");
 	}
 
 	bool GlApi::has_extension(const char* name) const

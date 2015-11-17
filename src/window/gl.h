@@ -6,12 +6,12 @@
 #if Y_PLATFORM_WINDOWS
 	#error Not implemented.
 #else
-	#define __Y_GLAPI
+	#define GLAPI_CALL
 #endif
 
 namespace Yttrium
 {
-	using GlAddress = void(*)();
+	using GlAddress = void(GLAPI_CALL *)();
 	GlAddress gl_address(const char* name);
 }
 

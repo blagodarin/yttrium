@@ -2,7 +2,7 @@
 #define _src_renderer_gl_renderer_h_
 
 #include "../renderer.h"
-#include "gl.h"
+#include "wrappers.h"
 
 namespace Yttrium
 {
@@ -34,8 +34,9 @@ namespace Yttrium
 #endif
 
 	private:
-
 		const GlApi _gl;
+		GlBufferHandle _2d_vbo;
+		GlVertexArrayHandle _2d_vao;
 	};
 }
 

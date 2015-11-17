@@ -24,11 +24,8 @@ namespace Yttrium
 
 		virtual ~VertexBuffer() = default;
 
-		/// Returns the number of vertices in the buffer.
-		virtual size_t size() const = 0;
-
 		/// Updates the buffer contents.
-		virtual void write(size_t offset, size_t size, const void* data) = 0;
+		virtual void write(size_t first, size_t count, const void* data) = 0;
 	};
 }
 

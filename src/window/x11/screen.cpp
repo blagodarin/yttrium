@@ -22,7 +22,7 @@ namespace Yttrium
 		return make_pointer<ScreenImpl>(allocator, std::move(display));
 	}
 
-	ScreenImpl::ScreenImpl(P_Display display)
+	ScreenImpl::ScreenImpl(P_Display&& display)
 		: _display(std::move(display))
 		, _screen(DefaultScreen(_display.get()))
 	{

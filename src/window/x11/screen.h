@@ -20,7 +20,7 @@ namespace Yttrium
 
 		static Pointer<ScreenImpl> open(Allocator&);
 
-		ScreenImpl(P_Display display);
+		ScreenImpl(P_Display&& display);
 		~ScreenImpl() override;
 
 		ScreenMode current_mode() const override;
@@ -30,7 +30,6 @@ namespace Yttrium
 		int screen() const { return _screen; }
 
 	private:
-
 		const P_Display _display;
 		const int _screen;
 	};

@@ -23,10 +23,11 @@ namespace Yttrium
 	public:
 
 		const GlBufferHandle _buffer;
+		const GlVertexArrayHandle _vertex_array;
 
-		GlVertexBuffer(std::initializer_list<VA>, size_t size, size_t element_size, GlBufferHandle&&, Allocator&);
+		GlVertexBuffer(size_t count, size_t element_size, GlBufferHandle&&, GlVertexArrayHandle&&);
 
-		void write(size_t offset, size_t size, const void* data) override;
+		void write(size_t first, size_t count, const void* data) override;
 	};
 }
 

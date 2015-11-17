@@ -18,6 +18,8 @@ namespace Yttrium
 	GlRenderer::GlRenderer(Allocator& allocator)
 		: RendererImpl(allocator)
 		, _gl(allocator)
+		, _2d_vbo(_gl, GL_ARRAY_BUFFER_ARB)
+		, _2d_vao(_gl)
 	{
 #if Y_IS_DEBUG
 		if (_gl.KHR_debug)
@@ -34,6 +36,14 @@ namespace Yttrium
 		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		_gl.ClearColor(0.5, 0.5, 0.5, 0);
 		_gl.ClearDepth(1);
+
+		_2d_vao.bind_vertex_buffer(0, _2d_vbo.get(), 0, sizeof(Vertex2D));
+		_2d_vao.vertex_attrib_binding(0, 0);
+		_2d_vao.vertex_attrib_format(0, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, position));
+		_2d_vao.vertex_attrib_binding(1, 0);
+		_2d_vao.vertex_attrib_format(1, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, color));
+		_2d_vao.vertex_attrib_binding(2, 0);
+		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
 	}
 
 	Pointer<GpuProgram> GlRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
@@ -59,14 +69,14 @@ namespace Yttrium
 		return std::move(result);
 	}
 
-	Pointer<IndexBuffer> GlRenderer::create_index_buffer(IndexBuffer::Format format, size_t size, const void* data)
+	Pointer<IndexBuffer> GlRenderer::create_index_buffer(IndexBuffer::Format format, size_t count, const void* data)
 	{
 		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
 		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
-		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		return make_pointer<GlIndexBuffer>(allocator(), format, size, element_size, std::move(buffer), gl_format);
+		buffer.initialize(GL_STATIC_DRAW_ARB, count * element_size, data);
+		return make_pointer<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
 	}
 
 	SharedPtr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
@@ -123,13 +133,45 @@ namespace Yttrium
 		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, std::move(texture)));
 	}
 
-	Pointer<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t size, const void* data)
+	Pointer<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)
 	{
-		const auto element_size = VertexBufferImpl::element_size(format);
-		assert(element_size > 0);
+		StdVector<VA> attributes(format, allocator());
+		assert(!attributes.empty());
+
+		GlVertexArrayHandle vertex_array(_gl);
+
+		GLuint index = 0;
+		size_t offset = 0;
+		for (const auto type : format)
+		{
+			vertex_array.vertex_attrib_binding(index, 0);
+			switch (type)
+			{
+			case VA::f:
+				vertex_array.vertex_attrib_format(index, 1, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float);
+				break;
+			case VA::f2:
+				vertex_array.vertex_attrib_format(index, 2, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float) * 2;
+				break;
+			case VA::f3:
+				vertex_array.vertex_attrib_format(index, 3, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float) * 3;
+				break;
+			case VA::f4:
+				vertex_array.vertex_attrib_format(index, 4, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float) * 4;
+				break;
+			}
+			++index;
+		}
+
 		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
-		buffer.initialize(GL_STATIC_DRAW_ARB, size * element_size, data);
-		return make_pointer<GlVertexBuffer>(allocator(), format, size, element_size, std::move(buffer), allocator());
+		buffer.initialize(GL_STATIC_DRAW_ARB, count * offset, data);
+		vertex_array.bind_vertex_buffer(0, buffer.get(), 0, offset);
+
+		return make_pointer<GlVertexBuffer>(allocator(), count, offset, std::move(buffer), std::move(vertex_array));
 	}
 
 	void GlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
@@ -142,49 +184,15 @@ namespace Yttrium
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
 
-		vertices._buffer.bind();
-
-		GLuint attribute_index = 0;
-		size_t attribute_offset = 0;
-
-		while (attribute_index < vertices.format().size())
-		{
-			_gl.EnableVertexAttribArray(attribute_index);
-			switch (vertices.format()[attribute_index])
-			{
-			case VA::f:
-				_gl.VertexAttribPointer(attribute_index, 1, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
-				attribute_offset += sizeof(float);
-				break;
-			case VA::f2:
-				_gl.VertexAttribPointer(attribute_index, 2, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
-				attribute_offset += sizeof(float) * 2;
-				break;
-			case VA::f3:
-				_gl.VertexAttribPointer(attribute_index, 3, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
-				attribute_offset += sizeof(float) * 3;
-				break;
-			case VA::f4:
-				_gl.VertexAttribPointer(attribute_index, 4, GL_FLOAT, GL_FALSE, vertices.element_size(), reinterpret_cast<void*>(attribute_offset));
-				attribute_offset += sizeof(float) * 4;
-				break;
-			}
-			++attribute_index;
-		}
-		assert(attribute_offset == vertices.element_size());
-
+		vertices._vertex_array.enable_vertex_attrib_arrays();
+		vertices._vertex_array.bind();
 		indices._buffer.bind();
-
 		_gl.DrawElements(GL_TRIANGLES, indices.size(), indices._gl_format, 0);
+		indices._buffer.unbind();
+		vertices._vertex_array.disable_vertex_attrib_arrays();
+
 		++_statistics._draw_calls;
 		_statistics._triangles += indices.size() / 3;
-
-		indices._buffer.unbind();
-
-		while (attribute_index > 0)
-			_gl.DisableVertexAttribArray(--attribute_index);
-
-		vertices._buffer.unbind();
 
 		_gl.Disable(GL_DEPTH_TEST);
 	}
@@ -213,25 +221,19 @@ namespace Yttrium
 	{
 		update_state();
 
-		_gl.EnableVertexAttribArray(0);
-		_gl.VertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), &vertices[0].position);
+		const auto buffer_size = vertices.size() * sizeof(Vertex2D);
+		if (buffer_size > _2d_vbo.size())
+			_2d_vbo.initialize(GL_STREAM_DRAW_ARB, buffer_size, vertices.data());
+		else
+			_2d_vbo.write(0, buffer_size, vertices.data());
 
-		_gl.EnableVertexAttribArray(1);
-		_gl.VertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), &vertices[0].color);
-
-		if (current_texture_2d())
-		{
-			_gl.EnableVertexAttribArray(2);
-			_gl.VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), &vertices[0].texture);
-		}
-
+		_2d_vao.enable_vertex_attrib_arrays();
+		_2d_vao.bind();
 		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, indices.data());
+		_2d_vao.disable_vertex_attrib_arrays();
+
 		++_statistics._draw_calls;
 		_statistics._triangles += indices.size() - 2;
-
-		_gl.DisableVertexAttribArray(2);
-		_gl.DisableVertexAttribArray(1);
-		_gl.DisableVertexAttribArray(0);
 	}
 
 	void GlRenderer::set_program(const GpuProgram* program)

@@ -17,12 +17,13 @@ namespace Yttrium
 			throw std::runtime_error("glGenBuffers failed");
 	}
 
-	GlBufferHandle::GlBufferHandle(GlBufferHandle&& handle)
-		: _gl(handle._gl)
-		, _target(handle._target)
-		, _handle(handle._handle)
+	GlBufferHandle::GlBufferHandle(GlBufferHandle&& buffer)
+		: _gl(buffer._gl)
+		, _target(buffer._target)
+		, _handle(buffer._handle)
+		, _size(buffer._size)
 	{
-		handle._handle = 0;
+		buffer._handle = 0;
 	}
 
 	GlBufferHandle::~GlBufferHandle()
@@ -36,9 +37,10 @@ namespace Yttrium
 		_gl.BindBuffer(_target, _handle);
 	}
 
-	void GlBufferHandle::initialize(GLenum usage, size_t size, const void* data) const
+	void GlBufferHandle::initialize(GLenum usage, size_t size, const void* data)
 	{
 		_gl.NamedBufferDataEXT(_handle, size, data, usage);
+		_size = size;
 	}
 
 	void GlBufferHandle::unbind() const
@@ -163,12 +165,12 @@ namespace Yttrium
 			throw std::runtime_error("glGenTextures failed");
 	}
 
-	GlTextureHandle::GlTextureHandle(GlTextureHandle&& handle)
-		: _gl(handle._gl)
-		, _target(handle._target)
-		, _handle(handle._handle)
+	GlTextureHandle::GlTextureHandle(GlTextureHandle&& texture)
+		: _gl(texture._gl)
+		, _target(texture._target)
+		, _handle(texture._handle)
 	{
-		handle._handle = 0;
+		texture._handle = 0;
 	}
 
 	GlTextureHandle::~GlTextureHandle()
@@ -214,12 +216,50 @@ namespace Yttrium
 	GlVertexArrayHandle::GlVertexArrayHandle(GlVertexArrayHandle&& vertex_array)
 		: _gl(vertex_array._gl)
 		, _handle(vertex_array._handle)
+		, _attributes(vertex_array._attributes)
 	{
+		vertex_array._handle = 0;
 	}
 
 	GlVertexArrayHandle::~GlVertexArrayHandle()
 	{
 		if (_handle)
 			_gl.DeleteVertexArrays(1, &_handle);
+	}
+
+	void GlVertexArrayHandle::bind() const
+	{
+		_gl.BindVertexArray(_handle);
+	}
+
+	void GlVertexArrayHandle::bind_vertex_buffer(GLuint binding, GLuint buffer, GLintptr offset, GLintptr stride)
+	{
+		_gl.VertexArrayBindVertexBufferEXT(_handle, binding, buffer, offset, stride);
+	}
+
+	void GlVertexArrayHandle::disable_vertex_attrib_arrays() const
+	{
+		for (GLuint i = 0; i < 32; ++i)
+			if (_attributes & (1 << i))
+				_gl.DisableVertexAttribArray(i);
+	}
+
+	void GlVertexArrayHandle::enable_vertex_attrib_arrays() const
+	{
+		for (GLuint i = 0; i < 32; ++i)
+			if (_attributes & (1 << i))
+				_gl.EnableVertexAttribArray(i);
+	}
+
+	void GlVertexArrayHandle::vertex_attrib_binding(GLuint attrib, GLuint binding)
+	{
+		_gl.VertexArrayVertexAttribBindingEXT(_handle, attrib, binding);
+	}
+
+	void GlVertexArrayHandle::vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, GLuint offset)
+	{
+		_gl.VertexArrayVertexAttribFormatEXT(_handle, attrib, size, type, normalized, offset);
+		assert(attrib < 32);
+		_attributes |= 1 << attrib;
 	}
 }

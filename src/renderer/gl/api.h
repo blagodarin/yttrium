@@ -13,7 +13,7 @@
 	#define GLEND
 	#define GLEXTENSION(name) bool name = false;
 	#define GLFLOAT(name) GLfloat name = 0;
-	#define GLFUNCTION(name, ret, attr) ret (__Y_GLAPI *name)attr = nullptr;
+	#define GLFUNCTION(name, ret, attr) ret (GLAPI_CALL *name)attr = nullptr;
 	#define GLINTEGER(name) GLint name = 0;
 	#define GLINTEGERV(name, count) GLint name[count] = {};
 	#define GLSTRING(name) const char* name = nullptr;

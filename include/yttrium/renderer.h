@@ -62,13 +62,13 @@ namespace Yttrium
 		virtual Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
 
 		///
-		virtual Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t size, const void* data = nullptr) = 0;
+		virtual Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual SharedPtr<Texture2D> create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps = false) = 0;
 
 		///
-		virtual Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t size, const void* data = nullptr) = 0;
+		virtual Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual Matrix4 current_projection() const = 0;
