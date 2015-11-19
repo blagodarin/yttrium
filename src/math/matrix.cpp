@@ -1,7 +1,7 @@
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
 
-#include <yttrium/size.h>
-#include <yttrium/vector.h>
+#include <yttrium/math/size.h>
+#include <yttrium/math/vector.h>
 
 #include <cassert>
 #include <cmath>
@@ -40,13 +40,13 @@ namespace Yttrium
 
 	Matrix4 Matrix4::projection_2d(const Size& size, float near, float far)
 	{
-		assert(size.width > 0 && size.height > 0 && far > near);
+		assert(size.width() > 0 && size.height() > 0 && far > near);
 
 		const auto left = 0.f;
 		const auto top = 0.f;
 
-		const auto m00 = 2.f / size.width;
-		const auto m11 = -2.f / size.height;
+		const auto m00 = 2.f / size.width();
+		const auto m11 = -2.f / size.height();
 		const auto m22 = 2 / (near - far);
 		const auto m03 = -1 - m00 * left;
 		const auto m13 = 1 - m11 * top;
@@ -55,10 +55,11 @@ namespace Yttrium
 		return Matrix4(m00, 0, 0, m03, 0, m11, 0, m13, 0, 0, m22, m23, 0, 0, 0, 1);
 	}
 
-	Matrix4 Matrix4::perspective(float aspect, float vertical_fov, float near, float far)
+	Matrix4 Matrix4::perspective(const Size& size, float vertical_fov, float near, float far)
 	{
-		assert(aspect > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
+		assert(size.width() > 0 && size.height() > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
 
+		const float aspect = static_cast<float>(size.width()) / size.height();
 		const float fov_radians = vertical_fov / 180 * M_PI;
 
 		const auto f = 1 / ::tan(fov_radians / 2);

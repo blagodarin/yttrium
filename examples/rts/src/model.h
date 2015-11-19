@@ -11,13 +11,11 @@ using namespace Yttrium;
 class Model
 {
 public:
-
-	Model(Renderer&);
+	Model(Renderer& renderer): _renderer(renderer) {}
 
 	void draw(const Vector4& translation);
 
 protected:
-
 	Renderer& _renderer;
 	Pointer<VertexBuffer> _vertices;
 	Pointer<IndexBuffer> _indices;
@@ -28,14 +26,12 @@ protected:
 class CubeModel : public Model
 {
 public:
-
 	CubeModel(Renderer&);
 };
 
 class ChessboardModel : public Model
 {
 public:
-
 	ChessboardModel(Renderer&);
 };
 

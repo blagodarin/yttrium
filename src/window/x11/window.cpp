@@ -1,6 +1,6 @@
 #include "window.h"
 
-#include <yttrium/point.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/pointer.h>
 #include <yttrium/static_string.h>
 #include "../../renderer/gl/version.h"
@@ -17,10 +17,10 @@ namespace Yttrium
 		{
 			::XSizeHints size_hints;
 			::memset(&size_hints, 0, sizeof size_hints);
-			size_hints.min_width = size.width;
-			size_hints.min_height = size.height;
-			size_hints.max_width = size.width;
-			size_hints.max_height = size.height;
+			size_hints.min_width = size.width();
+			size_hints.min_height = size.height();
+			size_hints.max_width = size.width();
+			size_hints.max_height = size.height();
 			size_hints.flags = PMinSize | PMaxSize;
 			::XSetWMNormalHints(display, window, &size_hints);
 		}
@@ -120,6 +120,7 @@ namespace Yttrium
 			// The actual context creation is wrapped in error handling code as advised
 			// by the official OpenGL context creation tutorial. The tutorial also warns
 			// that X error handling is global and not thread-safe.
+			error_occurred = false;
 			const auto old_error_handler = ::XSetErrorHandler(error_handler);
 			glx_context = glXCreateContextAttribsARB(display, best_fbc, nullptr, True, context_attributes);
 			::XSync(display, False); // To ensure any errors generated are processed.
@@ -139,7 +140,7 @@ namespace Yttrium
 				swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
 
 				window = ::XCreateWindow(display, root_window,
-					0, 0, size.width, size.height, 0, best_vi->depth, InputOutput, best_vi->visual,
+					0, 0, size.width(), size.height(), 0, best_vi->depth, InputOutput, best_vi->visual,
 					CWBorderPixel | CWColormap | CWEventMask, &swa);
 
 				if (window != None)
@@ -249,17 +250,25 @@ namespace Yttrium
 		}
 	}
 
-	WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, const Size& size, Callbacks& callbacks)
+	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, const Size& size, WindowBackendCallbacks& callbacks)
+	{
+		::Window window_handle;
+		::GLXContext glx_context;
+		if (!initialize_window(screen.display(), screen.screen(), size, window_handle, glx_context))
+			return {};
+		return make_pointer<WindowBackend>(allocator, screen.display(), window_handle, glx_context, size, callbacks);
+	}
+
+	WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, const Size& size, WindowBackendCallbacks& callbacks)
 		: _display(display)
 		, _window(window)
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
 		, _glx_context(glx_context)
-		, _size(size)
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
-		fix_window_size(_display, _window, _size);
+		fix_window_size(_display, _window, size);
 	}
 
 	WindowBackend::~WindowBackend()
@@ -294,8 +303,7 @@ namespace Yttrium
 		if (!::XQueryPointer(_display, _window, &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
-		cursor.x = window_x;
-		cursor.y = window_y;
+		cursor = {window_x, window_y};
 
 		return true;
 	}
@@ -306,7 +314,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool WindowBackend::put(int left, int top, int width, int height, bool border)
+	bool WindowBackend::put(const Rect& rect, bool border)
 	{
 		if (_window == None)
 			return false;
@@ -315,10 +323,9 @@ namespace Yttrium
 		attributes.override_redirect = border ? False : True;
 
 		::XChangeWindowAttributes(_display, _window, CWOverrideRedirect, &attributes);
-		::XMoveResizeWindow(_display, _window, left, top, width, height);
+		::XMoveResizeWindow(_display, _window, rect.left(), rect.top(), rect.width(), rect.height());
 
-		_size = Size(width, height);
-		fix_window_size(_display, _window, _size);
+		fix_window_size(_display, _window, rect.size());
 
 		return true;
 	}
@@ -430,7 +437,7 @@ namespace Yttrium
 	{
 		if (_window == None)
 			return false;
-		::XWarpPointer(_display, None, _window, 0, 0, 0, 0, cursor.x, cursor.y);
+		::XWarpPointer(_display, None, _window, 0, 0, 0, 0, cursor.x(), cursor.y());
 		return true;
 	}
 
@@ -452,14 +459,5 @@ namespace Yttrium
 		if (_window == None)
 			return;
 		::glXSwapBuffers(_display, _window);
-	}
-
-	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, const Size& size, Callbacks& callbacks)
-	{
-		::Window window_handle;
-		::GLXContext glx_context;
-		if (!initialize_window(screen.display(), screen.screen(), size, window_handle, glx_context))
-			return {};
-		return make_pointer<WindowBackend>(allocator, screen.display(), window_handle, glx_context, size, callbacks);
 	}
 }

@@ -18,7 +18,7 @@ namespace Yttrium
 
 	private:
 
-		Vector2            _position;
+		PointF             _position;
 		ForegroundProperty _foreground;
 		unsigned           _alignment = 0;
 		mutable String     _final_text;

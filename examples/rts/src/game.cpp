@@ -2,7 +2,7 @@
 
 #include <yttrium/date_time.h>
 #include <yttrium/gui.h>
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
 #include <yttrium/renderer.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
@@ -132,11 +132,7 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 	if (name != "main")
 		return;
 
-	const auto& window_size = renderer.window_size();
-	Push3D projection(renderer,
-		Matrix4::perspective(static_cast<float>(window_size.width) / window_size.height,
-			60,       // Vertical FOV angle in degrees.
-			1, 100)); // Near/far plane distance.
+	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 60, 1, 100));
 
 	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
 

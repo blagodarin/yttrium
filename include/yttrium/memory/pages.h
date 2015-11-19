@@ -15,8 +15,11 @@ namespace Yttrium
 	{
 	public:
 
+		///
+		PageAllocation() = default;
+
 		/// Creates an allocation of no less than the specified size.
-		PageAllocation(size_t min_size);
+		explicit PageAllocation(size_t min_size);
 
 		/// Returns the pointer to the allocated data.
 		void* data() noexcept { return _data; }
@@ -33,10 +36,9 @@ namespace Yttrium
 		~PageAllocation() noexcept;
 		PageAllocation& operator=(const PageAllocation&) = delete;
 		PageAllocation& operator=(PageAllocation&&) noexcept;
-
 	private:
-		size_t _size;
-		void* _data;
+		size_t _size = 0;
+		void* _data = nullptr;
 	};
 }
 

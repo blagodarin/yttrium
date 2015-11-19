@@ -46,14 +46,14 @@ namespace Yttrium
 		_texture.set_anisotropy_enabled(_filter & Texture2D::AnisotropicFilter);
 	}
 
-	Vector2 GlTexture2D::map(const Vector2& coords) const
+	PointF GlTexture2D::map(const PointF& coords) const
 	{
-		auto x = coords.x;
-		auto y = coords.y;
+		auto x = coords.x();
+		auto y = coords.y();
 		if (_orientation == ImageOrientation::XLeftYDown || _orientation == ImageOrientation::XLeftYUp)
-			x = _size.width - x;
+			x = _size.width() - x;
 		if (_orientation == ImageOrientation::XRightYUp || _orientation == ImageOrientation::XLeftYUp)
-			y = _size.height - y;
-		return Vector2(x / _size.width, y / _size.height);
+			y = _size.height() - y;
+		return {x / _size.width(), y / _size.height()};
 	}
 }

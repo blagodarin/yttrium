@@ -4,6 +4,8 @@
 #include <yttrium/window.h>
 
 #include <yttrium/image.h>
+#include <yttrium/math/point.h>
+#include <yttrium/math/size.h>
 #include <yttrium/pointer.h>
 #include "backend.h"
 #include "console.h"
@@ -12,9 +14,10 @@ namespace Yttrium
 {
 	class GuiImpl;
 	class RendererImpl;
-	class Screen;
+	class ScreenImpl;
+	class WindowBackend;
 
-	class WindowImpl : public Window, private WindowBackend::Callbacks
+	class WindowImpl : public Window, private WindowBackendCallbacks
 	{
 	public:
 
@@ -47,7 +50,7 @@ namespace Yttrium
 
 	private:
 
-		// WindowBackend::Callbacks
+		// WindowBackendCallbacks
 		void on_focus_event(bool is_focused) override;
 		void on_key_event(Key key, bool is_pressed) override;
 
@@ -63,11 +66,11 @@ namespace Yttrium
 		Pointer<ScreenImpl>    _screen;
 		Pointer<WindowBackend> _backend;
 		Pointer<RendererImpl>  _renderer;
-		bool                   _is_active;
+		bool                   _is_active = false;
 		Point                  _cursor;
-		bool                   _is_cursor_locked;
+		bool                   _is_cursor_locked = false;
 		Size                   _size;
-		Mode                   _mode;
+		bool                   _fullscreen = false;
 		bool                   _keys[KeyCount];
 		Console                _console;
 		bool                   _console_visible = false;

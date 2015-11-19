@@ -12,7 +12,7 @@ namespace Yttrium
 	class IonObject;
 	class IonValue;
 	class StaticString;
-	class Vector2;
+	class PointF;
 
 	/// ION facilities.
 	namespace Ion
@@ -21,7 +21,7 @@ namespace Yttrium
 		Y_API void append(IonObject& target, const IonNode& source);
 
 		///
-		Y_API bool get(const IonValue& source, Vector2& value);
+		Y_API bool get(const IonValue& source, PointF& value);
 
 		///
 		Y_API bool get(const IonNode& source, const StaticString*& value);

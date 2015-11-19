@@ -5,7 +5,7 @@
 #define _include_yttrium_texture_font_h_
 
 #include <yttrium/base.h>
-#include <yttrium/rect.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/types.h>
 
 namespace Yttrium
@@ -44,7 +44,7 @@ namespace Yttrium
 		Size text_size(const StaticString& text) const;
 
 		///
-		Vector2 text_size(const StaticString& text, const Vector2& font_size) const;
+		SizeF text_size(const StaticString& text, const SizeF& font_size) const;
 
 	private:
 		Y_SHARED_PRIVATE(TextureFont);

@@ -1,13 +1,17 @@
 #include "window.h"
 
 #include <yttrium/log.h>
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
 #include <yttrium/timer.h>
-#include <yttrium/utils.h>
 #include "../gui/gui.h"
 #include "../renderer/debug_renderer.h"
 #include "../renderer/exception.h"
 #include "../renderer/renderer.h"
+
+#if Y_PLATFORM_POSIX
+	#include "x11/screen.h"
+	#include "x11/window.h"
+#endif
 
 namespace Yttrium
 {
@@ -39,10 +43,7 @@ namespace Yttrium
 		: _script_context(script_context)
 		, _callbacks(callbacks)
 		, _allocator(allocator)
-		, _is_active(false)
-		, _is_cursor_locked(false)
 		, _size(640, 480)
-		, _mode(Windowed)
 		, _console(_script_context, _allocator)
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(&_allocator)
@@ -130,7 +131,7 @@ namespace Yttrium
 		_is_cursor_locked = lock;
 		if (lock && _is_active)
 		{
-			_cursor = Point(_size.width / 2, _size.height / 2);
+			_cursor = Rect(_size).center();
 			_backend->set_cursor(_cursor);
 		}
 	}
@@ -199,14 +200,8 @@ namespace Yttrium
 
 	bool WindowImpl::set_cursor(const Point& cursor)
 	{
-		if (_is_cursor_locked
-			|| cursor.x < 0 || cursor.x >= _size.width
-			|| cursor.y < 0 || cursor.y >= _size.height
-			|| !_backend->set_cursor(cursor))
-		{
+		if (_is_cursor_locked || !Rect(_size).contains(cursor) || !_backend->set_cursor(cursor))
 			return false;
-		}
-
 		_cursor = cursor;
 		return true;
 	}
@@ -225,42 +220,35 @@ namespace Yttrium
 	{
 		_size = size;
 		if (_is_active)
-			show(_mode);
+			show(_fullscreen ? Fullscreen : Windowed);
 	}
 
 	void WindowImpl::show(Mode mode)
 	{
-		Point top_left;
-
-		_mode = mode;
-
-		if (_mode == Fullscreen)
+		_fullscreen = mode == Fullscreen;
+		if (_fullscreen)
 		{
 			// TODO: Set display mode here.
-			const ScreenMode& screen_mode = _screen->current_mode();
-			_size.width = screen_mode.width;
-			_size.height = screen_mode.height;
-			top_left = Point(0, 0);
 		}
 		else
 		{
 			// TODO: Restore display mode here.
-			const ScreenMode& screen_mode = _screen->current_mode();
-			_size.width = min(_size.width, screen_mode.width);
-			_size.height = min(_size.height, screen_mode.height);
-			top_left = Point((screen_mode.width - _size.width) / 2, (screen_mode.height - _size.height) / 2);
 		}
 
-		_backend->put(top_left.x, top_left.y, _size.width, _size.height, _mode != Fullscreen);
+		const Rect screen_rect(_screen->current_mode().resolution);
+		const auto& window_rect = _fullscreen ? screen_rect : Rect(_size).centered_at(screen_rect).intersected(screen_rect);
+
+		_size = window_rect.size();
+
+		_backend->put(window_rect, !_fullscreen);
 		_renderer->set_window_size(_size);
 		_backend->show();
 
 		if (!_is_cursor_locked)
 		{
-			Point cursor(_size.width / 2, _size.height / 2);
+			auto cursor = Rect(_size).center();
 			_backend->get_cursor(cursor);
-			_cursor.x = min(max(cursor.x, 0), _size.width - 1);
-			_cursor.y = min(max(cursor.y, 0), _size.height - 1);
+			_cursor = Rect(_size).bound(cursor);
 		}
 		else
 		{
@@ -366,20 +354,15 @@ namespace Yttrium
 		if (!_is_active)
 			return true;
 
-		Point cursor(_size.width / 2, _size.height / 2);
+		Point cursor = Rect(_size).center();
 		_backend->get_cursor(cursor);
 
-		const Point movement(_cursor.x - cursor.x, cursor.y - _cursor.y);
+		const Point movement(_cursor.x() - cursor.x(), cursor.y() - _cursor.y());
 
 		if (!_is_cursor_locked)
-		{
-			_cursor.x = min(max(cursor.x, 0), _size.width - 1);
-			_cursor.y = min(max(cursor.y, 0), _size.height - 1);
-		}
+			_cursor = Rect(_size).bound(cursor);
 		else
-		{
 			_backend->set_cursor(_cursor);
-		}
 
 		_callbacks.on_cursor_movement(movement);
 

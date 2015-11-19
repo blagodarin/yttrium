@@ -115,8 +115,7 @@ namespace Yttrium
 
 		void bind() const;
 		void bind_vertex_buffer(GLuint binding, GLuint buffer, GLintptr offset, GLintptr stride);
-		void disable_vertex_attrib_arrays() const;
-		void enable_vertex_attrib_arrays() const;
+		void unbind() const;
 		void vertex_attrib_binding(GLuint attrib, GLuint binding);
 		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, GLuint offset);
 

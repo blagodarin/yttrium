@@ -1,11 +1,15 @@
 #ifndef _src_window_backend_h_
 #define _src_window_backend_h_
 
-#include <yttrium/global.h>
+namespace Yttrium
+{
+	class WindowBackendCallbacks
+	{
+	public:
 
-#if Y_PLATFORM_POSIX
-	#include "x11/screen.h"
-	#include "x11/window.h"
-#endif
+		virtual void on_focus_event(bool is_focused) = 0;
+		virtual void on_key_event(Key key, bool is_pressed) = 0;
+	};
+}
 
 #endif

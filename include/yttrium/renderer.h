@@ -5,7 +5,7 @@
 #define _include_yttrium_renderer_h_
 
 #include <yttrium/index_buffer.h>
-#include <yttrium/rect.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/types.h>
 
 #include <initializer_list>
@@ -32,7 +32,6 @@ namespace Yttrium
 	class Renderer
 	{
 	public:
-
 		///
 		struct TextCapture
 		{
@@ -83,7 +82,7 @@ namespace Yttrium
 		virtual void draw_rectangle(const RectF& rect, const RectF& texture_rect) = 0;
 
 		///
-		virtual void draw_text(const Vector2& position, const StaticString& text,
+		virtual void draw_text(const PointF& position, const StaticString& text,
 			unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) = 0;
 
 		///
@@ -96,13 +95,10 @@ namespace Yttrium
 		virtual bool set_font(const TextureFont& font) = 0;
 
 		///
-		virtual void set_font_size(const Vector2& size) = 0;
+		virtual void set_font_size(const SizeF& size) = 0;
 
 		///
-		void set_font_size(float y_size, float x_scaling = 1)
-		{
-			set_font_size(Vector2(x_scaling, y_size));
-		}
+		void set_font_size(float y_size, float x_scaling = 1) { set_font_size({x_scaling, y_size}); }
 
 		///
 		virtual bool set_texture_borders(const Margins& borders) = 0;
@@ -111,13 +107,7 @@ namespace Yttrium
 		virtual void set_texture_rectangle(const RectF& rect) = 0;
 
 		///
-		void set_texture_rectangle(float x, float y, float width, float height)
-		{
-			set_texture_rectangle(RectF(x, y, width, height));
-		}
-
-		///
-		virtual Vector2 text_size(const StaticString& text) const = 0;
+		virtual SizeF text_size(const StaticString& text) const = 0;
 
 		///
 		virtual Size window_size() const = 0;
@@ -127,9 +117,8 @@ namespace Yttrium
 	class Y_API Push2D
 	{
 	public:
-
 		///
-		Push2D(Renderer& renderer);
+		Push2D(Renderer&);
 
 		///
 		~Push2D();
@@ -144,9 +133,8 @@ namespace Yttrium
 	class Y_API Push3D
 	{
 	public:
-
 		///
-		Push3D(Renderer& renderer, const Matrix4& projection);
+		Push3D(Renderer&, const Matrix4&);
 
 		///
 		~Push3D();
@@ -161,7 +149,6 @@ namespace Yttrium
 	class Y_API PushGpuProgram
 	{
 	public:
-
 		///
 		PushGpuProgram(Renderer&, const GpuProgram*);
 
@@ -178,9 +165,8 @@ namespace Yttrium
 	class Y_API PushTexture
 	{
 	public:
-
 		///
-		PushTexture(Renderer& renderer, const Texture2D* texture);
+		PushTexture(Renderer&, const Texture2D*);
 
 		///
 		~PushTexture();
@@ -195,12 +181,11 @@ namespace Yttrium
 	class Y_API PushTransformation
 	{
 	public:
-
 		/// Multiplies the current transformation matrix by the specified one,
 		/// pushes it to the transformation stack and applies the resulting transformation.
-		PushTransformation(Renderer& renderer, const Matrix4& matrix);
+		PushTransformation(Renderer&, const Matrix4&);
 
-		/// Pops a matrix from the transformation stack and applies the next matrix.
+		/// Pops a matrix from the transformation stack and applies the previous matrix.
 		~PushTransformation();
 
 		PushTransformation(const PushTransformation&) = delete;

@@ -126,6 +126,18 @@ namespace Yttrium
 		return true;
 	}
 
+	String File::to_string()
+	{
+		if (_private && (_private->_mode & Read))
+		{
+			String result(_private->_allocator);
+			result.resize(min<uint64_t>(size(), SIZE_MAX - 1)); // TODO: See above.
+			if (read(result.text(), result.size()))
+				return result;
+		}
+		return {};
+	}
+
 	File::File(Private* private_, uint64_t base, uint64_t size)
 		: _private(Private::copy(private_))
 		, _offset(0)

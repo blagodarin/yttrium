@@ -1,16 +1,13 @@
 #include "model.h"
 
+#include <yttrium/file.h>
 #include <yttrium/image.h>
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
+#include <yttrium/string.h>
 #include <yttrium/vertex_buffer.h>
 
 #include <array>
 #include <vector>
-
-Model::Model(Renderer& renderer)
-	: _renderer(renderer)
-{
-}
 
 void Model::draw(const Vector4& translation)
 {
@@ -81,31 +78,8 @@ CubeModel::CubeModel(Renderer& renderer)
 	_indices = _renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data());
 
 	_program = _renderer.create_gpu_program(
-		"#version 330\n"
-		"\n"
-		"layout(location = 0) in vec4 in_position;\n"
-		"layout(location = 1) in vec4 in_color;\n"
-		"\n"
-		"uniform mat4 u_modelview;\n"
-		"uniform mat4 u_projection;\n"
-		"\n"
-		"out vec4 color;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-			"gl_Position = u_projection * u_modelview * in_position;\n"
-			"color = in_color;\n"
-		"}\n",
-
-		"#version 150\n"
-		"\n"
-		"in vec4 color;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-			"gl_FragColor = color;\n"
-		"}\n"
-	);
+		File("examples/rts/data/cube_vs.glsl").to_string(),
+		File("examples/rts/data/cube_fs.glsl").to_string());
 }
 
 ChessboardModel::ChessboardModel(Renderer& renderer)
@@ -166,52 +140,6 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
 	_program = _renderer.create_gpu_program(
-		"#version 330\n"
-		"\n"
-		"layout(location = 0) in vec4 in_position;\n"
-		"layout(location = 1) in vec2 in_texcoord;\n"
-		"layout(location = 2) in vec4 in_normal;\n"
-		"\n"
-		"uniform mat4 u_modelview;\n"
-		"uniform mat4 u_projection;\n"
-		"\n"
-		"out vec2 texcoord;\n"
-		"out vec3 view_direction;\n"
-		"out vec3 n;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-			"view_direction = vec3(u_modelview * in_position);\n"
-			"n = normalize(transpose(inverse(mat3(u_modelview))) * vec3(in_normal));\n"
-			"gl_Position = u_projection * u_modelview * in_position;\n"
-			"texcoord = in_texcoord;\n"
-		"}\n",
-
-		"#version 150\n"
-		"\n"
-		"in vec2 texcoord;\n"
-		"in vec3 view_direction;\n"
-		"in vec3 n;\n"
-		"\n"
-		"uniform sampler2D surface_texture;\n"
-		"\n"
-		"void main()\n"
-		"{"
-			"vec4 c = texture2D(surface_texture, texcoord.xy);\n"
-			"if (view_direction.x < 0.0)\n"
-			"{\n"
-				"float gray = dot(c.xyz, vec3(1.0, 1.0, 1.0));\n"
-				"gl_FragColor = vec4(gray, gray, gray, c.a * 0.25);\n"
-			"}\n"
-			"else\n"
-			"{\n"
-				"vec3 l = normalize(-view_direction);\n"
-				"vec3 e = normalize(-view_direction);\n"
-				"vec3 r = normalize(-reflect(l, n));\n"
-				"vec3 diffuse = c.rgb * clamp(dot(n, l), 0.0, 1.0);\n"
-				"vec3 specular = vec3(1.0, 1.0, 1.0) * clamp(dot(r, e), 0.0, 1.0);\n"
-				"gl_FragColor = vec4(diffuse + specular, c.a);\n"
-			"}\n"
-		"}\n"
-	);
+		File("examples/rts/data/chessboard_vs.glsl").to_string(),
+		File("examples/rts/data/chessboard_fs.glsl").to_string());
 }

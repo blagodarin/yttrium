@@ -1,6 +1,6 @@
 #include "wrappers.h"
 
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
 #include <yttrium/string.h>
 
 #include <cassert>
@@ -230,6 +230,9 @@ namespace Yttrium
 	void GlVertexArrayHandle::bind() const
 	{
 		_gl.BindVertexArray(_handle);
+		for (int i = 0; i < 32; ++i)
+			if (_attributes & (1 << i))
+				_gl.EnableVertexAttribArray(i);
 	}
 
 	void GlVertexArrayHandle::bind_vertex_buffer(GLuint binding, GLuint buffer, GLintptr offset, GLintptr stride)
@@ -237,18 +240,12 @@ namespace Yttrium
 		_gl.VertexArrayBindVertexBufferEXT(_handle, binding, buffer, offset, stride);
 	}
 
-	void GlVertexArrayHandle::disable_vertex_attrib_arrays() const
+	void GlVertexArrayHandle::unbind() const
 	{
-		for (GLuint i = 0; i < 32; ++i)
+		for (int i = 31; i >= 0; --i)
 			if (_attributes & (1 << i))
 				_gl.DisableVertexAttribArray(i);
-	}
-
-	void GlVertexArrayHandle::enable_vertex_attrib_arrays() const
-	{
-		for (GLuint i = 0; i < 32; ++i)
-			if (_attributes & (1 << i))
-				_gl.EnableVertexAttribArray(i);
+		_gl.BindVertexArray(0);
 	}
 
 	void GlVertexArrayHandle::vertex_attrib_binding(GLuint attrib, GLuint binding)

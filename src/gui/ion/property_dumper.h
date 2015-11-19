@@ -10,23 +10,21 @@ namespace Yttrium
 	class GuiIonPropertyDumper : public GuiPropertyDumper
 	{
 	public:
+		GuiIonPropertyDumper(IonObject& object) : _object(object) {}
 
-		GuiIonPropertyDumper(IonObject& object);
-
-		void dump_alignment(const StaticString& name, unsigned alignment) override;
-		void dump_color(const StaticString& name, const Vector4& color) override;
-		void dump_margins(const StaticString& name, const Margins& margins) override;
-		void dump_position(const StaticString& name, const Vector2& position) override;
-		void dump_rect(const StaticString& name, const Rect& rect) override;
-		void dump_scaling(const StaticString& name, Scaling scaling) override;
-		void dump_size(const StaticString& name, const Vector2& size) override;
-		void dump_sound(const StaticString& name, const Sound& sound) override;
-		void dump_state(const StaticString& name, WidgetState state) override;
-		void dump_text(const StaticString& name, const StaticString& text) override;
-		void dump_texture(const StaticString& name, const SharedPtr<Texture2D>& texture) override;
+		void dump_alignment(const StaticString& name, unsigned) override;
+		void dump_color(const StaticString& name, const Vector4&) override;
+		void dump_margins(const StaticString& name, const Margins&) override;
+		void dump_position(const StaticString& name, const PointF&) override;
+		void dump_rect(const StaticString& name, const Rect&) override;
+		void dump_scaling(const StaticString& name, Scaling) override;
+		void dump_size(const StaticString& name, const SizeF&) override;
+		void dump_sound(const StaticString& name, const Sound&) override;
+		void dump_state(const StaticString& name, WidgetState) override;
+		void dump_text(const StaticString& name, const StaticString&) override;
+		void dump_texture(const StaticString& name, const SharedPtr<Texture2D>&) override;
 
 	private:
-
 		IonObject& _object;
 	};
 }

@@ -5,7 +5,7 @@
 #define _include_yttrium_image_h_
 
 #include <yttrium/buffer.h>
-#include <yttrium/size.h>
+#include <yttrium/math/size.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium

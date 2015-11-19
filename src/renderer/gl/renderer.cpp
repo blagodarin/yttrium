@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 #include <yttrium/log.h>
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
 #include <yttrium/utils.h>
 #include "buffer.h"
 #include "gpu_program.h"
@@ -10,6 +10,7 @@
 #include <cassert>
 
 #if Y_IS_DEBUG
+	#include <csignal>
 	#include <iostream>
 #endif
 
@@ -18,7 +19,8 @@ namespace Yttrium
 	GlRenderer::GlRenderer(Allocator& allocator)
 		: RendererImpl(allocator)
 		, _gl(allocator)
-		, _2d_vbo(_gl, GL_ARRAY_BUFFER_ARB)
+		, _2d_ibo(_gl, GL_ELEMENT_ARRAY_BUFFER)
+		, _2d_vbo(_gl, GL_ARRAY_BUFFER)
 		, _2d_vao(_gl)
 	{
 #if Y_IS_DEBUG
@@ -37,6 +39,7 @@ namespace Yttrium
 		_gl.ClearColor(0.5, 0.5, 0.5, 0);
 		_gl.ClearDepth(1);
 
+		_2d_vbo.initialize(GL_DYNAMIC_DRAW, 0, nullptr); // The next line fails without this.
 		_2d_vao.bind_vertex_buffer(0, _2d_vbo.get(), 0, sizeof(Vertex2D));
 		_2d_vao.vertex_attrib_binding(0, 0);
 		_2d_vao.vertex_attrib_format(0, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, position));
@@ -74,8 +77,8 @@ namespace Yttrium
 		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
 		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
-		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER_ARB);
-		buffer.initialize(GL_STATIC_DRAW_ARB, count * element_size, data);
+		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
+		buffer.initialize(GL_STATIC_DRAW, count * element_size, data);
 		return make_pointer<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
 	}
 
@@ -135,8 +138,7 @@ namespace Yttrium
 
 	Pointer<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)
 	{
-		StdVector<VA> attributes(format, allocator());
-		assert(!attributes.empty());
+		assert(format.size() > 0);
 
 		GlVertexArrayHandle vertex_array(_gl);
 
@@ -167,8 +169,8 @@ namespace Yttrium
 			++index;
 		}
 
-		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER_ARB);
-		buffer.initialize(GL_STATIC_DRAW_ARB, count * offset, data);
+		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER);
+		buffer.initialize(GL_STATIC_DRAW, count * offset, data);
 		vertex_array.bind_vertex_buffer(0, buffer.get(), 0, offset);
 
 		return make_pointer<GlVertexBuffer>(allocator(), count, offset, std::move(buffer), std::move(vertex_array));
@@ -184,12 +186,11 @@ namespace Yttrium
 		_gl.Enable(GL_DEPTH_TEST);
 		_gl.DepthFunc(GL_LESS);
 
-		vertices._vertex_array.enable_vertex_attrib_arrays();
 		vertices._vertex_array.bind();
 		indices._buffer.bind();
 		_gl.DrawElements(GL_TRIANGLES, indices.size(), indices._gl_format, 0);
 		indices._buffer.unbind();
-		vertices._vertex_array.disable_vertex_attrib_arrays();
+		vertices._vertex_array.unbind();
 
 		++_statistics._draw_calls;
 		_statistics._triangles += indices.size() / 3;
@@ -208,12 +209,12 @@ namespace Yttrium
 
 		GLint unpack_alignment;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
-		image.set_size(size.width, size.height, unpack_alignment);
+		image.set_size(size.width(), size.height(), unpack_alignment);
 
 		GLint read_buffer;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
-		_gl.ReadPixels(0, 0, size.width, size.height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+		_gl.ReadPixels(0, 0, size.width(), size.height(), GL_RGB, GL_UNSIGNED_BYTE, image.data());
 		_gl.ReadBuffer(read_buffer);
 	}
 
@@ -221,16 +222,23 @@ namespace Yttrium
 	{
 		update_state();
 
-		const auto buffer_size = vertices.size() * sizeof(Vertex2D);
-		if (buffer_size > _2d_vbo.size())
-			_2d_vbo.initialize(GL_STREAM_DRAW_ARB, buffer_size, vertices.data());
+		const auto vertices_size = vertices.size() * sizeof(Vertex2D);
+		if (vertices_size > _2d_vbo.size())
+			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices_size, vertices.data());
 		else
-			_2d_vbo.write(0, buffer_size, vertices.data());
+			_2d_vbo.write(0, vertices_size, vertices.data());
 
-		_2d_vao.enable_vertex_attrib_arrays();
+		const auto indices_size = indices.size() * sizeof(uint16_t);
+		if (indices_size > _2d_ibo.size())
+			_2d_ibo.initialize(GL_DYNAMIC_DRAW, indices_size, indices.data());
+		else
+			_2d_ibo.write(0, indices_size, indices.data());
+
 		_2d_vao.bind();
-		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, indices.data());
-		_2d_vao.disable_vertex_attrib_arrays();
+		_2d_ibo.bind();
+		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, 0);
+		_2d_ibo.unbind();
+		_2d_vao.unbind();
 
 		++_statistics._draw_calls;
 		_statistics._triangles += indices.size() - 2;
@@ -248,13 +256,36 @@ namespace Yttrium
 
 	void GlRenderer::set_window_size_impl(const Size& size)
 	{
-		_gl.Viewport(0, 0, size.width, size.height);
+		_gl.Viewport(0, 0, size.width(), size.height());
 	}
 
 #if Y_IS_DEBUG
-	void GlRenderer::debug_callback(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar* message) const
+	void GlRenderer::debug_callback(GLenum, GLenum type, GLuint, GLenum, GLsizei, const GLchar* message) const
 	{
+		bool stop = true;
+		switch (type)
+		{
+		case GL_DEBUG_TYPE_ERROR:
+			std::cerr << "[error] ";
+			break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+			std::cerr << "[deprecated] ";
+			break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			std::cerr << "[undefined behavior] ";
+			break;
+		case GL_DEBUG_TYPE_PORTABILITY:
+			std::cerr << "[portability warning] ";
+			break;
+		case GL_DEBUG_TYPE_PERFORMANCE:
+			std::cerr << "[performance warning] ";
+			break;
+		default:
+			stop = false;
+		}
 		std::cerr << message << std::endl;
+		if (stop)
+			::raise(SIGINT);
 	}
 #endif
 }

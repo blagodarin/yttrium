@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_matrix_h_
-#define _include_yttrium_matrix_h_
+#ifndef _include_yttrium_math_matrix_h_
+#define _include_yttrium_math_matrix_h_
 
 #include <yttrium/global.h>
 
@@ -39,7 +39,7 @@ namespace Yttrium
 		static Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f);
 
 		///
-		static Matrix4 perspective(float aspect, float vertical_fov, float near, float far);
+		static Matrix4 perspective(const Size& size, float vertical_fov, float near, float far);
 
 		///
 		static Matrix4 rotation(float angle, const Vector4& axis);

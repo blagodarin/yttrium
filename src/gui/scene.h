@@ -2,7 +2,7 @@
 #define _src_gui_scene_h_
 
 #include <yttrium/bindings.h>
-#include <yttrium/rect.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include "types.h"
@@ -50,7 +50,7 @@ namespace Yttrium
 
 		void reserve(size_t capacity);
 
-		void set_cursor(const Vector2& cursor)
+		void set_cursor(const PointF& cursor)
 		{
 			_is_cursor_set = true;
 			_cursor = cursor;
@@ -61,7 +61,7 @@ namespace Yttrium
 			_scaling = scaling;
 		}
 
-		void set_size(const Vector2& size)
+		void set_size(const SizeF& size)
 		{
 			_size = size;
 			_has_size = true;
@@ -75,13 +75,13 @@ namespace Yttrium
 
 		GuiImpl&                   _gui;
 		String                     _name;
-		Vector2                    _size;
+		SizeF                      _size;
 		bool                       _has_size = false;
 		Scaling                    _scaling = Scaling::Stretch;
 		StdVector<Pointer<Widget>> _widgets;
 		StdMap<String, Widget*>    _named_widgets;
 		bool                       _is_cursor_set = false;
-		Vector2                    _cursor;
+		PointF                     _cursor;
 		Widget*                    _mouse_widget = nullptr;
 		const Widget*              _left_click_widget = nullptr;
 		Widget*                    _focus_widget = nullptr;

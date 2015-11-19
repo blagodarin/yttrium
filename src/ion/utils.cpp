@@ -3,8 +3,8 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/math/point.h>
 #include <yttrium/string_format.h>
-#include <yttrium/vector.h>
 
 namespace Yttrium
 {
@@ -44,14 +44,14 @@ namespace Yttrium
 				append(*target_node, source_value);
 		}
 
-		bool get(const IonValue& source, Vector2& value)
+		bool get(const IonValue& source, PointF& value)
 		{
 			const IonList* list;
 			if (!source.get(&list) || list->size() != 2)
 				return false;
-			if (!list->first()->string().to_number(&value.x))
+			if (!list->first()->string().to_number(value.data()))
 				return false;
-			if (!list->last()->string().to_number(&value.y))
+			if (!list->last()->string().to_number(value.data() + 1))
 				return false;
 			return true;
 		}

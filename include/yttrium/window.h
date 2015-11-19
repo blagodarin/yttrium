@@ -5,16 +5,16 @@
 #define _include_yttrium_window_h_
 
 #include <yttrium/key.h>
-#include <yttrium/point.h>
-#include <yttrium/size.h>
 
 namespace Yttrium
 {
 	class Gui;
+	class Point;
 	class RectF;
 	class Renderer;
 	class Screen;
 	class ScriptContext;
+	class Size;
 	class StaticString;
 	class String;
 	template <typename> class Pointer;

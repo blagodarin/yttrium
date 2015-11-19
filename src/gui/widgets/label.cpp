@@ -28,7 +28,7 @@ namespace Yttrium
 
 	bool LabelWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_position("position"_s, &_position)
+		if (!(loader.load_position("position"_s, _position)
 			&& _foreground.load(loader)
 			&& loader.load_translatable("text"_s, &_text)))
 		{
@@ -39,7 +39,7 @@ namespace Yttrium
 		loader.load_scaling("scale"_s, &_scaling);
 		loader.load_alignment("align"_s, &_alignment);
 
-		_rect = RectF(_position, {});
+		_rect = RectF(_position, SizeF());
 
 		return true;
 	}
@@ -48,15 +48,16 @@ namespace Yttrium
 	{
 		_gui.script_context().substitute(_final_text, _text);
 
-		const auto& text_size = _foreground.font.text_size(_final_text, _foreground.size) * scale;
+		const auto& text_size = _foreground.font.text_size(_final_text, _foreground.size) * std::make_pair(scale.x, scale.y);
 
-		RectF final_rect = rect;
+		auto x = rect.left();
 		if ((_alignment & HorizontalAlignmentMask) != RightAlignment)
-			final_rect.set_left(final_rect.left() - text_size.x * (_alignment & LeftAlignment ? 1.0 : 0.5));
-		if ((_alignment & VerticalAlignmentMask) != BottomAlignment)
-			final_rect.set_top(final_rect.top() - text_size.y * (_alignment & TopAlignment ? 1.0 : 0.5));
-		final_rect.set_size(text_size);
+			x -= text_size.width() * (_alignment & LeftAlignment ? 1.0 : 0.5);
 
-		_foreground.draw(renderer, _final_text, final_rect.center(), 0, scale.y);
+		auto y = rect.top();
+		if ((_alignment & VerticalAlignmentMask) != BottomAlignment)
+			y -= text_size.height() * (_alignment & TopAlignment ? 1.0 : 0.5);
+
+		_foreground.draw(renderer, _final_text, RectF({x, y}, text_size).center(), 0, scale.y);
 	}
 }

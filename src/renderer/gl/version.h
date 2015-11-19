@@ -6,7 +6,7 @@ namespace Yttrium
 	namespace Gl
 	{
 		constexpr int required_major = 3;
-		constexpr int required_minor = 0;
+		constexpr int required_minor = 3;
 	}
 }
 

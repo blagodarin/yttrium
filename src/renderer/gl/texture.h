@@ -16,7 +16,7 @@ namespace Yttrium
 
 	private:
 
-		Vector2 map(const Vector2&) const override;
+		PointF map(const PointF&) const override;
 
 	private:
 

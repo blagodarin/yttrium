@@ -4,15 +4,14 @@
 #ifndef _include_yttrium_screen_h_
 #define _include_yttrium_screen_h_
 
-#include <yttrium/global.h>
+#include <yttrium/math/size.h>
 
 namespace Yttrium
 {
 	///
 	struct ScreenMode
 	{
-		int      width = 0;     ///<
-		int      height = 0;    ///<
+		Size     resolution;    ///<
 		unsigned frequency = 0; ///<
 	};
 

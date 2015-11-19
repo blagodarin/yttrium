@@ -25,15 +25,13 @@ namespace Yttrium
 		struct Style
 		{
 			BackgroundProperty background;
-			Vector4            text_color;
-
-			Style(): text_color(1, 1, 1) {}
+			Vector4            text_color{1, 1, 1};
 		};
 
 		Rect                 _position;
 		TextureFont          _font;
 		SharedPtr<Texture2D> _font_texture;
-		Vector2              _text_size;
+		SizeF                _text_size;
 		SharedPtr<Sound>     _sound;
 		WidgetState          _state = WidgetState::NotSet;
 		Style                _styles[WidgetStateCount];

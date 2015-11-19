@@ -84,7 +84,7 @@ namespace Yttrium
 			return;
 
 		auto i = _scene_stack.begin() + (_scene_stack.size() - 1);
-		(*i)->set_cursor(Vector2(cursor.x, cursor.y));
+		(*i)->set_cursor(PointF(cursor));
 		while (i != _scene_stack.begin() && (*i)->is_transparent())
 			--i;
 
@@ -118,7 +118,7 @@ namespace Yttrium
 	void GuiImpl::clear()
 	{
 		_has_size = false;
-		_size = Vector2(0, 0);
+		_size = {};
 		_fonts.clear();
 		_scenes.clear();
 		_scene_stack.clear();

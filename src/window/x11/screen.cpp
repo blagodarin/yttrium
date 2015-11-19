@@ -43,8 +43,7 @@ namespace Yttrium
 		const int size_index = ::XRRConfigCurrentConfiguration(config.get(), &rotation);
 
 		ScreenMode mode;
-		mode.width = sizes[size_index].width;
-		mode.height = sizes[size_index].height;
+		mode.resolution = {sizes[size_index].width, sizes[size_index].height};
 		mode.frequency = ::XRRConfigCurrentRate(config.get());
 
 		return mode;
@@ -63,8 +62,7 @@ namespace Yttrium
 		short* rates = ::XRRConfigRates(config.get(), size_index, &nrates);
 
 		ScreenMode mode;
-		mode.width = sizes[size_index].width;
-		mode.height = sizes[size_index].height;
+		mode.resolution = {sizes[size_index].width, sizes[size_index].height};
 		mode.frequency = rates[0];
 
 		return mode;

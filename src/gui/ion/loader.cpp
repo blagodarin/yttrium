@@ -82,8 +82,8 @@ namespace Yttrium
 
 		if (!is_internal)
 		{
-			Vector2 size;
-			if (GuiIonPropertyLoader::load_size(&size, document_root.last("size"_s)))
+			SizeF size;
+			if (GuiIonPropertyLoader::load_size(size, document_root.last("size"_s)))
 				_gui.set_size(size);
 
 			Scaling scaling;
@@ -217,8 +217,8 @@ namespace Yttrium
 		{
 			if (node.name() == "size"_s)
 			{
-				Vector2 size;
-				if (GuiIonPropertyLoader::load_size(&size, node))
+				SizeF size;
+				if (GuiIonPropertyLoader::load_size(size, node))
 					scene.set_size(size);
 			}
 			else if (node.name() == "scale"_s)

@@ -3,7 +3,7 @@
 
 #include <yttrium/renderer.h>
 
-#include <yttrium/margins.h>
+#include <yttrium/math/margins.h>
 #include <yttrium/object.h>
 #include <yttrium/pointer.h>
 #include <yttrium/std/vector.h>
@@ -20,7 +20,6 @@ namespace Yttrium
 	class RendererImpl : public Renderer
 	{
 	public:
-
 		struct Statistics
 		{
 			int _triangles = 0;
@@ -33,41 +32,41 @@ namespace Yttrium
 
 		static Pointer<RendererImpl> create(WindowBackend&, Allocator&);
 
-		RendererImpl(Allocator& allocator);
+		RendererImpl(Allocator&);
 		~RendererImpl() override;
 
 		Matrix4 current_projection() const override;
 		Matrix4 current_transformation() const override;
-		void draw_rectangle(const RectF& rect) override;
-		void draw_rectangle(const RectF& rect, const RectF& texture_rect) override;
-		void draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture) override;
-		void set_color(const Vector4& color) override;
-		bool set_font(const TextureFont& font) override;
-		void set_font_size(const Vector2& size) override;
-		bool set_texture_borders(const Margins& borders) override;
-		void set_texture_rectangle(const RectF& rect) override;
-		Vector2 text_size(const StaticString& text) const override;
+		void draw_rectangle(const RectF&) override;
+		void draw_rectangle(const RectF&, const RectF& texture_rect) override;
+		void draw_text(const PointF&, const StaticString&, unsigned alignment, TextCapture*) override;
+		void set_color(const Vector4&) override;
+		bool set_font(const TextureFont&) override;
+		void set_font_size(const SizeF&) override;
+		bool set_texture_borders(const Margins&) override;
+		void set_texture_rectangle(const RectF&) override;
+		SizeF text_size(const StaticString&) const override;
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
-		virtual void take_screenshot(Image& image) = 0;
+		virtual void take_screenshot(Image&) = 0;
 
 		Allocator& allocator() const { return _allocator; }
 		const Texture2D* debug_texture() const;
-		void forget_program(const GpuProgram* program);
-		void forget_texture(const Texture2D* texture);
+		void forget_program(const GpuProgram*);
+		void forget_texture(const Texture2D*);
 		void pop_program();
 		void pop_projection();
 		void pop_texture();
 		void pop_transformation();
 		const GpuProgram* program_2d() const { return _program_2d.get(); }
-		void push_program(const GpuProgram* program);
-		void push_projection_2d(const Matrix4& matrix);
-		void push_projection_3d(const Matrix4& matrix);
-		void push_texture(const Texture2D* texture);
-		void push_transformation(const Matrix4& matrix);
+		void push_program(const GpuProgram*);
+		void push_projection_2d(const Matrix4&);
+		void push_projection_3d(const Matrix4&);
+		void push_texture(const Texture2D*);
+		void push_transformation(const Matrix4&);
 		Statistics reset_statistics();
-		void set_window_size(const Size& size);
+		void set_window_size(const Size&);
 
 	protected:
 
@@ -111,7 +110,7 @@ namespace Yttrium
 		MarginsF _texture_borders;
 
 		TextureFont _font;
-		Vector2     _font_size;
+		SizeF       _font_size{1, 1};
 
 		SharedPtr<Texture2D> _white_texture;
 		SharedPtr<Texture2D> _debug_texture;

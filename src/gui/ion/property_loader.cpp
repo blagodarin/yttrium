@@ -5,7 +5,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/margins.h>
+#include <yttrium/math/margins.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/utils.h>
 #include "../gui.h"
@@ -41,7 +41,7 @@ namespace Yttrium
 			return result;
 		}
 
-		unsigned read_position(Vector2* position, const IonNode& node)
+		unsigned read_position(PointF& position, const IonNode& node)
 		{
 			unsigned result = 0;
 
@@ -54,7 +54,7 @@ namespace Yttrium
 				for (size_t i = 0; i < items; values.pop_first(), ++i)
 				{
 					const StaticString* value;
-					if (values->get(&value) && value->to_number(position->data() + i))
+					if (values->get(&value) && value->to_number(position.data() + i))
 						result |= 1 << i;
 				}
 			}
@@ -83,7 +83,7 @@ namespace Yttrium
 			}
 		}
 
-		unsigned read_size(Vector2* size, const IonNode& node, unsigned inherit)
+		unsigned read_size(SizeF& size, const IonNode& node, unsigned inherit)
 		{
 			unsigned result = 0;
 
@@ -96,13 +96,13 @@ namespace Yttrium
 				for (size_t i = 0; i < items; values.pop_first(), ++i)
 				{
 					const StaticString* value;
-					if (values->get(&value) && value->to_number(size->data() + i))
+					if (values->get(&value) && value->to_number(size.data() + i))
 						result |= 1 << i;
 				}
 
 				if (items < 2 && !(inherit & (1 << 1)))
 				{
-					size->y = 1.f;
+					size.data()[1] = 1.f;
 					result |= 1 << 1;
 				}
 			}
@@ -237,7 +237,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_position(const StaticString& name, Vector2* position) const
+	bool GuiIonPropertyLoader::load_position(const StaticString& name, PointF& position) const
 	{
 		unsigned loaded = 0x0;
 
@@ -287,7 +287,7 @@ namespace Yttrium
 		if (!update && (elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
 			return false;
 
-		*rect = Rect(elements[0], elements[1], elements[2], elements[3]);
+		*rect = Rect(Point(elements[0], elements[1]), Size(elements[2], elements[3]));
 
 		return true;
 	}
@@ -311,7 +311,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_size(const StaticString& name, Vector2* size) const
+	bool GuiIonPropertyLoader::load_size(const StaticString& name, SizeF& size) const
 	{
 		unsigned loaded = 0x0;
 
@@ -579,7 +579,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_size(Vector2* size, const IonNode& node)
+	bool GuiIonPropertyLoader::load_size(SizeF& size, const IonNode& node)
 	{
 		return read_size(size, node, 0) == 3;
 	}

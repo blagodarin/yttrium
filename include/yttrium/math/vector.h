@@ -1,12 +1,12 @@
 /// \file
 /// \brief Geometry/color vectors.
 
-#ifndef _include_yttrium_vector_h_
-#define _include_yttrium_vector_h_
+#ifndef _include_yttrium_math_vector_h_
+#define _include_yttrium_math_vector_h_
 
 #include <yttrium/global.h>
-#include <yttrium/point.h>
-#include <yttrium/size.h>
+#include <yttrium/math/point.h>
+#include <yttrium/math/size.h>
 
 namespace Yttrium
 {
@@ -15,28 +15,15 @@ namespace Yttrium
 	{
 	public:
 
-		float x; ///<
-		float y; ///<
+		float x;
+		float y;
 
-		///
 		Vector2() = default;
-
-		///
 		Vector2(float x, float y): x(x), y(y) {}
-
-		///
-		explicit Vector2(const Point& point)
-			: x(point.x)
-			, y(point.y)
-		{
-		}
-
-		///
-		explicit Vector2(const Size& size)
-			: x(size.width)
-			, y(size.height)
-		{
-		}
+		explicit Vector2(const Point& point) : x(point.x()), y(point.y()) {}
+		explicit Vector2(const PointF& point) : x(point.x()), y(point.y()) {}
+		explicit Vector2(const Size& size) : x(size.width()), y(size.height()) {}
+		explicit Vector2(const SizeF& size) : x(size.width()), y(size.height()) {}
 
 		///
 		float* data() { return &x; }

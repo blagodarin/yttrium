@@ -2,7 +2,7 @@
 #define _src_gui_widgets_widget_h_
 
 #include <yttrium/key.h>
-#include <yttrium/rect.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/string.h>
 #include "../types.h"
 

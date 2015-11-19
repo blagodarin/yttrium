@@ -115,6 +115,9 @@ namespace Yttrium
 		///
 		bool skip(uint64_t size) { return seek(size, Relative); }
 
+		///
+		String to_string();
+
 		/// Truncate the file past the current pointer.
 		bool truncate() { return resize(_offset); }
 

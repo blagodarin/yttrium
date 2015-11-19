@@ -1,4 +1,4 @@
-#include <yttrium/vector.h>
+#include <yttrium/math/vector.h>
 
 #include <cmath>
 

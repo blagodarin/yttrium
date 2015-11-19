@@ -4,12 +4,13 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
+#include <yttrium/math/point.h>
+#include <yttrium/math/size.h>
 #include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/pointer.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
 #include <yttrium/texture_cache.h>
-#include <yttrium/vector.h>
 #include <yttrium/window.h>
 
 #include "tetrium.h"
@@ -34,9 +35,9 @@ private:
 	void on_update(const UpdateEvent& update) override;
 
 	void draw_field(Renderer& renderer, const RectF& rect);
-	void draw_field_blocks(Renderer& renderer, const RectF& rect, const Vector2& block_size);
-	void draw_field_figure(Renderer& renderer, const RectF& rect, const Vector2& block_size);
-	void draw_field_frame(Renderer& renderer, const RectF& rect, const Vector2& block_size);
+	void draw_field_blocks(Renderer& renderer, const RectF& rect, const SizeF& block_size);
+	void draw_field_figure(Renderer& renderer, const RectF& rect, const SizeF& block_size);
+	void draw_field_frame(Renderer& renderer, const RectF& rect, const SizeF& block_size);
 	void draw_next_figure(Renderer& renderer, const RectF& rect);
 	void set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type);
 
@@ -55,8 +56,8 @@ private:
 	Bindings         _bindings;
 
 	SharedPtr<Texture2D> _block_texture;
-	float                _block_size;
-	Vector2              _block_coords[8];
+	SizeF                _block_size;
+	PointF               _block_coords[8];
 
 	Tetrium::Game _game;
 	bool          _game_running = false;

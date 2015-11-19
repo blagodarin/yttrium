@@ -119,14 +119,14 @@ namespace Yttrium
 	void GuiScene::render(Renderer& renderer)
 	{
 		const auto& window_size = renderer.window_size();
-		const Vector2& scene_size = _has_size ? _size : Vector2(window_size);
+		const auto& scene_size = _has_size ? _size : SizeF(window_size);
 
 		const Vector2 scale(
-			window_size.width / scene_size.x,
-			window_size.height / scene_size.y);
+			window_size.width() / scene_size.width(),
+			window_size.height() / scene_size.height());
 		const Vector2 shift(
-			(window_size.width - scene_size.x * scale.y) * .5f,
-			(window_size.height - scene_size.y * scale.x) * .5f);
+			(window_size.width() - scene_size.width() * scale.y) * .5f,
+			(window_size.height() - scene_size.height() * scale.x) * .5f);
 
 		Widget* mouse_widget = nullptr;
 
@@ -162,76 +162,69 @@ namespace Yttrium
 
 	RectF GuiScene::map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const
 	{
-		RectF result;
-
 		switch (scaling)
 		{
 		case Scaling::Min:
-
 			if (scale.x < scale.y)
-			{
-				result.set_left(source.left() * scale.x);
-				result.set_top(source.top() * scale.x + shift.y);
-				result.set_width(source.width() * scale.x);
-				result.set_height(source.height() * scale.x);
-			}
+				return
+				{
+					{
+						source.left() * scale.x,
+						source.top() * scale.x + shift.y
+					},
+					source.size() * std::make_pair(scale.x, scale.x)
+				};
 			else
-			{
-				result.set_left(source.left() * scale.y + shift.x);
-				result.set_top(source.top() * scale.y);
-				result.set_width(source.width() * scale.y);
-				result.set_height(source.height() * scale.y);
-			}
-			break;
+				return
+				{
+					{
+						source.left() * scale.y + shift.x,
+						source.top() * scale.y
+					},
+					source.size() * std::make_pair(scale.y, scale.y)
+				};
 
 		case Scaling::Max:
-
 			if (scale.x > scale.y)
-			{
-				result.set_left(source.left() * scale.x);
-				result.set_top(source.top() * scale.x + shift.y);
-				result.set_width(source.width() * scale.x);
-				result.set_height(source.height() * scale.x);
-			}
+				return
+				{
+					{
+						source.left() * scale.x,
+						source.top() * scale.x + shift.y
+					},
+					source.size() * std::make_pair(scale.x, scale.x)
+				};
 			else
-			{
-				result.set_left(source.left() * scale.y + shift.x);
-				result.set_top(source.top() * scale.y);
-				result.set_width(source.width() * scale.y);
-				result.set_height(source.height() * scale.y);
-			}
-			break;
+				return
+				{
+					{
+						source.left() * scale.y + shift.x,
+						source.top() * scale.y
+					},
+					source.size() * std::make_pair(scale.y, scale.y)
+				};
 
 		case Scaling::Fit:
-
-			result.set_left(source.left() * scale.x);
-			result.set_top(source.top() * scale.y);
-			if (scale.x < scale.y)
+			return
 			{
-				result.set_width(source.width() * scale.x);
-				result.set_height(source.height() * scale.x);
-			}
-			else
-			{
-				result.set_width(source.width() * scale.y);
-				result.set_height(source.height() * scale.y);
-			}
-			break;
+				{
+					source.left() * scale.x,
+					source.top() * scale.y
+				},
+				source.size() * (scale.x < scale.y ? std::make_pair(scale.x, scale.x) : std::make_pair(scale.y, scale.y))
+			};
 
 		default:
-
 			assert(false);
-			// Fallthrough.
-
 		case Scaling::Stretch:
-
-			result.set_left(source.left() * scale.x);
-			result.set_top(source.top() * scale.y);
-			result.set_width(source.width() * scale.x);
-			result.set_height(source.height() * scale.y);
-			break;
+			return
+			{
+				{
+					source.left() * scale.x,
+					source.top() * scale.y
+				},
+				source.size() * std::make_pair(scale.x, scale.y)
+			};
 		}
-
-		return result;
 	}
 }

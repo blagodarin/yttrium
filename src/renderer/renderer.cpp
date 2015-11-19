@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 #include <yttrium/gpu_program.h>
-#include <yttrium/matrix.h>
+#include <yttrium/math/matrix.h>
 #include "debug_texture.h"
 #include "exception.h"
 #include "gl/renderer.h"
@@ -82,7 +82,6 @@ namespace Yttrium
 		, _color(1, 1, 1)
 		, _vertices_2d(_allocator)
 		, _indices_2d(_allocator)
-		, _font_size(1, 1)
 		, _matrix_stack(_allocator)
 		, _texture_stack({{nullptr, 1}}, _allocator)
 #if Y_IS_DEBUG
@@ -109,28 +108,29 @@ namespace Yttrium
 		draw_rectangle(rect, texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
 	}
 
-	void RendererImpl::draw_text(const Vector2& position, const StaticString& text, unsigned alignment, TextCapture* capture)
+	void RendererImpl::draw_text(const PointF& position, const StaticString& text, unsigned alignment, TextCapture* capture)
 	{
 		if (!_font)
 			return;
 
-		Vector2 current_position = position;
+		float current_x = position.x();
+		float current_y = position.y();
 		char last_symbol = '\0';
-		float y_scaling = _font_size.y / _font.size();
-		float x_scaling = y_scaling * _font_size.x;
+		float y_scaling = _font_size.height() / _font.size();
+		float x_scaling = y_scaling * _font_size.width();
 
 		if (alignment != BottomRightAlignment)
 		{
-			const Vector2& size = text_size(text);
+			const auto& size = text_size(text);
 
 			if ((alignment & HorizontalAlignmentMask) != RightAlignment)
-				current_position.x -= size.x * (alignment & LeftAlignment ? 1.0 : 0.5);
+				current_x -= size.width() * (alignment & LeftAlignment ? 1.0 : 0.5);
 
 			if ((alignment & VerticalAlignmentMask) != BottomAlignment)
-				current_position.y -= size.y * (alignment & TopAlignment ? 1.0 : 0.5);
+				current_y -= size.height() * (alignment & TopAlignment ? 1.0 : 0.5);
 		}
 
-		float selection_left = 0.f;
+		float selection_left = 0;
 		const auto do_capture = [&](unsigned index)
 		{
 			if (!capture)
@@ -138,7 +138,7 @@ namespace Yttrium
 
 			if (capture->cursor_pos == index)
 			{
-				capture->cursor_rect = RectF(current_position.x, current_position.y, 2, _font_size.y);
+				capture->cursor_rect = {{current_x, current_y}, SizeF(2, _font_size.height())};
 				capture->has_cursor = true;
 			}
 
@@ -146,12 +146,11 @@ namespace Yttrium
 			{
 				if (index == capture->selection_begin)
 				{
-					selection_left = current_position.x;
+					selection_left = current_x;
 				}
 				else if (index == capture->selection_end)
 				{
-					capture->selection_rect.set_coords(selection_left, current_position.y,
-						current_position.x, current_position.y + _font_size.y);
+					capture->selection_rect = {{selection_left, current_y}, PointF(current_x, current_y + _font_size.height())};
 					capture->has_selection = true;
 				}
 			}
@@ -166,16 +165,14 @@ namespace Yttrium
 			if (info)
 			{
 				const RectF symbol_rect(
-					current_position.x + x_scaling * info->offset.x,
-					current_position.y + y_scaling * info->offset.y,
-					info->rect.width() * x_scaling,
-					info->rect.height() * y_scaling);
+					{current_x + x_scaling * info->offset.x(), current_y + y_scaling * info->offset.y()},
+					SizeF(info->rect.width() * x_scaling, info->rect.height() * y_scaling));
 
 				draw_rectangle(symbol_rect, current_texture_2d()->map(RectF(info->rect)), {});
 
 				do_capture(i);
 
-				current_position.x += x_scaling * (info->advance + _font.kerning(last_symbol, *current_symbol));
+				current_x += x_scaling * (info->advance + _font.kerning(last_symbol, *current_symbol));
 			}
 
 			last_symbol = *current_symbol;
@@ -214,7 +211,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void RendererImpl::set_font_size(const Vector2& size)
+	void RendererImpl::set_font_size(const SizeF& size)
 	{
 		_font_size = size;
 	}
@@ -225,14 +222,14 @@ namespace Yttrium
 		if (!current_texture)
 			return false;
 
-		const Vector2 texture_size(current_texture->size());
-		const Vector2& texture_rect_size = _texture_rect.size();
-		const Vector2& min_size = Vector2(borders.min_size()) / texture_size;
-		if (texture_rect_size.x < min_size.x || texture_rect_size.y < min_size.y)
+		const auto& texture_size = SizeF(current_texture->size());
+		const auto& texture_rect_size = _texture_rect.size();
+		const auto& min_size = SizeF(borders.min_size()) / std::make_pair(texture_size.width(), texture_size.height());
+		if (texture_rect_size.width() < min_size.width() || texture_rect_size.height() < min_size.height())
 			return false;
 
-		_texture_borders = MarginsF(borders.top / texture_size.y, borders.right / texture_size.x,
-			borders.bottom / texture_size.y, borders.right / texture_size.x);
+		_texture_borders = {borders.top() / texture_size.height(), borders.right() / texture_size.width(),
+			borders.bottom() / texture_size.height(), borders.left() / texture_size.width()};
 
 		return true;
 	}
@@ -243,12 +240,12 @@ namespace Yttrium
 		if (!current_texture)
 			return;
 		_texture_rect = current_texture->map(rect);
-		_texture_borders = MarginsF();
+		_texture_borders = {};
 	}
 
-	Vector2 RendererImpl::text_size(const StaticString& text) const
+	SizeF RendererImpl::text_size(const StaticString& text) const
 	{
-		return _font ? _font.text_size(text, _font_size) : Vector2(0, 0);
+		return _font ? _font.text_size(text, _font_size) : SizeF();
 	}
 
 	const Texture2D* RendererImpl::debug_texture() const
@@ -463,21 +460,21 @@ namespace Yttrium
 		vertex.texture.x = texture.left();
 		_vertices_2d.push_back(vertex);
 
-		if (borders.left > 0)
+		if (borders.left() > 0)
 		{
-			left_offset = borders.left * current_texture_2d()->size().width;
+			left_offset = borders.left() * current_texture_2d()->size().width();
 
 			vertex.position.x = position.left() + left_offset;
-			vertex.texture.x = texture.left() + borders.left;
+			vertex.texture.x = texture.left() + borders.left();
 			_vertices_2d.push_back(vertex);
 		}
 
-		if (borders.right > 0)
+		if (borders.right() > 0)
 		{
-			right_offset = borders.right * current_texture_2d()->size().width;
+			right_offset = borders.right() * current_texture_2d()->size().width();
 
 			vertex.position.x = position.right() - right_offset;
-			vertex.texture.x = texture.right() - borders.right;
+			vertex.texture.x = texture.right() - borders.right();
 			_vertices_2d.push_back(vertex);
 		}
 
@@ -495,30 +492,30 @@ namespace Yttrium
 			_indices_2d.push_back(index + i + row_vertices);
 		}
 
-		if (borders.top > 0)
+		if (borders.top() > 0)
 		{
-			float top_offset = borders.top * current_texture_2d()->size().height;
+			float top_offset = borders.top() * current_texture_2d()->size().height();
 
 			// Inner top vertex row.
 
 			vertex.position.y = position.top() + top_offset;
-			vertex.texture.y = texture.top() + borders.top;
+			vertex.texture.y = texture.top() + borders.top();
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
 			_vertices_2d.push_back(vertex);
 
-			if (borders.left > 0)
+			if (borders.left() > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
-				vertex.texture.x = texture.left() + borders.left;
+				vertex.texture.x = texture.left() + borders.left();
 				_vertices_2d.push_back(vertex);
 			}
 
-			if (borders.right > 0)
+			if (borders.right() > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
-				vertex.texture.x = texture.right() - borders.right;
+				vertex.texture.x = texture.right() - borders.right();
 				_vertices_2d.push_back(vertex);
 			}
 
@@ -540,30 +537,30 @@ namespace Yttrium
 			}
 		}
 
-		if (borders.bottom > 0)
+		if (borders.bottom() > 0)
 		{
-			float bottom_offset = borders.bottom * current_texture_2d()->size().height;
+			float bottom_offset = borders.bottom() * current_texture_2d()->size().height();
 
 			// Inner bottom vertex row.
 
 			vertex.position.y = position.bottom() - bottom_offset;
-			vertex.texture.y = texture.bottom() - borders.bottom;
+			vertex.texture.y = texture.bottom() - borders.bottom();
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
 			_vertices_2d.push_back(vertex);
 
-			if (borders.left > 0)
+			if (borders.left() > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
-				vertex.texture.x = texture.left() + borders.left;
+				vertex.texture.x = texture.left() + borders.left();
 				_vertices_2d.push_back(vertex);
 			}
 
-			if (borders.right > 0)
+			if (borders.right() > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
-				vertex.texture.x = texture.right() - borders.right;
+				vertex.texture.x = texture.right() - borders.right();
 				_vertices_2d.push_back(vertex);
 			}
 
@@ -594,17 +591,17 @@ namespace Yttrium
 		vertex.texture.x = texture.left();
 		_vertices_2d.push_back(vertex);
 
-		if (borders.left > 0)
+		if (borders.left() > 0)
 		{
 			vertex.position.x = position.left() + left_offset;
-			vertex.texture.x = texture.left() + borders.left;
+			vertex.texture.x = texture.left() + borders.left();
 			_vertices_2d.push_back(vertex);
 		}
 
-		if (borders.right > 0)
+		if (borders.right() > 0)
 		{
 			vertex.position.x = position.right() - right_offset;
-			vertex.texture.x = texture.right() - borders.right;
+			vertex.texture.x = texture.right() - borders.right();
 			_vertices_2d.push_back(vertex);
 		}
 

@@ -4,11 +4,6 @@
 
 namespace Yttrium
 {
-	GuiIonPropertyDumper::GuiIonPropertyDumper(IonObject& object)
-		: _object(object)
-	{
-	}
-
 	void GuiIonPropertyDumper::dump_alignment(const StaticString&, unsigned)
 	{
 	}
@@ -21,7 +16,7 @@ namespace Yttrium
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_position(const StaticString&, const Vector2&)
+	void GuiIonPropertyDumper::dump_position(const StaticString&, const PointF&)
 	{
 	}
 
@@ -33,7 +28,7 @@ namespace Yttrium
 	{
 	}
 
-	void GuiIonPropertyDumper::dump_size(const StaticString&, const Vector2&)
+	void GuiIonPropertyDumper::dump_size(const StaticString&, const SizeF&)
 	{
 	}
 

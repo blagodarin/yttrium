@@ -74,7 +74,7 @@ namespace Yttrium
 
 		void set_scene_change_action(const String& from_scene, const String& to_scene, const String& action);
 
-		void set_size(const Vector2& size)
+		void set_size(const SizeF& size)
 		{
 			_size = size;
 			_has_size = true;
@@ -103,7 +103,7 @@ namespace Yttrium
 		ProxyAllocator                    _proxy_allocator;
 		Pointer<TextureCache>             _texture_cache;
 		bool                              _has_size = false;
-		Vector2                           _size{0, 0};
+		SizeF                             _size;
 		Scaling                           _scaling = Scaling::Stretch;
 		StdMap<String, FontDesc>          _fonts;
 		StdMap<StaticString, Pointer<GuiScene>> _scenes;

@@ -33,7 +33,7 @@ namespace Yttrium
 	{
 		if (!(loader.load_rect("position"_s, &_position)
 			&& loader.load_font("font"_s, &_font, &_font_texture)
-			&& loader.load_size("text_size"_s, &_text_size)))
+			&& loader.load_size("text_size"_s, _text_size)))
 		{
 			Log() << "(gui/button) Unable to load"_s;
 			return false;
@@ -129,7 +129,7 @@ namespace Yttrium
 
 		if (renderer.set_font(_font))
 		{
-			renderer.set_font_size(_text_size.x * scale.y, _text_size.y);
+			renderer.set_font_size(_text_size.width() * scale.y, _text_size.height());
 			renderer.draw_text(rect.center(), _text, CenterAlignment);
 		}
 	}

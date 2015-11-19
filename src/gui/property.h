@@ -1,9 +1,9 @@
 #ifndef _src_gui_property_h_
 #define _src_gui_property_h_
 
-#include <yttrium/margins.h>
+#include <yttrium/math/margins.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/object.h>
-#include <yttrium/rect.h>
 #include <yttrium/renderer.h>
 #include <yttrium/texture_font.h>
 
@@ -31,10 +31,10 @@ namespace Yttrium
 	{
 		TextureFont          font;
 		SharedPtr<Texture2D> font_texture;
-		Vector2              size;
+		SizeF                size;
 		Vector4              color{1, 1, 1};
 
-		void draw(Renderer& renderer, const String& text, const Vector2& origin,
+		void draw(Renderer& renderer, const String& text, const PointF& origin,
 			unsigned alignment, float scale, Renderer::TextCapture* capture = nullptr) const;
 		void dump(GuiPropertyDumper& dumper) const;
 		bool load(const GuiPropertyLoader& loader);

@@ -10,12 +10,14 @@ namespace Yttrium
 		void draw_debug_char(Renderer& renderer, int x, int y, int width, int height, uint8_t value)
 		{
 			renderer.draw_rectangle(
-				RectF(
-					x * DebugTexture::char_width, y * DebugTexture::char_height,
-					width * DebugTexture::char_width, height * DebugTexture::char_height),
-				RectF::from_coords(
-					DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1],
-					DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1]));
+				{
+					PointF(x * DebugTexture::char_width, y * DebugTexture::char_height),
+					SizeF(width * DebugTexture::char_width, height * DebugTexture::char_height)
+				},
+				{
+					PointF(DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]),
+					PointF(DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1])
+				});
 		}
 	}
 
@@ -49,11 +51,11 @@ namespace Yttrium
 
 	int DebugRenderer::max_width() const
 	{
-		return _renderer.window_size().width / DebugTexture::char_width;
+		return _renderer.window_size().width() / DebugTexture::char_width;
 	}
 
 	void DebugRenderer::set_color(float r, float g, float b, float a)
 	{
-		_renderer.set_color(Vector4(r, g, b, a));
+		_renderer.set_color({r, g, b, a});
 	}
 }

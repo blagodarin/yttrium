@@ -3,21 +3,23 @@
 	#define GLEND }
 	#define GLEXTENSION(name) if ((name = GLAPI_HAS_EXTENSION("GL_"#name))) {
 	#define GLFLOAT(name) GetFloatv(GL_##name, &name);
+	#define GLFLOATV(name, count) do { name.resize(count); GetFloatv(GL_##name, name.data()); } while (false);
 	#define GLFUNCTION(name, ret, attr) reinterpret_cast<GlAddress&>(name) = GLAPI_GET_FUNCTION("gl"#name);
 	#define GLINTEGER(name) GetIntegerv(GL_##name, &name);
-	#define GLINTEGERV(name, count) GetIntegerv(GL_##name, name);
+	#define GLINTEGERV(name, count) do { name.resize(count); GetIntegerv(GL_##name, name.data()); } while (false);
 	#define GLSTRING(name) name = GetString(GL_##name);
-	#define GLSTRINGS(name, count) do { name.reserve(count); for (GLsizei i = 0; i < count; ++i) name.emplace_back(GetStringi(GL_##name, i)); } while (false);
+	#define GLSTRINGV(name, count) do { name.reserve(count); for (GLsizei i = 0; i < count; ++i) name.emplace_back(GetStringi(GL_##name, i)); } while (false);
 #else
 	// Declaration mode.
 	#define GLEND
 	#define GLEXTENSION(name) bool name = false;
 	#define GLFLOAT(name) GLfloat name = 0;
+	#define GLFLOATV(name, count) StdVector<GLfloat> name;
 	#define GLFUNCTION(name, ret, attr) ret (GLAPI_CALL *name)attr = nullptr;
 	#define GLINTEGER(name) GLint name = 0;
-	#define GLINTEGERV(name, count) GLint name[count] = {};
+	#define GLINTEGERV(name, count) StdVector<GLint> name;
 	#define GLSTRING(name) const char* name = nullptr;
-	#define GLSTRINGS(name, count) StdVector<StaticString> name;
+	#define GLSTRINGV(name, count) StdVector<StaticString> name;
 #endif
 
 // OpenGL 1.0
@@ -100,9 +102,9 @@ GLFUNCTION(DrawRangeElements, void, (GLenum, GLuint, GLuint, GLsizei, GLenum, co
 GLFUNCTION(TexImage3D, void, (GLenum, GLint, GLint, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, const void*))
 GLFUNCTION(TexSubImage3D, void, (GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, const void*))
 
-//GLINTEGER(MAX_3D_TEXTURE_SIZE)
-//GLINTEGER(MAX_ELEMENTS_INDICES)
-//GLINTEGER(MAX_ELEMENTS_VERTICES)
+GLINTEGER(MAX_3D_TEXTURE_SIZE)
+GLINTEGER(MAX_ELEMENTS_INDICES)
+GLINTEGER(MAX_ELEMENTS_VERTICES)
 
 // OpenGL 1.3
 
@@ -118,7 +120,7 @@ GLFUNCTION(SampleCoverage, void, (GLfloat, GLboolean))
 
 GLINTEGER(MAX_COMBINED_TEXTURE_IMAGE_UNITS)
 GLINTEGER(NUM_COMPRESSED_TEXTURE_FORMATS)
-//GLINTEGERV(COMPRESSED_TEXTURE_FORMATS, NUM_COMPRESSED_TEXTURE_FORMATS)
+GLINTEGERV(COMPRESSED_TEXTURE_FORMATS, NUM_COMPRESSED_TEXTURE_FORMATS)
 
 // OpenGL 1.5
 
@@ -159,12 +161,32 @@ GLFUNCTION(VertexAttribPointer, void, (GLuint, GLint, GLenum, GLboolean, GLsizei
 
 // OpenGL 3.0
 
+GLFUNCTION(BindFramebuffer, void, (GLenum, GLuint))
+GLFUNCTION(BindRenderbuffer, void, (GLenum, GLuint))
+GLFUNCTION(BlitFramebuffer, void, (GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLbitfield, GLenum))
+GLFUNCTION(CheckFramebufferStatus, GLenum, (GLenum))
+GLFUNCTION(DeleteFramebuffers, void, (GLsizei, const GLuint*))
+GLFUNCTION(DeleteRenderbuffers, void, (GLsizei, const GLuint*))
+GLFUNCTION(FramebufferRenderbuffer, void, (GLenum, GLenum, GLenum, GLuint))
+GLFUNCTION(FramebufferTexture, void, (GLenum, GLenum, GLuint, GLint))
+GLFUNCTION(FramebufferTexture1D, void, (GLenum, GLenum, GLenum, GLuint, GLint))
+GLFUNCTION(FramebufferTexture2D, void, (GLenum, GLenum, GLenum, GLuint, GLint))
+GLFUNCTION(FramebufferTexture3D, void, (GLenum, GLenum, GLenum, GLuint, GLint, GLint))
+GLFUNCTION(FramebufferTextureLayer, void, (GLenum, GLenum, GLuint, GLint, GLint))
+GLFUNCTION(GenFramebuffers, void, (GLsizei, GLuint*))
+GLFUNCTION(GenRenderbuffers, void, (GLsizei, GLuint*))
+GLFUNCTION(GetFramebufferAttachmentParameteriv, void, (GLenum, GLenum, GLenum, GLint*))
+GLFUNCTION(GetRenderbufferParameteriv, void, (GLenum, GLenum, GLint*))
 GLFUNCTION(GetStringi, const char*, (GLenum, GLuint))
+GLFUNCTION(IsFramebuffer, GLboolean, (GLuint))
+GLFUNCTION(IsRenderbuffer, GLboolean, (GLuint))
+GLFUNCTION(RenderbufferStorage, void, (GLenum, GLenum, GLsizei, GLsizei))
+GLFUNCTION(RenderbufferStorageMultisample, void, (GLenum, GLsizei, GLenum, GLsizei, GLsizei))
 
 GLINTEGER(MAJOR_VERSION)
 GLINTEGER(MINOR_VERSION)
 GLINTEGER(NUM_EXTENSIONS)
-GLSTRINGS(EXTENSIONS, NUM_EXTENSIONS)
+GLSTRINGV(EXTENSIONS, NUM_EXTENSIONS)
 
 GLEXTENSION(EXT_direct_state_access)
 	// OpenGL 1.0
@@ -214,29 +236,6 @@ GLEXTENSION(ARB_vertex_attrib_binding) // Core OpenGL 4.3 and higher.
 	GLFUNCTION(VertexArrayVertexBindingDivisorEXT, void, (GLuint, GLuint, GLuint))
 	GLEND
 
-GLEXTENSION(ARB_framebuffer_object) // Core OpenGL 3.0 and higher.
-	GLFUNCTION(BindFramebuffer, void, (GLenum, GLuint))
-	GLFUNCTION(BindRenderbuffer, void, (GLenum, GLuint))
-	GLFUNCTION(BlitFramebuffer, void, (GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLint, GLbitfield, GLenum))
-	GLFUNCTION(CheckFramebufferStatus, GLenum, (GLenum))
-	GLFUNCTION(DeleteFramebuffers, void, (GLsizei, const GLuint*))
-	GLFUNCTION(DeleteRenderbuffers, void, (GLsizei, const GLuint*))
-	GLFUNCTION(FramebufferRenderbuffer, void, (GLenum, GLenum, GLenum, GLuint))
-	GLFUNCTION(FramebufferTexture1D, void, (GLenum, GLenum, GLenum, GLuint, GLint))
-	GLFUNCTION(FramebufferTexture2D, void, (GLenum, GLenum, GLenum, GLuint, GLint))
-	GLFUNCTION(FramebufferTexture3D, void, (GLenum, GLenum, GLenum, GLuint, GLint, GLint))
-	GLFUNCTION(FramebufferTextureLayer, void, (GLenum, GLenum, GLuint, GLint, GLint))
-	GLFUNCTION(GenFramebuffers, void, (GLsizei, GLuint*))
-	GLFUNCTION(GenRenderbuffers, void, (GLsizei, GLuint*))
-	GLFUNCTION(GenerateMipmap, void, (GLenum))
-	GLFUNCTION(GetFramebufferAttachmentParameteriv, void, (GLenum, GLenum, GLenum, GLint*))
-	GLFUNCTION(GetRenderbufferParameteriv, void, (GLenum, GLenum, GLint*))
-	GLFUNCTION(IsFramebuffer, GLboolean, (GLuint))
-	GLFUNCTION(IsRenderbuffer, GLboolean, (GLuint))
-	GLFUNCTION(RenderbufferStorage, void, (GLenum, GLenum, GLsizei, GLsizei))
-	GLFUNCTION(RenderbufferStorageMultisample, void, (GLenum, GLsizei, GLenum, GLsizei, GLsizei))
-	GLEND
-
 GLEXTENSION(EXT_texture_filter_anisotropic)
 	GLFLOAT(MAX_TEXTURE_MAX_ANISOTROPY_EXT)
 	GLEND
@@ -258,11 +257,12 @@ GLEXTENSION(KHR_debug)
 #undef GLEND
 #undef GLEXTENSION
 #undef GLFLOAT
+#undef GLFLOATV
 #undef GLFUNCTION
 #undef GLINTEGER
 #undef GLINTEGERV
 #undef GLSTRING
-#undef GLSTRINGS
+#undef GLSTRINGV
 
 #undef GLAPI_GET_FUNCTION
 #undef GLAPI_HAS_EXTENSION

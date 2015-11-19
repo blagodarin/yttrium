@@ -49,13 +49,13 @@ namespace Yttrium
 	}
 
 	void ForegroundProperty::draw(Renderer& renderer, const String& text,
-		const Vector2& origin, unsigned alignment, float scale, Renderer::TextCapture* capture) const
+		const PointF& origin, unsigned alignment, float scale, Renderer::TextCapture* capture) const
 	{
 		PushTexture push_texture(renderer, font_texture.get());
 		if (!renderer.set_font(font))
 			return;
 		renderer.set_color(color);
-		renderer.set_font_size(size.x * scale, size.y);
+		renderer.set_font_size(size.width() * scale, size.height());
 		renderer.draw_text(origin, text, alignment, capture);
 	}
 
@@ -72,7 +72,7 @@ namespace Yttrium
 	{
 		if (!loader.load_font("font"_s, &font, &font_texture))
 			return false;
-		if (!loader.load_size("text_size"_s, &size))
+		if (!loader.load_size("text_size"_s, size))
 			return false;
 		loader.load_color("text_color"_s, &color);
 		return true;
