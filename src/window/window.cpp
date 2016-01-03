@@ -46,7 +46,7 @@ namespace Yttrium
 		, _size(640, 480)
 		, _console(_script_context, _allocator)
 		, _screenshot_filename(&_allocator)
-		, _screenshot_image(&_allocator)
+		, _screenshot_image(_allocator)
 		, _debug_text(&_allocator)
 	{
 		for (bool& pressed : _keys)

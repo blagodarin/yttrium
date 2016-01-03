@@ -4,8 +4,8 @@
 #ifndef _include_yttrium_image_h_
 #define _include_yttrium_image_h_
 
-#include <yttrium/buffer.h>
 #include <yttrium/math/size.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium
@@ -145,16 +145,13 @@ namespace Yttrium
 	public:
 
 		///
-		Image(Allocator* allocator = DefaultAllocator)
-			: _buffer(allocator)
-		{
-		}
+		Image(Allocator& allocator = *DefaultAllocator);
 
 		/// Allocate an image for the specified \a format.
 		/// \param format Image format.
 		/// \param allocator Image allocator.
 		/// \note The image data is left uninitialized.
-		Image(const ImageFormat& format, Allocator* allocator = DefaultAllocator);
+		Image(const ImageFormat& format, Allocator& allocator = *DefaultAllocator);
 
 	public:
 
@@ -174,7 +171,7 @@ namespace Yttrium
 		bool intensity_to_bgra();
 
 		///
-		bool is_valid() const { return _buffer.data(); }
+		bool is_valid() const { return static_cast<bool>(_buffer); }
 
 		///
 		bool load(const StaticString& name, ImageType type = ImageType::Auto);
@@ -193,16 +190,16 @@ namespace Yttrium
 		///
 		bool swap_channels();
 
-	public:
-
-		///
-		bool operator ==(const Image& image) const;
-
 	private:
-
+		Allocator& _allocator;
 		ImageFormat _format;
-		Buffer      _buffer;
+		Buffer _buffer;
+
+		friend bool operator==(const Image&, const Image&);
 	};
+
+	Y_API bool operator==(const Image&, const Image&);
+	inline bool operator!=(const Image& lhs, const Image& rhs) { return !(lhs == rhs); }
 }
 
 #endif

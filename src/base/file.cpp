@@ -1,6 +1,6 @@
 #include "file.h"
 
-#include <yttrium/buffer.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
 #include <yttrium/utils.h>
@@ -41,10 +41,10 @@ namespace Yttrium
 	{
 		if (_private && (_private->_mode & Read))
 		{
-			// We should unconditionally crash if the file is too large.
-			// This way we shall have the same behavior for both files larger
-			// than the free space and files larger than all the allocatable space.
-			buffer->resize(min<uint64_t>(size(), SIZE_MAX));
+			const auto buffer_size = size();
+			if (buffer_size > SIZE_MAX)
+				throw std::bad_alloc();
+			buffer->reset(buffer_size);
 			if (read(buffer->data(), buffer->size()))
 				return true;
 		}
@@ -55,11 +55,10 @@ namespace Yttrium
 	{
 		if (_private && (_private->_mode & Read))
 		{
-			// We should unconditionally crash if the file is too large.
-			// This way we shall have the same behavior for both files larger
-			// than the free space and files larger than all the allocatable space.
-
-			string->resize(min<uint64_t>(size(), SIZE_MAX - 1)); // TODO: Make some String::MaxSize.
+			const auto string_size = size();
+			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
+				throw std::bad_alloc();
+			string->resize(string_size);
 			if (read(string->text(), string->size()))
 				return true;
 		}
@@ -130,8 +129,11 @@ namespace Yttrium
 	{
 		if (_private && (_private->_mode & Read))
 		{
+			const auto string_size = size();
+			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
+				throw std::bad_alloc();
 			String result(_private->_allocator);
-			result.resize(min<uint64_t>(size(), SIZE_MAX - 1)); // TODO: See above.
+			result.resize(string_size);
 			if (read(result.text(), result.size()))
 				return result;
 		}

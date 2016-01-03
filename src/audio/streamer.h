@@ -3,7 +3,7 @@
 
 #include <yttrium/audio/io.h>
 #include <yttrium/audio/player.h>
-#include <yttrium/buffer.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/pointer.h>
 
 namespace Yttrium
@@ -26,7 +26,6 @@ namespace Yttrium
 		AudioStreamer(AudioPlayerBackend& backend, Allocator& allocator)
 			: _allocator(allocator)
 			, _backend(backend)
-			, _buffer(&_allocator)
 		{
 		}
 

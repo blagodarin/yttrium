@@ -85,9 +85,15 @@ namespace Yttrium
 		return true;
 	}
 
-	Image::Image(const ImageFormat& format, Allocator* allocator)
-		: _format(format)
-		, _buffer(_format.frame_size(), allocator)
+	Image::Image(Allocator& allocator)
+		: _allocator(allocator)
+	{
+	}
+
+	Image::Image(const ImageFormat& format, Allocator& allocator)
+		: _allocator(allocator)
+		, _format(format)
+		, _buffer(_format.frame_size())
 	{
 	}
 
@@ -96,7 +102,7 @@ namespace Yttrium
 		if (_format._pixel_format != PixelFormat::Gray || _format._bits_per_pixel != 8)
 			return false;
 
-		const size_t old_row_size = _format._row_size;
+		const auto old_row_size = _format._row_size;
 
 		_format._pixel_format = PixelFormat::Bgra;
 		_format._channels = 4;
@@ -104,10 +110,10 @@ namespace Yttrium
 		_format._row_alignment = 4;
 		_format._row_size = _format._width * 4;
 
-		Buffer output_buffer(_format.frame_size(), _buffer.allocator());
+		Buffer output_buffer(_format.frame_size());
 
-		const uint8_t* src = static_cast<const uint8_t*>(_buffer.const_data());
-		uint8_t* dst = static_cast<uint8_t*>(output_buffer.data());
+		const auto* src = &_buffer[0];
+		auto* dst = &output_buffer[0];
 
 		for (size_t i = 0; i < _format._height; ++i)
 		{
@@ -121,7 +127,7 @@ namespace Yttrium
 			src += old_row_size - _format._width;
 		}
 
-		_buffer.swap(output_buffer);
+		_buffer = std::move(output_buffer);
 
 		return true;
 	}
@@ -143,16 +149,14 @@ namespace Yttrium
 				return false;
 		}
 
-		Allocator& allocator = *_buffer.allocator();
-
 		Pointer<ImageReader> reader;
 		switch (type)
 		{
-		case ImageType::Tga:  reader = make_pointer<TgaReader>(allocator, name, &allocator); break;
+		case ImageType::Tga:  reader = make_pointer<TgaReader>(_allocator, name, &_allocator); break;
 	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: reader = make_pointer<JpegReader>(allocator, name, &allocator); break;
+		case ImageType::Jpeg: reader = make_pointer<JpegReader>(_allocator, name, &_allocator); break;
 	#endif
-		case ImageType::Dds:  reader = make_pointer<DdsReader>(allocator, name, &allocator); break;
+		case ImageType::Dds:  reader = make_pointer<DdsReader>(_allocator, name, &_allocator); break;
 		default:              return false;
 		}
 
@@ -160,7 +164,7 @@ namespace Yttrium
 			return false;
 
 		_format = reader->_format;
-		_buffer.resize(_format.frame_size());
+		_buffer.reset(_format.frame_size());
 		return reader->read(_buffer.data());
 	}
 
@@ -179,14 +183,12 @@ namespace Yttrium
 				return false;
 		}
 
-		Allocator& allocator = *_buffer.allocator();
-
 		Pointer<ImageWriter> writer;
 		switch (type)
 		{
-		case ImageType::Tga: writer = make_pointer<TgaWriter>(allocator, name, &allocator); break;
+		case ImageType::Tga: writer = make_pointer<TgaWriter>(_allocator, name, &_allocator); break;
 	#ifndef Y_NO_PNG
-		case ImageType::Png: writer = make_pointer<PngWriter>(allocator, name, &allocator); break;
+		case ImageType::Png: writer = make_pointer<PngWriter>(_allocator, name, &_allocator); break;
 	#endif
 		default:             return false;
 		}
@@ -201,7 +203,7 @@ namespace Yttrium
 	void Image::set_format(const ImageFormat& format)
 	{
 		_format = format;
-		_buffer.resize(_format.frame_size());
+		_buffer.reset(_format.frame_size());
 	}
 
 	void Image::set_size(size_t width, size_t height, size_t row_alignment)
@@ -210,7 +212,7 @@ namespace Yttrium
 		_format.set_width(width);
 		if (row_alignment)
 			_format.set_row_alignment(row_alignment);
-		_buffer.resize(_format.frame_size());
+		_buffer.reset(_format.frame_size());
 	}
 
 	bool Image::swap_channels()
@@ -226,7 +228,7 @@ namespace Yttrium
 
 			if (_format._bits_per_pixel == 24)
 			{
-				uint8_t* scanline = static_cast<uint8_t*>(_buffer.data());
+				auto* scanline = &_buffer[0];
 
 				for (size_t row = 0; row < _format._height; ++row)
 				{
@@ -253,11 +255,10 @@ namespace Yttrium
 		return false;
 	}
 
-	bool Image::operator ==(const Image& image) const
+	bool operator==(const Image& lhs, const Image& rhs)
 	{
 		// This implementation relies on equal padding data (if any).
-
-		return _format == image._format
-			&& _buffer == image._buffer; // TODO: Fix the capacity-less buffer comparison.
+		return lhs._format == rhs._format
+			&& lhs._buffer == rhs._buffer; // TODO: Fix the capacity-less buffer comparison.
 	}
 }

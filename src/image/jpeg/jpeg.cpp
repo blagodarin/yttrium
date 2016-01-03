@@ -6,7 +6,6 @@ namespace Yttrium
 {
 	JpegReader::JpegReader(const StaticString& name, Allocator* allocator)
 		: ImageReader(name, allocator)
-		, _buffer(allocator)
 	{
 		_decompressor.err = jpeg_std_error(&_error_handler.pub);
 		_error_handler.pub.error_exit = error_callback;
@@ -32,7 +31,7 @@ namespace Yttrium
 		if (!_file.read_all(&_buffer))
 			return false;
 
-		jpeg_mem_src(&_decompressor, static_cast<unsigned char*>(_buffer.data()), _buffer.size());
+		jpeg_mem_src(&_decompressor, &_buffer[0], _buffer.size());
 
 		jpeg_read_header(&_decompressor, TRUE);
 

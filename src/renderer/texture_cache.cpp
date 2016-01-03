@@ -31,7 +31,7 @@ namespace Yttrium
 
 		Allocator& allocator = _renderer.allocator();
 
-		Image image(&allocator);
+		Image image(allocator);
 		if (!image.load(name))
 			return {};
 

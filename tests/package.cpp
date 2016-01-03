@@ -1,5 +1,5 @@
-#include <yttrium/buffer.h>
 #include <yttrium/file.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/package.h>
 
 #include "common.h"
@@ -7,23 +7,31 @@
 #include <cstdlib>
 #include <cstring>
 
+namespace Yttrium
+{
+	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
+	{
+		return stream << "Buffer(" << buffer.size() << ")";
+	}
+}
+
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_package)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	std::array<uint8_t, 100003> buffer1;
-	for (uint8_t& item: buffer1)
-		item = rand() % UINT8_MAX;
+	Buffer buffer1(100003);
+	for (auto& byte : buffer1)
+		byte = rand() % UINT8_MAX;
 
-	std::array<uint8_t, 100019> buffer2;
-	for (uint8_t& item: buffer2)
-		item = rand() % UINT8_MAX;
+	Buffer buffer2(100019);
+	for (auto& byte : buffer2)
+		byte = rand() % UINT8_MAX;
 
-	std::array<uint8_t, 100043> buffer3;
-	for (uint8_t& item: buffer3)
-		item = rand() % UINT8_MAX;
+	Buffer buffer3(100043);
+	for (auto& byte : buffer3)
+		byte = rand() % UINT8_MAX;
 
 	File file1(File::Temporary);
 	file1.write(buffer1.data(), buffer1.size());
@@ -82,22 +90,19 @@ BOOST_AUTO_TEST_CASE(test_package)
 
 	BOOST_REQUIRE(packed_file1);
 	BOOST_REQUIRE(packed_file1.read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), buffer1.size());
-	BOOST_CHECK(!::memcmp(actual.const_data(), buffer1.data(), buffer1.size()));
+	BOOST_CHECK_EQUAL(actual, buffer1);
 
 	packed_file1 = File();
 
 	BOOST_REQUIRE(packed_file2);
 	BOOST_REQUIRE(packed_file2.read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), buffer2.size());
-	BOOST_CHECK(!::memcmp(actual.const_data(), buffer2.data(), buffer2.size()));
+	BOOST_CHECK_EQUAL(actual, buffer2);
 
 	packed_file2 = File();
 
 	BOOST_REQUIRE(packed_file3);
 	BOOST_REQUIRE(packed_file3.read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), buffer3.size());
-	BOOST_CHECK(!::memcmp(actual.const_data(), buffer3.data(), buffer3.size()));
+	BOOST_CHECK_EQUAL(actual, buffer3);
 
 	packed_file3 = File();
 }

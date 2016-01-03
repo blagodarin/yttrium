@@ -1,11 +1,19 @@
-#include <yttrium/buffer.h>
 #include <yttrium/file.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/string.h>
 
 #include "common.h"
 
 #include <cstdlib>
 #include <cstring>
+
+namespace Yttrium
+{
+	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
+	{
+		return stream << "Buffer(" << buffer.size() << ")";
+	}
+}
 
 using namespace Yttrium;
 
@@ -25,8 +33,8 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	std::array<uint8_t, 100003> buffer;
-	for (uint8_t& item: buffer)
+	Buffer buffer(100003);
+	for (auto& item : buffer)
 		item = rand() % UINT8_MAX;
 
 	File file(File::Temporary);
@@ -37,8 +45,7 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 	Buffer actual_buffer;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_buffer));
-	BOOST_CHECK_EQUAL(actual_buffer.size(), buffer.size());
-	BOOST_CHECK(!::memcmp(actual_buffer.const_data(), buffer.data(), buffer.size()));
+	BOOST_CHECK_EQUAL(actual_buffer, buffer);
 
 	String actual_string;
 
@@ -51,8 +58,8 @@ BOOST_AUTO_TEST_CASE(test_file_transfer)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	std::array<uint8_t, 100003> buffer;
-	for (uint8_t& item: buffer)
+	Buffer buffer(100003);
+	for (auto& item : buffer)
 		item = rand() % UINT8_MAX;
 
 	File input(File::Temporary);
@@ -68,6 +75,5 @@ BOOST_AUTO_TEST_CASE(test_file_transfer)
 	Buffer actual;
 
 	BOOST_REQUIRE(File(output.name()).read_all(&actual));
-	BOOST_CHECK_EQUAL(actual.size(), buffer.size());
-	BOOST_CHECK(!::memcmp(actual.const_data(), buffer.data(), buffer.size()));
+	BOOST_CHECK_EQUAL(actual, buffer);
 }

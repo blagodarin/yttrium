@@ -260,6 +260,21 @@ test_env.Alias('test', tests, str(tests[0]) + ' --log_level=message')
 AlwaysBuild('test')
 
 #-------------------------------------------------------------------------------
+# Benchmarks
+#-------------------------------------------------------------------------------
+
+def YttriumBenchmark(env, name):
+	build_path = '$BUILD/benchmarks/' + name
+	target = env.Program('bin/benchmark-' + name, env.Glob(build_path + '/*.cpp'))
+	env.Clean(target, env.Dir(build_path))
+	Alias('benchmarks', target)
+	return target
+
+YttriumBenchmark(env, 'buffer')
+
+Clean('benchmarks', Dir('$BUILD/benchmarks'))
+
+#-------------------------------------------------------------------------------
 # Tools
 #-------------------------------------------------------------------------------
 
@@ -312,5 +327,5 @@ Clean('examples', Dir('$BUILD/examples'))
 # All targets
 #===============================================================================
 
-Alias('all', ['yttrium', 'tests', 'tools', 'examples'])
+Alias('all', ['yttrium', 'tests', 'benchmarks', 'tools', 'examples'])
 Clean('all', Dir(['bin', 'lib', '$BUILD']))

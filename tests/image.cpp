@@ -1,6 +1,6 @@
-#include <yttrium/buffer.h>
 #include <yttrium/file.h>
 #include <yttrium/image.h>
+#include <yttrium/memory/buffer.h>
 
 #include "common.h"
 

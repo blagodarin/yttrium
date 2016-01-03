@@ -1,6 +1,6 @@
 #include "sound.h"
 
-#include <yttrium/buffer.h>
+#include <yttrium/memory/buffer.h>
 #include "../../manager.h"
 
 namespace Yttrium
@@ -39,7 +39,10 @@ namespace Yttrium
 		{
 			::alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
 
-			Buffer buffer(reader.size(), allocator()); // NOTE: This might be troublesome with 4+ GB files.
+			const auto reader_size = reader.size();
+			if (reader_size > SIZE_MAX)
+				throw std::bad_alloc();
+			Buffer buffer(reader_size);
 
 			if (reader.read(buffer.data(), buffer.size()) == buffer.size())
 			{

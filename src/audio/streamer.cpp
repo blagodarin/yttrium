@@ -63,7 +63,7 @@ namespace Yttrium
 				if (_backend.set_format(format))
 				{
 					_unit_size = format.unit_size();
-					_buffer.resize(_buffer_units * _unit_size);
+					_buffer.reset(_buffer_units * _unit_size);
 					_source->seek(_begin_sample);
 					return true;
 				}
@@ -90,7 +90,7 @@ namespace Yttrium
 		if (_is_looping)
 		{
 			_source->seek(_loop_sample);
-			size += _source->read(_buffer.data(size), _buffer.size() - tail);
+			size += _source->read(&_buffer[size], _buffer.size() - tail);
 		}
 		return size;
 	}

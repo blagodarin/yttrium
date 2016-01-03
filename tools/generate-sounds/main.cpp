@@ -1,5 +1,5 @@
-#include <yttrium/buffer.h>
 #include <yttrium/file.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/memory/manager.h>
 #include "../../src/audio/io/wav_private.h"
 
