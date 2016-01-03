@@ -8,11 +8,13 @@
 #include <cstring>
 #include <new>
 
-#if Y_IS_DEBUG
-	#include <iostream>
-#endif
-
+#define PRINT_TRACKING_INFO Y_IS_DEBUG
 #define TRACK_WASTED_MEMORY Y_IS_DEBUG
+
+#if PRINT_TRACKING_INFO
+	#include <iostream>
+	#include <sstream>
+#endif
 
 namespace Yttrium
 {
@@ -42,18 +44,30 @@ namespace Yttrium
 			AtomicPair _wasted;
 		#endif
 
-		#if Y_IS_DEBUG
+		#if PRINT_TRACKING_INFO
 			~BufferMemoryStatus()
 			{
+				const auto human_readable_size = [](size_t size)
+				{
+					std::ostringstream stream;
+					if (size < 1024)
+						stream << size << " B";
+					else if (size < 1024 * 1024)
+						stream << size / 1024. << " KiB";
+					else
+						stream << size / 1024. / 1024. << " MiB";
+					return stream.str();
+				};
+
 				const auto max_allocated = _allocated._max_value.load();
-				std::cerr << "(DEBUG) Max buffer memory allocated: " << max_allocated / 1024 << " KiB" << std::endl;
+				std::cerr << "(DEBUG) Max buffer memory allocated: " << human_readable_size(max_allocated) << std::endl;
 			#if TRACK_WASTED_MEMORY
 				const auto max_wasted = _wasted._max_value.load();
-				std::cerr << "(DEBUG) Max buffer memory wasted: " << max_wasted / 1024. << " KiB" << std::endl;
+				std::cerr << "(DEBUG) Max buffer memory wasted: " << human_readable_size(max_wasted) << std::endl;
 			#endif
 				const auto allocated = _allocated._value.load();
 				if (allocated > 0)
-					std::cerr << "(ERROR) Buffer memory leaked: " << allocated / 1024 << " KiB" << std::endl;
+					std::cerr << "(ERROR) Buffer memory leaked: " << human_readable_size(allocated) << std::endl;
 			}
 		#endif
 		};

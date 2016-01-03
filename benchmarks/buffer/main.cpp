@@ -3,12 +3,14 @@
 #include <chrono>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 using namespace Yttrium;
 
 namespace
 {
-	const unsigned ops_per_iteration = 1000;
+	const unsigned ops_per_cycle = 10;
+	const unsigned cycles_per_iteration = 100;
 	const auto step_duration = 10000;
 
 	class Measurement
@@ -28,9 +30,9 @@ namespace
 				<< std::endl;
 		}
 
-		bool add(unsigned ops)
+		bool next_iteration()
 		{
-			_ops += ops;
+			_ops += ops_per_cycle * cycles_per_iteration;
 			_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _start).count();
 			return _milliseconds < step_duration;
 		}
@@ -42,88 +44,122 @@ namespace
 		const std::chrono::steady_clock::time_point _start = std::chrono::steady_clock::now();
 	};
 
-	void common_allocate_deallocate(unsigned size)
+	void common_allocate_deallocate(size_t size)
 	{
+		std::vector<uint8_t*> buffers(ops_per_cycle);
 		Measurement measurement("common");
 		do
 		{
-			for (unsigned i = 0; i < ops_per_iteration; ++i)
-				::free(::malloc(size));
-		} while (measurement.add(ops_per_iteration));
+			for (unsigned i = 0; i < cycles_per_iteration; ++i)
+			{
+				for (auto& buffer : buffers)
+					buffer = static_cast<uint8_t*>(::malloc(size));
+				for (auto& buffer : buffers)
+					::free(buffer);
+			}
+		} while (measurement.next_iteration());
 	}
 
-	void buffer_allocate_deallocate(unsigned size)
+	void buffer_allocate_deallocate(size_t size)
 	{
+		std::vector<Buffer> buffers(ops_per_cycle);
 		Measurement measurement("buffer");
 		do
 		{
-			for (unsigned i = 0; i < ops_per_iteration; ++i)
-				Buffer buffer(size);
-		} while (measurement.add(ops_per_iteration));
+			for (unsigned i = 0; i < cycles_per_iteration; ++i)
+			{
+				for (auto& buffer : buffers)
+					buffer = Buffer(size);
+				for (auto& buffer : buffers)
+					buffer = {};
+			}
+		} while (measurement.next_iteration());
 	}
 
-	void common_allocate_touch_deallocate(unsigned size)
+	void common_allocate_touch_deallocate(size_t size)
 	{
+		std::vector<uint8_t*> buffers(ops_per_cycle);
 		const auto granularity = Buffer::memory_granularity();
 		Measurement measurement("common");
 		do
 		{
-			for (unsigned i = 0; i < ops_per_iteration; ++i)
+			for (unsigned i = 0; i < cycles_per_iteration; ++i)
 			{
-				const auto buffer = static_cast<uint8_t*>(::malloc(size));
-				for (size_t i = 0; i < size; i += granularity)
-					buffer[i] = -1;
-				::free(buffer);
+				for (auto& buffer : buffers)
+				{
+					buffer = static_cast<uint8_t*>(::malloc(size));
+					for (size_t i = 0; i < size; i += granularity)
+						buffer[i] = -1;
+				}
+				for (auto& buffer : buffers)
+					::free(buffer);
 			}
-		} while (measurement.add(ops_per_iteration));
+		} while (measurement.next_iteration());
 	}
 
-	void buffer_allocate_touch_deallocate(unsigned size)
+	void buffer_allocate_touch_deallocate(size_t size)
 	{
+		std::vector<Buffer> buffers(ops_per_cycle);
 		const auto granularity = Buffer::memory_granularity();
 		Measurement measurement("buffer");
 		do
 		{
-			for (unsigned i = 0; i < ops_per_iteration; ++i)
+			for (unsigned i = 0; i < cycles_per_iteration; ++i)
 			{
-				Buffer buffer(size);
-				for (size_t i = 0; i < size; i += granularity)
-					buffer[i] = -1;
+				for (auto& buffer : buffers)
+				{
+					buffer = Buffer(size);
+					for (size_t i = 0; i < size; i += granularity)
+						buffer[i] = -1;
+				}
+				for (auto& buffer : buffers)
+					buffer = {};
 			}
-		} while (measurement.add(ops_per_iteration));
+		} while (measurement.next_iteration());
 	}
 
-	void common_allocate_fill_deallocate(unsigned size)
+	void common_allocate_fill_deallocate(size_t size)
 	{
+		std::vector<uint8_t*> buffers(ops_per_cycle);
 		Measurement measurement("common");
 		do
 		{
-			for (unsigned i = 0; i < ops_per_iteration; ++i)
+			for (unsigned i = 0; i < cycles_per_iteration; ++i)
 			{
-				const auto buffer = ::malloc(size);
-				::memset(buffer, -1, size);
-				::free(buffer);
+				for (auto& buffer : buffers)
+				{
+					buffer = static_cast<uint8_t*>(::malloc(size));
+					::memset(buffer, -1, size);
+				}
+				for (auto& buffer : buffers)
+					::free(buffer);
 			}
-		} while (measurement.add(ops_per_iteration));
+		} while (measurement.next_iteration());
 	}
 
-	void buffer_allocate_fill_deallocate(unsigned size)
+	void buffer_allocate_fill_deallocate(size_t size)
 	{
+		std::vector<Buffer> buffers(ops_per_cycle);
 		Measurement measurement("buffer");
 		do
 		{
-			for (unsigned i = 0; i < ops_per_iteration; ++i)
+			for (unsigned i = 0; i < cycles_per_iteration; ++i)
 			{
-				Buffer buffer(size);
-				::memset(buffer.data(), -1, size);
+				for (auto& buffer : buffers)
+				{
+					buffer = Buffer(size);
+					::memset(buffer.data(), -1, size);
+				}
+				for (auto& buffer : buffers)
+					buffer = {};
 			}
-		} while (measurement.add(ops_per_iteration));
+		} while (measurement.next_iteration());
 	}
 }
 
 int main(int, char**)
 {
-	const auto human_readable_size = [](unsigned bytes) -> std::string
+	const auto human_readable_size = [](size_t bytes)
 	{
 		if (bytes < 1024)
 			return std::to_string(bytes) + " B";
