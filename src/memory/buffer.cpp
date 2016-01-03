@@ -10,6 +10,8 @@
 	#include <iostream>
 #endif
 
+// TODO: Accelerate small buffers (see benchmark).
+
 #define TRACK_WASTED_MEMORY Y_IS_DEBUG
 
 namespace Yttrium
@@ -71,6 +73,20 @@ namespace Yttrium
 	#endif
 	}
 
+	void Buffer::shrink_to_fit() noexcept
+	{
+		const auto new_capacity = pages_size(_size);
+		if (new_capacity < _capacity)
+		{
+			_data = pages_reallocate(_data, _capacity, new_capacity);
+		#if TRACK_WASTED_MEMORY
+			_buffer_memory_status._wasted._value.fetch_sub(_capacity - new_capacity);
+		#endif
+			_buffer_memory_status._allocated._value.fetch_sub(_capacity - new_capacity);
+			_capacity = new_capacity;
+		}
+	}
+
 	void Buffer::reset(size_t size)
 	{
 		if (size > _capacity)
@@ -98,7 +114,7 @@ namespace Yttrium
 		_size = size;
 	}
 
-	size_t Buffer::max_memory_allocated() noexcept
+	size_t Buffer::max_total_memory_allocated() noexcept
 	{
 		return _buffer_memory_status._allocated._max_value;
 	}
@@ -106,6 +122,11 @@ namespace Yttrium
 	size_t Buffer::memory_granularity() noexcept
 	{
 		return pages_size(1);
+	}
+
+	size_t Buffer::total_memory_allocated() noexcept
+	{
+		return _buffer_memory_status._allocated._value;
 	}
 
 	Buffer::Buffer(Buffer&& other) noexcept

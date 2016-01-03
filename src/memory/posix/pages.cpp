@@ -11,14 +11,6 @@
 
 namespace Yttrium
 {
-	const size_t _page_size_mask = []()
-	{
-		const auto page_size = ::sysconf(_SC_PAGE_SIZE);
-		assert(page_size > 0);
-		assert(is_power_of_2(page_size));
-		return page_size - 1;
-	}();
-
 	void* pages_allocate(size_t size) noexcept
 	{
 		assert(size > 0 && size == pages_size(size));
@@ -46,13 +38,17 @@ namespace Yttrium
 		const auto new_pointer = ::mremap(old_pointer, old_size, new_size, MREMAP_MAYMOVE); // TODO: Make portable equivalent.
 		if (new_pointer != MAP_FAILED)
 			return new_pointer;
-		if (errno != ENOMEM)
+		if (errno != ENOMEM && old_size < new_size)
 			return nullptr;
 		::abort();
 	}
 
 	size_t pages_size(size_t size) noexcept
 	{
-		return (size + _page_size_mask) & ~_page_size_mask;
+		static const auto page_size = ::sysconf(_SC_PAGESIZE);
+		assert(page_size > 0);
+		assert(is_power_of_2(page_size));
+		const auto page_size_mask = static_cast<size_t>(page_size) - 1;
+		return (size + page_size_mask) & ~page_size_mask;
 	}
 }

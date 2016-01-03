@@ -12,7 +12,8 @@
 namespace Yttrium
 {
 	/// Memory buffer.
-	/// Buffer memory is allocated in whole pages, which makes every allocation big and very aligned.
+	/// Buffer memory is allocated in whole pages making each allocation big and very aligned.
+	/// Memory buffers can be used without MemoryManager.
 	class Y_API Buffer
 	{
 	public:
@@ -49,15 +50,21 @@ namespace Yttrium
 		///
 		size_t size() const noexcept { return _size; }
 
+		///
+		void shrink_to_fit() noexcept;
+
 		/// Changes the buffer size, invalidating its contents.
 		/// The buffer capacity may remain unchanged if the specified size is not greater than the current size.
 		void reset(size_t);
 
 		/// Returns the maximum size of all buffer memory allocated at one point of time since startup.
-		static size_t max_memory_allocated() noexcept;
+		static size_t max_total_memory_allocated() noexcept;
 
 		/// Returns the granularity of buffer memory, i.e. the size of a memory page.
 		static size_t memory_granularity() noexcept;
+
+		/// Returns the total size of all currently allocated buffer memory.
+		static size_t total_memory_allocated() noexcept;
 
 		Buffer(const Buffer&) = delete;
 		Buffer(Buffer&&) noexcept;
