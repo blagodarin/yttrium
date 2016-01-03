@@ -28,37 +28,38 @@ BOOST_AUTO_TEST_CASE(test_buffer_reset)
 	BOOST_CHECK_EQUAL(buffer.size(), 1);
 	BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
 
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), granularity);
-	BOOST_CHECK_EQUAL(Buffer::max_total_memory_allocated(), granularity);
+	BOOST_CHECK(Buffer::total_memory_allocated() >= granularity);
+	BOOST_CHECK(Buffer::max_total_memory_allocated() >= granularity);
 
 	buffer.reset(granularity);
 	BOOST_CHECK(buffer);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity);
 	BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
 
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), granularity);
-	BOOST_CHECK_EQUAL(Buffer::max_total_memory_allocated(), granularity);
+	BOOST_CHECK(Buffer::total_memory_allocated() >= granularity);
+	BOOST_CHECK(Buffer::max_total_memory_allocated() >= granularity);
 
 	buffer.reset(granularity + 1);
 	BOOST_CHECK(buffer);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity + 1);
 	BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
 
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), granularity * 2);
-	BOOST_CHECK_EQUAL(Buffer::max_total_memory_allocated(), granularity * 2);
+	BOOST_CHECK(Buffer::total_memory_allocated() >= granularity * 2);
+	BOOST_CHECK(Buffer::max_total_memory_allocated() >= granularity * 2);
 
 	buffer.reset(granularity);
 	BOOST_CHECK(buffer);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity);
 	BOOST_CHECK(buffer.capacity() >= granularity);
 
-	BOOST_CHECK_EQUAL(Buffer::max_total_memory_allocated(), granularity * 2);
+	BOOST_CHECK(Buffer::total_memory_allocated() >= granularity);
+	BOOST_CHECK(Buffer::max_total_memory_allocated() >= granularity * 2);
 
 	buffer.shrink_to_fit();
 	BOOST_CHECK(buffer);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity);
 	BOOST_CHECK(buffer.capacity() == granularity);
 
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), granularity);
-	BOOST_CHECK_EQUAL(Buffer::max_total_memory_allocated(), granularity * 2);
+	BOOST_CHECK(Buffer::total_memory_allocated() >= granularity);
+	BOOST_CHECK(Buffer::max_total_memory_allocated() >= granularity * 2);
 }
