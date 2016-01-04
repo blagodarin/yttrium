@@ -2,7 +2,6 @@
 
 #include <yttrium/utils.h>
 
-#include <cassert>
 #include <cstdlib>
 
 #include <errno.h>
@@ -27,6 +26,14 @@ namespace Yttrium
 			::abort();
 	}
 
+	size_t pages_granularity() noexcept
+	{
+		const auto page_size = ::sysconf(_SC_PAGESIZE);
+		if (page_size <= 0)
+			::abort();
+		return page_size;
+	}
+
 	void* pages_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
 	{
 		const auto new_pointer = ::mremap(old_pointer, old_size, new_size, MREMAP_MAYMOVE); // TODO: Make portable equivalent.
@@ -35,14 +42,5 @@ namespace Yttrium
 		if (errno != ENOMEM && old_size < new_size)
 			return nullptr;
 		::abort();
-	}
-
-	size_t pages_size(size_t size) noexcept
-	{
-		static const auto page_size = ::sysconf(_SC_PAGESIZE);
-		assert(page_size > 0);
-		assert(is_power_of_2(page_size));
-		const auto page_size_mask = static_cast<size_t>(page_size) - 1;
-		return (size + page_size_mask) & ~page_size_mask;
 	}
 }

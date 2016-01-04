@@ -9,12 +9,15 @@
 #include <new>
 
 #define PRINT_TRACKING_INFO Y_IS_DEBUG
+#define TRACK_ALLOCATION_COUNT Y_IS_DEBUG
 #define TRACK_WASTED_MEMORY Y_IS_DEBUG
 
 #if PRINT_TRACKING_INFO
 	#include <iostream>
 	#include <sstream>
 #endif
+
+// TODO: Improve allocation algorithm (e.g. use buddy allocator for blocks up to 1 MiB).
 
 namespace Yttrium
 {
@@ -40,6 +43,10 @@ namespace Yttrium
 		struct BufferMemoryStatus
 		{
 			AtomicPair _allocated;
+		#if TRACK_ALLOCATION_COUNT
+			AtomicPair _allocations;
+			std::atomic<size_t> _total_allocations{0};
+		#endif
 		#if TRACK_WASTED_MEMORY
 			AtomicPair _wasted;
 		#endif
@@ -60,78 +67,137 @@ namespace Yttrium
 				};
 
 				const auto max_allocated = _allocated._max_value.load();
-				std::cerr << "(DEBUG) Max buffer memory allocated: " << human_readable_size(max_allocated) << std::endl;
-			#if TRACK_WASTED_MEMORY
-				const auto max_wasted = _wasted._max_value.load();
-				std::cerr << "(DEBUG) Max buffer memory wasted: " << human_readable_size(max_wasted) << std::endl;
+				if (!max_allocated)
+					return;
+				std::cerr << "(DEBUG) Buffer memory statistics:";
+				std::cerr << "\n(DEBUG)  * max_allocated : " << human_readable_size(_allocated._max_value);
+			#if TRACK_ALLOCATION_COUNT
+				std::cerr << "\n(DEBUG)  * max_allocations : " << _allocations._max_value;
+				std::cerr << "\n(DEBUG)  * total_allocations : " << _total_allocations;
 			#endif
+			#if TRACK_WASTED_MEMORY
+				std::cerr << "\n(DEBUG)  * max_wasted : " << human_readable_size(_wasted._max_value);
+			#endif
+				std::cerr << std::endl;
 				const auto allocated = _allocated._value.load();
 				if (allocated > 0)
-					std::cerr << "(ERROR) Buffer memory leaked: " << human_readable_size(allocated) << std::endl;
+				{
+					std::cerr << "(ERROR) Buffer memory leaked: " << human_readable_size(allocated);
+				#if TRACK_ALLOCATION_COUNT
+					std::cerr << " (in " << _allocations._value << " allocations)";
+				#endif
+					std::cerr << std::endl;
+				}
 			}
 		#endif
 		};
 
 		BufferMemoryStatus _buffer_memory_status;
 
-		void* buffer_allocate(size_t size) noexcept
+		size_t buffer_granularity() noexcept
 		{
-			assert(size > 0 && size == pages_size(size));
-			if (size >= SmallBufferThreshold)
-				return pages_allocate(size);
-			const auto granularity = Buffer::memory_granularity();
-			const auto buffer = ::malloc(size + granularity);
-			if (!buffer)
-				return nullptr;
-			auto memory_offset = reinterpret_cast<uintptr_t>(buffer) + sizeof(void*);
-			const auto granularity_mask = uintptr_t{granularity - 1};
-			memory_offset = (memory_offset + granularity_mask) & ~granularity_mask;
-			const auto result = reinterpret_cast<void*>(memory_offset);
-			*(static_cast<void**>(result) - 1) = buffer;
-			_buffer_memory_status._allocated.add(granularity);
-		#if TRACK_WASTED_MEMORY
-			_buffer_memory_status._wasted.add(granularity);
-		#endif
-			return result;
+			static const auto page_size = pages_granularity();
+			assert(is_power_of_2(page_size));
+			return page_size;
 		}
 
-		void buffer_deallocate(void* pointer, size_t size) noexcept
+		size_t buffer_capacity(size_t size) noexcept
 		{
-			assert(pointer);
-			assert(size > 0 && size == pages_size(size));
-			if (size >= SmallBufferThreshold)
-				return pages_deallocate(pointer, size);
-			::free(*(static_cast<void**>(pointer) - 1));
-			const auto granularity = Buffer::memory_granularity();
-		#if TRACK_WASTED_MEMORY
-			_buffer_memory_status._wasted._value.fetch_sub(granularity);
-		#endif
-			_buffer_memory_status._allocated._value.fetch_sub(granularity);
+			const auto granularity_mask = buffer_granularity() - 1;
+			return (size + granularity_mask) & ~granularity_mask;
 		}
 
-		void* buffer_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
+		void* buffer_allocate(size_t capacity)
 		{
-			assert(old_pointer);
-			assert(old_size > 0 && old_size == pages_size(old_size));
-			assert(new_size > 0 && new_size == pages_size(new_size));
-			if (old_size >= SmallBufferThreshold && new_size >= SmallBufferThreshold)
-				return pages_reallocate(old_pointer, old_size, new_size);
-			// This is a rare situation, so let's do something simple.
-			const auto new_pointer = buffer_allocate(new_size);
-			::memcpy(new_pointer, old_pointer, min(old_size, new_size));
-			buffer_deallocate(old_pointer, old_size);
-			return new_pointer;
+			assert(capacity > 0 && capacity == buffer_capacity(capacity));
+			if (capacity >= SmallBufferThreshold)
+			{
+				const auto data = pages_allocate(capacity);
+				if (!data)
+					throw std::bad_alloc();
+				_buffer_memory_status._allocated.add(capacity);
+			#if TRACK_ALLOCATION_COUNT
+				_buffer_memory_status._allocations.add(1);
+				++_buffer_memory_status._total_allocations;
+			#endif
+				return data;
+			}
+			else
+			{
+				const auto granularity = buffer_granularity();
+				const auto buffer = ::malloc(capacity + granularity);
+				if (!buffer)
+					throw std::bad_alloc();
+				auto memory_offset = reinterpret_cast<uintptr_t>(buffer) + sizeof(void*);
+				const auto granularity_mask = uintptr_t{granularity - 1};
+				memory_offset = (memory_offset + granularity_mask) & ~granularity_mask;
+				const auto data = reinterpret_cast<void*>(memory_offset);
+				*(static_cast<void**>(data) - 1) = buffer;
+				_buffer_memory_status._allocated.add(capacity + granularity);
+			#if TRACK_ALLOCATION_COUNT
+				_buffer_memory_status._allocations.add(1);
+				++_buffer_memory_status._total_allocations;
+			#endif
+			#if TRACK_WASTED_MEMORY
+				_buffer_memory_status._wasted.add(granularity);
+			#endif
+				return data;
+			}
+		}
+
+		void buffer_deallocate(void* data, size_t capacity) noexcept
+		{
+			assert(data);
+			assert(capacity > 0 && capacity == buffer_capacity(capacity));
+			if (capacity >= SmallBufferThreshold)
+			{
+				pages_deallocate(data, capacity);
+				_buffer_memory_status._allocated._value.fetch_sub(capacity);
+			#if TRACK_ALLOCATION_COUNT
+				_buffer_memory_status._allocations._value.fetch_sub(1);
+			#endif
+			}
+			else
+			{
+				::free(*(static_cast<void**>(data) - 1));
+				const auto granularity = buffer_granularity();
+				_buffer_memory_status._allocated._value.fetch_sub(capacity + granularity);
+			#if TRACK_ALLOCATION_COUNT
+				_buffer_memory_status._allocations._value.fetch_sub(1);
+			#endif
+			#if TRACK_WASTED_MEMORY
+				_buffer_memory_status._wasted._value.fetch_sub(granularity);
+			#endif
+			}
+		}
+
+		void* buffer_reallocate(void* old_data, size_t old_capacity, size_t new_capacity)
+		{
+			assert(old_data);
+			assert(old_capacity > 0 && old_capacity == buffer_capacity(old_capacity));
+			assert(new_capacity > 0 && new_capacity == buffer_capacity(new_capacity));
+			if (old_capacity >= SmallBufferThreshold && new_capacity >= SmallBufferThreshold)
+			{
+				const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
+				if (!new_data)
+					throw std::bad_alloc();
+				return new_data;
+			}
+			else
+			{
+				// This is a rare situation, so let's do something simple.
+				const auto new_data = buffer_allocate(new_capacity);
+				buffer_deallocate(old_data, old_capacity);
+				return new_data;
+			}
 		}
 	}
 
 	Buffer::Buffer(size_t size)
 		: _size(size)
-		, _capacity(pages_size(_size))
+		, _capacity(buffer_capacity(_size))
 		, _data(buffer_allocate(_capacity))
 	{
-		if (!_data)
-			throw std::bad_alloc();
-		_buffer_memory_status._allocated.add(_capacity);
 	#if TRACK_WASTED_MEMORY
 		if (_capacity > _size)
 			_buffer_memory_status._wasted.add(_capacity - _size);
@@ -140,14 +206,24 @@ namespace Yttrium
 
 	void Buffer::shrink_to_fit() noexcept
 	{
-		const auto new_capacity = pages_size(_size);
+		const auto new_capacity = buffer_capacity(_size);
 		if (new_capacity < _capacity)
 		{
-			_data = buffer_reallocate(_data, _capacity, new_capacity);
-		#if TRACK_WASTED_MEMORY
-			_buffer_memory_status._wasted._value.fetch_sub(_capacity - new_capacity);
-		#endif
-			_buffer_memory_status._allocated._value.fetch_sub(_capacity - new_capacity);
+			if (!new_capacity)
+			{
+				buffer_deallocate(_data, _capacity);
+			#if TRACK_WASTED_MEMORY
+				_buffer_memory_status._wasted._value.fetch_sub(_capacity);
+			#endif
+				_data = nullptr;
+			}
+			else
+			{
+				_data = buffer_reallocate(_data, _capacity, new_capacity);
+			#if TRACK_WASTED_MEMORY
+				_buffer_memory_status._wasted._value.fetch_sub(_capacity - new_capacity);
+			#endif
+			}
 			_capacity = new_capacity;
 		}
 	}
@@ -156,15 +232,10 @@ namespace Yttrium
 	{
 		if (size > _capacity)
 		{
-			const auto new_capacity = pages_size(size);
+			const auto new_capacity = buffer_capacity(size);
 			const auto new_data = _data ? buffer_reallocate(_data, _capacity, new_capacity) : buffer_allocate(new_capacity);
-			if (!new_data)
-				throw std::bad_alloc();
 		#if TRACK_WASTED_MEMORY
 			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
-		#endif
-			_buffer_memory_status._allocated.add(new_capacity - _capacity);
-		#if TRACK_WASTED_MEMORY
 			_buffer_memory_status._wasted.add(new_capacity - size);
 		#endif
 			_capacity = new_capacity;
@@ -186,7 +257,7 @@ namespace Yttrium
 
 	size_t Buffer::memory_granularity() noexcept
 	{
-		return pages_size(1);
+		return buffer_granularity();
 	}
 
 	size_t Buffer::total_memory_allocated() noexcept
@@ -210,7 +281,6 @@ namespace Yttrium
 		#if TRACK_WASTED_MEMORY
 			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
 		#endif
-			_buffer_memory_status._allocated._value.fetch_sub(_capacity);
 		}
 	}
 
@@ -222,7 +292,6 @@ namespace Yttrium
 		#if TRACK_WASTED_MEMORY
 			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
 		#endif
-			_buffer_memory_status._allocated._value.fetch_sub(_capacity);
 		}
 		_size = other._size;
 		_capacity = other._capacity;

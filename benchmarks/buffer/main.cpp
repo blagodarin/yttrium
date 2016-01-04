@@ -9,8 +9,8 @@ using namespace Yttrium;
 
 namespace
 {
-	const unsigned ops_per_cycle = 10;
-	const unsigned cycles_per_iteration = 100;
+	const unsigned ops_per_cycle = 16;
+	const unsigned cycles_per_iteration = 64;
 	const auto step_duration = 10000;
 
 	class Measurement
@@ -172,7 +172,7 @@ int main(int, char**)
 
 	std::cout << "Allocate-deallocate:" << std::endl;
 
-	for (unsigned i = 16; i <= 24; ++i)
+	for (unsigned i = 0; i <= 24; ++i)
 	{
 		const auto size = size_t{1} << i;
 		std::cout << " * " << human_readable_size(size) << ":" << std::endl;
@@ -182,7 +182,7 @@ int main(int, char**)
 
 	std::cout << "\nAllocate-touch-deallocate:" << std::endl;
 
-	for (unsigned i = 16; i <= 24; ++i)
+	for (unsigned i = 0; i <= 24; ++i)
 	{
 		const auto size = size_t{1} << i;
 		std::cout << " * " << human_readable_size(size) << ":" << std::endl;
@@ -192,7 +192,7 @@ int main(int, char**)
 
 	std::cout << "\nAllocate-fill-deallocate:" << std::endl;
 
-	for (unsigned i = 16; i <= 24; ++i)
+	for (unsigned i = 0; i <= 24; ++i)
 	{
 		const auto size = size_t{1} << i;
 		std::cout << " * " << human_readable_size(size) << ":" << std::endl;
