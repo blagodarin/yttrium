@@ -38,7 +38,7 @@ namespace Yttrium
 		if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 			image.intensity_to_bgra();
 
-		const auto& backend_texture = _renderer.create_texture_2d(image.format(), image.const_data());
+		const auto& backend_texture = _renderer.create_texture_2d(image.format(), image.data());
 		if (!backend_texture)
 			return {};
 

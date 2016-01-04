@@ -18,25 +18,17 @@ namespace Yttrium
 	{
 	public:
 
-		///
+		/// Creates a buffer with no data.
 		Buffer() noexcept = default;
 
-		/// Creates a memory buffer of the specified size with uninitialized contents.
-		/// The specified size must be positive.
-		/// Throws \c std::bad_alloc if unable to allocate memory.
+		/// Creates a buffer of the specified size with uninitialized contents.
 		explicit Buffer(size_t);
-
-		explicit operator bool() const noexcept { return _data; }
-
-		///
-		uint8_t& operator[](size_t offset) noexcept { return static_cast<uint8_t*>(_data)[offset]; }
-		const uint8_t& operator[](size_t offset) const noexcept { return static_cast<const uint8_t*>(_data)[offset]; }
 
 		///
 		uint8_t* begin() noexcept { return static_cast<uint8_t*>(_data); }
 		const uint8_t* begin() const noexcept { return static_cast<const uint8_t*>(_data); }
 
-		///
+		/// Returns the size of memory allocated for the buffer.
 		size_t capacity() const noexcept { return _capacity; }
 
 		///
@@ -47,15 +39,19 @@ namespace Yttrium
 		uint8_t* end() noexcept { return static_cast<uint8_t*>(_data) + _size; }
 		const uint8_t* end() const noexcept { return static_cast<const uint8_t*>(_data) + _size; }
 
-		///
+		/// Changes the buffer size, invalidating its contents.
+		/// The buffer capacity may remain unchanged if the specified size is not greater than current capacity.
+		void reset(size_t);
+
+		/// Returns the requested size of the buffer.
 		size_t size() const noexcept { return _size; }
 
-		///
+		/// Releases unused buffer capacity if possible.
 		void shrink_to_fit() noexcept;
 
-		/// Changes the buffer size, invalidating its contents.
-		/// The buffer capacity may remain unchanged if the specified size is not greater than the current size.
-		void reset(size_t);
+		///
+		uint8_t& operator[](size_t offset) noexcept { return static_cast<uint8_t*>(_data)[offset]; }
+		const uint8_t& operator[](size_t offset) const noexcept { return static_cast<const uint8_t*>(_data)[offset]; }
 
 		/// Returns the maximum size of all buffer memory allocated at one point of time since startup.
 		static size_t max_total_memory_allocated() noexcept;

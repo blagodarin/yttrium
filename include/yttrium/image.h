@@ -153,25 +153,15 @@ namespace Yttrium
 		/// \note The image data is left uninitialized.
 		Image(const ImageFormat& format, Allocator& allocator = *DefaultAllocator);
 
-	public:
-
 		///
-		const void* const_data() const { return _buffer.data(); }
-
-		///
-		void* data() { return _buffer.data(); }
-
-		///
-		const void* data() const { return _buffer.data(); }
+		void* data() noexcept { return _buffer.data(); }
+		const void* data() const noexcept { return _buffer.data(); }
 
 		///
 		ImageFormat format() const { return _format; }
 
 		///
 		bool intensity_to_bgra();
-
-		///
-		bool is_valid() const { return static_cast<bool>(_buffer); }
 
 		///
 		bool load(const StaticString& name, ImageType type = ImageType::Auto);

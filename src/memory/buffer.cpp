@@ -196,12 +196,34 @@ namespace Yttrium
 	Buffer::Buffer(size_t size)
 		: _size(size)
 		, _capacity(buffer_capacity(_size))
-		, _data(buffer_allocate(_capacity))
+		, _data(_capacity > 0 ? buffer_allocate(_capacity) : nullptr)
 	{
 	#if TRACK_WASTED_MEMORY
 		if (_capacity > _size)
 			_buffer_memory_status._wasted.add(_capacity - _size);
 	#endif
+	}
+
+	void Buffer::reset(size_t size)
+	{
+		if (size > _capacity)
+		{
+			const auto new_capacity = buffer_capacity(size);
+			const auto new_data = _data ? buffer_reallocate(_data, _capacity, new_capacity) : buffer_allocate(new_capacity);
+		#if TRACK_WASTED_MEMORY
+			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
+			_buffer_memory_status._wasted.add(new_capacity - size);
+		#endif
+			_capacity = new_capacity;
+			_data = new_data;
+		}
+	#if TRACK_WASTED_MEMORY
+		else if (size < _size)
+			_buffer_memory_status._wasted.add(_size - size);
+		else
+			_buffer_memory_status._wasted._value.fetch_sub(size - _size);
+	#endif
+		_size = size;
 	}
 
 	void Buffer::shrink_to_fit() noexcept
@@ -226,28 +248,6 @@ namespace Yttrium
 			}
 			_capacity = new_capacity;
 		}
-	}
-
-	void Buffer::reset(size_t size)
-	{
-		if (size > _capacity)
-		{
-			const auto new_capacity = buffer_capacity(size);
-			const auto new_data = _data ? buffer_reallocate(_data, _capacity, new_capacity) : buffer_allocate(new_capacity);
-		#if TRACK_WASTED_MEMORY
-			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
-			_buffer_memory_status._wasted.add(new_capacity - size);
-		#endif
-			_capacity = new_capacity;
-			_data = new_data;
-		}
-	#if TRACK_WASTED_MEMORY
-		else if (size < _size)
-			_buffer_memory_status._wasted.add(_size - size);
-		else
-			_buffer_memory_status._wasted._value.fetch_sub(size - _size);
-	#endif
-		_size = size;
 	}
 
 	size_t Buffer::max_total_memory_allocated() noexcept
