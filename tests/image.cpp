@@ -4,6 +4,14 @@
 
 #include "common.h"
 
+namespace Yttrium
+{
+	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
+	{
+		return stream << "Buffer(" << buffer.size() << ")";
+	}
+}
+
 using namespace Yttrium;
 
 // The TGA test must come first because the TGA format
@@ -74,12 +82,10 @@ BOOST_AUTO_TEST_CASE(test_png)
 
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
 
-	Buffer expected;
-	Buffer actual;
-
-	BOOST_REQUIRE(File("tests/image/gradient24.png").read_all(&expected));
-	BOOST_REQUIRE(File(file.name()).read_all(&actual));
-	BOOST_CHECK(expected == actual);
+	const auto expected = File::read_to_buffer("tests/image/gradient24.png");
+	BOOST_REQUIRE(expected.size() > 0);
+	const auto actual = File::read_to_buffer(file.name());
+	BOOST_CHECK_EQUAL(expected, actual);
 }
 
 BOOST_AUTO_TEST_CASE(test_intensity)

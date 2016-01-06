@@ -140,6 +140,24 @@ namespace Yttrium
 		return {};
 	}
 
+	Buffer File::read_to_buffer(const StaticString& name, Allocator* allocator)
+	{
+		File file(name, allocator);
+		if (!file)
+			return {};
+		const auto file_size = file.size();
+		if (file_size <= 0)
+			return {};
+		if (file_size > SIZE_MAX - 1)
+			throw std::bad_alloc();
+		Buffer buffer(file_size + 1);
+		if (file.read(buffer.data(), file_size) != file_size)
+			return {};
+		buffer[file_size] = '\0';
+		buffer.resize(file_size);
+		return buffer;
+	}
+
 	File::File(Private* private_, uint64_t base, uint64_t size)
 		: _private(Private::copy(private_))
 		, _offset(0)

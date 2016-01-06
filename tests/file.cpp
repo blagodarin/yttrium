@@ -9,6 +9,14 @@
 
 namespace Yttrium
 {
+	Buffer make_random_buffer(size_t size)
+	{
+		Buffer buffer(size);
+		for (auto& byte : buffer)
+			byte = rand() % UINT8_MAX;
+		return buffer;
+	}
+
 	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
 	{
 		return stream << "Buffer(" << buffer.size() << ")";
@@ -33,34 +41,46 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	Buffer buffer(100003);
-	for (auto& item : buffer)
-		item = rand() % UINT8_MAX;
+	const auto expected_buffer = make_random_buffer(100003);
 
 	File file(File::Temporary);
 
-	file.write(buffer.data(), buffer.size());
+	file.write(expected_buffer.data(), expected_buffer.size());
 	file.flush();
 
 	Buffer actual_buffer;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_buffer));
-	BOOST_CHECK_EQUAL(actual_buffer, buffer);
+	BOOST_CHECK_EQUAL(actual_buffer, expected_buffer);
 
 	String actual_string;
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_string));
-	BOOST_CHECK_EQUAL(actual_string.size(), buffer.size());
-	BOOST_CHECK(!::memcmp(actual_string.const_text(), buffer.data(), buffer.size()));
+	BOOST_CHECK_EQUAL(actual_string.size(), expected_buffer.size());
+	BOOST_CHECK(!::memcmp(actual_string.const_text(), expected_buffer.data(), expected_buffer.size()));
+}
+
+BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
+{
+	DECLARE_MEMORY_MANAGER;
+
+	const auto expected = make_random_buffer(Buffer::memory_granularity());
+
+	File file(File::Temporary);
+	file.write(expected.data(), expected.size());
+	file.flush();
+
+	const auto actual = File::read_to_buffer(file.name());
+	BOOST_CHECK_EQUAL(actual, expected);
+	BOOST_REQUIRE(actual.capacity() > actual.size());
+	BOOST_CHECK_EQUAL(actual[actual.size()], '\0');
 }
 
 BOOST_AUTO_TEST_CASE(test_file_transfer)
 {
 	DECLARE_MEMORY_MANAGER;
 
-	Buffer buffer(100003);
-	for (auto& item : buffer)
-		item = rand() % UINT8_MAX;
+	const auto buffer = make_random_buffer(100003);
 
 	File input(File::Temporary);
 
@@ -72,8 +92,6 @@ BOOST_AUTO_TEST_CASE(test_file_transfer)
 
 	FileTransfer<8192>(&output, &input);
 
-	Buffer actual;
-
-	BOOST_REQUIRE(File(output.name()).read_all(&actual));
+	const auto actual = File::read_to_buffer(output.name());
 	BOOST_CHECK_EQUAL(actual, buffer);
 }

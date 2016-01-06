@@ -46,6 +46,7 @@ namespace Yttrium
 		#if TRACK_ALLOCATION_COUNT
 			AtomicPair _allocations;
 			std::atomic<size_t> _total_allocations{0};
+			std::atomic<size_t> _total_reallocations{0};
 		#endif
 		#if TRACK_WASTED_MEMORY
 			AtomicPair _wasted;
@@ -74,6 +75,7 @@ namespace Yttrium
 			#if TRACK_ALLOCATION_COUNT
 				std::cerr << "\n(DEBUG)  * max_allocations : " << _allocations._max_value;
 				std::cerr << "\n(DEBUG)  * total_allocations : " << _total_allocations;
+				std::cerr << "\n(DEBUG)  * total_reallocations : " << _total_reallocations;
 			#endif
 			#if TRACK_WASTED_MEMORY
 				std::cerr << "\n(DEBUG)  * max_wasted : " << human_readable_size(_wasted._max_value);
@@ -171,7 +173,7 @@ namespace Yttrium
 			}
 		}
 
-		void* buffer_reallocate(void* old_data, size_t old_capacity, size_t new_capacity)
+		void* buffer_reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size)
 		{
 			assert(old_data);
 			assert(old_capacity > 0 && old_capacity == buffer_capacity(old_capacity));
@@ -181,13 +183,21 @@ namespace Yttrium
 				const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 				if (!new_data)
 					throw std::bad_alloc();
+			#if TRACK_ALLOCATION_COUNT
+				++_buffer_memory_status._total_reallocations; // TODO: Perhaps pure shrinking reallocations should be counted differently.
+			#endif
 				return new_data;
 			}
 			else
 			{
-				// This is a rare situation, so let's do something simple.
+				// This situation is rare, so let's do something simple.
 				const auto new_data = buffer_allocate(new_capacity);
+				if (old_size > 0)
+					::memcpy(new_data, old_data, old_size);
 				buffer_deallocate(old_data, old_capacity);
+			#if TRACK_ALLOCATION_COUNT
+				++_buffer_memory_status._total_reallocations;
+			#endif
 				return new_data;
 			}
 		}
@@ -209,7 +219,9 @@ namespace Yttrium
 		if (size > _capacity)
 		{
 			const auto new_capacity = buffer_capacity(size);
-			const auto new_data = _data ? buffer_reallocate(_data, _capacity, new_capacity) : buffer_allocate(new_capacity);
+			const auto new_data = _data
+				? buffer_reallocate(_data, _capacity, new_capacity, 0)
+				: buffer_allocate(new_capacity);
 		#if TRACK_WASTED_MEMORY
 			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
 			_buffer_memory_status._wasted.add(new_capacity - size);
@@ -226,7 +238,31 @@ namespace Yttrium
 		_size = size;
 	}
 
-	void Buffer::shrink_to_fit() noexcept
+	void Buffer::resize(size_t size)
+	{
+		if (size > _capacity)
+		{
+			const auto new_capacity = buffer_capacity(size);
+			const auto new_data = _data
+				? buffer_reallocate(_data, _capacity, new_capacity, min(size, _size))
+				: buffer_allocate(new_capacity);
+		#if TRACK_WASTED_MEMORY
+			_buffer_memory_status._wasted._value.fetch_sub(_capacity - _size);
+			_buffer_memory_status._wasted.add(new_capacity - size);
+		#endif
+			_capacity = new_capacity;
+			_data = new_data;
+		}
+	#if TRACK_WASTED_MEMORY
+		else if (size < _size)
+			_buffer_memory_status._wasted.add(_size - size);
+		else
+			_buffer_memory_status._wasted._value.fetch_sub(size - _size);
+	#endif
+		_size = size;
+	}
+
+	void Buffer::shrink_to_fit()
 	{
 		const auto new_capacity = buffer_capacity(_size);
 		if (new_capacity < _capacity)
@@ -241,7 +277,7 @@ namespace Yttrium
 			}
 			else
 			{
-				_data = buffer_reallocate(_data, _capacity, new_capacity);
+				_data = buffer_reallocate(_data, _capacity, new_capacity, _size);
 			#if TRACK_WASTED_MEMORY
 				_buffer_memory_status._wasted._value.fetch_sub(_capacity - new_capacity);
 			#endif

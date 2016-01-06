@@ -2,7 +2,10 @@
 * Library:
 	* Overall:
 		- Windows port.
+		- Lua scripting.
 		- Get rid of exception-unsafe Y_NEW.
+		- Introduce generic resource concept (real file, packed file, named buffer, etc.).
+		- Introduce advanced resource naming (string-based, hash-based).
 	* GUI:
 		- Line editor widget.
 		- Layouts.

@@ -133,6 +133,12 @@ namespace Yttrium
 
 	public:
 
+		/// Reads the specified file to the buffer.
+		/// The buffer is guaranteed to be implicitly zero-terminated.
+		static Buffer read_to_buffer(const StaticString& name, Allocator* allocator = DefaultAllocator);
+
+	public:
+
 		class Private;
 
 	protected:
