@@ -12,9 +12,8 @@ namespace Yttrium
 		, _capacity(buffer_memory_capacity(_size))
 		, _data(_capacity > 0 ? buffer_memory_allocate(_capacity) : nullptr)
 	{
-	#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-		if (_capacity > _size)
-			_buffer_memory_status._total_capacity_wasted.add(_capacity - _size);
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		buffer_memory_track_size_allocation(_size);
 	#endif
 	}
 
@@ -26,9 +25,6 @@ namespace Yttrium
 		const auto new_data = _data
 			? buffer_memory_reallocate(_data, _capacity, new_capacity, _size)
 			: buffer_memory_allocate(new_capacity);
-	#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-		_buffer_memory_status._total_capacity_wasted.add(new_capacity - _capacity);
-	#endif
 		_capacity = new_capacity;
 		_data = new_data;
 	}
@@ -41,18 +37,11 @@ namespace Yttrium
 			const auto new_data = _data
 				? buffer_memory_reallocate(_data, _capacity, new_capacity, 0)
 				: buffer_memory_allocate(new_capacity);
-		#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-			_buffer_memory_status._total_capacity_wasted._value.fetch_sub(_capacity - _size);
-			_buffer_memory_status._total_capacity_wasted.add(new_capacity - size);
-		#endif
 			_capacity = new_capacity;
 			_data = new_data;
 		}
-	#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-		else if (size < _size)
-			_buffer_memory_status._total_capacity_wasted.add(_size - size);
-		else
-			_buffer_memory_status._total_capacity_wasted._value.fetch_sub(size - _size);
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		buffer_memory_track_size_change(_size, size);
 	#endif
 		_size = size;
 	}
@@ -65,18 +54,11 @@ namespace Yttrium
 			const auto new_data = _data
 				? buffer_memory_reallocate(_data, _capacity, new_capacity, min(size, _size))
 				: buffer_memory_allocate(new_capacity);
-		#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-			_buffer_memory_status._total_capacity_wasted._value.fetch_sub(_capacity - _size);
-			_buffer_memory_status._total_capacity_wasted.add(new_capacity - size);
-		#endif
 			_capacity = new_capacity;
 			_data = new_data;
 		}
-	#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-		else if (size < _size)
-			_buffer_memory_status._total_capacity_wasted.add(_size - size);
-		else
-			_buffer_memory_status._total_capacity_wasted._value.fetch_sub(size - _size);
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		buffer_memory_track_size_change(_size, size);
 	#endif
 		_size = size;
 	}
@@ -89,25 +71,21 @@ namespace Yttrium
 			if (!new_capacity)
 			{
 				buffer_memory_deallocate(_data, _capacity);
-			#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-				_buffer_memory_status._total_capacity_wasted._value.fetch_sub(_capacity);
-			#endif
 				_data = nullptr;
 			}
 			else
-			{
 				_data = buffer_memory_reallocate(_data, _capacity, new_capacity, _size);
-			#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-				_buffer_memory_status._total_capacity_wasted._value.fetch_sub(_capacity - new_capacity);
-			#endif
-			}
 			_capacity = new_capacity;
 		}
 	}
 
-	size_t Buffer::max_total_capacity() noexcept
+	size_t Buffer::max_total_size() noexcept
 	{
-		return _buffer_memory_status._total_capacity._max_value;
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		return buffer_memory_max_total_size();
+	#else
+		return 0;
+	#endif
 	}
 
 	size_t Buffer::memory_granularity() noexcept
@@ -115,9 +93,13 @@ namespace Yttrium
 		return buffer_memory_granularity();
 	}
 
-	size_t Buffer::total_capacity() noexcept
+	size_t Buffer::total_size() noexcept
 	{
-		return _buffer_memory_status._total_capacity._value;
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		return buffer_memory_total_size();
+	#else
+		return 0;
+	#endif
 	}
 
 	Buffer::Buffer(Buffer&& other) noexcept
@@ -133,8 +115,8 @@ namespace Yttrium
 		if (_data)
 		{
 			buffer_memory_deallocate(_data, _capacity);
-		#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-			_buffer_memory_status._total_capacity_wasted._value.fetch_sub(_capacity - _size);
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			buffer_memory_track_size_deallocation(_size);
 		#endif
 		}
 	}
@@ -144,8 +126,8 @@ namespace Yttrium
 		if (_data)
 		{
 			buffer_memory_deallocate(_data, _capacity);
-		#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
-			_buffer_memory_status._total_capacity_wasted._value.fetch_sub(_capacity - _size);
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			buffer_memory_track_size_deallocation(_size);
 		#endif
 		}
 		_size = other._size;

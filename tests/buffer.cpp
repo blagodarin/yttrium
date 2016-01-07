@@ -1,5 +1,6 @@
 #include <yttrium/memory/buffer.h>
 
+#include "src/memory/buffer_memory.h"
 #include "common.h"
 
 using namespace Yttrium;
@@ -8,41 +9,31 @@ const auto granularity = Buffer::memory_granularity();
 
 BOOST_AUTO_TEST_CASE(test_buffer_initialization)
 {
-	BOOST_REQUIRE_EQUAL(Buffer::total_capacity(), 0);
 	{
 		Buffer buffer;
 		BOOST_CHECK_EQUAL(buffer.size(), 0);
 		BOOST_CHECK_EQUAL(buffer.capacity(), 0);
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	}
 	{
 		Buffer buffer(0);
 		BOOST_CHECK_EQUAL(buffer.size(), 0);
 		BOOST_CHECK_EQUAL(buffer.capacity(), 0);
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	}
 	{
 		Buffer buffer(1);
 		BOOST_CHECK_EQUAL(buffer.size(), 1);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
-		BOOST_CHECK(Buffer::total_capacity() >= granularity);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	{
 		Buffer buffer(granularity);
 		BOOST_CHECK_EQUAL(buffer.size(), granularity);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
-
-		BOOST_CHECK(Buffer::total_capacity() >= granularity);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	{
 		Buffer buffer(granularity + 1);
 		BOOST_CHECK_EQUAL(buffer.size(), granularity + 1);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
-		BOOST_CHECK(Buffer::total_capacity() >= granularity * 2);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_buffer_reserve)
@@ -108,8 +99,6 @@ BOOST_AUTO_TEST_CASE(test_buffer_resize)
 
 BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 {
-	BOOST_REQUIRE_EQUAL(Buffer::total_capacity(), 0);
-
 	Buffer buffer(granularity * 2);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity * 2);
 	BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
@@ -129,6 +118,31 @@ BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 	buffer.shrink_to_fit();
 	BOOST_CHECK_EQUAL(buffer.size(), 0);
 	BOOST_CHECK_EQUAL(buffer.capacity(), 0);
-
-	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 }
+
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+BOOST_AUTO_TEST_CASE(test_buffer_total_size)
+{
+	BOOST_CHECK_EQUAL(Buffer::total_size(), 0);
+	{
+		Buffer buffer;
+		BOOST_CHECK_EQUAL(Buffer::total_size(), 0);
+
+		buffer.reserve(1);
+		BOOST_CHECK_EQUAL(Buffer::total_size(), 0);
+
+		buffer.resize(1);
+		BOOST_CHECK_EQUAL(Buffer::total_size(), 1);
+
+		buffer.resize(0);
+		BOOST_CHECK_EQUAL(Buffer::total_size(), 0);
+
+		buffer.resize(1);
+		BOOST_CHECK_EQUAL(Buffer::total_size(), 1);
+
+		buffer = Buffer(2);
+		BOOST_CHECK_EQUAL(Buffer::total_size(), 2);
+	}
+	BOOST_CHECK_EQUAL(Buffer::total_size(), 0);
+}
+#endif

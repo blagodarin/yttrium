@@ -288,9 +288,11 @@ namespace Yttrium
 		if (_matrix_stack.empty())
 			return;
 		assert(_matrix_stack.back().second == MatrixType::Transformation);
+	#ifndef NDEBUG
 		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
 			[](const auto& matrix) { return matrix.second == MatrixType::Projection; });
 		assert(last_projection != _matrix_stack.rend());
+	#endif
 	}
 
 	void RendererImpl::pop_texture()

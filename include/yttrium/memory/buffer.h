@@ -59,14 +59,14 @@ namespace Yttrium
 		uint8_t& operator[](size_t offset) noexcept { return static_cast<uint8_t*>(_data)[offset]; }
 		const uint8_t& operator[](size_t offset) const noexcept { return static_cast<const uint8_t*>(_data)[offset]; }
 
-		/// Returns the maximum total capacity of all buffer memory since startup.
-		static size_t max_total_capacity() noexcept;
+		/// Returns the maximum total size of all Buffers.
+		static size_t max_total_size() noexcept;
 
 		/// Returns the granularity of buffer memory, i.e. the size of a memory page.
 		static size_t memory_granularity() noexcept;
 
-		/// Returns the current total capacity of all buffer memory.
-		static size_t total_capacity() noexcept;
+		/// Returns the total size of all Buffers.
+		static size_t total_size() noexcept;
 
 		Buffer(const Buffer&) = delete;
 		Buffer(Buffer&&) noexcept;

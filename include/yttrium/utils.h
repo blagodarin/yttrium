@@ -4,8 +4,6 @@
 #ifndef _include_yttrium_utils_h_
 #define _include_yttrium_utils_h_
 
-#include <yttrium/global.h>
-
 #include <cstdint>
 #include <type_traits>
 
