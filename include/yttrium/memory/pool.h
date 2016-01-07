@@ -4,26 +4,12 @@
 #ifndef _include_yttrium_memory_pool_h_
 #define _include_yttrium_memory_pool_h_
 
-#include <yttrium/base.h>
 #include <yttrium/types.h>
 
 #include <cstddef>
 
 namespace Yttrium
 {
-	/// %Pool status.
-	struct PoolStatus
-	{
-		size_t allocated_items = 0; ///< Number of allocated items.
-		size_t allocated_chunks = 0; ///< Number of allocated chunks.
-
-		size_t item_allocations = 0; ///< Lifetime (wrapping) number of item allocations.
-		size_t chunk_allocations = 0; ///< Lifetime (wrapping) number of chunk allocations.
-
-		size_t item_deallocations = 0; ///< Lifetime (wrapping) number of item deallocations.
-		size_t chunk_deallocations = 0; ///< Lifetime (wrapping) number of chunk deallocations.
-	};
-
 	///
 	class Y_API PoolBase
 	{
@@ -34,9 +20,6 @@ namespace Yttrium
 
 		///
 		~PoolBase();
-
-		///
-		PoolStatus status() const;
 
 		PoolBase(const PoolBase&) = delete;
 		PoolBase& operator=(const PoolBase&) = delete;
@@ -61,7 +44,6 @@ namespace Yttrium
 		size_t     _item_size;
 		size_t     _chunk_size;
 		Chunk*     _last_chunk;
-		PoolStatus _status;
 	};
 
 	///

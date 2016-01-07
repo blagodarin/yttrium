@@ -94,26 +94,15 @@ namespace Yttrium
 		}
 	}
 
-	PoolStatus PoolBase::status() const
-	{
-		return _status;
-	}
-
 	void* PoolBase::allocate()
 	{
 		if (!_last_chunk || _last_chunk->is_full())
 		{
 			_last_chunk = new(_allocator->allocate(_chunk_size))
 				Chunk(_chunk_items, _item_size, _last_chunk);
-
-			++_status.allocated_chunks;
-			++_status.chunk_allocations;
 		}
 
 		char* pointer = _last_chunk->allocate()->data;
-
-		++_status.allocated_items;
-		++_status.item_allocations;
 
 		return pointer;
 	}
@@ -126,18 +115,12 @@ namespace Yttrium
 
 		chunk->deallocate(item);
 
-		--_status.allocated_items;
-		++_status.item_deallocations;
-
 		if (chunk->is_empty())
 		{
 			if (chunk == _last_chunk)
 				_last_chunk = chunk->_previous;
 
 			Y_DELETE(_allocator, chunk);
-
-			--_status.allocated_chunks;
-			++_status.chunk_deallocations;
 		}
 	}
 
