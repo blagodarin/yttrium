@@ -4,6 +4,9 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/log.h>
+#include <yttrium/memory/buffer.h>
+
+#include <cassert>
 
 namespace Yttrium
 {
@@ -13,39 +16,43 @@ namespace Yttrium
 	{
 	}
 
-	bool IonParser::parse(const StaticString& string, const StaticString& source_name)
+	bool IonParser::parse(Buffer& buffer, const StaticString& source_name)
 	{
+		if (buffer.capacity() == 0)
+			return false;
+
+		assert(buffer.capacity() > buffer.size() && buffer[buffer.size()] == '\0');
+
 		_states.push_back(State(&_document.root()));
 		_state = &_states.back();
 
-		for (const char* src = string.text(); ; )
+		for (const auto* src = buffer.begin(); ; )
 		{
-			switch (char_class[static_cast<unsigned char>(*src)])
+			switch (char_class[*src])
 			{
 			case Other:
 				return false;
 
 			case End:
-				return src == string.text() + string.size()
-					&& parse_end();
+				return src == buffer.end() && parse_end();
 
 			case Space:
 				do
 				{
 					++src;
-				} while (char_class[static_cast<unsigned char>(*src)] == Space);
+				} while (char_class[*src] == Space);
 				break;
 
 			case Name:
 				{
-					const char* begin = src;
+					const auto begin = src;
 
 					do
 					{
 						++src;
-					} while (char_class[static_cast<unsigned char>(*src)] == Name);
+					} while (char_class[*src] == Name);
 
-					if (!parse_name(StaticString(begin, src - begin)))
+					if (!parse_name(StaticString(reinterpret_cast<const char*>(begin), src - begin)))
 					{
 						return false;
 					}
@@ -54,18 +61,18 @@ namespace Yttrium
 
 			case Quote:
 				{
-					const char* begin = ++src;
+					const auto begin = ++src;
 
 					while (*src != '"' && *src != '\\' && *src)
 						++src;
 
-					char* dst = const_cast<char*>(src);
+					auto dst = const_cast<uint8_t*>(src);
 
 					while (*src != '"')
 					{
-						char c0 = *src;
+						const auto c0 = *src;
 
-						if (!c0 && src == string.text() + string.size())
+						if (!c0 && src == buffer.end())
 						{
 							Log() << "ion: Error: "_s << source_name << ": String continues past the end of source"_s;
 							return false;
@@ -129,7 +136,7 @@ namespace Yttrium
 
 						++src;
 					}
-					if (!parse_value(StaticString(begin, dst - begin)))
+					if (!parse_value(StaticString(reinterpret_cast<const char*>(begin), dst - begin)))
 						return false;
 					++src;
 				}

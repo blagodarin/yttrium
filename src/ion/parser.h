@@ -5,6 +5,7 @@
 
 namespace Yttrium
 {
+	class Buffer;
 	class IonDocument;
 	class IonList;
 	class IonObject;
@@ -16,9 +17,9 @@ namespace Yttrium
 
 		IonParser(IonDocument& document);
 
-		/// Parse the \a string as an ION document.
-		/// \note The \a string MUST have a zero terminator.
-		bool parse(const StaticString& string, const StaticString& source_name);
+		/// Parses a buffer as an ION document.
+		/// The buffer must have a zero terminator.
+		bool parse(Buffer&, const StaticString& source_name);
 
 	private:
 

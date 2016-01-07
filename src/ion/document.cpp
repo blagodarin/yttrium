@@ -63,8 +63,8 @@ namespace Yttrium
 	bool IonDocument::load(const StaticString& file_name)
 	{
 		_private->clear();
-		return File(file_name, _private->_allocator).read_all(&_private->_buffer)
-			&& IonParser(*this).parse(_private->_buffer, file_name);
+		_private->_buffer = File::read_to_buffer(file_name, _private->_allocator);
+		return IonParser(*this).parse(_private->_buffer, file_name);
 	}
 
 	IonObject& IonDocument::root()

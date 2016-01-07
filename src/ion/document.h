@@ -6,6 +6,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/memory/pool.h>
 
 namespace Yttrium
@@ -21,7 +22,6 @@ namespace Yttrium
 
 		IonDocumentPrivate(Allocator* allocator)
 			: _allocator(allocator)
-			, _buffer(allocator)
 			, _root(*this)
 			, _objects(32, allocator)
 			, _nodes(32, allocator)
@@ -42,7 +42,7 @@ namespace Yttrium
 	private:
 
 		Allocator* const _allocator;
-		String _buffer;
+		Buffer _buffer;
 		IonObject _root;
 		Pool<IonObject> _objects;
 		Pool<IonNode> _nodes;
