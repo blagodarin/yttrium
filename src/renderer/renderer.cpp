@@ -2,6 +2,7 @@
 
 #include <yttrium/gpu_program.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/memory/buffer_appender.h>
 #include "debug_texture.h"
 #include "exception.h"
 #include "gl/renderer.h"
@@ -80,8 +81,6 @@ namespace Yttrium
 	RendererImpl::RendererImpl(Allocator& allocator)
 		: _allocator(allocator)
 		, _color(1, 1, 1)
-		, _vertices_2d(_allocator)
-		, _indices_2d(_allocator)
 		, _matrix_stack(_allocator)
 		, _texture_stack({{nullptr, 1}}, _allocator)
 #if Y_IS_DEBUG
@@ -436,15 +435,16 @@ namespace Yttrium
 
 	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
 	{
-		uint16_t index = _vertices_2d.size();
+		BufferAppender<Vertex2D> vertices(_vertices_2d);
+		BufferAppender<uint16_t> indices(_indices_2d);
+
+		uint16_t index = vertices.count();
 
 		if (index > 0)
 		{
-			_indices_2d.push_back(index - 1);
-			_indices_2d.push_back(index);
-
-			if (_indices_2d.size() & 1)
-				_indices_2d.push_back(index); // Add an extra degenerate to ensure the correct face ordering.
+			indices << (index - 1) << (index);
+			if (indices.count() & 1)
+				indices << (index); // Add an extra degenerate to ensure the correct face ordering.
 		}
 
 		Vertex2D vertex;
@@ -460,7 +460,7 @@ namespace Yttrium
 
 		vertex.position.x = position.left();
 		vertex.texture.x = texture.left();
-		_vertices_2d.push_back(vertex);
+		vertices << vertex;
 
 		if (borders.left() > 0)
 		{
@@ -468,7 +468,7 @@ namespace Yttrium
 
 			vertex.position.x = position.left() + left_offset;
 			vertex.texture.x = texture.left() + borders.left();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 		}
 
 		if (borders.right() > 0)
@@ -477,22 +477,19 @@ namespace Yttrium
 
 			vertex.position.x = position.right() - right_offset;
 			vertex.texture.x = texture.right() - borders.right();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 		}
 
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
-		_vertices_2d.push_back(vertex);
+		vertices << vertex;
 
 		// Top/only part indices.
 
-		const size_t row_vertices = _vertices_2d.size() - index;
+		const uint16_t row_vertices = vertices.count() - index;
 
-		for (size_t i = 0; i < row_vertices; ++i)
-		{
-			_indices_2d.push_back(index + i);
-			_indices_2d.push_back(index + i + row_vertices);
-		}
+		for (uint16_t i = 0; i < row_vertices; ++i)
+			indices << (index + i) << (index + i + row_vertices);
 
 		if (borders.top() > 0)
 		{
@@ -505,38 +502,33 @@ namespace Yttrium
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 
 			if (borders.left() > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
 				vertex.texture.x = texture.left() + borders.left();
-				_vertices_2d.push_back(vertex);
+				vertices << vertex;
 			}
 
 			if (borders.right() > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
 				vertex.texture.x = texture.right() - borders.right();
-				_vertices_2d.push_back(vertex);
+				vertices << vertex;
 			}
 
 			vertex.position.x = position.right();
 			vertex.texture.x = texture.right();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 
 			// Middle/bottom part indices.
 
 			index += row_vertices;
 
-			_indices_2d.push_back(index + row_vertices - 1);
-			_indices_2d.push_back(index);
-
-			for (size_t i = 0; i < row_vertices; ++i)
-			{
-				_indices_2d.push_back(index + i);
-				_indices_2d.push_back(index + i + row_vertices);
-			}
+			indices << (index + row_vertices - 1) << (index);
+			for (uint16_t i = 0; i < row_vertices; ++i)
+				indices << (index + i) << (index + i + row_vertices);
 		}
 
 		if (borders.bottom() > 0)
@@ -550,38 +542,33 @@ namespace Yttrium
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 
 			if (borders.left() > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
 				vertex.texture.x = texture.left() + borders.left();
-				_vertices_2d.push_back(vertex);
+				vertices << vertex;
 			}
 
 			if (borders.right() > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
 				vertex.texture.x = texture.right() - borders.right();
-				_vertices_2d.push_back(vertex);
+				vertices << vertex;
 			}
 
 			vertex.position.x = position.right();
 			vertex.texture.x = texture.right();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 
 			// Bottom part indices.
 
 			index += row_vertices;
 
-			_indices_2d.push_back(index + row_vertices - 1);
-			_indices_2d.push_back(index);
-
+			indices << (index + row_vertices - 1) << (index);
 			for (size_t i = 0; i < row_vertices; ++i)
-			{
-				_indices_2d.push_back(index + i);
-				_indices_2d.push_back(index + i + row_vertices);
-			}
+				indices << (index + i) << (index + i + row_vertices);
 		}
 
 		// Outer bottom vertex row.
@@ -591,35 +578,35 @@ namespace Yttrium
 
 		vertex.position.x = position.left();
 		vertex.texture.x = texture.left();
-		_vertices_2d.push_back(vertex);
+		vertices << vertex;
 
 		if (borders.left() > 0)
 		{
 			vertex.position.x = position.left() + left_offset;
 			vertex.texture.x = texture.left() + borders.left();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 		}
 
 		if (borders.right() > 0)
 		{
 			vertex.position.x = position.right() - right_offset;
 			vertex.texture.x = texture.right() - borders.right();
-			_vertices_2d.push_back(vertex);
+			vertices << vertex;
 		}
 
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
-		_vertices_2d.push_back(vertex);
+		vertices << vertex;
 	}
 
 	void RendererImpl::flush_2d()
 	{
-		if (!_vertices_2d.empty())
+		if (_vertices_2d.size() > 0)
 		{
 			_program_2d->set_uniform("mvp", current_projection() * current_transformation());
 			flush_2d_impl(_vertices_2d, _indices_2d);
-			_vertices_2d.clear();
-			_indices_2d.clear();
+			_vertices_2d.resize(0);
+			_indices_2d.resize(0);
 		}
 	}
 

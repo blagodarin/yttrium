@@ -22,7 +22,7 @@ namespace Yttrium
 		// RendererImpl
 		void clear() override;
 		void take_screenshot(Image&) override;
-		void flush_2d_impl(const StdVector<Vertex2D>&, const StdVector<uint16_t>&) override;
+		void flush_2d_impl(const Buffer&, const Buffer&) override;
 		void set_program(const GpuProgram*) override;
 		void set_texture(const Texture2D&) override;
 		void set_window_size_impl(const Size&) override;

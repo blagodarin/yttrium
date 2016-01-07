@@ -18,6 +18,21 @@ namespace Yttrium
 	#endif
 	}
 
+	void Buffer::reserve(size_t capacity)
+	{
+		if (capacity <= _capacity)
+			return;
+		const auto new_capacity = buffer_memory_capacity(capacity);
+		const auto new_data = _data
+			? buffer_memory_reallocate(_data, _capacity, new_capacity, _size)
+			: buffer_memory_allocate(new_capacity);
+	#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
+		_buffer_memory_status._total_capacity_wasted.add(new_capacity - _capacity);
+	#endif
+		_capacity = new_capacity;
+		_data = new_data;
+	}
+
 	void Buffer::reset(size_t size)
 	{
 		if (size > _capacity)

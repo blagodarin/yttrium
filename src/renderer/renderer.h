@@ -4,6 +4,7 @@
 #include <yttrium/renderer.h>
 
 #include <yttrium/math/margins.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/object.h>
 #include <yttrium/pointer.h>
 #include <yttrium/std/vector.h>
@@ -77,7 +78,7 @@ namespace Yttrium
 			Vector2 texture;
 		};
 
-		virtual void flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices) = 0;
+		virtual void flush_2d_impl(const Buffer& vertices, const Buffer& indices) = 0;
 		virtual void set_program(const GpuProgram*) = 0;
 		virtual void set_texture(const Texture2D&) = 0;
 		virtual void set_window_size_impl(const Size&) = 0;
@@ -103,8 +104,8 @@ namespace Yttrium
 
 		Vector4 _color;
 
-		StdVector<Vertex2D> _vertices_2d;
-		StdVector<uint16_t> _indices_2d;
+		Buffer _vertices_2d;
+		Buffer _indices_2d;
 
 		RectF    _texture_rect;
 		MarginsF _texture_borders;

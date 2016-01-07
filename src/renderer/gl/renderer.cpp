@@ -218,30 +218,28 @@ namespace Yttrium
 		_gl.ReadBuffer(read_buffer);
 	}
 
-	void GlRenderer::flush_2d_impl(const StdVector<Vertex2D>& vertices, const StdVector<uint16_t>& indices)
+	void GlRenderer::flush_2d_impl(const Buffer& vertices, const Buffer& indices)
 	{
 		update_state();
 
-		const auto vertices_size = vertices.size() * sizeof(Vertex2D);
-		if (vertices_size > _2d_vbo.size())
-			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices_size, vertices.data());
+		if (vertices.size() > _2d_vbo.size())
+			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices.size(), vertices.data());
 		else
-			_2d_vbo.write(0, vertices_size, vertices.data());
+			_2d_vbo.write(0, vertices.size(), vertices.data());
 
-		const auto indices_size = indices.size() * sizeof(uint16_t);
-		if (indices_size > _2d_ibo.size())
-			_2d_ibo.initialize(GL_DYNAMIC_DRAW, indices_size, indices.data());
+		if (indices.size() > _2d_ibo.size())
+			_2d_ibo.initialize(GL_DYNAMIC_DRAW, indices.size(), indices.data());
 		else
-			_2d_ibo.write(0, indices_size, indices.data());
+			_2d_ibo.write(0, indices.size(), indices.data());
 
 		_2d_vao.bind();
 		_2d_ibo.bind();
-		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_SHORT, 0);
+		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size() / sizeof(uint16_t), GL_UNSIGNED_SHORT, 0);
 		_2d_ibo.unbind();
 		_2d_vao.unbind();
 
 		++_statistics._draw_calls;
-		_statistics._triangles += indices.size() - 2;
+		_statistics._triangles += indices.size() / sizeof(uint16_t) - 2;
 	}
 
 	void GlRenderer::set_program(const GpuProgram* program)

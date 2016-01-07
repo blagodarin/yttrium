@@ -45,6 +45,35 @@ BOOST_AUTO_TEST_CASE(test_buffer_initialization)
 	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_buffer_reserve)
+{
+	Buffer buffer;
+
+	buffer.reserve(1);
+	BOOST_CHECK_EQUAL(buffer.size(), 0);
+	BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
+
+	const auto data1 = buffer.data();
+	BOOST_CHECK(data1);
+
+	buffer.reserve(granularity);
+	BOOST_CHECK_EQUAL(buffer.size(), 0);
+	BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
+	BOOST_CHECK_EQUAL(buffer.data(), data1);
+
+	buffer.reserve(granularity + 1);
+	BOOST_CHECK_EQUAL(buffer.size(), 0);
+	BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
+
+	const auto data2 = buffer.data();
+	BOOST_CHECK(data2);
+
+	buffer.reserve(granularity);
+	BOOST_CHECK_EQUAL(buffer.size(), 0);
+	BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
+	BOOST_CHECK_EQUAL(buffer.data(), data2);
+}
+
 BOOST_AUTO_TEST_CASE(test_buffer_reset)
 {
 	Buffer buffer;

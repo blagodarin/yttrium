@@ -39,6 +39,9 @@ namespace Yttrium
 		uint8_t* end() noexcept { return static_cast<uint8_t*>(_data) + _size; }
 		const uint8_t* end() const noexcept { return static_cast<const uint8_t*>(_data) + _size; }
 
+		///
+		void reserve(size_t);
+
 		/// Changes the buffer size without preserving its contents.
 		void reset(size_t);
 
