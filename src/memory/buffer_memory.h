@@ -6,13 +6,27 @@
 #include <atomic>
 #include <cstddef>
 
-#define Y_BUFFER_TRACK_ALLOCATION_COUNT Y_IS_DEBUG
-#define Y_BUFFER_TRACK_WASTED_MEMORY Y_IS_DEBUG
+#define Y_BUFFER_TRACK_ALLOCATION_COUNT      Y_IS_DEBUG
+#define Y_BUFFER_TRACK_MAX_CAPACITY          Y_IS_DEBUG
+#define Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED Y_IS_DEBUG
 
 namespace Yttrium
 {
 	struct BufferMemoryStatus
 	{
+		struct AtomicMax
+		{
+			std::atomic<size_t> _value{0};
+
+			void update(size_t new_value) noexcept
+			{
+				auto old_value = _value.load();
+				while (old_value < new_value)
+					if (_value.compare_exchange_strong(old_value, new_value))
+						break;
+			}
+		};
+
 		struct AtomicPair
 		{
 			std::atomic<size_t> _value{0};
@@ -28,14 +42,19 @@ namespace Yttrium
 			}
 		};
 
-		AtomicPair _allocated;
+		AtomicPair _total_allocated;
+		AtomicPair _total_capacity;
+	#if Y_BUFFER_TRACK_TOTAL_CAPACITY_WASTED
+		AtomicPair _total_capacity_wasted;
+	#endif
+	#if Y_BUFFER_TRACK_MAX_CAPACITY
+		AtomicMax _max_capacity;
+	#endif
 	#if Y_BUFFER_TRACK_ALLOCATION_COUNT
 		AtomicPair _allocations;
+		std::atomic<size_t> _total_system_allocations{0};
 		std::atomic<size_t> _total_allocations{0};
 		std::atomic<size_t> _total_reallocations{0};
-	#endif
-	#if Y_BUFFER_TRACK_WASTED_MEMORY
-		AtomicPair _wasted;
 	#endif
 
 		~BufferMemoryStatus();

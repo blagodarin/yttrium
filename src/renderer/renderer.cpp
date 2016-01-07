@@ -375,8 +375,10 @@ namespace Yttrium
 	{
 		const auto result = _statistics;
 		_statistics = {};
+	#if Y_IS_DEBUG
 		_seen_textures.clear();
 		_seen_programs.clear();
+	#endif
 		return result;
 	}
 
@@ -402,13 +404,13 @@ namespace Yttrium
 				_current_program = program;
 				set_program(program);
 				++_statistics._shader_switches;
-#if Y_IS_DEBUG
+			#if Y_IS_DEBUG
 				const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
 				if (i == _seen_programs.end())
 					_seen_programs.emplace_back(program);
 				else
 					++_statistics._redundant_shader_switches;
-#endif
+			#endif
 			}
 		}
 
@@ -421,13 +423,13 @@ namespace Yttrium
 				_current_texture = texture;
 				set_texture(*texture);
 				++_statistics._texture_switches;
-#if Y_IS_DEBUG
+			#if Y_IS_DEBUG
 				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
 				if (i == _seen_textures.end())
 					_seen_textures.emplace_back(texture);
 				else
 					++_statistics._redundant_texture_switches;
-#endif
+			#endif
 			}
 		}
 	}

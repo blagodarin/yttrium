@@ -20,7 +20,9 @@ namespace Yttrium
 		Private(String&& name, Allocator& allocator)
 			: _allocator(allocator)
 			, _name(std::move(name))
+		#if Y_IS_DEBUG
 			, _pointers(_allocator)
+		#endif
 		{
 		}
 

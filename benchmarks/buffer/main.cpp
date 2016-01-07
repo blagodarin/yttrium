@@ -11,7 +11,7 @@ namespace
 {
 	const unsigned ops_per_cycle = 16;
 	const unsigned cycles_per_iteration = 64;
-	const auto step_duration = 10000;
+	const auto step_duration = 1000;
 
 	class Measurement
 	{

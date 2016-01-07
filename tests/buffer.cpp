@@ -8,41 +8,41 @@ const auto granularity = Buffer::memory_granularity();
 
 BOOST_AUTO_TEST_CASE(test_buffer_initialization)
 {
-	BOOST_REQUIRE_EQUAL(Buffer::total_memory_allocated(), 0);
+	BOOST_REQUIRE_EQUAL(Buffer::total_capacity(), 0);
 	{
 		Buffer buffer;
 		BOOST_CHECK_EQUAL(buffer.size(), 0);
 		BOOST_CHECK_EQUAL(buffer.capacity(), 0);
-		BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), 0);
+		BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	}
 	{
 		Buffer buffer(0);
 		BOOST_CHECK_EQUAL(buffer.size(), 0);
 		BOOST_CHECK_EQUAL(buffer.capacity(), 0);
-		BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), 0);
+		BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	}
 	{
 		Buffer buffer(1);
 		BOOST_CHECK_EQUAL(buffer.size(), 1);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
-		BOOST_CHECK(Buffer::total_memory_allocated() >= granularity);
+		BOOST_CHECK(Buffer::total_capacity() >= granularity);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), 0);
+	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	{
 		Buffer buffer(granularity);
 		BOOST_CHECK_EQUAL(buffer.size(), granularity);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
 
-		BOOST_CHECK(Buffer::total_memory_allocated() >= granularity);
+		BOOST_CHECK(Buffer::total_capacity() >= granularity);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), 0);
+	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	{
 		Buffer buffer(granularity + 1);
 		BOOST_CHECK_EQUAL(buffer.size(), granularity + 1);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
-		BOOST_CHECK(Buffer::total_memory_allocated() >= granularity * 2);
+		BOOST_CHECK(Buffer::total_capacity() >= granularity * 2);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), 0);
+	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_buffer_reset)
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_resize)
 
 BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 {
-	BOOST_REQUIRE_EQUAL(Buffer::total_memory_allocated(), 0);
+	BOOST_REQUIRE_EQUAL(Buffer::total_capacity(), 0);
 
 	Buffer buffer(granularity * 2);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity * 2);
@@ -101,5 +101,5 @@ BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 	BOOST_CHECK_EQUAL(buffer.size(), 0);
 	BOOST_CHECK_EQUAL(buffer.capacity(), 0);
 
-	BOOST_CHECK_EQUAL(Buffer::total_memory_allocated(), 0);
+	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 }
