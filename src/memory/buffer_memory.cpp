@@ -12,16 +12,18 @@
 
 #define ENABLE_SYNCHRONIZATION 1 // Disable for profiling purposes only.
 
-#define PRINT_TRACKING_INFO    Y_IS_DEBUG
-#define TRACK_ALLOCATION_COUNT Y_IS_DEBUG
-#define TRACK_MAX_ALLOCATION   Y_IS_DEBUG
-#define TRACK_MAX_CAPACITY     Y_IS_DEBUG
-#define TRACK_MAX_SIZE         Y_IS_DEBUG
-#define TRACK_TOTAL_CAPACITY   Y_IS_DEBUG
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+	#define PRINT_TRACKING_INFO    Y_IS_DEBUG
+	#define TRACK_ALLOCATION_COUNT Y_IS_DEBUG
+	#define TRACK_MAX_ALLOCATION   Y_IS_DEBUG
+	#define TRACK_MAX_CAPACITY     Y_IS_DEBUG
+	#define TRACK_MAX_SIZE         Y_IS_DEBUG
+	#define TRACK_TOTAL_CAPACITY   Y_IS_DEBUG
 
-#if PRINT_TRACKING_INFO
-	#include <iostream>
-	#include <sstream>
+	#if PRINT_TRACKING_INFO
+		#include <iostream>
+		#include <sstream>
+	#endif
 #endif
 
 namespace Yttrium
@@ -46,57 +48,10 @@ namespace Yttrium
 			return level;
 		}
 
-		struct BufferMemoryStatus
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		class BufferMemoryStatus
 		{
-			struct AtomicMax
-			{
-				std::atomic<size_t> _value{0};
-
-				void update(size_t new_value) noexcept
-				{
-					auto old_value = _value.load();
-					while (old_value < new_value)
-						if (_value.compare_exchange_strong(old_value, new_value))
-							break;
-				}
-			};
-
-			struct AtomicPair
-			{
-				std::atomic<size_t> _value{0};
-				std::atomic<size_t> _max_value{0};
-
-				void add(size_t difference) noexcept
-				{
-					auto old_value = _value.fetch_add(difference);
-					const auto new_value = old_value + difference;
-					while (!_max_value.compare_exchange_strong(old_value, new_value))
-						if (old_value >= new_value)
-							break;
-				}
-			};
-
-			AtomicPair _total_allocated;
-		#if TRACK_TOTAL_CAPACITY
-			AtomicPair _total_capacity;
-		#endif
-			AtomicPair _total_size;
-		#if TRACK_MAX_ALLOCATION
-			AtomicMax _max_allocation;
-		#endif
-		#if TRACK_MAX_CAPACITY
-			AtomicMax _max_capacity;
-		#endif
-		#if TRACK_MAX_SIZE
-			AtomicMax _max_size;
-		#endif
-		#if TRACK_ALLOCATION_COUNT
-			AtomicPair _allocations;
-			std::atomic<size_t> _total_system_allocations{0};
-			std::atomic<size_t> _total_allocations{0};
-			std::atomic<size_t> _total_reallocations{0};
-		#endif
-
+		public:
 		#if PRINT_TRACKING_INFO
 			~BufferMemoryStatus()
 			{
@@ -165,6 +120,16 @@ namespace Yttrium
 			}
 		#endif
 
+			size_t max_total_size() const noexcept
+			{
+				return _total_size._max_value;
+			}
+
+			size_t total_size() const noexcept
+			{
+				return _total_size._value;
+			}
+
 			void track_capacity_allocation(size_t capacity) noexcept
 			{
 				Y_UNUSED(capacity);
@@ -191,8 +156,10 @@ namespace Yttrium
 					_max_capacity.update(new_capacity);
 				#endif
 				}
+			#if TRACK_TOTAL_CAPACITY
 				else
-					_total_size._value.fetch_sub(old_capacity - new_capacity);
+					_total_capacity._value.fetch_sub(old_capacity - new_capacity);
+			#endif
 			#if TRACK_ALLOCATION_COUNT
 				++_total_reallocations; // TODO: Perhaps pure shrinking reallocations should be counted differently.
 			#endif
@@ -206,6 +173,13 @@ namespace Yttrium
 			#endif
 			#if TRACK_ALLOCATION_COUNT
 				_allocations._value.fetch_sub(1);
+			#endif
+			}
+
+			void track_reallocation() noexcept
+			{
+			#if TRACK_ALLOCATION_COUNT
+				++_total_reallocations;
 			#endif
 			}
 
@@ -234,21 +208,97 @@ namespace Yttrium
 			{
 				_total_size._value.fetch_sub(size);
 			}
+
+			void track_system_allocation(size_t size) noexcept
+			{
+				_total_allocated.add(size);
+			#if TRACK_MAX_ALLOCATION
+				_max_allocation.update(size);
+			#endif
+			#if TRACK_ALLOCATION_COUNT
+				++_total_system_allocations;
+			#endif
+			}
+
+			void track_system_deallocation(size_t size) noexcept
+			{
+				_total_allocated._value.fetch_sub(size);
+			}
+
+			void track_system_reallocation(size_t old_size, size_t new_size) noexcept
+			{
+				if (new_size > old_size)
+				{
+					_total_allocated.add(new_size - old_size);
+				#if TRACK_MAX_ALLOCATED
+					_max_allocation.update(new_size);
+				#endif
+				}
+				else
+					_total_allocated._value.fetch_sub(old_size - new_size);
+			}
+
+		private:
+			struct AtomicMax
+			{
+				std::atomic<size_t> _value{0};
+
+				void update(size_t new_value) noexcept
+				{
+					auto old_value = _value.load();
+					while (old_value < new_value)
+						if (_value.compare_exchange_strong(old_value, new_value))
+							break;
+				}
+			};
+
+			struct AtomicPair
+			{
+				std::atomic<size_t> _value{0};
+				std::atomic<size_t> _max_value{0};
+
+				void add(size_t difference) noexcept
+				{
+					auto old_value = _value.fetch_add(difference);
+					const auto new_value = old_value + difference;
+					while (!_max_value.compare_exchange_strong(old_value, new_value))
+						if (old_value >= new_value)
+							break;
+				}
+			};
+
+			AtomicPair _total_allocated;
+		#if TRACK_TOTAL_CAPACITY
+			AtomicPair _total_capacity;
+		#endif
+			AtomicPair _total_size;
+		#if TRACK_MAX_ALLOCATION
+			AtomicMax _max_allocation;
+		#endif
+		#if TRACK_MAX_CAPACITY
+			AtomicMax _max_capacity;
+		#endif
+		#if TRACK_MAX_SIZE
+			AtomicMax _max_size;
+		#endif
+		#if TRACK_ALLOCATION_COUNT
+			AtomicPair _allocations;
+			std::atomic<size_t> _total_system_allocations{0};
+			std::atomic<size_t> _total_allocations{0};
+			std::atomic<size_t> _total_reallocations{0};
+		#endif
 		};
 
 		BufferMemoryStatus _buffer_memory_status;
+	#endif
 
 		void* allocate_big_block(size_t size)
 		{
 			const auto data = pages_allocate(size);
 			if (!data)
 				throw std::bad_alloc();
-			_buffer_memory_status._total_allocated.add(size);
-		#if TRACK_MAX_ALLOCATION
-			_buffer_memory_status._max_allocation.update(size);
-		#endif
-		#if TRACK_ALLOCATION_COUNT
-			++_buffer_memory_status._total_system_allocations;
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			_buffer_memory_status.track_system_allocation(size);
 		#endif
 			return data;
 		}
@@ -286,6 +336,7 @@ namespace Yttrium
 					}
 					if (!data)
 					{
+						// TODO: Try to merge smaller blocks before allocating a new big one.
 						assert(1 << i == 2 * MaxSmallBlockSize);
 						data = allocate_big_block(2 * MaxSmallBlockSize);
 					}
@@ -299,7 +350,9 @@ namespace Yttrium
 				}
 			}
 		}
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_status.track_capacity_allocation(capacity);
+	#endif
 		return data;
 	}
 
@@ -317,7 +370,9 @@ namespace Yttrium
 		if (capacity > MaxSmallBlockSize)
 		{
 			pages_deallocate(data, capacity);
-			_buffer_memory_status._total_allocated._value.fetch_sub(capacity);
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			_buffer_memory_status.track_system_deallocation(capacity);
+		#endif
 		}
 		else
 		{
@@ -330,7 +385,9 @@ namespace Yttrium
 				_small_blocks[level] = data;
 			}
 		}
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_status.track_capacity_deallocation(capacity);
+	#endif
 	}
 
 	size_t buffer_memory_granularity() noexcept
@@ -351,9 +408,9 @@ namespace Yttrium
 			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
 				throw std::bad_alloc();
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			_buffer_memory_status.track_system_reallocation(old_capacity, new_capacity);
 			_buffer_memory_status.track_capacity_change(old_capacity, new_capacity);
-		#if TRACK_MAX_ALLOCATION
-			_buffer_memory_status._max_allocation.update(new_capacity);
 		#endif
 			return new_data;
 		}
@@ -364,8 +421,8 @@ namespace Yttrium
 			if (old_size > 0)
 				::memcpy(new_data, old_data, old_size);
 			buffer_memory_deallocate(old_data, old_capacity);
-		#if TRACK_ALLOCATION_COUNT
-			++_buffer_memory_status._total_reallocations;
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			_buffer_memory_status.track_reallocation();
 		#endif
 			return new_data;
 		}
@@ -374,12 +431,12 @@ namespace Yttrium
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
 	size_t buffer_memory_max_total_size() noexcept
 	{
-		return _buffer_memory_status._total_size._max_value;
+		return _buffer_memory_status.max_total_size();
 	}
 
 	size_t buffer_memory_total_size() noexcept
 	{
-		return _buffer_memory_status._total_size._value;
+		return _buffer_memory_status.total_size();
 	}
 
 	void buffer_memory_track_size_allocation(size_t size) noexcept
