@@ -1,4 +1,5 @@
 #include <yttrium/memory/buffer.h>
+#include "../../src/memory/buffer_memory.h"
 
 #include <array>
 #include <chrono>
@@ -10,7 +11,10 @@ using namespace Yttrium;
 
 namespace
 {
-	constexpr auto Duration = 10000;
+	constexpr auto Duration = 1000;
+
+	const auto Granularity = Buffer::memory_granularity();
+	const auto MaxSmallBlock = MaxBufferMemorySmallBlockSize; // For brevity.
 
 	class Measurement
 	{
@@ -41,18 +45,52 @@ namespace
 		const std::chrono::steady_clock::time_point _start = std::chrono::steady_clock::now();
 	};
 
-	std::array<uint8_t*, 1000> _malloc_allocations;
-	std::array<Buffer, 1000> _buffer_allocations;
+	double operator/(const Measurement::Results& lhs, const Measurement::Results& rhs)
+	{
+		return (static_cast<double>(lhs.ops) / lhs.ms) / (static_cast<double>(rhs.ops) / rhs.ms);
+	}
 
 	struct BenchmarkSetup
 	{
-		const unsigned size;
-		const unsigned blocks;
-		const unsigned cycles;
 		Measurement::Results malloc;
 		Measurement::Results buffer;
+	};
 
-		BenchmarkSetup(unsigned size, unsigned blocks, unsigned cycles)
+	std::ostream& operator<<(std::ostream& stream, const BenchmarkSetup& setup)
+	{
+		stream << "\n   - malloc: "
+			<< setup.malloc.ms << " ms, "
+			<< setup.malloc.ops_per_second() << " ops/s, "
+			<< setup.malloc.ns_per_op() << " ns/op";
+		stream << "\n   - buffer: " << setup.buffer.ms << " ms, "
+			<< setup.buffer.ops_per_second() << " ops/s, "
+			<< setup.buffer.ns_per_op() << " ns/op"
+			<< " (" << setup.buffer / setup.malloc << " x)";
+		return stream;
+	}
+
+	std::string human_readable_size(size_t size)
+	{
+		std::ostringstream stream;
+		if (size < 1024)
+			stream << size << " B";
+		else if (size < 1024 * 1024)
+			stream << size / 1024. << " KiB";
+		else
+			stream << size / 1024. / 1024. << " MiB";
+		return stream.str();
+	}
+
+	std::array<uint8_t*, 1000> _malloc_allocations;
+	std::array<Buffer, 1000> _buffer_allocations;
+
+	struct AllocateSetup : BenchmarkSetup
+	{
+		const size_t size;
+		const unsigned blocks;
+		const unsigned cycles;
+
+		AllocateSetup(size_t size, unsigned blocks, unsigned cycles)
 			: size(size)
 			, blocks(blocks)
 			, cycles(cycles)
@@ -62,7 +100,14 @@ namespace
 		}
 	};
 
-	BenchmarkSetup _benchmark_setups[] =
+	std::ostream& operator<<(std::ostream& stream, const AllocateSetup& setup)
+	{
+		stream << "\n * " << human_readable_size(setup.size) << " x " << setup.blocks << ":";
+		stream << static_cast<const BenchmarkSetup&>(setup);
+		return stream;
+	}
+
+	AllocateSetup _allocate_setups[] =
 	{
 		// TODO: Small blocks.
 
@@ -98,7 +143,7 @@ namespace
 		{ 2047 * 1024, 127,     8 }, // 256 MiB
 	};
 
-	void malloc_allocate_deallocate(BenchmarkSetup& setup)
+	void malloc_allocate(AllocateSetup& setup)
 	{
 		Measurement measurement(setup.malloc);
 		do
@@ -116,7 +161,7 @@ namespace
 		} while (measurement.next_iteration(setup.cycles * setup.blocks));
 	}
 
-	void buffer_allocate_deallocate(BenchmarkSetup& setup)
+	void buffer_allocate(AllocateSetup& setup)
 	{
 		Measurement measurement(setup.buffer);
 		do
@@ -134,9 +179,8 @@ namespace
 		} while (measurement.next_iteration(setup.cycles * setup.blocks));
 	}
 
-	void malloc_allocate_touch_deallocate(BenchmarkSetup& setup)
+	void malloc_allocate_touch(AllocateSetup& setup)
 	{
-		const auto granularity = Buffer::memory_granularity();
 		Measurement measurement(setup.malloc);
 		do
 		{
@@ -146,7 +190,7 @@ namespace
 				while (j < setup.blocks)
 				{
 					const auto allocation = static_cast<uint8_t*>(::malloc(setup.size));
-					for (size_t i = 0; i < setup.size; i += granularity)
+					for (size_t i = 0; i < setup.size; i += Granularity)
 						allocation[i] = -1;
 					_malloc_allocations[j++] = allocation;
 				}
@@ -158,9 +202,8 @@ namespace
 		} while (measurement.next_iteration(setup.cycles * setup.blocks));
 	}
 
-	void buffer_allocate_touch_deallocate(BenchmarkSetup& setup)
+	void buffer_allocate_touch(AllocateSetup& setup)
 	{
-		const auto granularity = Buffer::memory_granularity();
 		Measurement measurement(setup.buffer);
 		do
 		{
@@ -170,7 +213,7 @@ namespace
 				while (j < setup.blocks)
 				{
 					Buffer buffer(setup.size);
-					for (size_t i = 0; i < setup.size; i += granularity)
+					for (size_t i = 0; i < setup.size; i += Granularity)
 						buffer[i] = -1;
 					_buffer_allocations[j++] = std::move(buffer);
 				}
@@ -182,7 +225,7 @@ namespace
 		} while (measurement.next_iteration(setup.cycles * setup.blocks));
 	}
 
-	void malloc_allocate_fill_deallocate(BenchmarkSetup& setup)
+	void malloc_allocate_fill(AllocateSetup& setup)
 	{
 		Measurement measurement(setup.malloc);
 		do
@@ -204,7 +247,7 @@ namespace
 		} while (measurement.next_iteration(setup.cycles * setup.blocks));
 	}
 
-	void buffer_allocate_fill_deallocate(BenchmarkSetup& setup)
+	void buffer_allocate_fill(AllocateSetup& setup)
 	{
 		Measurement measurement(setup.buffer);
 		do
@@ -225,6 +268,168 @@ namespace
 			}
 		} while (measurement.next_iteration(setup.cycles * setup.blocks));
 	}
+
+	struct ReallocateSetup : BenchmarkSetup
+	{
+		const size_t initial_size;
+		const size_t final_size;
+		const unsigned cycles;
+
+		ReallocateSetup(size_t initial_size, size_t final_size, unsigned cycles)
+			: initial_size(initial_size)
+			, final_size(final_size)
+			, cycles(cycles)
+		{
+		}
+	};
+
+	std::ostream& operator<<(std::ostream& stream, const ReallocateSetup& setup)
+	{
+		stream << "\n * " << human_readable_size(setup.initial_size) << " - " << human_readable_size(setup.final_size) << ":";
+		stream << static_cast<const BenchmarkSetup&>(setup);
+		return stream;
+	}
+
+	ReallocateSetup _grow_setups[] =
+	{
+		{                 1,       Granularity, 100000 },
+		{       Granularity,     MaxSmallBlock,   1000 },
+		{     MaxSmallBlock, 2 * MaxSmallBlock,   1000 },
+		{ 2 * MaxSmallBlock, 256 * 1024 * 1024,    100 },
+		{                 1, 256 * 1024 * 1024,    100 },
+	};
+
+	void malloc_grow(ReallocateSetup& setup)
+	{
+		Measurement measurement(setup.malloc);
+		do
+		{
+			for (unsigned i = 0; i < setup.cycles; ++i)
+			{
+				void* allocation = nullptr;
+				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+					allocation = ::realloc(allocation, size);
+				::free(allocation);
+			}
+		} while (measurement.next_iteration(setup.cycles));
+	}
+
+	void buffer_grow(ReallocateSetup& setup)
+	{
+		Measurement measurement(setup.buffer);
+		do
+		{
+			for (unsigned i = 0; i < setup.cycles; ++i)
+			{
+				Buffer buffer;
+				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+					buffer.resize(size);
+			}
+		} while (measurement.next_iteration(setup.cycles));
+	}
+
+	ReallocateSetup _grow_touch_setups[] =
+	{
+		{                 1,       Granularity, 100000 },
+		{       Granularity,     MaxSmallBlock,   1000 },
+		{     MaxSmallBlock, 2 * MaxSmallBlock,   1000 },
+		{ 2 * MaxSmallBlock, 256 * 1024 * 1024,      1 },
+		{                 1, 256 * 1024 * 1024,      1 },
+	};
+
+	void malloc_grow_touch(ReallocateSetup& setup)
+	{
+		Measurement measurement(setup.malloc);
+		do
+		{
+			for (unsigned i = 0; i < setup.cycles; ++i)
+			{
+				void* allocation = nullptr;
+				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				{
+					allocation = ::realloc(allocation, size);
+					for (size_t i = size / 2; i < size; i += Granularity)
+						static_cast<uint8_t*>(allocation)[i] = -1;
+				}
+				::free(allocation);
+			}
+		} while (measurement.next_iteration(setup.cycles));
+	}
+
+	void buffer_grow_touch(ReallocateSetup& setup)
+	{
+		Measurement measurement(setup.buffer);
+		do
+		{
+			for (unsigned i = 0; i < setup.cycles; ++i)
+			{
+				Buffer buffer;
+				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				{
+					buffer.resize(size);
+					for (size_t i = size / 2; i < size; i += Granularity)
+						buffer[i] = -1;
+				}
+			}
+		} while (measurement.next_iteration(setup.cycles));
+	}
+
+	ReallocateSetup _grow_fill_setups[] =
+	{
+		{                 1,       Granularity, 100000 },
+		{       Granularity,     MaxSmallBlock,   1000 },
+		{     MaxSmallBlock, 2 * MaxSmallBlock,   1000 },
+		{ 2 * MaxSmallBlock, 256 * 1024 * 1024,      1 },
+		{                 1, 256 * 1024 * 1024,      1 },
+	};
+
+	void malloc_grow_fill(ReallocateSetup& setup)
+	{
+		Measurement measurement(setup.malloc);
+		do
+		{
+			for (unsigned i = 0; i < setup.cycles; ++i)
+			{
+				void* allocation = nullptr;
+				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				{
+					allocation = ::realloc(allocation, size);
+					::memset(static_cast<uint8_t*>(allocation) + size / 2, -1, size - size / 2);
+				}
+				::free(allocation);
+			}
+		} while (measurement.next_iteration(setup.cycles));
+	}
+
+	void buffer_grow_fill(ReallocateSetup& setup)
+	{
+		Measurement measurement(setup.buffer);
+		do
+		{
+			for (unsigned i = 0; i < setup.cycles; ++i)
+			{
+				Buffer buffer;
+				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				{
+					buffer.resize(size);
+					::memset(buffer.begin() + size / 2, -1, size - size / 2);
+				}
+			}
+		} while (measurement.next_iteration(setup.cycles));
+	}
+
+	template <typename Setups, typename Setup>
+	void run_benchmark(const char* name, Setups& setups, void (*malloc_function)(Setup&), void (*buffer_function)(Setup&))
+	{
+		for (auto& setup : setups)
+			malloc_function(setup);
+		for (auto& setup : setups)
+			buffer_function(setup);
+		std::cout << name << ":";
+		for (const auto& setup : setups)
+			std::cout << setup;
+		std::cout << std::endl;
+	}
 }
 
 int main(int argc, char** argv)
@@ -232,72 +437,24 @@ int main(int argc, char** argv)
 	if (argc != 2)
 	{
 		std::cerr << "Usage:\n"
-			"\t" << argv[0] << " 1  -- run \"Allocate-deallocate\" benchmark;\n"
-			"\t" << argv[0] << " 2  -- run \"Allocate-touch-deallocate\" benchmark;\n"
-			"\t" << argv[0] << " 3  -- run \"Allocate-fill-deallocate\" benchmark;\n"
+			"\t" << argv[0] << " 1  -- run \"Allocate\" benchmark;\n"
+			"\t" << argv[0] << " 2  -- run \"Allocate & touch\" benchmark;\n"
+			"\t" << argv[0] << " 3  -- run \"Allocate & fill\" benchmark;\n"
+			"\t" << argv[0] << " 4  -- run \"Grow\" benchmark;\n"
+			"\t" << argv[0] << " 5  -- run \"Grow & touch\" benchmark;\n"
+			"\t" << argv[0] << " 6  -- run \"Grow & fill\" benchmark;\n"
 			"\t" << argv[0] << "    -- print this usage." << std::endl;
 		return 0;
 	}
 
-	const auto print_results = [](const std::string& name)
-	{
-		const auto human_readable_size = [](size_t size)
-		{
-			std::ostringstream stream;
-			if (size < 1024)
-				stream << size << " B";
-			else if (size < 1024 * 1024)
-				stream << size / 1024. << " KiB";
-			else
-				stream << size / 1024. / 1024. << " MiB";
-			return stream.str();
-		};
-
-		std::cout << name << ":";
-		for (const auto& setup : _benchmark_setups)
-		{
-			std::cout
-				<< "\n * " << human_readable_size(setup.size) << " x " << setup.blocks << ":"
-				<< "\n   - malloc: "
-					<< setup.malloc.ms << " ms, "
-					<< setup.malloc.ops_per_second() << " ops/s, "
-					<< setup.malloc.ns_per_op() << " ns/op"
-				<< "\n   - buffer: "
-					<< setup.buffer.ms << " ms, "
-					<< setup.buffer.ops_per_second() << " ops/s, "
-					<< setup.buffer.ns_per_op() << " ns/op"
-					<< " (" << static_cast<double>(setup.buffer.ops_per_second()) / setup.malloc.ops_per_second() << " x)";
-		}
-		std::cout << std::endl;
-	};
-
 	switch (::atoi(argv[1]))
 	{
-	case 1:
-		for (auto& setup : _benchmark_setups)
-		{
-			malloc_allocate_deallocate(setup);
-			buffer_allocate_deallocate(setup);
-		}
-		print_results("Allocate-deallocate");
-		break;
-	case 2:
-		for (auto& setup : _benchmark_setups)
-		{
-			malloc_allocate_touch_deallocate(setup);
-			buffer_allocate_touch_deallocate(setup);
-		}
-		print_results("Allocate-touch-deallocate");
-		break;
-	case 3:
-		for (auto& setup : _benchmark_setups)
-		{
-			malloc_allocate_fill_deallocate(setup);
-			buffer_allocate_fill_deallocate(setup);
-		}
-		print_results("Allocate-fill-deallocate");
-		break;
+	case 1: run_benchmark("Allocate",         _allocate_setups,   malloc_allocate,       buffer_allocate);       break;
+	case 2: run_benchmark("Allocate & touch", _allocate_setups,   malloc_allocate_touch, buffer_allocate_touch); break;
+	case 3: run_benchmark("Allocate & fill",  _allocate_setups,   malloc_allocate_fill,  buffer_allocate_fill);  break;
+	case 4: run_benchmark("Grow",             _grow_setups,       malloc_grow,           buffer_grow);           break;
+	case 5: run_benchmark("Grow & touch",     _grow_touch_setups, malloc_grow_touch,     buffer_grow_touch);     break;
+	case 6: run_benchmark("Grow & fill",      _grow_fill_setups,  malloc_grow_fill,      buffer_grow_fill);      break;
 	}
-
 	return 0;
 }

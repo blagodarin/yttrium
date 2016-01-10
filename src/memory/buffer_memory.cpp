@@ -16,23 +16,10 @@ namespace Yttrium
 {
 	namespace
 	{
-		constexpr size_t MaxSmallBlockLevel = 19;
-		constexpr size_t MaxSmallBlockSize = 1 << MaxSmallBlockLevel;
-
-		void* _small_blocks[MaxSmallBlockLevel + 1];
+		void* _small_blocks[MaxBufferMemorySmallBlockLevel + 1];
 	#if ENABLE_SYNCHRONIZATION
 		std::mutex _small_blocks_mutex;
 	#endif
-
-		size_t level_from_capacity(size_t capacity) noexcept
-		{
-			assert(is_power_of_2(capacity));
-			size_t level = 0;
-			for (auto i = capacity; i > 1; i >>= 1)
-				++level;
-			assert(size_t{1} << level == capacity);
-			return level;
-		}
 
 		void* allocate_big_block(size_t size)
 		{
@@ -44,13 +31,23 @@ namespace Yttrium
 		#endif
 			return data;
 		}
+
+		size_t level_from_capacity(size_t capacity) noexcept
+		{
+			assert(is_power_of_2(capacity));
+			size_t level = 0;
+			for (auto i = capacity; i > 1; i >>= 1)
+				++level;
+			assert(size_t{1} << level == capacity);
+			return level;
+		}
 	}
 
 	void* buffer_memory_allocate(size_t capacity)
 	{
 		assert(capacity > 0 && capacity == buffer_memory_capacity(capacity));
 		void* data = nullptr;
-		if (capacity > MaxSmallBlockSize)
+		if (capacity > MaxBufferMemorySmallBlockSize)
 		{
 			data = allocate_big_block(capacity);
 		}
@@ -67,7 +64,7 @@ namespace Yttrium
 				else
 				{
 					auto i = level + 1;
-					for (; i <= MaxSmallBlockLevel; ++i)
+					for (; i <= MaxBufferMemorySmallBlockLevel; ++i)
 					{
 						data = _small_blocks[i];
 						if (data)
@@ -79,8 +76,8 @@ namespace Yttrium
 					if (!data)
 					{
 						// TODO: Try to merge smaller blocks before allocating a new big one.
-						assert(1 << i == 2 * MaxSmallBlockSize);
-						data = allocate_big_block(2 * MaxSmallBlockSize);
+						assert(1 << i == 2 * MaxBufferMemorySmallBlockSize);
+						data = allocate_big_block(2 * MaxBufferMemorySmallBlockSize);
 					}
 					do
 					{
@@ -102,14 +99,14 @@ namespace Yttrium
 	{
 		const auto granularity_mask = buffer_memory_granularity() - 1;
 		auto capacity = (size + granularity_mask) & ~granularity_mask;
-		return capacity > MaxSmallBlockSize ? capacity : next_power_of_2(capacity);
+		return capacity > MaxBufferMemorySmallBlockSize ? capacity : next_power_of_2(capacity);
 	}
 
 	void buffer_memory_deallocate(void* data, size_t capacity) noexcept
 	{
 		assert(data);
 		assert(capacity > 0 && capacity == buffer_memory_capacity(capacity));
-		if (capacity > MaxSmallBlockSize)
+		if (capacity > MaxBufferMemorySmallBlockSize)
 		{
 			pages_deallocate(data, capacity);
 		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
@@ -154,7 +151,7 @@ namespace Yttrium
 		assert(old_capacity > 0 && old_capacity == buffer_memory_capacity(old_capacity));
 		assert(new_capacity > 0 && new_capacity == buffer_memory_capacity(new_capacity));
 		assert(old_capacity != new_capacity);
-		if (old_capacity > MaxSmallBlockSize && new_capacity > MaxSmallBlockSize)
+		if (old_capacity > MaxBufferMemorySmallBlockSize && new_capacity > MaxBufferMemorySmallBlockSize)
 		{
 			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
@@ -197,7 +194,7 @@ namespace Yttrium
 		std::lock_guard<std::mutex> lock(_small_blocks_mutex);
 	#endif
 		std::map<size_t, size_t> result;
-		for (auto i = level_from_capacity(buffer_memory_capacity(1)); i <= MaxSmallBlockLevel; ++i)
+		for (auto i = level_from_capacity(buffer_memory_capacity(1)); i <= MaxBufferMemorySmallBlockLevel; ++i)
 		{
 			size_t count = 0;
 			for (void* block = _small_blocks[i]; block; block = *reinterpret_cast<void**>(block))

@@ -8,6 +8,8 @@
 #include <yttrium/global.h>
 #include "../utils/atomic_counters.h"
 
+#include <cstddef>
+
 #if Y_IS_DEBUG
 	#include <map>
 #endif

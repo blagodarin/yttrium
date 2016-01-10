@@ -5,6 +5,10 @@
 
 namespace Yttrium
 {
+	// Internal properties required for proper benchmarking.
+	constexpr size_t MaxBufferMemorySmallBlockLevel = 19;
+	constexpr size_t MaxBufferMemorySmallBlockSize = 1 << MaxBufferMemorySmallBlockLevel;
+
 	void* buffer_memory_allocate(size_t capacity);
 	size_t buffer_memory_capacity(size_t size) noexcept;
 	void buffer_memory_deallocate(void* data, size_t capacity) noexcept;
