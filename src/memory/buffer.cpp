@@ -12,9 +12,6 @@ namespace Yttrium
 		, _capacity(buffer_memory_capacity(_size))
 		, _data(_capacity > 0 ? buffer_memory_allocate(_capacity) : nullptr)
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		buffer_memory_track_size_allocation(_size);
-	#endif
 	}
 
 	void Buffer::reserve(size_t capacity)
@@ -40,9 +37,6 @@ namespace Yttrium
 			_capacity = new_capacity;
 			_data = new_data;
 		}
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		buffer_memory_track_size_change(_size, size);
-	#endif
 		_size = size;
 	}
 
@@ -57,9 +51,6 @@ namespace Yttrium
 			_capacity = new_capacity;
 			_data = new_data;
 		}
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		buffer_memory_track_size_change(_size, size);
-	#endif
 		_size = size;
 	}
 
@@ -79,13 +70,9 @@ namespace Yttrium
 		}
 	}
 
-	size_t Buffer::max_total_size() noexcept
+	size_t Buffer::max_total_capacity() noexcept
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		return buffer_memory_max_total_size();
-	#else
-		return 0;
-	#endif
+		return buffer_memory_max_total_capacity();
 	}
 
 	size_t Buffer::memory_granularity() noexcept
@@ -93,13 +80,9 @@ namespace Yttrium
 		return buffer_memory_granularity();
 	}
 
-	size_t Buffer::total_size() noexcept
+	size_t Buffer::total_capacity() noexcept
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		return buffer_memory_total_size();
-	#else
-		return 0;
-	#endif
+		return buffer_memory_total_capacity();
 	}
 
 	Buffer::Buffer(Buffer&& other) noexcept
@@ -113,23 +96,13 @@ namespace Yttrium
 	Buffer::~Buffer() noexcept
 	{
 		if (_data)
-		{
 			buffer_memory_deallocate(_data, _capacity);
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-			buffer_memory_track_size_deallocation(_size);
-		#endif
-		}
 	}
 
 	Buffer& Buffer::operator=(Buffer&& other) noexcept
 	{
 		if (_data)
-		{
 			buffer_memory_deallocate(_data, _capacity);
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-			buffer_memory_track_size_deallocation(_size);
-		#endif
-		}
 		_size = other._size;
 		_capacity = other._capacity;
 		_data = other._data;
