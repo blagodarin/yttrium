@@ -1,6 +1,6 @@
-scene "menu_single"
+layer "menu_single"
 {
-	bind "esc" "pop_scene"
+	bind "esc" "pop_layer"
 
 	image
 	{
@@ -26,27 +26,27 @@ scene "menu_single"
 	{
 		position "" "260"
 		text     {tr"Easy"}
-		on_click "set start_level 1; push_scene game_single"
+		on_click "set start_level 1; push_layer game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "310"
 		text     {tr"Normal"}
-		on_click "set start_level 10; push_scene game_single"
+		on_click "set start_level 10; push_layer game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "360"
 		text     {tr"Hard"}
-		on_click "set start_level 30; push_scene game_single"
+		on_click "set start_level 30; push_layer game_single"
 	}
 
 	button ["button"]
 	{
 		position "" "410"
 		text     {tr"Back"}
-		on_click "pop_scene"
+		on_click "pop_layer"
 	}
 }

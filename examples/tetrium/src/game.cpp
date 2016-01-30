@@ -92,16 +92,16 @@ Game::Game(Allocator& allocator)
 		}
 	});
 
-	_script.define("pop_scene", 0, 1, [this](const ScriptCall& call)
+	_script.define("pop_layer", 0, 1, [this](const ScriptCall& call)
 	{
-		const auto scenes_to_pop = call.args.get_int(0, 1);
-		if (scenes_to_pop > 0 && !_window->gui().pop_scenes(scenes_to_pop))
+		const auto layers_to_pop = call.args.get_int(0, 1);
+		if (layers_to_pop > 0 && !_window->gui().pop_layers(layers_to_pop))
 			_window->close();
 	});
 
-	_script.define("push_scene", 1, [this](const ScriptCall& call)
+	_script.define("push_layer", 1, [this](const ScriptCall& call)
 	{
-		_window->gui().push_scene(call.args.string(0));
+		_window->gui().push_layer(call.args.string(0));
 	});
 
 	_script.define("save_score", [this](const ScriptCall&)
@@ -319,7 +319,7 @@ void Game::on_update(const UpdateEvent& update)
 		if (_game.has_finished())
 		{
 			_game_running = false;
-			_window->gui().push_scene("game_over");
+			_window->gui().push_layer("game_over");
 		}
 	}
 }

@@ -12,9 +12,9 @@ class "help_text"
 	align     "bottom" "right"
 }
 
-scene "menu_help"
+layer "menu_help"
 {
-	bind "esc" "pop_scene"
+	bind "esc" "pop_layer"
 
 	image
 	{
@@ -50,6 +50,6 @@ scene "menu_help"
 	{
 		position "" "360"
 		text     {tr"Back"}
-		on_click "pop_scene"
+		on_click "pop_layer"
 	}
 }

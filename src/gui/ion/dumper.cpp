@@ -5,7 +5,7 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/string_format.h>
 #include "../gui.h"
-#include "../scene.h"
+#include "../layer.h"
 
 namespace Yttrium
 {
@@ -32,47 +32,47 @@ namespace Yttrium
 
 		// TODO: Dump fonts.
 
-		for (const auto& scene : _gui._scenes)
+		for (const auto& layer : _gui._layers)
 		{
-			IonNode* scene_node = document.root().append("scene"_s);
+			IonNode* layer_node = document.root().append("layer"_s);
 
-			scene_node->append(scene.first);
+			layer_node->append(layer.first);
 
-			if (scene.first == _gui._scene_stack.front()->name())
-				scene_node->append_list()->append("root"_s);
-			else if (scene.second->is_transparent())
-				scene_node->append_list()->append("transparent"_s);
+			if (layer.first == _gui._layer_stack.front()->name())
+				layer_node->append_list()->append("root"_s);
+			else if (layer.second->is_transparent())
+				layer_node->append_list()->append("transparent"_s);
 
-			dump_scene(*scene.second, scene_node);
+			dump_layer(*layer.second, layer_node);
 		}
 
-		for (const auto& action : _gui._scene_actions)
+		for (const auto& action : _gui._layer_actions)
 		{
-			IonNode* on_scene_change_node = document.root().append("on_scene_change"_s);
+			IonNode* on_layer_change_node = document.root().append("on_layer_change"_s);
 
-			IonList* scene_list = on_scene_change_node->append_list();
+			IonList* layer_list = on_layer_change_node->append_list();
 
-			scene_list->append(action.first.first);
-			scene_list->append(action.first.second);
+			layer_list->append(action.first.first);
+			layer_list->append(action.first.second);
 
-			on_scene_change_node->append(action.second.first);
+			on_layer_change_node->append(action.second.first);
 		}
 
 		document.save(filename);
 	}
 
-	void GuiIonDumper::dump_scene(const GuiScene& scene, IonNode* scene_node) const
+	void GuiIonDumper::dump_layer(const GuiLayer& layer, IonNode* layer_node) const
 	{
-		IonObject* scene_object = scene_node->append_object();
+		IonObject* layer_object = layer_node->append_object();
 
-		IonNode* size_node = scene_object->append("size"_s);
+		IonNode* size_node = layer_object->append("size"_s);
 
-		size_node->append(String(&_gui.allocator()) << scene._size.width());
-		size_node->append(String(&_gui.allocator()) << scene._size.height());
+		size_node->append(String(&_gui.allocator()) << layer._size.width());
+		size_node->append(String(&_gui.allocator()) << layer._size.height());
 
-		IonNode* scale_node = scene_object->append("scale"_s);
+		IonNode* scale_node = layer_object->append("scale"_s);
 
-		switch (scene._scaling)
+		switch (layer._scaling)
 		{
 		case Scaling::Stretch: scale_node->append("stretch"_s); break;
 		case Scaling::Min:     scale_node->append("min"_s);     break;
@@ -80,9 +80,9 @@ namespace Yttrium
 		case Scaling::Fit:     scale_node->append("fit"_s);     break;
 		}
 
-		for (const auto& binding : scene._bindings)
+		for (const auto& binding : layer._bindings)
 		{
-			const auto bound_node = scene_object->append("bind"_s);
+			const auto bound_node = layer_object->append("bind"_s);
 			bound_node->append(binding.first);
 			bound_node->append(binding.second);
 		}

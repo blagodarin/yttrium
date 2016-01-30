@@ -15,7 +15,7 @@
 namespace Yttrium
 {
 	class GuiIonDumper;
-	class GuiScene;
+	class GuiLayer;
 	class KeyEvent;
 	class RendererImpl;
 	class Texture2D;
@@ -25,6 +25,17 @@ namespace Yttrium
 	class GuiImpl : public Gui
 	{
 		friend GuiIonDumper;
+
+	public:
+		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&, Allocator& allocator);
+		~GuiImpl() override;
+
+		void clear() override;
+		void dump(const StaticString& filename) const override;
+		bool has_layer(const StaticString& name) const override;
+		bool load(const StaticString& filename) override;
+		bool pop_layers(size_t count) override;
+		bool push_layer(const StaticString& name) override;
 
 	public:
 
@@ -42,20 +53,13 @@ namespace Yttrium
 			}
 		};
 
-	public:
-
-		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&, Allocator& allocator);
-		~GuiImpl() override;
-
-	public:
-
-		bool add_scene(Pointer<GuiScene>&& scene, bool is_root);
+		bool add_layer(Pointer<GuiLayer>&&, bool is_root);
 
 		Allocator& allocator() const { return const_cast<ProxyAllocator&>(_proxy_allocator); }
 
 		WindowCallbacks& callbacks() const { return _callbacks; }
 
-		Pointer<GuiScene> create_scene(const StaticString& name, bool is_transparent);
+		Pointer<GuiLayer> create_layer(const StaticString& name, bool is_transparent);
 
 		const FontDesc* font(const StaticString& name) const;
 
@@ -72,7 +76,7 @@ namespace Yttrium
 			_scaling = scaling;
 		}
 
-		void set_scene_change_action(const String& from_scene, const String& to_scene, const String& action);
+		void set_layer_change_action(const String& from_layer, const String& to_layer, const String& action);
 
 		void set_size(const SizeF& size)
 		{
@@ -82,21 +86,11 @@ namespace Yttrium
 
 		TextureCache& texture_cache() { return *_texture_cache; }
 
-	public: // Gui
-
-		void clear() override;
-		void dump(const StaticString& filename) const override;
-		bool has_scene(const StaticString& name) const override;
-		bool load(const StaticString& filename) override;
-		bool pop_scenes(size_t count) override;
-		bool push_scene(const StaticString& name) override;
-
 	private:
 
-		void change_scene(const StaticString& old_scene, const StaticString& new_scene);
+		void change_layer(const StaticString& old_layer, const StaticString& new_layer);
 
 	private:
-
 		ScriptContext&                    _script_context;
 		RendererImpl&                     _renderer;
 		WindowCallbacks&                  _callbacks;
@@ -106,9 +100,9 @@ namespace Yttrium
 		SizeF                             _size;
 		Scaling                           _scaling = Scaling::Stretch;
 		StdMap<String, FontDesc>          _fonts;
-		StdMap<StaticString, Pointer<GuiScene>> _scenes;
-		StdVector<GuiScene*>              _scene_stack;
-		StdMap<std::pair<String, String>, std::pair<String, ScriptCode>> _scene_actions;
+		StdMap<StaticString, Pointer<GuiLayer>> _layers;
+		StdVector<GuiLayer*>              _layer_stack;
+		StdMap<std::pair<String, String>, std::pair<String, ScriptCode>> _layer_actions;
 	};
 }
 

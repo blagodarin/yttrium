@@ -15,12 +15,12 @@ class "background"
 	color "0" "0" "0" "0.5"
 }
 
-scene "game_single"
+layer "game_single"
 {
 	size  "30" "26"
 	scale "min"
 
-	bind "esc" "push_scene game_pause"
+	bind "esc" "push_layer game_pause"
 
 	image
 	{

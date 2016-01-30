@@ -7,7 +7,7 @@
 #include "../renderer/renderer.h"
 #include "ion/dumper.h"
 #include "ion/loader.h"
-#include "scene.h"
+#include "layer.h"
 
 namespace Yttrium
 {
@@ -18,9 +18,9 @@ namespace Yttrium
 		, _proxy_allocator("gui"_s, allocator)
 		, _texture_cache(TextureCache::create(_renderer))
 		, _fonts(_proxy_allocator)
-		, _scenes(_proxy_allocator)
-		, _scene_stack(_proxy_allocator)
-		, _scene_actions(_proxy_allocator)
+		, _layers(_proxy_allocator)
+		, _layer_stack(_proxy_allocator)
+		, _layer_actions(_proxy_allocator)
 	{
 	}
 
@@ -29,40 +29,109 @@ namespace Yttrium
 		clear();
 	}
 
-	bool GuiImpl::add_scene(Pointer<GuiScene>&& scene, bool is_root)
+	void GuiImpl::clear()
 	{
-		const String& scene_name = scene->name();
+		_has_size = false;
+		_size = {};
+		_fonts.clear();
+		_layers.clear();
+		_layer_stack.clear();
+		_layer_actions.clear();
+	}
 
-		if (_scenes.find(scene_name) != _scenes.end())
+	void GuiImpl::dump(const StaticString& filename) const
+	{
+		GuiIonDumper(*this).dump(filename);
+	}
+
+	bool GuiImpl::has_layer(const StaticString& name) const
+	{
+		return _layers.find(String(name, ByReference())) != _layers.end();
+	}
+
+	bool GuiImpl::load(const StaticString& filename)
+	{
+		clear();
+
+		GuiIonLoader loader(*this);
+		if (!loader.load(filename))
+			return false;
+
+		if (_layer_stack.empty())
 		{
-			Log() << "(gui) Scene \""_s << scene_name << "\" has already been added"_s;
+			Log() << "(gui) No root layer has been added"_s;
+			clear();
+			return false;
+		}
+
+		return true;
+	}
+
+	bool GuiImpl::pop_layers(size_t count)
+	{
+		if (_layer_stack.empty())
+			return false;
+
+		const GuiLayer* old_layer = _layer_stack.back();
+
+		if (count >= _layer_stack.size())
+		{
+			_layer_stack.clear();
+			change_layer(old_layer->name(), StaticString());
+			return false;
+		}
+
+		_layer_stack.resize(_layer_stack.size() - count);
+		change_layer(old_layer->name(), _layer_stack.back()->name());
+		return true;
+	}
+
+	bool GuiImpl::push_layer(const StaticString& name)
+	{
+		auto i = _layers.find(String(name, ByReference()));
+		if (i == _layers.end())
+			return false;
+
+		const GuiLayer* old_layer = _layer_stack.back();
+		_layer_stack.push_back(i->second.get());
+		change_layer(old_layer->name(), name);
+		return true;
+	}
+
+	bool GuiImpl::add_layer(Pointer<GuiLayer>&& layer, bool is_root)
+	{
+		const String& layer_name = layer->name();
+
+		if (_layers.find(layer_name) != _layers.end())
+		{
+			Log() << "(gui) Layer \""_s << layer_name << "\" has already been added"_s;
 			return false;
 		}
 
 		if (is_root)
 		{
-			if (!_scene_stack.empty())
+			if (!_layer_stack.empty())
 			{
-				Log() << "(gui) Scene \""_s << scene_name << "\" \"root\" option ignored"_s;
-				// TODO: Print the existing root scene name.
+				Log() << "(gui) Layer \""_s << layer_name << "\" \"root\" option ignored"_s;
+				// TODO: Print the existing root layer name.
 			}
 			else
 			{
-				_scene_stack.push_back(scene.get());
+				_layer_stack.push_back(layer.get());
 			}
 		}
 
-		_scenes.emplace(scene_name, std::move(scene));
+		_layers.emplace(layer_name, std::move(layer));
 
 		return true;
 	}
 
-	Pointer<GuiScene> GuiImpl::create_scene(const StaticString& name, bool is_transparent)
+	Pointer<GuiLayer> GuiImpl::create_layer(const StaticString& name, bool is_transparent)
 	{
-		auto scene = make_pointer<GuiScene>(_proxy_allocator, *this, name, is_transparent);
+		auto layer = make_pointer<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
 		if (_has_size)
-			scene->set_size(_size);
-		return scene;
+			layer->set_size(_size);
+		return layer;
 	}
 
 	const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
@@ -73,23 +142,22 @@ namespace Yttrium
 
 	bool GuiImpl::process_key_event(const KeyEvent& event)
 	{
-		if (_scene_stack.empty())
-			return false;
-		return _scene_stack.back()->process_key(event);
+		return !_layer_stack.empty() && _layer_stack.back()->process_key(event);
 	}
 
 	void GuiImpl::render(const Point& cursor)
 	{
-		if (_scene_stack.empty())
+		if (_layer_stack.empty())
 			return;
-
-		auto i = _scene_stack.begin() + (_scene_stack.size() - 1);
+		auto i = _layer_stack.begin() + (_layer_stack.size() - 1);
 		(*i)->set_cursor(PointF(cursor));
-		while (i != _scene_stack.begin() && (*i)->is_transparent())
+		while (i != _layer_stack.begin() && (*i)->is_transparent())
 			--i;
-
-		for (; i != _scene_stack.end(); ++i)
+		do
+		{
 			(*i)->render(_renderer);
+			++i;
+		} while (i != _layer_stack.end());
 	}
 
 	void GuiImpl::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
@@ -110,84 +178,15 @@ namespace Yttrium
 		}
 	}
 
-	void GuiImpl::set_scene_change_action(const String& from_scene, const String& to_scene, const String& action)
+	void GuiImpl::set_layer_change_action(const String& from_layer, const String& to_layer, const String& action)
 	{
-		_scene_actions[std::make_pair(from_scene, to_scene)] = std::make_pair(action, ScriptCode(action, &_script_context.allocator()));
+		_layer_actions[std::make_pair(from_layer, to_layer)] = std::make_pair(action, ScriptCode(action, &_script_context.allocator()));
 	}
 
-	void GuiImpl::clear()
+	void GuiImpl::change_layer(const StaticString& old_layer, const StaticString& new_layer)
 	{
-		_has_size = false;
-		_size = {};
-		_fonts.clear();
-		_scenes.clear();
-		_scene_stack.clear();
-		_scene_actions.clear();
-	}
-
-	void GuiImpl::dump(const StaticString& filename) const
-	{
-		GuiIonDumper(*this).dump(filename);
-	}
-
-	bool GuiImpl::has_scene(const StaticString& name) const
-	{
-		return _scenes.find(String(name, ByReference())) != _scenes.end();
-	}
-
-	bool GuiImpl::load(const StaticString& filename)
-	{
-		clear();
-
-		GuiIonLoader loader(*this);
-		if (!loader.load(filename))
-			return false;
-
-		if (_scene_stack.empty())
-		{
-			Log() << "(gui) No root scene has been added"_s;
-			clear();
-			return false;
-		}
-
-		return true;
-	}
-
-	bool GuiImpl::pop_scenes(size_t count)
-	{
-		if (_scene_stack.empty())
-			return false;
-
-		const GuiScene* old_scene = _scene_stack.back();
-
-		if (count >= _scene_stack.size())
-		{
-			_scene_stack.clear();
-			change_scene(old_scene->name(), StaticString());
-			return false;
-		}
-
-		_scene_stack.resize(_scene_stack.size() - count);
-		change_scene(old_scene->name(), _scene_stack.back()->name());
-		return true;
-	}
-
-	bool GuiImpl::push_scene(const StaticString& name)
-	{
-		auto i = _scenes.find(String(name, ByReference()));
-		if (i == _scenes.end())
-			return false;
-
-		const GuiScene* old_scene = _scene_stack.back();
-		_scene_stack.push_back(i->second.get());
-		change_scene(old_scene->name(), name);
-		return true;
-	}
-
-	void GuiImpl::change_scene(const StaticString& old_scene, const StaticString& new_scene)
-	{
-		auto i = _scene_actions.find(std::make_pair(String(old_scene, ByReference()), String(new_scene, ByReference())));
-		if (i != _scene_actions.end())
+		auto i = _layer_actions.find(std::make_pair(String(old_layer, ByReference()), String(new_layer, ByReference())));
+		if (i != _layer_actions.end())
 			i->second.second.execute(script_context());
 	}
 }

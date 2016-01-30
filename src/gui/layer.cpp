@@ -1,4 +1,4 @@
-#include "scene.h"
+#include "layer.h"
 
 #include <yttrium/renderer.h>
 #include "gui.h"
@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	GuiScene::GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent)
+	GuiLayer::GuiLayer(GuiImpl& gui, const StaticString& name, bool is_transparent)
 		: _gui(gui)
 		, _name(name, &_gui.allocator())
 		, _widgets(_gui.allocator())
@@ -22,11 +22,11 @@ namespace Yttrium
 	{
 	}
 
-	GuiScene::~GuiScene()
+	GuiLayer::~GuiLayer()
 	{
 	}
 
-	void GuiScene::load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader)
+	void GuiLayer::load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader)
 	{
 		Pointer<Widget> widget;
 		if (type == "button"_s)
@@ -57,7 +57,7 @@ namespace Yttrium
 		_widgets.emplace_back(std::move(widget));
 	}
 
-	bool GuiScene::process_key(const KeyEvent& event)
+	bool GuiLayer::process_key(const KeyEvent& event)
 	{
 		if (event.pressed && event.key >= Key::Mouse1 && event.key <= Key::Mouse5
 			&& _focus_widget && _focus_widget != _mouse_widget)
@@ -116,17 +116,17 @@ namespace Yttrium
 		return false;
 	}
 
-	void GuiScene::render(Renderer& renderer)
+	void GuiLayer::render(Renderer& renderer)
 	{
 		const auto& window_size = renderer.window_size();
-		const auto& scene_size = _has_size ? _size : SizeF(window_size);
+		const auto& layer_size = _has_size ? _size : SizeF(window_size);
 
 		const Vector2 scale(
-			window_size.width() / scene_size.width(),
-			window_size.height() / scene_size.height());
+			window_size.width() / layer_size.width(),
+			window_size.height() / layer_size.height());
 		const Vector2 shift(
-			(window_size.width() - scene_size.width() * scale.y) * .5f,
-			(window_size.height() - scene_size.height() * scale.x) * .5f);
+			(window_size.width() - layer_size.width() * scale.y) * .5f,
+			(window_size.height() - layer_size.height() * scale.x) * .5f);
 
 		Widget* mouse_widget = nullptr;
 
@@ -155,12 +155,12 @@ namespace Yttrium
 		_is_cursor_set = false;
 	}
 
-	void GuiScene::reserve(size_t capacity)
+	void GuiLayer::reserve(size_t capacity)
 	{
 		_widgets.reserve(capacity);
 	}
 
-	RectF GuiScene::map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const
+	RectF GuiLayer::map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const
 	{
 		switch (scaling)
 		{

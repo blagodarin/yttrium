@@ -1,19 +1,19 @@
 size "640" "480"
 scale "stretch"
-scene "game" ["transparent"]
+layer "game" ["transparent"]
 {
 	size "640" "480"
 	scale "stretch"
 }
-scene "menu" ["root"]
+layer "menu" ["root"]
 {
 	size "100" "100"
 	scale "fit"
 	bind "esc" "exit"
 }
-on_scene_change ["game" "menu"] "game_stop"
-on_scene_change ["game" "over"] "game_stop"
-on_scene_change ["game" "pause"] "game_pause"
-on_scene_change ["menu" "game"] "game_start"
-on_scene_change ["pause" "game"] "game_resume"
-on_scene_change ["pause" "menu"] "game_stop"
+on_layer_change ["game" "menu"] "game_stop"
+on_layer_change ["game" "over"] "game_stop"
+on_layer_change ["game" "pause"] "game_pause"
+on_layer_change ["menu" "game"] "game_start"
+on_layer_change ["pause" "game"] "game_resume"
+on_layer_change ["pause" "menu"] "game_stop"

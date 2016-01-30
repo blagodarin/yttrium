@@ -1,6 +1,6 @@
-scene "menu_multi"
+layer "menu_multi"
 {
-	bind "esc" "pop_scene"
+	bind "esc" "pop_layer"
 
 	image
 	{
@@ -40,6 +40,6 @@ scene "menu_multi"
 	{
 		position "" "410"
 		text     {tr"Back"}
-		on_click "pop_scene"
+		on_click "pop_layer"
 	}
 }

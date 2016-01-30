@@ -19,9 +19,9 @@ class "statistics_score"
 	align     "left"
 }
 
-scene "menu_statistics"
+layer "menu_statistics"
 {
-	bind "esc" "pop_scene"
+	bind "esc" "pop_layer"
 
 	image
 	{
@@ -59,6 +59,6 @@ scene "menu_statistics"
 	{
 		position "" "310"
 		text     {tr"Back"}
-		on_click "pop_scene"
+		on_click "pop_layer"
 	}
 }

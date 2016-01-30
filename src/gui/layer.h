@@ -1,5 +1,5 @@
-#ifndef _src_gui_scene_h_
-#define _src_gui_scene_h_
+#ifndef _src_gui_layer_h_
+#define _src_gui_layer_h_
 
 #include <yttrium/bindings.h>
 #include <yttrium/math/rect.h>
@@ -16,14 +16,14 @@ namespace Yttrium
 	class Widget;
 	template <typename> class Pointer;
 
-	class GuiScene
+	class GuiLayer
 	{
 		friend GuiIonDumper;
 
 	public:
 
-		GuiScene(GuiImpl& gui, const StaticString& name, bool is_transparent);
-		~GuiScene();
+		GuiLayer(GuiImpl& gui, const StaticString& name, bool is_transparent);
+		~GuiLayer();
 
 	public:
 

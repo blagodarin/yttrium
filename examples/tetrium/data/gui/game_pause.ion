@@ -4,12 +4,12 @@ class "pause_button" ["button"]
 	text_size "1.75"
 }
 
-scene "game_pause" ["transparent"]
+layer "game_pause" ["transparent"]
 {
 	size        "30" "26"
 	scale       "min"
 
-	bind "esc" "pop_scene"
+	bind "esc" "pop_layer"
 
 	image
 	{
@@ -22,21 +22,21 @@ scene "game_pause" ["transparent"]
 	{
 		position "" "9"
 		text     {tr"Resume"}
-		on_click "pop_scene"
+		on_click "pop_layer"
 	}
 
 	button ["pause_button"]
 	{
 		position "" "12"
 		text     {tr"Restart"}
-		on_click "pop_scene 2; push_scene game_single"
+		on_click "pop_layer 2; push_layer game_single"
 	}
 
 	button ["pause_button"]
 	{
 		position "" "15"
 		text     {tr"Give up"}
-		on_click "pop_scene 3"
+		on_click "pop_layer 3"
 	}
 
 	button ["pause_button"]

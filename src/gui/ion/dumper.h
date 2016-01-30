@@ -6,23 +6,20 @@
 namespace Yttrium
 {
 	class GuiImpl;
-	class GuiScene;
+	class GuiLayer;
 	class IonNode;
 
 	class GuiIonDumper
 	{
 	public:
-
-		GuiIonDumper(const GuiImpl& gui): _gui(gui) {}
+		GuiIonDumper(const GuiImpl& gui) : _gui(gui) {}
 
 		void dump(const StaticString& filename) const;
 
 	private:
-
-		void dump_scene(const GuiScene& scene, IonNode* node) const;
+		void dump_layer(const GuiLayer& layer, IonNode* node) const;
 
 	private:
-
 		const GuiImpl& _gui;
 	};
 }

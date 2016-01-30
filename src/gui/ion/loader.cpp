@@ -8,7 +8,7 @@
 #include <yttrium/log.h>
 #include <yttrium/texture_cache.h>
 #include "../gui.h"
-#include "../scene.h"
+#include "../layer.h"
 #include "property_loader.h"
 
 namespace Yttrium
@@ -114,7 +114,7 @@ namespace Yttrium
 				if (!_classes.add(*element.name, *element.object, element.attribute))
 					Log() << "(gui) Can' load class \""_s << *element.name << "\""_s;
 			}
-			else if (node.name() == "scene"_s)
+			else if (node.name() == "layer"_s)
 			{
 				const auto& element = load_element(node);
 				if (!element.object || !element.name)
@@ -129,23 +129,23 @@ namespace Yttrium
 					else if (*element.attribute == "transparent"_s)
 						is_transparent = true;
 					else
-						Log() << "(gui) Unknown scene \""_s << *element.name << "\" attribute \""_s << *element.attribute << "\" ignored"_s;
+						Log() << "(gui) Unknown layer \""_s << *element.name << "\" attribute \""_s << *element.attribute << "\" ignored"_s;
 				}
 
-				auto scene = _gui.create_scene(*element.name, is_transparent);
-				if (scene)
+				auto layer = _gui.create_layer(*element.name, is_transparent);
+				if (layer)
 				{
-					load_scene(*scene, *element.object);
-					_gui.add_scene(std::move(scene), is_root);
+					load_layer(*layer, *element.object);
+					_gui.add_layer(std::move(layer), is_root);
 				}
 			}
-			else if (node.name() == "on_scene_change"_s)
+			else if (node.name() == "on_layer_change"_s)
 			{
 				const auto& s = node.values();
 
 				if (s.size() != 2 || s->type() != IonValue::Type::List || s.last().type() != IonValue::Type::String)
 				{
-					Log() << "(gui) Bad 'on_scene_change'"_s;
+					Log() << "(gui) Bad 'on_layer_change'"_s;
 					continue;
 				}
 
@@ -157,11 +157,11 @@ namespace Yttrium
 
 				if (t.size() != 2 || !t->get(&from) || !t.last().get(&to) || !s.last().get(&action))
 				{
-					Log() << "(gui) Bad 'on_scene_change'"_s;
+					Log() << "(gui) Bad 'on_layer_change'"_s;
 					continue;
 				}
 
-				_gui.set_scene_change_action(
+				_gui.set_layer_change_action(
 					String(*from, &_gui.allocator()),
 					String(*to, &_gui.allocator()),
 					String(*action, &_gui.allocator()));
@@ -209,9 +209,9 @@ namespace Yttrium
 		}
 	}
 
-	void GuiIonLoader::load_scene(GuiScene& scene, const IonObject& source) const
+	void GuiIonLoader::load_layer(GuiLayer& layer, const IonObject& source) const
 	{
-		scene.reserve(source.size());
+		layer.reserve(source.size());
 
 		for (const auto& node : source)
 		{
@@ -219,19 +219,19 @@ namespace Yttrium
 			{
 				SizeF size;
 				if (GuiIonPropertyLoader::load_size(size, node))
-					scene.set_size(size);
+					layer.set_size(size);
 			}
 			else if (node.name() == "scale"_s)
 			{
 				Scaling scaling;
 				if (GuiIonPropertyLoader::load_scaling(&scaling, node))
-					scene.set_scaling(scaling);
+					layer.set_scaling(scaling);
 			}
 			else if (node.name() == "bind"_s)
 			{
 				const auto s = node.values();
 				if (s.size() == 2 && s->type() == IonValue::Type::String && s.last().type() == IonValue::Type::String)
-					scene.bind(s->string(), s.last().string());
+					layer.bind(s->string(), s.last().string());
 			}
 			else
 			{
@@ -243,7 +243,7 @@ namespace Yttrium
 				if (_has_default_font)
 					loader.set_default_font_name(&_default_font_name);
 
-				scene.load_widget(node.name(), (element.name ? *element.name : StaticString()), loader);
+				layer.load_widget(node.name(), (element.name ? *element.name : StaticString()), loader);
 			}
 		}
 	}

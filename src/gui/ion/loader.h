@@ -7,7 +7,7 @@
 namespace Yttrium
 {
 	class GuiImpl;
-	class GuiScene;
+	class GuiLayer;
 
 	class GuiIonLoader
 	{
@@ -18,7 +18,7 @@ namespace Yttrium
 
 	private:
 		void load(const IonObject& source);
-		void load_scene(GuiScene& scene, const IonObject& source) const;
+		void load_layer(GuiLayer& layer, const IonObject& source) const;
 
 	private:
 		GuiImpl& _gui;

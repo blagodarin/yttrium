@@ -24,16 +24,16 @@ namespace Yttrium
 		virtual void dump(const StaticString& filename) const = 0;
 
 		///
-		virtual bool has_scene(const StaticString& name) const = 0;
+		virtual bool has_layer(const StaticString& name) const = 0;
 
 		///
 		virtual bool load(const StaticString& filename) = 0;
 
 		///
-		virtual bool pop_scenes(size_t count) = 0;
+		virtual bool pop_layers(size_t count) = 0;
 
 		///
-		virtual bool push_scene(const StaticString& name) = 0;
+		virtual bool push_layer(const StaticString& name) = 0;
 	};
 }
 

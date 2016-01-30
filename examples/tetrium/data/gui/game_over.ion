@@ -1,9 +1,9 @@
-scene "game_over" ["transparent"]
+layer "game_over" ["transparent"]
 {
 	size  "30" "26"
 	scale "min"
 
-	bind "esc" "pop_scene 3"
+	bind "esc" "pop_layer 3"
 
 	image
 	{
@@ -34,6 +34,6 @@ scene "game_over" ["transparent"]
 		color      "1" "1" "1" "0.5"
 		text_size  "3"
 		text_color "0" "0" "0"
-		on_enter   "save_score; pop_scene 3; push_scene menu_statistics"
+		on_enter   "save_score; pop_layer 3; push_layer menu_statistics"
 	}
 }
