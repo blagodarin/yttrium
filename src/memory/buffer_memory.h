@@ -1,21 +1,38 @@
 #ifndef _src_memory_buffer_memory_h_
 #define _src_memory_buffer_memory_h_
 
-#include <cstddef>
+#include <mutex>
 
 namespace Yttrium
 {
-	// Internal properties required for proper benchmarking.
-	constexpr size_t MaxBufferMemorySmallBlockLevel = 19;
-	constexpr size_t MaxBufferMemorySmallBlockSize = 1 << MaxBufferMemorySmallBlockLevel;
+	class BufferMemory
+	{
+	public:
+		// Internal properties required for proper benchmarking.
+		constexpr static size_t MaxSmallBlockLevel = 19;
+		constexpr static size_t MaxSmallBlockSize = 1 << MaxSmallBlockLevel;
 
-	void* buffer_memory_allocate(size_t capacity);
-	size_t buffer_memory_capacity(size_t size) noexcept;
-	void buffer_memory_deallocate(void* data, size_t capacity) noexcept;
-	size_t buffer_memory_granularity() noexcept;
-	size_t buffer_memory_max_total_capacity() noexcept;
-	void* buffer_memory_reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size);
-	size_t buffer_memory_total_capacity() noexcept;
+		BufferMemory() = default;
+		~BufferMemory();
+
+		void* allocate(size_t capacity);
+		void deallocate(void* data, size_t capacity) noexcept;
+		void* reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size);
+
+		static size_t capacity_for_size(size_t) noexcept;
+		static size_t granularity() noexcept;
+		static size_t max_total_capacity() noexcept;
+		static size_t total_capacity() noexcept;
+
+		BufferMemory(const BufferMemory&) = delete;
+		BufferMemory& operator=(const BufferMemory&) = delete;
+
+	private:
+		void* _small_blocks[MaxSmallBlockLevel + 1] = {};
+		std::mutex _small_blocks_mutex;
+	};
+
+	extern BufferMemory _buffer_memory;
 }
 
 #endif

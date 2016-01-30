@@ -14,7 +14,7 @@ namespace
 	constexpr auto Duration = 1000;
 
 	const auto Granularity = Buffer::memory_granularity();
-	const auto MaxSmallBlock = MaxBufferMemorySmallBlockSize; // For brevity.
+	const auto MaxSmallBlock = BufferMemory::MaxSmallBlockSize; // For brevity.
 
 	class Measurement
 	{
@@ -436,14 +436,15 @@ int main(int argc, char** argv)
 {
 	if (argc != 2)
 	{
-		std::cerr << "Usage:\n"
-			"\t" << argv[0] << " 1  -- run \"Allocate\" benchmark;\n"
-			"\t" << argv[0] << " 2  -- run \"Allocate & touch\" benchmark;\n"
-			"\t" << argv[0] << " 3  -- run \"Allocate & fill\" benchmark;\n"
-			"\t" << argv[0] << " 4  -- run \"Grow\" benchmark;\n"
-			"\t" << argv[0] << " 5  -- run \"Grow & touch\" benchmark;\n"
-			"\t" << argv[0] << " 6  -- run \"Grow & fill\" benchmark;\n"
-			"\t" << argv[0] << "    -- print this usage." << std::endl;
+		std::cerr << "Usage:"
+			"\n\t" << argv[0] << " 1  -- run \"Allocate\" benchmark;"
+			"\n\t" << argv[0] << " 2  -- run \"Allocate & touch\" benchmark;"
+			"\n\t" << argv[0] << " 3  -- run \"Allocate & fill\" benchmark;"
+			"\n\t" << argv[0] << " 4  -- run \"Grow\" benchmark;"
+			"\n\t" << argv[0] << " 5  -- run \"Grow & touch\" benchmark;"
+			"\n\t" << argv[0] << " 6  -- run \"Grow & fill\" benchmark;"
+			"\n\t" << argv[0] << "    -- print this usage."
+			<< std::endl;
 		return 0;
 	}
 

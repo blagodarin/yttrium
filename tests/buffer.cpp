@@ -1,6 +1,6 @@
 #include <yttrium/memory/buffer.h>
 
-#include "src/memory/buffer_memory_tracking.h"
+#include "src/memory/buffer_memory_tracker.h"
 #include "common.h"
 
 using namespace Yttrium;
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 	BOOST_CHECK_EQUAL(buffer.capacity(), 0);
 }
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKER
 BOOST_AUTO_TEST_CASE(test_buffer_total_capacity)
 {
 	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);

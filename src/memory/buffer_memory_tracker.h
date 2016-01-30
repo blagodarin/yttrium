@@ -1,9 +1,9 @@
-#ifndef _src_memory_buffer_memory_tracking_h_
-#define _src_memory_buffer_memory_tracking_h_
+#ifndef _src_memory_buffer_memory_tracker_h_
+#define _src_memory_buffer_memory_tracker_h_
 
-#define Y_ENABLE_BUFFER_MEMORY_TRACKING 1 // Disable for profiling purposes only.
+#define Y_ENABLE_BUFFER_MEMORY_TRACKER 1 // Disable for profiling purposes only.
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKER
 
 #include <yttrium/global.h>
 #include "../utils/atomic_counters.h"
@@ -19,12 +19,14 @@ namespace Yttrium
 	class BufferMemoryTracker
 	{
 	public:
-		~BufferMemoryTracker();
-
 		size_t max_total_capacity() const noexcept
 		{
 			return _total_capacity.maximum_value();
 		}
+
+	#if Y_IS_DEBUG
+		void print_state(const std::map<size_t, size_t>& free_block_count);
+	#endif
 
 		size_t total_capacity() const noexcept
 		{
@@ -96,10 +98,6 @@ namespace Yttrium
 	};
 
 	extern BufferMemoryTracker _buffer_memory_tracker;
-
-#if Y_IS_DEBUG
-	std::map<size_t, size_t> buffer_memory_free_block_count() noexcept;
-#endif
 }
 
 #endif

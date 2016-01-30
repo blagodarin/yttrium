@@ -1,21 +1,17 @@
-#include "buffer_memory_tracking.h"
+#include "buffer_memory_tracker.h"
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKER
 
-#define PRINT_TRACKING Y_IS_DEBUG
-
-#if PRINT_TRACKING
+#if Y_IS_DEBUG
 	#include <iostream>
 	#include <sstream>
 #endif
 
 namespace Yttrium
 {
-	BufferMemoryTracker _buffer_memory_tracker;
-
-	BufferMemoryTracker::~BufferMemoryTracker()
+#if Y_IS_DEBUG
+	void BufferMemoryTracker::print_state(const std::map<size_t, size_t>& free_block_count)
 	{
-	#if PRINT_TRACKING
 		const auto human_readable_size = [](size_t size)
 		{
 			std::ostringstream stream;
@@ -40,7 +36,7 @@ namespace Yttrium
 		std::cerr << "\n(DEBUG)  * total_allocations : " << _total_allocations;
 		std::cerr << "\n(DEBUG)  * total_reallocations : " << _total_reallocations;
 		std::cerr << "\n(DEBUG)  * remaining_free_blocks : " << human_readable_size(_total_allocated.current_value());
-		for (const auto& block_count : buffer_memory_free_block_count())
+		for (const auto& block_count : free_block_count)
 			std::cerr << "\n(DEBUG)     - " << human_readable_size(block_count.first) << " : " << block_count.second;
 	#endif
 		std::cerr << std::endl;
@@ -53,8 +49,8 @@ namespace Yttrium
 		#endif
 			std::cerr << std::endl;
 		}
-	#endif
 	}
+#endif
 }
 
 #endif

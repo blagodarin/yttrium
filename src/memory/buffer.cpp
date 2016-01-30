@@ -9,8 +9,8 @@ namespace Yttrium
 {
 	Buffer::Buffer(size_t size)
 		: _size(size)
-		, _capacity(buffer_memory_capacity(_size))
-		, _data(_capacity > 0 ? buffer_memory_allocate(_capacity) : nullptr)
+		, _capacity(BufferMemory::capacity_for_size(_size))
+		, _data(_capacity > 0 ? _buffer_memory.allocate(_capacity) : nullptr)
 	{
 	}
 
@@ -18,10 +18,10 @@ namespace Yttrium
 	{
 		if (capacity <= _capacity)
 			return;
-		const auto new_capacity = buffer_memory_capacity(capacity);
+		const auto new_capacity = BufferMemory::capacity_for_size(capacity);
 		const auto new_data = _data
-			? buffer_memory_reallocate(_data, _capacity, new_capacity, _size)
-			: buffer_memory_allocate(new_capacity);
+			? _buffer_memory.reallocate(_data, _capacity, new_capacity, _size)
+			: _buffer_memory.allocate(new_capacity);
 		_capacity = new_capacity;
 		_data = new_data;
 	}
@@ -30,10 +30,10 @@ namespace Yttrium
 	{
 		if (size > _capacity)
 		{
-			const auto new_capacity = buffer_memory_capacity(size);
+			const auto new_capacity = BufferMemory::capacity_for_size(size);
 			const auto new_data = _data
-				? buffer_memory_reallocate(_data, _capacity, new_capacity, 0)
-				: buffer_memory_allocate(new_capacity);
+				? _buffer_memory.reallocate(_data, _capacity, new_capacity, 0)
+				: _buffer_memory.allocate(new_capacity);
 			_capacity = new_capacity;
 			_data = new_data;
 		}
@@ -44,10 +44,10 @@ namespace Yttrium
 	{
 		if (size > _capacity)
 		{
-			const auto new_capacity = buffer_memory_capacity(size);
+			const auto new_capacity = BufferMemory::capacity_for_size(size);
 			const auto new_data = _data
-				? buffer_memory_reallocate(_data, _capacity, new_capacity, min(size, _size))
-				: buffer_memory_allocate(new_capacity);
+				? _buffer_memory.reallocate(_data, _capacity, new_capacity, min(size, _size))
+				: _buffer_memory.allocate(new_capacity);
 			_capacity = new_capacity;
 			_data = new_data;
 		}
@@ -56,33 +56,33 @@ namespace Yttrium
 
 	void Buffer::shrink_to_fit()
 	{
-		const auto new_capacity = buffer_memory_capacity(_size);
+		const auto new_capacity = BufferMemory::capacity_for_size(_size);
 		if (new_capacity < _capacity)
 		{
 			if (!new_capacity)
 			{
-				buffer_memory_deallocate(_data, _capacity);
+				_buffer_memory.deallocate(_data, _capacity);
 				_data = nullptr;
 			}
 			else
-				_data = buffer_memory_reallocate(_data, _capacity, new_capacity, _size);
+				_data = _buffer_memory.reallocate(_data, _capacity, new_capacity, _size);
 			_capacity = new_capacity;
 		}
 	}
 
 	size_t Buffer::max_total_capacity() noexcept
 	{
-		return buffer_memory_max_total_capacity();
+		return BufferMemory::max_total_capacity();
 	}
 
 	size_t Buffer::memory_granularity() noexcept
 	{
-		return buffer_memory_granularity();
+		return BufferMemory::granularity();
 	}
 
 	size_t Buffer::total_capacity() noexcept
 	{
-		return buffer_memory_total_capacity();
+		return BufferMemory::total_capacity();
 	}
 
 	Buffer::Buffer(Buffer&& other) noexcept
@@ -96,13 +96,13 @@ namespace Yttrium
 	Buffer::~Buffer() noexcept
 	{
 		if (_data)
-			buffer_memory_deallocate(_data, _capacity);
+			_buffer_memory.deallocate(_data, _capacity);
 	}
 
 	Buffer& Buffer::operator=(Buffer&& other) noexcept
 	{
 		if (_data)
-			buffer_memory_deallocate(_data, _capacity);
+			_buffer_memory.deallocate(_data, _capacity);
 		_size = other._size;
 		_capacity = other._capacity;
 		_data = other._data;
