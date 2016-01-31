@@ -1,5 +1,5 @@
-#ifndef _examples_rts_model_h_
-#define _examples_rts_model_h_
+#ifndef _examples_3d_model_h_
+#define _examples_3d_model_h_
 
 #include <yttrium/gpu_program.h>
 #include <yttrium/pointer.h>

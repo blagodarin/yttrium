@@ -317,7 +317,7 @@ def YttriumExample(env, name):
 	Alias('examples', target)
 	return target
 
-YttriumExample(env, 'rts')
+YttriumExample(env, '3d')
 tetrium = YttriumExample(env, 'tetrium')
 Depends(tetrium, YttriumTranslation(env, 'examples/tetrium/data/i18n/en.ion', 'examples/tetrium/data/gui'))
 

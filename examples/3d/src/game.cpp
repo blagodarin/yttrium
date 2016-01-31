@@ -22,10 +22,10 @@ void Game::run()
 
 	_texture_cache = TextureCache::create(_window->renderer());
 
-	_window->set_name("Yttrium RTS example");
+	_window->set_name("Yttrium 3D example");
 	_window->set_size({1024, 768});
 
-	if (!_window->gui().load("examples/rts/data/gui.ion"))
+	if (!_window->gui().load("examples/3d/data/gui.ion"))
 		return;
 
 	_cube = std::make_unique<CubeModel>(_window->renderer());

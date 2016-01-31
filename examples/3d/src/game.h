@@ -1,5 +1,5 @@
-#ifndef _examples_rts_game_h_
-#define _examples_rts_game_h_
+#ifndef _examples_3d_game_h_
+#define _examples_3d_game_h_
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/math/vector.h>

@@ -78,8 +78,8 @@ CubeModel::CubeModel(Renderer& renderer)
 	_indices = _renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data());
 
 	_program = _renderer.create_gpu_program(
-		File("examples/rts/data/cube_vs.glsl").to_string(),
-		File("examples/rts/data/cube_fs.glsl").to_string());
+		File("examples/3d/data/cube_vs.glsl").to_string(),
+		File("examples/3d/data/cube_fs.glsl").to_string());
 }
 
 ChessboardModel::ChessboardModel(Renderer& renderer)
@@ -140,6 +140,6 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
 	_program = _renderer.create_gpu_program(
-		File("examples/rts/data/chessboard_vs.glsl").to_string(),
-		File("examples/rts/data/chessboard_fs.glsl").to_string());
+		File("examples/3d/data/chessboard_vs.glsl").to_string(),
+		File("examples/3d/data/chessboard_fs.glsl").to_string());
 }
