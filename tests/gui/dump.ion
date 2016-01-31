@@ -1,13 +1,15 @@
 size "640" "480"
 scale "stretch"
-layer "game" ["transparent"]
-{
-	size "640" "480"
-	scale "stretch"
-}
-layer "menu" ["root"]
+root
+layer
 {
 	size "100" "100"
 	scale "fit"
 	bind "esc" "exit"
+}
+transparent
+layer "game"
+{
+	size "640" "480"
+	scale "stretch"
 }

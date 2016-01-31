@@ -98,9 +98,48 @@ namespace Yttrium
 
 	void GuiIonLoader::load(const IonObject& source)
 	{
+		StaticString current_attribute;
 		for (const auto& node : source)
 		{
-			if (node.name() == "include"_s)
+			if (node.name() == "layer"_s)
+			{
+				const auto& element = load_element(node);
+				StaticString layer_name = element.name ? *element.name : StaticString();
+
+				if (!element.object)
+				{
+					Log() << "(gui) Ignored empty layer \""_s << layer_name << "\""_s;
+					continue;
+				}
+
+				const bool is_root = current_attribute == "root"_s;
+				if (!is_root && layer_name.is_empty())
+				{
+					Log() << "(gui) Ignored unnamed non-root layer"_s;
+					continue;
+				}
+
+				const bool is_transparent = current_attribute == "transparent"_s;
+
+				auto layer = _gui.create_layer(layer_name, is_transparent);
+				if (layer)
+				{
+					load_layer(*layer, *element.object);
+					_gui.add_layer(std::move(layer), is_root);
+				}
+				current_attribute = {};
+				continue;
+			}
+			if (!current_attribute.is_empty())
+			{
+				Log() << "(gui) Unable to apply \""_s << current_attribute << "\" attribute to \""_s << node.name() << "\""_s;
+				current_attribute = {};
+			}
+			if (node.name() == "root"_s || node.name() == "transparent"_s)
+			{
+				current_attribute = node.name();
+			}
+			else if (node.name() == "include"_s)
 			{
 				const StaticString* include_path;
 				if (Ion::get(node, include_path))
@@ -113,31 +152,6 @@ namespace Yttrium
 					continue;
 				if (!_classes.add(*element.name, *element.object, element.attribute))
 					Log() << "(gui) Can' load class \""_s << *element.name << "\""_s;
-			}
-			else if (node.name() == "layer"_s)
-			{
-				const auto& element = load_element(node);
-				if (!element.object || !element.name)
-					continue;
-
-				bool is_root = false;
-				bool is_transparent = false;
-				if (element.attribute)
-				{
-					if (*element.attribute == "root"_s)
-						is_root = true;
-					else if (*element.attribute == "transparent"_s)
-						is_transparent = true;
-					else
-						Log() << "(gui) Unknown layer \""_s << *element.name << "\" attribute \""_s << *element.attribute << "\" ignored"_s;
-				}
-
-				auto layer = _gui.create_layer(*element.name, is_transparent);
-				if (layer)
-				{
-					load_layer(*layer, *element.object);
-					_gui.add_layer(std::move(layer), is_root);
-				}
 			}
 			else if (node.name() == "font"_s)
 			{

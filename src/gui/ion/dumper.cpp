@@ -34,15 +34,13 @@ namespace Yttrium
 
 		for (const auto& layer : _gui._layers)
 		{
-			IonNode* layer_node = document.root().append("layer"_s);
-
-			layer_node->append(layer.first);
-
 			if (layer.first == _gui._layer_stack.front()->name())
-				layer_node->append_list()->append("root"_s);
+				document.root().append("root"_s);
 			else if (layer.second->is_transparent())
-				layer_node->append_list()->append("transparent"_s);
-
+				document.root().append("transparent"_s);
+			const auto layer_node = document.root().append("layer"_s);
+			if (!layer.first.is_empty())
+				layer_node->append(layer.first);
 			dump_layer(*layer.second, layer_node);
 		}
 

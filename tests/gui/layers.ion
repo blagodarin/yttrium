@@ -1,11 +1,11 @@
-layer "menu" ["root"]
+root layer
 {
 	size "100" "100"
 	scale "fit"
 	bind "esc" "exit"
 }
 
-layer "game" ["transparent"]
+transparent layer "game"
 {
 	scale "stretch"
 }

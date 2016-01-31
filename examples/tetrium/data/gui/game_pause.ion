@@ -4,7 +4,7 @@ class "pause_button" ["button"]
 	text_size "1.75"
 }
 
-layer "game_pause" ["transparent"]
+transparent layer "game_pause"
 {
 	on_push "game_pause"
 	on_pop "game_resume"
