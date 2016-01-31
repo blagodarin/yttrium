@@ -59,6 +59,30 @@ namespace Yttrium
 
 			return result;
 		}
+
+		enum GuiAttribute : unsigned
+		{
+			IsDefault     = 1 << 0,
+			IsRoot        = 1 << 1,
+			IsTransparent = 1 << 2,
+		};
+
+		const std::pair<StaticString, GuiAttribute> _root_attributes[] =
+		{
+			{"default"_s, IsDefault},
+			{"root"_s, IsRoot},
+			{"transparent"_s, IsTransparent},
+		};
+
+		unsigned find_attribute(const StaticString& value)
+		{
+			for (const auto& attribute : _root_attributes)
+			{
+				if (attribute.first == value)
+					return attribute.second;
+			}
+			return 0;
+		}
 	}
 
 	GuiIonLoader::GuiIonLoader(GuiImpl& gui)
@@ -98,48 +122,19 @@ namespace Yttrium
 
 	void GuiIonLoader::load(const IonObject& source)
 	{
-		StaticString current_attribute;
+		unsigned attributes = 0;
 		for (const auto& node : source)
 		{
-			if (node.name() == "layer"_s)
+			if (node.is_empty())
 			{
-				const auto& element = load_element(node);
-				StaticString layer_name = element.name ? *element.name : StaticString();
-
-				if (!element.object)
-				{
-					Log() << "(gui) Ignored empty layer \""_s << layer_name << "\""_s;
-					continue;
-				}
-
-				const bool is_root = current_attribute == "root"_s;
-				if (!is_root && layer_name.is_empty())
-				{
-					Log() << "(gui) Ignored unnamed non-root layer"_s;
-					continue;
-				}
-
-				const bool is_transparent = current_attribute == "transparent"_s;
-
-				auto layer = _gui.create_layer(layer_name, is_transparent);
-				if (layer)
-				{
-					load_layer(*layer, *element.object);
-					_gui.add_layer(std::move(layer), is_root);
-				}
-				current_attribute = {};
+				const auto attribute = find_attribute(node.name());
+				if (!attribute)
+					Log() << "(gui) Unknown attribute \""_s << node.name() << "\""_s;
+				else
+					attributes |= attribute;
 				continue;
 			}
-			if (!current_attribute.is_empty())
-			{
-				Log() << "(gui) Unable to apply \""_s << current_attribute << "\" attribute to \""_s << node.name() << "\""_s;
-				current_attribute = {};
-			}
-			if (node.name() == "root"_s || node.name() == "transparent"_s)
-			{
-				current_attribute = node.name();
-			}
-			else if (node.name() == "include"_s)
+			if (node.name() == "include"_s)
 			{
 				const StaticString* include_path;
 				if (Ion::get(node, include_path))
@@ -163,14 +158,9 @@ namespace Yttrium
 				if (!element.name)
 					element.name = &default_name;
 
-				if (element.attribute)
+				if (attributes & IsDefault)
 				{
-					if (*element.attribute != "default"_s)
-					{
-						Log() << "(gui) Unknown font attribute \""_s << *element.attribute << "\" ignored"_s;
-						element.attribute = nullptr;
-					}
-					else if (_has_default_font)
+					if (_has_default_font)
 					{
 						Log() << "(gui) Default font redefinition ignored"_s;
 						element.attribute = nullptr;
@@ -193,6 +183,32 @@ namespace Yttrium
 
 				_gui.set_font(*element.name, *font_name, *texture_name);
 			}
+			else if (node.name() == "layer"_s)
+			{
+				const auto& element = load_element(node);
+				StaticString layer_name = element.name ? *element.name : StaticString();
+
+				if (!element.object)
+				{
+					Log() << "(gui) Ignored empty layer \""_s << layer_name << "\""_s;
+					continue;
+				}
+
+				const bool is_root = attributes & IsRoot;
+				if (!is_root && layer_name.is_empty())
+				{
+					Log() << "(gui) Ignored unnamed non-root layer"_s;
+					continue;
+				}
+
+				auto layer = _gui.create_layer(layer_name, attributes == IsTransparent);
+				if (layer)
+				{
+					load_layer(*layer, *element.object);
+					_gui.add_layer(std::move(layer), is_root);
+				}
+			}
+			attributes = 0;
 		}
 	}
 

@@ -1,7 +1,7 @@
 size "640" "480"
 scale "stretch"
 
-font ["default"]
+default font
 {
 	file    "data/font.ytf"
 	texture "data/font.tga"
