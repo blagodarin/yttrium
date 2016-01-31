@@ -46,18 +46,6 @@ namespace Yttrium
 			dump_layer(*layer.second, layer_node);
 		}
 
-		for (const auto& action : _gui._layer_actions)
-		{
-			IonNode* on_layer_change_node = document.root().append("on_layer_change"_s);
-
-			IonList* layer_list = on_layer_change_node->append_list();
-
-			layer_list->append(action.first.first);
-			layer_list->append(action.first.second);
-
-			on_layer_change_node->append(action.second.first);
-		}
-
 		document.save(filename);
 	}
 

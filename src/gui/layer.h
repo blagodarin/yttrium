@@ -32,6 +32,16 @@ namespace Yttrium
 			_bindings.bind(name, action);
 		}
 
+		void do_pop_action(ScriptContext& context) const
+		{
+			_on_pop.execute(context);
+		}
+
+		void do_push_action(ScriptContext& context) const
+		{
+			_on_push.execute(context);
+		}
+
 		bool is_transparent() const
 		{
 			return _is_transparent;
@@ -54,6 +64,16 @@ namespace Yttrium
 		{
 			_is_cursor_set = true;
 			_cursor = cursor;
+		}
+
+		void set_pop_action(ScriptCode&& action)
+		{
+			_on_pop = std::move(action);
+		}
+
+		void set_push_action(ScriptCode&& action)
+		{
+			_on_push = std::move(action);
 		}
 
 		void set_scaling(Scaling scaling)
@@ -87,6 +107,8 @@ namespace Yttrium
 		Widget*                    _focus_widget = nullptr;
 		const bool                 _is_transparent;
 		Bindings                   _bindings;
+		ScriptCode                 _on_push;
+		ScriptCode                 _on_pop;
 	};
 }
 

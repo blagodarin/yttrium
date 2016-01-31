@@ -17,10 +17,13 @@ class "background"
 
 layer "game_single"
 {
-	size  "30" "26"
-	scale "min"
+	on_push "game_start"
+	on_pop "game_stop"
 
 	bind "esc" "push_layer game_pause"
+
+	size  "30" "26"
+	scale "min"
 
 	image
 	{

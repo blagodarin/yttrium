@@ -6,10 +6,13 @@ class "pause_button" ["button"]
 
 layer "game_pause" ["transparent"]
 {
-	size        "30" "26"
-	scale       "min"
+	on_push "game_pause"
+	on_pop "game_resume"
 
 	bind "esc" "pop_layer"
+
+	size  "30" "26"
+	scale "min"
 
 	image
 	{

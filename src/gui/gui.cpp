@@ -20,7 +20,6 @@ namespace Yttrium
 		, _fonts(_proxy_allocator)
 		, _layers(_proxy_allocator)
 		, _layer_stack(_proxy_allocator)
-		, _layer_actions(_proxy_allocator)
 	{
 	}
 
@@ -36,7 +35,6 @@ namespace Yttrium
 		_fonts.clear();
 		_layers.clear();
 		_layer_stack.clear();
-		_layer_actions.clear();
 	}
 
 	void GuiImpl::dump(const StaticString& filename) const
@@ -69,21 +67,12 @@ namespace Yttrium
 
 	bool GuiImpl::pop_layers(size_t count)
 	{
-		if (_layer_stack.empty())
-			return false;
-
-		const GuiLayer* old_layer = _layer_stack.back();
-
-		if (count >= _layer_stack.size())
+		for (auto n = min(count, _layer_stack.size()); n > 0; --n)
 		{
-			_layer_stack.clear();
-			change_layer(old_layer->name(), StaticString());
-			return false;
+			_layer_stack.back()->do_pop_action(_script_context);
+			_layer_stack.pop_back();
 		}
-
-		_layer_stack.resize(_layer_stack.size() - count);
-		change_layer(old_layer->name(), _layer_stack.back()->name());
-		return true;
+		return !_layer_stack.empty();
 	}
 
 	bool GuiImpl::push_layer(const StaticString& name)
@@ -91,10 +80,8 @@ namespace Yttrium
 		auto i = _layers.find(String(name, ByReference()));
 		if (i == _layers.end())
 			return false;
-
-		const GuiLayer* old_layer = _layer_stack.back();
 		_layer_stack.push_back(i->second.get());
-		change_layer(old_layer->name(), name);
+		i->second->do_push_action(_script_context);
 		return true;
 	}
 
@@ -176,17 +163,5 @@ namespace Yttrium
 			texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
 			_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), texture);
 		}
-	}
-
-	void GuiImpl::set_layer_change_action(const String& from_layer, const String& to_layer, const String& action)
-	{
-		_layer_actions[std::make_pair(from_layer, to_layer)] = std::make_pair(action, ScriptCode(action, &_script_context.allocator()));
-	}
-
-	void GuiImpl::change_layer(const StaticString& old_layer, const StaticString& new_layer)
-	{
-		auto i = _layer_actions.find(std::make_pair(String(old_layer, ByReference()), String(new_layer, ByReference())));
-		if (i != _layer_actions.end())
-			i->second.second.execute(script_context());
 	}
 }

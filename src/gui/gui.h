@@ -76,8 +76,6 @@ namespace Yttrium
 			_scaling = scaling;
 		}
 
-		void set_layer_change_action(const String& from_layer, const String& to_layer, const String& action);
-
 		void set_size(const SizeF& size)
 		{
 			_size = size;
@@ -85,10 +83,6 @@ namespace Yttrium
 		}
 
 		TextureCache& texture_cache() { return *_texture_cache; }
-
-	private:
-
-		void change_layer(const StaticString& old_layer, const StaticString& new_layer);
 
 	private:
 		ScriptContext&                    _script_context;
@@ -102,7 +96,6 @@ namespace Yttrium
 		StdMap<String, FontDesc>          _fonts;
 		StdMap<StaticString, Pointer<GuiLayer>> _layers;
 		StdVector<GuiLayer*>              _layer_stack;
-		StdMap<std::pair<String, String>, std::pair<String, ScriptCode>> _layer_actions;
 	};
 }
 

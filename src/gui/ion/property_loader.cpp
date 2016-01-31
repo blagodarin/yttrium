@@ -374,7 +374,7 @@ namespace Yttrium
 	{
 		const StaticString* value;
 
-		if (!_bound_object || !load_text(&value, *_bound_object, name))
+		if (!_bound_object || !load_text(&value, _bound_object->last(name)))
 			return false;
 
 		*text = *value;
@@ -625,9 +625,8 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_text(const StaticString** text, const IonObject& object, const StaticString& name)
+	bool GuiIonPropertyLoader::load_text(const StaticString** text, const IonNode& node)
 	{
-		const IonNode& node = object.last(name);
 		return node.size() == 1 && node.first()->get(text);
 	}
 

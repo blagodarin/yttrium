@@ -139,33 +139,6 @@ namespace Yttrium
 					_gui.add_layer(std::move(layer), is_root);
 				}
 			}
-			else if (node.name() == "on_layer_change"_s)
-			{
-				const auto& s = node.values();
-
-				if (s.size() != 2 || s->type() != IonValue::Type::List || s.last().type() != IonValue::Type::String)
-				{
-					Log() << "(gui) Bad 'on_layer_change'"_s;
-					continue;
-				}
-
-				const StaticString* from;
-				const StaticString* to;
-				const StaticString* action;
-
-				const auto& t = s->list().values();
-
-				if (t.size() != 2 || !t->get(&from) || !t.last().get(&to) || !s.last().get(&action))
-				{
-					Log() << "(gui) Bad 'on_layer_change'"_s;
-					continue;
-				}
-
-				_gui.set_layer_change_action(
-					String(*from, &_gui.allocator()),
-					String(*to, &_gui.allocator()),
-					String(*action, &_gui.allocator()));
-			}
 			else if (node.name() == "font"_s)
 			{
 				auto element = load_element(node);
@@ -198,8 +171,8 @@ namespace Yttrium
 				const StaticString* font_name;
 				const StaticString* texture_name;
 
-				if (!(GuiIonPropertyLoader::load_text(&font_name, *element.object, "file"_s)
-					&& GuiIonPropertyLoader::load_text(&texture_name, *element.object, "texture"_s)))
+				if (!(GuiIonPropertyLoader::load_text(&font_name, element.object->last("file"_s))
+					&& GuiIonPropertyLoader::load_text(&texture_name, element.object->last("texture"_s))))
 				{
 					continue;
 				}
@@ -232,6 +205,18 @@ namespace Yttrium
 				const auto s = node.values();
 				if (s.size() == 2 && s->type() == IonValue::Type::String && s.last().type() == IonValue::Type::String)
 					layer.bind(s->string(), s.last().string());
+			}
+			else if (node.name() == "on_push"_s)
+			{
+				const StaticString* action;
+				if (GuiIonPropertyLoader::load_text(&action, node))
+					layer.set_push_action(ScriptCode(*action, &_gui.allocator()));
+			}
+			else if (node.name() == "on_pop"_s)
+			{
+				const StaticString* action;
+				if (GuiIonPropertyLoader::load_text(&action, node))
+					layer.set_pop_action(ScriptCode(*action, &_gui.allocator()));
 			}
 			else
 			{

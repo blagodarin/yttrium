@@ -1,9 +1,11 @@
 layer "game_over" ["transparent"]
 {
-	size  "30" "26"
-	scale "min"
+	on_push "game_stop"
 
 	bind "esc" "pop_layer 3"
+
+	size  "30" "26"
+	scale "min"
 
 	image
 	{
