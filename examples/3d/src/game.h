@@ -3,7 +3,6 @@
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/math/vector.h>
-#include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/script/context.h>
 #include <yttrium/texture_cache.h>
 #include <yttrium/vertex_buffer.h>
@@ -18,8 +17,6 @@ using namespace Yttrium;
 class Game : public WindowCallbacks
 {
 public:
-	Game(Allocator&);
-
 	void run();
 
 private:
@@ -29,11 +26,8 @@ private:
 	void on_update(const UpdateEvent& update) override;
 
 private:
-	ProxyAllocator _allocator;
 	ScriptContext _script;
-	ProxyAllocator _window_allocator;
 	Pointer<Window> _window;
-	Pointer<TextureCache> _texture_cache;
 	std::unique_ptr<CubeModel> _cube;
 	std::unique_ptr<ChessboardModel> _chessboard;
 

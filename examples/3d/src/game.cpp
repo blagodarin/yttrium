@@ -7,20 +7,11 @@
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
 
-Game::Game(Allocator& allocator)
-	: _allocator("game", allocator)
-	, _script(&_allocator)
-	, _window_allocator("window", allocator)
-{
-}
-
 void Game::run()
 {
-	_window = Window::create(_script, *this, _window_allocator);
+	_window = Window::create(_script, *this);
 	if (!_window)
 		return;
-
-	_texture_cache = TextureCache::create(_window->renderer());
 
 	_window->set_name("Yttrium 3D example");
 	_window->set_size({1024, 768});
@@ -119,7 +110,7 @@ void Game::on_key_event(const KeyEvent& event)
 		break;
 
 	case Key::F10: // KDE grabs Key::Print. =(
-		_window->take_screenshot(String(&_allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+		_window->take_screenshot(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 		break;
 
 	default:
@@ -127,11 +118,8 @@ void Game::on_key_event(const KeyEvent& event)
 	}
 }
 
-void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString& name)
+void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString&)
 {
-	if (name != "main")
-		return;
-
 	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 60, 1, 100));
 
 	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
