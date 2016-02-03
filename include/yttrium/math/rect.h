@@ -185,6 +185,17 @@ namespace Yttrium
 		float _right = 0;
 		float _bottom = 0;
 	};
+
+	inline bool operator==(const RectF& lhs, const RectF& rhs)
+	{
+		return lhs.left() == rhs.left() && lhs.top() == rhs.top()
+			&& lhs.right() == rhs.right() && lhs.bottom() == rhs.bottom();
+	}
+
+	inline bool operator!=(const RectF& lhs, const RectF& rhs)
+	{
+		return !(lhs == rhs);
+	}
 }
 
 #endif

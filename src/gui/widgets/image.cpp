@@ -15,12 +15,7 @@ namespace Yttrium
 
 	bool ImageWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!loader.load_rect("position"_s, &_position))
-		{
-			Log() << "(gui/image) Unable to load"_s;
-			return false;
-		}
-
+		loader.load_rect("position"_s, &_position);
 		loader.load_scaling("scale", &_scaling);
 		_background.load(loader);
 

@@ -22,12 +22,7 @@ namespace Yttrium
 
 	bool CanvasWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!loader.load_rect("position"_s, &_position))
-		{
-			Log() << "(gui/canvas) Unable to load"_s;
-			return false;
-		}
-
+		loader.load_rect("position"_s, &_position);
 		loader.load_scaling("scale"_s, &_scaling);
 
 		_rect = RectF(_position);

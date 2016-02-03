@@ -27,9 +27,7 @@ layer "game_single"
 
 	image
 	{
-		position "0" "0" "30" "26"
-		texture  "data/textures/wall.jpeg"
-		scale    "stretch"
+		texture "data/textures/wall.jpeg"
 	}
 
 	image ["background"] { position  "1" "1"  "6"  "5" } # Next

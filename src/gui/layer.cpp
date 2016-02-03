@@ -149,7 +149,11 @@ namespace Yttrium
 			WidgetState state = WidgetState::Normal;
 			if (widget.get() == _mouse_widget)
 				state = (widget.get() == _left_click_widget) ? WidgetState::Pressed : WidgetState::Active;
-			widget->render(renderer, map(widget->rect(), shift, scale, widget->scaling()), scale, state);
+			const auto& widget_rect = widget->rect();
+			const auto& mapped_rect = widget_rect == RectF()
+				? map(RectF({}, layer_size), shift, scale, Scaling::Stretch)
+				: map(widget_rect, shift, scale, widget->scaling());
+			widget->render(renderer, mapped_rect, scale, state);
 		}
 
 		_is_cursor_set = false;

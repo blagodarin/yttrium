@@ -16,9 +16,7 @@ transparent layer "game_pause"
 
 	image
 	{
-		position "0" "0" "30" "26"
-		color    "0" "0" "0" "0.5"
-		scale    "stretch"
+		color "0" "0" "0" "0.5"
 	}
 
 	button ["pause_button"]

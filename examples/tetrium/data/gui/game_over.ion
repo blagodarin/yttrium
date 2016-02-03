@@ -9,9 +9,7 @@ transparent layer "game_over"
 
 	image
 	{
-		position "0" "0" "30" "26"
-		color    "0" "0" "0" "0.5"
-		scale    "stretch"
+		color "0" "0" "0" "0.5"
 	}
 
 	label

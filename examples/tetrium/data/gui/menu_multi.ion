@@ -4,8 +4,7 @@ layer "menu_multi"
 
 	image
 	{
-		position "0" "0" "640" "480"
-		texture  "data/textures/wall.jpeg"
+		texture "data/textures/wall.jpeg"
 	}
 
 	label
