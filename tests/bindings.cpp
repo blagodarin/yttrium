@@ -1,6 +1,6 @@
 #include "src/window/bindings/lookup.h"
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 #include "src/window/bindings/lookup.cpp"
 

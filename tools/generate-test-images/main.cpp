@@ -1,6 +1,5 @@
 #include <yttrium/file.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/memory/manager.h>
 #include "../../src/image/dds_private.h"
 #include "../../src/image/tga_private.h"
 
@@ -90,8 +89,6 @@ void write_grayscale_intensity(File& file)
 
 int main(int, char**)
 {
-	MemoryManager memory_manager;
-
 	{
 		File file("tests/image/gradient24.tga", File::Write | File::Truncate);
 
@@ -108,7 +105,6 @@ int main(int, char**)
 		if (file.write(header))
 			write_color_gradient(file, false);
 	}
-
 	{
 		File file("tests/image/gradient32.tga", File::Write | File::Truncate);
 
@@ -125,7 +121,6 @@ int main(int, char**)
 		if (file.write(header))
 			write_color_gradient(file, true);
 	}
-
 	{
 		File file("tests/image/gradient32.tga", File::Write | File::Truncate);
 
@@ -142,7 +137,6 @@ int main(int, char**)
 		if (file.write(header))
 			write_color_gradient(file, true);
 	}
-
 	{
 		File file("tests/image/gradient32.dds", File::Write | File::Truncate);
 
@@ -167,7 +161,6 @@ int main(int, char**)
 		if (file.write(header))
 			write_color_gradient(file, true);
 	}
-
 	{
 		File file("tests/image/intensity8.tga", File::Write | File::Truncate);
 
@@ -184,7 +177,6 @@ int main(int, char**)
 		if (file.write(header))
 			write_grayscale_intensity(file);
 	}
-
 	{
 		File file("tests/image/intensity32.tga", File::Write | File::Truncate);
 
@@ -201,6 +193,5 @@ int main(int, char**)
 		if (file.write(header))
 			write_color_intensity(file);
 	}
-
 	return 0;
 }

@@ -1,7 +1,7 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/size.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 

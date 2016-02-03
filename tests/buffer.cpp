@@ -1,7 +1,8 @@
 #include <yttrium/memory/buffer.h>
 
 #include "src/memory/buffer_memory_tracker.h"
-#include "common.h"
+
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 

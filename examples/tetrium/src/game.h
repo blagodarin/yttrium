@@ -20,8 +20,7 @@ using namespace Yttrium;
 class Game : public WindowCallbacks
 {
 public:
-
-	Game(Allocator&);
+	Game();
 
 	void run();
 

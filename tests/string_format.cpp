@@ -2,14 +2,12 @@
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_string_format)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	BOOST_CHECK_EQUAL(String() << "", "");
 	BOOST_CHECK_EQUAL(String() << "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	BOOST_CHECK_EQUAL(String() << "AB" << "CD" << "EF", "ABCDEF");
@@ -38,8 +36,6 @@ BOOST_AUTO_TEST_CASE(test_string_format)
 
 BOOST_AUTO_TEST_CASE(test_string_format_date_time)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	DateTime date_time;
 	date_time.year = 2000;
 	date_time.month = 1;

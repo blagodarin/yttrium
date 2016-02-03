@@ -1,7 +1,7 @@
 #include <yttrium/date_time.h>
 #include <yttrium/string.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
@@ -22,8 +22,6 @@ BOOST_AUTO_TEST_CASE(test_string_initialization)
 
 BOOST_AUTO_TEST_CASE(test_string_assignment)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	String s1;
 	String s2;
 	String s3;
@@ -55,8 +53,6 @@ BOOST_AUTO_TEST_CASE(test_string_assignment)
 
 BOOST_AUTO_TEST_CASE(test_string_swap)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	String s1("test");
 	String s2("another test");
 
@@ -70,8 +66,6 @@ BOOST_AUTO_TEST_CASE(test_string_swap)
 
 BOOST_AUTO_TEST_CASE(test_string_insert)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	String s1("test");
 
 	s1.insert("just ", 0);

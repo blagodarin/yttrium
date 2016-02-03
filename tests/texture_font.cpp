@@ -1,7 +1,7 @@
 #include <yttrium/texture_font.h>
 #include <yttrium/file.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
@@ -18,8 +18,6 @@ void write(File& file, const std::vector<uint8_t>& data)
 
 BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	// ASCII printable character codes.
 	const uint8_t first_char = 33;
 	const uint8_t last_char = 126;

@@ -17,12 +17,12 @@
 #include <yttrium/texture.h>
 #include <yttrium/timer.h>
 
-Game::Game(Allocator& allocator)
-	: _allocator("game", allocator)
-	, _script_allocator("script", allocator)
+Game::Game()
+	: _allocator("game")
+	, _script_allocator("script")
 	, _script(&_script_allocator)
-	, _audio_allocator("audio", allocator)
-	, _window_allocator("window", allocator)
+	, _audio_allocator("audio")
+	, _window_allocator("window")
 	, _bindings(_script, &_allocator)
 	, _statistics({
 			{100000, String("John Placeholder", &_allocator)},

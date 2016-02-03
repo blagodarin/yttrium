@@ -13,7 +13,6 @@ namespace Yttrium
 {
 	/// Memory buffer.
 	/// Buffer memory is allocated in whole pages making each allocation big and very aligned.
-	/// Memory buffers can be used without MemoryManager.
 	class Y_API Buffer
 	{
 	public:

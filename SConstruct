@@ -162,6 +162,7 @@ if option_no_png:
 	src_env.Append(CPPDEFINES = ['Y_NO_PNG'])
 
 src_paths = [
+	'.',
 	'audio',
 	'audio/backend',
 	'audio/backend/openal',

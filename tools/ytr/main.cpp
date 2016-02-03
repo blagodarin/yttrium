@@ -3,7 +3,6 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/memory/manager.h>
 #include <yttrium/pointer.h>
 #include <yttrium/string.h>
 
@@ -56,8 +55,6 @@ void update_translation(Translation& translation, const IonObject& source)
 
 int main(int argc, char** argv)
 {
-	MemoryManager memory_manager;
-
 	if (argc < 3)
 	{
 		std::cerr << "Usage: ytr TRANSLATION SOURCES..." << std::endl;

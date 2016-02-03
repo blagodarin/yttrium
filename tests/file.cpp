@@ -2,10 +2,10 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/string.h>
 
-#include "common.h"
-
 #include <cstdlib>
 #include <cstring>
+
+#include <boost/test/unit_test.hpp>
 
 namespace Yttrium
 {
@@ -27,8 +27,6 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_file_special)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	File file(File::StdErr);
 	BOOST_REQUIRE(file);
 	BOOST_CHECK(file.name().is_empty());
@@ -39,8 +37,6 @@ BOOST_AUTO_TEST_CASE(test_file_special)
 
 BOOST_AUTO_TEST_CASE(test_file_read_all)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	const auto expected_buffer = make_random_buffer(100003);
 
 	File file(File::Temporary);
@@ -62,8 +58,6 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 
 BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	const auto expected = make_random_buffer(Buffer::memory_granularity());
 
 	File file(File::Temporary);
@@ -78,8 +72,6 @@ BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
 
 BOOST_AUTO_TEST_CASE(test_file_transfer)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	const auto buffer = make_random_buffer(100003);
 
 	File input(File::Temporary);

@@ -6,14 +6,12 @@
 #include <yttrium/string.h>
 #include <yttrium/window.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_gui)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	File file(File::Temporary);
 
 	{

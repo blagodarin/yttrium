@@ -2,10 +2,10 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/package.h>
 
-#include "common.h"
-
 #include <cstdlib>
 #include <cstring>
+
+#include <boost/test/unit_test.hpp>
 
 namespace Yttrium
 {
@@ -19,8 +19,6 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_package)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	Buffer buffer1(100003);
 	for (auto& byte : buffer1)
 		byte = rand() % UINT8_MAX;

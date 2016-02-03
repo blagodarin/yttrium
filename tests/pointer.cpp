@@ -1,6 +1,7 @@
 #include <yttrium/pointer.h>
+#include <yttrium/types.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
@@ -13,8 +14,6 @@ BOOST_AUTO_TEST_CASE(test_pointer)
 		Object(int& counter) : _counter(counter) { ++_counter; }
 		~Object() { --_counter; }
 	};
-
-	DECLARE_MEMORY_MANAGER;
 
 	int counter = 0;
 	{

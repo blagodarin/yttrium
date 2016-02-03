@@ -5,6 +5,7 @@
 #define _include_yttrium_memory_proxy_allocator_h_
 
 #include <yttrium/memory/allocator.h>
+#include <yttrium/types.h>
 
 namespace Yttrium
 {
@@ -16,7 +17,7 @@ namespace Yttrium
 	public:
 
 		///
-		ProxyAllocator(const StaticString& name, Allocator& allocator);
+		ProxyAllocator(const StaticString& name, Allocator& allocator = *DefaultAllocator);
 
 		///
 		~ProxyAllocator() override;

@@ -1,6 +1,7 @@
 #include <yttrium/object.h>
+#include <yttrium/types.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 class Object : public Yttrium::Object
 {
@@ -27,8 +28,6 @@ BOOST_AUTO_TEST_CASE(test_unique_ptr)
 {
 	using UniquePtr = Yttrium::UniquePtr<Object>;
 
-	DECLARE_MEMORY_MANAGER;
-
 	Yttrium::Allocator* allocator = Yttrium::DefaultAllocator;
 
 	int counter = 0;
@@ -54,8 +53,6 @@ BOOST_AUTO_TEST_CASE(test_unique_ptr)
 BOOST_AUTO_TEST_CASE(test_shared_ptr)
 {
 	using SharedPtr = Yttrium::SharedPtr<Object>;
-
-	DECLARE_MEMORY_MANAGER;
 
 	Yttrium::Allocator* allocator = Yttrium::DefaultAllocator;
 

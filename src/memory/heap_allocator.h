@@ -8,7 +8,6 @@ namespace Yttrium
 	class HeapAllocator : public Allocator
 	{
 	private:
-
 		void* do_allocate(size_t, size_t) override;
 		void do_deallocate(void*, bool) noexcept override;
 	};

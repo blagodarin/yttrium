@@ -2,14 +2,12 @@
 #include <yttrium/ion/document.h>
 #include <yttrium/string.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_ion_serialization)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	File file(File::Temporary);
 
 	IonDocument document;

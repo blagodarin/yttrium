@@ -1,5 +1,4 @@
 #include <yttrium/file.h>
-#include <yttrium/memory/manager.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
 
@@ -9,8 +8,6 @@ using namespace Yttrium;
 
 int main(int argc, char** argv)
 {
-	MemoryManager memory_manager;
-
 	if (argc != 3)
 	{
 		std::cerr << "Usage: ypq PACKAGE LISTFILE" << std::endl;

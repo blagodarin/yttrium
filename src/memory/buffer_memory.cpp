@@ -10,11 +10,6 @@
 
 namespace Yttrium
 {
-#if Y_ENABLE_BUFFER_MEMORY_TRACKER
-	BufferMemoryTracker _buffer_memory_tracker; // Must outlive BufferMemory.
-#endif
-	BufferMemory _buffer_memory;
-
 	namespace
 	{
 		void* allocate_big_block(size_t size)

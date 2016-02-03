@@ -1,13 +1,11 @@
 #include <yttrium/dir.h>
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_dir)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	BOOST_CHECK(Dir::exists("tests/dir"));
 	BOOST_CHECK(!Dir::exists("tests/void"));
 	BOOST_CHECK(!Dir("tests/void"));

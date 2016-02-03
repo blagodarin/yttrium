@@ -1,6 +1,7 @@
+#include <yttrium/types.h>
 #include "src/base/private_base.h"
 
-#include "common.h"
+#include <boost/test/unit_test.hpp>
 
 class Public
 {
@@ -32,8 +33,6 @@ Y_IMPLEMENT_SHARED(Public);
 
 BOOST_AUTO_TEST_CASE(test_private)
 {
-	DECLARE_MEMORY_MANAGER;
-
 	Public public1;
 
 	BOOST_CHECK(!public1.get());
