@@ -5,7 +5,6 @@
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
 #include "../renderer/renderer.h"
-#include "ion/dumper.h"
 #include "ion/loader.h"
 #include "layer.h"
 
@@ -30,16 +29,9 @@ namespace Yttrium
 
 	void GuiImpl::clear()
 	{
-		_has_size = false;
-		_size = {};
 		_fonts.clear();
 		_layers.clear();
 		_layer_stack.clear();
-	}
-
-	void GuiImpl::dump(const StaticString& filename) const
-	{
-		GuiIonDumper(*this).dump(filename);
 	}
 
 	bool GuiImpl::has_layer(const StaticString& name) const
@@ -115,10 +107,7 @@ namespace Yttrium
 
 	Pointer<GuiLayer> GuiImpl::create_layer(const StaticString& name, bool is_transparent)
 	{
-		auto layer = make_pointer<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
-		if (_has_size)
-			layer->set_size(_size);
-		return layer;
+		return make_pointer<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
 	}
 
 	const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const

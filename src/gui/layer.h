@@ -4,22 +4,21 @@
 #include <yttrium/bindings.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/std/map.h>
-#include <yttrium/std/vector.h>
+#include "layout.h"
 #include "types.h"
 
 namespace Yttrium
 {
 	class GuiImpl;
-	class GuiIonDumper;
+	class GuiLayout;
 	class GuiPropertyLoader;
 	class Renderer;
 	class Widget;
+
 	template <typename> class Pointer;
 
 	class GuiLayer
 	{
-		friend GuiIonDumper;
-
 	public:
 
 		GuiLayer(GuiImpl& gui, const StaticString& name, bool is_transparent);
@@ -47,7 +46,9 @@ namespace Yttrium
 			return _is_transparent;
 		}
 
-		void load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader);
+		GuiLayout& add_layout(GuiLayout::Placement);
+
+		bool add_widget(Widget*);
 
 		const String& name() const
 		{
@@ -57,8 +58,6 @@ namespace Yttrium
 		bool process_key(const KeyEvent& event);
 
 		void render(Renderer& renderer); // TODO: Make const.
-
-		void reserve(size_t capacity);
 
 		void set_cursor(const PointF& cursor)
 		{
@@ -88,18 +87,14 @@ namespace Yttrium
 		}
 
 	private:
-
-		RectF map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const;
-
-	private:
-
 		GuiImpl&                   _gui;
 		String                     _name;
 		SizeF                      _size;
 		bool                       _has_size = false;
 		Scaling                    _scaling = Scaling::Stretch;
-		StdVector<Pointer<Widget>> _widgets;
-		StdMap<String, Widget*>    _named_widgets;
+		StdVector<Pointer<GuiLayout>> _layouts;
+		StdMap<StaticString, Widget*> _named_widgets;
+		StdVector<Widget*>         _widgets;
 		bool                       _is_cursor_set = false;
 		PointF                     _cursor;
 		Widget*                    _mouse_widget = nullptr;

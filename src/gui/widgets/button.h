@@ -12,16 +12,13 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-
 		ButtonWidget(const GuiImpl& gui) : Widget(gui) {}
 
-		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
-
 		struct Style
 		{
 			BackgroundProperty background;

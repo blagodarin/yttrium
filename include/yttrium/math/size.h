@@ -58,6 +58,8 @@ namespace Yttrium
 		float height() const { return _height; }
 		float width() const { return _width; }
 
+		bool is_empty() const { return _width <= 0 || _height <= 0; }
+
 		float* data() { return &_width; }
 		const float* data() const { return &_width; }
 

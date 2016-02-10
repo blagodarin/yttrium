@@ -4,7 +4,6 @@
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
 #include "../gui.h"
-#include "../property_dumper.h"
 #include "../property_loader.h"
 
 // TODO: Use proper rects for labels, scaling the text accordingly.
@@ -17,15 +16,6 @@ namespace Yttrium
 	{
 	}
 
-	void LabelWidget::dump(GuiPropertyDumper& dumper) const
-	{
-		dumper.dump_position("position"_s, _position);
-		dumper.dump_scaling("scale"_s, _scaling);
-		_foreground.dump(dumper);
-		dumper.dump_alignment("align"_s, _alignment);
-		dumper.dump_text("text"_s, _text);
-	}
-
 	bool LabelWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!(loader.load_position("position"_s, _position)
@@ -36,10 +26,9 @@ namespace Yttrium
 			return false;
 		}
 
-		loader.load_scaling("scale"_s, &_scaling);
 		loader.load_alignment("align"_s, &_alignment);
 
-		_rect = RectF(_position, SizeF());
+		_rect = RectF(_position, SizeF(1, 1));
 
 		return true;
 	}

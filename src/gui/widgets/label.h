@@ -9,15 +9,12 @@ namespace Yttrium
 	class LabelWidget : public Widget
 	{
 	public:
-
 		LabelWidget(const GuiImpl&);
 
-		void dump(GuiPropertyDumper&) const override;
 		bool load(GuiPropertyLoader&) override;
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
-
 		PointF             _position;
 		ForegroundProperty _foreground;
 		unsigned           _alignment = 0;

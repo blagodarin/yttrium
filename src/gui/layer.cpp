@@ -2,11 +2,8 @@
 
 #include <yttrium/renderer.h>
 #include "gui.h"
-#include "widgets/button.h"
-#include "widgets/canvas.h"
-#include "widgets/image.h"
-#include "widgets/input.h"
-#include "widgets/label.h"
+#include "layout.h"
+#include "widgets/widget.h"
 
 #include <cassert>
 
@@ -15,8 +12,9 @@ namespace Yttrium
 	GuiLayer::GuiLayer(GuiImpl& gui, const StaticString& name, bool is_transparent)
 		: _gui(gui)
 		, _name(name, &_gui.allocator())
-		, _widgets(_gui.allocator())
+		, _layouts(_gui.allocator())
 		, _named_widgets(_gui.allocator())
+		, _widgets(_gui.allocator())
 		, _is_transparent(is_transparent)
 		, _bindings(_gui.script_context(), &_gui.allocator())
 	{
@@ -26,35 +24,18 @@ namespace Yttrium
 	{
 	}
 
-	void GuiLayer::load_widget(const StaticString& type, const StaticString& name, GuiPropertyLoader& loader)
+	GuiLayout& GuiLayer::add_layout(GuiLayout::Placement placement)
 	{
-		Pointer<Widget> widget;
-		if (type == "button"_s)
-			widget = make_pointer<ButtonWidget>(_gui.allocator(), _gui);
-		else if (type == "canvas"_s)
-			widget = make_pointer<CanvasWidget>(_gui.allocator(), _gui);
-		else if (type == "image"_s)
-			widget = make_pointer<ImageWidget>(_gui.allocator(), _gui);
-		else if (type == "input"_s)
-			widget = make_pointer<InputWidget>(_gui.allocator(), _gui);
-		else if (type == "label"_s)
-			widget = make_pointer<LabelWidget>(_gui.allocator(), _gui);
+		_layouts.emplace_back(make_pointer<GuiLayout>(_gui.allocator(), _gui, placement));
+		return *_layouts.back();
+	}
 
-		if (!widget)
-			return;
-
-		widget->set_scaling(_scaling);
-
-		if (!widget->load(loader))
-			return;
-
-		if (!name.is_empty())
-		{
-			widget->set_name(name);
-			_named_widgets[String(name, &_gui.allocator())] = widget.get();
-		}
-
-		_widgets.emplace_back(std::move(widget));
+	bool GuiLayer::add_widget(Widget* widget)
+	{
+		if (!widget->name().is_empty() && !_named_widgets.emplace(widget->name(), widget).second)
+			return false;
+		_widgets.emplace_back(widget);
+		return true;
 	}
 
 	bool GuiLayer::process_key(const KeyEvent& event)
@@ -118,117 +99,26 @@ namespace Yttrium
 
 	void GuiLayer::render(Renderer& renderer)
 	{
-		const auto& window_size = renderer.window_size();
-		const auto& layer_size = _has_size ? _size : SizeF(window_size);
-
-		const Vector2 scale(
-			window_size.width() / layer_size.width(),
-			window_size.height() / layer_size.height());
-		const Vector2 shift(
-			(window_size.width() - layer_size.width() * scale.y) * .5f,
-			(window_size.height() - layer_size.height() * scale.x) * .5f);
+		const RectF rect({}, SizeF(renderer.window_size()));
+		for (const auto& layout : _layouts)
+			layout->update(rect);
 
 		Widget* mouse_widget = nullptr;
-
 		if (_is_cursor_set)
 		{
 			for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
 			{
-				if (map((*i)->rect(), shift, scale, (*i)->scaling()).contains(_cursor))
+				if ((*i)->render_rect().contains(_cursor))
 				{
-					mouse_widget = i->get();
+					mouse_widget = *i;
 					break;
 				}
 			}
+			_is_cursor_set = false;
 		}
-
 		_mouse_widget = mouse_widget;
 
-		for (const auto& widget : _widgets)
-		{
-			WidgetState state = WidgetState::Normal;
-			if (widget.get() == _mouse_widget)
-				state = (widget.get() == _left_click_widget) ? WidgetState::Pressed : WidgetState::Active;
-			const auto& widget_rect = widget->rect();
-			const auto& mapped_rect = widget_rect == RectF()
-				? map(RectF({}, layer_size), shift, scale, Scaling::Stretch)
-				: map(widget_rect, shift, scale, widget->scaling());
-			widget->render(renderer, mapped_rect, scale, state);
-		}
-
-		_is_cursor_set = false;
-	}
-
-	void GuiLayer::reserve(size_t capacity)
-	{
-		_widgets.reserve(capacity);
-	}
-
-	RectF GuiLayer::map(const RectF& source, const Vector2& shift, const Vector2& scale, Scaling scaling) const
-	{
-		switch (scaling)
-		{
-		case Scaling::Min:
-			if (scale.x < scale.y)
-				return
-				{
-					{
-						source.left() * scale.x,
-						source.top() * scale.x + shift.y
-					},
-					source.size() * std::make_pair(scale.x, scale.x)
-				};
-			else
-				return
-				{
-					{
-						source.left() * scale.y + shift.x,
-						source.top() * scale.y
-					},
-					source.size() * std::make_pair(scale.y, scale.y)
-				};
-
-		case Scaling::Max:
-			if (scale.x > scale.y)
-				return
-				{
-					{
-						source.left() * scale.x,
-						source.top() * scale.x + shift.y
-					},
-					source.size() * std::make_pair(scale.x, scale.x)
-				};
-			else
-				return
-				{
-					{
-						source.left() * scale.y + shift.x,
-						source.top() * scale.y
-					},
-					source.size() * std::make_pair(scale.y, scale.y)
-				};
-
-		case Scaling::Fit:
-			return
-			{
-				{
-					source.left() * scale.x,
-					source.top() * scale.y
-				},
-				source.size() * (scale.x < scale.y ? std::make_pair(scale.x, scale.x) : std::make_pair(scale.y, scale.y))
-			};
-
-		default:
-			assert(false);
-		case Scaling::Stretch:
-			return
-			{
-				{
-					source.left() * scale.x,
-					source.top() * scale.y
-				},
-				source.size() * std::make_pair(scale.x, scale.y)
-			};
-		}
+		for (const auto& layout : _layouts)
+			layout->render(renderer, _mouse_widget, _left_click_widget);
 	}
 }

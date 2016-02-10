@@ -3,7 +3,6 @@
 #include <yttrium/renderer.h>
 #include <yttrium/string.h>
 #include <yttrium/texture.h>
-#include "property_dumper.h"
 #include "property_loader.h"
 
 namespace Yttrium
@@ -15,17 +14,6 @@ namespace Yttrium
 		renderer.set_texture_rectangle(RectF(texture_rect));
 		renderer.set_texture_borders(borders);
 		renderer.draw_rectangle(rect);
-	}
-
-	void BackgroundProperty::dump(GuiPropertyDumper& dumper) const
-	{
-		dumper.dump_color("color"_s, color);
-		if (texture)
-		{
-			dumper.dump_texture("texture"_s, texture);
-			dumper.dump_rect("texture_rect"_s, texture_rect);
-			dumper.dump_margins("borders"_s, borders);
-		}
 	}
 
 	bool BackgroundProperty::load(const GuiPropertyLoader& loader)
@@ -57,15 +45,6 @@ namespace Yttrium
 		renderer.set_color(color);
 		renderer.set_font_size(size.width() * scale, size.height());
 		renderer.draw_text(origin, text, alignment, capture);
-	}
-
-	void ForegroundProperty::dump(GuiPropertyDumper& dumper) const
-	{
-		if (!font_texture)
-			return;
-		// TODO: Dump font.
-		dumper.dump_size("text_size"_s, size);
-		dumper.dump_color("text_color"_s, color);
 	}
 
 	bool ForegroundProperty::load(const GuiPropertyLoader& loader)

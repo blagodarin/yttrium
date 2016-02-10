@@ -1,11 +1,16 @@
 root layer
 {
-	size "100" "100"
-	scale "fit"
-	bind "esc" "exit"
+	on_key "esc" "exit"
+	center
+	{
+		size "100" "100"
+	}
 }
 
 transparent layer "game"
 {
-	scale "stretch"
+	stretch
+	{
+		size "640" "480"
+	}
 }

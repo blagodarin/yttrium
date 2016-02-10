@@ -8,7 +8,6 @@
 		- Introduce advanced resource naming (string-based, hash-based).
 	* GUI:
 		- Line editor widget.
-		- Layouts.
 		- Move Gui object out of Window object.
 	* Image:
 		- Compressed image format support (e.g. compressed textures).

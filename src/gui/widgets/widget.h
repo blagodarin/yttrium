@@ -9,7 +9,6 @@
 namespace Yttrium
 {
 	class GuiImpl;
-	class GuiPropertyDumper;
 	class GuiPropertyLoader;
 	class Renderer;
 
@@ -30,28 +29,26 @@ namespace Yttrium
 		bool is_focused() const { return _is_focused; }
 		StaticString name() const { return _name; }
 		RectF rect() const { return _rect; }
-		Scaling scaling() const { return _scaling; }
+		RectF render_rect() const { return _render_rect; }
 		void set_focused(bool focused) { _is_focused = focused; }
 		void set_name(const StaticString& name) { _name = name; }
-		void set_scaling(Scaling scaling) { _scaling = scaling; }
+		void set_render_rect(const RectF& rect) { _render_rect = rect; }
 		void set_text(const StaticString& text) { _text = text; }
 		StaticString text() const { return _text; }
 
-		virtual void dump(GuiPropertyDumper& dumper) const = 0;
 		virtual bool load(GuiPropertyLoader& loader) = 0;
 		virtual bool process_key(const KeyEvent& event);
 		virtual void render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const = 0;
 
 	protected:
-
 		const GuiImpl& _gui;
 		RectF          _rect;
-		Scaling        _scaling = Scaling::Stretch;
 		bool           _is_enabled = true;
 		String         _text;
 		String         _name;
 		const unsigned _flags;
 		bool           _is_focused = false;
+		RectF          _render_rect;
 	};
 }
 

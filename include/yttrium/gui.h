@@ -21,9 +21,6 @@ namespace Yttrium
 		virtual void clear() = 0;
 
 		///
-		virtual void dump(const StaticString& filename) const = 0;
-
-		///
 		virtual bool has_layer(const StaticString& name) const = 0;
 
 		///

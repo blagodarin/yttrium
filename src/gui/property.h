@@ -9,7 +9,6 @@
 
 namespace Yttrium
 {
-	class GuiPropertyDumper;
 	class GuiPropertyLoader;
 	class Renderer;
 	class String;
@@ -22,7 +21,6 @@ namespace Yttrium
 		Margins              borders;
 
 		void draw(Renderer& renderer, const RectF& rect) const;
-		void dump(GuiPropertyDumper& dumper) const;
 		bool load(const GuiPropertyLoader& loader);
 		void update(const GuiPropertyLoader& loader);
 	};
@@ -36,7 +34,6 @@ namespace Yttrium
 
 		void draw(Renderer& renderer, const String& text, const PointF& origin,
 			unsigned alignment, float scale, Renderer::TextCapture* capture = nullptr) const;
-		void dump(GuiPropertyDumper& dumper) const;
 		bool load(const GuiPropertyLoader& loader);
 		void update(const GuiPropertyLoader& loader);
 	};

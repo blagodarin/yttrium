@@ -1,44 +1,46 @@
 layer "menu_multi"
 {
-	bind "esc" "pop_layer"
+	on_key "esc" "pop_layer"
 
-	image
-	{
-		texture "data/textures/wall.jpeg"
-	}
+	stretch { image { texture "data/textures/wall.jpeg" } }
 
-	label
+	center
 	{
-		position  "320" "100"
-		text_size "160"
-		text      {tr"Tetrium"}
-	}
+		size "640" "480"
 
-	button ["button"]
-	{
-		position "" "260"
-		text     {tr"Multiplayer"}
-		state    "checked"
-	}
+		label
+		{
+			position  "320" "100"
+			text_size "160"
+			text      {tr"Tetrium"}
+		}
 
-	button ["button"]
-	{
-		position "" "310"
-		text     {tr"Host game"}
-		state    "disabled"
-	}
+		button ["button"]
+		{
+			position "" "260"
+			text     {tr"Multiplayer"}
+			state    "checked"
+		}
 
-	button ["button"]
-	{
-		position "" "360"
-		text     {tr"Join game"}
-		state    "disabled"
-	}
+		button ["button"]
+		{
+			position "" "310"
+			text     {tr"Host game"}
+			state    "disabled"
+		}
 
-	button ["button"]
-	{
-		position "" "410"
-		text     {tr"Back"}
-		on_click "pop_layer"
+		button ["button"]
+		{
+			position "" "360"
+			text     {tr"Join game"}
+			state    "disabled"
+		}
+
+		button ["button"]
+		{
+			position "" "410"
+			text     {tr"Back"}
+			on_click "pop_layer"
+		}
 	}
 }

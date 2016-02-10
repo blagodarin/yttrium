@@ -1,51 +1,53 @@
 root layer "menu_main"
 {
-	bind "esc" "exit"
+	on_key "esc" "exit"
 
-	image
-	{
-		texture "data/textures/wall.jpeg"
-	}
+	stretch { image { texture "data/textures/wall.jpeg" } }
 
-	label
+	center
 	{
-		position  "320" "100"
-		text_size "160"
-		text      {tr"Tetrium"}
-	}
+		size "640" "480"
 
-	button ["button"]
-	{
-		position "" "210"
-		text     {tr"Single player"}
-		on_click "push_layer menu_single"
-	}
+		label
+		{
+			position  "320" "100"
+			text_size "160"
+			text      {tr"Tetrium"}
+		}
 
-	button ["button"]
-	{
-		position "" "260"
-		text     {tr"Multiplayer"}
-		on_click "push_layer menu_multi"
-	}
+		button ["button"]
+		{
+			position "" "210"
+			text     {tr"Single player"}
+			on_click "push_layer menu_single"
+		}
 
-	button ["button"]
-	{
-		position "" "310"
-		text     {tr"Statistics"}
-		on_click "push_layer menu_statistics"
-	}
+		button ["button"]
+		{
+			position "" "260"
+			text     {tr"Multiplayer"}
+			on_click "push_layer menu_multi"
+		}
 
-	button ["button"]
-	{
-		position "" "360"
-		text     {tr"Help"}
-		on_click "push_layer menu_help"
-	}
+		button ["button"]
+		{
+			position "" "310"
+			text     {tr"Statistics"}
+			on_click "push_layer menu_statistics"
+		}
 
-	button ["button"]
-	{
-		position "" "410"
-		text     {tr"Exit"}
-		on_click "exit"
+		button ["button"]
+		{
+			position "" "360"
+			text     {tr"Help"}
+			on_click "push_layer menu_help"
+		}
+
+		button ["button"]
+		{
+			position "" "410"
+			text     {tr"Exit"}
+			on_click "exit"
+		}
 	}
 }

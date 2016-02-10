@@ -19,35 +19,33 @@ layer "game_single"
 {
 	on_push "game_start"
 	on_pop "game_stop"
+	on_key "esc" "push_layer game_pause"
 
-	bind "esc" "push_layer game_pause"
+	stretch { image { texture "data/textures/wall.jpeg" } }
 
-	size  "30" "26"
-	scale "min"
-
-	image
+	center
 	{
-		texture "data/textures/wall.jpeg"
+		size "30" "26"
+
+		image ["background"] { position  "1" "1"  "6"  "5" } # Next
+		image ["background"] { position "10" "2" "10" "22" } # Field
+		image ["background"] { position "23" "1"  "6"  "2" } # Score
+		image ["background"] { position "23" "5"  "6"  "2" } # Lines
+		image ["background"] { position "23" "9"  "6"  "2" } # Level
+
+		label ["label_name"]  { position  "1.5"  "1.5" text {tr"Next:"}  }
+
+		label ["label_name"]  { position "23.5"  "1.5" text {tr"Score:"} }
+		label ["label_value"] { position "28.5"  "2.5" text "{score}"    }
+
+		label ["label_name"]  { position "23.5"  "5.5" text {tr"Lines:"} }
+		label ["label_value"] { position "28.5"  "6.5" text "{lines}"    }
+
+		label ["label_name"]  { position "23.5"  "9.5" text {tr"Level:"} }
+		label ["label_value"] { position "28.5" "10.5" text "{level}"    }
+
+		canvas "next" { position "2" "3" "4" "2" }
+
+		canvas "field" { position "9"  "1" "12" "24" }
 	}
-
-	image ["background"] { position  "1" "1"  "6"  "5" } # Next
-	image ["background"] { position "10" "2" "10" "22" } # Field
-	image ["background"] { position "23" "1"  "6"  "2" } # Score
-	image ["background"] { position "23" "5"  "6"  "2" } # Lines
-	image ["background"] { position "23" "9"  "6"  "2" } # Level
-
-	label ["label_name"]  { position  "1.5"  "1.5" text {tr"Next:"}  }
-
-	label ["label_name"]  { position "23.5"  "1.5" text {tr"Score:"} }
-	label ["label_value"] { position "28.5"  "2.5" text "{score}"    }
-
-	label ["label_name"]  { position "23.5"  "5.5" text {tr"Lines:"} }
-	label ["label_value"] { position "28.5"  "6.5" text "{lines}"    }
-
-	label ["label_name"]  { position "23.5"  "9.5" text {tr"Level:"} }
-	label ["label_value"] { position "28.5" "10.5" text "{level}"    }
-
-	canvas "next" { position "2" "3" "4" "2" }
-
-	canvas "field" { position "9"  "1" "12" "24" }
 }

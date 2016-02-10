@@ -14,7 +14,6 @@
 
 namespace Yttrium
 {
-	class GuiIonDumper;
 	class GuiLayer;
 	class KeyEvent;
 	class RendererImpl;
@@ -24,14 +23,11 @@ namespace Yttrium
 
 	class GuiImpl : public Gui
 	{
-		friend GuiIonDumper;
-
 	public:
 		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&, Allocator& allocator);
 		~GuiImpl() override;
 
 		void clear() override;
-		void dump(const StaticString& filename) const override;
 		bool has_layer(const StaticString& name) const override;
 		bool load(const StaticString& filename) override;
 		bool pop_layers(size_t count) override;
@@ -71,17 +67,6 @@ namespace Yttrium
 
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 
-		void set_scaling(Scaling scaling)
-		{
-			_scaling = scaling;
-		}
-
-		void set_size(const SizeF& size)
-		{
-			_size = size;
-			_has_size = true;
-		}
-
 		TextureCache& texture_cache() { return *_texture_cache; }
 
 	private:
@@ -90,9 +75,6 @@ namespace Yttrium
 		WindowCallbacks&                  _callbacks;
 		ProxyAllocator                    _proxy_allocator;
 		Pointer<TextureCache>             _texture_cache;
-		bool                              _has_size = false;
-		SizeF                             _size;
-		Scaling                           _scaling = Scaling::Stretch;
 		StdMap<String, FontDesc>          _fonts;
 		StdMap<StaticString, Pointer<GuiLayer>> _layers;
 		StdVector<GuiLayer*>              _layer_stack;

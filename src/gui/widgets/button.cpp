@@ -6,29 +6,12 @@
 #include <yttrium/script/context.h>
 #include <yttrium/texture.h>
 #include "../gui.h"
-#include "../property_dumper.h"
 #include "../property_loader.h"
 
 #include <utility>
 
 namespace Yttrium
 {
-	void ButtonWidget::dump(GuiPropertyDumper& dumper) const
-	{
-		dumper.dump_rect("position"_s, _position);
-		dumper.dump_scaling("scale"_s, _scaling);
-
-		// TODO: Dump font.
-
-		dumper.dump_size("text_size"_s, _text_size);
-		dumper.dump_text("text"_s, _text);
-
-		if (_state != WidgetState::NotSet)
-			dumper.dump_state("state"_s, _state); // NOTE: This would dump not the default state, but the current one. Is it OK?
-
-		// TODO: Dump styles.
-	}
-
 	bool ButtonWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!(loader.load_rect("position"_s, &_position)
@@ -39,7 +22,6 @@ namespace Yttrium
 			return false;
 		}
 
-		loader.load_scaling("scale"_s, &_scaling);
 		loader.load_translatable("text"_s, &_text);
 
 		if (_styles[0].background.load(loader))

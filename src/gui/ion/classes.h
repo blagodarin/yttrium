@@ -13,7 +13,6 @@ namespace Yttrium
 	class GuiClasses
 	{
 	public:
-
 		GuiClasses(Allocator& allocator);
 		~GuiClasses();
 
@@ -22,7 +21,6 @@ namespace Yttrium
 		const IonObject* find(const StaticString& name) const;
 
 	private:
-
 		Allocator& _allocator;
 		StdMap<String, IonDocument> _classes;
 	};

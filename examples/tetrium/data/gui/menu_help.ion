@@ -14,41 +14,43 @@ class "help_text"
 
 layer "menu_help"
 {
-	bind "esc" "pop_layer"
+	on_key "esc" "pop_layer"
 
-	image
+	stretch { image { texture "data/textures/wall.jpeg" } }
+
+	center
 	{
-		texture "data/textures/wall.jpeg"
-	}
+		size "640" "480"
 
-	image
-	{
-		position "120" "30" "400" "300"
-		color    "0" "0" "0" "0.5"
-	}
+		image
+		{
+			position "120" "30" "400" "300"
+			color    "0" "0" "0" "0.5"
+		}
 
-	label ["help_key" ] { position "" "55"  text "[A]" }
-	label ["help_text"] { position "" "55"  text {tr"Move left"} }
+		label ["help_key" ] { position ""  "55" text "[A]" }
+		label ["help_text"] { position ""  "55" text {tr"Move left"} }
 
-	label ["help_key" ] { position "" "105" text "[D]" }
-	label ["help_text"] { position "" "105" text {tr"Move right"} }
+		label ["help_key" ] { position "" "105" text "[D]" }
+		label ["help_text"] { position "" "105" text {tr"Move right"} }
 
-	label ["help_key" ] { position "" "155" text "[S]" }
-	label ["help_text"] { position "" "155" text {tr"Accelerate"} }
+		label ["help_key" ] { position "" "155" text "[S]" }
+		label ["help_text"] { position "" "155" text {tr"Accelerate"} }
 
-	label ["help_key" ] { position "" "205" text "[Left]" }
-	label ["help_text"] { position "" "205" text {tr"Rotate left"} }
+		label ["help_key" ] { position "" "205" text "[Left]" }
+		label ["help_text"] { position "" "205" text {tr"Rotate left"} }
 
-	label ["help_key" ] { position "" "255" text "[Right]" }
-	label ["help_text"] { position "" "255" text {tr"Rotate right"} }
+		label ["help_key" ] { position "" "255" text "[Right]" }
+		label ["help_text"] { position "" "255" text {tr"Rotate right"} }
 
-	label ["help_key" ] { position "" "305" text "[Esc]" }
-	label ["help_text"] { position "" "305" text {tr"Pause/Exit"} }
+		label ["help_key" ] { position "" "305" text "[Esc]" }
+		label ["help_text"] { position "" "305" text {tr"Pause/Exit"} }
 
-	button ["button"]
-	{
-		position "" "360"
-		text     {tr"Back"}
-		on_click "pop_layer"
+		button ["button"]
+		{
+			position "" "360"
+			text     {tr"Back"}
+			on_click "pop_layer"
+		}
 	}
 }

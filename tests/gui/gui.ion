@@ -1,3 +1,1 @@
-size "640" "480"
-
 include "tests/gui/layers.ion"

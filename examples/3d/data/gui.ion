@@ -1,6 +1,4 @@
 root layer
 {
-	canvas
-	{
-	}
+	stretch { canvas { } }
 }

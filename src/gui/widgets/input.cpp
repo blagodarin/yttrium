@@ -4,7 +4,6 @@
 #include <yttrium/renderer.h>
 #include <yttrium/script/context.h>
 #include "../gui.h"
-#include "../property_dumper.h"
 #include "../property_loader.h"
 
 #include <utility>
@@ -17,14 +16,6 @@ namespace Yttrium
 	{
 	}
 
-	void InputWidget::dump(GuiPropertyDumper& dumper) const
-	{
-		dumper.dump_rect("position"_s, _position);
-		dumper.dump_scaling("scale"_s, _scaling);
-		_background.dump(dumper);
-		_foreground.dump(dumper);
-	}
-
 	bool InputWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!(loader.load_rect("position"_s, &_position)
@@ -34,7 +25,6 @@ namespace Yttrium
 			return false;
 		}
 
-		loader.load_scaling("scale"_s, &_scaling);
 		_background.load(loader);
 
 		_rect = RectF(_position);
