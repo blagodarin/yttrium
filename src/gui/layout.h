@@ -28,7 +28,7 @@ namespace Yttrium
 
 		void set_size(const SizeF& size) { _size = size; }
 
-		Widget* add_widget(const StaticString& type, GuiPropertyLoader&);
+		Widget& add_widget(const StaticString& type, GuiPropertyLoader&);
 
 		void update(const RectF&);
 		void render(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;

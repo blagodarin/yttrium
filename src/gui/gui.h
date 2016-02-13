@@ -10,7 +10,6 @@
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/texture_font.h>
-#include "types.h"
 
 namespace Yttrium
 {
@@ -49,19 +48,17 @@ namespace Yttrium
 			}
 		};
 
-		bool add_layer(Pointer<GuiLayer>&&, bool is_root);
+		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
 
 		Allocator& allocator() const { return const_cast<ProxyAllocator&>(_proxy_allocator); }
 
 		WindowCallbacks& callbacks() const { return _callbacks; }
 
-		Pointer<GuiLayer> create_layer(const StaticString& name, bool is_transparent);
-
 		const FontDesc* font(const StaticString& name) const;
 
 		bool process_key_event(const KeyEvent& event);
 
-		void render(const Point& cursor);
+		void render(const PointF& cursor) const;
 
 		ScriptContext& script_context() const { return _script_context; }
 

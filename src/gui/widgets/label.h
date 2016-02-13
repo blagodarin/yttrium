@@ -1,7 +1,7 @@
 #ifndef _src_gui_widgets_label_h_
 #define _src_gui_widgets_label_h_
 
-#include "../property.h"
+#include "../properties.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -15,9 +15,7 @@ namespace Yttrium
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
-		PointF             _position;
 		ForegroundProperty _foreground;
-		unsigned           _alignment = 0;
 		mutable String     _final_text;
 	};
 }

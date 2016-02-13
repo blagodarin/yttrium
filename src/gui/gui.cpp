@@ -5,6 +5,7 @@
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
 #include "../renderer/renderer.h"
+#include "exceptions.h"
 #include "ion/loader.h"
 #include "layer.h"
 
@@ -61,7 +62,7 @@ namespace Yttrium
 	{
 		for (auto n = min(count, _layer_stack.size()); n > 0; --n)
 		{
-			_layer_stack.back()->do_pop_action(_script_context);
+			_layer_stack.back()->run_action(GuiLayer::Action::Pop, _script_context);
 			_layer_stack.pop_back();
 		}
 		return !_layer_stack.empty();
@@ -73,41 +74,25 @@ namespace Yttrium
 		if (i == _layers.end())
 			return false;
 		_layer_stack.push_back(i->second.get());
-		i->second->do_push_action(_script_context);
+		i->second->run_action(GuiLayer::Action::Push, _script_context);
 		return true;
 	}
 
-	bool GuiImpl::add_layer(Pointer<GuiLayer>&& layer, bool is_root)
+	GuiLayer& GuiImpl::add_layer(const StaticString& name, bool is_transparent, bool is_root)
 	{
-		const String& layer_name = layer->name();
-
+		if (!is_root && name.is_empty())
+			throw GuiError(_proxy_allocator) << "Non-root layer must have a name"_s;
+		auto&& layer = make_pointer<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
+		const String& layer_name = layer->name(); // To avoid extra allocations.
 		if (_layers.find(layer_name) != _layers.end())
-		{
-			Log() << "(gui) Layer \""_s << layer_name << "\" has already been added"_s;
-			return false;
-		}
-
+			throw GuiError(_proxy_allocator) << "Duplicate layer name \""_s << layer_name << "\""_s;
 		if (is_root)
 		{
 			if (!_layer_stack.empty())
-			{
-				Log() << "(gui) Layer \""_s << layer_name << "\" \"root\" option ignored"_s;
-				// TODO: Print the existing root layer name.
-			}
-			else
-			{
-				_layer_stack.push_back(layer.get());
-			}
+				throw GuiError(_proxy_allocator) << "\""_s << layer_name << "\" can't be the root layer, \""_s << _layer_stack.front()->name() << "\" is the root layer"_s;
+			_layer_stack.push_back(layer.get());
 		}
-
-		_layers.emplace(layer_name, std::move(layer));
-
-		return true;
-	}
-
-	Pointer<GuiLayer> GuiImpl::create_layer(const StaticString& name, bool is_transparent)
-	{
-		return make_pointer<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
+		return *_layers.emplace(layer_name, std::move(layer)).first->second;
 	}
 
 	const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
@@ -121,36 +106,39 @@ namespace Yttrium
 		return !_layer_stack.empty() && _layer_stack.back()->process_key(event);
 	}
 
-	void GuiImpl::render(const Point& cursor)
+	void GuiImpl::render(const PointF& cursor) const
 	{
 		if (_layer_stack.empty())
 			return;
-		auto i = _layer_stack.begin() + (_layer_stack.size() - 1);
-		(*i)->set_cursor(PointF(cursor));
+		const auto top = _layer_stack.begin() + (_layer_stack.size() - 1);
+		auto i = top;
 		while (i != _layer_stack.begin() && (*i)->is_transparent())
 			--i;
-		do
-		{
-			(*i)->render(_renderer);
-			++i;
-		} while (i != _layer_stack.end());
+		while (i != top)
+			(*i++)->render(_renderer, nullptr);
+		(*i)->render(_renderer, &cursor);
 	}
 
 	void GuiImpl::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
 		const auto& texture = _texture_cache->load_texture_2d(texture_name, true);
 		if (!texture)
+		{
+			Log() << "Can't load \""_s << texture_name << "\""_s;
 			return;
+		}
 
 		// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
 		// when the manager is being cleant up, so we must use the renderer's allocator here.
 
 		TextureFont font(font_source, &_renderer.allocator());
-
-		if (font)
+		if (!font)
 		{
-			texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
-			_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), texture);
+			Log() << "Can't load \""_s << font_source << "\""_s;
+			return;
 		}
+
+		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
+		_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), texture);
 	}
 }

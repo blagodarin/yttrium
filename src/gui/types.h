@@ -5,15 +5,6 @@
 
 namespace Yttrium
 {
-	// Widget scaling mode.
-	enum class Scaling
-	{
-		Stretch, // Scale the widget into the region.
-		Min,     // Scale the widget proportionally until it fits the region.
-		Max,     // Scale the widget proportionally until it covers the region.
-		Fit,     // Stretch for position, Min for size.
-	};
-
 	typedef uint_fast8_t WidgetStateType;
 
 	enum class WidgetState: WidgetStateType

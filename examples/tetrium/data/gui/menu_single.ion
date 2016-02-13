@@ -10,9 +10,8 @@ layer "menu_single"
 
 		label
 		{
-			position  "320" "100"
-			text_size "160"
-			text      {tr"Tetrium"}
+			position "0" "20" "640" "160"
+			text     {tr"Tetrium"}
 		}
 
 		button ["button"]

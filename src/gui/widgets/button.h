@@ -2,7 +2,7 @@
 #define _src_gui_widgets_button_h_
 
 #include <yttrium/script/code.h>
-#include "../property.h"
+#include "../properties.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -25,14 +25,11 @@ namespace Yttrium
 			Vector4            text_color{1, 1, 1};
 		};
 
-		Rect                 _position;
-		TextureFont          _font;
-		SharedPtr<Texture2D> _font_texture;
-		SizeF                _text_size;
-		SharedPtr<Sound>     _sound;
-		WidgetState          _state = WidgetState::NotSet;
-		Style                _styles[WidgetStateCount];
-		ScriptCode           _on_click;
+		mutable ForegroundProperty _foreground;
+		SharedPtr<Sound>   _sound;
+		WidgetState        _state = WidgetState::NotSet;
+		Style              _styles[WidgetStateCount];
+		ScriptCode         _on_click;
 	};
 }
 

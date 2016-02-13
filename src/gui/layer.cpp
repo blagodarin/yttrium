@@ -1,6 +1,7 @@
 #include "layer.h"
 
 #include <yttrium/renderer.h>
+#include "exceptions.h"
 #include "gui.h"
 #include "layout.h"
 #include "widgets/widget.h"
@@ -28,14 +29,6 @@ namespace Yttrium
 	{
 		_layouts.emplace_back(make_pointer<GuiLayout>(_gui.allocator(), _gui, placement));
 		return *_layouts.back();
-	}
-
-	bool GuiLayer::add_widget(Widget* widget)
-	{
-		if (!widget->name().is_empty() && !_named_widgets.emplace(widget->name(), widget).second)
-			return false;
-		_widgets.emplace_back(widget);
-		return true;
 	}
 
 	bool GuiLayer::process_key(const KeyEvent& event)
@@ -97,28 +90,54 @@ namespace Yttrium
 		return false;
 	}
 
-	void GuiLayer::render(Renderer& renderer)
+	void GuiLayer::register_widget(Widget& widget)
+	{
+		if (!widget.name().is_empty() && !_named_widgets.emplace(widget.name(), &widget).second)
+			throw GuiError(_gui.allocator()) << "Duplicate layer \""_s << _name << "\" widget name \""_s << widget.name() << "\""_s;
+		_widgets.emplace_back(&widget);
+	}
+
+	void GuiLayer::render(Renderer& renderer, const PointF* cursor)
 	{
 		const RectF rect({}, SizeF(renderer.window_size()));
 		for (const auto& layout : _layouts)
 			layout->update(rect);
-
-		Widget* mouse_widget = nullptr;
-		if (_is_cursor_set)
-		{
-			for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
-			{
-				if ((*i)->render_rect().contains(_cursor))
-				{
-					mouse_widget = *i;
-					break;
-				}
-			}
-			_is_cursor_set = false;
-		}
-		_mouse_widget = mouse_widget;
-
+		_mouse_widget = cursor ? widget_at(*cursor) : nullptr;
 		for (const auto& layout : _layouts)
 			layout->render(renderer, _mouse_widget, _left_click_widget);
+	}
+
+	void GuiLayer::run_action(Action action, ScriptContext& context) const
+	{
+		switch (action)
+		{
+		case Action::Push:
+			_on_push.execute(context);
+			break;
+		case Action::Pop:
+			_on_pop.execute(context);
+			break;
+		}
+	}
+
+	void GuiLayer::set_action(Action action, ScriptCode&& script)
+	{
+		switch (action)
+		{
+		case Action::Push:
+			_on_push = std::move(script);
+			break;
+		case Action::Pop:
+			_on_pop = std::move(script);
+			break;
+		}
+	}
+
+	Widget* GuiLayer::widget_at(const PointF& point) const
+	{
+		for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
+			if ((*i)->render_rect().contains(point))
+				return *i;
+		return nullptr;
 	}
 }

@@ -12,13 +12,14 @@
 
 namespace Yttrium
 {
+	constexpr auto ButtonTextSize = 0.875f;
+
 	bool ButtonWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_rect("position"_s, &_position)
-			&& loader.load_font("font"_s, &_font, &_font_texture)
-			&& loader.load_size("text_size"_s, _text_size)))
+		if (!loader.load_rect("position"_s, _rect)
+			|| !_foreground.load(loader))
 		{
-			Log() << "(gui/button) Unable to load"_s;
+			Log() << "Failed to load 'button'"_s;
 			return false;
 		}
 
@@ -69,8 +70,6 @@ namespace Yttrium
 
 		loader.unbind();
 
-		_rect = RectF(_position);
-
 		String on_click(&_gui.allocator());
 		loader.load_text("on_click"_s, &on_click);
 		_on_click = ScriptCode(std::move(on_click), &_gui.script_context().allocator());
@@ -95,24 +94,12 @@ namespace Yttrium
 		return true;
 	}
 
-	void ButtonWidget::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const
+	void ButtonWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState state) const
 	{
 		if (_state != WidgetState::NotSet)
 			state = _state;
-
 		_styles[WidgetStateType(state)].background.draw(renderer, rect);
-
-		if (_text.is_empty())
-			return;
-
-		renderer.set_color(_styles[WidgetStateType(state)].text_color);
-
-		PushTexture push_texture(renderer, _font_texture.get());
-
-		if (renderer.set_font(_font))
-		{
-			renderer.set_font_size(_text_size.width() * scale.y, _text_size.height());
-			renderer.draw_text(rect.center(), _text, CenterAlignment);
-		}
+		_foreground.color = _styles[WidgetStateType(state)].text_color;
+		_foreground.draw(renderer, _text, rect);
 	}
 }

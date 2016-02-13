@@ -4,7 +4,7 @@
 #include <yttrium/script/code.h>
 #include <yttrium/timer.h>
 #include "../logic/line_editor.h"
-#include "../property.h"
+#include "../properties.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -19,7 +19,6 @@ namespace Yttrium
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
-		Rect               _position;
 		BackgroundProperty _background;
 		ForegroundProperty _foreground;
 		LineEditor         _logic;

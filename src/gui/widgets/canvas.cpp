@@ -13,8 +13,7 @@ namespace Yttrium
 
 	bool CanvasWidget::load(GuiPropertyLoader& loader)
 	{
-		loader.load_rect("position"_s, &_position);
-		_rect = RectF(_position);
+		loader.load_rect("position"_s, _rect);
 		return true;
 	}
 

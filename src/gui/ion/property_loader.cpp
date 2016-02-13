@@ -10,6 +10,8 @@
 #include <yttrium/utils.h>
 #include "../gui.h"
 
+#include <yttrium/log.h>
+
 namespace Yttrium
 {
 	namespace
@@ -144,6 +146,25 @@ namespace Yttrium
 		}
 	}
 
+	bool GuiIonPropertyLoader::load(const StaticString& name, float& value) const
+	{
+		if (_bound_object)
+		{
+			const IonNode& node = _bound_object->last(name);
+			if (node.exists() && load(value, node))
+				return true;
+		}
+
+		if (_bound_class)
+		{
+			const IonNode& node = _bound_class->last(name);
+			if (node.exists() && load(value, node))
+				return true;
+		}
+
+		return false;
+	}
+
 	bool GuiIonPropertyLoader::load_alignment(const StaticString& name, unsigned* alignment) const
 	{
 		if (_bound_object)
@@ -210,7 +231,10 @@ namespace Yttrium
 
 		const auto font_desc = _gui.font(*font_name);
 		if (!font_desc)
+		{
+			Log() << "No font \""_s << *font_name << "\""_s;
 			return false;
+		}
 
 		*font = font_desc->font;
 		*texture = font_desc->texture;
@@ -258,16 +282,16 @@ namespace Yttrium
 		return loaded == 0x3;
 	}
 
-	bool GuiIonPropertyLoader::load_rect(const StaticString& name, Rect* rect, bool update) const
+	bool GuiIonPropertyLoader::load_rect(const StaticString& name, RectF& rect, bool update) const
 	{
 		int32_t elements[4] = {-1, -1, -1, -1};
 
 		if (update)
 		{
-			elements[0] = rect->left();
-			elements[1] = rect->top();
-			elements[2] = rect->width();
-			elements[3] = rect->height();
+			elements[0] = rect.left();
+			elements[1] = rect.top();
+			elements[2] = rect.width();
+			elements[3] = rect.height();
 		}
 
 		if (_bound_object)
@@ -287,28 +311,9 @@ namespace Yttrium
 		if (!update && (elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
 			return false;
 
-		*rect = Rect(Point(elements[0], elements[1]), Size(elements[2], elements[3]));
+		rect = RectF(PointF(elements[0], elements[1]), SizeF(elements[2], elements[3]));
 
 		return true;
-	}
-
-	bool GuiIonPropertyLoader::load_scaling(const StaticString& name, Scaling* scaling) const
-	{
-		if (_bound_object)
-		{
-			const IonNode& node = _bound_object->last(name);
-			if (node.exists() && load_scaling(scaling, node))
-				return true;
-		}
-
-		if (_bound_class)
-		{
-			const IonNode& node = _bound_class->last(name);
-			if (node.exists() && load_scaling(scaling, node))
-				return true;
-		}
-
-		return false;
 	}
 
 	bool GuiIonPropertyLoader::load_size(const StaticString& name, SizeF& size) const
@@ -443,6 +448,20 @@ namespace Yttrium
 		_bound_class = _class;
 	}
 
+	bool GuiIonPropertyLoader::load(float& value, const IonNode& node)
+	{
+		const auto& values = node.values();
+
+		if (values.size() != 1)
+			return false;
+
+		const StaticString* value_string;
+		if (!values->get(&value_string))
+			return false;
+
+		return value_string->to_number(&value);
+	}
+
 	bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const IonNode& node)
 	{
 		// TODO: Inheritance.
@@ -550,31 +569,6 @@ namespace Yttrium
 			left = right;
 
 		*margins = Margins(top, right, bottom, left);
-
-		return true;
-	}
-
-	bool GuiIonPropertyLoader::load_scaling(Scaling* scaling, const IonNode& node)
-	{
-		const auto& values = node.values();
-
-		if (values.size() != 1)
-			return false;
-
-		const StaticString* value;
-		if (!values->get(&value))
-			return false;
-
-		if (*value == "fit"_s)
-			*scaling = Scaling::Fit;
-		else if (*value == "max"_s)
-			*scaling = Scaling::Max;
-		else if (*value == "min"_s)
-			*scaling = Scaling::Min;
-		else if (*value == "stretch"_s)
-			*scaling = Scaling::Stretch;
-		else
-			return false;
 
 		return true;
 	}

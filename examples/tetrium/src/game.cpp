@@ -223,7 +223,6 @@ void Game::run()
 				_audio->player().load(file_name, settings);
 			}
 			_audio->player().set_order(AudioPlayer::Random);
-			_audio->player().play();
 		}
 	}
 
@@ -232,6 +231,8 @@ void Game::run()
 
 	Log() << "Starting";
 
+	if (_audio)
+		_audio->player().play();
 	_window->run();
 
 	Log() << "Saving settings";

@@ -11,16 +11,14 @@ transparent layer "game_over"
 
 		label
 		{
-			position   "15" "8"
-			text_size  "8"
+			position   "0" "4" "30" "8"
 			text_color "1" "1" "0"
 			text       {tr"Game over"}
 		}
 
 		label
 		{
-			position   "15" "15"
-			text_size  "3"
+			position   "0" "13" "30" "3"
 			text_color "1" "1" "1"
 			text       {tr"Enter your name:"}
 		}
@@ -29,7 +27,6 @@ transparent layer "game_over"
 		{
 			position   "5" "18" "20" "4"
 			color      "1" "1" "1" "0.5"
-			text_size  "3"
 			text_color "0" "0" "0"
 			on_enter   "save_score; pop_layer 3; push_layer menu_statistics"
 		}

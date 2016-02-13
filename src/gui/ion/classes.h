@@ -13,7 +13,7 @@ namespace Yttrium
 	class GuiClasses
 	{
 	public:
-		GuiClasses(Allocator& allocator);
+		GuiClasses(Allocator&);
 		~GuiClasses();
 
 		bool add(const StaticString& name, const IonObject& source, const StaticString* base_class = nullptr);

@@ -1,15 +1,12 @@
 class "help_key"
 {
-	position  "230" ""
-	text_size "40"
-	align     "bottom"
+	position "120" "" "180" "40"
 }
 
 class "help_text"
 {
-	position  "300" ""
-	text_size "40"
-	align     "bottom" "right"
+	position  "300" "" "200" "40"
+	align     "left"
 }
 
 layer "menu_help"
@@ -28,23 +25,23 @@ layer "menu_help"
 			color    "0" "0" "0" "0.5"
 		}
 
-		label ["help_key" ] { position ""  "55" text "[A]" }
-		label ["help_text"] { position ""  "55" text {tr"Move left"} }
+		label ["help_key" ] { position ""  "35" text "[A]" }
+		label ["help_text"] { position ""  "35" text {tr"Move left"} }
 
-		label ["help_key" ] { position "" "105" text "[D]" }
-		label ["help_text"] { position "" "105" text {tr"Move right"} }
+		label ["help_key" ] { position ""  "85" text "[D]" }
+		label ["help_text"] { position ""  "85" text {tr"Move right"} }
 
-		label ["help_key" ] { position "" "155" text "[S]" }
-		label ["help_text"] { position "" "155" text {tr"Accelerate"} }
+		label ["help_key" ] { position "" "135" text "[S]" }
+		label ["help_text"] { position "" "135" text {tr"Accelerate"} }
 
-		label ["help_key" ] { position "" "205" text "[Left]" }
-		label ["help_text"] { position "" "205" text {tr"Rotate left"} }
+		label ["help_key" ] { position "" "185" text "[Left]" }
+		label ["help_text"] { position "" "185" text {tr"Rotate left"} }
 
-		label ["help_key" ] { position "" "255" text "[Right]" }
-		label ["help_text"] { position "" "255" text {tr"Rotate right"} }
+		label ["help_key" ] { position "" "235" text "[Right]" }
+		label ["help_text"] { position "" "235" text {tr"Rotate right"} }
 
-		label ["help_key" ] { position "" "305" text "[Esc]" }
-		label ["help_text"] { position "" "305" text {tr"Pause/Exit"} }
+		label ["help_key" ] { position "" "285" text "[Esc]" }
+		label ["help_text"] { position "" "285" text {tr"Pause/Exit"} }
 
 		button ["button"]
 		{

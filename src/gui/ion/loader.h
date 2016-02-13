@@ -19,6 +19,7 @@ namespace Yttrium
 		bool load(const StaticString& source_name);
 
 	private:
+		void load_impl(const StaticString& source_name);
 		void load(const IonObject&);
 
 		void load_class(const IonNode&, unsigned attributes);
@@ -26,12 +27,11 @@ namespace Yttrium
 		void load_include(const IonNode&, unsigned attributes);
 		void load_layer(const IonNode&, unsigned attributes);
 
-		void load_layer_layout(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_key(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_pop(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_push(GuiLayer&, const IonNode&, int extra) const;
+		bool load_layer_action(GuiLayer&, const IonNode&, int extra) const;
+		bool load_layer_layout(GuiLayer&, const IonNode&, int extra) const;
+		bool load_layer_on_key(GuiLayer&, const IonNode&, int extra) const;
 
-		void load_layout_size(GuiLayout&, const IonNode&) const;
+		bool load_layout_size(GuiLayout&, const IonNode&) const;
 
 	private:
 		GuiImpl& _gui;

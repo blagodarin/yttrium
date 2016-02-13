@@ -1,15 +1,13 @@
 #include "image.h"
 
-#include <yttrium/log.h>
 #include "../property_loader.h"
 
 namespace Yttrium
 {
 	bool ImageWidget::load(GuiPropertyLoader& loader)
 	{
-		loader.load_rect("position"_s, &_position);
+		loader.load_rect("position"_s, _rect);
 		_background.load(loader);
-		_rect = RectF(_position);
 		return true;
 	}
 

@@ -1,6 +1,7 @@
 #include "layout.h"
 
 #include <yttrium/static_string.h>
+#include "exceptions.h"
 #include "gui.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
@@ -17,7 +18,7 @@ namespace Yttrium
 	{
 	}
 
-	Widget* GuiLayout::add_widget(const StaticString& type, GuiPropertyLoader& loader)
+	Widget& GuiLayout::add_widget(const StaticString& type, GuiPropertyLoader& loader)
 	{
 		Pointer<Widget> widget;
 		if (type == "button"_s)
@@ -31,13 +32,13 @@ namespace Yttrium
 		else if (type == "label"_s)
 			widget = make_pointer<LabelWidget>(_gui.allocator(), _gui);
 		else
-			return nullptr;
+			throw GuiError(_gui.allocator()) << "Unknown widget type '"_s << type << "'"_s;
 
 		if (!widget->load(loader))
-			return nullptr;
+			throw GuiError(_gui.allocator()) << "Can't load '"_s << type << "'"_s;
 
 		_widgets.emplace_back(std::move(widget));
-		return _widgets.back().get();
+		return *_widgets.back();
 	}
 
 	void GuiLayout::update(const RectF& rect)

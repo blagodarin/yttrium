@@ -155,7 +155,7 @@ namespace Yttrium
 				_renderer->clear();
 				PushGpuProgram gpu_program(*_renderer, _renderer->program_2d());
 				Push2D projection(*_renderer);
-				_gui->render(_cursor);
+				_gui->render(PointF(_cursor));
 				draw_debug();
 			}
 			_backend->swap_buffers();

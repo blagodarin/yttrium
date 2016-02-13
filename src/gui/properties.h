@@ -17,7 +17,7 @@ namespace Yttrium
 	{
 		Vector4              color{1, 1, 1};
 		SharedPtr<Texture2D> texture;
-		Rect                 texture_rect;
+		RectF                texture_rect;
 		Margins              borders;
 
 		void draw(Renderer& renderer, const RectF& rect) const;
@@ -29,11 +29,11 @@ namespace Yttrium
 	{
 		TextureFont          font;
 		SharedPtr<Texture2D> font_texture;
-		SizeF                size;
+		float                size = .875f;
 		Vector4              color{1, 1, 1};
+		unsigned             alignment = 0;
 
-		void draw(Renderer& renderer, const String& text, const PointF& origin,
-			unsigned alignment, float scale, Renderer::TextCapture* capture = nullptr) const;
+		void draw(Renderer& renderer, const StaticString& text, const RectF& rect, Renderer::TextCapture* capture = nullptr) const;
 		bool load(const GuiPropertyLoader& loader);
 		void update(const GuiPropertyLoader& loader);
 	};

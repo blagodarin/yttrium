@@ -1,22 +1,19 @@
 class "statistics_index"
 {
-	position  "60" ""
-	text_size "40"
-	align     "left"
+	position "30" "" "30" "40"
+	align "right"
 }
 
 class "statistics_name"
 {
-	position  "70" ""
-	text_size "40"
-	align     "right"
+	position "60" "" "440" "40"
+	align    "left"
 }
 
 class "statistics_score"
 {
-	position  "600" ""
-	text_size "40"
-	align     "left"
+	position "500" "" "100" "40"
+	align    "right"
 }
 
 layer "menu_statistics"
@@ -35,25 +32,25 @@ layer "menu_statistics"
 			color    "0" "0" "0" "0.5"
 		}
 
-		label ["statistics_index"] { position ""  "55" text "1."       }
-		label ["statistics_name" ] { position ""  "55" text "{name1}"  }
-		label ["statistics_score"] { position ""  "55" text "{score1}" }
+		label ["statistics_index"] { position ""  "35" text "1."       }
+		label ["statistics_name"]  { position ""  "35" text "{name1}"  }
+		label ["statistics_score"] { position ""  "35" text "{score1}" }
 
-		label ["statistics_index"] { position "" "105" text "2."       }
-		label ["statistics_name" ] { position "" "105" text "{name2}"  }
-		label ["statistics_score"] { position "" "105" text "{score2}" }
+		label ["statistics_index"] { position ""  "85" text "2."       }
+		label ["statistics_name"]  { position ""  "85" text "{name2}"  }
+		label ["statistics_score"] { position ""  "85" text "{score2}" }
 
-		label ["statistics_index"] { position "" "155" text "3."       }
-		label ["statistics_name" ] { position "" "155" text "{name3}"  }
-		label ["statistics_score"] { position "" "155" text "{score3}" }
+		label ["statistics_index"] { position "" "135" text "3."       }
+		label ["statistics_name"]  { position "" "135" text "{name3}"  }
+		label ["statistics_score"] { position "" "135" text "{score3}" }
 
-		label ["statistics_index"] { position "" "205" text "4."       }
-		label ["statistics_name" ] { position "" "205" text "{name4}"  }
-		label ["statistics_score"] { position "" "205" text "{score4}" }
+		label ["statistics_index"] { position "" "185" text "4."       }
+		label ["statistics_name"]  { position "" "185" text "{name4}"  }
+		label ["statistics_score"] { position "" "185" text "{score4}" }
 
-		label ["statistics_index"] { position "" "255" text "5."       }
-		label ["statistics_name" ] { position "" "255" text "{name5}"  }
-		label ["statistics_score"] { position "" "255" text "{score5}" }
+		label ["statistics_index"] { position "" "235" text "5."       }
+		label ["statistics_name"]  { position "" "235" text "{name5}"  }
+		label ["statistics_score"] { position "" "235" text "{score5}" }
 
 		button ["button"]
 		{

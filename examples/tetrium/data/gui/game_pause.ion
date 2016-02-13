@@ -1,7 +1,6 @@
 class "pause_button" ["button"]
 {
 	position  "11" "" "8" "2"
-	text_size "1.75"
 }
 
 transparent layer "game_pause"
@@ -18,28 +17,28 @@ transparent layer "game_pause"
 
 		button ["pause_button"]
 		{
-			position "" "9"
+			position "" "7"
 			text     {tr"Resume"}
 			on_click "pop_layer"
 		}
 
 		button ["pause_button"]
 		{
-			position "" "12"
+			position "" "10"
 			text     {tr"Restart"}
 			on_click "pop_layer 2; push_layer game_single"
 		}
 
 		button ["pause_button"]
 		{
-			position "" "15"
+			position "" "13"
 			text     {tr"Give up"}
 			on_click "pop_layer 3"
 		}
 
 		button ["pause_button"]
 		{
-			position "" "18"
+			position "" "16"
 			text     {tr"Exit game"}
 			on_click "exit"
 		}

@@ -14,9 +14,6 @@ namespace Yttrium
 
 		bool load(GuiPropertyLoader&) override;
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
-
-	private:
-		Rect _position;
 	};
 }
 

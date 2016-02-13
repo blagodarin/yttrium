@@ -18,16 +18,14 @@ namespace Yttrium
 
 	bool InputWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_rect("position"_s, &_position)
+		if (!(loader.load_rect("position"_s, _rect)
 			&& _foreground.load(loader)))
 		{
-			Log() << "(gui/input) Unable to load"_s;
+			Log() << "Failed to load 'input'"_s;
 			return false;
 		}
 
 		_background.load(loader);
-
-		_rect = RectF(_position);
 
 		String on_enter(_name.allocator());
 		loader.load_text("on_enter"_s, &on_enter);
@@ -61,12 +59,12 @@ namespace Yttrium
 		return false;
 	}
 
-	void InputWidget::render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState) const
+	void InputWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 
 		Renderer::TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
-		_foreground.draw(renderer, _logic.text(), rect.center(), CenterAlignment, scale.y, &capture);
+		_foreground.draw(renderer, _logic.text(), rect, &capture);
 
 		if (_is_focused && capture.has_cursor && (Timer::clock() - _cursor_mark) % 1000 < 500)
 		{
