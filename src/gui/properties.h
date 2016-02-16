@@ -29,7 +29,7 @@ namespace Yttrium
 	{
 		TextureFont          font;
 		SharedPtr<Texture2D> font_texture;
-		float                size = .875f;
+		float                size = 7 / 8.f;
 		Vector4              color{1, 1, 1};
 		unsigned             alignment = 0;
 

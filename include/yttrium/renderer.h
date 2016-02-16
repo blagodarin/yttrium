@@ -82,8 +82,7 @@ namespace Yttrium
 		virtual void draw_rectangle(const RectF& rect, const RectF& texture_rect) = 0;
 
 		///
-		virtual void draw_text(const PointF& position, const StaticString& text,
-			unsigned alignment = BottomRightAlignment, TextCapture* capture = nullptr) = 0;
+		virtual void draw_text(const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture = nullptr) = 0;
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;
@@ -95,19 +94,10 @@ namespace Yttrium
 		virtual bool set_font(const TextureFont& font) = 0;
 
 		///
-		virtual void set_font_size(const SizeF& size) = 0;
-
-		///
-		void set_font_size(float y_size, float x_scaling = 1) { set_font_size({x_scaling, y_size}); }
-
-		///
 		virtual bool set_texture_borders(const Margins& borders) = 0;
 
 		///
 		virtual void set_texture_rectangle(const RectF& rect) = 0;
-
-		///
-		virtual SizeF text_size(const StaticString& text) const = 0;
 
 		///
 		virtual Size window_size() const = 0;

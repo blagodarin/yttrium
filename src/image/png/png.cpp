@@ -119,7 +119,7 @@ namespace Yttrium
 			transforms |= PNG_TRANSFORM_BGR;
 		}
 
-		// NOTE: Remove PNG_TRANSFORM_SWAP_ENDIAN for a big endian platform.
+		// TODO: Remove PNG_TRANSFORM_SWAP_ENDIAN for a big endian platform.
 		switch (_format.pixel_format())
 		{
 		case PixelFormat::Gray:

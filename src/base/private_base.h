@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <cstdlib>
 #include <utility>
 
 namespace Yttrium
@@ -36,11 +37,8 @@ namespace Yttrium
 			if (!object)
 				return nullptr;
 			assert(object->_allocator);
-			// NOTE: The check should work well if a thread is trying to copy an object
-			// which is being destroyed, but with two or more copying threads only one
-			// will end up with nullptr with others having an invalid pointer.
 			if (object->_references++ == 0)
-				return nullptr;
+				std::abort(); // Tried to copy an object which is being destroyed.
 			return object;
 		}
 

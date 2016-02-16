@@ -40,13 +40,11 @@ namespace Yttrium
 		Matrix4 current_transformation() const override;
 		void draw_rectangle(const RectF&) override;
 		void draw_rectangle(const RectF&, const RectF& texture_rect) override;
-		void draw_text(const PointF&, const StaticString&, unsigned alignment, TextCapture*) override;
+		void draw_text(const PointF&, float, const StaticString&, TextCapture*) override;
 		void set_color(const Vector4&) override;
 		bool set_font(const TextureFont&) override;
-		void set_font_size(const SizeF&) override;
 		bool set_texture_borders(const Margins&) override;
 		void set_texture_rectangle(const RectF&) override;
-		SizeF text_size(const StaticString&) const override;
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
@@ -111,7 +109,6 @@ namespace Yttrium
 		MarginsF _texture_borders;
 
 		TextureFont _font;
-		SizeF       _font_size{1, 1};
 
 		SharedPtr<Texture2D> _white_texture;
 		SharedPtr<Texture2D> _debug_texture;

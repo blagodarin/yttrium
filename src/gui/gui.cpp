@@ -128,9 +128,8 @@ namespace Yttrium
 			return;
 		}
 
-		// NOTE: If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
+		// If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
 		// when the manager is being cleant up, so we must use the renderer's allocator here.
-
 		TextureFont font(font_source, &_renderer.allocator());
 		if (!font)
 		{

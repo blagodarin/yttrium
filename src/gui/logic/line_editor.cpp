@@ -152,7 +152,7 @@ namespace Yttrium
 			_cursor = _max_size;
 		if (_selection_offset > _max_size)
 			_selection_offset = _max_size;
-		if (_selection_offset + _selection_size > _max_size)
-			_selection_size = _max_size - _selection_size;
+		if (_selection_size > _max_size - _selection_offset)
+			_selection_size = _max_size - _selection_offset;
 	}
 }

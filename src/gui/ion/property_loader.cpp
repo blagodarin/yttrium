@@ -12,63 +12,17 @@
 
 #include <yttrium/log.h>
 
+#include <array>
+
 namespace Yttrium
 {
 	namespace
 	{
-		unsigned read_color(Vector4* color, const IonNode& node, unsigned inherit)
-		{
-			unsigned result = 0;
-
-			auto&& values = node.values();
-
-			if (!values.is_empty())
-			{
-				const size_t items = min<size_t>(values.size(), 4);
-
-				for (size_t i = 0; i < items; values.pop_first(), ++i)
-				{
-					const StaticString* value;
-					if (values->get(&value) && value->to_number(color->data() + i))
-						result |= 1 << i;
-				}
-
-				if (items < 4 && !(inherit & (1 << 3)))
-				{
-					color->a = 1.f;
-					result |= 1 << 3;
-				}
-			}
-
-			return result;
-		}
-
-		unsigned read_position(PointF& position, const IonNode& node)
-		{
-			unsigned result = 0;
-
-			auto&& values = node.values();
-
-			if (!values.is_empty())
-			{
-				const size_t items = min<size_t>(values.size(), 2);
-
-				for (size_t i = 0; i < items; values.pop_first(), ++i)
-				{
-					const StaticString* value;
-					if (values->get(&value) && value->to_number(position.data() + i))
-						result |= 1 << i;
-				}
-			}
-
-			return result;
-		}
-
-		void read_rect(int32_t elements[4], const IonNode& node)
+		template <std::size_t N>
+		void read_floats(std::array<float, N>& elements, const IonNode& node)
 		{
 			auto&& values = node.values();
-
-			for (int i = 0; i < 4; ++i)
+			for (auto& element : elements)
 			{
 				if (values.is_empty())
 					break;
@@ -76,40 +30,49 @@ namespace Yttrium
 				const StaticString* value;
 				if (values->get(&value))
 				{
-					int32_t number;
-					if (value->to_number(&number) && number >= i >> 1) // 'number' must be not less than {0, 0, 1, 1}.
-						elements[i] = number;
+					float number;
+					if (value->to_number(&number))
+						element = number;
 				}
-				
 				values.pop_first();
 			}
 		}
 
-		unsigned read_size(SizeF& size, const IonNode& node, unsigned inherit)
+		template <typename T, std::size_t N>
+		std::size_t read_array(std::array<T, N>& elements, const IonNode& node)
 		{
-			unsigned result = 0;
-
+			if (node.size() > N)
+				return 0; // TODO: Throw.
 			auto&& values = node.values();
-
-			if (!values.is_empty())
+			for (std::size_t i = 0; i < N; ++i)
 			{
-				const size_t items = min<size_t>(values.size(), 2);
-
-				for (size_t i = 0; i < items; values.pop_first(), ++i)
+				if (values.is_empty())
+					return i;
+				const StaticString* value;
+				if (values->get(&value))
 				{
-					const StaticString* value;
-					if (values->get(&value) && value->to_number(size.data() + i))
-						result |= 1 << i;
+					T number;
+					if (!value->to_number(&number))
+						return i; // TODO: Throw.
+					elements[i] = number;
 				}
-
-				if (items < 2 && !(inherit & (1 << 1)))
-				{
-					size.data()[1] = 1.f;
-					result |= 1 << 1;
-				}
+				values.pop_first();
 			}
+			return N;
+		}
 
-			return result;
+		bool read_color(Vector4& color, const IonNode& node)
+		{
+			std::array<float, 4> elements;
+			switch (read_array(elements, node))
+			{
+			case 3:
+				elements[3] = 1;
+			case 4:
+				color = {elements[0], elements[1], elements[2], elements[3]};
+				return true;
+			}
+			return false; // TODO: Throw.
 		}
 	}
 
@@ -186,23 +149,21 @@ namespace Yttrium
 
 	bool GuiIonPropertyLoader::load_color(const StaticString& name, Vector4* color) const
 	{
-		unsigned loaded = 0x0;
+		if (_bound_object)
+		{
+			const IonNode& node = _bound_object->last(name);
+			if (node.exists() && read_color(*color, node))
+				return true;
+		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
-			if (node.exists())
-				loaded = read_color(color, node, 0x0);
+			if (node.exists() && read_color(*color, node))
+				return true;
 		}
 
-		if (_bound_object)
-		{
-			const IonNode& node = _bound_object->last(name);
-			if (node.exists())
-				loaded |= read_color(color, node, loaded);
-		}
-
-		return loaded == 0xF;
+		return false;
 	}
 
 	bool GuiIonPropertyLoader::load_font(const StaticString& name, TextureFont* font, SharedPtr<Texture2D>* texture) const
@@ -261,30 +222,9 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_position(const StaticString& name, PointF& position) const
-	{
-		unsigned loaded = 0x0;
-
-		if (_bound_class)
-		{
-			const IonNode& node = _bound_class->last(name);
-			if (node.exists())
-				loaded = read_position(position, node);
-		}
-
-		if (_bound_object)
-		{
-			const IonNode& node = _bound_object->last(name);
-			if (node.exists())
-				loaded |= read_position(position, node);
-		}
-
-		return loaded == 0x3;
-	}
-
 	bool GuiIonPropertyLoader::load_rect(const StaticString& name, RectF& rect, bool update) const
 	{
-		int32_t elements[4] = {-1, -1, -1, -1};
+		std::array<float, 4> elements = {-1, -1, -1, -1};
 
 		if (update)
 		{
@@ -298,43 +238,22 @@ namespace Yttrium
 		{
 			const IonNode& node = _bound_object->last(name);
 			if (node.exists())
-				read_rect(elements, node);
+				read_floats(elements, node);
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
 			if (node.exists())
-				read_rect(elements, node);
+				read_floats(elements, node);
 		}
 
-		if (!update && (elements[0] < 0 || elements[1] < 0 || elements[2] < 0 || elements[3] < 0))
+		if (elements[0] < 0 || elements[1] < 0 || elements[2] <= 0 || elements[3] <= 0)
 			return false;
 
-		rect = RectF(PointF(elements[0], elements[1]), SizeF(elements[2], elements[3]));
+		rect = RectF({elements[0], elements[1]}, SizeF(elements[2], elements[3]));
 
 		return true;
-	}
-
-	bool GuiIonPropertyLoader::load_size(const StaticString& name, SizeF& size) const
-	{
-		unsigned loaded = 0x0;
-
-		if (_bound_class)
-		{
-			const IonNode& node = _bound_class->last(name);
-			if (node.exists())
-				loaded = read_size(size, node, 0x0);
-		}
-
-		if (_bound_object)
-		{
-			const IonNode& node = _bound_object->last(name);
-			if (node.exists())
-				loaded |= read_size(size, node, loaded);
-		}
-
-		return loaded == 0x3;
 	}
 
 	SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
@@ -450,22 +369,15 @@ namespace Yttrium
 
 	bool GuiIonPropertyLoader::load(float& value, const IonNode& node)
 	{
-		const auto& values = node.values();
-
-		if (values.size() != 1)
-			return false;
-
-		const StaticString* value_string;
-		if (!values->get(&value_string))
-			return false;
-
-		return value_string->to_number(&value);
+		std::array<float, 1> elements;
+		if (read_array(elements, node) != 1)
+			return false; // TODO: Throw.
+		value = elements[0];
+		return true;
 	}
 
 	bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const IonNode& node)
 	{
-		// TODO: Inheritance.
-
 		auto&& values = node.values();
 
 		if (values.is_empty() || values.size() > 2)
@@ -524,58 +436,31 @@ namespace Yttrium
 
 	bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
 	{
-		int32_t top = -1;
-		int32_t right = -1;
-		int32_t bottom = -1;
-		int32_t left = -1;
-
-		auto&& values = node.values();
-		switch (values.size())
+		std::array<int32_t, 4> elements;
+		switch (read_array(elements, node))
 		{
-		case 4:
-			if (!values.last().get(&left) || left < 0)
-				return false;
-			values.pop_last();
-			// Fallthrough.
-
-		case 3:
-			if (!values.last().get(&bottom) || bottom < 0)
-				return false;
-			values.pop_last();
-			// Fallthrough.
-
-		case 2:
-			if (!values.last().get(&right) || right < 0)
-				return false;
-			values.pop_last();
-			// Fallthrough.
-
 		case 1:
-			if (!values.last().get(&top) || top < 0)
-				return false;
-			break;
-
-		default:
-			return false;
+			elements[1] = elements[0];
+		case 2:
+			elements[2] = elements[0];
+		case 3:
+			elements[3] = elements[1];
+		case 4:
+			*margins = {elements[0], elements[1], elements[2], elements[3]};
+			return true;
 		}
-
-		if (right < 0)
-			right = top;
-
-		if (bottom < 0)
-			bottom = top;
-
-		if (left < 0)
-			left = right;
-
-		*margins = Margins(top, right, bottom, left);
-
-		return true;
+		return false; // TODO: Throw.
 	}
 
 	bool GuiIonPropertyLoader::load_size(SizeF& size, const IonNode& node)
 	{
-		return read_size(size, node, 0) == 3;
+		std::array<float, 2> elements;
+		if (read_array(elements, node) != 2
+			|| elements[0] <= 0
+			|| elements[1] <= 0)
+			return false; // TODO: Throw.
+		size = {elements[0], elements[1]};
+		return true;
 	}
 
 	SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const IonNode& node)

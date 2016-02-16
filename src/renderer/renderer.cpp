@@ -107,27 +107,15 @@ namespace Yttrium
 		draw_rectangle(rect, texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
 	}
 
-	void RendererImpl::draw_text(const PointF& position, const StaticString& text, unsigned alignment, TextCapture* capture)
+	void RendererImpl::draw_text(const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture)
 	{
 		if (!_font)
 			return;
 
-		float current_x = position.x();
-		float current_y = position.y();
+		float current_x = top_left.x();
+		float current_y = top_left.y();
 		char last_symbol = '\0';
-		float y_scaling = _font_size.height() / _font.size();
-		float x_scaling = y_scaling * _font_size.width();
-
-		if (alignment != BottomRightAlignment)
-		{
-			const auto& size = text_size(text);
-
-			if ((alignment & HorizontalAlignmentMask) != RightAlignment)
-				current_x -= size.width() * (alignment & LeftAlignment ? 1.0 : 0.5);
-
-			if ((alignment & VerticalAlignmentMask) != BottomAlignment)
-				current_y -= size.height() * (alignment & TopAlignment ? 1.0 : 0.5);
-		}
+		const float scaling = font_size / _font.size();
 
 		float selection_left = 0;
 		const auto do_capture = [&](unsigned index)
@@ -137,7 +125,7 @@ namespace Yttrium
 
 			if (capture->cursor_pos == index)
 			{
-				capture->cursor_rect = {{current_x, current_y}, SizeF(2, _font_size.height())};
+				capture->cursor_rect = {{current_x, current_y + font_size * 0.125f}, SizeF(2, font_size * 0.75f)};
 				capture->has_cursor = true;
 			}
 
@@ -149,7 +137,7 @@ namespace Yttrium
 				}
 				else if (index == capture->selection_end)
 				{
-					capture->selection_rect = {{selection_left, current_y}, PointF(current_x, current_y + _font_size.height())};
+					capture->selection_rect = {{selection_left, current_y}, PointF(current_x, current_y + font_size)};
 					capture->has_selection = true;
 				}
 			}
@@ -164,14 +152,14 @@ namespace Yttrium
 			if (info)
 			{
 				const RectF symbol_rect(
-					{current_x + x_scaling * info->offset.x(), current_y + y_scaling * info->offset.y()},
-					SizeF(info->rect.width() * x_scaling, info->rect.height() * y_scaling));
+					{current_x + info->offset.x() * scaling, current_y + info->offset.y() * scaling},
+					SizeF(info->rect.width() * scaling, info->rect.height() * scaling));
 
 				draw_rectangle(symbol_rect, current_texture_2d()->map(RectF(info->rect)), {});
 
 				do_capture(i);
 
-				current_x += x_scaling * (info->advance + _font.kerning(last_symbol, *current_symbol));
+				current_x += (info->advance + _font.kerning(last_symbol, *current_symbol)) * scaling;
 			}
 
 			last_symbol = *current_symbol;
@@ -210,11 +198,6 @@ namespace Yttrium
 		return true;
 	}
 
-	void RendererImpl::set_font_size(const SizeF& size)
-	{
-		_font_size = size;
-	}
-
 	bool RendererImpl::set_texture_borders(const Margins& borders)
 	{
 		const auto current_texture = current_texture_2d();
@@ -240,11 +223,6 @@ namespace Yttrium
 			return;
 		_texture_rect = current_texture->map(rect);
 		_texture_borders = {};
-	}
-
-	SizeF RendererImpl::text_size(const StaticString& text) const
-	{
-		return _font ? _font.text_size(text, _font_size) : SizeF();
 	}
 
 	const Texture2D* RendererImpl::debug_texture() const
