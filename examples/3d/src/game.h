@@ -20,7 +20,7 @@ public:
 	void run();
 
 private:
-	// WindowCallbacks
+	void on_cursor_movement(const Point& movement) override;
 	void on_key_event(const KeyEvent& event) override;
 	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
 	void on_update(const UpdateEvent& update) override;
@@ -32,9 +32,9 @@ private:
 	std::unique_ptr<ChessboardModel> _chessboard;
 
 	Vector4 _position = {0, -6, 12};
-	int _pitch = -60;
-	int _yaw = 0;
-	int _roll = 0;
+	float _pitch = -60;
+	float _yaw = 0;
+	float _roll = 0;
 };
 
 #endif

@@ -374,6 +374,7 @@ namespace Yttrium
 		if (_window == None)
 			return false;
 		::XWarpPointer(_display, None, _window, 0, 0, 0, 0, cursor.x(), cursor.y());
+		::XSync(_display, False);
 		return true;
 	}
 

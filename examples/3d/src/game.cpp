@@ -21,8 +21,24 @@ void Game::run()
 	_cube = std::make_unique<CubeModel>(_window->renderer());
 	_chessboard = std::make_unique<ChessboardModel>(_window->renderer());
 
+	_window->lock_cursor(true);
 	_window->show();
 	_window->run();
+}
+
+void Game::on_cursor_movement(const Point& movement)
+{
+	_yaw -= movement.x() / 4.f;
+	if (_yaw < -180)
+		do { _yaw += 360; } while (_yaw < -180);
+	else if (_yaw >= 180)
+		do { _yaw -= 360; } while (_yaw >= 180);
+
+	_pitch -= movement.y() / 4.f;
+	if (_pitch < -90)
+		_pitch = -90;
+	else if (_pitch > 90)
+		_pitch = 90;
 }
 
 void Game::on_key_event(const KeyEvent& event)
@@ -34,30 +50,6 @@ void Game::on_key_event(const KeyEvent& event)
 
 	switch (event.key)
 	{
-	case Key::Up:
-		if (_pitch < 90)
-			_pitch += rotation_step;
-		break;
-
-	case Key::Down:
-		if (_pitch > -90)
-			_pitch -= rotation_step;
-		break;
-
-	case Key::Left:
-		if (_yaw > -180)
-			_yaw -= rotation_step;
-		else
-			_yaw = 180 - rotation_step;
-		break;
-
-	case Key::Right:
-		if (_yaw < 180 - rotation_step)
-			_yaw += rotation_step;
-		else
-			_yaw = -180;
-		break;
-
 	case Key::Escape:
 		_window->close();
 		break;
