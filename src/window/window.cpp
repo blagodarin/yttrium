@@ -27,6 +27,10 @@ namespace Yttrium
 	{
 	}
 
+	void WindowCallbacks::on_render_cursor(Renderer&, const PointF&)
+	{
+	}
+
 	void WindowCallbacks::on_update(const UpdateEvent&)
 	{
 	}
@@ -128,7 +132,6 @@ namespace Yttrium
 	void WindowImpl::lock_cursor(bool lock)
 	{
 		_is_cursor_locked = lock;
-		_backend->show_cursor(!_is_cursor_locked);
 		if (_is_cursor_locked && _is_active)
 		{
 			_cursor = Rect(_size).center();
@@ -155,7 +158,9 @@ namespace Yttrium
 				_renderer->clear();
 				PushGpuProgram gpu_program(*_renderer, _renderer->program_2d());
 				Push2D projection(*_renderer);
-				_gui->render(PointF(_cursor));
+				const PointF cursor(_cursor);
+				_gui->render(cursor);
+				_callbacks.on_render_cursor(*_renderer, cursor);
 				draw_debug();
 			}
 			_backend->swap_buffers();

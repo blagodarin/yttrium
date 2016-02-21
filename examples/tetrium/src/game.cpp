@@ -175,6 +175,8 @@ void Game::run()
 	if (!_window)
 		return;
 
+	_cursor = make_pointer<Cursor>(_allocator, _window->renderer());
+
 	ScriptCode::load("tetrium.txt", &_script.allocator()).execute(_script);
 
 	_bindings.bind_default(Key::_1, "play_music");
@@ -297,6 +299,12 @@ void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticS
 		draw_field(renderer, rect);
 	else if (canvas_name == "next")
 		draw_next_figure(renderer, rect);
+}
+
+void Game::on_render_cursor(Renderer&, const PointF& point)
+{
+	if (!_game_running)
+		_cursor->draw(point);
 }
 
 void Game::on_update(const UpdateEvent& update)

@@ -10,6 +10,7 @@ namespace Yttrium
 {
 	class Gui;
 	class Point;
+	class PointF;
 	class RectF;
 	class Renderer;
 	class Screen;
@@ -65,6 +66,9 @@ namespace Yttrium
 
 		///
 		virtual void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name);
+
+		///
+		virtual void on_render_cursor(Renderer&, const PointF&);
 
 		///
 		virtual void on_update(const UpdateEvent& update);

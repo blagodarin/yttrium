@@ -31,7 +31,6 @@ namespace Yttrium
 		bool set_cursor(const Point& cursor);
 		void set_name(const StaticString& name);
 		void show();
-		void show_cursor(bool);
 		void swap_buffers();
 
 	private:

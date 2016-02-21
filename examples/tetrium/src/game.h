@@ -13,6 +13,7 @@
 #include <yttrium/texture_cache.h>
 #include <yttrium/window.h>
 
+#include "cursor.h"
 #include "tetrium.h"
 
 using namespace Yttrium;
@@ -31,7 +32,8 @@ private:
 	// WindowCallbacks
 	void on_key_event(const KeyEvent& event) override;
 	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
-	void on_update(const UpdateEvent& update) override;
+	void on_render_cursor(Renderer&, const PointF&) override;
+	void on_update(const UpdateEvent&) override;
 
 	void draw_field(Renderer& renderer, const RectF& rect);
 	void draw_field_blocks(Renderer& renderer, const RectF& rect, const SizeF& block_size);
@@ -51,6 +53,7 @@ private:
 	Pointer<AudioManager> _audio;
 	ProxyAllocator _window_allocator;
 	Pointer<Window> _window;
+	Pointer<Cursor> _cursor;
 	Pointer<TextureCache> _texture_cache;
 	Bindings         _bindings;
 

@@ -294,6 +294,11 @@ namespace Yttrium
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
+
+		// Hide system cursor.
+		::XDefineCursor(_display, _window, _empty_cursor->get());
+
+		// Show window in fullscreen mode.
 		::XChangeProperty(_display, _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 	}
 
@@ -417,16 +422,6 @@ namespace Yttrium
 		if (_window == None)
 			return;
 		::XMapRaised(_display, _window);
-	}
-
-	void WindowBackend::show_cursor(bool show)
-	{
-		if (_window == None)
-			return;
-		if (show)
-			::XUndefineCursor(_display, _window);
-		else
-			::XDefineCursor(_display, _window, _empty_cursor->get());
 	}
 
 	void WindowBackend::swap_buffers()
