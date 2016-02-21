@@ -128,7 +128,8 @@ namespace Yttrium
 	void WindowImpl::lock_cursor(bool lock)
 	{
 		_is_cursor_locked = lock;
-		if (lock && _is_active)
+		_backend->show_cursor(!_is_cursor_locked);
+		if (_is_cursor_locked && _is_active)
 		{
 			_cursor = Rect(_size).center();
 			_backend->set_cursor(_cursor);

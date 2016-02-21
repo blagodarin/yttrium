@@ -240,22 +240,56 @@ namespace Yttrium
 		}
 	}
 
+	class WindowBackend::EmptyCursor
+	{
+	public:
+		EmptyCursor(::Display* display, ::Window window)
+			: _display(display)
+		{
+			char data[1] = { 0 };
+			const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
+			if (None != pixmap) // TODO: Throw on failure.
+			{
+				::XColor color;
+				::memset(&color, 0, sizeof(color));
+				_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
+				::XFreePixmap(_display, pixmap);
+			}
+		}
+
+		~EmptyCursor()
+		{
+			if (_cursor != None)
+				::XFreeCursor(_display, _cursor);
+		}
+
+		::Cursor get() const
+		{
+			return _cursor;
+		}
+
+	private:
+		::Display* const _display;
+		::Cursor _cursor = None;
+	};
+
 	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, WindowBackendCallbacks& callbacks)
 	{
 		::Window window_handle;
 		::GLXContext glx_context;
 		if (!initialize_window(screen.display(), screen.screen(), window_handle, glx_context))
 			return {};
-		return make_pointer<WindowBackend>(allocator, screen.display(), window_handle, glx_context, callbacks);
+		return make_pointer<WindowBackend>(allocator, allocator, screen.display(), window_handle, glx_context, callbacks);
 	}
 
-	WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks& callbacks)
 		: _display(display)
 		, _window(window)
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
 		, _net_wm_state(::XInternAtom(_display, "_NET_WM_STATE", True))
 		, _net_wm_state_fullscreen(::XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", True))
+		, _empty_cursor(make_pointer<EmptyCursor>(allocator, _display, _window))
 		, _glx_context(glx_context)
 		, _callbacks(callbacks)
 	{
@@ -383,6 +417,16 @@ namespace Yttrium
 		if (_window == None)
 			return;
 		::XMapRaised(_display, _window);
+	}
+
+	void WindowBackend::show_cursor(bool show)
+	{
+		if (_window == None)
+			return;
+		if (show)
+			::XUndefineCursor(_display, _window);
+		else
+			::XDefineCursor(_display, _window, _empty_cursor->get());
 	}
 
 	void WindowBackend::swap_buffers()
