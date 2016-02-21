@@ -194,8 +194,6 @@ void Game::run()
 	_game.set_random_seed(Timer::clock());
 
 	_window->set_name("Tetrium");
-	_window->set_size({1024, 768});
-	_window->show();
 
 	if (!load_blocks())
 		return;
@@ -233,6 +231,8 @@ void Game::run()
 
 	if (_audio)
 		_audio->player().play();
+
+	_window->show();
 	_window->run();
 
 	Log() << "Saving settings";

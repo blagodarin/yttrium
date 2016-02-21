@@ -14,7 +14,6 @@ void Game::run()
 		return;
 
 	_window->set_name("Yttrium 3D example");
-	_window->set_size({1024, 768});
 
 	if (!_window->gui().load("examples/3d/data/gui.ion"))
 		return;

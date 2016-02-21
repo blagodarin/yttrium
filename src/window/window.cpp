@@ -43,7 +43,6 @@ namespace Yttrium
 		: _script_context(script_context)
 		, _callbacks(callbacks)
 		, _allocator(allocator)
-		, _size(640, 480)
 		, _console(_script_context, _allocator)
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
@@ -68,7 +67,7 @@ namespace Yttrium
 		if (!_screen)
 			return false;
 
-		_backend = WindowBackend::create(_allocator, *_screen, _size, *this);
+		_backend = WindowBackend::create(_allocator, *_screen, *this);
 		if (!_backend)
 			return false;
 
@@ -216,45 +215,9 @@ namespace Yttrium
 		_backend->set_name(name);
 	}
 
-	void WindowImpl::set_size(const Size& size)
+	void WindowImpl::show()
 	{
-		_size = size;
-		if (_is_active)
-			show(_fullscreen ? Fullscreen : Windowed);
-	}
-
-	void WindowImpl::show(Mode mode)
-	{
-		_fullscreen = mode == Fullscreen;
-		if (_fullscreen)
-		{
-			// TODO: Set display mode here.
-		}
-		else
-		{
-			// TODO: Restore display mode here.
-		}
-
-		const Rect screen_rect(_screen->current_mode().resolution);
-		const auto& window_rect = _fullscreen ? screen_rect : Rect(_size).centered_at(screen_rect).intersected(screen_rect);
-
-		_size = window_rect.size();
-
-		_backend->put(window_rect, !_fullscreen);
-		_renderer->set_window_size(_size);
 		_backend->show();
-
-		if (!_is_cursor_locked)
-		{
-			auto cursor = Rect(_size).center();
-			_backend->get_cursor(cursor);
-			_cursor = Rect(_size).bound(cursor);
-		}
-		else
-		{
-			lock_cursor(true);
-		}
-
 		set_active(true);
 	}
 
@@ -308,6 +271,22 @@ namespace Yttrium
 			return;
 
 		_callbacks.on_key_event(event);
+	}
+
+	void WindowImpl::on_resize_event(const Size& size)
+	{
+		_size = size;
+		_renderer->set_window_size(_size);
+		if (!_is_cursor_locked)
+		{
+			auto cursor = Rect(_size).center();
+			_backend->get_cursor(cursor);
+			_cursor = Rect(_size).bound(cursor);
+		}
+		else
+		{
+			lock_cursor(true);
+		}
 	}
 
 	void WindowImpl::draw_debug()
@@ -372,7 +351,6 @@ namespace Yttrium
 	void WindowImpl::set_active(bool active)
 	{
 		_is_active = active;
-		if (active)
-			lock_cursor(_is_cursor_locked);
+		lock_cursor(_is_cursor_locked);
 	}
 }

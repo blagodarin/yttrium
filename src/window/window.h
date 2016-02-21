@@ -43,8 +43,7 @@ namespace Yttrium
 		bool set_cursor(const Point& cursor) override;
 		void set_debug_text_visible(bool visible) override;
 		void set_name(const StaticString& name) override;
-		void set_size(const Size& size) override;
-		void show(Mode mode) override;
+		void show() override;
 		Size size() const override;
 		void take_screenshot(const StaticString& name) override;
 
@@ -53,6 +52,7 @@ namespace Yttrium
 		// WindowBackendCallbacks
 		void on_focus_event(bool is_focused) override;
 		void on_key_event(Key key, bool is_pressed) override;
+		void on_resize_event(const Size& size) override;
 
 		void draw_debug();
 		bool process_events();

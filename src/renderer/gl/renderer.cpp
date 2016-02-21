@@ -264,22 +264,24 @@ namespace Yttrium
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			std::cerr << "[error] ";
+			std::cerr << "[OPENGL] [error] "_s;
 			break;
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			std::cerr << "[deprecated] ";
+			std::cerr << "[OPENGL] [deprecated] "_s;
 			break;
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			std::cerr << "[undefined behavior] ";
+			std::cerr << "[OPENGL] [undefined behavior] "_s;
 			break;
 		case GL_DEBUG_TYPE_PORTABILITY:
-			std::cerr << "[portability warning] ";
+			std::cerr << "[OPENGL] [portability warning] "_s;
 			break;
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			std::cerr << "[performance warning] ";
+			std::cerr << "[OPENGL] [performance warning] "_s;
 			break;
 		default:
+			std::cerr << "[OPENGL] "_s;
 			stop = false;
+			break;
 		}
 		std::cerr << message << std::endl;
 		if (stop)

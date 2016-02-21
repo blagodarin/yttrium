@@ -9,22 +9,12 @@
 
 #include <cstring>
 
+#include <X11/Xatom.h>
+
 namespace Yttrium
 {
 	namespace
 	{
-		void fix_window_size(::Display* display, ::Window window, const Size& size)
-		{
-			::XSizeHints size_hints;
-			::memset(&size_hints, 0, sizeof size_hints);
-			size_hints.min_width = size.width();
-			size_hints.min_height = size.height();
-			size_hints.max_width = size.width();
-			size_hints.max_height = size.height();
-			size_hints.flags = PMinSize | PMaxSize;
-			::XSetWMNormalHints(display, window, &size_hints);
-		}
-
 		// X error handling (see below).
 		bool error_occurred = false;
 		int error_handler(::Display*, ::XErrorEvent*)
@@ -33,7 +23,7 @@ namespace Yttrium
 			return 0;
 		}
 
-		bool initialize_window(::Display* display, int screen, const Size& size, ::Window& window, ::GLXContext& glx_context)
+		bool initialize_window(::Display* display, int screen, ::Window& window, ::GLXContext& glx_context)
 		{
 			// GLXFBConfig API requires GLX 1.3.
 			// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
@@ -137,10 +127,10 @@ namespace Yttrium
 				swa.colormap = ::XCreateColormap(display, root_window, best_vi->visual, AllocNone);
 				swa.background_pixmap = None;
 				swa.border_pixel = 0;
-				swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask;
+				swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
 
 				window = ::XCreateWindow(display, root_window,
-					0, 0, size.width(), size.height(), 0, best_vi->depth, InputOutput, best_vi->visual,
+					0, 0, 1, 1, 0, best_vi->depth, InputOutput, best_vi->visual,
 					CWBorderPixel | CWColormap | CWEventMask, &swa);
 
 				if (window != None)
@@ -250,25 +240,27 @@ namespace Yttrium
 		}
 	}
 
-	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, const Size& size, WindowBackendCallbacks& callbacks)
+	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, WindowBackendCallbacks& callbacks)
 	{
 		::Window window_handle;
 		::GLXContext glx_context;
-		if (!initialize_window(screen.display(), screen.screen(), size, window_handle, glx_context))
+		if (!initialize_window(screen.display(), screen.screen(), window_handle, glx_context))
 			return {};
-		return make_pointer<WindowBackend>(allocator, screen.display(), window_handle, glx_context, size, callbacks);
+		return make_pointer<WindowBackend>(allocator, screen.display(), window_handle, glx_context, callbacks);
 	}
 
-	WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, const Size& size, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(::Display* display, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks& callbacks)
 		: _display(display)
 		, _window(window)
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
+		, _net_wm_state(::XInternAtom(_display, "_NET_WM_STATE", True))
+		, _net_wm_state_fullscreen(::XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", True))
 		, _glx_context(glx_context)
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
-		fix_window_size(_display, _window, size);
+		::XChangeProperty(_display, _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 	}
 
 	WindowBackend::~WindowBackend()
@@ -279,12 +271,11 @@ namespace Yttrium
 
 	void WindowBackend::close()
 	{
-		if (_window != None)
-		{
-			::glXMakeCurrent(_display, None, nullptr);
-			::XDestroyWindow(_display, _window);
-			_window = None;
-		}
+		if (_window == None)
+			return;
+		::glXMakeCurrent(_display, None, nullptr);
+		::XDestroyWindow(_display, _window);
+		_window = None;
 	}
 
 	bool WindowBackend::get_cursor(Point& cursor)
@@ -308,121 +299,66 @@ namespace Yttrium
 		return true;
 	}
 
-	bool WindowBackend::get_frame_sync(bool& frame_sync)
-	{
-		Y_UNUSED(frame_sync);
-		return false;
-	}
-
-	bool WindowBackend::put(const Rect& rect, bool border)
-	{
-		if (_window == None)
-			return false;
-
-		::XSetWindowAttributes attributes;
-		attributes.override_redirect = border ? False : True;
-
-		::XChangeWindowAttributes(_display, _window, CWOverrideRedirect, &attributes);
-		::XMoveResizeWindow(_display, _window, rect.left(), rect.top(), rect.width(), rect.height());
-
-		fix_window_size(_display, _window, rect.size());
-
-		return true;
-	}
-
 	bool WindowBackend::process_events()
 	{
 		if (_window == None)
 			return false;
-
-		while (::XPending(_display))
+		while (!_has_size ||::XPending(_display) > 0)
 		{
 			::XEvent event;
-
-			::XNextEvent(_display, &event);
-			if (event.type == ClientMessage)
+			::XNextEvent(_display, &event); // TODO: Don't process events for all windows.
+			switch (event.type)
 			{
-				if (event.xclient.message_type == _wm_protocols && ::Atom(event.xclient.data.l[0]) == _wm_delete_window)
+			case KeyPress:
+			case KeyRelease:
+				_callbacks.on_key_event(key_from_event(event), event.type == KeyPress);
+				break;
+
+			case ButtonPress:
+			case ButtonRelease:
+				switch (event.xbutton.button)
+				{
+				case Button1:
+					_callbacks.on_key_event(Key::Mouse1, event.type == ButtonPress);
+					break;
+
+				case Button2:
+					_callbacks.on_key_event(Key::Mouse2, event.type == ButtonPress);
+					break;
+
+				case Button3:
+					_callbacks.on_key_event(Key::Mouse3, event.type == ButtonPress);
+					break;
+
+				case Button4:
+					_callbacks.on_key_event(Key::Mouse4, event.type == ButtonPress);
+					break;
+
+				case Button5:
+					_callbacks.on_key_event(Key::Mouse5, event.type == ButtonPress);
+					break;
+				}
+				break;
+
+			case FocusIn:
+			case FocusOut:
+				_callbacks.on_focus_event(event.type == FocusIn);
+				break;
+
+			case ConfigureNotify:
+				_has_size = true;
+				_callbacks.on_resize_event({event.xconfigure.width, event.xconfigure.height});
+				break;
+
+			case ClientMessage:
+				if (event.xclient.message_type == _wm_protocols && event.xclient.data.l[0] == static_cast<long>(_wm_delete_window))
 				{
 					close();
 					return false;
 				}
-			}
-			else
-			{
-				switch (event.type)
-				{
-				case KeyPress:
-
-					_callbacks.on_key_event(key_from_event(event), true);
-					break;
-
-				case KeyRelease:
-
-					_callbacks.on_key_event(key_from_event(event), false);
-					break;
-
-				case ButtonPress:
-
-					if (event.xbutton.button == Button1)
-					{
-						_callbacks.on_key_event(Key::Mouse1, true);
-					}
-					else if (event.xbutton.button == Button2)
-					{
-						_callbacks.on_key_event(Key::Mouse2, true);
-					}
-					else if (event.xbutton.button == Button3)
-					{
-						_callbacks.on_key_event(Key::Mouse3, true);
-					}
-					else if (event.xbutton.button == Button4)
-					{
-						_callbacks.on_key_event(Key::Mouse4, true);
-					}
-					else if (event.xbutton.button == Button5)
-					{
-						_callbacks.on_key_event(Key::Mouse5, true);
-					}
-					break;
-
-				case ButtonRelease:
-
-					if (event.xbutton.button == Button1)
-					{
-						_callbacks.on_key_event(Key::Mouse1, false);
-					}
-					else if (event.xbutton.button == Button2)
-					{
-						_callbacks.on_key_event(Key::Mouse2, false);
-					}
-					else if (event.xbutton.button == Button3)
-					{
-						_callbacks.on_key_event(Key::Mouse3, false);
-					}
-					else if (event.xbutton.button == Button4)
-					{
-						_callbacks.on_key_event(Key::Mouse4, false);
-					}
-					else if (event.xbutton.button == Button5)
-					{
-						_callbacks.on_key_event(Key::Mouse5, false);
-					}
-					break;
-
-				case FocusIn:
-
-					_callbacks.on_focus_event(true);
-					break;
-
-				case FocusOut:
-
-					_callbacks.on_focus_event(false);
-					break;
-				}
+				break;
 			}
 		}
-
 		return true;
 	}
 
@@ -439,12 +375,6 @@ namespace Yttrium
 			return false;
 		::XWarpPointer(_display, None, _window, 0, 0, 0, 0, cursor.x(), cursor.y());
 		return true;
-	}
-
-	bool WindowBackend::set_frame_sync(bool frame_sync)
-	{
-		Y_UNUSED(frame_sync);
-		return false;
 	}
 
 	void WindowBackend::show()

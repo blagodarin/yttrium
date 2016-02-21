@@ -75,13 +75,6 @@ namespace Yttrium
 	{
 	public:
 
-		///
-		enum Mode
-		{
-			Windowed,   ///<
-			Fullscreen, ///<
-		};
-
 		/// Creates a Window.
 		/// \param script_context ScriptContext for console and GUI.
 		/// \param callbacks
@@ -140,10 +133,7 @@ namespace Yttrium
 		virtual void set_name(const StaticString& name) = 0;
 
 		///
-		virtual void set_size(const Size& size) = 0;
-
-		///
-		virtual void show(Mode mode = Windowed) = 0;
+		virtual void show() = 0;
 
 		///
 		virtual Size size() const = 0;
