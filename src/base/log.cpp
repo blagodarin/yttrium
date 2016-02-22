@@ -34,7 +34,6 @@ namespace Yttrium
 		{
 			_std_err.write(string.text(), string.size());
 			_file.write(string.text(), string.size());
-			_file.flush();
 		}
 
 	private:
