@@ -1,5 +1,5 @@
 #include <yttrium/memory/proxy_allocator.h>
-#include <yttrium/static_string.h>
+#include "base/log.h"
 #include "memory/buffer_memory.h"
 #include "memory/buffer_memory_tracker.h"
 #include "memory/heap_allocator.h"
@@ -18,4 +18,11 @@ namespace Yttrium
 	}
 
 	Allocator* const DefaultAllocator = &_default_allocator;
+
+	namespace
+	{
+		ProxyAllocator _log_allocator("log"_s, _default_allocator);
+	}
+
+	LogManager _log_manager(_log_allocator);
 }

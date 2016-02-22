@@ -1,6 +1,5 @@
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
-#include <yttrium/log_manager.h>
 #include <yttrium/pointer.h>
 #include <yttrium/script/context.h>
 #include <yttrium/string.h>
@@ -12,7 +11,6 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_gui)
 {
-	const auto& log_manager = LogManager::create("test.gui.log");
 	ScriptContext script_context;
 	WindowCallbacks window_callbacks;
 	const auto& window = Window::create(script_context, window_callbacks);

@@ -20,7 +20,6 @@
 		- Location information support.
 	* Memory:
 		- Keep a global track of all ProxyAllocators for realtime memory activity tracking.
-		- Don't use ProxyAllocators inside the library except for the default allocator.
 	* Renderer:
 		- Pre-rendered text (i.e. pre-built geometry).
 		- OpenGL 3.3 compliance.

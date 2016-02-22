@@ -1,13 +1,11 @@
 #include "game.h"
 
 #include <yttrium/i18n/localization.h>
-#include <yttrium/log_manager.h>
-#include <yttrium/static_string.h>
+#include <yttrium/log.h>
 
 int main(int, char**)
 {
-	ProxyAllocator log_allocator("log"_s);
-	const auto& log_manager = LogManager::create("tetrium.log", log_allocator);
+	Log::set_file("tetrium.log");
 
 	ProxyAllocator i18n_allocator("i18n"_s);
 	const auto& localization = Localization::create("examples/tetrium/i18n/en.ion", i18n_allocator);
