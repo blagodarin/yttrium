@@ -32,9 +32,9 @@ namespace Yttrium
 
 	Matrix4 Matrix4::camera(const Vector4& position, float pitch, float yaw, float roll)
 	{
-		return Matrix4::rotation(roll, Vector4(0, -1, 0))
-			* Matrix4::rotation(pitch, Vector4(-1, 0, 0))
-			* Matrix4::rotation(yaw, Vector4(0, 0, 1))
+		return Matrix4::rotation(roll, {0, -1, 0})
+			* Matrix4::rotation(pitch, {-1, 0, 0})
+			* Matrix4::rotation(yaw, {0, 0, 1})
 			* Matrix4::translation(-position);
 	}
 
@@ -122,5 +122,16 @@ namespace Yttrium
 			a(3,0) * b(0,2) + a(3,1) * b(1,2) + a(3,2) * b(2,2) + a(3,3) * b(3,2),
 			a(3,0) * b(0,3) + a(3,1) * b(1,3) + a(3,2) * b(2,3) + a(3,3) * b(3,3)
 		);
+	}
+
+	Vector4 operator*(const Matrix4& a, const Vector4& b)
+	{
+		return
+		{
+			a(0,0) * b.x + a(0,1) * b.y + a(0,2) * b.z + a(0,3) * b.w,
+			a(1,0) * b.x + a(1,1) * b.y + a(1,2) * b.z + a(1,3) * b.w,
+			a(2,0) * b.x + a(2,1) * b.y + a(2,2) * b.z + a(2,3) * b.w,
+			a(3,0) * b.x + a(3,1) * b.y + a(3,2) * b.z + a(3,3) * b.w,
+		};
 	}
 }

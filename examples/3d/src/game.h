@@ -31,10 +31,14 @@ private:
 	std::unique_ptr<CubeModel> _cube;
 	std::unique_ptr<ChessboardModel> _chessboard;
 
-	Vector4 _position = {0, -6, 12};
-	float _pitch = -60;
-	float _yaw = 0;
-	float _roll = 0;
+	Vector4 _position = {-16, -16, 16};
+	float _pitch = -30;
+	float _yaw = 45;
+
+	bool _move_forward = false;
+	bool _move_backward = false;
+	bool _move_left = false;
+	bool _move_right = false;
 };
 
 #endif

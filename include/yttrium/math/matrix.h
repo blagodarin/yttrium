@@ -53,6 +53,7 @@ namespace Yttrium
 	};
 
 	Y_API Matrix4 operator*(const Matrix4&, const Matrix4&);
+	Y_API Vector4 operator*(const Matrix4&, const Vector4&);
 }
 
 #endif

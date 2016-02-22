@@ -7,6 +7,8 @@
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
 
+#include <cmath>
+
 void Game::run()
 {
 	_window = Window::create(_script, *this);
@@ -43,77 +45,54 @@ void Game::on_cursor_movement(const Point& movement)
 
 void Game::on_key_event(const KeyEvent& event)
 {
-	static const int rotation_step = 1;
-
-	if (!event.pressed)
-		return;
-
 	switch (event.key)
 	{
 	case Key::Escape:
-		_window->close();
+		if (event.pressed)
+			_window->close();
 		break;
 
 	case Key::A:
-		_position.x -= .1;
+		_move_left = event.pressed;
 		break;
 
 	case Key::D:
-		_position.x += .1;
-		break;
-
-	case Key::E:
-		if (_roll < 180 - rotation_step)
-			_roll += rotation_step;
-		else
-			_roll = -180;
-		break;
-
-	case Key::F:
-		_position.z -= .1;
-		break;
-
-	case Key::Q:
-		if (_roll > -180)
-			_roll -= rotation_step;
-		else
-			_roll = 180 - rotation_step;
-		break;
-
-	case Key::R:
-		_position.z += .1;
+		_move_right = event.pressed;
 		break;
 
 	case Key::S:
-		_position.y -= .1;
+		_move_backward = event.pressed;
 		break;
 
 	case Key::W:
-		_position.y += .1;
+		_move_forward = event.pressed;
 		break;
 
 	case Key::Grave:
-		_window->set_console_visible(!_window->is_console_visible());
+		if (event.pressed)
+			_window->set_console_visible(!_window->is_console_visible());
 		break;
 
 	case Key::F1:
-		_window->set_debug_text_visible(!_window->is_debug_text_visible());
+		if (event.pressed)
+			_window->set_debug_text_visible(!_window->is_debug_text_visible());
 		break;
 
 	case Key::F10: // KDE grabs Key::Print. =(
-		_window->take_screenshot(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+		if (event.pressed)
+			_window->take_screenshot(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 		break;
 
-	default:
+	default: // To avoid compiler warnings.
 		break;
 	}
 }
 
 void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString&)
 {
-	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 60, 1, 100));
+	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256));
 
-	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, _roll));
+	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, 0));
 
 	// Center.
 	_cube->draw({0, 0, 0});
@@ -135,6 +114,40 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 
 void Game::on_update(const UpdateEvent& update)
 {
+	if (_move_forward != _move_backward || _move_left != _move_right)
+	{
+		constexpr auto speed = 8.f; // Units per second.
+		const auto distance = update.milliseconds * speed / 1000.f;
+		const auto offset = (_move_forward || _move_backward) && (_move_left || _move_right) ? distance * M_SQRT1_2 : distance;
+
+		Vector4 movement(0, 0, 0);
+		if (_move_forward)
+			movement.y += offset;
+		else if (_move_backward)
+			movement.y -= offset;
+		if (_move_left)
+			movement.x -= offset;
+		else if (_move_right)
+			movement.x += offset;
+
+		_position += Matrix4::rotation(_yaw, {0, 0, -1}) * Matrix4::rotation(_pitch, {1, 0, 0}) * movement;
+
+		if (_position.x < -64)
+			_position.x = -64;
+		else if (_position.x > 64)
+			_position.x = 64;
+
+		if (_position.y < -64)
+			_position.y = -64;
+		else if (_position.y > 64)
+			_position.y = 64;
+
+		if (_position.z < 1)
+			_position.z = 1;
+		else if (_position.z > 64)
+			_position.z = 64;
+	}
+
 	_window->debug_text().clear()
 		<< "FPS: " << update.fps << "\n"
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
@@ -143,6 +156,6 @@ void Game::on_update(const UpdateEvent& update)
 		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
 		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
-		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << ", Roll: " << _roll << "\n"
+		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << "\n"
 		;
 }
