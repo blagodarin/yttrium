@@ -8,6 +8,7 @@
 
 namespace Yttrium
 {
+	class Euler;
 	class Size;
 	class Vector4;
 
@@ -26,6 +27,9 @@ namespace Yttrium
 			float m20, float m21, float m22, float m23,
 			float m30, float m31, float m32, float m33);
 
+		/// Constructs a rotation matrix from Euler angles.
+		explicit Matrix4(const Euler&);
+
 		///
 		const float* data() const { return _data[0]; }
 
@@ -33,7 +37,7 @@ namespace Yttrium
 		float operator()(int row, int column) const { return _data[column][row]; }
 
 		///
-		static Matrix4 camera(const Vector4& position, float pitch, float yaw, float roll);
+		static Matrix4 camera(const Vector4& position, const Euler& rotation);
 
 		///
 		static Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f);

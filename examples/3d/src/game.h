@@ -2,6 +2,7 @@
 #define _examples_3d_game_h_
 
 #include <yttrium/index_buffer.h>
+#include <yttrium/math/euler.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/script/context.h>
 #include <yttrium/texture_cache.h>
@@ -32,8 +33,7 @@ private:
 	std::unique_ptr<ChessboardModel> _chessboard;
 
 	Vector4 _position = {-16, -16, 16};
-	float _pitch = -30;
-	float _yaw = 45;
+	Euler _rotation = {45, -30, 0};
 
 	bool _move_forward = false;
 	bool _move_backward = false;

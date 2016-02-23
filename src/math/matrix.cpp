@@ -1,5 +1,6 @@
 #include <yttrium/math/matrix.h>
 
+#include <yttrium/math/euler.h>
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
 
@@ -30,11 +31,18 @@ namespace Yttrium
 	{
 	}
 
-	Matrix4 Matrix4::camera(const Vector4& position, float pitch, float yaw, float roll)
+	Matrix4::Matrix4(const Euler& rotation)
 	{
-		return Matrix4::rotation(roll, {0, -1, 0})
-			* Matrix4::rotation(pitch, {-1, 0, 0})
-			* Matrix4::rotation(yaw, {0, 0, 1})
+		*this = Matrix4::rotation(rotation.yaw, {0, 0, -1})
+			* Matrix4::rotation(rotation.pitch, {1, 0, 0})
+			* Matrix4::rotation(rotation.roll, {0, 1, 0});
+	}
+
+	Matrix4 Matrix4::camera(const Vector4& position, const Euler& rotation)
+	{
+		return Matrix4::rotation(rotation.roll, {0, -1, 0})
+			* Matrix4::rotation(rotation.pitch, {-1, 0, 0})
+			* Matrix4::rotation(rotation.yaw, {0, 0, 1})
 			* Matrix4::translation(-position);
 	}
 

@@ -30,17 +30,8 @@ void Game::run()
 
 void Game::on_cursor_movement(const Point& movement)
 {
-	_yaw -= movement.x() / 4.f;
-	if (_yaw < -180)
-		do { _yaw += 360; } while (_yaw < -180);
-	else if (_yaw >= 180)
-		do { _yaw -= 360; } while (_yaw >= 180);
-
-	_pitch -= movement.y() / 4.f;
-	if (_pitch < -90)
-		_pitch = -90;
-	else if (_pitch > 90)
-		_pitch = 90;
+	_rotation.yaw = wrap(_rotation.yaw - movement.x() / 4.f, -180, 180);
+	_rotation.pitch = clamp(_rotation.pitch - movement.y() / 4.f, -90, 90);
 }
 
 void Game::on_key_event(const KeyEvent& event)
@@ -92,7 +83,7 @@ void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString
 {
 	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256));
 
-	PushTransformation camera(renderer, Matrix4::camera(_position, _pitch, _yaw, 0));
+	PushTransformation camera(renderer, Matrix4::camera(_position, _rotation));
 
 	// Center.
 	_cube->draw({0, 0, 0});
@@ -130,22 +121,11 @@ void Game::on_update(const UpdateEvent& update)
 		else if (_move_right)
 			movement.x += offset;
 
-		_position += Matrix4::rotation(_yaw, {0, 0, -1}) * Matrix4::rotation(_pitch, {1, 0, 0}) * movement;
+		_position += Matrix4(_rotation) * movement;
 
-		if (_position.x < -64)
-			_position.x = -64;
-		else if (_position.x > 64)
-			_position.x = 64;
-
-		if (_position.y < -64)
-			_position.y = -64;
-		else if (_position.y > 64)
-			_position.y = 64;
-
-		if (_position.z < 1)
-			_position.z = 1;
-		else if (_position.z > 64)
-			_position.z = 64;
+		_position.x = clamp(_position.x, -64, 64);
+		_position.y = clamp(_position.y, -64, 64);
+		_position.z = clamp(_position.z, 1, 64);
 	}
 
 	_window->debug_text().clear()
@@ -156,6 +136,6 @@ void Game::on_update(const UpdateEvent& update)
 		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
 		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
-		<< "Pitch: " << _pitch << ", Yaw: " << _yaw << "\n"
+		<< "Pitch: " << _rotation.pitch << ", Yaw: " << _rotation.yaw << "\n"
 		;
 }
