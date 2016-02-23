@@ -21,10 +21,8 @@ namespace Yttrium
 	{
 	public:
 
-		WindowImpl(ScriptContext&, WindowCallbacks&, Allocator& allocator);
+		WindowImpl(ScriptContext&, WindowCallbacks&, Allocator&);
 		~WindowImpl() override;
-
-		bool initialize();
 
 		// Window
 		void close() override;

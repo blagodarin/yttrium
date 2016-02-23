@@ -2,6 +2,8 @@
 
 #include <yttrium/pointer.h>
 
+#include <stdexcept>
+
 #include <X11/extensions/Xrandr.h>
 
 namespace Yttrium
@@ -12,12 +14,12 @@ namespace Yttrium
 	{
 		P_Display display(::XOpenDisplay(nullptr));
 		if (!display)
-			return {};
+			throw std::runtime_error("Failed to open the default X11 display");
 
 		int event_base = 0;
 		int error_base = 0;
 		if (!::XRRQueryExtension(display.get(), &event_base, &error_base))
-			return {};
+			throw std::runtime_error("XRandR is unavailable");
 
 		return make_pointer<ScreenImpl>(allocator, std::move(display));
 	}

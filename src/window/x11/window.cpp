@@ -1,11 +1,9 @@
 #include "window.h"
 
-#include <yttrium/math/rect.h>
-#include <yttrium/pointer.h>
+#include <yttrium/math/point.h>
+#include <yttrium/math/size.h>
 #include <yttrium/static_string.h>
-#include "../../renderer/gl/version.h"
-#include "../gl.h"
-#include "screen.h"
+#include "../backend.h"
 
 #include <cstring>
 
@@ -15,139 +13,6 @@ namespace Yttrium
 {
 	namespace
 	{
-		// X error handling (see below).
-		bool error_occurred = false;
-		int error_handler(::Display*, ::XErrorEvent*)
-		{
-			error_occurred = true;
-			return 0;
-		}
-
-		bool initialize_window(::Display* display, int screen, ::Window& window, ::GLXContext& glx_context)
-		{
-			// GLXFBConfig API requires GLX 1.3.
-			// glXGetProcAddress, GLX_SAMPLE_BUFFERS and GLX_SAMPLES require GLX 1.4.
-			int glx_version_major = 0;
-			int glx_version_minor = 0;
-			if (!::glXQueryVersion(display, &glx_version_major, &glx_version_minor)
-				|| glx_version_major != 1 // GLX 2.0 may be completely different from GLX 1.x.
-				|| glx_version_minor < 4)
-				return false;
-
-			const int attributes[] =
-			{
-				GLX_CONFIG_CAVEAT, GLX_NONE,
-				GLX_X_RENDERABLE,  True,
-				GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, // Default.
-				GLX_RENDER_TYPE,   GLX_RGBA_BIT,   // Default.
-				GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
-				GLX_RED_SIZE,      8,
-				GLX_GREEN_SIZE,    8,
-				GLX_BLUE_SIZE,     8,
-				GLX_ALPHA_SIZE,    8,
-				GLX_DEPTH_SIZE,    24,
-				GLX_STENCIL_SIZE,  8,
-				GLX_DOUBLEBUFFER,  True,
-				None
-			};
-
-			Y_UNIQUE_PTR(::XVisualInfo, ::XFree) best_vi;
-			::GLXFBConfig best_fbc = {};
-			{
-				int fbc_count = 0;
-				const Y_UNIQUE_PTR(::GLXFBConfig[], ::XFree) fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
-				if (!fbcs)
-					return false;
-
-				for (int i = 0; i < fbc_count; ++i)
-				{
-					// The official OpenGL example suggest sorting by GLX_SAMPLE_BUFFERS
-					// and GLX_SAMPLES, but we have no successful experience in using it.
-					Y_UNIQUE_PTR(::XVisualInfo, ::XFree) vi(::glXGetVisualFromFBConfig(display, fbcs[i]));
-					if (vi->depth == 24) // A depth of 32 will give us an ugly result.
-					{
-						best_vi = std::move(vi);
-						best_fbc = fbcs[i];
-						break;
-					}
-				}
-
-				if (!best_vi)
-					return false;
-			}
-
-			const auto check_extension = [](const char* list, const char* name)
-			{
-				const size_t name_size = ::strlen(name);
-				while ((list = ::strstr(list, name)))
-				{
-					list += name_size;
-					if (*list == ' ' || *list == 0)
-						return true;
-				}
-				return false;
-			};
-
-			const auto glx_extensions = ::glXQueryExtensionsString(display, screen);
-			if (!check_extension(glx_extensions, "GLX_ARB_create_context"))
-				return false;
-
-			using glXCreateContextAttribsARB_t = ::GLXContext (*)(::Display*, ::GLXFBConfig, ::GLXContext, Bool, const int*);
-			const auto glXCreateContextAttribsARB = reinterpret_cast<glXCreateContextAttribsARB_t>(::glXGetProcAddress(reinterpret_cast<const GLubyte*>("glXCreateContextAttribsARB")));
-			if (!glXCreateContextAttribsARB)
-				return false;
-
-			const int context_attributes[] =
-			{
-				GLX_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
-				GLX_CONTEXT_MINOR_VERSION_ARB, Gl::required_minor,
-		#if Y_IS_DEBUG
-				GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-		#endif
-				None
-			};
-
-			// The actual context creation is wrapped in error handling code as advised
-			// by the official OpenGL context creation tutorial. The tutorial also warns
-			// that X error handling is global and not thread-safe.
-			error_occurred = false;
-			const auto old_error_handler = ::XSetErrorHandler(error_handler);
-			glx_context = glXCreateContextAttribsARB(display, best_fbc, nullptr, True, context_attributes);
-			::XSync(display, False); // To ensure any errors generated are processed.
-			::XSetErrorHandler(old_error_handler);
-			if (error_occurred || !glx_context)
-				return false;
-
-			if (::glXIsDirect(display, glx_context))
-			{
-				::Window root_window = RootWindow(display, screen);
-
-				::XSetWindowAttributes swa;
-
-				swa.colormap = ::XCreateColormap(display, root_window, best_vi->visual, AllocNone);
-				swa.background_pixmap = None;
-				swa.border_pixel = 0;
-				swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
-
-				window = ::XCreateWindow(display, root_window,
-					0, 0, 1, 1, 0, best_vi->depth, InputOutput, best_vi->visual,
-					CWBorderPixel | CWColormap | CWEventMask, &swa);
-
-				if (window != None)
-				{
-					::glXMakeCurrent(display, window, glx_context);
-					return true;
-				}
-
-				::XFreeColormap(display, swa.colormap);
-			}
-
-			::glXDestroyContext(display, glx_context);
-			glx_context = nullptr;
-
-			return false;
-		}
-
 		Key key_from_event(::XEvent& event)
 		{
 			::KeySym key_sym = ::XLookupKeysym(&event.xkey, 0);
@@ -248,19 +113,19 @@ namespace Yttrium
 		{
 			char data[1] = { 0 };
 			const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
-			if (None != pixmap) // TODO: Throw on failure.
-			{
-				::XColor color;
-				::memset(&color, 0, sizeof(color));
-				_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
-				::XFreePixmap(_display, pixmap);
-			}
+			if (pixmap == None)
+				throw std::runtime_error("Failed to create a pixmap for an empty cursor");
+			::XColor color;
+			::memset(&color, 0, sizeof(color));
+			_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
+			::XFreePixmap(_display, pixmap);
+			if (_cursor == None)
+				throw std::runtime_error("Failed to create an empty cursor");
 		}
 
 		~EmptyCursor()
 		{
-			if (_cursor != None)
-				::XFreeCursor(_display, _cursor);
+			::XFreeCursor(_display, _cursor);
 		}
 
 		::Cursor get() const
@@ -273,25 +138,41 @@ namespace Yttrium
 		::Cursor _cursor = None;
 	};
 
-	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, const ScreenImpl& screen, WindowBackendCallbacks& callbacks)
+	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, ::Display* display, int screen, WindowBackendCallbacks& callbacks)
 	{
-		::Window window_handle;
-		::GLXContext glx_context;
-		if (!initialize_window(screen.display(), screen.screen(), window_handle, glx_context))
-			return {};
-		return make_pointer<WindowBackend>(allocator, allocator, screen.display(), screen.screen(), window_handle, glx_context, callbacks);
+		GlContext glx(display, screen);
+
+		const auto root_window = RootWindow(display, screen);
+
+		::XSetWindowAttributes swa;
+		swa.colormap = ::XCreateColormap(display, root_window, glx.visual_info()->visual, AllocNone);
+		swa.background_pixmap = None;
+		swa.border_pixel = 0;
+		swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
+
+		const auto window = ::XCreateWindow(display, root_window,
+			0, 0, 1, 1, 0, glx.visual_info()->depth, InputOutput, glx.visual_info()->visual,
+			CWBorderPixel | CWColormap | CWEventMask, &swa);
+
+		if (window == None)
+		{
+			::XFreeColormap(display, swa.colormap);
+			throw std::runtime_error("Failed to create an X11 window");
+		}
+
+		glx.bind(window);
+		return make_pointer<WindowBackend>(allocator, allocator, display, std::move(glx), window, callbacks);
 	}
 
-	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, int screen, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, GlContext&& glx, ::Window window, WindowBackendCallbacks& callbacks)
 		: _display(display)
+		, _glx(std::move(glx))
 		, _window(window)
+		, _empty_cursor(make_pointer<EmptyCursor>(allocator, _display, _window))
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
 		, _net_wm_state(::XInternAtom(_display, "_NET_WM_STATE", True))
 		, _net_wm_state_fullscreen(::XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", True))
-		, _empty_cursor(make_pointer<EmptyCursor>(allocator, _display, _window))
-		, _glx_context(glx_context)
-		, _glx(display, screen)
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
@@ -303,21 +184,20 @@ namespace Yttrium
 		::XChangeProperty(_display, _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 
 		// Force vsync.
-		if (_glx.EXT_swap_control)
-			_glx.SwapIntervalEXT(_display, _window, _glx.EXT_swap_control_tear ? -1 : 1);
+		if (_glx->EXT_swap_control)
+			_glx->SwapIntervalEXT(_display, _window, _glx->EXT_swap_control_tear ? -1 : 1);
 	}
 
 	WindowBackend::~WindowBackend()
 	{
 		close();
-		::glXDestroyContext(_display, _glx_context);
 	}
 
 	void WindowBackend::close()
 	{
 		if (_window == None)
 			return;
-		::glXMakeCurrent(_display, None, nullptr);
+		_glx.unbind();
 		::XDestroyWindow(_display, _window);
 		_window = None;
 	}
@@ -433,6 +313,6 @@ namespace Yttrium
 	{
 		if (_window == None)
 			return;
-		::glXSwapBuffers(_display, _window);
+		_glx.swap_buffers(_window);
 	}
 }

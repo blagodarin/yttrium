@@ -1,50 +1,45 @@
 #ifndef _src_window_x11_window_h_
 #define _src_window_x11_window_h_
 
-#include <yttrium/key.h>
 #include <yttrium/pointer.h>
-#include "../backend.h"
-#include "glx.h"
+#include "gl.h"
 
 #include <X11/Xlib.h>
 
 namespace Yttrium
 {
 	class Point;
-	class Rect;
-	class ScreenImpl;
-	class Size;
 	class StaticString;
+	class WindowBackendCallbacks;
 
 	class WindowBackend
 	{
 	public:
 
-		static Pointer<WindowBackend> create(Allocator& allocator, const ScreenImpl& screen, WindowBackendCallbacks&);
+		static Pointer<WindowBackend> create(Allocator&, ::Display*, int screen, WindowBackendCallbacks&);
 
-		WindowBackend(Allocator& allocator, ::Display* display, int screen, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks&);
+		WindowBackend(Allocator&, ::Display*, GlContext&&, ::Window, WindowBackendCallbacks&);
 		~WindowBackend();
 
 		void close();
-		bool get_cursor(Point& cursor);
+		bool get_cursor(Point&);
 		bool process_events();
-		bool set_cursor(const Point& cursor);
-		void set_name(const StaticString& name);
+		bool set_cursor(const Point&);
+		void set_name(const StaticString&);
 		void show();
 		void swap_buffers();
 
 	private:
 		class EmptyCursor;
 
-		::Display* _display;
+		::Display* const _display;
+		const GlContext _glx;
 		::Window _window;
+		const Pointer<EmptyCursor> _empty_cursor;
 		::Atom _wm_protocols = None;
 		::Atom _wm_delete_window = None;
 		::Atom _net_wm_state = None;
 		::Atom _net_wm_state_fullscreen = None;
-		const Pointer<EmptyCursor> _empty_cursor;
-		::GLXContext _glx_context;
-		const Glx _glx;
 		WindowBackendCallbacks& _callbacks;
 		bool _has_size = false;
 	};

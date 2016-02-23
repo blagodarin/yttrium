@@ -92,7 +92,7 @@ namespace Yttrium
 		if (_capacity > 0)
 			const_cast<char*>(_text)[0] = '\0';
 		else
-			_text = &StringNull;
+			_text = &Null;
 		_size = 0;
 		return *this;
 	}

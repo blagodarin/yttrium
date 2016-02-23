@@ -136,7 +136,7 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			const StaticString& extension = name.file_extension();
+			const StaticString& extension = name.file_name_extension();
 			if (extension == ".tga"_s)
 				type = ImageType::Tga;
 			else if (extension == ".dds"_s)
@@ -172,7 +172,7 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			const StaticString& extension = name.file_extension();
+			const StaticString& extension = name.file_name_extension();
 			if (extension == ".tga"_s)
 				type = ImageType::Tga;
 	#ifndef Y_NO_PNG

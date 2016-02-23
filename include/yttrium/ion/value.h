@@ -39,12 +39,12 @@ namespace Yttrium
 		/**
 		* \overload
 		*/
-		bool get(int32_t* value) const { return _type == Type::String && _string.to_number(value); }
+		bool get(int32_t* value) const { return _type == Type::String && _string.to_number(*value); }
 
 		/**
 		* \overload
 		*/
-		bool get(float* value) const { return _type == Type::String && _string.to_number(value); }
+		bool get(float* value) const { return _type == Type::String && _string.to_number(*value); }
 
 		/**
 		* \overload

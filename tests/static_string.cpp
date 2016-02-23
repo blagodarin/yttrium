@@ -4,36 +4,82 @@
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(test_static_string_initialization)
+BOOST_AUTO_TEST_CASE(test_static_string_default_construction)
 {
-	StaticString s1;
+	StaticString a;
+	BOOST_CHECK_EQUAL(a.size(), 0);
+	BOOST_CHECK(a.is_empty());
+	BOOST_CHECK(a.text());
+	BOOST_CHECK_EQUAL(a[0], '\0');
 
-	BOOST_CHECK_EQUAL(s1.size(), 0);
-	BOOST_CHECK(s1.is_empty());
-	BOOST_CHECK(s1.text());
-	BOOST_CHECK_EQUAL(s1[0], '\0');
-
-	StaticString s2;
-
-	BOOST_CHECK_EQUAL(s1, s2);
-	BOOST_CHECK_EQUAL(s1.text(), s2.text());
-	BOOST_CHECK_EQUAL(s1.size(), s2.size());
+	StaticString b;
+	BOOST_CHECK_EQUAL(b.text(), a.text());
+	BOOST_CHECK_EQUAL(b.size(), a.size());
 }
 
-BOOST_AUTO_TEST_CASE(test_static_string_assignment)
+BOOST_AUTO_TEST_CASE(test_static_string_construction)
 {
-	StaticString s1 = "test";
+	StaticString a("test");
+	BOOST_CHECK_EQUAL(a[0], 't');
+	BOOST_CHECK_EQUAL(a[1], 'e');
+	BOOST_CHECK_EQUAL(a[2], 's');
+	BOOST_CHECK_EQUAL(a[3], 't');
+	BOOST_CHECK_EQUAL(a[4], '\0');
+	BOOST_CHECK_EQUAL(a.size(), 4);
 
-	BOOST_CHECK_EQUAL(s1.size(), 4);
-	BOOST_CHECK_EQUAL(s1[0], 't');
-	BOOST_CHECK_EQUAL(s1[2], 's');
-	BOOST_CHECK_EQUAL(s1, "test");
+	StaticString b(a);
+	BOOST_CHECK_EQUAL(b.text(), a.text());
+	BOOST_CHECK_EQUAL(b.size(), a.size());
 
-	StaticString s2 = s1;
+	const auto& c = "test"_s;
+	BOOST_CHECK_EQUAL(c.size(), b.size());
+	for (size_t i = 0; i <= c.size(); ++i)
+		BOOST_CHECK_EQUAL(c[i], b[i]);
+}
 
-	BOOST_CHECK_EQUAL(s1, s2);
-	BOOST_CHECK_EQUAL(s1.text(), s2.text());
-	BOOST_CHECK_EQUAL(s1.size(), s2.size());
+BOOST_AUTO_TEST_CASE(test_static_string_comparison)
+{
+	const auto& ab = "ab"_s;
+	BOOST_CHECK(ab == ab);
+	BOOST_CHECK(!(ab != ab));
+	BOOST_CHECK(!(ab > ab));
+	BOOST_CHECK(!(ab < ab));
+	BOOST_CHECK(ab >= ab);
+	BOOST_CHECK(ab <= ab);
+
+	const auto& ba = "ba"_s;
+	BOOST_CHECK(!(ab == ba));
+	BOOST_CHECK(ab != ba);
+	BOOST_CHECK(!(ab > ba));
+	BOOST_CHECK(ab < ba);
+	BOOST_CHECK(!(ab >= ba));
+	BOOST_CHECK(ab <= ba);
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_file_name_extension)
+{
+	BOOST_CHECK_EQUAL(""_s.file_name_extension(), ""_s);
+	BOOST_CHECK_EQUAL("abc"_s.file_name_extension(), ""_s);
+	BOOST_CHECK_EQUAL("abc."_s.file_name_extension(), "."_s);
+	BOOST_CHECK_EQUAL("abc.xyz"_s.file_name_extension(), ".xyz"_s);
+	BOOST_CHECK_EQUAL(".xyz"_s.file_name_extension(), ""_s);
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_trimmed)
+{
+	BOOST_CHECK_EQUAL(""_s.trimmed(), ""_s);
+
+	BOOST_CHECK_EQUAL("\x01"_s.trimmed(), ""_s);
+	BOOST_CHECK_EQUAL("\x20"_s.trimmed(), ""_s);
+	BOOST_CHECK_EQUAL("\x21"_s.trimmed(), "\x21"_s);
+	BOOST_CHECK_EQUAL("\x7F"_s.trimmed(), "\x7F"_s);
+	BOOST_CHECK_EQUAL("\x80"_s.trimmed(), "\x80"_s);
+	BOOST_CHECK_EQUAL("\xFF"_s.trimmed(), "\xFF"_s);
+
+	BOOST_CHECK_EQUAL("\x20\x20"_s.trimmed(), ""_s);
+	BOOST_CHECK_EQUAL("\x20\x21\x20"_s.trimmed(), "\x21"_s);
+	BOOST_CHECK_EQUAL("\x20\x20\x21\x20\x20"_s.trimmed(), "\x21"_s);
+	BOOST_CHECK_EQUAL("\x20\x20\x21\x21\x20\x20"_s.trimmed(), "\x21\x21"_s);
 }
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_int)
@@ -47,7 +93,7 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 	BOOST_CHECK_EQUAL("-1"_s.to_uint64(), 0);
 
 	// Minimum.
-	BOOST_CHECK_EQUAL("-2147483648"_s.to_int32(), -2147483647 - 1);
+	BOOST_CHECK_EQUAL("-2147483648"_s.to_int32(), -2147483648);
 	BOOST_CHECK_EQUAL("0"_s.to_uint32(), 0);
 	BOOST_CHECK_EQUAL("-9223372036854775808"_s.to_int64(), -INT64_C(9223372036854775807) - 1);
 	BOOST_CHECK_EQUAL("0"_s.to_uint64(), 0);
@@ -81,56 +127,81 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_int32_number)
 {
-	int32_t i32 = 0;
+	int32_t i = 0;
 
-	BOOST_CHECK("2147483647"_s.to_number(&i32));
-	BOOST_CHECK_EQUAL(i32, 2147483647);
+	BOOST_CHECK(!""_s.to_number(i));
 
-	BOOST_CHECK(!"2147483648"_s.to_number(&i32));
+	BOOST_CHECK(!"-2147483649"_s.to_number(i));
 
-	BOOST_CHECK("+2147483647"_s.to_number(&i32));
-	BOOST_CHECK_EQUAL(i32, 2147483647);
+	BOOST_CHECK("-2147483648"_s.to_number(i));
+	BOOST_CHECK_EQUAL(i, -2147483648);
 
-	BOOST_CHECK(!"+2147483648"_s.to_number(&i32));
+	BOOST_CHECK("2147483647"_s.to_number(i));
+	BOOST_CHECK_EQUAL(i, 2147483647);
 
-	BOOST_CHECK("-2147483648"_s.to_number(&i32));
-	BOOST_CHECK_EQUAL(i32, -2147483647 - 1);
+	BOOST_CHECK("+2147483647"_s.to_number(i));
+	BOOST_CHECK_EQUAL(i, 2147483647);
 
-	BOOST_CHECK(!"-2147483649"_s.to_number(&i32));
+	BOOST_CHECK(!"2147483648"_s.to_number(i));
+	BOOST_CHECK(!"+2147483648"_s.to_number(i));
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_to_uint32_number)
+{
+	uint32_t u = 1;
+
+	BOOST_CHECK(!""_s.to_number(u));
+
+	BOOST_CHECK(!"-0"_s.to_number(u));
+
+	BOOST_CHECK("0"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 0);
+
+	BOOST_CHECK("+0"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 0);
+
+	BOOST_CHECK("4294967295"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 4294967295);
+
+	BOOST_CHECK("+4294967295"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 4294967295);
+
+	BOOST_CHECK(!"4294967296"_s.to_number(u));
+	BOOST_CHECK(!"+4294967296"_s.to_number(u));
 }
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_double_number)
 {
-	double d;
+	double d = -1.;
 
-	BOOST_CHECK("0"_s.to_number(&d));
+	BOOST_CHECK("0"_s.to_number(d));
 	BOOST_CHECK_EQUAL(d, 0.0);
 
-	BOOST_CHECK("0.0"_s.to_number(&d));
+	BOOST_CHECK("0.0"_s.to_number(d));
 	BOOST_CHECK_EQUAL(d, 0.0);
 
-	BOOST_CHECK(!"0."_s.to_number(&d));
+	BOOST_CHECK(!"0."_s.to_number(d));
 
-	BOOST_CHECK(!".0"_s.to_number(&d));
+	BOOST_CHECK(!".0"_s.to_number(d));
 
-	BOOST_CHECK("1.0"_s.to_number(&d));
+	BOOST_CHECK("1.0"_s.to_number(d));
 	BOOST_CHECK_EQUAL(d, 1.0);
 
-	BOOST_CHECK("3.2"_s.to_number(&d));
+	BOOST_CHECK("3.2"_s.to_number(d));
 	BOOST_CHECK_EQUAL(d, 3.2);
 
-	BOOST_CHECK("5.4e1"_s.to_number(&d));
+	BOOST_CHECK("5.4e1"_s.to_number(d));
 	BOOST_CHECK_EQUAL(d, 5.4e1);
 
-	BOOST_CHECK("7.6e+1"_s.to_number(&d));
+	BOOST_CHECK("7.6e+1"_s.to_number(d));
 	BOOST_CHECK_EQUAL(d, 7.6e+1);
 
-	BOOST_CHECK("9.8e-1"_s.to_number(&d));
+	BOOST_CHECK("9.8e-1"_s.to_number(d));
 	BOOST_CHECK_CLOSE(d, 9.8e-1, 1e-13);
 
-	BOOST_CHECK("+98765.43210e-7"_s.to_number(&d));
+	BOOST_CHECK("+98765.43210e-7"_s.to_number(d));
 	BOOST_CHECK_CLOSE(d, +98765.43210e-7, 1e-13);
 
-	BOOST_CHECK("-01234.56789e+7"_s.to_number(&d));
+	BOOST_CHECK("-01234.56789e+7"_s.to_number(d));
 	BOOST_CHECK_CLOSE(d, -01234.56789e+7, 1e-13);
 }

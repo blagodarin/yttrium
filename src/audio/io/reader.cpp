@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 		if (type == AudioType::Auto)
 		{
-			const StaticString extension = name.file_extension();
+			const StaticString extension = name.file_name_extension();
 			if (extension == ".wav"_s)
 				type = AudioType::Wav;
 #ifndef Y_NO_OGG_VORBIS

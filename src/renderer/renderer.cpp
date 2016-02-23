@@ -4,12 +4,12 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
 #include "debug_texture.h"
-#include "exception.h"
 #include "gl/renderer.h"
 #include "texture.h"
 
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 namespace Yttrium
 {
@@ -58,7 +58,7 @@ namespace Yttrium
 		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
 		if (!renderer->_white_texture)
-			throw RendererError("Failed to initialize an internal texture");
+			throw std::runtime_error("Failed to initialize an internal texture");
 		renderer->_white_texture->set_filter(Texture2D::NearestFilter);
 
 		ImageFormat debug_texture_format;
@@ -68,12 +68,12 @@ namespace Yttrium
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
-			throw RendererError("Failed to initialize an internal texture");
+			throw std::runtime_error("Failed to initialize an internal texture");
 		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
 
 		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
 		if (!renderer->_program_2d)
-			throw RendererError("Failed to initialize an internal GPU program");
+			throw std::runtime_error("Failed to initialize an internal GPU program");
 
 		return std::move(renderer);
 	}

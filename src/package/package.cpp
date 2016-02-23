@@ -9,7 +9,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (package.file_extension() == ".ypq"_s)
+			if (package.file_name_extension() == ".ypq"_s)
 				type = PackageType::Ypq;
 			else
 				return {};
@@ -44,7 +44,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (package.file_extension() == ".ypq"_s)
+			if (package.file_name_extension() == ".ypq"_s)
 				type = PackageType::Ypq;
 			else
 				return {};

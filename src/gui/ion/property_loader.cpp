@@ -31,7 +31,7 @@ namespace Yttrium
 				if (values->get(&value))
 				{
 					float number;
-					if (value->to_number(&number))
+					if (value->to_number(number))
 						element = number;
 				}
 				values.pop_first();
@@ -52,7 +52,7 @@ namespace Yttrium
 				if (values->get(&value))
 				{
 					T number;
-					if (!value->to_number(&number))
+					if (!value->to_number(number))
 						return i; // TODO: Throw.
 					elements[i] = number;
 				}

@@ -5,13 +5,14 @@
 #include <yttrium/timer.h>
 #include "../gui/gui.h"
 #include "../renderer/debug_renderer.h"
-#include "../renderer/exception.h"
 #include "../renderer/renderer.h"
 
 #if Y_PLATFORM_POSIX
 	#include "x11/screen.h"
 	#include "x11/window.h"
 #endif
+
+#include <stdexcept>
 
 namespace Yttrium
 {
@@ -37,17 +38,26 @@ namespace Yttrium
 
 	Pointer<Window> Window::create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
 	{
-		auto window = make_pointer<WindowImpl>(allocator, script_context, callbacks, allocator);
-		if (!window->initialize())
+		try
+		{
+			return make_pointer<WindowImpl>(allocator, script_context, callbacks, allocator);
+		}
+		catch (const std::runtime_error& e)
+		{
+			Log() << "Unable to create a Window: "_s << e.what();
 			return {};
-		return std::move(window);
+		}
 	}
 
 	WindowImpl::WindowImpl(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
 		: _script_context(script_context)
 		, _callbacks(callbacks)
 		, _allocator(allocator)
+		, _screen(ScreenImpl::open(_allocator))
+		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), *this))
+		, _renderer(RendererImpl::create(*_backend, _allocator))
 		, _console(_script_context, _allocator)
+		, _gui(make_pointer<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator))
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
 		, _debug_text(&_allocator)
@@ -63,30 +73,6 @@ namespace Yttrium
 
 	WindowImpl::~WindowImpl()
 	{
-	}
-
-	bool WindowImpl::initialize()
-	{
-		_screen = ScreenImpl::open(_allocator);
-		if (!_screen)
-			return false;
-
-		_backend = WindowBackend::create(_allocator, *_screen, *this);
-		if (!_backend)
-			return false;
-
-		try
-		{
-			_renderer = RendererImpl::create(*_backend, _allocator);
-		}
-		catch (const RendererError& e)
-		{
-			Log() << e.what();
-			return false;
-		}
-
-		_gui = make_pointer<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator);
-		return true;
 	}
 
 	void WindowImpl::close()

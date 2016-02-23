@@ -35,7 +35,7 @@ namespace Yttrium
 	public:
 
 		///
-		int to_int() const { return _value.to_int32(); }
+		int to_int() const { return _value.to_int(); }
 
 		///
 		double to_double() const { return _value.to_double(); }

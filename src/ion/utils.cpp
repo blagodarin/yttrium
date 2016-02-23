@@ -49,9 +49,9 @@ namespace Yttrium
 			const IonList* list;
 			if (!source.get(&list) || list->size() != 2)
 				return false;
-			if (!list->first()->string().to_number(value.data()))
+			if (!list->first()->string().to_number(value.data()[0]))
 				return false;
-			if (!list->last()->string().to_number(value.data() + 1))
+			if (!list->last()->string().to_number(value.data()[1]))
 				return false;
 			return true;
 		}

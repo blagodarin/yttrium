@@ -1,10 +1,10 @@
 #include "gl.h"
 
 #include <yttrium/log.h>
-#include "../exception.h"
 #include "version.h"
 
 #include <cassert>
+#include <stdexcept>
 
 namespace Yttrium
 {
@@ -23,10 +23,10 @@ namespace Yttrium
 		Log() << "Renderer backend: OpenGL " << VERSION;
 
 		if (!ARB_vertex_attrib_binding)
-			throw RendererError("GL_ARB_vertex_attrib_binding extension must be present");
+			throw std::runtime_error("GL_ARB_vertex_attrib_binding is unavailable");
 
 		if (!EXT_direct_state_access)
-			throw RendererError("GL_EXT_direct_state_access extension must be present");
+			throw std::runtime_error("GL_EXT_direct_state_access is unavailable");
 
 	#if Y_IS_DEBUG
 		Log() << "GL_MAX_3D_TEXTURE_SIZE = " << MAX_3D_TEXTURE_SIZE;

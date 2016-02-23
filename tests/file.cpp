@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 
 	BOOST_REQUIRE(File(file.name()).read_all(&actual_string));
 	BOOST_CHECK_EQUAL(actual_string.size(), expected_buffer.size());
-	BOOST_CHECK(!::memcmp(actual_string.const_text(), expected_buffer.data(), expected_buffer.size()));
+	BOOST_CHECK(!::memcmp(actual_string.text(), expected_buffer.data(), expected_buffer.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
