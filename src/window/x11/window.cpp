@@ -279,10 +279,10 @@ namespace Yttrium
 		::GLXContext glx_context;
 		if (!initialize_window(screen.display(), screen.screen(), window_handle, glx_context))
 			return {};
-		return make_pointer<WindowBackend>(allocator, allocator, screen.display(), window_handle, glx_context, callbacks);
+		return make_pointer<WindowBackend>(allocator, allocator, screen.display(), screen.screen(), window_handle, glx_context, callbacks);
 	}
 
-	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, int screen, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks& callbacks)
 		: _display(display)
 		, _window(window)
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
@@ -291,6 +291,7 @@ namespace Yttrium
 		, _net_wm_state_fullscreen(::XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", True))
 		, _empty_cursor(make_pointer<EmptyCursor>(allocator, _display, _window))
 		, _glx_context(glx_context)
+		, _glx(display, screen)
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
@@ -300,6 +301,10 @@ namespace Yttrium
 
 		// Show window in fullscreen mode.
 		::XChangeProperty(_display, _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
+
+		// Force vsync.
+		if (_glx.EXT_swap_control)
+			_glx.SwapIntervalEXT(_display, _window, _glx.EXT_swap_control_tear ? -1 : 1);
 	}
 
 	WindowBackend::~WindowBackend()

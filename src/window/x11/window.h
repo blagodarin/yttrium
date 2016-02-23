@@ -4,8 +4,8 @@
 #include <yttrium/key.h>
 #include <yttrium/pointer.h>
 #include "../backend.h"
+#include "glx.h"
 
-#include <GL/glx.h>
 #include <X11/Xlib.h>
 
 namespace Yttrium
@@ -22,7 +22,7 @@ namespace Yttrium
 
 		static Pointer<WindowBackend> create(Allocator& allocator, const ScreenImpl& screen, WindowBackendCallbacks&);
 
-		WindowBackend(Allocator& allocator, ::Display* display, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks&);
+		WindowBackend(Allocator& allocator, ::Display* display, int screen, ::Window window, ::GLXContext glx_context, WindowBackendCallbacks&);
 		~WindowBackend();
 
 		void close();
@@ -44,6 +44,7 @@ namespace Yttrium
 		::Atom _net_wm_state_fullscreen = None;
 		const Pointer<EmptyCursor> _empty_cursor;
 		::GLXContext _glx_context;
+		const Glx _glx;
 		WindowBackendCallbacks& _callbacks;
 		bool _has_size = false;
 	};
