@@ -122,22 +122,6 @@ int main(int, char**)
 			write_color_gradient(file, true);
 	}
 	{
-		File file("tests/image/gradient32.tga", File::Write | File::Truncate);
-
-		TgaHeader header;
-
-		::memset(&header, 0, sizeof(header));
-
-		header.image_type = tgaTrueColor;
-		header.image.width = 16;
-		header.image.height = 16;
-		header.image.pixel_depth = 32;
-		header.image.descriptor = tgaTopLeft | 8;
-
-		if (file.write(header))
-			write_color_gradient(file, true);
-	}
-	{
 		File file("tests/image/gradient32.dds", File::Write | File::Truncate);
 
 		DDS_HEADER header;
