@@ -4,7 +4,7 @@
 #include <yttrium/audio/io.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 
 namespace Yttrium
 {

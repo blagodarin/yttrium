@@ -1,6 +1,6 @@
 #include <yttrium/i18n/localization.h>
 
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include "../base/instance_guard.h"
 #include "translation.h"
 

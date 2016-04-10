@@ -1,5 +1,5 @@
-#include <yttrium/object.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
+#include <yttrium/memory/object.h>
 
 #include <boost/test/unit_test.hpp>
 

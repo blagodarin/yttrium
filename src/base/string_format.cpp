@@ -52,7 +52,7 @@ namespace Yttrium
 		if (f.value < 0)
 			string << '-';
 		if (f.width > 0)
-			string << rep('0', f.width);
+			string << repeat('0', f.width);
 		return string << StaticString(&buffer[i], buffer.size() - i);
 	}
 
@@ -69,7 +69,7 @@ namespace Yttrium
 		} while (f.value);
 
 		if (f.width > 0)
-			string << rep('0', f.width);
+			string << repeat('0', f.width);
 		return string << StaticString(&buffer[i], buffer.size() - i);
 	}
 

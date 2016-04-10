@@ -1,7 +1,7 @@
 #ifndef _examples_tetrium_cursor_h_
 #define _examples_tetrium_cursor_h_
 
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 
 namespace Yttrium
 {

@@ -4,8 +4,8 @@
 #ifndef _include_yttrium_package_h_
 #define _include_yttrium_package_h_
 
-#include <yttrium/pointer.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
+#include <yttrium/memory/pointer.h>
 
 namespace Yttrium
 {

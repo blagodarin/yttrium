@@ -26,14 +26,14 @@ namespace Yttrium
 	public:
 
 		///
-		explicit TemporaryAllocator(Allocator* parent) : _parent(parent) {}
+		explicit TemporaryAllocator(Allocator& parent) : _parent(parent) {}
 
 		TemporaryAllocator(const TemporaryAllocator&) = delete;
 		TemporaryAllocator& operator=(const TemporaryAllocator&) = delete;
 
 	private:
 
-		Allocator* const _parent;
+		Allocator& _parent;
 		size_t _allocated = 0;
 		uint8_t _buffer[Size];
 
@@ -41,7 +41,7 @@ namespace Yttrium
 		{
 			const auto pointer = align_forward(&_buffer[_allocated], alignment);
 			if (pointer + size > &_buffer[Size])
-				return _parent->allocate(size, alignment);
+				return _parent.allocate(size, alignment);
 			_allocated = pointer + size - &_buffer[0];
 			return pointer;
 		}
@@ -49,7 +49,7 @@ namespace Yttrium
 		void do_deallocate(void* pointer, bool reallocation) noexcept override
 		{
 			if (pointer < &_buffer[0] || pointer >= &_buffer[Size])
-				_parent->deallocate(pointer, reallocation);
+				_parent.deallocate(pointer, reallocation);
 		}
 	};
 }

@@ -1,7 +1,7 @@
 #include "backend.h"
 
 #include <yttrium/log.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"

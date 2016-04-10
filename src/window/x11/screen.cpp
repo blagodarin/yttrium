@@ -1,6 +1,6 @@
 #include "screen.h"
 
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 
 #include <stdexcept>
 

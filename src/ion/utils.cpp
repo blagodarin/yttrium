@@ -126,7 +126,7 @@ namespace Yttrium
 			void serialize_node(String& result, const IonNode& node, int indentation)
 			{
 				if (indentation > 0)
-					result << rep('\t', indentation);
+					result << repeat('\t', indentation);
 				result << node.name();
 				if (!node.is_empty())
 					serialize_list(result, node, true, indentation);
@@ -152,7 +152,7 @@ namespace Yttrium
 				else
 				{
 					if (!is_root)
-						result << '\n' << rep('\t', indentation) << "{\n"_s;
+						result << '\n' << repeat('\t', indentation) << "{\n"_s;
 					const auto node_indentation = indentation + !is_root;
 					for (const auto& node : object)
 					{
@@ -160,7 +160,7 @@ namespace Yttrium
 						result << '\n';
 					}
 					if (!is_root)
-						result << rep('\t', indentation) << '}';
+						result << repeat('\t', indentation) << '}';
 				}
 			}
 		}

@@ -2,10 +2,9 @@
 
 #include <yttrium/log.h>
 
-int main(int, char**)
+int main()
 {
 	Log::set_file("3d.log");
 	Game game;
 	game.run();
-	return 0;
 }

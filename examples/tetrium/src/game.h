@@ -6,8 +6,8 @@
 #include <yttrium/bindings.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
+#include <yttrium/memory/pointer.h>
 #include <yttrium/memory/proxy_allocator.h>
-#include <yttrium/pointer.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
 #include <yttrium/texture_cache.h>

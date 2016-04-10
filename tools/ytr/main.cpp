@@ -3,7 +3,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include <yttrium/string.h>
 
 #include <iostream>
@@ -81,6 +81,4 @@ int main(int argc, char** argv)
 		std::cerr << "ERROR: Failed to save translation file \"" << argv[1] << "\"" << std::endl;
 		return 1;
 	}
-
-	return 0;
 }

@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_CASE(test_string_format)
 	BOOST_CHECK_EQUAL(String() << 7.25f, "7.25");
 	BOOST_CHECK_EQUAL(String() << 3.625, "3.625");
 
-	BOOST_CHECK_EQUAL(String() << rep('A', 0), "");
-	BOOST_CHECK_EQUAL(String() << rep('A', 1), "A");
-	BOOST_CHECK_EQUAL(String() << rep('A', 2), "AA");
+	BOOST_CHECK_EQUAL(String() << repeat('A', 0), "");
+	BOOST_CHECK_EQUAL(String() << repeat('A', 1), "A");
+	BOOST_CHECK_EQUAL(String() << repeat('A', 2), "AA");
 }
 
 BOOST_AUTO_TEST_CASE(test_string_format_date_time)

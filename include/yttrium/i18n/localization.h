@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_i18n_localization_h_
 #define _include_yttrium_i18n_localization_h_
 
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 
 namespace Yttrium
 {

@@ -1,7 +1,7 @@
 #ifndef _src_window_x11_window_h_
 #define _src_window_x11_window_h_
 
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include "gl.h"
 
 #include <X11/Xlib.h>

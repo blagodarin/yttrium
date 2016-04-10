@@ -9,6 +9,9 @@
 namespace Yttrium
 {
 	///
+	class ByReference {};
+
+	///
 	/// \note Strings with allocated storage always store a zero terminator.
 	class Y_API String : public StaticString
 	{

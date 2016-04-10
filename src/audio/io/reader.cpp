@@ -1,6 +1,6 @@
 #include "reader.h"
 
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include "wav.h"
 
 #ifndef Y_NO_OGG_VORBIS

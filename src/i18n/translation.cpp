@@ -4,7 +4,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 
 namespace Yttrium
 {

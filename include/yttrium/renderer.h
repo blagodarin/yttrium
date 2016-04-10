@@ -6,7 +6,6 @@
 
 #include <yttrium/index_buffer.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/types.h>
 
 #include <initializer_list>
 

@@ -1,5 +1,5 @@
-#include <yttrium/pointer.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
+#include <yttrium/memory/pointer.h>
 
 #include <boost/test/unit_test.hpp>
 

@@ -15,9 +15,16 @@ namespace Yttrium
 	{
 		HeapAllocator _root_allocator;
 		ProxyAllocator _default_allocator("heap"_s, _root_allocator);
+
+		class : public Allocator
+		{
+			void* do_allocate(size_t, size_t) override { std::abort(); }
+			void do_deallocate(void*, bool) noexcept override { std::abort(); }
+		} _no_allocator;
 	}
 
 	Allocator* const DefaultAllocator = &_default_allocator;
+	Allocator& NoAllocator = _no_allocator;
 
 	namespace
 	{

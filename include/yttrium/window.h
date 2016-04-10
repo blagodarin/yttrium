@@ -5,6 +5,7 @@
 #define _include_yttrium_window_h_
 
 #include <yttrium/key.h>
+#include <yttrium/memory/global.h>
 
 namespace Yttrium
 {

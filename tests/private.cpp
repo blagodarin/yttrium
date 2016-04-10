@@ -1,4 +1,4 @@
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 #include "src/base/private_base.h"
 
 #include <boost/test/unit_test.hpp>

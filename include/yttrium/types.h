@@ -1,21 +1,11 @@
 /// \file
-/// \brief Basic types.
+/// \brief
 
 #ifndef _include_yttrium_types_h_
 #define _include_yttrium_types_h_
 
-#include <yttrium/global.h>
-
 namespace Yttrium
 {
-	class Allocator;
-
-	/// The default allocator.
-	extern Y_API Allocator* const DefaultAllocator;
-
-	///
-	class ByReference {};
-
 	enum
 	{
 		CenterAlignment = 0, ///< Center alignment.

@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_key_h_
 #define _include_yttrium_key_h_
 
-#include <yttrium/types.h>
+#include <yttrium/global.h>
 
 #include <cstdint>
 
@@ -14,7 +14,7 @@ namespace Yttrium
 	typedef uint_fast8_t KeyType;
 
 	/// Input key.
-	enum class Key: KeyType
+	enum class Key : KeyType
 	{
 		// Null key (0x00):
 

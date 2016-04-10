@@ -3,9 +3,9 @@
 
 #include <yttrium/gui.h>
 
+#include <yttrium/memory/object.h>
+#include <yttrium/memory/pointer.h>
 #include <yttrium/memory/proxy_allocator.h>
-#include <yttrium/object.h>
-#include <yttrium/pointer.h>
 #include <yttrium/script/code.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>

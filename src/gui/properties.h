@@ -3,7 +3,7 @@
 
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/object.h>
+#include <yttrium/memory/object.h>
 #include <yttrium/renderer.h>
 #include <yttrium/texture_font.h>
 

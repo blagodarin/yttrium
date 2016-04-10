@@ -20,7 +20,7 @@ namespace Yttrium
 	template <typename> class Format;
 
 	///
-	inline Format<char> rep(char value, size_t count);
+	inline Format<char> repeat(char value, size_t count);
 
 	/// Produces a decimal formatting for a signed integral \a value.
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value>>
@@ -32,6 +32,9 @@ namespace Yttrium
 
 	///
 	inline Format<DateTime> print(const DateTime& value, const char* format);
+
+	///
+	inline String& operator<<(String&, char);
 
 	///
 	Y_API String& operator<<(String&, const StaticString&);
@@ -57,14 +60,14 @@ namespace Yttrium
 	template <>
 	class Format<char>
 	{
-		friend Format rep(char, size_t);
+		friend Format repeat(char, size_t);
 		friend String& operator<<(String&, Format<char>&&);
 		char value;
 		size_t count;
 		Format(char value, size_t count) : value(value), count(count) {}
 	};
 
-	Format<char> rep(char value, size_t count)
+	Format<char> repeat(char value, size_t count)
 	{
 		return {value, count};
 	}
@@ -118,7 +121,7 @@ namespace Yttrium
 
 	inline String& operator<<(String& string, char value)
 	{
-		return string << rep(value, 1);
+		return string << repeat(value, 1);
 	}
 
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>

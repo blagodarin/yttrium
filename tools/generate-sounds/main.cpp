@@ -57,6 +57,4 @@ int main(int, char**)
 
 		file.write(buffer.data(), buffer.size());
 	}
-
-	return 0;
 }

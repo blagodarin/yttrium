@@ -7,6 +7,7 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/texture_cache.h>
+#include <yttrium/types.h>
 #include <yttrium/utils.h>
 #include "../gui.h"
 

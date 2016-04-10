@@ -5,7 +5,7 @@
 #define _include_yttrium_memory_proxy_allocator_h_
 
 #include <yttrium/memory/allocator.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 
 namespace Yttrium
 {

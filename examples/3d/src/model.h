@@ -2,7 +2,7 @@
 #define _examples_3d_model_h_
 
 #include <yttrium/gpu_program.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include <yttrium/renderer.h>
 #include <yttrium/texture.h>
 

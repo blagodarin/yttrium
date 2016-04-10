@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_object_h_
-#define _include_yttrium_object_h_
+#ifndef _include_yttrium_memory_object_h_
+#define _include_yttrium_memory_object_h_
 
 #include <yttrium/memory/allocator.h>
 

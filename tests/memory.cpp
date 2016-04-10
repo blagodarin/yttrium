@@ -1,5 +1,5 @@
 #include <yttrium/memory/allocator.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 
 #include <boost/test/unit_test.hpp>
 

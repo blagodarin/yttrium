@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_static_string_h_
 #define _include_yttrium_static_string_h_
 
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 
 #include <cstddef>
 #include <cstdint>

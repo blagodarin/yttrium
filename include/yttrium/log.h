@@ -13,6 +13,7 @@ namespace Yttrium
 	class Y_API Log
 	{
 	public:
+
 		///
 		static void set_file(const StaticString&);
 

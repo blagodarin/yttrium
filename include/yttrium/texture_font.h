@@ -6,7 +6,7 @@
 
 #include <yttrium/base.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 
 namespace Yttrium
 {

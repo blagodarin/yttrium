@@ -49,6 +49,4 @@ int main(int argc, char** argv)
 
 		FileTransfer<8192>(&packed_file, &source_file);
 	}
-
-	return 0;
 }

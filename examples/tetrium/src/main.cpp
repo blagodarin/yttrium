@@ -3,7 +3,7 @@
 #include <yttrium/i18n/localization.h>
 #include <yttrium/log.h>
 
-int main(int, char**)
+int main()
 {
 	Log::set_file("tetrium.log");
 
@@ -12,5 +12,4 @@ int main(int, char**)
 
 	Game game;
 	game.run();
-	return 0;
 }

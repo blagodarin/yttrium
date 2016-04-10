@@ -5,7 +5,7 @@
 #define _include_yttrium_script_context_h_
 
 #include <yttrium/base.h>
-#include <yttrium/types.h>
+#include <yttrium/memory/global.h>
 
 #include <functional>
 

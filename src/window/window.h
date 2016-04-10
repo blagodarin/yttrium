@@ -6,7 +6,7 @@
 #include <yttrium/image.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/pointer.h>
 #include "backend.h"
 #include "console.h"
 

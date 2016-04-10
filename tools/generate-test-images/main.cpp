@@ -177,5 +177,4 @@ int main(int, char**)
 		if (file.write(header))
 			write_color_intensity(file);
 	}
-	return 0;
 }

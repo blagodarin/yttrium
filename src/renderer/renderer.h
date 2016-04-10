@@ -5,8 +5,8 @@
 
 #include <yttrium/math/margins.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/object.h>
-#include <yttrium/pointer.h>
+#include <yttrium/memory/object.h>
+#include <yttrium/memory/pointer.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 #include <yttrium/texture_font.h>

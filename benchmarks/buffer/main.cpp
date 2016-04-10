@@ -457,5 +457,4 @@ int main(int argc, char** argv)
 	case 5: run_benchmark("Grow & touch",     _grow_touch_setups, malloc_grow_touch,     buffer_grow_touch);     break;
 	case 6: run_benchmark("Grow & fill",      _grow_fill_setups,  malloc_grow_fill,      buffer_grow_fill);      break;
 	}
-	return 0;
 }
