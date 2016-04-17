@@ -3,7 +3,7 @@
 #include <yttrium/date_time.h>
 #include <yttrium/gui.h>
 #include <yttrium/math/matrix.h>
-#include <yttrium/renderer.h>
+#include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
 

@@ -3,6 +3,7 @@
 #include <yttrium/file.h>
 #include <yttrium/image.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
 #include <yttrium/vertex_buffer.h>
 

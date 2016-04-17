@@ -12,6 +12,7 @@
 #include <yttrium/log.h>
 #include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/renderer.h>
+#include <yttrium/renderer_modifiers.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
 #include <yttrium/texture.h>

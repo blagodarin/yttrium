@@ -1,16 +1,16 @@
 #ifndef _src_renderer_debug_renderer_h_
 #define _src_renderer_debug_renderer_h_
 
-#include <yttrium/renderer.h>
+#include <yttrium/renderer_modifiers.h>
 
 namespace Yttrium
 {
 	class RendererImpl;
+	class StaticString;
 
 	class DebugRenderer
 	{
 	public:
-
 		DebugRenderer(RendererImpl& renderer);
 
 		void draw_cursor(int x, int y);
@@ -20,7 +20,6 @@ namespace Yttrium
 		void set_color(float r, float g, float b, float a = 1);
 
 	private:
-
 		RendererImpl& _renderer;
 		PushTexture _debug_texture;
 	};

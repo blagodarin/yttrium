@@ -2,6 +2,7 @@
 
 #include <yttrium/log.h>
 #include <yttrium/renderer.h>
+#include <yttrium/renderer_modifiers.h>
 #include <yttrium/script/context.h>
 #include "../gui.h"
 #include "../property_loader.h"

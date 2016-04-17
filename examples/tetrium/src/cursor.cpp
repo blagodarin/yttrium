@@ -2,6 +2,7 @@
 
 #include <yttrium/math/vector.h>
 #include <yttrium/renderer.h>
+#include <yttrium/renderer_modifiers.h>
 #include <yttrium/timer.h>
 #include <yttrium/vertex_buffer.h>
 
