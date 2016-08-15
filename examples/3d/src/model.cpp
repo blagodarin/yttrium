@@ -2,6 +2,7 @@
 
 #include <yttrium/file.h>
 #include <yttrium/image.h>
+#include <yttrium/index_buffer.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
@@ -76,7 +77,7 @@ CubeModel::CubeModel(Renderer& renderer)
 		6, 0, 4,
 	};
 
-	_indices = _renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data());
+	_indices = _renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data());
 
 	_program = _renderer.create_gpu_program(
 		File("examples/3d/data/cube_vs.glsl").to_string(),
@@ -118,7 +119,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 		2, 1, 3,
 	};
 
-	_indices = _renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data());
+	_indices = _renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data());
 
 	ImageFormat image_format;
 	image_format.set_width(size);

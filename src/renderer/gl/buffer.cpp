@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	GlIndexBuffer::GlIndexBuffer(Format format, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format)
+	GlIndexBuffer::GlIndexBuffer(IndexFormat format, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format)
 		: IndexBufferImpl(format, size, element_size)
 		, _buffer(std::move(buffer))
 		, _gl_format(gl_format)

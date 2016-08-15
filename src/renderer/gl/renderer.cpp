@@ -72,10 +72,10 @@ namespace Yttrium
 		return std::move(result);
 	}
 
-	Pointer<IndexBuffer> GlRenderer::create_index_buffer(IndexBuffer::Format format, size_t count, const void* data)
+	Pointer<IndexBuffer> GlRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
 	{
-		const size_t element_size = (format == IndexBuffer::Format::U16) ? 2 : 4;
-		const size_t gl_format = (format == IndexBuffer::Format::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+		const size_t element_size = (format == IndexFormat::U16) ? 2 : 4;
+		const size_t gl_format = (format == IndexFormat::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
 		buffer.initialize(GL_STATIC_DRAW, count * element_size, data);

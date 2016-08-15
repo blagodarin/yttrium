@@ -4,15 +4,16 @@
 #ifndef _include_yttrium_renderer_h_
 #define _include_yttrium_renderer_h_
 
-#include <yttrium/index_buffer.h>
 #include <yttrium/math/rect.h>
 
+#include <cstddef>
 #include <initializer_list>
 
 namespace Yttrium
 {
 	class GpuProgram;
 	class ImageFormat;
+	class IndexBuffer;
 	class Margins;
 	class Matrix4;
 	class StaticString;
@@ -24,6 +25,7 @@ namespace Yttrium
 	template <typename> class Pointer;
 	template <typename> class SharedPtr;
 
+	enum class IndexFormat;
 	enum class VA;
 
 	///
@@ -60,10 +62,10 @@ namespace Yttrium
 		virtual Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
 
 		///
-		virtual Pointer<IndexBuffer> create_index_buffer(IndexBuffer::Format format, size_t count, const void* data = nullptr) = 0;
+		virtual Pointer<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual SharedPtr<Texture2D> create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps = false) = 0;
+		virtual SharedPtr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
 
 		///
 		virtual Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;

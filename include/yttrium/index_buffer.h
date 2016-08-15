@@ -8,22 +8,21 @@
 
 namespace Yttrium
 {
+	/// Index format.
+	enum class IndexFormat
+	{
+		U16, ///< Unsigned 16-bit indices.
+		U32, ///< Unsigned 32-bit indices.
+	};
+
 	/// Index buffer.
 	class IndexBuffer
 	{
 	public:
-
-		/// Index format.
-		enum class Format
-		{
-			U16, ///< Unsigned 16-bit indices.
-			U32, ///< Unsigned 32-bit indices.
-		};
-
 		virtual ~IndexBuffer() = default;
 
 		/// Returns the index format.
-		virtual Format format() const = 0;
+		virtual IndexFormat format() const = 0;
 
 		/// Returns the number of indices in the buffer.
 		virtual size_t size() const = 0;

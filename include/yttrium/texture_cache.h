@@ -11,6 +11,7 @@ namespace Yttrium
 	class Renderer;
 	class StaticString;
 	class Texture2D;
+
 	template <typename> class Pointer;
 	template <typename> class SharedPtr;
 

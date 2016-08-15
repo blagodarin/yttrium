@@ -9,11 +9,10 @@ namespace Yttrium
 	class GlIndexBuffer : public IndexBufferImpl
 	{
 	public:
-
 		const GlBufferHandle _buffer;
 		const GLenum _gl_format;
 
-		GlIndexBuffer(Format format, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format);
+		GlIndexBuffer(IndexFormat, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format);
 
 		void write(size_t offset, size_t size, const void* data) override;
 	};
@@ -21,7 +20,6 @@ namespace Yttrium
 	class GlVertexBuffer : public VertexBufferImpl
 	{
 	public:
-
 		const GlBufferHandle _buffer;
 		const GlVertexArrayHandle _vertex_array;
 

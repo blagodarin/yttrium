@@ -1,5 +1,6 @@
 #include "cursor.h"
 
+#include <yttrium/index_buffer.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
@@ -27,7 +28,7 @@ const std::array<uint16_t, 36> indices = {0, 1, 2};
 Cursor::Cursor(Renderer& renderer)
 	: _renderer(renderer)
 	, _vertices(_renderer.create_vertex_buffer({VA::f2, VA::f4, VA::f2}, 3 * sizeof(Vertex)))
-	, _indices(_renderer.create_index_buffer(IndexBuffer::Format::U16, indices.size(), indices.data()))
+	, _indices(_renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data()))
 {
 }
 
