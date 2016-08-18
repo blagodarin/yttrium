@@ -4,7 +4,6 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/object.h>
-#include <yttrium/renderer.h>
 #include <yttrium/texture_font.h>
 
 namespace Yttrium
@@ -12,6 +11,8 @@ namespace Yttrium
 	class GuiPropertyLoader;
 	class Renderer;
 	class String;
+	class TextCapture;
+	class Texture2D;
 
 	struct BackgroundProperty
 	{
@@ -20,9 +21,9 @@ namespace Yttrium
 		RectF                texture_rect;
 		Margins              borders;
 
-		void draw(Renderer& renderer, const RectF& rect) const;
-		bool load(const GuiPropertyLoader& loader);
-		void update(const GuiPropertyLoader& loader);
+		void draw(Renderer&, const RectF& rect) const;
+		bool load(const GuiPropertyLoader&);
+		void update(const GuiPropertyLoader&);
 	};
 
 	struct ForegroundProperty
@@ -33,9 +34,9 @@ namespace Yttrium
 		Vector4              color{1, 1, 1};
 		unsigned             alignment = 0;
 
-		void draw(Renderer& renderer, const StaticString& text, const RectF& rect, Renderer::TextCapture* capture = nullptr) const;
-		bool load(const GuiPropertyLoader& loader);
-		void update(const GuiPropertyLoader& loader);
+		void draw(Renderer&, const StaticString& text, const RectF& rect, TextCapture* = nullptr) const;
+		bool load(const GuiPropertyLoader&);
+		void update(const GuiPropertyLoader&);
 	};
 }
 

@@ -4,6 +4,7 @@
 #include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/script/context.h>
+#include <yttrium/text.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
@@ -64,7 +65,7 @@ namespace Yttrium
 	{
 		_background.draw(renderer, rect);
 
-		Renderer::TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
+		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
 		_foreground.draw(renderer, _logic.text(), rect, &capture);
 
 		if (_is_focused && capture.has_cursor && (Timer::clock() - _cursor_mark) % 1000 < 500)

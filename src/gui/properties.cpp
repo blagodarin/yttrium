@@ -75,7 +75,7 @@ namespace Yttrium
 		loader.load_margins("borders"_s, &borders);
 	}
 
-	void ForegroundProperty::draw(Renderer& renderer, const StaticString& text, const RectF& rect, Renderer::TextCapture* capture) const
+	void ForegroundProperty::draw(Renderer& renderer, const StaticString& text, const RectF& rect, TextCapture* capture) const
 	{
 		PushTexture push_texture(renderer, font_texture.get());
 		if (!renderer.set_font(font))

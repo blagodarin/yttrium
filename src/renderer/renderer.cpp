@@ -3,6 +3,7 @@
 #include <yttrium/gpu_program.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
+#include <yttrium/text.h>
 #include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
