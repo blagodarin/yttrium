@@ -3,7 +3,6 @@
 #include <yttrium/gpu_program.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
-#include <yttrium/text.h>
 #include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -82,6 +81,7 @@ namespace Yttrium
 	RendererImpl::RendererImpl(Allocator& allocator)
 		: _allocator(allocator)
 		, _color(1, 1, 1)
+		, _text_geometry(_allocator)
 		, _matrix_stack(_allocator)
 		, _texture_stack({{nullptr, 1}}, _allocator)
 #if Y_IS_DEBUG
@@ -94,9 +94,7 @@ namespace Yttrium
 	{
 	}
 
-	RendererImpl::~RendererImpl()
-	{
-	}
+	RendererImpl::~RendererImpl() = default;
 
 	void RendererImpl::draw_rectangle(const RectF& rect)
 	{
@@ -110,63 +108,9 @@ namespace Yttrium
 
 	void RendererImpl::draw_text(const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture)
 	{
-		if (!_font)
-			return;
-
-		float current_x = top_left.x();
-		float current_y = top_left.y();
-		char last_symbol = '\0';
-		const float scaling = font_size / _font.size();
-
-		float selection_left = 0;
-		const auto do_capture = [&](unsigned index)
-		{
-			if (!capture)
-				return;
-
-			if (capture->cursor_pos == index)
-			{
-				capture->cursor_rect = {{current_x, current_y + font_size * 0.125f}, SizeF(2, font_size * 0.75f)};
-				capture->has_cursor = true;
-			}
-
-			if (capture->selection_begin < capture->selection_end)
-			{
-				if (index == capture->selection_begin)
-				{
-					selection_left = current_x;
-				}
-				else if (index == capture->selection_end)
-				{
-					capture->selection_rect = {{selection_left, current_y}, PointF(current_x, current_y + font_size)};
-					capture->has_selection = true;
-				}
-			}
-		};
-
-		const char* current_symbol = text.text();
-
-		for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
-		{
-			const TextureFont::CharInfo* info = _font.char_info(*current_symbol);
-
-			if (info)
-			{
-				const RectF symbol_rect(
-					{current_x + info->offset.x() * scaling, current_y + info->offset.y() * scaling},
-					SizeF(info->rect.width() * scaling, info->rect.height() * scaling));
-
-				draw_rectangle(symbol_rect, current_texture_2d()->map(RectF(info->rect)), {});
-
-				do_capture(i);
-
-				current_x += (info->advance + _font.kerning(last_symbol, *current_symbol)) * scaling;
-			}
-
-			last_symbol = *current_symbol;
-		}
-
-		do_capture(text.size());
+		_text_geometry.build(top_left, font_size, text, _font, capture);
+		for (const auto& item : _text_geometry.items())
+			draw_rectangle(item.target, current_texture_2d()->map(item.source), {});
 	}
 
 	Matrix4 RendererImpl::current_projection() const

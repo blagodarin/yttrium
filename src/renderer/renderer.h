@@ -9,6 +9,7 @@
 #include <yttrium/memory/pointer.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
+#include <yttrium/text.h>
 #include <yttrium/texture_font.h>
 #include "../base/private_base.h"
 
@@ -109,6 +110,7 @@ namespace Yttrium
 		MarginsF _texture_borders;
 
 		TextureFont _font;
+		TextGeometry _text_geometry;
 
 		SharedPtr<Texture2D> _white_texture;
 		SharedPtr<Texture2D> _debug_texture;
