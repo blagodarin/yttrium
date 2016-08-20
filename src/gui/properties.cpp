@@ -75,28 +75,38 @@ namespace Yttrium
 		loader.load_margins("borders"_s, &borders);
 	}
 
-	void ForegroundProperty::draw(Renderer& renderer, const StaticString& text, const RectF& rect, TextCapture* capture) const
+	ForegroundProperty::ForegroundProperty(Allocator& allocator)
+		: geometry(allocator)
+	{
+	}
+
+	void ForegroundProperty::draw(Renderer& renderer) const
 	{
 		PushTexture push_texture(renderer, font_texture.get());
-		if (!renderer.set_font(font))
-			return;
+		renderer.set_color(color);
+		renderer.draw_text(geometry);
+	}
+
+	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
+	{
+		if (!loader.load_font("font"_s, &font, &font_texture)
+			|| !Rect(font_texture->size()).contains(font.rect()))
+			return false;
+		loader.load("text_size"_s, size);
+		loader.load_color("text_color"_s, &color);
+		loader.load_alignment("align"_s, &alignment);
+		return true;
+	}
+
+	void ForegroundProperty::prepare(const StaticString& text, const RectF& rect, TextCapture* capture)
+	{
+		assert(font && font_texture);
 		const auto max_text_height = rect.height() * size;
 		const auto margins = rect.height() - max_text_height;
 		const auto max_text_width = rect.width() - margins;
 		if (max_text_height < 1 || max_text_width < 1)
 			return;
 		const auto& text_size = make_text_size(font, text, max_text_width, max_text_height);
-		renderer.set_color(color);
-		renderer.draw_text(make_top_left(rect, text_size, margins, alignment), text_size.height(), text, capture);
-	}
-
-	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
-	{
-		if (!loader.load_font("font"_s, &font, &font_texture))
-			return false;
-		loader.load("text_size"_s, size);
-		loader.load_color("text_color"_s, &color);
-		loader.load_alignment("align"_s, &alignment);
-		return true;
+		geometry.build(make_top_left(rect, text_size, margins, alignment), text_size.height(), text, font, capture);
 	}
 }

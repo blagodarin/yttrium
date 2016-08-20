@@ -14,7 +14,8 @@ namespace Yttrium
 {
 	InputWidget::InputWidget(const GuiImpl& gui)
 		: Widget(gui, CanHaveFocus)
-		, _logic(gui.allocator())
+		, _foreground(_gui.allocator())
+		, _logic(_gui.allocator())
 	{
 	}
 
@@ -66,7 +67,8 @@ namespace Yttrium
 		_background.draw(renderer, rect);
 
 		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
-		_foreground.draw(renderer, _logic.text(), rect, &capture);
+		_foreground.prepare(_logic.text(), rect, &capture);
+		_foreground.draw(renderer);
 
 		if (_is_focused && capture.has_cursor && (Timer::clock() - _cursor_mark) % 1000 < 500)
 		{

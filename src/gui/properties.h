@@ -4,6 +4,7 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/object.h>
+#include <yttrium/text.h>
 #include <yttrium/texture_font.h>
 
 namespace Yttrium
@@ -33,10 +34,13 @@ namespace Yttrium
 		float                size = 7 / 8.f;
 		Vector4              color{1, 1, 1};
 		unsigned             alignment = 0;
+		TextGeometry         geometry;
 
-		void draw(Renderer&, const StaticString& text, const RectF& rect, TextCapture* = nullptr) const;
+		ForegroundProperty(Allocator&);
+
+		void draw(Renderer&) const;
 		bool load(const GuiPropertyLoader&);
-		void update(const GuiPropertyLoader&);
+		void prepare(const StaticString& text, const RectF& rect, TextCapture* = nullptr);
 	};
 }
 

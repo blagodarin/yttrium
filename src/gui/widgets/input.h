@@ -20,10 +20,10 @@ namespace Yttrium
 
 	private:
 		BackgroundProperty _background;
-		ForegroundProperty _foreground;
-		LineEditor         _logic;
-		Clock              _cursor_mark = 0;
-		ScriptCode         _on_enter;
+		mutable ForegroundProperty _foreground;
+		LineEditor _logic;
+		Clock _cursor_mark = 0;
+		ScriptCode _on_enter;
 	};
 }
 

@@ -3,6 +3,7 @@
 #include <yttrium/gpu_program.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
+#include <yttrium/text.h>
 #include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -81,7 +82,6 @@ namespace Yttrium
 	RendererImpl::RendererImpl(Allocator& allocator)
 		: _allocator(allocator)
 		, _color(1, 1, 1)
-		, _text_geometry(_allocator)
 		, _matrix_stack(_allocator)
 		, _texture_stack({{nullptr, 1}}, _allocator)
 #if Y_IS_DEBUG
@@ -106,10 +106,9 @@ namespace Yttrium
 		draw_rectangle(rect, texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
 	}
 
-	void RendererImpl::draw_text(const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture)
+	void RendererImpl::draw_text(const TextGeometry& geometry)
 	{
-		_text_geometry.build(top_left, font_size, text, _font, capture);
-		for (const auto& item : _text_geometry.items())
+		for (const auto& item : geometry.items())
 			draw_rectangle(item.target, current_texture_2d()->map(item.source), {});
 	}
 
@@ -131,16 +130,6 @@ namespace Yttrium
 	void RendererImpl::set_color(const Vector4& color)
 	{
 		_color = color;
-	}
-
-	bool RendererImpl::set_font(const TextureFont& font)
-	{
-		const auto current_texture = current_texture_2d();
-		if (!current_texture || (font && !Rect(current_texture->size()).contains(font.rect())))
-			return false;
-
-		_font = font;
-		return true;
 	}
 
 	bool RendererImpl::set_texture_borders(const Margins& borders)
@@ -540,6 +529,5 @@ namespace Yttrium
 		const auto* texture = current_texture_2d();
 		_texture_rect = texture ? texture->full_rectangle() : RectF();
 		_texture_borders = {};
-		_font = {};
 	}
 }

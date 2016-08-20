@@ -14,6 +14,12 @@ namespace Yttrium
 {
 	constexpr auto ButtonTextSize = 0.875f;
 
+	ButtonWidget::ButtonWidget(const GuiImpl& gui)
+		: Widget(gui)
+		, _foreground(_gui.allocator())
+	{
+	}
+
 	bool ButtonWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!loader.load_rect("position"_s, _rect)
@@ -100,6 +106,7 @@ namespace Yttrium
 			state = _state;
 		_styles[WidgetStateType(state)].background.draw(renderer, rect);
 		_foreground.color = _styles[WidgetStateType(state)].text_color;
-		_foreground.draw(renderer, _text, rect);
+		_foreground.prepare(_text, rect);
+		_foreground.draw(renderer);
 	}
 }

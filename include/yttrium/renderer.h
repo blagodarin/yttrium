@@ -14,13 +14,11 @@ namespace Yttrium
 	class IndexBuffer;
 	class Margins;
 	class Matrix4;
-	class PointF;
 	class RectF;
 	class Size;
 	class StaticString;
-	class TextCapture;
+	class TextGeometry;
 	class Texture2D;
-	class TextureFont;
 	class Vector4;
 	class VertexBuffer;
 
@@ -63,16 +61,13 @@ namespace Yttrium
 		virtual void draw_rectangle(const RectF& rect, const RectF& texture_rect) = 0;
 
 		///
-		virtual void draw_text(const PointF& top_left, float font_size, const StaticString& text, TextCapture* = nullptr) = 0;
+		virtual void draw_text(const TextGeometry&) = 0;
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;
 
 		///
 		virtual void set_color(const Vector4&) = 0;
-
-		///
-		virtual bool set_font(const TextureFont&) = 0;
 
 		///
 		virtual bool set_texture_borders(const Margins&) = 0;

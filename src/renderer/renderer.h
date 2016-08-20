@@ -4,13 +4,13 @@
 #include <yttrium/renderer.h>
 
 #include <yttrium/math/margins.h>
+#include <yttrium/math/rect.h>
+#include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/object.h>
 #include <yttrium/memory/pointer.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
-#include <yttrium/text.h>
-#include <yttrium/texture_font.h>
 #include "../base/private_base.h"
 
 namespace Yttrium
@@ -41,9 +41,8 @@ namespace Yttrium
 		Matrix4 current_transformation() const override;
 		void draw_rectangle(const RectF&) override;
 		void draw_rectangle(const RectF&, const RectF& texture_rect) override;
-		void draw_text(const PointF&, float, const StaticString&, TextCapture*) override;
+		void draw_text(const TextGeometry&) override;
 		void set_color(const Vector4&) override;
-		bool set_font(const TextureFont&) override;
 		bool set_texture_borders(const Margins&) override;
 		void set_texture_rectangle(const RectF&) override;
 		Size window_size() const override { return _window_size; }
@@ -108,9 +107,6 @@ namespace Yttrium
 
 		RectF    _texture_rect;
 		MarginsF _texture_borders;
-
-		TextureFont _font;
-		TextGeometry _text_geometry;
 
 		SharedPtr<Texture2D> _white_texture;
 		SharedPtr<Texture2D> _debug_texture;

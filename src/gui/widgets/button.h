@@ -12,7 +12,7 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-		ButtonWidget(const GuiImpl& gui) : Widget(gui) {}
+		ButtonWidget(const GuiImpl&);
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
@@ -26,10 +26,10 @@ namespace Yttrium
 		};
 
 		mutable ForegroundProperty _foreground;
-		SharedPtr<Sound>   _sound;
-		WidgetState        _state = WidgetState::NotSet;
-		Style              _styles[WidgetStateCount];
-		ScriptCode         _on_click;
+		SharedPtr<Sound> _sound;
+		WidgetState _state = WidgetState::NotSet;
+		Style _styles[WidgetStateCount];
+		ScriptCode _on_click;
 	};
 }
 

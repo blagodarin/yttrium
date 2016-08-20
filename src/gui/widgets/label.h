@@ -15,8 +15,8 @@ namespace Yttrium
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
 
 	private:
-		ForegroundProperty _foreground;
-		mutable String     _final_text;
+		mutable ForegroundProperty _foreground;
+		mutable String _final_text;
 	};
 }
 
