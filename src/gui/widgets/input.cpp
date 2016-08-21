@@ -75,7 +75,7 @@ namespace Yttrium
 			// TODO: Force a cursor symbol to be included in every font.
 			renderer.set_color(_foreground.color);
 			PushTexture push_texture(renderer, nullptr);
-			renderer.draw_rectangle(capture.cursor_rect);
+			renderer.draw_rect(capture.cursor_rect);
 		}
 
 		if (capture.has_selection)
@@ -84,7 +84,7 @@ namespace Yttrium
 			selection_color.a *= .25f;
 			renderer.set_color(selection_color);
 			PushTexture push_texture(renderer, nullptr);
-			renderer.draw_rectangle(capture.selection_rect);
+			renderer.draw_rect(capture.selection_rect);
 		}
 	}
 }

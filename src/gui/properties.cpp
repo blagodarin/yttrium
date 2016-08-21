@@ -51,9 +51,8 @@ namespace Yttrium
 	{
 		renderer.set_color(color);
 		PushTexture push_texture(renderer, texture.get());
-		renderer.set_texture_rectangle(texture_rect);
-		renderer.set_texture_borders(borders);
-		renderer.draw_rectangle(rect);
+		renderer.set_texture_rect(texture_rect, borders);
+		renderer.draw_rect(rect);
 	}
 
 	bool BackgroundProperty::load(const GuiPropertyLoader& loader)

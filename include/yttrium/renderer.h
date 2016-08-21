@@ -54,10 +54,7 @@ namespace Yttrium
 		virtual Matrix4 current_transformation() const = 0;
 
 		///
-		virtual void draw_rectangle(const RectF&) = 0;
-
-		///
-		virtual void draw_rectangle(const RectF& rect, const RectF& texture_rect) = 0;
+		virtual void draw_rect(const RectF&) = 0;
 
 		///
 		virtual void draw_rects(const StdVector<TexturedRect>&) = 0;
@@ -69,10 +66,7 @@ namespace Yttrium
 		virtual void set_color(const Vector4&) = 0;
 
 		///
-		virtual bool set_texture_borders(const Margins&) = 0;
-
-		///
-		virtual void set_texture_rectangle(const RectF&) = 0;
+		virtual void set_texture_rect(const RectF&, const Margins&) = 0;
 
 		///
 		virtual Size window_size() const = 0;

@@ -10,6 +10,7 @@
 #include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
+#include <yttrium/math/margins.h>
 #include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
@@ -356,8 +357,8 @@ void Game::draw_field_blocks(Renderer& renderer, const RectF& rect, const SizeF&
 			const auto figure_type = field.blocks[y][x];
 			if (figure_type != Tetrium::Figure::None)
 			{
-				set_texture_rectangle(renderer, figure_type);
-				renderer.draw_rectangle(
+				set_texture_rect(renderer, figure_type);
+				renderer.draw_rect(
 					{
 						{
 							rect.left() + (1 + x) * block_size.width(),
@@ -378,12 +379,12 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const SizeF&
 	if (figure.type() == Tetrium::Figure::None)
 		return;
 
-	set_texture_rectangle(renderer, figure.type());
+	set_texture_rect(renderer, figure.type());
 	for (const auto& block : figure.blocks)
 	{
 		if (block.y < Tetrium::Field::Height * Tetrium::PointsPerRow)
 		{
-			renderer.draw_rectangle(
+			renderer.draw_rect(
 				{
 					{
 						rect.left() + (frame_offset.x + block.x) * block_size.width(),
@@ -398,24 +399,24 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const SizeF&
 void Game::draw_field_frame(Renderer& renderer, const RectF& rect, const SizeF& block_size)
 {
 	renderer.set_color({1, 1, 1, 1});
-	set_texture_rectangle(renderer, Tetrium::Figure::None);
+	set_texture_rect(renderer, Tetrium::Figure::None);
 
 	const int total_width = 1 + Tetrium::Field::Width + 1;
 	const int total_height = 1 + Tetrium::Field::Height + 1;
 
 	for (int i = 0; i < total_width; ++i)
-		renderer.draw_rectangle({{rect.left() + i * block_size.width(), rect.top()}, block_size});
+		renderer.draw_rect({{rect.left() + i * block_size.width(), rect.top()}, block_size});
 
 	for (int i = 1; i < total_height - 1; ++i)
 	{
 		const auto y = rect.top() + i * block_size.height();
-		renderer.draw_rectangle({{rect.left(), y}, block_size});
-		renderer.draw_rectangle({{rect.left() + (total_width - 1) * block_size.width(), y}, block_size});
+		renderer.draw_rect({{rect.left(), y}, block_size});
+		renderer.draw_rect({{rect.left() + (total_width - 1) * block_size.width(), y}, block_size});
 	}
 
 	const auto bottom_y = rect.top() + (total_height - 1) * block_size.height();
 	for (int i = 0; i < total_width; ++i)
-		renderer.draw_rectangle({{rect.left() + i * block_size.width(), bottom_y}, block_size});
+		renderer.draw_rect({{rect.left() + i * block_size.width(), bottom_y}, block_size});
 }
 
 void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
@@ -425,11 +426,11 @@ void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 		const Tetrium::Figure& figure = _game.next_figure();
 		if (figure.type() != Tetrium::Figure::None)
 		{
-			set_texture_rectangle(renderer, figure.type());
+			set_texture_rect(renderer, figure.type());
 			const SizeF block_size(rect.width() / 4, rect.height() / 2);
 			for (const auto& block : figure.blocks)
 			{
-				renderer.draw_rectangle(
+				renderer.draw_rect(
 					{
 						{
 							rect.left() + block.x * block_size.width(),
@@ -442,10 +443,10 @@ void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 	}
 }
 
-void Game::set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type)
+void Game::set_texture_rect(Renderer& renderer, Tetrium::Figure::Type figure_type)
 {
 	const int figure_index = (figure_type == Tetrium::Figure::None) ? 0 : figure_type + 1;
-	renderer.set_texture_rectangle({_block_coords[figure_index], _block_size});
+	renderer.set_texture_rect({_block_coords[figure_index], _block_size}, {});
 }
 
 void Game::update_statistics()

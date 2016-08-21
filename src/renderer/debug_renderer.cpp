@@ -7,9 +7,9 @@ namespace Yttrium
 {
 	namespace
 	{
-		void draw_debug_char(Renderer& renderer, int x, int y, int width, int height, uint8_t value)
+		void draw_debug_char(RendererImpl& renderer, int x, int y, int width, int height, uint8_t value)
 		{
-			renderer.draw_rectangle(
+			renderer.draw_rect(
 				{
 					PointF(x * DebugTexture::char_width, y * DebugTexture::char_height),
 					SizeF(width * DebugTexture::char_width, height * DebugTexture::char_height)

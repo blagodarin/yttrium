@@ -96,20 +96,15 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
-	void RendererImpl::draw_rectangle(const RectF& rect)
+	void RendererImpl::draw_rect(const RectF& rect)
 	{
-		draw_rectangle(rect, _texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
-	}
-
-	void RendererImpl::draw_rectangle(const RectF& rect, const RectF& texture_rect)
-	{
-		draw_rectangle(rect, texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
+		draw_rect(rect, _texture_rect, _texture_borders);
 	}
 
 	void RendererImpl::draw_rects(const StdVector<TexturedRect>& rects)
 	{
 		for (const auto& rect : rects)
-			draw_rectangle(rect.geometry, current_texture_2d()->map_scaled(rect.texture), {});
+			draw_rect(rect.geometry, current_texture_2d()->map_scaled(rect.texture), {});
 	}
 
 	Matrix4 RendererImpl::current_projection() const
@@ -132,36 +127,36 @@ namespace Yttrium
 		_color = color;
 	}
 
-	bool RendererImpl::set_texture_borders(const Margins& borders)
+	void RendererImpl::set_texture_rect(const RectF& rect, const Margins& borders)
 	{
 		const auto current_texture = current_texture_2d();
 		if (!current_texture)
-			return false;
+			return;
 
 		const auto& texture_size = SizeF(current_texture->size());
 		const auto& texture_rect_size = _texture_rect.size();
 		const auto& min_size = SizeF(borders.min_size()) / std::make_pair(texture_size.width(), texture_size.height());
 		if (texture_rect_size.width() < min_size.width() || texture_rect_size.height() < min_size.height())
-			return false;
-
-		_texture_borders = {borders.top() / texture_size.height(), borders.right() / texture_size.width(),
-			borders.bottom() / texture_size.height(), borders.left() / texture_size.width()};
-
-		return true;
-	}
-
-	void RendererImpl::set_texture_rectangle(const RectF& rect)
-	{
-		const auto current_texture = current_texture_2d();
-		if (!current_texture)
 			return;
+
 		_texture_rect = current_texture->map(rect);
-		_texture_borders = {};
+		_texture_borders =
+		{
+			borders.top() / texture_size.height(),
+			borders.right() / texture_size.width(),
+			borders.bottom() / texture_size.height(),
+			borders.left() / texture_size.width()
+		};
 	}
 
 	const Texture2D* RendererImpl::debug_texture() const
 	{
 		return _debug_texture.get();
+	}
+
+	void RendererImpl::draw_rect(const RectF& position, const RectF& texture)
+	{
+		draw_rect(position, texture, {});
 	}
 
 	void RendererImpl::forget_program(const GpuProgram* program)
@@ -347,7 +342,7 @@ namespace Yttrium
 		}
 	}
 
-	void RendererImpl::draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders)
+	void RendererImpl::draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders)
 	{
 		BufferAppender<Vertex2D> vertices(_vertices_2d);
 		BufferAppender<uint16_t> indices(_indices_2d);

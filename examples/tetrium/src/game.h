@@ -40,7 +40,7 @@ private:
 	void draw_field_figure(Renderer& renderer, const RectF& rect, const SizeF& block_size);
 	void draw_field_frame(Renderer& renderer, const RectF& rect, const SizeF& block_size);
 	void draw_next_figure(Renderer& renderer, const RectF& rect);
-	void set_texture_rectangle(Renderer& renderer, Tetrium::Figure::Type figure_type);
+	void set_texture_rect(Renderer& renderer, Tetrium::Figure::Type figure_type);
 
 	void update_statistics();
 

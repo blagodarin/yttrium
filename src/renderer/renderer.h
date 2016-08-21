@@ -39,12 +39,10 @@ namespace Yttrium
 
 		Matrix4 current_projection() const override;
 		Matrix4 current_transformation() const override;
-		void draw_rectangle(const RectF&) override;
-		void draw_rectangle(const RectF&, const RectF& texture_rect) override;
+		void draw_rect(const RectF&) override;
 		void draw_rects(const StdVector<TexturedRect>&) override;
 		void set_color(const Vector4&) override;
-		bool set_texture_borders(const Margins&) override;
-		void set_texture_rectangle(const RectF&) override;
+		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
@@ -52,6 +50,7 @@ namespace Yttrium
 
 		Allocator& allocator() const { return _allocator; }
 		const Texture2D* debug_texture() const;
+		void draw_rect(const RectF& position, const RectF& texture);
 		void forget_program(const GpuProgram*);
 		void forget_texture(const Texture2D*);
 		void pop_program();
@@ -86,7 +85,7 @@ namespace Yttrium
 
 	private:
 
-		void draw_rectangle(const RectF& position, const RectF& texture, const MarginsF& borders);
+		void draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
 		void reset_texture_state();
 
