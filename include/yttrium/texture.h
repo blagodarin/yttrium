@@ -44,10 +44,6 @@ namespace Yttrium
 			TrilinearFilter = LinearTexelFilter  | LinearMipmapFilter,  ///< Trilinear filter.
 		};
 
-	public:
-
-		~Texture2D() override = default;
-
 		///
 		Filter filter() const { return _filter; }
 

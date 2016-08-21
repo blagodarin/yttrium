@@ -128,12 +128,16 @@ namespace Yttrium
 			return;
 		}
 
-		// If one of the manager's fonts is set in the renderer, we have no ways of removing it from there
-		// when the manager is being cleant up, so we must use the renderer's allocator here.
-		TextureFont font(font_source, &_renderer.allocator());
+		auto&& font = TextureFont::load(font_source, _proxy_allocator);
 		if (!font)
 		{
 			Log() << "Can't load \""_s << font_source << "\""_s;
+			return;
+		}
+
+		if (!Rect(texture->size()).contains(font->rect()))
+		{
+			Log() << "Can't use \""_s << font_source << "\" with \""_s << texture_name << "\""_s;
 			return;
 		}
 

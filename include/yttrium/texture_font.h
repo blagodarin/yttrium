@@ -4,9 +4,8 @@
 #ifndef _include_yttrium_texture_font_h_
 #define _include_yttrium_texture_font_h_
 
-#include <yttrium/base.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/memory/global.h>
+#include <yttrium/memory/object.h>
 #include <yttrium/std/vector.h>
 
 namespace Yttrium
@@ -16,10 +15,9 @@ namespace Yttrium
 	class TexturedRect;
 
 	/// Texture font markup.
-	class Y_API TextureFont
+	class Y_API TextureFont : public Object
 	{
 	public:
-
 		/// Font character information.
 		struct CharInfo
 		{
@@ -29,25 +27,22 @@ namespace Yttrium
 		};
 
 		///
-		explicit TextureFont(const StaticString& name, Allocator* allocator = DefaultAllocator);
+		static UniquePtr<TextureFont> load(const StaticString& name, Allocator&);
 
 		///
-		void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, const SizeF& texture_size, TextCapture* = nullptr) const;
+		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, const SizeF& texture_size, TextCapture* = nullptr) const = 0;
 
 		///
-		Rect rect() const;
+		virtual Rect rect() const = 0;
 
 		///
-		int size() const;
+		virtual Size text_size(const StaticString&) const = 0;
 
 		///
-		Size text_size(const StaticString& text) const;
+		virtual SizeF text_size(const StaticString&, const SizeF& font_size) const = 0;
 
-		///
-		SizeF text_size(const StaticString& text, const SizeF& font_size) const;
-
-	private:
-		Y_SHARED_PRIVATE(TextureFont);
+	protected:
+		TextureFont(Allocator& allocator) : Object(&allocator) {}
 	};
 }
 

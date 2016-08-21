@@ -153,9 +153,4 @@ namespace Yttrium
 	Class::~Class() { Private::release(&_private); } \
 	Class& Class::operator=(Class&& x) noexcept { Private::move(_private, x._private); return *this; } \
 
-#define Y_IMPLEMENT_SHARED(Class) \
-	Y_IMPLEMENT_UNIQUE(Class) \
-	Class::Class(const Class& x): _private(Private::copy(x._private)) {} \
-	Class& Class::operator=(const Class& x) { Private::copy(_private, x._private); return *this; } \
-
 #endif
