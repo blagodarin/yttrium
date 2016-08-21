@@ -20,7 +20,7 @@ namespace Yttrium
 		{
 		}
 
-		void build(StdVector<TexturedRect>& rects, const PointF& top_left, float font_size, const StaticString& text, const SizeF& texture_size, TextCapture* capture) const override
+		void build(StdVector<TexturedRect>& rects, const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture) const override
 		{
 			rects.clear();
 
@@ -67,10 +67,7 @@ namespace Yttrium
 							{ current_x + info->second.offset.x() * scaling, current_y + info->second.offset.y() * scaling },
 							SizeF(info->second.rect.size()) * scaling
 						),
-						RectF(
-							{ info->second.rect.left() / texture_size.width(), info->second.rect.top() / texture_size.height() },
-							SizeF(info->second.rect.size()) / std::make_pair(texture_size.width(), texture_size.height())
-						)
+						RectF(info->second.rect)
 					);
 					do_capture(i);
 					const auto kerning = _kernings.find({last_symbol, *current_symbol});

@@ -19,6 +19,8 @@ namespace Yttrium
 	class Image;
 	class WindowBackend;
 
+	enum class ImageOrientation;
+
 	class RendererImpl : public Renderer
 	{
 	public:
@@ -46,6 +48,7 @@ namespace Yttrium
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
+		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual void take_screenshot(Image&) = 0;
 
 		Allocator& allocator() const { return _allocator; }

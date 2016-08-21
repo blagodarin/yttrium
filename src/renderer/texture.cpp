@@ -16,4 +16,9 @@ namespace Yttrium
 	{
 		_renderer.forget_texture(this);
 	}
+
+	RectF BackendTexture2D::full_rectangle() const
+	{
+		return _renderer.map_rect({{}, SizeF(_size)}, _orientation);
+	}
 }

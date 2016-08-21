@@ -45,22 +45,4 @@ namespace Yttrium
 		_texture.set_parameter(GL_TEXTURE_MAG_FILTER, mag_filter);
 		_texture.set_anisotropy_enabled(_filter & Texture2D::AnisotropicFilter);
 	}
-
-	PointF GlTexture2D::map(const PointF& coords) const
-	{
-		auto x = coords.x();
-		auto y = coords.y();
-		if (_orientation == ImageOrientation::XLeftYDown || _orientation == ImageOrientation::XLeftYUp)
-			x = _size.width() - x;
-		if (_orientation == ImageOrientation::XRightYUp || _orientation == ImageOrientation::XLeftYUp)
-			y = _size.height() - y;
-		return {x / _size.width(), y / _size.height()};
-	}
-
-	PointF GlTexture2D::map_scaled(const PointF& coords) const
-	{
-		return PointF(
-			_orientation == ImageOrientation::XLeftYDown || _orientation == ImageOrientation::XLeftYUp ? 1.f - coords.x() : coords.x(),
-			_orientation == ImageOrientation::XRightYUp || _orientation == ImageOrientation::XLeftYUp ? 1.f - coords.y() : coords.y());
-	}
 }

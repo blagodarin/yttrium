@@ -107,6 +107,6 @@ namespace Yttrium
 		if (max_text_height < 1 || max_text_width < 1)
 			return;
 		const auto& text_size = make_text_size(*font, text, max_text_width, max_text_height);
-		font->build(geometry, make_top_left(rect, text_size, margins, alignment), text_size.height(), text, SizeF(font_texture->size()), capture);
+		font->build(geometry, make_top_left(rect, text_size, margins, alignment), text_size.height(), text, capture);
 	}
 }

@@ -30,7 +30,7 @@ namespace Yttrium
 		static UniquePtr<TextureFont> load(const StaticString& name, Allocator&);
 
 		///
-		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, const SizeF& texture_size, TextCapture* = nullptr) const = 0;
+		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;
 
 		///
 		virtual Rect rect() const = 0;

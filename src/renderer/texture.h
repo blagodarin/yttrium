@@ -15,28 +15,13 @@ namespace Yttrium
 		BackendTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps);
 		~BackendTexture2D() override;
 
-		RectF full_rectangle() const
-		{
-			return map({{}, SizeF(_size)});
-		}
-
-		RectF map(const RectF& rect) const
-		{
-			return {map(rect.top_left()), map(rect.bottom_right())};
-		}
-
-		RectF map_scaled(const RectF& rect) const
-		{
-			return {map_scaled(rect.top_left()), map_scaled(rect.bottom_right())};
-		}
+		RectF full_rectangle() const;
+		ImageOrientation orientation() const { return _orientation; }
 
 	protected:
 		RendererImpl& _renderer;
 		const ImageOrientation _orientation;
 		const bool _has_mipmaps;
-
-		virtual PointF map(const PointF&) const = 0;
-		virtual PointF map_scaled(const PointF&) const = 0;
 	};
 }
 

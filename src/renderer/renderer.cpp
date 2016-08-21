@@ -103,8 +103,10 @@ namespace Yttrium
 
 	void RendererImpl::draw_rects(const StdVector<TexturedRect>& rects)
 	{
+		const auto& texture_size = SizeF(current_texture_2d()->size());
+		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
 		for (const auto& rect : rects)
-			draw_rect(rect.geometry, current_texture_2d()->map_scaled(rect.texture), {});
+			draw_rect(rect.geometry, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
 	Matrix4 RendererImpl::current_projection() const
@@ -134,12 +136,13 @@ namespace Yttrium
 			return;
 
 		const auto& texture_size = SizeF(current_texture->size());
+		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
 		const auto& texture_rect_size = _texture_rect.size();
-		const auto& min_size = SizeF(borders.min_size()) / std::make_pair(texture_size.width(), texture_size.height());
+		const auto& min_size = SizeF(borders.min_size()) / texture_scale;
 		if (texture_rect_size.width() < min_size.width() || texture_rect_size.height() < min_size.height())
 			return;
 
-		_texture_rect = current_texture->map(rect);
+		_texture_rect = map_rect(rect / texture_scale, current_texture->orientation());
 		_texture_borders =
 		{
 			borders.top() / texture_size.height(),

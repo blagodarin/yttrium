@@ -21,6 +21,7 @@ namespace Yttrium
 
 		// RendererImpl
 		void clear() override;
+		RectF map_rect(const RectF&, ImageOrientation) const override;
 		void take_screenshot(Image&) override;
 		void flush_2d_impl(const Buffer&, const Buffer&) override;
 		void set_program(const GpuProgram*) override;

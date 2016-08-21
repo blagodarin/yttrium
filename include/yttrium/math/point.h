@@ -4,6 +4,8 @@
 #ifndef _include_yttrium_math_point_h_
 #define _include_yttrium_math_point_h_
 
+#include <utility>
+
 namespace Yttrium
 {
 	/// Integral 2D point.
@@ -49,6 +51,9 @@ namespace Yttrium
 		float _x = 0;
 		float _y = 0;
 	};
+
+	inline PointF operator/(const PointF& lhs, float rhs) { return { lhs.x() / rhs, lhs.y() / rhs }; }
+	inline PointF operator/(const PointF& lhs, const std::pair<float, float>& rhs) { return { lhs.x() / rhs.first, lhs.y() / rhs.second }; }
 }
 
 #endif

@@ -203,6 +203,19 @@ namespace Yttrium
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
+	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const
+	{
+		const auto map_point = [orientation](const PointF& point) -> PointF
+		{
+			return
+			{
+				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point.x() : point.x(),
+				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point.y() : point.y()
+			};
+		};
+		return { map_point(rect.top_left()), map_point(rect.bottom_right()) };
+	}
+
 	void GlRenderer::take_screenshot(Image& image)
 	{
 		const auto& size = window_size();

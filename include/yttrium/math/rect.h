@@ -196,6 +196,9 @@ namespace Yttrium
 	{
 		return !(lhs == rhs);
 	}
+
+	inline RectF operator/(const RectF& lhs, float rhs) { return { lhs.top_left() / rhs, lhs.bottom_right() / rhs }; }
+	inline RectF operator/(const RectF& lhs, const std::pair<float, float>& rhs) { return { lhs.top_left() / rhs, lhs.bottom_right() / rhs }; }
 }
 
 #endif

@@ -14,10 +14,6 @@ namespace Yttrium
 		void bind() const;
 
 	private:
-		PointF map(const PointF&) const override;
-		PointF map_scaled(const PointF&) const override;
-
-	private:
 		const GlTextureHandle _texture;
 	};
 }
