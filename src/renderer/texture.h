@@ -12,7 +12,6 @@ namespace Yttrium
 	class BackendTexture2D : public Texture2D
 	{
 	public:
-
 		BackendTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps);
 		~BackendTexture2D() override;
 
@@ -26,13 +25,18 @@ namespace Yttrium
 			return {map(rect.top_left()), map(rect.bottom_right())};
 		}
 
-	protected:
+		RectF map_scaled(const RectF& rect) const
+		{
+			return {map_scaled(rect.top_left()), map_scaled(rect.bottom_right())};
+		}
 
+	protected:
 		RendererImpl& _renderer;
 		const ImageOrientation _orientation;
 		const bool _has_mipmaps;
 
 		virtual PointF map(const PointF&) const = 0;
+		virtual PointF map_scaled(const PointF&) const = 0;
 	};
 }
 

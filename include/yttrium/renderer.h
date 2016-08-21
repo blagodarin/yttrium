@@ -4,8 +4,7 @@
 #ifndef _include_yttrium_renderer_h_
 #define _include_yttrium_renderer_h_
 
-#include <cstddef>
-#include <initializer_list>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
@@ -17,8 +16,8 @@ namespace Yttrium
 	class RectF;
 	class Size;
 	class StaticString;
-	class TextGeometry;
 	class Texture2D;
+	class TexturedRect;
 	class Vector4;
 	class VertexBuffer;
 
@@ -61,7 +60,7 @@ namespace Yttrium
 		virtual void draw_rectangle(const RectF& rect, const RectF& texture_rect) = 0;
 
 		///
-		virtual void draw_text(const TextGeometry&) = 0;
+		virtual void draw_rects(const StdVector<TexturedRect>&) = 0;
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;

@@ -56,4 +56,11 @@ namespace Yttrium
 			y = _size.height() - y;
 		return {x / _size.width(), y / _size.height()};
 	}
+
+	PointF GlTexture2D::map_scaled(const PointF& coords) const
+	{
+		return PointF(
+			_orientation == ImageOrientation::XLeftYDown || _orientation == ImageOrientation::XLeftYUp ? 1.f - coords.x() : coords.x(),
+			_orientation == ImageOrientation::XRightYUp || _orientation == ImageOrientation::XLeftYUp ? 1.f - coords.y() : coords.y());
+	}
 }

@@ -7,10 +7,13 @@
 #include <yttrium/base.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/global.h>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
 	class StaticString;
+	class TextCapture;
+	class TexturedRect;
 
 	/// Texture font markup.
 	class Y_API TextureFont
@@ -29,10 +32,7 @@ namespace Yttrium
 		explicit TextureFont(const StaticString& name, Allocator* allocator = DefaultAllocator);
 
 		///
-		const CharInfo* char_info(char symbol) const;
-
-		///
-		int kerning(char left, char right) const;
+		void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, const SizeF& texture_size, TextCapture* = nullptr) const;
 
 		///
 		Rect rect() const;

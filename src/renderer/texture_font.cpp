@@ -2,6 +2,8 @@
 
 #include <yttrium/file.h>
 #include <yttrium/std/map.h>
+#include <yttrium/text_capture.h>
+#include <yttrium/textured_rect.h>
 #include <yttrium/utils.h>
 #include "../base/private_base.h"
 #include "texture_font.h"
@@ -92,16 +94,66 @@ namespace Yttrium
 		_private = font.release();
 	}
 
-	const TextureFont::CharInfo* TextureFont::char_info(char symbol) const
+	void TextureFont::build(StdVector<TexturedRect>& rects, const PointF& top_left, float font_size, const StaticString& text, const SizeF& texture_size, TextCapture* capture) const
 	{
-		const auto i = _private->_chars.find(symbol);
-		return i == _private->_chars.end() ? nullptr : &i->second;
-	}
+		rects.clear();
 
-	int TextureFont::kerning(char left, char right) const
-	{
-		const auto i = _private->_kernings.find({left, right});
-		return i != _private->_kernings.end() ? i->second : 0;
+		float current_x = top_left.x();
+		float current_y = top_left.y();
+		char last_symbol = '\0';
+		const float scaling = font_size / _private->_size;
+
+		float selection_left = 0;
+		const auto do_capture = [&](unsigned index)
+		{
+			if (!capture)
+				return;
+
+			if (capture->cursor_pos == index)
+			{
+				capture->cursor_rect = {{current_x, current_y + font_size * 0.125f}, SizeF(2, font_size * 0.75f)};
+				capture->has_cursor = true;
+			}
+
+			if (capture->selection_begin < capture->selection_end)
+			{
+				if (index == capture->selection_begin)
+				{
+					selection_left = current_x;
+				}
+				else if (index == capture->selection_end)
+				{
+					capture->selection_rect = {{selection_left, current_y}, PointF(current_x, current_y + font_size)};
+					capture->has_selection = true;
+				}
+			}
+		};
+
+		const char* current_symbol = text.text();
+
+		for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
+		{
+			const auto info = _private->_chars.find(*current_symbol);
+			if (info != _private->_chars.end())
+			{
+				rects.emplace_back(
+					RectF(
+						{ current_x + info->second.offset.x() * scaling, current_y + info->second.offset.y() * scaling },
+						SizeF(info->second.rect.size()) * scaling
+					),
+					RectF(
+						{ info->second.rect.left() / texture_size.width(), info->second.rect.top() / texture_size.height() },
+						SizeF(info->second.rect.size()) / std::make_pair(texture_size.width(), texture_size.height())
+					)
+				);
+				do_capture(i);
+				const auto kerning = _private->_kernings.find({last_symbol, *current_symbol});
+				current_x += (info->second.advance + (kerning != _private->_kernings.end() ? kerning->second : 0)) * scaling;
+			}
+			last_symbol = *current_symbol;
+		}
+
+		do_capture(text.size());
 	}
 
 	Rect TextureFont::rect() const
@@ -121,11 +173,15 @@ namespace Yttrium
 		{
 			for (size_t i = 0; i < text.size(); ++i)
 			{
-				const auto info = char_info(text[i]);
-				if (info)
-					width += info->advance;
+				const auto info = _private->_chars.find(text[i]);
+				if (info != _private->_chars.end())
+					width += info->second.advance;
 				if (i > 0)
-					width += kerning(text[i - 1], text[i]);
+				{
+					const auto kerning = _private->_kernings.find({text[i - 1], text[i]});
+					if (kerning != _private->_kernings.end())
+						width += kerning->second;
+				}
 			}
 		}
 		return {width, _private->_size};

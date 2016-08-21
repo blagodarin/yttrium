@@ -9,17 +9,15 @@ namespace Yttrium
 	class GlTexture2D : public BackendTexture2D
 	{
 	public:
-
 		GlTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, GlTextureHandle&& texture);
 
 		void bind() const;
 
 	private:
-
 		PointF map(const PointF&) const override;
+		PointF map_scaled(const PointF&) const override;
 
 	private:
-
 		const GlTextureHandle _texture;
 	};
 }

@@ -4,7 +4,7 @@
 #include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/script/context.h>
-#include <yttrium/text.h>
+#include <yttrium/text_capture.h>
 #include "../gui.h"
 #include "../property_loader.h"
 

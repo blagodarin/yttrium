@@ -4,6 +4,7 @@
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
 #include <yttrium/texture.h>
+#include <yttrium/textured_rect.h>
 #include "property_loader.h"
 
 #include <cassert>
@@ -23,12 +24,12 @@ namespace Yttrium
 
 		PointF make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)
 		{
-			const auto x_left = [&]() { return rect.left() + margin; };
-			const auto x_center = [&]() { return (rect.left() + rect.right() - size.width()) / 2; };
-			const auto x_right = [&]() { return rect.right() - margin - size.width(); };
-			const auto y_top = [&]() { return rect.top() + margin; };
-			const auto y_center = [&]() { return (rect.top() + rect.bottom() - size.height()) / 2; };
-			const auto y_bottom = [&]() { return rect.bottom() - margin - size.height(); };
+			const auto x_left = [&]{ return rect.left() + margin; };
+			const auto x_center = [&]{ return (rect.left() + rect.right() - size.width()) / 2; };
+			const auto x_right = [&]{ return rect.right() - margin - size.width(); };
+			const auto y_top = [&]{ return rect.top() + margin; };
+			const auto y_center = [&]{ return (rect.top() + rect.bottom() - size.height()) / 2; };
+			const auto y_bottom = [&]{ return rect.bottom() - margin - size.height(); };
 
 			switch (alignment)
 			{
@@ -80,11 +81,13 @@ namespace Yttrium
 	{
 	}
 
+	ForegroundProperty::~ForegroundProperty() = default;
+
 	void ForegroundProperty::draw(Renderer& renderer) const
 	{
 		PushTexture push_texture(renderer, font_texture.get());
 		renderer.set_color(color);
-		renderer.draw_text(geometry);
+		renderer.draw_rects(geometry);
 	}
 
 	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
@@ -107,6 +110,6 @@ namespace Yttrium
 		if (max_text_height < 1 || max_text_width < 1)
 			return;
 		const auto& text_size = make_text_size(font, text, max_text_width, max_text_height);
-		geometry.build(make_top_left(rect, text_size, margins, alignment), text_size.height(), text, font, capture);
+		font.build(geometry, make_top_left(rect, text_size, margins, alignment), text_size.height(), text, SizeF(font_texture->size()), capture);
 	}
 }

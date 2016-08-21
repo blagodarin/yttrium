@@ -3,7 +3,7 @@
 #include <yttrium/gpu_program.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
-#include <yttrium/text.h>
+#include <yttrium/textured_rect.h>
 #include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -106,10 +106,10 @@ namespace Yttrium
 		draw_rectangle(rect, texture_rect, current_texture_2d() ? _texture_borders : MarginsF());
 	}
 
-	void RendererImpl::draw_text(const TextGeometry& geometry)
+	void RendererImpl::draw_rects(const StdVector<TexturedRect>& rects)
 	{
-		for (const auto& item : geometry.items())
-			draw_rectangle(item.target, current_texture_2d()->map(item.source), {});
+		for (const auto& rect : rects)
+			draw_rectangle(rect.geometry, current_texture_2d()->map_scaled(rect.texture), {});
 	}
 
 	Matrix4 RendererImpl::current_projection() const
