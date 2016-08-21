@@ -4,14 +4,17 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/object.h>
-#include <yttrium/texture_font.h>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
 	class GuiPropertyLoader;
 	class Renderer;
-	class String;
+	class StaticString;
+	class TextCapture;
 	class Texture2D;
+	class TextureFont;
+	class TexturedRect;
 
 	struct BackgroundProperty
 	{

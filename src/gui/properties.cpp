@@ -4,6 +4,7 @@
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
 #include <yttrium/texture.h>
+#include <yttrium/texture_font.h>
 #include <yttrium/textured_rect.h>
 #include "property_loader.h"
 
@@ -105,7 +106,10 @@ namespace Yttrium
 		const auto margins = rect.height() - max_text_height;
 		const auto max_text_width = rect.width() - margins;
 		if (max_text_height < 1 || max_text_width < 1)
+		{
+			geometry.clear();
 			return;
+		}
 		const auto& text_size = make_text_size(*font, text, max_text_width, max_text_height);
 		font->build(geometry, make_top_left(rect, text_size, margins, alignment), text_size.height(), text, capture);
 	}
