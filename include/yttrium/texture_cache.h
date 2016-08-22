@@ -19,7 +19,6 @@ namespace Yttrium
 	class Y_API TextureCache
 	{
 	public:
-
 		///
 		static Pointer<TextureCache> create(Renderer& renderer);
 

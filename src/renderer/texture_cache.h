@@ -13,14 +13,12 @@ namespace Yttrium
 	class TextureCacheImpl : public TextureCache
 	{
 	public:
-
-		TextureCacheImpl(RendererImpl& renderer);
+		TextureCacheImpl(RendererImpl&);
 
 		void clear() override;
 		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity) override;
 
 	private:
-
 		RendererImpl& _renderer;
 		StdMap<String, SharedPtr<Texture2D>> _cache_2d;
 	};

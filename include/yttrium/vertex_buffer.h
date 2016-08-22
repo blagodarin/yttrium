@@ -21,7 +21,6 @@ namespace Yttrium
 	class VertexBuffer
 	{
 	public:
-
 		virtual ~VertexBuffer() = default;
 
 		/// Updates the buffer contents.

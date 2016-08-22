@@ -9,7 +9,7 @@ namespace Yttrium
 	class GlTexture2D : public BackendTexture2D
 	{
 	public:
-		GlTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps, GlTextureHandle&& texture);
+		GlTexture2D(RendererImpl&, const ImageFormat&, bool has_mipmaps, GlTextureHandle&&);
 
 		void bind() const;
 

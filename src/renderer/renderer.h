@@ -102,7 +102,7 @@ namespace Yttrium
 
 		Size _window_size;
 
-		Vector4 _color;
+		Vector4 _color { 1, 1, 1 };
 
 		Buffer _vertices_2d;
 		Buffer _indices_2d;

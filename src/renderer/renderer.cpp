@@ -81,7 +81,6 @@ namespace Yttrium
 
 	RendererImpl::RendererImpl(Allocator& allocator)
 		: _allocator(allocator)
-		, _color(1, 1, 1)
 		, _matrix_stack(_allocator)
 		, _texture_stack({{nullptr, 1}}, _allocator)
 #if Y_IS_DEBUG

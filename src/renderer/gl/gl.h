@@ -14,7 +14,6 @@ namespace Yttrium
 	class GlApi
 	{
 	public:
-
 		#include "api.h"
 
 		GlApi(Allocator&);
@@ -25,8 +24,7 @@ namespace Yttrium
 		GlApi& operator=(GlApi&&) = delete;
 
 	private:
-
-		bool has_extension(const char* name) const;
+		bool has_extension(const char*) const;
 	};
 }
 

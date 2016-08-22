@@ -13,7 +13,6 @@ namespace Yttrium
 	class GpuProgram
 	{
 	public:
-
 		virtual ~GpuProgram() = default;
 
 		///

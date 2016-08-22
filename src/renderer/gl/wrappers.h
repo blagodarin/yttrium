@@ -13,7 +13,6 @@ namespace Yttrium
 	class GlBufferHandle
 	{
 	public:
-
 		GlBufferHandle(const GlApi&, GLenum target);
 		GlBufferHandle(GlBufferHandle&&);
 		~GlBufferHandle();
@@ -39,7 +38,6 @@ namespace Yttrium
 	class GlProgramHandle
 	{
 	public:
-
 		GlProgramHandle(const GlApi&);
 		GlProgramHandle(GlProgramHandle&&);
 		~GlProgramHandle();
@@ -62,7 +60,6 @@ namespace Yttrium
 	class GlShaderHandle
 	{
 	public:
-
 		GlShaderHandle(const GlApi&, GLenum type);
 		GlShaderHandle(GlShaderHandle&&);
 		~GlShaderHandle();
@@ -84,7 +81,6 @@ namespace Yttrium
 	class GlTextureHandle
 	{
 	public:
-
 		GlTextureHandle(const GlApi&, GLenum target);
 		GlTextureHandle(GlTextureHandle&&);
 		~GlTextureHandle();
@@ -108,7 +104,6 @@ namespace Yttrium
 	class GlVertexArrayHandle
 	{
 	public:
-
 		GlVertexArrayHandle(const GlApi&);
 		GlVertexArrayHandle(GlVertexArrayHandle&&);
 		~GlVertexArrayHandle();
