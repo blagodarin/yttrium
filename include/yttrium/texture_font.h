@@ -5,7 +5,7 @@
 #define _include_yttrium_texture_font_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/memory/object.h>
+#include <yttrium/memory/shared_ptr.h>
 #include <yttrium/std/vector.h>
 
 namespace Yttrium
@@ -13,6 +13,8 @@ namespace Yttrium
 	class StaticString;
 	class TextCapture;
 	class TexturedRect;
+
+	template <typename> class UniquePtr;
 
 	/// Texture font markup.
 	class Y_API TextureFont : public Object

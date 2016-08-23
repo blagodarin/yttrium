@@ -1,11 +1,12 @@
 #include "package.h"
 
 #include <yttrium/log.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "ypq.h"
 
 namespace Yttrium
 {
-	Pointer<PackageReader> PackageReader::create(const StaticString& package, PackageType type, Allocator& allocator)
+	UniquePtr<PackageReader> PackageReader::create(const StaticString& package, PackageType type, Allocator& allocator)
 	{
 		if (type == PackageType::Auto)
 		{
@@ -23,7 +24,7 @@ namespace Yttrium
 		{
 			switch (type)
 			{
-			case PackageType::Ypq: return make_pointer<YpqReader>(allocator, std::move(file), allocator);
+			case PackageType::Ypq: return make_unique<YpqReader>(allocator, std::move(file), allocator);
 			default: return {};
 			}
 		}
@@ -40,7 +41,7 @@ namespace Yttrium
 		return packed_file.file ? File(packed_file.file->_private, packed_file.file->_offset, packed_file.size) : File();
 	}
 
-	Pointer<PackageWriter> PackageWriter::create(const StaticString& package, PackageType type, Allocator& allocator)
+	UniquePtr<PackageWriter> PackageWriter::create(const StaticString& package, PackageType type, Allocator& allocator)
 	{
 		if (type == PackageType::Auto)
 		{
@@ -56,7 +57,7 @@ namespace Yttrium
 
 		switch (type)
 		{
-		case PackageType::Ypq: return make_pointer<YpqWriter>(allocator, std::move(file), allocator);
+		case PackageType::Ypq: return make_unique<YpqWriter>(allocator, std::move(file), allocator);
 		default: return {};
 		}
 	}

@@ -13,11 +13,6 @@ namespace Yttrium
 		friend OpenAlBackend;
 
 	public:
-
-		void play() const override;
-
-	private:
-
 		OpenAlSound(const StaticString& name, Allocator* allocator)
 			: SoundImpl(name, allocator)
 		{
@@ -25,12 +20,14 @@ namespace Yttrium
 
 		~OpenAlSound() override;
 
+		void play() const override;
+
+	private:
 		bool load(AudioReader&) override;
 
 	private:
-
-		ALuint       _source = 0;
-		ALuint       _buffer = 0;
+		ALuint _source = 0;
+		ALuint _buffer = 0;
 		OpenAlFormat _format;
 	};
 }

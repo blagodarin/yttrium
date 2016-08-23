@@ -6,7 +6,7 @@
 #include <yttrium/image.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "backend.h"
 #include "console.h"
 
@@ -61,9 +61,9 @@ namespace Yttrium
 		ScriptContext&         _script_context;
 		WindowCallbacks&       _callbacks;
 		Allocator&             _allocator;
-		Pointer<ScreenImpl>    _screen;
-		Pointer<WindowBackend> _backend;
-		Pointer<RendererImpl>  _renderer;
+		UniquePtr<ScreenImpl>  _screen;
+		UniquePtr<WindowBackend> _backend;
+		UniquePtr<RendererImpl> _renderer;
 		bool                   _is_active = false;
 		Point                  _cursor;
 		bool                   _is_cursor_locked = false;
@@ -72,7 +72,7 @@ namespace Yttrium
 		bool                   _keys[KeyCount];
 		Console                _console;
 		bool                   _console_visible = false;
-		Pointer<GuiImpl>       _gui;
+		UniquePtr<GuiImpl>     _gui;
 		String                 _screenshot_filename;
 		Image                  _screenshot_image;
 		String                 _debug_text;

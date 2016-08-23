@@ -4,7 +4,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 
 namespace Yttrium
 {
@@ -70,9 +70,9 @@ namespace Yttrium
 		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, &_allocator);
 	}
 
-	Pointer<Translation> Translation::open(const StaticString& file_name, Allocator& allocator)
+	UniquePtr<Translation> Translation::open(const StaticString& file_name, Allocator& allocator)
 	{
-		auto translation = make_pointer<TranslationImpl>(allocator, allocator);
+		auto&& translation = make_unique<TranslationImpl>(allocator, allocator);
 		translation->load(file_name);
 		return std::move(translation);
 	}

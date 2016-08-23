@@ -3,8 +3,7 @@
 
 #include <yttrium/gui.h>
 
-#include <yttrium/memory/object.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/shared_ptr.h>
 #include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/script/code.h>
 #include <yttrium/std/map.h>
@@ -71,9 +70,9 @@ namespace Yttrium
 		RendererImpl&                     _renderer;
 		WindowCallbacks&                  _callbacks;
 		ProxyAllocator                    _proxy_allocator;
-		Pointer<TextureCache>             _texture_cache;
+		UniquePtr<TextureCache>           _texture_cache;
 		StdMap<String, FontDesc>          _fonts;
-		StdMap<StaticString, Pointer<GuiLayer>> _layers;
+		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
 		StdVector<GuiLayer*>              _layer_stack;
 	};
 }

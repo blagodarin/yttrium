@@ -1,4 +1,5 @@
 #include <yttrium/file.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/package.h>
 #include <yttrium/string.h>
 

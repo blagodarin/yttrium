@@ -177,7 +177,7 @@ void Game::run()
 	if (!_window)
 		return;
 
-	_cursor = make_pointer<Cursor>(_allocator, _window->renderer());
+	_cursor = make_unique<Cursor>(_allocator, _window->renderer());
 
 	ScriptCode::load("tetrium.txt", &_script.allocator()).execute(_script);
 

@@ -2,7 +2,6 @@
 #define _examples_3d_model_h_
 
 #include <yttrium/gpu_program.h>
-#include <yttrium/memory/pointer.h>
 #include <yttrium/renderer.h>
 #include <yttrium/texture.h>
 
@@ -17,10 +16,10 @@ public:
 
 protected:
 	Renderer& _renderer;
-	Pointer<VertexBuffer> _vertices;
-	Pointer<IndexBuffer> _indices;
+	UniquePtr<VertexBuffer> _vertices;
+	UniquePtr<IndexBuffer> _indices;
 	SharedPtr<Texture2D> _texture;
-	Pointer<GpuProgram> _program;
+	UniquePtr<GpuProgram> _program;
 };
 
 class CubeModel : public Model

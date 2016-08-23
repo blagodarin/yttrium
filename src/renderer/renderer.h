@@ -7,8 +7,7 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/memory/object.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 #include "../base/private_base.h"
@@ -34,7 +33,7 @@ namespace Yttrium
 			int _redundant_shader_switches = 0;
 		};
 
-		static Pointer<RendererImpl> create(WindowBackend&, Allocator&);
+		static UniquePtr<RendererImpl> create(WindowBackend&, Allocator&);
 
 		RendererImpl(Allocator&);
 		~RendererImpl() override;
@@ -110,9 +109,9 @@ namespace Yttrium
 		RectF    _texture_rect;
 		MarginsF _texture_borders;
 
-		SharedPtr<Texture2D> _white_texture;
-		SharedPtr<Texture2D> _debug_texture;
-		Pointer<GpuProgram> _program_2d;
+		UniquePtr<Texture2D> _white_texture;
+		UniquePtr<Texture2D> _debug_texture;
+		UniquePtr<GpuProgram> _program_2d;
 
 		enum class MatrixType
 		{

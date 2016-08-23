@@ -141,7 +141,7 @@ namespace Yttrium
 		if (!file.read(&char_count))
 			return {};
 
-		UniquePtr<TextureFontImpl> font(Y_NEW(&allocator, TextureFontImpl)(allocator, font_section.size));
+		auto&& font = make_unique<TextureFontImpl>(allocator, allocator, font_section.size);
 
 		Size font_rect_size;
 		for (; char_count > 0; --char_count)

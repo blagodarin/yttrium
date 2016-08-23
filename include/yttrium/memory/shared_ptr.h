@@ -1,13 +1,12 @@
 /// \file
-/// \brief
+/// \brief Shared pointer.
 
-#ifndef _include_yttrium_memory_object_h_
-#define _include_yttrium_memory_object_h_
+#ifndef _include_yttrium_memory_shared_ptr_h_
+#define _include_yttrium_memory_shared_ptr_h_
 
-#include <yttrium/memory/allocator.h>
+#include <yttrium/memory/unique_ptr.h>
 
 #include <atomic>
-#include <type_traits>
 
 namespace Yttrium
 {
@@ -38,81 +37,6 @@ namespace Yttrium
 
 		Allocator* const _allocator;
 		std::atomic<size_t> _counter{0};
-	};
-
-	/// Unique pointer to an Object descendant.
-	template <typename T>
-	class UniquePtr
-	{
-		template <typename> friend class UniquePtr;
-		template <typename> friend class SharedPtr;
-	public:
-
-		UniquePtr() = default;
-
-		UniquePtr(const UniquePtr&) = delete;
-
-		UniquePtr(UniquePtr&& p)
-			: _object(p._object)
-		{
-			p._object = nullptr;
-		}
-
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		UniquePtr(UniquePtr<U>&& p)
-			: _object(p._object)
-		{
-			p._object = nullptr;
-		}
-
-		explicit UniquePtr(T* p)
-			: _object(p)
-		{
-		}
-
-		~UniquePtr()
-		{
-			if (_object)
-				Y_DELETE(_object->_allocator, _object);
-		}
-
-		UniquePtr& operator=(const UniquePtr&) = delete;
-
-		UniquePtr& operator=(UniquePtr&& p)
-		{
-			if (_object)
-				Y_DELETE(_object->_allocator, _object);
-			_object = p._object;
-			p._object = nullptr;
-			return *this;
-		}
-
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		UniquePtr& operator=(UniquePtr<U>&& p)
-		{
-			if (_object)
-				Y_DELETE(_object->_allocator, _object);
-			_object = p._object;
-			p._object = nullptr;
-			return *this;
-		}
-
-		explicit operator bool() const { return _object; }
-
-		T* get() const { return static_cast<T*>(_object); }
-
-		T* operator->() const { return get(); }
-
-		T& operator*() const { return *get(); }
-
-		template <typename U>
-		bool operator==(const UniquePtr<U>& p) const { return _object == p._object; }
-
-		template <typename U>
-		bool operator!=(const UniquePtr<U>& p) const { return _object != p._object; }
-
-	private:
-		Object* _object = nullptr;
 	};
 
 	/// Shared pointer to an Object descendant.
@@ -152,24 +76,22 @@ namespace Yttrium
 			p._object = nullptr;
 		}
 
+		SharedPtr(UniquePtr<T>&& p)
+			: _object(p._allocation.release())
+		{
+		}
+
+		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		SharedPtr(UniquePtr<U>&& p)
+			: _object(p._allocation.release())
+		{
+		}
+
 		explicit SharedPtr(T* p)
 			: _object(p)
 		{
 			if (_object)
 				++_object->_counter;
-		}
-
-		SharedPtr(UniquePtr<T>&& p)
-			: _object(p._object)
-		{
-			p._object = nullptr;
-		}
-
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(UniquePtr<U>&& p)
-			: _object(p._object)
-		{
-			p._object = nullptr;
 		}
 
 		~SharedPtr()
@@ -215,15 +137,23 @@ namespace Yttrium
 
 		T& operator*() const { return *get(); }
 
-		template <typename U>
-		bool operator==(const SharedPtr<U>& p) const { return _object == p._object; }
-
-		template <typename U>
-		bool operator!=(const SharedPtr<U>& p) const { return _object != p._object; }
-
 	private:
 		Object* _object = nullptr;
 	};
+
+	template <typename T, typename... Args>
+	SharedPtr<T> make_shared(Allocator& allocator, Args&&... args)
+	{
+		Allocation<T> allocation(allocator);
+		new(allocation.get()) T(std::forward<Args>(args)...);
+		return SharedPtr<T>(allocation.release());
+	}
+
+	template <typename T1, typename T2>
+	bool operator==(const SharedPtr<T1>& a, const SharedPtr<T1>& b) { return a.get() == b.get(); }
+
+	template <typename T1, typename T2>
+	bool operator!=(const SharedPtr<T1>& a, const SharedPtr<T1>& b) { return !(a == b); }
 }
 
 #endif

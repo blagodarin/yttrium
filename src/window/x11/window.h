@@ -1,7 +1,7 @@
 #ifndef _src_window_x11_window_h_
 #define _src_window_x11_window_h_
 
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "gl.h"
 
 #include <X11/Xlib.h>
@@ -16,7 +16,7 @@ namespace Yttrium
 	{
 	public:
 
-		static Pointer<WindowBackend> create(Allocator&, ::Display*, int screen, WindowBackendCallbacks&);
+		static UniquePtr<WindowBackend> create(Allocator&, ::Display*, int screen, WindowBackendCallbacks&);
 
 		WindowBackend(Allocator&, ::Display*, GlContext&&, ::Window, WindowBackendCallbacks&);
 		~WindowBackend();
@@ -35,7 +35,7 @@ namespace Yttrium
 		::Display* const _display;
 		const GlContext _glx;
 		::Window _window;
-		const Pointer<EmptyCursor> _empty_cursor;
+		const UniquePtr<EmptyCursor> _empty_cursor;
 		::Atom _wm_protocols = None;
 		::Atom _wm_delete_window = None;
 		::Atom _net_wm_state = None;

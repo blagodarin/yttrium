@@ -21,8 +21,7 @@ namespace Yttrium
 	class Vector4;
 	class VertexBuffer;
 
-	template <typename> class Pointer;
-	template <typename> class SharedPtr;
+	template <typename> class UniquePtr;
 
 	enum class IndexFormat;
 	enum class VA;
@@ -36,16 +35,16 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
+		virtual UniquePtr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
 
 		///
-		virtual Pointer<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
+		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual SharedPtr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
+		virtual UniquePtr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
 
 		///
-		virtual Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;
+		virtual UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual Matrix4 current_projection() const = 0;

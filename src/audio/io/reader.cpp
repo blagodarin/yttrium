@@ -1,6 +1,6 @@
 #include "reader.h"
 
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "wav.h"
 
 #ifndef Y_NO_OGG_VORBIS
@@ -9,7 +9,7 @@
 
 namespace Yttrium
 {
-	Pointer<AudioReader> AudioReader::open(const StaticString& name, AudioType type, Allocator* allocator)
+	UniquePtr<AudioReader> AudioReader::open(const StaticString& name, AudioType type, Allocator* allocator)
 	{
 		if (type == AudioType::Auto)
 		{
@@ -27,12 +27,12 @@ namespace Yttrium
 		if (!allocator)
 			allocator = DefaultAllocator;
 
-		Pointer<AudioReaderImpl> reader;
+		UniquePtr<AudioReaderImpl> reader;
 		switch (type)
 		{
-		case AudioType::Wav: reader = make_pointer<WavReader>(*allocator, name, allocator); break;
+		case AudioType::Wav: reader = make_unique<WavReader>(*allocator, name, allocator); break;
 #ifndef Y_NO_OGG_VORBIS
-		case AudioType::OggVorbis: reader = make_pointer<OggVorbisReader>(*allocator, name, allocator); break;
+		case AudioType::OggVorbis: reader = make_unique<OggVorbisReader>(*allocator, name, allocator); break;
 #endif
 		default: return {};
 		}

@@ -32,9 +32,8 @@ namespace Yttrium
 		void delete_sound(const String& name);
 
 	private:
-
 		Allocator& _allocator;
-		const Pointer<AudioBackend> _backend;
+		const UniquePtr<AudioBackend> _backend;
 		AudioPlayerImpl _player;
 		StdMap<String, Sound*> _sounds;
 		AudioManagerGuard _instance_guard;

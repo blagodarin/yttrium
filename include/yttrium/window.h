@@ -19,7 +19,8 @@ namespace Yttrium
 	class Size;
 	class StaticString;
 	class String;
-	template <typename> class Pointer;
+
+	template <typename> class UniquePtr;
 
 	///
 	struct UpdateEvent
@@ -84,7 +85,7 @@ namespace Yttrium
 		/// \param script_context ScriptContext for console and GUI.
 		/// \param callbacks
 		/// \param allocator
-		static Pointer<Window> create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<Window> create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator = *DefaultAllocator);
 
 		Window() = default;
 		virtual ~Window() = default;

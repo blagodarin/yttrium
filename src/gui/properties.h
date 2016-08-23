@@ -3,7 +3,7 @@
 
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/memory/object.h>
+#include <yttrium/memory/shared_ptr.h>
 #include <yttrium/std/vector.h>
 
 namespace Yttrium

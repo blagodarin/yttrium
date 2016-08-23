@@ -36,11 +36,11 @@ namespace Yttrium
 	{
 	}
 
-	Pointer<Window> Window::create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
+	UniquePtr<Window> Window::create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
 	{
 		try
 		{
-			return make_pointer<WindowImpl>(allocator, script_context, callbacks, allocator);
+			return make_unique<WindowImpl>(allocator, script_context, callbacks, allocator);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -57,7 +57,7 @@ namespace Yttrium
 		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), *this))
 		, _renderer(RendererImpl::create(*_backend, _allocator))
 		, _console(_script_context, _allocator)
-		, _gui(make_pointer<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator))
+		, _gui(make_unique<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator))
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
 		, _debug_text(&_allocator)

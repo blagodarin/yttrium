@@ -20,17 +20,17 @@ namespace Yttrium
 
 	Widget& GuiLayout::add_widget(const StaticString& type, GuiPropertyLoader& loader)
 	{
-		Pointer<Widget> widget;
+		UniquePtr<Widget> widget;
 		if (type == "button"_s)
-			widget = make_pointer<ButtonWidget>(_gui.allocator(), _gui);
+			widget = make_unique<ButtonWidget>(_gui.allocator(), _gui);
 		else if (type == "canvas"_s)
-			widget = make_pointer<CanvasWidget>(_gui.allocator(), _gui);
+			widget = make_unique<CanvasWidget>(_gui.allocator(), _gui);
 		else if (type == "image"_s)
-			widget = make_pointer<ImageWidget>(_gui.allocator(), _gui);
+			widget = make_unique<ImageWidget>(_gui.allocator(), _gui);
 		else if (type == "input"_s)
-			widget = make_pointer<InputWidget>(_gui.allocator(), _gui);
+			widget = make_unique<InputWidget>(_gui.allocator(), _gui);
 		else if (type == "label"_s)
-			widget = make_pointer<LabelWidget>(_gui.allocator(), _gui);
+			widget = make_unique<LabelWidget>(_gui.allocator(), _gui);
 		else
 			throw GuiError(_gui.allocator()) << "Unknown widget type '"_s << type << "'"_s;
 

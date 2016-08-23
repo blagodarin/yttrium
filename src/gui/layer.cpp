@@ -27,7 +27,7 @@ namespace Yttrium
 
 	GuiLayout& GuiLayer::add_layout(GuiLayout::Placement placement)
 	{
-		_layouts.emplace_back(make_pointer<GuiLayout>(_gui.allocator(), _gui, placement));
+		_layouts.emplace_back(make_unique<GuiLayout>(_gui.allocator(), _gui, placement));
 		return *_layouts.back();
 	}
 

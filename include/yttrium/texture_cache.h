@@ -12,15 +12,15 @@ namespace Yttrium
 	class StaticString;
 	class Texture2D;
 
-	template <typename> class Pointer;
 	template <typename> class SharedPtr;
+	template <typename> class UniquePtr;
 
 	/// Texture cache.
 	class Y_API TextureCache
 	{
 	public:
 		///
-		static Pointer<TextureCache> create(Renderer& renderer);
+		static UniquePtr<TextureCache> create(Renderer& renderer);
 
 		TextureCache() = default;
 		virtual ~TextureCache() = default;

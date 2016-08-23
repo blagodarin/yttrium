@@ -15,7 +15,7 @@ namespace Yttrium
 	{
 	public:
 
-		AudioPlayerImpl(Pointer<AudioPlayerBackend> backend, Allocator& allocator);
+		AudioPlayerImpl(UniquePtr<AudioPlayerBackend>&&, Allocator&);
 		~AudioPlayerImpl() override;
 
 		void load(const StaticString& name, const Settings& settings, AudioType type) override;
@@ -51,7 +51,7 @@ namespace Yttrium
 		AudioPlaylist _playlist;
 		ThreadBuffer<Action> _action;
 		State _state = Stopped;
-		const Pointer<AudioPlayerBackend> _backend;
+		const UniquePtr<AudioPlayerBackend> _backend;
 		AudioStreamer _streamer;
 		std::thread _thread;
 	};

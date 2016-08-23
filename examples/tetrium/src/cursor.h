@@ -1,7 +1,7 @@
 #ifndef _examples_tetrium_cursor_h_
 #define _examples_tetrium_cursor_h_
 
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 
 namespace Yttrium
 {
@@ -23,8 +23,8 @@ public:
 
 protected:
 	Renderer& _renderer;
-	const Pointer<VertexBuffer> _vertices;
-	const Pointer<IndexBuffer> _indices;
+	const UniquePtr<VertexBuffer> _vertices;
+	const UniquePtr<IndexBuffer> _indices;
 };
 
 #endif

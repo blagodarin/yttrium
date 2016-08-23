@@ -10,7 +10,7 @@ namespace Yttrium
 		FetchDelay = 300, ///< 300 ms interval between the successive fetches.
 	};
 
-	AudioPlayerImpl::AudioPlayerImpl(Pointer<AudioPlayerBackend> backend, Allocator& allocator)
+	AudioPlayerImpl::AudioPlayerImpl(UniquePtr<AudioPlayerBackend>&& backend, Allocator& allocator)
 		: _allocator(allocator)
 		, _playlist(_allocator)
 		, _backend(std::move(backend))

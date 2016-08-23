@@ -13,7 +13,8 @@ namespace Yttrium
 {
 	class Allocator;
 	class StaticString;
-	template <typename> class Pointer;
+
+	template <typename> class UniquePtr;
 
 	/// Audio container-codec combo.
 	enum class AudioType
@@ -40,7 +41,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<AudioReader> open(const StaticString& name, AudioType type = AudioType::Auto, Allocator* allocator = nullptr);
+		static UniquePtr<AudioReader> open(const StaticString& name, AudioType type = AudioType::Auto, Allocator* allocator = nullptr);
 
 		virtual ~AudioReader() = default;
 

@@ -1,6 +1,6 @@
 #include <yttrium/file.h>
 #include <yttrium/gui.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/script/context.h>
 #include <yttrium/string.h>
 #include <yttrium/window.h>

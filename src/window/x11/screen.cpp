@@ -1,6 +1,6 @@
 #include "screen.h"
 
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 
 #include <stdexcept>
 
@@ -10,7 +10,7 @@ namespace Yttrium
 {
 	using P_XRRScreenConfiguration = Y_UNIQUE_PTR(::XRRScreenConfiguration, ::XRRFreeScreenConfigInfo);
 
-	Pointer<ScreenImpl> ScreenImpl::open(Allocator& allocator)
+	UniquePtr<ScreenImpl> ScreenImpl::open(Allocator& allocator)
 	{
 		P_Display display(::XOpenDisplay(nullptr));
 		if (!display)
@@ -21,7 +21,7 @@ namespace Yttrium
 		if (!::XRRQueryExtension(display.get(), &event_base, &error_base))
 			throw std::runtime_error("XRandR is unavailable");
 
-		return make_pointer<ScreenImpl>(allocator, std::move(display));
+		return make_unique<ScreenImpl>(allocator, std::move(display));
 	}
 
 	ScreenImpl::ScreenImpl(P_Display&& display)

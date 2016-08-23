@@ -10,7 +10,7 @@
 
 namespace Yttrium
 {
-	template <typename> class Pointer;
+	template <typename> class UniquePtr;
 
 	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);
 
@@ -18,7 +18,7 @@ namespace Yttrium
 	{
 	public:
 
-		static Pointer<ScreenImpl> open(Allocator&);
+		static UniquePtr<ScreenImpl> open(Allocator&);
 
 		ScreenImpl(P_Display&& display);
 		~ScreenImpl() override;

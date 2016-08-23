@@ -18,11 +18,11 @@ namespace Yttrium
 		OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator&);
 		~OpenAlBackend() override;
 
-		Pointer<AudioPlayerBackend> create_player() override;
+		UniquePtr<AudioPlayerBackend> create_player() override;
 		UniquePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) override;
 
 		static StdVector<StaticString> devices(Allocator&);
-		static Pointer<OpenAlBackend> create(const StaticString& device, Allocator&);
+		static UniquePtr<OpenAlBackend> create(const StaticString& device, Allocator&);
 
 	private:
 

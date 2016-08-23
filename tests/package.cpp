@@ -1,5 +1,6 @@
 #include <yttrium/file.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/package.h>
 
 #include <cstdlib>

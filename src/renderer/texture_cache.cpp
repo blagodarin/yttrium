@@ -1,15 +1,17 @@
 #include "texture_cache.h"
 
 #include <yttrium/image.h>
+#include <yttrium/memory/shared_ptr.h>
 #include <yttrium/string.h>
+#include <yttrium/texture.h>
 #include "renderer.h"
 
 namespace Yttrium
 {
-	Pointer<TextureCache> TextureCache::create(Renderer& renderer)
+	UniquePtr<TextureCache> TextureCache::create(Renderer& renderer)
 	{
 		RendererImpl& renderer_impl = static_cast<RendererImpl&>(renderer);
-		return make_pointer<TextureCacheImpl>(renderer_impl.allocator(), static_cast<RendererImpl&>(renderer));
+		return make_unique<TextureCacheImpl>(renderer_impl.allocator(), static_cast<RendererImpl&>(renderer));
 	}
 
 	TextureCacheImpl::TextureCacheImpl(RendererImpl& renderer)
@@ -38,10 +40,10 @@ namespace Yttrium
 		if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 			image.intensity_to_bgra();
 
-		const auto& backend_texture = _renderer.create_texture_2d(image.format(), image.data());
+		auto&& backend_texture = _renderer.create_texture_2d(image.format(), image.data());
 		if (!backend_texture)
 			return {};
 
-		return _cache_2d.emplace(String(name, &allocator), backend_texture).first->second;
+		return _cache_2d.emplace(String(name, &allocator), std::move(backend_texture)).first->second;
 	}
 }

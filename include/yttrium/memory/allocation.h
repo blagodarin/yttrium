@@ -6,23 +6,33 @@
 
 #include <yttrium/memory/allocator.h>
 
-#include <cassert>
+#include <type_traits>
 
 namespace Yttrium
 {
+	template <typename T>
 	class Allocation
 	{
 	public:
-
 		Allocation() = default;
+		Allocation(const Allocation&) = delete;
+		Allocation& operator=(const Allocation&) = delete;
 
-		Allocation(Allocator& allocator, size_t size)
+		Allocation(Allocator& allocator)
 			: _allocator(&allocator)
-			, _pointer(_allocator->allocate(size))
+			, _pointer(static_cast<T*>(_allocator->allocate(sizeof(T))))
 		{
 		}
 
 		Allocation(Allocation&& other) noexcept
+			: _allocator(other._allocator)
+			, _pointer(other._pointer)
+		{
+			other._pointer = nullptr;
+		}
+
+		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		Allocation(Allocation<U>&& other) noexcept
 			: _allocator(other._allocator)
 			, _pointer(other._pointer)
 		{
@@ -39,15 +49,33 @@ namespace Yttrium
 			return *this;
 		}
 
+		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		Allocation& operator=(Allocation<U>&& other) noexcept
+		{
+			if (_pointer)
+				_allocator->deallocate(_pointer);
+			_allocator = other._allocator;
+			_pointer = other._pointer;
+			other._pointer = nullptr;
+			return *this;
+		}
+
 		~Allocation()
 		{
 			if (_pointer)
 				_allocator->deallocate(_pointer);
 		}
 
-		void* get() const noexcept
+		T* get() const noexcept
 		{
 			return _pointer;
+		}
+
+		T* release() noexcept
+		{
+			auto result = _pointer;
+			_pointer = nullptr;
+			return result;
 		}
 
 		explicit operator bool() const noexcept
@@ -55,12 +83,10 @@ namespace Yttrium
 			return _pointer;
 		}
 
-		Allocation(const Allocation&) = delete;
-		Allocation& operator=(const Allocation&) = delete;
-
 	private:
 		Allocator* _allocator = nullptr;
-		void* _pointer = nullptr;
+		T* _pointer = nullptr;
+		template <typename> friend class Allocation;
 	};
 }
 

@@ -13,7 +13,8 @@ namespace Yttrium
 	class Renderer;
 	class StaticString;
 	class Widget;
-	template <typename> class Pointer;
+
+	template <typename> class UniquePtr;
 
 	class GuiLayout
 	{
@@ -38,7 +39,7 @@ namespace Yttrium
 		const Placement _placement;
 		SizeF _size;
 		Vector2 _scaling{1, 1};
-		StdVector<Pointer<Widget>> _widgets;
+		StdVector<UniquePtr<Widget>> _widgets;
 	};
 }
 

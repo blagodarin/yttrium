@@ -12,10 +12,10 @@ namespace Yttrium
 		GlRenderer(Allocator&);
 
 		// Renderer
-		Pointer<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
-		Pointer<IndexBuffer> create_index_buffer(IndexFormat, size_t, const void*) override;
-		SharedPtr<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
-		Pointer<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t, const void*) override;
+		UniquePtr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
+		UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t, const void*) override;
+		UniquePtr<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
+		UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t, const void*) override;
 		void draw_triangles(const VertexBuffer&, const IndexBuffer&) override;
 
 		// RendererImpl

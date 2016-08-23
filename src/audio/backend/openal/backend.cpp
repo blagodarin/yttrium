@@ -1,7 +1,7 @@
 #include "backend.h"
 
 #include <yttrium/log.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"
@@ -21,14 +21,14 @@ namespace Yttrium
 			::alcMakeContextCurrent(nullptr);
 	}
 
-	Pointer<AudioPlayerBackend> OpenAlBackend::create_player()
+	UniquePtr<AudioPlayerBackend> OpenAlBackend::create_player()
 	{
-		return make_pointer<OpenAlPlayer>(allocator());
+		return make_unique<OpenAlPlayer>(allocator());
 	}
 
 	UniquePtr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
 	{
-		return UniquePtr<SoundImpl>(Y_NEW(&allocator, OpenAlSound)(name, &allocator));
+		return make_unique<OpenAlSound>(allocator, name, &allocator);
 	}
 
 	StdVector<StaticString> OpenAlBackend::devices(Allocator& allocator)
@@ -51,7 +51,7 @@ namespace Yttrium
 		return result;
 	}
 
-	Pointer<OpenAlBackend> OpenAlBackend::create(const StaticString& device, Allocator& allocator)
+	UniquePtr<OpenAlBackend> OpenAlBackend::create(const StaticString& device, Allocator& allocator)
 	{
 		P_ALCdevice alc_device;
 
@@ -74,6 +74,6 @@ namespace Yttrium
 			throw UnableToCreate(String("(audio/openal) Failed to create context"_s, &allocator));
 
 		::alcMakeContextCurrent(alc_context.get());
-		return make_pointer<OpenAlBackend>(allocator, std::move(alc_device), std::move(alc_context), allocator);
+		return make_unique<OpenAlBackend>(allocator, std::move(alc_device), std::move(alc_context), allocator);
 	}
 }

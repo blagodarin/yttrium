@@ -5,12 +5,13 @@
 #define _include_yttrium_package_h_
 
 #include <yttrium/memory/global.h>
-#include <yttrium/memory/pointer.h>
 
 namespace Yttrium
 {
 	class File;
 	class StaticString;
+
+	template <typename> class UniquePtr;
 
 	/// Package file types.
 	enum class PackageType
@@ -25,7 +26,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<PackageReader> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<PackageReader> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
 
 		PackageReader() = default;
 		virtual ~PackageReader() = default;
@@ -40,7 +41,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<PackageWriter> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<PackageWriter> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
 
 		PackageWriter() = default;
 		virtual ~PackageWriter() = default;
@@ -63,7 +64,7 @@ namespace Yttrium
 		};
 
 		///
-		static Pointer<PackageManager> create(Order order, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<PackageManager> create(Order order, Allocator& allocator = *DefaultAllocator);
 
 		PackageManager() = default;
 		virtual ~PackageManager() = default;

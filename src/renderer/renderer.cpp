@@ -46,9 +46,9 @@ namespace Yttrium
 			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
 		"}\n"_s;
 
-	Pointer<RendererImpl> RendererImpl::create(WindowBackend&, Allocator& allocator)
+	UniquePtr<RendererImpl> RendererImpl::create(WindowBackend&, Allocator& allocator)
 	{
-		auto renderer = make_pointer<GlRenderer>(allocator, allocator);
+		auto renderer = make_unique<GlRenderer>(allocator, allocator);
 
 		static const int32_t white_texture_data = -1;
 

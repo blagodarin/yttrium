@@ -82,7 +82,7 @@ namespace Yttrium
 	{
 		if (!is_root && name.is_empty())
 			throw GuiError(_proxy_allocator) << "Non-root layer must have a name"_s;
-		auto&& layer = make_pointer<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
+		auto&& layer = make_unique<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
 		const String& layer_name = layer->name(); // To avoid extra allocations.
 		if (_layers.find(layer_name) != _layers.end())
 			throw GuiError(_proxy_allocator) << "Duplicate layer name \""_s << layer_name << "\""_s;

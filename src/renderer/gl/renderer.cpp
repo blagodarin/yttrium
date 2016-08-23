@@ -49,7 +49,7 @@ namespace Yttrium
 		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
 	}
 
-	Pointer<GpuProgram> GlRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
+	UniquePtr<GpuProgram> GlRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
 	{
 		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
 		if (!vertex.compile(vertex_shader))
@@ -65,24 +65,24 @@ namespace Yttrium
 			return {};
 		}
 
-		auto result = make_pointer<GlGpuProgram>(allocator(), *this, std::move(vertex), std::move(fragment), _gl);
+		auto result = make_unique<GlGpuProgram>(allocator(), *this, std::move(vertex), std::move(fragment), _gl);
 		if (!result->link())
 			return {};
 
 		return std::move(result);
 	}
 
-	Pointer<IndexBuffer> GlRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
+	UniquePtr<IndexBuffer> GlRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
 	{
 		const size_t element_size = (format == IndexFormat::U16) ? 2 : 4;
 		const size_t gl_format = (format == IndexFormat::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
 		buffer.initialize(GL_STATIC_DRAW, count * element_size, data);
-		return make_pointer<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
+		return make_unique<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
 	}
 
-	SharedPtr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
+	UniquePtr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
 		if (format.bits_per_channel() != 8)
 			return {};
@@ -133,10 +133,10 @@ namespace Yttrium
 		texture.set_data(0, internal_format, format.width(), format.height(), data_format, data_type, data);
 		if (!no_mipmaps)
 			texture.generate_mipmaps();
-		return SharedPtr<Texture2D>(Y_NEW(&allocator(), GlTexture2D)(*this, format, !no_mipmaps, std::move(texture)));
+		return make_unique<GlTexture2D>(allocator(), *this, format, !no_mipmaps, std::move(texture));
 	}
 
-	Pointer<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)
+	UniquePtr<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)
 	{
 		assert(format.size() > 0);
 
@@ -173,7 +173,7 @@ namespace Yttrium
 		buffer.initialize(GL_STATIC_DRAW, count * offset, data);
 		vertex_array.bind_vertex_buffer(0, buffer.get(), 0, offset);
 
-		return make_pointer<GlVertexBuffer>(allocator(), count, offset, std::move(buffer), std::move(vertex_array));
+		return make_unique<GlVertexBuffer>(allocator(), count, offset, std::move(buffer), std::move(vertex_array));
 	}
 
 	void GlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)

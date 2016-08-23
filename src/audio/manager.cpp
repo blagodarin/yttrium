@@ -24,11 +24,11 @@ namespace Yttrium
 			return StdVector<StaticString>(allocator);
 	}
 
-	Pointer<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
+	UniquePtr<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
 	{
 		try
 		{
-			return make_pointer<AudioManagerImpl>(allocator, backend, device, allocator);
+			return make_unique<AudioManagerImpl>(allocator, backend, device, allocator);
 		}
 		catch (const AudioBackend::UnableToCreate& e)
 		{

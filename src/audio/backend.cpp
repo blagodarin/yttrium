@@ -1,14 +1,14 @@
 #include "backend.h"
 
 #include <yttrium/log.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "backend/openal/backend.h"
 
 namespace Yttrium
 {
 	const StaticString AudioBackend::OpenAL = "openal"_s;
 
-	Pointer<AudioBackend> AudioBackend::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
+	UniquePtr<AudioBackend> AudioBackend::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
 	{
 		const StaticString actual_backend = !backend.is_empty() ? backend : OpenAL;
 		if (actual_backend == OpenAL)

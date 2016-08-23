@@ -4,7 +4,7 @@
 #include <yttrium/audio/io.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 
 namespace Yttrium
 {
@@ -45,7 +45,7 @@ namespace Yttrium
 
 		Allocator&           _allocator;
 		AudioPlayerBackend&  _backend;
-		Pointer<AudioReader> _source;
+		UniquePtr<AudioReader> _source;
 		uint64_t             _begin_sample;
 		uint64_t             _end_sample;
 		bool                 _is_looping;

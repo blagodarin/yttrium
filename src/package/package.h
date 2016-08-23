@@ -6,6 +6,8 @@
 #include <yttrium/file.h>
 #include <yttrium/string.h>
 
+#include <utility>
+
 namespace Yttrium
 {
 	struct PackedFile

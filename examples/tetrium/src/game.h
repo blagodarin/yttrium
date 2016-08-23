@@ -6,7 +6,6 @@
 #include <yttrium/bindings.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/memory/pointer.h>
 #include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
@@ -50,12 +49,12 @@ private:
 	ProxyAllocator _script_allocator;
 	ScriptContext _script;
 	ProxyAllocator _audio_allocator;
-	Pointer<AudioManager> _audio;
+	UniquePtr<AudioManager> _audio;
 	ProxyAllocator _window_allocator;
-	Pointer<Window> _window;
-	Pointer<Cursor> _cursor;
-	Pointer<TextureCache> _texture_cache;
-	Bindings         _bindings;
+	UniquePtr<Window> _window;
+	UniquePtr<Cursor> _cursor;
+	UniquePtr<TextureCache> _texture_cache;
+	Bindings _bindings;
 
 	SharedPtr<Texture2D> _block_texture;
 	SizeF                _block_size;

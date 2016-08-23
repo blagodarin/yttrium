@@ -1,6 +1,6 @@
 #include <yttrium/i18n/localization.h>
 
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include "../base/instance_guard.h"
 #include "translation.h"
 
@@ -13,7 +13,6 @@ namespace Yttrium
 	class LocalizationImpl : public Localization
 	{
 	public:
-
 		LocalizationImpl(const StaticString& file_name, Allocator& allocator)
 			: _translation(Translation::open(file_name, allocator))
 			, _instance_guard(this, "Duplicate Localization construction")
@@ -21,14 +20,13 @@ namespace Yttrium
 		}
 
 	public:
-
-		Pointer<Translation> _translation;
+		const UniquePtr<Translation> _translation;
 		LocalizationGuard _instance_guard;
 	};
 
-	Pointer<Localization> Localization::create(const StaticString& file_name, Allocator& allocator)
+	UniquePtr<Localization> Localization::create(const StaticString& file_name, Allocator& allocator)
 	{
-		return make_pointer<LocalizationImpl>(allocator, file_name, allocator);
+		return make_unique<LocalizationImpl>(allocator, file_name, allocator);
 	}
 
 	String Localization::localize(const StaticString& source)

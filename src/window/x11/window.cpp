@@ -138,7 +138,7 @@ namespace Yttrium
 		::Cursor _cursor = None;
 	};
 
-	Pointer<WindowBackend> WindowBackend::create(Allocator& allocator, ::Display* display, int screen, WindowBackendCallbacks& callbacks)
+	UniquePtr<WindowBackend> WindowBackend::create(Allocator& allocator, ::Display* display, int screen, WindowBackendCallbacks& callbacks)
 	{
 		GlContext glx(display, screen);
 
@@ -161,14 +161,14 @@ namespace Yttrium
 		}
 
 		glx.bind(window);
-		return make_pointer<WindowBackend>(allocator, allocator, display, std::move(glx), window, callbacks);
+		return make_unique<WindowBackend>(allocator, allocator, display, std::move(glx), window, callbacks);
 	}
 
 	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, GlContext&& glx, ::Window window, WindowBackendCallbacks& callbacks)
 		: _display(display)
 		, _glx(std::move(glx))
 		, _window(window)
-		, _empty_cursor(make_pointer<EmptyCursor>(allocator, _display, _window))
+		, _empty_cursor(make_unique<EmptyCursor>(allocator, _display, _window))
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
 		, _net_wm_state(::XInternAtom(_display, "_NET_WM_STATE", True))

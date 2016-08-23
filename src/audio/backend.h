@@ -9,7 +9,6 @@ namespace Yttrium
 {
 	class AudioFormat;
 	class SoundImpl;
-	template <typename> class Pointer;
 	template <typename> class UniquePtr;
 
 	class AudioPlayerBackend
@@ -47,11 +46,11 @@ namespace Yttrium
 
 		static const StaticString OpenAL;
 
-		static Pointer<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator&);
+		static UniquePtr<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator&);
 
 		virtual ~AudioBackend() = default;
 
-		virtual Pointer<AudioPlayerBackend> create_player() = 0;
+		virtual UniquePtr<AudioPlayerBackend> create_player() = 0;
 		virtual UniquePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) = 0;
 
 		StaticString backend() const { return _backend; }

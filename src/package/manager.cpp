@@ -2,6 +2,7 @@
 #include "manager.h"
 
 #include <yttrium/file.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/vector.h>
 #include "../base/instance_guard.h"
 
@@ -72,16 +73,15 @@ namespace Yttrium
 		}
 
 	private:
-
 		Allocator& _allocator;
-		StdVector<Pointer<PackageReader>> _packages;
+		StdVector<UniquePtr<PackageReader>> _packages;
 		const Order _order;
 		PackageManagerGuard _instance_guard;
 	};
 
-	Pointer<PackageManager> PackageManager::create(Order order, Allocator& allocator)
+	UniquePtr<PackageManager> PackageManager::create(Order order, Allocator& allocator)
 	{
-		return make_pointer<PackageManagerImpl>(allocator, order, allocator);
+		return make_unique<PackageManagerImpl>(allocator, order, allocator);
 	}
 
 	File open_file_for_reading(const StaticString& name, Allocator& allocator)

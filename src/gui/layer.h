@@ -13,7 +13,7 @@ namespace Yttrium
 	class Renderer;
 	class Widget;
 
-	template <typename> class Pointer;
+	template <typename> class UniquePtr;
 
 	class GuiLayer
 	{
@@ -48,7 +48,7 @@ namespace Yttrium
 	private:
 		GuiImpl&                   _gui;
 		String                     _name;
-		StdVector<Pointer<GuiLayout>> _layouts;
+		StdVector<UniquePtr<GuiLayout>> _layouts;
 		StdMap<StaticString, Widget*> _named_widgets;
 		StdVector<Widget*>         _widgets;
 		Widget*                    _mouse_widget = nullptr;

@@ -11,7 +11,8 @@ namespace Yttrium
 	class Allocator;
 	class StaticString;
 	class String;
-	template <typename> class Pointer;
+
+	template <typename> class UniquePtr;
 
 	///
 	class Y_API Localization
@@ -19,7 +20,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<Localization> create(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<Localization> create(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
 
 		///
 		static String localize(const StaticString& source);

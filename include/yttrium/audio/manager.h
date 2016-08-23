@@ -10,7 +10,8 @@
 namespace Yttrium
 {
 	class AudioPlayer;
-	template <typename> class Pointer;
+
+	template <typename> class UniquePtr;
 
 	/// Audio manager.
 	class Y_API AudioManager
@@ -24,7 +25,7 @@ namespace Yttrium
 		static StdVector<StaticString> backend_devices(const StaticString& backend, Allocator& allocator = *DefaultAllocator);
 
 		///
-		static Pointer<AudioManager> create(const StaticString& backend = StaticString(),
+		static UniquePtr<AudioManager> create(const StaticString& backend = StaticString(),
 			const StaticString& device = StaticString(), Allocator& allocator = *DefaultAllocator);
 
 		AudioManager() = default;

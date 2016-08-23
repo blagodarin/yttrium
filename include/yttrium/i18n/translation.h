@@ -10,7 +10,8 @@ namespace Yttrium
 {
 	class Localization;
 	class StaticString;
-	template <typename> class Pointer;
+
+	template <typename> class UniquePtr;
 
 	///
 	class Y_API Translation
@@ -18,7 +19,7 @@ namespace Yttrium
 	public:
 
 		///
-		static Pointer<Translation> open(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<Translation> open(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
 
 		Translation() = default;
 		virtual ~Translation() = default;

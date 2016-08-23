@@ -28,7 +28,7 @@ private:
 
 private:
 	ScriptContext _script;
-	Pointer<Window> _window;
+	UniquePtr<Window> _window;
 	std::unique_ptr<CubeModel> _cube;
 	std::unique_ptr<ChessboardModel> _chessboard;
 

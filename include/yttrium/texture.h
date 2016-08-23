@@ -5,7 +5,7 @@
 #define _include_yttrium_texture_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/memory/object.h>
+#include <yttrium/memory/shared_ptr.h>
 
 namespace Yttrium
 {

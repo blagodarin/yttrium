@@ -1,6 +1,6 @@
 #include "image.h"
 
-#include <yttrium/memory/pointer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/package.h>
 #include <yttrium/utils.h>
 #include "dds.h"
@@ -149,14 +149,14 @@ namespace Yttrium
 				return false;
 		}
 
-		Pointer<ImageReader> reader;
+		UniquePtr<ImageReader> reader;
 		switch (type)
 		{
-		case ImageType::Tga:  reader = make_pointer<TgaReader>(_allocator, name, &_allocator); break;
+		case ImageType::Tga:  reader = make_unique<TgaReader>(_allocator, name, &_allocator); break;
 	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: reader = make_pointer<JpegReader>(_allocator, name, &_allocator); break;
+		case ImageType::Jpeg: reader = make_unique<JpegReader>(_allocator, name, &_allocator); break;
 	#endif
-		case ImageType::Dds:  reader = make_pointer<DdsReader>(_allocator, name, &_allocator); break;
+		case ImageType::Dds:  reader = make_unique<DdsReader>(_allocator, name, &_allocator); break;
 		default:              return false;
 		}
 
@@ -183,12 +183,12 @@ namespace Yttrium
 				return false;
 		}
 
-		Pointer<ImageWriter> writer;
+		UniquePtr<ImageWriter> writer;
 		switch (type)
 		{
-		case ImageType::Tga: writer = make_pointer<TgaWriter>(_allocator, name, &_allocator); break;
+		case ImageType::Tga: writer = make_unique<TgaWriter>(_allocator, name, &_allocator); break;
 	#ifndef Y_NO_PNG
-		case ImageType::Png: writer = make_pointer<PngWriter>(_allocator, name, &_allocator); break;
+		case ImageType::Png: writer = make_unique<PngWriter>(_allocator, name, &_allocator); break;
 	#endif
 		default:             return false;
 		}
