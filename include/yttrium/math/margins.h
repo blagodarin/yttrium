@@ -24,7 +24,7 @@ namespace Yttrium
 		int top() const { return _top; }
 
 		///
-		Size min_size() const { return {_left + 1 + _right, _top + 1 + _bottom}; }
+		Size min_size() const { return { _left + 1 + _right, _top + 1 + _bottom }; }
 
 	private:
 		int _top = 0;

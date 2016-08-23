@@ -38,13 +38,13 @@ namespace Yttrium
 	///
 	inline Size max(const Size& lhs, const Size& rhs)
 	{
-		return {max(lhs.width(), rhs.width()), max(lhs.height(), rhs.height())};
+		return { max(lhs.width(), rhs.width()), max(lhs.height(), rhs.height()) };
 	}
 
 	///
 	inline Size min(const Size& lhs, const Size& rhs)
 	{
-		return {min(lhs.width(), rhs.width()), min(lhs.height(), rhs.height())};
+		return { min(lhs.width(), rhs.width()), min(lhs.height(), rhs.height()) };
 	}
 
 	/// Floating-point 2D size.
@@ -69,9 +69,9 @@ namespace Yttrium
 	};
 
 	inline SizeF operator*(const SizeF& lhs, float rhs) { return { lhs.width() * rhs, lhs.height() * rhs }; }
-	inline SizeF operator*(float lhs, const SizeF& rhs) { return { lhs * rhs.width(), lhs * rhs.height() }; }
+	inline SizeF operator*(float lhs, const SizeF& rhs) { return rhs * lhs; }
 	inline SizeF operator*(const SizeF& lhs, const std::pair<float, float>& rhs) { return { lhs.width() * rhs.first, lhs.height() * rhs.second }; }
-	inline SizeF operator*(const std::pair<float, float>& lhs, const SizeF& rhs) { return { lhs.first * rhs.width(), lhs.second * rhs.height() }; }
+	inline SizeF operator*(const std::pair<float, float>& lhs, const SizeF& rhs) { return rhs * lhs; }
 
 	inline SizeF operator/(const SizeF& lhs, float rhs) { return { lhs.width() / rhs, lhs.height() / rhs }; }
 	inline SizeF operator/(const SizeF& lhs, const std::pair<float, float>& rhs) { return { lhs.width() / rhs.first, lhs.height() / rhs.second }; }

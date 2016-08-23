@@ -20,19 +20,19 @@ namespace Yttrium
 		explicit Rect(const Size& size) : _right(size.width()), _bottom(size.height()) {}
 
 		int bottom() const { return _bottom; }
-		Point bottom_left() const { return {_left, _bottom}; }
-		Point bottom_right() const { return {_right, _bottom}; }
+		Point bottom_left() const { return { _left, _bottom }; }
+		Point bottom_right() const { return { _right, _bottom }; }
 		int height() const { return _bottom - _top; }
 		int left() const { return _left; }
 		int right() const { return _right; }
-		Size size() const { return {width(), height()}; }
+		Size size() const { return { width(), height() }; }
 		int top() const { return _top; }
-		Point top_left() const { return {_left, _top}; }
-		Point top_right() const { return {_right, _top}; }
+		Point top_left() const { return { _left, _top }; }
+		Point top_right() const { return { _right, _top }; }
 		int width() const { return _right - _left; }
 
 		///
-		Point center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
+		Point center() const { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
 
 		///
 		bool is_empty() const
@@ -61,7 +61,7 @@ namespace Yttrium
 		{
 			return
 			{
-				{(rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2},
+				{ (rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2 },
 				size()
 			};
 		}
@@ -92,7 +92,7 @@ namespace Yttrium
 		{
 			return
 			{
-				{max(_left, rect._left), max(_top, rect._top)},
+				{ max(_left, rect._left), max(_top, rect._top) },
 				Point(min(_right, rect._right), min(_bottom, rect._bottom))
 			};
 		}
@@ -158,19 +158,19 @@ namespace Yttrium
 		explicit RectF(const Rect& rect) :  _left(rect.left()), _top(rect.top()), _right(rect.right()), _bottom(rect.bottom()) {}
 
 		float bottom() const { return _bottom; }
-		PointF bottom_left() const { return {_left, _bottom}; }
-		PointF bottom_right() const { return {_right, _bottom}; }
+		PointF bottom_left() const { return { _left, _bottom }; }
+		PointF bottom_right() const { return { _right, _bottom }; }
 		float height() const { return _bottom - _top; }
 		float left() const { return _left; }
 		float right() const { return _right; }
-		SizeF size() const { return {width(), height()}; }
+		SizeF size() const { return { width(), height() }; }
 		float top() const { return _top; }
-		PointF top_left() const { return {_left, _top}; }
-		PointF top_right() const { return {_right, _top}; }
+		PointF top_left() const { return { _left, _top }; }
+		PointF top_right() const { return { _right, _top }; }
 		float width() const { return _right - _left; }
 
 		///
-		PointF center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
+		PointF center() const { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
 
 		///
 		bool contains(const PointF& point) const
