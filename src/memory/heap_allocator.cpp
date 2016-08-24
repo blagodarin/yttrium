@@ -1,6 +1,7 @@
 #include "heap_allocator.h"
 
 #include <cstdlib>
+#include <new>
 
 namespace Yttrium
 {

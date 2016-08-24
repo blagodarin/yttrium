@@ -1,6 +1,7 @@
 #include "pool.h"
 
 #include <yttrium/memory/allocator.h>
+#include "new.h"
 
 // TODO: Get rid of magical chunk item count in places where pools are used.
 // Perhaps setting the pool chunk size to memory page size will do.

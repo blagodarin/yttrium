@@ -7,7 +7,6 @@
 #include <yttrium/global.h>
 
 #include <cstddef>
-#include <new>
 
 namespace Yttrium
 {
@@ -38,31 +37,12 @@ namespace Yttrium
 				do_deallocate(pointer, reallocation);
 		}
 
-		///
-		template <typename T>
-		void delete_(T* pointer) noexcept
-		{
-			if (pointer)
-			{
-				pointer->~T();
-				do_deallocate(pointer, false);
-			}
-		}
-
 	protected:
-
 		Allocator() = default;
 		virtual ~Allocator() = default;
-
 		virtual void* do_allocate(size_t, size_t) = 0;
 		virtual void do_deallocate(void*, bool) noexcept = 0;
 	};
 }
-
-///
-#define Y_DELETE(allocator, pointer) (allocator)->delete_(pointer)
-
-///
-#define Y_NEW(allocator, Class) new(static_cast<Yttrium::Allocator*>(allocator)->allocate<Class>()) Class
 
 #endif

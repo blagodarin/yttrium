@@ -22,7 +22,7 @@ namespace Yttrium
 
 		///
 		template <typename T>
-		Log& operator<<(T&& value)
+		Y_PRIVATE Log& operator<<(T&& value)
 		{
 			_message << std::forward<T>(value);
 			return *this;

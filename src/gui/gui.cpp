@@ -121,7 +121,7 @@ namespace Yttrium
 
 	void GuiImpl::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
-		const auto& texture = _texture_cache->load_texture_2d(texture_name, true);
+		auto&& texture = _texture_cache->load_texture_2d(texture_name, true);
 		if (!texture)
 		{
 			Log() << "Can't load \""_s << texture_name << "\""_s;
@@ -142,6 +142,6 @@ namespace Yttrium
 		}
 
 		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
-		_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), texture);
+		_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 }

@@ -3,6 +3,7 @@
 
 #include <yttrium/base.h>
 #include <yttrium/memory/allocator.h>
+#include "../memory/new.h"
 
 #include <atomic>
 #include <cassert>

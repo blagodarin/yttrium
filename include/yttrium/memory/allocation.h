@@ -41,8 +41,7 @@ namespace Yttrium
 
 		Allocation& operator=(Allocation&& other) noexcept
 		{
-			if (_pointer)
-				_allocator->deallocate(_pointer);
+			_allocator->deallocate(_pointer);
 			_allocator = other._allocator;
 			_pointer = other._pointer;
 			other._pointer = nullptr;
@@ -52,8 +51,7 @@ namespace Yttrium
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
 		Allocation& operator=(Allocation<U>&& other) noexcept
 		{
-			if (_pointer)
-				_allocator->deallocate(_pointer);
+			_allocator->deallocate(_pointer);
 			_allocator = other._allocator;
 			_pointer = other._pointer;
 			other._pointer = nullptr;
@@ -62,8 +60,7 @@ namespace Yttrium
 
 		~Allocation()
 		{
-			if (_pointer)
-				_allocator->deallocate(_pointer);
+			_allocator->deallocate(_pointer);
 		}
 
 		T* get() const noexcept

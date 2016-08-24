@@ -13,12 +13,7 @@ namespace Yttrium
 	/// An object with a reference counter.
 	class Y_API Object
 	{
-		friend Allocator; // To make Object::~Object available.
-		template <typename> friend class UniquePtr;
-		template <typename> friend class SharedPtr;
-
 	public:
-
 		Object() = delete;
 		Object(const Object&) = delete;
 		Object(Object&&) = delete;
@@ -29,26 +24,24 @@ namespace Yttrium
 		Allocator* allocator() const { return _allocator; }
 
 	protected:
-
 		explicit Object(Allocator* allocator) : _allocator(allocator) {}
 		virtual ~Object() = default;
 
 	private:
-
 		Allocator* const _allocator;
 		std::atomic<size_t> _counter{0};
+		template <typename> friend class SharedPtr;
 	};
 
 	/// Shared pointer to an Object descendant.
 	template <typename T>
 	class SharedPtr
 	{
-		template <typename> friend class SharedPtr;
 	public:
 
 		SharedPtr() = default;
 
-		SharedPtr(const SharedPtr& p)
+		SharedPtr(const SharedPtr& p) noexcept
 			: _object(p._object)
 		{
 			if (_object)
@@ -56,38 +49,38 @@ namespace Yttrium
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(const SharedPtr<U>& p)
+		SharedPtr(const SharedPtr<U>& p) noexcept
 			: _object(p._object)
 		{
 			if (_object)
 				++_object->_counter;
 		}
 
-		SharedPtr(SharedPtr&& p)
+		SharedPtr(SharedPtr&& p) noexcept
 			: _object(p._object)
 		{
 			p._object = nullptr;
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(SharedPtr<U>&& p)
+		SharedPtr(SharedPtr<U>&& p) noexcept
 			: _object(p._object)
 		{
 			p._object = nullptr;
 		}
 
-		SharedPtr(UniquePtr<T>&& p)
+		SharedPtr(UniquePtr<T>&& p) noexcept
 			: _object(p._allocation.release())
 		{
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(UniquePtr<U>&& p)
+		SharedPtr(UniquePtr<U>&& p) noexcept
 			: _object(p._allocation.release())
 		{
 		}
 
-		explicit SharedPtr(T* p)
+		explicit SharedPtr(T* p) noexcept
 			: _object(p)
 		{
 			if (_object)
@@ -96,49 +89,56 @@ namespace Yttrium
 
 		~SharedPtr()
 		{
-			if (_object && !--_object->_counter)
-				Y_DELETE(_object->_allocator, _object);
+			detach();
 		}
 
-		SharedPtr& operator=(const SharedPtr& p)
+		SharedPtr& operator=(const SharedPtr& p) noexcept
 		{
-			if (_object && !--_object->_counter)
-				Y_DELETE(_object->_allocator, _object);
+			detach();
 			_object = p._object;
 			if (_object)
 				++_object->_counter;
 			return *this;
 		}
 
-		SharedPtr& operator=(SharedPtr&& p)
+		SharedPtr& operator=(SharedPtr&& p) noexcept
 		{
-			if (_object && !--_object->_counter)
-				Y_DELETE(_object->_allocator, _object);
+			detach();
 			_object = p._object;
 			p._object = nullptr;
 			return *this;
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr& operator=(SharedPtr<U>&& p)
+		SharedPtr& operator=(SharedPtr<U>&& p) noexcept
 		{
-			if (_object && !--_object->_counter)
-				Y_DELETE(_object->_allocator, _object);
+			detach();
 			_object = p._object;
 			p._object = nullptr;
 			return *this;
 		}
 
-		explicit operator bool() const { return _object; }
+		explicit operator bool() const noexcept { return _object; }
 
-		T* get() const { return static_cast<T*>(_object); }
+		T* get() const noexcept { return static_cast<T*>(_object); }
 
-		T* operator->() const { return get(); }
+		T* operator->() const noexcept { return get(); }
 
-		T& operator*() const { return *get(); }
+		T& operator*() const noexcept { return *get(); }
+
+	private:
+		void detach() noexcept
+		{
+			if (_object && !--_object->_counter)
+			{
+				_object->~Object();
+				_object->_allocator->deallocate(_object);
+			}
+		}
 
 	private:
 		Object* _object = nullptr;
+		template <typename> friend class SharedPtr;
 	};
 
 	template <typename T, typename... Args>

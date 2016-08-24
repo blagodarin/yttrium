@@ -35,7 +35,7 @@ namespace Yttrium
 				_allocation.get()->~T();
 		}
 
-		UniquePtr& operator=(UniquePtr&& other)
+		UniquePtr& operator=(UniquePtr&& other) noexcept
 		{
 			if (_allocation)
 				_allocation.get()->~T();
@@ -44,7 +44,7 @@ namespace Yttrium
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		UniquePtr& operator=(UniquePtr<U>&& other)
+		UniquePtr& operator=(UniquePtr<U>&& other) noexcept
 		{
 			if (_allocation)
 				_allocation.get()->~T();

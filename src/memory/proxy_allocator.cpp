@@ -2,6 +2,7 @@
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
+#include "new.h"
 
 #include <atomic>
 
