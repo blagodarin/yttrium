@@ -222,7 +222,7 @@ namespace Yttrium
 	Y_IMPLEMENT_UNIQUE(Bindings);
 
 	Bindings::Bindings(ScriptContext& script_context, Allocator* allocator)
-		: _private(Y_NEW(allocator, Private)(script_context, allocator))
+		: _private(make_raw<Private>(*allocator, script_context, allocator))
 	{
 	}
 

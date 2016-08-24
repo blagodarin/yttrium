@@ -2,7 +2,7 @@
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
-#include "new.h"
+#include "raw.h"
 
 #include <atomic>
 
@@ -43,17 +43,15 @@ namespace Yttrium
 		: _private(nullptr)
 	{
 		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(&allocator);
-		if (!proxy_allocator)
-		{
-			_private = Y_NEW(&allocator, Private)(String(name, &allocator), allocator);
-		}
-		else
+		if (proxy_allocator)
 		{
 			const auto& proxy_name = proxy_allocator->name();
-			_private = Y_NEW(&proxy_allocator->_private->_allocator, Private)(
+			_private = make_raw<Private>(proxy_allocator->_private->_allocator,
 				String(proxy_name.size() + 1 + name.size(), &allocator) << proxy_name << '.' << name,
 				proxy_allocator->_private->_allocator);
 		}
+		else
+			_private = make_raw<Private>(allocator, String(name, &allocator), allocator);
 	}
 
 	ProxyAllocator::~ProxyAllocator()
@@ -85,7 +83,7 @@ namespace Yttrium
 		}
 	#endif
 
-		Y_DELETE(&_private->_allocator, _private);
+		unmake_raw(_private->_allocator, _private);
 	}
 
 	StaticString ProxyAllocator::name() const

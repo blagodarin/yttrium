@@ -51,7 +51,7 @@ namespace Yttrium
 	}
 
 	IonDocument::IonDocument(Allocator* allocator)
-		: _private(Y_NEW(allocator, IonDocumentPrivate)(allocator))
+		: _private(make_raw<IonDocumentPrivate>(*allocator, allocator))
 	{
 	}
 
@@ -89,7 +89,7 @@ namespace Yttrium
 	IonDocument& IonDocument::operator=(IonDocument&& document) noexcept
 	{
 		if (_private)
-			Y_DELETE(_private->_allocator, _private);
+			unmake_raw(*_private->_allocator, _private);
 		_private = document._private;
 		document._private = nullptr;
 		return *this;
@@ -98,6 +98,6 @@ namespace Yttrium
 	IonDocument::~IonDocument()
 	{
 		if (_private)
-			Y_DELETE(_private->_allocator, _private);
+			unmake_raw(*_private->_allocator, _private);
 	}
 }

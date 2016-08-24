@@ -1,5 +1,6 @@
 #include <yttrium/dir.h>
 
+#include "../../memory/sized_allocation.h"
 #include "../../utils/unique_ptr.h"
 #include "../../utils/zero_terminated.h"
 #include "../private_base.h"
@@ -106,7 +107,7 @@ namespace Yttrium
 			max_name_size = 255;
 		}
 
-		_private = Y_NEW(allocator, Private)(std::move(dir), max_name_size, allocator);
+		_private = make_raw<Private>(*allocator, std::move(dir), max_name_size, allocator);
 	}
 
 	Dir::Iterator Dir::begin() const
@@ -114,8 +115,8 @@ namespace Yttrium
 		if (!_private)
 			return end();
 
-		Iterator iterator(new(_private->_allocator->allocate(_private->_iterator_private_size))
-			Iterator::Private(_private->_dir.get(), _private->_allocator));
+		Iterator iterator(make_sized<Iterator::Private>(*_private->_allocator,
+			_private->_iterator_private_size, _private->_dir.get(), _private->_allocator));
 		::rewinddir(_private->_dir.get());
 		++iterator;
 		return iterator;

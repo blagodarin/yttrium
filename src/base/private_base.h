@@ -3,7 +3,7 @@
 
 #include <yttrium/base.h>
 #include <yttrium/memory/allocator.h>
-#include "../memory/new.h"
+#include "../memory/raw.h"
 
 #include <atomic>
 #include <cassert>
@@ -50,14 +50,14 @@ namespace Yttrium
 			if (source)
 				++source->_references;
 			if (target && !--target->_references)
-				Y_DELETE(target->_allocator, target);
+				unmake_raw(*target->_allocator, target);
 			target = source;
 		}
 
 		static void move(T*& target, T*& source)
 		{
 			if (target && !--target->_references)
-				Y_DELETE(target->_allocator, target);
+				unmake_raw(*target->_allocator, target);
 			target = source;
 			source = nullptr;
 		}
@@ -67,7 +67,7 @@ namespace Yttrium
 			Allocator* allocator = object->_allocator;
 			if (allocator && !--object->_references)
 			{
-				Y_DELETE(allocator, object);
+				unmake_raw(*allocator, object);
 				return true;
 			}
 			return false;
@@ -82,7 +82,7 @@ namespace Yttrium
 				if (allocator) // Otherwise it's an object with static private data.
 				{
 					if (!--object->_references)
-						Y_DELETE(allocator, object);
+						unmake_raw(*allocator, object);
 					*object_ptr = nullptr;
 				}
 			}
@@ -113,7 +113,7 @@ namespace Yttrium
 
 		template <typename... Args>
 		PrivateHolder(Args&&... args, Allocator* allocator)
-			: _pointer(Y_NEW(allocator, T)(std::forward<Args>(args)..., allocator))
+			: _pointer(make_raw<T>(*allocator, std::forward<Args>(args)..., allocator))
 		{
 		}
 
@@ -138,7 +138,7 @@ namespace Yttrium
 		void reset(Allocator* allocator, Args&&... args)
 		{
 			assert(!_pointer);
-			_pointer = Y_NEW(allocator, U)(std::forward<Args>(args)..., allocator);
+			_pointer = make_raw<U>(*allocator, std::forward<Args>(args)..., allocator);
 		}
 
 		PrivateHolder(const PrivateHolder&) = delete;

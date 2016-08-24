@@ -58,7 +58,7 @@ namespace Yttrium
 		if (descriptor == -1)
 			return;
 
-		_private = Y_NEW(allocator, Private)(String(name, allocator), descriptor, mode, allocator);
+		_private = make_raw<Private>(*allocator, String(name, allocator), descriptor, mode, allocator);
 		if ((mode & (Read | Write | Pipe)) == Read)
 			_size = ::lseek(descriptor, 0, SEEK_END);
 	}
@@ -76,13 +76,13 @@ namespace Yttrium
 				if (descriptor == -1)
 					break;
 
-				_private = Y_NEW(allocator, Private)(std::move(name), descriptor, ReadWrite, allocator);
+				_private = make_raw<Private>(*allocator, std::move(name), descriptor, ReadWrite, allocator);
 				_private->_auto_remove = true;
 			}
 			break;
 
 		case StdErr:
-			_private = Y_NEW(allocator, Private)(String(allocator), STDERR_FILENO, Write | Pipe, allocator);
+			_private = make_raw<Private>(*allocator, String(allocator), STDERR_FILENO, Write | Pipe, allocator);
 			_private->_auto_close = false;
 			break;
 		}
