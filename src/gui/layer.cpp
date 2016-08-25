@@ -17,7 +17,7 @@ namespace Yttrium
 		, _named_widgets(_gui.allocator())
 		, _widgets(_gui.allocator())
 		, _is_transparent(is_transparent)
-		, _bindings(_gui.script_context(), &_gui.allocator())
+		, _bindings(_gui.script_context(), _gui.allocator())
 	{
 	}
 

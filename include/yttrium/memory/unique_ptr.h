@@ -54,6 +54,7 @@ namespace Yttrium
 
 		explicit operator bool() const noexcept { return static_cast<bool>(_allocation); }
 
+		Allocator& allocator() const { return _allocation.allocator(); }
 		T* get() const noexcept { return _allocation.get(); }
 		T* operator->() const noexcept { return _allocation.get(); }
 		T& operator*() const noexcept { return *_allocation.get(); }

@@ -5,6 +5,7 @@
 #define _include_yttrium_memory_allocation_h_
 
 #include <yttrium/memory/allocator.h>
+#include <yttrium/memory/global.h>
 
 #include <type_traits>
 
@@ -63,6 +64,11 @@ namespace Yttrium
 			_allocator->deallocate(_pointer);
 		}
 
+		Allocator& allocator() const noexcept
+		{
+			return *_allocator;
+		}
+
 		T* get() const noexcept
 		{
 			return _pointer;
@@ -81,7 +87,7 @@ namespace Yttrium
 		}
 
 	private:
-		Allocator* _allocator = nullptr;
+		Allocator* _allocator = &NoAllocator;
 		T* _pointer = nullptr;
 		template <typename> friend class Allocation;
 	};

@@ -19,6 +19,7 @@
 		- Location information support.
 	* Memory:
 		- Keep a global track of all ProxyAllocators for realtime memory activity tracking.
+		- Get rid of <yttrium/base.h>.
 	* Renderer:
 		- OpenGL 3.3 compliance.
 * Examples:

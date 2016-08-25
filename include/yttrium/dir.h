@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_dir_h_
 #define _include_yttrium_dir_h_
 
-#include <yttrium/base.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium
@@ -52,7 +52,11 @@ namespace Yttrium
 		};
 
 		///
-		explicit Dir(const StaticString& name, Allocator* allocator = DefaultAllocator);
+		explicit Dir(const StaticString& name, Allocator& = *DefaultAllocator);
+
+		~Dir();
+
+		explicit operator bool() const noexcept;
 
 		///
 		Iterator begin() const;
@@ -64,8 +68,8 @@ namespace Yttrium
 		static bool exists(const StaticString& name);
 
 	private:
-		Y_UNIQUE_PRIVATE(Dir);
-		Dir() = delete;
+		class Private;
+		UniquePtr<Private> _private;
 	};
 }
 

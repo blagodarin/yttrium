@@ -1,9 +1,10 @@
 #include <yttrium/dir.h>
 
+#include "../../memory/raw.h"
 #include "../../utils/unique_ptr.h"
 #include "../../utils/zero_terminated.h"
-#include "../private_base.h"
 
+#include <cassert>
 #include <system_error>
 
 #include <dirent.h>
@@ -16,22 +17,22 @@ namespace Yttrium
 	class Dir::Iterator::Private
 	{
 	public:
-
-		Allocator* _allocator;
-		DIR*       _dir;
-		::dirent   _dirent;
-
-		Private(DIR* dir, Allocator* allocator)
-			: _allocator(allocator)
+		Private(Allocator& allocator, DIR* dir)
+			: _allocator(&allocator)
 			, _dir(dir)
 		{
 		}
+
+	public:
+		Allocator* const _allocator; // TODO: Why changing it to reference generates compiler warning on offsetof?
+		DIR* const _dir;
+		::dirent _dirent;
 	};
 
 	Dir::Iterator::~Iterator()
 	{
 		if (_private)
-			_private->_allocator->deallocate(_private);
+			unmake_raw(*_private->_allocator, _private);
 	}
 
 	void Dir::Iterator::operator++()
@@ -42,7 +43,7 @@ namespace Yttrium
 			throw std::system_error(errno, std::generic_category());
 		else if (dirent)
 			return;
-		_private->_allocator->deallocate(_private);
+		unmake_raw(*_private->_allocator, _private);
 		_private = nullptr;
 	}
 
@@ -58,27 +59,24 @@ namespace Yttrium
 
 	using P_DIR = Y_UNIQUE_PTR(DIR, ::closedir);
 
-	class Y_PRIVATE Dir::Private : public PrivateBase<Dir::Private>
+	class Dir::Private
 	{
 	public:
-
-		Private(P_DIR&& dir, long max_name_size, Allocator* allocator)
-			: PrivateBase(allocator)
-			, _dir(std::move(dir))
-			, _iterator_private_size(offsetof(Iterator::Private, _dirent)
+		Private(P_DIR&& dir, long max_name_size)
+			: _dir(std::move(dir))
+			, _iterator_private_size(offsetof(Dir::Iterator::Private, _dirent)
 				+ offsetof(::dirent, d_name) + max_name_size + 1)
 		{
 		}
 
-	public:
+		~Private() = default; // Prevents external visibility.
 
+	public:
 		P_DIR _dir;
 		const size_t _iterator_private_size;
 	};
 
-	Y_IMPLEMENT_UNIQUE(Dir);
-
-	Dir::Dir(const StaticString& name, Allocator* allocator)
+	Dir::Dir(const StaticString& name, Allocator& allocator)
 	{
 		Y_ZERO_TERMINATED(name_z, name);
 
@@ -106,16 +104,22 @@ namespace Yttrium
 			max_name_size = 255;
 		}
 
-		_private = make_raw<Private>(*allocator, std::move(dir), max_name_size, allocator);
+		_private = make_unique<Private>(allocator, std::move(dir), max_name_size);
+	}
+
+	Dir::~Dir() = default;
+
+	Dir::operator bool() const noexcept
+	{
+		return static_cast<bool>(_private);
 	}
 
 	Dir::Iterator Dir::begin() const
 	{
 		if (!_private)
 			return end();
-
-		Iterator iterator(make_raw_sized<Iterator::Private>(*_private->_allocator,
-			_private->_iterator_private_size, _private->_dir.get(), _private->_allocator));
+		Iterator iterator(make_raw_sized<Iterator::Private>(_private.allocator(),
+			_private->_iterator_private_size, _private.allocator(), _private->_dir.get()));
 		::rewinddir(_private->_dir.get());
 		++iterator;
 		return iterator;

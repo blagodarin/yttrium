@@ -25,7 +25,7 @@ Game::Game()
 	, _script(&_script_allocator)
 	, _audio_allocator("audio")
 	, _window_allocator("window")
-	, _bindings(_script, &_allocator)
+	, _bindings(_script, _allocator)
 	, _statistics({
 			{100000, String("John Placeholder", &_allocator)},
 			{50000, String("John Placeholder", &_allocator)},

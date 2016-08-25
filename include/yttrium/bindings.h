@@ -5,6 +5,7 @@
 #define _include_yttrium_bindings_h_
 
 #include <yttrium/key.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/script/code.h>
 #include <yttrium/string.h>
 
@@ -33,7 +34,9 @@ namespace Yttrium
 		friend Iterator;
 
 		///
-		Bindings(ScriptContext& script_context, Allocator* allocator = DefaultAllocator);
+		Bindings(ScriptContext&, Allocator& = *DefaultAllocator);
+
+		~Bindings();
 
 		///
 		Iterator begin() const;
@@ -66,7 +69,8 @@ namespace Yttrium
 		bool unbind(const StaticString& name);
 
 	private:
-		Y_UNIQUE_PRIVATE(Bindings);
+		class Private;
+		const UniquePtr<Private> _private;
 	};
 }
 

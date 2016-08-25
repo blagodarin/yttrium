@@ -1,7 +1,6 @@
 #include <yttrium/bindings.h>
 
 #include <yttrium/script/context.h>
-#include "../../base/private_base.h"
 #include "lookup.h"
 
 #include <array>
@@ -185,21 +184,24 @@ namespace Yttrium
 		};
 	}
 
-	struct Y_PRIVATE Bindings::Private : public PrivateBase<Bindings::Private>
+	class Bindings::Private
 	{
-		ScriptContext& _script_context;
-		std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
-
-		Private(ScriptContext& script_context, Allocator* allocator)
-			: PrivateBase(allocator)
-			, _script_context(script_context)
+	public:
+		Private(ScriptContext& script_context)
+			: _script_context(script_context)
 		{
 		}
+
+		~Private() = default; // Prevents external visibility.
 
 		bool is_valid_index(size_t index) const
 		{
 			return bind_names[index][0] && !_actions[index].first.is_empty();
 		}
+
+	public:
+		ScriptContext& _script_context;
+		std::array<std::pair<String, ScriptCode>, KeyCount> _actions;
 	};
 
 	std::pair<StaticString, StaticString> Bindings::Iterator::operator*() const
@@ -219,12 +221,12 @@ namespace Yttrium
 		} while (_index < _bindings._private->_actions.size());
 	}
 
-	Y_IMPLEMENT_UNIQUE(Bindings);
-
-	Bindings::Bindings(ScriptContext& script_context, Allocator* allocator)
-		: _private(make_raw<Private>(*allocator, script_context, allocator))
+	Bindings::Bindings(ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<Private>(allocator, script_context))
 	{
 	}
+
+	Bindings::~Bindings() = default;
 
 	Bindings::Iterator Bindings::begin() const
 	{
@@ -237,7 +239,7 @@ namespace Yttrium
 	void Bindings::bind(Key key, const StaticString& action)
 	{
 		auto& binding = _private->_actions[KeyType(key)];
-		binding.first.swap(String(action, _private->_allocator));
+		binding.first.swap(String(action, &_private.allocator()));
 		binding.second = ScriptCode(binding.first, &_private->_script_context.allocator());
 	}
 
@@ -255,7 +257,7 @@ namespace Yttrium
 		auto& binding = _private->_actions[KeyType(key)];
 		if (binding.first.is_empty())
 		{
-			binding.first.swap(String(action, _private->_allocator));
+			binding.first.swap(String(action, &_private.allocator()));
 			binding.second = ScriptCode(binding.first, &_private->_script_context.allocator());
 		}
 	}
