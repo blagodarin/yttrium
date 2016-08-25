@@ -18,9 +18,9 @@ namespace Yttrium
 		Allocation(const Allocation&) = delete;
 		Allocation& operator=(const Allocation&) = delete;
 
-		Allocation(Allocator& allocator)
+		Allocation(Allocator& allocator, size_t size = sizeof(T))
 			: _allocator(&allocator)
-			, _pointer(static_cast<T*>(_allocator->allocate(sizeof(T))))
+			, _pointer(static_cast<T*>(_allocator->allocate(size)))
 		{
 		}
 

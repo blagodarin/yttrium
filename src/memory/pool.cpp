@@ -1,8 +1,6 @@
 #include "pool.h"
 
-#include <yttrium/memory/allocator.h>
 #include "raw.h"
-#include "sized_allocation.h"
 
 // TODO: Get rid of magical chunk item count in places where pools are used.
 // Perhaps setting the pool chunk size to memory page size will do.
@@ -99,7 +97,7 @@ namespace Yttrium
 	void* PoolBase::allocate()
 	{
 		if (!_last_chunk || _last_chunk->is_full())
-			_last_chunk = make_sized<Chunk>(*_allocator, _chunk_size, _chunk_items, _item_size, _last_chunk);
+			_last_chunk = make_raw_sized<Chunk>(*_allocator, _chunk_size, _chunk_items, _item_size, _last_chunk);
 
 		char* pointer = _last_chunk->allocate()->data;
 

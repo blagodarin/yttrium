@@ -16,6 +16,14 @@ namespace Yttrium
 		return allocation.release();
 	}
 
+	template <typename T, typename... Args>
+	T* make_raw_sized(Allocator& allocator, size_t size, Args&&... args)
+	{
+		Allocation<T> allocation(allocator, size);
+		new(allocation.get()) T(std::forward<Args>(args)...);
+		return allocation.release();
+	}
+
 	template <typename T>
 	void unmake_raw(Allocator& allocator, T* pointer)
 	{
