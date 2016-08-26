@@ -18,7 +18,7 @@ namespace Yttrium
 
 	String ScriptArgs::string(size_t index, NameResolution resolution) const
 	{
-		String result(_context._private->_allocator);
+		String result(&_context._private.allocator());
 
 		if (index < _values.size())
 		{

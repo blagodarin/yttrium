@@ -56,7 +56,7 @@ namespace Yttrium
 
 		~Dir();
 
-		explicit operator bool() const noexcept;
+		explicit operator bool() const noexcept { return static_cast<bool>(_private); }
 
 		///
 		Iterator begin() const;

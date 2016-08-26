@@ -1,7 +1,6 @@
 #ifndef _src_base_private_base_h_
 #define _src_base_private_base_h_
 
-#include <yttrium/base.h>
 #include "../memory/raw.h"
 
 #include <atomic>

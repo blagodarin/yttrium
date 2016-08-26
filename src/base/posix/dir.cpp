@@ -109,11 +109,6 @@ namespace Yttrium
 
 	Dir::~Dir() = default;
 
-	Dir::operator bool() const noexcept
-	{
-		return static_cast<bool>(_private);
-	}
-
 	Dir::Iterator Dir::begin() const
 	{
 		if (!_private)

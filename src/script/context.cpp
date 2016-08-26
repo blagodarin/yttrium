@@ -9,21 +9,14 @@
 
 namespace Yttrium
 {
-	Y_IMPLEMENT_UNIQUE(ScriptContext);
-
 	ScriptContext::ScriptContext(Allocator* allocator)
-		: _private(make_raw<Private>(*allocator, nullptr, *allocator))
+		: _private(make_unique<Private>(*allocator, *allocator))
 	{
 	}
 
 	ScriptContext::ScriptContext(ScriptContext* parent, Allocator* allocator)
-		: _private(make_raw<Private>(*allocator, parent, *allocator))
+		: _private(make_unique<Private>(*allocator, *allocator, parent))
 	{
-	}
-
-	Allocator& ScriptContext::allocator() const
-	{
-		return *_private->_allocator;
 	}
 
 	bool ScriptContext::call(const StaticString& name, String* result, const ScriptArgs& args)
@@ -54,7 +47,7 @@ namespace Yttrium
 
 	void ScriptContext::define(const StaticString& name, size_t min_args, size_t max_args, const Command& command)
 	{
-		_private->_commands[String(name, _private->_allocator)] = Private::CommandContext(command, min_args, max_args);
+		_private->_commands[String(name, &_private.allocator())] = ScriptCommandContext(command, min_args, max_args);
 	}
 
 	ScriptValue* ScriptContext::find(const StaticString& name) const
@@ -82,8 +75,8 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, _private->_allocator),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
+			i = _private->_values.emplace(String(name, &_private.allocator()),
+				new(_private->_value_pool.allocate()) ScriptValue(value, &_private.allocator())).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -93,8 +86,8 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, _private->_allocator),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
+			i = _private->_values.emplace(String(name, &_private.allocator()),
+				new(_private->_value_pool.allocate()) ScriptValue(value, &_private.allocator())).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -104,8 +97,8 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, _private->_allocator),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
+			i = _private->_values.emplace(String(name, &_private.allocator()),
+				new(_private->_value_pool.allocate()) ScriptValue(value, &_private.allocator())).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -155,4 +148,6 @@ namespace Yttrium
 	{
 		_private->_commands.erase(String(name, ByReference()));
 	}
+
+	ScriptContext::~ScriptContext() = default;
 }

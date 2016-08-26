@@ -5,7 +5,6 @@
 #define _include_yttrium_bindings_h_
 
 #include <yttrium/key.h>
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/script/code.h>
 #include <yttrium/string.h>
 

@@ -5,55 +5,51 @@
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
-#include "../base/private_base.h"
 #include "scanner.h"
 
 namespace Yttrium
 {
-	class Y_PRIVATE ScriptCode::Private: public PrivateBase<ScriptCode::Private>
+	struct ScriptCommand
+	{
+		String name;
+		StdVector<ScriptValue*> args;
+
+		ScriptCommand(const StaticString& name, Allocator& allocator)
+			: name(name, &allocator)
+			, args(allocator)
+		{
+		}
+	};
+
+	class ScriptCode::Private
 	{
 	public:
-
-		Private(Allocator* allocator)
-			: PrivateBase(allocator)
-			, _commands(*allocator)
-			, _temporaries(32, allocator)
-			, _last_result(allocator)
+		Private(Allocator& allocator)
+			: _commands(allocator)
+			, _temporaries(32, &allocator)
+			, _last_result(&allocator)
 		{
 		}
 
-		~Private() = default;
+		~Private() = default; // Prevents external visibility.
 
 	public:
-
-		struct Command
-		{
-			String name;
-			StdVector<ScriptValue*> args;
-
-			Command(const StaticString& name, Allocator* allocator)
-				: name(name, allocator)
-				, args(*allocator)
-			{
-			}
-		};
-
-		StdVector<Command> _commands;
-		Pool<ScriptValue>  _temporaries;
-		String             _last_result;
+		StdVector<ScriptCommand> _commands;
+		Pool<ScriptValue> _temporaries;
+		String _last_result;
 	};
 
-	Y_IMPLEMENT_UNIQUE(ScriptCode);
+	ScriptCode::ScriptCode() = default;
 
 	ScriptCode::ScriptCode(String&& text, Allocator* allocator)
 	{
-		PrivateHolder<ScriptCode::Private> code(allocator);
+		auto&& code = make_unique<Private>(*allocator, *allocator);
 
 		ScriptScanner scanner(text);
 
 		ScriptScanner::Token token;
 
-		Private::Command* command = nullptr;
+		ScriptCommand* command = nullptr;
 
 		enum class ParserState
 		{
@@ -72,7 +68,7 @@ namespace Yttrium
 				{
 				case ScriptScanner::Token::Identifier:
 				case ScriptScanner::Token::XIdentifier:
-					code->_commands.emplace_back(token.string, allocator);
+					code->_commands.emplace_back(token.string, *allocator);
 					command = &code->_commands.back();
 					state = ParserState::Command;
 					break;
@@ -118,7 +114,7 @@ namespace Yttrium
 		if (token.type != ScriptScanner::Token::End)
 			return;
 
-		_private = code.release();
+		_private = std::move(code);
 	}
 
 	ScriptCode::ScriptCode(const StaticString& text, Allocator* allocator)
@@ -158,4 +154,7 @@ namespace Yttrium
 		String text(allocator);
 		return File(filename, allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
 	}
+
+	ScriptCode::~ScriptCode() = default;
+	ScriptCode& ScriptCode::operator=(ScriptCode&&) = default;
 }

@@ -10,6 +10,8 @@
 
 namespace Yttrium
 {
+	template <typename> class SharedPtr;
+
 	template <typename T>
 	class UniquePtr
 	{

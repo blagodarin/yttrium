@@ -1,7 +1,6 @@
 #ifndef _src_base_thread_buffer_h_
 #define _src_base_thread_buffer_h_
 
-#include <yttrium/base.h>
 #include <yttrium/timer.h>
 
 #include <condition_variable>

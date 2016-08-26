@@ -2,14 +2,14 @@
 #define _src_window_x11_screen_h_
 
 #include <yttrium/screen.h>
-
-#include "../../base/private_base.h"
 #include "../../utils/unique_ptr.h"
 
 #include <X11/Xlib.h>
 
 namespace Yttrium
 {
+	class Allocator;
+
 	template <typename> class UniquePtr;
 
 	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);

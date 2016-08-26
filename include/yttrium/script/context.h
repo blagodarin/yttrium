@@ -4,8 +4,7 @@
 #ifndef _include_yttrium_script_context_h_
 #define _include_yttrium_script_context_h_
 
-#include <yttrium/base.h>
-#include <yttrium/memory/global.h>
+#include <yttrium/memory/unique_ptr.h>
 
 #include <functional>
 
@@ -59,7 +58,7 @@ namespace Yttrium
 		ScriptContext(ScriptContext* parent, Allocator* allocator = nullptr);
 
 		///
-		Allocator& allocator() const;
+		Allocator& allocator() const { return _private.allocator(); }
 
 		/// Call a command.
 		/// \param name Command name.
@@ -133,7 +132,10 @@ namespace Yttrium
 		void unset(const StaticString& name);
 
 	private:
-		Y_UNIQUE_PRIVATE(ScriptContext);
+		class Private;
+		const UniquePtr<Private> _private;
+	public:
+		~ScriptContext();
 	};
 }
 

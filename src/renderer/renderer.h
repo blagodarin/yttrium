@@ -10,7 +10,6 @@
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
-#include "../base/private_base.h"
 
 namespace Yttrium
 {
