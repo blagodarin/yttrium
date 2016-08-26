@@ -226,8 +226,6 @@ namespace Yttrium
 	{
 	}
 
-	Bindings::~Bindings() = default;
-
 	Bindings::Iterator Bindings::begin() const
 	{
 		size_t index = 0;
@@ -309,4 +307,6 @@ namespace Yttrium
 		unbind(key);
 		return true;
 	}
+
+	Bindings::~Bindings() = default;
 }

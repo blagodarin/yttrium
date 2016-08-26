@@ -134,6 +134,7 @@ namespace Yttrium
 	private:
 		class Private;
 		const UniquePtr<Private> _private;
+
 	public:
 		~ScriptContext();
 	};

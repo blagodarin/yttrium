@@ -47,6 +47,7 @@ namespace Yttrium
 	private:
 		class Private;
 		UniquePtr<Private> _private;
+
 	public:
 		ScriptCode(ScriptCode&&) = default;
 		~ScriptCode();

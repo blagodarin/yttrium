@@ -54,8 +54,7 @@ namespace Yttrium
 		///
 		explicit Dir(const StaticString& name, Allocator& = *DefaultAllocator);
 
-		~Dir();
-
+		///
 		explicit operator bool() const noexcept { return static_cast<bool>(_private); }
 
 		///
@@ -70,6 +69,9 @@ namespace Yttrium
 	private:
 		class Private;
 		UniquePtr<Private> _private;
+
+	public:
+		~Dir();
 	};
 }
 

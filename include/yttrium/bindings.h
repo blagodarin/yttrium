@@ -35,8 +35,6 @@ namespace Yttrium
 		///
 		Bindings(ScriptContext&, Allocator& = *DefaultAllocator);
 
-		~Bindings();
-
 		///
 		Iterator begin() const;
 
@@ -70,6 +68,9 @@ namespace Yttrium
 	private:
 		class Private;
 		const UniquePtr<Private> _private;
+
+	public:
+		~Bindings();
 	};
 }
 

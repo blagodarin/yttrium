@@ -190,7 +190,7 @@ namespace Yttrium
 		__Count,
 	};
 
-	enum: KeyType
+	enum : KeyType
 	{
 		KeyCount = Key::__Count, ///< Number of keys defined.
 	};

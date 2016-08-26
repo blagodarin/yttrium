@@ -107,8 +107,6 @@ namespace Yttrium
 		_private = make_unique<Private>(allocator, std::move(dir), max_name_size);
 	}
 
-	Dir::~Dir() = default;
-
 	Dir::Iterator Dir::begin() const
 	{
 		if (!_private)
@@ -130,4 +128,6 @@ namespace Yttrium
 
 		return S_ISDIR(stat_buffer.st_mode);
 	}
+
+	Dir::~Dir() = default;
 }
