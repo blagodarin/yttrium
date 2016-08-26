@@ -14,21 +14,14 @@ namespace Yttrium
 	class Y_API Object
 	{
 	public:
-		Object() = delete;
 		Object(const Object&) = delete;
-		Object(Object&&) = delete;
 		Object& operator=(const Object&) = delete;
-		Object& operator=(Object&&) = delete;
-
-		///
-		Allocator* allocator() const { return _allocator; }
 
 	protected:
-		explicit Object(Allocator* allocator) : _allocator(allocator) {}
+		Object() = default;
 		virtual ~Object() = default;
 
 	private:
-		Allocator* const _allocator;
 		std::atomic<size_t> _counter{0};
 		template <typename> friend class SharedPtr;
 	};
@@ -41,50 +34,41 @@ namespace Yttrium
 
 		SharedPtr() = default;
 
-		SharedPtr(const SharedPtr& p) noexcept
-			: _object(p._object)
+		SharedPtr(const SharedPtr& other) noexcept
+			: _allocation(other._allocation.allocator(), other._allocation.get())
 		{
-			if (_object)
-				++_object->_counter;
+			attach();
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(const SharedPtr<U>& p) noexcept
-			: _object(p._object)
+		SharedPtr(const SharedPtr<U>& other) noexcept
+			: _allocation(other._allocation.allocator(), other._allocation.get())
 		{
-			if (_object)
-				++_object->_counter;
+			attach();
 		}
 
-		SharedPtr(SharedPtr&& p) noexcept
-			: _object(p._object)
-		{
-			p._object = nullptr;
-		}
-
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(SharedPtr<U>&& p) noexcept
-			: _object(p._object)
-		{
-			p._object = nullptr;
-		}
-
-		SharedPtr(UniquePtr<T>&& p) noexcept
-			: _object(p._allocation.release())
+		SharedPtr(SharedPtr&& other) noexcept
+			: _allocation(std::move(other._allocation))
 		{
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr(UniquePtr<U>&& p) noexcept
-			: _object(p._allocation.release())
+		SharedPtr(SharedPtr<U>&& other) noexcept
+			: _allocation(std::move(other._allocation))
 		{
 		}
 
-		explicit SharedPtr(T* p) noexcept
-			: _object(p)
+		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		SharedPtr(UniquePtr<U>&& other) noexcept
+			: _allocation(std::move(other._allocation))
 		{
-			if (_object)
-				++_object->_counter;
+			attach();
+		}
+
+		SharedPtr(Allocator& allocator, T* pointer) noexcept
+			: _allocation(allocator, pointer)
+		{
+			attach();
 		}
 
 		~SharedPtr()
@@ -92,52 +76,58 @@ namespace Yttrium
 			detach();
 		}
 
-		SharedPtr& operator=(const SharedPtr& p) noexcept
+		SharedPtr& operator=(const SharedPtr& other) noexcept
 		{
 			detach();
-			_object = p._object;
-			if (_object)
-				++_object->_counter;
+			_allocation = Allocation<Object>(other._allocation.allocator(), other._allocation.get());
+			attach();
 			return *this;
 		}
 
-		SharedPtr& operator=(SharedPtr&& p) noexcept
+		SharedPtr& operator=(SharedPtr&& other) noexcept
 		{
 			detach();
-			_object = p._object;
-			p._object = nullptr;
+			_allocation = std::move(other._allocation);
 			return *this;
 		}
 
 		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
-		SharedPtr& operator=(SharedPtr<U>&& p) noexcept
+		SharedPtr& operator=(SharedPtr<U>&& other) noexcept
 		{
 			detach();
-			_object = p._object;
-			p._object = nullptr;
+			_allocation = std::move(other._allocation);
 			return *this;
 		}
 
-		explicit operator bool() const noexcept { return _object; }
+		explicit operator bool() const noexcept { return static_cast<bool>(_allocation); }
 
-		T* get() const noexcept { return static_cast<T*>(_object); }
-
+		Allocator& allocator() const { return _allocation.allocator(); }
+		T* get() const noexcept { return static_cast<T*>(_allocation.get()); }
 		T* operator->() const noexcept { return get(); }
-
 		T& operator*() const noexcept { return *get(); }
 
 	private:
+		void attach() noexcept
+		{
+			if (_allocation)
+				++_allocation.get()->_counter;
+		}
+
 		void detach() noexcept
 		{
-			if (_object && !--_object->_counter)
+			if (_allocation)
 			{
-				_object->~Object();
-				_object->_allocator->deallocate(_object);
+				if (--_allocation.get()->_counter > 0)
+					_allocation.release();
+				else
+					_allocation.get()->~Object();
 			}
 		}
 
 	private:
-		Object* _object = nullptr;
+		Allocation<Object> _allocation;
+		SharedPtr(Allocation<T>&& allocation) noexcept : _allocation(std::move(allocation)) { attach(); }
+		template <typename U, typename... Args> friend SharedPtr<U> make_shared(Allocator&, Args&&...);
 		template <typename> friend class SharedPtr;
 	};
 
@@ -146,7 +136,7 @@ namespace Yttrium
 	{
 		Allocation<T> allocation(allocator);
 		new(allocation.get()) T(std::forward<Args>(args)...);
-		return SharedPtr<T>(allocation.release());
+		return SharedPtr<T>(std::move(allocation));
 	}
 
 	template <typename T1, typename T2>

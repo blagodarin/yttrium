@@ -22,9 +22,6 @@ namespace Yttrium
 
 		/// Plays the sound asynchronously.
 		virtual void play() const = 0;
-
-	protected:
-		Sound(Allocator* allocator) : Object(allocator) {}
 	};
 }
 

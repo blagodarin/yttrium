@@ -19,7 +19,7 @@ namespace Yttrium
 
 	protected:
 
-		SoundImpl(const StaticString& name, Allocator* allocator): Sound(allocator), _name(name, allocator) {}
+		SoundImpl(const StaticString& name, Allocator* allocator): _name(name, allocator) {}
 
 	private:
 

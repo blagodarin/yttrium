@@ -77,7 +77,7 @@ namespace Yttrium
 
 		const auto i = _sounds.find(String(name, ByReference()));
 		if (i != _sounds.end())
-			return SharedPtr<Sound>(i->second);
+			return SharedPtr<Sound>(*i->second.first, i->second.second);
 
 		const auto reader = AudioReader::open(name, AudioType::Auto, allocator);
 		if (!reader)
@@ -87,7 +87,7 @@ namespace Yttrium
 		if (!sound->load(*reader))
 			return {};
 
-		_sounds.emplace(sound->name(), sound.get());
+		_sounds.emplace(sound->name(), std::make_pair(&sound.allocator(), sound.get()));
 		return std::move(sound);
 	}
 

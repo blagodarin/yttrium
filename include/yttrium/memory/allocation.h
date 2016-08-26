@@ -40,6 +40,13 @@ namespace Yttrium
 			other._pointer = nullptr;
 		}
 
+		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		Allocation(Allocator& allocator, U* pointer) noexcept
+			: _allocator(&allocator)
+			, _pointer(pointer)
+		{
+		}
+
 		Allocation& operator=(Allocation&& other) noexcept
 		{
 			_allocator->deallocate(_pointer);

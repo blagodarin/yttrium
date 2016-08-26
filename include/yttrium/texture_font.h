@@ -42,9 +42,6 @@ namespace Yttrium
 
 		///
 		virtual SizeF text_size(const StaticString&, const SizeF& font_size) const = 0;
-
-	protected:
-		TextureFont(Allocator& allocator) : Object(&allocator) {}
 	};
 }
 

@@ -35,7 +35,7 @@ namespace Yttrium
 		Allocator& _allocator;
 		const UniquePtr<AudioBackend> _backend;
 		AudioPlayerImpl _player;
-		StdMap<String, Sound*> _sounds;
+		StdMap<String, std::pair<Allocator*, Sound*>> _sounds;
 		AudioManagerGuard _instance_guard;
 	};
 }

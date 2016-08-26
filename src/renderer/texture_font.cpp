@@ -13,8 +13,7 @@ namespace Yttrium
 	{
 	public:
 		TextureFontImpl(Allocator& allocator, int size)
-			: TextureFont(allocator)
-			, _size(size)
+			: _size(size)
 			, _chars(allocator)
 			, _kernings(allocator)
 		{

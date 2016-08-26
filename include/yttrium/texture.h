@@ -58,14 +58,9 @@ namespace Yttrium
 
 	protected:
 		const Size _size;
-		Filter _filter;
+		Filter _filter = NearestFilter;
 
-		Texture2D(const Size& size, Allocator* allocator)
-			: Object(allocator)
-			, _size(size)
-			, _filter(NearestFilter)
-		{
-		}
+		Texture2D(const Size& size) : _size(size) {}
 	};
 }
 

@@ -18,7 +18,7 @@ protected:
 	Renderer& _renderer;
 	UniquePtr<VertexBuffer> _vertices;
 	UniquePtr<IndexBuffer> _indices;
-	SharedPtr<Texture2D> _texture;
+	UniquePtr<Texture2D> _texture;
 	UniquePtr<GpuProgram> _program;
 };
 
