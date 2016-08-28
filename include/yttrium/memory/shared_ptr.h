@@ -11,22 +11,22 @@
 namespace Yttrium
 {
 	/// An object with a reference counter.
-	class Y_API Object
+	class Y_API Shared
 	{
 	public:
-		Object(const Object&) = delete;
-		Object& operator=(const Object&) = delete;
+		Shared(const Shared&) = delete;
+		Shared& operator=(const Shared&) = delete;
 
 	protected:
-		Object() = default;
-		virtual ~Object() = default;
+		Shared() = default;
+		virtual ~Shared() = default;
 
 	private:
 		std::atomic<size_t> _counter{0};
 		template <typename> friend class SharedPtr;
 	};
 
-	/// Shared pointer to an Object descendant.
+	/// %Shared pointer to Shared descendant.
 	template <typename T>
 	class SharedPtr
 	{
@@ -79,7 +79,7 @@ namespace Yttrium
 		SharedPtr& operator=(const SharedPtr& other) noexcept
 		{
 			detach();
-			_allocation = Allocation<Object>(other._allocation.allocator(), other._allocation.get());
+			_allocation = Allocation<Shared>(other._allocation.allocator(), other._allocation.get());
 			attach();
 			return *this;
 		}
@@ -120,18 +120,18 @@ namespace Yttrium
 				if (--_allocation.get()->_counter > 0)
 					_allocation.release();
 				else
-					_allocation.get()->~Object();
+					_allocation.get()->~Shared();
 			}
 		}
 
 	private:
-		Allocation<Object> _allocation;
+		Allocation<Shared> _allocation;
 		SharedPtr(Allocation<T>&& allocation) noexcept : _allocation(std::move(allocation)) { attach(); }
-		template <typename U, typename... Args> friend SharedPtr<U> make_shared(Allocator&, Args&&...);
+		template <typename U, typename... Args, typename> friend SharedPtr<U> make_shared(Allocator&, Args&&...);
 		template <typename> friend class SharedPtr;
 	};
 
-	template <typename T, typename... Args>
+	template <typename T, typename... Args, typename = std::enable_if_t<std::is_base_of<Shared, T>::value>>
 	SharedPtr<T> make_shared(Allocator& allocator, Args&&... args)
 	{
 		Allocation<T> allocation(allocator);

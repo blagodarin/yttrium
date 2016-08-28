@@ -11,7 +11,7 @@ namespace Yttrium
 	class StaticString;
 
 	/// %Sound.
-	class Y_API Sound : public Object
+	class Y_API Sound : public Shared
 	{
 	public:
 

@@ -10,7 +10,7 @@
 namespace Yttrium
 {
 	/// 2D texture.
-	class Y_API Texture2D : public Object
+	class Y_API Texture2D : public Shared
 	{
 	public:
 

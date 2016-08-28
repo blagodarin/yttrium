@@ -8,8 +8,8 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_bindings)
 {
-	BOOST_CHECK(lookup_key(StaticString()) == Key::Null);
-	BOOST_CHECK(lookup_key("invalid_key") == Key::Null);
+	BOOST_CHECK(lookup_key({}) == Key::Null);
+	BOOST_CHECK(lookup_key("no_such_key") == Key::Null);
 
 	// Special keys (0x01 - 0x0F).
 

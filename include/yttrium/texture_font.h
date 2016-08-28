@@ -17,7 +17,7 @@ namespace Yttrium
 	template <typename> class UniquePtr;
 
 	/// Texture font markup.
-	class Y_API TextureFont : public Object
+	class Y_API TextureFont : public Shared
 	{
 	public:
 		/// Font character information.
