@@ -40,7 +40,7 @@ namespace Yttrium
 			attach();
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		SharedPtr(const SharedPtr<U>& other) noexcept
 			: _allocation(other._allocation.allocator(), other._allocation.get())
 		{
@@ -52,13 +52,13 @@ namespace Yttrium
 		{
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		SharedPtr(SharedPtr<U>&& other) noexcept
 			: _allocation(std::move(other._allocation))
 		{
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		SharedPtr(UniquePtr<U>&& other) noexcept
 			: _allocation(std::move(other._allocation))
 		{
@@ -91,7 +91,7 @@ namespace Yttrium
 			return *this;
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		SharedPtr& operator=(SharedPtr<U>&& other) noexcept
 		{
 			detach();

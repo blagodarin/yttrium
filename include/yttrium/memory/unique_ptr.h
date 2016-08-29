@@ -25,7 +25,7 @@ namespace Yttrium
 		{
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		UniquePtr(UniquePtr<U>&& other) noexcept
 			: _allocation(std::move(other._allocation))
 		{
@@ -45,7 +45,7 @@ namespace Yttrium
 			return *this;
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		UniquePtr& operator=(UniquePtr<U>&& other) noexcept
 		{
 			if (_allocation)

@@ -32,7 +32,7 @@ namespace Yttrium
 			other._pointer = nullptr;
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		Allocation(Allocation<U>&& other) noexcept
 			: _allocator(other._allocator)
 			, _pointer(other._pointer)
@@ -40,7 +40,7 @@ namespace Yttrium
 			other._pointer = nullptr;
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		Allocation(Allocator& allocator, U* pointer) noexcept
 			: _allocator(&allocator)
 			, _pointer(pointer)
@@ -56,7 +56,7 @@ namespace Yttrium
 			return *this;
 		}
 
-		template <typename U, typename = std::enable_if_t<std::is_base_of<T, U>::value>>
+		template <typename U, typename = std::enable_if_t<std::is_convertible<U*, T*>::value>>
 		Allocation& operator=(Allocation<U>&& other) noexcept
 		{
 			_allocator->deallocate(_pointer);
