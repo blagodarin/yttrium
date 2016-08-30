@@ -67,8 +67,7 @@ namespace Yttrium
 		static bool exists(const StaticString& name);
 
 	private:
-		class Private;
-		UniquePtr<Private> _private;
+		UniquePtr<class DirPrivate> _private;
 
 	public:
 		~Dir();

@@ -132,8 +132,7 @@ namespace Yttrium
 		void unset(const StaticString& name);
 
 	private:
-		class Private;
-		const UniquePtr<Private> _private;
+		const UniquePtr<class ScriptContextPrivate> _private;
 
 	public:
 		~ScriptContext();

@@ -184,15 +184,13 @@ namespace Yttrium
 		};
 	}
 
-	class Bindings::Private
+	class BindingsPrivate
 	{
 	public:
-		Private(ScriptContext& script_context)
+		BindingsPrivate(ScriptContext& script_context)
 			: _script_context(script_context)
 		{
 		}
-
-		~Private() = default; // Prevents external visibility.
 
 		bool is_valid_index(size_t index) const
 		{
@@ -222,7 +220,7 @@ namespace Yttrium
 	}
 
 	Bindings::Bindings(ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<Private>(allocator, script_context))
+		: _private(make_unique<BindingsPrivate>(allocator, script_context))
 	{
 	}
 

@@ -21,17 +21,15 @@ namespace Yttrium
 		}
 	};
 
-	class ScriptCode::Private
+	class ScriptCodePrivate
 	{
 	public:
-		Private(Allocator& allocator)
+		ScriptCodePrivate(Allocator& allocator)
 			: _commands(allocator)
 			, _temporaries(32, &allocator)
 			, _last_result(&allocator)
 		{
 		}
-
-		~Private() = default; // Prevents external visibility.
 
 	public:
 		StdVector<ScriptCommand> _commands;
@@ -43,7 +41,7 @@ namespace Yttrium
 
 	ScriptCode::ScriptCode(String&& text, Allocator* allocator)
 	{
-		auto&& code = make_unique<Private>(*allocator, *allocator);
+		auto&& code = make_unique<ScriptCodePrivate>(*allocator, *allocator);
 
 		ScriptScanner scanner(text);
 

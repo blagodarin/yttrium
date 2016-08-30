@@ -66,8 +66,7 @@ namespace Yttrium
 		bool unbind(const StaticString& name);
 
 	private:
-		class Private;
-		const UniquePtr<Private> _private;
+		const UniquePtr<class BindingsPrivate> _private;
 
 	public:
 		~Bindings();

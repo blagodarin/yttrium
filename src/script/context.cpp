@@ -1,21 +1,57 @@
-#include "context.h"
+#include <yttrium/script/context.h>
 
 #include <yttrium/file.h>
 #include <yttrium/log.h>
+#include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
+#include <yttrium/std/map.h>
 
 #include <cassert>
 
 namespace Yttrium
 {
+	struct ScriptCommandContext
+	{
+		ScriptContext::Command command;
+		size_t min_args = 0;
+		size_t max_args = 0;
+
+		ScriptCommandContext() = default;
+
+		ScriptCommandContext(ScriptContext::Command command, size_t min_args, size_t max_args)
+			: command(command)
+			, min_args(min_args)
+			, max_args(max_args)
+		{
+		}
+	};
+
+	class ScriptContextPrivate
+	{
+	public:
+		ScriptContextPrivate(Allocator& allocator, ScriptContext* parent = nullptr)
+			: _parent(parent)
+			, _value_pool(32, &allocator)
+			, _values(allocator)
+			, _commands(allocator)
+		{
+		}
+
+	public:
+		ScriptContext* const _parent;
+		Pool<ScriptValue> _value_pool;
+		StdMap<String, ScriptValue*> _values;
+		StdMap<String, ScriptCommandContext> _commands;
+	};
+
 	ScriptContext::ScriptContext(Allocator* allocator)
-		: _private(make_unique<Private>(*allocator, *allocator))
+		: _private(make_unique<ScriptContextPrivate>(*allocator, *allocator))
 	{
 	}
 
 	ScriptContext::ScriptContext(ScriptContext* parent, Allocator* allocator)
-		: _private(make_unique<Private>(*allocator, *allocator, parent))
+		: _private(make_unique<ScriptContextPrivate>(*allocator, *allocator, parent))
 	{
 	}
 

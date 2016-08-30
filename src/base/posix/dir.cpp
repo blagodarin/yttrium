@@ -59,17 +59,14 @@ namespace Yttrium
 
 	using P_DIR = Y_UNIQUE_PTR(DIR, ::closedir);
 
-	class Dir::Private
+	class DirPrivate
 	{
 	public:
-		Private(P_DIR&& dir, long max_name_size)
+		DirPrivate(P_DIR&& dir, size_t iterator_private_size)
 			: _dir(std::move(dir))
-			, _iterator_private_size(offsetof(Dir::Iterator::Private, _dirent)
-				+ offsetof(::dirent, d_name) + max_name_size + 1)
+			, _iterator_private_size(iterator_private_size)
 		{
 		}
-
-		~Private() = default; // Prevents external visibility.
 
 	public:
 		P_DIR _dir;
@@ -104,7 +101,8 @@ namespace Yttrium
 			max_name_size = 255;
 		}
 
-		_private = make_unique<Private>(allocator, std::move(dir), max_name_size);
+		_private = make_unique<DirPrivate>(allocator, std::move(dir),
+			offsetof(Dir::Iterator::Private, _dirent) + offsetof(::dirent, d_name) + max_name_size + 1);
 	}
 
 	Dir::Iterator Dir::begin() const

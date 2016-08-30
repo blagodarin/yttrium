@@ -45,8 +45,7 @@ namespace Yttrium
 		static ScriptCode load(const StaticString& filename, Allocator* allocator = DefaultAllocator);
 
 	private:
-		class Private;
-		UniquePtr<Private> _private;
+		UniquePtr<class ScriptCodePrivate> _private;
 
 	public:
 		ScriptCode(ScriptCode&&) = default;

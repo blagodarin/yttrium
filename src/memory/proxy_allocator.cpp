@@ -2,7 +2,6 @@
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
-#include "raw.h"
 
 #include <atomic>
 
@@ -14,11 +13,10 @@
 
 namespace Yttrium
 {
-	class Y_PRIVATE ProxyAllocator::Private
+	class ProxyAllocatorPrivate
 	{
 	public:
-
-		Private(String&& name, Allocator& allocator)
+		ProxyAllocatorPrivate(Allocator& allocator, String&& name)
 			: _allocator(allocator)
 			, _name(std::move(name))
 		#if Y_IS_DEBUG
@@ -28,7 +26,6 @@ namespace Yttrium
 		}
 
 	public:
-
 		Allocator& _allocator;
 		const String _name;
 		std::atomic<size_t> _allocations{0};
@@ -40,18 +37,21 @@ namespace Yttrium
 	};
 
 	ProxyAllocator::ProxyAllocator(const StaticString& name, Allocator& allocator)
-		: _private(nullptr)
 	{
 		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(&allocator);
 		if (proxy_allocator)
 		{
 			const auto& proxy_name = proxy_allocator->name();
-			_private = make_raw<Private>(proxy_allocator->_private->_allocator,
-				String(proxy_name.size() + 1 + name.size(), &allocator) << proxy_name << '.' << name,
-				proxy_allocator->_private->_allocator);
+			_private = make_unique<ProxyAllocatorPrivate>(allocator, proxy_allocator->_private->_allocator,
+				String(proxy_name.size() + 1 + name.size(), &allocator) << proxy_name << '.' << name);
 		}
 		else
-			_private = make_raw<Private>(allocator, String(name, &allocator), allocator);
+			_private = make_unique<ProxyAllocatorPrivate>(allocator, allocator, String(name, &allocator));
+	}
+
+	StaticString ProxyAllocator::name() const noexcept
+	{
+		return _private->_name;
 	}
 
 	ProxyAllocator::~ProxyAllocator()
@@ -82,13 +82,6 @@ namespace Yttrium
 			std::cerr << std::endl;
 		}
 	#endif
-
-		unmake_raw(_private->_allocator, _private);
-	}
-
-	StaticString ProxyAllocator::name() const
-	{
-		return _private->_name;
 	}
 
 	void* ProxyAllocator::do_allocate(size_t size, size_t alignment)
