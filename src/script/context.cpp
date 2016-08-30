@@ -32,7 +32,7 @@ namespace Yttrium
 	public:
 		ScriptContextPrivate(Allocator& allocator, ScriptContext* parent = nullptr)
 			: _parent(parent)
-			, _value_pool(32, &allocator)
+			, _value_pool(32, allocator)
 			, _values(allocator)
 			, _commands(allocator)
 		{

@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	IonDocumentPrivate IonDocumentPrivate::null(nullptr);
+	IonDocumentPrivate IonDocumentPrivate::null(NoAllocator);
 	const IonNode IonDocumentPrivate::null_node(null);
 
 	void IonDocumentPrivate::clear()
@@ -51,19 +51,19 @@ namespace Yttrium
 	}
 
 	IonDocument::IonDocument(Allocator* allocator)
-		: _private(make_raw<IonDocumentPrivate>(*allocator, allocator))
+		: _private(make_raw<IonDocumentPrivate>(*allocator, *allocator))
 	{
 	}
 
 	Allocator* IonDocument::allocator() const
 	{
-		return _private->_allocator;
+		return &_private->_allocator;
 	}
 
 	bool IonDocument::load(const StaticString& file_name)
 	{
 		_private->clear();
-		_private->_buffer = File::read_to_buffer(file_name, _private->_allocator);
+		_private->_buffer = File::read_to_buffer(file_name, &_private->_allocator);
 		return IonParser(*this).parse(_private->_buffer, file_name);
 	}
 
@@ -79,17 +79,17 @@ namespace Yttrium
 
 	bool IonDocument::save(const StaticString& file_name, Formatting formatting) const
 	{
-		File file(file_name, File::Write | File::Truncate, _private->_allocator);
+		File file(file_name, File::Write | File::Truncate, &_private->_allocator);
 		if (!file)
 			return false;
-		const auto& buffer = Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, _private->_allocator);
+		const auto& buffer = Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, &_private->_allocator);
 		return file.write(buffer.text(), buffer.size()) == buffer.size() && file.flush();
 	}
 
 	IonDocument& IonDocument::operator=(IonDocument&& document) noexcept
 	{
 		if (_private)
-			unmake_raw(*_private->_allocator, _private);
+			unmake_raw(_private->_allocator, _private);
 		_private = document._private;
 		document._private = nullptr;
 		return *this;
@@ -98,6 +98,6 @@ namespace Yttrium
 	IonDocument::~IonDocument()
 	{
 		if (_private)
-			unmake_raw(*_private->_allocator, _private);
+			unmake_raw(_private->_allocator, _private);
 	}
 }

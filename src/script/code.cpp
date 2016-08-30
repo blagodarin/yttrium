@@ -26,7 +26,7 @@ namespace Yttrium
 	public:
 		ScriptCodePrivate(Allocator& allocator)
 			: _commands(allocator)
-			, _temporaries(32, &allocator)
+			, _temporaries(32, allocator)
 			, _last_result(&allocator)
 		{
 		}

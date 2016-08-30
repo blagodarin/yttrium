@@ -11,19 +11,19 @@ namespace Yttrium
 
 	IonNode::IonNode(IonDocumentPrivate& document)
 		: IonList(document)
-		, _name(static_cast<Allocator*>(nullptr))
+		, _name(&document.allocator())
 	{
 	}
 
 	IonNode::IonNode(IonDocumentPrivate& document, const StaticString& name)
 		: IonList(document)
-		, _name(name, document.allocator())
+		, _name(name, &document.allocator())
 	{
 	}
 
 	IonNode::IonNode(IonDocumentPrivate& document, const StaticString& name, const ByReference&)
 		: IonList(document)
-		, _name(name, ByReference(), document.allocator())
+		, _name(name, ByReference(), &document.allocator())
 	{
 	}
 }

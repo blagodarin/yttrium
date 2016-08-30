@@ -8,7 +8,7 @@ namespace Yttrium
 	{
 		IonNode* node = _document.new_node(name);
 		_nodes.emplace_back(node);
-		_node_map.emplace(node->_name, StdVector<IonNode*>(*_document.allocator())).first->second.emplace_back(node);
+		_node_map.emplace(node->_name, StdVector<IonNode*>(_document.allocator())).first->second.emplace_back(node);
 		return node;
 	}
 
@@ -63,8 +63,8 @@ namespace Yttrium
 
 	IonObject::IonObject(IonDocumentPrivate& document)
 		: _document(document)
-		, _nodes(*_document.allocator())
-		, _node_map(*_document.allocator())
+		, _nodes(_document.allocator())
+		, _node_map(_document.allocator())
 	{
 	}
 
@@ -72,7 +72,7 @@ namespace Yttrium
 	{
 		IonNode* node = _document.new_node(name, ByReference());
 		_nodes.emplace_back(node);
-		_node_map.emplace(node->_name, StdVector<IonNode*>(*_document.allocator())).first->second.emplace_back(node);
+		_node_map.emplace(node->_name, StdVector<IonNode*>(_document.allocator())).first->second.emplace_back(node);
 		return node;
 	}
 

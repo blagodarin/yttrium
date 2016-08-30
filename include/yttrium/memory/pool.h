@@ -16,13 +16,10 @@ namespace Yttrium
 	public:
 
 		///
-		PoolBase(size_t chunk_items, size_t item_size, Allocator* allocator = DefaultAllocator);
+		PoolBase(size_t chunk_items, size_t item_size, Allocator& allocator = *DefaultAllocator);
 
 		///
 		~PoolBase();
-
-		PoolBase(const PoolBase&) = delete;
-		PoolBase& operator=(const PoolBase&) = delete;
 
 	protected:
 
@@ -36,14 +33,15 @@ namespace Yttrium
 		void* take();
 
 	private:
+		Allocator& _allocator;
+		size_t _chunk_items;
+		size_t _item_size;
+		size_t _chunk_size;
+		class PoolChunk* _last_chunk;
 
-		class Chunk;
-
-		Allocator* _allocator;
-		size_t     _chunk_items;
-		size_t     _item_size;
-		size_t     _chunk_size;
-		Chunk*     _last_chunk;
+	public:
+		PoolBase(const PoolBase&) = delete;
+		PoolBase& operator=(const PoolBase&) = delete;
 	};
 
 	///
@@ -53,7 +51,7 @@ namespace Yttrium
 	public:
 
 		///
-		Pool(size_t chunk_items = 32, Allocator* allocator = DefaultAllocator)
+		Pool(size_t chunk_items = 32, Allocator& allocator = *DefaultAllocator)
 			: PoolBase(chunk_items, sizeof(T), allocator)
 		{
 		}
