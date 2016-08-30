@@ -1,4 +1,4 @@
-#include <yttrium/memory/proxy_allocator.h>
+#include <yttrium/memory/named_allocator.h>
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
@@ -13,10 +13,10 @@
 
 namespace Yttrium
 {
-	class ProxyAllocatorPrivate
+	class NamedAllocatorPrivate
 	{
 	public:
-		ProxyAllocatorPrivate(Allocator& allocator, String&& name)
+		NamedAllocatorPrivate(Allocator& allocator, String&& name)
 			: _allocator(allocator)
 			, _name(std::move(name))
 		#if Y_IS_DEBUG
@@ -36,25 +36,25 @@ namespace Yttrium
 	#endif
 	};
 
-	ProxyAllocator::ProxyAllocator(const StaticString& name, Allocator& allocator)
+	NamedAllocator::NamedAllocator(const StaticString& name, Allocator& allocator)
 	{
-		const auto proxy_allocator = dynamic_cast<ProxyAllocator*>(&allocator);
-		if (proxy_allocator)
+		const auto named_allocator = dynamic_cast<NamedAllocator*>(&allocator);
+		if (named_allocator)
 		{
-			const auto& proxy_name = proxy_allocator->name();
-			_private = make_unique<ProxyAllocatorPrivate>(allocator, proxy_allocator->_private->_allocator,
-				String(proxy_name.size() + 1 + name.size(), &allocator) << proxy_name << '.' << name);
+			const auto& base_name = named_allocator->name();
+			_private = make_unique<NamedAllocatorPrivate>(allocator, named_allocator->_private->_allocator,
+				String(base_name.size() + 1 + name.size(), &allocator) << base_name << '.' << name);
 		}
 		else
-			_private = make_unique<ProxyAllocatorPrivate>(allocator, allocator, String(name, &allocator));
+			_private = make_unique<NamedAllocatorPrivate>(allocator, allocator, String(name, &allocator));
 	}
 
-	StaticString ProxyAllocator::name() const noexcept
+	StaticString NamedAllocator::name() const noexcept
 	{
 		return _private->_name;
 	}
 
-	ProxyAllocator::~ProxyAllocator()
+	NamedAllocator::~NamedAllocator()
 	{
 	#if Y_IS_DEBUG
 		const auto allocations = _private->_allocations.load();
@@ -84,7 +84,7 @@ namespace Yttrium
 	#endif
 	}
 
-	void* ProxyAllocator::do_allocate(size_t size, size_t alignment)
+	void* NamedAllocator::do_allocate(size_t size, size_t alignment)
 	{
 		const auto pointer = _private->_allocator.allocate(size, alignment);
 		++_private->_allocated_blocks;
@@ -95,7 +95,7 @@ namespace Yttrium
 		return pointer;
 	}
 
-	void ProxyAllocator::do_deallocate(void* pointer, bool reallocation) noexcept
+	void NamedAllocator::do_deallocate(void* pointer, bool reallocation) noexcept
 	{
 	#if Y_IS_DEBUG
 		if (_private->_pointers.find(pointer) == _private->_pointers.end())

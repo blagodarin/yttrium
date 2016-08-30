@@ -3,8 +3,8 @@
 
 #include <yttrium/gui.h>
 
+#include <yttrium/memory/named_allocator.h>
 #include <yttrium/memory/shared_ptr.h>
-#include <yttrium/memory/proxy_allocator.h>
 #include <yttrium/script/code.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
@@ -49,7 +49,7 @@ namespace Yttrium
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
 
-		Allocator& allocator() const { return const_cast<ProxyAllocator&>(_proxy_allocator); }
+		Allocator& allocator() const { return const_cast<NamedAllocator&>(_allocator); }
 
 		WindowCallbacks& callbacks() const { return _callbacks; }
 
@@ -69,7 +69,7 @@ namespace Yttrium
 		ScriptContext&                    _script_context;
 		RendererImpl&                     _renderer;
 		WindowCallbacks&                  _callbacks;
-		ProxyAllocator                    _proxy_allocator;
+		NamedAllocator                    _allocator;
 		UniquePtr<TextureCache>           _texture_cache;
 		StdMap<String, FontDesc>          _fonts;
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;

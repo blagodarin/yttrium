@@ -18,7 +18,7 @@
 	* ION:
 		- Location information support.
 	* Memory:
-		- Keep a global track of all ProxyAllocators for realtime memory activity tracking.
+		- Keep a global track of all NamedAllocators for realtime memory activity tracking.
 	* Renderer:
 		- OpenGL 3.3 compliance.
 * Examples:

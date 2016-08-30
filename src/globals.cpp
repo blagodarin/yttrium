@@ -1,4 +1,4 @@
-#include <yttrium/memory/proxy_allocator.h>
+#include <yttrium/memory/named_allocator.h>
 #include "base/log.h"
 #include "memory/buffer_memory.h"
 #include "memory/buffer_memory_tracker.h"
@@ -14,7 +14,7 @@ namespace Yttrium
 	namespace
 	{
 		HeapAllocator _root_allocator;
-		ProxyAllocator _default_allocator("heap"_s, _root_allocator);
+		NamedAllocator _default_allocator("heap"_s, _root_allocator);
 
 		class : public Allocator
 		{
@@ -28,7 +28,7 @@ namespace Yttrium
 
 	namespace
 	{
-		ProxyAllocator _log_allocator("log"_s, _default_allocator);
+		NamedAllocator _log_allocator("log"_s, _default_allocator);
 	}
 
 	LogManager _log_manager(_log_allocator);

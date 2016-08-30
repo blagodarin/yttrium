@@ -15,11 +15,11 @@ namespace Yttrium
 		: _script_context(script_context)
 		, _renderer(renderer)
 		, _callbacks(callbacks)
-		, _proxy_allocator("gui"_s, allocator)
+		, _allocator("gui"_s, allocator)
 		, _texture_cache(TextureCache::create(_renderer))
-		, _fonts(_proxy_allocator)
-		, _layers(_proxy_allocator)
-		, _layer_stack(_proxy_allocator)
+		, _fonts(_allocator)
+		, _layers(_allocator)
+		, _layer_stack(_allocator)
 	{
 	}
 
@@ -81,15 +81,15 @@ namespace Yttrium
 	GuiLayer& GuiImpl::add_layer(const StaticString& name, bool is_transparent, bool is_root)
 	{
 		if (!is_root && name.is_empty())
-			throw GuiError(_proxy_allocator) << "Non-root layer must have a name"_s;
-		auto&& layer = make_unique<GuiLayer>(_proxy_allocator, *this, name, is_transparent);
+			throw GuiError(_allocator) << "Non-root layer must have a name"_s;
+		auto&& layer = make_unique<GuiLayer>(_allocator, *this, name, is_transparent);
 		const String& layer_name = layer->name(); // To avoid extra allocations.
 		if (_layers.find(layer_name) != _layers.end())
-			throw GuiError(_proxy_allocator) << "Duplicate layer name \""_s << layer_name << "\""_s;
+			throw GuiError(_allocator) << "Duplicate layer name \""_s << layer_name << "\""_s;
 		if (is_root)
 		{
 			if (!_layer_stack.empty())
-				throw GuiError(_proxy_allocator) << "\""_s << layer_name << "\" can't be the root layer, \""_s << _layer_stack.front()->name() << "\" is the root layer"_s;
+				throw GuiError(_allocator) << "\""_s << layer_name << "\" can't be the root layer, \""_s << _layer_stack.front()->name() << "\" is the root layer"_s;
 			_layer_stack.push_back(layer.get());
 		}
 		return *_layers.emplace(layer_name, std::move(layer)).first->second;
@@ -128,7 +128,7 @@ namespace Yttrium
 			return;
 		}
 
-		auto&& font = TextureFont::load(font_source, _proxy_allocator);
+		auto&& font = TextureFont::load(font_source, _allocator);
 		if (!font)
 		{
 			Log() << "Can't load \""_s << font_source << "\""_s;
@@ -142,6 +142,6 @@ namespace Yttrium
 		}
 
 		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
-		_fonts[String(name, &_proxy_allocator)] = FontDesc(std::move(font), std::move(texture));
+		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 }
