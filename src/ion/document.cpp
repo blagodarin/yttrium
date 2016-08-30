@@ -50,14 +50,9 @@ namespace Yttrium
 		return new(_values.allocate()) IonValue(*this, name, ByReference());
 	}
 
-	IonDocument::IonDocument(Allocator* allocator)
-		: _private(make_raw<IonDocumentPrivate>(*allocator, *allocator))
+	IonDocument::IonDocument(Allocator& allocator)
+		: _private(make_unique<IonDocumentPrivate>(allocator, allocator))
 	{
-	}
-
-	Allocator* IonDocument::allocator() const
-	{
-		return &_private->_allocator;
 	}
 
 	bool IonDocument::load(const StaticString& file_name)
@@ -86,18 +81,7 @@ namespace Yttrium
 		return file.write(buffer.text(), buffer.size()) == buffer.size() && file.flush();
 	}
 
-	IonDocument& IonDocument::operator=(IonDocument&& document) noexcept
-	{
-		if (_private)
-			unmake_raw(_private->_allocator, _private);
-		_private = document._private;
-		document._private = nullptr;
-		return *this;
-	}
-
-	IonDocument::~IonDocument()
-	{
-		if (_private)
-			unmake_raw(_private->_allocator, _private);
-	}
+	IonDocument::~IonDocument() = default;
+	IonDocument::IonDocument(IonDocument&&) noexcept = default;
+	IonDocument& IonDocument::operator=(IonDocument&&) noexcept = default;
 }

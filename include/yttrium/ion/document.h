@@ -4,11 +4,10 @@
 #ifndef _include_yttrium_ion_document_h_
 #define _include_yttrium_ion_document_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/memory/unique_ptr.h>
 
 namespace Yttrium
 {
-	class IonDocumentPrivate;
 	class IonObject;
 	class StaticString;
 
@@ -16,7 +15,6 @@ namespace Yttrium
 	class Y_API IonDocument
 	{
 	public:
-
 		///
 		enum class Formatting
 		{
@@ -25,10 +23,10 @@ namespace Yttrium
 		};
 
 		///
-		IonDocument(Allocator* allocator = DefaultAllocator);
+		IonDocument(Allocator& = *DefaultAllocator);
 
 		///
-		Allocator* allocator() const;
+		Allocator& allocator() const { return _private.allocator(); }
 
 		///
 		bool load(const StaticString& file_name);
@@ -40,13 +38,13 @@ namespace Yttrium
 		///
 		bool save(const StaticString& file_name, Formatting formatting = Formatting::Pretty) const;
 
-		IonDocument(const IonDocument&) = delete;
-		IonDocument(IonDocument&& document) noexcept : _private(document._private) { document._private = nullptr; }
-		~IonDocument();
-		IonDocument& operator=(const IonDocument&) = delete;
-		IonDocument& operator=(IonDocument&&) noexcept;
 	private:
-		IonDocumentPrivate* _private = nullptr;
+		UniquePtr<class IonDocumentPrivate> _private;
+
+	public:
+		~IonDocument();
+		IonDocument(IonDocument&&) noexcept;
+		IonDocument& operator=(IonDocument&&) noexcept;
 	};
 }
 

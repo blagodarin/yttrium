@@ -154,5 +154,6 @@ namespace Yttrium
 	}
 
 	ScriptCode::~ScriptCode() = default;
-	ScriptCode& ScriptCode::operator=(ScriptCode&&) = default;
+	ScriptCode::ScriptCode(ScriptCode&&) noexcept = default;
+	ScriptCode& ScriptCode::operator=(ScriptCode&&) noexcept = default;
 }

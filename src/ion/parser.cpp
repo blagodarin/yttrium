@@ -12,7 +12,7 @@ namespace Yttrium
 {
 	IonParser::IonParser(IonDocument& document)
 		: _document(document)
-		, _states(*_document.allocator())
+		, _states(_document.allocator())
 	{
 	}
 

@@ -48,9 +48,9 @@ namespace Yttrium
 		UniquePtr<class ScriptCodePrivate> _private;
 
 	public:
-		ScriptCode(ScriptCode&&) = default;
 		~ScriptCode();
-		ScriptCode& operator=(ScriptCode&&);
+		ScriptCode(ScriptCode&&) noexcept;
+		ScriptCode& operator=(ScriptCode&&) noexcept;
 	};
 }
 

@@ -33,7 +33,7 @@ namespace Yttrium
 
 	bool TranslationImpl::save(const StaticString& file_name) const
 	{
-		IonDocument document(&_allocator);
+		IonDocument document(_allocator);
 		for (const auto& translation : _translations)
 		{
 			auto& node = *document.root().append("tr"_s);
@@ -45,7 +45,7 @@ namespace Yttrium
 
 	bool TranslationImpl::load(const StaticString& file_name)
 	{
-		IonDocument document(&_allocator);
+		IonDocument document(_allocator);
 		if (!document.load(file_name))
 			return false;
 		decltype(_translations) translations(_allocator);

@@ -205,7 +205,7 @@ void Game::run()
 	_audio = AudioManager::create({}, {}, _audio_allocator);
 	if (_audio)
 	{
-		IonDocument data(&_allocator);
+		IonDocument data(_allocator);
 		if (data.load("data/music.ion"))
 		{
 			for (const IonValue& value : data.root().last("music"))
@@ -254,7 +254,7 @@ void Game::run()
 
 bool Game::load_blocks()
 {
-	IonDocument data(&_allocator);
+	IonDocument data(_allocator);
 	if (!data.load("examples/tetrium/data/tetrium.ion"))
 		return false;
 

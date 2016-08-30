@@ -25,9 +25,7 @@ namespace Yttrium
 	{
 	}
 
-	GuiClasses::~GuiClasses()
-	{
-	}
+	GuiClasses::~GuiClasses() = default;
 
 	bool GuiClasses::add(const StaticString& name, const IonObject& source, const StaticString* base_class)
 	{
@@ -43,7 +41,7 @@ namespace Yttrium
 			base = &i->second.root();
 		}
 
-		IonDocument document(&_allocator);
+		IonDocument document(_allocator);
 		update_document(document.root(), source);
 		if (base)
 			update_document(document.root(), *base);

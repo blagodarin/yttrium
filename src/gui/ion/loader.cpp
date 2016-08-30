@@ -116,7 +116,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_impl(const StaticString& source_name)
 	{
-		IonDocument document(&_allocator);
+		IonDocument document(_allocator);
 		if (!document.load(source_name))
 			throw GuiError(_allocator) << "Can't load \""_s << source_name << "\"..."_s;
 		try
