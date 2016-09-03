@@ -6,7 +6,7 @@ namespace Yttrium
 {
 	bool IonNode::exists() const
 	{
-		return _name.allocator();
+		return _name.allocator() != &NoAllocator;
 	}
 
 	IonNode::IonNode(IonDocumentPrivate& document)

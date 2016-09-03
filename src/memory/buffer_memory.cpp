@@ -17,7 +17,7 @@ namespace Yttrium
 			const auto data = pages_allocate(size);
 			if (!data)
 				throw std::bad_alloc();
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_system_allocation(size);
 		#endif
 			return data;
@@ -36,7 +36,7 @@ namespace Yttrium
 
 	BufferMemory::~BufferMemory()
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKER && Y_IS_DEBUG
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		std::map<size_t, size_t> free_block_count;
 		{
 			std::lock_guard<std::mutex> lock(_small_blocks_mutex);
@@ -97,7 +97,7 @@ namespace Yttrium
 				}
 			}
 		}
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_tracker.track_capacity_allocation(capacity);
 	#endif
 		return data;
@@ -110,7 +110,7 @@ namespace Yttrium
 		if (capacity > MaxSmallBlockSize)
 		{
 			pages_deallocate(data, capacity);
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_system_deallocation(capacity);
 		#endif
 		}
@@ -123,7 +123,7 @@ namespace Yttrium
 				_small_blocks[level] = data;
 			}
 		}
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_tracker.track_capacity_deallocation(capacity);
 	#endif
 	}
@@ -139,7 +139,7 @@ namespace Yttrium
 			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
 				throw std::bad_alloc();
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_system_reallocation(old_capacity, new_capacity);
 			_buffer_memory_tracker.track_capacity_change(old_capacity, new_capacity);
 			_buffer_memory_tracker.track_reallocation(); // TODO: Perhaps pure shrinking reallocations should be counted differently.
@@ -154,7 +154,7 @@ namespace Yttrium
 			if (old_size > 0)
 				::memcpy(new_data, old_data, old_size);
 			deallocate(old_data, old_capacity);
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_reallocation();
 		#endif
 			return new_data;
@@ -177,7 +177,7 @@ namespace Yttrium
 
 	size_t BufferMemory::max_total_capacity() noexcept
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		return _buffer_memory_tracker.max_total_capacity();
 	#else
 		std::abort();
@@ -186,7 +186,7 @@ namespace Yttrium
 
 	size_t BufferMemory::total_capacity() noexcept
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		return _buffer_memory_tracker.total_capacity();
 	#else
 		std::abort();

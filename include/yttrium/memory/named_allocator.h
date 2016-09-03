@@ -5,10 +5,19 @@
 #define _include_yttrium_memory_named_allocator_h_
 
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/static_string.h>
+#include <yttrium/std/vector.h>
 
 namespace Yttrium
 {
-	class StaticString;
+	///
+	struct NamedAllocatorInfo
+	{
+		StaticString name;
+		size_t blocks = 0;
+		size_t allocations = 0;
+		size_t reallocations = 0;
+	};
 
 	/// Named allocator.
 	class Y_API NamedAllocator : public Allocator
@@ -20,6 +29,9 @@ namespace Yttrium
 
 		///
 		StaticString name() const noexcept;
+
+		///
+		static void enumerate(StdVector<NamedAllocatorInfo>&);
 
 	private:
 		UniquePtr<class NamedAllocatorPrivate> _private;

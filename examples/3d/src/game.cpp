@@ -128,6 +128,7 @@ void Game::on_update(const UpdateEvent& update)
 		_position.z = clamp(_position.z, 1, 64);
 	}
 
+	_window->debug_text().reserve(1024);
 	_window->debug_text().clear()
 		<< "FPS: " << update.fps << "\n"
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
@@ -137,5 +138,12 @@ void Game::on_update(const UpdateEvent& update)
 		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
 		<< "Pitch: " << _rotation.pitch << ", Yaw: " << _rotation.yaw << "\n"
-		;
+		<< "Memory:";
+	NamedAllocator::enumerate(_memory_statistics);
+	for (const auto& info : _memory_statistics)
+	{
+		_window->debug_text() << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
+		if (info.reallocations)
+			_window->debug_text() << " (" << info.reallocations << ")";
+	}
 }

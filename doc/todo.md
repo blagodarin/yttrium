@@ -17,8 +17,6 @@
 		- Unicode font support.
 	* ION:
 		- Location information support.
-	* Memory:
-		- Keep a global track of all NamedAllocators for realtime memory activity tracking.
 	* Renderer:
 		- OpenGL 3.3 compliance.
 * Examples:

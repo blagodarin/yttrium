@@ -1,16 +1,17 @@
 #ifndef _src_memory_buffer_memory_tracker_h_
 #define _src_memory_buffer_memory_tracker_h_
 
-#define Y_ENABLE_BUFFER_MEMORY_TRACKER 1 // Disable for profiling purposes only.
+#define Y_ENABLE_BUFFER_MEMORY_TRACKING 1 // Disable for profiling purposes only.
+#define Y_ENABLE_BUFFER_MEMORY_DEBUGGING 0
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 
 #include <yttrium/global.h>
 #include "../utils/atomic_counters.h"
 
 #include <cstddef>
 
-#if Y_IS_DEBUG
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 	#include <map>
 #endif
 
@@ -24,7 +25,7 @@ namespace Yttrium
 			return _total_capacity.maximum_value();
 		}
 
-	#if Y_IS_DEBUG
+	#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		void print_state(const std::map<size_t, size_t>& free_block_count);
 	#endif
 
@@ -36,7 +37,7 @@ namespace Yttrium
 		void track_capacity_allocation(size_t capacity) noexcept
 		{
 			_total_capacity += capacity;
-		#if Y_IS_DEBUG
+		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			++_allocations;
 			++_total_allocations;
 		#endif
@@ -53,14 +54,14 @@ namespace Yttrium
 		void track_capacity_deallocation(size_t capacity) noexcept
 		{
 			_total_capacity -= capacity;
-		#if Y_IS_DEBUG
+		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			--_allocations;
 		#endif
 		}
 
 		void track_reallocation() noexcept
 		{
-		#if Y_IS_DEBUG
+		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			++_total_reallocations;
 		#endif
 		}
@@ -68,7 +69,7 @@ namespace Yttrium
 		void track_system_allocation(size_t size) noexcept
 		{
 			_total_allocated += size;
-		#if Y_IS_DEBUG
+		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			++_total_system_allocations;
 		#endif
 		}
@@ -89,7 +90,7 @@ namespace Yttrium
 	private:
 		MaxCounter<size_t> _total_allocated;
 		MaxCounter<size_t> _total_capacity;
-	#if Y_IS_DEBUG
+	#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		MaxCounter<size_t> _allocations;
 		std::atomic<size_t> _total_system_allocations{0};
 		std::atomic<size_t> _total_allocations{0};

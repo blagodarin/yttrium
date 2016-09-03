@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 	BOOST_CHECK_EQUAL(buffer.capacity(), 0);
 }
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKER
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 BOOST_AUTO_TEST_CASE(test_buffer_total_capacity)
 {
 	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);

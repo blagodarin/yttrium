@@ -21,6 +21,7 @@
 
 Game::Game()
 	: _allocator("game")
+	, _memory_statistics(_allocator)
 	, _script_allocator("script")
 	, _script(&_script_allocator)
 	, _audio_allocator("audio")
@@ -319,7 +320,14 @@ void Game::on_update(const UpdateEvent& update)
 		<< "DrawCalls: " << update.draw_calls << "\n"
 		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
 		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
-		;
+		<< "Memory:";
+	NamedAllocator::enumerate(_memory_statistics);
+	for (const auto& info : _memory_statistics)
+	{
+		_window->debug_text() << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
+		if (info.reallocations)
+			_window->debug_text() << " (" << info.reallocations << ")";
+	}
 
 	if (_game_running)
 	{

@@ -44,8 +44,8 @@ private:
 	void update_statistics();
 
 private:
-
 	NamedAllocator _allocator;
+	StdVector<NamedAllocatorInfo> _memory_statistics;
 	NamedAllocator _script_allocator;
 	ScriptContext _script;
 	NamedAllocator _audio_allocator;
