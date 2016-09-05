@@ -10,8 +10,7 @@ namespace Yttrium
 	class OggVorbisReader : public AudioReaderImpl
 	{
 	public:
-
-		OggVorbisReader(const StaticString& name, Allocator* allocator);
+		OggVorbisReader(const StaticString& name, Allocator&);
 		~OggVorbisReader() override;
 
 		bool open() override;
@@ -19,7 +18,6 @@ namespace Yttrium
 		bool seek(uint64_t offset) override;
 
 	private:
-
 		OggVorbis_File _ov_file;
 	};
 }

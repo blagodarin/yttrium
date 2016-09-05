@@ -68,26 +68,23 @@ namespace Yttrium
 
 	// TODO: Lock the instance mutex outside these functions.
 
-	SharedPtr<Sound> AudioManagerImpl::create_sound(const StaticString& name, Allocator* allocator)
+	SharedPtr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
 	{
-		if (!allocator)
-			allocator = &_allocator;
-
 		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
 
 		const auto i = _sounds.find(String(name, ByReference()));
 		if (i != _sounds.end())
 			return SharedPtr<Sound>(*i->second.first, i->second.second);
 
-		const auto reader = AudioReader::open(name, AudioType::Auto, allocator);
+		const auto reader = AudioReader::open(name, AudioType::Auto, _allocator);
 		if (!reader)
 			return {};
 
-		auto sound = _backend->create_sound(name, *allocator);
+		auto sound = _backend->create_sound(name, _allocator);
 		if (!sound->load(*reader))
 			return {};
 
-		_sounds.emplace(sound->name(), std::make_pair(&sound.allocator(), sound.get()));
+		_sounds.emplace(sound->name(), std::make_pair(&_allocator, sound.get()));
 		return std::move(sound);
 	}
 

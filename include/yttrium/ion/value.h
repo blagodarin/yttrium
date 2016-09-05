@@ -89,10 +89,10 @@ namespace Yttrium
 
 	private:
 
-		Y_PRIVATE IonValue(IonDocumentPrivate& document);
-		Y_PRIVATE IonValue(IonDocumentPrivate& document, const StaticString& string);
-		Y_PRIVATE IonValue(IonDocumentPrivate& document, const StaticString& string, const ByReference&);
-		Y_PRIVATE IonValue(IonDocumentPrivate& document, IonObject* object);
+		Y_PRIVATE IonValue(IonDocumentPrivate&);
+		Y_PRIVATE IonValue(IonDocumentPrivate&, const StaticString& string);
+		Y_PRIVATE IonValue(IonDocumentPrivate&, const StaticString& string, const ByReference&);
+		Y_PRIVATE IonValue(IonDocumentPrivate&, IonObject* object);
 
 	private:
 

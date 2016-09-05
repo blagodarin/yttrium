@@ -36,7 +36,7 @@ namespace Yttrium
 		const IonObject& root() const;
 
 		///
-		bool save(const StaticString& file_name, Formatting formatting = Formatting::Pretty) const;
+		bool save(const StaticString& file_name, Formatting = Formatting::Pretty) const;
 
 	private:
 		UniquePtr<class IonDocumentPrivate> _private;

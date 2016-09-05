@@ -9,7 +9,7 @@
 
 namespace Yttrium
 {
-	UniquePtr<AudioReader> AudioReader::open(const StaticString& name, AudioType type, Allocator* allocator)
+	UniquePtr<AudioReader> AudioReader::open(const StaticString& name, AudioType type, Allocator& allocator)
 	{
 		if (type == AudioType::Auto)
 		{
@@ -24,15 +24,12 @@ namespace Yttrium
 				return {};
 		}
 
-		if (!allocator)
-			allocator = DefaultAllocator;
-
 		UniquePtr<AudioReaderImpl> reader;
 		switch (type)
 		{
-		case AudioType::Wav: reader = make_unique<WavReader>(*allocator, name, allocator); break;
+		case AudioType::Wav: reader = make_unique<WavReader>(allocator, name, allocator); break;
 #ifndef Y_NO_OGG_VORBIS
-		case AudioType::OggVorbis: reader = make_unique<OggVorbisReader>(*allocator, name, allocator); break;
+		case AudioType::OggVorbis: reader = make_unique<OggVorbisReader>(allocator, name, allocator); break;
 #endif
 		default: return {};
 		}

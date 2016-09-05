@@ -14,7 +14,6 @@ namespace Yttrium
 	class AudioPlayerImpl : public AudioPlayer
 	{
 	public:
-
 		AudioPlayerImpl(UniquePtr<AudioPlayerBackend>&&, Allocator&);
 		~AudioPlayerImpl() override;
 
@@ -27,11 +26,9 @@ namespace Yttrium
 		bool is_playing() const override;
 
 	private:
-
 		void run();
 
 	private:
-
 		enum State
 		{
 			Stopped,

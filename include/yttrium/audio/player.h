@@ -36,17 +36,14 @@ namespace Yttrium
 		/// \param name Audio file name.
 		/// \param settings Playback parameters.
 		/// \param type Audio file type.
-		virtual void load(const StaticString& name, const Settings& settings = {}, AudioType type = AudioType::Auto) = 0;
+		virtual void load(const StaticString& name, const Settings& = {}, AudioType = AudioType::Auto) = 0;
 
 		/**
 		* \overload
 		* \param name Audio file name.
 		* \param type Audio file type.
 		*/
-		void load(const StaticString& name, AudioType type)
-		{
-			load(name, {}, type);
-		}
+		void load(const StaticString& name, AudioType type) { load(name, {}, type); }
 
 		/// Clear the playlist.
 		virtual void clear() = 0;

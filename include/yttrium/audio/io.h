@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_audio_io_h_
 #define _include_yttrium_audio_io_h_
 
-#include <yttrium/global.h>
+#include <yttrium/memory/global.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -39,9 +39,8 @@ namespace Yttrium
 	class Y_API AudioReader
 	{
 	public:
-
 		///
-		static UniquePtr<AudioReader> open(const StaticString& name, AudioType type = AudioType::Auto, Allocator* allocator = nullptr);
+		static UniquePtr<AudioReader> open(const StaticString& name, AudioType = AudioType::Auto, Allocator& = *DefaultAllocator);
 
 		virtual ~AudioReader() = default;
 

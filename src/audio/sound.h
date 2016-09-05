@@ -12,17 +12,14 @@ namespace Yttrium
 	class SoundImpl : public Sound
 	{
 	public:
-
 		const String& name() const { return _name; }
 
-		virtual bool load(AudioReader& reader) = 0;
+		virtual bool load(AudioReader&) = 0;
 
 	protected:
-
-		SoundImpl(const StaticString& name, Allocator* allocator): _name(name, allocator) {}
+		SoundImpl(const StaticString& name, Allocator& allocator): _name(name, &allocator) {}
 
 	private:
-
 		const String _name;
 	};
 }

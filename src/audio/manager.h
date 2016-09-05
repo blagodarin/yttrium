@@ -18,7 +18,6 @@ namespace Yttrium
 	class AudioManagerImpl : public AudioManager
 	{
 	public:
-
 		static AudioManagerImpl* instance();
 
 		AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator&);
@@ -28,7 +27,7 @@ namespace Yttrium
 		StaticString device() const override;
 		AudioPlayer& player() override { return _player; }
 
-		SharedPtr<Sound> create_sound(const StaticString& name, Allocator*);
+		SharedPtr<Sound> create_sound(const StaticString& name);
 		void delete_sound(const String& name);
 
 	private:

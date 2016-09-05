@@ -4,8 +4,8 @@
 
 namespace Yttrium
 {
-	SharedPtr<Sound> Sound::create(const StaticString& name, Allocator* allocator)
+	SharedPtr<Sound> Sound::create(const StaticString& name)
 	{
-		return AudioManagerImpl::instance()->create_sound(name, allocator);
+		return AudioManagerImpl::instance()->create_sound(name);
 	}
 }

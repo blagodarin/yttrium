@@ -19,25 +19,21 @@ namespace Yttrium
 	public:
 
 		///
-		static StdVector<StaticString> backends(Allocator& allocator = *DefaultAllocator);
+		static StdVector<StaticString> backends(Allocator& = *DefaultAllocator);
 
 		///
-		static StdVector<StaticString> backend_devices(const StaticString& backend, Allocator& allocator = *DefaultAllocator);
+		static StdVector<StaticString> backend_devices(const StaticString& backend, Allocator& = *DefaultAllocator);
 
 		///
-		static UniquePtr<AudioManager> create(const StaticString& backend = StaticString(),
-			const StaticString& device = StaticString(), Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<AudioManager> create(const StaticString& backend = {}, const StaticString& device = {}, Allocator& = *DefaultAllocator);
 
 		AudioManager() = default;
 		virtual ~AudioManager() = default;
 
-		///
-		/// Get the current backend name.
-		/// \return Audio backend name.
+		/// Returns the current backend name.
 		virtual StaticString backend() const = 0;
 
-		/// Get the current backend device name.
-		/// \return Audio output device name.
+		/// Returns the current backend device name.
 		virtual StaticString device() const = 0;
 
 		///

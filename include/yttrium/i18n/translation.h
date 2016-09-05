@@ -19,7 +19,7 @@ namespace Yttrium
 	public:
 
 		///
-		static UniquePtr<Translation> open(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<Translation> open(const StaticString& file_name, Allocator& = *DefaultAllocator);
 
 		Translation() = default;
 		virtual ~Translation() = default;

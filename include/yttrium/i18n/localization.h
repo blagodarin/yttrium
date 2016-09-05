@@ -20,7 +20,7 @@ namespace Yttrium
 	public:
 
 		///
-		static UniquePtr<Localization> create(const StaticString& file_name, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<Localization> create(const StaticString& file_name, Allocator& = *DefaultAllocator);
 
 		///
 		static String localize(const StaticString& source);

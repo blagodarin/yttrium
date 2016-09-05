@@ -14,9 +14,8 @@ namespace Yttrium
 	class Y_API Sound : public Shared
 	{
 	public:
-
 		/// Creates a sound.
-		static SharedPtr<Sound> create(const StaticString& name, Allocator* allocator = nullptr);
+		static SharedPtr<Sound> create(const StaticString& name);
 
 		~Sound() override = default;
 

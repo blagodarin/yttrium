@@ -37,7 +37,7 @@ namespace Yttrium
 		};
 	}
 
-	OggVorbisReader::OggVorbisReader(const StaticString& name, Allocator* allocator)
+	OggVorbisReader::OggVorbisReader(const StaticString& name, Allocator& allocator)
 		: AudioReaderImpl(name, allocator)
 	{
 		::memset(&_ov_file, 0, sizeof _ov_file);

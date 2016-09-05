@@ -24,13 +24,11 @@ namespace Yttrium
 		StaticString name() const { return _name; }
 
 	private:
-
-		Y_PRIVATE IonNode(IonDocumentPrivate& document);
-		Y_PRIVATE IonNode(IonDocumentPrivate& document, const StaticString& name);
-		Y_PRIVATE IonNode(IonDocumentPrivate& document, const StaticString& name, const ByReference&);
+		Y_PRIVATE IonNode(IonDocumentPrivate&);
+		Y_PRIVATE IonNode(IonDocumentPrivate&, const StaticString& name);
+		Y_PRIVATE IonNode(IonDocumentPrivate&, const StaticString& name, const ByReference&);
 
 	private:
-
 		const String _name;
 	};
 }

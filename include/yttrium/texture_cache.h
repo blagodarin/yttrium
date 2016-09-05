@@ -20,7 +20,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<TextureCache> create(Renderer& renderer);
+		static UniquePtr<TextureCache> create(Renderer&);
 
 		TextureCache() = default;
 		virtual ~TextureCache() = default;
