@@ -39,9 +39,9 @@ namespace Yttrium
 
 	ScriptCode::ScriptCode() = default;
 
-	ScriptCode::ScriptCode(String&& text, Allocator* allocator)
+	ScriptCode::ScriptCode(String&& text, Allocator& allocator)
 	{
-		auto&& code = make_unique<ScriptCodePrivate>(*allocator, *allocator);
+		auto&& code = make_unique<ScriptCodePrivate>(allocator, allocator);
 
 		ScriptScanner scanner(text);
 
@@ -66,7 +66,7 @@ namespace Yttrium
 				{
 				case ScriptScanner::Token::Identifier:
 				case ScriptScanner::Token::XIdentifier:
-					code->_commands.emplace_back(token.string, *allocator);
+					code->_commands.emplace_back(token.string, allocator);
 					command = &code->_commands.back();
 					state = ParserState::Command;
 					break;
@@ -115,12 +115,12 @@ namespace Yttrium
 		_private = std::move(code);
 	}
 
-	ScriptCode::ScriptCode(const StaticString& text, Allocator* allocator)
-		: ScriptCode(String(text, allocator), allocator) // The script text must be mutable for in-place parsing.
+	ScriptCode::ScriptCode(const StaticString& text, Allocator& allocator)
+		: ScriptCode(String(text, &allocator), allocator) // The script text must be mutable for in-place parsing.
 	{
 	}
 
-	void ScriptCode::execute(ScriptContext& context, ExecutionMode mode) const
+	void ScriptCode::execute(ScriptContext& context, ScriptCodeMode mode) const
 	{
 		if (!_private)
 			return;
@@ -129,7 +129,7 @@ namespace Yttrium
 		{
 			bool revert_mode = false;
 
-			if (mode == Undo)
+			if (mode == ScriptCodeMode::Undo)
 			{
 				if (command.name[0] != '+')
 					continue;
@@ -147,10 +147,10 @@ namespace Yttrium
 		}
 	}
 
-	ScriptCode ScriptCode::load(const StaticString& filename, Allocator* allocator)
+	ScriptCode ScriptCode::load(const StaticString& filename, Allocator& allocator)
 	{
-		String text(allocator);
-		return File(filename, allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
+		String text(&allocator);
+		return File(filename, &allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
 	}
 
 	ScriptCode::~ScriptCode() = default;

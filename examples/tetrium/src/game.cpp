@@ -180,7 +180,7 @@ void Game::run()
 
 	_cursor = make_unique<Cursor>(_allocator, _window->renderer());
 
-	ScriptCode::load("tetrium.txt", &_script.allocator()).execute(_script);
+	ScriptCode::load("tetrium.txt", _script.allocator()).execute(_script);
 
 	_bindings.bind_default(Key::_1, "play_music");
 	_bindings.bind_default(Key::_2, "stop_music");
@@ -292,7 +292,7 @@ bool Game::load_blocks()
 void Game::on_key_event(const KeyEvent& event)
 {
 	if (!event.autorepeat)
-		_bindings.call(event.key, event.pressed ? ScriptCode::Do : ScriptCode::Undo);
+		_bindings.call(event.key, event.pressed ? ScriptCodeMode::Do : ScriptCodeMode::Undo);
 }
 
 void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)

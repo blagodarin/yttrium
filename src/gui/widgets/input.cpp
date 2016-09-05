@@ -32,7 +32,7 @@ namespace Yttrium
 
 		String on_enter(_name.allocator());
 		loader.load_text("on_enter"_s, &on_enter);
-		_on_enter = ScriptCode(std::move(on_enter), &_gui.script_context().allocator());
+		_on_enter = ScriptCode(std::move(on_enter), _gui.script_context().allocator());
 
 		return true;
 	}

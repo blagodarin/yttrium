@@ -21,7 +21,7 @@ namespace Yttrium
 
 		if (event.key == Key::Enter)
 		{
-			ScriptCode(_line_editor.text(), &_script_context.allocator()).execute(_script_context);
+			ScriptCode(_line_editor.text(), _script_context.allocator()).execute(_script_context);
 			_line_editor.clear();
 			return true;
 		}

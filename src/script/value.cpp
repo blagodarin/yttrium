@@ -25,29 +25,29 @@ namespace Yttrium
 		return *this;
 	}
 
-	ScriptValue::ScriptValue(int value, Allocator* allocator)
+	ScriptValue::ScriptValue(int value, Allocator& allocator)
 		: _type(Type::Literal)
-		, _value(allocator)
+		, _value(&allocator)
 	{
 		_value << value;
 	}
 
-	ScriptValue::ScriptValue(double value, Allocator* allocator)
+	ScriptValue::ScriptValue(double value, Allocator& allocator)
 		: _type(Type::Literal)
-		, _value(allocator)
+		, _value(&allocator)
 	{
 		_value << value;
 	}
 
-	ScriptValue::ScriptValue(const StaticString& value, Allocator* allocator)
+	ScriptValue::ScriptValue(const StaticString& value, Allocator& allocator)
 		: _type(Type::String)
-		, _value(value, allocator)
+		, _value(value, &allocator)
 	{
 	}
 
-	ScriptValue::ScriptValue(const StaticString& value, Type type, Allocator* allocator)
+	ScriptValue::ScriptValue(const StaticString& value, Type type, Allocator& allocator)
 		: _type(type)
-		, _value(value, allocator)
+		, _value(value, &allocator)
 	{
 	}
 }

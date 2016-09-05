@@ -51,7 +51,7 @@ namespace Yttrium
 		bool bind_default(const StaticString& name, const StaticString& action);
 
 		///
-		bool call(Key key, ScriptCode::ExecutionMode mode = ScriptCode::Do);
+		bool call(Key key, ScriptCodeMode = ScriptCodeMode::Do);
 
 		///
 		void clear();

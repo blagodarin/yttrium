@@ -236,7 +236,7 @@ namespace Yttrium
 	{
 		auto& binding = _private->_actions[KeyType(key)];
 		binding.first.swap(String(action, &_private.allocator()));
-		binding.second = ScriptCode(binding.first, &_private->_script_context.allocator());
+		binding.second = ScriptCode(binding.first, _private->_script_context.allocator());
 	}
 
 	bool Bindings::bind(const StaticString& name, const StaticString& action)
@@ -254,7 +254,7 @@ namespace Yttrium
 		if (binding.first.is_empty())
 		{
 			binding.first.swap(String(action, &_private.allocator()));
-			binding.second = ScriptCode(binding.first, &_private->_script_context.allocator());
+			binding.second = ScriptCode(binding.first, _private->_script_context.allocator());
 		}
 	}
 
@@ -267,7 +267,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Bindings::call(Key key, ScriptCode::ExecutionMode mode)
+	bool Bindings::call(Key key, ScriptCodeMode mode)
 	{
 		const auto& binding = _private->_actions[KeyType(key)];
 		if (binding.first.is_empty())
@@ -294,7 +294,7 @@ namespace Yttrium
 	{
 		auto& binding = _private->_actions[KeyType(key)];
 		binding.first.clear();
-		binding.second = ScriptCode();
+		binding.second = {};
 	}
 
 	bool Bindings::unbind(const StaticString& name)

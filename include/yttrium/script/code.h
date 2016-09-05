@@ -12,26 +12,25 @@ namespace Yttrium
 	class StaticString;
 	class String;
 
+	///
+	enum class ScriptCodeMode
+	{
+		Do,   ///<
+		Undo, ///<
+	};
+
 	/// Script code.
 	class Y_API ScriptCode
 	{
 	public:
-
-		///
-		enum ExecutionMode
-		{
-			Do,   ///<
-			Undo, ///<
-		};
-
 		///
 		ScriptCode();
 
 		///
-		explicit ScriptCode(String&& text, Allocator* allocator = DefaultAllocator);
+		explicit ScriptCode(String&& text, Allocator& = *DefaultAllocator);
 
 		///
-		explicit ScriptCode(const StaticString& text, Allocator* allocator = DefaultAllocator);
+		explicit ScriptCode(const StaticString& text, Allocator& = *DefaultAllocator);
 
 		///
 		explicit operator bool() const noexcept { return static_cast<bool>(_private); }
@@ -39,10 +38,10 @@ namespace Yttrium
 		/// Execute the script.
 		/// \param context Context to execute the script in.
 		/// \param mode Execution mode.
-		void execute(ScriptContext& context, ExecutionMode mode = Do) const;
+		void execute(ScriptContext&, ScriptCodeMode = ScriptCodeMode::Do) const;
 
 		///
-		static ScriptCode load(const StaticString& filename, Allocator* allocator = DefaultAllocator);
+		static ScriptCode load(const StaticString& filename, Allocator& = *DefaultAllocator);
 
 	private:
 		UniquePtr<class ScriptCodePrivate> _private;

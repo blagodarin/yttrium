@@ -78,7 +78,7 @@ namespace Yttrium
 
 		String on_click(&_gui.allocator());
 		loader.load_text("on_click"_s, &on_click);
-		_on_click = ScriptCode(std::move(on_click), &_gui.script_context().allocator());
+		_on_click = ScriptCode(std::move(on_click), _gui.script_context().allocator());
 
 		return true;
 	}

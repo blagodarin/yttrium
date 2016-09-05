@@ -60,16 +60,14 @@ namespace Yttrium
 		ScriptValue& operator=(const StaticString& value);
 
 	private:
-
 		Type _type;
 		String _value;
 
 	private:
-
-		Y_PRIVATE ScriptValue(int value, Allocator* allocator);
-		Y_PRIVATE ScriptValue(double value, Allocator* allocator);
-		Y_PRIVATE ScriptValue(const StaticString& value, Allocator* allocator);
-		Y_PRIVATE ScriptValue(const StaticString& value, Type type, Allocator* allocator);
+		Y_PRIVATE ScriptValue(int, Allocator&);
+		Y_PRIVATE ScriptValue(double, Allocator&);
+		Y_PRIVATE ScriptValue(const StaticString&, Allocator&);
+		Y_PRIVATE ScriptValue(const StaticString&, Type, Allocator&);
 	};
 }
 

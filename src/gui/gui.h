@@ -5,7 +5,6 @@
 
 #include <yttrium/memory/named_allocator.h>
 #include <yttrium/memory/shared_ptr.h>
-#include <yttrium/script/code.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/texture_font.h>
@@ -15,6 +14,7 @@ namespace Yttrium
 	class GuiLayer;
 	class KeyEvent;
 	class RendererImpl;
+	class ScriptContext;
 	class Texture2D;
 	class TextureCache;
 	class WindowCallbacks;

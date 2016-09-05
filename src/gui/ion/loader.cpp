@@ -240,7 +240,7 @@ namespace Yttrium
 		const StaticString* action;
 		if (!GuiIonPropertyLoader::load_text(&action, node))
 			return false;
-		layer.set_action(static_cast<GuiLayer::Action>(extra), ScriptCode(*action, &_allocator));
+		layer.set_action(static_cast<GuiLayer::Action>(extra), ScriptCode(*action, _allocator));
 		return true;
 	}
 

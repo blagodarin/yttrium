@@ -112,7 +112,7 @@ namespace Yttrium
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
 			i = _private->_values.emplace(String(name, &_private.allocator()),
-				new(_private->_value_pool.allocate()) ScriptValue(value, &_private.allocator())).first;
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private.allocator())).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -123,7 +123,7 @@ namespace Yttrium
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
 			i = _private->_values.emplace(String(name, &_private.allocator()),
-				new(_private->_value_pool.allocate()) ScriptValue(value, &_private.allocator())).first;
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private.allocator())).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -134,7 +134,7 @@ namespace Yttrium
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
 			i = _private->_values.emplace(String(name, &_private.allocator()),
-				new(_private->_value_pool.allocate()) ScriptValue(value, &_private.allocator())).first;
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private.allocator())).first;
 		else
 			*i->second = value;
 		return i->second;

@@ -34,7 +34,7 @@ namespace Yttrium
 	public:
 
 		///
-		ScriptArgs(ScriptContext& context);
+		ScriptArgs(ScriptContext&);
 
 		///
 		int get_int(size_t index, int default_value) const;
