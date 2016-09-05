@@ -31,8 +31,8 @@ private:
 	StdVector<NamedAllocatorInfo> _memory_statistics { *DefaultAllocator };
 	ScriptContext _script;
 	UniquePtr<Window> _window;
-	std::unique_ptr<CubeModel> _cube;
-	std::unique_ptr<ChessboardModel> _chessboard;
+	UniquePtr<CubeModel> _cube;
+	UniquePtr<ChessboardModel> _chessboard;
 
 	Vector4 _position = {-16, -16, 16};
 	Euler _rotation = {45, -30, 0};

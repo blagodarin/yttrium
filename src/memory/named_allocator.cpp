@@ -2,6 +2,7 @@
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
+#include "heap_allocator.h"
 #include "named_allocator.h"
 
 #include <atomic>
@@ -97,34 +98,22 @@ namespace Yttrium
 	class NamedAllocatorPrivate
 	{
 	public:
+		Allocator& _allocator;
+		NamedAllocatorData* const _data;
+
 		NamedAllocatorPrivate(Allocator& allocator, NamedAllocatorData* data)
 			: _allocator(allocator)
 			, _data(data)
 		{
 		}
-
-	public:
-		Allocator& _allocator;
-		NamedAllocatorData* const _data;
 	};
 
-	NamedAllocator::NamedAllocator(const StaticString& name, Allocator& allocator)
+	NamedAllocator::NamedAllocator(const StaticString& name)
+		: _private(make_unique<NamedAllocatorPrivate>(_heap_allocator, _heap_allocator,
+			_named_allocators.data(name.is_empty()
+				? String("heap"_s, &_heap_allocator)
+				: String("heap."_s.size() + name.size(), &_heap_allocator) << "heap."_s << name)))
 	{
-		const auto named_allocator = dynamic_cast<NamedAllocator*>(&allocator);
-		if (named_allocator)
-		{
-			const auto& base_name = named_allocator->_private->_data->_name;
-			_private = make_unique<NamedAllocatorPrivate>(allocator, named_allocator->_private->_allocator,
-				_named_allocators.data(String(base_name.size() + 1 + name.size(), &_named_allocators._allocator) << base_name << '.' << name));
-		}
-		else
-			_private = make_unique<NamedAllocatorPrivate>(allocator, allocator,
-				_named_allocators.data(String(name, &_named_allocators._allocator)));
-	}
-
-	StaticString NamedAllocator::name() const noexcept
-	{
-		return _private->_data->_name;
 	}
 
 	void NamedAllocator::enumerate(StdVector<NamedAllocatorInfo>& infos)

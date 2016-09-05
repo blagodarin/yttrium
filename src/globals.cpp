@@ -22,11 +22,11 @@ namespace Yttrium
 #endif
 	BufferMemory _buffer_memory;
 
-	static HeapAllocator _root_allocator;
-	NamedAllocators _named_allocators(_root_allocator);
-	static NamedAllocator _default_allocator("heap"_s, _root_allocator);
+	HeapAllocator _heap_allocator;
+	NamedAllocators _named_allocators(_heap_allocator);
+	static NamedAllocator _default_allocator({});
 	Allocator* const DefaultAllocator = &_default_allocator;
 
-	static NamedAllocator _log_allocator("log"_s, _default_allocator);
+	static NamedAllocator _log_allocator("log"_s);
 	LogManager _log_manager(_log_allocator);
 }

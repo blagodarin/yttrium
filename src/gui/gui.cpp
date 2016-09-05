@@ -11,11 +11,11 @@
 
 namespace Yttrium
 {
-	GuiImpl::GuiImpl(ScriptContext& script_context, RendererImpl& renderer, WindowCallbacks& callbacks, Allocator& allocator)
+	GuiImpl::GuiImpl(ScriptContext& script_context, RendererImpl& renderer, WindowCallbacks& callbacks)
 		: _script_context(script_context)
 		, _renderer(renderer)
 		, _callbacks(callbacks)
-		, _allocator("gui"_s, allocator)
+		, _allocator("gui"_s)
 		, _texture_cache(TextureCache::create(_renderer))
 		, _fonts(_allocator)
 		, _layers(_allocator)

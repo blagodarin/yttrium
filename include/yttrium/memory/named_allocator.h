@@ -23,25 +23,20 @@ namespace Yttrium
 	class Y_API NamedAllocator : public Allocator
 	{
 	public:
+		~NamedAllocator() override;
 
-		///
-		NamedAllocator(const StaticString& name, Allocator& = *DefaultAllocator);
-
-		///
-		StaticString name() const noexcept;
+		/// Creates a named allocator for heap memory allocations.
+		NamedAllocator(const StaticString& name);
 
 		///
 		static void enumerate(StdVector<NamedAllocatorInfo>&);
 
 	private:
-		UniquePtr<class NamedAllocatorPrivate> _private;
-
-	public:
-		~NamedAllocator() override;
-
-	private:
 		void* do_allocate(size_t, size_t) override;
 		void do_deallocate(void*, bool) noexcept override;
+
+	private:
+		const UniquePtr<class NamedAllocatorPrivate> _private;
 	};
 }
 

@@ -20,8 +20,8 @@ void Game::run()
 	if (!_window->gui().load("examples/3d/data/gui.ion"))
 		return;
 
-	_cube = std::make_unique<CubeModel>(_window->renderer());
-	_chessboard = std::make_unique<ChessboardModel>(_window->renderer());
+	_cube = make_unique<CubeModel>(*DefaultAllocator, _window->renderer());
+	_chessboard = make_unique<ChessboardModel>(*DefaultAllocator, _window->renderer());
 
 	_window->lock_cursor(true);
 	_window->show();

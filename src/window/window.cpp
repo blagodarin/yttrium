@@ -57,7 +57,7 @@ namespace Yttrium
 		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), *this))
 		, _renderer(RendererImpl::create(*_backend, _allocator))
 		, _console(_script_context, _allocator)
-		, _gui(make_unique<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks, _allocator))
+		, _gui(make_unique<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks))
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
 		, _debug_text(&_allocator)

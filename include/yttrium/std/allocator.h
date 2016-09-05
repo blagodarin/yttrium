@@ -17,7 +17,7 @@ namespace Yttrium
 
 		StdAllocator() = delete; // For better diagnostics.
 
-		StdAllocator(Allocator& a)
+		StdAllocator(Allocator& a) noexcept
 			: _allocator(&a)
 		{
 		}

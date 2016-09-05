@@ -22,7 +22,7 @@ namespace Yttrium
 	class GuiImpl : public Gui
 	{
 	public:
-		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&, Allocator& allocator);
+		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&);
 		~GuiImpl() override;
 
 		void clear() override;
