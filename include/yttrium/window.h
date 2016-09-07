@@ -77,9 +77,6 @@ namespace Yttrium
 	public:
 
 		/// Creates a Window.
-		/// \param script_context ScriptContext for console and GUI.
-		/// \param callbacks
-		/// \param allocator
 		static UniquePtr<Window> create(ScriptContext&, WindowCallbacks&, Allocator& = *DefaultAllocator);
 
 		Window() = default;

@@ -125,24 +125,22 @@ namespace Yttrium
 		if (!_private)
 			return;
 
-		for (auto& command: _private->_commands)
+		class NameFixer
 		{
-			bool revert_mode = false;
+		public:
+			NameFixer(String& name, bool fix) : _name(name), _fix(fix) { if (_fix) _name[0] = '-'; }
+			~NameFixer() { if (_fix) _name[0] = '+'; }
+		private:
+			String& _name;
+			const bool _fix;
+		};
 
-			if (mode == ScriptCodeMode::Undo)
-			{
-				if (command.name[0] != '+')
-					continue;
-				command.name[0] = '-'; // TODO: Replace this unsafe anti-allocation trick with a better one.
-				revert_mode = true;
-			}
-
-			const bool result = context.call(command.name, &_private->_last_result, ScriptArgs(context, command.args));
-
-			if (revert_mode)
-				command.name[0] = '+';
-
-			if (!result)
+		for (auto& command : _private->_commands)
+		{
+			if (mode == ScriptCodeMode::Undo && command.name[0] != '+')
+				continue;
+			NameFixer fixer(command.name, mode == ScriptCodeMode::Undo);
+			if (!context.call(command.name, &_private->_last_result, ScriptArgs(context, command.args)))
 				break;
 		}
 	}
