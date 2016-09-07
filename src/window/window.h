@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	class GuiImpl;
+	class GuiPrivate;
 	class RendererImpl;
 	class ScreenImpl;
 	class WindowBackend;
@@ -20,18 +20,16 @@ namespace Yttrium
 	class WindowImpl : public Window, private WindowBackendCallbacks
 	{
 	public:
-
 		WindowImpl(ScriptContext&, WindowCallbacks&, Allocator&);
 		~WindowImpl() override;
 
 		// Window
 		void close() override;
-		Point cursor() const override;
-		String& debug_text() override;
-		Gui& gui() override;
-		bool is_console_visible() const override;
-		bool is_cursor_locked() const override;
-		bool is_debug_text_visible() const override;
+		Point cursor() const override { return _cursor; }
+		String& debug_text() override { return _debug_text; }
+		bool is_console_visible() const override { return _console_visible; }
+		bool is_cursor_locked() const override { return _is_cursor_locked; }
+		bool is_debug_text_visible() const override { return _debug_text_visible; }
 		bool is_shift_pressed() const override;
 		void lock_cursor(bool lock) override;
 		Renderer& renderer() override;
@@ -42,11 +40,12 @@ namespace Yttrium
 		void set_debug_text_visible(bool visible) override;
 		void set_name(const StaticString& name) override;
 		void show() override;
-		Size size() const override;
+		Size size() const override { return _size; }
 		void take_screenshot(const StaticString& name) override;
 
-	private:
+		WindowCallbacks& callbacks() { return _callbacks; }
 
+	private:
 		// WindowBackendCallbacks
 		void on_focus_event(bool is_focused) override;
 		void on_key_event(Key key, bool is_pressed) override;
@@ -57,7 +56,6 @@ namespace Yttrium
 		void set_active(bool active);
 
 	private:
-
 		ScriptContext&         _script_context;
 		WindowCallbacks&       _callbacks;
 		Allocator&             _allocator;
@@ -72,7 +70,6 @@ namespace Yttrium
 		bool                   _keys[KeyCount];
 		Console                _console;
 		bool                   _console_visible = false;
-		UniquePtr<GuiImpl>     _gui;
 		String                 _screenshot_filename;
 		Image                  _screenshot_image;
 		String                 _debug_text;

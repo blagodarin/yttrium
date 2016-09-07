@@ -9,7 +9,6 @@
 
 namespace Yttrium
 {
-	class Gui;
 	class Point;
 	class PointF;
 	class RectF;
@@ -67,10 +66,10 @@ namespace Yttrium
 		virtual void on_key_event(const KeyEvent& event);
 
 		///
-		virtual void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name);
+		virtual void on_render(Renderer&, const PointF& cursor);
 
 		///
-		virtual void on_render_cursor(Renderer&, const PointF&);
+		virtual void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name);
 
 		///
 		virtual void on_update(const UpdateEvent& update);
@@ -98,9 +97,6 @@ namespace Yttrium
 
 		///
 		virtual String& debug_text() = 0;
-
-		///
-		virtual Gui& gui() = 0;
 
 		///
 		virtual bool is_console_visible() const = 0;

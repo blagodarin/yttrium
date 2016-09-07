@@ -8,7 +8,7 @@
 
 namespace Yttrium
 {
-	LabelWidget::LabelWidget(const GuiImpl& gui)
+	LabelWidget::LabelWidget(const GuiPrivate& gui)
 		: Widget(gui)
 		, _foreground(_gui.allocator())
 		, _final_text(&_gui.allocator())

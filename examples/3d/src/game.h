@@ -1,6 +1,7 @@
 #ifndef _examples_3d_game_h_
 #define _examples_3d_game_h_
 
+#include <yttrium/gui.h>
 #include <yttrium/index_buffer.h>
 #include <yttrium/math/euler.h>
 #include <yttrium/math/vector.h>
@@ -23,14 +24,16 @@ public:
 
 private:
 	void on_cursor_movement(const Point& movement) override;
-	void on_key_event(const KeyEvent& event) override;
-	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
-	void on_update(const UpdateEvent& update) override;
+	void on_key_event(const KeyEvent&) override;
+	void on_render(Renderer&, const PointF& cursor) override;
+	void on_render_canvas(Renderer&, const RectF&, const StaticString& canvas_name) override;
+	void on_update(const UpdateEvent&) override;
 
 private:
 	StdVector<NamedAllocatorInfo> _memory_statistics { *DefaultAllocator };
 	ScriptContext _script;
 	UniquePtr<Window> _window;
+	UniquePtr<Gui> _gui;
 	UniquePtr<CubeModel> _cube;
 	UniquePtr<ChessboardModel> _chessboard;
 

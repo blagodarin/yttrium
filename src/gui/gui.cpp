@@ -1,21 +1,23 @@
-#include "gui.h"
+#include <yttrium/gui.h>
 
 #include <yttrium/log.h>
 #include <yttrium/script/context.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
 #include "../renderer/renderer.h"
+#include "../window/window.h"
 #include "exceptions.h"
+#include "gui.h"
 #include "ion/loader.h"
 #include "layer.h"
 
 namespace Yttrium
 {
-	GuiImpl::GuiImpl(ScriptContext& script_context, RendererImpl& renderer, WindowCallbacks& callbacks)
-		: _script_context(script_context)
-		, _renderer(renderer)
-		, _callbacks(callbacks)
-		, _allocator("gui"_s)
+	GuiPrivate::GuiPrivate(Window& window, ScriptContext& script_context, Allocator& allocator)
+		: _renderer(static_cast<RendererImpl&>(static_cast<WindowImpl&>(window).renderer()))
+		, _callbacks(static_cast<WindowImpl&>(window).callbacks())
+		, _script_context(script_context)
+		, _allocator(allocator)
 		, _texture_cache(TextureCache::create(_renderer))
 		, _fonts(_allocator)
 		, _layers(_allocator)
@@ -23,62 +25,9 @@ namespace Yttrium
 	{
 	}
 
-	GuiImpl::~GuiImpl()
-	{
-		clear();
-	}
+	GuiPrivate::~GuiPrivate() = default;
 
-	void GuiImpl::clear()
-	{
-		_fonts.clear();
-		_layers.clear();
-		_layer_stack.clear();
-	}
-
-	bool GuiImpl::has_layer(const StaticString& name) const
-	{
-		return _layers.find(String(name, ByReference())) != _layers.end();
-	}
-
-	bool GuiImpl::load(const StaticString& filename)
-	{
-		clear();
-
-		GuiIonLoader loader(*this);
-		if (!loader.load(filename))
-			return false;
-
-		if (_layer_stack.empty())
-		{
-			Log() << "(gui) No root layer has been added"_s;
-			clear();
-			return false;
-		}
-
-		return true;
-	}
-
-	bool GuiImpl::pop_layers(size_t count)
-	{
-		for (auto n = min(count, _layer_stack.size()); n > 0; --n)
-		{
-			_layer_stack.back()->run_action(GuiLayer::Action::Pop, _script_context);
-			_layer_stack.pop_back();
-		}
-		return !_layer_stack.empty();
-	}
-
-	bool GuiImpl::push_layer(const StaticString& name)
-	{
-		auto i = _layers.find(String(name, ByReference()));
-		if (i == _layers.end())
-			return false;
-		_layer_stack.push_back(i->second.get());
-		i->second->run_action(GuiLayer::Action::Push, _script_context);
-		return true;
-	}
-
-	GuiLayer& GuiImpl::add_layer(const StaticString& name, bool is_transparent, bool is_root)
+	GuiLayer& GuiPrivate::add_layer(const StaticString& name, bool is_transparent, bool is_root)
 	{
 		if (!is_root && name.is_empty())
 			throw GuiError(_allocator) << "Non-root layer must have a name"_s;
@@ -95,31 +44,20 @@ namespace Yttrium
 		return *_layers.emplace(layer_name, std::move(layer)).first->second;
 	}
 
-	const GuiImpl::FontDesc* GuiImpl::font(const StaticString& name) const
+	void GuiPrivate::clear()
+	{
+		_fonts.clear();
+		_layers.clear();
+		_layer_stack.clear();
+	}
+
+	const GuiPrivate::FontDesc* GuiPrivate::font(const StaticString& name) const
 	{
 		const auto i = _fonts.find(String(name, ByReference()));
 		return i != _fonts.end() ? &i->second : nullptr;
 	}
 
-	bool GuiImpl::process_key_event(const KeyEvent& event)
-	{
-		return !_layer_stack.empty() && _layer_stack.back()->process_key(event);
-	}
-
-	void GuiImpl::render(const PointF& cursor) const
-	{
-		if (_layer_stack.empty())
-			return;
-		const auto top = _layer_stack.begin() + (_layer_stack.size() - 1);
-		auto i = top;
-		while (i != _layer_stack.begin() && (*i)->is_transparent())
-			--i;
-		while (i != top)
-			(*i++)->render(_renderer, nullptr);
-		(*i)->render(_renderer, &cursor);
-	}
-
-	void GuiImpl::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
+	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
 		auto&& texture = _texture_cache->load_texture_2d(texture_name, true);
 		if (!texture)
@@ -144,4 +82,74 @@ namespace Yttrium
 		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
+
+	Gui::Gui(Window& window, ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<GuiPrivate>(allocator, window, script_context, allocator))
+	{
+	}
+
+	void Gui::clear()
+	{
+		_private->clear();
+	}
+
+	bool Gui::has_layer(const StaticString& name) const
+	{
+		return _private->_layers.find(String(name, ByReference())) != _private->_layers.end();
+	}
+
+	bool Gui::load(const StaticString& filename)
+	{
+		clear();
+		GuiIonLoader loader(*_private);
+		if (!loader.load(filename))
+			return false;
+		if (_private->_layer_stack.empty())
+		{
+			Log() << "(gui) No root layer has been added"_s;
+			clear();
+			return false;
+		}
+		return true;
+	}
+
+	bool Gui::pop_layers(size_t count)
+	{
+		for (auto n = min(count, _private->_layer_stack.size()); n > 0; --n)
+		{
+			_private->_layer_stack.back()->run_action(GuiLayer::Action::Pop, _private->_script_context);
+			_private->_layer_stack.pop_back();
+		}
+		return !_private->_layer_stack.empty();
+	}
+
+	bool Gui::process_key_event(const KeyEvent& event)
+	{
+		return !_private->_layer_stack.empty() && _private->_layer_stack.back()->process_key(event);
+	}
+
+	bool Gui::push_layer(const StaticString& name)
+	{
+		const auto i = _private->_layers.find(String(name, ByReference()));
+		if (i == _private->_layers.end())
+			return false;
+		_private->_layer_stack.push_back(i->second.get());
+		i->second->run_action(GuiLayer::Action::Push, _private->_script_context);
+		return true;
+	}
+
+	void Gui::render(const PointF& cursor) const
+	{
+		if (_private->_layer_stack.empty())
+			return;
+		const auto top_layer = std::prev(_private->_layer_stack.end());
+		auto layer = top_layer;
+		while (layer != _private->_layer_stack.begin() && (*layer)->is_transparent())
+			--layer;
+		while (layer != top_layer)
+			(*layer++)->render(_private->_renderer, nullptr);
+		(*layer)->render(_private->_renderer, &cursor);
+	}
+
+	Gui::~Gui() = default;
 }

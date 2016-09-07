@@ -6,15 +6,15 @@
 
 namespace Yttrium
 {
-	class GuiImpl;
 	class GuiLayer;
 	class GuiLayout;
+	class GuiPrivate;
 	class IonNode;
 
 	class GuiIonLoader
 	{
 	public:
-		GuiIonLoader(GuiImpl& gui);
+		GuiIonLoader(GuiPrivate&);
 
 		bool load(const StaticString& source_name);
 
@@ -34,7 +34,7 @@ namespace Yttrium
 		bool load_layout_size(GuiLayout&, const IonNode&) const;
 
 	private:
-		GuiImpl& _gui;
+		GuiPrivate& _gui;
 		Allocator& _allocator;
 		GuiClasses _classes;
 		bool _has_default_font = false;

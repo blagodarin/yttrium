@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	class GuiImpl;
+	class GuiPrivate;
 	class IonNode;
 	class IonObject;
 	class TextureCache;
@@ -15,7 +15,7 @@ namespace Yttrium
 	class GuiIonPropertyLoader : public GuiPropertyLoader
 	{
 	public:
-		GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiImpl& gui);
+		GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiPrivate&);
 
 		void set_default_font_name(const String*);
 
@@ -45,11 +45,11 @@ namespace Yttrium
 	private:
 		const IonObject* _object;
 		const IonObject* _class;
-		const GuiImpl&   _gui;
-		TextureCache&    _texture_cache;
+		const GuiPrivate& _gui;
+		TextureCache& _texture_cache;
 		const IonObject* _bound_object;
 		const IonObject* _bound_class;
-		const String*    _default_font_name = nullptr;
+		const String* _default_font_name = nullptr;
 	};
 }
 

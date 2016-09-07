@@ -87,7 +87,7 @@ namespace Yttrium
 		}
 	}
 
-	GuiIonLoader::GuiIonLoader(GuiImpl& gui)
+	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
 		: _gui(gui)
 		, _allocator(_gui.allocator())
 		, _classes(_allocator)

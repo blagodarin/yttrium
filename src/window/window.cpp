@@ -24,11 +24,11 @@ namespace Yttrium
 	{
 	}
 
-	void WindowCallbacks::on_render_canvas(Renderer&, const RectF&, const StaticString&)
+	void WindowCallbacks::on_render(Renderer&, const PointF&)
 	{
 	}
 
-	void WindowCallbacks::on_render_cursor(Renderer&, const PointF&)
+	void WindowCallbacks::on_render_canvas(Renderer&, const RectF&, const StaticString&)
 	{
 	}
 
@@ -57,7 +57,6 @@ namespace Yttrium
 		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), *this))
 		, _renderer(RendererImpl::create(*_backend, _allocator))
 		, _console(_script_context, _allocator)
-		, _gui(make_unique<GuiImpl>(_allocator, _script_context, *_renderer, _callbacks))
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
 		, _debug_text(&_allocator)
@@ -78,36 +77,6 @@ namespace Yttrium
 	void WindowImpl::close()
 	{
 		_backend->close();
-	}
-
-	Point WindowImpl::cursor() const
-	{
-		return _cursor;
-	}
-
-	String& WindowImpl::debug_text()
-	{
-		return _debug_text;
-	}
-
-	Gui& WindowImpl::gui()
-	{
-		return *_gui;
-	}
-
-	bool WindowImpl::is_console_visible() const
-	{
-		return _console_visible;
-	}
-
-	bool WindowImpl::is_cursor_locked() const
-	{
-		return _is_cursor_locked;
-	}
-
-	bool WindowImpl::is_debug_text_visible() const
-	{
-		return _debug_text_visible;
 	}
 
 	bool WindowImpl::is_shift_pressed() const
@@ -144,9 +113,7 @@ namespace Yttrium
 				_renderer->clear();
 				PushGpuProgram gpu_program(*_renderer, _renderer->program_2d());
 				Push2D projection(*_renderer);
-				const PointF cursor(_cursor);
-				_gui->render(cursor);
-				_callbacks.on_render_cursor(*_renderer, cursor);
+				_callbacks.on_render(*_renderer, PointF(_cursor));
 				draw_debug();
 			}
 			_backend->swap_buffers();
@@ -213,11 +180,6 @@ namespace Yttrium
 		set_active(true);
 	}
 
-	Size WindowImpl::size() const
-	{
-		return _size;
-	}
-
 	void WindowImpl::take_screenshot(const StaticString& name)
 	{
 		_screenshot_filename = name;
@@ -258,9 +220,6 @@ namespace Yttrium
 				return;
 			}
 		}
-
-		if (_gui->process_key_event(event))
-			return;
 
 		_callbacks.on_key_event(event);
 	}

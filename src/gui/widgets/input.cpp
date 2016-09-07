@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	InputWidget::InputWidget(const GuiImpl& gui)
+	InputWidget::InputWidget(const GuiPrivate& gui)
 		: Widget(gui, CanHaveFocus)
 		, _foreground(_gui.allocator())
 		, _logic(_gui.allocator())

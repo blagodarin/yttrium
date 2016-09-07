@@ -4,33 +4,49 @@
 #ifndef _include_yttrium_gui_h_
 #define _include_yttrium_gui_h_
 
-#include <cstddef>
+#include <yttrium/memory/unique_ptr.h>
 
 namespace Yttrium
 {
+	class KeyEvent;
+	class PointF;
+	class ScriptContext;
 	class StaticString;
+	class Window;
 
 	/// GUI manager.
-	class Gui
+	class Y_API Gui
 	{
 	public:
-
-		virtual ~Gui() = default;
+		///
+		Gui(Window&, ScriptContext&, Allocator& = *DefaultAllocator);
 
 		///
-		virtual void clear() = 0;
+		void clear();
 
 		///
-		virtual bool has_layer(const StaticString& name) const = 0;
+		bool has_layer(const StaticString& name) const;
 
 		///
-		virtual bool load(const StaticString& filename) = 0;
+		bool load(const StaticString& filename);
 
 		///
-		virtual bool pop_layers(size_t count) = 0;
+		bool pop_layers(size_t count);
 
 		///
-		virtual bool push_layer(const StaticString& name) = 0;
+		bool process_key_event(const KeyEvent&);
+
+		///
+		bool push_layer(const StaticString& name);
+
+		///
+		void render(const PointF& cursor) const;
+
+	private:
+		const UniquePtr<class GuiPrivate> _private;
+
+	public:
+		~Gui();
 	};
 }
 

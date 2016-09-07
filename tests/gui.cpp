@@ -15,5 +15,6 @@ BOOST_AUTO_TEST_CASE(test_gui)
 	WindowCallbacks window_callbacks;
 	const auto& window = Window::create(script_context, window_callbacks);
 	BOOST_REQUIRE(window);
-	BOOST_REQUIRE(window->gui().load("tests/gui/gui.ion"));
+	Gui gui(*window, script_context);
+	BOOST_REQUIRE(gui.load("tests/gui/gui.ion"));
 }

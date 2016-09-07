@@ -8,7 +8,7 @@
 
 namespace Yttrium
 {
-	class GuiImpl;
+	class GuiPrivate;
 	class GuiPropertyLoader;
 	class Renderer;
 
@@ -21,7 +21,7 @@ namespace Yttrium
 			CanHaveFocus = 1 << 0,
 		};
 
-		Widget(const GuiImpl&, unsigned flags = 0);
+		Widget(const GuiPrivate&, unsigned flags = 0);
 		virtual ~Widget() = default;
 
 		unsigned flags() const { return _flags; }
@@ -41,7 +41,7 @@ namespace Yttrium
 		virtual void render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const = 0;
 
 	protected:
-		const GuiImpl& _gui;
+		const GuiPrivate& _gui;
 		RectF          _rect;
 		bool           _is_enabled = true;
 		String         _text;

@@ -26,6 +26,7 @@ Game::Game()
 	, _script(&_script_allocator)
 	, _audio_allocator("audio")
 	, _window_allocator("window")
+	, _gui_allocator("gui")
 	, _bindings(_script, _allocator)
 	, _statistics({
 			{100000, String("John Placeholder", &_allocator)},
@@ -98,13 +99,13 @@ Game::Game()
 	_script.define("pop_layer", 0, 1, [this](const ScriptCall& call)
 	{
 		const auto layers_to_pop = call.args.get_int(0, 1);
-		if (layers_to_pop > 0 && !_window->gui().pop_layers(layers_to_pop))
+		if (layers_to_pop > 0 && !_gui->pop_layers(layers_to_pop))
 			_window->close();
 	});
 
 	_script.define("push_layer", 1, [this](const ScriptCall& call)
 	{
-		_window->gui().push_layer(call.args.string(0));
+		_gui->push_layer(call.args.string(0));
 	});
 
 	_script.define("save_score", [this](const ScriptCall&)
@@ -229,7 +230,8 @@ void Game::run()
 		}
 	}
 
-	if (!_window->gui().load("examples/tetrium/data/gui.ion"))
+	_gui = make_unique<Gui>(_gui_allocator, *_window, _script, _gui_allocator);
+	if (!_gui->load("examples/tetrium/data/gui.ion"))
 		return;
 
 	Log() << "Starting";
@@ -291,8 +293,18 @@ bool Game::load_blocks()
 
 void Game::on_key_event(const KeyEvent& event)
 {
+	if (_gui->process_key_event(event))
+		return;
+
 	if (!event.autorepeat)
 		_bindings.call(event.key, event.pressed ? ScriptCodeMode::Do : ScriptCodeMode::Undo);
+}
+
+void Game::on_render(Renderer&, const PointF& cursor)
+{
+	_gui->render(cursor);
+	if (!_game_running)
+		_cursor->draw(cursor);
 }
 
 void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
@@ -302,12 +314,6 @@ void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticS
 		draw_field(renderer, rect);
 	else if (canvas_name == "next")
 		draw_next_figure(renderer, rect);
-}
-
-void Game::on_render_cursor(Renderer&, const PointF& point)
-{
-	if (!_game_running)
-		_cursor->draw(point);
 }
 
 void Game::on_update(const UpdateEvent& update)
@@ -338,7 +344,7 @@ void Game::on_update(const UpdateEvent& update)
 		if (_game.has_finished())
 		{
 			_game_running = false;
-			_window->gui().push_layer("game_over");
+			_gui->push_layer("game_over");
 		}
 	}
 }

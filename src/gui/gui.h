@@ -1,9 +1,6 @@
 #ifndef _src_gui_gui_h_
 #define _src_gui_gui_h_
 
-#include <yttrium/gui.h>
-
-#include <yttrium/memory/named_allocator.h>
 #include <yttrium/memory/shared_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
@@ -11,28 +8,19 @@
 
 namespace Yttrium
 {
+	class Gui;
 	class GuiLayer;
-	class KeyEvent;
 	class RendererImpl;
 	class ScriptContext;
+	class String;
 	class Texture2D;
 	class TextureCache;
+	class Window;
 	class WindowCallbacks;
 
-	class GuiImpl : public Gui
+	class GuiPrivate
 	{
 	public:
-		GuiImpl(ScriptContext&, RendererImpl&, WindowCallbacks&);
-		~GuiImpl() override;
-
-		void clear() override;
-		bool has_layer(const StaticString& name) const override;
-		bool load(const StaticString& filename) override;
-		bool pop_layers(size_t count) override;
-		bool push_layer(const StaticString& name) override;
-
-	public:
-
 		struct FontDesc
 		{
 			SharedPtr<TextureFont> font;
@@ -47,33 +35,29 @@ namespace Yttrium
 			}
 		};
 
+		GuiPrivate(Window&, ScriptContext&, Allocator&);
+		~GuiPrivate();
+
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
-
-		Allocator& allocator() const { return const_cast<NamedAllocator&>(_allocator); }
-
+		Allocator& allocator() const { return _allocator; }
 		WindowCallbacks& callbacks() const { return _callbacks; }
-
+		void clear();
 		const FontDesc* font(const StaticString& name) const;
-
-		bool process_key_event(const KeyEvent& event);
-
-		void render(const PointF& cursor) const;
-
 		ScriptContext& script_context() const { return _script_context; }
-
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
-
 		TextureCache& texture_cache() { return *_texture_cache; }
 
 	private:
-		ScriptContext&                    _script_context;
-		RendererImpl&                     _renderer;
-		WindowCallbacks&                  _callbacks;
-		NamedAllocator                    _allocator;
-		UniquePtr<TextureCache>           _texture_cache;
-		StdMap<String, FontDesc>          _fonts;
+		RendererImpl& _renderer;
+		WindowCallbacks& _callbacks;
+		ScriptContext& _script_context;
+		Allocator& _allocator;
+		const UniquePtr<TextureCache> _texture_cache;
+		StdMap<String, FontDesc> _fonts;
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
-		StdVector<GuiLayer*>              _layer_stack;
+		StdVector<GuiLayer*> _layer_stack;
+
+		friend Gui;
 	};
 }
 

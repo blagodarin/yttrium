@@ -10,7 +10,6 @@ namespace Yttrium
 	class LineEditor
 	{
 	public:
-
 		LineEditor(Allocator& allocator);
 
 		void clear();
@@ -24,8 +23,7 @@ namespace Yttrium
 		String text() const { return _text; }
 
 	private:
-
-		String   _text;
+		String _text;
 		unsigned _cursor = 0;
 		unsigned _selection_size = 0;
 		unsigned _selection_offset = 0;

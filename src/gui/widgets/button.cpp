@@ -14,7 +14,7 @@ namespace Yttrium
 {
 	constexpr auto ButtonTextSize = 0.875f;
 
-	ButtonWidget::ButtonWidget(const GuiImpl& gui)
+	ButtonWidget::ButtonWidget(const GuiPrivate& gui)
 		: Widget(gui)
 		, _foreground(_gui.allocator())
 	{

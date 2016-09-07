@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	Widget::Widget(const GuiImpl& gui, unsigned flags)
+	Widget::Widget(const GuiPrivate& gui, unsigned flags)
 		: _gui(gui)
 		, _text(&_gui.allocator())
 		, _name(&_gui.allocator())

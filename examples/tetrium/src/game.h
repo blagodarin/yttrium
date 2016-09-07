@@ -4,6 +4,7 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
+#include <yttrium/gui.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/memory/named_allocator.h>
@@ -29,17 +30,17 @@ private:
 	bool load_blocks();
 
 	// WindowCallbacks
-	void on_key_event(const KeyEvent& event) override;
-	void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name) override;
-	void on_render_cursor(Renderer&, const PointF&) override;
+	void on_key_event(const KeyEvent&) override;
+	void on_render(Renderer&, const PointF& cursor) override;
+	void on_render_canvas(Renderer&, const RectF&, const StaticString& canvas_name) override;
 	void on_update(const UpdateEvent&) override;
 
-	void draw_field(Renderer& renderer, const RectF& rect);
-	void draw_field_blocks(Renderer& renderer, const RectF& rect, const SizeF& block_size);
-	void draw_field_figure(Renderer& renderer, const RectF& rect, const SizeF& block_size);
-	void draw_field_frame(Renderer& renderer, const RectF& rect, const SizeF& block_size);
-	void draw_next_figure(Renderer& renderer, const RectF& rect);
-	void set_texture_rect(Renderer& renderer, Tetrium::Figure::Type figure_type);
+	void draw_field(Renderer&, const RectF&);
+	void draw_field_blocks(Renderer&, const RectF&, const SizeF& block_size);
+	void draw_field_figure(Renderer&, const RectF&, const SizeF& block_size);
+	void draw_field_frame(Renderer&, const RectF&, const SizeF& block_size);
+	void draw_next_figure(Renderer&, const RectF&);
+	void set_texture_rect(Renderer&, Tetrium::Figure::Type);
 
 	void update_statistics();
 
@@ -52,6 +53,8 @@ private:
 	UniquePtr<AudioManager> _audio;
 	NamedAllocator _window_allocator;
 	UniquePtr<Window> _window;
+	NamedAllocator _gui_allocator;
+	UniquePtr<Gui> _gui;
 	UniquePtr<Cursor> _cursor;
 	UniquePtr<TextureCache> _texture_cache;
 	Bindings _bindings;

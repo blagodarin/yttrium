@@ -10,7 +10,7 @@
 
 namespace Yttrium
 {
-	GuiLayer::GuiLayer(GuiImpl& gui, const StaticString& name, bool is_transparent)
+	GuiLayer::GuiLayer(GuiPrivate& gui, const StaticString& name, bool is_transparent)
 		: _gui(gui)
 		, _name(name, &_gui.allocator())
 		, _layouts(_gui.allocator())

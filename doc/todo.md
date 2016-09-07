@@ -7,7 +7,6 @@
 		- Introduce advanced resource naming (string-based, hash-based).
 	* GUI:
 		- Line editor widget.
-		- Move Gui object out of Window object.
 	* Image:
 		- Compressed image format support (e.g. compressed textures).
 		- Multi-level image support (e.g. textures with mipmaps).
@@ -19,6 +18,8 @@
 		- Location information support.
 	* Renderer:
 		- OpenGL 3.3 compliance.
+	* Window:
+		- Move console out of Window.
 * Examples:
 	* Tetrium:
 		- Pack the data at build time.

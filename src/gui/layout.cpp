@@ -11,7 +11,7 @@
 
 namespace Yttrium
 {
-	GuiLayout::GuiLayout(const GuiImpl& gui, Placement placement)
+	GuiLayout::GuiLayout(const GuiPrivate& gui, Placement placement)
 		: _gui(gui)
 		, _placement(placement)
 		, _widgets(_gui.allocator())

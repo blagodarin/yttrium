@@ -12,7 +12,7 @@ namespace Yttrium
 	class InputWidget : public Widget
 	{
 	public:
-		InputWidget(const GuiImpl&);
+		InputWidget(const GuiPrivate&);
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;

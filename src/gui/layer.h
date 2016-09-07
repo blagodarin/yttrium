@@ -8,8 +8,8 @@
 
 namespace Yttrium
 {
-	class GuiImpl;
 	class GuiLayout;
+	class GuiPrivate;
 	class Renderer;
 	class Widget;
 
@@ -24,7 +24,7 @@ namespace Yttrium
 			Pop,
 		};
 
-		GuiLayer(GuiImpl& gui, const StaticString& name, bool is_transparent);
+		GuiLayer(GuiPrivate&, const StaticString& name, bool is_transparent);
 		~GuiLayer();
 
 		bool is_transparent() const { return _is_transparent; }
@@ -46,7 +46,7 @@ namespace Yttrium
 		Widget* widget_at(const PointF&) const;
 
 	private:
-		GuiImpl&                   _gui;
+		GuiPrivate&                _gui;
 		String                     _name;
 		StdVector<UniquePtr<GuiLayout>> _layouts;
 		StdMap<StaticString, Widget*> _named_widgets;

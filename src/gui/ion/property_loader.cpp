@@ -76,7 +76,7 @@ namespace Yttrium
 		}
 	}
 
-	GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiImpl& gui)
+	GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiPrivate& gui)
 		: _object(object)
 		, _class(class_)
 		, _gui(gui)

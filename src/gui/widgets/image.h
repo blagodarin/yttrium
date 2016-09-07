@@ -9,7 +9,7 @@ namespace Yttrium
 	class ImageWidget : public Widget
 	{
 	public:
-		ImageWidget(const GuiImpl& gui) : Widget(gui) {}
+		ImageWidget(const GuiPrivate& gui) : Widget(gui) {}
 
 		bool load(GuiPropertyLoader&) override;
 		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;

@@ -17,7 +17,8 @@ void Game::run()
 
 	_window->set_name("Yttrium 3D example");
 
-	if (!_window->gui().load("examples/3d/data/gui.ion"))
+	_gui = make_unique<Gui>(*DefaultAllocator, *_window, _script);
+	if (!_gui->load("examples/3d/data/gui.ion"))
 		return;
 
 	_cube = make_unique<CubeModel>(*DefaultAllocator, _window->renderer());
@@ -36,6 +37,9 @@ void Game::on_cursor_movement(const Point& movement)
 
 void Game::on_key_event(const KeyEvent& event)
 {
+	if (_gui->process_key_event(event))
+		return;
+
 	switch (event.key)
 	{
 	case Key::Escape:
@@ -77,6 +81,11 @@ void Game::on_key_event(const KeyEvent& event)
 	default: // To avoid compiler warnings.
 		break;
 	}
+}
+
+void Game::on_render(Renderer&, const PointF& cursor)
+{
+	_gui->render(cursor);
 }
 
 void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString&)
