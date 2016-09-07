@@ -17,10 +17,6 @@ void Game::run()
 
 	_window->set_name("Yttrium 3D example");
 
-	_gui = make_unique<Gui>(*DefaultAllocator, *_window, _script);
-	if (!_gui->load("examples/3d/data/gui.ion"))
-		return;
-
 	_cube = make_unique<CubeModel>(*DefaultAllocator, _window->renderer());
 	_chessboard = make_unique<ChessboardModel>(*DefaultAllocator, _window->renderer());
 
@@ -37,9 +33,6 @@ void Game::on_cursor_movement(const Point& movement)
 
 void Game::on_key_event(const KeyEvent& event)
 {
-	if (_gui->process_key_event(event))
-		return;
-
 	switch (event.key)
 	{
 	case Key::Escape:
@@ -83,12 +76,7 @@ void Game::on_key_event(const KeyEvent& event)
 	}
 }
 
-void Game::on_render(Renderer&, const PointF& cursor)
-{
-	_gui->render(cursor);
-}
-
-void Game::on_render_canvas(Renderer& renderer, const RectF&, const StaticString&)
+void Game::on_render(Renderer& renderer, const PointF&)
 {
 	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256));
 

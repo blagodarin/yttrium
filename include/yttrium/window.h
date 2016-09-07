@@ -58,7 +58,6 @@ namespace Yttrium
 	class Y_API WindowCallbacks
 	{
 	public:
-
 		///
 		virtual void on_cursor_movement(const Point& movement);
 
@@ -67,9 +66,6 @@ namespace Yttrium
 
 		///
 		virtual void on_render(Renderer&, const PointF& cursor);
-
-		///
-		virtual void on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name);
 
 		///
 		virtual void on_update(const UpdateEvent& update);

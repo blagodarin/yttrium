@@ -4,8 +4,6 @@
 #include <yttrium/script/context.h>
 #include <yttrium/texture.h>
 #include <yttrium/texture_cache.h>
-#include "../renderer/renderer.h"
-#include "../window/window.h"
 #include "exceptions.h"
 #include "gui.h"
 #include "ion/loader.h"
@@ -13,15 +11,15 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(Window& window, ScriptContext& script_context, Allocator& allocator)
-		: _renderer(static_cast<RendererImpl&>(static_cast<WindowImpl&>(window).renderer()))
-		, _callbacks(static_cast<WindowImpl&>(window).callbacks())
+	GuiPrivate::GuiPrivate(Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _renderer(renderer)
 		, _script_context(script_context)
 		, _allocator(allocator)
 		, _texture_cache(TextureCache::create(_renderer))
 		, _fonts(_allocator)
 		, _layers(_allocator)
 		, _layer_stack(_allocator)
+		, _canvas_handlers(_allocator)
 	{
 	}
 
@@ -57,6 +55,13 @@ namespace Yttrium
 		return i != _fonts.end() ? &i->second : nullptr;
 	}
 
+	void GuiPrivate::render_canvas(const StaticString& name, const RectF& rect) const
+	{
+		const auto i = _canvas_handlers.find(String(name, ByReference()));
+		if (i != _canvas_handlers.end())
+			i->second(_renderer, rect);
+	}
+
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
 		auto&& texture = _texture_cache->load_texture_2d(texture_name, true);
@@ -83,8 +88,8 @@ namespace Yttrium
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 
-	Gui::Gui(Window& window, ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<GuiPrivate>(allocator, window, script_context, allocator))
+	Gui::Gui(Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<GuiPrivate>(allocator, renderer, script_context, allocator))
 	{
 	}
 
@@ -149,6 +154,11 @@ namespace Yttrium
 		while (layer != top_layer)
 			(*layer++)->render(_private->_renderer, nullptr);
 		(*layer)->render(_private->_renderer, &cursor);
+	}
+
+	void Gui::set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>& handler)
+	{
+		_private->_canvas_handlers[String(name, &_private->_allocator)] = handler;
 	}
 
 	Gui::~Gui() = default;

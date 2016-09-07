@@ -6,20 +6,23 @@
 
 #include <yttrium/memory/unique_ptr.h>
 
+#include <functional>
+
 namespace Yttrium
 {
 	class KeyEvent;
 	class PointF;
+	class RectF;
+	class Renderer;
 	class ScriptContext;
 	class StaticString;
-	class Window;
 
 	/// GUI manager.
 	class Y_API Gui
 	{
 	public:
 		///
-		Gui(Window&, ScriptContext&, Allocator& = *DefaultAllocator);
+		Gui(Renderer&, ScriptContext&, Allocator& = *DefaultAllocator);
 
 		///
 		void clear();
@@ -41,6 +44,9 @@ namespace Yttrium
 
 		///
 		void render(const PointF& cursor) const;
+
+		///
+		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
 
 	private:
 		const UniquePtr<class GuiPrivate> _private;

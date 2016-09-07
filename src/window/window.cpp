@@ -28,10 +28,6 @@ namespace Yttrium
 	{
 	}
 
-	void WindowCallbacks::on_render_canvas(Renderer&, const RectF&, const StaticString&)
-	{
-	}
-
 	void WindowCallbacks::on_update(const UpdateEvent&)
 	{
 	}

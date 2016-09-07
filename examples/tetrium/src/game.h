@@ -32,7 +32,6 @@ private:
 	// WindowCallbacks
 	void on_key_event(const KeyEvent&) override;
 	void on_render(Renderer&, const PointF& cursor) override;
-	void on_render_canvas(Renderer&, const RectF&, const StaticString& canvas_name) override;
 	void on_update(const UpdateEvent&) override;
 
 	void draw_field(Renderer&, const RectF&);

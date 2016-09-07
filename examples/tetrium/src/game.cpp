@@ -230,9 +230,21 @@ void Game::run()
 		}
 	}
 
-	_gui = make_unique<Gui>(_gui_allocator, *_window, _script, _gui_allocator);
+	_gui = make_unique<Gui>(_gui_allocator, _window->renderer(), _script, _gui_allocator);
 	if (!_gui->load("examples/tetrium/data/gui.ion"))
 		return;
+
+	_gui->set_canvas_handler("field", [this](Renderer& renderer, const RectF& rect)
+	{
+		PushTexture push_texture(renderer, _block_texture.get());
+		draw_field(renderer, rect);
+	});
+
+	_gui->set_canvas_handler("next", [this](Renderer& renderer, const RectF& rect)
+	{
+		PushTexture push_texture(renderer, _block_texture.get());
+		draw_next_figure(renderer, rect);
+	});
 
 	Log() << "Starting";
 
@@ -305,15 +317,6 @@ void Game::on_render(Renderer&, const PointF& cursor)
 	_gui->render(cursor);
 	if (!_game_running)
 		_cursor->draw(cursor);
-}
-
-void Game::on_render_canvas(Renderer& renderer, const RectF& rect, const StaticString& canvas_name)
-{
-	PushTexture push_texture(renderer, _block_texture.get());
-	if (canvas_name == "field")
-		draw_field(renderer, rect);
-	else if (canvas_name == "next")
-		draw_next_figure(renderer, rect);
 }
 
 void Game::on_update(const UpdateEvent& update)
