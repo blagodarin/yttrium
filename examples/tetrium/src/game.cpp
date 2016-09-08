@@ -336,6 +336,8 @@ void Game::on_update(const UpdateEvent& update)
 		_window->debug_text() << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
 		if (info.reallocations)
 			_window->debug_text() << " (" << info.reallocations << ")";
+		if (info.bytes)
+			_window->debug_text() << ", " << info.bytes << " B";
 	}
 
 	if (_game_running)

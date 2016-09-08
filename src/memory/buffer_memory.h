@@ -5,6 +5,8 @@
 
 namespace Yttrium
 {
+	class NamedAllocatorData;
+
 	class BufferMemory
 	{
 	public:
@@ -12,7 +14,7 @@ namespace Yttrium
 		constexpr static size_t MaxSmallBlockLevel = 19;
 		constexpr static size_t MaxSmallBlockSize = 1 << MaxSmallBlockLevel;
 
-		BufferMemory() = default;
+		BufferMemory();
 		~BufferMemory();
 
 		void* allocate(size_t capacity);
@@ -28,6 +30,7 @@ namespace Yttrium
 		BufferMemory& operator=(const BufferMemory&) = delete;
 
 	private:
+		NamedAllocatorData* const _named_allocator_data;
 		void* _small_blocks[MaxSmallBlockLevel + 1] = {};
 		std::mutex _small_blocks_mutex;
 	};

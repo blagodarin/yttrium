@@ -1,40 +1,22 @@
 #include <yttrium/memory/named_allocator.h>
 
-#include <yttrium/string.h>
 #include <yttrium/string_format.h>
+#include <yttrium/memory/temporary_allocator.h>
 #include "heap_allocator.h"
 #include "named_allocator.h"
 
-#include <atomic>
-
-#define Y_ENABLE_NAMED_MEMORY_DEBUGGING 0
-
-#if Y_IS_DEBUG
-	#include <yttrium/std/unordered_map.h>
-	#include <iomanip>
-	#include <iostream>
-#endif
+#include <iostream>
 
 namespace Yttrium
 {
-	struct NamedAllocatorData
+	void NamedAllocatorData::store(NamedAllocatorInfo& info)
 	{
-		const String _name;
-		std::atomic<size_t> _allocated_blocks{0};
-		std::atomic<size_t> _allocations{0};
-		std::atomic<size_t> _reallocations{0};
-	#if Y_ENABLE_NAMED_MEMORY_DEBUGGING
-		StdUnorderedMap<void*, size_t> _pointers;
-	#endif
-
-		NamedAllocatorData(String&& name)
-			: _name(std::move(name))
-	#if Y_ENABLE_NAMED_MEMORY_DEBUGGING
-			, _pointers(*_name.allocator())
-	#endif
-		{
-		}
-	};
+		info.name = _name;
+		info.allocations = _allocations.load(std::memory_order_relaxed);
+		info.blocks = _allocated_blocks.load(std::memory_order_relaxed);
+		info.bytes = _allocated_bytes.load(std::memory_order_relaxed);
+		info.reallocations = _reallocations.load(std::memory_order_relaxed);
+	}
 
 	NamedAllocators::NamedAllocators(Allocator& allocator)
 		: _allocator(allocator)
@@ -44,30 +26,26 @@ namespace Yttrium
 
 	NamedAllocators::~NamedAllocators()
 	{
-		bool memory_leak_detected = false;
+		bool memory_leaks = false;
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			for (const auto& data : _list)
 			{
-				if (data->_allocated_blocks.load())
-				{
-					memory_leak_detected = true;
-				#if Y_ENABLE_NAMED_MEMORY_DEBUGGING
-					int column = 0;
-					std::cerr << data->_name << ":\n";
-					for (const auto& pointer : data->_pointers)
-					{
-						std::cerr << (column ? "  " : "\n\t") << std::setw(10) << pointer.first << "," << pointer.second;
-						column = (column + 1) % 10;
-					}
-					std::cerr << std::endl;
-				#else
-					break;
-				#endif
-				}
+				NamedAllocatorInfo info;
+				data->store(info);
+				if (!info.blocks)
+					continue;
+				TemporaryAllocator<128> allocator(NoAllocator);
+				String message(&allocator);
+				message << "Memory leak detected in \""_s << info.name << "\" ("_s << info.blocks << " blocks"_s;
+				if (info.bytes)
+					message << ", "_s << info.bytes << " bytes"_s;
+				message << ")"_s;
+				std::cerr << message << std::endl; // LogManager is already destroyed at this point.
+				memory_leaks = true;
 			}
 		}
-		if (memory_leak_detected)
+		if (memory_leaks)
 			std::abort();
 	}
 
@@ -75,7 +53,7 @@ namespace Yttrium
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		for (const auto& data : _list)
-			if (data->_name == name)
+			if (data->name() == name)
 				return data.get();
 		_list.emplace_back(make_unique<NamedAllocatorData>(_allocator, std::move(name)));
 		return _list.back().get();
@@ -86,13 +64,7 @@ namespace Yttrium
 		std::lock_guard<std::mutex> lock(_mutex);
 		infos.resize(_list.size());
 		for (const auto& data : _list)
-		{
-			auto& info = infos[&data - &_list.front()];
-			info.name = data->_name;
-			info.blocks = data->_allocated_blocks.load();
-			info.allocations = data->_allocations.load();
-			info.reallocations = data->_reallocations.load();
-		}
+			data->store(infos[&data - &_list.front()]);
 	}
 
 	class NamedAllocatorPrivate
@@ -126,26 +98,15 @@ namespace Yttrium
 	void* NamedAllocator::do_allocate(size_t size, size_t alignment)
 	{
 		const auto pointer = _private->_allocator.allocate(size, alignment);
-		++_private->_data->_allocated_blocks;
-		++_private->_data->_allocations;
-	#if Y_ENABLE_NAMED_MEMORY_DEBUGGING
-		_private->_data->_pointers.emplace(pointer, size);
-	#endif
+		_private->_data->allocate(0);
 		return pointer;
 	}
 
 	void NamedAllocator::do_deallocate(void* pointer, bool reallocation) noexcept
 	{
-	#if Y_ENABLE_NAMED_MEMORY_DEBUGGING
-		if (_private->_data->_pointers.find(pointer) == _private->_data->_pointers.end())
-			::abort();
-	#endif
 		_private->_allocator.deallocate(pointer);
-		--_private->_data->_allocated_blocks;
+		_private->_data->deallocate(0);
 		if (reallocation)
-			++_private->_data->_reallocations;
-	#if Y_ENABLE_NAMED_MEMORY_DEBUGGING
-		_private->_data->_pointers.erase(pointer);
-	#endif
+			_private->_data->reallocate(0, 0);
 	}
 }

@@ -14,8 +14,9 @@ namespace Yttrium
 	struct NamedAllocatorInfo
 	{
 		StaticString name;
-		size_t blocks = 0;
 		size_t allocations = 0;
+		size_t blocks = 0;
+		size_t bytes = 0;
 		size_t reallocations = 0;
 	};
 
