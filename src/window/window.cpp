@@ -32,11 +32,11 @@ namespace Yttrium
 	{
 	}
 
-	UniquePtr<Window> Window::create(WindowCallbacks& callbacks, Allocator& allocator)
+	UniquePtr<Window> Window::create(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
 	{
 		try
 		{
-			return make_unique<WindowImpl>(allocator, callbacks, allocator);
+			return make_unique<WindowImpl>(allocator, name, callbacks, allocator);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -45,11 +45,11 @@ namespace Yttrium
 		}
 	}
 
-	WindowImpl::WindowImpl(WindowCallbacks& callbacks, Allocator& allocator)
+	WindowImpl::WindowImpl(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
 		: _callbacks(callbacks)
 		, _allocator(allocator)
 		, _screen(ScreenImpl::open(_allocator))
-		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), *this))
+		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), name, *this))
 		, _renderer(RendererImpl::create(*_backend, _allocator))
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
@@ -147,11 +147,6 @@ namespace Yttrium
 			return false;
 		_cursor = cursor;
 		return true;
-	}
-
-	void WindowImpl::set_name(const StaticString& name)
-	{
-		_backend->set_name(name);
 	}
 
 	void WindowImpl::show()

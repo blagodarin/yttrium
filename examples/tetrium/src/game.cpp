@@ -168,7 +168,7 @@ void Game::run()
 {
 	Log() << "Loading";
 
-	_window = Window::create(*this, _window_allocator);
+	_window = Window::create("Tetrium", *this, _window_allocator);
 	if (!_window)
 		return;
 
@@ -191,8 +191,6 @@ void Game::run()
 	_texture_cache = TextureCache::create(_window->renderer());
 
 	_game.set_random_seed(Timer::clock());
-
-	_window->set_name("Tetrium");
 
 	if (!load_blocks())
 		return;

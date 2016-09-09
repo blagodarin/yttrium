@@ -76,7 +76,7 @@ namespace Yttrium
 	public:
 
 		/// Creates a Window.
-		static UniquePtr<Window> create(WindowCallbacks&, Allocator& = *DefaultAllocator);
+		static UniquePtr<Window> create(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
 
 		Window() = default;
 		virtual ~Window() = default;
@@ -107,9 +107,6 @@ namespace Yttrium
 
 		///
 		virtual bool set_cursor(const Point& cursor) = 0;
-
-		///
-		virtual void set_name(const StaticString& name) = 0;
 
 		///
 		virtual void show() = 0;

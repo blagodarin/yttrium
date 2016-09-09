@@ -20,7 +20,7 @@ namespace Yttrium
 	class WindowImpl : public Window, private WindowBackendCallbacks
 	{
 	public:
-		WindowImpl(WindowCallbacks&, Allocator&);
+		WindowImpl(const StaticString& name, WindowCallbacks&, Allocator&);
 		~WindowImpl() override;
 
 		// Window
@@ -33,7 +33,6 @@ namespace Yttrium
 		void run() override;
 		Screen& screen() override;
 		bool set_cursor(const Point& cursor) override;
-		void set_name(const StaticString& name) override;
 		void show() override;
 		Size size() const override { return _size; }
 		void take_screenshot(const StaticString& name) override;

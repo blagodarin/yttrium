@@ -10,7 +10,7 @@ namespace Yttrium
 	class LineEditor
 	{
 	public:
-		LineEditor(Allocator& allocator);
+		LineEditor(Allocator&);
 
 		void clear();
 		unsigned cursor() const { return _cursor; }

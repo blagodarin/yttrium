@@ -138,7 +138,7 @@ namespace Yttrium
 		::Cursor _cursor = None;
 	};
 
-	UniquePtr<WindowBackend> WindowBackend::create(Allocator& allocator, ::Display* display, int screen, WindowBackendCallbacks& callbacks)
+	UniquePtr<WindowBackend> WindowBackend::create(Allocator& allocator, ::Display* display, int screen, const StaticString& name, WindowBackendCallbacks& callbacks)
 	{
 		GlContext glx(display, screen);
 
@@ -161,10 +161,10 @@ namespace Yttrium
 		}
 
 		glx.bind(window);
-		return make_unique<WindowBackend>(allocator, allocator, display, std::move(glx), window, callbacks);
+		return make_unique<WindowBackend>(allocator, allocator, display, std::move(glx), window, name, callbacks);
 	}
 
-	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, GlContext&& glx, ::Window window, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, GlContext&& glx, ::Window window, const StaticString& name, WindowBackendCallbacks& callbacks)
 		: _display(display)
 		, _glx(std::move(glx))
 		, _window(window)
@@ -176,6 +176,7 @@ namespace Yttrium
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
+		::XStoreName(_display, _window, name.text());
 
 		// Hide system cursor.
 		::XDefineCursor(_display, _window, _empty_cursor->get());
@@ -284,13 +285,6 @@ namespace Yttrium
 			}
 		}
 		return true;
-	}
-
-	void WindowBackend::set_name(const StaticString& name)
-	{
-		if (_window == None)
-			return;
-		::XStoreName(_display, _window, name.text());
 	}
 
 	bool WindowBackend::set_cursor(const Point& cursor)

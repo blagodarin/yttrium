@@ -10,11 +10,9 @@
 
 void Game::run()
 {
-	_window = Window::create(*this);
+	_window = Window::create("Yttrium 3D example", *this);
 	if (!_window)
 		return;
-
-	_window->set_name("Yttrium 3D example");
 
 	_cube = make_unique<CubeModel>(*DefaultAllocator, _window->renderer());
 	_chessboard = make_unique<ChessboardModel>(*DefaultAllocator, _window->renderer());

@@ -15,17 +15,15 @@ namespace Yttrium
 	class WindowBackend
 	{
 	public:
+		static UniquePtr<WindowBackend> create(Allocator&, ::Display*, int screen, const StaticString& name, WindowBackendCallbacks&);
 
-		static UniquePtr<WindowBackend> create(Allocator&, ::Display*, int screen, WindowBackendCallbacks&);
-
-		WindowBackend(Allocator&, ::Display*, GlContext&&, ::Window, WindowBackendCallbacks&);
+		WindowBackend(Allocator&, ::Display*, GlContext&&, ::Window, const StaticString& name, WindowBackendCallbacks&);
 		~WindowBackend();
 
 		void close();
 		bool get_cursor(Point&);
 		bool process_events();
 		bool set_cursor(const Point&);
-		void set_name(const StaticString&);
 		void show();
 		void swap_buffers();
 

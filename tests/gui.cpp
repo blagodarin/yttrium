@@ -12,7 +12,7 @@ using namespace Yttrium;
 BOOST_AUTO_TEST_CASE(test_gui)
 {
 	WindowCallbacks window_callbacks;
-	const auto& window = Window::create(window_callbacks);
+	const auto& window = Window::create("GUI test", window_callbacks);
 	BOOST_REQUIRE(window);
 	ScriptContext script_context;
 	Gui gui(window->renderer(), script_context);
