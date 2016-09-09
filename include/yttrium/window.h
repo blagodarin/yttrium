@@ -4,11 +4,11 @@
 #ifndef _include_yttrium_window_h_
 #define _include_yttrium_window_h_
 
-#include <yttrium/key.h>
 #include <yttrium/memory/global.h>
 
 namespace Yttrium
 {
+	class KeyEvent;
 	class Point;
 	class PointF;
 	class RectF;
@@ -61,7 +61,7 @@ namespace Yttrium
 		virtual void on_cursor_movement(const Point& movement);
 
 		///
-		virtual void on_key_event(const KeyEvent& event);
+		virtual void on_key_event(const KeyEvent&);
 
 		///
 		virtual void on_render(Renderer&, const PointF& cursor);

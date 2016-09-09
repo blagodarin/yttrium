@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <yttrium/date_time.h>
+#include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
