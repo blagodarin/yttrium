@@ -88,13 +88,7 @@ namespace Yttrium
 		virtual Point cursor() const = 0;
 
 		///
-		virtual String& debug_text() = 0;
-
-		///
 		virtual bool is_cursor_locked() const = 0;
-
-		///
-		virtual bool is_debug_text_visible() const = 0;
 
 		///
 		virtual bool is_shift_pressed() const = 0;
@@ -113,9 +107,6 @@ namespace Yttrium
 
 		///
 		virtual bool set_cursor(const Point& cursor) = 0;
-
-		///
-		virtual void set_debug_text_visible(bool visible) = 0;
 
 		///
 		virtual void set_name(const StaticString& name) = 0;

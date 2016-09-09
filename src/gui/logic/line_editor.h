@@ -20,7 +20,7 @@ namespace Yttrium
 		unsigned selection_offset() const { return _selection_offset; }
 		unsigned selection_size() const { return _selection_size; }
 		void set_max_size(unsigned max_size);
-		String text() const { return _text; }
+		const String& text() const { return _text; }
 
 	private:
 		String _text;

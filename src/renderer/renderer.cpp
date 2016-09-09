@@ -4,6 +4,7 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/textured_rect.h>
+#include "debug_renderer.h"
 #include "debug_texture.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -94,6 +95,25 @@ namespace Yttrium
 	}
 
 	RendererImpl::~RendererImpl() = default;
+
+	void RendererImpl::draw_debug_text(const StaticString& text)
+	{
+		if (text.is_empty())
+			return;
+
+		DebugRenderer debug(*this);
+		debug.set_color(1, 1, 1);
+		int top = 0;
+		size_t line_begin = 0;
+		auto line_end = text.find_first('\n', line_begin);
+		while (line_end != StaticString::End)
+		{
+			debug.draw_text(0, top++, text.mid(line_begin, line_end - line_begin));
+			line_begin = line_end + 1;
+			line_end = text.find_first('\n', line_begin);
+		}
+		debug.draw_text(0, top, text.mid(line_begin));
+	}
 
 	void RendererImpl::draw_rect(const RectF& rect)
 	{

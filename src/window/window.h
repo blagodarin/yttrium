@@ -26,16 +26,13 @@ namespace Yttrium
 		// Window
 		void close() override;
 		Point cursor() const override { return _cursor; }
-		String& debug_text() override { return _debug_text; }
 		bool is_cursor_locked() const override { return _is_cursor_locked; }
-		bool is_debug_text_visible() const override { return _debug_text_visible; }
 		bool is_shift_pressed() const override;
 		void lock_cursor(bool lock) override;
 		Renderer& renderer() override;
 		void run() override;
 		Screen& screen() override;
 		bool set_cursor(const Point& cursor) override;
-		void set_debug_text_visible(bool visible) override;
 		void set_name(const StaticString& name) override;
 		void show() override;
 		Size size() const override { return _size; }
@@ -47,7 +44,6 @@ namespace Yttrium
 		void on_key_event(Key key, bool is_pressed) override;
 		void on_resize_event(const Size& size) override;
 
-		void draw_debug();
 		bool process_events();
 		void set_active(bool active);
 
@@ -65,8 +61,6 @@ namespace Yttrium
 		bool                   _keys[KeyCount];
 		String                 _screenshot_filename;
 		Image                  _screenshot_image;
-		String                 _debug_text;
-		bool                   _debug_text_visible = false;
 	};
 }
 

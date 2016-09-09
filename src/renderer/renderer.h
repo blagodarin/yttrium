@@ -39,6 +39,7 @@ namespace Yttrium
 
 		Matrix4 current_projection() const override;
 		Matrix4 current_transformation() const override;
+		void draw_debug_text(const StaticString&) override;
 		void draw_rect(const RectF&) override;
 		void draw_rects(const StdVector<TexturedRect>&) override;
 		void set_color(const Vector4&) override;

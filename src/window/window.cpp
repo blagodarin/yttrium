@@ -2,9 +2,9 @@
 
 #include <yttrium/log.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer_modifiers.h>
 #include <yttrium/timer.h>
 #include "../gui/gui.h"
-#include "../renderer/debug_renderer.h"
 #include "../renderer/renderer.h"
 
 #if Y_PLATFORM_POSIX
@@ -53,7 +53,6 @@ namespace Yttrium
 		, _renderer(RendererImpl::create(*_backend, _allocator))
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
-		, _debug_text(&_allocator)
 	{
 		for (bool& pressed : _keys)
 			pressed = false;
@@ -106,7 +105,6 @@ namespace Yttrium
 				PushGpuProgram gpu_program(*_renderer, _renderer->program_2d());
 				Push2D projection(*_renderer);
 				_callbacks.on_render(*_renderer, PointF(_cursor));
-				draw_debug();
 			}
 			_backend->swap_buffers();
 			if (!_screenshot_filename.is_empty())
@@ -149,11 +147,6 @@ namespace Yttrium
 			return false;
 		_cursor = cursor;
 		return true;
-	}
-
-	void WindowImpl::set_debug_text_visible(bool visible)
-	{
-		_debug_text_visible = visible;
 	}
 
 	void WindowImpl::set_name(const StaticString& name)
@@ -212,26 +205,6 @@ namespace Yttrium
 		{
 			lock_cursor(true);
 		}
-	}
-
-	void WindowImpl::draw_debug()
-	{
-		if (!_debug_text_visible || _debug_text.is_empty())
-			return;
-
-		DebugRenderer debug(*_renderer);
-		debug.set_color(1, 1, 1);
-		int debug_text_top = 1;
-		size_t line_begin = 0;
-		auto line_end = _debug_text.find_first('\n', line_begin);
-		while (line_end != StaticString::End)
-		{
-			debug.draw_text(0, debug_text_top, _debug_text.mid(line_begin, line_end - line_begin));
-			++debug_text_top;
-			line_begin = line_end + 1;
-			line_end = _debug_text.find_first('\n', line_begin);
-		}
-		debug.draw_text(0, debug_text_top, _debug_text.mid(line_begin));
 	}
 
 	bool WindowImpl::process_events()

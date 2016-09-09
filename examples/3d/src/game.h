@@ -4,6 +4,7 @@
 #include <yttrium/math/euler.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/named_allocator.h>
+#include <yttrium/string.h>
 #include <yttrium/window.h>
 
 #include "model.h"
@@ -22,13 +23,15 @@ private:
 	void on_update(const UpdateEvent&) override;
 
 private:
-	StdVector<NamedAllocatorInfo> _memory_statistics { *DefaultAllocator };
+	StdVector<NamedAllocatorInfo> _memory_statistics{ *DefaultAllocator };
 	UniquePtr<Window> _window;
+	bool _debug_text_visible = false;
+	String _debug_text{ 1024 };
 	UniquePtr<CubeModel> _cube;
 	UniquePtr<ChessboardModel> _chessboard;
 
-	Vector4 _position = {-16, -16, 16};
-	Euler _rotation = {45, -30, 0};
+	Vector4 _position{ -16, -16, 16 };
+	Euler _rotation{ 45, -30, 0 };
 
 	bool _move_forward = false;
 	bool _move_backward = false;

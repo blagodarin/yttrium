@@ -45,20 +45,22 @@ private:
 	void update_statistics();
 
 private:
-	NamedAllocator _allocator;
-	StdVector<NamedAllocatorInfo> _memory_statistics;
-	NamedAllocator _script_allocator;
+	NamedAllocator _allocator{ "game" };
+	StdVector<NamedAllocatorInfo> _memory_statistics{ _allocator };
+	NamedAllocator _script_allocator{ "script" };
 	ScriptContext _script;
-	NamedAllocator _audio_allocator;
+	NamedAllocator _audio_allocator{ "audio" };
 	UniquePtr<AudioManager> _audio;
-	NamedAllocator _window_allocator;
+	NamedAllocator _window_allocator{ "window" };
 	UniquePtr<Window> _window;
-	Console _console;
-	NamedAllocator _gui_allocator;
+	Console _console{ _script, _allocator };
+	bool _debug_text_visible = false;
+	String _debug_text{ 1024, &_allocator };
+	NamedAllocator _gui_allocator{ "gui" };
 	UniquePtr<Gui> _gui;
 	UniquePtr<Cursor> _cursor;
 	UniquePtr<TextureCache> _texture_cache;
-	Bindings _bindings;
+	Bindings _bindings{ _script, _allocator };
 
 	SharedPtr<Texture2D> _block_texture;
 	SizeF                _block_size;

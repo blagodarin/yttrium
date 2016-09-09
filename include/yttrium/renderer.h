@@ -53,6 +53,9 @@ namespace Yttrium
 		virtual Matrix4 current_transformation() const = 0;
 
 		///
+		virtual void draw_debug_text(const StaticString&) = 0;
+
+		///
 		virtual void draw_rect(const RectF&) = 0;
 
 		///

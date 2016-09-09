@@ -4,7 +4,6 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
-#include <yttrium/string.h>
 #include <yttrium/string_format.h>
 
 #include <cmath>
@@ -58,7 +57,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 	case Key::F1:
 		if (event.pressed)
-			_window->set_debug_text_visible(!_window->is_debug_text_visible());
+			_debug_text_visible = !_debug_text_visible;
 		break;
 
 	case Key::F10: // KDE grabs Key::Print. =(
@@ -73,26 +72,30 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render(Renderer& renderer, const PointF&)
 {
-	Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256));
+	{
+		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256));
 
-	PushTransformation camera(renderer, Matrix4::camera(_position, _rotation));
+		PushTransformation camera(renderer, Matrix4::camera(_position, _rotation));
 
-	// Center.
-	_cube->draw({0, 0, 0});
+		// Center.
+		_cube->draw({0, 0, 0});
 
-	// X direction -- one cube.
-	_cube->draw({2, 0, 0});
+		// X direction -- one cube.
+		_cube->draw({2, 0, 0});
 
-	// Y direction -- two cubes.
-	_cube->draw({0, 2, 0});
-	_cube->draw({0, 4, 0});
+		// Y direction -- two cubes.
+		_cube->draw({0, 2, 0});
+		_cube->draw({0, 4, 0});
 
-	// Z direction -- three cubes.
-	_cube->draw({0, 0, 2});
-	_cube->draw({0, 0, 4});
-	_cube->draw({0, 0, 6});
+		// Z direction -- three cubes.
+		_cube->draw({0, 0, 2});
+		_cube->draw({0, 0, 4});
+		_cube->draw({0, 0, 6});
 
-	_chessboard->draw({0, 0, 0});
+		_chessboard->draw({0, 0, 0});
+	}
+	if (_debug_text_visible)
+		renderer.draw_debug_text(_debug_text);
 }
 
 void Game::on_update(const UpdateEvent& update)
@@ -120,8 +123,7 @@ void Game::on_update(const UpdateEvent& update)
 		_position.z = clamp(_position.z, 1, 64);
 	}
 
-	_window->debug_text().reserve(1024);
-	_window->debug_text().clear()
+	_debug_text.clear()
 		<< "FPS: " << update.fps << "\n"
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
 		<< "Triangles: " << update.triangles << "\n"
@@ -134,10 +136,10 @@ void Game::on_update(const UpdateEvent& update)
 	NamedAllocator::enumerate(_memory_statistics);
 	for (const auto& info : _memory_statistics)
 	{
-		_window->debug_text() << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
+		_debug_text << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
 		if (info.reallocations)
-			_window->debug_text() << " (" << info.reallocations << ")";
+			_debug_text << " (" << info.reallocations << ")";
 		if (info.bytes)
-			_window->debug_text() << ", " << info.bytes << " B";
+			_debug_text << ", " << info.bytes << " B";
 	}
 }

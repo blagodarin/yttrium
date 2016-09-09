@@ -20,15 +20,7 @@
 #include <yttrium/timer.h>
 
 Game::Game()
-	: _allocator("game")
-	, _memory_statistics(_allocator)
-	, _script_allocator("script")
-	, _script(&_script_allocator)
-	, _audio_allocator("audio")
-	, _window_allocator("window")
-	, _console(_script, _allocator)
-	, _gui_allocator("gui")
-	, _bindings(_script, _allocator)
+	: _script(&_script_allocator)
 	, _statistics({
 			{100000, String("John Placeholder", &_allocator)},
 			{50000, String("John Placeholder", &_allocator)},
@@ -142,7 +134,7 @@ Game::Game()
 
 	_script.define("toggle_debug", [this](const ScriptCall&)
 	{
-		_window->set_debug_text_visible(!_window->is_debug_text_visible());
+		_debug_text_visible = !_debug_text_visible;
 	});
 
 	_script.define("turn_left", [this](const ScriptCall&)
@@ -321,13 +313,14 @@ void Game::on_render(Renderer& renderer, const PointF& cursor)
 	_gui->render(cursor);
 	if (!_game_running)
 		_cursor->draw(cursor);
+	if (_debug_text_visible)
+		renderer.draw_debug_text(_debug_text);
 	_console.render(renderer);
 }
 
 void Game::on_update(const UpdateEvent& update)
 {
-	_window->debug_text().reserve(1024);
-	_window->debug_text().clear()
+	_debug_text.clear()
 		<< "FPS: " << update.fps << "\n"
 		<< "MaxFrameTime: " << update.max_frame_time << "\n"
 		<< "Triangles: " << update.triangles << "\n"
@@ -338,11 +331,11 @@ void Game::on_update(const UpdateEvent& update)
 	NamedAllocator::enumerate(_memory_statistics);
 	for (const auto& info : _memory_statistics)
 	{
-		_window->debug_text() << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
+		_debug_text << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
 		if (info.reallocations)
-			_window->debug_text() << " (" << info.reallocations << ")";
+			_debug_text << " (" << info.reallocations << ")";
 		if (info.bytes)
-			_window->debug_text() << ", " << info.bytes << " B";
+			_debug_text << ", " << info.bytes << " B";
 	}
 
 	if (_game_running)
