@@ -18,8 +18,6 @@
 		- Location information support.
 	* Renderer:
 		- OpenGL 3.3 compliance.
-	* Window:
-		- Move console out of Window.
 * Examples:
 	* Tetrium:
 		- Pack the data at build time.

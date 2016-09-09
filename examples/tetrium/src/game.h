@@ -4,6 +4,7 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
+#include <yttrium/console.h>
 #include <yttrium/gui.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
@@ -52,6 +53,7 @@ private:
 	UniquePtr<AudioManager> _audio;
 	NamedAllocator _window_allocator;
 	UniquePtr<Window> _window;
+	Console _console;
 	NamedAllocator _gui_allocator;
 	UniquePtr<Gui> _gui;
 	UniquePtr<Cursor> _cursor;

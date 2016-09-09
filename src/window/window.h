@@ -7,8 +7,8 @@
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/string.h>
 #include "backend.h"
-#include "console.h"
 
 namespace Yttrium
 {
@@ -20,14 +20,13 @@ namespace Yttrium
 	class WindowImpl : public Window, private WindowBackendCallbacks
 	{
 	public:
-		WindowImpl(ScriptContext&, WindowCallbacks&, Allocator&);
+		WindowImpl(WindowCallbacks&, Allocator&);
 		~WindowImpl() override;
 
 		// Window
 		void close() override;
 		Point cursor() const override { return _cursor; }
 		String& debug_text() override { return _debug_text; }
-		bool is_console_visible() const override { return _console_visible; }
 		bool is_cursor_locked() const override { return _is_cursor_locked; }
 		bool is_debug_text_visible() const override { return _debug_text_visible; }
 		bool is_shift_pressed() const override;
@@ -35,15 +34,12 @@ namespace Yttrium
 		Renderer& renderer() override;
 		void run() override;
 		Screen& screen() override;
-		void set_console_visible(bool visible) override;
 		bool set_cursor(const Point& cursor) override;
 		void set_debug_text_visible(bool visible) override;
 		void set_name(const StaticString& name) override;
 		void show() override;
 		Size size() const override { return _size; }
 		void take_screenshot(const StaticString& name) override;
-
-		WindowCallbacks& callbacks() { return _callbacks; }
 
 	private:
 		// WindowBackendCallbacks
@@ -56,7 +52,6 @@ namespace Yttrium
 		void set_active(bool active);
 
 	private:
-		ScriptContext&         _script_context;
 		WindowCallbacks&       _callbacks;
 		Allocator&             _allocator;
 		UniquePtr<ScreenImpl>  _screen;
@@ -68,8 +63,6 @@ namespace Yttrium
 		Size                   _size;
 		bool                   _fullscreen = false;
 		bool                   _keys[KeyCount];
-		Console                _console;
-		bool                   _console_visible = false;
 		String                 _screenshot_filename;
 		Image                  _screenshot_image;
 		String                 _debug_text;

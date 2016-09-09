@@ -1,18 +1,12 @@
 #ifndef _examples_3d_game_h_
 #define _examples_3d_game_h_
 
-#include <yttrium/index_buffer.h>
 #include <yttrium/math/euler.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/named_allocator.h>
-#include <yttrium/script/context.h>
-#include <yttrium/texture_cache.h>
-#include <yttrium/vertex_buffer.h>
 #include <yttrium/window.h>
 
 #include "model.h"
-
-#include <memory>
 
 using namespace Yttrium;
 
@@ -29,7 +23,6 @@ private:
 
 private:
 	StdVector<NamedAllocatorInfo> _memory_statistics { *DefaultAllocator };
-	ScriptContext _script;
 	UniquePtr<Window> _window;
 	UniquePtr<CubeModel> _cube;
 	UniquePtr<ChessboardModel> _chessboard;

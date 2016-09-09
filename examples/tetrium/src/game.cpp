@@ -26,6 +26,7 @@ Game::Game()
 	, _script(&_script_allocator)
 	, _audio_allocator("audio")
 	, _window_allocator("window")
+	, _console(_script, _allocator)
 	, _gui_allocator("gui")
 	, _bindings(_script, _allocator)
 	, _statistics({
@@ -136,7 +137,7 @@ Game::Game()
 
 	_script.define("tgcon", [this](const ScriptCall&)
 	{
-		_window->set_console_visible(!_window->is_console_visible());
+		_console.set_visible(!_console.is_visible());
 	});
 
 	_script.define("toggle_debug", [this](const ScriptCall&)
@@ -175,7 +176,7 @@ void Game::run()
 {
 	Log() << "Loading";
 
-	_window = Window::create(_script, *this, _window_allocator);
+	_window = Window::create(*this, _window_allocator);
 	if (!_window)
 		return;
 
@@ -305,6 +306,9 @@ bool Game::load_blocks()
 
 void Game::on_key_event(const KeyEvent& event)
 {
+	if (_console.process_key_event(event))
+		return;
+
 	if (_gui->process_key_event(event))
 		return;
 
@@ -312,11 +316,12 @@ void Game::on_key_event(const KeyEvent& event)
 		_bindings.call(event.key, event.pressed ? ScriptCodeMode::Do : ScriptCodeMode::Undo);
 }
 
-void Game::on_render(Renderer&, const PointF& cursor)
+void Game::on_render(Renderer& renderer, const PointF& cursor)
 {
 	_gui->render(cursor);
 	if (!_game_running)
 		_cursor->draw(cursor);
+	_console.render(renderer);
 }
 
 void Game::on_update(const UpdateEvent& update)

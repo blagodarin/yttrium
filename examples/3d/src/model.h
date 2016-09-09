@@ -1,16 +1,25 @@
 #ifndef _examples_3d_model_h_
 #define _examples_3d_model_h_
 
-#include <yttrium/gpu_program.h>
-#include <yttrium/renderer.h>
-#include <yttrium/texture.h>
+#include <yttrium/memory/unique_ptr.h>
+
+namespace Yttrium
+{
+	class GpuProgram;
+	class IndexBuffer;
+	class Renderer;
+	class Texture2D;
+	class Vector4;
+	class VertexBuffer;
+}
 
 using namespace Yttrium;
 
 class Model
 {
 public:
-	Model(Renderer& renderer): _renderer(renderer) {}
+	Model(Renderer&);
+	~Model();
 
 	void draw(const Vector4& translation);
 

@@ -1,15 +1,25 @@
 #include "model.h"
 
 #include <yttrium/file.h>
+#include <yttrium/gpu_program.h>
 #include <yttrium/image.h>
 #include <yttrium/index_buffer.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
+#include <yttrium/texture.h>
 #include <yttrium/vertex_buffer.h>
 
 #include <array>
 #include <vector>
+
+Model::Model(Renderer& renderer)
+	: _renderer(renderer)
+{
+}
+
+Model::~Model() = default;
 
 void Model::draw(const Vector4& translation)
 {

@@ -32,11 +32,11 @@ namespace Yttrium
 	{
 	}
 
-	UniquePtr<Window> Window::create(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
+	UniquePtr<Window> Window::create(WindowCallbacks& callbacks, Allocator& allocator)
 	{
 		try
 		{
-			return make_unique<WindowImpl>(allocator, script_context, callbacks, allocator);
+			return make_unique<WindowImpl>(allocator, callbacks, allocator);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -45,14 +45,12 @@ namespace Yttrium
 		}
 	}
 
-	WindowImpl::WindowImpl(ScriptContext& script_context, WindowCallbacks& callbacks, Allocator& allocator)
-		: _script_context(script_context)
-		, _callbacks(callbacks)
+	WindowImpl::WindowImpl(WindowCallbacks& callbacks, Allocator& allocator)
+		: _callbacks(callbacks)
 		, _allocator(allocator)
 		, _screen(ScreenImpl::open(_allocator))
 		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), *this))
 		, _renderer(RendererImpl::create(*_backend, _allocator))
-		, _console(_script_context, _allocator)
 		, _screenshot_filename(&_allocator)
 		, _screenshot_image(_allocator)
 		, _debug_text(&_allocator)
@@ -66,9 +64,7 @@ namespace Yttrium
 		_screenshot_image.set_format(screenshot_format); // TODO: Get the proper format from the renderer.
 	}
 
-	WindowImpl::~WindowImpl()
-	{
-	}
+	WindowImpl::~WindowImpl() = default;
 
 	void WindowImpl::close()
 	{
@@ -147,11 +143,6 @@ namespace Yttrium
 		return *_screen;
 	}
 
-	void WindowImpl::set_console_visible(bool visible)
-	{
-		_console_visible = visible;
-	}
-
 	bool WindowImpl::set_cursor(const Point& cursor)
 	{
 		if (_is_cursor_locked || !Rect(_size).contains(cursor) || !_backend->set_cursor(cursor))
@@ -204,19 +195,6 @@ namespace Yttrium
 		if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
 			event.modifiers |= KeyEvent::Alt;
 
-		if (_console_visible && is_pressed)
-		{
-			if (key == Key::Escape)
-			{
-				_console_visible = false;
-				return;
-			}
-			else if (_console.process_key(event))
-			{
-				return;
-			}
-		}
-
 		_callbacks.on_key_event(event);
 	}
 
@@ -238,38 +216,22 @@ namespace Yttrium
 
 	void WindowImpl::draw_debug()
 	{
-		const bool draw_console = _console_visible;
-		const bool draw_debug_text = _debug_text_visible && !_debug_text.is_empty();
-
-		if (!draw_console && !draw_debug_text)
+		if (!_debug_text_visible || _debug_text.is_empty())
 			return;
 
-		DebugRenderer renderer(*_renderer);
-		const auto max_width = renderer.max_width();
-		int debug_text_top = 0;
-
-		if (draw_console)
+		DebugRenderer debug(*_renderer);
+		debug.set_color(1, 1, 1);
+		int debug_text_top = 1;
+		size_t line_begin = 0;
+		auto line_end = _debug_text.find_first('\n', line_begin);
+		while (line_end != StaticString::End)
 		{
-			renderer.set_color(0, 0, 0, 0.5);
-			renderer.draw_rectangle(0, 0, max_width + 1, 1);
-			_console.draw_input(renderer, 0, 0, max_width);
+			debug.draw_text(0, debug_text_top, _debug_text.mid(line_begin, line_end - line_begin));
 			++debug_text_top;
+			line_begin = line_end + 1;
+			line_end = _debug_text.find_first('\n', line_begin);
 		}
-
-		if (draw_debug_text)
-		{
-			renderer.set_color(1, 1, 1);
-			size_t line_begin = 0;
-			auto line_end = _debug_text.find_first('\n', line_begin);
-			while (line_end != StaticString::End)
-			{
-				renderer.draw_text(0, debug_text_top, _debug_text.mid(line_begin, line_end - line_begin));
-				++debug_text_top;
-				line_begin = line_end + 1;
-				line_end = _debug_text.find_first('\n', line_begin);
-			}
-			renderer.draw_text(0, debug_text_top, _debug_text.mid(line_begin));
-		}
+		debug.draw_text(0, debug_text_top, _debug_text.mid(line_begin));
 	}
 
 	bool WindowImpl::process_events()

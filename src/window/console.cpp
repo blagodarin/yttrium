@@ -1,46 +1,90 @@
-#include "console.h"
+#include <yttrium/console.h>
 
+#include <yttrium/key.h>
 #include <yttrium/script/code.h>
 #include <yttrium/script/context.h>
-#include <yttrium/window.h>
+#include "../gui/logic/line_editor.h"
 #include "../renderer/debug_renderer.h"
-
-#include <cassert>
+#include "../renderer/renderer.h"
 
 namespace Yttrium
 {
+	class ConsolePrivate
+	{
+	public:
+		ConsolePrivate(ScriptContext& script_context, Allocator& allocator)
+			: _script_context(script_context)
+			, _line_editor(allocator)
+		{
+		}
+
+	public:
+		ScriptContext& _script_context;
+		LineEditor _line_editor;
+		bool _visible = false;
+	};
+
 	Console::Console(ScriptContext& script_context, Allocator& allocator)
-		: _script_context(script_context)
-		, _line_editor(allocator)
+		: _private(make_unique<ConsolePrivate>(allocator, script_context, allocator))
 	{
 	}
 
-	bool Console::process_key(const KeyEvent& event)
+	bool Console::is_visible() const
 	{
-		assert(event.pressed);
+		return _private->_visible;
+	}
 
-		if (event.key == Key::Enter)
+	bool Console::process_key_event(const KeyEvent& event)
+	{
+		if (_private->_visible && event.pressed)
 		{
-			ScriptCode(_line_editor.text(), _script_context.allocator()).execute(_script_context);
-			_line_editor.clear();
-			return true;
+			switch (event.key)
+			{
+			case Key::Escape:
+				_private->_visible = false;
+				return true;
+
+			case Key::Enter:
+				ScriptCode(_private->_line_editor.text(), _private->_script_context.allocator()).execute(_private->_script_context);
+				_private->_line_editor.clear();
+				return true;
+
+			default:
+				return _private->_line_editor.process_key(event);
+			}
+		}
+		return false;
+	}
+
+	void Console::render(Renderer& renderer) const
+	{
+		if (!_private->_visible)
+			return;
+
+		DebugRenderer debug(static_cast<RendererImpl&>(renderer));
+
+		const auto max_width = debug.max_width();
+
+		debug.set_color(0, 0, 0, 0.5);
+		debug.draw_rectangle(0, 0, max_width + 1, 1);
+
+		if (_private->_line_editor.selection_size())
+		{
+			debug.set_color(1.0, 1.0, 1.0, 0.5);
+			debug.draw_rectangle(_private->_line_editor.selection_offset(), 0, _private->_line_editor.selection_size(), 1);
 		}
 
-		return _line_editor.process_key(event);
+		debug.set_color(1.0, 1.0, 1.0);
+		debug.draw_text(0, 0, _private->_line_editor.text(), max_width);
+
+		debug.set_color(1.0, 0.0, 0.0);
+		debug.draw_cursor(_private->_line_editor.cursor(), 0);
 	}
 
-	void Console::draw_input(DebugRenderer& renderer, int x, int y, int max_size)
+	void Console::set_visible(bool visible)
 	{
-		if (_line_editor.selection_size())
-		{
-			renderer.set_color(1.0, 1.0, 1.0, 0.5);
-			renderer.draw_rectangle(x + _line_editor.selection_offset(), y, _line_editor.selection_size(), 1);
-		}
-
-		renderer.set_color(1.0, 1.0, 1.0);
-		renderer.draw_text(x, y, _line_editor.text(), max_size);
-
-		renderer.set_color(1.0, 0.0, 0.0);
-		renderer.draw_cursor(x + _line_editor.cursor(), y);
+		_private->_visible = visible;
 	}
+
+	Console::~Console() = default;
 }

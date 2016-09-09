@@ -14,7 +14,6 @@ namespace Yttrium
 	class RectF;
 	class Renderer;
 	class Screen;
-	class ScriptContext;
 	class Size;
 	class StaticString;
 	class String;
@@ -77,7 +76,7 @@ namespace Yttrium
 	public:
 
 		/// Creates a Window.
-		static UniquePtr<Window> create(ScriptContext&, WindowCallbacks&, Allocator& = *DefaultAllocator);
+		static UniquePtr<Window> create(WindowCallbacks&, Allocator& = *DefaultAllocator);
 
 		Window() = default;
 		virtual ~Window() = default;
@@ -90,9 +89,6 @@ namespace Yttrium
 
 		///
 		virtual String& debug_text() = 0;
-
-		///
-		virtual bool is_console_visible() const = 0;
 
 		///
 		virtual bool is_cursor_locked() const = 0;
@@ -114,9 +110,6 @@ namespace Yttrium
 
 		///
 		virtual Screen& screen() = 0;
-
-		///
-		virtual void set_console_visible(bool visible) = 0;
 
 		///
 		virtual bool set_cursor(const Point& cursor) = 0;

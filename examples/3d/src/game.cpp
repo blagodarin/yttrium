@@ -1,8 +1,8 @@
 #include "game.h"
 
 #include <yttrium/date_time.h>
-#include <yttrium/gui.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer.h>
 #include <yttrium/renderer_modifiers.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
@@ -11,7 +11,7 @@
 
 void Game::run()
 {
-	_window = Window::create(_script, *this);
+	_window = Window::create(*this);
 	if (!_window)
 		return;
 
@@ -54,11 +54,6 @@ void Game::on_key_event(const KeyEvent& event)
 
 	case Key::W:
 		_move_forward = event.pressed;
-		break;
-
-	case Key::Grave:
-		if (event.pressed)
-			_window->set_console_visible(!_window->is_console_visible());
 		break;
 
 	case Key::F1:
