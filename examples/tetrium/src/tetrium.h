@@ -1,10 +1,12 @@
 /// \file
-/// \brief %Tetrium logic.
+/// \brief %Tetrium game logic.
 
 #ifndef _examples_tetrium_tetrium_h_
 #define _examples_tetrium_tetrium_h_
 
-/// %Tetrium logic.
+#include <array>
+
+/// %Tetrium game logic.
 namespace Tetrium
 {
 	enum
@@ -13,20 +15,13 @@ namespace Tetrium
 	};
 
 	/// Field coordinate point.
-	class Point
+	struct Point
 	{
-	public:
+		int x = 0;
+		int y = 0;
 
-		int x; ///<
-		int y; ///<
-
-	public:
-
-		///
-		Point(int x = 0, int y = 0)
-			: x(x), y(y)
-		{
-		}
+		Point() = default;
+		Point(int x, int y) : x(x), y(y) {}
 	};
 
 	class Field;
@@ -51,12 +46,7 @@ namespace Tetrium
 			None,  ///< No figure (empty block).
 		};
 
-		enum
-		{
-			Blocks = 4, ///< Number of blocks in a figure.
-		};
-
-		Point blocks[Blocks]; ///< Figure blocks coordinates (x is column, y is line).
+		std::array<Point, 4> blocks; ///< Figure blocks coordinates (x is column, y is line).
 
 	public:
 
@@ -150,12 +140,6 @@ namespace Tetrium
 	class Game
 	{
 	public:
-
-		/// Constructor.
-		Game(): _state(Stopped) {}
-
-	public:
-
 		/// Advance the game by the specified amount of \a milliseconds.
 		void advance(unsigned milliseconds);
 
@@ -229,7 +213,7 @@ namespace Tetrium
 
 	private:
 
-		State    _state;
+		State    _state = Stopped;
 		int      _timeout;
 		unsigned _random;
 		Field    _field;

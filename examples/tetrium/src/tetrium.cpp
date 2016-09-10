@@ -28,30 +28,23 @@ namespace Tetrium
 	{
 		int offset = 0;
 
-		for (int i = 0; i < Blocks; ++i)
+		for (const auto& block : blocks)
 		{
-			int column = blocks[i].x;
-			int lower_row = blocks[i].y / PointsPerRow;
-			int upper_row = (4 * blocks[i].y + 3 * PointsPerRow) / (4 * PointsPerRow);
+			const auto lower_row = block.y / PointsPerRow;
+			const auto upper_row = (4 * block.y + 3 * PointsPerRow) / (4 * PointsPerRow);
 
-			if (lower_row < Field::Height && field.blocks[lower_row][column] != None)
-			{
+			if (lower_row < Field::Height && field.blocks[lower_row][block.x] != None)
 				return false;
-			}
 
 			if (lower_row != upper_row)
 			{
-				if (upper_row < Field::Height && field.blocks[upper_row][column] != None)
-				{
+				if (upper_row < Field::Height && field.blocks[upper_row][block.x] != None)
 					return false;
-				}
 			}
 			else
 			{
-				if (lower_row < Field::Height - 1 && field.blocks[lower_row + 1][column] != None)
-				{
-					offset = blocks[i].y - lower_row * PointsPerRow; // NOTE: Why does it rewrite the offset from the previous iteration?
-				}
+				if (lower_row < Field::Height - 1 && field.blocks[lower_row + 1][block.x] != None)
+					offset = block.y - lower_row * PointsPerRow; // NOTE: Why does it rewrite the offset from the previous iteration?
 			}
 		}
 
@@ -61,10 +54,10 @@ namespace Tetrium
 
 	void Figure::move(int x, int y)
 	{
-		for (int i = 0; i < Blocks; ++i)
+		for (auto& block : blocks)
 		{
-			blocks[i].x += x;
-			blocks[i].y += y;
+			block.x += x;
+			block.y += y;
 		}
 		_top_left.x += x;
 		_top_left.y += y;
@@ -74,21 +67,20 @@ namespace Tetrium
 
 	int Figure::move_down(const Field& field, int distance)
 	{
-		int max_distance = bottom();
+		const auto max_distance = bottom();
 		if (distance > max_distance)
 			distance = max_distance;
 
-		for (int i = 0; i < Blocks; ++i)
+		for (const auto& block : blocks)
 		{
-			int column = blocks[i].x;
-			int row = blocks[i].y / PointsPerRow - 1;
+			auto row = block.y / PointsPerRow - 1;
 			if (row > Field::Height - 1)
 				row = Field::Height - 1;
 			for (; row >= 0; --row)
 			{
-				if (field.blocks[row][column] != None)
+				if (field.blocks[row][block.x] != None)
 				{
-					int altitude = blocks[i].y - (row + 1) * PointsPerRow;
+					int altitude = block.y - (row + 1) * PointsPerRow;
 					if (distance > altitude)
 						distance = altitude;
 					break;
@@ -104,7 +96,6 @@ namespace Tetrium
 	{
 		// We should move the figure cell by cell to ensure
 		// it can really be moved, not just teleported.
-
 		if (cells < 0)
 		{
 			for (int i = cells; i < 0; ++i)
@@ -122,7 +113,7 @@ namespace Tetrium
 
 	bool Figure::move_left(const Field& field)
 	{
-		Figure moved_figure = moved_horizontally(-1);
+		auto&& moved_figure = moved_horizontally(-1);
 		if (moved_figure.check_left() && moved_figure.fit(field))
 		{
 			*this = moved_figure;
@@ -133,7 +124,7 @@ namespace Tetrium
 
 	bool Figure::move_right(const Field& field)
 	{
-		Figure moved_figure = moved_horizontally(+1);
+		auto&& moved_figure = moved_horizontally(+1);
 		if (moved_figure.check_right() && moved_figure.fit(field))
 		{
 			*this = moved_figure;
@@ -250,9 +241,8 @@ namespace Tetrium
 
 	bool Figure::turn_left(const Field& field)
 	{
-		Figure turned_figure = turned_left();
-		if (turned_figure.check_left() && turned_figure.check_right()
-			&& turned_figure.check_bottom() && turned_figure.fit(field))
+		auto&& turned_figure = turned_left();
+		if (turned_figure.check_left() && turned_figure.check_right() && turned_figure.check_bottom() && turned_figure.fit(field))
 		{
 			*this = turned_figure;
 			return true;
@@ -262,9 +252,8 @@ namespace Tetrium
 
 	bool Figure::turn_right(const Field& field)
 	{
-		Figure turned_figure = turned_right();
-		if (turned_figure.check_left() && turned_figure.check_right()
-			&& turned_figure.check_bottom() && turned_figure.fit(field))
+		auto&& turned_figure = turned_right();
+		if (turned_figure.check_left() && turned_figure.check_right() && turned_figure.check_bottom() && turned_figure.fit(field))
 		{
 			*this = turned_figure;
 			return true;
@@ -277,7 +266,7 @@ namespace Tetrium
 	int Figure::bottom() const
 	{
 		int result = blocks[0].y;
-		for (int i = 1; i < Blocks; ++i)
+		for (std::size_t i = 1; i < blocks.size(); ++i)
 			if (result > blocks[i].y)
 				result = blocks[i].y;
 		return result;
@@ -285,41 +274,41 @@ namespace Tetrium
 
 	bool Figure::check_bottom() const
 	{
-		for (int i = 0; i < Blocks; ++i)
-			if (blocks[i].y < 0)
+		for (const auto& block : blocks)
+			if (block.y < 0)
 				return false;
 		return true;
 	}
 
 	bool Figure::check_left() const
 	{
-		for (int i = 0; i < Blocks; ++i)
-			if (blocks[i].x < 0)
+		for (const auto& block : blocks)
+			if (block.x < 0)
 				return false;
 		return true;
 	}
 
 	bool Figure::check_right() const
 	{
-		for (int i = 0; i < Blocks; ++i)
-			if (blocks[i].x >= Field::Width)
+		for (const auto& block : blocks)
+			if (block.x >= Field::Width)
 				return false;
 		return true;
 	}
 
 	void Figure::move_down(int distance)
 	{
-		for (int i = 0; i < Blocks; ++i)
-			blocks[i].y -= distance;
+		for (auto& block : blocks)
+			block.y -= distance;
 		_top_left.y -= distance;
 		_bottom_right.y -= distance;
 	}
 
 	Figure Figure::moved_horizontally(int by) const
 	{
-		Figure result = *this;
-		for (int i = 0; i < Blocks; ++i)
-			result.blocks[i].x += by;
+		auto result = *this;
+		for (auto& block : result.blocks)
+			block.x += by;
 		result._top_left.x += by;
 		result._bottom_right.x += by;
 		return result;
@@ -327,25 +316,21 @@ namespace Tetrium
 
 	Figure Figure::turned_left() const
 	{
-		Figure result = *this;
-		for (int i = 0; i < Blocks; ++i)
-		{
-			result.blocks[i] = Point(
-				result._top_left.x + (result._top_left.y     - result.blocks[i].y) / PointsPerRow,
-				result._top_left.y - (result._bottom_right.x - result.blocks[i].x) * PointsPerRow);
-		}
+		auto result = *this;
+		for (auto& block : result.blocks)
+			block = Point(
+				result._top_left.x + (result._top_left.y     - block.y) / PointsPerRow,
+				result._top_left.y - (result._bottom_right.x - block.x) * PointsPerRow);
 		return result;
 	}
 
 	Figure Figure::turned_right() const
 	{
-		Figure result = *this;
-		for (int i = 0; i < Blocks; ++i)
-		{
-			result.blocks[i] = Point(
-				result._bottom_right.x - (result._top_left.y - result.blocks[i].y) / PointsPerRow,
-				result._top_left.y     + (result._top_left.x - result.blocks[i].x) * PointsPerRow);
-		}
+		auto result = *this;
+		for (auto& block : result.blocks)
+			block = Point(
+				result._bottom_right.x - (result._top_left.y - block.y) / PointsPerRow,
+				result._top_left.y     + (result._top_left.x - block.x) * PointsPerRow);
 		return result;
 	}
 
@@ -383,12 +368,8 @@ namespace Tetrium
 
 	void Field::put_figure(const Figure& figure)
 	{
-		for (int i = 0; i < Figure::Blocks; ++i)
-		{
-			int column = figure.blocks[i].x;
-			int row = figure.blocks[i].y / PointsPerRow;
-			blocks[row][column] = figure.type();
-		}
+		for (const auto& figure_block : figure.blocks)
+			blocks[figure_block.y / PointsPerRow][figure_block.x] = figure.type();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
