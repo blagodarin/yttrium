@@ -1,8 +1,8 @@
 /// \file
 /// \brief Index buffer.
 
-#ifndef _include_yttrium_index_buffer_h_
-#define _include_yttrium_index_buffer_h_
+#ifndef _include_yttrium_renderer_index_buffer_h_
+#define _include_yttrium_renderer_index_buffer_h_
 
 #include <cstddef>
 

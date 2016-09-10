@@ -1,4 +1,4 @@
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/modifiers.h>
 
 #include <yttrium/math/matrix.h>
 #include "renderer.h"

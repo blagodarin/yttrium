@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_renderer_h_
-#define _include_yttrium_renderer_h_
+#ifndef _include_yttrium_renderer_renderer_h_
+#define _include_yttrium_renderer_renderer_h_
 
 #include <yttrium/std/vector.h>
 

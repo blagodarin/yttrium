@@ -1,9 +1,9 @@
-#include <yttrium/texture_font.h>
+#include <yttrium/renderer/texture_font.h>
 
 #include <yttrium/file.h>
+#include <yttrium/renderer/text_capture.h>
+#include <yttrium/renderer/textured_rect.h>
 #include <yttrium/std/map.h>
-#include <yttrium/text_capture.h>
-#include <yttrium/textured_rect.h>
 #include <yttrium/utils.h>
 #include "texture_font.h"
 

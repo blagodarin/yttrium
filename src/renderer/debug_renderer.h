@@ -1,7 +1,7 @@
 #ifndef _src_renderer_debug_renderer_h_
 #define _src_renderer_debug_renderer_h_
 
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/modifiers.h>
 
 namespace Yttrium
 {

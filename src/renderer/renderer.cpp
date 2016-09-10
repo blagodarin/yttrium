@@ -1,9 +1,9 @@
 #include "renderer.h"
 
-#include <yttrium/gpu_program.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
-#include <yttrium/textured_rect.h>
+#include <yttrium/renderer/gpu_program.h>
+#include <yttrium/renderer/textured_rect.h>
 #include "debug_renderer.h"
 #include "debug_texture.h"
 #include "gl/renderer.h"

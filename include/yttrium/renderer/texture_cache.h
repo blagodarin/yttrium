@@ -1,8 +1,8 @@
 /// \file
 /// \brief Texture cache.
 
-#ifndef _include_yttrium_texture_cache_h_
-#define _include_yttrium_texture_cache_h_
+#ifndef _include_yttrium_renderer_texture_cache_h_
+#define _include_yttrium_renderer_texture_cache_h_
 
 #include <yttrium/global.h>
 

@@ -1,28 +1,35 @@
 #ifndef _examples_tetrium_game_h_
 #define _examples_tetrium_game_h_
 
-#include <yttrium/audio/manager.h>
-#include <yttrium/audio/sound.h>
 #include <yttrium/bindings.h>
 #include <yttrium/console.h>
-#include <yttrium/gui.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/memory/named_allocator.h>
+#include <yttrium/memory/shared_ptr.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
-#include <yttrium/texture_cache.h>
 #include <yttrium/window.h>
 
-#include "cursor.h"
 #include "tetrium.h"
 
+namespace Yttrium
+{
+	class AudioManager;
+	class Gui;
+	class Texture2D;
+	class TextureCache;
+}
+
 using namespace Yttrium;
+
+class Cursor;
 
 class Game : public WindowCallbacks
 {
 public:
 	Game();
+	~Game();
 
 	void run();
 

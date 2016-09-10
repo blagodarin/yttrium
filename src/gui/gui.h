@@ -2,9 +2,9 @@
 #define _src_gui_gui_h_
 
 #include <yttrium/memory/shared_ptr.h>
+#include <yttrium/renderer/texture_font.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
-#include <yttrium/texture_font.h>
 
 #include <functional>
 

@@ -1,6 +1,6 @@
 #include "layer.h"
 
-#include <yttrium/renderer.h>
+#include <yttrium/renderer/renderer.h>
 #include "exceptions.h"
 #include "gui.h"
 #include "layout.h"

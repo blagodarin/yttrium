@@ -1,11 +1,11 @@
 #include "properties.h"
 
-#include <yttrium/renderer.h>
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/renderer.h>
+#include <yttrium/renderer/texture.h>
+#include <yttrium/renderer/texture_font.h>
+#include <yttrium/renderer/textured_rect.h>
 #include <yttrium/string.h>
-#include <yttrium/texture.h>
-#include <yttrium/texture_font.h>
-#include <yttrium/textured_rect.h>
 #include "property_loader.h"
 
 #include <cassert>

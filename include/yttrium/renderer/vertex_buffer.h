@@ -1,8 +1,8 @@
 /// \file
 /// \brief Vertex buffer.
 
-#ifndef _include_yttrium_vertex_buffer_h_
-#define _include_yttrium_vertex_buffer_h_
+#ifndef _include_yttrium_renderer_vertex_buffer_h_
+#define _include_yttrium_renderer_vertex_buffer_h_
 
 #include <cstddef>
 

@@ -1,7 +1,7 @@
 #ifndef _src_renderer_texture_cache_h_
 #define _src_renderer_texture_cache_h_
 
-#include <yttrium/texture_cache.h>
+#include <yttrium/renderer/texture_cache.h>
 
 #include <yttrium/std/map.h>
 

@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_textured_rect_h_
-#define _include_yttrium_textured_rect_h_
+#ifndef _include_yttrium_renderer_textured_rect_h_
+#define _include_yttrium_renderer_textured_rect_h_
 
 #include <yttrium/math/rect.h>
 

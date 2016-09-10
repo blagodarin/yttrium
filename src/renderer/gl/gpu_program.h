@@ -1,7 +1,7 @@
 #ifndef _src_renderer_gl_gpu_program_h_
 #define _src_renderer_gl_gpu_program_h_
 
-#include <yttrium/gpu_program.h>
+#include <yttrium/renderer/gpu_program.h>
 
 #include "wrappers.h"
 

@@ -1,11 +1,11 @@
 #include "cursor.h"
 
-#include <yttrium/index_buffer.h>
 #include <yttrium/math/vector.h>
-#include <yttrium/renderer.h>
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/index_buffer.h>
+#include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/renderer.h>
+#include <yttrium/renderer/vertex_buffer.h>
 #include <yttrium/timer.h>
-#include <yttrium/vertex_buffer.h>
 
 #include <array>
 

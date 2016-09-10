@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/date_time.h>
 #include <yttrium/file.h>
@@ -12,12 +13,15 @@
 #include <yttrium/log.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/memory/temporary_allocator.h>
-#include <yttrium/renderer.h>
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/renderer.h>
+#include <yttrium/renderer/texture.h>
+#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/texture.h>
 #include <yttrium/timer.h>
+
+#include "cursor.h"
 
 Game::Game()
 	: _script(&_script_allocator)
@@ -163,6 +167,8 @@ Game::Game()
 
 	update_statistics();
 }
+
+Game::~Game() = default;
 
 void Game::run()
 {

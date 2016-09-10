@@ -2,9 +2,9 @@
 
 #include <yttrium/audio/sound.h>
 #include <yttrium/log.h>
-#include <yttrium/renderer.h>
+#include <yttrium/renderer/renderer.h>
+#include <yttrium/renderer/texture.h>
 #include <yttrium/script/context.h>
-#include <yttrium/texture.h>
 #include "../gui.h"
 #include "../property_loader.h"
 

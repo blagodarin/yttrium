@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_gpu_program_h_
-#define _include_yttrium_gpu_program_h_
+#ifndef _include_yttrium_renderer_gpu_program_h_
+#define _include_yttrium_renderer_gpu_program_h_
 
 namespace Yttrium
 {

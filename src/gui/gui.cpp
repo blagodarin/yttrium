@@ -1,9 +1,9 @@
 #include <yttrium/gui.h>
 
 #include <yttrium/log.h>
+#include <yttrium/renderer/texture.h>
+#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/script/context.h>
-#include <yttrium/texture.h>
-#include <yttrium/texture_cache.h>
 #include "exceptions.h"
 #include "gui.h"
 #include "ion/loader.h"

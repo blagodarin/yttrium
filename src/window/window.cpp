@@ -2,7 +2,7 @@
 
 #include <yttrium/log.h>
 #include <yttrium/math/matrix.h>
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/modifiers.h>
 #include <yttrium/timer.h>
 #include "../gui/gui.h"
 #include "../renderer/renderer.h"

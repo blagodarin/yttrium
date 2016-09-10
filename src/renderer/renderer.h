@@ -1,7 +1,7 @@
 #ifndef _src_renderer_renderer_h_
 #define _src_renderer_renderer_h_
 
-#include <yttrium/renderer.h>
+#include <yttrium/renderer/renderer.h>
 
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>

@@ -3,7 +3,7 @@
 
 #include "../property_loader.h"
 
-#include <yttrium/texture.h>
+#include <yttrium/renderer/texture.h>
 
 namespace Yttrium
 {

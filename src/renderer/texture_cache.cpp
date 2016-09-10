@@ -2,8 +2,8 @@
 
 #include <yttrium/image.h>
 #include <yttrium/memory/shared_ptr.h>
+#include <yttrium/renderer/texture.h>
 #include <yttrium/string.h>
-#include <yttrium/texture.h>
 #include "renderer.h"
 
 namespace Yttrium

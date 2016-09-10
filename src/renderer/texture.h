@@ -1,7 +1,7 @@
 #ifndef _src_renderer_texture_h_
 #define _src_renderer_texture_h_
 
-#include <yttrium/texture.h>
+#include <yttrium/renderer/texture.h>
 
 #include <yttrium/image.h>
 

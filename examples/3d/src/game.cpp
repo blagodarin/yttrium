@@ -3,8 +3,8 @@
 #include <yttrium/date_time.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
-#include <yttrium/renderer.h>
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/renderer.h>
 #include <yttrium/string_format.h>
 
 #include <cmath>

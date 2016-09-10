@@ -1,8 +1,8 @@
 /// \file
 /// \brief Textures.
 
-#ifndef _include_yttrium_texture_h_
-#define _include_yttrium_texture_h_
+#ifndef _include_yttrium_renderer_texture_h_
+#define _include_yttrium_renderer_texture_h_
 
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/shared_ptr.h>

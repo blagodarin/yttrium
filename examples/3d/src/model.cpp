@@ -1,15 +1,15 @@
 #include "model.h"
 
 #include <yttrium/file.h>
-#include <yttrium/gpu_program.h>
 #include <yttrium/image.h>
-#include <yttrium/index_buffer.h>
 #include <yttrium/math/matrix.h>
-#include <yttrium/renderer.h>
-#include <yttrium/renderer_modifiers.h>
+#include <yttrium/renderer/gpu_program.h>
+#include <yttrium/renderer/index_buffer.h>
+#include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/renderer.h>
+#include <yttrium/renderer/texture.h>
+#include <yttrium/renderer/vertex_buffer.h>
 #include <yttrium/string.h>
-#include <yttrium/texture.h>
-#include <yttrium/vertex_buffer.h>
 
 #include <array>
 #include <vector>
