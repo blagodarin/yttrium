@@ -46,9 +46,7 @@ namespace Tetrium
 			None,  ///< No figure (empty block).
 		};
 
-		std::array<Point, 4> blocks; ///< Figure blocks coordinates (x is column, y is line).
-
-	public:
+		const std::array<Point, 4>& blocks() const { return _blocks; }
 
 		/// Try to fit the figure on the \a field, moving it slightly if necessary.
 		bool fit(const Field& field);
@@ -84,8 +82,8 @@ namespace Tetrium
 		Figure turned_right() const;
 
 	private:
-
 		Type _type = None;
+		std::array<Point, 4> _blocks; // Figure blocks coordinates (x is column, y is line).
 		Point _top_left; // Top left point of the rotation rectangle.
 		Point _bottom_right; // Bottom right point of the rotation rectangle.
 	};

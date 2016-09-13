@@ -401,7 +401,7 @@ void Game::draw_field_figure(Renderer& renderer, const RectF& rect, const SizeF&
 		return;
 
 	set_texture_rect(renderer, figure.type());
-	for (const auto& block : figure.blocks)
+	for (const auto& block : figure.blocks())
 	{
 		if (block.y < Tetrium::Field::Height * Tetrium::PointsPerRow)
 		{
@@ -449,7 +449,7 @@ void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 		{
 			set_texture_rect(renderer, figure.type());
 			const SizeF block_size(rect.width() / 4, rect.height() / 2);
-			for (const auto& block : figure.blocks)
+			for (const auto& block : figure.blocks())
 			{
 				renderer.draw_rect(
 					{

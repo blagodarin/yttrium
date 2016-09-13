@@ -1,5 +1,7 @@
 #include "tetrium.h"
 
+#include <algorithm>
+
 namespace Tetrium
 {
 	// Game timing parameters.
@@ -26,35 +28,28 @@ namespace Tetrium
 
 	bool Figure::fit(const Field& field)
 	{
-		int offset = 0;
-
-		for (const auto& block : blocks)
+		const auto row_offset = _blocks[0].y % PointsPerRow; // This value should be equal for all blocks.
+		bool shift = false;
+		for (const auto& block : _blocks)
 		{
-			const auto lower_row = block.y / PointsPerRow;
-			const auto upper_row = (4 * block.y + 3 * PointsPerRow) / (4 * PointsPerRow);
-
-			if (lower_row < Field::Height && field.blocks[lower_row][block.x] != None)
+			const auto row = block.y / PointsPerRow;
+			if (row < Field::Height && field.blocks[row][block.x] != None)
 				return false;
-
-			if (lower_row != upper_row)
+			if (row + 1 < Field::Height && field.blocks[row + 1][block.x] != None)
 			{
-				if (upper_row < Field::Height && field.blocks[upper_row][block.x] != None)
+				if (row_offset >= PointsPerRow / 4)
 					return false;
-			}
-			else
-			{
-				if (lower_row < Field::Height - 1 && field.blocks[lower_row + 1][block.x] != None)
-					offset = block.y - lower_row * PointsPerRow; // NOTE: Why does it rewrite the offset from the previous iteration?
+				shift = true;
 			}
 		}
-
-		move_down(offset);
+		if (shift)
+			move_down(row_offset);
 		return true;
 	}
 
 	void Figure::move(int x, int y)
 	{
-		for (auto& block : blocks)
+		for (auto& block : _blocks)
 		{
 			block.x += x;
 			block.y += y;
@@ -71,7 +66,7 @@ namespace Tetrium
 		if (distance > max_distance)
 			distance = max_distance;
 
-		for (const auto& block : blocks)
+		for (const auto& block : _blocks)
 		{
 			auto row = block.y / PointsPerRow - 1;
 			if (row > Field::Height - 1)
@@ -136,105 +131,88 @@ namespace Tetrium
 	void Figure::set_type(Type type)
 	{
 		_type = type;
-
 		switch (_type)
 		{
 		case I:
-
 			// ....
 			// XXXX
-
-			blocks[0] = Point(0, 0);
-			blocks[1] = Point(1, 0);
-			blocks[2] = Point(2, 0);
-			blocks[3] = Point(3, 0);
-			_top_left = Point(0, 2 * PointsPerRow);
-			_bottom_right = Point(3, -PointsPerRow);
+			_blocks[0] = { 0, 0 };
+			_blocks[1] = { 1, 0 };
+			_blocks[2] = { 2, 0 };
+			_blocks[3] = { 3, 0 };
+			_top_left = { 0, 2 * PointsPerRow };
+			_bottom_right = { 3, -PointsPerRow };
 			break;
 
 		case J:
-
 			// .X..
 			// .XXX
-
-			blocks[0] = Point(1, 0);
-			blocks[1] = Point(2, 0);
-			blocks[2] = Point(3, 0);
-			blocks[3] = Point(1, PointsPerRow);
-			_top_left = Point(1, PointsPerRow);
-			_bottom_right = Point(3, -PointsPerRow);
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 3, 0 };
+			_blocks[3] = { 1, PointsPerRow };
+			_top_left = { 1, PointsPerRow };
+			_bottom_right = { 3, -PointsPerRow };
 			break;
 
 		case L:
-
 			// ..X.
 			// XXX.
-
-			blocks[0] = Point(0, 0);
-			blocks[1] = Point(1, 0);
-			blocks[2] = Point(2, 0);
-			blocks[3] = Point(2, PointsPerRow);
-			_top_left = Point(0, PointsPerRow);
-			_bottom_right = Point(2, -PointsPerRow);
+			_blocks[0] = { 0, 0 };
+			_blocks[1] = { 1, 0 };
+			_blocks[2] = { 2, 0 };
+			_blocks[3] = { 2, PointsPerRow };
+			_top_left = { 0, PointsPerRow };
+			_bottom_right = { 2, -PointsPerRow };
 			break;
 
 		case O:
-
 			// .XX.
 			// .XX.
-
-			blocks[0] = Point(1, 0);
-			blocks[1] = Point(2, 0);
-			blocks[2] = Point(1, PointsPerRow);
-			blocks[3] = Point(2, PointsPerRow);
-			_top_left = Point(1, PointsPerRow);
-			_bottom_right = Point(2, 0);
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 1, PointsPerRow };
+			_blocks[3] = { 2, PointsPerRow };
+			_top_left = { 1, PointsPerRow };
+			_bottom_right = { 2, 0 };
 			break;
 
 		case S:
-
 			// ..XX
 			// .XX.
-
-			blocks[0] = Point(1, 0);
-			blocks[1] = Point(2, 0);
-			blocks[2] = Point(2, PointsPerRow);
-			blocks[3] = Point(3, PointsPerRow);
-			_top_left = Point(1, 2 * PointsPerRow);
-			_bottom_right = Point(3, 0);
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 2, PointsPerRow };
+			_blocks[3] = { 3, PointsPerRow };
+			_top_left = { 1, 2 * PointsPerRow };
+			_bottom_right = { 3, 0 };
 			break;
 
 		case T:
-
 			// .X..
 			// XXX.
-
-			blocks[0] = Point(0, 0);
-			blocks[1] = Point(1, 0);
-			blocks[2] = Point(2, 0);
-			blocks[3] = Point(1, PointsPerRow);
-			_top_left = Point(0, PointsPerRow);
-			_bottom_right = Point(2, -PointsPerRow);
+			_blocks[0] = { 0, 0 };
+			_blocks[1] = { 1, 0 };
+			_blocks[2] = { 2, 0 };
+			_blocks[3] = { 1, PointsPerRow };
+			_top_left = { 0, PointsPerRow };
+			_bottom_right = { 2, -PointsPerRow };
 			break;
 
 		case Z:
-
 			// XX..
 			// .XX.
-
-			blocks[0] = Point(1, 0);
-			blocks[1] = Point(2, 0);
-			blocks[2] = Point(0, PointsPerRow);
-			blocks[3] = Point(1, PointsPerRow);
-			_top_left = Point(0, 2 * PointsPerRow);
-			_bottom_right = Point(2, 0);
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 0, PointsPerRow };
+			_blocks[3] = { 1, PointsPerRow };
+			_top_left = { 0, 2 * PointsPerRow };
+			_bottom_right = { 2, 0 };
 			break;
 
 		default:
-
 			// ....
 			// ....
-
 			break;
 		}
 	}
@@ -265,40 +243,27 @@ namespace Tetrium
 
 	int Figure::bottom() const
 	{
-		int result = blocks[0].y;
-		for (std::size_t i = 1; i < blocks.size(); ++i)
-			if (result > blocks[i].y)
-				result = blocks[i].y;
-		return result;
+		return std::min_element(_blocks.begin(), _blocks.end(), [](const auto& a, const auto& b){ return a.y < b.y; })->y;
 	}
 
 	bool Figure::check_bottom() const
 	{
-		for (const auto& block : blocks)
-			if (block.y < 0)
-				return false;
-		return true;
+		return std::none_of(_blocks.begin(), _blocks.end(), [](const auto& block){ return block.y < 0; });
 	}
 
 	bool Figure::check_left() const
 	{
-		for (const auto& block : blocks)
-			if (block.x < 0)
-				return false;
-		return true;
+		return std::none_of(_blocks.begin(), _blocks.end(), [](const auto& block){ return block.x < 0; });
 	}
 
 	bool Figure::check_right() const
 	{
-		for (const auto& block : blocks)
-			if (block.x >= Field::Width)
-				return false;
-		return true;
+		return std::none_of(_blocks.begin(), _blocks.end(), [](const auto& block){ return block.x >= Field::Width; });
 	}
 
 	void Figure::move_down(int distance)
 	{
-		for (auto& block : blocks)
+		for (auto& block : _blocks)
 			block.y -= distance;
 		_top_left.y -= distance;
 		_bottom_right.y -= distance;
@@ -307,7 +272,7 @@ namespace Tetrium
 	Figure Figure::moved_horizontally(int by) const
 	{
 		auto result = *this;
-		for (auto& block : result.blocks)
+		for (auto& block : result._blocks)
 			block.x += by;
 		result._top_left.x += by;
 		result._bottom_right.x += by;
@@ -317,7 +282,7 @@ namespace Tetrium
 	Figure Figure::turned_left() const
 	{
 		auto result = *this;
-		for (auto& block : result.blocks)
+		for (auto& block : result._blocks)
 			block = Point(
 				result._top_left.x + (result._top_left.y     - block.y) / PointsPerRow,
 				result._top_left.y - (result._bottom_right.x - block.x) * PointsPerRow);
@@ -327,7 +292,7 @@ namespace Tetrium
 	Figure Figure::turned_right() const
 	{
 		auto result = *this;
-		for (auto& block : result.blocks)
+		for (auto& block : result._blocks)
 			block = Point(
 				result._bottom_right.x - (result._top_left.y - block.y) / PointsPerRow,
 				result._top_left.y     + (result._top_left.x - block.x) * PointsPerRow);
@@ -368,7 +333,7 @@ namespace Tetrium
 
 	void Field::put_figure(const Figure& figure)
 	{
-		for (const auto& figure_block : figure.blocks)
+		for (const auto& figure_block : figure.blocks())
 			blocks[figure_block.y / PointsPerRow][figure_block.x] = figure.type();
 	}
 
