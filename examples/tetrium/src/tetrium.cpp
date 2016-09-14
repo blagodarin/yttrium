@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace Tetrium
+namespace
 {
 	// Game timing parameters.
 	enum
@@ -26,64 +26,132 @@ namespace Tetrium
 		HMoveInterval        =  2, // 50 ms successive delays.
 	};
 
-	bool Figure::fit(const Field& field)
+	enum
 	{
-		const auto row_offset = _blocks[0].y % PointsPerRow; // This value should be equal for all blocks.
-		bool shift = false;
-		for (const auto& block : _blocks)
+		MaxFigureWidth = 4,
+	};
+}
+
+namespace Tetrium
+{
+	Figure::Figure(Type type)
+		: _type(type)
+	{
+		switch (_type)
 		{
-			const auto row = block.y / PointsPerRow;
-			if (row < Field::Height && field.blocks[row][block.x] != None)
-				return false;
-			if (row + 1 < Field::Height && field.blocks[row + 1][block.x] != None)
-			{
-				if (row_offset >= PointsPerRow / 4)
-					return false;
-				shift = true;
-			}
+		case I:
+			// ....
+			// XXXX
+			_blocks[0] = { 0, 0 };
+			_blocks[1] = { 1, 0 };
+			_blocks[2] = { 2, 0 };
+			_blocks[3] = { 3, 0 };
+			_top_left = { 0, 2 };
+			_bottom_right = { 3, -1 };
+			break;
+
+		case J:
+			// .X..
+			// .XXX
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 3, 0 };
+			_blocks[3] = { 1, 1 };
+			_top_left = { 1, 1 };
+			_bottom_right = { 3, -1 };
+			break;
+
+		case L:
+			// ..X.
+			// XXX.
+			_blocks[0] = { 0, 0 };
+			_blocks[1] = { 1, 0 };
+			_blocks[2] = { 2, 0 };
+			_blocks[3] = { 2, 1 };
+			_top_left = { 0, 1 };
+			_bottom_right = { 2, -1 };
+			break;
+
+		case O:
+			// .XX.
+			// .XX.
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 1, 1 };
+			_blocks[3] = { 2, 1 };
+			_top_left = { 1, 1 };
+			_bottom_right = { 2, 0 };
+			break;
+
+		case S:
+			// ..XX
+			// .XX.
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 2, 1 };
+			_blocks[3] = { 3, 1 };
+			_top_left = { 1, 2 };
+			_bottom_right = { 3, 0 };
+			break;
+
+		case T:
+			// .X..
+			// XXX.
+			_blocks[0] = { 0, 0 };
+			_blocks[1] = { 1, 0 };
+			_blocks[2] = { 2, 0 };
+			_blocks[3] = { 1, 1 };
+			_top_left = { 0, 1 };
+			_bottom_right = { 2, -1 };
+			break;
+
+		case Z:
+			// XX..
+			// .XX.
+			_blocks[0] = { 1, 0 };
+			_blocks[1] = { 2, 0 };
+			_blocks[2] = { 0, 1 };
+			_blocks[3] = { 1, 1 };
+			_top_left = { 0, 2 };
+			_bottom_right = { 2, 0 };
+			break;
+
+		default:
+			// ....
+			// ....
+			break;
 		}
-		if (shift)
-			move_down(row_offset);
-		return true;
+	}
+
+	std::array<Point, 4> Figure::blocks() const
+	{
+		std::array<Point, 4> result;
+		for (const auto& block : _blocks)
+			result[&block - _blocks.data()] = { _offset.x + block.x, _offset.y + block.y * PointsPerRow };
+		return result;
 	}
 
 	void Figure::move(int x, int y)
 	{
-		for (auto& block : _blocks)
-		{
-			block.x += x;
-			block.y += y;
-		}
-		_top_left.x += x;
-		_top_left.y += y;
-		_bottom_right.x += x;
-		_bottom_right.y += y;
+		_offset.x += x;
+		_offset.y += y;
 	}
 
 	int Figure::move_down(const Field& field, int distance)
 	{
-		const auto max_distance = bottom();
-		if (distance > max_distance)
-			distance = max_distance;
-
-		for (const auto& block : _blocks)
+		for (const auto& block : blocks())
 		{
-			auto row = block.y / PointsPerRow - 1;
-			if (row > Field::Height - 1)
-				row = Field::Height - 1;
-			for (; row >= 0; --row)
+			distance = std::min(distance, block.y);
+			for (auto row = std::min(block.y / PointsPerRow, Field::Height - 1); row > 0; --row)
 			{
-				if (field.blocks[row][block.x] != None)
+				if (field.blocks[row - 1][block.x] != None)
 				{
-					int altitude = block.y - (row + 1) * PointsPerRow;
-					if (distance > altitude)
-						distance = altitude;
+					distance = std::min(distance, block.y - row * PointsPerRow);
 					break;
 				}
 			}
 		}
-
-		move_down(distance);
+		_offset.y -= distance;
 		return distance;
 	}
 
@@ -108,200 +176,72 @@ namespace Tetrium
 
 	bool Figure::move_left(const Field& field)
 	{
-		auto&& moved_figure = moved_horizontally(-1);
-		if (moved_figure.check_left() && moved_figure.fit(field))
-		{
-			*this = moved_figure;
-			return true;
-		}
-		return false;
+		auto moved = *this;
+		moved._offset.x -= 1;
+		if (!moved.fit(field))
+			return false;
+		*this = moved;
+		return true;
 	}
 
 	bool Figure::move_right(const Field& field)
 	{
-		auto&& moved_figure = moved_horizontally(+1);
-		if (moved_figure.check_right() && moved_figure.fit(field))
-		{
-			*this = moved_figure;
-			return true;
-		}
-		return false;
-	}
-
-	void Figure::set_type(Type type)
-	{
-		_type = type;
-		switch (_type)
-		{
-		case I:
-			// ....
-			// XXXX
-			_blocks[0] = { 0, 0 };
-			_blocks[1] = { 1, 0 };
-			_blocks[2] = { 2, 0 };
-			_blocks[3] = { 3, 0 };
-			_top_left = { 0, 2 * PointsPerRow };
-			_bottom_right = { 3, -PointsPerRow };
-			break;
-
-		case J:
-			// .X..
-			// .XXX
-			_blocks[0] = { 1, 0 };
-			_blocks[1] = { 2, 0 };
-			_blocks[2] = { 3, 0 };
-			_blocks[3] = { 1, PointsPerRow };
-			_top_left = { 1, PointsPerRow };
-			_bottom_right = { 3, -PointsPerRow };
-			break;
-
-		case L:
-			// ..X.
-			// XXX.
-			_blocks[0] = { 0, 0 };
-			_blocks[1] = { 1, 0 };
-			_blocks[2] = { 2, 0 };
-			_blocks[3] = { 2, PointsPerRow };
-			_top_left = { 0, PointsPerRow };
-			_bottom_right = { 2, -PointsPerRow };
-			break;
-
-		case O:
-			// .XX.
-			// .XX.
-			_blocks[0] = { 1, 0 };
-			_blocks[1] = { 2, 0 };
-			_blocks[2] = { 1, PointsPerRow };
-			_blocks[3] = { 2, PointsPerRow };
-			_top_left = { 1, PointsPerRow };
-			_bottom_right = { 2, 0 };
-			break;
-
-		case S:
-			// ..XX
-			// .XX.
-			_blocks[0] = { 1, 0 };
-			_blocks[1] = { 2, 0 };
-			_blocks[2] = { 2, PointsPerRow };
-			_blocks[3] = { 3, PointsPerRow };
-			_top_left = { 1, 2 * PointsPerRow };
-			_bottom_right = { 3, 0 };
-			break;
-
-		case T:
-			// .X..
-			// XXX.
-			_blocks[0] = { 0, 0 };
-			_blocks[1] = { 1, 0 };
-			_blocks[2] = { 2, 0 };
-			_blocks[3] = { 1, PointsPerRow };
-			_top_left = { 0, PointsPerRow };
-			_bottom_right = { 2, -PointsPerRow };
-			break;
-
-		case Z:
-			// XX..
-			// .XX.
-			_blocks[0] = { 1, 0 };
-			_blocks[1] = { 2, 0 };
-			_blocks[2] = { 0, PointsPerRow };
-			_blocks[3] = { 1, PointsPerRow };
-			_top_left = { 0, 2 * PointsPerRow };
-			_bottom_right = { 2, 0 };
-			break;
-
-		default:
-			// ....
-			// ....
-			break;
-		}
+		auto moved = *this;
+		moved._offset.x += 1;
+		if (!moved.fit(field))
+			return false;
+		*this = moved;
+		return true;
 	}
 
 	bool Figure::turn_left(const Field& field)
 	{
-		auto&& turned_figure = turned_left();
-		if (turned_figure.check_left() && turned_figure.check_right() && turned_figure.check_bottom() && turned_figure.fit(field))
-		{
-			*this = turned_figure;
-			return true;
-		}
-		return false;
+		auto turned = *this;
+		for (auto& block : turned._blocks)
+			block = { turned._top_left.x + (turned._top_left.y - block.y), turned._top_left.y - (turned._bottom_right.x - block.x) };
+		if (!turned.fit(field))
+			return false;
+		*this = turned;
+		return true;
 	}
 
 	bool Figure::turn_right(const Field& field)
 	{
-		auto&& turned_figure = turned_right();
-		if (turned_figure.check_left() && turned_figure.check_right() && turned_figure.check_bottom() && turned_figure.fit(field))
+		auto turned = *this;
+		for (auto& block : turned._blocks)
+			block = { turned._bottom_right.x - (turned._top_left.y - block.y), turned._top_left.y + (turned._top_left.x - block.x) };
+		if (!turned.fit(field))
+			return false;
+		*this = turned;
+		return true;
+	}
+
+	bool Figure::fit(const Field& field)
+	{
+		const auto row_offset = _offset.y % PointsPerRow;
+		bool shift = false;
+		for (const auto& block : blocks())
 		{
-			*this = turned_figure;
-			return true;
+			if (block.x < 0 || block.x >= Field::Width || block.y < 0)
+				return false;
+			const auto row = block.y / PointsPerRow;
+			if (row < Field::Height && field.blocks[row][block.x] != None)
+				return false;
+			if (row + 1 < Field::Height && field.blocks[row + 1][block.x] != None)
+			{
+				if (row_offset >= PointsPerRow / 4)
+					return false;
+				shift = true;
+			}
 		}
-		return false;
+		if (shift)
+			_offset.y -= row_offset;
+		return true;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	int Figure::bottom() const
-	{
-		return std::min_element(_blocks.begin(), _blocks.end(), [](const auto& a, const auto& b){ return a.y < b.y; })->y;
-	}
-
-	bool Figure::check_bottom() const
-	{
-		return std::none_of(_blocks.begin(), _blocks.end(), [](const auto& block){ return block.y < 0; });
-	}
-
-	bool Figure::check_left() const
-	{
-		return std::none_of(_blocks.begin(), _blocks.end(), [](const auto& block){ return block.x < 0; });
-	}
-
-	bool Figure::check_right() const
-	{
-		return std::none_of(_blocks.begin(), _blocks.end(), [](const auto& block){ return block.x >= Field::Width; });
-	}
-
-	void Figure::move_down(int distance)
-	{
-		for (auto& block : _blocks)
-			block.y -= distance;
-		_top_left.y -= distance;
-		_bottom_right.y -= distance;
-	}
-
-	Figure Figure::moved_horizontally(int by) const
-	{
-		auto result = *this;
-		for (auto& block : result._blocks)
-			block.x += by;
-		result._top_left.x += by;
-		result._bottom_right.x += by;
-		return result;
-	}
-
-	Figure Figure::turned_left() const
-	{
-		auto result = *this;
-		for (auto& block : result._blocks)
-			block = Point(
-				result._top_left.x + (result._top_left.y     - block.y) / PointsPerRow,
-				result._top_left.y - (result._bottom_right.x - block.x) * PointsPerRow);
-		return result;
-	}
-
-	Figure Figure::turned_right() const
-	{
-		auto result = *this;
-		for (auto& block : result._blocks)
-			block = Point(
-				result._bottom_right.x - (result._top_left.y - block.y) / PointsPerRow,
-				result._top_left.y     + (result._top_left.x - block.x) * PointsPerRow);
-		return result;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	void Field::clear()
+	Field::Field()
 	{
 		for (int y = 0; y < Height + HeightPadding; ++y)
 			for (int x = 0; x < Width; ++x)
@@ -407,17 +347,17 @@ namespace Tetrium
 
 	Figure Game::current_figure() const
 	{
-		return (_state == Falling || _state == Fixing) ? _current_figure : Figure();
+		return _state == Falling || _state == Fixing ? _current_figure : Figure();
 	}
 
 	Field Game::field() const
 	{
-		return (_state != Stopped) ? _field : Field();
+		return _state != Stopped ? _field : Field();
 	}
 
 	Figure Game::next_figure() const
 	{
-		return (_state != Stopped) ? _next_figure : Figure();
+		return _state != Stopped ? _next_figure : Figure();
 	}
 
 	void Game::set_left_movement(bool move)
@@ -450,8 +390,8 @@ namespace Tetrium
 
 	void Game::start(int start_level)
 	{
-		_field.clear();
-		_next_figure.set_type(random_figure_type());
+		_field = {};
+		_next_figure = Figure(random_figure_type());
 		_time_remainder = 0;
 
 		_is_accelerating = false;
@@ -532,8 +472,8 @@ namespace Tetrium
 		{
 			_state = Falling;
 			_current_figure = _next_figure;
-			_current_figure.move((Field::Width - 4) / 2, Field::Height * PointsPerRow); // NOTE: Magic number 4 (that's NOT # of figure blocks!).
-			_next_figure.set_type(random_figure_type());
+			_current_figure.move((Field::Width - MaxFigureWidth) / 2, Field::Height * PointsPerRow);
+			_next_figure = Figure(random_figure_type());
 		}
 	}
 

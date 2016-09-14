@@ -1,20 +1,17 @@
-/// \file
-/// \brief %Tetrium game logic.
-
 #ifndef _examples_tetrium_tetrium_h_
 #define _examples_tetrium_tetrium_h_
 
 #include <array>
 
-/// %Tetrium game logic.
+// Tetrium game logic.
 namespace Tetrium
 {
 	enum
 	{
-		PointsPerRow = 40, ///< Logical points per row.
+		PointsPerRow = 40, // Logical points per row.
 	};
 
-	/// Field coordinate point.
+	// Field coordinate point.
 	struct Point
 	{
 		int x = 0;
@@ -26,115 +23,74 @@ namespace Tetrium
 
 	class Field;
 
-	/// Data representing the falling tetromino.
+	// Data representing the falling tetromino.
 	class Figure
 	{
 	public:
 
-		/// Figure type.
+		// Figure type.
 		enum Type
 		{
-			I, ///< I figure (stick).
-			J, ///< J figure (mirrored L).
-			L, ///< L figure (mirrored J).
-			O, ///< O figure (square).
-			S, ///< S figure (mirrored Z).
-			T, ///< T figure.
-			Z, ///< Z figure (mirrored S).
+			I, // I figure (stick).
+			J, // J figure (mirrored L).
+			L, // L figure (mirrored J).
+			O, // O figure (square).
+			S, // S figure (mirrored Z).
+			T, // T figure.
+			Z, // Z figure (mirrored S).
 
-			Count, ///< Number of different figures.
-			None,  ///< No figure (empty block).
+			Count, // Number of different figures.
+			None,  // No figure (empty block).
 		};
 
-		const std::array<Point, 4>& blocks() const { return _blocks; }
+		Figure(Type = None);
 
-		/// Try to fit the figure on the \a field, moving it slightly if necessary.
-		bool fit(const Field& field);
-
+		std::array<Point, 4> blocks() const;
 		void move(int x, int y);
-
-		int move_down(const Field& field, int distance);
-
-		bool move_horizontally(const Field& field, int cells);
-
-		bool move_left(const Field& field);
-
-		bool move_right(const Field& field);
-
-		void set_type(Type type);
-
-		bool turn_left(const Field& field);
-
-		bool turn_right(const Field& field);
-
-		/// Get the figure type.
+		int move_down(const Field&, int distance);
+		bool move_horizontally(const Field&, int cells);
+		bool move_left(const Field&);
+		bool move_right(const Field&);
+		bool turn_left(const Field&);
+		bool turn_right(const Field&);
 		Type type() const { return _type; }
 
 	private:
-
-		int bottom() const;
-		bool check_bottom() const;
-		bool check_left() const;
-		bool check_right() const;
-		void move_down(int distance);
-		Figure moved_horizontally(int by) const;
-		Figure turned_left() const;
-		Figure turned_right() const;
+		bool fit(const Field&);
 
 	private:
-		Type _type = None;
+		Type _type;
 		std::array<Point, 4> _blocks; // Figure blocks coordinates (x is column, y is line).
 		Point _top_left; // Top left point of the rotation rectangle.
 		Point _bottom_right; // Bottom right point of the rotation rectangle.
+		Point _offset; // Offset on the field.
 	};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/// Data structure representing the field (blocks without the falling tetromino).
-
+	// Data structure representing the field (blocks without the falling tetromino).
 	class Field
 	{
 	public:
-
 		enum
 		{
-			Height        = 22, ///< Field height.
-			HeightPadding =  4, ///< Invisible field part height.
-			Width         = 10, ///< Field width.
+			Height        = 22, // Field height.
+			HeightPadding =  4, // Invisible field part height.
+			Width         = 10, // Field width.
 		};
 
-	public:
+		Figure::Type blocks[Height + HeightPadding][Width];
 
-		Figure::Type blocks[Height + HeightPadding][Width]; ///<
+		Field();
 
-	public:
-
-		/// Create an empty field.
-		Field() { clear(); }
-
-	public:
-
-		/// Clear the field.
-		void clear();
-
-		///
 		int collapse_full_rows();
-
-		///
 		bool is_overflown() const;
-
-		///
-		void put_figure(const Figure& figure);
+		void put_figure(const Figure&);
 
 	private:
-
 		void collapse_row(int row);
 		bool is_row_full(int row) const;
 	};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/// Game engine.
+	// Game engine.
 	class Game
 	{
 	public:
@@ -190,7 +146,6 @@ namespace Tetrium
 
 	private:
 
-		/// Game state.
 		enum State
 		{
 			Stopped,  ///< The game hasn't started.
