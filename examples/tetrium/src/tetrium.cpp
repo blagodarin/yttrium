@@ -131,112 +131,16 @@ namespace Tetrium
 		return result;
 	}
 
-	void Figure::move(int x, int y)
+	void Figure::turn_left()
 	{
-		_offset.x += x;
-		_offset.y += y;
+		for (auto& block : _blocks)
+			block = { _top_left.x + (_top_left.y - block.y), _top_left.y - (_bottom_right.x - block.x) };
 	}
 
-	int Figure::move_down(const Field& field, int distance)
+	void Figure::turn_right()
 	{
-		for (const auto& block : blocks())
-		{
-			distance = std::min(distance, block.y);
-			for (auto row = std::min(block.y / PointsPerRow, Field::Height - 1); row > 0; --row)
-			{
-				if (field.blocks[row - 1][block.x] != None)
-				{
-					distance = std::min(distance, block.y - row * PointsPerRow);
-					break;
-				}
-			}
-		}
-		_offset.y -= distance;
-		return distance;
-	}
-
-	bool Figure::move_horizontally(const Field& field, int cells)
-	{
-		// We should move the figure cell by cell to ensure
-		// it can really be moved, not just teleported.
-		if (cells < 0)
-		{
-			for (int i = cells; i < 0; ++i)
-				if (!move_left(field))
-					return false;
-		}
-		else if (cells > 0)
-		{
-			for (int i = 0; i < cells; ++i)
-				if (!move_right(field))
-					return false;
-		}
-		return true;
-	}
-
-	bool Figure::move_left(const Field& field)
-	{
-		auto moved = *this;
-		moved._offset.x -= 1;
-		if (!moved.fit(field))
-			return false;
-		*this = moved;
-		return true;
-	}
-
-	bool Figure::move_right(const Field& field)
-	{
-		auto moved = *this;
-		moved._offset.x += 1;
-		if (!moved.fit(field))
-			return false;
-		*this = moved;
-		return true;
-	}
-
-	bool Figure::turn_left(const Field& field)
-	{
-		auto turned = *this;
-		for (auto& block : turned._blocks)
-			block = { turned._top_left.x + (turned._top_left.y - block.y), turned._top_left.y - (turned._bottom_right.x - block.x) };
-		if (!turned.fit(field))
-			return false;
-		*this = turned;
-		return true;
-	}
-
-	bool Figure::turn_right(const Field& field)
-	{
-		auto turned = *this;
-		for (auto& block : turned._blocks)
-			block = { turned._bottom_right.x - (turned._top_left.y - block.y), turned._top_left.y + (turned._top_left.x - block.x) };
-		if (!turned.fit(field))
-			return false;
-		*this = turned;
-		return true;
-	}
-
-	bool Figure::fit(const Field& field)
-	{
-		const auto row_offset = _offset.y % PointsPerRow;
-		bool shift = false;
-		for (const auto& block : blocks())
-		{
-			if (block.x < 0 || block.x >= Field::Width || block.y < 0)
-				return false;
-			const auto row = block.y / PointsPerRow;
-			if (row < Field::Height && field.blocks[row][block.x] != None)
-				return false;
-			if (row + 1 < Field::Height && field.blocks[row + 1][block.x] != None)
-			{
-				if (row_offset >= PointsPerRow / 4)
-					return false;
-				shift = true;
-			}
-		}
-		if (shift)
-			_offset.y -= row_offset;
-		return true;
+		for (auto& block : _blocks)
+			block = { _bottom_right.x - (_top_left.y - block.y), _top_left.y + (_top_left.x - block.x) };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,13 +175,34 @@ namespace Tetrium
 		return false;
 	}
 
-	void Field::put_figure(const Figure& figure)
+	bool Field::fit(Figure& figure) const
 	{
-		for (const auto& figure_block : figure.blocks())
-			blocks[figure_block.y / PointsPerRow][figure_block.x] = figure.type();
+		const auto row_offset = figure.row_offset();
+		bool shift = false;
+		for (const auto& block : figure.blocks())
+		{
+			if (block.x < 0 || block.x >= Width || block.y < 0)
+				return false;
+			const auto row = block.y / PointsPerRow;
+			if (row < Height && blocks[row][block.x] != Figure::None)
+				return false;
+			if (row + 1 < Height && blocks[row + 1][block.x] != Figure::None)
+			{
+				if (row_offset >= PointsPerRow / 4)
+					return false;
+				shift = true;
+			}
+		}
+		if (shift)
+			figure.move_down(row_offset);
+		return true;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void Field::put_figure(const Figure& figure)
+	{
+		for (const auto& block : figure.blocks())
+			blocks[block.y / PointsPerRow][block.x] = figure.type();
+	}
 
 	void Field::collapse_row(int row)
 	{
@@ -311,33 +236,41 @@ namespace Tetrium
 			switch (_state)
 			{
 			case Stopped:
-
 				// NOTE: This should never happen.
 				break;
 
 			case Waiting:
-
 				process_falldown_delay(&frames);
 				break;
 
 			case Falling:
-
-				if (horizontal)
-					_current_figure.move_horizontally(_field, process_horizontal_movement(frames));
-				process_falldown(&frames);
-				break;
-
 			case Fixing:
-
 				if (horizontal)
-					_current_figure.move_horizontally(_field, process_horizontal_movement(frames));
+				{
+					for (auto offset = process_horizontal_movement(frames); offset;)
+					{
+						auto figure = _current_figure;
+						if (offset > 0)
+						{
+							figure.move_right();
+							--offset;
+						}
+						else
+						{
+							figure.move_left();
+							++offset;
+						}
+						if (!_field.fit(figure))
+							break;
+						_current_figure = figure;
+					}
+				}
 				process_falldown(&frames);
-				if (frames)
+				if (_state == Fixing && frames)
 					process_fixation(&frames);
 				break;
 
 			case Finished:
-
 				frames = 0;
 				break;
 			}
@@ -368,7 +301,12 @@ namespace Tetrium
 			if (_is_moving_left)
 			{
 				if (_state == Falling || _state == Fixing)
-					_current_figure.move_left(_field);
+				{
+					auto figure = _current_figure;
+					figure.move_left();
+					if (_field.fit(figure))
+						_current_figure = figure;
+				}
 				_left_movement_timer = HMoveInterval - HMoveDelay;
 			}
 		}
@@ -382,7 +320,12 @@ namespace Tetrium
 			if (_is_moving_right)
 			{
 				if (_state == Falling || _state == Fixing)
-					_current_figure.move_right(_field);
+				{
+					auto figure = _current_figure;
+					figure.move_right();
+					if (_field.fit(figure))
+						_current_figure = figure;
+				}
 				_right_movement_timer = HMoveInterval - HMoveDelay;
 			}
 		}
@@ -391,7 +334,7 @@ namespace Tetrium
 	void Game::start(int start_level)
 	{
 		_field = {};
-		_next_figure = Figure(random_figure_type());
+		_next_figure = Figure(static_cast<Figure::Type>(std::rand() % Figure::Count));
 		_time_remainder = 0;
 
 		_is_accelerating = false;
@@ -414,21 +357,49 @@ namespace Tetrium
 
 	bool Game::turn_left()
 	{
-		return (_state == Falling || _state == Fixing) && _current_figure.turn_left(_field);
+		if (_state != Falling && _state != Fixing)
+			return false;
+		auto figure = _current_figure;
+		figure.turn_left();
+		if (!_field.fit(figure))
+			return false;
+		_current_figure = figure;
+		return true;
 	}
 
 	bool Game::turn_right()
 	{
-		return (_state == Falling || _state == Fixing) && _current_figure.turn_right(_field);
+		if (_state != Falling && _state != Fixing)
+			return false;
+		auto figure = _current_figure;
+		figure.turn_right();
+		if (!_field.fit(figure))
+			return false;
+		_current_figure = figure;
+		return true;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void Game::process_falldown(int* frames)
 	{
-		int speed = (_is_accelerating && _speed < AccelerationSpeed) ? AccelerationSpeed : _speed;
-		int distance = *frames * speed;
-		int actual_distance = _current_figure.move_down(_field, distance);
+		const auto speed = (_is_accelerating && _speed < AccelerationSpeed) ? AccelerationSpeed : _speed;
+		const auto expected_distance = *frames * speed;
+
+		auto actual_distance = expected_distance;
+		for (const auto& block : _current_figure.blocks())
+		{
+			actual_distance = std::min(actual_distance, block.y);
+			for (auto row = std::min(block.y / PointsPerRow, Field::Height - 1); row > 0; --row)
+			{
+				if (_field.blocks[row - 1][block.x] != Figure::None)
+				{
+					actual_distance = std::min(actual_distance, block.y - row * PointsPerRow);
+					break;
+				}
+			}
+		}
+		_current_figure.move_down(actual_distance);
 
 		if (actual_distance)
 		{
@@ -439,7 +410,7 @@ namespace Tetrium
 
 		// The division throws away the entire contact frame, but it can't be helped.
 
-		int remaining_frames = (distance - actual_distance) / speed;
+		int remaining_frames = (expected_distance - actual_distance) / speed;
 		*frames = remaining_frames;
 
 		if (remaining_frames && _state != Fixing)
@@ -472,8 +443,8 @@ namespace Tetrium
 		{
 			_state = Falling;
 			_current_figure = _next_figure;
-			_current_figure.move((Field::Width - MaxFigureWidth) / 2, Field::Height * PointsPerRow);
-			_next_figure = Figure(random_figure_type());
+			_current_figure.put_at({ (Field::Width - MaxFigureWidth) / 2, Field::Height * PointsPerRow });
+			_next_figure = Figure(static_cast<Figure::Type>(std::rand() % Figure::Count));
 		}
 	}
 
@@ -518,7 +489,7 @@ namespace Tetrium
 
 		static int score_table[] = { 0, 40, 100, 300, 1200 };
 
-		int lines = _field.collapse_full_rows();
+		const auto lines = _field.collapse_full_rows();
 		_score += score_table[lines] * _level;
 		_lines += lines;
 		_level += _lines / Field::Width - (_lines - lines) / Field::Width;
@@ -549,11 +520,5 @@ namespace Tetrium
 		}
 
 		return offset;
-	}
-
-	Figure::Type Game::random_figure_type()
-	{
-		_random = _random * 1664525 + 1013904223; // Knuth & Lewis roll for unsigned 32-bit numbers.
-		return static_cast<Figure::Type>(_random % Figure::Count);
 	}
 }

@@ -21,8 +21,6 @@ namespace Tetrium
 		Point(int x, int y) : x(x), y(y) {}
 	};
 
-	class Field;
-
 	// Data representing the falling tetromino.
 	class Figure
 	{
@@ -46,17 +44,14 @@ namespace Tetrium
 		Figure(Type = None);
 
 		std::array<Point, 4> blocks() const;
-		void move(int x, int y);
-		int move_down(const Field&, int distance);
-		bool move_horizontally(const Field&, int cells);
-		bool move_left(const Field&);
-		bool move_right(const Field&);
-		bool turn_left(const Field&);
-		bool turn_right(const Field&);
+		void put_at(const Point& point) { _offset = point; }
+		void move_down(int points) { _offset.y -= points; }
+		void move_left() { _offset.x -= 1; }
+		void move_right() { _offset.x += 1; }
+		int row_offset() const { return _offset.y % PointsPerRow; }
+		void turn_left();
+		void turn_right();
 		Type type() const { return _type; }
-
-	private:
-		bool fit(const Field&);
 
 	private:
 		Type _type;
@@ -83,6 +78,7 @@ namespace Tetrium
 
 		int collapse_full_rows();
 		bool is_overflown() const;
+		bool fit(Figure&) const;
 		void put_figure(const Figure&);
 
 	private:
@@ -162,7 +158,6 @@ namespace Tetrium
 		void process_fixation(int* frames);
 		void update_score();
 		int process_horizontal_movement(int frames);
-		Figure::Type random_figure_type();
 
 	private:
 
