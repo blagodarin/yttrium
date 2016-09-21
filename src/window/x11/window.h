@@ -9,15 +9,14 @@
 namespace Yttrium
 {
 	class Point;
-	class StaticString;
+	class ScreenImpl;
+	class String;
 	class WindowBackendCallbacks;
 
 	class WindowBackend
 	{
 	public:
-		static UniquePtr<WindowBackend> create(Allocator&, ::Display*, int screen, const StaticString& name, WindowBackendCallbacks&);
-
-		WindowBackend(Allocator&, ::Display*, GlContext&&, ::Window, const StaticString& name, WindowBackendCallbacks&);
+		WindowBackend(const ScreenImpl&, const String& name, WindowBackendCallbacks&, Allocator&);
 		~WindowBackend();
 
 		void close();
@@ -32,7 +31,7 @@ namespace Yttrium
 
 		::Display* const _display;
 		const GlContext _glx;
-		::Window _window;
+		::Window _window; // TODO: Prevent resource leak if _empty_cursor construction throws.
 		const UniquePtr<EmptyCursor> _empty_cursor;
 		::Atom _wm_protocols = None;
 		::Atom _wm_delete_window = None;

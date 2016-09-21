@@ -2,8 +2,9 @@
 
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/static_string.h>
+#include <yttrium/string.h>
 #include "../backend.h"
+#include "screen.h"
 
 #include <cstring>
 
@@ -13,6 +14,29 @@ namespace Yttrium
 {
 	namespace
 	{
+		::Window create_window(::Display* display, int screen, const GlContext& glx)
+		{
+			const auto root_window = RootWindow(display, screen);
+
+			::XSetWindowAttributes swa;
+			swa.colormap = ::XCreateColormap(display, root_window, glx.visual_info()->visual, AllocNone);
+			swa.background_pixmap = None;
+			swa.border_pixel = 0;
+			swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
+
+			const auto window = ::XCreateWindow(display, root_window,
+				0, 0, 1, 1, 0, glx.visual_info()->depth, InputOutput, glx.visual_info()->visual,
+				CWBorderPixel | CWColormap | CWEventMask, &swa);
+
+			if (window == None)
+			{
+				::XFreeColormap(display, swa.colormap);
+				throw std::runtime_error("Failed to create an X11 window");
+			}
+
+			return window;
+		}
+
 		Key key_from_event(::XEvent& event)
 		{
 			::KeySym key_sym = ::XLookupKeysym(&event.xkey, 0);
@@ -138,36 +162,10 @@ namespace Yttrium
 		::Cursor _cursor = None;
 	};
 
-	UniquePtr<WindowBackend> WindowBackend::create(Allocator& allocator, ::Display* display, int screen, const StaticString& name, WindowBackendCallbacks& callbacks)
-	{
-		GlContext glx(display, screen);
-
-		const auto root_window = RootWindow(display, screen);
-
-		::XSetWindowAttributes swa;
-		swa.colormap = ::XCreateColormap(display, root_window, glx.visual_info()->visual, AllocNone);
-		swa.background_pixmap = None;
-		swa.border_pixel = 0;
-		swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
-
-		const auto window = ::XCreateWindow(display, root_window,
-			0, 0, 1, 1, 0, glx.visual_info()->depth, InputOutput, glx.visual_info()->visual,
-			CWBorderPixel | CWColormap | CWEventMask, &swa);
-
-		if (window == None)
-		{
-			::XFreeColormap(display, swa.colormap);
-			throw std::runtime_error("Failed to create an X11 window");
-		}
-
-		glx.bind(window);
-		return make_unique<WindowBackend>(allocator, allocator, display, std::move(glx), window, name, callbacks);
-	}
-
-	WindowBackend::WindowBackend(Allocator& allocator, ::Display* display, GlContext&& glx, ::Window window, const StaticString& name, WindowBackendCallbacks& callbacks)
-		: _display(display)
-		, _glx(std::move(glx))
-		, _window(window)
+	WindowBackend::WindowBackend(const ScreenImpl& screen, const String& name, WindowBackendCallbacks& callbacks, Allocator& allocator)
+		: _display(screen.display())
+		, _glx(screen.display(), screen.screen())
+		, _window(create_window(screen.display(), screen.screen(), _glx))
 		, _empty_cursor(make_unique<EmptyCursor>(allocator, _display, _window))
 		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
 		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
@@ -183,6 +181,8 @@ namespace Yttrium
 
 		// Show window in fullscreen mode.
 		::XChangeProperty(_display, _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
+
+		_glx.bind(_window);
 
 		// Force vsync.
 		if (_glx->EXT_swap_control)
@@ -219,7 +219,7 @@ namespace Yttrium
 		if (!::XQueryPointer(_display, _window, &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
-		cursor = {window_x, window_y};
+		cursor = { window_x, window_y };
 
 		return true;
 	}
@@ -272,11 +272,12 @@ namespace Yttrium
 
 			case ConfigureNotify:
 				_has_size = true;
-				_callbacks.on_resize_event({event.xconfigure.width, event.xconfigure.height});
+				_callbacks.on_resize_event({ event.xconfigure.width, event.xconfigure.height });
 				break;
 
 			case ClientMessage:
-				if (event.xclient.message_type == _wm_protocols && event.xclient.data.l[0] == static_cast<long>(_wm_delete_window))
+				if (event.xclient.message_type == _wm_protocols
+					&& event.xclient.data.l[0] == static_cast<long>(_wm_delete_window))
 				{
 					close();
 					return false;

@@ -8,20 +8,13 @@
 
 namespace Yttrium
 {
-	class Allocator;
-
-	template <typename> class UniquePtr;
-
 	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);
 
 	class ScreenImpl : public Screen
 	{
 	public:
-
-		static UniquePtr<ScreenImpl> open(Allocator&);
-
-		ScreenImpl(P_Display&& display);
-		~ScreenImpl() override;
+		ScreenImpl();
+		~ScreenImpl() override = default;
 
 		ScreenMode current_mode() const override;
 		ScreenMode default_mode() const override;
@@ -31,7 +24,7 @@ namespace Yttrium
 
 	private:
 		const P_Display _display;
-		const int _screen;
+		const int _screen = DefaultScreen(_display.get());
 	};
 }
 

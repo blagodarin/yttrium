@@ -1,37 +1,31 @@
 #include "screen.h"
 
-#include <yttrium/memory/unique_ptr.h>
-
 #include <stdexcept>
 
 #include <X11/extensions/Xrandr.h>
 
 namespace Yttrium
 {
-	using P_XRRScreenConfiguration = Y_UNIQUE_PTR(::XRRScreenConfiguration, ::XRRFreeScreenConfigInfo);
-
-	UniquePtr<ScreenImpl> ScreenImpl::open(Allocator& allocator)
+	namespace
 	{
-		P_Display display(::XOpenDisplay(nullptr));
-		if (!display)
-			throw std::runtime_error("Failed to open the default X11 display");
+		using P_XRRScreenConfiguration = Y_UNIQUE_PTR(::XRRScreenConfiguration, ::XRRFreeScreenConfigInfo);
 
+		P_Display open_display()
+		{
+			P_Display display(::XOpenDisplay(nullptr));
+			if (!display)
+				throw std::runtime_error("Failed to open the default X11 display");
+			return display;
+		}
+	}
+
+	ScreenImpl::ScreenImpl()
+		: _display(open_display())
+	{
 		int event_base = 0;
 		int error_base = 0;
-		if (!::XRRQueryExtension(display.get(), &event_base, &error_base))
+		if (!::XRRQueryExtension(_display.get(), &event_base, &error_base))
 			throw std::runtime_error("XRandR is unavailable");
-
-		return make_unique<ScreenImpl>(allocator, std::move(display));
-	}
-
-	ScreenImpl::ScreenImpl(P_Display&& display)
-		: _display(std::move(display))
-		, _screen(DefaultScreen(_display.get()))
-	{
-	}
-
-	ScreenImpl::~ScreenImpl()
-	{
 	}
 
 	ScreenMode ScreenImpl::current_mode() const
@@ -45,7 +39,7 @@ namespace Yttrium
 		const int size_index = ::XRRConfigCurrentConfiguration(config.get(), &rotation);
 
 		ScreenMode mode;
-		mode.resolution = {sizes[size_index].width, sizes[size_index].height};
+		mode.resolution = { sizes[size_index].width, sizes[size_index].height };
 		mode.frequency = ::XRRConfigCurrentRate(config.get());
 
 		return mode;
@@ -64,7 +58,7 @@ namespace Yttrium
 		short* rates = ::XRRConfigRates(config.get(), size_index, &nrates);
 
 		ScreenMode mode;
-		mode.resolution = {sizes[size_index].width, sizes[size_index].height};
+		mode.resolution = { sizes[size_index].width, sizes[size_index].height };
 		mode.frequency = rates[0];
 
 		return mode;

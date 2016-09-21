@@ -11,16 +11,9 @@
 
 void Game::run()
 {
-	_window = Window::create("Yttrium 3D example", *this);
-	if (!_window)
-		return;
-
-	_cube = make_unique<CubeModel>(*DefaultAllocator, _window->renderer());
-	_chessboard = make_unique<ChessboardModel>(*DefaultAllocator, _window->renderer());
-
-	_window->lock_cursor(true);
-	_window->show();
-	_window->run();
+	_window.lock_cursor(true);
+	_window.show();
+	_window.run();
 }
 
 void Game::on_cursor_movement(const Point& movement)
@@ -35,7 +28,7 @@ void Game::on_key_event(const KeyEvent& event)
 	{
 	case Key::Escape:
 		if (event.pressed)
-			_window->close();
+			_window.close();
 		break;
 
 	case Key::A:
@@ -61,7 +54,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 	case Key::F10: // KDE grabs Key::Print. =(
 		if (event.pressed)
-			_window->take_screenshot(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+			_window.take_screenshot(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 		break;
 
 	default: // To avoid compiler warnings.
@@ -77,21 +70,21 @@ void Game::on_render(Renderer& renderer, const PointF&)
 		PushTransformation camera(renderer, Matrix4::camera(_position, _rotation));
 
 		// Center.
-		_cube->draw({0, 0, 0});
+		_cube.draw({0, 0, 0});
 
 		// X direction -- one cube.
-		_cube->draw({2, 0, 0});
+		_cube.draw({2, 0, 0});
 
 		// Y direction -- two cubes.
-		_cube->draw({0, 2, 0});
-		_cube->draw({0, 4, 0});
+		_cube.draw({0, 2, 0});
+		_cube.draw({0, 4, 0});
 
 		// Z direction -- three cubes.
-		_cube->draw({0, 0, 2});
-		_cube->draw({0, 0, 4});
-		_cube->draw({0, 0, 6});
+		_cube.draw({0, 0, 2});
+		_cube.draw({0, 0, 4});
+		_cube.draw({0, 0, 6});
 
-		_chessboard->draw({0, 0, 0});
+		_chessboard.draw({0, 0, 0});
 	}
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);

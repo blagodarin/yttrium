@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_window_h_
 #define _include_yttrium_window_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/memory/unique_ptr.h>
 
 namespace Yttrium
 {
@@ -17,8 +17,6 @@ namespace Yttrium
 	class Size;
 	class StaticString;
 	class String;
-
-	template <typename> class UniquePtr;
 
 	///
 	struct UpdateEvent
@@ -75,50 +73,54 @@ namespace Yttrium
 	{
 	public:
 
-		/// Creates a Window.
-		static UniquePtr<Window> create(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
-
-		Window() = default;
-		virtual ~Window() = default;
+		///
+		/// \throws std::runtime_error If unable to create a Window.
+		Window(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
 
 		///
-		virtual void close() = 0;
+		void close();
 
 		///
-		virtual Point cursor() const = 0;
+		Point cursor() const;
 
 		///
-		virtual bool is_cursor_locked() const = 0;
+		bool is_cursor_locked() const;
 
 		///
-		virtual bool is_shift_pressed() const = 0;
+		bool is_shift_pressed() const;
 
 		///
-		virtual void lock_cursor(bool lock) = 0;
+		void lock_cursor(bool lock);
 
 		///
-		virtual Renderer& renderer() = 0;
+		Renderer& renderer();
 
 		///
-		virtual void run() = 0;
+		void run();
 
 		///
-		virtual Screen& screen() = 0;
+		Screen& screen();
 
 		///
-		virtual bool set_cursor(const Point& cursor) = 0;
+		bool set_cursor(const Point& cursor);
 
 		///
-		virtual void show() = 0;
+		void show();
 
 		///
-		virtual Size size() const = 0;
+		Size size() const;
 
 		/// Take a screenshot.
 		/// \param name
 		/// \note The screenshot would be actually taken at the end of the frame
 		/// and saved in the PNG format.
-		virtual void take_screenshot(const StaticString& name) = 0;
+		void take_screenshot(const StaticString& name);
+
+	private:
+		const UniquePtr<class WindowPrivate> _private;
+
+	public:
+		~Window();
 	};
 }
 

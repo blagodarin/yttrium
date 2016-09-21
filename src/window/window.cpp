@@ -1,11 +1,10 @@
-#include "window.h"
+#include <yttrium/window.h>
 
-#include <yttrium/log.h>
-#include <yttrium/math/matrix.h>
+#include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/timer.h>
-#include "../gui/gui.h"
 #include "../renderer/renderer.h"
+#include "backend.h"
 
 #if Y_PLATFORM_POSIX
 	#include "x11/screen.h"
@@ -32,86 +31,176 @@ namespace Yttrium
 	{
 	}
 
-	UniquePtr<Window> Window::create(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
+	class WindowPrivate : private WindowBackendCallbacks
 	{
-		try
+	public:
+		WindowCallbacks& _callbacks;
+		Allocator& _allocator;
+		const String _name;
+		ScreenImpl _screen;
+		WindowBackend _backend{ _screen, _name, *this, _allocator };
+		const UniquePtr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator);
+		bool _is_active = false;
+		Point _cursor;
+		bool _is_cursor_locked = false;
+		Size _size;
+		bool _fullscreen = false;
+		bool _keys[KeyCount];
+		String _screenshot_filename{ &_allocator };
+		Image _screenshot_image{ _allocator };
+
+		WindowPrivate(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
+			: _callbacks(callbacks)
+			, _allocator(allocator)
+			, _name(name, &_allocator)
 		{
-			return make_unique<WindowImpl>(allocator, name, callbacks, allocator);
+			for (bool& pressed : _keys)
+				pressed = false;
+
+			ImageFormat screenshot_format;
+			screenshot_format.set_pixel_format(PixelFormat::Rgb, 24);
+			screenshot_format.set_orientation(ImageOrientation::XRightYUp);
+			_screenshot_image.set_format(screenshot_format); // TODO: Get the proper format from the renderer.
 		}
-		catch (const std::runtime_error& e)
+
+		void lock_cursor(bool lock)
 		{
-			Log() << "Unable to create a Window: "_s << e.what();
-			return {};
+			_is_cursor_locked = lock;
+			if (_is_cursor_locked && _is_active)
+			{
+				_cursor = Rect(_size).center();
+				_backend.set_cursor(_cursor);
+			}
 		}
-	}
 
-	WindowImpl::WindowImpl(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
-		: _callbacks(callbacks)
-		, _allocator(allocator)
-		, _screen(ScreenImpl::open(_allocator))
-		, _backend(WindowBackend::create(_allocator, _screen->display(), _screen->screen(), name, *this))
-		, _renderer(RendererImpl::create(*_backend, _allocator))
-		, _screenshot_filename(&_allocator)
-		, _screenshot_image(_allocator)
-	{
-		for (bool& pressed : _keys)
-			pressed = false;
-
-		ImageFormat screenshot_format;
-		screenshot_format.set_pixel_format(PixelFormat::Rgb, 24);
-		screenshot_format.set_orientation(ImageOrientation::XRightYUp);
-		_screenshot_image.set_format(screenshot_format); // TODO: Get the proper format from the renderer.
-	}
-
-	WindowImpl::~WindowImpl() = default;
-
-	void WindowImpl::close()
-	{
-		_backend->close();
-	}
-
-	bool WindowImpl::is_shift_pressed() const
-	{
-		return _keys[KeyType(Key::LShift)] || _keys[KeyType(Key::RShift)];
-	}
-
-	void WindowImpl::lock_cursor(bool lock)
-	{
-		_is_cursor_locked = lock;
-		if (_is_cursor_locked && _is_active)
+		bool process_events()
 		{
-			_cursor = Rect(_size).center();
-			_backend->set_cursor(_cursor);
+			if (!_backend.process_events())
+				return false;
+
+			if (!_is_active)
+				return true;
+
+			Point cursor = Rect(_size).center();
+			_backend.get_cursor(cursor);
+
+			const Point movement(_cursor.x() - cursor.x(), cursor.y() - _cursor.y());
+
+			if (!_is_cursor_locked)
+				_cursor = Rect(_size).bound(cursor);
+			else
+				_backend.set_cursor(_cursor);
+
+			_callbacks.on_cursor_movement(movement);
+
+			return true;
 		}
-	}
 
-	Renderer& WindowImpl::renderer()
+		void set_active(bool active)
+		{
+			_is_active = active;
+			lock_cursor(_is_cursor_locked);
+		}
+
+	private:
+		void on_focus_event(bool is_focused) override
+		{
+			set_active(is_focused);
+		}
+
+		void on_key_event(Key key, bool is_pressed) override
+		{
+			bool& was_pressed = _keys[static_cast<KeyType>(key)];
+
+			KeyEvent event(key, is_pressed, is_pressed && was_pressed);
+
+			if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
+				was_pressed = is_pressed;
+
+			if (_keys[static_cast<KeyType>(Key::LShift)] || _keys[static_cast<KeyType>(Key::RShift)])
+				event.modifiers |= KeyEvent::Shift;
+
+			if (_keys[static_cast<KeyType>(Key::LControl)] || _keys[static_cast<KeyType>(Key::RControl)])
+				event.modifiers |= KeyEvent::Control;
+
+			if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
+				event.modifiers |= KeyEvent::Alt;
+
+			_callbacks.on_key_event(event);
+		}
+
+		void on_resize_event(const Size& size) override
+		{
+			_size = size;
+			_renderer->set_window_size(_size);
+			if (!_is_cursor_locked)
+			{
+				auto cursor = Rect(_size).center();
+				_backend.get_cursor(cursor);
+				_cursor = Rect(_size).bound(cursor);
+			}
+			else
+				lock_cursor(true);
+		}
+	};
+
+	Window::Window(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
+		: _private(make_unique<WindowPrivate>(allocator, name, callbacks, allocator))
 	{
-		return *_renderer;
 	}
 
-	void WindowImpl::run()
+	void Window::close()
+	{
+		_private->_backend.close();
+	}
+
+	Point Window::cursor() const
+	{
+		return _private->_cursor;
+	}
+
+	bool Window::is_cursor_locked() const
+	{
+		return _private->_is_cursor_locked;
+	}
+
+	bool Window::is_shift_pressed() const
+	{
+		return _private->_keys[KeyType(Key::LShift)] || _private->_keys[KeyType(Key::RShift)];
+	}
+
+	void Window::lock_cursor(bool lock)
+	{
+		_private->lock_cursor(lock);
+	}
+
+	Renderer& Window::renderer()
+	{
+		return *_private->_renderer;
+	}
+
+	void Window::run()
 	{
 		UpdateEvent update;
 		int frames = 0;
 		int max_frame_time = 0;
 		auto clock = Timer::clock();
 		auto fps_time = clock;
-		while (process_events())
+		while (_private->process_events())
 		{
-			_callbacks.on_update(update);
+			_private->_callbacks.on_update(update);
 			{
-				_renderer->clear();
-				PushGpuProgram gpu_program(*_renderer, _renderer->program_2d());
-				Push2D projection(*_renderer);
-				_callbacks.on_render(*_renderer, PointF(_cursor));
+				_private->_renderer->clear();
+				PushGpuProgram gpu_program(*_private->_renderer, _private->_renderer->program_2d());
+				Push2D projection(*_private->_renderer);
+				_private->_callbacks.on_render(*_private->_renderer, PointF(_private->_cursor));
 			}
-			_backend->swap_buffers();
-			if (!_screenshot_filename.is_empty())
+			_private->_backend.swap_buffers();
+			if (!_private->_screenshot_filename.is_empty())
 			{
-				_renderer->take_screenshot(_screenshot_image);
-				_screenshot_image.save(_screenshot_filename, ImageType::Png);
-				_screenshot_filename.clear();
+				_private->_renderer->take_screenshot(_private->_screenshot_image);
+				_private->_screenshot_image.save(_private->_screenshot_filename, ImageType::Png);
+				_private->_screenshot_filename.clear();
 			}
 			++frames;
 			update.milliseconds = Timer::clock() - clock;
@@ -126,7 +215,7 @@ namespace Yttrium
 				frames = 0;
 				max_frame_time = 0;
 			}
-			const auto& renderer_statistics = _renderer->reset_statistics();
+			const auto& renderer_statistics = _private->_renderer->reset_statistics();
 			update.triangles = renderer_statistics._triangles;
 			update.draw_calls = renderer_statistics._draw_calls;
 			update.texture_switches = renderer_statistics._texture_switches;
@@ -136,98 +225,34 @@ namespace Yttrium
 		}
 	}
 
-	Screen& WindowImpl::screen()
+	Screen& Window::screen()
 	{
-		return *_screen;
+		return _private->_screen;
 	}
 
-	bool WindowImpl::set_cursor(const Point& cursor)
+	bool Window::set_cursor(const Point& cursor)
 	{
-		if (_is_cursor_locked || !Rect(_size).contains(cursor) || !_backend->set_cursor(cursor))
+		if (_private->_is_cursor_locked || !Rect(_private->_size).contains(cursor) || !_private->_backend.set_cursor(cursor))
 			return false;
-		_cursor = cursor;
+		_private->_cursor = cursor;
 		return true;
 	}
 
-	void WindowImpl::show()
+	void Window::show()
 	{
-		_backend->show();
-		set_active(true);
+		_private->_backend.show();
+		_private->set_active(true);
 	}
 
-	void WindowImpl::take_screenshot(const StaticString& name)
+	Size Window::size() const
 	{
-		_screenshot_filename = name;
+		return _private->_size;
 	}
 
-	void WindowImpl::on_focus_event(bool is_focused)
+	void Window::take_screenshot(const StaticString& name)
 	{
-		set_active(is_focused);
+		_private->_screenshot_filename = name;
 	}
 
-	void WindowImpl::on_key_event(Key key, bool is_pressed)
-	{
-		bool& was_pressed = _keys[static_cast<KeyType>(key)];
-
-		KeyEvent event(key, is_pressed, is_pressed && was_pressed);
-
-		if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
-			was_pressed = is_pressed;
-
-		if (_keys[static_cast<KeyType>(Key::LShift)] || _keys[static_cast<KeyType>(Key::RShift)])
-			event.modifiers |= KeyEvent::Shift;
-
-		if (_keys[static_cast<KeyType>(Key::LControl)] || _keys[static_cast<KeyType>(Key::RControl)])
-			event.modifiers |= KeyEvent::Control;
-
-		if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
-			event.modifiers |= KeyEvent::Alt;
-
-		_callbacks.on_key_event(event);
-	}
-
-	void WindowImpl::on_resize_event(const Size& size)
-	{
-		_size = size;
-		_renderer->set_window_size(_size);
-		if (!_is_cursor_locked)
-		{
-			auto cursor = Rect(_size).center();
-			_backend->get_cursor(cursor);
-			_cursor = Rect(_size).bound(cursor);
-		}
-		else
-		{
-			lock_cursor(true);
-		}
-	}
-
-	bool WindowImpl::process_events()
-	{
-		if (!_backend->process_events())
-			return false;
-
-		if (!_is_active)
-			return true;
-
-		Point cursor = Rect(_size).center();
-		_backend->get_cursor(cursor);
-
-		const Point movement(_cursor.x() - cursor.x(), cursor.y() - _cursor.y());
-
-		if (!_is_cursor_locked)
-			_cursor = Rect(_size).bound(cursor);
-		else
-			_backend->set_cursor(_cursor);
-
-		_callbacks.on_cursor_movement(movement);
-
-		return true;
-	}
-
-	void WindowImpl::set_active(bool active)
-	{
-		_is_active = active;
-		lock_cursor(_is_cursor_locked);
-	}
+	Window::~Window() = default;
 }

@@ -10,6 +10,15 @@ int main()
 	NamedAllocator i18n_allocator("i18n"_s);
 	const auto& localization = Localization::create("examples/tetrium/i18n/en.ion", i18n_allocator);
 
-	Game game;
-	game.run();
+	try
+	{
+		Game game;
+		game.run();
+		return 0;
+	}
+	catch (const std::runtime_error& e)
+	{
+		Log() << "Runtime error: " << e.what();
+		return 1;
+	}
 }

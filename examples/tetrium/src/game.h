@@ -1,29 +1,23 @@
 #ifndef _examples_tetrium_game_h_
 #define _examples_tetrium_game_h_
 
+#include <yttrium/audio/manager.h>
 #include <yttrium/bindings.h>
 #include <yttrium/console.h>
+#include <yttrium/gui.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/memory/named_allocator.h>
 #include <yttrium/memory/shared_ptr.h>
+#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
 #include <yttrium/window.h>
 
+#include "cursor.h"
 #include "tetrium.h"
 
-namespace Yttrium
-{
-	class AudioManager;
-	class Gui;
-	class Texture2D;
-	class TextureCache;
-}
-
 using namespace Yttrium;
-
-class Cursor;
 
 class Game : public WindowCallbacks
 {
@@ -55,18 +49,18 @@ private:
 	NamedAllocator _allocator{ "game" };
 	StdVector<NamedAllocatorInfo> _memory_statistics{ _allocator };
 	NamedAllocator _script_allocator{ "script" };
-	ScriptContext _script;
+	ScriptContext _script{ &_script_allocator };
 	NamedAllocator _audio_allocator{ "audio" };
-	UniquePtr<AudioManager> _audio;
+	const UniquePtr<AudioManager> _audio = AudioManager::create({}, {}, _audio_allocator);
 	NamedAllocator _window_allocator{ "window" };
-	UniquePtr<Window> _window;
+	Window _window{ "Tetrium", *this, _window_allocator };
 	Console _console{ _script, _allocator };
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024, &_allocator };
 	NamedAllocator _gui_allocator{ "gui" };
-	UniquePtr<Gui> _gui;
-	UniquePtr<Cursor> _cursor;
-	UniquePtr<TextureCache> _texture_cache;
+	Gui _gui{ _window.renderer(), _script, _gui_allocator };
+	Cursor _cursor{ _window.renderer() };
+	UniquePtr<TextureCache> _texture_cache{ TextureCache::create(_window.renderer()) };
 	Bindings _bindings{ _script, _allocator };
 
 	SharedPtr<Texture2D> _block_texture;

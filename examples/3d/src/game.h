@@ -24,11 +24,11 @@ private:
 
 private:
 	StdVector<NamedAllocatorInfo> _memory_statistics{ *DefaultAllocator };
-	UniquePtr<Window> _window;
+	Window _window{ "Yttrium 3D example", *this };
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024 };
-	UniquePtr<CubeModel> _cube;
-	UniquePtr<ChessboardModel> _chessboard;
+	CubeModel _cube{ _window.renderer() };
+	ChessboardModel _chessboard{ _window.renderer() };
 
 	Vector4 _position{ -16, -16, 16 };
 	Euler _rotation{ 45, -30, 0 };

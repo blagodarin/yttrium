@@ -1,10 +1,8 @@
 #include "game.h"
 
-#include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/date_time.h>
 #include <yttrium/file.h>
-#include <yttrium/gui.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -16,16 +14,12 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
 #include <yttrium/timer.h>
 
-#include "cursor.h"
-
 Game::Game()
-	: _script(&_script_allocator)
-	, _statistics({
+	: _statistics({
 			{100000, String("John Placeholder", &_allocator)},
 			{50000, String("John Placeholder", &_allocator)},
 			{10000, String("John Placeholder", &_allocator)},
@@ -40,7 +34,7 @@ Game::Game()
 
 	_script.define("exit", [this](const ScriptCall&)
 	{
-		_window->close();
+		_window.close();
 	});
 
 	_script.define("game_pause", [this](const ScriptCall&)
@@ -96,13 +90,13 @@ Game::Game()
 	_script.define("pop_layer", 0, 1, [this](const ScriptCall& call)
 	{
 		const auto layers_to_pop = call.args.get_int(0, 1);
-		if (layers_to_pop > 0 && !_gui->pop_layers(layers_to_pop))
-			_window->close();
+		if (layers_to_pop > 0 && !_gui.pop_layers(layers_to_pop))
+			_window.close();
 	});
 
 	_script.define("push_layer", 1, [this](const ScriptCall& call)
 	{
-		_gui->push_layer(call.args.string(0));
+		_gui.push_layer(call.args.string(0));
 	});
 
 	_script.define("save_score", [this](const ScriptCall&)
@@ -122,7 +116,7 @@ Game::Game()
 	_script.define("screenshot", [this](const ScriptCall&)
 	{
 		TemporaryAllocator<28> allocator(NoAllocator);
-		_window->take_screenshot(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+		_window.take_screenshot(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 	});
 
 	_script.define("stop_music", [this](const ScriptCall&)
@@ -172,14 +166,6 @@ Game::~Game() = default;
 
 void Game::run()
 {
-	Log() << "Loading";
-
-	_window = Window::create("Tetrium", *this, _window_allocator);
-	if (!_window)
-		return;
-
-	_cursor = make_unique<Cursor>(_allocator, _window->renderer());
-
 	ScriptCode::load("tetrium.txt", _script.allocator()).execute(_script);
 
 	_bindings.bind_default(Key::_1, "play_music");
@@ -194,14 +180,11 @@ void Game::run()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_texture_cache = TextureCache::create(_window->renderer());
-
 	_game.set_random_seed(Timer::clock());
 
 	if (!load_blocks())
 		return;
 
-	_audio = AudioManager::create({}, {}, _audio_allocator);
 	if (_audio)
 	{
 		IonDocument data(_allocator);
@@ -227,31 +210,26 @@ void Game::run()
 		}
 	}
 
-	_gui = make_unique<Gui>(_gui_allocator, _window->renderer(), _script, _gui_allocator);
-	if (!_gui->load("examples/tetrium/data/gui.ion"))
+	if (!_gui.load("examples/tetrium/data/gui.ion"))
 		return;
 
-	_gui->set_canvas_handler("field", [this](Renderer& renderer, const RectF& rect)
+	_gui.set_canvas_handler("field", [this](Renderer& renderer, const RectF& rect)
 	{
 		PushTexture push_texture(renderer, _block_texture.get());
 		draw_field(renderer, rect);
 	});
 
-	_gui->set_canvas_handler("next", [this](Renderer& renderer, const RectF& rect)
+	_gui.set_canvas_handler("next", [this](Renderer& renderer, const RectF& rect)
 	{
 		PushTexture push_texture(renderer, _block_texture.get());
 		draw_next_figure(renderer, rect);
 	});
 
-	Log() << "Starting";
-
 	if (_audio)
 		_audio->player().play();
 
-	_window->show();
-	_window->run();
-
-	Log() << "Saving settings";
+	_window.show();
+	_window.run();
 
 	File settings_file("tetrium.txt", File::Write | File::Truncate, &_allocator);
 	if (settings_file)
@@ -305,7 +283,7 @@ void Game::on_key_event(const KeyEvent& event)
 	if (_console.process_key_event(event))
 		return;
 
-	if (_gui->process_key_event(event))
+	if (_gui.process_key_event(event))
 		return;
 
 	if (!event.autorepeat)
@@ -314,9 +292,9 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render(Renderer& renderer, const PointF& cursor)
 {
-	_gui->render(cursor);
+	_gui.render(cursor);
 	if (!_game_running)
-		_cursor->draw(cursor);
+		_cursor.draw(cursor);
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
 	_console.render(renderer);
@@ -351,7 +329,7 @@ void Game::on_update(const UpdateEvent& update)
 		if (_game.has_finished())
 		{
 			_game_running = false;
-			_gui->push_layer("game_over");
+			_gui.push_layer("game_over");
 		}
 	}
 }
