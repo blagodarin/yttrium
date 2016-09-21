@@ -11,12 +11,10 @@ namespace Yttrium
 	class KeyEvent;
 	class Point;
 	class PointF;
-	class RectF;
 	class Renderer;
 	class Screen;
 	class Size;
 	class StaticString;
-	class String;
 
 	///
 	struct UpdateEvent
@@ -65,14 +63,13 @@ namespace Yttrium
 		virtual void on_render(Renderer&, const PointF& cursor);
 
 		///
-		virtual void on_update(const UpdateEvent& update);
+		virtual void on_update(const UpdateEvent&);
 	};
 
 	///
 	class Y_API Window
 	{
 	public:
-
 		///
 		/// \throws std::runtime_error If unable to create a Window.
 		Window(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
