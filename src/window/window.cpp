@@ -7,11 +7,8 @@
 #include "backend.h"
 
 #if Y_PLATFORM_POSIX
-	#include "x11/screen.h"
 	#include "x11/window.h"
 #endif
-
-#include <stdexcept>
 
 namespace Yttrium
 {
@@ -37,8 +34,7 @@ namespace Yttrium
 		WindowCallbacks& _callbacks;
 		Allocator& _allocator;
 		const String _name;
-		ScreenImpl _screen;
-		WindowBackend _backend{ _screen, _name, *this, _allocator };
+		WindowBackend _backend{ _name, *this, _allocator };
 		const UniquePtr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator);
 		bool _is_active = false;
 		Point _cursor;
@@ -223,11 +219,6 @@ namespace Yttrium
 			update.shader_switches = renderer_statistics._shader_switches;
 			update.redundant_shader_switches = renderer_statistics._redundant_shader_switches;
 		}
-	}
-
-	Screen& Window::screen()
-	{
-		return _private->_screen;
 	}
 
 	bool Window::set_cursor(const Point& cursor)

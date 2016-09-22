@@ -4,7 +4,6 @@
 #include <yttrium/math/size.h>
 #include <yttrium/string.h>
 #include "../backend.h"
-#include "screen.h"
 
 #include <cstring>
 
@@ -14,6 +13,14 @@ namespace Yttrium
 {
 	namespace
 	{
+		P_Display open_display()
+		{
+			P_Display display(::XOpenDisplay(nullptr));
+			if (!display)
+				throw std::runtime_error("Failed to open the default X11 display");
+			return display;
+		}
+
 		::Window create_window(::Display* display, int screen, const GlContext& glx)
 		{
 			const auto root_window = RootWindow(display, screen);
@@ -162,31 +169,26 @@ namespace Yttrium
 		::Cursor _cursor = None;
 	};
 
-	WindowBackend::WindowBackend(const ScreenImpl& screen, const String& name, WindowBackendCallbacks& callbacks, Allocator& allocator)
-		: _display(screen.display())
-		, _glx(screen.display(), screen.screen())
-		, _window(create_window(screen.display(), screen.screen(), _glx))
-		, _empty_cursor(make_unique<EmptyCursor>(allocator, _display, _window))
-		, _wm_protocols(::XInternAtom(_display, "WM_PROTOCOLS", True))
-		, _wm_delete_window(::XInternAtom(_display, "WM_DELETE_WINDOW", True))
-		, _net_wm_state(::XInternAtom(_display, "_NET_WM_STATE", True))
-		, _net_wm_state_fullscreen(::XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", True))
+	WindowBackend::WindowBackend(const String& name, WindowBackendCallbacks& callbacks, Allocator& allocator)
+		: _display(open_display())
+		, _window(create_window(_display.get(), _screen, _glx))
+		, _empty_cursor(make_unique<EmptyCursor>(allocator, _display.get(), _window))
 		, _callbacks(callbacks)
 	{
-		::XSetWMProtocols(_display, _window, &_wm_delete_window, 1);
-		::XStoreName(_display, _window, name.text());
+		::XSetWMProtocols(_display.get(), _window, &_wm_delete_window, 1);
+		::XStoreName(_display.get(), _window, name.text());
 
 		// Hide system cursor.
-		::XDefineCursor(_display, _window, _empty_cursor->get());
+		::XDefineCursor(_display.get(), _window, _empty_cursor->get());
 
 		// Show window in fullscreen mode.
-		::XChangeProperty(_display, _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
+		::XChangeProperty(_display.get(), _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 
 		_glx.bind(_window);
 
 		// Force vsync.
 		if (_glx->EXT_swap_control)
-			_glx->SwapIntervalEXT(_display, _window, _glx->EXT_swap_control_tear ? -1 : 1);
+			_glx->SwapIntervalEXT(_display.get(), _window, _glx->EXT_swap_control_tear ? -1 : 1);
 	}
 
 	WindowBackend::~WindowBackend()
@@ -199,7 +201,7 @@ namespace Yttrium
 		if (_window == None)
 			return;
 		_glx.unbind();
-		::XDestroyWindow(_display, _window);
+		::XDestroyWindow(_display.get(), _window);
 		_window = None;
 	}
 
@@ -216,7 +218,7 @@ namespace Yttrium
 		int window_y = 0;
 		unsigned mask = 0;
 
-		if (!::XQueryPointer(_display, _window, &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
+		if (!::XQueryPointer(_display.get(), _window, &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
 		cursor = { window_x, window_y };
@@ -228,10 +230,10 @@ namespace Yttrium
 	{
 		if (_window == None)
 			return false;
-		while (!_has_size ||::XPending(_display) > 0)
+		while (!_has_size ||::XPending(_display.get()) > 0)
 		{
 			::XEvent event;
-			::XNextEvent(_display, &event); // TODO: Don't process events for all windows.
+			::XNextEvent(_display.get(), &event); // TODO: Don't process events for all windows.
 			switch (event.type)
 			{
 			case KeyPress:
@@ -292,8 +294,8 @@ namespace Yttrium
 	{
 		if (_window == None)
 			return false;
-		::XWarpPointer(_display, None, _window, 0, 0, 0, 0, cursor.x(), cursor.y());
-		::XSync(_display, False);
+		::XWarpPointer(_display.get(), None, _window, 0, 0, 0, 0, cursor.x(), cursor.y());
+		::XSync(_display.get(), False);
 		return true;
 	}
 
@@ -301,7 +303,7 @@ namespace Yttrium
 	{
 		if (_window == None)
 			return;
-		::XMapRaised(_display, _window);
+		::XMapRaised(_display.get(), _window);
 	}
 
 	void WindowBackend::swap_buffers()

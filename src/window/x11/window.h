@@ -2,6 +2,7 @@
 #define _src_window_x11_window_h_
 
 #include <yttrium/memory/unique_ptr.h>
+#include "../../utils/unique_ptr.h"
 #include "gl.h"
 
 #include <X11/Xlib.h>
@@ -9,14 +10,15 @@
 namespace Yttrium
 {
 	class Point;
-	class ScreenImpl;
 	class String;
 	class WindowBackendCallbacks;
+
+	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);
 
 	class WindowBackend
 	{
 	public:
-		WindowBackend(const ScreenImpl&, const String& name, WindowBackendCallbacks&, Allocator&);
+		WindowBackend(const String& name, WindowBackendCallbacks&, Allocator&);
 		~WindowBackend();
 
 		void close();
@@ -29,14 +31,15 @@ namespace Yttrium
 	private:
 		class EmptyCursor;
 
-		::Display* const _display;
-		const GlContext _glx;
+		const P_Display _display;
+		const int _screen = DefaultScreen(_display.get());
+		const GlContext _glx{ _display.get(), _screen };
 		::Window _window; // TODO: Prevent resource leak if _empty_cursor construction throws.
 		const UniquePtr<EmptyCursor> _empty_cursor;
-		::Atom _wm_protocols = None;
-		::Atom _wm_delete_window = None;
-		::Atom _net_wm_state = None;
-		::Atom _net_wm_state_fullscreen = None;
+		::Atom _wm_protocols = ::XInternAtom(_display.get(), "WM_PROTOCOLS", True);
+		::Atom _wm_delete_window = ::XInternAtom(_display.get(), "WM_DELETE_WINDOW", True);
+		::Atom _net_wm_state = ::XInternAtom(_display.get(), "_NET_WM_STATE", True);
+		::Atom _net_wm_state_fullscreen = ::XInternAtom(_display.get(), "_NET_WM_STATE_FULLSCREEN", True);
 		WindowBackendCallbacks& _callbacks;
 		bool _has_size = false;
 	};

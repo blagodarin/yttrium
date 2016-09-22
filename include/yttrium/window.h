@@ -12,7 +12,6 @@ namespace Yttrium
 	class Point;
 	class PointF;
 	class Renderer;
-	class Screen;
 	class Size;
 	class StaticString;
 
@@ -94,9 +93,6 @@ namespace Yttrium
 
 		///
 		void run();
-
-		///
-		Screen& screen();
 
 		///
 		bool set_cursor(const Point& cursor);
