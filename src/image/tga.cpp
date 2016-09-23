@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	TgaReader::TgaReader(const StaticString& name, Allocator* allocator)
+	TgaReader::TgaReader(const StaticString& name, Allocator& allocator)
 		: ImageReader(name, allocator)
 	{
 	}
@@ -73,7 +73,7 @@ namespace Yttrium
 		return _file.read(buffer, frame_size) == frame_size;
 	}
 
-	TgaWriter::TgaWriter(const StaticString& name, Allocator* allocator)
+	TgaWriter::TgaWriter(const StaticString& name, Allocator& allocator)
 		: ImageWriter(name, allocator)
 	{
 	}

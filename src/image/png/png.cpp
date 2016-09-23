@@ -4,21 +4,19 @@ namespace Yttrium
 {
 	namespace
 	{
-		void _png_write_callback(png_structp png_ptr, png_bytep data, png_size_t length)
+		void _png_write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
 		{
 			reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->write(data, length);
 		}
 
-		void _png_flush_callback(png_structp png_ptr)
+		void _png_flush_callback(png_struct* png_ptr)
 		{
 			reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->flush();
 		}
 	}
 
-	PngWriter::PngWriter(const StaticString& name, Allocator* allocator)
+	PngWriter::PngWriter(const StaticString& name, Allocator& allocator)
 		: ImageWriter(name, allocator)
-		, _png(nullptr)
-		, _info(nullptr)
 	{
 	}
 
@@ -152,11 +150,11 @@ namespace Yttrium
 			break;
 		}
 
-		png_bytepp rows = _allocator->allocate<png_bytep>(_format.height());
+		png_bytepp rows = _allocator.allocate<png_bytep>(_format.height());
 
 		if (setjmp(png_jmpbuf(_png)))
 		{
-			_allocator->deallocate(rows);
+			_allocator.deallocate(rows);
 			return false;
 		}
 
@@ -180,7 +178,7 @@ namespace Yttrium
 		png_set_rows(_png, _info, rows);
 		png_write_png(_png, _info, transforms, nullptr);
 
-		_allocator->deallocate(rows);
+		_allocator.deallocate(rows);
 
 		return true;
 	}

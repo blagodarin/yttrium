@@ -10,23 +10,20 @@ namespace Yttrium
 	class ImageReader
 	{
 	public:
-
 		virtual ~ImageReader() = default;
 
 		virtual bool open() = 0;
-		virtual bool read(void* buffer) = 0;
+		virtual bool read(void*) = 0;
 
 	public:
-
-		Allocator*  _allocator;
+		Allocator& _allocator;
 		ImageFormat _format;
-		File        _file;
+		File _file;
 
 	protected:
-
-		ImageReader(const StaticString& name, Allocator* allocator)
+		ImageReader(const StaticString& name, Allocator& allocator)
 			: _allocator(allocator)
-			, _file(name, allocator)
+			, _file(name, &allocator)
 		{
 		}
 	};
@@ -34,24 +31,21 @@ namespace Yttrium
 	class ImageWriter
 	{
 	public:
-
 		virtual ~ImageWriter() = default;
 
 		virtual bool open();
-		virtual bool set_format(const ImageFormat& format) = 0;
-		virtual bool write(const void* buffer) = 0;
+		virtual bool set_format(const ImageFormat&) = 0;
+		virtual bool write(const void*) = 0;
 
 	public:
-
-		Allocator*  _allocator;
+		Allocator& _allocator;
 		ImageFormat _format;
-		File        _file;
+		File _file;
 
 	protected:
-
-		ImageWriter(const StaticString& name, Allocator* allocator)
+		ImageWriter(const StaticString& name, Allocator& allocator)
 			: _allocator(allocator)
-			, _file(name, File::Write | File::Truncate, allocator)
+			, _file(name, File::Write | File::Truncate, &allocator)
 		{
 		}
 	};

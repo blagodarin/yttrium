@@ -3,6 +3,7 @@
 #include <yttrium/audio/player.h>
 #include <yttrium/date_time.h>
 #include <yttrium/file.h>
+#include <yttrium/image.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -115,8 +116,7 @@ Game::Game()
 
 	_script.define("screenshot", [this](const ScriptCall&)
 	{
-		TemporaryAllocator<28> allocator(NoAllocator);
-		_window.take_screenshot(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+		_window.take_screenshot();
 	});
 
 	_script.define("stop_music", [this](const ScriptCall&)
@@ -298,6 +298,12 @@ void Game::on_render(Renderer& renderer, const PointF& cursor)
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
 	_console.render(renderer);
+}
+
+void Game::on_screenshot(Image&& image)
+{
+	TemporaryAllocator<32> allocator(NoAllocator);
+	image.save(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"), ImageType::Auto, _allocator);
 }
 
 void Game::on_update(const UpdateEvent& update)

@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	JpegReader::JpegReader(const StaticString& name, Allocator* allocator)
+	JpegReader::JpegReader(const StaticString& name, Allocator& allocator)
 		: ImageReader(name, allocator)
 	{
 		_decompressor.err = jpeg_std_error(&_error_handler.pub);

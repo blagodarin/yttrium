@@ -216,19 +216,29 @@ namespace Yttrium
 		return { map_point(rect.top_left()), map_point(rect.bottom_right()) };
 	}
 
-	void GlRenderer::take_screenshot(Image& image)
+	Image GlRenderer::take_screenshot() const
 	{
 		const auto& size = window_size();
 
-		GLint unpack_alignment;
+		GLint unpack_alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
-		image.set_size(size.width(), size.height(), unpack_alignment);
 
-		GLint read_buffer;
+		ImageFormat format;
+		format.set_width(size.width());
+		format.set_height(size.height());
+		format.set_row_alignment(unpack_alignment);
+		format.set_pixel_format(PixelFormat::Rgb, 24);
+		format.set_orientation(ImageOrientation::XRightYUp);
+
+		Image image(format);
+
+		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
 		_gl.ReadPixels(0, 0, size.width(), size.height(), GL_RGB, GL_UNSIGNED_BYTE, image.data());
 		_gl.ReadBuffer(read_buffer);
+
+		return image;
 	}
 
 	void GlRenderer::flush_2d_impl(const Buffer& vertices, const Buffer& indices)

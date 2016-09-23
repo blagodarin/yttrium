@@ -24,6 +24,10 @@ namespace Yttrium
 	{
 	}
 
+	void WindowCallbacks::on_screenshot(Image&&)
+	{
+	}
+
 	void WindowCallbacks::on_update(const UpdateEvent&)
 	{
 	}
@@ -42,8 +46,7 @@ namespace Yttrium
 		Size _size;
 		bool _fullscreen = false;
 		bool _keys[KeyCount];
-		String _screenshot_filename{ &_allocator };
-		Image _screenshot_image{ _allocator };
+		bool _take_screenshot = false;
 
 		WindowPrivate(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
 			: _callbacks(callbacks)
@@ -52,11 +55,6 @@ namespace Yttrium
 		{
 			for (bool& pressed : _keys)
 				pressed = false;
-
-			ImageFormat screenshot_format;
-			screenshot_format.set_pixel_format(PixelFormat::Rgb, 24);
-			screenshot_format.set_orientation(ImageOrientation::XRightYUp);
-			_screenshot_image.set_format(screenshot_format); // TODO: Get the proper format from the renderer.
 		}
 
 		void lock_cursor(bool lock)
@@ -192,11 +190,10 @@ namespace Yttrium
 				_private->_callbacks.on_render(*_private->_renderer, PointF(_private->_cursor));
 			}
 			_private->_backend.swap_buffers();
-			if (!_private->_screenshot_filename.is_empty())
+			if (_private->_take_screenshot)
 			{
-				_private->_renderer->take_screenshot(_private->_screenshot_image);
-				_private->_screenshot_image.save(_private->_screenshot_filename, ImageType::Png);
-				_private->_screenshot_filename.clear();
+				_private->_take_screenshot = false;
+				_private->_callbacks.on_screenshot(_private->_renderer->take_screenshot());
 			}
 			++frames;
 			update.milliseconds = Timer::clock() - clock;
@@ -240,9 +237,9 @@ namespace Yttrium
 		return _private->_size;
 	}
 
-	void Window::take_screenshot(const StaticString& name)
+	void Window::take_screenshot()
 	{
-		_private->_screenshot_filename = name;
+		_private->_take_screenshot = true;
 	}
 
 	Window::~Window() = default;

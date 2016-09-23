@@ -33,8 +33,8 @@ namespace Yttrium
 
 		Allocator& allocator = _renderer.allocator();
 
-		Image image(allocator);
-		if (!image.load(name))
+		Image image;
+		if (!image.load(name, ImageType::Auto, allocator))
 			return {};
 
 		if (intensity && image.format().pixel_format() == PixelFormat::Gray)

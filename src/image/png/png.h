@@ -7,21 +7,19 @@
 
 namespace Yttrium
 {
-	class PngWriter: public ImageWriter
+	class PngWriter : public ImageWriter
 	{
 	public:
-
-		PngWriter(const StaticString& name, Allocator* allocator);
+		PngWriter(const StaticString& name, Allocator&);
 		~PngWriter() override;
 
 		bool open() override;
-		bool set_format(const ImageFormat& format) override;
-		bool write(const void* buffer) override;
+		bool set_format(const ImageFormat&) override;
+		bool write(const void*) override;
 
 	private:
-
-		png_structp _png;
-		png_infop   _info;
+		png_struct* _png = nullptr;
+		png_info* _info = nullptr;
 	};
 }
 

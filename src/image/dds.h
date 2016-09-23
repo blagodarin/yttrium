@@ -5,14 +5,13 @@
 
 namespace Yttrium
 {
-	class DdsReader: public ImageReader
+	class DdsReader : public ImageReader
 	{
 	public:
-
-		DdsReader(const StaticString& name, Allocator* allocator);
+		DdsReader(const StaticString& name, Allocator&);
 
 		bool open() override;
-		bool read(void* buffer) override;
+		bool read(void*) override;
 	};
 }
 

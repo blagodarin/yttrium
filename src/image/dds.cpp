@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	DdsReader::DdsReader(const StaticString& name, Allocator* allocator)
+	DdsReader::DdsReader(const StaticString& name, Allocator& allocator)
 		: ImageReader(name, allocator)
 	{
 	}

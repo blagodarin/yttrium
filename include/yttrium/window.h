@@ -8,6 +8,7 @@
 
 namespace Yttrium
 {
+	class Image;
 	class KeyEvent;
 	class Point;
 	class PointF;
@@ -61,6 +62,9 @@ namespace Yttrium
 		///
 		virtual void on_render(Renderer&, const PointF& cursor);
 
+		/// Called when a screenshot image is ready.
+		virtual void on_screenshot(Image&&);
+
 		///
 		virtual void on_update(const UpdateEvent&);
 	};
@@ -103,11 +107,8 @@ namespace Yttrium
 		///
 		Size size() const;
 
-		/// Take a screenshot.
-		/// \param name
-		/// \note The screenshot would be actually taken at the end of the frame
-		/// and saved in the PNG format.
-		void take_screenshot(const StaticString& name);
+		/// Requests a screenshot to be taken.
+		void take_screenshot();
 
 	private:
 		const UniquePtr<class WindowPrivate> _private;

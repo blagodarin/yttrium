@@ -85,14 +85,8 @@ namespace Yttrium
 		return true;
 	}
 
-	Image::Image(Allocator& allocator)
-		: _allocator(allocator)
-	{
-	}
-
-	Image::Image(const ImageFormat& format, Allocator& allocator)
-		: _allocator(allocator)
-		, _format(format)
+	Image::Image(const ImageFormat& format)
+		: _format(format)
 		, _buffer(_format.frame_size())
 	{
 	}
@@ -132,7 +126,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Image::load(const StaticString& name, ImageType type)
+	bool Image::load(const StaticString& name, ImageType type, Allocator& allocator)
 	{
 		if (type == ImageType::Auto)
 		{
@@ -152,11 +146,11 @@ namespace Yttrium
 		UniquePtr<ImageReader> reader;
 		switch (type)
 		{
-		case ImageType::Tga:  reader = make_unique<TgaReader>(_allocator, name, &_allocator); break;
+		case ImageType::Tga:  reader = make_unique<TgaReader>(allocator, name, allocator); break;
 	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: reader = make_unique<JpegReader>(_allocator, name, &_allocator); break;
+		case ImageType::Jpeg: reader = make_unique<JpegReader>(allocator, name, allocator); break;
 	#endif
-		case ImageType::Dds:  reader = make_unique<DdsReader>(_allocator, name, &_allocator); break;
+		case ImageType::Dds:  reader = make_unique<DdsReader>(allocator, name, allocator); break;
 		default:              return false;
 		}
 
@@ -168,7 +162,7 @@ namespace Yttrium
 		return reader->read(_buffer.data());
 	}
 
-	bool Image::save(const StaticString& name, ImageType type) const
+	bool Image::save(const StaticString& name, ImageType type, Allocator& allocator) const
 	{
 		if (type == ImageType::Auto)
 		{
@@ -186,9 +180,9 @@ namespace Yttrium
 		UniquePtr<ImageWriter> writer;
 		switch (type)
 		{
-		case ImageType::Tga: writer = make_unique<TgaWriter>(_allocator, name, &_allocator); break;
+		case ImageType::Tga: writer = make_unique<TgaWriter>(allocator, name, allocator); break;
 	#ifndef Y_NO_PNG
-		case ImageType::Png: writer = make_unique<PngWriter>(_allocator, name, &_allocator); break;
+		case ImageType::Png: writer = make_unique<PngWriter>(allocator, name, allocator); break;
 	#endif
 		default:             return false;
 		}

@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <yttrium/date_time.h>
+#include <yttrium/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/modifiers.h>
@@ -54,7 +55,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 	case Key::F10: // KDE grabs Key::Print. =(
 		if (event.pressed)
-			_window.take_screenshot(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
+			_window.take_screenshot();
 		break;
 
 	default: // To avoid compiler warnings.
@@ -88,6 +89,11 @@ void Game::on_render(Renderer& renderer, const PointF&)
 	}
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
+}
+
+void Game::on_screenshot(Image&& image)
+{
+	image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
 }
 
 void Game::on_update(const UpdateEvent& update)

@@ -145,13 +145,12 @@ namespace Yttrium
 	public:
 
 		///
-		Image(Allocator& = *DefaultAllocator);
+		Image() = default;
 
 		/// Allocate an image for the specified \a format.
 		/// \param format Image format.
-		/// \param allocator Image allocator.
 		/// \note The image data is left uninitialized.
-		Image(const ImageFormat&, Allocator& = *DefaultAllocator);
+		Image(const ImageFormat&);
 
 		///
 		void* data() noexcept { return _buffer.data(); }
@@ -164,10 +163,10 @@ namespace Yttrium
 		bool intensity_to_bgra();
 
 		///
-		bool load(const StaticString& name, ImageType = ImageType::Auto);
+		bool load(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator);
 
 		///
-		bool save(const StaticString& name, ImageType = ImageType::Auto) const;
+		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;
 
 		/// Change the format to \a format.
 		/// \param format New image format.
@@ -181,7 +180,6 @@ namespace Yttrium
 		bool swap_channels();
 
 	private:
-		Allocator& _allocator;
 		ImageFormat _format;
 		Buffer _buffer;
 

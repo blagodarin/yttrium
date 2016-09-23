@@ -20,6 +20,7 @@ private:
 	void on_cursor_movement(const Point& movement) override;
 	void on_key_event(const KeyEvent&) override;
 	void on_render(Renderer&, const PointF& cursor) override;
+	void on_screenshot(Image&&) override;
 	void on_update(const UpdateEvent&) override;
 
 private:

@@ -48,7 +48,7 @@ namespace Yttrium
 
 		virtual void clear() = 0;
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
-		virtual void take_screenshot(Image&) = 0;
+		virtual Image take_screenshot() const = 0;
 
 		Allocator& allocator() const { return _allocator; }
 		const Texture2D* debug_texture() const;
