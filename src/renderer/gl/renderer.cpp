@@ -245,13 +245,13 @@ namespace Yttrium
 	{
 		update_state();
 
-		if (vertices.size() > _2d_vbo.size())
-			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices.size(), vertices.data());
+		if (vertices.capacity() > _2d_vbo.size())
+			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices.capacity(), vertices.data());
 		else
 			_2d_vbo.write(0, vertices.size(), vertices.data());
 
-		if (indices.size() > _2d_ibo.size())
-			_2d_ibo.initialize(GL_DYNAMIC_DRAW, indices.size(), indices.data());
+		if (indices.capacity() > _2d_ibo.size())
+			_2d_ibo.initialize(GL_DYNAMIC_DRAW, indices.capacity(), indices.data());
 		else
 			_2d_ibo.write(0, indices.size(), indices.data());
 
