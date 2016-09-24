@@ -23,4 +23,3 @@
 * Examples:
 	* Tetrium:
 		- Pack the data at build time.
-		- Runtime block texture generation.

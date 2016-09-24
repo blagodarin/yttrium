@@ -182,9 +182,6 @@ void Game::run()
 
 	_game.set_random_seed(Timer::clock());
 
-	if (!load_blocks())
-		return;
-
 	if (_audio)
 	{
 		IonDocument data(_allocator);
@@ -215,13 +212,13 @@ void Game::run()
 
 	_gui.set_canvas_handler("field", [this](Renderer& renderer, const RectF& rect)
 	{
-		PushTexture push_texture(renderer, _block_texture.get());
+		PushTexture push_texture(renderer, _blocks.texture());
 		draw_field(renderer, rect);
 	});
 
 	_gui.set_canvas_handler("next", [this](Renderer& renderer, const RectF& rect)
 	{
-		PushTexture push_texture(renderer, _block_texture.get());
+		PushTexture push_texture(renderer, _blocks.texture());
 		draw_next_figure(renderer, rect);
 	});
 
@@ -240,42 +237,6 @@ void Game::run()
 			settings << "bind " << binding.first << " \"" << binding.second.escaped("\\\"", '\\', &_allocator) << "\"\n";
 		settings_file.write(settings.text(), settings.size());
 	}
-}
-
-bool Game::load_blocks()
-{
-	IonDocument data(_allocator);
-	if (!data.load("examples/tetrium/data/tetrium.ion"))
-		return false;
-
-	const IonObject* blocks;
-	if (!Ion::get(data.root(), "blocks", blocks))
-		return false;
-
-	const StaticString* block_texture_name;
-	if (!Ion::get(*blocks, "file", block_texture_name))
-		return false;
-	_block_texture = _texture_cache->load_texture_2d(*block_texture_name);
-	if (_block_texture)
-		_block_texture->set_filter(Texture2D::TrilinearFilter);
-
-	float block_size = 0;
-	if (!Ion::get(*blocks, "size", block_size))
-		return false;
-	_block_size = {block_size, block_size};
-
-	const IonNode& block_bases = blocks->last("base");
-	if (block_bases.size() != 8)
-		return false;
-
-	int index = 0;
-	for (const IonValue& value : block_bases)
-	{
-		if (!Ion::get(value, _block_coords[index++]))
-			return false;
-	}
-
-	return true;
 }
 
 void Game::on_key_event(const KeyEvent& event)
@@ -451,7 +412,7 @@ void Game::draw_next_figure(Renderer& renderer, const RectF& rect)
 void Game::set_texture_rect(Renderer& renderer, Tetrium::Figure::Type figure_type)
 {
 	const int figure_index = (figure_type == Tetrium::Figure::None) ? 0 : figure_type + 1;
-	renderer.set_texture_rect({_block_coords[figure_index], _block_size}, {});
+	renderer.set_texture_rect({ _blocks.block_coords(figure_index), _blocks.block_size() }, {});
 }
 
 void Game::update_statistics()

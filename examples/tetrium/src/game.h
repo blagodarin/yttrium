@@ -14,6 +14,7 @@
 #include <yttrium/std/map.h>
 #include <yttrium/window.h>
 
+#include "blocks.h"
 #include "cursor.h"
 #include "tetrium.h"
 
@@ -28,9 +29,6 @@ public:
 	void run();
 
 private:
-
-	bool load_blocks();
-
 	// WindowCallbacks
 	void on_key_event(const KeyEvent&) override;
 	void on_render(Renderer&, const PointF& cursor) override;
@@ -61,16 +59,10 @@ private:
 	NamedAllocator _gui_allocator{ "gui" };
 	Gui _gui{ _window.renderer(), _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };
-	UniquePtr<TextureCache> _texture_cache{ TextureCache::create(_window.renderer()) };
+	Blocks _blocks{ _window.renderer() };
 	Bindings _bindings{ _script, _allocator };
-
-	SharedPtr<Texture2D> _block_texture;
-	SizeF                _block_size;
-	PointF               _block_coords[8];
-
 	Tetrium::Game _game;
-	bool          _game_running = false;
-
+	bool _game_running = false;
 	StdMultimap<int, String> _statistics;
 };
 
