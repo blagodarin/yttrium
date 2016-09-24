@@ -313,7 +313,7 @@ def YttriumTranslation(env, translation, source_dir):
 
 def YttriumExample(env, name):
 	build_path = '$BUILD/examples/' + name
-	target = env.Program('bin/' + name, env.Glob(build_path + '/src/*.cpp'))
+	target = env.Program('bin/' + name, env.Glob(build_path + '/*.cpp'))
 	env.Clean(target, env.Dir(build_path))
 	Alias('examples', target)
 	return target
