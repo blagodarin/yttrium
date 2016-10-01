@@ -85,7 +85,9 @@ namespace Yttrium
 			return {};
 
 		const auto size = mode & File::Pipe ? 0 : ::lseek(descriptor, 0, SEEK_END);
-		assert(size != -1); // TODO: Throw.
+		if (size == -1)
+			throw std::system_error(errno, std::generic_category());
+
 		return make_unique<SystemFile>(allocator, std::move(name), mode, size, descriptor);
 	}
 

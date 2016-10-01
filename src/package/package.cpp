@@ -4,7 +4,7 @@
 #include <yttrium/memory/unique_ptr.h>
 #include "ypq.h"
 
-#include <cstdlib>
+#include <limits>
 
 namespace Yttrium
 {
@@ -15,27 +15,33 @@ namespace Yttrium
 
 	bool PackedFile::resize(uint64_t size)
 	{
-		return _package->resize(_base + size); // TODO: Prevent overflow.
+		if (size > std::numeric_limits<uint64_t>::max() - _base)
+			return false;
+		return _package->resize(_base + size);
 	}
 
 	size_t PackedFile::read(void*, size_t)
 	{
-		std::abort();
+		throw std::logic_error("Bad packed file operation");
 	}
 
 	size_t PackedFile::read(void* buffer, size_t size, uint64_t offset)
 	{
-		return _package->read(buffer, size, _base + offset); // TODO: Prevent overflow.
+		if (offset > std::numeric_limits<uint64_t>::max() - _base)
+			return 0;
+		return _package->read(buffer, size, _base + offset);
 	}
 
 	size_t PackedFile::write(const void*, size_t)
 	{
-		std::abort();
+		throw std::logic_error("Bad packed file operation");
 	}
 
 	size_t PackedFile::write(const void* buffer, size_t size, uint64_t offset)
 	{
-		const auto result = _package->write(buffer, size, _base + offset); // TODO: Prevent overflow.
+		if (offset > std::numeric_limits<uint64_t>::max() - _base)
+			return 0;
+		const auto result = _package->write(buffer, size, _base + offset);
 		_package->update_size(_base + offset + result);
 		return result;
 	}
