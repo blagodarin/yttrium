@@ -1,45 +1,68 @@
 #include "file.h"
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/package.h>
-#include <yttrium/string.h>
 #include <yttrium/utils.h>
-#include "../package/manager.h"
+
+#include <cassert>
+#include <new>
 
 namespace Yttrium
 {
-	File::~File()
+	FilePrivate::FilePrivate(String&& name, unsigned mode, uint64_t size)
+		: _name(std::move(name))
+		, _mode(mode)
+		, _size(size)
 	{
-		Private::release(&_private);
+		assert(_mode & File::ReadWrite);
 	}
 
-	File& File::operator=(File&& file)
+	void FilePrivate::update_size(uint64_t offset)
 	{
-		Private::move(_private, file._private);
-		_offset = file._offset;
-		_size = file._size;
-		_base = file._base;
-		return *this;
+		if (_size < offset)
+			_size = offset;
 	}
 
-	File::operator bool() const
+	File::File(const StaticString& path, unsigned mode, Allocator& allocator)
+		: _private(FilePrivate::open(path, mode, allocator))
 	{
-		return _private && (_private->_mode & ReadWrite);
 	}
 
-	File::File(const StaticString& name, Allocator* allocator)
-		: File(open_file_for_reading(name, *allocator))
+	File::File(Special special, Allocator& allocator)
+		: _private(FilePrivate::open(special, allocator))
 	{
+	}
+
+	bool File::flush()
+	{
+		return _private && _private->flush();
 	}
 
 	StaticString File::name() const
 	{
-		return _private->_name;
+		return _private ? StaticString(_private->_name) : StaticString();
+	}
+
+	uint64_t File::offset() const
+	{
+		return _private ? _private->_offset : 0;
+	}
+
+	size_t File::read(void* buffer, size_t size)
+	{
+		if (!size || !_private || !(_private->_mode & Read))
+			return 0;
+		if (_private->_mode & Pipe)
+			return _private->read(buffer, size);
+		if (_private->_offset == _private->_size)
+			return 0;
+		const auto result = _private->read(buffer, min<uint64_t>(size, _private->_size - _private->_offset), _private->_offset);
+		_private->_offset += result;
+		return result;
 	}
 
 	bool File::read_all(Buffer* buffer)
 	{
-		if (_private && (_private->_mode & Read))
+		if (_private && _private->_mode & Read)
 		{
 			const auto buffer_size = size();
 			if (buffer_size > SIZE_MAX)
@@ -53,7 +76,7 @@ namespace Yttrium
 
 	bool File::read_all(String* string)
 	{
-		if (_private && (_private->_mode & Read))
+		if (_private && _private->_mode & Read)
 		{
 			const auto string_size = size();
 			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
@@ -67,15 +90,12 @@ namespace Yttrium
 
 	bool File::read_line(String& string)
 	{
-		if (!_private || !(_private->_mode & Read))
+		if (!_private || (_private->_mode & (Read | Pipe)) != Read) // TODO: Make it work for pipes too.
 			return false;
-
-		if (_private->_mode & Pipe)
-			return false; // TODO: Make it work for pipes too.
 
 		static const size_t buffer_step = 32;
 
-		uint64_t file_offset = _offset;
+		uint64_t file_offset = _private->_offset;
 
 		string.clear();
 
@@ -125,14 +145,59 @@ namespace Yttrium
 		return true;
 	}
 
+	bool File::resize(uint64_t size)
+	{
+		if (!_private || (_private->_mode & (Write | Pipe)) != Write || !_private->resize(size))
+			return false;
+		_private->_size = size;
+		return true;
+	}
+
+	bool File::seek(uint64_t offset, Whence whence)
+	{
+		if (_private && !(_private->_mode & Pipe))
+		{
+			switch (whence)
+			{
+			case Absolute:
+				if (offset <= _private->_size)
+				{
+					_private->_offset = offset;
+					return true;
+				}
+				break;
+			case Relative:
+				if (offset <= _private->_size - _private->_offset)
+				{
+					_private->_offset += offset;
+					return true;
+				}
+				break;
+			case Reverse:
+				if (offset <= _private->_size)
+				{
+					_private->_offset = _private->_size - offset;
+					return true;
+				}
+				break;
+			}
+		}
+		return false;
+	}
+
+	uint64_t File::size() const
+	{
+		return _private ? _private->_size : 0;
+	}
+
 	String File::to_string()
 	{
-		if (_private && (_private->_mode & Read))
+		if (_private->_mode & Read)
 		{
 			const auto string_size = size();
 			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
 				throw std::bad_alloc();
-			String result(_private->_allocator);
+			String result(&_private.allocator());
 			result.resize(string_size);
 			if (read(result.text(), result.size()))
 				return result;
@@ -140,7 +205,19 @@ namespace Yttrium
 		return {};
 	}
 
-	Buffer File::read_to_buffer(const StaticString& name, Allocator* allocator)
+	size_t File::write(const void* buffer, size_t size)
+	{
+		if (!_private || !(_private->_mode & Write))
+			return 0;
+		if (_private->_mode & Pipe)
+			return _private->write(buffer, size);
+		const auto result = _private->write(buffer, size, _private->_offset);
+		_private->_offset += result;
+		_private->update_size(_private->_offset);
+		return result;
+	}
+
+	Buffer File::read_to_buffer(const StaticString& name, Allocator& allocator)
 	{
 		File file(name, allocator);
 		if (!file)
@@ -158,11 +235,7 @@ namespace Yttrium
 		return buffer;
 	}
 
-	File::File(Private* private_, uint64_t base, uint64_t size)
-		: _private(Private::copy(private_))
-		, _offset(0)
-		, _size(size)
-		, _base(base)
-	{
-	}
+	File::File(File&&) noexcept = default;
+	File::~File() = default;
+	File& File::operator=(File&&) noexcept = default;
 }

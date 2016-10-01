@@ -1,6 +1,7 @@
 #include <yttrium/renderer/texture_font.h>
 
 #include <yttrium/file.h>
+#include <yttrium/log.h>
 #include <yttrium/renderer/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/std/map.h>
@@ -118,36 +119,57 @@ namespace Yttrium
 
 	UniquePtr<TextureFont> TextureFont::load(const StaticString& name, Allocator& allocator)
 	{
-		File file(name, &allocator);
+		File file(name, allocator);
 		if (!file)
+		{
+			Log() << "("_s << name << ") Bad file"_s;
 			return {};
+		}
 
 		uint32_t fourcc = 0;
 		if (!file.read(&fourcc) || fourcc != FourccYtf1)
+		{
+			Log() << "("_s << name << ") Bad 'YTF1' fourcc"_s;
 			return {};
+		}
 
 		if (!file.read(&fourcc) || fourcc != FourccFont)
+		{
+			Log() << "("_s << name << ") Bad 'font' section fourcc"_s;
 			return {};
+		}
 
 		Ytf1Font font_section;
 		if (!file.read(&font_section))
+		{
+			Log() << "("_s << name << ") Bad 'font' section"_s;
 			return {};
+		}
 
 		if (!file.read(&fourcc) || fourcc != FourccChar)
+		{
+			Log() << "("_s << name << ") Bad 'char' section fourcc"_s;
 			return {};
+		}
 
 		uint8_t char_count = 0;
 		if (!file.read(&char_count))
+		{
+			Log() << "("_s << name << ") Bad 'char' section header"_s;
 			return {};
+		}
 
 		auto&& font = make_unique<TextureFontImpl>(allocator, allocator, font_section.size);
 
 		Size font_rect_size;
-		for (; char_count > 0; --char_count)
+		for (uint8_t i = 0; i < char_count; ++i)
 		{
 			Ytf1Char char_data;
 			if (!file.read(&char_data))
+			{
+				Log() << "("_s << name << ") Bad 'char' section entry "_s << i;
 				return {};
+			}
 
 			CharInfo info;
 			info.rect = {{font_section.base_x + char_data.x, font_section.base_y + char_data.y}, Size(char_data.width, char_data.height)};
@@ -162,17 +184,26 @@ namespace Yttrium
 		if (file.read(&fourcc))
 		{
 			if (fourcc != FourccKern)
+			{
+				Log() << "("_s << name << ") Bad 'kern' section fourcc"_s;
 				return {};
+			}
 
 			uint16_t kerning_count = 0;
 			if (!file.read(&kerning_count))
+			{
+				Log() << "("_s << name << ") Bad 'kern' section header"_s;
 				return {};
+			}
 
-			for (; kerning_count > 0; --kerning_count)
+			for (uint16_t i = 0; i < kerning_count; ++i)
 			{
 				Ytf1Kerning kerning;
 				if (!file.read(&kerning))
+				{
+					Log() << "("_s << name << ") Bad 'kern' section entry "_s << i;
 					return {};
+				}
 				font->_kernings[{kerning.first, kerning.second}] = kerning.amount;
 			}
 		}

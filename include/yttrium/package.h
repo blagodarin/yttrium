@@ -24,9 +24,8 @@ namespace Yttrium
 	class Y_API PackageReader
 	{
 	public:
-
 		///
-		static UniquePtr<PackageReader> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<PackageReader> create(const StaticString& path, PackageType = PackageType::Auto, Allocator& = *DefaultAllocator);
 
 		PackageReader() = default;
 		virtual ~PackageReader() = default;
@@ -39,9 +38,8 @@ namespace Yttrium
 	class Y_API PackageWriter
 	{
 	public:
-
 		///
-		static UniquePtr<PackageWriter> create(const StaticString& package, PackageType type = PackageType::Auto, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<PackageWriter> create(const StaticString& path, PackageType = PackageType::Auto, Allocator& = *DefaultAllocator);
 
 		PackageWriter() = default;
 		virtual ~PackageWriter() = default;
@@ -64,7 +62,7 @@ namespace Yttrium
 		};
 
 		///
-		static UniquePtr<PackageManager> create(Order order, Allocator& allocator = *DefaultAllocator);
+		static UniquePtr<PackageManager> create(Order, Allocator& = *DefaultAllocator);
 
 		PackageManager() = default;
 		virtual ~PackageManager() = default;
@@ -73,7 +71,7 @@ namespace Yttrium
 		/// \param name The package name.
 		/// \param type Package file type.
 		/// \return \c true on success.
-		virtual bool mount(const StaticString& name, PackageType type = PackageType::Auto) = 0;
+		virtual bool mount(const StaticString& name, PackageType = PackageType::Auto) = 0;
 	};
 }
 

@@ -7,6 +7,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
+
 namespace Yttrium
 {
 	Buffer make_random_buffer(size_t size)
@@ -82,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_file_transfer)
 
 	File output(File::Temporary);
 
-	FileTransfer<8192>(&output, &input);
+	FileTransfer<8192>(output, input);
 
 	const auto actual = File::read_to_buffer(output.name());
 	BOOST_CHECK_EQUAL(actual, buffer);

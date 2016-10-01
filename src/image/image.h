@@ -3,7 +3,7 @@
 
 #include <yttrium/image.h>
 
-#include "../base/file.h"
+#include <yttrium/file.h>
 
 namespace Yttrium
 {
@@ -23,7 +23,7 @@ namespace Yttrium
 	protected:
 		ImageReader(const StaticString& name, Allocator& allocator)
 			: _allocator(allocator)
-			, _file(name, &allocator)
+			, _file(name, allocator)
 		{
 		}
 	};
@@ -45,7 +45,7 @@ namespace Yttrium
 	protected:
 		ImageWriter(const StaticString& name, Allocator& allocator)
 			: _allocator(allocator)
-			, _file(name, File::Write | File::Truncate, &allocator)
+			, _file(name, File::Write | File::Truncate, allocator)
 		{
 		}
 	};

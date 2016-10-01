@@ -1,5 +1,6 @@
-#include <yttrium/renderer/texture_font.h>
 #include <yttrium/file.h>
+#include <yttrium/renderer/texture_font.h>
+#include <yttrium/static_string.h>
 
 #include <boost/test/unit_test.hpp>
 

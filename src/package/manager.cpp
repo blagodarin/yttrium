@@ -1,9 +1,9 @@
 #include <yttrium/package.h>
-#include "manager.h"
 
-#include <yttrium/file.h>
+#include <yttrium/log.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/vector.h>
+#include "../base/file.h"
 #include "../base/instance_guard.h"
 
 namespace Yttrium
@@ -15,7 +15,6 @@ namespace Yttrium
 	class PackageManagerImpl : public PackageManager
 	{
 	public:
-
 		PackageManagerImpl(Order order, Allocator& allocator)
 			: _allocator(allocator)
 			, _packages(_allocator)
@@ -26,9 +25,12 @@ namespace Yttrium
 
 		bool mount(const StaticString& name, PackageType type) override
 		{
-			auto&& package = PackageReader::create(name, type, _allocator);
+			auto package = PackageReader::create(name, type, _allocator);
 			if (!package)
+			{
+				Log() << "("_s << name << ") Unable to open"_s;
 				return false;
+			}
 			_packages.emplace(_packages.begin(), std::move(package));
 			return true;
 		}
@@ -39,9 +41,9 @@ namespace Yttrium
 			{
 				for (const auto& package : _packages)
 				{
-					File&& file = package->open_file(name);
+					auto file = package->open_file(name);
 					if (file)
-						return std::move(file);
+						return file;
 				}
 				return {};
 			};
@@ -53,17 +55,17 @@ namespace Yttrium
 
 			case PackageManager::Order::PackedFirst:
 				{
-					auto&& file = open_packed(name);
+					auto file = open_packed(name);
 					if (file)
-						return std::move(file);
+						return file;
 				}
-				return File(name, File::Read, &_allocator);
+				return File(name, File::Read, _allocator);
 
 			case PackageManager::Order::SystemFirst:
 				{
-					File file(name, File::Read, &_allocator);
+					File file(name, File::Read, _allocator);
 					if (file)
-						return std::move(file);
+						return file;
 				}
 				return open_packed(name);
 
@@ -84,13 +86,16 @@ namespace Yttrium
 		return make_unique<PackageManagerImpl>(allocator, order, allocator);
 	}
 
-	File open_file_for_reading(const StaticString& name, Allocator& allocator)
+	File::File(const StaticString& path, Allocator& allocator)
 	{
 		{
 			std::lock_guard<std::mutex> lock(PackageManagerGuard::instance_mutex);
 			if (PackageManagerGuard::instance)
-				return PackageManagerGuard::instance->open_file(name);
+			{
+				_private = PackageManagerGuard::instance->open_file(path)._private;
+				return;
+			}
 		}
-		return File(name, File::Read, &allocator);
+		_private = FilePrivate::open(path, Read, allocator);
 	}
 }

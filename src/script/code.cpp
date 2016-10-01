@@ -148,7 +148,7 @@ namespace Yttrium
 	ScriptCode ScriptCode::load(const StaticString& filename, Allocator& allocator)
 	{
 		String text(&allocator);
-		return File(filename, &allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
+		return File(filename, allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
 	}
 
 	ScriptCode::~ScriptCode() = default;

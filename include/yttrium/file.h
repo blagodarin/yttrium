@@ -4,21 +4,17 @@
 #ifndef _include_yttrium_file_h_
 #define _include_yttrium_file_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/memory/shared_ptr.h>
 
 namespace Yttrium
 {
 	class Buffer;
-	class PackageReaderImpl; // TODO: Remove references to internal classes.
-	class PackageWriterImpl;
+	class StaticString;
 	class String;
 
 	/// %File access class.
 	class Y_API File
 	{
-		friend PackageReaderImpl;
-		friend PackageWriterImpl;
-
 	public:
 
 		enum
@@ -45,38 +41,23 @@ namespace Yttrium
 			Reverse,  ///< Offset from the end of file (added).
 		};
 
-	public:
-
-		File() = default;
-		File(const File&) = delete;
-		File(File&& file): _private(file._private), _offset(file._offset), _size(file._size), _base(file._base) { file._private = nullptr; }
-		~File();
-
-		File& operator=(const File&) = delete;
-		File& operator=(File&&);
-
-		explicit operator bool() const;
-
 		///
-		File(const StaticString& name, unsigned mode, Allocator* allocator = DefaultAllocator);
+		File(const StaticString& path, unsigned mode, Allocator& = *DefaultAllocator);
 
 		/// Open a file for reading using the package manager if possible.
-		explicit File(const StaticString& name, Allocator* allocator = DefaultAllocator);
+		File(const StaticString& path, Allocator& = *DefaultAllocator);
 
 		///
-		explicit File(Special special, Allocator* allocator = DefaultAllocator);
+		File(Special, Allocator& = *DefaultAllocator);
 
-	public:
-
-		/// Flush all written data to the storage media.
+		/// Flushes buffered data to the storage medium.
 		bool flush();
 
 		///
 		StaticString name() const;
 
-		/// Return the current file offset.
-		/// \return Current offset.
-		uint64_t offset() const { return _offset; }
+		/// Returns the current offset in the file.
+		uint64_t offset() const;
 
 		/// Read a block of data from the file.
 		/// \param buffer The buffer to read into.
@@ -88,10 +69,7 @@ namespace Yttrium
 		/// \param buffer Buffer to read.
 		/// \return \c true on success.
 		template <typename T>
-		bool read(T* buffer)
-		{
-			return read(buffer, sizeof(T)) == sizeof(T);
-		}
+		bool read(T* buffer) { return read(buffer, sizeof(T)) == sizeof(T); }
 
 		///
 		bool read_all(Buffer* buffer);
@@ -102,14 +80,13 @@ namespace Yttrium
 		///
 		bool read_line(String& string);
 
-		/// Change the size of the file.
+		/// Resizes the file.
 		bool resize(uint64_t size);
 
-		/// Set the file offset to the specified position.
-		bool seek(uint64_t offset, Whence whence = Absolute);
+		/// Adjusts the current offset in the file.
+		bool seek(uint64_t offset, Whence = Absolute);
 
-		/// Return the file size.
-		/// \return File size.
+		/// Returns the size of the file.
 		uint64_t size() const;
 
 		///
@@ -118,8 +95,8 @@ namespace Yttrium
 		///
 		String to_string();
 
-		/// Truncate the file past the current pointer.
-		bool truncate() { return resize(_offset); }
+		/// Truncates the file past the current offset.
+		bool truncate() { return resize(offset()); }
 
 		/// Write a buffer to the file.
 		/// \param buffer The buffer to write.
@@ -131,28 +108,22 @@ namespace Yttrium
 		template <typename T>
 		bool write(const T& buffer) { return write(&buffer, sizeof buffer) == sizeof buffer; }
 
-	public:
-
 		/// Reads the specified file to the buffer.
 		/// The buffer is guaranteed to be implicitly zero-terminated.
-		static Buffer read_to_buffer(const StaticString& name, Allocator* allocator = DefaultAllocator);
-
-	public:
-
-		class Private;
-
-	protected:
-
-		explicit File(Private* private_) : _private(private_) {}
-
-		Y_PRIVATE File(Private* private_, uint64_t base, uint64_t size);
+		static Buffer read_to_buffer(const StaticString& path, Allocator& = *DefaultAllocator);
 
 	private:
+		SharedPtr<class FilePrivate> _private;
+		friend FilePrivate;
 
-		Private* _private = nullptr;
-		uint64_t _offset = 0;
-		uint64_t _size = 0;
-		uint64_t _base = 0;
+	public:
+		File() = default;
+		File(const File&) = delete;
+		File(File&&) noexcept;
+		~File();
+		File& operator=(const File&) = delete;
+		File& operator=(File&&) noexcept;
+		explicit operator bool() const { return static_cast<bool>(_private); }
 	};
 
 	/// Utility class for data transfer between files.
@@ -161,18 +132,16 @@ namespace Yttrium
 	class FileTransfer
 	{
 	public:
-
 		/// Performs the transfer till the \a reader 's end, then truncate the \a writer.
-		FileTransfer(File* writer, File* reader)
+		FileTransfer(File& writer, File& reader)
 		{
 			size_t size;
-			while ((size = reader->read(_buffer, buffer_size)))
-				writer->write(_buffer, size);
-			writer->truncate();
+			while ((size = reader.read(_buffer, buffer_size)))
+				writer.write(_buffer, size);
+			writer.truncate();
 		}
 
 	private:
-
 		uint8_t _buffer[buffer_size];
 	};
 }

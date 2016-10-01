@@ -7,17 +7,18 @@
 	#include "ogg_vorbis/ogg_vorbis.h"
 #endif
 
+#include <new>
+
 namespace Yttrium
 {
 	UniquePtr<AudioReader> AudioReader::open(const StaticString& name, AudioType type, Allocator& allocator)
 	{
 		if (type == AudioType::Auto)
 		{
-			const StaticString extension = name.file_name_extension();
-			if (extension == ".wav"_s)
+			if (name.ends_with(".wav"_s))
 				type = AudioType::Wav;
 #ifndef Y_NO_OGG_VORBIS
-			else if (extension == ".ogg"_s)
+			else if (name.ends_with(".ogg"_s))
 				type = AudioType::OggVorbis;
 #endif
 			else

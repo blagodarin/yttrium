@@ -20,6 +20,3 @@
 		- OpenGL 3.3 compliance.
 * Tools:
 	- Create textured font builder.
-* Examples:
-	* Tetrium:
-		- Pack the data at build time.

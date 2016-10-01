@@ -288,7 +288,7 @@ def YttriumTool(env, name):
 
 YttriumTool(env, 'generate-sounds')
 YttriumTool(env, 'generate-test-images')
-YttriumTool(env, 'ypq')
+ypq = YttriumTool(env, 'ypq')
 ytr = YttriumTool(env, 'ytr')
 
 Clean('tools', Dir('$BUILD/tools'))
@@ -307,6 +307,15 @@ def YttriumTranslation(env, translation, source_dir):
 	NoClean(target)
 	return target
 
+def YttriumPackage(env, package, index):
+	ytr_env = Environment(TOOLS = [])
+	if host_platform == 'posix':
+		ytr_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
+	target = ytr_env.Command(package, index, str(ypq[0]) + ' $TARGET $SOURCE')
+	Depends(target, [ypq, yttrium])
+	AlwaysBuild(target)
+	return target
+
 #-------------------------------------------------------------------------------
 # Examples
 #-------------------------------------------------------------------------------
@@ -319,8 +328,12 @@ def YttriumExample(env, name):
 	return target
 
 YttriumExample(env, '3d')
+
 tetrium = YttriumExample(env, 'tetrium')
-Depends(tetrium, YttriumTranslation(env, 'examples/tetrium/data/i18n/en.ion', 'examples/tetrium/data/gui'))
+tetrium_ytr = YttriumTranslation(env, 'examples/tetrium/data/i18n/en.ion', 'examples/tetrium/data/gui')
+tetrium_ypq = YttriumPackage(env, 'tetrium.ypq', 'examples/tetrium/data/index.txt')
+Depends(tetrium_ypq, tetrium_ytr)
+Depends(tetrium, tetrium_ypq)
 
 Clean('examples', Dir('$BUILD/examples'))
 

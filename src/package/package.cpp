@@ -4,67 +4,86 @@
 #include <yttrium/memory/unique_ptr.h>
 #include "ypq.h"
 
+#include <cstdlib>
+
 namespace Yttrium
 {
-	UniquePtr<PackageReader> PackageReader::create(const StaticString& package, PackageType type, Allocator& allocator)
+	bool PackedFile::flush()
+	{
+		return _package->flush();
+	}
+
+	bool PackedFile::resize(uint64_t size)
+	{
+		return _package->resize(_base + size); // TODO: Prevent overflow.
+	}
+
+	size_t PackedFile::read(void*, size_t)
+	{
+		std::abort();
+	}
+
+	size_t PackedFile::read(void* buffer, size_t size, uint64_t offset)
+	{
+		return _package->read(buffer, size, _base + offset); // TODO: Prevent overflow.
+	}
+
+	size_t PackedFile::write(const void*, size_t)
+	{
+		std::abort();
+	}
+
+	size_t PackedFile::write(const void* buffer, size_t size, uint64_t offset)
+	{
+		const auto result = _package->write(buffer, size, _base + offset); // TODO: Prevent overflow.
+		_package->update_size(_base + offset + result);
+		return result;
+	}
+
+	UniquePtr<PackageReader> PackageReader::create(const StaticString& path, PackageType type, Allocator& allocator)
 	{
 		if (type == PackageType::Auto)
 		{
-			if (package.file_name_extension() == ".ypq"_s)
+			if (path.ends_with(".ypq"_s))
 				type = PackageType::Ypq;
 			else
 				return {};
 		}
-
-		File file(package, File::Read, &allocator);
+		File file(path, File::Read, allocator);
 		if (!file)
 			return {};
-
 		try
 		{
 			switch (type)
 			{
 			case PackageType::Ypq: return make_unique<YpqReader>(allocator, std::move(file), allocator);
-			default: return {};
+			default: break;
 			}
 		}
 		catch (const BadPackage& e)
 		{
-			Log() << e.what();
-			return {};
+			Log() << "("_s << path << ") "_s << e.what();
 		}
+		return {};
 	}
 
-	File PackageReaderImpl::open_file(const StaticString& name)
-	{
-		const auto& packed_file = do_open_file(name);
-		return packed_file.file ? File(packed_file.file->_private, packed_file.file->_offset, packed_file.size) : File();
-	}
-
-	UniquePtr<PackageWriter> PackageWriter::create(const StaticString& package, PackageType type, Allocator& allocator)
+	UniquePtr<PackageWriter> PackageWriter::create(const StaticString& path, PackageType type, Allocator& allocator)
 	{
 		if (type == PackageType::Auto)
 		{
-			if (package.file_name_extension() == ".ypq"_s)
+			if (path.ends_with(".ypq"_s))
 				type = PackageType::Ypq;
 			else
 				return {};
 		}
-
-		File file(package, File::Write | File::Truncate, &allocator);
+		File file(path, File::Write | File::Truncate, allocator);
 		if (!file)
 			return {};
-
 		switch (type)
 		{
 		case PackageType::Ypq: return make_unique<YpqWriter>(allocator, std::move(file), allocator);
-		default: return {};
+		default: break;
 		}
-	}
-
-	File PackageWriterImpl::open_file(const StaticString& name)
-	{
-		const auto& packed_file = do_open_file(name);
-		return packed_file.file ? File(packed_file.file->_private, packed_file.file->_offset, packed_file.size) : File();
+		return {};
 	}
 }

@@ -1,226 +1,115 @@
 #define _FILE_OFFSET_BITS 64
 
-#include "../../utils/zero_terminated.h"
+#include <yttrium/utils.h>
 #include "file.h"
 
+#include <cassert>
+#include <cstdlib>
+#include <limits>
+#include <new>
 #include <system_error>
 
-#include <cstdlib>
 #include <fcntl.h>
 #include <unistd.h>
 
 namespace Yttrium
 {
-	File::Private::Private(String&& name, int descriptor, unsigned mode, Allocator* allocator)
-		: PrivateBase(allocator)
+	SystemFile::SystemFile(String&& name, unsigned mode, uint64_t size, int descriptor)
+		: FilePrivate(std::move(name), mode, size)
 		, _descriptor(descriptor)
-		, _mode(mode)
-		, _name(name)
-		, _auto_close(true)
-		, _auto_remove(false)
 	{
 		assert(_descriptor != -1);
-		assert(_mode & ReadWrite);
 	}
 
-	File::Private::~Private()
+	SystemFile::~SystemFile()
 	{
 		if (_auto_close)
 		{
 			::close(_descriptor);
-			if (_auto_remove && ::unlink(_name.text()))
+			if (_auto_remove && ::unlink(name().text()))
 				throw std::system_error(errno, std::generic_category());
 		}
 	}
 
-	int File::Private::open(const StaticString& name, int flags)
+	bool SystemFile::flush()
 	{
-		Y_ZERO_TERMINATED(name_z, name);
-		return ::open(name_z, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		return !::fsync(_descriptor);
 	}
 
-	File::File(const StaticString& name, unsigned mode, Allocator* allocator)
-		: File()
+	size_t SystemFile::read(void* buffer, size_t size)
+	{
+		const auto result = ::read(_descriptor, buffer, size);
+		return result != -1 ? result : 0;
+	}
+
+	size_t SystemFile::read(void* buffer, size_t size, uint64_t offset)
+	{
+		const auto result = ::pread(_descriptor, buffer, size, offset);
+		return result != -1 ? result : 0;
+	}
+
+	bool SystemFile::resize(uint64_t size)
+	{
+		return !::ftruncate(_descriptor, size);
+	}
+
+	size_t SystemFile::write(const void* buffer, size_t size)
+	{
+		const auto result = ::write(_descriptor, buffer, size);
+		return result != -1 ? result : 0;
+	}
+
+	size_t SystemFile::write(const void* buffer, size_t size, uint64_t offset)
+	{
+		const auto result = ::pwrite(_descriptor, buffer, size, offset);
+		return result != -1 ? result : 0;
+	}
+
+	UniquePtr<FilePrivate> FilePrivate::open(const StaticString& path, unsigned mode, Allocator& allocator)
 	{
 		int flags = Y_PLATFORM_LINUX ? O_NOATIME : 0;
-		switch (mode & ReadWrite)
+		switch (mode & File::ReadWrite)
 		{
-		case Read:      flags |= O_RDONLY;          break;
-		case Write:     flags = O_WRONLY | O_CREAT; break;
-		case ReadWrite: flags |= O_RDWR | O_CREAT;  break;
-		default:        return;
+		case File::Read: flags |= O_RDONLY;  break;
+		case File::Write: flags = O_WRONLY | O_CREAT; break;
+		case File::ReadWrite: flags |= O_RDWR | O_CREAT;  break;
+		default: return {};
 		}
 
-		if ((mode & (Write | Pipe | Truncate)) == (Write | Truncate))
+		if ((mode & (File::Write | File::Pipe | File::Truncate)) == (File::Write | File::Truncate))
 			flags |= O_TRUNC;
 
-		const int descriptor = Private::open(name, flags);
+		String name(path, &allocator); // Guaranteed to be zero terminated.
+		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
-			return;
+			return {};
 
-		_private = make_raw<Private>(*allocator, String(name, allocator), descriptor, mode, allocator);
-		if ((mode & (Read | Write | Pipe)) == Read)
-			_size = ::lseek(descriptor, 0, SEEK_END);
+		const auto size = mode & File::Pipe ? 0 : ::lseek(descriptor, 0, SEEK_END);
+		assert(size != -1); // TODO: Throw.
+		return make_unique<SystemFile>(allocator, std::move(name), mode, size, descriptor);
 	}
 
-	File::File(Special special, Allocator* allocator)
-		: File()
+	UniquePtr<FilePrivate> FilePrivate::open(File::Special special, Allocator& allocator)
 	{
+		UniquePtr<SystemFile> result;
 		switch (special)
 		{
-		case Temporary:
+		case File::Temporary:
 			{
-				String name("/tmp/XXXXXX"_s, allocator);
-
+				String name("/tmp/yttrium-XXXXXX"_s, &allocator);
 				const auto descriptor = ::mkstemp(name.text());
 				if (descriptor == -1)
 					break;
-
-				_private = make_raw<Private>(*allocator, std::move(name), descriptor, ReadWrite, allocator);
-				_private->_auto_remove = true;
+				result = make_unique<SystemFile>(allocator, std::move(name), File::ReadWrite, 0, descriptor);
 			}
+			result->_auto_remove = true;
 			break;
 
-		case StdErr:
-			_private = make_raw<Private>(*allocator, String(allocator), STDERR_FILENO, Write | Pipe, allocator);
-			_private->_auto_close = false;
+		case File::StdErr:
+			result = make_unique<SystemFile>(allocator, String(&allocator), File::Write | File::Pipe, 0, STDERR_FILENO);
+			result->_auto_close = false;
 			break;
 		}
-	}
-
-	bool File::flush()
-	{
-		return _private && (_private->_mode & Write)
-			? !::fsync(_private->_descriptor)
-			: false;
-	}
-
-	size_t File::read(void* buffer, size_t size)
-	{
-		if (_private && (_private->_mode & Read))
-		{
-			ssize_t result;
-
-			if (_private->_mode & Pipe)
-			{
-				result = ::read(_private->_descriptor, buffer, size);
-				if (result != -1)
-					return result;
-			}
-			else
-			{
-				result = ::pread(_private->_descriptor, buffer, size, _base + _offset);
-				if (result != -1)
-				{
-					_offset += static_cast<size_t>(result);
-					return result;
-				}
-			}
-		}
-		return 0;
-	}
-
-	bool File::resize(uint64_t size)
-	{
-		return (_private && ((_private->_mode & (Write | Pipe)) == Write)
-			? !::ftruncate(_private->_descriptor, _base + size)
-			: false);
-	}
-
-	bool File::seek(uint64_t offset, Whence whence)
-	{
-		if (!_private || (_private->_mode & Pipe))
-			return false;
-
-		bool read_only = ((_private->_mode & ReadWrite) == Read);
-
-		switch (whence)
-		{
-		case Relative:
-
-			{
-				uint64_t limit = (read_only ? _size : UINT64_MAX);
-				if (limit - _offset < offset)
-					return false;
-				_offset += offset;
-			}
-			break;
-
-		case Reverse:
-
-			{
-				uint64_t size;
-				if (read_only)
-				{
-					size = _size;
-				}
-				else
-				{
-					off_t off = ::lseek(_private->_descriptor, 0, SEEK_END);
-					if (off == -1)
-						throw std::system_error(errno, std::generic_category());
-					size = static_cast<uint64_t>(off);
-				}
-				if (size < offset)
-					return false;
-				_offset = size - offset;
-			}
-			break;
-
-		default:
-
-			if (read_only && offset > _size)
-				return false;
-			_offset = offset;
-			break;
-		}
-		return true;
-	}
-
-	uint64_t File::size() const
-	{
-		if (!_private)
-			return 0;
-
-		switch (_private->_mode & (ReadWrite | Pipe))
-		{
-		case Read:
-			return _size;
-
-		case Write:
-		case ReadWrite:
-			{
-				off_t size = ::lseek(_private->_descriptor, 0, SEEK_END);
-				if (size == -1)
-					throw std::system_error(errno, std::generic_category());
-				return size - _base;
-			}
-
-		default:
-			return 0;
-		}
-	}
-
-	size_t File::write(const void* buffer, size_t size)
-	{
-		if (_private && (_private->_mode & Write))
-		{
-			if (_private->_mode & Pipe)
-			{
-				const ssize_t result = ::write(_private->_descriptor, buffer, size);
-				if (result != -1)
-					return result;
-			}
-			else
-			{
-				const ssize_t result = ::pwrite(_private->_descriptor, buffer, size, _base + _offset);
-				if (result != -1)
-				{
-					_offset += static_cast<size_t>(result);
-					return result;
-				}
-			}
-		}
-		return 0;
+		return std::move(result);
 	}
 }

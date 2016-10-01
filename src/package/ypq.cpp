@@ -1,5 +1,6 @@
 #include "ypq.h"
 
+#include <yttrium/log.h>
 #include "../base/fourcc.h"
 
 #include <cstring>
@@ -13,106 +14,104 @@ namespace Yttrium
 
 		struct YpqPackageHeader
 		{
-			uint64_t signature;
-			uint64_t index_file_offset;
+			uint64_t signature = 0;
+			uint64_t index_file_offset = 0;
 		};
 
 		struct YpqIndexHeader
 		{
-			uint64_t signature;
-			uint32_t size;
+			uint64_t signature = 0;
+			uint32_t size = 0;
 		};
 
 		struct YpqIndexEntry
 		{
-			uint64_t offset;
-			uint8_t  name_size;
+			uint64_t offset = 0;
+			uint8_t  name_size = 0;
 		};
 
 		struct YpqFileHeader
 		{
-			uint64_t signature;
-			uint32_t size;
+			uint64_t signature = 0;
+			uint32_t size = 0;
 		};
 
 	#pragma pack(pop)
 
-		const uint64_t YpqPackageSignature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
-		const uint64_t YpqFileSignature    = "\xDA\xBDYPQF\xED\xDE"_eightcc;
-		const uint64_t YpqIndexSignature   = "\xDA\xBDYPQI\xED\xDE"_eightcc;
+		const auto YpqPackageSignature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
+		const auto YpqFileSignature    = "\xDA\xBDYPQF\xED\xDE"_eightcc;
+		const auto YpqIndexSignature   = "\xDA\xBDYPQI\xED\xDE"_eightcc;
 	}
 
 	YpqReader::YpqReader(File&& file, Allocator& allocator)
-		: PackageReaderImpl(std::move(file), allocator)
-		, _index(allocator)
+		: _file(std::move(file))
+		, _allocator(allocator)
+		, _index(_allocator)
 	{
 		YpqPackageHeader package_header;
-
-		if (!_file.seek(sizeof(package_header), File::Reverse)
-			|| !_file.read(&package_header) || package_header.signature != YpqPackageSignature)
-		{
-			throw BadPackage(String("(package/ypq) Bad package"_s, &allocator));
-		}
+		if (_file.size() < sizeof package_header
+			|| !_file.seek(_file.size() - sizeof package_header)
+			|| !_file.read(&package_header)
+			|| package_header.signature != YpqPackageSignature)
+			throw BadPackage(String("Bad package header"_s, &_allocator));
 
 		YpqFileHeader index_file_header;
-
 		if (!_file.seek(package_header.index_file_offset)
-			|| !_file.read(&index_file_header) || index_file_header.signature != YpqFileSignature)
-		{
-			throw BadPackage(String("(package/ypq) Bad package"_s, &allocator));
-		}
+			|| !_file.read(&index_file_header)
+			|| index_file_header.signature != YpqFileSignature)
+			throw BadPackage(String("Bad package index file header"_s, &_allocator));
 
 		YpqIndexHeader index_header;
+		if (!_file.read(&index_header)
+			|| index_header.signature != YpqIndexSignature
+			|| index_file_header.size < sizeof index_header)
+			throw BadPackage(String("Bad package index header"_s, &_allocator));
 
-		if (!_file.read(&index_header) || index_header.signature != YpqIndexSignature
-			|| index_file_header.size < sizeof(index_header))
-		{
-			throw BadPackage(String("(package/ypq) Bad package"_s, &allocator));
-		}
-
-		uint32_t index_size = index_file_header.size - sizeof(index_header);
+		auto index_size = index_file_header.size - sizeof index_header;
 
 		for (uint32_t i = 0; i < index_header.size; ++i)
 		{
-			YpqIndexEntry index_entry;
+			YpqIndexEntry entry;
+			if (index_size < sizeof entry
+				|| !_file.read(&entry))
+				throw BadPackage(String("Bad package index entry"_s, &_allocator));
 
-			if (index_size < sizeof(index_entry))
-				throw BadPackage(String("(package/ypq) Bad package"_s, &allocator));
+			index_size -= sizeof entry;
 
-			index_size -= sizeof(index_entry);
+			String name(entry.name_size, &_allocator);
+			name.resize(entry.name_size);
+			if (index_size < entry.name_size
+				|| !_file.read(name.text(), entry.name_size))
+				throw BadPackage(String("Bad package index entry name"_s, &_allocator));
 
-			if (!_file.read(&index_entry) || index_size < index_entry.name_size)
-				throw BadPackage(String("(package/ypq) Bad package"_s, &allocator));
+			index_size -= entry.name_size;
 
-			index_size -= index_entry.name_size;
-
-			String name(index_entry.name_size, &_allocator);
-
-			name.resize(index_entry.name_size);
-
-			if (!_file.read(name.text(), index_entry.name_size))
-				throw BadPackage(String("(package/ypq) Bad package"_s, &allocator));
-
-			_index[name] = index_entry.offset;
+			_index[name] = entry.offset;
 		}
 
 		if (index_size)
-			throw BadPackage(String("(package/ypq) Bad package"_s, &allocator)); // Disallow index padding.
+			throw BadPackage(String("Stray index data"_s, &_allocator)); // Disallow index padding.
 	}
 
-	PackedFile YpqReader::do_open_file(const StaticString& name)
+	File YpqReader::open_file(const StaticString& name)
 	{
 		const auto i = _index.find(String(name, ByReference()));
-		if (i != _index.end())
+		if (i == _index.end())
+			return {};
+
+		YpqFileHeader file_header;
+		if (!_file.seek(i->second)
+			|| !_file.read(&file_header)
+			|| file_header.signature != YpqFileSignature) // TODO: Check file size.
 		{
-			YpqFileHeader file_header;
-			if (_file.seek(i->second) && _file.read(&file_header)
-				&& file_header.signature == YpqFileSignature) // TODO: Check file size.
-			{
-				return PackedFile(&_file, file_header.size);
-			}
+			Log() << "("_s << _file.name() << ") Bad package"_s;
+			return {};
 		}
-		return PackedFile();
+
+		File file;
+		FilePrivate::set(file, make_unique<PackedFile>(_allocator,
+			String(&NoAllocator), File::Read, file_header.size, FilePrivate::get(_file), i->second + sizeof file_header));
+		return file;
 	}
 
 	YpqWriter::~YpqWriter()
@@ -120,26 +119,24 @@ namespace Yttrium
 		if (!_entries.empty())
 			flush_file();
 
-		_last_offset = _file.offset();
-
 		YpqFileHeader index_file_header;
-
 		index_file_header.signature = YpqFileSignature;
 		index_file_header.size = 0;
 
-		_file.write(index_file_header);
-
 		YpqIndexHeader index_header;
-
 		index_header.signature = YpqIndexSignature;
 		index_header.size = _entries.size();
+
+		_file.seek(_file.size());
+		_file.write(index_file_header);
+
+		_last_base = _file.size();
 
 		_file.write(index_header);
 
 		for (const auto& entry : _entries)
 		{
 			YpqIndexEntry index_entry;
-
 			index_entry.offset = entry.offset;
 			index_entry.name_size = entry.name.size();
 
@@ -150,41 +147,40 @@ namespace Yttrium
 		flush_file();
 
 		YpqPackageHeader package_header;
-
 		package_header.signature = YpqPackageSignature;
-		package_header.index_file_offset = _last_offset;
+		package_header.index_file_offset = _last_base - sizeof index_file_header;
 
+		_file.seek(_file.size());
 		_file.write(package_header);
 	}
 
-	PackedFile YpqWriter::do_open_file(const StaticString& name)
+	File YpqWriter::open_file(const StaticString& name)
 	{
-		YpqFileHeader file_header;
-
 		if (!_entries.empty())
 			flush_file();
 
-		_last_offset = _file.offset();
-
-		_entries.push_back(Entry(_last_offset, String(name, &_allocator)));
-
+		YpqFileHeader file_header;
 		file_header.signature = YpqFileSignature;
 		file_header.size = 0;
+		_file.seek(_file.size());
+		if (!_file.write(file_header))
+			return {};
 
-		return _file.write(file_header) ? PackedFile(&_file) : PackedFile();
+		_last_base = _file.size();
+		_entries.emplace_back(_last_base - sizeof file_header, String(name, &_allocator));
+
+		File file;
+		FilePrivate::set(file, make_unique<PackedFile>(_allocator,
+			String(&NoAllocator), File::Write, 0, FilePrivate::get(_file), _last_base));
+		return file;
 	}
 
 	void YpqWriter::flush_file()
 	{
-		_file.seek(0, File::Reverse);
-
-		const auto begin_offset = _last_offset + sizeof(YpqFileHeader);
-		const auto end_offset = _file.offset();
-		if (end_offset - begin_offset > std::numeric_limits<uint32_t>::max())
+		const auto file_size = _file.size() - _last_base;
+		if (file_size > std::numeric_limits<uint32_t>::max())
 			throw std::logic_error("Unsupported file size");
-
-		_file.seek(_last_offset + offsetof(YpqFileHeader, size));
-		_file.write(static_cast<uint32_t>(end_offset - begin_offset));
-		_file.seek(end_offset);
+		_file.seek(_last_base - sizeof(YpqFileHeader) + offsetof(YpqFileHeader, size));
+		_file.write(static_cast<uint32_t>(file_size));
 	}
 }

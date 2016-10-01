@@ -3,23 +3,32 @@
 
 #include <yttrium/package.h>
 
-#include <yttrium/file.h>
-#include <yttrium/string.h>
+#include "../base/file.h"
 
 #include <utility>
 
 namespace Yttrium
 {
-	struct PackedFile
+	class PackedFile : public FilePrivate
 	{
-		File*    file;
-		uint64_t size;
-
-		PackedFile(File* file = nullptr, uint64_t size = 0)
-			: file(file)
-			, size(size)
+	public:
+		PackedFile(String&& name, unsigned mode, uint64_t size, const SharedPtr<FilePrivate>& package, uint64_t base)
+			: FilePrivate(std::move(name), mode, size)
+			, _package(package)
+			, _base(base)
 		{
 		}
+
+		bool flush() override;
+		bool resize(uint64_t size) override;
+		size_t read(void*, size_t) override;
+		size_t read(void*, size_t, uint64_t) override;
+		size_t write(const void*, size_t) override;
+		size_t write(const void*, size_t, uint64_t) override;
+
+	private:
+		const SharedPtr<FilePrivate> _package;
+		const uint64_t _base;
 	};
 
 	class BadPackage
@@ -29,42 +38,6 @@ namespace Yttrium
 		StaticString what() const { return _what; }
 	private:
 		const String _what;
-	};
-
-	class PackageReaderImpl : public PackageReader
-	{
-	public:
-
-		PackageReaderImpl(File&& file, Allocator& allocator) : _allocator(allocator), _file(std::move(file)) {}
-
-		File open_file(const StaticString& name) override;
-
-	protected:
-
-		virtual PackedFile do_open_file(const StaticString& name) = 0;
-
-	protected:
-
-		Allocator& _allocator;
-		File _file;
-	};
-
-	class PackageWriterImpl : public PackageWriter
-	{
-	public:
-
-		PackageWriterImpl(File&& file, Allocator& allocator) : _allocator(allocator), _file(std::move(file)) {}
-
-		File open_file(const StaticString& name) override;
-
-	protected:
-
-		virtual PackedFile do_open_file(const StaticString& name) = 0;
-
-	protected:
-
-		Allocator& _allocator;
-		File _file;
 	};
 }
 

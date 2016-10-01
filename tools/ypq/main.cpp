@@ -36,8 +36,6 @@ int main(int argc, char** argv)
 		if (entry.is_empty() || entry[0] == '#')
 			continue;
 
-		std::cout << entry << std::endl;
-
 		File source_file(entry);
 		if (!source_file)
 		{
@@ -48,6 +46,6 @@ int main(int argc, char** argv)
 
 		File packed_file = package_file->open_file(entry);
 
-		FileTransfer<8192>(&packed_file, &source_file);
+		FileTransfer<8192>(packed_file, source_file);
 	}
 }

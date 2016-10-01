@@ -14,6 +14,8 @@
 	#include "png/png.h"
 #endif
 
+#include <new>
+
 namespace Yttrium
 {
 	namespace

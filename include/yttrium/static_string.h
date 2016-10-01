@@ -34,6 +34,9 @@ namespace Yttrium
 		/// The text must not be `nullptr`.
 		constexpr StaticString(const char* text, size_t size) : _text(text), _size(size) {}
 
+		///
+		bool ends_with(const StaticString& other) const;
+
 		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
 		String escaped(const char* symbols, char with, Allocator* allocator = DefaultAllocator) const;
 

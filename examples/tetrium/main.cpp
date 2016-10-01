@@ -2,13 +2,19 @@
 
 #include <yttrium/i18n/localization.h>
 #include <yttrium/log.h>
+#include <yttrium/package.h>
 
 int main()
 {
 	Log::set_file("tetrium.log");
 
-	NamedAllocator i18n_allocator("i18n"_s);
+	NamedAllocator i18n_allocator("i18n");
 	const auto& localization = Localization::create("examples/tetrium/i18n/en.ion", i18n_allocator);
+
+	NamedAllocator package_allocator("package");
+	const auto& package_manager = PackageManager::create(PackageManager::Order::PackedOnly, package_allocator);
+	if (!package_manager->mount("tetrium.ypq"))
+		return 1;
 
 	try
 	{

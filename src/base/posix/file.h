@@ -1,31 +1,29 @@
 #ifndef _src_base_posix_file_h_
 #define _src_base_posix_file_h_
 
-#include <yttrium/file.h>
-
-#include <yttrium/string.h>
-#include "../private_base.h"
+#include "../file.h"
 
 namespace Yttrium
 {
-	class Y_PRIVATE File::Private: public PrivateBase<File::Private>
+	class SystemFile : public FilePrivate
 	{
 	public:
+		SystemFile(String&& name, unsigned mode, uint64_t size, int descriptor);
+		~SystemFile() override;
 
-		const int      _descriptor;
-		const unsigned _mode;
-		const String   _name;
-		bool           _auto_close;
-		bool           _auto_remove;
+		bool flush() override;
+		size_t read(void*, size_t) override;
+		size_t read(void*, size_t, uint64_t) override;
+		bool resize(uint64_t) override;
+		size_t write(const void*, size_t) override;
+		size_t write(const void*, size_t, uint64_t) override;
 
-	public:
+	private:
+		const int _descriptor;
+		bool _auto_close = false;
+		bool _auto_remove = false;
 
-		Private(String&& name, int descriptor, unsigned mode, Allocator* allocator);
-		~Private();
-
-	public:
-
-		static int open(const StaticString& name, int flags);
+		friend FilePrivate;
 	};
 }
 

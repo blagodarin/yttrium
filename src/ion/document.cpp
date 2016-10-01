@@ -1,7 +1,7 @@
 #include "document.h"
 
 #include <yttrium/ion/list.h>
-#include "../base/file.h"
+#include <yttrium/file.h>
 #include "parser.h"
 #include "utils.h"
 
@@ -58,7 +58,7 @@ namespace Yttrium
 	bool IonDocument::load(const StaticString& file_name)
 	{
 		_private->clear();
-		_private->_buffer = File::read_to_buffer(file_name, &_private->_allocator);
+		_private->_buffer = File::read_to_buffer(file_name, _private->_allocator);
 		return IonParser(*this).parse(_private->_buffer, file_name);
 	}
 
@@ -74,7 +74,7 @@ namespace Yttrium
 
 	bool IonDocument::save(const StaticString& file_name, Formatting formatting) const
 	{
-		File file(file_name, File::Write | File::Truncate, &_private->_allocator);
+		File file(file_name, File::Write | File::Truncate, _private->_allocator);
 		if (!file)
 			return false;
 		const auto& buffer = Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, &_private->_allocator);

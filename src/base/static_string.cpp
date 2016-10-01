@@ -251,6 +251,11 @@ namespace Yttrium
 	{
 	}
 
+	bool StaticString::ends_with(const StaticString& other) const
+	{
+		return right(other.size()) == other;
+	}
+
 	String StaticString::escaped(const char* symbols, char with, Allocator* allocator) const
 	{
 		String result(_size, allocator); // Best case assumption.

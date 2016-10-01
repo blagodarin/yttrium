@@ -7,33 +7,33 @@
 
 namespace Yttrium
 {
-	class YpqReader : public PackageReaderImpl
+	class YpqReader : public PackageReader
 	{
 	public:
+		YpqReader(File&&, Allocator&);
 
-		YpqReader(File&& file, Allocator& allocator);
-
-		PackedFile do_open_file(const StaticString& name) override;
+		File open_file(const StaticString&) override;
 
 	private:
-
+		File _file;
+		Allocator& _allocator;
 		StdMap<String, uint64_t> _index;
 	};
 
-	class YpqWriter : public PackageWriterImpl
+	class YpqWriter : public PackageWriter
 	{
 	public:
-
-		YpqWriter(File&& file, Allocator& allocator) : PackageWriterImpl(std::move(file), allocator), _entries(allocator) {}
+		YpqWriter(File&& file, Allocator& allocator) : _file(std::move(file)), _allocator(allocator), _entries(_allocator) {}
 		~YpqWriter() override;
 
-		PackedFile do_open_file(const StaticString& name) override;
+		File open_file(const StaticString&) override;
 
 	private:
 
 		struct Entry
 		{
 			uint64_t offset;
+			uint32_t size = 0;
 			String   name;
 
 			Entry(uint64_t offset, const String& name)
@@ -48,8 +48,9 @@ namespace Yttrium
 		void flush_file();
 
 	private:
-
-		uint64_t _last_offset = 0;
+		File _file;
+		Allocator& _allocator;
+		uint64_t _last_base = 0;
 		StdVector<Entry> _entries;
 	};
 }

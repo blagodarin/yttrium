@@ -1,0 +1,17 @@
+data/font.tga
+data/font.ytf
+data/music.ion
+data/music.ogg
+data/sound.wav
+data/textures/wall.jpeg
+examples/tetrium/data/blocks.tga
+examples/tetrium/data/gui.ion
+examples/tetrium/data/gui/game_over.ion
+examples/tetrium/data/gui/game_pause.ion
+examples/tetrium/data/gui/game_single.ion
+examples/tetrium/data/gui/menu_help.ion
+examples/tetrium/data/gui/menu_main.ion
+examples/tetrium/data/gui/menu_multi.ion
+examples/tetrium/data/gui/menu_single.ion
+examples/tetrium/data/gui/menu_statistics.ion
+examples/tetrium/data/i18n/en.ion

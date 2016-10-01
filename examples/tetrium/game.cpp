@@ -228,7 +228,7 @@ void Game::run()
 	_window.show();
 	_window.run();
 
-	File settings_file("tetrium.txt", File::Write | File::Truncate, &_allocator);
+	File settings_file("tetrium.txt", File::Write | File::Truncate, _allocator);
 	if (settings_file)
 	{
 		String settings(1024, &_allocator);
