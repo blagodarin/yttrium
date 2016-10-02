@@ -14,68 +14,70 @@
 
 #include <array>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	using namespace Yttrium;
+
+	template <std::size_t N>
+	void read_floats(std::array<float, N>& elements, const IonNode& node)
 	{
-		template <std::size_t N>
-		void read_floats(std::array<float, N>& elements, const IonNode& node)
+		auto&& values = node.values();
+		for (auto& element : elements)
 		{
-			auto&& values = node.values();
-			for (auto& element : elements)
-			{
-				if (values.is_empty())
-					break;
+			if (values.is_empty())
+				break;
 
-				const StaticString* value;
-				if (values->get(&value))
-				{
-					float number;
-					if (value->to_number(number))
-						element = number;
-				}
-				values.pop_first();
-			}
-		}
-
-		template <typename T, std::size_t N>
-		std::size_t read_array(std::array<T, N>& elements, const IonNode& node)
-		{
-			if (node.size() > N)
-				return 0; // TODO: Throw.
-			auto&& values = node.values();
-			for (std::size_t i = 0; i < N; ++i)
+			const StaticString* value;
+			if (values->get(&value))
 			{
-				if (values.is_empty())
-					return i;
-				const StaticString* value;
-				if (values->get(&value))
-				{
-					T number;
-					if (!value->to_number(number))
-						return i; // TODO: Throw.
-					elements[i] = number;
-				}
-				values.pop_first();
+				float number;
+				if (value->to_number(number))
+					element = number;
 			}
-			return N;
-		}
-
-		bool read_color(Vector4& color, const IonNode& node)
-		{
-			std::array<float, 4> elements;
-			switch (read_array(elements, node))
-			{
-			case 3:
-				elements[3] = 1;
-			case 4:
-				color = {elements[0], elements[1], elements[2], elements[3]};
-				return true;
-			}
-			return false; // TODO: Throw.
+			values.pop_first();
 		}
 	}
 
+	template <typename T, std::size_t N>
+	std::size_t read_array(std::array<T, N>& elements, const IonNode& node)
+	{
+		if (node.size() > N)
+			return 0; // TODO: Throw.
+		auto&& values = node.values();
+		for (std::size_t i = 0; i < N; ++i)
+		{
+			if (values.is_empty())
+				return i;
+			const StaticString* value;
+			if (values->get(&value))
+			{
+				T number;
+				if (!value->to_number(number))
+					return i; // TODO: Throw.
+				elements[i] = number;
+			}
+			values.pop_first();
+		}
+		return N;
+	}
+
+	bool read_color(Vector4& color, const IonNode& node)
+	{
+		std::array<float, 4> elements;
+		switch (read_array(elements, node))
+		{
+		case 3:
+			elements[3] = 1;
+		case 4:
+			color = {elements[0], elements[1], elements[2], elements[3]};
+			return true;
+		}
+		return false; // TODO: Throw.
+	}
+}
+
+namespace Yttrium
+{
 	GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiPrivate& gui)
 		: _object(object)
 		, _class(class_)
@@ -152,14 +154,14 @@ namespace Yttrium
 		if (_bound_object)
 		{
 			const IonNode& node = _bound_object->last(name);
-			if (node.exists() && read_color(*color, node))
+			if (node.exists() && ::read_color(*color, node))
 				return true;
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
-			if (node.exists() && read_color(*color, node))
+			if (node.exists() && ::read_color(*color, node))
 				return true;
 		}
 
@@ -238,14 +240,14 @@ namespace Yttrium
 		{
 			const IonNode& node = _bound_object->last(name);
 			if (node.exists())
-				read_floats(elements, node);
+				::read_floats(elements, node);
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
 			if (node.exists())
-				read_floats(elements, node);
+				::read_floats(elements, node);
 		}
 
 		if (elements[0] < 0 || elements[1] < 0 || elements[2] <= 0 || elements[3] <= 0)
@@ -370,7 +372,7 @@ namespace Yttrium
 	bool GuiIonPropertyLoader::load(float& value, const IonNode& node)
 	{
 		std::array<float, 1> elements;
-		if (read_array(elements, node) != 1)
+		if (::read_array(elements, node) != 1)
 			return false; // TODO: Throw.
 		value = elements[0];
 		return true;
@@ -437,7 +439,7 @@ namespace Yttrium
 	bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
 	{
 		std::array<int32_t, 4> elements;
-		switch (read_array(elements, node))
+		switch (::read_array(elements, node))
 		{
 		case 1:
 			elements[1] = elements[0];
@@ -455,7 +457,7 @@ namespace Yttrium
 	bool GuiIonPropertyLoader::load_size(SizeF& size, const IonNode& node)
 	{
 		std::array<float, 2> elements;
-		if (read_array(elements, node) != 2
+		if (::read_array(elements, node) != 2
 			|| elements[0] <= 0
 			|| elements[1] <= 0)
 			return false; // TODO: Throw.

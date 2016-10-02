@@ -10,44 +10,46 @@
 
 #include <cassert>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	using namespace Yttrium;
+
+	SizeF make_text_size(const TextureFont& font, const StaticString& text, float max_width, float max_height)
 	{
-		SizeF make_text_size(const TextureFont& font, const StaticString& text, float max_width, float max_height)
-		{
-			const SizeF unscaled_text_size(font.text_size(text));
-			if (text.is_empty())
-				return {0, max_height};
-			const auto font_size = min(max_height, unscaled_text_size.height() * max_width / unscaled_text_size.width());
-			return {unscaled_text_size.width() * font_size / unscaled_text_size.height(), font_size};
-		}
-
-		PointF make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)
-		{
-			const auto x_left = [&]{ return rect.left() + margin; };
-			const auto x_center = [&]{ return (rect.left() + rect.right() - size.width()) / 2; };
-			const auto x_right = [&]{ return rect.right() - margin - size.width(); };
-			const auto y_top = [&]{ return rect.top() + margin; };
-			const auto y_center = [&]{ return (rect.top() + rect.bottom() - size.height()) / 2; };
-			const auto y_bottom = [&]{ return rect.bottom() - margin - size.height(); };
-
-			switch (alignment)
-			{
-			default: assert(false);
-			case TopLeftAlignment:     return { x_left(),   y_top()    };
-			case TopAlignment:         return { x_center(), y_top()    };
-			case TopRightAlignment:    return { x_right(),  y_top()    };
-			case LeftAlignment:        return { x_left(),   y_center() };
-			case CenterAlignment:      return { x_center(), y_center() };
-			case RightAlignment:       return { x_right(),  y_center() };
-			case BottomLeftAlignment:  return { x_left(),   y_bottom() };
-			case BottomAlignment:      return { x_center(), y_bottom() };
-			case BottomRightAlignment: return { x_right(),  y_bottom() };
-			}
-		}
+		const SizeF unscaled_text_size(font.text_size(text));
+		if (text.is_empty())
+			return {0, max_height};
+		const auto font_size = min(max_height, unscaled_text_size.height() * max_width / unscaled_text_size.width());
+		return {unscaled_text_size.width() * font_size / unscaled_text_size.height(), font_size};
 	}
 
+	PointF make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)
+	{
+		const auto x_left = [&]{ return rect.left() + margin; };
+		const auto x_center = [&]{ return (rect.left() + rect.right() - size.width()) / 2; };
+		const auto x_right = [&]{ return rect.right() - margin - size.width(); };
+		const auto y_top = [&]{ return rect.top() + margin; };
+		const auto y_center = [&]{ return (rect.top() + rect.bottom() - size.height()) / 2; };
+		const auto y_bottom = [&]{ return rect.bottom() - margin - size.height(); };
+
+		switch (alignment)
+		{
+		default: assert(false);
+		case TopLeftAlignment:     return { x_left(),   y_top()    };
+		case TopAlignment:         return { x_center(), y_top()    };
+		case TopRightAlignment:    return { x_right(),  y_top()    };
+		case LeftAlignment:        return { x_left(),   y_center() };
+		case CenterAlignment:      return { x_center(), y_center() };
+		case RightAlignment:       return { x_right(),  y_center() };
+		case BottomLeftAlignment:  return { x_left(),   y_bottom() };
+		case BottomAlignment:      return { x_center(), y_bottom() };
+		case BottomRightAlignment: return { x_right(),  y_bottom() };
+		}
+	}
+}
+
+namespace Yttrium
+{
 	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 	{
 		renderer.set_color(color);
@@ -110,7 +112,7 @@ namespace Yttrium
 			geometry.clear();
 			return;
 		}
-		const auto& text_size = make_text_size(*font, text, max_text_width, max_text_height);
-		font->build(geometry, make_top_left(rect, text_size, margins, alignment), text_size.height(), text, capture);
+		const auto& text_size = ::make_text_size(*font, text, max_text_width, max_text_height);
+		font->build(geometry, ::make_top_left(rect, text_size, margins, alignment), text_size.height(), text, capture);
 	}
 }

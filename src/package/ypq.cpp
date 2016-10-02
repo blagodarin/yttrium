@@ -6,43 +6,45 @@
 #include <cstring>
 #include <limits>
 
+namespace
+{
+	using namespace Yttrium;
+
+#pragma pack(push, 1)
+
+	struct YpqPackageHeader
+	{
+		uint64_t signature = 0;
+		uint64_t index_file_offset = 0;
+	};
+
+	struct YpqIndexHeader
+	{
+		uint64_t signature = 0;
+		uint32_t size = 0;
+	};
+
+	struct YpqIndexEntry
+	{
+		uint64_t offset = 0;
+		uint8_t  name_size = 0;
+	};
+
+	struct YpqFileHeader
+	{
+		uint64_t signature = 0;
+		uint32_t size = 0;
+	};
+
+#pragma pack(pop)
+
+	const auto YpqPackageSignature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
+	const auto YpqFileSignature = "\xDA\xBDYPQF\xED\xDE"_eightcc;
+	const auto YpqIndexSignature = "\xDA\xBDYPQI\xED\xDE"_eightcc;
+}
+
 namespace Yttrium
 {
-	namespace
-	{
-	#pragma pack(push, 1)
-
-		struct YpqPackageHeader
-		{
-			uint64_t signature = 0;
-			uint64_t index_file_offset = 0;
-		};
-
-		struct YpqIndexHeader
-		{
-			uint64_t signature = 0;
-			uint32_t size = 0;
-		};
-
-		struct YpqIndexEntry
-		{
-			uint64_t offset = 0;
-			uint8_t  name_size = 0;
-		};
-
-		struct YpqFileHeader
-		{
-			uint64_t signature = 0;
-			uint32_t size = 0;
-		};
-
-	#pragma pack(pop)
-
-		const auto YpqPackageSignature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
-		const auto YpqFileSignature    = "\xDA\xBDYPQF\xED\xDE"_eightcc;
-		const auto YpqIndexSignature   = "\xDA\xBDYPQI\xED\xDE"_eightcc;
-	}
-
 	YpqReader::YpqReader(File&& file, Allocator& allocator)
 		: _file(std::move(file))
 		, _allocator(allocator)

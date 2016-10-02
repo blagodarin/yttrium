@@ -5,20 +5,22 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/utils.h>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	using namespace Yttrium;
+
+	void update_document(IonObject& target, const IonObject& source)
 	{
-		void update_document(IonObject& target, const IonObject& source)
+		for (auto i = source.rbegin(); i != source.rend(); ++i)
 		{
-			for (auto i = source.rbegin(); i != source.rend(); ++i)
-			{
-				if (!target.contains(i->name()))
-					Ion::append(target, *i);
-			}
+			if (!target.contains(i->name()))
+				Ion::append(target, *i);
 		}
 	}
+}
 
+namespace Yttrium
+{
 	GuiClasses::GuiClasses(Allocator& allocator)
 		: _allocator(allocator)
 		, _classes(_allocator)
@@ -42,9 +44,9 @@ namespace Yttrium
 		}
 
 		IonDocument document(_allocator);
-		update_document(document.root(), source);
+		::update_document(document.root(), source);
 		if (base)
-			update_document(document.root(), *base);
+			::update_document(document.root(), *base);
 
 		_classes.emplace(String(name, &_allocator), std::move(document));
 

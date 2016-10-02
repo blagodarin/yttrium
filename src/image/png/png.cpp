@@ -1,20 +1,22 @@
 #include "png.h"
 
-namespace Yttrium
+namespace
 {
-	namespace
-	{
-		void _png_write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
-		{
-			reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->write(data, length);
-		}
+	using namespace Yttrium;
 
-		void _png_flush_callback(png_struct* png_ptr)
-		{
-			reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->flush();
-		}
+	void y_png_write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
+	{
+		reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->write(data, length);
 	}
 
+	void y_png_flush_callback(png_struct* png_ptr)
+	{
+		reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->flush();
+	}
+}
+
+namespace Yttrium
+{
 	PngWriter::PngWriter(const StaticString& name, Allocator& allocator)
 		: ImageWriter(name, allocator)
 	{
@@ -40,7 +42,7 @@ namespace Yttrium
 			_info = png_create_info_struct(_png);
 			if (_info)
 			{
-				png_set_write_fn(_png, &_file, _png_write_callback, _png_flush_callback);
+				png_set_write_fn(_png, &_file, ::y_png_write_callback, ::y_png_flush_callback);
 				return true;
 				//png_destroy_write_struct(&_png, &_info);
 			}

@@ -6,37 +6,37 @@
 #include <cstring>
 #include <stdexcept>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	// X error handling (see below).
+	bool error_occurred = false;
+	int error_handler(::Display*, ::XErrorEvent*)
 	{
-		// X error handling (see below).
-		bool error_occurred = false;
-		int error_handler(::Display*, ::XErrorEvent*)
-		{
-			error_occurred = true;
-			return 0;
-		}
-
-		bool check_extension(const char* list, const char* name)
-		{
-			const size_t name_size = ::strlen(name);
-			while ((list = ::strstr(list, name)))
-			{
-				list += name_size;
-				if (*list == ' ' || *list == 0)
-					return true;
-			}
-			return false;
-		}
-
-		template <typename T>
-		void get_proc_address(T& address, const char* name)
-		{
-			address = reinterpret_cast<T>(::glXGetProcAddress(reinterpret_cast<const GLubyte*>(name)));
-		}
+		error_occurred = true;
+		return 0;
 	}
 
+	bool check_extension(const char* list, const char* name)
+	{
+		const size_t name_size = ::strlen(name);
+		while ((list = ::strstr(list, name)))
+		{
+			list += name_size;
+			if (*list == ' ' || *list == 0)
+				return true;
+		}
+		return false;
+	}
+
+	template <typename T>
+	void get_proc_address(T& address, const char* name)
+	{
+		address = reinterpret_cast<T>(::glXGetProcAddress(reinterpret_cast<const GLubyte*>(name)));
+	}
+}
+
+namespace Yttrium
+{
 	GlContext::GlContext(::Display* display, int screen)
 		: _display(display)
 		, _screen(screen)
@@ -85,11 +85,11 @@ namespace Yttrium
 			throw std::runtime_error("Failed to find suitable GLXFBConfig");
 
 		const auto extensions = ::glXQueryExtensionsString(_display, _screen);
-		if (!check_extension(extensions, "GLX_ARB_create_context"))
+		if (!::check_extension(extensions, "GLX_ARB_create_context"))
 			throw std::runtime_error("GLX_ARB_create_context is unavailable");
 
 		::GLXContext (*glXCreateContextAttribsARB)(::Display*, ::GLXFBConfig, ::GLXContext, Bool, const int*) = nullptr;
-		get_proc_address(glXCreateContextAttribsARB, "glXCreateContextAttribsARB");
+		::get_proc_address(glXCreateContextAttribsARB, "glXCreateContextAttribsARB");
 		if (!glXCreateContextAttribsARB) // The official OpenGL context creation example suggests checking this too.
 			throw std::runtime_error("glXCreateContextAttribsARB is unavailable");
 
@@ -106,14 +106,14 @@ namespace Yttrium
 		// The actual context creation is wrapped in error handling code as advised
 		// by the official OpenGL context creation tutorial. The tutorial also warns
 		// that X error handling is global and not thread-safe.
-		error_occurred = false;
-		const auto old_error_handler = ::XSetErrorHandler(error_handler);
+		::error_occurred = false;
+		const auto old_error_handler = ::XSetErrorHandler(::error_handler);
 		const auto context = glXCreateContextAttribsARB(_display, best_fbc, nullptr, True, context_attributes);
 		if (!context)
 			throw std::runtime_error("Failed to create a GLX context");
 		::XSync(_display, False); // To ensure any errors generated are processed.
 		::XSetErrorHandler(old_error_handler);
-		if (error_occurred)
+		if (::error_occurred)
 		{
 			::glXDestroyContext(_display, context);
 			throw std::runtime_error("Failed to create a GLX context");
@@ -127,11 +127,11 @@ namespace Yttrium
 
 		_context = context;
 
-		_extensions.EXT_swap_control = check_extension(extensions, "GLX_EXT_swap_control");
+		_extensions.EXT_swap_control = ::check_extension(extensions, "GLX_EXT_swap_control");
 		if (_extensions.EXT_swap_control)
-			get_proc_address(_extensions.SwapIntervalEXT, "glXSwapIntervalEXT");
+			::get_proc_address(_extensions.SwapIntervalEXT, "glXSwapIntervalEXT");
 
-		_extensions.EXT_swap_control_tear = check_extension(extensions, "GLX_EXT_swap_control_tear");
+		_extensions.EXT_swap_control_tear = ::check_extension(extensions, "GLX_EXT_swap_control_tear");
 	}
 
 	GlContext::GlContext(GlContext&& context)

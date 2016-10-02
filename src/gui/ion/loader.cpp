@@ -13,80 +13,82 @@
 #include "../widgets/widget.h"
 #include "property_loader.h"
 
-namespace Yttrium
+namespace
 {
-	namespace
+	using namespace Yttrium;
+
+	struct GuiElement
 	{
-		struct GuiElement
-		{
-			const IonObject* object = nullptr;
-			const StaticString* name = nullptr;
-			const StaticString* attribute = nullptr;
-		};
+		const IonObject* object = nullptr;
+		const StaticString* name = nullptr;
+		const StaticString* attribute = nullptr;
+	};
 
-		GuiElement load_element(const IonList& source)
-		{
-			GuiElement result;
+	GuiElement load_element(const IonList& source)
+	{
+		GuiElement result;
 
-			auto value = source.begin();
+		auto value = source.begin();
+		if (value == source.end())
+			return {};
+
+		if (value->type() == IonValue::Type::String)
+		{
+			value->get(&result.name);
+			++value;
 			if (value == source.end())
 				return {};
+		}
 
-			if (value->type() == IonValue::Type::String)
-			{
-				value->get(&result.name);
-				++value;
-				if (value == source.end())
-					return {};
-			}
-
-			if (value->type() == IonValue::Type::List)
-			{
-				const auto& list = value->list();
-				if (list.size() != 1 || !list.first()->get(&result.attribute))
-					return {};
-				++value;
-				if (value == source.end())
-					return {};
-			}
-
-			if (value->type() != IonValue::Type::Object)
+		if (value->type() == IonValue::Type::List)
+		{
+			const auto& list = value->list();
+			if (list.size() != 1 || !list.first()->get(&result.attribute))
 				return {};
-
-			result.object = value->object();
-
 			++value;
-			if (value != source.end())
+			if (value == source.end())
 				return {};
-
-			return result;
 		}
 
-		enum GuiAttribute : unsigned
-		{
-			IsDefault     = 1 << 0,
-			IsRoot        = 1 << 1,
-			IsTransparent = 1 << 2,
-		};
+		if (value->type() != IonValue::Type::Object)
+			return {};
 
-		const std::pair<StaticString, GuiAttribute> _root_attributes[] =
-		{
-			{"default"_s, IsDefault},
-			{"root"_s, IsRoot},
-			{"transparent"_s, IsTransparent},
-		};
+		result.object = value->object();
 
-		unsigned find_attribute(const StaticString& value)
-		{
-			for (const auto& attribute : _root_attributes)
-			{
-				if (attribute.first == value)
-					return attribute.second;
-			}
-			return 0;
-		}
+		++value;
+		if (value != source.end())
+			return {};
+
+		return result;
 	}
 
+	enum GuiAttribute : unsigned
+	{
+		IsDefault     = 1 << 0,
+		IsRoot        = 1 << 1,
+		IsTransparent = 1 << 2,
+	};
+
+	const std::pair<StaticString, GuiAttribute> _root_attributes[] =
+	{
+		{"default"_s, IsDefault},
+		{"root"_s, IsRoot},
+		{"transparent"_s, IsTransparent},
+	};
+
+	unsigned find_attribute(const StaticString& value)
+	{
+		for (const auto& attribute : _root_attributes)
+		{
+			if (attribute.first == value)
+				return attribute.second;
+		}
+		return 0;
+	}
+}
+
+namespace Yttrium
+{
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
 		: _gui(gui)
 		, _allocator(_gui.allocator())
@@ -145,7 +147,7 @@ namespace Yttrium
 		{
 			if (node.is_empty())
 			{
-				const auto attribute = find_attribute(node.name());
+				const auto attribute = ::find_attribute(node.name());
 				if (!attribute)
 					throw GuiError(_allocator) << "Unknown attribute '"_s << node.name() << "'"_s;
 				attributes |= attribute;
@@ -163,7 +165,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_class(const IonNode& node, unsigned)
 	{
-		const auto& element = load_element(node);
+		const auto& element = ::load_element(node);
 		if (!element.object || !element.name)
 			throw GuiError(_allocator) << "Bad 'class'"_s;
 		if (!_classes.add(*element.name, *element.object, element.attribute))
@@ -172,7 +174,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_font(const IonNode& node, unsigned attributes)
 	{
-		auto element = load_element(node);
+		auto element = ::load_element(node);
 		if (!element.object)
 			throw GuiError(_allocator) << "Bad 'font'"_s;
 
@@ -218,7 +220,7 @@ namespace Yttrium
 			{"stretch"_s, {&GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Stretch)}},
 		};
 
-		const auto& element = load_element(node);
+		const auto& element = ::load_element(node);
 		if (!element.object)
 			throw GuiError(_allocator) << "Empty 'layer'"_s;
 
@@ -264,7 +266,7 @@ namespace Yttrium
 				continue;
 			}
 
-			const auto& element = load_element(layout_node);
+			const auto& element = ::load_element(layout_node);
 			if (!element.object)
 				throw GuiError(_allocator) << "Bad layout entry '"_s << layout_node.name() << "'"_s;
 

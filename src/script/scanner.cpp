@@ -2,98 +2,98 @@
 
 #include <yttrium/log.h>
 
+namespace
+{
+	enum class Kind
+	{
+		Other,
+		Space,
+		Comment,
+		Quote,
+		Newline,
+		Semicolon,
+		End,
+		Error,
+	};
+
+	const Kind kind_of[256] =
+	{
+		Kind::End,     Kind::Error,   Kind::Error,   Kind::Error,     // 0
+		Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+		Kind::Error,   Kind::Space,   Kind::Newline, Kind::Space,     //   t n v
+		Kind::Space,   Kind::Newline, Kind::Error,   Kind::Error,     // f r
+		Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+		Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+		Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+		Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
+
+		Kind::Space,   Kind::Other,   Kind::Quote,   Kind::Comment,   //   ! " #
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // $ % & '
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ( ) * +
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // , - . /
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 0 1 2 3
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 4 5 6 7
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Semicolon, // 8 9 : ;
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // < = > ?
+
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // @ A B C
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // D E F G
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // H I J K
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // L M N O
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // P Q R S
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // T U V W
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // X Y Z [
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // \ ] ^ _
+
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ` a b c
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // d e f g
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // h i j k
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // l m n o
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // p q r s
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // t u v w
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // x y z {
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Error,     // | } ~
+
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+		Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
+	};
+}
+
 namespace Yttrium
 {
-	namespace
-	{
-		enum class Kind
-		{
-			Other,
-			Space,
-			Comment,
-			Quote,
-			Newline,
-			Semicolon,
-			End,
-			Error,
-		};
-
-		const Kind kind_of[256] =
-		{
-			Kind::End,     Kind::Error,   Kind::Error,   Kind::Error,     // 0
-			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-			Kind::Error,   Kind::Space,   Kind::Newline, Kind::Space,     //   t n v
-			Kind::Space,   Kind::Newline, Kind::Error,   Kind::Error,     // f r
-			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-			Kind::Error,   Kind::Error,   Kind::Error,   Kind::Error,     //
-
-			Kind::Space,   Kind::Other,   Kind::Quote,   Kind::Comment,   //   ! " #
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // $ % & '
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ( ) * +
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // , - . /
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 0 1 2 3
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // 4 5 6 7
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Semicolon, // 8 9 : ;
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // < = > ?
-
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // @ A B C
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // D E F G
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // H I J K
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // L M N O
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // P Q R S
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // T U V W
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // X Y Z [
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // \ ] ^ _
-
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // ` a b c
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // d e f g
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // h i j k
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // l m n o
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // p q r s
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // t u v w
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     // x y z {
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Error,     // | } ~
-
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-			Kind::Other,   Kind::Other,   Kind::Other,   Kind::Other,     //
-		};
-	}
-
 	ScriptScanner::ScriptScanner(const StaticString& text)
 		: _cursor(const_cast<char*>(text.text()))
 		, _end(text.text() + text.size())
@@ -110,7 +110,7 @@ namespace Yttrium
 
 	rescan:
 
-		switch (kind_of[static_cast<unsigned char>(*cursor)])
+		switch (::kind_of[static_cast<unsigned char>(*cursor)])
 		{
 		case Kind::Other:
 
@@ -138,10 +138,10 @@ namespace Yttrium
 					}
 				}
 
-				if (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other)
+				if (::kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other)
 				{
 					token.type = Token::Literal;
-					do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other);
+					do ++cursor; while (::kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other);
 				}
 
 				if (token.type == Token::Identifier && has_sigil)
@@ -153,7 +153,7 @@ namespace Yttrium
 
 		case Kind::Space:
 
-			do ++cursor; while (kind_of[static_cast<unsigned char>(*cursor)] == Kind::Space);
+			do ++cursor; while (::kind_of[static_cast<unsigned char>(*cursor)] == Kind::Space);
 			goto rescan;
 
 		case Kind::Comment:

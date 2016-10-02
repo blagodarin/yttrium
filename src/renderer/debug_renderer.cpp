@@ -3,24 +3,26 @@
 #include "debug_texture.h"
 #include "renderer.h"
 
+namespace
+{
+	using namespace Yttrium;
+
+	void draw_debug_char(RendererImpl& renderer, int x, int y, int width, int height, uint8_t value)
+	{
+		renderer.draw_rect(
+			{
+				PointF(x * DebugTexture::char_width, y * DebugTexture::char_height),
+				SizeF(width * DebugTexture::char_width, height * DebugTexture::char_height)
+			},
+			{
+				PointF(DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]),
+				PointF(DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1])
+			});
+	}
+}
+
 namespace Yttrium
 {
-	namespace
-	{
-		void draw_debug_char(RendererImpl& renderer, int x, int y, int width, int height, uint8_t value)
-		{
-			renderer.draw_rect(
-				{
-					PointF(x * DebugTexture::char_width, y * DebugTexture::char_height),
-					SizeF(width * DebugTexture::char_width, height * DebugTexture::char_height)
-				},
-				{
-					PointF(DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]),
-					PointF(DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1])
-				});
-		}
-	}
-
 	DebugRenderer::DebugRenderer(RendererImpl& renderer)
 		: _renderer(renderer)
 		, _debug_texture(_renderer, _renderer.debug_texture())
@@ -30,12 +32,12 @@ namespace Yttrium
 
 	void DebugRenderer::draw_cursor(int x, int y)
 	{
-		draw_debug_char(_renderer, x, y, 1, 1, DebugTexture::cursor_index);
+		::draw_debug_char(_renderer, x, y, 1, 1, DebugTexture::cursor_index);
 	}
 
 	void DebugRenderer::draw_rectangle(int x, int y, int width, int height)
 	{
-		draw_debug_char(_renderer, x, y, width, height, DebugTexture::rect_index);
+		::draw_debug_char(_renderer, x, y, width, height, DebugTexture::rect_index);
 	}
 
 	void DebugRenderer::draw_text(int x, int y, const StaticString& text, int max_size)
@@ -45,7 +47,7 @@ namespace Yttrium
 		{
 			const uint8_t symbol = text[i];
 			if (symbol >= DebugTexture::first_char && symbol <= DebugTexture::last_char)
-				draw_debug_char(_renderer, x + i, y, 1, 1, symbol);
+				::draw_debug_char(_renderer, x + i, y, 1, 1, symbol);
 		}
 	}
 

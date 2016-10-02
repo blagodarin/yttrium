@@ -4,39 +4,41 @@
 
 #include <cstring>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	using namespace Yttrium;
+
+	size_t read_callback(void* ptr, size_t size, size_t nmemb, void* datasource)
 	{
-		size_t _ov_read_callback(void* ptr, size_t size, size_t nmemb, void* datasource)
-		{
-			return static_cast<File*>(datasource)->read(ptr, size * nmemb); // TODO: Check if the product fits into size_t.
-		}
-
-		int _ov_seek_callback(void* datasource, ogg_int64_t offset, int whence)
-		{
-			return (static_cast<File*>(datasource)->seek(offset, File::Whence(whence)) ? 0 : -1);
-		}
-
-		int _ov_close_callback(void*)
-		{
-			return 0;
-		}
-
-		long _ov_tell_callback(void* datasource)
-		{
-			return static_cast<File*>(datasource)->offset();
-		}
-
-		const ov_callbacks _ov_callbacks =
-		{
-			_ov_read_callback,
-			_ov_seek_callback,
-			_ov_close_callback,
-			_ov_tell_callback
-		};
+		return static_cast<File*>(datasource)->read(ptr, size * nmemb); // TODO: Check if the product fits into size_t.
 	}
 
+	int seek_callback(void* datasource, ogg_int64_t offset, int whence)
+	{
+		return (static_cast<File*>(datasource)->seek(offset, File::Whence(whence)) ? 0 : -1);
+	}
+
+	int close_callback(void*)
+	{
+		return 0;
+	}
+
+	long tell_callback(void* datasource)
+	{
+		return static_cast<File*>(datasource)->offset();
+	}
+
+	const ov_callbacks y_ov_callbacks =
+	{
+		read_callback,
+		seek_callback,
+		close_callback,
+		tell_callback,
+	};
+}
+
+namespace Yttrium
+{
 	OggVorbisReader::OggVorbisReader(const StaticString& name, Allocator& allocator)
 		: AudioReaderImpl(name, allocator)
 	{
@@ -50,7 +52,7 @@ namespace Yttrium
 
 	bool OggVorbisReader::open()
 	{
-		if (::ov_open_callbacks(&_file, &_ov_file, nullptr, 0, _ov_callbacks) < 0)
+		if (::ov_open_callbacks(&_file, &_ov_file, nullptr, 0, ::y_ov_callbacks) < 0)
 			return false;
 
 		vorbis_info* info = ::ov_info(&_ov_file, -1);

@@ -16,21 +16,21 @@
 
 #include <new>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	size_t unaligned_row_size(size_t width, size_t bits_per_pixel)
 	{
-		size_t unaligned_row_size(size_t width, size_t bits_per_pixel)
-		{
-			return (width * bits_per_pixel + 7) / 8;
-		}
-
-		size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
-		{
-			return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
-		}
+		return (width * bits_per_pixel + 7) / 8;
 	}
 
+	size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
+	{
+		return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
+	}
+}
+
+namespace Yttrium
+{
 	ImageFormat::ImageFormat()
 		: _pixel_format(PixelFormat::Gray)
 		, _channels(1)
@@ -61,7 +61,7 @@ namespace Yttrium
 		}
 
 		_bits_per_pixel = bits_per_pixel;
-		_row_size = aligned_row_size(_width, bits_per_pixel, _row_alignment);
+		_row_size = ::aligned_row_size(_width, bits_per_pixel, _row_alignment);
 	}
 
 	void ImageFormat::set_row_alignment(size_t alignment)
@@ -69,7 +69,7 @@ namespace Yttrium
 		if (is_power_of_2(alignment))
 		{
 			_row_alignment = alignment;
-			_row_size = aligned_row_size(_width, _bits_per_pixel, alignment);
+			_row_size = ::aligned_row_size(_width, _bits_per_pixel, alignment);
 		}
 		// TODO: Think of a better behavior on trying to set an invalid alignment than just ignoring to change anything.
 	}
@@ -77,7 +77,7 @@ namespace Yttrium
 	void ImageFormat::set_width(size_t width)
 	{
 		_width = width;
-		_row_size = aligned_row_size(width, _bits_per_pixel, _row_alignment);
+		_row_size = ::aligned_row_size(width, _bits_per_pixel, _row_alignment);
 	}
 
 	// TODO: Add a function to set width and alignment simultaneously (and more efficiently) to use in Image::set_size.

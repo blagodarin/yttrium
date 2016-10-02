@@ -8,243 +8,243 @@
 #include <iostream>
 #include <limits>
 
-namespace Yttrium
+namespace
 {
-	namespace
+	template <typename T>
+	T string_to_int(const char* p, const char* end)
 	{
-		template <typename T>
-		T string_to_int(const char* p, const char* end)
+		if (p == end)
+			return 0;
+
+		bool negative = false;
+		switch (*p)
 		{
-			if (p == end)
-				return 0;
+		case '-': negative = true;
+		case '+': ++p;
+		}
 
-			bool negative = false;
-			switch (*p)
+		T result = 0;
+		for (; p != end && *p >= '0' && *p <= '9'; ++p)
+			result = result * 10 + (*p - '0');
+
+		return negative ? -result : result;
+	}
+
+	template <typename T>
+	bool string_to_int(const char* p, const char* end, T& value)
+	{
+		if (p == end)
+			return false;
+
+		bool negative = false;
+		switch (*p)
+		{
+		case '-': negative = true;
+		case '+': ++p;
+		}
+
+		if (p == end || *p < '0' || *p > '9')
+			return false;
+
+		T result = 0;
+		do
+		{
+			if (result > std::numeric_limits<T>::max() / 10)
+				return false;
+
+			T digit = *p++ - '0';
+
+			// The maximum value for an N-bit signed integral number is 2^(2^N - 1) - 1.
+			// For N > 1, (2^(2^N - 1) - 1) % 10 == 7.
+			// The minimum value for an N-bit signed integral number is -2^(2^N - 1).
+			// For N > 1, 2^(2^N - 1) % 10 == 8.
+			if (result == std::numeric_limits<T>::max() / 10 && digit > 7 + negative)
+				return false;
+
+			result = result * 10 + digit;
+		} while (p != end && *p >= '0' && *p <= '9');
+
+		if (p != end)
+			return false;
+
+		value = negative ? -result : result;
+		return true;
+	}
+
+	template <typename T>
+	T string_to_uint(const char* p, const char* end)
+	{
+		if (p == end)
+			return 0;
+
+		if (*p == '+')
+			++p;
+
+		T result = 0;
+		for (; p != end && *p >= '0' && *p <= '9'; ++p)
+			result = result * 10 + *p - '0';
+
+		return result;
+	}
+
+	template <typename T>
+	bool string_to_uint(const char* p, const char* end, T& value)
+	{
+		if (p == end)
+			return false;
+
+		if (*p == '+')
+			++p;
+
+		if (p == end || *p < '0' || *p > '9')
+			return false;
+
+		T result = 0;
+		do
+		{
+			if (result > std::numeric_limits<T>::max() / 10)
+				return false;
+
+			T digit = *p++ - '0';
+
+			// The maximum value for an N-bit unsigned integral number is 2^(2^N) - 1.
+			// For N > 3, (2^(2^N)-1) % 10 == 5.
+			if (result == std::numeric_limits<T>::max() / 10 && digit > 5)
+				return false;
+
+			result = result * 10 + digit;
+		} while (p != end && *p >= '0' && *p <= '9');
+
+		if (p != end)
+			return false;
+
+		value = result;
+		return true;
+	}
+
+	template <typename T>
+	T string_to_float(const char* p, const char* end)
+	{
+		if (p == end)
+			return 0;
+
+		bool negative = false;
+		switch (*p)
+		{
+		case '-': negative = true;
+		case '+': ++p;
+		}
+
+		T result = 0;
+		for (; p != end && *p >= '0' && *p <= '9'; ++p)
+			result = result * 10 + (*p - '0');
+
+		if (p != end && *p == '.')
+		{
+			T factor = 1;
+			for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
 			{
-			case '-': negative = true;
-			case '+': ++p;
-			}
-
-			T result = 0;
-			for (; p != end && *p >= '0' && *p <= '9'; ++p)
 				result = result * 10 + (*p - '0');
+				factor *= 10;
+			}
 
-			return negative ? -result : result;
+			result /= factor;
 		}
 
-		template <typename T>
-		bool string_to_int(const char* p, const char* end, T& value)
+		if (p != end && (*p == 'E' || *p == 'e'))
 		{
-			if (p == end)
-				return false;
+			++p;
 
-			bool negative = false;
+			bool negative_power = false;
 			switch (*p)
 			{
-			case '-': negative = true;
+			case '-': negative_power = true;
 			case '+': ++p;
 			}
 
-			if (p == end || *p < '0' || *p > '9')
-				return false;
-
-			T result = 0;
-			do
-			{
-				if (result > std::numeric_limits<T>::max() / 10)
-					return false;
-
-				T digit = *p++ - '0';
-
-				// The maximum value for an N-bit signed integral number is 2^(2^N - 1) - 1.
-				// For N > 1, (2^(2^N - 1) - 1) % 10 == 7.
-				// The minimum value for an N-bit signed integral number is -2^(2^N - 1).
-				// For N > 1, 2^(2^N - 1) % 10 == 8.
-				if (result == std::numeric_limits<T>::max() / 10 && digit > 7 + negative)
-					return false;
-
-				result = result * 10 + digit;
-			} while (p != end && *p >= '0' && *p <= '9');
-
-			if (p != end)
-				return false;
-
-			value = negative ? -result : result;
-			return true;
-		}
-
-		template <typename T>
-		T string_to_uint(const char* p, const char* end)
-		{
-			if (p == end)
-				return 0;
-
-			if (*p == '+')
-				++p;
-
-			T result = 0;
+			T power = 0;
 			for (; p != end && *p >= '0' && *p <= '9'; ++p)
-				result = result * 10 + *p - '0';
+				power = power * 10 + (*p - '0');
 
-			return result;
+			result *= ::pow(10, negative_power ? -power : power);
 		}
 
-		template <typename T>
-		bool string_to_uint(const char* p, const char* end, T& value)
-		{
-			if (p == end)
-				return false;
+		return negative ? -result : result;
+	}
 
-			if (*p == '+')
-				++p;
+	template <typename T>
+	bool string_to_float(const char* p, const char* end, T& value)
+	{
+		if (p == end)
+			return false;
+
+		bool negative = false;
+		switch (*p)
+		{
+		case '-': negative = true;
+		case '+': ++p;
+		}
+
+		if (p == end || *p < '0' || *p > '9')
+			return false;
+
+		T result = 0;
+		do
+		{
+			result = result * 10 + (*p++ - '0');
+		} while (p != end && *p >= '0' && *p <= '9');
+
+		if (p != end && *p == '.')
+		{
+			++p;
 
 			if (p == end || *p < '0' || *p > '9')
 				return false;
 
-			T result = 0;
-			do
-			{
-				if (result > std::numeric_limits<T>::max() / 10)
-					return false;
-
-				T digit = *p++ - '0';
-
-				// The maximum value for an N-bit unsigned integral number is 2^(2^N) - 1.
-				// For N > 3, (2^(2^N)-1) % 10 == 5.
-				if (result == std::numeric_limits<T>::max() / 10 && digit > 5)
-					return false;
-
-				result = result * 10 + digit;
-			} while (p != end && *p >= '0' && *p <= '9');
-
-			if (p != end)
-				return false;
-
-			value = result;
-			return true;
-		}
-
-		template <typename T>
-		T string_to_float(const char* p, const char* end)
-		{
-			if (p == end)
-				return 0;
-
-			bool negative = false;
-			switch (*p)
-			{
-			case '-': negative = true;
-			case '+': ++p;
-			}
-
-			T result = 0;
-			for (; p != end && *p >= '0' && *p <= '9'; ++p)
-				result = result * 10 + (*p - '0');
-
-			if (p != end && *p == '.')
-			{
-				T factor = 1;
-				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
-				{
-					result = result * 10 + (*p - '0');
-					factor *= 10;
-				}
-
-				result /= factor;
-			}
-
-			if (p != end && (*p == 'E' || *p == 'e'))
-			{
-				++p;
-
-				bool negative_power = false;
-				switch (*p)
-				{
-				case '-': negative_power = true;
-				case '+': ++p;
-				}
-
-				T power = 0;
-				for (; p != end && *p >= '0' && *p <= '9'; ++p)
-					power = power * 10 + (*p - '0');
-
-				result *= ::pow(10, negative_power ? -power : power);
-			}
-
-			return negative ? -result : result;
-		}
-
-		template <typename T>
-		bool string_to_float(const char* p, const char* end, T& value)
-		{
-			if (p == end)
-				return false;
-
-			bool negative = false;
-			switch (*p)
-			{
-			case '-': negative = true;
-			case '+': ++p;
-			}
-
-			if (p == end || *p < '0' || *p > '9')
-				return false;
-
-			T result = 0;
+			T factor = 1;
 			do
 			{
 				result = result * 10 + (*p++ - '0');
+				factor *= 10;
 			} while (p != end && *p >= '0' && *p <= '9');
 
-			if (p != end && *p == '.')
-			{
-				++p;
+			result /= factor;
+		}
 
-				if (p == end || *p < '0' || *p > '9')
-					return false;
-
-				T factor = 1;
-				do
-				{
-					result = result * 10 + (*p++ - '0');
-					factor *= 10;
-				} while (p != end && *p >= '0' && *p <= '9');
-
-				result /= factor;
-			}
-
-			if (p != end && (*p == 'E' || *p == 'e'))
-			{
-				if (++p == end)
-					return false;
-
-				bool negative_power = false;
-				switch (*p)
-				{
-				case '-': negative_power = true;
-				case '+': ++p;
-				}
-
-				if (p == end || *p < '0' || *p > '9')
-					return false;
-
-				T power = 0;
-				do
-				{
-					power = power * 10 + (*p++ - '0');
-				} while (p != end && *p >= '0' && *p <= '9');
-
-				result *= ::pow(10, negative_power ? -power : power);
-			}
-
-			if (p != end)
+		if (p != end && (*p == 'E' || *p == 'e'))
+		{
+			if (++p == end)
 				return false;
 
-			value = negative ? -result : result;
-			return true;
-		}
-	}
+			bool negative_power = false;
+			switch (*p)
+			{
+			case '-': negative_power = true;
+			case '+': ++p;
+			}
 
+			if (p == end || *p < '0' || *p > '9')
+				return false;
+
+			T power = 0;
+			do
+			{
+				power = power * 10 + (*p++ - '0');
+			} while (p != end && *p >= '0' && *p <= '9');
+
+			result *= ::pow(10, negative_power ? -power : power);
+		}
+
+		if (p != end)
+			return false;
+
+		value = negative ? -result : result;
+		return true;
+	}
+}
+
+namespace Yttrium
+{
 	StaticString::StaticString(const char* text)
 		: _text(text ? const_cast<char*>(text) : &Null)
 		, _size(::strlen(_text))
@@ -317,47 +317,47 @@ namespace Yttrium
 
 	double StaticString::to_double() const
 	{
-		return string_to_float<double>(_text, _text + _size);
+		return ::string_to_float<double>(_text, _text + _size);
 	}
 
 	float StaticString::to_float() const
 	{
-		return string_to_float<float>(_text, _text + _size);
+		return ::string_to_float<float>(_text, _text + _size);
 	}
 
 	int StaticString::to_int() const
 	{
-		return string_to_int<int>(_text, _text + _size);
+		return ::string_to_int<int>(_text, _text + _size);
 	}
 
 	int32_t StaticString::to_int32() const
 	{
-		return string_to_int<int32_t>(_text, _text + _size);
+		return ::string_to_int<int32_t>(_text, _text + _size);
 	}
 
 	int64_t StaticString::to_int64() const
 	{
-		return string_to_int<int64_t>(_text, _text + _size);
+		return ::string_to_int<int64_t>(_text, _text + _size);
 	}
 
 	bool StaticString::to_number(int32_t& value) const
 	{
-		return string_to_int(_text, _text + _size, value);
+		return ::string_to_int(_text, _text + _size, value);
 	}
 
 	bool StaticString::to_number(uint32_t& value) const
 	{
-		return string_to_uint(_text, _text + _size, value);
+		return ::string_to_uint(_text, _text + _size, value);
 	}
 
 	bool StaticString::to_number(float& value) const
 	{
-		return string_to_float(_text, _text + _size, value);
+		return ::string_to_float(_text, _text + _size, value);
 	}
 
 	bool StaticString::to_number(double& value) const
 	{
-		return string_to_float(_text, _text + _size, value);
+		return ::string_to_float(_text, _text + _size, value);
 	}
 
 	double StaticString::to_time() const
@@ -411,17 +411,17 @@ namespace Yttrium
 
 	unsigned StaticString::to_uint() const
 	{
-		return string_to_uint<unsigned>(_text, _text + _size);
+		return ::string_to_uint<unsigned>(_text, _text + _size);
 	}
 
 	uint32_t StaticString::to_uint32() const
 	{
-		return string_to_uint<uint32_t>(_text, _text + _size);
+		return ::string_to_uint<uint32_t>(_text, _text + _size);
 	}
 
 	uint64_t StaticString::to_uint64() const
 	{
-		return string_to_uint<uint64_t>(_text, _text + _size);
+		return ::string_to_uint<uint64_t>(_text, _text + _size);
 	}
 
 	StaticString StaticString::trimmed() const

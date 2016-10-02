@@ -10,32 +10,34 @@
 #include <cstring>
 #include <new>
 
-namespace Yttrium
+namespace
 {
-	namespace
-	{
-		void* allocate_big_block(size_t size)
-		{
-			const auto data = pages_allocate(size);
-			if (!data)
-				throw std::bad_alloc();
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-			_buffer_memory_tracker.track_system_allocation(size);
-		#endif
-			return data;
-		}
+	using namespace Yttrium;
 
-		size_t level_from_capacity(size_t capacity) noexcept
-		{
-			assert(is_power_of_2(capacity));
-			size_t level = 0;
-			for (auto i = capacity; i > 1; i >>= 1)
-				++level;
-			assert(size_t{1} << level == capacity);
-			return level;
-		}
+	void* allocate_big_block(size_t size)
+	{
+		const auto data = pages_allocate(size);
+		if (!data)
+			throw std::bad_alloc();
+	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+		_buffer_memory_tracker.track_system_allocation(size);
+	#endif
+		return data;
 	}
 
+	size_t level_from_capacity(size_t capacity) noexcept
+	{
+		assert(is_power_of_2(capacity));
+		size_t level = 0;
+		for (auto i = capacity; i > 1; i >>= 1)
+			++level;
+		assert(size_t{1} << level == capacity);
+		return level;
+	}
+}
+
+namespace Yttrium
+{
 	BufferMemory::BufferMemory()
 		: _named_allocator_data(_named_allocators.data(String("buffers"_s, &_heap_allocator)))
 	{
@@ -47,7 +49,7 @@ namespace Yttrium
 		std::map<size_t, size_t> free_block_count;
 		{
 			std::lock_guard<std::mutex> lock(_small_blocks_mutex);
-			for (auto i = level_from_capacity(capacity_for_size(1)); i <= MaxSmallBlockLevel; ++i)
+			for (auto i = ::level_from_capacity(capacity_for_size(1)); i <= MaxSmallBlockLevel; ++i)
 			{
 				size_t count = 0;
 				for (void* block = _small_blocks[i]; block; block = *reinterpret_cast<void**>(block))
@@ -66,11 +68,11 @@ namespace Yttrium
 		void* data = nullptr;
 		if (capacity > MaxSmallBlockSize)
 		{
-			data = allocate_big_block(capacity);
+			data = ::allocate_big_block(capacity);
 		}
 		else
 		{
-			const auto level = level_from_capacity(capacity);
+			const auto level = ::level_from_capacity(capacity);
 			{
 				std::lock_guard<std::mutex> lock(_small_blocks_mutex);
 				data = _small_blocks[level];
@@ -92,7 +94,7 @@ namespace Yttrium
 					{
 						// TODO: Try to merge smaller blocks before allocating a new big one.
 						assert(1 << i == 2 * MaxSmallBlockSize);
-						data = allocate_big_block(2 * MaxSmallBlockSize);
+						data = ::allocate_big_block(2 * MaxSmallBlockSize);
 					}
 					do
 					{
@@ -124,7 +126,7 @@ namespace Yttrium
 		}
 		else
 		{
-			const auto level = level_from_capacity(capacity);
+			const auto level = ::level_from_capacity(capacity);
 			{
 				std::lock_guard<std::mutex> lock(_small_blocks_mutex);
 				*reinterpret_cast<void**>(data) = _small_blocks[level];
