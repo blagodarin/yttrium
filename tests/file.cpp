@@ -27,14 +27,19 @@ namespace Yttrium
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(test_file_special)
+BOOST_AUTO_TEST_CASE(test_file_copy_all_from)
 {
-	File file(File::StdErr);
-	BOOST_REQUIRE(file);
-	BOOST_CHECK(file.name().is_empty());
+	const auto buffer = make_random_buffer(100003);
 
-	const auto text = "Standard error output test.\n"_s;
-	BOOST_CHECK(file.write(text.text(), text.size()));
+	File input(File::Temporary);
+	input.write(buffer.data(), buffer.size());
+	input.seek(0);
+
+	File output(File::Temporary);
+	output.copy_all_from(input);
+
+	const auto actual = File::read_to_buffer(output.name());
+	BOOST_CHECK_EQUAL(actual, buffer);
 }
 
 BOOST_AUTO_TEST_CASE(test_file_read_all)
@@ -42,9 +47,7 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 	const auto expected_buffer = make_random_buffer(100003);
 
 	File file(File::Temporary);
-
 	file.write(expected_buffer.data(), expected_buffer.size());
-	file.flush();
 
 	Buffer actual_buffer;
 
@@ -64,7 +67,6 @@ BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
 
 	File file(File::Temporary);
 	file.write(expected.data(), expected.size());
-	file.flush();
 
 	const auto actual = File::read_to_buffer(file.name());
 	BOOST_CHECK_EQUAL(actual, expected);
@@ -72,20 +74,12 @@ BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
 	BOOST_CHECK_EQUAL(actual[actual.size()], '\0');
 }
 
-BOOST_AUTO_TEST_CASE(test_file_transfer)
+BOOST_AUTO_TEST_CASE(test_file_special)
 {
-	const auto buffer = make_random_buffer(100003);
+	File file(File::StdErr);
+	BOOST_REQUIRE(file);
+	BOOST_CHECK(file.name().is_empty());
 
-	File input(File::Temporary);
-
-	input.write(buffer.data(), buffer.size());
-	input.flush();
-	input.seek(0);
-
-	File output(File::Temporary);
-
-	FileTransfer<8192>(output, input);
-
-	const auto actual = File::read_to_buffer(output.name());
-	BOOST_CHECK_EQUAL(actual, buffer);
+	const auto text = "Standard error output test.\n"_s;
+	BOOST_CHECK(file.write(text.text(), text.size()));
 }

@@ -22,16 +22,13 @@ using namespace Yttrium;
 BOOST_AUTO_TEST_CASE(test_package)
 {
 	Buffer buffer1(100003);
-	for (auto& byte : buffer1)
-		byte = 1;//rand() % UINT8_MAX;
+	::memset(buffer1.data(), 1, buffer1.size());
 
 	Buffer buffer2(100019);
-	for (auto& byte : buffer2)
-		byte = 2;//rand() % UINT8_MAX;
+	::memset(buffer2.data(), 2, buffer2.size());
 
 	Buffer buffer3(100043);
-	for (auto& byte : buffer3)
-		byte = 3;//rand() % UINT8_MAX;
+	::memset(buffer3.data(), 3, buffer3.size());
 
 	File file1(File::Temporary);
 	file1.write(buffer1.data(), buffer1.size());
@@ -51,25 +48,25 @@ BOOST_AUTO_TEST_CASE(test_package)
 	File package_file(File::Temporary);
 
 	{
-		const auto& package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
 
 		{
-			File packed_file1 = package_writer->open_file(file1.name());
+			auto packed_file1 = package_writer->open_file(file1.name());
 			BOOST_REQUIRE(packed_file1);
-			FileTransfer<8192>(packed_file1, file1);
+			BOOST_REQUIRE_EQUAL(packed_file1.copy_all_from(file1), file1.size());
 		}
 
 		{
-			File packed_file2 = package_writer->open_file(file2.name());
+			auto packed_file2 = package_writer->open_file(file2.name());
 			BOOST_REQUIRE(packed_file2);
-			FileTransfer<8192>(packed_file2, file2);
+			BOOST_REQUIRE_EQUAL(packed_file2.copy_all_from(file2), file2.size());
 		}
 
 		{
-			File packed_file3 = package_writer->open_file(file3.name());
+			auto packed_file3 = package_writer->open_file(file3.name());
 			BOOST_REQUIRE(packed_file3);
-			FileTransfer<8192>(packed_file3, file3);
+			BOOST_REQUIRE_EQUAL(packed_file3.copy_all_from(file3), file3.size());
 		}
 	}
 
@@ -78,7 +75,7 @@ BOOST_AUTO_TEST_CASE(test_package)
 	File packed_file3;
 
 	{
-		const auto& package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
+		const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_reader);
 
 		packed_file3 = package_reader->open_file(file3.name());
@@ -111,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 {
 	File package_file(File::Temporary);
 	{
-		const auto& package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
 		{
 			auto packed_file = package_writer->open_file("1");
@@ -125,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 		}
 	}
 
-	const auto& package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
+	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 	BOOST_REQUIRE(package_reader);
 
 	auto packed_file = package_reader->open_file("1");

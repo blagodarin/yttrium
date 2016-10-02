@@ -5,6 +5,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/text_capture.h>
 #include <yttrium/script/context.h>
+#include <yttrium/time.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
@@ -48,13 +49,13 @@ namespace Yttrium
 				return true;
 
 			case Key::Mouse1:
-				_cursor_mark = Timer::clock();
+				_cursor_mark = millisecond_clock();
 				return true;
 
 			default:
 				if (_logic.process_key(event))
 				{
-					_cursor_mark = Timer::clock();
+					_cursor_mark = millisecond_clock();
 					return true;
 				}
 			}
@@ -70,7 +71,7 @@ namespace Yttrium
 		_foreground.prepare(_logic.text(), rect, &capture);
 		_foreground.draw(renderer);
 
-		if (_is_focused && capture.has_cursor && (Timer::clock() - _cursor_mark) % 1000 < 500)
+		if (_is_focused && capture.has_cursor && (millisecond_clock() - _cursor_mark) % 1000 < 500)
 		{
 			// TODO: Force a cursor symbol to be included in every font.
 			renderer.set_color(_foreground.color);

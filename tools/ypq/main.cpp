@@ -22,8 +22,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	const auto& package_file = PackageWriter::create(argv[1], PackageType::Ypq);
-	if (!package_file)
+	const auto package = PackageWriter::create(argv[1], PackageType::Ypq);
+	if (!package)
 	{
 		std::cerr << "ERROR: Can't open package file \"" << argv[1] << "\"" << std::endl;
 		return 1;
@@ -44,8 +44,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		File packed_file = package_file->open_file(entry);
-
-		FileTransfer<8192>(packed_file, source_file);
+		File packed_file = package->open_file(entry);
+		packed_file.copy_all_from(source_file);
 	}
 }

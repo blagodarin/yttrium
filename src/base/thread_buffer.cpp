@@ -42,7 +42,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool ThreadBufferBase::try_begin_read(Clock milliseconds)
+	bool ThreadBufferBase::try_begin_read(int milliseconds)
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
 		if (!_read.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]{ return _size > 0; }))
@@ -60,7 +60,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool ThreadBufferBase::try_begin_write(Clock milliseconds)
+	bool ThreadBufferBase::try_begin_write(int milliseconds)
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
 		if (!_write.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]{ return _size < _capacity; }))

@@ -2,7 +2,7 @@
 
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/timer.h>
+#include <yttrium/time.h>
 #include "../renderer/renderer.h"
 #include "backend.h"
 
@@ -178,7 +178,7 @@ namespace Yttrium
 		UpdateEvent update;
 		int frames = 0;
 		int max_frame_time = 0;
-		auto clock = Timer::clock();
+		auto clock = millisecond_clock();
 		auto fps_time = clock;
 		while (_private->process_events())
 		{
@@ -196,7 +196,7 @@ namespace Yttrium
 				_private->_callbacks.on_screenshot(_private->_renderer->take_screenshot());
 			}
 			++frames;
-			update.milliseconds = Timer::clock() - clock;
+			update.milliseconds = millisecond_clock() - clock;
 			clock += update.milliseconds;
 			fps_time += update.milliseconds;
 			max_frame_time = max(max_frame_time, update.milliseconds);

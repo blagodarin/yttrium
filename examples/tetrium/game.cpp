@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include <yttrium/audio/player.h>
-#include <yttrium/date_time.h>
 #include <yttrium/file.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
@@ -17,7 +16,7 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/timer.h>
+#include <yttrium/time.h>
 
 Game::Game()
 	: _statistics({
@@ -180,7 +179,7 @@ void Game::run()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_game.set_random_seed(Timer::clock());
+	_game.set_random_seed(millisecond_clock());
 
 	if (_audio)
 	{

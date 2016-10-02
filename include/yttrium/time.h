@@ -1,8 +1,8 @@
 /// \file
 /// \brief Date and time.
 
-#ifndef _include_yttrium_date_time_h_
-#define _include_yttrium_date_time_h_
+#ifndef _include_yttrium_time_h_
+#define _include_yttrium_time_h_
 
 #include <yttrium/global.h>
 
@@ -24,6 +24,9 @@ namespace Yttrium
 		/// Get the current date and time.
 		static DateTime now();
 	};
+
+	///
+	Y_API int millisecond_clock();
 }
 
 #endif

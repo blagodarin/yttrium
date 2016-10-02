@@ -1,4 +1,3 @@
-#include <yttrium/date_time.h>
 #include <yttrium/string.h>
 
 #include <boost/test/unit_test.hpp>

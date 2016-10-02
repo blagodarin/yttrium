@@ -1,7 +1,7 @@
 #include <yttrium/string_format.h>
 
-#include <yttrium/date_time.h>
 #include <yttrium/string.h>
+#include <yttrium/time.h>
 
 #include <array>
 #include <cassert>

@@ -32,6 +32,15 @@ namespace Yttrium
 	{
 	}
 
+	uint64_t File::copy_all_from(File& file)
+	{
+		uint64_t total_size = 0;
+		Buffer buffer(Buffer::memory_granularity());
+		while (size_t size = file.read(buffer.data(), buffer.size()))
+			total_size += write(buffer.data(), size);
+		return total_size;
+	}
+
 	bool File::flush()
 	{
 		return _private && _private->flush();

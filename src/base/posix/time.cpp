@@ -1,8 +1,7 @@
-#include <yttrium/date_time.h>
+#include <yttrium/time.h>
 
+#include <ctime>
 #include <system_error>
-
-#include <time.h>
 
 namespace Yttrium
 {

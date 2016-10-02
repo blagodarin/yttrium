@@ -1,12 +1,12 @@
 #include "game.h"
 
-#include <yttrium/date_time.h>
 #include <yttrium/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/string_format.h>
+#include <yttrium/time.h>
 
 #include <cmath>
 

@@ -5,7 +5,7 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>
-#include <yttrium/timer.h>
+#include <yttrium/time.h>
 
 #include <array>
 
@@ -36,16 +36,16 @@ Cursor::~Cursor() = default;
 
 void Cursor::draw(const PointF& point)
 {
-	const auto animation = [](Clock tick)
+	const auto animation = [](int tick)
 	{
-		constexpr Clock period = 1500;
+		constexpr int period = 1500;
 		constexpr float half_period = period / 2;
 
 		const auto step = tick % period;
 		return (step < half_period ? half_period - step : step - half_period) / half_period;
 	};
 
-	const auto tick = Timer::clock();
+	const auto tick = millisecond_clock();
 
 	const auto a = animation(tick);
 	const auto b = animation(tick + 500);

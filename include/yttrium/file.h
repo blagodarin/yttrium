@@ -50,6 +50,10 @@ namespace Yttrium
 		///
 		File(Special, Allocator& = *DefaultAllocator);
 
+		/// Copies all available contents from another file.
+		/// Returns the number of bytes written.
+		uint64_t copy_all_from(File&);
+
 		/// Flushes buffered data to the storage medium.
 		bool flush();
 
@@ -124,25 +128,6 @@ namespace Yttrium
 		File& operator=(const File&) = delete;
 		File& operator=(File&&) noexcept;
 		explicit operator bool() const { return static_cast<bool>(_private); }
-	};
-
-	/// Utility class for data transfer between files.
-	/// \tparam buffer_size Size of a buffer to use.
-	template <size_t buffer_size>
-	class FileTransfer
-	{
-	public:
-		/// Performs the transfer till the \a reader 's end, then truncate the \a writer.
-		FileTransfer(File& writer, File& reader)
-		{
-			size_t size;
-			while ((size = reader.read(_buffer, buffer_size)))
-				writer.write(_buffer, size);
-			writer.truncate();
-		}
-
-	private:
-		uint8_t _buffer[buffer_size];
 	};
 }
 

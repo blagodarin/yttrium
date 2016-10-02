@@ -1,6 +1,6 @@
-#include <yttrium/date_time.h>
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
+#include <yttrium/time.h>
 
 #include <boost/test/unit_test.hpp>
 

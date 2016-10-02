@@ -1,8 +1,6 @@
 #ifndef _src_base_thread_buffer_h_
 #define _src_base_thread_buffer_h_
 
-#include <yttrium/timer.h>
-
 #include <condition_variable>
 #include <mutex>
 
@@ -24,9 +22,9 @@ namespace Yttrium
 		void end_read();
 		void end_write();
 		bool try_begin_read();
-		bool try_begin_read(Clock milliseconds);
+		bool try_begin_read(int milliseconds);
 		bool try_begin_write();
-		bool try_begin_write(Clock milliseconds);
+		bool try_begin_write(int milliseconds);
 
 	protected:
 
@@ -56,7 +54,7 @@ namespace Yttrium
 			return result;
 		}
 
-		T read(Clock milliseconds, const T& default_value = T())
+		T read(int milliseconds, const T& default_value = T())
 		{
 			if (!try_begin_read(milliseconds))
 				return default_value;
@@ -74,7 +72,7 @@ namespace Yttrium
 			return true;
 		}
 
-		bool try_read(T* value, Clock milliseconds)
+		bool try_read(T* value, int milliseconds)
 		{
 			if (!try_begin_read(milliseconds))
 				return false;
@@ -92,7 +90,7 @@ namespace Yttrium
 			return true;
 		}
 
-		bool try_write(const T& value, Clock milliseconds)
+		bool try_write(const T& value, int milliseconds)
 		{
 			if (!try_begin_write(milliseconds))
 				return false;
