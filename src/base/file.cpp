@@ -2,6 +2,7 @@
 
 #include <yttrium/memory/buffer.h>
 #include <yttrium/utils.h>
+#include "buffer_file.h"
 
 #include <cassert>
 #include <new>
@@ -29,6 +30,11 @@ namespace Yttrium
 
 	File::File(Special special, Allocator& allocator)
 		: _private(FilePrivate::open(special, allocator))
+	{
+	}
+
+	File::File(Buffer&& buffer, Allocator& allocator)
+		: _private(make_unique<BufferFile>(allocator, String(&NoAllocator), ReadWrite, std::move(buffer)))
 	{
 	}
 
@@ -224,6 +230,11 @@ namespace Yttrium
 		_private->_offset += result;
 		_private->update_size(_private->_offset);
 		return result;
+	}
+
+	bool File::write_all(const Buffer& buffer)
+	{
+		return write(buffer.data(), buffer.size()) == buffer.size();
 	}
 
 	Buffer File::read_to_buffer(const StaticString& name, Allocator& allocator)

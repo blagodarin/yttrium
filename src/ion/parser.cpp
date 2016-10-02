@@ -74,7 +74,7 @@ namespace Yttrium
 
 						if (!c0 && src == buffer.end())
 						{
-							Log() << "ion: Error: "_s << source_name << ": String continues past the end of source"_s;
+							Log() << "("_s << source_name << ") String continues past the end of source"_s;
 							return false;
 						}
 
@@ -98,7 +98,7 @@ namespace Yttrium
 								}
 								else
 								{
-									Log() << "ion: Error: "_s << source_name << ": Bad second hex digit '"_s << c2 << '\'';
+									Log() << "("_s << source_name << ") Bad second hex digit '"_s << c2 << '\'';
 									return false;
 								}
 
@@ -124,7 +124,7 @@ namespace Yttrium
 								case 't':  *dst++ = '\t'; break;
 								default:
 
-									Log() << "ion: Error: "_s << source_name << ": Bad escape symbol '"_s << c1 << '\'';
+									Log() << "("_s << source_name << ") Bad escape symbol '"_s << c1 << '\'';
 									return false;
 								}
 							}

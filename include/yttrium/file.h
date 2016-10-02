@@ -50,6 +50,9 @@ namespace Yttrium
 		///
 		File(Special, Allocator& = *DefaultAllocator);
 
+		///
+		File(Buffer&&, Allocator& = *DefaultAllocator);
+
 		/// Copies all available contents from another file.
 		/// Returns the number of bytes written.
 		uint64_t copy_all_from(File&);
@@ -111,6 +114,9 @@ namespace Yttrium
 		/// Write the \a buffer to the file.
 		template <typename T>
 		bool write(const T& buffer) { return write(&buffer, sizeof buffer) == sizeof buffer; }
+
+		///
+		bool write_all(const Buffer&);
 
 		/// Reads the specified file to the buffer.
 		/// The buffer is guaranteed to be implicitly zero-terminated.

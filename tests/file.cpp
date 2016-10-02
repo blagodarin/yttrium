@@ -29,7 +29,7 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_file_copy_all_from)
 {
-	const auto buffer = make_random_buffer(100003);
+	const auto buffer = ::make_random_buffer(100003);
 
 	File input(File::Temporary);
 	input.write(buffer.data(), buffer.size());
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_file_copy_all_from)
 
 BOOST_AUTO_TEST_CASE(test_file_read_all)
 {
-	const auto expected_buffer = make_random_buffer(100003);
+	const auto expected_buffer = ::make_random_buffer(100003);
 
 	File file(File::Temporary);
 	file.write(expected_buffer.data(), expected_buffer.size());
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_file_read_all)
 
 BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
 {
-	const auto expected = make_random_buffer(Buffer::memory_granularity());
+	const auto expected = ::make_random_buffer(Buffer::memory_granularity());
 
 	File file(File::Temporary);
 	file.write(expected.data(), expected.size());
@@ -82,4 +82,36 @@ BOOST_AUTO_TEST_CASE(test_file_special)
 
 	const auto text = "Standard error output test.\n"_s;
 	BOOST_CHECK(file.write(text.text(), text.size()));
+}
+
+BOOST_AUTO_TEST_CASE(test_memory_file_reading)
+{
+	const auto original_buffer = ::make_random_buffer(Buffer::memory_granularity());
+
+	Buffer file_buffer(original_buffer.size());
+	std::memcpy(file_buffer.data(), original_buffer.data(), original_buffer.size());
+
+	File file(std::move(file_buffer));
+	BOOST_REQUIRE(file);
+
+	Buffer read_buffer;
+	BOOST_REQUIRE(file.read_all(&read_buffer));
+	BOOST_CHECK_EQUAL(read_buffer, original_buffer);
+}
+
+BOOST_AUTO_TEST_CASE(test_memory_file_writing)
+{
+	File file{ Buffer() };
+	BOOST_REQUIRE(file);
+	BOOST_CHECK_EQUAL(file.size(), 0);
+
+	const auto original_buffer = ::make_random_buffer(Buffer::memory_granularity());
+
+	BOOST_REQUIRE(file.write_all(original_buffer));
+	BOOST_CHECK_EQUAL(file.size(), original_buffer.size());
+
+	Buffer read_buffer;
+	BOOST_REQUIRE(file.seek(0));
+	BOOST_REQUIRE(file.read_all(&read_buffer));
+	BOOST_CHECK_EQUAL(read_buffer, original_buffer);
 }
