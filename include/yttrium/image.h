@@ -10,6 +10,7 @@
 
 namespace Yttrium
 {
+	class File;
 	class Image;
 
 	/// Pixel format.
@@ -167,6 +168,9 @@ namespace Yttrium
 
 		///
 		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;
+
+		///
+		bool save(File&, ImageType, Allocator& = *DefaultAllocator) const;
 
 		/// Change the format to \a format.
 		/// \param format New image format.

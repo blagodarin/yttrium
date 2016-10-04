@@ -27,28 +27,6 @@ namespace Yttrium
 		{
 		}
 	};
-
-	class ImageWriter
-	{
-	public:
-		virtual ~ImageWriter() = default;
-
-		virtual bool open();
-		virtual bool set_format(const ImageFormat&) = 0;
-		virtual bool write(const void*) = 0;
-
-	public:
-		Allocator& _allocator;
-		ImageFormat _format;
-		File _file;
-
-	protected:
-		ImageWriter(const StaticString& name, Allocator& allocator)
-			: _allocator(allocator)
-			, _file(name, File::Write | File::Truncate, allocator)
-		{
-		}
-	};
 }
 
 #endif

@@ -1,61 +1,15 @@
 #include "png.h"
 
+#include <yttrium/file.h>
+#include <yttrium/image.h>
+
+#include <png.h>
+
 namespace
 {
 	using namespace Yttrium;
 
-	void y_png_write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
-	{
-		reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->write(data, length);
-	}
-
-	void y_png_flush_callback(png_struct* png_ptr)
-	{
-		reinterpret_cast<File*>(png_get_io_ptr(png_ptr))->flush();
-	}
-}
-
-namespace Yttrium
-{
-	PngWriter::PngWriter(const StaticString& name, Allocator& allocator)
-		: ImageWriter(name, allocator)
-	{
-	}
-
-	PngWriter::~PngWriter()
-	{
-		if (_png)
-		{
-			if (_info)
-				png_destroy_write_struct(&_png, &_info);
-			else
-				png_destroy_write_struct(&_png, nullptr);
-		}
-	}
-
-	bool PngWriter::open()
-	{
-		_png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-
-		if (_png)
-		{
-			_info = png_create_info_struct(_png);
-			if (_info)
-			{
-				png_set_write_fn(_png, &_file, ::y_png_write_callback, ::y_png_flush_callback);
-				return true;
-				//png_destroy_write_struct(&_png, &_info);
-			}
-			else
-			{
-				png_destroy_write_struct(&_png, nullptr);
-			}
-		}
-
-		return false;
-	}
-
-	bool PngWriter::set_format(const ImageFormat& format)
+	bool can_write(const ImageFormat& format)
 	{
 		switch (format.pixel_format())
 		{
@@ -100,44 +54,91 @@ namespace Yttrium
 		return true;
 	}
 
-	bool PngWriter::write(const void* buffer)
+	class PngWriter
 	{
+	public:
+		PngWriter(File& file)
+		{
+			_png = ::png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+			if (!_png)
+				return;
+			_info = ::png_create_info_struct(_png);
+			if (!_info)
+				return;
+			::png_set_write_fn(_png, &file, write_callback, flush_callback);
+		}
+
+		~PngWriter()
+		{
+			if (_png)
+			{
+				if (_info)
+					::png_destroy_write_struct(&_png, &_info);
+				else
+					::png_destroy_write_struct(&_png, nullptr);
+			}
+		}
+
+	private:
+		static void write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
+		{
+			reinterpret_cast<File*>(::png_get_io_ptr(png_ptr))->write(data, length);
+		}
+
+		static void flush_callback(png_struct* png_ptr)
+		{
+			reinterpret_cast<File*>(::png_get_io_ptr(png_ptr))->flush();
+		}
+
+	public:
+		png_struct* _png = nullptr;
+		png_info* _info = nullptr;
+	};
+}
+
+namespace Yttrium
+{
+	bool write_png(File& file, const ImageFormat& format, const void* data, Allocator& allocator)
+	{
+		if (!::can_write(format))
+			return false;
+
 		int color_type = 0;
 		int transforms = 0;
 
-		if (_format.pixel_format() == PixelFormat::AlphaGray
-			|| _format.pixel_format() == PixelFormat::Argb
-			|| _format.pixel_format() == PixelFormat::Abgr)
+		if (format.pixel_format() == PixelFormat::AlphaGray
+			|| format.pixel_format() == PixelFormat::Argb
+			|| format.pixel_format() == PixelFormat::Abgr)
 		{
 			transforms |= PNG_TRANSFORM_SWAP_ALPHA;
 		}
 
-		if (_format.pixel_format() == PixelFormat::Bgr
-			|| _format.pixel_format() == PixelFormat::Bgra
-			|| _format.pixel_format() == PixelFormat::Abgr)
+		if (format.pixel_format() == PixelFormat::Bgr
+			|| format.pixel_format() == PixelFormat::Bgra
+			|| format.pixel_format() == PixelFormat::Abgr)
 		{
 			transforms |= PNG_TRANSFORM_BGR;
 		}
 
 		// TODO: Remove PNG_TRANSFORM_SWAP_ENDIAN for a big endian platform.
-		switch (_format.pixel_format())
+		switch (format.pixel_format())
 		{
 		case PixelFormat::Gray:
-			if (_format.bits_per_pixel() > 8)
+			if (format.bits_per_pixel() > 8)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_GRAY;
 			break;
 
 		case PixelFormat::GrayAlpha:
 		case PixelFormat::AlphaGray:
-			if (_format.bits_per_pixel() > 16)
+			if (format.bits_per_pixel() > 16)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
 			break;
 
 		case PixelFormat::Rgb:
 		case PixelFormat::Bgr:
-			if (_format.bits_per_pixel() > 24)
+			if (format.bits_per_pixel() > 24)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_RGB;
 			break;
@@ -146,41 +147,41 @@ namespace Yttrium
 		case PixelFormat::Bgra:
 		case PixelFormat::Argb:
 		case PixelFormat::Abgr:
-			if (_format.bits_per_pixel() > 32)
+			if (format.bits_per_pixel() > 32)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
 			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 			break;
 		}
 
-		png_bytepp rows = _allocator.allocate<png_bytep>(_format.height());
+		PngWriter png_writer(file);
 
-		if (setjmp(png_jmpbuf(_png)))
+		const auto rows = allocator.allocate<png_bytep>(format.height());
+
+		if (::setjmp(png_jmpbuf(png_writer._png)))
 		{
-			_allocator.deallocate(rows);
+			allocator.deallocate(rows);
 			return false;
 		}
 
-		png_set_compression_level(_png, 0);
-		png_set_IHDR(_png, _info, _format.width(), _format.height(), _format.bits_per_channel(),
+		::png_set_compression_level(png_writer._png, 0);
+		::png_set_IHDR(png_writer._png, png_writer._info, format.width(), format.height(), format.bits_per_channel(),
 			color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
-		size_t j = 0;
-
-		if (_format.orientation() == ImageOrientation::XRightYDown)
+		if (format.orientation() == ImageOrientation::XRightYDown)
 		{
-			for (size_t i = 0; i < _format.height(); i++, j += _format.row_size())
-				rows[i] = const_cast<png_bytep>(static_cast<png_const_bytep>(buffer) + j);
+			for (size_t i = 0, j = 0; i < format.height(); i++, j += format.row_size())
+				rows[i] = const_cast<png_bytep>(static_cast<png_const_bytep>(data) + j);
 		}
 		else
 		{
-			for (size_t i = _format.height(); i > 0; i--, j += _format.row_size())
-				rows[i - 1] = const_cast<png_bytep>(static_cast<png_const_bytep>(buffer) + j);
+			for (size_t i = format.height(), j = 0; i > 0; i--, j += format.row_size())
+				rows[i - 1] = const_cast<png_bytep>(static_cast<png_const_bytep>(data) + j);
 		}
 
-		png_set_rows(_png, _info, rows);
-		png_write_png(_png, _info, transforms, nullptr);
+		::png_set_rows(png_writer._png, png_writer._info, rows);
+		::png_write_png(png_writer._png, png_writer._info, transforms, nullptr);
 
-		_allocator.deallocate(rows);
+		allocator.deallocate(rows);
 
 		return true;
 	}

@@ -82,11 +82,6 @@ namespace Yttrium
 
 	// TODO: Add a function to set width and alignment simultaneously (and more efficiently) to use in Image::set_size.
 
-	bool ImageWriter::open()
-	{
-		return true;
-	}
-
 	Image::Image(const ImageFormat& format)
 		: _format(format)
 		, _buffer(_format.frame_size())
@@ -178,22 +173,20 @@ namespace Yttrium
 			else
 				return false;
 		}
+		File file(name, File::Write | File::Truncate, allocator);
+		return file && save(file, type, allocator);
+	}
 
-		UniquePtr<ImageWriter> writer;
+	bool Image::save(File& file, ImageType type, Allocator& allocator) const
+	{
 		switch (type)
 		{
-		case ImageType::Tga: writer = make_unique<TgaWriter>(allocator, name, allocator); break;
+		case ImageType::Tga: return write_tga(file, _format, _buffer.data()); break;
 	#ifndef Y_NO_PNG
-		case ImageType::Png: writer = make_unique<PngWriter>(allocator, name, allocator); break;
+		case ImageType::Png: return write_png(file, _format, _buffer.data(), allocator); break;
 	#endif
-		default:             return false;
+		default: return false;
 		}
-
-		if (!writer->_file || !writer->open() || !writer->set_format(_format))
-			return false;
-
-		writer->_format = _format;
-		return writer->write(_buffer.data());
 	}
 
 	void Image::set_format(const ImageFormat& format)

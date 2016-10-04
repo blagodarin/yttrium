@@ -14,14 +14,7 @@ namespace Yttrium
 		bool read(void*) override;
 	};
 
-	class TgaWriter : public ImageWriter
-	{
-	public:
-		TgaWriter(const StaticString& name, Allocator&);
-
-		bool set_format(const ImageFormat&) override;
-		bool write(const void*) override;
-	};
+	bool write_tga(File&, const ImageFormat&, const void*);
 }
 
 #endif
