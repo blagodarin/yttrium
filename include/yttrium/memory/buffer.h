@@ -24,6 +24,9 @@ namespace Yttrium
 		explicit Buffer(size_t);
 
 		///
+		Buffer(size_t, const void*);
+
+		///
 		uint8_t* begin() noexcept { return static_cast<uint8_t*>(_data); }
 		const uint8_t* begin() const noexcept { return static_cast<const uint8_t*>(_data); }
 

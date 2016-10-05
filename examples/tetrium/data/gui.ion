@@ -8,25 +8,25 @@ class "button"
 {
 	position     "230" "" "180" "40"
 	texture      "examples/tetrium/data/blocks.tga"
-	texture_rect "65" "33" "24" "24"
+	texture_rect "0" "0" "16" "16"
 	borders      "4" "4" "4" "4"
 	sound        "data/sound.wav"
 
 	active
 	{
-		texture_rect "33" "33"
+		texture_rect "0" "16"
 	}
 
 	pressed
 	{
-		texture_rect "33" "33"
+		texture_rect "0" "32"
 		color        "0.9" "0.9" "0.9"
 		text_color   "1" "1" "0"
 	}
 
 	checked
 	{
-		texture_rect "33" "1"
+		texture_rect "0" "48"
 		text_color   "1" "1" "0"
 	}
 

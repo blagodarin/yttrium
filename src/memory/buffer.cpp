@@ -14,6 +14,12 @@ namespace Yttrium
 	{
 	}
 
+	Buffer::Buffer(size_t size, const void* data)
+		: Buffer(size)
+	{
+		std::memcpy(_data, data, size);
+	}
+
 	void Buffer::reserve(size_t capacity)
 	{
 		if (capacity <= _capacity)
@@ -112,6 +118,6 @@ namespace Yttrium
 
 	bool operator==(const Buffer& lhs, const Buffer& rhs) noexcept
 	{
-		return lhs.size() == rhs.size() && (lhs.size() == 0 || !::memcmp(lhs.data(), rhs.data(), lhs.size()));
+		return lhs.size() == rhs.size() && (lhs.size() == 0 || !std::memcmp(lhs.data(), rhs.data(), lhs.size()));
 	}
 }

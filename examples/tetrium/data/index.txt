@@ -4,7 +4,6 @@ data/music.ion
 data/music.ogg
 data/sound.wav
 data/textures/wall.jpeg
-examples/tetrium/data/blocks.tga
 examples/tetrium/data/gui.ion
 examples/tetrium/data/gui/game_over.ion
 examples/tetrium/data/gui/game_pause.ion

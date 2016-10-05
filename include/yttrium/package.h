@@ -8,6 +8,7 @@
 
 namespace Yttrium
 {
+	class Buffer;
 	class File;
 	class StaticString;
 
@@ -66,6 +67,9 @@ namespace Yttrium
 
 		PackageManager() = default;
 		virtual ~PackageManager() = default;
+
+		///
+		virtual bool bind(const StaticString& path, Buffer&&) = 0;
 
 		/// Mount the specified package into the file system.
 		/// \param name The package name.

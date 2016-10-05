@@ -1,10 +1,14 @@
 #include <yttrium/package.h>
 
 #include <yttrium/log.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include "../base/file.h"
 #include "../base/instance_guard.h"
+
+#include <cstring>
 
 namespace Yttrium
 {
@@ -17,10 +21,13 @@ namespace Yttrium
 	public:
 		PackageManagerImpl(Order order, Allocator& allocator)
 			: _allocator(allocator)
-			, _packages(_allocator)
 			, _order(order)
-			, _instance_guard(this, "Duplicate PackageManager construction")
 		{
+		}
+
+		bool bind(const StaticString& path, Buffer&& buffer) override
+		{
+			return _bound.emplace(String(path, &_allocator), std::move(buffer)).second; // TODO: Throw if failed to insert.
 		}
 
 		bool mount(const StaticString& name, PackageType type) override
@@ -47,6 +54,10 @@ namespace Yttrium
 				}
 				return {};
 			};
+
+			const auto i = _bound.find(String(name, ByReference()));
+			if (i != _bound.end())
+				return File(Buffer(i->second.size(), i->second.data()), _allocator); // TODO: Share buffer contents.
 
 			switch (_order)
 			{
@@ -76,9 +87,10 @@ namespace Yttrium
 
 	private:
 		Allocator& _allocator;
-		StdVector<UniquePtr<PackageReader>> _packages;
 		const Order _order;
-		PackageManagerGuard _instance_guard;
+		StdVector<UniquePtr<PackageReader>> _packages{ _allocator };
+		StdMap<String, Buffer> _bound{ _allocator };
+		PackageManagerGuard _instance_guard{ this, "Duplicate PackageManager construction" };
 	};
 
 	UniquePtr<PackageManager> PackageManager::create(Order order, Allocator& allocator)

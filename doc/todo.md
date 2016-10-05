@@ -3,8 +3,7 @@
 	* Overall:
 		- Windows port.
 		- Lua scripting.
-		- Introduce generic resource concept (real file, packed file, named buffer, etc.).
-		- Introduce advanced resource naming (string-based, hash-based).
+		- Hash-based packed file access.
 	* GUI:
 		- Line editor widget.
 	* Image:
