@@ -1,6 +1,6 @@
 #include "dds.h"
 
-#include "dds_private.h"
+#include "dds_format.h"
 
 namespace Yttrium
 {

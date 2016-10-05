@@ -278,14 +278,6 @@ namespace Yttrium
 		return result;
 	}
 
-	StaticString StaticString::file_name_extension() const
-	{
-		const auto last_dot = find_last('.');
-		return last_dot != End && last_dot > 0
-			? StaticString(&_text[last_dot], _size - last_dot)
-			: StaticString();
-	}
-
 	size_t StaticString::find_first(char symbol, size_t offset) const
 	{
 		if (offset < _size)

@@ -3,8 +3,8 @@
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/package.h>
 #include <yttrium/utils.h>
-#include "dds.h"
-#include "tga.h"
+#include "dds/dds.h"
+#include "tga/tga.h"
 
 #ifndef Y_NO_JPEG
 	#include "jpeg/jpeg.h"
@@ -18,6 +18,8 @@
 
 namespace
 {
+	using namespace Yttrium;
+
 	size_t unaligned_row_size(size_t width, size_t bits_per_pixel)
 	{
 		return (width * bits_per_pixel + 7) / 8;
@@ -26,6 +28,20 @@ namespace
 	size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
 	{
 		return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
+	}
+
+	template <typename T>
+	bool save_impl(T& target, ImageType type, const ImageFormat& format, const void* data, Allocator& allocator)
+	{
+		Writer<T> writer(target);
+		switch (type)
+		{
+		case ImageType::Tga: return write_tga(writer, format, data);
+	#ifndef Y_NO_PNG
+		case ImageType::Png: return write_png(writer, format, data, allocator);
+	#endif
+		default: return false;
+		}
 	}
 }
 
@@ -127,13 +143,12 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			const StaticString& extension = name.file_name_extension();
-			if (extension == ".tga"_s)
+			if (name.ends_with(".tga"_s))
 				type = ImageType::Tga;
-			else if (extension == ".dds"_s)
+			else if (name.ends_with(".dds"_s))
 				type = ImageType::Dds;
 	#ifndef Y_NO_JPEG
-			else if (extension == ".jpeg"_s || extension == ".jpg"_s)
+			else if (name.ends_with(".jpeg"_s) || name.ends_with(".jpg"_s))
 				type = ImageType::Jpeg;
 	#endif
 			else
@@ -163,11 +178,10 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			const StaticString& extension = name.file_name_extension();
-			if (extension == ".tga"_s)
+			if (name.ends_with(".tga"_s))
 				type = ImageType::Tga;
 	#ifndef Y_NO_PNG
-			else if (extension == ".png"_s)
+			else if (name.ends_with(".png"_s))
 				type = ImageType::Png;
 	#endif
 			else
@@ -177,16 +191,14 @@ namespace Yttrium
 		return file && save(file, type, allocator);
 	}
 
+	bool Image::save(Buffer& buffer, ImageType type, Allocator& allocator) const
+	{
+		return ::save_impl(buffer, type, _format, _buffer.data(), allocator);
+	}
+
 	bool Image::save(File& file, ImageType type, Allocator& allocator) const
 	{
-		switch (type)
-		{
-		case ImageType::Tga: return write_tga(file, _format, _buffer.data()); break;
-	#ifndef Y_NO_PNG
-		case ImageType::Png: return write_png(file, _format, _buffer.data(), allocator); break;
-	#endif
-		default: return false;
-		}
+		return ::save_impl(file, type, _format, _buffer.data(), allocator);
 	}
 
 	void Image::set_format(const ImageFormat& format)

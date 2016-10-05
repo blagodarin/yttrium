@@ -1,7 +1,7 @@
-#ifndef _src_image_dds_private_h_
-#define _src_image_dds_private_h_
+#ifndef _src_image_dds_dds_format_h_
+#define _src_image_dds_dds_format_h_
 
-#include "../base/fourcc.h"
+#include "../../base/fourcc.h"
 
 namespace Yttrium
 {
@@ -70,7 +70,7 @@ namespace Yttrium
 
 		DDS_CUBEMAP_ALLFACES = DDS_CUBEMAP_POSITIVEX | DDS_CUBEMAP_NEGATIVEX | DDS_CUBEMAP_POSITIVEY
 			| DDSCAPS2_CUBEMAP_NEGATIVEY | DDS_CUBEMAP_POSITIVEZ | DDS_CUBEMAP_NEGATIVEZ,
-		
+
 		DDS_FLAGS_VOLUME = DDSCAPS2_VOLUME,
 	};
 

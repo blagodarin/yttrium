@@ -1,7 +1,7 @@
-#ifndef _src_image_dds_h_
-#define _src_image_dds_h_
+#ifndef _src_image_dds_dds_h_
+#define _src_image_dds_dds_h_
 
-#include "image.h"
+#include "../image.h"
 
 namespace Yttrium
 {

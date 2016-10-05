@@ -54,10 +54,11 @@ namespace
 		return true;
 	}
 
+	template <typename T>
 	class PngWriter
 	{
 	public:
-		PngWriter(File& file)
+		PngWriter(T& writer)
 		{
 			_png = ::png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 			if (!_png)
@@ -65,7 +66,7 @@ namespace
 			_info = ::png_create_info_struct(_png);
 			if (!_info)
 				return;
-			::png_set_write_fn(_png, &file, write_callback, flush_callback);
+			::png_set_write_fn(_png, &writer, write_callback, flush_callback);
 		}
 
 		~PngWriter()
@@ -82,23 +83,20 @@ namespace
 	private:
 		static void write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
 		{
-			reinterpret_cast<File*>(::png_get_io_ptr(png_ptr))->write(data, length);
+			reinterpret_cast<T*>(::png_get_io_ptr(png_ptr))->write(data, length);
 		}
 
-		static void flush_callback(png_struct* png_ptr)
+		static void flush_callback(png_struct*)
 		{
-			reinterpret_cast<File*>(::png_get_io_ptr(png_ptr))->flush();
 		}
 
 	public:
 		png_struct* _png = nullptr;
 		png_info* _info = nullptr;
 	};
-}
 
-namespace Yttrium
-{
-	bool write_png(File& file, const ImageFormat& format, const void* data, Allocator& allocator)
+	template <typename T>
+	bool write_png_impl(Writer<T>& writer, const ImageFormat& format, const void* data, Allocator& allocator)
 	{
 		if (!::can_write(format))
 			return false;
@@ -153,7 +151,7 @@ namespace Yttrium
 			break;
 		}
 
-		PngWriter png_writer(file);
+		PngWriter<Writer<T>> png_writer(writer);
 
 		const auto rows = allocator.allocate<png_bytep>(format.height());
 
@@ -184,5 +182,18 @@ namespace Yttrium
 		allocator.deallocate(rows);
 
 		return true;
+	}
+}
+
+namespace Yttrium
+{
+	bool write_png(Writer<Buffer>& writer, const ImageFormat& format, const void* data, Allocator& allocator)
+	{
+		return ::write_png_impl(writer, format, data, allocator);
+	}
+
+	bool write_png(Writer<File>& writer, const ImageFormat& format, const void* data, Allocator& allocator)
+	{
+		return ::write_png_impl(writer, format, data, allocator);
 	}
 }

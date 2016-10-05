@@ -170,6 +170,9 @@ namespace Yttrium
 		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;
 
 		///
+		bool save(Buffer&, ImageType, Allocator& = *DefaultAllocator) const;
+
+		///
 		bool save(File&, ImageType, Allocator& = *DefaultAllocator) const;
 
 		/// Change the format to \a format.

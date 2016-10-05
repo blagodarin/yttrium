@@ -56,15 +56,6 @@ BOOST_AUTO_TEST_CASE(test_static_string_comparison)
 	BOOST_CHECK(ab <= ba);
 }
 
-BOOST_AUTO_TEST_CASE(test_static_string_file_name_extension)
-{
-	BOOST_CHECK_EQUAL(""_s.file_name_extension(), ""_s);
-	BOOST_CHECK_EQUAL("abc"_s.file_name_extension(), ""_s);
-	BOOST_CHECK_EQUAL("abc."_s.file_name_extension(), "."_s);
-	BOOST_CHECK_EQUAL("abc.xyz"_s.file_name_extension(), ".xyz"_s);
-	BOOST_CHECK_EQUAL(".xyz"_s.file_name_extension(), ""_s);
-}
-
 BOOST_AUTO_TEST_CASE(test_static_string_trimmed)
 {
 	BOOST_CHECK_EQUAL(""_s.trimmed(), ""_s);

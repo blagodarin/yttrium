@@ -1,6 +1,6 @@
 #include "tga.h"
 
-#include "tga_private.h"
+#include "tga_format.h"
 
 namespace
 {
@@ -46,6 +46,50 @@ namespace
 
 		if (format.height() <= 0 || format.height() > UINT16_MAX)
 			return false;
+
+		return true;
+	}
+
+	template <typename T>
+	bool write_tga_impl(Writer<T>& writer, const ImageFormat& format, const void* data)
+	{
+		if (!::can_write(format))
+			return false;
+
+		TgaHeader header;
+
+		header.id_length = 0;
+		header.color_map_type = tgaNoColorMap;
+		header.image_type = (format.pixel_format() == PixelFormat::Gray) ? tgaBlackAndWhite : tgaTrueColor;
+		header.color_map.first_entry_index = 0;
+		header.color_map.length = 0;
+		header.color_map.entry_size = 0;
+		header.image.x = 0;
+		header.image.y = 0;
+		header.image.width = format.width();
+		header.image.height = format.height();
+		header.image.pixel_depth = format.bits_per_pixel();
+		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra) ? 8 : 0;
+
+		switch (format.orientation())
+		{
+		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft;     break;
+		case ImageOrientation::XRightYUp:   header.image.descriptor |= tgaBottomLeft;  break;
+		case ImageOrientation::XLeftYDown:  header.image.descriptor |= tgaTopRight;    break;
+		case ImageOrientation::XLeftYUp:    header.image.descriptor |= tgaBottomRight; break;
+		}
+
+		writer.reserve(sizeof header + format.frame_size());
+		if (!writer.write(&header, sizeof header))
+			return false;
+
+		auto scanline = static_cast<const uint8_t*>(data);
+		for (size_t row = 0; row < format.height(); ++row)
+		{
+			if (!writer.write(scanline, format.row_size()))
+				return false;
+			scanline += format.row_size();
+		}
 
 		return true;
 	}
@@ -122,45 +166,13 @@ namespace Yttrium
 		return _file.read(buffer, frame_size) == frame_size;
 	}
 
-	bool write_tga(File& file, const ImageFormat& format, const void* data)
+	bool write_tga(Writer<Buffer>& writer, const ImageFormat& format, const void* data)
 	{
-		if (!::can_write(format))
-			return false;
+		return ::write_tga_impl(writer, format, data);
+	}
 
-		TgaHeader header;
-
-		header.id_length = 0;
-		header.color_map_type = tgaNoColorMap;
-		header.image_type = (format.pixel_format() == PixelFormat::Gray) ? tgaBlackAndWhite : tgaTrueColor;
-		header.color_map.first_entry_index = 0;
-		header.color_map.length = 0;
-		header.color_map.entry_size = 0;
-		header.image.x = 0;
-		header.image.y = 0;
-		header.image.width = format.width();
-		header.image.height = format.height();
-		header.image.pixel_depth = format.bits_per_pixel();
-		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra) ? 8 : 0;
-
-		switch (format.orientation())
-		{
-		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft;     break;
-		case ImageOrientation::XRightYUp:   header.image.descriptor |= tgaBottomLeft;  break;
-		case ImageOrientation::XLeftYDown:  header.image.descriptor |= tgaTopRight;    break;
-		case ImageOrientation::XLeftYUp:    header.image.descriptor |= tgaBottomRight; break;
-		}
-
-		if (!file.write(header))
-			return false;
-
-		auto scanline = static_cast<const uint8_t*>(data);
-		for (size_t row = 0; row < format.height(); ++row)
-		{
-			if (file.write(scanline, format.row_size()) != format.row_size())
-				return false;
-			scanline += format.row_size();
-		}
-
-		return true;
+	bool write_tga(Writer<File>& writer, const ImageFormat& format, const void* data)
+	{
+		return ::write_tga_impl(writer, format, data);
 	}
 }

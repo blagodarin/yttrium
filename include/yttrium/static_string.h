@@ -40,9 +40,6 @@ namespace Yttrium
 		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
 		String escaped(const char* symbols, char with, Allocator* allocator = DefaultAllocator) const;
 
-		///
-		StaticString file_name_extension() const;
-
 		/// Returns the offset of the first \a symbol since \a offset, or End if there is no such symbol.
 		size_t find_first(char symbol, size_t offset = 0) const;
 
