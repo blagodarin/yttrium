@@ -1,5 +1,5 @@
-#ifndef _src_package_ypq_h_
-#define _src_package_ypq_h_
+#ifndef _src_io_ypq_h_
+#define _src_io_ypq_h_
 
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>

@@ -3,19 +3,19 @@
 #include <yttrium/i18n/localization.h>
 #include <yttrium/image.h>
 #include <yttrium/log.h>
-#include <yttrium/package.h>
+#include <yttrium/resource_manager.h>
 
 int main()
 {
 	Log::set_file("tetrium.log");
 
+	NamedAllocator resources_allocator("resources");
+	ResourceManager resource_manager(ResourceManager::SearchOrder::PackedOnly, resources_allocator);
+	if (!resource_manager.mount_package("tetrium.ypq"))
+		return 1;
+
 	NamedAllocator i18n_allocator("i18n");
 	const auto& localization = Localization::create("examples/tetrium/i18n/en.ion", i18n_allocator);
-
-	NamedAllocator package_allocator("package");
-	const auto& package_manager = PackageManager::create(PackageManager::Order::PackedOnly, package_allocator);
-	if (!package_manager->mount("tetrium.ypq"))
-		return 1;
 
 	{
 		constexpr auto button_size = 16;
@@ -44,8 +44,8 @@ int main()
 		}
 
 		Buffer buffer;
-		image.save(buffer, ImageType::Tga, package_allocator);
-		package_manager->bind("examples/tetrium/data/blocks.tga", std::move(buffer));
+		image.save(buffer, ImageType::Tga, resources_allocator);
+		resource_manager.bind("examples/tetrium/data/blocks.tga", std::move(buffer));
 	}
 
 	try

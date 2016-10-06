@@ -44,7 +44,7 @@ namespace Yttrium
 		///
 		File(const StaticString& path, unsigned mode, Allocator& = *DefaultAllocator);
 
-		/// Open a file for reading using the package manager if possible.
+		/// Open a file for reading using the resource manager if possible.
 		File(const StaticString& path, Allocator& = *DefaultAllocator);
 
 		///

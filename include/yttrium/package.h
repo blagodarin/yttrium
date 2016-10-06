@@ -48,35 +48,6 @@ namespace Yttrium
 		///
 		virtual File open_file(const StaticString& name) = 0;
 	};
-
-	/// Package manager.
-	class Y_API PackageManager
-	{
-	public:
-
-		/// File search order.
-		enum class Order
-		{
-			PackedFirst, ///< Try packed, then system file.
-			SystemFirst, ///< Try system, then packed file.
-			PackedOnly,  ///< Try packed file only.
-		};
-
-		///
-		static UniquePtr<PackageManager> create(Order, Allocator& = *DefaultAllocator);
-
-		PackageManager() = default;
-		virtual ~PackageManager() = default;
-
-		///
-		virtual bool bind(const StaticString& path, Buffer&&) = 0;
-
-		/// Mount the specified package into the file system.
-		/// \param name The package name.
-		/// \param type Package file type.
-		/// \return \c true on success.
-		virtual bool mount(const StaticString& name, PackageType = PackageType::Auto) = 0;
-	};
 }
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _src_package_package_h_
-#define _src_package_package_h_
+#ifndef _src_io_package_h_
+#define _src_io_package_h_
 
 #include <yttrium/package.h>
 
