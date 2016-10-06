@@ -9,87 +9,86 @@
 
 namespace Yttrium
 {
+	struct ResourceAttachment
+	{
+		enum class Type
+		{
+			Package,
+			Buffer,
+		};
+
+		Type type;
+		UniquePtr<PackageReader> package;
+		String buffer_name{ &NoAllocator };
+		Buffer buffer;
+
+		ResourceAttachment(UniquePtr<PackageReader>&& package) : type(Type::Package), package(std::move(package)) {}
+		ResourceAttachment(String&& name, Buffer&& buffer) : type(Type::Buffer), buffer_name(std::move(name)), buffer(std::move(buffer)) {}
+	};
+
 	using ResourceManagerGuard = InstanceGuard<ResourceManagerPrivate>;
 
 	class ResourceManagerPrivate
 	{
 	public:
-		ResourceManagerPrivate(ResourceManager::SearchOrder order, Allocator& allocator)
+		ResourceManagerPrivate(ResourceManager::UseFileSystem use_file_system, Allocator& allocator)
 			: _allocator(allocator)
-			, _order(order)
+			, _use_file_system(use_file_system)
 		{
 		}
 
-		File open_file(const StaticString& name) const
+		File open(const StaticString& name) const
 		{
-			const auto open_packed = [this](const StaticString& name) -> File
+			if (_use_file_system == ResourceManager::UseFileSystem::Before)
 			{
-				for (const auto& package : _packages)
-				{
-					auto file = package->open_file(name);
-					if (file)
-						return file;
-				}
-				return {};
-			};
-
-			const auto i = _bound.find(String(name, ByReference()));
-			if (i != _bound.end())
-				return File(Buffer(i->second.size(), i->second.data()), _allocator); // TODO: Share buffer contents.
-
-			switch (_order)
-			{
-			case ResourceManager::SearchOrder::PackedOnly:
-				return open_packed(name);
-
-			case ResourceManager::SearchOrder::PackedFirst:
-				{
-					auto file = open_packed(name);
-					if (file)
-						return file;
-				}
-				return File(name, File::Read, _allocator);
-
-			case ResourceManager::SearchOrder::SystemFirst:
-				{
-					File file(name, File::Read, _allocator);
-					if (file)
-						return file;
-				}
-				return open_packed(name);
-
-			default:
-				return {};
+				File file(name, File::Read, _allocator);
+				if (file)
+					return file;
 			}
+			// TODO: Build a single name-to-resource map for the entire resource system.
+			for (const auto& attachment : _attachments)
+			{
+				if (attachment.type == ResourceAttachment::Type::Package)
+				{
+					auto file = attachment.package->open_file(name);
+					if (file)
+						return file;
+				}
+				else if (attachment.type == ResourceAttachment::Type::Buffer)
+				{
+					if (attachment.buffer_name == name)
+						return File(Buffer(attachment.buffer.size(), attachment.buffer.data()), _allocator); // TODO: Share buffer contents.
+				}
+			}
+			if (_use_file_system == ResourceManager::UseFileSystem::After)
+			{
+				File file(name, File::Read, _allocator);
+				if (file)
+					return file;
+			}
+			return {};
 		}
 
 	private:
 		Allocator& _allocator;
-		const ResourceManager::SearchOrder _order;
-		StdVector<UniquePtr<PackageReader>> _packages{ _allocator };
-		StdMap<String, Buffer> _bound{ _allocator };
+		const ResourceManager::UseFileSystem _use_file_system;
+		StdVector<ResourceAttachment> _attachments{ _allocator };
 		ResourceManagerGuard _instance_guard{ this, "Duplicate ResourceManager construction" };
 
 		friend ResourceManager;
 	};
 
-	ResourceManager::ResourceManager(SearchOrder order, Allocator& allocator)
-		: _private(make_unique<ResourceManagerPrivate>(allocator, order, allocator))
+	ResourceManager::ResourceManager(UseFileSystem use_file_system, Allocator& allocator)
+		: _private(make_unique<ResourceManagerPrivate>(allocator, use_file_system, allocator))
 	{
 	}
 
-	bool ResourceManager::bind(const StaticString& path, Buffer&& buffer)
+	void ResourceManager::attach_buffer(const StaticString& name, Buffer&& buffer)
 	{
-		// TODO: Throw if failed to insert.
-		if (!_private->_bound.emplace(String(path, &_private->_allocator), std::move(buffer)).second)
-		{
-			Log() << "("_s << path << ") Unable to bind"_s;
-			return false;
-		}
-		return true;
+		_private->_attachments.emplace_back(String(name, &_private->_allocator), std::move(buffer));
 	}
 
-	bool ResourceManager::mount_package(const StaticString& path, PackageType type)
+	bool ResourceManager::attach_package(const StaticString& path, PackageType type)
 	{
 		auto package = PackageReader::create(path, type, _private->_allocator);
 		if (!package)
@@ -97,8 +96,13 @@ namespace Yttrium
 			Log() << "("_s << path << ") Unable to open"_s;
 			return false;
 		}
-		_private->_packages.emplace(_private->_packages.begin(), std::move(package));
+		_private->_attachments.emplace_back(std::move(package));
 		return true;
+	}
+
+	File ResourceManager::open(const StaticString& path)
+	{
+		return _private->open(path);
 	}
 
 	ResourceManager::~ResourceManager() = default;
@@ -109,7 +113,7 @@ namespace Yttrium
 			std::lock_guard<std::mutex> lock(ResourceManagerGuard::instance_mutex);
 			if (ResourceManagerGuard::instance)
 			{
-				_private = ResourceManagerGuard::instance->open_file(path)._private;
+				_private = ResourceManagerGuard::instance->open(path)._private;
 				return;
 			}
 		}

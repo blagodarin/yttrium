@@ -10,8 +10,8 @@ int main()
 	Log::set_file("tetrium.log");
 
 	NamedAllocator resources_allocator("resources");
-	ResourceManager resource_manager(ResourceManager::SearchOrder::PackedOnly, resources_allocator);
-	if (!resource_manager.mount_package("tetrium.ypq"))
+	ResourceManager resource_manager(ResourceManager::UseFileSystem::Never, resources_allocator);
+	if (!resource_manager.attach_package("tetrium.ypq"))
 		return 1;
 
 	NamedAllocator i18n_allocator("i18n");
@@ -45,7 +45,7 @@ int main()
 
 		Buffer buffer;
 		image.save(buffer, ImageType::Tga, resources_allocator);
-		resource_manager.bind("examples/tetrium/data/blocks.tga", std::move(buffer));
+		resource_manager.attach_buffer("examples/tetrium/data/blocks.tga", std::move(buffer));
 	}
 
 	try

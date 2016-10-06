@@ -13,29 +13,31 @@ namespace Yttrium
 	class Y_API ResourceManager
 	{
 	public:
-
-		/// Resource search order.
-		enum class SearchOrder
+		///
+		enum class UseFileSystem
 		{
-			PackedFirst, ///< Try packed, then system file.
-			SystemFirst, ///< Try system, then packed file.
-			PackedOnly,  ///< Try packed file only.
+			After,
+			Before,
+			Never,
 		};
 
 		///
-		ResourceManager(SearchOrder, Allocator& = *DefaultAllocator);
+		ResourceManager(UseFileSystem, Allocator& = *DefaultAllocator);
 
-		/// Adds a named buffer into the resource system.
-		bool bind(const StaticString& path, Buffer&&);
+		///
+		~ResourceManager();
 
-		/// Mounts a package into the resource system.
-		bool mount_package(const StaticString& path, PackageType = PackageType::Auto);
+		/// Attaches a buffer to the resource system.
+		void attach_buffer(const StaticString& name, Buffer&&);
+
+		/// Attaches a package to the resource system.
+		bool attach_package(const StaticString& path, PackageType = PackageType::Auto);
+
+		/// Opens a resource.
+		File open(const StaticString& path);
 
 	private:
 		const UniquePtr<class ResourceManagerPrivate> _private;
-
-	public:
-		~ResourceManager();
 	};
 }
 
