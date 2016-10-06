@@ -1,7 +1,7 @@
 #ifndef _src_audio_io_wav_private_h_
 #define _src_audio_io_wav_private_h_
 
-#include "../../base/fourcc.h"
+#include "../../utils/fourcc.h"
 
 namespace Yttrium
 {

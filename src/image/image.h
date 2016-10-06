@@ -3,7 +3,7 @@
 
 #include <yttrium/image.h>
 
-#include <yttrium/file.h>
+#include <yttrium/io/file.h>
 
 namespace Yttrium
 {

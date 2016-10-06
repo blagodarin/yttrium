@@ -1,7 +1,7 @@
 #ifndef _src_image_tga_tga_h_
 #define _src_image_tga_tga_h_
 
-#include "../../base/writer.h"
+#include "../../io/writer.h"
 #include "../image.h"
 
 namespace Yttrium

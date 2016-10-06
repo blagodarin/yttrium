@@ -1,11 +1,11 @@
-#include <yttrium/resource_manager.h>
+#include <yttrium/io/resources.h>
 
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
-#include "../base/file.h"
 #include "../base/instance_guard.h"
+#include "file.h"
 
 namespace Yttrium
 {
@@ -100,7 +100,7 @@ namespace Yttrium
 		return true;
 	}
 
-	File ResourceManager::open(const StaticString& path)
+	File ResourceManager::open(const StaticString& path) const
 	{
 		return _private->open(path);
 	}

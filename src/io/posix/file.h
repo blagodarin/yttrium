@@ -1,5 +1,5 @@
-#ifndef _src_base_posix_file_h_
-#define _src_base_posix_file_h_
+#ifndef _src_io_posix_file_h_
+#define _src_io_posix_file_h_
 
 #include "../file.h"
 

@@ -1,5 +1,5 @@
-#ifndef _src_base_fourcc_h_
-#define _src_base_fourcc_h_
+#ifndef _src_utils_fourcc_h_
+#define _src_utils_fourcc_h_
 
 #include <cstddef>
 #include <cstdint>

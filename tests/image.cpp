@@ -1,5 +1,5 @@
-#include <yttrium/file.h>
 #include <yttrium/image.h>
+#include <yttrium/io/file.h>
 #include <yttrium/memory/buffer.h>
 
 #include <boost/test/unit_test.hpp>

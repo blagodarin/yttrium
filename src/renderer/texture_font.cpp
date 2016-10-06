@@ -1,6 +1,6 @@
 #include <yttrium/renderer/texture_font.h>
 
-#include <yttrium/file.h>
+#include <yttrium/io/file.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>

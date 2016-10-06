@@ -2,8 +2,8 @@
 
 #include <yttrium/i18n/localization.h>
 #include <yttrium/image.h>
+#include <yttrium/io/resources.h>
 #include <yttrium/log.h>
-#include <yttrium/resource_manager.h>
 
 int main()
 {

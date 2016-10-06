@@ -1,7 +1,7 @@
 #include "document.h"
 
+#include <yttrium/io/file.h>
 #include <yttrium/ion/list.h>
-#include <yttrium/file.h>
 #include "parser.h"
 #include "utils.h"
 

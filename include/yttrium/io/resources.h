@@ -1,11 +1,11 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_resource_manager_h_
-#define _include_yttrium_resource_manager_h_
+#ifndef _include_yttrium_io_resources_h_
+#define _include_yttrium_io_resources_h_
 
+#include <yttrium/io/package.h>
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/package.h>
 
 namespace Yttrium
 {
@@ -34,7 +34,7 @@ namespace Yttrium
 		bool attach_package(const StaticString& path, PackageType = PackageType::Auto);
 
 		/// Opens a resource.
-		File open(const StaticString& path);
+		File open(const StaticString& path) const;
 
 	private:
 		const UniquePtr<class ResourceManagerPrivate> _private;

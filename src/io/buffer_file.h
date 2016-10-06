@@ -1,5 +1,5 @@
-#ifndef _src_base_buffer_file_h_
-#define _src_base_buffer_file_h_
+#ifndef _src_io_buffer_file_h_
+#define _src_io_buffer_file_h_
 
 #include <yttrium/memory/buffer.h>
 #include "file.h"

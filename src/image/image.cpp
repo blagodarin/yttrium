@@ -1,7 +1,7 @@
 #include "image.h"
 
+#include <yttrium/io/package.h>
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/package.h>
 #include <yttrium/utils.h>
 #include "dds/dds.h"
 #include "tga/tga.h"

@@ -1,7 +1,7 @@
 #include "model.h"
 
-#include <yttrium/file.h>
 #include <yttrium/image.h>
+#include <yttrium/io/file.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/index_buffer.h>

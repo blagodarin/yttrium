@@ -1,7 +1,7 @@
 #include "png.h"
 
-#include <yttrium/file.h>
 #include <yttrium/image.h>
+#include <yttrium/io/file.h>
 
 #include <png.h>
 

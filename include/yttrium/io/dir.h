@@ -1,8 +1,8 @@
 /// \file
 /// \brief Directory facilities.
 
-#ifndef _include_yttrium_dir_h_
-#define _include_yttrium_dir_h_
+#ifndef _include_yttrium_io_dir_h_
+#define _include_yttrium_io_dir_h_
 
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>

@@ -1,7 +1,7 @@
 #include "ypq.h"
 
 #include <yttrium/log.h>
-#include "../base/fourcc.h"
+#include "../utils/fourcc.h"
 
 #include <cstring>
 #include <limits>

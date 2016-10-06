@@ -1,8 +1,8 @@
 #include "game.h"
 
 #include <yttrium/audio/player.h>
-#include <yttrium/file.h>
 #include <yttrium/image.h>
+#include <yttrium/io/file.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>

@@ -1,8 +1,8 @@
 /// \file
 /// \brief %File facilities.
 
-#ifndef _include_yttrium_file_h_
-#define _include_yttrium_file_h_
+#ifndef _include_yttrium_io_file_h_
+#define _include_yttrium_io_file_h_
 
 #include <yttrium/memory/shared_ptr.h>
 

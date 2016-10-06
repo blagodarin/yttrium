@@ -1,7 +1,7 @@
 #ifndef _src_image_png_png_h_
 #define _src_image_png_png_h_
 
-#include "../../base/writer.h"
+#include "../../io/writer.h"
 
 namespace Yttrium
 {

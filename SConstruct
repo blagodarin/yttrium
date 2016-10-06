@@ -194,10 +194,10 @@ if not option_no_png:
 	src_paths += ['image/png']
 
 if 'posix' in ports:
-	src_paths += ['base/posix', 'memory/posix']
+	src_paths += ['base/posix', 'io/posix', 'memory/posix']
 
 if 'windows' in ports:
-	src_paths += ['base/windows', 'memory/windows', 'window/windows']
+	src_paths += ['base/windows', 'io/windows', 'memory/windows', 'window/windows']
 
 if 'x11' in ports:
 	src_paths += ['window/x11']

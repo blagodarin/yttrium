@@ -1,9 +1,9 @@
 #ifndef _src_io_package_h_
 #define _src_io_package_h_
 
-#include <yttrium/package.h>
+#include <yttrium/io/package.h>
 
-#include "../base/file.h"
+#include "file.h"
 
 #include <utility>
 

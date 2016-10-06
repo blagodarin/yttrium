@@ -1,5 +1,5 @@
-#ifndef _src_base_writer_h_
-#define _src_base_writer_h_
+#ifndef _src_io_writer_h_
+#define _src_io_writer_h_
 
 #include <cstddef>
 

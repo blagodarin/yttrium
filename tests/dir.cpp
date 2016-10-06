@@ -1,4 +1,4 @@
-#include <yttrium/dir.h>
+#include <yttrium/io/dir.h>
 
 #include <boost/test/unit_test.hpp>
 
