@@ -2,6 +2,7 @@
 
 #include <yttrium/image.h>
 #include <yttrium/io/file.h>
+#include "../io/writer.h"
 
 #include <png.h>
 

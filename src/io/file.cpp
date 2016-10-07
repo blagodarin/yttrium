@@ -83,7 +83,7 @@ namespace Yttrium
 			if (buffer_size > SIZE_MAX)
 				throw std::bad_alloc();
 			buffer->reset(buffer_size);
-			if (read(buffer->data(), buffer->size()))
+			if (read(buffer->data(), buffer->size()) == buffer->size())
 				return true;
 		}
 		return false;
@@ -97,7 +97,7 @@ namespace Yttrium
 			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
 				throw std::bad_alloc();
 			string->resize(string_size);
-			if (read(string->text(), string->size()))
+			if (read(string->text(), string->size()) == string->size())
 				return true;
 		}
 		return false;

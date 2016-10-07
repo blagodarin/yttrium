@@ -1,7 +1,7 @@
 #ifndef _src_image_dds_dds_format_h_
 #define _src_image_dds_dds_format_h_
 
-#include "../../utils/fourcc.h"
+#include "../utils/fourcc.h"
 
 namespace Yttrium
 {

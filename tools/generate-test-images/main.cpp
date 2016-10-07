@@ -1,8 +1,8 @@
 #include <yttrium/io/file.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
-#include "../../src/image/dds/dds_format.h"
-#include "../../src/image/tga/tga_format.h"
+#include "../../src/image/dds_format.h"
+#include "../../src/image/tga_format.h"
 
 #include <cstring>
 

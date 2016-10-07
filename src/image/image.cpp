@@ -1,17 +1,19 @@
-#include "image.h"
+#include <yttrium/image.h>
 
+#include <yttrium/io/file.h>
 #include <yttrium/io/package.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/utils.h>
-#include "dds/dds.h"
-#include "tga/tga.h"
+#include "../io/writer.h"
+#include "dds.h"
+#include "tga.h"
 
 #ifndef Y_NO_JPEG
-	#include "jpeg/jpeg.h"
+	#include "jpeg.h"
 #endif
 
 #ifndef Y_NO_PNG
-	#include "png/png.h"
+	#include "png.h"
 #endif
 
 #include <new>
@@ -30,8 +32,35 @@ namespace
 		return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
 	}
 
+	bool read_image_data(File& file, const ImageFormat& format, Buffer& buffer)
+	{
+		const auto frame_size = format.frame_size();
+		try
+		{
+			buffer.reset(frame_size);
+		}
+		catch (const std::bad_alloc&)
+		{
+			return false;
+		}
+		return file.read(buffer.data(), frame_size) == frame_size;
+	}
+
+	bool read_image(File& file, ImageType type, ImageFormat& format, Buffer& buffer)
+	{
+		switch (type)
+		{
+		case ImageType::Tga: return ::read_tga_header(file, format) && ::read_image_data(file, format, buffer);
+	#ifndef Y_NO_JPEG
+		case ImageType::Jpeg: return ::read_jpeg(file, format, buffer);
+	#endif
+		case ImageType::Dds: return ::read_dds_header(file, format) && ::read_image_data(file, format, buffer);
+		default: return false;
+		}
+	}
+
 	template <typename T>
-	bool save_impl(T& target, ImageType type, const ImageFormat& format, const void* data, Allocator& allocator)
+	bool write_image(T& target, ImageType type, const ImageFormat& format, const void* data, Allocator& allocator)
 	{
 		Writer<T> writer(target);
 		switch (type)
@@ -154,24 +183,16 @@ namespace Yttrium
 			else
 				return false;
 		}
-
-		UniquePtr<ImageReader> reader;
-		switch (type)
-		{
-		case ImageType::Tga:  reader = make_unique<TgaReader>(allocator, name, allocator); break;
-	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: reader = make_unique<JpegReader>(allocator, name, allocator); break;
-	#endif
-		case ImageType::Dds:  reader = make_unique<DdsReader>(allocator, name, allocator); break;
-		default:              return false;
-		}
-
-		if (!reader->_file || !reader->open())
+		File file(name, allocator);
+		if (!file)
 			return false;
-
-		_format = reader->_format;
-		_buffer.reset(_format.frame_size());
-		return reader->read(_buffer.data());
+		ImageFormat format;
+		Buffer buffer;
+		if (!::read_image(file, type, format, buffer))
+			return false;
+		_format = format;
+		_buffer = std::move(buffer);
+		return true;
 	}
 
 	bool Image::save(const StaticString& name, ImageType type, Allocator& allocator) const
@@ -193,12 +214,12 @@ namespace Yttrium
 
 	bool Image::save(Buffer& buffer, ImageType type, Allocator& allocator) const
 	{
-		return ::save_impl(buffer, type, _format, _buffer.data(), allocator);
+		return ::write_image(buffer, type, _format, _buffer.data(), allocator);
 	}
 
 	bool Image::save(File& file, ImageType type, Allocator& allocator) const
 	{
-		return ::save_impl(file, type, _format, _buffer.data(), allocator);
+		return ::write_image(file, type, _format, _buffer.data(), allocator);
 	}
 
 	void Image::set_format(const ImageFormat& format)

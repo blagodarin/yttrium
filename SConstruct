@@ -173,9 +173,6 @@ src_paths = [
 	'gui/logic',
 	'gui/widgets',
 	'i18n',
-	'image',
-	'image/dds',
-	'image/tga',
 	'io',
 	'ion',
 	'math',
@@ -186,12 +183,8 @@ src_paths = [
 	'window',
 	'window/bindings']
 
-if not option_no_jpeg:
-	src_paths += ['image/jpeg']
 if not option_no_ogg_vorbis:
 	src_paths += ['audio/io/ogg_vorbis']
-if not option_no_png:
-	src_paths += ['image/png']
 
 if 'posix' in ports:
 	src_paths += ['base/posix', 'io/posix', 'memory/posix']
@@ -204,6 +197,12 @@ if 'x11' in ports:
 
 src_target = 'lib/yttrium'
 src_sources = [src_env.Glob('$BUILD/src/' + path + '/*.cpp') for path in src_paths]
+
+src_sources += ['$BUILD/src/image/dds.cpp', '$BUILD/src/image/image.cpp', '$BUILD/src/image/tga.cpp']
+if not option_no_jpeg:
+	src_sources += ['$BUILD/src/image/jpeg.cpp']
+if not option_no_png:
+	src_sources += ['$BUILD/src/image/png.cpp']
 
 if option_static:
 	yttrium = src_env.StaticLibrary(src_target, src_sources)

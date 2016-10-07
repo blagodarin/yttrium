@@ -1,19 +1,16 @@
 #include "dds.h"
-
 #include "dds_format.h"
+
+#include <yttrium/image.h>
+#include <yttrium/io/file.h>
 
 namespace Yttrium
 {
-	DdsReader::DdsReader(const StaticString& name, Allocator& allocator)
-		: ImageReader(name, allocator)
-	{
-	}
-
-	bool DdsReader::open()
+	bool read_dds_header(File& file, ImageFormat& format)
 	{
 		DDS_HEADER header;
 
-		if (!_file.read(&header)
+		if (!file.read(&header)
 			|| header.dwMagic != DDS_HEADER::MAGIC
 			|| header.dwSize != DDS_HEADER::SIZE
 			|| !(header.dwFlags & (DDSD_HEIGHT | DDSD_WIDTH))
@@ -48,14 +45,14 @@ namespace Yttrium
 				&& header.ddspf.dwBBitMask == 0x000000FF
 				&& !header.ddspf.dwABitMask)
 			{
-				_format.set_pixel_format(PixelFormat::Bgr, 24);
+				format.set_pixel_format(PixelFormat::Bgr, 24);
 			}
 			else if (header.ddspf.dwRBitMask == 0x000000FF
 				&& header.ddspf.dwGBitMask == 0x0000FF00
 				&& header.ddspf.dwBBitMask == 0x00FF0000
 				&& !header.ddspf.dwABitMask)
 			{
-				_format.set_pixel_format(PixelFormat::Rgb, 24);
+				format.set_pixel_format(PixelFormat::Rgb, 24);
 			}
 			else
 			{
@@ -73,14 +70,14 @@ namespace Yttrium
 				&& header.ddspf.dwBBitMask == 0x000000FF
 				&& header.ddspf.dwABitMask == 0xFF000000)
 			{
-				_format.set_pixel_format(PixelFormat::Bgra, 32);
+				format.set_pixel_format(PixelFormat::Bgra, 32);
 			}
 			else if (header.ddspf.dwRBitMask == 0x000000FF
 				&& header.ddspf.dwGBitMask == 0x0000FF00
 				&& header.ddspf.dwBBitMask == 0x00FF0000
 				&& header.ddspf.dwABitMask == 0xFF000000)
 			{
-				_format.set_pixel_format(PixelFormat::Rgba, 32);
+				format.set_pixel_format(PixelFormat::Rgba, 32);
 			}
 			else
 			{
@@ -100,7 +97,7 @@ namespace Yttrium
 				&& !header.ddspf.dwBBitMask
 				&& !header.ddspf.dwABitMask)
 			{
-				_format.set_pixel_format(PixelFormat::Gray, 8);
+				format.set_pixel_format(PixelFormat::Gray, 8);
 			}
 			else
 			{
@@ -118,7 +115,7 @@ namespace Yttrium
 				&& !header.ddspf.dwBBitMask
 				&& header.ddspf.dwABitMask == 0x0000FF00)
 			{
-				_format.set_pixel_format(PixelFormat::GrayAlpha, 16);
+				format.set_pixel_format(PixelFormat::GrayAlpha, 16);
 			}
 			else
 			{
@@ -131,16 +128,10 @@ namespace Yttrium
 			return false;
 		}
 
-		_format.set_orientation(ImageOrientation::XRightYDown);
-		_format.set_width(header.dwWidth);
-		_format.set_height(header.dwHeight);
+		format.set_orientation(ImageOrientation::XRightYDown);
+		format.set_width(header.dwWidth);
+		format.set_height(header.dwHeight);
 
 		return true;
-	}
-
-	bool DdsReader::read(void* buffer)
-	{
-		size_t frame_size = _format.frame_size();
-		return _file.read(buffer, frame_size) == frame_size;
 	}
 }

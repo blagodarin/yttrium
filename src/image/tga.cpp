@@ -1,6 +1,9 @@
 #include "tga.h"
-
 #include "tga_format.h"
+
+#include <yttrium/image.h>
+#include <yttrium/io/file.h>
+#include "../io/writer.h"
 
 namespace
 {
@@ -97,73 +100,50 @@ namespace
 
 namespace Yttrium
 {
-	TgaReader::TgaReader(const StaticString& name, Allocator& allocator)
-		: ImageReader(name, allocator)
-	{
-	}
-
-	bool TgaReader::open()
+	bool read_tga_header(File& file, ImageFormat& format)
 	{
 		TgaHeader header;
 
-		do
+		if (!file.read(&header)
+			|| header.color_map_type != tgaNoColorMap
+			|| !header.image.width
+			|| !header.image.height
+			|| header.image.descriptor & tgaReservedMask)
+			return false;
+
+		if (header.image_type == tgaTrueColor)
 		{
-			if (!_file.read(&header)
-				|| header.color_map_type != tgaNoColorMap
-				|| !header.image.width
-				|| !header.image.height
-				|| header.image.descriptor & tgaReservedMask)
-			{
-				break;
-			}
-
-			if (header.image_type == tgaTrueColor)
-			{
-				uint_fast8_t alpha = header.image.descriptor & tgaAlphaMask;
-
-				if (!alpha && header.image.pixel_depth == 24)
-					_format.set_pixel_format(PixelFormat::Bgr, 24);
-				else if (alpha == 8 && header.image.pixel_depth == 32)
-					_format.set_pixel_format(PixelFormat::Bgra, 32);
-				else
-					break;
-			}
-			else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
-			{
-				_format.set_pixel_format(PixelFormat::Gray, 8);
-			}
+			const auto alpha = header.image.descriptor & tgaAlphaMask;
+			if (!alpha && header.image.pixel_depth == 24)
+				format.set_pixel_format(PixelFormat::Bgr, 24);
+			else if (alpha == 8 && header.image.pixel_depth == 32)
+				format.set_pixel_format(PixelFormat::Bgra, 32);
 			else
-			{
-				break;
-			}
+				return false;
+		}
+		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
+			format.set_pixel_format(PixelFormat::Gray, 8);
+		else
+			return false;
 
-			_format.set_width(header.image.width);
-			_format.set_height(header.image.height);
+		format.set_width(header.image.width);
+		format.set_height(header.image.height);
 
-			switch (header.image.descriptor & tgaOriginMask)
-			{
-			case tgaBottomLeft:  _format.set_orientation(ImageOrientation::XRightYUp);   break;
-			case tgaBottomRight: _format.set_orientation(ImageOrientation::XLeftYUp);    break;
-			case tgaTopLeft:     _format.set_orientation(ImageOrientation::XRightYDown); break;
-			case tgaTopRight:    _format.set_orientation(ImageOrientation::XLeftYDown);  break;
-			}
+		switch (header.image.descriptor & tgaOriginMask)
+		{
+		case tgaBottomLeft: format.set_orientation(ImageOrientation::XRightYUp); break;
+		case tgaBottomRight: format.set_orientation(ImageOrientation::XLeftYUp); break;
+		case tgaTopLeft: format.set_orientation(ImageOrientation::XRightYDown); break;
+		case tgaTopRight: format.set_orientation(ImageOrientation::XLeftYDown); break;
+		}
 
-			if (header.id_length)
-				_file.skip(header.id_length);
+		if (header.id_length)
+			file.skip(header.id_length);
 
-			if (header.color_map.length)
-				_file.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8));
+		if (header.color_map.length)
+			file.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8));
 
-			return true;
-		} while (false);
-
-		return false;
-	}
-
-	bool TgaReader::read(void* buffer)
-	{
-		size_t frame_size = _format.frame_size();
-		return _file.read(buffer, frame_size) == frame_size;
+		return true;
 	}
 
 	bool write_tga(Writer<Buffer>& writer, const ImageFormat& format, const void* data)
