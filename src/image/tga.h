@@ -1,5 +1,5 @@
-#ifndef _src_image_tga_tga_h_
-#define _src_image_tga_tga_h_
+#ifndef _src_image_tga_h_
+#define _src_image_tga_h_
 
 namespace Yttrium
 {
