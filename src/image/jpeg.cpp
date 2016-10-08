@@ -1,15 +1,11 @@
 #include "jpeg.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/file.h>
-
-#include <new>
+#include <yttrium/io/reader.h>
 
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <jpeglib.h>
 #include <setjmp.h>
-
-// TODO: Substitute JpegLib's memory manager.
 
 namespace
 {
@@ -27,12 +23,12 @@ namespace
 
 namespace Yttrium
 {
-	bool read_jpeg(File& file, ImageFormat& format, Buffer& buffer)
+	bool read_jpeg(Reader& reader, ImageFormat& format, Buffer& buffer)
 	{
-		Buffer file_buffer;
+		Buffer reader_buffer;
 		try
 		{
-			if (!file.read_all(&file_buffer))
+			if (!reader.read_all(reader_buffer))
 				return false;
 		}
 		catch (const std::bad_alloc&)
@@ -54,9 +50,7 @@ namespace Yttrium
 			return false;
 		}
 
-		// TODO: Consider switching to jpeg_source_mgr.
-
-		::jpeg_mem_src(&decompressor, &file_buffer[0], file_buffer.size());
+		::jpeg_mem_src(&decompressor, &reader_buffer[0], reader_buffer.size());
 
 		::jpeg_read_header(&decompressor, TRUE);
 

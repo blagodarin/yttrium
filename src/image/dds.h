@@ -3,10 +3,10 @@
 
 namespace Yttrium
 {
-	class File;
 	class ImageFormat;
+	class Reader;
 
-	bool read_dds_header(File&, ImageFormat&);
+	bool read_dds_header(Reader&, ImageFormat&);
 }
 
 #endif

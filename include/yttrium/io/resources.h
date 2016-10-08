@@ -9,6 +9,8 @@
 
 namespace Yttrium
 {
+	class Reader;
+
 	/// Resource manager.
 	class Y_API ResourceManager
 	{
@@ -34,7 +36,7 @@ namespace Yttrium
 		bool attach_package(const StaticString& path, PackageType = PackageType::Auto);
 
 		/// Opens a resource.
-		File open(const StaticString& path) const;
+		Reader open(const StaticString& name) const;
 
 	private:
 		const UniquePtr<class ResourceManagerPrivate> _private;

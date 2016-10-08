@@ -1,5 +1,6 @@
 #include <yttrium/io/resources.h>
 
+#include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/std/map.h>
@@ -20,10 +21,20 @@ namespace Yttrium
 		Type type;
 		UniquePtr<PackageReader> package;
 		String buffer_name{ &NoAllocator };
-		Buffer buffer;
+		std::shared_ptr<const Buffer> buffer;
 
-		ResourceAttachment(UniquePtr<PackageReader>&& package) : type(Type::Package), package(std::move(package)) {}
-		ResourceAttachment(String&& name, Buffer&& buffer) : type(Type::Buffer), buffer_name(std::move(name)), buffer(std::move(buffer)) {}
+		ResourceAttachment(UniquePtr<PackageReader>&& package)
+			: type(Type::Package)
+			, package(std::move(package))
+		{
+		}
+
+		ResourceAttachment(String&& name, Buffer&& buffer)
+			: type(Type::Buffer)
+			, buffer_name(std::move(name))
+			, buffer(std::make_shared<const Buffer>(std::move(buffer)))
+		{
+		}
 	};
 
 	using ResourceManagerGuard = InstanceGuard<ResourceManagerPrivate>;
@@ -37,13 +48,13 @@ namespace Yttrium
 		{
 		}
 
-		File open(const StaticString& name) const
+		Reader open(const StaticString& name) const
 		{
 			if (_use_file_system == ResourceManager::UseFileSystem::Before)
 			{
 				File file(name, File::Read, _allocator);
 				if (file)
-					return file;
+					return Reader(std::move(file));
 			}
 			// TODO: Build a single name-to-resource map for the entire resource system.
 			for (const auto& attachment : _attachments)
@@ -52,19 +63,19 @@ namespace Yttrium
 				{
 					auto file = attachment.package->open_file(name);
 					if (file)
-						return file;
+						return Reader(std::move(file));
 				}
 				else if (attachment.type == ResourceAttachment::Type::Buffer)
 				{
 					if (attachment.buffer_name == name)
-						return File(Buffer(attachment.buffer.size(), attachment.buffer.data()), _allocator); // TODO: Share buffer contents.
+						return Reader(attachment.buffer);
 				}
 			}
 			if (_use_file_system == ResourceManager::UseFileSystem::After)
 			{
 				File file(name, File::Read, _allocator);
 				if (file)
-					return file;
+					return Reader(std::move(file));
 			}
 			return {};
 		}
@@ -100,23 +111,24 @@ namespace Yttrium
 		return true;
 	}
 
-	File ResourceManager::open(const StaticString& path) const
+	Reader ResourceManager::open(const StaticString& name) const
 	{
-		return _private->open(path);
+		return _private->open(name);
 	}
 
 	ResourceManager::~ResourceManager() = default;
 
-	File::File(const StaticString& path, Allocator& allocator)
+	Reader::Reader(const StaticString& path, Allocator& allocator)
+		: Reader()
 	{
 		{
 			std::lock_guard<std::mutex> lock(ResourceManagerGuard::instance_mutex);
 			if (ResourceManagerGuard::instance)
 			{
-				_private = ResourceManagerGuard::instance->open(path)._private;
+				*this = ResourceManagerGuard::instance->open(path);
 				return;
 			}
 		}
-		_private = FilePrivate::open(path, Read, allocator);
+		*this = Reader(File(path, File::Read, allocator));
 	}
 }

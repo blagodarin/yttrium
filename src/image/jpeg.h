@@ -4,10 +4,10 @@
 namespace Yttrium
 {
 	class Buffer;
-	class File;
 	class ImageFormat;
+	class Reader;
 
-	bool read_jpeg(File&, ImageFormat&, Buffer&);
+	bool read_jpeg(Reader&, ImageFormat&, Buffer&);
 }
 
 #endif

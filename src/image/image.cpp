@@ -1,7 +1,7 @@
 #include <yttrium/image.h>
 
 #include <yttrium/io/file.h>
-#include <yttrium/io/package.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/utils.h>
 #include "../io/writer.h"
@@ -32,7 +32,7 @@ namespace
 		return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
 	}
 
-	bool read_image_data(File& file, const ImageFormat& format, Buffer& buffer)
+	bool read_image_data(Reader& reader, const ImageFormat& format, Buffer& buffer)
 	{
 		const auto frame_size = format.frame_size();
 		try
@@ -43,19 +43,19 @@ namespace
 		{
 			return false;
 		}
-		return file.read(buffer.data(), frame_size) == frame_size;
+		return reader.read(buffer.data(), frame_size) == frame_size;
 	}
 
-	bool read_image(File& file, ImageType type, ImageFormat& format, Buffer& buffer)
+	bool read_image(Reader& reader, ImageType type, ImageFormat& format, Buffer& buffer)
 	{
 		switch (type)
 		{
-		case ImageType::Tga: return ::read_tga_header(file, format) && ::read_image_data(file, format, buffer);
+		case ImageType::Tga: return ::read_tga_header(reader, format) && ::read_image_data(reader, format, buffer);
 	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: return ::read_jpeg(file, format, buffer);
+		case ImageType::Jpeg: return ::read_jpeg(reader, format, buffer);
 	#endif
-		case ImageType::Dds: return ::read_dds_header(file, format) && ::read_image_data(file, format, buffer);
-		default: return false;
+		case ImageType::Dds: return ::read_dds_header(reader, format) && ::read_image_data(reader, format, buffer);
+		default: return false; // TODO: Make it work for ImageType::Auto.
 		}
 	}
 
@@ -183,12 +183,15 @@ namespace Yttrium
 			else
 				return false;
 		}
-		File file(name, allocator);
-		if (!file)
-			return false;
+		Reader reader(name, allocator);
+		return reader && load(std::move(reader), type);
+	}
+
+	bool Image::load(Reader&& reader, ImageType type)
+	{
 		ImageFormat format;
 		Buffer buffer;
-		if (!::read_image(file, type, format, buffer))
+		if (!::read_image(reader, type, format, buffer))
 			return false;
 		_format = format;
 		_buffer = std::move(buffer);

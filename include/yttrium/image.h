@@ -12,6 +12,7 @@ namespace Yttrium
 {
 	class File;
 	class Image;
+	class Reader;
 
 	/// Pixel format.
 	enum class PixelFormat
@@ -165,6 +166,9 @@ namespace Yttrium
 
 		///
 		bool load(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator);
+
+		///
+		bool load(Reader&&, ImageType);
 
 		///
 		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;

@@ -2,15 +2,15 @@
 #include "dds_format.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 
 namespace Yttrium
 {
-	bool read_dds_header(File& file, ImageFormat& format)
+	bool read_dds_header(Reader& reader, ImageFormat& format)
 	{
 		DDS_HEADER header;
 
-		if (!file.read(&header)
+		if (!reader.read(header)
 			|| header.dwMagic != DDS_HEADER::MAGIC
 			|| header.dwSize != DDS_HEADER::SIZE
 			|| !(header.dwFlags & (DDSD_HEIGHT | DDSD_WIDTH))

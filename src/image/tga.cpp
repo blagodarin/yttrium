@@ -2,7 +2,7 @@
 #include "tga_format.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include "../io/writer.h"
 
 namespace
@@ -100,11 +100,11 @@ namespace
 
 namespace Yttrium
 {
-	bool read_tga_header(File& file, ImageFormat& format)
+	bool read_tga_header(Reader& reader, ImageFormat& format)
 	{
 		TgaHeader header;
 
-		if (!file.read(&header)
+		if (!reader.read(header)
 			|| header.color_map_type != tgaNoColorMap
 			|| !header.image.width
 			|| !header.image.height
@@ -138,10 +138,10 @@ namespace Yttrium
 		}
 
 		if (header.id_length)
-			file.skip(header.id_length);
+			reader.skip(header.id_length);
 
 		if (header.color_map.length)
-			file.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8));
+			reader.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8));
 
 		return true;
 	}
