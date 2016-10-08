@@ -5,18 +5,7 @@
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/utils.h>
 #include "../io/writer.h"
-#include "dds.h"
-#include "tga.h"
-
-#ifndef Y_NO_JPEG
-	#include "jpeg.h"
-#endif
-
-#ifndef Y_NO_PNG
-	#include "png.h"
-#endif
-
-#include <new>
+#include "formats.h"
 
 namespace
 {
@@ -30,47 +19,6 @@ namespace
 	size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
 	{
 		return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
-	}
-
-	bool read_image_data(Reader& reader, const ImageFormat& format, Buffer& buffer)
-	{
-		const auto frame_size = format.frame_size();
-		try
-		{
-			buffer.reset(frame_size);
-		}
-		catch (const std::bad_alloc&)
-		{
-			return false;
-		}
-		return reader.read(buffer.data(), frame_size) == frame_size;
-	}
-
-	bool read_image(Reader& reader, ImageType type, ImageFormat& format, Buffer& buffer)
-	{
-		switch (type)
-		{
-		case ImageType::Tga: return ::read_tga_header(reader, format) && ::read_image_data(reader, format, buffer);
-	#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: return ::read_jpeg(reader, format, buffer);
-	#endif
-		case ImageType::Dds: return ::read_dds_header(reader, format) && ::read_image_data(reader, format, buffer);
-		default: return false; // TODO: Make it work for ImageType::Auto.
-		}
-	}
-
-	template <typename T>
-	bool write_image(T& target, ImageType type, const ImageFormat& format, const void* data, Allocator& allocator)
-	{
-		Writer<T> writer(target);
-		switch (type)
-		{
-		case ImageType::Tga: return write_tga(writer, format, data);
-	#ifndef Y_NO_PNG
-		case ImageType::Png: return write_png(writer, format, data, allocator);
-	#endif
-		default: return false;
-		}
 	}
 }
 
@@ -191,7 +139,7 @@ namespace Yttrium
 	{
 		ImageFormat format;
 		Buffer buffer;
-		if (!::read_image(reader, type, format, buffer))
+		if (!read_image(reader, type, format, buffer))
 			return false;
 		_format = format;
 		_buffer = std::move(buffer);
@@ -217,12 +165,12 @@ namespace Yttrium
 
 	bool Image::save(Buffer& buffer, ImageType type, Allocator& allocator) const
 	{
-		return ::write_image(buffer, type, _format, _buffer.data(), allocator);
+		return write_image(buffer, type, _format, _buffer.data(), allocator);
 	}
 
 	bool Image::save(File& file, ImageType type, Allocator& allocator) const
 	{
-		return ::write_image(file, type, _format, _buffer.data(), allocator);
+		return write_image(file, type, _format, _buffer.data(), allocator);
 	}
 
 	void Image::set_format(const ImageFormat& format)

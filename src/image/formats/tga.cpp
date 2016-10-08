@@ -1,9 +1,9 @@
 #include "tga.h"
-#include "tga_format.h"
+#include "../formats.h"
 
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
-#include "../io/writer.h"
+#include "../../io/writer.h"
 
 namespace
 {

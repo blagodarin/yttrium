@@ -1,4 +1,4 @@
-#include "jpeg.h"
+#include "../formats.h"
 
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>

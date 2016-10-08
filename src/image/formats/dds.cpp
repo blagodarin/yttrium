@@ -1,5 +1,5 @@
 #include "dds.h"
-#include "dds_format.h"
+#include "../formats.h"
 
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>

@@ -1,5 +1,5 @@
-#ifndef _src_image_tga_format_h_
-#define _src_image_tga_format_h_
+#ifndef _src_image_formats_tga_h_
+#define _src_image_formats_tga_h_
 
 #include <cstdint>
 

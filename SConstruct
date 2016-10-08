@@ -198,11 +198,15 @@ if 'x11' in ports:
 src_target = 'lib/yttrium'
 src_sources = [src_env.Glob('$BUILD/src/' + path + '/*.cpp') for path in src_paths]
 
-src_sources += ['$BUILD/src/image/dds.cpp', '$BUILD/src/image/image.cpp', '$BUILD/src/image/tga.cpp']
+src_sources += [
+	'$BUILD/src/image/image.cpp',
+	'$BUILD/src/image/formats.cpp',
+	'$BUILD/src/image/formats/dds.cpp',
+	'$BUILD/src/image/formats/tga.cpp']
 if not option_no_jpeg:
-	src_sources += ['$BUILD/src/image/jpeg.cpp']
+	src_sources += ['$BUILD/src/image/formats/jpeg.cpp']
 if not option_no_png:
-	src_sources += ['$BUILD/src/image/png.cpp']
+	src_sources += ['$BUILD/src/image/formats/png.cpp']
 
 if option_static:
 	yttrium = src_env.StaticLibrary(src_target, src_sources)
