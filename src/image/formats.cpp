@@ -2,7 +2,6 @@
 
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
-#include "../io/writer.h"
 #include "../utils/fourcc.h"
 
 #include <new>
@@ -18,7 +17,7 @@ namespace Yttrium
 		case ImageType::Jpeg: return read_jpeg(reader, format, buffer);
 	#endif
 		case ImageType::Dds: return read_dds_header(reader, format) && read_image_data(reader, format, buffer);
-		default: return false; // TODO: Make it work for ImageType::Auto.
+		default: return false;
 		}
 	}
 
@@ -36,22 +35,8 @@ namespace Yttrium
 		return reader.read(buffer.data(), frame_size) == frame_size;
 	}
 
-	bool write_image(Buffer& buffer, ImageType type, const ImageFormat& format, const void* data)
+	bool write_image(Writer& writer, ImageType type, const ImageFormat& format, const void* data)
 	{
-		Writer<Buffer> writer(buffer);
-		switch (type)
-		{
-		case ImageType::Tga: return write_tga(writer, format, data);
-	#ifndef Y_NO_PNG
-		case ImageType::Png: return write_png(writer, format, data);
-	#endif
-		default: return false;
-		}
-	}
-
-	bool write_image(File& file, ImageType type, const ImageFormat& format, const void* data)
-	{
-		Writer<File> writer(file);
 		switch (type)
 		{
 		case ImageType::Tga: return write_tga(writer, format, data);

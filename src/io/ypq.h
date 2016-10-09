@@ -1,6 +1,7 @@
 #ifndef _src_io_ypq_h_
 #define _src_io_ypq_h_
 
+#include <yttrium/io/file.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
@@ -28,7 +29,7 @@ namespace Yttrium
 		YpqWriter(File&& file, Allocator& allocator) : _file(std::move(file)), _allocator(allocator), _entries(_allocator) {}
 		~YpqWriter() override;
 
-		File open_file(const StaticString&) override;
+		Writer open(const StaticString&) override;
 
 	private:
 

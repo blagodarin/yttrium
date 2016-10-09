@@ -1,6 +1,7 @@
 #include "ypq.h"
 
 #include <yttrium/io/reader.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/log.h>
 #include "../utils/fourcc.h"
 
@@ -153,7 +154,7 @@ namespace Yttrium
 		_file.write(package_header);
 	}
 
-	File YpqWriter::open_file(const StaticString& name)
+	Writer YpqWriter::open(const StaticString& name)
 	{
 		if (!_entries.empty())
 			flush_file();
@@ -168,10 +169,7 @@ namespace Yttrium
 		_last_base = _file.size();
 		_entries.emplace_back(_last_base - sizeof file_header, String(name, &_allocator));
 
-		File file;
-		FilePrivate::set(file, make_unique<PackedFile>(_allocator,
-			String(&NoAllocator), File::Write, 0, FilePrivate::get(_file), _last_base));
-		return file;
+		return Writer(_file);
 	}
 
 	void YpqWriter::flush_file()

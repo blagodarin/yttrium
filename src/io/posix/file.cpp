@@ -26,7 +26,7 @@ namespace Yttrium
 		if (_auto_close)
 		{
 			::close(_descriptor);
-			if (_auto_remove && ::unlink(name().text()))
+			if (_auto_remove && ::unlink(_name.text()))
 				throw std::system_error(errno, std::generic_category());
 		}
 	}

@@ -1,5 +1,6 @@
 #include <yttrium/io/file.h>
 #include <yttrium/io/package.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/string.h>
 
@@ -44,7 +45,11 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		File packed_file = package->open_file(entry);
-		packed_file.copy_all_from(source_file);
+		if (package->open(entry).write_all(source_file) != source_file.size())
+		{
+			// TODO: Remove the package file.
+			std::cerr << "ERROR: Can't write \"" << entry << "\" (" << argv[2] << ":" << line << ")" << std::endl;
+			return 1;
+		}
 	}
 }

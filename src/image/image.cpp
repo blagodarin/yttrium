@@ -2,6 +2,7 @@
 
 #include <yttrium/io/file.h>
 #include <yttrium/io/reader.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/utils.h>
 #include "../io/writer.h"
@@ -150,17 +151,12 @@ namespace Yttrium
 				return false;
 		}
 		File file(name, File::Write | File::Truncate, allocator);
-		return file && save(file, type);
+		return save(Writer(file), type);
 	}
 
-	bool Image::save(Buffer& buffer, ImageType type) const
+	bool Image::save(Writer&& writer, ImageType type) const
 	{
-		return write_image(buffer, type, _format, _buffer.data());
-	}
-
-	bool Image::save(File& file, ImageType type) const
-	{
-		return write_image(file, type, _format, _buffer.data());
+		return write_image(writer, type, _format, _buffer.data());
 	}
 
 	void Image::set_format(const ImageFormat& format)
@@ -221,7 +217,7 @@ namespace Yttrium
 	Buffer Image::to_buffer(ImageType type)
 	{
 		Buffer buffer;
-		return save(buffer, type) ? std::move(buffer) : Buffer();
+		return save(Writer(buffer), type) ? std::move(buffer) : Buffer();
 	}
 
 	bool operator==(const Image& lhs, const Image& rhs)

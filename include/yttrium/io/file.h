@@ -12,6 +12,7 @@ namespace Yttrium
 	class Reader;
 	class StaticString;
 	class String;
+	class Writer;
 
 	/// %File access class.
 	class Y_API File
@@ -50,10 +51,6 @@ namespace Yttrium
 
 		///
 		File(Special, Allocator& = *DefaultAllocator);
-
-		/// Copies all available contents from another file.
-		/// Returns the number of bytes written.
-		uint64_t copy_all_from(File&);
 
 		/// Flushes buffered data to the storage medium.
 		bool flush();
@@ -104,16 +101,14 @@ namespace Yttrium
 		template <typename T>
 		bool write(const T& buffer) { return write(&buffer, sizeof buffer) == sizeof buffer; }
 
-		///
-		bool write_all(const Buffer&);
-
 	private:
 		SharedPtr<class FilePrivate> _private;
 		friend FilePrivate;
 		friend Reader;
+		friend Writer;
 
 	public:
-		File() = default;
+		File() noexcept;
 		File(const File&) = delete;
 		File(File&&) noexcept;
 		~File();

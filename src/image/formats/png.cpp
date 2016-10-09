@@ -56,11 +56,10 @@ namespace
 		return true;
 	}
 
-	template <typename T>
 	class PngWriter
 	{
 	public:
-		PngWriter(T& writer)
+		PngWriter(Writer& writer)
 		{
 			_png = ::png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 			if (!_png)
@@ -85,7 +84,7 @@ namespace
 	private:
 		static void write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
 		{
-			reinterpret_cast<T*>(::png_get_io_ptr(png_ptr))->write(data, length);
+			reinterpret_cast<Writer*>(::png_get_io_ptr(png_ptr))->write(data, length);
 		}
 
 		static void flush_callback(png_struct*)
@@ -96,9 +95,11 @@ namespace
 		png_struct* _png = nullptr;
 		png_info* _info = nullptr;
 	};
+}
 
-	template <typename T>
-	bool write_png_impl(Writer<T>& writer, const ImageFormat& format, const void* data)
+namespace Yttrium
+{
+	bool write_png(Writer& writer, const ImageFormat& format, const void* data)
 	{
 		if (!::can_write(format))
 			return false;
@@ -153,7 +154,7 @@ namespace
 			break;
 		}
 
-		PngWriter<Writer<T>> png_writer(writer);
+		PngWriter png_writer(writer);
 
 		const auto rows = std::make_unique<png_bytep[]>(format.height());
 
@@ -179,18 +180,5 @@ namespace
 		::png_write_png(png_writer._png, png_writer._info, transforms, nullptr);
 
 		return true;
-	}
-}
-
-namespace Yttrium
-{
-	bool write_png(Writer<Buffer>& writer, const ImageFormat& format, const void* data)
-	{
-		return ::write_png_impl(writer, format, data);
-	}
-
-	bool write_png(Writer<File>& writer, const ImageFormat& format, const void* data)
-	{
-		return ::write_png_impl(writer, format, data);
 	}
 }

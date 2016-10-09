@@ -1,6 +1,7 @@
 #include <yttrium/io/file.h>
 #include <yttrium/io/package.h>
 #include <yttrium/io/reader.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
@@ -51,23 +52,20 @@ BOOST_AUTO_TEST_CASE(test_package)
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-
 		{
-			auto packed_file1 = package_writer->open_file(file1.name());
+			auto packed_file1 = package_writer->open(file1.name());
 			BOOST_REQUIRE(packed_file1);
-			BOOST_REQUIRE_EQUAL(packed_file1.copy_all_from(file1), file1.size());
+			BOOST_REQUIRE_EQUAL(packed_file1.write_all(file1), file1.size());
 		}
-
 		{
-			auto packed_file2 = package_writer->open_file(file2.name());
+			auto packed_file2 = package_writer->open(file2.name());
 			BOOST_REQUIRE(packed_file2);
-			BOOST_REQUIRE_EQUAL(packed_file2.copy_all_from(file2), file2.size());
+			BOOST_REQUIRE_EQUAL(packed_file2.write_all(file2), file2.size());
 		}
-
 		{
-			auto packed_file3 = package_writer->open_file(file3.name());
+			auto packed_file3 = package_writer->open(file3.name());
 			BOOST_REQUIRE(packed_file3);
-			BOOST_REQUIRE_EQUAL(packed_file3.copy_all_from(file3), file3.size());
+			BOOST_REQUIRE_EQUAL(packed_file3.write_all(file3), file3.size());
 		}
 	}
 
@@ -110,12 +108,12 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
 		{
-			auto packed_file = package_writer->open_file("1");
+			auto packed_file = package_writer->open("1");
 			BOOST_REQUIRE(packed_file);
 			BOOST_CHECK(packed_file.write<uint8_t>(1));
 		}
 		{
-			auto packed_file = package_writer->open_file("2");
+			auto packed_file = package_writer->open("2");
 			BOOST_REQUIRE(packed_file);
 			BOOST_CHECK(packed_file.write<uint8_t>(2));
 		}

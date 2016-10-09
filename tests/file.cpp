@@ -28,21 +28,6 @@ namespace Yttrium
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(test_file_copy_all_from)
-{
-	const auto buffer = ::make_random_buffer(100003);
-
-	File input(File::Temporary);
-	input.write(buffer.data(), buffer.size());
-	input.seek(0);
-
-	File output(File::Temporary);
-	output.copy_all_from(input);
-
-	const auto actual = Reader(output.name()).to_buffer();
-	BOOST_CHECK_EQUAL(actual, buffer);
-}
-
 BOOST_AUTO_TEST_CASE(test_file_special)
 {
 	File file(File::StdErr);

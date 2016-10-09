@@ -16,12 +16,6 @@ namespace Yttrium
 		assert(_mode & File::ReadWrite);
 	}
 
-	void FilePrivate::update_size(uint64_t offset)
-	{
-		if (_size < offset)
-			_size = offset;
-	}
-
 	File::File(const StaticString& path, unsigned mode, Allocator& allocator)
 		: _private(FilePrivate::open(path, mode, allocator))
 	{
@@ -30,15 +24,6 @@ namespace Yttrium
 	File::File(Special special, Allocator& allocator)
 		: _private(FilePrivate::open(special, allocator))
 	{
-	}
-
-	uint64_t File::copy_all_from(File& file)
-	{
-		uint64_t total_size = 0;
-		Buffer buffer(Buffer::memory_granularity());
-		while (size_t size = file.read(buffer.data(), buffer.size()))
-			total_size += write(buffer.data(), size);
-		return total_size;
 	}
 
 	bool File::flush()
@@ -179,15 +164,12 @@ namespace Yttrium
 			return _private->write(buffer, size);
 		const auto result = _private->write(buffer, size, _private->_offset);
 		_private->_offset += result;
-		_private->update_size(_private->_offset);
+		if (_private->_size < _private->_offset)
+			_private->_size = _private->_offset;
 		return result;
 	}
 
-	bool File::write_all(const Buffer& buffer)
-	{
-		return write(buffer.data(), buffer.size()) == buffer.size();
-	}
-
+	File::File() noexcept = default;
 	File::File(File&&) noexcept = default;
 	File::~File() = default;
 	File& File::operator=(File&&) noexcept = default;

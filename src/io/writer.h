@@ -1,38 +1,39 @@
 #ifndef _src_io_writer_h_
 #define _src_io_writer_h_
 
-#include <cstddef>
+#include <yttrium/io/writer.h>
 
 namespace Yttrium
 {
-	class Buffer;
-	class File;
-
-	template <typename>
-	class Writer;
-
-	template <>
-	class Writer<Buffer>
+	class WriterPrivate
 	{
 	public:
-		Writer(Buffer&) noexcept;
+		virtual ~WriterPrivate() = default;
 
-		void reserve(size_t size);
-		bool write(const void*, size_t);
+		virtual void reserve(size_t) = 0;
+		virtual size_t write(const void*, size_t) = 0;
+	};
+
+	class BufferWriter : public WriterPrivate
+	{
+	public:
+		BufferWriter(Buffer&);
+
+		void reserve(size_t) override;
+		size_t write(const void*, size_t) override;
 
 	private:
 		Buffer& _buffer;
-		size_t _offset;
+		size_t _offset = 0;
 	};
 
-	template <>
-	class Writer<File>
+	class FileWriter : public WriterPrivate
 	{
 	public:
-		Writer(File& file) : _file(file) {}
+		FileWriter(File& file) : _file(file) {}
 
-		void reserve(size_t) {}
-		bool write(const void*, size_t);
+		void reserve(size_t) override {}
+		size_t write(const void*, size_t) override;
 
 	private:
 		File& _file;

@@ -10,6 +10,7 @@
 
 namespace Yttrium
 {
+	class Buffer;
 	class Reader;
 
 	/// Resource manager.

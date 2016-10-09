@@ -22,8 +22,8 @@ namespace Yttrium
 		return size;
 	}
 
-	FileReader::FileReader(const SharedPtr<const FilePrivate>& file)
-		: ReaderPrivate(file->size())
+	FileReader::FileReader(uint64_t size, const SharedPtr<const FilePrivate>& file)
+		: ReaderPrivate(size)
 		, _file(file)
 	{
 	}
@@ -46,13 +46,13 @@ namespace Yttrium
 	}
 
 	Reader::Reader(const std::shared_ptr<const Buffer>& buffer)
-		: _private(buffer ? std::make_unique<BufferReader>(buffer) : nullptr)
+		: _private(buffer ? std::make_shared<BufferReader>(buffer) : nullptr)
 	{
 	}
 
 	Reader::Reader(File&& file)
 		: _private(file._private && (file._private->_mode & (File::Read | File::Pipe)) == File::Read
-			? std::make_unique<FileReader>(std::move(file._private))
+			? std::make_shared<FileReader>(file._private->_size, std::move(file._private))
 			: nullptr)
 	{
 	}
@@ -63,7 +63,7 @@ namespace Yttrium
 	}
 
 	Reader::Reader(const Reader& reader, uint64_t base, uint64_t size)
-		: _private(base < reader.size() ? std::make_unique<ReaderReader>(reader._private, base, min(size, reader.size() - base)) : nullptr)
+		: _private(base < reader.size() ? std::make_shared<ReaderReader>(reader._private, base, min(size, reader.size() - base)) : nullptr)
 	{
 	}
 

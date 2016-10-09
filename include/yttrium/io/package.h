@@ -8,10 +8,9 @@
 
 namespace Yttrium
 {
-	class Buffer;
-	class File;
 	class Reader;
 	class StaticString;
+	class Writer;
 
 	template <typename> class UniquePtr;
 
@@ -47,7 +46,7 @@ namespace Yttrium
 		virtual ~PackageWriter() = default;
 
 		///
-		virtual File open_file(const StaticString& name) = 0;
+		virtual Writer open(const StaticString& name) = 0;
 	};
 }
 

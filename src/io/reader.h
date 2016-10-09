@@ -37,12 +37,12 @@ namespace Yttrium
 	class FileReader : public ReaderPrivate
 	{
 	public:
-		FileReader(const SharedPtr<const FilePrivate>&);
+		FileReader(uint64_t, const SharedPtr<const FilePrivate>&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 
 	private:
-		const SharedPtr<const FilePrivate> _file; // TODO: std::unique_ptr.
+		const SharedPtr<const FilePrivate> _file;
 	};
 
 	class ReaderReader : public ReaderPrivate

@@ -10,9 +10,9 @@
 
 namespace Yttrium
 {
-	class File;
 	class Image;
 	class Reader;
+	class Writer;
 
 	/// Pixel format.
 	enum class PixelFormat
@@ -174,10 +174,7 @@ namespace Yttrium
 		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;
 
 		///
-		bool save(Buffer&, ImageType) const;
-
-		///
-		bool save(File&, ImageType) const;
+		bool save(Writer&&, ImageType) const;
 
 		/// Change the format to \a format.
 		/// \param format New image format.
