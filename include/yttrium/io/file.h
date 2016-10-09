@@ -9,6 +9,7 @@
 namespace Yttrium
 {
 	class Buffer;
+	class Reader;
 	class StaticString;
 	class String;
 
@@ -49,9 +50,6 @@ namespace Yttrium
 
 		///
 		File(Special, Allocator& = *DefaultAllocator);
-
-		///
-		File(Buffer&&, Allocator& = *DefaultAllocator);
 
 		/// Copies all available contents from another file.
 		/// Returns the number of bytes written.
@@ -112,6 +110,7 @@ namespace Yttrium
 	private:
 		SharedPtr<class FilePrivate> _private;
 		friend FilePrivate;
+		friend Reader;
 
 	public:
 		File() = default;

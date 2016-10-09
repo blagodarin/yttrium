@@ -1,51 +1,67 @@
-#include <yttrium/io/reader.h>
 #include "reader.h"
 
 #include <yttrium/memory/buffer.h>
 #include <yttrium/string.h>
 #include <yttrium/utils.h>
+#include "file.h"
 
 #include <cstring>
 #include <limits>
 
 namespace Yttrium
 {
-	ReaderBuffer::ReaderBuffer(const std::shared_ptr<const Buffer>& buffer)
+	BufferReader::BufferReader(const std::shared_ptr<const Buffer>& buffer)
 		: ReaderPrivate(buffer->size())
 		, _buffer(buffer)
 	{
 	}
 
-	size_t ReaderBuffer::read_at(uint64_t offset, void* buffer, size_t size) const
+	size_t BufferReader::read_at(uint64_t offset, void* buffer, size_t size) const
 	{
 		std::memcpy(buffer, static_cast<const uint8_t*>(_buffer->data()) + offset, size);
 		return size;
 	}
 
-	ReaderFile::ReaderFile(File&& file)
-		: ReaderPrivate(file.size())
-		, _file(std::move(file))
+	FileReader::FileReader(const SharedPtr<const FilePrivate>& file)
+		: ReaderPrivate(file->size())
+		, _file(file)
 	{
 	}
 
-	size_t ReaderFile::read_at(uint64_t offset, void* buffer, size_t size) const
+	size_t FileReader::read_at(uint64_t offset, void* buffer, size_t size) const
 	{
-		return _file.seek(offset) ? _file.read(buffer, size) : 0;
+		return _file->read(buffer, size, offset);
+	}
+
+	ReaderReader::ReaderReader(const std::shared_ptr<const ReaderPrivate>& reader, uint64_t base, uint64_t size)
+		: ReaderPrivate(size)
+		, _reader(reader)
+		, _base(base)
+	{
+	}
+
+	size_t ReaderReader::read_at(uint64_t offset, void* buffer, size_t size) const
+	{
+		return offset <= std::numeric_limits<uint64_t>::max() - _base ? _reader->read_at(_base + offset, buffer, size) : 0;
 	}
 
 	Reader::Reader(const std::shared_ptr<const Buffer>& buffer)
-		: _private(buffer ? std::make_unique<ReaderBuffer>(buffer) : nullptr)
+		: _private(buffer ? std::make_unique<BufferReader>(buffer) : nullptr)
 	{
 	}
 
 	Reader::Reader(File&& file)
-		: _private(file ? std::make_unique<ReaderFile>(std::move(file)) : nullptr)
+		: _private(file ? std::make_unique<FileReader>(std::move(file._private)) : nullptr)
 	{
 	}
 
-
 	Reader::Reader(const StaticString& path, Allocator& allocator)
 		: Reader(File(path, File::Read, allocator))
+	{
+	}
+
+	Reader::Reader(const Reader& reader, uint64_t base, uint64_t size)
+		: _private(base < reader.size() ? std::make_unique<ReaderReader>(reader._private, base, min(size, reader.size() - base)) : nullptr)
 	{
 	}
 

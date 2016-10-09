@@ -46,26 +46,26 @@ namespace
 
 namespace Yttrium
 {
-	YpqReader::YpqReader(File&& file, Allocator& allocator)
-		: _file(std::move(file))
+	YpqReader::YpqReader(String&& name, Reader&& reader, Allocator& allocator)
+		: _name(std::move(name))
+		, _reader(std::move(reader))
 		, _allocator(allocator)
 		, _index(_allocator)
 	{
 		YpqPackageHeader package_header;
-		if (_file.size() < sizeof package_header
-			|| !_file.seek(_file.size() - sizeof package_header)
-			|| !_file.read(&package_header)
+		if (_reader.size() < sizeof package_header
+			|| !_reader.read_at(_reader.size() - sizeof package_header, package_header)
 			|| package_header.signature != YpqPackageSignature)
 			throw BadPackage(String("Bad package header"_s, &_allocator));
 
 		YpqFileHeader index_file_header;
-		if (!_file.seek(package_header.index_file_offset)
-			|| !_file.read(&index_file_header)
+		if (!_reader.seek(package_header.index_file_offset)
+			||!_reader.read(index_file_header)
 			|| index_file_header.signature != YpqFileSignature)
 			throw BadPackage(String("Bad package index file header"_s, &_allocator));
 
 		YpqIndexHeader index_header;
-		if (!_file.read(&index_header)
+		if (!_reader.read(index_header)
 			|| index_header.signature != YpqIndexSignature
 			|| index_file_header.size < sizeof index_header)
 			throw BadPackage(String("Bad package index header"_s, &_allocator));
@@ -76,7 +76,7 @@ namespace Yttrium
 		{
 			YpqIndexEntry entry;
 			if (index_size < sizeof entry
-				|| !_file.read(&entry))
+				|| !_reader.read(entry))
 				throw BadPackage(String("Bad package index entry"_s, &_allocator));
 
 			index_size -= sizeof entry;
@@ -84,7 +84,7 @@ namespace Yttrium
 			String name(entry.name_size, &_allocator);
 			name.resize(entry.name_size);
 			if (index_size < entry.name_size
-				|| !_file.read(name.text(), entry.name_size))
+				|| _reader.read(name.text(), entry.name_size) != entry.name_size)
 				throw BadPackage(String("Bad package index entry name"_s, &_allocator));
 
 			index_size -= entry.name_size;
@@ -96,25 +96,21 @@ namespace Yttrium
 			throw BadPackage(String("Stray index data"_s, &_allocator)); // Disallow index padding.
 	}
 
-	Reader YpqReader::open(const StaticString& name)
+	Reader YpqReader::open(const StaticString& name) const
 	{
 		const auto i = _index.find(String(name, ByReference()));
 		if (i == _index.end())
 			return {};
 
 		YpqFileHeader file_header;
-		if (!_file.seek(i->second)
-			|| !_file.read(&file_header)
+		if (!_reader.read_at(i->second, file_header)
 			|| file_header.signature != YpqFileSignature) // TODO: Check file size.
 		{
-			Log() << "("_s << _file.name() << ") Bad package"_s;
+			Log() << "("_s << _name << ") Bad package"_s;
 			return {};
 		}
 
-		File file;
-		FilePrivate::set(file, make_unique<PackedFile>(_allocator,
-			String(&NoAllocator), File::Read, file_header.size, FilePrivate::get(_file), i->second + sizeof file_header));
-		return Reader(std::move(file));
+		return Reader(_reader, i->second + sizeof file_header, file_header.size);
 	}
 
 	YpqWriter::~YpqWriter()

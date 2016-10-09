@@ -25,7 +25,7 @@ namespace Yttrium
 		throw std::logic_error("Bad packed file operation");
 	}
 
-	size_t PackedFile::read(void* buffer, size_t size, uint64_t offset)
+	size_t PackedFile::read(void* buffer, size_t size, uint64_t offset) const
 	{
 		if (offset > std::numeric_limits<uint64_t>::max() - _base)
 			return 0;
@@ -55,14 +55,14 @@ namespace Yttrium
 			else
 				return {};
 		}
-		File file(path, File::Read, allocator);
-		if (!file)
+		Reader reader(path, allocator);
+		if (!reader)
 			return {};
 		try
 		{
 			switch (type)
 			{
-			case PackageType::Ypq: return make_unique<YpqReader>(allocator, std::move(file), allocator);
+			case PackageType::Ypq: return make_unique<YpqReader>(allocator, String(path, &allocator), std::move(reader), allocator);
 			default: break;
 			}
 		}

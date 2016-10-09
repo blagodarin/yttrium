@@ -22,7 +22,7 @@ namespace Yttrium
 		bool flush() override;
 		bool resize(uint64_t size) override;
 		size_t read(void*, size_t) override;
-		size_t read(void*, size_t, uint64_t) override;
+		size_t read(void*, size_t, uint64_t) const override;
 		size_t write(const void*, size_t) override;
 		size_t write(const void*, size_t, uint64_t) override;
 

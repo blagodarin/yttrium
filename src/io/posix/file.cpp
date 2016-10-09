@@ -42,7 +42,7 @@ namespace Yttrium
 		return result != -1 ? result : 0;
 	}
 
-	size_t SystemFile::read(void* buffer, size_t size, uint64_t offset)
+	size_t SystemFile::read(void* buffer, size_t size, uint64_t offset) const
 	{
 		const auto result = ::pread(_descriptor, buffer, size, offset);
 		return result != -1 ? result : 0;

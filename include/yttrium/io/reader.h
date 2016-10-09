@@ -22,11 +22,14 @@ namespace Yttrium
 		/// Creates a Reader for a Buffer.
 		explicit Reader(const std::shared_ptr<const Buffer>&);
 
-		/// Creates a reader for the specified file.
+		/// Creates a Reader for a File.
 		explicit Reader(File&&);
 
-		/// Creates a reader for the specified file.
+		/// Creates a Reader for the specified file.
 		explicit Reader(const StaticString& path, Allocator& = *DefaultAllocator);
+
+		/// Creates a Reader for a range of another Reader.
+		Reader(const Reader&, uint64_t base, uint64_t size);
 
 		/// Returns the current offset.
 		uint64_t offset() const;
@@ -67,7 +70,7 @@ namespace Yttrium
 		String to_string(Allocator& = *DefaultAllocator) const;
 
 	private:
-		std::unique_ptr<class ReaderPrivate> _private;
+		std::shared_ptr<class ReaderPrivate> _private;
 		friend ReaderPrivate;
 
 	public:

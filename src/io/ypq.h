@@ -1,6 +1,7 @@
 #ifndef _src_io_ypq_h_
 #define _src_io_ypq_h_
 
+#include <yttrium/io/reader.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include "package.h"
@@ -10,12 +11,13 @@ namespace Yttrium
 	class YpqReader : public PackageReader
 	{
 	public:
-		YpqReader(File&&, Allocator&);
+		YpqReader(String&&, Reader&&, Allocator&);
 
-		Reader open(const StaticString&) override;
+		Reader open(const StaticString&) const override;
 
 	private:
-		File _file;
+		const String _name;
+		Reader _reader;
 		Allocator& _allocator;
 		StdMap<String, uint64_t> _index;
 	};

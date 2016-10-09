@@ -33,7 +33,7 @@ namespace Yttrium
 		virtual ~PackageReader() = default;
 
 		///
-		virtual Reader open(const StaticString& name) = 0;
+		virtual Reader open(const StaticString& name) const = 0;
 	};
 
 	/// Package writer class.

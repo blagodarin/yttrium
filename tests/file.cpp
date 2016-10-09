@@ -52,29 +52,3 @@ BOOST_AUTO_TEST_CASE(test_file_special)
 	const auto text = "Standard error output test.\n"_s;
 	BOOST_CHECK(file.write(text.text(), text.size()));
 }
-
-BOOST_AUTO_TEST_CASE(test_memory_file_reading)
-{
-	const auto original_buffer = ::make_random_buffer(Buffer::memory_granularity());
-
-	Buffer file_buffer(original_buffer.size());
-	std::memcpy(file_buffer.data(), original_buffer.data(), original_buffer.size());
-
-	const auto read_buffer = Reader(File(std::move(file_buffer))).to_buffer();
-	BOOST_CHECK_EQUAL(read_buffer, original_buffer);
-}
-
-BOOST_AUTO_TEST_CASE(test_memory_file_writing)
-{
-	File file{ Buffer() };
-	BOOST_REQUIRE(file);
-	BOOST_CHECK_EQUAL(file.size(), 0);
-
-	const auto original_buffer = ::make_random_buffer(Buffer::memory_granularity());
-
-	BOOST_REQUIRE(file.write_all(original_buffer));
-	BOOST_CHECK_EQUAL(file.size(), original_buffer.size());
-
-	const auto read_buffer = Reader(std::move(file)).to_buffer();
-	BOOST_CHECK_EQUAL(read_buffer, original_buffer);
-}
