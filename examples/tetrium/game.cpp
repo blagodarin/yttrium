@@ -180,7 +180,7 @@ void Game::run()
 	_bindings.bind_default(Key::Left, "turn_left");
 	_bindings.bind_default(Key::Right, "turn_right");
 
-	_game.set_random_seed(millisecond_clock());
+	std::srand(millisecond_clock());
 
 	if (_audio)
 	{

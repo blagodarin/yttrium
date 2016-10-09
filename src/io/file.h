@@ -36,6 +36,7 @@ namespace Yttrium
 		uint64_t _offset = 0;
 
 		friend File;
+		friend Reader;
 	};
 }
 

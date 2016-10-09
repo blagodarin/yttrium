@@ -121,10 +121,6 @@ namespace Tetrium
 		/// \param move \c true if the figure should move left.
 		void set_left_movement(bool move);
 
-		/// Initialize the randomizer.
-		/// \param seed Randomized seed.
-		void set_random_seed(unsigned seed) { _random = seed; }
-
 		/// Begin or end the right move.
 		/// \param move \c true if the figure should move right.
 		void set_right_movement(bool move);
@@ -163,7 +159,6 @@ namespace Tetrium
 
 		State    _state = Stopped;
 		int      _timeout;
-		unsigned _random;
 		Field    _field;
 		Figure   _current_figure;
 		Figure   _next_figure;

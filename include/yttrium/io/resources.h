@@ -5,7 +5,8 @@
 #define _include_yttrium_io_resources_h_
 
 #include <yttrium/io/package.h>
-#include <yttrium/memory/unique_ptr.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -26,9 +27,6 @@ namespace Yttrium
 		///
 		ResourceManager(UseFileSystem, Allocator& = *DefaultAllocator);
 
-		///
-		~ResourceManager();
-
 		/// Attaches a buffer to the resource system.
 		void attach_buffer(const StaticString& name, Buffer&&);
 
@@ -39,7 +37,10 @@ namespace Yttrium
 		Reader open(const StaticString& name) const;
 
 	private:
-		const UniquePtr<class ResourceManagerPrivate> _private;
+		const std::unique_ptr<class ResourceManagerPrivate> _private;
+
+	public:
+		~ResourceManager();
 	};
 }
 

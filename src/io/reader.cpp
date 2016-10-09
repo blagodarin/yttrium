@@ -51,7 +51,9 @@ namespace Yttrium
 	}
 
 	Reader::Reader(File&& file)
-		: _private(file ? std::make_unique<FileReader>(std::move(file._private)) : nullptr)
+		: _private(file._private && (file._private->_mode & (File::Read | File::Pipe)) == File::Read
+			? std::make_unique<FileReader>(std::move(file._private))
+			: nullptr)
 	{
 	}
 
@@ -72,9 +74,7 @@ namespace Yttrium
 
 	size_t Reader::read(void* buffer, size_t size)
 	{
-		if (!size || !_private)
-			return 0;
-		if (_private->_offset == _private->_size)
+		if (!size || !_private || _private->_offset == _private->_size)
 			return 0;
 		const auto result = _private->read_at(_private->_offset, buffer, min<uint64_t>(size, _private->_size - _private->_offset));
 		_private->_offset += result;

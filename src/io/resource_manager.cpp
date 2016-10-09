@@ -5,7 +5,6 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
-#include "../base/instance_guard.h"
 #include "file.h"
 
 namespace Yttrium
@@ -36,8 +35,6 @@ namespace Yttrium
 		{
 		}
 	};
-
-	using ResourceManagerGuard = InstanceGuard<ResourceManagerPrivate>;
 
 	class ResourceManagerPrivate
 	{
@@ -84,13 +81,12 @@ namespace Yttrium
 		Allocator& _allocator;
 		const ResourceManager::UseFileSystem _use_file_system;
 		StdVector<ResourceAttachment> _attachments{ _allocator };
-		ResourceManagerGuard _instance_guard{ this, "Duplicate ResourceManager construction" };
 
 		friend ResourceManager;
 	};
 
 	ResourceManager::ResourceManager(UseFileSystem use_file_system, Allocator& allocator)
-		: _private(make_unique<ResourceManagerPrivate>(allocator, use_file_system, allocator))
+		: _private(std::make_unique<ResourceManagerPrivate>(use_file_system, allocator))
 	{
 	}
 
