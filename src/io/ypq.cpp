@@ -1,5 +1,6 @@
 #include "ypq.h"
 
+#include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include "../utils/fourcc.h"
 
@@ -95,7 +96,7 @@ namespace Yttrium
 			throw BadPackage(String("Stray index data"_s, &_allocator)); // Disallow index padding.
 	}
 
-	File YpqReader::open_file(const StaticString& name)
+	Reader YpqReader::open(const StaticString& name)
 	{
 		const auto i = _index.find(String(name, ByReference()));
 		if (i == _index.end())
@@ -113,7 +114,7 @@ namespace Yttrium
 		File file;
 		FilePrivate::set(file, make_unique<PackedFile>(_allocator,
 			String(&NoAllocator), File::Read, file_header.size, FilePrivate::get(_file), i->second + sizeof file_header));
-		return file;
+		return Reader(std::move(file));
 	}
 
 	YpqWriter::~YpqWriter()

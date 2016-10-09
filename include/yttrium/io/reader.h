@@ -20,13 +20,13 @@ namespace Yttrium
 	{
 	public:
 		/// Creates a Reader for a Buffer.
-		Reader(const std::shared_ptr<const Buffer>&);
+		explicit Reader(const std::shared_ptr<const Buffer>&);
 
 		/// Creates a reader for the specified file.
-		Reader(File&&);
+		explicit Reader(File&&);
 
-		/// Creates a reader for the specified file using the resource manager if possible.
-		Reader(const StaticString& path, Allocator& = *DefaultAllocator);
+		/// Creates a reader for the specified file.
+		explicit Reader(const StaticString& path, Allocator& = *DefaultAllocator);
 
 		/// Returns the current offset.
 		uint64_t offset() const;
@@ -59,6 +59,12 @@ namespace Yttrium
 
 		/// Advances the current offset by the specified number of bytes.
 		bool skip(uint64_t size);
+
+		/// Reads the entire source into a Buffer.
+		Buffer to_buffer() const;
+
+		/// Reads the entire source into a String.
+		String to_string(Allocator& = *DefaultAllocator) const;
 
 	private:
 		std::unique_ptr<class ReaderPrivate> _private;

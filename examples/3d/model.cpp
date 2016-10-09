@@ -1,7 +1,7 @@
 #include "model.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/index_buffer.h>
@@ -90,8 +90,8 @@ CubeModel::CubeModel(Renderer& renderer)
 	_indices = _renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data());
 
 	_program = _renderer.create_gpu_program(
-		File("examples/3d/data/cube_vs.glsl").to_string(),
-		File("examples/3d/data/cube_fs.glsl").to_string());
+		Reader("examples/3d/data/cube_vs.glsl").to_string(),
+		Reader("examples/3d/data/cube_fs.glsl").to_string());
 }
 
 ChessboardModel::ChessboardModel(Renderer& renderer)
@@ -152,6 +152,6 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
 	_program = _renderer.create_gpu_program(
-		File("examples/3d/data/chessboard_vs.glsl").to_string(),
-		File("examples/3d/data/chessboard_fs.glsl").to_string());
+		Reader("examples/3d/data/chessboard_vs.glsl").to_string(),
+		Reader("examples/3d/data/chessboard_fs.glsl").to_string());
 }

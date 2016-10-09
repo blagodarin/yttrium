@@ -12,7 +12,7 @@ namespace Yttrium
 	public:
 		YpqReader(File&&, Allocator&);
 
-		File open_file(const StaticString&) override;
+		Reader open(const StaticString&) override;
 
 	private:
 		File _file;

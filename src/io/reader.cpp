@@ -43,6 +43,12 @@ namespace Yttrium
 	{
 	}
 
+
+	Reader::Reader(const StaticString& path, Allocator& allocator)
+		: Reader(File(path, File::Read, allocator))
+	{
+	}
+
 	uint64_t Reader::offset() const
 	{
 		return _private ? _private->_offset : 0;
@@ -63,17 +69,21 @@ namespace Yttrium
 	{
 		if (!_private)
 			return false;
-		if (_private->_size > std::numeric_limits<size_t>::max())
+		if (_private->_size > std::numeric_limits<size_t>::max() - 1)
 			throw std::bad_alloc();
-		buffer.reset(_private->_size);
-		return _private->read_at(0, buffer.data(), buffer.size()) == buffer.size();
+		buffer.reset(_private->_size + 1);
+		if (_private->read_at(0, buffer.data(), _private->_size) != _private->_size)
+			return false;
+		buffer[_private->_size] = '\0';
+		buffer.resize(_private->_size);
+		return true;
 	}
 
 	bool Reader::read_all(String& string) const
 	{
 		if (!_private)
 			return false;
-		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for zero terminator. // TODO: Fix.
+		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for zero terminator.
 			throw std::bad_alloc();
 		string.resize(_private->_size);
 		return _private->read_at(0, string.text(), string.size()) == string.size();
@@ -105,6 +115,18 @@ namespace Yttrium
 			return false;
 		_private->_offset += size;
 		return true;
+	}
+
+	Buffer Reader::to_buffer() const
+	{
+		Buffer buffer;
+		return read_all(buffer) ? std::move(buffer) : Buffer();
+	}
+
+	String Reader::to_string(Allocator& allocator) const
+	{
+		String string(&allocator);
+		return read_all(string) ? std::move(string) : String(&allocator);
 	}
 
 	Reader::Reader() noexcept = default;

@@ -79,12 +79,6 @@ namespace Yttrium
 		bool read(T* buffer) { return read(buffer, sizeof(T)) == sizeof(T); }
 
 		///
-		bool read_all(Buffer* buffer);
-
-		///
-		bool read_all(String* string);
-
-		///
 		bool read_line(String& string);
 
 		/// Resizes the file.
@@ -98,9 +92,6 @@ namespace Yttrium
 
 		///
 		bool skip(uint64_t size) { return seek(size, Relative); }
-
-		///
-		String to_string();
 
 		/// Truncates the file past the current offset.
 		bool truncate() { return resize(offset()); }
@@ -117,10 +108,6 @@ namespace Yttrium
 
 		///
 		bool write_all(const Buffer&);
-
-		/// Reads the specified file to the buffer.
-		/// The buffer is guaranteed to be implicitly zero-terminated.
-		static Buffer read_to_buffer(const StaticString& path, Allocator& = *DefaultAllocator);
 
 	private:
 		SharedPtr<class FilePrivate> _private;

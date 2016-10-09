@@ -1,4 +1,5 @@
 #include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/string.h>
 
@@ -11,7 +12,7 @@
 
 namespace Yttrium
 {
-	Buffer make_random_buffer(size_t size)
+	inline Buffer make_random_buffer(size_t size)
 	{
 		Buffer buffer(size);
 		for (auto& byte : buffer)
@@ -38,40 +39,8 @@ BOOST_AUTO_TEST_CASE(test_file_copy_all_from)
 	File output(File::Temporary);
 	output.copy_all_from(input);
 
-	const auto actual = File::read_to_buffer(output.name());
+	const auto actual = Reader(output.name()).to_buffer();
 	BOOST_CHECK_EQUAL(actual, buffer);
-}
-
-BOOST_AUTO_TEST_CASE(test_file_read_all)
-{
-	const auto expected_buffer = ::make_random_buffer(100003);
-
-	File file(File::Temporary);
-	file.write(expected_buffer.data(), expected_buffer.size());
-
-	Buffer actual_buffer;
-
-	BOOST_REQUIRE(File(file.name()).read_all(&actual_buffer));
-	BOOST_CHECK_EQUAL(actual_buffer, expected_buffer);
-
-	String actual_string;
-
-	BOOST_REQUIRE(File(file.name()).read_all(&actual_string));
-	BOOST_CHECK_EQUAL(actual_string.size(), expected_buffer.size());
-	BOOST_CHECK(!::memcmp(actual_string.text(), expected_buffer.data(), expected_buffer.size()));
-}
-
-BOOST_AUTO_TEST_CASE(test_file_read_to_buffer)
-{
-	const auto expected = ::make_random_buffer(Buffer::memory_granularity());
-
-	File file(File::Temporary);
-	file.write(expected.data(), expected.size());
-
-	const auto actual = File::read_to_buffer(file.name());
-	BOOST_CHECK_EQUAL(actual, expected);
-	BOOST_REQUIRE(actual.capacity() > actual.size());
-	BOOST_CHECK_EQUAL(actual[actual.size()], '\0');
 }
 
 BOOST_AUTO_TEST_CASE(test_file_special)
@@ -91,11 +60,7 @@ BOOST_AUTO_TEST_CASE(test_memory_file_reading)
 	Buffer file_buffer(original_buffer.size());
 	std::memcpy(file_buffer.data(), original_buffer.data(), original_buffer.size());
 
-	File file(std::move(file_buffer));
-	BOOST_REQUIRE(file);
-
-	Buffer read_buffer;
-	BOOST_REQUIRE(file.read_all(&read_buffer));
+	const auto read_buffer = Reader(File(std::move(file_buffer))).to_buffer();
 	BOOST_CHECK_EQUAL(read_buffer, original_buffer);
 }
 
@@ -110,8 +75,6 @@ BOOST_AUTO_TEST_CASE(test_memory_file_writing)
 	BOOST_REQUIRE(file.write_all(original_buffer));
 	BOOST_CHECK_EQUAL(file.size(), original_buffer.size());
 
-	Buffer read_buffer;
-	BOOST_REQUIRE(file.seek(0));
-	BOOST_REQUIRE(file.read_all(&read_buffer));
+	const auto read_buffer = Reader(std::move(file)).to_buffer();
 	BOOST_CHECK_EQUAL(read_buffer, original_buffer);
 }

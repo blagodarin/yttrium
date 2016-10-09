@@ -1,6 +1,6 @@
 #include <yttrium/script/code.h>
 
-#include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
@@ -148,7 +148,7 @@ namespace Yttrium
 	ScriptCode ScriptCode::load(const StaticString& filename, Allocator& allocator)
 	{
 		String text(&allocator);
-		return File(filename, allocator).read_all(&text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
+		return Reader(filename, allocator).read_all(text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
 	}
 
 	ScriptCode::~ScriptCode() = default;

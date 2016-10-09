@@ -1,5 +1,6 @@
 #include <yttrium/image.h>
 #include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
 
 #include <boost/test/unit_test.hpp>
@@ -25,11 +26,9 @@ BOOST_AUTO_TEST_CASE(test_tga)
 	File file(File::Temporary);
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
-	Buffer expected;
-	Buffer actual;
-	BOOST_REQUIRE(File("tests/image/gradient32.tga").read_all(&expected));
-	BOOST_REQUIRE(File(file.name()).read_all(&actual));
-	BOOST_CHECK(expected == actual);
+	const auto expected = Reader("tests/image/gradient32.tga").to_buffer();
+	const auto actual = Reader(file.name()).to_buffer();
+	BOOST_CHECK_EQUAL(expected, actual);
 }
 
 BOOST_AUTO_TEST_CASE(test_dds)
@@ -65,9 +64,8 @@ BOOST_AUTO_TEST_CASE(test_png)
 	File file(File::Temporary);
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
 
-	const auto expected = File::read_to_buffer("tests/image/gradient24.png");
-	BOOST_REQUIRE(expected.size() > 0);
-	const auto actual = File::read_to_buffer(file.name());
+	const auto expected = Reader("tests/image/gradient24.png").to_buffer();
+	const auto actual = Reader(file.name()).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }
 
@@ -80,9 +78,7 @@ BOOST_AUTO_TEST_CASE(test_intensity)
 	File file(File::Temporary);
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
-	Buffer expected;
-	Buffer actual;
-	BOOST_REQUIRE(File("tests/image/intensity32.tga").read_all(&expected));
-	BOOST_REQUIRE(File(file.name()).read_all(&actual));
-	BOOST_CHECK(expected == actual);
+	const auto expected = Reader("tests/image/intensity32.tga").to_buffer();
+	const auto actual = Reader(file.name()).to_buffer();
+	BOOST_CHECK_EQUAL(expected, actual);
 }

@@ -52,18 +52,18 @@ namespace Yttrium
 		{
 			if (_use_file_system == ResourceManager::UseFileSystem::Before)
 			{
-				File file(name, File::Read, _allocator);
-				if (file)
-					return Reader(std::move(file));
+				Reader reader(name, _allocator);
+				if (reader)
+					return reader;
 			}
 			// TODO: Build a single name-to-resource map for the entire resource system.
 			for (const auto& attachment : _attachments)
 			{
 				if (attachment.type == ResourceAttachment::Type::Package)
 				{
-					auto file = attachment.package->open_file(name);
-					if (file)
-						return Reader(std::move(file));
+					auto reader = attachment.package->open(name);
+					if (reader)
+						return reader;
 				}
 				else if (attachment.type == ResourceAttachment::Type::Buffer)
 				{
@@ -73,9 +73,9 @@ namespace Yttrium
 			}
 			if (_use_file_system == ResourceManager::UseFileSystem::After)
 			{
-				File file(name, File::Read, _allocator);
-				if (file)
-					return Reader(std::move(file));
+				Reader reader(name, _allocator);
+				if (reader)
+					return reader;
 			}
 			return {};
 		}
@@ -117,18 +117,4 @@ namespace Yttrium
 	}
 
 	ResourceManager::~ResourceManager() = default;
-
-	Reader::Reader(const StaticString& path, Allocator& allocator)
-		: Reader()
-	{
-		{
-			std::lock_guard<std::mutex> lock(ResourceManagerGuard::instance_mutex);
-			if (ResourceManagerGuard::instance)
-			{
-				*this = ResourceManagerGuard::instance->open(path);
-				return;
-			}
-		}
-		*this = Reader(File(path, File::Read, allocator));
-	}
 }

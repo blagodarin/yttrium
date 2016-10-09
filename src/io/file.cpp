@@ -75,34 +75,6 @@ namespace Yttrium
 		return result;
 	}
 
-	bool File::read_all(Buffer* buffer)
-	{
-		if (_private && _private->_mode & Read)
-		{
-			const auto buffer_size = size();
-			if (buffer_size > SIZE_MAX)
-				throw std::bad_alloc();
-			buffer->reset(buffer_size);
-			if (read(buffer->data(), buffer->size()) == buffer->size())
-				return true;
-		}
-		return false;
-	}
-
-	bool File::read_all(String* string)
-	{
-		if (_private && _private->_mode & Read)
-		{
-			const auto string_size = size();
-			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
-				throw std::bad_alloc();
-			string->resize(string_size);
-			if (read(string->text(), string->size()) == string->size())
-				return true;
-		}
-		return false;
-	}
-
 	bool File::read_line(String& string)
 	{
 		if (!_private || (_private->_mode & (Read | Pipe)) != Read) // TODO: Make it work for pipes too.
@@ -205,21 +177,6 @@ namespace Yttrium
 		return _private ? _private->_size : 0;
 	}
 
-	String File::to_string()
-	{
-		if (_private->_mode & Read)
-		{
-			const auto string_size = size();
-			if (string_size > SIZE_MAX - 1) // One extra byte for zero terminator.
-				throw std::bad_alloc();
-			String result(&_private.allocator());
-			result.resize(string_size);
-			if (read(result.text(), result.size()))
-				return result;
-		}
-		return {};
-	}
-
 	size_t File::write(const void* buffer, size_t size)
 	{
 		if (!_private || !(_private->_mode & Write))
@@ -235,24 +192,6 @@ namespace Yttrium
 	bool File::write_all(const Buffer& buffer)
 	{
 		return write(buffer.data(), buffer.size()) == buffer.size();
-	}
-
-	Buffer File::read_to_buffer(const StaticString& name, Allocator& allocator)
-	{
-		File file(name, allocator);
-		if (!file)
-			return {};
-		const auto file_size = file.size();
-		if (file_size <= 0)
-			return {};
-		if (file_size > SIZE_MAX - 1)
-			throw std::bad_alloc();
-		Buffer buffer(file_size + 1);
-		if (file.read(buffer.data(), file_size) != file_size)
-			return {};
-		buffer[file_size] = '\0';
-		buffer.resize(file_size);
-		return buffer;
 	}
 
 	File::File(File&&) noexcept = default;

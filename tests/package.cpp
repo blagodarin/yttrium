@@ -1,5 +1,6 @@
 #include <yttrium/io/file.h>
 #include <yttrium/io/package.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
@@ -70,38 +71,36 @@ BOOST_AUTO_TEST_CASE(test_package)
 		}
 	}
 
-	File packed_file1;
-	File packed_file2;
-	File packed_file3;
+	Reader packed_file1;
+	Reader packed_file2;
+	Reader packed_file3;
 
 	{
 		const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_reader);
 
-		packed_file3 = package_reader->open_file(file3.name());
-		packed_file1 = package_reader->open_file(file1.name());
-		packed_file2 = package_reader->open_file(file2.name());
+		packed_file3 = package_reader->open(file3.name());
+		packed_file1 = package_reader->open(file1.name());
+		packed_file2 = package_reader->open(file2.name());
 	}
 
 	Buffer actual;
 
 	BOOST_REQUIRE(packed_file1);
-	BOOST_REQUIRE(packed_file1.read_all(&actual));
+	BOOST_REQUIRE(packed_file1.read_all(actual));
 	BOOST_CHECK_EQUAL(actual, buffer1);
 
-	packed_file1 = File();
+	packed_file1 = {};
 
 	BOOST_REQUIRE(packed_file2);
-	BOOST_REQUIRE(packed_file2.read_all(&actual));
+	BOOST_REQUIRE(packed_file2.read_all(actual));
 	BOOST_CHECK_EQUAL(actual, buffer2);
 
-	packed_file2 = File();
+	packed_file2 = {};
 
 	BOOST_REQUIRE(packed_file3);
-	BOOST_REQUIRE(packed_file3.read_all(&actual));
+	BOOST_REQUIRE(packed_file3.read_all(actual));
 	BOOST_CHECK_EQUAL(actual, buffer3);
-
-	packed_file3 = File();
 }
 
 BOOST_AUTO_TEST_CASE(test_packed_file_size)
@@ -125,12 +124,10 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 	BOOST_REQUIRE(package_reader);
 
-	auto packed_file = package_reader->open_file("1");
+	auto packed_file = package_reader->open("1");
 	BOOST_REQUIRE(packed_file);
 
 	std::array<uint8_t, 2> data = { 0, 0 };
 	BOOST_CHECK_EQUAL(packed_file.read(data.data(), 2), 1);
 	BOOST_CHECK_EQUAL(data[0], 1);
 }
-
-// TODO: Test PackageManager.

@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <limits>
 
 namespace Yttrium
 {
@@ -153,6 +154,7 @@ namespace Yttrium
 
 	void String::reserve(size_t size)
 	{
+		assert(size < std::numeric_limits<size_t>::max());
 		const auto capacity = size + 1;
 		if (_capacity > 0)
 		{
@@ -169,6 +171,7 @@ namespace Yttrium
 
 	void String::resize(size_t size)
 	{
+		assert(size < std::numeric_limits<size_t>::max());
 		const auto capacity = size + 1;
 		if (_capacity > 0)
 		{
