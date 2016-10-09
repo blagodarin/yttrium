@@ -23,7 +23,7 @@ using namespace Yttrium;
 class Game : public WindowCallbacks
 {
 public:
-	Game();
+	Game(ResourceManager&);
 	~Game();
 
 	void run();
@@ -45,6 +45,7 @@ private:
 	void update_statistics();
 
 private:
+	const ResourceManager& _resource_manager;
 	NamedAllocator _allocator{ "game" };
 	StdVector<NamedAllocatorInfo> _memory_statistics{ _allocator };
 	NamedAllocator _script_allocator{ "script" };
@@ -57,7 +58,7 @@ private:
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024, &_allocator };
 	NamedAllocator _gui_allocator{ "gui" };
-	Gui _gui{ _window.renderer(), _script, _gui_allocator };
+	Gui _gui{ _resource_manager, _window.renderer(), _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };
 	Blocks _blocks{ _window.renderer() };
 	Bindings _bindings{ _script, _allocator };

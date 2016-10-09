@@ -16,7 +16,7 @@ namespace Yttrium
 	{
 	}
 
-	size_t ReaderBuffer::read(void* buffer, size_t size, uint64_t offset) const
+	size_t ReaderBuffer::read_at(uint64_t offset, void* buffer, size_t size) const
 	{
 		std::memcpy(buffer, static_cast<const uint8_t*>(_buffer->data()) + offset, size);
 		return size;
@@ -28,7 +28,7 @@ namespace Yttrium
 	{
 	}
 
-	size_t ReaderFile::read(void* buffer, size_t size, uint64_t offset) const
+	size_t ReaderFile::read_at(uint64_t offset, void* buffer, size_t size) const
 	{
 		return _file.seek(offset) ? _file.read(buffer, size) : 0;
 	}
@@ -54,7 +54,7 @@ namespace Yttrium
 			return 0;
 		if (_private->_offset == _private->_size)
 			return 0;
-		const auto result = _private->read(buffer, min<uint64_t>(size, _private->_size - _private->_offset), _private->_offset);
+		const auto result = _private->read_at(_private->_offset, buffer, min<uint64_t>(size, _private->_size - _private->_offset));
 		_private->_offset += result;
 		return result;
 	}
@@ -66,7 +66,7 @@ namespace Yttrium
 		if (_private->_size > std::numeric_limits<size_t>::max())
 			throw std::bad_alloc();
 		buffer.reset(_private->_size);
-		return _private->read(buffer.data(), buffer.size(), 0) == buffer.size();
+		return _private->read_at(0, buffer.data(), buffer.size()) == buffer.size();
 	}
 
 	bool Reader::read_all(String& string) const
@@ -76,7 +76,14 @@ namespace Yttrium
 		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for zero terminator. // TODO: Fix.
 			throw std::bad_alloc();
 		string.resize(_private->_size);
-		return _private->read(string.text(), string.size(), 0) == string.size();
+		return _private->read_at(0, string.text(), string.size()) == string.size();
+	}
+
+	size_t Reader::read_at(uint64_t offset, void* buffer, size_t size) const
+	{
+		if (!size || !_private || offset >= _private->_size)
+			return 0;
+		return _private->read_at(offset, buffer, min<uint64_t>(size, _private->_size - offset));
 	}
 
 	bool Reader::seek(uint64_t offset)

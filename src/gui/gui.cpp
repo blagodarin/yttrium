@@ -11,11 +11,12 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _renderer(renderer)
+	GuiPrivate::GuiPrivate(const ResourceManager& resource_manager, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _resource_manager(resource_manager)
+		, _renderer(renderer)
 		, _script_context(script_context)
 		, _allocator(allocator)
-		, _texture_cache(TextureCache::create(_renderer))
+		, _texture_cache(TextureCache::create(_resource_manager, _renderer))
 		, _fonts(_allocator)
 		, _layers(_allocator)
 		, _layer_stack(_allocator)
@@ -88,8 +89,8 @@ namespace Yttrium
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 
-	Gui::Gui(Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<GuiPrivate>(allocator, renderer, script_context, allocator))
+	Gui::Gui(const ResourceManager& resource_manager, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<GuiPrivate>(allocator, resource_manager, renderer, script_context, allocator))
 	{
 	}
 

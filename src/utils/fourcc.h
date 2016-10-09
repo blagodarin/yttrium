@@ -6,6 +6,13 @@
 
 namespace Yttrium
 {
+	constexpr uint16_t operator"" _twocc(const char* text, size_t)
+	{
+		return uint16_t{static_cast<unsigned char>(text[0])}
+			| uint16_t{static_cast<unsigned char>(text[1])} << 8
+			;
+	}
+
 	constexpr uint32_t operator"" _fourcc(const char* text, size_t)
 	{
 		return uint32_t{static_cast<unsigned char>(text[0])}
@@ -28,6 +35,7 @@ namespace Yttrium
 			;
 	}
 
+	static_assert("\x00\xff"_twocc == 0xff00, "TWOCC compile time test failed");
 	static_assert("\x00\x80\x7f\xff"_fourcc == 0xff7f8000, "FOURCC compile time test failed");
 	static_assert("\x00\x01\x7e\x7f\x80\x81\xfe\xff"_eightcc == 0xfffe81807f7e0100, "EIGHTCC compile time test failed");
 }

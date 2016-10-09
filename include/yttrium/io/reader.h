@@ -31,18 +31,25 @@ namespace Yttrium
 		/// Returns the current offset.
 		uint64_t offset() const;
 
-		/// Read a block of data from the source.
+		/// Reads a block of data from the source.
 		size_t read(void* buffer, size_t size);
 
-		/// Read the buffer from the source.
+		/// Reads the buffer from the source.
 		template <typename T>
 		bool read(T& buffer) { return read(&buffer, sizeof buffer) == sizeof buffer; }
 
-		///
+		/// Reads the entire source into the buffer.
 		bool read_all(Buffer&) const;
 
-		///
+		/// Reads the entire source into the string.
 		bool read_all(String&) const;
+
+		/// Reads a block of data from the source at the specified offset.
+		size_t read_at(uint64_t offset, void* buffer, size_t size) const;
+
+		/// Reads the buffer from the source at the specified offset.
+		template <typename T>
+		bool read_at(uint64_t offset, T& buffer) const { return read_at(offset, &buffer, sizeof buffer) == sizeof buffer; }
 
 		/// Sets the current offset.
 		bool seek(uint64_t offset);
@@ -50,7 +57,7 @@ namespace Yttrium
 		/// Returns the size of the source.
 		uint64_t size() const;
 
-		///
+		/// Advances the current offset by the specified number of bytes.
 		bool skip(uint64_t size);
 
 	private:

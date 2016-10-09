@@ -13,7 +13,7 @@ namespace Yttrium
 		virtual ~ReaderPrivate() = default;
 
 	protected:
-		virtual size_t read(void*, size_t, uint64_t) const = 0;
+		virtual size_t read_at(uint64_t, void*, size_t) const = 0;
 
 	private:
 		const uint64_t _size;
@@ -28,7 +28,7 @@ namespace Yttrium
 		ReaderBuffer(const std::shared_ptr<const Buffer>&);
 
 	private:
-		size_t read(void*, size_t, uint64_t) const override;
+		size_t read_at(uint64_t, void*, size_t) const override;
 
 	private:
 		const std::shared_ptr<const Buffer> _buffer;
@@ -40,7 +40,7 @@ namespace Yttrium
 		ReaderFile(File&&);
 
 	private:
-		size_t read(void*, size_t, uint64_t) const override;
+		size_t read_at(uint64_t, void*, size_t) const override;
 
 	private:
 		mutable File _file; // TODO: Drop 'mutable'.

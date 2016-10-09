@@ -13,6 +13,7 @@ namespace Yttrium
 	class Gui;
 	class GuiLayer;
 	class Renderer;
+	class ResourceManager;
 	class ScriptContext;
 	class String;
 	class Texture2D;
@@ -35,7 +36,7 @@ namespace Yttrium
 			}
 		};
 
-		GuiPrivate(Renderer&, ScriptContext&, Allocator&);
+		GuiPrivate(const ResourceManager&, Renderer&, ScriptContext&, Allocator&);
 		~GuiPrivate();
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
@@ -48,6 +49,7 @@ namespace Yttrium
 		TextureCache& texture_cache() { return *_texture_cache; }
 
 	private:
+		const ResourceManager& _resource_manager;
 		Renderer& _renderer;
 		ScriptContext& _script_context;
 		Allocator& _allocator;

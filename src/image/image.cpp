@@ -118,25 +118,15 @@ namespace Yttrium
 
 	bool Image::load(const StaticString& name, ImageType type, Allocator& allocator)
 	{
-		if (type == ImageType::Auto)
-		{
-			if (name.ends_with(".tga"_s))
-				type = ImageType::Tga;
-			else if (name.ends_with(".dds"_s))
-				type = ImageType::Dds;
-	#ifndef Y_NO_JPEG
-			else if (name.ends_with(".jpeg"_s) || name.ends_with(".jpg"_s))
-				type = ImageType::Jpeg;
-	#endif
-			else
-				return false;
-		}
-		Reader reader(name, allocator);
-		return reader && load(std::move(reader), type);
+		return load(Reader(name, allocator), type);
 	}
 
 	bool Image::load(Reader&& reader, ImageType type)
 	{
+		if (!reader)
+			return false;
+		if (type == ImageType::Auto && !detect_image_type(reader, type))
+			return false;
 		ImageFormat format;
 		Buffer buffer;
 		if (!read_image(reader, type, format, buffer))
@@ -160,17 +150,17 @@ namespace Yttrium
 				return false;
 		}
 		File file(name, File::Write | File::Truncate, allocator);
-		return file && save(file, type, allocator);
+		return file && save(file, type);
 	}
 
-	bool Image::save(Buffer& buffer, ImageType type, Allocator& allocator) const
+	bool Image::save(Buffer& buffer, ImageType type) const
 	{
-		return write_image(buffer, type, _format, _buffer.data(), allocator);
+		return write_image(buffer, type, _format, _buffer.data());
 	}
 
-	bool Image::save(File& file, ImageType type, Allocator& allocator) const
+	bool Image::save(File& file, ImageType type) const
 	{
-		return write_image(file, type, _format, _buffer.data(), allocator);
+		return write_image(file, type, _format, _buffer.data());
 	}
 
 	void Image::set_format(const ImageFormat& format)
@@ -226,6 +216,12 @@ namespace Yttrium
 		}
 
 		return false;
+	}
+
+	Buffer Image::to_buffer(ImageType type)
+	{
+		Buffer buffer;
+		return save(buffer, type) ? std::move(buffer) : Buffer();
 	}
 
 	bool operator==(const Image& lhs, const Image& rhs)

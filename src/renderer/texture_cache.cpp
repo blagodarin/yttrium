@@ -1,6 +1,8 @@
 #include "texture_cache.h"
 
 #include <yttrium/image.h>
+#include <yttrium/io/reader.h>
+#include <yttrium/io/resources.h>
 #include <yttrium/memory/shared_ptr.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/string.h>
@@ -8,14 +10,15 @@
 
 namespace Yttrium
 {
-	UniquePtr<TextureCache> TextureCache::create(Renderer& renderer)
+	UniquePtr<TextureCache> TextureCache::create(const ResourceManager& resource_manager, Renderer& renderer)
 	{
 		RendererImpl& renderer_impl = static_cast<RendererImpl&>(renderer);
-		return make_unique<TextureCacheImpl>(renderer_impl.allocator(), static_cast<RendererImpl&>(renderer));
+		return make_unique<TextureCacheImpl>(renderer_impl.allocator(), resource_manager, renderer_impl);
 	}
 
-	TextureCacheImpl::TextureCacheImpl(RendererImpl& renderer)
-		: _renderer(renderer)
+	TextureCacheImpl::TextureCacheImpl(const ResourceManager& resource_manager, RendererImpl& renderer)
+		: _resource_manager(resource_manager)
+		, _renderer(renderer)
 		, _cache_2d(_renderer.allocator())
 	{
 	}
@@ -34,7 +37,7 @@ namespace Yttrium
 		Allocator& allocator = _renderer.allocator();
 
 		Image image;
-		if (!image.load(name, ImageType::Auto, allocator))
+		if (!image.load(_resource_manager.open(name)))
 			return {};
 
 		if (intensity && image.format().pixel_format() == PixelFormat::Gray)

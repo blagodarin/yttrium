@@ -168,16 +168,16 @@ namespace Yttrium
 		bool load(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator);
 
 		///
-		bool load(Reader&&, ImageType);
+		bool load(Reader&&, ImageType = ImageType::Auto);
 
 		///
 		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;
 
 		///
-		bool save(Buffer&, ImageType, Allocator& = *DefaultAllocator) const;
+		bool save(Buffer&, ImageType) const;
 
 		///
-		bool save(File&, ImageType, Allocator& = *DefaultAllocator) const;
+		bool save(File&, ImageType) const;
 
 		/// Change the format to \a format.
 		/// \param format New image format.
@@ -189,6 +189,9 @@ namespace Yttrium
 
 		///
 		bool swap_channels();
+
+		///
+		Buffer to_buffer(ImageType);
 
 	private:
 		ImageFormat _format;

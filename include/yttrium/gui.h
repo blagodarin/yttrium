@@ -14,6 +14,7 @@ namespace Yttrium
 	class PointF;
 	class RectF;
 	class Renderer;
+	class ResourceManager;
 	class ScriptContext;
 	class StaticString;
 
@@ -22,7 +23,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Gui(Renderer&, ScriptContext&, Allocator& = *DefaultAllocator);
+		Gui(const ResourceManager&, Renderer&, ScriptContext&, Allocator& = *DefaultAllocator);
 
 		///
 		void clear();

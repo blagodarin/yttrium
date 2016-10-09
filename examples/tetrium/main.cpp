@@ -43,14 +43,12 @@ int main()
 			}
 		}
 
-		Buffer buffer;
-		image.save(buffer, ImageType::Tga, resources_allocator);
-		resource_manager.attach_buffer("examples/tetrium/data/blocks.tga", std::move(buffer));
+		resource_manager.attach_buffer("examples/tetrium/data/blocks.tga", image.to_buffer(ImageType::Tga));
 	}
 
 	try
 	{
-		Game game;
+		Game game(resource_manager);
 		game.run();
 		return 0;
 	}

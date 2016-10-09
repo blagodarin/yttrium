@@ -4,6 +4,7 @@
 #include <yttrium/io/file.h>
 #include "../../io/writer.h"
 
+#include <memory>
 #include <png.h>
 
 namespace
@@ -97,7 +98,7 @@ namespace
 	};
 
 	template <typename T>
-	bool write_png_impl(Writer<T>& writer, const ImageFormat& format, const void* data, Allocator& allocator)
+	bool write_png_impl(Writer<T>& writer, const ImageFormat& format, const void* data)
 	{
 		if (!::can_write(format))
 			return false;
@@ -154,13 +155,10 @@ namespace
 
 		PngWriter<Writer<T>> png_writer(writer);
 
-		const auto rows = allocator.allocate<png_bytep>(format.height());
+		const auto rows = std::make_unique<png_bytep[]>(format.height());
 
 		if (::setjmp(png_jmpbuf(png_writer._png)))
-		{
-			allocator.deallocate(rows);
 			return false;
-		}
 
 		::png_set_compression_level(png_writer._png, 0);
 		::png_set_IHDR(png_writer._png, png_writer._info, format.width(), format.height(), format.bits_per_channel(),
@@ -177,10 +175,8 @@ namespace
 				rows[i - 1] = const_cast<png_bytep>(static_cast<png_const_bytep>(data) + j);
 		}
 
-		::png_set_rows(png_writer._png, png_writer._info, rows);
+		::png_set_rows(png_writer._png, png_writer._info, rows.get());
 		::png_write_png(png_writer._png, png_writer._info, transforms, nullptr);
-
-		allocator.deallocate(rows);
 
 		return true;
 	}
@@ -188,13 +184,13 @@ namespace
 
 namespace Yttrium
 {
-	bool write_png(Writer<Buffer>& writer, const ImageFormat& format, const void* data, Allocator& allocator)
+	bool write_png(Writer<Buffer>& writer, const ImageFormat& format, const void* data)
 	{
-		return ::write_png_impl(writer, format, data, allocator);
+		return ::write_png_impl(writer, format, data);
 	}
 
-	bool write_png(Writer<File>& writer, const ImageFormat& format, const void* data, Allocator& allocator)
+	bool write_png(Writer<File>& writer, const ImageFormat& format, const void* data)
 	{
-		return ::write_png_impl(writer, format, data, allocator);
+		return ::write_png_impl(writer, format, data);
 	}
 }

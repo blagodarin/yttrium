@@ -18,8 +18,9 @@
 #include <yttrium/script/value.h>
 #include <yttrium/time.h>
 
-Game::Game()
-	: _statistics({
+Game::Game(ResourceManager& resource_manager)
+	: _resource_manager(resource_manager)
+	, _statistics({
 			{100000, String("John Placeholder", &_allocator)},
 			{50000, String("John Placeholder", &_allocator)},
 			{10000, String("John Placeholder", &_allocator)},
