@@ -10,12 +10,19 @@ namespace
 
 	size_t read_callback(void* ptr, size_t size, size_t nmemb, void* datasource)
 	{
-		return static_cast<File*>(datasource)->read(ptr, size * nmemb); // TODO: Check if the product fits into size_t.
+		return static_cast<Reader*>(datasource)->read(ptr, size * nmemb); // TODO: Check if the product fits into size_t.
 	}
 
 	int seek_callback(void* datasource, ogg_int64_t offset, int whence)
 	{
-		return (static_cast<File*>(datasource)->seek(offset, File::Whence(whence)) ? 0 : -1);
+		auto& reader = *static_cast<Reader*>(datasource);
+		switch (whence)
+		{
+		case SEEK_SET: return reader.seek(offset) ? 0 : -1;
+		case SEEK_CUR: return reader.skip(offset) ? 0 : -1;
+		case SEEK_END: return reader.seek(reader.size() + offset) ? 0 : -1;
+		}
+		return -1;
 	}
 
 	int close_callback(void*)
@@ -25,7 +32,7 @@ namespace
 
 	long tell_callback(void* datasource)
 	{
-		return static_cast<File*>(datasource)->offset();
+		return static_cast<Reader*>(datasource)->offset();
 	}
 
 	const ov_callbacks y_ov_callbacks =
@@ -52,7 +59,7 @@ namespace Yttrium
 
 	bool OggVorbisReader::open()
 	{
-		if (::ov_open_callbacks(&_file, &_ov_file, nullptr, 0, ::y_ov_callbacks) < 0)
+		if (::ov_open_callbacks(&_reader, &_ov_file, nullptr, 0, ::y_ov_callbacks) < 0)
 			return false;
 
 		vorbis_info* info = ::ov_info(&_ov_file, -1);

@@ -1,5 +1,5 @@
-#include <yttrium/io/file.h>
 #include <yttrium/io/package.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/string.h>
@@ -16,8 +16,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	File list_file(argv[2]);
-	if (!list_file)
+	Reader index_file(argv[2]);
+	if (!index_file)
 	{
 		std::cerr << "ERROR: Can't open index file \"" << argv[2] << "\"" << std::endl;
 		return 1;
@@ -31,13 +31,13 @@ int main(int argc, char** argv)
 	}
 
 	String entry;
-	for (size_t line = 1; list_file.read_line(entry); ++line)
+	for (size_t line = 1; index_file.read_line(entry); ++line)
 	{
 		entry.trim();
 		if (entry.is_empty() || entry[0] == '#')
 			continue;
 
-		File source_file(entry);
+		Reader source_file(entry);
 		if (!source_file)
 		{
 			// TODO: Remove the package file.

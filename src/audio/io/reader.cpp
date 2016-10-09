@@ -35,7 +35,7 @@ namespace Yttrium
 		default: return {};
 		}
 
-		if (!reader->_file || !reader->open())
+		if (!reader->_reader || !reader->open())
 			return {};
 
 		return std::move(reader);

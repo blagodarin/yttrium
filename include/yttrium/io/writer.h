@@ -12,6 +12,7 @@ namespace Yttrium
 {
 	class Buffer;
 	class File;
+	class Reader;
 
 	///
 	class Y_API Writer
@@ -35,6 +36,9 @@ namespace Yttrium
 
 		///
 		uint64_t write_all(const File&);
+
+		///
+		uint64_t write_all(const Reader&);
 
 	private:
 		std::unique_ptr<class WriterPrivate> _private;

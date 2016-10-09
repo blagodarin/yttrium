@@ -1,5 +1,6 @@
 #include "writer.h"
 
+#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
 #include "file.h"
 
@@ -70,6 +71,22 @@ namespace Yttrium
 				if (size_written < size_read)
 					break;
 			}
+		}
+		return total_size;
+	}
+
+	uint64_t Writer::write_all(const Reader& reader)
+	{
+		if (!reader)
+			return 0;
+		uint64_t total_size = 0;
+		Buffer buffer(Buffer::memory_granularity());
+		while (auto size_read = reader.read_at(total_size, buffer.data(), buffer.size()))
+		{
+			const auto size_written = write(buffer.data(), size_read);
+			total_size += size_written;
+			if (size_written < size_read)
+				break;
 		}
 		return total_size;
 	}

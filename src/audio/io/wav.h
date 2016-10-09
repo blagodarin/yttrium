@@ -17,7 +17,7 @@ namespace Yttrium
 		bool seek(uint64_t offset) override;
 
 	private:
-		bool find_chunk(uint32_t fourcc, WavChunkHeader* header);
+		bool find_chunk(uint32_t fourcc, WavChunkHeader&);
 
 	private:
 		uint64_t _data_offset = 0;

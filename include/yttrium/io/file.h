@@ -11,7 +11,6 @@ namespace Yttrium
 	class Buffer;
 	class Reader;
 	class StaticString;
-	class String;
 	class Writer;
 
 	/// %File access class.
@@ -46,9 +45,6 @@ namespace Yttrium
 		///
 		File(const StaticString& path, unsigned mode, Allocator& = *DefaultAllocator);
 
-		/// Open a file for reading.
-		File(const StaticString& path, Allocator& allocator = *DefaultAllocator) : File(path, Read, allocator) {} // TODO: Remove.
-
 		///
 		File(Special, Allocator& = *DefaultAllocator);
 
@@ -72,9 +68,6 @@ namespace Yttrium
 		/// \return \c true on success.
 		template <typename T>
 		bool read(T* buffer) { return read(buffer, sizeof(T)) == sizeof(T); }
-
-		///
-		bool read_line(String& string);
 
 		/// Resizes the file.
 		bool resize(uint64_t size);

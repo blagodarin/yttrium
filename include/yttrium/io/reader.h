@@ -54,6 +54,9 @@ namespace Yttrium
 		template <typename T>
 		bool read_at(uint64_t offset, T& buffer) const { return read_at(offset, &buffer, sizeof buffer) == sizeof buffer; }
 
+		///
+		bool read_line(String& string);
+
 		/// Sets the current offset.
 		bool seek(uint64_t offset);
 

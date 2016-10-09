@@ -112,6 +112,62 @@ namespace Yttrium
 		return _private->read_at(offset, buffer, min<uint64_t>(size, _private->_size - offset));
 	}
 
+	bool Reader::read_line(String& string)
+	{
+		if (!_private)
+			return false;
+
+		static const size_t buffer_step = 32;
+
+		const auto origin = _private->_offset;
+
+		string.clear();
+
+		for (size_t offset = 0, bytes_read = 0; ; offset += bytes_read)
+		{
+			string.resize(offset + buffer_step);
+
+			bytes_read = read(string.text() + offset, buffer_step);
+
+			string.resize(offset + bytes_read);
+
+			if (!bytes_read)
+			{
+				seek(origin + string.size());
+				return offset; // Return 'false' if we haven't read anything.
+			}
+
+			const auto r_offset = string.find_first('\r', offset);
+
+			if (r_offset != String::End)
+			{
+				size_t string_size = string.size();
+
+				if (r_offset == string_size - 1)
+				{
+					string.resize(string_size + 1);
+					bytes_read += read(string.text() + string_size, 1);
+				}
+
+				string.resize(r_offset);
+				seek(origin + r_offset + 1 + (string[r_offset + 1] == '\n'));
+				break;
+			}
+			else
+			{
+				const auto n_offset = string.find_first('\n', offset);
+				if (n_offset != String::End)
+				{
+					string.resize(n_offset);
+					seek(origin + n_offset + 1);
+					break;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	bool Reader::seek(uint64_t offset)
 	{
 		if (!_private || offset > _private->_size)

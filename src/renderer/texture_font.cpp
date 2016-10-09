@@ -1,6 +1,6 @@
 #include <yttrium/renderer/texture_font.h>
 
-#include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
@@ -119,41 +119,41 @@ namespace Yttrium
 
 	UniquePtr<TextureFont> TextureFont::load(const StaticString& name, Allocator& allocator)
 	{
-		File file(name, allocator);
-		if (!file)
+		Reader reader(name, allocator);
+		if (!reader)
 		{
 			Log() << "("_s << name << ") Bad file"_s;
 			return {};
 		}
 
 		uint32_t fourcc = 0;
-		if (!file.read(&fourcc) || fourcc != FourccYtf1)
+		if (!reader.read(fourcc) || fourcc != FourccYtf1)
 		{
 			Log() << "("_s << name << ") Bad 'YTF1' fourcc"_s;
 			return {};
 		}
 
-		if (!file.read(&fourcc) || fourcc != FourccFont)
+		if (!reader.read(fourcc) || fourcc != FourccFont)
 		{
 			Log() << "("_s << name << ") Bad 'font' section fourcc"_s;
 			return {};
 		}
 
 		Ytf1Font font_section;
-		if (!file.read(&font_section))
+		if (!reader.read(font_section))
 		{
 			Log() << "("_s << name << ") Bad 'font' section"_s;
 			return {};
 		}
 
-		if (!file.read(&fourcc) || fourcc != FourccChar)
+		if (!reader.read(fourcc) || fourcc != FourccChar)
 		{
 			Log() << "("_s << name << ") Bad 'char' section fourcc"_s;
 			return {};
 		}
 
 		uint8_t char_count = 0;
-		if (!file.read(&char_count))
+		if (!reader.read(char_count))
 		{
 			Log() << "("_s << name << ") Bad 'char' section header"_s;
 			return {};
@@ -165,7 +165,7 @@ namespace Yttrium
 		for (uint8_t i = 0; i < char_count; ++i)
 		{
 			Ytf1Char char_data;
-			if (!file.read(&char_data))
+			if (!reader.read(char_data))
 			{
 				Log() << "("_s << name << ") Bad 'char' section entry "_s << i;
 				return {};
@@ -181,7 +181,7 @@ namespace Yttrium
 		}
 		font->_rect = {{font_section.base_x, font_section.base_y}, font_rect_size};
 
-		if (file.read(&fourcc))
+		if (reader.read(fourcc))
 		{
 			if (fourcc != FourccKern)
 			{
@@ -190,7 +190,7 @@ namespace Yttrium
 			}
 
 			uint16_t kerning_count = 0;
-			if (!file.read(&kerning_count))
+			if (!reader.read(kerning_count))
 			{
 				Log() << "("_s << name << ") Bad 'kern' section header"_s;
 				return {};
@@ -199,7 +199,7 @@ namespace Yttrium
 			for (uint16_t i = 0; i < kerning_count; ++i)
 			{
 				Ytf1Kerning kerning;
-				if (!file.read(&kerning))
+				if (!reader.read(kerning))
 				{
 					Log() << "("_s << name << ") Bad 'kern' section entry "_s << i;
 					return {};
