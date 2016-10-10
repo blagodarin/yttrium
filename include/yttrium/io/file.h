@@ -78,9 +78,6 @@ namespace Yttrium
 		/// Returns the size of the file.
 		uint64_t size() const;
 
-		///
-		bool skip(uint64_t size) { return seek(size, Relative); }
-
 		/// Truncates the file past the current offset.
 		bool truncate() { return resize(offset()); }
 

@@ -11,6 +11,8 @@ namespace Yttrium
 	public:
 		FilePrivate(String&& name, unsigned mode, uint64_t size);
 
+		uint64_t size() const { return _size; }
+
 		virtual bool flush() = 0;
 		virtual bool resize(uint64_t) = 0;
 		virtual size_t read(void*, size_t) = 0;

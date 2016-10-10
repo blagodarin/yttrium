@@ -27,6 +27,7 @@ namespace Yttrium
 	{
 	public:
 		BufferReader(const std::shared_ptr<const Buffer>&);
+		BufferReader(Buffer&&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 
@@ -37,7 +38,7 @@ namespace Yttrium
 	class FileReader : public ReaderPrivate
 	{
 	public:
-		FileReader(uint64_t, const SharedPtr<const FilePrivate>&);
+		FileReader(SharedPtr<const FilePrivate>&&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 

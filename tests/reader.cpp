@@ -27,6 +27,58 @@ namespace Yttrium
 
 using namespace Yttrium;
 
+BOOST_AUTO_TEST_CASE(test_reader_construction)
+{
+	BOOST_CHECK(!Reader());
+	BOOST_CHECK(!Reader(std::shared_ptr<const Buffer>()));
+	BOOST_CHECK(Reader(std::make_shared<const Buffer>()));
+	BOOST_CHECK(Reader(Buffer()));
+}
+
+BOOST_AUTO_TEST_CASE(test_reader_size)
+{
+	BOOST_CHECK_EQUAL(Reader().size(), 0);
+	BOOST_CHECK_EQUAL(Reader(Buffer()).size(), 0);
+	BOOST_CHECK_EQUAL(Reader(Buffer(1)).size(), 1);
+	BOOST_CHECK_EQUAL(Reader(Buffer(997)).size(), 997);
+}
+
+BOOST_AUTO_TEST_CASE(test_reader_offset)
+{
+	BOOST_CHECK_EQUAL(Reader().offset(), 0);
+	BOOST_CHECK_EQUAL(Reader(Buffer()).offset(), 0);
+	BOOST_CHECK_EQUAL(Reader(Buffer(1)).offset(), 0);
+	BOOST_CHECK_EQUAL(Reader(Buffer(997)).offset(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_reader_seek)
+{
+	Reader reader(Buffer(997));
+	BOOST_CHECK(reader.seek(1));
+	BOOST_CHECK_EQUAL(reader.offset(), 1);
+	BOOST_CHECK(reader.seek(499));
+	BOOST_CHECK_EQUAL(reader.offset(), 499);
+	BOOST_CHECK(!reader.seek(1000));
+	BOOST_CHECK_EQUAL(reader.offset(), 499);
+	BOOST_CHECK(reader.seek(997));
+	BOOST_CHECK_EQUAL(reader.offset(), 997);
+	BOOST_CHECK(!reader.seek(998));
+}
+
+BOOST_AUTO_TEST_CASE(test_reader_skip)
+{
+	Reader reader(Buffer(997));
+	BOOST_CHECK(reader.skip(1));
+	BOOST_CHECK_EQUAL(reader.offset(), 1);
+	BOOST_CHECK(reader.skip(499));
+	BOOST_CHECK_EQUAL(reader.offset(), 500);
+	BOOST_CHECK(!reader.skip(1000));
+	BOOST_CHECK_EQUAL(reader.offset(), 500);
+	BOOST_CHECK(reader.skip(497));
+	BOOST_CHECK_EQUAL(reader.offset(), 997);
+	BOOST_CHECK(!reader.skip(1));
+}
+
 BOOST_AUTO_TEST_CASE(test_reader_read_all_buffer)
 {
 	const auto expected = std::make_shared<const Buffer>(::make_random_buffer(100003));
@@ -69,4 +121,34 @@ BOOST_AUTO_TEST_CASE(test_reader_to_string)
 
 	BOOST_CHECK_EQUAL(actual.size(), expected->size());
 	BOOST_CHECK(!::memcmp(actual.text(), expected->data(), expected->size()));
+}
+
+BOOST_AUTO_TEST_CASE(test_reader_reader)
+{
+	const auto source = std::make_shared<const Buffer>(::make_random_buffer(100003));
+	const Reader reader(source);
+	{
+		Reader subreader(reader, 0, reader.size());
+		BOOST_CHECK_EQUAL(subreader.offset(), 0);
+		BOOST_REQUIRE_EQUAL(subreader.size(), reader.size());
+		Buffer buffer(reader.size());
+		BOOST_CHECK_EQUAL(subreader.read(buffer.data(), reader.size()), subreader.size());
+		BOOST_CHECK(!::memcmp(buffer.begin(), source->begin(), subreader.size()));
+	}
+	{
+		Reader subreader(reader, 0, reader.size() / 2);
+		BOOST_CHECK_EQUAL(subreader.offset(), 0);
+		BOOST_REQUIRE_EQUAL(subreader.size(), reader.size() / 2);
+		Buffer buffer(reader.size());
+		BOOST_CHECK_EQUAL(subreader.read(buffer.data(), reader.size()), subreader.size());
+		BOOST_CHECK(!::memcmp(buffer.begin(), source->begin(), subreader.size()));
+	}
+	{
+		Reader subreader(reader, reader.size() / 2, reader.size() - reader.size() / 2);
+		BOOST_CHECK_EQUAL(subreader.offset(), 0);
+		BOOST_REQUIRE_EQUAL(subreader.size(), reader.size() - reader.size() / 2);
+		Buffer buffer(reader.size());
+		BOOST_CHECK_EQUAL(subreader.read(buffer.data(), reader.size()), subreader.size());
+		BOOST_CHECK(!::memcmp(buffer.begin(), source->begin() + reader.size() / 2, subreader.size()));
+	}
 }

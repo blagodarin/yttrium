@@ -22,8 +22,8 @@ namespace Yttrium
 		/// Creates a Reader for a Buffer.
 		explicit Reader(const std::shared_ptr<const Buffer>&);
 
-		/// Creates a Reader for a File.
-		explicit Reader(File&&);
+		/// Creates a Reader for a Buffer.
+		explicit Reader(Buffer&&);
 
 		/// Creates a Reader for the specified file.
 		explicit Reader(const StaticString& path, Allocator& = *DefaultAllocator);

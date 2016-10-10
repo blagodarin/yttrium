@@ -16,15 +16,21 @@ namespace Yttrium
 	{
 	}
 
+	BufferReader::BufferReader(Buffer&& buffer)
+		: ReaderPrivate(buffer.size())
+		, _buffer(std::make_shared<Buffer>(std::move(buffer)))
+	{
+	}
+
 	size_t BufferReader::read_at(uint64_t offset, void* buffer, size_t size) const
 	{
 		std::memcpy(buffer, static_cast<const uint8_t*>(_buffer->data()) + offset, size);
 		return size;
 	}
 
-	FileReader::FileReader(uint64_t size, const SharedPtr<const FilePrivate>& file)
-		: ReaderPrivate(size)
-		, _file(file)
+	FileReader::FileReader(SharedPtr<const FilePrivate>&& file)
+		: ReaderPrivate(file->size())
+		, _file(std::move(file))
 	{
 	}
 
@@ -50,16 +56,16 @@ namespace Yttrium
 	{
 	}
 
-	Reader::Reader(File&& file)
-		: _private(file._private && (file._private->_mode & (File::Read | File::Pipe)) == File::Read
-			? std::make_shared<FileReader>(file._private->_size, std::move(file._private))
-			: nullptr)
+	Reader::Reader(Buffer&& buffer)
+		: _private(std::make_shared<BufferReader>(std::move(buffer)))
 	{
 	}
 
 	Reader::Reader(const StaticString& path, Allocator& allocator)
-		: Reader(File(path, File::Read, allocator))
 	{
+		File file(path, File::Read, allocator);
+		if (file)
+			_private = std::make_shared<FileReader>(std::move(file._private));
 	}
 
 	Reader::Reader(const Reader& reader, uint64_t base, uint64_t size)
