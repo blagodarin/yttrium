@@ -28,7 +28,7 @@ namespace Yttrium
 		return size;
 	}
 
-	FileReader::FileReader(SharedPtr<const FilePrivate>&& file)
+	FileReader::FileReader(std::shared_ptr<const FilePrivate>&& file)
 		: ReaderPrivate(file->size())
 		, _file(std::move(file))
 	{

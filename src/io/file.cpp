@@ -1,21 +1,10 @@
-#include "file.h"
+#include <yttrium/io/file.h>
 
-#include <yttrium/memory/buffer.h>
 #include <yttrium/utils.h>
-
-#include <cassert>
-#include <new>
+#include "file.h"
 
 namespace Yttrium
 {
-	FilePrivate::FilePrivate(String&& name, unsigned mode, uint64_t size)
-		: _name(std::move(name))
-		, _mode(mode)
-		, _size(size)
-	{
-		assert(_mode & File::ReadWrite);
-	}
-
 	File::File(const StaticString& path, unsigned mode, Allocator& allocator)
 		: _private(FilePrivate::open(path, mode, allocator))
 	{

@@ -1,6 +1,5 @@
 #define _FILE_OFFSET_BITS 64
 
-#include <yttrium/utils.h>
 #include "file.h"
 
 #include <cassert>
@@ -14,14 +13,16 @@
 
 namespace Yttrium
 {
-	SystemFile::SystemFile(String&& name, unsigned mode, uint64_t size, int descriptor)
-		: FilePrivate(std::move(name), mode, size)
+	FilePrivate::FilePrivate(String&& name, unsigned mode, uint64_t size, int descriptor)
+		: _name(std::move(name))
+		, _mode(mode)
+		, _size(size)
 		, _descriptor(descriptor)
 	{
 		assert(_descriptor != -1);
 	}
 
-	SystemFile::~SystemFile()
+	FilePrivate::~FilePrivate()
 	{
 		if (_auto_close)
 		{
@@ -31,41 +32,41 @@ namespace Yttrium
 		}
 	}
 
-	bool SystemFile::flush()
+	bool FilePrivate::flush()
 	{
 		return !::fsync(_descriptor);
 	}
 
-	size_t SystemFile::read(void* buffer, size_t size)
+	size_t FilePrivate::read(void* buffer, size_t size)
 	{
 		const auto result = ::read(_descriptor, buffer, size);
 		return result != -1 ? result : 0;
 	}
 
-	size_t SystemFile::read(void* buffer, size_t size, uint64_t offset) const
+	size_t FilePrivate::read(void* buffer, size_t size, uint64_t offset) const
 	{
 		const auto result = ::pread(_descriptor, buffer, size, offset);
 		return result != -1 ? result : 0;
 	}
 
-	bool SystemFile::resize(uint64_t size)
+	bool FilePrivate::resize(uint64_t size)
 	{
 		return !::ftruncate(_descriptor, size);
 	}
 
-	size_t SystemFile::write(const void* buffer, size_t size)
+	size_t FilePrivate::write(const void* buffer, size_t size)
 	{
 		const auto result = ::write(_descriptor, buffer, size);
 		return result != -1 ? result : 0;
 	}
 
-	size_t SystemFile::write(const void* buffer, size_t size, uint64_t offset)
+	size_t FilePrivate::write(const void* buffer, size_t size, uint64_t offset)
 	{
 		const auto result = ::pwrite(_descriptor, buffer, size, offset);
 		return result != -1 ? result : 0;
 	}
 
-	UniquePtr<FilePrivate> FilePrivate::open(const StaticString& path, unsigned mode, Allocator& allocator)
+	std::shared_ptr<FilePrivate> FilePrivate::open(const StaticString& path, unsigned mode, Allocator& allocator)
 	{
 		int flags = Y_PLATFORM_LINUX ? O_NOATIME : 0;
 		switch (mode & File::ReadWrite)
@@ -88,12 +89,12 @@ namespace Yttrium
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
 
-		return make_unique<SystemFile>(allocator, std::move(name), mode, size, descriptor);
+		return std::make_shared<FilePrivate>(std::move(name), mode, size, descriptor);
 	}
 
-	UniquePtr<FilePrivate> FilePrivate::open(File::Special special, Allocator& allocator)
+	std::shared_ptr<FilePrivate> FilePrivate::open(File::Special special, Allocator& allocator)
 	{
-		UniquePtr<SystemFile> result;
+		std::shared_ptr<FilePrivate> result;
 		switch (special)
 		{
 		case File::Temporary:
@@ -102,13 +103,13 @@ namespace Yttrium
 				const auto descriptor = ::mkstemp(name.text());
 				if (descriptor == -1)
 					break;
-				result = make_unique<SystemFile>(allocator, std::move(name), File::ReadWrite, 0, descriptor);
+				result = std::make_shared<FilePrivate>(std::move(name), File::ReadWrite, 0, descriptor);
 			}
 			result->_auto_remove = true;
 			break;
 
 		case File::StdErr:
-			result = make_unique<SystemFile>(allocator, String(&allocator), File::Write | File::Pipe, 0, STDERR_FILENO);
+			result = std::make_shared<FilePrivate>(String(&allocator), File::Write | File::Pipe, 0, STDERR_FILENO);
 			result->_auto_close = false;
 			break;
 		}

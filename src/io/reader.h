@@ -2,7 +2,6 @@
 #define _src_io_reader_h_
 
 #include <yttrium/io/reader.h>
-#include <yttrium/memory/shared_ptr.h>
 
 namespace Yttrium
 {
@@ -38,12 +37,12 @@ namespace Yttrium
 	class FileReader : public ReaderPrivate
 	{
 	public:
-		FileReader(SharedPtr<const FilePrivate>&&);
+		FileReader(std::shared_ptr<const FilePrivate>&&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 
 	private:
-		const SharedPtr<const FilePrivate> _file;
+		const std::shared_ptr<const FilePrivate> _file;
 	};
 
 	class ReaderReader : public ReaderPrivate

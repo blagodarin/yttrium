@@ -3,6 +3,7 @@
 #include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include "file.h"

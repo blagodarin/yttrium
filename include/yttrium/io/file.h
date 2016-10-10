@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_io_file_h_
 #define _include_yttrium_io_file_h_
 
-#include <yttrium/memory/shared_ptr.h>
+#include <yttrium/memory/global.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -92,7 +94,7 @@ namespace Yttrium
 		bool write(const T& buffer) { return write(&buffer, sizeof buffer) == sizeof buffer; }
 
 	private:
-		SharedPtr<class FilePrivate> _private;
+		std::shared_ptr<class FilePrivate> _private;
 		friend FilePrivate;
 		friend Reader;
 		friend Writer;
