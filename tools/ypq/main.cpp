@@ -37,18 +37,10 @@ int main(int argc, char** argv)
 		if (entry.is_empty() || entry[0] == '#')
 			continue;
 
-		Reader source_file(entry);
-		if (!source_file)
+		if (!package->open(entry).write_all(Reader(entry))) // TODO: Append.
 		{
 			// TODO: Remove the package file.
-			std::cerr << "ERROR: Can't open \"" << entry << "\" (" << argv[2] << ":" << line << ")" << std::endl;
-			return 1;
-		}
-
-		if (package->open(entry).write_all(source_file) != source_file.size())
-		{
-			// TODO: Remove the package file.
-			std::cerr << "ERROR: Can't write \"" << entry << "\" (" << argv[2] << ":" << line << ")" << std::endl;
+			std::cerr << "ERROR: Can't pack \"" << entry << "\" (" << argv[2] << ":" << line << ")" << std::endl;
 			return 1;
 		}
 	}

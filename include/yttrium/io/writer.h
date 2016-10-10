@@ -35,10 +35,7 @@ namespace Yttrium
 		bool write(const T& data) { return write(&data, sizeof data) == sizeof data; }
 
 		///
-		uint64_t write_all(const File&);
-
-		///
-		uint64_t write_all(const Reader&);
+		bool write_all(const Reader&);
 
 	private:
 		std::unique_ptr<class WriterPrivate> _private;

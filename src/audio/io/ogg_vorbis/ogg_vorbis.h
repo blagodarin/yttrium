@@ -10,7 +10,7 @@ namespace Yttrium
 	class OggVorbisReader : public AudioReaderImpl
 	{
 	public:
-		OggVorbisReader(const StaticString& name, Allocator&);
+		OggVorbisReader(Reader&&);
 		~OggVorbisReader() override;
 
 		bool open() override;

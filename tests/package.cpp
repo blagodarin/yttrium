@@ -55,17 +55,17 @@ BOOST_AUTO_TEST_CASE(test_package)
 		{
 			auto packed_file1 = package_writer->open(file1.name());
 			BOOST_REQUIRE(packed_file1);
-			BOOST_REQUIRE_EQUAL(packed_file1.write_all(file1), file1.size());
+			BOOST_REQUIRE(packed_file1.write_all(Reader(file1.name())));
 		}
 		{
 			auto packed_file2 = package_writer->open(file2.name());
 			BOOST_REQUIRE(packed_file2);
-			BOOST_REQUIRE_EQUAL(packed_file2.write_all(file2), file2.size());
+			BOOST_REQUIRE(packed_file2.write_all(Reader(file2.name())));
 		}
 		{
 			auto packed_file3 = package_writer->open(file3.name());
 			BOOST_REQUIRE(packed_file3);
-			BOOST_REQUIRE_EQUAL(packed_file3.write_all(file3), file3.size());
+			BOOST_REQUIRE(packed_file3.write_all(Reader(file3.name())));
 		}
 	}
 

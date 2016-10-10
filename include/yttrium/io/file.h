@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_io_file_h_
 #define _include_yttrium_io_file_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/global.h>
 
 #include <memory>
 
@@ -45,10 +45,10 @@ namespace Yttrium
 		};
 
 		///
-		File(const StaticString& path, unsigned mode, Allocator& = *DefaultAllocator);
+		File(const StaticString& path, unsigned mode);
 
 		///
-		File(Special, Allocator& = *DefaultAllocator);
+		File(Special);
 
 		/// Flushes buffered data to the storage medium.
 		bool flush();

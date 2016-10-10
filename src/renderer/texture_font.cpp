@@ -119,7 +119,7 @@ namespace Yttrium
 
 	UniquePtr<TextureFont> TextureFont::load(const StaticString& name, Allocator& allocator)
 	{
-		Reader reader(name, allocator);
+		Reader reader(name);
 		if (!reader)
 		{
 			Log() << "("_s << name << ") Bad file"_s;

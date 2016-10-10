@@ -4,6 +4,7 @@
 #include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/static_string.h>
 #include <yttrium/utils.h>
 #include "../io/writer.h"
 #include "formats.h"
@@ -117,9 +118,9 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Image::load(const StaticString& name, ImageType type, Allocator& allocator)
+	bool Image::load(const StaticString& name, ImageType type)
 	{
-		return load(Reader(name, allocator), type);
+		return load(Reader(name), type);
 	}
 
 	bool Image::load(Reader&& reader, ImageType type)
@@ -137,7 +138,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Image::save(const StaticString& name, ImageType type, Allocator& allocator) const
+	bool Image::save(const StaticString& name, ImageType type) const
 	{
 		if (type == ImageType::Auto)
 		{
@@ -150,7 +151,7 @@ namespace Yttrium
 			else
 				return false;
 		}
-		File file(name, File::Write | File::Truncate, allocator);
+		File file(name, File::Write | File::Truncate);
 		return save(Writer(file), type);
 	}
 

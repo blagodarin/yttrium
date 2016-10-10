@@ -228,7 +228,7 @@ void Game::run()
 	_window.show();
 	_window.run();
 
-	File settings_file("tetrium.txt", File::Write | File::Truncate, _allocator);
+	File settings_file("tetrium.txt", File::Write | File::Truncate);
 	if (settings_file)
 	{
 		String settings(1024, &_allocator);
@@ -264,7 +264,7 @@ void Game::on_render(Renderer& renderer, const PointF& cursor)
 void Game::on_screenshot(Image&& image)
 {
 	TemporaryAllocator<32> allocator(NoAllocator);
-	image.save(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"), ImageType::Auto, _allocator);
+	image.save(String(&allocator) << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"), ImageType::Auto);
 }
 
 void Game::on_update(const UpdateEvent& update)

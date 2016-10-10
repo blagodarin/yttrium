@@ -50,7 +50,7 @@ namespace Yttrium
 		{
 			if (_use_file_system == ResourceManager::UseFileSystem::Before)
 			{
-				Reader reader(name, _allocator);
+				Reader reader(name);
 				if (reader)
 					return reader;
 			}
@@ -71,7 +71,7 @@ namespace Yttrium
 			}
 			if (_use_file_system == ResourceManager::UseFileSystem::After)
 			{
-				Reader reader(name, _allocator);
+				Reader reader(name);
 				if (reader)
 					return reader;
 			}

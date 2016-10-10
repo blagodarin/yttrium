@@ -3,7 +3,6 @@
 
 #include <yttrium/audio/io.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
@@ -25,7 +24,7 @@ namespace Yttrium
 		uint64_t _offset_units = 0;
 		Reader _reader;
 
-		AudioReaderImpl(const StaticString& name, Allocator& allocator) : _reader(name, allocator) {}
+		AudioReaderImpl(Reader&& reader) : _reader(std::move(reader)) {}
 	};
 }
 

@@ -2,6 +2,8 @@
 
 #include "file.h"
 
+#include <yttrium/static_string.h>
+
 #include <cassert>
 #include <cstdlib>
 #include <limits>
@@ -13,7 +15,7 @@
 
 namespace Yttrium
 {
-	FilePrivate::FilePrivate(String&& name, unsigned mode, uint64_t size, int descriptor)
+	FilePrivate::FilePrivate(std::string&& name, unsigned mode, uint64_t size, int descriptor)
 		: _name(std::move(name))
 		, _mode(mode)
 		, _size(size)
@@ -27,7 +29,7 @@ namespace Yttrium
 		if (_auto_close)
 		{
 			::close(_descriptor);
-			if (_auto_remove && ::unlink(_name.text()))
+			if (_auto_remove && ::unlink(_name.c_str()))
 				throw std::system_error(errno, std::generic_category());
 		}
 	}
@@ -66,7 +68,7 @@ namespace Yttrium
 		return result != -1 ? result : 0;
 	}
 
-	std::shared_ptr<FilePrivate> FilePrivate::open(const StaticString& path, unsigned mode, Allocator& allocator)
+	std::shared_ptr<FilePrivate> FilePrivate::open(const StaticString& path, unsigned mode)
 	{
 		int flags = Y_PLATFORM_LINUX ? O_NOATIME : 0;
 		switch (mode & File::ReadWrite)
@@ -80,8 +82,8 @@ namespace Yttrium
 		if ((mode & (File::Write | File::Pipe | File::Truncate)) == (File::Write | File::Truncate))
 			flags |= O_TRUNC;
 
-		String name(path, &allocator); // Guaranteed to be zero terminated.
-		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		std::string name(path.text(), path.size()); // Guaranteed to be zero terminated.
+		const auto descriptor = ::open(name.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};
 
@@ -92,15 +94,15 @@ namespace Yttrium
 		return std::make_shared<FilePrivate>(std::move(name), mode, size, descriptor);
 	}
 
-	std::shared_ptr<FilePrivate> FilePrivate::open(File::Special special, Allocator& allocator)
+	std::shared_ptr<FilePrivate> FilePrivate::open(File::Special special)
 	{
 		std::shared_ptr<FilePrivate> result;
 		switch (special)
 		{
 		case File::Temporary:
 			{
-				String name("/tmp/yttrium-XXXXXX"_s, &allocator);
-				const auto descriptor = ::mkstemp(name.text());
+				std::string name("/tmp/yttrium-XXXXXX");
+				const auto descriptor = ::mkstemp(const_cast<char*>(name.data())); // TODO: Remove const_cast in C++17.
 				if (descriptor == -1)
 					break;
 				result = std::make_shared<FilePrivate>(std::move(name), File::ReadWrite, 0, descriptor);
@@ -109,7 +111,7 @@ namespace Yttrium
 			break;
 
 		case File::StdErr:
-			result = std::make_shared<FilePrivate>(String(&allocator), File::Write | File::Pipe, 0, STDERR_FILENO);
+			result = std::make_shared<FilePrivate>(std::string(), File::Write | File::Pipe, 0, STDERR_FILENO);
 			result->_auto_close = false;
 			break;
 		}

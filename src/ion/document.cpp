@@ -59,7 +59,7 @@ namespace Yttrium
 	bool IonDocument::load(const StaticString& file_name)
 	{
 		_private->clear();
-		return Reader(file_name, _private->_allocator).read_all(_private->_buffer)
+		return Reader(file_name).read_all(_private->_buffer)
 			&& IonParser(*this).parse(_private->_buffer, file_name);
 	}
 
@@ -75,7 +75,7 @@ namespace Yttrium
 
 	bool IonDocument::save(const StaticString& file_name, Formatting formatting) const
 	{
-		File file(file_name, File::Write | File::Truncate, _private->_allocator);
+		File file(file_name, File::Write | File::Truncate);
 		if (!file)
 			return false;
 		const auto& buffer = Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, &_private->_allocator);

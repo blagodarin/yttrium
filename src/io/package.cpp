@@ -16,7 +16,7 @@ namespace Yttrium
 			else
 				return {};
 		}
-		Reader reader(path, allocator);
+		Reader reader(path);
 		if (!reader)
 			return {};
 		try
@@ -43,7 +43,7 @@ namespace Yttrium
 			else
 				return {};
 		}
-		File file(path, File::Write | File::Truncate, allocator);
+		File file(path, File::Write | File::Truncate);
 		if (!file)
 			return {};
 		switch (type)

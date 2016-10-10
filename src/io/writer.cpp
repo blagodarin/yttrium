@@ -58,27 +58,10 @@ namespace Yttrium
 		return _private ? _private->write(data, size) : 0;
 	}
 
-	uint64_t Writer::write_all(const File& file)
-	{
-		uint64_t total_size = 0;
-		if (file._private && file._private->_mode & File::Read)
-		{
-			Buffer buffer(Buffer::memory_granularity());
-			while (auto size_read = file._private->read(buffer.data(), buffer.size(), total_size))
-			{
-				const auto size_written = write(buffer.data(), size_read);
-				total_size += size_written;
-				if (size_written < size_read)
-					break;
-			}
-		}
-		return total_size;
-	}
-
-	uint64_t Writer::write_all(const Reader& reader)
+	bool Writer::write_all(const Reader& reader)
 	{
 		if (!reader)
-			return 0;
+			return false;
 		uint64_t total_size = 0;
 		Buffer buffer(Buffer::memory_granularity());
 		while (auto size_read = reader.read_at(total_size, buffer.data(), buffer.size()))
@@ -88,7 +71,7 @@ namespace Yttrium
 			if (size_written < size_read)
 				break;
 		}
-		return total_size;
+		return total_size == reader.size();
 	}
 
 	Writer::Writer() noexcept = default;

@@ -26,7 +26,7 @@ namespace Yttrium
 		explicit Reader(Buffer&&);
 
 		/// Creates a Reader for the specified file.
-		explicit Reader(const StaticString& path, Allocator& = *DefaultAllocator);
+		explicit Reader(const StaticString& path);
 
 		/// Creates a Reader for a range of another Reader.
 		Reader(const Reader&, uint64_t base, uint64_t size);

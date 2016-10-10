@@ -10,7 +10,7 @@ namespace Yttrium
 	class WavReader : public AudioReaderImpl
 	{
 	public:
-		WavReader(const StaticString& name, Allocator&);
+		WavReader(Reader&&);
 
 		bool open() override;
 		size_t read(void* buffer, size_t bytes_to_read) override;

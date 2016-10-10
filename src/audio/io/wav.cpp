@@ -5,8 +5,8 @@
 
 namespace Yttrium
 {
-	WavReader::WavReader(const StaticString& name, Allocator& allocator)
-		: AudioReaderImpl(name, allocator)
+	WavReader::WavReader(Reader&& reader)
+		: AudioReaderImpl(std::move(reader))
 	{
 	}
 

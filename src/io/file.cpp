@@ -1,17 +1,18 @@
 #include <yttrium/io/file.h>
 
+#include <yttrium/static_string.h>
 #include <yttrium/utils.h>
 #include "file.h"
 
 namespace Yttrium
 {
-	File::File(const StaticString& path, unsigned mode, Allocator& allocator)
-		: _private(FilePrivate::open(path, mode, allocator))
+	File::File(const StaticString& path, unsigned mode)
+		: _private(FilePrivate::open(path, mode))
 	{
 	}
 
-	File::File(Special special, Allocator& allocator)
-		: _private(FilePrivate::open(special, allocator))
+	File::File(Special special)
+		: _private(FilePrivate::open(special))
 	{
 	}
 
@@ -22,7 +23,7 @@ namespace Yttrium
 
 	StaticString File::name() const
 	{
-		return _private ? StaticString(_private->_name) : StaticString();
+		return _private ? StaticString(_private->_name.data(), _private->_name.size()) : StaticString();
 	}
 
 	uint64_t File::offset() const

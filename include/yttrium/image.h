@@ -6,12 +6,12 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
 	class Image;
 	class Reader;
+	class StaticString;
 	class Writer;
 
 	/// Pixel format.
@@ -165,13 +165,13 @@ namespace Yttrium
 		bool intensity_to_bgra();
 
 		///
-		bool load(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator);
+		bool load(const StaticString& name, ImageType = ImageType::Auto);
 
 		///
 		bool load(Reader&&, ImageType = ImageType::Auto);
 
 		///
-		bool save(const StaticString& name, ImageType = ImageType::Auto, Allocator& = *DefaultAllocator) const;
+		bool save(const StaticString& name, ImageType = ImageType::Auto) const;
 
 		///
 		bool save(Writer&&, ImageType) const;

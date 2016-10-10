@@ -61,9 +61,9 @@ namespace Yttrium
 	{
 	}
 
-	Reader::Reader(const StaticString& path, Allocator& allocator)
+	Reader::Reader(const StaticString& path)
 	{
-		File file(path, File::Read, allocator);
+		File file(path, File::Read);
 		if (file)
 			_private = std::make_shared<FileReader>(std::move(file._private));
 	}
