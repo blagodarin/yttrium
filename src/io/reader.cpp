@@ -22,9 +22,9 @@ namespace Yttrium
 	{
 	}
 
-	size_t BufferReader::read_at(uint64_t offset, void* buffer, size_t size) const
+	size_t BufferReader::read_at(uint64_t offset, void* data, size_t size) const
 	{
-		std::memcpy(buffer, static_cast<const uint8_t*>(_buffer->data()) + offset, size);
+		std::memcpy(data, static_cast<const uint8_t*>(_buffer->data()) + offset, size);
 		return size;
 	}
 
@@ -34,9 +34,9 @@ namespace Yttrium
 	{
 	}
 
-	size_t FileReader::read_at(uint64_t offset, void* buffer, size_t size) const
+	size_t FileReader::read_at(uint64_t offset, void* data, size_t size) const
 	{
-		return _file->read(buffer, size, offset);
+		return _file->read_at(offset, data, size);
 	}
 
 	ReaderReader::ReaderReader(const std::shared_ptr<const ReaderPrivate>& reader, uint64_t base, uint64_t size)
@@ -46,9 +46,9 @@ namespace Yttrium
 	{
 	}
 
-	size_t ReaderReader::read_at(uint64_t offset, void* buffer, size_t size) const
+	size_t ReaderReader::read_at(uint64_t offset, void* data, size_t size) const
 	{
-		return offset <= std::numeric_limits<uint64_t>::max() - _base ? _reader->read_at(_base + offset, buffer, size) : 0;
+		return offset <= std::numeric_limits<uint64_t>::max() - _base ? _reader->read_at(_base + offset, data, size) : 0;
 	}
 
 	Reader::Reader(const std::shared_ptr<const Buffer>& buffer)
@@ -78,11 +78,11 @@ namespace Yttrium
 		return _private ? _private->_offset : 0;
 	}
 
-	size_t Reader::read(void* buffer, size_t size)
+	size_t Reader::read(void* data, size_t size)
 	{
 		if (!size || !_private || _private->_offset == _private->_size)
 			return 0;
-		const auto result = _private->read_at(_private->_offset, buffer, min<uint64_t>(size, _private->_size - _private->_offset));
+		const auto result = _private->read_at(_private->_offset, data, min<uint64_t>(size, _private->_size - _private->_offset));
 		_private->_offset += result;
 		return result;
 	}
@@ -111,11 +111,11 @@ namespace Yttrium
 		return _private->read_at(0, string.text(), string.size()) == string.size();
 	}
 
-	size_t Reader::read_at(uint64_t offset, void* buffer, size_t size) const
+	size_t Reader::read_at(uint64_t offset, void* data, size_t size) const
 	{
 		if (!size || !_private || offset >= _private->_size)
 			return 0;
-		return _private->read_at(offset, buffer, min<uint64_t>(size, _private->_size - offset));
+		return _private->read_at(offset, data, min<uint64_t>(size, _private->_size - offset));
 	}
 
 	bool Reader::read_line(String& string)

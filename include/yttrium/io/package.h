@@ -10,7 +10,6 @@ namespace Yttrium
 {
 	class Reader;
 	class StaticString;
-	class Writer;
 
 	template <typename> class UniquePtr;
 
@@ -45,8 +44,8 @@ namespace Yttrium
 		PackageWriter() = default;
 		virtual ~PackageWriter() = default;
 
-		///
-		virtual Writer open(const StaticString& name) = 0;
+		/// Adds the data from the Reader to the package.
+		virtual bool add(const StaticString& name, const Reader&) = 0;
 	};
 }
 

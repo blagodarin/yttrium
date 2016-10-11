@@ -56,26 +56,21 @@ namespace Yttrium
 		///
 		StaticString name() const;
 
-		/// Returns the current offset in the file.
+		/// Returns the current offset.
 		uint64_t offset() const;
 
-		/// Read a block of data from the file.
-		/// \param buffer The buffer to read into.
-		/// \param size Buffer size.
-		/// \return Number of bytes read or 0 on failure.
-		size_t read(void* buffer, size_t size);
+		/// Reads data from the file.
+		size_t read(void*, size_t);
 
-		/// Read the buffer from the file.
-		/// \param buffer Buffer to read.
-		/// \return \c true on success.
+		/// Reads data from the file.
 		template <typename T>
-		bool read(T* buffer) { return read(buffer, sizeof(T)) == sizeof(T); }
+		bool read(T& data) { return read(data, sizeof data) == sizeof data; }
 
 		/// Resizes the file.
-		bool resize(uint64_t size);
+		bool resize(uint64_t);
 
-		/// Adjusts the current offset in the file.
-		bool seek(uint64_t offset, Whence = Absolute);
+		/// Adjusts the current offset.
+		bool seek(uint64_t, Whence = Absolute);
 
 		/// Returns the size of the file.
 		uint64_t size() const;
@@ -83,15 +78,19 @@ namespace Yttrium
 		/// Truncates the file past the current offset.
 		bool truncate() { return resize(offset()); }
 
-		/// Write a buffer to the file.
-		/// \param buffer The buffer to write.
-		/// \param size Buffer size.
-		/// \return Number of bytes written or 0 on failure.
-		size_t write(const void* buffer, size_t size);
+		/// Writes data to the file.
+		size_t write(const void*, size_t);
 
-		/// Write the \a buffer to the file.
+		/// Writes data to the file.
 		template <typename T>
-		bool write(const T& buffer) { return write(&buffer, sizeof buffer) == sizeof buffer; }
+		bool write(const T& data) { return write(&data, sizeof data) == sizeof data; }
+
+		/// Writes data at the specified offset.
+		size_t write_at(uint64_t offset, const void* data, size_t size);
+
+		/// Writes data at the specified offset.
+		template <typename T>
+		bool write_at(uint64_t offset, const T& data) { return write_at(offset, &data, sizeof data) == sizeof data; }
 
 	private:
 		std::shared_ptr<class FilePrivate> _private;

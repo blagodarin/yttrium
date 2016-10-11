@@ -45,7 +45,7 @@ namespace Yttrium
 		return result != -1 ? result : 0;
 	}
 
-	size_t FilePrivate::read(void* buffer, size_t size, uint64_t offset) const
+	size_t FilePrivate::read_at(uint64_t offset, void* buffer, size_t size) const
 	{
 		const auto result = ::pread(_descriptor, buffer, size, offset);
 		return result != -1 ? result : 0;
@@ -62,7 +62,7 @@ namespace Yttrium
 		return result != -1 ? result : 0;
 	}
 
-	size_t FilePrivate::write(const void* buffer, size_t size, uint64_t offset)
+	size_t FilePrivate::write_at(uint64_t offset, const void* buffer, size_t size)
 	{
 		const auto result = ::pwrite(_descriptor, buffer, size, offset);
 		return result != -1 ? result : 0;

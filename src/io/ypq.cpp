@@ -116,68 +116,53 @@ namespace Yttrium
 
 	YpqWriter::~YpqWriter()
 	{
-		if (!_entries.empty())
-			flush_file();
+		const auto index_file_offset = _file.size();
 
 		YpqFileHeader index_file_header;
 		index_file_header.signature = YpqFileSignature;
 		index_file_header.size = 0;
+		if (!_file.write(index_file_header))
+			return;
 
 		YpqIndexHeader index_header;
 		index_header.signature = YpqIndexSignature;
 		index_header.size = _entries.size();
-
-		_file.seek(_file.size());
-		_file.write(index_file_header);
-
-		_last_base = _file.size();
-
-		_file.write(index_header);
+		if (!_file.write(index_header))
+			return;
 
 		for (const auto& entry : _entries)
 		{
 			YpqIndexEntry index_entry;
 			index_entry.offset = entry.offset;
 			index_entry.name_size = entry.name.size();
-
-			_file.write(index_entry);
-			_file.write(entry.name.text(), entry.name.size());
+			if (!_file.write(index_entry) || !_file.write(entry.name.text(), entry.name.size()))
+				return;
 		}
 
-		flush_file();
+		const auto index_file_size = static_cast<uint32_t>(_file.size() - index_file_offset - sizeof index_file_header);
+		if (!_file.write_at(index_file_offset + offsetof(YpqFileHeader, size), index_file_size))
+			return;
 
 		YpqPackageHeader package_header;
 		package_header.signature = YpqPackageSignature;
-		package_header.index_file_offset = _last_base - sizeof index_file_header;
-
-		_file.seek(_file.size());
-		_file.write(package_header);
+		package_header.index_file_offset = index_file_offset;
+		_file.write_at(_file.size(), package_header);
 	}
 
-	Writer YpqWriter::open(const StaticString& name)
+	bool YpqWriter::add(const StaticString& name, const Reader& reader)
 	{
-		if (!_entries.empty())
-			flush_file();
-
+		if (!reader || reader.size() > std::numeric_limits<uint32_t>::max())
+			return false;
+		const auto file_offset = _file.size();
 		YpqFileHeader file_header;
 		file_header.signature = YpqFileSignature;
-		file_header.size = 0;
-		_file.seek(_file.size());
-		if (!_file.write(file_header))
-			return {};
-
-		_last_base = _file.size();
-		_entries.emplace_back(_last_base - sizeof file_header, String(name, &_allocator));
-
-		return Writer(_file);
-	}
-
-	void YpqWriter::flush_file()
-	{
-		const auto file_size = _file.size() - _last_base;
-		if (file_size > std::numeric_limits<uint32_t>::max())
-			throw std::logic_error("Unsupported file size");
-		_file.seek(_last_base - sizeof(YpqFileHeader) + offsetof(YpqFileHeader, size));
-		_file.write(static_cast<uint32_t>(file_size));
+		file_header.size = reader.size();
+		if (!_file.write(file_header) || !Writer(_file).write_all(reader))
+		{
+			_file.resize(file_offset);
+			return false;
+		}
+		_entries.emplace_back(file_offset, String(name, &_allocator));
+		return true;
 	}
 }

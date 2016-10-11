@@ -34,25 +34,25 @@ namespace Yttrium
 		/// Returns the current offset.
 		uint64_t offset() const;
 
-		/// Reads a block of data from the source.
-		size_t read(void* buffer, size_t size);
+		/// Reads data from the source.
+		size_t read(void*, size_t);
 
-		/// Reads the buffer from the source.
+		/// Reads data from the source.
 		template <typename T>
-		bool read(T& buffer) { return read(&buffer, sizeof buffer) == sizeof buffer; }
+		bool read(T& data) { return read(&data, sizeof data) == sizeof data; }
 
-		/// Reads the entire source into the buffer.
+		/// Reads the entire source data into the buffer.
 		bool read_all(Buffer&) const;
 
-		/// Reads the entire source into the string.
+		/// Reads the entire source data into the string.
 		bool read_all(String&) const;
 
-		/// Reads a block of data from the source at the specified offset.
-		size_t read_at(uint64_t offset, void* buffer, size_t size) const;
+		/// Reads data from the source at the specified offset.
+		size_t read_at(uint64_t offset, void* data, size_t size) const;
 
-		/// Reads the buffer from the source at the specified offset.
+		/// Reads data from the source at the specified offset.
 		template <typename T>
-		bool read_at(uint64_t offset, T& buffer) const { return read_at(offset, &buffer, sizeof buffer) == sizeof buffer; }
+		bool read_at(uint64_t offset, T& data) const { return read_at(offset, &data, sizeof data) == sizeof data; }
 
 		///
 		bool read_line(String& string);
@@ -60,16 +60,16 @@ namespace Yttrium
 		/// Sets the current offset.
 		bool seek(uint64_t offset);
 
-		/// Returns the size of the source.
+		/// Returns the size of the source data.
 		uint64_t size() const;
 
 		/// Advances the current offset by the specified number of bytes.
 		bool skip(uint64_t size);
 
-		/// Reads the entire source into a Buffer.
+		/// Reads the entire source data into a Buffer.
 		Buffer to_buffer() const;
 
-		/// Reads the entire source into a String.
+		/// Reads the entire source data into a String.
 		String to_string(Allocator& = *DefaultAllocator) const;
 
 	private:

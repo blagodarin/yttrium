@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		if (entry.is_empty() || entry[0] == '#')
 			continue;
 
-		if (!package->open(entry).write_all(Reader(entry))) // TODO: Append.
+		if (!package->add(entry, Reader(entry)))
 		{
 			// TODO: Remove the package file.
 			std::cerr << "ERROR: Can't pack \"" << entry << "\" (" << argv[2] << ":" << line << ")" << std::endl;

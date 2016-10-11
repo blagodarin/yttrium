@@ -15,11 +15,11 @@ namespace Yttrium
 
 		bool flush();
 		size_t read(void*, size_t);
-		size_t read(void*, size_t, uint64_t) const;
+		size_t read_at(uint64_t, void*, size_t) const;
 		bool resize(uint64_t);
 		uint64_t size() const { return _size; }
 		size_t write(const void*, size_t);
-		size_t write(const void*, size_t, uint64_t);
+		size_t write_at(uint64_t, const void*, size_t);
 
 		static std::shared_ptr<FilePrivate> open(const StaticString& path, unsigned mode);
 		static std::shared_ptr<FilePrivate> open(File::Special);

@@ -52,21 +52,9 @@ BOOST_AUTO_TEST_CASE(test_package)
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-		{
-			auto packed_file1 = package_writer->open(file1.name());
-			BOOST_REQUIRE(packed_file1);
-			BOOST_REQUIRE(packed_file1.write_all(Reader(file1.name())));
-		}
-		{
-			auto packed_file2 = package_writer->open(file2.name());
-			BOOST_REQUIRE(packed_file2);
-			BOOST_REQUIRE(packed_file2.write_all(Reader(file2.name())));
-		}
-		{
-			auto packed_file3 = package_writer->open(file3.name());
-			BOOST_REQUIRE(packed_file3);
-			BOOST_REQUIRE(packed_file3.write_all(Reader(file3.name())));
-		}
+		BOOST_REQUIRE(package_writer->add(file1.name(), Reader(file1.name())));
+		BOOST_REQUIRE(package_writer->add(file2.name(), Reader(file2.name())));
+		BOOST_REQUIRE(package_writer->add(file3.name(), Reader(file3.name())));
 	}
 
 	Reader packed_file1;
@@ -107,25 +95,18 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-		{
-			auto packed_file = package_writer->open("1");
-			BOOST_REQUIRE(packed_file);
-			BOOST_CHECK(packed_file.write<uint8_t>(1));
-		}
-		{
-			auto packed_file = package_writer->open("2");
-			BOOST_REQUIRE(packed_file);
-			BOOST_CHECK(packed_file.write<uint8_t>(2));
-		}
+		BOOST_REQUIRE(package_writer->add("1", Reader(Buffer(1, "1"))));
+		BOOST_REQUIRE(package_writer->add("2", Reader(Buffer(1, "2"))));
+		BOOST_REQUIRE(package_writer->add("3", Reader(Buffer(1, "3"))));
 	}
 
 	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 	BOOST_REQUIRE(package_reader);
 
-	auto packed_file = package_reader->open("1");
+	auto packed_file = package_reader->open("2");
 	BOOST_REQUIRE(packed_file);
 
 	std::array<uint8_t, 2> data = { 0, 0 };
 	BOOST_CHECK_EQUAL(packed_file.read(data.data(), 2), 1);
-	BOOST_CHECK_EQUAL(data[0], 1);
+	BOOST_CHECK_EQUAL(data[0], '2');
 }

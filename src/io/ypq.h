@@ -29,7 +29,7 @@ namespace Yttrium
 		YpqWriter(File&& file, Allocator& allocator) : _file(std::move(file)), _allocator(allocator), _entries(_allocator) {}
 		~YpqWriter() override;
 
-		Writer open(const StaticString&) override;
+		bool add(const StaticString&, const Reader&) override;
 
 	private:
 
@@ -39,21 +39,16 @@ namespace Yttrium
 			uint32_t size = 0;
 			String   name;
 
-			Entry(uint64_t offset, const String& name)
+			Entry(uint64_t offset, const String&& name)
 				: offset(offset)
-				, name(name)
+				, name(std::move(name))
 			{
 			}
 		};
 
 	private:
-
-		void flush_file();
-
-	private:
 		File _file;
 		Allocator& _allocator;
-		uint64_t _last_base = 0;
 		StdVector<Entry> _entries;
 	};
 }
