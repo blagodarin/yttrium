@@ -2,7 +2,7 @@
 
 #include <yttrium/audio/player.h>
 #include <yttrium/image.h>
-#include <yttrium/io/file.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -228,7 +228,7 @@ void Game::run()
 	_window.show();
 	_window.run();
 
-	File settings_file("tetrium.txt", File::Write | File::Truncate);
+	Writer settings_file("tetrium.txt");
 	if (settings_file)
 	{
 		String settings(1024, &_allocator);

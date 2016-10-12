@@ -1,6 +1,5 @@
 #include <yttrium/script/context.h>
 
-#include <yttrium/io/file.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>

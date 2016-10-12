@@ -73,7 +73,7 @@ namespace Yttrium
 		int flags = Y_PLATFORM_LINUX ? O_NOATIME : 0;
 		switch (mode & File::ReadWrite)
 		{
-		case File::Read: flags |= O_RDONLY;  break;
+		case File::Read: flags |= O_RDONLY; break;
 		case File::Write: flags = O_WRONLY | O_CREAT; break;
 		case File::ReadWrite: flags |= O_RDWR | O_CREAT;  break;
 		default: return {};

@@ -1,6 +1,5 @@
 #include "package.h"
 
-#include <yttrium/io/file.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/unique_ptr.h>
 #include "ypq.h"

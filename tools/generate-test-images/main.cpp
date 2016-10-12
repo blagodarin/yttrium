@@ -1,4 +1,4 @@
-#include <yttrium/io/file.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
 #include "../../src/image/formats/dds.h"
@@ -8,7 +8,7 @@
 
 using namespace Yttrium;
 
-void write_color_gradient(File& file, bool with_alpha)
+void write_color_gradient(Writer& writer, bool with_alpha)
 {
 	Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
 
@@ -50,10 +50,10 @@ void write_color_gradient(File& file, bool with_alpha)
 		}
 	}
 
-	file.write(buffer.data(), buffer.size());
+	writer.write_all(buffer);
 }
 
-void write_color_intensity(File& file)
+void write_color_intensity(Writer& writer)
 {
 	Buffer buffer(16 * 16 * 4);
 
@@ -72,10 +72,10 @@ void write_color_intensity(File& file)
 		}
 	}
 
-	file.write(buffer.data(), buffer.size());
+	writer.write_all(buffer);
 }
 
-void write_grayscale_intensity(File& file)
+void write_grayscale_intensity(Writer& writer)
 {
 	Buffer buffer(16 * 16);
 
@@ -85,13 +85,13 @@ void write_grayscale_intensity(File& file)
 		for (size_t x = 0; x < 16; ++x)
 			*data++ = y * 16 + x;
 
-	file.write(buffer.data(), buffer.size());
+	writer.write_all(buffer);
 }
 
 int main(int, char**)
 {
 	{
-		File file("tests/image/gradient24.tga", File::Write | File::Truncate);
+		Writer writer("tests/image/gradient24.tga");
 
 		TgaHeader header;
 
@@ -103,11 +103,11 @@ int main(int, char**)
 		header.image.pixel_depth = 24;
 		header.image.descriptor = tgaTopLeft;
 
-		if (file.write(header))
-			write_color_gradient(file, false);
+		if (writer.write(header))
+			write_color_gradient(writer, false);
 	}
 	{
-		File file("tests/image/gradient32.tga", File::Write | File::Truncate);
+		Writer writer("tests/image/gradient32.tga");
 
 		TgaHeader header;
 
@@ -119,11 +119,11 @@ int main(int, char**)
 		header.image.pixel_depth = 32;
 		header.image.descriptor = tgaTopLeft | 8;
 
-		if (file.write(header))
-			write_color_gradient(file, true);
+		if (writer.write(header))
+			write_color_gradient(writer, true);
 	}
 	{
-		File file("tests/image/gradient32.dds", File::Write | File::Truncate);
+		Writer writer("tests/image/gradient32.dds");
 
 		DDS_HEADER header;
 
@@ -143,11 +143,11 @@ int main(int, char**)
 		header.ddspf.dwABitMask = 0xFF000000;
 		header.dwCaps = DDSCAPS_TEXTURE;
 
-		if (file.write(header))
-			write_color_gradient(file, true);
+		if (writer.write(header))
+			write_color_gradient(writer, true);
 	}
 	{
-		File file("tests/image/intensity8.tga", File::Write | File::Truncate);
+		Writer writer("tests/image/intensity8.tga");
 
 		TgaHeader header;
 
@@ -159,11 +159,11 @@ int main(int, char**)
 		header.image.pixel_depth = 8;
 		header.image.descriptor = tgaTopLeft;
 
-		if (file.write(header))
-			write_grayscale_intensity(file);
+		if (writer.write(header))
+			write_grayscale_intensity(writer);
 	}
 	{
-		File file("tests/image/intensity32.tga", File::Write | File::Truncate);
+		Writer writer("tests/image/intensity32.tga");
 
 		TgaHeader header;
 
@@ -175,7 +175,7 @@ int main(int, char**)
 		header.image.pixel_depth = 32;
 		header.image.descriptor = tgaTopLeft | 8;
 
-		if (file.write(header))
-			write_color_intensity(file);
+		if (writer.write(header))
+			write_color_intensity(writer);
 	}
 }

@@ -29,14 +29,14 @@ namespace Yttrium
 		Allocator& allocator() const { return _private.allocator(); }
 
 		///
-		bool load(const StaticString& file_name);
+		bool load(const StaticString& path);
 
 		///
 		IonObject& root();
 		const IonObject& root() const;
 
 		///
-		bool save(const StaticString& file_name, Formatting = Formatting::Pretty) const;
+		bool save(const StaticString& path, Formatting = Formatting::Pretty) const;
 
 	private:
 		UniquePtr<class IonDocumentPrivate> _private;

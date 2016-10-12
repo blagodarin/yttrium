@@ -135,7 +135,7 @@ namespace Yttrium
 			YpqIndexEntry index_entry;
 			index_entry.offset = entry.offset;
 			index_entry.name_size = entry.name.size();
-			if (!_writer.write(index_entry) || !_writer.write(entry.name.text(), entry.name.size()))
+			if (!_writer.write(index_entry) || !_writer.write_all(entry.name))
 				return;
 		}
 

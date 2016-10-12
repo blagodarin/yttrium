@@ -1,6 +1,5 @@
 #include <yttrium/image.h>
 
-#include <yttrium/io/file.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/memory/unique_ptr.h>

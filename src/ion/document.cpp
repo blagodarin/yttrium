@@ -1,7 +1,7 @@
 #include "document.h"
 
-#include <yttrium/io/file.h>
 #include <yttrium/io/reader.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/ion/list.h>
 #include "parser.h"
 #include "utils.h"
@@ -56,11 +56,10 @@ namespace Yttrium
 	{
 	}
 
-	bool IonDocument::load(const StaticString& file_name)
+	bool IonDocument::load(const StaticString& path)
 	{
 		_private->clear();
-		return Reader(file_name).read_all(_private->_buffer)
-			&& IonParser(*this).parse(_private->_buffer, file_name);
+		return Reader(path).read_all(_private->_buffer) && IonParser(*this).parse(_private->_buffer, path);
 	}
 
 	IonObject& IonDocument::root()
@@ -73,13 +72,10 @@ namespace Yttrium
 		return _private->_root;
 	}
 
-	bool IonDocument::save(const StaticString& file_name, Formatting formatting) const
+	bool IonDocument::save(const StaticString& path, Formatting formatting) const
 	{
-		File file(file_name, File::Write | File::Truncate);
-		if (!file)
-			return false;
-		const auto& buffer = Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, &_private->_allocator);
-		return file.write(buffer.text(), buffer.size()) == buffer.size() && file.flush();
+		// TODO: Serialize directly to the writer.
+		return Writer(path).write_all(Ion::serialize(_private->_root, true, formatting == Formatting::Pretty ? 0 : -1, &_private->_allocator));
 	}
 
 	IonDocument::~IonDocument() = default;

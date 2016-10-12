@@ -2,6 +2,7 @@
 
 #include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/static_string.h>
 #include <yttrium/utils.h>
 #include "file.h"
 
@@ -110,6 +111,12 @@ namespace Yttrium
 		return result;
 	}
 
+	bool Writer::write_all(const Buffer& buffer)
+	{
+		// TODO: Write from BufferReader without intermediate buffer.
+		return write(buffer.data(), buffer.size()) == buffer.size();
+	}
+
 	bool Writer::write_all(const Reader& reader)
 	{
 		if (!reader)
@@ -124,6 +131,11 @@ namespace Yttrium
 				break;
 		}
 		return total_size == reader.size();
+	}
+
+	bool Writer::write_all(const StaticString& string)
+	{
+		return write(string.text(), string.size()) == string.size();
 	}
 
 	size_t Writer::write_at(uint64_t offset, const void* data, size_t size)

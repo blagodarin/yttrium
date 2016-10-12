@@ -1,4 +1,4 @@
-#include <yttrium/io/file.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
 #include "../../src/audio/io/wav_private.h"
@@ -9,7 +9,7 @@ using namespace Yttrium;
 
 int main(int, char**)
 {
-	File file("data/sound.wav", File::Write | File::Truncate);
+	Writer writer("data/sound.wav");
 
 	size_t frequency = 44100;
 	size_t duration = frequency / 4; // 0.25 s.
@@ -40,8 +40,8 @@ int main(int, char**)
 		+ sizeof(format_chunk) + sizeof(data_chunk_header) + data_chunk_header.size;
 	file_header.wave_fourcc = WavFileHeader::WAVE;
 
-	if (file.write(file_header) && file.write(format_chunk_header)
-		&& file.write(format_chunk) && file.write(data_chunk_header))
+	if (writer.write(file_header) && writer.write(format_chunk_header)
+		&& writer.write(format_chunk) && writer.write(data_chunk_header))
 	{
 		Buffer buffer(data_chunk_header.size);
 
@@ -56,6 +56,6 @@ int main(int, char**)
 			data[i] = base * amplitude;
 		}
 
-		file.write(buffer.data(), buffer.size());
+		writer.write_all(buffer);
 	}
 }

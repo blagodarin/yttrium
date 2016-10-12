@@ -47,7 +47,13 @@ namespace Yttrium
 		bool write(const T& data) { return write(&data, sizeof data) == sizeof data; }
 
 		///
+		bool write_all(const Buffer&);
+
+		///
 		bool write_all(const Reader&);
+
+		///
+		bool write_all(const StaticString&);
 
 		/// Writes data at the specified offset.
 		size_t write_at(uint64_t offset, const void* data, size_t size);
