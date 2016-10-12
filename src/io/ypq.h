@@ -30,6 +30,7 @@ namespace Yttrium
 		~YpqWriter() override;
 
 		bool add(const StaticString&, const Reader&) override;
+		void unlink() override;
 
 	private:
 

@@ -39,6 +39,9 @@ namespace Yttrium
 		/// Returns the size of the target data.
 		uint64_t size() const;
 
+		///
+		void unlink();
+
 		/// Writes data to the target.
 		size_t write(const void*, size_t);
 

@@ -15,6 +15,7 @@ namespace Yttrium
 
 		virtual void reserve(uint64_t) = 0;
 		virtual void resize(uint64_t) = 0;
+		virtual void unlink() = 0;
 		virtual size_t write_at(uint64_t, const void*, size_t) = 0;
 
 	private:
@@ -31,6 +32,7 @@ namespace Yttrium
 
 		void reserve(uint64_t) override;
 		void resize(uint64_t) override;
+		void unlink() override {}
 		size_t write_at(uint64_t, const void*, size_t) override;
 
 	private:
@@ -44,6 +46,7 @@ namespace Yttrium
 
 		void reserve(uint64_t) override {}
 		void resize(uint64_t) override;
+		void unlink() override;
 		size_t write_at(uint64_t, const void*, size_t) override;
 
 	private:

@@ -165,4 +165,10 @@ namespace Yttrium
 		_entries.emplace_back(file_offset, String(name, &_allocator));
 		return true;
 	}
+
+	void YpqWriter::unlink()
+	{
+		_writer.unlink();
+		_writer = {};
+	}
 }

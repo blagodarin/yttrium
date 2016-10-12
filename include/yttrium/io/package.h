@@ -46,6 +46,9 @@ namespace Yttrium
 
 		/// Adds the data from the Reader to the package.
 		virtual bool add(const StaticString& name, const Reader&) = 0;
+
+		///
+		virtual void unlink() = 0;
 	};
 }
 

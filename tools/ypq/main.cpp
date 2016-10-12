@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 
 		if (!package->add(entry, Reader(entry)))
 		{
-			// TODO: Remove the package file.
+			package->unlink();
 			std::cerr << "ERROR: Can't pack \"" << entry << "\" (" << argv[2] << ":" << line << ")" << std::endl;
 			return 1;
 		}

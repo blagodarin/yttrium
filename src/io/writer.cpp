@@ -54,6 +54,11 @@ namespace Yttrium
 		_file->resize(size); // TODO: Process result.
 	}
 
+	void FileWriter::unlink()
+	{
+		_file->unlink();
+	}
+
 	size_t FileWriter::write_at(uint64_t offset, const void* data, size_t size)
 	{
 		return _file->write_at(offset, data, size);
@@ -99,6 +104,12 @@ namespace Yttrium
 	uint64_t Writer::size() const
 	{
 		return _private ? _private->_size : 0;
+	}
+
+	void Writer::unlink()
+	{
+		if (_private)
+			_private->unlink();
 	}
 
 	size_t Writer::write(const void* data, size_t size)

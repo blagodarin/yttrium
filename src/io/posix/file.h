@@ -18,6 +18,7 @@ namespace Yttrium
 		size_t read_at(uint64_t, void*, size_t) const;
 		bool resize(uint64_t);
 		uint64_t size() const { return _size; }
+		void unlink() { _auto_remove = true; }
 		size_t write(const void*, size_t);
 		size_t write_at(uint64_t, const void*, size_t);
 
