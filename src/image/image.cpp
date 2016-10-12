@@ -151,8 +151,7 @@ namespace Yttrium
 			else
 				return false;
 		}
-		File file(name, File::Write | File::Truncate);
-		return save(Writer(file), type);
+		return save(Writer(name), type);
 	}
 
 	bool Image::save(Writer&& writer, ImageType type) const

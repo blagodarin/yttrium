@@ -5,13 +5,23 @@
 
 namespace Yttrium
 {
+	class FilePrivate;
+
 	class WriterPrivate
 	{
 	public:
+		WriterPrivate(uint64_t size) : _size(size), _offset(size) {}
 		virtual ~WriterPrivate() = default;
 
-		virtual void reserve(size_t) = 0;
-		virtual size_t write(const void*, size_t) = 0;
+		virtual void reserve(uint64_t) = 0;
+		virtual void resize(uint64_t) = 0;
+		virtual size_t write_at(uint64_t, const void*, size_t) = 0;
+
+	private:
+		uint64_t _size = 0;
+		uint64_t _offset = 0;
+
+		friend Writer;
 	};
 
 	class BufferWriter : public WriterPrivate
@@ -19,24 +29,25 @@ namespace Yttrium
 	public:
 		BufferWriter(Buffer&);
 
-		void reserve(size_t) override;
-		size_t write(const void*, size_t) override;
+		void reserve(uint64_t) override;
+		void resize(uint64_t) override;
+		size_t write_at(uint64_t, const void*, size_t) override;
 
 	private:
 		Buffer& _buffer;
-		size_t _offset = 0;
 	};
 
 	class FileWriter : public WriterPrivate
 	{
 	public:
-		FileWriter(File& file) : _file(file) {}
+		FileWriter(std::shared_ptr<FilePrivate>&&);
 
-		void reserve(size_t) override {}
-		size_t write(const void*, size_t) override;
+		void reserve(uint64_t) override {}
+		void resize(uint64_t) override;
+		size_t write_at(uint64_t, const void*, size_t) override;
 
 	private:
-		File& _file;
+		const std::shared_ptr<FilePrivate> _file;
 	};
 }
 

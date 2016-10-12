@@ -11,7 +11,6 @@
 namespace Yttrium
 {
 	class Buffer;
-	class File;
 	class StaticString;
 	class String;
 

@@ -43,12 +43,12 @@ namespace Yttrium
 			else
 				return {};
 		}
-		File file(path, File::Write | File::Truncate);
-		if (!file)
+		Writer writer(path);
+		if (!writer)
 			return {};
 		switch (type)
 		{
-		case PackageType::Ypq: return make_unique<YpqWriter>(allocator, std::move(file), allocator);
+		case PackageType::Ypq: return make_unique<YpqWriter>(allocator, std::move(writer), allocator);
 		default: break;
 		}
 		return {};

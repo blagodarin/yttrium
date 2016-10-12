@@ -1,8 +1,8 @@
 #ifndef _src_io_ypq_h_
 #define _src_io_ypq_h_
 
-#include <yttrium/io/file.h>
 #include <yttrium/io/reader.h>
+#include <yttrium/io/writer.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 #include "package.h"
@@ -26,7 +26,7 @@ namespace Yttrium
 	class YpqWriter : public PackageWriter
 	{
 	public:
-		YpqWriter(File&& file, Allocator& allocator) : _file(std::move(file)), _allocator(allocator), _entries(_allocator) {}
+		YpqWriter(Writer&& writer, Allocator& allocator) : _writer(std::move(writer)), _allocator(allocator), _entries(_allocator) {}
 		~YpqWriter() override;
 
 		bool add(const StaticString&, const Reader&) override;
@@ -47,7 +47,7 @@ namespace Yttrium
 		};
 
 	private:
-		File _file;
+		Writer _writer;
 		Allocator& _allocator;
 		StdVector<Entry> _entries;
 	};

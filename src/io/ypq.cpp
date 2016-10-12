@@ -116,18 +116,18 @@ namespace Yttrium
 
 	YpqWriter::~YpqWriter()
 	{
-		const auto index_file_offset = _file.size();
+		const auto index_file_offset = _writer.size();
 
 		YpqFileHeader index_file_header;
 		index_file_header.signature = YpqFileSignature;
 		index_file_header.size = 0;
-		if (!_file.write(index_file_header))
+		if (!_writer.write(index_file_header))
 			return;
 
 		YpqIndexHeader index_header;
 		index_header.signature = YpqIndexSignature;
 		index_header.size = _entries.size();
-		if (!_file.write(index_header))
+		if (!_writer.write(index_header))
 			return;
 
 		for (const auto& entry : _entries)
@@ -135,31 +135,31 @@ namespace Yttrium
 			YpqIndexEntry index_entry;
 			index_entry.offset = entry.offset;
 			index_entry.name_size = entry.name.size();
-			if (!_file.write(index_entry) || !_file.write(entry.name.text(), entry.name.size()))
+			if (!_writer.write(index_entry) || !_writer.write(entry.name.text(), entry.name.size()))
 				return;
 		}
 
-		const auto index_file_size = static_cast<uint32_t>(_file.size() - index_file_offset - sizeof index_file_header);
-		if (!_file.write_at(index_file_offset + offsetof(YpqFileHeader, size), index_file_size))
+		const auto index_file_size = static_cast<uint32_t>(_writer.size() - index_file_offset - sizeof index_file_header);
+		if (!_writer.write_at(index_file_offset + offsetof(YpqFileHeader, size), index_file_size))
 			return;
 
 		YpqPackageHeader package_header;
 		package_header.signature = YpqPackageSignature;
 		package_header.index_file_offset = index_file_offset;
-		_file.write_at(_file.size(), package_header);
+		_writer.write_at(_writer.size(), package_header);
 	}
 
 	bool YpqWriter::add(const StaticString& name, const Reader& reader)
 	{
 		if (!reader || reader.size() > std::numeric_limits<uint32_t>::max())
 			return false;
-		const auto file_offset = _file.size();
+		const auto file_offset = _writer.size();
 		YpqFileHeader file_header;
 		file_header.signature = YpqFileSignature;
 		file_header.size = reader.size();
-		if (!_file.write(file_header) || !Writer(_file).write_all(reader))
+		if (!_writer.write(file_header) || !_writer.write_all(reader))
 		{
-			_file.resize(file_offset);
+			_writer.resize(file_offset);
 			return false;
 		}
 		_entries.emplace_back(file_offset, String(name, &_allocator));
