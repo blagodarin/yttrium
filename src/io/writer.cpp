@@ -13,7 +13,7 @@
 namespace Yttrium
 {
 	BufferWriter::BufferWriter(Buffer& buffer)
-		: WriterPrivate(_buffer.size())
+		: WriterPrivate(buffer.size())
 		, _buffer(buffer)
 	{
 	}
