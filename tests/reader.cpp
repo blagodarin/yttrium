@@ -30,8 +30,8 @@ using namespace Yttrium;
 BOOST_AUTO_TEST_CASE(test_reader_construction)
 {
 	BOOST_CHECK(!Reader());
-	BOOST_CHECK(!Reader(std::shared_ptr<const Buffer>()));
-	BOOST_CHECK(Reader(std::make_shared<const Buffer>()));
+	BOOST_CHECK(!Reader("no_such_file"));
+	BOOST_CHECK(Reader(nullptr, 0));
 	BOOST_CHECK(Reader(Buffer()));
 }
 
@@ -81,59 +81,51 @@ BOOST_AUTO_TEST_CASE(test_reader_skip)
 
 BOOST_AUTO_TEST_CASE(test_reader_read_all_buffer)
 {
-	const auto expected = std::make_shared<const Buffer>(::make_random_buffer(100003));
-
+	const auto expected = ::make_random_buffer(997);
 	Buffer actual;
-	BOOST_REQUIRE(Reader(expected).read_all(actual));
-
-	BOOST_CHECK_EQUAL(*expected, actual);
+	BOOST_REQUIRE(Reader(expected.data(), expected.size()).read_all(actual));
+	BOOST_CHECK_EQUAL(expected, actual);
 	BOOST_REQUIRE(actual.capacity() > actual.size());
 	BOOST_CHECK_EQUAL(actual[actual.size()], '\0');
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_read_all_string)
 {
-	const auto expected = std::make_shared<const Buffer>(::make_random_buffer(100003));
-
+	const auto expected = ::make_random_buffer(997);
 	String actual;
-	BOOST_REQUIRE(Reader(expected).read_all(actual));
-
-	BOOST_CHECK_EQUAL(actual.size(), expected->size());
-	BOOST_CHECK(!::memcmp(actual.text(), expected->data(), expected->size()));
+	BOOST_REQUIRE(Reader(expected.data(), expected.size()).read_all(actual));
+	BOOST_CHECK_EQUAL(actual.size(), expected.size());
+	BOOST_CHECK(!::memcmp(actual.text(), expected.data(), expected.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_to_buffer)
 {
-	const auto expected = std::make_shared<const Buffer>(::make_random_buffer(100003));
-
-	const auto actual = Reader(expected).to_buffer();
-
-	BOOST_CHECK_EQUAL(*expected, actual);
+	const auto expected = ::make_random_buffer(997);
+	const auto actual = Reader(expected.data(), expected.size()).to_buffer();
+	BOOST_CHECK_EQUAL(expected, actual);
 	BOOST_REQUIRE(actual.capacity() > actual.size());
 	BOOST_CHECK_EQUAL(actual[actual.size()], '\0');
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_to_string)
 {
-	const auto expected = std::make_shared<const Buffer>(::make_random_buffer(100003));
-
-	const auto actual = Reader(expected).to_string();
-
-	BOOST_CHECK_EQUAL(actual.size(), expected->size());
-	BOOST_CHECK(!::memcmp(actual.text(), expected->data(), expected->size()));
+	const auto expected = ::make_random_buffer(997);
+	const auto actual = Reader(expected.data(), expected.size()).to_string();
+	BOOST_CHECK_EQUAL(actual.size(), expected.size());
+	BOOST_CHECK(!::memcmp(actual.text(), expected.data(), expected.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_reader)
 {
-	const auto source = std::make_shared<const Buffer>(::make_random_buffer(100003));
-	const Reader reader(source);
+	const auto source = ::make_random_buffer(997);
+	const Reader reader(source.data(), source.size());
 	{
 		Reader subreader(reader, 0, reader.size());
 		BOOST_CHECK_EQUAL(subreader.offset(), 0);
 		BOOST_REQUIRE_EQUAL(subreader.size(), reader.size());
 		Buffer buffer(reader.size());
 		BOOST_CHECK_EQUAL(subreader.read(buffer.data(), reader.size()), subreader.size());
-		BOOST_CHECK(!::memcmp(buffer.begin(), source->begin(), subreader.size()));
+		BOOST_CHECK(!::memcmp(buffer.begin(), source.begin(), subreader.size()));
 	}
 	{
 		Reader subreader(reader, 0, reader.size() / 2);
@@ -141,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_reader_reader)
 		BOOST_REQUIRE_EQUAL(subreader.size(), reader.size() / 2);
 		Buffer buffer(reader.size());
 		BOOST_CHECK_EQUAL(subreader.read(buffer.data(), reader.size()), subreader.size());
-		BOOST_CHECK(!::memcmp(buffer.begin(), source->begin(), subreader.size()));
+		BOOST_CHECK(!::memcmp(buffer.begin(), source.begin(), subreader.size()));
 	}
 	{
 		Reader subreader(reader, reader.size() / 2, reader.size() - reader.size() / 2);
@@ -149,6 +141,6 @@ BOOST_AUTO_TEST_CASE(test_reader_reader)
 		BOOST_REQUIRE_EQUAL(subreader.size(), reader.size() - reader.size() / 2);
 		Buffer buffer(reader.size());
 		BOOST_CHECK_EQUAL(subreader.read(buffer.data(), reader.size()), subreader.size());
-		BOOST_CHECK(!::memcmp(buffer.begin(), source->begin() + reader.size() / 2, subreader.size()));
+		BOOST_CHECK(!::memcmp(buffer.begin(), source.begin() + reader.size() / 2, subreader.size()));
 	}
 }

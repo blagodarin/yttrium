@@ -10,15 +10,15 @@
 
 namespace Yttrium
 {
-	BufferReader::BufferReader(const std::shared_ptr<const Buffer>& buffer)
-		: ReaderPrivate(buffer->size())
-		, _buffer(buffer)
+	BufferReader::BufferReader(Buffer&& buffer)
+		: ReaderPrivate(buffer.size())
+		, _buffer(std::make_shared<const Buffer>(std::move(buffer)))
 	{
 	}
 
-	BufferReader::BufferReader(Buffer&& buffer)
-		: ReaderPrivate(buffer.size())
-		, _buffer(std::make_shared<Buffer>(std::move(buffer)))
+	BufferReader::BufferReader(const std::shared_ptr<const Buffer>& buffer, const String& name)
+		: ReaderPrivate(buffer->size(), name)
+		, _buffer(buffer)
 	{
 	}
 
@@ -29,7 +29,7 @@ namespace Yttrium
 	}
 
 	FileReader::FileReader(std::shared_ptr<const FilePrivate>&& file)
-		: ReaderPrivate(file->size())
+		: ReaderPrivate(file->size(), file->name())
 		, _file(std::move(file))
 	{
 	}
@@ -46,13 +46,32 @@ namespace Yttrium
 	{
 	}
 
+	ReaderReader::ReaderReader(const std::shared_ptr<const ReaderPrivate>& reader, uint64_t base, uint64_t size, const String& name)
+		: ReaderPrivate(size, name)
+		, _reader(reader)
+		, _base(base)
+	{
+	}
+
 	size_t ReaderReader::read_at(uint64_t offset, void* data, size_t size) const
 	{
 		return offset <= std::numeric_limits<uint64_t>::max() - _base ? _reader->read_at(_base + offset, data, size) : 0;
 	}
 
-	Reader::Reader(const std::shared_ptr<const Buffer>& buffer)
-		: _private(buffer ? std::make_shared<BufferReader>(buffer) : nullptr)
+	SpanReader::SpanReader(const void* data, size_t size)
+		: ReaderPrivate(size)
+		, _data(data)
+	{
+	}
+
+	size_t SpanReader::read_at(uint64_t offset, void* data, size_t size) const
+	{
+		std::memcpy(data, static_cast<const uint8_t*>(_data) + offset, size);
+		return size;
+	}
+
+	Reader::Reader(const void* data, size_t size)
+		: _private(std::make_shared<SpanReader>(data, size))
 	{
 	}
 
@@ -71,6 +90,11 @@ namespace Yttrium
 	Reader::Reader(const Reader& reader, uint64_t base, uint64_t size)
 		: _private(base < reader.size() ? std::make_shared<ReaderReader>(reader._private, base, min(size, reader.size() - base)) : nullptr)
 	{
+	}
+
+	StaticString Reader::name() const
+	{
+		return _private ? StaticString(_private->_name) : StaticString();
 	}
 
 	uint64_t Reader::offset() const
@@ -209,6 +233,7 @@ namespace Yttrium
 
 	Reader::Reader() noexcept = default;
 	Reader::Reader(Reader&&) noexcept = default;
+	Reader::Reader(std::shared_ptr<class ReaderPrivate>&& private_) noexcept : _private(std::move(private_)) {}
 	Reader::~Reader() = default;
 	Reader& Reader::operator=(Reader&&) noexcept = default;
 }

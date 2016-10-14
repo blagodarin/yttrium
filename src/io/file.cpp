@@ -23,7 +23,7 @@ namespace Yttrium
 
 	StaticString File::name() const
 	{
-		return _private ? StaticString(_private->_name.data(), _private->_name.size()) : StaticString();
+		return _private ? StaticString(_private->_name) : StaticString();
 	}
 
 	uint64_t File::offset() const

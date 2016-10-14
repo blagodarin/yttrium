@@ -18,8 +18,8 @@ namespace Yttrium
 	class Y_API Reader
 	{
 	public:
-		/// Creates a Reader for a Buffer.
-		explicit Reader(const std::shared_ptr<const Buffer>&);
+		/// Creates a Reader for a custom data range. The data must stay valid for the lifetime of the Reader.
+		Reader(const void* data, size_t size);
 
 		/// Creates a Reader for a Buffer.
 		explicit Reader(Buffer&&);
@@ -29,6 +29,9 @@ namespace Yttrium
 
 		/// Creates a Reader for a range of another Reader.
 		Reader(const Reader&, uint64_t base, uint64_t size);
+
+		/// Returns the name of the Reader's source.
+		StaticString name() const;
 
 		/// Returns the current offset.
 		uint64_t offset() const;
@@ -79,6 +82,7 @@ namespace Yttrium
 		Reader() noexcept;
 		Reader(const Reader&) = delete;
 		Reader(Reader&&) noexcept;
+		Reader(std::shared_ptr<class ReaderPrivate>&&) noexcept;
 		~Reader();
 		Reader& operator=(const Reader&) = delete;
 		Reader& operator=(Reader&&) noexcept;

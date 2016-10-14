@@ -1,12 +1,11 @@
 #include <yttrium/io/resources.h>
 
-#include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
-#include "file.h"
+#include "reader.h"
 
 namespace Yttrium
 {
@@ -66,7 +65,7 @@ namespace Yttrium
 				else if (attachment.type == ResourceAttachment::Type::Buffer)
 				{
 					if (attachment.buffer_name == name)
-						return Reader(attachment.buffer);
+						return Reader(std::make_shared<BufferReader>(attachment.buffer, attachment.buffer_name));
 				}
 			}
 			if (_use_file_system == ResourceManager::UseFileSystem::After)

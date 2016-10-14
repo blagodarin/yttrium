@@ -2,18 +2,18 @@
 #define _src_io_posix_file_h_
 
 #include <yttrium/io/file.h>
-
-#include <string>
+#include <yttrium/string.h>
 
 namespace Yttrium
 {
 	class FilePrivate
 	{
 	public:
-		FilePrivate(std::string&& name, unsigned mode, uint64_t size, int descriptor);
+		FilePrivate(String&& name, unsigned mode, uint64_t size, int descriptor);
 		~FilePrivate();
 
 		bool flush();
+		const String& name() const { return _name; }
 		size_t read(void*, size_t);
 		size_t read_at(uint64_t, void*, size_t) const;
 		bool resize(uint64_t);
@@ -26,7 +26,7 @@ namespace Yttrium
 		static std::shared_ptr<FilePrivate> open(File::Special);
 
 	private:
-		const std::string _name; // TODO: Don't store names in Files.
+		const String _name;
 		const unsigned _mode;
 		uint64_t _size = 0;
 		uint64_t _offset = 0;
