@@ -44,6 +44,7 @@ namespace Yttrium
 		void clear();
 		const FontDesc* font(const StaticString& name) const;
 		void render_canvas(const StaticString& name, const RectF&) const;
+		const ResourceManager& resource_manager() const { return _resource_manager; }
 		ScriptContext& script_context() const { return _script_context; }
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 		TextureCache& texture_cache() { return *_texture_cache; }

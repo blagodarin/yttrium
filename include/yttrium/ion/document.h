@@ -9,6 +9,7 @@
 namespace Yttrium
 {
 	class IonObject;
+	class Reader;
 	class StaticString;
 
 	///
@@ -27,6 +28,9 @@ namespace Yttrium
 
 		///
 		Allocator& allocator() const { return _private.allocator(); }
+
+		///
+		bool load(const Reader&);
 
 		///
 		bool load(const StaticString& path);

@@ -2,6 +2,8 @@
 
 #include <yttrium/audio/player.h>
 #include <yttrium/image.h>
+#include <yttrium/io/reader.h>
+#include <yttrium/io/resources.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
@@ -185,7 +187,7 @@ void Game::run()
 	if (_audio)
 	{
 		IonDocument data(_allocator);
-		if (data.load("data/music.ion"))
+		if (data.load(_resource_manager.open("data/music.ion")))
 		{
 			for (const IonValue& value : data.root().last("music"))
 			{
