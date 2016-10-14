@@ -12,7 +12,7 @@
 namespace Yttrium
 {
 	class Allocator;
-	class StaticString;
+	class Reader;
 
 	template <typename> class UniquePtr;
 
@@ -40,7 +40,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<AudioReader> open(const StaticString& name, AudioType = AudioType::Auto, Allocator& = *DefaultAllocator);
+		static UniquePtr<AudioReader> open(Reader&&, AudioType = AudioType::Auto, Allocator& = *DefaultAllocator);
 
 		virtual ~AudioReader() = default;
 

@@ -51,7 +51,7 @@ private:
 	NamedAllocator _script_allocator{ "script" };
 	ScriptContext _script{ &_script_allocator };
 	NamedAllocator _audio_allocator{ "audio" };
-	const UniquePtr<AudioManager> _audio = AudioManager::create({}, {}, _audio_allocator);
+	const UniquePtr<AudioManager> _audio = AudioManager::create(_resource_manager, {}, {}, _audio_allocator);
 	NamedAllocator _window_allocator{ "window" };
 	Window _window{ "Tetrium", *this, _window_allocator };
 	Console _console{ _script, _allocator };

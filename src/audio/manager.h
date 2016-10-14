@@ -20,7 +20,7 @@ namespace Yttrium
 	public:
 		static AudioManagerImpl* instance();
 
-		AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator&);
+		AudioManagerImpl(const ResourceManager&, const StaticString& backend, const StaticString& device, Allocator&);
 		~AudioManagerImpl() override;
 
 		StaticString backend() const override;

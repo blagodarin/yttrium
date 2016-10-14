@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include "sound.h"
 
@@ -24,11 +25,11 @@ namespace Yttrium
 			return StdVector<StaticString>(allocator);
 	}
 
-	UniquePtr<AudioManager> AudioManager::create(const StaticString& backend, const StaticString& device, Allocator& allocator)
+	UniquePtr<AudioManager> AudioManager::create(const ResourceManager& resource_manager, const StaticString& backend, const StaticString& device, Allocator& allocator)
 	{
 		try
 		{
-			return make_unique<AudioManagerImpl>(allocator, backend, device, allocator);
+			return make_unique<AudioManagerImpl>(allocator, resource_manager, backend, device, allocator);
 		}
 		catch (const AudioBackend::UnableToCreate& e)
 		{
@@ -42,10 +43,10 @@ namespace Yttrium
 		return AudioManagerGuard::instance;
 	}
 
-	AudioManagerImpl::AudioManagerImpl(const StaticString& backend, const StaticString& device, Allocator& allocator)
+	AudioManagerImpl::AudioManagerImpl(const ResourceManager& resource_manager, const StaticString& backend, const StaticString& device, Allocator& allocator)
 		: _allocator(allocator)
 		, _backend(AudioBackend::create(backend, device, _allocator))
-		, _player(_backend->create_player(), _allocator)
+		, _player(resource_manager, _backend->create_player(), _allocator)
 		, _sounds(_allocator)
 		, _instance_guard(this, "Duplicate AudioManager construction")
 	{
@@ -76,7 +77,7 @@ namespace Yttrium
 		if (i != _sounds.end())
 			return SharedPtr<Sound>(*i->second.first, i->second.second);
 
-		const auto reader = AudioReader::open(name, AudioType::Auto, _allocator);
+		const auto reader = AudioReader::open(Reader(name), AudioType::Auto, _allocator);
 		if (!reader)
 			return {};
 

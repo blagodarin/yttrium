@@ -33,7 +33,7 @@ namespace Yttrium
 
 		FetchResult fetch();
 
-		bool open(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type, AudioPlayer::Order order);
+		bool open(Reader&&, const AudioPlayer::Settings&, AudioType, AudioPlayer::Order);
 
 		void prefetch();
 

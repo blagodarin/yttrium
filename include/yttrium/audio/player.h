@@ -8,6 +8,8 @@
 
 namespace Yttrium
 {
+	class StaticString;
+
 	/// Audio player.
 	class AudioPlayer
 	{

@@ -27,12 +27,10 @@ namespace Yttrium
 		{
 		case AudioPlayer::Random:
 		case AudioPlayer::Shuffle:
-
-			_next = rand() % _items.size();
+			_next = std::rand() % _items.size();
 			break;
 
 		default:
-
 			_next = 0;
 		}
 	}
@@ -49,14 +47,12 @@ namespace Yttrium
 		switch (_order)
 		{
 		case AudioPlayer::Loop:
-
 			_next = (_next + 1) % _items.size();
 			break;
 
 		case AudioPlayer::Random:
 		case AudioPlayer::Shuffle:
-
-			_next = rand() % _items.size();
+			_next = std::rand() % _items.size();
 			break;
 		}
 
