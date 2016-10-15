@@ -1,5 +1,6 @@
 #include <yttrium/gui.h>
 
+#include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/resource_manager.h>
 #include <yttrium/log.h>
@@ -79,7 +80,7 @@ namespace Yttrium
 		{
 			font = TextureFont::load(_resource_manager.open(font_source), _allocator);
 		}
-		catch (const BadTextureFont& e)
+		catch (const ResourceError& e)
 		{
 			Log() << "Can't load \""_s << font_source << "\": "_s << e.what();
 			return;

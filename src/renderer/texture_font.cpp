@@ -1,5 +1,6 @@
 #include <yttrium/renderer/texture_font.h>
 
+#include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/text_capture.h>
@@ -120,27 +121,27 @@ namespace Yttrium
 	UniquePtr<TextureFont> TextureFont::load(Reader&& reader, Allocator& allocator)
 	{
 		if (!reader)
-			throw BadTextureFont("Bad file");
+			throw ResourceError(allocator) << "Bad file"_s;
 
 		reader.seek(0);
 
 		uint32_t fourcc = 0;
 		if (!reader.read(fourcc) || fourcc != FourccYtf1)
-			throw BadTextureFont("Bad 'YTF1' fourcc");
+			throw ResourceError(allocator) << "Bad 'YTF1' fourcc"_s;
 
 		if (!reader.read(fourcc) || fourcc != FourccFont)
-			throw BadTextureFont("Bad 'font' section fourcc");
+			throw ResourceError(allocator) << "Bad 'font' section fourcc"_s;
 
 		Ytf1Font font_section;
 		if (!reader.read(font_section))
-			throw BadTextureFont("Bad 'font' section");
+			throw ResourceError(allocator) << "Bad 'font' section"_s;
 
 		if (!reader.read(fourcc) || fourcc != FourccChar)
-			throw BadTextureFont("Bad 'char' section fourcc");
+			throw ResourceError(allocator) << "Bad 'char' section fourcc"_s;
 
 		uint8_t char_count = 0;
 		if (!reader.read(char_count))
-			throw BadTextureFont("Bad 'char' section header");
+			throw ResourceError(allocator) << "Bad 'char' section header"_s;
 
 		auto font = make_unique<TextureFontImpl>(allocator, allocator, font_section.size);
 
@@ -149,7 +150,7 @@ namespace Yttrium
 		{
 			Ytf1Char char_data;
 			if (!reader.read(char_data))
-				throw BadTextureFont("Bad 'char' section entry " + std::to_string(i));
+				throw ResourceError(allocator) << "Bad 'char' section entry "_s << i;
 
 			CharInfo info;
 			info.rect = {{font_section.base_x + char_data.x, font_section.base_y + char_data.y}, Size(char_data.width, char_data.height)};
@@ -164,17 +165,17 @@ namespace Yttrium
 		if (reader.read(fourcc))
 		{
 			if (fourcc != FourccKern)
-				throw BadTextureFont("Bad 'kern' section fourcc");
+				throw ResourceError(allocator) << "Bad 'kern' section fourcc"_s;
 
 			uint16_t kerning_count = 0;
 			if (!reader.read(kerning_count))
-				throw BadTextureFont("Bad 'kern' section header");
+				throw ResourceError(allocator) << "Bad 'kern' section header"_s;
 
 			for (uint16_t i = 0; i < kerning_count; ++i)
 			{
 				Ytf1Kerning kerning;
 				if (!reader.read(kerning))
-					throw BadTextureFont("Bad 'kern' section entry " + std::to_string(i));
+					throw ResourceError(allocator) << "Bad 'kern' section entry "_s << i;
 				font->_kernings[{kerning.first, kerning.second}] = kerning.amount;
 			}
 		}
