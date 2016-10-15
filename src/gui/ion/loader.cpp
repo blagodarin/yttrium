@@ -1,7 +1,7 @@
 #include "loader.h"
 
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resources.h>
+#include <yttrium/io/resource_manager.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>

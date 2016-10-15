@@ -2,7 +2,7 @@
 
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resources.h>
+#include <yttrium/io/resource_manager.h>
 #include <yttrium/memory/shared_ptr.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/string.h>

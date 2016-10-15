@@ -1,6 +1,7 @@
 #include "manager.h"
 
 #include <yttrium/io/reader.h>
+#include <yttrium/io/resource_manager.h>
 #include <yttrium/log.h>
 #include "sound.h"
 
@@ -44,11 +45,10 @@ namespace Yttrium
 	}
 
 	AudioManagerImpl::AudioManagerImpl(const ResourceManager& resource_manager, const StaticString& backend, const StaticString& device, Allocator& allocator)
-		: _allocator(allocator)
+		: _resource_manager(resource_manager)
+		, _allocator(allocator)
 		, _backend(AudioBackend::create(backend, device, _allocator))
-		, _player(resource_manager, _backend->create_player(), _allocator)
-		, _sounds(_allocator)
-		, _instance_guard(this, "Duplicate AudioManager construction")
+		, _player(_resource_manager, _backend->create_player(), _allocator)
 	{
 	}
 
@@ -77,7 +77,7 @@ namespace Yttrium
 		if (i != _sounds.end())
 			return SharedPtr<Sound>(*i->second.first, i->second.second);
 
-		const auto reader = AudioReader::open(Reader(name), AudioType::Auto, _allocator);
+		const auto reader = AudioReader::open(_resource_manager.open(name), AudioType::Auto, _allocator);
 		if (!reader)
 			return {};
 

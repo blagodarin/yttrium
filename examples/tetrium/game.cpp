@@ -3,7 +3,7 @@
 #include <yttrium/audio/player.h>
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resources.h>
+#include <yttrium/io/resource_manager.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>

@@ -1,4 +1,4 @@
-#include <yttrium/io/resources.h>
+#include <yttrium/io/resource_manager.h>
 
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>

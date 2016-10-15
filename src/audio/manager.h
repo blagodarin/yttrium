@@ -31,11 +31,12 @@ namespace Yttrium
 		void delete_sound(const String& name);
 
 	private:
+		const ResourceManager& _resource_manager;
 		Allocator& _allocator;
 		const UniquePtr<AudioBackend> _backend;
 		AudioPlayerImpl _player;
-		StdMap<String, std::pair<Allocator*, Sound*>> _sounds;
-		AudioManagerGuard _instance_guard;
+		StdMap<String, std::pair<Allocator*, Sound*>> _sounds{ _allocator };
+		AudioManagerGuard _instance_guard{ this, "Duplicate AudioManager construction" };
 	};
 }
 

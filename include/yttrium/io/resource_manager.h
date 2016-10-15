@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_io_resources_h_
-#define _include_yttrium_io_resources_h_
+#ifndef _include_yttrium_io_resource_manager_h_
+#define _include_yttrium_io_resource_manager_h_
 
 #include <yttrium/io/package.h>
 
