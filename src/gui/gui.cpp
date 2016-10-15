@@ -1,5 +1,7 @@
 #include <yttrium/gui.h>
 
+#include <yttrium/io/reader.h>
+#include <yttrium/io/resource_manager.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_cache.h>
@@ -72,10 +74,14 @@ namespace Yttrium
 			return;
 		}
 
-		auto&& font = TextureFont::load(font_source, _allocator);
-		if (!font)
+		UniquePtr<TextureFont> font;
+		try
 		{
-			Log() << "Can't load \""_s << font_source << "\""_s;
+			font = TextureFont::load(_resource_manager.open(font_source), _allocator);
+		}
+		catch (const BadTextureFont& e)
+		{
+			Log() << "Can't load \""_s << font_source << "\": "_s << e.what();
 			return;
 		}
 

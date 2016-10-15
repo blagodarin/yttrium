@@ -1,4 +1,5 @@
 #include <yttrium/io/file.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/renderer/texture_font.h>
 #include <yttrium/static_string.h>
 
@@ -67,6 +68,6 @@ BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
 
 	BOOST_REQUIRE(file.flush());
 
-	const auto& font = TextureFont::load(file.name(), *DefaultAllocator);
+	const auto font = TextureFont::load(Reader(file.name()), *DefaultAllocator);
 	BOOST_REQUIRE(font);
 }

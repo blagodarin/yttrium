@@ -117,59 +117,39 @@ namespace Yttrium
 		friend TextureFont;
 	};
 
-	UniquePtr<TextureFont> TextureFont::load(const StaticString& name, Allocator& allocator)
+	UniquePtr<TextureFont> TextureFont::load(Reader&& reader, Allocator& allocator)
 	{
-		Reader reader(name);
 		if (!reader)
-		{
-			Log() << "("_s << name << ") Bad file"_s;
-			return {};
-		}
+			throw BadTextureFont("Bad file");
+
+		reader.seek(0);
 
 		uint32_t fourcc = 0;
 		if (!reader.read(fourcc) || fourcc != FourccYtf1)
-		{
-			Log() << "("_s << name << ") Bad 'YTF1' fourcc"_s;
-			return {};
-		}
+			throw BadTextureFont("Bad 'YTF1' fourcc");
 
 		if (!reader.read(fourcc) || fourcc != FourccFont)
-		{
-			Log() << "("_s << name << ") Bad 'font' section fourcc"_s;
-			return {};
-		}
+			throw BadTextureFont("Bad 'font' section fourcc");
 
 		Ytf1Font font_section;
 		if (!reader.read(font_section))
-		{
-			Log() << "("_s << name << ") Bad 'font' section"_s;
-			return {};
-		}
+			throw BadTextureFont("Bad 'font' section");
 
 		if (!reader.read(fourcc) || fourcc != FourccChar)
-		{
-			Log() << "("_s << name << ") Bad 'char' section fourcc"_s;
-			return {};
-		}
+			throw BadTextureFont("Bad 'char' section fourcc");
 
 		uint8_t char_count = 0;
 		if (!reader.read(char_count))
-		{
-			Log() << "("_s << name << ") Bad 'char' section header"_s;
-			return {};
-		}
+			throw BadTextureFont("Bad 'char' section header");
 
-		auto&& font = make_unique<TextureFontImpl>(allocator, allocator, font_section.size);
+		auto font = make_unique<TextureFontImpl>(allocator, allocator, font_section.size);
 
 		Size font_rect_size;
 		for (uint8_t i = 0; i < char_count; ++i)
 		{
 			Ytf1Char char_data;
 			if (!reader.read(char_data))
-			{
-				Log() << "("_s << name << ") Bad 'char' section entry "_s << i;
-				return {};
-			}
+				throw BadTextureFont("Bad 'char' section entry " + std::to_string(i));
 
 			CharInfo info;
 			info.rect = {{font_section.base_x + char_data.x, font_section.base_y + char_data.y}, Size(char_data.width, char_data.height)};
@@ -184,26 +164,17 @@ namespace Yttrium
 		if (reader.read(fourcc))
 		{
 			if (fourcc != FourccKern)
-			{
-				Log() << "("_s << name << ") Bad 'kern' section fourcc"_s;
-				return {};
-			}
+				throw BadTextureFont("Bad 'kern' section fourcc");
 
 			uint16_t kerning_count = 0;
 			if (!reader.read(kerning_count))
-			{
-				Log() << "("_s << name << ") Bad 'kern' section header"_s;
-				return {};
-			}
+				throw BadTextureFont("Bad 'kern' section header");
 
 			for (uint16_t i = 0; i < kerning_count; ++i)
 			{
 				Ytf1Kerning kerning;
 				if (!reader.read(kerning))
-				{
-					Log() << "("_s << name << ") Bad 'kern' section entry "_s << i;
-					return {};
-				}
+					throw BadTextureFont("Bad 'kern' section entry " + std::to_string(i));
 				font->_kernings[{kerning.first, kerning.second}] = kerning.amount;
 			}
 		}
