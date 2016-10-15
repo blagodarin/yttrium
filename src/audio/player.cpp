@@ -1,7 +1,7 @@
 #include "player.h"
 
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 #include "backend.h"
 #include "playlist.h"
 
@@ -12,8 +12,8 @@ namespace Yttrium
 		FetchDelay = 300, ///< 300 ms interval between the successive fetches.
 	};
 
-	AudioPlayerImpl::AudioPlayerImpl(const ResourceManager& resource_manager, UniquePtr<AudioPlayerBackend>&& backend, Allocator& allocator)
-		: _resource_manager(resource_manager)
+	AudioPlayerImpl::AudioPlayerImpl(const Storage& storage, UniquePtr<AudioPlayerBackend>&& backend, Allocator& allocator)
+		: _storage(storage)
 		, _allocator(allocator)
 		, _playlist(_allocator)
 		, _backend(std::move(backend))
@@ -74,7 +74,7 @@ namespace Yttrium
 				AudioPlaylist::Item item(_allocator);
 
 				if (_playlist.next(&item)
-					&& _streamer.open(_resource_manager.open(item.name), item.settings, item.type, _playlist.order()))
+					&& _streamer.open(_storage.open(item.name), item.settings, item.type, _playlist.order()))
 				{
 					_streamer.prefetch();
 					_backend->play();
@@ -95,7 +95,7 @@ namespace Yttrium
 								if (fetch_result != AudioStreamer::Ok)
 								{
 									if (_playlist.next(&item)
-										&& _streamer.open(_resource_manager.open(item.name), item.settings, item.type, _playlist.order()))
+										&& _streamer.open(_storage.open(item.name), item.settings, item.type, _playlist.order()))
 									{
 										if (fetch_result == AudioStreamer::NoMoreData)
 										{

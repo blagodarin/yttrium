@@ -1,7 +1,7 @@
 #include "loader.h"
 
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -121,7 +121,7 @@ namespace Yttrium
 	void GuiIonLoader::load_impl(const StaticString& source_name)
 	{
 		IonDocument document(_allocator);
-		if (!document.load(_gui.resource_manager().open(source_name)))
+		if (!document.load(_gui.storage().open(source_name)))
 			throw GuiError(_allocator) << "Can't load \""_s << source_name << "\"..."_s;
 		try
 		{

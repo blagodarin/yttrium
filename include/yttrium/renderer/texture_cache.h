@@ -9,8 +9,8 @@
 namespace Yttrium
 {
 	class Renderer;
-	class ResourceManager;
 	class StaticString;
+	class Storage;
 	class Texture2D;
 
 	template <typename> class SharedPtr;
@@ -21,7 +21,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<TextureCache> create(const ResourceManager&, Renderer&);
+		static UniquePtr<TextureCache> create(const Storage&, Renderer&);
 
 		TextureCache() = default;
 		virtual ~TextureCache() = default;

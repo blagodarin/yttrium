@@ -10,7 +10,7 @@
 namespace Yttrium
 {
 	class AudioPlayer;
-	class ResourceManager;
+	class Storage;
 
 	template <typename> class UniquePtr;
 
@@ -26,7 +26,7 @@ namespace Yttrium
 		static StdVector<StaticString> backend_devices(const StaticString& backend, Allocator& = *DefaultAllocator);
 
 		///
-		static UniquePtr<AudioManager> create(const ResourceManager&, const StaticString& backend = {}, const StaticString& device = {}, Allocator& = *DefaultAllocator);
+		static UniquePtr<AudioManager> create(const Storage&, const StaticString& backend = {}, const StaticString& device = {}, Allocator& = *DefaultAllocator);
 
 		AudioManager() = default;
 		virtual ~AudioManager() = default;

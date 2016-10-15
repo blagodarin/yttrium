@@ -2,16 +2,16 @@
 
 #include <yttrium/i18n/localization.h>
 #include <yttrium/image.h>
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 
 int main()
 {
 	Log::set_file("tetrium.log");
 
-	NamedAllocator resources_allocator("resources");
-	ResourceManager resource_manager(ResourceManager::UseFileSystem::Never, resources_allocator);
-	if (!resource_manager.attach_package("tetrium.ypq"))
+	NamedAllocator storage_allocator("storage");
+	Storage storage(Storage::UseFileSystem::Never, storage_allocator);
+	if (!storage.attach_package("tetrium.ypq"))
 		return 1;
 
 	NamedAllocator i18n_allocator("i18n");
@@ -43,12 +43,12 @@ int main()
 			}
 		}
 
-		resource_manager.attach_buffer("examples/tetrium/data/blocks.tga", image.to_buffer(ImageType::Tga));
+		storage.attach_buffer("examples/tetrium/data/blocks.tga", image.to_buffer(ImageType::Tga));
 	}
 
 	try
 	{
-		Game game(resource_manager);
+		Game game(storage);
 		game.run();
 		return 0;
 	}

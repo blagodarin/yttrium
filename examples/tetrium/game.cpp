@@ -3,7 +3,7 @@
 #include <yttrium/audio/player.h>
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
@@ -20,8 +20,8 @@
 #include <yttrium/script/value.h>
 #include <yttrium/time.h>
 
-Game::Game(ResourceManager& resource_manager)
-	: _resource_manager(resource_manager)
+Game::Game(Storage& storage)
+	: _storage(storage)
 	, _statistics({
 			{100000, String("John Placeholder", &_allocator)},
 			{50000, String("John Placeholder", &_allocator)},
@@ -187,7 +187,7 @@ void Game::run()
 	if (_audio)
 	{
 		IonDocument data(_allocator);
-		if (data.load(_resource_manager.open("data/music.ion")))
+		if (data.load(_storage.open("data/music.ion")))
 		{
 			for (const IonValue& value : data.root().last("music"))
 			{

@@ -11,12 +11,12 @@
 
 namespace Yttrium
 {
-	class ResourceManager;
+	class Storage;
 
 	class AudioPlayerImpl : public AudioPlayer
 	{
 	public:
-		AudioPlayerImpl(const ResourceManager&, UniquePtr<AudioPlayerBackend>&&, Allocator&);
+		AudioPlayerImpl(const Storage&, UniquePtr<AudioPlayerBackend>&&, Allocator&);
 		~AudioPlayerImpl() override;
 
 		void load(const StaticString& name, const Settings& settings, AudioType type) override;
@@ -46,7 +46,7 @@ namespace Yttrium
 			Exit,
 		};
 
-		const ResourceManager& _resource_manager;
+		const Storage& _storage;
 		Allocator& _allocator;
 		AudioPlaylist _playlist;
 		ThreadBuffer<Action> _action;

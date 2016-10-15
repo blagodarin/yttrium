@@ -1,4 +1,4 @@
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
@@ -9,7 +9,7 @@
 
 namespace Yttrium
 {
-	struct ResourceAttachment
+	struct StorageAttachment
 	{
 		enum class Type
 		{
@@ -22,13 +22,13 @@ namespace Yttrium
 		String buffer_name{ &NoAllocator };
 		std::shared_ptr<const Buffer> buffer;
 
-		ResourceAttachment(UniquePtr<PackageReader>&& package)
+		StorageAttachment(UniquePtr<PackageReader>&& package)
 			: type(Type::Package)
 			, package(std::move(package))
 		{
 		}
 
-		ResourceAttachment(String&& name, Buffer&& buffer)
+		StorageAttachment(String&& name, Buffer&& buffer)
 			: type(Type::Buffer)
 			, buffer_name(std::move(name))
 			, buffer(std::make_shared<const Buffer>(std::move(buffer)))
@@ -36,10 +36,10 @@ namespace Yttrium
 		}
 	};
 
-	class ResourceManagerPrivate
+	class StoragePrivate
 	{
 	public:
-		ResourceManagerPrivate(ResourceManager::UseFileSystem use_file_system, Allocator& allocator)
+		StoragePrivate(Storage::UseFileSystem use_file_system, Allocator& allocator)
 			: _allocator(allocator)
 			, _use_file_system(use_file_system)
 		{
@@ -47,7 +47,7 @@ namespace Yttrium
 
 		Reader open(const StaticString& name) const
 		{
-			if (_use_file_system == ResourceManager::UseFileSystem::Before)
+			if (_use_file_system == Storage::UseFileSystem::Before)
 			{
 				Reader reader(name);
 				if (reader)
@@ -56,19 +56,19 @@ namespace Yttrium
 			// TODO: Build a single name-to-resource map for the entire resource system.
 			for (const auto& attachment : _attachments)
 			{
-				if (attachment.type == ResourceAttachment::Type::Package)
+				if (attachment.type == StorageAttachment::Type::Package)
 				{
 					auto reader = attachment.package->open(name);
 					if (reader)
 						return reader;
 				}
-				else if (attachment.type == ResourceAttachment::Type::Buffer)
+				else if (attachment.type == StorageAttachment::Type::Buffer)
 				{
 					if (attachment.buffer_name == name)
 						return Reader(std::make_shared<BufferReader>(attachment.buffer, attachment.buffer_name));
 				}
 			}
-			if (_use_file_system == ResourceManager::UseFileSystem::After)
+			if (_use_file_system == Storage::UseFileSystem::After)
 			{
 				Reader reader(name);
 				if (reader)
@@ -79,23 +79,23 @@ namespace Yttrium
 
 	private:
 		Allocator& _allocator;
-		const ResourceManager::UseFileSystem _use_file_system;
-		StdVector<ResourceAttachment> _attachments{ _allocator };
+		const Storage::UseFileSystem _use_file_system;
+		StdVector<StorageAttachment> _attachments{ _allocator };
 
-		friend ResourceManager;
+		friend Storage;
 	};
 
-	ResourceManager::ResourceManager(UseFileSystem use_file_system, Allocator& allocator)
-		: _private(std::make_unique<ResourceManagerPrivate>(use_file_system, allocator))
+	Storage::Storage(UseFileSystem use_file_system, Allocator& allocator)
+		: _private(std::make_unique<StoragePrivate>(use_file_system, allocator))
 	{
 	}
 
-	void ResourceManager::attach_buffer(const StaticString& name, Buffer&& buffer)
+	void Storage::attach_buffer(const StaticString& name, Buffer&& buffer)
 	{
 		_private->_attachments.emplace_back(String(name, &_private->_allocator), std::move(buffer));
 	}
 
-	bool ResourceManager::attach_package(const StaticString& path, PackageType type)
+	bool Storage::attach_package(const StaticString& path, PackageType type)
 	{
 		auto package = PackageReader::create(path, type, _private->_allocator);
 		if (!package)
@@ -107,10 +107,10 @@ namespace Yttrium
 		return true;
 	}
 
-	Reader ResourceManager::open(const StaticString& name) const
+	Reader Storage::open(const StaticString& name) const
 	{
 		return _private->open(name);
 	}
 
-	ResourceManager::~ResourceManager() = default;
+	Storage::~Storage() = default;
 }

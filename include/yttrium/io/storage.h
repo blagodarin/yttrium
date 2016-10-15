@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_io_resource_manager_h_
-#define _include_yttrium_io_resource_manager_h_
+#ifndef _include_yttrium_io_storage_h_
+#define _include_yttrium_io_storage_h_
 
 #include <yttrium/io/package.h>
 
@@ -13,8 +13,8 @@ namespace Yttrium
 	class Buffer;
 	class Reader;
 
-	/// Resource manager.
-	class Y_API ResourceManager
+	///
+	class Y_API Storage
 	{
 	public:
 		///
@@ -26,22 +26,22 @@ namespace Yttrium
 		};
 
 		///
-		ResourceManager(UseFileSystem, Allocator& = *DefaultAllocator);
+		Storage(UseFileSystem, Allocator& = *DefaultAllocator);
 
-		/// Attaches a buffer to the resource system.
+		/// Attaches a buffer to the storage.
 		void attach_buffer(const StaticString& name, Buffer&&);
 
-		/// Attaches a package to the resource system.
+		/// Attaches a package to the storage.
 		bool attach_package(const StaticString& path, PackageType = PackageType::Auto);
 
 		/// Opens a resource.
 		Reader open(const StaticString& name) const;
 
 	private:
-		const std::unique_ptr<class ResourceManagerPrivate> _private;
+		const std::unique_ptr<class StoragePrivate> _private;
 
 	public:
-		~ResourceManager();
+		~Storage();
 	};
 }
 

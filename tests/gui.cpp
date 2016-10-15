@@ -1,5 +1,5 @@
 #include <yttrium/gui.h>
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/script/context.h>
 #include <yttrium/string.h>
@@ -11,10 +11,10 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_gui)
 {
-	ResourceManager resource_manager(ResourceManager::UseFileSystem::Before);
+	Storage storage(Storage::UseFileSystem::Before);
 	WindowCallbacks window_callbacks;
 	Window window("GUI test", window_callbacks);
 	ScriptContext script_context;
-	Gui gui(resource_manager, window.renderer(), script_context);
+	Gui gui(storage, window.renderer(), script_context);
 	BOOST_REQUIRE(gui.load("tests/gui/gui.ion"));
 }

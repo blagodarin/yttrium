@@ -2,7 +2,7 @@
 
 #include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_manager.h>
+#include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_cache.h>
@@ -14,12 +14,12 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(const ResourceManager& resource_manager, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _resource_manager(resource_manager)
+	GuiPrivate::GuiPrivate(const Storage& storage, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _storage(storage)
 		, _renderer(renderer)
 		, _script_context(script_context)
 		, _allocator(allocator)
-		, _texture_cache(TextureCache::create(_resource_manager, _renderer))
+		, _texture_cache(TextureCache::create(_storage, _renderer))
 		, _fonts(_allocator)
 		, _layers(_allocator)
 		, _layer_stack(_allocator)
@@ -78,7 +78,7 @@ namespace Yttrium
 		UniquePtr<TextureFont> font;
 		try
 		{
-			font = TextureFont::load(_resource_manager.open(font_source), _allocator);
+			font = TextureFont::load(_storage.open(font_source), _allocator);
 		}
 		catch (const ResourceError& e)
 		{
@@ -96,8 +96,8 @@ namespace Yttrium
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 
-	Gui::Gui(const ResourceManager& resource_manager, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<GuiPrivate>(allocator, resource_manager, renderer, script_context, allocator))
+	Gui::Gui(const Storage& storage, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<GuiPrivate>(allocator, storage, renderer, script_context, allocator))
 	{
 	}
 
