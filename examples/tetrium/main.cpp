@@ -1,6 +1,5 @@
 #include "game.h"
 
-#include <yttrium/i18n/localization.h>
 #include <yttrium/image.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>
@@ -13,9 +12,6 @@ int main()
 	Storage storage(Storage::UseFileSystem::Never, storage_allocator);
 	if (!storage.attach_package("tetrium.ypq"))
 		return 1;
-
-	NamedAllocator i18n_allocator("i18n");
-	const auto& localization = Localization::create("examples/tetrium/i18n/en.ion", i18n_allocator);
 
 	{
 		constexpr auto button_size = 16;

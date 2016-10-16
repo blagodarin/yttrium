@@ -142,6 +142,7 @@ namespace Yttrium
 			{"font"_s, &GuiIonLoader::load_font},
 			{"include"_s, &GuiIonLoader::load_include},
 			{"layer"_s, &GuiIonLoader::load_layer},
+			{"translation"_s, &GuiIonLoader::load_translation},
 		};
 
 		unsigned attributes = 0;
@@ -237,6 +238,14 @@ namespace Yttrium
 			if (!(this->*i->second.first)(layer, layer_node, i->second.second))
 				throw GuiError(_allocator) << "Bad '"_s << node.name() << "' '"_s << layer_node.name() << "'"_s;
 		}
+	}
+
+	void GuiIonLoader::load_translation(const IonNode& node, unsigned)
+	{
+		const StaticString* path;
+		if (!Ion::get(node, path))
+			throw GuiError(_allocator) << "Bad 'translation'"_s;
+		_gui.set_translation(*path);
 	}
 
 	bool GuiIonLoader::load_layer_action(GuiLayer& layer, const IonNode& node, int extra) const

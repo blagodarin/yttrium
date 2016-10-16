@@ -6,20 +6,19 @@
 
 #include <yttrium/memory/global.h>
 
+#include <memory>
+
 namespace Yttrium
 {
-	class Localization;
 	class StaticString;
-
-	template <typename> class UniquePtr;
+	class String;
 
 	///
 	class Y_API Translation
 	{
 	public:
-
 		///
-		static UniquePtr<Translation> open(const StaticString& file_name, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<Translation> open(const StaticString& path, Allocator& = *DefaultAllocator);
 
 		Translation() = default;
 		virtual ~Translation() = default;
@@ -31,7 +30,10 @@ namespace Yttrium
 		virtual void remove_obsolete() = 0;
 
 		///
-		virtual bool save(const StaticString& file_name) const = 0;
+		virtual bool save(const StaticString& path) const = 0;
+
+		///
+		virtual String translate(const StaticString& source) const = 0;
 	};
 }
 

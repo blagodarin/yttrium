@@ -1,3 +1,5 @@
+translation "examples/tetrium/i18n/en.ion"
+
 default font
 {
 	file    "data/font.ytf"

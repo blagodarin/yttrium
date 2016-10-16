@@ -26,6 +26,7 @@ namespace Yttrium
 		void load_font(const IonNode&, unsigned attributes);
 		void load_include(const IonNode&, unsigned attributes);
 		void load_layer(const IonNode&, unsigned attributes);
+		void load_translation(const IonNode&, unsigned attributes);
 
 		bool load_layer_action(GuiLayer&, const IonNode&, int extra) const;
 		bool load_layer_layout(GuiLayer&, const IonNode&, int extra) const;

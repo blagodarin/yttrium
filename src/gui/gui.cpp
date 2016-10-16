@@ -1,5 +1,6 @@
 #include <yttrium/gui.h>
 
+#include <yttrium/i18n/translation.h>
 #include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
@@ -20,10 +21,7 @@ namespace Yttrium
 		, _script_context(script_context)
 		, _allocator(allocator)
 		, _texture_cache(TextureCache::create(_storage, _renderer))
-		, _fonts(_allocator)
 		, _layers(_allocator)
-		, _layer_stack(_allocator)
-		, _canvas_handlers(_allocator)
 	{
 	}
 
@@ -44,6 +42,15 @@ namespace Yttrium
 			_layer_stack.push_back(layer.get());
 		}
 		return *_layers.emplace(layer_name, std::move(layer)).first->second;
+	}
+
+	void GuiPrivate::set_translation(const StaticString& path)
+	{
+		if (_translation)
+			throw GuiError(_allocator) << "Only one translation is allowed"_s;
+		_translation = Translation::open(path, _allocator);
+		if (!_translation)
+			throw GuiError(_allocator) << "Bad translation \""_s << path << "\""_s;
 	}
 
 	void GuiPrivate::clear()
@@ -94,6 +101,11 @@ namespace Yttrium
 
 		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
+	}
+
+	String GuiPrivate::translate(const StaticString& source) const
+	{
+		return _translation ? _translation->translate(source) : String(source, &_allocator);
 	}
 
 	Gui::Gui(const Storage& storage, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)

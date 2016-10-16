@@ -1,7 +1,6 @@
 #include "property_loader.h"
 
 #include <yttrium/audio/sound.h>
-#include <yttrium/i18n/localization.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
@@ -359,7 +358,7 @@ namespace Yttrium
 		if (tr_value.type() != IonValue::Type::String)
 			return false;
 
-		*text = Localization::localize(tr_value.string());
+		*text = _gui.translate(tr_value.string());
 		return true;
 	}
 
