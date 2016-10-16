@@ -24,10 +24,10 @@ namespace Yttrium
 		~AudioManagerImpl() override;
 
 		StaticString backend() const override;
+		SharedPtr<Sound> create_sound(const StaticString&) override;
 		StaticString device() const override;
 		AudioPlayer& player() override { return _player; }
 
-		SharedPtr<Sound> create_sound(const StaticString& name);
 		void delete_sound(const String& name);
 
 	private:

@@ -62,13 +62,6 @@ namespace Yttrium
 		return _backend->backend();
 	}
 
-	StaticString AudioManagerImpl::device() const
-	{
-		return _backend->device();
-	}
-
-	// TODO: Lock the instance mutex outside these functions.
-
 	SharedPtr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
 	{
 		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
@@ -88,6 +81,13 @@ namespace Yttrium
 		_sounds.emplace(sound->name(), std::make_pair(&_allocator, sound.get()));
 		return std::move(sound);
 	}
+
+	StaticString AudioManagerImpl::device() const
+	{
+		return _backend->device();
+	}
+
+	// TODO: Lock the instance mutex outside of this function.
 
 	void AudioManagerImpl::delete_sound(const String& name)
 	{

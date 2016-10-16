@@ -3,6 +3,7 @@
 #include <yttrium/i18n/translation.h>
 #include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
+#include <yttrium/io/resource_loader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
@@ -15,12 +16,12 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(const Storage& storage, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _storage(storage)
+	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _resource_loader(resource_loader)
 		, _renderer(renderer)
 		, _script_context(script_context)
 		, _allocator(allocator)
-		, _texture_cache(TextureCache::create(_storage, _renderer))
+		, _texture_cache(TextureCache::create(_resource_loader.storage(), _renderer))
 		, _layers(_allocator)
 	{
 	}
@@ -85,7 +86,7 @@ namespace Yttrium
 		UniquePtr<TextureFont> font;
 		try
 		{
-			font = TextureFont::load(_storage.open(font_source), _allocator);
+			font = TextureFont::load(_resource_loader.storage().open(font_source), _allocator);
 		}
 		catch (const ResourceError& e)
 		{
@@ -103,13 +104,18 @@ namespace Yttrium
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 
+	const Storage& GuiPrivate::storage() const
+	{
+		return _resource_loader.storage();
+	}
+
 	String GuiPrivate::translate(const StaticString& source) const
 	{
 		return _translation ? _translation->translate(source) : String(source, &_allocator);
 	}
 
-	Gui::Gui(const Storage& storage, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<GuiPrivate>(allocator, storage, renderer, script_context, allocator))
+	Gui::Gui(ResourceLoader& resource_loader, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<GuiPrivate>(allocator, resource_loader, renderer, script_context, allocator))
 	{
 	}
 

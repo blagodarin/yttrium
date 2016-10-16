@@ -5,6 +5,7 @@
 #include <yttrium/bindings.h>
 #include <yttrium/console.h>
 #include <yttrium/gui.h>
+#include <yttrium/io/resource_loader.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/memory/named_allocator.h>
@@ -46,6 +47,7 @@ private:
 
 private:
 	const Storage& _storage;
+	ResourceLoader _resource_loader{ _storage };
 	NamedAllocator _allocator{ "game" };
 	StdVector<NamedAllocatorInfo> _memory_statistics{ _allocator };
 	NamedAllocator _script_allocator{ "script" };
@@ -58,7 +60,7 @@ private:
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024, &_allocator };
 	NamedAllocator _gui_allocator{ "gui" };
-	Gui _gui{ _storage, _window.renderer(), _script, _gui_allocator };
+	Gui _gui{ _resource_loader, _window.renderer(), _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };
 	Blocks _blocks{ _window.renderer() };
 	Bindings _bindings{ _script, _allocator };

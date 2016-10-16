@@ -1,6 +1,7 @@
 #include "property_loader.h"
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/io/resource_loader.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
@@ -259,18 +260,29 @@ namespace Yttrium
 
 	SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
 	{
+		const auto load_sound_node = [this](const IonNode& node) -> SharedPtr<Sound>
+		{
+			const auto& values = node.values();
+			if (values.size() != 1)
+				return {};
+			const StaticString* value;
+			if (!values->get(&value))
+				return {};
+			return _gui.resource_loader().load_sound(*value);
+		};
+
 		if (_bound_object)
 		{
 			const IonNode& node = _bound_object->last(name);
 			if (node.exists())
-				return load_sound(node);
+				return load_sound_node(node);
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
 			if (node.exists())
-				return load_sound(node);
+				return load_sound_node(node);
 		}
 
 		return {};
@@ -462,20 +474,6 @@ namespace Yttrium
 			return false; // TODO: Throw.
 		size = {elements[0], elements[1]};
 		return true;
-	}
-
-	SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const IonNode& node)
-	{
-		const auto& values = node.values();
-
-		if (values.size() != 1)
-			return {};
-
-		const StaticString* value;
-		if (!values->get(&value))
-			return {};
-
-		return Sound::create(*value);
 	}
 
 	bool GuiIonPropertyLoader::load_state(WidgetState* state, const IonNode& node)

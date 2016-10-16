@@ -10,8 +10,9 @@
 namespace Yttrium
 {
 	class AudioPlayer;
+	template <typename> class SharedPtr;
+	class Sound;
 	class Storage;
-
 	template <typename> class UniquePtr;
 
 	/// Audio manager.
@@ -33,6 +34,9 @@ namespace Yttrium
 
 		/// Returns the current backend name.
 		virtual StaticString backend() const = 0;
+
+		///
+		virtual SharedPtr<Sound> create_sound(const StaticString& name) = 0;
 
 		/// Returns the current backend device name.
 		virtual StaticString device() const = 0;

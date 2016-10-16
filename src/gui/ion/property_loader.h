@@ -37,7 +37,6 @@ namespace Yttrium
 		static bool load_alignment(unsigned* alignment, const IonNode& node);
 		static bool load_margins(Margins* margins, const IonNode& node);
 		static bool load_size(SizeF& size, const IonNode& node);
-		static SharedPtr<Sound> load_sound(const IonNode& node);
 		static bool load_state(WidgetState* state, const IonNode& node);
 		static bool load_text(const StaticString** text, const IonNode& node);
 		static bool load_texture(SharedPtr<Texture2D>* texture, const IonNode& node, TextureCache& texture_cache, Texture2D::Filter default_filter);

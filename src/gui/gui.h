@@ -14,6 +14,7 @@ namespace Yttrium
 	class Gui;
 	class GuiLayer;
 	class Renderer;
+	class ResourceLoader;
 	class ScriptContext;
 	class Storage;
 	class String;
@@ -38,7 +39,7 @@ namespace Yttrium
 			}
 		};
 
-		GuiPrivate(const Storage&, Renderer&, ScriptContext&, Allocator&);
+		GuiPrivate(ResourceLoader&, Renderer&, ScriptContext&, Allocator&);
 		~GuiPrivate();
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
@@ -46,7 +47,8 @@ namespace Yttrium
 		void clear();
 		const FontDesc* font(const StaticString& name) const;
 		void render_canvas(const StaticString& name, const RectF&) const;
-		const Storage& storage() const { return _storage; }
+		ResourceLoader& resource_loader() const { return _resource_loader; }
+		const Storage& storage() const;
 		ScriptContext& script_context() const { return _script_context; }
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 		void set_translation(const StaticString& path);
@@ -54,7 +56,7 @@ namespace Yttrium
 		String translate(const StaticString&) const;
 
 	private:
-		const Storage& _storage;
+		ResourceLoader& _resource_loader;
 		Renderer& _renderer;
 		ScriptContext& _script_context;
 		Allocator& _allocator;

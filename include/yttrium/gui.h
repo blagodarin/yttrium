@@ -14,16 +14,16 @@ namespace Yttrium
 	class PointF;
 	class RectF;
 	class Renderer;
+	class ResourceLoader;
 	class ScriptContext;
 	class StaticString;
-	class Storage;
 
 	/// GUI manager.
 	class Y_API Gui
 	{
 	public:
 		///
-		Gui(const Storage&, Renderer&, ScriptContext&, Allocator& = *DefaultAllocator);
+		Gui(ResourceLoader&, Renderer&, ScriptContext&, Allocator& = *DefaultAllocator);
 
 		///
 		void clear();
