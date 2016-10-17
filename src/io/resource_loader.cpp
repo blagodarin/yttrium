@@ -3,10 +3,13 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/image.h>
+#include <yttrium/log.h>
+#include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/renderer/texture_font.h>
 
 namespace Yttrium
 {
@@ -49,6 +52,19 @@ namespace Yttrium
 		if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 			image.intensity_to_bgra();
 		return _private->_renderer->create_texture_2d(image.format(), image.data());
+	}
+
+	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
+	{
+		try
+		{
+			return TextureFont::load(_private->_storage.open(name), *DefaultAllocator); // TODO: Remove explicit DefaultAllocator.
+		}
+		catch (const ResourceError& e)
+		{
+			Log() << "Can't load \""_s << name << "\": "_s << e.what();
+			return {};
+		}
 	}
 
 	const Storage& ResourceLoader::storage() const

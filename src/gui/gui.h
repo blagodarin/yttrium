@@ -32,7 +32,7 @@ namespace Yttrium
 
 			FontDesc() = default;
 
-			FontDesc(UniquePtr<TextureFont>&& font, SharedPtr<Texture2D>&& texture)
+			FontDesc(SharedPtr<TextureFont>&& font, SharedPtr<Texture2D>&& texture)
 				: font(std::move(font))
 				, texture(std::move(texture))
 			{

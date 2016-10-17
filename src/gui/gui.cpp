@@ -76,23 +76,16 @@ namespace Yttrium
 
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
-		auto&& texture = _texture_cache->load_texture_2d(texture_name, true);
+		auto texture = _texture_cache->load_texture_2d(texture_name, true);
 		if (!texture)
 		{
-			Log() << "Can't load \""_s << texture_name << "\""_s;
+			Log() << "Can't load \""_s << texture_name << "\""_s; // TODO: Move to ResourceLoader.
 			return;
 		}
 
-		UniquePtr<TextureFont> font;
-		try
-		{
-			font = TextureFont::load(_resource_loader.storage().open(font_source), _allocator);
-		}
-		catch (const ResourceError& e)
-		{
-			Log() << "Can't load \""_s << font_source << "\": "_s << e.what();
+		auto font = _resource_loader.load_texture_font(font_source);
+		if (!font)
 			return;
-		}
 
 		if (!Rect(texture->size()).contains(font->rect()))
 		{

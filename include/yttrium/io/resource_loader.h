@@ -17,6 +17,7 @@ namespace Yttrium
 	class StaticString;
 	class Storage;
 	class Texture2D;
+	class TextureFont;
 
 	///
 	class Y_API ResourceLoader
@@ -30,6 +31,9 @@ namespace Yttrium
 
 		///
 		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
+
+		///
+		SharedPtr<TextureFont> load_texture_font(const StaticString& name);
 
 		///
 		const Storage& storage() const; // TODO: Remove.
