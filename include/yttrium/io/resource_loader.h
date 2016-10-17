@@ -11,26 +11,28 @@
 namespace Yttrium
 {
 	class AudioManager;
+	class Renderer;
 	template <typename> class SharedPtr;
 	class Sound;
 	class StaticString;
 	class Storage;
+	class Texture2D;
 
 	///
 	class Y_API ResourceLoader
 	{
 	public:
 		///
-		ResourceLoader(const Storage&);
+		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr);
 
 		///
 		SharedPtr<Sound> load_sound(const StaticString& name);
 
 		///
-		void set_audio_manager(AudioManager&);
+		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
 
 		///
-		const Storage& storage() const;
+		const Storage& storage() const; // TODO: Remove.
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;

@@ -47,7 +47,6 @@ private:
 
 private:
 	const Storage& _storage;
-	ResourceLoader _resource_loader{ _storage };
 	NamedAllocator _allocator{ "game" };
 	StdVector<NamedAllocatorInfo> _memory_statistics{ _allocator };
 	NamedAllocator _script_allocator{ "script" };
@@ -59,6 +58,7 @@ private:
 	Console _console{ _script, _allocator };
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024, &_allocator };
+	ResourceLoader _resource_loader{ _storage, &_window.renderer(), _audio.get() };
 	NamedAllocator _gui_allocator{ "gui" };
 	Gui _gui{ _resource_loader, _window.renderer(), _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };

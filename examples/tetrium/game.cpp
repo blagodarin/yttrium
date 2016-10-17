@@ -161,9 +161,6 @@ Game::Game(Storage& storage)
 			call.context.unset(value->to_string());
 	});
 
-	if (_audio)
-		_resource_loader.set_audio_manager(*_audio);
-
 	update_statistics();
 }
 

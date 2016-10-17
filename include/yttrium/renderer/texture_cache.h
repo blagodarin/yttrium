@@ -4,11 +4,11 @@
 #ifndef _include_yttrium_renderer_texture_cache_h_
 #define _include_yttrium_renderer_texture_cache_h_
 
-#include <yttrium/global.h>
+#include <yttrium/memory/global.h>
 
 namespace Yttrium
 {
-	class Renderer;
+	class ResourceLoader;
 	class StaticString;
 	class Storage;
 	class Texture2D;
@@ -21,7 +21,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<TextureCache> create(const Storage&, Renderer&);
+		static UniquePtr<TextureCache> create(ResourceLoader&, Allocator& = *DefaultAllocator);
 
 		TextureCache() = default;
 		virtual ~TextureCache() = default;

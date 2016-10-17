@@ -21,7 +21,7 @@ namespace Yttrium
 		, _renderer(renderer)
 		, _script_context(script_context)
 		, _allocator(allocator)
-		, _texture_cache(TextureCache::create(_resource_loader.storage(), _renderer))
+		, _texture_cache(TextureCache::create(_resource_loader, _allocator))
 		, _layers(_allocator)
 	{
 	}
