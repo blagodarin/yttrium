@@ -48,7 +48,7 @@ namespace Yttrium
 	{
 		if (_translation)
 			throw GuiError(_allocator) << "Only one translation is allowed"_s;
-		_translation = Translation::open(path, _allocator);
+		_translation = _resource_loader.load_translation(path, _allocator);
 		if (!_translation)
 			throw GuiError(_allocator) << "Bad translation \""_s << path << "\""_s;
 	}
@@ -82,7 +82,7 @@ namespace Yttrium
 			return;
 		}
 
-		auto font = _resource_loader.load_texture_font(font_source);
+		auto font = _resource_loader.load_texture_font(font_source, _allocator);
 		if (!font)
 			return;
 

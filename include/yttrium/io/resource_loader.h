@@ -19,6 +19,7 @@ namespace Yttrium
 	class Storage;
 	class Texture2D;
 	class TextureFont;
+	class Translation;
 
 	///
 	class Y_API ResourceLoader
@@ -37,7 +38,10 @@ namespace Yttrium
 		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
 
 		///
-		SharedPtr<TextureFont> load_texture_font(const StaticString& name);
+		SharedPtr<TextureFont> load_texture_font(const StaticString& name, Allocator& = *DefaultAllocator);
+
+		///
+		std::unique_ptr<const Translation> load_translation(const StaticString& name, Allocator& = *DefaultAllocator) const;
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;

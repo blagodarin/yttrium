@@ -4,6 +4,7 @@
 #include <yttrium/audio/sound.h>
 #include <yttrium/image.h>
 #include <yttrium/log.h>
+#include <yttrium/i18n/translation.h>
 #include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
@@ -61,17 +62,22 @@ namespace Yttrium
 		return _private->_renderer->create_texture_2d(image.format(), image.data());
 	}
 
-	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
+	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name, Allocator& allocator)
 	{
 		try
 		{
-			return TextureFont::load(_private->_storage.open(name), *DefaultAllocator); // TODO: Remove explicit DefaultAllocator.
+			return TextureFont::load(_private->_storage.open(name), allocator);
 		}
 		catch (const ResourceError& e)
 		{
 			Log() << "Can't load \""_s << name << "\": "_s << e.what();
 			return {};
 		}
+	}
+
+	std::unique_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name, Allocator& allocator) const
+	{
+		return Translation::open(_private->_storage.open(name), allocator);
 	}
 
 	ResourceLoader::~ResourceLoader() = default;

@@ -10,6 +10,7 @@
 
 namespace Yttrium
 {
+	class Reader;
 	class StaticString;
 	class String;
 
@@ -18,7 +19,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<Translation> open(const StaticString& path, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<Translation> open(const Reader&, Allocator& = *DefaultAllocator);
 
 		Translation() = default;
 		virtual ~Translation() = default;

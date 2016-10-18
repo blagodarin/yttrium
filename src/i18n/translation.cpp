@@ -19,7 +19,7 @@ namespace Yttrium
 		bool save(const StaticString& path) const override;
 		String translate(const StaticString& source) const override;
 
-		bool load(const StaticString& path);
+		bool load(const Reader&);
 
 	private:
 		struct Entry
@@ -69,10 +69,10 @@ namespace Yttrium
 		return document.save(file_name);
 	}
 
-	bool TranslationImpl::load(const StaticString& file_name)
+	bool TranslationImpl::load(const Reader& reader)
 	{
 		IonDocument document(_allocator);
-		if (!document.load(file_name))
+		if (!document.load(reader))
 			return false;
 		decltype(_translations) translations(_allocator);
 		const auto& root = document.root();
@@ -96,10 +96,9 @@ namespace Yttrium
 		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, &_allocator);
 	}
 
-	std::unique_ptr<Translation> Translation::open(const StaticString& file_name, Allocator& allocator)
+	std::unique_ptr<Translation> Translation::open(const Reader& reader, Allocator& allocator)
 	{
 		auto translation = std::make_unique<TranslationImpl>(allocator);
-		translation->load(file_name);
-		return std::move(translation);
+		return translation->load(reader) ? std::move(translation) : nullptr;
 	}
 }

@@ -186,10 +186,10 @@ void Game::run()
 
 	if (_audio)
 	{
-		IonDocument data(_allocator);
-		if (data.load(_storage.open("data/music.ion")))
+		const auto ion = _resource_loader.load_ion("data/music.ion", _allocator);
+		if (ion)
 		{
-			for (const IonValue& value : data.root().last("music"))
+			for (const IonValue& value : ion->root().last("music"))
 			{
 				const IonObject* entry = value.object();
 				if (!entry)
