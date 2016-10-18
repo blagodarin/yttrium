@@ -2,10 +2,10 @@
 
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_loader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/memory/shared_ptr.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/resource/loader.h>
 #include <yttrium/std/map.h>
 #include <yttrium/string.h>
 

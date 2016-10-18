@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_io_resource_loader_h_
-#define _include_yttrium_io_resource_loader_h_
+#ifndef _include_yttrium_resource_loader_h_
+#define _include_yttrium_resource_loader_h_
 
 #include <yttrium/memory/global.h>
 

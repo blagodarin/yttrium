@@ -3,11 +3,11 @@
 #include <yttrium/i18n/translation.h>
 #include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_loader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_cache.h>
+#include <yttrium/resource/loader.h>
 #include <yttrium/script/context.h>
 #include "exceptions.h"
 #include "gui.h"

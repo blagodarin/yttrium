@@ -1,12 +1,12 @@
 #include "property_loader.h"
 
 #include <yttrium/audio/sound.h>
-#include <yttrium/io/resource_loader.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/renderer/texture_cache.h>
+#include <yttrium/resource/loader.h>
 #include <yttrium/utils.h>
 #include "../gui.h"
 

@@ -179,6 +179,7 @@ src_paths = [
 	'memory',
 	'renderer',
 	'renderer/gl',
+	'resource',
 	'script',
 	'window',
 	'window/bindings']

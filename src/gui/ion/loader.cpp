@@ -1,7 +1,6 @@
 #include "loader.h"
 
 #include <yttrium/io/reader.h>
-#include <yttrium/io/resource_loader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
@@ -10,6 +9,7 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture_cache.h>
+#include <yttrium/resource/loader.h>
 #include "../exceptions.h"
 #include "../gui.h"
 #include "../layer.h"

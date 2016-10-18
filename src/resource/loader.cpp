@@ -1,4 +1,4 @@
-#include <yttrium/io/resource_loader.h>
+#include <yttrium/resource/loader.h>
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
