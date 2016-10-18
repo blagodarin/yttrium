@@ -23,7 +23,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Gui(ResourceLoader&, Renderer&, ScriptContext&, Allocator& = *DefaultAllocator);
+		Gui(ResourceLoader&, ScriptContext&, Allocator& = *DefaultAllocator);
 
 		///
 		void clear();
@@ -44,7 +44,7 @@ namespace Yttrium
 		bool push_layer(const StaticString& name);
 
 		///
-		void render(const PointF& cursor) const;
+		void render(Renderer&, const PointF& cursor) const;
 
 		///
 		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);

@@ -255,7 +255,7 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render(Renderer& renderer, const PointF& cursor)
 {
-	_gui.render(cursor);
+	_gui.render(renderer, cursor);
 	if (!_game_running)
 		_cursor.draw(cursor);
 	if (_debug_text_visible)

@@ -16,9 +16,8 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
+	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
 		: _resource_loader(resource_loader)
-		, _renderer(renderer)
 		, _script_context(script_context)
 		, _allocator(allocator)
 		, _texture_cache(TextureCache::create(_resource_loader, _allocator))
@@ -67,11 +66,11 @@ namespace Yttrium
 		return i != _fonts.end() ? &i->second : nullptr;
 	}
 
-	void GuiPrivate::render_canvas(const StaticString& name, const RectF& rect) const
+	void GuiPrivate::render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) const
 	{
 		const auto i = _canvas_handlers.find(String(name, ByReference()));
 		if (i != _canvas_handlers.end())
-			i->second(_renderer, rect);
+			i->second(renderer, rect);
 	}
 
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
@@ -102,8 +101,8 @@ namespace Yttrium
 		return _translation ? _translation->translate(source) : String(source, &_allocator);
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, Renderer& renderer, ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<GuiPrivate>(allocator, resource_loader, renderer, script_context, allocator))
+	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
+		: _private(make_unique<GuiPrivate>(allocator, resource_loader, script_context, allocator))
 	{
 	}
 
@@ -157,7 +156,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void Gui::render(const PointF& cursor) const
+	void Gui::render(Renderer& renderer, const PointF& cursor) const
 	{
 		if (_private->_layer_stack.empty())
 			return;
@@ -166,8 +165,8 @@ namespace Yttrium
 		while (layer != _private->_layer_stack.begin() && (*layer)->is_transparent())
 			--layer;
 		while (layer != top_layer)
-			(*layer++)->render(_private->_renderer, nullptr);
-		(*layer)->render(_private->_renderer, &cursor);
+			(*layer++)->render(renderer, nullptr);
+		(*layer)->render(renderer, &cursor);
 	}
 
 	void Gui::set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>& handler)

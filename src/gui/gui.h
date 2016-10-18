@@ -39,14 +39,14 @@ namespace Yttrium
 			}
 		};
 
-		GuiPrivate(ResourceLoader&, Renderer&, ScriptContext&, Allocator&);
+		GuiPrivate(ResourceLoader&, ScriptContext&, Allocator&);
 		~GuiPrivate();
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
 		Allocator& allocator() const { return _allocator; }
 		void clear();
 		const FontDesc* font(const StaticString& name) const;
-		void render_canvas(const StaticString& name, const RectF&) const;
+		void render_canvas(Renderer&, const StaticString& name, const RectF&) const;
 		ResourceLoader& resource_loader() const { return _resource_loader; }
 		ScriptContext& script_context() const { return _script_context; }
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
@@ -56,7 +56,6 @@ namespace Yttrium
 
 	private:
 		ResourceLoader& _resource_loader;
-		Renderer& _renderer;
 		ScriptContext& _script_context;
 		Allocator& _allocator;
 		const UniquePtr<TextureCache> _texture_cache;

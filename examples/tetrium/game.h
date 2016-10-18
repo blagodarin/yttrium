@@ -60,7 +60,7 @@ private:
 	String _debug_text{ 1024, &_allocator };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer(), _audio.get() };
 	NamedAllocator _gui_allocator{ "gui" };
-	Gui _gui{ _resource_loader, _window.renderer(), _script, _gui_allocator };
+	Gui _gui{ _resource_loader, _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };
 	Blocks _blocks{ _window.renderer() };
 	Bindings _bindings{ _script, _allocator };
