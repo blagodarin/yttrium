@@ -7,6 +7,7 @@
 #include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
+#include <yttrium/ion/document.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_font.h>
@@ -34,6 +35,12 @@ namespace Yttrium
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
 		: _private(std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager))
 	{
+	}
+
+	std::unique_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name, Allocator& allocator) const
+	{
+		auto ion = std::make_unique<IonDocument>(allocator);
+		return ion->load(_private->_storage.open(name)) ? std::move(ion) : nullptr;
 	}
 
 	SharedPtr<Sound> ResourceLoader::load_sound(const StaticString& name)
@@ -65,11 +72,6 @@ namespace Yttrium
 			Log() << "Can't load \""_s << name << "\": "_s << e.what();
 			return {};
 		}
-	}
-
-	const Storage& ResourceLoader::storage() const
-	{
-		return _private->_storage;
 	}
 
 	ResourceLoader::~ResourceLoader() = default;

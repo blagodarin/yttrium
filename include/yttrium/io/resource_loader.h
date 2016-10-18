@@ -4,13 +4,14 @@
 #ifndef _include_yttrium_io_resource_loader_h_
 #define _include_yttrium_io_resource_loader_h_
 
-#include <yttrium/global.h>
+#include <yttrium/memory/global.h>
 
 #include <memory>
 
 namespace Yttrium
 {
 	class AudioManager;
+	class IonDocument;
 	class Renderer;
 	template <typename> class SharedPtr;
 	class Sound;
@@ -27,6 +28,9 @@ namespace Yttrium
 		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr);
 
 		///
+		std::unique_ptr<const IonDocument> load_ion(const StaticString& name, Allocator& = *DefaultAllocator) const; // TODO: Consider throwing on failure or returning optional.
+
+		///
 		SharedPtr<Sound> load_sound(const StaticString& name);
 
 		///
@@ -34,9 +38,6 @@ namespace Yttrium
 
 		///
 		SharedPtr<TextureFont> load_texture_font(const StaticString& name);
-
-		///
-		const Storage& storage() const; // TODO: Remove.
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;

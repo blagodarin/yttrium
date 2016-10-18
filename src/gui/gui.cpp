@@ -97,11 +97,6 @@ namespace Yttrium
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 
-	const Storage& GuiPrivate::storage() const
-	{
-		return _resource_loader.storage();
-	}
-
 	String GuiPrivate::translate(const StaticString& source) const
 	{
 		return _translation ? _translation->translate(source) : String(source, &_allocator);
