@@ -166,7 +166,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_font(const StaticString& name, SharedPtr<TextureFont>* font, std::shared_ptr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_font(const StaticString& name, std::shared_ptr<const TextureFont>* font, std::shared_ptr<Texture2D>* texture) const
 	{
 		const StaticString* font_name = nullptr;
 

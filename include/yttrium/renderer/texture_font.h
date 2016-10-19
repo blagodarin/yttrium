@@ -8,14 +8,14 @@
 #include <yttrium/memory/shared_ptr.h>
 #include <yttrium/std/vector.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class Reader;
 	class StaticString;
 	class TextCapture;
 	class TexturedRect;
-
-	template <typename> class UniquePtr;
 
 	/// Texture font markup.
 	class Y_API TextureFont : public Shared
@@ -31,7 +31,7 @@ namespace Yttrium
 
 		///
 		/// Throws ResourceError.
-		static UniquePtr<TextureFont> load(Reader&&, Allocator&);
+		static std::shared_ptr<TextureFont> load(Reader&&, Allocator&);
 
 		///
 		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;

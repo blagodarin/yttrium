@@ -69,6 +69,7 @@ namespace Yttrium
 		Allocator& _allocator;
 		ResourceCache<Sound> _sounds{ _allocator };
 		ResourceCache<Texture2D> _textures_2d{ _allocator };
+		ResourceCache<TextureFont> _texture_fonts{ _allocator };
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
@@ -108,17 +109,20 @@ namespace Yttrium
 		});
 	}
 
-	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
+	std::shared_ptr<const TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
 	{
-		try
+		return _private->_texture_fonts.fetch(name, [this](const StaticString& name) -> std::shared_ptr<TextureFont>
 		{
-			return TextureFont::load(_private->_storage.open(name), _private->_allocator);
-		}
-		catch (const ResourceError& e)
-		{
-			Log() << "Can't load \""_s << name << "\": "_s << e.what();
-			return {};
-		}
+			try
+			{
+				return TextureFont::load(_private->_storage.open(name), _private->_allocator);
+			}
+			catch (const ResourceError& e)
+			{
+				Log() << "Can't load \""_s << name << "\": "_s << e.what();
+				return {};
+			}
+		});
 	}
 
 	std::unique_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name) const

@@ -18,9 +18,6 @@ namespace Yttrium
 	class TextureFont;
 	class Vector4;
 
-	template <typename T>
-	class SharedPtr;
-
 	class GuiPropertyLoader
 	{
 	public:
@@ -31,7 +28,7 @@ namespace Yttrium
 		virtual bool load(const StaticString& name, float&) const = 0;
 		virtual bool load_alignment(const StaticString& name, unsigned*) const = 0;
 		virtual bool load_color(const StaticString& name, Vector4*) const = 0;
-		virtual bool load_font(const StaticString& name, SharedPtr<TextureFont>*, std::shared_ptr<Texture2D>*) const = 0;
+		virtual bool load_font(const StaticString& name, std::shared_ptr<const TextureFont>*, std::shared_ptr<Texture2D>*) const = 0;
 		virtual bool load_margins(const StaticString& name, Margins*) const = 0;
 		virtual bool load_rect(const StaticString& name, RectF&, bool update = false) const = 0;
 		virtual std::shared_ptr<const Sound> load_sound(const StaticString& name) const = 0;

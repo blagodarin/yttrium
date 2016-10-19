@@ -26,12 +26,12 @@ namespace Yttrium
 	public:
 		struct FontDesc
 		{
-			SharedPtr<TextureFont> font;
+			std::shared_ptr<const TextureFont> font;
 			std::shared_ptr<Texture2D> texture;
 
 			FontDesc() = default;
 
-			FontDesc(SharedPtr<TextureFont>&& font, std::shared_ptr<Texture2D>&& texture)
+			FontDesc(std::shared_ptr<const TextureFont>&& font, std::shared_ptr<Texture2D>&& texture)
 				: font(std::move(font))
 				, texture(std::move(texture))
 			{

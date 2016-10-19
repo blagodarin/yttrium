@@ -118,7 +118,7 @@ namespace Yttrium
 		friend TextureFont;
 	};
 
-	UniquePtr<TextureFont> TextureFont::load(Reader&& reader, Allocator& allocator)
+	std::shared_ptr<TextureFont> TextureFont::load(Reader&& reader, Allocator& allocator)
 	{
 		if (!reader)
 			throw ResourceError(allocator) << "Bad file"_s;
@@ -143,7 +143,7 @@ namespace Yttrium
 		if (!reader.read(char_count))
 			throw ResourceError(allocator) << "Bad 'char' section header"_s;
 
-		auto font = make_unique<TextureFontImpl>(allocator, allocator, font_section.size);
+		auto font = std::make_shared<TextureFontImpl>(allocator, font_section.size);
 
 		Size font_rect_size;
 		for (uint8_t i = 0; i < char_count; ++i)

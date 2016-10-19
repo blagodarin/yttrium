@@ -32,7 +32,7 @@ namespace Yttrium
 
 	struct ForegroundProperty
 	{
-		SharedPtr<TextureFont> font;
+		std::shared_ptr<const TextureFont> font;
 		std::shared_ptr<Texture2D> font_texture;
 		float                size = 7 / 8.f;
 		Vector4              color{1, 1, 1};
