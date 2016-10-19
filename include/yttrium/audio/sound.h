@@ -4,17 +4,15 @@
 #ifndef _include_yttrium_audio_sound_h_
 #define _include_yttrium_audio_sound_h_
 
-#include <yttrium/memory/shared_ptr.h>
+#include <yttrium/global.h>
 
 namespace Yttrium
 {
-	class StaticString;
-
 	/// %Sound.
-	class Y_API Sound : public Shared
+	class Y_API Sound
 	{
 	public:
-		~Sound() override = default;
+		virtual ~Sound() = default;
 
 		/// Plays the sound asynchronously.
 		virtual void play() const = 0;

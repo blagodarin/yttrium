@@ -7,10 +7,11 @@
 #include <yttrium/static_string.h>
 #include <yttrium/std/vector.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class AudioPlayer;
-	template <typename> class SharedPtr;
 	class Sound;
 	class Storage;
 	template <typename> class UniquePtr;
@@ -36,7 +37,7 @@ namespace Yttrium
 		virtual StaticString backend() const = 0;
 
 		///
-		virtual SharedPtr<Sound> create_sound(const StaticString& name) = 0;
+		virtual std::shared_ptr<Sound> create_sound(const StaticString& name) = 0;
 
 		/// Returns the current backend device name.
 		virtual StaticString device() const = 0;

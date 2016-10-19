@@ -26,7 +26,7 @@ namespace Yttrium
 		bool load_font(const StaticString& name, SharedPtr<TextureFont>* font, SharedPtr<Texture2D>* texture) const override;
 		bool load_margins(const StaticString& name, Margins* margins) const override;
 		bool load_rect(const StaticString& name, RectF& rect, bool update) const override;
-		SharedPtr<Sound> load_sound(const StaticString& name) const override;
+		std::shared_ptr<const Sound> load_sound(const StaticString& name) const override;
 		bool load_state(const StaticString& name, WidgetState* state) const override;
 		bool load_text(const StaticString& name, String* text) const override;
 		bool load_texture(const StaticString& name, SharedPtr<Texture2D>* texture) const override;

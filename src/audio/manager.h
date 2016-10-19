@@ -5,7 +5,6 @@
 
 #include <yttrium/audio/sound.h>
 #include <yttrium/std/map.h>
-#include "../base/instance_guard.h"
 #include "player.h"
 
 namespace Yttrium
@@ -13,18 +12,13 @@ namespace Yttrium
 	class AudioBackend;
 	class AudioManagerImpl;
 
-	using AudioManagerGuard = InstanceGuard<AudioManagerImpl>;
-
 	class AudioManagerImpl : public AudioManager
 	{
 	public:
-		static AudioManagerImpl* instance();
-
 		AudioManagerImpl(const Storage&, const StaticString& backend, const StaticString& device, Allocator&);
-		~AudioManagerImpl() override;
 
 		StaticString backend() const override;
-		SharedPtr<Sound> create_sound(const StaticString&) override;
+		std::shared_ptr<Sound> create_sound(const StaticString&) override;
 		StaticString device() const override;
 		AudioPlayer& player() override { return _player; }
 
@@ -35,8 +29,6 @@ namespace Yttrium
 		Allocator& _allocator;
 		const UniquePtr<AudioBackend> _backend;
 		AudioPlayerImpl _player;
-		StdMap<String, std::pair<Allocator*, Sound*>> _sounds{ _allocator };
-		AudioManagerGuard _instance_guard{ this, "Duplicate AudioManager construction" };
 	};
 }
 

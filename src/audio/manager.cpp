@@ -7,8 +7,6 @@
 
 #include "backend/openal/backend.h"
 
-#include <cassert>
-
 namespace Yttrium
 {
 	StdVector<StaticString> AudioManager::backends(Allocator& allocator)
@@ -39,11 +37,6 @@ namespace Yttrium
 		}
 	}
 
-	AudioManagerImpl* AudioManagerImpl::instance()
-	{
-		return AudioManagerGuard::instance;
-	}
-
 	AudioManagerImpl::AudioManagerImpl(const Storage& storage, const StaticString& backend, const StaticString& device, Allocator& allocator)
 		: _storage(storage)
 		, _allocator(allocator)
@@ -52,46 +45,24 @@ namespace Yttrium
 	{
 	}
 
-	AudioManagerImpl::~AudioManagerImpl()
-	{
-		assert(_sounds.empty());
-	}
-
 	StaticString AudioManagerImpl::backend() const
 	{
 		return _backend->backend();
 	}
 
-	SharedPtr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
+	std::shared_ptr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
 	{
-		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
-
-		const auto i = _sounds.find(String(name, ByReference()));
-		if (i != _sounds.end())
-			return SharedPtr<Sound>(*i->second.first, i->second.second);
-
 		const auto reader = AudioReader::open(_storage.open(name), AudioType::Auto, _allocator);
 		if (!reader)
 			return {};
-
 		auto sound = _backend->create_sound(name, _allocator);
 		if (!sound->load(*reader))
 			return {};
-
-		_sounds.emplace(sound->name(), std::make_pair(&_allocator, sound.get()));
-		return std::move(sound);
+		return sound;
 	}
 
 	StaticString AudioManagerImpl::device() const
 	{
 		return _backend->device();
-	}
-
-	// TODO: Lock the instance mutex outside of this function.
-
-	void AudioManagerImpl::delete_sound(const String& name)
-	{
-		std::lock_guard<std::mutex> lock(AudioManagerGuard::instance_mutex);
-		_sounds.erase(name);
 	}
 }

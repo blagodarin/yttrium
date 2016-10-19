@@ -5,6 +5,8 @@
 #include "../properties.h"
 #include "widget.h"
 
+#include <memory>
+
 namespace Yttrium
 {
 	class Sound;
@@ -26,7 +28,7 @@ namespace Yttrium
 		};
 
 		mutable ForegroundProperty _foreground;
-		SharedPtr<Sound> _sound;
+		std::shared_ptr<const Sound> _sound;
 		WidgetState _state = WidgetState::NotSet;
 		Style _styles[WidgetStateCount];
 		ScriptCode _on_click;

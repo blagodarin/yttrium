@@ -258,9 +258,9 @@ namespace Yttrium
 		return true;
 	}
 
-	SharedPtr<Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
+	std::shared_ptr<const Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
 	{
-		const auto load_sound_node = [this](const IonNode& node) -> SharedPtr<Sound>
+		const auto load_sound_node = [this](const IonNode& node) -> std::shared_ptr<const Sound>
 		{
 			const auto& values = node.values();
 			if (values.size() != 1)

@@ -13,13 +13,6 @@ namespace Yttrium
 
 	OpenAlSound::~OpenAlSound()
 	{
-		// It is not enough to lock the erase operation for a sound deletion to become thread safe.
-		// It may be possible that a thread has already initiated a destruction (i.e. has entered here)
-		// while some other thread is trying to open the sound, causing the reference counter to zero-trip.
-		// TODO: Implement deleters to work around this problem.
-
-		AudioManagerImpl::instance()->delete_sound(name());
-
 		::alDeleteSources(1, &_source);
 		::alDeleteBuffers(1, &_buffer);
 	}

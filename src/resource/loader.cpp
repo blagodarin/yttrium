@@ -12,10 +12,14 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_font.h>
+#include <yttrium/std/map.h>
+
+#include <mutex>
 
 namespace Yttrium
 {
-	// TODO: Resource cache.
+	// TODO: Shared mutexes.
+	// TODO: Deferred resource deallocation.
 
 	class ResourceLoaderPrivate
 	{
@@ -33,6 +37,8 @@ namespace Yttrium
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
+		StdMap<String, std::weak_ptr<const Sound>> _sounds{ _allocator };
+		std::mutex _sounds_mutex;
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
@@ -46,9 +52,24 @@ namespace Yttrium
 		return ion->load(_private->_storage.open(name)) ? std::move(ion) : nullptr;
 	}
 
-	SharedPtr<Sound> ResourceLoader::load_sound(const StaticString& name)
+	std::shared_ptr<const Sound> ResourceLoader::load_sound(const StaticString& name)
 	{
-		return _private->_audio_manager ? _private->_audio_manager->create_sound(name) : SharedPtr<Sound>();
+		if (!_private->_audio_manager)
+			return {};
+		std::lock_guard<std::mutex> lock(_private->_sounds_mutex);
+		const auto i = _private->_sounds.find(String(name, ByReference()));
+		if (i != _private->_sounds.end())
+		{
+			auto sound = i->second.lock();
+			if (sound)
+				return sound;
+		}
+		auto sound = _private->_audio_manager->create_sound(name);
+		if (i != _private->_sounds.end())
+			i->second = sound;
+		else
+			_private->_sounds.emplace(String(name, &_private->_allocator), sound);
+		return sound;
 	}
 
 	SharedPtr<Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)

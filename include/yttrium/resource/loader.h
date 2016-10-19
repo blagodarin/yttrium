@@ -32,7 +32,7 @@ namespace Yttrium
 		std::unique_ptr<const IonDocument> load_ion(const StaticString& name) const; // TODO: Consider throwing on failure or returning optional.
 
 		///
-		SharedPtr<Sound> load_sound(const StaticString& name);
+		std::shared_ptr<const Sound> load_sound(const StaticString& name);
 
 		///
 		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);

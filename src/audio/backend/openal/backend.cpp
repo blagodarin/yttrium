@@ -26,9 +26,9 @@ namespace Yttrium
 		return make_unique<OpenAlPlayer>(allocator());
 	}
 
-	UniquePtr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
+	std::shared_ptr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
 	{
-		return make_unique<OpenAlSound>(allocator, name, allocator);
+		return std::make_shared<OpenAlSound>(name, allocator);
 	}
 
 	StdVector<StaticString> OpenAlBackend::devices(Allocator& allocator)
