@@ -5,7 +5,6 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/math/margins.h>
-#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/resource/loader.h>
 #include <yttrium/utils.h>
 #include "../gui.h"
@@ -82,7 +81,6 @@ namespace Yttrium
 		: _object(object)
 		, _class(class_)
 		, _gui(gui)
-		, _texture_cache(gui.texture_cache())
 		, _bound_object(_object)
 		, _bound_class(_class)
 	{
@@ -168,7 +166,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_font(const StaticString& name, SharedPtr<TextureFont>* font, SharedPtr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_font(const StaticString& name, SharedPtr<TextureFont>* font, std::shared_ptr<Texture2D>* texture) const
 	{
 		const StaticString* font_name = nullptr;
 
@@ -318,19 +316,19 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_texture(const StaticString& name, SharedPtr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_texture(const StaticString& name, std::shared_ptr<Texture2D>* texture) const
 	{
 		if (_bound_object)
 		{
 			const IonNode& node = _bound_object->last(name);
-			if (node.exists() && load_texture(texture, node, _texture_cache, Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
+			if (node.exists() && load_texture(texture, node, _gui.resource_loader(), Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
 				return true;
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
-			if (node.exists() && load_texture(texture, node, _texture_cache, Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
+			if (node.exists() && load_texture(texture, node, _gui.resource_loader(), Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
 				return true;
 		}
 
@@ -508,8 +506,8 @@ namespace Yttrium
 		return node.size() == 1 && node.first()->get(text);
 	}
 
-	bool GuiIonPropertyLoader::load_texture(SharedPtr<Texture2D>* texture, const IonNode& node,
-		TextureCache& texture_cache, Texture2D::Filter default_filter)
+	bool GuiIonPropertyLoader::load_texture(std::shared_ptr<Texture2D>* texture, const IonNode& node,
+		ResourceLoader& resource_loader, Texture2D::Filter default_filter)
 	{
 		auto&& values = node.values();
 
@@ -580,7 +578,7 @@ namespace Yttrium
 			}
 		}
 
-		const auto result_texture = texture_cache.load_texture_2d(*texture_name);
+		const auto result_texture = resource_loader.load_texture_2d(*texture_name);
 		if (!result_texture)
 			return false;
 

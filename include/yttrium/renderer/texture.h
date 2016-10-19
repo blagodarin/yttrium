@@ -5,14 +5,14 @@
 #define _include_yttrium_renderer_texture_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/memory/shared_ptr.h>
 
 namespace Yttrium
 {
 	/// 2D texture.
-	class Y_API Texture2D : public Shared
+	class Y_API Texture2D
 	{
 	public:
+		virtual ~Texture2D() = default;
 
 		///
 		typedef uint_fast8_t Filter;

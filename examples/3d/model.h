@@ -3,6 +3,8 @@
 
 #include <yttrium/memory/unique_ptr.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class GpuProgram;
@@ -27,7 +29,7 @@ protected:
 	Renderer& _renderer;
 	UniquePtr<VertexBuffer> _vertices;
 	UniquePtr<IndexBuffer> _indices;
-	UniquePtr<Texture2D> _texture;
+	std::shared_ptr<Texture2D> _texture;
 	UniquePtr<GpuProgram> _program;
 };
 

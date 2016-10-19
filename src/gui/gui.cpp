@@ -6,7 +6,6 @@
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/resource/loader.h>
 #include <yttrium/script/context.h>
 #include "exceptions.h"
@@ -20,7 +19,6 @@ namespace Yttrium
 		: _resource_loader(resource_loader)
 		, _script_context(script_context)
 		, _allocator(allocator)
-		, _texture_cache(TextureCache::create(_resource_loader, _allocator))
 		, _layers(_allocator)
 	{
 	}
@@ -75,7 +73,7 @@ namespace Yttrium
 
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
-		auto texture = _texture_cache->load_texture_2d(texture_name, true);
+		auto texture = _resource_loader.load_texture_2d(texture_name, true);
 		if (!texture)
 		{
 			Log() << "Can't load \""_s << texture_name << "\""_s; // TODO: Move to ResourceLoader.

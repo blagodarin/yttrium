@@ -21,6 +21,36 @@ namespace Yttrium
 	// TODO: Shared mutexes.
 	// TODO: Deferred resource deallocation.
 
+	template <typename T>
+	struct ResourceCache
+	{
+		Allocator& _allocator;
+		StdMap<String, std::weak_ptr<T>> _map{ _allocator };
+		std::mutex _mutex;
+
+		ResourceCache(Allocator& allocator) : _allocator(allocator) {}
+
+		std::shared_ptr<T> fetch(const StaticString& name, const std::function<std::shared_ptr<T>(const StaticString&)>& factory)
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+			const auto i = _map.find(String(name, ByReference()));
+			if (i != _map.end())
+			{
+				auto resource = i->second.lock();
+				if (resource)
+					return resource;
+			}
+			auto resource = factory(name);
+			if (!resource)
+				return {};
+			if (i != _map.end())
+				i->second = resource;
+			else
+				_map.emplace(String(name, &_allocator), resource);
+			return resource;
+		}
+	};
+
 	class ResourceLoaderPrivate
 	{
 	public:
@@ -37,8 +67,8 @@ namespace Yttrium
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
-		StdMap<String, std::weak_ptr<const Sound>> _sounds{ _allocator };
-		std::mutex _sounds_mutex;
+		ResourceCache<Sound> _sounds{ _allocator };
+		ResourceCache<Texture2D> _textures_2d{ _allocator };
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
@@ -56,33 +86,26 @@ namespace Yttrium
 	{
 		if (!_private->_audio_manager)
 			return {};
-		std::lock_guard<std::mutex> lock(_private->_sounds_mutex);
-		const auto i = _private->_sounds.find(String(name, ByReference()));
-		if (i != _private->_sounds.end())
+		return _private->_sounds.fetch(name, [this](const StaticString& name)
 		{
-			auto sound = i->second.lock();
-			if (sound)
-				return sound;
-		}
-		auto sound = _private->_audio_manager->create_sound(name);
-		if (i != _private->_sounds.end())
-			i->second = sound;
-		else
-			_private->_sounds.emplace(String(name, &_private->_allocator), sound);
-		return sound;
+			return _private->_audio_manager->create_sound(name);
+		});
 	}
 
-	SharedPtr<Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)
+	std::shared_ptr<Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)
 	{
 		// TODO: Map texture memory, then read the image into that memory.
 		if (!_private->_renderer)
 			return {};
-		Image image;
-		if (!image.load(_private->_storage.open(name)))
-			return {};
-		if (intensity && image.format().pixel_format() == PixelFormat::Gray)
-			image.intensity_to_bgra();
-		return _private->_renderer->create_texture_2d(image.format(), image.data());
+		return _private->_textures_2d.fetch(name, [this, intensity](const StaticString& name) -> std::shared_ptr<Texture2D>
+		{
+			Image image;
+			if (!image.load(_private->_storage.open(name)))
+				return {};
+			if (intensity && image.format().pixel_format() == PixelFormat::Gray)
+				image.intensity_to_bgra();
+			return _private->_renderer->create_texture_2d(image.format(), image.data());
+		});
 	}
 
 	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name)

@@ -9,7 +9,6 @@
 #include <yttrium/math/size.h>
 #include <yttrium/memory/named_allocator.h>
 #include <yttrium/memory/shared_ptr.h>
-#include <yttrium/renderer/texture_cache.h>
 #include <yttrium/resource/loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>

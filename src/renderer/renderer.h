@@ -109,8 +109,8 @@ namespace Yttrium
 		RectF    _texture_rect;
 		MarginsF _texture_borders;
 
-		UniquePtr<Texture2D> _white_texture;
-		UniquePtr<Texture2D> _debug_texture;
+		std::shared_ptr<Texture2D> _white_texture;
+		std::shared_ptr<Texture2D> _debug_texture;
 		UniquePtr<GpuProgram> _program_2d;
 
 		enum class MatrixType

@@ -19,7 +19,6 @@ namespace Yttrium
 	class Storage;
 	class String;
 	class Texture2D;
-	class TextureCache;
 	class Translation;
 
 	class GuiPrivate
@@ -28,11 +27,11 @@ namespace Yttrium
 		struct FontDesc
 		{
 			SharedPtr<TextureFont> font;
-			SharedPtr<Texture2D> texture;
+			std::shared_ptr<Texture2D> texture;
 
 			FontDesc() = default;
 
-			FontDesc(SharedPtr<TextureFont>&& font, SharedPtr<Texture2D>&& texture)
+			FontDesc(SharedPtr<TextureFont>&& font, std::shared_ptr<Texture2D>&& texture)
 				: font(std::move(font))
 				, texture(std::move(texture))
 			{
@@ -51,14 +50,12 @@ namespace Yttrium
 		ScriptContext& script_context() const { return _script_context; }
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 		void set_translation(const StaticString& path);
-		TextureCache& texture_cache() { return *_texture_cache; }
 		String translate(const StaticString&) const;
 
 	private:
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
 		Allocator& _allocator;
-		const UniquePtr<TextureCache> _texture_cache;
 		StdMap<String, FontDesc> _fonts{ _allocator };
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
 		StdVector<GuiLayer*> _layer_stack{ _allocator };

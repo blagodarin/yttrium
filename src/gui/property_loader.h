@@ -31,13 +31,13 @@ namespace Yttrium
 		virtual bool load(const StaticString& name, float&) const = 0;
 		virtual bool load_alignment(const StaticString& name, unsigned*) const = 0;
 		virtual bool load_color(const StaticString& name, Vector4*) const = 0;
-		virtual bool load_font(const StaticString& name, SharedPtr<TextureFont>*, SharedPtr<Texture2D>*) const = 0;
+		virtual bool load_font(const StaticString& name, SharedPtr<TextureFont>*, std::shared_ptr<Texture2D>*) const = 0;
 		virtual bool load_margins(const StaticString& name, Margins*) const = 0;
 		virtual bool load_rect(const StaticString& name, RectF&, bool update = false) const = 0;
 		virtual std::shared_ptr<const Sound> load_sound(const StaticString& name) const = 0;
 		virtual bool load_state(const StaticString& name, WidgetState*) const = 0;
 		virtual bool load_text(const StaticString& name, String*) const = 0;
-		virtual bool load_texture(const StaticString& name, SharedPtr<Texture2D>*) const = 0;
+		virtual bool load_texture(const StaticString& name, std::shared_ptr<Texture2D>*) const = 0;
 		virtual bool load_translatable(const StaticString& name, String*) const = 0;
 		virtual void unbind() = 0;
 	};

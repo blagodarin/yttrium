@@ -6,6 +6,8 @@
 
 #include <yttrium/std/vector.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class GpuProgram;
@@ -41,7 +43,7 @@ namespace Yttrium
 		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual UniquePtr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
+		virtual std::shared_ptr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
 
 		///
 		virtual UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;

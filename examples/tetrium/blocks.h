@@ -5,6 +5,8 @@
 #include <yttrium/math/size.h>
 #include <yttrium/memory/unique_ptr.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class Renderer;
@@ -25,7 +27,7 @@ public:
 	static PointF block_coords(size_t index);
 
 protected:
-	UniquePtr<Texture2D> _texture;
+	std::shared_ptr<Texture2D> _texture;
 };
 
 #endif

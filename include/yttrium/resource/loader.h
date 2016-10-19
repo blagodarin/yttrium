@@ -35,7 +35,7 @@ namespace Yttrium
 		std::shared_ptr<const Sound> load_sound(const StaticString& name);
 
 		///
-		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
+		std::shared_ptr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
 
 		///
 		SharedPtr<TextureFont> load_texture_font(const StaticString& name);
