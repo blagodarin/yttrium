@@ -20,10 +20,11 @@ namespace Yttrium
 	class ResourceLoaderPrivate
 	{
 	public:
-		ResourceLoaderPrivate(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
+		ResourceLoaderPrivate(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
 			: _storage(storage)
 			, _renderer(renderer)
 			, _audio_manager(audio_manager)
+			, _allocator(allocator)
 		{
 		}
 
@@ -31,16 +32,17 @@ namespace Yttrium
 		const Storage& _storage;
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
+		Allocator& _allocator;
 	};
 
-	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
-		: _private(std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager))
+	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
+		: _private(std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager, allocator))
 	{
 	}
 
-	std::unique_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name, Allocator& allocator) const
+	std::unique_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name) const
 	{
-		auto ion = std::make_unique<IonDocument>(allocator);
+		auto ion = std::make_unique<IonDocument>(_private->_allocator);
 		return ion->load(_private->_storage.open(name)) ? std::move(ion) : nullptr;
 	}
 
@@ -62,11 +64,11 @@ namespace Yttrium
 		return _private->_renderer->create_texture_2d(image.format(), image.data());
 	}
 
-	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name, Allocator& allocator)
+	SharedPtr<TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
 	{
 		try
 		{
-			return TextureFont::load(_private->_storage.open(name), allocator);
+			return TextureFont::load(_private->_storage.open(name), _private->_allocator);
 		}
 		catch (const ResourceError& e)
 		{
@@ -75,9 +77,9 @@ namespace Yttrium
 		}
 	}
 
-	std::unique_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name, Allocator& allocator) const
+	std::unique_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name) const
 	{
-		return Translation::open(_private->_storage.open(name), allocator);
+		return Translation::open(_private->_storage.open(name), _private->_allocator);
 	}
 
 	ResourceLoader::~ResourceLoader() = default;

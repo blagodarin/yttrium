@@ -121,7 +121,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_impl(const StaticString& source_name)
 	{
-		const auto document = _gui.resource_loader().load_ion(source_name, _allocator);
+		const auto document = _gui.resource_loader().load_ion(source_name);
 		if (!document)
 			throw GuiError(_allocator) << "Can't load \""_s << source_name << "\"..."_s;
 		try

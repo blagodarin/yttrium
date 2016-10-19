@@ -26,10 +26,10 @@ namespace Yttrium
 	{
 	public:
 		///
-		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr);
+		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr, Allocator& = *DefaultAllocator);
 
 		///
-		std::unique_ptr<const IonDocument> load_ion(const StaticString& name, Allocator& = *DefaultAllocator) const; // TODO: Consider throwing on failure or returning optional.
+		std::unique_ptr<const IonDocument> load_ion(const StaticString& name) const; // TODO: Consider throwing on failure or returning optional.
 
 		///
 		SharedPtr<Sound> load_sound(const StaticString& name);
@@ -38,10 +38,10 @@ namespace Yttrium
 		SharedPtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
 
 		///
-		SharedPtr<TextureFont> load_texture_font(const StaticString& name, Allocator& = *DefaultAllocator);
+		SharedPtr<TextureFont> load_texture_font(const StaticString& name);
 
 		///
-		std::unique_ptr<const Translation> load_translation(const StaticString& name, Allocator& = *DefaultAllocator) const;
+		std::unique_ptr<const Translation> load_translation(const StaticString& name) const;
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;

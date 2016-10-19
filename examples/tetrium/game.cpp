@@ -186,7 +186,7 @@ void Game::run()
 
 	if (_audio)
 	{
-		const auto ion = _resource_loader.load_ion("data/music.ion", _allocator);
+		const auto ion = _resource_loader.load_ion("data/music.ion");
 		if (ion)
 		{
 			for (const IonValue& value : ion->root().last("music"))
