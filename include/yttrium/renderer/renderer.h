@@ -6,27 +6,24 @@
 
 #include <yttrium/std/vector.h>
 
-#include <memory>
-
 namespace Yttrium
 {
 	class GpuProgram;
 	class ImageFormat;
 	class IndexBuffer;
+	enum class IndexFormat;
 	class Margins;
 	class Matrix4;
 	class RectF;
+	template <typename> class ResourcePtr;
 	class Size;
 	class StaticString;
 	class Texture2D;
 	class TexturedRect;
+	template <typename> class UniquePtr;
+	enum class VA;
 	class Vector4;
 	class VertexBuffer;
-
-	template <typename> class UniquePtr;
-
-	enum class IndexFormat;
-	enum class VA;
 
 	///
 	/// \note Lifetimes of entities created by a renderer must not exceed the lifetime of the renderer.
@@ -43,7 +40,7 @@ namespace Yttrium
 		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual std::shared_ptr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
+		virtual ResourcePtr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
 
 		///
 		virtual UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;

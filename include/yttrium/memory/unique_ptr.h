@@ -10,8 +10,6 @@
 
 namespace Yttrium
 {
-	template <typename> class SharedPtr;
-
 	template <typename T>
 	class UniquePtr
 	{
@@ -66,7 +64,6 @@ namespace Yttrium
 		UniquePtr(Allocation<T>&& allocation) noexcept : _allocation(std::move(allocation)) {}
 		template <typename U, typename... Args> friend UniquePtr<U> make_unique(Allocator&, Args&&...);
 		template <typename> friend class UniquePtr;
-		template <typename> friend class SharedPtr;
 	};
 
 	template <typename T, typename... Args>

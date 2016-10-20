@@ -4,16 +4,14 @@
 #ifndef _include_yttrium_audio_sound_h_
 #define _include_yttrium_audio_sound_h_
 
-#include <yttrium/global.h>
+#include <yttrium/resource/resource.h>
 
 namespace Yttrium
 {
 	/// %Sound.
-	class Y_API Sound
+	class Sound : public Resource
 	{
 	public:
-		virtual ~Sound() = default;
-
 		/// Plays the sound asynchronously.
 		virtual void play() const = 0;
 	};

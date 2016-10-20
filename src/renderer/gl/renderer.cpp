@@ -82,7 +82,7 @@ namespace Yttrium
 		return make_unique<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
 	}
 
-	std::shared_ptr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
+	ResourcePtr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
 	{
 		if (format.bits_per_channel() != 8)
 			return {};
@@ -133,7 +133,7 @@ namespace Yttrium
 		texture.set_data(0, internal_format, format.width(), format.height(), data_format, data_type, data);
 		if (!no_mipmaps)
 			texture.generate_mipmaps();
-		return std::make_shared<GlTexture2D>(*this, format, !no_mipmaps, std::move(texture));
+		return make_resource<GlTexture2D>(*this, format, !no_mipmaps, std::move(texture));
 	}
 
 	UniquePtr<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)

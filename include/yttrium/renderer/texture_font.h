@@ -5,7 +5,8 @@
 #define _include_yttrium_renderer_texture_font_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/memory/shared_ptr.h>
+#include <yttrium/resource/resource.h>
+#include <yttrium/resource/resource_ptr.h>
 #include <yttrium/std/vector.h>
 
 #include <memory>
@@ -18,7 +19,7 @@ namespace Yttrium
 	class TexturedRect;
 
 	/// Texture font markup.
-	class Y_API TextureFont : public Shared
+	class Y_API TextureFont : public Resource
 	{
 	public:
 		/// Font character information.
@@ -31,7 +32,7 @@ namespace Yttrium
 
 		///
 		/// Throws ResourceError.
-		static std::shared_ptr<TextureFont> load(Reader&&, Allocator&);
+		static ResourcePtr<TextureFont> load(Reader&&, Allocator&);
 
 		///
 		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;

@@ -2,8 +2,7 @@
 #define _examples_3d_model_h_
 
 #include <yttrium/memory/unique_ptr.h>
-
-#include <memory>
+#include <yttrium/resource/resource_ptr.h>
 
 namespace Yttrium
 {
@@ -29,7 +28,7 @@ protected:
 	Renderer& _renderer;
 	UniquePtr<VertexBuffer> _vertices;
 	UniquePtr<IndexBuffer> _indices;
-	std::shared_ptr<Texture2D> _texture;
+	ResourcePtr<Texture2D> _texture;
 	UniquePtr<GpuProgram> _program;
 };
 

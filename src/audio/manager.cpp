@@ -3,6 +3,7 @@
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>
+#include <yttrium/resource/resource_ptr.h>
 #include "sound.h"
 
 #include "backend/openal/backend.h"
@@ -50,7 +51,7 @@ namespace Yttrium
 		return _backend->backend();
 	}
 
-	std::shared_ptr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
+	ResourcePtr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
 	{
 		const auto reader = AudioReader::open(_storage.open(name), AudioType::Auto, _allocator);
 		if (!reader)

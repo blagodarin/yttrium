@@ -166,7 +166,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_font(const StaticString& name, std::shared_ptr<const TextureFont>* font, std::shared_ptr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<Texture2D>* texture) const
 	{
 		const StaticString* font_name = nullptr;
 
@@ -256,9 +256,9 @@ namespace Yttrium
 		return true;
 	}
 
-	std::shared_ptr<const Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
+	ResourcePtr<const Sound> GuiIonPropertyLoader::load_sound(const StaticString& name) const
 	{
-		const auto load_sound_node = [this](const IonNode& node) -> std::shared_ptr<const Sound>
+		const auto load_sound_node = [this](const IonNode& node) -> ResourcePtr<const Sound>
 		{
 			const auto& values = node.values();
 			if (values.size() != 1)
@@ -316,7 +316,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_texture(const StaticString& name, std::shared_ptr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_texture(const StaticString& name, ResourcePtr<Texture2D>* texture) const
 	{
 		if (_bound_object)
 		{
@@ -506,7 +506,7 @@ namespace Yttrium
 		return node.size() == 1 && node.first()->get(text);
 	}
 
-	bool GuiIonPropertyLoader::load_texture(std::shared_ptr<Texture2D>* texture, const IonNode& node,
+	bool GuiIonPropertyLoader::load_texture(ResourcePtr<Texture2D>* texture, const IonNode& node,
 		ResourceLoader& resource_loader, Texture2D::Filter default_filter)
 	{
 		auto&& values = node.values();

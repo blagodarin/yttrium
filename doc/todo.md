@@ -4,6 +4,7 @@
 		- Windows port.
 		- Lua scripting.
 		- Hash-based packed file access.
+		- Named realtime counters.
 	* GUI:
 		- Line editor widget.
 	* Image:

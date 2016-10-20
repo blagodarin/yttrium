@@ -1,8 +1,9 @@
 #ifndef _src_gui_gui_h_
 #define _src_gui_gui_h_
 
-#include <yttrium/memory/shared_ptr.h>
+#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/renderer/texture_font.h>
+#include <yttrium/resource/resource_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 
@@ -26,12 +27,12 @@ namespace Yttrium
 	public:
 		struct FontDesc
 		{
-			std::shared_ptr<const TextureFont> font;
-			std::shared_ptr<Texture2D> texture;
+			ResourcePtr<const TextureFont> font;
+			ResourcePtr<Texture2D> texture;
 
 			FontDesc() = default;
 
-			FontDesc(std::shared_ptr<const TextureFont>&& font, std::shared_ptr<Texture2D>&& texture)
+			FontDesc(ResourcePtr<const TextureFont>&& font, ResourcePtr<Texture2D>&& texture)
 				: font(std::move(font))
 				, texture(std::move(texture))
 			{

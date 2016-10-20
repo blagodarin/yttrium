@@ -13,6 +13,7 @@ namespace Yttrium
 	class AudioManager;
 	class IonDocument;
 	class Renderer;
+	template <typename> class ResourcePtr;
 	class Sound;
 	class StaticString;
 	class Storage;
@@ -27,17 +28,20 @@ namespace Yttrium
 		///
 		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr, Allocator& = *DefaultAllocator);
 
+		/// Releases all loaded resources that have no references outside of the loader.
+		void collect();
+
 		///
 		std::unique_ptr<const IonDocument> load_ion(const StaticString& name) const;
 
 		///
-		std::shared_ptr<const Sound> load_sound(const StaticString& name);
+		ResourcePtr<const Sound> load_sound(const StaticString& name);
 
 		///
-		std::shared_ptr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
+		ResourcePtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
 
 		///
-		std::shared_ptr<const TextureFont> load_texture_font(const StaticString& name);
+		ResourcePtr<const TextureFont> load_texture_font(const StaticString& name);
 
 		///
 		std::unique_ptr<const Translation> load_translation(const StaticString& name) const;

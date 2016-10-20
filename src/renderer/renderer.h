@@ -8,6 +8,7 @@
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/resource/resource_ptr.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 
@@ -15,9 +16,8 @@ namespace Yttrium
 {
 	class BackendTexture2D;
 	class Image;
-	class WindowBackend;
-
 	enum class ImageOrientation;
+	class WindowBackend;
 
 	class RendererImpl : public Renderer
 	{
@@ -109,8 +109,8 @@ namespace Yttrium
 		RectF    _texture_rect;
 		MarginsF _texture_borders;
 
-		std::shared_ptr<Texture2D> _white_texture;
-		std::shared_ptr<Texture2D> _debug_texture;
+		ResourcePtr<Texture2D> _white_texture;
+		ResourcePtr<Texture2D> _debug_texture;
 		UniquePtr<GpuProgram> _program_2d;
 
 		enum class MatrixType

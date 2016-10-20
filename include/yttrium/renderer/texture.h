@@ -5,11 +5,12 @@
 #define _include_yttrium_renderer_texture_h_
 
 #include <yttrium/math/rect.h>
+#include <yttrium/resource/resource.h>
 
 namespace Yttrium
 {
 	/// 2D texture.
-	class Y_API Texture2D
+	class Y_API Texture2D : public Resource
 	{
 	public:
 		virtual ~Texture2D() = default;

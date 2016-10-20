@@ -19,7 +19,7 @@ namespace Yttrium
 		~OpenAlBackend() override;
 
 		UniquePtr<AudioPlayerBackend> create_player() override;
-		std::shared_ptr<SoundImpl> create_sound(const StaticString& name, Allocator&) override;
+		ResourcePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) override;
 
 		static StdVector<StaticString> devices(Allocator&);
 		static UniquePtr<OpenAlBackend> create(const StaticString& device, Allocator&);

@@ -1,11 +1,10 @@
 #ifndef _src_gui_widgets_button_h_
 #define _src_gui_widgets_button_h_
 
+#include <yttrium/resource/resource.h>
 #include <yttrium/script/code.h>
 #include "../properties.h"
 #include "widget.h"
-
-#include <memory>
 
 namespace Yttrium
 {
@@ -28,7 +27,7 @@ namespace Yttrium
 		};
 
 		mutable ForegroundProperty _foreground;
-		std::shared_ptr<const Sound> _sound;
+		ResourcePtr<const Sound> _sound;
 		WidgetState _state = WidgetState::NotSet;
 		Style _styles[WidgetStateCount];
 		ScriptCode _on_click;

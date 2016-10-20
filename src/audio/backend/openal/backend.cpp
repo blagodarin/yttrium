@@ -2,6 +2,7 @@
 
 #include <yttrium/log.h>
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/resource/resource_ptr.h>
 #include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"
@@ -26,9 +27,9 @@ namespace Yttrium
 		return make_unique<OpenAlPlayer>(allocator());
 	}
 
-	std::shared_ptr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
+	ResourcePtr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
 	{
-		return std::make_shared<OpenAlSound>(name, allocator);
+		return make_resource<OpenAlSound>(name, allocator);
 	}
 
 	StdVector<StaticString> OpenAlBackend::devices(Allocator& allocator)

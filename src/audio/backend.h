@@ -3,12 +3,12 @@
 
 #include <yttrium/string.h>
 
-#include <memory>
 #include <utility>
 
 namespace Yttrium
 {
 	class AudioFormat;
+	template <typename> class ResourcePtr;
 	class SoundImpl;
 	template <typename> class UniquePtr;
 
@@ -52,7 +52,7 @@ namespace Yttrium
 		virtual ~AudioBackend() = default;
 
 		virtual UniquePtr<AudioPlayerBackend> create_player() = 0;
-		virtual std::shared_ptr<SoundImpl> create_sound(const StaticString& name, Allocator&) = 0;
+		virtual ResourcePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) = 0;
 
 		StaticString backend() const { return _backend; }
 		StaticString device() const { return _device; }

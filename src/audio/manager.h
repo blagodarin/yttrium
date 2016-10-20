@@ -18,11 +18,9 @@ namespace Yttrium
 		AudioManagerImpl(const Storage&, const StaticString& backend, const StaticString& device, Allocator&);
 
 		StaticString backend() const override;
-		std::shared_ptr<Sound> create_sound(const StaticString&) override;
+		ResourcePtr<Sound> create_sound(const StaticString&) override;
 		StaticString device() const override;
 		AudioPlayer& player() override { return _player; }
-
-		void delete_sound(const String& name);
 
 	private:
 		const Storage& _storage;
