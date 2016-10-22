@@ -4,21 +4,18 @@
 #ifndef _include_yttrium_renderer_texture_h_
 #define _include_yttrium_renderer_texture_h_
 
-#include <yttrium/math/rect.h>
 #include <yttrium/resource/resource.h>
 
 namespace Yttrium
 {
+	class Size;
+
 	/// 2D texture.
-	class Y_API Texture2D : public Resource
+	class Texture2D : public Resource
 	{
 	public:
-		virtual ~Texture2D() = default;
-
 		///
-		typedef uint_fast8_t Filter;
-
-		enum: Filter
+		enum Filter
 		{
 			// Base filter flags and masks.
 
@@ -46,22 +43,7 @@ namespace Yttrium
 		};
 
 		///
-		Filter filter() const { return _filter; }
-
-		///
-		Rect rect() const { return Rect(_size); }
-
-		///
-		void set_filter(Filter filter) { _filter = filter; }
-
-		///
-		Size size() const { return _size; }
-
-	protected:
-		const Size _size;
-		Filter _filter = NearestFilter;
-
-		Texture2D(const Size& size) : _size(size) {}
+		virtual Size size() const noexcept = 0;
 	};
 }
 

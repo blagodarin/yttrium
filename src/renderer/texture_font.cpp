@@ -111,7 +111,7 @@ namespace Yttrium
 
 	private:
 		const int _size;
-		StdMap<char, TextureFont::CharInfo> _chars;
+		StdMap<char, TextureFont::CharInfo> _chars; // TODO: Flat map.
 		StdMap<std::pair<char, char>, int> _kernings;
 		Rect _rect;
 

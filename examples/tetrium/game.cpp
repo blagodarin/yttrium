@@ -12,6 +12,7 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
 #include <yttrium/math/margins.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
@@ -214,13 +215,13 @@ void Game::run()
 
 	_gui.set_canvas_handler("field", [this](Renderer& renderer, const RectF& rect)
 	{
-		PushTexture push_texture(renderer, _blocks.texture());
+		PushTexture push_texture(renderer, _blocks.texture(), Texture2D::TrilinearFilter);
 		draw_field(renderer, rect);
 	});
 
 	_gui.set_canvas_handler("next", [this](Renderer& renderer, const RectF& rect)
 	{
-		PushTexture push_texture(renderer, _blocks.texture());
+		PushTexture push_texture(renderer, _blocks.texture(), Texture2D::TrilinearFilter);
 		draw_next_figure(renderer, rect);
 	});
 

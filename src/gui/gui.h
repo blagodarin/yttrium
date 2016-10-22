@@ -28,11 +28,11 @@ namespace Yttrium
 		struct FontDesc
 		{
 			ResourcePtr<const TextureFont> font;
-			ResourcePtr<Texture2D> texture;
+			ResourcePtr<const Texture2D> texture;
 
 			FontDesc() = default;
 
-			FontDesc(ResourcePtr<const TextureFont>&& font, ResourcePtr<Texture2D>&& texture)
+			FontDesc(ResourcePtr<const TextureFont>&& font, ResourcePtr<const Texture2D>&& texture)
 				: font(std::move(font))
 				, texture(std::move(texture))
 			{

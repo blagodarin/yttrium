@@ -270,9 +270,9 @@ namespace Yttrium
 		_gl.UseProgram(program ? static_cast<const GlGpuProgram*>(program)->handle() : 0);
 	}
 
-	void GlRenderer::set_texture(const Texture2D& texture)
+	void GlRenderer::set_texture(const Texture2D& texture, Texture2D::Filter filter)
 	{
-		static_cast<const GlTexture2D&>(texture).bind();
+		static_cast<const GlTexture2D&>(texture).bind(filter);
 	}
 
 	void GlRenderer::set_window_size_impl(const Size& size)

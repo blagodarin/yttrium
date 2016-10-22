@@ -38,7 +38,7 @@ namespace Yttrium
 		ResourcePtr<const Sound> load_sound(const StaticString& name);
 
 		///
-		ResourcePtr<Texture2D> load_texture_2d(const StaticString& name, bool intensity = false);
+		ResourcePtr<const Texture2D> load_texture_2d(const StaticString& name, bool intensity = false); // TODO: Make parameter-less.
 
 		///
 		ResourcePtr<const TextureFont> load_texture_font(const StaticString& name);

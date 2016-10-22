@@ -5,8 +5,8 @@
 namespace Yttrium
 {
 	BackendTexture2D::BackendTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps)
-		: Texture2D(format.size())
-		, _renderer(renderer)
+		: _renderer(renderer)
+		, _size(format.size())
 		, _orientation(format.orientation())
 		, _has_mipmaps(has_mipmaps)
 	{

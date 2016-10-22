@@ -25,18 +25,18 @@ namespace Yttrium
 	struct ResourceCache
 	{
 		Allocator& _allocator;
-		StdMap<String, ResourcePtr<T>> _map{ _allocator };
+		StdMap<String, ResourcePtr<const T>> _map{ _allocator };
 		std::mutex _mutex;
 
 		ResourceCache(Allocator& allocator) : _allocator(allocator) {}
 
 		void collect()
 		{
-			std::vector<ResourcePtr<T>> collected;
+			std::vector<ResourcePtr<const T>> collected;
 			std::lock_guard<std::mutex> lock(_mutex);
 			for (auto i = _map.begin(); i != _map.end(); )
 			{
-				if (!i->second.has_another_references())
+				if (i->second.unique())
 				{
 					collected.emplace_back(std::move(i->second));
 					i = _map.erase(i);
@@ -46,7 +46,7 @@ namespace Yttrium
 			}
 		}
 
-		ResourcePtr<T> fetch(const StaticString& name, const std::function<ResourcePtr<T>(const StaticString&)>& factory)
+		ResourcePtr<const T> fetch(const StaticString& name, const std::function<ResourcePtr<const T>(const StaticString&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			const auto i = _map.find(String(name, ByReference()));
@@ -109,12 +109,12 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)
+	ResourcePtr<const Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)
 	{
 		// TODO: Map texture memory, then read the image into that memory.
 		if (!_private->_renderer)
 			return {};
-		return _private->_textures_2d.fetch(name, [this, intensity](const StaticString& name) -> ResourcePtr<Texture2D>
+		return _private->_textures_2d.fetch(name, [this, intensity](const StaticString& name) -> ResourcePtr<const Texture2D>
 		{
 			Image image;
 			if (!image.load(_private->_storage.open(name)))
@@ -127,7 +127,7 @@ namespace Yttrium
 
 	ResourcePtr<const TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
 	{
-		return _private->_texture_fonts.fetch(name, [this](const StaticString& name) -> ResourcePtr<TextureFont>
+		return _private->_texture_fonts.fetch(name, [this](const StaticString& name) -> ResourcePtr<const TextureFont>
 		{
 			try
 			{

@@ -105,7 +105,6 @@ Blocks::Blocks(Renderer& renderer)
 	}
 
 	_texture = renderer.create_texture_2d(image.format(), image.data());
-	_texture->set_filter(Texture2D::TrilinearFilter);
 }
 
 Blocks::~Blocks() = default;

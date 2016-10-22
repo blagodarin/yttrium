@@ -8,6 +8,7 @@
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
+#include <yttrium/renderer/texture.h>
 #include <yttrium/resource/resource_ptr.h>
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
@@ -57,13 +58,13 @@ namespace Yttrium
 		void forget_texture(const Texture2D*);
 		void pop_program();
 		void pop_projection();
-		void pop_texture();
+		void pop_texture(Texture2D::Filter);
 		void pop_transformation();
 		const GpuProgram* program_2d() const { return _program_2d.get(); }
 		void push_program(const GpuProgram*);
 		void push_projection_2d(const Matrix4&);
 		void push_projection_3d(const Matrix4&);
-		void push_texture(const Texture2D*);
+		Texture2D::Filter push_texture(const Texture2D*, Texture2D::Filter);
 		void push_transformation(const Matrix4&);
 		Statistics reset_statistics();
 		void set_window_size(const Size&);
@@ -79,7 +80,7 @@ namespace Yttrium
 
 		virtual void flush_2d_impl(const Buffer& vertices, const Buffer& indices) = 0;
 		virtual void set_program(const GpuProgram*) = 0;
-		virtual void set_texture(const Texture2D&) = 0;
+		virtual void set_texture(const Texture2D&, Texture2D::Filter) = 0;
 		virtual void set_window_size_impl(const Size&) = 0;
 
 		const BackendTexture2D* current_texture_2d() const;
@@ -123,6 +124,7 @@ namespace Yttrium
 
 		StdVector<std::pair<const Texture2D*, int>> _texture_stack;
 		const Texture2D* _current_texture = nullptr;
+		Texture2D::Filter _current_texture_filter = Texture2D::NearestFilter;
 		bool _reset_texture = false;
 #if Y_IS_DEBUG
 		StdVector<const Texture2D*> _seen_textures; // For redundancy statistics.

@@ -3,6 +3,7 @@
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/math/vector.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/index_buffer.h>
 #include <yttrium/renderer/modifiers.h>
@@ -24,7 +25,7 @@ Model::~Model() = default;
 void Model::draw(const Vector4& translation)
 {
 	PushGpuProgram push_gpu_program(_renderer, _program.get());
-	PushTexture push_texture(_renderer, _texture.get());
+	PushTexture push_texture(_renderer, _texture.get(), static_cast<Texture2D::Filter>(Texture2D::NearestFilter | Texture2D::AnisotropicFilter));
 	PushTransformation push_transformation(_renderer, Matrix4::translation(translation));
 	_program->set_uniform("u_modelview", _renderer.current_transformation());
 	_program->set_uniform("u_projection", _renderer.current_projection());
@@ -149,7 +150,6 @@ ChessboardModel::ChessboardModel(Renderer& renderer)
 	}
 
 	_texture = _renderer.create_texture_2d(image_format, pixels.data(), false);
-	_texture->set_filter(Texture2D::NearestFilter | Texture2D::AnisotropicFilter);
 
 	_program = _renderer.create_gpu_program(
 		Reader("examples/3d/data/chessboard_vs.glsl").to_string(),

@@ -1,6 +1,7 @@
 #include <yttrium/renderer/modifiers.h>
 
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer/texture.h>
 #include "renderer.h"
 
 namespace Yttrium
@@ -38,15 +39,15 @@ namespace Yttrium
 		static_cast<RendererImpl&>(_renderer).pop_program();
 	}
 
-	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture)
+	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture, Texture2D::Filter filter)
 		: RendererModifier(renderer)
+		, _filter(static_cast<RendererImpl&>(_renderer).push_texture(texture, filter))
 	{
-		static_cast<RendererImpl&>(_renderer).push_texture(texture);
 	}
 
 	PushTexture::~PushTexture()
 	{
-		static_cast<RendererImpl&>(_renderer).pop_texture();
+		static_cast<RendererImpl&>(_renderer).pop_texture(_filter);
 	}
 
 	PushTransformation::PushTransformation(Renderer& renderer, const Matrix4& matrix)

@@ -5,13 +5,13 @@
 #define _include_yttrium_renderer_modifiers_h_
 
 #include <yttrium/global.h>
+#include <yttrium/renderer/texture.h>
 
 namespace Yttrium
 {
 	class GpuProgram;
 	class Matrix4;
 	class Renderer;
-	class Texture2D;
 
 	/// Base class for Renderer modifiers.
 	class RendererModifier
@@ -62,10 +62,13 @@ namespace Yttrium
 	{
 	public:
 		///
-		PushTexture(Renderer&, const Texture2D*);
+		PushTexture(Renderer&, const Texture2D*, Texture2D::Filter = Texture2D::NearestFilter);
 
 		///
 		~PushTexture();
+
+	private:
+		const Texture2D::Filter _filter;
 	};
 
 	///

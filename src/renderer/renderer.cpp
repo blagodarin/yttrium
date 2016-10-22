@@ -61,7 +61,6 @@ namespace Yttrium
 		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
 		if (!renderer->_white_texture)
 			throw std::runtime_error("Failed to initialize an internal texture");
-		renderer->_white_texture->set_filter(Texture2D::NearestFilter);
 
 		ImageFormat debug_texture_format;
 		debug_texture_format.set_width(DebugTexture::width);
@@ -71,7 +70,6 @@ namespace Yttrium
 		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
 			throw std::runtime_error("Failed to initialize an internal texture");
-		renderer->_debug_texture->set_filter(Texture2D::NearestFilter);
 
 		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
 		if (!renderer->_program_2d)
@@ -224,18 +222,19 @@ namespace Yttrium
 	#endif
 	}
 
-	void RendererImpl::pop_texture()
+	void RendererImpl::pop_texture(Texture2D::Filter filter)
 	{
 		assert(_texture_stack.size() > 1 || (_texture_stack.size() == 1 && _texture_stack.back().second > 1));
-		if (_texture_stack.back().second > 1)
+		if (_texture_stack.back().second == 1)
 		{
-			--_texture_stack.back().second;
-			return;
+			flush_2d();
+			_texture_stack.pop_back();
+			_reset_texture = true;
+			reset_texture_state();
 		}
-		flush_2d();
-		_texture_stack.pop_back();
-		_reset_texture = true;
-		reset_texture_state();
+		else
+			--_texture_stack.back().second;
+		_current_texture_filter = filter;
 	}
 
 	void RendererImpl::pop_transformation()
@@ -279,20 +278,26 @@ namespace Yttrium
 			0,  0,  0,  1), MatrixType::Transformation);
 	}
 
-	void RendererImpl::push_texture(const Texture2D* texture)
+	Texture2D::Filter RendererImpl::push_texture(const Texture2D* texture, Texture2D::Filter filter)
 	{
-		assert(!_texture_stack.empty());
 		if (!texture)
-			texture = _white_texture.get();
-		if (_texture_stack.back().first == texture)
 		{
-			++_texture_stack.back().second;
-			return;
+			texture = _white_texture.get();
+			filter = Texture2D::NearestFilter;
 		}
-		flush_2d();
-		_texture_stack.emplace_back(texture, 1);
-		_reset_texture = true;
-		reset_texture_state();
+		assert(!_texture_stack.empty());
+		if (_texture_stack.back().first != texture)
+		{
+			flush_2d();
+			_texture_stack.emplace_back(texture, 1);
+			_reset_texture = true;
+			reset_texture_state();
+		}
+		else
+			++_texture_stack.back().second;
+		const auto previous_filter = _current_texture_filter;
+		_current_texture_filter = filter;
+		return previous_filter;
 	}
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
@@ -351,7 +356,7 @@ namespace Yttrium
 			if (texture != _current_texture)
 			{
 				_current_texture = texture;
-				set_texture(*texture);
+				set_texture(*texture, _current_texture_filter);
 				++_statistics._texture_switches;
 			#if Y_IS_DEBUG
 				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);

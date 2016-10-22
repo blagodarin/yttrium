@@ -1,5 +1,6 @@
 #include "debug_renderer.h"
 
+#include <yttrium/renderer/texture.h>
 #include "debug_texture.h"
 #include "renderer.h"
 
@@ -25,7 +26,7 @@ namespace Yttrium
 {
 	DebugRenderer::DebugRenderer(RendererImpl& renderer)
 		: _renderer(renderer)
-		, _debug_texture(_renderer, _renderer.debug_texture())
+		, _debug_texture(_renderer, _renderer.debug_texture(), Texture2D::NearestFilter)
 	{
 		set_color(1, 1, 1);
 	}

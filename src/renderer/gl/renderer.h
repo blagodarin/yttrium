@@ -24,7 +24,7 @@ namespace Yttrium
 		Image take_screenshot() const override;
 		void flush_2d_impl(const Buffer&, const Buffer&) override;
 		void set_program(const GpuProgram*) override;
-		void set_texture(const Texture2D&) override;
+		void set_texture(const Texture2D&, Texture2D::Filter) override;
 		void set_window_size_impl(const Size&) override;
 
 	private:

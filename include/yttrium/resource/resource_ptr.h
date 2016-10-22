@@ -21,7 +21,7 @@ namespace Yttrium
 		ResourcePtrBase& operator=(const ResourcePtrBase& other) noexcept;
 		ResourcePtrBase& operator=(ResourcePtrBase&& other) noexcept;
 		explicit operator bool() const noexcept { return _pointer; }
-		bool has_another_references() const noexcept { return _pointer->_references.load() > 1; } // TODO: Hide.
+		bool unique() const noexcept { return _pointer && _pointer->_references.load() == 1; }
 	protected:
 		ResourcePtrBase(Resource* pointer) noexcept : _pointer(pointer) { if (_pointer) ++_pointer->_references; }
 		Resource* get() const noexcept { return _pointer; }

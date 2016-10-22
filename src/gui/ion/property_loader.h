@@ -23,13 +23,13 @@ namespace Yttrium
 		bool load(const StaticString&, float&) const override;
 		bool load_alignment(const StaticString& name, unsigned* alignment) const override;
 		bool load_color(const StaticString& name, Vector4* color) const override;
-		bool load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<Texture2D>* texture) const override;
+		bool load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<const Texture2D>* texture) const override;
 		bool load_margins(const StaticString& name, Margins* margins) const override;
 		bool load_rect(const StaticString& name, RectF& rect, bool update) const override;
 		ResourcePtr<const Sound> load_sound(const StaticString& name) const override;
 		bool load_state(const StaticString& name, WidgetState* state) const override;
 		bool load_text(const StaticString& name, String* text) const override;
-		bool load_texture(const StaticString& name, ResourcePtr<Texture2D>* texture) const override;
+		bool load_texture(const StaticString& name, ResourcePtr<const Texture2D>& texture, Texture2D::Filter&) const override;
 		bool load_translatable(const StaticString& name, String* text) const override;
 		void unbind() override;
 
@@ -39,7 +39,7 @@ namespace Yttrium
 		static bool load_size(SizeF& size, const IonNode& node);
 		static bool load_state(WidgetState* state, const IonNode& node);
 		static bool load_text(const StaticString** text, const IonNode& node);
-		static bool load_texture(ResourcePtr<Texture2D>* texture, const IonNode& node, ResourceLoader&, Texture2D::Filter default_filter);
+		static bool load_texture(ResourcePtr<const Texture2D>& texture, Texture2D::Filter&, const IonNode& node, ResourceLoader&);
 
 	private:
 		const IonObject* _object;

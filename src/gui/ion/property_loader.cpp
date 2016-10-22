@@ -166,7 +166,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<const Texture2D>* texture) const
 	{
 		const StaticString* font_name = nullptr;
 
@@ -316,19 +316,19 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_texture(const StaticString& name, ResourcePtr<Texture2D>* texture) const
+	bool GuiIonPropertyLoader::load_texture(const StaticString& name, ResourcePtr<const Texture2D>& texture, Texture2D::Filter& filter) const
 	{
 		if (_bound_object)
 		{
 			const IonNode& node = _bound_object->last(name);
-			if (node.exists() && load_texture(texture, node, _gui.resource_loader(), Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
+			if (node.exists() && load_texture(texture, filter, node, _gui.resource_loader()))
 				return true;
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
-			if (node.exists() && load_texture(texture, node, _gui.resource_loader(), Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter))
+			if (node.exists() && load_texture(texture, filter, node, _gui.resource_loader()))
 				return true;
 		}
 
@@ -506,8 +506,7 @@ namespace Yttrium
 		return node.size() == 1 && node.first()->get(text);
 	}
 
-	bool GuiIonPropertyLoader::load_texture(ResourcePtr<Texture2D>* texture, const IonNode& node,
-		ResourceLoader& resource_loader, Texture2D::Filter default_filter)
+	bool GuiIonPropertyLoader::load_texture(ResourcePtr<const Texture2D>& texture, Texture2D::Filter& filter, const IonNode& node, ResourceLoader& resource_loader)
 	{
 		auto&& values = node.values();
 
@@ -519,8 +518,6 @@ namespace Yttrium
 			return false;
 
 		values.pop_first();
-
-		Texture2D::Filter filter = default_filter;
 
 		Rect rect;
 		Margins borders;
@@ -540,35 +537,35 @@ namespace Yttrium
 				{
 					if (has_interpolation)
 						return false;
-					filter = Texture2D::NearestFilter | (filter & Texture2D::AnisotropicFilter);
+					filter = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (filter & Texture2D::AnisotropicFilter));
 					has_interpolation = true;
 				}
 				else if (*value == "linear"_s)
 				{
 					if (has_interpolation)
 						return false;
-					filter = Texture2D::LinearFilter | (filter & Texture2D::AnisotropicFilter);
+					filter = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (filter & Texture2D::AnisotropicFilter));
 					has_interpolation = true;
 				}
 				else if (*value == "bilinear"_s)
 				{
 					if (has_interpolation)
 						return false;
-					filter = Texture2D::BilinearFilter | (filter & Texture2D::AnisotropicFilter);
+					filter = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (filter & Texture2D::AnisotropicFilter));
 					has_interpolation = true;
 				}
 				else if (*value == "trilinear"_s)
 				{
 					if (has_interpolation)
 						return false;
-					filter = Texture2D::TrilinearFilter | (filter & Texture2D::AnisotropicFilter);
+					filter = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (filter & Texture2D::AnisotropicFilter));
 					has_interpolation = true;
 				}
 				else if (*value == "anisotropic"_s)
 				{
 					if (!has_interpolation || has_anisotropy)
 						return false;
-					filter = (filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter;
+					filter = static_cast<Texture2D::Filter>((filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
 					has_anisotropy = true;
 				}
 				else
@@ -582,8 +579,7 @@ namespace Yttrium
 		if (!result_texture)
 			return false;
 
-		result_texture->set_filter(filter);
-		*texture = result_texture;
+		texture = result_texture;
 
 		return true;
 	}

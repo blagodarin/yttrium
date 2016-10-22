@@ -53,7 +53,7 @@ namespace Yttrium
 	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 	{
 		renderer.set_color(color);
-		PushTexture push_texture(renderer, texture.get());
+		PushTexture push_texture(renderer, texture.get(), texture_filter);
 		renderer.set_texture_rect(texture_rect, borders);
 		renderer.draw_rect(rect);
 	}
@@ -61,10 +61,10 @@ namespace Yttrium
 	bool BackgroundProperty::load(const GuiPropertyLoader& loader)
 	{
 		loader.load_color("color"_s, &color);
-		if (loader.load_texture("texture"_s, &texture))
+		if (loader.load_texture("texture"_s, texture, texture_filter))
 		{
 			if (!loader.load_rect("texture_rect"_s, texture_rect))
-				texture_rect = RectF(texture->rect());
+				texture_rect = RectF(Rect(texture->size()));
 			loader.load_margins("borders"_s, &borders);
 		}
 		return true;
@@ -73,7 +73,7 @@ namespace Yttrium
 	void BackgroundProperty::update(const GuiPropertyLoader& loader)
 	{
 		loader.load_color("color"_s, &color);
-		loader.load_texture("texture"_s, &texture);
+		loader.load_texture("texture"_s, texture, texture_filter);
 		loader.load_rect("texture_rect"_s, texture_rect, true);
 		loader.load_margins("borders"_s, &borders);
 	}
@@ -87,7 +87,7 @@ namespace Yttrium
 
 	void ForegroundProperty::draw(Renderer& renderer) const
 	{
-		PushTexture push_texture(renderer, font_texture.get());
+		PushTexture push_texture(renderer, font_texture.get(), Texture2D::TrilinearFilter);
 		renderer.set_color(color);
 		renderer.draw_rects(geometry);
 	}

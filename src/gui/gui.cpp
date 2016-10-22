@@ -90,7 +90,6 @@ namespace Yttrium
 			return;
 		}
 
-		texture->set_filter(Texture2D::TrilinearFilter | Texture2D::AnisotropicFilter);
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
 

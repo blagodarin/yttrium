@@ -10,12 +10,12 @@ namespace Yttrium
 	{
 	}
 
-	void GlTexture2D::bind() const
+	void GlTexture2D::bind(Texture2D::Filter filter) const
 	{
 		GLint min_filter = GL_NEAREST;
 		GLint mag_filter = GL_NEAREST;
 
-		switch (_filter & Texture2D::IsotropicFilterMask)
+		switch (filter & Texture2D::IsotropicFilterMask)
 		{
 		case Texture2D::NearestFilter:
 			min_filter = _has_mipmaps ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
@@ -43,6 +43,6 @@ namespace Yttrium
 		_texture.set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		_texture.set_parameter(GL_TEXTURE_MIN_FILTER, min_filter);
 		_texture.set_parameter(GL_TEXTURE_MAG_FILTER, mag_filter);
-		_texture.set_anisotropy_enabled(_filter & Texture2D::AnisotropicFilter);
+		_texture.set_anisotropy_enabled(filter & Texture2D::AnisotropicFilter);
 	}
 }
