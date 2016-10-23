@@ -121,27 +121,27 @@ namespace Yttrium
 	ResourcePtr<TextureFont> TextureFont::load(Reader&& reader, Allocator& allocator)
 	{
 		if (!reader)
-			throw ResourceError(allocator) << "Bad file"_s;
+			throw DataError("No data");
 
 		reader.seek(0);
 
 		uint32_t fourcc = 0;
 		if (!reader.read(fourcc) || fourcc != FourccYtf1)
-			throw ResourceError(allocator) << "Bad 'YTF1' fourcc"_s;
+			throw DataError("Bad 'YTF1' fourcc");
 
 		if (!reader.read(fourcc) || fourcc != FourccFont)
-			throw ResourceError(allocator) << "Bad 'font' section fourcc"_s;
+			throw DataError("Bad 'font' section fourcc");
 
 		Ytf1Font font_section;
 		if (!reader.read(font_section))
-			throw ResourceError(allocator) << "Bad 'font' section"_s;
+			throw DataError("Bad 'font' section");
 
 		if (!reader.read(fourcc) || fourcc != FourccChar)
-			throw ResourceError(allocator) << "Bad 'char' section fourcc"_s;
+			throw DataError("Bad 'char' section fourcc");
 
 		uint8_t char_count = 0;
 		if (!reader.read(char_count))
-			throw ResourceError(allocator) << "Bad 'char' section header"_s;
+			throw DataError("Bad 'char' section header");
 
 		auto font = make_resource<TextureFontImpl>(allocator, font_section.size);
 
@@ -150,7 +150,7 @@ namespace Yttrium
 		{
 			Ytf1Char char_data;
 			if (!reader.read(char_data))
-				throw ResourceError(allocator) << "Bad 'char' section entry "_s << i;
+				throw DataError("Bad 'char' section entry ", i);
 
 			CharInfo info;
 			info.rect = {{font_section.base_x + char_data.x, font_section.base_y + char_data.y}, Size(char_data.width, char_data.height)};
@@ -165,17 +165,17 @@ namespace Yttrium
 		if (reader.read(fourcc))
 		{
 			if (fourcc != FourccKern)
-				throw ResourceError(allocator) << "Bad 'kern' section fourcc"_s;
+				throw DataError("Bad 'kern' section fourcc");
 
 			uint16_t kerning_count = 0;
 			if (!reader.read(kerning_count))
-				throw ResourceError(allocator) << "Bad 'kern' section header"_s;
+				throw DataError("Bad 'kern' section header");
 
 			for (uint16_t i = 0; i < kerning_count; ++i)
 			{
 				Ytf1Kerning kerning;
 				if (!reader.read(kerning))
-					throw ResourceError(allocator) << "Bad 'kern' section entry "_s << i;
+					throw DataError("Bad 'kern' section entry ", i);
 				font->_kernings[{kerning.first, kerning.second}] = kerning.amount;
 			}
 		}

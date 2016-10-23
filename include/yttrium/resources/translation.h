@@ -19,6 +19,7 @@ namespace Yttrium
 	{
 	public:
 		///
+		/// May throw DataError.
 		static ResourcePtr<Translation> open(const Reader&, Allocator& = *DefaultAllocator);
 
 		///

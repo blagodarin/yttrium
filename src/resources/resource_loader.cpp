@@ -24,11 +24,16 @@ namespace Yttrium
 	template <typename T>
 	struct ResourceCache
 	{
+		const Storage& _storage;
 		Allocator& _allocator;
 		StdMap<String, ResourcePtr<const T>> _map{ _allocator };
 		std::mutex _mutex;
 
-		ResourceCache(Allocator& allocator) : _allocator(allocator) {}
+		ResourceCache(const Storage& storage, Allocator& allocator)
+			: _storage(storage)
+			, _allocator(allocator)
+		{
+		}
 
 		void collect()
 		{
@@ -46,15 +51,18 @@ namespace Yttrium
 			}
 		}
 
-		ResourcePtr<const T> fetch(const StaticString& name, const std::function<ResourcePtr<const T>(const StaticString&)>& factory)
+		ResourcePtr<const T> fetch(const StaticString& name, const std::function<ResourcePtr<const T>(Reader&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			const auto i = _map.find(String(name, ByReference()));
 			if (i != _map.end())
 				return i->second;
-			auto resource_ptr = factory(name);
+			auto reader = _storage.open(name);
+			if (!reader)
+				throw ResourceError("Can't find \"", name, "\"");
+			auto resource_ptr = factory(std::move(reader));
 			if (!resource_ptr)
-				return {}; // TODO: Throw.
+				throw DataError("Can't load \"", name, "\""); // We don't have more information at this point. =(
 			_map.emplace(String(name, &_allocator), resource_ptr);
 			return resource_ptr;
 		}
@@ -76,11 +84,11 @@ namespace Yttrium
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
-		ResourceCache<IonDocument> _ion_documents{ _allocator };
-		ResourceCache<Sound> _sounds{ _allocator };
-		ResourceCache<Texture2D> _textures_2d{ _allocator };
-		ResourceCache<TextureFont> _texture_fonts{ _allocator };
-		ResourceCache<Translation> _translations{ _allocator };
+		ResourceCache<IonDocument> _ion_document_cache{ _storage, _allocator };
+		ResourceCache<Sound> _sound_cache{ _storage, _allocator };
+		ResourceCache<Texture2D> _texture_2d_cache{ _storage, _allocator };
+		ResourceCache<TextureFont> _texture_font_cache{ _storage, _allocator };
+		ResourceCache<Translation> _translation_cache{ _storage, _allocator };
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
@@ -90,18 +98,18 @@ namespace Yttrium
 
 	void ResourceLoader::collect()
 	{
-		_private->_ion_documents.collect();
-		_private->_sounds.collect();
-		_private->_textures_2d.collect();
-		_private->_texture_fonts.collect();
-		_private->_translations.collect();
+		_private->_ion_document_cache.collect();
+		_private->_sound_cache.collect();
+		_private->_texture_2d_cache.collect();
+		_private->_texture_font_cache.collect();
+		_private->_translation_cache.collect();
 	}
 
 	ResourcePtr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
 	{
-		return _private->_ion_documents.fetch(name, [this](const StaticString& name)
+		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
 		{
-			return IonDocument::open(_private->_storage.open(name), _private->_allocator);
+			return IonDocument::open(reader, _private->_allocator);
 		});
 	}
 
@@ -109,21 +117,21 @@ namespace Yttrium
 	{
 		if (!_private->_audio_manager)
 			return {};
-		return _private->_sounds.fetch(name, [this](const StaticString& name)
+		return _private->_sound_cache.fetch(name, [this](Reader&& reader)
 		{
-			return _private->_audio_manager->create_sound(_private->_storage.open(name));
+			return _private->_audio_manager->create_sound(std::move(reader));
 		});
 	}
 
 	ResourcePtr<const Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)
 	{
-		// TODO: Map texture memory, then read the image into that memory.
 		if (!_private->_renderer)
 			return {};
-		return _private->_textures_2d.fetch(name, [this, intensity](const StaticString& name) -> ResourcePtr<const Texture2D>
+		return _private->_texture_2d_cache.fetch(name, [this, intensity](Reader&& reader) -> ResourcePtr<const Texture2D>
 		{
+			// TODO: Map texture memory, then read the image into that memory.
 			Image image;
-			if (!image.load(_private->_storage.open(name)))
+			if (!image.load(std::move(reader)))
 				return {};
 			if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 				image.intensity_to_bgra();
@@ -133,25 +141,17 @@ namespace Yttrium
 
 	ResourcePtr<const TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
 	{
-		return _private->_texture_fonts.fetch(name, [this](const StaticString& name) -> ResourcePtr<const TextureFont>
+		return _private->_texture_font_cache.fetch(name, [this](Reader&& reader)
 		{
-			try
-			{
-				return TextureFont::load(_private->_storage.open(name), _private->_allocator);
-			}
-			catch (const ResourceError& e)
-			{
-				Log() << "Can't load \""_s << name << "\": "_s << e.what();
-				return {};
-			}
+			return TextureFont::load(std::move(reader), _private->_allocator);
 		});
 	}
 
 	ResourcePtr<const Translation> ResourceLoader::load_translation(const StaticString& name)
 	{
-		return _private->_translations.fetch(name, [this](const StaticString& name)
+		return _private->_translation_cache.fetch(name, [this](Reader&& reader)
 		{
-			return Translation::open(_private->_storage.open(name), _private->_allocator);
+			return Translation::open(reader, _private->_allocator);
 		});
 	}
 

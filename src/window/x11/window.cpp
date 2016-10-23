@@ -18,7 +18,7 @@ namespace
 	{
 		P_Display display(::XOpenDisplay(nullptr));
 		if (!display)
-			throw InitializationError() << "Failed to open the default X11 display";
+			throw InitializationError("Failed to open the default X11 display");
 		return display;
 	}
 
@@ -39,7 +39,7 @@ namespace
 		if (window == None)
 		{
 			::XFreeColormap(display, swa.colormap);
-			throw InitializationError() << "Failed to create an X11 window";
+			throw InitializationError("Failed to create an X11 window");
 		}
 
 		return window;
@@ -148,13 +148,13 @@ namespace Yttrium
 			char data[1] = { 0 };
 			const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
 			if (pixmap == None)
-				throw InitializationError() << "Failed to create a pixmap for an empty cursor"_s;
+				throw InitializationError("Failed to create a pixmap for an empty cursor");
 			::XColor color;
 			::memset(&color, 0, sizeof(color));
 			_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
 			::XFreePixmap(_display, pixmap);
 			if (_cursor == None)
-				throw InitializationError() << "Failed to create an empty cursor"_s;
+				throw InitializationError("Failed to create an empty cursor");
 		}
 
 		~EmptyCursor()

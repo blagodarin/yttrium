@@ -60,7 +60,7 @@ namespace Yttrium
 		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
 		if (!renderer->_white_texture)
-			throw InitializationError(allocator) << "Failed to initialize an internal texture"_s;
+			throw InitializationError("Failed to initialize an internal texture");
 
 		ImageFormat debug_texture_format;
 		debug_texture_format.set_width(DebugTexture::width);
@@ -69,11 +69,11 @@ namespace Yttrium
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
-			throw InitializationError(allocator) << "Failed to initialize an internal texture"_s;
+			throw InitializationError("Failed to initialize an internal texture");
 
 		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
 		if (!renderer->_program_2d)
-			throw InitializationError(allocator) << "Failed to initialize an internal GPU program"_s;
+			throw InitializationError("Failed to initialize an internal GPU program");
 
 		return std::move(renderer);
 	}

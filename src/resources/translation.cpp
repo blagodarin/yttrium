@@ -1,5 +1,6 @@
 #include <yttrium/resources/translation.h>
 
+#include <yttrium/exceptions.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -13,14 +14,12 @@ namespace Yttrium
 	class TranslationImpl : public Translation
 	{
 	public:
-		TranslationImpl(Allocator&);
+		TranslationImpl(const Reader&, Allocator&);
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
 		bool save(const StaticString& path) const override;
 		String translate(const StaticString& source) const override;
-
-		bool load(const Reader&);
 
 	private:
 		struct Entry
@@ -35,10 +34,25 @@ namespace Yttrium
 		StdMap<String, Entry> _translations;
 	};
 
-	TranslationImpl::TranslationImpl(Allocator& allocator)
+	TranslationImpl::TranslationImpl(const Reader& reader, Allocator& allocator)
 		: _allocator(allocator)
 		, _translations(_allocator)
 	{
+		const auto document = IonDocument::open(reader, _allocator);
+		if (!document)
+			throw DataError("Bad translation data");
+		decltype(_translations) translations(_allocator);
+		for (const auto& node : document->root())
+		{
+			if (node.name() != "tr"_s || node.size() != 2)
+				throw DataError("Bad translation data");
+			const StaticString* source = nullptr;
+			const StaticString* translation = nullptr;
+			if (!node.first()->get(&source) || !node.last()->get(&translation))
+				throw DataError("Bad translation data");
+			translations.emplace(String(*source, &_allocator), String(*translation, &_allocator));
+		}
+		_translations = std::move(translations);
 	}
 
 	void TranslationImpl::add(const StaticString& source)
@@ -70,26 +84,6 @@ namespace Yttrium
 		return document->save(file_name);
 	}
 
-	bool TranslationImpl::load(const Reader& reader)
-	{
-		const auto document = IonDocument::open(reader, _allocator);
-		if (!document)
-			return false;
-		decltype(_translations) translations(_allocator);
-		for (const auto& node : document->root())
-		{
-			if (node.name() != "tr"_s || node.size() != 2)
-				return false;
-			const StaticString* source = nullptr;
-			const StaticString* translation = nullptr;
-			if (!node.first()->get(&source) || !node.last()->get(&translation))
-				return false;
-			translations.emplace(String(*source, &_allocator), String(*translation, &_allocator));
-		}
-		_translations = std::move(translations);
-		return true;
-	}
-
 	String TranslationImpl::translate(const StaticString& source) const
 	{
 		const auto i = _translations.find(String(source, ByReference(), &_allocator));
@@ -98,7 +92,6 @@ namespace Yttrium
 
 	ResourcePtr<Translation> Translation::open(const Reader& reader, Allocator& allocator)
 	{
-		auto translation = make_resource<TranslationImpl>(allocator);
-		return translation->load(reader) ? std::move(translation) : nullptr;
+		return make_resource<TranslationImpl>(reader, allocator);
 	}
 }

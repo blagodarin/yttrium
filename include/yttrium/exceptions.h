@@ -11,42 +11,37 @@
 
 namespace Yttrium
 {
-	// TODO: Fix.
-	class InitializationError;
-	class ResourceError;
-
 	///
 	class Exception : public std::exception
 	{
 	public:
-		Exception(Allocator& allocator) : _what(&allocator) {}
-		const char* what() const noexcept override { return _what.text(); }
+		///
+		template <typename... Args>
+		Exception(Args&&... args) { append(std::forward<Args>(args)...); }
 
-	private:
-		String _what;
-		template <typename T> friend Exception operator<<(Exception&&, T&&);
-		template <typename T> friend InitializationError operator<<(InitializationError&&, T&&);
-		template <typename T> friend ResourceError operator<<(ResourceError&&, T&&);
+		const char* what() const noexcept override { return _what.text(); }
 
 	public:
 		Exception(const Exception&) = delete;
 		Exception(Exception&&) = default;
 		Exception& operator=(const Exception&) = delete;
 		Exception& operator=(Exception&&) = default;
+
+	private:
+		template <typename T, typename... Args>
+		void append(T&& value, Args&&... args) { _what << value; append(std::forward<Args>(args)...); }
+		void append() {}
+
+	private:
+		String _what;
 	};
 
-	template <typename T>
-	Exception operator<<(Exception&& e, T&& value)
-	{
-		e._what << std::forward<T>(value);
-		return std::move(e);
-	}
-
-	///
+	/// Thrown if a resource can't be loaded from the supplied data.
 	class DataError : public Exception
 	{
 	public:
-		DataError(Allocator& allocator) : Exception(allocator) {}
+		template <typename... Args>
+		DataError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
 	};
 
 	/// Thrown if the initialization of an object (e.g. Window) fails.
@@ -54,29 +49,17 @@ namespace Yttrium
 	class InitializationError : public Exception
 	{
 	public:
-		InitializationError(Allocator& allocator = *DefaultAllocator) : Exception(allocator) {}
+		template <typename... Args>
+		InitializationError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
 	};
 
-	template <typename T>
-	InitializationError operator<<(InitializationError&& e, T&& value)
-	{
-		e._what << std::forward<T>(value);
-		return std::move(e);
-	}
-
-	///
+	/// Thrown by ResourceLoader if it is unable to find the specified resource.
 	class ResourceError : public Exception
 	{
 	public:
-		ResourceError(Allocator& allocator) : Exception(allocator) {}
+		template <typename... Args>
+		ResourceError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
 	};
-
-	template <typename T>
-	ResourceError operator<<(ResourceError&& e, T&& value)
-	{
-		e._what << std::forward<T>(value);
-		return std::move(e);
-	}
 }
 
 #endif

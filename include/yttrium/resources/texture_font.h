@@ -32,7 +32,7 @@ namespace Yttrium
 		};
 
 		///
-		/// Throws ResourceError.
+		/// May throw DataError.
 		static ResourcePtr<TextureFont> load(Reader&&, Allocator&);
 
 		///
