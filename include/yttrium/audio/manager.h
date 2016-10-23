@@ -29,11 +29,10 @@ namespace Yttrium
 		///
 		AudioPlayer& player();
 
+		~AudioManager();
+
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;
-
-	public:
-		~AudioManager();
 	};
 }
 

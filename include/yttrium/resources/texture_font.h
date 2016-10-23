@@ -6,10 +6,7 @@
 
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/vector.h>
-
-#include <memory>
 
 namespace Yttrium
 {

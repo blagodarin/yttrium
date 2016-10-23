@@ -28,29 +28,20 @@ namespace Yttrium
 		///
 		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr, Allocator& = *DefaultAllocator);
 
-		/// Releases all loaded resources that have no references outside of the loader.
-		void collect();
-
 		///
 		ResourcePtr<const IonDocument> load_ion(const StaticString& name);
-
-		///
 		ResourcePtr<const Sound> load_sound(const StaticString& name);
-
-		///
 		ResourcePtr<const Texture2D> load_texture_2d(const StaticString& name, bool intensity = false); // TODO: Make parameter-less.
-
-		///
 		ResourcePtr<const TextureFont> load_texture_font(const StaticString& name);
-
-		///
 		ResourcePtr<const Translation> load_translation(const StaticString& name);
+
+		/// Releases all loaded resources that have no references outside of the loader.
+		void release_unused();
+
+		~ResourceLoader();
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;
-
-	public:
-		~ResourceLoader();
 	};
 }
 

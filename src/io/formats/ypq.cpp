@@ -3,7 +3,7 @@
 #include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/log.h>
-#include "../utils/fourcc.h"
+#include "../../utils/fourcc.h"
 
 #include <cstring>
 #include <limits>

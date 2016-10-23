@@ -2,7 +2,8 @@
 
 namespace Yttrium
 {
-	static_assert(sizeof(ResourcePtr<Resource>) == sizeof(Resource*), "Bad ResourcePtr size");
+	static_assert(sizeof(Resource) == 2 * sizeof(void*), "Unexpected Resource size");
+	static_assert(sizeof(ResourcePtr<Resource>) == sizeof(Resource*), "Unexpected ResourcePtr size");
 
 	ResourcePtrBase& ResourcePtrBase::operator=(const ResourcePtrBase& other) noexcept
 	{

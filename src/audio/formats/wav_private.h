@@ -1,5 +1,5 @@
-#ifndef _src_audio_io_wav_private_h_
-#define _src_audio_io_wav_private_h_
+#ifndef _src_audio_formats_wav_private_h_
+#define _src_audio_formats_wav_private_h_
 
 #include "../../utils/fourcc.h"
 

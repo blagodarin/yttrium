@@ -1,5 +1,5 @@
 /// \file
-/// \brief %File facilities.
+/// \brief
 
 #ifndef _include_yttrium_io_file_h_
 #define _include_yttrium_io_file_h_

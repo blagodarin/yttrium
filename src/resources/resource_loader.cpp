@@ -9,6 +9,7 @@
 #include <yttrium/ion/document.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/resources/texture_font.h>
 #include <yttrium/resources/translation.h>
 #include <yttrium/std/map.h>
@@ -34,22 +35,6 @@ namespace Yttrium
 		{
 		}
 
-		void collect()
-		{
-			std::vector<ResourcePtr<const T>> collected;
-			std::lock_guard<std::mutex> lock(_mutex);
-			for (auto i = _map.begin(); i != _map.end(); )
-			{
-				if (i->second.unique())
-				{
-					collected.emplace_back(std::move(i->second));
-					i = _map.erase(i);
-				}
-				else
-					++i;
-			}
-		}
-
 		ResourcePtr<const T> fetch(const StaticString& name, const std::function<ResourcePtr<const T>(Reader&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
@@ -64,6 +49,22 @@ namespace Yttrium
 				throw DataError("Can't load \"", name, "\""); // We don't have more information at this point. =(
 			_map.emplace(String(name, &_allocator), resource_ptr);
 			return resource_ptr;
+		}
+
+		void release_unused()
+		{
+			std::vector<ResourcePtr<const T>> unused;
+			std::lock_guard<std::mutex> lock(_mutex);
+			for (auto i = _map.begin(); i != _map.end(); )
+			{
+				if (i->second.unique())
+				{
+					unused.emplace_back(std::move(i->second));
+					i = _map.erase(i);
+				}
+				else
+					++i;
+			}
 		}
 	};
 
@@ -95,15 +96,6 @@ namespace Yttrium
 	{
 	}
 
-	void ResourceLoader::collect()
-	{
-		_private->_ion_document_cache.collect();
-		_private->_sound_cache.collect();
-		_private->_texture_2d_cache.collect();
-		_private->_texture_font_cache.collect();
-		_private->_translation_cache.collect();
-	}
-
 	ResourcePtr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
 	{
 		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
@@ -133,7 +125,7 @@ namespace Yttrium
 			if (!image.load(std::move(reader)))
 				return {};
 			if (intensity && image.format().pixel_format() == PixelFormat::Gray)
-				image.intensity_to_bgra();
+				image.intensity_to_bgra(); // TODO: Move this inside the renderer.
 			return _private->_renderer->create_texture_2d(image.format(), image.data());
 		});
 	}
@@ -152,6 +144,15 @@ namespace Yttrium
 		{
 			return Translation::open(reader, _private->_allocator);
 		});
+	}
+
+	void ResourceLoader::release_unused()
+	{
+		_private->_ion_document_cache.release_unused();
+		_private->_sound_cache.release_unused();
+		_private->_texture_2d_cache.release_unused();
+		_private->_texture_font_cache.release_unused();
+		_private->_translation_cache.release_unused();
 	}
 
 	ResourceLoader::~ResourceLoader() = default;

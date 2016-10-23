@@ -1,11 +1,11 @@
-#ifndef _src_io_ypq_h_
-#define _src_io_ypq_h_
+#ifndef _src_io_formats_ypq_h_
+#define _src_io_formats_ypq_h_
 
 #include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
-#include "package.h"
+#include "../package.h"
 
 namespace Yttrium
 {

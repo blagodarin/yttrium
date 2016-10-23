@@ -2,7 +2,7 @@
 
 #include <yttrium/log.h>
 #include <yttrium/memory/unique_ptr.h>
-#include "ypq.h"
+#include "formats/ypq.h"
 
 namespace Yttrium
 {

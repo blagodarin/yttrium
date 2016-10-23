@@ -1,5 +1,5 @@
-#ifndef _src_audio_io_ogg_vorbis_h_
-#define _src_audio_io_ogg_vorbis_h_
+#ifndef _src_audio_formats_ogg_vorbis_h_
+#define _src_audio_formats_ogg_vorbis_h_
 
 #include "../reader.h"
 

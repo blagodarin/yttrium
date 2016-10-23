@@ -2,11 +2,11 @@
 
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
-#include "../../utils/fourcc.h"
-#include "wav.h"
+#include "../utils/fourcc.h"
+#include "formats/wav.h"
 
 #ifndef Y_NO_OGG_VORBIS
-	#include "ogg_vorbis/ogg_vorbis.h"
+	#include "formats/ogg_vorbis.h"
 #endif
 
 #include <new>

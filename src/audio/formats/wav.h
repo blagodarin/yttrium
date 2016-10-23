@@ -1,7 +1,7 @@
-#ifndef _src_audio_io_wav_h_
-#define _src_audio_io_wav_h_
+#ifndef _src_audio_formats_wav_h_
+#define _src_audio_formats_wav_h_
 
-#include "reader.h"
+#include "../reader.h"
 
 namespace Yttrium
 {

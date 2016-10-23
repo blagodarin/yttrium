@@ -166,13 +166,13 @@ src_paths = [
 	'audio',
 	'audio/backend',
 	'audio/backend/openal',
-	'audio/io',
 	'base',
 	'gui',
 	'gui/ion',
 	'gui/logic',
 	'gui/widgets',
 	'io',
+	'io/formats',
 	'ion',
 	'math',
 	'memory',
@@ -199,12 +199,15 @@ src_target = 'lib/yttrium'
 src_sources = [src_env.Glob('$BUILD/src/' + path + '/*.cpp') for path in src_paths]
 
 src_sources += [
+	'$BUILD/src/audio/formats/wav.cpp',
 	'$BUILD/src/image/image.cpp',
 	'$BUILD/src/image/formats.cpp',
 	'$BUILD/src/image/formats/dds.cpp',
 	'$BUILD/src/image/formats/tga.cpp']
 if not option_no_jpeg:
 	src_sources += ['$BUILD/src/image/formats/jpeg.cpp']
+if not option_no_ogg_vorbis:
+	src_sources += ['$BUILD/src/audio/formats/ogg_vorbis.cpp']
 if not option_no_png:
 	src_sources += ['$BUILD/src/image/formats/png.cpp']
 
