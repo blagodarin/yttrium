@@ -3,30 +3,24 @@
 
 #include <yttrium/audio/manager.h>
 
-#include <yttrium/audio/sound.h>
-#include <yttrium/std/map.h>
 #include "player.h"
 
 namespace Yttrium
 {
 	class AudioBackend;
-	class AudioManagerImpl;
 
-	class AudioManagerImpl : public AudioManager
+	class AudioManagerPrivate
 	{
 	public:
-		AudioManagerImpl(const Storage&, const StaticString& backend, const StaticString& device, Allocator&);
-
-		StaticString backend() const override;
-		ResourcePtr<Sound> create_sound(const StaticString&) override;
-		StaticString device() const override;
-		AudioPlayer& player() override { return _player; }
+		AudioManagerPrivate(const Storage&, Allocator&);
 
 	private:
 		const Storage& _storage;
 		Allocator& _allocator;
-		const UniquePtr<AudioBackend> _backend;
+		const std::unique_ptr<AudioBackend> _backend;
 		AudioPlayerImpl _player;
+
+		friend AudioManager;
 	};
 }
 

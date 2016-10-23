@@ -1,5 +1,7 @@
 #include "format.h"
 
+#include <yttrium/audio/io.h>
+
 namespace Yttrium
 {
 	bool OpenAlFormat::set(const AudioFormat& format)

@@ -50,14 +50,14 @@ private:
 	NamedAllocator _script_allocator{ "script" };
 	ScriptContext _script{ &_script_allocator };
 	NamedAllocator _audio_allocator{ "audio" };
-	const UniquePtr<AudioManager> _audio = AudioManager::create(_storage, {}, {}, _audio_allocator);
+	AudioManager _audio{ _storage, _audio_allocator };
 	NamedAllocator _window_allocator{ "window" };
 	Window _window{ "Tetrium", *this, _window_allocator };
 	Console _console{ _script, _allocator };
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024, &_allocator };
 	NamedAllocator _resources_allocator{ "resources" };
-	ResourceLoader _resource_loader{ _storage, &_window.renderer(), _audio.get(), _resources_allocator };
+	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio, _resources_allocator };
 	NamedAllocator _gui_allocator{ "gui" };
 	Gui _gui{ _resource_loader, _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };

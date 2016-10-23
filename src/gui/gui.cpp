@@ -1,7 +1,7 @@
 #include <yttrium/gui.h>
 
+#include <yttrium/exceptions.h>
 #include <yttrium/i18n/translation.h>
-#include <yttrium/io/errors.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>

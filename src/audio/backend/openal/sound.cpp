@@ -1,20 +1,22 @@
 #include "sound.h"
 
+#include <yttrium/audio/io.h>
 #include <yttrium/memory/buffer.h>
-#include "../../manager.h"
+
+#include <new>
 
 namespace Yttrium
 {
-	void OpenAlSound::play() const
-	{
-		::alSourceStop(_source);
-		::alSourcePlay(_source);
-	}
-
 	OpenAlSound::~OpenAlSound()
 	{
 		::alDeleteSources(1, &_source);
 		::alDeleteBuffers(1, &_buffer);
+	}
+
+	void OpenAlSound::play() const
+	{
+		::alSourceStop(_source);
+		::alSourcePlay(_source);
 	}
 
 	bool OpenAlSound::load(AudioReader& reader)

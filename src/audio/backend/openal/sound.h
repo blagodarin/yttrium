@@ -9,7 +9,6 @@ namespace Yttrium
 	class OpenAlSound : public SoundImpl
 	{
 	public:
-		OpenAlSound(const StaticString& name, Allocator& allocator) : SoundImpl(name, allocator) {}
 		~OpenAlSound() override;
 
 		void play() const override;
@@ -21,8 +20,6 @@ namespace Yttrium
 		ALuint _source = 0;
 		ALuint _buffer = 0;
 		OpenAlFormat _format;
-
-		friend class OpenAlBackend;
 	};
 }
 

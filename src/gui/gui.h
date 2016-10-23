@@ -61,7 +61,7 @@ namespace Yttrium
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
 		StdVector<GuiLayer*> _layer_stack{ _allocator };
 		StdMap<String, std::function<void(Renderer&, const RectF&)>> _canvas_handlers{ _allocator };
-		std::unique_ptr<const Translation> _translation;
+		ResourcePtr<const Translation> _translation;
 
 		friend Gui;
 	};

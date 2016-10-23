@@ -44,7 +44,7 @@ namespace Yttrium
 		ResourcePtr<const TextureFont> load_texture_font(const StaticString& name);
 
 		///
-		std::unique_ptr<const Translation> load_translation(const StaticString& name) const;
+		ResourcePtr<const Translation> load_translation(const StaticString& name);
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;

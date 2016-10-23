@@ -14,18 +14,13 @@ namespace Yttrium
 	class OpenAlBackend : public AudioBackend
 	{
 	public:
-
-		OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator&);
+		OpenAlBackend(Allocator&);
 		~OpenAlBackend() override;
 
-		UniquePtr<AudioPlayerBackend> create_player() override;
-		ResourcePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) override;
-
-		static StdVector<StaticString> devices(Allocator&);
-		static UniquePtr<OpenAlBackend> create(const StaticString& device, Allocator&);
+		std::unique_ptr<AudioPlayerBackend> create_player() override;
+		ResourcePtr<SoundImpl> create_sound() override;
 
 	private:
-
 		const P_ALCdevice _device;
 		const P_ALCcontext _context;
 	};

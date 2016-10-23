@@ -1,19 +1,41 @@
 #include "backend.h"
 
-#include <yttrium/log.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/resource/resource_ptr.h>
 #include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"
 
+namespace
+{
+	using namespace Yttrium;
+
+	P_ALCdevice create_alc_device(Allocator& allocator)
+	{
+		P_ALCdevice device(::alcOpenDevice(nullptr));
+		if (!device)
+			throw InitializationError(allocator) << "Failed to open the default OpenAL device"_s;
+		return device;
+	}
+
+	P_ALCcontext create_alc_context(::ALCdevice* device, Allocator& allocator)
+	{
+		P_ALCcontext context(::alcCreateContext(device, nullptr));
+		if (!context)
+			throw InitializationError(allocator) << "Failed to create an OpenAL context for \""_s << ::alcGetString(device, ALC_DEVICE_SPECIFIER) << "\" device"_s;
+		return context;
+	}
+}
+
 namespace Yttrium
 {
-	OpenAlBackend::OpenAlBackend(P_ALCdevice device, P_ALCcontext context, Allocator& allocator)
-		: AudioBackend(OpenAL, ::alcGetString(device.get(), ALC_DEVICE_SPECIFIER), allocator)
-		, _device(std::move(device))
-		, _context(std::move(context))
+	OpenAlBackend::OpenAlBackend(Allocator& allocator)
+		: AudioBackend(allocator)
+		, _device(::create_alc_device(allocator))
+		, _context(::create_alc_context(_device.get(), allocator))
 	{
+		::alcMakeContextCurrent(_context.get());
 	}
 
 	OpenAlBackend::~OpenAlBackend()
@@ -22,59 +44,13 @@ namespace Yttrium
 			::alcMakeContextCurrent(nullptr);
 	}
 
-	UniquePtr<AudioPlayerBackend> OpenAlBackend::create_player()
+	std::unique_ptr<AudioPlayerBackend> OpenAlBackend::create_player()
 	{
-		return make_unique<OpenAlPlayer>(allocator());
+		return std::make_unique<OpenAlPlayer>();
 	}
 
-	ResourcePtr<SoundImpl> OpenAlBackend::create_sound(const StaticString& name, Allocator& allocator)
+	ResourcePtr<SoundImpl> OpenAlBackend::create_sound()
 	{
-		return make_resource<OpenAlSound>(name, allocator);
-	}
-
-	StdVector<StaticString> OpenAlBackend::devices(Allocator& allocator)
-	{
-		StdVector<StaticString> result(allocator);
-
-		const ALCchar* devices = ::alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
-
-		if (devices)
-		{
-			for (const ALCchar* current = devices; *current; )
-			{
-				const ALCchar* next = current;
-				do ++next; while (*next);
-				result.emplace_back(current, next - current);
-				current = next + 1;
-			}
-		}
-
-		return result;
-	}
-
-	UniquePtr<OpenAlBackend> OpenAlBackend::create(const StaticString& device, Allocator& allocator)
-	{
-		P_ALCdevice alc_device;
-
-		if (!device.is_empty())
-		{
-			Y_ZERO_TERMINATED(device_z, device);
-			alc_device.reset(::alcOpenDevice(device_z));
-			if (!alc_device)
-				Log() << "(audio/openal) Unable to open device \""_s << device << "\""_s;
-		}
-
-		if (!alc_device)
-			alc_device.reset(::alcOpenDevice(nullptr));
-
-		if (!alc_device)
-			throw UnableToCreate(String("(audio/openal) Failed to create device"_s, &allocator));
-
-		P_ALCcontext alc_context(::alcCreateContext(alc_device.get(), nullptr));
-		if (!alc_context)
-			throw UnableToCreate(String("(audio/openal) Failed to create context"_s, &allocator));
-
-		::alcMakeContextCurrent(alc_context.get());
-		return make_unique<OpenAlBackend>(allocator, std::move(alc_device), std::move(alc_context), allocator);
+		return make_resource<OpenAlSound>();
 	}
 }

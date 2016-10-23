@@ -5,6 +5,7 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/memory/named_allocator.h>
+#include <yttrium/resource/resource_ptr.h>
 #include <yttrium/string.h>
 
 #include <iostream>

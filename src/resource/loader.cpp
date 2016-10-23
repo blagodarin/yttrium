@@ -2,13 +2,13 @@
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
-#include <yttrium/image.h>
-#include <yttrium/log.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/i18n/translation.h>
-#include <yttrium/io/errors.h>
+#include <yttrium/image.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/ion/document.h>
+#include <yttrium/log.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/texture_font.h>
@@ -79,6 +79,7 @@ namespace Yttrium
 		ResourceCache<Sound> _sounds{ _allocator };
 		ResourceCache<Texture2D> _textures_2d{ _allocator };
 		ResourceCache<TextureFont> _texture_fonts{ _allocator };
+		ResourceCache<Translation> _translations{ _allocator };
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
@@ -91,6 +92,7 @@ namespace Yttrium
 		_private->_sounds.collect();
 		_private->_textures_2d.collect();
 		_private->_texture_fonts.collect();
+		_private->_translations.collect();
 	}
 
 	std::unique_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name) const
@@ -105,7 +107,7 @@ namespace Yttrium
 			return {};
 		return _private->_sounds.fetch(name, [this](const StaticString& name)
 		{
-			return _private->_audio_manager->create_sound(name);
+			return _private->_audio_manager->create_sound(_private->_storage.open(name));
 		});
 	}
 
@@ -141,9 +143,12 @@ namespace Yttrium
 		});
 	}
 
-	std::unique_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name) const
+	ResourcePtr<const Translation> ResourceLoader::load_translation(const StaticString& name)
 	{
-		return Translation::open(_private->_storage.open(name), _private->_allocator);
+		return _private->_translations.fetch(name, [this](const StaticString& name)
+		{
+			return Translation::open(_private->_storage.open(name), _private->_allocator);
+		});
 	}
 
 	ResourceLoader::~ResourceLoader() = default;

@@ -3,8 +3,6 @@
 
 #include <yttrium/audio/sound.h>
 
-#include <yttrium/string.h>
-
 namespace Yttrium
 {
 	class AudioReader;
@@ -12,15 +10,7 @@ namespace Yttrium
 	class SoundImpl : public Sound
 	{
 	public:
-		const String& name() const { return _name; }
-
 		virtual bool load(AudioReader&) = 0;
-
-	protected:
-		SoundImpl(const StaticString& name, Allocator& allocator): _name(name, &allocator) {}
-
-	private:
-		const String _name;
 	};
 }
 

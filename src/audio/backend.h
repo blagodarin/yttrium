@@ -3,19 +3,17 @@
 
 #include <yttrium/string.h>
 
-#include <utility>
+#include <memory>
 
 namespace Yttrium
 {
 	class AudioFormat;
 	template <typename> class ResourcePtr;
 	class SoundImpl;
-	template <typename> class UniquePtr;
 
 	class AudioPlayerBackend
 	{
 	public:
-
 		enum
 		{
 			NumBuffers = 2,
@@ -35,38 +33,20 @@ namespace Yttrium
 	class AudioBackend
 	{
 	public:
-
-		class UnableToCreate
-		{
-		public:
-			UnableToCreate(String&& what) : _what(std::move(what)) {}
-			StaticString what() const { return _what; }
-		private:
-			const String _what;
-		};
-
-		static const StaticString OpenAL;
-
-		static UniquePtr<AudioBackend> create(const StaticString& backend, const StaticString& device, Allocator&);
+		static std::unique_ptr<AudioBackend> create(Allocator&);
 
 		virtual ~AudioBackend() = default;
 
-		virtual UniquePtr<AudioPlayerBackend> create_player() = 0;
-		virtual ResourcePtr<SoundImpl> create_sound(const StaticString& name, Allocator&) = 0;
-
-		StaticString backend() const { return _backend; }
-		StaticString device() const { return _device; }
+		virtual std::unique_ptr<AudioPlayerBackend> create_player() = 0;
+		virtual ResourcePtr<SoundImpl> create_sound() = 0;
 
 	protected:
+		AudioBackend(Allocator& allocator) : _allocator(allocator) {}
 
-		AudioBackend(const StaticString& backend, const StaticString& device, Allocator& allocator);
-
-		Allocator& allocator() const { return *_backend.allocator(); }
+		Allocator& allocator() const { return _allocator; }
 
 	private:
-
-		const String _backend;
-		const String _device;
+		Allocator& _allocator;
 	};
 }
 

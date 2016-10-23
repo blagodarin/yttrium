@@ -32,7 +32,7 @@ namespace Yttrium
 		bool has_layer(const StaticString& name) const;
 
 		///
-		bool load(const StaticString& filename);
+		bool load(const StaticString& filename); // TODO: Throw on failure.
 
 		///
 		bool pop_layers(size_t count);

@@ -1,6 +1,6 @@
 #include <yttrium/renderer/texture_font.h>
 
-#include <yttrium/io/errors.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/text_capture.h>

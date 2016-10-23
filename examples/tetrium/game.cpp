@@ -82,13 +82,10 @@ Game::Game(Storage& storage)
 
 	_script.define("play_music", [this](const ScriptCall&)
 	{
-		if (_audio)
-		{
-			if (!_audio->player().is_playing())
-				_audio->player().play();
-			else
-				_audio->player().pause();
-		}
+		if (!_audio.player().is_playing())
+			_audio.player().play();
+		else
+			_audio.player().pause();
 	});
 
 	_script.define("pop_layer", 0, 1, [this](const ScriptCall& call)
@@ -124,8 +121,7 @@ Game::Game(Storage& storage)
 
 	_script.define("stop_music", [this](const ScriptCall&)
 	{
-		if (_audio)
-			_audio->player().stop();
+		_audio.player().stop();
 	});
 
 	_script.define("tgcon", [this](const ScriptCall&)
@@ -185,29 +181,26 @@ void Game::run()
 
 	std::srand(millisecond_clock());
 
-	if (_audio)
+	const auto music_ion = _resource_loader.load_ion("data/music.ion");
+	if (music_ion)
 	{
-		const auto ion = _resource_loader.load_ion("data/music.ion");
-		if (ion)
+		for (const IonValue& value : music_ion->root().last("music"))
 		{
-			for (const IonValue& value : ion->root().last("music"))
-			{
-				const IonObject* entry = value.object();
-				if (!entry)
-					continue;
+			const IonObject* entry = value.object();
+			if (!entry)
+				continue;
 
-				const auto& file_name = Ion::to_string(*entry, "file");
-				if (file_name.is_empty())
-					continue;
+			const auto& file_name = Ion::to_string(*entry, "file");
+			if (file_name.is_empty())
+				continue;
 
-				AudioPlayer::Settings settings;
-				settings.begin = Ion::to_string(*entry, "begin").to_time();
-				settings.end = Ion::to_string(*entry, "end").to_time();
-				settings.loop = Ion::to_string(*entry, "loop").to_time();
-				_audio->player().load(file_name, settings);
-			}
-			_audio->player().set_order(AudioPlayer::Random);
+			AudioPlayer::Settings settings;
+			settings.begin = Ion::to_string(*entry, "begin").to_time();
+			settings.end = Ion::to_string(*entry, "end").to_time();
+			settings.loop = Ion::to_string(*entry, "loop").to_time();
+			_audio.player().load(file_name, settings);
 		}
+		_audio.player().set_order(AudioPlayer::Random);
 	}
 
 	if (!_gui.load("examples/tetrium/data/gui.ion"))
@@ -225,8 +218,7 @@ void Game::run()
 		draw_next_figure(renderer, rect);
 	});
 
-	if (_audio)
-		_audio->player().play();
+	_audio.player().play();
 
 	_window.show();
 	_window.run();

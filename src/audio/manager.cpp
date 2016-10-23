@@ -2,7 +2,6 @@
 
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
-#include <yttrium/log.h>
 #include <yttrium/resource/resource_ptr.h>
 #include "sound.h"
 
@@ -10,60 +9,34 @@
 
 namespace Yttrium
 {
-	StdVector<StaticString> AudioManager::backends(Allocator& allocator)
-	{
-		StdVector<StaticString> result(allocator);
-		result.emplace_back(AudioBackend::OpenAL);
-		return result;
-	}
-
-	StdVector<StaticString> AudioManager::backend_devices(const StaticString& backend, Allocator& allocator)
-	{
-		if (backend == AudioBackend::OpenAL)
-			return OpenAlBackend::devices(allocator);
-		else
-			return StdVector<StaticString>(allocator);
-	}
-
-	UniquePtr<AudioManager> AudioManager::create(const Storage& storage, const StaticString& backend, const StaticString& device, Allocator& allocator)
-	{
-		try
-		{
-			return make_unique<AudioManagerImpl>(allocator, storage, backend, device, allocator);
-		}
-		catch (const AudioBackend::UnableToCreate& e)
-		{
-			Log() << e.what();
-			return {};
-		}
-	}
-
-	AudioManagerImpl::AudioManagerImpl(const Storage& storage, const StaticString& backend, const StaticString& device, Allocator& allocator)
+	AudioManagerPrivate::AudioManagerPrivate(const Storage& storage, Allocator& allocator)
 		: _storage(storage)
 		, _allocator(allocator)
-		, _backend(AudioBackend::create(backend, device, _allocator))
+		, _backend(AudioBackend::create(_allocator))
 		, _player(_storage, _backend->create_player(), _allocator)
 	{
 	}
 
-	StaticString AudioManagerImpl::backend() const
+	AudioManager::AudioManager(const Storage& storage, Allocator& allocator)
+		: _private(std::make_unique<AudioManagerPrivate>(storage, allocator))
 	{
-		return _backend->backend();
 	}
 
-	ResourcePtr<Sound> AudioManagerImpl::create_sound(const StaticString& name)
+	ResourcePtr<Sound> AudioManager::create_sound(Reader&& reader)
 	{
-		const auto reader = AudioReader::open(_storage.open(name), AudioType::Auto, _allocator);
-		if (!reader)
+		const auto audio_reader = AudioReader::open(std::move(reader), AudioType::Auto, _private->_allocator);
+		if (!audio_reader)
 			return {};
-		auto sound = _backend->create_sound(name, _allocator);
-		if (!sound->load(*reader))
+		auto sound = _private->_backend->create_sound();
+		if (!sound->load(*audio_reader))
 			return {};
 		return sound;
 	}
 
-	StaticString AudioManagerImpl::device() const
+	AudioPlayer& AudioManager::player()
 	{
-		return _backend->device();
+		return _private->_player;
 	}
+
+	AudioManager::~AudioManager() = default;
 }
