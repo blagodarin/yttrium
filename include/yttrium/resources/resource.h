@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_resource_resource_h_
-#define _include_yttrium_resource_resource_h_
+#ifndef _include_yttrium_resources_resource_h_
+#define _include_yttrium_resources_resource_h_
 
 #include <atomic>
 #include <cstddef>

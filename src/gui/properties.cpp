@@ -3,8 +3,8 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/renderer/texture_font.h>
 #include <yttrium/renderer/textured_rect.h>
+#include <yttrium/resources/texture_font.h>
 #include <yttrium/string.h>
 #include "property_loader.h"
 

@@ -1,7 +1,6 @@
 #ifndef _src_gui_widgets_button_h_
 #define _src_gui_widgets_button_h_
 
-#include <yttrium/resource/resource.h>
 #include <yttrium/script/code.h>
 #include "../properties.h"
 #include "widget.h"

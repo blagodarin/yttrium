@@ -4,7 +4,7 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/vector.h>
 
 namespace Yttrium

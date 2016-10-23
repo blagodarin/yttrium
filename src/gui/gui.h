@@ -2,8 +2,7 @@
 #define _src_gui_gui_h_
 
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/renderer/texture_font.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
 
@@ -14,12 +13,14 @@ namespace Yttrium
 {
 	class Gui;
 	class GuiLayer;
+	class RectF;
 	class Renderer;
 	class ResourceLoader;
 	class ScriptContext;
 	class Storage;
 	class String;
 	class Texture2D;
+	class TextureFont;
 	class Translation;
 
 	class GuiPrivate

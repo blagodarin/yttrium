@@ -4,7 +4,7 @@
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 
 namespace Yttrium
 {

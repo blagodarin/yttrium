@@ -1,11 +1,11 @@
 /// \file
-/// \brief Translation file.
+/// \brief
 
-#ifndef _include_yttrium_i18n_translation_h_
-#define _include_yttrium_i18n_translation_h_
+#ifndef _include_yttrium_resources_translation_h_
+#define _include_yttrium_resources_translation_h_
 
 #include <yttrium/memory/global.h>
-#include <yttrium/resource/resource.h>
+#include <yttrium/resources/resource.h>
 
 namespace Yttrium
 {
@@ -14,7 +14,7 @@ namespace Yttrium
 	class StaticString;
 	class String;
 
-	///
+	/// Translation file.
 	class Y_API Translation : public Resource
 	{
 	public:

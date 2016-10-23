@@ -1,12 +1,13 @@
 #include <yttrium/gui.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/i18n/translation.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resource/loader.h>
+#include <yttrium/resources/resource_loader.h>
+#include <yttrium/resources/texture_font.h>
+#include <yttrium/resources/translation.h>
 #include <yttrium/script/context.h>
 #include "exceptions.h"
 #include "gui.h"

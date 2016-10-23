@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_renderer_texture_h_
 #define _include_yttrium_renderer_texture_h_
 
-#include <yttrium/resource/resource.h>
+#include <yttrium/resources/resource.h>
 
 namespace Yttrium
 {

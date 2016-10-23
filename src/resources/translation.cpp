@@ -1,10 +1,10 @@
-#include <yttrium/i18n/translation.h>
+#include <yttrium/resources/translation.h>
 
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/string.h>
 

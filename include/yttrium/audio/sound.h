@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_audio_sound_h_
 #define _include_yttrium_audio_sound_h_
 
-#include <yttrium/resource/resource.h>
+#include <yttrium/resources/resource.h>
 
 namespace Yttrium
 {

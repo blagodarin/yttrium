@@ -1,11 +1,11 @@
-#include <yttrium/i18n/translation.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/memory/named_allocator.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
+#include <yttrium/resources/translation.h>
 #include <yttrium/string.h>
 
 #include <iostream>
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	}
 
 	NamedAllocator i18n_allocator("i18n"_s);
-	const auto& translation = Translation::open(Reader(argv[1]), i18n_allocator);
+	const auto translation = Translation::open(Reader(argv[1]), i18n_allocator);
 
 	for (int i = 2; i < argc; ++i)
 	{

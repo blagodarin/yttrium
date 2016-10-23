@@ -2,7 +2,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 #include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"

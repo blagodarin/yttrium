@@ -1,4 +1,4 @@
-#include <yttrium/renderer/texture_font.h>
+#include <yttrium/resources/texture_font.h>
 
 #include <yttrium/exceptions.h>
 #include <yttrium/io/reader.h>
@@ -11,7 +11,7 @@
 
 namespace Yttrium
 {
-	class TextureFontImpl : public TextureFont
+	class TextureFontImpl final : public TextureFont
 	{
 	public:
 		TextureFontImpl(Allocator& allocator, int size)

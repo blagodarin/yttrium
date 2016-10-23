@@ -1,7 +1,7 @@
 #include <yttrium/gui.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/resource/loader.h>
+#include <yttrium/resources/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/string.h>
 #include <yttrium/window.h>

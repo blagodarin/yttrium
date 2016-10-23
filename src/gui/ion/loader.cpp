@@ -8,7 +8,7 @@
 #include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/log.h>
-#include <yttrium/resource/loader.h>
+#include <yttrium/resources/resource_loader.h>
 #include "../exceptions.h"
 #include "../gui.h"
 #include "../layer.h"

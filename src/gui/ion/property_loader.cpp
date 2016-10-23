@@ -5,7 +5,8 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/math/margins.h>
-#include <yttrium/resource/loader.h>
+#include <yttrium/math/rect.h>
+#include <yttrium/resources/resource_loader.h>
 #include <yttrium/utils.h>
 #include "../gui.h"
 

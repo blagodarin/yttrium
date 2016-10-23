@@ -1,4 +1,4 @@
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 
 namespace Yttrium
 {

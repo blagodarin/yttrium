@@ -1,12 +1,12 @@
 /// \file
-/// \brief Texture font markup.
+/// \brief
 
-#ifndef _include_yttrium_renderer_texture_font_h_
-#define _include_yttrium_renderer_texture_font_h_
+#ifndef _include_yttrium_resources_texture_font_h_
+#define _include_yttrium_resources_texture_font_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/resource/resource.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource.h>
+#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/vector.h>
 
 #include <memory>
@@ -14,6 +14,7 @@
 namespace Yttrium
 {
 	class Reader;
+	template <typename> class ResourcePtr;
 	class StaticString;
 	class TextCapture;
 	class TexturedRect;

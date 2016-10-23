@@ -2,7 +2,7 @@
 
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
-#include <yttrium/resource/resource_ptr.h>
+#include <yttrium/resources/resource_ptr.h>
 #include "sound.h"
 
 #include "backend/openal/backend.h"

@@ -1,9 +1,8 @@
-#include <yttrium/resource/loader.h>
+#include <yttrium/resources/resource_loader.h>
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
-#include <yttrium/i18n/translation.h>
 #include <yttrium/image.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
@@ -11,7 +10,8 @@
 #include <yttrium/log.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/renderer/texture_font.h>
+#include <yttrium/resources/texture_font.h>
+#include <yttrium/resources/translation.h>
 #include <yttrium/std/map.h>
 
 #include <mutex>
