@@ -6,7 +6,7 @@
 namespace Yttrium
 {
 	class Buffer;
-	class IonDocument;
+	class IonDocumentImpl;
 	class IonList;
 	class IonObject;
 	class StaticString;
@@ -14,15 +14,12 @@ namespace Yttrium
 	class IonParser
 	{
 	public:
+		IonParser(IonDocumentImpl&);
 
-		IonParser(IonDocument& document);
-
-		/// Parses a buffer as an ION document.
-		/// The buffer must have a zero terminator.
+		// The buffer must be zero-terminated.
 		bool parse(Buffer&, const StaticString& source_name);
 
 	private:
-
 		bool parse_name(const StaticString& name);
 		bool parse_value(const StaticString& value);
 		bool parse_lbrace();
@@ -32,11 +29,9 @@ namespace Yttrium
 		bool parse_end();
 
 	private:
-
-		IonDocument& _document;
+		IonDocumentImpl& _document;
 
 	private:
-
 		enum CharClass
 		{
 			Other,    // Any character not mentioned below.
@@ -54,7 +49,6 @@ namespace Yttrium
 		static const CharClass char_class[256];
 
 	private:
-
 		struct State
 		{
 			IonObject* object = nullptr;

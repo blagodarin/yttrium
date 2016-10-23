@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 	class ByReference;
-	class IonDocumentPrivate;
+	class IonDocumentImpl;
 	class IonListIterator;
 	class IonListRange;
 	class IonObject;
@@ -22,6 +22,7 @@ namespace Yttrium
 	///
 	class Y_API IonList
 	{
+		friend IonDocumentImpl;
 		friend IonParser;
 		friend IonValue;
 
@@ -61,17 +62,14 @@ namespace Yttrium
 		IonList& operator=(const IonList&) = delete;
 
 	protected:
-
-		IonList(IonDocumentPrivate& document): _document(document) {}
+		IonList(IonDocumentImpl& document): _document(document) {}
 
 	private:
-
 		Y_PRIVATE IonValue* append(const StaticString& string, const ByReference&);
 		Y_PRIVATE void append(IonValue* value);
 
 	private:
-
-		IonDocumentPrivate& _document;
+		IonDocumentImpl& _document;
 		IonValue* _first = nullptr;
 		IonValue* _last = nullptr;
 		size_t _size = 0;

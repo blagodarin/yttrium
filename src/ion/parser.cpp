@@ -1,16 +1,16 @@
 #include "parser.h"
 
-#include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
+#include "document.h"
 
 #include <cassert>
 
 namespace Yttrium
 {
-	IonParser::IonParser(IonDocument& document)
+	IonParser::IonParser(IonDocumentImpl& document)
 		: _document(document)
 		, _states(_document.allocator())
 	{

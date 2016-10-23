@@ -10,7 +10,7 @@
 namespace Yttrium
 {
 	class ByReference;
-	class IonDocumentPrivate;
+	class IonDocumentImpl;
 	class IonNode;
 	class IonObjectIterator;
 	class IonObjectReverseIterator;
@@ -22,7 +22,7 @@ namespace Yttrium
 	///
 	class Y_API IonObject
 	{
-		friend IonDocumentPrivate;
+		friend IonDocumentImpl;
 		friend IonParser;
 
 	public:
@@ -58,15 +58,13 @@ namespace Yttrium
 		IonObject& operator=(const IonObject&) = delete;
 
 	private:
-
-		IonObject(IonDocumentPrivate& document);
+		IonObject(IonDocumentImpl& document);
 
 		Y_PRIVATE IonNode* append(const StaticString& name, const ByReference&);
 		Y_PRIVATE void clear();
 
 	private:
-
-		IonDocumentPrivate& _document;
+		IonDocumentImpl& _document;
 		StdVector<IonNode*> _nodes;
 		StdMap<String, StdVector<IonNode*>> _node_map;
 	};

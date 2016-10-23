@@ -76,6 +76,7 @@ namespace Yttrium
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
+		ResourceCache<IonDocument> _ion_documents{ _allocator };
 		ResourceCache<Sound> _sounds{ _allocator };
 		ResourceCache<Texture2D> _textures_2d{ _allocator };
 		ResourceCache<TextureFont> _texture_fonts{ _allocator };
@@ -89,16 +90,19 @@ namespace Yttrium
 
 	void ResourceLoader::collect()
 	{
+		_private->_ion_documents.collect();
 		_private->_sounds.collect();
 		_private->_textures_2d.collect();
 		_private->_texture_fonts.collect();
 		_private->_translations.collect();
 	}
 
-	std::unique_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name) const
+	ResourcePtr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
 	{
-		auto ion = std::make_unique<IonDocument>(_private->_allocator);
-		return ion->load(_private->_storage.open(name)) ? std::move(ion) : nullptr;
+		return _private->_ion_documents.fetch(name, [this](const StaticString& name)
+		{
+			return IonDocument::open(_private->_storage.open(name), _private->_allocator);
+		});
 	}
 
 	ResourcePtr<const Sound> ResourceLoader::load_sound(const StaticString& name)

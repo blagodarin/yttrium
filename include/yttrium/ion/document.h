@@ -4,51 +4,39 @@
 #ifndef _include_yttrium_ion_document_h_
 #define _include_yttrium_ion_document_h_
 
-#include <yttrium/memory/unique_ptr.h>
+#include <yttrium/memory/global.h>
+#include <yttrium/resources/resource.h>
 
 namespace Yttrium
 {
 	class IonObject;
 	class Reader;
+	template <typename> class ResourcePtr;
 	class StaticString;
 
 	///
-	class Y_API IonDocument
+	class Y_API IonDocument : public Resource
 	{
 	public:
 		///
 		enum class Formatting
 		{
-			Pretty,  ///<
+			Pretty, ///<
 			Compact, ///<
 		};
 
-		///
-		IonDocument(Allocator& = *DefaultAllocator);
+		/// Creates an empty document.
+		static ResourcePtr<IonDocument> create(Allocator& = *DefaultAllocator);
 
 		///
-		Allocator& allocator() const { return _private.allocator(); }
+		static ResourcePtr<IonDocument> open(const Reader&, Allocator& = *DefaultAllocator);
 
 		///
-		bool load(const Reader&);
+		virtual IonObject& root() = 0;
+		virtual const IonObject& root() const = 0;
 
 		///
-		bool load(const StaticString& path);
-
-		///
-		IonObject& root();
-		const IonObject& root() const;
-
-		///
-		bool save(const StaticString& path, Formatting = Formatting::Pretty) const;
-
-	private:
-		UniquePtr<class IonDocumentPrivate> _private;
-
-	public:
-		~IonDocument();
-		IonDocument(IonDocument&&) noexcept;
-		IonDocument& operator=(IonDocument&&) noexcept;
+		virtual bool save(const StaticString& path, Formatting = Formatting::Pretty) const = 0;
 	};
 }
 

@@ -7,6 +7,7 @@ namespace Yttrium
 {
 	class IonDocument;
 	class IonObject;
+	template <typename> class ResourcePtr;
 	class StaticString;
 	class String;
 
@@ -22,7 +23,7 @@ namespace Yttrium
 
 	private:
 		Allocator& _allocator;
-		StdMap<String, IonDocument> _classes;
+		StdMap<String, ResourcePtr<IonDocument>> _classes;
 	};
 }
 

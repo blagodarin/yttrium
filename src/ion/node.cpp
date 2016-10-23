@@ -9,19 +9,19 @@ namespace Yttrium
 		return _name.allocator() != &NoAllocator;
 	}
 
-	IonNode::IonNode(IonDocumentPrivate& document)
+	IonNode::IonNode(IonDocumentImpl& document)
 		: IonList(document)
 		, _name(&document.allocator())
 	{
 	}
 
-	IonNode::IonNode(IonDocumentPrivate& document, const StaticString& name)
+	IonNode::IonNode(IonDocumentImpl& document, const StaticString& name)
 		: IonList(document)
 		, _name(name, &document.allocator())
 	{
 	}
 
-	IonNode::IonNode(IonDocumentPrivate& document, const StaticString& name, const ByReference&)
+	IonNode::IonNode(IonDocumentImpl& document, const StaticString& name, const ByReference&)
 		: IonList(document)
 		, _name(name, ByReference(), &document.allocator())
 	{

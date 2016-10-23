@@ -12,7 +12,7 @@ namespace Yttrium
 	///
 	class Y_API IonValue
 	{
-		friend IonDocumentPrivate;
+		friend IonDocumentImpl;
 		friend IonList;
 		friend IonListIterator;
 		friend IonListRange;
@@ -88,14 +88,12 @@ namespace Yttrium
 		IonValue& operator=(const IonValue&) = delete;
 
 	private:
-
-		Y_PRIVATE IonValue(IonDocumentPrivate&);
-		Y_PRIVATE IonValue(IonDocumentPrivate&, const StaticString& string);
-		Y_PRIVATE IonValue(IonDocumentPrivate&, const StaticString& string, const ByReference&);
-		Y_PRIVATE IonValue(IonDocumentPrivate&, IonObject* object);
+		Y_PRIVATE IonValue(IonDocumentImpl&);
+		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString& string);
+		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString& string, const ByReference&);
+		Y_PRIVATE IonValue(IonDocumentImpl&, IonObject* object);
 
 	private:
-
 		const Type _type;
 		String _string;
 		IonList _list;

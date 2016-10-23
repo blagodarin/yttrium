@@ -4,6 +4,7 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/utils.h>
+#include <yttrium/resources/resource_ptr.h>
 
 namespace
 {
@@ -40,13 +41,13 @@ namespace Yttrium
 			auto i = _classes.find(String(*base_class, ByReference()));
 			if (i == _classes.end())
 				return false;
-			base = &i->second.root();
+			base = &i->second->root();
 		}
 
-		IonDocument document(_allocator);
-		::update_document(document.root(), source);
+		auto document = IonDocument::create(_allocator);
+		::update_document(document->root(), source);
 		if (base)
-			::update_document(document.root(), *base);
+			::update_document(document->root(), *base);
 
 		_classes.emplace(String(name, &_allocator), std::move(document));
 
@@ -61,6 +62,6 @@ namespace Yttrium
 	const IonObject* GuiClasses::find(const StaticString& name) const
 	{
 		auto i = _classes.find(String(name, ByReference()));
-		return i != _classes.end() ? &i->second.root() : nullptr;
+		return i != _classes.end() ? &i->second->root() : nullptr;
 	}
 }

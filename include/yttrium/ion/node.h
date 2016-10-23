@@ -12,7 +12,7 @@ namespace Yttrium
 	///
 	class Y_API IonNode : public IonList
 	{
-		friend IonDocumentPrivate;
+		friend IonDocumentImpl;
 		friend IonObject;
 
 	public:
@@ -24,9 +24,9 @@ namespace Yttrium
 		StaticString name() const { return _name; }
 
 	private:
-		Y_PRIVATE IonNode(IonDocumentPrivate&);
-		Y_PRIVATE IonNode(IonDocumentPrivate&, const StaticString& name);
-		Y_PRIVATE IonNode(IonDocumentPrivate&, const StaticString& name, const ByReference&);
+		Y_PRIVATE IonNode(IonDocumentImpl&);
+		Y_PRIVATE IonNode(IonDocumentImpl&, const StaticString& name);
+		Y_PRIVATE IonNode(IonDocumentImpl&, const StaticString& name, const ByReference&);
 
 	private:
 		const String _name;

@@ -32,7 +32,7 @@ namespace Yttrium
 		void collect();
 
 		///
-		std::unique_ptr<const IonDocument> load_ion(const StaticString& name) const;
+		ResourcePtr<const IonDocument> load_ion(const StaticString& name);
 
 		///
 		ResourcePtr<const Sound> load_sound(const StaticString& name);

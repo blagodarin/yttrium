@@ -4,28 +4,28 @@
 
 namespace Yttrium
 {
-	IonValue::IonValue(IonDocumentPrivate& document)
+	IonValue::IonValue(IonDocumentImpl& document)
 		: _type(Type::List)
 		, _string(&document.allocator())
 		, _list(document)
 	{
 	}
 
-	IonValue::IonValue(IonDocumentPrivate& document, const StaticString& string)
+	IonValue::IonValue(IonDocumentImpl& document, const StaticString& string)
 		: _type(Type::String)
 		, _string(string, &document.allocator())
 		, _list(document)
 	{
 	}
 
-	IonValue::IonValue(IonDocumentPrivate& document, const StaticString& string, const ByReference&)
+	IonValue::IonValue(IonDocumentImpl& document, const StaticString& string, const ByReference&)
 		: _type(Type::String)
 		, _string(string, ByReference(), &document.allocator())
 		, _list(document)
 	{
 	}
 
-	IonValue::IonValue(IonDocumentPrivate& document, IonObject* object)
+	IonValue::IonValue(IonDocumentImpl& document, IonObject* object)
 		: _type(Type::Object)
 		, _string(&document.allocator())
 		, _list(document)

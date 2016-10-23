@@ -11,13 +11,13 @@
 
 namespace Yttrium
 {
-	class IonDocumentPrivate
+	class IonDocumentImpl final : public IonDocument
 	{
 	public:
-		static IonDocumentPrivate null;
+		static IonDocumentImpl null;
 		static const IonNode null_node;
 
-		IonDocumentPrivate(Allocator& allocator)
+		IonDocumentImpl(Allocator& allocator)
 			: _allocator(allocator)
 			, _root(*this)
 			, _objects(32, allocator)
@@ -25,6 +25,10 @@ namespace Yttrium
 			, _values(32, allocator)
 		{
 		}
+
+		IonObject& root() override { return _root; }
+		const IonObject& root() const override { return _root; }
+		bool save(const StaticString&, Formatting) const override;
 
 		Allocator& allocator() const { return _allocator; }
 		void clear();
@@ -35,6 +39,9 @@ namespace Yttrium
 		IonValue* new_object_value(IonObject* object);
 		IonValue* new_value(const StaticString& text);
 		IonValue* new_value(const StaticString& name, const ByReference&);
+
+	private:
+		bool load(const Reader&);
 
 	private:
 		Allocator& _allocator;

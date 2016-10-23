@@ -36,7 +36,7 @@ namespace Yttrium
 			if (!nodes.empty())
 				return *nodes.front();
 		}
-		return IonDocumentPrivate::null_node;
+		return IonDocumentImpl::null_node;
 	}
 
 	const IonNode& IonObject::last(const StaticString& name) const
@@ -48,7 +48,7 @@ namespace Yttrium
 			if (!nodes.empty())
 				return *nodes.back();
 		}
-		return IonDocumentPrivate::null_node;
+		return IonDocumentImpl::null_node;
 	}
 
 	IonObjectReverseIterator IonObject::rbegin() const
@@ -61,7 +61,7 @@ namespace Yttrium
 		return IonObjectReverseIterator(_nodes.empty() ? nullptr : &_nodes.front() - 1);
 	}
 
-	IonObject::IonObject(IonDocumentPrivate& document)
+	IonObject::IonObject(IonDocumentImpl& document)
 		: _document(document)
 		, _nodes(_document.allocator())
 		, _node_map(_document.allocator())

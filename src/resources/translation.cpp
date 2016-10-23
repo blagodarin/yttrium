@@ -60,24 +60,23 @@ namespace Yttrium
 
 	bool TranslationImpl::save(const StaticString& file_name) const
 	{
-		IonDocument document(_allocator);
+		const auto document = IonDocument::create(_allocator);
 		for (const auto& translation : _translations)
 		{
-			auto& node = *document.root().append("tr"_s);
+			auto& node = *document->root().append("tr"_s);
 			node.append(translation.first);
 			node.append(translation.second.text);
 		}
-		return document.save(file_name);
+		return document->save(file_name);
 	}
 
 	bool TranslationImpl::load(const Reader& reader)
 	{
-		IonDocument document(_allocator);
-		if (!document.load(reader))
+		const auto document = IonDocument::open(reader, _allocator);
+		if (!document)
 			return false;
 		decltype(_translations) translations(_allocator);
-		const auto& root = document.root();
-		for (const auto& node : root)
+		for (const auto& node : document->root())
 		{
 			if (node.name() != "tr"_s || node.size() != 2)
 				return false;

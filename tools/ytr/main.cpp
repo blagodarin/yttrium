@@ -3,7 +3,6 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/memory/named_allocator.h>
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/resources/translation.h>
 #include <yttrium/string.h>
@@ -63,18 +62,17 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	NamedAllocator i18n_allocator("i18n"_s);
-	const auto translation = Translation::open(Reader(argv[1]), i18n_allocator);
+	const auto translation = Translation::open(Reader(argv[1]));
 
 	for (int i = 2; i < argc; ++i)
 	{
-		IonDocument document(i18n_allocator);
-		if (!document.load(argv[i]))
+		const auto document = IonDocument::open(Reader(argv[i]));
+		if (!document)
 		{
 			std::cerr << "ERROR: Failed to load source file \"" << argv[i] << "\"" << std::endl;
 			return 1;
 		}
-		update_translation(*translation, document.root());
+		update_translation(*translation, document->root());
 	}
 
 	translation->remove_obsolete();
