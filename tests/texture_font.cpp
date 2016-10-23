@@ -68,6 +68,6 @@ BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
 
 	BOOST_REQUIRE(file.flush());
 
-	const auto font = TextureFont::load(Reader(file.name()), *DefaultAllocator);
+	const auto font = TextureFont::open(Reader(file.name()), *DefaultAllocator);
 	BOOST_REQUIRE(font);
 }

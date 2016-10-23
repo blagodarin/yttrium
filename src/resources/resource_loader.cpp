@@ -143,7 +143,7 @@ namespace Yttrium
 	{
 		return _private->_texture_font_cache.fetch(name, [this](Reader&& reader)
 		{
-			return TextureFont::load(std::move(reader), _private->_allocator);
+			return TextureFont::open(std::move(reader), _private->_allocator);
 		});
 	}
 

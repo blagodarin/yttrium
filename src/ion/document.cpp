@@ -1,5 +1,6 @@
 #include "document.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
 #include <yttrium/ion/list.h>
@@ -11,6 +12,15 @@ namespace Yttrium
 {
 	IonDocumentImpl IonDocumentImpl::null(NoAllocator);
 	const IonNode IonDocumentImpl::null_node(null);
+
+	IonDocumentImpl::IonDocumentImpl(Allocator& allocator)
+		: _allocator(allocator)
+		, _root(*this)
+		, _objects(32, allocator)
+		, _nodes(32, allocator)
+		, _values(32, allocator)
+	{
+	}
 
 	bool IonDocumentImpl::save(const StaticString& path, Formatting formatting) const
 	{
@@ -43,19 +53,14 @@ namespace Yttrium
 		return new(_values.allocate()) IonValue(*this, object);
 	}
 
-	IonValue* IonDocumentImpl::new_value(const StaticString& name)
+	IonValue* IonDocumentImpl::new_value(const StaticString& text)
 	{
-		return new(_values.allocate()) IonValue(*this, name);
+		return new(_values.allocate()) IonValue(*this, text);
 	}
 
-	IonValue* IonDocumentImpl::new_value(const StaticString& name, const ByReference&)
+	IonValue* IonDocumentImpl::new_value(const StaticString& text, const ByReference&)
 	{
-		return new(_values.allocate()) IonValue(*this, name, ByReference());
-	}
-
-	bool IonDocumentImpl::load(const Reader& reader)
-	{
-		return reader.read_all(_buffer) && IonParser(*this).parse(_buffer, reader.name());
+		return new(_values.allocate()) IonValue(*this, text, ByReference());
 	}
 
 	ResourcePtr<IonDocument> IonDocument::create(Allocator& allocator)
@@ -66,6 +71,10 @@ namespace Yttrium
 	ResourcePtr<IonDocument> IonDocument::open(const Reader& reader, Allocator& allocator)
 	{
 		auto document = make_resource<IonDocumentImpl>(allocator);
-		return document->load(reader) ? std::move(document) : nullptr;
+		if (!reader.read_all(document->_buffer))
+			return nullptr;
+		if (!IonParser(*document).parse(document->_buffer, reader.name()))
+			throw DataError("Bad ION document: \"", reader.name(), "\"");
+		return std::move(document);
 	}
 }

@@ -11,8 +11,6 @@
 
 using namespace Yttrium;
 
-void update_translation(Translation& translation, const IonObject& source);
-
 bool update_tr(Translation& translation, const IonObject& tr_object)
 {
 	if (tr_object.size() != 1)
@@ -29,6 +27,8 @@ bool update_tr(Translation& translation, const IonObject& tr_object)
 	translation.add(tr_value.string());
 	return true;
 }
+
+void update_translation(Translation& translation, const IonObject& source);
 
 void update_translation(Translation& translation, const IonValue& source)
 {
@@ -63,13 +63,18 @@ int main(int argc, char** argv)
 	}
 
 	const auto translation = Translation::open(Reader(argv[1]));
+	if (!translation)
+	{
+		std::cerr << "ERROR: Unable to open translation \"" << argv[1] << "\"" << std::endl;
+		return 1;
+	}
 
 	for (int i = 2; i < argc; ++i)
 	{
 		const auto document = IonDocument::open(Reader(argv[i]));
 		if (!document)
 		{
-			std::cerr << "ERROR: Failed to load source file \"" << argv[i] << "\"" << std::endl;
+			std::cerr << "ERROR: Unable to open source \"" << argv[i] << "\"" << std::endl;
 			return 1;
 		}
 		update_translation(*translation, document->root());

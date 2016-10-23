@@ -17,14 +17,7 @@ namespace Yttrium
 		static IonDocumentImpl null;
 		static const IonNode null_node;
 
-		IonDocumentImpl(Allocator& allocator)
-			: _allocator(allocator)
-			, _root(*this)
-			, _objects(32, allocator)
-			, _nodes(32, allocator)
-			, _values(32, allocator)
-		{
-		}
+		IonDocumentImpl(Allocator&);
 
 		IonObject& root() override { return _root; }
 		const IonObject& root() const override { return _root; }
@@ -38,10 +31,7 @@ namespace Yttrium
 		IonObject* new_object();
 		IonValue* new_object_value(IonObject* object);
 		IonValue* new_value(const StaticString& text);
-		IonValue* new_value(const StaticString& name, const ByReference&);
-
-	private:
-		bool load(const Reader&);
+		IonValue* new_value(const StaticString& text, const ByReference&);
 
 	private:
 		Allocator& _allocator;

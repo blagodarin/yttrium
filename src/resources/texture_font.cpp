@@ -118,10 +118,10 @@ namespace Yttrium
 		friend TextureFont;
 	};
 
-	ResourcePtr<TextureFont> TextureFont::load(Reader&& reader, Allocator& allocator)
+	ResourcePtr<TextureFont> TextureFont::open(Reader&& reader, Allocator& allocator)
 	{
 		if (!reader)
-			throw DataError("No data");
+			return nullptr;
 
 		reader.seek(0);
 

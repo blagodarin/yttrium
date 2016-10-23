@@ -32,8 +32,9 @@ namespace Yttrium
 		};
 
 		///
+		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static ResourcePtr<TextureFont> load(Reader&&, Allocator&);
+		static ResourcePtr<TextureFont> open(Reader&&, Allocator&);
 
 		///
 		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;

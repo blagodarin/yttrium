@@ -1,6 +1,7 @@
 #include <yttrium/resources/translation.h>
 
 #include <yttrium/exceptions.h>
+#include <yttrium/io/reader.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -92,6 +93,6 @@ namespace Yttrium
 
 	ResourcePtr<Translation> Translation::open(const Reader& reader, Allocator& allocator)
 	{
-		return make_resource<TranslationImpl>(reader, allocator);
+		return reader ? make_resource<TranslationImpl>(reader, allocator) : nullptr;
 	}
 }

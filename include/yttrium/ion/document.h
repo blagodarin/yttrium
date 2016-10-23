@@ -29,6 +29,8 @@ namespace Yttrium
 		static ResourcePtr<IonDocument> create(Allocator& = *DefaultAllocator);
 
 		///
+		/// Returns 'nullptr' for a null Reader.
+		/// May throw DataError.
 		static ResourcePtr<IonDocument> open(const Reader&, Allocator& = *DefaultAllocator);
 
 		///
