@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_console_h_
 #define _include_yttrium_console_h_
 
-#include <yttrium/memory/unique_ptr.h>
+#include <yttrium/memory/global.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -31,11 +33,11 @@ namespace Yttrium
 		///
 		void set_visible(bool);
 
-	private:
-		const UniquePtr<class ConsolePrivate> _private;
-
 	public:
 		~Console();
+
+	private:
+		const std::unique_ptr<class ConsolePrivate> _private;
 	};
 }
 

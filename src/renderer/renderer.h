@@ -13,6 +13,8 @@
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class BackendTexture2D;
@@ -33,7 +35,7 @@ namespace Yttrium
 			int _redundant_shader_switches = 0;
 		};
 
-		static UniquePtr<RendererImpl> create(WindowBackend&, Allocator&);
+		static std::unique_ptr<RendererImpl> create(WindowBackend&, Allocator&);
 
 		RendererImpl(Allocator&);
 		~RendererImpl() override;

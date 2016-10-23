@@ -4,9 +4,10 @@
 #ifndef _include_yttrium_gui_h_
 #define _include_yttrium_gui_h_
 
-#include <yttrium/memory/unique_ptr.h>
+#include <yttrium/memory/global.h>
 
 #include <functional>
+#include <memory>
 
 namespace Yttrium
 {
@@ -32,7 +33,7 @@ namespace Yttrium
 		bool has_layer(const StaticString& name) const;
 
 		///
-		bool load(const StaticString& filename); // TODO: Throw on failure.
+		bool load(const StaticString& name); // TODO: Throw on failure.
 
 		///
 		bool pop_layers(size_t count);
@@ -49,11 +50,11 @@ namespace Yttrium
 		///
 		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
 
-	private:
-		const UniquePtr<class GuiPrivate> _private;
-
 	public:
 		~Gui();
+
+	private:
+		const std::unique_ptr<class GuiPrivate> _private;
 	};
 }
 

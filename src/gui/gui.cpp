@@ -100,7 +100,7 @@ namespace Yttrium
 	}
 
 	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<GuiPrivate>(allocator, resource_loader, script_context, allocator))
+		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, allocator))
 	{
 	}
 

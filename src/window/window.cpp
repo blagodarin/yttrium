@@ -38,8 +38,8 @@ namespace Yttrium
 		WindowCallbacks& _callbacks;
 		Allocator& _allocator;
 		const String _name;
-		WindowBackend _backend{ _name, *this, _allocator };
-		const UniquePtr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator);
+		WindowBackend _backend{ _name, *this };
+		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator);
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;
@@ -139,7 +139,7 @@ namespace Yttrium
 	};
 
 	Window::Window(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
-		: _private(make_unique<WindowPrivate>(allocator, name, callbacks, allocator))
+		: _private(std::make_unique<WindowPrivate>(name, callbacks, allocator))
 	{
 	}
 

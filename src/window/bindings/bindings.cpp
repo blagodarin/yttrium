@@ -219,8 +219,8 @@ namespace Yttrium
 		} while (_index < _bindings._private->_actions.size());
 	}
 
-	Bindings::Bindings(ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<BindingsPrivate>(allocator, script_context))
+	Bindings::Bindings(ScriptContext& script_context)
+		: _private(std::make_unique<BindingsPrivate>(script_context))
 	{
 	}
 
@@ -235,7 +235,7 @@ namespace Yttrium
 	void Bindings::bind(Key key, const StaticString& action)
 	{
 		auto& binding = _private->_actions[KeyType(key)];
-		binding.first.swap(String(action, &_private.allocator()));
+		binding.first.swap(String(action, &_private->_script_context.allocator()));
 		binding.second = ScriptCode(binding.first, _private->_script_context.allocator());
 	}
 
@@ -253,7 +253,7 @@ namespace Yttrium
 		auto& binding = _private->_actions[KeyType(key)];
 		if (binding.first.is_empty())
 		{
-			binding.first.swap(String(action, &_private.allocator()));
+			binding.first.swap(String(action, &_private->_script_context.allocator()));
 			binding.second = ScriptCode(binding.first, _private->_script_context.allocator());
 		}
 	}

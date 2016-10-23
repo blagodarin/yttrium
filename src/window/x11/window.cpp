@@ -1,5 +1,6 @@
 #include "window.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/string.h>
@@ -17,7 +18,7 @@ namespace
 	{
 		P_Display display(::XOpenDisplay(nullptr));
 		if (!display)
-			throw std::runtime_error("Failed to open the default X11 display");
+			throw InitializationError() << "Failed to open the default X11 display";
 		return display;
 	}
 
@@ -38,7 +39,7 @@ namespace
 		if (window == None)
 		{
 			::XFreeColormap(display, swa.colormap);
-			throw std::runtime_error("Failed to create an X11 window");
+			throw InitializationError() << "Failed to create an X11 window";
 		}
 
 		return window;
@@ -147,13 +148,13 @@ namespace Yttrium
 			char data[1] = { 0 };
 			const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
 			if (pixmap == None)
-				throw std::runtime_error("Failed to create a pixmap for an empty cursor");
+				throw InitializationError() << "Failed to create a pixmap for an empty cursor"_s;
 			::XColor color;
 			::memset(&color, 0, sizeof(color));
 			_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
 			::XFreePixmap(_display, pixmap);
 			if (_cursor == None)
-				throw std::runtime_error("Failed to create an empty cursor");
+				throw InitializationError() << "Failed to create an empty cursor"_s;
 		}
 
 		~EmptyCursor()
@@ -171,10 +172,10 @@ namespace Yttrium
 		::Cursor _cursor = None;
 	};
 
-	WindowBackend::WindowBackend(const String& name, WindowBackendCallbacks& callbacks, Allocator& allocator)
+	WindowBackend::WindowBackend(const String& name, WindowBackendCallbacks& callbacks)
 		: _display(::open_display())
 		, _window(::create_window(_display.get(), _screen, _glx))
-		, _empty_cursor(make_unique<EmptyCursor>(allocator, _display.get(), _window))
+		, _empty_cursor(std::make_unique<EmptyCursor>(_display.get(), _window))
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display.get(), _window, &_wm_delete_window, 1);

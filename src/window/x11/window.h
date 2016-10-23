@@ -18,7 +18,7 @@ namespace Yttrium
 	class WindowBackend
 	{
 	public:
-		WindowBackend(const String& name, WindowBackendCallbacks&, Allocator&);
+		WindowBackend(const String& name, WindowBackendCallbacks&);
 		~WindowBackend();
 
 		void close();
@@ -35,7 +35,7 @@ namespace Yttrium
 		const int _screen = DefaultScreen(_display.get());
 		const GlContext _glx{ _display.get(), _screen };
 		::Window _window; // TODO: Prevent resource leak if _empty_cursor construction throws.
-		const UniquePtr<EmptyCursor> _empty_cursor;
+		const std::unique_ptr<EmptyCursor> _empty_cursor;
 		::Atom _wm_protocols = ::XInternAtom(_display.get(), "WM_PROTOCOLS", True);
 		::Atom _wm_delete_window = ::XInternAtom(_display.get(), "WM_DELETE_WINDOW", True);
 		::Atom _net_wm_state = ::XInternAtom(_display.get(), "_NET_WM_STATE", True);

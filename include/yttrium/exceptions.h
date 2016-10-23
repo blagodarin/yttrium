@@ -42,12 +42,19 @@ namespace Yttrium
 		return std::move(e);
 	}
 
-	/// Thrown if a subsystem failed to initialize.
-	/// This usually means inability to use the corresponding subsystem.
+	///
+	class DataError : public Exception
+	{
+	public:
+		DataError(Allocator& allocator) : Exception(allocator) {}
+	};
+
+	/// Thrown if the initialization of an object (e.g. Window) fails.
+	/// This usually means the inability to use the corresponding object.
 	class InitializationError : public Exception
 	{
 	public:
-		InitializationError(Allocator& allocator) : Exception(allocator) {}
+		InitializationError(Allocator& allocator = *DefaultAllocator) : Exception(allocator) {}
 	};
 
 	template <typename T>

@@ -62,7 +62,7 @@ private:
 	Gui _gui{ _resource_loader, _script, _gui_allocator };
 	Cursor _cursor{ _window.renderer() };
 	Blocks _blocks{ _window.renderer() };
-	Bindings _bindings{ _script, _allocator };
+	Bindings _bindings{ _script };
 	Tetrium::Game _game;
 	bool _game_running = false;
 	StdMultimap<int, String> _statistics;

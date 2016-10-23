@@ -25,7 +25,7 @@ namespace Yttrium
 	};
 
 	Console::Console(ScriptContext& script_context, Allocator& allocator)
-		: _private(make_unique<ConsolePrivate>(allocator, script_context, allocator))
+		: _private(std::make_unique<ConsolePrivate>(script_context, allocator))
 	{
 	}
 

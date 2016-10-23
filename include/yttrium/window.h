@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_window_h_
 #define _include_yttrium_window_h_
 
-#include <yttrium/memory/unique_ptr.h>
+#include <yttrium/memory/global.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -74,7 +76,6 @@ namespace Yttrium
 	{
 	public:
 		///
-		/// \throws std::runtime_error If unable to create a Window.
 		Window(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
 
 		///
@@ -111,7 +112,7 @@ namespace Yttrium
 		void take_screenshot();
 
 	private:
-		const UniquePtr<class WindowPrivate> _private;
+		const std::unique_ptr<class WindowPrivate> _private;
 
 	public:
 		~Window();

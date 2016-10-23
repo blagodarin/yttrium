@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/gpu_program.h>
@@ -11,7 +12,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <stdexcept>
 
 namespace Yttrium
 {
@@ -47,9 +47,9 @@ namespace Yttrium
 			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
 		"}\n"_s;
 
-	UniquePtr<RendererImpl> RendererImpl::create(WindowBackend&, Allocator& allocator)
+	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&, Allocator& allocator)
 	{
-		auto renderer = make_unique<GlRenderer>(allocator, allocator);
+		auto renderer = std::make_unique<GlRenderer>(allocator);
 
 		static const int32_t white_texture_data = -1;
 
@@ -60,7 +60,7 @@ namespace Yttrium
 		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
 		if (!renderer->_white_texture)
-			throw std::runtime_error("Failed to initialize an internal texture");
+			throw InitializationError(allocator) << "Failed to initialize an internal texture"_s;
 
 		ImageFormat debug_texture_format;
 		debug_texture_format.set_width(DebugTexture::width);
@@ -69,11 +69,11 @@ namespace Yttrium
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
 		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
 		if (!renderer->_debug_texture)
-			throw std::runtime_error("Failed to initialize an internal texture");
+			throw InitializationError(allocator) << "Failed to initialize an internal texture"_s;
 
 		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
 		if (!renderer->_program_2d)
-			throw std::runtime_error("Failed to initialize an internal GPU program");
+			throw InitializationError(allocator) << "Failed to initialize an internal GPU program"_s;
 
 		return std::move(renderer);
 	}
