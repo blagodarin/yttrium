@@ -7,7 +7,6 @@
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/ion/document.h>
-#include <yttrium/log.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/texture_font.h>

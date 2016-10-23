@@ -1,7 +1,5 @@
 #include "backend.h"
 
-#include <yttrium/log.h>
-#include <yttrium/memory/unique_ptr.h>
 #include "backend/openal/backend.h"
 
 namespace Yttrium

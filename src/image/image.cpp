@@ -2,7 +2,6 @@
 
 #include <yttrium/io/reader.h>
 #include <yttrium/io/writer.h>
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
 #include <yttrium/utils.h>
 #include "../io/writer.h"

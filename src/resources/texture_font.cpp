@@ -2,7 +2,6 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/io/reader.h>
-#include <yttrium/log.h>
 #include <yttrium/renderer/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/std/map.h>
