@@ -1,5 +1,5 @@
-#ifndef _src_audio_backend_openal_openal_h_
-#define _src_audio_backend_openal_openal_h_
+#ifndef _src_audio_openal_openal_h_
+#define _src_audio_openal_openal_h_
 
 #include <yttrium/global.h>
 

@@ -63,14 +63,11 @@ namespace Yttrium
 				{
 					_is_looping = false;
 				}
-
-				if (_backend.set_format(format))
-				{
-					_unit_size = format.unit_size();
-					_buffer.reset(_buffer_units * _unit_size);
-					_source->seek(_begin_sample);
-					return true;
-				}
+				_backend.set_format(format);
+				_unit_size = format.unit_size();
+				_buffer.reset(_buffer_units * _unit_size);
+				_source->seek(_begin_sample);
+				return true;
 			}
 		}
 

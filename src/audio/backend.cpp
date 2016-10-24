@@ -1,11 +1,11 @@
 #include "backend.h"
 
-#include "backend/openal/backend.h"
+#include "openal/backend.h"
 
 namespace Yttrium
 {
-	std::unique_ptr<AudioBackend> AudioBackend::create(Allocator& allocator)
+	std::unique_ptr<AudioBackend> AudioBackend::create()
 	{
-		return std::make_unique<OpenAlBackend>(allocator);
+		return std::make_unique<OpenAlBackend>();
 	}
 }

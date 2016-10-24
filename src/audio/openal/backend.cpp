@@ -1,9 +1,7 @@
 #include "backend.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/resources/resource_ptr.h>
-#include "../../../utils/zero_terminated.h"
 #include "player.h"
 #include "sound.h"
 
@@ -30,9 +28,8 @@ namespace
 
 namespace Yttrium
 {
-	OpenAlBackend::OpenAlBackend(Allocator& allocator)
-		: AudioBackend(allocator)
-		, _device(::create_alc_device())
+	OpenAlBackend::OpenAlBackend()
+		: _device(::create_alc_device())
 		, _context(::create_alc_context(_device.get()))
 	{
 		::alcMakeContextCurrent(_context.get());
@@ -49,8 +46,8 @@ namespace Yttrium
 		return std::make_unique<OpenAlPlayer>();
 	}
 
-	ResourcePtr<SoundImpl> OpenAlBackend::create_sound()
+	ResourcePtr<Sound> OpenAlBackend::create_sound(AudioReader& reader)
 	{
-		return make_resource<OpenAlSound>();
+		return make_resource<Sound_OpenAL>(reader);
 	}
 }

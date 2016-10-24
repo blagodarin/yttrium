@@ -8,8 +8,9 @@
 namespace Yttrium
 {
 	class AudioFormat;
+	class AudioReader;
 	template <typename> class ResourcePtr;
-	class SoundImpl;
+	class Sound;
 
 	class AudioPlayerBackend
 	{
@@ -21,7 +22,7 @@ namespace Yttrium
 
 		virtual ~AudioPlayerBackend() = default;
 
-		virtual bool set_format(const AudioFormat& format) = 0;
+		virtual void set_format(const AudioFormat&) = 0;
 		virtual void fill_buffer(size_t index, void* data, size_t size) = 0;
 		virtual size_t check_buffers() = 0;
 		virtual void refill_buffer(void* data, size_t size) = 0;
@@ -33,20 +34,12 @@ namespace Yttrium
 	class AudioBackend
 	{
 	public:
-		static std::unique_ptr<AudioBackend> create(Allocator&);
+		static std::unique_ptr<AudioBackend> create();
 
 		virtual ~AudioBackend() = default;
 
 		virtual std::unique_ptr<AudioPlayerBackend> create_player() = 0;
-		virtual ResourcePtr<SoundImpl> create_sound() = 0;
-
-	protected:
-		AudioBackend(Allocator& allocator) : _allocator(allocator) {}
-
-		Allocator& allocator() const { return _allocator; }
-
-	private:
-		Allocator& _allocator;
+		virtual ResourcePtr<Sound> create_sound(AudioReader&) = 0;
 	};
 }
 

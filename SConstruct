@@ -164,8 +164,7 @@ if option_no_png:
 src_paths = [
 	'.',
 	'audio',
-	'audio/backend',
-	'audio/backend/openal',
+	'audio/openal',
 	'base',
 	'gui',
 	'gui/ion',
