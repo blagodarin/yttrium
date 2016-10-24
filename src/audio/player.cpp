@@ -28,9 +28,9 @@ namespace Yttrium
 		_thread.join();
 	}
 
-	void AudioPlayerImpl::load(const StaticString& name, const Settings& settings, AudioType type)
+	void AudioPlayerImpl::load(const StaticString& name, const Settings& settings)
 	{
-		_playlist.load(name, settings, type);
+		_playlist.load(name, settings);
 	}
 
 	void AudioPlayerImpl::clear()
@@ -74,7 +74,7 @@ namespace Yttrium
 				AudioPlaylist::Item item(_allocator);
 
 				if (_playlist.next(&item)
-					&& _streamer.open(_storage.open(item.name), item.settings, item.type, _playlist.order()))
+					&& _streamer.open(_storage.open(item.name), item.settings, _playlist.order()))
 				{
 					_streamer.prefetch();
 					_backend->play();
@@ -95,7 +95,7 @@ namespace Yttrium
 								if (fetch_result != AudioStreamer::Ok)
 								{
 									if (_playlist.next(&item)
-										&& _streamer.open(_storage.open(item.name), item.settings, item.type, _playlist.order()))
+										&& _streamer.open(_storage.open(item.name), item.settings, _playlist.order()))
 									{
 										if (fetch_result == AudioStreamer::NoMoreData)
 										{

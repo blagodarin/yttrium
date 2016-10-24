@@ -33,7 +33,6 @@ namespace Yttrium
 		///
 		void set_visible(bool);
 
-	public:
 		~Console();
 
 	private:

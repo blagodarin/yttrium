@@ -17,11 +17,11 @@ namespace Yttrium
 		_next = 0;
 	}
 
-	void AudioPlaylist::load(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type)
+	void AudioPlaylist::load(const StaticString& name, const AudioPlayer::Settings& settings)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
-		_items.emplace_back(String(name, &_allocator), settings, type);
+		_items.emplace_back(String(name, &_allocator), settings);
 
 		switch (_order)
 		{

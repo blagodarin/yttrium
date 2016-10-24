@@ -1,13 +1,17 @@
 #include "streamer.h"
 
+#include <yttrium/audio/io.h>
 #include "backend.h"
 
 namespace Yttrium
 {
-	enum
+	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend, Allocator& allocator)
+		: _allocator(allocator)
+		, _backend(backend)
 	{
-		BufferSize = 1000, // 1 s buffer.
-	};
+	}
+
+	AudioStreamer::~AudioStreamer() = default;
 
 	void AudioStreamer::close()
 	{
@@ -23,15 +27,15 @@ namespace Yttrium
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(Reader&& reader, const AudioPlayer::Settings& settings, AudioType type, AudioPlayer::Order order)
+	bool AudioStreamer::open(Reader&& reader, const AudioPlayer::Settings& settings, AudioPlayer::Order order)
 	{
-		_source = AudioReader::open(std::move(reader), type, _allocator);
+		_source = AudioReader::open(std::move(reader));
 		if (!_source)
 			return false;
 
 		const AudioFormat& format = _source->format();
 
-		_buffer_units = format.frequency * BufferSize / 1000;
+		_buffer_units = format.frequency; // One-second buffer.
 
 		// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
 		// I have no idea whether this is a real bug.

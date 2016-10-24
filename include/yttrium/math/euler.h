@@ -1,5 +1,5 @@
 /// \file
-/// \brief Euler angles.
+/// \brief
 
 #ifndef _include_yttrium_math_euler_h_
 #define _include_yttrium_math_euler_h_

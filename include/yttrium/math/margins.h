@@ -1,5 +1,5 @@
 /// \file
-/// \brief %Margins.
+/// \brief
 
 #ifndef _include_yttrium_math_margins_h_
 #define _include_yttrium_math_margins_h_

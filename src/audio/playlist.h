@@ -17,25 +17,23 @@ namespace Yttrium
 		{
 			String                name;
 			AudioPlayer::Settings settings;
-			AudioType             type;
 
 			Item(Allocator& allocator)
 				: name(&allocator)
 			{
 			}
 
-			Item(const String& name, const AudioPlayer::Settings& settings, AudioType type)
+			Item(const String& name, const AudioPlayer::Settings& settings)
 				: name(name)
 				, settings(settings)
-				, type(type)
 			{
 			}
 		};
 
-		AudioPlaylist(Allocator& allocator);
+		AudioPlaylist(Allocator&);
 
 		void clear();
-		void load(const StaticString& name, const AudioPlayer::Settings& settings, AudioType type);
+		void load(const StaticString& name, const AudioPlayer::Settings&);
 		bool next(Item* item);
 		AudioPlayer::Order order();
 		void set_order(AudioPlayer::Order order);

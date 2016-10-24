@@ -1,5 +1,5 @@
 /// \file
-/// \brief 2D points.
+/// \brief
 
 #ifndef _include_yttrium_math_point_h_
 #define _include_yttrium_math_point_h_
@@ -23,15 +23,8 @@ namespace Yttrium
 		int _y = 0;
 	};
 
-	inline bool operator==(const Point& lhs, const Point& rhs)
-	{
-		return lhs.x() == rhs.x() && lhs.y() == rhs.y();
-	}
-
-	inline bool operator!=(const Point& lhs, const Point& rhs)
-	{
-		return !(lhs == rhs);
-	}
+	inline bool operator==(const Point& a, const Point& b) { return a.x() == b.x() && a.y() == b.y(); }
+	inline bool operator!=(const Point& a, const Point& b) { return !(a == b); }
 
 	/// Floating-point 2D point.
 	class PointF
@@ -52,8 +45,8 @@ namespace Yttrium
 		float _y = 0;
 	};
 
-	inline PointF operator/(const PointF& lhs, float rhs) { return { lhs.x() / rhs, lhs.y() / rhs }; }
-	inline PointF operator/(const PointF& lhs, const std::pair<float, float>& rhs) { return { lhs.x() / rhs.first, lhs.y() / rhs.second }; }
+	inline PointF operator/(const PointF& a, float b) { return { a.x() / b, a.y() / b }; }
+	inline PointF operator/(const PointF& a, const std::pair<float, float>& b) { return { a.x() / b.first, a.y() / b.second }; }
 }
 
 #endif

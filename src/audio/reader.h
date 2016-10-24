@@ -24,7 +24,11 @@ namespace Yttrium
 		uint64_t _offset_units = 0;
 		Reader _reader;
 
-		AudioReaderImpl(Reader&& reader) : _reader(std::move(reader)) {}
+		AudioReaderImpl(Reader&& reader)
+			: _reader(std::move(reader))
+		{
+			_reader.seek(0);
+		}
 	};
 }
 

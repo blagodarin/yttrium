@@ -1,5 +1,5 @@
 /// \file
-/// \brief GUI.
+/// \brief
 
 #ifndef _include_yttrium_gui_h_
 #define _include_yttrium_gui_h_
@@ -50,7 +50,6 @@ namespace Yttrium
 		///
 		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
 
-	public:
 		~Gui();
 
 	private:

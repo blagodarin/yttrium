@@ -21,7 +21,6 @@ namespace Yttrium
 
 		const char* what() const noexcept override { return _what.text(); }
 
-	public:
 		Exception(const Exception&) = delete;
 		Exception(Exception&&) = default;
 		Exception& operator=(const Exception&) = delete;

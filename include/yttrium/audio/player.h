@@ -1,10 +1,8 @@
 /// \file
-/// \brief Audio player.
+/// \brief
 
 #ifndef _include_yttrium_audio_player_h_
 #define _include_yttrium_audio_player_h_
-
-#include <yttrium/audio/io.h>
 
 namespace Yttrium
 {
@@ -34,37 +32,25 @@ namespace Yttrium
 
 		virtual ~AudioPlayer() = default;
 
-		/// Load an audio file for playback.
-		/// \param name Audio file name.
-		/// \param settings Playback parameters.
-		/// \param type Audio file type.
-		virtual void load(const StaticString& name, const Settings& = {}, AudioType = AudioType::Auto) = 0;
-
-		/**
-		* \overload
-		* \param name Audio file name.
-		* \param type Audio file type.
-		*/
-		void load(const StaticString& name, AudioType type) { load(name, {}, type); }
+		/// Loads a music file for playback.
+		virtual void load(const StaticString& name, const Settings& = {}) = 0;
 
 		/// Clear the playlist.
 		virtual void clear() = 0;
 
-		/// Set the playback order.
-		/// \param order Playback order.
-		virtual void set_order(Order order) = 0;
+		/// Sets the playback order.
+		virtual void set_order(Order) = 0;
 
-		/// Start or resume the playback.
+		/// Starts or resumes the playback.
 		virtual void play() = 0;
 
-		/// Pause the playback.
+		/// Pauses the playback.
 		virtual void pause() = 0;
 
-		/// Stop the playback.
+		/// Stops the playback.
 		virtual void stop() = 0;
 
-		/// Check if music is currently playing.
-		/// \return Playback status.
+		/// Checks if music is currently playing.
 		virtual bool is_playing() const = 0;
 	};
 }

@@ -1,7 +1,6 @@
 #include "reader.h"
 
-#include <yttrium/memory/unique_ptr.h>
-#include <yttrium/static_string.h>
+#include <yttrium/exceptions.h>
 #include "../utils/fourcc.h"
 #include "formats/wav.h"
 
@@ -9,58 +8,50 @@
 	#include "formats/ogg_vorbis.h"
 #endif
 
-#include <new>
-
 namespace
 {
 	using namespace Yttrium;
 
-	bool detect_audio_type(const Reader& reader, AudioType& type)
+	enum class AudioType
+	{
+		Unknown,
+		Wav,
+		OggVorbis,
+	};
+
+	AudioType detect_audio_type(const Reader& reader)
 	{
 		uint32_t signature = 0;
 		if (!reader.read_at(0, signature))
-			return false;
+			return AudioType::Unknown;
 		switch (signature)
 		{
-		case "RIFF"_fourcc:
-			type = AudioType::Wav;
-			return true;
-#ifndef Y_NO_OGG_VORBIS
-		case "OggS"_fourcc:
-			type = AudioType::OggVorbis;
-			return true;
-#endif
-		default:
-			return false;
+		case "RIFF"_fourcc: return AudioType::Wav;
+	#ifndef Y_NO_OGG_VORBIS
+		case "OggS"_fourcc: return AudioType::OggVorbis;
+	#endif
+		default: return AudioType::Unknown;
 		}
 	}
 }
 
 namespace Yttrium
 {
-	UniquePtr<AudioReader> AudioReader::open(Reader&& reader, AudioType type, Allocator& allocator)
+	std::unique_ptr<AudioReader> AudioReader::open(Reader&& reader)
 	{
 		if (!reader)
 			return {};
-
-		if (type == AudioType::Auto && !::detect_audio_type(reader, type))
-			return {};
-
-		reader.seek(0);
-
-		UniquePtr<AudioReaderImpl> audio_reader;
-		switch (type)
+		std::unique_ptr<AudioReaderImpl> audio_reader;
+		switch (::detect_audio_type(reader))
 		{
-		case AudioType::Wav: audio_reader = make_unique<WavReader>(allocator, std::move(reader)); break;
+		case AudioType::Wav: audio_reader = std::make_unique<WavReader>(std::move(reader)); break;
 	#ifndef Y_NO_OGG_VORBIS
-		case AudioType::OggVorbis: audio_reader = make_unique<OggVorbisReader>(allocator, std::move(reader)); break;
+		case AudioType::OggVorbis: audio_reader = std::make_unique<OggVorbisReader>(std::move(reader)); break;
 	#endif
-		default: return {};
+		default: throw DataError("Unknown audio format");
 		}
-
 		if (!audio_reader->open())
-			return {};
-
+			throw DataError("Bad audio data");
 		return std::move(audio_reader);
 	}
 }

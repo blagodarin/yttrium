@@ -37,11 +37,10 @@ namespace Yttrium
 		/// Opens a resource.
 		Reader open(const StaticString& name) const;
 
+		~Storage();
+
 	private:
 		const std::unique_ptr<class StoragePrivate> _private;
-
-	public:
-		~Storage();
 	};
 }
 

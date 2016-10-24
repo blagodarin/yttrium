@@ -1,5 +1,5 @@
 /// \file
-/// \brief Rectangles.
+/// \brief
 
 #ifndef _include_yttrium_math_rect_h_
 #define _include_yttrium_math_rect_h_

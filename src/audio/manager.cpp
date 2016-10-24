@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <yttrium/audio/io.h>
 #include <yttrium/io/reader.h>
 #include <yttrium/io/storage.h>
 #include <yttrium/resources/resource_ptr.h>
@@ -24,7 +25,7 @@ namespace Yttrium
 
 	ResourcePtr<Sound> AudioManager::create_sound(Reader&& reader)
 	{
-		const auto audio_reader = AudioReader::open(std::move(reader), AudioType::Auto, _private->_allocator);
+		const auto audio_reader = AudioReader::open(std::move(reader));
 		if (!audio_reader)
 			return {};
 		auto sound = _private->_backend->create_sound();

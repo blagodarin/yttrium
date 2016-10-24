@@ -3,6 +3,25 @@
 #include <yttrium/utils.h>
 #include "wav_private.h"
 
+namespace
+{
+	using namespace Yttrium;
+
+	template <uint32_t fourcc>
+	bool find_chunk(Reader& reader, WavChunkHeader& header)
+	{
+		for (;;)
+		{
+			if (!reader.read(header))
+				return false;
+			else if (header.name_fourcc == fourcc)
+				return true;
+			else if (!reader.skip(header.size))
+				return false;
+		}
+	}
+}
+
 namespace Yttrium
 {
 	WavReader::WavReader(Reader&& reader)
@@ -21,7 +40,7 @@ namespace Yttrium
 			|| file_header.wave_fourcc != WavFileHeader::WAVE)
 			return false;
 
-		if (!find_chunk(WavChunkHeader::fmt, chunk_header))
+		if (!::find_chunk<WavChunkHeader::fmt>(_reader, chunk_header))
 			return false;
 
 		if (!_reader.read(format_chunk)
@@ -32,7 +51,7 @@ namespace Yttrium
 			&& !_reader.skip(chunk_header.size - sizeof format_chunk))
 			return false;
 
-		if (!find_chunk(WavChunkHeader::data, chunk_header))
+		if (!::find_chunk<WavChunkHeader::data>(_reader, chunk_header))
 			return false;
 
 		_format.bytes_per_sample = format_chunk.bits_per_sample / 8;
@@ -61,20 +80,6 @@ namespace Yttrium
 		if (!_reader.seek(_data_offset + offset_units * _format.unit_size()))
 			return false;
 		_offset_units = offset_units;
-		return true;
-	}
-
-	bool WavReader::find_chunk(uint32_t fourcc, WavChunkHeader& header)
-	{
-		for (; ; )
-		{
-			if (!_reader.read(header))
-				return false;
-			else if (header.name_fourcc == fourcc)
-				break;
-			else if (!_reader.skip(header.size))
-				return false;
-		}
 		return true;
 	}
 }

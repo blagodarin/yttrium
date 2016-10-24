@@ -1,5 +1,5 @@
 /// \file
-/// \brief 2D sizes.
+/// \brief
 
 #ifndef _include_yttrium_math_size_h_
 #define _include_yttrium_math_size_h_
@@ -25,26 +25,19 @@ namespace Yttrium
 		int _height = 0;
 	};
 
-	inline bool operator==(const Size& lhs, const Size& rhs)
-	{
-		return lhs.width() == rhs.width() && lhs.height() == rhs.height();
-	}
+	inline bool operator==(const Size& a, const Size& b) { return a.width() == b.width() && a.height() == b.height(); }
+	inline bool operator!=(const Size& a, const Size& b) { return !(a == b); }
 
-	inline bool operator!=(const Size& lhs, const Size& rhs)
+	///
+	inline Size max(const Size& a, const Size& b)
 	{
-		return !(lhs == rhs);
+		return { max(a.width(), b.width()), max(a.height(), b.height()) };
 	}
 
 	///
-	inline Size max(const Size& lhs, const Size& rhs)
+	inline Size min(const Size& a, const Size& b)
 	{
-		return { max(lhs.width(), rhs.width()), max(lhs.height(), rhs.height()) };
-	}
-
-	///
-	inline Size min(const Size& lhs, const Size& rhs)
-	{
-		return { min(lhs.width(), rhs.width()), min(lhs.height(), rhs.height()) };
+		return { min(a.width(), b.width()), min(a.height(), b.height()) };
 	}
 
 	/// Floating-point 2D size.
@@ -68,13 +61,13 @@ namespace Yttrium
 		float _height = 0;
 	};
 
-	inline SizeF operator*(const SizeF& lhs, float rhs) { return { lhs.width() * rhs, lhs.height() * rhs }; }
-	inline SizeF operator*(float lhs, const SizeF& rhs) { return rhs * lhs; }
-	inline SizeF operator*(const SizeF& lhs, const std::pair<float, float>& rhs) { return { lhs.width() * rhs.first, lhs.height() * rhs.second }; }
-	inline SizeF operator*(const std::pair<float, float>& lhs, const SizeF& rhs) { return rhs * lhs; }
+	inline SizeF operator*(const SizeF& a, float b) { return { a.width() * b, a.height() * b }; }
+	inline SizeF operator*(float a, const SizeF& b) { return b * a; }
+	inline SizeF operator*(const SizeF& a, const std::pair<float, float>& b) { return { a.width() * b.first, a.height() * b.second }; }
+	inline SizeF operator*(const std::pair<float, float>& a, const SizeF& b) { return b * a; }
 
-	inline SizeF operator/(const SizeF& lhs, float rhs) { return { lhs.width() / rhs, lhs.height() / rhs }; }
-	inline SizeF operator/(const SizeF& lhs, const std::pair<float, float>& rhs) { return { lhs.width() / rhs.first, lhs.height() / rhs.second }; }
+	inline SizeF operator/(const SizeF& a, float b) { return { a.width() / b, a.height() / b }; }
+	inline SizeF operator/(const SizeF& a, const std::pair<float, float>& b) { return { a.width() / b.first, a.height() / b.second }; }
 }
 
 #endif

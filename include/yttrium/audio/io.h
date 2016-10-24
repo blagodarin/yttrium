@@ -1,28 +1,16 @@
 /// \file
-/// \brief Audio input/output facilities.
+/// \brief
 
 #ifndef _include_yttrium_audio_io_h_
 #define _include_yttrium_audio_io_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/global.h>
 
-#include <cstddef>
-#include <cstdint>
+#include <memory>
 
 namespace Yttrium
 {
-	class Allocator;
 	class Reader;
-
-	template <typename> class UniquePtr;
-
-	/// Audio container-codec combo.
-	enum class AudioType
-	{
-		Auto,      ///< Automatical detection.
-		Wav,       ///< PCM waveform audio (WAV) file.
-		OggVorbis, ///< Ogg/Vorbis file.
-	};
 
 	/// Audio data format.
 	struct AudioFormat
@@ -40,7 +28,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<AudioReader> open(Reader&&, AudioType = AudioType::Auto, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<AudioReader> open(Reader&&);
 
 		virtual ~AudioReader() = default;
 

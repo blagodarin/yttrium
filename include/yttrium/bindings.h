@@ -66,11 +66,10 @@ namespace Yttrium
 		///
 		bool unbind(const StaticString& name);
 
+		~Bindings();
+
 	private:
 		const std::unique_ptr<class BindingsPrivate> _private;
-
-	public:
-		~Bindings();
 	};
 }
 
