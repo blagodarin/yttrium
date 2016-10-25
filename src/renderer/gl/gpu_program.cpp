@@ -1,7 +1,6 @@
 #include "gpu_program.h"
 
 #include <yttrium/log.h>
-#include "../../utils/zero_terminated.h"
 #include "renderer.h"
 
 namespace Yttrium
@@ -23,8 +22,8 @@ namespace Yttrium
 
 	void GlGpuProgram::set_uniform(const StaticString& name, const Matrix4& value)
 	{
-		Y_ZERO_TERMINATED(name_z, name);
-		_program.set_uniform(name_z, value);
+		const std::string name_z(name.text(), name.size()); // NOTE: Guarantees '\0'-termination.
+		_program.set_uniform(name_z.c_str(), value);
 	}
 
 	bool GlGpuProgram::link()

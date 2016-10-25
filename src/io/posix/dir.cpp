@@ -2,7 +2,6 @@
 
 #include "../../memory/raw.h"
 #include "../../utils/unique_ptr.h"
-#include "../../utils/zero_terminated.h"
 
 #include <cassert>
 #include <system_error>
@@ -75,9 +74,9 @@ namespace Yttrium
 
 	Dir::Dir(const StaticString& name, Allocator& allocator)
 	{
-		Y_ZERO_TERMINATED(name_z, name);
+		const std::string name_z(name.text(), name.size()); // NOTE: Guarantees '\0'-termination.
 
-		P_DIR dir(::opendir(name_z));
+		P_DIR dir(::opendir(name_z.c_str()));
 		if (!dir)
 			return;
 
@@ -87,7 +86,7 @@ namespace Yttrium
 		if (dir_descriptor < 0)
 		{
 			assert(errno == ENOTSUP);
-			max_name_size = ::pathconf(name_z, _PC_NAME_MAX);
+			max_name_size = ::pathconf(name_z.c_str(), _PC_NAME_MAX);
 		}
 		else
 		{
@@ -118,10 +117,10 @@ namespace Yttrium
 
 	bool Dir::exists(const StaticString& name)
 	{
-		Y_ZERO_TERMINATED(name_z, name);
+		const std::string name_z(name.text(), name.size()); // NOTE: Guarantees '\0'-termination.
 
 		struct stat stat_buffer;
-		if (::stat(name_z, &stat_buffer))
+		if (::stat(name_z.c_str(), &stat_buffer))
 			return false;
 
 		return S_ISDIR(stat_buffer.st_mode);

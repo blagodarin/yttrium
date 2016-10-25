@@ -4,8 +4,6 @@
 #include <yttrium/exceptions.h>
 #include "openal.h"
 
-#include <array>
-
 namespace Yttrium
 {
 	class OpenALBuffer
