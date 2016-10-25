@@ -4,7 +4,7 @@ namespace Yttrium
 {
 	OpenAlPlayer::OpenAlPlayer()
 	{
-		_source.set_int(AL_SOURCE_RELATIVE, AL_TRUE);
+		::alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
 	}
 
 	void OpenAlPlayer::set_format(const AudioFormat& format)
@@ -15,37 +15,42 @@ namespace Yttrium
 	void OpenAlPlayer::fill_buffer(size_t index, void* data, size_t size)
 	{
 		::alBufferData(_buffers[index], _format._format, data, size, _format._frequency);
-		::alSourceQueueBuffers(_source.get(), 1, &_buffers[index]);
+		::alSourceQueueBuffers(_source, 1, &_buffers[index]);
 	}
 
 	size_t OpenAlPlayer::check_buffers()
 	{
-		return _source.get_int(AL_BUFFERS_PROCESSED);
+		ALint buffers_processed = 0;
+		::alGetSourcei(_source, AL_BUFFERS_PROCESSED, &buffers_processed);
+		return buffers_processed;
 	}
 
 	void OpenAlPlayer::refill_buffer(void* data, size_t size)
 	{
 		ALuint buffer = 0;
-		::alSourceUnqueueBuffers(_source.get(), 1, &buffer);
+		::alSourceUnqueueBuffers(_source, 1, &buffer);
 		::alBufferData(buffer, _format._format, data, size, _format._frequency);
-		::alSourceQueueBuffers(_source.get(), 1, &buffer);
+		::alSourceQueueBuffers(_source, 1, &buffer);
 	}
 
 	void OpenAlPlayer::play()
 	{
-		::alSourcePlay(_source.get());
+		::alSourcePlay(_source);
 	}
 
 	void OpenAlPlayer::pause()
 	{
-		::alSourcePause(_source.get());
+		::alSourcePause(_source);
 	}
 
 	void OpenAlPlayer::stop()
 	{
-		ALuint buffers[NumBuffers];
+		::alSourceStop(_source);
 
-		::alSourceStop(_source.get());
-		::alSourceUnqueueBuffers(_source.get(), _source.get_int(AL_BUFFERS_PROCESSED), buffers);
+		ALint buffers_processed = 0;
+		::alGetSourcei(_source, AL_BUFFERS_PROCESSED, &buffers_processed);
+
+		ALuint buffers[_buffers.size()];
+		::alSourceUnqueueBuffers(_source, buffers_processed, buffers);
 	}
 }

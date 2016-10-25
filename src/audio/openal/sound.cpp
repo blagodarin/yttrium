@@ -18,16 +18,16 @@ namespace Yttrium
 		Buffer buffer(reader_size);
 		if (reader.read(buffer.data(), buffer.size()) != buffer.size())
 			throw DataError("Bad audio data");
-		::alBufferData(_buffer.get(), _format._format, buffer.data(), buffer.size(), _format._frequency);
+		::alBufferData(_buffer, _format._format, buffer.data(), buffer.size(), _format._frequency);
 		if (::alGetError() != AL_NO_ERROR)
 			throw std::runtime_error("Failed to initialize a Sound");
-		_source.set_int(AL_BUFFER, _buffer.get()); // This must be done after alBufferData.
-		_source.set_int(AL_SOURCE_RELATIVE, AL_TRUE);
+		::alSourcei(_source, AL_BUFFER, _buffer); // This must be done after alBufferData.
+		::alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
 	}
 
 	void Sound_OpenAL::play() const
 	{
-		::alSourceStop(_source.get());
-		::alSourcePlay(_source.get());
+		::alSourceStop(_source);
+		::alSourcePlay(_source);
 	}
 }

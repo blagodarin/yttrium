@@ -8,38 +8,29 @@
 
 namespace Yttrium
 {
-	template <size_t N>
-	class OpenALBuffers
-	{
-	public:
-		OpenALBuffers()
-		{
-			::alGenBuffers(N, _buffers.data());
-			if (::alGetError() != AL_NO_ERROR)
-				throw InitializationError("Failed to allocate ", N, " OpenAL buffers");
-		}
-
-		~OpenALBuffers()
-		{
-			::alDeleteBuffers(N, _buffers.data());
-		}
-
-		ALuint& operator[](size_t index) noexcept { return _buffers[index]; }
-		ALuint operator[](size_t index) const noexcept { return _buffers[index]; }
-
-		OpenALBuffers(const OpenALBuffers&) = delete;
-		OpenALBuffers& operator=(const OpenALBuffers&) = delete;
-
-	private:
-		std::array<ALuint, N> _buffers;
-	};
-
 	class OpenALBuffer
 	{
 	public:
-		ALuint get() const noexcept { return _buffers[0]; }
+		OpenALBuffer()
+		{
+			::alGenBuffers(1, &_buffer);
+			if (::alGetError() != AL_NO_ERROR)
+				throw InitializationError("Failed to allocate OpenAL buffer");
+		}
+
+		~OpenALBuffer()
+		{
+			::alDeleteBuffers(1, &_buffer);
+		}
+
+		operator ALuint() const { return _buffer; }
+		const ALuint* operator&() const { return &_buffer; }
+
+		OpenALBuffer(const OpenALBuffer&) = delete;
+		OpenALBuffer& operator=(const OpenALBuffer&) = delete;
+
 	private:
-		const OpenALBuffers<1> _buffers;
+		ALuint _buffer = 0;
 	};
 
 	class OpenALSource
@@ -57,22 +48,7 @@ namespace Yttrium
 			::alDeleteSources(1, &_source);
 		}
 
-		ALuint get() const noexcept
-		{
-			return _source;
-		}
-
-		ALint get_int(ALenum name) const
-		{
-			ALint value = 0;
-			::alGetSourcei(_source, name, &value); // TODO: Check result.
-			return value;
-		}
-
-		void set_int(ALenum name, ALint value) const
-		{
-			::alSourcei(_source, name, value); // TODO: Check result.
-		}
+		operator ALuint() const { return _source; }
 
 		OpenALSource(const OpenALSource&) = delete;
 		OpenALSource& operator=(const OpenALSource&) = delete;
