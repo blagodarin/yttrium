@@ -1,7 +1,7 @@
-#ifndef _src_io_reader_h_
-#define _src_io_reader_h_
+#ifndef _src_storage_reader_h_
+#define _src_storage_reader_h_
 
-#include <yttrium/io/reader.h>
+#include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
 namespace Yttrium

@@ -1,7 +1,6 @@
 #include "model.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/reader.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/renderer/gpu_program.h>
@@ -10,6 +9,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/vertex_buffer.h>
+#include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
 #include <array>

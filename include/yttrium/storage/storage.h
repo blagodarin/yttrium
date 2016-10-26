@@ -1,10 +1,10 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_io_storage_h_
-#define _include_yttrium_io_storage_h_
+#ifndef _include_yttrium_storage_storage_h_
+#define _include_yttrium_storage_storage_h_
 
-#include <yttrium/io/package.h>
+#include <yttrium/storage/package.h>
 
 #include <memory>
 

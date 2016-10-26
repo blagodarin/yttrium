@@ -1,7 +1,7 @@
-#ifndef _src_io_writer_h_
-#define _src_io_writer_h_
+#ifndef _src_storage_writer_h_
+#define _src_storage_writer_h_
 
-#include <yttrium/io/writer.h>
+#include <yttrium/storage/writer.h>
 
 namespace Yttrium
 {

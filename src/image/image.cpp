@@ -1,10 +1,9 @@
 #include <yttrium/image.h>
 
-#include <yttrium/io/reader.h>
-#include <yttrium/io/writer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/utils.h>
-#include "../io/writer.h"
 #include "formats.h"
 
 namespace

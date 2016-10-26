@@ -1,11 +1,11 @@
 #include <yttrium/resources/texture_font.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/io/reader.h>
 #include <yttrium/renderer/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/map.h>
+#include <yttrium/storage/reader.h>
 #include <yttrium/utils.h>
 #include "texture_font.h"
 

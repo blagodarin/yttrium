@@ -1,9 +1,8 @@
 #include "../formats.h"
 
 #include <yttrium/image.h>
-#include "../../io/writer.h"
+#include <yttrium/storage/writer.h>
 
-#include <memory>
 #include <png.h>
 
 namespace

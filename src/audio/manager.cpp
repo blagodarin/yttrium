@@ -1,8 +1,8 @@
 #include <yttrium/audio/manager.h>
 
 #include <yttrium/audio/io.h>
-#include <yttrium/io/reader.h>
-#include <yttrium/io/storage.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/storage.h>
 #include <yttrium/resources/resource_ptr.h>
 #include "backend.h"
 #include "player.h"

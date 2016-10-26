@@ -2,7 +2,7 @@
 #include "../formats.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/reader.h>
+#include <yttrium/storage/reader.h>
 
 namespace Yttrium
 {

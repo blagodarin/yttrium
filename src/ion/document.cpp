@@ -1,10 +1,10 @@
 #include "document.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/io/reader.h>
-#include <yttrium/io/writer.h>
 #include <yttrium/ion/list.h>
 #include <yttrium/resources/resource_ptr.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/writer.h>
 #include "parser.h"
 #include "utils.h"
 

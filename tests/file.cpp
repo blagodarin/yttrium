@@ -1,6 +1,6 @@
-#include <yttrium/io/file.h>
-#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/storage/file.h>
+#include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
 #include <cstdlib>

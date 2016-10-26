@@ -1,10 +1,10 @@
 #include <yttrium/script/code.h>
 
-#include <yttrium/io/reader.h>
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
+#include <yttrium/storage/reader.h>
 #include "scanner.h"
 
 namespace Yttrium

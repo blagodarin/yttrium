@@ -1,8 +1,8 @@
 #include "writer.h"
 
-#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/storage/reader.h>
 #include <yttrium/utils.h>
 #include "file.h"
 

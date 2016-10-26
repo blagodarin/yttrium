@@ -1,6 +1,6 @@
-#include <yttrium/io/writer.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/storage/writer.h>
 #include "../../src/image/formats/dds.h"
 #include "../../src/image/formats/tga.h"
 

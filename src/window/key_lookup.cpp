@@ -3,7 +3,7 @@
 /* Computed positions: -k'1-2,$' */
 /* maximum key range = 137, duplicates = 0 */
 
-#include "lookup.h"
+#include "key_lookup.h"
 
 #include <yttrium/static_string.h>
 

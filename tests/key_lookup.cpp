@@ -1,12 +1,12 @@
-#include "src/window/bindings/lookup.h"
+#include "src/window/key_lookup.h"
 
 #include <boost/test/unit_test.hpp>
 
-#include "src/window/bindings/lookup.cpp"
+#include "src/window/key_lookup.cpp"
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(test_bindings)
+BOOST_AUTO_TEST_CASE(test_key_lookup)
 {
 	BOOST_CHECK(lookup_key({}) == Key::Null);
 	BOOST_CHECK(lookup_key("no_such_key") == Key::Null);

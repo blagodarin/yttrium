@@ -1,8 +1,8 @@
 #include "game.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/storage.h>
 #include <yttrium/log.h>
+#include <yttrium/storage/storage.h>
 
 int main()
 {

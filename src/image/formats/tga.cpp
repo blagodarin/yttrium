@@ -2,8 +2,8 @@
 #include "../formats.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/reader.h>
-#include "../../io/writer.h"
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/writer.h>
 
 namespace
 {

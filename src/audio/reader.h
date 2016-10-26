@@ -2,7 +2,7 @@
 #define _src_audio_io_reader_h_
 
 #include <yttrium/audio/io.h>
-#include <yttrium/io/reader.h>
+#include <yttrium/storage/reader.h>
 
 namespace Yttrium
 {

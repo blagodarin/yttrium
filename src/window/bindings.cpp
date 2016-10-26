@@ -1,7 +1,7 @@
 #include <yttrium/bindings.h>
 
 #include <yttrium/script/context.h>
-#include "lookup.h"
+#include "key_lookup.h"
 
 #include <array>
 

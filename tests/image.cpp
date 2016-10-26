@@ -1,8 +1,8 @@
 #include <yttrium/image.h>
-#include <yttrium/io/file.h>
-#include <yttrium/io/reader.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/storage/file.h>
+#include <yttrium/storage/reader.h>
 
 #include <boost/test/unit_test.hpp>
 

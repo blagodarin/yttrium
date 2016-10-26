@@ -1,6 +1,6 @@
-#include <yttrium/io/writer.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/storage/writer.h>
 #include "../../src/audio/formats/wav_private.h"
 
 #include <cmath>

@@ -170,8 +170,6 @@ src_paths = [
 	'gui/ion',
 	'gui/logic',
 	'gui/widgets',
-	'io',
-	'io/formats',
 	'ion',
 	'math',
 	'memory',
@@ -179,17 +177,15 @@ src_paths = [
 	'renderer/gl',
 	'resources',
 	'script',
-	'window',
-	'window/bindings']
-
-if not option_no_ogg_vorbis:
-	src_paths += ['audio/io/ogg_vorbis']
+	'storage',
+	'storage/formats',
+	'window']
 
 if 'posix' in ports:
-	src_paths += ['base/posix', 'io/posix', 'memory/posix']
+	src_paths += ['base/posix', 'memory/posix', 'storage/posix']
 
 if 'windows' in ports:
-	src_paths += ['base/windows', 'io/windows', 'memory/windows', 'window/windows']
+	src_paths += ['base/windows', 'memory/windows', 'storage/windows', 'window/windows']
 
 if 'x11' in ports:
 	src_paths += ['window/x11']

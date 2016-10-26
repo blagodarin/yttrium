@@ -1,7 +1,7 @@
-#ifndef _src_io_package_h_
-#define _src_io_package_h_
+#ifndef _src_storage_package_h_
+#define _src_storage_package_h_
 
-#include <yttrium/io/package.h>
+#include <yttrium/storage/package.h>
 #include <yttrium/string.h>
 
 #include <utility>

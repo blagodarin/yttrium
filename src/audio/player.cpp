@@ -1,7 +1,7 @@
 #include "player.h"
 
-#include <yttrium/io/reader.h>
-#include <yttrium/io/storage.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/storage.h>
 #include "backend.h"
 #include "playlist.h"
 

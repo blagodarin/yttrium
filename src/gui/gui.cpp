@@ -1,14 +1,14 @@
 #include <yttrium/gui.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/io/reader.h>
-#include <yttrium/io/storage.h>
 #include <yttrium/log.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/resources/texture_font.h>
 #include <yttrium/resources/translation.h>
 #include <yttrium/script/context.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/storage.h>
 #include "exceptions.h"
 #include "gui.h"
 #include "ion/loader.h"

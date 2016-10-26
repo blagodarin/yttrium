@@ -2,9 +2,6 @@
 
 #include <yttrium/audio/player.h>
 #include <yttrium/image.h>
-#include <yttrium/io/reader.h>
-#include <yttrium/io/storage.h>
-#include <yttrium/io/writer.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -19,6 +16,9 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/storage.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/time.h>
 
 Game::Game(Storage& storage)

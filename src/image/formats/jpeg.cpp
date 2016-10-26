@@ -1,7 +1,7 @@
 #include "../formats.h"
 
 #include <yttrium/image.h>
-#include <yttrium/io/reader.h>
+#include <yttrium/storage/reader.h>
 
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <jpeglib.h>

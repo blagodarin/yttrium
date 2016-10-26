@@ -1,8 +1,8 @@
 #include "ypq.h"
 
-#include <yttrium/io/reader.h>
-#include <yttrium/io/writer.h>
 #include <yttrium/log.h>
+#include <yttrium/storage/reader.h>
+#include <yttrium/storage/writer.h>
 #include "../../utils/fourcc.h"
 
 #include <cstring>
