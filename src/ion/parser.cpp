@@ -82,8 +82,9 @@ namespace
 		IonObject* object = nullptr;
 		IonList* list = nullptr;
 
-		State(IonObject* object) : object(object) {}
-		State(IonList* list) : list(list) {}
+		State() = default;
+		explicit State(IonObject* object) : object(object) {}
+		explicit State(IonList* list) : list(list) {}
 	};
 }
 
@@ -93,10 +94,9 @@ namespace Yttrium
 	{
 		assert(document._buffer.capacity() > document._buffer.size() && document._buffer[document._buffer.size()] == '\0');
 
-		StdVector<State> states(document.allocator());
-		states.emplace_back(&document.root());
-
-		State* state = &states.back();
+		std::array<State, 64> states;
+		auto state = states.begin();
+		*state = State(&document.root());
 
 		size_t i = 0;
 		size_t line_base = -1;
@@ -111,7 +111,7 @@ namespace Yttrium
 
 			case End:
 				if (i == document._buffer.size())
-					return { states.size() == 1 ? Status::Ok : Status::Error, line, i - line_base };
+					return { state == states.begin() ? Status::Ok : Status::Error, line, i - line_base };
 
 			case Space:
 				do { ++i; } while (::class_of(c[i]) == Space);
@@ -165,32 +165,40 @@ namespace Yttrium
 			case LBrace:
 				if (!state->list)
 					return { Status::Error, line, i - line_base };
-				states.emplace_back(state->list->append_object());
-				state = &states.back();
+				{
+					const auto next_state = std::next(state);
+					if (next_state == states.end())
+						return { Status::Error, line, i - line_base };
+					*next_state = State(state->list->append_object());
+					state = next_state;
+				}
 				++i;
 				break;
 
 			case RBrace:
-				if (!state->object || states.size() == 1)
+				if (!state->object || state == states.begin())
 					return { Status::Error, line, i - line_base };
-				states.pop_back();
-				state = &states.back();
+				--state;
 				++i;
 				break;
 
 			case LBracket:
 				if (!state->list)
 					return { Status::Error, line, i - line_base };
-				states.emplace_back(state->list->append_list());
-				state = &states.back();
+				{
+					const auto next_state = std::next(state);
+					if (next_state == states.end())
+						return { Status::Error, line, i - line_base };
+					*next_state = State(state->list->append_list());
+					state = next_state;
+				}
 				++i;
 				break;
 
 			case RBracket:
-				if (state->object || states.size() == 1)
+				if (state->object || state == states.begin())
 					return { Status::Error, line, i - line_base };
-				states.pop_back();
-				state = &states.back();
+				--state;
 				++i;
 				break;
 

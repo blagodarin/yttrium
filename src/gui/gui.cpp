@@ -14,6 +14,8 @@
 #include "ion/loader.h"
 #include "layer.h"
 
+#include <cassert>
+
 namespace Yttrium
 {
 	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
@@ -75,19 +77,14 @@ namespace Yttrium
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
 		auto texture = _resource_loader.load_texture_2d(texture_name, true);
-		if (!texture)
-		{
-			Log() << "Can't load \""_s << texture_name << "\""_s; // TODO: Move to ResourceLoader.
-			return;
-		}
+		assert(texture);
 
 		auto font = _resource_loader.load_texture_font(font_source);
-		if (!font)
-			return;
+		assert(font);
 
 		if (!Rect(texture->size()).contains(font->rect()))
 		{
-			Log() << "Can't use \""_s << font_source << "\" with \""_s << texture_name << "\""_s;
+			Log() << "Can't use font \""_s << font_source << "\" with texture \""_s << texture_name << "\""_s;
 			return;
 		}
 
