@@ -73,8 +73,9 @@ namespace Yttrium
 		auto document = make_resource<IonDocumentImpl>(allocator);
 		if (!reader.read_all(document->_buffer))
 			return nullptr;
-		if (!IonParser(*document).parse(document->_buffer, reader.name()))
-			throw DataError("Bad ION document: \"", reader.name(), "\"");
+		const auto parsing_result = IonParser::parse(*document);
+		if (parsing_result.status != IonParser::Status::Ok)
+			throw DataError('(', reader.name(), ':', parsing_result.line, ':', parsing_result.position, ") Syntax error"_s);
 		return std::move(document);
 	}
 }

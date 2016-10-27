@@ -42,6 +42,7 @@ namespace Yttrium
 		Pool<IonValue> _values;
 
 		friend IonDocument;
+		friend IonParser;
 	};
 }
 

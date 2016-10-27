@@ -8,237 +8,32 @@
 
 #include <cassert>
 
-namespace Yttrium
+namespace
 {
-	IonParser::IonParser(IonDocumentImpl& document)
-		: _document(document)
-		, _states(_document.allocator())
+	using namespace Yttrium;
+
+	enum CharClass
 	{
-	}
+		Other,    // Any character not mentioned below.
+		End,      // '\0'.
+		Space,    // '\t', '\v', '\f' or ' '.
+		Cr,       // '\r'.
+		Lf,       // '\n'.
+		Name,     // 'A'-'Z', 'a'-'z', '0'-'9' or '_'.
+		Quote,    // '"'.
+		LBrace,   // '{'.
+		RBrace,   // '}'.
+		LBracket, // '['.
+		RBracket, // ']'.
+		Comment,  // '#'.
+	};
 
-	bool IonParser::parse(Buffer& buffer, const StaticString& source_name)
-	{
-		if (buffer.capacity() == 0)
-			return false;
-
-		assert(buffer.capacity() > buffer.size() && buffer[buffer.size()] == '\0');
-
-		_states.push_back(State(&_document.root()));
-		_state = &_states.back();
-
-		for (const auto* src = buffer.begin(); ; )
-		{
-			switch (char_class[*src])
-			{
-			case Other:
-				return false;
-
-			case End:
-				return src == buffer.end() && parse_end();
-
-			case Space:
-				do
-				{
-					++src;
-				} while (char_class[*src] == Space);
-				break;
-
-			case Name:
-				{
-					const auto begin = src;
-
-					do
-					{
-						++src;
-					} while (char_class[*src] == Name);
-
-					if (!parse_name(StaticString(reinterpret_cast<const char*>(begin), src - begin)))
-					{
-						return false;
-					}
-				}
-				break;
-
-			case Quote:
-				{
-					const auto begin = ++src;
-
-					while (*src != '"' && *src != '\\' && *src)
-						++src;
-
-					auto dst = const_cast<uint8_t*>(src);
-
-					while (*src != '"')
-					{
-						const auto c0 = *src;
-
-						if (!c0 && src == buffer.end())
-						{
-							Log() << "("_s << source_name << ") String continues past the end of source"_s;
-							return false;
-						}
-
-						if (c0 == '\\')
-						{
-							char c1 = *++src;
-
-							if ((c1 >= '0' && c1 <= '9') || (c1 >= 'A' && c1 <= 'F'))
-							{
-								unsigned char hex;
-
-								char c2 = *++src;
-
-								if (c2 >= '0' && c2 <= '9')
-								{
-									hex = c2 - '0';
-								}
-								else if (c2 >= 'A' && c2 <= 'F')
-								{
-									hex = c2 - 'A' + 10;
-								}
-								else
-								{
-									Log() << "("_s << source_name << ") Bad second hex digit '"_s << c2 << '\'';
-									return false;
-								}
-
-								if (c1 <= '9')
-								{
-									hex += 16 * (c1 - '0');
-								}
-								else
-								{
-									hex += 16 * (c1 - 'A' + 10);
-								}
-
-								*dst++ = hex;
-							}
-							else
-							{
-								switch (c1)
-								{
-								case '"':  *dst++ = '\"'; break;
-								case '\\': *dst++ = '\\'; break;
-								case 'n':  *dst++ = '\n'; break;
-								case 'r':  *dst++ = '\r'; break;
-								case 't':  *dst++ = '\t'; break;
-								default:
-
-									Log() << "("_s << source_name << ") Bad escape symbol '"_s << c1 << '\'';
-									return false;
-								}
-							}
-						}
-						else
-						{
-							*dst++ = c0;
-						}
-
-						++src;
-					}
-					if (!parse_value(StaticString(reinterpret_cast<const char*>(begin), dst - begin)))
-						return false;
-					++src;
-				}
-				break;
-
-			case LBrace:
-				if (!parse_lbrace())
-					return false;
-				++src;
-				break;
-
-			case RBrace:
-				if (!parse_rbrace())
-					return false;
-				++src;
-				break;
-
-			case LBracket:
-				if (!parse_lbracket())
-					return false;
-				++src;
-				break;
-
-			case RBracket:
-				if (!parse_rbracket())
-					return false;
-				++src;
-				break;
-
-			case Comment:
-				do
-				{
-					++src;
-				} while (*src != '\n' && *src != '\r' && *src);
-				break;
-			}
-		}
-	}
-
-	bool IonParser::parse_name(const StaticString& name)
-	{
-		if (!_state->object)
-			return false;
-		_state->list = _state->object->append(name, ByReference());
-		return true;
-	}
-
-	bool IonParser::parse_value(const StaticString& value)
-	{
-		if (!_state->list)
-			return false;
-		_state->list->append(value, ByReference());
-		return true;
-	}
-
-	bool IonParser::parse_lbrace()
-	{
-		if (!_state->list)
-			return false;
-		_states.emplace_back(_state->list->append_object());
-		_state = &_states.back();
-		return true;
-	}
-
-	bool IonParser::parse_rbrace()
-	{
-		if (!_state->object || _states.size() == 1)
-			return false;
-		_states.pop_back();
-		_state = &_states.back();
-		return true;
-	}
-
-	bool IonParser::parse_lbracket()
-	{
-		if (!_state->list)
-			return false;
-		_states.emplace_back(_state->list->append_list());
-		_state = &_states.back();
-		return true;
-	}
-
-	bool IonParser::parse_rbracket()
-	{
-		if (_state->object || _states.size() == 1)
-			return false;
-		_states.pop_back();
-		_state = &_states.back();
-		return true;
-	}
-
-	bool IonParser::parse_end()
-	{
-		return _states.size() == 1;
-	}
-
-	const IonParser::CharClass IonParser::char_class[256] =
+	const std::array<CharClass, 256> char_class =
 	{
 		// #0 - #31: Special character set.
 
 		End,    Other,  Other, Other,    Other, Other,    Other, Other, // \0
-		Other,  Space,  Space, Space,    Space, Space,    Other, Other, // \t \n \v \f \r
+		Other,  Space,  Lf,    Space,    Space, Cr,       Other, Other, // \t \n \v \f \r
 		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
 		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
 
@@ -276,4 +71,133 @@ namespace Yttrium
 		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
 		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
 	};
+
+	CharClass class_of(char c)
+	{
+		return char_class[static_cast<unsigned char>(c)];
+	}
+
+	struct State
+	{
+		IonObject* object = nullptr;
+		IonList* list = nullptr;
+
+		State(IonObject* object) : object(object) {}
+		State(IonList* list) : list(list) {}
+	};
+}
+
+namespace Yttrium
+{
+	IonParser::Result IonParser::parse(IonDocumentImpl& document)
+	{
+		assert(document._buffer.capacity() > document._buffer.size() && document._buffer[document._buffer.size()] == '\0');
+
+		StdVector<State> states(document.allocator());
+		states.emplace_back(&document.root());
+
+		State* state = &states.back();
+
+		size_t i = 0;
+		size_t line_base = -1;
+		size_t line = 1;
+
+		for (const auto c = reinterpret_cast<char*>(document._buffer.begin());;)
+		{
+			switch (::class_of(c[i]))
+			{
+			case Other:
+				return { Status::Error, line, i - line_base };
+
+			case End:
+				if (i == document._buffer.size())
+					return { states.size() == 1 ? Status::Ok : Status::Error, line, i - line_base };
+
+			case Space:
+				do { ++i; } while (::class_of(c[i]) == Space);
+				break;
+
+			case Cr:
+				if (c[i + 1] == '\n')
+					++i;
+
+			case Lf:
+				line_base = i++;
+				++line;
+				break;
+
+			case Name:
+				if (!state->object)
+					return { Status::Error, line, i - line_base };
+				{
+					const auto base = i;
+					do { ++i; } while (::class_of(c[i]) == Name);
+					state->list = state->object->append(StaticString(&c[base], i - base), ByReference());
+				}
+				break;
+
+			case Quote:
+				if (!state->list)
+					return { Status::Error, line, i - line_base };
+				{
+					const auto base = ++i;
+					while (c[i] != '"')
+					{
+						switch (c[i])
+						{
+						case '\0':
+							if (i == document._buffer.size())
+								return { Status::Error, line, i - line_base };
+							++i;
+							break;
+						case '\n':
+						case '\r':
+							return { Status::Error, line, i - line_base };
+						default:
+							++i;
+						}
+					}
+					state->list->append(StaticString(&c[base], i - base), ByReference());
+					++i;
+				}
+				break;
+
+			case LBrace:
+				if (!state->list)
+					return { Status::Error, line, i - line_base };
+				states.emplace_back(state->list->append_object());
+				state = &states.back();
+				++i;
+				break;
+
+			case RBrace:
+				if (!state->object || states.size() == 1)
+					return { Status::Error, line, i - line_base };
+				states.pop_back();
+				state = &states.back();
+				++i;
+				break;
+
+			case LBracket:
+				if (!state->list)
+					return { Status::Error, line, i - line_base };
+				states.emplace_back(state->list->append_list());
+				state = &states.back();
+				++i;
+				break;
+
+			case RBracket:
+				if (state->object || states.size() == 1)
+					return { Status::Error, line, i - line_base };
+				states.pop_back();
+				state = &states.back();
+				++i;
+				break;
+
+			case Comment:
+				do { ++i; } while (c[i] != '\n' && c[i] != '\r' && c[i]);
+				break;
+			}
+		}
+	}
 }

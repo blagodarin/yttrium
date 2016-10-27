@@ -14,8 +14,6 @@
 		- Image pack support (a list of headers with filenames and raw image data offsets).
 	* Internationalization:
 		- Unicode font support.
-	* ION:
-		- Location information support.
 	* Renderer:
 		- OpenGL 3.3 compliance.
 * Tools:
