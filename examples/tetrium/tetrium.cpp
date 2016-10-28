@@ -1,6 +1,7 @@
 #include "tetrium.h"
 
 #include <algorithm>
+#include <cassert>
 
 namespace
 {
@@ -236,7 +237,7 @@ namespace Tetrium
 			switch (_state)
 			{
 			case Stopped:
-				// NOTE: This should never happen.
+				assert(false);
 				break;
 
 			case Waiting:

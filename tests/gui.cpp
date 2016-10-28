@@ -1,4 +1,4 @@
-#include <yttrium/gui.h>
+#include <yttrium/gui/gui.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/script/context.h>

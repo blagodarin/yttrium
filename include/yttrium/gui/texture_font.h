@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_resources_texture_font_h_
-#define _include_yttrium_resources_texture_font_h_
+#ifndef _include_yttrium_gui_texture_font_h_
+#define _include_yttrium_gui_texture_font_h_
 
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource.h>

@@ -1,5 +1,5 @@
+#include <yttrium/gui/texture_font.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/resources/texture_font.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/file.h>
 #include <yttrium/storage/reader.h>

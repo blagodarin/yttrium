@@ -4,7 +4,7 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/bindings.h>
 #include <yttrium/console.h>
-#include <yttrium/gui.h>
+#include <yttrium/gui/gui.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include <yttrium/memory/named_allocator.h>

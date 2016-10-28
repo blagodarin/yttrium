@@ -3,12 +3,12 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
+#include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/resources/texture_font.h>
 #include <yttrium/resources/translation.h>
 #include <yttrium/std/map.h>
 #include <yttrium/storage/reader.h>

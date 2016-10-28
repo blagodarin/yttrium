@@ -1,7 +1,7 @@
-#include <yttrium/resources/texture_font.h>
+#include <yttrium/gui/texture_font.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/renderer/text_capture.h>
+#include <yttrium/gui/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/map.h>

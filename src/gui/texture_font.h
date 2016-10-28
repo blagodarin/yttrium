@@ -1,5 +1,5 @@
-#ifndef _src_resources_texture_font_h_
-#define _src_resources_texture_font_h_
+#ifndef _src_gui_texture_font_h_
+#define _src_gui_texture_font_h_
 
 #include "../utils/fourcc.h"
 
