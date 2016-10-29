@@ -1,5 +1,6 @@
 #include <yttrium/script/code.h>
 
+#include <yttrium/exceptions.h>
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
@@ -41,45 +42,33 @@ namespace Yttrium
 
 	ScriptCode::ScriptCode(String&& text, Allocator& allocator)
 	{
-		auto&& code = make_unique<ScriptCodePrivate>(allocator, allocator);
+		auto code = make_unique<ScriptCodePrivate>(allocator, allocator);
 
 		ScriptScanner scanner(text);
-
-		ScriptScanner::Token token;
-
-		ScriptCommand* command = nullptr;
-
-		enum class ParserState
+		for (ScriptCommand* command = nullptr;;)
 		{
-			Initial,
-			Command,
-		};
-
-		ParserState state = ParserState::Initial;
-
-		while (scanner.read(token) && token.type != ScriptScanner::Token::End)
-		{
-			switch (state)
+			const auto token = scanner.read();
+			if (token.type == ScriptScanner::Token::End)
+				break;
+			if (!command)
 			{
-			case ParserState::Initial:
 				switch (token.type)
 				{
 				case ScriptScanner::Token::Identifier:
 				case ScriptScanner::Token::XIdentifier:
 					code->_commands.emplace_back(token.string, allocator);
 					command = &code->_commands.back();
-					state = ParserState::Command;
 					break;
 
 				case ScriptScanner::Token::Separator:
 					break;
 
 				default:
-					return;
+					throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 				}
-				break;
-
-			case ParserState::Command:
+			}
+			else
+			{
 				switch (token.type)
 				{
 				case ScriptScanner::Token::Identifier:
@@ -99,18 +88,14 @@ namespace Yttrium
 					break;
 
 				case ScriptScanner::Token::Separator:
-					state = ParserState::Initial;
+					command = nullptr;
 					break;
 
 				default:
-					return;
+					throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 				}
-				break;
 			}
 		}
-
-		if (token.type != ScriptScanner::Token::End)
-			return;
 
 		_private = std::move(code);
 	}

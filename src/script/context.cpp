@@ -71,7 +71,8 @@ namespace Yttrium
 
 		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 		{
-			Log() << "[Script.Context] Argument number mismatch for command \""_s << id << '\"';
+			Log() << "[Script.Context] Argument number mismatch for command \""_s << id << "\": "_s
+				<< args.size() << " instead of "_s << command->second.min_args << '-' << command->second.max_args;
 			return false;
 		}
 

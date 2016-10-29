@@ -1,6 +1,6 @@
 #include "scanner.h"
 
-#include <yttrium/log.h>
+#include <yttrium/exceptions.h>
 
 namespace
 {
@@ -97,166 +97,126 @@ namespace Yttrium
 	ScriptScanner::ScriptScanner(const StaticString& text)
 		: _cursor(const_cast<char*>(text.text()))
 		, _end(text.text() + text.size())
-		, _line_origin(_cursor - 1)
-		, _line(1)
 	{
 	}
 
-	bool ScriptScanner::read(Token& token)
+	ScriptScanner::Token ScriptScanner::read()
 	{
-		char* cursor = _cursor;
-
+		Token token;
 		token.line = _line;
-
-	rescan:
-
-		switch (::kind_of[static_cast<unsigned char>(*cursor)])
+		for (;;)
 		{
-		case Kind::Other:
-
+			token.column = _cursor - _line_origin;
+			switch (::kind_of[static_cast<unsigned char>(*_cursor)])
 			{
-				token.column = cursor - _line_origin;
+			case Kind::Other:
 				token.type = Token::Literal;
-
-				char* begin = cursor;
-
-				bool has_sigil = (*cursor == '+' || *cursor == '-');
-
-				if (has_sigil)
 				{
-					++cursor;
-				}
+					char* begin = _cursor;
 
-				if ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
-					|| (*cursor >= 'A' && *cursor <= 'Z'))
-				{
-					token.type = Token::Identifier;
-					while ((*cursor >= 'a' && *cursor <= 'z') || *cursor == '_'
-						|| (*cursor >= '0' && *cursor <= '9') || (*cursor >= 'A' && *cursor <= 'Z'))
+					const bool has_sigil = (*_cursor == '+' || *_cursor == '-');
+					if (has_sigil)
+						++_cursor;
+
+					if ((*_cursor >= 'a' && *_cursor <= 'z') || *_cursor == '_' || (*_cursor >= 'A' && *_cursor <= 'Z'))
 					{
-						++cursor;
-					}
-				}
-
-				if (::kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other)
-				{
-					token.type = Token::Literal;
-					do ++cursor; while (::kind_of[static_cast<unsigned char>(*cursor)] == Kind::Other);
-				}
-
-				if (token.type == Token::Identifier && has_sigil)
-					token.type = Token::XIdentifier;
-
-				token.string = StaticString(begin, cursor - begin);
-			}
-			break;
-
-		case Kind::Space:
-
-			do ++cursor; while (::kind_of[static_cast<unsigned char>(*cursor)] == Kind::Space);
-			goto rescan;
-
-		case Kind::Comment:
-
-			do ++cursor; while (cursor != _end && *cursor != '\r' && *cursor != '\n');
-			goto rescan;
-
-		case Kind::Quote:
-
-			{
-				token.column = cursor - _line_origin;
-
-				char* begin = ++cursor;
-				char* end = begin;
-
-				for (; ; )
-				{
-					if (*cursor == '"')
-					{
-						++cursor;
-						break;
-					}
-					else if (*cursor == '\\')
-					{
-						switch (*++cursor)
+						token.type = Token::Identifier;
+						while ((*_cursor >= 'a' && *_cursor <= 'z') || *_cursor == '_'
+							|| (*_cursor >= '0' && *_cursor <= '9') || (*_cursor >= 'A' && *_cursor <= 'Z'))
 						{
-						case '\\': *end++ = '\\'; break;
-						case '"':  *end++ = '"';  break;
-						case '\'': *end++ = '\''; break;
-						case 'n':  *end++ = '\n'; break;
-						case 'r':  *end++ = '\r'; break;
-						default:
+							++_cursor;
+						}
+					}
 
-							Log() << "[ScriptScanner] Invalid escape sequence \""_s << *cursor
-								<< "\" ("_s << token.line << ':' << cursor - _line_origin << ')';
-							return false;
-						}
-						++cursor;
-					}
-					else if (*cursor == '\n' || *cursor == '\r')
+					if (::kind_of[static_cast<unsigned char>(*_cursor)] == Kind::Other)
 					{
-						Log() << "[ScriptScanner] Unexpected end of line ("_s
-							<< token.line << ':' << cursor - _line_origin << ')';
-						return false;
+						token.type = Token::Literal;
+						do ++_cursor; while (::kind_of[static_cast<unsigned char>(*_cursor)] == Kind::Other);
 					}
-					else if (cursor != _end)
-					{
-						if (end != cursor)
-						{
-							*end = *cursor;
-						}
-						++cursor;
-						++end;
-					}
-					else
-					{
-						Log() << "[ScriptScanner] Unexpected end of script ("_s
-							<< token.line << ':' << cursor - _line_origin << ')';
-						return false;
-					}
+
+					if (token.type == Token::Identifier && has_sigil)
+						token.type = Token::XIdentifier;
+
+					token.string = StaticString(begin, _cursor - begin);
 				}
+				return token;
 
+			case Kind::Space:
+				do ++_cursor; while (::kind_of[static_cast<unsigned char>(*_cursor)] == Kind::Space);
+				break;
+
+			case Kind::Comment:
+				do ++_cursor; while (*_cursor != '\n' && *_cursor != '\r' && _cursor != _end);
+				break;
+
+			case Kind::Quote:
+				{
+					auto begin = ++_cursor;
+					auto end = begin;
+					for (;;)
+					{
+						if (*_cursor == '"')
+						{
+							++_cursor;
+							break;
+						}
+						else if (*_cursor == '\\')
+						{
+							switch (*++_cursor)
+							{
+							case '\\': *end++ = '\\'; break;
+							case '"': *end++ = '"'; break;
+							case '\'': *end++ = '\''; break;
+							case 'n': *end++ = '\n'; break;
+							case 'r': *end++ = '\r'; break;
+							default: throw DataError("[", _line, ":", _cursor - _line_origin, "] Invalid escape character");
+							}
+							++_cursor;
+						}
+						else if (*_cursor == '\n' || *_cursor == '\r')
+						{
+							throw DataError("[", _line, ":", _cursor - _line_origin, "] Unexpected end of line");
+						}
+						else if (_cursor != _end)
+						{
+							if (end != _cursor)
+								*end = *_cursor;
+							++_cursor;
+							++end;
+						}
+						else
+							throw DataError("[", _line, ":", _cursor - _line_origin, "] Unexpected end of file");
+					}
+					token.string = StaticString(begin, end - begin);
+				}
 				token.type = Token::String;
-				token.string = StaticString(begin, end - begin);
+				return token;
+
+			case Kind::Newline:
+				if (*_cursor == '\r' && *(_cursor + 1) == '\n')
+					++_cursor;
+				++_line;
+				_line_origin = _cursor++;
+				token.type = Token::Separator;
+				return token;
+
+			case Kind::Semicolon:
+				++_cursor;
+				token.type = Token::Separator;
+				return token;
+
+			case Kind::End:
+				if (_cursor != _end)
+				{
+					++_cursor;
+					break;
+				}
+				token.type = Token::End;
+				return token;
+
+			default:
+				throw DataError("[", _line, ":", _cursor - _line_origin, "] Invalid character");
 			}
-			break;
-
-		case Kind::Newline:
-
-			token.column = cursor - _line_origin;
-			if (*cursor == '\r' && *(cursor + 1) == '\n') // Treat "\r\n" as a single newline.
-				++cursor;
-			++_line;
-			_line_origin = ++cursor - 1;
-			token.type = Token::Separator;
-			break;
-
-		case Kind::Semicolon:
-
-			token.column = cursor++ - _line_origin;
-			token.type = Token::Separator;
-			break;
-
-		case Kind::End:
-
-			if (cursor != _end)
-			{
-				++cursor;
-				goto rescan;
-			}
-			token.column = cursor - _line_origin;
-			token.type = Token::End;
-			break;
-
-		case Kind::Error:
-
-			Log() << "[ScriptScanner] Invalid script character ("_s
-				<< token.line << ':' << cursor - _line_origin << ')';
-			return false;
 		}
-
-		_cursor = cursor;
-
-		return true;
 	}
 }
