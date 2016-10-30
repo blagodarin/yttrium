@@ -235,8 +235,9 @@ namespace Yttrium
 	void Bindings::bind(Key key, const StaticString& action)
 	{
 		auto& binding = _private->_actions[KeyType(key)];
-		binding.first.swap(String(action, &_private->_script_context.allocator()));
-		binding.second = ScriptCode(binding.first, _private->_script_context.allocator());
+		String action_copy(action, &_private->_script_context.allocator());
+		binding.second = ScriptCode(action_copy, _private->_script_context.allocator());
+		binding.first.swap(std::move(action_copy));
 	}
 
 	bool Bindings::bind(const StaticString& name, const StaticString& action)
@@ -251,11 +252,11 @@ namespace Yttrium
 	void Bindings::bind_default(Key key, const StaticString& action)
 	{
 		auto& binding = _private->_actions[KeyType(key)];
-		if (binding.first.is_empty())
-		{
-			binding.first.swap(String(action, &_private->_script_context.allocator()));
-			binding.second = ScriptCode(binding.first, _private->_script_context.allocator());
-		}
+		if (!binding.first.is_empty())
+			return;
+		String action_copy(action, &_private->_script_context.allocator());
+		binding.second = ScriptCode(action_copy, _private->_script_context.allocator());
+		binding.first.swap(std::move(action_copy));
 	}
 
 	bool Bindings::bind_default(const StaticString& name, const StaticString& action)

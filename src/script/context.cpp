@@ -29,61 +29,66 @@ namespace Yttrium
 	class ScriptContextPrivate
 	{
 	public:
-		ScriptContextPrivate(Allocator& allocator, ScriptContext* parent = nullptr)
-			: _parent(parent)
-			, _value_pool(32, allocator)
-			, _values(allocator)
-			, _commands(allocator)
+		ScriptContextPrivate(Allocator& allocator, ScriptContext* parent)
+			: _allocator(allocator)
+			, _parent(parent)
 		{
 		}
 
 	public:
+		Allocator& _allocator;
 		ScriptContext* const _parent;
-		Pool<ScriptValue> _value_pool;
-		StdMap<String, ScriptValue*> _values;
-		StdMap<String, ScriptCommandContext> _commands;
+		Pool<ScriptValue> _value_pool{ 32, _allocator };
+		StdMap<String, ScriptValue*> _values{ _allocator };
+		StdMap<String, ScriptCommandContext> _commands{ _allocator };
 	};
 
 	ScriptContext::ScriptContext(Allocator* allocator)
-		: _private(make_unique<ScriptContextPrivate>(*allocator, *allocator))
+		: _private(std::make_unique<ScriptContextPrivate>(*allocator, nullptr))
 	{
 	}
 
 	ScriptContext::ScriptContext(ScriptContext* parent, Allocator* allocator)
-		: _private(make_unique<ScriptContextPrivate>(*allocator, *allocator, parent))
+		: _private(std::make_unique<ScriptContextPrivate>(*allocator, parent))
 	{
+	}
+
+	Allocator& ScriptContext::allocator() const noexcept
+	{
+		return _private->_allocator;
 	}
 
 	bool ScriptContext::call(const StaticString& name, String* result, const ScriptArgs& args)
 	{
 		if (name.is_empty())
+		{
+			Log()("Invalid command \"\""_s);
 			return false;
+		}
 
 		StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
 		const auto command = _private->_commands.find(String(id, ByReference(), nullptr));
-
 		if (command == _private->_commands.end())
 		{
-			Log() << "[Script.Context] Unknown command \""_s << id << '\"';
+			Log()("Unknown command \"", id, "\"");
 			return false;
 		}
 
 		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 		{
-			Log() << "[Script.Context] Argument number mismatch for command \""_s << id << "\": "_s
-				<< args.size() << " instead of "_s << command->second.min_args << '-' << command->second.max_args;
+			Log()("Argument number mismatch for \""_s, id, "\": "_s,
+				args.size(), " instead of "_s, command->second.min_args, '-', command->second.max_args);
 			return false;
 		}
 
 		command->second.command(ScriptCall(*this, name, args, *result));
-
 		return true;
 	}
 
 	void ScriptContext::define(const StaticString& name, size_t min_args, size_t max_args, const Command& command)
 	{
-		_private->_commands[String(name, &_private.allocator())] = ScriptCommandContext(command, min_args, max_args);
+		_private->_commands[String(name, &_private->_allocator)] = ScriptCommandContext(command, min_args, max_args);
 	}
 
 	ScriptValue* ScriptContext::find(const StaticString& name) const
@@ -111,8 +116,8 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private.allocator()),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private.allocator())).first;
+			i = _private->_values.emplace(String(name, &_private->_allocator),
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -122,8 +127,8 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private.allocator()),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private.allocator())).first;
+			i = _private->_values.emplace(String(name, &_private->_allocator),
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -133,8 +138,8 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private.allocator()),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private.allocator())).first;
+			i = _private->_values.emplace(String(name, &_private->_allocator),
+				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
 		else
 			*i->second = value;
 		return i->second;

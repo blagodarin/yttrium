@@ -2,11 +2,14 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/pool.h>
+#include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 #include <yttrium/storage/reader.h>
 #include "scanner.h"
+
+#include <cassert>
 
 namespace Yttrium
 {
@@ -25,79 +28,74 @@ namespace Yttrium
 	class ScriptCodePrivate
 	{
 	public:
-		ScriptCodePrivate(Allocator& allocator)
-			: _commands(allocator)
-			, _temporaries(32, allocator)
-			, _last_result(&allocator)
+		ScriptCodePrivate(String&& text, Allocator& allocator)
+			: _allocator(allocator)
 		{
+			ScriptScanner scanner(text);
+			for (ScriptCommand* command = nullptr;;)
+			{
+				const auto token = scanner.read();
+				if (token.type == ScriptScanner::Token::End)
+					break;
+				if (!command)
+				{
+					switch (token.type)
+					{
+					case ScriptScanner::Token::Identifier:
+					case ScriptScanner::Token::XIdentifier:
+						_commands.emplace_back(token.string, allocator);
+						command = &_commands.back();
+						break;
+
+					case ScriptScanner::Token::Separator:
+						break;
+
+					default:
+						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+					}
+				}
+				else
+				{
+					switch (token.type)
+					{
+					case ScriptScanner::Token::Identifier:
+						command->args.emplace_back(new(_temporaries.allocate())
+							ScriptValue(token.string, ScriptValue::Type::Name, allocator));
+						break;
+
+					case ScriptScanner::Token::XIdentifier:
+					case ScriptScanner::Token::Literal:
+						command->args.emplace_back(new(_temporaries.allocate())
+							ScriptValue(token.string, ScriptValue::Type::Literal, allocator));
+						break;
+
+					case ScriptScanner::Token::String:
+						command->args.emplace_back(new(_temporaries.allocate())
+							ScriptValue(token.string, ScriptValue::Type::String, allocator));
+						break;
+
+					case ScriptScanner::Token::Separator:
+						command = nullptr;
+						break;
+
+					default:
+						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+					}
+				}
+			}
 		}
 
 	public:
-		StdVector<ScriptCommand> _commands;
-		Pool<ScriptValue> _temporaries;
-		String _last_result;
+		Allocator& _allocator;
+		StdVector<ScriptCommand> _commands{ _allocator };
+		Pool<ScriptValue> _temporaries{ 32, _allocator };
 	};
 
 	ScriptCode::ScriptCode() = default;
 
 	ScriptCode::ScriptCode(String&& text, Allocator& allocator)
+		: _private(std::make_unique<ScriptCodePrivate>(std::move(text), allocator))
 	{
-		auto code = make_unique<ScriptCodePrivate>(allocator, allocator);
-
-		ScriptScanner scanner(text);
-		for (ScriptCommand* command = nullptr;;)
-		{
-			const auto token = scanner.read();
-			if (token.type == ScriptScanner::Token::End)
-				break;
-			if (!command)
-			{
-				switch (token.type)
-				{
-				case ScriptScanner::Token::Identifier:
-				case ScriptScanner::Token::XIdentifier:
-					code->_commands.emplace_back(token.string, allocator);
-					command = &code->_commands.back();
-					break;
-
-				case ScriptScanner::Token::Separator:
-					break;
-
-				default:
-					throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-				}
-			}
-			else
-			{
-				switch (token.type)
-				{
-				case ScriptScanner::Token::Identifier:
-					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Type::Name, allocator));
-					break;
-
-				case ScriptScanner::Token::XIdentifier:
-				case ScriptScanner::Token::Literal:
-					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Type::Literal, allocator));
-					break;
-
-				case ScriptScanner::Token::String:
-					command->args.emplace_back(new(code->_temporaries.allocate())
-						ScriptValue(token.string, ScriptValue::Type::String, allocator));
-					break;
-
-				case ScriptScanner::Token::Separator:
-					command = nullptr;
-					break;
-
-				default:
-					throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-				}
-			}
-		}
-
-		_private = std::move(code);
 	}
 
 	ScriptCode::ScriptCode(const StaticString& text, Allocator& allocator)
@@ -109,24 +107,27 @@ namespace Yttrium
 	{
 		if (!_private)
 			return;
-
-		class NameFixer
+		TemporaryAllocator<64> result_allocator(_private->_allocator);
+		String result(&result_allocator);
+		if (mode == ScriptCodeMode::Do)
 		{
-		public:
-			NameFixer(String& name, bool fix) : _name(name), _fix(fix) { if (_fix) _name[0] = '-'; }
-			~NameFixer() { if (_fix) _name[0] = '+'; }
-		private:
-			String& _name;
-			const bool _fix;
-		};
-
-		for (auto& command : _private->_commands)
+			for (const auto& command : _private->_commands)
+				if (!context.call(command.name, &result, ScriptArgs(context, command.args)))
+					break;
+		}
+		else
 		{
-			if (mode == ScriptCodeMode::Undo && command.name[0] != '+')
-				continue;
-			NameFixer fixer(command.name, mode == ScriptCodeMode::Undo);
-			if (!context.call(command.name, &_private->_last_result, ScriptArgs(context, command.args)))
-				break;
+			assert(mode == ScriptCodeMode::Undo);
+			for (auto command = _private->_commands.crbegin(); command != _private->_commands.crend(); ++command)
+			{
+				if (command->name[0] != '+')
+					continue;
+				TemporaryAllocator<32> name_allocator(_private->_allocator);
+				String name(command->name, &name_allocator);
+				name[0] = '-';
+				if (!context.call(name, &result, ScriptArgs(context, command->args)))
+					break;
+			}
 		}
 	}
 

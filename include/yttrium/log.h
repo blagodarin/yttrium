@@ -17,7 +17,7 @@ namespace Yttrium
 		///
 		static void set_file(const StaticString&);
 
-		Log();
+		Log(); // TODO: Allocator.
 		~Log();
 
 		///
@@ -27,6 +27,11 @@ namespace Yttrium
 			_message << std::forward<T>(value);
 			return *this;
 		}
+
+		///
+		template <typename T, typename... Args>
+		Log& operator()(T&& value, Args&&... args) { _message << std::forward<T>(value); return (*this)(std::forward<Args>(args)...); }
+		Log& operator()() { return *this; }
 
 	private:
 		String _message;

@@ -2,7 +2,6 @@
 
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
-#include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include "document.h"
 

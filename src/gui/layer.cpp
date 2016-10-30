@@ -21,9 +21,7 @@ namespace Yttrium
 	{
 	}
 
-	GuiLayer::~GuiLayer()
-	{
-	}
+	GuiLayer::~GuiLayer() = default;
 
 	GuiLayout& GuiLayer::add_layout(GuiLayout::Placement placement)
 	{

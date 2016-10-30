@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 	class ScriptArgs;
-	class ScriptCode;
+	class ScriptCodePrivate;
 	class ScriptContext;
 	class ScriptParser;
 
@@ -17,7 +17,7 @@ namespace Yttrium
 	class Y_API ScriptValue
 	{
 		friend ScriptArgs;
-		friend ScriptCode;
+		friend ScriptCodePrivate;
 		friend ScriptContext;
 		friend ScriptParser;
 

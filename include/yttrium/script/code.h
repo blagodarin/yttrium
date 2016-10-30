@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_script_code_h_
 #define _include_yttrium_script_code_h_
 
-#include <yttrium/memory/unique_ptr.h>
+#include <yttrium/memory/global.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -44,7 +46,7 @@ namespace Yttrium
 		static ScriptCode load(const StaticString& filename, Allocator& = *DefaultAllocator);
 
 	private:
-		UniquePtr<class ScriptCodePrivate> _private;
+		std::unique_ptr<class ScriptCodePrivate> _private;
 
 	public:
 		~ScriptCode();

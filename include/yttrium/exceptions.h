@@ -28,19 +28,11 @@ namespace Yttrium
 
 	private:
 		template <typename T, typename... Args>
-		void append(T&& value, Args&&... args) { _what << value; append(std::forward<Args>(args)...); }
+		void append(T&& value, Args&&... args) { _what << std::forward<T>(value); append(std::forward<Args>(args)...); }
 		void append() {}
 
 	private:
 		String _what;
-	};
-
-	/// Thrown if a resource can't be loaded from the supplied data.
-	class DataError : public Exception
-	{
-	public:
-		template <typename... Args>
-		DataError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
 	};
 
 	/// Thrown if the initialization of an object (e.g. Window) fails.
@@ -52,12 +44,36 @@ namespace Yttrium
 		InitializationError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
 	};
 
-	/// Thrown by ResourceLoader if it is unable to find the specified resource.
-	class ResourceError : public Exception
+	/// Generic error that can occur in an initialized environment.
+	class RuntimeError : public Exception
 	{
 	public:
 		template <typename... Args>
-		ResourceError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
+		RuntimeError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
+	};
+
+	/// Thrown if a resource can't be loaded from the supplied data.
+	class DataError : public RuntimeError
+	{
+	public:
+		template <typename... Args>
+		DataError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
+	};
+
+	/// Thrown by ResourceLoader if it is unable to find the specified resource.
+	class ResourceError : public RuntimeError
+	{
+	public:
+		template <typename... Args>
+		ResourceError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
+	};
+
+	/// Thrown by script classes on any errors during script execution.
+	class ScriptError : public RuntimeError
+	{
+	public:
+		template <typename... Args>
+		ScriptError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
 	};
 }
 
