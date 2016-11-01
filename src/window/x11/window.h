@@ -29,13 +29,35 @@ namespace Yttrium
 		void swap_buffers();
 
 	private:
-		class EmptyCursor;
+		class WindowHandle
+		{
+		public:
+			WindowHandle(::Display* display, ::Window window) : _display(display), _window(window) {}
+			~WindowHandle() { reset(); }
+			explicit operator bool() const noexcept { return _window != None; }
+			::Window get() const noexcept { return _window; }
+			void reset() noexcept;
+		private:
+			::Display* const _display;
+			::Window _window = None;
+		};
+
+		class EmptyCursor
+		{
+		public:
+			EmptyCursor(::Display*, ::Window);
+			~EmptyCursor();
+			::Cursor get() const { return _cursor; }
+		private:
+			::Display* const _display;
+			::Cursor _cursor = None;
+		};
 
 		const P_Display _display;
 		const int _screen = DefaultScreen(_display.get());
 		const GlContext _glx{ _display.get(), _screen };
-		::Window _window; // TODO: Prevent resource leak if _empty_cursor construction throws.
-		const std::unique_ptr<EmptyCursor> _empty_cursor;
+		WindowHandle _window;
+		const EmptyCursor _empty_cursor{ _display.get(), _window.get() };
 		::Atom _wm_protocols = ::XInternAtom(_display.get(), "WM_PROTOCOLS", True);
 		::Atom _wm_delete_window = ::XInternAtom(_display.get(), "WM_DELETE_WINDOW", True);
 		::Atom _net_wm_state = ::XInternAtom(_display.get(), "_NET_WM_STATE", True);

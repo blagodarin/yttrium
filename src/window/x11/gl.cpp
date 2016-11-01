@@ -134,31 +134,9 @@ namespace Yttrium
 		_extensions.EXT_swap_control_tear = ::check_extension(extensions, "GLX_EXT_swap_control_tear");
 	}
 
-	GlContext::GlContext(GlContext&& context)
-		: _display(context._display)
-		, _screen(context._screen)
-		, _context(context._context)
-		, _extensions(context._extensions)
-	{
-		context._context = nullptr;
-	}
-
-	GlContext& GlContext::operator=(GlContext&& context)
-	{
-		if (_context)
-			::glXDestroyContext(_display, _context);
-		_display = context._display;
-		_screen = context._screen;
-		_context = context._context;
-		_extensions = context._extensions;
-		context._context = nullptr;
-		return *this;
-	}
-
 	GlContext::~GlContext()
 	{
-		if (_context)
-			::glXDestroyContext(_display, _context);
+		::glXDestroyContext(_display, _context);
 	}
 
 	void GlContext::bind(::Window window) const

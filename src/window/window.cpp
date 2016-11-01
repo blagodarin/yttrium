@@ -39,7 +39,7 @@ namespace Yttrium
 		Allocator& _allocator;
 		const String _name;
 		WindowBackend _backend{ _name, *this };
-		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator);
+		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator); // TODO: Store renderer by value.
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;

@@ -18,10 +18,7 @@ namespace Yttrium
 			bool EXT_swap_control_tear = false;
 		};
 
-		GlContext() = default;
 		GlContext(::Display*, int screen);
-		GlContext(GlContext&&);
-		GlContext& operator=(GlContext&&);
 		~GlContext();
 
 		explicit operator bool() const { return _context; }
@@ -34,8 +31,8 @@ namespace Yttrium
 		const Extensions* operator->() const { return &_extensions; }
 
 	private:
-		::Display* _display = nullptr;
-		int _screen = 0;
+		::Display* const _display;
+		const int _screen;
 		Y_UNIQUE_PTR(::XVisualInfo, ::XFree) _visual_info;
 		::GLXContext _context = nullptr;
 		Extensions _extensions;

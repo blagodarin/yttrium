@@ -139,78 +139,40 @@ namespace
 
 namespace Yttrium
 {
-	class WindowBackend::EmptyCursor
-	{
-	public:
-		EmptyCursor(::Display* display, ::Window window)
-			: _display(display)
-		{
-			char data[1] = { 0 };
-			const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
-			if (pixmap == None)
-				throw InitializationError("Failed to create a pixmap for an empty cursor");
-			::XColor color;
-			::memset(&color, 0, sizeof(color));
-			_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
-			::XFreePixmap(_display, pixmap);
-			if (_cursor == None)
-				throw InitializationError("Failed to create an empty cursor");
-		}
-
-		~EmptyCursor()
-		{
-			::XFreeCursor(_display, _cursor);
-		}
-
-		::Cursor get() const
-		{
-			return _cursor;
-		}
-
-	private:
-		::Display* const _display;
-		::Cursor _cursor = None;
-	};
-
 	WindowBackend::WindowBackend(const String& name, WindowBackendCallbacks& callbacks)
 		: _display(::open_display())
-		, _window(::create_window(_display.get(), _screen, _glx))
-		, _empty_cursor(std::make_unique<EmptyCursor>(_display.get(), _window))
+		, _window(_display.get(), ::create_window(_display.get(), _screen, _glx))
 		, _callbacks(callbacks)
 	{
-		::XSetWMProtocols(_display.get(), _window, &_wm_delete_window, 1);
-		::XStoreName(_display.get(), _window, name.text());
+		::XSetWMProtocols(_display.get(), _window.get(), &_wm_delete_window, 1);
+		::XStoreName(_display.get(), _window.get(), name.text());
 
 		// Hide system cursor.
-		::XDefineCursor(_display.get(), _window, _empty_cursor->get());
+		::XDefineCursor(_display.get(), _window.get(), _empty_cursor.get());
 
 		// Show window in fullscreen mode.
-		::XChangeProperty(_display.get(), _window, _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
+		::XChangeProperty(_display.get(), _window.get(), _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 
-		_glx.bind(_window);
+		_glx.bind(_window.get());
 
 		// Force vsync.
 		if (_glx->EXT_swap_control)
-			_glx->SwapIntervalEXT(_display.get(), _window, _glx->EXT_swap_control_tear ? -1 : 1);
+			_glx->SwapIntervalEXT(_display.get(), _window.get(), _glx->EXT_swap_control_tear ? -1 : 1);
 	}
 
-	WindowBackend::~WindowBackend()
-	{
-		close();
-	}
+	WindowBackend::~WindowBackend() = default;
 
 	void WindowBackend::close()
 	{
-		if (_window == None)
+		if (!_window)
 			return;
 		_glx.unbind();
-		::XDestroyWindow(_display.get(), _window);
-		_window = None;
+		_window.reset();
 	}
 
 	bool WindowBackend::get_cursor(Point& cursor)
 	{
-		if (_window == None)
+		if (!_window)
 			return false;
 
 		::Window root = None;
@@ -221,7 +183,7 @@ namespace Yttrium
 		int window_y = 0;
 		unsigned mask = 0;
 
-		if (!::XQueryPointer(_display.get(), _window, &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
+		if (!::XQueryPointer(_display.get(), _window.get(), &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
 		cursor = { window_x, window_y };
@@ -231,7 +193,7 @@ namespace Yttrium
 
 	bool WindowBackend::process_events()
 	{
-		if (_window == None)
+		if (!_window)
 			return false;
 		while (!_has_size ||::XPending(_display.get()) > 0)
 		{
@@ -295,24 +257,50 @@ namespace Yttrium
 
 	bool WindowBackend::set_cursor(const Point& cursor)
 	{
-		if (_window == None)
+		if (!_window)
 			return false;
-		::XWarpPointer(_display.get(), None, _window, 0, 0, 0, 0, cursor.x(), cursor.y());
+		::XWarpPointer(_display.get(), None, _window.get(), 0, 0, 0, 0, cursor.x(), cursor.y());
 		::XSync(_display.get(), False);
 		return true;
 	}
 
 	void WindowBackend::show()
 	{
-		if (_window == None)
-			return;
-		::XMapRaised(_display.get(), _window);
+		if (_window)
+			::XMapRaised(_display.get(), _window.get());
 	}
 
 	void WindowBackend::swap_buffers()
 	{
+		if (_window)
+			_glx.swap_buffers(_window.get());
+	}
+
+	void WindowBackend::WindowHandle::reset() noexcept
+	{
 		if (_window == None)
 			return;
-		_glx.swap_buffers(_window);
+		::XDestroyWindow(_display, _window);
+		_window = None;
+	}
+
+	WindowBackend::EmptyCursor::EmptyCursor(::Display* display, ::Window window)
+		: _display(display)
+	{
+		char data[1] = { 0 };
+		const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
+		if (pixmap == None)
+			throw InitializationError("Failed to create a pixmap for an empty cursor");
+		::XColor color;
+		::memset(&color, 0, sizeof(color));
+		_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
+		::XFreePixmap(_display, pixmap);
+		if (_cursor == None)
+			throw InitializationError("Failed to create an empty cursor");
+	}
+
+	WindowBackend::EmptyCursor::~EmptyCursor()
+	{
+		::XFreeCursor(_display, _cursor);
 	}
 }
