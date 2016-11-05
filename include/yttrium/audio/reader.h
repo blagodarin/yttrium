@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_audio_io_h_
-#define _include_yttrium_audio_io_h_
+#ifndef _include_yttrium_audio_reader_h_
+#define _include_yttrium_audio_reader_h_
 
 #include <yttrium/global.h>
 
@@ -10,18 +10,8 @@
 
 namespace Yttrium
 {
+	class AudioFormat;
 	class Reader;
-
-	/// Audio data format.
-	struct AudioFormat
-	{
-		uint_fast8_t  bytes_per_sample = 0; ///< Bytes per sample, usually 1 or 2.
-		uint_fast8_t  channels = 0;         ///< Sampling channels, usually 1 or 2.
-		uint_fast32_t frequency = 0;        ///< Sampling rate.
-
-		///
-		uint_fast16_t unit_size() const { return bytes_per_sample * channels; }
-	};
 
 	/// Read-only audio file access interface.
 	class Y_API AudioReader

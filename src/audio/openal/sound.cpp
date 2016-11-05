@@ -1,6 +1,7 @@
 #include "sound.h"
 
-#include <yttrium/audio/io.h>
+#include <yttrium/audio/format.h>
+#include <yttrium/audio/reader.h>
 #include <yttrium/memory/buffer.h>
 
 #include <new>
@@ -10,7 +11,7 @@ namespace Yttrium
 	Sound_OpenAL::Sound_OpenAL(AudioReader& reader)
 		: _format(reader.format())
 	{
-		if (reader.format().channels != 1)
+		if (reader.format().channels() != 1)
 			throw DataError("Sound audio must have one channel");
 		const auto reader_size = reader.size();
 		if (reader_size > SIZE_MAX)

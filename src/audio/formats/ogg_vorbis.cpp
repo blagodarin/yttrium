@@ -64,9 +64,7 @@ namespace Yttrium
 
 		vorbis_info* info = ::ov_info(&_ov_file, -1);
 
-		_format.bytes_per_sample = 2;
-		_format.channels = info->channels;
-		_format.frequency = info->rate;
+		_format = AudioFormat(2, info->channels, info->rate);
 		_total_units = ::ov_pcm_total(&_ov_file, -1);
 
 		return true;
