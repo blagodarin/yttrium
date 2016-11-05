@@ -1,5 +1,6 @@
 #include "wav.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/utils.h>
 #include "wav_private.h"
 
@@ -26,39 +27,29 @@ namespace Yttrium
 	WavReader::WavReader(Reader&& reader)
 		: AudioReaderImpl(std::move(reader))
 	{
-	}
-
-	bool WavReader::open()
-	{
-		WavFileHeader  file_header;
-		WavChunkHeader chunk_header;
-		WavFormatChunk format_chunk;
-
+		WavFileHeader file_header;
 		if (!_reader.read(file_header)
 			|| file_header.riff_fourcc != WavFileHeader::RIFF
 			|| file_header.wave_fourcc != WavFileHeader::WAVE)
-			return false;
+			throw DataError("Bad WAV header");
 
-		if (!::find_chunk(_reader, WavChunkHeader::fmt, chunk_header))
-			return false;
+		WavChunkHeader fmt_header;
+		WavFormatChunk fmt;
+		if (!::find_chunk(_reader, WavChunkHeader::fmt, fmt_header)
+			|| !_reader.read(fmt)
+			|| (fmt_header.size > sizeof fmt && !_reader.skip(fmt_header.size - sizeof fmt)))
+			throw DataError("Bad WAV 'fmt' chunk");
 
-		if (!_reader.read(format_chunk)
-			|| format_chunk.format != WAVE_FORMAT_PCM)
-			return false;
+		if (fmt.format != WAVE_FORMAT_PCM)
+			throw DataError("Bad WAV format (must be WAVE_FORMAT_PCM)");
 
-		if (chunk_header.size > sizeof format_chunk
-			&& !_reader.skip(chunk_header.size - sizeof format_chunk))
-			return false;
+		WavChunkHeader data_header;
+		if (!::find_chunk(_reader, WavChunkHeader::data, data_header))
+			throw DataError("Bad WAV 'data' chunk");
 
-		if (!::find_chunk(_reader, WavChunkHeader::data, chunk_header))
-			return false;
-
-		_format = AudioFormat(format_chunk.bits_per_sample / 8, format_chunk.channels, format_chunk.samples_per_second);
-		_total_units = min<uint64_t>(_reader.size() - _reader.offset(), chunk_header.size) / _format.unit_size();
-
+		_format = AudioFormat(fmt.bits_per_sample / 8, fmt.channels, fmt.samples_per_second);
+		_total_units = min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.unit_size();
 		_data_offset = _reader.offset();
-
-		return true;
 	}
 
 	size_t WavReader::read(void* buffer, size_t bytes_to_read)

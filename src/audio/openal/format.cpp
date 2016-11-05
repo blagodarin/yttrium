@@ -6,7 +6,7 @@
 namespace Yttrium
 {
 	OpenALFormat::OpenALFormat(const AudioFormat& format)
-		: _frequency(format.frequency()) // TODO: Check the frequency too.
+		: _frequency(format.samples_per_second()) // TODO: Check the frequency too.
 	{
 		switch (format.bytes_per_sample())
 		{

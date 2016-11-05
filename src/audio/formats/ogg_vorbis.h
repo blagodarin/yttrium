@@ -13,9 +13,8 @@ namespace Yttrium
 		OggVorbisReader(Reader&&);
 		~OggVorbisReader() override;
 
-		bool open() override;
-		size_t read(void* buffer, size_t bytes_to_read) override;
-		bool seek(uint64_t offset) override;
+		size_t read(void*, size_t) override;
+		bool seek(uint64_t) override;
 
 	private:
 		OggVorbis_File _ov_file;

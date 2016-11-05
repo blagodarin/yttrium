@@ -36,7 +36,7 @@ namespace Yttrium
 
 		const auto format = _source->format();
 
-		_buffer_units = format.frequency(); // One-second buffer.
+		_buffer_units = format.samples_per_second(); // One-second buffer.
 
 		// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
 		// I have no idea whether this is a real bug.
@@ -47,8 +47,8 @@ namespace Yttrium
 		{
 			// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
 
-			_begin_sample = static_cast<uint64_t>(settings.begin * format.frequency());
-			_end_sample = static_cast<uint64_t>(settings.end * format.frequency());
+			_begin_sample = static_cast<uint64_t>(settings.begin * format.samples_per_second());
+			_end_sample = static_cast<uint64_t>(settings.end * format.samples_per_second());
 
 			if (_end_sample == 0 || _end_sample > source_units)
 				_end_sample = source_units;
@@ -57,7 +57,7 @@ namespace Yttrium
 			{
 				if (order == AudioPlayer::Random)
 				{
-					_loop_sample = static_cast<uint64_t>(settings.loop * format.frequency());
+					_loop_sample = static_cast<uint64_t>(settings.loop * format.samples_per_second());
 					_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_units);
 				}
 				else

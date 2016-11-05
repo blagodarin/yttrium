@@ -41,17 +41,13 @@ namespace Yttrium
 	{
 		if (!reader)
 			return {};
-		std::unique_ptr<AudioReaderImpl> audio_reader;
 		switch (::detect_audio_type(reader))
 		{
-		case AudioType::Wav: audio_reader = std::make_unique<WavReader>(std::move(reader)); break;
+		case AudioType::Wav: return std::make_unique<WavReader>(std::move(reader)); break;
 	#ifndef Y_NO_OGG_VORBIS
-		case AudioType::OggVorbis: audio_reader = std::make_unique<OggVorbisReader>(std::move(reader)); break;
+		case AudioType::OggVorbis: return std::make_unique<OggVorbisReader>(std::move(reader)); break;
 	#endif
 		default: throw DataError("Unknown audio format");
 		}
-		if (!audio_reader->open())
-			throw DataError("Bad audio data");
-		return std::move(audio_reader);
 	}
 }

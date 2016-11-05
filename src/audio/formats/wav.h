@@ -10,9 +10,8 @@ namespace Yttrium
 	public:
 		WavReader(Reader&&);
 
-		bool open() override;
-		size_t read(void* buffer, size_t bytes_to_read) override;
-		bool seek(uint64_t offset) override;
+		size_t read(void*, size_t) override;
+		bool seek(uint64_t) override;
 
 	private:
 		uint64_t _data_offset = 0;

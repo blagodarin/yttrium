@@ -1,5 +1,6 @@
 #include "ogg_vorbis.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/utils.h>
 
 #include <cstring>
@@ -10,7 +11,7 @@ namespace
 
 	size_t read_callback(void* ptr, size_t size, size_t nmemb, void* datasource)
 	{
-		return static_cast<Reader*>(datasource)->read(ptr, size * nmemb); // TODO: Check if the product fits into size_t.
+		return static_cast<Reader*>(datasource)->read(ptr, size * nmemb);
 	}
 
 	int seek_callback(void* datasource, ogg_int64_t offset, int whence)
@@ -50,24 +51,17 @@ namespace Yttrium
 		: AudioReaderImpl(std::move(reader))
 	{
 		::memset(&_ov_file, 0, sizeof _ov_file);
+		if (::ov_open_callbacks(&_reader, &_ov_file, nullptr, 0, ::y_ov_callbacks) < 0)
+			throw DataError("Bad Ogg Vorbis file");
+
+		vorbis_info* info = ::ov_info(&_ov_file, -1);
+		_format = AudioFormat(2, info->channels, info->rate);
+		_total_units = ::ov_pcm_total(&_ov_file, -1);
 	}
 
 	OggVorbisReader::~OggVorbisReader()
 	{
 		::ov_clear(&_ov_file);
-	}
-
-	bool OggVorbisReader::open()
-	{
-		if (::ov_open_callbacks(&_reader, &_ov_file, nullptr, 0, ::y_ov_callbacks) < 0)
-			return false;
-
-		vorbis_info* info = ::ov_info(&_ov_file, -1);
-
-		_format = AudioFormat(2, info->channels, info->rate);
-		_total_units = ::ov_pcm_total(&_ov_file, -1);
-
-		return true;
 	}
 
 	size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)

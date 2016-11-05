@@ -14,8 +14,8 @@ namespace Yttrium
 		AudioFormat() = default;
 
 		///
-		AudioFormat(unsigned bytes_per_sample, unsigned channels, unsigned frequency)
-			: _bytes_per_sample(bytes_per_sample), _channels(channels), _frequency(frequency) {}
+		AudioFormat(unsigned bytes_per_sample, unsigned channels, unsigned samples_per_second)
+			: _bytes_per_sample(bytes_per_sample), _channels(channels), _samples_per_second(samples_per_second) {}
 
 		/// Returns the number of bytes per sample (usually 1 or 2).
 		unsigned bytes_per_sample() const { return _bytes_per_sample; }
@@ -23,8 +23,11 @@ namespace Yttrium
 		/// Returns the number of channels (usually 1 or 2).
 		unsigned channels() const { return _channels; }
 
-		/// Returns the number of samples per second.
-		unsigned frequency() const { return _frequency; }
+		/// Returns the number of bytes per second.
+		unsigned bytes_per_second() const { return _bytes_per_sample * _channels * _samples_per_second; }
+
+		/// Returns the number of samples per second for each channel.
+		unsigned samples_per_second() const { return _samples_per_second; }
 
 		///
 		unsigned unit_size() const { return _bytes_per_sample * _channels; }
@@ -32,7 +35,7 @@ namespace Yttrium
 	private:
 		unsigned _bytes_per_sample = 0;
 		unsigned _channels = 0;
-		unsigned _frequency = 0;
+		unsigned _samples_per_second = 0;
 	};
 }
 
