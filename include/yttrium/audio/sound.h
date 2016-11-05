@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 	public:
 		/// Plays the sound asynchronously.
-		virtual void play() const = 0; // TODO: Use some sound player to play sounds.
+		virtual void play() const = 0;
 	};
 }
 
