@@ -190,7 +190,7 @@ void Game::run()
 			if (!entry)
 				continue;
 
-			const auto& file_name = Ion::to_string(*entry, "file");
+			const auto file_name = Ion::to_string(*entry, "file");
 			if (file_name.is_empty())
 				continue;
 
@@ -198,7 +198,7 @@ void Game::run()
 			settings.begin = Ion::to_string(*entry, "begin").to_time();
 			settings.end = Ion::to_string(*entry, "end").to_time();
 			settings.loop = Ion::to_string(*entry, "loop").to_time();
-			_audio.player().load(file_name, settings);
+			_audio.player().load(_storage.open(file_name), settings);
 		}
 		_audio.player().set_order(AudioPlayer::Random);
 	}

@@ -1,5 +1,7 @@
 #include "playlist.h"
 
+#include <yttrium/audio/reader.h>
+
 #include <cstdlib>
 
 namespace Yttrium
@@ -17,32 +19,23 @@ namespace Yttrium
 		_next = 0;
 	}
 
-	void AudioPlaylist::load(const StaticString& name, const AudioPlayer::Settings& settings)
+	void AudioPlaylist::load(Reader&& reader, const AudioPlayer::Settings& settings)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-
-		_items.emplace_back(String(name, &_allocator), settings);
-
-		switch (_order)
-		{
-		case AudioPlayer::Random:
-		case AudioPlayer::Shuffle:
-			_next = std::rand() % _items.size();
-			break;
-
-		default:
-			_next = 0;
-		}
+		auto audio_reader = AudioReader::open(std::move(reader));
+		if (!audio_reader)
+			return;
+		_items.emplace_back(std::move(audio_reader), settings);
+		if (_order == AudioPlayer::Loop)
+			_next = _items.size() - 1;
 	}
 
-	bool AudioPlaylist::next(Item* item)
+	std::pair<std::shared_ptr<AudioReader>, AudioPlayer::Settings> AudioPlaylist::next()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
 		if (_items.empty())
-			return false;
-
-		*item = _items[_next];
+			return {};
 
 		switch (_order)
 		{
@@ -56,7 +49,7 @@ namespace Yttrium
 			break;
 		}
 
-		return true;
+		return _items[_next];
 	}
 
 	AudioPlayer::Order AudioPlaylist::order()

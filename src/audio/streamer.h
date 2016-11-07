@@ -28,7 +28,7 @@ namespace Yttrium
 
 		void close();
 		FetchResult fetch();
-		bool open(Reader&&, const AudioPlayer::Settings&, AudioPlayer::Order);
+		bool open(std::shared_ptr<AudioReader>&&, const AudioPlayer::Settings&, AudioPlayer::Order);
 		void prefetch();
 
 	private:
@@ -37,7 +37,7 @@ namespace Yttrium
 	private:
 		Allocator& _allocator;
 		AudioPlayerBackend& _backend;
-		std::unique_ptr<AudioReader> _source;
+		std::shared_ptr<AudioReader> _source;
 		uint64_t _begin_sample;
 		uint64_t _end_sample;
 		bool _is_looping;

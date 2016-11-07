@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	class StaticString;
+	class Reader;
 
 	/// Audio player.
 	class AudioPlayer
@@ -33,7 +33,7 @@ namespace Yttrium
 		virtual ~AudioPlayer() = default;
 
 		/// Loads a music file for playback.
-		virtual void load(const StaticString& name, const Settings& = {}) = 0;
+		virtual void load(Reader&&, const Settings& = {}) = 0;
 
 		/// Clear the playlist.
 		virtual void clear() = 0;

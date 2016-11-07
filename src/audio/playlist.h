@@ -5,44 +5,28 @@
 #include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 
+#include <memory>
 #include <mutex>
 
 namespace Yttrium
 {
+	class AudioReader;
+
 	class AudioPlaylist
 	{
 	public:
-
-		struct Item
-		{
-			String                name;
-			AudioPlayer::Settings settings;
-
-			Item(Allocator& allocator)
-				: name(&allocator)
-			{
-			}
-
-			Item(const String& name, const AudioPlayer::Settings& settings)
-				: name(name)
-				, settings(settings)
-			{
-			}
-		};
-
 		AudioPlaylist(Allocator&);
 
 		void clear();
-		void load(const StaticString& name, const AudioPlayer::Settings&);
-		bool next(Item* item);
+		void load(Reader&&, const AudioPlayer::Settings&);
+		std::pair<std::shared_ptr<AudioReader>, AudioPlayer::Settings> next();
 		AudioPlayer::Order order();
 		void set_order(AudioPlayer::Order order);
 
 	private:
-
 		Allocator&         _allocator;
 		std::mutex         _mutex;
-		StdVector<Item>    _items;
+		StdVector<std::pair<std::shared_ptr<AudioReader>, AudioPlayer::Settings>> _items;
 		AudioPlayer::Order _order = AudioPlayer::Loop;
 		size_t             _next = 0;
 	};

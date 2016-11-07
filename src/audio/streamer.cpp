@@ -28,11 +28,9 @@ namespace Yttrium
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(Reader&& reader, const AudioPlayer::Settings& settings, AudioPlayer::Order order)
+	bool AudioStreamer::open(std::shared_ptr<AudioReader>&& reader, const AudioPlayer::Settings& settings, AudioPlayer::Order order)
 	{
-		_source = AudioReader::open(std::move(reader));
-		if (!_source)
-			return false;
+		_source = std::move(reader);
 
 		const auto format = _source->format();
 

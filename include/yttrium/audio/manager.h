@@ -14,14 +14,13 @@ namespace Yttrium
 	class Reader;
 	template <typename> class ResourcePtr;
 	class Sound;
-	class Storage;
 
 	/// Audio manager.
 	class Y_API AudioManager
 	{
 	public:
 		///
-		AudioManager(const Storage&, Allocator& = *DefaultAllocator);
+		AudioManager(Allocator& = *DefaultAllocator);
 
 		///
 		ResourcePtr<Sound> create_sound(Reader&&);

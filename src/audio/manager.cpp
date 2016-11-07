@@ -1,8 +1,6 @@
 #include <yttrium/audio/manager.h>
 
 #include <yttrium/audio/reader.h>
-#include <yttrium/storage/reader.h>
-#include <yttrium/storage/storage.h>
 #include <yttrium/resources/resource_ptr.h>
 #include "backend.h"
 #include "player.h"
@@ -12,21 +10,19 @@ namespace Yttrium
 	class AudioManagerPrivate
 	{
 	public:
-		AudioManagerPrivate(const Storage& storage, Allocator& allocator)
-			: _storage(storage)
-			, _allocator(allocator)
+		AudioManagerPrivate(Allocator& allocator)
+			: _allocator(allocator)
 		{
 		}
 
 	public:
-		const Storage& _storage;
 		Allocator& _allocator;
 		const std::unique_ptr<AudioBackend> _backend = AudioBackend::create();
-		AudioPlayerImpl _player{ _storage, _backend->create_player(), _allocator };
+		AudioPlayerImpl _player{ _backend->create_player(), _allocator };
 	};
 
-	AudioManager::AudioManager(const Storage& storage, Allocator& allocator)
-		: _private(std::make_unique<AudioManagerPrivate>(storage, allocator))
+	AudioManager::AudioManager(Allocator& allocator)
+		: _private(std::make_unique<AudioManagerPrivate>(allocator))
 	{
 	}
 
