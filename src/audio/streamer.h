@@ -3,6 +3,7 @@
 
 #include <yttrium/audio/player.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/resources/resource_ptr.h>
 
 #include <memory>
 
@@ -28,7 +29,7 @@ namespace Yttrium
 
 		void close();
 		FetchResult fetch();
-		bool open(std::shared_ptr<AudioReader>&&, const AudioPlayer::Settings&, AudioPlayer::Order);
+		bool open(const ResourcePtr<Music>&, AudioPlayer::Order);
 		void prefetch();
 
 	private:
@@ -37,7 +38,7 @@ namespace Yttrium
 	private:
 		Allocator& _allocator;
 		AudioPlayerBackend& _backend;
-		std::shared_ptr<AudioReader> _source;
+		ResourcePtr<Music> _music;
 		uint64_t _begin_sample;
 		uint64_t _end_sample;
 		bool _is_looping;

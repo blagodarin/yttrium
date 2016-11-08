@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <yttrium/audio/music.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
@@ -194,11 +195,15 @@ void Game::run()
 			if (file_name.is_empty())
 				continue;
 
-			AudioPlayer::Settings settings;
+			const auto music = Music::open(_storage.open(file_name));
+
+			Music::Settings settings;
 			settings.begin = Ion::to_string(*entry, "begin").to_time();
 			settings.end = Ion::to_string(*entry, "end").to_time();
 			settings.loop = Ion::to_string(*entry, "loop").to_time();
-			_audio.player().load(_storage.open(file_name), settings);
+			music->set_settings(settings);
+
+			_audio.player().load(music);
 		}
 		_audio.player().set_order(AudioPlayer::Random);
 	}

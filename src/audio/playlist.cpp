@@ -1,6 +1,6 @@
 #include "playlist.h"
 
-#include <yttrium/audio/reader.h>
+#include <yttrium/resources/resource_ptr.h>
 
 #include <cstdlib>
 
@@ -19,18 +19,17 @@ namespace Yttrium
 		_next = 0;
 	}
 
-	void AudioPlaylist::load(Reader&& reader, const AudioPlayer::Settings& settings)
+	void AudioPlaylist::load(const ResourcePtr<Music>& music)
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		auto audio_reader = AudioReader::open(std::move(reader));
-		if (!audio_reader)
+		if (!music)
 			return;
-		_items.emplace_back(std::move(audio_reader), settings);
+		std::lock_guard<std::mutex> lock(_mutex);
+		_items.emplace_back(music);
 		if (_order == AudioPlayer::Loop)
 			_next = _items.size() - 1;
 	}
 
-	std::pair<std::shared_ptr<AudioReader>, AudioPlayer::Settings> AudioPlaylist::next()
+	ResourcePtr<Music> AudioPlaylist::next()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 

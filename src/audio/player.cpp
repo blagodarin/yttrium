@@ -25,9 +25,9 @@ namespace Yttrium
 		_thread.join();
 	}
 
-	void AudioPlayerImpl::load(Reader&& reader, const Settings& settings)
+	void AudioPlayerImpl::load(const ResourcePtr<Music>& music)
 	{
-		_playlist.load(std::move(reader), settings);
+		_playlist.load(music);
 	}
 
 	void AudioPlayerImpl::clear()
@@ -67,17 +67,14 @@ namespace Yttrium
 			Action action = _action.read();
 			if (action == Play)
 			{
-				auto item = _playlist.next();
-				if (item.first && _streamer.open(std::move(item.first), item.second, _playlist.order()))
+				if (_streamer.open(_playlist.next(), _playlist.order()))
 				{
 					_streamer.prefetch();
 					_backend->play();
 					_state = Playing;
-
 					while (action == Play)
 					{
 						action = _action.read(FetchDelay, Play);
-
 						switch (action)
 						{
 						case Play:
@@ -88,14 +85,12 @@ namespace Yttrium
 
 								if (fetch_result != AudioStreamer::Ok)
 								{
-									auto item = _playlist.next();
-									if (item.first && _streamer.open(std::move(item.first), item.second, _playlist.order()))
+									if (_streamer.open(_playlist.next(), _playlist.order()))
 									{
 										if (fetch_result == AudioStreamer::NoMoreData)
 										{
 											// NOTE: Since audio shorter than a buffer can't be loaded into a playlist,
 											// we can check nothing here.
-
 											_streamer.fetch();
 										}
 									}

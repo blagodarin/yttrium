@@ -6,22 +6,13 @@
 
 namespace Yttrium
 {
-	class Reader;
+	class Music;
+	template <typename> class ResourcePtr;
 
 	/// Audio player.
 	class AudioPlayer
 	{
 	public:
-
-		/// Structure containing audio start, end and loop (re)start times in samples.
-		/// \note No loop if \a loop >= \a end.
-		struct Settings
-		{
-			double begin = 0; ///< Position to begin playback at.
-			double end = 0;   ///< Position to end playback at.
-			double loop = 0;  ///< Position to loop playback at.
-		};
-
 		/// Playback order.
 		enum Order
 		{
@@ -33,7 +24,7 @@ namespace Yttrium
 		virtual ~AudioPlayer() = default;
 
 		/// Loads a music file for playback.
-		virtual void load(Reader&&, const Settings& = {}) = 0;
+		virtual void load(const ResourcePtr<Music>&) = 0;
 
 		/// Clear the playlist.
 		virtual void clear() = 0;

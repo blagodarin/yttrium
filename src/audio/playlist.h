@@ -18,17 +18,17 @@ namespace Yttrium
 		AudioPlaylist(Allocator&);
 
 		void clear();
-		void load(Reader&&, const AudioPlayer::Settings&);
-		std::pair<std::shared_ptr<AudioReader>, AudioPlayer::Settings> next();
+		void load(const ResourcePtr<Music>&);
+		ResourcePtr<Music> next();
 		AudioPlayer::Order order();
 		void set_order(AudioPlayer::Order order);
 
 	private:
-		Allocator&         _allocator;
-		std::mutex         _mutex;
-		StdVector<std::pair<std::shared_ptr<AudioReader>, AudioPlayer::Settings>> _items;
+		Allocator& _allocator;
+		std::mutex _mutex;
+		StdVector<ResourcePtr<Music>> _items;
 		AudioPlayer::Order _order = AudioPlayer::Loop;
-		size_t             _next = 0;
+		size_t _next = 0;
 	};
 }
 

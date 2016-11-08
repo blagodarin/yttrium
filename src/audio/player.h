@@ -17,7 +17,7 @@ namespace Yttrium
 		AudioPlayerImpl(std::unique_ptr<AudioPlayerBackend>&&, Allocator&);
 		~AudioPlayerImpl() override;
 
-		void load(Reader&&, const Settings&) override;
+		void load(const ResourcePtr<Music>&) override;
 		void clear() override;
 		void set_order(Order) override;
 		void play() override;

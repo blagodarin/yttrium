@@ -3,6 +3,7 @@
 #include <yttrium/audio/format.h>
 #include <yttrium/audio/reader.h>
 #include "backend.h"
+#include "music.h"
 
 namespace Yttrium
 {
@@ -16,7 +17,7 @@ namespace Yttrium
 
 	void AudioStreamer::close()
 	{
-		_source = {};
+		_music = {};
 	}
 
 	AudioStreamer::FetchResult AudioStreamer::fetch()
@@ -28,18 +29,23 @@ namespace Yttrium
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(std::shared_ptr<AudioReader>&& reader, const AudioPlayer::Settings& settings, AudioPlayer::Order order)
+	bool AudioStreamer::open(const ResourcePtr<Music>& music, AudioPlayer::Order order)
 	{
-		_source = std::move(reader);
+		_music = music;
+		if (!_music)
+			return false;
 
-		const auto format = _source->format();
+		auto& reader = static_cast<MusicImpl&>(*_music).reader();
+		const auto settings = static_cast<MusicImpl&>(*_music).settings();
+
+		const auto format = reader.format();
 
 		_buffer_units = format.samples_per_second(); // One-second buffer.
 
 		// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
 		// I have no idea whether this is a real bug.
 
-		const uint64_t source_units = _source->size() / format.unit_size();
+		const uint64_t source_units = reader.size() / format.unit_size();
 
 		if (source_units >= _buffer_units * AudioPlayerBackend::NumBuffers)
 		{
@@ -65,12 +71,12 @@ namespace Yttrium
 				_backend.set_format(format);
 				_unit_size = format.unit_size();
 				_buffer.reset(_buffer_units * _unit_size);
-				_source->seek(_begin_sample);
+				reader.seek(_begin_sample);
 				return true;
 			}
 		}
 
-		_source = {};
+		_music = {};
 		return false;
 	}
 
@@ -82,15 +88,17 @@ namespace Yttrium
 
 	size_t AudioStreamer::read()
 	{
-		if (_end_sample - _source->offset() >= _buffer_units)
-			return _source->read(_buffer.data(), _buffer.size());
+		auto& reader = static_cast<MusicImpl&>(*_music).reader();
 
-		const size_t tail = (_end_sample - _source->offset()) * _unit_size;
-		auto size = _source->read(_buffer.data(), tail);
+		if (_end_sample - reader.offset() >= _buffer_units)
+			return reader.read(_buffer.data(), _buffer.size());
+
+		const size_t tail = (_end_sample - reader.offset()) * _unit_size;
+		auto size = reader.read(_buffer.data(), tail);
 		if (_is_looping)
 		{
-			_source->seek(_loop_sample);
-			size += _source->read(&_buffer[size], _buffer.size() - tail);
+			reader.seek(_loop_sample);
+			size += reader.read(&_buffer[size], _buffer.size() - tail);
 		}
 		return size;
 	}
