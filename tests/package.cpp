@@ -52,9 +52,10 @@ BOOST_AUTO_TEST_CASE(test_package)
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-		BOOST_REQUIRE(package_writer->add(file1.name(), Reader(file1.name())));
-		BOOST_REQUIRE(package_writer->add(file2.name(), Reader(file2.name())));
-		BOOST_REQUIRE(package_writer->add(file3.name(), Reader(file3.name())));
+		BOOST_REQUIRE(package_writer->add(file1.name(), Reader(file1.name()), {}));
+		BOOST_REQUIRE(package_writer->add(file2.name(), Reader(file2.name()), {}));
+		BOOST_REQUIRE(package_writer->add(file3.name(), Reader(file3.name()), {}));
+		BOOST_REQUIRE(package_writer->commit());
 	}
 
 	Reader packed_file1;
@@ -95,9 +96,10 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-		BOOST_REQUIRE(package_writer->add("1", Reader(Buffer(1, "1"))));
-		BOOST_REQUIRE(package_writer->add("2", Reader(Buffer(1, "2"))));
-		BOOST_REQUIRE(package_writer->add("3", Reader(Buffer(1, "3"))));
+		BOOST_REQUIRE(package_writer->add("1", Reader(Buffer(1, "1")), {}));
+		BOOST_REQUIRE(package_writer->add("2", Reader(Buffer(1, "2")), {}));
+		BOOST_REQUIRE(package_writer->add("3", Reader(Buffer(1, "3")), {}));
+		BOOST_REQUIRE(package_writer->commit());
 	}
 
 	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);

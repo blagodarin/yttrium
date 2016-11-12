@@ -6,6 +6,9 @@
 
 #include <yttrium/memory/global.h>
 
+#include <map>
+#include <string>
+
 namespace Yttrium
 {
 	class Reader;
@@ -45,10 +48,10 @@ namespace Yttrium
 		virtual ~PackageWriter() = default;
 
 		/// Adds the data from the Reader to the package.
-		virtual bool add(const StaticString& name, const Reader&) = 0;
+		virtual bool add(const StaticString& name, const Reader&, std::map<std::string, std::string>&& properties) = 0;
 
 		///
-		virtual void unlink() = 0;
+		virtual bool commit() = 0;
 	};
 }
 

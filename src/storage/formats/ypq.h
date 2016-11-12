@@ -26,31 +26,19 @@ namespace Yttrium
 	class YpqWriter : public PackageWriter
 	{
 	public:
-		YpqWriter(Writer&& writer, Allocator& allocator) : _writer(std::move(writer)), _allocator(allocator), _entries(_allocator) {}
+		YpqWriter(Writer&&, Allocator&);
 		~YpqWriter() override;
 
-		bool add(const StaticString&, const Reader&) override;
-		void unlink() override;
+		bool add(const StaticString&, const Reader&, std::map<std::string, std::string>&&) override;
+		bool commit() override;
 
 	private:
+		struct Entry;
 
-		struct Entry
-		{
-			uint64_t offset;
-			uint32_t size = 0;
-			String   name;
-
-			Entry(uint64_t offset, const String&& name)
-				: offset(offset)
-				, name(std::move(name))
-			{
-			}
-		};
-
-	private:
 		Writer _writer;
 		Allocator& _allocator;
 		StdVector<Entry> _entries;
+		bool _committed = false;
 	};
 }
 

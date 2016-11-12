@@ -11,6 +11,7 @@
 #include <yttrium/string.h>
 
 #include <iostream>
+#include <limits>
 #include <vector>
 
 using namespace Yttrium;
@@ -30,7 +31,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	std::vector<std::pair<String, std::vector<std::pair<String, String>>>> entries;
+	std::vector<std::pair<String, std::map<std::string, std::string>>> entries;
 	try
 	{
 		const auto document = IonDocument::open(Reader(argv[2]));
@@ -51,10 +52,10 @@ int main(int argc, char** argv)
 			switch (entry.type())
 			{
 			case IonValue::Type::String:
-				entries.emplace_back(String(entry.string()), std::vector<std::pair<String, String>>());
+				entries.emplace_back(String(entry.string()), std::map<std::string, std::string>());
 				break;
 			case IonValue::Type::Object:
-				check(!entries.empty(), "Properties must follow a file");
+				check(!entries.empty(), "Property set must follow a file");
 				check(entries.back().second.empty(), "\"", entries.back().first, "\": Multiple property sets are not allowed");
 				{
 					const auto& properties = *entry.object();
@@ -63,7 +64,13 @@ int main(int argc, char** argv)
 					{
 						check(property.size() == 1, "\"", entries.back().first, "\": Bad property '", property.name(), "'");
 						check(property.begin()->type() == IonValue::Type::String, "\"", entries.back().first, "\": Bad property '", property.name(), "' value");
-						entries.back().second.emplace_back(String(property.name()), String(property.begin()->string()));
+						std::string property_name(property.name().text(), property.name().size());
+						check(property_name.size() <= std::numeric_limits<uint8_t>::max(), "\"", entries.back().first, "\": Property name is too long");
+						check(entries.back().second.count(property_name) == 0, "\": Duplicate property '", property.name(), "'");
+						std::string property_value(property.begin()->string().text(), property.begin()->string().size());
+						check(property_value.size() <= std::numeric_limits<uint8_t>::max(), "\"", entries.back().first, "\": Property '", property.name(), "' value is too long");
+						entries.back().second.emplace(std::move(property_name), std::move(property_value));
+						// TODO: Usa actual limits from the implementation.
 					}
 				}
 				break;
@@ -85,15 +92,14 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	for (const auto& entry : entries)
+	for (auto& entry : entries)
 	{
-		if (!entry.second.empty())
-			std::cerr << "WARNING(" << argv[2] << "): \"" << entry.first << "\": Properties are not yet supported" << std::endl;
-		if (!package->add(entry.first, Reader(entry.first)))
+		if (!package->add(entry.first, Reader(entry.first), std::move(entry.second)))
 		{
-			package->unlink();
 			std::cerr << "ERROR(" << argv[2] << "): \"" << entry.first << "\": Can't pack" << std::endl;
 			return 1;
 		}
 	}
+
+	package->commit();
 }
