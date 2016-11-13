@@ -14,6 +14,12 @@ namespace Yttrium
 	class Y_API SmallStringMap
 	{
 	public:
+		SmallStringMap() noexcept = default;
+		SmallStringMap(const SmallStringMap&);
+		SmallStringMap(SmallStringMap&&) noexcept = default;
+		SmallStringMap& operator=(const SmallStringMap& other) { return *this = SmallStringMap(other); }
+		SmallStringMap& operator=(SmallStringMap&&) noexcept = default;
+
 		///
 		void erase(const StaticString& key) noexcept;
 

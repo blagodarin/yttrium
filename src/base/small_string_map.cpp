@@ -8,6 +8,14 @@ static_assert(sizeof(uint8_t) == sizeof(char), "Unexpected char size");
 
 namespace Yttrium
 {
+	SmallStringMap::SmallStringMap(const SmallStringMap& other)
+		: _data(std::make_unique<uint8_t[]>(other._size))
+		, _size(other._size)
+		, _capacity(other._size)
+	{
+		std::memcpy(_data.get(), other._data.get(), _size);
+	}
+
 	void SmallStringMap::erase(const StaticString& key) noexcept
 	{
 		const auto value = find(key);
