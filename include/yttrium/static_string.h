@@ -50,6 +50,9 @@ namespace Yttrium
 		constexpr bool is_empty() const { return _size == 0; }
 
 		///
+		constexpr bool is_null() const noexcept { return _text == &Null; }
+
+		///
 		constexpr StaticString left(size_t size) const { return { _text, size < _size ? size : _size }; }
 
 		///
