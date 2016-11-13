@@ -10,6 +10,17 @@
 
 namespace Yttrium
 {
+	StaticString ReaderPrivate::property(const StaticString& name) const
+	{
+		const auto i = _properties.find(std::string(name.text(), name.size()));
+		return i != _properties.end() ? StaticString(i->second.data(), i->second.size()) : StaticString();
+	}
+
+	void ReaderPrivate::set_property(const StaticString& name, const StaticString& value)
+	{
+		_properties[std::string(name.text(), name.size())] = std::string(value.text(), value.size());
+	}
+
 	BufferReader::BufferReader(Buffer&& buffer)
 		: ReaderPrivate(buffer.size())
 		, _buffer(std::make_shared<const Buffer>(std::move(buffer)))
@@ -100,6 +111,11 @@ namespace Yttrium
 	uint64_t Reader::offset() const
 	{
 		return _private ? _private->_offset : 0;
+	}
+
+	StaticString Reader::property(const StaticString& name) const
+	{
+		return _private ? _private->property(name) : StaticString();
 	}
 
 	size_t Reader::read(void* data, size_t size)
@@ -204,6 +220,12 @@ namespace Yttrium
 			return false;
 		_private->_offset = offset;
 		return true;
+	}
+
+	void Reader::set_property(const StaticString& name, const StaticString& value)
+	{
+		if (_private)
+			_private->set_property(name, value);
 	}
 
 	uint64_t Reader::size() const

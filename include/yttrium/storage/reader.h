@@ -36,6 +36,9 @@ namespace Yttrium
 		/// Returns the current offset.
 		uint64_t offset() const;
 
+		/// Retrieve a metadata property value by its name.
+		StaticString property(const StaticString&) const;
+
 		/// Reads data from the source.
 		size_t read(void*, size_t);
 
@@ -61,6 +64,9 @@ namespace Yttrium
 
 		/// Sets the current offset.
 		bool seek(uint64_t offset);
+
+		/// Sets a metadata property.
+		void set_property(const StaticString& name, const StaticString& value);
 
 		/// Returns the size of the source data.
 		uint64_t size() const;

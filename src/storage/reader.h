@@ -4,6 +4,8 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
+#include <unordered_map>
+
 namespace Yttrium
 {
 	class FilePrivate;
@@ -15,12 +17,16 @@ namespace Yttrium
 		ReaderPrivate(uint64_t size, const String& name) : _name(name), _size(size) {}
 		virtual ~ReaderPrivate() = default;
 
+		StaticString property(const StaticString&) const;
+		void set_property(const StaticString&, const StaticString&);
+
 		virtual size_t read_at(uint64_t, void*, size_t) const = 0;
 
 	private:
 		const String _name{ &NoAllocator };
 		const uint64_t _size;
 		uint64_t _offset = 0;
+		std::unordered_map<std::string, std::string> _properties; // TODO: Use more efficient data structure.
 
 		friend Reader;
 	};

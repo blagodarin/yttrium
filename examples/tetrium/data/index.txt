@@ -2,7 +2,6 @@ package
 [
 	"data/font.tga" { intensity "1" }
 	"data/font.ytf"
-	"data/music.ion"
 	"data/music.ogg" { end "1:18.40" loop "0:04.90" }
 	"data/sound.wav"
 	"data/textures/wall.jpeg"

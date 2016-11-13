@@ -25,7 +25,7 @@ namespace Yttrium
 		_thread.join();
 	}
 
-	void AudioPlayerImpl::load(const ResourcePtr<Music>& music)
+	void AudioPlayerImpl::load(const ResourcePtr<const Music>& music)
 	{
 		_playlist.load(music);
 	}

@@ -19,7 +19,7 @@ namespace Yttrium
 		_next = 0;
 	}
 
-	void AudioPlaylist::load(const ResourcePtr<Music>& music)
+	void AudioPlaylist::load(const ResourcePtr<const Music>& music)
 	{
 		if (!music)
 			return;
@@ -29,7 +29,7 @@ namespace Yttrium
 			_next = _items.size() - 1;
 	}
 
-	ResourcePtr<Music> AudioPlaylist::next()
+	ResourcePtr<const Music> AudioPlaylist::next()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 

@@ -51,6 +51,17 @@ BOOST_AUTO_TEST_CASE(test_reader_offset)
 	BOOST_CHECK_EQUAL(Reader(Buffer(997)).offset(), 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_reader_property)
+{
+	Reader reader(nullptr, 0);
+	BOOST_REQUIRE(reader);
+	BOOST_CHECK_EQUAL(reader.property("name"), "");
+	reader.set_property("name", "value");
+	BOOST_CHECK_EQUAL(reader.property("name"), "value");
+	reader.set_property("name", "another value");
+	BOOST_CHECK_EQUAL(reader.property("name"), "another value");
+}
+
 BOOST_AUTO_TEST_CASE(test_reader_seek)
 {
 	Reader reader(Buffer(997));

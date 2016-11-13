@@ -29,14 +29,14 @@ namespace Yttrium
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(const ResourcePtr<Music>& music, AudioPlayer::Order order)
+	bool AudioStreamer::open(const ResourcePtr<const Music>& music, AudioPlayer::Order order)
 	{
 		_music = music;
 		if (!_music)
 			return false;
 
-		auto& reader = static_cast<MusicImpl&>(*_music).reader();
-		const auto settings = static_cast<MusicImpl&>(*_music).settings();
+		auto& reader = static_cast<const MusicImpl&>(*_music).reader();
+		const auto settings = static_cast<const MusicImpl&>(*_music).settings();
 
 		const auto format = reader.format();
 
@@ -51,13 +51,13 @@ namespace Yttrium
 		{
 			// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
 
-			_begin_sample = static_cast<uint64_t>(settings.begin * format.samples_per_second());
+			_start_sample = static_cast<uint64_t>(settings.start * format.samples_per_second());
 			_end_sample = static_cast<uint64_t>(settings.end * format.samples_per_second());
 
 			if (_end_sample == 0 || _end_sample > source_units)
 				_end_sample = source_units;
 
-			if (_begin_sample < _end_sample && _end_sample - _begin_sample >= _buffer_units)
+			if (_start_sample < _end_sample && _end_sample - _start_sample >= _buffer_units)
 			{
 				if (order == AudioPlayer::Random)
 				{
@@ -71,7 +71,7 @@ namespace Yttrium
 				_backend.set_format(format);
 				_unit_size = format.unit_size();
 				_buffer.reset(_buffer_units * _unit_size);
-				reader.seek(_begin_sample);
+				reader.seek(_start_sample);
 				return true;
 			}
 		}
@@ -88,7 +88,7 @@ namespace Yttrium
 
 	size_t AudioStreamer::read()
 	{
-		auto& reader = static_cast<MusicImpl&>(*_music).reader();
+		auto& reader = static_cast<const MusicImpl&>(*_music).reader();
 
 		if (_end_sample - reader.offset() >= _buffer_units)
 			return reader.read(_buffer.data(), _buffer.size());

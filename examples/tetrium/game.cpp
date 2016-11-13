@@ -182,32 +182,6 @@ void Game::run()
 
 	std::srand(millisecond_clock());
 
-	const auto music_ion = _resource_loader.load_ion("data/music.ion");
-	if (music_ion)
-	{
-		for (const IonValue& value : music_ion->root().last("music"))
-		{
-			const IonObject* entry = value.object();
-			if (!entry)
-				continue;
-
-			const auto file_name = Ion::to_string(*entry, "file");
-			if (file_name.is_empty())
-				continue;
-
-			const auto music = Music::open(_storage.open(file_name));
-
-			Music::Settings settings;
-			settings.begin = Ion::to_string(*entry, "begin").to_time();
-			settings.end = Ion::to_string(*entry, "end").to_time();
-			settings.loop = Ion::to_string(*entry, "loop").to_time();
-			music->set_settings(settings);
-
-			_audio.player().load(music);
-		}
-		_audio.player().set_order(AudioPlayer::Random);
-	}
-
 	if (!_gui.load("examples/tetrium/data/gui.ion"))
 		return;
 
@@ -223,6 +197,8 @@ void Game::run()
 		draw_next_figure(renderer, rect);
 	});
 
+	_audio.player().load(_resource_loader.load_music("data/music.ogg"));
+	_audio.player().set_order(AudioPlayer::Random);
 	_audio.player().play();
 
 	_window.show();

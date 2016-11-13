@@ -16,7 +16,7 @@ namespace Yttrium
 
 		void set_settings(const Settings&) override;
 
-		AudioReader& reader() { return *_reader; } // TODO: Remove.
+		AudioReader& reader() const { return *_reader; } // TODO: Remove.
 		Settings settings() const { return _settings; }
 
 	private:

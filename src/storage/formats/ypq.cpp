@@ -139,8 +139,10 @@ namespace Yttrium
 			return {};
 		}
 
-		// TODO: Add properties.
-		return Reader(_reader, i->second.offset + sizeof file_header, file_header.size);
+		Reader reader(_reader, i->second.offset + sizeof file_header, file_header.size);
+		for (size_t j = i->second.properties_begin; j < i->second.properties_end; ++j)
+			reader.set_property(_properties[j].first, _properties[j].second);
+		return reader;
 	}
 
 	struct YpqWriter::Entry

@@ -1,6 +1,7 @@
 #include <yttrium/resources/resource_loader.h>
 
 #include <yttrium/audio/manager.h>
+#include <yttrium/audio/music.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/texture_font.h>
@@ -85,6 +86,7 @@ namespace Yttrium
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
 		ResourceCache<IonDocument> _ion_document_cache{ _storage, _allocator };
+		ResourceCache<Music> _music_cache{ _storage, _allocator };
 		ResourceCache<Sound> _sound_cache{ _storage, _allocator };
 		ResourceCache<Texture2D> _texture_2d_cache{ _storage, _allocator };
 		ResourceCache<TextureFont> _texture_font_cache{ _storage, _allocator };
@@ -104,6 +106,20 @@ namespace Yttrium
 		});
 	}
 
+	ResourcePtr<const Music> ResourceLoader::load_music(const StaticString& name)
+	{
+		return _private->_music_cache.fetch(name, [this](Reader&& reader)
+		{
+			Music::Settings settings;
+			settings.start = reader.property("start"_s).to_time();
+			settings.end = reader.property("end"_s).to_time();
+			settings.loop = reader.property("loop"_s).to_time();
+			auto music = Music::open(std::move(reader));
+			music->set_settings(settings);
+			return music;
+		});
+	}
+
 	ResourcePtr<const Sound> ResourceLoader::load_sound(const StaticString& name)
 	{
 		if (!_private->_audio_manager)
@@ -114,12 +130,13 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Texture2D> ResourceLoader::load_texture_2d(const StaticString& name, bool intensity)
+	ResourcePtr<const Texture2D> ResourceLoader::load_texture_2d(const StaticString& name)
 	{
 		if (!_private->_renderer)
 			return {};
-		return _private->_texture_2d_cache.fetch(name, [this, intensity](Reader&& reader) -> ResourcePtr<const Texture2D>
+		return _private->_texture_2d_cache.fetch(name, [this](Reader&& reader) -> ResourcePtr<const Texture2D>
 		{
+			const bool intensity = reader.property("intensity"_s) == "1"_s;
 			// TODO: Map texture memory, then read the image into that memory.
 			Image image;
 			if (!image.load(std::move(reader)))

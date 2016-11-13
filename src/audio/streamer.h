@@ -29,7 +29,7 @@ namespace Yttrium
 
 		void close();
 		FetchResult fetch();
-		bool open(const ResourcePtr<Music>&, AudioPlayer::Order);
+		bool open(const ResourcePtr<const Music>&, AudioPlayer::Order);
 		void prefetch();
 
 	private:
@@ -38,8 +38,8 @@ namespace Yttrium
 	private:
 		Allocator& _allocator;
 		AudioPlayerBackend& _backend;
-		ResourcePtr<Music> _music;
-		uint64_t _begin_sample;
+		ResourcePtr<const Music> _music;
+		uint64_t _start_sample;
 		uint64_t _end_sample;
 		bool _is_looping;
 		uint64_t _loop_sample;

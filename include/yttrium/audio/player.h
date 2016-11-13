@@ -24,7 +24,7 @@ namespace Yttrium
 		virtual ~AudioPlayer() = default;
 
 		/// Loads a music file for playback.
-		virtual void load(const ResourcePtr<Music>&) = 0;
+		virtual void load(const ResourcePtr<const Music>&) = 0;
 
 		/// Clear the playlist.
 		virtual void clear() = 0;

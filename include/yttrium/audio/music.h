@@ -25,7 +25,7 @@ namespace Yttrium
 		/// \note No loop if \a loop >= \a end.
 		struct Settings
 		{
-			double begin = 0; ///< Position to begin playback at.
+			double start = 0; ///< Position to start playback at.
 			double end = 0; ///< Position to end playback at.
 			double loop = 0; ///< Position to loop playback at.
 		};
