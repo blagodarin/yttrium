@@ -65,10 +65,8 @@ int main(int argc, char** argv)
 						check(property.size() == 1, "\"", entries.back().first, "\": Bad property '", property.name(), "'");
 						check(property.begin()->type() == IonValue::Type::String, "\"", entries.back().first, "\": Bad property '", property.name(), "' value");
 						std::string property_name(property.name().text(), property.name().size());
-						check(property_name.size() <= std::numeric_limits<uint8_t>::max(), "\"", entries.back().first, "\": Property name is too long");
 						check(entries.back().second.count(property_name) == 0, "\": Duplicate property '", property.name(), "'");
 						std::string property_value(property.begin()->string().text(), property.begin()->string().size());
-						check(property_value.size() <= std::numeric_limits<uint8_t>::max(), "\"", entries.back().first, "\": Property '", property.name(), "' value is too long");
 						entries.back().second.emplace(std::move(property_name), std::move(property_value));
 						// TODO: Usa actual limits from the implementation.
 					}

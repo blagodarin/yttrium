@@ -47,7 +47,7 @@ namespace Yttrium
 			return {};
 		switch (type)
 		{
-		case PackageType::Ypq: return make_unique<YpqWriter>(allocator, std::move(writer), allocator);
+		case PackageType::Ypq: return make_unique<YpqWriter>(allocator, std::move(writer));
 		default: break;
 		}
 		return {};

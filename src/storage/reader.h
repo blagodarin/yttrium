@@ -29,9 +29,11 @@ namespace Yttrium
 	{
 	public:
 		BufferReader(Buffer&&);
-		BufferReader(const std::shared_ptr<const Buffer>&, const String& name);
+		BufferReader(const std::shared_ptr<const Buffer>&, const String&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
+
+		static Reader create(const std::shared_ptr<const Buffer>&);
 
 	private:
 		const std::shared_ptr<const Buffer> _buffer;

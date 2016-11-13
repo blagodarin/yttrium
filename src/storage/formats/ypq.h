@@ -2,10 +2,11 @@
 #define _src_storage_formats_ypq_h_
 
 #include <yttrium/std/map.h>
-#include <yttrium/std/vector.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 #include "../package.h"
+
+#include <vector>
 
 namespace Yttrium
 {
@@ -13,20 +14,24 @@ namespace Yttrium
 	{
 	public:
 		YpqReader(String&&, Reader&&, Allocator&);
+		~YpqReader() override;
 
 		Reader open(const StaticString&) const override;
 
 	private:
+		struct Entry;
+
 		const String _name;
 		Reader _reader;
-		Allocator& _allocator;
-		StdMap<String, uint64_t> _index;
+		std::shared_ptr<const Buffer> _index_buffer; // Contains string data.
+		StdMap<StaticString, Entry> _entries;
+		std::vector<std::pair<StaticString, StaticString>> _properties;
 	};
 
 	class YpqWriter : public PackageWriter
 	{
 	public:
-		YpqWriter(Writer&&, Allocator&);
+		YpqWriter(Writer&&);
 		~YpqWriter() override;
 
 		bool add(const StaticString&, const Reader&, std::map<std::string, std::string>&&) override;
@@ -36,8 +41,7 @@ namespace Yttrium
 		struct Entry;
 
 		Writer _writer;
-		Allocator& _allocator;
-		StdVector<Entry> _entries;
+		std::vector<Entry> _entries;
 		bool _committed = false;
 	};
 }
