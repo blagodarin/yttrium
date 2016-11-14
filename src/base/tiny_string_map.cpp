@@ -16,6 +16,15 @@ namespace Yttrium
 		std::memcpy(_data.get(), other._data.get(), _size);
 	}
 
+	TinyStringMap::TinyStringMap(TinyStringMap&& other) noexcept
+		: _data(std::move(other._data))
+		, _capacity(other._capacity)
+		, _size(other._size)
+	{
+		other._capacity = 0;
+		other._size = 0;
+	}
+
 	TinyStringMap& TinyStringMap::operator=(const TinyStringMap& other)
 	{
 		if (_capacity < other._capacity)
@@ -25,6 +34,16 @@ namespace Yttrium
 		}
 		std::memcpy(_data.get(), other._data.get(), other._size);
 		_size = other._size;
+		return *this;
+	}
+
+	TinyStringMap& TinyStringMap::operator=(TinyStringMap&& other) noexcept
+	{
+		_data = std::move(other._data);
+		_capacity = other._capacity;
+		_size = other._size;
+		other._capacity = 0;
+		other._size = 0;
 		return *this;
 	}
 

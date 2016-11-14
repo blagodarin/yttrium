@@ -16,11 +16,11 @@ namespace Yttrium
 	public:
 		TinyStringMap() noexcept = default;
 		TinyStringMap(const TinyStringMap&);
-		TinyStringMap(TinyStringMap&&) noexcept = default;
+		TinyStringMap(TinyStringMap&&) noexcept;
 		TinyStringMap& operator=(const TinyStringMap&);
-		TinyStringMap& operator=(TinyStringMap&&) noexcept = default;
+		TinyStringMap& operator=(TinyStringMap&&) noexcept;
 
-		/// Removes the element with the specified key if there is one.
+		/// Removes the element with the specified key.
 		void erase(const StaticString& key) noexcept;
 
 		///
