@@ -1,19 +1,19 @@
-#include <yttrium/small_string_map.h>
+#include <yttrium/tiny_string_map.h>
 
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;
 
-BOOST_AUTO_TEST_CASE(test_small_string_map_find)
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_find)
 {
-	SmallStringMap m;
+	TinyStringMap m;
 	BOOST_CHECK(m.find({}).is_null());
 	BOOST_CHECK(m.find("test").is_null());
 }
 
-BOOST_AUTO_TEST_CASE(test_small_string_map_insert)
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_insert)
 {
-	SmallStringMap m;
+	TinyStringMap m;
 	m.insert_or_assign({}, {});
 	BOOST_CHECK_EQUAL(m.find({}), "");
 	BOOST_CHECK(!m.find({}).is_null());
@@ -28,9 +28,9 @@ BOOST_AUTO_TEST_CASE(test_small_string_map_insert)
 	BOOST_CHECK_EQUAL(m.find({}), "");
 }
 
-BOOST_AUTO_TEST_CASE(test_small_string_map_erase)
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_erase)
 {
-	SmallStringMap m;
+	TinyStringMap m;
 	m.insert_or_assign({}, {});
 	m.insert_or_assign("test", "value");
 	m.insert_or_assign("another", "test value");
@@ -49,9 +49,9 @@ BOOST_AUTO_TEST_CASE(test_small_string_map_erase)
 	BOOST_CHECK(m.find("another").is_null());
 }
 
-BOOST_AUTO_TEST_CASE(test_small_string_map_assign)
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_assign)
 {
-	SmallStringMap m;
+	TinyStringMap m;
 	m.insert_or_assign({}, {});
 	m.insert_or_assign("test", "value");
 	m.insert_or_assign("another", "test value");
@@ -68,4 +68,43 @@ BOOST_AUTO_TEST_CASE(test_small_string_map_assign)
 	BOOST_CHECK_EQUAL(m.find({}), "the longest value");
 	BOOST_CHECK_EQUAL(m.find("test"), "longer value");
 	BOOST_CHECK_EQUAL(m.find("another"), "short");
+}
+
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_copy_construction)
+{
+	TinyStringMap m;
+	m.insert_or_assign({}, {});
+	m.insert_or_assign("test", "value");
+	m.insert_or_assign("another", "test value");
+	TinyStringMap n(m);
+	BOOST_CHECK_EQUAL(m.find({}), "");
+	BOOST_CHECK_EQUAL(m.find("test"), "value");
+	BOOST_CHECK_EQUAL(m.find("another"), "test value");
+	BOOST_CHECK_EQUAL(n.find({}), "");
+	BOOST_CHECK_EQUAL(n.find("test"), "value");
+	BOOST_CHECK_EQUAL(n.find("another"), "test value");
+}
+
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_move_construction)
+{
+	TinyStringMap m;
+	m.insert_or_assign({}, {});
+	m.insert_or_assign("test", "value");
+	m.insert_or_assign("another", "test value");
+	TinyStringMap n(std::move(m));
+	BOOST_CHECK_EQUAL(n.find({}), "");
+	BOOST_CHECK_EQUAL(n.find("test"), "value");
+	BOOST_CHECK_EQUAL(n.find("another"), "test value");
+}
+
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_self_assignment)
+{
+	TinyStringMap m;
+	m.insert_or_assign({}, {});
+	m.insert_or_assign("test", "value");
+	m.insert_or_assign("another", "test value");
+	m = m;
+	BOOST_CHECK_EQUAL(m.find({}), "");
+	BOOST_CHECK_EQUAL(m.find("test"), "value");
+	BOOST_CHECK_EQUAL(m.find("another"), "test value");
 }

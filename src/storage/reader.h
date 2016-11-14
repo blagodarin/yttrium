@@ -1,9 +1,9 @@
 #ifndef _src_storage_reader_h_
 #define _src_storage_reader_h_
 
-#include <yttrium/small_string_map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
+#include <yttrium/tiny_string_map.h>
 
 namespace Yttrium
 {
@@ -22,7 +22,7 @@ namespace Yttrium
 		const String _name{ &NoAllocator };
 		const uint64_t _size;
 		uint64_t _offset = 0;
-		SmallStringMap _properties;
+		TinyStringMap _properties;
 
 		friend Reader;
 	};
