@@ -117,6 +117,9 @@ BOOST_AUTO_TEST_CASE(test_tiny_string_shrinking_assignment)
 	BOOST_CHECK_EQUAL(m.find("a"), "b");
 	BOOST_CHECK_EQUAL(m.find("c"), "d");
 	BOOST_CHECK_EQUAL(m.find("e"), "f");
+	BOOST_CHECK_EQUAL(n.find("a"), "b");
+	BOOST_CHECK_EQUAL(n.find("c"), "d");
+	BOOST_CHECK_EQUAL(n.find("e"), "f");
 }
 
 BOOST_AUTO_TEST_CASE(test_tiny_string_expanding_assignment)
@@ -133,6 +136,9 @@ BOOST_AUTO_TEST_CASE(test_tiny_string_expanding_assignment)
 	BOOST_CHECK(m.find("a").is_null());
 	BOOST_CHECK(m.find("c").is_null());
 	BOOST_CHECK(m.find("e").is_null());
+	BOOST_CHECK_EQUAL(m.find({}), "");
+	BOOST_CHECK_EQUAL(m.find("test"), "value");
+	BOOST_CHECK_EQUAL(m.find("another"), "test value");
 	BOOST_CHECK_EQUAL(n.find({}), "");
 	BOOST_CHECK_EQUAL(n.find("test"), "value");
 	BOOST_CHECK_EQUAL(n.find("another"), "test value");
