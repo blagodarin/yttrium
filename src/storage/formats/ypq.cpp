@@ -1,9 +1,9 @@
 #include "ypq.h"
 
-#include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
+#include <yttrium/string_format.h>
 #include "../../utils/fourcc.h"
 #include "../reader.h"
 
@@ -12,38 +12,35 @@
 
 namespace
 {
+	using namespace Yttrium;
+
 #pragma pack(push, 1)
 
 	struct YpqPackageHeader
 	{
 		uint64_t signature = 0;
-		uint64_t index_file_offset = 0;
+		uint64_t index_offset = 0;
+
+		static constexpr auto Signature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
 	};
 
 	struct YpqIndexHeader
 	{
-		uint32_t signature = 0;
+		uint64_t signature = 0;
+		uint32_t size = 0;
 		uint32_t entry_count = 0;
+
+		static constexpr auto Signature = "\xC8\xCD\xCA\xD1\xD4\xC0\xC9\xCB"_eightcc;
 	};
 
 	struct YpqIndexEntry
 	{
 		uint64_t offset = 0;
+		uint32_t size = 0;
 		// Followed by name and properties.
 	};
 
-	struct YpqFileHeader
-	{
-		uint32_t signature = 0;
-		uint32_t size = 0;
-	};
-
 #pragma pack(pop)
-
-	using namespace Yttrium;
-	const auto YpqPackageSignature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
-	const auto YpqFileSignature = "\xD4\xC0\xC9\xCB"_fourcc;
-	const auto YpqIndexSignature = "\xC8\xCD\xCA\xD1"_fourcc;
 }
 
 namespace Yttrium
@@ -51,6 +48,7 @@ namespace Yttrium
 	struct YpqReader::Entry
 	{
 		uint64_t offset = 0;
+		uint32_t size = 0;
 		size_t properties_begin = 0;
 		size_t properties_end = 0;
 	};
@@ -63,28 +61,23 @@ namespace Yttrium
 		YpqPackageHeader package_header;
 		if (_reader.size() < sizeof package_header
 			|| !_reader.read_at(_reader.size() - sizeof package_header, package_header)
-			|| package_header.signature != YpqPackageSignature)
+			|| package_header.signature != YpqPackageHeader::Signature)
 			throw BadPackage(String("Bad package header"_s, &allocator));
 
-		YpqFileHeader index_file_header;
-		if (!_reader.seek(package_header.index_file_offset)
-			||!_reader.read(index_file_header)
-			|| index_file_header.signature != YpqFileSignature)
-			throw BadPackage(String("Bad package index file header"_s, &allocator));
+		YpqIndexHeader index_header;
+		if (!_reader.seek(package_header.index_offset)
+			|| !_reader.read(index_header)
+			|| index_header.signature != YpqIndexHeader::Signature)
+			throw BadPackage(String("Bad package index header"_s, &allocator));
 
 		{
-			Buffer index_buffer(index_file_header.size);
+			Buffer index_buffer(index_header.size);
 			if (!_reader.read(index_buffer.data(), index_buffer.size()))
 				throw BadPackage(String("Bad package index"_s, &allocator));
 			_index_buffer = std::make_shared<const Buffer>(std::move(index_buffer));
 		}
 
-		Reader index_reader(std::make_shared<BufferReader>(_index_buffer, _name));
-
-		YpqIndexHeader index_header;
-		if (!index_reader.read(index_header)
-			|| index_header.signature != YpqIndexSignature)
-			throw BadPackage(String("Bad package index header"_s, &allocator));
+		Reader index_reader(std::make_shared<BufferReader>(_index_buffer, _name)); // TODO: Span reader.
 
 		const auto read_uint8 = [&allocator, &index_reader]
 		{
@@ -102,11 +95,17 @@ namespace Yttrium
 			return StaticString(static_cast<const char*>(_index_buffer->data()) + index_reader.offset() - size, size);
 		};
 
+		const auto reader_size = _reader.size();
 		for (uint32_t i = 0; i < index_header.entry_count; ++i)
 		{
-			Entry entry;
-			if (!index_reader.read(entry.offset))
+			YpqIndexEntry index_entry;
+			if (!index_reader.read(index_entry))
 				throw BadPackage(String("Unable to read package index entry #"_s, &allocator) << i);
+			if (index_entry.size > reader_size || index_entry.offset > reader_size - index_entry.size)
+				throw BadPackage(String("Bad package index entry #"_s, &allocator) << i);
+			Entry entry;
+			entry.offset = index_entry.offset;
+			entry.size = index_entry.size;
 			const auto name = read_string();
 			entry.properties_begin = _properties.size();
 			for (auto property_count = read_uint8(); property_count > 0; --property_count)
@@ -130,16 +129,7 @@ namespace Yttrium
 		const auto i = _entries.find(name);
 		if (i == _entries.end())
 			return {};
-
-		YpqFileHeader file_header;
-		if (!_reader.read_at(i->second.offset, file_header)
-			|| file_header.signature != YpqFileSignature) // TODO: Check file size.
-		{
-			Log() << "("_s << _name << ") Bad package"_s;
-			return {};
-		}
-
-		Reader reader(_reader, i->second.offset + sizeof file_header, file_header.size);
+		Reader reader(_reader, i->second.offset, i->second.size);
 		for (size_t j = i->second.properties_begin; j < i->second.properties_end; ++j)
 			reader.set_property(_properties[j].first, _properties[j].second);
 		return reader;
@@ -152,8 +142,8 @@ namespace Yttrium
 		std::string name;
 		std::map<std::string, std::string> properties;
 
-		Entry(uint64_t offset, std::string&& name, std::map<std::string, std::string>&& properties)
-			: offset(offset), name(std::move(name)), properties(std::move(properties)) {}
+		Entry(uint64_t offset, uint32_t size, std::string&& name, std::map<std::string, std::string>&& properties)
+			: offset(offset), size(size), name(std::move(name)), properties(std::move(properties)) {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
@@ -172,12 +162,10 @@ namespace Yttrium
 		if (_committed || !reader)
 			return false;
 		const auto file_offset = _writer.size();
-		YpqFileHeader file_header;
-		file_header.signature = YpqFileSignature;
-		file_header.size = reader.size();
-		if (file_header.size != reader.size() || !_writer.write(file_header) || !_writer.write_all(reader))
+		const auto file_size = static_cast<uint32_t>(reader.size());
+		if (file_size != reader.size() || !_writer.write_all(reader))
 			return false;
-		_entries.emplace_back(file_offset, std::string(name.text(), name.size()), std::move(properties));
+		_entries.emplace_back(file_offset, file_size, std::string(name.text(), name.size()), std::move(properties));
 		return true;
 	}
 
@@ -192,16 +180,10 @@ namespace Yttrium
 			return size == value.size() && _writer.write(size) && _writer.write(value.data(), size);
 		};
 
-		const auto index_file_offset = _writer.size();
-
-		YpqFileHeader index_file_header;
-		index_file_header.signature = YpqFileSignature;
-		index_file_header.size = 0;
-		if (!_writer.write(index_file_header))
-			return false;
+		const auto index_offset = _writer.size();
 
 		YpqIndexHeader index_header;
-		index_header.signature = YpqIndexSignature;
+		index_header.signature = YpqIndexHeader::Signature;
 		index_header.entry_count = _entries.size();
 		if (!_writer.write(index_header))
 			return false;
@@ -210,6 +192,7 @@ namespace Yttrium
 		{
 			YpqIndexEntry index_entry;
 			index_entry.offset = entry.offset;
+			index_entry.size = entry.size;
 			if (!_writer.write(index_entry))
 				return false;
 			if (!write_string(entry.name))
@@ -222,13 +205,13 @@ namespace Yttrium
 					return false;
 		}
 
-		const auto index_file_size = static_cast<uint32_t>(_writer.size() - index_file_offset - sizeof index_file_header);
-		if (!_writer.write_at(index_file_offset + offsetof(YpqFileHeader, size), index_file_size))
+		const auto index_size = static_cast<uint32_t>(_writer.size() - index_offset - sizeof index_header);
+		if (!_writer.write_at(index_offset + offsetof(YpqIndexHeader, size), index_size))
 			return false;
 
 		YpqPackageHeader package_header;
-		package_header.signature = YpqPackageSignature;
-		package_header.index_file_offset = index_file_offset;
+		package_header.signature = YpqPackageHeader::Signature;
+		package_header.index_offset = index_offset;
 		if (!_writer.write_at(_writer.size(), package_header))
 			return false;
 
