@@ -1,6 +1,7 @@
 #ifndef _src_storage_formats_ypq_h_
 #define _src_storage_formats_ypq_h_
 
+#include <yttrium/memory/buffer.h>
 #include <yttrium/std/map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
@@ -23,9 +24,9 @@ namespace Yttrium
 
 		const String _name;
 		Reader _reader;
-		std::shared_ptr<const Buffer> _index_buffer; // Contains string data.
+		Buffer _index_buffer;
 		StdMap<StaticString, Entry> _entries;
-		std::vector<std::pair<StaticString, StaticString>> _properties;
+		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the index buffer.
 	};
 
 	class YpqWriter : public PackageWriter

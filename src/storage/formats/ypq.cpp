@@ -1,11 +1,7 @@
 #include "ypq.h"
 
-#include <yttrium/memory/buffer.h>
-#include <yttrium/storage/reader.h>
-#include <yttrium/storage/writer.h>
 #include <yttrium/string_format.h>
 #include "../../utils/fourcc.h"
-#include "../reader.h"
 
 #include <cstring>
 #include <limits>
@@ -70,14 +66,11 @@ namespace Yttrium
 			|| index_header.signature != YpqIndexHeader::Signature)
 			throw BadPackage(String("Bad package index header"_s, &allocator));
 
-		{
-			Buffer index_buffer(index_header.size);
-			if (!_reader.read(index_buffer.data(), index_buffer.size()))
-				throw BadPackage(String("Bad package index"_s, &allocator));
-			_index_buffer = std::make_shared<const Buffer>(std::move(index_buffer));
-		}
+		_index_buffer.reset(index_header.size);
+		if (!_reader.read(_index_buffer.data(), _index_buffer.size()))
+			throw BadPackage(String("Bad package index"_s, &allocator));
 
-		Reader index_reader(std::make_shared<BufferReader>(_index_buffer, _name)); // TODO: Span reader.
+		Reader index_reader(_index_buffer.data(), _index_buffer.size());
 
 		const auto read_uint8 = [&allocator, &index_reader]
 		{
@@ -92,7 +85,7 @@ namespace Yttrium
 			const auto size = read_uint8();
 			if (!index_reader.skip(size))
 				throw BadPackage(String("Bad package index entry"_s, &allocator));
-			return StaticString(static_cast<const char*>(_index_buffer->data()) + index_reader.offset() - size, size);
+			return StaticString(static_cast<const char*>(_index_buffer.data()) + index_reader.offset() - size, size);
 		};
 
 		const auto reader_size = _reader.size();
