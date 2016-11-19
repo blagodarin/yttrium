@@ -1,8 +1,8 @@
 #include <yttrium/image.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
-#include <yttrium/storage/file.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/temporary_file.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(test_tga)
 	Image image;
 	BOOST_REQUIRE(image.load("tests/image/gradient32.tga"));
 
-	File file(File::Temporary);
+	TemporaryFile file;
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
 	const auto expected = Reader("tests/image/gradient32.tga").to_buffer();
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(test_png)
 	Image image;
 	BOOST_REQUIRE(image.load("tests/image/gradient24.tga"));
 
-	File file(File::Temporary);
+	TemporaryFile file;
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
 
 	const auto expected = Reader("tests/image/gradient24.png").to_buffer();
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(test_intensity)
 	BOOST_REQUIRE(image.load("tests/image/intensity8.tga"));
 	BOOST_REQUIRE(image.intensity_to_bgra());
 
-	File file(File::Temporary);
+	TemporaryFile file;
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
 	const auto expected = Reader("tests/image/intensity32.tga").to_buffer();

@@ -12,15 +12,13 @@ namespace Yttrium
 
 	void LogManager::set_file(const StaticString& name)
 	{
-		_file = File(name, File::Write | File::Truncate);
+		_writer = Writer(name);
 	}
 
 	void LogManager::write(const StaticString& string)
 	{
-		if (!_std_err)
-			_std_err = File(File::StdErr);
-		_std_err.write(string.text(), string.size());
-		_file.write(string.text(), string.size());
+		_std_err.write(string);
+		_writer.write_all(string);
 	}
 
 	void Log::set_file(const StaticString& name)

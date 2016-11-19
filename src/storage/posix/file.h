@@ -23,7 +23,6 @@ namespace Yttrium
 		size_t write_at(uint64_t, const void*, size_t);
 
 		static std::shared_ptr<FilePrivate> open(const StaticString& path, unsigned mode);
-		static std::shared_ptr<FilePrivate> open(File::Special);
 
 	private:
 		const String _name;
@@ -31,7 +30,6 @@ namespace Yttrium
 		uint64_t _size = 0;
 		uint64_t _offset = 0;
 		const int _descriptor;
-		bool _auto_close = false;
 		bool _auto_remove = false;
 
 		friend File;

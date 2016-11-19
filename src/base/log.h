@@ -1,7 +1,9 @@
 #ifndef _src_base_log_h_
 #define _src_base_log_h_
 
-#include <yttrium/storage/file.h>
+#include <yttrium/storage/writer.h>
+
+#include "std_err.h"
 
 namespace Yttrium
 {
@@ -16,8 +18,8 @@ namespace Yttrium
 
 	private:
 		Allocator& _allocator;
-		File _std_err;
-		File _file;
+		StdErr _std_err;
+		Writer _writer;
 	};
 
 	extern LogManager _log_manager;

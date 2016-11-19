@@ -49,6 +49,9 @@ namespace Yttrium
 		template <typename T>
 		bool write(const T& data) { return write(&data, sizeof data) == sizeof data; }
 
+		/// Writes data to the target.
+		bool write_all(const void* data, size_t size) { return write(data, size) == size; }
+
 		///
 		bool write_all(const Buffer&);
 

@@ -11,11 +11,6 @@ namespace Yttrium
 	{
 	}
 
-	File::File(Special special)
-		: _private(FilePrivate::open(special))
-	{
-	}
-
 	bool File::flush()
 	{
 		return _private && _private->flush();

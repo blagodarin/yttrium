@@ -1,9 +1,9 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
-#include <yttrium/storage/file.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 
 #include <cstdlib>
@@ -32,16 +32,16 @@ BOOST_AUTO_TEST_CASE(test_package)
 	Buffer buffer3(100043);
 	::memset(buffer3.data(), 3, buffer3.size());
 
-	File file1(File::Temporary);
+	TemporaryFile file1;
 	Writer(file1.name()).write_all(buffer1);
 
-	File file2(File::Temporary);
+	TemporaryFile file2;
 	Writer(file2.name()).write_all(buffer2);
 
-	File file3(File::Temporary);
+	TemporaryFile file3;
 	Writer(file3.name()).write_all(buffer3);
 
-	File package_file(File::Temporary);
+	TemporaryFile package_file;
 
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
@@ -86,16 +86,16 @@ BOOST_AUTO_TEST_CASE(test_package)
 
 BOOST_AUTO_TEST_CASE(test_packed_file_size)
 {
-	File file1(File::Temporary);
+	TemporaryFile file1;
 	Writer(file1.name()).write_all(Buffer(1, "1"));
 
-	File file2(File::Temporary);
+	TemporaryFile file2;
 	Writer(file2.name()).write_all(Buffer(1, "2"));
 
-	File file3(File::Temporary);
+	TemporaryFile file3;
 	Writer(file3.name()).write_all(Buffer(1, "3"));
 
-	File package_file(File::Temporary);
+	TemporaryFile package_file;
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);

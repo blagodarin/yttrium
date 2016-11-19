@@ -2,8 +2,8 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/static_string.h>
-#include <yttrium/storage/file.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/temporary_file.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -19,7 +19,7 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_ion_serialization)
 {
-	File file(File::Temporary);
+	TemporaryFile file;
 	{
 		const auto document = IonDocument::open(Reader("tests/ion/original.ion"));
 		BOOST_REQUIRE(document);

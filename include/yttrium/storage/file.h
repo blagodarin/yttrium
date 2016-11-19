@@ -29,13 +29,6 @@ namespace Yttrium
 			Truncate  = 1 << 3,       ///< Truncate the file after opening.
 		};
 
-		///
-		enum Special
-		{
-			Temporary, ///<
-			StdErr,    ///< Standard error output stream.
-		};
-
 		/// Valid "whences" (origins) for the seek function.
 		enum Whence
 		{
@@ -46,9 +39,6 @@ namespace Yttrium
 
 		///
 		File(const StaticString& path, unsigned mode);
-
-		///
-		File(Special);
 
 		/// Flushes buffered data to the storage medium.
 		bool flush();

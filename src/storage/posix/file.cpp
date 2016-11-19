@@ -24,12 +24,10 @@ namespace Yttrium
 
 	FilePrivate::~FilePrivate()
 	{
-		if (_auto_close)
-		{
-			::close(_descriptor);
-			if (_auto_remove && ::unlink(_name.text()))
-				throw std::system_error(errno, std::generic_category());
-		}
+		if (::close(_descriptor))
+			::perror("ERROR! 'close' failed");
+		if (_auto_remove && ::unlink(_name.text()))
+			::perror("ERROR! 'unlink' failed");
 	}
 
 	bool FilePrivate::flush()
@@ -90,29 +88,5 @@ namespace Yttrium
 			throw std::system_error(errno, std::generic_category());
 
 		return std::make_shared<FilePrivate>(std::move(name), mode, size, descriptor);
-	}
-
-	std::shared_ptr<FilePrivate> FilePrivate::open(File::Special special)
-	{
-		std::shared_ptr<FilePrivate> result;
-		switch (special)
-		{
-		case File::Temporary:
-			{
-				String name("/tmp/yttrium-XXXXXX");
-				const auto descriptor = ::mkstemp(name.text());
-				if (descriptor == -1)
-					break;
-				result = std::make_shared<FilePrivate>(std::move(name), File::ReadWrite, 0, descriptor);
-			}
-			result->_auto_remove = true;
-			break;
-
-		case File::StdErr:
-			result = std::make_shared<FilePrivate>(String(&NoAllocator), File::Write | File::Pipe, 0, STDERR_FILENO);
-			result->_auto_close = false;
-			break;
-		}
-		return std::move(result);
 	}
 }
