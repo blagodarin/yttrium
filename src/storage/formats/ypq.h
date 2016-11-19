@@ -23,7 +23,7 @@ namespace Yttrium
 		struct Entry;
 
 		const String _name;
-		Reader _reader;
+		const Reader _reader;
 		Buffer _index_buffer;
 		StdMap<StaticString, Entry> _entries;
 		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the index buffer.
@@ -35,7 +35,7 @@ namespace Yttrium
 		YpqWriter(Writer&&);
 		~YpqWriter() override;
 
-		bool add(const StaticString&, const Reader&, std::map<std::string, std::string>&&) override;
+		bool add(const StaticString&, std::map<std::string, std::string>&&) override;
 		bool commit() override;
 
 	private:
@@ -44,6 +44,7 @@ namespace Yttrium
 		Writer _writer;
 		std::vector<Entry> _entries;
 		bool _committed = false;
+		bool _finished = false;
 	};
 }
 

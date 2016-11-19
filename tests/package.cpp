@@ -33,28 +33,22 @@ BOOST_AUTO_TEST_CASE(test_package)
 	::memset(buffer3.data(), 3, buffer3.size());
 
 	File file1(File::Temporary);
-	file1.write(buffer1.data(), buffer1.size());
-	file1.flush();
-	file1.seek(0);
+	Writer(file1.name()).write_all(buffer1);
 
 	File file2(File::Temporary);
-	file2.write(buffer2.data(), buffer2.size());
-	file2.flush();
-	file2.seek(0);
+	Writer(file2.name()).write_all(buffer2);
 
 	File file3(File::Temporary);
-	file3.write(buffer3.data(), buffer3.size());
-	file3.flush();
-	file3.seek(0);
+	Writer(file3.name()).write_all(buffer3);
 
 	File package_file(File::Temporary);
 
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-		BOOST_REQUIRE(package_writer->add(file1.name(), Reader(file1.name()), {}));
-		BOOST_REQUIRE(package_writer->add(file2.name(), Reader(file2.name()), {}));
-		BOOST_REQUIRE(package_writer->add(file3.name(), Reader(file3.name()), {}));
+		BOOST_REQUIRE(package_writer->add(file1.name(), {}));
+		BOOST_REQUIRE(package_writer->add(file2.name(), {}));
+		BOOST_REQUIRE(package_writer->add(file3.name(), {}));
 		BOOST_REQUIRE(package_writer->commit());
 	}
 
@@ -92,20 +86,29 @@ BOOST_AUTO_TEST_CASE(test_package)
 
 BOOST_AUTO_TEST_CASE(test_packed_file_size)
 {
+	File file1(File::Temporary);
+	Writer(file1.name()).write_all(Buffer(1, "1"));
+
+	File file2(File::Temporary);
+	Writer(file2.name()).write_all(Buffer(1, "2"));
+
+	File file3(File::Temporary);
+	Writer(file3.name()).write_all(Buffer(1, "3"));
+
 	File package_file(File::Temporary);
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_writer);
-		BOOST_REQUIRE(package_writer->add("1", Reader(Buffer(1, "1")), {}));
-		BOOST_REQUIRE(package_writer->add("2", Reader(Buffer(1, "2")), {}));
-		BOOST_REQUIRE(package_writer->add("3", Reader(Buffer(1, "3")), {}));
+		BOOST_REQUIRE(package_writer->add(file1.name(), {}));
+		BOOST_REQUIRE(package_writer->add(file2.name(), {}));
+		BOOST_REQUIRE(package_writer->add(file3.name(), {}));
 		BOOST_REQUIRE(package_writer->commit());
 	}
 
 	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 	BOOST_REQUIRE(package_reader);
 
-	auto packed_file = package_reader->open("2");
+	auto packed_file = package_reader->open(file2.name());
 	BOOST_REQUIRE(packed_file);
 
 	std::array<uint8_t, 2> data = { 0, 0 };

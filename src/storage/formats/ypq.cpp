@@ -12,28 +12,21 @@ namespace
 
 #pragma pack(push, 1)
 
-	struct YpqPackageHeader
+	struct YpqHeader
 	{
-		uint64_t signature = 0;
-		uint64_t index_offset = 0;
-
-		static constexpr auto Signature = "\xDA\xBDYPQA\xED\xDE"_eightcc;
-	};
-
-	struct YpqIndexHeader
-	{
-		uint64_t signature = 0;
-		uint32_t size = 0;
+		uint32_t signature = 0;
 		uint32_t entry_count = 0;
+		uint32_t index_size = 0;
+		uint32_t reserved = 0;
 
-		static constexpr auto Signature = "\xC8\xCD\xCA\xD1\xD4\xC0\xC9\xCB"_eightcc;
+		static constexpr auto Signature = "\xDFYPQ"_fourcc;
 	};
 
-	struct YpqIndexEntry
+	struct YpqEntry
 	{
-		uint64_t offset = 0;
-		uint32_t size = 0;
-		// Followed by name and properties.
+		uint64_t data_offset = 0;
+		uint32_t data_size = 0;
+		uint32_t metadata_offset = 0; // Name and properties.
 	};
 
 #pragma pack(pop)
@@ -54,23 +47,23 @@ namespace Yttrium
 		, _reader(std::move(reader))
 		, _entries(allocator)
 	{
-		YpqPackageHeader package_header;
-		if (_reader.size() < sizeof package_header
-			|| !_reader.read_at(_reader.size() - sizeof package_header, package_header)
-			|| package_header.signature != YpqPackageHeader::Signature)
+		YpqHeader header;
+		if (!_reader.read_at(0, header)
+			|| header.signature != YpqHeader::Signature
+			|| header.index_size < sizeof header + sizeof(YpqEntry) * header.entry_count)
 			throw BadPackage(String("Bad package header"_s, &allocator));
 
-		YpqIndexHeader index_header;
-		if (!_reader.seek(package_header.index_offset)
-			|| !_reader.read(index_header)
-			|| index_header.signature != YpqIndexHeader::Signature)
-			throw BadPackage(String("Bad package index header"_s, &allocator));
-
-		_index_buffer.reset(index_header.size);
-		if (!_reader.read(_index_buffer.data(), _index_buffer.size()))
+		_index_buffer.reset(size_t{ header.index_size });
+		if (_reader.read_at(0, _index_buffer.data(), _index_buffer.size()) != _index_buffer.size())
 			throw BadPackage(String("Bad package index"_s, &allocator));
 
 		Reader index_reader(_index_buffer.data(), _index_buffer.size());
+		if (!index_reader.seek(sizeof header))
+			throw BadPackage(String("Bad package index"_s, &allocator));
+
+		std::vector<YpqEntry> entries(size_t{ header.entry_count });
+		if (index_reader.read(entries.data(), entries.size() * sizeof(YpqEntry)) != entries.size() * sizeof(YpqEntry))
+			throw BadPackage(String("Bad package index"_s, &allocator));
 
 		const auto read_uint8 = [&allocator, &index_reader]
 		{
@@ -89,30 +82,27 @@ namespace Yttrium
 		};
 
 		const auto reader_size = _reader.size();
-		for (uint32_t i = 0; i < index_header.entry_count; ++i)
+		for (const auto& entry : entries)
 		{
-			YpqIndexEntry index_entry;
-			if (!index_reader.read(index_entry))
-				throw BadPackage(String("Unable to read package index entry #"_s, &allocator) << i);
-			if (index_entry.size > reader_size || index_entry.offset > reader_size - index_entry.size)
-				throw BadPackage(String("Bad package index entry #"_s, &allocator) << i);
-			Entry entry;
-			entry.offset = index_entry.offset;
-			entry.size = index_entry.size;
+			const auto i = &entry - entries.data();
+			if (entry.data_offset > reader_size || entry.data_offset + entry.data_size > reader_size)
+				throw BadPackage(String(&allocator) << "Bad package index entry #"_s << i << " location"_s);
+			if (!index_reader.seek(entry.metadata_offset))
+				throw BadPackage(String(&allocator) << "Bad package index entry #"_s << i << " metadata"_s);
+			Entry internal;
+			internal.offset = entry.data_offset;
+			internal.size = entry.data_size;
 			const auto name = read_string();
-			entry.properties_begin = _properties.size();
+			internal.properties_begin = _properties.size();
 			for (auto property_count = read_uint8(); property_count > 0; --property_count)
 			{
 				const auto property_name = read_string();
 				const auto property_value = read_string();
 				_properties.emplace_back(property_name, property_value);
 			}
-			entry.properties_end = _properties.size();
-			_entries.emplace(name, entry);
+			internal.properties_end = _properties.size();
+			_entries.emplace(name, internal);
 		}
-
-		if (index_reader.offset() != index_reader.size())
-			throw BadPackage(String("Stray index data"_s, &allocator)); // Disallows index padding.
 	}
 
 	YpqReader::~YpqReader() = default;
@@ -130,13 +120,13 @@ namespace Yttrium
 
 	struct YpqWriter::Entry
 	{
-		uint64_t offset = 0;
-		uint32_t size = 0;
 		std::string name;
 		std::map<std::string, std::string> properties;
+		uint64_t offset = 0;
+		uint32_t size = 0;
 
-		Entry(uint64_t offset, uint32_t size, std::string&& name, std::map<std::string, std::string>&& properties)
-			: offset(offset), size(size), name(std::move(name)), properties(std::move(properties)) {}
+		Entry(const StaticString& name, std::map<std::string, std::string>&& properties)
+			: name(name.text(), name.size()), properties(std::move(properties)) {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
@@ -146,19 +136,15 @@ namespace Yttrium
 
 	YpqWriter::~YpqWriter()
 	{
-		if (!_committed)
+		if (!_finished)
 			_writer.unlink();
 	}
 
-	bool YpqWriter::add(const StaticString& name, const Reader& reader, std::map<std::string, std::string>&& properties)
+	bool YpqWriter::add(const StaticString& path, std::map<std::string, std::string>&& properties)
 	{
-		if (_committed || !reader)
+		if (_committed)
 			return false;
-		const auto file_offset = _writer.size();
-		const auto file_size = static_cast<uint32_t>(reader.size());
-		if (file_size != reader.size() || !_writer.write_all(reader))
-			return false;
-		_entries.emplace_back(file_offset, file_size, std::string(name.text(), name.size()), std::move(properties));
+		_entries.emplace_back(path, std::move(properties));
 		return true;
 	}
 
@@ -166,49 +152,74 @@ namespace Yttrium
 	{
 		if (_committed)
 			return false;
+		_committed = true;
 
-		const auto write_string = [this](const std::string& value)
+		std::vector<YpqEntry> entries;
+
+		const auto metadata_offset = sizeof(YpqHeader) + sizeof(YpqEntry) * _entries.size();
+
+		Buffer metadata_buffer;
 		{
-			const auto size = static_cast<uint8_t>(value.size());
-			return size == value.size() && _writer.write(size) && _writer.write(value.data(), size);
-		};
+			Writer writer(metadata_buffer);
 
-		const auto index_offset = _writer.size();
+			const auto write_string = [this, &writer](const std::string& value)
+			{
+				const auto size = static_cast<uint8_t>(value.size());
+				return size == value.size() && writer.write(size) && writer.write(value.data(), size);
+			};
 
-		YpqIndexHeader index_header;
-		index_header.signature = YpqIndexHeader::Signature;
-		index_header.entry_count = _entries.size();
-		if (!_writer.write(index_header))
+			for (const auto& entry : _entries)
+			{
+				entries.emplace_back();
+				entries.back().metadata_offset = metadata_offset + writer.offset();
+				if (!write_string(entry.name))
+					return false;
+				const auto property_count = static_cast<uint8_t>(entry.properties.size());
+				if (property_count != entry.properties.size() || !writer.write(property_count))
+					return false;
+				for (const auto& property : entry.properties)
+					if (!write_string(property.first) || !write_string(property.second))
+						return false;
+			}
+		}
+
+		const auto data_offset = metadata_offset + metadata_buffer.size();
+
+		for (auto& entry : entries)
+			entry.data_offset = data_offset;
+
+		YpqHeader header;
+		header.signature = YpqHeader::Signature;
+		header.entry_count = _entries.size();
+		header.index_size = data_offset;
+		if (!_writer.write(header))
+			return false;
+
+		if (_writer.write(entries.data(), entries.size() * sizeof(YpqEntry)) != entries.size() * sizeof(YpqEntry))
+			return false;
+
+		if (!_writer.write_all(metadata_buffer))
 			return false;
 
 		for (const auto& entry : _entries)
 		{
-			YpqIndexEntry index_entry;
-			index_entry.offset = entry.offset;
-			index_entry.size = entry.size;
-			if (!_writer.write(index_entry))
+			Reader reader(StaticString(entry.name.data(), entry.name.size()));
+			if (!reader)
 				return false;
-			if (!write_string(entry.name))
+			const auto i = &entry - _entries.data();
+			entries[i].data_offset = decltype(entries[i].data_offset){ _writer.offset() };
+			entries[i].data_size = reader.size();
+			if (entries[i].data_size != reader.size())
 				return false;
-			const auto property_count = static_cast<uint8_t>(entry.properties.size());
-			if (property_count != entry.properties.size() || !_writer.write(property_count))
+			if (!_writer.write_all(reader))
 				return false;
-			for (const auto& property : entry.properties)
-				if (!write_string(property.first) || !write_string(property.second))
-					return false;
 		}
 
-		const auto index_size = static_cast<uint32_t>(_writer.size() - index_offset - sizeof index_header);
-		if (!_writer.write_at(index_offset + offsetof(YpqIndexHeader, size), index_size))
+		_writer.seek(sizeof(YpqHeader));
+		if (_writer.write(entries.data(), entries.size() * sizeof(YpqEntry)) != entries.size() * sizeof(YpqEntry))
 			return false;
 
-		YpqPackageHeader package_header;
-		package_header.signature = YpqPackageHeader::Signature;
-		package_header.index_offset = index_offset;
-		if (!_writer.write_at(_writer.size(), package_header))
-			return false;
-
-		_committed = true;
+		_finished = true;
 		return true;
 	}
 }

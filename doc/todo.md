@@ -5,6 +5,7 @@
 		- Lua scripting.
 		- Hash-based packed file access.
 		- Named realtime counters.
+		- Split the library into core library and toolkit (utility, support) library.
 	* Audio:
 		- Consider loading the entire Music data into memory at once, it shouldn't be big enough to make streaming the only option.
 	* GUI:

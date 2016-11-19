@@ -47,8 +47,8 @@ namespace Yttrium
 		PackageWriter() = default;
 		virtual ~PackageWriter() = default;
 
-		/// Adds the data from the Reader to the package.
-		virtual bool add(const StaticString& name, const Reader&, std::map<std::string, std::string>&& properties) = 0;
+		///
+		virtual bool add(const StaticString&, std::map<std::string, std::string>&& properties) = 0;
 
 		///
 		virtual bool commit() = 0;

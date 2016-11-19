@@ -68,7 +68,6 @@ int main(int argc, char** argv)
 						check(entries.back().second.count(property_name) == 0, "\": Duplicate property '", property.name(), "'");
 						std::string property_value(property.begin()->string().text(), property.begin()->string().size());
 						entries.back().second.emplace(std::move(property_name), std::move(property_value));
-						// TODO: Usa actual limits from the implementation.
 					}
 				}
 				break;
@@ -90,14 +89,15 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	for (auto& entry : entries)
+	try
 	{
-		if (!package->add(entry.first, Reader(entry.first), std::move(entry.second)))
-		{
-			std::cerr << "ERROR(" << argv[2] << "): \"" << entry.first << "\": Can't pack" << std::endl;
-			return 1;
-		}
+		for (auto& entry : entries)
+			package->add(entry.first, std::move(entry.second));
+		package->commit();
 	}
-
-	package->commit();
+	catch (const DataError& e)
+	{
+		std::cerr << "ERROR(" << argv[2] << "): " << e.what() << std::endl;
+		return 1;
+	}
 }
