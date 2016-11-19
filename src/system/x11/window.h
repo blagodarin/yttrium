@@ -1,5 +1,5 @@
-#ifndef _src_window_x11_window_h_
-#define _src_window_x11_window_h_
+#ifndef _src_system_x11_window_h_
+#define _src_system_x11_window_h_
 
 #include <yttrium/memory/unique_ptr.h>
 #include "../../utils/unique_ptr.h"

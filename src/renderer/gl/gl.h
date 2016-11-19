@@ -2,7 +2,7 @@
 #define _src_renderer_gl_gl_h_
 
 #include <yttrium/std/vector.h>
-#include "../../window/gl.h"
+#include "../../system/gl.h"
 
 #include <GL/gl.h>
 #include <GL/glext.h>

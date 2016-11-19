@@ -1,10 +1,10 @@
 #include "buffer_memory.h"
 
 #include <yttrium/utils.h>
+#include "../system/memory.h"
 #include "buffer_memory_tracker.h"
 #include "heap_allocator.h"
 #include "named_allocator.h"
-#include "pages.h"
 
 #include <cassert>
 #include <cstring>

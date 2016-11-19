@@ -1,5 +1,5 @@
-#ifndef _src_window_gl_h_
-#define _src_window_gl_h_
+#ifndef _src_system_gl_h_
+#define _src_system_gl_h_
 
 #include <yttrium/global.h>
 

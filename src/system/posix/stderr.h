@@ -1,5 +1,5 @@
-#ifndef _src_base_posix_std_err_h_
-#define _src_base_posix_std_err_h_
+#ifndef _src_system_posix_stderr_h_
+#define _src_system_posix_stderr_h_
 
 namespace Yttrium
 {

@@ -1,7 +1,7 @@
 #ifndef _src_audio_openal_format_h_
 #define _src_audio_openal_format_h_
 
-#include "openal.h"
+#include "../../system/openal.h"
 
 namespace Yttrium
 {

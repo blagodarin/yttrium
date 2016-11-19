@@ -4,11 +4,8 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/time.h>
 #include "../renderer/renderer.h"
+#include "../system/window.h"
 #include "backend.h"
-
-#if Y_PLATFORM_POSIX
-	#include "x11/window.h"
-#endif
 
 namespace Yttrium
 {

@@ -1,5 +1,5 @@
-#ifndef _src_memory_pages_h_
-#define _src_memory_pages_h_
+#ifndef _src_system_memory_h_
+#define _src_system_memory_h_
 
 #include <cstddef>
 

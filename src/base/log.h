@@ -2,8 +2,7 @@
 #define _src_base_log_h_
 
 #include <yttrium/storage/writer.h>
-
-#include "std_err.h"
+#include "../system/stderr.h"
 
 namespace Yttrium
 {
