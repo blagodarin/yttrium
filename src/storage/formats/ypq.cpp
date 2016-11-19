@@ -49,36 +49,37 @@ namespace Yttrium
 	{
 		YpqHeader header;
 		if (!_reader.read_at(0, header)
-			|| header.signature != YpqHeader::Signature
-			|| header.index_size < sizeof header + sizeof(YpqEntry) * header.entry_count)
+			|| header.signature != YpqHeader::Signature)
+			throw BadPackage(String("Not an YPQ package"_s, &allocator));
+
+		const auto metadata_offset = sizeof header + sizeof(YpqEntry) * header.entry_count;
+		if (header.index_size < metadata_offset)
 			throw BadPackage(String("Bad package header"_s, &allocator));
 
-		_index_buffer.reset(size_t{ header.index_size });
-		if (_reader.read_at(0, _index_buffer.data(), _index_buffer.size()) != _index_buffer.size())
-			throw BadPackage(String("Bad package index"_s, &allocator));
-
-		Reader index_reader(_index_buffer.data(), _index_buffer.size());
-		if (!index_reader.seek(sizeof header))
-			throw BadPackage(String("Bad package index"_s, &allocator));
-
 		std::vector<YpqEntry> entries(size_t{ header.entry_count });
-		if (index_reader.read(entries.data(), entries.size() * sizeof(YpqEntry)) != entries.size() * sizeof(YpqEntry))
+		if (!_reader.read_all_at(sizeof header, entries.data(), entries.size() * sizeof(YpqEntry)))
 			throw BadPackage(String("Bad package index"_s, &allocator));
 
-		const auto read_uint8 = [&allocator, &index_reader]
+		_metadata_buffer.reset(size_t{ header.index_size - metadata_offset });
+		if (!_reader.read_all_at(metadata_offset, _metadata_buffer.data(), _metadata_buffer.size()))
+			throw BadPackage(String("Bad package metadata"_s, &allocator));
+
+		Reader metadata_reader(_metadata_buffer.data(), _metadata_buffer.size());
+
+		const auto read_uint8 = [&allocator, &metadata_reader]
 		{
 			uint8_t value = 0;
-			if (!index_reader.read(value))
-				throw BadPackage(String("Bad package index entry"_s, &allocator));
+			if (!metadata_reader.read(value))
+				throw BadPackage(String("Bad package index entry metadata"_s, &allocator));
 			return value;
 		};
 
-		const auto read_string = [this, &allocator, &index_reader, &read_uint8]
+		const auto read_string = [this, &allocator, &metadata_reader, &read_uint8]
 		{
 			const auto size = read_uint8();
-			if (!index_reader.skip(size))
-				throw BadPackage(String("Bad package index entry"_s, &allocator));
-			return StaticString(static_cast<const char*>(_index_buffer.data()) + index_reader.offset() - size, size);
+			if (!metadata_reader.skip(size))
+				throw BadPackage(String("Bad package index entry metadata"_s, &allocator));
+			return StaticString(static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size);
 		};
 
 		const auto reader_size = _reader.size();
@@ -86,8 +87,8 @@ namespace Yttrium
 		{
 			const auto i = &entry - entries.data();
 			if (entry.data_offset > reader_size || entry.data_offset + entry.data_size > reader_size)
-				throw BadPackage(String(&allocator) << "Bad package index entry #"_s << i << " location"_s);
-			if (!index_reader.seek(entry.metadata_offset))
+				throw BadPackage(String(&allocator) << "Bad package index entry #"_s << i << " data"_s);
+			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
 				throw BadPackage(String(&allocator) << "Bad package index entry #"_s << i << " metadata"_s);
 			Entry internal;
 			internal.offset = entry.data_offset;

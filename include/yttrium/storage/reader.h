@@ -46,11 +46,17 @@ namespace Yttrium
 		template <typename T>
 		bool read(T& data) { return read(&data, sizeof data) == sizeof data; }
 
+		/// Reads data from the source.
+		bool read_all(void* data, size_t size) { return read(data, size) == size; }
+
 		/// Reads the entire source data into the buffer.
 		bool read_all(Buffer&) const;
 
 		/// Reads the entire source data into the string.
 		bool read_all(String&) const;
+
+		/// Reads data from the source at the specified offset.
+		bool read_all_at(uint64_t offset, void* data, size_t size) const { return read_at(offset, data, size) == size; }
 
 		/// Reads data from the source at the specified offset.
 		size_t read_at(uint64_t offset, void* data, size_t size) const;

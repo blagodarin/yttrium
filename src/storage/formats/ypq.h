@@ -24,9 +24,9 @@ namespace Yttrium
 
 		const String _name;
 		const Reader _reader;
-		Buffer _index_buffer;
+		Buffer _metadata_buffer;
 		StdMap<StaticString, Entry> _entries;
-		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the index buffer.
+		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the metadata buffer.
 	};
 
 	class YpqWriter : public PackageWriter
