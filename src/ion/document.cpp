@@ -24,7 +24,6 @@ namespace Yttrium
 
 	bool IonDocumentImpl::save(const StaticString& path, Formatting formatting) const
 	{
-		// TODO: Serialize directly to the writer.
 		return Writer(path).write_all(Ion::serialize(_root, true, formatting == Formatting::Pretty ? 0 : -1, &_allocator));
 	}
 

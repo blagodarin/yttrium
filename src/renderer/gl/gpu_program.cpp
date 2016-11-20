@@ -22,7 +22,7 @@ namespace Yttrium
 
 	void GlGpuProgram::set_uniform(const StaticString& name, const Matrix4& value)
 	{
-		const std::string name_z(name.text(), name.size()); // NOTE: Guarantees '\0'-termination.
+		const std::string name_z(name.text(), name.size()); // Guaranteed to be null-terminated.
 		_program.set_uniform(name_z.c_str(), value);
 	}
 

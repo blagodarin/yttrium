@@ -94,7 +94,7 @@ namespace Yttrium
 	#else
 		const int flags = O_RDONLY;
 	#endif
-		String name(path); // Guaranteed to be zero terminated.
+		String name(path); // Guaranteed to be null-terminated.
 		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};
@@ -112,7 +112,7 @@ namespace Yttrium
 	#else
 		const int flags = O_WRONLY | O_CREAT | O_TRUNC;
 	#endif
-		String name(path); // Guaranteed to be zero terminated.
+		String name(path); // Guaranteed to be null-terminated.
 		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};

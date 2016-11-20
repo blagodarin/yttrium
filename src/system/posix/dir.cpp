@@ -74,7 +74,7 @@ namespace Yttrium
 
 	Dir::Dir(const StaticString& name, Allocator& allocator)
 	{
-		const std::string name_z(name.text(), name.size()); // NOTE: Guarantees '\0'-termination.
+		const std::string name_z(name.text(), name.size()); // Guaranteed to be null-terminated.
 
 		P_DIR dir(::opendir(name_z.c_str()));
 		if (!dir)
@@ -117,7 +117,7 @@ namespace Yttrium
 
 	bool Dir::exists(const StaticString& name)
 	{
-		const std::string name_z(name.text(), name.size()); // NOTE: Guarantees '\0'-termination.
+		const std::string name_z(name.text(), name.size()); // Guaranteed to be null-terminated.
 
 		struct stat stat_buffer;
 		if (::stat(name_z.c_str(), &stat_buffer))

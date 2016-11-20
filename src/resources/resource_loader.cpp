@@ -19,9 +19,6 @@
 
 namespace Yttrium
 {
-	// TODO: Count loaded resources and resource loads.
-	// TODO: Shared mutexes.
-
 	template <typename T>
 	struct ResourceCache
 	{

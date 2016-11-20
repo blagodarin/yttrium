@@ -127,7 +127,7 @@ namespace Yttrium
 	{
 		if (!_private)
 			return false;
-		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for zero terminator.
+		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for null terminator.
 			throw std::bad_alloc();
 		string.resize(_private->_size);
 		return _private->read_at(0, string.text(), string.size()) == string.size();
