@@ -13,6 +13,7 @@ namespace Yttrium
 	class Buffer;
 	class Reader;
 	class StaticString;
+	class TemporaryFile;
 
 	///
 	class Y_API Writer
@@ -23,6 +24,9 @@ namespace Yttrium
 
 		/// Creates a Writer for the specified file.
 		explicit Writer(const StaticString& path);
+
+		/// Creates a Writer for a temporary file.
+		explicit Writer(TemporaryFile&);
 
 		/// Returns the current offset.
 		uint64_t offset() const;

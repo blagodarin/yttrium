@@ -3,6 +3,7 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
 
@@ -50,6 +51,11 @@ namespace Yttrium
 
 	Writer::Writer(const StaticString& path)
 		: _private(create_file_writer(path))
+	{
+	}
+
+	Writer::Writer(TemporaryFile& file)
+		: _private(create_file_writer(file.name())) // TODO: Don't reopen the file.
 	{
 	}
 

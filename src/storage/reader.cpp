@@ -1,6 +1,7 @@
 #include "reader.h"
 
 #include <yttrium/memory/buffer.h>
+#include <yttrium/storage/temporary_file.h>
 #include <yttrium/string.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
@@ -71,6 +72,11 @@ namespace Yttrium
 
 	Reader::Reader(const StaticString& path)
 		: _private(create_file_reader(path))
+	{
+	}
+
+	Reader::Reader(const TemporaryFile& file)
+		: _private(create_file_reader(file.name())) // TODO: Don't reopen the file.
 	{
 	}
 

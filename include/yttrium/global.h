@@ -117,17 +117,6 @@
 	#define Y_PRIVATE
 #endif
 
-/// Non-returning function attribute.
-#if Y_COMPILER_GCC
-	#define Y_NORETURN __attribute__((__noreturn__))
-#elif Y_COMPILER_MSVC
-	#define Y_NORETURN __declspec(noreturn)
-#else
-	#define Y_NORETURN
-#endif
-
-// Both MSVC and GCC support #pragma pack, so we don't bother with attributes.
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compiler-independent declarations.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

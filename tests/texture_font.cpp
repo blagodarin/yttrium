@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
 
 	TemporaryFile file;
 	{
-		Writer writer(file.name());
+		Writer writer(file);
 
 		// File header.
 		write(writer, {'Y', 'T', 'F', '1'});
@@ -70,6 +70,6 @@ BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
 		}
 	}
 
-	const auto font = TextureFont::open(Reader(file.name()), *DefaultAllocator);
+	const auto font = TextureFont::open(Reader(file), *DefaultAllocator);
 	BOOST_REQUIRE(font);
 }

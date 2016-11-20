@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(test_tga)
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
 	const auto expected = Reader("tests/image/gradient32.tga").to_buffer();
-	const auto actual = Reader(file.name()).to_buffer();
+	const auto actual = Reader(file).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(test_png)
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
 
 	const auto expected = Reader("tests/image/gradient24.png").to_buffer();
-	const auto actual = Reader(file.name()).to_buffer();
+	const auto actual = Reader(file).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }
 
@@ -80,6 +80,6 @@ BOOST_AUTO_TEST_CASE(test_intensity)
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
 
 	const auto expected = Reader("tests/image/intensity32.tga").to_buffer();
-	const auto actual = Reader(file.name()).to_buffer();
+	const auto actual = Reader(file).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }

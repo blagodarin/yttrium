@@ -33,13 +33,13 @@ BOOST_AUTO_TEST_CASE(test_package)
 	::memset(buffer3.data(), 3, buffer3.size());
 
 	TemporaryFile file1;
-	Writer(file1.name()).write_all(buffer1);
+	Writer(file1).write_all(buffer1);
 
 	TemporaryFile file2;
-	Writer(file2.name()).write_all(buffer2);
+	Writer(file2).write_all(buffer2);
 
 	TemporaryFile file3;
-	Writer(file3.name()).write_all(buffer3);
+	Writer(file3).write_all(buffer3);
 
 	TemporaryFile package_file;
 
@@ -87,13 +87,13 @@ BOOST_AUTO_TEST_CASE(test_package)
 BOOST_AUTO_TEST_CASE(test_packed_file_size)
 {
 	TemporaryFile file1;
-	Writer(file1.name()).write_all(Buffer(1, "1"));
+	Writer(file1).write_all(Buffer(1, "1"));
 
 	TemporaryFile file2;
-	Writer(file2.name()).write_all(Buffer(1, "2"));
+	Writer(file2).write_all(Buffer(1, "2"));
 
 	TemporaryFile file3;
-	Writer(file3.name()).write_all(Buffer(1, "3"));
+	Writer(file3).write_all(Buffer(1, "3"));
 
 	TemporaryFile package_file;
 	{
