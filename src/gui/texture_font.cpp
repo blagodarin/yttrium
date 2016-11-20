@@ -4,10 +4,20 @@
 #include <yttrium/gui/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/std/map.h>
+#include <yttrium/std/unordered_map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/utils.h>
 #include "texture_font.h"
+
+namespace
+{
+	static_assert(2 * sizeof(char) == sizeof(uint16_t), "Bad char size");
+
+	constexpr uint16_t make_key(char a, char b)
+	{
+		return static_cast<unsigned char>(a) + (uint16_t{ static_cast<unsigned char>(b) } << 8);
+	}
+}
 
 namespace Yttrium
 {
@@ -71,7 +81,7 @@ namespace Yttrium
 						RectF(info->second.rect)
 					);
 					do_capture(i);
-					const auto kerning = _kernings.find({last_symbol, *current_symbol});
+					const auto kerning = _kernings.find(::make_key(last_symbol, *current_symbol));
 					current_x += (info->second.advance + (kerning != _kernings.end() ? kerning->second : 0)) * scaling;
 				}
 				last_symbol = *current_symbol;
@@ -95,7 +105,7 @@ namespace Yttrium
 					width += info->second.advance;
 				if (i > 0)
 				{
-					const auto kerning = _kernings.find({text[i - 1], text[i]});
+					const auto kerning = _kernings.find(::make_key(text[i - 1], text[i]));
 					if (kerning != _kernings.end())
 						width += kerning->second;
 				}
@@ -111,8 +121,8 @@ namespace Yttrium
 
 	private:
 		const int _size;
-		StdMap<char, TextureFont::CharInfo> _chars; // TODO: Flat map.
-		StdMap<std::pair<char, char>, int> _kernings;
+		StdUnorderedMap<char, TextureFont::CharInfo> _chars;
+		StdUnorderedMap<uint16_t, int> _kernings;
 		Rect _rect;
 
 		friend TextureFont;
@@ -176,7 +186,7 @@ namespace Yttrium
 				Ytf1Kerning kerning;
 				if (!reader.read(kerning))
 					throw DataError("Bad 'kern' section entry ", i);
-				font->_kernings[{kerning.first, kerning.second}] = kerning.amount;
+				font->_kernings.emplace(::make_key(kerning.first, kerning.second), kerning.amount);
 			}
 		}
 

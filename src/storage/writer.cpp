@@ -107,7 +107,6 @@ namespace Yttrium
 
 	bool Writer::write_all(const Buffer& buffer)
 	{
-		// TODO: Write from BufferReader without intermediate buffer.
 		return write(buffer.data(), buffer.size()) == buffer.size();
 	}
 
@@ -115,6 +114,7 @@ namespace Yttrium
 	{
 		if (!reader)
 			return false;
+		// TODO: Write from BufferReader without intermediate buffer.
 		uint64_t total_size = 0;
 		Buffer buffer(Buffer::memory_granularity());
 		while (auto size_read = reader.read_at(total_size, buffer.data(), buffer.size()))
