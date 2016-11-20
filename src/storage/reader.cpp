@@ -28,17 +28,6 @@ namespace Yttrium
 		return size;
 	}
 
-	FileReader::FileReader(std::shared_ptr<const FilePrivate>&& file)
-		: ReaderPrivate(file->size(), file->name())
-		, _file(std::move(file))
-	{
-	}
-
-	size_t FileReader::read_at(uint64_t offset, void* data, size_t size) const
-	{
-		return _file->read_at(offset, data, size);
-	}
-
 	ReaderReader::ReaderReader(const std::shared_ptr<const ReaderPrivate>& reader, uint64_t base, uint64_t size)
 		: ReaderPrivate(size)
 		, _reader(reader)
@@ -81,10 +70,8 @@ namespace Yttrium
 	}
 
 	Reader::Reader(const StaticString& path)
+		: _private(create_file_reader(path))
 	{
-		File file(path, File::Read);
-		if (file)
-			_private = std::make_shared<FileReader>(std::move(file._private));
 	}
 
 	Reader::Reader(const Reader& reader, uint64_t base, uint64_t size)

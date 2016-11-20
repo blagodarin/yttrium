@@ -1,6 +1,9 @@
 #define _FILE_OFFSET_BITS 64
 
-#include "file.h"
+#include "../file.h"
+
+#include "../../storage/reader.h"
+#include "../../storage/writer.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -13,80 +16,109 @@
 
 namespace Yttrium
 {
-	FilePrivate::FilePrivate(String&& name, unsigned mode, uint64_t size, int descriptor)
-		: _name(std::move(name))
-		, _mode(mode)
-		, _size(size)
-		, _descriptor(descriptor)
+	class FileReader : public ReaderPrivate
 	{
-		assert(_descriptor != -1);
-	}
-
-	FilePrivate::~FilePrivate()
-	{
-		if (::close(_descriptor))
-			::perror("ERROR! 'close' failed");
-		if (_auto_remove && ::unlink(_name.text()))
-			::perror("ERROR! 'unlink' failed");
-	}
-
-	bool FilePrivate::flush()
-	{
-		return !::fsync(_descriptor);
-	}
-
-	size_t FilePrivate::read(void* buffer, size_t size)
-	{
-		const auto result = ::read(_descriptor, buffer, size);
-		return result != -1 ? result : 0;
-	}
-
-	size_t FilePrivate::read_at(uint64_t offset, void* buffer, size_t size) const
-	{
-		const auto result = ::pread(_descriptor, buffer, size, offset);
-		return result != -1 ? result : 0;
-	}
-
-	bool FilePrivate::resize(uint64_t size)
-	{
-		return !::ftruncate(_descriptor, size);
-	}
-
-	size_t FilePrivate::write(const void* buffer, size_t size)
-	{
-		const auto result = ::write(_descriptor, buffer, size);
-		return result != -1 ? result : 0;
-	}
-
-	size_t FilePrivate::write_at(uint64_t offset, const void* buffer, size_t size)
-	{
-		const auto result = ::pwrite(_descriptor, buffer, size, offset);
-		return result != -1 ? result : 0;
-	}
-
-	std::shared_ptr<FilePrivate> FilePrivate::open(const StaticString& path, unsigned mode)
-	{
-		int flags = Y_PLATFORM_LINUX ? O_NOATIME : 0;
-		switch (mode & File::ReadWrite)
+	public:
+		FileReader(uint64_t size, const String& name, int descriptor)
+			: ReaderPrivate(size, name)
+			, _descriptor(descriptor)
 		{
-		case File::Read: flags |= O_RDONLY; break;
-		case File::Write: flags = O_WRONLY | O_CREAT; break;
-		case File::ReadWrite: flags |= O_RDWR | O_CREAT;  break;
-		default: return {};
 		}
 
-		if ((mode & (File::Write | File::Pipe | File::Truncate)) == (File::Write | File::Truncate))
-			flags |= O_TRUNC;
+		~FileReader() override
+		{
+			if (::close(_descriptor))
+				::perror("ERROR! 'close' failed");
+		}
 
+		size_t read_at(uint64_t offset, void* data, size_t size) const override
+		{
+			const auto result = ::pread(_descriptor, data, size, offset);
+			return result != -1 ? result : 0;
+		}
+
+	private:
+		const int _descriptor;
+	};
+
+	class FileWriter : public WriterPrivate
+	{
+	public:
+		FileWriter(uint64_t size, String&& name, int descriptor)
+			: WriterPrivate(size)
+			, _name(std::move(name))
+			, _descriptor(descriptor)
+		{
+		}
+
+		~FileWriter() override
+		{
+			if (::close(_descriptor) == -1)
+				::perror("ERROR! 'close' failed");
+			if (_unlink && ::unlink(_name.text()) == -1)
+				::perror("ERROR! 'unlink' failed");
+		}
+
+		void reserve(uint64_t) override
+		{
+		}
+
+		void resize(uint64_t size) override
+		{
+			if (::ftruncate(_descriptor, size) == -1)
+				throw std::system_error(errno, std::generic_category());
+		}
+
+		void unlink() override
+		{
+			_unlink = true;
+		}
+
+		size_t write_at(uint64_t offset, const void* data, size_t size) override
+		{
+			const auto result = ::pwrite(_descriptor, data, size, offset);
+			return result != -1 ? result : 0;
+		}
+
+	private:
+		const String _name;
+		const int _descriptor;
+		bool _unlink = false;
+	};
+
+	std::shared_ptr<ReaderPrivate> create_file_reader(const StaticString& path)
+	{
+	#if Y_PLATFORM_LINUX
+		static_assert(Y_PLATFORM_LINUX, "Include <yttrium/global.h>");
+		const int flags = O_RDONLY | O_NOATIME;
+	#else
+		const int flags = O_RDONLY;
+	#endif
 		String name(path); // Guaranteed to be zero terminated.
 		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};
-
-		const auto size = mode & File::Pipe ? 0 : ::lseek(descriptor, 0, SEEK_END);
+		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
+		return std::make_shared<FileReader>(size, std::move(name), descriptor);
+	}
 
-		return std::make_shared<FilePrivate>(std::move(name), mode, size, descriptor);
+	std::unique_ptr<WriterPrivate> create_file_writer(const StaticString& path)
+	{
+	#if Y_PLATFORM_LINUX
+		static_assert(Y_PLATFORM_LINUX, "Include <yttrium/global.h>");
+		const int flags = O_WRONLY | O_CREAT | O_TRUNC | O_NOATIME;
+	#else
+		const int flags = O_WRONLY | O_CREAT | O_TRUNC;
+	#endif
+		String name(path); // Guaranteed to be zero terminated.
+		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		if (descriptor == -1)
+			return {};
+		const auto size = ::lseek(descriptor, 0, SEEK_END);
+		if (size == -1)
+			throw std::system_error(errno, std::generic_category());
+		return std::make_unique<FileWriter>(size, std::move(name), descriptor);
 	}
 }

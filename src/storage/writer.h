@@ -38,20 +38,6 @@ namespace Yttrium
 	private:
 		Buffer& _buffer;
 	};
-
-	class FileWriter : public WriterPrivate
-	{
-	public:
-		FileWriter(std::shared_ptr<FilePrivate>&&);
-
-		void reserve(uint64_t) override {}
-		void resize(uint64_t) override;
-		void unlink() override;
-		size_t write_at(uint64_t, const void*, size_t) override;
-
-	private:
-		const std::shared_ptr<FilePrivate> _file;
-	};
 }
 
 #endif

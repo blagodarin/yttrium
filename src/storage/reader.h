@@ -35,21 +35,8 @@ namespace Yttrium
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 
-		static Reader create(const std::shared_ptr<const Buffer>&);
-
 	private:
 		const std::shared_ptr<const Buffer> _buffer;
-	};
-
-	class FileReader : public ReaderPrivate
-	{
-	public:
-		FileReader(std::shared_ptr<const FilePrivate>&&);
-
-		size_t read_at(uint64_t, void*, size_t) const override;
-
-	private:
-		const std::shared_ptr<const FilePrivate> _file;
 	};
 
 	class ReaderReader : public ReaderPrivate

@@ -43,37 +43,14 @@ namespace Yttrium
 		return size;
 	}
 
-	FileWriter::FileWriter(std::shared_ptr<FilePrivate>&& file)
-		: WriterPrivate(file->size())
-		, _file(std::move(file))
-	{
-	}
-
-	void FileWriter::resize(uint64_t size)
-	{
-		_file->resize(size); // TODO: Process result.
-	}
-
-	void FileWriter::unlink()
-	{
-		_file->unlink();
-	}
-
-	size_t FileWriter::write_at(uint64_t offset, const void* data, size_t size)
-	{
-		return _file->write_at(offset, data, size);
-	}
-
 	Writer::Writer(Buffer& buffer)
 		: _private(std::make_unique<BufferWriter>(buffer))
 	{
 	}
 
 	Writer::Writer(const StaticString& path)
+		: _private(create_file_writer(path))
 	{
-		File file(path, File::Write | File::Truncate);
-		if (file)
-			_private = std::make_unique<FileWriter>(std::move(file._private));
 	}
 
 	uint64_t Writer::offset() const
