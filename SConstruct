@@ -277,15 +277,17 @@ Clean('benchmarks', Dir('$BUILD/benchmarks'))
 #-------------------------------------------------------------------------------
 
 def YttriumTool(env, name):
+	tool_env = env.Clone()
+	tool_env.Append(LIBS = 'boost_program_options')
 	build_path = '$BUILD/tools/' + name
-	target = env.Program('bin/' + name, env.Glob(build_path + '/*.cpp'))
-	env.Clean(target, env.Dir(build_path))
+	target = tool_env.Program('bin/' + name, tool_env.Glob(build_path + '/*.cpp'))
+	tool_env.Clean(target, tool_env.Dir(build_path))
 	Alias('tools', target)
 	return target
 
 YttriumTool(env, 'generate-sounds')
 YttriumTool(env, 'generate-test-images')
-ypq = YttriumTool(env, 'ypq')
+ypack = YttriumTool(env, 'ypack')
 ytr = YttriumTool(env, 'ytr')
 
 Clean('tools', Dir('$BUILD/tools'))
@@ -308,8 +310,8 @@ def YttriumPackage(env, package, index):
 	ytr_env = Environment(TOOLS = [])
 	if host_platform == 'posix':
 		ytr_env.Append(ENV = {'LD_LIBRARY_PATH': 'lib'})
-	target = ytr_env.Command(package, index, str(ypq[0]) + ' $TARGET $SOURCE')
-	Depends(target, [ypq, yttrium])
+	target = ytr_env.Command(package, index, str(ypack[0]) + ' $SOURCE $TARGET')
+	Depends(target, [ypack, yttrium])
 	AlwaysBuild(target)
 	return target
 

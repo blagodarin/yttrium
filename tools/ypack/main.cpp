@@ -14,6 +14,10 @@
 #include <limits>
 #include <vector>
 
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/positional_options.hpp>
+#include <boost/program_options/variables_map.hpp>
+
 using namespace Yttrium;
 
 template <typename... Args>
@@ -25,16 +29,56 @@ void check(bool condition, Args&&... args)
 
 int main(int argc, char** argv)
 {
-	if (argc != 3)
+	std::string index_name;
+	std::string package_name;
 	{
-		std::cerr << "Usage: ypq PACKAGE INDEX" << std::endl;
-		return 1;
+		boost::program_options::options_description public_options("Options");
+		public_options.add_options()
+			("dependencies,d", boost::program_options::value<bool>()->zero_tokens());
+
+		const auto show_usage = [&public_options]
+		{
+			std::cerr
+				<< "Usage:\n"
+				<< "  ypack INDEX PACKAGE\n"
+				<< "  ypack (--dependencies|-d) INDEX\n"
+				<< "\n"
+				<< public_options << std::endl;
+		};
+
+		boost::program_options::options_description o;
+		o.add(public_options).add_options()
+			("input,i", boost::program_options::value<std::string>()->required())
+			("output,o", boost::program_options::value<std::string>());
+
+		boost::program_options::positional_options_description p;
+		p.add("input", 1).add("output", 1);
+
+		try
+		{
+			boost::program_options::variables_map vm;
+			boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(o).positional(p).run(), vm);
+			boost::program_options::notify(vm);
+			index_name = vm["input"].as<std::string>();
+			if (!vm.count("dependencies"))
+				package_name = vm["output"].as<std::string>();
+		}
+		catch (const boost::program_options::error&)
+		{
+			show_usage();
+			return 1;
+		}
+		catch (const boost::bad_any_cast&)
+		{
+			show_usage();
+			return 1;
+		}
 	}
 
 	std::vector<std::pair<String, std::map<std::string, std::string>>> entries;
 	try
 	{
-		const auto document = IonDocument::open(Reader(argv[2]));
+		const auto document = IonDocument::open(Reader(index_name.c_str()));
 		check(!!document, "Bad index file");
 
 		const auto& root_object = document->root();
@@ -78,14 +122,21 @@ int main(int argc, char** argv)
 	}
 	catch (const DataError& e)
 	{
-		std::cerr << "ERROR(" << argv[2] << "): " << e.what() << std::endl;
+		std::cerr << "ERROR(" << index_name << "): " << e.what() << std::endl;
 		return 1;
 	}
 
-	const auto package = PackageWriter::create(argv[1], PackageType::Ypq);
+	if (package_name.empty())
+	{
+		for (const auto& entry : entries)
+			std::cout << entry.first << "\n";
+		return 0;
+	}
+
+	const auto package = PackageWriter::create(package_name.c_str(), PackageType::Ypq);
 	if (!package)
 	{
-		std::cerr << "ERROR(" << argv[1] << "): Can't open package file" << std::endl;
+		std::cerr << "ERROR(" << package_name << "): Can't open package file" << std::endl;
 		return 1;
 	}
 
@@ -97,7 +148,7 @@ int main(int argc, char** argv)
 	}
 	catch (const DataError& e)
 	{
-		std::cerr << "ERROR(" << argv[2] << "): " << e.what() << std::endl;
+		std::cerr << "ERROR(" << index_name << "): " << e.what() << std::endl;
 		return 1;
 	}
 }
