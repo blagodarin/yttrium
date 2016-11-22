@@ -1,8 +1,13 @@
-*.log
-*.sh
-.sconsign.dblite
 bin
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
 doc/html
 lib
+*.log
+Makefile
+.sconsign.dblite
+*.sh
 tetrium.txt
+tetrium.ypq
 tmp

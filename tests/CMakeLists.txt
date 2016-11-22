@@ -1,0 +1,28 @@
+add_executable(tests
+	buffer.cpp
+	dir.cpp
+	gui.cpp
+	image.cpp
+	ion.cpp
+	key_lookup.cpp
+	main.cpp
+	margins.cpp
+	memory.cpp
+	package.cpp
+	point.cpp
+	reader.cpp
+	rect.cpp
+	static_string.cpp
+	string.cpp
+	string_format.cpp
+	texture_font.cpp
+	tiny_string_map.cpp
+	unique_ptr.cpp
+	utils.cpp
+	vector.cpp
+	)
+target_compile_definitions(tests PRIVATE __YTTRIUM_TEST BOOST_TEST_DYN_LINK)
+target_include_directories(tests PRIVATE ${PROJECT_SOURCE_DIR})
+target_link_libraries(tests yttrium ${Boost_LIBRARIES})
+
+add_custom_target(check COMMAND tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
