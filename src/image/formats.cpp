@@ -13,9 +13,9 @@ namespace Yttrium
 		switch (type)
 		{
 		case ImageType::Tga: return read_tga_header(reader, format) && read_image_data(reader, format, buffer);
-	#ifndef Y_NO_JPEG
+#ifndef Y_NO_JPEG
 		case ImageType::Jpeg: return read_jpeg(reader, format, buffer);
-	#endif
+#endif
 		case ImageType::Dds: return read_dds_header(reader, format) && read_image_data(reader, format, buffer);
 		default: return false;
 		}
@@ -40,9 +40,9 @@ namespace Yttrium
 		switch (type)
 		{
 		case ImageType::Tga: return write_tga(writer, format, data);
-	#ifndef Y_NO_PNG
+#ifndef Y_NO_PNG
 		case ImageType::Png: return write_png(writer, format, data);
-	#endif
+#endif
 		default: return false;
 		}
 	}
@@ -57,12 +57,16 @@ namespace Yttrium
 		case "DDS "_fourcc:
 			type = ImageType::Dds;
 			return true;
+#ifndef Y_NO_PNG
 		case "\xff\xd8\xff\xe0"_fourcc: // SOI marker and JFIF APP0 marker.
 			type = ImageType::Jpeg;
 			return true;
+#endif
+#ifndef Y_NO_JPEG
 		case "\x89PNG"_fourcc:
 			type = ImageType::Png;
 			return true;
+#endif
 		default:
 			// TGA is the last remaining option, and TGA images have no signature,
 			// so we need to read the entire header anyway to determine whether it

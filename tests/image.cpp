@@ -3,6 +3,7 @@
 #include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>
+#include "src/config.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -43,6 +44,7 @@ BOOST_AUTO_TEST_CASE(test_dds)
 	BOOST_CHECK(dds_image == tga_image);
 }
 
+#ifndef Y_NO_JPEG
 BOOST_AUTO_TEST_CASE(test_jpeg)
 {
 	Image jpeg_image;
@@ -56,7 +58,9 @@ BOOST_AUTO_TEST_CASE(test_jpeg)
 
 	BOOST_CHECK(jpeg_image == tga_image);
 }
+#endif
 
+#ifndef Y_NO_PNG
 BOOST_AUTO_TEST_CASE(test_png)
 {
 	Image image;
@@ -69,6 +73,7 @@ BOOST_AUTO_TEST_CASE(test_png)
 	const auto actual = Reader(file).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(test_intensity)
 {

@@ -1,6 +1,8 @@
 #ifndef _src_image_formats_h_
 #define _src_image_formats_h_
 
+#include "../config.h"
+
 namespace Yttrium
 {
 	class Buffer;

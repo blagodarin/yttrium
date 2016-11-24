@@ -119,26 +119,31 @@ namespace Yttrium
 			transforms |= PNG_TRANSFORM_BGR;
 		}
 
-		// TODO: Remove PNG_TRANSFORM_SWAP_ENDIAN for a big endian platform.
 		switch (format.pixel_format())
 		{
 		case PixelFormat::Gray:
+#ifndef Y_IS_BIG_ENDIAN
 			if (format.bits_per_pixel() > 8)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
+#endif
 			color_type = PNG_COLOR_TYPE_GRAY;
 			break;
 
 		case PixelFormat::GrayAlpha:
 		case PixelFormat::AlphaGray:
+#ifndef Y_IS_BIG_ENDIAN
 			if (format.bits_per_pixel() > 16)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
+#endif
 			color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
 			break;
 
 		case PixelFormat::Rgb:
 		case PixelFormat::Bgr:
+#ifndef Y_IS_BIG_ENDIAN
 			if (format.bits_per_pixel() > 24)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
+#endif
 			color_type = PNG_COLOR_TYPE_RGB;
 			break;
 
@@ -146,8 +151,10 @@ namespace Yttrium
 		case PixelFormat::Bgra:
 		case PixelFormat::Argb:
 		case PixelFormat::Abgr:
+#ifndef Y_IS_BIG_ENDIAN
 			if (format.bits_per_pixel() > 32)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
+#endif
 			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 			break;
 		}

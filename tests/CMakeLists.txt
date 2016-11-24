@@ -21,7 +21,7 @@ add_executable(tests
 	utils.cpp
 	vector.cpp
 	)
-target_compile_definitions(tests PRIVATE __YTTRIUM_TEST BOOST_TEST_DYN_LINK)
+target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
 target_include_directories(tests PRIVATE ${PROJECT_SOURCE_DIR})
 target_link_libraries(tests yttrium ${Boost_LIBRARIES})
 

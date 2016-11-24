@@ -1,4 +1,24 @@
-add_library(yttrium SHARED
+include(TestBigEndian)
+
+option(NO_JPEG "Exclude JPEG support")
+option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
+option(NO_PNG "Exclude PNG support")
+
+test_big_endian(Y_IS_BIG_ENDIAN)
+set(Y_NO_JPEG ${NO_JPEG})
+set(Y_NO_OGG_VORBIS ${NO_OGG_VORBIS})
+set(Y_NO_PNG ${NO_PNG})
+configure_file(config.h.in config.h)
+
+if(BUILD_STATIC)
+	add_library(yttrium STATIC globals.cpp)
+else()
+	add_library(yttrium SHARED globals.cpp)
+endif()
+
+target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+target_link_libraries(yttrium ${OPENAL_LIBRARY} ${OPENGL_gl_LIBRARY} Threads::Threads)
+target_sources(yttrium PRIVATE
 	audio/backend.cpp
 	audio/formats/wav.cpp
 	audio/manager.cpp
@@ -84,28 +104,37 @@ add_library(yttrium SHARED
 	window/window.cpp
 	)
 
-if(TRUE)
+if(NOT NO_JPEG)
+	if(NOT JPEG_FOUND)
+		message(FATAL_ERROR "JPEG library not found")
+	endif()
+	target_include_directories(yttrium PRIVATE ${JPEG_INCLUDE_DIR})
+	target_link_libraries(yttrium ${JPEG_LIBRARIES})
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
 		)
-	target_link_libraries(yttrium jpeg)
 endif()
 
-if(TRUE)
+if(NOT NO_OGG_VORBIS)
+	target_link_libraries(yttrium vorbisfile) # TODO: Use find_library or some third-party package.
 	target_sources(yttrium PRIVATE
 		audio/formats/ogg_vorbis.cpp
 		)
-	target_link_libraries(yttrium vorbisfile)
 endif()
 
-if(TRUE)
+if(NOT NO_PNG)
+	if(NOT PNG_FOUND)
+		message(FATAL_ERROR "PNG library not found")
+	endif()
+	target_compile_definitions(yttrium PRIVATE ${PNG_DEFINITIONS})
+	target_include_directories(yttrium PRIVATE ${PNG_INCLUDE_DIRS})
+	target_link_libraries(yttrium ${PNG_LIBRARIES})
 	target_sources(yttrium PRIVATE
 		image/formats/png.cpp
 		)
-	target_link_libraries(yttrium png)
 endif()
 
-if(TRUE)
+if(UNIX)
 	target_sources(yttrium PRIVATE
 		system/posix/dir.cpp
 		system/posix/file.cpp
@@ -114,13 +143,17 @@ if(TRUE)
 		system/posix/temporary_file.cpp
 		system/posix/time.cpp
 		)
-	target_link_libraries(yttrium openal)
+elseif(WIN32)
+	# TODO: Add Windows support.
 endif()
 
-if(TRUE)
+if(UNIX)
+	target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
+	target_link_libraries(yttrium ${X11_X11_LIB} ${X11_Xrandr_LIB})
 	target_sources(yttrium PRIVATE
 		system/x11/gl.cpp
 		system/x11/window.cpp
 		)
-	target_link_libraries(yttrium GL X11 Xrandr)
+elseif(WIN32)
+	# TODO: Add GDI support.
 endif()
