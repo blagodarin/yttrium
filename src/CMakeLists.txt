@@ -3,6 +3,7 @@ include(TestBigEndian)
 option(NO_JPEG "Exclude JPEG support")
 option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
+option(YTTRIUM_STATIC "Build static yttrium library")
 
 test_big_endian(Y_IS_BIG_ENDIAN)
 set(Y_NO_JPEG ${NO_JPEG})
@@ -10,7 +11,7 @@ set(Y_NO_OGG_VORBIS ${NO_OGG_VORBIS})
 set(Y_NO_PNG ${NO_PNG})
 configure_file(config.h.in config.h)
 
-if(BUILD_STATIC)
+if(YTTRIUM_STATIC)
 	set(LIBRARY_TYPE STATIC)
 else()
 	set(LIBRARY_TYPE SHARED)
@@ -103,6 +104,7 @@ add_library(yttrium ${LIBRARY_TYPE}
 	)
 target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 target_link_libraries(yttrium ${OPENAL_LIBRARY} ${OPENGL_gl_LIBRARY} Threads::Threads)
+set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
 
 # JPEG support.
 if(NOT NO_JPEG)

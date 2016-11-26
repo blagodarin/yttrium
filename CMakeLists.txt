@@ -12,13 +12,6 @@ find_package(PNG)
 find_package(Threads REQUIRED)
 find_package(X11 REQUIRED)
 
-option(BUILD_STATIC "Build static library")
-if(BUILD_STATIC)
-	add_definitions(-D__YTTRIUM_STATIC)
-else()
-	add_definitions(-D__YTTRIUM_SHARED)
-endif()
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)

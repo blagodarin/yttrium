@@ -4,20 +4,6 @@
 #ifndef _include_yttrium_global_h_
 #define _include_yttrium_global_h_
 
-/// \def __YTTRIUM_SHARED
-/// \brief %Yttrium shared library compilation "flag".
-/// \note Must be defined when building %Yttrium as a shared library.
-
-/// \def __YTTRIUM_STATIC
-/// \brief %Yttrium static library compilation "flag".
-/// \note Must be defined when building %Yttrium as a static library
-/// **or using it as one**.
-
-#if defined(__YTTRIUM_DOXYGEN)
-	#define __YTTRIUM_SHARED
-	#define __YTTRIUM_STATIC
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compiler detection.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,16 +109,10 @@
 
 /// Public %Yttrium API specifier.
 
-#if !defined(__YTTRIUM_DOXYGEN)
-	#if defined(__YTTRIUM_SHARED)
-		#define Y_API Y_EXPORT
-	#elif !defined(__YTTRIUM_STATIC)
-		#define Y_API Y_IMPORT
-	#endif
-#endif
-
-#if !defined(Y_API)
-	#define Y_API
+#ifdef YTTRIUM_EXPORT
+	#define Y_API Y_EXPORT
+#else
+	#define Y_API Y_IMPORT
 #endif
 
 /// \def Y_UNUSED
