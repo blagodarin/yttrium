@@ -22,7 +22,7 @@ add_executable(tests
 	vector.cpp
 	)
 target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
-target_include_directories(tests PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(tests PRIVATE "${PROJECT_SOURCE_DIR}")
 target_link_libraries(tests yttrium ${Boost_LIBRARIES})
 
-add_custom_target(check COMMAND tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_custom_target(check COMMAND tests WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

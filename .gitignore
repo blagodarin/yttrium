@@ -8,6 +8,7 @@ lib
 Makefile
 .sconsign.dblite
 *.sh
+src/config.h
 tetrium.txt
 tetrium.ypq
 tmp
