@@ -3,7 +3,6 @@ include(TestBigEndian)
 option(NO_JPEG "Exclude JPEG support")
 option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
-option(YTTRIUM_STATIC "Build static yttrium library")
 
 test_big_endian(Y_IS_BIG_ENDIAN)
 set(Y_NO_JPEG ${NO_JPEG})
@@ -11,13 +10,7 @@ set(Y_NO_OGG_VORBIS ${NO_OGG_VORBIS})
 set(Y_NO_PNG ${NO_PNG})
 configure_file(config.h.in config.h)
 
-if(YTTRIUM_STATIC)
-	set(LIBRARY_TYPE STATIC)
-else()
-	set(LIBRARY_TYPE SHARED)
-endif()
-
-add_library(yttrium ${LIBRARY_TYPE}
+add_library(yttrium
 	audio/backend.cpp
 	audio/formats/wav.cpp
 	audio/manager.cpp
