@@ -13,9 +13,9 @@ namespace Yttrium
 		, COMPRESSED_TEXTURE_FORMATS(allocator)
 		, EXTENSIONS(allocator)
 	{
-		#define GLAPI_GET_FUNCTION(name) gl_address(name)
-		#define GLAPI_HAS_EXTENSION(name) has_extension(name)
-		#include "api.h"
+#define GLAPI_GET_FUNCTION(name) gl_address(name)
+#define GLAPI_HAS_EXTENSION(name) has_extension(name)
+#include "api.h"
 
 		assert(MAJOR_VERSION >= Gl::required_major
 			|| (MAJOR_VERSION == Gl::required_major && MINOR_VERSION < Gl::required_minor));
@@ -28,7 +28,7 @@ namespace Yttrium
 		if (!EXT_direct_state_access)
 			throw std::runtime_error("GL_EXT_direct_state_access is unavailable");
 
-	#if Y_IS_DEBUG
+#ifndef NDEBUG
 		Log() << "GL_MAX_3D_TEXTURE_SIZE = " << MAX_3D_TEXTURE_SIZE;
 		Log() << "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS = " << MAX_COMBINED_TEXTURE_IMAGE_UNITS;
 		Log() << "GL_MAX_ELEMENTS_INDICES = " << MAX_ELEMENTS_INDICES;
@@ -39,7 +39,7 @@ namespace Yttrium
 		Log() << "GL_MAX_VIEWPORT_DIMS = {" << MAX_VIEWPORT_DIMS[0] << ", " << MAX_VIEWPORT_DIMS[1] << "}";
 		Log() << "GL_RENDERER = \"" << RENDERER << "\"";
 		Log() << "GL_VENDOR = \"" << VENDOR << "\"";
-	#endif
+#endif
 	}
 
 	bool GlApi::has_extension(const char* name) const

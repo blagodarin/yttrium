@@ -97,9 +97,9 @@ namespace Yttrium
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
 			GLX_CONTEXT_MINOR_VERSION_ARB, Gl::required_minor,
-		#if Y_IS_DEBUG
+#ifndef NDEBUG
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-		#endif
+#endif
 			None
 		};
 

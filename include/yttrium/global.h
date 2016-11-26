@@ -135,14 +135,6 @@
 	#define Y_API
 #endif
 
-/// Defined to 1 when compiling in the debug mode.
-
-#if defined(_DEBUG) && !defined(NDEBUG)
-	#define Y_IS_DEBUG 1
-#else
-	#define Y_IS_DEBUG 0
-#endif
-
 /// \def Y_UNUSED
 /// \brief Mark the specified parameter as unused.
 /// \note Don't use this macro to mark the parameters that are never going

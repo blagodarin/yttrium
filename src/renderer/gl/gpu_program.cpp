@@ -30,7 +30,7 @@ namespace Yttrium
 	{
 		if (_program.link())
 			return true;
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		Log() << _program.info_log(_renderer.allocator());
 #endif
 		return false;

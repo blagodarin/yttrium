@@ -28,7 +28,7 @@ namespace Yttrium
 		void set_window_size_impl(const Size&) override;
 
 	private:
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		void debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message) const;
 #endif
 

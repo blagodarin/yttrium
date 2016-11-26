@@ -82,11 +82,11 @@ namespace Yttrium
 		: _allocator(allocator)
 		, _matrix_stack(_allocator)
 		, _texture_stack({{nullptr, 1}}, _allocator)
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		, _seen_textures(_allocator)
 #endif
 		, _program_stack({{nullptr, 1}}, _allocator)
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		, _seen_programs(_allocator)
 #endif
 	{
@@ -215,11 +215,11 @@ namespace Yttrium
 		if (_matrix_stack.empty())
 			return;
 		assert(_matrix_stack.back().second == MatrixType::Transformation);
-	#ifndef NDEBUG
+#ifndef NDEBUG
 		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
 			[](const auto& matrix) { return matrix.second == MatrixType::Projection; });
 		assert(last_projection != _matrix_stack.rend());
-	#endif
+#endif
 	}
 
 	void RendererImpl::pop_texture(Texture2D::Filter filter)
@@ -310,10 +310,10 @@ namespace Yttrium
 	{
 		const auto result = _statistics;
 		_statistics = {};
-	#if Y_IS_DEBUG
+#ifndef NDEBUG
 		_seen_textures.clear();
 		_seen_programs.clear();
-	#endif
+#endif
 		return result;
 	}
 
@@ -339,13 +339,13 @@ namespace Yttrium
 				_current_program = program;
 				set_program(program);
 				++_statistics._shader_switches;
-			#if Y_IS_DEBUG
+#ifndef NDEBUG
 				const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
 				if (i == _seen_programs.end())
 					_seen_programs.emplace_back(program);
 				else
 					++_statistics._redundant_shader_switches;
-			#endif
+#endif
 			}
 		}
 
@@ -358,13 +358,13 @@ namespace Yttrium
 				_current_texture = texture;
 				set_texture(*texture, _current_texture_filter);
 				++_statistics._texture_switches;
-			#if Y_IS_DEBUG
+#ifndef NDEBUG
 				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
 				if (i == _seen_textures.end())
 					_seen_textures.emplace_back(texture);
 				else
 					++_statistics._redundant_texture_switches;
-			#endif
+#endif
 			}
 		}
 	}

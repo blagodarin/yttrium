@@ -9,7 +9,7 @@
 
 #include <cassert>
 
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 	#include <csignal>
 	#include <iostream>
 #endif
@@ -23,7 +23,7 @@ namespace Yttrium
 		, _2d_vbo(_gl, GL_ARRAY_BUFFER)
 		, _2d_vao(_gl)
 	{
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		if (_gl.KHR_debug)
 		{
 			_gl.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -280,7 +280,7 @@ namespace Yttrium
 		_gl.Viewport(0, 0, size.width(), size.height());
 	}
 
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 	void GlRenderer::debug_callback(GLenum, GLenum type, GLuint, GLenum, GLsizei, const GLchar* message) const
 	{
 		bool stop = true;

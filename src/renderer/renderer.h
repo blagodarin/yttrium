@@ -128,14 +128,14 @@ namespace Yttrium
 		const Texture2D* _current_texture = nullptr;
 		Texture2D::Filter _current_texture_filter = Texture2D::NearestFilter;
 		bool _reset_texture = false;
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		StdVector<const Texture2D*> _seen_textures; // For redundancy statistics.
 #endif
 
 		StdVector<std::pair<const GpuProgram*, int>> _program_stack;
 		const GpuProgram* _current_program = nullptr;
 		bool _reset_program = false;
-#if Y_IS_DEBUG
+#ifndef NDEBUG
 		StdVector<const GpuProgram*> _seen_programs; // For redundancy statistics.
 #endif
 	};
