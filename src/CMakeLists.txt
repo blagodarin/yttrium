@@ -95,6 +95,7 @@ target_link_libraries(yttrium ${OPENGL_gl_LIBRARY} Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
 
 # OpenAL port.
+find_package(OpenAL REQUIRED)
 target_sources(yttrium PRIVATE
 	audio/openal/backend.cpp
 	audio/openal/format.cpp
@@ -106,9 +107,7 @@ target_link_libraries(yttrium ${OPENAL_LIBRARY})
 
 # JPEG support.
 if(NOT NO_JPEG)
-	if(NOT JPEG_FOUND)
-		message(FATAL_ERROR "JPEG library not found")
-	endif()
+	find_package(JPEG REQUIRED)
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
 		)
@@ -127,9 +126,7 @@ endif()
 
 # PNG support.
 if(NOT NO_PNG)
-	if(NOT PNG_FOUND)
-		message(FATAL_ERROR "PNG library not found")
-	endif()
+	find_package(PNG REQUIRED)
 	target_sources(yttrium PRIVATE
 		image/formats/png.cpp
 		)
@@ -154,6 +151,7 @@ endif()
 
 # Window system.
 if(UNIX)
+	find_package(X11 REQUIRED)
 	target_sources(yttrium PRIVATE
 		system/x11/gl.cpp
 		system/x11/window.cpp

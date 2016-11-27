@@ -7,12 +7,8 @@ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 
 find_package(Boost REQUIRED COMPONENTS program_options unit_test_framework)
-find_package(JPEG)
-find_package(OpenAL REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(PNG)
 find_package(Threads REQUIRED)
-find_package(X11 REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
