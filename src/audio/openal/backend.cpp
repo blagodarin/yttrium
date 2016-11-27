@@ -50,4 +50,9 @@ namespace Yttrium
 	{
 		return make_resource<Sound_OpenAL>(reader);
 	}
+
+	std::unique_ptr<AudioBackend> AudioBackend::create()
+	{
+		return std::make_unique<OpenAlBackend>();
+	}
 }

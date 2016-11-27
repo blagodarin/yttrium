@@ -35,5 +35,7 @@ add_subdirectory(tools/generate-test-images)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
+add_subdirectory(benchmarks/buffer)
+
 add_subdirectory(examples/3d)
 add_subdirectory(examples/tetrium)

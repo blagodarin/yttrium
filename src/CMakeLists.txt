@@ -11,14 +11,9 @@ set(Y_NO_PNG ${NO_PNG})
 configure_file(config.h.in config.h)
 
 add_library(yttrium
-	audio/backend.cpp
 	audio/formats/wav.cpp
 	audio/manager.cpp
 	audio/music.cpp
-	audio/openal/backend.cpp
-	audio/openal/format.cpp
-	audio/openal/player.cpp
-	audio/openal/sound.cpp
 	audio/player.cpp
 	audio/playlist.cpp
 	audio/reader.cpp
@@ -95,9 +90,19 @@ add_library(yttrium
 	window/key.cpp
 	window/window.cpp
 	)
-target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
-target_link_libraries(yttrium ${OPENAL_LIBRARY} ${OPENGL_gl_LIBRARY} Threads::Threads)
+target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
+target_link_libraries(yttrium ${OPENGL_gl_LIBRARY} Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
+
+# OpenAL port.
+target_sources(yttrium PRIVATE
+	audio/openal/backend.cpp
+	audio/openal/format.cpp
+	audio/openal/player.cpp
+	audio/openal/sound.cpp
+	)
+target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR})
+target_link_libraries(yttrium ${OPENAL_LIBRARY})
 
 # JPEG support.
 if(NOT NO_JPEG)

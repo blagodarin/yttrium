@@ -1,4 +1,4 @@
-add_executable(tests
+add_executable(unit_tests
 	buffer.cpp
 	dir.cpp
 	gui.cpp
@@ -21,8 +21,8 @@ add_executable(tests
 	utils.cpp
 	vector.cpp
 	)
-target_compile_definitions(tests PRIVATE BOOST_TEST_DYN_LINK)
-target_include_directories(tests PRIVATE "${PROJECT_SOURCE_DIR}")
-target_link_libraries(tests yttrium ${Boost_LIBRARIES})
+target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
+target_include_directories(unit_tests PRIVATE "${PROJECT_SOURCE_DIR}")
+target_link_libraries(unit_tests yttrium ${Boost_LIBRARIES})
 
-add_custom_target(check COMMAND tests WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+add_custom_target(check COMMAND unit_tests WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
