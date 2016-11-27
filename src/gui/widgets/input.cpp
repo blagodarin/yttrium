@@ -1,7 +1,6 @@
 #include "input.h"
 
 #include <yttrium/gui/text_capture.h>
-#include <yttrium/log.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/script/context.h>
@@ -24,10 +23,7 @@ namespace Yttrium
 	{
 		if (!loader.load_rect("position"_s, _rect)
 			|| !_foreground.load(loader))
-		{
-			Log() << "Failed to load 'input'"_s;
 			return false;
-		}
 
 		_background.load(loader);
 
@@ -81,7 +77,7 @@ namespace Yttrium
 
 		if (capture.has_selection)
 		{
-			auto selection_color(_foreground.color);
+			auto selection_color = _foreground.color;
 			selection_color.a *= .25f;
 			renderer.set_color(selection_color);
 			PushTexture push_texture(renderer, nullptr);

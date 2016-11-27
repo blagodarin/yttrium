@@ -1,6 +1,5 @@
 #include "label.h"
 
-#include <yttrium/log.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/script/context.h>
 #include "../gui.h"
@@ -21,10 +20,7 @@ namespace Yttrium
 		if (!loader.load_rect("position"_s, _rect)
 			|| !_foreground.load(loader)
 			|| !loader.load_translatable("text"_s, &_text))
-		{
-			Log() << "Failed to load 'label'"_s;
 			return false;
-		}
 
 		return true;
 	}
