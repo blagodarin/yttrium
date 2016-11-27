@@ -44,8 +44,8 @@ namespace Yttrium
 		bool _is_looping;
 		uint64_t _loop_sample;
 		Buffer _buffer;
-		size_t _unit_size;
-		size_t _buffer_units;
+		size_t _block_size;
+		size_t _buffer_samples;
 	};
 }
 

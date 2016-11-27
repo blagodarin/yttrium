@@ -40,37 +40,36 @@ namespace Yttrium
 
 		const auto format = reader.format();
 
-		_buffer_units = format.samples_per_second(); // One-second buffer.
+		_buffer_samples = format.samples_per_second(); // One-second buffer.
 
 		// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
-		// I have no idea whether this is a real bug.
 
-		const uint64_t source_units = reader.size() / format.unit_size();
+		const uint64_t total_samples = reader.total_bytes() / format.block_size();
 
-		if (source_units >= _buffer_units * AudioPlayerBackend::NumBuffers)
+		if (total_samples >= _buffer_samples * AudioPlayerBackend::NumBuffers)
 		{
 			// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
 
 			_start_sample = static_cast<uint64_t>(settings.start * format.samples_per_second());
 			_end_sample = static_cast<uint64_t>(settings.end * format.samples_per_second());
 
-			if (_end_sample == 0 || _end_sample > source_units)
-				_end_sample = source_units;
+			if (_end_sample == 0 || _end_sample > total_samples)
+				_end_sample = total_samples;
 
-			if (_start_sample < _end_sample && _end_sample - _start_sample >= _buffer_units)
+			if (_start_sample < _end_sample && _end_sample - _start_sample >= _buffer_samples)
 			{
 				if (order == AudioPlayer::Random)
 				{
 					_loop_sample = static_cast<uint64_t>(settings.loop * format.samples_per_second());
-					_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_units);
+					_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_samples);
 				}
 				else
 				{
 					_is_looping = false;
 				}
 				_backend.set_format(format);
-				_unit_size = format.unit_size();
-				_buffer.reset(_buffer_units * _unit_size);
+				_block_size = format.block_size();
+				_buffer.reset(_buffer_samples * _block_size);
 				reader.seek(_start_sample);
 				return true;
 			}
@@ -90,10 +89,10 @@ namespace Yttrium
 	{
 		auto& reader = static_cast<const MusicImpl&>(*_music).reader();
 
-		if (_end_sample - reader.offset() >= _buffer_units)
+		if (_end_sample - reader.current_sample() >= _buffer_samples)
 			return reader.read(_buffer.data(), _buffer.size());
 
-		const size_t tail = (_end_sample - reader.offset()) * _unit_size;
+		const size_t tail = (_end_sample - reader.current_sample()) * _block_size;
 		auto size = reader.read(_buffer.data(), tail);
 		if (_is_looping)
 		{

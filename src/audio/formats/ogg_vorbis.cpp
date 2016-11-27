@@ -56,7 +56,7 @@ namespace Yttrium
 
 		vorbis_info* info = ::ov_info(&_ov_file, -1);
 		_format = AudioFormat(2, info->channels, info->rate);
-		_total_units = ::ov_pcm_total(&_ov_file, -1);
+		_total_samples = ::ov_pcm_total(&_ov_file, -1);
 	}
 
 	OggVorbisReader::~OggVorbisReader()
@@ -66,8 +66,8 @@ namespace Yttrium
 
 	size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)
 	{
-		const size_t unit_size = _format.unit_size();
-		bytes_to_read = min<uint64_t>(bytes_to_read / unit_size, _total_units - _offset_units) * unit_size;
+		const size_t block_size = _format.block_size();
+		bytes_to_read = min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read; )
 		{
@@ -76,17 +76,17 @@ namespace Yttrium
 				break;
 			bytes_read += read;
 		}
-		_offset_units += bytes_read / unit_size;
+		_current_sample += bytes_read / block_size;
 		return bytes_read;
 	}
 
-	bool OggVorbisReader::seek(uint64_t offset_units)
+	bool OggVorbisReader::seek(uint64_t block_offset)
 	{
-		if (offset_units > _total_units)
+		if (block_offset > _total_samples)
 			return false;
-		if (::ov_pcm_seek(&_ov_file, offset_units) != 0)
+		if (::ov_pcm_seek(&_ov_file, block_offset) != 0)
 			return false;
-		_offset_units = offset_units;
+		_current_sample = block_offset;
 		return true;
 	}
 }

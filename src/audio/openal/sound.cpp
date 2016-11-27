@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 		if (reader.format().channels() != 1)
 			throw DataError("Sound audio must have one channel");
-		const auto reader_size = reader.size();
+		const auto reader_size = reader.total_bytes();
 		if (reader_size > SIZE_MAX)
 			throw std::bad_alloc();
 		Buffer buffer(reader_size);
