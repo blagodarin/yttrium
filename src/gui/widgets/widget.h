@@ -39,6 +39,8 @@ namespace Yttrium
 	protected:
 		const GuiPrivate& _gui;
 		RectF _rect;
+
+	private:
 		const unsigned _flags;
 		bool _is_focused = false;
 		RectF _render_rect;

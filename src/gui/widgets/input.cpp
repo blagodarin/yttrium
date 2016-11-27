@@ -22,8 +22,8 @@ namespace Yttrium
 
 	bool InputWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!(loader.load_rect("position"_s, _rect)
-			&& _foreground.load(loader)))
+		if (!loader.load_rect("position"_s, _rect)
+			|| !_foreground.load(loader))
 		{
 			Log() << "Failed to load 'input'"_s;
 			return false;
@@ -71,7 +71,7 @@ namespace Yttrium
 		_foreground.prepare(_logic.text(), rect, &capture);
 		_foreground.draw(renderer);
 
-		if (_is_focused && capture.has_cursor && (millisecond_clock() - _cursor_mark) % 1000 < 500)
+		if (is_focused() && capture.has_cursor && (millisecond_clock() - _cursor_mark) % 1000 < 500)
 		{
 			// TODO: Force a cursor symbol to be included in every font.
 			renderer.set_color(_foreground.color);
