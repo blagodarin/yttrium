@@ -13,7 +13,10 @@ namespace Yttrium
 		CanvasWidget(const GuiPrivate&);
 
 		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
+		void render(Renderer&, const RectF&, WidgetState) const override;
+
+	private:
+		String _id;
 	};
 }
 

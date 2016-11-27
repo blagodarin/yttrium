@@ -15,40 +15,33 @@ namespace Yttrium
 	class Widget
 	{
 	public:
-
 		enum
 		{
 			CanHaveFocus = 1 << 0,
 		};
 
-		Widget(const GuiPrivate&, unsigned flags = 0);
 		virtual ~Widget() = default;
 
 		unsigned flags() const { return _flags; }
-		bool is_enabled() const { return _is_enabled; }
 		bool is_focused() const { return _is_focused; }
-		StaticString name() const { return _name; }
 		RectF rect() const { return _rect; }
 		RectF render_rect() const { return _render_rect; }
 		void set_focused(bool focused) { _is_focused = focused; }
-		void set_name(const StaticString& name) { _name = name; }
 		void set_render_rect(const RectF& rect) { _render_rect = rect; }
-		void set_text(const StaticString& text) { _text = text; }
-		StaticString text() const { return _text; }
 
-		virtual bool load(GuiPropertyLoader& loader) = 0;
-		virtual bool process_key(const KeyEvent& event);
-		virtual void render(Renderer& renderer, const RectF& rect, const Vector2& scale, WidgetState state) const = 0;
+		virtual bool load(GuiPropertyLoader&) = 0;
+		virtual bool process_key(const KeyEvent&);
+		virtual void render(Renderer&, const RectF&, WidgetState) const = 0;
+
+	protected:
+		Widget(const GuiPrivate&, unsigned flags = 0);
 
 	protected:
 		const GuiPrivate& _gui;
-		RectF          _rect;
-		bool           _is_enabled = true;
-		String         _text;
-		String         _name;
+		RectF _rect;
 		const unsigned _flags;
-		bool           _is_focused = false;
-		RectF          _render_rect;
+		bool _is_focused = false;
+		RectF _render_rect;
 	};
 }
 

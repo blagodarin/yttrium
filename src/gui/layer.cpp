@@ -14,7 +14,6 @@ namespace Yttrium
 		: _gui(gui)
 		, _name(name, &_gui.allocator())
 		, _layouts(_gui.allocator())
-		, _named_widgets(_gui.allocator())
 		, _widgets(_gui.allocator())
 		, _is_transparent(is_transparent)
 		, _bindings(_gui.script_context())
@@ -90,8 +89,6 @@ namespace Yttrium
 
 	void GuiLayer::register_widget(Widget& widget)
 	{
-		if (!widget.name().is_empty() && !_named_widgets.emplace(widget.name(), &widget).second)
-			throw GuiError(_gui.allocator()) << "Duplicate layer \""_s << _name << "\" widget name \""_s << widget.name() << "\""_s;
 		_widgets.emplace_back(&widget);
 	}
 

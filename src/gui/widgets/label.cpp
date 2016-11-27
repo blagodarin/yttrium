@@ -10,6 +10,7 @@ namespace Yttrium
 {
 	LabelWidget::LabelWidget(const GuiPrivate& gui)
 		: Widget(gui)
+		, _text(&_gui.allocator())
 		, _foreground(_gui.allocator())
 		, _final_text(&_gui.allocator())
 	{
@@ -28,7 +29,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void LabelWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
+	void LabelWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
 		_gui.script_context().substitute(_final_text, _text);
 		_foreground.prepare(_final_text, rect);

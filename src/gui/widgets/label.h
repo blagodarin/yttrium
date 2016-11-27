@@ -12,9 +12,10 @@ namespace Yttrium
 		LabelWidget(const GuiPrivate&);
 
 		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
+		void render(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
+		String _text;
 		mutable ForegroundProperty _foreground;
 		mutable String _final_text;
 	};

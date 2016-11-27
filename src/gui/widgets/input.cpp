@@ -31,7 +31,7 @@ namespace Yttrium
 
 		_background.load(loader);
 
-		String on_enter(_name.allocator());
+		String on_enter(&_gui.allocator());
 		loader.load_text("on_enter"_s, &on_enter);
 		_on_enter = ScriptCode(std::move(on_enter), _gui.script_context().allocator());
 
@@ -63,7 +63,7 @@ namespace Yttrium
 		return false;
 	}
 
-	void InputWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
+	void InputWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 

@@ -49,7 +49,6 @@ namespace Yttrium
 		GuiPrivate&                _gui;
 		String                     _name;
 		StdVector<UniquePtr<GuiLayout>> _layouts;
-		StdMap<StaticString, Widget*> _named_widgets;
 		StdVector<Widget*>         _widgets;
 		Widget*                    _mouse_widget = nullptr;
 		const Widget*              _left_click_widget = nullptr;

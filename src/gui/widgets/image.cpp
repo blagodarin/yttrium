@@ -11,7 +11,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void ImageWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState) const
+	void ImageWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 	}

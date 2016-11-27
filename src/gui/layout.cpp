@@ -45,6 +45,7 @@ namespace Yttrium
 	{
 		RectF layout_rect = rect;
 
+		Vector2 scaling(1, 1);
 		if (!_size.is_empty())
 		{
 			if (_placement == Placement::Center)
@@ -62,10 +63,8 @@ namespace Yttrium
 					layout_rect = RectF({0, (rect.height() - height) / 2}, SizeF(rect.width(), height));
 				}
 			}
-			_scaling = Vector2(layout_rect.width() / _size.width(), layout_rect.height() / _size.height());
+			scaling = Vector2(layout_rect.width() / _size.width(), layout_rect.height() / _size.height());
 		}
-		else
-			_scaling = {1, 1};
 
 		for (const auto& widget : _widgets)
 		{
@@ -74,10 +73,10 @@ namespace Yttrium
 				? layout_rect
 				: RectF(
 					{
-						layout_rect.left() + widget_rect.left() * _scaling.x,
-						layout_rect.top() + widget_rect.top() * _scaling.y
+						layout_rect.left() + widget_rect.left() * scaling.x,
+						layout_rect.top() + widget_rect.top() * scaling.y
 					},
-					widget_rect.size() * std::make_pair(_scaling.x, _scaling.y)));
+					widget_rect.size() * std::make_pair(scaling.x, scaling.y)));
 		}
 	}
 
@@ -88,7 +87,7 @@ namespace Yttrium
 			WidgetState state = WidgetState::Normal;
 			if (widget.get() == hover_widget)
 				state = (widget.get() == click_widget) ? WidgetState::Pressed : WidgetState::Active;
-			widget->render(renderer, widget->render_rect(), _scaling, state);
+			widget->render(renderer, widget->render_rect(), state);
 		}
 	}
 }

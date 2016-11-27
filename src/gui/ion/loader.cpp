@@ -280,16 +280,13 @@ namespace Yttrium
 			const auto& element = ::load_element(layout_node);
 			if (!element.object)
 				throw GuiError(_allocator) << "Bad layout entry '"_s << layout_node.name() << "'"_s;
+			if (element.name)
+				throw GuiError(_allocator) << "Widget names are not supported"_s;
 
 			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(*element.attribute) : nullptr), _gui);
 			if (_has_default_font)
 				loader.set_default_font_name(&_default_font_name);
-			auto& widget = layout.add_widget(layout_node.name(), loader);
-
-			if (element.name)
-				widget.set_name(*element.name);
-
-			layer.register_widget(widget);
+			layer.register_widget(layout.add_widget(layout_node.name(), loader));
 		}
 		return true;
 	}

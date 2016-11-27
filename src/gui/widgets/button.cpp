@@ -16,6 +16,7 @@ namespace Yttrium
 
 	ButtonWidget::ButtonWidget(const GuiPrivate& gui)
 		: Widget(gui)
+		, _text(&_gui.allocator())
 		, _foreground(_gui.allocator())
 	{
 	}
@@ -43,10 +44,7 @@ namespace Yttrium
 				_styles[i].text_color = _styles[0].text_color;
 		}
 
-		if (loader.load_state("state"_s, &_state)) // Fixed state button.
-		{
-			_is_enabled = false;
-		}
+		loader.load_state("state"_s, &_state);
 
 		_sound = loader.load_sound("sound"_s);
 
@@ -100,7 +98,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void ButtonWidget::render(Renderer& renderer, const RectF& rect, const Vector2&, WidgetState state) const
+	void ButtonWidget::render(Renderer& renderer, const RectF& rect, WidgetState state) const
 	{
 		if (_state != WidgetState::NotSet)
 			state = _state;

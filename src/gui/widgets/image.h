@@ -12,7 +12,7 @@ namespace Yttrium
 		ImageWidget(const GuiPrivate& gui) : Widget(gui) {}
 
 		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
+		void render(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
 		BackgroundProperty _background;

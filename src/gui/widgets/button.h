@@ -16,7 +16,7 @@ namespace Yttrium
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
-		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
+		void render(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
 		struct Style
@@ -25,6 +25,7 @@ namespace Yttrium
 			Vector4            text_color{1, 1, 1};
 		};
 
+		String _text;
 		mutable ForegroundProperty _foreground;
 		ResourcePtr<const Sound> _sound;
 		WidgetState _state = WidgetState::NotSet;

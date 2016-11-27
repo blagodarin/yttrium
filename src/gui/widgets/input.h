@@ -15,7 +15,7 @@ namespace Yttrium
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
-		void render(Renderer&, const RectF&, const Vector2&, WidgetState) const override;
+		void render(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
 		BackgroundProperty _background;
