@@ -23,15 +23,14 @@ namespace Yttrium
 		AudioManager(Allocator& = *DefaultAllocator);
 
 		///
-		ResourcePtr<Sound> create_sound(Reader&&);
+		~AudioManager();
 
 		///
-		AudioPlayer& player();
-
-		~AudioManager();
+		ResourcePtr<Sound> create_sound(Reader&&);
 
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;
+		friend AudioPlayer;
 	};
 }
 

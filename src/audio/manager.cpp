@@ -3,28 +3,28 @@
 #include <yttrium/audio/reader.h>
 #include <yttrium/resources/resource_ptr.h>
 #include "backend.h"
+#include "manager.h"
 #include "player.h"
 
 namespace Yttrium
 {
-	class AudioManagerPrivate
+	AudioManagerPrivate::AudioManagerPrivate(Allocator& allocator)
+		: _allocator(allocator)
+		, _backend(AudioBackend::create())
 	{
-	public:
-		AudioManagerPrivate(Allocator& allocator)
-			: _allocator(allocator)
-		{
-		}
+	}
 
-	public:
-		Allocator& _allocator;
-		const std::unique_ptr<AudioBackend> _backend = AudioBackend::create();
-		AudioPlayerImpl _player{ _backend->create_player(), _allocator };
-	};
+	std::unique_ptr<AudioPlayerBackend> AudioManagerPrivate::create_player_backend()
+	{
+		return _backend->create_player();
+	}
 
 	AudioManager::AudioManager(Allocator& allocator)
 		: _private(std::make_unique<AudioManagerPrivate>(allocator))
 	{
 	}
+
+	AudioManager::~AudioManager() = default;
 
 	ResourcePtr<Sound> AudioManager::create_sound(Reader&& reader)
 	{
@@ -33,11 +33,4 @@ namespace Yttrium
 			return {};
 		return _private->_backend->create_sound(*audio_reader);
 	}
-
-	AudioPlayer& AudioManager::player()
-	{
-		return _private->_player;
-	}
-
-	AudioManager::~AudioManager() = default;
 }

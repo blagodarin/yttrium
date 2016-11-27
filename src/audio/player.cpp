@@ -1,6 +1,8 @@
 #include "player.h"
 
+#include <yttrium/audio/manager.h>
 #include "backend.h"
+#include "manager.h"
 #include "playlist.h"
 
 namespace Yttrium
@@ -10,7 +12,7 @@ namespace Yttrium
 		FetchDelay = 300, ///< 300 ms interval between the successive fetches.
 	};
 
-	AudioPlayerImpl::AudioPlayerImpl(std::unique_ptr<AudioPlayerBackend>&& backend, Allocator& allocator)
+	AudioPlayerPrivate::AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&& backend, Allocator& allocator)
 		: _allocator(allocator)
 		, _playlist(_allocator)
 		, _backend(std::move(backend))
@@ -19,48 +21,13 @@ namespace Yttrium
 	{
 	}
 
-	AudioPlayerImpl::~AudioPlayerImpl()
+	AudioPlayerPrivate::~AudioPlayerPrivate()
 	{
 		_action.write(Exit);
 		_thread.join();
 	}
 
-	void AudioPlayerImpl::load(const ResourcePtr<const Music>& music)
-	{
-		_playlist.load(music);
-	}
-
-	void AudioPlayerImpl::clear()
-	{
-		_playlist.clear();
-	}
-
-	void AudioPlayerImpl::set_order(Order order)
-	{
-		_playlist.set_order(order);
-	}
-
-	void AudioPlayerImpl::play()
-	{
-		_action.write(Play);
-	}
-
-	void AudioPlayerImpl::pause()
-	{
-		_action.write(Pause);
-	}
-
-	void AudioPlayerImpl::stop()
-	{
-		_action.write(Stop);
-	}
-
-	bool AudioPlayerImpl::is_playing() const
-	{
-		return _state == Playing;
-	}
-
-	void AudioPlayerImpl::run()
+	void AudioPlayerPrivate::run()
 	{
 		for (;;)
 		{
@@ -135,5 +102,47 @@ namespace Yttrium
 			if (action == Exit)
 				break;
 		}
+	}
+
+	AudioPlayer::AudioPlayer(AudioManager& manager)
+		: _private(std::make_unique<AudioPlayerPrivate>(manager._private->create_player_backend(), manager._private->_allocator))
+	{
+	}
+
+	AudioPlayer::~AudioPlayer() = default;
+
+	void AudioPlayer::load(const ResourcePtr<const Music>& music)
+	{
+		_private->playlist().load(music);
+	}
+
+	void AudioPlayer::clear()
+	{
+		_private->playlist().clear();
+	}
+
+	void AudioPlayer::set_order(Order order)
+	{
+		_private->playlist().set_order(order);
+	}
+
+	void AudioPlayer::play()
+	{
+		_private->push_action(AudioPlayerPrivate::Play);
+	}
+
+	void AudioPlayer::pause()
+	{
+		_private->push_action(AudioPlayerPrivate::Pause);
+	}
+
+	void AudioPlayer::stop()
+	{
+		_private->push_action(AudioPlayerPrivate::Stop);
+	}
+
+	bool AudioPlayer::is_playing() const
+	{
+		return _private->state() == AudioPlayerPrivate::Playing;
 	}
 }

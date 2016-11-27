@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include <yttrium/audio/music.h>
-#include <yttrium/audio/player.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
@@ -83,10 +82,10 @@ Game::Game(Storage& storage)
 
 	_script.define("play_music", [this](const ScriptCall&)
 	{
-		if (!_audio.player().is_playing())
-			_audio.player().play();
+		if (!_audio_player.is_playing())
+			_audio_player.play();
 		else
-			_audio.player().pause();
+			_audio_player.pause();
 	});
 
 	_script.define("pop_layer", 0, 1, [this](const ScriptCall& call)
@@ -122,7 +121,7 @@ Game::Game(Storage& storage)
 
 	_script.define("stop_music", [this](const ScriptCall&)
 	{
-		_audio.player().stop();
+		_audio_player.stop();
 	});
 
 	_script.define("tgcon", [this](const ScriptCall&)
@@ -197,9 +196,9 @@ void Game::run()
 		draw_next_figure(renderer, rect);
 	});
 
-	_audio.player().load(_resource_loader.load_music("data/music.ogg"));
-	_audio.player().set_order(AudioPlayer::Random);
-	_audio.player().play();
+	_audio_player.load(_resource_loader.load_music("data/music.ogg"));
+	_audio_player.set_order(AudioPlayer::Random);
+	_audio_player.play();
 
 	_window.show();
 	_window.run();

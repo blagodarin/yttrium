@@ -11,24 +11,9 @@
 
 namespace Yttrium
 {
-	class AudioPlayerImpl : public AudioPlayer
+	class AudioPlayerPrivate
 	{
 	public:
-		AudioPlayerImpl(std::unique_ptr<AudioPlayerBackend>&&, Allocator&);
-		~AudioPlayerImpl() override;
-
-		void load(const ResourcePtr<const Music>&) override;
-		void clear() override;
-		void set_order(Order) override;
-		void play() override;
-		void pause() override;
-		void stop() override;
-		bool is_playing() const override;
-
-	private:
-		void run();
-
-	private:
 		enum State
 		{
 			Stopped,
@@ -44,6 +29,17 @@ namespace Yttrium
 			Exit,
 		};
 
+		AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&&, Allocator&);
+		~AudioPlayerPrivate();
+
+		AudioPlaylist& playlist() { return _playlist; }
+		void push_action(Action action) { _action.write(action); }
+		State state() const { return _state; }
+
+	private:
+		void run();
+
+	private:
 		Allocator& _allocator;
 		AudioPlaylist _playlist;
 		ThreadBuffer<Action> _action;

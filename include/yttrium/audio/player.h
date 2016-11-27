@@ -4,13 +4,18 @@
 #ifndef _include_yttrium_audio_player_h_
 #define _include_yttrium_audio_player_h_
 
+#include <yttrium/global.h>
+
+#include <memory>
+
 namespace Yttrium
 {
+	class AudioManager;
 	class Music;
 	template <typename> class ResourcePtr;
 
 	/// Audio player.
-	class AudioPlayer
+	class Y_API AudioPlayer
 	{
 	public:
 		/// Playback order.
@@ -21,28 +26,35 @@ namespace Yttrium
 			Shuffle, ///< Play the shuffled list in a loop.
 		};
 
-		virtual ~AudioPlayer() = default;
+		///
+		AudioPlayer(AudioManager&);
+
+		///
+		~AudioPlayer();
 
 		/// Loads a music file for playback.
-		virtual void load(const ResourcePtr<const Music>&) = 0;
+		void load(const ResourcePtr<const Music>&);
 
-		/// Clear the playlist.
-		virtual void clear() = 0;
+		/// Clears the playlist.
+		void clear();
 
 		/// Sets the playback order.
-		virtual void set_order(Order) = 0;
+		void set_order(Order);
 
 		/// Starts or resumes the playback.
-		virtual void play() = 0;
+		void play();
 
 		/// Pauses the playback.
-		virtual void pause() = 0;
+		void pause();
 
 		/// Stops the playback.
-		virtual void stop() = 0;
+		void stop();
 
 		/// Checks if music is currently playing.
-		virtual bool is_playing() const = 0;
+		bool is_playing() const;
+
+	private:
+		const std::unique_ptr<class AudioPlayerPrivate> _private;
 	};
 }
 

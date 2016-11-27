@@ -2,6 +2,7 @@
 #define _examples_tetrium_game_h_
 
 #include <yttrium/audio/manager.h>
+#include <yttrium/audio/player.h>
 #include <yttrium/bindings.h>
 #include <yttrium/console.h>
 #include <yttrium/gui/gui.h>
@@ -51,6 +52,7 @@ private:
 	ScriptContext _script{ &_script_allocator };
 	NamedAllocator _audio_allocator{ "audio" };
 	AudioManager _audio{ _audio_allocator };
+	AudioPlayer _audio_player{ _audio };
 	NamedAllocator _window_allocator{ "window" };
 	Window _window{ "Tetrium", *this, _window_allocator };
 	Console _console{ _script, _allocator };
