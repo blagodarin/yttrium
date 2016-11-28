@@ -1,9 +1,8 @@
-#ifndef _src_audio_openal_openal_h_
-#define _src_audio_openal_openal_h_
+#ifndef _src_system_openal_h_
+#define _src_system_openal_h_
 
-#include <yttrium/global.h>
-
-#if Y_PLATFORM_WINDOWS && !defined(AL_APIENTRY)
+#include "../config.h"
+#if defined(Y_IS_WINDOWS) && !defined(AL_APIENTRY)
 	#define AL_APIENTRY __cdecl
 #endif
 

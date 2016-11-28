@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_audio_player_h_
 #define _include_yttrium_audio_player_h_
 
-#include <yttrium/global.h>
+#include <yttrium/api.h>
 
 #include <memory>
 

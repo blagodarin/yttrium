@@ -88,12 +88,11 @@ namespace Yttrium
 
 	std::shared_ptr<ReaderPrivate> create_file_reader(const StaticString& path)
 	{
-	#if Y_PLATFORM_LINUX
-		static_assert(Y_PLATFORM_LINUX, "Include <yttrium/global.h>");
+#ifdef __linux__
 		const int flags = O_RDONLY | O_NOATIME;
-	#else
+#else
 		const int flags = O_RDONLY;
-	#endif
+#endif
 		String name(path); // Guaranteed to be null-terminated.
 		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
@@ -106,12 +105,11 @@ namespace Yttrium
 
 	std::unique_ptr<WriterPrivate> create_file_writer(const StaticString& path)
 	{
-	#if Y_PLATFORM_LINUX
-		static_assert(Y_PLATFORM_LINUX, "Include <yttrium/global.h>");
+#ifdef __linux__
 		const int flags = O_WRONLY | O_CREAT | O_TRUNC | O_NOATIME;
-	#else
+#else
 		const int flags = O_WRONLY | O_CREAT | O_TRUNC;
-	#endif
+#endif
 		String name(path); // Guaranteed to be null-terminated.
 		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)

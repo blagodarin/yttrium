@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_memory_buffer_h_
 #define _include_yttrium_memory_buffer_h_
 
-#include <yttrium/global.h>
+#include <yttrium/api.h>
 
 #include <cstddef>
 #include <cstdint>

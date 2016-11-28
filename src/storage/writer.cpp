@@ -1,11 +1,10 @@
 #include "writer.h"
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/static_string.h>
-#include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
+#include "reader.h"
 
 #include <cassert>
 #include <cstring>
@@ -114,7 +113,8 @@ namespace Yttrium
 	{
 		if (!reader)
 			return false;
-		// TODO: Write from BufferReader without intermediate buffer.
+        if (const auto data = ReaderPrivate::data(reader))
+			return write_all(data, reader.size());
 		uint64_t total_size = 0;
 		Buffer buffer(Buffer::memory_granularity());
 		while (auto size_read = reader.read_at(total_size, buffer.data(), buffer.size()))

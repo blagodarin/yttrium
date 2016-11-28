@@ -5,9 +5,9 @@
 
 namespace Yttrium
 {
-	void* HeapAllocator::do_allocate(size_t size, size_t alignment)
+	void* HeapAllocator::do_allocate(size_t size, size_t)
 	{
-		Y_UNUSED(alignment);
+		// TODO: Alignment.
 		const auto pointer = ::malloc(size);
 		if (!pointer)
 			throw std::bad_alloc();

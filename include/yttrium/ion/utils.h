@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_ion_utils_h_
 #define _include_yttrium_ion_utils_h_
 
-#include <yttrium/global.h>
+#include <yttrium/api.h>
 
 namespace Yttrium
 {

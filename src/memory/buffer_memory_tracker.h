@@ -6,7 +6,6 @@
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
 
-#include <yttrium/global.h>
 #include "../utils/atomic_counters.h"
 
 #include <cstddef>

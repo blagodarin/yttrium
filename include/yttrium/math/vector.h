@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_math_vector_h_
 #define _include_yttrium_math_vector_h_
 
-#include <yttrium/global.h>
+#include <yttrium/api.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 

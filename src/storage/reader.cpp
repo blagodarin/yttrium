@@ -29,6 +29,11 @@ namespace Yttrium
 		return size;
 	}
 
+	const void* BufferReader::data() const noexcept
+	{
+		return _buffer->data();
+	}
+
 	ReaderReader::ReaderReader(const std::shared_ptr<const ReaderPrivate>& reader, uint64_t base, uint64_t size)
 		: ReaderPrivate(size)
 		, _reader(reader)
@@ -58,6 +63,11 @@ namespace Yttrium
 	{
 		std::memcpy(data, static_cast<const uint8_t*>(_data) + offset, size);
 		return size;
+	}
+
+	const void* SpanReader::data() const noexcept
+	{
+		return _data;
 	}
 
 	Reader::Reader(const void* data, size_t size)

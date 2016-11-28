@@ -2,6 +2,9 @@
 #define _src_config_h_
 
 #cmakedefine Y_IS_BIG_ENDIAN
+#cmakedefine Y_IS_LINUX
+#cmakedefine Y_IS_POSIX
+#cmakedefine Y_IS_WINDOWS
 #cmakedefine Y_NO_JPEG
 #cmakedefine Y_NO_OGG_VORBIS
 #cmakedefine Y_NO_PNG

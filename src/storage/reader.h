@@ -18,6 +18,11 @@ namespace Yttrium
 
 		virtual size_t read_at(uint64_t, void*, size_t) const = 0;
 
+		static const void* data(const Reader& reader) noexcept { return reader._private ? reader._private->data() : nullptr; }
+
+	protected:
+		virtual const void* data() const noexcept { return nullptr; }
+
 	private:
 		const String _name{ &NoAllocator };
 		const uint64_t _size;
@@ -34,6 +39,9 @@ namespace Yttrium
 		BufferReader(const std::shared_ptr<const Buffer>&, const String&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
+
+	private:
+		const void* data() const noexcept override;
 
 	private:
 		const std::shared_ptr<const Buffer> _buffer;
@@ -58,6 +66,9 @@ namespace Yttrium
 		SpanReader(const void*, size_t);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
+
+	private:
+		const void* data() const noexcept override;
 
 	private:
 		const void* const _data;

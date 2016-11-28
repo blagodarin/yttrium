@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_resources_resource_ptr_h_
 #define _include_yttrium_resources_resource_ptr_h_
 
-#include <yttrium/global.h>
+#include <yttrium/api.h>
 #include <yttrium/resources/resource.h>
 
 #include <utility>
