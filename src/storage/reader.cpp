@@ -86,7 +86,7 @@ namespace Yttrium
 	}
 
 	Reader::Reader(const TemporaryFile& file)
-		: _private(create_file_reader(file.name())) // TODO: Don't reopen the file.
+		: _private(create_file_reader(file))
 	{
 	}
 

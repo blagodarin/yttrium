@@ -7,8 +7,6 @@
 
 namespace Yttrium
 {
-	class FilePrivate;
-
 	class ReaderPrivate
 	{
 	public:

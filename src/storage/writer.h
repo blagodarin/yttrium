@@ -5,8 +5,6 @@
 
 namespace Yttrium
 {
-	class FilePrivate;
-
 	class WriterPrivate
 	{
 	public:

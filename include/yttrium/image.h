@@ -1,5 +1,5 @@
 /// \file
-/// \brief %Image input/output facilities.
+/// \brief
 
 #ifndef _include_yttrium_image_h_
 #define _include_yttrium_image_h_

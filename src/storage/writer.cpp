@@ -54,7 +54,7 @@ namespace Yttrium
 	}
 
 	Writer::Writer(TemporaryFile& file)
-		: _private(create_file_writer(file.name())) // TODO: Don't reopen the file.
+		: _private(create_file_writer(file))
 	{
 	}
 

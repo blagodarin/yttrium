@@ -2,6 +2,7 @@
 
 #include "../file.h"
 
+#include <yttrium/storage/temporary_file.h>
 #include "../../storage/reader.h"
 #include "../../storage/writer.h"
 
@@ -13,6 +14,8 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+
+// TODO: Don't reopen temporary files.
 
 namespace Yttrium
 {
@@ -103,6 +106,11 @@ namespace Yttrium
 		return std::make_shared<FileReader>(size, std::move(name), descriptor);
 	}
 
+	std::shared_ptr<ReaderPrivate> create_file_reader(const TemporaryFile& file)
+	{
+		return create_file_reader(file.name());
+	}
+
 	std::unique_ptr<WriterPrivate> create_file_writer(const StaticString& path)
 	{
 #ifdef __linux__
@@ -118,5 +126,10 @@ namespace Yttrium
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
 		return std::make_unique<FileWriter>(size, std::move(name), descriptor);
+	}
+
+	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
+	{
+		return create_file_writer(file.name());
 	}
 }
