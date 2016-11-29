@@ -5,21 +5,7 @@
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils.h>
 #include "formats.h"
-
-namespace
-{
-	using namespace Yttrium;
-
-	size_t unaligned_row_size(size_t width, size_t bits_per_pixel)
-	{
-		return (width * bits_per_pixel + 7) / 8;
-	}
-
-	size_t aligned_row_size(size_t width, size_t bits_per_pixel, size_t row_alignment)
-	{
-		return (unaligned_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
-	}
-}
+#include "utils.h"
 
 namespace Yttrium
 {
@@ -53,7 +39,7 @@ namespace Yttrium
 		}
 
 		_bits_per_pixel = bits_per_pixel;
-		_row_size = ::aligned_row_size(_width, bits_per_pixel, _row_alignment);
+		_row_size = aligned_image_row_size(_width, bits_per_pixel, _row_alignment);
 	}
 
 	void ImageFormat::set_row_alignment(size_t alignment)
@@ -61,7 +47,7 @@ namespace Yttrium
 		if (is_power_of_2(alignment))
 		{
 			_row_alignment = alignment;
-			_row_size = ::aligned_row_size(_width, _bits_per_pixel, alignment);
+			_row_size = aligned_image_row_size(_width, _bits_per_pixel, alignment);
 		}
 		// TODO: Think of a better behavior on trying to set an invalid alignment than just ignoring to change anything.
 	}
@@ -69,7 +55,7 @@ namespace Yttrium
 	void ImageFormat::set_width(size_t width)
 	{
 		_width = width;
-		_row_size = ::aligned_row_size(width, _bits_per_pixel, _row_alignment);
+		_row_size = aligned_image_row_size(width, _bits_per_pixel, _row_alignment);
 	}
 
 	// TODO: Add a function to set width and alignment simultaneously (and more efficiently) to use in Image::set_size.
@@ -115,11 +101,6 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Image::load(const StaticString& name, ImageType type)
-	{
-		return load(Reader(name), type);
-	}
-
 	bool Image::load(Reader&& reader, ImageType type)
 	{
 		if (!reader)
@@ -141,10 +122,10 @@ namespace Yttrium
 		{
 			if (name.ends_with(".tga"_s))
 				type = ImageType::Tga;
-	#ifndef Y_NO_PNG
+#ifndef Y_NO_PNG
 			else if (name.ends_with(".png"_s))
 				type = ImageType::Png;
-	#endif
+#endif
 			else
 				return false;
 		}
@@ -154,12 +135,6 @@ namespace Yttrium
 	bool Image::save(Writer&& writer, ImageType type) const
 	{
 		return write_image(writer, type, _format, _buffer.data());
-	}
-
-	void Image::set_format(const ImageFormat& format)
-	{
-		_format = format;
-		_buffer.reset(_format.frame_size());
 	}
 
 	void Image::set_size(size_t width, size_t height, size_t row_alignment)
@@ -215,12 +190,5 @@ namespace Yttrium
 	{
 		Buffer buffer;
 		return save(Writer(buffer), type) ? std::move(buffer) : Buffer();
-	}
-
-	bool operator==(const Image& lhs, const Image& rhs)
-	{
-		// This implementation relies on equal padding data (if any).
-		return lhs._format == rhs._format
-			&& lhs._buffer == rhs._buffer; // TODO: Fix the capacity-less buffer comparison.
 	}
 }

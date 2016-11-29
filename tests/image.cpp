@@ -4,6 +4,7 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>
 #include "src/config.h"
+#include "src/image/utils.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -12,6 +13,21 @@ namespace Yttrium
 	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
 	{
 		return stream << "Buffer(" << buffer.size() << ")";
+	}
+
+	inline bool operator==(const Image& a, const Image& b)
+	{
+		const auto format = a.format();
+		if (format != b.format())
+			return false;
+		for (size_t i = 0; i < format.height(); ++i)
+		{
+			const auto a_row = static_cast<const uint8_t*>(a.data()) + i * format.row_size();
+			const auto b_row = static_cast<const uint8_t*>(b.data()) + i * format.row_size();
+			if (std::memcmp(a_row, b_row, unaligned_image_row_size(format.width(), format.bits_per_pixel())))
+				return false;
+		}
+		return true;
 	}
 }
 
@@ -23,7 +39,7 @@ using namespace Yttrium;
 BOOST_AUTO_TEST_CASE(test_tga)
 {
 	Image image;
-	BOOST_REQUIRE(image.load("tests/image/gradient32.tga"));
+	BOOST_REQUIRE(image.load(Reader("tests/image/gradient32.tga")));
 
 	TemporaryFile file;
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
@@ -36,10 +52,10 @@ BOOST_AUTO_TEST_CASE(test_tga)
 BOOST_AUTO_TEST_CASE(test_dds)
 {
 	Image dds_image;
-	BOOST_REQUIRE(dds_image.load("tests/image/gradient32.dds"));
+	BOOST_REQUIRE(dds_image.load(Reader("tests/image/gradient32.dds")));
 
 	Image tga_image;
-	BOOST_REQUIRE(tga_image.load("tests/image/gradient32.tga"));
+	BOOST_REQUIRE(tga_image.load(Reader("tests/image/gradient32.tga")));
 
 	BOOST_CHECK(dds_image == tga_image);
 }
@@ -48,11 +64,11 @@ BOOST_AUTO_TEST_CASE(test_dds)
 BOOST_AUTO_TEST_CASE(test_jpeg)
 {
 	Image jpeg_image;
-	BOOST_REQUIRE(jpeg_image.load("tests/image/gradient24.jpeg"));
+	BOOST_REQUIRE(jpeg_image.load(Reader("tests/image/gradient24.jpeg")));
 	BOOST_REQUIRE(jpeg_image.format().pixel_format() == PixelFormat::Rgb);
 
 	Image tga_image;
-	BOOST_REQUIRE(tga_image.load("tests/image/gradient24.jpeg.tga"));
+	BOOST_REQUIRE(tga_image.load(Reader("tests/image/gradient24.jpeg.tga")));
 	BOOST_REQUIRE(tga_image.format().pixel_format() == PixelFormat::Bgr);
 	BOOST_REQUIRE(tga_image.swap_channels());
 
@@ -64,7 +80,7 @@ BOOST_AUTO_TEST_CASE(test_jpeg)
 BOOST_AUTO_TEST_CASE(test_png)
 {
 	Image image;
-	BOOST_REQUIRE(image.load("tests/image/gradient24.tga"));
+	BOOST_REQUIRE(image.load(Reader("tests/image/gradient24.tga")));
 
 	TemporaryFile file;
 	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
@@ -78,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_png)
 BOOST_AUTO_TEST_CASE(test_intensity)
 {
 	Image image;
-	BOOST_REQUIRE(image.load("tests/image/intensity8.tga"));
+	BOOST_REQUIRE(image.load(Reader("tests/image/intensity8.tga")));
 	BOOST_REQUIRE(image.intensity_to_bgra());
 
 	TemporaryFile file;

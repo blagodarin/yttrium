@@ -9,7 +9,6 @@
 
 namespace Yttrium
 {
-	class Image;
 	class Reader;
 	class StaticString;
 	class Writer;
@@ -47,13 +46,14 @@ namespace Yttrium
 		XLeftYUp,    ///< X right-to-left, Y bottom-to-top.
 	};
 
+	class Image;
+
 	/// Image format.
 	class Y_API ImageFormat
 	{
 		friend Image;
 
 	public:
-
 		///
 		ImageFormat();
 
@@ -105,32 +105,7 @@ namespace Yttrium
 		///
 		size_t width() const { return _width; }
 
-	public:
-
-		///
-		bool operator==(const ImageFormat& format) const
-		{
-			return _pixel_format == format._pixel_format
-				&& _bits_per_pixel == format._bits_per_pixel
-				&& _orientation == format._orientation
-				&& _width == format._width
-				&& _row_alignment == format._row_alignment
-				&& _height == format._height;
-		}
-
-		///
-		bool operator!=(const ImageFormat& format) const
-		{
-			return _pixel_format != format._pixel_format
-				|| _bits_per_pixel != format._bits_per_pixel
-				|| _orientation != format._orientation
-				|| _width != format._width
-				|| _row_alignment != format._row_alignment
-				|| _height != format._height;
-		}
-
 	private:
-
 		PixelFormat      _pixel_format;
 		size_t           _channels;
 		size_t           _bits_per_pixel;
@@ -141,11 +116,19 @@ namespace Yttrium
 		size_t           _height;
 	};
 
+	inline bool operator==(const ImageFormat& a, const ImageFormat& b)
+	{
+		return a.pixel_format() == b.pixel_format() && a.bits_per_pixel() == b.bits_per_pixel()
+			&& a.orientation() == b.orientation() && a.width() == b.width() && a.row_size() == b.row_size()
+			&& a.height() == b.height();
+	}
+
+	inline bool operator!=(const ImageFormat& a, const ImageFormat& b) { return !(a == b); }
+
 	///
 	class Y_API Image
 	{
 	public:
-
 		///
 		Image() = default;
 
@@ -165,9 +148,6 @@ namespace Yttrium
 		bool intensity_to_bgra();
 
 		///
-		bool load(const StaticString& name, ImageType = ImageType::Auto);
-
-		///
 		bool load(Reader&&, ImageType = ImageType::Auto);
 
 		///
@@ -175,11 +155,6 @@ namespace Yttrium
 
 		///
 		bool save(Writer&&, ImageType) const;
-
-		/// Change the format to \a format.
-		/// \param format New image format.
-		/// \note The image data becomes undefined after the call.
-		void set_format(const ImageFormat&);
 
 		///
 		void set_size(size_t width, size_t height, size_t row_alignment = 0);
@@ -193,12 +168,7 @@ namespace Yttrium
 	private:
 		ImageFormat _format;
 		Buffer _buffer;
-
-		friend bool operator==(const Image&, const Image&);
 	};
-
-	Y_API bool operator==(const Image&, const Image&);
-	inline bool operator!=(const Image& lhs, const Image& rhs) { return !(lhs == rhs); }
 }
 
 #endif
