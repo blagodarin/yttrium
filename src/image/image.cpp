@@ -58,7 +58,7 @@ namespace Yttrium
 		_row_size = aligned_image_row_size(width, _bits_per_pixel, _row_alignment);
 	}
 
-	// TODO: Add a function to set width and alignment simultaneously (and more efficiently) to use in Image::set_size.
+	// TODO: Add a function to set width and alignment simultaneously (and more efficiently).
 
 	Image::Image(const ImageFormat& format)
 		: _format(format)
@@ -137,15 +137,6 @@ namespace Yttrium
 		return write_image(writer, type, _format, _buffer.data());
 	}
 
-	void Image::set_size(size_t width, size_t height, size_t row_alignment)
-	{
-		_format.set_height(height);
-		_format.set_width(width);
-		if (row_alignment)
-			_format.set_row_alignment(row_alignment);
-		_buffer.reset(_format.frame_size());
-	}
-
 	bool Image::swap_channels()
 	{
 		switch (_format._pixel_format)
@@ -186,7 +177,7 @@ namespace Yttrium
 		return false;
 	}
 
-	Buffer Image::to_buffer(ImageType type)
+	Buffer Image::to_buffer(ImageType type) const
 	{
 		Buffer buffer;
 		return save(Writer(buffer), type) ? std::move(buffer) : Buffer();

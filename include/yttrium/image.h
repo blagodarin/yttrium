@@ -157,13 +157,10 @@ namespace Yttrium
 		bool save(Writer&&, ImageType) const;
 
 		///
-		void set_size(size_t width, size_t height, size_t row_alignment = 0);
-
-		///
 		bool swap_channels();
 
 		///
-		Buffer to_buffer(ImageType);
+		Buffer to_buffer(ImageType) const;
 
 	private:
 		ImageFormat _format;
