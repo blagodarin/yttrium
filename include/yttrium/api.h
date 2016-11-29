@@ -5,13 +5,13 @@
 #define _include_yttrium_api_h_
 
 /// \def Y_EXPORT
-/// \brief Shared library exported declaration specifier.
+/// \brief Exported API specifier.
 
 /// \def Y_IMPORT
-/// \brief Shared library imported declaration specifier.
+/// \brief Imported API specifier.
 
 /// \def Y_PRIVATE
-/// \brief Shared library private declaration specifier.
+/// \brief Prevents a declaration from being exported as a part of API.
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	#define Y_EXPORT __declspec(dllexport)
@@ -22,7 +22,7 @@
 	#define Y_IMPORT
 	#define Y_PRIVATE __attribute__((visibility("hidden")))
 #else
-	#define Y_EXPORT
+	#error
 #endif
 
 /// \def Y_API
@@ -33,10 +33,5 @@
 #else
 	#define Y_API Y_IMPORT
 #endif
-
-/// %Yttrium namespace.
-namespace Yttrium
-{
-}
 
 #endif
