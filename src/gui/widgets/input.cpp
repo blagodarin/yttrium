@@ -70,18 +70,16 @@ namespace Yttrium
 		if (is_focused() && capture.has_cursor && (millisecond_clock() - _cursor_mark) % 1000 < 500)
 		{
 			// TODO: Force a cursor symbol to be included in every font.
-			renderer.set_color(_foreground.color);
 			PushTexture push_texture(renderer, nullptr);
-			renderer.draw_rect(capture.cursor_rect);
+			renderer.draw_rect(capture.cursor_rect, _foreground.color);
 		}
 
 		if (capture.has_selection)
 		{
 			auto selection_color = _foreground.color;
 			selection_color.a *= .25f;
-			renderer.set_color(selection_color);
 			PushTexture push_texture(renderer, nullptr);
-			renderer.draw_rect(capture.selection_rect);
+			renderer.draw_rect(capture.selection_rect, selection_color);
 		}
 	}
 }

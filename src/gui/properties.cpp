@@ -52,10 +52,9 @@ namespace Yttrium
 {
 	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 	{
-		renderer.set_color(color);
 		PushTexture push_texture(renderer, texture.get(), texture_filter);
 		renderer.set_texture_rect(texture_rect, borders);
-		renderer.draw_rect(rect);
+		renderer.draw_rect(rect, color);
 	}
 
 	bool BackgroundProperty::load(const GuiPropertyLoader& loader)
@@ -88,8 +87,7 @@ namespace Yttrium
 	void ForegroundProperty::draw(Renderer& renderer) const
 	{
 		PushTexture push_texture(renderer, font_texture.get(), Texture2D::TrilinearFilter);
-		renderer.set_color(color);
-		renderer.draw_rects(geometry);
+		renderer.draw_rects(geometry, color);
 	}
 
 	bool ForegroundProperty::load(const GuiPropertyLoader& loader)

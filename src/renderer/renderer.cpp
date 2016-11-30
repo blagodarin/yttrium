@@ -113,17 +113,17 @@ namespace Yttrium
 		debug.draw_text(0, top, text.mid(line_begin));
 	}
 
-	void RendererImpl::draw_rect(const RectF& rect)
+	void RendererImpl::draw_rect(const RectF& rect, const Vector4& color)
 	{
-		draw_rect(rect, _texture_rect, _texture_borders);
+		draw_rect(rect, color, _texture_rect, _texture_borders);
 	}
 
-	void RendererImpl::draw_rects(const StdVector<TexturedRect>& rects)
+	void RendererImpl::draw_rects(const StdVector<TexturedRect>& rects, const Vector4& color)
 	{
 		const auto& texture_size = SizeF(current_texture_2d()->size());
 		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
 		for (const auto& rect : rects)
-			draw_rect(rect.geometry, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
+			draw_rect(rect.geometry, color, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
 	Matrix4 RendererImpl::current_projection() const
@@ -139,11 +139,6 @@ namespace Yttrium
 		assert(!_matrix_stack.empty());
 		assert(_matrix_stack.back().second == MatrixType::Transformation);
 		return _matrix_stack.back().first;
-	}
-
-	void RendererImpl::set_color(const Vector4& color)
-	{
-		_color = color;
 	}
 
 	void RendererImpl::set_texture_rect(const RectF& rect, const Margins& borders)
@@ -174,9 +169,9 @@ namespace Yttrium
 		return _debug_texture.get();
 	}
 
-	void RendererImpl::draw_rect(const RectF& position, const RectF& texture)
+	void RendererImpl::draw_rect(const RectF& position, const Vector4& color, const RectF& texture)
 	{
-		draw_rect(position, texture, {});
+		draw_rect(position, color, texture, {});
 	}
 
 	void RendererImpl::forget_program(const GpuProgram* program)
@@ -369,7 +364,7 @@ namespace Yttrium
 		}
 	}
 
-	void RendererImpl::draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders)
+	void RendererImpl::draw_rect(const RectF& position, const Vector4& color, const RectF& texture, const MarginsF& borders)
 	{
 		BufferAppender<Vertex2D> vertices(_vertices_2d);
 		BufferAppender<uint16_t> indices(_indices_2d);
@@ -384,7 +379,7 @@ namespace Yttrium
 		}
 
 		Vertex2D vertex;
-		vertex.color = _color;
+		vertex.color = color;
 
 		float left_offset = 0;
 		float right_offset = 0;

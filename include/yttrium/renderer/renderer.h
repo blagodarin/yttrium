@@ -4,6 +4,7 @@
 #ifndef _include_yttrium_renderer_renderer_h_
 #define _include_yttrium_renderer_renderer_h_
 
+#include <yttrium/math/vector.h>
 #include <yttrium/std/vector.h>
 
 namespace Yttrium
@@ -16,13 +17,11 @@ namespace Yttrium
 	class Matrix4;
 	class RectF;
 	template <typename> class ResourcePtr;
-	class Size;
 	class StaticString;
 	class Texture2D;
 	class TexturedRect;
 	template <typename> class UniquePtr;
 	enum class VA;
-	class Vector4;
 	class VertexBuffer;
 
 	///
@@ -55,16 +54,13 @@ namespace Yttrium
 		virtual void draw_debug_text(const StaticString&) = 0;
 
 		///
-		virtual void draw_rect(const RectF&) = 0;
+		virtual void draw_rect(const RectF&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
 
 		///
-		virtual void draw_rects(const StdVector<TexturedRect>&) = 0;
+		virtual void draw_rects(const StdVector<TexturedRect>&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;
-
-		///
-		virtual void set_color(const Vector4&) = 0;
 
 		///
 		virtual void set_texture_rect(const RectF&, const Margins&) = 0;
