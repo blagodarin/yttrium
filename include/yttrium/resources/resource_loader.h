@@ -30,6 +30,11 @@ namespace Yttrium
 		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr, Allocator& = *DefaultAllocator);
 
 		///
+		~ResourceLoader();
+
+		/// Loads a resource by name (if it isn't already loaded) and returns a pointer to the loaded resource.
+		/// Throws ResourceError if there is no such resource.
+		/// Throws DataError if the resource can't be loaded.
 		ResourcePtr<const IonDocument> load_ion(const StaticString& name);
 		ResourcePtr<const Music> load_music(const StaticString& name);
 		ResourcePtr<const Sound> load_sound(const StaticString& name);
@@ -39,8 +44,6 @@ namespace Yttrium
 
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();
-
-		~ResourceLoader();
 
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;

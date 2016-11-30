@@ -95,6 +95,8 @@ namespace Yttrium
 	{
 	}
 
+	ResourceLoader::~ResourceLoader() = default;
+
 	ResourcePtr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
 	{
 		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
@@ -163,11 +165,10 @@ namespace Yttrium
 	void ResourceLoader::release_unused()
 	{
 		_private->_ion_document_cache.release_unused();
+		_private->_music_cache.release_unused();
 		_private->_sound_cache.release_unused();
 		_private->_texture_2d_cache.release_unused();
 		_private->_texture_font_cache.release_unused();
 		_private->_translation_cache.release_unused();
 	}
-
-	ResourceLoader::~ResourceLoader() = default;
 }
