@@ -79,16 +79,13 @@ namespace Yttrium
 		Window(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
 
 		///
+		~Window();
+
+		///
 		void close();
 
 		///
 		Point cursor() const;
-
-		///
-		bool is_cursor_locked() const;
-
-		///
-		bool is_shift_pressed() const;
 
 		///
 		void lock_cursor(bool lock);
@@ -110,8 +107,6 @@ namespace Yttrium
 
 		/// Requests a screenshot to be taken.
 		void take_screenshot();
-
-		~Window();
 
 	private:
 		const std::unique_ptr<class WindowPrivate> _private;

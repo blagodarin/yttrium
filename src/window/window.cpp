@@ -140,6 +140,8 @@ namespace Yttrium
 	{
 	}
 
+	Window::~Window() = default;
+
 	void Window::close()
 	{
 		_private->_backend.close();
@@ -148,16 +150,6 @@ namespace Yttrium
 	Point Window::cursor() const
 	{
 		return _private->_cursor;
-	}
-
-	bool Window::is_cursor_locked() const
-	{
-		return _private->_is_cursor_locked;
-	}
-
-	bool Window::is_shift_pressed() const
-	{
-		return _private->_keys[KeyType(Key::LShift)] || _private->_keys[KeyType(Key::RShift)];
 	}
 
 	void Window::lock_cursor(bool lock)
@@ -238,6 +230,4 @@ namespace Yttrium
 	{
 		_private->_take_screenshot = true;
 	}
-
-	Window::~Window() = default;
 }
