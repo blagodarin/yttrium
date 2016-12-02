@@ -6,6 +6,7 @@
 #include <yttrium/utils.h>
 #include "../system/file.h"
 
+#include <algorithm>
 #include <cstring>
 #include <limits>
 
@@ -161,6 +162,7 @@ namespace Yttrium
 
 		string.clear();
 
+		// TODO: Copy string data if reading from memory.
 		for (size_t offset = 0, bytes_read = 0; ; offset += bytes_read)
 		{
 			string.resize(offset + buffer_step);
@@ -204,6 +206,34 @@ namespace Yttrium
 		}
 
 		return true;
+	}
+
+	bool Reader::read_line(std::string& string)
+	{
+		if (!_private)
+			return false;
+		constexpr size_t buffer_size = 32;
+		std::array<char, buffer_size + 1> buffer;
+		string.clear();
+		for (;;)
+		{
+			const auto bytes_read = read_at(_private->_offset + string.size(), buffer.data(), buffer_size);
+			const auto data_end = buffer.begin() + bytes_read;
+			const auto text_end = std::find_if(buffer.begin(), data_end, [](char c){ return c == '\r' || c == '\n'; });
+			string.append(buffer.begin(), text_end);
+			if (text_end < data_end)
+			{
+				_private->_offset += string.size() + (*text_end == '\r'
+					&& (text_end + 1 < data_end || read_at(_private->_offset + string.size() + 1, &buffer[buffer_size], 1))
+					&& *(text_end + 1) == '\n' ? 2 : 1);
+				return true;
+			}
+			if (bytes_read < buffer.size())
+			{
+				_private->_offset += string.size();
+				return !string.empty();
+			}
+		}
 	}
 
 	bool Reader::seek(uint64_t offset)

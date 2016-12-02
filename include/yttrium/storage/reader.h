@@ -70,7 +70,10 @@ namespace Yttrium
 		bool read_at(uint64_t offset, T& data) const { return read_at(offset, &data, sizeof data) == sizeof data; }
 
 		///
-		bool read_line(String& string);
+		bool read_line(String&);
+
+		///
+		bool read_line(std::string&);
 
 		/// Sets the current offset.
 		bool seek(uint64_t offset);

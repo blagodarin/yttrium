@@ -109,6 +109,65 @@ BOOST_AUTO_TEST_CASE(test_reader_read_all_string)
 	BOOST_CHECK(!::memcmp(actual.text(), expected.data(), expected.size()));
 }
 
+BOOST_AUTO_TEST_CASE(test_reader_read_line_std_string)
+{
+	{
+		const std::string data = "hello\nworld";
+		Reader reader(data.data(), data.size());
+		std::string line;
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "hello");
+		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "world");
+		BOOST_CHECK_EQUAL(reader.offset(), 11);
+		BOOST_CHECK(!reader.read_line(line));
+		BOOST_CHECK(line.empty());
+	}
+	{
+		const std::string data = "hello\rworld";
+		Reader reader(data.data(), data.size());
+		std::string line;
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "hello");
+		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "world");
+		BOOST_CHECK_EQUAL(reader.offset(), 11);
+		BOOST_CHECK(!reader.read_line(line));
+		BOOST_CHECK(line.empty());
+	}
+	{
+		const std::string data = "hello\r\nworld";
+		Reader reader(data.data(), data.size());
+		std::string line;
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "hello");
+		BOOST_REQUIRE_EQUAL(reader.offset(), 7);
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "world");
+		BOOST_CHECK_EQUAL(reader.offset(), 12);
+		BOOST_CHECK(!reader.read_line(line));
+		BOOST_CHECK(line.empty());
+	}
+	{
+		const std::string data = "hello\n\rworld";
+		Reader reader(data.data(), data.size());
+		std::string line;
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "hello");
+		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK(line.empty());
+		BOOST_REQUIRE_EQUAL(reader.offset(), 7);
+		BOOST_REQUIRE(reader.read_line(line));
+		BOOST_CHECK_EQUAL(line, "world");
+		BOOST_CHECK_EQUAL(reader.offset(), 12);
+		BOOST_CHECK(!reader.read_line(line));
+		BOOST_CHECK(line.empty());
+	}
+}
+
 BOOST_AUTO_TEST_CASE(test_reader_to_buffer)
 {
 	const auto expected = ::make_random_buffer(997);
