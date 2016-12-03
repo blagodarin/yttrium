@@ -1,5 +1,6 @@
 #include "model.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/image.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/vector.h>
@@ -12,8 +13,55 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
-#include <array>
+#include <regex>
 #include <vector>
+
+namespace
+{
+	const std::regex _obj_empty_regex(R"(\s*(?:#.*)?)", std::regex::optimize);
+	const std::regex _obj_face_regex(R"(\s*f\s+([1-9]\d*)\s+([1-9]\d*)\s+([1-9]\d*)\s*)", std::regex::optimize);
+	const std::regex _obj_vertex_regex(R"(\s*v\s+([+-]?\d+\.\d+)\s+([+-]?\d+\.\d+)\s+([+-]?\d+\.\d+)\s*)", std::regex::optimize);
+
+	void load_obj_mesh(const StaticString& path, Renderer& renderer,
+		UniquePtr<VertexBuffer>& vertex_buffer, UniquePtr<IndexBuffer>& index_buffer)
+	{
+		Reader reader(path);
+		if (!reader)
+			throw DataError("Bad OBJ \"", path, "\"");
+
+		std::vector<Vector4> vertices;
+		std::vector<uint16_t> indices;
+
+		std::string line;
+		size_t line_number = 0;
+		while (reader.read_line(line))
+		{
+			++line_number;
+			if (std::regex_match(line, _obj_empty_regex))
+				continue;
+
+			std::smatch match;
+			if (std::regex_match(line, match, _obj_vertex_regex))
+				vertices.emplace_back(std::stod(match[1]), std::stod(match[2]), std::stod(match[3]));
+			else if (std::regex_match(line, match, _obj_face_regex))
+			{
+				const auto a = std::stoul(match[1]) - 1;
+				const auto b = std::stoul(match[2]) - 1;
+				const auto c = std::stoul(match[3]) - 1;
+				if (a >= vertices.size() || b >= vertices.size() || c >= vertices.size())
+					throw DataError("Bad OBJ face (", path, ":", line_number, ")");
+				indices.emplace_back(a);
+				indices.emplace_back(b);
+				indices.emplace_back(c);
+			}
+			else
+				throw DataError("Bad OBJ entry (", path, ":", line_number, ")");
+		}
+
+		vertex_buffer = renderer.create_vertex_buffer({ VA::f4 }, vertices.size(), vertices.data());
+		index_buffer = renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data());
+	}
+}
 
 Model::Model(Renderer& renderer)
 	: _renderer(renderer)
@@ -35,61 +83,7 @@ void Model::draw(const Vector4& translation)
 CubeModel::CubeModel(Renderer& renderer)
 	: Model(renderer)
 {
-	struct Vertex
-	{
-		Vector4 position;
-		Vector4 color;
-
-		Vertex(const Vector4& position, const Vector4& color)
-			: position(position)
-			, color(color)
-		{
-		}
-	};
-
-	const std::array<Vertex, 8> vertices =
-	{
-		Vertex({-0.5, -0.5, -0.5}, {0, 0, 0}),
-		Vertex({+0.5, -0.5, -0.5}, {0, 0, 1}),
-		Vertex({-0.5, +0.5, -0.5}, {0, 1, 0}),
-		Vertex({+0.5, +0.5, -0.5}, {0, 1, 1}),
-		Vertex({-0.5, -0.5, +0.5}, {1, 0, 0}),
-		Vertex({+0.5, -0.5, +0.5}, {1, 0, 1}),
-		Vertex({-0.5, +0.5, +0.5}, {1, 1, 0}),
-		Vertex({+0.5, +0.5, +0.5}, {1, 1, 1}),
-	};
-
-	_vertices = _renderer.create_vertex_buffer({VA::f4, VA::f4}, vertices.size(), vertices.data());
-
-	const std::array<uint16_t, 36> indices =
-	{
-		// Bottom.
-		0, 2, 1,
-		1, 2, 3,
-
-		// Front.
-		0, 1, 4,
-		4, 1, 5,
-
-		// Top.
-		4, 5, 6,
-		6, 5, 7,
-
-		// Back.
-		2, 6, 3,
-		3, 6, 7,
-
-		// Right.
-		5, 1, 7,
-		7, 1, 3,
-
-		// Left.
-		2, 0, 6,
-		6, 0, 4,
-	};
-
-	_indices = _renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data());
-
+	::load_obj_mesh("examples/3d/data/cube.obj", _renderer, _vertices, _indices);
 	_program = _renderer.create_gpu_program(
 		Reader("examples/3d/data/cube_vs.glsl").to_string(),
 		Reader("examples/3d/data/cube_fs.glsl").to_string());
