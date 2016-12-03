@@ -23,7 +23,9 @@ void Model::draw(const Vector4& translation)
 {
 	PushGpuProgram push_gpu_program(_renderer, _program.get());
 	PushTexture push_texture(_renderer, _texture.get(), static_cast<Texture2D::Filter>(Texture2D::NearestFilter | Texture2D::AnisotropicFilter));
-	PushTransformation push_transformation(_renderer, Matrix4::translation(translation));
+	const auto transformation = Matrix4::translation(translation);
+	PushTransformation push_transformation(_renderer, transformation);
+	_program->set_uniform("u_model", transformation);
 	_program->set_uniform("u_modelview", _renderer.current_transformation());
 	_program->set_uniform("u_projection", _renderer.current_projection());
 	_renderer.draw_triangles(*_vertices, *_indices);
