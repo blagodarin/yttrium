@@ -49,6 +49,9 @@ namespace Yttrium
 		static Matrix4 rotation(float angle, const Vector4& axis);
 
 		///
+		static Matrix4 scaling(float scale);
+
+		///
 		static Matrix4 translation(const Vector4& point);
 
 	private:

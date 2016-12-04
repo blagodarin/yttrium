@@ -31,8 +31,8 @@ private:
 	CubeModel _cube{ _window.renderer() };
 	ChessboardModel _chessboard{ _window.renderer() };
 
-	Vector4 _position{ -16, -16, 16 };
-	Euler _rotation{ 45, -30, 0 };
+	Vector4 _position{ 16, 16, 16 };
+	Euler _rotation{ -135, -30, 0 };
 
 	bool _move_forward = false;
 	bool _move_backward = false;

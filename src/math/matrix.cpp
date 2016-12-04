@@ -95,6 +95,17 @@ namespace Yttrium
 			0,                             0,                             0,                             1);
 	}
 
+	Matrix4 Matrix4::scaling(float scale)
+	{
+		return Matrix4
+		(
+			scale, 0,     0,     0,
+			0,     scale, 0,     0,
+			0,     0,     scale, 0,
+			0,     0,     0,     1
+		);
+	}
+
 	Matrix4 Matrix4::translation(const Vector4& point)
 	{
 		return Matrix4
