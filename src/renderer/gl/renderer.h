@@ -16,10 +16,12 @@ namespace Yttrium
 		UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t, const void*) override;
 		ResourcePtr<Texture2D> create_texture_2d(const ImageFormat&, const void*, bool no_mipmaps) override;
 		UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t, const void*) override;
+		void draw_mesh(const Mesh&) override;
 		void draw_triangles(const VertexBuffer&, const IndexBuffer&) override;
 
 		// RendererImpl
 		void clear() override;
+		ResourcePtr<Mesh> create_mesh(const std::vector<VA>&, const Buffer&, const std::vector<uint32_t>&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
 		Image take_screenshot() const override;
 		void flush_2d_impl(const Buffer&, const Buffer&) override;

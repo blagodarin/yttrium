@@ -45,10 +45,12 @@ namespace Yttrium
 		void draw_debug_text(const StaticString&) override;
 		void draw_rect(const RectF&, const Vector4&) override;
 		void draw_rects(const StdVector<TexturedRect>&, const Vector4&) override;
+		ResourcePtr<Mesh> load_mesh(Reader&&) override;
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
+		virtual ResourcePtr<Mesh> create_mesh(const std::vector<VA>& vertex_format, const Buffer& vertex_data, const std::vector<uint32_t>& indices) = 0;
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual Image take_screenshot() const = 0;
 

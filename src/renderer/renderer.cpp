@@ -94,6 +94,21 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
+	Matrix4 RendererImpl::current_projection() const
+	{
+		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
+			[](const auto& matrix) { return matrix.second == MatrixType::Projection; });
+		assert(last_projection != _matrix_stack.rend());
+		return last_projection->first;
+	}
+
+	Matrix4 RendererImpl::current_transformation() const
+	{
+		assert(!_matrix_stack.empty());
+		assert(_matrix_stack.back().second == MatrixType::Transformation);
+		return _matrix_stack.back().first;
+	}
+
 	void RendererImpl::draw_debug_text(const StaticString& text)
 	{
 		if (text.is_empty())
@@ -126,19 +141,9 @@ namespace Yttrium
 			draw_rect(rect.geometry, color, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
-	Matrix4 RendererImpl::current_projection() const
+	ResourcePtr<Mesh> RendererImpl::load_mesh(Reader&&)
 	{
-		const auto last_projection = std::find_if(_matrix_stack.rbegin(), _matrix_stack.rend(),
-			[](const auto& matrix) { return matrix.second == MatrixType::Projection; });
-		assert(last_projection != _matrix_stack.rend());
-		return last_projection->first;
-	}
-
-	Matrix4 RendererImpl::current_transformation() const
-	{
-		assert(!_matrix_stack.empty());
-		assert(_matrix_stack.back().second == MatrixType::Transformation);
-		return _matrix_stack.back().first;
+		return nullptr; // TODO: Implement.
 	}
 
 	void RendererImpl::set_texture_rect(const RectF& rect, const Margins& borders)

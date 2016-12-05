@@ -15,6 +15,8 @@ namespace Yttrium
 	enum class IndexFormat;
 	class Margins;
 	class Matrix4;
+	class Mesh;
+	class Reader;
 	class RectF;
 	template <typename> class ResourcePtr;
 	class StaticString;
@@ -54,6 +56,9 @@ namespace Yttrium
 		virtual void draw_debug_text(const StaticString&) = 0;
 
 		///
+		virtual void draw_mesh(const Mesh&) = 0;
+
+		///
 		virtual void draw_rect(const RectF&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
 
 		///
@@ -61,6 +66,9 @@ namespace Yttrium
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;
+
+		///
+		virtual ResourcePtr<Mesh> load_mesh(Reader&&) = 0;
 
 		///
 		virtual void set_texture_rect(const RectF&, const Margins&) = 0;
