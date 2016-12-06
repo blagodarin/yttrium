@@ -3,14 +3,13 @@
 #include <yttrium/log.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/utils.h>
+#include "../mesh_data.h"
 #include "buffer.h"
 #include "gpu_program.h"
 #include "mesh.h"
 #include "texture.h"
 
-#include <algorithm>
 #include <cassert>
-#include <limits>
 
 #ifndef NDEBUG
 	#include <csignal>
@@ -227,16 +226,16 @@ namespace Yttrium
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	ResourcePtr<Mesh> GlRenderer::create_mesh(const std::vector<VA>& vertex_format, const Buffer& vertex_data, const std::vector<uint32_t>& indices)
+	ResourcePtr<Mesh> GlRenderer::create_mesh(const MeshData& data)
 	{
-		assert(!vertex_format.empty());
-		assert(vertex_data.size() > 0);
-		assert(!indices.empty());
+		assert(!data._vertex_format.empty());
+		assert(data._vertex_data.size() > 0);
+		assert(!data._indices.empty());
 
 		GlVertexArrayHandle vertex_array(_gl);
 		GLuint index = 0;
 		size_t offset = 0;
-		for (const auto type : vertex_format)
+		for (const auto type : data._vertex_format)
 		{
 			vertex_array.vertex_attrib_binding(index, 0);
 			switch (type)
@@ -262,24 +261,23 @@ namespace Yttrium
 		}
 
 		GlBufferHandle vertex_buffer(_gl, GL_ARRAY_BUFFER);
-		vertex_buffer.initialize(GL_STATIC_DRAW, vertex_data.size(), vertex_data.data());
+		vertex_buffer.initialize(GL_STATIC_DRAW, data._vertex_data.size(), data._vertex_data.data());
 		vertex_array.bind_vertex_buffer(0, vertex_buffer.get(), 0, offset);
 
 		GlBufferHandle index_buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
 		GLenum index_format = GL_UNSIGNED_INT;
-		if (indices.end() == std::find_if(indices.begin(), indices.end(), [](auto index){ return index > std::numeric_limits<uint16_t>::max(); }))
 		{
-			// TODO: Move format conversion to backend-independent code.
-			std::vector<uint16_t> uint16_indices;
-			uint16_indices.reserve(indices.size());
-			std::copy(indices.begin(), indices.end(), std::back_inserter(uint16_indices));
-			index_buffer.initialize(GL_STATIC_DRAW, indices.size() * sizeof(uint16_t), uint16_indices.data());
-			index_format = GL_UNSIGNED_SHORT;
+			Buffer index_data;
+			if (data.make_uint16_indices(index_data))
+			{
+				index_buffer.initialize(GL_STATIC_DRAW, index_data.size(), index_data.data());
+				index_format = GL_UNSIGNED_SHORT;
+			}
+			else
+				index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
 		}
-		else
-			index_buffer.initialize(GL_STATIC_DRAW, indices.size() * sizeof(uint32_t), indices.data());
 
-		return make_resource<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), indices.size(), index_format);
+		return make_resource<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
 	}
 
 	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const

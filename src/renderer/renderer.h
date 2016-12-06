@@ -20,6 +20,7 @@ namespace Yttrium
 	class BackendTexture2D;
 	class Image;
 	enum class ImageOrientation;
+	class MeshData;
 	class WindowBackend;
 
 	class RendererImpl : public Renderer
@@ -50,7 +51,7 @@ namespace Yttrium
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
-		virtual ResourcePtr<Mesh> create_mesh(const std::vector<VA>& vertex_format, const Buffer& vertex_data, const std::vector<uint32_t>& indices) = 0;
+		virtual ResourcePtr<Mesh> create_mesh(const MeshData&) = 0;
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual Image take_screenshot() const = 0;
 

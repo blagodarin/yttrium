@@ -21,7 +21,7 @@ namespace Yttrium
 
 		// RendererImpl
 		void clear() override;
-		ResourcePtr<Mesh> create_mesh(const std::vector<VA>&, const Buffer&, const std::vector<uint32_t>&) override;
+		ResourcePtr<Mesh> create_mesh(const MeshData&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
 		Image take_screenshot() const override;
 		void flush_2d_impl(const Buffer&, const Buffer&) override;
