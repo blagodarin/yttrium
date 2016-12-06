@@ -7,11 +7,10 @@
 namespace Yttrium
 {
 	class GpuProgram;
-	class IndexBuffer;
+	class Mesh;
 	class Renderer;
 	class Texture2D;
 	class Vector4;
-	class VertexBuffer;
 }
 
 using namespace Yttrium;
@@ -26,8 +25,7 @@ public:
 
 protected:
 	Renderer& _renderer;
-	UniquePtr<VertexBuffer> _vertices;
-	UniquePtr<IndexBuffer> _indices;
+	ResourcePtr<Mesh> _mesh;
 	ResourcePtr<Texture2D> _texture;
 	UniquePtr<GpuProgram> _program;
 };

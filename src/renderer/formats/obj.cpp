@@ -8,6 +8,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>
 #include <yttrium/storage/reader.h>
+#include "../mesh_data.h"
 
 #include <regex>
 
@@ -16,6 +17,8 @@
 
 namespace
 {
+	using namespace Yttrium;
+
 	const std::string _float = R"(\s+([+-]?\d+(?:\.\d+)))";
 	const std::string _index = R"(\s+(\S+))";
 
@@ -33,7 +36,7 @@ namespace
 	class ObjState
 	{
 	public:
-		bool process_line(const std::string& line)
+		bool process_line(const std::string& line, MeshData& data)
 		{
 			std::smatch match;
 			if (std::regex_match(line, match, _obj_v_regex))
@@ -47,7 +50,7 @@ namespace
 				for (int i = 1; i <= 3; ++i)
 				{
 					const auto index = make_index(match[i]);
-					if (!index || !process_index(*index))
+					if (!index || !process_index(*index, data))
 						return false;
 				}
 			}
@@ -56,27 +59,25 @@ namespace
 			return true;
 		}
 
-		bool create_buffers(Renderer& renderer, UniquePtr<VertexBuffer>& vertex_buffer, UniquePtr<IndexBuffer>& index_buffer)
+		bool finalize(MeshData& data)
 		{
 			switch (_face_format)
 			{
 			case FaceFormat::v:
-				vertex_buffer = renderer.create_vertex_buffer({ VA::f4 }, _vertex_data.size() / (4 * sizeof(float)), _vertex_data.data());
-				break;
+				data._vertex_format = { VA::f4 };
+				return true;
 			case FaceFormat::vt:
-				vertex_buffer = renderer.create_vertex_buffer({ VA::f4, VA::f2 }, _vertex_data.size() / (6 * sizeof(float)), _vertex_data.data());
-				break;
+				data._vertex_format = { VA::f4, VA::f2 };
+				return true;
 			case FaceFormat::vn:
-				vertex_buffer = renderer.create_vertex_buffer({ VA::f4, VA::f4 }, _vertex_data.size() / (8 * sizeof(float)), _vertex_data.data());
-				break;
+				data._vertex_format = { VA::f4, VA::f4 };
+				return true;
 			case FaceFormat::vtn:
-				vertex_buffer = renderer.create_vertex_buffer({ VA::f4, VA::f2, VA::f4 }, _vertex_data.size() / (10 * sizeof(float)), _vertex_data.data());
-				break;
+				data._vertex_format = { VA::f4, VA::f2, VA::f4 };
+				return true;
 			default:
 				return false;
 			}
-			index_buffer = renderer.create_index_buffer(IndexFormat::U16, _index_data.size(), _index_data.data());
-			return true;
 		}
 
 	private:
@@ -135,7 +136,7 @@ namespace
 			return {};
 		}
 
-		bool process_index(const std::tuple<int, int, int>& index)
+		bool process_index(const std::tuple<int, int, int>& index, MeshData& data)
 		{
 			const auto index_v = std::get<0>(index);
 			const auto index_t = std::get<1>(index);
@@ -149,18 +150,18 @@ namespace
 			const auto i = std::find(_indices.cbegin(), _indices.cend(), index);
 			if (i != _indices.cend())
 			{
-				_index_data.emplace_back(i - _indices.cbegin());
+				data._indices.emplace_back(i - _indices.cbegin());
 				return true;
 			}
 
-			BufferAppender<float> appender(_vertex_data);
+			BufferAppender<float> appender(data._vertex_data);
 			appender << _vertices[index_v].x << _vertices[index_v].y << _vertices[index_v].z << _vertices[index_v].w;
 			if (index_t >= 0)
 				appender << _texcoords[index_t].x << _texcoords[index_t].y;
 			if (index_n >= 0)
 				appender << _normals[index_n].x << _normals[index_n].y << _normals[index_n].z << _normals[index_n].w;
 
-			_index_data.emplace_back(_indices.size());
+			data._indices.emplace_back(_indices.size());
 			_indices.emplace_back(index);
 			return true;
 		}
@@ -171,25 +172,28 @@ namespace
 		std::vector<Vector2> _texcoords;
 		std::vector<Vector4> _normals;
 		std::vector<std::tuple<int, int, int>> _indices;
-		Buffer _vertex_data;
-		std::vector<uint16_t> _index_data;
 	};
 }
 
-void load_obj_mesh(Reader&& reader, Renderer& renderer, UniquePtr<VertexBuffer>& vertex_buffer, UniquePtr<IndexBuffer>& index_buffer)
+namespace Yttrium
 {
-	std::string line;
-	size_t line_number = 0;
-	ObjState state;
-	while (reader.read_line(line))
+	MeshData load_obj_mesh(Reader&& reader)
 	{
-		++line_number;
-		if (std::regex_match(line, _obj_empty_regex))
-			continue;
-		boost::algorithm::trim(line);
-		if (!state.process_line(line))
-			throw DataError("OBJ processing error (", reader.name(), ":", line_number, ")");
+		MeshData result;
+		std::string line;
+		size_t line_number = 0;
+		ObjState state;
+		while (reader.read_line(line))
+		{
+			++line_number;
+			if (std::regex_match(line, _obj_empty_regex))
+				continue;
+			boost::algorithm::trim(line);
+			if (!state.process_line(line, result))
+				throw DataError("OBJ processing error (", reader.name(), ":", line_number, ")");
+		}
+		if (!state.finalize(result))
+			throw DataError("Bad OBJ");
+		return result;
 	}
-	if (!state.create_buffers(renderer, vertex_buffer, index_buffer))
-		throw DataError("Bad OBJ");
 }

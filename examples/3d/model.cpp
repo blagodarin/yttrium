@@ -4,13 +4,13 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/index_buffer.h>
+#include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/vertex_buffer.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
-#include "obj.h"
 
 Model::Model(Renderer& renderer)
 	: _renderer(renderer)
@@ -28,13 +28,13 @@ void Model::draw(const Vector4& translation)
 	_program->set_uniform("u_model", transformation);
 	_program->set_uniform("u_modelview", _renderer.current_transformation());
 	_program->set_uniform("u_projection", _renderer.current_projection());
-	_renderer.draw_triangles(*_vertices, *_indices);
+	_renderer.draw_mesh(*_mesh);
 }
 
 CubeModel::CubeModel(Renderer& renderer)
 	: Model(renderer)
 {
-	::load_obj_mesh(Reader("examples/3d/data/cube.obj"), _renderer, _vertices, _indices);
+	_mesh = _renderer.load_mesh(Reader("examples/3d/data/cube.obj"));
 	_program = _renderer.create_gpu_program(
 		Reader("examples/3d/data/cube_vs.glsl").to_string(),
 		Reader("examples/3d/data/cube_fs.glsl").to_string());
@@ -43,7 +43,7 @@ CubeModel::CubeModel(Renderer& renderer)
 ChessboardModel::ChessboardModel(Renderer& renderer)
 	: Model(renderer)
 {
-	::load_obj_mesh(Reader("examples/3d/data/chessboard.obj"), _renderer, _vertices, _indices);
+	_mesh = _renderer.load_mesh(Reader("examples/3d/data/chessboard.obj"));
 
 	const int size = 128;
 

@@ -65,6 +65,7 @@ add_library(yttrium
 	memory/pool.cpp
 	renderer/debug_renderer.cpp
 	renderer/debug_texture.cpp
+	renderer/formats/obj.cpp
 	renderer/gl/buffer.cpp
 	renderer/gl/gl.cpp
 	renderer/gl/gpu_program.cpp

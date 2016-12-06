@@ -7,6 +7,8 @@
 #include <yttrium/renderer/textured_rect.h>
 #include "debug_renderer.h"
 #include "debug_texture.h"
+#include "formats/obj.h"
+#include "mesh_data.h"
 #include "gl/renderer.h"
 #include "texture.h"
 
@@ -141,9 +143,9 @@ namespace Yttrium
 			draw_rect(rect.geometry, color, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
-	ResourcePtr<Mesh> RendererImpl::load_mesh(Reader&&)
+	ResourcePtr<Mesh> RendererImpl::load_mesh(Reader&& reader)
 	{
-		return nullptr; // TODO: Implement.
+		return create_mesh(load_obj_mesh(std::move(reader)));
 	}
 
 	void RendererImpl::set_texture_rect(const RectF& rect, const Margins& borders)

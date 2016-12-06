@@ -20,5 +20,6 @@
 		- Unicode font support.
 	* Renderer:
 		- OpenGL 3.3 compliance.
+		- Smooth 3D rotation.
 * Tools:
 	- Create textured font builder.
