@@ -9,6 +9,7 @@ namespace Yttrium
 	class GpuProgram;
 	class Mesh;
 	class Renderer;
+	class ResourceLoader;
 	class Texture2D;
 	class Vector4;
 }
@@ -25,7 +26,7 @@ public:
 
 protected:
 	Renderer& _renderer;
-	ResourcePtr<Mesh> _mesh;
+	ResourcePtr<const Mesh> _mesh;
 	ResourcePtr<Texture2D> _texture;
 	UniquePtr<GpuProgram> _program;
 };
@@ -33,13 +34,13 @@ protected:
 class CubeModel : public Model
 {
 public:
-	CubeModel(Renderer&);
+	CubeModel(Renderer&, ResourceLoader&);
 };
 
 class ChessboardModel : public Model
 {
 public:
-	ChessboardModel(Renderer&);
+	ChessboardModel(Renderer&, ResourceLoader&);
 };
 
 #endif

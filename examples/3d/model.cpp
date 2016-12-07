@@ -9,6 +9,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/vertex_buffer.h>
+#include <yttrium/resources/resource_loader.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
@@ -31,19 +32,19 @@ void Model::draw(const Vector4& translation)
 	_renderer.draw_mesh(*_mesh);
 }
 
-CubeModel::CubeModel(Renderer& renderer)
+CubeModel::CubeModel(Renderer& renderer, ResourceLoader& resource_loader)
 	: Model(renderer)
 {
-	_mesh = _renderer.load_mesh(Reader("examples/3d/data/cube.obj"));
+	_mesh = resource_loader.load_mesh("examples/3d/data/cube.obj");
 	_program = _renderer.create_gpu_program(
 		Reader("examples/3d/data/cube_vs.glsl").to_string(),
 		Reader("examples/3d/data/cube_fs.glsl").to_string());
 }
 
-ChessboardModel::ChessboardModel(Renderer& renderer)
+ChessboardModel::ChessboardModel(Renderer& renderer, ResourceLoader& resource_loader)
 	: Model(renderer)
 {
-	_mesh = _renderer.load_mesh(Reader("examples/3d/data/chessboard.obj"));
+	_mesh = resource_loader.load_mesh("examples/3d/data/chessboard.obj");
 
 	const int size = 128;
 

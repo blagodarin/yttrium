@@ -7,6 +7,7 @@
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
+#include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
@@ -83,6 +84,7 @@ namespace Yttrium
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
 		ResourceCache<IonDocument> _ion_document_cache{ _storage, _allocator };
+		ResourceCache<Mesh> _mesh_cache{ _storage, _allocator };
 		ResourceCache<Music> _music_cache{ _storage, _allocator };
 		ResourceCache<Sound> _sound_cache{ _storage, _allocator };
 		ResourceCache<Texture2D> _texture_2d_cache{ _storage, _allocator };
@@ -102,6 +104,16 @@ namespace Yttrium
 		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
 		{
 			return IonDocument::open(reader, _private->_allocator);
+		});
+	}
+
+	ResourcePtr<const Mesh> ResourceLoader::load_mesh(const StaticString& name)
+	{
+		if (!_private->_renderer)
+			return {};
+		return _private->_mesh_cache.fetch(name, [this](Reader&& reader)
+		{
+			return _private->_renderer->load_mesh(std::move(reader));
 		});
 	}
 
@@ -165,6 +177,7 @@ namespace Yttrium
 	void ResourceLoader::release_unused()
 	{
 		_private->_ion_document_cache.release_unused();
+		_private->_mesh_cache.release_unused();
 		_private->_music_cache.release_unused();
 		_private->_sound_cache.release_unused();
 		_private->_texture_2d_cache.release_unused();

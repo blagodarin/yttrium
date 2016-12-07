@@ -4,6 +4,8 @@
 #include <yttrium/math/euler.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/named_allocator.h>
+#include <yttrium/resources/resource_loader.h>
+#include <yttrium/storage/storage.h>
 #include <yttrium/string.h>
 #include <yttrium/window.h>
 
@@ -25,11 +27,13 @@ private:
 
 private:
 	StdVector<NamedAllocatorInfo> _memory_statistics{ *DefaultAllocator };
+	const Storage _storage{ Storage::UseFileSystem::Before };
 	Window _window{ "Yttrium 3D example", *this };
+	ResourceLoader _resource_loader{ _storage, &_window.renderer() };
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024 };
-	CubeModel _cube{ _window.renderer() };
-	ChessboardModel _chessboard{ _window.renderer() };
+	CubeModel _cube{ _window.renderer(), _resource_loader };
+	ChessboardModel _chessboard{ _window.renderer(), _resource_loader };
 
 	Vector4 _position{ 16, 16, 16 };
 	Euler _rotation{ -135, -30, 0 };
