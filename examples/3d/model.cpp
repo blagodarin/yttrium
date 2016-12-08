@@ -68,7 +68,7 @@ ChessboardModel::ChessboardModel(Renderer& renderer, ResourceLoader& resource_lo
 		}
 	}
 
-	_texture = _renderer.create_texture_2d(image.format(), image.data(), false);
+	_texture = _renderer.create_texture_2d(image);
 
 	_program = _renderer.create_gpu_program(
 		Reader("examples/3d/data/chessboard_vs.glsl").to_string(),

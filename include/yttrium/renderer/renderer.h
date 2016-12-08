@@ -10,7 +10,7 @@
 namespace Yttrium
 {
 	class GpuProgram;
-	class ImageFormat;
+	class Image;
 	class IndexBuffer;
 	enum class IndexFormat;
 	class Margins;
@@ -41,7 +41,7 @@ namespace Yttrium
 		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual ResourcePtr<Texture2D> create_texture_2d(const ImageFormat&, const void* data, bool no_mipmaps = false) = 0;
+		virtual ResourcePtr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;
 
 		///
 		virtual UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;

@@ -135,7 +135,7 @@ namespace Yttrium
 		/// Allocate an image for the specified \a format.
 		/// \param format Image format.
 		/// \note The image data is left uninitialized.
-		Image(const ImageFormat&);
+		explicit Image(const ImageFormat&);
 
 		///
 		void* data() noexcept { return _buffer.data(); }

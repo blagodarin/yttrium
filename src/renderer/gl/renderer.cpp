@@ -84,15 +84,16 @@ namespace Yttrium
 		return make_unique<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
 	}
 
-	ResourcePtr<Texture2D> GlRenderer::create_texture_2d(const ImageFormat& format, const void* data, bool no_mipmaps)
+	ResourcePtr<Texture2D> GlRenderer::create_texture_2d(const Image& image, bool no_mipmaps)
 	{
-		if (format.bits_per_channel() != 8)
+		const auto image_format = image.format();
+		if (image_format.bits_per_channel() != 8)
 			return {};
 
 		GLenum internal_format = 0;
 		GLenum data_format = 0;
 		GLenum data_type = 0;
-		switch (format.pixel_format())
+		switch (image_format.pixel_format())
 		{
 		case PixelFormat::Gray:
 			internal_format = GL_LUMINANCE8;
@@ -130,12 +131,12 @@ namespace Yttrium
 		// TODO: Remove deprecated LUMINANCE formats.
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
-		assert(is_power_of_2(format.row_alignment()) && format.row_alignment() <= 8); // OpenGL requirements.
-		_gl.PixelStorei(GL_PACK_ALIGNMENT, format.row_alignment());
-		texture.set_data(0, internal_format, format.width(), format.height(), data_format, data_type, data);
+		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
+		_gl.PixelStorei(GL_PACK_ALIGNMENT, image_format.row_alignment());
+		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, image.data());
 		if (!no_mipmaps)
 			texture.generate_mipmaps();
-		return make_resource<GlTexture2D>(*this, format, !no_mipmaps, std::move(texture));
+		return make_resource<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));
 	}
 
 	UniquePtr<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)

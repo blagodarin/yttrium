@@ -154,7 +154,7 @@ namespace Yttrium
 				return {};
 			if (intensity && image.format().pixel_format() == PixelFormat::Gray)
 				image.intensity_to_bgra(); // TODO: Move this inside the renderer.
-			return _private->_renderer->create_texture_2d(image.format(), image.data());
+			return _private->_renderer->create_texture_2d(image);
 		});
 	}
 

@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 
 namespace Yttrium
 {
@@ -53,6 +54,8 @@ namespace Yttrium
 	{
 		auto renderer = std::make_unique<GlRenderer>(allocator);
 
+		// TODO: Don't copy static texture data.
+
 		static const int32_t white_texture_data = -1;
 
 		ImageFormat white_texture_format;
@@ -60,7 +63,11 @@ namespace Yttrium
 		white_texture_format.set_height(1);
 		white_texture_format.set_orientation(ImageOrientation::XRightYDown);
 		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
-		renderer->_white_texture = renderer->create_texture_2d(white_texture_format, &white_texture_data, false);
+
+		Image white_texture_image(white_texture_format);
+		std::memcpy(white_texture_image.data(), &white_texture_data, white_texture_format.frame_size());
+
+		renderer->_white_texture = renderer->create_texture_2d(white_texture_image, false);
 		if (!renderer->_white_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
@@ -69,7 +76,11 @@ namespace Yttrium
 		debug_texture_format.set_height(DebugTexture::height);
 		debug_texture_format.set_orientation(ImageOrientation::XRightYDown);
 		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
-		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_format, DebugTexture::data, false);
+
+		Image debug_texture_image(debug_texture_format);
+		std::memcpy(debug_texture_image.data(), DebugTexture::data, debug_texture_format.frame_size());
+
+		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_image, false);
 		if (!renderer->_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 

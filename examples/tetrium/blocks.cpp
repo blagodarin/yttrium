@@ -104,7 +104,7 @@ Blocks::Blocks(Renderer& renderer)
 		}
 	}
 
-	_texture = renderer.create_texture_2d(image.format(), image.data());
+	_texture = renderer.create_texture_2d(image);
 }
 
 Blocks::~Blocks() = default;
