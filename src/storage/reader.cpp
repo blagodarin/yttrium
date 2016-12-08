@@ -174,7 +174,7 @@ namespace Yttrium
 			if (!bytes_read)
 			{
 				seek(origin + string.size());
-				return offset; // Return 'false' if we haven't read anything.
+				return offset > 0;
 			}
 
 			const auto r_offset = string.find_first('\r', offset);
