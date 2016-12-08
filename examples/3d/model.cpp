@@ -48,24 +48,27 @@ ChessboardModel::ChessboardModel(Renderer& renderer, ResourceLoader& resource_lo
 
 	const int size = 128;
 
-	ImageFormat image_format;
-	image_format.set_width(size);
-	image_format.set_height(size);
-	image_format.set_orientation(ImageOrientation::XRightYDown);
-	image_format.set_pixel_format(PixelFormat::Bgra, 32);
+	ImageFormat format;
+	format.set_width(size);
+	format.set_height(size);
+	format.set_pixel_format(PixelFormat::Bgra, 32);
+	format.set_orientation(ImageOrientation::XRightYDown);
 
-	std::vector<uint32_t> pixels;
-	pixels.reserve(size * size);
-	for (int y = size - 1; y >= 0; --y) // OpenGL bottom-to-top row order.
+	Image image(format);
+	for (int y = 0; y < size; ++y)
 	{
 		for (int x = 0; x < size; ++x)
 		{
-			const bool black = (x ^ y) & 1;
-			pixels.emplace_back(black ? 0xff000000 : 0xffdddddd);
+			const auto pixel = static_cast<uint8_t*>(image.data()) + y * format.row_size() + x * 4;
+			const auto color = (x ^ y) & 1 ? uint8_t{ 0xdd } : uint8_t{ 0x00 };
+			pixel[0] = color;
+			pixel[1] = color;
+			pixel[2] = color;
+			pixel[3] = 0xff;
 		}
 	}
 
-	_texture = _renderer.create_texture_2d(image_format, pixels.data(), false);
+	_texture = _renderer.create_texture_2d(image.format(), image.data(), false);
 
 	_program = _renderer.create_gpu_program(
 		Reader("examples/3d/data/chessboard_vs.glsl").to_string(),
