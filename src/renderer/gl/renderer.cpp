@@ -93,17 +93,19 @@ namespace Yttrium
 		GLenum internal_format = 0;
 		GLenum data_format = 0;
 		GLenum data_type = 0;
+		auto data = image.data();
+
+		Image temporary;
 		switch (image_format.pixel_format())
 		{
 		case PixelFormat::Gray:
-			internal_format = GL_LUMINANCE8;
-			data_format = GL_LUMINANCE;
-			data_type = GL_UNSIGNED_BYTE;
-			break;
 		case PixelFormat::GrayAlpha:
-			internal_format = GL_LUMINANCE8_ALPHA8;
-			data_format = GL_LUMINANCE_ALPHA;
+		case PixelFormat::AlphaGray:
+			temporary = grayscale_to_bgra(image);
+			internal_format = GL_RGBA8;
+			data_format = GL_BGRA;
 			data_type = GL_UNSIGNED_BYTE;
+			data = temporary.data();
 			break;
 		case PixelFormat::Rgb:
 			internal_format = GL_RGB8;
@@ -128,12 +130,11 @@ namespace Yttrium
 		default:
 			return {};
 		}
-		// TODO: Remove deprecated LUMINANCE formats.
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
 		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
 		_gl.PixelStorei(GL_PACK_ALIGNMENT, image_format.row_alignment());
-		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, image.data());
+		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, data);
 		if (!no_mipmaps)
 			texture.generate_mipmaps();
 		return make_resource<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));

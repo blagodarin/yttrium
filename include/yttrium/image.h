@@ -166,6 +166,9 @@ namespace Yttrium
 		ImageFormat _format;
 		Buffer _buffer;
 	};
+
+	///
+	Image grayscale_to_bgra(const Image&);
 }
 
 #endif

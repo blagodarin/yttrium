@@ -48,6 +48,7 @@ add_library(yttrium
 	image/formats/dds.cpp
 	image/formats/tga.cpp
 	image/image.cpp
+	image/utils.cpp
 	ion/document.cpp
 	ion/list.cpp
 	ion/node.cpp
