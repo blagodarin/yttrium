@@ -63,41 +63,6 @@ namespace Yttrium
 	{
 	}
 
-	bool Image::intensity_to_bgra()
-	{
-		if (_format._pixel_format != PixelFormat::Gray || _format._bits_per_pixel != 8)
-			return false;
-
-		const auto old_row_size = _format._row_size;
-
-		_format._pixel_format = PixelFormat::Bgra;
-		_format._channels = 4;
-		_format._bits_per_pixel = 32;
-		_format._row_alignment = 4;
-		_format._row_size = _format._width * 4;
-
-		Buffer output_buffer(_format.frame_size());
-
-		const auto* src = &_buffer[0];
-		auto* dst = &output_buffer[0];
-
-		for (size_t i = 0; i < _format._height; ++i)
-		{
-			for (size_t j = 0; j < _format._width; ++j)
-			{
-				*dst++ = *src;
-				*dst++ = *src;
-				*dst++ = *src;
-				*dst++ = *src++;
-			}
-			src += old_row_size - _format._width;
-		}
-
-		_buffer = std::move(output_buffer);
-
-		return true;
-	}
-
 	bool Image::load(Reader&& reader, ImageType type)
 	{
 		if (!reader)
@@ -139,35 +104,29 @@ namespace Yttrium
 		switch (_format._pixel_format)
 		{
 		case PixelFormat::Gray:
-
 			return true;
 
 		case PixelFormat::Rgb:
 		case PixelFormat::Bgr:
-
 			if (_format._bits_per_pixel == 24)
 			{
-				auto* scanline = &_buffer[0];
-
+				auto scanline = static_cast<uint8_t*>(_buffer.data());
 				for (size_t row = 0; row < _format._height; ++row)
 				{
 					for (size_t offset = 0; offset < _format._width * 3; offset += 3)
 					{
-						uint8_t x = scanline[offset];
+						const auto x = scanline[offset];
 						scanline[offset] = scanline[offset + 2];
 						scanline[offset + 2] = x;
 					}
 					scanline += _format.row_size();
 				}
-
 				_format._pixel_format = (_format._pixel_format == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb);
-
 				return true;
 			}
 			break;
 
 		default:
-
 			break;
 		}
 

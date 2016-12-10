@@ -152,8 +152,13 @@ namespace Yttrium
 			Image image;
 			if (!image.load(std::move(reader)))
 				return {};
-			if (intensity && image.format().pixel_format() == PixelFormat::Gray)
-				image.intensity_to_bgra(); // TODO: Move this inside the renderer.
+			if (intensity)
+			{
+				// TODO: Move this inside the renderer.
+				auto converted = intensity_to_bgra(image);
+				if (converted)
+					image = std::move(converted);
+			}
 			return _private->_renderer->create_texture_2d(image);
 		});
 	}

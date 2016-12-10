@@ -135,14 +135,14 @@ namespace Yttrium
 		explicit Image(const ImageFormat&);
 
 		///
+		operator bool() const noexcept { return _buffer.size() > 0; }
+
+		///
 		void* data() noexcept { return _buffer.data(); }
 		const void* data() const noexcept { return _buffer.data(); }
 
 		///
 		ImageFormat format() const { return _format; }
-
-		///
-		bool intensity_to_bgra();
 
 		///
 		bool load(Reader&&, ImageType = ImageType::Auto);
@@ -166,6 +166,9 @@ namespace Yttrium
 
 	///
 	Y_API Image grayscale_to_bgra(const Image&);
+
+	///
+	Y_API Image intensity_to_bgra(const Image&);
 }
 
 #endif

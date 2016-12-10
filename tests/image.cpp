@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test_dds)
 	BOOST_CHECK(dds_image == tga_image);
 }
 
-BOOST_AUTO_TEST_CASE(test_grayscale_to_bgra)
+BOOST_AUTO_TEST_CASE(test_grayscale_to_bgra) // TODO: Add GrayAlpha-to-Bgra test.
 {
 	Image y8;
 	BOOST_REQUIRE(y8.load(Reader("tests/image/y8.tga")));
@@ -104,12 +104,14 @@ BOOST_AUTO_TEST_CASE(test_png)
 
 BOOST_AUTO_TEST_CASE(test_intensity)
 {
-	Image actual;
-	BOOST_REQUIRE(actual.load(Reader("tests/image/y8.tga")));
-	BOOST_REQUIRE(actual.intensity_to_bgra());
+	Image source;
+	BOOST_REQUIRE(source.load(Reader("tests/image/y8.tga")));
+
+	const auto converted = intensity_to_bgra(source);
+	BOOST_REQUIRE(converted);
 
 	Image expected;
 	BOOST_REQUIRE(expected.load(Reader("tests/image/y8_bgra32.tga")));
 
-	BOOST_CHECK(expected == actual);
+	BOOST_CHECK(expected == converted);
 }
