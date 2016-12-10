@@ -40,7 +40,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Push3D(Renderer&, const Matrix4&);
+		Push3D(Renderer&, const Matrix4& projection, const Matrix4& view);
 
 		///
 		~Push3D();

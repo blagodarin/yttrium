@@ -47,12 +47,6 @@ namespace Yttrium
 		virtual UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual Matrix4 current_projection() const = 0;
-
-		///
-		virtual Matrix4 current_transformation() const = 0;
-
-		///
 		virtual void draw_debug_text(const StaticString&) = 0;
 
 		///
@@ -68,7 +62,13 @@ namespace Yttrium
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;
 
 		///
+		virtual Matrix4 full_matrix() const = 0;
+
+		///
 		virtual ResourcePtr<Mesh> load_mesh(Reader&&) = 0;
+
+		///
+		virtual Matrix4 model_matrix() const = 0;
 
 		///
 		virtual void set_texture_rect(const RectF&, const Margins&) = 0;

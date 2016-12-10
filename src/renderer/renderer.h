@@ -41,12 +41,12 @@ namespace Yttrium
 		RendererImpl(Allocator&);
 		~RendererImpl() override;
 
-		Matrix4 current_projection() const override;
-		Matrix4 current_transformation() const override;
 		void draw_debug_text(const StaticString&) override;
 		void draw_rect(const RectF&, const Vector4&) override;
 		void draw_rects(const StdVector<TexturedRect>&, const Vector4&) override;
+		Matrix4 full_matrix() const override;
 		ResourcePtr<Mesh> load_mesh(Reader&&) override;
+		Matrix4 model_matrix() const override;
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
 
@@ -67,7 +67,7 @@ namespace Yttrium
 		const GpuProgram* program_2d() const { return _program_2d.get(); }
 		void push_program(const GpuProgram*);
 		void push_projection_2d(const Matrix4&);
-		void push_projection_3d(const Matrix4&);
+		void push_projection_3d(const Matrix4& projection, const Matrix4& view);
 		Texture2D::Filter push_texture(const Texture2D*, Texture2D::Filter);
 		void push_transformation(const Matrix4&);
 		Statistics reset_statistics();
@@ -119,7 +119,8 @@ namespace Yttrium
 		enum class MatrixType
 		{
 			Projection,
-			Transformation,
+			View,
+			Model,
 		};
 
 		StdVector<std::pair<Matrix4, MatrixType>> _matrix_stack;

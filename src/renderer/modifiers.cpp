@@ -17,10 +17,10 @@ namespace Yttrium
 		static_cast<RendererImpl&>(_renderer).pop_projection();
 	}
 
-	Push3D::Push3D(Renderer& renderer, const Matrix4& matrix)
+	Push3D::Push3D(Renderer& renderer, const Matrix4& projection, const Matrix4& view)
 		: RendererModifier(renderer)
 	{
-		static_cast<RendererImpl&>(_renderer).push_projection_3d(matrix);
+		static_cast<RendererImpl&>(_renderer).push_projection_3d(projection, view);
 	}
 
 	Push3D::~Push3D()

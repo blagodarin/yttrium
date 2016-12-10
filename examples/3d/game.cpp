@@ -66,9 +66,7 @@ void Game::on_key_event(const KeyEvent& event)
 void Game::on_render(Renderer& renderer, const PointF&)
 {
 	{
-		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256));
-
-		PushTransformation camera(renderer, Matrix4::camera(_position, _rotation));
+		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation));
 
 		// Center.
 		_cube.draw({0, 0, 0});
