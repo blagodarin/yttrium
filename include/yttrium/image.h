@@ -168,7 +168,7 @@ namespace Yttrium
 	};
 
 	///
-	Image grayscale_to_bgra(const Image&);
+	Y_API Image grayscale_to_bgra(const Image&);
 }
 
 #endif

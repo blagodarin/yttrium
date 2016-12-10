@@ -15,27 +15,24 @@ namespace Yttrium
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		auto dst = static_cast<uint8_t*>(output.data());
-		const auto src_padding = input_format.row_size() - input_format.width() * 2;
-		const auto dst_padding = output_format.row_size() - output_format.width() * 4;
+		const auto scanline_size = output_format.width() * 4;
 
 		switch (input_format.pixel_format())
 		{
 		case PixelFormat::Gray:
 			if (input_format.bits_per_pixel() == 8)
 			{
-				for (size_t i = 0; i < output_format.height(); ++i)
+				for (size_t y = 0; y < output_format.height(); ++y)
 				{
-					for (size_t j = 0; j < output_format.width(); ++j)
+					for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
 					{
-						dst[0] = src[0];
-						dst[1] = src[0];
-						dst[2] = src[0];
-						dst[3] = 0xff;
-						src += 1;
-						dst += 4;
+						dst[a + 0] = src[b + 0];
+						dst[a + 1] = src[b + 0];
+						dst[a + 2] = src[b + 0];
+						dst[a + 3] = 0xff;
 					}
-					src += src_padding;
-					dst += dst_padding;
+					src += input_format.row_size();
+					dst += output_format.row_size();
 				}
 				return output;
 			}
@@ -44,19 +41,17 @@ namespace Yttrium
 		case PixelFormat::GrayAlpha:
 			if (input_format.bits_per_pixel() == 16)
 			{
-				for (size_t i = 0; i < output_format.height(); ++i)
+				for (size_t y = 0; y < output_format.height(); ++y)
 				{
-					for (size_t j = 0; j < output_format.width(); ++j)
+					for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
 					{
-						dst[0] = src[0];
-						dst[1] = src[0];
-						dst[2] = src[0];
-						dst[3] = src[1];
-						src += 2;
-						dst += 4;
+						dst[a + 0] = src[b + 0];
+						dst[a + 1] = src[b + 0];
+						dst[a + 2] = src[b + 0];
+						dst[a + 3] = src[b + 1];
 					}
-					src += src_padding;
-					dst += dst_padding;
+					src += input_format.row_size();
+					dst += output_format.row_size();
 				}
 				return output;
 			}
@@ -65,19 +60,17 @@ namespace Yttrium
 		case PixelFormat::AlphaGray:
 			if (input_format.bits_per_pixel() == 16)
 			{
-				for (size_t i = 0; i < output_format.height(); ++i)
+				for (size_t y = 0; y < output_format.height(); ++y)
 				{
-					for (size_t j = 0; j < output_format.width(); ++j)
+					for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
 					{
-						dst[0] = src[1];
-						dst[1] = src[1];
-						dst[2] = src[1];
-						dst[3] = src[0];
-						src += 2;
-						dst += 4;
+						dst[a + 0] = src[b + 1];
+						dst[a + 1] = src[b + 1];
+						dst[a + 2] = src[b + 1];
+						dst[a + 3] = src[b + 0];
 					}
-					src += src_padding;
-					dst += dst_padding;
+					src += input_format.row_size();
+					dst += output_format.row_size();
 				}
 				return output;
 			}

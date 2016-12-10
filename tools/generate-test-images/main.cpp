@@ -53,7 +53,20 @@ void write_color_gradient(Writer& writer, bool with_alpha)
 	writer.write_all(buffer);
 }
 
-void write_color_intensity(Writer& writer)
+void write_y8(Writer& writer)
+{
+	Buffer buffer(16 * 16);
+
+	auto data = &buffer[0];
+
+	for (size_t y = 0; y < 16; ++y)
+		for (size_t x = 0; x < 16; ++x)
+			*data++ = y * 16 + x;
+
+	writer.write_all(buffer);
+}
+
+void write_y8_bgra32(Writer& writer)
 {
 	Buffer buffer(16 * 16 * 4);
 
@@ -75,15 +88,24 @@ void write_color_intensity(Writer& writer)
 	writer.write_all(buffer);
 }
 
-void write_grayscale_intensity(Writer& writer)
+void write_y8_bgrx32(Writer& writer)
 {
-	Buffer buffer(16 * 16);
+	Buffer buffer(16 * 16 * 4);
 
 	auto data = &buffer[0];
 
 	for (size_t y = 0; y < 16; ++y)
+	{
 		for (size_t x = 0; x < 16; ++x)
-			*data++ = y * 16 + x;
+		{
+			uint8_t value = y * 16 + x;
+
+			*data++ = value;
+			*data++ = value;
+			*data++ = value;
+			*data++ = 0xff;
+		}
+	}
 
 	writer.write_all(buffer);
 }
@@ -91,44 +113,34 @@ void write_grayscale_intensity(Writer& writer)
 int main(int, char**)
 {
 	{
-		Writer writer("tests/image/gradient24.tga");
-
 		TgaHeader header;
-
 		::memset(&header, 0, sizeof(header));
-
 		header.image_type = tgaTrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 24;
 		header.image.descriptor = tgaTopLeft;
 
+		Writer writer("tests/image/gradient24.tga");
 		if (writer.write(header))
 			write_color_gradient(writer, false);
 	}
 	{
-		Writer writer("tests/image/gradient32.tga");
-
 		TgaHeader header;
-
 		::memset(&header, 0, sizeof(header));
-
 		header.image_type = tgaTrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 32;
 		header.image.descriptor = tgaTopLeft | 8;
 
+		Writer writer("tests/image/gradient32.tga");
 		if (writer.write(header))
 			write_color_gradient(writer, true);
 	}
 	{
-		Writer writer("tests/image/gradient32.dds");
-
 		DDS_HEADER header;
-
 		::memset(&header, 0, sizeof(header));
-
 		header.dwMagic = DDS_HEADER::MAGIC;
 		header.dwSize = DDS_HEADER::SIZE;
 		header.dwFlags = DDS_HEADER_FLAGS_TEXTURE;
@@ -143,39 +155,47 @@ int main(int, char**)
 		header.ddspf.dwABitMask = 0xFF000000;
 		header.dwCaps = DDSCAPS_TEXTURE;
 
+		Writer writer("tests/image/gradient32.dds");
 		if (writer.write(header))
 			write_color_gradient(writer, true);
 	}
 	{
-		Writer writer("tests/image/intensity8.tga");
-
 		TgaHeader header;
-
 		::memset(&header, 0, sizeof(header));
-
 		header.image_type = tgaBlackAndWhite;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 8;
 		header.image.descriptor = tgaTopLeft;
 
+		Writer writer("tests/image/y8.tga");
 		if (writer.write(header))
-			write_grayscale_intensity(writer);
+			write_y8(writer);
 	}
 	{
-		Writer writer("tests/image/intensity32.tga");
-
 		TgaHeader header;
-
 		::memset(&header, 0, sizeof(header));
-
 		header.image_type = tgaTrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 32;
 		header.image.descriptor = tgaTopLeft | 8;
 
+		Writer writer("tests/image/y8_bgra32.tga");
 		if (writer.write(header))
-			write_color_intensity(writer);
+			write_y8_bgra32(writer);
+	}
+	{
+		TgaHeader header;
+		::memset(&header, 0, sizeof(header));
+		header.image_type = tgaTrueColor;
+		header.image.width = 16;
+		header.image.height = 16;
+		header.image.pixel_depth = 32;
+		header.image.descriptor = tgaTopLeft | 8;
+
+		Writer writer("tests/image/y8_bgrx32.tga");
+		if (writer.write(header))
+			write_y8_bgrx32(writer);
 	}
 }

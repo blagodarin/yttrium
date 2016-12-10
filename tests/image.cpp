@@ -60,6 +60,17 @@ BOOST_AUTO_TEST_CASE(test_dds)
 	BOOST_CHECK(dds_image == tga_image);
 }
 
+BOOST_AUTO_TEST_CASE(test_grayscale_to_bgra)
+{
+	Image y8;
+	BOOST_REQUIRE(y8.load(Reader("tests/image/y8.tga")));
+
+	Image bgrx32;
+	BOOST_REQUIRE(bgrx32.load(Reader("tests/image/y8_bgrx32.tga")));
+
+	BOOST_CHECK(grayscale_to_bgra(y8) == bgrx32);
+}
+
 #ifndef Y_NO_JPEG
 BOOST_AUTO_TEST_CASE(test_jpeg)
 {
@@ -93,14 +104,12 @@ BOOST_AUTO_TEST_CASE(test_png)
 
 BOOST_AUTO_TEST_CASE(test_intensity)
 {
-	Image image;
-	BOOST_REQUIRE(image.load(Reader("tests/image/intensity8.tga")));
-	BOOST_REQUIRE(image.intensity_to_bgra());
+	Image actual;
+	BOOST_REQUIRE(actual.load(Reader("tests/image/y8.tga")));
+	BOOST_REQUIRE(actual.intensity_to_bgra());
 
-	TemporaryFile file;
-	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
+	Image expected;
+	BOOST_REQUIRE(expected.load(Reader("tests/image/y8_bgra32.tga")));
 
-	const auto expected = Reader("tests/image/intensity32.tga").to_buffer();
-	const auto actual = Reader(file).to_buffer();
-	BOOST_CHECK_EQUAL(expected, actual);
+	BOOST_CHECK(expected == actual);
 }
