@@ -42,6 +42,8 @@ private:
 	bool _move_backward = false;
 	bool _move_left = false;
 	bool _move_right = false;
+
+	unsigned _animation = 0;
 };
 
 #endif

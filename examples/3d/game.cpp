@@ -73,17 +73,28 @@ void Game::on_render(Renderer& renderer, const PointF&)
 		// Center.
 		_cube.draw({0, 0, 0});
 
+		const auto angle = (_animation % 3000) / 3000.0 * 360.0;
+
 		// X direction -- one cube.
-		_cube.draw({2, 0, 0});
+		{
+			PushTransformation camera(renderer, Matrix4::rotation(angle, {1, 0, 0}));
+			_cube.draw({2, 0, 0});
+		}
 
 		// Y direction -- two cubes.
-		_cube.draw({0, 2, 0});
-		_cube.draw({0, 4, 0});
+		{
+			PushTransformation camera(renderer, Matrix4::rotation(angle, {0, 1, 0}));
+			_cube.draw({0, 2, 0});
+			_cube.draw({0, 4, 0});
+		}
 
 		// Z direction -- three cubes.
-		_cube.draw({0, 0, 2});
-		_cube.draw({0, 0, 4});
-		_cube.draw({0, 0, 6});
+		{
+			PushTransformation camera(renderer, Matrix4::rotation(angle, {0, 0, 1}));
+			_cube.draw({0, 0, 2});
+			_cube.draw({0, 0, 4});
+			_cube.draw({0, 0, 6});
+		}
 
 		_chessboard.draw({0, 0, 0});
 	}
@@ -98,6 +109,8 @@ void Game::on_screenshot(Image&& image)
 
 void Game::on_update(const UpdateEvent& update)
 {
+	_animation += update.milliseconds;
+
 	if (_move_forward != _move_backward || _move_left != _move_right)
 	{
 		constexpr auto speed = 8.f; // Units per second.
