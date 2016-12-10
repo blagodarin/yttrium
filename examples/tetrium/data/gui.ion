@@ -9,7 +9,7 @@ default font
 class "button"
 {
 	position     "230" "" "180" "40"
-	texture      "examples/tetrium/data/blocks.tga"
+	texture      "examples/tetrium/data/buttons.tga"
 	texture_rect "0" "0" "16" "16"
 	borders      "4" "4" "4" "4"
 	sound        "data/sound.wav"

@@ -16,6 +16,8 @@ using namespace Yttrium;
 class Game : public WindowCallbacks
 {
 public:
+	Game(const Storage& storage) : _storage(storage) {}
+
 	void run();
 
 private:
@@ -26,8 +28,8 @@ private:
 	void on_update(const UpdateEvent&) override;
 
 private:
+	const Storage& _storage;
 	StdVector<NamedAllocatorInfo> _memory_statistics{ *DefaultAllocator };
-	const Storage _storage{ Storage::UseFileSystem::Before };
 	Window _window{ "Yttrium 3D example", *this };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer() };
 	bool _debug_text_visible = false;

@@ -42,33 +42,9 @@ CubeModel::CubeModel(Renderer& renderer, ResourceLoader& resource_loader)
 ChessboardModel::ChessboardModel(Renderer& renderer, ResourceLoader& resource_loader)
 	: Model(renderer)
 {
-	_mesh = resource_loader.load_mesh("examples/3d/data/chessboard.obj");
-
-	const int size = 128;
-
-	ImageFormat format;
-	format.set_width(size);
-	format.set_height(size);
-	format.set_pixel_format(PixelFormat::Bgra, 32);
-	format.set_orientation(ImageOrientation::XRightYDown);
-
-	Image image(format);
-	for (int y = 0; y < size; ++y)
-	{
-		for (int x = 0; x < size; ++x)
-		{
-			const auto pixel = static_cast<uint8_t*>(image.data()) + y * format.row_size() + x * 4;
-			const auto color = (x ^ y) & 1 ? uint8_t{ 0xdd } : uint8_t{ 0x00 };
-			pixel[0] = color;
-			pixel[1] = color;
-			pixel[2] = color;
-			pixel[3] = 0xff;
-		}
-	}
-
-	_texture = _renderer.create_texture_2d(image);
-
+	_mesh = resource_loader.load_mesh("examples/3d/data/checkerboard.obj");
+	_texture = resource_loader.load_texture_2d("examples/3d/data/checkerboard.tga");
 	_program = _renderer.create_gpu_program(
-		Reader("examples/3d/data/chessboard_vs.glsl").to_string(),
-		Reader("examples/3d/data/chessboard_fs.glsl").to_string());
+		Reader("examples/3d/data/checkerboard_vs.glsl").to_string(),
+		Reader("examples/3d/data/checkerboard_fs.glsl").to_string());
 }

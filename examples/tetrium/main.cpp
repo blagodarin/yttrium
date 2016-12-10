@@ -4,15 +4,9 @@
 #include <yttrium/log.h>
 #include <yttrium/storage/storage.h>
 
-int main()
+namespace
 {
-	Log::set_file("tetrium.log");
-
-	NamedAllocator storage_allocator("storage");
-	Storage storage(Storage::UseFileSystem::Never, storage_allocator);
-	if (!storage.attach_package("tetrium.ypq"))
-		return 1;
-
+	void make_buttons_texture(Storage& storage)
 	{
 		constexpr auto button_size = 16;
 		constexpr auto button_styles = 4;
@@ -39,8 +33,19 @@ int main()
 			}
 		}
 
-		storage.attach_buffer("examples/tetrium/data/blocks.tga", image.to_buffer(ImageType::Tga));
+		storage.attach_buffer("examples/tetrium/data/buttons.tga", image.to_buffer(ImageType::Tga));
 	}
+}
+
+int main()
+{
+	Log::set_file("tetrium.log");
+
+	NamedAllocator storage_allocator("storage");
+	Storage storage(Storage::UseFileSystem::Never, storage_allocator);
+	if (!storage.attach_package("tetrium.ypq"))
+		return 1;
+	::make_buttons_texture(storage);
 
 	try
 	{

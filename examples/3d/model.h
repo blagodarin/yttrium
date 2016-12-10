@@ -27,7 +27,7 @@ public:
 protected:
 	Renderer& _renderer;
 	ResourcePtr<const Mesh> _mesh;
-	ResourcePtr<Texture2D> _texture;
+	ResourcePtr<const Texture2D> _texture;
 	UniquePtr<GpuProgram> _program;
 };
 
