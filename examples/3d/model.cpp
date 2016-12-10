@@ -27,8 +27,7 @@ void Model::draw(const Vector4& translation)
 	const auto transformation = Matrix4::translation(translation);
 	PushTransformation push_transformation(_renderer, transformation);
 	_program->set_uniform("u_model", transformation);
-	_program->set_uniform("u_modelview", _renderer.current_transformation());
-	_program->set_uniform("u_projection", _renderer.current_projection());
+	_program->set_uniform("u_mvp", _renderer.current_projection() * _renderer.current_transformation());
 	_renderer.draw_mesh(*_mesh);
 }
 
