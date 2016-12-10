@@ -18,13 +18,10 @@ namespace Yttrium
 	{
 		Gray,      ///< Gray.
 		GrayAlpha, ///< Gray-alpha.
-		AlphaGray, ///< Alpha-gray.
 		Rgb,       ///< Red-green-blue.
 		Bgr,       ///< Blue-green-red (reverse).
 		Rgba,      ///< Red-green-blue-alpha.
 		Bgra,      ///< Blue-green-red-alpha (reverse RGB).
-		Argb,      ///< Alpha-red-green-blue (reverse alpha).
-		Abgr,      ///< Alpha-blue-green-red (reverse).
 	};
 
 	/// Image file type.

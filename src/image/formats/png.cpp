@@ -19,7 +19,6 @@ namespace
 			break;
 
 		case PixelFormat::GrayAlpha:
-		case PixelFormat::AlphaGray:
 			if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
 				return false;
 			break;
@@ -32,8 +31,6 @@ namespace
 
 		case PixelFormat::Rgba:
 		case PixelFormat::Bgra:
-		case PixelFormat::Argb:
-		case PixelFormat::Abgr:
 			if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
 				return false;
 			break;
@@ -105,19 +102,8 @@ namespace Yttrium
 		int color_type = 0;
 		int transforms = 0;
 
-		if (format.pixel_format() == PixelFormat::AlphaGray
-			|| format.pixel_format() == PixelFormat::Argb
-			|| format.pixel_format() == PixelFormat::Abgr)
-		{
-			transforms |= PNG_TRANSFORM_SWAP_ALPHA;
-		}
-
-		if (format.pixel_format() == PixelFormat::Bgr
-			|| format.pixel_format() == PixelFormat::Bgra
-			|| format.pixel_format() == PixelFormat::Abgr)
-		{
+		if (format.pixel_format() == PixelFormat::Bgr || format.pixel_format() == PixelFormat::Bgra)
 			transforms |= PNG_TRANSFORM_BGR;
-		}
 
 		switch (format.pixel_format())
 		{
@@ -130,7 +116,6 @@ namespace Yttrium
 			break;
 
 		case PixelFormat::GrayAlpha:
-		case PixelFormat::AlphaGray:
 #ifndef Y_IS_BIG_ENDIAN
 			if (format.bits_per_pixel() > 16)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
@@ -149,8 +134,6 @@ namespace Yttrium
 
 		case PixelFormat::Rgba:
 		case PixelFormat::Bgra:
-		case PixelFormat::Argb:
-		case PixelFormat::Abgr:
 #ifndef Y_IS_BIG_ENDIAN
 			if (format.bits_per_pixel() > 32)
 				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;

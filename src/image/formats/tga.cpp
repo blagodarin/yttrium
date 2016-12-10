@@ -14,25 +14,21 @@ namespace
 		switch (format.pixel_format())
 		{
 		case PixelFormat::Gray:
-
 			if (format.bits_per_pixel() != 8)
 				return false;
 			break;
 
 		case PixelFormat::Bgr:
-
 			if (format.bits_per_pixel() != 24)
 				return false;
 			break;
 
 		case PixelFormat::Bgra:
-
 			if (format.bits_per_pixel() != 32)
 				return false;
 			break;
 
 		default:
-
 			return false;
 		}
 
@@ -40,9 +36,7 @@ namespace
 			&& format.orientation() != ImageOrientation::XRightYUp
 			&& format.orientation() != ImageOrientation::XLeftYDown
 			&& format.orientation() != ImageOrientation::XLeftYUp)
-		{
 			return false;
-		}
 
 		if (format.width() <= 0 || format.width() > UINT16_MAX)
 			return false;

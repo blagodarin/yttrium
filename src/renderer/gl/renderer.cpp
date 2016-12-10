@@ -100,7 +100,6 @@ namespace Yttrium
 		{
 		case PixelFormat::Gray:
 		case PixelFormat::GrayAlpha:
-		case PixelFormat::AlphaGray:
 			temporary = grayscale_to_bgra(image);
 			internal_format = GL_RGBA8;
 			data_format = GL_BGRA;

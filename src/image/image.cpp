@@ -29,13 +29,10 @@ namespace Yttrium
 		{
 		case PixelFormat::Gray:      _channels = 1; break;
 		case PixelFormat::GrayAlpha: _channels = 2; break;
-		case PixelFormat::AlphaGray: _channels = 2; break;
 		case PixelFormat::Rgb:       _channels = 3; break;
 		case PixelFormat::Bgr:       _channels = 3; break;
 		case PixelFormat::Rgba:      _channels = 4; break;
 		case PixelFormat::Bgra:      _channels = 4; break;
-		case PixelFormat::Argb:      _channels = 4; break;
-		case PixelFormat::Abgr:      _channels = 4; break;
 		}
 
 		_bits_per_pixel = bits_per_pixel;

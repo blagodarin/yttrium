@@ -57,25 +57,6 @@ namespace Yttrium
 			}
 			break;
 
-		case PixelFormat::AlphaGray:
-			if (input_format.bits_per_pixel() == 16)
-			{
-				for (size_t y = 0; y < output_format.height(); ++y)
-				{
-					for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
-					{
-						dst[a + 0] = src[b + 1];
-						dst[a + 1] = src[b + 1];
-						dst[a + 2] = src[b + 1];
-						dst[a + 3] = src[b + 0];
-					}
-					src += input_format.row_size();
-					dst += output_format.row_size();
-				}
-				return output;
-			}
-			break;
-
 		default:
 			break;
 		}
