@@ -1,46 +1,26 @@
 #ifndef _examples_3d_model_h_
 #define _examples_3d_model_h_
 
-#include <yttrium/memory/unique_ptr.h>
-#include <yttrium/resources/resource_ptr.h>
+#include "material.h"
 
 namespace Yttrium
 {
-	class GpuProgram;
 	class Mesh;
-	class Renderer;
-	class ResourceLoader;
-	class Texture2D;
 	class Vector4;
 }
-
-using namespace Yttrium;
 
 class Model
 {
 public:
-	Model(Renderer&);
+	Model(Renderer&, ResourceLoader&, const StaticString& mesh, const StaticString& material);
 	~Model();
 
-	void draw(const Vector4& translation);
+	void draw();
 
 protected:
 	Renderer& _renderer;
 	ResourcePtr<const Mesh> _mesh;
-	ResourcePtr<const Texture2D> _texture;
-	UniquePtr<GpuProgram> _program;
-};
-
-class CubeModel : public Model
-{
-public:
-	CubeModel(Renderer&, ResourceLoader&);
-};
-
-class ChessboardModel : public Model
-{
-public:
-	ChessboardModel(Renderer&, ResourceLoader&);
+	Material _material; // TODO: Make 'const'.
 };
 
 #endif

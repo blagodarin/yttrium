@@ -1,0 +1,3 @@
+vertex_shader "examples/3d/data/checkerboard_vs.glsl"
+fragment_shader "examples/3d/data/checkerboard_fs.glsl"
+texture "examples/3d/data/checkerboard.tga"

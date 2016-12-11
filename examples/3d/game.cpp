@@ -65,36 +65,69 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::on_render(Renderer& renderer, const PointF&)
 {
+	const auto draw_tr = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
+	{
+		PushTransformation t(renderer, Matrix4::translation(translation));
+		PushTransformation r(renderer, Matrix4::rotation(angle, axis));
+		model.draw();
+	};
+
+	const auto draw_rt = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
+	{
+		PushTransformation r(renderer, Matrix4::rotation(angle, axis));
+		PushTransformation t(renderer, Matrix4::translation(translation));
+		model.draw();
+	};
+
+
 	{
 		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation));
 
 		// Center.
-		_cube.draw({0, 0, 0});
+		{
+			PushTransformation t(renderer, Matrix4::translation({ 0, 0, 1 }));
+			_cube.draw();
+		}
 
 		const auto angle = (_animation % 3000) / 3000.0 * 360.0;
 
-		// X direction -- one cube.
-		{
-			PushTransformation camera(renderer, Matrix4::rotation(angle, {1, 0, 0}));
-			_cube.draw({2, 0, 0});
-		}
+		// X direction.
+		draw_tr(_cube, { -5.00, 0, 2.50 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, { -3.75, 0, 1.75 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, { -2.50, 0, 1.25 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, { -1.25, 0, 1.00 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, {  1.25, 0, 1.00 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, {  2.50, 0, 1.25 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, {  3.75, 0, 1.75 }, angle, { 1, 0, 0 });
+		draw_tr(_cube, {  5.00, 0, 2.50 }, angle, { 1, 0, 0 });
 
-		// Y direction -- two cubes.
-		{
-			PushTransformation camera(renderer, Matrix4::rotation(angle, {0, 1, 0}));
-			_cube.draw({0, 2, 0});
-			_cube.draw({0, 4, 0});
-		}
+		// Y direction.
+		draw_tr(_cube, { 0, -5.00, 2.50 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0, -3.75, 1.75 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0, -2.50, 1.25 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0, -1.25, 1.00 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0,  1.25, 1.00 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0,  2.50, 1.25 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0,  3.75, 1.75 }, angle, { 0, 1, 0 });
+		draw_tr(_cube, { 0,  5.00, 2.50 }, angle, { 0, 1, 0 });
 
-		// Z direction -- three cubes.
-		{
-			PushTransformation camera(renderer, Matrix4::rotation(angle, {0, 0, 1}));
-			_cube.draw({0, 0, 2});
-			_cube.draw({0, 0, 4});
-			_cube.draw({0, 0, 6});
-		}
+		// Z direction.
+		draw_tr(_cube, { 0, 0, 2.25 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 3.50 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 4.75 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 5.00 }, angle, { 0, 0, 1 });
 
-		_chessboard.draw({0, 0, 0});
+		draw_tr(_cube, { -1.25, -1.25, 2.25 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, { -1.25,  1.25, 2.25 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, {  1.25, -1.25, 2.25 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, {  1.25,  1.25, 2.25 }, angle, { 0, 0, 1 });
+
+		draw_rt(_cube, { -1.25,  0.00, 3.50 }, -angle, { 0, 0, 1 });
+		draw_rt(_cube, {  1.25,  0.00, 3.50 }, -angle, { 0, 0, 1 });
+		draw_rt(_cube, {  0.00, -1.25, 3.50 }, -angle, { 0, 0, 1 });
+		draw_rt(_cube, {  0.00,  1.25, 3.50 }, -angle, { 0, 0, 1 });
+
+		_checkerboard.draw();
 	}
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
@@ -140,15 +173,5 @@ void Game::on_update(const UpdateEvent& update)
 		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
 		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
 		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
-		<< "Pitch: " << _rotation.pitch << ", Yaw: " << _rotation.yaw << "\n"
-		<< "Memory:";
-	NamedAllocator::enumerate(_memory_statistics);
-	for (const auto& info : _memory_statistics)
-	{
-		_debug_text << "\n    " << info.name << " = " << info.blocks << "/" << info.allocations;
-		if (info.reallocations)
-			_debug_text << " (" << info.reallocations << ")";
-		if (info.bytes)
-			_debug_text << ", " << info.bytes << " B";
-	}
+		<< "Pitch: " << _rotation.pitch << ", Yaw: " << _rotation.yaw;
 }

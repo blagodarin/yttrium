@@ -189,4 +189,14 @@ namespace Yttrium
 		_private->_texture_font_cache.release_unused();
 		_private->_translation_cache.release_unused();
 	}
+
+	Renderer* ResourceLoader::renderer()
+	{
+		return _private->_renderer;
+	}
+
+	const Storage& ResourceLoader::storage() const
+	{
+		return _private->_storage;
+	}
 }
