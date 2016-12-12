@@ -35,8 +35,8 @@ private:
 	Model _cube{ _window.renderer(), _resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material" };
 	Model _checkerboard{ _window.renderer(), _resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material" };
 
-	Vector4 _position{ 8, 8, 8 };
-	Euler _rotation{ -135, -26.5, 0 };
+	Vector4 _position{ 9, 9, 9 };
+	Euler _rotation{ -135, -27.5, 0 };
 
 	bool _move_forward = false;
 	bool _move_backward = false;

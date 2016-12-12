@@ -83,12 +83,6 @@ void Game::on_render(Renderer& renderer, const PointF&)
 	{
 		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation));
 
-		// Center.
-		{
-			PushTransformation t(renderer, Matrix4::translation({ 0, 0, 1 }));
-			_cube.draw();
-		}
-
 		const auto angle = (_animation % 3000) / 3000.0 * 360.0;
 
 		// X direction.
@@ -112,10 +106,10 @@ void Game::on_render(Renderer& renderer, const PointF&)
 		draw_tr(_cube, { 0,  5.00, 2.50 }, angle, { 0, 1, 0 });
 
 		// Z direction.
-		draw_tr(_cube, { 0, 0, 2.25 }, angle, { 0, 0, 1 });
-		draw_tr(_cube, { 0, 0, 3.50 }, angle, { 0, 0, 1 });
-		draw_tr(_cube, { 0, 0, 4.75 }, angle, { 0, 0, 1 });
-		draw_tr(_cube, { 0, 0, 5.00 }, angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 1.00 },  angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 2.25 }, -angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 3.50 },  angle, { 0, 0, 1 });
+		draw_tr(_cube, { 0, 0, 4.75 }, -angle, { 0, 0, 1 });
 
 		draw_tr(_cube, { -1.25, -1.25, 2.25 }, angle, { 0, 0, 1 });
 		draw_tr(_cube, { -1.25,  1.25, 2.25 }, angle, { 0, 0, 1 });
