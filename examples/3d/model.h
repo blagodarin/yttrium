@@ -1,13 +1,18 @@
 #ifndef _examples_3d_model_h_
 #define _examples_3d_model_h_
 
-#include "material.h"
+#include <yttrium/resources/resource_ptr.h>
 
 namespace Yttrium
 {
+	class Material;
 	class Mesh;
-	class Vector4;
+	class Renderer;
+	class ResourceLoader;
+	class StaticString;
 }
+
+using namespace Yttrium;
 
 class Model
 {
@@ -19,8 +24,8 @@ public:
 
 protected:
 	Renderer& _renderer;
-	ResourcePtr<const Mesh> _mesh;
-	Material _material; // TODO: Make 'const'.
+	const ResourcePtr<const Mesh> _mesh;
+	const ResourcePtr<const Material> _material;
 };
 
 #endif

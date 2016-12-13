@@ -12,6 +12,7 @@ namespace Yttrium
 {
 	class AudioManager;
 	class IonDocument;
+	class Material;
 	class Mesh;
 	class Music;
 	class Renderer;
@@ -37,6 +38,7 @@ namespace Yttrium
 		/// Throws ResourceError if there is no such resource.
 		/// Throws DataError if the resource can't be loaded.
 		ResourcePtr<const IonDocument> load_ion(const StaticString& name);
+		ResourcePtr<const Material> load_material(const StaticString& name);
 		ResourcePtr<const Mesh> load_mesh(const StaticString& name);
 		ResourcePtr<const Music> load_music(const StaticString& name);
 		ResourcePtr<const Sound> load_sound(const StaticString& name);

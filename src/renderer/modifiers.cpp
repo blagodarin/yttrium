@@ -1,7 +1,9 @@
 #include <yttrium/renderer/modifiers.h>
 
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/texture.h>
+#include "material.h"
 #include "renderer.h"
 
 namespace Yttrium
@@ -37,6 +39,19 @@ namespace Yttrium
 	PushGpuProgram::~PushGpuProgram()
 	{
 		static_cast<RendererImpl&>(_renderer).pop_program();
+	}
+
+	PushMaterial::PushMaterial(Renderer& renderer, const Material* material)
+		: RendererModifier(renderer)
+		, _material(material)
+		, _gpu_program(renderer, &static_cast<const MaterialImpl*>(_material)->gpu_program())
+		, _texture(renderer, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<Texture2D::Filter>(Texture2D::NearestFilter | Texture2D::AnisotropicFilter))
+	{
+	}
+
+	void PushMaterial::set_uniform(const StaticString& name, const Matrix4& value)
+	{
+		const_cast<MaterialImpl*>(static_cast<const MaterialImpl*>(_material))->gpu_program().set_uniform(name, value); // TODO: Remove 'const_cast'.
 	}
 
 	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture, Texture2D::Filter filter)

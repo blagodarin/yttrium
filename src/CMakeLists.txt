@@ -73,6 +73,7 @@ add_library(yttrium
 	renderer/gl/renderer.cpp
 	renderer/gl/texture.cpp
 	renderer/gl/wrappers.cpp
+	renderer/material.cpp
 	renderer/mesh_data.cpp
 	renderer/modifiers.cpp
 	renderer/renderer.cpp

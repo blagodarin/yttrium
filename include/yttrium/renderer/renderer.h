@@ -14,10 +14,12 @@ namespace Yttrium
 	class IndexBuffer;
 	enum class IndexFormat;
 	class Margins;
+	class Material;
 	class Matrix4;
 	class Mesh;
 	class Reader;
 	class RectF;
+	class ResourceLoader;
 	template <typename> class ResourcePtr;
 	class StaticString;
 	class Texture2D;
@@ -39,6 +41,9 @@ namespace Yttrium
 
 		///
 		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
+
+		///
+		virtual ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) = 0;
 
 		///
 		virtual ResourcePtr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;

@@ -41,6 +41,7 @@ namespace Yttrium
 		RendererImpl(Allocator&);
 		~RendererImpl() override;
 
+		ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) override;
 		void draw_debug_text(const StaticString&) override;
 		void draw_rect(const RectF&, const Vector4&) override;
 		void draw_rects(const StdVector<TexturedRect>&, const Vector4&) override;

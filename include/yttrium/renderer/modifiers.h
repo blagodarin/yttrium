@@ -10,8 +10,10 @@
 namespace Yttrium
 {
 	class GpuProgram;
+	class Material;
 	class Matrix4;
 	class Renderer;
+	class StaticString;
 
 	/// Base class for Renderer modifiers.
 	class RendererModifier
@@ -69,6 +71,22 @@ namespace Yttrium
 
 	private:
 		const Texture2D::Filter _filter;
+	};
+
+	///
+	class Y_API PushMaterial : public RendererModifier
+	{
+	public:
+		///
+		PushMaterial(Renderer&, const Material*);
+
+		///
+		void set_uniform(const StaticString&, const Matrix4&);
+
+	private:
+		const Material* const _material;
+		PushGpuProgram _gpu_program;
+		PushTexture _texture;
 	};
 
 	///
