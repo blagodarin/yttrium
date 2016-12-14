@@ -58,10 +58,7 @@ namespace Yttrium
 
 		::jpeg_calc_output_dimensions(&decompressor);
 
-		format.set_pixel_format(PixelFormat::Rgb, 24);
-		format.set_orientation(ImageOrientation::XRightYDown);
-		format.set_width(decompressor.output_width);
-		format.set_height(decompressor.output_height);
+		format = { decompressor.output_width, decompressor.output_height, PixelFormat::Rgb, 24 };
 
 		try
 		{

@@ -36,9 +36,9 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 24)
 				return false;
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && !header.ddspf.dwABitMask)
-				format.set_pixel_format(PixelFormat::Bgr, 24);
+				format = { header.dwWidth, header.dwHeight, PixelFormat::Bgr, 24 };
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && !header.ddspf.dwABitMask)
-				format.set_pixel_format(PixelFormat::Rgb, 24);
+				format = { header.dwWidth, header.dwHeight, PixelFormat::Rgb, 24 };
 			else
 				return false;
 			break;
@@ -47,9 +47,9 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 32)
 				return false;
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && header.ddspf.dwABitMask == 0xff000000)
-				format.set_pixel_format(PixelFormat::Bgra, 32);
+				format = { header.dwWidth, header.dwHeight, PixelFormat::Bgra, 32 };
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && header.ddspf.dwABitMask == 0xff000000)
-				format.set_pixel_format(PixelFormat::Rgba, 32);
+				format = { header.dwWidth, header.dwHeight, PixelFormat::Rgba, 32 };
 			else
 				return false;
 			break;
@@ -58,7 +58,7 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 8)
 				return false;
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && !header.ddspf.dwABitMask)
-				format.set_pixel_format(PixelFormat::Gray, 8);
+				format = { header.dwWidth, header.dwHeight, PixelFormat::Gray, 8 };
 			else
 				return false;
 			break;
@@ -67,7 +67,7 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 16)
 				return false;
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && header.ddspf.dwABitMask == 0xff00)
-				format.set_pixel_format(PixelFormat::GrayAlpha, 16);
+				format = { header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha, 16 };
 			else
 				return false;
 			break;
@@ -76,9 +76,6 @@ namespace Yttrium
 			return false;
 		}
 
-		format.set_orientation(ImageOrientation::XRightYDown);
-		format.set_width(header.dwWidth);
-		format.set_height(header.dwHeight);
 		return true;
 	}
 }

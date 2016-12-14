@@ -61,31 +61,31 @@ namespace Yttrium
 			|| header.image.descriptor & tgaReservedMask)
 			return false;
 
+		const auto orientation = [&header]
+		{
+			switch (header.image.descriptor & tgaOriginMask)
+			{
+			case tgaBottomLeft:  return ImageOrientation::XRightYUp;
+			case tgaBottomRight: return ImageOrientation::XLeftYUp;
+			case tgaTopRight:    return ImageOrientation::XLeftYDown;
+			default:             return ImageOrientation::XRightYDown;
+			}
+		};
+
 		if (header.image_type == tgaTrueColor)
 		{
 			const auto alpha = header.image.descriptor & tgaAlphaMask;
 			if (!alpha && header.image.pixel_depth == 24)
-				format.set_pixel_format(PixelFormat::Bgr, 24);
+				format = { header.image.width, header.image.height, PixelFormat::Bgr, 24, orientation() };
 			else if (alpha == 8 && header.image.pixel_depth == 32)
-				format.set_pixel_format(PixelFormat::Bgra, 32);
+				format = { header.image.width, header.image.height, PixelFormat::Bgra, 32, orientation() };
 			else
 				return false;
 		}
 		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
-			format.set_pixel_format(PixelFormat::Gray, 8);
+			format = { header.image.width, header.image.height, PixelFormat::Gray, 8, orientation() };
 		else
 			return false;
-
-		format.set_width(header.image.width);
-		format.set_height(header.image.height);
-
-		switch (header.image.descriptor & tgaOriginMask)
-		{
-		case tgaBottomLeft: format.set_orientation(ImageOrientation::XRightYUp); break;
-		case tgaBottomRight: format.set_orientation(ImageOrientation::XLeftYUp); break;
-		case tgaTopLeft: format.set_orientation(ImageOrientation::XRightYDown); break;
-		case tgaTopRight: format.set_orientation(ImageOrientation::XLeftYDown); break;
-		}
 
 		if (header.id_length)
 			reader.skip(header.id_length);

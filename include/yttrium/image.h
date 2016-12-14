@@ -58,6 +58,18 @@ namespace Yttrium
 		ImageFormat(size_t width, size_t height, PixelFormat, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
 
 		///
+		ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t bits_per_pixel, ImageOrientation orientation)
+			: ImageFormat(width, height, pixel_format, bits_per_pixel, 1, orientation) {}
+
+		///
+		ImageFormat(const Size& size, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation orientation = ImageOrientation::XRightYDown)
+			: ImageFormat(size.width(), size.height(), pixel_format, bits_per_pixel, row_alignment, orientation) {}
+
+		///
+		ImageFormat(const Size& size, PixelFormat pixel_format, size_t bits_per_pixel, ImageOrientation orientation)
+			: ImageFormat(size.width(), size.height(), pixel_format, bits_per_pixel, 1, orientation) {}
+
+		///
 		size_t bits_per_channel() const { return _bits_per_pixel % _channels ? 0 : _bits_per_pixel / _channels; }
 
 		///
@@ -83,21 +95,6 @@ namespace Yttrium
 
 		///
 		size_t row_size() const { return _row_size; }
-
-		///
-		void set_height(size_t height) { _height = height; }
-
-		///
-		void set_orientation(ImageOrientation orientation) { _orientation = orientation; }
-
-		///
-		void set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel);
-
-		///
-		void set_row_alignment(size_t alignment);
-
-		///
-		void set_width(size_t width);
 
 		///
 		Size size() const { return Size(_width, _height); }

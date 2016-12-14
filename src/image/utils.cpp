@@ -6,23 +6,22 @@ namespace Yttrium
 {
 	Image grayscale_to_bgra(const Image& input)
 	{
-		const auto input_format = input.format();
-
-		auto output_format = input_format;
-		output_format.set_pixel_format(PixelFormat::Bgra, 32);
-
-		Image output(output_format);
+		Image output({ input.format().size(), PixelFormat::Bgra, 32, input.format().orientation() });
 
 		auto src = static_cast<const uint8_t*>(input.data());
-		auto dst = static_cast<uint8_t*>(output.data());
-		const auto scanline_size = output_format.width() * 4;
+		const auto src_row_size = input.format().row_size();
 
-		switch (input_format.pixel_format())
+		auto dst = static_cast<uint8_t*>(output.data());
+		const auto dst_row_size = output.format().row_size();
+
+		const auto scanline_size = output.format().width() * 4;
+
+		switch (input.format().pixel_format())
 		{
 		case PixelFormat::Gray:
-			if (input_format.bits_per_pixel() == 8)
+			if (input.format().bits_per_pixel() == 8)
 			{
-				for (size_t y = 0; y < output_format.height(); ++y)
+				for (size_t y = output.format().height(); y > 0; --y)
 				{
 					for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
 					{
@@ -31,17 +30,17 @@ namespace Yttrium
 						dst[a + 2] = src[b + 0];
 						dst[a + 3] = 0xff;
 					}
-					src += input_format.row_size();
-					dst += output_format.row_size();
+					src += src_row_size;
+					dst += dst_row_size;
 				}
 				return output;
 			}
 			break;
 
 		case PixelFormat::GrayAlpha:
-			if (input_format.bits_per_pixel() == 16)
+			if (input.format().bits_per_pixel() == 16)
 			{
-				for (size_t y = 0; y < output_format.height(); ++y)
+				for (size_t y = output.format().height(); y > 0; --y)
 				{
 					for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
 					{
@@ -50,8 +49,8 @@ namespace Yttrium
 						dst[a + 2] = src[b + 0];
 						dst[a + 3] = src[b + 1];
 					}
-					src += input_format.row_size();
-					dst += output_format.row_size();
+					src += src_row_size;
+					dst += dst_row_size;
 				}
 				return output;
 			}
@@ -65,20 +64,20 @@ namespace Yttrium
 
 	Image intensity_to_bgra(const Image& input)
 	{
-		const auto input_format = input.format();
-		if (input_format.pixel_format() != PixelFormat::Gray || input_format.bits_per_pixel() != 8)
+		if (input.format().pixel_format() != PixelFormat::Gray || input.format().bits_per_pixel() != 8)
 			return {};
 
-		auto output_format = input_format;
-		output_format.set_pixel_format(PixelFormat::Bgra, 32);
-
-		Image output(output_format);
+		Image output({ input.format().size(), PixelFormat::Bgra, 32, input.format().orientation() });
 
 		auto src = static_cast<const uint8_t*>(input.data());
-		auto dst = static_cast<uint8_t*>(output.data());
-		const auto scanline_size = output_format.width() * 4;
+		const auto src_row_size = input.format().row_size();
 
-		for (size_t y = 0; y < output_format.height(); ++y)
+		auto dst = static_cast<uint8_t*>(output.data());
+		const auto dst_row_size = output.format().row_size();
+
+		const auto scanline_size = output.format().width() * 4;
+
+		for (size_t y = output.format().height(); y > 0; --y)
 		{
 			for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
 			{
@@ -87,8 +86,8 @@ namespace Yttrium
 				dst[a + 2] = src[b + 0];
 				dst[a + 3] = src[b + 0];
 			}
-			src += input_format.row_size();
-			dst += output_format.row_size();
+			src += src_row_size;
+			dst += dst_row_size;
 		}
 
 		return output;

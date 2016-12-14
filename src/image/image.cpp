@@ -53,44 +53,8 @@ namespace Yttrium
 		, _row_size(aligned_image_row_size(_width, _bits_per_pixel, _row_alignment))
 		, _height(height)
 	{
-		assert(is_power_of_2(_bits_per_pixel));
+		assert(is_power_of_2(_row_alignment));
 	}
-
-	void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel)
-	{
-		_pixel_format = pixel_format;
-
-		switch (pixel_format)
-		{
-		case PixelFormat::Gray:      _channels = 1; break;
-		case PixelFormat::GrayAlpha: _channels = 2; break;
-		case PixelFormat::Rgb:       _channels = 3; break;
-		case PixelFormat::Bgr:       _channels = 3; break;
-		case PixelFormat::Rgba:      _channels = 4; break;
-		case PixelFormat::Bgra:      _channels = 4; break;
-		}
-
-		_bits_per_pixel = bits_per_pixel;
-		_row_size = aligned_image_row_size(_width, bits_per_pixel, _row_alignment);
-	}
-
-	void ImageFormat::set_row_alignment(size_t alignment)
-	{
-		if (is_power_of_2(alignment))
-		{
-			_row_alignment = alignment;
-			_row_size = aligned_image_row_size(_width, _bits_per_pixel, alignment);
-		}
-		// TODO: Think of a better behavior on trying to set an invalid alignment than just ignoring to change anything.
-	}
-
-	void ImageFormat::set_width(size_t width)
-	{
-		_width = width;
-		_row_size = aligned_image_row_size(width, _bits_per_pixel, _row_alignment);
-	}
-
-	// TODO: Add a function to set width and alignment simultaneously (and more efficiently).
 
 	Image::Image(const ImageFormat& format)
 		: _format(format)
