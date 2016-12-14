@@ -32,14 +32,7 @@ namespace
 namespace Yttrium
 {
 	ImageFormat::ImageFormat()
-		: _pixel_format(PixelFormat::Gray)
-		, _channels(1)
-		, _bits_per_pixel(1)
-		, _orientation(ImageOrientation::XRightYDown)
-		, _width(0)
-		, _row_alignment(1)
-		, _row_size(0)
-		, _height(0)
+		: ImageFormat(0, 0, PixelFormat::Gray, 8)
 	{
 	}
 

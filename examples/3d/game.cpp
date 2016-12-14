@@ -89,30 +89,30 @@ void Game::on_render(Renderer& renderer, const PointF&)
 			const auto angle = (_animation % 3000) / 3000.0 * 360.0;
 
 			// X direction.
-			draw_tr(_cube, { -5.00, 0, 2.50 }, angle, { -1, 0, 0 });
-			draw_tr(_cube, { -3.75, 0, 1.75 }, angle, { -1, 0, 0 });
-			draw_tr(_cube, { -2.50, 0, 1.25 }, angle, { -1, 0, 0 });
-			draw_tr(_cube, { -1.25, 0, 1.00 }, angle, { -1, 0, 0 });
-			draw_tr(_cube, {  1.25, 0, 1.00 }, angle, {  1, 0, 0 });
-			draw_tr(_cube, {  2.50, 0, 1.25 }, angle, {  1, 0, 0 });
-			draw_tr(_cube, {  3.75, 0, 1.75 }, angle, {  1, 0, 0 });
-			draw_tr(_cube, {  5.00, 0, 2.50 }, angle, {  1, 0, 0 });
+			draw_tr(_cube, { -5.00, 0, 2.50 }, 2 * angle, {  1, 0, 0 });
+			draw_tr(_cube, { -3.75, 0, 1.75 },     angle, { -1, 0, 0 });
+			draw_tr(_cube, { -2.50, 0, 1.25 }, 2 * angle, {  1, 0, 0 });
+			draw_tr(_cube, { -1.25, 0, 1.00 },     angle, { -1, 0, 0 });
+			draw_tr(_cube, {  1.25, 0, 1.00 },     angle, {  1, 0, 0 });
+			draw_tr(_cube, {  2.50, 0, 1.25 }, 2 * angle, { -1, 0, 0 });
+			draw_tr(_cube, {  3.75, 0, 1.75 },     angle, {  1, 0, 0 });
+			draw_tr(_cube, {  5.00, 0, 2.50 }, 2 * angle, { -1, 0, 0 });
 
 			// Y direction.
-			draw_tr(_cube, { 0, -5.00, 2.50 }, angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0, -3.75, 1.75 }, angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0, -2.50, 1.25 }, angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0, -1.25, 1.00 }, angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0,  1.25, 1.00 }, angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0,  2.50, 1.25 }, angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0,  3.75, 1.75 }, angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0,  5.00, 2.50 }, angle, { 0,  1, 0 });
+			draw_tr(_cube, { 0, -5.00, 2.50 }, 2 * angle, { 0,  1, 0 });
+			draw_tr(_cube, { 0, -3.75, 1.75 },     angle, { 0, -1, 0 });
+			draw_tr(_cube, { 0, -2.50, 1.25 }, 2 * angle, { 0,  1, 0 });
+			draw_tr(_cube, { 0, -1.25, 1.00 },     angle, { 0, -1, 0 });
+			draw_tr(_cube, { 0,  1.25, 1.00 },     angle, { 0,  1, 0 });
+			draw_tr(_cube, { 0,  2.50, 1.25 }, 2 * angle, { 0, -1, 0 });
+			draw_tr(_cube, { 0,  3.75, 1.75 },     angle, { 0,  1, 0 });
+			draw_tr(_cube, { 0,  5.00, 2.50 }, 2 * angle, { 0, -1, 0 });
 
 			// Z direction.
-			draw_tr(_cube, { 0, 0, 1.00 },  angle, { 0, 0, 1 });
-			draw_tr(_cube, { 0, 0, 2.25 }, -angle, { 0, 0, 1 });
-			draw_tr(_cube, { 0, 0, 3.50 },  angle, { 0, 0, 1 });
-			draw_tr(_cube, { 0, 0, 4.75 }, -angle, { 0, 0, 1 });
+			draw_tr(_cube, { 0, 0, 1.00 }, 2 * angle, { 0, 0,  1 });
+			draw_tr(_cube, { 0, 0, 2.25 },     angle, { 0, 0, -1 });
+			draw_tr(_cube, { 0, 0, 3.50 }, 2 * angle, { 0, 0,  1 });
+			draw_tr(_cube, { 0, 0, 4.75 },     angle, { 0, 0, -1 });
 
 			draw_tr(_cube, { -1.25, -1.25, 2.25 }, angle, { 0, 0, 1 });
 			draw_tr(_cube, { -1.25,  1.25, 2.25 }, angle, { 0, 0, 1 });
