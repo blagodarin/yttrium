@@ -55,6 +55,9 @@ namespace Yttrium
 		ImageFormat();
 
 		///
+		ImageFormat(size_t width, size_t height, PixelFormat, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
+
+		///
 		size_t bits_per_channel() const { return _bits_per_pixel % _channels ? 0 : _bits_per_pixel / _channels; }
 
 		///

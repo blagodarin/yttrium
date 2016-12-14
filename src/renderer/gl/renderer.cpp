@@ -301,14 +301,7 @@ namespace Yttrium
 		GLint unpack_alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 
-		ImageFormat format;
-		format.set_width(size.width());
-		format.set_height(size.height());
-		format.set_row_alignment(unpack_alignment);
-		format.set_pixel_format(PixelFormat::Rgb, 24);
-		format.set_orientation(ImageOrientation::XRightYUp);
-
-		Image image(format);
+		Image image({ static_cast<size_t>(size.width()), static_cast<size_t>(size.height()), PixelFormat::Rgb, 24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp });
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);

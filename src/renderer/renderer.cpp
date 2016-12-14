@@ -59,29 +59,17 @@ namespace Yttrium
 
 		static const int32_t white_texture_data = -1;
 
-		ImageFormat white_texture_format;
-		white_texture_format.set_width(1);
-		white_texture_format.set_height(1);
-		white_texture_format.set_orientation(ImageOrientation::XRightYDown);
-		white_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
+		Image white_image({ 1, 1, PixelFormat::Bgra, 32 });
+		std::memcpy(white_image.data(), &white_texture_data, white_image.format().frame_size()); // TODO: Move inside Image constructor.
 
-		Image white_texture_image(white_texture_format);
-		std::memcpy(white_texture_image.data(), &white_texture_data, white_texture_format.frame_size());
-
-		renderer->_white_texture = renderer->create_texture_2d(white_texture_image, false);
+		renderer->_white_texture = renderer->create_texture_2d(white_image, false);
 		if (!renderer->_white_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
-		ImageFormat debug_texture_format;
-		debug_texture_format.set_width(DebugTexture::width);
-		debug_texture_format.set_height(DebugTexture::height);
-		debug_texture_format.set_orientation(ImageOrientation::XRightYDown);
-		debug_texture_format.set_pixel_format(PixelFormat::Bgra, 32);
+		Image debug_image({ DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 });
+		std::memcpy(debug_image.data(), DebugTexture::data, debug_image.format().frame_size());
 
-		Image debug_texture_image(debug_texture_format);
-		std::memcpy(debug_texture_image.data(), DebugTexture::data, debug_texture_format.frame_size());
-
-		renderer->_debug_texture = renderer->create_texture_2d(debug_texture_image, false);
+		renderer->_debug_texture = renderer->create_texture_2d(debug_image, false);
 		if (!renderer->_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 

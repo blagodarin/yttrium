@@ -81,20 +81,14 @@ namespace
 
 Blocks::Blocks(Renderer& renderer)
 {
-	ImageFormat format;
-	format.set_width(FragmentSize);
-	format.set_height(FragmentSize * FragmentCount);
-	format.set_pixel_format(PixelFormat::Bgra, 32);
-	format.set_orientation(ImageOrientation::XRightYDown);
-
-	Image image(format);
+	Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra, 32 });
 	for (int i = 0; i < FragmentCount; ++i)
 	{
 		for (int y = 0; y < FragmentSize; ++y)
 		{
 			for (int x = 0; x < FragmentSize; ++x)
 			{
-				const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * format.row_size() + x * 4;
+				const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.format().row_size() + x * 4;
 				const auto color = ::pixel_color(i, x, y);
 				pixel[0] = color.b;
 				pixel[1] = color.g;

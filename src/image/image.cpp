@@ -7,6 +7,28 @@
 #include "formats.h"
 #include "utils.h"
 
+#include <cassert>
+
+namespace
+{
+	using namespace Yttrium;
+
+	size_t channels_of(PixelFormat pixel_format)
+	{
+		switch (pixel_format)
+		{
+		case PixelFormat::Gray: return 1;
+		case PixelFormat::GrayAlpha: return 2;
+		case PixelFormat::Rgb: return 3;
+		case PixelFormat::Bgr: return 3;
+		case PixelFormat::Rgba: return 4;
+		case PixelFormat::Bgra: return 4;
+		}
+		assert(false);
+		return 0;
+	}
+}
+
 namespace Yttrium
 {
 	ImageFormat::ImageFormat()
@@ -19,6 +41,19 @@ namespace Yttrium
 		, _row_size(0)
 		, _height(0)
 	{
+	}
+
+	ImageFormat::ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment, ImageOrientation orientation)
+		: _pixel_format(pixel_format)
+		, _channels(::channels_of(pixel_format))
+		, _bits_per_pixel(bits_per_pixel)
+		, _orientation(orientation)
+		, _width(width)
+		, _row_alignment(row_alignment)
+		, _row_size(aligned_image_row_size(_width, _bits_per_pixel, _row_alignment))
+		, _height(height)
+	{
+		assert(is_power_of_2(_bits_per_pixel));
 	}
 
 	void ImageFormat::set_pixel_format(PixelFormat pixel_format, size_t bits_per_pixel)
