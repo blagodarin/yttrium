@@ -113,5 +113,5 @@ BOOST_AUTO_TEST_CASE(test_intensity)
 	Image expected;
 	BOOST_REQUIRE(expected.load(Reader("tests/image/y8_bgra32.tga")));
 
-	BOOST_CHECK(expected == converted);
+	BOOST_CHECK(expected == *converted);
 }

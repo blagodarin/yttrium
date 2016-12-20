@@ -170,7 +170,7 @@ namespace Yttrium
 				// TODO: Move this inside the renderer.
 				auto converted = intensity_to_bgra(image);
 				if (converted)
-					image = std::move(converted);
+					image = std::move(*converted);
 			}
 			return _private->_renderer->create_texture_2d(image);
 		});

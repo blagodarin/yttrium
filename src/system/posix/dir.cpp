@@ -17,13 +17,10 @@ namespace Yttrium
 	{
 	public:
 		Private(Allocator& allocator, DIR* dir)
-			: _allocator(&allocator)
-			, _dir(dir)
-		{
-		}
+			: _allocator(&allocator), _dir(dir) {}
 
 	public:
-		Allocator* const _allocator; // TODO: Why changing it to reference generates compiler warning on offsetof?
+		Allocator* const _allocator;
 		DIR* const _dir;
 		::dirent _dirent;
 	};

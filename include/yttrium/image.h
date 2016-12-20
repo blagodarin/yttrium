@@ -7,6 +7,8 @@
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
 
+#include <boost/optional/optional.hpp> // TODO: Use std::optional in C++17.
+
 namespace Yttrium
 {
 	class Reader;
@@ -129,13 +131,11 @@ namespace Yttrium
 		///
 		Image() = default;
 
-		/// Allocate an image for the specified \a format.
-		/// \param format Image format.
-		/// \note The image data is left uninitialized.
-		explicit Image(const ImageFormat&);
+		/// Creates an image of the specified format with uninitialized contents.
+		explicit Image(const ImageFormat& format);
 
-		///
-		operator bool() const noexcept { return _buffer.size() > 0; }
+		/// Creates an image of the specified format, initialized from the provided data.
+		Image(const ImageFormat&, const void* data);
 
 		///
 		void* data() noexcept { return _buffer.data(); }
@@ -168,7 +168,7 @@ namespace Yttrium
 	Y_API Image grayscale_to_bgra(const Image&);
 
 	///
-	Y_API Image intensity_to_bgra(const Image&);
+	Y_API boost::optional<Image> intensity_to_bgra(const Image&);
 }
 
 #endif

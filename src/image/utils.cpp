@@ -62,7 +62,7 @@ namespace Yttrium
 		throw std::logic_error("Bad image format for grayscale-BGRA conversion");
 	}
 
-	Image intensity_to_bgra(const Image& input)
+	boost::optional<Image> intensity_to_bgra(const Image& input)
 	{
 		if (input.format().pixel_format() != PixelFormat::Gray || input.format().bits_per_pixel() != 8)
 			return {};
@@ -90,6 +90,6 @@ namespace Yttrium
 			dst += dst_row_size;
 		}
 
-		return output;
+		return std::move(output);
 	}
 }

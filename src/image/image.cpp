@@ -55,6 +55,12 @@ namespace Yttrium
 	{
 	}
 
+	Image::Image(const ImageFormat& format, const void* data)
+		: _format(format)
+		, _buffer(_format.frame_size(), data)
+	{
+	}
+
 	bool Image::load(Reader&& reader, ImageType type)
 	{
 		if (!reader)

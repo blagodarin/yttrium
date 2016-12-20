@@ -15,7 +15,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cstring>
 
 namespace Yttrium
 {
@@ -58,18 +57,11 @@ namespace Yttrium
 		// TODO: Don't copy static texture data.
 
 		static const int32_t white_texture_data = -1;
-
-		Image white_image({ 1, 1, PixelFormat::Bgra, 32 });
-		std::memcpy(white_image.data(), &white_texture_data, white_image.format().frame_size()); // TODO: Move inside Image constructor.
-
-		renderer->_white_texture = renderer->create_texture_2d(white_image, false);
+		renderer->_white_texture = renderer->create_texture_2d({ { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, false);
 		if (!renderer->_white_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
-		Image debug_image({ DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 });
-		std::memcpy(debug_image.data(), DebugTexture::data, debug_image.format().frame_size());
-
-		renderer->_debug_texture = renderer->create_texture_2d(debug_image, false);
+		renderer->_debug_texture = renderer->create_texture_2d({ { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 }, DebugTexture::data }, false);
 		if (!renderer->_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
