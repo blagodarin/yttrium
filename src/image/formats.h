@@ -3,6 +3,8 @@
 
 #include "../config.h"
 
+#include <boost/optional/optional_fwd.hpp>
+
 namespace Yttrium
 {
 	class Buffer;
@@ -11,20 +13,20 @@ namespace Yttrium
 	class Reader;
 	class Writer;
 
-	bool read_dds_header(Reader&, ImageFormat&);
+	boost::optional<ImageFormat> read_dds_header(Reader&);
 
 #ifndef Y_NO_JPEG
-	bool read_jpeg(Reader&, ImageFormat&, Buffer&);
+	boost::optional<ImageFormat> read_jpeg(Reader&, Buffer&);
 #endif
 
 #ifndef Y_NO_PNG
 	bool write_png(Writer&, const ImageFormat&, const void*);
 #endif
 
-	bool read_tga_header(Reader&, ImageFormat&);
+	boost::optional<ImageFormat> read_tga_header(Reader&);
 	bool write_tga(Writer&, const ImageFormat&, const void*);
 
-	bool read_image(Reader&, ImageType, ImageFormat&, Buffer&);
+	boost::optional<ImageFormat> read_image(Reader&, ImageType, Buffer&);
 	bool read_image_data(Reader&, const ImageFormat&, Buffer&);
 	bool write_image(Writer&, ImageType, const ImageFormat&, const void*);
 

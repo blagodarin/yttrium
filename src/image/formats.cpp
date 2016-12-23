@@ -8,17 +8,21 @@
 
 namespace Yttrium
 {
-	bool read_image(Reader& reader, ImageType type, ImageFormat& format, Buffer& buffer)
+	boost::optional<ImageFormat> read_image(Reader& reader, ImageType type, Buffer& buffer)
 	{
+		boost::optional<ImageFormat> format;
 		switch (type)
 		{
-		case ImageType::Tga: return read_tga_header(reader, format) && read_image_data(reader, format, buffer);
+		case ImageType::Tga: format = read_tga_header(reader); break;
 #ifndef Y_NO_JPEG
-		case ImageType::Jpeg: return read_jpeg(reader, format, buffer);
+		case ImageType::Jpeg: return read_jpeg(reader, buffer);
 #endif
-		case ImageType::Dds: return read_dds_header(reader, format) && read_image_data(reader, format, buffer);
-		default: return false;
+		case ImageType::Dds: format = read_dds_header(reader); break;
+		default: return {};
 		}
+		if (!format || !read_image_data(reader, *format, buffer))
+			return {};
+		return format;
 	}
 
 	bool read_image_data(Reader& reader, const ImageFormat& format, Buffer& buffer)

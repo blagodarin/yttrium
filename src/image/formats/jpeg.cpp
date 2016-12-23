@@ -23,23 +23,23 @@ namespace
 
 namespace Yttrium
 {
-	bool read_jpeg(Reader& reader, ImageFormat& format, Buffer& buffer)
+	boost::optional<ImageFormat> read_jpeg(Reader& reader, Buffer& buffer)
 	{
 		Buffer reader_buffer;
 		try
 		{
 			if (!reader.read_all(reader_buffer))
-				return false;
+				return {};
 		}
 		catch (const std::bad_alloc&)
 		{
-			return false;
+			return {};
 		}
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
 		if (::setjmp(error_handler._jmp_buf))
-			return false;
+			return {};
 
 		jpeg_decompress_struct decompressor;
 		decompressor.err = ::jpeg_std_error(&error_handler._error_mgr);
@@ -47,7 +47,7 @@ namespace Yttrium
 		if (::setjmp(error_handler._jmp_buf))
 		{
 			::jpeg_destroy_decompress(&decompressor);
-			return false;
+			return {};
 		}
 
 		::jpeg_mem_src(&decompressor, &reader_buffer[0], reader_buffer.size());
@@ -58,7 +58,7 @@ namespace Yttrium
 
 		::jpeg_calc_output_dimensions(&decompressor);
 
-		format = { decompressor.output_width, decompressor.output_height, PixelFormat::Rgb, 24 };
+		ImageFormat format(decompressor.output_width, decompressor.output_height, PixelFormat::Rgb, 24);
 
 		try
 		{
@@ -67,7 +67,7 @@ namespace Yttrium
 		catch (const std::bad_alloc&)
 		{
 			::jpeg_destroy_decompress(&decompressor);
-			return false;
+			return {};
 		}
 
 		::jpeg_start_decompress(&decompressor);
@@ -76,10 +76,10 @@ namespace Yttrium
 		::jpeg_finish_decompress(&decompressor);
 
 		if (::setjmp(error_handler._jmp_buf))
-			return false;
+			return {};
 
 		::jpeg_destroy_decompress(&decompressor);
 
-		return true;
+		return format;
 	}
 }

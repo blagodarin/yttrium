@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	bool read_dds_header(Reader& reader, ImageFormat& format)
+	boost::optional<ImageFormat> read_dds_header(Reader& reader)
 	{
 		DDS_HEADER header;
 		if (!reader.read(header)
@@ -28,54 +28,56 @@ namespace Yttrium
 			|| header.dwCaps3
 			|| header.dwCaps4
 			|| header.dwReserved2)
-			return false;
+			return {};
+
+		boost::optional<ImageFormat> format;
 
 		switch (header.ddspf.dwFlags & (DDPF_ALPHAPIXELS | DDPF_RGB | DDPF_LUMINANCE))
 		{
 		case DDPF_RGB:
 			if (header.ddspf.dwRGBBitCount != 24)
-				return false;
+				return {};
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && !header.ddspf.dwABitMask)
-				format = { header.dwWidth, header.dwHeight, PixelFormat::Bgr, 24 };
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgr, 24);
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && !header.ddspf.dwABitMask)
-				format = { header.dwWidth, header.dwHeight, PixelFormat::Rgb, 24 };
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgb, 24);
 			else
-				return false;
+				return {};
 			break;
 
 		case DDPF_RGB | DDPF_ALPHAPIXELS:
 			if (header.ddspf.dwRGBBitCount != 32)
-				return false;
+				return {};
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && header.ddspf.dwABitMask == 0xff000000)
-				format = { header.dwWidth, header.dwHeight, PixelFormat::Bgra, 32 };
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgra, 32);
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && header.ddspf.dwABitMask == 0xff000000)
-				format = { header.dwWidth, header.dwHeight, PixelFormat::Rgba, 32 };
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgba, 32);
 			else
-				return false;
+				return {};
 			break;
 
 		case DDPF_LUMINANCE:
 			if (header.ddspf.dwRGBBitCount != 8)
-				return false;
+				return {};
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && !header.ddspf.dwABitMask)
-				format = { header.dwWidth, header.dwHeight, PixelFormat::Gray, 8 };
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Gray, 8);
 			else
-				return false;
+				return {};
 			break;
 
 		case DDPF_LUMINANCE | DDPF_ALPHAPIXELS:
 			if (header.ddspf.dwRGBBitCount != 16)
-				return false;
+				return {};
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && header.ddspf.dwABitMask == 0xff00)
-				format = { header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha, 16 };
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha, 16);
 			else
-				return false;
+				return {};
 			break;
 
 		default:
-			return false;
+			return {};
 		}
 
-		return true;
+		return format;
 	}
 }

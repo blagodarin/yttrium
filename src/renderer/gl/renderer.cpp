@@ -95,16 +95,16 @@ namespace Yttrium
 		GLenum data_type = 0;
 		auto data = image.data();
 
-		Image temporary;
+		boost::optional<Image> temporary;
 		switch (image_format.pixel_format())
 		{
 		case PixelFormat::Gray:
 		case PixelFormat::GrayAlpha:
-			temporary = grayscale_to_bgra(image);
 			internal_format = GL_RGBA8;
 			data_format = GL_BGRA;
 			data_type = GL_UNSIGNED_BYTE;
-			data = temporary.data();
+			temporary = grayscale_to_bgra(image);
+			data = temporary->data();
 			break;
 		case PixelFormat::Rgb:
 			internal_format = GL_RGB8;

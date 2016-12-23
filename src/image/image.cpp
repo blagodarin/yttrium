@@ -31,11 +31,6 @@ namespace
 
 namespace Yttrium
 {
-	ImageFormat::ImageFormat()
-		: ImageFormat(0, 0, PixelFormat::Gray, 8)
-	{
-	}
-
 	ImageFormat::ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment, ImageOrientation orientation)
 		: _pixel_format(pixel_format)
 		, _channels(::channels_of(pixel_format))
@@ -61,19 +56,17 @@ namespace Yttrium
 	{
 	}
 
-	bool Image::load(Reader&& reader, ImageType type)
+	boost::optional<Image> Image::load(Reader&& reader, ImageType type)
 	{
 		if (!reader)
-			return false;
+			return {};
 		if (type == ImageType::Auto && !detect_image_type(reader, type))
-			return false;
-		ImageFormat format;
+			return {};
 		Buffer buffer;
-		if (!read_image(reader, type, format, buffer))
-			return false;
-		_format = format;
-		_buffer = std::move(buffer);
-		return true;
+		const auto format = read_image(reader, type, buffer);
+		if (!format)
+			return {};
+		return Image(*format, std::move(buffer));
 	}
 
 	bool Image::save(const StaticString& name, ImageType type) const
@@ -99,19 +92,19 @@ namespace Yttrium
 
 	bool Image::swap_channels()
 	{
-		switch (_format._pixel_format)
+		switch (_format.pixel_format())
 		{
 		case PixelFormat::Gray:
 			return true;
 
 		case PixelFormat::Rgb:
 		case PixelFormat::Bgr:
-			if (_format._bits_per_pixel == 24)
+			if (_format.bits_per_pixel() == 24)
 			{
 				auto scanline = static_cast<uint8_t*>(_buffer.data());
-				for (size_t row = 0; row < _format._height; ++row)
+				for (size_t row = 0; row < _format.height(); ++row)
 				{
-					for (size_t offset = 0; offset < _format._width * 3; offset += 3)
+					for (size_t offset = 0; offset < _format.width() * 3; offset += 3)
 					{
 						const auto x = scanline[offset];
 						scanline[offset] = scanline[offset + 2];
@@ -119,7 +112,7 @@ namespace Yttrium
 					}
 					scanline += _format.row_size();
 				}
-				_format._pixel_format = (_format._pixel_format == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb);
+				_format._pixel_format = (_format.pixel_format() == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb);
 				return true;
 			}
 			break;

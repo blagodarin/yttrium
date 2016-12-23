@@ -50,7 +50,7 @@ namespace
 
 namespace Yttrium
 {
-	bool read_tga_header(Reader& reader, ImageFormat& format)
+	boost::optional<ImageFormat> read_tga_header(Reader& reader)
 	{
 		TgaHeader header;
 
@@ -59,7 +59,7 @@ namespace Yttrium
 			|| !header.image.width
 			|| !header.image.height
 			|| header.image.descriptor & tgaReservedMask)
-			return false;
+			return {};
 
 		const auto orientation = [&header]
 		{
@@ -72,28 +72,30 @@ namespace Yttrium
 			}
 		};
 
+		boost::optional<ImageFormat> format;
+
 		if (header.image_type == tgaTrueColor)
 		{
 			const auto alpha = header.image.descriptor & tgaAlphaMask;
 			if (!alpha && header.image.pixel_depth == 24)
-				format = { header.image.width, header.image.height, PixelFormat::Bgr, 24, orientation() };
+				format.emplace(header.image.width, header.image.height, PixelFormat::Bgr, 24, orientation());
 			else if (alpha == 8 && header.image.pixel_depth == 32)
-				format = { header.image.width, header.image.height, PixelFormat::Bgra, 32, orientation() };
+				format.emplace(header.image.width, header.image.height, PixelFormat::Bgra, 32, orientation());
 			else
-				return false;
+				return {};
 		}
 		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
-			format = { header.image.width, header.image.height, PixelFormat::Gray, 8, orientation() };
+			format.emplace(header.image.width, header.image.height, PixelFormat::Gray, 8, orientation());
 		else
-			return false;
+			return {};
 
-		if (header.id_length)
-			reader.skip(header.id_length);
+		if (header.id_length && !reader.skip(header.id_length))
+			return {};
 
-		if (header.color_map.length)
-			reader.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8));
+		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8)))
+			return {};
 
-		return true;
+		return format;
 	}
 
 	bool write_tga(Writer& writer, const ImageFormat& format, const void* data)

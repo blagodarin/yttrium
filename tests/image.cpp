@@ -38,11 +38,11 @@ using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_tga)
 {
-	Image image;
-	BOOST_REQUIRE(image.load(Reader("tests/image/gradient32.tga")));
+	const auto image = Image::load(Reader("tests/image/gradient32.tga"));
+	BOOST_REQUIRE(image);
 
 	TemporaryFile file;
-	BOOST_REQUIRE(image.save(file.name(), ImageType::Tga));
+	BOOST_REQUIRE(image->save(file.name(), ImageType::Tga));
 
 	const auto expected = Reader("tests/image/gradient32.tga").to_buffer();
 	const auto actual = Reader(file).to_buffer();
@@ -51,37 +51,37 @@ BOOST_AUTO_TEST_CASE(test_tga)
 
 BOOST_AUTO_TEST_CASE(test_dds)
 {
-	Image dds_image;
-	BOOST_REQUIRE(dds_image.load(Reader("tests/image/gradient32.dds")));
+	const auto dds_image = Image::load(Reader("tests/image/gradient32.dds"));
+	BOOST_REQUIRE(dds_image);
 
-	Image tga_image;
-	BOOST_REQUIRE(tga_image.load(Reader("tests/image/gradient32.tga")));
+	const auto tga_image = Image::load(Reader("tests/image/gradient32.tga"));
+	BOOST_REQUIRE(tga_image);
 
 	BOOST_CHECK(dds_image == tga_image);
 }
 
 BOOST_AUTO_TEST_CASE(test_grayscale_to_bgra) // TODO: Add GrayAlpha-to-Bgra test.
 {
-	Image y8;
-	BOOST_REQUIRE(y8.load(Reader("tests/image/y8.tga")));
+	const auto y8 = Image::load(Reader("tests/image/y8.tga"));
+	BOOST_REQUIRE(y8);
 
-	Image bgrx32;
-	BOOST_REQUIRE(bgrx32.load(Reader("tests/image/y8_bgrx32.tga")));
+	const auto bgrx32 = Image::load(Reader("tests/image/y8_bgrx32.tga"));
+	BOOST_REQUIRE(bgrx32);
 
-	BOOST_CHECK(grayscale_to_bgra(y8) == bgrx32);
+	BOOST_CHECK(grayscale_to_bgra(*y8) == *bgrx32);
 }
 
 #ifndef Y_NO_JPEG
 BOOST_AUTO_TEST_CASE(test_jpeg)
 {
-	Image jpeg_image;
-	BOOST_REQUIRE(jpeg_image.load(Reader("tests/image/gradient24.jpeg")));
-	BOOST_REQUIRE(jpeg_image.format().pixel_format() == PixelFormat::Rgb);
+	const auto jpeg_image = Image::load(Reader("tests/image/gradient24.jpeg"));
+	BOOST_REQUIRE(jpeg_image);
+	BOOST_REQUIRE(jpeg_image->format().pixel_format() == PixelFormat::Rgb);
 
-	Image tga_image;
-	BOOST_REQUIRE(tga_image.load(Reader("tests/image/gradient24.jpeg.tga")));
-	BOOST_REQUIRE(tga_image.format().pixel_format() == PixelFormat::Bgr);
-	BOOST_REQUIRE(tga_image.swap_channels());
+	auto tga_image = Image::load(Reader("tests/image/gradient24.jpeg.tga"));
+	BOOST_REQUIRE(tga_image);
+	BOOST_REQUIRE(tga_image->format().pixel_format() == PixelFormat::Bgr);
+	BOOST_REQUIRE(tga_image->swap_channels());
 
 	BOOST_CHECK(jpeg_image == tga_image);
 }
@@ -90,11 +90,11 @@ BOOST_AUTO_TEST_CASE(test_jpeg)
 #ifndef Y_NO_PNG
 BOOST_AUTO_TEST_CASE(test_png)
 {
-	Image image;
-	BOOST_REQUIRE(image.load(Reader("tests/image/gradient24.tga")));
+	const auto image = Image::load(Reader("tests/image/gradient24.tga"));
+	BOOST_REQUIRE(image);
 
 	TemporaryFile file;
-	BOOST_REQUIRE(image.save(file.name(), ImageType::Png));
+	BOOST_REQUIRE(image->save(file.name(), ImageType::Png));
 
 	const auto expected = Reader("tests/image/gradient24.png").to_buffer();
 	const auto actual = Reader(file).to_buffer();
@@ -104,14 +104,14 @@ BOOST_AUTO_TEST_CASE(test_png)
 
 BOOST_AUTO_TEST_CASE(test_intensity)
 {
-	Image source;
-	BOOST_REQUIRE(source.load(Reader("tests/image/y8.tga")));
+	const auto source = Image::load(Reader("tests/image/y8.tga"));
+	BOOST_REQUIRE(source);
 
-	const auto converted = intensity_to_bgra(source);
+	const auto converted = intensity_to_bgra(*source);
 	BOOST_REQUIRE(converted);
 
-	Image expected;
-	BOOST_REQUIRE(expected.load(Reader("tests/image/y8_bgra32.tga")));
+	const auto expected = Image::load(Reader("tests/image/y8_bgra32.tga"));
+	BOOST_REQUIRE(expected);
 
-	BOOST_CHECK(expected == *converted);
+	BOOST_CHECK(expected == converted);
 }

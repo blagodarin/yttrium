@@ -162,17 +162,17 @@ namespace Yttrium
 		{
 			const bool intensity = reader.property("intensity"_s) == "1"_s;
 			// TODO: Map texture memory, then read the image into that memory.
-			Image image;
-			if (!image.load(std::move(reader)))
+			auto image = Image::load(std::move(reader));
+			if (!image)
 				return {};
 			if (intensity)
 			{
 				// TODO: Move this inside the renderer.
-				auto converted = intensity_to_bgra(image);
+				auto converted = intensity_to_bgra(*image);
 				if (converted)
-					image = std::move(*converted);
+					*image = std::move(*converted);
 			}
-			return _private->_renderer->create_texture_2d(image);
+			return _private->_renderer->create_texture_2d(*image);
 		});
 	}
 

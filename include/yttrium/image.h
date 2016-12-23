@@ -45,17 +45,10 @@ namespace Yttrium
 		XLeftYUp,    ///< X right-to-left, Y bottom-to-top.
 	};
 
-	class Image;
-
 	/// Image format.
 	class Y_API ImageFormat
 	{
-		friend Image;
-
 	public:
-		///
-		ImageFormat();
-
 		///
 		ImageFormat(size_t width, size_t height, PixelFormat, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
 
@@ -105,14 +98,15 @@ namespace Yttrium
 		size_t width() const { return _width; }
 
 	private:
-		PixelFormat      _pixel_format;
-		size_t           _channels;
-		size_t           _bits_per_pixel;
+		PixelFormat _pixel_format;
+		size_t _channels;
+		size_t _bits_per_pixel;
 		ImageOrientation _orientation;
-		size_t           _width;
-		size_t           _row_alignment;
-		size_t           _row_size;
-		size_t           _height;
+		size_t _width;
+		size_t _row_alignment;
+		size_t _row_size;
+		size_t _height;
+		friend class Image;
 	};
 
 	inline bool operator==(const ImageFormat& a, const ImageFormat& b)
@@ -128,9 +122,6 @@ namespace Yttrium
 	class Y_API Image
 	{
 	public:
-		///
-		Image() = default;
-
 		/// Creates an image of the specified format with uninitialized contents.
 		explicit Image(const ImageFormat& format);
 
@@ -138,14 +129,14 @@ namespace Yttrium
 		Image(const ImageFormat&, const void* data);
 
 		///
+		static boost::optional<Image> load(Reader&&, ImageType = ImageType::Auto);
+
+		///
 		void* data() noexcept { return _buffer.data(); }
 		const void* data() const noexcept { return _buffer.data(); }
 
 		///
 		ImageFormat format() const { return _format; }
-
-		///
-		bool load(Reader&&, ImageType = ImageType::Auto);
 
 		///
 		bool save(const StaticString& name, ImageType = ImageType::Auto) const;
@@ -162,6 +153,7 @@ namespace Yttrium
 	private:
 		ImageFormat _format;
 		Buffer _buffer;
+		Image(const ImageFormat& format, Buffer&& buffer) : _format(format), _buffer(std::move(buffer)) {}
 	};
 
 	///
