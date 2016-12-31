@@ -3,6 +3,7 @@ add_executable(unit_tests
 	dir.cpp
 	gui.cpp
 	image.cpp
+	image_formats.cpp
 	ion.cpp
 	key_lookup.cpp
 	main.cpp
