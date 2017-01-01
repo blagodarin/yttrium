@@ -7,7 +7,7 @@
 
 using namespace Yttrium;
 
-int main(int, char**)
+int main()
 {
 	Writer writer("data/sound.wav");
 

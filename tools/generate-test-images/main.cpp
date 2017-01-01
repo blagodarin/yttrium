@@ -18,7 +18,7 @@ namespace
 	}
 }
 
-int main(int, char**)
+int main()
 {
 	{
 		TgaHeader header;
