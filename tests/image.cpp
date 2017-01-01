@@ -1,6 +1,6 @@
 #include "image.h"
 
-#include "src/config.h"
+#include "../src/config.h"
 
 #include <boost/test/unit_test.hpp>
 

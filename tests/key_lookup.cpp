@@ -1,8 +1,8 @@
-#include "src/window/key_lookup.h"
+#include "../src/window/key_lookup.h"
 
 #include <boost/test/unit_test.hpp>
 
-#include "src/window/key_lookup.cpp"
+#include "../src/window/key_lookup.cpp"
 
 using namespace Yttrium;
 

@@ -23,7 +23,6 @@ add_executable(unit_tests
 	vector.cpp
 	)
 target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
-target_include_directories(unit_tests PRIVATE "${PROJECT_SOURCE_DIR}")
 target_link_libraries(unit_tests yttrium ${Boost_LIBRARIES})
 
 add_custom_target(check COMMAND unit_tests WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

@@ -3,54 +3,19 @@
 #include <yttrium/storage/writer.h>
 #include "../../src/image/formats/dds.h"
 #include "../../src/image/formats/tga.h"
+#include "../../tests/image_formats.h"
 
 #include <cstring>
 
 using namespace Yttrium;
 
-void write_color_gradient(Writer& writer, bool with_alpha)
+namespace
 {
-	Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
-
-	auto data = &buffer[0];
-
-	for (size_t y = 0; y < 16; ++y)
+	void write_color_gradient(Writer& writer, bool with_alpha)
 	{
-		for (size_t x = 0; x < 16; ++x)
-		{
-			uint8_t b = 0;
-			uint8_t g = 0;
-			uint8_t r = 0;
-
-			if (y < 4)
-			{
-				r = (y * 16 + x) * 4 + 3;
-			}
-			else if (y < 8)
-			{
-				r = ((7 - y) * 16 + x) * 4 + 3;
-				g = ((y - 4) * 16 + x) * 4 + 3;
-			}
-			else if (y < 12)
-			{
-				g = ((11 - y) * 16 + x) * 4 + 3;
-				b = (( y - 8) * 16 + x) * 4 + 3;
-			}
-			else
-			{
-				b = ((15 - y) * 16 + x) * 4 + 3;
-			}
-
-			*data++ = b;
-			*data++ = g;
-			*data++ = r;
-
-			if (with_alpha)
-				*data++ = x * 16 + 15;
-		}
+		const auto image = make_test_image(with_alpha);
+		writer.write(image.data(), image.format().frame_size());
 	}
-
-	writer.write_all(buffer);
 }
 
 int main(int, char**)

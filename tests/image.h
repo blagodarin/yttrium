@@ -2,7 +2,7 @@
 #define _tests_image_h_
 
 #include <yttrium/image.h>
-#include "src/image/utils.h"
+#include "../src/image/utils.h"
 
 #include <cstring>
 
