@@ -103,32 +103,15 @@ namespace Yttrium
 	{
 	}
 
-	void ScriptCode::execute(ScriptContext& context, ScriptCodeMode mode) const
+	void ScriptCode::execute(ScriptContext& context) const
 	{
 		if (!_private)
 			return;
 		TemporaryAllocator<64> result_allocator(_private->_allocator);
 		String result(&result_allocator);
-		if (mode == ScriptCodeMode::Do)
-		{
-			for (const auto& command : _private->_commands)
-				if (!context.call(command.name, &result, ScriptArgs(context, command.args)))
-					break;
-		}
-		else
-		{
-			assert(mode == ScriptCodeMode::Undo);
-			for (auto command = _private->_commands.crbegin(); command != _private->_commands.crend(); ++command)
-			{
-				if (command->name[0] != '+')
-					continue;
-				TemporaryAllocator<32> name_allocator(_private->_allocator);
-				String name(command->name, &name_allocator);
-				name[0] = '-';
-				if (!context.call(name, &result, ScriptArgs(context, command->args)))
-					break;
-			}
-		}
+		for (const auto& command : _private->_commands)
+			if (!context.call(command.name, &result, ScriptArgs(context, command.args)))
+				break;
 	}
 
 	ScriptCode ScriptCode::load(const StaticString& filename, Allocator& allocator)

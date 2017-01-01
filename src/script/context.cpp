@@ -66,7 +66,7 @@ namespace Yttrium
 			return false;
 		}
 
-		StaticString id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
+		const auto id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
 
 		const auto command = _private->_commands.find(String(id, ByReference(), nullptr));
 		if (command == _private->_commands.end())

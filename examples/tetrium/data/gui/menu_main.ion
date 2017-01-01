@@ -1,6 +1,6 @@
 root layer "menu_main"
 {
-	on_key "esc" "exit"
+	on_key "esc" { quit }
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
@@ -18,35 +18,35 @@ root layer "menu_main"
 		{
 			position "" "210"
 			text     {tr"Single player"}
-			on_click "push_layer menu_single"
+			on_click { enter "menu_single" }
 		}
 
 		button ["button"]
 		{
 			position "" "260"
 			text     {tr"Multiplayer"}
-			on_click "push_layer menu_multi"
+			on_click { enter "menu_multi" }
 		}
 
 		button ["button"]
 		{
 			position "" "310"
 			text     {tr"Statistics"}
-			on_click "push_layer menu_statistics"
+			on_click { enter "menu_statistics" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
 			text     {tr"Help"}
-			on_click "push_layer menu_help"
+			on_click { enter "menu_help" }
 		}
 
 		button ["button"]
 		{
 			position "" "410"
 			text     {tr"Exit"}
-			on_click "exit"
+			on_click { quit }
 		}
 	}
 }

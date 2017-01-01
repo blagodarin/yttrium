@@ -18,7 +18,7 @@ class "statistics_score"
 
 layer "menu_statistics"
 {
-	on_key "esc" "pop_layer"
+	on_key "esc" { return }
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
@@ -56,7 +56,7 @@ layer "menu_statistics"
 		{
 			position "" "310"
 			text     {tr"Back"}
-			on_click "pop_layer"
+			on_click { return }
 		}
 	}
 }

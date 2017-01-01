@@ -1,6 +1,6 @@
 layer "menu_multi"
 {
-	on_key "esc" "pop_layer"
+	on_key "esc" { return }
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
@@ -39,7 +39,7 @@ layer "menu_multi"
 		{
 			position "" "410"
 			text     {tr"Back"}
-			on_click "pop_layer"
+			on_click { return }
 		}
 	}
 }

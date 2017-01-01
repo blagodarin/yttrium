@@ -1,5 +1,5 @@
-#ifndef _src_window_bindings_lookup_h_
-#define _src_window_bindings_lookup_h_
+#ifndef _src_gui_key_lookup_h_
+#define _src_gui_key_lookup_h_
 
 #include <yttrium/key.h>
 

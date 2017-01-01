@@ -2,6 +2,7 @@
 #define _src_gui_widgets_button_h_
 
 #include <yttrium/script/code.h>
+#include "../actions.h"
 #include "../properties.h"
 #include "widget.h"
 
@@ -12,7 +13,7 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-		ButtonWidget(const GuiPrivate&);
+		ButtonWidget(GuiPrivate&);
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
@@ -30,7 +31,7 @@ namespace Yttrium
 		ResourcePtr<const Sound> _sound;
 		WidgetState _state = WidgetState::NotSet;
 		Style _styles[WidgetStateCount];
-		ScriptCode _on_click;
+		GuiActions _on_click;
 	};
 }
 

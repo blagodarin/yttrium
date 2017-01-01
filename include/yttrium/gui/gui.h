@@ -24,25 +24,16 @@ namespace Yttrium
 	{
 	public:
 		///
-		Gui(ResourceLoader&, ScriptContext&, Allocator& = *DefaultAllocator);
+		Gui(ResourceLoader&, ScriptContext&, const StaticString& name, Allocator& = *DefaultAllocator);
 
 		///
-		void clear();
+		~Gui();
 
 		///
-		bool has_layer(const StaticString& name) const;
-
-		///
-		bool load(const StaticString& name); // TODO: Throw on failure.
-
-		///
-		bool pop_layers(size_t count);
+		void notify(const StaticString& event);
 
 		///
 		bool process_key_event(const KeyEvent&);
-
-		///
-		bool push_layer(const StaticString& name);
 
 		///
 		void render(Renderer&, const PointF& cursor) const;
@@ -50,7 +41,8 @@ namespace Yttrium
 		///
 		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
 
-		~Gui();
+		///
+		void set_quit_handler(const std::function<void()>&);
 
 	private:
 		const std::unique_ptr<class GuiPrivate> _private;

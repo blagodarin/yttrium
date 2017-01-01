@@ -5,9 +5,14 @@
 
 namespace Yttrium
 {
-	void IonListIterator::operator ++()
+	void IonListIterator::operator++()
 	{
 		_value = _value->_next;
+	}
+
+	IonListIterator IonListIterator::next() const
+	{
+		return IonListIterator(_value->_next);
 	}
 
 	void IonListRange::pop_first()

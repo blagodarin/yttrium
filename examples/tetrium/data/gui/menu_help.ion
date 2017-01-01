@@ -11,7 +11,7 @@ class "help_text"
 
 layer "menu_help"
 {
-	on_key "esc" "pop_layer"
+	on_key "esc" { return }
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
@@ -47,7 +47,7 @@ layer "menu_help"
 		{
 			position "" "360"
 			text     {tr"Back"}
-			on_click "pop_layer"
+			on_click { return }
 		}
 	}
 }

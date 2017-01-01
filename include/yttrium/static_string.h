@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iosfwd>
+#include <string>
 
 namespace Yttrium
 {
@@ -100,6 +101,9 @@ namespace Yttrium
 		unsigned to_uint() const;
 		uint32_t to_uint32() const;
 		uint64_t to_uint64() const;
+
+		///
+		std::string to_std() const { return std::string(_text, _size); }
 
 		///
 		StaticString trimmed() const;

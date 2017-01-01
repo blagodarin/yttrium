@@ -31,16 +31,6 @@ Game::Game(Storage& storage)
 			{1000, String("John Placeholder", &_allocator)},
 		}, _allocator)
 {
-	_script.define("bind", 2, [this](const ScriptCall& call)
-	{
-		_bindings.bind(call.args.string(0), call.args.string(1));
-	});
-
-	_script.define("exit", [this](const ScriptCall&)
-	{
-		_window.close();
-	});
-
 	_script.define("game_pause", [this](const ScriptCall&)
 	{
 		_game_running = false;
@@ -86,18 +76,6 @@ Game::Game(Storage& storage)
 			_audio_player.play();
 		else
 			_audio_player.pause();
-	});
-
-	_script.define("pop_layer", 0, 1, [this](const ScriptCall& call)
-	{
-		const auto layers_to_pop = call.args.get_int(0, 1);
-		if (layers_to_pop > 0 && !_gui.pop_layers(layers_to_pop))
-			_window.close();
-	});
-
-	_script.define("push_layer", 1, [this](const ScriptCall& call)
-	{
-		_gui.push_layer(call.args.string(0));
 	});
 
 	_script.define("save_score", [this](const ScriptCall&)
@@ -146,11 +124,6 @@ Game::Game(Storage& storage)
 			_game.turn_right();
 	});
 
-	_script.define("unbindall", [this](const ScriptCall&)
-	{
-		_bindings.clear();
-	});
-
 	_script.define("unset", 1, [this](const ScriptCall& call)
 	{
 		const ScriptValue* value = call.args.value(0);
@@ -165,24 +138,7 @@ Game::~Game() = default;
 
 void Game::run()
 {
-	ScriptCode::load("tetrium.txt", _script.allocator()).execute(_script);
-
-	_bindings.bind_default(Key::_1, "play_music");
-	_bindings.bind_default(Key::_2, "stop_music");
-	_bindings.bind_default(Key::F1, "toggle_debug");
-	_bindings.bind_default(Key::F10, "screenshot"); // KDE grabs Key::Print. =(
-	_bindings.bind_default(Key::Grave, "tgcon");
-
-	_bindings.bind_default(Key::A, "+move_left");
-	_bindings.bind_default(Key::D, "+move_right");
-	_bindings.bind_default(Key::S, "+move_down");
-	_bindings.bind_default(Key::Left, "turn_left");
-	_bindings.bind_default(Key::Right, "turn_right");
-
 	std::srand(millisecond_clock());
-
-	if (!_gui.load("examples/tetrium/data/gui.ion"))
-		return;
 
 	_gui.set_canvas_handler("field", [this](Renderer& renderer, const RectF& rect)
 	{
@@ -196,22 +152,14 @@ void Game::run()
 		draw_next_figure(renderer, rect);
 	});
 
+	_gui.set_quit_handler([this]{ _window.close(); });
+
 	_audio_player.load(_resource_loader.load_music("data/music.ogg"));
 	_audio_player.set_order(AudioPlayer::Random);
 	_audio_player.play();
 
 	_window.show();
 	_window.run();
-
-	Writer settings_file("tetrium.txt");
-	if (settings_file)
-	{
-		String settings(1024, &_allocator);
-		settings << "unbindall\n";
-		for (const auto& binding : _bindings)
-			settings << "bind " << binding.first << " \"" << binding.second.escaped("\\\"", '\\', &_allocator) << "\"\n";
-		settings_file.write(settings.text(), settings.size());
-	}
 }
 
 void Game::on_key_event(const KeyEvent& event)
@@ -219,11 +167,7 @@ void Game::on_key_event(const KeyEvent& event)
 	if (_console.process_key_event(event))
 		return;
 
-	if (_gui.process_key_event(event))
-		return;
-
-	if (!event.autorepeat)
-		_bindings.call(event.key, event.pressed ? ScriptCodeMode::Do : ScriptCodeMode::Undo);
+	_gui.process_key_event(event);
 }
 
 void Game::on_render(Renderer& renderer, const PointF& cursor)
@@ -271,7 +215,7 @@ void Game::on_update(const UpdateEvent& update)
 		if (_game.has_finished())
 		{
 			_game_running = false;
-			_gui.push_layer("game_over");
+			_gui.notify("GameOver");
 		}
 	}
 }

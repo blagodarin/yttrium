@@ -64,7 +64,7 @@ namespace Yttrium
 		{
 			if (!loader.load_rect("texture_rect"_s, texture_rect))
 				texture_rect = RectF(Rect(texture->size()));
-			loader.load_margins("borders"_s, &borders);
+			loader.load_margins("borders"_s, borders);
 		}
 		return true;
 	}
@@ -74,7 +74,7 @@ namespace Yttrium
 		loader.load_color("color"_s, &color);
 		loader.load_texture("texture"_s, texture, texture_filter);
 		loader.load_rect("texture_rect"_s, texture_rect, true);
-		loader.load_margins("borders"_s, &borders);
+		loader.load_margins("borders"_s, borders);
 	}
 
 	ForegroundProperty::ForegroundProperty(Allocator& allocator)
@@ -92,8 +92,7 @@ namespace Yttrium
 
 	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
 	{
-		if (!loader.load_font("font"_s, &font, &font_texture))
-			return false;
+		loader.load_font("font"_s, &font, &font_texture);
 		loader.load("text_size"_s, size);
 		loader.load_color("text_color"_s, &color);
 		loader.load_alignment("align"_s, &alignment);

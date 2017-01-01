@@ -84,6 +84,7 @@ namespace Yttrium
 		const IonValue* operator->() const { return _value; }
 		bool operator==(const IonListIterator& iterator) const { return _value == iterator._value; }
 		bool operator!=(const IonListIterator& iterator) const { return _value != iterator._value; }
+		IonListIterator next() const;
 	private:
 		const IonValue* _value;
 		IonListIterator(const IonValue* value): _value(value) {}

@@ -13,7 +13,7 @@ namespace Yttrium
 {
 	constexpr auto ButtonTextSize = 0.875f;
 
-	ButtonWidget::ButtonWidget(const GuiPrivate& gui)
+	ButtonWidget::ButtonWidget(GuiPrivate& gui)
 		: Widget(gui)
 		, _text(&_gui.allocator())
 		, _foreground(_gui.allocator())
@@ -70,9 +70,7 @@ namespace Yttrium
 
 		loader.unbind();
 
-		String on_click(&_gui.allocator());
-		loader.load_text("on_click"_s, &on_click);
-		_on_click = ScriptCode(std::move(on_click), _gui.script_context().allocator());
+		_on_click = loader.load_actions("on_click"_s);;
 
 		return true;
 	}
@@ -90,7 +88,7 @@ namespace Yttrium
 
 		if (_sound)
 			_sound->play();
-		_on_click.execute(_gui.script_context());
+		_on_click.run(_gui);
 		return true;
 	}
 

@@ -1,5 +1,6 @@
 #include "loader.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/ion/document.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
@@ -9,11 +10,12 @@
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
-#include "../exceptions.h"
 #include "../gui.h"
 #include "../layer.h"
 #include "../widgets/widget.h"
 #include "property_loader.h"
+
+#include <boost/optional/optional.hpp>
 
 namespace
 {
@@ -64,6 +66,21 @@ namespace
 		return result;
 	}
 
+	boost::optional<std::tuple<StaticString, GuiActions, GuiActions>> load_on_key(const IonList& source)
+	{
+		const auto key = source.begin();
+		if (key == source.end() || key->type() != IonValue::Type::String)
+			return {};
+		const auto on_press = key.next();
+		if (on_press == source.end() || on_press->type() != IonValue::Type::Object)
+			return {};
+		const auto on_release = on_press.next();
+		if (on_release != source.end() && (on_release->type() != IonValue::Type::Object || on_release.next() != source.end()))
+			return {};
+		return std::make_tuple(key->string(), GuiIonPropertyLoader::load_actions(*on_press->object()),
+			on_release != source.end() ? GuiIonPropertyLoader::load_actions(*on_release->object()) : GuiActions());
+	}
+
 	enum GuiAttribute : unsigned
 	{
 		IsDefault     = 1 << 0,
@@ -99,38 +116,16 @@ namespace Yttrium
 	{
 	}
 
-	bool GuiIonLoader::load(const StaticString& source_name)
+	void GuiIonLoader::load(const StaticString& source_name)
 	{
 		try
 		{
-			load_impl(source_name);
-			return true;
+			load(_gui.resource_loader().load_ion(source_name)->root());
 		}
-		catch (const GuiError& e)
+		catch (GuiDataError& e)
 		{
-			const auto& source_name = e.source_name();
-			if (source_name.is_empty())
-				Log() << e.what();
-			else
-				Log() << "(" << e.source_name() << ") " << e.what();
-		}
-		_gui.clear();
-		return false;
-	}
-
-	void GuiIonLoader::load_impl(const StaticString& source_name)
-	{
-		const auto document = _gui.resource_loader().load_ion(source_name);
-		if (!document)
-			throw GuiError(_allocator) << "Can't load \""_s << source_name << "\"..."_s;
-		try
-		{
-			load(document->root());
-		}
-		catch (GuiError& e)
-		{
-			e.set_file(source_name);
-			throw std::move(e);
+			e.set_source(source_name);
+			throw;
 		}
 	}
 
@@ -142,6 +137,7 @@ namespace Yttrium
 			{"font"_s, &GuiIonLoader::load_font},
 			{"include"_s, &GuiIonLoader::load_include},
 			{"layer"_s, &GuiIonLoader::load_layer},
+			{"on_key"_s, &GuiIonLoader::load_on_key},
 			{"translation"_s, &GuiIonLoader::load_translation},
 		};
 
@@ -152,14 +148,14 @@ namespace Yttrium
 			{
 				const auto attribute = ::find_attribute(node.name());
 				if (!attribute)
-					throw GuiError(_allocator) << "Unknown attribute '"_s << node.name() << "'"_s;
+					throw GuiDataError("Unknown attribute '"_s, node.name(), "'"_s);
 				attributes |= attribute;
 			}
 			else
 			{
 				const auto i = handlers.find(node.name());
 				if (i == handlers.end())
-					throw GuiError(_allocator) << "Unknown entry '"_s << node.name() << "'"_s;
+					throw GuiDataError("Unknown entry '"_s, node.name(), "'"_s);
 				(this->*i->second)(node, attributes);
 				attributes = 0;
 			}
@@ -170,16 +166,16 @@ namespace Yttrium
 	{
 		const auto& element = ::load_element(node);
 		if (!element.object || !element.name)
-			throw GuiError(_allocator) << "Bad 'class'"_s;
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 		if (!_classes.add(*element.name, *element.object, element.attribute))
-			throw GuiError(_allocator) << "Bad 'class' \""_s << *element.name << "\""_s;
+			throw GuiDataError("Bad '"_s, node.name(), "' \""_s, *element.name, "\""_s);
 	}
 
 	void GuiIonLoader::load_font(const IonNode& node, unsigned attributes)
 	{
 		auto element = ::load_element(node);
 		if (!element.object)
-			throw GuiError(_allocator) << "Bad 'font'"_s;
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 
 		const auto& default_name = "default"_s;
 		if (!element.name)
@@ -188,18 +184,18 @@ namespace Yttrium
 		if (attributes & IsDefault)
 		{
 			if (_has_default_font)
-				throw GuiError(_allocator) << "Default 'font' redefinition"_s;
+				throw GuiDataError("Default '"_s, node.name(), "' redefinition"_s);
 			_default_font_name = *element.name;
 			_has_default_font = true;
 		}
 
 		const StaticString* font_name;
 		if (!GuiIonPropertyLoader::load_text(&font_name, element.object->last("file"_s)))
-			throw GuiError(_allocator) << "Bad 'font' 'file'"_s;
+			throw GuiDataError("Bad '"_s, node.name(), "' 'file'"_s);
 
 		const StaticString* texture_name;
 		if (!GuiIonPropertyLoader::load_text(&texture_name, element.object->last("texture"_s)))
-			throw GuiError(_allocator) << "Bad 'font' 'texture'"_s;
+			throw GuiDataError("Bad '"_s, node.name(), "' 'texture'"_s);
 
 		_gui.set_font(*element.name, *font_name, *texture_name);
 	}
@@ -208,24 +204,25 @@ namespace Yttrium
 	{
 		const StaticString* path;
 		if (!Ion::get(node, path))
-			throw GuiError(_allocator) << "Bad 'include'"_s;
-		load_impl(*path);
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		load(*path);
 	}
 
 	void GuiIonLoader::load_layer(const IonNode& node, unsigned attributes)
 	{
-		static const std::map<StaticString, std::pair<bool (GuiIonLoader::*)(GuiLayer&, const IonNode&, int) const, int>> handlers =
+		static const std::map<StaticString, std::pair<void (GuiIonLoader::*)(GuiLayer&, const IonNode&, int) const, int>> handlers =
 		{
 			{"center"_s, {&GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Center)}},
+			{"on_enter"_s, {&GuiIonLoader::load_layer_on_enter, 0}},
+			{"on_event"_s, {&GuiIonLoader::load_layer_on_event, 0}},
 			{"on_key"_s, {&GuiIonLoader::load_layer_on_key, 0}},
-			{"on_pop"_s, {&GuiIonLoader::load_layer_action, static_cast<int>(GuiLayer::Action::Pop)}},
-			{"on_push"_s, {&GuiIonLoader::load_layer_action, static_cast<int>(GuiLayer::Action::Push)}},
+			{"on_return"_s, {&GuiIonLoader::load_layer_on_return, 0}},
 			{"stretch"_s, {&GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Stretch)}},
 		};
 
 		const auto& element = ::load_element(node);
 		if (!element.object)
-			throw GuiError(_allocator) << "Empty 'layer'"_s;
+			throw GuiDataError("Empty '"_s, node.name(), "'"_s);
 
 		const StaticString layer_name = element.name ? *element.name : StaticString();
 
@@ -234,78 +231,89 @@ namespace Yttrium
 		{
 			const auto i = handlers.find(layer_node.name());
 			if (i == handlers.end())
-				throw GuiError(_allocator) << "Unknown '"_s << node.name() << "' entry '"_s << layer_node.name() << "'"_s;
-			if (!(this->*i->second.first)(layer, layer_node, i->second.second))
-				throw GuiError(_allocator) << "Bad '"_s << node.name() << "' '"_s << layer_node.name() << "'"_s;
+				throw GuiDataError("Unknown '"_s, node.name(), "' entry '"_s, layer_node.name(), "'"_s);
+			(this->*i->second.first)(layer, layer_node, i->second.second);
 		}
+	}
+
+	void GuiIonLoader::load_on_key(const IonNode& node, unsigned)
+	{
+		auto binding = ::load_on_key(node);
+		if (!binding)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		_gui.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
 	}
 
 	void GuiIonLoader::load_translation(const IonNode& node, unsigned)
 	{
 		const StaticString* path;
 		if (!Ion::get(node, path))
-			throw GuiError(_allocator) << "Bad 'translation'"_s;
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 		_gui.set_translation(*path);
 	}
 
-	bool GuiIonLoader::load_layer_action(GuiLayer& layer, const IonNode& node, int extra) const
+	void GuiIonLoader::load_layer_layout(GuiLayer& layer, const IonNode& node, int extra) const
 	{
-		const StaticString* action;
-		if (!GuiIonPropertyLoader::load_text(&action, node))
-			return false;
-		layer.set_action(static_cast<GuiLayer::Action>(extra), ScriptCode(*action, _allocator));
-		return true;
-	}
-
-	bool GuiIonLoader::load_layer_layout(GuiLayer& layer, const IonNode& node, int extra) const
-	{
-		static const std::map<StaticString, bool (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
+		static const std::map<StaticString, void (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
 		{
 			{"size"_s, &GuiIonLoader::load_layout_size},
 		};
 
 		if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
-			return false;
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 		auto& layout = layer.add_layout(static_cast<GuiLayout::Placement>(extra));
 		for (const auto& layout_node : *node.first()->object())
 		{
 			const auto i = handlers.find(layout_node.name());
 			if (i != handlers.end())
 			{
-				if (!(this->*i->second)(layout, layout_node))
-					throw GuiError(_allocator) << "Bad '"_s << node.name() << "' '"_s << layout_node.name() << "'"_s;
+				(this->*i->second)(layout, layout_node);
 				continue;
 			}
 
 			const auto& element = ::load_element(layout_node);
 			if (!element.object)
-				throw GuiError(_allocator) << "Bad layout entry '"_s << layout_node.name() << "'"_s;
+				throw GuiDataError("Bad layout entry '"_s, layout_node.name(), "'"_s);
 			if (element.name)
-				throw GuiError(_allocator) << "Widget names are not supported"_s;
+				throw GuiDataError("Widget names are not supported"_s);
 
 			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(*element.attribute) : nullptr), _gui);
 			if (_has_default_font)
 				loader.set_default_font_name(&_default_font_name);
 			layer.register_widget(layout.add_widget(layout_node.name(), loader));
 		}
-		return true;
 	}
 
-	bool GuiIonLoader::load_layer_on_key(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_layer_on_enter(GuiLayer& layer, const IonNode& node, int) const
+	{
+		layer.set_on_enter(GuiIonPropertyLoader::load_actions(node));
+	}
+
+	void GuiIonLoader::load_layer_on_event(GuiLayer& layer, const IonNode& node, int) const
 	{
 		const auto values = node.values();
-		if (values.size() != 2 || values->type() != IonValue::Type::String || values.last().type() != IonValue::Type::String)
-			return false;
-		layer.bind(values->string(), values.last().string());
-		return true;
+		if (values.size() != 2 || values->type() != IonValue::Type::String || values.last().type() != IonValue::Type::Object)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		layer.set_on_event(values->string().to_std(), GuiIonPropertyLoader::load_actions(*values.last().object()));
 	}
 
-	bool GuiIonLoader::load_layout_size(GuiLayout& layout, const IonNode& node) const
+	void GuiIonLoader::load_layer_on_key(GuiLayer& layer, const IonNode& node, int) const
+	{
+		auto binding = ::load_on_key(node);
+		if (!binding)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		layer.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
+	}
+
+	void GuiIonLoader::load_layer_on_return(GuiLayer& layer, const IonNode& node, int) const
+	{
+		layer.set_on_return(GuiIonPropertyLoader::load_actions(node));
+	}
+
+	void GuiIonLoader::load_layout_size(GuiLayout& layout, const IonNode& node) const
 	{
 		SizeF size;
-		if (!GuiIonPropertyLoader::load_size(size, node))
-			return false;
+		GuiIonPropertyLoader::load_size(size, node);
 		layout.set_size(size);
-		return true;
 	}
 }

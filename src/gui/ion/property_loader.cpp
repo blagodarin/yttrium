@@ -1,6 +1,7 @@
 #include "property_loader.h"
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
@@ -8,6 +9,7 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/utils.h>
+#include "../actions.h"
 #include "../gui.h"
 
 #include <yttrium/log.h>
@@ -42,7 +44,7 @@ namespace
 	std::size_t read_array(std::array<T, N>& elements, const IonNode& node)
 	{
 		if (node.size() > N)
-			return 0; // TODO: Throw.
+			throw GuiDataError("Bad '", node.name(), "'");
 		auto&& values = node.values();
 		for (std::size_t i = 0; i < N; ++i)
 		{
@@ -53,7 +55,7 @@ namespace
 			{
 				T number;
 				if (!value->to_number(number))
-					return i; // TODO: Throw.
+					throw GuiDataError("Bad '", node.name(), "'");
 				elements[i] = number;
 			}
 			values.pop_first();
@@ -61,7 +63,7 @@ namespace
 		return N;
 	}
 
-	bool read_color(Vector4& color, const IonNode& node)
+	void read_color(Vector4& color, const IonNode& node)
 	{
 		std::array<float, 4> elements;
 		switch (read_array(elements, node))
@@ -69,10 +71,11 @@ namespace
 		case 3:
 			elements[3] = 1;
 		case 4:
-			color = {elements[0], elements[1], elements[2], elements[3]};
-			return true;
+			break;
+		default:
+			throw GuiDataError("Bad '", node.name(), "'");
 		}
-		return false; // TODO: Throw.
+		color = { elements[0], elements[1], elements[2], elements[3] };
 	}
 }
 
@@ -129,6 +132,25 @@ namespace Yttrium
 		return false;
 	}
 
+	GuiActions GuiIonPropertyLoader::load_actions(const StaticString& name) const
+	{
+		if (_bound_object)
+		{
+			const IonNode& node = _bound_object->last(name);
+			if (node.exists())
+				return load_actions(node);
+		}
+
+		if (_bound_class)
+		{
+			const IonNode& node = _bound_class->last(name);
+			if (node.exists())
+				return load_actions(node);
+		}
+
+		return {};
+	}
+
 	bool GuiIonPropertyLoader::load_alignment(const StaticString& name, unsigned* alignment) const
 	{
 		if (_bound_object)
@@ -153,21 +175,27 @@ namespace Yttrium
 		if (_bound_object)
 		{
 			const IonNode& node = _bound_object->last(name);
-			if (node.exists() && ::read_color(*color, node))
+			if (node.exists())
+			{
+				::read_color(*color, node);
 				return true;
+			}
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
-			if (node.exists() && ::read_color(*color, node))
+			if (node.exists())
+			{
+				::read_color(*color, node);
 				return true;
+			}
 		}
 
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<const Texture2D>* texture) const
+	void GuiIonPropertyLoader::load_font(const StaticString& name, ResourcePtr<const TextureFont>* font, ResourcePtr<const Texture2D>* texture) const
 	{
 		const StaticString* font_name = nullptr;
 
@@ -189,35 +217,36 @@ namespace Yttrium
 			font_name = _default_font_name;
 
 		if (!font_name)
-			return false;
+			return;
 
 		const auto font_desc = _gui.font(*font_name);
 		if (!font_desc)
-		{
-			Log() << "No font \""_s << *font_name << "\""_s;
-			return false;
-		}
+			throw GuiDataError("Bad font ", *font_name);
 
 		*font = font_desc->font;
 		*texture = font_desc->texture;
-
-		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_margins(const StaticString& name, Margins* margins) const
+	bool GuiIonPropertyLoader::load_margins(const StaticString& name, Margins& margins) const
 	{
 		if (_bound_object)
 		{
 			const IonNode& node = _bound_object->last(name);
-			if (node.exists() && load_margins(margins, node))
+			if (node.exists())
+			{
+				load_margins(margins, node);
 				return true;
+			}
 		}
 
 		if (_bound_class)
 		{
 			const IonNode& node = _bound_class->last(name);
-			if (node.exists() && load_margins(margins, node))
+			if (node.exists())
+			{
+				load_margins(margins, node);
 				return true;
+			}
 		}
 
 		return false;
@@ -383,9 +412,54 @@ namespace Yttrium
 	{
 		std::array<float, 1> elements;
 		if (::read_array(elements, node) != 1)
-			return false; // TODO: Throw.
+			throw GuiDataError("Bad '", node.name(), "'");
 		value = elements[0];
 		return true;
+	}
+
+	GuiActions GuiIonPropertyLoader::load_actions(const IonObject& object)
+	{
+		GuiActions actions(object.size());
+		for (const auto& node : object)
+		{
+			if (node.name() == "call"_s)
+			{
+				const StaticString* code;
+				if (!GuiIonPropertyLoader::load_text(&code, node))
+					throw GuiDataError("Bad action '"_s, node.name(), "'"_s);
+				actions.add<GuiAction_Call>(*code);
+			}
+			else if (node.name() == "enter"_s)
+			{
+				const StaticString* layer;
+				if (!GuiIonPropertyLoader::load_text(&layer, node))
+					throw GuiDataError("Bad action '"_s, node.name(), "'"_s);
+				actions.add<GuiAction_Enter>(*layer);
+			}
+			else if (node.name() == "quit"_s)
+			{
+				actions.add<GuiAction_Quit>();
+			}
+			else if (node.name() == "return"_s)
+			{
+				actions.add<GuiAction_Return>();
+			}
+			else if (node.name() == "return_to"_s)
+			{
+				const StaticString* layer;
+				if (!GuiIonPropertyLoader::load_text(&layer, node))
+					throw GuiDataError("Bad action '"_s, node.name(), "'"_s);
+				actions.add<GuiAction_ReturnTo>(*layer);
+			}
+		}
+		return actions;
+	}
+
+	GuiActions GuiIonPropertyLoader::load_actions(const IonNode& node)
+	{
+		if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
+			throw GuiDataError("Bad action sequence '"_s, node.name(), "'"_s);
+		return load_actions(*node.first()->object());
 	}
 
 	bool GuiIonPropertyLoader::load_alignment(unsigned* alignment, const IonNode& node)
@@ -446,7 +520,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiIonPropertyLoader::load_margins(Margins* margins, const IonNode& node)
+	void GuiIonPropertyLoader::load_margins(Margins& margins, const IonNode& node)
 	{
 		std::array<int32_t, 4> elements;
 		switch (::read_array(elements, node))
@@ -458,21 +532,21 @@ namespace Yttrium
 		case 3:
 			elements[3] = elements[1];
 		case 4:
-			*margins = {elements[0], elements[1], elements[2], elements[3]};
-			return true;
+			break;
+		default:
+			throw GuiDataError("Bad '", node.name(), "'");
 		}
-		return false; // TODO: Throw.
+		margins = {elements[0], elements[1], elements[2], elements[3]};
 	}
 
-	bool GuiIonPropertyLoader::load_size(SizeF& size, const IonNode& node)
+	void GuiIonPropertyLoader::load_size(SizeF& size, const IonNode& node)
 	{
 		std::array<float, 2> elements;
 		if (::read_array(elements, node) != 2
 			|| elements[0] <= 0
 			|| elements[1] <= 0)
-			return false; // TODO: Throw.
+			throw GuiDataError("Bad '", node.name(), "'");
 		size = {elements[0], elements[1]};
-		return true;
 	}
 
 	bool GuiIonPropertyLoader::load_state(WidgetState* state, const IonNode& node)

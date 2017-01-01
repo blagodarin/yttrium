@@ -1,6 +1,6 @@
 root layer
 {
-	on_key "esc" "exit"
+	on_key "esc" { quit }
 	center
 	{
 		size "100" "100"

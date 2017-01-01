@@ -1,7 +1,6 @@
 #include "layer.h"
 
 #include <yttrium/renderer/renderer.h>
-#include "exceptions.h"
 #include "gui.h"
 #include "layout.h"
 #include "widgets/widget.h"
@@ -16,7 +15,6 @@ namespace Yttrium
 		, _layouts(_gui.allocator())
 		, _widgets(_gui.allocator())
 		, _is_transparent(is_transparent)
-		, _bindings(_gui.script_context())
 	{
 	}
 
@@ -28,7 +26,16 @@ namespace Yttrium
 		return *_layouts.back();
 	}
 
-	bool GuiLayer::process_key(const KeyEvent& event)
+	bool GuiLayer::handle_event(const std::string& event) const
+	{
+		const auto i = _on_event.find(event);
+		if (i == _on_event.end())
+			return false;
+		i->second.run(_gui);
+		return true;
+	}
+
+	bool GuiLayer::handle_key(const KeyEvent& event)
 	{
 		if (event.pressed && event.key >= Key::Mouse1 && event.key <= Key::Mouse5
 			&& _focus_widget && _focus_widget != _mouse_widget)
@@ -74,14 +81,19 @@ namespace Yttrium
 		if (processed)
 			return true;
 
-		if (event.pressed && _bindings.call(event.key))
+		if (!event.autorepeat)
 		{
-			if (_focus_widget)
+			const auto i = _on_key.find(event.key);
+			if (i != _on_key.end())
 			{
-				_focus_widget->set_focused(false);
-				_focus_widget = nullptr;
+				(event.pressed ? i->second.first : i->second.second).run(_gui);
+				if (_focus_widget)
+				{
+					_focus_widget->set_focused(false);
+					_focus_widget = nullptr;
+				}
+				return true;
 			}
-			return true;
 		}
 
 		return false;
@@ -100,32 +112,6 @@ namespace Yttrium
 		_mouse_widget = cursor ? widget_at(*cursor) : nullptr;
 		for (const auto& layout : _layouts)
 			layout->render(renderer, _mouse_widget, _left_click_widget);
-	}
-
-	void GuiLayer::run_action(Action action, ScriptContext& context) const
-	{
-		switch (action)
-		{
-		case Action::Push:
-			_on_push.execute(context);
-			break;
-		case Action::Pop:
-			_on_pop.execute(context);
-			break;
-		}
-	}
-
-	void GuiLayer::set_action(Action action, ScriptCode&& script)
-	{
-		switch (action)
-		{
-		case Action::Push:
-			_on_push = std::move(script);
-			break;
-		case Action::Pop:
-			_on_pop = std::move(script);
-			break;
-		}
 	}
 
 	Widget* GuiLayer::widget_at(const PointF& point) const

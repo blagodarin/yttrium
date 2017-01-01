@@ -5,6 +5,8 @@
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/map.h>
 #include <yttrium/std/vector.h>
+#include "actions.h"
+#include "key_lookup.h"
 
 #include <functional>
 #include <memory>
@@ -45,12 +47,16 @@ namespace Yttrium
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
 		Allocator& allocator() const { return _allocator; }
-		void clear();
 		const FontDesc* font(const StaticString& name) const;
+		bool pop_layer();
+		bool pop_layers_until(const StaticString& name);
+		bool push_layer(const StaticString& name);
+		void quit() const { if (_quit_handler) _quit_handler(); }
 		void render_canvas(Renderer&, const StaticString& name, const RectF&) const;
 		ResourceLoader& resource_loader() const { return _resource_loader; }
 		ScriptContext& script_context() const { return _script_context; }
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
+		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
 		void set_translation(const StaticString& path);
 		String translate(const StaticString&) const;
 
@@ -62,7 +68,9 @@ namespace Yttrium
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
 		StdVector<GuiLayer*> _layer_stack{ _allocator };
 		StdMap<String, std::function<void(Renderer&, const RectF&)>> _canvas_handlers{ _allocator };
+		std::function<void()> _quit_handler;
 		ResourcePtr<const Translation> _translation;
+		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 
 		friend Gui;
 	};

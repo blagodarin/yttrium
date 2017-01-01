@@ -29,10 +29,12 @@ add_library(yttrium
 	base/time.cpp
 	base/tiny_string_map.cpp
 	globals.cpp
+	gui/actions.cpp
 	gui/gui.cpp
 	gui/ion/classes.cpp
 	gui/ion/loader.cpp
 	gui/ion/property_loader.cpp
+	gui/key_lookup.cpp
 	gui/layer.cpp
 	gui/layout.cpp
 	gui/logic/line_editor.cpp
@@ -91,9 +93,7 @@ add_library(yttrium
 	storage/reader.cpp
 	storage/storage.cpp
 	storage/writer.cpp
-	window/bindings.cpp
 	window/console.cpp
-	window/key_lookup.cpp
 	window/key.cpp
 	window/window.cpp
 	)

@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	CanvasWidget::CanvasWidget(const GuiPrivate& gui)
+	CanvasWidget::CanvasWidget(GuiPrivate& gui)
 		: Widget(gui)
 		, _id(&_gui.allocator())
 	{

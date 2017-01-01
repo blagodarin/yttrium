@@ -1,6 +1,6 @@
 layer "menu_single"
 {
-	on_key "esc" "pop_layer"
+	on_key "esc" { return }
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
@@ -25,28 +25,28 @@ layer "menu_single"
 		{
 			position "" "260"
 			text     {tr"Easy"}
-			on_click "set start_level 1; push_layer game_single"
+			on_click { call "set start_level 1" enter "game_single" }
 		}
 
 		button ["button"]
 		{
 			position "" "310"
 			text     {tr"Normal"}
-			on_click "set start_level 10; push_layer game_single"
+			on_click { call "set start_level 10" enter "game_single" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
 			text     {tr"Hard"}
-			on_click "set start_level 30; push_layer game_single"
+			on_click { call "set start_level 30" enter "game_single" }
 		}
 
 		button ["button"]
 		{
 			position "" "410"
 			text     {tr"Back"}
-			on_click "pop_layer"
+			on_click { return }
 		}
 	}
 }

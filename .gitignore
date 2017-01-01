@@ -8,5 +8,4 @@ lib
 Makefile
 *.sh
 src/config.h
-tetrium.txt
 tetrium.ypq

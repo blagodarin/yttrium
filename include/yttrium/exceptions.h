@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_io_errors_h_
-#define _include_yttrium_io_errors_h_
+#ifndef _include_yttrium_exceptions_h_
+#define _include_yttrium_exceptions_h_
 
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
@@ -31,7 +31,7 @@ namespace Yttrium
 		void append(T&& value, Args&&... args) { _what << std::forward<T>(value); append(std::forward<Args>(args)...); }
 		void append() {}
 
-	private:
+	protected:
 		String _what;
 	};
 
@@ -58,6 +58,26 @@ namespace Yttrium
 	public:
 		template <typename... Args>
 		DataError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
+	};
+
+	///
+	class GuiDataError : public DataError
+	{
+	public:
+		template <typename... Args>
+		GuiDataError(Args&&... args) : DataError(std::forward<Args>(args)...) {}
+
+		void set_source(const StaticString& source)
+		{
+			if (!_has_source)
+			{
+				_what.swap(String() << "("_s << source << ") "_s << _what);
+				_has_source = true;
+			}
+		}
+
+	private:
+		bool _has_source = false;
 	};
 
 	/// Thrown by ResourceLoader if it is unable to find the specified resource.

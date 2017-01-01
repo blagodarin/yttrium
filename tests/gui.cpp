@@ -17,6 +17,5 @@ BOOST_AUTO_TEST_CASE(test_gui)
 	WindowCallbacks window_callbacks;
 	Window window("GUI test", window_callbacks);
 	ScriptContext script_context;
-	Gui gui(resource_loader, script_context);
-	BOOST_REQUIRE(gui.load("tests/gui/gui.ion"));
+	Gui gui(resource_loader, script_context, "tests/gui/gui.ion");
 }

@@ -2,6 +2,7 @@
 #define _src_gui_widgets_input_h_
 
 #include <yttrium/script/code.h>
+#include "../actions.h"
 #include "../logic/line_editor.h"
 #include "../properties.h"
 #include "widget.h"
@@ -11,7 +12,7 @@ namespace Yttrium
 	class InputWidget : public Widget
 	{
 	public:
-		InputWidget(const GuiPrivate&);
+		InputWidget(GuiPrivate&);
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
@@ -22,7 +23,7 @@ namespace Yttrium
 		mutable ForegroundProperty _foreground;
 		LineEditor _logic;
 		int _cursor_mark = 0;
-		ScriptCode _on_enter;
+		GuiActions _on_enter;
 	};
 }
 

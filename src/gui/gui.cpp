@@ -9,11 +9,11 @@
 #include <yttrium/script/context.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
-#include "exceptions.h"
 #include "gui.h"
 #include "ion/loader.h"
 #include "layer.h"
 
+#include <algorithm>
 #include <cassert>
 
 namespace Yttrium
@@ -31,15 +31,15 @@ namespace Yttrium
 	GuiLayer& GuiPrivate::add_layer(const StaticString& name, bool is_transparent, bool is_root)
 	{
 		if (!is_root && name.is_empty())
-			throw GuiError(_allocator) << "Non-root layer must have a name"_s;
+			throw GuiDataError("Non-root layer must have a name"_s);
 		auto&& layer = make_unique<GuiLayer>(_allocator, *this, name, is_transparent);
 		const String& layer_name = layer->name(); // To avoid extra allocations.
 		if (_layers.find(layer_name) != _layers.end())
-			throw GuiError(_allocator) << "Duplicate layer name \""_s << layer_name << "\""_s;
+			throw GuiDataError("Duplicate layer name \""_s, layer_name, "\""_s);
 		if (is_root)
 		{
 			if (!_layer_stack.empty())
-				throw GuiError(_allocator) << "\""_s << layer_name << "\" can't be the root layer, \""_s << _layer_stack.front()->name() << "\" is the root layer"_s;
+				throw GuiDataError("\""_s, layer_name, "\" can't be the root layer, \""_s, _layer_stack.front()->name(), "\" is the root layer"_s);
 			_layer_stack.push_back(layer.get());
 		}
 		return *_layers.emplace(layer_name, std::move(layer)).first->second;
@@ -48,23 +48,48 @@ namespace Yttrium
 	void GuiPrivate::set_translation(const StaticString& path)
 	{
 		if (_translation)
-			throw GuiError(_allocator) << "Only one translation is allowed"_s;
+			throw GuiDataError("Only one translation is allowed"_s);
 		_translation = _resource_loader.load_translation(path);
 		if (!_translation)
-			throw GuiError(_allocator) << "Bad translation \""_s << path << "\""_s;
-	}
-
-	void GuiPrivate::clear()
-	{
-		_fonts.clear();
-		_layers.clear();
-		_layer_stack.clear();
+			throw GuiDataError("Bad translation \""_s, path, "\""_s);
 	}
 
 	const GuiPrivate::FontDesc* GuiPrivate::font(const StaticString& name) const
 	{
 		const auto i = _fonts.find(String(name, ByReference()));
 		return i != _fonts.end() ? &i->second : nullptr;
+	}
+
+	bool GuiPrivate::pop_layer()
+	{
+		if (_layer_stack.size() <= 1)
+			return false;
+		_layer_stack.back()->handle_return();
+		_layer_stack.pop_back();
+		return true;
+	}
+
+	bool GuiPrivate::pop_layers_until(const StaticString& name)
+	{
+		const auto end = std::find_if(_layer_stack.rbegin(), _layer_stack.rend(), [&name](GuiLayer* layer){ return layer->name() == name; });
+		if (end == _layer_stack.rend())
+			return false;
+		for (auto n = std::distance(_layer_stack.rbegin(), end); n > 0; --n)
+		{
+			_layer_stack.back()->handle_return();
+			_layer_stack.pop_back();
+		}
+		return true;
+	}
+
+	bool GuiPrivate::push_layer(const StaticString& name)
+	{
+		const auto i = _layers.find(String(name, ByReference()));
+		if (i == _layers.end())
+			return false;
+		_layer_stack.push_back(i->second.get());
+		i->second->handle_enter();
+		return true;
 	}
 
 	void GuiPrivate::render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) const
@@ -83,10 +108,7 @@ namespace Yttrium
 		assert(font);
 
 		if (!Rect(texture->size()).contains(font->rect()))
-		{
-			Log() << "Can't use font \""_s << font_source << "\" with texture \""_s << texture_name << "\""_s;
-			return;
-		}
+			throw GuiDataError("Can't use font \""_s, font_source, "\" with texture \""_s, texture_name, "\""_s);
 
 		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
 	}
@@ -96,59 +118,36 @@ namespace Yttrium
 		return _translation ? _translation->translate(source) : String(source, &_allocator);
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
+	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name, Allocator& allocator)
 		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, allocator))
 	{
-	}
-
-	void Gui::clear()
-	{
-		_private->clear();
-	}
-
-	bool Gui::has_layer(const StaticString& name) const
-	{
-		return _private->_layers.find(String(name, ByReference())) != _private->_layers.end();
-	}
-
-	bool Gui::load(const StaticString& filename)
-	{
-		clear();
-		GuiIonLoader loader(*_private);
-		if (!loader.load(filename))
-			return false;
+		GuiIonLoader(*_private).load(name);
 		if (_private->_layer_stack.empty())
-		{
-			Log() << "(gui) No root layer has been added"_s;
-			clear();
-			return false;
-		}
-		return true;
+			throw GuiDataError("(gui) No root layer has been added"_s);
 	}
 
-	bool Gui::pop_layers(size_t count)
+	Gui::~Gui() = default;
+
+	void Gui::notify(const StaticString& event)
 	{
-		for (auto n = min(count, _private->_layer_stack.size()); n > 0; --n)
-		{
-			_private->_layer_stack.back()->run_action(GuiLayer::Action::Pop, _private->_script_context);
-			_private->_layer_stack.pop_back();
-		}
-		return !_private->_layer_stack.empty();
+		if (!_private->_layer_stack.empty())
+			_private->_layer_stack.back()->handle_event(event.to_std());
 	}
 
 	bool Gui::process_key_event(const KeyEvent& event)
 	{
-		return !_private->_layer_stack.empty() && _private->_layer_stack.back()->process_key(event);
-	}
-
-	bool Gui::push_layer(const StaticString& name)
-	{
-		const auto i = _private->_layers.find(String(name, ByReference()));
-		if (i == _private->_layers.end())
-			return false;
-		_private->_layer_stack.push_back(i->second.get());
-		i->second->run_action(GuiLayer::Action::Push, _private->_script_context);
-		return true;
+		if (!_private->_layer_stack.empty() && _private->_layer_stack.back()->handle_key(event))
+			return true;
+		if (!event.autorepeat)
+		{
+			const auto i = _private->_on_key.find(event.key);
+			if (i != _private->_on_key.end())
+			{
+				(event.pressed ? i->second.first : i->second.second).run(*_private);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void Gui::render(Renderer& renderer, const PointF& cursor) const
@@ -169,5 +168,8 @@ namespace Yttrium
 		_private->_canvas_handlers[String(name, &_private->_allocator)] = handler;
 	}
 
-	Gui::~Gui() = default;
+	void Gui::set_quit_handler(const std::function<void()>& handler)
+	{
+		_private->_quit_handler = handler;
+	}
 }

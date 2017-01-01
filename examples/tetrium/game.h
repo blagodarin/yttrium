@@ -3,7 +3,6 @@
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
-#include <yttrium/bindings.h>
 #include <yttrium/console.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/math/point.h>
@@ -12,6 +11,7 @@
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/std/map.h>
+#include <yttrium/string.h>
 #include <yttrium/window.h>
 
 #include "blocks.h"
@@ -61,10 +61,9 @@ private:
 	NamedAllocator _resources_allocator{ "resources" };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio, _resources_allocator };
 	NamedAllocator _gui_allocator{ "gui" };
-	Gui _gui{ _resource_loader, _script, _gui_allocator };
+	Gui _gui{ _resource_loader, _script, "examples/tetrium/data/gui.ion", _gui_allocator };
 	Cursor _cursor{ _window.renderer() };
 	Blocks _blocks{ _window.renderer() };
-	Bindings _bindings{ _script };
 	Tetrium::Game _game;
 	bool _game_running = false;
 	StdMultimap<int, String> _statistics;

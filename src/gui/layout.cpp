@@ -1,7 +1,7 @@
 #include "layout.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/static_string.h>
-#include "exceptions.h"
 #include "gui.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
@@ -11,7 +11,7 @@
 
 namespace Yttrium
 {
-	GuiLayout::GuiLayout(const GuiPrivate& gui, Placement placement)
+	GuiLayout::GuiLayout(GuiPrivate& gui, Placement placement)
 		: _gui(gui)
 		, _placement(placement)
 		, _widgets(_gui.allocator())
@@ -32,10 +32,10 @@ namespace Yttrium
 		else if (type == "label"_s)
 			widget = make_unique<LabelWidget>(_gui.allocator(), _gui);
 		else
-			throw GuiError(_gui.allocator()) << "Unknown widget type '"_s << type << "'"_s;
+			throw GuiDataError("Unknown widget type '"_s, type, "'"_s);
 
 		if (!widget->load(loader))
-			throw GuiError(_gui.allocator()) << "Can't load '"_s << type << "'"_s;
+			throw GuiDataError("Can't load '"_s, type, "'"_s);
 
 		_widgets.emplace_back(std::move(widget));
 		return *_widgets.back();

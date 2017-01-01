@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	InputWidget::InputWidget(const GuiPrivate& gui)
+	InputWidget::InputWidget(GuiPrivate& gui)
 		: Widget(gui, CanHaveFocus)
 		, _foreground(_gui.allocator())
 		, _logic(_gui.allocator())
@@ -24,13 +24,8 @@ namespace Yttrium
 		if (!loader.load_rect("position"_s, _rect)
 			|| !_foreground.load(loader))
 			return false;
-
 		_background.load(loader);
-
-		String on_enter(&_gui.allocator());
-		loader.load_text("on_enter"_s, &on_enter);
-		_on_enter = ScriptCode(std::move(on_enter), _gui.script_context().allocator());
-
+		_on_enter = loader.load_actions("on_enter"_s);
 		return true;
 	}
 
@@ -41,7 +36,7 @@ namespace Yttrium
 			switch (event.key)
 			{
 			case Key::Enter:
-				_on_enter.execute(_gui.script_context());
+				_on_enter.run(_gui);
 				return true;
 
 			case Key::Mouse1:

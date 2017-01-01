@@ -9,7 +9,7 @@ namespace Yttrium
 	class LabelWidget : public Widget
 	{
 	public:
-		LabelWidget(const GuiPrivate&);
+		LabelWidget(GuiPrivate&);
 
 		bool load(GuiPropertyLoader&) override;
 		void render(Renderer&, const RectF&, WidgetState) const override;

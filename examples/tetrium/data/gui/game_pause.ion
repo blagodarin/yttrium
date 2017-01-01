@@ -1,13 +1,13 @@
 class "pause_button" ["button"]
 {
-	position  "11" "" "8" "2"
+	position "11" "" "8" "2"
 }
 
 transparent layer "game_pause"
 {
-	on_push "game_pause"
-	on_pop "game_resume"
-	on_key "esc" "pop_layer"
+	on_enter { call "game_pause" }
+	on_key "esc" { return }
+	on_return { call "game_resume" }
 
 	stretch { image { color "0" "0" "0" "0.5" } }
 
@@ -19,28 +19,28 @@ transparent layer "game_pause"
 		{
 			position "" "7"
 			text     {tr"Resume"}
-			on_click "pop_layer"
+			on_click { return }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "10"
 			text     {tr"Restart"}
-			on_click "pop_layer 2; push_layer game_single"
+			on_click { return_to "menu_single" enter "game_single" }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "13"
 			text     {tr"Give up"}
-			on_click "pop_layer 3"
+			on_click { return_to "menu_main" }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "16"
 			text     {tr"Exit game"}
-			on_click "exit"
+			on_click { quit }
 		}
 	}
 }

@@ -34,10 +34,10 @@ namespace Yttrium
 		virtual void render(Renderer&, const RectF&, WidgetState) const = 0;
 
 	protected:
-		Widget(const GuiPrivate&, unsigned flags = 0);
+		Widget(GuiPrivate&, unsigned flags = 0);
 
 	protected:
-		const GuiPrivate& _gui;
+		GuiPrivate& _gui;
 		RectF _rect;
 
 	private:

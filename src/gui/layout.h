@@ -25,7 +25,7 @@ namespace Yttrium
 			Center,
 		};
 
-		GuiLayout(const GuiPrivate&, Placement);
+		GuiLayout(GuiPrivate&, Placement);
 
 		void set_size(const SizeF& size) { _size = size; }
 
@@ -35,7 +35,7 @@ namespace Yttrium
 		void render(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;
 
 	private:
-		const GuiPrivate& _gui;
+		GuiPrivate& _gui;
 		const Placement _placement;
 		SizeF _size;
 		Vector2 _scaling{1, 1};
