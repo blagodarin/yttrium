@@ -2,9 +2,6 @@
 
 #include <yttrium/image.h>
 #include <yttrium/renderer/renderer.h>
-#include <yttrium/renderer/texture.h>
-
-#include <array>
 
 namespace
 {
@@ -79,7 +76,7 @@ namespace
 	}
 }
 
-Blocks::Blocks(Renderer& renderer)
+TetriumBlocks::TetriumBlocks(Renderer& renderer)
 {
 	Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra, 32 });
 	for (int i = 0; i < FragmentCount; ++i)
@@ -101,14 +98,14 @@ Blocks::Blocks(Renderer& renderer)
 	_texture = renderer.create_texture_2d(image);
 }
 
-Blocks::~Blocks() = default;
+TetriumBlocks::~TetriumBlocks() = default;
 
-SizeF Blocks::block_size()
+SizeF TetriumBlocks::block_size()
 {
 	return SizeF(FragmentSize - 2, FragmentSize - 2);
 }
 
-PointF Blocks::block_coords(size_t index)
+PointF TetriumBlocks::block_coords(size_t index)
 {
 	return PointF(1, index * FragmentSize + 1);
 }

@@ -39,11 +39,7 @@ class "button"
 	}
 }
 
-on_key "1" { call "play_music" }
-on_key "2" { call "stop_music" }
-on_key "`" { call "tgcon" }
-on_key "f1" { call "toggle_debug" }
-on_key "f10" { call "screenshot" } # KDE grabs Key::Print. =(
+on_key "f10" { call "screenshot" } # KDE grabs "print" key. =(
 
 include "examples/tetrium/data/gui/menu_main.ion"
 include "examples/tetrium/data/gui/menu_single.ion"

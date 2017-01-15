@@ -35,8 +35,7 @@ int main()
 {
 	Log::set_file("tetrium.log");
 
-	NamedAllocator storage_allocator("storage");
-	Storage storage(Storage::UseFileSystem::Never, storage_allocator);
+	Storage storage(Storage::UseFileSystem::Never);
 	if (!storage.attach_package("tetrium.ypq"))
 		return 1;
 	::make_buttons_texture(storage);

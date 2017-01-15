@@ -20,8 +20,9 @@ add_executable(tetrium
 	blocks.cpp
 	cursor.cpp
 	game.cpp
+	graphics.cpp
+	logic.cpp
 	main.cpp
-	tetrium.cpp
 	)
 target_link_libraries(tetrium yttrium)
 add_dependencies(tetrium tetrium_package)

@@ -3,20 +3,16 @@
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
-#include <yttrium/console.h>
 #include <yttrium/gui/gui.h>
-#include <yttrium/math/point.h>
-#include <yttrium/math/size.h>
-#include <yttrium/memory/named_allocator.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/script/context.h>
-#include <yttrium/std/map.h>
-#include <yttrium/string.h>
+#include <yttrium/static_string.h>
 #include <yttrium/window.h>
 
-#include "blocks.h"
 #include "cursor.h"
-#include "tetrium.h"
+#include "graphics.h"
+
+#include <map>
 
 using namespace Yttrium;
 
@@ -35,38 +31,20 @@ private:
 	void on_screenshot(Image&&) override;
 	void on_update(const UpdateEvent&) override;
 
-	void draw_field(Renderer&, const RectF&);
-	void draw_field_blocks(Renderer&, const RectF&, const SizeF& block_size);
-	void draw_field_figure(Renderer&, const RectF&, const SizeF& block_size);
-	void draw_field_frame(Renderer&, const RectF&, const SizeF& block_size);
-	void draw_next_figure(Renderer&, const RectF&);
-	void set_texture_rect(Renderer&, Tetrium::Figure::Type);
-
 	void update_statistics();
 
 private:
 	const Storage& _storage;
-	NamedAllocator _allocator{ "game" };
-	StdVector<NamedAllocatorInfo> _memory_statistics{ _allocator };
-	NamedAllocator _script_allocator{ "script" };
-	ScriptContext _script{ &_script_allocator };
-	NamedAllocator _audio_allocator{ "audio" };
-	AudioManager _audio{ _audio_allocator };
+	ScriptContext _script;
+	AudioManager _audio;
 	AudioPlayer _audio_player{ _audio };
-	NamedAllocator _window_allocator{ "window" };
-	Window _window{ "Tetrium", *this, _window_allocator };
-	Console _console{ _script, _allocator };
-	bool _debug_text_visible = false;
-	String _debug_text{ 1024, &_allocator };
-	NamedAllocator _resources_allocator{ "resources" };
-	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio, _resources_allocator };
-	NamedAllocator _gui_allocator{ "gui" };
-	Gui _gui{ _resource_loader, _script, "examples/tetrium/data/gui.ion", _gui_allocator };
+	Window _window{ "Tetrium", *this };
+	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio };
+	Gui _gui{ _resource_loader, _script, "examples/tetrium/data/gui.ion" };
 	Cursor _cursor{ _window.renderer() };
-	Blocks _blocks{ _window.renderer() };
-	Tetrium::Game _game;
-	bool _game_running = false;
-	StdMultimap<int, String> _statistics;
+	TetriumGraphics _graphics{ _window.renderer() };
+	Tetrium::Game _logic;
+	std::multimap<int, std::string> _statistics;
 };
 
 #endif

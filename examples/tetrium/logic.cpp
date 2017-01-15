@@ -1,7 +1,8 @@
-#include "tetrium.h"
+#include "logic.h"
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 
 namespace
 {
@@ -222,10 +223,15 @@ namespace Tetrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Game::advance(unsigned milliseconds)
+	Game::Game()
 	{
-		if (_state == Stopped || _state == Finished)
-			return;
+		std::srand(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+	}
+
+	bool Game::advance(unsigned milliseconds)
+	{
+		if (!is_active())
+			return false;
 
 		_time_remainder += milliseconds;
 
@@ -277,58 +283,80 @@ namespace Tetrium
 			}
 			horizontal = false;
 		}
+		return true;
 	}
 
 	Figure Game::current_figure() const
 	{
-		return _state == Falling || _state == Fixing ? _current_figure : Figure();
+		return (_state == Falling || _state == Fixing) && !_paused ? _current_figure : Figure();
 	}
 
 	Field Game::field() const
 	{
-		return _state != Stopped ? _field : Field();
+		return _state != Stopped && !_paused ? _field : Field();
+	}
+
+	bool Game::is_active() const
+	{
+		return _state != Stopped && _state != Finished && !_paused;
 	}
 
 	Figure Game::next_figure() const
 	{
-		return _state != Stopped ? _next_figure : Figure();
+		return _state != Stopped && !_paused ? _next_figure : Figure();
+	}
+
+	void Game::pause()
+	{
+		if (_state != Stopped && _state != Finished)
+			_paused = true;
+	}
+
+	void Game::resume()
+	{
+		if (_state != Stopped && _state != Finished)
+			_paused = false;
+	}
+
+	void Game::set_acceleration(bool accelerate)
+	{
+		if (is_active())
+			_is_accelerating = accelerate;
 	}
 
 	void Game::set_left_movement(bool move)
 	{
-		if (_is_moving_left != move)
+		if (!is_active() || _is_moving_left == move)
+			return;
+		_is_moving_left = move;
+		if (_is_moving_left)
 		{
-			_is_moving_left = move;
-			if (_is_moving_left)
+			if (_state != Waiting)
 			{
-				if (_state == Falling || _state == Fixing)
-				{
-					auto figure = _current_figure;
-					figure.move_left();
-					if (_field.fit(figure))
-						_current_figure = figure;
-				}
-				_left_movement_timer = HMoveInterval - HMoveDelay;
+				auto figure = _current_figure;
+				figure.move_left();
+				if (_field.fit(figure))
+					_current_figure = figure;
 			}
+			_left_movement_timer = HMoveInterval - HMoveDelay;
 		}
 	}
 
 	void Game::set_right_movement(bool move)
 	{
-		if (_is_moving_right != move)
+		if (!is_active() || _is_moving_right == move)
+			return;
+		_is_moving_right = move;
+		if (_is_moving_right)
 		{
-			_is_moving_right = move;
-			if (_is_moving_right)
+			if (_state != Waiting)
 			{
-				if (_state == Falling || _state == Fixing)
-				{
-					auto figure = _current_figure;
-					figure.move_right();
-					if (_field.fit(figure))
-						_current_figure = figure;
-				}
-				_right_movement_timer = HMoveInterval - HMoveDelay;
+				auto figure = _current_figure;
+				figure.move_right();
+				if (_field.fit(figure))
+					_current_figure = figure;
 			}
+			_right_movement_timer = HMoveInterval - HMoveDelay;
 		}
 	}
 
@@ -354,11 +382,13 @@ namespace Tetrium
 
 		_state = Waiting;
 		_timeout = StartupDelay;
+
+		_paused = false;
 	}
 
 	bool Game::turn_left()
 	{
-		if (_state != Falling && _state != Fixing)
+		if (!is_active() || _state == Waiting)
 			return false;
 		auto figure = _current_figure;
 		figure.turn_left();
@@ -370,7 +400,7 @@ namespace Tetrium
 
 	bool Game::turn_right()
 	{
-		if (_state != Falling && _state != Fixing)
+		if (!is_active() || _state == Waiting)
 			return false;
 		auto figure = _current_figure;
 		figure.turn_right();
@@ -391,7 +421,7 @@ namespace Tetrium
 		for (const auto& block : _current_figure.blocks())
 		{
 			actual_distance = std::min(actual_distance, block.y);
-			for (auto row = std::min(block.y / PointsPerRow, Field::Height - 1); row > 0; --row)
+			for (auto row = std::min(block.y / PointsPerRow, int{ Field::Height }); row > 0; --row)
 			{
 				if (_field.blocks[row - 1][block.x] != Figure::None)
 				{
@@ -471,6 +501,7 @@ namespace Tetrium
 			if (_field.is_overflown())
 			{
 				_state = Finished;
+				_paused = false;
 			}
 			else
 			{

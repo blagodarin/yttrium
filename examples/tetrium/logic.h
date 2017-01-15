@@ -1,5 +1,5 @@
-#ifndef _examples_tetrium_tetrium_h_
-#define _examples_tetrium_tetrium_h_
+#ifndef _examples_tetrium_logic_h_
+#define _examples_tetrium_logic_h_
 
 #include <array>
 
@@ -90,8 +90,10 @@ namespace Tetrium
 	class Game
 	{
 	public:
+		Game();
+
 		/// Advance the game by the specified amount of \a milliseconds.
-		void advance(unsigned milliseconds);
+		bool advance(unsigned milliseconds);
 
 		/// Retrieve the current figure.
 		Figure current_figure() const;
@@ -102,6 +104,9 @@ namespace Tetrium
 		///
 		bool has_finished() const { return _state == Finished; }
 
+		///
+		bool is_active() const;
+
 		/// Get the current level.
 		int level() const { return _level; }
 
@@ -111,11 +116,17 @@ namespace Tetrium
 		/// Retrieve the next figure.
 		Figure next_figure() const;
 
+		///
+		void pause();
+
+		///
+		void resume();
+
 		/// Get the current score.
 		int score() const { return _score; }
 
 		/// Accelerate the figure.
-		void set_acceleration(bool accelerate) { _is_accelerating = accelerate; }
+		void set_acceleration(bool accelerate);
 
 		/// Begin or end the left move.
 		/// \param move \c true if the figure should move left.
@@ -148,7 +159,6 @@ namespace Tetrium
 		};
 
 	private:
-
 		void process_falldown(int* frames);
 		void process_falldown_delay(int* frames);
 		void process_fixation(int* frames);
@@ -158,6 +168,7 @@ namespace Tetrium
 	private:
 
 		State    _state = Stopped;
+		bool     _paused = false;
 		int      _timeout;
 		Field    _field;
 		Figure   _current_figure;
