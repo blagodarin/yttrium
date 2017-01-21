@@ -22,12 +22,14 @@ namespace Yttrium
 		void load(const IonObject&);
 
 		void load_class(const IonNode&, unsigned attributes);
+		void load_cursor(const IonNode&, unsigned attributes);
 		void load_font(const IonNode&, unsigned attributes);
 		void load_include(const IonNode&, unsigned attributes);
 		void load_layer(const IonNode&, unsigned attributes);
 		void load_on_key(const IonNode&, unsigned attributes);
 		void load_translation(const IonNode&, unsigned attributes);
 
+		void load_layer_cursor(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_layout(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_on_enter(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_on_event(GuiLayer&, const IonNode&, int extra) const;

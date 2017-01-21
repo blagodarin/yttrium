@@ -90,9 +90,9 @@ namespace
 
 	const std::pair<StaticString, GuiAttribute> _root_attributes[] =
 	{
-		{"default"_s, IsDefault},
-		{"root"_s, IsRoot},
-		{"transparent"_s, IsTransparent},
+		{ "default"_s, IsDefault },
+		{ "root"_s, IsRoot },
+		{ "transparent"_s, IsTransparent },
 	};
 
 	unsigned find_attribute(const StaticString& value)
@@ -133,12 +133,13 @@ namespace Yttrium
 	{
 		static const std::map<StaticString, void (GuiIonLoader::*)(const IonNode&, unsigned)> handlers =
 		{
-			{"class"_s, &GuiIonLoader::load_class},
-			{"font"_s, &GuiIonLoader::load_font},
-			{"include"_s, &GuiIonLoader::load_include},
-			{"layer"_s, &GuiIonLoader::load_layer},
-			{"on_key"_s, &GuiIonLoader::load_on_key},
-			{"translation"_s, &GuiIonLoader::load_translation},
+			{ "class"_s, &GuiIonLoader::load_class },
+			{ "cursor"_s, &GuiIonLoader::load_cursor },
+			{ "font"_s, &GuiIonLoader::load_font },
+			{ "include"_s, &GuiIonLoader::load_include },
+			{ "layer"_s, &GuiIonLoader::load_layer },
+			{ "on_key"_s, &GuiIonLoader::load_on_key },
+			{ "translation"_s, &GuiIonLoader::load_translation },
 		};
 
 		unsigned attributes = 0;
@@ -169,6 +170,19 @@ namespace Yttrium
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 		if (!_classes.add(*element.name, *element.object, element.attribute))
 			throw GuiDataError("Bad '"_s, node.name(), "' \""_s, *element.name, "\""_s);
+	}
+
+	void GuiIonLoader::load_cursor(const IonNode& node, unsigned)
+	{
+		const auto values = node.values();
+		if (values.size() != 1 || values->type() != IonValue::Type::String)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		if (values->string() == "none"_s)
+			_gui.set_default_cursor(GuiCursor::None);
+		else if (values->string() == "custom"_s)
+			_gui.set_default_cursor(GuiCursor::Custom);
+		else if (values->string() != "default"_s)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 	}
 
 	void GuiIonLoader::load_font(const IonNode& node, unsigned attributes)
@@ -212,12 +226,13 @@ namespace Yttrium
 	{
 		static const std::map<StaticString, std::pair<void (GuiIonLoader::*)(GuiLayer&, const IonNode&, int) const, int>> handlers =
 		{
-			{"center"_s, {&GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Center)}},
-			{"on_enter"_s, {&GuiIonLoader::load_layer_on_enter, 0}},
-			{"on_event"_s, {&GuiIonLoader::load_layer_on_event, 0}},
-			{"on_key"_s, {&GuiIonLoader::load_layer_on_key, 0}},
-			{"on_return"_s, {&GuiIonLoader::load_layer_on_return, 0}},
-			{"stretch"_s, {&GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Stretch)}},
+			{ "center"_s, { &GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Center) } },
+			{ "cursor"_s, { &GuiIonLoader::load_layer_cursor, 0 } },
+			{ "on_enter"_s, { &GuiIonLoader::load_layer_on_enter, 0 } },
+			{ "on_event"_s, { &GuiIonLoader::load_layer_on_event, 0 } },
+			{ "on_key"_s, { &GuiIonLoader::load_layer_on_key, 0 } },
+			{ "on_return"_s, { &GuiIonLoader::load_layer_on_return, 0 } },
+			{ "stretch"_s, { &GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Stretch) } },
 		};
 
 		const auto& element = ::load_element(node);
@@ -227,6 +242,7 @@ namespace Yttrium
 		const StaticString layer_name = element.name ? *element.name : StaticString();
 
 		auto& layer = _gui.add_layer(layer_name, attributes == IsTransparent, attributes & IsRoot);
+		layer.set_cursor(_gui.default_cursor());
 		for (const auto& layer_node : *element.object)
 		{
 			const auto i = handlers.find(layer_node.name());
@@ -252,11 +268,24 @@ namespace Yttrium
 		_gui.set_translation(*path);
 	}
 
+	void GuiIonLoader::load_layer_cursor(GuiLayer& layer, const IonNode& node, int) const
+	{
+		const auto values = node.values();
+		if (values.size() != 1 || values->type() != IonValue::Type::String)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		if (values->string() == "none"_s)
+			layer.set_cursor(GuiCursor::None);
+		else if (values->string() == "custom"_s)
+			layer.set_cursor(GuiCursor::Custom);
+		else if (values->string() != "default"_s)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+	}
+
 	void GuiIonLoader::load_layer_layout(GuiLayer& layer, const IonNode& node, int extra) const
 	{
 		static const std::map<StaticString, void (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
 		{
-			{"size"_s, &GuiIonLoader::load_layout_size},
+			{ "size"_s, &GuiIonLoader::load_layout_size },
 		};
 
 		if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)

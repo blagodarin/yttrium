@@ -18,6 +18,8 @@ layer "game_single"
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
+	cursor "none"
+
 	center
 	{
 		size "30" "26"

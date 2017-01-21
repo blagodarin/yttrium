@@ -4,6 +4,7 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/std/map.h>
 #include "actions.h"
+#include "cursor.h"
 #include "key_lookup.h"
 #include "layout.h"
 
@@ -35,6 +36,7 @@ namespace Yttrium
 		void handle_return() const { _on_return.run(_gui); }
 		void register_widget(Widget&);
 		void render(Renderer& renderer, const PointF* cursor);
+		void set_cursor(GuiCursor cursor) { _cursor = cursor; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(const std::string& event, GuiActions&& actions) { _on_event[event] = std::move(actions); }
 		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
@@ -56,6 +58,7 @@ namespace Yttrium
 		std::unordered_map<std::string, GuiActions> _on_event;
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiActions _on_return;
+		GuiCursor _cursor = GuiCursor::None;
 	};
 }
 

@@ -98,6 +98,11 @@ void Game::run()
 		_graphics.draw_next_figure(rect, _logic.next_figure());
 	});
 
+	_gui.set_custom_cursor_handler([this](Renderer&, const PointF& point)
+	{
+		_cursor.draw(point);
+	});
+
 	_gui.set_quit_handler([this]
 	{
 		_window.close();
@@ -119,8 +124,6 @@ void Game::on_key_event(const KeyEvent& event)
 void Game::on_render(Renderer& renderer, const PointF& cursor)
 {
 	_gui.render(renderer, cursor);
-	if (!_logic.is_active()) // TODO: Something like 'cursor { image "path" }', 'cursor { custom "name" }' and 'cursor { none }' in GUI.
-		_cursor.draw(cursor);
 }
 
 void Game::on_screenshot(Image&& image)

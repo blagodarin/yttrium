@@ -112,6 +112,17 @@ namespace Yttrium
 		_mouse_widget = cursor ? widget_at(*cursor) : nullptr;
 		for (const auto& layout : _layouts)
 			layout->render(renderer, _mouse_widget, _left_click_widget);
+		if (cursor)
+		{
+			switch (_cursor)
+			{
+			case GuiCursor::Custom:
+				_gui.draw_custom_cursor(renderer, *cursor);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	Widget* GuiLayer::widget_at(const PointF& point) const

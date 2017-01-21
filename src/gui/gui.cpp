@@ -155,17 +155,24 @@ namespace Yttrium
 		if (_private->_layer_stack.empty())
 			return;
 		const auto top_layer = std::prev(_private->_layer_stack.end());
-		auto layer = top_layer;
-		while (layer != _private->_layer_stack.begin() && (*layer)->is_transparent())
-			--layer;
-		while (layer != top_layer)
-			(*layer++)->render(renderer, nullptr);
-		(*layer)->render(renderer, &cursor);
+		{
+			auto layer = top_layer;
+			while (layer != _private->_layer_stack.begin() && (*layer)->is_transparent())
+				--layer;
+			while (layer != top_layer)
+				(*layer++)->render(renderer, nullptr);
+		}
+		(*top_layer)->render(renderer, &cursor);
 	}
 
 	void Gui::set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>& handler)
 	{
 		_private->_canvas_handlers[String(name, &_private->_allocator)] = handler;
+	}
+
+	void Gui::set_custom_cursor_handler(const std::function<void(Renderer&, const PointF&)>& handler)
+	{
+		_private->_custom_cursor_handler = handler;
 	}
 
 	void Gui::set_quit_handler(const std::function<void()>& handler)

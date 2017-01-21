@@ -39,6 +39,8 @@ class "button"
 	}
 }
 
+cursor "custom"
+
 on_key "f10" { call "screenshot" } # KDE grabs "print" key. =(
 
 include "examples/tetrium/data/gui/menu_main.ion"

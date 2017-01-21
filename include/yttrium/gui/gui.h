@@ -42,6 +42,9 @@ namespace Yttrium
 		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
 
 		///
+		void set_custom_cursor_handler(const std::function<void(Renderer&, const PointF&)>&);
+
+		///
 		void set_quit_handler(const std::function<void()>&);
 
 	private:
