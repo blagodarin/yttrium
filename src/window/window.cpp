@@ -9,30 +9,9 @@
 
 namespace Yttrium
 {
-	void WindowCallbacks::on_cursor_movement(const Point&)
-	{
-	}
-
-	void WindowCallbacks::on_key_event(const KeyEvent&)
-	{
-	}
-
-	void WindowCallbacks::on_render(Renderer&, const PointF&)
-	{
-	}
-
-	void WindowCallbacks::on_screenshot(Image&&)
-	{
-	}
-
-	void WindowCallbacks::on_update(const UpdateEvent&)
-	{
-	}
-
 	class WindowPrivate : private WindowBackendCallbacks
 	{
 	public:
-		WindowCallbacks& _callbacks;
 		Allocator& _allocator;
 		const String _name;
 		WindowBackend _backend{ _name, *this };
@@ -44,10 +23,14 @@ namespace Yttrium
 		bool _fullscreen = false;
 		bool _keys[KeyCount];
 		bool _take_screenshot = false;
+		std::function<void(int, int)> _on_cursor_moved;
+		std::function<void(const KeyEvent&)> _on_key_event;
+		std::function<void(Renderer&, const PointF&)> _on_render;
+		std::function<void(Image&&)> _on_screenshot;
+		std::function<void(const UpdateEvent&)> _on_update;
 
-		WindowPrivate(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
-			: _callbacks(callbacks)
-			, _allocator(allocator)
+		WindowPrivate(const StaticString& name, Allocator& allocator)
+			: _allocator(allocator)
 			, _name(name, &_allocator)
 		{
 			for (bool& pressed : _keys)
@@ -75,14 +58,16 @@ namespace Yttrium
 			Point cursor = Rect(_size).center();
 			_backend.get_cursor(cursor);
 
-			const Point movement(_cursor.x() - cursor.x(), cursor.y() - _cursor.y());
+			const auto dx = _cursor.x() - cursor.x();
+			const auto dy = cursor.y() - _cursor.y();
 
 			if (!_is_cursor_locked)
 				_cursor = Rect(_size).bound(cursor);
 			else
 				_backend.set_cursor(_cursor);
 
-			_callbacks.on_cursor_movement(movement);
+			if (_on_cursor_moved)
+				_on_cursor_moved(dx, dy);
 
 			return true;
 		}
@@ -117,7 +102,8 @@ namespace Yttrium
 			if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
 				event.modifiers |= KeyEvent::Alt;
 
-			_callbacks.on_key_event(event);
+			if (_on_key_event)
+				_on_key_event(event);
 		}
 
 		void on_resize_event(const Size& size) override
@@ -135,8 +121,8 @@ namespace Yttrium
 		}
 	};
 
-	Window::Window(const StaticString& name, WindowCallbacks& callbacks, Allocator& allocator)
-		: _private(std::make_unique<WindowPrivate>(name, callbacks, allocator))
+	Window::Window(const StaticString& name, Allocator& allocator)
+		: _private(std::make_unique<WindowPrivate>(name, allocator))
 	{
 	}
 
@@ -157,6 +143,31 @@ namespace Yttrium
 		_private->lock_cursor(lock);
 	}
 
+	void Window::on_cursor_moved(const std::function<void(int, int)>& callback)
+	{
+		_private->_on_cursor_moved = callback;
+	}
+
+	void Window::on_key_event(const std::function<void(const KeyEvent&)>& callback)
+	{
+		_private->_on_key_event = callback;
+	}
+
+	void Window::on_render(const std::function<void(Renderer&, const PointF&)>& callback)
+	{
+		_private->_on_render = callback;
+	}
+
+	void Window::on_screenshot(const std::function<void(Image&&)>& callback)
+	{
+		_private->_on_screenshot = callback;
+	}
+
+	void Window::on_update(const std::function<void(const UpdateEvent&)>& callback)
+	{
+		_private->_on_update = callback;
+	}
+
 	Renderer& Window::renderer()
 	{
 		return *_private->_renderer;
@@ -171,18 +182,21 @@ namespace Yttrium
 		auto fps_time = clock;
 		while (_private->process_events())
 		{
-			_private->_callbacks.on_update(update);
+			if (_private->_on_update)
+				_private->_on_update(update);
 			{
 				_private->_renderer->clear();
 				PushGpuProgram gpu_program(*_private->_renderer, _private->_renderer->program_2d());
 				Push2D projection(*_private->_renderer);
-				_private->_callbacks.on_render(*_private->_renderer, PointF(_private->_cursor));
+				if (_private->_on_render)
+					_private->_on_render(*_private->_renderer, PointF(_private->_cursor));
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)
 			{
 				_private->_take_screenshot = false;
-				_private->_callbacks.on_screenshot(_private->_renderer->take_screenshot());
+				if (_private->_on_screenshot)
+					_private->_on_screenshot(_private->_renderer->take_screenshot());
 			}
 			++frames;
 			update.milliseconds = millisecond_clock() - clock;

@@ -12,23 +12,21 @@
 
 using namespace Yttrium;
 
-class Game : public WindowCallbacks
+class Game
 {
 public:
-	Game(const Storage& storage) : _storage(storage) {}
+	Game(const Storage&);
 
 	void run();
 
 private:
-	void on_cursor_movement(const Point& movement) override;
-	void on_key_event(const KeyEvent&) override;
-	void on_render(Renderer&, const PointF& cursor) override;
-	void on_screenshot(Image&&) override;
-	void on_update(const UpdateEvent&) override;
+	void on_key_event(const KeyEvent&);
+	void render(Renderer&);
+	void update(const UpdateEvent&);
 
 private:
 	const Storage& _storage;
-	Window _window{ "Yttrium 3D example", *this };
+	Window _window{ "Yttrium 3D example" };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer() };
 	bool _debug_text_visible = false;
 	String _debug_text{ 1024 };

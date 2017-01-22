@@ -10,17 +10,25 @@
 
 #include <cmath>
 
+Game::Game(const Storage& storage)
+	: _storage(storage)
+{
+	_window.on_cursor_moved([this](int dx, int dy)
+	{
+		_rotation.yaw = wrap(_rotation.yaw - dx / 4.f, -180, 180);
+		_rotation.pitch = clamp(_rotation.pitch - dy / 4.f, -90, 90);
+	});
+	_window.on_key_event([this](const KeyEvent& event){ on_key_event(event); });
+	_window.on_render([this](Renderer& renderer, const PointF&){ render(renderer); });
+	_window.on_screenshot([this](Image&& image){ image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png")); });
+	_window.on_update([this](const UpdateEvent& event){ update(event); });
+}
+
 void Game::run()
 {
 	_window.lock_cursor(true);
 	_window.show();
 	_window.run();
-}
-
-void Game::on_cursor_movement(const Point& movement)
-{
-	_rotation.yaw = wrap(_rotation.yaw - movement.x() / 4.f, -180, 180);
-	_rotation.pitch = clamp(_rotation.pitch - movement.y() / 4.f, -90, 90);
 }
 
 void Game::on_key_event(const KeyEvent& event)
@@ -63,7 +71,7 @@ void Game::on_key_event(const KeyEvent& event)
 	}
 }
 
-void Game::on_render(Renderer& renderer, const PointF&)
+void Game::render(Renderer& renderer)
 {
 	const auto draw_tr = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
 	{
@@ -131,12 +139,7 @@ void Game::on_render(Renderer& renderer, const PointF&)
 		renderer.draw_debug_text(_debug_text);
 }
 
-void Game::on_screenshot(Image&& image)
-{
-	image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"));
-}
-
-void Game::on_update(const UpdateEvent& update)
+void Game::update(const UpdateEvent& update)
 {
 	_animation += update.milliseconds;
 

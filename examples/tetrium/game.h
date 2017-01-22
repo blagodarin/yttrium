@@ -16,7 +16,7 @@
 
 using namespace Yttrium;
 
-class Game : public WindowCallbacks
+class Game
 {
 public:
 	Game(Storage&);
@@ -25,12 +25,6 @@ public:
 	void run();
 
 private:
-	// WindowCallbacks
-	void on_key_event(const KeyEvent&) override;
-	void on_render(Renderer&, const PointF& cursor) override;
-	void on_screenshot(Image&&) override;
-	void on_update(const UpdateEvent&) override;
-
 	void update_statistics();
 
 private:
@@ -38,7 +32,7 @@ private:
 	ScriptContext _script;
 	AudioManager _audio;
 	AudioPlayer _audio_player{ _audio };
-	Window _window{ "Tetrium", *this };
+	Window _window{ "Tetrium" };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio };
 	Gui _gui{ _resource_loader, _script, _audio_player, "examples/tetrium/data/gui.ion" };
 	Cursor _cursor{ _window.renderer() };

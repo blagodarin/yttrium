@@ -34,19 +34,19 @@ namespace Yttrium
 		void notify(const StaticString& event);
 
 		///
+		void on_canvas(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
+
+		///
+		void on_custom_cursor(const std::function<void(Renderer&, const PointF&)>&);
+
+		///
+		void on_quit(const std::function<void()>&);
+
+		///
 		bool process_key_event(const KeyEvent&);
 
 		///
 		void render(Renderer&, const PointF& cursor) const;
-
-		///
-		void set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>&);
-
-		///
-		void set_custom_cursor_handler(const std::function<void(Renderer&, const PointF&)>&);
-
-		///
-		void set_quit_handler(const std::function<void()>&);
 
 		///
 		void start();

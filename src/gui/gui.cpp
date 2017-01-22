@@ -162,6 +162,21 @@ namespace Yttrium
 			_private->_layer_stack.back()->handle_event(event.to_std());
 	}
 
+	void Gui::on_canvas(const StaticString& name, const std::function<void(Renderer&, const RectF&)>& handler)
+	{
+		_private->_canvas_handlers[String(name, &_private->_allocator)] = handler;
+	}
+
+	void Gui::on_custom_cursor(const std::function<void(Renderer&, const PointF&)>& handler)
+	{
+		_private->_custom_cursor_handler = handler;
+	}
+
+	void Gui::on_quit(const std::function<void()>& handler)
+	{
+		_private->_quit_handler = handler;
+	}
+
 	bool Gui::process_key_event(const KeyEvent& event)
 	{
 		if (!_private->_layer_stack.empty() && _private->_layer_stack.back()->handle_key(event))
@@ -191,21 +206,6 @@ namespace Yttrium
 				(*layer++)->render(renderer, nullptr);
 		}
 		(*top_layer)->render(renderer, &cursor);
-	}
-
-	void Gui::set_canvas_handler(const StaticString& name, const std::function<void(Renderer&, const RectF&)>& handler)
-	{
-		_private->_canvas_handlers[String(name, &_private->_allocator)] = handler;
-	}
-
-	void Gui::set_custom_cursor_handler(const std::function<void(Renderer&, const PointF&)>& handler)
-	{
-		_private->_custom_cursor_handler = handler;
-	}
-
-	void Gui::set_quit_handler(const std::function<void()>& handler)
-	{
-		_private->_quit_handler = handler;
 	}
 
 	void Gui::start()

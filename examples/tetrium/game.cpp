@@ -81,22 +81,49 @@ Game::Game(Storage& storage)
 		_logic.turn_right();
 	});
 
-	_gui.set_canvas_handler("field", [this](Renderer&, const RectF& rect)
+	_window.on_key_event([this](const KeyEvent& event)
+	{
+		_gui.process_key_event(event);
+	});
+
+	_window.on_render([this](Renderer& renderer, const PointF& cursor)
+	{
+		_gui.render(renderer, cursor);
+	});
+
+	_window.on_screenshot([this](Image&& image)
+	{
+		image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"), ImageType::Auto);
+	});
+
+	_window.on_update([this](const UpdateEvent& update)
+	{
+		if (_logic.advance(update.milliseconds))
+		{
+			_script.set("score", _logic.score());
+			_script.set("lines", _logic.lines());
+			_script.set("level", _logic.level());
+			if (_logic.has_finished())
+				_gui.notify("game_over");
+		}
+	});
+
+	_gui.on_canvas("field", [this](Renderer&, const RectF& rect)
 	{
 		_graphics.draw_field(rect, _logic.field(), _logic.current_figure());
 	});
 
-	_gui.set_canvas_handler("next", [this](Renderer&, const RectF& rect)
+	_gui.on_canvas("next", [this](Renderer&, const RectF& rect)
 	{
 		_graphics.draw_next_figure(rect, _logic.next_figure());
 	});
 
-	_gui.set_custom_cursor_handler([this](Renderer&, const PointF& point)
+	_gui.on_custom_cursor([this](Renderer&, const PointF& point)
 	{
 		_cursor.draw(point);
 	});
 
-	_gui.set_quit_handler([this]
+	_gui.on_quit([this]
 	{
 		_window.close();
 	});
@@ -111,33 +138,6 @@ void Game::run()
 	_gui.start();
 	_window.show();
 	_window.run();
-}
-
-void Game::on_key_event(const KeyEvent& event)
-{
-	_gui.process_key_event(event);
-}
-
-void Game::on_render(Renderer& renderer, const PointF& cursor)
-{
-	_gui.render(renderer, cursor);
-}
-
-void Game::on_screenshot(Image&& image)
-{
-	image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png"), ImageType::Auto);
-}
-
-void Game::on_update(const UpdateEvent& update)
-{
-	if (_logic.advance(update.milliseconds))
-	{
-		_script.set("score", _logic.score());
-		_script.set("lines", _logic.lines());
-		_script.set("level", _logic.level());
-		if (_logic.has_finished())
-			_gui.notify("game_over");
-	}
 }
 
 void Game::update_statistics()

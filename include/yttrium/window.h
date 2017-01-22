@@ -6,6 +6,7 @@
 
 #include <yttrium/memory/global.h>
 
+#include <functional>
 #include <memory>
 
 namespace Yttrium
@@ -52,31 +53,11 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API WindowCallbacks
-	{
-	public:
-		///
-		virtual void on_cursor_movement(const Point& movement);
-
-		///
-		virtual void on_key_event(const KeyEvent&);
-
-		///
-		virtual void on_render(Renderer&, const PointF& cursor);
-
-		/// Called when a screenshot image is ready.
-		virtual void on_screenshot(Image&&);
-
-		///
-		virtual void on_update(const UpdateEvent&);
-	};
-
-	///
 	class Y_API Window
 	{
 	public:
 		///
-		Window(const StaticString& name, WindowCallbacks&, Allocator& = *DefaultAllocator);
+		Window(const StaticString& name, Allocator& = *DefaultAllocator);
 
 		///
 		~Window();
@@ -89,6 +70,21 @@ namespace Yttrium
 
 		///
 		void lock_cursor(bool lock);
+
+		///
+		void on_cursor_moved(const std::function<void(int dx, int dy)>&);
+
+		///
+		void on_key_event(const std::function<void(const KeyEvent&)>&);
+
+		///
+		void on_render(const std::function<void(Renderer&, const PointF& cursor)>&);
+
+		/// Sets a callback to be called when a screenshot image is ready.
+		void on_screenshot(const std::function<void(Image&&)>&);
+
+		///
+		void on_update(const std::function<void(const UpdateEvent&)>&);
 
 		///
 		Renderer& renderer();
