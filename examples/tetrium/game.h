@@ -11,8 +11,9 @@
 
 #include "cursor.h"
 #include "graphics.h"
+#include "statistics.h"
 
-#include <map>
+#include <chrono>
 
 using namespace Yttrium;
 
@@ -20,11 +21,11 @@ class Game
 {
 public:
 	Game(Storage&);
-	~Game();
 
 	void run();
 
 private:
+	void update(const std::chrono::milliseconds&);
 	void update_statistics();
 
 private:
@@ -38,7 +39,7 @@ private:
 	Cursor _cursor{ _window.renderer() };
 	TetriumGraphics _graphics{ _window.renderer() };
 	Tetrium::Game _logic;
-	std::multimap<int, std::string> _statistics;
+	TetriumStatistics _statistics{ _script };
 };
 
 #endif

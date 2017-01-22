@@ -88,13 +88,6 @@ namespace Yttrium
 		return true;
 	}
 
-	void GuiPrivate::render_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) const
-	{
-		const auto i = _canvas_handlers.find(String(name, ByReference()));
-		if (i != _canvas_handlers.end())
-			i->second(renderer, rect);
-	}
-
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
 	{
 		auto texture = _resource_loader.load_texture_2d(texture_name);
@@ -162,19 +155,19 @@ namespace Yttrium
 			_private->_layer_stack.back()->handle_event(event.to_std());
 	}
 
-	void Gui::on_canvas(const StaticString& name, const std::function<void(Renderer&, const RectF&)>& handler)
+	void Gui::on_canvas(const std::function<void(Renderer&, const StaticString&, const RectF&)>& callback)
 	{
-		_private->_canvas_handlers[String(name, &_private->_allocator)] = handler;
+		_private->_on_canvas = callback;
 	}
 
-	void Gui::on_custom_cursor(const std::function<void(Renderer&, const PointF&)>& handler)
+	void Gui::on_custom_cursor(const std::function<void(Renderer&, const PointF&)>& callback)
 	{
-		_private->_custom_cursor_handler = handler;
+		_private->_on_custom_cursor = callback;
 	}
 
-	void Gui::on_quit(const std::function<void()>& handler)
+	void Gui::on_quit(const std::function<void()>& callback)
 	{
-		_private->_quit_handler = handler;
+		_private->_on_quit = callback;
 	}
 
 	bool Gui::process_key_event(const KeyEvent& event)

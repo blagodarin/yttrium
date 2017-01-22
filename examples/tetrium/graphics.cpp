@@ -5,6 +5,7 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
+#include <yttrium/static_string.h>
 
 namespace
 {
@@ -111,6 +112,14 @@ TetriumGraphics::TetriumGraphics(Renderer& renderer)
 	: _renderer(renderer)
 	, _blocks_texture(_renderer.create_texture_2d(::make_blocks_image()))
 {
+}
+
+void TetriumGraphics::draw(const StaticString& canvas, const RectF& rect, const Tetrium::Game& logic) const
+{
+	if (canvas == "field")
+		draw_field(rect, logic.field(), logic.current_figure());
+	else if (canvas == "next")
+		draw_next_figure(rect, logic.next_figure());
 }
 
 void TetriumGraphics::draw_field(const RectF& rect, const Tetrium::Field& field, const Tetrium::Figure& current_figure) const

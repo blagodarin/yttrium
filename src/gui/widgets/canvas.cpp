@@ -1,6 +1,5 @@
 #include "canvas.h"
 
-#include <yttrium/window.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
@@ -22,6 +21,6 @@ namespace Yttrium
 
 	void CanvasWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
-		_gui.render_canvas(renderer, _id, rect);
+		_gui.draw_canvas(renderer, _id, rect);
 	}
 }

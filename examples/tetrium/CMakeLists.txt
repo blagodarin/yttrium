@@ -22,6 +22,7 @@ add_executable(tetrium
 	graphics.cpp
 	logic.cpp
 	main.cpp
+	statistics.cpp
 	)
 target_link_libraries(tetrium yttrium)
 add_dependencies(tetrium tetrium_package)
