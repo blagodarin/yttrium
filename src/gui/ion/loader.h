@@ -31,6 +31,7 @@ namespace Yttrium
 
 		void load_layer_cursor(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_layout(GuiLayer&, const IonNode&, int extra) const;
+		void load_layer_music(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_on_enter(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_on_event(GuiLayer&, const IonNode&, int extra) const;
 		void load_layer_on_key(GuiLayer&, const IonNode&, int extra) const;

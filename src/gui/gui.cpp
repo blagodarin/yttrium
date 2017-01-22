@@ -1,5 +1,6 @@
 #include <yttrium/gui/gui.h>
 
+#include <yttrium/audio/player.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/log.h>
@@ -18,9 +19,10 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
+	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, AudioPlayer& audio_player, Allocator& allocator)
 		: _resource_loader(resource_loader)
 		, _script_context(script_context)
+		, _audio_player(audio_player)
 		, _allocator(allocator)
 		, _layers(_allocator)
 	{
@@ -32,17 +34,16 @@ namespace Yttrium
 	{
 		if (!is_root && name.is_empty())
 			throw GuiDataError("Non-root layer must have a name"_s);
+		if (_layers.find(String(name, ByReference())) != _layers.end())
+			throw GuiDataError("Duplicate layer name \""_s, name, "\""_s);
 		auto&& layer = make_unique<GuiLayer>(_allocator, *this, name, is_transparent);
-		const String& layer_name = layer->name(); // To avoid extra allocations.
-		if (_layers.find(layer_name) != _layers.end())
-			throw GuiDataError("Duplicate layer name \""_s, layer_name, "\""_s);
 		if (is_root)
 		{
-			if (!_layer_stack.empty())
-				throw GuiDataError("\""_s, layer_name, "\" can't be the root layer, \""_s, _layer_stack.front()->name(), "\" is the root layer"_s);
-			_layer_stack.push_back(layer.get());
+			if (_root_layer)
+				throw GuiDataError("\""_s, name, "\" can't be the root layer, \""_s, _root_layer->name(), "\" is the root layer"_s);
+			_root_layer = layer.get();
 		}
-		return *_layers.emplace(layer_name, std::move(layer)).first->second;
+		return *_layers.emplace(name, std::move(layer)).first->second;
 	}
 
 	void GuiPrivate::set_translation(const StaticString& path)
@@ -64,8 +65,7 @@ namespace Yttrium
 	{
 		if (_layer_stack.size() <= 1)
 			return false;
-		_layer_stack.back()->handle_return();
-		_layer_stack.pop_back();
+		leave_layer();
 		return true;
 	}
 
@@ -75,10 +75,7 @@ namespace Yttrium
 		if (end == _layer_stack.rend())
 			return false;
 		for (auto n = std::distance(_layer_stack.rbegin(), end); n > 0; --n)
-		{
-			_layer_stack.back()->handle_return();
-			_layer_stack.pop_back();
-		}
+			leave_layer();
 		return true;
 	}
 
@@ -87,8 +84,7 @@ namespace Yttrium
 		const auto i = _layers.find(String(name, ByReference()));
 		if (i == _layers.end())
 			return false;
-		_layer_stack.push_back(i->second.get());
-		i->second->handle_enter();
+		enter_layer(i->second.get());
 		return true;
 	}
 
@@ -118,11 +114,43 @@ namespace Yttrium
 		return _translation ? _translation->translate(source) : String(source, &_allocator);
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name, Allocator& allocator)
-		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, allocator))
+	void GuiPrivate::enter_layer(GuiLayer* layer)
+	{
+		_layer_stack.emplace_back(layer);
+		const auto& layer_music = layer->music();
+		if (layer_music)
+		{
+			_audio_player.stop();
+			_audio_player.load(layer_music);
+			_audio_player.set_order(AudioPlayer::Random);
+			_audio_player.play();
+		}
+		layer->handle_enter();
+	}
+
+	void GuiPrivate::leave_layer()
+	{
+		const auto layer = _layer_stack.back();
+		layer->handle_return();
+		if (layer->music())
+		{
+			_audio_player.stop();
+			const auto next_music_layer = std::find_if(std::next(_layer_stack.rbegin()), _layer_stack.rend(), [](GuiLayer* layer){ return static_cast<bool>(layer->music()); });
+			if (next_music_layer != _layer_stack.rend())
+			{
+				_audio_player.load((*next_music_layer)->music());
+				_audio_player.set_order(AudioPlayer::Random);
+				_audio_player.play();
+			}
+		}
+		_layer_stack.pop_back();
+	}
+
+	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, AudioPlayer& audio_player, const StaticString& name, Allocator& allocator)
+		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, audio_player, allocator))
 	{
 		GuiIonLoader(*_private).load(name);
-		if (_private->_layer_stack.empty())
+		if (!_private->_root_layer)
 			throw GuiDataError("(gui) No root layer has been added"_s);
 	}
 
@@ -178,5 +206,11 @@ namespace Yttrium
 	void Gui::set_quit_handler(const std::function<void()>& handler)
 	{
 		_private->_quit_handler = handler;
+	}
+
+	void Gui::start()
+	{
+		assert(_private->_layer_stack.empty()); // TODO: Remove explicit 'start()'.
+		_private->enter_layer(_private->_root_layer);
 	}
 }

@@ -228,6 +228,7 @@ namespace Yttrium
 		{
 			{ "center"_s, { &GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Center) } },
 			{ "cursor"_s, { &GuiIonLoader::load_layer_cursor, 0 } },
+			{ "music"_s, { &GuiIonLoader::load_layer_music, 0 } },
 			{ "on_enter"_s, { &GuiIonLoader::load_layer_on_enter, 0 } },
 			{ "on_event"_s, { &GuiIonLoader::load_layer_on_event, 0 } },
 			{ "on_key"_s, { &GuiIonLoader::load_layer_on_key, 0 } },
@@ -311,6 +312,14 @@ namespace Yttrium
 				loader.set_default_font_name(&_default_font_name);
 			layer.register_widget(layout.add_widget(layout_node.name(), loader));
 		}
+	}
+
+	void GuiIonLoader::load_layer_music(GuiLayer& layer, const IonNode& node, int) const
+	{
+		const auto values = node.values();
+		if (values.size() != 1 || values->type() != IonValue::Type::String)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		layer.set_music(_gui.resource_loader().load_music(values->string()));
 	}
 
 	void GuiIonLoader::load_layer_on_enter(GuiLayer& layer, const IonNode& node, int) const

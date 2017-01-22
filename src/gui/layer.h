@@ -2,6 +2,7 @@
 #define _src_gui_layer_h_
 
 #include <yttrium/math/rect.h>
+#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/std/map.h>
 #include "actions.h"
 #include "cursor.h"
@@ -15,6 +16,7 @@ namespace Yttrium
 {
 	class GuiLayout;
 	class GuiPrivate;
+	class Music;
 	class Renderer;
 	class Widget;
 
@@ -34,9 +36,11 @@ namespace Yttrium
 		bool handle_event(const std::string&) const;
 		bool handle_key(const KeyEvent&);
 		void handle_return() const { _on_return.run(_gui); }
+		ResourcePtr<const Music> music() const { return _music; }
 		void register_widget(Widget&);
 		void render(Renderer& renderer, const PointF* cursor);
 		void set_cursor(GuiCursor cursor) { _cursor = cursor; }
+		void set_music(const ResourcePtr<const Music>& music) { _music = music; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(const std::string& event, GuiActions&& actions) { _on_event[event] = std::move(actions); }
 		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
@@ -59,6 +63,7 @@ namespace Yttrium
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiActions _on_return;
 		GuiCursor _cursor = GuiCursor::None;
+		ResourcePtr<const Music> _music;
 	};
 }
 

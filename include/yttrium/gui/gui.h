@@ -11,6 +11,7 @@
 
 namespace Yttrium
 {
+	class AudioPlayer;
 	class KeyEvent;
 	class PointF;
 	class RectF;
@@ -24,7 +25,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Gui(ResourceLoader&, ScriptContext&, const StaticString& name, Allocator& = *DefaultAllocator);
+		Gui(ResourceLoader&, ScriptContext&, AudioPlayer&, const StaticString& name, Allocator& = *DefaultAllocator);
 
 		///
 		~Gui();
@@ -46,6 +47,9 @@ namespace Yttrium
 
 		///
 		void set_quit_handler(const std::function<void()>&);
+
+		///
+		void start();
 
 	private:
 		const std::unique_ptr<class GuiPrivate> _private;

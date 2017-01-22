@@ -14,6 +14,7 @@
 
 namespace Yttrium
 {
+	class AudioPlayer;
 	class Gui;
 	class GuiLayer;
 	class PointF;
@@ -44,7 +45,7 @@ namespace Yttrium
 			}
 		};
 
-		GuiPrivate(ResourceLoader&, ScriptContext&, Allocator&);
+		GuiPrivate(ResourceLoader&, ScriptContext&, AudioPlayer&, Allocator&);
 		~GuiPrivate();
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
@@ -66,11 +67,17 @@ namespace Yttrium
 		String translate(const StaticString&) const;
 
 	private:
+		void enter_layer(GuiLayer*);
+		void leave_layer();
+
+	private:
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
+		AudioPlayer& _audio_player;
 		Allocator& _allocator;
 		StdMap<String, FontDesc> _fonts{ _allocator };
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
+		GuiLayer* _root_layer = nullptr;
 		StdVector<GuiLayer*> _layer_stack{ _allocator };
 		StdMap<String, std::function<void(Renderer&, const RectF&)>> _canvas_handlers{ _allocator };
 		std::function<void()> _quit_handler;

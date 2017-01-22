@@ -81,13 +81,6 @@ Game::Game(Storage& storage)
 		_logic.turn_right();
 	});
 
-	update_statistics();
-}
-
-Game::~Game() = default;
-
-void Game::run()
-{
 	_gui.set_canvas_handler("field", [this](Renderer&, const RectF& rect)
 	{
 		_graphics.draw_field(rect, _logic.field(), _logic.current_figure());
@@ -108,10 +101,14 @@ void Game::run()
 		_window.close();
 	});
 
-	_audio_player.load(_resource_loader.load_music("data/music.ogg"));
-	_audio_player.set_order(AudioPlayer::Random);
-	_audio_player.play();
+	update_statistics();
+}
 
+Game::~Game() = default;
+
+void Game::run()
+{
+	_gui.start();
 	_window.show();
 	_window.run();
 }

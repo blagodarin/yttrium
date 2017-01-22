@@ -40,7 +40,7 @@ private:
 	AudioPlayer _audio_player{ _audio };
 	Window _window{ "Tetrium", *this };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio };
-	Gui _gui{ _resource_loader, _script, "examples/tetrium/data/gui.ion" };
+	Gui _gui{ _resource_loader, _script, _audio_player, "examples/tetrium/data/gui.ion" };
 	Cursor _cursor{ _window.renderer() };
 	TetriumGraphics _graphics{ _window.renderer() };
 	Tetrium::Game _logic;
