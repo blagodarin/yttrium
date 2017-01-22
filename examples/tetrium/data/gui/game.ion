@@ -3,10 +3,10 @@ class "background"
 	color "0" "0" "0" "0.5"
 }
 
-layer "game_single"
+layer "game"
 {
 	on_enter { call "game_start" }
-	on_event "GameOver" { enter "game_over" }
+	on_event "game_over" { enter "game_over" }
 	on_return { call "game_stop" }
 
 	on_key "a" { call "+move_left" } { call "-move_left" }
@@ -14,7 +14,7 @@ layer "game_single"
 	on_key "s" { call "+move_down" } { call "-move_down" }
 	on_key "left" { call "turn_left" }
 	on_key "right" { call "turn_right" }
-	on_key "esc" { enter "game_pause" }
+	on_key "esc" { enter "pause" }
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 

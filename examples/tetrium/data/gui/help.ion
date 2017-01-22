@@ -9,7 +9,7 @@ class "help_text"
 	align     "left"
 }
 
-layer "menu_help"
+layer "help"
 {
 	on_key "esc" { return }
 

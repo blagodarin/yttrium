@@ -3,7 +3,7 @@ class "pause_button" ["button"]
 	position "11" "" "8" "2"
 }
 
-transparent layer "game_pause"
+transparent layer "pause"
 {
 	on_enter { call "game_pause" }
 	on_key "esc" { return }
@@ -26,14 +26,14 @@ transparent layer "game_pause"
 		{
 			position "" "10"
 			text     {tr"Restart"}
-			on_click { return_to "menu_single" enter "game_single" }
+			on_click { return_to "play_menu" enter "game" }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "13"
 			text     {tr"Give up"}
-			on_click { return_to "menu_main" }
+			on_click { return_to "main_menu" }
 		}
 
 		button ["pause_button"]

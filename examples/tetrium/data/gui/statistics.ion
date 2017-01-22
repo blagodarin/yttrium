@@ -16,7 +16,7 @@ class "statistics_score"
 	align    "right"
 }
 
-layer "menu_statistics"
+layer "statistics"
 {
 	on_key "esc" { return }
 

@@ -144,7 +144,11 @@ int main(int argc, char** argv)
 	{
 		for (auto& entry : entries)
 			package->add(entry.first, std::move(entry.second));
-		package->commit();
+		if (!package->commit())
+		{
+			std::cerr << "ERROR(" << package_name << "): Unable to write package file" << std::endl;
+			return 1;
+		}
 	}
 	catch (const DataError& e)
 	{

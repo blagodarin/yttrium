@@ -1,7 +1,7 @@
 transparent layer "game_over"
 {
 	on_enter { call "game_stop" }
-	on_key "esc" { return_to "menu_main" }
+	on_key "esc" { return_to "main_menu" }
 
 	stretch { image { color "0" "0" "0" "0.5" } }
 
@@ -28,7 +28,7 @@ transparent layer "game_over"
 			position   "5" "18" "20" "4"
 			color      "1" "1" "1" "0.5"
 			text_color "0" "0" "0"
-			on_enter   { call "save_score" return_to "menu_main" enter "menu_statistics" }
+			on_enter   { call "save_score" return_to "main_menu" enter "statistics" }
 		}
 	}
 }

@@ -1,4 +1,4 @@
-root layer "menu_main"
+root layer "main_menu"
 {
 	on_key "esc" { quit }
 
@@ -19,34 +19,27 @@ root layer "menu_main"
 		button ["button"]
 		{
 			position "" "210"
-			text     {tr"Single player"}
-			on_click { enter "menu_single" }
+			text     {tr"Play"}
+			on_click { enter "play_menu" }
 		}
 
 		button ["button"]
 		{
 			position "" "260"
-			text     {tr"Multiplayer"}
-			on_click { enter "menu_multi" }
+			text     {tr"Statistics"}
+			on_click { enter "statistics" }
 		}
 
 		button ["button"]
 		{
 			position "" "310"
-			text     {tr"Statistics"}
-			on_click { enter "menu_statistics" }
+			text     {tr"Help"}
+			on_click { enter "help" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
-			text     {tr"Help"}
-			on_click { enter "menu_help" }
-		}
-
-		button ["button"]
-		{
-			position "" "410"
 			text     {tr"Exit"}
 			on_click { quit }
 		}

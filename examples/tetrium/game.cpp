@@ -136,7 +136,7 @@ void Game::on_update(const UpdateEvent& update)
 		_script.set("lines", _logic.lines());
 		_script.set("level", _logic.level());
 		if (_logic.has_finished())
-			_gui.notify("GameOver");
+			_gui.notify("game_over");
 	}
 }
 

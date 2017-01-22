@@ -1,4 +1,4 @@
-layer "menu_multi"
+layer "play_menu"
 {
 	on_key "esc" { return }
 
@@ -16,23 +16,30 @@ layer "menu_multi"
 
 		button ["button"]
 		{
-			position "" "260"
-			text     {tr"Multiplayer"}
+			position "" "210"
+			text     {tr"Play"}
 			state    "checked"
 		}
 
 		button ["button"]
 		{
+			position "" "260"
+			text     {tr"Easy"}
+			on_click { call "set start_level 1" enter "game" }
+		}
+
+		button ["button"]
+		{
 			position "" "310"
-			text     {tr"Host game"}
-			state    "disabled"
+			text     {tr"Normal"}
+			on_click { call "set start_level 10" enter "game" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
-			text     {tr"Join game"}
-			state    "disabled"
+			text     {tr"Hard"}
+			on_click { call "set start_level 30" enter "game" }
 		}
 
 		button ["button"]
