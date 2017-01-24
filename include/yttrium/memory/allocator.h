@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 	/// Memory allocator interface.
-	class Allocator
+	class Y_API Allocator
 	{
 	public:
 

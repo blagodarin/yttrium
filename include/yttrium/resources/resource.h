@@ -4,13 +4,15 @@
 #ifndef _include_yttrium_resources_resource_h_
 #define _include_yttrium_resources_resource_h_
 
+#include <yttrium/api.h>
+
 #include <atomic>
 #include <cstddef>
 
 namespace Yttrium
 {
 	/// Base class for all resources.
-	class Resource
+	class Y_API Resource
 	{
 	public:
 		Resource(const Resource&) = delete;

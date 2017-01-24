@@ -16,7 +16,7 @@ namespace Yttrium
 	class StaticString;
 
 	/// Base class for Renderer modifiers.
-	class RendererModifier
+	class Y_API RendererModifier
 	{
 	public:
 		RendererModifier(const RendererModifier&) = delete;

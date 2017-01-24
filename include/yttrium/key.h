@@ -196,8 +196,9 @@ namespace Yttrium
 	};
 
 	/// %Key event.
-	struct Y_API KeyEvent
+	class Y_API KeyEvent
 	{
+	public:
 		enum
 		{
 			Shift   = 1 << 0, ///< Key::LShift or Key::RShift is pressed.

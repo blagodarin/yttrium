@@ -13,7 +13,7 @@ namespace Yttrium
 		struct Item
 		{
 			PoolChunk* chunk;
-			char data[0];
+			char data[1];
 
 			static Item* base(void* pointer)
 			{

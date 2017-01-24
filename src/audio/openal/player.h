@@ -5,6 +5,8 @@
 #include "format.h"
 #include "wrappers.h"
 
+#include <array>
+
 namespace Yttrium
 {
 	class OpenAlPlayer : public AudioPlayerBackend

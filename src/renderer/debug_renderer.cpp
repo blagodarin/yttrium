@@ -4,6 +4,8 @@
 #include "debug_texture.h"
 #include "renderer.h"
 
+#include <algorithm>
+
 namespace
 {
 	using namespace Yttrium;

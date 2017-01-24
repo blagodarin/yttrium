@@ -5,6 +5,7 @@
 #include <yttrium/memory/buffer.h>
 #include "document.h"
 
+#include <array>
 #include <cassert>
 
 namespace

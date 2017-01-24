@@ -55,12 +55,12 @@ namespace Yttrium
 
 	private:
 		ResourcePtr(T* pointer) noexcept : ResourcePtrBase(pointer) {}
-		template <typename U, typename... Args, typename> friend ResourcePtr<U> make_resource(Args&&...);
+		template <typename U, typename, typename... Args> friend ResourcePtr<U> make_resource(Args&&...);
 		template <typename> friend class ResourcePtr;
 	};
 
 	///
-	template <typename T, typename... Args, typename = std::enable_if_t<std::is_base_of<Resource, T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_base_of<Resource, T>::value>, typename... Args>
 	ResourcePtr<T> make_resource(Args&&... args)
 	{
 		return ResourcePtr<T>(new T(std::forward<Args>(args)...));

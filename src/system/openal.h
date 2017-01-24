@@ -6,7 +6,7 @@
 	#define AL_APIENTRY __cdecl
 #endif
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#include <al.h>
+#include <alc.h>
 
 #endif

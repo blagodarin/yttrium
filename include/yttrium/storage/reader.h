@@ -7,6 +7,7 @@
 #include <yttrium/memory/global.h>
 
 #include <memory>
+#include <string>
 
 namespace Yttrium
 {

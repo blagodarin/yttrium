@@ -31,7 +31,7 @@ namespace Yttrium
 
 	bool InputWidget::process_key(const KeyEvent& event)
 	{
-		if (event.pressed > 0)
+		if (event.pressed)
 		{
 			switch (event.key)
 			{
