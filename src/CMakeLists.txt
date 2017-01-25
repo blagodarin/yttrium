@@ -5,7 +5,11 @@ option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
 
 test_big_endian(Y_IS_BIG_ENDIAN)
-set(Y_IS_LINUX $<${CMAKE_SYSTEM_NAME} STREQUAL Linux>)
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+	set(Y_IS_LINUX ON)
+else()
+	set(Y_IS_LINUX OFF)
+endif()
 set(Y_IS_POSIX ${UNIX})
 set(Y_IS_WINDOWS ${WIN32})
 set(Y_NO_JPEG ${NO_JPEG})
@@ -145,15 +149,17 @@ endif()
 # Operating system.
 if(UNIX)
 	target_sources(yttrium PRIVATE
-		system/posix/dir.cpp
 		system/posix/file.cpp
 		system/posix/memory.cpp
 		system/posix/stderr.cpp
 		system/posix/temporary_file.cpp
-		system/posix/time.cpp
 		)
 elseif(WIN32)
-	# TODO: Add Windows support.
+	target_sources(yttrium PRIVATE
+		system/windows/memory.cpp
+		system/windows/stderr.cpp
+		system/windows/temporary_file.cpp
+		)
 endif()
 
 # Window system.

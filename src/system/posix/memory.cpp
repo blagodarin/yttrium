@@ -17,22 +17,22 @@ namespace Yttrium
 		const auto result = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (result != MAP_FAILED)
 			return result;
-		if (errno != ENOMEM)
+		if (errno == ENOMEM)
 			return nullptr;
-		::abort();
+		std::abort();
 	}
 
 	void pages_deallocate(void* pointer, size_t size) noexcept
 	{
 		if (::munmap(pointer, size) != 0)
-			::abort();
+			std::abort();
 	}
 
 	size_t pages_granularity() noexcept
 	{
 		const auto page_size = ::sysconf(_SC_PAGESIZE);
 		if (page_size <= 0)
-			::abort();
+			std::abort();
 		return page_size;
 	}
 
@@ -48,12 +48,12 @@ namespace Yttrium
 		{
 			std::memcpy(new_pointer, old_pointer, min(old_size, new_size));
 			if (::munmap(old_pointer, old_size) != 0)
-				::abort();
+				std::abort();
 			return new_pointer;
 		}
 #endif
 		if (errno != ENOMEM && old_size < new_size)
 			return nullptr;
-		::abort();
+		std::abort();
 	}
 }

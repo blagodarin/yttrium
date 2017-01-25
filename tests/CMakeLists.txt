@@ -1,6 +1,5 @@
 add_executable(unit_tests
 	buffer.cpp
-	dir.cpp
 	gui.cpp
 	image.cpp
 	image_formats.cpp
