@@ -1,12 +1,13 @@
 #include "game.h"
 
+#include "../utils.h"
+
 #include <yttrium/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/string_format.h>
-#include <yttrium/time.h>
 
 #include <cmath>
 
@@ -20,7 +21,7 @@ Game::Game(const Storage& storage)
 	});
 	_window.on_key_event([this](const KeyEvent& event){ on_key_event(event); });
 	_window.on_render([this](Renderer& renderer, const PointF&){ render(renderer); });
-	_window.on_screenshot([this](Image&& image){ image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png")); });
+	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });
 }
 
@@ -141,12 +142,12 @@ void Game::render(Renderer& renderer)
 
 void Game::update(const UpdateEvent& update)
 {
-	_animation += update.milliseconds;
+	_animation += update.milliseconds.count();
 
 	if (_move_forward != _move_backward || _move_left != _move_right)
 	{
 		constexpr auto speed = 8.f; // Units per second.
-		const auto distance = update.milliseconds * speed / 1000.f;
+		const auto distance = update.milliseconds.count() * speed / 1000.f;
 		const auto offset = (_move_forward || _move_backward) && (_move_left || _move_right) ? distance * M_SQRT1_2 : distance;
 
 		Vector4 movement(0, 0, 0);
@@ -168,7 +169,7 @@ void Game::update(const UpdateEvent& update)
 
 	_debug_text.clear()
 		<< "FPS: " << update.fps << "\n"
-		<< "MaxFrameTime: " << update.max_frame_time << "\n"
+		<< "MaxFrameTime: " << update.max_frame_time.count() << "\n"
 		<< "Triangles: " << update.triangles << "\n"
 		<< "DrawCalls: " << update.draw_calls << "\n"
 		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"

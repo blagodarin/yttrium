@@ -1,7 +1,6 @@
 #include <yttrium/string_format.h>
 
 #include <yttrium/string.h>
-#include <yttrium/time.h>
 
 #include <array>
 #include <cassert>
@@ -82,99 +81,5 @@ namespace Yttrium
 	{
 		std::array<char, 32> buffer;
 		return string << StaticString(buffer.data(), ::snprintf(buffer.data(), buffer.size(), "%g", value));
-	}
-
-	String& operator<<(String& string, const Format<DateTime>& f)
-	{
-		string.reserve(string.size() + ::strlen(f.format)); // A good estimate.
-		for (auto format = f.format; *format != '\0';)
-		{
-			if (*format != '%')
-			{
-				string << *format++;
-				continue;
-			}
-			switch (*++format)
-			{
-			case '%':
-				string << '%';
-				++format;
-				break;
-
-			case 'D':
-				if (*++format == 'D')
-				{
-					string << dec(f.value.day, 2);
-					++format;
-				}
-				else
-					string << f.value.day;
-				break;
-
-			case 'M':
-				if (*++format == 'M')
-				{
-					string << dec(f.value.month, 2);
-					++format;
-				}
-				else
-					string << f.value.month;
-				break;
-
-			case 'Y':
-				if (*++format == 'Y')
-				{
-					string << dec(f.value.year, 4);
-					++format;
-				}
-				else
-					string << f.value.year;
-				break;
-
-			case 'h':
-				if (*++format == 'h')
-				{
-					string << dec(f.value.hour, 2);
-					++format;
-				}
-				else
-					string << f.value.hour;
-				break;
-
-			case 'm':
-				if (*++format == 'm')
-				{
-					string << dec(f.value.minute, 2);
-					++format;
-				}
-				else
-					string << f.value.minute;
-				break;
-
-			case 's':
-				if (*++format == 's')
-				{
-					string << dec(f.value.second, 2);
-					++format;
-				}
-				else
-					string << f.value.second;
-				break;
-
-			case 'z':
-				if (*++format == 'z')
-				{
-					string << dec(f.value.msecond, 3);
-					++format;
-				}
-				else
-					string << f.value.msecond;
-				break;
-
-			default:
-				string << '%';
-			}
-		}
-		return string;
 	}
 }

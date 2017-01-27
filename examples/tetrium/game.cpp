@@ -1,10 +1,11 @@
 #include "game.h"
 
+#include "../utils.h"
+
 #include <yttrium/image.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
 #include <yttrium/string_format.h>
-#include <yttrium/time.h>
 
 Game::Game(Storage& storage)
 	: _storage(storage)
@@ -29,7 +30,7 @@ Game::Game(Storage& storage)
 
 	_window.on_key_event([this](const KeyEvent& event){ _gui.process_key_event(event); });
 	_window.on_render([this](Renderer& renderer, const PointF& cursor){ _gui.render(renderer, cursor); });
-	_window.on_screenshot([this](Image&& image){ image.save(String() << print(DateTime::now(), "%YY-%MM-%DD_%hh-%mm-%ss.png")); });
+	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
 	_window.on_update([this](const UpdateEvent& event){ update(std::chrono::milliseconds(event.milliseconds)); });
 
 	_gui.on_canvas([this](Renderer&, const StaticString& canvas, const RectF& rect){ _graphics.draw(canvas, rect, _logic); });

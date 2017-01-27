@@ -1,6 +1,5 @@
 #include <yttrium/string.h>
 #include <yttrium/string_format.h>
-#include <yttrium/time.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -32,29 +31,4 @@ BOOST_AUTO_TEST_CASE(test_string_format)
 	BOOST_CHECK_EQUAL(String() << repeat('A', 0), "");
 	BOOST_CHECK_EQUAL(String() << repeat('A', 1), "A");
 	BOOST_CHECK_EQUAL(String() << repeat('A', 2), "AA");
-}
-
-BOOST_AUTO_TEST_CASE(test_string_format_date_time)
-{
-	DateTime date_time;
-	date_time.year = 2000;
-	date_time.month = 1;
-	date_time.day = 2;
-	date_time.hour = 3;
-	date_time.minute = 4;
-	date_time.second = 5;
-	date_time.msecond = 6;
-
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%Y-%M-%D %h:%m:%s.%z"), "2000-1-2 3:4:5.6");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%YY-%MM-%DD %hh:%mm:%ss.%zz"), "2000-01-02 03:04:05.006");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%YYY-%MMM-%DDD %hhh:%mmm:%sss.%zzz"), "2000Y-01M-02D 03h:04m:05s.006z");
-
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%"), "%");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%%"), "%");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%%%"), "%%");
-
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%A%B%C%_%E%F%G%H%I%J%K%L%_"), "%A%B%C%_%E%F%G%H%I%J%K%L%_");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%N%O%P%Q%R%S%T%U%V%W%X%_%Z"), "%N%O%P%Q%R%S%T%U%V%W%X%_%Z");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%a%b%c%d%e%f%g%_%i%j%k%l%_"), "%a%b%c%d%e%f%g%_%i%j%k%l%_");
-	BOOST_CHECK_EQUAL(String() << print(date_time, "%n%o%p%q%r%_%t%u%v%w%x%y%_"), "%n%o%p%q%r%_%t%u%v%w%x%y%_");
 }

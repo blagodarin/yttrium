@@ -7,6 +7,8 @@
 #include "../properties.h"
 #include "widget.h"
 
+#include <chrono>
+
 namespace Yttrium
 {
 	class InputWidget : public Widget
@@ -22,7 +24,7 @@ namespace Yttrium
 		BackgroundProperty _background;
 		mutable ForegroundProperty _foreground;
 		LineEditor _logic;
-		int _cursor_mark = 0;
+		std::chrono::steady_clock::time_point _cursor_mark;
 		GuiActions _on_enter;
 	};
 }

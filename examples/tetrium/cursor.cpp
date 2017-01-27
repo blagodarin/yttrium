@@ -5,9 +5,9 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>
-#include <yttrium/time.h>
 
 #include <array>
+#include <chrono>
 
 struct Vertex // TODO: Don't rely on any specific GUI vertex format.
 {
@@ -45,7 +45,7 @@ void Cursor::draw(const PointF& point)
 		return (step < half_period ? half_period - step : step - half_period) / half_period;
 	};
 
-	const auto tick = millisecond_clock();
+	const auto tick = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 	const auto a = animation(tick);
 	const auto b = animation(tick + 500);

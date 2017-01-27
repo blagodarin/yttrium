@@ -2,7 +2,6 @@
 
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/time.h>
 #include "../renderer/renderer.h"
 #include "../system/window.h"
 #include "backend.h"
@@ -175,11 +174,13 @@ namespace Yttrium
 
 	void Window::run()
 	{
+		using namespace std::literals::chrono_literals;
+
 		UpdateEvent update;
 		int frames = 0;
-		int max_frame_time = 0;
-		auto clock = millisecond_clock();
-		auto fps_time = clock;
+		auto max_frame_time = 0ms;
+		auto clock = std::chrono::high_resolution_clock::now();
+		auto fps_time = 0ms;
 		while (_private->process_events())
 		{
 			if (_private->_on_update)
@@ -199,17 +200,17 @@ namespace Yttrium
 					_private->_on_screenshot(_private->_renderer->take_screenshot());
 			}
 			++frames;
-			update.milliseconds = millisecond_clock() - clock;
+			update.milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - clock);
 			clock += update.milliseconds;
 			fps_time += update.milliseconds;
-			max_frame_time = max(max_frame_time, update.milliseconds);
-			if (fps_time >= 1000)
+			max_frame_time = std::max(max_frame_time, update.milliseconds);
+			if (fps_time >= 1s)
 			{
-				update.fps = frames * 1000 / fps_time;
+				update.fps = frames * 1000 / fps_time.count();
 				update.max_frame_time = max_frame_time;
-				fps_time = 0;
+				fps_time = 0ms;
 				frames = 0;
-				max_frame_time = 0;
+				max_frame_time = 0ms;
 			}
 			const auto& renderer_statistics = _private->_renderer->reset_statistics();
 			update.triangles = renderer_statistics._triangles;

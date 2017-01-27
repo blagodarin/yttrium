@@ -1,7 +1,8 @@
 #include <yttrium/log.h>
 
-#include <yttrium/time.h>
 #include "log.h"
+
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace Yttrium
 {
@@ -29,8 +30,8 @@ namespace Yttrium
 	Log::Log()
 		: _message(64, &_log_manager.allocator())
 	{
-		const auto& now = DateTime::now();
-		_message << '[' << dec(now.hour, 2) << ':' << dec(now.minute, 2) << ':' << dec(now.second, 2) << "] "_s;
+		const auto now = boost::posix_time::second_clock::local_time().time_of_day();
+		_message << '[' << dec(now.hours(), 2) << ':' << dec(now.minutes(), 2) << ':' << dec(now.seconds(), 2) << "] "_s;
 	}
 
 	Log::~Log()

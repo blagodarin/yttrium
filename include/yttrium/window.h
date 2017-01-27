@@ -6,6 +6,7 @@
 
 #include <yttrium/memory/global.h>
 
+#include <chrono>
 #include <functional>
 #include <memory>
 
@@ -23,13 +24,13 @@ namespace Yttrium
 	struct UpdateEvent
 	{
 		/// Milliseconds to update the time by.
-		int milliseconds = 0;
+		std::chrono::milliseconds milliseconds{ 0 };
 
 		/// Current updates per second (frames per second, FPS) rate, \c -1 if not yet evaluated.
 		int fps = -1;
 
 		/// Maximum frame time in milliseconds.
-		int max_frame_time = 0;
+		std::chrono::milliseconds max_frame_time{ 0 };
 
 		/// Number of triangles rendered.
 		int triangles = 0;

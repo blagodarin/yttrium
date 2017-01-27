@@ -30,7 +30,6 @@ add_library(yttrium
 	base/string.cpp
 	base/string_format.cpp
 	base/thread_buffer.cpp
-	base/time.cpp
 	base/tiny_string_map.cpp
 	globals.cpp
 	gui/actions.cpp
