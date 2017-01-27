@@ -155,6 +155,7 @@ if(UNIX)
 		)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
+		system/windows/file.cpp
 		system/windows/memory.cpp
 		system/windows/stderr.cpp
 		system/windows/temporary_file.cpp

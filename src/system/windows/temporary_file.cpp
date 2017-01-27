@@ -5,7 +5,7 @@
 #include <array>
 #include <cstdlib>
 
-#include <windows.h>
+#include "windows.h"
 
 namespace Yttrium
 {
@@ -23,10 +23,9 @@ namespace Yttrium
 				std::abort();
 		}
 
-		~TemporaryFilePrivate()
+		~TemporaryFilePrivate() // TODO: Report failure.
 		{
-			if (!::DeleteFileA(_name.data()))
-				; // TODO: Output the error somehow.
+			::DeleteFileA(_name.data());
 		}
 
 	public:

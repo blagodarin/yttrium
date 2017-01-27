@@ -3,7 +3,7 @@
 
 #include "../config.h"
 #ifdef Y_IS_WINDOWS
-	#include <windows.h>
+	#include "windows/windows.h"
 	#define GLAPI_CALL APIENTRY
 #else
 	#define GLAPI_CALL

@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <windows.h>
+#include "windows.h"
 
 namespace Yttrium
 {

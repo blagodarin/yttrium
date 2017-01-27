@@ -1,7 +1,7 @@
 #ifndef _src_system_windows_stderr_h_
 #define _src_system_windows_stderr_h_
 
-#include <windows.h>
+#include "windows.h"
 
 namespace Yttrium
 {
