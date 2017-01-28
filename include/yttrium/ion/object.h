@@ -4,8 +4,10 @@
 #ifndef _include_yttrium_ion_object_h_
 #define _include_yttrium_ion_object_h_
 
-#include <yttrium/std/map.h>
-#include <yttrium/std/vector.h>
+#include <yttrium/api.h>
+
+#include <map>
+#include <vector>
 
 namespace Yttrium
 {
@@ -65,8 +67,8 @@ namespace Yttrium
 
 	private:
 		IonDocumentImpl& _document;
-		StdVector<IonNode*> _nodes;
-		StdMap<String, StdVector<IonNode*>> _node_map;
+		std::vector<IonNode*> _nodes;
+		std::map<String, std::vector<IonNode*>> _node_map;
 	};
 
 	class IonObjectIterator

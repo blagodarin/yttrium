@@ -41,6 +41,6 @@ namespace Yttrium
 
 	StaticString TemporaryFile::name() const
 	{
-		return StaticString(_private->_name.data(), _private->_name.size());
+		return _private->_name.data();
 	}
 }

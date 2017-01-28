@@ -24,7 +24,7 @@ namespace
 	}
 }
 
-int main()
+int main(int, char**)
 {
 	Log::set_file("3d.log");
 

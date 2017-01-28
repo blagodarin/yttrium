@@ -22,6 +22,7 @@ using namespace Yttrium;
 BOOST_AUTO_TEST_CASE(test_dds_reading)
 {
 	const auto image = Image::load(Reader("tests/image/gradient32.dds"));
+	BOOST_REQUIRE(image);
 	BOOST_CHECK(*image == make_test_image(true));
 }
 
@@ -55,7 +56,8 @@ BOOST_AUTO_TEST_CASE(test_png_writing)
 BOOST_AUTO_TEST_CASE(test_tga_reading)
 {
 	const auto image = Image::load(Reader("tests/image/gradient32.tga"));
-	BOOST_REQUIRE(*image == make_test_image(true));
+	BOOST_REQUIRE(image);
+	BOOST_CHECK(*image == make_test_image(true));
 }
 
 BOOST_AUTO_TEST_CASE(test_tga_writing)

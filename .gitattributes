@@ -1,0 +1,2 @@
+examples/tetrium/data/i18n/*.ion eol=lf
+tests/ion/*.ion eol=lf

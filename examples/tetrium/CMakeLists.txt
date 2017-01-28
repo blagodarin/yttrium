@@ -16,7 +16,7 @@ add_custom_target(tetrium_package
 add_dependencies(tetrium_package tetrium_localization)
 
 # Executable.
-add_executable(tetrium
+add_executable(tetrium WIN32
 	cursor.cpp
 	data.cpp
 	graphics.cpp
@@ -25,4 +25,7 @@ add_executable(tetrium
 	statistics.cpp
 	)
 target_link_libraries(tetrium yttrium)
+if(WIN32)
+	target_link_libraries(tetrium ywinmain)
+endif()
 add_dependencies(tetrium tetrium_package)

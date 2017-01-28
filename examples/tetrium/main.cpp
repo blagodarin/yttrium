@@ -84,9 +84,10 @@ private:
 	TetriumStatistics _statistics{ _script };
 };
 
-int main()
+int main(int, char**)
 {
 	Log::set_file("tetrium.log");
 	Game game;
 	game.run();
+	return 0;
 }
