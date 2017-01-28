@@ -2,6 +2,8 @@
 
 #include "../src/config.h"
 
+#include <array>
+
 #include <boost/test/unit_test.hpp>
 
 using namespace Yttrium;

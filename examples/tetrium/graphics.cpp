@@ -39,9 +39,9 @@ namespace
 		1, 4, 4,
 	};
 
-	static constexpr int FragmentSize = 32;
-	static constexpr int FragmentCount = 8;
-	static constexpr int Border = 3;
+	static constexpr auto FragmentSize = 32u;
+	static constexpr auto FragmentCount = 8u;
+	static constexpr auto Border = 3;
 
 	const SizeF BlockSize(FragmentSize - 2, FragmentSize - 2);
 
@@ -84,11 +84,11 @@ namespace
 	Image make_blocks_image()
 	{
 		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra, 32 });
-		for (int i = 0; i < FragmentCount; ++i)
+		for (unsigned i = 0; i < FragmentCount; ++i)
 		{
-			for (int y = 0; y < FragmentSize; ++y)
+			for (unsigned y = 0; y < FragmentSize; ++y)
 			{
-				for (int x = 0; x < FragmentSize; ++x)
+				for (unsigned x = 0; x < FragmentSize; ++x)
 				{
 					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.format().row_size() + x * 4;
 					const auto color = ::pixel_color(i, x, y);

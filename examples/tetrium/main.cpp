@@ -8,8 +8,8 @@ namespace
 {
 	void make_buttons_texture(Storage& storage)
 	{
-		constexpr auto button_size = 16;
-		constexpr auto button_styles = 4;
+		constexpr auto button_size = 16u;
+		constexpr auto button_styles = 4u;
 
 		Image image({ button_size, button_size * button_styles, PixelFormat::Bgra, 32 });
 		for (int i = 0; i < button_styles; ++i)

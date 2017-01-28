@@ -6,6 +6,7 @@
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 
+#include <array>
 #include <cstdlib>
 #include <cstring>
 

@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(test_is_power_of_2)
 	for (int8_t i = INT8_MIN; i < 0; ++i)
 		BOOST_CHECK(!is_power_of_2(i));
 	for (uint8_t i = 0; i <= INT8_MAX; ++i)
-		BOOST_CHECK_EQUAL(is_power_of_2(i), table[i]);
+		BOOST_CHECK_EQUAL(int{ is_power_of_2(i) }, table[i]);
 }
 
 BOOST_AUTO_TEST_CASE(test_max)
