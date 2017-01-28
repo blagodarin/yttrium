@@ -18,7 +18,7 @@ add_dependencies(tetrium_package tetrium_localization)
 # Executable.
 add_executable(tetrium
 	cursor.cpp
-	game.cpp
+	data.cpp
 	graphics.cpp
 	logic.cpp
 	main.cpp

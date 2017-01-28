@@ -1,54 +1,92 @@
-#include "game.h"
-
+#include <yttrium/audio/manager.h>
+#include <yttrium/audio/player.h>
+#include <yttrium/gui/gui.h>
 #include <yttrium/image.h>
 #include <yttrium/log.h>
+#include <yttrium/resources/resource_loader.h>
+#include <yttrium/script/args.h>
+#include <yttrium/script/context.h>
+#include <yttrium/script/value.h>
+#include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>
+#include <yttrium/window.h>
 
-namespace
+#include "../utils.h"
+#include "cursor.h"
+#include "data.h"
+#include "graphics.h"
+#include "statistics.h"
+
+using namespace Yttrium;
+
+class Game
 {
-	void make_buttons_texture(Storage& storage)
+public:
+	Game()
 	{
-		constexpr auto button_size = 16u;
-		constexpr auto button_styles = 4u;
-
-		Image image({ button_size, button_size * button_styles, PixelFormat::Bgra, 32 });
-		for (unsigned i = 0; i < button_styles; ++i)
+		_script.define("game_pause", [this](const ScriptCall&){ _logic.pause(); });
+		_script.define("game_start", [this](const ScriptCall& call){ _logic.start(call.context.get_int("start_level", 1)); });
+		_script.define("game_stop", [this](const ScriptCall&){ _logic.pause(); });
+		_script.define("game_resume", [this](const ScriptCall&){ _logic.resume(); });
+		_script.define("move_down", [this](const ScriptCall& call){ _logic.set_acceleration(call.function[0] == '+'); });
+		_script.define("move_left", [this](const ScriptCall& call){ _logic.set_left_movement(call.function[0] == '+'); });
+		_script.define("move_right", [this](const ScriptCall& call){ _logic.set_right_movement(call.function[0] == '+'); });
+		_script.define("save_score", [this](const ScriptCall&){ _statistics.update(_logic.score(), "John Placeholder"); }); // TODO: Get the entered name.
+		_script.define("set", 2, [this](const ScriptCall& call) // TODO: Make built-in, maybe as '='.
 		{
-			for (unsigned y = 0; y < button_size; ++y)
-			{
-				for (unsigned x = 0; x < button_size; ++x)
-				{
-					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * button_size + y) * image.format().row_size() + x * 4;
-					pixel[0] = 0xff;
-					pixel[1] = 0x44 * i;
-					pixel[2] = 0x44 * i;
-					pixel[3] = 0xff;
-				}
-			}
-		}
+			const ScriptValue* value = call.args.value(0);
+			if (value->type() == ScriptValue::Type::Name)
+				call.context.set(value->to_string(), call.args.string(1, ScriptArgs::Resolve));
+		});
+		_script.define("screenshot", [this](const ScriptCall&){ _window.take_screenshot(); });
+		_script.define("turn_left", [this](const ScriptCall&){ _logic.turn_left(); });
+		_script.define("turn_right", [this](const ScriptCall&){ _logic.turn_right(); });
 
-		storage.attach_buffer("examples/tetrium/data/buttons.tga", image.to_buffer(ImageType::Tga));
+		_window.on_key_event([this](const KeyEvent& event){ _gui.process_key_event(event); });
+		_window.on_render([this](Renderer& renderer, const PointF& cursor){ _gui.render(renderer, cursor); });
+		_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
+		_window.on_update([this](const UpdateEvent& event)
+		{
+			if (_logic.advance(event.milliseconds.count()))
+			{
+				_script.set("score", _logic.score());
+				_script.set("lines", _logic.lines());
+				_script.set("level", _logic.level());
+				if (_logic.has_finished())
+					_gui.notify("game_over");
+			}
+		});
+
+		_gui.on_canvas([this](Renderer&, const StaticString& canvas, const RectF& rect){ _graphics.draw(canvas, rect, _logic); });
+		_gui.on_custom_cursor([this](Renderer&, const PointF& point){ _cursor.draw(point); });
+		_gui.on_quit([this]{ _window.close(); });
 	}
-}
+
+	void run()
+	{
+		_gui.start();
+		_window.show();
+		_window.run();
+	}
+
+private:
+	Storage _storage{ Storage::UseFileSystem::Never };
+	TetriumData _data{ _storage };
+	ScriptContext _script;
+	AudioManager _audio;
+	AudioPlayer _audio_player{ _audio };
+	Window _window{ "Tetrium" };
+	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio };
+	Gui _gui{ _resource_loader, _script, _audio_player, "examples/tetrium/data/gui.ion" };
+	Cursor _cursor{ _window.renderer() };
+	TetriumGraphics _graphics{ _window.renderer() };
+	Tetrium::Game _logic;
+	TetriumStatistics _statistics{ _script };
+};
 
 int main()
 {
 	Log::set_file("tetrium.log");
-
-	Storage storage(Storage::UseFileSystem::Never);
-	if (!storage.attach_package("tetrium.ypq"))
-		return 1;
-	::make_buttons_texture(storage);
-
-	try
-	{
-		Game game(storage);
-		game.run();
-		return 0;
-	}
-	catch (const std::runtime_error& e)
-	{
-		Log() << "Runtime error: " << e.what();
-		return 1;
-	}
+	Game game;
+	game.run();
 }

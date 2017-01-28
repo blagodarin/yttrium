@@ -80,12 +80,20 @@ namespace Yttrium
 		bool _has_source = false;
 	};
 
-	/// Thrown by ResourceLoader if it is unable to find the specified resource.
-	class ResourceError : public RuntimeError
+	/// Thrown when required data is missing.
+	class MissingDataError : public RuntimeError
 	{
 	public:
 		template <typename... Args>
-		ResourceError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
+		MissingDataError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
+	};
+
+	/// Thrown by ResourceLoader if it is unable to find the specified resource.
+	class ResourceError : public MissingDataError
+	{
+	public:
+		template <typename... Args>
+		ResourceError(Args&&... args) : MissingDataError(std::forward<Args>(args)...) {}
 	};
 
 	/// Thrown by script classes on any errors during script execution.

@@ -1,5 +1,6 @@
 #include <yttrium/storage/storage.h>
 
+#include <yttrium/exceptions.h>
 #include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
@@ -90,27 +91,23 @@ namespace Yttrium
 	{
 	}
 
+	Storage::~Storage() = default;
+
 	void Storage::attach_buffer(const StaticString& name, Buffer&& buffer)
 	{
 		_private->_attachments.emplace_back(String(name, &_private->_allocator), std::move(buffer));
 	}
 
-	bool Storage::attach_package(const StaticString& path, PackageType type)
+	void Storage::attach_package(const StaticString& path, PackageType type)
 	{
 		auto package = PackageReader::create(path, type, _private->_allocator);
 		if (!package)
-		{
-			Log() << "("_s << path << ") Unable to open"_s;
-			return false;
-		}
+			throw MissingDataError("Unable to open \"", path, "\"");
 		_private->_attachments.emplace_back(std::move(package));
-		return true;
 	}
 
 	Reader Storage::open(const StaticString& name) const
 	{
 		return _private->open(name);
 	}
-
-	Storage::~Storage() = default;
 }
