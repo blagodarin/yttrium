@@ -1,10 +1,10 @@
 #include "wgl.h"
 
+#include <yttrium/exceptions.h>
 #include "../../renderer/gl/version.h"
 #include "../gl.h"
 
 #include <cstring>
-#include <stdexcept>
 
 namespace
 {
@@ -69,7 +69,7 @@ namespace Yttrium
 		: _hglrc(::create_hglrc(hdc))
 	{
 		if (!_hglrc)
-			throw std::runtime_error("Failed to create OpenGL context");
+			throw InitializationError("Failed to create OpenGL context");
 		::wglMakeCurrent(hdc, _hglrc);
 		::get_proc_address(_wgl.GetExtensionsStringARB, "wglGetExtensionsStringARB");
 		if (_wgl.GetExtensionsStringARB)

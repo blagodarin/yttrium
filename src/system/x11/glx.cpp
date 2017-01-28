@@ -1,10 +1,10 @@
 #include "glx.h"
 
+#include <yttrium/exceptions.h>
 #include "../../renderer/gl/version.h"
 #include "../gl.h"
 
 #include <cstring>
-#include <stdexcept>
 
 namespace
 {
@@ -44,7 +44,7 @@ namespace Yttrium
 		int major = 0;
 		int minor = 0;
 		if (!::glXQueryVersion(display, &major, &minor) || major != 1 || minor < 4)
-			throw std::runtime_error("GLX 1.4 is unavailable");
+			throw InitializationError("GLX 1.4 is unavailable");
 
 		const int attributes[] =
 		{
@@ -68,7 +68,7 @@ namespace Yttrium
 			int fbc_count = 0;
 			const Y_UNIQUE_PTR(::GLXFBConfig[], ::XFree) fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
 			if (!fbcs)
-				throw std::runtime_error("Failed to obtain GLXFBConfigs");
+				throw InitializationError("Failed to obtain GLXFBConfigs");
 			for (int i = 0; i < fbc_count; ++i)
 			{
 				// TODO: Try sorting by GLX_SAMPLE_BUFFERS and GLX_SAMPLES as suggested in the official OpenGL example.
@@ -82,16 +82,16 @@ namespace Yttrium
 			}
 		}
 		if (!_visual_info)
-			throw std::runtime_error("Failed to find suitable GLXFBConfig");
+			throw InitializationError("Failed to find suitable GLXFBConfig");
 
 		const auto extensions = ::glXQueryExtensionsString(_display, _screen);
 		if (!::check_extension(extensions, "GLX_ARB_create_context"))
-			throw std::runtime_error("GLX_ARB_create_context is unavailable");
+			throw InitializationError("GLX_ARB_create_context is unavailable");
 
 		::GLXContext (*glXCreateContextAttribsARB)(::Display*, ::GLXFBConfig, ::GLXContext, Bool, const int*) = nullptr;
 		::get_proc_address(glXCreateContextAttribsARB, "glXCreateContextAttribsARB");
 		if (!glXCreateContextAttribsARB) // The official OpenGL context creation example suggests checking this too.
-			throw std::runtime_error("glXCreateContextAttribsARB is unavailable");
+			throw InitializationError("glXCreateContextAttribsARB is unavailable");
 
 		const int context_attributes[] =
 		{
@@ -110,19 +110,19 @@ namespace Yttrium
 		const auto old_error_handler = ::XSetErrorHandler(::error_handler);
 		const auto context = glXCreateContextAttribsARB(_display, best_fbc, nullptr, True, context_attributes);
 		if (!context)
-			throw std::runtime_error("Failed to create a GLX context");
+			throw InitializationError("Failed to create a GLX context");
 		::XSync(_display, False); // To ensure any errors generated are processed.
 		::XSetErrorHandler(old_error_handler);
 		if (::error_occurred)
 		{
 			::glXDestroyContext(_display, context);
-			throw std::runtime_error("Failed to create a GLX context");
+			throw InitializationError("Failed to create a GLX context");
 		}
 
 		if (!::glXIsDirect(_display, context))
 		{
 			::glXDestroyContext(_display, context);
-			throw std::runtime_error("Failed to create a direct GLX context");
+			throw InitializationError("Failed to create a direct GLX context");
 		}
 
 		_context = context;
