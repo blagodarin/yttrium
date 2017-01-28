@@ -1,7 +1,9 @@
 #include "window.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/key.h>
 #include <yttrium/math/point.h>
+#include <yttrium/math/size.h>
 #include <yttrium/string.h>
 #include "../../window/backend.h"
 
@@ -75,7 +77,6 @@ namespace
 		case VK_OEM_7:      return Key::Apostrophe;
 		}
 		return Key::Null;
-		// NOTE: inNumEnter???
 	}
 }
 
@@ -92,19 +93,19 @@ namespace Yttrium
 		_wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		_wndclass.lpszClassName = "Yttrium";
 		if (!::RegisterClassExA(&_wndclass))
-			std::abort();
+			throw InitializationError("Failed to register window class");
 	}
 
 	WindowBackend::WindowClass::~WindowClass()
 	{
-		::UnregisterClass(_wndclass.lpszClassName, _hinstance); // TODO: Report failure.
+		::UnregisterClass(_wndclass.lpszClassName, _hinstance);
 	}
 
 	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
 		: _hwnd(::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data))
 	{
 		if (!_hwnd)
-			std::abort();
+			throw InitializationError("Failed to create window");
 	}
 
 	WindowBackend::WindowHandle::~WindowHandle()
@@ -117,7 +118,7 @@ namespace Yttrium
 		, _hdc(::GetDC(_hwnd))
 	{
 		if (!_hdc)
-			std::abort();
+			throw InitializationError("Failed to get device context");
 	}
 
 	WindowBackend::WindowDC::~WindowDC()
@@ -150,7 +151,7 @@ namespace Yttrium
 	{
 		// TODO: Process VK_SNAPSHOT, VK_{L,R}SHIFT, VK_{L,R}CONTROL, VK_{L,R}MENU.
 		MSG msg;
-		while (::PeekMessage(&msg, _hwnd, 0, 0, PM_NOREMOVE))
+		while (!_has_size || ::PeekMessage(&msg, _hwnd, 0, 0, PM_NOREMOVE))
 		{
 			if (!::GetMessage(&msg, _hwnd, 0, 0))
 				return false;
@@ -227,6 +228,11 @@ namespace Yttrium
 
 		case WM_ACTIVATE:
 			_callbacks.on_focus_event(wparam == WA_ACTIVE || wparam == WA_CLICKACTIVE);
+			break;
+
+		case WM_SIZE:
+			_has_size = true;
+			_callbacks.on_resize_event({ LOWORD(lparam), HIWORD(lparam) });
 			break;
 
 		default:

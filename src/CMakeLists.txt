@@ -166,13 +166,14 @@ endif()
 if(UNIX)
 	find_package(X11 REQUIRED)
 	target_sources(yttrium PRIVATE
-		system/x11/gl.cpp
+		system/x11/glx.cpp
 		system/x11/window.cpp
 		)
 	target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
 	target_link_libraries(yttrium ${X11_X11_LIB} ${X11_Xrandr_LIB})
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
+		system/gdi/wgl.cpp
 		system/gdi/window.cpp
 		)
 endif()

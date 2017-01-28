@@ -1,4 +1,4 @@
-#include "gl.h"
+#include "glx.h"
 
 #include "../../renderer/gl/version.h"
 #include "../gl.h"
@@ -22,7 +22,7 @@ namespace
 		while ((list = ::strstr(list, name)))
 		{
 			list += name_size;
-			if (*list == ' ' || *list == 0)
+			if (*list == ' ' || *list == '\0')
 				return true;
 		}
 		return false;
@@ -37,7 +37,7 @@ namespace
 
 namespace Yttrium
 {
-	GlContext::GlContext(::Display* display, int screen)
+	GlxContext::GlxContext(::Display* display, int screen)
 		: _display(display)
 		, _screen(screen)
 	{
@@ -134,22 +134,22 @@ namespace Yttrium
 		_extensions.EXT_swap_control_tear = ::check_extension(extensions, "GLX_EXT_swap_control_tear");
 	}
 
-	GlContext::~GlContext()
+	GlxContext::~GlxContext()
 	{
 		::glXDestroyContext(_display, _context);
 	}
 
-	void GlContext::bind(::Window window) const
+	void GlxContext::bind(::Window window) const
 	{
 		::glXMakeCurrent(_display, window, _context);
 	}
 
-	void GlContext::swap_buffers(::Window window) const
+	void GlxContext::swap_buffers(::Window window) const
 	{
 		::glXSwapBuffers(_display, window);
 	}
 
-	void GlContext::unbind() const
+	void GlxContext::unbind() const
 	{
 		::glXMakeCurrent(_display, None, nullptr);
 	}

@@ -22,7 +22,7 @@ namespace
 		return display;
 	}
 
-	::Window create_window(::Display* display, int screen, const GlContext& glx)
+	::Window create_window(::Display* display, int screen, const GlxContext& glx)
 	{
 		const auto root_window = RootWindow(display, screen);
 

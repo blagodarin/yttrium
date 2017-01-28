@@ -3,7 +3,7 @@
 
 #include <yttrium/memory/unique_ptr.h>
 #include "../../utils/unique_ptr.h"
-#include "gl.h"
+#include "glx.h"
 
 #include <X11/Xlib.h>
 
@@ -55,7 +55,7 @@ namespace Yttrium
 
 		const P_Display _display;
 		const int _screen = DefaultScreen(_display.get());
-		const GlContext _glx{ _display.get(), _screen };
+		const GlxContext _glx{ _display.get(), _screen };
 		WindowHandle _window;
 		const EmptyCursor _empty_cursor{ _display.get(), _window.get() };
 		::Atom _wm_protocols = ::XInternAtom(_display.get(), "WM_PROTOCOLS", True);

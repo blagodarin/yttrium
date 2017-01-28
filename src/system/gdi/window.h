@@ -1,7 +1,7 @@
 #ifndef _src_system_gdi_window_h_
 #define _src_system_gdi_window_h_
 
-#include "../windows/windows.h"
+#include "wgl.h"
 
 #include <string>
 
@@ -68,6 +68,8 @@ namespace Yttrium
 		const WindowClass _wndclass{ _hinstance, reinterpret_cast<WNDPROC>(static_window_proc) };
 		const WindowHandle _hwnd{ _wndclass, _name.c_str(), this };
 		const WindowDC _hdc{ _hwnd };
+		const WglContext _wgl{ _hdc };
+		bool _has_size = false;
 	};
 }
 

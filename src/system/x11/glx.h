@@ -1,5 +1,5 @@
-#ifndef _src_system_x11_gl_h_
-#define _src_system_x11_gl_h_
+#ifndef _src_system_x11_glx_h_
+#define _src_system_x11_glx_h_
 
 #include "../../utils/unique_ptr.h"
 
@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	class GlContext
+	class GlxContext
 	{
 	public:
 		struct Extensions
@@ -18,10 +18,8 @@ namespace Yttrium
 			bool EXT_swap_control_tear = false;
 		};
 
-		GlContext(::Display*, int screen);
-		~GlContext();
-
-		explicit operator bool() const { return _context; }
+		GlxContext(::Display*, int screen);
+		~GlxContext();
 
 		void bind(::Window) const;
 		void swap_buffers(::Window) const;
