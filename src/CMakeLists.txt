@@ -5,7 +5,7 @@ option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
 
 test_big_endian(Y_IS_BIG_ENDIAN)
-if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(Y_IS_LINUX ON)
 else()
 	set(Y_IS_LINUX OFF)

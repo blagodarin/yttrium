@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.7)
 
 project(yttrium C CXX)
 
+message(STATUS "CMAKE_SYSTEM_NAME=\"${CMAKE_SYSTEM_NAME}\"")
+message(STATUS "CMAKE_CXX_COMPILER_ID=\"${CMAKE_CXX_COMPILER_ID}\"")
+
 option(BOOST_ALL_DYN_LINK "Define BOOST_ALL_DYN_LINK" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
