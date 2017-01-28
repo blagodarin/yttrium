@@ -4,8 +4,10 @@
 #include "../config.h"
 #ifdef Y_IS_POSIX
 	#include "x11/window.h"
+#elif defined(Y_IS_WINDOWS)
+	#include "gdi/window.h"
 #else
-	#error Not implemented.
+	#error Not implemented
 #endif
 
 #endif

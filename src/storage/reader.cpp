@@ -7,6 +7,7 @@
 #include "../system/file.h"
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <limits>
 

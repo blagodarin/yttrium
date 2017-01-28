@@ -50,7 +50,7 @@ namespace Yttrium
 		ALint buffers_processed = 0;
 		::alGetSourcei(_source, AL_BUFFERS_PROCESSED, &buffers_processed);
 
-		ALuint buffers[_buffers.size()];
+		ALuint buffers[2];
 		::alSourceUnqueueBuffers(_source, buffers_processed, buffers);
 	}
 }

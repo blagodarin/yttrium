@@ -6,7 +6,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 
-find_package(Boost REQUIRED COMPONENTS program_options unit_test_framework)
+find_package(Boost REQUIRED COMPONENTS date_time program_options unit_test_framework)
 find_package(OpenGL REQUIRED)
 find_package(Threads REQUIRED)
 

@@ -101,7 +101,7 @@ add_library(yttrium
 	window/window.cpp
 	)
 target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
-target_link_libraries(yttrium ${OPENGL_gl_LIBRARY} Threads::Threads)
+target_link_libraries(yttrium ${OPENGL_gl_LIBRARY} Threads::Threads ${Boost_LIBRARIES})
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
 
 # OpenAL port.
@@ -172,5 +172,7 @@ if(UNIX)
 	target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
 	target_link_libraries(yttrium ${X11_X11_LIB} ${X11_Xrandr_LIB})
 elseif(WIN32)
-	# TODO: Add GDI support.
+	target_sources(yttrium PRIVATE
+		system/gdi/window.cpp
+		)
 endif()

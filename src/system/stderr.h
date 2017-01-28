@@ -7,7 +7,7 @@
 #elif defined(Y_IS_WINDOWS)
 	#include "windows/stderr.h"
 #else
-	#error Not implemented.
+	#error Not implemented
 #endif
 
 #endif
