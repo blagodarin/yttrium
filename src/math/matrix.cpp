@@ -1,5 +1,3 @@
-#define _USE_MATH_DEFINES
-
 #include <yttrium/math/matrix.h>
 
 #include <yttrium/math/euler.h>

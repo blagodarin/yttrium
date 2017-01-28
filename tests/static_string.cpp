@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 	BOOST_CHECK_EQUAL("-1"_s.to_uint64(), 0);
 
 	// Minimum.
-	BOOST_CHECK_EQUAL("-2147483648"_s.to_int32(), -2147483648);
+	BOOST_CHECK_EQUAL("-2147483648"_s.to_int32(), -2147483647 - 1);
 	BOOST_CHECK_EQUAL("0"_s.to_uint32(), 0);
 	BOOST_CHECK_EQUAL("-9223372036854775808"_s.to_int64(), -INT64_C(9223372036854775807) - 1);
 	BOOST_CHECK_EQUAL("0"_s.to_uint64(), 0);
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_int32_number)
 	BOOST_CHECK(!"-2147483649"_s.to_number(i));
 
 	BOOST_CHECK("-2147483648"_s.to_number(i));
-	BOOST_CHECK_EQUAL(i, -2147483648);
+	BOOST_CHECK_EQUAL(i, -2147483647 - 1);
 
 	BOOST_CHECK("2147483647"_s.to_number(i));
 	BOOST_CHECK_EQUAL(i, 2147483647);

@@ -12,11 +12,11 @@ namespace
 		constexpr auto button_styles = 4u;
 
 		Image image({ button_size, button_size * button_styles, PixelFormat::Bgra, 32 });
-		for (int i = 0; i < button_styles; ++i)
+		for (unsigned i = 0; i < button_styles; ++i)
 		{
-			for (int y = 0; y < button_size; ++y)
+			for (unsigned y = 0; y < button_size; ++y)
 			{
-				for (int x = 0; x < button_size; ++x)
+				for (unsigned x = 0; x < button_size; ++x)
 				{
 					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * button_size + y) * image.format().row_size() + x * 4;
 					pixel[0] = 0xff;

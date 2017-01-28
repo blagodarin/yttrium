@@ -13,7 +13,6 @@
 
 namespace Yttrium
 {
-	struct DateTime;
 	class StaticString;
 	class String;
 
@@ -29,9 +28,6 @@ namespace Yttrium
 	/// Produces a decimal formatting for a unsigned integral \a value.
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value>>
 	Format<uintmax_t> dec(T value, int width = 0);
-
-	///
-	inline Format<DateTime> print(const DateTime& value, const char* format);
 
 	///
 	inline String& operator<<(String&, char);
@@ -54,14 +50,11 @@ namespace Yttrium
 	///
 	Y_API String& operator<<(String&, double);
 
-	///
-	Y_API String& operator<<(String&, const Format<DateTime>&);
-
 	template <>
 	class Format<char>
 	{
 		friend Format repeat(char, size_t);
-		friend String& operator<<(String&, Format<char>&&);
+		friend Y_API String& operator<<(String&, Format<char>&&);
 		char value;
 		size_t count;
 		Format(char value, size_t count) : value(value), count(count) {}
@@ -76,7 +69,7 @@ namespace Yttrium
 	class Format<intmax_t>
 	{
 		template <typename T, typename> friend Format dec(T, int);
-		friend String& operator<<(String&, Format<intmax_t>&&);
+		friend Y_API String& operator<<(String&, Format<intmax_t>&&);
 		intmax_t value;
 		int width;
 		Format(intmax_t value, int width) : value(value), width(width) {}
@@ -92,7 +85,7 @@ namespace Yttrium
 	class Format<uintmax_t>
 	{
 		template <typename T, typename> friend Format dec(T, int);
-		friend String& operator<<(String&, Format<uintmax_t>&&);
+		friend Y_API String& operator<<(String&, Format<uintmax_t>&&);
 		uintmax_t value;
 		int width;
 		Format(uintmax_t value, int width) : value(value), width(width) {}
@@ -102,21 +95,6 @@ namespace Yttrium
 	Format<uintmax_t> dec(T value, int width)
 	{
 		return {value, width};
-	}
-
-	template <>
-	class Format<DateTime>
-	{
-		friend Format print(const DateTime&, const char*);
-		friend String& operator<<(String&, const Format<DateTime>&);
-		const DateTime& value;
-		const char* format;
-		Format(const DateTime& value, const char* format) : value(value), format(format) {}
-	};
-
-	Format<DateTime> print(const DateTime& value, const char* format)
-	{
-		return {value, format};
 	}
 
 	inline String& operator<<(String& string, char value)

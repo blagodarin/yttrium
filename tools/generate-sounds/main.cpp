@@ -1,5 +1,3 @@
-#define _USE_MATH_DEFINES
-
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/writer.h>
