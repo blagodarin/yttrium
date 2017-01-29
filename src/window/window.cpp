@@ -20,7 +20,7 @@ namespace Yttrium
 		bool _is_cursor_locked = false;
 		Size _size;
 		bool _fullscreen = false;
-		bool _keys[KeyCount];
+		bool _keys[KeyCount] = {};
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;
 		std::function<void(const KeyEvent&)> _on_key_event;
@@ -32,8 +32,9 @@ namespace Yttrium
 			: _allocator(allocator)
 			, _name(name, &_allocator)
 		{
-			for (bool& pressed : _keys)
-				pressed = false;
+			const auto size = _backend.size();
+			if (size)
+				on_resize_event(*size);
 		}
 
 		void lock_cursor(bool lock)

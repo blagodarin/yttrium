@@ -195,7 +195,7 @@ namespace Yttrium
 	{
 		if (!_window)
 			return false;
-		while (!_has_size ||::XPending(_display.get()) > 0)
+		while (!_size ||::XPending(_display.get()) > 0)
 		{
 			::XEvent event;
 			::XNextEvent(_display.get(), &event); // TODO: Don't process events for all windows.
@@ -238,8 +238,8 @@ namespace Yttrium
 				break;
 
 			case ConfigureNotify:
-				_has_size = true;
-				_callbacks.on_resize_event({ event.xconfigure.width, event.xconfigure.height });
+				_size.emplace(event.xconfigure.width, event.xconfigure.height);
+				_callbacks.on_resize_event(*_size);
 				break;
 
 			case ClientMessage:

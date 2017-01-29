@@ -130,11 +130,13 @@ namespace Yttrium
 		: _name(name.text())
 		, _callbacks(callbacks)
 	{
+		assert(_size);
+		_created = true;
 	}
 
 	void WindowBackend::close()
 	{
-		::SendMessage(_hwnd, WM_CLOSE, 0, 0);
+		::SendMessageA(_hwnd, WM_CLOSE, 0, 0);
 	}
 
 	bool WindowBackend::get_cursor(Point& cursor)
@@ -151,12 +153,12 @@ namespace Yttrium
 	{
 		// TODO: Process VK_SNAPSHOT, VK_{L,R}SHIFT, VK_{L,R}CONTROL, VK_{L,R}MENU.
 		MSG msg;
-		while (!_has_size || ::PeekMessage(&msg, _hwnd, 0, 0, PM_NOREMOVE))
+		while (::PeekMessageA(&msg, _hwnd, 0, 0, PM_NOREMOVE))
 		{
-			if (!::GetMessage(&msg, _hwnd, 0, 0))
+			if (!::GetMessageA(&msg, _hwnd, 0, 0))
 				return false;
 			::TranslateMessage(&msg);
-			::DispatchMessage(&msg);
+			::DispatchMessageA(&msg);
 		}
 		return true;
 	}
@@ -194,11 +196,13 @@ namespace Yttrium
 
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
+			assert(_created);
 			_callbacks.on_key_event(::key_from_wparam(wparam), true);
 			break;
 
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
+			assert(_created);
 			_callbacks.on_key_event(::key_from_wparam(wparam), false);
 			break;
 
@@ -218,6 +222,7 @@ namespace Yttrium
 		case WM_XBUTTONUP:
 			{
 				const auto buttons = GET_KEYSTATE_WPARAM(wparam);
+				assert(_created);
 				_callbacks.on_key_event(Key::Mouse1, buttons & MK_LBUTTON);
 				_callbacks.on_key_event(Key::Mouse2, buttons & MK_RBUTTON);
 				_callbacks.on_key_event(Key::Mouse3, buttons & MK_MBUTTON);
@@ -227,12 +232,14 @@ namespace Yttrium
 			break;
 
 		case WM_ACTIVATE:
+			assert(_created);
 			_callbacks.on_focus_event(wparam == WA_ACTIVE || wparam == WA_CLICKACTIVE);
 			break;
 
 		case WM_SIZE:
-			_has_size = true;
-			_callbacks.on_resize_event({ LOWORD(lparam), HIWORD(lparam) });
+			_size.emplace(LOWORD(lparam), HIWORD(lparam));
+			if (_created)
+				_callbacks.on_resize_event(*_size);
 			break;
 
 		default:
@@ -247,10 +254,10 @@ namespace Yttrium
 		if (msg == WM_NCCREATE)
 		{
 			window = static_cast<WindowBackend*>(((CREATESTRUCTA*)lparam)->lpCreateParams);
-			::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
+			::SetWindowLongPtrA(hwnd, GWLP_USERDATA, (LONG_PTR)window);
 		}
 		else
-			window = (WindowBackend*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+			window = (WindowBackend*)::GetWindowLongPtrA(hwnd, GWLP_USERDATA);
 		return window->window_proc(hwnd, msg, wparam, lparam);
 	}
 }

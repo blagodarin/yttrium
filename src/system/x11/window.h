@@ -1,9 +1,12 @@
 #ifndef _src_system_x11_window_h_
 #define _src_system_x11_window_h_
 
+#include <yttrium/math/size.h>
 #include <yttrium/memory/unique_ptr.h>
 #include "../../utils/unique_ptr.h"
 #include "glx.h"
+
+#include <boost/optional/optional.hpp>
 
 #include <X11/Xlib.h>
 
@@ -26,6 +29,7 @@ namespace Yttrium
 		bool process_events();
 		bool set_cursor(const Point&);
 		void show();
+		boost::optional<Size> size() const { return _size; }
 		void swap_buffers();
 
 	private:
@@ -53,6 +57,7 @@ namespace Yttrium
 			::Cursor _cursor = None;
 		};
 
+		boost::optional<Size> _size;
 		const P_Display _display;
 		const int _screen = DefaultScreen(_display.get());
 		const GlxContext _glx{ _display.get(), _screen };
@@ -63,7 +68,6 @@ namespace Yttrium
 		::Atom _net_wm_state = ::XInternAtom(_display.get(), "_NET_WM_STATE", True);
 		::Atom _net_wm_state_fullscreen = ::XInternAtom(_display.get(), "_NET_WM_STATE_FULLSCREEN", True);
 		WindowBackendCallbacks& _callbacks;
-		bool _has_size = false;
 	};
 }
 

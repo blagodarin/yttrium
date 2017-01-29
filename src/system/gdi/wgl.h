@@ -23,12 +23,23 @@ namespace Yttrium
 		};
 
 		WglContext(HDC);
-		~WglContext();
 
 		const Extensions* operator->() const { return &_wgl; }
 
 	private:
-		const HGLRC _hglrc;
+		class RenderingContext
+		{
+		public:
+			RenderingContext(HDC, HGLRC);
+			~RenderingContext();
+			operator HGLRC() const { return _hglrc; }
+			static HGLRC create(HDC);
+		private:
+			const HGLRC _hglrc;
+		};
+
+	private:
+		const RenderingContext _hglrc;
 		Extensions _wgl;
 	};
 }
