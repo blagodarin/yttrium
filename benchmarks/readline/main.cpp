@@ -10,7 +10,7 @@ using namespace Yttrium;
 template <int N>
 auto benchmark_v1(Reader& reader)
 {
-	std::cout << "Benchmarking version 1...\n";
+	std::cout << "Benchmarking 'String' version...\n";
 	String string;
 	string.reserve(1024);
 	const auto start = std::chrono::high_resolution_clock::now();
@@ -26,7 +26,7 @@ auto benchmark_v1(Reader& reader)
 template <int N>
 auto benchmark_v2(Reader& reader)
 {
-	std::cout << "Benchmarking version 2...\n";
+	std::cout << "Benchmarking 'std::string' version...\n";
 	std::string string;
 	string.reserve(1024);
 	const auto start = std::chrono::high_resolution_clock::now();

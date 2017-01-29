@@ -57,17 +57,17 @@ namespace Yttrium
 		pfd.iLayerType = PFD_MAIN_PLANE;
 		const auto pf = ::ChoosePixelFormat(hdc, &pfd);
 		if (!pf || !::SetPixelFormat(hdc, pf, &pfd))
-			throw Yttrium::InitializationError("Failed to set pixel format");
+			throw InitializationError("Failed to set pixel format");
 		const RenderingContext legacy_context(hdc, ::wglCreateContext(hdc));
 		if (!legacy_context)
-			throw Yttrium::InitializationError("Failed to create OpenGL legacy context");
+			throw InitializationError("Failed to create OpenGL legacy context");
 		const auto wglCreateContextAttribsARB = reinterpret_cast<HGLRC (APIENTRY*)(HDC, HGLRC, const int*)>(::wglGetProcAddress("wglCreateContextAttribsARB"));
 		if (!wglCreateContextAttribsARB)
-			throw Yttrium::InitializationError("Failed to use WGL_ARB_create_context");
+			throw InitializationError("Failed to use WGL_ARB_create_context");
 		const int attributes[] =
 		{
-			WGL_CONTEXT_MAJOR_VERSION_ARB, Yttrium::Gl::required_major,
-			WGL_CONTEXT_MINOR_VERSION_ARB, Yttrium::Gl::required_minor,
+			WGL_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
+			WGL_CONTEXT_MINOR_VERSION_ARB, Gl::required_minor,
 			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
 			0
 		};
