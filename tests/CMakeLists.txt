@@ -2,7 +2,9 @@ add_executable(unit_tests
 	buffer.cpp
 	gui.cpp
 	image.cpp
+	image.h
 	image_formats.cpp
+	image_formats.h
 	ion.cpp
 	key_lookup.cpp
 	main.cpp
