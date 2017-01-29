@@ -60,10 +60,10 @@ namespace Yttrium
 			throw InitializationError("Failed to set pixel format");
 		const RenderingContext legacy_context(hdc, ::wglCreateContext(hdc));
 		if (!legacy_context)
-			throw InitializationError("Failed to create OpenGL legacy context");
+			throw InitializationError("Unable to create OpenGL legacy context");
 		const auto wglCreateContextAttribsARB = reinterpret_cast<HGLRC (APIENTRY*)(HDC, HGLRC, const int*)>(::wglGetProcAddress("wglCreateContextAttribsARB"));
 		if (!wglCreateContextAttribsARB)
-			throw InitializationError("Failed to use WGL_ARB_create_context");
+			throw InitializationError("Unable to use WGL_ARB_create_context");
 		const int attributes[] =
 		{
 			WGL_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
@@ -78,7 +78,7 @@ namespace Yttrium
 		: _hglrc(hdc, RenderingContext::create(hdc))
 	{
 		if (!_hglrc)
-			throw InitializationError("Failed to create OpenGL context");
+			throw InitializationError("Unable to create OpenGL context");
 		::get_proc_address(_wgl.GetExtensionsStringARB, "wglGetExtensionsStringARB");
 		if (_wgl.GetExtensionsStringARB)
 		{
