@@ -14,9 +14,9 @@
 
 namespace Yttrium
 {
-	class AudioPlayer;
 	class Gui;
 	class GuiLayer;
+	class Music;
 	class PointF;
 	class RectF;
 	class Renderer;
@@ -45,7 +45,7 @@ namespace Yttrium
 			}
 		};
 
-		GuiPrivate(ResourceLoader&, ScriptContext&, AudioPlayer&, Allocator&);
+		GuiPrivate(ResourceLoader&, ScriptContext&, Allocator&);
 		~GuiPrivate();
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
@@ -73,7 +73,6 @@ namespace Yttrium
 	private:
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
-		AudioPlayer& _audio_player;
 		Allocator& _allocator;
 		StdMap<String, FontDesc> _fonts{ _allocator };
 		StdMap<StaticString, UniquePtr<GuiLayer>> _layers;
@@ -84,6 +83,7 @@ namespace Yttrium
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::function<void(Renderer&, const StaticString&, const RectF&)> _on_canvas;
 		std::function<void(Renderer&, const PointF&)> _on_custom_cursor;
+		std::function<void(const ResourcePtr<const Music>&)> _on_music;
 		std::function<void()> _on_quit;
 
 		friend Gui;

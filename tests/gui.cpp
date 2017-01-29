@@ -15,10 +15,8 @@ using namespace Yttrium;
 BOOST_AUTO_TEST_CASE(test_gui)
 {
 	Storage storage(Storage::UseFileSystem::Before);
-	AudioManager audio_manager;
-	ResourceLoader resource_loader(storage, nullptr, &audio_manager);
+	ResourceLoader resource_loader(storage);
 	Window window("GUI test");
 	ScriptContext script_context;
-	AudioPlayer audio_player(audio_manager);
-	Gui gui(resource_loader, script_context, audio_player, "tests/gui/gui.ion");
+	Gui gui(resource_loader, script_context, "tests/gui/gui.ion");
 }

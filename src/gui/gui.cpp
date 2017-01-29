@@ -1,6 +1,5 @@
 #include <yttrium/gui/gui.h>
 
-#include <yttrium/audio/player.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/log.h>
@@ -19,10 +18,9 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, AudioPlayer& audio_player, Allocator& allocator)
+	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
 		: _resource_loader(resource_loader)
 		, _script_context(script_context)
-		, _audio_player(audio_player)
 		, _allocator(allocator)
 		, _layers(_allocator)
 	{
@@ -110,14 +108,9 @@ namespace Yttrium
 	void GuiPrivate::enter_layer(GuiLayer* layer)
 	{
 		_layer_stack.emplace_back(layer);
-		const auto& layer_music = layer->music();
-		if (layer_music)
-		{
-			_audio_player.stop();
-			_audio_player.load(layer_music);
-			_audio_player.set_order(AudioPlayer::Random);
-			_audio_player.play();
-		}
+		const auto& layer_music = layer->music(); // TODO: Silent layers.
+		if (layer_music && _on_music)
+			_on_music(layer_music);
 		layer->handle_enter();
 	}
 
@@ -125,22 +118,16 @@ namespace Yttrium
 	{
 		const auto layer = _layer_stack.back();
 		layer->handle_return();
-		if (layer->music())
+		if (layer->music() && _on_music)
 		{
-			_audio_player.stop();
-			const auto next_music_layer = std::find_if(std::next(_layer_stack.rbegin()), _layer_stack.rend(), [](GuiLayer* layer){ return static_cast<bool>(layer->music()); });
-			if (next_music_layer != _layer_stack.rend())
-			{
-				_audio_player.load((*next_music_layer)->music());
-				_audio_player.set_order(AudioPlayer::Random);
-				_audio_player.play();
-			}
+			const auto i = std::find_if(std::next(_layer_stack.rbegin()), _layer_stack.rend(), [](GuiLayer* layer){ return static_cast<bool>(layer->music()); });
+			_on_music(i != _layer_stack.rend() ? (*i)->music() : nullptr);
 		}
 		_layer_stack.pop_back();
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, AudioPlayer& audio_player, const StaticString& name, Allocator& allocator)
-		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, audio_player, allocator))
+	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name, Allocator& allocator)
+		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, allocator))
 	{
 		GuiIonLoader(*_private).load(name);
 		if (!_private->_root_layer)
@@ -163,6 +150,11 @@ namespace Yttrium
 	void Gui::on_custom_cursor(const std::function<void(Renderer&, const PointF&)>& callback)
 	{
 		_private->_on_custom_cursor = callback;
+	}
+
+	void Gui::on_music(const std::function<void(const ResourcePtr<const Music>&)>& callback)
+	{
+		_private->_on_music = callback;
 	}
 
 	void Gui::on_quit(const std::function<void()>& callback)

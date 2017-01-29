@@ -11,12 +11,13 @@
 
 namespace Yttrium
 {
-	class AudioPlayer;
 	class KeyEvent;
+	class Music;
 	class PointF;
 	class RectF;
 	class Renderer;
 	class ResourceLoader;
+	template <typename> class ResourcePtr;
 	class ScriptContext;
 	class StaticString;
 
@@ -25,7 +26,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Gui(ResourceLoader&, ScriptContext&, AudioPlayer&, const StaticString& name, Allocator& = *DefaultAllocator);
+		Gui(ResourceLoader&, ScriptContext&, const StaticString& name, Allocator& = *DefaultAllocator);
 
 		///
 		~Gui();
@@ -38,6 +39,9 @@ namespace Yttrium
 
 		///
 		void on_custom_cursor(const std::function<void(Renderer&, const PointF&)>&);
+
+		///
+		void on_music(const std::function<void(const ResourcePtr<const Music>&)>&);
 
 		///
 		void on_quit(const std::function<void()>&);
