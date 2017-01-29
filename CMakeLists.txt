@@ -30,21 +30,40 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 include_directories(${Boost_INCLUDE_DIR} include)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
+
 add_subdirectory(src)
+if(WIN32)
+	add_subdirectory(ywinmain)
+endif()
 
 add_subdirectory(tests)
+set_target_properties(
+	check unit_tests
+	PROPERTIES FOLDER "tests")
 
 add_subdirectory(tools/generate-sounds)
 add_subdirectory(tools/generate-test-images)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
+set_target_properties(
+	generate-sounds
+	generate-test-images
+	ypack
+	ytr
+	PROPERTIES FOLDER "tools")
 
 add_subdirectory(benchmarks/buffer)
 add_subdirectory(benchmarks/readline)
-
-if(WIN32)
-	add_subdirectory(ywinmain)
-endif()
+set_target_properties(
+	benchmark_buffer
+	benchmark_readline
+	PROPERTIES FOLDER "benchmarks")
 
 add_subdirectory(examples/3d)
 add_subdirectory(examples/tetrium)
+set_target_properties(
+	3d
+	tetrium tetrium_localization tetrium_package
+	PROPERTIES FOLDER "examples")
