@@ -16,5 +16,6 @@ src/config.h
 tetrium.ypq
 *.vcxproj
 *.vcxproj.filters
+*.vcxproj.user
 .vs
 Win32
