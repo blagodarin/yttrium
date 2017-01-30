@@ -40,8 +40,8 @@ namespace Yttrium
 				message << "Memory leak detected in \""_s << info.name << "\" ("_s << info.blocks << " blocks"_s;
 				if (info.bytes)
 					message << ", "_s << info.bytes << " bytes"_s;
-				message << ")"_s;
-				std::cerr << message << std::endl; // LogManager is already destroyed at this point.
+				message << ")\n"_s;
+				std::cerr << message;
 				memory_leaks = true;
 			}
 		}

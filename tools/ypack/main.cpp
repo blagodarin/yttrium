@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 				<< "  ypack INDEX PACKAGE\n"
 				<< "  ypack (--dependencies|-d) INDEX\n"
 				<< "\n"
-				<< public_options << std::endl;
+				<< public_options << "\n";
 		};
 
 		boost::program_options::options_description o;
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 	}
 	catch (const DataError& e)
 	{
-		std::cerr << "ERROR(" << index_name << "): " << e.what() << std::endl;
+		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
 		return 1;
 	}
 
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 	const auto package = PackageWriter::create(package_name.c_str(), PackageType::Ypq);
 	if (!package)
 	{
-		std::cerr << "ERROR(" << package_name << "): Can't open package file" << std::endl;
+		std::cerr << "ERROR(" << package_name << "): Can't open package file\n";
 		return 1;
 	}
 
@@ -146,13 +146,13 @@ int main(int argc, char** argv)
 			package->add(entry.first, std::move(entry.second));
 		if (!package->commit())
 		{
-			std::cerr << "ERROR(" << package_name << "): Unable to write package file" << std::endl;
+			std::cerr << "ERROR(" << package_name << "): Unable to write package file\n";
 			return 1;
 		}
 	}
 	catch (const DataError& e)
 	{
-		std::cerr << "ERROR(" << index_name << "): " << e.what() << std::endl;
+		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
 		return 1;
 	}
 }

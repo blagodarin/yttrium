@@ -1,7 +1,6 @@
 #include <yttrium/storage/storage.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/log.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/std/map.h>

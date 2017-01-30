@@ -39,7 +39,7 @@ namespace Yttrium
 		for (const auto& block_count : free_block_count)
 			std::cerr << "\n(DEBUG)     - " << human_readable_size(block_count.first) << " : " << block_count.second;
 	#endif
-		std::cerr << std::endl;
+		std::cerr << "\n";
 		const auto total_usable_memory = _total_capacity.current_value();
 		if (total_usable_memory > 0)
 		{
@@ -47,7 +47,7 @@ namespace Yttrium
 		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			std::cerr << " (in " << _allocations.current_value() << " allocations)";
 		#endif
-			std::cerr << std::endl;
+			std::cerr << "\n";
 		}
 	}
 #endif

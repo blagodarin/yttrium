@@ -12,8 +12,6 @@
 #include "../actions.h"
 #include "../gui.h"
 
-#include <yttrium/log.h>
-
 #include <array>
 
 namespace

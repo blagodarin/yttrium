@@ -1,7 +1,10 @@
 #include "gpu_program.h"
 
-#include <yttrium/log.h>
 #include "renderer.h"
+
+#ifndef NDEBUG
+	#include <iostream>
+#endif
 
 namespace Yttrium
 {
@@ -31,7 +34,7 @@ namespace Yttrium
 		if (_program.link())
 			return true;
 #ifndef NDEBUG
-		Log() << _program.info_log(_renderer.allocator());
+		std::cerr << _program.info_log(_renderer.allocator()) << "\n";
 #endif
 		return false;
 	}

@@ -1,6 +1,5 @@
 #include "renderer.h"
 
-#include <yttrium/log.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/utils.h>
 #include "../mesh_data.h"
@@ -10,7 +9,6 @@
 #include "texture.h"
 
 #include <cassert>
-
 #ifndef NDEBUG
 	#include <csignal>
 	#include <iostream>
@@ -56,14 +54,18 @@ namespace Yttrium
 		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
 		if (!vertex.compile(vertex_shader))
 		{
-			Log() << vertex.info_log(allocator());
+#ifndef NDEBUG
+			std::cerr << vertex.info_log(allocator()) << "\n";
+#endif
 			return {};
 		}
 
 		GlShaderHandle fragment(_gl, GL_FRAGMENT_SHADER);
 		if (!fragment.compile(fragment_shader))
 		{
-			Log() << fragment.info_log(allocator());
+#ifndef NDEBUG
+			std::cerr << fragment.info_log(allocator()) << "\n";
+#endif
 			return {};
 		}
 
@@ -377,7 +379,7 @@ namespace Yttrium
 			stop = false;
 			break;
 		}
-		std::cerr << message << std::endl;
+		std::cerr << message << "\n";
 		if (stop)
 			::raise(SIGINT);
 	}

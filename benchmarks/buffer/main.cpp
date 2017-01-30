@@ -428,7 +428,7 @@ namespace
 		std::cout << name << ":";
 		for (const auto& setup : setups)
 			std::cout << setup;
-		std::cout << std::endl;
+		std::cout << "\n";
 	}
 }
 
@@ -444,7 +444,7 @@ int main(int argc, char** argv)
 			"\n\t" << argv[0] << " 5  -- run \"Grow & touch\" benchmark;"
 			"\n\t" << argv[0] << " 6  -- run \"Grow & fill\" benchmark;"
 			"\n\t" << argv[0] << "    -- print this usage."
-			<< std::endl;
+			"\n";
 		return 0;
 	}
 

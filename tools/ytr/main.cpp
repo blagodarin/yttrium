@@ -58,14 +58,14 @@ int main(int argc, char** argv)
 {
 	if (argc < 3)
 	{
-		std::cerr << "Usage: ytr TRANSLATION SOURCES..." << std::endl;
+		std::cerr << "Usage: ytr TRANSLATION SOURCES...\n";
 		return 1;
 	}
 
 	const auto translation = Translation::open(Reader(argv[1]));
 	if (!translation)
 	{
-		std::cerr << "ERROR: Unable to open translation \"" << argv[1] << "\"" << std::endl;
+		std::cerr << "ERROR: Unable to open translation \"" << argv[1] << "\"\n";
 		return 1;
 	}
 
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 		const auto document = IonDocument::open(Reader(argv[i]));
 		if (!document)
 		{
-			std::cerr << "ERROR: Unable to open source \"" << argv[i] << "\"" << std::endl;
+			std::cerr << "ERROR: Unable to open source \"" << argv[i] << "\"\n";
 			return 1;
 		}
 		update_translation(*translation, document->root());
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 
 	if (!translation->save(argv[1]))
 	{
-		std::cerr << "ERROR: Failed to save translation file \"" << argv[1] << "\"" << std::endl;
+		std::cerr << "ERROR: Failed to save translation file \"" << argv[1] << "\"\n";
 		return 1;
 	}
 }
