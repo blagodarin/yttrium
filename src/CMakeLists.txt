@@ -18,6 +18,49 @@ set(Y_NO_PNG ${NO_PNG})
 configure_file(config.h.in config.h)
 
 add_library(yttrium
+	../include/yttrium/api.h
+	../include/yttrium/exceptions.h
+	../include/yttrium/log.h
+	../include/yttrium/static_string.h
+	../include/yttrium/string_format.h
+	../include/yttrium/string.h
+	../include/yttrium/tiny_string_map.h
+	base/log.cpp
+	base/log.h
+	base/static_string.cpp
+	base/string_format.cpp
+	base/string.cpp
+	base/thread_buffer.cpp
+	base/thread_buffer.h
+	base/tiny_string_map.cpp
+	system/stderr.h
+	config.h
+	globals.cpp
+	)
+target_link_libraries(yttrium Threads::Threads ${Boost_LIBRARIES})
+set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
+if(UNIX)
+	target_sources(yttrium PRIVATE
+		system/posix/stderr.cpp
+		system/posix/stderr.h
+		)
+elseif(WIN32)
+	target_sources(yttrium PRIVATE
+		system/windows/stderr.cpp
+		system/windows/stderr.h
+		system/windows/windows.h
+		)
+endif()
+
+########################################################################################################################
+# audio
+target_sources(yttrium PRIVATE
+	../include/yttrium/audio/format.h
+	../include/yttrium/audio/manager.h
+	../include/yttrium/audio/music.h
+	../include/yttrium/audio/player.h
+	../include/yttrium/audio/reader.h
+	../include/yttrium/audio/sound.h
 	audio/formats/wav_private.h
 	audio/formats/wav.cpp
 	audio/formats/wav.h
@@ -34,14 +77,38 @@ add_library(yttrium
 	audio/reader.h
 	audio/streamer.cpp
 	audio/streamer.h
-	base/log.cpp
-	base/log.h
-	base/static_string.cpp
-	base/string.cpp
-	base/string_format.cpp
-	base/thread_buffer.cpp
-	base/thread_buffer.h
-	base/tiny_string_map.cpp
+	)
+if(ON)
+	find_package(OpenAL REQUIRED)
+	target_sources(yttrium PRIVATE
+		audio/openal/backend.cpp
+		audio/openal/backend.h
+		audio/openal/format.cpp
+		audio/openal/format.h
+		audio/openal/player.cpp
+		audio/openal/player.h
+		audio/openal/sound.cpp
+		audio/openal/sound.h
+		system/openal.h
+		)
+	target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR})
+	target_link_libraries(yttrium ${OPENAL_LIBRARY})
+endif()
+if(NOT NO_OGG_VORBIS)
+	# TODO: Use find_library or some third-party package.
+	target_link_libraries(yttrium vorbisfile)
+	target_sources(yttrium PRIVATE
+		audio/formats/ogg_vorbis.cpp
+		audio/formats/ogg_vorbis.h
+		)
+endif()
+
+########################################################################################################################
+# gui
+target_sources(yttrium PRIVATE
+	../include/yttrium/gui/gui.h
+	../include/yttrium/gui/text_capture.h
+	../include/yttrium/gui/texture_font.h
 	gui/ion/classes.cpp
 	gui/ion/classes.h
 	gui/ion/loader.cpp
@@ -79,6 +146,12 @@ add_library(yttrium
 	gui/texture_font.cpp
 	gui/texture_font.h
 	gui/types.h
+	)
+
+########################################################################################################################
+# image
+target_sources(yttrium PRIVATE
+	../include/yttrium/image.h
 	image/formats/dds.cpp
 	image/formats/dds.h
 	image/formats/tga.cpp
@@ -88,6 +161,34 @@ add_library(yttrium
 	image/image.cpp
 	image/utils.cpp
 	image/utils.h
+	)
+if(NOT NO_JPEG)
+	find_package(JPEG REQUIRED)
+	target_sources(yttrium PRIVATE
+		image/formats/jpeg.cpp
+		)
+	target_include_directories(yttrium PRIVATE ${JPEG_INCLUDE_DIR})
+	target_link_libraries(yttrium ${JPEG_LIBRARIES})
+endif()
+if(NOT NO_PNG)
+	find_package(PNG REQUIRED)
+	target_sources(yttrium PRIVATE
+		image/formats/png.cpp
+		)
+	target_compile_definitions(yttrium PRIVATE ${PNG_DEFINITIONS})
+	target_include_directories(yttrium PRIVATE ${PNG_INCLUDE_DIRS})
+	target_link_libraries(yttrium ${PNG_LIBRARIES})
+endif()
+
+########################################################################################################################
+# ion
+target_sources(yttrium PRIVATE
+	../include/yttrium/ion/document.h
+	../include/yttrium/ion/node.h
+	../include/yttrium/ion/list.h
+	../include/yttrium/ion/object.h
+	../include/yttrium/ion/utils.h
+	../include/yttrium/ion/value.h
 	ion/document.cpp
 	ion/document.h
 	ion/list.cpp
@@ -98,8 +199,35 @@ add_library(yttrium
 	ion/utils.cpp
 	ion/utils.h
 	ion/value.cpp
+	)
+
+########################################################################################################################
+# math
+target_sources(yttrium PRIVATE
+	../include/yttrium/math/euler.h
+	../include/yttrium/math/iostream.h
+	../include/yttrium/math/margins.h
+	../include/yttrium/math/matrix.h
+	../include/yttrium/math/point.h
+	../include/yttrium/math/rect.h
+	../include/yttrium/math/size.h
+	../include/yttrium/math/vector.h
 	math/matrix.cpp
 	math/vector.cpp
+	)
+
+########################################################################################################################
+# memory
+target_sources(yttrium PRIVATE
+	../include/yttrium/memory/allocation.h
+	../include/yttrium/memory/allocator.h
+	../include/yttrium/memory/buffer_appender.h
+	../include/yttrium/memory/buffer.h
+	../include/yttrium/memory/global.h
+	../include/yttrium/memory/named_allocator.h
+	../include/yttrium/memory/pool.h
+	../include/yttrium/memory/temporary_allocator.h
+	../include/yttrium/memory/unique_ptr.h
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
 	memory/buffer_memory_tracker.cpp
@@ -111,23 +239,32 @@ add_library(yttrium
 	memory/named_allocator.h
 	memory/pool.cpp
 	memory/raw.h
+	system/memory.h
+	)
+if(UNIX)
+	target_sources(yttrium PRIVATE
+		system/posix/memory.cpp
+		)
+elseif(WIN32)
+	target_sources(yttrium PRIVATE
+		system/windows/memory.cpp
+		)
+endif()
+
+########################################################################################################################
+# renderer
+target_sources(yttrium PRIVATE
+	../include/yttrium/renderer/gpu_program.h
+	../include/yttrium/renderer/index_buffer.h
+	../include/yttrium/renderer/material.h
+	../include/yttrium/renderer/mesh.h
+	../include/yttrium/renderer/modifiers.h
+	../include/yttrium/renderer/renderer.h
+	../include/yttrium/renderer/texture.h
+	../include/yttrium/renderer/textured_rect.h
+	../include/yttrium/renderer/vertex_buffer.h
 	renderer/formats/obj.cpp
 	renderer/formats/obj.h
-	renderer/gl/api.h
-	renderer/gl/buffer.cpp
-	renderer/gl/buffer.h
-	renderer/gl/gl.cpp
-	renderer/gl/gl.h
-	renderer/gl/gpu_program.cpp
-	renderer/gl/gpu_program.h
-	renderer/gl/mesh.h
-	renderer/gl/renderer.cpp
-	renderer/gl/renderer.h
-	renderer/gl/texture.cpp
-	renderer/gl/texture.h
-	renderer/gl/version.h
-	renderer/gl/wrappers.cpp
-	renderer/gl/wrappers.h
 	renderer/debug_renderer.cpp
 	renderer/debug_renderer.h
 	renderer/debug_texture.cpp
@@ -141,15 +278,75 @@ add_library(yttrium
 	renderer/renderer.h
 	renderer/texture.cpp
 	renderer/texture.h
+	system/gl.h
+	)
+if(ON)
+	find_package(OpenGL REQUIRED)
+	target_sources(yttrium PRIVATE
+		renderer/gl/api.h
+		renderer/gl/buffer.cpp
+		renderer/gl/buffer.h
+		renderer/gl/gl.cpp
+		renderer/gl/gl.h
+		renderer/gl/gpu_program.cpp
+		renderer/gl/gpu_program.h
+		renderer/gl/mesh.h
+		renderer/gl/renderer.cpp
+		renderer/gl/renderer.h
+		renderer/gl/texture.cpp
+		renderer/gl/texture.h
+		renderer/gl/version.h
+		renderer/gl/wrappers.cpp
+		renderer/gl/wrappers.h
+		)
+	target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
+	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
+endif()
+
+########################################################################################################################
+# resources
+target_sources(yttrium PRIVATE
+	../include/yttrium/resources/resource_loader.h
+	../include/yttrium/resources/resource_ptr.h
+	../include/yttrium/resources/resource.h
+	../include/yttrium/resources/translation.h
 	resources/resource_loader.cpp
 	resources/resource_ptr.cpp
 	resources/translation.cpp
+	)
+
+########################################################################################################################
+# script
+target_sources(yttrium PRIVATE
+	../include/yttrium/script/args.h
+	../include/yttrium/script/code.h
+	../include/yttrium/script/context.h
+	../include/yttrium/script/value.h
 	script/args.cpp
 	script/code.cpp
 	script/context.cpp
 	script/scanner.cpp
 	script/scanner.h
 	script/value.cpp
+	)
+
+########################################################################################################################
+# std
+target_sources(yttrium PRIVATE
+	../include/yttrium/std/allocator.h
+	../include/yttrium/std/map.h
+	../include/yttrium/std/unordered_map.h
+	../include/yttrium/std/vector.h
+	)
+
+########################################################################################################################
+# storage
+target_sources(yttrium PRIVATE
+	../include/yttrium/storage/package.h
+	../include/yttrium/storage/reader.h
+	../include/yttrium/storage/storage.h
+	../include/yttrium/storage/temporary_file.h
+	../include/yttrium/storage/writer.h
 	storage/formats/ypq.cpp
 	storage/formats/ypq.h
 	storage/package.cpp
@@ -160,92 +357,40 @@ add_library(yttrium
 	storage/writer.cpp
 	storage/writer.h
 	system/file.h
-	system/gl.h
-	system/memory.h
-	system/openal.h
-	system/stderr.h
-	system/window.h
-	utils/atomic_counters.h
-	utils/fourcc.h
-	utils/unique_ptr.h
-	window/backend.h
-	window/console.cpp
-	window/key.cpp
-	window/window.cpp
-	config.h
-	globals.cpp
 	)
-target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
-target_link_libraries(yttrium ${OPENGL_gl_LIBRARY} Threads::Threads ${Boost_LIBRARIES})
-set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
-
-# OpenAL port.
-find_package(OpenAL REQUIRED)
-target_sources(yttrium PRIVATE
-	audio/openal/backend.cpp
-	audio/openal/backend.h
-	audio/openal/format.cpp
-	audio/openal/format.h
-	audio/openal/player.cpp
-	audio/openal/player.h
-	audio/openal/sound.cpp
-	audio/openal/sound.h
-	)
-target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR})
-target_link_libraries(yttrium ${OPENAL_LIBRARY})
-
-# JPEG support.
-if(NOT NO_JPEG)
-	find_package(JPEG REQUIRED)
-	target_sources(yttrium PRIVATE
-		image/formats/jpeg.cpp
-		)
-	target_include_directories(yttrium PRIVATE ${JPEG_INCLUDE_DIR})
-	target_link_libraries(yttrium ${JPEG_LIBRARIES})
-endif()
-
-# Ogg Vorbis support.
-if(NOT NO_OGG_VORBIS)
-	# TODO: Use find_library or some third-party package.
-	target_link_libraries(yttrium vorbisfile)
-	target_sources(yttrium PRIVATE
-		audio/formats/ogg_vorbis.cpp
-		audio/formats/ogg_vorbis.h
-		)
-endif()
-
-# PNG support.
-if(NOT NO_PNG)
-	find_package(PNG REQUIRED)
-	target_sources(yttrium PRIVATE
-		image/formats/png.cpp
-		)
-	target_compile_definitions(yttrium PRIVATE ${PNG_DEFINITIONS})
-	target_include_directories(yttrium PRIVATE ${PNG_INCLUDE_DIRS})
-	target_link_libraries(yttrium ${PNG_LIBRARIES})
-endif()
-
-# Operating system.
 if(UNIX)
 	target_sources(yttrium PRIVATE
 		system/posix/file.cpp
-		system/posix/memory.cpp
-		system/posix/stderr.cpp
-		system/posix/stderr.h
 		system/posix/temporary_file.cpp
 		)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
 		system/windows/file.cpp
-		system/windows/memory.cpp
-		system/windows/stderr.cpp
-		system/windows/stderr.h
 		system/windows/temporary_file.cpp
-		system/windows/windows.h
 		)
 endif()
 
-# Window system.
+########################################################################################################################
+# utils
+target_sources(yttrium PRIVATE
+	../include/yttrium/utils.h
+	utils/atomic_counters.h
+	utils/fourcc.h
+	utils/unique_ptr.h
+	)
+
+########################################################################################################################
+# window
+target_sources(yttrium PRIVATE
+	../include/yttrium/console.h
+	../include/yttrium/key.h
+	../include/yttrium/window.h
+	system/window.h
+	window/backend.h
+	window/console.cpp
+	window/key.cpp
+	window/window.cpp
+	)
 if(UNIX)
 	find_package(X11 REQUIRED)
 	target_sources(yttrium PRIVATE
