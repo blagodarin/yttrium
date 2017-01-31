@@ -59,16 +59,7 @@ public:
 
 		_gui.on_canvas([this](Renderer&, const StaticString& canvas, const RectF& rect){ _graphics.draw(canvas, rect, _logic); });
 		_gui.on_custom_cursor([this](Renderer&, const PointF& point){ _cursor.draw(point); });
-		_gui.on_music([this](const ResourcePtr<const Music>& music)
-		{
-			_audio_player.stop();
-			if (music)
-			{
-				_audio_player.load(music);
-				_audio_player.set_order(AudioPlayer::Random);
-				_audio_player.play();
-			}
-		});
+		_gui.on_music([this](const ResourcePtr<const Music>& music){ _audio_player.play(music); });
 		_gui.on_quit([this]{ _window.close(); });
 	}
 

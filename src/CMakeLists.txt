@@ -63,8 +63,6 @@ target_sources(yttrium PRIVATE
 	audio/music.h
 	audio/player.cpp
 	audio/player.h
-	audio/playlist.cpp
-	audio/playlist.h
 	audio/reader.cpp
 	audio/reader.h
 	audio/streamer.cpp

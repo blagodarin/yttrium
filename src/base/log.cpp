@@ -20,7 +20,7 @@ namespace Yttrium
 
 	void LogManager::write(const StaticString& string)
 	{
-        std::cerr.write(string.text(), string.size());
+		std::cerr.write(string.text(), string.size());
 		_writer.write_all(string);
 	}
 

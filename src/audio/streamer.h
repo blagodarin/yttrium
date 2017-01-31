@@ -29,7 +29,7 @@ namespace Yttrium
 
 		void close();
 		FetchResult fetch();
-		bool open(const ResourcePtr<const Music>&, AudioPlayer::Order);
+		bool open(const ResourcePtr<const Music>&);
 		void prefetch();
 
 	private:

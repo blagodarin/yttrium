@@ -29,7 +29,7 @@ namespace Yttrium
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(const ResourcePtr<const Music>& music, AudioPlayer::Order order)
+	bool AudioStreamer::open(const ResourcePtr<const Music>& music)
 	{
 		_music = music;
 		if (!_music)
@@ -58,15 +58,8 @@ namespace Yttrium
 
 			if (_start_sample < _end_sample && _end_sample - _start_sample >= _buffer_samples)
 			{
-				if (order == AudioPlayer::Random)
-				{
-					_loop_sample = static_cast<uint64_t>(settings.loop * format.samples_per_second());
-					_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_samples);
-				}
-				else
-				{
-					_is_looping = false;
-				}
+				_loop_sample = static_cast<uint64_t>(settings.loop * format.samples_per_second());
+				_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_samples);
 				_backend.set_format(format);
 				_block_size = format.block_size();
 				_buffer.reset(_buffer_samples * _block_size);

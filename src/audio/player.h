@@ -4,7 +4,6 @@
 #include <yttrium/audio/player.h>
 
 #include "../base/thread_buffer.h"
-#include "playlist.h"
 #include "streamer.h"
 
 #include <thread>
@@ -32,8 +31,8 @@ namespace Yttrium
 		AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&&, Allocator&);
 		~AudioPlayerPrivate();
 
-		AudioPlaylist& playlist() { return _playlist; }
 		void push_action(Action action) { _action.write(action); }
+		void set_music(const ResourcePtr<const Music>&);
 		State state() const { return _state; }
 
 	private:
@@ -41,7 +40,8 @@ namespace Yttrium
 
 	private:
 		Allocator& _allocator;
-		AudioPlaylist _playlist;
+		ResourcePtr<const Music> _music;
+		std::mutex _music_mutex;
 		ThreadBuffer<Action> _action;
 		State _state = Stopped;
 		const std::unique_ptr<AudioPlayerBackend> _backend;
