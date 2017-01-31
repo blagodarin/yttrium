@@ -33,21 +33,13 @@ add_library(yttrium
 	base/thread_buffer.cpp
 	base/thread_buffer.h
 	base/tiny_string_map.cpp
-	system/stderr.h
 	config.h
 	globals.cpp
 	)
 target_link_libraries(yttrium Threads::Threads ${Boost_LIBRARIES})
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
-if(UNIX)
+if(WIN32)
 	target_sources(yttrium PRIVATE
-		system/posix/stderr.cpp
-		system/posix/stderr.h
-		)
-elseif(WIN32)
-	target_sources(yttrium PRIVATE
-		system/windows/stderr.cpp
-		system/windows/stderr.h
 		system/windows/windows.h
 		)
 endif()

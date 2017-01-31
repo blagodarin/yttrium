@@ -2,6 +2,8 @@
 
 #include "log.h"
 
+#include <iostream>
+
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace Yttrium
@@ -18,7 +20,7 @@ namespace Yttrium
 
 	void LogManager::write(const StaticString& string)
 	{
-		_std_err.write(string);
+        std::cerr.write(string.text(), string.size());
 		_writer.write_all(string);
 	}
 
