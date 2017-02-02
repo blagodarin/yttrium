@@ -59,7 +59,7 @@ public:
 
 		_gui.on_canvas([this](Renderer&, const StaticString& canvas, const RectF& rect){ _graphics.draw(canvas, rect, _logic); });
 		_gui.on_custom_cursor([this](Renderer&, const PointF& point){ _cursor.draw(point); });
-		_gui.on_music([this](const ResourcePtr<const Music>& music){ _audio_player.play(music); });
+		_gui.on_music([this](const ResourcePtr<const Music>& music){ _audio_player.set_music(music); });
 		_gui.on_quit([this]{ _window.close(); });
 	}
 
@@ -75,7 +75,7 @@ private:
 	TetriumData _data{ _storage };
 	ScriptContext _script;
 	AudioManager _audio;
-	AudioPlayer _audio_player{ _audio };
+	AudioPlayer _audio_player{ _audio, AudioPlayer::State::Playing };
 	Window _window{ "Tetrium" };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer(), &_audio };
 	Gui _gui{ _resource_loader, _script, "examples/tetrium/data/gui.ion" };

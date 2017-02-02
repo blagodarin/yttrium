@@ -7,9 +7,8 @@
 
 namespace Yttrium
 {
-	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend, Allocator& allocator)
-		: _allocator(allocator)
-		, _backend(backend)
+	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend)
+		: _backend(backend)
 	{
 	}
 

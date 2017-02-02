@@ -2,50 +2,35 @@
 #define _src_audio_player_h_
 
 #include <yttrium/audio/player.h>
+#include <yttrium/resources/resource_ptr.h>
 
-#include "../base/thread_buffer.h"
-#include "streamer.h"
-
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 
 namespace Yttrium
 {
+	class AudioPlayerBackend;
+
 	class AudioPlayerPrivate
 	{
 	public:
-		enum State
-		{
-			Stopped,
-			Paused,
-			Playing,
-		};
-
-		enum Action
-		{
-			Play,
-			Pause,
-			Stop,
-			Exit,
-		};
-
-		AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&&, Allocator&);
+		AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&&, AudioPlayer::State);
 		~AudioPlayerPrivate();
 
-		void push_action(Action action) { _action.write(action); }
 		void set_music(const ResourcePtr<const Music>&);
-		State state() const { return _state; }
+		void set_state(AudioPlayer::State);
 
 	private:
 		void run();
 
 	private:
-		Allocator& _allocator;
-		ResourcePtr<const Music> _music;
-		std::mutex _music_mutex;
-		ThreadBuffer<Action> _action;
-		State _state = Stopped;
 		const std::unique_ptr<AudioPlayerBackend> _backend;
-		AudioStreamer _streamer;
+		std::mutex _mutex;
+		std::condition_variable _condition;
+		AudioPlayer::State _state = AudioPlayer::State::Stopped;
+		ResourcePtr<const Music> _music;
+		bool _terminate = false;
 		std::thread _thread;
 	};
 }

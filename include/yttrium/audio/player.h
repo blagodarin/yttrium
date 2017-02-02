@@ -19,19 +19,23 @@ namespace Yttrium
 	{
 	public:
 		///
-		AudioPlayer(AudioManager&);
+		enum class State
+		{
+			Stopped, ///<
+			Playing, ///<
+		};
+
+		///
+		AudioPlayer(AudioManager&, State = State::Stopped);
 
 		///
 		~AudioPlayer();
 
 		///
-		void pause();
+		void set_music(const ResourcePtr<const Music>&);
 
 		///
-		void play(const ResourcePtr<const Music>&);
-
-		///
-		void resume();
+		void set_state(State);
 
 	private:
 		const std::unique_ptr<class AudioPlayerPrivate> _private;

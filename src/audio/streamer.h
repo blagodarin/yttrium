@@ -9,7 +9,6 @@
 
 namespace Yttrium
 {
-	class Allocator;
 	class AudioPlayerBackend;
 	class AudioReader;
 	class Reader;
@@ -24,7 +23,7 @@ namespace Yttrium
 			NoMoreData,
 		};
 
-		AudioStreamer(AudioPlayerBackend&, Allocator&);
+		AudioStreamer(AudioPlayerBackend&);
 		~AudioStreamer();
 
 		void close();
@@ -36,7 +35,6 @@ namespace Yttrium
 		size_t read();
 
 	private:
-		Allocator& _allocator;
 		AudioPlayerBackend& _backend;
 		ResourcePtr<const Music> _music;
 		uint64_t _start_sample;

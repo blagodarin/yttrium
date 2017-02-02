@@ -68,11 +68,11 @@ namespace Yttrium
 
 	///
 	template <typename T1, typename T2>
-	bool operator==(const ResourcePtr<T1>& a, const ResourcePtr<T1>& b) noexcept { return a.get() == b.get(); }
+	bool operator==(const ResourcePtr<T1>& a, const ResourcePtr<T2>& b) noexcept { return static_cast<const Resource*>(a.get()) == static_cast<const Resource*>(b.get()); }
 
 	///
 	template <typename T1, typename T2>
-	bool operator!=(const ResourcePtr<T1>& a, const ResourcePtr<T1>& b) noexcept { return !(a == b); }
+	bool operator!=(const ResourcePtr<T1>& a, const ResourcePtr<T2>& b) noexcept { return !(a == b); }
 }
 
 #endif
