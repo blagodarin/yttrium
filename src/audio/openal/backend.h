@@ -1,7 +1,6 @@
 #ifndef _src_audio_openal_backend_h_
 #define _src_audio_openal_backend_h_
 
-#include <yttrium/std/vector.h>
 #include "../../system/openal.h"
 #include "../../utils/unique_ptr.h"
 #include "../backend.h"

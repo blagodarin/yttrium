@@ -12,11 +12,9 @@ namespace Yttrium
 	{
 	}
 
-	AudioStreamer::~AudioStreamer() = default;
-
-	void AudioStreamer::close()
+	AudioStreamer::~AudioStreamer()
 	{
-		_music = {};
+		_backend.stop();
 	}
 
 	AudioStreamer::FetchResult AudioStreamer::fetch()
@@ -71,10 +69,11 @@ namespace Yttrium
 		return false;
 	}
 
-	void AudioStreamer::prefetch()
+	void AudioStreamer::start()
 	{
 		for (size_t i = 0; i < AudioPlayerBackend::NumBuffers; ++i)
 			_backend.fill_buffer(i, _buffer.data(), read());
+		_backend.play();
 	}
 
 	size_t AudioStreamer::read()

@@ -4,13 +4,12 @@
 #ifndef _include_yttrium_audio_manager_h_
 #define _include_yttrium_audio_manager_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <memory>
 
 namespace Yttrium
 {
-	class AudioPlayer;
 	class Reader;
 	template <typename> class ResourcePtr;
 	class Sound;
@@ -20,7 +19,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		AudioManager(Allocator& = *DefaultAllocator);
+		AudioManager();
 
 		///
 		~AudioManager();
@@ -30,7 +29,7 @@ namespace Yttrium
 
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;
-		friend AudioPlayer;
+		friend class AudioPlayer;
 	};
 }
 

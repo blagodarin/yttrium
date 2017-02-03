@@ -1,7 +1,6 @@
 #ifndef _src_audio_streamer_h_
 #define _src_audio_streamer_h_
 
-#include <yttrium/audio/player.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/resources/resource_ptr.h>
 
@@ -11,6 +10,7 @@ namespace Yttrium
 {
 	class AudioPlayerBackend;
 	class AudioReader;
+	class Music;
 	class Reader;
 
 	class AudioStreamer
@@ -26,10 +26,9 @@ namespace Yttrium
 		AudioStreamer(AudioPlayerBackend&);
 		~AudioStreamer();
 
-		void close();
 		FetchResult fetch();
 		bool open(const ResourcePtr<const Music>&);
-		void prefetch();
+		void start();
 
 	private:
 		size_t read();

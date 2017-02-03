@@ -21,7 +21,7 @@ namespace Yttrium
 		void refill_buffer(void* data, size_t size) override;
 		void play() override;
 		void pause() override;
-		void stop() override;
+		void stop() noexcept override;
 
 	private:
 		OpenALSource _source;

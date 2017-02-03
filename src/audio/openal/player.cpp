@@ -43,7 +43,7 @@ namespace Yttrium
 		::alSourcePause(_source);
 	}
 
-	void OpenAlPlayer::stop()
+	void OpenAlPlayer::stop() noexcept
 	{
 		::alSourceStop(_source);
 

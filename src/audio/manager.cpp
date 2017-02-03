@@ -8,19 +8,13 @@
 
 namespace Yttrium
 {
-	AudioManagerPrivate::AudioManagerPrivate(Allocator& allocator)
-		: _allocator(allocator)
-		, _backend(AudioBackend::create())
+	AudioManagerPrivate::AudioManagerPrivate()
+		: _backend(AudioBackend::create())
 	{
 	}
 
-	std::unique_ptr<AudioPlayerBackend> AudioManagerPrivate::create_player_backend()
-	{
-		return _backend->create_player();
-	}
-
-	AudioManager::AudioManager(Allocator& allocator)
-		: _private(std::make_unique<AudioManagerPrivate>(allocator))
+	AudioManager::AudioManager()
+		: _private(std::make_unique<AudioManagerPrivate>())
 	{
 	}
 

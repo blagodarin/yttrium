@@ -10,12 +10,12 @@
 
 namespace Yttrium
 {
-	class AudioPlayerBackend;
+	class AudioBackend;
 
 	class AudioPlayerPrivate
 	{
 	public:
-		AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&&, AudioPlayer::State);
+		AudioPlayerPrivate(AudioBackend&, AudioPlayer::State);
 		~AudioPlayerPrivate();
 
 		void set_music(const ResourcePtr<const Music>&);
@@ -25,11 +25,12 @@ namespace Yttrium
 		void run();
 
 	private:
-		const std::unique_ptr<AudioPlayerBackend> _backend;
+		AudioBackend& _backend;
 		std::mutex _mutex;
 		std::condition_variable _condition;
 		AudioPlayer::State _state = AudioPlayer::State::Stopped;
 		ResourcePtr<const Music> _music;
+		bool _music_changed = false;
 		bool _terminate = false;
 		std::thread _thread;
 	};

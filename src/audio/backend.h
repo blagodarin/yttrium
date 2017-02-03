@@ -1,8 +1,6 @@
 #ifndef _src_audio_backend_h_
 #define _src_audio_backend_h_
 
-#include <yttrium/string.h>
-
 #include <memory>
 
 namespace Yttrium
@@ -28,7 +26,7 @@ namespace Yttrium
 		virtual void refill_buffer(void* data, size_t size) = 0;
 		virtual void play() = 0;
 		virtual void pause() = 0;
-		virtual void stop() = 0;
+		virtual void stop() noexcept = 0;
 	};
 
 	class AudioBackend

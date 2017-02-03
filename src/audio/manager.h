@@ -9,12 +9,11 @@ namespace Yttrium
 	class AudioManagerPrivate
 	{
 	public:
-		AudioManagerPrivate(Allocator&);
+		AudioManagerPrivate();
 
-		std::unique_ptr<AudioPlayerBackend> create_player_backend();
+		AudioBackend& backend() const { return *_backend; }
 
 	public:
-		Allocator& _allocator;
 		const std::unique_ptr<AudioBackend> _backend;
 	};
 }

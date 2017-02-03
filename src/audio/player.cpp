@@ -8,8 +8,8 @@
 
 namespace Yttrium
 {
-	AudioPlayerPrivate::AudioPlayerPrivate(std::unique_ptr<AudioPlayerBackend>&& backend, AudioPlayer::State initial_state)
-		: _backend(std::move(backend))
+	AudioPlayerPrivate::AudioPlayerPrivate(AudioBackend& backend, AudioPlayer::State initial_state)
+		: _backend(backend)
 		, _state(initial_state)
 		, _thread([this]{ run(); })
 	{
@@ -30,6 +30,7 @@ namespace Yttrium
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			_music = music;
+			_music_changed = true;
 			if (!_music || _state != AudioPlayer::State::Playing)
 				return;
 		}
@@ -49,47 +50,42 @@ namespace Yttrium
 
 	void AudioPlayerPrivate::run()
 	{
-		AudioStreamer streamer(*_backend); // TODO: Move inside the loop.
+		const auto player_backend = _backend.create_player();
 		for (;;)
 		{
 			ResourcePtr<const Music> music;
 			{
 				std::unique_lock<std::mutex> lock(_mutex);
+				if (!_music_changed)
+					_music = {};
 				_condition.wait(lock, [this]{ return (_state == AudioPlayer::State::Playing && _music) || _terminate; });
 				if (_terminate)
 					break;
 				music = _music;
+				_music_changed = false;
 			}
+			AudioStreamer streamer(*player_backend);
 			if (!streamer.open(music))
-			{
-				std::lock_guard<std::mutex> lock(_mutex);
-				if (_music == music)
-					_music = {};
 				continue;
-			}
-			streamer.prefetch();
-			_backend->play();
+			streamer.start();
 			for (bool restart = false; !restart;)
 			{
 				{
 					std::unique_lock<std::mutex> lock(_mutex);
-					if (_condition.wait_for(lock, std::chrono::milliseconds(300), [this, &music]{ return _state != AudioPlayer::State::Playing || _music != music || _terminate; }))
+					if (_condition.wait_for(lock, std::chrono::milliseconds(300), [this]{ return _state != AudioPlayer::State::Playing || _music_changed || _terminate; }))
 					{
-						_condition.wait(lock, [this, &music]{ return _state == AudioPlayer::State::Playing || _music != music || _terminate; });
-						if (_music != music || _terminate)
+						_condition.wait(lock, [this]{ return _state == AudioPlayer::State::Playing || _music_changed || _terminate; });
+						if (_music_changed || _terminate)
 							break;
 					}
 				}
-				for (auto i = _backend->check_buffers(); i > 0; --i)
+				for (auto i = player_backend->check_buffers(); i > 0; --i)
 				{
 					const auto fetch_result = streamer.fetch();
 					if (fetch_result == AudioStreamer::Ok)
 						continue;
 					if (!streamer.open(music))
 					{
-						std::lock_guard<std::mutex> lock(_mutex);
-						if (_music == music)
-							_music = {};
 						restart = true;
 						break;
 					}
@@ -100,13 +96,11 @@ namespace Yttrium
 					}
 				}
 			}
-			_backend->stop();
-			streamer.close();
 		}
 	}
 
 	AudioPlayer::AudioPlayer(AudioManager& manager, State initial_state)
-		: _private(std::make_unique<AudioPlayerPrivate>(manager._private->create_player_backend(), initial_state))
+		: _private(std::make_unique<AudioPlayerPrivate>(manager._private->backend(), initial_state))
 	{
 	}
 
