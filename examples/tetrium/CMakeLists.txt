@@ -27,7 +27,7 @@ add_executable(tetrium WIN32
 	statistics.cpp
 	statistics.h
 	)
-target_link_libraries(tetrium yttrium)
+target_link_libraries(tetrium yttrium ${Boost_LIBRARIES})
 if(WIN32)
 	target_link_libraries(tetrium ywinmain)
 endif()
