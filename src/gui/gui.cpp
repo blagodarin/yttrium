@@ -107,9 +107,8 @@ namespace Yttrium
 	void GuiPrivate::enter_layer(GuiLayer* layer)
 	{
 		_layer_stack.emplace_back(layer);
-		const auto& layer_music = layer->music(); // TODO: Silent layers.
-		if (layer_music && _on_music)
-			_on_music(layer_music);
+		if (layer->has_music() && _on_music)
+			_on_music(layer->music());
 		layer->handle_enter();
 	}
 
@@ -117,9 +116,9 @@ namespace Yttrium
 	{
 		const auto layer = _layer_stack.back();
 		layer->handle_return();
-		if (layer->music() && _on_music)
+		if (layer->has_music() && _on_music)
 		{
-			const auto i = std::find_if(std::next(_layer_stack.rbegin()), _layer_stack.rend(), [](GuiLayer* layer){ return static_cast<bool>(layer->music()); });
+			const auto i = std::find_if(std::next(_layer_stack.rbegin()), _layer_stack.rend(), [](GuiLayer* layer){ return layer->has_music(); });
 			_on_music(i != _layer_stack.rend() ? (*i)->music() : nullptr);
 		}
 		_layer_stack.pop_back();

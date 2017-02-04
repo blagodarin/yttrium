@@ -3,6 +3,8 @@ transparent layer "game_over"
 	on_enter { call "game_stop" }
 	on_key "esc" { return_to "main_menu" }
 
+	music ""
+
 	stretch { image { color "0" "0" "0" "0.5" } }
 
 	center

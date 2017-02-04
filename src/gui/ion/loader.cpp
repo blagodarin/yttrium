@@ -318,7 +318,8 @@ namespace Yttrium
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::String)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		layer.set_music(_gui.resource_loader().load_music(values->string()));
+		const auto music_name = values->string();
+		layer.set_music(music_name.is_empty() ? nullptr : _gui.resource_loader().load_music(music_name));
 	}
 
 	void GuiIonLoader::load_layer_on_enter(GuiLayer& layer, const IonNode& node, int) const
