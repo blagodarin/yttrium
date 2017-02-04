@@ -20,13 +20,10 @@ configure_file(config.h.in config.h)
 add_library(yttrium
 	../include/yttrium/api.h
 	../include/yttrium/exceptions.h
-	../include/yttrium/log.h
 	../include/yttrium/static_string.h
 	../include/yttrium/string_format.h
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
-	base/log.cpp
-	base/log.h
 	base/static_string.cpp
 	base/string_format.cpp
 	base/string.cpp
@@ -34,7 +31,7 @@ add_library(yttrium
 	config.h
 	globals.cpp
 	)
-target_link_libraries(yttrium Threads::Threads ${Boost_LIBRARIES})
+target_link_libraries(yttrium Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
 if(WIN32)
 	target_sources(yttrium PRIVATE

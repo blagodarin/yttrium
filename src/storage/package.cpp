@@ -1,8 +1,9 @@
 #include "package.h"
 
-#include <yttrium/log.h>
 #include <yttrium/memory/unique_ptr.h>
 #include "formats/ypq.h"
+
+#include <iostream>
 
 namespace Yttrium
 {
@@ -28,7 +29,7 @@ namespace Yttrium
 		}
 		catch (const BadPackage& e)
 		{
-			Log() << "("_s << path << ") "_s << e.what();
+			std::cerr << "(" << path << ") " << e.what() << "\n";
 		}
 		return {};
 	}

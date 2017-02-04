@@ -7,7 +7,6 @@ cmake_install.cmake
 *.dir
 doc/html
 lib
-*.log
 Makefile
 *.opendb
 *.sh

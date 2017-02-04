@@ -1,12 +1,13 @@
 #include <yttrium/script/context.h>
 
-#include <yttrium/log.h>
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
 #include <yttrium/std/map.h>
+#include <yttrium/string_format.h>
 
 #include <cassert>
+#include <iostream>
 
 namespace Yttrium
 {
@@ -62,7 +63,7 @@ namespace Yttrium
 	{
 		if (name.is_empty())
 		{
-			Log()("Invalid command \"\""_s);
+			std::cerr << "Invalid command \"\"\n";
 			return false;
 		}
 
@@ -71,14 +72,14 @@ namespace Yttrium
 		const auto command = _private->_commands.find(String(id, ByReference(), nullptr));
 		if (command == _private->_commands.end())
 		{
-			Log()("Unknown command \"", id, "\"");
+			std::cerr << "Unknown command \"" << id << "\"\n";
 			return false;
 		}
 
 		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 		{
-			Log()("Argument number mismatch for \""_s, id, "\": "_s,
-				args.size(), " instead of "_s, command->second.min_args, '-', command->second.max_args);
+			std::cerr << "Argument number mismatch for \"" << id << "\": "
+				<< args.size() << " instead of " << command->second.min_args << "-" << command->second.max_args << "\n";
 			return false;
 		}
 

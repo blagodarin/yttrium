@@ -1,5 +1,4 @@
 #include <yttrium/memory/named_allocator.h>
-#include "base/log.h"
 #include "memory/buffer_memory.h"
 #include "memory/buffer_memory_tracker.h"
 #include "memory/heap_allocator.h"
@@ -27,7 +26,4 @@ namespace Yttrium
 
 	static NamedAllocator _default_allocator({});
 	Allocator* const DefaultAllocator = &_default_allocator;
-
-	static NamedAllocator _log_allocator("log"_s);
-	LogManager _log_manager(_log_allocator);
 }

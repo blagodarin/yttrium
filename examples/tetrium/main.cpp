@@ -2,7 +2,6 @@
 #include <yttrium/audio/player.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/image.h>
-#include <yttrium/log.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
@@ -15,6 +14,8 @@
 #include "cursor.h"
 #include "graphics.h"
 #include "statistics.h"
+
+using namespace Yttrium;
 
 namespace
 {
@@ -43,10 +44,6 @@ namespace
 
 int main(int, char**)
 {
-	using namespace Yttrium;
-
-	Log::set_file("tetrium.log");
-
 	Window window{ "Tetrium" };
 
 	ScriptContext script;

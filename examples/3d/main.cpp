@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include <yttrium/image.h>
-#include <yttrium/log.h>
 
 namespace
 {
@@ -26,12 +25,10 @@ namespace
 
 int main(int, char**)
 {
-	Log::set_file("3d.log");
-
-	Storage storage(Storage::UseFileSystem::Before);
+	Storage storage{ Storage::UseFileSystem::Before };
 	::make_checkerboard_texture(storage, "examples/3d/data/checkerboard.tga", 128, 128);
 
-	Game game(storage);
+	Game game{ storage };
 	game.run();
 	return 0;
 }
