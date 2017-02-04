@@ -13,11 +13,11 @@ namespace Yttrium
 
 using namespace Yttrium;
 
-class Cursor
+class TetriumCursor
 {
 public:
-	Cursor(Renderer&);
-	~Cursor();
+	TetriumCursor(Renderer&);
+	~TetriumCursor();
 
 	void draw(const PointF&);
 

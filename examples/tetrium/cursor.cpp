@@ -25,16 +25,16 @@ struct Vertex // TODO: Don't rely on any specific GUI vertex format.
 
 const std::array<uint16_t, 3> indices = { 0, 1, 2 };
 
-Cursor::Cursor(Renderer& renderer)
+TetriumCursor::TetriumCursor(Renderer& renderer)
 	: _renderer(renderer)
 	, _vertices(_renderer.create_vertex_buffer({ VA::f2, VA::f4, VA::f2 }, 3 * sizeof(Vertex)))
 	, _indices(_renderer.create_index_buffer(IndexFormat::U16, indices.size(), indices.data()))
 {
 }
 
-Cursor::~Cursor() = default;
+TetriumCursor::~TetriumCursor() = default;
 
-void Cursor::draw(const PointF& point)
+void TetriumCursor::draw(const PointF& point)
 {
 	const auto animation = [](int tick)
 	{
