@@ -55,15 +55,15 @@ int main(int, char**)
 	script.define("game_start", [&logic](const ScriptCall& call){ logic.start(call.context.get_int("start_level", 1)); });
 	script.define("game_stop", [&logic](const ScriptCall&){ logic.pause(); });
 	script.define("game_resume", [&logic](const ScriptCall&){ logic.resume(); });
-	script.define("move_down", [&logic](const ScriptCall& call){ logic.set_acceleration(call.function[0] == '+'); });
-	script.define("move_left", [&logic](const ScriptCall& call){ logic.set_left_movement(call.function[0] == '+'); });
-	script.define("move_right", [&logic](const ScriptCall& call){ logic.set_right_movement(call.function[0] == '+'); });
+	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call.args.get_int(0, 0)); });
+	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call.args.get_int(0, 0)); });
+	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call.args.get_int(0, 0)); });
 	script.define("save_score", [&logic, &statistics](const ScriptCall&){ statistics.update(logic.score(), "John Placeholder"); }); // TODO: Get the entered name.
 	script.define("set", 2, [](const ScriptCall& call) // TODO: Make built-in, maybe as '='.
 	{
 		const ScriptValue* value = call.args.value(0);
 		if (value->type() == ScriptValue::Type::Name)
-			call.context.set(value->to_string(), call.args.string(1, ScriptArgs::Resolve));
+			call.context.set(value->to_string(), call.args.string(1));
 	});
 	script.define("screenshot", [&window](const ScriptCall&){ window.take_screenshot(); });
 	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });

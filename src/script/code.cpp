@@ -42,7 +42,6 @@ namespace Yttrium
 					switch (token.type)
 					{
 					case ScriptScanner::Token::Identifier:
-					case ScriptScanner::Token::XIdentifier:
 						_commands.emplace_back(token.string, allocator);
 						command = &_commands.back();
 						break;
@@ -63,8 +62,7 @@ namespace Yttrium
 							ScriptValue(token.string, ScriptValue::Type::Name, allocator));
 						break;
 
-					case ScriptScanner::Token::XIdentifier:
-					case ScriptScanner::Token::Literal:
+					case ScriptScanner::Token::Number:
 						command->args.emplace_back(new(_temporaries.allocate())
 							ScriptValue(token.string, ScriptValue::Type::Literal, allocator));
 						break;

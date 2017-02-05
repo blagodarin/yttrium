@@ -9,9 +9,9 @@ layer "game"
 	on_event "game_over" { enter "game_over" }
 	on_return { call "game_stop" }
 
-	on_key "a" { call "+move_left" } { call "-move_left" }
-	on_key "d" { call "+move_right" } { call "-move_right" }
-	on_key "s" { call "+move_down" } { call "-move_down" }
+	on_key "a" { call "move_left 1" } { call "move_left 0" }
+	on_key "d" { call "move_right 1" } { call "move_right 0" }
+	on_key "s" { call "move_down 1" } { call "move_down 0" }
 	on_key "left" { call "turn_left" }
 	on_key "right" { call "turn_right" }
 	on_key "esc" { enter "pause" }

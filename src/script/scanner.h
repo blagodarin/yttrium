@@ -16,8 +16,7 @@ namespace Yttrium
 			{
 				End,
 				Identifier,
-				XIdentifier, // "+identifier" and "-identifier".
-				Literal,
+				Number,
 				String,
 				Separator, // Command separator (newline or semicolon).
 			};
