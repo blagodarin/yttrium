@@ -19,6 +19,7 @@ namespace Yttrium
 				Number,
 				String,
 				Separator, // Command separator (newline or semicolon).
+				Equals,
 			};
 
 			size_t line;

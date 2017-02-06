@@ -25,21 +25,21 @@ layer "play_menu"
 		{
 			position "" "260"
 			text     {tr"Easy"}
-			on_click { call "set start_level 1" enter "game" }
+			on_click { call "start_level = 1" enter "game" }
 		}
 
 		button ["button"]
 		{
 			position "" "310"
 			text     {tr"Normal"}
-			on_click { call "set start_level 10" enter "game" }
+			on_click { call "start_level = 10" enter "game" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
 			text     {tr"Hard"}
-			on_click { call "set start_level 30" enter "game" }
+			on_click { call "start_level = 30" enter "game" }
 		}
 
 		button ["button"]

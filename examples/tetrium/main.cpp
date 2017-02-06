@@ -59,12 +59,6 @@ int main(int, char**)
 	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call.args.get_int(0, 0)); });
 	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call.args.get_int(0, 0)); });
 	script.define("save_score", [&logic, &statistics](const ScriptCall&){ statistics.update(logic.score(), "John Placeholder"); }); // TODO: Get the entered name.
-	script.define("set", 2, [](const ScriptCall& call) // TODO: Make built-in, maybe as '='.
-	{
-		const ScriptValue* value = call.args.value(0);
-		if (value->type() == ScriptValue::Type::Name)
-			call.context.set(value->to_string(), call.args.string(1));
-	});
 	script.define("screenshot", [&window](const ScriptCall&){ window.take_screenshot(); });
 	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });

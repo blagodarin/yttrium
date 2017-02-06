@@ -36,7 +36,11 @@ namespace Yttrium
 			{
 				const auto token = scanner.read();
 				if (token.type == ScriptScanner::Token::End)
+				{
+					if (command && command->name == "="_s && command->args.size() != 2)
+						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 					break;
+				}
 				if (!command)
 				{
 					switch (token.type)
@@ -58,22 +62,38 @@ namespace Yttrium
 					switch (token.type)
 					{
 					case ScriptScanner::Token::Identifier:
+						if (command->name == "="_s && command->args.size() != 1)
+							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 						command->args.emplace_back(new(_temporaries.allocate())
 							ScriptValue(token.string, ScriptValue::Type::Name, allocator));
 						break;
 
 					case ScriptScanner::Token::Number:
+						if (command->name == "="_s && command->args.size() != 1)
+							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 						command->args.emplace_back(new(_temporaries.allocate())
 							ScriptValue(token.string, ScriptValue::Type::Literal, allocator));
 						break;
 
 					case ScriptScanner::Token::String:
+						if (command->name == "="_s && command->args.size() != 1)
+							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 						command->args.emplace_back(new(_temporaries.allocate())
 							ScriptValue(token.string, ScriptValue::Type::String, allocator));
 						break;
 
 					case ScriptScanner::Token::Separator:
+						if (command->name == "="_s && command->args.size() != 2)
+							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 						command = nullptr;
+						break;
+
+					case ScriptScanner::Token::Equals:
+						if (!command->args.empty())
+							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+						command->args.emplace_back(new(_temporaries.allocate())
+							ScriptValue(command->name, ScriptValue::Type::Name, allocator));
+						command->name = "="_s;
 						break;
 
 					default:
@@ -108,7 +128,19 @@ namespace Yttrium
 		TemporaryAllocator<64> result_allocator(_private->_allocator);
 		String result(&result_allocator);
 		for (const auto& command : _private->_commands)
-			if (!context.call(command.name, &result, ScriptArgs(context, command.args)))
+			if (command.name == "="_s)
+			{
+				assert(command.args.size() == 2);
+				assert(command.args[0]->type() == ScriptValue::Type::Name);
+				if (command.args[1]->type() == ScriptValue::Type::Name)
+				{
+					const auto value = context.find(command.args[1]->to_string());
+					context.set(command.args[0]->to_string(), value ? value->to_string() : StaticString());
+				}
+				else
+					context.set(command.args[0]->to_string(), command.args[1]->to_string());
+			}
+			else if (!context.call(command.name, &result, ScriptArgs(context, command.args)))
 				break;
 	}
 
