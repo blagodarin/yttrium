@@ -40,7 +40,9 @@ namespace Yttrium
 				throw GuiDataError("\""_s, name, "\" can't be the root layer, \""_s, _root_layer->name(), "\" is the root layer"_s);
 			_root_layer = layer.get();
 		}
-		return *_layers.emplace(name, std::move(layer)).first->second;
+		auto& result = *_layers.emplace(name, std::move(layer)).first->second;
+		result.set_cursor(_default_cursor, _default_cursor_texture);
+		return result;
 	}
 
 	void GuiPrivate::set_translation(const StaticString& path)
@@ -83,6 +85,13 @@ namespace Yttrium
 			return false;
 		enter_layer(i->second.get());
 		return true;
+	}
+
+	void GuiPrivate::set_default_cursor(GuiCursor cursor, const StaticString& texture)
+	{
+		_default_cursor = cursor;
+		if (_default_cursor == GuiCursor::Texture)
+			_default_cursor_texture = _resource_loader.load_texture_2d(texture);
 	}
 
 	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)

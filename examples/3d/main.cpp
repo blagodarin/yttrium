@@ -1,32 +1,24 @@
 #include "game.h"
 
-#include <yttrium/image.h>
+#include "../utils.h"
 
 namespace
 {
-	void make_checkerboard_texture(Storage& storage, const StaticString& name, size_t width, size_t height)
+	void make_checkerboard_texture(Storage& storage, const StaticString& name)
 	{
-		Image image({ width, height, PixelFormat::Bgra, 32 });
-		for (size_t y = 0; y < height; ++y)
+		storage.attach_buffer(name, ::make_bgra_tga(128, 128, [](size_t x, size_t y)
 		{
-			for (size_t x = 0; x < width; ++x)
-			{
-				const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.format().row_size() + x * 4;
-				const auto color = (x ^ y) & 1 ? uint8_t{ 0xdd } : uint8_t{ 0x00 };
-				pixel[0] = color;
-				pixel[1] = color;
-				pixel[2] = color;
-				pixel[3] = 0xff;
-			}
-		}
-		storage.attach_buffer(name, image.to_buffer(ImageType::Tga));
+			return (x ^ y) & 1
+				? std::make_tuple(0xdd, 0xdd, 0xdd, 0xff)
+				: std::make_tuple(0x00, 0x00, 0x00, 0xff);
+		}));
 	}
 }
 
 int main(int, char**)
 {
 	Storage storage{ Storage::UseFileSystem::Before };
-	::make_checkerboard_texture(storage, "examples/3d/data/checkerboard.tga", 128, 128);
+	::make_checkerboard_texture(storage, "examples/3d/data/checkerboard.tga");
 
 	Game game{ storage };
 	game.run();

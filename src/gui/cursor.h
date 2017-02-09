@@ -3,10 +3,11 @@
 
 namespace Yttrium
 {
-	enum class GuiCursor // TODO: Add texture cursor.
+	enum class GuiCursor
 	{
 		None,
 		Custom,
+		Texture,
 	};
 }
 

@@ -174,13 +174,31 @@ namespace Yttrium
 	void GuiIonLoader::load_cursor(const IonNode& node, unsigned)
 	{
 		const auto values = node.values();
-		if (values.size() != 1 || values->type() != IonValue::Type::String)
+		if (values.size() != 1 || values->type() != IonValue::Type::Object)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		if (values->string() == "none"_s)
+		const auto& object = *node.first()->object();
+		if (object.size() != 1)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		const auto& object_node = *object.begin();
+		if (object_node.name() == "none"_s)
+		{
+			if (!object_node.is_empty())
+				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
 			_gui.set_default_cursor(GuiCursor::None);
-		else if (values->string() == "custom"_s)
+		}
+		else if (object_node.name() == "custom"_s)
+		{
+			if (!object_node.is_empty())
+				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
 			_gui.set_default_cursor(GuiCursor::Custom);
-		else if (values->string() != "default"_s)
+		}
+		else if (object_node.name() == "texture"_s)
+		{
+			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
+				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+			_gui.set_default_cursor(GuiCursor::Texture, object_node.first()->string());
+		}
+		else if (object_node.name() != "default"_s)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 	}
 
@@ -242,7 +260,6 @@ namespace Yttrium
 		const StaticString layer_name = element.name ? *element.name : StaticString();
 
 		auto& layer = _gui.add_layer(layer_name, attributes == IsTransparent, attributes & IsRoot);
-		layer.set_cursor(_gui.default_cursor());
 		for (const auto& layer_node : *element.object)
 		{
 			const auto i = handlers.find(layer_node.name());
@@ -271,13 +288,31 @@ namespace Yttrium
 	void GuiIonLoader::load_layer_cursor(GuiLayer& layer, const IonNode& node, int) const
 	{
 		const auto values = node.values();
-		if (values.size() != 1 || values->type() != IonValue::Type::String)
+		if (values.size() != 1 || values->type() != IonValue::Type::Object)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		if (values->string() == "none"_s)
+		const auto& object = *node.first()->object();
+		if (object.size() != 1)
+			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		const auto& object_node = *object.begin();
+		if (object_node.name() == "none"_s)
+		{
+			if (!object_node.is_empty())
+				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
 			layer.set_cursor(GuiCursor::None);
-		else if (values->string() == "custom"_s)
+		}
+		else if (object_node.name() == "custom"_s)
+		{
+			if (!object_node.is_empty())
+				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
 			layer.set_cursor(GuiCursor::Custom);
-		else if (values->string() != "default"_s)
+		}
+		else if (object_node.name() == "texture"_s)
+		{
+			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
+				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+			layer.set_cursor(GuiCursor::Texture, object_node.first()->string());
+		}
+		else if (object_node.name() != "default"_s)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 	}
 

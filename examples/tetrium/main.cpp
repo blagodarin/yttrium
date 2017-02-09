@@ -1,7 +1,6 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/gui/gui.h>
-#include <yttrium/image.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
@@ -11,7 +10,6 @@
 #include <yttrium/window.h>
 
 #include "../utils.h"
-#include "cursor.h"
 #include "graphics.h"
 #include "statistics.h"
 
@@ -21,24 +19,29 @@ namespace
 {
 	void make_buttons_texture(Storage& storage, const StaticString& name)
 	{
-		constexpr auto button_size = 16u;
-		constexpr auto button_styles = 4u;
-		Image image({ button_size, button_size * button_styles, PixelFormat::Bgra, 32 });
-		for (unsigned i = 0; i < button_styles; ++i)
+		constexpr size_t button_size = 16;
+		constexpr size_t button_styles = 4;
+		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [](size_t, size_t y)
 		{
-			for (unsigned y = 0; y < button_size; ++y)
-			{
-				for (unsigned x = 0; x < button_size; ++x)
-				{
-					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * button_size + y) * image.format().row_size() + x * 4;
-					pixel[0] = 0xff;
-					pixel[1] = 0x44 * i;
-					pixel[2] = 0x44 * i;
-					pixel[3] = 0xff;
-				}
-			}
-		}
-		storage.attach_buffer(name, image.to_buffer(ImageType::Tga));
+			const auto style = y / button_size;
+			return std::make_tuple(0xff, 0x44 * style, 0x44 * style, 0xff);
+		}));
+	}
+
+	void make_cursor_texture(Storage& storage, const StaticString& name)
+	{
+		constexpr size_t size = 64;
+		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y) -> std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>
+		{
+			if (y > 2 * x || 2 * y < x || (y > 2 * (size - x) && x > 2 * (size - y)))
+				return std::make_tuple(0, 0, 0, 0);
+			else
+				return std::make_tuple(
+					y * 0xff / (size - 1),
+					x * 0xff / (size - 1),
+					(size * size - x * y) * 0xff / (size * size),
+					0xff);
+		}));
 	}
 }
 
@@ -49,8 +52,6 @@ int main(int, char**)
 	ScriptContext script;
 
 	Tetrium::Game logic;
-	TetriumStatistics statistics{ script };
-
 	script.define("game_pause", [&logic](const ScriptCall&){ logic.pause(); });
 	script.define("game_start", [&logic](const ScriptCall& call){ logic.start(call.context.get_int("start_level", 1)); });
 	script.define("game_stop", [&logic](const ScriptCall&){ logic.pause(); });
@@ -58,14 +59,17 @@ int main(int, char**)
 	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call.args.get_int(0, 0)); });
 	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call.args.get_int(0, 0)); });
 	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call.args.get_int(0, 0)); });
-	script.define("save_score", [&logic, &statistics](const ScriptCall&){ statistics.update(logic.score(), "John Placeholder"); }); // TODO: Get the entered name.
 	script.define("screenshot", [&window](const ScriptCall&){ window.take_screenshot(); });
 	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });
 
+	TetriumStatistics statistics{ script };
+	script.define("save_score", [&logic, &statistics](const ScriptCall&){ statistics.update(logic.score(), "John Placeholder"); }); // TODO: Get the entered name.
+
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");
 	::make_buttons_texture(storage, "examples/tetrium/data/buttons.tga");
+	::make_cursor_texture(storage, "examples/tetrium/data/cursor.tga");
 
 	AudioManager audio;
 	ResourceLoader resource_loader{ storage, &window.renderer(), &audio };
@@ -87,11 +91,9 @@ int main(int, char**)
 	});
 
 	TetriumGraphics graphics{ window.renderer() };
-	TetriumCursor cursor{ window.renderer() };
 	AudioPlayer audio_player{ audio, AudioPlayer::State::Playing };
 
 	gui.on_canvas([&logic, &graphics](Renderer&, const StaticString& canvas, const RectF& rect){ graphics.draw(canvas, rect, logic); });
-	gui.on_custom_cursor([&cursor](Renderer&, const PointF& point){ cursor.draw(point); });
 	gui.on_music([&audio_player](const ResourcePtr<const Music>& music){ audio_player.set_music(music); });
 	gui.on_quit([&window]{ window.close(); });
 

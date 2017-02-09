@@ -18,7 +18,7 @@ layer "game"
 
 	stretch { image { texture "data/textures/wall.jpeg" } }
 
-	cursor "none"
+	cursor { none }
 
 	center
 	{

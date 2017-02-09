@@ -1,6 +1,9 @@
 #include "layer.h"
 
+#include <yttrium/math/margins.h>
+#include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
+#include <yttrium/resources/resource_loader.h>
 #include "gui.h"
 #include "layout.h"
 #include "widgets/widget.h"
@@ -119,10 +122,24 @@ namespace Yttrium
 			case GuiCursor::Custom:
 				_gui.draw_custom_cursor(renderer, *cursor);
 				break;
+			case GuiCursor::Texture:
+				{
+					PushTexture push_texture(renderer, _cursor_texture.get(), Texture2D::TrilinearFilter);
+					renderer.set_texture_rect({ {}, SizeF{ _cursor_texture->size() } }, {});
+					renderer.draw_rect({ *cursor, SizeF{ _cursor_texture->size() } });
+				}
+				break;
 			default:
 				break;
 			}
 		}
+	}
+
+	void GuiLayer::set_cursor(GuiCursor cursor, const StaticString& texture)
+	{
+		_cursor = cursor;
+		if (_cursor == GuiCursor::Texture)
+			_cursor_texture = _gui.resource_loader().load_texture_2d(texture);
 	}
 
 	Widget* GuiLayer::widget_at(const PointF& point) const

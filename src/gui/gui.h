@@ -50,7 +50,6 @@ namespace Yttrium
 
 		GuiLayer& add_layer(const StaticString& name, bool is_transparent, bool is_root);
 		Allocator& allocator() const { return _allocator; }
-		GuiCursor default_cursor() const { return _default_cursor; }
 		void draw_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) const { if (_on_canvas) _on_canvas(renderer, name, rect); }
 		void draw_custom_cursor(Renderer& renderer, const PointF& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const StaticString& name) const;
@@ -60,7 +59,7 @@ namespace Yttrium
 		void quit() const { if (_on_quit) _on_quit(); }
 		ResourceLoader& resource_loader() const { return _resource_loader; }
 		ScriptContext& script_context() const { return _script_context; }
-		void set_default_cursor(GuiCursor cursor) { _default_cursor = cursor; }
+		void set_default_cursor(GuiCursor, const StaticString& texture = {});
 		void set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name);
 		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
 		void set_translation(const StaticString& path);
@@ -81,6 +80,7 @@ namespace Yttrium
 		ResourcePtr<const Translation> _translation;
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
+		ResourcePtr<const Texture2D> _default_cursor_texture;
 		std::function<void(Renderer&, const StaticString&, const RectF&)> _on_canvas;
 		std::function<void(Renderer&, const PointF&)> _on_custom_cursor;
 		std::function<void(const ResourcePtr<const Music>&)> _on_music;

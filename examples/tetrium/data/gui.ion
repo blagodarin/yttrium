@@ -39,7 +39,7 @@ class "button"
 	}
 }
 
-cursor "custom"
+cursor { texture "examples/tetrium/data/cursor.tga" }
 
 on_key "f10" { call "screenshot" } # KDE grabs "print" key. =(
 

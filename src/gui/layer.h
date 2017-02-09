@@ -20,6 +20,7 @@ namespace Yttrium
 	class GuiPrivate;
 	class Music;
 	class Renderer;
+	class Texture2D;
 	class Widget;
 
 	template <typename> class UniquePtr;
@@ -41,8 +42,9 @@ namespace Yttrium
 		bool has_music() const noexcept { return static_cast<bool>(_music); }
 		ResourcePtr<const Music> music() const { return *_music; }
 		void register_widget(Widget&);
-		void render(Renderer& renderer, const PointF* cursor);
-		void set_cursor(GuiCursor cursor) { _cursor = cursor; }
+		void render(Renderer&, const PointF* cursor);
+		void set_cursor(GuiCursor, const StaticString& texture = {});
+		void set_cursor(GuiCursor cursor, const ResourcePtr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
 		void set_music(const ResourcePtr<const Music>& music) { _music = music; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(const std::string& event, GuiActions&& actions) { _on_event[event] = std::move(actions); }
@@ -66,6 +68,7 @@ namespace Yttrium
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiActions _on_return;
 		GuiCursor _cursor = GuiCursor::None;
+		ResourcePtr<const Texture2D> _cursor_texture;
 		boost::optional<ResourcePtr<const Music>> _music;
 	};
 }
