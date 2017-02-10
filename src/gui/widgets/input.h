@@ -25,6 +25,7 @@ namespace Yttrium
 		mutable ForegroundProperty _foreground;
 		LineEditor _logic;
 		std::chrono::steady_clock::time_point _cursor_mark;
+		GuiActions _on_update;
 		GuiActions _on_enter;
 	};
 }

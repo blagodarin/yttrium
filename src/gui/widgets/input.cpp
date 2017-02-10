@@ -24,6 +24,7 @@ namespace Yttrium
 			|| !_foreground.load(loader))
 			return false;
 		_background.load(loader);
+		_on_update = loader.load_actions("on_update"_s);
 		_on_enter = loader.load_actions("on_enter"_s);
 		return true;
 	}
@@ -45,6 +46,8 @@ namespace Yttrium
 			default:
 				if (_logic.process_key(event))
 				{
+					_gui.script_context().set("_"_s, _logic.text());
+					_on_update.run(_gui);
 					_cursor_mark = std::chrono::steady_clock::now();
 					return true;
 				}

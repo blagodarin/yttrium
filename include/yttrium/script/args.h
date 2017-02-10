@@ -24,11 +24,8 @@ namespace Yttrium
 		/// Returns the number of values.
 		size_t size() const { return _values.size(); }
 
-		///
-		String string(size_t index) const;
-
 		/// Returns value at given index or \c nullptr if no such value exist.
-		const ScriptValue* value(size_t index) const;
+		const ScriptValue* operator[](size_t index) const;
 
 	private:
 		ScriptContext& _context;
