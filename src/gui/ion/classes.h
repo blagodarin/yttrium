@@ -1,15 +1,16 @@
 #ifndef _src_gui_ion_classes_h_
 #define _src_gui_ion_classes_h_
 
-#include <yttrium/std/map.h>
+#include <yttrium/resources/resource_ptr.h>
+
+#include <string>
+#include <unordered_map>
 
 namespace Yttrium
 {
+	class Allocator;
 	class IonDocument;
 	class IonObject;
-	template <typename> class ResourcePtr;
-	class StaticString;
-	class String;
 
 	class GuiClasses
 	{
@@ -17,13 +18,13 @@ namespace Yttrium
 		GuiClasses(Allocator&);
 		~GuiClasses();
 
-		bool add(const StaticString& name, const IonObject& source, const StaticString* base_class = nullptr);
+		bool add(const std::string& name, const IonObject& source, const std::string* base_class = nullptr);
 		void clear();
-		const IonObject* find(const StaticString& name) const;
+		const IonObject* find(const std::string& name) const;
 
 	private:
 		Allocator& _allocator;
-		StdMap<String, ResourcePtr<IonDocument>> _classes;
+		std::unordered_map<std::string, ResourcePtr<const IonDocument>> _classes;
 	};
 }
 

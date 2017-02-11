@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_script_args_h_
 #define _include_yttrium_script_args_h_
 
-#include <yttrium/std/vector.h>
+#include <yttrium/api.h>
+
+#include <vector>
 
 namespace Yttrium
 {
@@ -17,20 +19,14 @@ namespace Yttrium
 	class Y_API ScriptArgs
 	{
 	public:
+		std::size_t size() const { return _values.size(); }
 
-		///
-		int get_int(size_t index, int default_value) const;
-
-		/// Returns the number of values.
-		size_t size() const { return _values.size(); }
-
-		/// Returns value at given index or \c nullptr if no such value exist.
-		const ScriptValue* operator[](size_t index) const;
+		const ScriptValue* operator[](std::size_t) const;
 
 	private:
 		ScriptContext& _context;
-		const StdVector<ScriptValue*>& _values;
-		ScriptArgs(ScriptContext& context, const StdVector<ScriptValue*>& values) : _context(context), _values(values) {}
+		const std::vector<ScriptValue*>& _values;
+		ScriptArgs(ScriptContext& context, const std::vector<ScriptValue*>& values) : _context(context), _values(values) {}
 		friend ScriptCode;
 	};
 }

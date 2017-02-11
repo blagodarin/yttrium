@@ -6,7 +6,6 @@
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/std/map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
@@ -32,17 +31,16 @@ namespace Yttrium
 		};
 
 		Allocator& _allocator;
-		StdMap<String, Entry> _translations;
+		std::map<String, Entry> _translations;
 	};
 
 	TranslationImpl::TranslationImpl(const Reader& reader, Allocator& allocator)
 		: _allocator(allocator)
-		, _translations(_allocator)
 	{
 		const auto document = IonDocument::open(reader, _allocator);
 		if (!document)
 			throw DataError("Bad translation data");
-		decltype(_translations) translations(_allocator);
+		decltype(_translations) translations;
 		for (const auto& node : document->root())
 		{
 			if (node.name() != "tr"_s || node.size() != 2)

@@ -2,11 +2,12 @@
 #define _src_memory_named_allocator_list_h_
 
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 namespace Yttrium
 {
@@ -17,12 +18,12 @@ namespace Yttrium
 	class NamedAllocatorData
 	{
 	public:
-		NamedAllocatorData(String&& name)
+		NamedAllocatorData(std::string&& name)
 			: _name(std::move(name))
 		{
 		}
 
-		StaticString name() const { return _name; }
+		StaticString name() const { return StaticString{ _name }; }
 
 		void allocate(size_t size)
 		{
@@ -50,7 +51,7 @@ namespace Yttrium
 		std::atomic<size_t> _allocated_blocks{0};
 		std::atomic<size_t> _allocated_bytes{0};
 		std::atomic<size_t> _reallocations{0};
-		const String _name;
+		const std::string _name;
 	};
 
 	class NamedAllocators
@@ -60,12 +61,12 @@ namespace Yttrium
 		~NamedAllocators();
 
 	private:
-		NamedAllocatorData* data(String&&);
-		void enumerate(StdVector<NamedAllocatorInfo>&) const;
+		NamedAllocatorData* data(std::string&&);
+		void enumerate(std::vector<NamedAllocatorInfo>&) const;
 
 	private:
 		Allocator& _allocator;
-		StdVector<UniquePtr<NamedAllocatorData>> _list;
+		std::vector<std::unique_ptr<NamedAllocatorData>> _list;
 		mutable std::mutex _mutex;
 		friend BufferMemory;
 		friend NamedAllocator;

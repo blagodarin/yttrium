@@ -49,7 +49,7 @@ namespace Yttrium
 	}
 
 	Writer::Writer(const StaticString& path)
-		: _private(create_file_writer(path))
+		: _private(create_file_writer(path.to_std()))
 	{
 	}
 

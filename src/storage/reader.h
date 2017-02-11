@@ -11,7 +11,7 @@ namespace Yttrium
 	{
 	public:
 		ReaderPrivate(uint64_t size) : _size(size) {}
-		ReaderPrivate(uint64_t size, const String& name) : _name(name), _size(size) {}
+		ReaderPrivate(uint64_t size, std::string&& name) : _name(std::move(name)), _size(size) {}
 		virtual ~ReaderPrivate() = default;
 
 		virtual size_t read_at(uint64_t, void*, size_t) const = 0;
@@ -22,7 +22,7 @@ namespace Yttrium
 		virtual const void* data() const noexcept { return nullptr; }
 
 	private:
-		const String _name{ &NoAllocator };
+		const std::string _name;
 		const uint64_t _size;
 		uint64_t _offset = 0;
 		TinyStringMap _properties;
@@ -34,7 +34,7 @@ namespace Yttrium
 	{
 	public:
 		BufferReader(Buffer&&);
-		BufferReader(const std::shared_ptr<const Buffer>&, const String&);
+		BufferReader(const std::shared_ptr<const Buffer>&, std::string&&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 
@@ -49,7 +49,6 @@ namespace Yttrium
 	{
 	public:
 		ReaderReader(const std::shared_ptr<const ReaderPrivate>&, uint64_t base, uint64_t size);
-		ReaderReader(const std::shared_ptr<const ReaderPrivate>&, uint64_t base, uint64_t size, const String& name);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 

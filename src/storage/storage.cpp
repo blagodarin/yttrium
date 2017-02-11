@@ -3,9 +3,9 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/memory/unique_ptr.h>
-#include <yttrium/std/map.h>
-#include <yttrium/std/vector.h>
 #include "reader.h"
+
+#include <vector>
 
 namespace Yttrium
 {
@@ -19,7 +19,7 @@ namespace Yttrium
 
 		Type type;
 		UniquePtr<PackageReader> package;
-		String buffer_name{ &NoAllocator };
+		std::string buffer_name;
 		std::shared_ptr<const Buffer> buffer;
 
 		StorageAttachment(UniquePtr<PackageReader>&& package)
@@ -28,7 +28,7 @@ namespace Yttrium
 		{
 		}
 
-		StorageAttachment(String&& name, Buffer&& buffer)
+		StorageAttachment(std::string&& name, Buffer&& buffer)
 			: type(Type::Buffer)
 			, buffer_name(std::move(name))
 			, buffer(std::make_shared<const Buffer>(std::move(buffer)))
@@ -64,8 +64,8 @@ namespace Yttrium
 				}
 				else if (attachment.type == StorageAttachment::Type::Buffer)
 				{
-					if (attachment.buffer_name == name)
-						return Reader(std::make_shared<BufferReader>(attachment.buffer, attachment.buffer_name));
+					if (StaticString{ attachment.buffer_name } == name)
+						return Reader(std::make_shared<BufferReader>(attachment.buffer, std::string{ attachment.buffer_name }));
 				}
 			}
 			if (_use_file_system == Storage::UseFileSystem::After)
@@ -80,7 +80,7 @@ namespace Yttrium
 	private:
 		Allocator& _allocator;
 		const Storage::UseFileSystem _use_file_system;
-		StdVector<StorageAttachment> _attachments{ _allocator };
+		std::vector<StorageAttachment> _attachments;
 
 		friend Storage;
 	};
@@ -94,7 +94,7 @@ namespace Yttrium
 
 	void Storage::attach_buffer(const StaticString& name, Buffer&& buffer)
 	{
-		_private->_attachments.emplace_back(String(name, &_private->_allocator), std::move(buffer));
+		_private->_attachments.emplace_back(name.to_std(), std::move(buffer));
 	}
 
 	void Storage::attach_package(const StaticString& path, PackageType type)

@@ -3,11 +3,11 @@
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/std/map.h>
 #include <yttrium/string_format.h>
 
 #include <cassert>
 #include <iostream>
+#include <map>
 
 namespace Yttrium
 {
@@ -40,8 +40,8 @@ namespace Yttrium
 		Allocator& _allocator;
 		ScriptContext* const _parent;
 		Pool<ScriptValue> _value_pool{ 32, _allocator };
-		StdMap<String, ScriptValue*> _values{ _allocator };
-		StdMap<String, ScriptCommandContext> _commands{ _allocator };
+		std::map<String, ScriptValue*> _values;
+		std::map<String, ScriptCommandContext> _commands;
 	};
 
 	ScriptContext::ScriptContext(Allocator* allocator)

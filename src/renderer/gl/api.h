@@ -14,12 +14,12 @@
 	#define GLEND
 	#define GLEXTENSION(name) bool name = false;
 	#define GLFLOAT(name) GLfloat name = 0;
-	#define GLFLOATV(name, count) StdVector<GLfloat> name;
+	#define GLFLOATV(name, count) std::vector<GLfloat> name;
 	#define GLFUNCTION(name, ret, attr) ret (GLAPI_CALL *name)attr = nullptr;
 	#define GLINTEGER(name) GLint name = 0;
-	#define GLINTEGERV(name, count) StdVector<GLint> name;
+	#define GLINTEGERV(name, count) std::vector<GLint> name;
 	#define GLSTRING(name) const char* name = nullptr;
-	#define GLSTRINGV(name, count) StdVector<StaticString> name;
+	#define GLSTRINGV(name, count) std::vector<std::string> name; // TODO: Use std::string_view in C++17.
 #endif
 
 // OpenGL 1.0

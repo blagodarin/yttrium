@@ -316,15 +316,6 @@ target_sources(yttrium PRIVATE
 	)
 
 ########################################################################################################################
-# std
-target_sources(yttrium PRIVATE
-	../include/yttrium/std/allocator.h
-	../include/yttrium/std/map.h
-	../include/yttrium/std/unordered_map.h
-	../include/yttrium/std/vector.h
-	)
-
-########################################################################################################################
 # storage
 target_sources(yttrium PRIVATE
 	../include/yttrium/storage/package.h

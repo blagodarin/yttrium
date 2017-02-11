@@ -13,7 +13,6 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/resources/translation.h>
-#include <yttrium/std/map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
 
@@ -26,7 +25,7 @@ namespace Yttrium
 	{
 		const Storage& _storage;
 		Allocator& _allocator;
-		StdMap<String, ResourcePtr<const T>> _map{ _allocator };
+		std::map<String, ResourcePtr<const T>> _map;
 		std::mutex _mutex;
 
 		ResourceCache(const Storage& storage, Allocator& allocator)
@@ -180,7 +179,7 @@ namespace Yttrium
 	{
 		return _private->_texture_font_cache.fetch(name, [this](Reader&& reader)
 		{
-			return TextureFont::open(std::move(reader), _private->_allocator);
+			return TextureFont::open(std::move(reader));
 		});
 	}
 

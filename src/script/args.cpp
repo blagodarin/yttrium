@@ -5,11 +5,6 @@
 
 namespace Yttrium
 {
-	int ScriptArgs::get_int(size_t index, int default_value) const
-	{
-		return index < _values.size() ? _values[index]->to_int() : default_value;
-	}
-
 	const ScriptValue* ScriptArgs::operator[](size_t index) const
 	{
 		if (index >= _values.size())

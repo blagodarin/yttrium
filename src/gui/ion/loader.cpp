@@ -167,8 +167,15 @@ namespace Yttrium
 		const auto& element = ::load_element(node);
 		if (!element.object || !element.name)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		if (!_classes.add(*element.name, *element.object, element.attribute))
-			throw GuiDataError("Bad '"_s, node.name(), "' \""_s, *element.name, "\""_s);
+		if (element.attribute)
+		{
+			const auto attribute = element.attribute->to_std();
+			if (_classes.add(element.name->to_std(), *element.object, &attribute))
+				return;
+		}
+		else if (_classes.add(element.name->to_std(), *element.object))
+			return;
+		throw GuiDataError("Bad '"_s, node.name(), "' \""_s, *element.name, "\""_s);
 	}
 
 	void GuiIonLoader::load_cursor(const IonNode& node, unsigned)
@@ -342,7 +349,7 @@ namespace Yttrium
 			if (element.name)
 				throw GuiDataError("Widget names are not supported"_s);
 
-			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(*element.attribute) : nullptr), _gui);
+			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(element.attribute->to_std()) : nullptr), _gui);
 			if (_has_default_font)
 				loader.set_default_font_name(&_default_font_name);
 			screen.register_widget(layout.add_widget(layout_node.name(), loader));

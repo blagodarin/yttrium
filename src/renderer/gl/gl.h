@@ -1,8 +1,10 @@
 #ifndef _src_renderer_gl_gl_h_
 #define _src_renderer_gl_gl_h_
 
-#include <yttrium/std/vector.h>
 #include "../../system/gl.h"
+
+#include <string>
+#include <vector>
 
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -16,7 +18,7 @@ namespace Yttrium
 	public:
 		#include "api.h"
 
-		GlApi(Allocator&);
+		GlApi();
 
 		GlApi(const GlApi&) = delete;
 		GlApi(GlApi&&) = delete;

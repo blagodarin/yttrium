@@ -3,9 +3,9 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
-#include <yttrium/std/vector.h>
 
 #include <memory>
+#include <vector>
 
 namespace Yttrium
 {

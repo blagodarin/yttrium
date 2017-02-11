@@ -10,7 +10,6 @@
 #include <yttrium/memory/unique_ptr.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/std/vector.h>
 #include <yttrium/string.h>
 
 #include <memory>
@@ -44,7 +43,7 @@ namespace Yttrium
 		ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) override;
 		void draw_debug_text(const StaticString&) override;
 		void draw_rect(const RectF&, const Vector4&) override;
-		void draw_rects(const StdVector<TexturedRect>&, const Vector4&) override;
+		void draw_rects(const std::vector<TexturedRect>&, const Vector4&) override;
 		Matrix4 full_matrix() const override;
 		ResourcePtr<Mesh> load_mesh(Reader&&) override;
 		Matrix4 model_matrix() const override;
@@ -124,21 +123,21 @@ namespace Yttrium
 			Model,
 		};
 
-		StdVector<std::pair<Matrix4, MatrixType>> _matrix_stack;
+		std::vector<std::pair<Matrix4, MatrixType>> _matrix_stack;
 
-		StdVector<std::pair<const Texture2D*, int>> _texture_stack;
+		std::vector<std::pair<const Texture2D*, int>> _texture_stack{ { nullptr, 1 } };
 		const Texture2D* _current_texture = nullptr;
 		Texture2D::Filter _current_texture_filter = Texture2D::NearestFilter;
 		bool _reset_texture = false;
 #ifndef NDEBUG
-		StdVector<const Texture2D*> _seen_textures; // For redundancy statistics.
+		std::vector<const Texture2D*> _seen_textures; // For redundancy statistics.
 #endif
 
-		StdVector<std::pair<const GpuProgram*, int>> _program_stack;
+		std::vector<std::pair<const GpuProgram*, int>> _program_stack{ { nullptr, 1 } };
 		const GpuProgram* _current_program = nullptr;
 		bool _reset_program = false;
 #ifndef NDEBUG
-		StdVector<const GpuProgram*> _seen_programs; // For redundancy statistics.
+		std::vector<const GpuProgram*> _seen_programs; // For redundancy statistics.
 #endif
 	};
 }

@@ -8,10 +8,7 @@
 
 namespace Yttrium
 {
-	GlApi::GlApi(Allocator& allocator)
-		: MAX_VIEWPORT_DIMS(allocator)
-		, COMPRESSED_TEXTURE_FORMATS(allocator)
-		, EXTENSIONS(allocator)
+	GlApi::GlApi()
 	{
 #define GLAPI_GET_FUNCTION(name) gl_address(name)
 #define GLAPI_HAS_EXTENSION(name) has_extension(name)

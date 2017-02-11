@@ -4,10 +4,6 @@
 #include <yttrium/renderer/index_buffer.h>
 #include <yttrium/renderer/vertex_buffer.h>
 
-#include <yttrium/std/vector.h>
-
-#include <initializer_list>
-
 namespace Yttrium
 {
 	class IndexBufferImpl : public IndexBuffer

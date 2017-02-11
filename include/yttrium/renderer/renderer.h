@@ -5,7 +5,8 @@
 #define _include_yttrium_renderer_renderer_h_
 
 #include <yttrium/math/vector.h>
-#include <yttrium/std/vector.h>
+
+#include <vector>
 
 namespace Yttrium
 {
@@ -40,7 +41,7 @@ namespace Yttrium
 		virtual UniquePtr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
 
 		///
-		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, size_t count, const void* data = nullptr) = 0;
+		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, std::size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) = 0;
@@ -49,7 +50,7 @@ namespace Yttrium
 		virtual ResourcePtr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;
 
 		///
-		virtual UniquePtr<VertexBuffer> create_vertex_buffer(std::initializer_list<VA>, size_t count, const void* data = nullptr) = 0;
+		virtual UniquePtr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual void draw_debug_text(const StaticString&) = 0;
@@ -61,7 +62,7 @@ namespace Yttrium
 		virtual void draw_rect(const RectF&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
 
 		///
-		virtual void draw_rects(const StdVector<TexturedRect>&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
+		virtual void draw_rects(const std::vector<TexturedRect>&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;

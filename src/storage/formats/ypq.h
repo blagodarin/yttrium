@@ -2,7 +2,6 @@
 #define _src_storage_formats_ypq_h_
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/std/map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 #include "../package.h"
@@ -25,7 +24,7 @@ namespace Yttrium
 		const String _name;
 		const Reader _reader;
 		Buffer _metadata_buffer;
-		StdMap<StaticString, Entry> _entries;
+		std::map<StaticString, Entry> _entries;
 		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the metadata buffer.
 	};
 

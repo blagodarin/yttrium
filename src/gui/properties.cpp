@@ -77,11 +77,7 @@ namespace Yttrium
 		loader.load_margins("borders"_s, borders);
 	}
 
-	ForegroundProperty::ForegroundProperty(Allocator& allocator)
-		: geometry(allocator)
-	{
-	}
-
+	ForegroundProperty::ForegroundProperty() = default;
 	ForegroundProperty::~ForegroundProperty() = default;
 
 	void ForegroundProperty::draw(Renderer& renderer) const

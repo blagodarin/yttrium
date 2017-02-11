@@ -18,7 +18,6 @@ namespace Yttrium
 {
 	GlRenderer::GlRenderer(Allocator& allocator)
 		: RendererImpl(allocator)
-		, _gl(allocator)
 		, _2d_ibo(_gl, GL_ELEMENT_ARRAY_BUFFER)
 		, _2d_vbo(_gl, GL_ARRAY_BUFFER)
 		, _2d_vao(_gl)
@@ -141,9 +140,9 @@ namespace Yttrium
 		return make_resource<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));
 	}
 
-	UniquePtr<VertexBuffer> GlRenderer::create_vertex_buffer(std::initializer_list<VA> format, size_t count, const void* data)
+	UniquePtr<VertexBuffer> GlRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
 	{
-		assert(format.size() > 0);
+		assert(!format.empty());
 
 		GlVertexArrayHandle vertex_array(_gl);
 

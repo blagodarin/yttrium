@@ -16,7 +16,6 @@ namespace Yttrium
 	ButtonWidget::ButtonWidget(GuiPrivate& gui)
 		: Widget(gui)
 		, _text(&_gui.allocator())
-		, _foreground(_gui.allocator())
 	{
 	}
 

@@ -4,7 +4,6 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/utils.h>
-#include <yttrium/resources/resource_ptr.h>
 
 namespace
 {
@@ -24,21 +23,20 @@ namespace Yttrium
 {
 	GuiClasses::GuiClasses(Allocator& allocator)
 		: _allocator(allocator)
-		, _classes(_allocator)
 	{
 	}
 
 	GuiClasses::~GuiClasses() = default;
 
-	bool GuiClasses::add(const StaticString& name, const IonObject& source, const StaticString* base_class)
+	bool GuiClasses::add(const std::string& name, const IonObject& source, const std::string* base_class)
 	{
-		if (name.is_empty() || _classes.find(String(name, ByReference())) != _classes.end())
+		if (name.empty() || _classes.find(name) != _classes.end())
 			return false;
 
-		IonObject* base = nullptr;
+		const IonObject* base = nullptr;
 		if (base_class)
 		{
-			auto i = _classes.find(String(*base_class, ByReference()));
+			const auto i = _classes.find(*base_class);
 			if (i == _classes.end())
 				return false;
 			base = &i->second->root();
@@ -49,7 +47,7 @@ namespace Yttrium
 		if (base)
 			::update_document(document->root(), *base);
 
-		_classes.emplace(String(name, &_allocator), std::move(document));
+		_classes.emplace(name, std::move(document));
 
 		return true;
 	}
@@ -59,9 +57,9 @@ namespace Yttrium
 		_classes.clear();
 	}
 
-	const IonObject* GuiClasses::find(const StaticString& name) const
+	const IonObject* GuiClasses::find(const std::string& name) const
 	{
-		auto i = _classes.find(String(name, ByReference()));
+		const auto i = _classes.find(name);
 		return i != _classes.end() ? &i->second->root() : nullptr;
 	}
 }

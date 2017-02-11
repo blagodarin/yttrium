@@ -19,8 +19,8 @@ namespace Yttrium
 	class FileReader : public ReaderPrivate
 	{
 	public:
-		FileReader(uint64_t size, const String& name, int descriptor)
-			: ReaderPrivate(size, name)
+		FileReader(uint64_t size, std::string&& name, int descriptor)
+			: ReaderPrivate(size, std::move(name))
 			, _descriptor(descriptor)
 		{
 		}
@@ -44,7 +44,7 @@ namespace Yttrium
 	class FileWriter : public WriterPrivate
 	{
 	public:
-		FileWriter(uint64_t size, String&& name, int descriptor)
+		FileWriter(uint64_t size, std::string&& name, int descriptor)
 			: WriterPrivate(size)
 			, _name(std::move(name))
 			, _descriptor(descriptor)
@@ -55,7 +55,7 @@ namespace Yttrium
 		{
 			if (::close(_descriptor) == -1)
 				::perror("ERROR! 'close' failed");
-			if (_unlink && ::unlink(_name.text()) == -1)
+			if (_unlink && ::unlink(_name.c_str()) == -1)
 				::perror("ERROR! 'unlink' failed");
 		}
 
@@ -81,52 +81,50 @@ namespace Yttrium
 		}
 
 	private:
-		const String _name;
+		const std::string _name;
 		const int _descriptor;
 		bool _unlink = false;
 	};
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(const StaticString& path)
+	std::shared_ptr<ReaderPrivate> create_file_reader(std::string&& path)
 	{
 #ifdef __linux__
 		const int flags = O_RDONLY | O_NOATIME;
 #else
 		const int flags = O_RDONLY;
 #endif
-		String name(path); // Guaranteed to be null-terminated.
-		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		const auto descriptor = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
-		return std::make_shared<FileReader>(size, std::move(name), descriptor);
+		return std::make_shared<FileReader>(size, std::move(path), descriptor);
 	}
 
 	std::shared_ptr<ReaderPrivate> create_file_reader(const TemporaryFile& file)
 	{
-		return create_file_reader(file.name());
+		return create_file_reader(file.name().to_std());
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(const StaticString& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(std::string&& path)
 	{
 #ifdef __linux__
 		const int flags = O_WRONLY | O_CREAT | O_TRUNC | O_NOATIME;
 #else
 		const int flags = O_WRONLY | O_CREAT | O_TRUNC;
 #endif
-		String name(path); // Guaranteed to be null-terminated.
-		const auto descriptor = ::open(name.text(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		const auto descriptor = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
-		return std::make_unique<FileWriter>(size, std::move(name), descriptor);
+		return std::make_unique<FileWriter>(size, std::move(path), descriptor);
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
 	{
-		return create_file_writer(file.name());
+		return create_file_writer(file.name().to_std());
 	}
 }

@@ -39,7 +39,7 @@ namespace
 namespace Yttrium
 {
 	BufferMemory::BufferMemory()
-		: _named_allocator_data(_named_allocators.data(String("buffers"_s, &_heap_allocator)))
+		: _named_allocator_data(_named_allocators.data("buffers"))
 	{
 	}
 

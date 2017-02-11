@@ -8,7 +8,7 @@
 
 namespace Yttrium
 {
-	class BadPackage
+	class BadPackage // TODO: Use variadic constructor.
 	{
 	public:
 		BadPackage(String&& what) : _what(std::move(what)) {}

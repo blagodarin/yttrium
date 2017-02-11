@@ -45,7 +45,6 @@ namespace Yttrium
 	YpqReader::YpqReader(String&& name, Reader&& reader, Allocator& allocator)
 		: _name(std::move(name))
 		, _reader(std::move(reader))
-		, _entries(allocator)
 	{
 		YpqHeader header;
 		if (!_reader.read_at(0, header)

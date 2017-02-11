@@ -11,7 +11,7 @@ namespace Yttrium
 {
 	void NamedAllocatorData::store(NamedAllocatorInfo& info)
 	{
-		info.name = _name;
+		info.name = StaticString{ _name };
 		info.allocations = _allocations.load(std::memory_order_relaxed);
 		info.blocks = _allocated_blocks.load(std::memory_order_relaxed);
 		info.bytes = _allocated_bytes.load(std::memory_order_relaxed);
@@ -20,7 +20,6 @@ namespace Yttrium
 
 	NamedAllocators::NamedAllocators(Allocator& allocator)
 		: _allocator(allocator)
-		, _list(_allocator)
 	{
 	}
 
@@ -49,17 +48,17 @@ namespace Yttrium
 			std::abort();
 	}
 
-	NamedAllocatorData* NamedAllocators::data(String&& name)
+	NamedAllocatorData* NamedAllocators::data(std::string&& name)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		for (const auto& data : _list)
-			if (data->name() == name)
+			if (data->name() == StaticString{ name })
 				return data.get();
-		_list.emplace_back(make_unique<NamedAllocatorData>(_allocator, std::move(name)));
+		_list.emplace_back(std::make_unique<NamedAllocatorData>(std::move(name)));
 		return _list.back().get();
 	}
 
-	void NamedAllocators::enumerate(StdVector<NamedAllocatorInfo>& infos) const
+	void NamedAllocators::enumerate(std::vector<NamedAllocatorInfo>& infos) const
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		infos.resize(_list.size());
@@ -80,15 +79,12 @@ namespace Yttrium
 		}
 	};
 
-	NamedAllocator::NamedAllocator(const StaticString& name)
-		: _private(make_unique<NamedAllocatorPrivate>(_heap_allocator, _heap_allocator,
-			_named_allocators.data(name.is_empty()
-				? String("heap"_s, &_heap_allocator)
-				: String("heap."_s.size() + name.size(), &_heap_allocator) << "heap."_s << name)))
+	NamedAllocator::NamedAllocator(const std::string& name)
+		: _private(std::make_unique<NamedAllocatorPrivate>(_heap_allocator, _named_allocators.data(name.empty() ? "heap" : "heap." + name)))
 	{
 	}
 
-	void NamedAllocator::enumerate(StdVector<NamedAllocatorInfo>& infos)
+	void NamedAllocator::enumerate(std::vector<NamedAllocatorInfo>& infos)
 	{
 		_named_allocators.enumerate(infos);
 	}

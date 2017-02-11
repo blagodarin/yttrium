@@ -74,15 +74,6 @@ namespace Yttrium
 
 	RendererImpl::RendererImpl(Allocator& allocator)
 		: _allocator(allocator)
-		, _matrix_stack(_allocator)
-		, _texture_stack({{nullptr, 1}}, _allocator)
-#ifndef NDEBUG
-		, _seen_textures(_allocator)
-#endif
-		, _program_stack({{nullptr, 1}}, _allocator)
-#ifndef NDEBUG
-		, _seen_programs(_allocator)
-#endif
 	{
 	}
 
@@ -117,9 +108,9 @@ namespace Yttrium
 		draw_rect(rect, color, _texture_rect, _texture_borders);
 	}
 
-	void RendererImpl::draw_rects(const StdVector<TexturedRect>& rects, const Vector4& color)
+	void RendererImpl::draw_rects(const std::vector<TexturedRect>& rects, const Vector4& color)
 	{
-		const auto& texture_size = SizeF(current_texture_2d()->size());
+		const auto& texture_size = SizeF{ current_texture_2d()->size() };
 		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
 		for (const auto& rect : rects)
 			draw_rect(rect.geometry, color, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});

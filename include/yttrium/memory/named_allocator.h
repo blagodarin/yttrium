@@ -4,9 +4,11 @@
 #ifndef _include_yttrium_memory_named_allocator_h_
 #define _include_yttrium_memory_named_allocator_h_
 
-#include <yttrium/memory/unique_ptr.h>
+#include <yttrium/memory/allocator.h>
 #include <yttrium/static_string.h>
-#include <yttrium/std/vector.h>
+
+#include <memory>
+#include <vector>
 
 namespace Yttrium
 {
@@ -27,17 +29,17 @@ namespace Yttrium
 		~NamedAllocator() override;
 
 		/// Creates a named allocator for heap memory allocations.
-		NamedAllocator(const StaticString& name);
+		NamedAllocator(const std::string& name);
 
 		///
-		static void enumerate(StdVector<NamedAllocatorInfo>&);
+		static void enumerate(std::vector<NamedAllocatorInfo>&);
 
 	private:
 		void* do_allocate(size_t, size_t) override;
 		void do_deallocate(void*, bool) noexcept override;
 
 	private:
-		const UniquePtr<class NamedAllocatorPrivate> _private;
+		const std::unique_ptr<class NamedAllocatorPrivate> _private;
 	};
 }
 

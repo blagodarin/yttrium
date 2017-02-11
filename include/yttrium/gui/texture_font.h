@@ -6,7 +6,8 @@
 
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource.h>
-#include <yttrium/std/vector.h>
+
+#include <vector>
 
 namespace Yttrium
 {
@@ -31,10 +32,10 @@ namespace Yttrium
 		///
 		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static ResourcePtr<TextureFont> open(Reader&&, Allocator&);
+		static ResourcePtr<TextureFont> open(Reader&&);
 
 		///
-		virtual void build(StdVector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;
+		virtual void build(std::vector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;
 
 		///
 		virtual Rect rect() const = 0;

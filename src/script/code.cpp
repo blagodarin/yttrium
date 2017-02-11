@@ -16,11 +16,10 @@ namespace Yttrium
 	struct ScriptCommand
 	{
 		String name;
-		StdVector<ScriptValue*> args;
+		std::vector<ScriptValue*> args;
 
 		ScriptCommand(const StaticString& name, Allocator& allocator)
 			: name(name, &allocator)
-			, args(allocator)
 		{
 		}
 	};
@@ -105,7 +104,7 @@ namespace Yttrium
 
 	public:
 		Allocator& _allocator;
-		StdVector<ScriptCommand> _commands{ _allocator };
+		std::vector<ScriptCommand> _commands;
 		Pool<ScriptValue> _temporaries{ 32, _allocator };
 	};
 

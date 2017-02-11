@@ -4,10 +4,11 @@
 #include <yttrium/gui/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/std/unordered_map.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/utils.h>
 #include "texture_font.h"
+
+#include <unordered_map>
 
 namespace
 {
@@ -24,14 +25,12 @@ namespace Yttrium
 	class TextureFontImpl final : public TextureFont
 	{
 	public:
-		TextureFontImpl(Allocator& allocator, int size)
+		TextureFontImpl(int size)
 			: _size(size)
-			, _chars(allocator)
-			, _kernings(allocator)
 		{
 		}
 
-		void build(StdVector<TexturedRect>& rects, const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture) const override
+		void build(std::vector<TexturedRect>& rects, const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture) const override
 		{
 			rects.clear();
 
@@ -121,14 +120,14 @@ namespace Yttrium
 
 	private:
 		const int _size;
-		StdUnorderedMap<char, TextureFont::CharInfo> _chars;
-		StdUnorderedMap<uint16_t, int> _kernings;
+		std::unordered_map<char, TextureFont::CharInfo> _chars;
+		std::unordered_map<uint16_t, int> _kernings;
 		Rect _rect;
 
 		friend TextureFont;
 	};
 
-	ResourcePtr<TextureFont> TextureFont::open(Reader&& reader, Allocator& allocator)
+	ResourcePtr<TextureFont> TextureFont::open(Reader&& reader)
 	{
 		if (!reader)
 			return nullptr;
@@ -153,7 +152,7 @@ namespace Yttrium
 		if (!reader.read(char_count))
 			throw DataError("Bad 'char' section header");
 
-		auto font = make_resource<TextureFontImpl>(allocator, font_section.size);
+		auto font = make_resource<TextureFontImpl>(font_section.size);
 
 		Size font_rect_size;
 		for (uint8_t i = 0; i < char_count; ++i)
