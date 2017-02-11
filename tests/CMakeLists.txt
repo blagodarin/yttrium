@@ -19,7 +19,6 @@ add_executable(unit_tests
 	string_format.cpp
 	texture_font.cpp
 	tiny_string_map.cpp
-	unique_ptr.cpp
 	utils.cpp
 	vector.cpp
 	)

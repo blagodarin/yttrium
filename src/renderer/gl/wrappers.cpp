@@ -79,18 +79,16 @@ namespace Yttrium
 		_gl.AttachShader(_handle, shader);
 	}
 
-	String GlProgramHandle::info_log(Allocator& allocator) const
+	std::string GlProgramHandle::info_log() const
 	{
-		String result(&allocator);
 		GLint info_log_length = 0;
 		_gl.GetProgramiv(_handle, GL_INFO_LOG_LENGTH, &info_log_length);
-		if (info_log_length > 0)
-		{
-			result.resize(info_log_length - 1);
-			GLsizei length = 0;
-			_gl.GetProgramInfoLog(_handle, info_log_length, &length, result.text());
-			assert(static_cast<GLsizei>(result.size()) == length);
-		}
+		if (info_log_length <= 1)
+			return {};
+		std::string result(info_log_length - 1, ' ');
+		GLsizei length = 0;
+		_gl.GetProgramInfoLog(_handle, info_log_length, &length, &result[0]);
+		assert(length == info_log_length - 1);
 		return result;
 	}
 
@@ -141,18 +139,16 @@ namespace Yttrium
 		return GL_TRUE == compile_status;
 	}
 
-	String GlShaderHandle::info_log(Allocator& allocator) const
+	std::string GlShaderHandle::info_log() const
 	{
-		String result(&allocator);
 		GLint info_log_length = 0;
 		_gl.GetShaderiv(_handle, GL_INFO_LOG_LENGTH, &info_log_length);
-		if (info_log_length > 0)
-		{
-			result.resize(info_log_length - 1);
-			GLsizei length = 0;
-			_gl.GetShaderInfoLog(_handle, info_log_length, &length, result.text());
-			assert(static_cast<GLsizei>(result.size()) == length);
-		}
+		if (info_log_length <= 1)
+			return {};
+		std::string result(info_log_length - 1, ' ');
+		GLsizei length = 0;
+		_gl.GetShaderInfoLog(_handle, info_log_length, &length, &result[0]);
+		assert(length == info_log_length - 1);
 		return result;
 	}
 

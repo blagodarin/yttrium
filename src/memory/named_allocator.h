@@ -1,7 +1,6 @@
 #ifndef _src_memory_named_allocator_list_h_
 #define _src_memory_named_allocator_list_h_
 
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/string.h>
 
 #include <atomic>

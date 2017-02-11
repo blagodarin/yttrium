@@ -48,13 +48,13 @@ namespace Yttrium
 		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
 	}
 
-	UniquePtr<GpuProgram> GlRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
+	std::unique_ptr<GpuProgram> GlRenderer::create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader)
 	{
 		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
 		if (!vertex.compile(vertex_shader))
 		{
 #ifndef NDEBUG
-			std::cerr << vertex.info_log(allocator()) << "\n";
+			std::cerr << vertex.info_log() << "\n";
 #endif
 			return {};
 		}
@@ -63,26 +63,26 @@ namespace Yttrium
 		if (!fragment.compile(fragment_shader))
 		{
 #ifndef NDEBUG
-			std::cerr << fragment.info_log(allocator()) << "\n";
+			std::cerr << fragment.info_log() << "\n";
 #endif
 			return {};
 		}
 
-		auto result = make_unique<GlGpuProgram>(allocator(), *this, std::move(vertex), std::move(fragment), _gl);
+		auto result = std::make_unique<GlGpuProgram>(*this, std::move(vertex), std::move(fragment), _gl);
 		if (!result->link())
 			return {};
 
-		return std::move(result);
+		return result;
 	}
 
-	UniquePtr<IndexBuffer> GlRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
+	std::unique_ptr<IndexBuffer> GlRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
 	{
 		const size_t element_size = (format == IndexFormat::U16) ? 2 : 4;
 		const size_t gl_format = (format == IndexFormat::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
 		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
 		buffer.initialize(GL_STATIC_DRAW, count * element_size, data);
-		return make_unique<GlIndexBuffer>(allocator(), format, count, element_size, std::move(buffer), gl_format);
+		return std::make_unique<GlIndexBuffer>(format, count, element_size, std::move(buffer), gl_format);
 	}
 
 	ResourcePtr<Texture2D> GlRenderer::create_texture_2d(const Image& image, bool no_mipmaps)
@@ -140,7 +140,7 @@ namespace Yttrium
 		return make_resource<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));
 	}
 
-	UniquePtr<VertexBuffer> GlRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
+	std::unique_ptr<VertexBuffer> GlRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
 	{
 		assert(!format.empty());
 
@@ -177,7 +177,7 @@ namespace Yttrium
 		buffer.initialize(GL_STATIC_DRAW, count * offset, data);
 		vertex_array.bind_vertex_buffer(0, buffer.get(), 0, offset);
 
-		return make_unique<GlVertexBuffer>(allocator(), count, offset, std::move(buffer), std::move(vertex_array));
+		return std::make_unique<GlVertexBuffer>(count, offset, std::move(buffer), std::move(vertex_array));
 	}
 
 	void GlRenderer::draw_mesh(const Mesh& mesh)
@@ -359,22 +359,22 @@ namespace Yttrium
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			std::cerr << "[OPENGL] [error] "_s;
+			std::cerr << "[OPENGL] [error] ";
 			break;
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			std::cerr << "[OPENGL] [deprecated] "_s;
+			std::cerr << "[OPENGL] [deprecated] ";
 			break;
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			std::cerr << "[OPENGL] [undefined behavior] "_s;
+			std::cerr << "[OPENGL] [undefined behavior] ";
 			break;
 		case GL_DEBUG_TYPE_PORTABILITY:
-			std::cerr << "[OPENGL] [portability warning] "_s;
+			std::cerr << "[OPENGL] [portability warning] ";
 			break;
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			std::cerr << "[OPENGL] [performance warning] "_s;
+			std::cerr << "[OPENGL] [performance warning] ";
 			break;
 		default:
-			std::cerr << "[OPENGL] "_s;
+			std::cerr << "[OPENGL] ";
 			stop = false;
 			break;
 		}

@@ -6,6 +6,7 @@
 
 #include <yttrium/math/vector.h>
 
+#include <memory>
 #include <vector>
 
 namespace Yttrium
@@ -25,7 +26,6 @@ namespace Yttrium
 	class StaticString;
 	class Texture2D;
 	class TexturedRect;
-	template <typename> class UniquePtr;
 	enum class VA;
 	class VertexBuffer;
 
@@ -38,10 +38,10 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual UniquePtr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
+		virtual std::unique_ptr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
 
 		///
-		virtual UniquePtr<IndexBuffer> create_index_buffer(IndexFormat, std::size_t count, const void* data = nullptr) = 0;
+		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexFormat, std::size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) = 0;
@@ -50,7 +50,7 @@ namespace Yttrium
 		virtual ResourcePtr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;
 
 		///
-		virtual UniquePtr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
+		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
 
 		///
 		virtual void draw_debug_text(const StaticString&) = 0;

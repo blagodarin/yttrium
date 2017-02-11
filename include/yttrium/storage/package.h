@@ -4,17 +4,16 @@
 #ifndef _include_yttrium_storage_package_h_
 #define _include_yttrium_storage_package_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <map>
+#include <memory>
 #include <string>
 
 namespace Yttrium
 {
 	class Reader;
 	class StaticString;
-
-	template <typename> class UniquePtr;
 
 	/// Package file types.
 	enum class PackageType
@@ -28,7 +27,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<PackageReader> create(const StaticString& path, PackageType = PackageType::Auto, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<PackageReader> create(const StaticString& path, PackageType = PackageType::Auto);
 
 		PackageReader() = default;
 		virtual ~PackageReader() = default;
@@ -42,7 +41,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static UniquePtr<PackageWriter> create(const StaticString& path, PackageType = PackageType::Auto, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<PackageWriter> create(const StaticString& path, PackageType = PackageType::Auto);
 
 		PackageWriter() = default;
 		virtual ~PackageWriter() = default;

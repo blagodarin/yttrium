@@ -1,5 +1,4 @@
 #include <yttrium/memory/buffer.h>
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/reader.h>

@@ -7,10 +7,7 @@
 
 namespace Yttrium
 {
-	class Allocator;
 	class RendererImpl;
-	class StaticString;
-	class String;
 
 	class GlGpuProgram : public GpuProgram
 	{
@@ -18,7 +15,7 @@ namespace Yttrium
 		GlGpuProgram(RendererImpl&, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);
 		~GlGpuProgram() override;
 
-		void set_uniform(const StaticString&, const Matrix4&) override;
+		void set_uniform(const std::string&, const Matrix4&) override;
 
 		GLuint handle() const { return _program.get(); }
 		bool link();

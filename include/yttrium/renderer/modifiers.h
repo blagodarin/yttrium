@@ -4,8 +4,9 @@
 #ifndef _include_yttrium_renderer_modifiers_h_
 #define _include_yttrium_renderer_modifiers_h_
 
-#include <yttrium/api.h>
 #include <yttrium/renderer/texture.h>
+
+#include <string>
 
 namespace Yttrium
 {
@@ -13,7 +14,6 @@ namespace Yttrium
 	class Material;
 	class Matrix4;
 	class Renderer;
-	class StaticString;
 
 	/// Base class for Renderer modifiers.
 	class Y_API RendererModifier
@@ -81,7 +81,7 @@ namespace Yttrium
 		PushMaterial(Renderer&, const Material*);
 
 		///
-		void set_uniform(const StaticString&, const Matrix4&);
+		void set_uniform(const std::string&, const Matrix4&);
 
 	private:
 		const Material* const _material;

@@ -212,7 +212,6 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/memory/named_allocator.h
 	../include/yttrium/memory/pool.h
 	../include/yttrium/memory/temporary_allocator.h
-	../include/yttrium/memory/unique_ptr.h
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
 	memory/buffer_memory_tracker.cpp

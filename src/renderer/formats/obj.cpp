@@ -3,7 +3,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer_appender.h>
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/renderer/index_buffer.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>

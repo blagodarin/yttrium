@@ -7,7 +7,6 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
 #include <yttrium/string.h>
@@ -114,7 +113,7 @@ namespace Yttrium
 
 		ResourcePtr<Texture2D> _white_texture;
 		ResourcePtr<Texture2D> _debug_texture;
-		UniquePtr<GpuProgram> _program_2d;
+		std::unique_ptr<GpuProgram> _program_2d;
 
 		enum class MatrixType
 		{

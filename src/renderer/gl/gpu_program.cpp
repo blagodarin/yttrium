@@ -23,10 +23,9 @@ namespace Yttrium
 		_renderer.forget_program(this);
 	}
 
-	void GlGpuProgram::set_uniform(const StaticString& name, const Matrix4& value)
+	void GlGpuProgram::set_uniform(const std::string& name, const Matrix4& value)
 	{
-		const std::string name_z(name.text(), name.size()); // Guaranteed to be null-terminated.
-		_program.set_uniform(name_z.c_str(), value);
+		_program.set_uniform(name.c_str(), value);
 	}
 
 	bool GlGpuProgram::link()
@@ -34,7 +33,7 @@ namespace Yttrium
 		if (_program.link())
 			return true;
 #ifndef NDEBUG
-		std::cerr << _program.info_log(_renderer.allocator()) << "\n";
+		std::cerr << _program.info_log() << "\n";
 #endif
 		return false;
 	}

@@ -5,10 +5,8 @@
 
 namespace Yttrium
 {
-	class Allocator;
 	class Matrix4;
 	class StaticString;
-	class String;
 
 	class GlBufferHandle
 	{
@@ -44,7 +42,7 @@ namespace Yttrium
 
 		void attach(GLuint) const;
 		GLuint get() const { return _handle; }
-		String info_log(Allocator&) const;
+		std::string info_log() const;
 		bool link() const;
 		void set_uniform(const char*, const Matrix4&) const;
 
@@ -66,7 +64,7 @@ namespace Yttrium
 
 		bool compile(const StaticString&) const;
 		GLuint get() const { return _handle; }
-		String info_log(Allocator&) const;
+		std::string info_log() const;
 
 		GlShaderHandle(const GlShaderHandle&) = delete;
 		GlShaderHandle& operator=(const GlShaderHandle&) = delete;

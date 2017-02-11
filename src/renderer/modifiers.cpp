@@ -49,7 +49,7 @@ namespace Yttrium
 	{
 	}
 
-	void PushMaterial::set_uniform(const StaticString& name, const Matrix4& value)
+	void PushMaterial::set_uniform(const std::string& name, const Matrix4& value)
 	{
 		const_cast<MaterialImpl*>(static_cast<const MaterialImpl*>(_material))->gpu_program().set_uniform(name, value); // TODO: Remove 'const_cast'.
 	}

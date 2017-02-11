@@ -1,5 +1,5 @@
-#ifndef _renderer_formats_obj_h_
-#define _renderer_formats_obj_h_
+#ifndef _src_renderer_formats_obj_h_
+#define _src_renderer_formats_obj_h_
 
 namespace Yttrium
 {

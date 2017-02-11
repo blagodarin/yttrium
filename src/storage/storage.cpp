@@ -2,7 +2,6 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/memory/unique_ptr.h>
 #include "reader.h"
 
 #include <vector>
@@ -18,11 +17,11 @@ namespace Yttrium
 		};
 
 		Type type;
-		UniquePtr<PackageReader> package;
+		std::unique_ptr<PackageReader> package;
 		std::string buffer_name;
 		std::shared_ptr<const Buffer> buffer;
 
-		StorageAttachment(UniquePtr<PackageReader>&& package)
+		StorageAttachment(std::unique_ptr<PackageReader>&& package)
 			: type(Type::Package)
 			, package(std::move(package))
 		{
@@ -39,9 +38,8 @@ namespace Yttrium
 	class StoragePrivate
 	{
 	public:
-		StoragePrivate(Storage::UseFileSystem use_file_system, Allocator& allocator)
-			: _allocator(allocator)
-			, _use_file_system(use_file_system)
+		StoragePrivate(Storage::UseFileSystem use_file_system)
+			: _use_file_system(use_file_system)
 		{
 		}
 
@@ -78,15 +76,14 @@ namespace Yttrium
 		}
 
 	private:
-		Allocator& _allocator;
 		const Storage::UseFileSystem _use_file_system;
 		std::vector<StorageAttachment> _attachments;
 
 		friend Storage;
 	};
 
-	Storage::Storage(UseFileSystem use_file_system, Allocator& allocator)
-		: _private(std::make_unique<StoragePrivate>(use_file_system, allocator))
+	Storage::Storage(UseFileSystem use_file_system)
+		: _private(std::make_unique<StoragePrivate>(use_file_system))
 	{
 	}
 
@@ -99,7 +96,7 @@ namespace Yttrium
 
 	void Storage::attach_package(const StaticString& path, PackageType type)
 	{
-		auto package = PackageReader::create(path, type, _private->_allocator);
+		auto package = PackageReader::create(path, type);
 		if (!package)
 			throw MissingDataError("Unable to open \"", path, "\"");
 		_private->_attachments.emplace_back(std::move(package));

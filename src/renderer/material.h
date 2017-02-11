@@ -1,9 +1,10 @@
 #ifndef _src_renderer_material_h_
 #define _src_renderer_material_h_
 
-#include <yttrium/memory/unique_ptr.h>
 #include <yttrium/renderer/material.h>
 #include <yttrium/resources/resource_ptr.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -23,7 +24,7 @@ namespace Yttrium
 
 	protected:
 		ResourcePtr<const Texture2D> _texture; // TODO: Texture filter.
-		UniquePtr<GpuProgram> _program;
+		std::unique_ptr<GpuProgram> _program;
 	};
 }
 

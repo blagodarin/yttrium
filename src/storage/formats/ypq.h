@@ -13,7 +13,7 @@ namespace Yttrium
 	class YpqReader : public PackageReader
 	{
 	public:
-		YpqReader(String&&, Reader&&, Allocator&);
+		YpqReader(std::string&&, Reader&&);
 		~YpqReader() override;
 
 		Reader open(const StaticString&) const override;
@@ -21,7 +21,7 @@ namespace Yttrium
 	private:
 		struct Entry;
 
-		const String _name;
+		const std::string _name;
 		const Reader _reader;
 		Buffer _metadata_buffer;
 		std::map<StaticString, Entry> _entries;
