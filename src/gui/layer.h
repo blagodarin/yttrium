@@ -3,7 +3,6 @@
 
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/std/map.h>
 #include "actions.h"
 #include "cursor.h"
 #include "key_lookup.h"
@@ -31,16 +30,15 @@ namespace Yttrium
 		GuiLayer(GuiPrivate&, const StaticString& name, bool is_transparent);
 		~GuiLayer();
 
-		bool is_transparent() const { return _is_transparent; }
-		const String& name() const { return _name; }
-
 		GuiLayout& add_layout(GuiLayout::Placement);
-		void handle_enter() const { _on_enter.run(_gui); }
+		void handle_enter();
 		bool handle_event(const std::string&) const;
 		bool handle_key(const KeyEvent&);
 		void handle_return() const { _on_return.run(_gui); }
 		bool has_music() const noexcept { return static_cast<bool>(_music); }
+		bool is_transparent() const { return _is_transparent; }
 		ResourcePtr<const Music> music() const { return *_music; }
+		const String& name() const { return _name; }
 		void register_widget(Widget&);
 		void render(Renderer&, const PointF* cursor);
 		void set_cursor(GuiCursor, const StaticString& texture = {});
@@ -56,13 +54,13 @@ namespace Yttrium
 
 	private:
 		GuiPrivate& _gui;
-		String _name;
-		StdVector<UniquePtr<GuiLayout>> _layouts;
-		StdVector<Widget*> _widgets;
+		const String _name;
+		const bool _is_transparent;
+		std::vector<UniquePtr<GuiLayout>> _layouts;
+		std::vector<Widget*> _widgets;
 		Widget* _mouse_widget = nullptr;
 		const Widget* _left_click_widget = nullptr;
 		Widget* _focus_widget = nullptr;
-		const bool _is_transparent;
 		GuiActions _on_enter;
 		std::unordered_map<std::string, GuiActions> _on_event;
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;

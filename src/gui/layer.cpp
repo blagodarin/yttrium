@@ -15,8 +15,6 @@ namespace Yttrium
 	GuiLayer::GuiLayer(GuiPrivate& gui, const StaticString& name, bool is_transparent)
 		: _gui(gui)
 		, _name(name, &_gui.allocator())
-		, _layouts(_gui.allocator())
-		, _widgets(_gui.allocator())
 		, _is_transparent(is_transparent)
 	{
 	}
@@ -27,6 +25,19 @@ namespace Yttrium
 	{
 		_layouts.emplace_back(make_unique<GuiLayout>(_gui.allocator(), _gui, placement));
 		return *_layouts.back();
+	}
+
+	void GuiLayer::handle_enter()
+	{
+		_on_enter.run(_gui);
+
+		std::vector<Widget*> focusable_widgets;
+		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget){ return widget->flags() & Widget::CanHaveFocus; });
+		if (!focusable_widgets.empty())
+		{
+			_focus_widget = focusable_widgets.front();
+			_focus_widget->set_focused(true);
+		}
 	}
 
 	bool GuiLayer::handle_event(const std::string& event) const

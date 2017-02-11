@@ -13,7 +13,7 @@ namespace Yttrium
 
 	bool CanvasWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!loader.load_text("id"_s, &_id))
+		if (!loader.load_text("id"_s, _id))
 			return false;
 		loader.load_rect("position"_s, _rect);
 		return true;

@@ -26,7 +26,7 @@ namespace Yttrium
 			|| !_foreground.load(loader))
 			return false;
 
-		loader.load_translatable("text"_s, &_text);
+		loader.load_translatable("text"_s, _text);
 
 		if (_styles[0].background.load(loader))
 		{

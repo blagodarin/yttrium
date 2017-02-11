@@ -17,12 +17,9 @@ namespace Yttrium
 
 	bool LabelWidget::load(GuiPropertyLoader& loader)
 	{
-		if (!loader.load_rect("position"_s, _rect)
-			|| !_foreground.load(loader)
-			|| !loader.load_translatable("text"_s, &_text))
-			return false;
-
-		return true;
+		return loader.load_rect("position"_s, _rect)
+			&& loader.load_translatable("text"_s, _text)
+			&& _foreground.load(loader);
 	}
 
 	void LabelWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const

@@ -29,9 +29,9 @@ namespace Yttrium
 		bool load_rect(const StaticString& name, RectF&, bool update) const override;
 		ResourcePtr<const Sound> load_sound(const StaticString& name) const override;
 		bool load_state(const StaticString& name, WidgetState*) const override;
-		bool load_text(const StaticString& name, String*) const override;
+		bool load_text(const StaticString& name, String&) const override;
 		bool load_texture(const StaticString& name, ResourcePtr<const Texture2D>&, Texture2D::Filter&) const override;
-		bool load_translatable(const StaticString& name, String*) const override;
+		bool load_translatable(const StaticString& name, String&) const override;
 		void unbind() override;
 
 		static bool load(float&, const IonNode&);

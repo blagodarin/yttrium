@@ -56,9 +56,9 @@ int main(int, char**)
 	script.define("game_start", [&logic](const ScriptCall& call){ logic.start(call.context.get_int("start_level", 1)); });
 	script.define("game_stop", [&logic](const ScriptCall&){ logic.pause(); });
 	script.define("game_resume", [&logic](const ScriptCall&){ logic.resume(); });
-	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call.args.get_int(0, 0)); });
-	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call.args.get_int(0, 0)); });
-	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call.args.get_int(0, 0)); });
+	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call.args[0]->to_int()); });
+	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call.args[0]->to_int()); });
+	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call.args[0]->to_int()); });
 	script.define("screenshot", [&window](const ScriptCall&){ window.take_screenshot(); });
 	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });

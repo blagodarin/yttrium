@@ -26,6 +26,9 @@ namespace Yttrium
 		_background.load(loader);
 		_on_update = loader.load_actions("on_update"_s);
 		_on_enter = loader.load_actions("on_enter"_s);
+		String initial_text(&_gui.allocator());
+		if (loader.load_text("text"_s, initial_text)) // TODO: Use init-statement in C++17.
+			_logic.insert(initial_text);
 		return true;
 	}
 

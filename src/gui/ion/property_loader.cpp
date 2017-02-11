@@ -333,14 +333,12 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_text(const StaticString& name, String* text) const
+	bool GuiIonPropertyLoader::load_text(const StaticString& name, String& text) const
 	{
 		const StaticString* value;
-
 		if (!_bound_object || !load_text(&value, _bound_object->last(name)))
 			return false;
-
-		*text = *value;
+		text = *value;
 		return true;
 	}
 
@@ -363,7 +361,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_translatable(const StaticString& name, String* text) const
+	bool GuiIonPropertyLoader::load_translatable(const StaticString& name, String& text) const
 	{
 		// TODO: Enable translation for classes.
 
@@ -377,7 +375,7 @@ namespace Yttrium
 		const auto& value = *node.first();
 		if (value.type() == IonValue::Type::String)
 		{
-			*text = value.string();
+			text = value.string();
 			return true;
 		}
 
@@ -396,7 +394,7 @@ namespace Yttrium
 		if (tr_value.type() != IonValue::Type::String)
 			return false;
 
-		*text = _gui.translate(tr_value.string());
+		text = _gui.translate(tr_value.string());
 		return true;
 	}
 
