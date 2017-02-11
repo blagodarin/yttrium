@@ -4,7 +4,6 @@
 #include "../system/memory.h"
 #include "buffer_memory_tracker.h"
 #include "heap_allocator.h"
-#include "named_allocator.h"
 
 #include <cassert>
 #include <cstring>
@@ -38,11 +37,6 @@ namespace
 
 namespace Yttrium
 {
-	BufferMemory::BufferMemory()
-		: _named_allocator_data(_named_allocators.data("buffers"))
-	{
-	}
-
 	BufferMemory::~BufferMemory()
 	{
 	#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
@@ -106,7 +100,6 @@ namespace Yttrium
 				}
 			}
 		}
-		_named_allocator_data->allocate(capacity);
 	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_tracker.track_capacity_allocation(capacity);
 	#endif
@@ -133,7 +126,6 @@ namespace Yttrium
 				_small_blocks[level] = data;
 			}
 		}
-		_named_allocator_data->deallocate(capacity);
 	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_tracker.track_capacity_deallocation(capacity);
 	#endif
@@ -150,7 +142,6 @@ namespace Yttrium
 			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
 				throw std::bad_alloc();
-			_named_allocator_data->reallocate(old_capacity, new_capacity);
 		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_system_reallocation(old_capacity, new_capacity);
 			_buffer_memory_tracker.track_capacity_change(old_capacity, new_capacity);
@@ -166,7 +157,6 @@ namespace Yttrium
 			if (old_size > 0)
 				::memcpy(new_data, old_data, old_size);
 			deallocate(old_data, old_capacity);
-			_named_allocator_data->reallocate(old_capacity, new_capacity);
 		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_reallocation();
 		#endif

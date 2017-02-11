@@ -209,7 +209,6 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/memory/buffer_appender.h
 	../include/yttrium/memory/buffer.h
 	../include/yttrium/memory/global.h
-	../include/yttrium/memory/named_allocator.h
 	../include/yttrium/memory/pool.h
 	../include/yttrium/memory/temporary_allocator.h
 	memory/buffer_memory.cpp
@@ -219,8 +218,6 @@ target_sources(yttrium PRIVATE
 	memory/buffer.cpp
 	memory/heap_allocator.cpp
 	memory/heap_allocator.h
-	memory/named_allocator.cpp
-	memory/named_allocator.h
 	memory/pool.cpp
 	memory/raw.h
 	system/memory.h
