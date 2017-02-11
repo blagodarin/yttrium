@@ -1,4 +1,4 @@
-root layer
+root screen "main"
 {
 	on_key "esc" { quit }
 	center
@@ -7,7 +7,7 @@ root layer
 	}
 }
 
-transparent layer "game"
+transparent screen "game"
 {
 	stretch
 	{

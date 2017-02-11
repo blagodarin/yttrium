@@ -1,4 +1,4 @@
-#include "layer.h"
+#include "screen.h"
 
 #include <yttrium/math/margins.h>
 #include <yttrium/renderer/modifiers.h>
@@ -12,22 +12,22 @@
 
 namespace Yttrium
 {
-	GuiLayer::GuiLayer(GuiPrivate& gui, const StaticString& name, bool is_transparent)
+	GuiScreen::GuiScreen(GuiPrivate& gui, const std::string& name, bool is_transparent)
 		: _gui(gui)
-		, _name(name, &_gui.allocator())
+		, _name(name)
 		, _is_transparent(is_transparent)
 	{
 	}
 
-	GuiLayer::~GuiLayer() = default;
+	GuiScreen::~GuiScreen() = default;
 
-	GuiLayout& GuiLayer::add_layout(GuiLayout::Placement placement)
+	GuiLayout& GuiScreen::add_layout(GuiLayout::Placement placement)
 	{
-		_layouts.emplace_back(make_unique<GuiLayout>(_gui.allocator(), _gui, placement));
+		_layouts.emplace_back(std::make_unique<GuiLayout>(_gui, placement));
 		return *_layouts.back();
 	}
 
-	void GuiLayer::handle_enter()
+	void GuiScreen::handle_enter()
 	{
 		_on_enter.run(_gui);
 
@@ -40,7 +40,7 @@ namespace Yttrium
 		}
 	}
 
-	bool GuiLayer::handle_event(const std::string& event) const
+	bool GuiScreen::handle_event(const std::string& event) const
 	{
 		const auto i = _on_event.find(event);
 		if (i == _on_event.end())
@@ -49,7 +49,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool GuiLayer::handle_key(const KeyEvent& event)
+	bool GuiScreen::handle_key(const KeyEvent& event)
 	{
 		if (event.pressed && event.key >= Key::Mouse1 && event.key <= Key::Mouse5
 			&& _focus_widget && _focus_widget != _mouse_widget)
@@ -113,12 +113,12 @@ namespace Yttrium
 		return false;
 	}
 
-	void GuiLayer::register_widget(Widget& widget)
+	void GuiScreen::register_widget(Widget& widget)
 	{
 		_widgets.emplace_back(&widget);
 	}
 
-	void GuiLayer::render(Renderer& renderer, const PointF* cursor)
+	void GuiScreen::render(Renderer& renderer, const PointF* cursor)
 	{
 		const RectF rect({}, SizeF(renderer.window_size()));
 		for (const auto& layout : _layouts)
@@ -146,14 +146,14 @@ namespace Yttrium
 		}
 	}
 
-	void GuiLayer::set_cursor(GuiCursor cursor, const StaticString& texture)
+	void GuiScreen::set_cursor(GuiCursor cursor, const StaticString& texture)
 	{
 		_cursor = cursor;
 		if (_cursor == GuiCursor::Texture)
 			_cursor_texture = _gui.resource_loader().load_texture_2d(texture);
 	}
 
-	Widget* GuiLayer::widget_at(const PointF& point) const
+	Widget* GuiScreen::widget_at(const PointF& point) const
 	{
 		for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
 			if ((*i)->render_rect().contains(point))

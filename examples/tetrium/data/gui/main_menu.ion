@@ -1,10 +1,13 @@
-root layer "main_menu"
+root screen "main_menu"
 {
 	on_key "esc" { quit }
 
 	music "data/music.ogg"
 
-	stretch { image { texture "data/textures/wall.jpeg" } }
+	stretch
+	{
+		image { texture "data/textures/wall.jpeg" }
+	}
 
 	center
 	{

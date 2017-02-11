@@ -121,13 +121,13 @@ target_sources(yttrium PRIVATE
 	gui/gui.h
 	gui/key_lookup.cpp
 	gui/key_lookup.h
-	gui/layer.cpp
-	gui/layer.h
 	gui/layout.cpp
 	gui/layout.h
 	gui/properties.cpp
 	gui/properties.h
 	gui/property_loader.h
+	gui/screen.cpp
+	gui/screen.h
 	gui/texture_font.cpp
 	gui/texture_font.h
 	gui/types.h

@@ -217,7 +217,7 @@ namespace Yttrium
 		if (!font_name)
 			return;
 
-		const auto font_desc = _gui.font(*font_name);
+		const auto font_desc = _gui.font(font_name->to_std());
 		if (!font_desc)
 			throw GuiDataError("Bad font ", *font_name);
 
@@ -427,10 +427,10 @@ namespace Yttrium
 			}
 			else if (node.name() == "enter"_s)
 			{
-				const StaticString* layer;
-				if (!GuiIonPropertyLoader::load_text(&layer, node))
+				const StaticString* screen;
+				if (!GuiIonPropertyLoader::load_text(&screen, node))
 					throw GuiDataError("Bad action '"_s, node.name(), "'"_s);
-				actions.add<GuiAction_Enter>(*layer);
+				actions.add<GuiAction_Enter>(screen->to_std());
 			}
 			else if (node.name() == "quit"_s)
 			{
@@ -442,10 +442,10 @@ namespace Yttrium
 			}
 			else if (node.name() == "return_to"_s)
 			{
-				const StaticString* layer;
-				if (!GuiIonPropertyLoader::load_text(&layer, node))
+				const StaticString* screen;
+				if (!GuiIonPropertyLoader::load_text(&screen, node))
 					throw GuiDataError("Bad action '"_s, node.name(), "'"_s);
-				actions.add<GuiAction_ReturnTo>(*layer);
+				actions.add<GuiAction_ReturnTo>(screen->to_std());
 			}
 		}
 		return actions;

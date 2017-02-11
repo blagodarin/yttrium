@@ -10,7 +10,7 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
 #include "../gui.h"
-#include "../layer.h"
+#include "../screen.h"
 #include "../widgets/widget.h"
 #include "property_loader.h"
 
@@ -136,8 +136,8 @@ namespace Yttrium
 			{ "cursor"_s, &GuiIonLoader::load_cursor },
 			{ "font"_s, &GuiIonLoader::load_font },
 			{ "include"_s, &GuiIonLoader::load_include },
-			{ "layer"_s, &GuiIonLoader::load_layer },
 			{ "on_key"_s, &GuiIonLoader::load_on_key },
+			{ "screen"_s, &GuiIonLoader::load_screen },
 			{ "translation"_s, &GuiIonLoader::load_translation },
 		};
 
@@ -228,7 +228,7 @@ namespace Yttrium
 		if (!GuiIonPropertyLoader::load_text(&texture_name, element.object->last("texture"_s)))
 			throw GuiDataError("Bad '"_s, node.name(), "' 'texture'"_s);
 
-		_gui.set_font(*element.name, *font_name, *texture_name);
+		_gui.set_font(element.name->to_std(), *font_name, *texture_name);
 	}
 
 	void GuiIonLoader::load_include(const IonNode& node, unsigned)
@@ -239,33 +239,34 @@ namespace Yttrium
 		load(*path);
 	}
 
-	void GuiIonLoader::load_layer(const IonNode& node, unsigned attributes)
+	void GuiIonLoader::load_screen(const IonNode& node, unsigned attributes)
 	{
-		static const std::map<StaticString, std::pair<void (GuiIonLoader::*)(GuiLayer&, const IonNode&, int) const, int>> handlers =
+		static const std::map<StaticString, std::pair<void (GuiIonLoader::*)(GuiScreen&, const IonNode&, int) const, int>> handlers =
 		{
-			{ "center"_s, { &GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Center) } },
-			{ "cursor"_s, { &GuiIonLoader::load_layer_cursor, 0 } },
-			{ "music"_s, { &GuiIonLoader::load_layer_music, 0 } },
-			{ "on_enter"_s, { &GuiIonLoader::load_layer_on_enter, 0 } },
-			{ "on_event"_s, { &GuiIonLoader::load_layer_on_event, 0 } },
-			{ "on_key"_s, { &GuiIonLoader::load_layer_on_key, 0 } },
-			{ "on_return"_s, { &GuiIonLoader::load_layer_on_return, 0 } },
-			{ "stretch"_s, { &GuiIonLoader::load_layer_layout, static_cast<int>(GuiLayout::Placement::Stretch) } },
+			{ "center"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Center) } },
+			{ "cursor"_s, { &GuiIonLoader::load_screen_cursor, 0 } },
+			{ "music"_s, { &GuiIonLoader::load_screen_music, 0 } },
+			{ "on_enter"_s, { &GuiIonLoader::load_screen_on_enter, 0 } },
+			{ "on_event"_s, { &GuiIonLoader::load_screen_on_event, 0 } },
+			{ "on_key"_s, { &GuiIonLoader::load_screen_on_key, 0 } },
+			{ "on_return"_s, { &GuiIonLoader::load_screen_on_return, 0 } },
+			{ "stretch"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch) } },
 		};
 
 		const auto& element = ::load_element(node);
 		if (!element.object)
 			throw GuiDataError("Empty '"_s, node.name(), "'"_s);
 
-		const StaticString layer_name = element.name ? *element.name : StaticString();
+		if (!element.name)
+			throw GuiDataError("'"_s, node.name(), "' must have a name"_s);
 
-		auto& layer = _gui.add_layer(layer_name, attributes == IsTransparent, attributes & IsRoot);
-		for (const auto& layer_node : *element.object)
+		auto& screen = _gui.add_screen(element.name->to_std(), attributes == IsTransparent, attributes & IsRoot);
+		for (const auto& screen_node : *element.object)
 		{
-			const auto i = handlers.find(layer_node.name());
+			const auto i = handlers.find(screen_node.name());
 			if (i == handlers.end())
-				throw GuiDataError("Unknown '"_s, node.name(), "' entry '"_s, layer_node.name(), "'"_s);
-			(this->*i->second.first)(layer, layer_node, i->second.second);
+				throw GuiDataError("Unknown '"_s, node.name(), "' entry '"_s, screen_node.name(), "'"_s);
+			(this->*i->second.first)(screen, screen_node, i->second.second);
 		}
 	}
 
@@ -285,7 +286,7 @@ namespace Yttrium
 		_gui.set_translation(*path);
 	}
 
-	void GuiIonLoader::load_layer_cursor(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_cursor(GuiScreen& screen, const IonNode& node, int) const
 	{
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::Object)
@@ -298,25 +299,25 @@ namespace Yttrium
 		{
 			if (!object_node.is_empty())
 				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
-			layer.set_cursor(GuiCursor::None);
+			screen.set_cursor(GuiCursor::None);
 		}
 		else if (object_node.name() == "custom"_s)
 		{
 			if (!object_node.is_empty())
 				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
-			layer.set_cursor(GuiCursor::Custom);
+			screen.set_cursor(GuiCursor::Custom);
 		}
 		else if (object_node.name() == "texture"_s)
 		{
 			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
 				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
-			layer.set_cursor(GuiCursor::Texture, object_node.first()->string());
+			screen.set_cursor(GuiCursor::Texture, object_node.first()->string());
 		}
 		else if (object_node.name() != "default"_s)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 	}
 
-	void GuiIonLoader::load_layer_layout(GuiLayer& layer, const IonNode& node, int extra) const
+	void GuiIonLoader::load_screen_layout(GuiScreen& screen, const IonNode& node, int extra) const
 	{
 		static const std::map<StaticString, void (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
 		{
@@ -325,7 +326,7 @@ namespace Yttrium
 
 		if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		auto& layout = layer.add_layout(static_cast<GuiLayout::Placement>(extra));
+		auto& layout = screen.add_layout(static_cast<GuiLayout::Placement>(extra));
 		for (const auto& layout_node : *node.first()->object())
 		{
 			const auto i = handlers.find(layout_node.name());
@@ -344,43 +345,43 @@ namespace Yttrium
 			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(*element.attribute) : nullptr), _gui);
 			if (_has_default_font)
 				loader.set_default_font_name(&_default_font_name);
-			layer.register_widget(layout.add_widget(layout_node.name(), loader));
+			screen.register_widget(layout.add_widget(layout_node.name(), loader));
 		}
 	}
 
-	void GuiIonLoader::load_layer_music(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_music(GuiScreen& screen, const IonNode& node, int) const
 	{
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::String)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 		const auto music_name = values->string();
-		layer.set_music(music_name.is_empty() ? nullptr : _gui.resource_loader().load_music(music_name));
+		screen.set_music(music_name.is_empty() ? nullptr : _gui.resource_loader().load_music(music_name));
 	}
 
-	void GuiIonLoader::load_layer_on_enter(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_on_enter(GuiScreen& screen, const IonNode& node, int) const
 	{
-		layer.set_on_enter(GuiIonPropertyLoader::load_actions(node));
+		screen.set_on_enter(GuiIonPropertyLoader::load_actions(node));
 	}
 
-	void GuiIonLoader::load_layer_on_event(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_on_event(GuiScreen& screen, const IonNode& node, int) const
 	{
 		const auto values = node.values();
 		if (values.size() != 2 || values->type() != IonValue::Type::String || values.last().type() != IonValue::Type::Object)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		layer.set_on_event(values->string().to_std(), GuiIonPropertyLoader::load_actions(*values.last().object()));
+		screen.set_on_event(values->string().to_std(), GuiIonPropertyLoader::load_actions(*values.last().object()));
 	}
 
-	void GuiIonLoader::load_layer_on_key(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_on_key(GuiScreen& screen, const IonNode& node, int) const
 	{
 		auto binding = ::load_on_key(node);
 		if (!binding)
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		layer.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
+		screen.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
 	}
 
-	void GuiIonLoader::load_layer_on_return(GuiLayer& layer, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_on_return(GuiScreen& screen, const IonNode& node, int) const
 	{
-		layer.set_on_return(GuiIonPropertyLoader::load_actions(node));
+		screen.set_on_return(GuiIonPropertyLoader::load_actions(node));
 	}
 
 	void GuiIonLoader::load_layout_size(GuiLayout& layout, const IonNode& node) const

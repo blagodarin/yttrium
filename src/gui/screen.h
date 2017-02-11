@@ -1,5 +1,5 @@
-#ifndef _src_gui_layer_h_
-#define _src_gui_layer_h_
+#ifndef _src_gui_screen_h_
+#define _src_gui_screen_h_
 
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource_ptr.h>
@@ -22,13 +22,11 @@ namespace Yttrium
 	class Texture2D;
 	class Widget;
 
-	template <typename> class UniquePtr;
-
-	class GuiLayer
+	class GuiScreen
 	{
 	public:
-		GuiLayer(GuiPrivate&, const StaticString& name, bool is_transparent);
-		~GuiLayer();
+		GuiScreen(GuiPrivate&, const std::string& name, bool is_transparent);
+		~GuiScreen();
 
 		GuiLayout& add_layout(GuiLayout::Placement);
 		void handle_enter();
@@ -38,7 +36,7 @@ namespace Yttrium
 		bool has_music() const noexcept { return static_cast<bool>(_music); }
 		bool is_transparent() const { return _is_transparent; }
 		ResourcePtr<const Music> music() const { return *_music; }
-		const String& name() const { return _name; }
+		const std::string& name() const { return _name; }
 		void register_widget(Widget&);
 		void render(Renderer&, const PointF* cursor);
 		void set_cursor(GuiCursor, const StaticString& texture = {});
@@ -54,9 +52,9 @@ namespace Yttrium
 
 	private:
 		GuiPrivate& _gui;
-		const String _name;
+		const std::string _name;
 		const bool _is_transparent;
-		std::vector<UniquePtr<GuiLayout>> _layouts;
+		std::vector<std::unique_ptr<GuiLayout>> _layouts;
 		std::vector<Widget*> _widgets;
 		Widget* _mouse_widget = nullptr;
 		const Widget* _left_click_widget = nullptr;

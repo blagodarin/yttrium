@@ -5,6 +5,8 @@
 #include <yttrium/math/vector.h>
 #include <yttrium/std/vector.h>
 
+#include <memory>
+
 namespace Yttrium
 {
 	class GuiPrivate;
@@ -13,8 +15,6 @@ namespace Yttrium
 	class Renderer;
 	class StaticString;
 	class Widget;
-
-	template <typename> class UniquePtr;
 
 	class GuiLayout
 	{
@@ -39,7 +39,7 @@ namespace Yttrium
 		const Placement _placement;
 		SizeF _size;
 		Vector2 _scaling{1, 1};
-		StdVector<UniquePtr<Widget>> _widgets;
+		std::vector<std::unique_ptr<Widget>> _widgets;
 	};
 }
 

@@ -16,11 +16,14 @@ class "statistics_score"
 	align    "right"
 }
 
-layer "statistics"
+screen "statistics"
 {
 	on_key "esc" { return }
 
-	stretch { image { texture "data/textures/wall.jpeg" } }
+	stretch
+	{
+		image { texture "data/textures/wall.jpeg" }
+	}
 
 	center
 	{

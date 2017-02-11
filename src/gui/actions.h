@@ -20,8 +20,8 @@ namespace Yttrium
 
 	struct GuiAction_Enter
 	{
-		String _layer;
-		GuiAction_Enter(const StaticString& layer) : _layer(layer) {}
+		std::string _screen;
+		GuiAction_Enter(const std::string& screen) : _screen(screen) {}
 	};
 
 	struct GuiAction_Quit
@@ -34,8 +34,8 @@ namespace Yttrium
 
 	struct GuiAction_ReturnTo
 	{
-		String _layer;
-		GuiAction_ReturnTo(const StaticString& layer) : _layer(layer) {}
+		std::string _screen;
+		GuiAction_ReturnTo(const std::string& screen) : _screen(screen) {}
 	};
 
 	class GuiActions

@@ -6,9 +6,9 @@
 
 namespace Yttrium
 {
-	class GuiLayer;
 	class GuiLayout;
 	class GuiPrivate;
+	class GuiScreen;
 	class IonNode;
 
 	class GuiIonLoader
@@ -25,17 +25,17 @@ namespace Yttrium
 		void load_cursor(const IonNode&, unsigned attributes);
 		void load_font(const IonNode&, unsigned attributes);
 		void load_include(const IonNode&, unsigned attributes);
-		void load_layer(const IonNode&, unsigned attributes);
+		void load_screen(const IonNode&, unsigned attributes);
 		void load_on_key(const IonNode&, unsigned attributes);
 		void load_translation(const IonNode&, unsigned attributes);
 
-		void load_layer_cursor(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_layout(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_music(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_enter(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_event(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_key(GuiLayer&, const IonNode&, int extra) const;
-		void load_layer_on_return(GuiLayer&, const IonNode&, int extra) const;
+		void load_screen_cursor(GuiScreen&, const IonNode&, int extra) const;
+		void load_screen_layout(GuiScreen&, const IonNode&, int extra) const;
+		void load_screen_music(GuiScreen&, const IonNode&, int extra) const;
+		void load_screen_on_enter(GuiScreen&, const IonNode&, int extra) const;
+		void load_screen_on_event(GuiScreen&, const IonNode&, int extra) const;
+		void load_screen_on_key(GuiScreen&, const IonNode&, int extra) const;
+		void load_screen_on_return(GuiScreen&, const IonNode&, int extra) const;
 
 		void load_layout_size(GuiLayout&, const IonNode&) const;
 

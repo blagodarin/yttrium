@@ -13,34 +13,13 @@ namespace
 	{
 	public:
 		GuiActionVisitor(GuiPrivate& gui)
-			: _gui(gui)
-		{
-		}
+			: _gui(gui) {}
 
-		void operator()(const GuiAction_Call& action) const
-		{
-			action._script.execute(_gui.script_context());
-		}
-
-		void operator()(const GuiAction_Enter& action) const
-		{
-			_gui.push_layer(action._layer);
-		}
-
-		void operator()(const GuiAction_Quit&) const
-		{
-			_gui.quit();
-		}
-
-		void operator()(const GuiAction_Return&) const
-		{
-			_gui.pop_layer();
-		}
-
-		void operator()(const GuiAction_ReturnTo& action) const
-		{
-			_gui.pop_layers_until(action._layer);
-		}
+		void operator()(const GuiAction_Call& action) const { action._script.execute(_gui.script_context()); }
+		void operator()(const GuiAction_Enter& action) const { _gui.push_screen(action._screen); }
+		void operator()(const GuiAction_Quit&) const { _gui.quit(); }
+		void operator()(const GuiAction_Return&) const { _gui.pop_screen(); }
+		void operator()(const GuiAction_ReturnTo& action) const { _gui.pop_screens_until(action._screen); }
 
 	private:
 		GuiPrivate& _gui;

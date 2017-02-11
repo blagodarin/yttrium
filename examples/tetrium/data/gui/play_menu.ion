@@ -1,8 +1,11 @@
-layer "play_menu"
+screen "play_menu"
 {
 	on_key "esc" { return }
 
-	stretch { image { texture "data/textures/wall.jpeg" } }
+	stretch
+	{
+		image { texture "data/textures/wall.jpeg" }
+	}
 
 	center
 	{

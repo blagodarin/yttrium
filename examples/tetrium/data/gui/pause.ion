@@ -3,13 +3,16 @@ class "pause_button" ["button"]
 	position "11" "" "8" "2"
 }
 
-transparent layer "pause"
+transparent screen "pause"
 {
 	on_enter { call "game_pause" }
 	on_key "esc" { return }
 	on_return { call "game_resume" }
 
-	stretch { image { color "0" "0" "0" "0.5" } }
+	stretch
+	{
+		image { color "0" "0" "0" "0.5" }
+	}
 
 	center
 	{

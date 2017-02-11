@@ -36,6 +36,9 @@ namespace Yttrium
 		constexpr StaticString(const char* text, size_t size) : _text(text), _size(size) {}
 
 		///
+		explicit StaticString(const std::string& string) : _text(string.data()), _size(string.size()) {}
+
+		///
 		bool ends_with(const StaticString& other) const;
 
 		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.

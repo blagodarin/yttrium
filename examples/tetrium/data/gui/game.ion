@@ -3,7 +3,7 @@ class "background"
 	color "0" "0" "0" "0.5"
 }
 
-layer "game"
+screen "game"
 {
 	on_enter { call "game_start" }
 	on_event "game_over" { enter "game_over" }
@@ -16,9 +16,12 @@ layer "game"
 	on_key "right" { call "turn_right" }
 	on_key "esc" { enter "pause" }
 
-	stretch { image { texture "data/textures/wall.jpeg" } }
-
 	cursor { none }
+
+	stretch
+	{
+		image { texture "data/textures/wall.jpeg" }
+	}
 
 	center
 	{

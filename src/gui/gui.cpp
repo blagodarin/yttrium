@@ -10,7 +10,7 @@
 #include <yttrium/storage/storage.h>
 #include "gui.h"
 #include "ion/loader.h"
-#include "layer.h"
+#include "screen.h"
 
 #include <algorithm>
 #include <cassert>
@@ -21,26 +21,25 @@ namespace Yttrium
 		: _resource_loader(resource_loader)
 		, _script_context(script_context)
 		, _allocator(allocator)
-		, _layers(_allocator)
 	{
 	}
 
 	GuiPrivate::~GuiPrivate() = default;
 
-	GuiLayer& GuiPrivate::add_layer(const StaticString& name, bool is_transparent, bool is_root)
+	GuiScreen& GuiPrivate::add_screen(const std::string& name, bool is_transparent, bool is_root)
 	{
-		if (!is_root && name.is_empty())
-			throw GuiDataError("Non-root layer must have a name"_s);
-		if (_layers.find(String(name, ByReference())) != _layers.end())
-			throw GuiDataError("Duplicate layer name \""_s, name, "\""_s);
-		auto&& layer = make_unique<GuiLayer>(_allocator, *this, name, is_transparent);
+		if (!is_root && name.empty())
+			throw GuiDataError("Non-root screen must have a name"_s);
+		if (_screens.find(name) != _screens.end())
+			throw GuiDataError("Duplicate screen name \""_s, name, "\""_s);
+		auto screen = std::make_unique<GuiScreen>(*this, name, is_transparent);
 		if (is_root)
 		{
-			if (_root_layer)
-				throw GuiDataError("\""_s, name, "\" can't be the root layer, \""_s, _root_layer->name(), "\" is the root layer"_s);
-			_root_layer = layer.get();
+			if (_root_screen)
+				throw GuiDataError("\""_s, name, "\" can't be a root screen, \""_s, _root_screen->name(), "\" is the root screen"_s);
+			_root_screen = screen.get();
 		}
-		auto& result = *_layers.emplace(name, std::move(layer)).first->second;
+		auto& result = *_screens.emplace(screen->name(), std::move(screen)).first->second;
 		result.set_cursor(_default_cursor, _default_cursor_texture);
 		return result;
 	}
@@ -54,36 +53,36 @@ namespace Yttrium
 			throw GuiDataError("Bad translation \""_s, path, "\""_s);
 	}
 
-	const GuiPrivate::FontDesc* GuiPrivate::font(const StaticString& name) const
+	const GuiPrivate::FontDesc* GuiPrivate::font(const std::string& name) const
 	{
-		const auto i = _fonts.find(String(name, ByReference()));
+		const auto i = _fonts.find(name);
 		return i != _fonts.end() ? &i->second : nullptr;
 	}
 
-	bool GuiPrivate::pop_layer()
+	bool GuiPrivate::pop_screen()
 	{
-		if (_layer_stack.size() <= 1)
+		if (_screen_stack.size() <= 1)
 			return false;
-		leave_layer();
+		leave_screen();
 		return true;
 	}
 
-	bool GuiPrivate::pop_layers_until(const StaticString& name)
+	bool GuiPrivate::pop_screens_until(const std::string& name)
 	{
-		const auto end = std::find_if(_layer_stack.rbegin(), _layer_stack.rend(), [&name](GuiLayer* layer){ return layer->name() == name; });
-		if (end == _layer_stack.rend())
+		const auto end = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [&name](GuiScreen* screen){ return screen->name() == name; });
+		if (end == _screen_stack.rend())
 			return false;
-		for (auto n = std::distance(_layer_stack.rbegin(), end); n > 0; --n)
-			leave_layer();
+		for (auto n = std::distance(_screen_stack.rbegin(), end); n > 0; --n)
+			leave_screen();
 		return true;
 	}
 
-	bool GuiPrivate::push_layer(const StaticString& name)
+	bool GuiPrivate::push_screen(const std::string& name)
 	{
-		const auto i = _layers.find(String(name, ByReference()));
-		if (i == _layers.end())
+		const auto i = _screens.find(name);
+		if (i == _screens.end())
 			return false;
-		enter_layer(i->second.get());
+		enter_screen(*i->second);
 		return true;
 	}
 
@@ -94,18 +93,20 @@ namespace Yttrium
 			_default_cursor_texture = _resource_loader.load_texture_2d(texture);
 	}
 
-	void GuiPrivate::set_font(const StaticString& name, const StaticString& font_source, const StaticString& texture_name)
+	void GuiPrivate::set_font(const std::string& name, const StaticString& font_source, const StaticString& texture_name)
 	{
 		auto texture = _resource_loader.load_texture_2d(texture_name);
 		assert(texture);
 
-		auto font = _resource_loader.load_texture_font(font_source);
-		assert(font);
+		auto texture_font = _resource_loader.load_texture_font(font_source);
+		assert(texture_font);
 
-		if (!Rect(texture->size()).contains(font->rect()))
+		if (!Rect(texture->size()).contains(texture_font->rect()))
 			throw GuiDataError("Can't use font \""_s, font_source, "\" with texture \""_s, texture_name, "\""_s);
 
-		_fonts[String(name, &_allocator)] = FontDesc(std::move(font), std::move(texture));
+		auto& font = _fonts[name];
+		font.font = std::move(texture_font);
+		font.texture = std::move(texture);
 	}
 
 	String GuiPrivate::translate(const StaticString& source) const
@@ -113,40 +114,40 @@ namespace Yttrium
 		return _translation ? _translation->translate(source) : String(source, &_allocator);
 	}
 
-	void GuiPrivate::enter_layer(GuiLayer* layer)
+	void GuiPrivate::enter_screen(GuiScreen& screen)
 	{
-		_layer_stack.emplace_back(layer);
-		if (layer->has_music() && _on_music)
-			_on_music(layer->music());
-		layer->handle_enter();
+		_screen_stack.emplace_back(&screen);
+		if (screen.has_music() && _on_music)
+			_on_music(screen.music());
+		screen.handle_enter();
 	}
 
-	void GuiPrivate::leave_layer()
+	void GuiPrivate::leave_screen()
 	{
-		const auto layer = _layer_stack.back();
-		layer->handle_return();
-		if (layer->has_music() && _on_music)
+		const auto screen = _screen_stack.back();
+		screen->handle_return();
+		if (screen->has_music() && _on_music)
 		{
-			const auto i = std::find_if(std::next(_layer_stack.rbegin()), _layer_stack.rend(), [](GuiLayer* layer){ return layer->has_music(); });
-			_on_music(i != _layer_stack.rend() ? (*i)->music() : nullptr);
+			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* screen){ return screen->has_music(); });
+			_on_music(i != _screen_stack.rend() ? (*i)->music() : nullptr);
 		}
-		_layer_stack.pop_back();
+		_screen_stack.pop_back();
 	}
 
 	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name, Allocator& allocator)
 		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, allocator))
 	{
 		GuiIonLoader(*_private).load(name);
-		if (!_private->_root_layer)
-			throw GuiDataError("(gui) No root layer has been added"_s);
+		if (!_private->_root_screen)
+			throw GuiDataError("(gui) No root screen has been added"_s);
 	}
 
 	Gui::~Gui() = default;
 
 	void Gui::notify(const StaticString& event)
 	{
-		if (!_private->_layer_stack.empty())
-			_private->_layer_stack.back()->handle_event(event.to_std());
+		if (!_private->_screen_stack.empty())
+			_private->_screen_stack.back()->handle_event(event.to_std());
 	}
 
 	void Gui::on_canvas(const std::function<void(Renderer&, const StaticString&, const RectF&)>& callback)
@@ -171,7 +172,7 @@ namespace Yttrium
 
 	bool Gui::process_key_event(const KeyEvent& event)
 	{
-		if (!_private->_layer_stack.empty() && _private->_layer_stack.back()->handle_key(event))
+		if (!_private->_screen_stack.empty() && _private->_screen_stack.back()->handle_key(event))
 			return true;
 		if (!event.autorepeat)
 		{
@@ -187,22 +188,22 @@ namespace Yttrium
 
 	void Gui::render(Renderer& renderer, const PointF& cursor) const
 	{
-		if (_private->_layer_stack.empty())
+		if (_private->_screen_stack.empty())
 			return;
-		const auto top_layer = std::prev(_private->_layer_stack.end());
+		const auto top_screen = std::prev(_private->_screen_stack.end());
 		{
-			auto layer = top_layer;
-			while (layer != _private->_layer_stack.begin() && (*layer)->is_transparent())
-				--layer;
-			while (layer != top_layer)
-				(*layer++)->render(renderer, nullptr);
+			auto screen = top_screen;
+			while (screen != _private->_screen_stack.begin() && (*screen)->is_transparent())
+				--screen;
+			while (screen != top_screen)
+				(*screen++)->render(renderer, nullptr);
 		}
-		(*top_layer)->render(renderer, &cursor);
+		(*top_screen)->render(renderer, &cursor);
 	}
 
 	void Gui::start()
 	{
-		assert(_private->_layer_stack.empty()); // TODO: Remove explicit 'start()'.
-		_private->enter_layer(_private->_root_layer);
+		assert(_private->_screen_stack.empty()); // TODO: Remove explicit 'start()'.
+		_private->enter_screen(*_private->_root_screen);
 	}
 }

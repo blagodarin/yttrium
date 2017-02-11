@@ -4,16 +4,13 @@
 #ifndef _include_yttrium_string_format_h_
 #define _include_yttrium_string_format_h_
 
-#include <yttrium/api.h>
+#include <yttrium/static_string.h>
 
-#include <cstddef>
-#include <cstdint>
 #include <type_traits>
 #include <utility>
 
 namespace Yttrium
 {
-	class StaticString;
 	class String;
 
 	template <typename> class Format;
@@ -34,6 +31,12 @@ namespace Yttrium
 
 	///
 	Y_API String& operator<<(String&, const StaticString&);
+
+	///
+	inline String& operator<<(String&, const std::string&);
+
+	///
+	inline String& operator<<(String&, const char*);
 
 	///
 	Y_API String& operator<<(String&, Format<char>&&);
@@ -100,6 +103,16 @@ namespace Yttrium
 	inline String& operator<<(String& string, char value)
 	{
 		return string << repeat(value, 1);
+	}
+
+	inline String& operator<<(String& string, const std::string& value)
+	{
+		return string << StaticString(value);
+	}
+
+	inline String& operator<<(String& string, const char* value)
+	{
+		return string << StaticString(value);
 	}
 
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
