@@ -9,7 +9,7 @@ namespace Yttrium
 	class GlRenderer : public RendererImpl
 	{
 	public:
-		GlRenderer(Allocator&);
+		GlRenderer();
 
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
@@ -36,9 +36,9 @@ namespace Yttrium
 
 	private:
 		const GlApi _gl;
-		GlBufferHandle _2d_ibo;
-		GlBufferHandle _2d_vbo;
-		GlVertexArrayHandle _2d_vao;
+		GlBufferHandle _2d_ibo{ _gl, GL_ELEMENT_ARRAY_BUFFER };
+		GlBufferHandle _2d_vbo{ _gl, GL_ARRAY_BUFFER };
+		GlVertexArrayHandle _2d_vao{ _gl };
 	};
 }
 

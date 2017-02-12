@@ -109,9 +109,7 @@ namespace Yttrium
 {
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
 		: _gui(gui)
-		, _allocator(_gui.allocator())
-		, _classes(_allocator)
-		, _default_font_name(&_allocator)
+		, _classes(_gui.allocator())
 	{
 	}
 
@@ -223,7 +221,7 @@ namespace Yttrium
 		{
 			if (_has_default_font)
 				throw GuiDataError("Default '"_s, node.name(), "' redefinition"_s);
-			_default_font_name = *element.name;
+			_default_font_name = element.name->to_std();
 			_has_default_font = true;
 		}
 

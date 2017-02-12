@@ -2,6 +2,7 @@
 #define _src_gui_widgets_button_h_
 
 #include <yttrium/script/code.h>
+#include <yttrium/string.h>
 #include "../actions.h"
 #include "../properties.h"
 #include "widget.h"

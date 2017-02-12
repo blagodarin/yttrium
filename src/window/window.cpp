@@ -11,10 +11,9 @@ namespace Yttrium
 	class WindowPrivate : private WindowBackendCallbacks
 	{
 	public:
-		Allocator& _allocator;
-		const String _name;
+		const std::string _name;
 		WindowBackend _backend{ _name, *this };
-		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend, _allocator); // TODO: Store renderer by value.
+		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend); // TODO: Store renderer by value.
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;
@@ -28,9 +27,8 @@ namespace Yttrium
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(const UpdateEvent&)> _on_update;
 
-		WindowPrivate(const StaticString& name, Allocator& allocator)
-			: _allocator(allocator)
-			, _name(name, &_allocator)
+		WindowPrivate(const std::string& name)
+			: _name(name)
 		{
 			const auto size = _backend.size();
 			if (size)
@@ -121,8 +119,8 @@ namespace Yttrium
 		}
 	};
 
-	Window::Window(const StaticString& name, Allocator& allocator)
-		: _private(std::make_unique<WindowPrivate>(name, allocator))
+	Window::Window(const std::string& name)
+		: _private(std::make_unique<WindowPrivate>(name))
 	{
 	}
 

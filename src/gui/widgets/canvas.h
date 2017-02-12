@@ -1,6 +1,7 @@
 #ifndef _src_gui_widgets_canvas_h_
 #define _src_gui_widgets_canvas_h_
 
+#include <yttrium/string.h>
 #include "widget.h"
 
 namespace Yttrium

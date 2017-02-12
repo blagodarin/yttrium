@@ -4,7 +4,6 @@
 #include <yttrium/key.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/string.h>
 #include "../../window/backend.h"
 
 namespace
@@ -126,8 +125,8 @@ namespace Yttrium
 		::ReleaseDC(_hwnd, _hdc);
 	}
 
-	WindowBackend::WindowBackend(const String& name, WindowBackendCallbacks& callbacks)
-		: _name(name.text())
+	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
+		: _name(name)
 		, _callbacks(callbacks)
 	{
 		assert(_size);

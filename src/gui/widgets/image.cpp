@@ -1,5 +1,6 @@
 #include "image.h"
 
+#include <yttrium/static_string.h>
 #include "../property_loader.h"
 
 namespace Yttrium

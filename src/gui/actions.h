@@ -2,7 +2,6 @@
 #define _src_gui_actions_h_
 
 #include <yttrium/script/code.h>
-#include <yttrium/string.h>
 
 #include <vector>
 

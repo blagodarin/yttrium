@@ -18,7 +18,6 @@ namespace Yttrium
 	class PointF;
 	class Renderer;
 	class Size;
-	class StaticString;
 
 	///
 	struct UpdateEvent
@@ -58,7 +57,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Window(const StaticString& name, Allocator& = *DefaultAllocator);
+		Window(const std::string& name);
 
 		///
 		~Window();

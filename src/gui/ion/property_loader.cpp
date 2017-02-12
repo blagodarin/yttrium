@@ -88,7 +88,7 @@ namespace Yttrium
 	{
 	}
 
-	void GuiIonPropertyLoader::set_default_font_name(const String* name)
+	void GuiIonPropertyLoader::set_default_font_name(const std::string* name)
 	{
 		_default_font_name = name;
 	}
@@ -211,13 +211,7 @@ namespace Yttrium
 				node.first()->get(&font_name);
 		}
 
-		if (!font_name && _default_font_name)
-			font_name = _default_font_name;
-
-		if (!font_name)
-			return;
-
-		const auto font_desc = _gui.font(font_name->to_std());
+		const auto font_desc = font_name ? _gui.font(font_name->to_std()) : (_default_font_name ? _gui.font(*_default_font_name) : nullptr);
 		if (!font_desc)
 			throw GuiDataError("Bad font ", *font_name);
 

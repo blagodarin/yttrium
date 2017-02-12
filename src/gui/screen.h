@@ -3,6 +3,7 @@
 
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource_ptr.h>
+#include <yttrium/static_string.h>
 #include "actions.h"
 #include "cursor.h"
 #include "key_lookup.h"

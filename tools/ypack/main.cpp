@@ -7,7 +7,6 @@
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/string.h>
 
 #include <iostream>
 #include <limits>

@@ -50,9 +50,9 @@ namespace Yttrium
 			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
 		"}\n"_s;
 
-	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&, Allocator& allocator)
+	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&)
 	{
-		auto renderer = std::make_unique<GlRenderer>(allocator);
+		auto renderer = std::make_unique<GlRenderer>();
 
 		// TODO: Don't copy static texture data.
 
@@ -70,11 +70,6 @@ namespace Yttrium
 			throw InitializationError("Failed to initialize an internal GPU program");
 
 		return std::move(renderer);
-	}
-
-	RendererImpl::RendererImpl(Allocator& allocator)
-		: _allocator(allocator)
-	{
 	}
 
 	RendererImpl::~RendererImpl() = default;

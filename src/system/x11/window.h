@@ -12,7 +12,6 @@
 namespace Yttrium
 {
 	class Point;
-	class String;
 	class WindowBackendCallbacks;
 
 	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);
@@ -20,7 +19,7 @@ namespace Yttrium
 	class WindowBackend
 	{
 	public:
-		WindowBackend(const String& name, WindowBackendCallbacks&);
+		WindowBackend(const std::string& name, WindowBackendCallbacks&);
 		~WindowBackend();
 
 		void close();

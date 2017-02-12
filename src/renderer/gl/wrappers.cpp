@@ -1,7 +1,7 @@
 #include "wrappers.h"
 
 #include <yttrium/math/matrix.h>
-#include <yttrium/string.h>
+#include <yttrium/static_string.h>
 
 #include <cassert>
 #include <stdexcept>

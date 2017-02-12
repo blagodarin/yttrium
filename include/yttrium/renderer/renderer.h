@@ -34,7 +34,6 @@ namespace Yttrium
 	class Renderer
 	{
 	public:
-		Renderer() = default;
 		virtual ~Renderer() = default;
 
 		///

@@ -5,7 +5,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
-#include <yttrium/string.h>
+#include <yttrium/static_string.h>
 #include "property_loader.h"
 
 #include <cassert>

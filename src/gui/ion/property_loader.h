@@ -5,6 +5,8 @@
 
 #include <yttrium/renderer/texture.h>
 
+#include <string>
+
 namespace Yttrium
 {
 	class GuiPrivate;
@@ -17,7 +19,7 @@ namespace Yttrium
 	public:
 		GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiPrivate&);
 
-		void set_default_font_name(const String*);
+		void set_default_font_name(const std::string*);
 
 		void bind(const StaticString& name) override;
 		bool load(const StaticString&, float&) const override;
@@ -50,7 +52,7 @@ namespace Yttrium
 		const GuiPrivate& _gui;
 		const IonObject* _bound_object;
 		const IonObject* _bound_class;
-		const String* _default_font_name = nullptr;
+		const std::string* _default_font_name = nullptr;
 	};
 }
 

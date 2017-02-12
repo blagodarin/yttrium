@@ -3,7 +3,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/string.h>
 #include "../../window/backend.h"
 
 #include <cstring>
@@ -139,13 +138,13 @@ namespace
 
 namespace Yttrium
 {
-	WindowBackend::WindowBackend(const String& name, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
 		: _display(::open_display())
 		, _window(_display.get(), ::create_window(_display.get(), _screen, _glx))
 		, _callbacks(callbacks)
 	{
 		::XSetWMProtocols(_display.get(), _window.get(), &_wm_delete_window, 1);
-		::XStoreName(_display.get(), _window.get(), name.text());
+		::XStoreName(_display.get(), _window.get(), name.c_str());
 
 		// Hide system cursor.
 		::XDefineCursor(_display.get(), _window.get(), _empty_cursor.get());

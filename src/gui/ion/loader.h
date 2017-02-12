@@ -1,7 +1,6 @@
 #ifndef _src_gui_ion_loader_h_
 #define _src_gui_ion_loader_h_
 
-#include <yttrium/string.h>
 #include "classes.h"
 
 namespace Yttrium
@@ -10,6 +9,7 @@ namespace Yttrium
 	class GuiPrivate;
 	class GuiScreen;
 	class IonNode;
+	class StaticString;
 
 	class GuiIonLoader
 	{
@@ -41,10 +41,9 @@ namespace Yttrium
 
 	private:
 		GuiPrivate& _gui;
-		Allocator& _allocator;
 		GuiClasses _classes;
 		bool _has_default_font = false;
-		String _default_font_name;
+		std::string _default_font_name;
 	};
 }
 

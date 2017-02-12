@@ -1,8 +1,7 @@
 #include "statistics.h"
 
 #include <yttrium/script/context.h>
-#include <yttrium/string.h>
-#include <yttrium/string_format.h>
+#include <yttrium/static_string.h>
 
 TetriumStatistics::TetriumStatistics(ScriptContext& script)
 	: _script(script)
@@ -31,7 +30,7 @@ void TetriumStatistics::update_variables() const
 	for (auto i = _statistics.rbegin(); i != _statistics.rend(); ++i)
 	{
 		++index;
-		_script.set(String() << "name" << index, i->second.c_str());
-		_script.set(String() << "score" << index, i->first);
+		_script.set(StaticString{ "name" + std::to_string(index) }, i->second.c_str());
+		_script.set(StaticString{ "score" + std::to_string(index) }, i->first);
 	}
 }

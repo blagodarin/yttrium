@@ -9,7 +9,7 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
-#include <yttrium/string.h>
+#include <yttrium/static_string.h>
 
 #include <memory>
 
@@ -34,9 +34,8 @@ namespace Yttrium
 			int _redundant_shader_switches = 0;
 		};
 
-		static std::unique_ptr<RendererImpl> create(WindowBackend&, Allocator&);
+		static std::unique_ptr<RendererImpl> create(WindowBackend&);
 
-		RendererImpl(Allocator&);
 		~RendererImpl() override;
 
 		ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) override;
@@ -54,7 +53,6 @@ namespace Yttrium
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual Image take_screenshot() const = 0;
 
-		Allocator& allocator() const { return _allocator; }
 		const Texture2D* debug_texture() const;
 		void draw_rect(const RectF& position, const Vector4& color, const RectF& texture);
 		void forget_program(const GpuProgram*);
@@ -100,9 +98,6 @@ namespace Yttrium
 		Statistics _statistics;
 
 	private:
-
-		Allocator& _allocator;
-
 		Size _window_size;
 
 		Buffer _vertices_2d;

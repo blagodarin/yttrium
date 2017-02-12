@@ -3,7 +3,6 @@
 
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/string.h>
 #include "../types.h"
 
 namespace Yttrium

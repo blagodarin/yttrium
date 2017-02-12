@@ -1,6 +1,7 @@
 #ifndef _src_gui_widgets_label_h_
 #define _src_gui_widgets_label_h_
 
+#include <yttrium/string.h>
 #include "../properties.h"
 #include "widget.h"
 

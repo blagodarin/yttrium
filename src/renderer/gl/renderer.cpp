@@ -16,11 +16,7 @@
 
 namespace Yttrium
 {
-	GlRenderer::GlRenderer(Allocator& allocator)
-		: RendererImpl(allocator)
-		, _2d_ibo(_gl, GL_ELEMENT_ARRAY_BUFFER)
-		, _2d_vbo(_gl, GL_ARRAY_BUFFER)
-		, _2d_vao(_gl)
+	GlRenderer::GlRenderer()
 	{
 #ifndef NDEBUG
 		if (_gl.KHR_debug)

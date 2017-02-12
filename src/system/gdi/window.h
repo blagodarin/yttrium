@@ -11,13 +11,12 @@
 namespace Yttrium
 {
 	class Point;
-	class String;
 	class WindowBackendCallbacks;
 
 	class WindowBackend
 	{
 	public:
-		WindowBackend(const String& name, WindowBackendCallbacks&);
+		WindowBackend(const std::string& name, WindowBackendCallbacks&);
 
 		void close();
 		bool get_cursor(Point&);
