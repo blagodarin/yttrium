@@ -4,8 +4,8 @@
 #include <yttrium/math/euler.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/resources/resource_loader.h>
+#include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>
-#include <yttrium/string.h>
 #include <yttrium/window.h>
 
 #include "model.h"
@@ -29,7 +29,7 @@ private:
 	Window _window{ "Yttrium 3D example" };
 	ResourceLoader _resource_loader{ _storage, &_window.renderer() };
 	bool _debug_text_visible = false;
-	String _debug_text{ 1024 };
+	std::string _debug_text;
 	Model _cube{ _window.renderer(), _resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material" };
 	Model _checkerboard{ _window.renderer(), _resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material" };
 

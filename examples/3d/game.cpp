@@ -7,7 +7,7 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
-#include <yttrium/string_format.h>
+#include <yttrium/string_utils.h>
 
 #include <cmath>
 
@@ -137,7 +137,7 @@ void Game::render(Renderer& renderer)
 		_checkerboard.draw();
 	}
 	if (_debug_text_visible)
-		renderer.draw_debug_text(_debug_text);
+		renderer.draw_debug_text(StaticString{ _debug_text });
 }
 
 void Game::update(const UpdateEvent& update)
@@ -167,13 +167,14 @@ void Game::update(const UpdateEvent& update)
 		_position.z = clamp(_position.z, 1, 64);
 	}
 
-	_debug_text.clear()
-		<< "FPS: " << update.fps << "\n"
-		<< "MaxFrameTime: " << update.max_frame_time.count() << "\n"
-		<< "Triangles: " << update.triangles << "\n"
-		<< "DrawCalls: " << update.draw_calls << "\n"
-		<< "TextureSwitches: " << update.texture_switches << " (Redundant: " << update.redundant_texture_switches << ")\n"
-		<< "ShaderSwitches: " << update.shader_switches << " (Redundant: " << update.redundant_shader_switches << ")\n"
-		<< "X: " << _position.x << ", Y: " << _position.y << ", Z: " << _position.z << "\n"
-		<< "Pitch: " << _rotation.pitch << ", Yaw: " << _rotation.yaw;
+	_debug_text.clear();
+	write_string(_debug_text,
+		"FPS: ", update.fps, "\n"
+		"MaxFrameTime: ", update.max_frame_time.count(), "\n"
+		"Triangles: ", update.triangles, "\n"
+		"DrawCalls: ", update.draw_calls, "\n"
+		"TextureSwitches: ", update.texture_switches, " (Redundant: ", update.redundant_texture_switches, ")\n"
+		"ShaderSwitches: ", update.shader_switches, " (Redundant: ", update.redundant_shader_switches, ")\n"
+		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, "\n"
+		"Pitch: ", _rotation.pitch, ", Yaw: ", _rotation.yaw);
 }
