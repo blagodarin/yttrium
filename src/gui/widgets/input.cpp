@@ -4,6 +4,7 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/script/context.h>
+#include <yttrium/string.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
@@ -13,7 +14,6 @@ namespace Yttrium
 {
 	InputWidget::InputWidget(GuiPrivate& gui)
 		: Widget(gui, CanHaveFocus)
-		, _logic(_gui.allocator())
 	{
 	}
 
@@ -48,7 +48,7 @@ namespace Yttrium
 			default:
 				if (_logic.process_key(event))
 				{
-					_gui.script_context().set("_"_s, _logic.text());
+					_gui.script_context().set("_"_s, StaticString{ _logic.text() });
 					_on_update.run(_gui);
 					_cursor_mark = std::chrono::steady_clock::now();
 					return true;
@@ -63,7 +63,7 @@ namespace Yttrium
 		_background.draw(renderer, rect);
 
 		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
-		_foreground.prepare(_logic.text(), rect, &capture);
+		_foreground.prepare(StaticString{ _logic.text() }, rect, &capture);
 		_foreground.draw(renderer);
 
 		if (is_focused() && capture.has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)

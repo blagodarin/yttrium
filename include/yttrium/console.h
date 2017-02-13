@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_console_h_
 #define _include_yttrium_console_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <memory>
 
@@ -19,7 +19,10 @@ namespace Yttrium
 	{
 	public:
 		///
-		Console(ScriptContext&, Allocator& = *DefaultAllocator);
+		Console(ScriptContext&);
+
+		///
+		~Console();
 
 		///
 		bool is_visible() const;
@@ -32,8 +35,6 @@ namespace Yttrium
 
 		///
 		void set_visible(bool);
-
-		~Console();
 
 	private:
 		const std::unique_ptr<class ConsolePrivate> _private;

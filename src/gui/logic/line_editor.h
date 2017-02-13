@@ -1,7 +1,7 @@
 #ifndef _src_gui_logic_line_editor_h_
 #define _src_gui_logic_line_editor_h_
 
-#include <yttrium/string.h>
+#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
@@ -10,24 +10,22 @@ namespace Yttrium
 	class LineEditor
 	{
 	public:
-		LineEditor(Allocator&);
-
 		void clear();
-		unsigned cursor() const { return _cursor; }
+		size_t cursor() const { return _cursor; }
 		void insert(const StaticString& text);
 		void insert(char symbol) { insert(StaticString(&symbol, 1)); }
 		bool process_key(const KeyEvent& event);
-		unsigned selection_offset() const { return _selection_offset; }
-		unsigned selection_size() const { return _selection_size; }
-		void set_max_size(unsigned max_size);
-		const String& text() const { return _text; }
+		size_t selection_offset() const { return _selection_offset; }
+		size_t selection_size() const { return _selection_size; }
+		void set_max_size(size_t);
+		const std::string& text() const { return _text; }
 
 	private:
-		String _text;
-		unsigned _cursor = 0;
-		unsigned _selection_size = 0;
-		unsigned _selection_offset = 0;
-		unsigned _max_size = 0;
+		std::string _text;
+		size_t _cursor = 0;
+		size_t _selection_size = 0;
+		size_t _selection_offset = 0;
+		size_t _max_size = _text.max_size();
 	};
 }
 
