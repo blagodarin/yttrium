@@ -7,10 +7,10 @@ namespace Yttrium
 {
 	namespace detail
 	{
-		void write_string(std::string& string, intmax_t value)
+		void write_string(std::string& string, long long value)
 		{
-			std::array<char, std::numeric_limits<intmax_t>::digits10 + 2> buffer; // Extra chars for a "lossy" digit and a sign.
-			uintmax_t uvalue = value >= 0 ? value : -value;
+			std::array<char, std::numeric_limits<long long>::digits10 + 2> buffer; // Extra chars for a "lossy" digit and a sign.
+			unsigned long long uvalue = value >= 0 ? value : -value;
 			auto i = buffer.size();
 			do
 			{
@@ -22,9 +22,9 @@ namespace Yttrium
 			string.append(&buffer[i], buffer.size() - i);
 		}
 
-		void write_string(std::string& string, uintmax_t value)
+		void write_string(std::string& string, unsigned long long value)
 		{
-			std::array<char, std::numeric_limits<uintmax_t>::digits10 + 1> buffer; // Extra char for a "lossy" digit.
+			std::array<char, std::numeric_limits<unsigned long long>::digits10 + 1> buffer; // Extra char for a "lossy" digit.
 			auto i = buffer.size();
 			do
 			{
