@@ -15,6 +15,7 @@
 #include <yttrium/resources/translation.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
+#include <yttrium/string.h>
 
 #include <mutex>
 

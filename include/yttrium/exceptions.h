@@ -4,8 +4,7 @@
 #ifndef _include_yttrium_exceptions_h_
 #define _include_yttrium_exceptions_h_
 
-#include <yttrium/string.h>
-#include <yttrium/string_format.h>
+#include <yttrium/string_utils.h>
 
 #include <exception>
 
@@ -17,22 +16,17 @@ namespace Yttrium
 	public:
 		///
 		template <typename... Args>
-		Exception(Args&&... args) { append(std::forward<Args>(args)...); }
+		Exception(Args&&... args) { append_to(_what, std::forward<Args>(args)...); }
 
-		const char* what() const noexcept override { return _what.text(); }
+		const char* what() const noexcept override { return _what.c_str(); }
 
 		Exception(const Exception&) = delete;
 		Exception(Exception&&) = default;
 		Exception& operator=(const Exception&) = delete;
 		Exception& operator=(Exception&&) = default;
 
-	private:
-		template <typename T, typename... Args>
-		void append(T&& value, Args&&... args) { _what << std::forward<T>(value); append(std::forward<Args>(args)...); }
-		void append() {}
-
 	protected:
-		String _what;
+		std::string _what;
 	};
 
 	/// Thrown if the initialization of an object (e.g. Window) fails.
@@ -71,7 +65,7 @@ namespace Yttrium
 		{
 			if (!_has_source)
 			{
-				_what.swap(String() << "("_s << source << ") "_s << _what);
+				_what = make_string("("_s, source, ") "_s, _what);
 				_has_source = true;
 			}
 		}

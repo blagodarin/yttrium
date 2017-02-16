@@ -2,10 +2,11 @@
 #define _src_storage_formats_ypq_h_
 
 #include <yttrium/memory/buffer.h>
+#include <yttrium/storage/package.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
-#include "../package.h"
 
+#include <map>
 #include <vector>
 
 namespace Yttrium

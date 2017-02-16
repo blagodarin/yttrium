@@ -1,7 +1,7 @@
 #include "ypq.h"
 
-#include <yttrium/string_format.h>
 #include "../../utils/fourcc.h"
+#include "../package.h"
 
 #include <cstring>
 #include <limits>
@@ -49,19 +49,19 @@ namespace Yttrium
 		YpqHeader header;
 		if (!_reader.read_at(0, header)
 			|| header.signature != YpqHeader::Signature)
-			throw BadPackage(String() << "Not an YPQ package"_s);
+			throw BadPackage("Not an YPQ package"_s);
 
 		const auto metadata_offset = sizeof header + sizeof(YpqEntry) * header.entry_count;
 		if (header.index_size < metadata_offset)
-			throw BadPackage(String() << "Bad package header"_s);
+			throw BadPackage("Bad package header"_s);
 
 		std::vector<YpqEntry> entries(size_t{ header.entry_count });
 		if (!_reader.read_all_at(sizeof header, entries.data(), entries.size() * sizeof(YpqEntry)))
-			throw BadPackage(String() << "Bad package index"_s);
+			throw BadPackage("Bad package index"_s);
 
 		_metadata_buffer.reset(size_t{ header.index_size - metadata_offset });
 		if (!_reader.read_all_at(metadata_offset, _metadata_buffer.data(), _metadata_buffer.size()))
-			throw BadPackage(String() << "Bad package metadata"_s);
+			throw BadPackage("Bad package metadata"_s);
 
 		Reader metadata_reader(_metadata_buffer.data(), _metadata_buffer.size());
 
@@ -69,7 +69,7 @@ namespace Yttrium
 		{
 			uint8_t value = 0;
 			if (!metadata_reader.read(value))
-				throw BadPackage(String() << "Bad package index entry metadata"_s);
+				throw BadPackage("Bad package index entry metadata"_s);
 			return value;
 		};
 
@@ -77,7 +77,7 @@ namespace Yttrium
 		{
 			const auto size = read_uint8();
 			if (!metadata_reader.skip(size))
-				throw BadPackage(String() << "Bad package index entry metadata"_s);
+				throw BadPackage("Bad package index entry metadata"_s);
 			return StaticString(static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size);
 		};
 
@@ -86,9 +86,9 @@ namespace Yttrium
 		{
 			const auto i = &entry - entries.data();
 			if (entry.data_offset > reader_size || entry.data_offset + entry.data_size > reader_size)
-				throw BadPackage(String() << "Bad package index entry #"_s << i << " data"_s);
+				throw BadPackage("Bad package index entry #"_s, i, " data"_s);
 			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
-				throw BadPackage(String() << "Bad package index entry #"_s << i << " metadata"_s);
+				throw BadPackage("Bad package index entry #"_s, i, " metadata"_s);
 			Entry internal;
 			internal.offset = entry.data_offset;
 			internal.size = entry.data_size;

@@ -3,14 +3,15 @@
 
 #include <yttrium/ion/utils.h>
 
+#include <string>
+
 namespace Yttrium
 {
-	class Allocator;
-	class String;
+	class IonObject;
 
 	namespace Ion
 	{
-		String serialize(const IonObject& object, bool root, int indentation, Allocator* allocator);
+		std::string serialize(const IonObject&, bool root, int indentation);
 	}
 }
 

@@ -168,7 +168,7 @@ void Game::update(const UpdateEvent& update)
 	}
 
 	_debug_text.clear();
-	write_string(_debug_text,
+	append_to(_debug_text,
 		"FPS: ", update.fps, "\n"
 		"MaxFrameTime: ", update.max_frame_time.count(), "\n"
 		"Triangles: ", update.triangles, "\n"

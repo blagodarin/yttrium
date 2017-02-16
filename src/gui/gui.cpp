@@ -8,6 +8,7 @@
 #include <yttrium/script/context.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
+#include <yttrium/string.h>
 #include "gui.h"
 #include "ion/loader.h"
 #include "screen.h"
