@@ -4,6 +4,7 @@
 #ifndef _include_yttrium_exceptions_h_
 #define _include_yttrium_exceptions_h_
 
+#include <yttrium/static_string.h>
 #include <yttrium/string_utils.h>
 
 #include <exception>

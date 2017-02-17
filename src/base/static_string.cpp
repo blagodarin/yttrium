@@ -1,7 +1,6 @@
 #include <yttrium/static_string.h>
 
-#include <yttrium/string.h>
-#include <yttrium/string_format.h>
+#include <yttrium/string_utils.h>
 
 #include <cmath>
 #include <cstring>
@@ -256,25 +255,23 @@ namespace Yttrium
 		return right(other.size()) == other;
 	}
 
-	String StaticString::escaped(const char* symbols, char with, Allocator* allocator) const
+	std::string StaticString::escaped(const char* symbols, char with) const
 	{
-		String result(_size, allocator); // Best case assumption.
-
+		std::string result;
+		result.reserve(_size); // Best case assumption.
 		const auto end = _text + _size;
-
 		for (auto i = _text; i != end; ++i)
 		{
 			for (auto j = symbols; *j; ++j)
 			{
 				if (*i == *j)
 				{
-					result << with;
+					append_to(result, with);
 					break;
 				}
 			}
-			result << *i;
+			append_to(result, *i);
 		}
-
 		return result;
 	}
 
@@ -467,11 +464,6 @@ namespace Yttrium
 	bool operator==(const StaticString& a, const StaticString& b)
 	{
 		return a.size() == b.size() && !::memcmp(a.text(), b.text(), a.size());
-	}
-
-	bool operator!=(const StaticString& a, const StaticString& b)
-	{
-		return a.size() != b.size() || ::memcmp(a.text(), b.text(), a.size());
 	}
 
 	std::ostream& operator<<(std::ostream& stream, const StaticString& string)

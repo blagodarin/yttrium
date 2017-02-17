@@ -49,12 +49,6 @@ namespace Yttrium
 		/// Clear the string.
 		String& clear() noexcept;
 
-		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with in-place.
-		String& escape(const char* symbols, char with) { return swap(escaped(symbols, with)); }
-
-		///
-		String escaped(const char* symbols, char with) const { return StaticString::escaped(symbols, with, _allocator); }
-
 		///
 		/// \param text
 		/// \param offset

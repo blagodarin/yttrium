@@ -42,7 +42,7 @@ namespace Yttrium
 		bool ends_with(const StaticString& other) const;
 
 		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
-		String escaped(const char* symbols, char with, Allocator* allocator = DefaultAllocator) const;
+		std::string escaped(const char* symbols, char with) const;
 
 		/// Returns the offset of the first \a symbol since \a offset, or End if there is no such symbol.
 		size_t find_first(char symbol, size_t offset = 0) const;
@@ -126,7 +126,7 @@ namespace Yttrium
 	Y_API int compare(const StaticString&, const StaticString&);
 
 	Y_API bool operator==(const StaticString&, const StaticString&);
-	Y_API bool operator!=(const StaticString&, const StaticString&);
+	inline bool operator!=(const StaticString& a, const StaticString& b) { return !(a == b); }
 
 	inline bool operator>(const StaticString& a, const StaticString& b) { return compare(a, b) > 0; }
 	inline bool operator<(const StaticString& a, const StaticString& b) { return compare(a, b) < 0; }
@@ -138,6 +138,11 @@ namespace Yttrium
 	constexpr StaticString operator"" _s(const char* text, size_t size) { return {text, size}; }
 
 	Y_API std::ostream& operator<<(std::ostream&, const StaticString&);
+
+	namespace detail
+	{
+		inline void append_to(std::string& string, const StaticString& value) { string.append(value.text(), value.size()); }
+	}
 }
 
 #endif

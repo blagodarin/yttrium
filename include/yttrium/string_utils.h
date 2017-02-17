@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_string_utils_h_
 #define _include_yttrium_string_utils_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/api.h>
+
+#include <string>
 
 namespace Yttrium
 {
@@ -20,7 +22,6 @@ namespace Yttrium
 		inline void append_to(std::string& string, char value) { string.append(1, value); }
 		inline void append_to(std::string& string, const char* value) { string.append(value); }
 		inline void append_to(std::string& string, const std::string& value) { string.append(value); }
-		inline void append_to(std::string& string, const StaticString& value) { string.append(value.text(), value.size()); }
 		inline void append_to(std::string& string, const Repeat& value) { string.append(value._count, value._value); }
 
 		Y_API void append_to(std::string&, long long);

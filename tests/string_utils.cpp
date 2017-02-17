@@ -11,12 +11,9 @@ BOOST_AUTO_TEST_CASE(test_make_string)
 	BOOST_CHECK_EQUAL("", make_string());
 	BOOST_CHECK_EQUAL("", make_string(""));
 	BOOST_CHECK_EQUAL("", make_string(std::string{}));
-	BOOST_CHECK_EQUAL("", make_string(StaticString{}));
-	BOOST_CHECK_EQUAL("", make_string(""_s));
 
 	BOOST_CHECK_EQUAL("abc", make_string("abc"));
 	BOOST_CHECK_EQUAL("abc", make_string(std::string{ "abc" }));
-	BOOST_CHECK_EQUAL("abc", make_string("abc"_s));
 
 	BOOST_CHECK_EQUAL("0", make_string(short{ 0 }));
 	BOOST_CHECK_EQUAL("0", make_string(static_cast<unsigned short>(0)));
