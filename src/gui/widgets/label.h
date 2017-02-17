@@ -18,7 +18,7 @@ namespace Yttrium
 	private:
 		String _text;
 		mutable ForegroundProperty _foreground;
-		mutable String _final_text;
+		mutable std::string _final_text;
 	};
 }
 

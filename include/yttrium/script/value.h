@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_script_value_h_
 #define _include_yttrium_script_value_h_
 
-#include <yttrium/string.h>
+#include <yttrium/static_string.h>
 
 namespace Yttrium
 {
@@ -35,13 +35,13 @@ namespace Yttrium
 	public:
 
 		///
-		int to_int() const { return _value.to_int(); }
+		int to_int() const { return StaticString{ _value }.to_int(); }
 
 		///
-		double to_double() const { return _value.to_double(); }
+		double to_double() const { return StaticString{ _value }.to_double(); }
 
 		///
-		StaticString to_string() const { return _value; }
+		StaticString to_string() const { return StaticString{ _value }; }
 
 		///
 		Type type() const { return _type; }
@@ -61,13 +61,12 @@ namespace Yttrium
 
 	private:
 		Type _type;
-		String _value;
+		std::string _value;
 
 	private:
-		Y_PRIVATE ScriptValue(int, Allocator&);
-		Y_PRIVATE ScriptValue(double, Allocator&);
-		Y_PRIVATE ScriptValue(const StaticString&, Allocator&);
-		Y_PRIVATE ScriptValue(const StaticString&, Type, Allocator&);
+		Y_PRIVATE ScriptValue(int);
+		Y_PRIVATE ScriptValue(double);
+		Y_PRIVATE ScriptValue(const StaticString&, Type = Type::String);
 	};
 }
 

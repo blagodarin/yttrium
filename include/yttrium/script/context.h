@@ -116,11 +116,9 @@ namespace Yttrium
 		*/
 		const ScriptValue* set(const StaticString& name, const StaticString& value);
 
-		/// Substitute script variables in a string.
-		/// \param target
-		/// \param source
-		/// \note Every occurence of the pair of curly braces is threated as a variable name.
-		void substitute(String& target, const StaticString& source) const;
+		/// Substitutes script variables in a string.
+		/// Every occurence of curly brace pair is threated as a variable reference.
+		void substitute(std::string& target, const StaticString& source) const;
 
 		/// Undefine a command.
 		/// \param name Command name.

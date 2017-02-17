@@ -3,7 +3,8 @@
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/string_format.h>
+#include <yttrium/string.h>
+#include <yttrium/string_utils.h>
 
 #include <cassert>
 #include <iostream>
@@ -117,8 +118,7 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private->_allocator),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
+			i = _private->_values.emplace(String(name, &_private->_allocator), new(_private->_value_pool.allocate()) ScriptValue(value)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -128,8 +128,7 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private->_allocator),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
+			i = _private->_values.emplace(String(name, &_private->_allocator), new(_private->_value_pool.allocate()) ScriptValue(value)).first;
 		else
 			*i->second = value;
 		return i->second;
@@ -139,24 +138,21 @@ namespace Yttrium
 	{
 		auto i = _private->_values.find(String(name, ByReference(), nullptr));
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private->_allocator),
-				new(_private->_value_pool.allocate()) ScriptValue(value, _private->_allocator)).first;
+			i = _private->_values.emplace(String(name, &_private->_allocator), new(_private->_value_pool.allocate()) ScriptValue(value)).first;
 		else
 			*i->second = value;
 		return i->second;
 	}
 
-	void ScriptContext::substitute(String& target, const StaticString& source) const
+	void ScriptContext::substitute(std::string& target, const StaticString& source) const
 	{
-		assert(target.text() != source.text());
-
 		target.clear();
 		for (auto left = source.text(), right = left, end = left + source.size(); ; )
 		{
 			while (right != end && *right != '{')
 				++right;
 
-			target << StaticString(left, right - left);
+			append_to(target, StaticString(left, right - left));
 
 			if (right == end)
 				break;
@@ -169,9 +165,9 @@ namespace Yttrium
 			if (right == end)
 				break;
 
-			ScriptValue* value = find(StaticString(left, right - left));
+			const auto value = find(StaticString(left, right - left));
 			if (value)
-				target << value->to_string();
+				append_to(target, value->to_string());
 
 			left = ++right;
 		}

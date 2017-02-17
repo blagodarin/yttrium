@@ -1,53 +1,47 @@
 #include <yttrium/script/value.h>
 
-#include <yttrium/string_format.h>
+#include <yttrium/string_utils.h>
 
 namespace Yttrium
 {
 	ScriptValue& ScriptValue::operator=(int value)
 	{
 		_type = Type::Literal;
-		_value.clear() << value;
+		_value.clear();
+		append_to(_value, value);
 		return *this;
 	}
 
 	ScriptValue& ScriptValue::operator=(double value)
 	{
 		_type = Type::Literal;
-		_value.clear() << value;
+		_value.clear();
+		append_to(_value, value);
 		return *this;
 	}
 
 	ScriptValue& ScriptValue::operator=(const StaticString& value)
 	{
 		_type = Type::String;
-		_value = value;
+		_value.assign(value.text(), value.size());
 		return *this;
 	}
 
-	ScriptValue::ScriptValue(int value, Allocator& allocator)
+	ScriptValue::ScriptValue(int value)
 		: _type(Type::Literal)
-		, _value(&allocator)
+		, _value(make_string(value))
 	{
-		_value << value;
 	}
 
-	ScriptValue::ScriptValue(double value, Allocator& allocator)
+	ScriptValue::ScriptValue(double value)
 		: _type(Type::Literal)
-		, _value(&allocator)
-	{
-		_value << value;
-	}
-
-	ScriptValue::ScriptValue(const StaticString& value, Allocator& allocator)
-		: _type(Type::String)
-		, _value(value, &allocator)
+		, _value(make_string(value))
 	{
 	}
 
-	ScriptValue::ScriptValue(const StaticString& value, Type type, Allocator& allocator)
+	ScriptValue::ScriptValue(const StaticString& value, Type type)
 		: _type(type)
-		, _value(value, &allocator)
+		, _value(make_string(value))
 	{
 	}
 }

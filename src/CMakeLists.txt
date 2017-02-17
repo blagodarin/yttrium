@@ -25,7 +25,6 @@ add_library(yttrium
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
 	base/static_string.cpp
-	base/string_format.cpp
 	base/string_utils.cpp
 	base/string.cpp
 	base/tiny_string_map.cpp

@@ -7,6 +7,7 @@
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/string.h>
 #include "scanner.h"
 
 #include <cassert>
@@ -15,11 +16,11 @@ namespace Yttrium
 {
 	struct ScriptCommand
 	{
-		String name;
+		std::string name;
 		std::vector<ScriptValue*> args;
 
-		ScriptCommand(const StaticString& name, Allocator& allocator)
-			: name(name, &allocator)
+		ScriptCommand(const StaticString& name)
+			: name(name.text(), name.size())
 		{
 		}
 	};
@@ -36,7 +37,7 @@ namespace Yttrium
 				const auto token = scanner.read();
 				if (token.type == ScriptScanner::Token::End)
 				{
-					if (command && command->name == "="_s && command->args.size() != 2)
+					if (command && command->name == "=" && command->args.size() != 2)
 						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 					break;
 				}
@@ -45,7 +46,7 @@ namespace Yttrium
 					switch (token.type)
 					{
 					case ScriptScanner::Token::Identifier:
-						_commands.emplace_back(token.string, allocator);
+						_commands.emplace_back(token.string);
 						command = &_commands.back();
 						break;
 
@@ -61,28 +62,25 @@ namespace Yttrium
 					switch (token.type)
 					{
 					case ScriptScanner::Token::Identifier:
-						if (command->name == "="_s && command->args.size() != 1)
+						if (command->name == "=" && command->args.size() != 1)
 							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate())
-							ScriptValue(token.string, ScriptValue::Type::Name, allocator));
+						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Type::Name));
 						break;
 
 					case ScriptScanner::Token::Number:
-						if (command->name == "="_s && command->args.size() != 1)
+						if (command->name == "=" && command->args.size() != 1)
 							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate())
-							ScriptValue(token.string, ScriptValue::Type::Literal, allocator));
+						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Type::Literal));
 						break;
 
 					case ScriptScanner::Token::String:
-						if (command->name == "="_s && command->args.size() != 1)
+						if (command->name == "=" && command->args.size() != 1)
 							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate())
-							ScriptValue(token.string, ScriptValue::Type::String, allocator));
+						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Type::String));
 						break;
 
 					case ScriptScanner::Token::Separator:
-						if (command->name == "="_s && command->args.size() != 2)
+						if (command->name == "=" && command->args.size() != 2)
 							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
 						command = nullptr;
 						break;
@@ -90,9 +88,8 @@ namespace Yttrium
 					case ScriptScanner::Token::Equals:
 						if (!command->args.empty())
 							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate())
-							ScriptValue(command->name, ScriptValue::Type::Name, allocator));
-						command->name = "="_s;
+						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(StaticString{ command->name }, ScriptValue::Type::Name));
+						command->name = "=";
 						break;
 
 					default:
@@ -104,8 +101,8 @@ namespace Yttrium
 
 	public:
 		Allocator& _allocator;
-		std::vector<ScriptCommand> _commands;
 		Pool<ScriptValue> _temporaries{ 32, _allocator };
+		std::vector<ScriptCommand> _commands;
 	};
 
 	ScriptCode::ScriptCode() = default;
@@ -127,7 +124,7 @@ namespace Yttrium
 		TemporaryAllocator<64> result_allocator(_private->_allocator);
 		String result(&result_allocator);
 		for (const auto& command : _private->_commands)
-			if (command.name == "="_s)
+			if (command.name == "=")
 			{
 				assert(command.args.size() == 2);
 				assert(command.args[0]->type() == ScriptValue::Type::Name);
@@ -139,7 +136,7 @@ namespace Yttrium
 				else
 					context.set(command.args[0]->to_string(), command.args[1]->to_string());
 			}
-			else if (!context.call(command.name, &result, ScriptArgs(context, command.args)))
+			else if (!context.call(StaticString{ command.name }, &result, ScriptArgs(context, command.args)))
 				break;
 	}
 

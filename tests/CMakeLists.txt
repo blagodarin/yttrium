@@ -16,7 +16,6 @@ add_executable(unit_tests
 	rect.cpp
 	static_string.cpp
 	string.cpp
-	string_format.cpp
 	string_utils.cpp
 	texture_font.cpp
 	tiny_string_map.cpp
