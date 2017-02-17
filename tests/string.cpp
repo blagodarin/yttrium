@@ -49,33 +49,3 @@ BOOST_AUTO_TEST_CASE(test_string_assignment)
 	BOOST_CHECK_EQUAL(s1, "!est");
 	BOOST_CHECK_EQUAL(s3, "test");
 }
-
-BOOST_AUTO_TEST_CASE(test_string_swap)
-{
-	String s1("test");
-	String s2("another test");
-
-	s2.swap(&s1);
-	BOOST_CHECK_EQUAL(s1, "another test");
-	BOOST_CHECK_EQUAL(s2, "test");
-
-	s1.swap(String("rvalue test"));
-	BOOST_CHECK_EQUAL(s1, "rvalue test");
-}
-
-BOOST_AUTO_TEST_CASE(test_string_insert)
-{
-	String s1("test");
-
-	s1.insert("just ", 0);
-	BOOST_CHECK_EQUAL(s1, "just test");
-
-	s1.insert("another ", 5);
-	BOOST_CHECK_EQUAL(s1, "just another test");
-
-	s1.insert('!', s1.size());
-	BOOST_CHECK_EQUAL(s1, "just another test!");
-
-	s1.insert('!', s1.size() + 1);
-	BOOST_CHECK_EQUAL(s1, "just another test!");
-}

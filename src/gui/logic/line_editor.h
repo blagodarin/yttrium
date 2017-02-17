@@ -12,9 +12,9 @@ namespace Yttrium
 	public:
 		void clear();
 		size_t cursor() const { return _cursor; }
-		void insert(const StaticString& text);
-		void insert(char symbol) { insert(StaticString(&symbol, 1)); }
-		bool process_key(const KeyEvent& event);
+		void insert(const StaticString&);
+		void insert(char symbol) { insert({ &symbol, 1 }); }
+		bool process_key(const KeyEvent&);
 		size_t selection_offset() const { return _selection_offset; }
 		size_t selection_size() const { return _selection_size; }
 		void set_max_size(size_t);

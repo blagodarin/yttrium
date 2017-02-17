@@ -32,14 +32,12 @@ namespace Yttrium
 		/// Preallocating constructor.
 		explicit String(size_t size, Allocator* allocator = DefaultAllocator);
 
-		/// Destructor.
-		~String();
-
-	public:
-
 		///
 		String(const StaticString& string, const ByReference&, Allocator* allocator = DefaultAllocator)
 			: StaticString(string), _allocator(allocator) {}
+
+		/// Destructor.
+		~String();
 
 	public:
 
@@ -49,39 +47,15 @@ namespace Yttrium
 		/// Clear the string.
 		String& clear() noexcept;
 
-		///
-		/// \param text
-		/// \param offset
-		/// \note The \a text must not refer to the current string's data.
-		void insert(const StaticString& text, size_t offset);
-
-		/// Insert a \a symbol at the specified \a offset.
-		void insert(char symbol, size_t offset) { insert(StaticString(&symbol, 1), offset); }
-
-		/// Remove \a size symbols starting at the specified \a offset.
-		void remove(size_t offset, size_t size = 1);
-
 		/// Reserve the space in the string for \a size symbols.
 		void reserve(size_t size);
 
 		/// Resize the string, filling the new part with random data.
 		void resize(size_t size);
 
-		/// Truncate the string to the specified \a size.
-		void truncate(size_t size);
-
-		///
-		String& swap(String*) noexcept;
-
-		///
-		String& swap(String&&) noexcept;
-
 		///
 		char* text() { return const_cast<char*>(_text); }
 		using StaticString::text;
-
-		///
-		String& trim();
 
 		String& operator=(const StaticString&);
 		String& operator=(const String& string) { return *this = StaticString(string); }
