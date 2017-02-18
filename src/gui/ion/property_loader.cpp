@@ -418,7 +418,7 @@ namespace Yttrium
 				const StaticString* code;
 				if (!GuiIonPropertyLoader::load_text(&code, node))
 					throw GuiDataError("Bad action '"_s, node.name(), "'"_s);
-				actions.add<GuiAction_Call>(*code);
+				actions.add<GuiAction_Call>(code->to_std());
 			}
 			else if (node.name() == "enter"_s)
 			{

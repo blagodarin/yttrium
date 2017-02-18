@@ -2,11 +2,9 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/pool.h>
-#include <yttrium/memory/temporary_allocator.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
-#include <yttrium/storage/reader.h>
 #include "scanner.h"
 
 #include <cassert>
@@ -104,14 +102,10 @@ namespace Yttrium
 	};
 
 	ScriptCode::ScriptCode() = default;
+	ScriptCode::~ScriptCode() = default;
 
 	ScriptCode::ScriptCode(std::string&& text, Allocator& allocator)
 		: _private(std::make_unique<ScriptCodePrivate>(std::move(text), allocator))
-	{
-	}
-
-	ScriptCode::ScriptCode(const StaticString& text, Allocator& allocator)
-		: ScriptCode(text.to_std(), allocator) // The script text must be mutable for in-place parsing.
 	{
 	}
 
@@ -137,13 +131,6 @@ namespace Yttrium
 				break;
 	}
 
-	ScriptCode ScriptCode::load(const StaticString& filename, Allocator& allocator)
-	{
-		std::string text;
-		return Reader(filename).read_all(text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
-	}
-
-	ScriptCode::~ScriptCode() = default;
 	ScriptCode::ScriptCode(ScriptCode&&) noexcept = default;
 	ScriptCode& ScriptCode::operator=(ScriptCode&&) noexcept = default;
 }

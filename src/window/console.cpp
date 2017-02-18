@@ -46,7 +46,7 @@ namespace Yttrium
 				return true;
 
 			case Key::Enter:
-				ScriptCode(StaticString{ _private->_line_editor.text() }, _private->_script_context.allocator()).execute(_private->_script_context);
+				ScriptCode(std::string{ _private->_line_editor.text() }, _private->_script_context.allocator()).execute(_private->_script_context);
 				_private->_line_editor.clear();
 				return true;
 

@@ -14,7 +14,7 @@ namespace Yttrium
 	struct GuiAction_Call
 	{
 		ScriptCode _script;
-		GuiAction_Call(const StaticString& script) : _script(script) {}
+		GuiAction_Call(std::string&& script) : _script(std::move(script)) {}
 	};
 
 	struct GuiAction_Enter
