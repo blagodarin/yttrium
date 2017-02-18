@@ -131,14 +131,12 @@ namespace Yttrium
 
 		bool get(const IonValue& source, PointF& value)
 		{
-			const IonList* list;
-			if (!source.get(&list) || list->size() != 2)
+			if (source.type() != IonValue::Type::List)
 				return false;
-			if (!list->first()->string().to_number(value.data()[0]))
-				return false;
-			if (!list->last()->string().to_number(value.data()[1]))
-				return false;
-			return true;
+			const auto& list = source.list();
+			return list.size() == 2
+				&& list.first()->string().to_number(value.data()[0])
+				&& list.last()->string().to_number(value.data()[1]);
 		}
 
 		bool get(const IonNode& source, const StaticString*& value)
@@ -149,7 +147,8 @@ namespace Yttrium
 		bool get(const IonObject& source, const StaticString& name, float& value)
 		{
 			const auto& node = source.last(name);
-			return !node.is_empty() && node.last()->get(&value);
+			const StaticString* value_string;
+			return !node.is_empty() && node.last()->get(&value_string) && value_string->to_number(value);
 		}
 
 		bool get(const IonObject& source, const StaticString& name, const StaticString*& value)

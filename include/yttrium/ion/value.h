@@ -39,28 +39,6 @@ namespace Yttrium
 		/**
 		* \overload
 		*/
-		bool get(int32_t* value) const { return _type == Type::String && _string.to_number(*value); }
-
-		/**
-		* \overload
-		*/
-		bool get(float* value) const { return _type == Type::String && _string.to_number(*value); }
-
-		/**
-		* \overload
-		*/
-
-		bool get(const IonList** value) const
-		{
-			if (_type != Type::List)
-				return false;
-			*value = &_list; // NOTE: Something's wrong here.
-			return true;
-		}
-
-		/**
-		* \overload
-		*/
 		bool get(const IonObject** value) const
 		{
 			if (_type != Type::Object)
@@ -76,7 +54,7 @@ namespace Yttrium
 		const IonList& list() const { return _list; }
 
 		///
-		const StaticString& string() const { return _string; }
+		StaticString string() const { return _string; }
 
 		///
 		Type type() const { return _type; }
