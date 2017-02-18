@@ -6,6 +6,7 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resources/resource_ptr.h>
 
+#include <string>
 #include <vector>
 
 namespace Yttrium
@@ -25,7 +26,7 @@ namespace Yttrium
 		RectF texture_rect;
 		Margins borders;
 
-		void draw(Renderer&, const RectF& rect) const;
+		void draw(Renderer&, const RectF&) const;
 		bool load(const GuiPropertyLoader&);
 		void update(const GuiPropertyLoader&);
 	};
@@ -44,7 +45,7 @@ namespace Yttrium
 
 		void draw(Renderer&) const;
 		bool load(const GuiPropertyLoader&);
-		void prepare(const StaticString& text, const RectF& rect, TextCapture* = nullptr);
+		void prepare(const std::string&, const RectF&, TextCapture* = nullptr);
 	};
 }
 

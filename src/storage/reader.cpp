@@ -128,14 +128,14 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Reader::read_all(String& string) const
+	bool Reader::read_all(std::string& string) const
 	{
 		if (!_private)
 			return false;
 		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for null terminator.
 			throw std::bad_alloc();
 		string.resize(_private->_size);
-		return _private->read_at(0, string.text(), string.size()) == string.size();
+		return _private->read_at(0, const_cast<char*>(string.data()), string.size()) == string.size();
 	}
 
 	size_t Reader::read_at(uint64_t offset, void* data, size_t size) const
@@ -263,10 +263,10 @@ namespace Yttrium
 		return read_all(buffer) ? std::move(buffer) : Buffer();
 	}
 
-	String Reader::to_string(Allocator& allocator) const
+	std::string Reader::to_string() const
 	{
-		String string(&allocator);
-		return read_all(string) ? std::move(string) : String(&allocator);
+		std::string string;
+		return read_all(string) ? string : std::string{};
 	}
 
 	Reader::Reader() noexcept = default;

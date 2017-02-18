@@ -58,9 +58,9 @@ namespace
 
 namespace Yttrium
 {
-	ScriptScanner::ScriptScanner(const StaticString& text)
-		: _cursor(const_cast<char*>(text.text()))
-		, _end(text.text() + text.size())
+	ScriptScanner::ScriptScanner(std::string& text)
+		: _cursor(const_cast<char*>(text.data())) // TODO: Remove const_cast in C++17.
+		, _end(text.data() + text.size())
 	{
 	}
 

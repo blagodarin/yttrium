@@ -114,7 +114,7 @@ TetriumGraphics::TetriumGraphics(Renderer& renderer)
 {
 }
 
-void TetriumGraphics::draw(const StaticString& canvas, const RectF& rect, const Tetrium::Game& logic) const
+void TetriumGraphics::draw(const std::string& canvas, const RectF& rect, const Tetrium::Game& logic) const
 {
 	if (canvas == "field")
 		draw_field(rect, logic.field(), logic.current_figure());

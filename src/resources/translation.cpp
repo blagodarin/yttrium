@@ -19,15 +19,16 @@ namespace Yttrium
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
 		bool save(const StaticString& path) const override;
-		String translate(const StaticString& source) const override;
+		std::string translate(const StaticString& source) const override;
 
 	private:
 		struct Entry
 		{
-			String text;
+			std::string text;
 			bool added = false;
 
-			Entry(String&& text) : text(std::move(text)) {}
+			Entry() = default;
+			Entry(std::string&& text) : text(std::move(text)) {}
 		};
 
 		Allocator& _allocator;
@@ -49,7 +50,7 @@ namespace Yttrium
 			const StaticString* translation = nullptr;
 			if (!node.first()->get(&source) || !node.last()->get(&translation))
 				throw DataError("Bad translation data");
-			translations.emplace(String(*source, &_allocator), String(*translation, &_allocator));
+			translations.emplace(String(*source, &_allocator), translation->to_std());
 		}
 		_translations = std::move(translations);
 	}
@@ -58,7 +59,7 @@ namespace Yttrium
 	{
 		auto i = _translations.find(String(source, ByReference(), &_allocator));
 		if (i == _translations.end())
-			i = _translations.emplace(String(source, &_allocator), String(&_allocator)).first;
+			i = _translations.emplace(String(source, &_allocator), Entry{}).first;
 		i->second.added = true;
 	}
 
@@ -78,15 +79,15 @@ namespace Yttrium
 		{
 			auto& node = *document->root().append("tr"_s);
 			node.append(translation.first);
-			node.append(translation.second.text);
+			node.append(StaticString{ translation.second.text });
 		}
 		return document->save(file_name);
 	}
 
-	String TranslationImpl::translate(const StaticString& source) const
+	std::string TranslationImpl::translate(const StaticString& source) const
 	{
 		const auto i = _translations.find(String(source, ByReference(), &_allocator));
-		return i != _translations.end() && !i->second.text.is_empty() ? i->second.text : String(source, &_allocator);
+		return i != _translations.end() && !i->second.text.empty() ? i->second.text : source.to_std();
 	}
 
 	ResourcePtr<Translation> Translation::open(const Reader& reader, Allocator& allocator)

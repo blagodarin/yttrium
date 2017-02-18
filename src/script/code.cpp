@@ -7,7 +7,6 @@
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 #include <yttrium/storage/reader.h>
-#include <yttrium/string.h>
 #include "scanner.h"
 
 #include <cassert>
@@ -28,8 +27,8 @@ namespace Yttrium
 	class ScriptCodePrivate
 	{
 	public:
-		ScriptCodePrivate(String&& text, Allocator& allocator)
-			: _allocator(allocator)
+		ScriptCodePrivate(std::string&& text, Allocator& allocator)
+			: _temporaries{ 32, allocator }
 		{
 			ScriptScanner scanner(text);
 			for (ScriptCommand* command = nullptr;;)
@@ -100,20 +99,19 @@ namespace Yttrium
 		}
 
 	public:
-		Allocator& _allocator;
-		Pool<ScriptValue> _temporaries{ 32, _allocator };
+		Pool<ScriptValue> _temporaries;
 		std::vector<ScriptCommand> _commands;
 	};
 
 	ScriptCode::ScriptCode() = default;
 
-	ScriptCode::ScriptCode(String&& text, Allocator& allocator)
+	ScriptCode::ScriptCode(std::string&& text, Allocator& allocator)
 		: _private(std::make_unique<ScriptCodePrivate>(std::move(text), allocator))
 	{
 	}
 
 	ScriptCode::ScriptCode(const StaticString& text, Allocator& allocator)
-		: ScriptCode(String(text, &allocator), allocator) // The script text must be mutable for in-place parsing.
+		: ScriptCode(text.to_std(), allocator) // The script text must be mutable for in-place parsing.
 	{
 	}
 
@@ -121,8 +119,7 @@ namespace Yttrium
 	{
 		if (!_private)
 			return;
-		TemporaryAllocator<64> result_allocator(_private->_allocator);
-		String result(&result_allocator);
+		std::string result;
 		for (const auto& command : _private->_commands)
 			if (command.name == "=")
 			{
@@ -136,13 +133,13 @@ namespace Yttrium
 				else
 					context.set(command.args[0]->to_string(), command.args[1]->to_string());
 			}
-			else if (!context.call(StaticString{ command.name }, &result, ScriptArgs(context, command.args)))
+			else if (!context.call(command.name, result, ScriptArgs(context, command.args)))
 				break;
 	}
 
 	ScriptCode ScriptCode::load(const StaticString& filename, Allocator& allocator)
 	{
-		String text(&allocator);
+		std::string text;
 		return Reader(filename).read_all(text) ? ScriptCode(std::move(text), allocator) : ScriptCode();
 	}
 

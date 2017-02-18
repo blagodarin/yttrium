@@ -30,7 +30,7 @@ namespace Yttrium
 		{
 		}
 
-		void build(std::vector<TexturedRect>& rects, const PointF& top_left, float font_size, const StaticString& text, TextCapture* capture) const override
+		void build(std::vector<TexturedRect>& rects, const PointF& top_left, float font_size, const std::string& text, TextCapture* capture) const override
 		{
 			rects.clear();
 
@@ -65,7 +65,7 @@ namespace Yttrium
 				}
 			};
 
-			const char* current_symbol = text.text();
+			const char* current_symbol = text.c_str();
 
 			for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
 			{
@@ -94,7 +94,7 @@ namespace Yttrium
 			return _rect;
 		}
 
-		Size text_size(const StaticString& text) const override
+		Size text_size(const std::string& text) const override
 		{
 			int width = 0;
 			for (size_t i = 0; i < text.size(); ++i)
@@ -112,7 +112,7 @@ namespace Yttrium
 			return {width, _size};
 		}
 
-		SizeF text_size(const StaticString& text, const SizeF& font_size) const override
+		SizeF text_size(const std::string& text, const SizeF& font_size) const override
 		{
 			const auto& size = text_size(text);
 			return {font_size.width() * (size.width() * font_size.height() / size.height()), font_size.height()};

@@ -2,22 +2,12 @@
 
 #include <yttrium/audio/sound.h>
 #include <yttrium/renderer/renderer.h>
-#include <yttrium/renderer/texture.h>
-#include <yttrium/script/context.h>
-#include "../gui.h"
+#include <yttrium/static_string.h>
 #include "../property_loader.h"
-
-#include <utility>
 
 namespace Yttrium
 {
 	constexpr auto ButtonTextSize = 0.875f;
-
-	ButtonWidget::ButtonWidget(GuiPrivate& gui)
-		: Widget(gui)
-		, _text(&_gui.allocator())
-	{
-	}
 
 	bool ButtonWidget::load(GuiPropertyLoader& loader)
 	{

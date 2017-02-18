@@ -14,10 +14,10 @@ namespace
 {
 	using namespace Yttrium;
 
-	SizeF make_text_size(const TextureFont& font, const StaticString& text, float max_width, float max_height)
+	SizeF make_text_size(const TextureFont& font, const std::string& text, float max_width, float max_height)
 	{
 		const SizeF unscaled_text_size(font.text_size(text));
-		if (text.is_empty())
+		if (text.empty())
 			return {0, max_height};
 		const auto font_size = min(max_height, unscaled_text_size.height() * max_width / unscaled_text_size.width());
 		return {unscaled_text_size.width() * font_size / unscaled_text_size.height(), font_size};
@@ -95,7 +95,7 @@ namespace Yttrium
 		return true;
 	}
 
-	void ForegroundProperty::prepare(const StaticString& text, const RectF& rect, TextCapture* capture)
+	void ForegroundProperty::prepare(const std::string& text, const RectF& rect, TextCapture* capture)
 	{
 		const auto max_text_height = rect.height() * size;
 		const auto margins = rect.height() - max_text_height;

@@ -4,19 +4,11 @@
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/script/context.h>
-#include <yttrium/string.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
-#include <utility>
-
 namespace Yttrium
 {
-	InputWidget::InputWidget(GuiPrivate& gui)
-		: Widget(gui, CanHaveFocus)
-	{
-	}
-
 	bool InputWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!loader.load_rect("position"_s, _rect)
@@ -25,9 +17,12 @@ namespace Yttrium
 		_background.load(loader);
 		_on_update = loader.load_actions("on_update"_s);
 		_on_enter = loader.load_actions("on_enter"_s);
-		String initial_text(&_gui.allocator());
+		std::string initial_text;
 		if (loader.load_text("text"_s, initial_text)) // TODO: Use init-statement in C++17.
-			_logic.insert(initial_text);
+		{
+			_logic.reset(std::move(initial_text));
+			_logic.process_key({ Key::End, true, false });
+		}
 		return true;
 	}
 
@@ -63,7 +58,7 @@ namespace Yttrium
 		_background.draw(renderer, rect);
 
 		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
-		_foreground.prepare(StaticString{ _logic.text() }, rect, &capture);
+		_foreground.prepare(_logic.text(), rect, &capture);
 		_foreground.draw(renderer);
 
 		if (is_focused() && capture.has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)

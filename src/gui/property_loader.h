@@ -4,6 +4,8 @@
 #include <yttrium/renderer/texture.h>
 #include "types.h"
 
+#include <string>
+
 namespace Yttrium
 {
 	class GuiActions;
@@ -14,7 +16,6 @@ namespace Yttrium
 	class SizeF;
 	class Sound;
 	class StaticString;
-	class String;
 	class Texture2D;
 	class TextureFont;
 	class Vector4;
@@ -35,9 +36,9 @@ namespace Yttrium
 		virtual bool load_rect(const StaticString& name, RectF&, bool update = false) const = 0;
 		virtual ResourcePtr<const Sound> load_sound(const StaticString& name) const = 0;
 		virtual bool load_state(const StaticString& name, WidgetState*) const = 0;
-		virtual bool load_text(const StaticString& name, String&) const = 0;
+		virtual bool load_text(const StaticString& name, std::string&) const = 0;
 		virtual bool load_texture(const StaticString& name, ResourcePtr<const Texture2D>&, Texture2D::Filter&) const = 0;
-		virtual bool load_translatable(const StaticString& name, String&) const = 0;
+		virtual bool load_translatable(const StaticString& name, std::string&) const = 0;
 		virtual void unbind() = 0;
 	};
 }

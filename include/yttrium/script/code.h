@@ -12,7 +12,6 @@ namespace Yttrium
 {
 	class ScriptContext;
 	class StaticString;
-	class String;
 
 	/// Script code.
 	class Y_API ScriptCode
@@ -22,10 +21,10 @@ namespace Yttrium
 		ScriptCode();
 
 		///
-		explicit ScriptCode(String&& text, Allocator& = *DefaultAllocator);
+		explicit ScriptCode(std::string&&, Allocator& = *DefaultAllocator);
 
 		///
-		explicit ScriptCode(const StaticString& text, Allocator& = *DefaultAllocator);
+		explicit ScriptCode(const StaticString&, Allocator& = *DefaultAllocator);
 
 		///
 		explicit operator bool() const noexcept { return static_cast<bool>(_private); }

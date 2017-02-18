@@ -215,7 +215,7 @@ namespace Yttrium
 		/// \param key Key.
 		/// \param pressed Press count.
 		/// \param modifiers Modifier mask.
-		explicit KeyEvent(Key key, bool pressed, bool autorepeat)
+		KeyEvent(Key key, bool pressed, bool autorepeat)
 			: key(key)
 			, pressed(pressed)
 			, autorepeat(autorepeat)

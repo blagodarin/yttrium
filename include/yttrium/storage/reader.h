@@ -58,7 +58,7 @@ namespace Yttrium
 		bool read_all(Buffer&) const;
 
 		/// Reads the entire source data into the string.
-		bool read_all(String&) const;
+		bool read_all(std::string&) const;
 
 		/// Reads data from the source at the specified offset.
 		bool read_all_at(uint64_t offset, void* data, size_t size) const { return read_at(offset, data, size) == size; }
@@ -91,8 +91,8 @@ namespace Yttrium
 		/// Reads the entire source data into a Buffer.
 		Buffer to_buffer() const;
 
-		/// Reads the entire source data into a String.
-		String to_string(Allocator& = *DefaultAllocator) const;
+		/// Reads the entire source data into a string.
+		std::string to_string() const;
 
 	private:
 		std::shared_ptr<class ReaderPrivate> _private;

@@ -7,12 +7,13 @@
 #include <yttrium/memory/global.h>
 #include <yttrium/resources/resource.h>
 
+#include <string>
+
 namespace Yttrium
 {
 	class Reader;
 	template <typename> class ResourcePtr;
 	class StaticString;
-	class String;
 
 	/// Translation file.
 	class Y_API Translation : public Resource
@@ -33,7 +34,7 @@ namespace Yttrium
 		virtual bool save(const StaticString& path) const = 0;
 
 		///
-		virtual String translate(const StaticString& source) const = 0;
+		virtual std::string translate(const StaticString& source) const = 0;
 	};
 }
 

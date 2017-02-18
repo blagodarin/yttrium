@@ -9,6 +9,7 @@
 #include <cassert>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 
 namespace Yttrium
 {
@@ -42,7 +43,7 @@ namespace Yttrium
 		ScriptContext* const _parent;
 		Pool<ScriptValue> _value_pool{ 32, _allocator };
 		std::map<String, ScriptValue*> _values;
-		std::map<String, ScriptCommandContext> _commands;
+		std::unordered_map<std::string, ScriptCommandContext> _commands;
 	};
 
 	ScriptContext::ScriptContext(Allocator* allocator)
@@ -55,42 +56,42 @@ namespace Yttrium
 	{
 	}
 
+	ScriptContext::~ScriptContext() = default;
+
 	Allocator& ScriptContext::allocator() const noexcept
 	{
 		return _private->_allocator;
 	}
 
-	bool ScriptContext::call(const StaticString& name, String* result, const ScriptArgs& args)
+	bool ScriptContext::call(const std::string& name, std::string& result, const ScriptArgs& args)
 	{
-		if (name.is_empty())
+		if (name.empty())
 		{
 			std::cerr << "Invalid command \"\"\n";
 			return false;
 		}
 
-		const auto id = (name[0] == '+' || name[0] == '-' ? StaticString(name.text() + 1, name.size() - 1) : name);
-
-		const auto command = _private->_commands.find(String(id, ByReference(), nullptr));
+		const auto command = _private->_commands.find(name);
 		if (command == _private->_commands.end())
 		{
-			std::cerr << "Unknown command \"" << id << "\"\n";
+			std::cerr << "Unknown command \"" << name << "\"\n";
 			return false;
 		}
 
 		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
 		{
-			std::cerr << "Argument number mismatch for \"" << id << "\": "
+			std::cerr << "Argument number mismatch for \"" << name << "\": "
 				<< args.size() << " instead of " << command->second.min_args << "-" << command->second.max_args << "\n";
 			return false;
 		}
 
-		command->second.command(ScriptCall(*this, name, args, *result));
+		command->second.command({ *this, name, result, args });
 		return true;
 	}
 
 	void ScriptContext::define(const StaticString& name, size_t min_args, size_t max_args, const Command& command)
 	{
-		_private->_commands[String(name, &_private->_allocator)] = ScriptCommandContext(command, min_args, max_args);
+		_private->_commands[name.to_std()] = ScriptCommandContext(command, min_args, max_args);
 	}
 
 	ScriptValue* ScriptContext::find(const StaticString& name) const
@@ -144,10 +145,10 @@ namespace Yttrium
 		return i->second;
 	}
 
-	void ScriptContext::substitute(std::string& target, const StaticString& source) const
+	void ScriptContext::substitute(std::string& target, const std::string& source) const
 	{
 		target.clear();
-		for (auto left = source.text(), right = left, end = left + source.size(); ; )
+		for (auto left = source.c_str(), right = left, end = left + source.size(); ; )
 		{
 			while (right != end && *right != '{')
 				++right;
@@ -172,20 +173,4 @@ namespace Yttrium
 			left = ++right;
 		}
 	}
-
-	void ScriptContext::unset(const StaticString& name)
-	{
-		const auto i = _private->_values.find(String(name, ByReference()));
-		if (i == _private->_values.end())
-			return;
-		_private->_value_pool.deallocate(i->second);
-		_private->_values.erase(i);
-	}
-
-	void ScriptContext::undefine(const StaticString& name)
-	{
-		_private->_commands.erase(String(name, ByReference()));
-	}
-
-	ScriptContext::~ScriptContext() = default;
 }

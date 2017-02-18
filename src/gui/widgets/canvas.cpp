@@ -5,12 +5,6 @@
 
 namespace Yttrium
 {
-	CanvasWidget::CanvasWidget(GuiPrivate& gui)
-		: Widget(gui)
-		, _id(&_gui.allocator())
-	{
-	}
-
 	bool CanvasWidget::load(GuiPropertyLoader& loader)
 	{
 		if (!loader.load_text("id"_s, _id))

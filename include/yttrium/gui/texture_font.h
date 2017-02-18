@@ -7,13 +7,13 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/resources/resource.h>
 
+#include <string>
 #include <vector>
 
 namespace Yttrium
 {
 	class Reader;
 	template <typename> class ResourcePtr;
-	class StaticString;
 	class TextCapture;
 	class TexturedRect;
 
@@ -35,16 +35,16 @@ namespace Yttrium
 		static ResourcePtr<TextureFont> open(Reader&&);
 
 		///
-		virtual void build(std::vector<TexturedRect>&, const PointF& top_left, float font_size, const StaticString&, TextCapture* = nullptr) const = 0;
+		virtual void build(std::vector<TexturedRect>&, const PointF& top_left, float font_size, const std::string&, TextCapture* = nullptr) const = 0;
 
 		///
 		virtual Rect rect() const = 0;
 
 		///
-		virtual Size text_size(const StaticString&) const = 0;
+		virtual Size text_size(const std::string&) const = 0;
 
 		///
-		virtual SizeF text_size(const StaticString&, const SizeF& font_size) const = 0;
+		virtual SizeF text_size(const std::string&, const SizeF& font_size) const = 0;
 	};
 }
 

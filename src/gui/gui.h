@@ -41,7 +41,7 @@ namespace Yttrium
 
 		GuiScreen& add_screen(const std::string& name, bool is_transparent, bool is_root);
 		Allocator& allocator() const { return _allocator; }
-		void draw_canvas(Renderer& renderer, const StaticString& name, const RectF& rect) const { if (_on_canvas) _on_canvas(renderer, name, rect); }
+		void draw_canvas(Renderer& renderer, const std::string& name, const RectF& rect) const { if (_on_canvas) _on_canvas(renderer, name, rect); }
 		void draw_custom_cursor(Renderer& renderer, const PointF& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
 		bool pop_screen();
@@ -54,7 +54,7 @@ namespace Yttrium
 		void set_font(const std::string& name, const StaticString& font_source, const StaticString& texture_name);
 		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
 		void set_translation(const StaticString& path);
-		String translate(const StaticString&) const;
+		std::string translate(const StaticString&) const;
 
 	private:
 		void enter_screen(GuiScreen&);
@@ -72,7 +72,7 @@ namespace Yttrium
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
 		ResourcePtr<const Texture2D> _default_cursor_texture;
-		std::function<void(Renderer&, const StaticString&, const RectF&)> _on_canvas;
+		std::function<void(Renderer&, const std::string&, const RectF&)> _on_canvas;
 		std::function<void(Renderer&, const PointF&)> _on_custom_cursor;
 		std::function<void(const ResourcePtr<const Music>&)> _on_music;
 		std::function<void()> _on_quit;

@@ -8,7 +8,6 @@
 #include <yttrium/script/context.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
-#include <yttrium/string.h>
 #include "gui.h"
 #include "ion/loader.h"
 #include "screen.h"
@@ -110,9 +109,9 @@ namespace Yttrium
 		font.texture = std::move(texture);
 	}
 
-	String GuiPrivate::translate(const StaticString& source) const
+	std::string GuiPrivate::translate(const StaticString& source) const
 	{
-		return _translation ? _translation->translate(source) : String(source, &_allocator);
+		return _translation ? _translation->translate(source) : source.to_std();
 	}
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)
@@ -151,7 +150,7 @@ namespace Yttrium
 			_private->_screen_stack.back()->handle_event(event.to_std());
 	}
 
-	void Gui::on_canvas(const std::function<void(Renderer&, const StaticString&, const RectF&)>& callback)
+	void Gui::on_canvas(const std::function<void(Renderer&, const std::string&, const RectF&)>& callback)
 	{
 		_private->_on_canvas = callback;
 	}

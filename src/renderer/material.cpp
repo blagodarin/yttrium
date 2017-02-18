@@ -49,7 +49,9 @@ namespace Yttrium
 		}
 		if (vertex_shader.is_empty() || fragment_shader.is_empty())
 			throw DataError("("_s, name, ") No 'vertex_shader' or 'fragment_shader'"_s);
-		_program = resource_loader.renderer()->create_gpu_program(resource_loader.storage().open(vertex_shader).to_string(), resource_loader.storage().open(fragment_shader).to_string());
+		_program = resource_loader.renderer()->create_gpu_program(
+			StaticString{ resource_loader.storage().open(vertex_shader).to_string() },
+			StaticString{ resource_loader.storage().open(fragment_shader).to_string() });
 		if (!_program)
 			throw DataError("("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s);
 	}

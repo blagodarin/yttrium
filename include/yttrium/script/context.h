@@ -24,31 +24,23 @@ namespace Yttrium
 
 	public:
 
-		ScriptContext&      context;  ///< Calling context.
-		const StaticString& function; ///< Function name, guaranteed to be non-empty.
-		const ScriptArgs&   args;     ///< Function arguments.
-		String&             result;   ///< Function result.
+		ScriptContext&     context;  ///< Calling context.
+		const std::string& function; ///< Function name, guaranteed to be non-empty.
+		std::string&       result;   ///< Function result.
+		const ScriptArgs&  args;     ///< Function arguments.
 
 	private:
 
-		ScriptCall(ScriptContext& context, const StaticString& function, const ScriptArgs& args, String& result)
-			: context(context)
-			, function(function)
-			, args(args)
-			, result(result)
-		{
-		}
+		ScriptCall(ScriptContext& context, const std::string& function, std::string& result, const ScriptArgs& args)
+			: context(context), function(function), result(result), args(args) {}
 	};
 
 	/// Script context.
 	class Y_API ScriptContext
 	{
 	public:
-
 		///
 		using Command = std::function<void(const ScriptCall&)>;
-
-	public:
 
 		///
 		ScriptContext(Allocator* allocator = DefaultAllocator);
@@ -57,21 +49,16 @@ namespace Yttrium
 		ScriptContext(ScriptContext* parent, Allocator* allocator = nullptr);
 
 		///
+		~ScriptContext();
+
+		///
 		Allocator& allocator() const noexcept;
 
 		/// Call a command.
-		/// \param name Command name.
-		/// \param result Command result.
-		/// \param args Command arguments.
-		/// \return \c true if the command was succesfully called.
-		bool call(const StaticString& name, String* result, const ScriptArgs& args);
+		bool call(const std::string& name, std::string& result, const ScriptArgs&);
 
 		/// Define a command.
-		/// \param name Command name.
-		/// \param min_args Minimum number of arguments.
-		/// \param max_args Maximum number of arguments.
-		/// \param command Command handler.
-		void define(const StaticString& name, size_t min_args, size_t max_args, const Command& command);
+		void define(const StaticString& name, size_t min_args, size_t max_args, const Command&);
 
 		///
 		void define(const StaticString& name, size_t args, const Command& command)
@@ -118,21 +105,10 @@ namespace Yttrium
 
 		/// Substitutes script variables in a string.
 		/// Every occurence of curly brace pair is threated as a variable reference.
-		void substitute(std::string& target, const StaticString& source) const;
-
-		/// Undefine a command.
-		/// \param name Command name.
-		void undefine(const StaticString& name);
-
-		/// Unset a variable.
-		/// \param name Variable name.
-		void unset(const StaticString& name);
+		void substitute(std::string& target, const std::string& source) const;
 
 	private:
 		const std::unique_ptr<class ScriptContextPrivate> _private;
-
-	public:
-		~ScriptContext();
 	};
 }
 

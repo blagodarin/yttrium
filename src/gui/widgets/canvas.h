@@ -1,21 +1,22 @@
 #ifndef _src_gui_widgets_canvas_h_
 #define _src_gui_widgets_canvas_h_
 
-#include <yttrium/string.h>
 #include "widget.h"
+
+#include <string>
 
 namespace Yttrium
 {
 	class CanvasWidget : public Widget
 	{
 	public:
-		CanvasWidget(GuiPrivate&);
+		CanvasWidget(GuiPrivate& gui) : Widget(gui) {}
 
 		bool load(GuiPropertyLoader&) override;
 		void render(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
-		String _id;
+		std::string _id;
 	};
 }
 

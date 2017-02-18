@@ -1,7 +1,6 @@
 #ifndef _src_gui_widgets_input_h_
 #define _src_gui_widgets_input_h_
 
-#include <yttrium/script/code.h>
 #include "../actions.h"
 #include "../logic/line_editor.h"
 #include "../properties.h"
@@ -14,7 +13,7 @@ namespace Yttrium
 	class InputWidget : public Widget
 	{
 	public:
-		InputWidget(GuiPrivate&);
+		InputWidget(GuiPrivate& gui) : Widget(gui, CanHaveFocus) {}
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;

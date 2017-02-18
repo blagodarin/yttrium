@@ -30,7 +30,7 @@ namespace Yttrium
 
 	public:
 
-		ScriptScanner(const StaticString& text);
+		ScriptScanner(std::string& text);
 
 		Token read();
 

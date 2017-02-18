@@ -103,10 +103,10 @@ BOOST_AUTO_TEST_CASE(test_reader_read_all_buffer)
 BOOST_AUTO_TEST_CASE(test_reader_read_all_string)
 {
 	const auto expected = ::make_random_buffer(997);
-	String actual;
+	std::string actual;
 	BOOST_REQUIRE(Reader(expected.data(), expected.size()).read_all(actual));
 	BOOST_CHECK_EQUAL(actual.size(), expected.size());
-	BOOST_CHECK(!::memcmp(actual.text(), expected.data(), expected.size()));
+	BOOST_CHECK(!::memcmp(actual.data(), expected.data(), expected.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_read_line_std_string)
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(test_reader_to_string)
 	const auto expected = ::make_random_buffer(997);
 	const auto actual = Reader(expected.data(), expected.size()).to_string();
 	BOOST_CHECK_EQUAL(actual.size(), expected.size());
-	BOOST_CHECK(!::memcmp(actual.text(), expected.data(), expected.size()));
+	BOOST_CHECK(!::memcmp(actual.data(), expected.data(), expected.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_reader)

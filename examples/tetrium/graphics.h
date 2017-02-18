@@ -10,7 +10,6 @@ namespace Yttrium
 	class RectF;
 	class Renderer;
 	class SizeF;
-	class StaticString;
 	class Texture2D;
 }
 
@@ -21,7 +20,7 @@ class TetriumGraphics
 public:
 	TetriumGraphics(Renderer&);
 
-	void draw(const StaticString& canvas, const RectF&, const Tetrium::Game&) const;
+	void draw(const std::string& canvas, const RectF&, const Tetrium::Game&) const;
 
 private:
 	void draw_block(const RectF&, const SizeF& block_size, float x, float y) const;
