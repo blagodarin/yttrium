@@ -1,6 +1,5 @@
 #include <yttrium/ion/document.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>

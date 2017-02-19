@@ -14,14 +14,14 @@ namespace Yttrium
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) override;
 		std::unique_ptr<IndexBuffer> create_index_buffer(IndexFormat, size_t, const void*) override;
-		ResourcePtr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps) override;
+		std::unique_ptr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps) override;
 		std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, size_t, const void*) override;
 		void draw_mesh(const Mesh&) override;
 		void draw_triangles(const VertexBuffer&, const IndexBuffer&) override;
 
 		// RendererImpl
 		void clear() override;
-		ResourcePtr<Mesh> create_mesh(const MeshData&) override;
+		std::unique_ptr<Mesh> create_mesh(const MeshData&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
 		Image take_screenshot() const override;
 		void flush_2d_impl(const Buffer&, const Buffer&) override;

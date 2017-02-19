@@ -1,7 +1,6 @@
 #include "backend.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/resources/resource_ptr.h>
 #include "player.h"
 #include "sound.h"
 
@@ -46,9 +45,9 @@ namespace Yttrium
 		return std::make_unique<OpenAlPlayer>();
 	}
 
-	ResourcePtr<Sound> OpenAlBackend::create_sound(AudioReader& reader)
+	std::unique_ptr<Sound> OpenAlBackend::create_sound(AudioReader& reader)
 	{
-		return make_resource<Sound_OpenAL>(reader);
+		return std::make_unique<Sound_OpenAL>(reader);
 	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create()

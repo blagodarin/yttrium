@@ -94,7 +94,7 @@ int main(int, char**)
 	AudioPlayer audio_player{ audio, AudioPlayer::State::Playing };
 
 	gui.on_canvas([&logic, &graphics](Renderer&, const std::string& canvas, const RectF& rect){ graphics.draw(canvas, rect, logic); });
-	gui.on_music([&audio_player](const ResourcePtr<const Music>& music){ audio_player.set_music(music); });
+	gui.on_music([&audio_player](const std::shared_ptr<const Music>& music){ audio_player.set_music(music); });
 	gui.on_quit([&window]{ window.close(); });
 
 	gui.start();

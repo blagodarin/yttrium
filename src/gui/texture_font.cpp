@@ -3,7 +3,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/utils.h>
 #include "texture_font.h"
@@ -127,7 +126,7 @@ namespace Yttrium
 		friend TextureFont;
 	};
 
-	ResourcePtr<TextureFont> TextureFont::open(Reader&& reader)
+	std::unique_ptr<TextureFont> TextureFont::open(Reader&& reader)
 	{
 		if (!reader)
 			return nullptr;
@@ -152,7 +151,7 @@ namespace Yttrium
 		if (!reader.read(char_count))
 			throw DataError("Bad 'char' section header");
 
-		auto font = make_resource<TextureFontImpl>(font_section.size);
+		auto font = std::make_unique<TextureFontImpl>(font_section.size);
 
 		Size font_rect_size;
 		for (uint8_t i = 0; i < char_count; ++i)

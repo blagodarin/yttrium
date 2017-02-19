@@ -8,7 +8,6 @@
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/static_string.h>
 
 #include <memory>
@@ -38,18 +37,18 @@ namespace Yttrium
 
 		~RendererImpl() override;
 
-		ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) override;
+		std::unique_ptr<Material> create_material(ResourceLoader&, const StaticString&) override;
 		void draw_debug_text(const StaticString&) override;
 		void draw_rect(const RectF&, const Vector4&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Vector4&) override;
 		Matrix4 full_matrix() const override;
-		ResourcePtr<Mesh> load_mesh(Reader&&) override;
+		std::unique_ptr<Mesh> load_mesh(Reader&&) override;
 		Matrix4 model_matrix() const override;
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
-		virtual ResourcePtr<Mesh> create_mesh(const MeshData&) = 0;
+		virtual std::unique_ptr<Mesh> create_mesh(const MeshData&) = 0;
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual Image take_screenshot() const = 0;
 
@@ -71,7 +70,6 @@ namespace Yttrium
 		void set_window_size(const Size&);
 
 	protected:
-
 		struct Vertex2D
 		{
 			Vector2 position;
@@ -88,13 +86,11 @@ namespace Yttrium
 		void update_state();
 
 	private:
-
 		void draw_rect(const RectF& position, const Vector4& color, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
 		void reset_texture_state();
 
 	protected:
-
 		Statistics _statistics;
 
 	private:
@@ -103,11 +99,11 @@ namespace Yttrium
 		Buffer _vertices_2d;
 		Buffer _indices_2d;
 
-		RectF    _texture_rect;
+		RectF _texture_rect;
 		MarginsF _texture_borders;
 
-		ResourcePtr<Texture2D> _white_texture;
-		ResourcePtr<Texture2D> _debug_texture;
+		std::unique_ptr<const Texture2D> _white_texture;
+		std::unique_ptr<const Texture2D> _debug_texture;
 		std::unique_ptr<GpuProgram> _program_2d;
 
 		enum class MatrixType

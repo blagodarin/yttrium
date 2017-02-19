@@ -5,24 +5,23 @@
 #define _include_yttrium_resources_translation_h_
 
 #include <yttrium/memory/global.h>
-#include <yttrium/resources/resource.h>
 
+#include <memory>
 #include <string>
 
 namespace Yttrium
 {
 	class Reader;
-	template <typename> class ResourcePtr;
 	class StaticString;
 
 	/// Translation file.
-	class Y_API Translation : public Resource
+	class Y_API Translation
 	{
 	public:
 		///
 		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static ResourcePtr<Translation> open(const Reader&, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<Translation> open(const Reader&, Allocator& = *DefaultAllocator);
 
 		///
 		virtual void add(const StaticString& source) = 0;

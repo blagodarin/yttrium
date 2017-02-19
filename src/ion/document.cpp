@@ -2,7 +2,6 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/list.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 #include "parser.h"
@@ -62,14 +61,14 @@ namespace Yttrium
 		return new(_values.allocate()) IonValue(*this, text, ByReference());
 	}
 
-	ResourcePtr<IonDocument> IonDocument::create(Allocator& allocator)
+	std::unique_ptr<IonDocument> IonDocument::create(Allocator& allocator)
 	{
-		return make_resource<IonDocumentImpl>(allocator);
+		return std::make_unique<IonDocumentImpl>(allocator);
 	}
 
-	ResourcePtr<IonDocument> IonDocument::open(const Reader& reader, Allocator& allocator)
+	std::unique_ptr<IonDocument> IonDocument::open(const Reader& reader, Allocator& allocator)
 	{
-		auto document = make_resource<IonDocumentImpl>(allocator);
+		auto document = std::make_unique<IonDocumentImpl>(allocator);
 		if (!reader.read_all(document->_buffer))
 			return nullptr;
 		const auto parsing_result = IonParser::parse(*document);

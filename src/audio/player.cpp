@@ -25,7 +25,7 @@ namespace Yttrium
 		_thread.join();
 	}
 
-	void AudioPlayerPrivate::set_music(const ResourcePtr<const Music>& music)
+	void AudioPlayerPrivate::set_music(const std::shared_ptr<const Music>& music)
 	{
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
@@ -53,7 +53,7 @@ namespace Yttrium
 		const auto player_backend = _backend.create_player();
 		for (;;)
 		{
-			ResourcePtr<const Music> music;
+			std::shared_ptr<const Music> music;
 			{
 				std::unique_lock<std::mutex> lock(_mutex);
 				if (!_music_changed)
@@ -106,7 +106,7 @@ namespace Yttrium
 
 	AudioPlayer::~AudioPlayer() = default;
 
-	void AudioPlayer::set_music(const ResourcePtr<const Music>& music)
+	void AudioPlayer::set_music(const std::shared_ptr<const Music>& music)
 	{
 		_private->set_music(music);
 	}

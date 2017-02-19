@@ -16,7 +16,6 @@ namespace Yttrium
 	class Mesh;
 	class Music;
 	class Renderer;
-	template <typename> class ResourcePtr;
 	class Sound;
 	class StaticString;
 	class Storage;
@@ -37,14 +36,14 @@ namespace Yttrium
 		/// Loads a resource by name (if it isn't already loaded) and returns a pointer to the loaded resource.
 		/// Throws ResourceError if there is no such resource.
 		/// Throws DataError if the resource can't be loaded.
-		ResourcePtr<const IonDocument> load_ion(const StaticString& name);
-		ResourcePtr<const Material> load_material(const StaticString& name);
-		ResourcePtr<const Mesh> load_mesh(const StaticString& name);
-		ResourcePtr<const Music> load_music(const StaticString& name);
-		ResourcePtr<const Sound> load_sound(const StaticString& name);
-		ResourcePtr<const Texture2D> load_texture_2d(const StaticString& name);
-		ResourcePtr<const TextureFont> load_texture_font(const StaticString& name);
-		ResourcePtr<const Translation> load_translation(const StaticString& name);
+		std::shared_ptr<const IonDocument> load_ion(const StaticString& name);
+		std::shared_ptr<const Material> load_material(const StaticString& name);
+		std::shared_ptr<const Mesh> load_mesh(const StaticString& name);
+		std::shared_ptr<const Music> load_music(const StaticString& name);
+		std::shared_ptr<const Sound> load_sound(const StaticString& name);
+		std::shared_ptr<const Texture2D> load_texture_2d(const StaticString& name);
+		std::shared_ptr<const TextureFont> load_texture_font(const StaticString& name);
+		std::shared_ptr<const Translation> load_translation(const StaticString& name);
 
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();

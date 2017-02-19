@@ -4,12 +4,10 @@
 #ifndef _include_yttrium_audio_sound_h_
 #define _include_yttrium_audio_sound_h_
 
-#include <yttrium/resources/resource.h>
-
 namespace Yttrium
 {
 	/// Sound.
-	class Sound : public Resource
+	class Sound
 	{
 	public:
 		/// Plays the sound asynchronously.

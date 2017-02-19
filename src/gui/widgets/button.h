@@ -27,7 +27,7 @@ namespace Yttrium
 
 		std::string _text;
 		mutable ForegroundProperty _foreground;
-		ResourcePtr<const Sound> _sound;
+		std::shared_ptr<const Sound> _sound;
 		WidgetState _state = WidgetState::NotSet;
 		Style _styles[WidgetStateCount];
 		GuiActions _on_click;

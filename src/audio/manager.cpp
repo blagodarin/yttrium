@@ -1,7 +1,7 @@
 #include <yttrium/audio/manager.h>
 
 #include <yttrium/audio/reader.h>
-#include <yttrium/resources/resource_ptr.h>
+#include <yttrium/audio/sound.h>
 #include "backend.h"
 #include "manager.h"
 #include "player.h"
@@ -20,7 +20,7 @@ namespace Yttrium
 
 	AudioManager::~AudioManager() = default;
 
-	ResourcePtr<Sound> AudioManager::create_sound(Reader&& reader)
+	std::unique_ptr<Sound> AudioManager::create_sound(Reader&& reader)
 	{
 		const auto audio_reader = AudioReader::open(std::move(reader));
 		if (!audio_reader)

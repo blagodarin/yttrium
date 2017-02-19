@@ -2,7 +2,6 @@
 #define _src_audio_player_h_
 
 #include <yttrium/audio/player.h>
-#include <yttrium/resources/resource_ptr.h>
 
 #include <condition_variable>
 #include <mutex>
@@ -18,7 +17,7 @@ namespace Yttrium
 		AudioPlayerPrivate(AudioBackend&, AudioPlayer::State);
 		~AudioPlayerPrivate();
 
-		void set_music(const ResourcePtr<const Music>&);
+		void set_music(const std::shared_ptr<const Music>&);
 		void set_state(AudioPlayer::State);
 
 	private:
@@ -29,7 +28,7 @@ namespace Yttrium
 		std::mutex _mutex;
 		std::condition_variable _condition;
 		AudioPlayer::State _state = AudioPlayer::State::Stopped;
-		ResourcePtr<const Music> _music;
+		std::shared_ptr<const Music> _music;
 		bool _music_changed = false;
 		bool _terminate = false;
 		std::thread _thread;

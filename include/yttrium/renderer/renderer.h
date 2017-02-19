@@ -22,7 +22,6 @@ namespace Yttrium
 	class Reader;
 	class RectF;
 	class ResourceLoader;
-	template <typename> class ResourcePtr;
 	class StaticString;
 	class Texture2D;
 	class TexturedRect;
@@ -43,10 +42,10 @@ namespace Yttrium
 		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexFormat, std::size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual ResourcePtr<Material> create_material(ResourceLoader&, const StaticString&) = 0;
+		virtual std::unique_ptr<Material> create_material(ResourceLoader&, const StaticString&) = 0;
 
 		///
-		virtual ResourcePtr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;
+		virtual std::unique_ptr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;
 
 		///
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
@@ -70,7 +69,7 @@ namespace Yttrium
 		virtual Matrix4 full_matrix() const = 0;
 
 		///
-		virtual ResourcePtr<Mesh> load_mesh(Reader&&) = 0;
+		virtual std::unique_ptr<Mesh> load_mesh(Reader&&) = 0;
 
 		///
 		virtual Matrix4 model_matrix() const = 0;

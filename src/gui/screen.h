@@ -2,7 +2,6 @@
 #define _src_gui_screen_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/static_string.h>
 #include "actions.h"
 #include "cursor.h"
@@ -36,13 +35,13 @@ namespace Yttrium
 		void handle_return() const { _on_return.run(_gui); }
 		bool has_music() const noexcept { return static_cast<bool>(_music); }
 		bool is_transparent() const { return _is_transparent; }
-		ResourcePtr<const Music> music() const { return *_music; }
+		std::shared_ptr<const Music> music() const { return *_music; }
 		const std::string& name() const { return _name; }
 		void register_widget(Widget&);
 		void render(Renderer&, const PointF* cursor);
 		void set_cursor(GuiCursor, const StaticString& texture = {});
-		void set_cursor(GuiCursor cursor, const ResourcePtr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
-		void set_music(const ResourcePtr<const Music>& music) { _music = music; }
+		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
+		void set_music(const std::shared_ptr<const Music>& music) { _music = music; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(const std::string& event, GuiActions&& actions) { _on_event[event] = std::move(actions); }
 		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
@@ -65,8 +64,8 @@ namespace Yttrium
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiActions _on_return;
 		GuiCursor _cursor = GuiCursor::None;
-		ResourcePtr<const Texture2D> _cursor_texture;
-		boost::optional<ResourcePtr<const Music>> _music;
+		std::shared_ptr<const Texture2D> _cursor_texture;
+		boost::optional<std::shared_ptr<const Music>> _music;
 	};
 }
 

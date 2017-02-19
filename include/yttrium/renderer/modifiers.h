@@ -4,6 +4,7 @@
 #ifndef _include_yttrium_renderer_modifiers_h_
 #define _include_yttrium_renderer_modifiers_h_
 
+#include <yttrium/api.h>
 #include <yttrium/renderer/texture.h>
 
 #include <string>

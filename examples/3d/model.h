@@ -1,7 +1,7 @@
 #ifndef _examples_3d_model_h_
 #define _examples_3d_model_h_
 
-#include <yttrium/resources/resource_ptr.h>
+#include <memory>
 
 namespace Yttrium
 {
@@ -24,8 +24,8 @@ public:
 
 protected:
 	Renderer& _renderer;
-	const ResourcePtr<const Mesh> _mesh;
-	const ResourcePtr<const Material> _material;
+	const std::shared_ptr<const Mesh> _mesh;
+	const std::shared_ptr<const Material> _material;
 };
 
 #endif

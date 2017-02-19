@@ -1,9 +1,11 @@
 #ifndef _examples_tetrium_graphics_h_
 #define _examples_tetrium_graphics_h_
 
-#include <yttrium/resources/resource_ptr.h>
-
 #include "logic.h"
+
+#include <yttrium/renderer/texture.h>
+
+#include <memory>
 
 namespace Yttrium
 {
@@ -33,7 +35,7 @@ private:
 
 private:
 	Renderer& _renderer;
-	const ResourcePtr<Texture2D> _blocks_texture;
+	const std::unique_ptr<const Texture2D> _blocks_texture;
 };
 
 #endif

@@ -17,7 +17,7 @@ namespace Yttrium
 		~OpenAlBackend() override;
 
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
-		ResourcePtr<Sound> create_sound(AudioReader&) override;
+		std::unique_ptr<Sound> create_sound(AudioReader&) override;
 
 	private:
 		const P_ALCdevice _device;

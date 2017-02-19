@@ -12,7 +12,6 @@ namespace Yttrium
 {
 	class AudioManager;
 	class Music;
-	template <typename> class ResourcePtr;
 
 	/// Audio player.
 	class Y_API AudioPlayer
@@ -32,7 +31,7 @@ namespace Yttrium
 		~AudioPlayer();
 
 		///
-		void set_music(const ResourcePtr<const Music>&);
+		void set_music(const std::shared_ptr<const Music>&);
 
 		///
 		void set_state(State);

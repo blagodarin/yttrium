@@ -5,21 +5,21 @@
 #define _include_yttrium_audio_music_h_
 
 #include <yttrium/api.h>
-#include <yttrium/resources/resource.h>
+
+#include <memory>
 
 namespace Yttrium
 {
 	class Reader;
-	template <typename> class ResourcePtr;
 
 	/// Music.
-	class Y_API Music : public Resource
+	class Y_API Music
 	{
 	public:
 		///
 		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static ResourcePtr<Music> open(Reader&&);
+		static std::unique_ptr<Music> open(Reader&&);
 
 		/// Start, end and loop (re)start time in seconds.
 		/// \note No loop if \a loop >= \a end.

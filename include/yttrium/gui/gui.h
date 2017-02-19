@@ -17,7 +17,6 @@ namespace Yttrium
 	class RectF;
 	class Renderer;
 	class ResourceLoader;
-	template <typename> class ResourcePtr;
 	class ScriptContext;
 	class StaticString;
 
@@ -41,7 +40,7 @@ namespace Yttrium
 		void on_custom_cursor(const std::function<void(Renderer&, const PointF&)>&);
 
 		///
-		void on_music(const std::function<void(const ResourcePtr<const Music>&)>&);
+		void on_music(const std::function<void(const std::shared_ptr<const Music>&)>&);
 
 		///
 		void on_quit(const std::function<void()>&);

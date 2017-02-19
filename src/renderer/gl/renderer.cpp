@@ -81,7 +81,7 @@ namespace Yttrium
 		return std::make_unique<GlIndexBuffer>(format, count, element_size, std::move(buffer), gl_format);
 	}
 
-	ResourcePtr<Texture2D> GlRenderer::create_texture_2d(const Image& image, bool no_mipmaps)
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const Image& image, bool no_mipmaps)
 	{
 		const auto image_format = image.format();
 		if (image_format.bits_per_channel() != 8)
@@ -133,7 +133,7 @@ namespace Yttrium
 		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, data);
 		if (!no_mipmaps)
 			texture.generate_mipmaps();
-		return make_resource<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));
+		return std::make_unique<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));
 	}
 
 	std::unique_ptr<VertexBuffer> GlRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
@@ -224,7 +224,7 @@ namespace Yttrium
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	ResourcePtr<Mesh> GlRenderer::create_mesh(const MeshData& data)
+	std::unique_ptr<Mesh> GlRenderer::create_mesh(const MeshData& data)
 	{
 		assert(!data._vertex_format.empty());
 		assert(data._vertex_data.size() > 0);
@@ -275,7 +275,7 @@ namespace Yttrium
 				index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
 		}
 
-		return make_resource<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
+		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
 	}
 
 	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const

@@ -2,7 +2,6 @@
 #define _src_audio_streamer_h_
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/resources/resource_ptr.h>
 
 #include <memory>
 
@@ -27,7 +26,7 @@ namespace Yttrium
 		~AudioStreamer();
 
 		FetchResult fetch();
-		bool open(const ResourcePtr<const Music>&);
+		bool open(const std::shared_ptr<const Music>&);
 		void start();
 
 	private:
@@ -35,7 +34,7 @@ namespace Yttrium
 
 	private:
 		AudioPlayerBackend& _backend;
-		ResourcePtr<const Music> _music;
+		std::shared_ptr<const Music> _music;
 		uint64_t _start_sample;
 		uint64_t _end_sample;
 		bool _is_looping;

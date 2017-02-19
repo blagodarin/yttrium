@@ -5,20 +5,19 @@
 #define _include_yttrium_gui_texture_font_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/resources/resource.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace Yttrium
 {
 	class Reader;
-	template <typename> class ResourcePtr;
 	class TextCapture;
 	class TexturedRect;
 
 	/// Texture font markup.
-	class Y_API TextureFont : public Resource
+	class Y_API TextureFont
 	{
 	public:
 		/// Font character information.
@@ -32,7 +31,7 @@ namespace Yttrium
 		///
 		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static ResourcePtr<TextureFont> open(Reader&&);
+		static std::unique_ptr<TextureFont> open(Reader&&);
 
 		///
 		virtual void build(std::vector<TexturedRect>&, const PointF& top_left, float font_size, const std::string&, TextCapture* = nullptr) const = 0;

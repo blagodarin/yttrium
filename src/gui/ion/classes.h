@@ -1,8 +1,7 @@
 #ifndef _src_gui_ion_classes_h_
 #define _src_gui_ion_classes_h_
 
-#include <yttrium/resources/resource_ptr.h>
-
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -24,7 +23,7 @@ namespace Yttrium
 
 	private:
 		Allocator& _allocator;
-		std::unordered_map<std::string, ResourcePtr<const IonDocument>> _classes;
+		std::unordered_map<std::string, std::unique_ptr<const IonDocument>> _classes;
 	};
 }
 

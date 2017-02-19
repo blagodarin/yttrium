@@ -21,7 +21,6 @@ add_library(yttrium
 	../include/yttrium/api.h
 	../include/yttrium/exceptions.h
 	../include/yttrium/static_string.h
-	../include/yttrium/string_format.h
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
 	base/static_string.cpp
@@ -288,11 +287,8 @@ endif()
 # resources
 target_sources(yttrium PRIVATE
 	../include/yttrium/resources/resource_loader.h
-	../include/yttrium/resources/resource_ptr.h
-	../include/yttrium/resources/resource.h
 	../include/yttrium/resources/translation.h
 	resources/resource_loader.cpp
-	resources/resource_ptr.cpp
 	resources/translation.cpp
 	)
 

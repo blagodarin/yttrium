@@ -2,7 +2,6 @@
 #define _src_renderer_material_h_
 
 #include <yttrium/renderer/material.h>
-#include <yttrium/resources/resource_ptr.h>
 
 #include <memory>
 
@@ -23,7 +22,7 @@ namespace Yttrium
 		const Texture2D* texture() const noexcept { return _texture.get(); }
 
 	protected:
-		ResourcePtr<const Texture2D> _texture; // TODO: Texture filter.
+		std::shared_ptr<const Texture2D> _texture; // TODO: Texture filter.
 		std::unique_ptr<GpuProgram> _program;
 	};
 }

@@ -4,6 +4,7 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/gpu_program.h>
+#include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/textured_rect.h>
 #include "debug_renderer.h"
 #include "debug_texture.h"
@@ -74,9 +75,9 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
-	ResourcePtr<Material> RendererImpl::create_material(ResourceLoader& resource_loader, const StaticString& name)
+	std::unique_ptr<Material> RendererImpl::create_material(ResourceLoader& resource_loader, const StaticString& name)
 	{
-		return make_resource<MaterialImpl>(resource_loader, name);
+		return std::make_unique<MaterialImpl>(resource_loader, name);
 	}
 
 	void RendererImpl::draw_debug_text(const StaticString& text)
@@ -121,7 +122,7 @@ namespace Yttrium
 		return current_projection->first * current_view->first * model_matrix();
 	}
 
-	ResourcePtr<Mesh> RendererImpl::load_mesh(Reader&& reader)
+	std::unique_ptr<Mesh> RendererImpl::load_mesh(Reader&& reader)
 	{
 		return create_mesh(load_obj_mesh(std::move(reader)));
 	}

@@ -4,14 +4,12 @@
 #ifndef _include_yttrium_renderer_texture_h_
 #define _include_yttrium_renderer_texture_h_
 
-#include <yttrium/resources/resource.h>
-
 namespace Yttrium
 {
 	class Size;
 
 	/// 2D texture.
-	class Texture2D : public Resource
+	class Texture2D
 	{
 	public:
 		///
@@ -41,6 +39,9 @@ namespace Yttrium
 			BilinearFilter  = LinearTexelFilter  | NearestMipmapFilter, ///< Bilinear filter.
 			TrilinearFilter = LinearTexelFilter  | LinearMipmapFilter,  ///< Trilinear filter.
 		};
+
+		///
+		virtual ~Texture2D() = default;
 
 		///
 		virtual Size size() const noexcept = 0;

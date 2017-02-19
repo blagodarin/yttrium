@@ -11,7 +11,6 @@
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/resources/translation.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
@@ -26,7 +25,7 @@ namespace Yttrium
 	{
 		const Storage& _storage;
 		Allocator& _allocator;
-		std::map<String, ResourcePtr<const T>> _map;
+		std::map<String, std::shared_ptr<const T>> _map;
 		std::mutex _mutex;
 
 		ResourceCache(const Storage& storage, Allocator& allocator)
@@ -35,7 +34,7 @@ namespace Yttrium
 		{
 		}
 
-		ResourcePtr<const T> fetch(const StaticString& name, const std::function<ResourcePtr<const T>(Reader&&)>& factory)
+		std::shared_ptr<const T> fetch(const StaticString& name, const std::function<std::shared_ptr<const T>(Reader&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			const auto i = _map.find(String(name, ByReference()));
@@ -53,7 +52,7 @@ namespace Yttrium
 
 		void release_unused()
 		{
-			std::vector<ResourcePtr<const T>> unused;
+			std::vector<std::shared_ptr<const T>> unused;
 			std::lock_guard<std::mutex> lock(_mutex);
 			for (auto i = _map.begin(); i != _map.end(); )
 			{
@@ -101,7 +100,7 @@ namespace Yttrium
 
 	ResourceLoader::~ResourceLoader() = default;
 
-	ResourcePtr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
+	std::shared_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
 	{
 		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
 		{
@@ -109,7 +108,7 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Material> ResourceLoader::load_material(const StaticString& name)
+	std::shared_ptr<const Material> ResourceLoader::load_material(const StaticString& name)
 	{
 		if (!_private->_renderer)
 			return {};
@@ -120,7 +119,7 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Mesh> ResourceLoader::load_mesh(const StaticString& name)
+	std::shared_ptr<const Mesh> ResourceLoader::load_mesh(const StaticString& name)
 	{
 		if (!_private->_renderer)
 			return {};
@@ -130,7 +129,7 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Music> ResourceLoader::load_music(const StaticString& name)
+	std::shared_ptr<const Music> ResourceLoader::load_music(const StaticString& name)
 	{
 		return _private->_music_cache.fetch(name, [this](Reader&& reader)
 		{
@@ -144,7 +143,7 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Sound> ResourceLoader::load_sound(const StaticString& name)
+	std::shared_ptr<const Sound> ResourceLoader::load_sound(const StaticString& name)
 	{
 		if (!_private->_audio_manager)
 			return {};
@@ -154,11 +153,11 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Texture2D> ResourceLoader::load_texture_2d(const StaticString& name)
+	std::shared_ptr<const Texture2D> ResourceLoader::load_texture_2d(const StaticString& name)
 	{
 		if (!_private->_renderer)
 			return {};
-		return _private->_texture_2d_cache.fetch(name, [this](Reader&& reader) -> ResourcePtr<const Texture2D>
+		return _private->_texture_2d_cache.fetch(name, [this](Reader&& reader) -> std::shared_ptr<const Texture2D>
 		{
 			const bool intensity = reader.property("intensity"_s) == "1"_s;
 			// TODO: Map texture memory, then read the image into that memory.
@@ -176,7 +175,7 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
+	std::shared_ptr<const TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
 	{
 		return _private->_texture_font_cache.fetch(name, [this](Reader&& reader)
 		{
@@ -184,7 +183,7 @@ namespace Yttrium
 		});
 	}
 
-	ResourcePtr<const Translation> ResourceLoader::load_translation(const StaticString& name)
+	std::shared_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name)
 	{
 		return _private->_translation_cache.fetch(name, [this](Reader&& reader)
 		{

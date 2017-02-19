@@ -11,7 +11,6 @@
 namespace Yttrium
 {
 	class Reader;
-	template <typename> class ResourcePtr;
 	class Sound;
 
 	/// Audio manager.
@@ -25,7 +24,7 @@ namespace Yttrium
 		~AudioManager();
 
 		///
-		ResourcePtr<Sound> create_sound(Reader&&);
+		std::unique_ptr<Sound> create_sound(Reader&&);
 
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;

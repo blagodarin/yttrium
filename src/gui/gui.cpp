@@ -160,7 +160,7 @@ namespace Yttrium
 		_private->_on_custom_cursor = callback;
 	}
 
-	void Gui::on_music(const std::function<void(const ResourcePtr<const Music>&)>& callback)
+	void Gui::on_music(const std::function<void(const std::shared_ptr<const Music>&)>& callback)
 	{
 		_private->_on_music = callback;
 	}

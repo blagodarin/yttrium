@@ -5,7 +5,6 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
 
@@ -90,8 +89,8 @@ namespace Yttrium
 		return i != _translations.end() && !i->second.text.empty() ? i->second.text : source.to_std();
 	}
 
-	ResourcePtr<Translation> Translation::open(const Reader& reader, Allocator& allocator)
+	std::unique_ptr<Translation> Translation::open(const Reader& reader, Allocator& allocator)
 	{
-		return reader ? make_resource<TranslationImpl>(reader, allocator) : nullptr;
+		return reader ? std::make_unique<TranslationImpl>(reader, allocator) : nullptr;
 	}
 }

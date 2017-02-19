@@ -4,8 +4,8 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resources/resource_ptr.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -21,7 +21,7 @@ namespace Yttrium
 	struct BackgroundProperty
 	{
 		Vector4 color{1, 1, 1};
-		ResourcePtr<const Texture2D> texture;
+		std::shared_ptr<const Texture2D> texture;
 		Texture2D::Filter texture_filter = Texture2D::TrilinearFilter;
 		RectF texture_rect;
 		Margins borders;
@@ -33,8 +33,8 @@ namespace Yttrium
 
 	struct ForegroundProperty
 	{
-		ResourcePtr<const TextureFont> font;
-		ResourcePtr<const Texture2D> font_texture;
+		std::shared_ptr<const TextureFont> font;
+		std::shared_ptr<const Texture2D> font_texture;
 		float size = 7 / 8.f;
 		Vector4 color{1, 1, 1};
 		unsigned alignment = 0;

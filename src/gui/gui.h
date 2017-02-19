@@ -1,7 +1,6 @@
 #ifndef _src_gui_gui_h_
 #define _src_gui_gui_h_
 
-#include <yttrium/resources/resource_ptr.h>
 #include <yttrium/static_string.h>
 #include "actions.h"
 #include "cursor.h"
@@ -32,8 +31,8 @@ namespace Yttrium
 	public:
 		struct FontDesc
 		{
-			ResourcePtr<const TextureFont> font;
-			ResourcePtr<const Texture2D> texture;
+			std::shared_ptr<const TextureFont> font;
+			std::shared_ptr<const Texture2D> texture;
 		};
 
 		GuiPrivate(ResourceLoader&, ScriptContext&, Allocator&);
@@ -68,13 +67,13 @@ namespace Yttrium
 		std::unordered_map<std::string, std::unique_ptr<GuiScreen>> _screens; // TODO: Use std::string_view in C++17.
 		GuiScreen* _root_screen = nullptr;
 		std::vector<GuiScreen*> _screen_stack;
-		ResourcePtr<const Translation> _translation;
+		std::shared_ptr<const Translation> _translation;
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
-		ResourcePtr<const Texture2D> _default_cursor_texture;
+		std::shared_ptr<const Texture2D> _default_cursor_texture;
 		std::function<void(Renderer&, const std::string&, const RectF&)> _on_canvas;
 		std::function<void(Renderer&, const PointF&)> _on_custom_cursor;
-		std::function<void(const ResourcePtr<const Music>&)> _on_music;
+		std::function<void(const std::shared_ptr<const Music>&)> _on_music;
 		std::function<void()> _on_quit;
 
 		friend Gui;

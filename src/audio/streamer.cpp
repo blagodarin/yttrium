@@ -26,7 +26,7 @@ namespace Yttrium
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(const ResourcePtr<const Music>& music)
+	bool AudioStreamer::open(const std::shared_ptr<const Music>& music)
 	{
 		_music = music;
 		if (!_music)

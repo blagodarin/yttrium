@@ -7,7 +7,6 @@ namespace Yttrium
 {
 	class AudioFormat;
 	class AudioReader;
-	template <typename> class ResourcePtr;
 	class Sound;
 
 	class AudioPlayerBackend
@@ -37,7 +36,7 @@ namespace Yttrium
 		virtual ~AudioBackend() = default;
 
 		virtual std::unique_ptr<AudioPlayerBackend> create_player() = 0;
-		virtual ResourcePtr<Sound> create_sound(AudioReader&) = 0;
+		virtual std::unique_ptr<Sound> create_sound(AudioReader&) = 0;
 	};
 }
 
