@@ -6,7 +6,6 @@
 namespace Yttrium
 {
 	class Matrix4;
-	class StaticString;
 
 	class GlBufferHandle
 	{
@@ -62,7 +61,7 @@ namespace Yttrium
 		GlShaderHandle(GlShaderHandle&&);
 		~GlShaderHandle();
 
-		bool compile(const StaticString&) const;
+		bool compile(const std::string&) const;
 		GLuint get() const { return _handle; }
 		std::string info_log() const;
 

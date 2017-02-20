@@ -128,11 +128,11 @@ namespace Yttrium
 			_gl.DeleteShader(_handle);
 	}
 
-	bool GlShaderHandle::compile(const StaticString& source) const
+	bool GlShaderHandle::compile(const std::string& source) const
 	{
-		const GLchar* source_text = source.text();
+		const GLchar* source_data = source.data();
 		const GLint source_size = source.size();
-		_gl.ShaderSource(_handle, 1, &source_text, &source_size);
+		_gl.ShaderSource(_handle, 1, &source_data, &source_size);
 		_gl.CompileShader(_handle);
 		GLint compile_status = GL_FALSE;
 		_gl.GetShaderiv(_handle, GL_COMPILE_STATUS, &compile_status);

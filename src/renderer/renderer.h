@@ -37,7 +37,7 @@ namespace Yttrium
 
 		~RendererImpl() override;
 
-		void draw_debug_text(const StaticString&) override;
+		void draw_debug_text(const std::string&) override;
 		void draw_rect(const RectF&, const Vector4&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Vector4&) override;
 		Matrix4 full_matrix() const override;

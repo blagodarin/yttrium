@@ -20,7 +20,6 @@ namespace Yttrium
 	class Mesh;
 	class Reader;
 	class RectF;
-	class StaticString;
 	class Texture2D;
 	class TexturedRect;
 	enum class VA;
@@ -34,7 +33,7 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
-		virtual std::unique_ptr<GpuProgram> create_gpu_program(const StaticString& vertex_shader, const StaticString& fragment_shader) = 0;
+		virtual std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
 
 		///
 		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexFormat, std::size_t count, const void* data = nullptr) = 0;
@@ -46,7 +45,7 @@ namespace Yttrium
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual void draw_debug_text(const StaticString&) = 0;
+		virtual void draw_debug_text(const std::string&) = 0;
 
 		///
 		virtual void draw_mesh(const Mesh&) = 0;

@@ -137,7 +137,7 @@ void Game::render(Renderer& renderer)
 		_checkerboard.draw();
 	}
 	if (_debug_text_visible)
-		renderer.draw_debug_text(StaticString{ _debug_text });
+		renderer.draw_debug_text(_debug_text);
 }
 
 void Game::update(const UpdateEvent& update)

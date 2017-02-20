@@ -18,7 +18,7 @@
 
 namespace Yttrium
 {
-	const auto _vertex_shader_2d =
+	const std::string _vertex_shader_2d =
 		"#version 330\n"
 		"\n"
 		"layout(location = 0) in vec2 in_position;\n"
@@ -35,9 +35,9 @@ namespace Yttrium
 			"gl_Position = mvp * vec4(in_position, 0, 1);\n"
 			"io_color = in_color;\n"
 			"io_texcoord = in_texcoord;\n"
-		"}\n"_s;
+		"}\n";
 
-	const auto _fragment_shader_2d =
+	const std::string _fragment_shader_2d =
 		"#version 330\n"
 		"\n"
 		"in vec4 io_color;\n"
@@ -48,7 +48,7 @@ namespace Yttrium
 		"void main()\n"
 		"{\n"
 			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
-		"}\n"_s;
+		"}\n";
 
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&)
 	{
@@ -74,23 +74,23 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
-	void RendererImpl::draw_debug_text(const StaticString& text)
+	void RendererImpl::draw_debug_text(const std::string& text)
 	{
-		if (text.is_empty())
+		if (text.empty())
 			return;
 
 		DebugRenderer debug(*this);
 		debug.set_color(1, 1, 1);
 		int top = 0;
 		size_t line_begin = 0;
-		auto line_end = text.find_first('\n', line_begin);
-		while (line_end != StaticString::End)
+		auto line_end = text.find('\n', line_begin);
+		while (line_end != std::string::npos)
 		{
-			debug.draw_text(0, top++, text.mid(line_begin, line_end - line_begin));
+			debug.draw_text(0, top++, StaticString{ text.data() + line_begin, line_end - line_begin });
 			line_begin = line_end + 1;
-			line_end = text.find_first('\n', line_begin);
+			line_end = text.find('\n', line_begin);
 		}
-		debug.draw_text(0, top, text.mid(line_begin));
+		debug.draw_text(0, top, StaticString{ text.data() + line_begin, text.size() - line_begin });
 	}
 
 	void RendererImpl::draw_rect(const RectF& rect, const Vector4& color)

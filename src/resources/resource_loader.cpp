@@ -155,7 +155,7 @@ namespace Yttrium
 			}
 			if (vertex_shader.is_empty() || fragment_shader.is_empty())
 				throw DataError("("_s, name, ") No 'vertex_shader' or 'fragment_shader'"_s);
-			auto program = _private->_renderer->create_gpu_program(StaticString{ _private->_storage.open(vertex_shader).to_string() }, StaticString{ _private->_storage.open(fragment_shader).to_string() });
+			auto program = _private->_renderer->create_gpu_program(_private->_storage.open(vertex_shader).to_string(), _private->_storage.open(fragment_shader).to_string());
 			if (!program)
 				throw DataError("("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s);
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture));
