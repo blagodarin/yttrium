@@ -9,7 +9,6 @@
 #include "debug_renderer.h"
 #include "debug_texture.h"
 #include "formats/obj.h"
-#include "material.h"
 #include "mesh_data.h"
 #include "gl/renderer.h"
 #include "texture.h"
@@ -74,11 +73,6 @@ namespace Yttrium
 	}
 
 	RendererImpl::~RendererImpl() = default;
-
-	std::unique_ptr<Material> RendererImpl::create_material(ResourceLoader& resource_loader, const StaticString& name)
-	{
-		return std::make_unique<MaterialImpl>(resource_loader, name);
-	}
 
 	void RendererImpl::draw_debug_text(const StaticString& text)
 	{

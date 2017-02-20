@@ -7,7 +7,10 @@
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
-#include <yttrium/renderer/material.h>
+#include <yttrium/ion/node.h>
+#include <yttrium/ion/object.h>
+#include <yttrium/ion/value.h>
+#include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
@@ -15,6 +18,7 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/string.h>
+#include "../renderer/material.h"
 
 #include <mutex>
 
@@ -112,10 +116,49 @@ namespace Yttrium
 	{
 		if (!_private->_renderer)
 			return {};
-		return _private->_material_cache.fetch(name, [this, name](Reader&&)
+		return _private->_material_cache.fetch(name, [this, name](Reader&& reader) -> std::shared_ptr<const Material>
 		{
-			// TODO: Move material parsing on this side.
-			return _private->_renderer->create_material(*this, name); // TODO: Use the provided reader.
+			const auto document = IonDocument::open(reader, _private->_allocator);
+			if (!document)
+				return {};
+			StaticString vertex_shader;
+			StaticString fragment_shader;
+			std::shared_ptr<const Texture2D> texture;
+			for (const auto& node : document->root())
+			{
+				if (node.name() == "vertex_shader"_s)
+				{
+					if (node.size() != 1 || node.begin()->type() != IonValue::Type::String || node.begin()->string().is_empty())
+						throw DataError("("_s, name, ") Bad 'vertex_shader'"_s);
+					if (!vertex_shader.is_empty())
+						throw DataError("("_s, name, ") Duplicate 'vertex_shader'"_s);
+					vertex_shader = node.begin()->string();
+				}
+				else if (node.name() == "fragment_shader"_s)
+				{
+					if (node.size() != 1 || node.begin()->type() != IonValue::Type::String || node.begin()->string().is_empty())
+						throw DataError("("_s, name, ") Bad 'fragment_shader'"_s);
+					if (!fragment_shader.is_empty())
+						throw DataError("("_s, name, ") Duplicate 'fragment_shader'"_s);
+					fragment_shader = node.begin()->string();
+				}
+				else if (node.name() == "texture"_s)
+				{
+					if (node.size() != 1 || node.begin()->type() != IonValue::Type::String || node.begin()->string().is_empty())
+						throw DataError("("_s, name, ") Bad 'texture'"_s);
+					if (texture)
+						throw DataError("("_s, name, ") Duplicate 'texture'"_s);
+					texture = load_texture_2d(node.begin()->string());
+				}
+				else
+					throw DataError("("_s, name, ") Bad material"_s);
+			}
+			if (vertex_shader.is_empty() || fragment_shader.is_empty())
+				throw DataError("("_s, name, ") No 'vertex_shader' or 'fragment_shader'"_s);
+			auto program = _private->_renderer->create_gpu_program(StaticString{ _private->_storage.open(vertex_shader).to_string() }, StaticString{ _private->_storage.open(fragment_shader).to_string() });
+			if (!program)
+				throw DataError("("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s);
+			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture));
 		});
 	}
 
@@ -202,15 +245,5 @@ namespace Yttrium
 		_private->_texture_font_cache.release_unused();
 		_private->_translation_cache.release_unused();
 		// TODO: Ensure that all unused resources have been unloaded in one pass.
-	}
-
-	Renderer* ResourceLoader::renderer()
-	{
-		return _private->_renderer;
-	}
-
-	const Storage& ResourceLoader::storage() const
-	{
-		return _private->_storage;
 	}
 }

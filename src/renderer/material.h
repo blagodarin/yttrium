@@ -8,22 +8,20 @@
 namespace Yttrium
 {
 	class GpuProgram;
-	class ResourceLoader;
-	class StaticString;
 	class Texture2D;
 
 	class MaterialImpl : public Material
 	{
 	public:
-		MaterialImpl(ResourceLoader&, const StaticString&);
+		MaterialImpl(std::unique_ptr<GpuProgram>&&, std::shared_ptr<const Texture2D>&&);
 
 		GpuProgram& gpu_program() noexcept { return *_program; }
 		const GpuProgram& gpu_program() const noexcept { return *_program; }
 		const Texture2D* texture() const noexcept { return _texture.get(); }
 
 	protected:
-		std::shared_ptr<const Texture2D> _texture; // TODO: Texture filter.
-		std::unique_ptr<GpuProgram> _program;
+		const std::unique_ptr<GpuProgram> _program;
+		const std::shared_ptr<const Texture2D> _texture; // TODO: Texture filter.
 	};
 }
 

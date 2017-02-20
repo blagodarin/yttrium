@@ -48,10 +48,6 @@ namespace Yttrium
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();
 
-		// TODO: Remove when shaders become resources.
-		Renderer* renderer();
-		const Storage& storage() const;
-
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;
 	};
