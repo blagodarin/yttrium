@@ -5,7 +5,6 @@
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
-#include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/window.h>
 

@@ -5,7 +5,6 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
-#include <yttrium/static_string.h>
 
 namespace
 {

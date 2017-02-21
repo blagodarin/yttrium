@@ -54,20 +54,23 @@ namespace Yttrium
 			return resource_ptr;
 		}
 
-		void release_unused()
+		bool release_unused()
 		{
 			std::vector<std::shared_ptr<const T>> unused;
 			std::lock_guard<std::mutex> lock(_mutex);
+			size_t released = 0;
 			for (auto i = _map.begin(); i != _map.end(); )
 			{
 				if (i->second.unique())
 				{
 					unused.emplace_back(std::move(i->second));
 					i = _map.erase(i);
+					++released;
 				}
 				else
 					++i;
 			}
+			return released > 0;
 		}
 	};
 
@@ -80,6 +83,18 @@ namespace Yttrium
 			, _audio_manager(audio_manager)
 			, _allocator(allocator)
 		{
+		}
+
+		bool release_unused()
+		{
+			return _material_cache.release_unused() // Uses textures.
+				|| _ion_document_cache.release_unused()
+				|| _mesh_cache.release_unused()
+				|| _music_cache.release_unused()
+				|| _sound_cache.release_unused()
+				|| _texture_2d_cache.release_unused()
+				|| _texture_font_cache.release_unused()
+				|| _translation_cache.release_unused();
 		}
 
 	public:
@@ -236,14 +251,7 @@ namespace Yttrium
 
 	void ResourceLoader::release_unused()
 	{
-		_private->_material_cache.release_unused(); // Uses textures.
-		_private->_ion_document_cache.release_unused();
-		_private->_mesh_cache.release_unused();
-		_private->_music_cache.release_unused();
-		_private->_sound_cache.release_unused();
-		_private->_texture_2d_cache.release_unused();
-		_private->_texture_font_cache.release_unused();
-		_private->_translation_cache.release_unused();
-		// TODO: Ensure that all unused resources have been unloaded in one pass.
+		_private->release_unused();
+		assert(!_private->release_unused());
 	}
 }
