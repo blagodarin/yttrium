@@ -26,6 +26,8 @@ namespace Yttrium
 		RectF texture_rect;
 		Margins borders;
 
+		BackgroundProperty() = default;
+
 		void draw(Renderer&, const RectF&) const;
 		bool load(const GuiPropertyLoader&);
 		void update(const GuiPropertyLoader&);

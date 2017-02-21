@@ -35,13 +35,13 @@ namespace Yttrium
 	private:
 		AudioPlayerBackend& _backend;
 		std::shared_ptr<const Music> _music;
-		uint64_t _start_sample;
-		uint64_t _end_sample;
-		bool _is_looping;
-		uint64_t _loop_sample;
+		uint64_t _start_sample = 0;
+		uint64_t _end_sample = 0;
+		bool _is_looping = false;
+		uint64_t _loop_sample = 0;
 		Buffer _buffer;
-		size_t _block_size;
-		size_t _buffer_samples;
+		size_t _block_size = 0;
+		size_t _buffer_samples = 0;
 	};
 }
 

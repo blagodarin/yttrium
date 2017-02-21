@@ -169,28 +169,28 @@ namespace Tetrium
 
 		State    _state = Stopped;
 		bool     _paused = false;
-		int      _timeout;
+		int      _timeout = 0;
 		Field    _field;
 		Figure   _current_figure;
 		Figure   _next_figure;
-		unsigned _time_remainder;
+		unsigned _time_remainder = 0;
 
-		int      _delay;
-		int      _fixation_delay;
+		int      _delay = 0;
+		int      _fixation_delay = 0;
 
-		bool     _is_accelerating;
-		int      _acceleration_bonus;
+		bool     _is_accelerating = false;
+		int      _acceleration_bonus = 0;
 
-		bool     _is_moving_left;
-		int      _left_movement_timer;
+		bool     _is_moving_left = false;
+		int      _left_movement_timer = 0;
 
-		bool     _is_moving_right;
-		int      _right_movement_timer;
+		bool     _is_moving_right = false;
+		int      _right_movement_timer = 0;
 
-		int      _score;
-		int      _lines;
-		int      _level;
-		int      _speed;
+		int      _score = 0;
+		int      _lines = 0;
+		int      _level = 0;
+		int      _speed = 0;
 	};
 }
 

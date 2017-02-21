@@ -66,3 +66,9 @@ set_target_properties(
 	3d
 	tetrium tetrium_localization tetrium_package
 	PROPERTIES FOLDER "examples")
+
+add_custom_target(cppcheck COMMAND cppcheck --enable=warning -q
+	-I "${PROJECT_SOURCE_DIR}/include"
+	-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
+	"-rp=${PROJECT_SOURCE_DIR}"
+	"${PROJECT_SOURCE_DIR}" VERBATIM)
