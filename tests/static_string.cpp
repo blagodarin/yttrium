@@ -42,9 +42,13 @@ BOOST_AUTO_TEST_CASE(test_static_string_comparison)
 	const auto& ab = "ab"_s;
 	BOOST_CHECK(ab == ab);
 	BOOST_CHECK(!(ab != ab));
+	// cppcheck-suppress duplicateExpression
 	BOOST_CHECK(!(ab > ab));
+	// cppcheck-suppress duplicateExpression
 	BOOST_CHECK(!(ab < ab));
+	// cppcheck-suppress duplicateExpression
 	BOOST_CHECK(ab >= ab);
+	// cppcheck-suppress duplicateExpression
 	BOOST_CHECK(ab <= ab);
 
 	const auto& ba = "ba"_s;

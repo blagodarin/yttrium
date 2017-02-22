@@ -39,7 +39,7 @@ namespace Yttrium
 			const float scaling = font_size / _size;
 
 			float selection_left = 0;
-			const auto do_capture = [&](unsigned index)
+			const auto do_capture = [font_size, capture, current_x, current_y, &selection_left](unsigned index)
 			{
 				if (!capture)
 					return;

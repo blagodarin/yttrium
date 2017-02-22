@@ -29,6 +29,7 @@ namespace Yttrium
 	private:
 		LRESULT window_proc(HWND, UINT, WPARAM, LPARAM);
 
+		// cppcheck-suppress unusedPrivateFunction
 		static LRESULT CALLBACK static_window_proc(HWND, UINT, WPARAM, LPARAM);
 
 	private:
