@@ -4,6 +4,7 @@ project(yttrium C CXX)
 
 option(BOOST_ALL_DYN_LINK "Define BOOST_ALL_DYN_LINK" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(COVERAGE "Build with coverage analysis support" OFF)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 
@@ -18,6 +19,11 @@ if(BOOST_ALL_DYN_LINK)
 endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+	if (COVERAGE)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+	endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-D_USE_MATH_DEFINES)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4251 /wd4267 /wd4800")
@@ -67,8 +73,19 @@ set_target_properties(
 	tetrium tetrium_localization tetrium_package
 	PROPERTIES FOLDER "examples")
 
-add_custom_target(cppcheck COMMAND cppcheck --enable=all --inline-suppr -q --suppress=missingIncludeSystem --suppress=noExplicitConstructor
+add_custom_target(cppcheck COMMAND cppcheck --enable=all --quiet
+	--inline-suppr --suppress=missingIncludeSystem --suppress=noExplicitConstructor
 	-I "${PROJECT_SOURCE_DIR}/include"
 	-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
-	"-rp=${PROJECT_SOURCE_DIR}"
+	"--relative-paths=${PROJECT_SOURCE_DIR}"
 	"${PROJECT_SOURCE_DIR}" VERBATIM)
+
+if(COVERAGE)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		add_custom_target(coverage
+			COMMAND geninfo --quiet "${PROJECT_BINARY_DIR}" --output-filename "${PROJECT_BINARY_DIR}/yttrium.info"
+			COMMAND lcov --quiet --remove "${PROJECT_BINARY_DIR}/yttrium.info" "/usr/*" --output-file "${PROJECT_BINARY_DIR}/yttrium.info"
+			COMMAND genhtml --quiet "${PROJECT_BINARY_DIR}/yttrium.info" --output-directory "${PROJECT_BINARY_DIR}/coverage"
+			VERBATIM)
+	endif()
+endif()
