@@ -82,10 +82,10 @@ add_custom_target(cppcheck
 
 if(COVERAGE)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		add_custom_target(coverage_base
+		add_custom_target(uncover
 			COMMAND lcov --zerocounters --quiet --directory "${PROJECT_BINARY_DIR}"
 			VERBATIM)
-		add_custom_target(coverage
+		add_custom_target(cover
 			COMMAND lcov --capture --no-external --quiet --directory "${PROJECT_BINARY_DIR}" --output-file "${PROJECT_BINARY_DIR}/coverage.info"
 			COMMAND genhtml --quiet "${PROJECT_BINARY_DIR}/coverage.info" --output-directory "${PROJECT_BINARY_DIR}/coverage"
 			VERBATIM)
