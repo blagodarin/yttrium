@@ -73,19 +73,23 @@ set_target_properties(
 	tetrium tetrium_localization tetrium_package
 	PROPERTIES FOLDER "examples")
 
-add_custom_target(cppcheck COMMAND cppcheck --enable=all --quiet
-	--inline-suppr --suppress=missingIncludeSystem --suppress=noExplicitConstructor
-	-I "${PROJECT_SOURCE_DIR}/include"
-	-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
-	"--relative-paths=${PROJECT_SOURCE_DIR}"
-	"${PROJECT_SOURCE_DIR}" VERBATIM)
+add_custom_target(cppcheck
+	COMMAND cppcheck --enable=all --quiet
+		--inline-suppr --suppress=missingIncludeSystem --suppress=noExplicitConstructor
+		-I "${PROJECT_SOURCE_DIR}/include"
+		-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
+		"--relative-paths=${PROJECT_SOURCE_DIR}"
+		"${PROJECT_SOURCE_DIR}"
+	VERBATIM)
 
 if(COVERAGE)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		add_custom_target(coverage_base
+			COMMAND lcov --zerocounters --quiet --directory "${PROJECT_BINARY_DIR}"
+			VERBATIM)
 		add_custom_target(coverage
-			COMMAND geninfo --quiet "${PROJECT_BINARY_DIR}" --output-filename "${PROJECT_BINARY_DIR}/yttrium.info"
-			COMMAND lcov --quiet --remove "${PROJECT_BINARY_DIR}/yttrium.info" "/usr/*" --output-file "${PROJECT_BINARY_DIR}/yttrium.info"
-			COMMAND genhtml --quiet "${PROJECT_BINARY_DIR}/yttrium.info" --output-directory "${PROJECT_BINARY_DIR}/coverage"
+			COMMAND lcov --capture --no-external --quiet --directory "${PROJECT_BINARY_DIR}" --output-file "${PROJECT_BINARY_DIR}/coverage.info"
+			COMMAND genhtml --quiet "${PROJECT_BINARY_DIR}/coverage.info" --output-directory "${PROJECT_BINARY_DIR}/coverage"
 			VERBATIM)
 	endif()
 endif()
