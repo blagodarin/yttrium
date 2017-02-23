@@ -34,12 +34,11 @@ namespace Yttrium
 			rects.clear();
 
 			float current_x = top_left.x();
-			float current_y = top_left.y();
-			char last_symbol = '\0';
+			const float current_y = top_left.y();
 			const float scaling = font_size / _size;
 
 			float selection_left = 0;
-			const auto do_capture = [font_size, capture, current_x, current_y, &selection_left](unsigned index)
+			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](unsigned index)
 			{
 				if (!capture)
 					return;
@@ -64,6 +63,7 @@ namespace Yttrium
 				}
 			};
 
+			char last_symbol = '\0';
 			const char* current_symbol = text.c_str();
 
 			for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
