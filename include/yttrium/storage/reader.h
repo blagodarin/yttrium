@@ -26,7 +26,7 @@ namespace Yttrium
 		explicit Reader(Buffer&&);
 
 		/// Creates a Reader for the specified file.
-		explicit Reader(const StaticString& path);
+		explicit Reader(const std::string& path);
 
 		/// Creates a Reader for a temporary file.
 		explicit Reader(const TemporaryFile&);

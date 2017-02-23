@@ -32,11 +32,11 @@ namespace Yttrium
 		~Storage();
 
 		/// Attaches a buffer to the storage.
-		void attach_buffer(const StaticString& name, Buffer&&);
+		void attach_buffer(const std::string& name, Buffer&&);
 
 		/// Attaches a package to the storage.
 		/// Throws MissingDataError if there is no such package.
-		void attach_package(const StaticString& path, PackageType = PackageType::Auto);
+		void attach_package(const std::string& path, PackageType = PackageType::Auto);
 
 		/// Opens a resource.
 		Reader open(const StaticString& name) const;

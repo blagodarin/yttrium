@@ -2,7 +2,6 @@
 #define _src_storage_reader_h_
 
 #include <yttrium/storage/reader.h>
-#include <yttrium/string.h>
 #include <yttrium/tiny_string_map.h>
 
 namespace Yttrium
@@ -11,7 +10,7 @@ namespace Yttrium
 	{
 	public:
 		ReaderPrivate(uint64_t size) : _size(size) {}
-		ReaderPrivate(uint64_t size, std::string&& name) : _name(std::move(name)), _size(size) {}
+		ReaderPrivate(uint64_t size, const std::string& name) : _name(name), _size(size) {}
 		virtual ~ReaderPrivate() = default;
 
 		virtual size_t read_at(uint64_t, void*, size_t) const = 0;
@@ -34,7 +33,7 @@ namespace Yttrium
 	{
 	public:
 		BufferReader(Buffer&&);
-		BufferReader(const std::shared_ptr<const Buffer>&, std::string&&);
+		BufferReader(const std::shared_ptr<const Buffer>&, const std::string&);
 
 		size_t read_at(uint64_t, void*, size_t) const override;
 

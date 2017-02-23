@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	std::vector<std::pair<String, std::map<std::string, std::string>>> entries;
+	std::vector<std::pair<std::string, std::map<std::string, std::string>>> entries;
 	try
 	{
 		const auto document = IonDocument::open(Reader(index_name.c_str()));
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 			switch (entry.type())
 			{
 			case IonValue::Type::String:
-				entries.emplace_back(String(entry.string()), std::map<std::string, std::string>());
+				entries.emplace_back(entry.string().to_std(), std::map<std::string, std::string>());
 				break;
 			case IonValue::Type::Object:
 				check(!entries.empty(), "Property set must follow a file");

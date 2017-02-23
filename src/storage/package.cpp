@@ -7,11 +7,11 @@
 
 namespace Yttrium
 {
-	std::unique_ptr<PackageReader> PackageReader::create(const StaticString& path, PackageType type)
+	std::unique_ptr<PackageReader> PackageReader::create(const std::string& path, PackageType type)
 	{
 		if (type == PackageType::Auto)
 		{
-			if (path.ends_with(".ypq"_s))
+			if (StaticString{ path }.ends_with(".ypq"_s))
 				type = PackageType::Ypq;
 			else
 				return {};
@@ -22,7 +22,7 @@ namespace Yttrium
 		try
 		{
 			if (type == PackageType::Ypq)
-				return std::make_unique<YpqReader>(path.to_std(), std::move(reader));
+				return std::make_unique<YpqReader>(std::move(reader));
 		}
 		catch (const BadPackage& e)
 		{
@@ -31,11 +31,11 @@ namespace Yttrium
 		return {};
 	}
 
-	std::unique_ptr<PackageWriter> PackageWriter::create(const StaticString& path, PackageType type)
+	std::unique_ptr<PackageWriter> PackageWriter::create(const std::string& path, PackageType type)
 	{
 		if (type == PackageType::Auto)
 		{
-			if (path.ends_with(".ypq"_s))
+			if (StaticString{ path }.ends_with(".ypq"_s))
 				type = PackageType::Ypq;
 			else
 				return {};

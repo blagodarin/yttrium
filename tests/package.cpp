@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE(test_package)
 		const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 		BOOST_REQUIRE(package_reader);
 
-		packed_file3 = package_reader->open(file3.name());
-		packed_file1 = package_reader->open(file1.name());
-		packed_file2 = package_reader->open(file2.name());
+		packed_file3 = package_reader->open(StaticString{ file3.name() });
+		packed_file1 = package_reader->open(StaticString{ file1.name() });
+		packed_file2 = package_reader->open(StaticString{ file2.name() });
 	}
 
 	Buffer actual;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
 	BOOST_REQUIRE(package_reader);
 
-	auto packed_file = package_reader->open(file2.name());
+	auto packed_file = package_reader->open(StaticString{ file2.name() });
 	BOOST_REQUIRE(packed_file);
 
 	std::array<uint8_t, 2> data = { 0, 0 };

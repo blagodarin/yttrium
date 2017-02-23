@@ -1,7 +1,6 @@
 #include "image_formats.h"
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>
 #include "../src/config.h"

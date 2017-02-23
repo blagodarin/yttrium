@@ -16,8 +16,8 @@ namespace Yttrium
 	class FileReader : public ReaderPrivate
 	{
 	public:
-		FileReader(uint64_t size, std::string&& name, HANDLE handle)
-			: ReaderPrivate(size, std::move(name))
+		FileReader(uint64_t size, const std::string& name, HANDLE handle)
+			: ReaderPrivate(size, name)
 			, _handle(handle)
 		{
 		}
@@ -43,9 +43,9 @@ namespace Yttrium
 	class FileWriter : public WriterPrivate
 	{
 	public:
-		FileWriter(uint64_t size, std::string&& name, HANDLE handle)
+		FileWriter(uint64_t size, const std::string& name, HANDLE handle)
 			: WriterPrivate(size)
-			, _name(std::move(name))
+			, _name(name)
 			, _handle(handle)
 		{
 		}
@@ -89,7 +89,7 @@ namespace Yttrium
 		bool _unlink = false;
 	};
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(std::string&& path)
+	std::shared_ptr<ReaderPrivate> create_file_reader(const std::string& path)
 	{
 		const auto handle = ::CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
@@ -97,15 +97,15 @@ namespace Yttrium
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
 			std::abort();
-		return std::make_shared<FileReader>(size.QuadPart, std::move(path), handle);
+		return std::make_shared<FileReader>(size.QuadPart, path, handle);
 	}
 
 	std::shared_ptr<ReaderPrivate> create_file_reader(const TemporaryFile& file)
 	{
-		return create_file_reader(file.name().to_std());
+		return create_file_reader(file.name());
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(std::string&& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
 	{
 		const auto handle = ::CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
@@ -113,11 +113,11 @@ namespace Yttrium
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
 			std::abort();
-		return std::make_unique<FileWriter>(size.QuadPart, std::move(path), handle);
+		return std::make_unique<FileWriter>(size.QuadPart, path, handle);
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
 	{
-		return create_file_writer(file.name().to_std());
+		return create_file_writer(file.name());
 	}
 }

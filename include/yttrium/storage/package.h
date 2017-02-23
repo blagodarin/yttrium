@@ -27,9 +27,9 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<PackageReader> create(const StaticString& path, PackageType = PackageType::Auto);
+		static std::unique_ptr<PackageReader> create(const std::string& path, PackageType = PackageType::Auto);
 
-		PackageReader() = default;
+		///
 		virtual ~PackageReader() = default;
 
 		///
@@ -41,13 +41,13 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<PackageWriter> create(const StaticString& path, PackageType = PackageType::Auto);
+		static std::unique_ptr<PackageWriter> create(const std::string& path, PackageType = PackageType::Auto);
 
-		PackageWriter() = default;
+		///
 		virtual ~PackageWriter() = default;
 
 		///
-		virtual bool add(const StaticString&, std::map<std::string, std::string>&& properties) = 0;
+		virtual bool add(const std::string&, std::map<std::string, std::string>&& properties) = 0;
 
 		///
 		virtual bool commit() = 0;

@@ -69,20 +69,20 @@ namespace Yttrium
 		return Image(*format, std::move(buffer));
 	}
 
-	bool Image::save(const StaticString& name, ImageType type) const
+	bool Image::save(const std::string& path, ImageType type) const
 	{
 		if (type == ImageType::Auto)
 		{
-			if (name.ends_with(".tga"_s))
+			if (StaticString{ path }.ends_with(".tga"_s))
 				type = ImageType::Tga;
 #ifndef Y_NO_PNG
-			else if (name.ends_with(".png"_s))
+			else if (StaticString{ path }.ends_with(".png"_s))
 				type = ImageType::Png;
 #endif
 			else
 				return false;
 		}
-		return save(Writer(name), type);
+		return save(Writer(path), type);
 	}
 
 	bool Image::save(Writer&& writer, ImageType type) const

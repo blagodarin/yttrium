@@ -27,9 +27,9 @@ namespace Yttrium
 		{
 		}
 
-		StorageAttachment(std::string&& name, Buffer&& buffer)
+		StorageAttachment(const std::string& name, Buffer&& buffer)
 			: type(Type::Buffer)
-			, buffer_name(std::move(name))
+			, buffer_name(name)
 			, buffer(std::make_shared<const Buffer>(std::move(buffer)))
 		{
 		}
@@ -47,7 +47,7 @@ namespace Yttrium
 		{
 			if (_use_file_system == Storage::UseFileSystem::Before)
 			{
-				Reader reader(name);
+				Reader reader(name.to_std());
 				if (reader)
 					return reader;
 			}
@@ -63,12 +63,12 @@ namespace Yttrium
 				else if (attachment.type == StorageAttachment::Type::Buffer)
 				{
 					if (StaticString{ attachment.buffer_name } == name)
-						return Reader(std::make_shared<BufferReader>(attachment.buffer, std::string{ attachment.buffer_name }));
+						return Reader(std::make_shared<BufferReader>(attachment.buffer, attachment.buffer_name));
 				}
 			}
 			if (_use_file_system == Storage::UseFileSystem::After)
 			{
-				Reader reader(name);
+				Reader reader(name.to_std());
 				if (reader)
 					return reader;
 			}
@@ -89,12 +89,12 @@ namespace Yttrium
 
 	Storage::~Storage() = default;
 
-	void Storage::attach_buffer(const StaticString& name, Buffer&& buffer)
+	void Storage::attach_buffer(const std::string& name, Buffer&& buffer)
 	{
-		_private->_attachments.emplace_back(name.to_std(), std::move(buffer));
+		_private->_attachments.emplace_back(name, std::move(buffer));
 	}
 
-	void Storage::attach_package(const StaticString& path, PackageType type)
+	void Storage::attach_package(const std::string& path, PackageType type)
 	{
 		auto package = PackageReader::create(path, type);
 		if (!package)

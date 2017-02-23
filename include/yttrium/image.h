@@ -7,12 +7,13 @@
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
 
+#include <string>
+
 #include <boost/optional/optional.hpp> // TODO: Use std::optional in C++17.
 
 namespace Yttrium
 {
 	class Reader;
-	class StaticString;
 	class Writer;
 
 	/// Pixel format.
@@ -139,7 +140,7 @@ namespace Yttrium
 		ImageFormat format() const { return _format; }
 
 		///
-		bool save(const StaticString& name, ImageType = ImageType::Auto) const;
+		bool save(const std::string& path, ImageType = ImageType::Auto) const;
 
 		///
 		bool save(Writer&&, ImageType) const;

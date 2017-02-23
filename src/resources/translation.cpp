@@ -17,7 +17,7 @@ namespace Yttrium
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
-		bool save(const StaticString& path) const override;
+		bool save(const std::string&) const override;
 		std::string translate(const StaticString& source) const override;
 
 	private:
@@ -71,7 +71,7 @@ namespace Yttrium
 				i = _translations.erase(i);
 	}
 
-	bool TranslationImpl::save(const StaticString& file_name) const
+	bool TranslationImpl::save(const std::string& path) const
 	{
 		const auto document = IonDocument::create(_allocator);
 		for (const auto& translation : _translations)
@@ -80,7 +80,7 @@ namespace Yttrium
 			node.append(translation.first);
 			node.append(StaticString{ translation.second.text });
 		}
-		return document->save(file_name);
+		return document->save(path);
 	}
 
 	std::string TranslationImpl::translate(const StaticString& source) const

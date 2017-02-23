@@ -4,7 +4,7 @@
 
 namespace
 {
-	void make_checkerboard_texture(Storage& storage, const StaticString& name)
+	void make_checkerboard_texture(Storage& storage, const std::string& name)
 	{
 		storage.attach_buffer(name, ::make_bgra_tga(128, 128, [](size_t x, size_t y)
 		{

@@ -7,11 +7,10 @@
 #include <yttrium/api.h>
 
 #include <memory>
+#include <string>
 
 namespace Yttrium
 {
-	class StaticString;
-
 	///
 	class Y_API TemporaryFile
 	{
@@ -23,7 +22,7 @@ namespace Yttrium
 		~TemporaryFile();
 
 		///
-		StaticString name() const;
+		const std::string& name() const;
 
 	private:
 		const std::unique_ptr<class TemporaryFilePrivate> _private;

@@ -1,6 +1,7 @@
 #include "reader.h"
 
 #include <yttrium/memory/buffer.h>
+#include <yttrium/static_string.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
@@ -18,8 +19,8 @@ namespace Yttrium
 	{
 	}
 
-	BufferReader::BufferReader(const std::shared_ptr<const Buffer>& buffer, std::string&& name)
-		: ReaderPrivate(buffer->size(), std::move(name))
+	BufferReader::BufferReader(const std::shared_ptr<const Buffer>& buffer, const std::string& name)
+		: ReaderPrivate(buffer->size(), name)
 		, _buffer(buffer)
 	{
 	}
@@ -74,8 +75,8 @@ namespace Yttrium
 	{
 	}
 
-	Reader::Reader(const StaticString& path)
-		: _private(create_file_reader(path.to_std()))
+	Reader::Reader(const std::string& path)
+		: _private(create_file_reader(path))
 	{
 	}
 
@@ -91,7 +92,7 @@ namespace Yttrium
 
 	StaticString Reader::name() const
 	{
-		return _private ? StaticString(_private->_name) : StaticString();
+		return _private ? StaticString{ _private->_name } : StaticString{};
 	}
 
 	uint64_t Reader::offset() const

@@ -16,7 +16,7 @@ using namespace Yttrium;
 
 namespace
 {
-	void make_buttons_texture(Storage& storage, const StaticString& name)
+	void make_buttons_texture(Storage& storage, const std::string& name)
 	{
 		constexpr size_t button_size = 16;
 		constexpr size_t button_styles = 4;
@@ -27,7 +27,7 @@ namespace
 		}));
 	}
 
-	void make_cursor_texture(Storage& storage, const StaticString& name)
+	void make_cursor_texture(Storage& storage, const std::string& name)
 	{
 		constexpr size_t size = 64;
 		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y) -> std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>

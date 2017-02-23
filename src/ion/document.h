@@ -21,7 +21,7 @@ namespace Yttrium
 
 		IonObject& root() override { return _root; }
 		const IonObject& root() const override { return _root; }
-		bool save(const StaticString&, Formatting) const override;
+		bool save(const std::string&, Formatting) const override;
 
 		Allocator& allocator() const { return _allocator; }
 		void clear();

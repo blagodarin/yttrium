@@ -1,35 +1,38 @@
 #include <yttrium/storage/temporary_file.h>
 
-#include <yttrium/static_string.h>
-
 #include <array>
 #include <cstdlib>
 
 #include "windows.h"
+
+namespace
+{
+	std::string make_temporary_file_name() // TODO: Throw on errors.
+	{
+		constexpr auto max_temp_path_size = MAX_PATH - 14; // GetTempFileName path length limit.
+		std::array<char, max_temp_path_size + 1> path;
+		if (!::GetTempPathA(path.size(), path.data()))
+			std::abort();
+		std::array<char, MAX_PATH> name;
+		const auto status = ::GetTempFileNameA(path.data(), "ytt", 0, name.data());
+		if (!status || status == ERROR_BUFFER_OVERFLOW)
+			std::abort();
+		return name.data();
+	}
+}
 
 namespace Yttrium
 {
 	class TemporaryFilePrivate
 	{
 	public:
-		TemporaryFilePrivate() // TODO: Throw on errors.
+		~TemporaryFilePrivate()
 		{
-			constexpr auto max_temp_path_size = MAX_PATH - 14; // GetTempFileName path length limit.
-			std::array<char, max_temp_path_size + 1> path;
-			if (!::GetTempPathA(path.size(), path.data()))
-				std::abort();
-			const auto status = ::GetTempFileNameA(path.data(), "ytt", 0, _name.data());
-			if (!status || status == ERROR_BUFFER_OVERFLOW)
-				std::abort();
-		}
-
-		~TemporaryFilePrivate() // TODO: Report failure.
-		{
-			::DeleteFileA(_name.data());
+			::DeleteFileA(_name.data()); // TODO: Report failure.
 		}
 
 	public:
-		std::array<char, MAX_PATH> _name;
+		const std::string _name = ::make_temporary_file_name();
 	};
 
 	TemporaryFile::TemporaryFile()
@@ -39,8 +42,8 @@ namespace Yttrium
 
 	TemporaryFile::~TemporaryFile() = default;
 
-	StaticString TemporaryFile::name() const
+	const std::string& TemporaryFile::name() const
 	{
-		return _private->_name.data();
+		return _private->_name;
 	}
 }

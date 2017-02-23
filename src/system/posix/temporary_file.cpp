@@ -1,7 +1,5 @@
 #include <yttrium/storage/temporary_file.h>
 
-#include <yttrium/static_string.h>
-
 #include <system_error>
 
 #include <unistd.h>
@@ -37,8 +35,8 @@ namespace Yttrium
 
 	TemporaryFile::~TemporaryFile() = default;
 
-	StaticString TemporaryFile::name() const
+	const std::string& TemporaryFile::name() const
 	{
-		return StaticString(_private->_name.data(), _private->_name.size());
+		return _private->_name;
 	}
 }

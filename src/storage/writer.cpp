@@ -1,6 +1,7 @@
 #include "writer.h"
 
 #include <yttrium/memory/buffer.h>
+#include <yttrium/static_string.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
@@ -48,8 +49,8 @@ namespace Yttrium
 	{
 	}
 
-	Writer::Writer(const StaticString& path)
-		: _private(create_file_writer(path.to_std()))
+	Writer::Writer(const std::string& path)
+		: _private(create_file_writer(path))
 	{
 	}
 

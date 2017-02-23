@@ -11,8 +11,6 @@
 
 namespace Yttrium
 {
-	class StaticString;
-
 	class GlApi
 	{
 	public:

@@ -19,7 +19,7 @@ namespace Yttrium
 	class FileReader : public ReaderPrivate
 	{
 	public:
-		FileReader(uint64_t size, std::string&& name, int descriptor)
+		FileReader(uint64_t size, const std::string& name, int descriptor)
 			: ReaderPrivate(size, std::move(name))
 			, _descriptor(descriptor)
 		{
@@ -44,9 +44,9 @@ namespace Yttrium
 	class FileWriter : public WriterPrivate
 	{
 	public:
-		FileWriter(uint64_t size, std::string&& name, int descriptor)
+		FileWriter(uint64_t size, const std::string& name, int descriptor)
 			: WriterPrivate(size)
-			, _name(std::move(name))
+			, _name(name)
 			, _descriptor(descriptor)
 		{
 		}
@@ -86,7 +86,7 @@ namespace Yttrium
 		bool _unlink = false;
 	};
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(std::string&& path)
+	std::shared_ptr<ReaderPrivate> create_file_reader(const std::string& path)
 	{
 #ifdef __linux__
 		const int flags = O_RDONLY | O_NOATIME;
@@ -99,15 +99,15 @@ namespace Yttrium
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
-		return std::make_shared<FileReader>(size, std::move(path), descriptor);
+		return std::make_shared<FileReader>(size, path, descriptor);
 	}
 
 	std::shared_ptr<ReaderPrivate> create_file_reader(const TemporaryFile& file)
 	{
-		return create_file_reader(file.name().to_std());
+		return create_file_reader(file.name());
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(std::string&& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
 	{
 #ifdef __linux__
 		const int flags = O_WRONLY | O_CREAT | O_TRUNC | O_NOATIME;
@@ -120,11 +120,11 @@ namespace Yttrium
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
 			throw std::system_error(errno, std::generic_category());
-		return std::make_unique<FileWriter>(size, std::move(path), descriptor);
+		return std::make_unique<FileWriter>(size, path, descriptor);
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
 	{
-		return create_file_writer(file.name().to_std());
+		return create_file_writer(file.name());
 	}
 }

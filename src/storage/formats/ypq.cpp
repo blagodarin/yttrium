@@ -42,9 +42,8 @@ namespace Yttrium
 		size_t properties_end = 0;
 	};
 
-	YpqReader::YpqReader(std::string&& name, Reader&& reader)
-		: _name(std::move(name))
-		, _reader(std::move(reader))
+	YpqReader::YpqReader(Reader&& reader)
+		: _reader(std::move(reader))
 	{
 		YpqHeader header;
 		if (!_reader.read_at(0, header)
@@ -125,8 +124,8 @@ namespace Yttrium
 		uint64_t offset = 0;
 		uint32_t size = 0;
 
-		Entry(const StaticString& name, std::map<std::string, std::string>&& properties)
-			: name(name.text(), name.size()), properties(std::move(properties)) {}
+		Entry(const std::string& name, std::map<std::string, std::string>&& properties)
+			: name(name), properties(std::move(properties)) {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
@@ -140,7 +139,7 @@ namespace Yttrium
 			_writer.unlink();
 	}
 
-	bool YpqWriter::add(const StaticString& path, std::map<std::string, std::string>&& properties)
+	bool YpqWriter::add(const std::string& path, std::map<std::string, std::string>&& properties)
 	{
 		if (_committed)
 			return false;
@@ -203,7 +202,7 @@ namespace Yttrium
 
 		for (const auto& entry : _entries)
 		{
-			Reader reader(StaticString(entry.name.data(), entry.name.size()));
+			Reader reader(entry.name);
 			if (!reader)
 				return false;
 			const auto i = &entry - _entries.data();

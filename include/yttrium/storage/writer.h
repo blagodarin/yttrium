@@ -23,7 +23,7 @@ namespace Yttrium
 		explicit Writer(Buffer&);
 
 		/// Creates a Writer for the specified file.
-		explicit Writer(const StaticString& path);
+		explicit Writer(const std::string& path);
 
 		/// Creates a Writer for a temporary file.
 		explicit Writer(TemporaryFile&);

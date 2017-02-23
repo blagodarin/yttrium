@@ -7,12 +7,12 @@
 #include <yttrium/memory/global.h>
 
 #include <memory>
+#include <string>
 
 namespace Yttrium
 {
 	class IonObject;
 	class Reader;
-	class StaticString;
 
 	///
 	class Y_API IonDocument
@@ -41,7 +41,7 @@ namespace Yttrium
 		virtual const IonObject& root() const = 0;
 
 		///
-		virtual bool save(const StaticString& path, Formatting = Formatting::Pretty) const = 0;
+		virtual bool save(const std::string& path, Formatting = Formatting::Pretty) const = 0;
 	};
 }
 

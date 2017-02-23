@@ -14,7 +14,7 @@ namespace Yttrium
 	class YpqReader : public PackageReader
 	{
 	public:
-		YpqReader(std::string&&, Reader&&);
+		YpqReader(Reader&&);
 		~YpqReader() override;
 
 		Reader open(const StaticString&) const override;
@@ -22,7 +22,6 @@ namespace Yttrium
 	private:
 		struct Entry;
 
-		const std::string _name;
 		const Reader _reader;
 		Buffer _metadata_buffer;
 		std::map<StaticString, Entry> _entries;
@@ -35,7 +34,7 @@ namespace Yttrium
 		YpqWriter(Writer&&);
 		~YpqWriter() override;
 
-		bool add(const StaticString&, std::map<std::string, std::string>&&) override;
+		bool add(const std::string&, std::map<std::string, std::string>&&) override;
 		bool commit() override;
 
 	private:
