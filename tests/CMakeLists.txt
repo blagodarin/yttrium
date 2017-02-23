@@ -9,6 +9,7 @@ add_executable(unit_tests
 	key_lookup.cpp
 	main.cpp
 	margins.cpp
+	matrix.cpp
 	memory.cpp
 	package.cpp
 	point.cpp

@@ -51,4 +51,6 @@ BOOST_AUTO_TEST_CASE(test_vector4_arithmetics)
 	BOOST_CHECK(Vector4(9, 9, 9, 9) - 3 == Vector4(6, 6, 6, 1));
 	BOOST_CHECK(Vector4(3, 3, 3, 3) * 3 == Vector4(9, 9, 9, 1));
 	BOOST_CHECK(Vector4(9, 9, 9, 9) / 3 == Vector4(3, 3, 3, 1));
+
+	BOOST_CHECK(-Vector4(1, 2, 3) == Vector4(-1, -2, -3));
 }

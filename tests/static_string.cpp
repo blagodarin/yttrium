@@ -252,3 +252,22 @@ BOOST_AUTO_TEST_CASE(test_static_string_trimmed)
 	BOOST_CHECK_EQUAL("\x20\x20\x21\x20\x20"_s.trimmed(), "\x21"_s);
 	BOOST_CHECK_EQUAL("\x20\x20\x21\x21\x20\x20"_s.trimmed(), "\x21\x21"_s);
 }
+
+BOOST_AUTO_TEST_CASE(test_static_string_ostream)
+{
+	{
+		std::ostringstream stream;
+		stream << ""_s;
+		BOOST_CHECK_EQUAL(stream.str(), "");
+	}
+	{
+		std::ostringstream stream;
+		stream << "a"_s;
+		BOOST_CHECK_EQUAL(stream.str(), "a");
+	}
+	{
+		std::ostringstream stream;
+		stream << "abcdefghijklmnopqrstuvwxyz"_s;
+		BOOST_CHECK_EQUAL(stream.str(), "abcdefghijklmnopqrstuvwxyz");
+	}
+}
