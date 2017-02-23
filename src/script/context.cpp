@@ -122,11 +122,11 @@ namespace Yttrium
 			*i->second = value;
 	}
 
-	void ScriptContext::set(const std::string& name, const StaticString& value)
+	void ScriptContext::set(const std::string& name, const std::string& value)
 	{
 		const auto i = _private->_values.find(name);
 		if (i == _private->_values.end())
-			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue(value));
+			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue(StaticString{ value }));
 		else
 			*i->second = value;
 	}

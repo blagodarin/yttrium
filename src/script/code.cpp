@@ -122,10 +122,10 @@ namespace Yttrium
 				if (command.args[1]->type() == ScriptValue::Type::Name)
 				{
 					const auto value = context.find(command.args[1]->string());
-					context.set(command.args[0]->string(), value ? StaticString{ value->string() } : StaticString{});
+					context.set(command.args[0]->string(), value ? value->string() : std::string{});
 				}
 				else
-					context.set(command.args[0]->string(), StaticString{ command.args[1]->string() });
+					context.set(command.args[0]->string(), command.args[1]->string());
 			}
 			else if (!context.call(command.name, result, ScriptArgs(context, command.args)))
 				break;

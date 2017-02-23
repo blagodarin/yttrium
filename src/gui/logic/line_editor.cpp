@@ -130,6 +130,13 @@ namespace Yttrium
 		return true;
 	}
 
+	void LineEditor::reset(std::string&& text)
+	{
+		_text = std::move(text);
+		_cursor = _text.size();
+		_selection_size = 0;
+	}
+
 	void LineEditor::set_max_size(size_t max_size)
 	{
 		_max_size = std::min(max_size, _text.max_size());

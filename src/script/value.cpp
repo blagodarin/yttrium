@@ -12,10 +12,10 @@ namespace Yttrium
 		return *this;
 	}
 
-	ScriptValue& ScriptValue::operator=(const StaticString& value)
+	ScriptValue& ScriptValue::operator=(const std::string& value)
 	{
 		_type = Type::String;
-		_value.assign(value.text(), value.size());
+		_value = value;
 		return *this;
 	}
 

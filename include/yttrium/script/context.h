@@ -14,7 +14,6 @@ namespace Yttrium
 	class ScriptArgs;
 	class ScriptContext;
 	class ScriptValue;
-	class StaticString;
 
 	/// Script call description.
 	class ScriptCall
@@ -87,7 +86,7 @@ namespace Yttrium
 		void set(const std::string& name, int value);
 
 		///
-		void set(const std::string& name, const StaticString& value);
+		void set(const std::string& name, const std::string& value);
 
 		/// Substitutes script variables in a string.
 		/// Every occurence of curly brace pair is threated as a variable reference.

@@ -46,7 +46,7 @@ namespace Yttrium
 		ScriptValue& operator=(int);
 
 		///
-		ScriptValue& operator=(const StaticString&);
+		ScriptValue& operator=(const std::string&);
 
 	private:
 		Type _type;

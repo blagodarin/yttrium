@@ -19,10 +19,7 @@ namespace Yttrium
 		_on_enter = loader.load_actions("on_enter"_s);
 		std::string initial_text;
 		if (loader.load_text("text"_s, initial_text)) // TODO: Use init-statement in C++17.
-		{
 			_logic.reset(std::move(initial_text));
-			_logic.process_key({ Key::End, true, false });
-		}
 		return true;
 	}
 
@@ -43,7 +40,7 @@ namespace Yttrium
 			default:
 				if (_logic.process_key(event))
 				{
-					_gui.script_context().set("_", StaticString{ _logic.text() });
+					_gui.script_context().set("_", _logic.text());
 					_on_update.run(_gui);
 					_cursor_mark = std::chrono::steady_clock::now();
 					return true;
