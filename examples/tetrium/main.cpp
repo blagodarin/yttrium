@@ -63,7 +63,7 @@ int main(int, char**)
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });
 
 	TetriumStatistics statistics{ script };
-	script.define("set_score", 2, [&logic, &statistics](const ScriptCall& call){ statistics.update(call.args[1]->to_int(), call.args[0]->to_string().to_std()); });
+	script.define("set_score", 2, [&logic, &statistics](const ScriptCall& call){ statistics.update(call.args[1]->to_int(), call.args[0]->string()); });
 
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");

@@ -12,14 +12,6 @@ namespace Yttrium
 		return *this;
 	}
 
-	ScriptValue& ScriptValue::operator=(double value)
-	{
-		_type = Type::Literal;
-		_value.clear();
-		append_to(_value, value);
-		return *this;
-	}
-
 	ScriptValue& ScriptValue::operator=(const StaticString& value)
 	{
 		_type = Type::String;
@@ -28,12 +20,6 @@ namespace Yttrium
 	}
 
 	ScriptValue::ScriptValue(int value)
-		: _type(Type::Literal)
-		, _value(make_string(value))
-	{
-	}
-
-	ScriptValue::ScriptValue(double value)
 		: _type(Type::Literal)
 		, _value(make_string(value))
 	{

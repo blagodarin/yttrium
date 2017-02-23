@@ -43,7 +43,7 @@ namespace Yttrium
 			default:
 				if (_logic.process_key(event))
 				{
-					_gui.script_context().set("_"_s, StaticString{ _logic.text() });
+					_gui.script_context().set("_", StaticString{ _logic.text() });
 					_on_update.run(_gui);
 					_cursor_mark = std::chrono::steady_clock::now();
 					return true;

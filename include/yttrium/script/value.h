@@ -22,7 +22,6 @@ namespace Yttrium
 		friend ScriptParser;
 
 	public:
-
 		/// Value type.
 		/// \note Every Name is a Literal, and every Literal is a String, but not visa versa.
 		enum class Type
@@ -33,31 +32,21 @@ namespace Yttrium
 		};
 
 	public:
-
 		///
 		int to_int() const { return StaticString{ _value }.to_int(); }
 
 		///
-		double to_double() const { return StaticString{ _value }.to_double(); }
-
-		///
-		StaticString to_string() const { return StaticString{ _value }; }
-
-		///
 		Type type() const { return _type; }
 
+		///
+		const std::string& string() const noexcept { return _value; }
+
 	public:
+		///
+		ScriptValue& operator=(int);
 
 		///
-		ScriptValue& operator=(int value);
-
-		///
-
-		ScriptValue& operator=(double value);
-
-		///
-
-		ScriptValue& operator=(const StaticString& value);
+		ScriptValue& operator=(const StaticString&);
 
 	private:
 		Type _type;

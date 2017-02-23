@@ -121,11 +121,11 @@ namespace Yttrium
 				assert(command.args[0]->type() == ScriptValue::Type::Name);
 				if (command.args[1]->type() == ScriptValue::Type::Name)
 				{
-					const auto value = context.find(command.args[1]->to_string());
-					context.set(command.args[0]->to_string(), value ? value->to_string() : StaticString());
+					const auto value = context.find(command.args[1]->string());
+					context.set(command.args[0]->string(), value ? StaticString{ value->string() } : StaticString{});
 				}
 				else
-					context.set(command.args[0]->to_string(), command.args[1]->to_string());
+					context.set(command.args[0]->string(), StaticString{ command.args[1]->string() });
 			}
 			else if (!context.call(command.name, result, ScriptArgs(context, command.args)))
 				break;

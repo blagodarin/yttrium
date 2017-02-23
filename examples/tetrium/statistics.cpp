@@ -30,7 +30,7 @@ void TetriumStatistics::update_variables() const
 	for (auto i = _statistics.rbegin(); i != _statistics.rend(); ++i)
 	{
 		++index;
-		_script.set(StaticString{ "name" + std::to_string(index) }, i->second.c_str());
-		_script.set(StaticString{ "score" + std::to_string(index) }, i->first);
+		_script.set("name" + std::to_string(index), i->second.c_str());
+		_script.set("score" + std::to_string(index), i->first);
 	}
 }

@@ -15,7 +15,6 @@ namespace Yttrium
 	class ScriptContext;
 	class ScriptValue;
 	class StaticString;
-	class String;
 
 	/// Script call description.
 	class ScriptCall
@@ -58,16 +57,16 @@ namespace Yttrium
 		bool call(const std::string& name, std::string& result, const ScriptArgs&);
 
 		/// Define a command.
-		void define(const StaticString& name, size_t min_args, size_t max_args, const Command&);
+		void define(const std::string& name, size_t min_args, size_t max_args, const Command&);
 
 		///
-		void define(const StaticString& name, size_t args, const Command& command)
+		void define(const std::string& name, size_t args, const Command& command)
 		{
 			define(name, args, args, command);
 		}
 
 		///
-		void define(const StaticString& name, const Command& command)
+		void define(const std::string& name, const Command& command)
 		{
 			define(name, 0, 0, command);
 		}
@@ -75,33 +74,20 @@ namespace Yttrium
 		/// Find a value by name.
 		/// \param name Value name.
 		/// \return Value pointer or \c nullptr if no such value exist.
-		ScriptValue* find(const StaticString& name) const;
+		ScriptValue* find(const std::string& name) const;
 
 		///
-		int get_int(const StaticString& name, int default_value);
+		int get_int(const std::string& name, int default_value);
 
 		/// Get the root context.
 		/// \return Root context.
 		ScriptContext& root();
 
 		///
-		const ScriptValue* set(const StaticString& name, int value);
+		void set(const std::string& name, int value);
 
-		/**
-		* \overload
-		* \param name
-		* \param value
-		* \return
-		*/
-		const ScriptValue* set(const StaticString& name, double value);
-
-		/**
-		* \overload
-		* \param name
-		* \param value
-		* \return
-		*/
-		const ScriptValue* set(const StaticString& name, const StaticString& value);
+		///
+		void set(const std::string& name, const StaticString& value);
 
 		/// Substitutes script variables in a string.
 		/// Every occurence of curly brace pair is threated as a variable reference.

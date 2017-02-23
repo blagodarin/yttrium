@@ -3,12 +3,10 @@
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/string.h>
 #include <yttrium/string_utils.h>
 
 #include <cassert>
 #include <iostream>
-#include <map>
 #include <unordered_map>
 
 namespace Yttrium
@@ -42,7 +40,7 @@ namespace Yttrium
 		Allocator& _allocator;
 		ScriptContext* const _parent;
 		Pool<ScriptValue> _value_pool{ 32, _allocator };
-		std::map<String, ScriptValue*> _values;
+		std::unordered_map<std::string, ScriptValue*> _values;
 		std::unordered_map<std::string, ScriptCommandContext> _commands;
 	};
 
@@ -89,14 +87,14 @@ namespace Yttrium
 		return true;
 	}
 
-	void ScriptContext::define(const StaticString& name, size_t min_args, size_t max_args, const Command& command)
+	void ScriptContext::define(const std::string& name, size_t min_args, size_t max_args, const Command& command)
 	{
-		_private->_commands[name.to_std()] = ScriptCommandContext(command, min_args, max_args);
+		_private->_commands[name] = ScriptCommandContext(command, min_args, max_args);
 	}
 
-	ScriptValue* ScriptContext::find(const StaticString& name) const
+	ScriptValue* ScriptContext::find(const std::string& name) const
 	{
-		const auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		const auto i = _private->_values.find(name);
 		if (i != _private->_values.end())
 			return i->second;
 		if (_private->_parent)
@@ -104,7 +102,7 @@ namespace Yttrium
 		return nullptr;
 	}
 
-	int ScriptContext::get_int(const StaticString& name, int default_value)
+	int ScriptContext::get_int(const std::string& name, int default_value)
 	{
 		const auto value = find(name);
 		return value ? value->to_int() : default_value;
@@ -115,34 +113,22 @@ namespace Yttrium
 		return _private->_parent ? _private->_parent->root() : *this;
 	}
 
-	const ScriptValue* ScriptContext::set(const StaticString& name, int value)
+	void ScriptContext::set(const std::string& name, int value)
 	{
-		auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		const auto i = _private->_values.find(name);
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private->_allocator), new(_private->_value_pool.allocate()) ScriptValue(value)).first;
+			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue(value));
 		else
 			*i->second = value;
-		return i->second;
 	}
 
-	const ScriptValue* ScriptContext::set(const StaticString& name, double value)
+	void ScriptContext::set(const std::string& name, const StaticString& value)
 	{
-		auto i = _private->_values.find(String(name, ByReference(), nullptr));
+		const auto i = _private->_values.find(name);
 		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private->_allocator), new(_private->_value_pool.allocate()) ScriptValue(value)).first;
+			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue(value));
 		else
 			*i->second = value;
-		return i->second;
-	}
-
-	const ScriptValue* ScriptContext::set(const StaticString& name, const StaticString& value)
-	{
-		auto i = _private->_values.find(String(name, ByReference(), nullptr));
-		if (i == _private->_values.end())
-			i = _private->_values.emplace(String(name, &_private->_allocator), new(_private->_value_pool.allocate()) ScriptValue(value)).first;
-		else
-			*i->second = value;
-		return i->second;
 	}
 
 	void ScriptContext::substitute(std::string& target, const std::string& source) const
@@ -166,9 +152,9 @@ namespace Yttrium
 			if (right == end)
 				break;
 
-			const auto value = find(StaticString(left, right - left));
+			const auto value = find({ left, static_cast<size_t>(right - left) });
 			if (value)
-				append_to(target, value->to_string());
+				append_to(target, value->string());
 
 			left = ++right;
 		}

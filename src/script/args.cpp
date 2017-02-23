@@ -10,6 +10,6 @@ namespace Yttrium
 		if (index >= _values.size())
 			return nullptr;
 		const ScriptValue* value = _values[index];
-		return value->type() == ScriptValue::Type::Name ? _context.find(value->to_string()) : value;
+		return value->type() == ScriptValue::Type::Name ? _context.find(value->string()) : value;
 	}
 }
