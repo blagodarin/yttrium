@@ -3,6 +3,8 @@ bin
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
+coverage/*
+coverage.info
 *.db
 *.dir
 doc/html
