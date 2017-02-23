@@ -1,5 +1,7 @@
 #include <yttrium/tiny_string_map.h>
 
+#include <yttrium/static_string.h>
+
 #include <cstring>
 
 // TODO: Benchmarks.

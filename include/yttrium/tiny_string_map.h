@@ -4,12 +4,14 @@
 #ifndef _include_yttrium_tiny_string_map_h_
 #define _include_yttrium_tiny_string_map_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/api.h>
 
 #include <memory>
 
 namespace Yttrium
 {
+	class StaticString;
+
 	///
 	class Y_API TinyStringMap
 	{

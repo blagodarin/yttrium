@@ -1,4 +1,7 @@
+#include <yttrium/static_string.h>
 #include <yttrium/tiny_string_map.h>
+
+#include <limits>
 
 #include <boost/test/unit_test.hpp>
 
@@ -100,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_tiny_string_map_move_construction)
 	BOOST_CHECK(m.find("another").is_null());
 }
 
-BOOST_AUTO_TEST_CASE(test_tiny_string_shrinking_assignment)
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_shrinking_assignment)
 {
 	TinyStringMap m;
 	m.insert_or_assign({}, {});
@@ -156,7 +159,7 @@ BOOST_AUTO_TEST_CASE(test_tiny_string_map_self_assignment)
 	BOOST_CHECK_EQUAL(m.find("another"), "test value");
 }
 
-BOOST_AUTO_TEST_CASE(test_tiny_string_move_assignment)
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_move_assignment)
 {
 	TinyStringMap m;
 	m.insert_or_assign("a", "b");
@@ -176,4 +179,16 @@ BOOST_AUTO_TEST_CASE(test_tiny_string_move_assignment)
 	BOOST_CHECK(n.find({}).is_null());
 	BOOST_CHECK(n.find("test").is_null());
 	BOOST_CHECK(n.find("another").is_null());
+}
+
+BOOST_AUTO_TEST_CASE(test_tiny_string_map_limit)
+{
+	TinyStringMap m;
+	const std::string tiny(std::numeric_limits<uint8_t>::max(), 'a');
+	const std::string not_tiny(tiny.size() + 1, 'a');
+	BOOST_CHECK_THROW(m.insert_or_assign(StaticString{ not_tiny }, StaticString{ not_tiny }), std::length_error);
+	BOOST_CHECK_THROW(m.insert_or_assign(StaticString{ not_tiny }, StaticString{ tiny }), std::length_error);
+	BOOST_CHECK_THROW(m.insert_or_assign(StaticString{ tiny }, StaticString{ not_tiny }), std::length_error);
+	BOOST_CHECK_NO_THROW(m.insert_or_assign(StaticString{ tiny }, StaticString{ tiny }));
+	BOOST_CHECK_THROW(m.insert_or_assign(StaticString{ tiny }, StaticString{ not_tiny }), std::length_error); // Throws before key lookup.
 }
