@@ -24,6 +24,32 @@ BOOST_AUTO_TEST_CASE(test_rect_initialization)
 	BOOST_CHECK_EQUAL(rect.top() + rect.height(), rect.bottom());
 }
 
+BOOST_AUTO_TEST_CASE(test_rect_bound)
+{
+	// Points are treated like solid objects, so e.g. a rect of width 2
+	// can only bound 2 different points with the same Y coordinate.
+
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 0, 0 }), Point(1, 1));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 1, 0 }), Point(1, 1));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 2, 0 }), Point(2, 1));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 4, 0 }), Point(2, 1));
+
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 0, 1 }), Point(1, 1));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 1, 1 }), Point(1, 1));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 2, 1 }), Point(2, 1));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 4, 1 }), Point(2, 1));
+
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 0, 2 }), Point(1, 2));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 1, 2 }), Point(1, 2));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 2, 2 }), Point(2, 2));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 4, 2 }), Point(2, 2));
+
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 0, 4 }), Point(1, 2));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 1, 4 }), Point(1, 2));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 2, 4 }), Point(2, 2));
+	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 4, 4 }), Point(2, 2));
+}
+
 BOOST_AUTO_TEST_CASE(test_rect_center)
 {
 	BOOST_CHECK_EQUAL(Rect({1, 1}, Size(3, 3)).center(), Point(2, 2));

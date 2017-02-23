@@ -60,21 +60,45 @@ BOOST_AUTO_TEST_CASE(test_static_string_comparison)
 	BOOST_CHECK(ab <= ba);
 }
 
-BOOST_AUTO_TEST_CASE(test_static_string_trimmed)
+BOOST_AUTO_TEST_CASE(test_static_string_ends_with)
 {
-	BOOST_CHECK_EQUAL(""_s.trimmed(), ""_s);
+	BOOST_CHECK(""_s.ends_with(""_s));
+	BOOST_CHECK("test"_s.ends_with(""_s));
+	BOOST_CHECK("test"_s.ends_with("t"_s));
+	BOOST_CHECK(!"test"_s.ends_with("tes"_s));
+	BOOST_CHECK("test"_s.ends_with("test"_s));
+	BOOST_CHECK(!"test"_s.ends_with("test "_s));
+}
 
-	BOOST_CHECK_EQUAL("\x01"_s.trimmed(), ""_s);
-	BOOST_CHECK_EQUAL("\x20"_s.trimmed(), ""_s);
-	BOOST_CHECK_EQUAL("\x21"_s.trimmed(), "\x21"_s);
-	BOOST_CHECK_EQUAL("\x7F"_s.trimmed(), "\x7F"_s);
-	BOOST_CHECK_EQUAL("\x80"_s.trimmed(), "\x80"_s);
-	BOOST_CHECK_EQUAL("\xFF"_s.trimmed(), "\xFF"_s);
+BOOST_AUTO_TEST_CASE(test_static_string_escaped)
+{
+	BOOST_CHECK_EQUAL(""_s.escaped("0123456789", '$'), "");
+	BOOST_CHECK_EQUAL("abcdefghij"_s.escaped("0123456789", '$'), "abcdefghij");
+	BOOST_CHECK_EQUAL("abc3456hij"_s.escaped("0123456789", '$'), "abc$3$4$5$6hij");
+}
 
-	BOOST_CHECK_EQUAL("\x20\x20"_s.trimmed(), ""_s);
-	BOOST_CHECK_EQUAL("\x20\x21\x20"_s.trimmed(), "\x21"_s);
-	BOOST_CHECK_EQUAL("\x20\x20\x21\x20\x20"_s.trimmed(), "\x21"_s);
-	BOOST_CHECK_EQUAL("\x20\x20\x21\x21\x20\x20"_s.trimmed(), "\x21\x21"_s);
+BOOST_AUTO_TEST_CASE(test_static_string_to_float)
+{
+	BOOST_CHECK_EQUAL(""_s.to_float(), 0.f);
+	BOOST_CHECK_EQUAL(""_s.to_double(), 0.);
+
+	BOOST_CHECK_EQUAL("1"_s.to_float(), 1.f);
+	BOOST_CHECK_EQUAL("1"_s.to_double(), 1.);
+
+	BOOST_CHECK_EQUAL("0.5"_s.to_float(), .5f);
+	BOOST_CHECK_EQUAL("0.5"_s.to_double(), .5);
+
+	BOOST_CHECK_EQUAL("-0.25"_s.to_float(), -.25f);
+	BOOST_CHECK_EQUAL("-0.25"_s.to_double(), -.25);
+
+	BOOST_CHECK_EQUAL("+0.125"_s.to_float(), .125f);
+	BOOST_CHECK_EQUAL("+0.125"_s.to_double(), .125);
+
+	BOOST_CHECK_CLOSE("+98765.43210e-7"_s.to_float(), +98765.43210e-7f, 1e-13f);
+	BOOST_CHECK_CLOSE("+98765.43210e-7"_s.to_double(), +98765.43210e-7, 1e-13);
+
+	BOOST_CHECK_CLOSE("-01234.56789e+7"_s.to_float(), -01234.56789e+7f, 1e-13f);
+	BOOST_CHECK_CLOSE("-01234.56789e+7"_s.to_double(), -01234.56789e+7, 1e-13);
 }
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_int)
@@ -120,52 +144,7 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 	BOOST_CHECK_EQUAL("-9223372036854775810"_s.to_int64(), INT64_C(9223372036854775806));
 }
 
-BOOST_AUTO_TEST_CASE(test_static_string_to_int32_number)
-{
-	int32_t i = 0;
-
-	BOOST_CHECK(!""_s.to_number(i));
-
-	BOOST_CHECK(!"-2147483649"_s.to_number(i));
-
-	BOOST_CHECK("-2147483648"_s.to_number(i));
-	BOOST_CHECK_EQUAL(i, -2147483647 - 1);
-
-	BOOST_CHECK("2147483647"_s.to_number(i));
-	BOOST_CHECK_EQUAL(i, 2147483647);
-
-	BOOST_CHECK("+2147483647"_s.to_number(i));
-	BOOST_CHECK_EQUAL(i, 2147483647);
-
-	BOOST_CHECK(!"2147483648"_s.to_number(i));
-	BOOST_CHECK(!"+2147483648"_s.to_number(i));
-}
-
-BOOST_AUTO_TEST_CASE(test_static_string_to_uint32_number)
-{
-	uint32_t u = 1;
-
-	BOOST_CHECK(!""_s.to_number(u));
-
-	BOOST_CHECK(!"-0"_s.to_number(u));
-
-	BOOST_CHECK("0"_s.to_number(u));
-	BOOST_CHECK_EQUAL(u, 0);
-
-	BOOST_CHECK("+0"_s.to_number(u));
-	BOOST_CHECK_EQUAL(u, 0);
-
-	BOOST_CHECK("4294967295"_s.to_number(u));
-	BOOST_CHECK_EQUAL(u, 4294967295);
-
-	BOOST_CHECK("+4294967295"_s.to_number(u));
-	BOOST_CHECK_EQUAL(u, 4294967295);
-
-	BOOST_CHECK(!"4294967296"_s.to_number(u));
-	BOOST_CHECK(!"+4294967296"_s.to_number(u));
-}
-
-BOOST_AUTO_TEST_CASE(test_static_string_to_double_number)
+BOOST_AUTO_TEST_CASE(test_static_string_to_number_double)
 {
 	double d = -1.;
 
@@ -199,4 +178,77 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_double_number)
 
 	BOOST_CHECK("-01234.56789e+7"_s.to_number(d));
 	BOOST_CHECK_CLOSE(d, -01234.56789e+7, 1e-13);
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_to_number_int32)
+{
+	int32_t i = 0;
+
+	BOOST_CHECK(!""_s.to_number(i));
+
+	BOOST_CHECK(!"-2147483649"_s.to_number(i));
+
+	BOOST_CHECK("-2147483648"_s.to_number(i));
+	BOOST_CHECK_EQUAL(i, -2147483647 - 1);
+
+	BOOST_CHECK("2147483647"_s.to_number(i));
+	BOOST_CHECK_EQUAL(i, 2147483647);
+
+	BOOST_CHECK("+2147483647"_s.to_number(i));
+	BOOST_CHECK_EQUAL(i, 2147483647);
+
+	BOOST_CHECK(!"2147483648"_s.to_number(i));
+	BOOST_CHECK(!"+2147483648"_s.to_number(i));
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_to_number_uint32)
+{
+	uint32_t u = 1;
+
+	BOOST_CHECK(!""_s.to_number(u));
+
+	BOOST_CHECK(!"-0"_s.to_number(u));
+
+	BOOST_CHECK("0"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 0);
+
+	BOOST_CHECK("+0"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 0);
+
+	BOOST_CHECK("4294967295"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 4294967295);
+
+	BOOST_CHECK("+4294967295"_s.to_number(u));
+	BOOST_CHECK_EQUAL(u, 4294967295);
+
+	BOOST_CHECK(!"4294967296"_s.to_number(u));
+	BOOST_CHECK(!"+4294967296"_s.to_number(u));
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_to_time)
+{
+	BOOST_CHECK_EQUAL(""_s.to_time(), 0);
+	BOOST_CHECK_EQUAL("1"_s.to_time(), 1);
+	BOOST_CHECK_EQUAL("1:2"_s.to_time(), 62);
+	BOOST_CHECK_EQUAL("1:1:2"_s.to_time(), 3662);
+	BOOST_CHECK_EQUAL("1:1:2.5"_s.to_time(), 3662.5);
+	BOOST_CHECK_EQUAL("-10:1:2.25"_s.to_time(), -36062.25);
+	BOOST_CHECK_EQUAL("+101:1:2.125"_s.to_time(), 363662.125);
+}
+
+BOOST_AUTO_TEST_CASE(test_static_string_trimmed)
+{
+	BOOST_CHECK_EQUAL(""_s.trimmed(), ""_s);
+
+	BOOST_CHECK_EQUAL("\x01"_s.trimmed(), ""_s);
+	BOOST_CHECK_EQUAL("\x20"_s.trimmed(), ""_s);
+	BOOST_CHECK_EQUAL("\x21"_s.trimmed(), "\x21"_s);
+	BOOST_CHECK_EQUAL("\x7F"_s.trimmed(), "\x7F"_s);
+	BOOST_CHECK_EQUAL("\x80"_s.trimmed(), "\x80"_s);
+	BOOST_CHECK_EQUAL("\xFF"_s.trimmed(), "\xFF"_s);
+
+	BOOST_CHECK_EQUAL("\x20\x20"_s.trimmed(), ""_s);
+	BOOST_CHECK_EQUAL("\x20\x21\x20"_s.trimmed(), "\x21"_s);
+	BOOST_CHECK_EQUAL("\x20\x20\x21\x20\x20"_s.trimmed(), "\x21"_s);
+	BOOST_CHECK_EQUAL("\x20\x20\x21\x21\x20\x20"_s.trimmed(), "\x21\x21"_s);
 }
