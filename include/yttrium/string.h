@@ -29,9 +29,6 @@ namespace Yttrium
 		///
 		explicit String(const StaticString& string, Allocator* allocator = DefaultAllocator);
 
-		/// Preallocating constructor.
-		explicit String(size_t size, Allocator* allocator = DefaultAllocator);
-
 		///
 		String(const StaticString& string, const ByReference&, Allocator* allocator = DefaultAllocator)
 			: StaticString(string), _allocator(allocator) {}
@@ -43,15 +40,6 @@ namespace Yttrium
 
 		///
 		Allocator* allocator() const { return _allocator; }
-
-		/// Clear the string.
-		String& clear() noexcept;
-
-		/// Reserve the space in the string for \a size symbols.
-		void reserve(size_t size);
-
-		/// Resize the string, filling the new part with random data.
-		void resize(size_t size);
 
 		///
 		char* text() { return const_cast<char*>(_text); }

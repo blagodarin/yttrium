@@ -13,7 +13,6 @@ namespace Yttrium
 {
 	class Buffer;
 	class StaticString;
-	class String;
 	class TemporaryFile;
 
 	///
@@ -69,9 +68,6 @@ namespace Yttrium
 		/// Reads data from the source at the specified offset.
 		template <typename T>
 		bool read_at(uint64_t offset, T& data) const { return read_at(offset, &data, sizeof data) == sizeof data; }
-
-		///
-		bool read_line(String&);
 
 		///
 		bool read_line(std::string&);

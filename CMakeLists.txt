@@ -60,10 +60,8 @@ set_target_properties(
 	PROPERTIES FOLDER "tools")
 
 add_subdirectory(benchmarks/buffer)
-add_subdirectory(benchmarks/readline)
 set_target_properties(
 	benchmark_buffer
-	benchmark_readline
 	PROPERTIES FOLDER "benchmarks")
 
 add_subdirectory(examples/3d)

@@ -6,7 +6,6 @@
 
 #include <yttrium/memory/global.h>
 
-#include <cstddef>
 #include <cstdint>
 #include <iosfwd>
 #include <string>
@@ -20,10 +19,6 @@ namespace Yttrium
 	{
 		friend String;
 	public:
-
-		/// An invalid offset.
-		static constexpr size_t End = SIZE_MAX;
-
 		/// Constructs an empty string.
 		StaticString() = default;
 
@@ -44,12 +39,6 @@ namespace Yttrium
 		/// Escape (prepend) all the specified \a symbols with an escape symbol \a with and return the new string.
 		std::string escaped(const char* symbols, char with) const;
 
-		/// Returns the offset of the first \a symbol since \a offset, or End if there is no such symbol.
-		size_t find_first(char symbol, size_t offset = 0) const;
-
-		/// Returns the offset of the last \a symbol before \a offset, or End if there is no such symbol.
-		size_t find_last(char symbol, size_t offset = End) const;
-
 		/// Returns `true` if the string is empty.
 		constexpr bool is_empty() const { return _size == 0; }
 
@@ -58,12 +47,6 @@ namespace Yttrium
 
 		///
 		constexpr StaticString left(size_t size) const { return { _text, size < _size ? size : _size }; }
-
-		///
-		constexpr StaticString mid(size_t offset, size_t size = End) const
-		{
-			return offset < _size ? StaticString(&_text[offset], _size - offset).left(size) : StaticString();
-		}
 
 		///
 		constexpr StaticString right(size_t size) const

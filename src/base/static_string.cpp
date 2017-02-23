@@ -275,35 +275,6 @@ namespace Yttrium
 		return result;
 	}
 
-	size_t StaticString::find_first(char symbol, size_t offset) const
-	{
-		if (offset < _size)
-		{
-			const auto end = _text + _size;
-			for (auto c = _text + offset; c != end; ++c)
-			{
-				if (*c == symbol)
-					return c - _text;
-			}
-		}
-		return End;
-	}
-
-	size_t StaticString::find_last(char symbol, size_t offset) const
-	{
-		if (offset > _size)
-			offset = _size;
-
-		const auto end = _text - 1;
-		for (auto c = _text + offset - 1; c != end; --c)
-		{
-			if (*c == symbol)
-				return c - _text;
-		}
-
-		return End;
-	}
-
 	double StaticString::to_double() const
 	{
 		return ::string_to_float<double>(_text, _text + _size);

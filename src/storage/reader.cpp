@@ -2,7 +2,6 @@
 
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/temporary_file.h>
-#include <yttrium/string.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
 
@@ -145,63 +144,6 @@ namespace Yttrium
 		return _private->read_at(offset, data, min<uint64_t>(size, _private->_size - offset));
 	}
 
-	bool Reader::read_line(String& string)
-	{
-		if (!_private)
-			return false;
-
-		static const size_t buffer_step = 32;
-
-		const auto origin = _private->_offset;
-
-		string.clear();
-
-		// TODO: Copy string data if reading from memory.
-		for (size_t offset = 0, bytes_read = 0; ; offset += bytes_read)
-		{
-			string.resize(offset + buffer_step);
-
-			bytes_read = read(string.text() + offset, buffer_step);
-
-			string.resize(offset + bytes_read);
-
-			if (!bytes_read)
-			{
-				seek(origin + string.size());
-				return offset > 0;
-			}
-
-			const auto r_offset = string.find_first('\r', offset);
-
-			if (r_offset != String::End)
-			{
-				size_t string_size = string.size();
-
-				if (r_offset == string_size - 1)
-				{
-					string.resize(string_size + 1);
-					bytes_read += read(string.text() + string_size, 1);
-				}
-
-				string.resize(r_offset);
-				seek(origin + r_offset + 1 + (string[r_offset + 1] == '\n'));
-				break;
-			}
-			else
-			{
-				const auto n_offset = string.find_first('\n', offset);
-				if (n_offset != String::End)
-				{
-					string.resize(n_offset);
-					seek(origin + n_offset + 1);
-					break;
-				}
-			}
-		}
-
-		return true;
-	}
-
 	bool Reader::read_line(std::string& string)
 	{
 		if (!_private)
@@ -211,6 +153,7 @@ namespace Yttrium
 		string.clear();
 		for (;;)
 		{
+			// TODO: Copy string data if reading from memory.
 			const auto bytes_read = read_at(_private->_offset + string.size(), buffer.data(), buffer_size);
 			const auto data_end = buffer.begin() + bytes_read;
 			const auto text_end = std::find_if(buffer.begin(), data_end, [](char c){ return c == '\r' || c == '\n'; });

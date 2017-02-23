@@ -5,7 +5,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <limits>
 
 namespace Yttrium
 {
@@ -74,64 +73,10 @@ namespace Yttrium
 		Private::initialize_copy(*this, string);
 	}
 
-	String::String(size_t size, Allocator* allocator)
-		: StaticString(nullptr, 0)
-		, _capacity(next_power_of_2(max(size + 1, Private::MinCapacity)))
-		, _allocator(allocator)
-	{
-		Private::initialize_copy(*this, {});
-	}
-
 	String::~String()
 	{
 		if (_capacity > 0)
 			_allocator->deallocate(const_cast<char*>(_text));
-	}
-
-	String& String::clear() noexcept
-	{
-		if (_capacity > 0)
-			const_cast<char*>(_text)[0] = '\0';
-		else
-			_text = &Null;
-		_size = 0;
-		return *this;
-	}
-
-	void String::reserve(size_t size)
-	{
-		assert(size < std::numeric_limits<size_t>::max());
-		const auto capacity = size + 1;
-		if (_capacity > 0)
-		{
-			Private::grow(*this, capacity);
-		}
-		else
-		{
-			const auto old_text = _text;
-			Private::initialize(*this, max(_size + 1, capacity));
-			::memcpy(const_cast<char*>(_text), old_text, _size + 1);
-			const_cast<char*>(_text)[_size] = '\0';
-		}
-	}
-
-	void String::resize(size_t size)
-	{
-		assert(size < std::numeric_limits<size_t>::max());
-		const auto capacity = size + 1;
-		if (_capacity > 0)
-		{
-			Private::grow(*this, capacity);
-		}
-		else
-		{
-			const auto old_text = _text;
-			Private::initialize(*this, max(_size + 1, capacity));
-			::memcpy(const_cast<char*>(_text), old_text, _size + 1);
-		}
-
-		const_cast<char*>(_text)[size] = '\0';
-		_size = size;
 	}
 
 	String& String::operator=(const StaticString& string)
