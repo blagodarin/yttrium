@@ -8,7 +8,7 @@ int main(int, char**);
 int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	int argc = 0;
-	const auto argv_w = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
+	const auto argv_w = ::CommandLineToArgvW(::GetCommandLineW(), &argc); // TODO: Use Y_UNIQUE_PTR.
 	std::vector<char*> argv;
 	for (int i = 0; i < argc; ++i)
 	{

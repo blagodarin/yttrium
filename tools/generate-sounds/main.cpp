@@ -3,6 +3,7 @@
 #include "../../src/audio/formats/wav_private.h"
 
 #include <cmath>
+#include <limits>
 
 using namespace Yttrium;
 
@@ -50,7 +51,7 @@ int main()
 
 		for (size_t i = 0; i < duration; ++i)
 		{
-			double base = INT16_MAX * ::sin(2 * M_PI * time_step * i);
+			double base = std::numeric_limits<int16_t>::max() * std::sin(2 * M_PI * time_step * i);
 			double amplitude = double(duration - i) / duration;
 			data[i] = base * amplitude;
 		}

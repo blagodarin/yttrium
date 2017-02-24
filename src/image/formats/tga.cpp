@@ -38,10 +38,10 @@ namespace
 			&& format.orientation() != ImageOrientation::XLeftYUp)
 			return false;
 
-		if (format.width() <= 0 || format.width() > UINT16_MAX)
+		if (format.width() <= 0 || format.width() > std::numeric_limits<uint16_t>::max())
 			return false;
 
-		if (format.height() <= 0 || format.height() > UINT16_MAX)
+		if (format.height() <= 0 || format.height() > std::numeric_limits<uint16_t>::max())
 			return false;
 
 		return true;

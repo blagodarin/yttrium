@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 		Buffer buffer(size);
 		for (auto& byte : buffer)
-			byte = rand() % UINT8_MAX;
+			byte = rand() % std::numeric_limits<uint8_t>::max();
 		return buffer;
 	}
 }

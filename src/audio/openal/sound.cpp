@@ -4,6 +4,7 @@
 #include <yttrium/audio/reader.h>
 #include <yttrium/memory/buffer.h>
 
+#include <limits>
 #include <new>
 
 namespace Yttrium
@@ -14,7 +15,7 @@ namespace Yttrium
 		if (reader.format().channels() != 1)
 			throw DataError("Sound audio must have one channel");
 		const auto reader_size = reader.total_bytes();
-		if (reader_size > SIZE_MAX)
+		if (reader_size > std::numeric_limits<size_t>::max())
 			throw std::bad_alloc();
 		Buffer buffer(reader_size);
 		if (reader.read(buffer.data(), buffer.size()) != buffer.size())

@@ -42,10 +42,10 @@ namespace
 		if (format.orientation() != ImageOrientation::XRightYDown && format.orientation() != ImageOrientation::XRightYUp)
 			return false;
 
-		if (format.width() <= 0 || format.width() > UINT32_MAX)
+		if (format.width() <= 0 || format.width() > std::numeric_limits<uint32_t>::max())
 			return false;
 
-		if (format.height() <= 0 || format.height() > UINT32_MAX)
+		if (format.height() <= 0 || format.height() > std::numeric_limits<uint32_t>::max())
 			return false;
 
 		return true;
