@@ -1,2 +1,3 @@
 examples/tetrium/data/i18n/*.ion eol=lf
+*.h linguist-language=C++
 tests/ion/*.ion eol=lf
