@@ -4,6 +4,7 @@
 #ifndef _include_yttrium_renderer_renderer_h_
 #define _include_yttrium_renderer_renderer_h_
 
+#include <yttrium/flags.h>
 #include <yttrium/math/vector.h>
 
 #include <memory>
@@ -30,6 +31,14 @@ namespace Yttrium
 	class Renderer
 	{
 	public:
+		///
+		enum class TextureFlag
+		{
+			NoMipmaps = 1 << 0,
+			Intensity = 1 << 1,
+		};
+
+		///
 		virtual ~Renderer() = default;
 
 		///
@@ -39,7 +48,7 @@ namespace Yttrium
 		virtual std::unique_ptr<IndexBuffer> create_index_buffer(IndexFormat, std::size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual std::unique_ptr<Texture2D> create_texture_2d(const Image&, bool no_mipmaps = false) = 0;
+		virtual std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag> = {}) = 0;
 
 		///
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;

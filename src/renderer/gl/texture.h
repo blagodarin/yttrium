@@ -11,7 +11,7 @@ namespace Yttrium
 	public:
 		GlTexture2D(RendererImpl&, const ImageFormat&, bool has_mipmaps, GlTextureHandle&&);
 
-		void bind(Texture2D::Filter) const;
+		void bind(Flags<Texture2D::Filter>) const;
 
 	private:
 		const GlTextureHandle _texture;

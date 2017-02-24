@@ -81,8 +81,15 @@ namespace Yttrium
 		return std::make_unique<GlIndexBuffer>(format, count, element_size, std::move(buffer), gl_format);
 	}
 
-	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const Image& image, bool no_mipmaps)
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
 	{
+		if (flags & TextureFlag::Intensity)
+		{
+			auto converted = intensity_to_bgra(image);
+			if (converted)
+				image = std::move(*converted);
+		}
+
 		const auto image_format = image.format();
 		if (image_format.bits_per_channel() != 8)
 			return {};
@@ -131,9 +138,10 @@ namespace Yttrium
 		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
 		_gl.PixelStorei(GL_PACK_ALIGNMENT, image_format.row_alignment());
 		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, data);
-		if (!no_mipmaps)
+		const auto has_mipmaps = !(flags & TextureFlag::NoMipmaps);
+		if (has_mipmaps)
 			texture.generate_mipmaps();
-		return std::make_unique<GlTexture2D>(*this, image_format, !no_mipmaps, std::move(texture));
+		return std::make_unique<GlTexture2D>(*this, image_format, has_mipmaps, std::move(texture));
 	}
 
 	std::unique_ptr<VertexBuffer> GlRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
@@ -338,7 +346,7 @@ namespace Yttrium
 		_gl.UseProgram(program ? static_cast<const GlGpuProgram*>(program)->handle() : 0);
 	}
 
-	void GlRenderer::set_texture(const Texture2D& texture, Texture2D::Filter filter)
+	void GlRenderer::set_texture(const Texture2D& texture, Flags<Texture2D::Filter> filter)
 	{
 		static_cast<const GlTexture2D&>(texture).bind(filter);
 	}

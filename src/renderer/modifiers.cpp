@@ -45,7 +45,7 @@ namespace Yttrium
 		: RendererModifier(renderer)
 		, _material(material)
 		, _gpu_program(renderer, &static_cast<const MaterialImpl*>(_material)->gpu_program())
-		, _texture(renderer, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<Texture2D::Filter>(Texture2D::NearestFilter | Texture2D::AnisotropicFilter))
+		, _texture(renderer, static_cast<const MaterialImpl*>(_material)->texture(), Texture2D::NearestFilter | Texture2D::AnisotropicFilter)
 	{
 	}
 
@@ -54,7 +54,7 @@ namespace Yttrium
 		const_cast<MaterialImpl*>(static_cast<const MaterialImpl*>(_material))->gpu_program().set_uniform(name, value); // TODO: Remove 'const_cast'.
 	}
 
-	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture, Texture2D::Filter filter)
+	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture, Flags<Texture2D::Filter> filter)
 		: RendererModifier(renderer)
 		, _filter(static_cast<RendererImpl&>(_renderer).push_texture(texture, filter))
 	{

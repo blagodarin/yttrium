@@ -65,13 +65,13 @@ namespace Yttrium
 	{
 	public:
 		///
-		PushTexture(Renderer&, const Texture2D*, Texture2D::Filter = Texture2D::NearestFilter);
+		PushTexture(Renderer&, const Texture2D*, Flags<Texture2D::Filter> = Texture2D::NearestFilter);
 
 		///
 		~PushTexture();
 
 	private:
-		const Texture2D::Filter _filter;
+		const Flags<Texture2D::Filter> _filter;
 	};
 
 	///

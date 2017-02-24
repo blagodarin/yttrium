@@ -10,7 +10,7 @@ namespace Yttrium
 	{
 	}
 
-	void GlTexture2D::bind(Texture2D::Filter filter) const
+	void GlTexture2D::bind(Flags<Texture2D::Filter> filter) const
 	{
 		GLint min_filter = GL_NEAREST;
 		GLint mag_filter = GL_NEAREST;

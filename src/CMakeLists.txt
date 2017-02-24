@@ -21,6 +21,7 @@ add_library(yttrium
 	../include/yttrium/api.h
 	../include/yttrium/console.h
 	../include/yttrium/exceptions.h
+	../include/yttrium/flags.h
 	../include/yttrium/resource_loader.h
 	../include/yttrium/static_string.h
 	../include/yttrium/string.h
@@ -32,6 +33,7 @@ add_library(yttrium
 	base/tiny_string_map.cpp
 	config.h
 	console.cpp
+	flags.cpp
 	globals.cpp
 	resource_loader.cpp
 	translation.cpp

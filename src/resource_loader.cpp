@@ -222,14 +222,7 @@ namespace Yttrium
 			auto image = Image::load(std::move(reader));
 			if (!image)
 				return {};
-			if (intensity)
-			{
-				// TODO: Move this inside the renderer.
-				auto converted = intensity_to_bgra(*image);
-				if (converted)
-					*image = std::move(*converted);
-			}
-			return _private->_renderer->create_texture_2d(*image);
+			return _private->_renderer->create_texture_2d(std::move(*image), intensity ? Renderer::TextureFlag::Intensity : Flags<Renderer::TextureFlag>{});
 		});
 	}
 

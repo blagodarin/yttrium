@@ -57,11 +57,11 @@ namespace Yttrium
 		// TODO: Don't copy static texture data.
 
 		static const int32_t white_texture_data = -1;
-		renderer->_white_texture = renderer->create_texture_2d({ { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, false);
+		renderer->_white_texture = renderer->create_texture_2d({ { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, TextureFlag::NoMipmaps);
 		if (!renderer->_white_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
-		renderer->_debug_texture = renderer->create_texture_2d({ { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 }, DebugTexture::data }, false);
+		renderer->_debug_texture = renderer->create_texture_2d({ { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 }, DebugTexture::data }, TextureFlag::NoMipmaps);
 		if (!renderer->_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
@@ -208,7 +208,7 @@ namespace Yttrium
 #endif
 	}
 
-	void RendererImpl::pop_texture(Texture2D::Filter filter)
+	void RendererImpl::pop_texture(Flags<Texture2D::Filter> filter)
 	{
 		assert(_texture_stack.size() > 1 || (_texture_stack.size() == 1 && _texture_stack.back().second > 1));
 		if (_texture_stack.back().second == 1)
@@ -269,7 +269,7 @@ namespace Yttrium
 		_matrix_stack.emplace_back(Matrix4(), MatrixType::Model);
 	}
 
-	Texture2D::Filter RendererImpl::push_texture(const Texture2D* texture, Texture2D::Filter filter)
+	Flags<Texture2D::Filter> RendererImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
 	{
 		if (!texture)
 		{
@@ -286,9 +286,7 @@ namespace Yttrium
 		}
 		else
 			++_texture_stack.back().second;
-		const auto previous_filter = _current_texture_filter;
-		_current_texture_filter = filter;
-		return previous_filter;
+		return std::exchange(_current_texture_filter, filter);
 	}
 
 	void RendererImpl::push_transformation(const Matrix4& matrix)
