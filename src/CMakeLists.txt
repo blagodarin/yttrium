@@ -19,16 +19,22 @@ configure_file(config.h.in config.h)
 
 add_library(yttrium
 	../include/yttrium/api.h
+	../include/yttrium/console.h
 	../include/yttrium/exceptions.h
+	../include/yttrium/resource_loader.h
 	../include/yttrium/static_string.h
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
+	../include/yttrium/translation.h
 	base/static_string.cpp
 	base/string_utils.cpp
 	base/string.cpp
 	base/tiny_string_map.cpp
 	config.h
+	console.cpp
 	globals.cpp
+	resource_loader.cpp
+	translation.cpp
 	)
 target_link_libraries(yttrium Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
@@ -283,15 +289,6 @@ if(ON)
 endif()
 
 ########################################################################################################################
-# resources
-target_sources(yttrium PRIVATE
-	../include/yttrium/resources/resource_loader.h
-	../include/yttrium/resources/translation.h
-	resources/resource_loader.cpp
-	resources/translation.cpp
-	)
-
-########################################################################################################################
 # script
 target_sources(yttrium PRIVATE
 	../include/yttrium/script/args.h
@@ -349,12 +346,10 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # window
 target_sources(yttrium PRIVATE
-	../include/yttrium/console.h
 	../include/yttrium/key.h
 	../include/yttrium/window.h
 	system/window.h
 	window/backend.h
-	window/console.cpp
 	window/key.cpp
 	window/window.cpp
 	)

@@ -3,9 +3,9 @@
 #include <yttrium/key.h>
 #include <yttrium/script/code.h>
 #include <yttrium/script/context.h>
-#include "../gui/logic/line_editor.h"
-#include "../renderer/debug_renderer.h"
-#include "../renderer/renderer.h"
+#include "gui/logic/line_editor.h"
+#include "renderer/debug_renderer.h"
+#include "renderer/renderer.h"
 
 namespace Yttrium
 {

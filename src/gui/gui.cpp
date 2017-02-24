@@ -3,11 +3,11 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resources/resource_loader.h>
-#include <yttrium/resources/translation.h>
+#include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
+#include <yttrium/translation.h>
 #include "gui.h"
 #include "ion/loader.h"
 #include "screen.h"

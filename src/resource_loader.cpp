@@ -1,4 +1,4 @@
-#include <yttrium/resources/resource_loader.h>
+#include <yttrium/resource_loader.h>
 
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/music.h>
@@ -14,11 +14,11 @@
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/resources/translation.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/string.h>
-#include "../renderer/material.h"
+#include <yttrium/translation.h>
+#include "renderer/material.h"
 
 #include <mutex>
 

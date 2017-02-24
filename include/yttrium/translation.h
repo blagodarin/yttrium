@@ -1,8 +1,8 @@
 /// \file
 /// \brief
 
-#ifndef _include_yttrium_resources_translation_h_
-#define _include_yttrium_resources_translation_h_
+#ifndef _include_yttrium_translation_h_
+#define _include_yttrium_translation_h_
 
 #include <yttrium/memory/global.h>
 

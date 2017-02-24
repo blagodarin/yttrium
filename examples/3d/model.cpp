@@ -10,7 +10,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/vertex_buffer.h>
-#include <yttrium/resources/resource_loader.h>
+#include <yttrium/resource_loader.h>
 #include <yttrium/storage/reader.h>
 
 Model::Model(Renderer& renderer, ResourceLoader& resource_loader, const StaticString& mesh, const StaticString& material)

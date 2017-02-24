@@ -3,7 +3,7 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
-#include <yttrium/resources/resource_loader.h>
+#include <yttrium/resource_loader.h>
 #include "gui.h"
 #include "layout.h"
 #include "widgets/widget.h"

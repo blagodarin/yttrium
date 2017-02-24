@@ -1,4 +1,4 @@
-#include <yttrium/resources/translation.h>
+#include <yttrium/translation.h>
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/document.h>
