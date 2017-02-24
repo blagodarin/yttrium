@@ -3,10 +3,16 @@
 #include <yttrium/audio/format.h>
 #include <yttrium/exceptions.h>
 
+#include <algorithm>
+#include <vector>
+
+// OpenAL doesn't expose its limitations, if any, so a list of common sampling rates should do.
+const std::vector<unsigned> _common_sampling_rates{ 8'000, 11'025, 16'000, 22'050, 32'000, 44'100, 48'000, 88'200, 96'000 };
+
 namespace Yttrium
 {
 	OpenALFormat::OpenALFormat(const AudioFormat& format)
-		: _frequency(format.samples_per_second()) // TODO: Check the frequency too.
+		: _frequency(format.samples_per_second())
 	{
 		switch (format.bytes_per_sample())
 		{
@@ -15,7 +21,7 @@ namespace Yttrium
 			{
 			case 1: _format = AL_FORMAT_MONO8; break;
 			case 2: _format = AL_FORMAT_STEREO8; break;
-			default: throw DataError("OpenAL backend doesn't support ", format.channels(), "-channel audio");
+			default: throw NotSupportedError("OpenAL backend doesn't support ", format.channels(), "-channel audio");
 			}
 			break;
 		case 2:
@@ -23,13 +29,13 @@ namespace Yttrium
 			{
 			case 1: _format = AL_FORMAT_MONO16; break;
 			case 2: _format = AL_FORMAT_STEREO16; break;
-			default: throw DataError("OpenAL backend doesn't support ", format.channels(), "-channel audio");
+			default: throw NotSupportedError("OpenAL backend doesn't support ", format.channels(), "-channel audio");
 			}
 			break;
 		default:
-			throw DataError("OpenAL backend doesn't support ", format.bytes_per_sample(), " bytes per sample");
+			throw NotSupportedError("OpenAL backend doesn't support ", format.bytes_per_sample(), " bytes per sample");
 		}
+		if (std::find(_common_sampling_rates.begin(), _common_sampling_rates.end(), _frequency) == _common_sampling_rates.end())
+			throw NotSupportedError("Unexpected sampling rate: ", _frequency, " Hz");
 	}
-
-	// TODO: Change exception type.
 }

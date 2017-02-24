@@ -47,6 +47,14 @@ namespace Yttrium
 		RuntimeError(Args&&... args) : Exception(std::forward<Args>(args)...) {}
 	};
 
+	/// Thrown if the requested operation is not supported by the implementation.
+	class NotSupportedError : public RuntimeError
+	{
+	public:
+		template <typename... Args>
+		NotSupportedError(Args&&... args) : RuntimeError(std::forward<Args>(args)...) {}
+	};
+
 	/// Thrown if a resource can't be loaded from the supplied data.
 	class DataError : public RuntimeError
 	{
