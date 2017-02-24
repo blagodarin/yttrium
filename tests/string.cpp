@@ -1,4 +1,5 @@
 #include <yttrium/string.h>
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
 

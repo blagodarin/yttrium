@@ -1,4 +1,4 @@
-#include <yttrium/math/iostream.h>
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -10,13 +10,6 @@ BOOST_AUTO_TEST_CASE(test_point)
 	BOOST_CHECK_EQUAL(Point(1, 2).y(), 2);
 
 	BOOST_CHECK_EQUAL(Point(), Point(0, 0));
-}
-
-BOOST_AUTO_TEST_CASE(test_point_ostream)
-{
-	std::ostringstream stream;
-	stream << Point{ 1, 2 };
-	BOOST_CHECK_EQUAL(stream.str(), "Point(1, 2)");
 }
 
 BOOST_AUTO_TEST_CASE(test_pointf)

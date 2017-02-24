@@ -4,7 +4,6 @@
 
 #include <cmath>
 #include <cstring>
-#include <iostream>
 #include <limits>
 
 namespace
@@ -430,11 +429,5 @@ namespace Yttrium
 	bool operator==(const StaticString& a, const StaticString& b)
 	{
 		return a.size() == b.size() && !::memcmp(a.text(), b.text(), a.size());
-	}
-
-	std::ostream& operator<<(std::ostream& stream, const StaticString& string)
-	{
-		stream.write(string.text(), string.size());
-		return stream;
 	}
 }

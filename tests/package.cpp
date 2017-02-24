@@ -1,23 +1,10 @@
-#include <yttrium/memory/buffer.h>
-#include <yttrium/static_string.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
-
-#include <array>
-#include <cstdlib>
-#include <cstring>
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
-
-namespace Yttrium
-{
-	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
-	{
-		return stream << "Buffer(" << buffer.size() << ")";
-	}
-}
 
 using namespace Yttrium;
 

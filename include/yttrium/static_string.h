@@ -4,10 +4,9 @@
 #ifndef _include_yttrium_static_string_h_
 #define _include_yttrium_static_string_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <cstdint>
-#include <iosfwd>
 #include <string>
 
 namespace Yttrium
@@ -118,8 +117,6 @@ namespace Yttrium
 
 	///
 	constexpr StaticString operator"" _s(const char* text, size_t size) { return {text, size}; }
-
-	Y_API std::ostream& operator<<(std::ostream&, const StaticString&);
 
 	namespace detail
 	{

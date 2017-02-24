@@ -6,6 +6,8 @@ add_executable(unit_tests
 	image_formats.cpp
 	image_formats.h
 	ion.cpp
+	iostream.cpp
+	iostream.h
 	key_lookup.cpp
 	main.cpp
 	margins.cpp

@@ -1,7 +1,5 @@
-#include <yttrium/static_string.h>
 #include <yttrium/tiny_string_map.h>
-
-#include <limits>
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
 

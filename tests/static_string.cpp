@@ -1,4 +1,4 @@
-#include <yttrium/static_string.h>
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -104,6 +104,7 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_float)
 BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 {
 	// Invalid.
+	BOOST_CHECK_EQUAL(""_s.to_int(), 0);
 	BOOST_CHECK_EQUAL(""_s.to_int32(), 0);
 	BOOST_CHECK_EQUAL(""_s.to_uint32(), 0);
 	BOOST_CHECK_EQUAL("-1"_s.to_uint32(), 0);
@@ -112,12 +113,14 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_int)
 	BOOST_CHECK_EQUAL("-1"_s.to_uint64(), 0);
 
 	// Minimum.
+	BOOST_CHECK_EQUAL(StaticString{ std::to_string(std::numeric_limits<int>::min()) }.to_int(), std::numeric_limits<int>::min());
 	BOOST_CHECK_EQUAL("-2147483648"_s.to_int32(), -2147483647 - 1);
 	BOOST_CHECK_EQUAL("0"_s.to_uint32(), 0);
 	BOOST_CHECK_EQUAL("-9223372036854775808"_s.to_int64(), -INT64_C(9223372036854775807) - 1);
 	BOOST_CHECK_EQUAL("0"_s.to_uint64(), 0);
 
 	// Maximum.
+	BOOST_CHECK_EQUAL(StaticString{ std::to_string(std::numeric_limits<int>::max()) }.to_int(), std::numeric_limits<int>::max());
 	BOOST_CHECK_EQUAL("2147483647"_s.to_int32(), 2147483647);
 	BOOST_CHECK_EQUAL("+2147483647"_s.to_int32(), 2147483647);
 	BOOST_CHECK_EQUAL("4294967295"_s.to_uint32(), UINT32_C(4294967295));
@@ -274,23 +277,4 @@ BOOST_AUTO_TEST_CASE(test_static_string_trimmed)
 	BOOST_CHECK_EQUAL("\x20\x21\x20"_s.trimmed(), "\x21"_s);
 	BOOST_CHECK_EQUAL("\x20\x20\x21\x20\x20"_s.trimmed(), "\x21"_s);
 	BOOST_CHECK_EQUAL("\x20\x20\x21\x21\x20\x20"_s.trimmed(), "\x21\x21"_s);
-}
-
-BOOST_AUTO_TEST_CASE(test_static_string_ostream)
-{
-	{
-		std::ostringstream stream;
-		stream << ""_s;
-		BOOST_CHECK_EQUAL(stream.str(), "");
-	}
-	{
-		std::ostringstream stream;
-		stream << "a"_s;
-		BOOST_CHECK_EQUAL(stream.str(), "a");
-	}
-	{
-		std::ostringstream stream;
-		stream << "abcdefghijklmnopqrstuvwxyz"_s;
-		BOOST_CHECK_EQUAL(stream.str(), "abcdefghijklmnopqrstuvwxyz");
-	}
 }

@@ -1,20 +1,12 @@
 #include "image_formats.h"
 
-#include <yttrium/memory/buffer.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/temporary_file.h>
 #include "../src/config.h"
 #include "image.h"
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
-
-namespace Yttrium
-{
-	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
-	{
-		return stream << "Buffer(" << buffer.size() << ")";
-	}
-}
 
 using namespace Yttrium;
 

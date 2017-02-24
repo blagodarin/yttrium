@@ -1,4 +1,4 @@
-#include <yttrium/math/iostream.h>
+#include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -234,11 +234,4 @@ BOOST_AUTO_TEST_CASE(test_rect_intersects_null)
 	BOOST_CHECK(!rect.intersects(null_rect));
 	BOOST_CHECK(!rect.intersects_fast(null_rect));
 	BOOST_CHECK(!rect.intersects_fastest(null_rect));
-}
-
-BOOST_AUTO_TEST_CASE(test_rect_ostream)
-{
-	std::ostringstream stream;
-	stream << Rect{ { 1, 2 }, Size{ 3, 4 } };
-	BOOST_CHECK_EQUAL(stream.str(), "Rect({1, 2}, Size(3, 4))");
 }

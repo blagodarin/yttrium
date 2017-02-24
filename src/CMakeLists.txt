@@ -189,7 +189,6 @@ target_sources(yttrium PRIVATE
 # math
 target_sources(yttrium PRIVATE
 	../include/yttrium/math/euler.h
-	../include/yttrium/math/iostream.h
 	../include/yttrium/math/margins.h
 	../include/yttrium/math/matrix.h
 	../include/yttrium/math/point.h

@@ -1,13 +1,11 @@
-#include <yttrium/memory/buffer.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/string.h>
+#include "iostream.h"
 
 #include <cstdlib>
 #include <cstring>
 
 #include <boost/test/unit_test.hpp>
-
-#include <iostream>
 
 namespace Yttrium
 {
@@ -17,11 +15,6 @@ namespace Yttrium
 		for (auto& byte : buffer)
 			byte = rand() % UINT8_MAX;
 		return buffer;
-	}
-
-	inline std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
-	{
-		return stream << "Buffer(" << buffer.size() << ")";
 	}
 }
 
