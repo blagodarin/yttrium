@@ -178,14 +178,20 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_number_double)
 
 	BOOST_CHECK("-01234.56789e+7"_s.to_number(d));
 	BOOST_CHECK_CLOSE(d, -01234.56789e+7, 1e-13);
+
+	BOOST_CHECK(!"1 "_s.to_number(d));
+	BOOST_CHECK(!" 1"_s.to_number(d));
+
+	BOOST_CHECK(!""_s.to_number(d));
+	BOOST_CHECK(!"1e"_s.to_number(d));
+	BOOST_CHECK(!"1eA"_s.to_number(d));
 }
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_number_int32)
 {
 	int32_t i = 0;
 
-	BOOST_CHECK(!""_s.to_number(i));
-
+	BOOST_CHECK(!"-9999999999"_s.to_number(i));
 	BOOST_CHECK(!"-2147483649"_s.to_number(i));
 
 	BOOST_CHECK("-2147483648"_s.to_number(i));
@@ -199,13 +205,21 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_number_int32)
 
 	BOOST_CHECK(!"2147483648"_s.to_number(i));
 	BOOST_CHECK(!"+2147483648"_s.to_number(i));
+	BOOST_CHECK(!"9999999999"_s.to_number(i));
+	BOOST_CHECK(!"+9999999999"_s.to_number(i));
+
+	BOOST_CHECK(!"1 "_s.to_number(i));
+	BOOST_CHECK(!" 1"_s.to_number(i));
+
+	BOOST_CHECK(!""_s.to_number(i));
+	BOOST_CHECK(!"+"_s.to_number(i));
+	BOOST_CHECK(!"-"_s.to_number(i));
+	BOOST_CHECK(!"A"_s.to_number(i));
 }
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_number_uint32)
 {
 	uint32_t u = 1;
-
-	BOOST_CHECK(!""_s.to_number(u));
 
 	BOOST_CHECK(!"-0"_s.to_number(u));
 
@@ -223,6 +237,15 @@ BOOST_AUTO_TEST_CASE(test_static_string_to_number_uint32)
 
 	BOOST_CHECK(!"4294967296"_s.to_number(u));
 	BOOST_CHECK(!"+4294967296"_s.to_number(u));
+	BOOST_CHECK(!"9999999999"_s.to_number(u));
+	BOOST_CHECK(!"+9999999999"_s.to_number(u));
+
+	BOOST_CHECK(!"1 "_s.to_number(u));
+	BOOST_CHECK(!" 1"_s.to_number(u));
+
+	BOOST_CHECK(!""_s.to_number(u));
+	BOOST_CHECK(!"+"_s.to_number(u));
+	BOOST_CHECK(!"A"_s.to_number(u));
 }
 
 BOOST_AUTO_TEST_CASE(test_static_string_to_time)

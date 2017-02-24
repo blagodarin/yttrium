@@ -71,7 +71,7 @@ namespace
 	}
 
 	template <typename T>
-	T string_to_uint(const char* p, const char* end)
+	T string_to_unsigned(const char* p, const char* end)
 	{
 		if (p == end)
 			return 0;
@@ -87,7 +87,7 @@ namespace
 	}
 
 	template <typename T>
-	bool string_to_uint(const char* p, const char* end, T& value)
+	bool string_to_unsigned(const char* p, const char* end, T& value)
 	{
 		if (p == end)
 			return false;
@@ -307,7 +307,7 @@ namespace Yttrium
 
 	bool StaticString::to_number(uint32_t& value) const
 	{
-		return ::string_to_uint(_text, _text + _size, value);
+		return ::string_to_unsigned(_text, _text + _size, value);
 	}
 
 	bool StaticString::to_number(float& value) const
@@ -369,19 +369,14 @@ namespace Yttrium
 		return negative ? -result : result;
 	}
 
-	unsigned StaticString::to_uint() const
-	{
-		return ::string_to_uint<unsigned>(_text, _text + _size);
-	}
-
 	uint32_t StaticString::to_uint32() const
 	{
-		return ::string_to_uint<uint32_t>(_text, _text + _size);
+		return ::string_to_unsigned<uint32_t>(_text, _text + _size);
 	}
 
 	uint64_t StaticString::to_uint64() const
 	{
-		return ::string_to_uint<uint64_t>(_text, _text + _size);
+		return ::string_to_unsigned<uint64_t>(_text, _text + _size);
 	}
 
 	StaticString StaticString::trimmed() const

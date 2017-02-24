@@ -84,7 +84,6 @@ namespace Yttrium
 
 		/// Converts the string to unsigned decimal integer.
 		/// The string must be in form `[+]d{d}`.
-		unsigned to_uint() const;
 		uint32_t to_uint32() const;
 		uint64_t to_uint64() const;
 
