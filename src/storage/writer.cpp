@@ -101,7 +101,7 @@ namespace Yttrium
 			return 0;
 		const auto result = write_at(_private->_offset, data, size);
 		_private->_offset += result;
-		_private->_size = max(_private->_size, _private->_offset);
+		_private->_size = std::max(_private->_size, _private->_offset);
 		return result;
 	}
 
@@ -139,7 +139,7 @@ namespace Yttrium
 			return 0;
 		const auto result = _private->write_at(offset, data, size);
 		if (result > 0)
-			_private->_size = max(_private->_size, offset + result);
+			_private->_size = std::max(_private->_size, offset + result);
 		return result;
 	}
 

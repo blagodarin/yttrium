@@ -86,7 +86,7 @@ namespace Yttrium
 	}
 
 	Reader::Reader(const Reader& reader, uint64_t base, uint64_t size)
-		: _private(base < reader.size() ? std::make_shared<ReaderReader>(reader._private, base, min(size, reader.size() - base)) : nullptr)
+		: _private(base < reader.size() ? std::make_shared<ReaderReader>(reader._private, base, std::min(size, reader.size() - base)) : nullptr)
 	{
 	}
 
@@ -109,7 +109,7 @@ namespace Yttrium
 	{
 		if (!size || !_private || _private->_offset == _private->_size)
 			return 0;
-		const auto result = _private->read_at(_private->_offset, data, min<uint64_t>(size, _private->_size - _private->_offset));
+		const auto result = _private->read_at(_private->_offset, data, std::min<uint64_t>(size, _private->_size - _private->_offset));
 		_private->_offset += result;
 		return result;
 	}
@@ -135,14 +135,14 @@ namespace Yttrium
 		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for null terminator.
 			throw std::bad_alloc();
 		string.resize(_private->_size);
-		return _private->read_at(0, const_cast<char*>(string.data()), string.size()) == string.size();
+		return _private->read_at(0, const_cast<char*>(string.data()), string.size()) == string.size(); // TODO: Remove const_cast in C++17.
 	}
 
 	size_t Reader::read_at(uint64_t offset, void* data, size_t size) const
 	{
 		if (!size || !_private || offset >= _private->_size)
 			return 0;
-		return _private->read_at(offset, data, min<uint64_t>(size, _private->_size - offset));
+		return _private->read_at(offset, data, std::min<uint64_t>(size, _private->_size - offset));
 	}
 
 	bool Reader::read_line(std::string& string)

@@ -52,7 +52,7 @@ namespace Yttrium
 		{
 			const auto new_capacity = BufferMemory::capacity_for_size(size);
 			const auto new_data = _data
-				? _buffer_memory.reallocate(_data, _capacity, new_capacity, min(size, _size))
+				? _buffer_memory.reallocate(_data, _capacity, new_capacity, std::min(size, _size))
 				: _buffer_memory.allocate(new_capacity);
 			_capacity = new_capacity;
 			_data = new_data;

@@ -67,7 +67,7 @@ namespace Yttrium
 	size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)
 	{
 		const size_t block_size = _format.block_size();
-		bytes_to_read = min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
+		bytes_to_read = std::min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read; )
 		{

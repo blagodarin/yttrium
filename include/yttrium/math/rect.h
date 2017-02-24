@@ -6,7 +6,8 @@
 
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include <yttrium/math/vector.h>
+
+#include <algorithm>
 
 namespace Yttrium
 {
@@ -92,8 +93,8 @@ namespace Yttrium
 		{
 			return
 			{
-				{ max(_left, rect._left), max(_top, rect._top) },
-				Point(min(_right, rect._right), min(_bottom, rect._bottom))
+				{ std::max(_left, rect._left), std::max(_top, rect._top) },
+				Point{ std::min(_right, rect._right), std::min(_bottom, rect._bottom) }
 			};
 		}
 

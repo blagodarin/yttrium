@@ -28,18 +28,6 @@ namespace Yttrium
 	inline bool operator==(const Size& a, const Size& b) { return a.width() == b.width() && a.height() == b.height(); }
 	inline bool operator!=(const Size& a, const Size& b) { return !(a == b); }
 
-	///
-	inline Size max(const Size& a, const Size& b)
-	{
-		return { max(a.width(), b.width()), max(a.height(), b.height()) };
-	}
-
-	///
-	inline Size min(const Size& a, const Size& b)
-	{
-		return { min(a.width(), b.width()), min(a.height(), b.height()) };
-	}
-
 	/// Floating-point 2D size.
 	class SizeF
 	{

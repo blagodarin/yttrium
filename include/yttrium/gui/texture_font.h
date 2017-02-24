@@ -4,6 +4,7 @@
 #ifndef _include_yttrium_gui_texture_font_h_
 #define _include_yttrium_gui_texture_font_h_
 
+#include <yttrium/api.h>
 #include <yttrium/math/rect.h>
 
 #include <memory>

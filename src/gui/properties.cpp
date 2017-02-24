@@ -16,11 +16,11 @@ namespace
 
 	SizeF make_text_size(const TextureFont& font, const std::string& text, float max_width, float max_height)
 	{
-		const SizeF unscaled_text_size(font.text_size(text));
+		const SizeF unscaled_text_size{ font.text_size(text) };
 		if (text.empty())
-			return {0, max_height};
-		const auto font_size = min(max_height, unscaled_text_size.height() * max_width / unscaled_text_size.width());
-		return {unscaled_text_size.width() * font_size / unscaled_text_size.height(), font_size};
+			return { 0, max_height };
+		const auto font_size = std::min(max_height, unscaled_text_size.height() * max_width / unscaled_text_size.width());
+		return { unscaled_text_size.width() * font_size / unscaled_text_size.height(), font_size };
 	}
 
 	PointF make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)

@@ -7,6 +7,7 @@
 #include <yttrium/ion/value.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/math/vector.h>
 #include <yttrium/resources/resource_loader.h>
 #include <yttrium/utils.h>
 #include "../actions.h"

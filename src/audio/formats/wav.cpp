@@ -48,14 +48,14 @@ namespace Yttrium
 			throw DataError("Bad WAV 'data' chunk");
 
 		_format = AudioFormat(fmt.bits_per_sample / 8, fmt.channels, fmt.samples_per_second);
-		_total_samples = min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.block_size();
+		_total_samples = std::min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.block_size();
 		_data_offset = _reader.offset();
 	}
 
 	size_t WavReader::read(void* buffer, size_t bytes_to_read)
 	{
 		const auto block_size = _format.block_size();
-		bytes_to_read = min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
+		bytes_to_read = std::min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
 		const auto bytes_read = _reader.read(buffer, bytes_to_read);
 		_current_sample += bytes_read / block_size;
 		return bytes_read;

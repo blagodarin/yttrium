@@ -10,7 +10,7 @@ namespace Yttrium
 {
 	struct String::Private
 	{
-		static constexpr size_t MinCapacity = 16;
+		static const size_t MinCapacity = 16;
 
 		static void grow(String& s, size_t capacity)
 		{
@@ -31,7 +31,7 @@ namespace Yttrium
 			assert(s._capacity == 0);
 			if (!s._allocator)
 				return; // Rely on this at your own risk.
-			const auto actual_capacity = next_power_of_2(max(capacity, MinCapacity));
+			const auto actual_capacity = next_power_of_2(std::max(capacity, MinCapacity));
 			s._text = static_cast<char*>(s._allocator->allocate(actual_capacity));
 			s._capacity = actual_capacity;
 		}
@@ -49,9 +49,11 @@ namespace Yttrium
 		}
 	};
 
+	const size_t String::Private::MinCapacity;
+
 	String::String(const String& string)
 		: StaticString(nullptr, string._size)
-		, _capacity(next_power_of_2(max(_size + 1, Private::MinCapacity)))
+		, _capacity(next_power_of_2(std::max(_size + 1, Private::MinCapacity)))
 		, _allocator(string._allocator)
 	{
 		Private::initialize_copy(*this, string);
@@ -67,7 +69,7 @@ namespace Yttrium
 
 	String::String(const StaticString& string, Allocator* allocator)
 		: StaticString(nullptr, string.size())
-		, _capacity(next_power_of_2(max(_size + 1, Private::MinCapacity)))
+		, _capacity(next_power_of_2(std::max(_size + 1, Private::MinCapacity)))
 		, _allocator(allocator)
 	{
 		Private::initialize_copy(*this, string);

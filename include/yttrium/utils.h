@@ -23,22 +23,6 @@ namespace Yttrium
 		return !(x & (x - 1)) && x > 0;
 	}
 
-	/// Returns the maximum of two values.
-	/// \note Including <algorithm> for the alternative leads to noticeable compilation slowdown.
-	template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
-	constexpr T max(T x, T y)
-	{
-		return x > y ? x : y;
-	}
-
-	/// Returns the minimum of two values.
-	/// \note Including <algorithm> for the alternative leads to noticeable compilation slowdown.
-	template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
-	constexpr T min(T x, T y)
-	{
-		return x < y ? x : y;
-	}
-
 	/// Returns the least power of two not less than the specified positive value.
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value && sizeof(T) <= sizeof(uint64_t)>>
 	T next_power_of_2(T x)
