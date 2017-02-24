@@ -1,8 +1,6 @@
 #include "logic.h"
 
-#include <algorithm>
 #include <cassert>
-#include <chrono>
 
 namespace
 {
@@ -225,7 +223,6 @@ namespace Tetrium
 
 	Game::Game()
 	{
-		std::srand(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
 	}
 
 	bool Game::advance(unsigned milliseconds)
@@ -363,7 +360,7 @@ namespace Tetrium
 	void Game::start(int start_level)
 	{
 		_field = {};
-		_next_figure = Figure(static_cast<Figure::Type>(std::rand() % Figure::Count));
+		_next_figure = Figure(static_cast<Figure::Type>(_random_distribution(_random_engine)));
 		_time_remainder = 0;
 
 		_is_accelerating = false;
@@ -475,7 +472,7 @@ namespace Tetrium
 			_state = Falling;
 			_current_figure = _next_figure;
 			_current_figure.put_at({ (Field::Width - MaxFigureWidth) / 2, Field::Height * PointsPerRow });
-			_next_figure = Figure(static_cast<Figure::Type>(std::rand() % Figure::Count));
+			_next_figure = Figure(static_cast<Figure::Type>(_random_distribution(_random_engine)));
 		}
 	}
 

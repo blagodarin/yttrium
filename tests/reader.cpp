@@ -2,8 +2,7 @@
 #include <yttrium/string.h>
 #include "iostream.h"
 
-#include <cstdlib>
-#include <cstring>
+#include <random>
 
 #include <boost/test/unit_test.hpp>
 
@@ -11,9 +10,11 @@ namespace Yttrium
 {
 	inline Buffer make_random_buffer(size_t size)
 	{
+		std::default_random_engine engine;
+		std::uniform_int_distribution<uint8_t> distribution{ 0, std::numeric_limits<uint8_t>::max() };
 		Buffer buffer(size);
 		for (auto& byte : buffer)
-			byte = rand() % std::numeric_limits<uint8_t>::max();
+			byte = distribution(engine);
 		return buffer;
 	}
 }

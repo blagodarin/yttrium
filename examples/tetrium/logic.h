@@ -2,6 +2,8 @@
 #define _examples_tetrium_logic_h_
 
 #include <array>
+#include <chrono>
+#include <random>
 
 // Tetrium game logic.
 namespace Tetrium
@@ -191,6 +193,9 @@ namespace Tetrium
 		int      _lines = 0;
 		int      _level = 0;
 		int      _speed = 0;
+
+		std::default_random_engine _random_engine{ static_cast<std::default_random_engine::result_type>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count()) };
+		std::uniform_int_distribution<int> _random_distribution{ 0, Figure::Count - 1 };
 	};
 }
 
