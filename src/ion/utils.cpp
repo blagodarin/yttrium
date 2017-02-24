@@ -3,7 +3,6 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/math/point.h>
 #include <yttrium/string_utils.h>
 
 namespace
@@ -129,38 +128,9 @@ namespace Yttrium
 				::append(*target_node, source_value);
 		}
 
-		bool get(const IonValue& source, PointF& value)
-		{
-			if (source.type() != IonValue::Type::List)
-				return false;
-			const auto& list = source.list();
-			return list.size() == 2
-				&& list.first()->string().to_number(value.data()[0])
-				&& list.last()->string().to_number(value.data()[1]);
-		}
-
 		bool get(const IonNode& source, const StaticString*& value)
 		{
 			return !source.is_empty() && source.last()->get(&value);
-		}
-
-		bool get(const IonObject& source, const StaticString& name, float& value)
-		{
-			const auto& node = source.last(name);
-			const StaticString* value_string;
-			return !node.is_empty() && node.last()->get(&value_string) && value_string->to_number(value);
-		}
-
-		bool get(const IonObject& source, const StaticString& name, const StaticString*& value)
-		{
-			const auto& node = source.last(name);
-			return !node.is_empty() && node.last()->get(&value);
-		}
-
-		bool get(const IonObject& source, const StaticString& name, const IonObject*& value)
-		{
-			const auto& node = source.last(name);
-			return !node.is_empty() && node.last()->get(&value);
 		}
 
 		std::string serialize(const IonObject& object, bool root, int indentation)
@@ -168,12 +138,6 @@ namespace Yttrium
 			std::string result;
 			::serialize_object(result, object, root, indentation);
 			return result;
-		}
-
-		StaticString to_string(const IonObject& source, const StaticString& name)
-		{
-			const auto* value = source.first(name).first();
-			return value && value->type() == IonValue::Type::String ? value->string() : StaticString();
 		}
 	}
 }
