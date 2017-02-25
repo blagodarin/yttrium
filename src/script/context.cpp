@@ -39,7 +39,7 @@ namespace Yttrium
 	public:
 		Allocator& _allocator;
 		ScriptContext* const _parent;
-		Pool<ScriptValue> _value_pool{ 32, _allocator };
+		Pool<ScriptValue> _value_pool{ 32 };
 		std::unordered_map<std::string, ScriptValue*> _values;
 		std::unordered_map<std::string, ScriptCommandContext> _commands;
 	};

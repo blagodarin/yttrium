@@ -93,12 +93,10 @@ namespace Yttrium
 		char* _items;
 	};
 
-	PoolBase::PoolBase(size_t chunk_items, size_t item_size, Allocator& allocator)
-		: _allocator(allocator)
-		, _chunk_items(chunk_items)
-		, _item_size(item_size)
-		, _chunk_size(PoolChunk::size(chunk_items, item_size))
-		, _last_chunk(nullptr)
+	PoolBase::PoolBase(size_t chunk_items, size_t item_size) noexcept
+		: _chunk_items{ chunk_items }
+		, _item_size{ item_size }
+		, _chunk_size{ PoolChunk::size(_chunk_items, _item_size) }
 	{
 	}
 
@@ -107,7 +105,7 @@ namespace Yttrium
 		for (auto chunk = _last_chunk; chunk; )
 		{
 			const auto previous_chunk = _last_chunk->_previous;
-			unmake_raw(_allocator, chunk);
+			delete chunk;
 			chunk = previous_chunk;
 		}
 	}
@@ -115,14 +113,14 @@ namespace Yttrium
 	void* PoolBase::allocate()
 	{
 		if (!_last_chunk || _last_chunk->is_full())
-			_last_chunk = make_raw_sized<PoolChunk>(_allocator, _chunk_size, _chunk_items, _item_size, _last_chunk);
+			_last_chunk = make_raw_sized<PoolChunk>(_chunk_size, _chunk_items, _item_size, _last_chunk);
 
 		char* pointer = _last_chunk->allocate()->data;
 
 		return pointer;
 	}
 
-	void PoolBase::deallocate(void* pointer)
+	void PoolBase::deallocate(void* pointer) noexcept
 	{
 		const auto item = PoolChunk::Item::base(pointer);
 
@@ -135,11 +133,11 @@ namespace Yttrium
 			if (chunk == _last_chunk)
 				_last_chunk = chunk->_previous;
 
-			unmake_raw(_allocator, chunk);
+			delete chunk;
 		}
 	}
 
-	void* PoolBase::take()
+	void* PoolBase::take() noexcept
 	{
 		return _last_chunk ? _last_chunk->_free[_last_chunk->_end]->data : nullptr;
 	}

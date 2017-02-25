@@ -13,6 +13,7 @@
 
 namespace Yttrium
 {
+	class Allocator;
 	class Gui;
 	class GuiScreen;
 	class Music;

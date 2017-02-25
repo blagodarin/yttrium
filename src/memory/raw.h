@@ -1,37 +1,52 @@
 #ifndef _src_memory_raw_h_
 #define _src_memory_raw_h_
 
-#include <yttrium/memory/allocation.h>
-
+#include <cassert>
+#include <cstdlib>
 #include <new>
 #include <utility>
 
 namespace Yttrium
 {
-	template <typename T, typename... Args>
-	T* make_raw(Allocator& allocator, Args&&... args)
+	class RawAllocation
 	{
-		Allocation<T> allocation(allocator);
-		new(allocation.get()) T(std::forward<Args>(args)...);
-		return allocation.release();
-	}
-
-	template <typename T, typename... Args>
-	T* make_raw_sized(Allocator& allocator, size_t size, Args&&... args)
-	{
-		Allocation<T> allocation(allocator, size);
-		new(allocation.get()) T(std::forward<Args>(args)...);
-		return allocation.release();
-	}
-
-	template <typename T>
-	void unmake_raw(Allocator& allocator, T* pointer)
-	{
-		if (pointer)
+	public:
+		RawAllocation(size_t size)
+			: _pointer{ std::malloc(size) }
 		{
-			pointer->~T();
-			allocator.deallocate(pointer);
+			if (!_pointer)
+				throw std::bad_alloc();
 		}
+
+		~RawAllocation()
+		{
+			std::free(_pointer);
+		}
+
+		void* get() const noexcept
+		{
+			return _pointer;
+		}
+
+		void* release() noexcept
+		{
+			return std::exchange(_pointer, nullptr);
+		}
+
+		RawAllocation(const RawAllocation&) = delete;
+		RawAllocation& operator=(const RawAllocation&) = delete;
+
+	private:
+		void* _pointer = nullptr;
+	};
+
+	template <typename T, typename... Args>
+	T* make_raw_sized(size_t size, Args&&... args)
+	{
+		assert(size >= sizeof(T));
+		RawAllocation allocation(size);
+		new(allocation.get()) T(std::forward<Args>(args)...);
+		return static_cast<T*>(allocation.release());
 	}
 }
 

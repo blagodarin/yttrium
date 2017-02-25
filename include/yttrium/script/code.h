@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_script_code_h_
 #define _include_yttrium_script_code_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <memory>
 
@@ -23,7 +23,7 @@ namespace Yttrium
 		~ScriptCode();
 
 		///
-		explicit ScriptCode(std::string&&, Allocator& = *DefaultAllocator);
+		explicit ScriptCode(std::string&&);
 
 		///
 		explicit operator bool() const noexcept { return static_cast<bool>(_private); }

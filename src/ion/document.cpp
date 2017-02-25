@@ -13,11 +13,11 @@ namespace Yttrium
 	const IonNode IonDocumentImpl::null_node(null);
 
 	IonDocumentImpl::IonDocumentImpl(Allocator& allocator)
-		: _allocator(allocator)
-		, _root(*this)
-		, _objects(32, allocator)
-		, _nodes(32, allocator)
-		, _values(32, allocator)
+		: _allocator{ allocator }
+		, _root{ *this }
+		, _objects{ 32 }
+		, _nodes{ 32 }
+		, _values{ 32 }
 	{
 	}
 

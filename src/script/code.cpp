@@ -25,8 +25,7 @@ namespace Yttrium
 	class ScriptCodePrivate
 	{
 	public:
-		ScriptCodePrivate(std::string&& text, Allocator& allocator)
-			: _temporaries{ 32, allocator }
+		ScriptCodePrivate(std::string&& text)
 		{
 			ScriptScanner scanner(text);
 			for (ScriptCommand* command = nullptr;;)
@@ -97,15 +96,15 @@ namespace Yttrium
 		}
 
 	public:
-		Pool<ScriptValue> _temporaries;
+		Pool<ScriptValue> _temporaries{ 32 };
 		std::vector<ScriptCommand> _commands;
 	};
 
 	ScriptCode::ScriptCode() = default;
 	ScriptCode::~ScriptCode() = default;
 
-	ScriptCode::ScriptCode(std::string&& text, Allocator& allocator)
-		: _private(std::make_unique<ScriptCodePrivate>(std::move(text), allocator))
+	ScriptCode::ScriptCode(std::string&& text)
+		: _private(std::make_unique<ScriptCodePrivate>(std::move(text)))
 	{
 	}
 
