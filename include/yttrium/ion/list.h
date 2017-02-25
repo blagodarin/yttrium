@@ -64,6 +64,8 @@ namespace Yttrium
 	protected:
 		IonList(IonDocumentImpl& document): _document(document) {}
 
+		const IonDocumentImpl& document() const { return _document; }
+
 	private:
 		Y_PRIVATE IonValue* append(const StaticString& string, const ByReference&);
 		Y_PRIVATE void append(IonValue* value);

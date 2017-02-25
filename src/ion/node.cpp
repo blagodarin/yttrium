@@ -6,7 +6,7 @@ namespace Yttrium
 {
 	bool IonNode::exists() const
 	{
-		return _name.allocator() != &NoAllocator;
+		return document().exists();
 	}
 
 	IonNode::IonNode(IonDocumentImpl& document)

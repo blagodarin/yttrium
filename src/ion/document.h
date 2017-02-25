@@ -25,6 +25,7 @@ namespace Yttrium
 
 		Allocator& allocator() const { return _allocator; }
 		void clear();
+		bool exists() const { return &_allocator != &NoAllocator; }
 		IonValue* new_list_value();
 		IonNode* new_node(const StaticString& name);
 		IonNode* new_node(const StaticString& name, const ByReference&);

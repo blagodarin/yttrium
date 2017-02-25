@@ -17,7 +17,6 @@ namespace Yttrium
 	class Y_API String : public StaticString
 	{
 	public:
-
 		///
 		String(Allocator* allocator = DefaultAllocator) : _allocator(allocator) {}
 
@@ -36,11 +35,6 @@ namespace Yttrium
 
 		/// Destructor.
 		~String();
-
-	public:
-
-		///
-		Allocator* allocator() const { return _allocator; }
 
 		///
 		char* text() { return const_cast<char*>(_text); }
