@@ -7,14 +7,12 @@
 
 namespace Yttrium
 {
-	class Allocator;
 	class IonDocument;
 	class IonObject;
 
 	class GuiClasses
 	{
 	public:
-		GuiClasses(Allocator&);
 		~GuiClasses();
 
 		bool add(const std::string& name, const IonObject& source, const std::string* base_class = nullptr);
@@ -22,7 +20,6 @@ namespace Yttrium
 		const IonObject* find(const std::string& name) const;
 
 	private:
-		Allocator& _allocator;
 		std::unordered_map<std::string, std::unique_ptr<const IonDocument>> _classes;
 	};
 }

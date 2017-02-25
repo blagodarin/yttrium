@@ -28,13 +28,11 @@ namespace Yttrium
 	struct ResourceCache
 	{
 		const Storage& _storage;
-		Allocator& _allocator;
 		std::map<String, std::shared_ptr<const T>> _map;
 		std::mutex _mutex;
 
-		ResourceCache(const Storage& storage, Allocator& allocator)
+		ResourceCache(const Storage& storage)
 			: _storage(storage)
-			, _allocator(allocator)
 		{
 		}
 
@@ -102,14 +100,14 @@ namespace Yttrium
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
 		Allocator& _allocator;
-		ResourceCache<IonDocument> _ion_document_cache{ _storage, _allocator };
-		ResourceCache<Material> _material_cache{ _storage, _allocator };
-		ResourceCache<Mesh> _mesh_cache{ _storage, _allocator };
-		ResourceCache<Music> _music_cache{ _storage, _allocator };
-		ResourceCache<Sound> _sound_cache{ _storage, _allocator };
-		ResourceCache<Texture2D> _texture_2d_cache{ _storage, _allocator };
-		ResourceCache<TextureFont> _texture_font_cache{ _storage, _allocator };
-		ResourceCache<Translation> _translation_cache{ _storage, _allocator };
+		ResourceCache<IonDocument> _ion_document_cache{ _storage };
+		ResourceCache<Material> _material_cache{ _storage };
+		ResourceCache<Mesh> _mesh_cache{ _storage };
+		ResourceCache<Music> _music_cache{ _storage };
+		ResourceCache<Sound> _sound_cache{ _storage };
+		ResourceCache<Texture2D> _texture_2d_cache{ _storage };
+		ResourceCache<TextureFont> _texture_font_cache{ _storage };
+		ResourceCache<Translation> _translation_cache{ _storage };
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
@@ -123,7 +121,7 @@ namespace Yttrium
 	{
 		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
 		{
-			return IonDocument::open(reader, _private->_allocator);
+			return IonDocument::open(reader);
 		});
 	}
 
@@ -133,7 +131,7 @@ namespace Yttrium
 			return {};
 		return _private->_material_cache.fetch(name, [this, name](Reader&& reader) -> std::shared_ptr<const Material>
 		{
-			const auto document = IonDocument::open(reader, _private->_allocator);
+			const auto document = IonDocument::open(reader);
 			if (!document)
 				return {};
 			StaticString vertex_shader;
@@ -238,7 +236,7 @@ namespace Yttrium
 	{
 		return _private->_translation_cache.fetch(name, [this](Reader&& reader)
 		{
-			return Translation::open(reader, _private->_allocator);
+			return Translation::open(reader);
 		});
 	}
 

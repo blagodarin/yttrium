@@ -109,7 +109,6 @@ namespace Yttrium
 {
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
 		: _gui(gui)
-		, _classes(_gui.allocator())
 	{
 	}
 

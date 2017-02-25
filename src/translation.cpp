@@ -13,7 +13,7 @@ namespace Yttrium
 	class TranslationImpl : public Translation
 	{
 	public:
-		TranslationImpl(const Reader&, Allocator&);
+		TranslationImpl(const Reader&);
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
@@ -30,14 +30,12 @@ namespace Yttrium
 			Entry(std::string&& text) : text(std::move(text)) {}
 		};
 
-		Allocator& _allocator;
 		std::map<String, Entry> _translations;
 	};
 
-	TranslationImpl::TranslationImpl(const Reader& reader, Allocator& allocator)
-		: _allocator(allocator)
+	TranslationImpl::TranslationImpl(const Reader& reader)
 	{
-		const auto document = IonDocument::open(reader, _allocator);
+		const auto document = IonDocument::open(reader);
 		if (!document)
 			throw DataError("Bad translation data");
 		decltype(_translations) translations;
@@ -73,7 +71,7 @@ namespace Yttrium
 
 	bool TranslationImpl::save(const std::string& path) const
 	{
-		const auto document = IonDocument::create(_allocator);
+		const auto document = IonDocument::create();
 		for (const auto& translation : _translations)
 		{
 			auto& node = *document->root().append("tr"_s);
@@ -89,8 +87,8 @@ namespace Yttrium
 		return i != _translations.end() && !i->second.text.empty() ? i->second.text : source.to_std();
 	}
 
-	std::unique_ptr<Translation> Translation::open(const Reader& reader, Allocator& allocator)
+	std::unique_ptr<Translation> Translation::open(const Reader& reader)
 	{
-		return reader ? std::make_unique<TranslationImpl>(reader, allocator) : nullptr;
+		return reader ? std::make_unique<TranslationImpl>(reader) : nullptr;
 	}
 }

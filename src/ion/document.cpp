@@ -9,11 +9,11 @@
 
 namespace Yttrium
 {
-	IonDocumentImpl IonDocumentImpl::null(NoAllocator);
+	IonDocumentImpl IonDocumentImpl::null(false);
 	const IonNode IonDocumentImpl::null_node(null);
 
-	IonDocumentImpl::IonDocumentImpl(Allocator& allocator)
-		: _allocator{ allocator }
+	IonDocumentImpl::IonDocumentImpl(bool exists)
+		: _exists{ exists }
 		, _root{ *this }
 		, _objects{ 32 }
 		, _nodes{ 32 }
@@ -61,14 +61,14 @@ namespace Yttrium
 		return new(_values.allocate()) IonValue(*this, text, ByReference());
 	}
 
-	std::unique_ptr<IonDocument> IonDocument::create(Allocator& allocator)
+	std::unique_ptr<IonDocument> IonDocument::create()
 	{
-		return std::make_unique<IonDocumentImpl>(allocator);
+		return std::make_unique<IonDocumentImpl>();
 	}
 
-	std::unique_ptr<IonDocument> IonDocument::open(const Reader& reader, Allocator& allocator)
+	std::unique_ptr<IonDocument> IonDocument::open(const Reader& reader)
 	{
-		auto document = std::make_unique<IonDocumentImpl>(allocator);
+		auto document = std::make_unique<IonDocumentImpl>();
 		if (!reader.read_all(document->_buffer))
 			return nullptr;
 		const auto parsing_result = IonParser::parse(*document);

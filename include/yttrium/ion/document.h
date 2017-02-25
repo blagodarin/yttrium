@@ -26,12 +26,12 @@ namespace Yttrium
 		};
 
 		/// Creates an empty document.
-		static std::unique_ptr<IonDocument> create(Allocator& = *DefaultAllocator);
+		static std::unique_ptr<IonDocument> create();
 
 		///
 		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static std::unique_ptr<IonDocument> open(const Reader&, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<IonDocument> open(const Reader&);
 
 		///
 		virtual ~IonDocument() = default;

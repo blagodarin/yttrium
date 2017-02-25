@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_translation_h_
 #define _include_yttrium_translation_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <memory>
 #include <string>
@@ -21,7 +21,7 @@ namespace Yttrium
 		///
 		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static std::unique_ptr<Translation> open(const Reader&, Allocator& = *DefaultAllocator);
+		static std::unique_ptr<Translation> open(const Reader&);
 
 		///
 		virtual void add(const StaticString& source) = 0;

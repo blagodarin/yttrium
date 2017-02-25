@@ -17,14 +17,14 @@ namespace Yttrium
 		static IonDocumentImpl null;
 		static const IonNode null_node;
 
-		IonDocumentImpl(Allocator&);
+		IonDocumentImpl(bool exists = true);
 
 		IonObject& root() override { return _root; }
 		const IonObject& root() const override { return _root; }
 		bool save(const std::string&, Formatting) const override;
 
 		void clear();
-		bool exists() const { return &_allocator != &NoAllocator; }
+		bool exists() const { return _exists; }
 		IonValue* new_list_value();
 		IonNode* new_node(const StaticString& name);
 		IonNode* new_node(const StaticString& name, const ByReference&);
@@ -34,7 +34,7 @@ namespace Yttrium
 		IonValue* new_value(const StaticString& text, const ByReference&);
 
 	private:
-		Allocator& _allocator;
+		const bool _exists; // TODO: Remove.
 		Buffer _buffer;
 		IonObject _root;
 		Pool<IonObject> _objects;
