@@ -19,7 +19,7 @@ namespace Yttrium
 
 	bool IonObject::contains(const StaticString& name) const
 	{
-		return _node_map.find(String(name, ByReference())) != _node_map.end();
+		return _node_map.find({ name, ByReference{} }) != _node_map.end();
 	}
 
 	IonObjectIterator IonObject::end() const
@@ -29,7 +29,7 @@ namespace Yttrium
 
 	const IonNode& IonObject::first(const StaticString& name) const
 	{
-		const auto i = _node_map.find(String(name, ByReference()));
+		const auto i = _node_map.find({ name, ByReference{} });
 		if (i != _node_map.end())
 		{
 			const auto& nodes = i->second;
@@ -41,7 +41,7 @@ namespace Yttrium
 
 	const IonNode& IonObject::last(const StaticString& name) const
 	{
-		const auto i = _node_map.find(String(name, ByReference()));
+		const auto i = _node_map.find({ name, ByReference{} });
 		if (i != _node_map.end())
 		{
 			const auto& nodes = i->second;

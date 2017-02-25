@@ -4,7 +4,6 @@
 #ifndef _include_yttrium_string_h_
 #define _include_yttrium_string_h_
 
-#include <yttrium/memory/global.h>
 #include <yttrium/static_string.h>
 
 namespace Yttrium
@@ -18,7 +17,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		String(Allocator* allocator = DefaultAllocator) : _allocator(allocator) {}
+		String() noexcept = default;
 
 		/// Copy constructor.
 		String(const String&);
@@ -27,11 +26,10 @@ namespace Yttrium
 		String(String&&) noexcept;
 
 		///
-		explicit String(const StaticString& string, Allocator* allocator = DefaultAllocator);
+		explicit String(const StaticString&);
 
 		///
-		String(const StaticString& string, const ByReference&, Allocator* allocator = DefaultAllocator)
-			: StaticString(string), _allocator(allocator) {}
+		String(const StaticString& string, const ByReference&) noexcept : StaticString(string) {}
 
 		/// Destructor.
 		~String();
@@ -41,7 +39,7 @@ namespace Yttrium
 		using StaticString::text;
 
 		String& operator=(const StaticString&);
-		String& operator=(const String& string) { return *this = StaticString(string); }
+		String& operator=(const String& string) { return *this = StaticString{ string }; }
 		String& operator=(String&&) noexcept;
 
 		char& operator[](size_t offset) { return const_cast<char*>(_text)[offset]; }
@@ -49,7 +47,6 @@ namespace Yttrium
 
 	private:
 		size_t _capacity = 0;
-		Allocator* _allocator = nullptr;
 		struct Private;
 		friend Private;
 	};

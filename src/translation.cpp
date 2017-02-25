@@ -49,16 +49,16 @@ namespace Yttrium
 			const StaticString* translation = nullptr;
 			if (!node.first()->get(&source) || !node.last()->get(&translation))
 				throw DataError("Bad translation data");
-			translations.emplace(String(*source, &_allocator), translation->to_std());
+			translations.emplace(String{ *source }, translation->to_std());
 		}
 		_translations = std::move(translations);
 	}
 
 	void TranslationImpl::add(const StaticString& source)
 	{
-		auto i = _translations.find(String(source, ByReference(), &_allocator));
+		auto i = _translations.find({ source, ByReference{} });
 		if (i == _translations.end())
-			i = _translations.emplace(String(source, &_allocator), Entry{}).first;
+			i = _translations.emplace(String{ source }, Entry{}).first;
 		i->second.added = true;
 	}
 
@@ -85,7 +85,7 @@ namespace Yttrium
 
 	std::string TranslationImpl::translate(const StaticString& source) const
 	{
-		const auto i = _translations.find(String(source, ByReference(), &_allocator));
+		const auto i = _translations.find({ source, ByReference{} });
 		return i != _translations.end() && !i->second.text.empty() ? i->second.text : source.to_std();
 	}
 

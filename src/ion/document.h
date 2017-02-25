@@ -23,7 +23,6 @@ namespace Yttrium
 		const IonObject& root() const override { return _root; }
 		bool save(const std::string&, Formatting) const override;
 
-		Allocator& allocator() const { return _allocator; }
 		void clear();
 		bool exists() const { return &_allocator != &NoAllocator; }
 		IonValue* new_list_value();

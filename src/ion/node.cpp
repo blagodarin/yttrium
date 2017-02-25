@@ -10,20 +10,19 @@ namespace Yttrium
 	}
 
 	IonNode::IonNode(IonDocumentImpl& document)
-		: IonList(document)
-		, _name(&document.allocator())
+		: IonList{ document }
 	{
 	}
 
 	IonNode::IonNode(IonDocumentImpl& document, const StaticString& name)
-		: IonList(document)
-		, _name(name, &document.allocator())
+		: IonList{ document }
+		, _name{ name }
 	{
 	}
 
 	IonNode::IonNode(IonDocumentImpl& document, const StaticString& name, const ByReference&)
-		: IonList(document)
-		, _name(name, ByReference(), &document.allocator())
+		: IonList{ document }
+		, _name{ name, ByReference{} }
 	{
 	}
 }

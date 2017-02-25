@@ -41,7 +41,7 @@ namespace Yttrium
 		std::shared_ptr<const T> fetch(const StaticString& name, const std::function<std::shared_ptr<const T>(Reader&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
-			const auto i = _map.find(String(name, ByReference()));
+			const auto i = _map.find({ name, ByReference{} });
 			if (i != _map.end())
 				return i->second;
 			auto reader = _storage.open(name);
@@ -50,7 +50,7 @@ namespace Yttrium
 			auto resource_ptr = factory(std::move(reader));
 			if (!resource_ptr)
 				throw DataError("Can't load \"", name, "\""); // We don't have more information at this point. =(
-			_map.emplace(String(name, &_allocator), resource_ptr);
+			_map.emplace(String{ name }, resource_ptr);
 			return resource_ptr;
 		}
 
