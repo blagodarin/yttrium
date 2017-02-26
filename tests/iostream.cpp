@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(test_iostream_rect)
 
 BOOST_AUTO_TEST_CASE(test_iostream_static_string)
 {
-	using namespace Yttrium; // TODO: A namespace for literals.
+	using namespace Yttrium::Literals;
 
 	{
 		std::ostringstream stream;

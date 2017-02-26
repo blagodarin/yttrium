@@ -115,8 +115,11 @@ namespace Yttrium
 	inline bool operator>=(const StaticString& a, const StaticString& b) { return compare(a, b) >= 0; }
 	inline bool operator<=(const StaticString& a, const StaticString& b) { return compare(a, b) <= 0; }
 
-	///
-	constexpr StaticString operator"" _s(const char* text, size_t size) { return {text, size}; }
+	inline namespace Literals
+	{
+		///
+		constexpr StaticString operator"" _s(const char* data, size_t size) { return { data, size }; }
+	}
 
 	namespace detail
 	{

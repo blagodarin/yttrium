@@ -7,7 +7,7 @@ enum class Test
 };
 
 using Yttrium::Flags;
-using namespace Yttrium::FlagOperators;
+using namespace Yttrium::Operators;
 
 static_assert(!(Flags<Test>{} & Test::One)
 	&& Flags<Test>{ Test::One } & Test::One

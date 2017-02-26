@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_resource_loader_release_unused)
 	Storage storage{ Storage::UseFileSystem::Before };
 	ResourceLoader resource_loader{ storage };
 	const std::weak_ptr<const IonDocument> resource = resource_loader.load_ion("tests/ion/original.ion"); // We can't just load raw data, so ION it is.
-	BOOST_REQUIRE_EQUAL(resource.use_count(), 1);
+	BOOST_REQUIRE(!resource.expired());
 	resource_loader.release_unused();
-	BOOST_CHECK_EQUAL(resource.use_count(), 0);
+	BOOST_CHECK(resource.expired());
 }
