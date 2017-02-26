@@ -12,7 +12,6 @@ add_executable(unit_tests
 	main.cpp
 	margins.cpp
 	matrix.cpp
-	memory.cpp
 	package.cpp
 	point.cpp
 	reader.cpp

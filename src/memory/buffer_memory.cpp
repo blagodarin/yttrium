@@ -3,7 +3,6 @@
 #include <yttrium/utils.h>
 #include "../system/memory.h"
 #include "buffer_memory_tracker.h"
-#include "heap_allocator.h"
 
 #include <cassert>
 #include <cstring>

@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_script_context_h_
 #define _include_yttrium_script_context_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <functional>
 #include <memory>
@@ -41,16 +41,10 @@ namespace Yttrium
 		using Command = std::function<void(const ScriptCall&)>;
 
 		///
-		ScriptContext(Allocator* allocator = DefaultAllocator);
-
-		///
-		ScriptContext(ScriptContext* parent, Allocator* allocator = nullptr);
+		ScriptContext(ScriptContext* parent = nullptr);
 
 		///
 		~ScriptContext();
-
-		///
-		Allocator& allocator() const noexcept;
 
 		/// Call a command.
 		bool call(const std::string& name, std::string& result, const ScriptArgs&);

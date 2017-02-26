@@ -13,7 +13,6 @@
 
 namespace Yttrium
 {
-	class Allocator;
 	class Gui;
 	class GuiScreen;
 	class Music;
@@ -36,11 +35,10 @@ namespace Yttrium
 			std::shared_ptr<const Texture2D> texture;
 		};
 
-		GuiPrivate(ResourceLoader&, ScriptContext&, Allocator&);
+		GuiPrivate(ResourceLoader&, ScriptContext&);
 		~GuiPrivate();
 
 		GuiScreen& add_screen(const std::string& name, bool is_transparent, bool is_root);
-		Allocator& allocator() const { return _allocator; }
 		void draw_canvas(Renderer& renderer, const std::string& name, const RectF& rect) const { if (_on_canvas) _on_canvas(renderer, name, rect); }
 		void draw_custom_cursor(Renderer& renderer, const PointF& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
@@ -63,7 +61,6 @@ namespace Yttrium
 	private:
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
-		Allocator& _allocator;
 		std::unordered_map<std::string, FontDesc> _fonts;
 		std::unordered_map<std::string, std::unique_ptr<GuiScreen>> _screens; // TODO: Use std::string_view in C++17.
 		GuiScreen* _root_screen = nullptr;

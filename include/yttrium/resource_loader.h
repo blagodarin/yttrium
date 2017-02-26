@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_resource_loader_h_
 #define _include_yttrium_resource_loader_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <memory>
 
@@ -28,7 +28,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr, Allocator& = *DefaultAllocator);
+		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr);
 
 		///
 		~ResourceLoader();

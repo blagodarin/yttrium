@@ -30,36 +30,22 @@ namespace Yttrium
 	class ScriptContextPrivate
 	{
 	public:
-		ScriptContextPrivate(Allocator& allocator, ScriptContext* parent)
-			: _allocator(allocator)
-			, _parent(parent)
-		{
-		}
+		ScriptContextPrivate(ScriptContext* parent)
+			: _parent(parent) {}
 
 	public:
-		Allocator& _allocator;
 		ScriptContext* const _parent;
 		Pool<ScriptValue> _value_pool{ 32 };
 		std::unordered_map<std::string, ScriptValue*> _values;
 		std::unordered_map<std::string, ScriptCommandContext> _commands;
 	};
 
-	ScriptContext::ScriptContext(Allocator* allocator)
-		: _private(std::make_unique<ScriptContextPrivate>(*allocator, nullptr))
-	{
-	}
-
-	ScriptContext::ScriptContext(ScriptContext* parent, Allocator* allocator)
-		: _private(std::make_unique<ScriptContextPrivate>(*allocator, parent))
+	ScriptContext::ScriptContext(ScriptContext* parent)
+		: _private(std::make_unique<ScriptContextPrivate>(parent))
 	{
 	}
 
 	ScriptContext::~ScriptContext() = default;
-
-	Allocator& ScriptContext::allocator() const noexcept
-	{
-		return _private->_allocator;
-	}
 
 	bool ScriptContext::call(const std::string& name, std::string& result, const ScriptArgs& args)
 	{

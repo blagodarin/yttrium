@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_window_h_
 #define _include_yttrium_window_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <chrono>
 #include <functional>

@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_gui_gui_h_
 #define _include_yttrium_gui_gui_h_
 
-#include <yttrium/memory/global.h>
+#include <yttrium/api.h>
 
 #include <functional>
 #include <memory>
@@ -25,7 +25,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Gui(ResourceLoader&, ScriptContext&, const StaticString& name, Allocator& = *DefaultAllocator);
+		Gui(ResourceLoader&, ScriptContext&, const StaticString& name);
 
 		///
 		~Gui();

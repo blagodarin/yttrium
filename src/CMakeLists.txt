@@ -210,20 +210,14 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # memory
 target_sources(yttrium PRIVATE
-	../include/yttrium/memory/allocation.h
-	../include/yttrium/memory/allocator.h
 	../include/yttrium/memory/buffer_appender.h
 	../include/yttrium/memory/buffer.h
-	../include/yttrium/memory/global.h
 	../include/yttrium/memory/pool.h
-	../include/yttrium/memory/temporary_allocator.h
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
 	memory/buffer_memory_tracker.cpp
 	memory/buffer_memory_tracker.h
 	memory/buffer.cpp
-	memory/heap_allocator.cpp
-	memory/heap_allocator.h
 	memory/pool.cpp
 	memory/raw.h
 	system/memory.h

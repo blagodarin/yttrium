@@ -2,6 +2,17 @@
 
 ## Overall
 
+### Why no custom allocators?
+
+Yttrium used to have custom allocators almost everywhere. However, they were
+removed in favor of standard memory allocation facilities. Custom allocators
+are not very useful if you don't intend to replace the standard memory manager
+on a global scale (and I don't), don't need to catch memory leaks by yourself
+(there is valgrind) and have no need of tracking memory usage per subsystem
+(that's a cool feature, but it doesn't justify the means). If memory allocation
+performance does matter, it's better to use more local facilities (e.g. memory
+pools) then to pollute the entire codebase with custom allocation stuff.
+
 ### Why not Google Test?
 
 Google Test generates some mandatory output for every test case and every test,
@@ -11,6 +22,8 @@ find which tests have failed and why.
 
 It does compile a bit faster than Boost Test, however, but the difference is
 not very noticeable, and fast builds aren't the primary property of unit tests.
+
+Yttrium also uses other Boost facilities, so Boost Test seems a natural choice.
 
 ## Code style
 

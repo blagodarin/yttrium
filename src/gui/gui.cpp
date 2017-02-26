@@ -17,10 +17,9 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context, Allocator& allocator)
+	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context)
 		: _resource_loader(resource_loader)
 		, _script_context(script_context)
-		, _allocator(allocator)
 	{
 	}
 
@@ -134,8 +133,8 @@ namespace Yttrium
 		_screen_stack.pop_back();
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name, Allocator& allocator)
-		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context, allocator))
+	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name)
+		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context))
 	{
 		GuiIonLoader(*_private).load(name);
 		if (!_private->_root_screen)

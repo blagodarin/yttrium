@@ -2,7 +2,6 @@
 
 namespace Yttrium
 {
-	class Allocator;
 	class AudioBackend;
 	class AudioPlayerBackend;
 

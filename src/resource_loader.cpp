@@ -75,13 +75,8 @@ namespace Yttrium
 	class ResourceLoaderPrivate
 	{
 	public:
-		ResourceLoaderPrivate(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
-			: _storage(storage)
-			, _renderer(renderer)
-			, _audio_manager(audio_manager)
-			, _allocator(allocator)
-		{
-		}
+		ResourceLoaderPrivate(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
+			: _storage(storage), _renderer(renderer), _audio_manager(audio_manager) {}
 
 		bool release_unused()
 		{
@@ -99,7 +94,6 @@ namespace Yttrium
 		const Storage& _storage;
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
-		Allocator& _allocator;
 		ResourceCache<IonDocument> _ion_document_cache{ _storage };
 		ResourceCache<Material> _material_cache{ _storage };
 		ResourceCache<Mesh> _mesh_cache{ _storage };
@@ -110,8 +104,8 @@ namespace Yttrium
 		ResourceCache<Translation> _translation_cache{ _storage };
 	};
 
-	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager, Allocator& allocator)
-		: _private(std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager, allocator))
+	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
+		: _private(std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager))
 	{
 	}
 
