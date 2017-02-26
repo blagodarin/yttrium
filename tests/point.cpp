@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::Point;
 
 BOOST_AUTO_TEST_CASE(test_point)
 {
@@ -14,6 +14,8 @@ BOOST_AUTO_TEST_CASE(test_point)
 
 BOOST_AUTO_TEST_CASE(test_pointf)
 {
+	using Yttrium::PointF;
+
 	BOOST_CHECK_EQUAL(PointF(1, 2).x(), 1);
 	BOOST_CHECK_EQUAL(PointF(1, 2).y(), 2);
 

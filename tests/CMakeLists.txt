@@ -1,5 +1,6 @@
 add_executable(unit_tests
 	buffer.cpp
+	flags.cpp
 	gui.cpp
 	image.cpp
 	image.h

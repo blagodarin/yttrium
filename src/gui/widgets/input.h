@@ -13,7 +13,7 @@ namespace Yttrium
 	class InputWidget : public Widget
 	{
 	public:
-		InputWidget(GuiPrivate& gui) : Widget(gui, CanHaveFocus) {}
+		InputWidget(GuiPrivate& gui) : Widget(gui, Flag::CanHaveFocus) {}
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;

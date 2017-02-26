@@ -3,7 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::String;
 
 BOOST_AUTO_TEST_CASE(test_string_initialization)
 {

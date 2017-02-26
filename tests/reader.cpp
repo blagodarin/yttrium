@@ -6,20 +6,18 @@
 
 #include <boost/test/unit_test.hpp>
 
-namespace Yttrium
-{
-	inline Buffer make_random_buffer(size_t size)
-	{
-		std::default_random_engine engine;
-		std::uniform_int_distribution<uint8_t> distribution{ 0, std::numeric_limits<uint8_t>::max() };
-		Buffer buffer(size);
-		for (auto& byte : buffer)
-			byte = distribution(engine);
-		return buffer;
-	}
-}
+using Yttrium::Buffer;
+using Yttrium::Reader;
 
-using namespace Yttrium;
+inline Buffer make_random_buffer(size_t size)
+{
+	std::default_random_engine engine;
+	std::uniform_int_distribution<uint8_t> distribution{ 0, std::numeric_limits<uint8_t>::max() };
+	Buffer buffer(size);
+	for (auto& byte : buffer)
+		byte = distribution(engine);
+	return buffer;
+}
 
 BOOST_AUTO_TEST_CASE(test_reader_construction)
 {

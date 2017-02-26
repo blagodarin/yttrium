@@ -32,7 +32,7 @@ namespace Yttrium
 		_on_enter.run(_gui);
 
 		std::vector<Widget*> focusable_widgets;
-		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget){ return widget->flags() & Widget::CanHaveFocus; });
+		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget){ return widget->flags() & Widget::Flag::CanHaveFocus; });
 		if (!focusable_widgets.empty())
 		{
 			_focus_widget = focusable_widgets.front();
@@ -70,7 +70,7 @@ namespace Yttrium
 					if (processed)
 					{
 						_left_click_widget = _mouse_widget;
-						if (_mouse_widget->flags() & Widget::CanHaveFocus && _mouse_widget != _focus_widget)
+						if (_mouse_widget->flags() & Widget::Flag::CanHaveFocus && _mouse_widget != _focus_widget)
 						{
 							assert(!_focus_widget);
 							_focus_widget = _mouse_widget;

@@ -5,10 +5,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_ion_serialization)
 {
+	using Yttrium::IonDocument;
+	using Yttrium::Reader;
+	using Yttrium::TemporaryFile;
+
 	TemporaryFile file;
 	{
 		const auto document = IonDocument::open(Reader("tests/ion/original.ion"));

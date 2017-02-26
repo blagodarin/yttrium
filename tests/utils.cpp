@@ -4,10 +4,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_is_power_of_2)
 {
+	using Yttrium::is_power_of_2;
+
 	static const int table[std::numeric_limits<int8_t>::max() + 1] =
 	{
 		0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
@@ -28,6 +28,8 @@ BOOST_AUTO_TEST_CASE(test_is_power_of_2)
 
 BOOST_AUTO_TEST_CASE(test_next_power_of_2)
 {
+	using Yttrium::next_power_of_2;
+
 	static const uint8_t table[std::numeric_limits<int8_t>::max() + 1] =
 	{
 		0, 1, 2, 4, 4, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16,
@@ -51,6 +53,8 @@ BOOST_AUTO_TEST_CASE(test_next_power_of_2)
 
 BOOST_AUTO_TEST_CASE(test_same_sign)
 {
+	using Yttrium::same_sign;
+
 	BOOST_CHECK(same_sign<intmax_t>(0, 0));
 	BOOST_CHECK(same_sign<intmax_t>(-1, -1));
 	BOOST_CHECK(!same_sign<intmax_t>(0, -1));
@@ -63,6 +67,8 @@ BOOST_AUTO_TEST_CASE(test_same_sign)
 
 BOOST_AUTO_TEST_CASE(test_wrap)
 {
+	using Yttrium::wrap;
+
 	BOOST_CHECK_EQUAL(wrap(-541, -180, 180),  179);
 	BOOST_CHECK_EQUAL(wrap(-540, -180, 180), -180);
 	BOOST_CHECK_EQUAL(wrap(-361, -180, 180),   -1);

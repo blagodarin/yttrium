@@ -15,6 +15,7 @@ namespace Yttrium
 		Flags() = default;
 		constexpr Flags(const T flag) : _flags(static_cast<std::underlying_type_t<T>>(flag)) {}
 		constexpr explicit operator std::underlying_type_t<T>() const { return _flags; }
+		constexpr Flags& operator|=(const Flags other) { _flags |= other._flags; return *this; }
 	private:
 		std::underlying_type_t<T> _flags = 0;
 	};
@@ -60,11 +61,14 @@ namespace Yttrium
 		return static_cast<T>(static_cast<U>(a) | static_cast<U>(b));
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
-	constexpr Flags<T> operator|(const T a, const T b)
+	inline namespace FlagOperators
 	{
-		using U = std::underlying_type_t<T>;
-		return static_cast<T>(static_cast<U>(a) | static_cast<U>(b));
+		template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+		constexpr Flags<T> operator|(const T a, const T b)
+		{
+			using U = std::underlying_type_t<T>;
+			return static_cast<T>(static_cast<U>(a) | static_cast<U>(b));
+		}
 	}
 }
 

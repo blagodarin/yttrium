@@ -3,7 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::Buffer;
 
 const auto granularity = Buffer::memory_granularity();
 

@@ -92,13 +92,13 @@ namespace Yttrium
 				was_pressed = is_pressed;
 
 			if (_keys[static_cast<KeyType>(Key::LShift)] || _keys[static_cast<KeyType>(Key::RShift)])
-				event.modifiers |= KeyEvent::Shift;
+				event.modifiers |= KeyEvent::Modifier::Shift;
 
 			if (_keys[static_cast<KeyType>(Key::LControl)] || _keys[static_cast<KeyType>(Key::RControl)])
-				event.modifiers |= KeyEvent::Control;
+				event.modifiers |= KeyEvent::Modifier::Control;
 
 			if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
-				event.modifiers |= KeyEvent::Alt;
+				event.modifiers |= KeyEvent::Modifier::Alt;
 
 			if (_on_key_event)
 				_on_key_event(event);

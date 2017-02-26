@@ -8,7 +8,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::Image;
+using Yttrium::ImageType;
+using Yttrium::PixelFormat;
+using Yttrium::Reader;
+using Yttrium::TemporaryFile;
 
 BOOST_AUTO_TEST_CASE(test_dds_reading)
 {

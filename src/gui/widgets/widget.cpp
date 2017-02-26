@@ -9,7 +9,7 @@ namespace Yttrium
 		return false;
 	}
 
-	Widget::Widget(GuiPrivate& gui, unsigned flags)
+	Widget::Widget(GuiPrivate& gui, Flags<Flag> flags)
 		: _gui(gui)
 		, _flags(flags)
 	{

@@ -1,6 +1,7 @@
 #ifndef _src_gui_widgets_widget_h_
 #define _src_gui_widgets_widget_h_
 
+#include <yttrium/flags.h>
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
 #include "../types.h"
@@ -14,14 +15,14 @@ namespace Yttrium
 	class Widget
 	{
 	public:
-		enum
+		enum class Flag
 		{
 			CanHaveFocus = 1 << 0,
 		};
 
 		virtual ~Widget() = default;
 
-		unsigned flags() const { return _flags; }
+		Flags<Flag> flags() const { return _flags; }
 		bool is_focused() const { return _is_focused; }
 		RectF rect() const { return _rect; }
 		RectF render_rect() const { return _render_rect; }
@@ -33,14 +34,14 @@ namespace Yttrium
 		virtual void render(Renderer&, const RectF&, WidgetState) const = 0;
 
 	protected:
-		Widget(GuiPrivate&, unsigned flags = 0);
+		Widget(GuiPrivate&, Flags<Flag> = {});
 
 	protected:
 		GuiPrivate& _gui;
 		RectF _rect;
 
 	private:
-		const unsigned _flags;
+		const Flags<Flag> _flags;
 		bool _is_focused = false;
 		RectF _render_rect;
 	};

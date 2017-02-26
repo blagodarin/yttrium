@@ -6,10 +6,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_gui)
 {
+	using namespace Yttrium;
+
 	Storage storage(Storage::UseFileSystem::Before);
 	ResourceLoader resource_loader(storage);
 	ScriptContext script_context;

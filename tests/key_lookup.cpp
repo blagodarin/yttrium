@@ -4,10 +4,11 @@
 
 #include "../src/gui/key_lookup.cpp"
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_key_lookup)
 {
+	using Yttrium::Key;
+	using Yttrium::lookup_key;
+
 	BOOST_CHECK(lookup_key({}) == Key::Null);
 	BOOST_CHECK(lookup_key("no_such_key") == Key::Null);
 

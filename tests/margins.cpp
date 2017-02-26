@@ -3,10 +3,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_margins)
 {
+	using Yttrium::Margins;
+
 	Margins m0;
 	BOOST_CHECK_EQUAL(m0.left(), 0);
 	BOOST_CHECK_EQUAL(m0.top(), 0);
@@ -43,6 +43,8 @@ BOOST_AUTO_TEST_CASE(test_margins)
 
 BOOST_AUTO_TEST_CASE(test_marginsf)
 {
+	using Yttrium::MarginsF;
+
 	MarginsF m0;
 	BOOST_CHECK_EQUAL(m0.left(), 0);
 	BOOST_CHECK_EQUAL(m0.top(), 0);

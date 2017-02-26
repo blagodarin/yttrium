@@ -33,7 +33,6 @@ add_library(yttrium
 	base/tiny_string_map.cpp
 	config.h
 	console.cpp
-	flags.cpp
 	globals.cpp
 	resource_loader.cpp
 	translation.cpp

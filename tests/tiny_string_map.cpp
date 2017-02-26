@@ -3,7 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::TinyStringMap;
 
 BOOST_AUTO_TEST_CASE(test_tiny_string_map_find)
 {
@@ -181,6 +181,8 @@ BOOST_AUTO_TEST_CASE(test_tiny_string_map_move_assignment)
 
 BOOST_AUTO_TEST_CASE(test_tiny_string_map_limit)
 {
+	using Yttrium::StaticString;
+
 	TinyStringMap m;
 	const std::string tiny(std::numeric_limits<uint8_t>::max(), 'a');
 	const std::string not_tiny(tiny.size() + 1, 'a');

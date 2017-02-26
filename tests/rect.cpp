@@ -2,7 +2,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::Point;
+using Yttrium::Rect;
+using Yttrium::Size;
 
 BOOST_AUTO_TEST_CASE(test_rect_initialization)
 {

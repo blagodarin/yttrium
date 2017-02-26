@@ -2,10 +2,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
 {
+	using Yttrium::Vector2;
+
 	BOOST_CHECK(Vector2(1, 2) + Vector2(3, 4) == Vector2(4, 6));
 	BOOST_CHECK(Vector2(1, 2) + 3 == Vector2(4, 5));
 	BOOST_CHECK(2 + Vector2(3, 4) == Vector2(5, 6));
@@ -25,12 +25,16 @@ BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
 
 BOOST_AUTO_TEST_CASE(test_vector4)
 {
+	using Yttrium::Vector4;
+
 	BOOST_CHECK_EQUAL(Vector4(1, 4, 8).length(), 9);
 	BOOST_CHECK_EQUAL(Vector4(1, 4, 8).normalized().length(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_vector4_arithmetics)
 {
+	using Yttrium::Vector4;
+
 	BOOST_CHECK(Vector4(1, 2, 3) + Vector4(4, 5, 6) == Vector4(5, 7, 9));
 	BOOST_CHECK(Vector4(1, 2, 3) + 4 == Vector4(5, 6, 7));
 	BOOST_CHECK(3 + Vector4(4, 5, 6) == Vector4(7, 8, 9));

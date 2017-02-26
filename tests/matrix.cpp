@@ -2,10 +2,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_matrix4)
 {
+	using Yttrium::Matrix4;
+
 	Matrix4 m{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	BOOST_CHECK_EQUAL(m(0, 0), 0);

@@ -4,10 +4,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
-
 BOOST_AUTO_TEST_CASE(test_make_string)
 {
+	using Yttrium::make_string;
+
 	BOOST_CHECK_EQUAL("", make_string());
 	BOOST_CHECK_EQUAL("", make_string(""));
 	BOOST_CHECK_EQUAL("", make_string(std::string{}));

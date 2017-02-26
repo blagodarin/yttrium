@@ -5,6 +5,7 @@
 #define _include_yttrium_key_h_
 
 #include <yttrium/api.h>
+#include <yttrium/flags.h>
 
 #include <cstdint>
 
@@ -199,17 +200,17 @@ namespace Yttrium
 	class Y_API KeyEvent
 	{
 	public:
-		enum
+		enum class Modifier
 		{
 			Shift   = 1 << 0, ///< Key::LShift or Key::RShift is pressed.
 			Control = 1 << 1, ///< Key::LControl or Key::RControl is pressed.
 			Alt     = 1 << 2, ///< Key::LAlt or Key::RAlt is pressed.
 		};
 
-		Key      key;           ///< Key.
-		bool     pressed;       ///< Is the key pressed?
-		bool     autorepeat;    ///< Is it an autorepeat event?
-		unsigned modifiers = 0; ///< Modifier mask.
+		Key key; ///< Key.
+		bool pressed; ///< Is the key pressed?
+		bool autorepeat; ///< Is it an autorepeat event?
+		Flags<Modifier> modifiers = {}; ///< Modifier mask.
 
 		///
 		/// \param key Key.

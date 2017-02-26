@@ -29,7 +29,7 @@ namespace Yttrium
 		if (key < Key::_0 || key > Key::Space)
 			return '\0';
 
-		const char* map = (modifiers & Shift) ? hi_map : lo_map;
+		const char* map = (modifiers & Modifier::Shift) ? hi_map : lo_map;
 		return map[static_cast<KeyType>(key) - static_cast<KeyType>(Key::_0)];
 	}
 }
