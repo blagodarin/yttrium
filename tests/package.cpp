@@ -6,6 +6,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+// TODO: Test Reader properties.
+
 using namespace Yttrium;
 
 BOOST_AUTO_TEST_CASE(test_package)

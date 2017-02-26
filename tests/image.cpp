@@ -1,12 +1,34 @@
 #include "image.h"
 
-#include "../src/config.h"
-
 #include <array>
 
 #include <boost/test/unit_test.hpp>
 
-using namespace Yttrium;
+using Yttrium::Image;
+using Yttrium::PixelFormat;
+
+BOOST_AUTO_TEST_CASE(test_image_comparison)
+{
+	{
+		const uint8_t data = 0x01;
+		const Image image1{ { 1, 1, PixelFormat::Gray, 8 }, &data };
+		const Image image2{ { 1, 1, PixelFormat::Gray, 8 }, &data };
+		BOOST_CHECK(image1 == image2);
+	}
+	{
+		const uint8_t data1 = 0x01;
+		const uint8_t data2 = 0x02;
+		const Image image1{ { 1, 1, PixelFormat::Gray, 8 }, &data1 };
+		const Image image2{ { 1, 1, PixelFormat::Gray, 8 }, &data2 };
+		BOOST_CHECK(image1 != image2);
+	}
+	{
+		const std::array<uint8_t, 2> data = { 0x01, 0x02 };
+		const Image image1{ { 2, 1, PixelFormat::Gray, 8 }, data.data() };
+		const Image image2{ { 1, 2, PixelFormat::Gray, 8 }, data.data() };
+		BOOST_CHECK(image1 != image2);
+	}
+}
 
 BOOST_AUTO_TEST_CASE(test_gray_alpha_to_bgra)
 {

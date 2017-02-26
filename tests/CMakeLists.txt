@@ -17,6 +17,7 @@ add_executable(unit_tests
 	point.cpp
 	reader.cpp
 	rect.cpp
+	resource_loader.cpp
 	static_string.cpp
 	string.cpp
 	string_utils.cpp

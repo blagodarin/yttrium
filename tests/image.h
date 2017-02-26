@@ -22,6 +22,11 @@ namespace Yttrium
 		}
 		return true;
 	}
+
+	inline bool operator!=(const Image& a, const Image& b)
+	{
+		return !(a == b);
+	}
 }
 
 #endif

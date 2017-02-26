@@ -59,7 +59,7 @@ namespace Yttrium
 			size_t released = 0;
 			for (auto i = _map.begin(); i != _map.end(); )
 			{
-				if (i->second.unique())
+				if (i->second.use_count() == 1)
 				{
 					unused.emplace_back(std::move(i->second));
 					i = _map.erase(i);

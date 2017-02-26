@@ -26,7 +26,7 @@ namespace Yttrium
 		};
 
 		///
-		Storage(UseFileSystem);
+		explicit Storage(UseFileSystem);
 
 		///
 		~Storage();
