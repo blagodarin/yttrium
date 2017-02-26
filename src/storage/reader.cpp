@@ -135,7 +135,7 @@ namespace Yttrium
 		if (_private->_size > std::numeric_limits<size_t>::max() - 1) // One extra byte for null terminator.
 			throw std::bad_alloc();
 		string.resize(_private->_size);
-		return _private->read_at(0, const_cast<char*>(string.data()), string.size()) == string.size(); // TODO: Remove const_cast in C++17.
+		return _private->read_at(0, const_cast<char*>(string.data()), string.size()) == string.size(); // TODO-17: Remove const_cast.
 	}
 
 	size_t Reader::read_at(uint64_t offset, void* data, size_t size) const

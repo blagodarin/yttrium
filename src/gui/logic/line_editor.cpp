@@ -119,7 +119,7 @@ namespace Yttrium
 		default:
 			{
 				const char event_char = event.to_char();
-				if (event_char) // TODO: Use init-statement in C++17.
+				if (event_char) // TODO-17: Use init-statement.
 				{
 					insert(event_char);
 					break;

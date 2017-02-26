@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <boost/optional/optional.hpp> // TODO: Use std::optional in C++17.
+#include <boost/optional/optional.hpp> // TODO-17: Use std::optional.
 
 namespace Yttrium
 {

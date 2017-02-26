@@ -62,7 +62,7 @@ namespace Yttrium
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
 		std::unordered_map<std::string, FontDesc> _fonts;
-		std::unordered_map<std::string, std::unique_ptr<GuiScreen>> _screens; // TODO: Use std::string_view in C++17.
+		std::unordered_map<std::string, std::unique_ptr<GuiScreen>> _screens; // TODO-17: Use std::string_view.
 		GuiScreen* _root_screen = nullptr;
 		std::vector<GuiScreen*> _screen_stack;
 		std::shared_ptr<const Translation> _translation;

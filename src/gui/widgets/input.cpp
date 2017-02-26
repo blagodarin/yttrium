@@ -18,7 +18,7 @@ namespace Yttrium
 		_on_update = loader.load_actions("on_update"_s);
 		_on_enter = loader.load_actions("on_enter"_s);
 		std::string initial_text;
-		if (loader.load_text("text"_s, initial_text)) // TODO: Use init-statement in C++17.
+		if (loader.load_text("text"_s, initial_text)) // TODO-17: Use init-statement.
 			_logic.reset(std::move(initial_text));
 		return true;
 	}

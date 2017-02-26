@@ -31,7 +31,7 @@ namespace Yttrium
 		x |= x >> 1;
 		x |= x >> 2;
 		x |= x >> 4;
-		if (sizeof x > sizeof(int8_t)) // TODO: Use 'if constexpr' in C++17.
+		if (sizeof x > sizeof(int8_t)) // TODO-17: Use 'if constexpr'.
 			x |= x >> 8;
 		if (sizeof x > sizeof(int16_t))
 			x |= x >> 16;

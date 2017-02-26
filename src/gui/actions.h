@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include <boost/variant/variant.hpp> // TODO: Use std::variant in C++17.
+#include <boost/variant/variant.hpp> // TODO-17: Use std::variant.
 
 namespace Yttrium
 {
