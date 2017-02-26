@@ -106,9 +106,9 @@ namespace Yttrium
 
 		if (_class)
 		{
-			const IonNode& node = _class->last(name);
-			if (node.size() == 1)
-				node.first()->get(&_bound_class);
+			const IonNode& class_node = _class->last(name);
+			if (class_node.size() == 1)
+				class_node.first()->get(&_bound_class);
 		}
 	}
 

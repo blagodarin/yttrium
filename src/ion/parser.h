@@ -19,10 +19,10 @@ namespace Yttrium
 		struct Result
 		{
 			const Status status;
-			const size_t line;
-			const size_t position;
+			const std::size_t line;
+			const std::size_t position;
 
-			Result(Status status, size_t line, size_t position) : status(status), line(line), position(position) {}
+			Result(Status status_, std::size_t line_, std::size_t position_) : status(status_), line(line_), position(position_) {}
 		};
 
 		static Result parse(IonDocumentImpl&);

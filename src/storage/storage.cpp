@@ -21,16 +21,16 @@ namespace Yttrium
 		std::string buffer_name;
 		std::shared_ptr<const Buffer> buffer;
 
-		StorageAttachment(std::unique_ptr<PackageReader>&& package)
+		StorageAttachment(std::unique_ptr<PackageReader>&& package_)
 			: type(Type::Package)
-			, package(std::move(package))
+			, package(std::move(package_))
 		{
 		}
 
-		StorageAttachment(const std::string& name, Buffer&& buffer)
+		StorageAttachment(const std::string& name, Buffer&& buffer_)
 			: type(Type::Buffer)
 			, buffer_name(name)
-			, buffer(std::make_shared<const Buffer>(std::move(buffer)))
+			, buffer(std::make_shared<const Buffer>(std::move(buffer_)))
 		{
 		}
 	};

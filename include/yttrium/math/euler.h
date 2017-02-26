@@ -15,7 +15,7 @@ namespace Yttrium
 		float roll = 0;  ///<
 
 		Euler() = default;
-		Euler(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
+		Euler(float yaw_, float pitch_, float roll_) : yaw(yaw_), pitch(pitch_), roll(roll_) {}
 	};
 }
 

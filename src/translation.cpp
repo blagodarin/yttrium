@@ -27,7 +27,7 @@ namespace Yttrium
 			bool added = false;
 
 			Entry() = default;
-			Entry(std::string&& text) : text(std::move(text)) {}
+			Entry(std::string&& text_) : text(std::move(text_)) {}
 		};
 
 		std::map<String, Entry> _translations;

@@ -14,7 +14,7 @@ namespace
 		uint8_t g = 0;
 		uint8_t b = 0;
 
-		Rgb(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+		Rgb(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
 	};
 
 	const std::array<int, 24> weights =
@@ -46,29 +46,29 @@ namespace
 
 	Rgb pixel_color(int block, int x, int y)
 	{
-		const auto pixel_type = [](int x, int y)
+		const auto pixel_type = [](int x_, int y_)
 		{
-			const int rx = FragmentSize - 1 - x;
-			if (y < Border)
+			const int rx = FragmentSize - 1 - x_;
+			if (y_ < Border)
 			{
-				if (x < Border)
-					return x > y ? Top : x < y ? Left : TopLeft;
-				else if (rx < Border && y < Border)
-					return rx > y ? Top : rx < y ? Right : TopRight;
+				if (x_ < Border)
+					return x_ > y_ ? Top : x_ < y_ ? Left : TopLeft;
+				else if (rx < Border && y_ < Border)
+					return rx > y_ ? Top : rx < y_ ? Right : TopRight;
 				else
 					return Top;
 			}
-			const int ry = FragmentSize - 1 - y;
+			const int ry = FragmentSize - 1 - y_;
 			if (ry < Border)
 			{
-				if (x < Border)
-					return x > ry ? Bottom : x < ry ? Left : BottomLeft;
+				if (x_ < Border)
+					return x_ > ry ? Bottom : x_ < ry ? Left : BottomLeft;
 				else if (rx < Border && ry < Border)
 					return rx > ry ? Bottom : rx < ry ? Right : BottomRight;
 				else
 					return Bottom;
 			}
-			return x < Border ? Left : rx < Border ? Right : Center;
+			return x_ < Border ? Left : rx < Border ? Right : Center;
 		};
 		const auto base = 255;
 		const auto offset = 20 * pattern[pixel_type(x, y)];
@@ -77,7 +77,7 @@ namespace
 			const auto weight = weights[block * 3 + index];
 			return weight ? base / weight - offset : 0;
 		};
-		return Rgb(scale(0), scale(1), scale( 2));
+		return Rgb(scale(0), scale(1), scale(2));
 	}
 
 	Image make_blocks_image()

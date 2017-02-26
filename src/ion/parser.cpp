@@ -83,8 +83,8 @@ namespace
 		IonList* list = nullptr;
 
 		State() = default;
-		explicit State(IonObject* object) : object(object) {}
-		explicit State(IonList* list) : list(list) {}
+		explicit State(IonObject* object_) : object(object_) {}
+		explicit State(IonList* list_) : list(list_) {}
 	};
 }
 

@@ -124,8 +124,8 @@ namespace Yttrium
 		uint64_t offset = 0;
 		uint32_t size = 0;
 
-		Entry(const std::string& name, std::map<std::string, std::string>&& properties)
-			: name(name), properties(std::move(properties)) {}
+		Entry(const std::string& name_, std::map<std::string, std::string>&& properties_)
+			: name(name_), properties(std::move(properties_)) {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)

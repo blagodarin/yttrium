@@ -14,12 +14,11 @@ namespace Yttrium
 	class Vector2
 	{
 	public:
-
 		float x;
 		float y;
 
 		Vector2() = default;
-		Vector2(float x, float y): x(x), y(y) {}
+		Vector2(float x_, float y_): x(x_), y(y_) {}
 		explicit Vector2(const Point& point) : x(point.x()), y(point.y()) {}
 		explicit Vector2(const PointF& point) : x(point.x()), y(point.y()) {}
 		explicit Vector2(const Size& size) : x(size.width()), y(size.height()) {}
@@ -100,37 +99,16 @@ namespace Yttrium
 	class Y_API Vector4
 	{
 	public:
-
-		union
-		{
-			struct
-			{
-				float x;
-				float y;
-				float z;
-				float w;
-			};
-			struct
-			{
-				float r;
-				float g;
-				float b;
-				float a;
-			};
-			struct
-			{
-				float s;
-				float t;
-				float p;
-				float q;
-			};
-		};
+		union { float x; float r; float s; };
+		union { float y; float g; float t; };
+		union { float z; float b; float p; };
+		union { float w; float a; float q; };
 
 		///
 		Vector4() = default;
 
 		///
-		Vector4(float x, float y, float z, float w = 1): x(x), y(y), z(z), w(w) {}
+		Vector4(float x_, float y_, float z_, float w_ = 1): x(x_), y(y_), z(z_), w(w_) {}
 
 		///
 		float* data() { return &x; }

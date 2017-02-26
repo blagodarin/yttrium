@@ -90,10 +90,10 @@ namespace
 		const unsigned blocks;
 		const unsigned cycles;
 
-		AllocateSetup(size_t size, unsigned blocks, unsigned cycles)
-			: size(size)
-			, blocks(blocks)
-			, cycles(cycles)
+		AllocateSetup(size_t size_, unsigned blocks_, unsigned cycles_)
+			: size(size_)
+			, blocks(blocks_)
+			, cycles(cycles_)
 		{
 			if (blocks > _malloc_allocations.size() || blocks > _buffer_allocations.size())
 				throw std::logic_error("Insufficient allocation list size");
@@ -190,8 +190,8 @@ namespace
 				while (j < setup.blocks)
 				{
 					const auto allocation = static_cast<uint8_t*>(::malloc(setup.size));
-					for (size_t i = 0; i < setup.size; i += Granularity)
-						allocation[i] = -1;
+					for (std::size_t k = 0; k < setup.size; k += Granularity)
+						allocation[k] = -1;
 					_malloc_allocations[j++] = allocation;
 				}
 				do
@@ -213,8 +213,8 @@ namespace
 				while (j < setup.blocks)
 				{
 					Buffer buffer(setup.size);
-					for (size_t i = 0; i < setup.size; i += Granularity)
-						buffer[i] = -1;
+					for (std::size_t k = 0; k < setup.size; k += Granularity)
+						buffer[k] = -1;
 					_buffer_allocations[j++] = std::move(buffer);
 				}
 				do
@@ -275,12 +275,8 @@ namespace
 		const size_t final_size;
 		const unsigned cycles;
 
-		ReallocateSetup(size_t initial_size, size_t final_size, unsigned cycles)
-			: initial_size(initial_size)
-			, final_size(final_size)
-			, cycles(cycles)
-		{
-		}
+		ReallocateSetup(size_t initial_size_, size_t final_size_, unsigned cycles_)
+			: initial_size(initial_size_), final_size(final_size_), cycles(cycles_) {}
 	};
 
 	std::ostream& operator<<(std::ostream& stream, const ReallocateSetup& setup)
@@ -348,8 +344,8 @@ namespace
 				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
 				{
 					allocation = ::realloc(allocation, size);
-					for (size_t i = size / 2; i < size; i += Granularity)
-						static_cast<uint8_t*>(allocation)[i] = -1;
+					for (auto j = size / 2; j < size; j += Granularity)
+						static_cast<uint8_t*>(allocation)[j] = -1;
 				}
 				::free(allocation);
 			}
@@ -367,8 +363,8 @@ namespace
 				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
 				{
 					buffer.resize(size);
-					for (size_t i = size / 2; i < size; i += Granularity)
-						buffer[i] = -1;
+					for (auto j = size / 2; j < size; j += Granularity)
+						buffer[j] = -1;
 				}
 			}
 		} while (measurement.next_iteration(setup.cycles));

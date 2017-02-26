@@ -20,7 +20,7 @@ namespace Tetrium
 		int y = 0;
 
 		Point() = default;
-		Point(int x, int y) : x(x), y(y) {}
+		Point(int x_, int y_) : x(x_), y(y_) {}
 	};
 
 	// Data representing the falling tetromino.

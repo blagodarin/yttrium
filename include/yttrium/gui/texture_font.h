@@ -34,6 +34,8 @@ namespace Yttrium
 		/// May throw DataError.
 		static std::unique_ptr<TextureFont> open(Reader&&);
 
+		virtual ~TextureFont() = default;
+
 		///
 		virtual void build(std::vector<TexturedRect>&, const PointF& top_left, float font_size, const std::string&, TextCapture* = nullptr) const = 0;
 

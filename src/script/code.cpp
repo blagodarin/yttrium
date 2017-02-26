@@ -16,8 +16,8 @@ namespace Yttrium
 		std::string name;
 		std::vector<ScriptValue*> args;
 
-		ScriptCommand(const StaticString& name)
-			: name(name.text(), name.size())
+		ScriptCommand(const StaticString& name_)
+			: name(name_.text(), name_.size())
 		{
 		}
 	};

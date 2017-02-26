@@ -29,8 +29,8 @@ namespace Yttrium
 
 	private:
 
-		ScriptCall(ScriptContext& context, const std::string& function, std::string& result, const ScriptArgs& args)
-			: context(context), function(function), result(result), args(args) {}
+		ScriptCall(ScriptContext& context_, const std::string& function_, std::string& result_, const ScriptArgs& args_)
+			: context(context_), function(function_), result(result_), args(args_) {}
 	};
 
 	/// Script context.

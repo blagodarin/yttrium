@@ -23,6 +23,8 @@ namespace Yttrium
 		/// May throw DataError.
 		static std::unique_ptr<Translation> open(const Reader&);
 
+		virtual ~Translation() = default;
+
 		///
 		virtual void add(const StaticString& source) = 0;
 

@@ -206,25 +206,19 @@ namespace Yttrium
 			Alt     = 1 << 2, ///< Key::LAlt or Key::RAlt is pressed.
 		};
 
-		Key      key;        ///< Key.
-		bool     pressed;    ///< Is the key pressed?
-		bool     autorepeat; ///< Is it an autorepeat event?
-		unsigned modifiers;  ///< Modifier mask.
+		Key      key;           ///< Key.
+		bool     pressed;       ///< Is the key pressed?
+		bool     autorepeat;    ///< Is it an autorepeat event?
+		unsigned modifiers = 0; ///< Modifier mask.
 
 		///
 		/// \param key Key.
 		/// \param pressed Press count.
 		/// \param modifiers Modifier mask.
-		KeyEvent(Key key, bool pressed, bool autorepeat)
-			: key(key)
-			, pressed(pressed)
-			, autorepeat(autorepeat)
-			, modifiers(0)
-		{
-		}
+		KeyEvent(Key key_, bool pressed_, bool autorepeat_)
+			: key(key_), pressed(pressed_), autorepeat(autorepeat_) {}
 
 		///
-		/// \return
 		char to_char() const;
 	};
 }

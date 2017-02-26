@@ -30,6 +30,8 @@ namespace Yttrium
 			double loop = 0; ///< Position to loop playback at.
 		};
 
+		virtual ~Music() = default;
+
 		///
 		virtual void set_settings(const Settings&) = 0;
 	};

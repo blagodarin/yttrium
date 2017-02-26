@@ -16,7 +16,7 @@ namespace Yttrium
 		RectF texture;  ///<
 
 		TexturedRect() = default;
-		TexturedRect(const RectF& geometry, const RectF& texture) : geometry(geometry), texture(texture) {}
+		TexturedRect(const RectF& geometry_, const RectF& texture_) : geometry(geometry_), texture(texture_) {}
 	};
 }
 

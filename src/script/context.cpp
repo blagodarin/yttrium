@@ -14,15 +14,15 @@ namespace Yttrium
 	struct ScriptCommandContext
 	{
 		ScriptContext::Command command;
-		size_t min_args = 0;
-		size_t max_args = 0;
+		std::size_t min_args = 0;
+		std::size_t max_args = 0;
 
 		ScriptCommandContext() = default;
 
-		ScriptCommandContext(ScriptContext::Command command, size_t min_args, size_t max_args)
-			: command(command)
-			, min_args(min_args)
-			, max_args(max_args)
+		ScriptCommandContext(ScriptContext::Command command_, std::size_t min_args_, std::size_t max_args_)
+			: command(command_)
+			, min_args(min_args_)
+			, max_args(max_args_)
 		{
 		}
 	};
