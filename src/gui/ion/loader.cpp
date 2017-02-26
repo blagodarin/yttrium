@@ -79,30 +79,6 @@ namespace
 		return std::make_tuple(key->string(), GuiIonPropertyLoader::load_actions(*on_press->object()),
 			on_release != source.end() ? GuiIonPropertyLoader::load_actions(*on_release->object()) : GuiActions());
 	}
-
-	enum GuiAttribute : unsigned
-	{
-		IsDefault     = 1 << 0,
-		IsRoot        = 1 << 1,
-		IsTransparent = 1 << 2,
-	};
-
-	const std::pair<StaticString, GuiAttribute> _root_attributes[] =
-	{
-		{ "default"_s, IsDefault },
-		{ "root"_s, IsRoot },
-		{ "transparent"_s, IsTransparent },
-	};
-
-	unsigned find_attribute(const StaticString& value)
-	{
-		for (const auto& attribute : _root_attributes)
-		{
-			if (attribute.first == value)
-				return attribute.second;
-		}
-		return 0;
-	}
 }
 
 namespace Yttrium
@@ -125,9 +101,29 @@ namespace Yttrium
 		}
 	}
 
+	enum class GuiIonLoader::Attribute
+	{
+		Unknown     = 0,
+		Default     = 1 << 0,
+		Root        = 1 << 1,
+		Transparent = 1 << 2,
+	};
+
+	GuiIonLoader::Attribute GuiIonLoader::load_attribute(const StaticString& name)
+	{
+		if (name == "default"_s)
+			return Attribute::Default;
+		else if (name == "root"_s)
+			return Attribute::Root;
+		else if (name == "transparent"_s)
+			return Attribute::Transparent;
+		else
+			return Attribute::Unknown;
+	}
+
 	void GuiIonLoader::load(const IonObject& source)
 	{
-		static const std::map<StaticString, void (GuiIonLoader::*)(const IonNode&, unsigned)> handlers =
+		static const std::map<StaticString, void (GuiIonLoader::*)(const IonNode&, Flags<Attribute>)> handlers =
 		{
 			{ "class"_s, &GuiIonLoader::load_class },
 			{ "cursor"_s, &GuiIonLoader::load_cursor },
@@ -138,13 +134,13 @@ namespace Yttrium
 			{ "translation"_s, &GuiIonLoader::load_translation },
 		};
 
-		unsigned attributes = 0;
+		Flags<Attribute> attributes;
 		for (const auto& node : source)
 		{
 			if (node.is_empty())
 			{
-				const auto attribute = ::find_attribute(node.name());
-				if (!attribute)
+				const auto attribute = load_attribute(node.name());
+				if (attribute == Attribute::Unknown)
 					throw GuiDataError("Unknown attribute '"_s, node.name(), "'"_s);
 				attributes |= attribute;
 			}
@@ -154,12 +150,12 @@ namespace Yttrium
 				if (i == handlers.end())
 					throw GuiDataError("Unknown entry '"_s, node.name(), "'"_s);
 				(this->*i->second)(node, attributes);
-				attributes = 0;
+				attributes = {};
 			}
 		}
 	}
 
-	void GuiIonLoader::load_class(const IonNode& node, unsigned)
+	void GuiIonLoader::load_class(const IonNode& node, Flags<Attribute>)
 	{
 		const auto& element = ::load_element(node);
 		if (!element.object || !element.name)
@@ -175,7 +171,7 @@ namespace Yttrium
 		throw GuiDataError("Bad '"_s, node.name(), "' \""_s, *element.name, "\""_s);
 	}
 
-	void GuiIonLoader::load_cursor(const IonNode& node, unsigned)
+	void GuiIonLoader::load_cursor(const IonNode& node, Flags<Attribute>)
 	{
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::Object)
@@ -206,7 +202,7 @@ namespace Yttrium
 			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
 	}
 
-	void GuiIonLoader::load_font(const IonNode& node, unsigned attributes)
+	void GuiIonLoader::load_font(const IonNode& node, Flags<Attribute> attributes)
 	{
 		auto element = ::load_element(node);
 		if (!element.object)
@@ -216,7 +212,7 @@ namespace Yttrium
 		if (!element.name)
 			element.name = &default_name;
 
-		if (attributes & IsDefault)
+		if (attributes & Attribute::Default)
 		{
 			if (_has_default_font)
 				throw GuiDataError("Default '"_s, node.name(), "' redefinition"_s);
@@ -235,7 +231,7 @@ namespace Yttrium
 		_gui.set_font(element.name->to_std(), *font_name, *texture_name);
 	}
 
-	void GuiIonLoader::load_include(const IonNode& node, unsigned)
+	void GuiIonLoader::load_include(const IonNode& node, Flags<Attribute>)
 	{
 		const StaticString* path;
 		if (!Ion::get(node, path))
@@ -243,7 +239,7 @@ namespace Yttrium
 		load(*path);
 	}
 
-	void GuiIonLoader::load_screen(const IonNode& node, unsigned attributes)
+	void GuiIonLoader::load_screen(const IonNode& node, Flags<Attribute> attributes)
 	{
 		static const std::map<StaticString, std::pair<void (GuiIonLoader::*)(GuiScreen&, const IonNode&, int) const, int>> handlers =
 		{
@@ -264,7 +260,7 @@ namespace Yttrium
 		if (!element.name)
 			throw GuiDataError("'"_s, node.name(), "' must have a name"_s);
 
-		auto& screen = _gui.add_screen(element.name->to_std(), attributes == IsTransparent, attributes & IsRoot);
+		auto& screen = _gui.add_screen(element.name->to_std(), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
 		for (const auto& screen_node : *element.object)
 		{
 			const auto i = handlers.find(screen_node.name());
@@ -274,7 +270,7 @@ namespace Yttrium
 		}
 	}
 
-	void GuiIonLoader::load_on_key(const IonNode& node, unsigned)
+	void GuiIonLoader::load_on_key(const IonNode& node, Flags<Attribute>)
 	{
 		auto binding = ::load_on_key(node);
 		if (!binding)
@@ -282,7 +278,7 @@ namespace Yttrium
 		_gui.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
 	}
 
-	void GuiIonLoader::load_translation(const IonNode& node, unsigned)
+	void GuiIonLoader::load_translation(const IonNode& node, Flags<Attribute>)
 	{
 		const StaticString* path;
 		if (!Ion::get(node, path))
