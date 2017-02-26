@@ -101,102 +101,69 @@ BOOST_AUTO_TEST_CASE(test_reader_read_all_string)
 	BOOST_CHECK(!::memcmp(actual.data(), expected.data(), expected.size()));
 }
 
-BOOST_AUTO_TEST_CASE(test_reader_read_line_std_string)
+BOOST_AUTO_TEST_CASE(test_reader_read_line_unbuffered)
 {
+	struct Entry
 	{
-		const std::string data = "hello\nworld";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "world");
-		BOOST_CHECK_EQUAL(reader.offset(), 11);
-		BOOST_CHECK(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
+		size_t text_size;
+		std::string newline;
+		std::string comment;
+	};
+	BOOST_TEST_CONTEXT("Unbuffered")
+	{
+		static const Entry entries[] =
+		{
+			{ 17, "\n",   "Short newline"    },
+			{ 17, "\r",   "Short newline #2" },
+			{ 17, "\r\n", "Long newline"     },
+			{ 17, "",     "No newline"       },
+		};
+		for (const auto& entry : entries)
+		{
+			BOOST_TEST_CONTEXT(entry.comment)
+			{
+				const std::string text(entry.text_size, 'A');
+				const std::string data = text + entry.newline;
+				Reader unbuffered_reader(data.data(), data.size());
+				std::string line;
+				BOOST_REQUIRE(unbuffered_reader.read_line(line));
+				BOOST_CHECK_EQUAL(line, text);
+				BOOST_REQUIRE_EQUAL(unbuffered_reader.offset(), data.size());
+				BOOST_REQUIRE(!unbuffered_reader.read_line(line));
+				BOOST_CHECK(line.empty());
+			}
+		}
 	}
+	BOOST_TEST_CONTEXT("Buffered")
 	{
-		const std::string data = "hello\rworld";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "world");
-		BOOST_CHECK_EQUAL(reader.offset(), 11);
-		BOOST_CHECK(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
-	}
-	{
-		const std::string data = "hello\r\nworld";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 7);
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "world");
-		BOOST_CHECK_EQUAL(reader.offset(), 12);
-		BOOST_CHECK(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
-	}
-	{
-		const std::string data = "hello\n\rworld";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK(line.empty());
-		BOOST_REQUIRE_EQUAL(reader.offset(), 7);
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "world");
-		BOOST_CHECK_EQUAL(reader.offset(), 12);
-		BOOST_CHECK(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
-	}
-	{
-		const std::string data = "hello";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 5);
-		BOOST_REQUIRE(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
-	}
-	{
-		const std::string data = "hello\n";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
-		BOOST_REQUIRE(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
-	}
-	{
-		const std::string data = "hello\r";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 6);
-		BOOST_REQUIRE(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
-	}
-	{
-		const std::string data = "hello\r\n";
-		Reader reader(data.data(), data.size());
-		std::string line;
-		BOOST_REQUIRE(reader.read_line(line));
-		BOOST_CHECK_EQUAL(line, "hello");
-		BOOST_REQUIRE_EQUAL(reader.offset(), 7);
-		BOOST_REQUIRE(!reader.read_line(line));
-		BOOST_CHECK(line.empty());
+		static const Entry entries[] =
+		{
+			{ 31, "\n",   "Short newline, one buffer"             },
+			{ 30, "\r\n", "Long newline, one buffer"              },
+			{ 31, "\r\n", "Split long newline"                    },
+			{ 31, "\r",   "Potentially split long newline"        },
+			{ 32, "\n",   "Short newline in the second buffer"    },
+			{ 33, "\r\n", "Text and newline in the second buffer" },
+			{ 31, "",     "No newline, less than one buffer"      },
+			{ 32, "",     "No newline, exactly one buffer"        },
+			{ 33, "",     "No newline, more than one buffer"      },
+		};
+		for (const auto& entry : entries)
+		{
+			BOOST_TEST_CONTEXT(entry.comment)
+			{
+				const std::string text(entry.text_size, 'A');
+				const std::string data = text + entry.newline;
+				Reader unbuffered_reader(data.data(), data.size());
+				Reader buffered_reader(unbuffered_reader, 0, unbuffered_reader.size());
+				std::string line;
+				BOOST_REQUIRE(buffered_reader.read_line(line));
+				BOOST_CHECK_EQUAL(line, text);
+				BOOST_REQUIRE_EQUAL(buffered_reader.offset(), data.size());
+				BOOST_REQUIRE(!buffered_reader.read_line(line));
+				BOOST_CHECK(line.empty());
+			}
+		}
 	}
 }
 
