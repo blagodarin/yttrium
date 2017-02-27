@@ -9,14 +9,17 @@
 using Yttrium::Buffer;
 using Yttrium::Reader;
 
-inline Buffer make_random_buffer(size_t size)
+namespace
 {
-	std::default_random_engine engine;
-	std::uniform_int_distribution<uint8_t> distribution{ 0, std::numeric_limits<uint8_t>::max() };
-	Buffer buffer(size);
-	for (auto& byte : buffer)
-		byte = distribution(engine);
-	return buffer;
+	Buffer make_random_buffer(size_t size)
+	{
+		std::default_random_engine engine;
+		std::uniform_int_distribution<uint8_t> distribution{ 0, std::numeric_limits<uint8_t>::max() };
+		Buffer buffer(size);
+		for (auto& byte : buffer)
+			byte = distribution(engine);
+		return buffer;
+	}
 }
 
 BOOST_AUTO_TEST_CASE(test_reader_construction)
@@ -109,6 +112,7 @@ BOOST_AUTO_TEST_CASE(test_reader_read_line_unbuffered)
 		std::string newline;
 		std::string comment;
 	};
+
 	BOOST_TEST_CONTEXT("Unbuffered")
 	{
 		static const Entry entries[] =
@@ -118,6 +122,7 @@ BOOST_AUTO_TEST_CASE(test_reader_read_line_unbuffered)
 			{ 17, "\r\n", "Long newline"     },
 			{ 17, "",     "No newline"       },
 		};
+
 		for (const auto& entry : entries)
 		{
 			BOOST_TEST_CONTEXT(entry.comment)
@@ -134,6 +139,7 @@ BOOST_AUTO_TEST_CASE(test_reader_read_line_unbuffered)
 			}
 		}
 	}
+
 	BOOST_TEST_CONTEXT("Buffered")
 	{
 		static const Entry entries[] =
@@ -148,6 +154,7 @@ BOOST_AUTO_TEST_CASE(test_reader_read_line_unbuffered)
 			{ 32, "",     "No newline, exactly one buffer"        },
 			{ 33, "",     "No newline, more than one buffer"      },
 		};
+
 		for (const auto& entry : entries)
 		{
 			BOOST_TEST_CONTEXT(entry.comment)

@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(test_dds_reading)
 {
 	const auto image = Image::load(Reader("tests/image/gradient32.dds"));
 	BOOST_REQUIRE(image);
-	BOOST_CHECK(*image == make_test_image(true));
+	BOOST_CHECK(*image == ::make_test_image(true));
 }
 
 #ifndef Y_NO_JPEG
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_jpeg_reading)
 BOOST_AUTO_TEST_CASE(test_png_writing)
 {
 	TemporaryFile file;
-	BOOST_REQUIRE(make_test_image(false).save(file.name(), ImageType::Png));
+	BOOST_REQUIRE(::make_test_image(false).save(file.name(), ImageType::Png));
 	const auto expected = Reader("tests/image/gradient24.png").to_buffer();
 	const auto actual = Reader(file).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
@@ -52,13 +52,13 @@ BOOST_AUTO_TEST_CASE(test_tga_reading)
 {
 	const auto image = Image::load(Reader("tests/image/gradient32.tga"));
 	BOOST_REQUIRE(image);
-	BOOST_CHECK(*image == make_test_image(true));
+	BOOST_CHECK(*image == ::make_test_image(true));
 }
 
 BOOST_AUTO_TEST_CASE(test_tga_writing)
 {
 	TemporaryFile file;
-	BOOST_REQUIRE(make_test_image(true).save(file.name(), ImageType::Tga));
+	BOOST_REQUIRE(::make_test_image(true).save(file.name(), ImageType::Tga));
 	const auto expected = Reader("tests/image/gradient32.tga").to_buffer();
 	const auto actual = Reader(file).to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);

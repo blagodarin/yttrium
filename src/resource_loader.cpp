@@ -52,7 +52,7 @@ namespace Yttrium
 			return resource_ptr;
 		}
 
-		bool release_unused()
+		auto release_unused()
 		{
 			std::vector<std::shared_ptr<const T>> unused;
 			std::lock_guard<std::mutex> lock(_mutex);
@@ -68,7 +68,7 @@ namespace Yttrium
 				else
 					++i;
 			}
-			return released > 0;
+			return released;
 		}
 	};
 
@@ -80,14 +80,15 @@ namespace Yttrium
 
 		bool release_unused()
 		{
-			return _material_cache.release_unused() // Uses textures.
-				|| _ion_document_cache.release_unused()
-				|| _mesh_cache.release_unused()
-				|| _music_cache.release_unused()
-				|| _sound_cache.release_unused()
-				|| _texture_2d_cache.release_unused()
-				|| _texture_font_cache.release_unused()
-				|| _translation_cache.release_unused();
+			auto released = _material_cache.release_unused(); // Uses textures.
+			released += _ion_document_cache.release_unused();
+			released += _mesh_cache.release_unused();
+			released += _music_cache.release_unused();
+			released += _sound_cache.release_unused();
+			released += _texture_2d_cache.release_unused();
+			released += _texture_font_cache.release_unused();
+			released += _translation_cache.release_unused();
+			return released > 0;
 		}
 
 	public:
