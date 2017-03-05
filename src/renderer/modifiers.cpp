@@ -45,7 +45,7 @@ namespace Yttrium
 		: RendererModifier(renderer)
 		, _material(material)
 		, _gpu_program(renderer, &static_cast<const MaterialImpl*>(_material)->gpu_program())
-		, _texture(renderer, static_cast<const MaterialImpl*>(_material)->texture(), Texture2D::NearestFilter | Texture2D::AnisotropicFilter)
+		, _texture(renderer, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<const MaterialImpl*>(_material)->texture_filter())
 	{
 	}
 

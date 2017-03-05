@@ -132,6 +132,7 @@ namespace Yttrium
 			StaticString vertex_shader;
 			StaticString fragment_shader;
 			std::shared_ptr<const Texture2D> texture;
+			Texture2D::Filter texture_filter = Texture2D::NearestFilter;
 			for (const auto& node : document->root())
 			{
 				if (node.name() == "vertex_shader"_s)
@@ -152,7 +153,74 @@ namespace Yttrium
 				}
 				else if (node.name() == "texture"_s)
 				{
-					if (node.size() != 1 || node.begin()->type() != IonValue::Type::String || node.begin()->string().is_empty())
+					auto i = node.begin();
+					if (i == node.end() || i->type() != IonValue::Type::String || i->string().is_empty())
+						throw DataError("("_s, name, ") Bad 'texture'"_s);
+					++i;
+					if (i != node.end())
+					{
+						if (i->type() != IonValue::Type::Object)
+							throw DataError("("_s, name, ") Bad 'texture'"_s);
+
+						const auto load_texture_filter = [](const IonObject& object) -> boost::optional<Texture2D::Filter> // TODO: Merge with GuiIonPropertyLoader::load_texture.
+						{
+							Texture2D::Filter f = Texture2D::NearestFilter;
+							bool has_interpolation = false;
+							bool has_anisotropy = false;
+							for (const auto& n : object)
+							{
+								if (!n.is_empty())
+									return {};
+								if (n.name() == "nearest"_s)
+								{
+									if (has_interpolation)
+										return {};
+									f = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (f & Texture2D::AnisotropicFilter));
+									has_interpolation = true;
+								}
+								else if (n.name() == "linear"_s)
+								{
+									if (has_interpolation)
+										return {};
+									f = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (f & Texture2D::AnisotropicFilter));
+									has_interpolation = true;
+								}
+								else if (n.name() == "bilinear"_s)
+								{
+									if (has_interpolation)
+										return {};
+									f = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (f & Texture2D::AnisotropicFilter));
+									has_interpolation = true;
+								}
+								else if (n.name() == "trilinear"_s)
+								{
+									if (has_interpolation)
+										return {};
+									f = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (f & Texture2D::AnisotropicFilter));
+									has_interpolation = true;
+								}
+								else if (n.name() == "anisotropic"_s)
+								{
+									if (!has_interpolation || has_anisotropy)
+										return {};
+									f = static_cast<Texture2D::Filter>((f & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
+									has_anisotropy = true;
+								}
+								else
+									return {};
+							}
+							return f;
+						};
+
+						const auto maybe_filter = load_texture_filter(*i->object());
+						if (!maybe_filter)
+							throw DataError("("_s, name, ") Bad 'texture'"_s);
+						texture_filter = *maybe_filter;
+						++i;
+						if (i != node.end())
+							throw DataError("("_s, name, ") Bad 'texture'"_s);
+					}
+					else if (node.size() > 2)
 						throw DataError("("_s, name, ") Bad 'texture'"_s);
 					if (texture)
 						throw DataError("("_s, name, ") Duplicate 'texture'"_s);
@@ -166,7 +234,7 @@ namespace Yttrium
 			auto program = _private->_renderer->create_gpu_program(_private->_storage.open(vertex_shader).to_string(), _private->_storage.open(fragment_shader).to_string());
 			if (!program)
 				throw DataError("("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s);
-			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture));
+			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
 		});
 	}
 
