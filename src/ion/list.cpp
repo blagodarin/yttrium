@@ -21,12 +21,6 @@ namespace Yttrium
 		--_size;
 	}
 
-	void IonListRange::pop_last()
-	{
-		_last = _last->_previous;
-		--_size;
-	}
-
 	IonList* IonList::append_list()
 	{
 		IonValue* new_value = _document.new_list_value();

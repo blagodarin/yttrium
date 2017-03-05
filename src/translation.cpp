@@ -5,8 +5,12 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/ion/writer.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/string.h>
+
+#include <algorithm>
 
 namespace Yttrium
 {
@@ -17,7 +21,7 @@ namespace Yttrium
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
-		bool save(const std::string&) const override;
+		void save(const std::string&) const override;
 		std::string translate(const StaticString& source) const override;
 
 	private:
@@ -69,16 +73,21 @@ namespace Yttrium
 				i = _translations.erase(i);
 	}
 
-	bool TranslationImpl::save(const std::string& path) const
+	void TranslationImpl::save(const std::string& path) const
 	{
-		const auto document = IonDocument::create();
-		for (const auto& translation : _translations)
+		std::vector<std::pair<StaticString, StaticString>> translations;
+		translations.reserve(_translations.size());
+		std::for_each(_translations.begin(), _translations.end(), [&translations](const auto& t){ translations.emplace_back(t.first, StaticString{ t.second.text }); });
+		std::sort(translations.begin(), translations.end(), [](const auto& a, const auto& b){ return a.first < b.first; });
+		Writer writer{ path };
+		IonWriter ion{ writer, IonWriter::Formatting::Pretty };
+		for (const auto& translation : translations)
 		{
-			auto& node = *document->root().append("tr"_s);
-			node.append(translation.first);
-			node.append(StaticString{ translation.second.text });
+			ion.add_name("tr"_s);
+			ion.add_value(translation.first);
+			ion.add_value(translation.second);
 		}
-		return document->save(path);
+		ion.flush();
 	}
 
 	std::string TranslationImpl::translate(const StaticString& source) const

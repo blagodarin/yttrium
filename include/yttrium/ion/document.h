@@ -18,13 +18,6 @@ namespace Yttrium
 	class Y_API IonDocument
 	{
 	public:
-		///
-		enum class Formatting
-		{
-			Pretty, ///<
-			Compact, ///<
-		};
-
 		/// Creates an empty document.
 		static std::unique_ptr<IonDocument> create();
 
@@ -39,9 +32,6 @@ namespace Yttrium
 		///
 		virtual IonObject& root() = 0;
 		virtual const IonObject& root() const = 0;
-
-		///
-		virtual bool save(const std::string& path, Formatting = Formatting::Pretty) const = 0;
 	};
 }
 

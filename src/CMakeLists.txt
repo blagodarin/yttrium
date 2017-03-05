@@ -180,6 +180,7 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/ion/object.h
 	../include/yttrium/ion/utils.h
 	../include/yttrium/ion/value.h
+	../include/yttrium/ion/writer.h
 	ion/document.cpp
 	ion/document.h
 	ion/list.cpp
@@ -188,8 +189,8 @@ target_sources(yttrium PRIVATE
 	ion/parser.cpp
 	ion/parser.h
 	ion/utils.cpp
-	ion/utils.h
 	ion/value.cpp
+	ion/writer.cpp
 	)
 
 ########################################################################################################################

@@ -101,7 +101,6 @@ namespace Yttrium
 		bool is_empty() const { return !_size; }
 		const IonValue& last() const { return *_last; }
 		void pop_first();
-		void pop_last();
 		size_t size() const { return _size; }
 		const IonValue* operator ->() const { return _first; }
 	private:

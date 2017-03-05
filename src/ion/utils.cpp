@@ -1,9 +1,8 @@
-#include "utils.h"
+#include <yttrium/ion/utils.h>
 
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
-#include <yttrium/string_utils.h>
 
 namespace
 {
@@ -32,89 +31,6 @@ namespace
 			break;
 		}
 	}
-
-	void serialize_list(std::string&, const IonList&, bool is_node, int indentation);
-	void serialize_object(std::string&, const IonObject&, bool is_root, int indentation);
-
-	void serialize_value(std::string& result, const IonValue& value, int indentation)
-	{
-		switch (value.type())
-		{
-		case IonValue::Type::List:
-			serialize_list(result, value.list(), false, indentation + (indentation >= 0));
-			break;
-		case IonValue::Type::Object:
-			serialize_object(result, *value.object(), false, indentation);
-			break;
-		default:
-			append_to(result, '"', value.string().escaped("\\\"", '\\'), '"');
-			break;
-		}
-	}
-
-	void serialize_list(std::string& result, const IonList& list, bool is_node, int indentation)
-	{
-		if (!is_node)
-			append_to(result, '[');
-		auto value = list.begin();
-		if (value != list.end())
-		{
-			if (is_node && indentation >= 0 && value->type() != IonValue::Type::Object)
-				append_to(result, ' ');
-			for (;;)
-			{
-				serialize_value(result, *value, indentation);
-				++value;
-				if (value == list.end())
-					break;
-				if (indentation >= 0 && value->type() != IonValue::Type::Object)
-					append_to(result, ' ');
-			}
-		}
-		if (!is_node)
-			append_to(result, ']');
-	}
-
-	void serialize_node(std::string& result, const IonNode& node, int indentation)
-	{
-		if (indentation > 0)
-			append_to(result, Repeat{ '\t', indentation });
-		append_to(result, node.name());
-		if (!node.is_empty())
-			serialize_list(result, node, true, indentation);
-	}
-
-	void serialize_object(std::string& result, const IonObject& object, bool is_root, int indentation)
-	{
-		if (indentation < 0)
-		{
-			if (!is_root)
-				append_to(result, '{');
-			bool need_separator = false;
-			for (const auto& node : object)
-			{
-				if (need_separator)
-					append_to(result, ' ');
-				serialize_node(result, node, indentation);
-				need_separator = node.is_empty();
-			}
-			if (!is_root)
-				append_to(result, '}');
-		}
-		else
-		{
-			if (!is_root)
-				append_to(result, '\n', Repeat{ '\t', indentation }, "{\n"_s);
-			const auto node_indentation = indentation + !is_root;
-			for (const auto& node : object)
-			{
-				serialize_node(result, node, node_indentation);
-				append_to(result, '\n');
-			}
-			if (!is_root)
-				append_to(result, Repeat{ '\t', indentation }, '}');
-		}
-	}
 }
 
 namespace Yttrium
@@ -131,13 +47,6 @@ namespace Yttrium
 		bool get(const IonNode& source, const StaticString*& value)
 		{
 			return !source.is_empty() && source.last()->get(&value);
-		}
-
-		std::string serialize(const IonObject& object, bool root, int indentation)
-		{
-			std::string result;
-			::serialize_object(result, object, root, indentation);
-			return result;
 		}
 	}
 }

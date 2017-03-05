@@ -21,7 +21,6 @@ namespace Yttrium
 
 		IonObject& root() override { return _root; }
 		const IonObject& root() const override { return _root; }
-		bool save(const std::string&, Formatting) const override;
 
 		void clear();
 		bool exists() const { return _exists; }

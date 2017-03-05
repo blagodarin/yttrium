@@ -42,9 +42,6 @@ namespace Yttrium
 		IonObjectIterator end() const;
 
 		///
-		const IonNode& first(const StaticString& name) const;
-
-		///
 		const IonNode& last(const StaticString& name) const;
 
 		///
@@ -63,7 +60,6 @@ namespace Yttrium
 		IonObject(IonDocumentImpl& document);
 
 		Y_PRIVATE IonNode* append(const StaticString& name, const ByReference&);
-		Y_PRIVATE void clear();
 
 	private:
 		IonDocumentImpl& _document;

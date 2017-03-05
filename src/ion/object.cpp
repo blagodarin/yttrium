@@ -27,18 +27,6 @@ namespace Yttrium
 		return IonObjectIterator(_nodes.empty() ? nullptr : &_nodes.back() + 1);
 	}
 
-	const IonNode& IonObject::first(const StaticString& name) const
-	{
-		const auto i = _node_map.find({ name, ByReference{} });
-		if (i != _node_map.end())
-		{
-			const auto& nodes = i->second;
-			if (!nodes.empty())
-				return *nodes.front();
-		}
-		return IonDocumentImpl::null_node;
-	}
-
 	const IonNode& IonObject::last(const StaticString& name) const
 	{
 		const auto i = _node_map.find({ name, ByReference{} });
@@ -72,11 +60,5 @@ namespace Yttrium
 		_nodes.emplace_back(node);
 		_node_map[node->_name].emplace_back(node);
 		return node;
-	}
-
-	void IonObject::clear()
-	{
-		_node_map.clear();
-		_nodes.clear();
 	}
 }

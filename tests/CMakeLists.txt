@@ -6,6 +6,7 @@ add_executable(unit_tests
 	image.h
 	image_formats.cpp
 	image_formats.h
+	ion_writer.cpp
 	ion.cpp
 	iostream.cpp
 	iostream.h
@@ -19,8 +20,8 @@ add_executable(unit_tests
 	rect.cpp
 	resource_loader.cpp
 	static_string.cpp
-	string.cpp
 	string_utils.cpp
+	string.cpp
 	texture_font.cpp
 	tiny_string_map.cpp
 	utils.cpp

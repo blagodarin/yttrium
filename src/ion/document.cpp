@@ -3,9 +3,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/list.h>
 #include <yttrium/storage/reader.h>
-#include <yttrium/storage/writer.h>
 #include "parser.h"
-#include "utils.h"
 
 namespace Yttrium
 {
@@ -19,11 +17,6 @@ namespace Yttrium
 		, _nodes{ 32 }
 		, _values{ 32 }
 	{
-	}
-
-	bool IonDocumentImpl::save(const std::string& path, Formatting formatting) const
-	{
-		return Writer(path).write_all(StaticString{ Ion::serialize(_root, true, formatting == Formatting::Pretty ? 0 : -1) });
 	}
 
 	IonValue* IonDocumentImpl::new_list_value()
