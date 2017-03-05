@@ -10,19 +10,11 @@
 
 namespace Yttrium
 {
-	struct Repeat
-	{
-		const char _value;
-		const size_t _count;
-		Repeat(char value, int count) : _value(value), _count(count) {}
-	};
-
 	namespace detail
 	{
 		inline void append_to(std::string& string, char value) { string.append(1, value); }
 		inline void append_to(std::string& string, const char* value) { string.append(value); }
 		inline void append_to(std::string& string, const std::string& value) { string.append(value); }
-		inline void append_to(std::string& string, const Repeat& value) { string.append(value._count, value._value); }
 
 		Y_API void append_to(std::string&, long long);
 		inline void append_to(std::string& string, int value) { append_to(string, static_cast<long long>(value)); }
@@ -33,7 +25,7 @@ namespace Yttrium
 		inline void append_to(std::string& string, unsigned value) { append_to(string, static_cast<unsigned long long>(value)); }
 
 		Y_API void append_to(std::string&, double);
-		inline void append_to(std::string& string, float value) { append_to(string, double{ value }); }
+		inline void append_to(std::string& string, float value) { append_to(string, double{value}); }
 	}
 
 	inline void append_to(std::string&) {}
