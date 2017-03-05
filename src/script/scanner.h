@@ -23,12 +23,10 @@ namespace Yttrium
 			};
 
 			size_t line;
-			size_t column;
+			std::ptrdiff_t column;
 			Type type;
 			StaticString string;
 		};
-
-	public:
 
 		ScriptScanner(std::string& text);
 

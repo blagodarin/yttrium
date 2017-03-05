@@ -27,7 +27,7 @@ namespace Yttrium
 
 	inline std::ostream& operator<<(std::ostream& stream, const StaticString& string)
 	{
-		stream.write(string.text(), string.size());
+		stream.write(string.text(), static_cast<std::streamsize>(string.size()));
 		return stream;
 	}
 }

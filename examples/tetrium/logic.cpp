@@ -127,7 +127,7 @@ namespace Tetrium
 	{
 		std::array<Point, 4> result;
 		for (const auto& block : _blocks)
-			result[&block - _blocks.data()] = { _offset.x + block.x, _offset.y + block.y * PointsPerRow };
+			result[static_cast<size_t>(&block - _blocks.data())] = { _offset.x + block.x, _offset.y + block.y * PointsPerRow };
 		return result;
 	}
 
@@ -225,7 +225,7 @@ namespace Tetrium
 	{
 	}
 
-	bool Game::advance(unsigned milliseconds)
+	bool Game::advance(int milliseconds)
 	{
 		if (!is_active())
 			return false;

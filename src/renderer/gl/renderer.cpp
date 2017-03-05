@@ -312,7 +312,7 @@ namespace Yttrium
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
 		_gl.ReadPixels(0, 0, size.width(), size.height(), GL_RGB, GL_UNSIGNED_BYTE, image.data());
-		_gl.ReadBuffer(read_buffer);
+		_gl.ReadBuffer(static_cast<GLenum>(read_buffer));
 
 		return image;
 	}

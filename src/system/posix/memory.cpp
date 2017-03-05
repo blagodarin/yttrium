@@ -33,7 +33,7 @@ namespace Yttrium
 		const auto page_size = ::sysconf(_SC_PAGESIZE);
 		if (page_size <= 0)
 			std::abort();
-		return page_size;
+		return static_cast<size_t>(page_size);
 	}
 
 	void* pages_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept

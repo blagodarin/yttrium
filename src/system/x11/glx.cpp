@@ -69,7 +69,7 @@ namespace Yttrium
 			const Y_UNIQUE_PTR(::GLXFBConfig[], ::XFree) fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
 			if (!fbcs)
 				throw InitializationError("Failed to obtain GLXFBConfigs");
-			for (int i = 0; i < fbc_count; ++i)
+			for (size_t i = 0; i < static_cast<size_t>(fbc_count); ++i)
 			{
 				// TODO: Try sorting by GLX_SAMPLE_BUFFERS and GLX_SAMPLES as suggested in the official OpenGL example.
 				decltype(_visual_info) vi(::glXGetVisualFromFBConfig(display, fbcs[i]));

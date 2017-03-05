@@ -10,7 +10,7 @@ namespace Yttrium
 		void append_to(std::string& string, long long value)
 		{
 			std::array<char, std::numeric_limits<long long>::digits10 + 2> buffer; // Extra chars for a "lossy" digit and a sign.
-			unsigned long long uvalue = value >= 0 ? value : -value;
+			auto uvalue = static_cast<unsigned long long>(value >= 0 ? value : -value);
 			auto i = buffer.size();
 			do
 			{
@@ -37,7 +37,7 @@ namespace Yttrium
 		void append_to(std::string& string, double value)
 		{
 			std::array<char, 32> buffer;
-			string.append(buffer.data(), std::snprintf(buffer.data(), buffer.size(), "%g", value));
+			string.append(buffer.data(), static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "%g", value)));
 		}
 	}
 }

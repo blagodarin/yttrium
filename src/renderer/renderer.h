@@ -25,12 +25,12 @@ namespace Yttrium
 	public:
 		struct Statistics
 		{
-			int _triangles = 0;
-			int _draw_calls = 0;
-			int _texture_switches = 0;
-			int _redundant_texture_switches = 0;
-			int _shader_switches = 0;
-			int _redundant_shader_switches = 0;
+			size_t _triangles = 0;
+			size_t _draw_calls = 0;
+			size_t _texture_switches = 0;
+			size_t _redundant_texture_switches = 0;
+			size_t _shader_switches = 0;
+			size_t _redundant_shader_switches = 0;
 		};
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend&);

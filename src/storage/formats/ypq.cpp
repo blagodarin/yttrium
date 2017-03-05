@@ -205,7 +205,7 @@ namespace Yttrium
 			Reader reader(entry.name);
 			if (!reader)
 				return false;
-			const auto i = &entry - _entries.data();
+			const auto i = static_cast<size_t>(&entry - _entries.data());
 			entries[i].data_offset = decltype(entries[i].data_offset){ _writer.offset() };
 			entries[i].data_size = reader.size();
 			if (entries[i].data_size != reader.size())

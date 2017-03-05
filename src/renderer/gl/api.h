@@ -6,9 +6,9 @@
 	#define GLFLOATV(name, count) do { name.resize(count); GetFloatv(GL_##name, name.data()); } while (false);
 	#define GLFUNCTION(name, ret, attr) reinterpret_cast<GlAddress&>(name) = GLAPI_GET_FUNCTION("gl"#name);
 	#define GLINTEGER(name) GetIntegerv(GL_##name, &name);
-	#define GLINTEGERV(name, count) do { name.resize(count); GetIntegerv(GL_##name, name.data()); } while (false);
+	#define GLINTEGERV(name, count) do { name.resize(static_cast<size_t>(count)); GetIntegerv(GL_##name, name.data()); } while (false);
 	#define GLSTRING(name) name = GetString(GL_##name);
-	#define GLSTRINGV(name, count) do { name.reserve(count); for (GLsizei i = 0; i < count; ++i) name.emplace_back(GetStringi(GL_##name, i)); } while (false);
+	#define GLSTRINGV(name, count) do { name.reserve(static_cast<size_t>(count)); for (GLsizei i = 0; i < count; ++i) name.emplace_back(GetStringi(GL_##name, static_cast<GLuint>(i))); } while (false);
 #else
 	// Declaration mode.
 	#define GLEND

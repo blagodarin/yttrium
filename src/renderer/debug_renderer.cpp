@@ -43,20 +43,20 @@ namespace Yttrium
 		::draw_debug_char(_renderer, x, y, width, height, _color, DebugTexture::rect_index);
 	}
 
-	void DebugRenderer::draw_text(int x, int y, const StaticString& text, int max_size)
+	void DebugRenderer::draw_text(int x, int y, const StaticString& text, const boost::optional<size_t>& max_size)
 	{
-		const int size = max_size < 0 ? text.size() : std::min<int>(text.size(), max_size);
-		for (int i = 0; i < size; ++i)
+		const auto size = max_size ? text.size() : std::min(text.size(), *max_size);
+		for (size_t i = 0; i < size; ++i)
 		{
-			const uint8_t symbol = text[i];
+			const auto symbol = static_cast<uint8_t>(text[i]);
 			if (symbol >= DebugTexture::first_char && symbol <= DebugTexture::last_char)
-				::draw_debug_char(_renderer, x + i, y, 1, 1, _color, symbol);
+				::draw_debug_char(_renderer, x + static_cast<int>(i), y, 1, 1, _color, symbol);
 		}
 	}
 
-	int DebugRenderer::max_width() const
+	size_t DebugRenderer::max_width() const
 	{
-		return _renderer.window_size().width() / DebugTexture::char_width;
+		return static_cast<size_t>(_renderer.window_size().width()) / DebugTexture::char_width;
 	}
 
 	void DebugRenderer::set_color(float r, float g, float b, float a)

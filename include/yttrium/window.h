@@ -32,24 +32,24 @@ namespace Yttrium
 		std::chrono::milliseconds max_frame_time{ 0 };
 
 		/// Number of triangles rendered.
-		int triangles = 0;
+		size_t triangles = 0;
 
 		/// Number of draw calls issued.
-		int draw_calls = 0;
+		size_t draw_calls = 0;
 
 		/// Number of texture switches.
-		int texture_switches = 0;
+		size_t texture_switches = 0;
 
 		/// Number of redundant texture switches, i.e. those which set a texture that had already been set in that frame.
 		/// \note Works only in debug mode.
-		int redundant_texture_switches = 0;
+		size_t redundant_texture_switches = 0;
 
 		/// Number of shader switches.
-		int shader_switches = 0;
+		size_t shader_switches = 0;
 
 		/// Number of redundant shader switches, i.e. those which set a GPU program that had already been set in that frame.
 		/// \note Works only in debug mode.
-		int redundant_shader_switches = 0;
+		size_t redundant_shader_switches = 0;
 	};
 
 	///

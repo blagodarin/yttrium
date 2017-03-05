@@ -18,7 +18,7 @@ namespace Yttrium
 
 	struct Ytf1Char
 	{
-		uint8_t  id;
+		char     id;
 		uint16_t x;
 		uint16_t y;
 		uint8_t  width;
@@ -30,9 +30,9 @@ namespace Yttrium
 
 	struct Ytf1Kerning
 	{
-		uint8_t first;
-		uint8_t second;
-		int8_t  amount;
+		char   first;
+		char   second;
+		int8_t amount;
 	};
 
 #pragma pack(pop)

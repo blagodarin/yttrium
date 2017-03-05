@@ -191,7 +191,7 @@ namespace
 				{
 					const auto allocation = static_cast<uint8_t*>(::malloc(setup.size));
 					for (std::size_t k = 0; k < setup.size; k += Granularity)
-						allocation[k] = -1;
+						allocation[k] = 1;
 					_malloc_allocations[j++] = allocation;
 				}
 				do
@@ -214,7 +214,7 @@ namespace
 				{
 					Buffer buffer(setup.size);
 					for (std::size_t k = 0; k < setup.size; k += Granularity)
-						buffer[k] = -1;
+						buffer[k] = 1;
 					_buffer_allocations[j++] = std::move(buffer);
 				}
 				do
@@ -345,7 +345,7 @@ namespace
 				{
 					allocation = ::realloc(allocation, size);
 					for (auto j = size / 2; j < size; j += Granularity)
-						static_cast<uint8_t*>(allocation)[j] = -1;
+						static_cast<uint8_t*>(allocation)[j] = 1;
 				}
 				::free(allocation);
 			}
@@ -364,7 +364,7 @@ namespace
 				{
 					buffer.resize(size);
 					for (auto j = size / 2; j < size; j += Granularity)
-						buffer[j] = -1;
+						buffer[j] = 1;
 				}
 			}
 		} while (measurement.next_iteration(setup.cycles));

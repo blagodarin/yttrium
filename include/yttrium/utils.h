@@ -36,7 +36,7 @@ namespace Yttrium
 		if (sizeof x > sizeof(int16_t))
 			x |= x >> 16;
 		if (sizeof x > sizeof(int32_t))
-			x |= static_cast<uint64_t>(x) >> 32; // The conversion is to avoid pointless GCC warning.
+			x |= static_cast<std::conditional_t<std::is_signed<T>::value, int64_t, uint64_t>>(x) >> 32;
 		return x + 1;
 	}
 

@@ -38,7 +38,7 @@ namespace Yttrium
 
 	void GlBufferHandle::initialize(GLenum usage, size_t size, const void* data)
 	{
-		_gl.NamedBufferDataEXT(_handle, size, data, usage);
+		_gl.NamedBufferDataEXT(_handle, static_cast<GLsizeiptr>(size), data, usage);
 		_size = size;
 	}
 
@@ -49,7 +49,7 @@ namespace Yttrium
 
 	void GlBufferHandle::write(size_t offset, size_t size, const void* data) const
 	{
-		_gl.NamedBufferSubDataEXT(_handle, offset, size, data);
+		_gl.NamedBufferSubDataEXT(_handle, static_cast<GLintptr>(offset), static_cast<GLsizeiptr>(size), data);
 	}
 
 	GlProgramHandle::GlProgramHandle(const GlApi& gl)
@@ -84,7 +84,7 @@ namespace Yttrium
 		_gl.GetProgramiv(_handle, GL_INFO_LOG_LENGTH, &info_log_length);
 		if (info_log_length <= 1)
 			return {};
-		std::string result(info_log_length - 1, ' ');
+		std::string result(static_cast<size_t>(info_log_length) - 1, ' ');
 		GLsizei length = 0;
 		_gl.GetProgramInfoLog(_handle, info_log_length, &length, &result[0]);
 		assert(length == info_log_length - 1);
@@ -144,7 +144,7 @@ namespace Yttrium
 		_gl.GetShaderiv(_handle, GL_INFO_LOG_LENGTH, &info_log_length);
 		if (info_log_length <= 1)
 			return {};
-		std::string result(info_log_length - 1, ' ');
+		std::string result(static_cast<size_t>(info_log_length) - 1, ' ');
 		GLsizei length = 0;
 		_gl.GetShaderInfoLog(_handle, info_log_length, &length, &result[0]);
 		assert(length == info_log_length - 1);
@@ -190,9 +190,9 @@ namespace Yttrium
 			_gl.TextureParameterfEXT(_handle, _target, GL_TEXTURE_MAX_ANISOTROPY_EXT, enabled ? _gl.MAX_TEXTURE_MAX_ANISOTROPY_EXT : 1.f);
 	}
 
-	void GlTextureHandle::set_data(GLint level, GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) const
+	void GlTextureHandle::set_data(GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) const
 	{
-		_gl.TextureImage2DEXT(_handle, _target, level, internalformat, width, height, 0, format, type, pixels);
+		_gl.TextureImage2DEXT(_handle, _target, level, static_cast<GLint>(internalformat), width, height, 0, format, type, pixels);
 	}
 
 	void GlTextureHandle::set_parameter(GLenum name, GLint value) const
@@ -225,20 +225,20 @@ namespace Yttrium
 	void GlVertexArrayHandle::bind() const
 	{
 		_gl.BindVertexArray(_handle);
-		for (int i = 0; i < 32; ++i)
-			if (_attributes & (1 << i))
+		for (size_t i = 0; i < 32; ++i)
+			if (_attributes & (1u << i))
 				_gl.EnableVertexAttribArray(i);
 	}
 
-	void GlVertexArrayHandle::bind_vertex_buffer(GLuint binding, GLuint buffer, GLintptr offset, GLintptr stride)
+	void GlVertexArrayHandle::bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride)
 	{
-		_gl.VertexArrayBindVertexBufferEXT(_handle, binding, buffer, offset, stride);
+		_gl.VertexArrayBindVertexBufferEXT(_handle, binding, buffer, static_cast<GLintptr>(offset), static_cast<GLsizei>(stride));
 	}
 
 	void GlVertexArrayHandle::unbind() const
 	{
-		for (int i = 31; i >= 0; --i)
-			if (_attributes & (1 << i))
+		for (size_t i = 32; i > 0;)
+			if (_attributes & (1u << --i))
 				_gl.DisableVertexAttribArray(i);
 		_gl.BindVertexArray(0);
 	}
@@ -252,6 +252,6 @@ namespace Yttrium
 	{
 		_gl.VertexArrayVertexAttribFormatEXT(_handle, attrib, size, type, normalized, offset);
 		assert(attrib < 32);
-		_attributes |= 1 << attrib;
+		_attributes |= 1u << attrib;
 	}
 }

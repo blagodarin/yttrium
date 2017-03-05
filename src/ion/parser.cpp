@@ -99,7 +99,7 @@ namespace Yttrium
 		*state = State(&document.root());
 
 		size_t i = 0;
-		size_t line_base = -1;
+		auto line_base = static_cast<size_t>(-1);
 		size_t line = 1;
 
 		for (const auto c = reinterpret_cast<char*>(document._buffer.begin());;)

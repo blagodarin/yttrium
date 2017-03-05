@@ -95,7 +95,7 @@ namespace Tetrium
 		Game();
 
 		/// Advance the game by the specified amount of \a milliseconds.
-		bool advance(unsigned milliseconds);
+		bool advance(int milliseconds);
 
 		/// Retrieve the current figure.
 		Figure current_figure() const;
@@ -175,7 +175,7 @@ namespace Tetrium
 		Field    _field;
 		Figure   _current_figure;
 		Figure   _next_figure;
-		unsigned _time_remainder = 0;
+		int      _time_remainder = 0;
 
 		int      _delay = 0;
 		int      _fixation_delay = 0;

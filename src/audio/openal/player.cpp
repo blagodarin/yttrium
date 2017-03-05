@@ -22,7 +22,7 @@ namespace Yttrium
 	{
 		ALint buffers_processed = 0;
 		::alGetSourcei(_source, AL_BUFFERS_PROCESSED, &buffers_processed);
-		return buffers_processed;
+		return static_cast<size_t>(buffers_processed);
 	}
 
 	void OpenAlPlayer::refill_buffer(void* data, size_t size)

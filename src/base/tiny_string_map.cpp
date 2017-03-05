@@ -56,8 +56,8 @@ namespace Yttrium
 			return;
 		const auto node_begin = value.text() - 1 - key.size() - 1;
 		const auto node_end = value.text() + *reinterpret_cast<const uint8_t*>(value.text() - 1);
-		std::memmove(const_cast<char*>(node_begin), node_end, reinterpret_cast<const char*>(_data.get() + _size) - node_end);
-		_size -= node_end - node_begin;
+		std::memmove(const_cast<char*>(node_begin), node_end, static_cast<size_t>(reinterpret_cast<const char*>(_data.get() + _size) - node_end));
+		_size -= static_cast<size_t>(node_end - node_begin);
 	}
 
 	StaticString TinyStringMap::find(const StaticString& key) const noexcept
@@ -91,7 +91,7 @@ namespace Yttrium
 		*dst++ = value_size;
 		std::memcpy(dst, value.text(), value_size);
 		dst += value_size;
-		_size = dst - _data.get();
+		_size = static_cast<size_t>(dst - _data.get());
 	}
 
 	void TinyStringMap::reserve_bytes(size_t required_capacity)

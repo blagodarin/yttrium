@@ -85,7 +85,7 @@ namespace Yttrium
 		void bind() const;
 		void generate_mipmaps() const;
 		void set_anisotropy_enabled(bool) const;
-		void set_data(GLint level, GLint internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) const;
+		void set_data(GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) const;
 		void set_parameter(GLenum, GLint) const;
 
 		GlTextureHandle(const GlTextureHandle&) = delete;
@@ -106,7 +106,7 @@ namespace Yttrium
 		~GlVertexArrayHandle();
 
 		void bind() const;
-		void bind_vertex_buffer(GLuint binding, GLuint buffer, GLintptr offset, GLintptr stride);
+		void bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride);
 		void unbind() const;
 		void vertex_attrib_binding(GLuint attrib, GLuint binding);
 		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, GLuint offset);

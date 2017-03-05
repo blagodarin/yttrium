@@ -33,8 +33,8 @@ namespace Yttrium
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
 		{
-			const auto result = ::pread(_descriptor, data, size, offset);
-			return result != -1 ? result : 0;
+			const auto result = ::pread(_descriptor, data, size, static_cast<int64_t>(offset));
+			return result != -1 ? static_cast<size_t>(result) : 0;
 		}
 
 	private:
@@ -65,7 +65,7 @@ namespace Yttrium
 
 		void resize(uint64_t size) override
 		{
-			if (::ftruncate(_descriptor, size) == -1)
+			if (::ftruncate(_descriptor, static_cast<int64_t>(size)) == -1)
 				throw std::system_error(errno, std::generic_category());
 		}
 
@@ -76,8 +76,8 @@ namespace Yttrium
 
 		size_t write_at(uint64_t offset, const void* data, size_t size) override
 		{
-			const auto result = ::pwrite(_descriptor, data, size, offset);
-			return result != -1 ? result : 0;
+			const auto result = ::pwrite(_descriptor, data, size, static_cast<int64_t>(offset));
+			return result != -1 ? static_cast<size_t>(result) : 0;
 		}
 
 	private:

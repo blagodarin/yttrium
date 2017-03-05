@@ -38,17 +38,17 @@ namespace
 		1, 4, 4,
 	};
 
-	static constexpr auto FragmentSize = 32u;
-	static constexpr auto FragmentCount = 8u;
+	static constexpr auto FragmentSize = 32;
+	static constexpr auto FragmentCount = 8;
 	static constexpr auto Border = 3;
 
 	const SizeF BlockSize(FragmentSize - 2, FragmentSize - 2);
 
-	Rgb pixel_color(int block, int x, int y)
+	Rgb pixel_color(size_t block, size_t x, size_t y)
 	{
-		const auto pixel_type = [](int x_, int y_)
+		const auto pixel_type = [](auto x_, auto y_)
 		{
-			const int rx = FragmentSize - 1 - x_;
+			const auto rx = FragmentSize - 1 - x_;
 			if (y_ < Border)
 			{
 				if (x_ < Border)
@@ -58,7 +58,7 @@ namespace
 				else
 					return Top;
 			}
-			const int ry = FragmentSize - 1 - y_;
+			const auto ry = FragmentSize - 1 - y_;
 			if (ry < Border)
 			{
 				if (x_ < Border)
@@ -72,7 +72,7 @@ namespace
 		};
 		const auto base = 255;
 		const auto offset = 20 * pattern[pixel_type(x, y)];
-		const auto scale = [block, base, offset](int index)
+		const auto scale = [block, base, offset](size_t index)
 		{
 			const auto weight = weights[block * 3 + index];
 			return weight ? base / weight - offset : 0;
@@ -83,11 +83,11 @@ namespace
 	Image make_blocks_image()
 	{
 		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra, 32 });
-		for (unsigned i = 0; i < FragmentCount; ++i)
+		for (size_t i = 0; i < FragmentCount; ++i)
 		{
-			for (unsigned y = 0; y < FragmentSize; ++y)
+			for (size_t y = 0; y < FragmentSize; ++y)
 			{
-				for (unsigned x = 0; x < FragmentSize; ++x)
+				for (size_t x = 0; x < FragmentSize; ++x)
 				{
 					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.format().row_size() + x * 4;
 					const auto color = ::pixel_color(i, x, y);
@@ -192,6 +192,6 @@ void TetriumGraphics::draw_field_frame(const RectF& rect, const SizeF& block_siz
 
 void TetriumGraphics::set_texture_rect(Tetrium::Figure::Type figure_type) const
 {
-	const int figure_index = (figure_type == Tetrium::Figure::None) ? 0 : figure_type + 1;
+	const auto figure_index = (figure_type == Tetrium::Figure::None) ? 0 : static_cast<size_t>(figure_type) + 1;
 	_renderer.set_texture_rect(::block_rect(figure_index), {});
 }

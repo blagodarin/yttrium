@@ -3,13 +3,15 @@
 
 #include "../../system/openal.h"
 
+#include <cstddef>
+
 namespace Yttrium
 {
 	class OpenALFormat
 	{
 	public:
-		ALuint _format = 0;
-		ALsizei _frequency = 0;
+		ALenum _format = 0;
+		size_t _frequency = 0;
 
 		OpenALFormat() = default;
 		explicit OpenALFormat(const class AudioFormat&);

@@ -161,14 +161,14 @@ namespace Yttrium
 				throw DataError("Bad 'char' section entry ", i);
 
 			CharInfo info;
-			info.rect = { { font_section.base_x + char_data.x, font_section.base_y + char_data.y }, Size{ char_data.width, char_data.height } };
+			info.rect = {{font_section.base_x + char_data.x, font_section.base_y + char_data.y}, Size{char_data.width, char_data.height}};
 			info.offset = Point{ char_data.x_offset, char_data.y_offset };
 			info.advance = char_data.advance;
 
 			font->_chars[char_data.id] = info;
-			font_rect_size = { std::max(font_rect_size.width(), char_data.x + char_data.width), std::max(font_rect_size.height(), char_data.y + char_data.height) };
+			font_rect_size = {std::max(font_rect_size.width(), char_data.x + char_data.width), std::max(font_rect_size.height(), char_data.y + char_data.height)};
 		}
-		font->_rect = { { font_section.base_x, font_section.base_y }, font_rect_size };
+		font->_rect = {{font_section.base_x, font_section.base_y}, font_rect_size};
 
 		if (reader.read(fourcc))
 		{

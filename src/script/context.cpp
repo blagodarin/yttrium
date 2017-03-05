@@ -125,7 +125,7 @@ namespace Yttrium
 			while (right != end && *right != '{')
 				++right;
 
-			append_to(target, StaticString(left, right - left));
+			append_to(target, StaticString{left, static_cast<size_t>(right - left)});
 
 			if (right == end)
 				break;

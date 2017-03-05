@@ -80,7 +80,7 @@ namespace
 
 		T result = 0;
 		for (; p != end && *p >= '0' && *p <= '9'; ++p)
-			result = result * 10 + *p - '0';
+			result = result * 10 + static_cast<T>(*p - '0');
 
 		return result;
 	}
@@ -103,7 +103,7 @@ namespace
 			if (result > std::numeric_limits<T>::max() / 10)
 				return false;
 
-			T digit = *p++ - '0';
+			const auto digit = static_cast<T>(*p++ - '0');
 
 			// The maximum value for an N-bit unsigned integral number is 2^(2^N) - 1.
 			// For N > 3, (2^(2^N)-1) % 10 == 5.
@@ -164,7 +164,7 @@ namespace
 			for (; p != end && *p >= '0' && *p <= '9'; ++p)
 				power = power * 10 + (*p - '0');
 
-			result *= ::pow(10, negative_power ? -power : power);
+			result *= std::pow(10, negative_power ? -power : power);
 		}
 
 		return negative ? -result : result;
@@ -230,7 +230,7 @@ namespace
 				power = power * 10 + (*p++ - '0');
 			} while (p != end && *p >= '0' && *p <= '9');
 
-			result *= ::pow(10, negative_power ? -power : power);
+			result *= std::pow(10, negative_power ? -power : power);
 		}
 
 		if (p != end)
@@ -403,7 +403,7 @@ namespace Yttrium
 				break;
 		}
 
-		return StaticString(left, right - left + 1);
+		return StaticString(left, static_cast<size_t>(right - left) + 1);
 	}
 
 	const char StaticString::Null = '\0';

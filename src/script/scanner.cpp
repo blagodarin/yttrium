@@ -82,7 +82,7 @@ namespace Yttrium
 				{
 					const auto begin = _cursor;
 					do ++_cursor; while (::kind_of[static_cast<unsigned char>(*_cursor)] == C::Id || ::kind_of[static_cast<unsigned char>(*_cursor)] == C::Digit);
-					token.string = StaticString(begin, _cursor - begin);
+					token.string = {begin, static_cast<size_t>(_cursor - begin)};
 				}
 				token.type = Token::Identifier;
 				return token;
@@ -96,7 +96,7 @@ namespace Yttrium
 				{
 					const auto begin = has_sign ? _cursor - 1 : _cursor;
 					do ++_cursor; while (::kind_of[static_cast<unsigned char>(*_cursor)] == C::Digit);
-					token.string = StaticString(begin, _cursor - begin);
+					token.string = {begin, static_cast<size_t>(_cursor - begin)};
 				}
 				token.type = Token::Number;
 				return token;
@@ -162,7 +162,7 @@ namespace Yttrium
 						else
 							throw DataError("[", _line, ":", _cursor - _line_origin, "] Unexpected end of file");
 					}
-					token.string = StaticString(begin, end - begin);
+					token.string = {begin, static_cast<size_t>(end - begin)};
 				}
 				token.type = Token::String;
 				return token;

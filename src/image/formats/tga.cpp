@@ -92,7 +92,7 @@ namespace Yttrium
 		if (header.id_length && !reader.skip(header.id_length))
 			return {};
 
-		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7) / 8)))
+		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7u) / 8u)))
 			return {};
 
 		return format;

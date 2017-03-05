@@ -12,7 +12,7 @@ const std::vector<unsigned> _common_sampling_rates{ 8'000, 11'025, 16'000, 22'05
 namespace Yttrium
 {
 	OpenALFormat::OpenALFormat(const AudioFormat& format)
-		: _frequency(format.samples_per_second())
+		: _frequency{format.samples_per_second()}
 	{
 		switch (format.bytes_per_sample())
 		{
