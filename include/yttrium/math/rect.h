@@ -16,24 +16,24 @@ namespace Yttrium
 	{
 	public:
 		Rect() = default;
-		Rect(const Point& top_left, const Point& bottom_right) : _left(top_left.x()), _top(top_left.y()), _right(bottom_right.x()), _bottom(bottom_right.y()) {}
-		Rect(const Point& top_left, const Size& size) : _left(top_left.x()), _top(top_left.y()), _right(_left + size.width()), _bottom(_top + size.height()) {}
-		explicit Rect(const Size& size) : _right(size.width()), _bottom(size.height()) {}
+		Rect(const Point& top_left, const Point& bottom_right) : _left{top_left.x()}, _top{top_left.y()}, _right{bottom_right.x()}, _bottom{bottom_right.y()} {}
+		Rect(const Point& top_left, const Size& s) : _left{top_left.x()}, _top{top_left.y()}, _right{_left + s.width()}, _bottom{_top + s.height()} {}
+		explicit Rect(const Size& s) : _right{s.width()}, _bottom{s.height()} {}
 
 		int bottom() const { return _bottom; }
-		Point bottom_left() const { return { _left, _bottom }; }
-		Point bottom_right() const { return { _right, _bottom }; }
+		Point bottom_left() const { return {_left, _bottom}; }
+		Point bottom_right() const { return {_right, _bottom}; }
 		int height() const { return _bottom - _top; }
 		int left() const { return _left; }
 		int right() const { return _right; }
-		Size size() const { return { width(), height() }; }
+		Size size() const { return {width(), height()}; }
 		int top() const { return _top; }
-		Point top_left() const { return { _left, _top }; }
-		Point top_right() const { return { _right, _top }; }
+		Point top_left() const { return {_left, _top}; }
+		Point top_right() const { return {_right, _top}; }
 		int width() const { return _right - _left; }
 
 		///
-		Point center() const { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
+		Point center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
 
 		///
 		bool is_empty() const
@@ -62,7 +62,7 @@ namespace Yttrium
 		{
 			return
 			{
-				{ (rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2 },
+				{(rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2},
 				size()
 			};
 		}
@@ -93,8 +93,8 @@ namespace Yttrium
 		{
 			return
 			{
-				{ std::max(_left, rect._left), std::max(_top, rect._top) },
-				Point{ std::min(_right, rect._right), std::min(_bottom, rect._bottom) }
+				{std::max(_left, rect._left), std::max(_top, rect._top)},
+				Point{std::min(_right, rect._right), std::min(_bottom, rect._bottom)}
 			};
 		}
 
@@ -153,25 +153,25 @@ namespace Yttrium
 	{
 	public:
 		RectF() = default;
-		RectF(const PointF& top_left, const PointF& bottom_right) : _left(top_left.x()), _top(top_left.y()), _right(bottom_right.x()), _bottom(bottom_right.y()) {}
-		RectF(const PointF& top_left, const SizeF& size) : _left(top_left.x()), _top(top_left.y()), _right(_left + size.width()), _bottom(_top + size.height()) {}
-		explicit RectF(const SizeF& size) : _right(size.width()), _bottom(size.height()) {}
-		explicit RectF(const Rect& rect) :  _left(rect.left()), _top(rect.top()), _right(rect.right()), _bottom(rect.bottom()) {}
+		RectF(const PointF& top_left, const PointF& bottom_right) : _left{top_left.x()}, _top{top_left.y()}, _right{bottom_right.x()}, _bottom{bottom_right.y()} {}
+		RectF(const PointF& top_left, const SizeF& s) : _left{top_left.x()}, _top{top_left.y()}, _right{_left + s.width()}, _bottom{_top + s.height()} {}
+		explicit RectF(const SizeF& s) : _right{static_cast<float>(s.width())}, _bottom{static_cast<float>(s.height())} {}
+		explicit RectF(const Rect& r) : _left{static_cast<float>(r.left())}, _top{static_cast<float>(r.top())}, _right{static_cast<float>(r.right())}, _bottom{static_cast<float>(r.bottom())} {}
 
 		float bottom() const { return _bottom; }
-		PointF bottom_left() const { return { _left, _bottom }; }
-		PointF bottom_right() const { return { _right, _bottom }; }
+		PointF bottom_left() const { return {_left, _bottom}; }
+		PointF bottom_right() const { return {_right, _bottom}; }
 		float height() const { return _bottom - _top; }
 		float left() const { return _left; }
 		float right() const { return _right; }
-		SizeF size() const { return { width(), height() }; }
+		SizeF size() const { return {width(), height()}; }
 		float top() const { return _top; }
-		PointF top_left() const { return { _left, _top }; }
-		PointF top_right() const { return { _right, _top }; }
+		PointF top_left() const { return {_left, _top}; }
+		PointF top_right() const { return {_right, _top}; }
 		float width() const { return _right - _left; }
 
 		///
-		PointF center() const { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
+		PointF center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
 
 		///
 		bool contains(const PointF& point) const
@@ -198,8 +198,8 @@ namespace Yttrium
 		return !(lhs == rhs);
 	}
 
-	inline RectF operator/(const RectF& lhs, float rhs) { return { lhs.top_left() / rhs, lhs.bottom_right() / rhs }; }
-	inline RectF operator/(const RectF& lhs, const std::pair<float, float>& rhs) { return { lhs.top_left() / rhs, lhs.bottom_right() / rhs }; }
+	inline RectF operator/(const RectF& lhs, float rhs) { return {lhs.top_left() / rhs, lhs.bottom_right() / rhs}; }
+	inline RectF operator/(const RectF& lhs, const std::pair<float, float>& rhs) { return {lhs.top_left() / rhs, lhs.bottom_right() / rhs}; }
 }
 
 #endif

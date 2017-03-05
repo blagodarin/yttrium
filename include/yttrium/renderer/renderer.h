@@ -21,6 +21,7 @@ namespace Yttrium
 	class Mesh;
 	class Reader;
 	class RectF;
+	class Size;
 	class Texture2D;
 	class TexturedRect;
 	enum class VA;

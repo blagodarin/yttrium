@@ -15,7 +15,7 @@ namespace Yttrium
 	{
 	public:
 		Size() = default;
-		Size(int width, int height) : _width(width), _height(height) {}
+		Size(int width, int height) : _width{width}, _height{height} {}
 
 		int height() const { return _height; }
 		int width() const { return _width; }
@@ -33,8 +33,8 @@ namespace Yttrium
 	{
 	public:
 		SizeF() = default;
-		SizeF(float width, float height) : _width(width), _height(height) {}
-		explicit SizeF(const Size& size) : SizeF(size.width(), size.height()) {}
+		SizeF(float width, float height) : _width{width}, _height{height} {}
+		explicit SizeF(const Size& s) : SizeF{static_cast<float>(s.width()), static_cast<float>(s.height())} {}
 
 		float height() const { return _height; }
 		float width() const { return _width; }
@@ -49,13 +49,13 @@ namespace Yttrium
 		float _height = 0;
 	};
 
-	inline SizeF operator*(const SizeF& a, float b) { return { a.width() * b, a.height() * b }; }
+	inline SizeF operator*(const SizeF& a, float b) { return {a.width() * b, a.height() * b}; }
 	inline SizeF operator*(float a, const SizeF& b) { return b * a; }
-	inline SizeF operator*(const SizeF& a, const std::pair<float, float>& b) { return { a.width() * b.first, a.height() * b.second }; }
+	inline SizeF operator*(const SizeF& a, const std::pair<float, float>& b) { return {a.width() * b.first, a.height() * b.second}; }
 	inline SizeF operator*(const std::pair<float, float>& a, const SizeF& b) { return b * a; }
 
-	inline SizeF operator/(const SizeF& a, float b) { return { a.width() / b, a.height() / b }; }
-	inline SizeF operator/(const SizeF& a, const std::pair<float, float>& b) { return { a.width() / b.first, a.height() / b.second }; }
+	inline SizeF operator/(const SizeF& a, float b) { return {a.width() / b, a.height() / b}; }
+	inline SizeF operator/(const SizeF& a, const std::pair<float, float>& b) { return {a.width() / b.first, a.height() / b.second}; }
 }
 
 #endif

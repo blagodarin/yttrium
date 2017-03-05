@@ -5,8 +5,6 @@
 #define _include_yttrium_math_vector_h_
 
 #include <yttrium/api.h>
-#include <yttrium/math/point.h>
-#include <yttrium/math/size.h>
 
 namespace Yttrium
 {
@@ -19,10 +17,6 @@ namespace Yttrium
 
 		Vector2() = default;
 		Vector2(float x_, float y_): x(x_), y(y_) {}
-		explicit Vector2(const Point& point) : x(point.x()), y(point.y()) {}
-		explicit Vector2(const PointF& point) : x(point.x()), y(point.y()) {}
-		explicit Vector2(const Size& size) : x(size.width()), y(size.height()) {}
-		explicit Vector2(const SizeF& size) : x(size.width()), y(size.height()) {}
 
 		///
 		float* data() { return &x; }

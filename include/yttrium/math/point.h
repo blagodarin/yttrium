@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 	public:
 		Point() = default;
-		Point(int x, int y) : _x(x), _y(y) {}
+		Point(int x, int y) : _x{x}, _y{y} {}
 
 		int x() const { return _x; }
 		int y() const { return _y; }
@@ -31,8 +31,8 @@ namespace Yttrium
 	{
 	public:
 		PointF() = default;
-		PointF(float x, float y) : _x(x), _y(y) {}
-		explicit PointF(const Point& point) : PointF(point.x(), point.y()) {}
+		PointF(float x, float y) : _x{x}, _y{y} {}
+		explicit PointF(const Point& p) : PointF{static_cast<float>(p.x()), static_cast<float>(p.y())} {}
 
 		float x() const { return _x; }
 		float y() const { return _y; }
