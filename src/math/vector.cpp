@@ -6,7 +6,7 @@ namespace Yttrium
 {
 	float Vector4::length() const
 	{
-		return ::sqrt(x * x + y * y + z * z);
+		return std::sqrt(x * x + y * y + z * z);
 	}
 
 	Vector4 Vector4::normalized() const

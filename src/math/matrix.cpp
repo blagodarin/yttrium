@@ -50,11 +50,11 @@ namespace Yttrium
 	{
 		assert(size.width() > 0 && size.height() > 0 && far > near);
 
-		const auto left = 0.f;
-		const auto top = 0.f;
+		constexpr auto left = 0.f;
+		constexpr auto top = 0.f;
 
-		const auto m00 = 2.f / size.width();
-		const auto m11 = -2.f / size.height();
+		const auto m00 = 2 / static_cast<float>(size.width());
+		const auto m11 = -2 / static_cast<float>(size.height());
 		const auto m22 = 2 / (near - far);
 		const auto m03 = -1 - m00 * left;
 		const auto m13 = 1 - m11 * top;
@@ -67,10 +67,10 @@ namespace Yttrium
 	{
 		assert(size.width() > 0 && size.height() > 0 && vertical_fov > 0 && vertical_fov < 360 && near > 0 && far > near);
 
-		const float aspect = static_cast<float>(size.width()) / size.height();
-		const float fov_radians = vertical_fov / 180 * M_PI;
+		const auto aspect = static_cast<float>(size.width()) / static_cast<float>(size.height());
+		const auto fov_radians = vertical_fov / 180 * M_PI;
 
-		const auto f = 1 / ::tan(fov_radians / 2);
+		const auto f = 1 / std::tan(fov_radians / 2);
 
 		const auto m00 = f / aspect;
 		const auto m11 = f;
@@ -84,9 +84,9 @@ namespace Yttrium
 	Matrix4 Matrix4::rotation(float angle, const Vector4& axis)
 	{
 		const auto& v = axis.normalized();
-		const float angle_radians = angle / 180 * M_PI;
-		const auto c = ::cos(angle_radians);
-		const auto s = ::sin(angle_radians);
+		const auto angle_radians = angle / 180 * M_PI;
+		const auto c = std::cos(angle_radians);
+		const auto s = std::sin(angle_radians);
 
 		return Matrix4(
 			v.x * v.x * (1 - c) + c,       v.y * v.x * (1 - c) - s * v.z, v.z * v.x * (1 - c) + s * v.y, 0,

@@ -16,8 +16,8 @@ Game::Game(const Storage& storage)
 {
 	_window.on_cursor_moved([this](int dx, int dy)
 	{
-		_rotation.yaw = wrap(_rotation.yaw - dx / 4.f, -180, 180);
-		_rotation.pitch = clamp(_rotation.pitch - dy / 4.f, -90, 90);
+		_rotation.yaw = wrap(_rotation.yaw - static_cast<float>(dx) / 4, -180.f, 180.f);
+		_rotation.pitch = clamp(_rotation.pitch - static_cast<float>(dy) / 4, -90.f, 90.f);
 	});
 	_window.on_key_event([this](const KeyEvent& event){ on_key_event(event); });
 	_window.on_render([this](Renderer& renderer, const PointF&){ render(renderer); });
@@ -93,9 +93,9 @@ void Game::render(Renderer& renderer)
 		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation));
 
 		{
-			PushTransformation r(renderer, Matrix4::rotation((_animation % 24000) / 24000.0 * 360.0, { 0, 0, 1 }));
+			PushTransformation r(renderer, Matrix4::rotation(static_cast<float>(_animation % 24000) / 24000.f * 360.f, { 0, 0, 1 }));
 
-			const auto angle = (_animation % 3000) / 3000.0 * 360.0;
+			const auto angle = static_cast<float>(_animation % 3000) / 3000.f * 360.f;
 
 			// X direction.
 			draw_tr(_cube, { -5.00, 0, 2.50 }, 2 * angle, {  1, 0, 0 });
@@ -142,15 +142,15 @@ void Game::render(Renderer& renderer)
 
 void Game::update(const UpdateEvent& update)
 {
-	_animation += update.milliseconds.count();
+	_animation += static_cast<unsigned>(update.milliseconds.count());
 
 	if (_move_forward != _move_backward || _move_left != _move_right)
 	{
 		constexpr auto speed = 8.f; // Units per second.
-		const auto distance = update.milliseconds.count() * speed / 1000.f;
-		const auto offset = (_move_forward || _move_backward) && (_move_left || _move_right) ? distance * M_SQRT1_2 : distance;
+		const auto distance = static_cast<float>(update.milliseconds.count()) * speed / 1000;
+		const auto offset = (_move_forward || _move_backward) && (_move_left || _move_right) ? distance * static_cast<float>(M_SQRT1_2) : distance;
 
-		Vector4 movement(0, 0, 0);
+		Vector4 movement{0, 0, 0};
 		if (_move_forward)
 			movement.y += offset;
 		else if (_move_backward)
@@ -162,9 +162,9 @@ void Game::update(const UpdateEvent& update)
 
 		_position += Matrix4(_rotation) * movement;
 
-		_position.x = clamp(_position.x, -64, 64);
-		_position.y = clamp(_position.y, -64, 64);
-		_position.z = clamp(_position.z, 1, 64);
+		_position.x = clamp(_position.x, -64.f, 64.f);
+		_position.y = clamp(_position.y, -64.f, 64.f);
+		_position.z = clamp(_position.z, 1.f, 64.f);
 	}
 
 	_debug_text.clear();

@@ -39,7 +39,7 @@ namespace Yttrium
 	void GlBufferHandle::initialize(GLenum usage, size_t size, const void* data)
 	{
 		_gl.NamedBufferDataEXT(_handle, static_cast<GLsizeiptr>(size), data, usage);
-		_size = size;
+		_size = static_cast<GLuint>(size);
 	}
 
 	void GlBufferHandle::unbind() const
@@ -129,8 +129,8 @@ namespace Yttrium
 
 	bool GlShaderHandle::compile(const std::string& source) const
 	{
-		const GLchar* source_data = source.data();
-		const GLint source_size = source.size();
+		auto source_data = source.data();
+		const auto source_size = static_cast<GLint>(source.size());
 		_gl.ShaderSource(_handle, 1, &source_data, &source_size);
 		_gl.CompileShader(_handle);
 		GLint compile_status = GL_FALSE;
@@ -225,7 +225,7 @@ namespace Yttrium
 	void GlVertexArrayHandle::bind() const
 	{
 		_gl.BindVertexArray(_handle);
-		for (size_t i = 0; i < 32; ++i)
+		for (GLuint i = 0; i < 32; ++i)
 			if (_attributes & (1u << i))
 				_gl.EnableVertexAttribArray(i);
 	}
@@ -237,7 +237,7 @@ namespace Yttrium
 
 	void GlVertexArrayHandle::unbind() const
 	{
-		for (size_t i = 32; i > 0;)
+		for (GLuint i = 32; i > 0;)
 			if (_attributes & (1u << --i))
 				_gl.DisableVertexAttribArray(i);
 		_gl.BindVertexArray(0);
@@ -248,9 +248,9 @@ namespace Yttrium
 		_gl.VertexArrayVertexAttribBindingEXT(_handle, attrib, binding);
 	}
 
-	void GlVertexArrayHandle::vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, GLuint offset)
+	void GlVertexArrayHandle::vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, size_t offset)
 	{
-		_gl.VertexArrayVertexAttribFormatEXT(_handle, attrib, size, type, normalized, offset);
+		_gl.VertexArrayVertexAttribFormatEXT(_handle, attrib, size, type, normalized, static_cast<GLuint>(offset));
 		assert(attrib < 32);
 		_attributes |= 1u << attrib;
 	}

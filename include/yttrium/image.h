@@ -93,7 +93,7 @@ namespace Yttrium
 		size_t row_size() const { return _row_size; }
 
 		///
-		Size size() const { return Size(_width, _height); }
+		Size size() const { return {static_cast<int>(_width), static_cast<int>(_height)}; }
 
 		///
 		size_t width() const { return _width; }

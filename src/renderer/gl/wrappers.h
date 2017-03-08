@@ -109,7 +109,7 @@ namespace Yttrium
 		void bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride);
 		void unbind() const;
 		void vertex_attrib_binding(GLuint attrib, GLuint binding);
-		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, GLuint offset);
+		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, size_t offset);
 
 		GlVertexArrayHandle(const GlVertexArrayHandle&) = delete;
 		GlVertexArrayHandle& operator=(const GlVertexArrayHandle&) = delete;
