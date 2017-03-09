@@ -6,6 +6,7 @@ add_executable(unit_tests
 	image.h
 	image_formats.cpp
 	image_formats.h
+	ion_reader.cpp
 	ion_writer.cpp
 	ion.cpp
 	iostream.cpp

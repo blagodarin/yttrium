@@ -10,7 +10,7 @@
 
 namespace Yttrium
 {
-    class StaticString;
+	class StaticString;
 	class Writer;
 
 	///
