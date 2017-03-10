@@ -106,7 +106,6 @@ namespace Yttrium
 				case Cr:
 					if (_cursor[1] == '\n')
 						++_cursor;
-					[[fallthrough]];
 				case Lf:
 					_line_base = _cursor++;
 					++_line;
@@ -127,7 +126,7 @@ namespace Yttrium
 						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected value")};
 					{
 						auto cursor = _cursor;
-						const auto base = cursor++;
+						const auto base = ++cursor;
 						while (*cursor != '"')
 						{
 							switch (*cursor)
@@ -145,7 +144,7 @@ namespace Yttrium
 							}
 						}
 						_cursor = cursor + 1;
-						return make_token<IonReader::Token::Type::Value>(base, cursor - base);
+						return make_token<IonReader::Token::Type::Value, -1>(base, cursor - base);
 					}
 
 				case LBrace:
@@ -180,10 +179,10 @@ namespace Yttrium
 		}
 
 	private:
-		template <IonReader::Token::Type type>
+		template <IonReader::Token::Type type, std::ptrdiff_t column_offset = 0>
 		IonReader::Token make_token(const char* begin, std::ptrdiff_t size) noexcept
 		{
-			return {_line, begin - _line_base, type, {begin, static_cast<std::size_t>(size)}};
+			return {_line, begin - _line_base + column_offset, type, {begin, static_cast<std::size_t>(size)}};
 		}
 
 		static Buffer read_buffer(const Reader& reader)

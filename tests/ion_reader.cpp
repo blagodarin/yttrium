@@ -51,3 +51,13 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_names)
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 14, IonReader::Token::Type::End, ""));
 	}
 }
+
+BOOST_AUTO_TEST_CASE(test_ion_reader_values)
+{
+	{
+		TestData ion{R"(name1 "value1" )"};
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 7, IonReader::Token::Type::Value, "value1"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 16, IonReader::Token::Type::End, ""));
+	}
+}
