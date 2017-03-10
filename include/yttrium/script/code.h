@@ -7,6 +7,7 @@
 #include <yttrium/api.h>
 
 #include <memory>
+#include <string>
 
 namespace Yttrium
 {

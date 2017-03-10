@@ -12,7 +12,7 @@ namespace Yttrium
 		buffer.reset(_indices.size() * sizeof(uint16_t));
 		auto data = static_cast<uint16_t*>(buffer.data());
 		for (const auto index : _indices)
-			*data++ = index;
+			*data++ = static_cast<uint16_t>(index);
 		return true;
 	}
 }

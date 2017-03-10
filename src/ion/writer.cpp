@@ -4,6 +4,7 @@
 #include <yttrium/storage/writer.h>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <vector>
 

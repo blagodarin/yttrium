@@ -364,7 +364,7 @@ namespace Yttrium
 		BufferAppender<Vertex2D> vertices(_vertices_2d);
 		BufferAppender<uint16_t> indices(_indices_2d);
 
-		uint16_t index = vertices.count();
+		auto index = static_cast<uint16_t>(vertices.count()); // TODO: Check size.
 
 		if (index > 0)
 		{

@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(test_next_power_of_2)
 	for (int i = 1; i <= std::numeric_limits<int8_t>::max(); ++i)
 		BOOST_CHECK_EQUAL(next_power_of_2(i), table[i]);
 
-	const auto max_power_of_2 = uintmax_t{ std::numeric_limits<intmax_t>::max() } + 1;
+	const auto max_power_of_2 = static_cast<uintmax_t>(std::numeric_limits<intmax_t>::max()) + 1;
 	BOOST_CHECK_EQUAL(next_power_of_2(max_power_of_2 - 1), max_power_of_2);
 	BOOST_CHECK_EQUAL(next_power_of_2(max_power_of_2), max_power_of_2);
 	BOOST_CHECK(next_power_of_2(max_power_of_2 + 1) != max_power_of_2);

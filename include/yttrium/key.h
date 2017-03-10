@@ -191,10 +191,8 @@ namespace Yttrium
 		__Count,
 	};
 
-	enum : KeyType
-	{
-		KeyCount = Key::__Count, ///< Number of keys defined.
-	};
+	/// Number of keys defined.
+	constexpr auto KeyCount = static_cast<KeyType>(Key::__Count);
 
 	/// %Key event.
 	class Y_API KeyEvent

@@ -54,7 +54,7 @@ namespace Yttrium
 		{
 			::CloseHandle(_handle);
 			if (_unlink)
-				::DeleteFileA(_name.text());
+				::DeleteFileA(_name.c_str());
 		}
 
 		void reserve(uint64_t) override

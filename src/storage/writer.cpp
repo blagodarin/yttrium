@@ -7,6 +7,7 @@
 #include "../system/file.h"
 #include "reader.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <limits>

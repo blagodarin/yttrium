@@ -4,6 +4,7 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/string_utils.h>
 
+#include <array>
 #include <vector>
 
 namespace
@@ -105,7 +106,7 @@ namespace Yttrium
 				case Cr:
 					if (_cursor[1] == '\n')
 						++_cursor;
-					[[fallthrough]]
+					[[fallthrough]];
 				case Lf:
 					_line_base = _cursor++;
 					++_line;

@@ -6,6 +6,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <array>
+
 // TODO: Test Reader properties.
 
 using namespace Yttrium;

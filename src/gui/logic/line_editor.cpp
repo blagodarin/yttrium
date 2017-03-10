@@ -2,6 +2,7 @@
 
 #include <yttrium/key.h>
 
+#include <algorithm>
 #include <cassert>
 
 namespace Yttrium

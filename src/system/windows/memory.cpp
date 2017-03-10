@@ -2,6 +2,7 @@
 
 #include <yttrium/utils.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
@@ -35,7 +36,7 @@ namespace Yttrium
 		const auto new_pointer = ::VirtualAlloc(nullptr, new_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		if (new_pointer)
 		{
-			std::memcpy(new_pointer, old_pointer, min(old_size, new_size));
+			std::memcpy(new_pointer, old_pointer, std::min(old_size, new_size));
 			if (!::VirtualFree(old_pointer, 0, MEM_RELEASE))
 				std::abort();
 			return new_pointer;

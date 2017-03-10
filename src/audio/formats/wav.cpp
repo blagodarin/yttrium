@@ -4,6 +4,8 @@
 #include <yttrium/utils.h>
 #include "wav_private.h"
 
+#include <algorithm>
+
 namespace
 {
 	using namespace Yttrium;

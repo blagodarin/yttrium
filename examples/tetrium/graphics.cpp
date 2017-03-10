@@ -38,7 +38,7 @@ namespace
 		1, 4, 4,
 	};
 
-	static constexpr auto FragmentSize = 32;
+	static constexpr auto FragmentSize = 32u;
 	static constexpr auto FragmentCount = 8;
 	static constexpr auto Border = 3;
 

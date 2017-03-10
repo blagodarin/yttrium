@@ -164,7 +164,7 @@ namespace
 			for (; p != end && *p >= '0' && *p <= '9'; ++p)
 				power = power * 10 + (*p - '0');
 
-			result *= std::pow(10, negative_power ? -power : power);
+			result *= std::pow(T{10}, negative_power ? -power : power);
 		}
 
 		return negative ? -result : result;
@@ -230,7 +230,7 @@ namespace
 				power = power * 10 + (*p++ - '0');
 			} while (p != end && *p >= '0' && *p <= '9');
 
-			result *= std::pow(10, negative_power ? -power : power);
+			result *= std::pow(T{10}, negative_power ? -power : power);
 		}
 
 		if (p != end)

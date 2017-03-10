@@ -176,7 +176,7 @@ namespace Yttrium
 			for (;;)
 			{
 				const auto bytes_read = read_at(_private->_offset + string.size(), buffer.data(), buffer.size());
-				if (read_block(buffer.begin(), buffer.begin() + bytes_read) || bytes_read < buffer.size())
+				if (read_block(buffer.data(), buffer.data() + bytes_read) || bytes_read < buffer.size())
 					break;
 			}
 		}

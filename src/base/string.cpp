@@ -2,6 +2,7 @@
 
 #include <yttrium/utils.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 

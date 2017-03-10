@@ -2,6 +2,8 @@
 
 #include <yttrium/script/context.h>
 
+#include <string>
+
 TetriumStatistics::TetriumStatistics(ScriptContext& script)
 	: _script(script)
 	, _statistics
