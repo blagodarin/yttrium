@@ -143,7 +143,7 @@ namespace
 			const auto index_t = std::get<1>(index);
 			const auto index_n = std::get<2>(index);
 
-			if (index_v >= _vertices.size() || index_t >= _texcoords.size() || index_n >= _normals.size())
+			if (index_v >= _vertices.size() || (index_t != _no_index && index_t >= _texcoords.size()) || (index_n != _no_index && index_n >= _normals.size()))
 				return false;
 
 			const auto i = std::find(_indices.cbegin(), _indices.cend(), index);
