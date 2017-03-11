@@ -11,13 +11,15 @@ namespace
 	bool check_extension(const char* list, const char* name)
 	{
 		const size_t name_size = ::strlen(name);
-		while ((list = ::strstr(list, name)))
+		for (;;)
 		{
+			list = std::strstr(list, name);
+			if (!list)
+				return false;
 			list += name_size;
 			if (*list == ' ' || *list == '\0')
 				return true;
 		}
-		return false;
 	}
 
 	template <typename T>
@@ -84,7 +86,7 @@ namespace Yttrium
 		{
 			_wgl.ARB_extensions_string = true;
 			_wgl.EXTENSIONS_ARB = _wgl.GetExtensionsStringARB(hdc);
-			if (_wgl.EXT_swap_control = ::check_extension(_wgl.EXTENSIONS_ARB, "WGL_EXT_swap_control"))
+			if (_wgl.EXT_swap_control = ::check_extension(_wgl.EXTENSIONS_ARB, "WGL_EXT_swap_control")) // TODO-17: Use init-statement.
 			{
 				::get_proc_address(_wgl.GetSwapIntervalEXT, "wglGetSwapIntervalEXT");
 				::get_proc_address(_wgl.SwapIntervalEXT, "wglSwapIntervalEXT");

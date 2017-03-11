@@ -138,7 +138,7 @@ namespace Yttrium
 		}
 
 	private:
-		enum
+		enum : uint8_t
 		{
 			IsObject      = 1 << 0,
 			AcceptsValues = 1 << 1,

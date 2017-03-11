@@ -86,7 +86,7 @@ namespace Yttrium
 					if (!data)
 					{
 						// TODO: Try to merge smaller blocks before allocating a new big one.
-						assert(1 << i == 2 * MaxSmallBlockSize);
+						assert(size_t{1} << i == 2 * MaxSmallBlockSize);
 						data = ::allocate_big_block(2 * MaxSmallBlockSize);
 					}
 					do
@@ -94,7 +94,7 @@ namespace Yttrium
 						--i;
 						*reinterpret_cast<void**>(data) = _small_blocks[i];
 						_small_blocks[i] = data;
-						data = static_cast<uint8_t*>(data) + (1 << i);
+						data = static_cast<uint8_t*>(data) + (size_t{1} << i);
 					} while (i > level);
 				}
 			}

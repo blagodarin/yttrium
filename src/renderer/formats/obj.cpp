@@ -41,11 +41,11 @@ namespace
 		{
 			std::smatch match;
 			if (std::regex_match(line, match, _obj_v_regex))
-				_vertices.emplace_back(std::stod(match[1]), std::stod(match[2]), std::stod(match[3]));
+				_vertices.emplace_back(std::stof(match[1]), std::stof(match[2]), std::stof(match[3]));
 			else if (std::regex_match(line, match, _obj_vt_regex))
-				_texcoords.emplace_back(std::stod(match[1]), std::stod(match[2]));
+				_texcoords.emplace_back(std::stof(match[1]), std::stof(match[2]));
 			else if (std::regex_match(line, match, _obj_vn_regex))
-				_normals.emplace_back(std::stod(match[1]), std::stod(match[2]), std::stod(match[3]));
+				_normals.emplace_back(std::stof(match[1]), std::stof(match[2]), std::stof(match[3]));
 			else if (std::regex_match(line, match, _obj_f_regex))
 			{
 				for (size_t i = 1; i <= 3; ++i)
@@ -149,7 +149,7 @@ namespace
 			const auto i = std::find(_indices.cbegin(), _indices.cend(), index);
 			if (i != _indices.cend())
 			{
-				data._indices.emplace_back(i - _indices.cbegin());
+				data._indices.emplace_back(static_cast<uint32_t>(i - _indices.cbegin()));
 				return true;
 			}
 
@@ -160,7 +160,7 @@ namespace
 			if (index_n != _no_index)
 				appender << _normals[index_n].x << _normals[index_n].y << _normals[index_n].z << _normals[index_n].w;
 
-			data._indices.emplace_back(_indices.size());
+			data._indices.emplace_back(static_cast<uint32_t>(_indices.size()));
 			_indices.emplace_back(index);
 			return true;
 		}
@@ -170,7 +170,7 @@ namespace
 		std::vector<Vector4> _vertices;
 		std::vector<Vector2> _texcoords;
 		std::vector<Vector4> _normals;
-		std::vector<std::tuple<int, int, int>> _indices;
+		std::vector<std::tuple<size_t, size_t, size_t>> _indices;
 	};
 }
 

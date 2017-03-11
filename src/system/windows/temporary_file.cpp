@@ -11,7 +11,8 @@ namespace
 	{
 		constexpr auto max_temp_path_size = MAX_PATH - 14; // GetTempFileName path length limit.
 		std::array<char, max_temp_path_size + 1> path;
-		if (!::GetTempPathA(path.size(), path.data()))
+		static_assert(path.size() <= std::numeric_limits<DWORD>::max());
+		if (!::GetTempPathA(static_cast<DWORD>(path.size()), path.data()))
 			std::abort();
 		std::array<char, MAX_PATH> name;
 		const auto status = ::GetTempFileNameA(path.data(), "ytt", 0, name.data());
