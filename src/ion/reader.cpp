@@ -132,10 +132,8 @@ namespace Yttrium
 							switch (*cursor)
 							{
 							case '\0':
-								if (cursor == static_cast<const char*>(_buffer.data()) + _buffer.size())
-									throw std::runtime_error{make_string("(", _line, ":", cursor - _line_base, ") Unexpected end of file")};
-								++cursor;
-								break;
+								throw std::runtime_error{make_string("(", _line, ":", cursor - _line_base, ") ",
+									cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character")};
 							case '\n':
 							case '\r':
 								throw std::runtime_error{make_string("(", _line, ":", cursor - _line_base, ") Unexpected end of line")};

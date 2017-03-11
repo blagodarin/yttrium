@@ -46,7 +46,7 @@ namespace Yttrium
 		};
 
 		///
-		IonReader(const Reader&);
+		explicit IonReader(const Reader&);
 
 		///
 		~IonReader();

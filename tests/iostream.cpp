@@ -37,7 +37,6 @@ BOOST_AUTO_TEST_CASE(test_iostream_rect)
 	BOOST_CHECK_EQUAL(stream.str(), "Rect({1, 2}, Size(3, 4))");
 }
 
-
 BOOST_AUTO_TEST_CASE(test_iostream_static_string)
 {
 	using namespace Yttrium::Literals;
