@@ -77,6 +77,13 @@ namespace
 
 namespace Yttrium
 {
+	StaticString IonReader::Token::to_name() const
+	{
+		if (_type != Type::Name)
+			throw IonError{_line, _column, "ION name expected"};
+		return _text;
+	}
+
 	class IonReaderPrivate
 	{
 	public:
@@ -92,11 +99,11 @@ namespace Yttrium
 				switch (::class_of(*_cursor))
 				{
 				case Other:
-					throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Bad character")};
+					throw IonError{_line, _cursor - _line_base, "Bad character"};
 
 				case End:
 					if (_cursor != static_cast<const char*>(_buffer.data()) + _buffer.size())
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Bad character")};
+						throw IonError{_line, _cursor - _line_base, "Bad character"};
 					return make_token<IonReader::Token::Type::End>(_cursor, 0);
 
 				case Space:
@@ -113,7 +120,7 @@ namespace Yttrium
 
 				case Name:
 					if (!(_stack.back() & AcceptNames))
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected name")};
+						throw IonError{_line, _cursor - _line_base, "Unexpected ION name"};
 					{
 						const auto base = _cursor;
 						do { ++_cursor; } while (::class_of(*_cursor) == Name);
@@ -123,7 +130,7 @@ namespace Yttrium
 
 				case Quote:
 					if (!(_stack.back() & AcceptValues))
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected value")};
+						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
 					{
 						auto cursor = _cursor;
 						const auto base = ++cursor;
@@ -132,11 +139,10 @@ namespace Yttrium
 							switch (*cursor)
 							{
 							case '\0':
-								throw std::runtime_error{make_string("(", _line, ":", cursor - _line_base, ") ",
-									cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character")};
+								throw IonError{_line, cursor - _line_base, cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character"};
 							case '\n':
 							case '\r':
-								throw std::runtime_error{make_string("(", _line, ":", cursor - _line_base, ") Unexpected end of line")};
+								throw IonError{_line, cursor - _line_base, "Unexpected end of line"};
 							default:
 								++cursor;
 							}
@@ -147,25 +153,25 @@ namespace Yttrium
 
 				case LBrace:
 					if (!(_stack.back() & AcceptValues))
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected list")};
+						throw IonError{_line, _cursor - _line_base, "Unexpected list"};
 					_stack.emplace_back(AcceptNames);
 					return make_token<IonReader::Token::Type::ObjectBegin>(_cursor++, 1);
 
 				case RBrace:
 					if (!(_stack.back() & AcceptNames) || _stack.size() == 1)
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected end of object")};
+						throw IonError{_line, _cursor - _line_base, "Unexpected end of object"};
 					_stack.pop_back();
 					return make_token<IonReader::Token::Type::ObjectEnd>(_cursor++, 1);
 
 				case LBracket:
 					if (!(_stack.back() & AcceptValues))
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected list")};
+						throw IonError{_line, _cursor - _line_base, "Unexpected list"};
 					_stack.emplace_back(AcceptValues);
 					return make_token<IonReader::Token::Type::ListBegin>(_cursor++, 1);
 
 				case RBracket:
 					if ((_stack.back() & (AcceptNames | AcceptValues)) != AcceptValues)
-						throw std::runtime_error{make_string("(", _line, ":", _cursor - _line_base, ") Unexpected end of object")};
+						throw IonError{_line, _cursor - _line_base, "Unexpected end of object"};
 					_stack.pop_back();
 					return make_token<IonReader::Token::Type::ListEnd>(_cursor++, 1);
 
@@ -221,5 +227,23 @@ namespace Yttrium
 	IonReader::Token IonReader::read()
 	{
 		return _private->read();
+	}
+
+	bool read_name(IonReader& ion, const StaticString& name)
+	{
+		const auto token = ion.read();
+		if (token.type() == IonReader::Token::Type::End)
+			return false;
+		if (token.to_name() != name)
+			throw IonError{token.line(), token.column(), "'", name, "' expected"};
+		return true;
+	}
+
+	StaticString read_value(IonReader& ion)
+	{
+		const auto token = ion.read();
+		if (token.type() != IonReader::Token::Type::Value)
+			throw IonError{token.line(), token.column(), "ION value expected"};
+		return token.text();
 	}
 }

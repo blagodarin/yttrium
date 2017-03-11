@@ -5,7 +5,6 @@
 #include <boost/test/unit_test.hpp>
 
 using Yttrium::IonReader;
-using Yttrium::Reader;
 
 namespace Yttrium
 {
@@ -32,7 +31,7 @@ namespace
 	class TestData
 	{
 	public:
-		TestData(const std::string& data) : _ion_reader{Reader{data.data(), data.size()}} {}
+		TestData(const std::string& data) : _ion_reader{Yttrium::Reader{data.data(), data.size()}} {}
 		IonReader* operator->() { return &_ion_reader; }
 	private:
 		IonReader _ion_reader;
@@ -125,126 +124,128 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_comments)
 
 BOOST_AUTO_TEST_CASE(test_ion_reader_negative)
 {
+	using Yttrium::IonError;
+
 	{
 		TestData ion{"\""};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"["};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"]"};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"{"};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"}"};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		using namespace std::literals::string_literals;
 		TestData ion{"\0"s};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"\xff"};
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1\"value1"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1\"\0"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1\"\n"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1\"\r"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1]"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1}"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1\"value1\"]"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1\"value1\"}"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1[name2"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::ListBegin, "["));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1[}"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::ListBegin, "["));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1{\""};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::ObjectBegin, "{"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1{["};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::ObjectBegin, "{"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 	{
 		TestData ion{"name1{]"};
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::ObjectBegin, "{"));
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
-		BOOST_CHECK_THROW(ion->read(), std::runtime_error);
+		BOOST_CHECK_THROW(ion->read(), IonError);
+		BOOST_CHECK_THROW(ion->read(), IonError);
 	}
 }
 

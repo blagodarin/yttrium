@@ -5,13 +5,32 @@
 #define _include_yttrium_ion_reader_h_
 
 #include <yttrium/static_string.h>
+#include <yttrium/string_utils.h>
 
 #include <memory>
+#include <stdexcept>
 
 namespace Yttrium
 {
 	class StaticString;
 	class Reader;
+
+	///
+	class IonError : public std::runtime_error
+	{
+	public:
+		///
+		template <typename... Args>
+		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args)
+			: std::runtime_error{make_string("(", line, ":", column, ") ", std::forward<Args>(args)...).c_str()}, _line{line}, _column{column} {}
+
+		std::ptrdiff_t column() const noexcept { return _column; }
+		std::size_t line() const noexcept { return _line; }
+
+	protected:
+		std::size_t _line;
+		std::ptrdiff_t _column;
+	};
 
 	///
 	class Y_API IonReader
@@ -38,11 +57,13 @@ namespace Yttrium
 			StaticString text() const noexcept { return _text; }
 			Type type() const noexcept { return _type; }
 
+			StaticString to_name() const;
+
 		private:
-			const std::size_t _line;
-			const std::ptrdiff_t _column;
-			const Type _type;
-			const StaticString _text;
+			std::size_t _line;
+			std::ptrdiff_t _column;
+			Type _type;
+			StaticString _text;
 		};
 
 		///
@@ -57,6 +78,12 @@ namespace Yttrium
 	private:
 		const std::unique_ptr<class IonReaderPrivate> _private;
 	};
+
+	///
+	Y_API bool read_name(IonReader&, const StaticString&);
+
+	///
+	Y_API StaticString read_value(IonReader&);
 }
 
 #endif

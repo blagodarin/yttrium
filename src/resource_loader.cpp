@@ -7,9 +7,7 @@
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/document.h>
-#include <yttrium/ion/node.h>
-#include <yttrium/ion/object.h>
-#include <yttrium/ion/value.h>
+#include <yttrium/ion/reader.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/renderer.h>
@@ -126,108 +124,93 @@ namespace Yttrium
 			return {};
 		return _private->_material_cache.fetch(name, [this, name](Reader&& reader) -> std::shared_ptr<const Material>
 		{
-			const auto document = IonDocument::open(reader);
-			if (!document)
-				return {};
+			IonReader ion{reader};
 			StaticString vertex_shader;
 			StaticString fragment_shader;
 			std::shared_ptr<const Texture2D> texture;
 			Texture2D::Filter texture_filter = Texture2D::NearestFilter;
-			for (const auto& node : document->root())
+			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End;)
 			{
-				if (node.name() == "vertex_shader"_s)
+				const auto ion_name = token.to_name();
+				if (ion_name == "vertex_shader"_s)
 				{
-					if (node.size() != 1 || node.begin()->type() != IonValue::Type::String || node.begin()->string().is_empty())
+					const auto value = read_value(ion);
+					if (value.is_empty())
 						throw DataError("("_s, name, ") Bad 'vertex_shader'"_s);
 					if (!vertex_shader.is_empty())
 						throw DataError("("_s, name, ") Duplicate 'vertex_shader'"_s);
-					vertex_shader = node.begin()->string();
+					vertex_shader = value;
 				}
-				else if (node.name() == "fragment_shader"_s)
+				else if (ion_name == "fragment_shader"_s)
 				{
-					if (node.size() != 1 || node.begin()->type() != IonValue::Type::String || node.begin()->string().is_empty())
+					const auto value = read_value(ion);
+					if (value.is_empty())
 						throw DataError("("_s, name, ") Bad 'fragment_shader'"_s);
 					if (!fragment_shader.is_empty())
 						throw DataError("("_s, name, ") Duplicate 'fragment_shader'"_s);
-					fragment_shader = node.begin()->string();
+					fragment_shader = value;
 				}
-				else if (node.name() == "texture"_s)
+				else if (ion_name == "texture"_s)
 				{
-					auto i = node.begin();
-					if (i == node.end() || i->type() != IonValue::Type::String || i->string().is_empty())
+					const auto texture_name = read_value(ion);
+					if (texture_name.is_empty())
 						throw DataError("("_s, name, ") Bad 'texture'"_s);
-					++i;
-					if (i != node.end())
+					token = ion.read();
+					if (token.type() == IonReader::Token::Type::ObjectBegin) // TODO: Merge with GuiIonPropertyLoader::load_texture.
 					{
-						if (i->type() != IonValue::Type::Object)
-							throw DataError("("_s, name, ") Bad 'texture'"_s);
-
-						const auto load_texture_filter = [](const IonObject& object) -> boost::optional<Texture2D::Filter> // TODO: Merge with GuiIonPropertyLoader::load_texture.
+						bool has_interpolation = false;
+						bool has_anisotropy = false;
+						for (token = ion.read(); token.type() != IonReader::Token::Type::ObjectEnd; token = ion.read())
 						{
-							Texture2D::Filter f = Texture2D::NearestFilter;
-							bool has_interpolation = false;
-							bool has_anisotropy = false;
-							for (const auto& n : object)
+							const auto filter_option = token.to_name();
+							if (filter_option == "nearest"_s)
 							{
-								if (!n.is_empty())
-									return {};
-								if (n.name() == "nearest"_s)
-								{
-									if (has_interpolation)
-										return {};
-									f = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (f & Texture2D::AnisotropicFilter));
-									has_interpolation = true;
-								}
-								else if (n.name() == "linear"_s)
-								{
-									if (has_interpolation)
-										return {};
-									f = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (f & Texture2D::AnisotropicFilter));
-									has_interpolation = true;
-								}
-								else if (n.name() == "bilinear"_s)
-								{
-									if (has_interpolation)
-										return {};
-									f = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (f & Texture2D::AnisotropicFilter));
-									has_interpolation = true;
-								}
-								else if (n.name() == "trilinear"_s)
-								{
-									if (has_interpolation)
-										return {};
-									f = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (f & Texture2D::AnisotropicFilter));
-									has_interpolation = true;
-								}
-								else if (n.name() == "anisotropic"_s)
-								{
-									if (!has_interpolation || has_anisotropy)
-										return {};
-									f = static_cast<Texture2D::Filter>((f & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
-									has_anisotropy = true;
-								}
-								else
-									return {};
+								if (has_interpolation)
+									throw DataError("("_s, name, ") Bad 'texture'"_s);
+								texture_filter = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (texture_filter & Texture2D::AnisotropicFilter));
+								has_interpolation = true;
 							}
-							return f;
-						};
-
-						const auto maybe_filter = load_texture_filter(*i->object());
-						if (!maybe_filter)
-							throw DataError("("_s, name, ") Bad 'texture'"_s);
-						texture_filter = *maybe_filter;
-						++i;
-						if (i != node.end())
-							throw DataError("("_s, name, ") Bad 'texture'"_s);
+							else if (filter_option == "linear"_s)
+							{
+								if (has_interpolation)
+									throw DataError("("_s, name, ") Bad 'texture'"_s);
+								texture_filter = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
+								has_interpolation = true;
+							}
+							else if (filter_option == "bilinear"_s)
+							{
+								if (has_interpolation)
+									throw DataError("("_s, name, ") Bad 'texture'"_s);
+								texture_filter = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
+								has_interpolation = true;
+							}
+							else if (filter_option == "trilinear"_s)
+							{
+								if (has_interpolation)
+									throw DataError("("_s, name, ") Bad 'texture'"_s);
+								texture_filter = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
+								has_interpolation = true;
+							}
+							else if (filter_option == "anisotropic"_s)
+							{
+								if (!has_interpolation || has_anisotropy)
+									throw DataError("("_s, name, ") Bad 'texture'"_s);
+								texture_filter = static_cast<Texture2D::Filter>((texture_filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
+								has_anisotropy = true;
+							}
+							else
+								throw DataError("("_s, name, ") Bad 'texture'"_s);
+						}
+						token = ion.read();
 					}
-					else if (node.size() > 2)
-						throw DataError("("_s, name, ") Bad 'texture'"_s);
 					if (texture)
 						throw DataError("("_s, name, ") Duplicate 'texture'"_s);
-					texture = load_texture_2d(node.begin()->string());
+					texture = load_texture_2d(texture_name);
+					continue;
 				}
 				else
-					throw DataError("("_s, name, ") Bad material"_s);
+					throw DataError("("_s, name, ") Bad material"_s); // TODO: Output location and the unknown ION name.
+				token = ion.read();
 			}
 			if (vertex_shader.is_empty() || fragment_shader.is_empty())
 				throw DataError("("_s, name, ") No 'vertex_shader' or 'fragment_shader'"_s);

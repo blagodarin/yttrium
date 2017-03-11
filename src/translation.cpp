@@ -1,16 +1,15 @@
 #include <yttrium/translation.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/ion/document.h>
-#include <yttrium/ion/node.h>
-#include <yttrium/ion/object.h>
-#include <yttrium/ion/value.h>
+#include <yttrium/ion/reader.h>
 #include <yttrium/ion/writer.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/string.h>
 
 #include <algorithm>
+#include <map>
+#include <vector>
 
 namespace Yttrium
 {
@@ -39,28 +38,22 @@ namespace Yttrium
 
 	TranslationImpl::TranslationImpl(const Reader& reader)
 	{
-		const auto document = IonDocument::open(reader);
-		if (!document)
-			throw DataError("Bad translation data");
+		IonReader ion{reader};
 		decltype(_translations) translations;
-		for (const auto& node : document->root())
+		while (read_name(ion, "tr"_s))
 		{
-			if (node.name() != "tr"_s || node.size() != 2)
-				throw DataError("Bad translation data");
-			const StaticString* source = nullptr;
-			const StaticString* translation = nullptr;
-			if (!node.first()->get(&source) || !node.last()->get(&translation))
-				throw DataError("Bad translation data");
-			translations.emplace(String{ *source }, translation->to_std());
+			const auto source = read_value(ion);
+			const auto translation = read_value(ion);
+			translations.emplace(String{source}, translation.to_std());
 		}
 		_translations = std::move(translations);
 	}
 
 	void TranslationImpl::add(const StaticString& source)
 	{
-		auto i = _translations.find({ source, ByReference{} });
+		auto i = _translations.find({source, ByReference{}});
 		if (i == _translations.end())
-			i = _translations.emplace(String{ source }, Entry{}).first;
+			i = _translations.emplace(String{source}, Entry{}).first;
 		i->second.added = true;
 	}
 
@@ -77,7 +70,7 @@ namespace Yttrium
 	{
 		std::vector<std::pair<StaticString, StaticString>> translations;
 		translations.reserve(_translations.size());
-		std::for_each(_translations.begin(), _translations.end(), [&translations](const auto& t){ translations.emplace_back(t.first, StaticString{ t.second.text }); });
+		std::for_each(_translations.begin(), _translations.end(), [&translations](const auto& t){ translations.emplace_back(t.first, StaticString{t.second.text}); });
 		std::sort(translations.begin(), translations.end(), [](const auto& a, const auto& b){ return a.first < b.first; });
 		Writer writer{ path };
 		IonWriter ion{ writer, IonWriter::Formatting::Pretty };
@@ -92,7 +85,7 @@ namespace Yttrium
 
 	std::string TranslationImpl::translate(const StaticString& source) const
 	{
-		const auto i = _translations.find({ source, ByReference{} });
+		const auto i = _translations.find({source, ByReference{}});
 		return i != _translations.end() && !i->second.text.empty() ? i->second.text : source.to_std();
 	}
 
