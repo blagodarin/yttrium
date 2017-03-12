@@ -77,11 +77,36 @@ namespace
 
 namespace Yttrium
 {
+	void IonReader::Token::check_name(const StaticString& name) const
+	{
+		if (to_name() != name)
+			throw IonError{_line, _column, "'", name, "' expected"};
+	}
+
 	StaticString IonReader::Token::to_name() const
 	{
 		if (_type != Type::Name)
 			throw IonError{_line, _column, "ION name expected"};
 		return _text;
+	}
+
+	StaticString IonReader::Token::to_value() const
+	{
+		if (_type != Type::Value)
+			throw IonError{_line, _column, "ION value expected"};
+		return _text;
+	}
+
+	void IonReader::Token::check_list_begin() const
+	{
+		if (_type != Type::ListBegin)
+			throw IonError{_line, _column, "'[' expected"};
+	}
+
+	void IonReader::Token::check_end() const
+	{
+		if (_type != Type::End)
+			throw IonError{_line, _column, "End of file expected"};
 	}
 
 	class IonReaderPrivate

@@ -12,7 +12,6 @@
 
 namespace Yttrium
 {
-	class StaticString;
 	class Reader;
 
 	///
@@ -57,7 +56,14 @@ namespace Yttrium
 			StaticString text() const noexcept { return _text; }
 			Type type() const noexcept { return _type; }
 
+			void check_name(const StaticString&) const;
 			StaticString to_name() const;
+
+			StaticString to_value() const;
+
+			void check_list_begin() const;
+
+			void check_end() const;
 
 		private:
 			std::size_t _line;
