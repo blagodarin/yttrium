@@ -77,6 +77,18 @@ namespace
 
 namespace Yttrium
 {
+	void IonReader::Token::check_end() const
+	{
+		if (_type != Type::End)
+			throw IonError{_line, _column, "End of file expected"};
+	}
+
+	void IonReader::Token::check_list_begin() const
+	{
+		if (_type != Type::ListBegin)
+			throw IonError{_line, _column, "'[' expected"};
+	}
+
 	void IonReader::Token::check_name(const StaticString& name) const
 	{
 		if (to_name() != name)
@@ -95,18 +107,6 @@ namespace Yttrium
 		if (_type != Type::Value)
 			throw IonError{_line, _column, "ION value expected"};
 		return _text;
-	}
-
-	void IonReader::Token::check_list_begin() const
-	{
-		if (_type != Type::ListBegin)
-			throw IonError{_line, _column, "'[' expected"};
-	}
-
-	void IonReader::Token::check_end() const
-	{
-		if (_type != Type::End)
-			throw IonError{_line, _column, "End of file expected"};
 	}
 
 	class IonReaderPrivate
@@ -252,23 +252,5 @@ namespace Yttrium
 	IonReader::Token IonReader::read()
 	{
 		return _private->read();
-	}
-
-	bool read_name(IonReader& ion, const StaticString& name)
-	{
-		const auto token = ion.read();
-		if (token.type() == IonReader::Token::Type::End)
-			return false;
-		if (token.to_name() != name)
-			throw IonError{token.line(), token.column(), "'", name, "' expected"};
-		return true;
-	}
-
-	StaticString read_value(IonReader& ion)
-	{
-		const auto token = ion.read();
-		if (token.type() != IonReader::Token::Type::Value)
-			throw IonError{token.line(), token.column(), "ION value expected"};
-		return token.text();
 	}
 }

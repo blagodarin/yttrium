@@ -40,10 +40,11 @@ namespace Yttrium
 	{
 		IonReader ion{reader};
 		decltype(_translations) translations;
-		while (read_name(ion, "tr"_s))
+		for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
 		{
-			const auto source = read_value(ion);
-			const auto translation = read_value(ion);
+			token.check_name("tr"_s);
+			const auto source = ion.read().to_value();
+			const auto translation = ion.read().to_value();
 			translations.emplace(String{source}, translation.to_std());
 		}
 		_translations = std::move(translations);

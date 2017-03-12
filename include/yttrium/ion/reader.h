@@ -56,14 +56,11 @@ namespace Yttrium
 			StaticString text() const noexcept { return _text; }
 			Type type() const noexcept { return _type; }
 
+			void check_end() const;
+			void check_list_begin() const;
 			void check_name(const StaticString&) const;
 			StaticString to_name() const;
-
 			StaticString to_value() const;
-
-			void check_list_begin() const;
-
-			void check_end() const;
 
 		private:
 			std::size_t _line;
@@ -84,12 +81,6 @@ namespace Yttrium
 	private:
 		const std::unique_ptr<class IonReaderPrivate> _private;
 	};
-
-	///
-	Y_API bool read_name(IonReader&, const StaticString&);
-
-	///
-	Y_API StaticString read_value(IonReader&);
 }
 
 #endif

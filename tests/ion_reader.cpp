@@ -26,6 +26,38 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_iostream)
 	BOOST_CHECK_EQUAL(stream.str(), "{1,2,IonReader::Token::Type(" + std::to_string(static_cast<int>(IonReader::Token::Type::End)) + "),R\"(test)\"}");
 }
 
+BOOST_AUTO_TEST_CASE(test_ion_reader_token)
+{
+	using Yttrium::IonError;
+
+	BOOST_TEST_CONTEXT("IonReader::Token::check_end")
+	{
+		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::End, "").check_end());
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ListEnd, "]").check_end(), IonError);
+	}
+	BOOST_TEST_CONTEXT("IonReader::Token::check_list_begin")
+	{
+		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ListBegin, "[").check_list_begin());
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ObjectBegin, "{").check_list_begin(), IonError);
+	}
+	BOOST_TEST_CONTEXT("IonReader::Token::check_name")
+	{
+		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").check_name("name1"));
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").check_name("name2"), IonError);
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Value, "name1").check_name("name1"), IonError);
+	}
+	BOOST_TEST_CONTEXT("IonReader::Token::to_name")
+	{
+		BOOST_CHECK_EQUAL(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").to_name(), "name1");
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Value, "name1").to_name(), IonError);
+	}
+	BOOST_TEST_CONTEXT("IonReader::Token::to_value")
+	{
+		BOOST_CHECK_EQUAL(IonReader::Token(1, 1, IonReader::Token::Type::Value, "value1").to_value(), "value1");
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Name, "value1").to_value(), IonError);
+	}
+}
+
 namespace
 {
 	class TestData

@@ -134,25 +134,27 @@ namespace Yttrium
 				const auto ion_name = token.to_name();
 				if (ion_name == "vertex_shader"_s)
 				{
-					const auto value = read_value(ion);
+					const auto value = ion.read().to_value();
 					if (value.is_empty())
 						throw DataError("("_s, name, ") Bad 'vertex_shader'"_s);
 					if (!vertex_shader.is_empty())
 						throw DataError("("_s, name, ") Duplicate 'vertex_shader'"_s);
 					vertex_shader = value;
+					token = ion.read();
 				}
 				else if (ion_name == "fragment_shader"_s)
 				{
-					const auto value = read_value(ion);
+					const auto value = ion.read().to_value();
 					if (value.is_empty())
 						throw DataError("("_s, name, ") Bad 'fragment_shader'"_s);
 					if (!fragment_shader.is_empty())
 						throw DataError("("_s, name, ") Duplicate 'fragment_shader'"_s);
 					fragment_shader = value;
+					token = ion.read();
 				}
 				else if (ion_name == "texture"_s)
 				{
-					const auto texture_name = read_value(ion);
+					const auto texture_name = ion.read().to_value();
 					if (texture_name.is_empty())
 						throw DataError("("_s, name, ") Bad 'texture'"_s);
 					token = ion.read();
@@ -206,11 +208,9 @@ namespace Yttrium
 					if (texture)
 						throw DataError("("_s, name, ") Duplicate 'texture'"_s);
 					texture = load_texture_2d(texture_name);
-					continue;
 				}
 				else
 					throw DataError("("_s, name, ") Bad material"_s); // TODO: Output location and the unknown ION name.
-				token = ion.read();
 			}
 			if (vertex_shader.is_empty() || fragment_shader.is_empty())
 				throw DataError("("_s, name, ") No 'vertex_shader' or 'fragment_shader'"_s);
