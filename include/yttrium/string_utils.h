@@ -10,6 +10,8 @@
 
 namespace Yttrium
 {
+	class StaticString;
+
 	namespace detail
 	{
 		inline void append_to(std::string& string, char value) { string.append(1, value); }
@@ -26,6 +28,8 @@ namespace Yttrium
 
 		Y_API void append_to(std::string&, double);
 		inline void append_to(std::string& string, float value) { append_to(string, double{value}); }
+
+		inline void append_to(std::string&, const StaticString&);
 	}
 
 	inline void append_to(std::string&) {}

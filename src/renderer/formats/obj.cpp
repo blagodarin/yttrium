@@ -6,6 +6,7 @@
 #include <yttrium/renderer/index_buffer.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>
+#include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
 #include "../mesh_data.h"
 

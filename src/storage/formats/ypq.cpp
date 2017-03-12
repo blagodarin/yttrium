@@ -1,5 +1,6 @@
 #include "ypq.h"
 
+#include <yttrium/static_string.h>
 #include "../../utils/fourcc.h"
 #include "../package.h"
 

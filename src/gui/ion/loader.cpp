@@ -96,8 +96,7 @@ namespace Yttrium
 		}
 		catch (GuiDataError& e)
 		{
-			e.set_source(source_name);
-			throw;
+			throw GuiDataError{source_name, ":", e.what()};
 		}
 	}
 

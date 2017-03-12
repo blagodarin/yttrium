@@ -2,6 +2,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/static_string.h>
 #include "reader.h"
 
 #include <vector>

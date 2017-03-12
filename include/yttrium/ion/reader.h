@@ -20,15 +20,7 @@ namespace Yttrium
 	public:
 		///
 		template <typename... Args>
-		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args)
-			: std::runtime_error{make_string("(", line, ":", column, ") ", std::forward<Args>(args)...).c_str()}, _line{line}, _column{column} {}
-
-		std::ptrdiff_t column() const noexcept { return _column; }
-		std::size_t line() const noexcept { return _line; }
-
-	protected:
-		std::size_t _line;
-		std::ptrdiff_t _column;
+		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args) : std::runtime_error{make_string("(", line, ":", column, ") ", std::forward<Args>(args)...)} {}
 	};
 
 	///

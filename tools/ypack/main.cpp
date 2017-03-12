@@ -94,12 +94,7 @@ int main(int argc, char** argv)
 		}
 		ion.read().check_end();
 	}
-	catch (const IonError& e)
-	{
-		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
-		return 1;
-	}
-	catch (const DataError& e)
+	catch (const std::runtime_error& e)
 	{
 		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
 		return 1;
