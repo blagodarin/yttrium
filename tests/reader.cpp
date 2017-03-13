@@ -14,10 +14,10 @@ namespace
 	Buffer make_random_buffer(size_t size)
 	{
 		std::default_random_engine engine;
-		std::uniform_int_distribution<uint8_t> distribution{ 0, std::numeric_limits<uint8_t>::max() };
+		std::uniform_int_distribution<unsigned> distribution{0, std::numeric_limits<uint8_t>::max()}; // Visual C++ 2017 doesn't allow uint8_t distribution.
 		Buffer buffer(size);
 		for (auto& byte : buffer)
-			byte = distribution(engine);
+			byte = static_cast<uint8_t>(distribution(engine));
 		return buffer;
 	}
 }

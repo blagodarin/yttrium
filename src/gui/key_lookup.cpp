@@ -9,9 +9,7 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	size_t hash(const StaticString& text)
+	size_t hash(const Yttrium::StaticString& text)
 	{
 		static const size_t asso_values[] =
 		{

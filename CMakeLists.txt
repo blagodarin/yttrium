@@ -26,7 +26,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-D_USE_MATH_DEFINES)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest /W4 /wd4251")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++14 /W4 /wd4251") # /std:c++latest is incompatible with boost 1.63.0.
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")

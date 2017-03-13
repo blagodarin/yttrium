@@ -11,7 +11,7 @@ namespace
 	{
 		constexpr auto max_temp_path_size = MAX_PATH - 14; // GetTempFileName path length limit.
 		std::array<char, max_temp_path_size + 1> path;
-		static_assert(path.size() <= std::numeric_limits<DWORD>::max());
+		static_assert(path.size() <= std::numeric_limits<DWORD>::max(), "Invalid MAX_PATH value"); // TODO-17: Remove the message.
 		if (!::GetTempPathA(static_cast<DWORD>(path.size()), path.data()))
 			std::abort();
 		std::array<char, MAX_PATH> name;

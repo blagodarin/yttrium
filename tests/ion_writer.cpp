@@ -123,7 +123,8 @@ BOOST_AUTO_TEST_CASE(test_ion_writer_escape)
 	ion->add_value("value\\value");
 	ion->add_value("value\\");
 	ion->flush();
-	BOOST_CHECK_EQUAL(ion.to_string(), R"(name"\"value""value\"value""value\"""\\value""value\\value""value\\")");
+	const std::string expected{R"(name"\"value""value\"value""value\"""\\value""value\\value""value\\")"}; // Outside of BOOST_CHECK_EQUAL for Visual C++ 2017.
+	BOOST_CHECK_EQUAL(ion.to_string(), expected);
 }
 
 BOOST_AUTO_TEST_CASE(test_ion_writer_flush)
