@@ -4,6 +4,7 @@
 #include <yttrium/gui/text_capture.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/utils.h>
 #include "texture_font.h"
 
@@ -126,12 +127,9 @@ namespace Yttrium
 		friend TextureFont;
 	};
 
-	std::unique_ptr<TextureFont> TextureFont::open(Reader&& reader)
+	std::unique_ptr<TextureFont> TextureFont::load(const Source& source)
 	{
-		if (!reader)
-			return nullptr;
-
-		reader.seek(0);
+		Reader reader{source};
 
 		uint32_t fourcc = 0;
 		if (!reader.read(fourcc) || fourcc != FourccYtf1)

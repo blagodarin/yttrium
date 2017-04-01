@@ -3,7 +3,6 @@
 
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/package.h>
-#include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 
 #include <map>
@@ -14,15 +13,15 @@ namespace Yttrium
 	class YpqReader : public PackageReader
 	{
 	public:
-		YpqReader(Reader&&);
+		YpqReader(std::unique_ptr<Source>&&);
 		~YpqReader() override;
 
-		Reader open(const StaticString&) const override;
+		std::unique_ptr<Source> open(const StaticString&) const override;
 
 	private:
 		struct Entry;
 
-		const Reader _reader;
+		const std::shared_ptr<const Source> _source;
 		Buffer _metadata_buffer;
 		std::map<StaticString, Entry> _entries;
 		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the metadata buffer.

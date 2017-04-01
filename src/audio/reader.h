@@ -5,6 +5,7 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 
 namespace Yttrium
 {
@@ -21,12 +22,12 @@ namespace Yttrium
 		AudioFormat _format;
 		uint64_t _total_samples = 0;
 		uint64_t _current_sample = 0;
-		Reader _reader;
+		const std::unique_ptr<Source> _source;
+		Reader _reader{*_source};
 
-		AudioReaderImpl(Reader&& reader)
-			: _reader(std::move(reader))
+		AudioReaderImpl(std::unique_ptr<Source>&& source)
+			: _source(std::move(source))
 		{
-			_reader.seek(0);
 		}
 	};
 }

@@ -1,7 +1,6 @@
 #include "music.h"
 
 #include <yttrium/audio/reader.h>
-#include <yttrium/storage/reader.h>
 
 #include <cassert>
 
@@ -18,8 +17,8 @@ namespace Yttrium
 		_settings = settings;
 	}
 
-	std::unique_ptr<Music> Music::open(Reader&& reader)
+	std::unique_ptr<Music> Music::open(std::unique_ptr<Source>&& source)
 	{
-		return reader ? std::make_unique<MusicImpl>(AudioReader::open(std::move(reader))) : nullptr;
+		return source ? std::make_unique<MusicImpl>(AudioReader::open(std::move(source))) : nullptr;
 	}
 }

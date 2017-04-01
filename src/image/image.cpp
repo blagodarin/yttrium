@@ -1,7 +1,6 @@
 #include <yttrium/image.h>
 
 #include <yttrium/static_string.h>
-#include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils.h>
 #include "formats.h"
@@ -56,14 +55,12 @@ namespace Yttrium
 	{
 	}
 
-	boost::optional<Image> Image::load(Reader&& reader, ImageType type)
+	boost::optional<Image> Image::load(const Source& source, ImageType type)
 	{
-		if (!reader)
-			return {};
-		if (type == ImageType::Auto && !detect_image_type(reader, type))
+		if (type == ImageType::Auto && !detect_image_type(source, type))
 			return {};
 		Buffer buffer;
-		const auto format = read_image(reader, type, buffer);
+		const auto format = read_image(source, type, buffer);
 		if (!format)
 			return {};
 		return Image(*format, std::move(buffer));
@@ -73,10 +70,10 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			if (StaticString{ path }.ends_with(".tga"_s))
+			if (StaticString{path}.ends_with(".tga"_s))
 				type = ImageType::Tga;
 #ifndef Y_NO_PNG
-			else if (StaticString{ path }.ends_with(".png"_s))
+			else if (StaticString{path}.ends_with(".png"_s))
 				type = ImageType::Png;
 #endif
 			else

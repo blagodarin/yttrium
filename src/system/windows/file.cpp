@@ -1,7 +1,7 @@
 #include "../file.h"
 
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../../storage/reader.h"
 #include "../../storage/writer.h"
 
 #include <cstdlib>
@@ -13,16 +13,16 @@
 
 namespace Yttrium
 {
-	class FileReader : public ReaderPrivate
+	class FileSource final : public Source
 	{
 	public:
-		FileReader(uint64_t size, const std::string& name, HANDLE handle)
-			: ReaderPrivate(size, name)
-			, _handle(handle)
+		FileSource(uint64_t size, const std::string& name, HANDLE handle)
+			: Source{size, name}
+			, _handle{handle}
 		{
 		}
 
-		~FileReader() override
+		~FileSource() override
 		{
 			::CloseHandle(_handle);
 		}
@@ -40,13 +40,13 @@ namespace Yttrium
 		const HANDLE _handle;
 	};
 
-	class FileWriter : public WriterPrivate
+	class FileWriter final : public WriterPrivate
 	{
 	public:
 		FileWriter(uint64_t size, const std::string& name, HANDLE handle)
-			: WriterPrivate(size)
-			, _name(name)
-			, _handle(handle)
+			: WriterPrivate{size}
+			, _name{name}
+			, _handle{handle}
 		{
 		}
 
@@ -89,7 +89,7 @@ namespace Yttrium
 		bool _unlink = false;
 	};
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(const std::string& path)
+	std::unique_ptr<Source> Source::from(const std::string& path)
 	{
 		const auto handle = ::CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
@@ -97,12 +97,12 @@ namespace Yttrium
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
 			std::abort();
-		return std::make_shared<FileReader>(size.QuadPart, path, handle);
+		return std::make_unique<FileSource>(size.QuadPart, path, handle);
 	}
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(const TemporaryFile& file)
+	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
 	{
-		return create_file_reader(file.name());
+		return from(file.name());
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)

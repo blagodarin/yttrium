@@ -11,7 +11,7 @@
 
 namespace Yttrium
 {
-	class Reader;
+	class Source;
 	class StaticString;
 
 	/// Translation file.
@@ -19,9 +19,8 @@ namespace Yttrium
 	{
 	public:
 		///
-		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static std::unique_ptr<Translation> open(const Reader&);
+		static std::unique_ptr<Translation> load(const Source&);
 
 		virtual ~Translation() = default;
 

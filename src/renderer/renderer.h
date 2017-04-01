@@ -41,7 +41,7 @@ namespace Yttrium
 		void draw_rect(const RectF&, const Vector4&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Vector4&) override;
 		Matrix4 full_matrix() const override;
-		std::unique_ptr<Mesh> load_mesh(Reader&&) override;
+		std::unique_ptr<Mesh> load_mesh(const Source&) override;
 		Matrix4 model_matrix() const override;
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }

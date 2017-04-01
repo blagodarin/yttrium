@@ -1,5 +1,5 @@
 #include <yttrium/ion/reader.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include "iostream.h"
 
 #include <boost/test/unit_test.hpp>
@@ -63,10 +63,12 @@ namespace
 	class TestData
 	{
 	public:
-		TestData(const std::string& data) : _ion_reader{Yttrium::Reader{data.data(), data.size()}} {}
+		TestData(const std::string& data) : _data(data) {}
 		IonReader* operator->() { return &_ion_reader; }
 	private:
-		IonReader _ion_reader;
+		const std::string _data;
+		const std::unique_ptr<const Yttrium::Source> _source{Yttrium::Source::from(_data.data(), _data.size())};
+		IonReader _ion_reader{*_source};
 	};
 }
 
@@ -281,7 +283,8 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_negative)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_null_reader)
+BOOST_AUTO_TEST_CASE(test_ion_reader_empty_source)
 {
-	BOOST_CHECK_EQUAL(IonReader({}).read(), IonReader::Token(1, 1, IonReader::Token::Type::End, ""));
+	TestData ion{""};
+	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::End, ""));
 }

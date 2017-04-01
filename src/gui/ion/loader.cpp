@@ -7,7 +7,6 @@
 #include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/resource_loader.h>
-#include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
 #include "../gui.h"
 #include "../screen.h"

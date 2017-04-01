@@ -19,9 +19,9 @@ namespace Yttrium
 	class Margins;
 	class Matrix4;
 	class Mesh;
-	class Reader;
 	class RectF;
 	class Size;
+	class Source;
 	class Texture2D;
 	class TexturedRect;
 	enum class VA;
@@ -73,7 +73,7 @@ namespace Yttrium
 		virtual Matrix4 full_matrix() const = 0;
 
 		///
-		virtual std::unique_ptr<Mesh> load_mesh(Reader&&) = 0;
+		virtual std::unique_ptr<Mesh> load_mesh(const Source&) = 0;
 
 		///
 		virtual Matrix4 model_matrix() const = 0;

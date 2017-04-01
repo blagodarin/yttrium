@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	class Reader;
+	class Source;
 	class StaticString;
 
 	/// Package file types.
@@ -33,7 +33,7 @@ namespace Yttrium
 		virtual ~PackageReader() = default;
 
 		///
-		virtual Reader open(const StaticString& name) const = 0;
+		virtual std::unique_ptr<Source> open(const StaticString& name) const = 0;
 	};
 
 	/// Package writer class.

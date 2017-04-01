@@ -1,7 +1,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/storage/package.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 
 #include <iostream>
@@ -72,9 +72,9 @@ int main(int argc, char** argv)
 	std::vector<std::pair<std::string, std::map<std::string, std::string>>> entries;
 	try
 	{
-		const Reader reader{index_name.c_str()};
-		check(static_cast<bool>(reader), "Bad index file");
-		IonReader ion{reader};
+		auto source = Source::from(index_name);
+		check(static_cast<bool>(source), "Bad index file");
+		IonReader ion{*source};
 		ion.read().check_name("package");
 		ion.read().check_list_begin();
 		for (auto token = ion.read(); token.type() != IonReader::Token::Type::ListEnd;)

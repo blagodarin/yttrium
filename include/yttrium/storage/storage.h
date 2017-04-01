@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 	class Buffer;
-	class Reader;
+	class Source;
 
 	///
 	class Y_API Storage
@@ -39,7 +39,7 @@ namespace Yttrium
 		void attach_package(const std::string& path, PackageType = PackageType::Auto);
 
 		/// Opens a resource.
-		Reader open(const StaticString& name) const;
+		std::unique_ptr<Source> open(const StaticString& name) const;
 
 	private:
 		const std::unique_ptr<class StoragePrivate> _private;

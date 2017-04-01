@@ -1,7 +1,7 @@
 #include "../formats.h"
 
 #include <yttrium/image.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <jpeglib.h>
@@ -23,18 +23,9 @@ namespace
 
 namespace Yttrium
 {
-	boost::optional<ImageFormat> read_jpeg(Reader& reader, Buffer& buffer)
+	boost::optional<ImageFormat> read_jpeg(const Source& source, Buffer& buffer)
 	{
-		Buffer reader_buffer;
-		try
-		{
-			if (!reader.read_all(reader_buffer))
-				return {};
-		}
-		catch (const std::bad_alloc&)
-		{
-			return {};
-		}
+		const auto source_buffer = source.to_buffer();
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
@@ -50,7 +41,7 @@ namespace Yttrium
 			return {};
 		}
 
-		::jpeg_mem_src(&decompressor, &reader_buffer[0], reader_buffer.size());
+		::jpeg_mem_src(&decompressor, &source_buffer[0], source_buffer.size());
 
 		::jpeg_read_header(&decompressor, TRUE);
 
@@ -67,7 +58,7 @@ namespace Yttrium
 		catch (const std::bad_alloc&)
 		{
 			::jpeg_destroy_decompress(&decompressor);
-			return {};
+			throw;
 		}
 
 		::jpeg_start_decompress(&decompressor);

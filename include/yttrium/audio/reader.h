@@ -11,14 +11,14 @@
 namespace Yttrium
 {
 	class AudioFormat;
-	class Reader;
+	class Source;
 
 	/// Read-only audio file access interface.
 	class Y_API AudioReader
 	{
 	public:
 		///
-		static std::unique_ptr<AudioReader> open(Reader&&);
+		static std::unique_ptr<AudioReader> open(std::unique_ptr<Source>&&);
 
 		virtual ~AudioReader() = default;
 

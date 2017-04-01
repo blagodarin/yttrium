@@ -47,8 +47,8 @@ namespace
 
 namespace Yttrium
 {
-	OggVorbisReader::OggVorbisReader(Reader&& reader)
-		: AudioReaderImpl{std::move(reader)}
+	OggVorbisReader::OggVorbisReader(std::unique_ptr<Source>&& source)
+		: AudioReaderImpl{std::move(source)}
 	{
 		::memset(&_ov_file, 0, sizeof _ov_file);
 		if (::ov_open_callbacks(&_reader, &_ov_file, nullptr, 0, ::y_ov_callbacks) < 0)

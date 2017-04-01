@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	class Reader;
+	class Source;
 
 	///
 	class IonError : public std::runtime_error
@@ -62,7 +62,7 @@ namespace Yttrium
 		};
 
 		///
-		explicit IonReader(const Reader&);
+		explicit IonReader(const Source&);
 
 		///
 		~IonReader();

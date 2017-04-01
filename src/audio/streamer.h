@@ -8,9 +8,7 @@
 namespace Yttrium
 {
 	class AudioPlayerBackend;
-	class AudioReader;
 	class Music;
-	class Reader;
 
 	class AudioStreamer
 	{

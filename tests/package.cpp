@@ -1,5 +1,5 @@
 #include <yttrium/storage/package.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 #include "iostream.h"
@@ -8,7 +8,7 @@
 
 #include <array>
 
-// TODO: Test Reader properties.
+// TODO: Test Source properties.
 
 using namespace Yttrium;
 
@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE(test_package)
 		BOOST_REQUIRE(package_writer->commit());
 	}
 
-	Reader packed_file1;
-	Reader packed_file2;
-	Reader packed_file3;
+	std::unique_ptr<Source> packed_file1;
+	std::unique_ptr<Source> packed_file2;
+	std::unique_ptr<Source> packed_file3;
 
 	{
 		const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
@@ -56,23 +56,18 @@ BOOST_AUTO_TEST_CASE(test_package)
 		packed_file2 = package_reader->open(StaticString{ file2.name() });
 	}
 
-	Buffer actual;
-
 	BOOST_REQUIRE(packed_file1);
-	BOOST_REQUIRE(packed_file1.read_all(actual));
-	BOOST_CHECK_EQUAL(actual, buffer1);
+	BOOST_CHECK_EQUAL(packed_file1->to_buffer(), buffer1);
 
 	packed_file1 = {};
 
 	BOOST_REQUIRE(packed_file2);
-	BOOST_REQUIRE(packed_file2.read_all(actual));
-	BOOST_CHECK_EQUAL(actual, buffer2);
+	BOOST_CHECK_EQUAL(packed_file2->to_buffer(), buffer2);
 
 	packed_file2 = {};
 
 	BOOST_REQUIRE(packed_file3);
-	BOOST_REQUIRE(packed_file3.read_all(actual));
-	BOOST_CHECK_EQUAL(actual, buffer3);
+	BOOST_CHECK_EQUAL(packed_file3->to_buffer(), buffer3);
 }
 
 BOOST_AUTO_TEST_CASE(test_packed_file_size)
@@ -103,6 +98,6 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 	BOOST_REQUIRE(packed_file);
 
 	std::array<uint8_t, 2> data = { 0, 0 };
-	BOOST_CHECK_EQUAL(packed_file.read(data.data(), 2), 1);
+	BOOST_CHECK_EQUAL(packed_file->read_at(0, data.data(), 2), 1);
 	BOOST_CHECK_EQUAL(data[0], '2');
 }

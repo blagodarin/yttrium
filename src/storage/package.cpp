@@ -1,6 +1,7 @@
 #include <yttrium/storage/package.h>
 
 #include <yttrium/static_string.h>
+#include <yttrium/storage/source.h>
 #include "formats/ypq.h"
 #include "package.h"
 
@@ -12,18 +13,18 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (StaticString{ path }.ends_with(".ypq"_s))
+			if (StaticString{path}.ends_with(".ypq"_s))
 				type = PackageType::Ypq;
 			else
 				return {};
 		}
-		Reader reader(path);
-		if (!reader)
+		auto source = Source::from(path);
+		if (!source)
 			return {};
 		try
 		{
 			if (type == PackageType::Ypq)
-				return std::make_unique<YpqReader>(std::move(reader));
+				return std::make_unique<YpqReader>(std::move(source));
 		}
 		catch (const BadPackage& e)
 		{

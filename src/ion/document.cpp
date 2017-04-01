@@ -2,7 +2,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/list.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include "parser.h"
 
 namespace Yttrium
@@ -59,14 +59,13 @@ namespace Yttrium
 		return std::make_unique<IonDocumentImpl>();
 	}
 
-	std::unique_ptr<IonDocument> IonDocument::open(const Reader& reader)
+	std::unique_ptr<IonDocument> IonDocument::load(const Source& source)
 	{
 		auto document = std::make_unique<IonDocumentImpl>();
-		if (!reader.read_all(document->_buffer))
-			return nullptr;
+		document->_buffer = source.to_buffer();
 		const auto parsing_result = IonParser::parse(*document);
 		if (parsing_result.status != IonParser::Status::Ok)
-			throw DataError('(', reader.name(), ':', parsing_result.line, ':', parsing_result.position, ") Syntax error"_s);
+			throw DataError('(', source.name(), ':', parsing_result.line, ':', parsing_result.position, ") Syntax error"_s);
 		return std::move(document);
 	}
 }

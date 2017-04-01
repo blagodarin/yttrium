@@ -2,8 +2,8 @@
 
 #include "../file.h"
 
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../../storage/reader.h"
 #include "../../storage/writer.h"
 
 #include <cstdlib>
@@ -16,16 +16,16 @@
 
 namespace Yttrium
 {
-	class FileReader : public ReaderPrivate
+	class FileSource final : public Source
 	{
 	public:
-		FileReader(uint64_t size, const std::string& name, int descriptor)
-			: ReaderPrivate(size, std::move(name))
-			, _descriptor(descriptor)
+		FileSource(uint64_t size, const std::string& name, int descriptor)
+			: Source{size, std::move(name)}
+			, _descriptor{descriptor}
 		{
 		}
 
-		~FileReader() override
+		~FileSource() override
 		{
 			if (::close(_descriptor))
 				::perror("ERROR! 'close' failed");
@@ -41,13 +41,13 @@ namespace Yttrium
 		const int _descriptor;
 	};
 
-	class FileWriter : public WriterPrivate
+	class FileWriter final : public WriterPrivate
 	{
 	public:
 		FileWriter(uint64_t size, const std::string& name, int descriptor)
-			: WriterPrivate(size)
-			, _name(name)
-			, _descriptor(descriptor)
+			: WriterPrivate{size}
+			, _name{name}
+			, _descriptor{descriptor}
 		{
 		}
 
@@ -66,7 +66,7 @@ namespace Yttrium
 		void resize(uint64_t size) override
 		{
 			if (::ftruncate(_descriptor, static_cast<int64_t>(size)) == -1)
-				throw std::system_error(errno, std::generic_category());
+				throw std::system_error{errno, std::generic_category()};
 		}
 
 		void unlink() override
@@ -86,7 +86,7 @@ namespace Yttrium
 		bool _unlink = false;
 	};
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(const std::string& path)
+	std::unique_ptr<Source> Source::from(const std::string& path)
 	{
 #ifdef __linux__
 		const int flags = O_RDONLY | O_NOATIME;
@@ -98,13 +98,13 @@ namespace Yttrium
 			return {};
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
-			throw std::system_error(errno, std::generic_category());
-		return std::make_shared<FileReader>(size, path, descriptor);
+			throw std::system_error{errno, std::generic_category()};
+		return std::make_unique<FileSource>(size, path, descriptor);
 	}
 
-	std::shared_ptr<ReaderPrivate> create_file_reader(const TemporaryFile& file)
+	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
 	{
-		return create_file_reader(file.name());
+		return from(file.name());
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
@@ -119,7 +119,7 @@ namespace Yttrium
 			return {};
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
-			throw std::system_error(errno, std::generic_category());
+			throw std::system_error{errno, std::generic_category()};
 		return std::make_unique<FileWriter>(size, path, descriptor);
 	}
 

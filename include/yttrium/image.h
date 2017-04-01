@@ -7,13 +7,14 @@
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
 
+#include <memory>
 #include <string>
 
 #include <boost/optional/optional.hpp> // TODO-17: Use std::optional.
 
 namespace Yttrium
 {
-	class Reader;
+	class Source;
 	class Writer;
 
 	/// Pixel format.
@@ -130,7 +131,7 @@ namespace Yttrium
 		Image(const ImageFormat&, const void* data);
 
 		///
-		static boost::optional<Image> load(Reader&&, ImageType = ImageType::Auto);
+		static boost::optional<Image> load(const Source&, ImageType = ImageType::Auto);
 
 		///
 		void* data() noexcept { return _buffer.data(); }

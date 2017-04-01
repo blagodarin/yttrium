@@ -12,7 +12,7 @@
 namespace Yttrium
 {
 	class IonObject;
-	class Reader;
+	class Source;
 
 	///
 	class Y_API IonDocument
@@ -22,9 +22,8 @@ namespace Yttrium
 		static std::unique_ptr<IonDocument> create();
 
 		///
-		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static std::unique_ptr<IonDocument> open(const Reader&);
+		static std::unique_ptr<IonDocument> load(const Source&);
 
 		///
 		virtual ~IonDocument() = default;

@@ -5,7 +5,6 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
-#include <yttrium/storage/reader.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
 #include "gui.h"

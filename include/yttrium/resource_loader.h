@@ -17,6 +17,7 @@ namespace Yttrium
 	class Music;
 	class Renderer;
 	class Sound;
+	class Source;
 	class StaticString;
 	class Storage;
 	class Texture2D;
@@ -44,6 +45,9 @@ namespace Yttrium
 		std::shared_ptr<const Texture2D> load_texture_2d(const StaticString& name);
 		std::shared_ptr<const TextureFont> load_texture_font(const StaticString& name);
 		std::shared_ptr<const Translation> load_translation(const StaticString& name);
+
+		///
+		std::unique_ptr<Source> open(const StaticString& name);
 
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();

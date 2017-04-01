@@ -26,8 +26,8 @@ namespace
 
 namespace Yttrium
 {
-	WavReader::WavReader(Reader&& reader)
-		: AudioReaderImpl(std::move(reader))
+	WavReader::WavReader(std::unique_ptr<Source>&& source)
+		: AudioReaderImpl(std::move(source))
 	{
 		WavFileHeader file_header;
 		if (!_reader.read(file_header)

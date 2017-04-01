@@ -3,7 +3,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/ion/writer.h>
-#include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/string.h>
 
@@ -16,7 +15,7 @@ namespace Yttrium
 	class TranslationImpl : public Translation
 	{
 	public:
-		TranslationImpl(const Reader&);
+		TranslationImpl(const Source&);
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
@@ -36,25 +35,25 @@ namespace Yttrium
 		std::map<String, Entry> _translations;
 	};
 
-	TranslationImpl::TranslationImpl(const Reader& reader)
+	TranslationImpl::TranslationImpl(const Source& source)
 	{
-		IonReader ion{reader};
+		IonReader ion{source};
 		decltype(_translations) translations;
 		for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
 		{
 			token.check_name("tr"_s);
-			const auto source = ion.read().to_value();
+			const auto text = ion.read().to_value();
 			const auto translation = ion.read().to_value();
-			translations.emplace(String{source}, translation.to_std());
+			translations.emplace(String{text}, translation.to_std());
 		}
 		_translations = std::move(translations);
 	}
 
-	void TranslationImpl::add(const StaticString& source)
+	void TranslationImpl::add(const StaticString& text)
 	{
-		auto i = _translations.find({source, ByReference{}});
+		auto i = _translations.find({text, ByReference{}});
 		if (i == _translations.end())
-			i = _translations.emplace(String{source}, Entry{}).first;
+			i = _translations.emplace(String{text}, Entry{}).first;
 		i->second.added = true;
 	}
 
@@ -90,8 +89,8 @@ namespace Yttrium
 		return i != _translations.end() && !i->second.text.empty() ? i->second.text : source.to_std();
 	}
 
-	std::unique_ptr<Translation> Translation::open(const Reader& reader)
+	std::unique_ptr<Translation> Translation::load(const Source& source)
 	{
-		return reader ? std::make_unique<TranslationImpl>(reader) : nullptr;
+		return std::make_unique<TranslationImpl>(source);
 	}
 }

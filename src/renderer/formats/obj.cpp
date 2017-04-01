@@ -8,6 +8,7 @@
 #include <yttrium/renderer/vertex_buffer.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include "../mesh_data.h"
 
 #include <regex>
@@ -177,20 +178,20 @@ namespace
 
 namespace Yttrium
 {
-	MeshData load_obj_mesh(Reader&& reader)
+	MeshData load_obj_mesh(const Source& source)
 	{
 		MeshData result;
 		std::string line;
 		size_t line_number = 0;
 		ObjState state;
-		while (reader.read_line(line))
+		for (Reader reader{source}; reader.read_line(line);)
 		{
 			++line_number;
 			if (std::regex_match(line, _obj_empty_regex))
 				continue;
 			boost::algorithm::trim(line);
 			if (!state.process_line(line, result))
-				throw DataError("OBJ processing error (", reader.name(), ":", line_number, ")");
+				throw DataError("OBJ processing error (", source.name(), ":", line_number, ")");
 		}
 		if (!state.finalize(result))
 			throw DataError("Bad OBJ");

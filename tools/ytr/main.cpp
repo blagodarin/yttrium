@@ -1,5 +1,5 @@
 #include <yttrium/ion/reader.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/translation.h>
 
 #include <iostream>
@@ -14,26 +14,28 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	const auto translation = Translation::open(Reader{argv[1]});
-	if (!translation)
+	const auto translation_source = Source::from(argv[1]);
+	if (!translation_source)
 	{
-		std::cerr << "ERROR: Unable to open translation \"" << argv[1] << "\"\n";
+		std::cerr << "ERROR: Unable to open \"" << argv[1] << "\"\n";
 		return 1;
 	}
 
+	const auto translation = Translation::load(*translation_source);
+
 	for (int i = 2; i < argc; ++i)
 	{
-		const Reader reader{argv[i]};
-		if (!reader)
+		const auto source = Source::from(argv[i]);
+		if (!source)
 		{
 			std::cerr << "ERROR: Unable to open source \"" << argv[i] << "\"\n";
 			return 1;
 		}
 		try
 		{
-			IonReader ion{reader};
-			enum { None, Open, Tr, Source, Close } stage = None;
-			StaticString source;
+			IonReader ion{*source};
+			enum { None, Open, Tr, Text, Close } stage = None;
+			StaticString text;
 			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
 			{
 				if (token.type() == IonReader::Token::Type::ObjectBegin)
@@ -42,11 +44,11 @@ int main(int argc, char** argv)
 					stage = Tr;
 				else if (stage == Tr && token.type() == IonReader::Token::Type::Value)
 				{
-					stage = Source;
-					source = token.text();
+					stage = Text;
+					text = token.text();
 				}
-				else if (stage == Source && token.type() == IonReader::Token::Type::ObjectEnd)
-					translation->add(source);
+				else if (stage == Text && token.type() == IonReader::Token::Type::ObjectEnd)
+					translation->add(text);
 				else
 					stage = None;
 			}

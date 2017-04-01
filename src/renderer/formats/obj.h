@@ -4,9 +4,9 @@
 namespace Yttrium
 {
 	class MeshData;
-	class Reader;
+	class Source;
 
-	MeshData load_obj_mesh(Reader&&);
+	MeshData load_obj_mesh(const Source&);
 }
 
 #endif

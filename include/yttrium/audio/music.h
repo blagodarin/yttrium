@@ -10,16 +10,16 @@
 
 namespace Yttrium
 {
-	class Reader;
+	class Source;
 
 	/// Music.
 	class Y_API Music
 	{
 	public:
 		///
-		/// Returns 'nullptr' for a null Reader.
+		/// Returns 'nullptr' for a null Source pointer.
 		/// May throw DataError.
-		static std::unique_ptr<Music> open(Reader&&);
+		static std::unique_ptr<Music> open(std::unique_ptr<Source>&&);
 
 		/// Start, end and loop (re)start time in seconds.
 		/// \note No loop if \a loop >= \a end.

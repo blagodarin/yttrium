@@ -13,7 +13,7 @@
 
 namespace Yttrium
 {
-	class Reader;
+	class Source;
 	class TextCapture;
 	class TexturedRect;
 
@@ -30,9 +30,8 @@ namespace Yttrium
 		};
 
 		///
-		/// Returns 'nullptr' for a null Reader.
 		/// May throw DataError.
-		static std::unique_ptr<TextureFont> open(Reader&&);
+		static std::unique_ptr<TextureFont> load(const Source&);
 
 		virtual ~TextureFont() = default;
 

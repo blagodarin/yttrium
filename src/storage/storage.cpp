@@ -3,7 +3,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
-#include "reader.h"
+#include "source.h"
 
 #include <vector>
 
@@ -44,34 +44,34 @@ namespace Yttrium
 		{
 		}
 
-		Reader open(const StaticString& name) const
+		std::unique_ptr<Source> open(const StaticString& name) const
 		{
 			if (_use_file_system == Storage::UseFileSystem::Before)
 			{
-				Reader reader(name.to_std());
-				if (reader)
-					return reader;
+				auto source = Source::from(name.to_std());
+				if (source)
+					return source;
 			}
 			// TODO: Build a single name-to-resource map for the entire resource system.
 			for (const auto& attachment : _attachments)
 			{
 				if (attachment.type == StorageAttachment::Type::Package)
 				{
-					auto reader = attachment.package->open(name);
-					if (reader)
-						return reader;
+					auto source = attachment.package->open(name);
+					if (source)
+						return source;
 				}
 				else if (attachment.type == StorageAttachment::Type::Buffer)
 				{
-					if (StaticString{ attachment.buffer_name } == name)
-						return Reader(std::make_shared<BufferReader>(attachment.buffer, attachment.buffer_name));
+					if (StaticString{attachment.buffer_name} == name)
+						return create_source(attachment.buffer, attachment.buffer_name);
 				}
 			}
 			if (_use_file_system == Storage::UseFileSystem::After)
 			{
-				Reader reader(name.to_std());
-				if (reader)
-					return reader;
+				auto source = Source::from(name.to_std());
+				if (source)
+					return source;
 			}
 			return {};
 		}
@@ -103,7 +103,7 @@ namespace Yttrium
 		_private->_attachments.emplace_back(std::move(package));
 	}
 
-	Reader Storage::open(const StaticString& name) const
+	std::unique_ptr<Source> Storage::open(const StaticString& name) const
 	{
 		return _private->open(name);
 	}

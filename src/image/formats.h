@@ -11,12 +11,13 @@ namespace Yttrium
 	class ImageFormat;
 	enum class ImageType;
 	class Reader;
+	class Source;
 	class Writer;
 
 	boost::optional<ImageFormat> read_dds_header(Reader&);
 
 #ifndef Y_NO_JPEG
-	boost::optional<ImageFormat> read_jpeg(Reader&, Buffer&);
+	boost::optional<ImageFormat> read_jpeg(const Source&, Buffer&);
 #endif
 
 #ifndef Y_NO_PNG
@@ -26,11 +27,10 @@ namespace Yttrium
 	boost::optional<ImageFormat> read_tga_header(Reader&);
 	bool write_tga(Writer&, const ImageFormat&, const void*);
 
-	boost::optional<ImageFormat> read_image(Reader&, ImageType, Buffer&);
-	bool read_image_data(Reader&, const ImageFormat&, Buffer&);
+	boost::optional<ImageFormat> read_image(const Source&, ImageType, Buffer&);
 	bool write_image(Writer&, ImageType, const ImageFormat&, const void*);
 
-	bool detect_image_type(const Reader&, ImageType&);
+	bool detect_image_type(const Source&, ImageType&);
 }
 
 #endif

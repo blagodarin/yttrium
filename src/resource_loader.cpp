@@ -12,7 +12,7 @@
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/string.h>
 #include <yttrium/translation.h>
@@ -34,16 +34,16 @@ namespace Yttrium
 		{
 		}
 
-		std::shared_ptr<const T> fetch(const StaticString& name, const std::function<std::shared_ptr<const T>(Reader&&)>& factory)
+		std::shared_ptr<const T> fetch(const StaticString& name, const std::function<std::shared_ptr<const T>(std::unique_ptr<Source>&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			const auto i = _map.find({ name, ByReference{} });
 			if (i != _map.end())
 				return i->second;
-			auto reader = _storage.open(name);
-			if (!reader)
+			auto source = _storage.open(name);
+			if (!source)
 				throw ResourceError("Can't find \"", name, "\"");
-			auto resource_ptr = factory(std::move(reader));
+			auto resource_ptr = factory(std::move(source));
 			if (!resource_ptr)
 				throw DataError("Can't load \"", name, "\""); // We don't have more information at this point. =(
 			_map.emplace(String{ name }, resource_ptr);
@@ -112,9 +112,9 @@ namespace Yttrium
 
 	std::shared_ptr<const IonDocument> ResourceLoader::load_ion(const StaticString& name)
 	{
-		return _private->_ion_document_cache.fetch(name, [this](Reader&& reader)
+		return _private->_ion_document_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
-			return IonDocument::open(reader);
+			return IonDocument::load(*source);
 		});
 	}
 
@@ -122,41 +122,45 @@ namespace Yttrium
 	{
 		if (!_private->_renderer)
 			return {};
-		return _private->_material_cache.fetch(name, [this, name](Reader&& reader) -> std::shared_ptr<const Material>
+		return _private->_material_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Material>
 		{
-			IonReader ion{reader};
-			StaticString vertex_shader;
-			StaticString fragment_shader;
+			IonReader ion{*source};
+			std::unique_ptr<Source> vertex_shader;
+			std::unique_ptr<Source> fragment_shader;
 			std::shared_ptr<const Texture2D> texture;
 			Texture2D::Filter texture_filter = Texture2D::NearestFilter;
 			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End;)
 			{
 				const auto ion_name = token.to_name();
+				const auto make_location = [name, &token]
+				{
+					return make_string("("_s, name, ":"_s, token.line(), ":"_s, token.column(), ") "_s);
+				};
 				if (ion_name == "vertex_shader"_s)
 				{
-					const auto value = ion.read().to_value();
-					if (value.is_empty())
-						throw DataError("("_s, name, ") Bad 'vertex_shader'"_s);
-					if (!vertex_shader.is_empty())
-						throw DataError("("_s, name, ") Duplicate 'vertex_shader'"_s);
-					vertex_shader = value;
+					if (vertex_shader)
+						throw DataError(make_location(), "Duplicate 'vertex_shader'"_s);
+					vertex_shader = _private->_storage.open(ion.read().to_value());
+					if (!vertex_shader)
+						throw DataError(make_location(), "Bad 'vertex_shader'"_s);
 					token = ion.read();
 				}
 				else if (ion_name == "fragment_shader"_s)
 				{
-					const auto value = ion.read().to_value();
-					if (value.is_empty())
-						throw DataError("("_s, name, ") Bad 'fragment_shader'"_s);
-					if (!fragment_shader.is_empty())
-						throw DataError("("_s, name, ") Duplicate 'fragment_shader'"_s);
-					fragment_shader = value;
+					if (fragment_shader)
+						throw DataError(make_location(), "Duplicate 'fragment_shader'"_s);
+					fragment_shader = _private->_storage.open(ion.read().to_value());
+					if (!fragment_shader)
+						throw DataError(make_location(), "Bad 'fragment_shader'"_s);
 					token = ion.read();
 				}
 				else if (ion_name == "texture"_s)
 				{
+					if (texture)
+						throw DataError(make_location(), "Duplicate 'texture'"_s);
 					const auto texture_name = ion.read().to_value();
 					if (texture_name.is_empty())
-						throw DataError("("_s, name, ") Bad 'texture'"_s);
+						throw DataError(make_location(), "Bad 'texture'"_s);
 					token = ion.read();
 					if (token.type() == IonReader::Token::Type::ObjectBegin) // TODO: Merge with GuiIonPropertyLoader::load_texture.
 					{
@@ -168,53 +172,53 @@ namespace Yttrium
 							if (filter_option == "nearest"_s)
 							{
 								if (has_interpolation)
-									throw DataError("("_s, name, ") Bad 'texture'"_s);
+									throw DataError(make_location(), "Bad texture property"_s);
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "linear"_s)
 							{
 								if (has_interpolation)
-									throw DataError("("_s, name, ") Bad 'texture'"_s);
+									throw DataError(make_location(), "Bad texture property"_s);
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "bilinear"_s)
 							{
 								if (has_interpolation)
-									throw DataError("("_s, name, ") Bad 'texture'"_s);
+									throw DataError(make_location(), "Bad texture property"_s);
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "trilinear"_s)
 							{
 								if (has_interpolation)
-									throw DataError("("_s, name, ") Bad 'texture'"_s);
+									throw DataError(make_location(), "Bad texture property"_s);
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "anisotropic"_s)
 							{
 								if (!has_interpolation || has_anisotropy)
-									throw DataError("("_s, name, ") Bad 'texture'"_s);
+									throw DataError(make_location(), "Bad texture property"_s);
 								texture_filter = static_cast<Texture2D::Filter>((texture_filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
 								has_anisotropy = true;
 							}
 							else
-								throw DataError("("_s, name, ") Bad 'texture'"_s);
+								throw DataError(make_location(), "Bad texture property"_s);
 						}
 						token = ion.read();
 					}
-					if (texture)
-						throw DataError("("_s, name, ") Duplicate 'texture'"_s);
 					texture = load_texture_2d(texture_name);
 				}
 				else
-					throw DataError("("_s, name, ") Bad material"_s); // TODO: Output location and the unknown ION name.
+					throw DataError(make_location(), "Unknown material entry '"_s, ion_name, "'"_s);
 			}
-			if (vertex_shader.is_empty() || fragment_shader.is_empty())
-				throw DataError("("_s, name, ") No 'vertex_shader' or 'fragment_shader'"_s);
-			auto program = _private->_renderer->create_gpu_program(_private->_storage.open(vertex_shader).to_string(), _private->_storage.open(fragment_shader).to_string());
+			if (!vertex_shader)
+				throw DataError("("_s, name, ") No 'vertex_shader'"_s);
+			if (!fragment_shader)
+				throw DataError("("_s, name, ") No 'fragment_shader'"_s);
+			auto program = _private->_renderer->create_gpu_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
 				throw DataError("("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s);
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
@@ -225,21 +229,21 @@ namespace Yttrium
 	{
 		if (!_private->_renderer)
 			return {};
-		return _private->_mesh_cache.fetch(name, [this](Reader&& reader)
+		return _private->_mesh_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
-			return _private->_renderer->load_mesh(std::move(reader));
+			return _private->_renderer->load_mesh(*source);
 		});
 	}
 
 	std::shared_ptr<const Music> ResourceLoader::load_music(const StaticString& name)
 	{
-		return _private->_music_cache.fetch(name, [this](Reader&& reader)
+		return _private->_music_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
 			Music::Settings settings;
-			settings.start = reader.property("start"_s).to_time();
-			settings.end = reader.property("end"_s).to_time();
-			settings.loop = reader.property("loop"_s).to_time();
-			auto music = Music::open(std::move(reader));
+			settings.start = source->property("start"_s).to_time();
+			settings.end = source->property("end"_s).to_time();
+			settings.loop = source->property("loop"_s).to_time();
+			auto music = Music::open(std::move(source));
 			music->set_settings(settings);
 			return music;
 		});
@@ -249,9 +253,9 @@ namespace Yttrium
 	{
 		if (!_private->_audio_manager)
 			return {};
-		return _private->_sound_cache.fetch(name, [this](Reader&& reader)
+		return _private->_sound_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
-			return _private->_audio_manager->create_sound(std::move(reader));
+			return _private->_audio_manager->create_sound(std::move(source));
 		});
 	}
 
@@ -259,31 +263,41 @@ namespace Yttrium
 	{
 		if (!_private->_renderer)
 			return {};
-		return _private->_texture_2d_cache.fetch(name, [this](Reader&& reader) -> std::shared_ptr<const Texture2D>
+		return _private->_texture_2d_cache.fetch(name, [this](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D>
 		{
-			const bool intensity = reader.property("intensity"_s) == "1"_s;
 			// TODO: Map texture memory, then read the image into that memory.
-			auto image = Image::load(std::move(reader));
+			auto image = Image::load(*source);
 			if (!image)
 				return {};
-			return _private->_renderer->create_texture_2d(std::move(*image), intensity ? Renderer::TextureFlag::Intensity : Flags<Renderer::TextureFlag>{});
+			Flags<Renderer::TextureFlag> flags;
+			if (source->property("intensity"_s) == "1"_s)
+				flags |= Renderer::TextureFlag::Intensity;
+			return _private->_renderer->create_texture_2d(std::move(*image), flags);
 		});
 	}
 
 	std::shared_ptr<const TextureFont> ResourceLoader::load_texture_font(const StaticString& name)
 	{
-		return _private->_texture_font_cache.fetch(name, [this](Reader&& reader)
+		return _private->_texture_font_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
-			return TextureFont::open(std::move(reader));
+			return TextureFont::load(*source);
 		});
 	}
 
 	std::shared_ptr<const Translation> ResourceLoader::load_translation(const StaticString& name)
 	{
-		return _private->_translation_cache.fetch(name, [this](Reader&& reader)
+		return _private->_translation_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
-			return Translation::open(reader);
+			return Translation::load(*source);
 		});
+	}
+
+	std::unique_ptr<Source> ResourceLoader::open(const StaticString& name)
+	{
+		auto source = _private->_storage.open(name);
+		if (!source)
+			throw ResourceError{"Missing \"", name, "\""};
+		return source;
 	}
 
 	void ResourceLoader::release_unused()

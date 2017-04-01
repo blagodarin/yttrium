@@ -2,30 +2,14 @@
 
 #include <yttrium/image.h>
 #include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include "../utils/fourcc.h"
 
 #include <new>
 
-namespace Yttrium
+namespace
 {
-	boost::optional<ImageFormat> read_image(Reader& reader, ImageType type, Buffer& buffer)
-	{
-		boost::optional<ImageFormat> format;
-		switch (type)
-		{
-		case ImageType::Tga: format = read_tga_header(reader); break;
-#ifndef Y_NO_JPEG
-		case ImageType::Jpeg: return read_jpeg(reader, buffer);
-#endif
-		case ImageType::Dds: format = read_dds_header(reader); break;
-		default: return {};
-		}
-		if (!format || !read_image_data(reader, *format, buffer))
-			return {};
-		return format;
-	}
-
-	bool read_image_data(Reader& reader, const ImageFormat& format, Buffer& buffer)
+	bool read_image_data(Yttrium::Reader& reader, const Yttrium::ImageFormat& format, Yttrium::Buffer& buffer)
 	{
 		const auto frame_size = format.frame_size();
 		try
@@ -37,6 +21,27 @@ namespace Yttrium
 			return false;
 		}
 		return reader.read(buffer.data(), frame_size) == frame_size;
+	}
+}
+
+namespace Yttrium
+{
+	boost::optional<ImageFormat> read_image(const Source& source, ImageType type, Buffer& buffer)
+	{
+		Reader reader{source};
+		boost::optional<ImageFormat> format;
+		switch (type)
+		{
+		case ImageType::Tga: format = read_tga_header(reader); break;
+#ifndef Y_NO_JPEG
+		case ImageType::Jpeg: return read_jpeg(source, buffer);
+#endif
+		case ImageType::Dds: format = read_dds_header(reader); break;
+		default: return {};
+		}
+		if (!format || !read_image_data(reader, *format, buffer))
+			return {};
+		return format;
 	}
 
 	bool write_image(Writer& writer, ImageType type, const ImageFormat& format, const void* data)
@@ -51,10 +56,10 @@ namespace Yttrium
 		}
 	}
 
-	bool detect_image_type(const Reader& reader, ImageType& type)
+	bool detect_image_type(const Source& source, ImageType& type)
 	{
 		uint32_t signature = 0;
-		if (!reader.read_at(0, signature))
+		if (!source.read_at(0, signature))
 			return false;
 		switch (signature)
 		{

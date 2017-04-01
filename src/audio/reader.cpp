@@ -22,10 +22,10 @@ namespace
 #endif
 	};
 
-	AudioType detect_audio_type(const Reader& reader)
+	AudioType detect_audio_type(const Source& source)
 	{
 		uint32_t signature = 0;
-		if (!reader.read_at(0, signature))
+		if (!source.read_at(0, signature))
 			return AudioType::Unknown;
 		switch (signature)
 		{
@@ -40,15 +40,15 @@ namespace
 
 namespace Yttrium
 {
-	std::unique_ptr<AudioReader> AudioReader::open(Reader&& reader)
+	std::unique_ptr<AudioReader> AudioReader::open(std::unique_ptr<Source>&& source)
 	{
-		if (!reader)
+		if (!source)
 			return {};
-		switch (::detect_audio_type(reader))
+		switch (::detect_audio_type(*source))
 		{
-		case AudioType::Wav: return std::make_unique<WavReader>(std::move(reader)); break;
+		case AudioType::Wav: return std::make_unique<WavReader>(std::move(source)); break;
 #ifndef Y_NO_OGG_VORBIS
-		case AudioType::OggVorbis: return std::make_unique<OggVorbisReader>(std::move(reader)); break;
+		case AudioType::OggVorbis: return std::make_unique<OggVorbisReader>(std::move(source)); break;
 #endif
 		default: throw DataError("Unknown audio format");
 		}

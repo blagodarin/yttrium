@@ -1,7 +1,7 @@
 #include <yttrium/ion/reader.h>
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/storage/reader.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/string_utils.h>
 
 #include <array>
@@ -112,8 +112,8 @@ namespace Yttrium
 	class IonReaderPrivate
 	{
 	public:
-		IonReaderPrivate(const Reader& reader)
-			: _buffer{read_buffer(reader)}
+		IonReaderPrivate(const Source& source)
+			: _buffer{source.to_buffer()}
 		{
 		}
 
@@ -214,20 +214,6 @@ namespace Yttrium
 			return {_line, begin - _line_base + column_offset, type, {begin, static_cast<std::size_t>(size)}};
 		}
 
-		static Buffer read_buffer(const Reader& reader)
-		{
-			Buffer buffer;
-			if (!reader)
-			{
-				buffer.resize(1);
-				buffer[0] = '\0';
-				buffer.resize(0);
-			}
-			else if (!reader.read_all(buffer))
-				throw std::runtime_error{"IO error"}; // TODO: Throw some actual IO error exception.
-			return buffer;
-		}
-
 	private:
 		enum
 		{
@@ -242,8 +228,8 @@ namespace Yttrium
 		std::vector<uint8_t> _stack{AcceptNames};
 	};
 
-	IonReader::IonReader(const Reader& reader)
-		: _private{std::make_unique<IonReaderPrivate>(reader)}
+	IonReader::IonReader(const Source& source)
+		: _private{std::make_unique<IonReaderPrivate>(source)}
 	{
 	}
 

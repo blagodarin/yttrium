@@ -1,11 +1,12 @@
 add_executable(unit_tests
 	buffer.cpp
+	buffer.h
 	flags.cpp
 	gui.cpp
-	image.cpp
-	image.h
 	image_formats.cpp
 	image_formats.h
+	image.cpp
+	image.h
 	ion_reader.cpp
 	ion_writer.cpp
 	ion.cpp
@@ -20,6 +21,7 @@ add_executable(unit_tests
 	reader.cpp
 	rect.cpp
 	resource_loader.cpp
+	source.cpp
 	static_string.cpp
 	string_utils.cpp
 	string.cpp

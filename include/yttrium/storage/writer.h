@@ -13,6 +13,7 @@ namespace Yttrium
 {
 	class Buffer;
 	class Reader;
+	class Source;
 	class StaticString;
 	class TemporaryFile;
 
@@ -61,7 +62,7 @@ namespace Yttrium
 		bool write_all(const Buffer&);
 
 		///
-		bool write_all(const Reader&);
+		bool write_all(const Source&);
 
 		///
 		bool write_all(const StaticString&);

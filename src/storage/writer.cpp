@@ -2,10 +2,10 @@
 
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
 #include "../system/file.h"
-#include "reader.h"
 
 #include <algorithm>
 #include <cassert>
@@ -111,22 +111,20 @@ namespace Yttrium
 		return write(buffer.data(), buffer.size()) == buffer.size();
 	}
 
-	bool Writer::write_all(const Reader& reader)
+	bool Writer::write_all(const Source& source)
 	{
-		if (!reader)
-			return false;
-        if (const auto data = ReaderPrivate::data(reader))
-			return write_all(data, reader.size());
+		if (const auto data = source.data())
+			return write_all(data, source.size());
 		uint64_t total_size = 0;
-		Buffer buffer(Buffer::memory_granularity());
-		while (auto size_read = reader.read_at(total_size, buffer.data(), buffer.size()))
+		Buffer buffer{Buffer::memory_granularity()};
+		while (auto size_read = source.read_at(total_size, buffer.data(), buffer.size()))
 		{
 			const auto size_written = write(buffer.data(), size_read);
 			total_size += size_written;
 			if (size_written < size_read)
 				break;
 		}
-		return total_size == reader.size();
+		return total_size == source.size();
 	}
 
 	bool Writer::write_all(const StaticString& string)

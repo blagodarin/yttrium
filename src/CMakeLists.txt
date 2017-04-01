@@ -306,6 +306,7 @@ target_sources(yttrium PRIVATE
 target_sources(yttrium PRIVATE
 	../include/yttrium/storage/package.h
 	../include/yttrium/storage/reader.h
+	../include/yttrium/storage/source.h
 	../include/yttrium/storage/storage.h
 	../include/yttrium/storage/temporary_file.h
 	../include/yttrium/storage/writer.h
@@ -314,7 +315,8 @@ target_sources(yttrium PRIVATE
 	storage/package.cpp
 	storage/package.h
 	storage/reader.cpp
-	storage/reader.h
+	storage/source.cpp
+	storage/source.h
 	storage/storage.cpp
 	storage/writer.cpp
 	storage/writer.h

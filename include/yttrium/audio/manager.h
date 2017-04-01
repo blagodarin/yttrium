@@ -10,8 +10,8 @@
 
 namespace Yttrium
 {
-	class Reader;
 	class Sound;
+	class Source;
 
 	/// Audio manager.
 	class Y_API AudioManager
@@ -24,7 +24,7 @@ namespace Yttrium
 		~AudioManager();
 
 		///
-		std::unique_ptr<Sound> create_sound(Reader&&);
+		std::unique_ptr<Sound> create_sound(std::unique_ptr<Source>&&);
 
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;

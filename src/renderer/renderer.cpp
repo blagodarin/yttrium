@@ -116,9 +116,9 @@ namespace Yttrium
 		return current_projection->first * current_view->first * model_matrix();
 	}
 
-	std::unique_ptr<Mesh> RendererImpl::load_mesh(Reader&& reader)
+	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source)
 	{
-		return create_mesh(load_obj_mesh(std::move(reader)));
+		return create_mesh(load_obj_mesh(source));
 	}
 
 	Matrix4 RendererImpl::model_matrix() const
