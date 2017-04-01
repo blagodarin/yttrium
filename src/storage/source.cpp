@@ -5,6 +5,8 @@
 #include <cstring>
 #include <limits>
 
+// TODO: Throw some IO exception if Source::to_xxx() fails.
+
 namespace Yttrium
 {
 	class MemorySource final : public Source
@@ -97,7 +99,7 @@ namespace Yttrium
 			throw std::bad_alloc();
 		Buffer buffer{_size + 1};
 		if (read_at(0, buffer.data(), _size) != _size)
-			return {}; // TODO: Throw IO error.
+			return {};
 		buffer[_size] = '\0';
 		buffer.resize(_size);
 		return buffer;
@@ -109,7 +111,7 @@ namespace Yttrium
 			throw std::bad_alloc();
 		std::string string(_size, '\0');
 		if (read_at(0, const_cast<char*>(string.data()), string.size()) != string.size()) // TODO-17: Remove const_cast.
-			return {}; // TODO: Throw IO error.
+			return {};
 		return string;
 	}
 }
