@@ -17,10 +17,10 @@ namespace
 
 int main(int, char**)
 {
-	Storage storage{ Storage::UseFileSystem::Before };
+	Storage storage{Storage::UseFileSystem::Before};
 	::make_checkerboard_texture(storage, "examples/3d/data/checkerboard.tga");
 
-	Game game{ storage };
+	Game game{storage};
 	game.run();
 	return 0;
 }

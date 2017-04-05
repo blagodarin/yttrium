@@ -12,7 +12,7 @@
 #include <cmath>
 
 Game::Game(const Storage& storage)
-	: _storage(storage)
+	: _storage{storage}
 {
 	_window.on_cursor_moved([this](int dx, int dy)
 	{
@@ -76,65 +76,62 @@ void Game::render(Renderer& renderer)
 {
 	const auto draw_tr = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
 	{
-		PushTransformation t(renderer, Matrix4::translation(translation));
-		PushTransformation r(renderer, Matrix4::rotation(angle, axis));
-		model.draw();
+		PushTransformation t{renderer, Matrix4::translation(translation)};
+		PushTransformation r{renderer, Matrix4::rotation(angle, axis)};
+		model.draw(renderer);
 	};
 
 	const auto draw_rt = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
 	{
-		PushTransformation r(renderer, Matrix4::rotation(angle, axis));
-		PushTransformation t(renderer, Matrix4::translation(translation));
-		model.draw();
+		PushTransformation r{renderer, Matrix4::rotation(angle, axis)};
+		PushTransformation t{renderer, Matrix4::translation(translation)};
+		model.draw(renderer);
 	};
 
-
 	{
-		Push3D projection(renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation));
-
+		Push3D projection{renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
 		{
-			PushTransformation r(renderer, Matrix4::rotation(static_cast<float>(_animation % 24000) / 24000.f * 360.f, { 0, 0, 1 }));
+			PushTransformation r{renderer, Matrix4::rotation(static_cast<float>(_animation % 24000) / 24000.f * 360.f, { 0, 0, 1 })};
 
 			const auto angle = static_cast<float>(_animation % 3000) / 3000.f * 360.f;
 
 			// X direction.
-			draw_tr(_cube, { -5.00, 0, 2.50 }, 2 * angle, {  1, 0, 0 });
-			draw_tr(_cube, { -3.75, 0, 1.75 },     angle, { -1, 0, 0 });
-			draw_tr(_cube, { -2.50, 0, 1.25 }, 2 * angle, {  1, 0, 0 });
-			draw_tr(_cube, { -1.25, 0, 1.00 },     angle, { -1, 0, 0 });
-			draw_tr(_cube, {  1.25, 0, 1.00 },     angle, {  1, 0, 0 });
-			draw_tr(_cube, {  2.50, 0, 1.25 }, 2 * angle, { -1, 0, 0 });
-			draw_tr(_cube, {  3.75, 0, 1.75 },     angle, {  1, 0, 0 });
-			draw_tr(_cube, {  5.00, 0, 2.50 }, 2 * angle, { -1, 0, 0 });
+			draw_tr(_cube, {-5.00,  0,    2.50}, 2 * angle, { 1,  0,  0});
+			draw_tr(_cube, {-3.75,  0,    1.75},     angle, {-1,  0,  0});
+			draw_tr(_cube, {-2.50,  0,    1.25}, 2 * angle, { 1,  0,  0});
+			draw_tr(_cube, {-1.25,  0,    1.00},     angle, {-1,  0,  0});
+			draw_tr(_cube, { 1.25,  0,    1.00},     angle, { 1,  0,  0});
+			draw_tr(_cube, { 2.50,  0,    1.25}, 2 * angle, {-1,  0,  0});
+			draw_tr(_cube, { 3.75,  0,    1.75},     angle, { 1,  0,  0});
+			draw_tr(_cube, { 5.00,  0,    2.50}, 2 * angle, {-1,  0,  0});
 
 			// Y direction.
-			draw_tr(_cube, { 0, -5.00, 2.50 }, 2 * angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0, -3.75, 1.75 },     angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0, -2.50, 1.25 }, 2 * angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0, -1.25, 1.00 },     angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0,  1.25, 1.00 },     angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0,  2.50, 1.25 }, 2 * angle, { 0, -1, 0 });
-			draw_tr(_cube, { 0,  3.75, 1.75 },     angle, { 0,  1, 0 });
-			draw_tr(_cube, { 0,  5.00, 2.50 }, 2 * angle, { 0, -1, 0 });
+			draw_tr(_cube, { 0,    -5.00, 2.50}, 2 * angle, { 0,  1,  0});
+			draw_tr(_cube, { 0,    -3.75, 1.75},     angle, { 0, -1,  0});
+			draw_tr(_cube, { 0,    -2.50, 1.25}, 2 * angle, { 0,  1,  0});
+			draw_tr(_cube, { 0,    -1.25, 1.00},     angle, { 0, -1,  0});
+			draw_tr(_cube, { 0,     1.25, 1.00},     angle, { 0,  1,  0});
+			draw_tr(_cube, { 0,     2.50, 1.25}, 2 * angle, { 0, -1,  0});
+			draw_tr(_cube, { 0,     3.75, 1.75},     angle, { 0,  1,  0});
+			draw_tr(_cube, { 0,     5.00, 2.50}, 2 * angle, { 0, -1,  0});
 
 			// Z direction.
-			draw_tr(_cube, { 0, 0, 1.00 }, 2 * angle, { 0, 0,  1 });
-			draw_tr(_cube, { 0, 0, 2.25 },     angle, { 0, 0, -1 });
-			draw_tr(_cube, { 0, 0, 3.50 }, 2 * angle, { 0, 0,  1 });
-			draw_tr(_cube, { 0, 0, 4.75 },     angle, { 0, 0, -1 });
+			draw_tr(_cube, { 0,     0,    1.00}, 2 * angle, { 0,  0,  1});
+			draw_tr(_cube, { 0,     0,    2.25},     angle, { 0,  0, -1});
+			draw_tr(_cube, { 0,     0,    3.50}, 2 * angle, { 0,  0,  1});
+			draw_tr(_cube, { 0,     0,    4.75},     angle, { 0,  0, -1});
 
-			draw_tr(_cube, { -1.25, -1.25, 2.25 }, angle, { 0, 0, 1 });
-			draw_tr(_cube, { -1.25,  1.25, 2.25 }, angle, { 0, 0, 1 });
-			draw_tr(_cube, {  1.25, -1.25, 2.25 }, angle, { 0, 0, 1 });
-			draw_tr(_cube, {  1.25,  1.25, 2.25 }, angle, { 0, 0, 1 });
+			draw_tr(_cube, {-1.25, -1.25, 2.25},     angle, { 0,  0,  1});
+			draw_tr(_cube, {-1.25,  1.25, 2.25},     angle, { 0,  0,  1});
+			draw_tr(_cube, { 1.25, -1.25, 2.25},     angle, { 0,  0,  1});
+			draw_tr(_cube, { 1.25,  1.25, 2.25},     angle, { 0,  0,  1});
 
-			draw_rt(_cube, { -1.25,  0.00, 3.50 }, -angle, { 0, 0, 1 });
-			draw_rt(_cube, {  1.25,  0.00, 3.50 }, -angle, { 0, 0, 1 });
-			draw_rt(_cube, {  0.00, -1.25, 3.50 }, -angle, { 0, 0, 1 });
-			draw_rt(_cube, {  0.00,  1.25, 3.50 }, -angle, { 0, 0, 1 });
+			draw_rt(_cube, {-1.25,  0.00, 3.50},    -angle, { 0,  0,  1});
+			draw_rt(_cube, { 1.25,  0.00, 3.50},    -angle, { 0,  0,  1});
+			draw_rt(_cube, { 0.00, -1.25, 3.50},    -angle, { 0,  0,  1});
+			draw_rt(_cube, { 0.00,  1.25, 3.50},    -angle, { 0,  0,  1});
 		}
-
-		_checkerboard.draw();
+		_checkerboard.draw(renderer);
 	}
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
@@ -160,7 +157,7 @@ void Game::update(const UpdateEvent& update)
 		else if (_move_right)
 			movement.x += offset;
 
-		_position += Matrix4(_rotation) * movement;
+		_position += Matrix4{_rotation} * movement;
 
 		_position.x = clamp(_position.x, -64.f, 64.f);
 		_position.y = clamp(_position.y, -64.f, 64.f);

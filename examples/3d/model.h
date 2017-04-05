@@ -17,13 +17,12 @@ using namespace Yttrium;
 class Model
 {
 public:
-	Model(Renderer&, ResourceLoader&, const StaticString& mesh, const StaticString& material);
+	Model(ResourceLoader&, const StaticString& mesh, const StaticString& material);
 	~Model();
 
-	void draw();
+	void draw(Renderer&);
 
-protected:
-	Renderer& _renderer;
+private:
 	const std::shared_ptr<const Mesh> _mesh;
 	const std::shared_ptr<const Material> _material;
 };
