@@ -18,6 +18,15 @@ BOOST_AUTO_TEST_CASE(test_iostream_buffer)
 	}
 }
 
+BOOST_AUTO_TEST_CASE(test_iostream_matrix)
+{
+	using Yttrium::Matrix4;
+
+	std::ostringstream stream;
+	stream << Matrix4::Identity;
+	BOOST_CHECK_EQUAL(stream.str(), "Matrix4{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}");
+}
+
 BOOST_AUTO_TEST_CASE(test_iostream_point)
 {
 	using Yttrium::Point;

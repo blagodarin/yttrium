@@ -249,24 +249,24 @@ namespace Yttrium
 	{
 		flush_2d();
 		_matrix_stack.emplace_back(matrix, MatrixType::Projection);
-		_matrix_stack.emplace_back(Matrix4(), MatrixType::View);
-		_matrix_stack.emplace_back(Matrix4(), MatrixType::Model);
+		_matrix_stack.emplace_back(Matrix4::Identity, MatrixType::View);
+		_matrix_stack.emplace_back(Matrix4::Identity, MatrixType::Model);
 	}
 
 	const Matrix4 _3d_directions // Makes Y point forward and Z point up.
-	(
+	{
 		1,  0,  0,  0,
 		0,  0,  1,  0,
 		0, -1,  0,  0,
-		0,  0,  0,  1
-	);
+		0,  0,  0,  1,
+	};
 
 	void RendererImpl::push_projection_3d(const Matrix4& projection, const Matrix4& view)
 	{
 		flush_2d();
 		_matrix_stack.emplace_back(projection, MatrixType::Projection);
 		_matrix_stack.emplace_back(_3d_directions * view, MatrixType::View);
-		_matrix_stack.emplace_back(Matrix4(), MatrixType::Model);
+		_matrix_stack.emplace_back(Matrix4::Identity, MatrixType::Model);
 	}
 
 	Flags<Texture2D::Filter> RendererImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
