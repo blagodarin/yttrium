@@ -63,7 +63,7 @@ namespace
 	class TestData
 	{
 	public:
-		TestData(const std::string& data) : _data(data) {}
+		explicit TestData(const std::string& data) : _data{data} {}
 		IonReader* operator->() { return &_ion_reader; }
 	private:
 		const std::string _data;

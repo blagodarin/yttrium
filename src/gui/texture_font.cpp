@@ -25,7 +25,7 @@ namespace Yttrium
 	class TextureFontImpl final : public TextureFont
 	{
 	public:
-		TextureFontImpl(int size)
+		explicit TextureFontImpl(int size)
 			: _size(size)
 		{
 		}

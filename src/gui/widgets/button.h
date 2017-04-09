@@ -12,7 +12,7 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-		ButtonWidget(GuiPrivate& gui) : Widget(gui) {}
+		explicit ButtonWidget(GuiPrivate& gui) : Widget(gui) {}
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;

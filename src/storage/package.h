@@ -9,7 +9,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		BadPackage(Args&&... args) : DataError(std::forward<Args>(args)...) {}
+		explicit BadPackage(Args&&... args) : DataError(std::forward<Args>(args)...) {}
 	};
 }
 

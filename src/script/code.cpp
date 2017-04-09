@@ -16,7 +16,7 @@ namespace Yttrium
 		std::string name;
 		std::vector<ScriptValue*> args;
 
-		ScriptCommand(const StaticString& name_)
+		explicit ScriptCommand(const StaticString& name_)
 			: name(name_.text(), name_.size())
 		{
 		}
@@ -25,7 +25,7 @@ namespace Yttrium
 	class ScriptCodePrivate
 	{
 	public:
-		ScriptCodePrivate(std::string&& text)
+		explicit ScriptCodePrivate(std::string&& text)
 		{
 			ScriptScanner scanner(text);
 			for (ScriptCommand* command = nullptr;;)

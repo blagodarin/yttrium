@@ -112,7 +112,7 @@ namespace Yttrium
 	class IonReaderPrivate
 	{
 	public:
-		IonReaderPrivate(const Source& source)
+		explicit IonReaderPrivate(const Source& source)
 			: _buffer{source.to_buffer()}
 		{
 		}

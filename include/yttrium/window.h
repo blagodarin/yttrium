@@ -57,7 +57,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Window(const std::string& name);
+		explicit Window(const std::string& name);
 
 		///
 		~Window();

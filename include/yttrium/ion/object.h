@@ -57,7 +57,7 @@ namespace Yttrium
 		IonObject& operator=(const IonObject&) = delete;
 
 	private:
-		IonObject(IonDocumentImpl& document);
+		explicit IonObject(IonDocumentImpl&);
 
 		Y_PRIVATE IonNode* append(const StaticString& name, const ByReference&);
 
@@ -78,7 +78,7 @@ namespace Yttrium
 		bool operator!=(IonObjectIterator iterator) const { return !operator==(iterator); }
 	private:
 		const IonNode* const* _node;
-		IonObjectIterator(const IonNode* const* node): _node(node) {}
+		explicit IonObjectIterator(const IonNode* const* node) : _node{node} {}
 	};
 
 	class IonObjectReverseIterator
@@ -92,7 +92,7 @@ namespace Yttrium
 		bool operator!=(IonObjectReverseIterator iterator) const { return !operator==(iterator); }
 	private:
 		const IonNode* const* _node;
-		IonObjectReverseIterator(const IonNode* const* node): _node(node) {}
+		explicit IonObjectReverseIterator(const IonNode* const* node) : _node{node} {}
 	};
 }
 

@@ -30,7 +30,7 @@ namespace Yttrium
 	class ScriptContextPrivate
 	{
 	public:
-		ScriptContextPrivate(ScriptContext* parent)
+		explicit ScriptContextPrivate(ScriptContext* parent)
 			: _parent(parent) {}
 
 	public:

@@ -17,7 +17,7 @@ namespace Yttrium
 		static IonDocumentImpl null;
 		static const IonNode null_node;
 
-		IonDocumentImpl(bool exists = true);
+		explicit IonDocumentImpl(bool exists = true);
 
 		IonObject& root() override { return _root; }
 		const IonObject& root() const override { return _root; }

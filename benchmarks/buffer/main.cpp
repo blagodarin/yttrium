@@ -28,7 +28,7 @@ namespace
 			unsigned ops_per_second() const { return ops * 1000.0 / ms; }
 		};
 
-		Measurement(Results& results)
+		explicit Measurement(Results& results)
 			: _results(results)
 		{
 		}

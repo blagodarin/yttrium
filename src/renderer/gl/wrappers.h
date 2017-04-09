@@ -35,7 +35,7 @@ namespace Yttrium
 	class GlProgramHandle
 	{
 	public:
-		GlProgramHandle(const GlApi&);
+		explicit GlProgramHandle(const GlApi&);
 		GlProgramHandle(GlProgramHandle&&);
 		~GlProgramHandle();
 
@@ -101,7 +101,7 @@ namespace Yttrium
 	class GlVertexArrayHandle
 	{
 	public:
-		GlVertexArrayHandle(const GlApi&);
+		explicit GlVertexArrayHandle(const GlApi&);
 		GlVertexArrayHandle(GlVertexArrayHandle&&);
 		~GlVertexArrayHandle();
 

@@ -14,13 +14,13 @@ namespace Yttrium
 	struct GuiAction_Call
 	{
 		ScriptCode _script;
-		GuiAction_Call(std::string&& script) : _script(std::move(script)) {}
+		explicit GuiAction_Call(std::string&& script) : _script(std::move(script)) {}
 	};
 
 	struct GuiAction_Enter
 	{
 		std::string _screen;
-		GuiAction_Enter(const std::string& screen) : _screen(screen) {}
+		explicit GuiAction_Enter(const std::string& screen) : _screen(screen) {}
 	};
 
 	struct GuiAction_Quit
@@ -34,13 +34,14 @@ namespace Yttrium
 	struct GuiAction_ReturnTo
 	{
 		std::string _screen;
-		GuiAction_ReturnTo(const std::string& screen) : _screen(screen) {}
+		explicit GuiAction_ReturnTo(const std::string& screen) : _screen(screen) {}
 	};
 
 	class GuiActions
 	{
 	public:
-		GuiActions(size_t reserve = 0) { _actions.reserve(reserve); }
+		GuiActions() = default;
+		explicit GuiActions(size_t reserve) { _actions.reserve(reserve); }
 
 		template <typename T, typename... Args>
 		void add(Args&&... args) { _actions.emplace_back(T(std::forward<Args>(args)...)); }

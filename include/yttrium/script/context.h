@@ -21,14 +21,12 @@ namespace Yttrium
 		friend ScriptContext;
 
 	public:
-
 		ScriptContext&     context;  ///< Calling context.
 		const std::string& function; ///< Function name, guaranteed to be non-empty.
 		std::string&       result;   ///< Function result.
 		const ScriptArgs&  args;     ///< Function arguments.
 
 	private:
-
 		ScriptCall(ScriptContext& context_, const std::string& function_, std::string& result_, const ScriptArgs& args_)
 			: context(context_), function(function_), result(result_), args(args_) {}
 	};
@@ -41,7 +39,7 @@ namespace Yttrium
 		using Command = std::function<void(const ScriptCall&)>;
 
 		///
-		ScriptContext(ScriptContext* parent = nullptr);
+		explicit ScriptContext(ScriptContext* parent = nullptr);
 
 		///
 		~ScriptContext();

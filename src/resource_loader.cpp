@@ -29,7 +29,7 @@ namespace Yttrium
 		std::map<String, std::shared_ptr<const T>> _map;
 		std::mutex _mutex;
 
-		ResourceCache(const Storage& storage)
+		explicit ResourceCache(const Storage& storage)
 			: _storage(storage)
 		{
 		}

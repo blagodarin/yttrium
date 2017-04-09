@@ -73,7 +73,7 @@ set_target_properties(
 
 add_custom_target(cppcheck
 	COMMAND cppcheck --enable=all --quiet
-		--inline-suppr --suppress=missingIncludeSystem --suppress=noExplicitConstructor --suppress=passedByValue
+		--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue
 		-I "${PROJECT_SOURCE_DIR}/include"
 		-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
 		"--relative-paths=${PROJECT_SOURCE_DIR}"

@@ -62,7 +62,7 @@ namespace Yttrium
 		IonList& operator=(const IonList&) = delete;
 
 	protected:
-		IonList(IonDocumentImpl& document): _document(document) {}
+		explicit IonList(IonDocumentImpl& document) : _document{document} {}
 
 		const IonDocumentImpl& document() const { return _document; }
 
@@ -89,7 +89,7 @@ namespace Yttrium
 		IonListIterator next() const;
 	private:
 		const IonValue* _value;
-		IonListIterator(const IonValue* value): _value(value) {}
+		explicit IonListIterator(const IonValue* value) : _value{value} {}
 	};
 
 	class Y_API IonListRange
@@ -107,7 +107,7 @@ namespace Yttrium
 		const IonValue* _first = nullptr;
 		const IonValue* _last = nullptr;
 		size_t _size = 0;
-		IonListRange(const IonValue* first, const IonValue* last, size_t size): _first(first), _last(last), _size(size) {}
+		IonListRange(const IonValue* first, const IonValue* last, size_t size) : _first{first}, _last{last}, _size{size} {}
 	};
 }
 

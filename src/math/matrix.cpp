@@ -17,6 +17,7 @@ namespace Yttrium
 		0, 0, 0, 1,
 	};
 
+	// cppcheck-suppress uninitMemberVar
 	Matrix4::Matrix4(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33) noexcept
 		: _00{m00}, _10{m10}, _20{m20}, _30{m30}, _01{m01}, _11{m11}, _21{m21}, _31{m31}, _02{m02}, _12{m12}, _22{m22}, _32{m32}, _03{m03}, _13{m13}, _23{m23}, _33{m33}
 	{

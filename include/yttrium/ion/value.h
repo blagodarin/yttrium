@@ -18,7 +18,6 @@ namespace Yttrium
 		friend IonListRange;
 
 	public:
-
 		///
 		enum class Type
 		{
@@ -66,10 +65,10 @@ namespace Yttrium
 		IonValue& operator=(const IonValue&) = delete;
 
 	private:
-		Y_PRIVATE IonValue(IonDocumentImpl&);
-		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString& string);
-		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString& string, const ByReference&);
-		Y_PRIVATE IonValue(IonDocumentImpl&, IonObject* object);
+		Y_PRIVATE explicit IonValue(IonDocumentImpl&);
+		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString&);
+		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString&, const ByReference&);
+		Y_PRIVATE IonValue(IonDocumentImpl&, IonObject*);
 
 	private:
 		const Type _type;

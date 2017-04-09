@@ -11,7 +11,7 @@ namespace Yttrium
 	class RawAllocation
 	{
 	public:
-		RawAllocation(size_t size)
+		explicit RawAllocation(size_t size)
 			: _pointer{ std::malloc(size) }
 		{
 			if (!_pointer)

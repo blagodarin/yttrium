@@ -27,7 +27,7 @@ namespace Yttrium
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(const UpdateEvent&)> _on_update;
 
-		WindowPrivate(const std::string& name)
+		explicit WindowPrivate(const std::string& name)
 			: _name(name)
 		{
 			const auto size = _backend.size();

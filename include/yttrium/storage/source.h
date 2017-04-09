@@ -69,7 +69,7 @@ namespace Yttrium
 		const std::string _name;
 		const uint64_t _size;
 
-		Source(uint64_t size) noexcept : _size{size} {}
+		explicit Source(uint64_t size) noexcept : _size{size} {}
 		Source(uint64_t size, const std::string& name) : _name{name}, _size{size} {}
 
 	private:

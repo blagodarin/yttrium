@@ -20,7 +20,7 @@ namespace Yttrium
 			NoMoreData,
 		};
 
-		AudioStreamer(AudioPlayerBackend&);
+		explicit AudioStreamer(AudioPlayerBackend&);
 		~AudioStreamer();
 
 		FetchResult fetch();

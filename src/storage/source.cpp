@@ -35,7 +35,7 @@ namespace Yttrium
 	class BufferSource final : public Source
 	{
 	public:
-		BufferSource(Buffer&& buffer) : Source{buffer.size()}, _buffer{std::make_shared<const Buffer>(std::move(buffer))} {}
+		explicit BufferSource(Buffer&& buffer) : Source{buffer.size()}, _buffer{std::make_shared<const Buffer>(std::move(buffer))} {}
 		BufferSource(const std::shared_ptr<const Buffer>& buffer, const std::string& name) : Source{buffer->size(), name}, _buffer{buffer} {}
 
 		const void* data() const noexcept override

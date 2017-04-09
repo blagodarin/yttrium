@@ -14,7 +14,7 @@ namespace Yttrium
 	class DebugRenderer
 	{
 	public:
-		DebugRenderer(RendererImpl& renderer);
+		explicit DebugRenderer(RendererImpl& renderer);
 
 		void draw_cursor(int x, int y);
 		void draw_rectangle(int x, int y, int width, int height);

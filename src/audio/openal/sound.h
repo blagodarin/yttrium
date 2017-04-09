@@ -10,7 +10,7 @@ namespace Yttrium
 	class Sound_OpenAL : public Sound
 	{
 	public:
-		Sound_OpenAL(class AudioReader&);
+		explicit Sound_OpenAL(class AudioReader&);
 
 		void play() const override;
 

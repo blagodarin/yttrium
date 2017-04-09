@@ -22,7 +22,7 @@ namespace Yttrium
 			BOOL (APIENTRY *SwapIntervalEXT)(int) = nullptr;
 		};
 
-		WglContext(HDC);
+		explicit WglContext(HDC);
 
 		const Extensions* operator->() const { return &_wgl; }
 

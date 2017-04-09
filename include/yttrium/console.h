@@ -19,7 +19,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Console(ScriptContext&);
+		explicit Console(ScriptContext&);
 
 		///
 		~Console();

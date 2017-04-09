@@ -58,7 +58,7 @@ namespace Yttrium
 		class WindowDC
 		{
 		public:
-			WindowDC(const WindowHandle&);
+			explicit WindowDC(const WindowHandle&);
 			~WindowDC();
 			operator HDC() const { return _hdc; }
 		private:

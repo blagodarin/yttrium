@@ -20,7 +20,7 @@ using namespace Yttrium;
 class TetriumGraphics
 {
 public:
-	TetriumGraphics(Renderer&);
+	explicit TetriumGraphics(Renderer&);
 
 	void draw(const std::string& canvas, const RectF&, const Tetrium::Game&) const;
 

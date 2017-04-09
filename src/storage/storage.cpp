@@ -39,7 +39,7 @@ namespace Yttrium
 	class StoragePrivate
 	{
 	public:
-		StoragePrivate(Storage::UseFileSystem use_file_system)
+		explicit StoragePrivate(Storage::UseFileSystem use_file_system)
 			: _use_file_system(use_file_system)
 		{
 		}

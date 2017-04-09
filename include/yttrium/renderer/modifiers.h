@@ -24,7 +24,7 @@ namespace Yttrium
 		RendererModifier& operator=(const RendererModifier&) = delete;
 	protected:
 		Renderer& _renderer;
-		RendererModifier(Renderer& renderer) : _renderer(renderer) {}
+		explicit RendererModifier(Renderer& renderer) : _renderer(renderer) {}
 	};
 
 	///
@@ -32,7 +32,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Push2D(Renderer&);
+		explicit Push2D(Renderer&);
 
 		///
 		~Push2D();

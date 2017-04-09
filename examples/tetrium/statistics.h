@@ -13,7 +13,7 @@ using namespace Yttrium;
 class TetriumStatistics
 {
 public:
-	TetriumStatistics(ScriptContext&);
+	explicit TetriumStatistics(ScriptContext&);
 
 	void update(int score, const std::string& name);
 

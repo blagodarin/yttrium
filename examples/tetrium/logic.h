@@ -43,7 +43,7 @@ namespace Tetrium
 			None,  // No figure (empty block).
 		};
 
-		Figure(Type = None);
+		explicit Figure(Type = None);
 
 		std::array<Point, 4> blocks() const;
 		void put_at(const Point& point) { _offset = point; }

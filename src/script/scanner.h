@@ -28,7 +28,7 @@ namespace Yttrium
 			StaticString string;
 		};
 
-		ScriptScanner(std::string& text);
+		explicit ScriptScanner(std::string& text);
 
 		Token read();
 

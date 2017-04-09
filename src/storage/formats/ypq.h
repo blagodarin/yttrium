@@ -30,7 +30,7 @@ namespace Yttrium
 	class YpqWriter : public PackageWriter
 	{
 	public:
-		YpqWriter(Writer&&);
+		explicit YpqWriter(Writer&&);
 		~YpqWriter() override;
 
 		bool add(const std::string&, std::map<std::string, std::string>&&) override;

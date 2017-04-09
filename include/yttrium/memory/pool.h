@@ -40,10 +40,9 @@ namespace Yttrium
 	class Pool : public PoolBase
 	{
 	public:
-
 		///
-		Pool(size_t chunk_items = 32) noexcept
-			: PoolBase{ chunk_items, sizeof(T) }
+		explicit Pool(size_t chunk_items = 32) noexcept
+			: PoolBase{chunk_items, sizeof(T)}
 		{
 		}
 

@@ -34,7 +34,7 @@ namespace Yttrium
 		virtual void render(Renderer&, const RectF&, WidgetState) const = 0;
 
 	protected:
-		Widget(GuiPrivate&, Flags<Flag> = {});
+		explicit Widget(GuiPrivate&, Flags<Flag> = {});
 
 	protected:
 		GuiPrivate& _gui;

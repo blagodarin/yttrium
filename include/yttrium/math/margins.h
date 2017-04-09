@@ -13,7 +13,7 @@ namespace Yttrium
 	{
 	public:
 		Margins() = default;
-		Margins(int all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
+		explicit Margins(int all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
 		Margins(int top_bottom, int left_right) : _top{top_bottom}, _right{left_right}, _bottom{top_bottom}, _left{left_right} {}
 		Margins(int top, int left_right, int bottom) : _top{top}, _right{left_right}, _bottom{bottom}, _left{left_right} {}
 		Margins(int top, int right, int bottom, int left) : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}
@@ -38,7 +38,7 @@ namespace Yttrium
 	{
 	public:
 		MarginsF() = default;
-		MarginsF(float all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
+		explicit MarginsF(float all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
 		MarginsF(float top_bottom, float left_right) : _top{top_bottom}, _right{left_right}, _bottom{top_bottom}, _left{left_right} {}
 		MarginsF(float top, float left_right, float bottom) : _top{top}, _right{left_right}, _bottom{bottom}, _left{left_right} {}
 		MarginsF(float top, float right, float bottom, float left) : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}

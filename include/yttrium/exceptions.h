@@ -16,7 +16,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		InitializationError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
+		explicit InitializationError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
 	};
 
 	/// Thrown if the requested operation is not supported by the implementation.
@@ -24,7 +24,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		NotSupportedError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
+		explicit NotSupportedError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
 	};
 
 	/// Thrown if a resource can't be loaded from the supplied data.
@@ -32,7 +32,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		DataError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
+		explicit DataError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
 	};
 
 	///
@@ -40,7 +40,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		GuiDataError(Args&&... args) : DataError{std::forward<Args>(args)...} {}
+		explicit GuiDataError(Args&&... args) : DataError{std::forward<Args>(args)...} {}
 	};
 
 	/// Thrown when required data is missing.
@@ -48,7 +48,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		MissingDataError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
+		explicit MissingDataError(Args&&... args) : std::runtime_error{make_string(std::forward<Args>(args)...)} {}
 	};
 
 	/// Thrown by ResourceLoader if it is unable to find the specified resource.
@@ -56,7 +56,7 @@ namespace Yttrium
 	{
 	public:
 		template <typename... Args>
-		ResourceError(Args&&... args) : MissingDataError{std::forward<Args>(args)...} {}
+		explicit ResourceError(Args&&... args) : MissingDataError{std::forward<Args>(args)...} {}
 	};
 }
 

@@ -8,7 +8,7 @@ namespace Yttrium
 	class WriterPrivate
 	{
 	public:
-		WriterPrivate(uint64_t size) : _size(size), _offset(size) {}
+		explicit WriterPrivate(uint64_t size) : _size(size), _offset(size) {}
 		virtual ~WriterPrivate() = default;
 
 		virtual void reserve(uint64_t) = 0;
@@ -26,7 +26,7 @@ namespace Yttrium
 	class BufferWriter : public WriterPrivate
 	{
 	public:
-		BufferWriter(Buffer&);
+		explicit BufferWriter(Buffer&);
 
 		void reserve(uint64_t) override;
 		void resize(uint64_t) override;

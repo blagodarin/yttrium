@@ -13,7 +13,7 @@ namespace Yttrium
 	class BufferAppender
 	{
 	public:
-		BufferAppender(Buffer& buffer) noexcept : _buffer(buffer) {}
+		explicit BufferAppender(Buffer& buffer) noexcept : _buffer(buffer) {}
 
 		///
 		size_t count() const noexcept { return _buffer.size() / sizeof(T); }

@@ -15,7 +15,7 @@ namespace Yttrium
 	class TranslationImpl : public Translation
 	{
 	public:
-		TranslationImpl(const Source&);
+		explicit TranslationImpl(const Source&);
 
 		void add(const StaticString& source) override;
 		void remove_obsolete() override;
@@ -29,7 +29,7 @@ namespace Yttrium
 			bool added = false;
 
 			Entry() = default;
-			Entry(std::string&& text_) : text(std::move(text_)) {}
+			explicit Entry(std::string&& text_) : text(std::move(text_)) {}
 		};
 
 		std::map<String, Entry> _translations;
@@ -44,7 +44,7 @@ namespace Yttrium
 			token.check_name("tr"_s);
 			const auto text = ion.read().to_value();
 			const auto translation = ion.read().to_value();
-			translations.emplace(String{text}, translation.to_std());
+			translations.emplace(String{text}, Entry{translation.to_std()});
 		}
 		_translations = std::move(translations);
 	}

@@ -15,7 +15,7 @@ namespace Yttrium
 	class GuiIonLoader
 	{
 	public:
-		GuiIonLoader(GuiPrivate&);
+		explicit GuiIonLoader(GuiPrivate&);
 
 		void load(const StaticString& source_name);
 

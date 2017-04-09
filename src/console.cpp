@@ -12,10 +12,7 @@ namespace Yttrium
 	class ConsolePrivate
 	{
 	public:
-		ConsolePrivate(ScriptContext& script_context)
-			: _script_context(script_context)
-		{
-		}
+		explicit ConsolePrivate(ScriptContext& script_context) : _script_context(script_context) {}
 
 	public:
 		ScriptContext& _script_context;

@@ -411,7 +411,7 @@ namespace Yttrium
 
 	GuiActions GuiIonPropertyLoader::load_actions(const IonObject& object)
 	{
-		GuiActions actions(object.size());
+		GuiActions actions{object.size()};
 		for (const auto& node : object)
 		{
 			if (node.name() == "call"_s)

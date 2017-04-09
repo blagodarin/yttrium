@@ -7,30 +7,28 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	bool can_write(const ImageFormat& format)
+	bool can_write(const Yttrium::ImageFormat& format)
 	{
 		switch (format.pixel_format())
 		{
-		case PixelFormat::Gray:
+		case Yttrium::PixelFormat::Gray:
 			if (format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16)
 				return false;
 			break;
 
-		case PixelFormat::GrayAlpha:
+		case Yttrium::PixelFormat::GrayAlpha:
 			if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
 				return false;
 			break;
 
-		case PixelFormat::Rgb:
-		case PixelFormat::Bgr:
+		case Yttrium::PixelFormat::Rgb:
+		case Yttrium::PixelFormat::Bgr:
 			if (format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48)
 				return false;
 			break;
 
-		case PixelFormat::Rgba:
-		case PixelFormat::Bgra:
+		case Yttrium::PixelFormat::Rgba:
+		case Yttrium::PixelFormat::Bgra:
 			if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
 				return false;
 			break;
@@ -39,7 +37,7 @@ namespace
 			return false;
 		}
 
-		if (format.orientation() != ImageOrientation::XRightYDown && format.orientation() != ImageOrientation::XRightYUp)
+		if (format.orientation() != Yttrium::ImageOrientation::XRightYDown && format.orientation() != Yttrium::ImageOrientation::XRightYUp)
 			return false;
 
 		if (format.width() <= 0 || format.width() > std::numeric_limits<uint32_t>::max())
@@ -54,7 +52,7 @@ namespace
 	class PngWriter
 	{
 	public:
-		PngWriter(Writer& writer)
+		explicit PngWriter(Yttrium::Writer& writer)
 		{
 			_png = ::png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 			if (!_png)
@@ -79,7 +77,7 @@ namespace
 	private:
 		static void write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
 		{
-			reinterpret_cast<Writer*>(::png_get_io_ptr(png_ptr))->write(data, length);
+			reinterpret_cast<Yttrium::Writer*>(::png_get_io_ptr(png_ptr))->write(data, length);
 		}
 
 		static void flush_callback(png_struct*)

@@ -53,9 +53,9 @@ namespace Yttrium
 		std::string _value;
 
 	private:
-		Y_PRIVATE ScriptValue(int);
-		Y_PRIVATE ScriptValue(double);
-		Y_PRIVATE ScriptValue(const StaticString&, Type = Type::String);
+		Y_PRIVATE explicit ScriptValue(int);
+		Y_PRIVATE explicit ScriptValue(double);
+		Y_PRIVATE explicit ScriptValue(const StaticString&, Type = Type::String);
 	};
 }
 

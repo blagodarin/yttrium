@@ -16,7 +16,6 @@ namespace Yttrium
 		friend IonObject;
 
 	public:
-
 		///
 		bool exists() const;
 
@@ -24,7 +23,7 @@ namespace Yttrium
 		StaticString name() const { return _name; }
 
 	private:
-		Y_PRIVATE IonNode(IonDocumentImpl&);
+		Y_PRIVATE explicit IonNode(IonDocumentImpl&);
 		Y_PRIVATE IonNode(IonDocumentImpl&, const StaticString& name);
 		Y_PRIVATE IonNode(IonDocumentImpl&, const StaticString& name, const ByReference&);
 

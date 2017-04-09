@@ -15,7 +15,7 @@ using namespace Yttrium;
 class Game
 {
 public:
-	Game(const Storage&);
+	explicit Game(const Storage&);
 
 	void run();
 

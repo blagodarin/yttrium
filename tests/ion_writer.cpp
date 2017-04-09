@@ -14,7 +14,7 @@ namespace
 	class TestData
 	{
 	public:
-		TestData(IonWriter::Formatting formatting) : _ion_writer{ _writer, formatting } {}
+		explicit TestData(IonWriter::Formatting formatting) : _ion_writer{_writer, formatting} {}
 		IonWriter* operator->() { return &_ion_writer; }
 		std::string to_string() const { return { static_cast<const char*>(_buffer.data()), _buffer.size() }; }
 	private:
