@@ -15,7 +15,7 @@ namespace Yttrium
 
 	inline std::ostream& operator<<(std::ostream& stream, const IonReader::Token& token)
 	{
-		return stream << "{" << token.line() << "," << token.column() << ",IonReader::Token::Type(" << static_cast<int>(token.type()) << "),R\"(" << token.text() << ")\"}"; // TODO: 'to_underlying_type'.
+		return stream << "{" << token.line() << "," << token.column() << ",IonReader::Token::Type(" << to_underlying(token.type()) << "),R\"(" << token.text() << ")\"}";
 	}
 }
 
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_iostream)
 {
 	std::ostringstream stream;
 	stream << IonReader::Token{1, 2, IonReader::Token::Type::End, "test"};
-	BOOST_CHECK_EQUAL(stream.str(), "{1,2,IonReader::Token::Type(" + std::to_string(static_cast<int>(IonReader::Token::Type::End)) + "),R\"(test)\"}");
+	BOOST_CHECK_EQUAL(stream.str(), "{1,2,IonReader::Token::Type(" + std::to_string(to_underlying(IonReader::Token::Type::End)) + "),R\"(test)\"}");
 }
 
 BOOST_AUTO_TEST_CASE(test_ion_reader_token)

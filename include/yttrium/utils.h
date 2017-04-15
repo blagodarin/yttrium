@@ -47,6 +47,14 @@ namespace Yttrium
 		return (x ^ y) >= 0;
 	}
 
+	///
+	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	constexpr auto to_underlying(T value)
+	{
+		return static_cast<std::underlying_type_t<T>>(value);
+	}
+
+	///
 	template <typename T, typename U, typename = std::enable_if_t<std::is_arithmetic<T>::value && std::is_arithmetic<U>::value>>
 	T wrap(T value, U min, U max)
 	{

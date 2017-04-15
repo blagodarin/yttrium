@@ -265,7 +265,6 @@ namespace Yttrium
 			return {};
 		return _private->_texture_2d_cache.fetch(name, [this](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D>
 		{
-			// TODO: Map texture memory, then read the image into that memory.
 			auto image = Image::load(*source);
 			if (!image)
 				return {};

@@ -8,8 +8,6 @@
 
 #include <array>
 
-// TODO: Test Source properties.
-
 using namespace Yttrium;
 
 namespace
@@ -135,4 +133,28 @@ BOOST_AUTO_TEST_CASE(test_package_duplicates)
 	BOOST_REQUIRE_EQUAL(packed_file->read_at(0, data.data(), data.size()), 2);
 	BOOST_CHECK_EQUAL(data[0], '2');
 	BOOST_CHECK_EQUAL(data[1], '3');
+}
+
+BOOST_AUTO_TEST_CASE(test_package_properties)
+{
+	TemporaryFile package_file;
+	TemporaryFile file;
+	{
+		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		BOOST_REQUIRE(package_writer);
+		BOOST_REQUIRE(package_writer->add(file.name(), {{"one", "two"}, {"three", "four"}}));
+		BOOST_REQUIRE(package_writer->commit());
+	}
+
+	const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+	BOOST_REQUIRE(package);
+
+	auto packed_file = ::open_packed(*package, file.name());
+	BOOST_REQUIRE(packed_file);
+
+	BOOST_CHECK_EQUAL(packed_file->property("one"), "two");
+	BOOST_CHECK_EQUAL(packed_file->property("two"), "");
+	BOOST_CHECK_EQUAL(packed_file->property("three"), "four");
+	BOOST_CHECK_EQUAL(packed_file->property("four"), "");
+	BOOST_CHECK_EQUAL(packed_file->property("five"), "");
 }

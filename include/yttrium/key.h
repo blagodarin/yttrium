@@ -6,6 +6,7 @@
 
 #include <yttrium/api.h>
 #include <yttrium/flags.h>
+#include <yttrium/utils.h>
 
 #include <cstdint>
 
@@ -192,7 +193,7 @@ namespace Yttrium
 	};
 
 	/// Number of keys defined.
-	constexpr auto KeyCount = static_cast<KeyType>(Key::__Count);
+	constexpr auto KeyCount = to_underlying(Key::__Count);
 
 	/// %Key event.
 	class Y_API KeyEvent

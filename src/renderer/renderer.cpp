@@ -54,8 +54,6 @@ namespace Yttrium
 	{
 		auto renderer = std::make_unique<GlRenderer>();
 
-		// TODO: Don't copy static texture data.
-
 		static const int32_t white_texture_data = -1;
 		renderer->_white_texture = renderer->create_texture_2d({ { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, TextureFlag::NoMipmaps);
 		if (!renderer->_white_texture)
