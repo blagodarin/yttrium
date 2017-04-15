@@ -4,8 +4,6 @@
 
 #include <cstring>
 
-// TODO: Benchmarks.
-
 static_assert(sizeof(uint8_t) == sizeof(char), "Unexpected char size");
 
 namespace Yttrium

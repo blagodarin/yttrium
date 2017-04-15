@@ -402,7 +402,7 @@ namespace Yttrium
 
 	bool GuiIonPropertyLoader::load(float& value, const IonNode& node)
 	{
-		std::array<float, 1> elements;
+		std::array<float, 1> elements{};
 		if (::read_array(elements, node) != 1)
 			throw GuiDataError("Bad '", node.name(), "'");
 		value = elements[0];

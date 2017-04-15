@@ -60,8 +60,10 @@ set_target_properties(
 	PROPERTIES FOLDER "tools")
 
 add_subdirectory(benchmarks/buffer)
+add_subdirectory(benchmarks/tiny_string_map)
 set_target_properties(
 	benchmark_buffer
+	benchmark_tiny_string_map
 	PROPERTIES FOLDER "benchmarks")
 
 add_subdirectory(examples/3d)

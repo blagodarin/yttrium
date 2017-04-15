@@ -74,6 +74,23 @@ namespace
 			}
 		}
 
+		// Code with 'setjmp' must reside in a separate function
+		// without local variables to avoid clobbering warnings.
+		bool write(const Yttrium::ImageFormat& format, int color_type, int transforms, png_bytep* data)
+		{
+			if (::setjmp(png_jmpbuf(_png)))
+				return false;
+
+			::png_set_compression_level(_png, 0);
+			::png_set_IHDR(_png, _info, format.width(), format.height(), format.bits_per_channel(),
+				color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+			::png_set_rows(_png, _info, data);
+			::png_write_png(_png, _info, transforms, nullptr);
+
+			return true;
+		}
+
 	private:
 		static void write_callback(png_struct* png_ptr, png_byte* data, png_size_t length)
 		{
@@ -140,31 +157,14 @@ namespace Yttrium
 			break;
 		}
 
-		PngWriter png_writer(writer);
-
 		const auto rows = std::make_unique<png_bytep[]>(format.height());
-
-		if (::setjmp(png_jmpbuf(png_writer._png)))
-			return false;
-
-		::png_set_compression_level(png_writer._png, 0);
-		::png_set_IHDR(png_writer._png, png_writer._info, format.width(), format.height(), format.bits_per_channel(),
-			color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
 		if (format.orientation() == ImageOrientation::XRightYDown)
-		{
 			for (size_t i = 0, j = 0; i < format.height(); i++, j += format.row_size())
 				rows[i] = const_cast<png_bytep>(static_cast<png_const_bytep>(data) + j);
-		}
 		else
-		{
 			for (size_t i = format.height(), j = 0; i > 0; i--, j += format.row_size())
 				rows[i - 1] = const_cast<png_bytep>(static_cast<png_const_bytep>(data) + j);
-		}
 
-		::png_set_rows(png_writer._png, png_writer._info, rows.get());
-		::png_write_png(png_writer._png, png_writer._info, transforms, nullptr);
-
-		return true;
+		return PngWriter(writer).write(format, color_type, transforms, rows.get());
 	}
 }

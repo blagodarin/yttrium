@@ -1,7 +1,7 @@
 # TODO
+* Overall:
+	- Building with clang.
 * Library:
-	* Overall:
-		- Hash-based packed file access.
 	* GUI:
 		- Line editor widget.
 	* Image:
@@ -15,5 +15,7 @@
 	* Renderer:
 		- Smooth 3D rotation.
 		- Loading textures without intermediate Images.
+	* Storage:
+		- Hash-based packed file access.
 * Tools:
 	- Textured font builder.
