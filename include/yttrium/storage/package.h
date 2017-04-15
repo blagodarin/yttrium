@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace Yttrium
 {
@@ -22,7 +23,7 @@ namespace Yttrium
 		Ypq,  ///< YPQ package.
 	};
 
-	/// Package reader class.
+	/// Package reader interface.
 	class Y_API PackageReader
 	{
 	public:
@@ -33,10 +34,13 @@ namespace Yttrium
 		virtual ~PackageReader() = default;
 
 		///
-		virtual std::unique_ptr<Source> open(const StaticString& name) const = 0;
+		virtual const std::vector<StaticString>& names() const = 0;
+
+		///
+		virtual std::unique_ptr<Source> open(std::size_t index) const = 0;
 	};
 
-	/// Package writer class.
+	/// Package writer interface.
 	class Y_API PackageWriter
 	{
 	public:

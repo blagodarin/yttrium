@@ -12,6 +12,15 @@
 
 using namespace Yttrium;
 
+namespace
+{
+	std::unique_ptr<Source> open_packed(const PackageReader& package, const std::string& name)
+	{
+		const auto& names = package.names();
+		return package.open(static_cast<std::size_t>(std::find(names.begin(), names.end(), StaticString{name}) - names.begin()));
+	}
+}
+
 BOOST_AUTO_TEST_CASE(test_package)
 {
 	Buffer buffer1(100003);
@@ -48,12 +57,12 @@ BOOST_AUTO_TEST_CASE(test_package)
 	std::unique_ptr<Source> packed_file3;
 
 	{
-		const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
-		BOOST_REQUIRE(package_reader);
+		const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+		BOOST_REQUIRE(package);
 
-		packed_file3 = package_reader->open(StaticString{ file3.name() });
-		packed_file1 = package_reader->open(StaticString{ file1.name() });
-		packed_file2 = package_reader->open(StaticString{ file2.name() });
+		packed_file3 = ::open_packed(*package, file3.name());
+		packed_file1 = ::open_packed(*package, file1.name());
+		packed_file2 = ::open_packed(*package, file2.name());
 	}
 
 	BOOST_REQUIRE(packed_file1);
@@ -91,13 +100,39 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 		BOOST_REQUIRE(package_writer->commit());
 	}
 
-	const auto package_reader = PackageReader::create(package_file.name(), PackageType::Ypq);
-	BOOST_REQUIRE(package_reader);
+	const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+	BOOST_REQUIRE(package);
 
-	auto packed_file = package_reader->open(StaticString{ file2.name() });
+	auto packed_file = ::open_packed(*package, file2.name());
 	BOOST_REQUIRE(packed_file);
 
-	std::array<uint8_t, 2> data = { 0, 0 };
-	BOOST_CHECK_EQUAL(packed_file->read_at(0, data.data(), 2), 1);
+	std::array<uint8_t, 2> data{0, 0};
+	BOOST_CHECK_EQUAL(packed_file->read_at(0, data.data(), data.size()), 1);
 	BOOST_CHECK_EQUAL(data[0], '2');
+}
+
+BOOST_AUTO_TEST_CASE(test_package_duplicates)
+{
+	TemporaryFile package_file;
+	TemporaryFile file;
+	{
+		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		BOOST_REQUIRE(package_writer);
+		Writer(file).write_all(Buffer(1, "1"));
+		BOOST_REQUIRE(package_writer->add(file.name(), {}));
+		Writer(file).write_all(Buffer(2, "23"));
+		BOOST_REQUIRE(package_writer->add(file.name(), {}));
+		BOOST_REQUIRE(package_writer->commit());
+	}
+
+	const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+	BOOST_REQUIRE(package);
+
+	auto packed_file = ::open_packed(*package, file.name());
+	BOOST_REQUIRE(packed_file);
+
+	std::array<uint8_t, 3> data{0, 0, 0};
+	BOOST_REQUIRE_EQUAL(packed_file->read_at(0, data.data(), data.size()), 2);
+	BOOST_CHECK_EQUAL(data[0], '2');
+	BOOST_CHECK_EQUAL(data[1], '3');
 }

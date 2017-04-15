@@ -39,10 +39,13 @@ namespace Yttrium
 {
 	struct YpqReader::Entry
 	{
-		uint64_t offset = 0;
-		uint32_t size = 0;
-		size_t properties_begin = 0;
-		size_t properties_end = 0;
+		uint64_t _offset = 0;
+		uint32_t _size = 0;
+		size_t _properties_begin = 0;
+		size_t _properties_end = 0;
+
+		Entry(uint64_t offset, uint32_t size, size_t properties_begin, size_t properties_end)
+			: _offset{offset}, _size{size}, _properties_begin{properties_begin}, _properties_end{properties_end} {}
 	};
 
 	YpqReader::YpqReader(std::unique_ptr<Source>&& source)
@@ -57,11 +60,11 @@ namespace Yttrium
 		if (header.index_size < metadata_offset)
 			throw BadPackage("Bad package header"_s);
 
-		std::vector<YpqEntry> entries(size_t{ header.entry_count });
+		std::vector<YpqEntry> entries(size_t{header.entry_count});
 		if (!_source->read_all_at(sizeof header, entries.data(), entries.size() * sizeof(YpqEntry)))
 			throw BadPackage("Bad package index"_s);
 
-		_metadata_buffer.reset(size_t{ header.index_size - metadata_offset });
+		_metadata_buffer.reset(size_t{header.index_size - metadata_offset});
 		if (!_source->read_all_at(metadata_offset, _metadata_buffer.data(), _metadata_buffer.size()))
 			throw BadPackage("Bad package metadata"_s);
 
@@ -81,43 +84,42 @@ namespace Yttrium
 			const auto size = read_uint8();
 			if (!metadata_reader.skip(size))
 				throw BadPackage("Bad package index entry metadata"_s);
-			return StaticString(static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size);
+			return StaticString{static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size};
 		};
+
+		_names.reserve(entries.size());
+		_entries.reserve(entries.size());
 
 		const auto source_size = _source->size();
 		for (const auto& entry : entries)
 		{
-			const auto i = &entry - entries.data();
+			const auto index = static_cast<std::size_t>(&entry - entries.data());
 			if (entry.data_offset > source_size || entry.data_offset + entry.data_size > source_size)
-				throw BadPackage("Bad package index entry #"_s, i, " data"_s);
+				throw BadPackage("Bad package index entry #"_s, index, " data"_s);
 			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
-				throw BadPackage("Bad package index entry #"_s, i, " metadata"_s);
-			Entry internal;
-			internal.offset = entry.data_offset;
-			internal.size = entry.data_size;
-			const auto name = read_string();
-			internal.properties_begin = _properties.size();
+				throw BadPackage("Bad package index entry #"_s, index, " metadata"_s);
+			_names.emplace_back(read_string());
+			const auto properties_begin = _properties.size();
 			for (auto property_count = read_uint8(); property_count > 0; --property_count)
 			{
 				const auto property_name = read_string();
 				const auto property_value = read_string();
 				_properties.emplace_back(property_name, property_value);
 			}
-			internal.properties_end = _properties.size();
-			_entries.emplace(name, internal);
+			_entries.emplace_back(entry.data_offset, entry.data_size, properties_begin, _properties.size());
 		}
 	}
 
 	YpqReader::~YpqReader() = default;
 
-	std::unique_ptr<Source> YpqReader::open(const StaticString& name) const
+	std::unique_ptr<Source> YpqReader::open(std::size_t index) const
 	{
-		const auto i = _entries.find(name);
-		if (i == _entries.end())
+		if (index >= _entries.size())
 			return {};
-		auto source = Source::from(_source, i->second.offset, i->second.size);
-		for (size_t j = i->second.properties_begin; j < i->second.properties_end; ++j)
-			source->set_property(_properties[j].first, _properties[j].second);
+		const auto& entry = _entries[index];
+		auto source = Source::from(_source, entry._offset, entry._size);
+		for (auto i = entry._properties_begin; i < entry._properties_end; ++i)
+			source->set_property(_properties[i].first, _properties[i].second);
 		return source;
 	}
 

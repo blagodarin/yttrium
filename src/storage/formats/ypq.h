@@ -10,24 +10,26 @@
 
 namespace Yttrium
 {
-	class YpqReader : public PackageReader
+	class YpqReader final : public PackageReader
 	{
 	public:
 		YpqReader(std::unique_ptr<Source>&&);
 		~YpqReader() override;
 
-		std::unique_ptr<Source> open(const StaticString&) const override;
+		const std::vector<StaticString>& names() const override { return _names; }
+		std::unique_ptr<Source> open(std::size_t) const override;
 
 	private:
 		struct Entry;
 
 		const std::shared_ptr<const Source> _source;
 		Buffer _metadata_buffer;
-		std::map<StaticString, Entry> _entries;
+		std::vector<StaticString> _names;
+		std::vector<Entry> _entries;
 		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the metadata buffer.
 	};
 
-	class YpqWriter : public PackageWriter
+	class YpqWriter final : public PackageWriter
 	{
 	public:
 		explicit YpqWriter(Writer&&);
