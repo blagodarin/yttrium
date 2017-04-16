@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	class GlRenderer : public RendererImpl
+	class GlRenderer final : public RendererImpl
 	{
 	public:
 		GlRenderer();

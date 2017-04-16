@@ -9,10 +9,10 @@
 
 namespace Yttrium
 {
-	class OpenAlPlayer : public AudioPlayerBackend
+	class OpenALPlayer final : public AudioPlayerBackend
 	{
 	public:
-		OpenAlPlayer();
+		OpenALPlayer();
 
 	private:
 		void set_format(const AudioFormat&) override;

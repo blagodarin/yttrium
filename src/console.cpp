@@ -12,7 +12,7 @@ namespace Yttrium
 	class ConsolePrivate
 	{
 	public:
-		explicit ConsolePrivate(ScriptContext& script_context) : _script_context(script_context) {}
+		explicit ConsolePrivate(ScriptContext& script_context) : _script_context{script_context} {}
 
 	public:
 		ScriptContext& _script_context;
@@ -21,7 +21,7 @@ namespace Yttrium
 	};
 
 	Console::Console(ScriptContext& script_context)
-		: _private(std::make_unique<ConsolePrivate>(script_context))
+		: _private{std::make_unique<ConsolePrivate>(script_context)}
 	{
 	}
 
@@ -43,7 +43,7 @@ namespace Yttrium
 				return true;
 
 			case Key::Enter:
-				ScriptCode{ std::string{ _private->_line_editor.text() } }.execute(_private->_script_context);
+				ScriptCode{std::string{ _private->_line_editor.text()}}.execute(_private->_script_context);
 				_private->_line_editor.clear();
 				return true;
 
@@ -59,7 +59,7 @@ namespace Yttrium
 		if (!_private->_visible)
 			return;
 
-		DebugRenderer debug(static_cast<RendererImpl&>(renderer));
+		DebugRenderer debug{static_cast<RendererImpl&>(renderer)};
 
 		const auto max_width = debug.max_width();
 
@@ -73,7 +73,7 @@ namespace Yttrium
 		}
 
 		debug.set_color(1.0, 1.0, 1.0);
-		debug.draw_text(0, 0, StaticString{ _private->_line_editor.text() }, max_width);
+		debug.draw_text(0, 0, StaticString{_private->_line_editor.text()}, max_width);
 
 		debug.set_color(1.0, 0.0, 0.0);
 		debug.draw_cursor(_private->_line_editor.cursor(), 0);

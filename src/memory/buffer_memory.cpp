@@ -10,22 +10,20 @@
 
 namespace
 {
-	using namespace Yttrium;
-
 	void* allocate_big_block(size_t size)
 	{
-		const auto data = pages_allocate(size);
+		const auto data = Yttrium::pages_allocate(size);
 		if (!data)
 			throw std::bad_alloc();
 	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		_buffer_memory_tracker.track_system_allocation(size);
+		Yttrium::_buffer_memory_tracker.track_system_allocation(size);
 	#endif
 		return data;
 	}
 
 	size_t level_from_capacity(size_t capacity) noexcept
 	{
-		assert(is_power_of_2(capacity));
+		assert(Yttrium::is_power_of_2(capacity));
 		size_t level = 0;
 		for (auto i = capacity; i > 1; i >>= 1)
 			++level;

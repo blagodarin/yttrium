@@ -10,11 +10,11 @@ namespace Yttrium
 	using P_ALCdevice = Y_UNIQUE_PTR(::ALCdevice, ::alcCloseDevice);
 	using P_ALCcontext = Y_UNIQUE_PTR(::ALCcontext, ::alcDestroyContext);
 
-	class OpenAlBackend : public AudioBackend
+	class OpenALBackend final : public AudioBackend
 	{
 	public:
-		OpenAlBackend();
-		~OpenAlBackend() override;
+		OpenALBackend();
+		~OpenALBackend() override;
 
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;

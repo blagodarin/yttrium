@@ -27,14 +27,14 @@ add_library(yttrium
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
 	../include/yttrium/translation.h
-	base/static_string.cpp
-	base/string_utils.cpp
-	base/string.cpp
-	base/tiny_string_map.cpp
 	config.h
 	console.cpp
 	globals.cpp
 	resource_loader.cpp
+	static_string.cpp
+	string_utils.cpp
+	string.cpp
+	tiny_string_map.cpp
 	translation.cpp
 	)
 target_link_libraries(yttrium Threads::Threads)

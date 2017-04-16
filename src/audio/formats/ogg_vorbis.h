@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	class OggVorbisReader : public AudioReaderImpl
+	class OggVorbisReader final : public AudioReaderImpl
 	{
 	public:
 		OggVorbisReader(std::unique_ptr<Source>&&);

@@ -5,7 +5,7 @@
 
 namespace Yttrium
 {
-	class WavReader : public AudioReaderImpl
+	class WavReader final : public AudioReaderImpl
 	{
 	public:
 		WavReader(std::unique_ptr<Source>&&);

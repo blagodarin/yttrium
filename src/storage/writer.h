@@ -23,7 +23,7 @@ namespace Yttrium
 		friend Writer;
 	};
 
-	class BufferWriter : public WriterPrivate
+	class BufferWriter final : public WriterPrivate
 	{
 	public:
 		explicit BufferWriter(Buffer&);

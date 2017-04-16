@@ -11,8 +11,6 @@
 
 namespace
 {
-	using namespace Yttrium;
-
 	enum class AudioType
 	{
 		Unknown,
@@ -22,8 +20,10 @@ namespace
 #endif
 	};
 
-	AudioType detect_audio_type(const Source& source)
+	AudioType detect_audio_type(const Yttrium::Source& source)
 	{
+		using namespace Yttrium::Literals;
+
 		uint32_t signature = 0;
 		if (!source.read_at(0, signature))
 			return AudioType::Unknown;

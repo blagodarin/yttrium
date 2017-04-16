@@ -7,14 +7,12 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	void update_document(IonObject& target, const IonObject& source)
+	void update_document(Yttrium::IonObject& target, const Yttrium::IonObject& source)
 	{
 		for (auto i = source.rbegin(); i != source.rend(); ++i)
 		{
 			if (!target.contains(i->name()))
-				Ion::append(target, *i);
+				Yttrium::Ion::append(target, *i);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	class GlIndexBuffer : public IndexBufferImpl
+	class GlIndexBuffer final : public IndexBufferImpl
 	{
 	public:
 		const GlBufferHandle _buffer;
@@ -17,7 +17,7 @@ namespace Yttrium
 		void write(size_t offset, size_t size, const void* data) override;
 	};
 
-	class GlVertexBuffer : public VertexBufferImpl
+	class GlVertexBuffer final : public VertexBufferImpl
 	{
 	public:
 		const GlBufferHandle _buffer;

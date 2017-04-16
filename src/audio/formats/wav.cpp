@@ -8,9 +8,7 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	bool find_chunk(Reader& reader, uint32_t fourcc, WavChunkHeader& header)
+	bool find_chunk(Yttrium::Reader& reader, uint32_t fourcc, Yttrium::WavChunkHeader& header)
 	{
 		for (;;)
 		{

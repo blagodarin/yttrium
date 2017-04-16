@@ -9,7 +9,7 @@
 
 namespace Yttrium
 {
-	Sound_OpenAL::Sound_OpenAL(AudioReader& reader)
+	OpenALSound::OpenALSound(AudioReader& reader)
 		: _format(reader.format())
 	{
 		if (reader.format().channels() != 1)
@@ -27,7 +27,7 @@ namespace Yttrium
 		::alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
 	}
 
-	void Sound_OpenAL::play() const
+	void OpenALSound::play() const
 	{
 		::alSourceStop(_source);
 		::alSourcePlay(_source);

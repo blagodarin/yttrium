@@ -10,9 +10,9 @@
 
 namespace
 {
-	using namespace Yttrium;
+	using Yttrium::PixelFormat;
 
-	size_t channels_of(PixelFormat pixel_format)
+	std::size_t channels_of(PixelFormat pixel_format)
 	{
 		switch (pixel_format)
 		{
@@ -31,28 +31,16 @@ namespace
 namespace Yttrium
 {
 	ImageFormat::ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment, ImageOrientation orientation)
-		: _pixel_format(pixel_format)
-		, _channels(::channels_of(pixel_format))
-		, _bits_per_pixel(bits_per_pixel)
-		, _orientation(orientation)
-		, _width(width)
-		, _row_alignment(row_alignment)
-		, _row_size(aligned_image_row_size(_width, _bits_per_pixel, _row_alignment))
-		, _height(height)
+		: _pixel_format{pixel_format}
+		, _channels{::channels_of(pixel_format)}
+		, _bits_per_pixel{bits_per_pixel}
+		, _orientation{orientation}
+		, _width{width}
+		, _row_alignment{row_alignment}
+		, _row_size{aligned_image_row_size(_width, _bits_per_pixel, _row_alignment)}
+		, _height{height}
 	{
 		assert(is_power_of_2(_row_alignment));
-	}
-
-	Image::Image(const ImageFormat& format)
-		: _format(format)
-		, _buffer(_format.frame_size())
-	{
-	}
-
-	Image::Image(const ImageFormat& format, const void* data)
-		: _format(format)
-		, _buffer(_format.frame_size(), data)
-	{
 	}
 
 	boost::optional<Image> Image::load(const Source& source, ImageType type)
@@ -63,7 +51,19 @@ namespace Yttrium
 		const auto format = read_image(source, type, buffer);
 		if (!format)
 			return {};
-		return Image(*format, std::move(buffer));
+		return Image{*format, std::move(buffer)};
+	}
+
+	Image::Image(const ImageFormat& format)
+		: _format{format}
+		, _buffer{_format.frame_size()}
+	{
+	}
+
+	Image::Image(const ImageFormat& format, const void* data)
+		: _format{format}
+		, _buffer{_format.frame_size(), data}
+	{
 	}
 
 	bool Image::save(const std::string& path, ImageType type) const
@@ -79,7 +79,7 @@ namespace Yttrium
 			else
 				return false;
 		}
-		return save(Writer(path), type);
+		return save(Writer{path}, type);
 	}
 
 	bool Image::save(Writer&& writer, ImageType type) const
@@ -109,7 +109,7 @@ namespace Yttrium
 					}
 					scanline += _format.row_size();
 				}
-				_format._pixel_format = (_format.pixel_format() == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb);
+				_format._pixel_format = _format.pixel_format() == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb;
 				return true;
 			}
 			break;
@@ -124,6 +124,6 @@ namespace Yttrium
 	Buffer Image::to_buffer(ImageType type) const
 	{
 		Buffer buffer;
-		return save(Writer(buffer), type) ? std::move(buffer) : Buffer();
+		return save(Writer{buffer}, type) ? std::move(buffer) : Buffer{};
 	}
 }

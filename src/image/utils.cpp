@@ -6,7 +6,7 @@ namespace Yttrium
 {
 	Image grayscale_to_bgra(const Image& input)
 	{
-		Image output({ input.format().size(), PixelFormat::Bgra, 32, input.format().orientation() });
+		Image output{{input.format().size(), PixelFormat::Bgra, 32, input.format().orientation()}};
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input.format().row_size();
@@ -21,7 +21,7 @@ namespace Yttrium
 		case PixelFormat::Gray:
 			if (input.format().bits_per_pixel() == 8)
 			{
-				for (size_t y = output.format().height(); y > 0; --y)
+				for (auto y = output.format().height(); y > 0; --y)
 				{
 					for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
 					{
@@ -40,7 +40,7 @@ namespace Yttrium
 		case PixelFormat::GrayAlpha:
 			if (input.format().bits_per_pixel() == 16)
 			{
-				for (size_t y = output.format().height(); y > 0; --y)
+				for (auto y = output.format().height(); y > 0; --y)
 				{
 					for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
 					{
@@ -59,7 +59,7 @@ namespace Yttrium
 		default:
 			break;
 		}
-		throw std::logic_error("Bad image format for grayscale-BGRA conversion");
+		throw std::logic_error{"Bad image format for grayscale-BGRA conversion"};
 	}
 
 	boost::optional<Image> intensity_to_bgra(const Image& input)
@@ -67,7 +67,7 @@ namespace Yttrium
 		if (input.format().pixel_format() != PixelFormat::Gray || input.format().bits_per_pixel() != 8)
 			return {};
 
-		Image output({ input.format().size(), PixelFormat::Bgra, 32, input.format().orientation() });
+		Image output{{input.format().size(), PixelFormat::Bgra, 32, input.format().orientation()}};
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input.format().row_size();
@@ -77,7 +77,7 @@ namespace Yttrium
 
 		const auto scanline_size = output.format().width() * 4;
 
-		for (size_t y = output.format().height(); y > 0; --y)
+		for (auto y = output.format().height(); y > 0; --y)
 		{
 			for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
 			{

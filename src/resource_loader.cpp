@@ -29,31 +29,28 @@ namespace Yttrium
 		std::map<String, std::shared_ptr<const T>> _map;
 		std::mutex _mutex;
 
-		explicit ResourceCache(const Storage& storage)
-			: _storage(storage)
-		{
-		}
+		explicit ResourceCache(const Storage& storage) : _storage{storage} {}
 
 		std::shared_ptr<const T> fetch(const StaticString& name, const std::function<std::shared_ptr<const T>(std::unique_ptr<Source>&&)>& factory)
 		{
-			std::lock_guard<std::mutex> lock(_mutex);
-			const auto i = _map.find({ name, ByReference{} });
+			std::lock_guard<std::mutex> lock{_mutex};
+			const auto i = _map.find({name, ByReference{}});
 			if (i != _map.end())
 				return i->second;
 			auto source = _storage.open(name);
 			if (!source)
-				throw ResourceError("Can't find \"", name, "\"");
+				throw ResourceError{"Can't find \"", name, "\""};
 			auto resource_ptr = factory(std::move(source));
 			if (!resource_ptr)
-				throw DataError("Can't load \"", name, "\""); // We don't have more information at this point. =(
-			_map.emplace(String{ name }, resource_ptr);
+				throw DataError{"Can't load \"", name, "\""}; // We don't have more information at this point. =(
+			_map.emplace(String{name}, resource_ptr);
 			return resource_ptr;
 		}
 
 		auto release_unused()
 		{
 			std::vector<std::shared_ptr<const T>> unused;
-			std::lock_guard<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock{_mutex};
 			size_t released = 0;
 			for (auto i = _map.begin(); i != _map.end(); )
 			{
@@ -74,7 +71,7 @@ namespace Yttrium
 	{
 	public:
 		ResourceLoaderPrivate(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
-			: _storage(storage), _renderer(renderer), _audio_manager(audio_manager) {}
+			: _storage{storage}, _renderer{renderer}, _audio_manager{audio_manager} {}
 
 		bool release_unused()
 		{
@@ -93,18 +90,18 @@ namespace Yttrium
 		const Storage& _storage;
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
-		ResourceCache<IonDocument> _ion_document_cache{ _storage };
-		ResourceCache<Material> _material_cache{ _storage };
-		ResourceCache<Mesh> _mesh_cache{ _storage };
-		ResourceCache<Music> _music_cache{ _storage };
-		ResourceCache<Sound> _sound_cache{ _storage };
-		ResourceCache<Texture2D> _texture_2d_cache{ _storage };
-		ResourceCache<TextureFont> _texture_font_cache{ _storage };
-		ResourceCache<Translation> _translation_cache{ _storage };
+		ResourceCache<IonDocument> _ion_document_cache{_storage};
+		ResourceCache<Material> _material_cache{_storage};
+		ResourceCache<Mesh> _mesh_cache{_storage};
+		ResourceCache<Music> _music_cache{_storage};
+		ResourceCache<Sound> _sound_cache{_storage};
+		ResourceCache<Texture2D> _texture_2d_cache{_storage};
+		ResourceCache<TextureFont> _texture_font_cache{_storage};
+		ResourceCache<Translation> _translation_cache{_storage};
 	};
 
 	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
-		: _private(std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager))
+		: _private{std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager)}
 	{
 	}
 
@@ -139,28 +136,28 @@ namespace Yttrium
 				if (ion_name == "vertex_shader"_s)
 				{
 					if (vertex_shader)
-						throw DataError(make_location(), "Duplicate 'vertex_shader'"_s);
+						throw DataError{make_location(), "Duplicate 'vertex_shader'"_s};
 					vertex_shader = _private->_storage.open(ion.read().to_value());
 					if (!vertex_shader)
-						throw DataError(make_location(), "Bad 'vertex_shader'"_s);
+						throw DataError{make_location(), "Bad 'vertex_shader'"_s};
 					token = ion.read();
 				}
 				else if (ion_name == "fragment_shader"_s)
 				{
 					if (fragment_shader)
-						throw DataError(make_location(), "Duplicate 'fragment_shader'"_s);
+						throw DataError{make_location(), "Duplicate 'fragment_shader'"_s};
 					fragment_shader = _private->_storage.open(ion.read().to_value());
 					if (!fragment_shader)
-						throw DataError(make_location(), "Bad 'fragment_shader'"_s);
+						throw DataError{make_location(), "Bad 'fragment_shader'"_s};
 					token = ion.read();
 				}
 				else if (ion_name == "texture"_s)
 				{
 					if (texture)
-						throw DataError(make_location(), "Duplicate 'texture'"_s);
+						throw DataError{make_location(), "Duplicate 'texture'"_s};
 					const auto texture_name = ion.read().to_value();
 					if (texture_name.is_empty())
-						throw DataError(make_location(), "Bad 'texture'"_s);
+						throw DataError{make_location(), "Bad 'texture'"_s};
 					token = ion.read();
 					if (token.type() == IonReader::Token::Type::ObjectBegin) // TODO: Merge with GuiIonPropertyLoader::load_texture.
 					{
@@ -172,55 +169,55 @@ namespace Yttrium
 							if (filter_option == "nearest"_s)
 							{
 								if (has_interpolation)
-									throw DataError(make_location(), "Bad texture property"_s);
+									throw DataError{make_location(), "Bad texture property"_s};
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "linear"_s)
 							{
 								if (has_interpolation)
-									throw DataError(make_location(), "Bad texture property"_s);
+									throw DataError{make_location(), "Bad texture property"_s};
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "bilinear"_s)
 							{
 								if (has_interpolation)
-									throw DataError(make_location(), "Bad texture property"_s);
+									throw DataError{make_location(), "Bad texture property"_s};
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "trilinear"_s)
 							{
 								if (has_interpolation)
-									throw DataError(make_location(), "Bad texture property"_s);
+									throw DataError{make_location(), "Bad texture property"_s};
 								texture_filter = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
 								has_interpolation = true;
 							}
 							else if (filter_option == "anisotropic"_s)
 							{
 								if (!has_interpolation || has_anisotropy)
-									throw DataError(make_location(), "Bad texture property"_s);
+									throw DataError{make_location(), "Bad texture property"_s};
 								texture_filter = static_cast<Texture2D::Filter>((texture_filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
 								has_anisotropy = true;
 							}
 							else
-								throw DataError(make_location(), "Bad texture property"_s);
+								throw DataError{make_location(), "Bad texture property"_s};
 						}
 						token = ion.read();
 					}
 					texture = load_texture_2d(texture_name);
 				}
 				else
-					throw DataError(make_location(), "Unknown material entry '"_s, ion_name, "'"_s);
+					throw DataError{make_location(), "Unknown material entry '"_s, ion_name, "'"_s};
 			}
 			if (!vertex_shader)
-				throw DataError("("_s, name, ") No 'vertex_shader'"_s);
+				throw DataError{"("_s, name, ") No 'vertex_shader'"_s};
 			if (!fragment_shader)
-				throw DataError("("_s, name, ") No 'fragment_shader'"_s);
+				throw DataError{"("_s, name, ") No 'fragment_shader'"_s};
 			auto program = _private->_renderer->create_gpu_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
-				throw DataError("("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s);
+				throw DataError{"("_s, name, ") Bad 'vertex_shader' or 'fragment_shader'"_s};
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
 		});
 	}

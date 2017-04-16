@@ -8,7 +8,7 @@
 
 namespace Yttrium
 {
-	class WindowPrivate : private WindowBackendCallbacks
+	class WindowPrivate final : private WindowBackendCallbacks
 	{
 	public:
 		const std::string _name;

@@ -9,7 +9,7 @@ namespace Yttrium
 {
 	class RendererImpl;
 
-	class GlGpuProgram : public GpuProgram
+	class GlGpuProgram final : public GpuProgram
 	{
 	public:
 		GlGpuProgram(RendererImpl&, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);

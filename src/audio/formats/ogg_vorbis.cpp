@@ -7,16 +7,14 @@
 
 namespace
 {
-	using namespace Yttrium;
-
 	size_t read_callback(void* ptr, size_t size, size_t nmemb, void* datasource)
 	{
-		return static_cast<Reader*>(datasource)->read(ptr, size * nmemb);
+		return static_cast<Yttrium::Reader*>(datasource)->read(ptr, size * nmemb);
 	}
 
 	int seek_callback(void* datasource, ogg_int64_t offset, int whence)
 	{
-		auto& reader = *static_cast<Reader*>(datasource);
+		auto& reader = *static_cast<Yttrium::Reader*>(datasource);
 		switch (whence)
 		{
 		case SEEK_SET: return reader.seek(static_cast<uint64_t>(offset)) ? 0 : -1;
@@ -33,7 +31,7 @@ namespace
 
 	long tell_callback(void* datasource)
 	{
-		return static_cast<long>(static_cast<Reader*>(datasource)->offset());
+		return static_cast<long>(static_cast<Yttrium::Reader*>(datasource)->offset());
 	}
 
 	const ov_callbacks y_ov_callbacks =

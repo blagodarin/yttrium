@@ -11,7 +11,7 @@
 
 namespace
 {
-	using namespace Yttrium;
+	using namespace Yttrium::Literals;
 
 #pragma pack(push, 1)
 

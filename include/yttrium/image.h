@@ -124,14 +124,14 @@ namespace Yttrium
 	class Y_API Image
 	{
 	public:
+		///
+		static boost::optional<Image> load(const Source&, ImageType = ImageType::Auto);
+
 		/// Creates an image of the specified format with uninitialized contents.
 		explicit Image(const ImageFormat& format);
 
 		/// Creates an image of the specified format, initialized from the provided data.
 		Image(const ImageFormat&, const void* data);
-
-		///
-		static boost::optional<Image> load(const Source&, ImageType = ImageType::Auto);
 
 		///
 		void* data() noexcept { return _buffer.data(); }

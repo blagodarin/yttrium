@@ -29,7 +29,7 @@ namespace Yttrium
 	public:
 		~TemporaryFilePrivate()
 		{
-			::DeleteFileA(_name.data()); // TODO: Report failure.
+			::DeleteFileA(_name.data()); // TODO: Report failure (e.g. with OutputDebugString).
 		}
 
 	public:

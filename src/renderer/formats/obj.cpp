@@ -18,8 +18,6 @@
 
 namespace
 {
-	using namespace Yttrium;
-
 	const std::string _float = R"(\s+([+-]?\d+(?:\.\d+)))";
 	const std::string _index = R"(\s+(\S+))";
 
@@ -39,7 +37,7 @@ namespace
 	class ObjState
 	{
 	public:
-		bool process_line(const std::string& line, MeshData& data)
+		bool process_line(const std::string& line, Yttrium::MeshData& data)
 		{
 			std::smatch match;
 			if (std::regex_match(line, match, _obj_v_regex))
@@ -62,8 +60,10 @@ namespace
 			return true;
 		}
 
-		bool finalize(MeshData& data)
+		bool finalize(Yttrium::MeshData& data)
 		{
+			using Yttrium::VA;
+
 			switch (_face_format)
 			{
 			case FaceFormat::v:
@@ -139,7 +139,7 @@ namespace
 			return {};
 		}
 
-		bool process_index(const std::tuple<size_t, size_t, size_t>& index, MeshData& data)
+		bool process_index(const std::tuple<size_t, size_t, size_t>& index, Yttrium::MeshData& data)
 		{
 			const auto index_v = std::get<0>(index);
 			const auto index_t = std::get<1>(index);
@@ -155,7 +155,7 @@ namespace
 				return true;
 			}
 
-			BufferAppender<float> appender(data._vertex_data);
+			Yttrium::BufferAppender<float> appender(data._vertex_data);
 			appender << _vertices[index_v].x << _vertices[index_v].y << _vertices[index_v].z << _vertices[index_v].w;
 			if (index_t != _no_index)
 				appender << _texcoords[index_t].x << _texcoords[index_t].y;
@@ -169,9 +169,9 @@ namespace
 
 	private:
 		FaceFormat _face_format = FaceFormat::unknown;
-		std::vector<Vector4> _vertices;
-		std::vector<Vector2> _texcoords;
-		std::vector<Vector4> _normals;
+		std::vector<Yttrium::Vector4> _vertices;
+		std::vector<Yttrium::Vector2> _texcoords;
+		std::vector<Yttrium::Vector4> _normals;
 		std::vector<std::tuple<size_t, size_t, size_t>> _indices;
 	};
 }

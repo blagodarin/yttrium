@@ -9,7 +9,7 @@ namespace Yttrium
 {
 	class AudioReader;
 
-	class MusicImpl : public Music
+	class MusicImpl final : public Music
 	{
 	public:
 		MusicImpl(std::unique_ptr<AudioReader>&&);

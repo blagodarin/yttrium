@@ -10,8 +10,6 @@
 
 namespace
 {
-	using namespace Yttrium;
-
 	enum CharClass
 	{
 		Other,    // Any character not mentioned below.
@@ -79,12 +77,12 @@ namespace
 
 	struct State
 	{
-		IonObject* object = nullptr;
-		IonList* list = nullptr;
+		Yttrium::IonObject* object = nullptr;
+		Yttrium::IonList* list = nullptr;
 
 		State() = default;
-		explicit State(IonObject* object_) : object(object_) {}
-		explicit State(IonList* list_) : list(list_) {}
+		explicit State(Yttrium::IonObject* object_) : object{object_} {}
+		explicit State(Yttrium::IonList* list_) : list{list_} {}
 	};
 }
 

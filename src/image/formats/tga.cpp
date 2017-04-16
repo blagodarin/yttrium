@@ -7,10 +7,11 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	bool can_write(const ImageFormat& format)
+	bool can_write(const Yttrium::ImageFormat& format)
 	{
+		using Yttrium::ImageOrientation;
+		using Yttrium::PixelFormat;
+
 		switch (format.pixel_format())
 		{
 		case PixelFormat::Gray:

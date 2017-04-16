@@ -6,24 +6,22 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	void append(IonList& target, const IonValue& source)
+	void append(Yttrium::IonList& target, const Yttrium::IonValue& source)
 	{
 		switch (source.type())
 		{
-		case IonValue::Type::List:
+		case Yttrium::IonValue::Type::List:
 			{
 				const auto target_list = target.append_list();
 				for (const auto& source_value : source.list())
 					append(*target_list, source_value);
 			}
 			break;
-		case IonValue::Type::Object:
+		case Yttrium::IonValue::Type::Object:
 			{
 				const auto target_object = target.append_object();
 				for (const auto& source_node : *source.object())
-					Ion::append(*target_object, source_node);
+					Yttrium::Ion::append(*target_object, source_node);
 			}
 			break;
 		default:

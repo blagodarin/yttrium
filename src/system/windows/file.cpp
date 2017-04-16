@@ -9,7 +9,7 @@
 #include "windows.h"
 
 // TODO: Throw on errors instead of aborting.
-// TODO: Report failures during destruction.
+// TODO: Report failures during destruction (e.g. with OutputDebugString).
 
 namespace Yttrium
 {
