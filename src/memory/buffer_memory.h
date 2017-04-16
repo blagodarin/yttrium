@@ -21,7 +21,6 @@ namespace Yttrium
 
 		static size_t capacity_for_size(size_t) noexcept;
 		static size_t granularity() noexcept;
-		static size_t max_total_capacity() noexcept;
 		static size_t total_capacity() noexcept;
 
 		BufferMemory(const BufferMemory&) = delete;

@@ -60,7 +60,6 @@ namespace Yttrium
 
 		if (is_focused() && capture.has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)
 		{
-			// TODO: Force a cursor symbol to be included in every font.
 			PushTexture push_texture(renderer, nullptr);
 			renderer.draw_rect(capture.cursor_rect, _foreground.color);
 		}

@@ -175,15 +175,6 @@ namespace Yttrium
 		return page_size;
 	}
 
-	size_t BufferMemory::max_total_capacity() noexcept
-	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		return _buffer_memory_tracker.max_total_capacity();
-	#else
-		std::abort();
-	#endif
-	}
-
 	size_t BufferMemory::total_capacity() noexcept
 	{
 	#if Y_ENABLE_BUFFER_MEMORY_TRACKING

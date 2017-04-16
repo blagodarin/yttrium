@@ -19,11 +19,6 @@ namespace Yttrium
 	class BufferMemoryTracker
 	{
 	public:
-		size_t max_total_capacity() const noexcept
-		{
-			return _total_capacity.maximum_value();
-		}
-
 	#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		void print_state(const std::map<size_t, size_t>& free_block_count);
 	#endif

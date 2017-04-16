@@ -77,11 +77,6 @@ namespace Yttrium
 		}
 	}
 
-	size_t Buffer::max_total_capacity() noexcept
-	{
-		return BufferMemory::max_total_capacity();
-	}
-
 	size_t Buffer::memory_granularity() noexcept
 	{
 		return BufferMemory::granularity();
