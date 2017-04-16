@@ -1,6 +1,6 @@
 #include "iostream.h"
 
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector4.h>
 
 #include <boost/test/unit_test.hpp>
 

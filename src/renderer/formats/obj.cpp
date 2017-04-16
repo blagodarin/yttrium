@@ -1,7 +1,8 @@
 #include "obj.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector2.h>
+#include <yttrium/math/vector4.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/index_buffer.h>
 #include <yttrium/renderer/renderer.h>

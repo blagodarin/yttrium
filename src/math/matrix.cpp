@@ -2,7 +2,8 @@
 
 #include <yttrium/math/euler.h>
 #include <yttrium/math/size.h>
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector3.h>
+#include <yttrium/math/vector4.h>
 
 #include <cassert>
 #include <cmath>
@@ -190,13 +191,13 @@ namespace Yttrium
 		);
 	}
 
-	Matrix4 Matrix4::translation(const Vector4& point) noexcept
+	Matrix4 Matrix4::translation(const Vector4& v) noexcept
 	{
 		return Matrix4
 		(
-			1, 0, 0, point.x,
-			0, 1, 0, point.y,
-			0, 0, 1, point.z,
+			1, 0, 0, v.x,
+			0, 1, 0, v.y,
+			0, 0, 1, v.z,
 			0, 0, 0, 1
 		);
 	}
@@ -227,14 +228,24 @@ namespace Yttrium
 		};
 	}
 
-	Vector4 operator*(const Matrix4& a, const Vector4& b) noexcept
+	Vector3 operator*(const Matrix4& m, const Vector3& v) noexcept
 	{
 		return
 		{
-			a(0,0) * b.x + a(0,1) * b.y + a(0,2) * b.z + a(0,3) * b.w,
-			a(1,0) * b.x + a(1,1) * b.y + a(1,2) * b.z + a(1,3) * b.w,
-			a(2,0) * b.x + a(2,1) * b.y + a(2,2) * b.z + a(2,3) * b.w,
-			a(3,0) * b.x + a(3,1) * b.y + a(3,2) * b.z + a(3,3) * b.w,
+			m(0,0) * v.x + m(0,1) * v.y + m(0,2) * v.z + m(0,3),
+			m(1,0) * v.x + m(1,1) * v.y + m(1,2) * v.z + m(1,3),
+			m(2,0) * v.x + m(2,1) * v.y + m(2,2) * v.z + m(2,3),
+		};
+	}
+
+	Vector4 operator*(const Matrix4& m, const Vector4& v) noexcept
+	{
+		return
+		{
+			m(0,0) * v.x + m(0,1) * v.y + m(0,2) * v.z + m(0,3) * v.w,
+			m(1,0) * v.x + m(1,1) * v.y + m(1,2) * v.z + m(1,3) * v.w,
+			m(2,0) * v.x + m(2,1) * v.y + m(2,2) * v.z + m(2,3) * v.w,
+			m(3,0) * v.x + m(3,1) * v.y + m(3,2) * v.z + m(3,3) * v.w,
 		};
 	}
 }

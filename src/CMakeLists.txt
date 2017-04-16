@@ -204,9 +204,10 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/math/point.h
 	../include/yttrium/math/rect.h
 	../include/yttrium/math/size.h
-	../include/yttrium/math/vector.h
+	../include/yttrium/math/vector2.h
+	../include/yttrium/math/vector3.h
+	../include/yttrium/math/vector4.h
 	math/matrix.cpp
-	math/vector.cpp
 	)
 
 ########################################################################################################################

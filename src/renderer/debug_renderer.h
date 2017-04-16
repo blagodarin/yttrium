@@ -1,7 +1,7 @@
 #ifndef _src_renderer_debug_renderer_h_
 #define _src_renderer_debug_renderer_h_
 
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector4.h>
 #include <yttrium/renderer/modifiers.h>
 
 #include <boost/optional/optional.hpp>

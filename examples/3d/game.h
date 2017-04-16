@@ -2,7 +2,7 @@
 #define _examples_3d_game_h_
 
 #include <yttrium/math/euler.h>
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector4.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>

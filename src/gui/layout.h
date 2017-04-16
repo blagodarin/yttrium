@@ -2,7 +2,7 @@
 #define _src_gui_layout_h_
 
 #include <yttrium/math/size.h>
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector2.h>
 
 #include <memory>
 #include <vector>

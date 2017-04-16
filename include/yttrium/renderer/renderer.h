@@ -5,7 +5,7 @@
 #define _include_yttrium_renderer_renderer_h_
 
 #include <yttrium/flags.h>
-#include <yttrium/math/vector.h>
+#include <yttrium/math/vector4.h>
 
 #include <memory>
 #include <vector>

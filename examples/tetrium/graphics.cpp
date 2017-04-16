@@ -3,6 +3,7 @@
 #include <yttrium/image.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/math/vector2.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 
