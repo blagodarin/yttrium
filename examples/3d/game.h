@@ -1,15 +1,17 @@
 #ifndef _examples_3d_game_h_
 #define _examples_3d_game_h_
 
+#include "model.h"
+
 #include <yttrium/math/euler.h>
-#include <yttrium/math/vector3.h>
+#include <yttrium/math/line3.h>
 #include <yttrium/math/vector4.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/window.h>
 
-#include "model.h"
+#include <boost/optional/optional.hpp>
 
 using namespace Yttrium;
 
@@ -44,7 +46,8 @@ private:
 
 	unsigned _animation = 0;
 
-	std::pair<Vector3, Vector3> _center_ray{{0, 0, 0}, {0, 0, 0}};
+	Line3 _center_ray{{0, 0, 0}, {0, 0, 0}};
+	boost::optional<Vector4> _board_point;
 };
 
 #endif

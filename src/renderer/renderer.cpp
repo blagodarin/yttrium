@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include <yttrium/exceptions.h>
+#include <yttrium/math/line3.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/vector3.h>
 #include <yttrium/memory/buffer_appender.h>
@@ -127,7 +128,7 @@ namespace Yttrium
 		return _matrix_stack.back().first;
 	}
 
-	std::pair<Vector3, Vector3> RendererImpl::pixel_ray(const Point& p) const
+	Line3 RendererImpl::pixel_ray(const Point& p) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
 		const auto xn = static_cast<float>(2 * p.x() + 1) / _window_size.width() - 1;

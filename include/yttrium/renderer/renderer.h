@@ -16,6 +16,7 @@ namespace Yttrium
 	class Image;
 	class IndexBuffer;
 	enum class IndexFormat;
+	class Line3;
 	class Margins;
 	class Matrix4;
 	class Mesh;
@@ -26,7 +27,6 @@ namespace Yttrium
 	class Texture2D;
 	class TexturedRect;
 	enum class VA;
-	class Vector3;
 	class VertexBuffer;
 
 	///
@@ -81,7 +81,7 @@ namespace Yttrium
 		virtual Matrix4 model_matrix() const = 0;
 
 		///
-		virtual std::pair<Vector3, Vector3> pixel_ray(const Point&) const = 0;
+		virtual Line3 pixel_ray(const Point&) const = 0;
 
 		///
 		virtual void set_texture_rect(const RectF&, const Margins&) = 0;

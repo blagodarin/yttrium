@@ -136,6 +136,17 @@ void Game::render(Renderer& renderer)
 			draw_rt(_cube, { 0.00,  1.25, 3.50},    -angle, { 0,  0,  1});
 		}
 		_checkerboard.draw(renderer);
+		{
+			Vector3 p;
+			if (_center_ray.plane_intersection({0, 0, 0}, {0, 0, 1}, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
+			{
+				_board_point = Vector4{std::floor(p.x) + .5f, std::floor(p.y) + .5f, -.4375f};
+				PushTransformation t{renderer, Matrix4::translation(*_board_point)};
+				_cube.draw(renderer);
+			}
+			else
+				_board_point = {};
+		}
 	}
 	{
 		PushTexture push_texture{renderer, nullptr};
@@ -183,6 +194,13 @@ void Game::update(const UpdateEvent& update)
 		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, "\n"
 		"Pitch: ", _rotation.pitch, ", Yaw: ", _rotation.yaw, "\n"
 		"Center ray:\n"
-		"  ", _center_ray.first.x, ", ", _center_ray.first.y, ", ", _center_ray.first.z, "\n"
-		"  ", _center_ray.second.x, ", ", _center_ray.second.y, ", ", _center_ray.second.z);
+		"  ", _center_ray.a.x, ", ", _center_ray.a.y, ", ", _center_ray.a.z, "\n"
+		"  ", _center_ray.b.x, ", ", _center_ray.b.y, ", ", _center_ray.b.z, "\n"
+		"Board intersection:\n"
+		"  ");
+
+	if (_board_point)
+		append_to(_debug_text, _board_point->x, ", ", _board_point->y, ", ", _board_point->z);
+	else
+		append_to(_debug_text, "(none)");
 }
