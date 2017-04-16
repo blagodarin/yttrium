@@ -5,6 +5,7 @@
 #include <yttrium/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/string_utils.h>
@@ -88,8 +89,11 @@ void Game::render(Renderer& renderer)
 		model.draw(renderer);
 	};
 
+	const auto center = Rect{renderer.window_size()}.center();
+
 	{
 		Push3D projection{renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
+		_center_ray = renderer.pixel_ray(center);
 		{
 			PushTransformation r{renderer, Matrix4::rotation(static_cast<float>(_animation % 24000) / 24000.f * 360.f, { 0, 0, 1 })};
 
@@ -133,6 +137,10 @@ void Game::render(Renderer& renderer)
 		}
 		_checkerboard.draw(renderer);
 	}
+	{
+		PushTexture push_texture{renderer, nullptr};
+		renderer.draw_rect(RectF{PointF{center}, SizeF{2, 2}}, {1, 1, 0});
+	}
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
 }
@@ -173,5 +181,8 @@ void Game::update(const UpdateEvent& update)
 		"TextureSwitches: ", update.texture_switches, " (Redundant: ", update.redundant_texture_switches, ")\n"
 		"ShaderSwitches: ", update.shader_switches, " (Redundant: ", update.redundant_shader_switches, ")\n"
 		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, "\n"
-		"Pitch: ", _rotation.pitch, ", Yaw: ", _rotation.yaw);
+		"Pitch: ", _rotation.pitch, ", Yaw: ", _rotation.yaw, "\n"
+		"Center ray:\n"
+		"  ", _center_ray.first.x, ", ", _center_ray.first.y, ", ", _center_ray.first.z, "\n"
+		"  ", _center_ray.second.x, ", ", _center_ray.second.y, ", ", _center_ray.second.z);
 }

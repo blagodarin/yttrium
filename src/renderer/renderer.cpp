@@ -2,6 +2,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/math/vector3.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
@@ -124,6 +125,15 @@ namespace Yttrium
 		assert(!_matrix_stack.empty());
 		assert(_matrix_stack.back().second == MatrixType::Model);
 		return _matrix_stack.back().first;
+	}
+
+	std::pair<Vector3, Vector3> RendererImpl::pixel_ray(const Point& p) const
+	{
+		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
+		const auto xn = static_cast<float>(2 * p.x() + 1) / _window_size.width() - 1;
+		const auto yn = static_cast<float>(2 * p.y() + 1) / _window_size.height() - 1;
+		const auto m = full_matrix().inversed();
+		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
 	}
 
 	void RendererImpl::set_texture_rect(const RectF& rect, const Margins& borders)

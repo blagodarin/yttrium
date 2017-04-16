@@ -43,6 +43,7 @@ namespace Yttrium
 		Matrix4 full_matrix() const override;
 		std::unique_ptr<Mesh> load_mesh(const Source&) override;
 		Matrix4 model_matrix() const override;
+		std::pair<Vector3, Vector3> pixel_ray(const Point&) const override;
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
 

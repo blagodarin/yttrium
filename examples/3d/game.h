@@ -2,6 +2,7 @@
 #define _examples_3d_game_h_
 
 #include <yttrium/math/euler.h>
+#include <yttrium/math/vector3.h>
 #include <yttrium/math/vector4.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/static_string.h>
@@ -42,6 +43,8 @@ private:
 	bool _move_right = false;
 
 	unsigned _animation = 0;
+
+	std::pair<Vector3, Vector3> _center_ray{{0, 0, 0}, {0, 0, 0}};
 };
 
 #endif
