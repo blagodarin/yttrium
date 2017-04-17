@@ -68,16 +68,16 @@ namespace
 			switch (_face_format)
 			{
 			case FaceFormat::v:
-				data._vertex_format = { VA::f4 };
+				data._vertex_format = { VA::f3 };
 				return true;
 			case FaceFormat::vt:
-				data._vertex_format = { VA::f4, VA::f2 };
+				data._vertex_format = { VA::f3, VA::f2 };
 				return true;
 			case FaceFormat::vn:
-				data._vertex_format = { VA::f4, VA::f4 };
+				data._vertex_format = { VA::f3, VA::f3 };
 				return true;
 			case FaceFormat::vtn:
-				data._vertex_format = { VA::f4, VA::f2, VA::f4 };
+				data._vertex_format = { VA::f3, VA::f2, VA::f3 };
 				return true;
 			default:
 				return false;
@@ -157,11 +157,11 @@ namespace
 			}
 
 			Yttrium::BufferAppender<float> appender(data._vertex_data);
-			appender << _vertices[index_v].x << _vertices[index_v].y << _vertices[index_v].z << _vertices[index_v].w;
+			appender << _vertices[index_v].x << _vertices[index_v].y << _vertices[index_v].z;
 			if (index_t != _no_index)
 				appender << _texcoords[index_t].x << _texcoords[index_t].y;
 			if (index_n != _no_index)
-				appender << _normals[index_n].x << _normals[index_n].y << _normals[index_n].z << _normals[index_n].w;
+				appender << _normals[index_n].x << _normals[index_n].y << _normals[index_n].z;
 
 			data._indices.emplace_back(static_cast<uint32_t>(_indices.size()));
 			_indices.emplace_back(index);
@@ -170,9 +170,9 @@ namespace
 
 	private:
 		FaceFormat _face_format = FaceFormat::unknown;
-		std::vector<Yttrium::Vector4> _vertices;
+		std::vector<Yttrium::Vector3> _vertices;
 		std::vector<Yttrium::Vector2> _texcoords;
-		std::vector<Yttrium::Vector4> _normals;
+		std::vector<Yttrium::Vector3> _normals;
 		std::vector<std::tuple<size_t, size_t, size_t>> _indices;
 	};
 }

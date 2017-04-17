@@ -36,7 +36,7 @@ private:
 	Model _cube{_resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material"};
 	Model _checkerboard{_resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material"};
 
-	Vector4 _position{9, 9, 9};
+	Vector3 _position{9, 9, 9};
 	Euler _rotation{-135, -29, 0};
 
 	bool _move_forward = false;
@@ -47,7 +47,7 @@ private:
 	unsigned _animation = 0;
 
 	Line3 _center_ray{{0, 0, 0}, {0, 0, 0}};
-	boost::optional<Vector4> _board_point;
+	boost::optional<Vector3> _board_point;
 };
 
 #endif

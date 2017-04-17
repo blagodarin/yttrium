@@ -21,7 +21,7 @@ namespace Yttrium
 
 	struct BackgroundProperty
 	{
-		Vector4 color{1, 1, 1};
+		Vector4 color{1, 1, 1, 1};
 		std::shared_ptr<const Texture2D> texture;
 		Texture2D::Filter texture_filter = Texture2D::TrilinearFilter;
 		RectF texture_rect;
@@ -39,7 +39,7 @@ namespace Yttrium
 		std::shared_ptr<const TextureFont> font;
 		std::shared_ptr<const Texture2D> font_texture;
 		float size = 7 / 8.f;
-		Vector4 color{1, 1, 1};
+		Vector4 color{1, 1, 1, 1};
 		unsigned alignment = 0;
 		std::vector<TexturedRect> geometry;
 

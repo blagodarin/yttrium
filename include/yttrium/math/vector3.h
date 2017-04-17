@@ -42,7 +42,7 @@ namespace Yttrium
 
 	constexpr Vector3 operator+(const Vector3& a, const Vector3& b) noexcept { return {a.x + b.x, a.y + b.y, a.z + b.z}; }
 	constexpr Vector3 operator+(const Vector3& a, float b) noexcept { return {a.x + b, a.y + b, a.z + b}; }
-	constexpr Vector3 operator+(float a, const Vector3& b) noexcept { return {a + b.x, a + b.y, a + b.z}; }
+	constexpr Vector3 operator+(float a, const Vector3& b) noexcept { return b + a; }
 
 	constexpr Vector3 operator-(const Vector3& v) noexcept { return {-v.x, -v.y, -v.z}; }
 
@@ -52,7 +52,7 @@ namespace Yttrium
 
 	constexpr Vector3 operator*(const Vector3& a, const Vector3& b) noexcept { return {a.x * b.x, a.y * b.y, a.z * b.z}; }
 	constexpr Vector3 operator*(const Vector3& a, float b) noexcept { return {a.x * b, a.y * b, a.z * b}; }
-	constexpr Vector3 operator*(float a, const Vector3& b) noexcept { return {a * b.x, a * b.y, a * b.z}; }
+	constexpr Vector3 operator*(float a, const Vector3& b) noexcept { return b * a; }
 
 	constexpr Vector3 operator/(const Vector3& a, const Vector3& b) noexcept { return {a.x / b.x, a.y / b.y, a.z / b.z}; }
 	constexpr Vector3 operator/(const Vector3& a, float b) noexcept { return {a.x / b, a.y / b, a.z / b}; }

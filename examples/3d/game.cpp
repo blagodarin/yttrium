@@ -75,14 +75,14 @@ void Game::on_key_event(const KeyEvent& event)
 
 void Game::render(Renderer& renderer)
 {
-	const auto draw_tr = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
+	const auto draw_tr = [&renderer](Model& model, const Vector3& translation, float angle, const Vector3& axis)
 	{
 		PushTransformation t{renderer, Matrix4::translation(translation)};
 		PushTransformation r{renderer, Matrix4::rotation(angle, axis)};
 		model.draw(renderer);
 	};
 
-	const auto draw_rt = [&renderer](Model& model, const Vector4& translation, float angle, const Vector4& axis)
+	const auto draw_rt = [&renderer](Model& model, const Vector3& translation, float angle, const Vector3& axis)
 	{
 		PushTransformation r{renderer, Matrix4::rotation(angle, axis)};
 		PushTransformation t{renderer, Matrix4::translation(translation)};
@@ -135,22 +135,22 @@ void Game::render(Renderer& renderer)
 			draw_rt(_cube, { 0.00, -1.25, 3.50},    -angle, { 0,  0,  1});
 			draw_rt(_cube, { 0.00,  1.25, 3.50},    -angle, { 0,  0,  1});
 		}
-		_checkerboard.draw(renderer);
 		{
 			Vector3 p;
 			if (_center_ray.plane_intersection({0, 0, 0}, {0, 0, 1}, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
 			{
-				_board_point = Vector4{std::floor(p.x) + .5f, std::floor(p.y) + .5f, -.4375f};
+				_board_point = Vector3{std::floor(p.x) + .5f, std::floor(p.y) + .5f, -.4375f};
 				PushTransformation t{renderer, Matrix4::translation(*_board_point)};
 				_cube.draw(renderer);
 			}
 			else
 				_board_point = {};
 		}
+		_checkerboard.draw(renderer);
 	}
 	{
 		PushTexture push_texture{renderer, nullptr};
-		renderer.draw_rect(RectF{PointF{center}, SizeF{2, 2}}, {1, 1, 0});
+		renderer.draw_rect(RectF{PointF{center}, SizeF{2, 2}}, {1, 1, 0, 1});
 	}
 	if (_debug_text_visible)
 		renderer.draw_debug_text(_debug_text);
@@ -166,7 +166,7 @@ void Game::update(const UpdateEvent& update)
 		const auto distance = static_cast<float>(update.milliseconds.count()) * speed / 1000;
 		const auto offset = (_move_forward || _move_backward) && (_move_left || _move_right) ? distance * static_cast<float>(M_SQRT1_2) : distance;
 
-		Vector4 movement{0, 0, 0};
+		Vector3 movement{0, 0, 0};
 		if (_move_forward)
 			movement.y += offset;
 		else if (_move_backward)

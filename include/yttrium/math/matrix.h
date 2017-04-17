@@ -46,7 +46,7 @@ namespace Yttrium
 		float operator()(int row, int column) const noexcept { return data()[column * 4 + row]; }
 
 		///
-		static Matrix4 camera(const Vector4& position, const Euler& rotation) noexcept;
+		static Matrix4 camera(const Vector3& position, const Euler& rotation) noexcept;
 
 		///
 		static Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f) noexcept;
@@ -55,13 +55,13 @@ namespace Yttrium
 		static Matrix4 perspective(const Size& size, float vertical_fov, float near, float far) noexcept;
 
 		///
-		static Matrix4 rotation(float angle, const Vector4& axis) noexcept;
+		static Matrix4 rotation(float angle, const Vector3& axis) noexcept;
 
 		///
 		static Matrix4 scaling(float scale) noexcept;
 
 		///
-		static Matrix4 translation(const Vector4& point) noexcept;
+		static Matrix4 translation(const Vector3& point) noexcept;
 
 	private:
 		float _00, _10, _20, _30;

@@ -1,181 +1,52 @@
 #ifndef _include_yttrium_math_vector4_h_
 #define _include_yttrium_math_vector4_h_
 
-#include <yttrium/api.h>
-
-#include <cmath>
+#include <yttrium/math/vector3.h>
 
 namespace Yttrium
 {
-	/// 4-component 3D vector.
-	class Y_API Vector4
+	class Vector4
 	{
 	public:
-		union { float x; float r; float s; };
-		union { float y; float g; float t; };
-		union { float z; float b; float p; };
-		union { float w; float a; float q; };
+		union { float x; float r; };
+		union { float y; float g; };
+		union { float z; float b; };
+		union { float w; float a; };
 
-		///
-		Vector4() = default;
+		Vector4() noexcept = default;
+		constexpr Vector4(float vx, float vy, float vz, float vw) noexcept : x{vx}, y{vy}, z{vz}, w{vw} {}
+		constexpr explicit Vector4(const Vector3& v, float vw) noexcept : x{v.x}, y{v.y}, z{v.z}, w{vw} {}
 
-		///
-		Vector4(float x_, float y_, float z_, float w_ = 1): x(x_), y(y_), z(z_), w(w_) {}
+		constexpr auto& operator+=(float s) noexcept { x += s; y += s; z += s; w += s; return *this; }
+		constexpr auto& operator+=(const Vector4& v) noexcept { x += v.x; y += v.y; z += v.z; w += v.w; return *this; }
 
-		///
-		float* data() { return &x; }
-		const float* data() const { return &x; }
+		constexpr auto& operator-=(float s) noexcept { x -= s; y -= s; z -= s; w -= s; return *this; }
+		constexpr auto& operator-=(const Vector4& v) noexcept { x -= v.x; y -= v.y; z -= v.z; w -= v.w; return *this; }
 
-		///
-		float length() const
-		{
-			return std::sqrt(x * x + y * y + z * z);
-		}
+		constexpr auto& operator*=(float s) noexcept { x *= s; y *= s; z *= s; w *= s; return *this; }
+		constexpr auto& operator*=(const Vector4& v) noexcept { x *= v.x; y *= v.y; z *= v.z; w *= v.w; return *this; }
 
-		///
-		Vector4 normalized() const
-		{
-			const auto l = length();
-			return {x / l, y / l, z / l};
-		}
-
-		///
-		Vector4& operator+=(float scalar)
-		{
-			x += scalar;
-			y += scalar;
-			z += scalar;
-			return *this;
-		}
-
-		///
-		Vector4& operator+=(const Vector4& vector)
-		{
-			x += vector.x;
-			y += vector.y;
-			z += vector.z;
-			return *this;
-		}
-
-		///
-		Vector4& operator-=(float scalar)
-		{
-			x -= scalar;
-			y -= scalar;
-			z -= scalar;
-			return *this;
-		}
-
-		///
-		Vector4& operator-=(const Vector4& vector)
-		{
-			x -= vector.x;
-			y -= vector.y;
-			z -= vector.z;
-			return *this;
-		}
-
-		///
-		Vector4& operator*=(float scalar)
-		{
-			x *= scalar;
-			y *= scalar;
-			z *= scalar;
-			return *this;
-		}
-
-		///
-		Vector4& operator*=(const Vector4& vector)
-		{
-			x *= vector.x;
-			y *= vector.y;
-			z *= vector.z;
-			return *this;
-		}
-
-		///
-		Vector4& operator/=(float scalar)
-		{
-			x /= scalar;
-			y /= scalar;
-			z /= scalar;
-			return *this;
-		}
-
-		///
-		Vector4& operator/=(const Vector4& vector)
-		{
-			x /= vector.x;
-			y /= vector.y;
-			z /= vector.z;
-			return *this;
-		}
+		constexpr auto& operator/=(float s) { x /= s; y /= s; z /= s; w /= s; return *this; }
+		constexpr auto& operator/=(const Vector4& v) noexcept { x /= v.x; y /= v.y; z /= v.z; w /= v.w; return *this; }
 	};
 
-	inline Vector4 operator-(const Vector4& vector)
-	{
-		return Vector4(-vector.x, -vector.y, -vector.z);
-	}
+	constexpr Vector4 operator+(const Vector4& a, const Vector4& b) noexcept { return {a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w}; }
+	constexpr Vector4 operator+(const Vector4& a, float b) noexcept { return {a.x + b, a.y + b, a.z + b, a.w + b}; }
+	constexpr Vector4 operator+(float a, const Vector4& b) noexcept { return b + a; }
 
-	inline Vector4 operator+(const Vector4& left, const Vector4& right)
-	{
-		return Vector4(left.x + right.x, left.y + right.y, left.z + right.z);
-	}
+	constexpr Vector4 operator-(const Vector4& v) noexcept { return {-v.x, -v.y, -v.z, -v.w}; }
 
-	inline Vector4 operator+(const Vector4& left, float right)
-	{
-		return Vector4(left.x + right, left.y + right, left.z + right);
-	}
+	constexpr Vector4 operator-(const Vector4& a, const Vector4& b) noexcept { return {a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w}; }
+	constexpr Vector4 operator-(const Vector4& a, float b) noexcept { return {a.x - b, a.y - b, a.z - b, a.w - b}; }
+	constexpr Vector4 operator-(float a, const Vector4& b) noexcept { return {a - b.x, a - b.y, a - b.z, a - b.w}; }
 
-	inline Vector4 operator+(float left, const Vector4& right)
-	{
-		return Vector4(left + right.x, left + right.y, left + right.z);
-	}
+	constexpr Vector4 operator*(const Vector4& a, const Vector4& b) noexcept { return {a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w}; }
+	constexpr Vector4 operator*(const Vector4& a, float b) noexcept { return {a.x * b, a.y * b, a.z * b, a.w * b}; }
+	constexpr Vector4 operator*(float a, const Vector4& b) noexcept { return b * a; }
 
-	inline Vector4 operator-(const Vector4& left, const Vector4& right)
-	{
-		return Vector4(left.x - right.x, left.y - right.y, left.z - right.z);
-	}
-
-	inline Vector4 operator-(const Vector4& left, float right)
-	{
-		return Vector4(left.x - right, left.y - right, left.z - right);
-	}
-
-	inline Vector4 operator-(float left, const Vector4& right)
-	{
-		return Vector4(left - right.x, left - right.y, left - right.z);
-	}
-
-	inline Vector4 operator*(const Vector4& left, const Vector4& right)
-	{
-		return Vector4(left.x * right.x, left.y * right.y, left.z * right.z);
-	}
-
-	inline Vector4 operator*(const Vector4& left, float right)
-	{
-		return Vector4(left.x * right, left.y * right, left.z * right);
-	}
-
-	inline Vector4 operator*(float left, const Vector4& right)
-	{
-		return Vector4(left * right.x, left * right.y, left * right.z);
-	}
-
-	inline Vector4 operator/(const Vector4& left, const Vector4& right)
-	{
-		return Vector4(left.x / right.x, left.y / right.y, left.z / right.z);
-	}
-
-	inline Vector4 operator/(const Vector4& left, float right)
-	{
-		return Vector4(left.x / right, left.y / right, left.z / right);
-	}
-
-	inline Vector4 operator/(float left, const Vector4& right)
-	{
-		return Vector4(left / right.x, left / right.y, left / right.z);
-	}
+	constexpr Vector4 operator/(const Vector4& a, const Vector4& b) noexcept { return {a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w}; }
+	constexpr Vector4 operator/(const Vector4& a, float b) noexcept { return {a.x / b, a.y / b, a.z / b, a.w / b}; }
+	constexpr Vector4 operator/(float a, const Vector4& b) noexcept { return {a / b.x, a / b.y, a / b.z, a / b.w}; }
 }
 
 #endif

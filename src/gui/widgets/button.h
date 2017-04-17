@@ -22,7 +22,7 @@ namespace Yttrium
 		struct Style
 		{
 			BackgroundProperty background;
-			Vector4            text_color{1, 1, 1};
+			Vector4            text_color{1, 1, 1, 1};
 		};
 
 		std::string _text;

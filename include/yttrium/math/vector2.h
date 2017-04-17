@@ -30,7 +30,9 @@ namespace Yttrium
 
 	constexpr Vector2 operator+(const Vector2& a, const Vector2& b) noexcept { return {a.x + b.x, a.y + b.y}; }
 	constexpr Vector2 operator+(const Vector2& a, float b) noexcept { return {a.x + b, a.y + b}; }
-	constexpr Vector2 operator+(float a, const Vector2& b) noexcept { return {a + b.x, a + b.y}; }
+	constexpr Vector2 operator+(float a, const Vector2& b) noexcept { return b + a; }
+
+	constexpr Vector2 operator-(const Vector2& v) noexcept { return {-v.x, -v.y}; }
 
 	constexpr Vector2 operator-(const Vector2& a, const Vector2& b) noexcept { return {a.x - b.x, a.y - b.y}; }
 	constexpr Vector2 operator-(const Vector2& a, float b) noexcept { return {a.x - b, a.y - b}; }
@@ -38,7 +40,7 @@ namespace Yttrium
 
 	constexpr Vector2 operator*(const Vector2& a, const Vector2& b) noexcept { return {a.x * b.x, a.y * b.y}; }
 	constexpr Vector2 operator*(const Vector2& a, float b) noexcept { return {a.x * b, a.y * b}; }
-	constexpr Vector2 operator*(float a, const Vector2& b) noexcept { return {a * b.x, a * b.y}; }
+	constexpr Vector2 operator*(float a, const Vector2& b) noexcept { return b * a; }
 
 	constexpr Vector2 operator/(const Vector2& a, const Vector2& b) noexcept { return {a.x / b.x, a.y / b.y}; }
 	constexpr Vector2 operator/(const Vector2& a, float b) noexcept { return {a.x / b, a.y / b}; }

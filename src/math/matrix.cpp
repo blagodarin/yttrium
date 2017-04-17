@@ -2,7 +2,6 @@
 
 #include <yttrium/math/euler.h>
 #include <yttrium/math/size.h>
-#include <yttrium/math/vector3.h>
 #include <yttrium/math/vector4.h>
 
 #include <cassert>
@@ -109,7 +108,7 @@ namespace Yttrium
 		return m;
 	}
 
-	Matrix4 Matrix4::camera(const Vector4& position, const Euler& rotation) noexcept
+	Matrix4 Matrix4::camera(const Vector3& position, const Euler& rotation) noexcept
 	{
 		return Matrix4::rotation(rotation.roll, {0, -1, 0})
 			* Matrix4::rotation(rotation.pitch, {-1, 0, 0})
@@ -164,7 +163,7 @@ namespace Yttrium
 		);
 	}
 
-	Matrix4 Matrix4::rotation(float angle, const Vector4& axis) noexcept
+	Matrix4 Matrix4::rotation(float angle, const Vector3& axis) noexcept
 	{
 		const auto& v = axis.normalized();
 		const auto angle_radians = angle / 180 * M_PI;
@@ -191,7 +190,7 @@ namespace Yttrium
 		);
 	}
 
-	Matrix4 Matrix4::translation(const Vector4& v) noexcept
+	Matrix4 Matrix4::translation(const Vector3& v) noexcept
 	{
 		return Matrix4
 		(
