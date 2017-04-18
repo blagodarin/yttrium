@@ -137,7 +137,7 @@ void Game::render(Renderer& renderer)
 		}
 		{
 			Vector3 p;
-			if (_center_ray.plane_intersection({0, 0, 0}, {0, 0, 1}, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
+			if (_center_ray.plane_intersection(_board_plane, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
 			{
 				_board_point = Vector3{std::floor(p.x) + .5f, std::floor(p.y) + .5f, -.4375f};
 				PushTransformation t{renderer, Matrix4::translation(*_board_point)};
@@ -194,8 +194,8 @@ void Game::update(const UpdateEvent& update)
 		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, "\n"
 		"Pitch: ", _rotation.pitch, ", Yaw: ", _rotation.yaw, "\n"
 		"Center ray:\n"
-		"  ", _center_ray.a.x, ", ", _center_ray.a.y, ", ", _center_ray.a.z, "\n"
-		"  ", _center_ray.b.x, ", ", _center_ray.b.y, ", ", _center_ray.b.z, "\n"
+		"  ", _center_ray._origin.x, ", ", _center_ray._origin.y, ", ", _center_ray._origin.z, "\n"
+		"  ", (_center_ray._origin + _center_ray._vector).x, ", ", (_center_ray._origin + _center_ray._vector).y, ", ", (_center_ray._origin + _center_ray._vector).z, "\n"
 		"Board intersection:\n"
 		"  ");
 

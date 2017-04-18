@@ -5,6 +5,7 @@
 
 #include <yttrium/math/euler.h>
 #include <yttrium/math/line3.h>
+#include <yttrium/math/plane.h>
 #include <yttrium/math/vector3.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/static_string.h>
@@ -47,6 +48,7 @@ private:
 	unsigned _animation = 0;
 
 	Line3 _center_ray{{0, 0, 0}, {0, 0, 0}};
+	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
 	boost::optional<Vector3> _board_point;
 };
 
