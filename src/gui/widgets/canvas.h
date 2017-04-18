@@ -10,7 +10,7 @@ namespace Yttrium
 	class CanvasWidget : public Widget
 	{
 	public:
-		explicit CanvasWidget(GuiPrivate& gui) : Widget(gui) {}
+		explicit CanvasWidget(GuiPrivate& gui) : Widget{gui} {}
 
 		bool load(GuiPropertyLoader&) override;
 		void render(Renderer&, const RectF&, WidgetState) const override;

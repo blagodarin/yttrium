@@ -1,4 +1,3 @@
-#include <yttrium/math/vector2.h>
 #include <yttrium/math/vector4.h>
 
 #include <boost/test/unit_test.hpp>

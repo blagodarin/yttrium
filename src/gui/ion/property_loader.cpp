@@ -5,9 +5,9 @@
 #include <yttrium/ion/node.h>
 #include <yttrium/ion/object.h>
 #include <yttrium/ion/value.h>
+#include <yttrium/math/color.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/math/vector4.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/utils.h>
 #include "../actions.h"
@@ -62,7 +62,7 @@ namespace
 		return N;
 	}
 
-	void read_color(Vector4& color, const IonNode& node)
+	void read_color(Color4f& color, const IonNode& node)
 	{
 		std::array<float, 4> elements;
 		switch (read_array(elements, node))
@@ -74,18 +74,18 @@ namespace
 		default:
 			throw GuiDataError("Bad '", node.name(), "'");
 		}
-		color = { elements[0], elements[1], elements[2], elements[3] };
+		color = {elements[0], elements[1], elements[2], elements[3]};
 	}
 }
 
 namespace Yttrium
 {
 	GuiIonPropertyLoader::GuiIonPropertyLoader(const IonObject* object, const IonObject* class_, GuiPrivate& gui)
-		: _object(object)
-		, _class(class_)
-		, _gui(gui)
-		, _bound_object(_object)
-		, _bound_class(_class)
+		: _object{object}
+		, _class{class_}
+		, _gui{gui}
+		, _bound_object{_object}
+		, _bound_class{_class}
 	{
 	}
 
@@ -169,7 +169,7 @@ namespace Yttrium
 		return false;
 	}
 
-	bool GuiIonPropertyLoader::load_color(const StaticString& name, Vector4* color) const
+	bool GuiIonPropertyLoader::load_color(const StaticString& name, Color4f* color) const
 	{
 		if (_bound_object)
 		{

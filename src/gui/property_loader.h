@@ -9,6 +9,7 @@
 
 namespace Yttrium
 {
+	class Color4f;
 	class GuiActions;
 	class Margins;
 	class PointF;
@@ -18,7 +19,6 @@ namespace Yttrium
 	class StaticString;
 	class Texture2D;
 	class TextureFont;
-	class Vector4;
 
 	class GuiPropertyLoader
 	{
@@ -30,7 +30,7 @@ namespace Yttrium
 		virtual bool load(const StaticString& name, float&) const = 0;
 		virtual GuiActions load_actions(const StaticString& name) const = 0;
 		virtual bool load_alignment(const StaticString& name, unsigned*) const = 0;
-		virtual bool load_color(const StaticString& name, Vector4*) const = 0;
+		virtual bool load_color(const StaticString& name, Color4f*) const = 0;
 		virtual void load_font(const StaticString& name, std::shared_ptr<const TextureFont>*, std::shared_ptr<const Texture2D>*) const = 0;
 		virtual bool load_margins(const StaticString& name, Margins&) const = 0;
 		virtual bool load_rect(const StaticString& name, RectF&, bool update = false) const = 0;

@@ -8,14 +8,11 @@ namespace Yttrium
 	class Vector4
 	{
 	public:
-		union { float x; float r; };
-		union { float y; float g; };
-		union { float z; float b; };
-		union { float w; float a; };
+		float x, y, z, w;
 
 		Vector4() noexcept = default;
 		constexpr Vector4(float vx, float vy, float vz, float vw) noexcept : x{vx}, y{vy}, z{vz}, w{vw} {}
-		constexpr explicit Vector4(const Vector3& v, float vw) noexcept : x{v.x}, y{v.y}, z{v.z}, w{vw} {}
+		constexpr Vector4(const Vector3& v, float vw) noexcept : x{v.x}, y{v.y}, z{v.z}, w{vw} {}
 
 		constexpr auto& operator+=(float s) noexcept { x += s; y += s; z += s; w += s; return *this; }
 		constexpr auto& operator+=(const Vector4& v) noexcept { x += v.x; y += v.y; z += v.z; w += v.w; return *this; }

@@ -93,12 +93,12 @@ namespace Yttrium
 		debug.draw_text(0, top, StaticString{ text.data() + line_begin, text.size() - line_begin });
 	}
 
-	void RendererImpl::draw_rect(const RectF& rect, const Vector4& color)
+	void RendererImpl::draw_rect(const RectF& rect, const Color4f& color)
 	{
 		draw_rect(rect, color, _texture_rect, _texture_borders);
 	}
 
-	void RendererImpl::draw_rects(const std::vector<TexturedRect>& rects, const Vector4& color)
+	void RendererImpl::draw_rects(const std::vector<TexturedRect>& rects, const Color4f& color)
 	{
 		const auto& texture_size = SizeF{ current_texture_2d()->size() };
 		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
@@ -165,7 +165,7 @@ namespace Yttrium
 		return _debug_texture.get();
 	}
 
-	void RendererImpl::draw_rect(const RectF& position, const Vector4& color, const RectF& texture)
+	void RendererImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture)
 	{
 		draw_rect(position, color, texture, {});
 	}
@@ -368,7 +368,7 @@ namespace Yttrium
 		}
 	}
 
-	void RendererImpl::draw_rect(const RectF& position, const Vector4& color, const RectF& texture, const MarginsF& borders)
+	void RendererImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
 	{
 		BufferAppender<Vertex2D> vertices(_vertices_2d);
 		BufferAppender<uint16_t> indices(_indices_2d);

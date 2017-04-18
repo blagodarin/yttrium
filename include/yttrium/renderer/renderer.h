@@ -5,7 +5,7 @@
 #define _include_yttrium_renderer_renderer_h_
 
 #include <yttrium/flags.h>
-#include <yttrium/math/vector4.h>
+#include <yttrium/math/color.h>
 
 #include <memory>
 #include <vector>
@@ -63,10 +63,10 @@ namespace Yttrium
 		virtual void draw_mesh(const Mesh&) = 0;
 
 		///
-		virtual void draw_rect(const RectF&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
+		virtual void draw_rect(const RectF&, const Color4f& = {1, 1, 1}) = 0;
 
 		///
-		virtual void draw_rects(const std::vector<TexturedRect>&, const Vector4& color = { 1, 1, 1, 1 }) = 0;
+		virtual void draw_rects(const std::vector<TexturedRect>&, const Color4f& = {1, 1, 1}) = 0;
 
 		///
 		virtual void draw_triangles(const VertexBuffer&, const IndexBuffer&) = 0;

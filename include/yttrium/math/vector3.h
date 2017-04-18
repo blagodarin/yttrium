@@ -1,6 +1,8 @@
 #ifndef _include_yttrium_math_vector3_h_
 #define _include_yttrium_math_vector3_h_
 
+#include <yttrium/math/vector2.h>
+
 #include <cmath>
 
 namespace Yttrium
@@ -8,12 +10,11 @@ namespace Yttrium
 	class Vector3
 	{
 	public:
-		float x;
-		float y;
-		float z;
+		float x, y, z;
 
 		Vector3() noexcept = default;
 		constexpr Vector3(float vx, float vy, float vz) noexcept : x{vx}, y{vy}, z{vz} {}
+		constexpr Vector3(const Vector2& v, float vz) noexcept : x{v.x}, y{v.y}, z{vz} {}
 
 		constexpr auto& operator+=(float s) noexcept { x += s; y += s; z += s; return *this; }
 		constexpr auto& operator+=(const Vector3& v) noexcept { x += v.x; y += v.y; z += v.z; return *this; }

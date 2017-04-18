@@ -21,7 +21,7 @@ namespace Yttrium
 		bool load(const StaticString&, float&) const override;
 		GuiActions load_actions(const StaticString& name) const override;
 		bool load_alignment(const StaticString& name, unsigned* alignment) const override;
-		bool load_color(const StaticString& name, Vector4* color) const override;
+		bool load_color(const StaticString& name, Color4f*) const override;
 		void load_font(const StaticString& name, std::shared_ptr<const TextureFont>*, std::shared_ptr<const Texture2D>*) const override;
 		bool load_margins(const StaticString& name, Margins&) const override;
 		bool load_rect(const StaticString& name, RectF&, bool update) const override;

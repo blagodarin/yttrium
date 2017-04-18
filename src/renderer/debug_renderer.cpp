@@ -10,7 +10,7 @@ namespace
 {
 	using namespace Yttrium;
 
-	void draw_debug_char(RendererImpl& renderer, int x, int y, int width, int height, const Vector4& color, uint8_t value)
+	void draw_debug_char(RendererImpl& renderer, int x, int y, int width, int height, const Color4f& color, uint8_t value)
 	{
 		renderer.draw_rect(
 			{

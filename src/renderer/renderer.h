@@ -38,8 +38,8 @@ namespace Yttrium
 		~RendererImpl() override;
 
 		void draw_debug_text(const std::string&) override;
-		void draw_rect(const RectF&, const Vector4&) override;
-		void draw_rects(const std::vector<TexturedRect>&, const Vector4&) override;
+		void draw_rect(const RectF&, const Color4f&) override;
+		void draw_rects(const std::vector<TexturedRect>&, const Color4f&) override;
 		Matrix4 full_matrix() const override;
 		std::unique_ptr<Mesh> load_mesh(const Source&) override;
 		Matrix4 model_matrix() const override;
@@ -53,7 +53,7 @@ namespace Yttrium
 		virtual Image take_screenshot() const = 0;
 
 		const Texture2D* debug_texture() const;
-		void draw_rect(const RectF& position, const Vector4& color, const RectF& texture);
+		void draw_rect(const RectF& position, const Color4f&, const RectF& texture);
 		void forget_program(const GpuProgram*);
 		void forget_texture(const Texture2D*);
 		void pop_program();
@@ -73,7 +73,7 @@ namespace Yttrium
 		struct Vertex2D
 		{
 			Vector2 position;
-			Vector4 color;
+			Color4f color;
 			Vector2 texture;
 		};
 
@@ -86,7 +86,7 @@ namespace Yttrium
 		void update_state();
 
 	private:
-		void draw_rect(const RectF& position, const Vector4& color, const RectF& texture, const MarginsF& borders);
+		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
 		void reset_texture_state();
 

@@ -1,7 +1,7 @@
 #ifndef _src_renderer_debug_renderer_h_
 #define _src_renderer_debug_renderer_h_
 
-#include <yttrium/math/vector4.h>
+#include <yttrium/math/color.h>
 #include <yttrium/renderer/modifiers.h>
 
 #include <boost/optional/optional.hpp>
@@ -24,7 +24,7 @@ namespace Yttrium
 
 	private:
 		RendererImpl& _renderer;
-		Vector4 _color{ 1, 1, 1, 1 };
+		Color4f _color{1, 1, 1};
 		PushTexture _debug_texture;
 	};
 }

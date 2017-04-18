@@ -12,7 +12,7 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-		explicit ButtonWidget(GuiPrivate& gui) : Widget(gui) {}
+		explicit ButtonWidget(GuiPrivate& gui) : Widget{gui} {}
 
 		bool load(GuiPropertyLoader&) override;
 		bool process_key(const KeyEvent&) override;
@@ -22,7 +22,7 @@ namespace Yttrium
 		struct Style
 		{
 			BackgroundProperty background;
-			Vector4            text_color{1, 1, 1, 1};
+			Color4f            text_color{1, 1, 1};
 		};
 
 		std::string _text;
