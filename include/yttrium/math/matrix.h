@@ -1,36 +1,67 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_math_matrix_h_
 #define _include_yttrium_math_matrix_h_
 
-#include <yttrium/api.h>
+#include <yttrium/math/euler.h>
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
 
 namespace Yttrium
 {
-	class Euler;
-	class Size;
-
-	///
-	class Y_API Matrix4
+	class Matrix4
 	{
 	public:
 		Vector4 x, y, z, t;
 
 		Matrix4() noexcept = default;
+
 		constexpr Matrix4(float xx, float yx, float zx, float tx, float xy, float yy, float zy, float ty, float xz, float yz, float zz, float tz, float xw, float yw, float zw, float tw) noexcept
-			: x{xx, xy, xz, xw}, y{yx, yy, yz, yw}, z{zx, zy, zz, zw}, t{tx, ty, tz, tw} {}
-		explicit Matrix4(const Euler&) noexcept;
+			: x{xx, xy, xz, xw}
+			, y{yx, yy, yz, yw}
+			, z{zx, zy, zz, zw}
+			, t{tx, ty, tz, tw}
+		{
+		}
 
-		///
-		constexpr const float* data() const noexcept { return &x.x; }
+		Matrix4(const Euler& e) noexcept
+		{
+			const auto yaw = static_cast<float>(e._yaw / 180 * M_PI);
+			const auto pitch = static_cast<float>(e._pitch / 180 * M_PI);
+			const auto roll = static_cast<float>(e._roll / 180 * M_PI);
+			const auto cy = std::cos(yaw);
+			const auto sy = std::sin(yaw);
+			const auto cp = std::cos(pitch);
+			const auto sp = std::sin(pitch);
+			const auto cr = std::cos(roll);
+			const auto sr = std::sin(roll);
+			x = {sy*sp*sr + cy*cr, cy*sp*sr - sy*cr, -cp*sr, 0};
+			y = {sy*cp, cy*cp, sp, 0};
+			z = {cy*sr - sy*sp*cr, -cy*sp*cr - sy*sr, cp*cr, 0};
+			t = {0, 0, 0, 1};
+		}
 
-		///
-		static Matrix4 camera(const Vector3& position, const Euler& orientation) noexcept;
+		static Matrix4 camera(const Vector3& position, const Euler& orientation) noexcept
+		{
+			const auto yaw = static_cast<float>(orientation._yaw / 180 * M_PI);
+			const auto pitch = static_cast<float>(orientation._pitch / 180 * M_PI);
+			const auto roll = static_cast<float>(orientation._roll / 180 * M_PI);
+			const auto cy = std::cos(yaw);
+			const auto sy = std::sin(yaw);
+			const auto cp = std::cos(pitch);
+			const auto sp = std::sin(pitch);
+			const auto cr = std::cos(roll);
+			const auto sr = std::sin(roll);
+			const Vector3 rx{sy*sp*sr + cy*cr, cy*sp*sr - sy*cr, -cp*sr};
+			const Vector3 ry{sy*cp, cy*cp, sp};
+			const Vector3 rz{cy*sr - sy*sp*cr, -cy*sp*cr - sy*sr, cp*cr};
+			return
+			{
+				rx.x, rx.y, rx.z, -dot_product(position, rx),
+				ry.x, ry.y, ry.z, -dot_product(position, ry),
+				rz.x, rz.y, rz.z, -dot_product(position, rz),
+				0, 0, 0, 1,
+			};
+		}
 
-		///
 		static constexpr Matrix4 identity() noexcept
 		{
 			return
@@ -42,33 +73,55 @@ namespace Yttrium
 			};
 		}
 
-		///
-		static constexpr Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f) noexcept
+		static Matrix4 perspective(const Size& size, float vertical_fov, float near, float far) noexcept
 		{
-			constexpr auto left = 0.f;
-			constexpr auto top = 0.f;
-
-			const auto m00 = 2.f / size._width;
-			const auto m11 = -2.f / size._height;
-			const auto m22 = 2 / (near - far);
-			const auto m03 = -1 - m00 * left;
-			const auto m13 = 1 - m11 * top;
-			const auto m23 = (near + far) / (near - far);
-
+			const auto aspect = static_cast<float>(size._width) / static_cast<float>(size._height);
+			const auto f = 1 / static_cast<float>(std::tan(vertical_fov / 360 * M_PI));
+			const auto xx = f / aspect;
+			const auto yy = f;
+			const auto zz = (near + far) / (near - far);
+			const auto tz = 2 * near * far / (near - far);
+			const auto zw = -1.f;
 			return
 			{
-				m00, 0,   0,   m03,
-				0,   m11, 0,   m13,
-				0,   0,   m22, m23,
-				0,   0,   0,   1,
+				xx, 0,  0,  0,
+				0,  yy, 0,  0,
+				0,  0,  zz, tz,
+				0,  0,  zw, 0,
 			};
 		}
 
-		///
-		static Matrix4 perspective(const Size& size, float vertical_fov, float near, float far) noexcept;
+		static constexpr Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f) noexcept
+		{
+			const auto xx = 2.f / size._width;
+			const auto yy = -2.f / size._height;
+			const auto zz = 2 / (near - far);
+			const auto tx = -1.f;
+			const auto ty = 1.f;
+			const auto tz = (near + far) / (near - far);
+			return
+			{
+				xx, 0,  0,  tx,
+				0,  yy, 0,  ty,
+				0,  0,  zz, tz,
+				0,  0,  0,  1,
+			};
+		}
 
-		///
-		static Matrix4 rotation(float angle, const Vector3& axis) noexcept;
+		static Matrix4 rotation(float angle, const Vector3& axis) noexcept
+		{
+			const auto v = normalize(axis);
+			const auto angle_radians = static_cast<float>(angle / 180 * M_PI);
+			const auto c = std::cos(angle_radians);
+			const auto s = std::sin(angle_radians);
+			return
+			{
+				v.x*v.x*(1 - c) + c,     v.y*v.x*(1 - c) - s*v.z, v.z*v.x*(1 - c) + s*v.y, 0,
+				v.x*v.y*(1 - c) + s*v.z, v.y*v.y*(1 - c) + c,     v.z*v.y*(1 - c) - s*v.x, 0,
+				v.x*v.z*(1 - c) - s*v.y, v.y*v.z*(1 - c) + s*v.x, v.z*v.z*(1 - c) + c,     0,
+				0,                       0,                       0,                       1,
+			};
+		}
 
 		static constexpr Matrix4 scaling(float s) noexcept
 		{

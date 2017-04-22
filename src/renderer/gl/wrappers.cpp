@@ -101,7 +101,7 @@ namespace Yttrium
 
 	void GlProgramHandle::set_uniform(const char* name, const Matrix4& value) const
 	{
-		_gl.ProgramUniformMatrix4fvEXT(_handle, _gl.GetUniformLocation(_handle, name), 1, GL_FALSE, value.data());
+		_gl.ProgramUniformMatrix4fvEXT(_handle, _gl.GetUniformLocation(_handle, name), 1, GL_FALSE, &value.x.x);
 	}
 
 	GlShaderHandle::GlShaderHandle(const GlApi& gl, GLenum type)

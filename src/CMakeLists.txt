@@ -208,7 +208,6 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/math/rect.h
 	../include/yttrium/math/size.h
 	../include/yttrium/math/vector.h
-	math/matrix.cpp
 	)
 
 ########################################################################################################################
