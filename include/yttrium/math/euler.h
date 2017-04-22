@@ -7,12 +7,12 @@ namespace Yttrium
 	class Euler
 	{
 	public:
-		float yaw;   ///< Horizontal rotation angle.
-		float pitch; ///< Vertical rotation angle.
-		float roll;  ///<
+		float _yaw;   ///< Rotation around vertical axis.
+		float _pitch; ///< Rotation around horizontal axis.
+		float _roll;  ///<
 
 		Euler() noexcept = default;
-		constexpr Euler(float y, float p, float r) noexcept : yaw{y}, pitch{p}, roll{r} {}
+		constexpr Euler(float yaw, float pitch, float roll) noexcept : _yaw{yaw}, _pitch{pitch}, _roll{roll} {}
 	};
 }
 

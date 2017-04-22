@@ -185,7 +185,7 @@ namespace Yttrium
 		if (!::XQueryPointer(_display.get(), _window.get(), &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
-		cursor = { window_x, window_y };
+		cursor = {window_x, window_y};
 
 		return true;
 	}
@@ -258,7 +258,7 @@ namespace Yttrium
 	{
 		if (!_window)
 			return false;
-		::XWarpPointer(_display.get(), None, _window.get(), 0, 0, 0, 0, cursor.x(), cursor.y());
+		::XWarpPointer(_display.get(), None, _window.get(), 0, 0, 0, 0, cursor._x, cursor._y);
 		::XSync(_display.get(), False);
 		return true;
 	}

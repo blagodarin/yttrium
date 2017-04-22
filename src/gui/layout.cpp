@@ -45,12 +45,12 @@ namespace Yttrium
 		RectF layout_rect = rect;
 
 		Vector2 scaling(1, 1);
-		if (!_size.is_empty())
+		if (_size._width > 0 && _size._height > 0)
 		{
 			if (_placement == Placement::Center)
 			{
 				const auto window_aspect = rect.width() / rect.height();
-				const auto layout_aspect = _size.width() / _size.height();
+				const auto layout_aspect = _size._width / _size._height;
 				if (window_aspect > layout_aspect)
 				{
 					const auto width = rect.height() * layout_aspect;
@@ -62,7 +62,7 @@ namespace Yttrium
 					layout_rect = RectF({0, (rect.height() - height) / 2}, SizeF(rect.width(), height));
 				}
 			}
-			scaling = Vector2(layout_rect.width() / _size.width(), layout_rect.height() / _size.height());
+			scaling = Vector2(layout_rect.width() / _size._width, layout_rect.height() / _size._height);
 		}
 
 		for (const auto& widget : _widgets)
@@ -75,7 +75,7 @@ namespace Yttrium
 						layout_rect.left() + widget_rect.left() * scaling.x,
 						layout_rect.top() + widget_rect.top() * scaling.y
 					},
-					widget_rect.size() * std::make_pair(scaling.x, scaling.y)));
+					widget_rect.size() * Vector2{scaling.x, scaling.y}));
 		}
 	}
 

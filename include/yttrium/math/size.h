@@ -1,61 +1,42 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_math_size_h_
 #define _include_yttrium_math_size_h_
 
-#include <yttrium/utils.h>
-
-#include <utility>
+#include <yttrium/math/vector.h>
 
 namespace Yttrium
 {
-	/// Integral 2D size.
 	class Size
 	{
 	public:
-		Size() = default;
-		Size(int width, int height) : _width{width}, _height{height} {}
-
-		int height() const { return _height; }
-		int width() const { return _width; }
-
-	private:
 		int _width = 0;
 		int _height = 0;
+
+		constexpr Size() noexcept = default;
+		constexpr Size(int w, int h) noexcept : _width{w}, _height{h} {}
 	};
 
-	inline bool operator==(const Size& a, const Size& b) { return a.width() == b.width() && a.height() == b.height(); }
-	inline bool operator!=(const Size& a, const Size& b) { return !(a == b); }
-
-	/// Floating-point 2D size.
 	class SizeF
 	{
 	public:
-		SizeF() = default;
-		SizeF(float width, float height) : _width{width}, _height{height} {}
-		explicit SizeF(const Size& s) : SizeF{static_cast<float>(s.width()), static_cast<float>(s.height())} {}
-
-		float height() const { return _height; }
-		float width() const { return _width; }
-
-		bool is_empty() const { return _width <= 0 || _height <= 0; }
-
-		float* data() { return &_width; }
-		const float* data() const { return &_width; }
-
-	private:
 		float _width = 0;
 		float _height = 0;
+
+		constexpr SizeF() noexcept = default;
+		constexpr SizeF(float w, float h) noexcept : _width{w}, _height{h} {}
+		constexpr explicit SizeF(const Size& s) noexcept : SizeF{static_cast<float>(s._width), static_cast<float>(s._height)} {}
 	};
 
-	inline SizeF operator*(const SizeF& a, float b) { return {a.width() * b, a.height() * b}; }
-	inline SizeF operator*(float a, const SizeF& b) { return b * a; }
-	inline SizeF operator*(const SizeF& a, const std::pair<float, float>& b) { return {a.width() * b.first, a.height() * b.second}; }
-	inline SizeF operator*(const std::pair<float, float>& a, const SizeF& b) { return b * a; }
+	constexpr bool operator==(const Size& a, const Size& b) noexcept { return a._width == b._width && a._height == b._height; }
+	constexpr bool operator!=(const Size& a, const Size& b) noexcept { return !(a == b); }
 
-	inline SizeF operator/(const SizeF& a, float b) { return {a.width() / b, a.height() / b}; }
-	inline SizeF operator/(const SizeF& a, const std::pair<float, float>& b) { return {a.width() / b.first, a.height() / b.second}; }
+	constexpr SizeF operator*(const SizeF& size, float s) noexcept { return {size._width * s, size._height * s}; }
+	constexpr SizeF operator*(const SizeF& size, const Vector2& v) noexcept { return {size._width * v.x, size._height * v.y}; }
+
+	constexpr SizeF operator*(float s, const SizeF& size) noexcept { return size * s; }
+	constexpr SizeF operator*(const Vector2& v, const SizeF& size) noexcept { return size * v; }
+
+	constexpr SizeF operator/(const SizeF& size, float s) noexcept { return {size._width / s, size._height / s}; }
+	constexpr SizeF operator/(const SizeF& size, const Vector2& v) noexcept { return {size._width / v.x, size._height / v.y}; }
 }
 
 #endif

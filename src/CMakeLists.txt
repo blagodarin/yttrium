@@ -198,15 +198,16 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # math
 target_sources(yttrium PRIVATE
+	../include/yttrium/math/color.h
 	../include/yttrium/math/euler.h
+	../include/yttrium/math/line.h
 	../include/yttrium/math/margins.h
 	../include/yttrium/math/matrix.h
+	../include/yttrium/math/plane.h
 	../include/yttrium/math/point.h
 	../include/yttrium/math/rect.h
 	../include/yttrium/math/size.h
-	../include/yttrium/math/vector2.h
-	../include/yttrium/math/vector3.h
-	../include/yttrium/math/vector4.h
+	../include/yttrium/math/vector.h
 	math/matrix.cpp
 	)
 

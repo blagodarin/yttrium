@@ -28,8 +28,8 @@ namespace
 namespace Yttrium
 {
 	DebugRenderer::DebugRenderer(RendererImpl& renderer)
-		: _renderer(renderer)
-		, _debug_texture(_renderer, _renderer.debug_texture(), Texture2D::NearestFilter)
+		: _renderer{renderer}
+		, _debug_texture{_renderer, _renderer.debug_texture(), Texture2D::NearestFilter}
 	{
 	}
 
@@ -56,7 +56,7 @@ namespace Yttrium
 
 	size_t DebugRenderer::max_width() const
 	{
-		return static_cast<size_t>(_renderer.window_size().width()) / DebugTexture::char_width;
+		return static_cast<size_t>(_renderer.window_size()._width) / DebugTexture::char_width;
 	}
 
 	void DebugRenderer::set_color(float r, float g, float b, float a)

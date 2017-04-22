@@ -56,8 +56,8 @@ namespace Yttrium
 			Point cursor = Rect(_size).center();
 			_backend.get_cursor(cursor);
 
-			const auto dx = _cursor.x() - cursor.x();
-			const auto dy = cursor.y() - _cursor.y();
+			const auto dx = _cursor._x - cursor._x;
+			const auto dy = cursor._y - _cursor._y;
 
 			if (!_is_cursor_locked)
 				_cursor = Rect(_size).bound(cursor);

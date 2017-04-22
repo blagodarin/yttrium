@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_iostream_buffer)
 	}
 	{
 		std::ostringstream stream;
-		stream << Buffer{ 1024 };
+		stream << Buffer{1024};
 		BOOST_CHECK_EQUAL(stream.str(), "Buffer(1024)");
 	}
 }
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_iostream_matrix)
 	using Yttrium::Matrix4;
 
 	std::ostringstream stream;
-	stream << Matrix4::Identity;
+	stream << Matrix4::identity();
 	BOOST_CHECK_EQUAL(stream.str(), "Matrix4{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}");
 }
 
@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE(test_iostream_point)
 	using Yttrium::Point;
 
 	std::ostringstream stream;
-	stream << Point{ 1, 2 };
-	BOOST_CHECK_EQUAL(stream.str(), "Point(1, 2)");
+	stream << Point{1, 2};
+	BOOST_CHECK_EQUAL(stream.str(), "Point{1,2}");
 }
 
 BOOST_AUTO_TEST_CASE(test_iostream_rect)
@@ -42,14 +42,13 @@ BOOST_AUTO_TEST_CASE(test_iostream_rect)
 	using Yttrium::Size;
 
 	std::ostringstream stream;
-	stream << Rect{ { 1, 2 }, Size{ 3, 4 } };
-	BOOST_CHECK_EQUAL(stream.str(), "Rect({1, 2}, Size(3, 4))");
+	stream << Rect{{1, 2}, Size{3, 4}};
+	BOOST_CHECK_EQUAL(stream.str(), "Rect{{1,2},Size{3,4}}");
 }
 
 BOOST_AUTO_TEST_CASE(test_iostream_static_string)
 {
 	using namespace Yttrium::Literals;
-
 	{
 		std::ostringstream stream;
 		stream << ""_s;

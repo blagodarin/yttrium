@@ -292,11 +292,11 @@ namespace Yttrium
 		{
 			return
 			{
-				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point.x() : point.x(),
-				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point.y() : point.y()
+				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point._x : point._x,
+				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point._y : point._y
 			};
 		};
-		return { map_point(rect.top_left()), map_point(rect.bottom_right()) };
+		return {map_point(rect.top_left()), map_point(rect.bottom_right())};
 	}
 
 	Image GlRenderer::take_screenshot() const
@@ -306,12 +306,12 @@ namespace Yttrium
 		GLint unpack_alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 
-		Image image({ size, PixelFormat::Rgb, 24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp });
+		Image image{{size, PixelFormat::Rgb, 24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp}};
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
-		_gl.ReadPixels(0, 0, size.width(), size.height(), GL_RGB, GL_UNSIGNED_BYTE, image.data());
+		_gl.ReadPixels(0, 0, size._width, size._height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
 		_gl.ReadBuffer(static_cast<GLenum>(read_buffer));
 
 		return image;
@@ -353,7 +353,7 @@ namespace Yttrium
 
 	void GlRenderer::set_window_size_impl(const Size& size)
 	{
-		_gl.Viewport(0, 0, size.width(), size.height());
+		_gl.Viewport(0, 0, size._width, size._height);
 	}
 
 #ifndef NDEBUG

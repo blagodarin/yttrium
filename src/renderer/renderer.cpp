@@ -1,9 +1,8 @@
 #include "renderer.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/math/line3.h>
+#include <yttrium/math/line.h>
 #include <yttrium/math/matrix.h>
-#include <yttrium/math/vector3.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
@@ -86,11 +85,11 @@ namespace Yttrium
 		auto line_end = text.find('\n', line_begin);
 		while (line_end != std::string::npos)
 		{
-			debug.draw_text(0, top++, StaticString{ text.data() + line_begin, line_end - line_begin });
+			debug.draw_text(0, top++, StaticString{text.data() + line_begin, line_end - line_begin});
 			line_begin = line_end + 1;
 			line_end = text.find('\n', line_begin);
 		}
-		debug.draw_text(0, top, StaticString{ text.data() + line_begin, text.size() - line_begin });
+		debug.draw_text(0, top, StaticString{text.data() + line_begin, text.size() - line_begin});
 	}
 
 	void RendererImpl::draw_rect(const RectF& rect, const Color4f& color)
@@ -100,8 +99,8 @@ namespace Yttrium
 
 	void RendererImpl::draw_rects(const std::vector<TexturedRect>& rects, const Color4f& color)
 	{
-		const auto& texture_size = SizeF{ current_texture_2d()->size() };
-		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
+		const SizeF texture_size{current_texture_2d()->size()};
+		const Vector2 texture_scale{texture_size._width, texture_size._height};
 		for (const auto& rect : rects)
 			draw_rect(rect.geometry, color, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
@@ -131,9 +130,9 @@ namespace Yttrium
 	Line3 RendererImpl::pixel_ray(const Point& p) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
-		const auto xn = static_cast<float>(2 * p.x() + 1) / _window_size.width() - 1;
-		const auto yn = static_cast<float>(2 * p.y() + 1) / _window_size.height() - 1;
-		const auto m = full_matrix().inversed();
+		const auto xn = static_cast<float>(2 * p._x + 1) / _window_size._width - 1;
+		const auto yn = static_cast<float>(2 * p._y + 1) / _window_size._height - 1;
+		const auto m = inverse(full_matrix());
 		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
 	}
 
@@ -143,20 +142,20 @@ namespace Yttrium
 		if (!current_texture)
 			return;
 
-		const auto& texture_size = SizeF(current_texture->size());
-		const auto& texture_scale = std::make_pair(texture_size.width(), texture_size.height());
-		const auto& texture_rect_size = _texture_rect.size();
-		const auto& min_size = SizeF(borders.min_size()) / texture_scale;
-		if (texture_rect_size.width() < min_size.width() || texture_rect_size.height() < min_size.height())
+		const SizeF texture_size{current_texture->size()};
+		const Vector2 texture_scale{texture_size._width, texture_size._height};
+		const auto texture_rect_size = _texture_rect.size();
+		const auto minimum = SizeF{min_size(borders)} / texture_scale;
+		if (texture_rect_size._width < minimum._width || texture_rect_size._height < minimum._height)
 			return;
 
 		_texture_rect = map_rect(rect / texture_scale, current_texture->orientation());
 		_texture_borders =
 		{
-			borders.top() / texture_size.height(),
-			borders.right() / texture_size.width(),
-			borders.bottom() / texture_size.height(),
-			borders.left() / texture_size.width()
+			borders._top / texture_size._height,
+			borders._right / texture_size._width,
+			borders._bottom / texture_size._height,
+			borders._left / texture_size._width,
 		};
 	}
 
@@ -258,8 +257,8 @@ namespace Yttrium
 	{
 		flush_2d();
 		_matrix_stack.emplace_back(matrix, MatrixType::Projection);
-		_matrix_stack.emplace_back(Matrix4::Identity, MatrixType::View);
-		_matrix_stack.emplace_back(Matrix4::Identity, MatrixType::Model);
+		_matrix_stack.emplace_back(Matrix4::identity(), MatrixType::View);
+		_matrix_stack.emplace_back(Matrix4::identity(), MatrixType::Model);
 	}
 
 	const Matrix4 _3d_directions // Makes Y point forward and Z point up.
@@ -275,7 +274,7 @@ namespace Yttrium
 		flush_2d();
 		_matrix_stack.emplace_back(projection, MatrixType::Projection);
 		_matrix_stack.emplace_back(_3d_directions * view, MatrixType::View);
-		_matrix_stack.emplace_back(Matrix4::Identity, MatrixType::Model);
+		_matrix_stack.emplace_back(Matrix4::identity(), MatrixType::Model);
 	}
 
 	Flags<Texture2D::Filter> RendererImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
@@ -397,21 +396,21 @@ namespace Yttrium
 		vertex.texture.x = texture.left();
 		vertices << vertex;
 
-		if (borders.left() > 0)
+		if (borders._left > 0)
 		{
-			left_offset = borders.left() * current_texture_2d()->size().width();
+			left_offset = borders._left * current_texture_2d()->size()._width;
 
 			vertex.position.x = position.left() + left_offset;
-			vertex.texture.x = texture.left() + borders.left();
+			vertex.texture.x = texture.left() + borders._left;
 			vertices << vertex;
 		}
 
-		if (borders.right() > 0)
+		if (borders._right > 0)
 		{
-			right_offset = borders.right() * current_texture_2d()->size().width();
+			right_offset = borders._right * current_texture_2d()->size()._width;
 
 			vertex.position.x = position.right() - right_offset;
-			vertex.texture.x = texture.right() - borders.right();
+			vertex.texture.x = texture.right() - borders._right;
 			vertices << vertex;
 		}
 
@@ -426,30 +425,30 @@ namespace Yttrium
 		for (uint16_t i = 0; i < row_vertices; ++i)
 			indices << (index + i) << (index + i + row_vertices);
 
-		if (borders.top() > 0)
+		if (borders._top > 0)
 		{
-			float top_offset = borders.top() * current_texture_2d()->size().height();
+			float top_offset = borders._top * current_texture_2d()->size()._height;
 
 			// Inner top vertex row.
 
 			vertex.position.y = position.top() + top_offset;
-			vertex.texture.y = texture.top() + borders.top();
+			vertex.texture.y = texture.top() + borders._top;
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
 			vertices << vertex;
 
-			if (borders.left() > 0)
+			if (borders._left > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
-				vertex.texture.x = texture.left() + borders.left();
+				vertex.texture.x = texture.left() + borders._left;
 				vertices << vertex;
 			}
 
-			if (borders.right() > 0)
+			if (borders._right > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
-				vertex.texture.x = texture.right() - borders.right();
+				vertex.texture.x = texture.right() - borders._right;
 				vertices << vertex;
 			}
 
@@ -466,30 +465,30 @@ namespace Yttrium
 				indices << (index + i) << (index + i + row_vertices);
 		}
 
-		if (borders.bottom() > 0)
+		if (borders._bottom > 0)
 		{
-			float bottom_offset = borders.bottom() * current_texture_2d()->size().height();
+			float bottom_offset = borders._bottom * current_texture_2d()->size()._height;
 
 			// Inner bottom vertex row.
 
 			vertex.position.y = position.bottom() - bottom_offset;
-			vertex.texture.y = texture.bottom() - borders.bottom();
+			vertex.texture.y = texture.bottom() - borders._bottom;
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
 			vertices << vertex;
 
-			if (borders.left() > 0)
+			if (borders._left > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
-				vertex.texture.x = texture.left() + borders.left();
+				vertex.texture.x = texture.left() + borders._left;
 				vertices << vertex;
 			}
 
-			if (borders.right() > 0)
+			if (borders._right > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
-				vertex.texture.x = texture.right() - borders.right();
+				vertex.texture.x = texture.right() - borders._right;
 				vertices << vertex;
 			}
 
@@ -515,17 +514,17 @@ namespace Yttrium
 		vertex.texture.x = texture.left();
 		vertices << vertex;
 
-		if (borders.left() > 0)
+		if (borders._left > 0)
 		{
 			vertex.position.x = position.left() + left_offset;
-			vertex.texture.x = texture.left() + borders.left();
+			vertex.texture.x = texture.left() + borders._left;
 			vertices << vertex;
 		}
 
-		if (borders.right() > 0)
+		if (borders._right > 0)
 		{
 			vertex.position.x = position.right() - right_offset;
-			vertex.texture.x = texture.right() - borders.right();
+			vertex.texture.x = texture.right() - borders._right;
 			vertices << vertex;
 		}
 

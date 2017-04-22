@@ -4,9 +4,7 @@
 #include "model.h"
 
 #include <yttrium/math/euler.h>
-#include <yttrium/math/line3.h>
-#include <yttrium/math/plane.h>
-#include <yttrium/math/vector3.h>
+#include <yttrium/math/line.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>

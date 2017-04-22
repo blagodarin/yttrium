@@ -1,5 +1,5 @@
-#ifndef _include_yttrium_math_line3_h_
-#define _include_yttrium_math_line3_h_
+#ifndef _include_yttrium_math_line_h_
+#define _include_yttrium_math_line_h_
 
 #include <yttrium/math/plane.h>
 

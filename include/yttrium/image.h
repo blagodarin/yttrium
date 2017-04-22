@@ -60,11 +60,11 @@ namespace Yttrium
 
 		///
 		ImageFormat(const Size& size, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation orientation = ImageOrientation::XRightYDown)
-			: ImageFormat{static_cast<size_t>(size.width()), static_cast<size_t>(size.height()), pixel_format, bits_per_pixel, row_alignment, orientation} {}
+			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, bits_per_pixel, row_alignment, orientation} {}
 
 		///
 		ImageFormat(const Size& size, PixelFormat pixel_format, size_t bits_per_pixel, ImageOrientation orientation)
-			: ImageFormat{static_cast<size_t>(size.width()), static_cast<size_t>(size.height()), pixel_format, bits_per_pixel, 1, orientation} {}
+			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, bits_per_pixel, 1, orientation} {}
 
 		///
 		size_t bits_per_channel() const { return _bits_per_pixel % _channels ? 0 : _bits_per_pixel / _channels; }

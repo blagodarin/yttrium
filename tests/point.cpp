@@ -2,35 +2,47 @@
 
 #include <boost/test/unit_test.hpp>
 
-using Yttrium::Point;
-
 BOOST_AUTO_TEST_CASE(test_point)
 {
-	BOOST_CHECK_EQUAL(Point(1, 2).x(), 1);
-	BOOST_CHECK_EQUAL(Point(1, 2).y(), 2);
-
-	BOOST_CHECK_EQUAL(Point(), Point(0, 0));
+	using Yttrium::Point;
+	{
+		Point p;
+		BOOST_CHECK_EQUAL(p._x, 0);
+		BOOST_CHECK_EQUAL(p._y, 0);
+	}
+	{
+		Point p{1, 2};
+		BOOST_CHECK_EQUAL(p._x, 1);
+		BOOST_CHECK_EQUAL(p._y, 2);
+	}
 }
 
 BOOST_AUTO_TEST_CASE(test_pointf)
 {
 	using Yttrium::PointF;
-
-	BOOST_CHECK_EQUAL(PointF(1, 2).x(), 1);
-	BOOST_CHECK_EQUAL(PointF(1, 2).y(), 2);
-
-	BOOST_CHECK_EQUAL(PointF().x(), 0);
-	BOOST_CHECK_EQUAL(PointF().y(), 0);
-
-	BOOST_CHECK_EQUAL(PointF(Point(1, 2)).x(), 1);
-	BOOST_CHECK_EQUAL(PointF(Point(1, 2)).y(), 2);
-
-	BOOST_CHECK_EQUAL(PointF(1, 2).data()[0], 1);
-	BOOST_CHECK_EQUAL(PointF(1, 2).data()[1], 2);
-
-	BOOST_CHECK_EQUAL((PointF(2, 3) / 2).x(), 1);
-	BOOST_CHECK_EQUAL((PointF(2, 3) / 2).y(), 1.5);
-
-	BOOST_CHECK_EQUAL((PointF(2, 3) / std::make_pair(4, 3)).x(), .5);
-	BOOST_CHECK_EQUAL((PointF(2, 3) / std::make_pair(4, 3)).y(), 1);
+	{
+		const PointF p;
+		BOOST_CHECK_EQUAL(p._x, 0);
+		BOOST_CHECK_EQUAL(p._y, 0);
+	}
+	{
+		const PointF p{1, 2};
+		BOOST_CHECK_EQUAL(p._x, 1);
+		BOOST_CHECK_EQUAL(p._y, 2);
+	}
+	{
+		const PointF p{Yttrium::Point{1, 2}};
+		BOOST_CHECK_EQUAL(p._x, 1);
+		BOOST_CHECK_EQUAL(p._y, 2);
+	}
+	{
+		const auto p = PointF{2, 3} / 2;
+		BOOST_CHECK_EQUAL(p._x, 1);
+		BOOST_CHECK_EQUAL(p._y, 1.5);
+	}
+	{
+		const auto p = PointF{2, 3} / Yttrium::Vector2{4, 3};
+		BOOST_CHECK_EQUAL(p._x, .5);
+		BOOST_CHECK_EQUAL(p._y, 1);
+	}
 }

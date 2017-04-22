@@ -16,9 +16,9 @@ namespace Yttrium
 	{
 	public:
 		Rect() = default;
-		Rect(const Point& top_left, const Point& bottom_right) : _left{top_left.x()}, _top{top_left.y()}, _right{bottom_right.x()}, _bottom{bottom_right.y()} {}
-		Rect(const Point& top_left, const Size& s) : _left{top_left.x()}, _top{top_left.y()}, _right{_left + s.width()}, _bottom{_top + s.height()} {}
-		explicit Rect(const Size& s) : _right{s.width()}, _bottom{s.height()} {}
+		Rect(const Point& top_left, const Point& bottom_right) : _left{top_left._x}, _top{top_left._y}, _right{bottom_right._x}, _bottom{bottom_right._y} {}
+		Rect(const Point& top_left, const Size& s) : _left{top_left._x}, _top{top_left._y}, _right{_left + s._width}, _bottom{_top + s._height} {}
+		explicit Rect(const Size& s) : _right{s._width}, _bottom{s._height} {}
 
 		int bottom() const { return _bottom; }
 		Point bottom_left() const { return {_left, _bottom}; }
@@ -42,14 +42,14 @@ namespace Yttrium
 		}
 
 		///
-		Point bound(const Point& point) const
+		Point bound(const Point& p) const
 		{
-			auto x = point.x();
+			auto x = p._x;
 			if (x < _left)
 				x = _left;
 			else if (x >= _right)
 				x = _right - 1;
-			auto y = point.y();
+			auto y = p._y;
 			if (y < _top)
 				y = _top;
 			else if (y >= _bottom)
@@ -68,10 +68,10 @@ namespace Yttrium
 		}
 
 		///
-		bool contains(const Point& point) const
+		bool contains(const Point& p) const
 		{
-			return _left <= point.x() && point.x() < _right
-				&& _top <= point.y() && point.y() < _bottom;
+			return _left <= p._x && p._x < _right
+				&& _top <= p._y && p._y < _bottom;
 		}
 
 		///
@@ -82,10 +82,10 @@ namespace Yttrium
 		}
 
 		///
-		bool contains_fast(const Point& point) const
+		bool contains_fast(const Point& p) const
 		{
-			return ((point.x() - _left) ^ (point.x() - _right)) < 0
-				&& ((point.y() - _top) ^ (point.y() - _bottom)) < 0;
+			return ((p._x - _left) ^ (p._x - _right)) < 0
+				&& ((p._y - _top) ^ (p._y - _bottom)) < 0;
 		}
 
 		///
@@ -153,9 +153,9 @@ namespace Yttrium
 	{
 	public:
 		RectF() = default;
-		RectF(const PointF& top_left, const PointF& bottom_right) : _left{top_left.x()}, _top{top_left.y()}, _right{bottom_right.x()}, _bottom{bottom_right.y()} {}
-		RectF(const PointF& top_left, const SizeF& s) : _left{top_left.x()}, _top{top_left.y()}, _right{_left + s.width()}, _bottom{_top + s.height()} {}
-		explicit RectF(const SizeF& s) : _right{static_cast<float>(s.width())}, _bottom{static_cast<float>(s.height())} {}
+		RectF(const PointF& top_left, const PointF& bottom_right) : _left{top_left._x}, _top{top_left._y}, _right{bottom_right._x}, _bottom{bottom_right._y} {}
+		RectF(const PointF& top_left, const SizeF& s) : _left{top_left._x}, _top{top_left._y}, _right{_left + s._width}, _bottom{_top + s._height} {}
+		explicit RectF(const SizeF& s) : _right{static_cast<float>(s._width)}, _bottom{static_cast<float>(s._height)} {}
 		explicit RectF(const Rect& r) : _left{static_cast<float>(r.left())}, _top{static_cast<float>(r.top())}, _right{static_cast<float>(r.right())}, _bottom{static_cast<float>(r.bottom())} {}
 
 		float bottom() const { return _bottom; }
@@ -174,11 +174,7 @@ namespace Yttrium
 		PointF center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
 
 		///
-		bool contains(const PointF& point) const
-		{
-			return _left <= point.x() && point.x() < _right
-				&& _top <= point.y() && point.y() < _bottom;
-		}
+		bool contains(const PointF& p) const { return _left <= p._x && p._x < _right && _top <= p._y && p._y < _bottom; }
 
 	private:
 		float _left = 0;
@@ -198,8 +194,8 @@ namespace Yttrium
 		return !(lhs == rhs);
 	}
 
-	inline RectF operator/(const RectF& lhs, float rhs) { return {lhs.top_left() / rhs, lhs.bottom_right() / rhs}; }
-	inline RectF operator/(const RectF& lhs, const std::pair<float, float>& rhs) { return {lhs.top_left() / rhs, lhs.bottom_right() / rhs}; }
+	inline RectF operator/(const RectF& rect, float s) { return {rect.top_left() / s, rect.bottom_right() / s}; }
+	inline RectF operator/(const RectF& rect, const Vector2& v) { return {rect.top_left() / v, rect.bottom_right() / v}; }
 }
 
 #endif

@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_math_margins_h_
 #define _include_yttrium_math_margins_h_
 
@@ -8,53 +5,38 @@
 
 namespace Yttrium
 {
-	/// Integral margins.
 	class Margins
 	{
 	public:
-		Margins() = default;
-		explicit Margins(int all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
-		Margins(int top_bottom, int left_right) : _top{top_bottom}, _right{left_right}, _bottom{top_bottom}, _left{left_right} {}
-		Margins(int top, int left_right, int bottom) : _top{top}, _right{left_right}, _bottom{bottom}, _left{left_right} {}
-		Margins(int top, int right, int bottom, int left) : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}
-
-		int bottom() const { return _bottom; }
-		int left() const { return _left; }
-		int right() const { return _right; }
-		int top() const { return _top; }
-
-		///
-		Size min_size() const { return {_left + 1 + _right, _top + 1 + _bottom}; }
-
-	private:
 		int _top = 0;
 		int _right = 0;
 		int _bottom = 0;
 		int _left = 0;
+
+		constexpr Margins() = default;
+		constexpr explicit Margins(int all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
+		constexpr Margins(int top_bottom, int left_right) : _top{top_bottom}, _right{left_right}, _bottom{top_bottom}, _left{left_right} {}
+		constexpr Margins(int top, int left_right, int bottom) : _top{top}, _right{left_right}, _bottom{bottom}, _left{left_right} {}
+		constexpr Margins(int top, int right, int bottom, int left) : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}
 	};
 
-	/// Floating-point margins.
 	class MarginsF
 	{
 	public:
-		MarginsF() = default;
-		explicit MarginsF(float all) : _top{all}, _right{all}, _bottom{all}, _left{all} {}
-		MarginsF(float top_bottom, float left_right) : _top{top_bottom}, _right{left_right}, _bottom{top_bottom}, _left{left_right} {}
-		MarginsF(float top, float left_right, float bottom) : _top{top}, _right{left_right}, _bottom{bottom}, _left{left_right} {}
-		MarginsF(float top, float right, float bottom, float left) : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}
-		explicit MarginsF(const Margins& m) : MarginsF{static_cast<float>(m.top()), static_cast<float>(m.right()), static_cast<float>(m.bottom()), static_cast<float>(m.left())} {}
-
-		float bottom() const { return _bottom; }
-		float left() const { return _left; }
-		float right() const { return _right; }
-		float top() const { return _top; }
-
-	private:
 		float _top = 0;
 		float _right = 0;
 		float _bottom = 0;
 		float _left = 0;
+
+		constexpr MarginsF() noexcept = default;
+		constexpr explicit MarginsF(float all) noexcept : _top{all}, _right{all}, _bottom{all}, _left{all} {}
+		constexpr MarginsF(float top_bottom, float left_right) noexcept : _top{top_bottom}, _right{left_right}, _bottom{top_bottom}, _left{left_right} {}
+		constexpr MarginsF(float top, float left_right, float bottom) noexcept : _top{top}, _right{left_right}, _bottom{bottom}, _left{left_right} {}
+		constexpr MarginsF(float top, float right, float bottom, float left) noexcept : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}
+		constexpr explicit MarginsF(const Margins& m) noexcept : MarginsF{static_cast<float>(m._top), static_cast<float>(m._right), static_cast<float>(m._bottom), static_cast<float>(m._left)} {}
 	};
+
+	constexpr Size min_size(const Margins& m) noexcept { return {m._left + 1 + m._right, m._top + 1 + m._bottom}; }
 }
 
 #endif

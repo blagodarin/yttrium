@@ -1,4 +1,4 @@
-#include <yttrium/math/vector4.h>
+#include <yttrium/math/vector.h>
 
 #include <boost/test/unit_test.hpp>
 
@@ -34,10 +34,8 @@ BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
 
 BOOST_AUTO_TEST_CASE(test_vector3)
 {
-	using Yttrium::Vector3;
-
-	BOOST_CHECK_EQUAL(Vector3(1, 4, 8).length(), 9);
-	BOOST_CHECK_EQUAL(Vector3(1, 4, 8).normalized().length(), 1);
+	BOOST_CHECK_EQUAL(Yttrium::length({1, 4, 8}), 9);
+	BOOST_CHECK_EQUAL(Yttrium::length(Yttrium::normalize({1, 4, 8})), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_vector3_arithmetics)

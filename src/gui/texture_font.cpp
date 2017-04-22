@@ -25,18 +25,15 @@ namespace Yttrium
 	class TextureFontImpl final : public TextureFont
 	{
 	public:
-		explicit TextureFontImpl(int size)
-			: _size(size)
-		{
-		}
+		explicit TextureFontImpl(int size) : _size{size} {}
 
 		void build(std::vector<TexturedRect>& rects, const PointF& top_left, float font_size, const std::string& text, TextCapture* capture) const override
 		{
 			rects.clear();
 
-			float current_x = top_left.x();
-			const float current_y = top_left.y();
-			const float scaling = font_size / _size;
+			auto current_x = top_left._x;
+			const auto current_y = top_left._y;
+			const auto scaling = font_size / _size;
 
 			float selection_left = 0;
 			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](size_t index)
@@ -74,7 +71,7 @@ namespace Yttrium
 				{
 					rects.emplace_back(
 						RectF(
-							{ current_x + info->second.offset.x() * scaling, current_y + info->second.offset.y() * scaling },
+							{ current_x + info->second.offset._x * scaling, current_y + info->second.offset._y * scaling },
 							SizeF(info->second.rect.size()) * scaling
 						),
 						RectF(info->second.rect)
@@ -89,10 +86,7 @@ namespace Yttrium
 			do_capture(text.size());
 		}
 
-		Rect rect() const override
-		{
-			return _rect;
-		}
+		Rect rect() const override { return _rect; }
 
 		Size text_size(const std::string& text) const override
 		{
@@ -115,7 +109,7 @@ namespace Yttrium
 		SizeF text_size(const std::string& text, const SizeF& font_size) const override
 		{
 			const auto& size = text_size(text);
-			return {font_size.width() * (size.width() * font_size.height() / size.height()), font_size.height()};
+			return {font_size._width * (size._width * font_size._height / size._height), font_size._height};
 		}
 
 	private:
@@ -164,7 +158,7 @@ namespace Yttrium
 			info.advance = char_data.advance;
 
 			font->_chars[char_data.id] = info;
-			font_rect_size = {std::max(font_rect_size.width(), char_data.x + char_data.width), std::max(font_rect_size.height(), char_data.y + char_data.height)};
+			font_rect_size = {std::max(font_rect_size._width, char_data.x + char_data.width), std::max(font_rect_size._height, char_data.y + char_data.height)};
 		}
 		font->_rect = {{font_section.base_x, font_section.base_y}, font_rect_size};
 

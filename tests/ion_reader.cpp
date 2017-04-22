@@ -1,5 +1,6 @@
 #include <yttrium/ion/reader.h>
 #include <yttrium/storage/source.h>
+#include <yttrium/utils.h>
 #include "iostream.h"
 
 #include <boost/test/unit_test.hpp>

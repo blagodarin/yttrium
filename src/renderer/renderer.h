@@ -5,7 +5,7 @@
 
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/math/vector2.h>
+#include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/static_string.h>

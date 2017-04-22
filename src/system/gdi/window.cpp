@@ -144,7 +144,7 @@ namespace Yttrium
 		if (!::GetCursorPos(&gdi_cursor))
 			return false;
 		::ScreenToClient(_hwnd, &gdi_cursor);
-		cursor = { gdi_cursor.x, gdi_cursor.y };
+		cursor = {gdi_cursor.x, gdi_cursor.y};
 		return true;
 	}
 
@@ -164,7 +164,7 @@ namespace Yttrium
 
 	bool WindowBackend::set_cursor(const Point& cursor)
 	{
-		POINT gdi_cursor{ cursor.x(), cursor.y() };
+		POINT gdi_cursor{cursor._x, cursor._y};
 		::ClientToScreen(_hwnd, &gdi_cursor);
 		return ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
 	}

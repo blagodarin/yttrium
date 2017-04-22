@@ -3,7 +3,7 @@
 #include <yttrium/image.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/math/vector2.h>
+#include <yttrium/math/vector.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 
@@ -139,14 +139,14 @@ void TetriumGraphics::draw_next_figure(const RectF& rect, const Tetrium::Figure&
 		return;
 	PushTexture push_texture(_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter);
 	set_texture_rect(figure.type());
-	const SizeF block_size(rect.width() / 4, rect.height() / 2);
+	const SizeF block_size{rect.width() / 4, rect.height() / 2};
 	for (const auto& block : figure.blocks())
 		draw_block(rect, block_size, block.x, 1 - block.y / Tetrium::PointsPerRow);
 }
 
 void TetriumGraphics::draw_block(const RectF& rect, const SizeF& block_size, float x, float y) const
 {
-	_renderer.draw_rect({ { rect.left() + x * block_size.width(), rect.top() + y * block_size.height() }, block_size });
+	_renderer.draw_rect({{rect.left() + x * block_size._width, rect.top() + y * block_size._height}, block_size});
 }
 
 void TetriumGraphics::draw_field_blocks(const RectF& rect, const SizeF& block_size, const Tetrium::Field& field) const

@@ -17,8 +17,8 @@ Game::Game(const Storage& storage)
 {
 	_window.on_cursor_moved([this](int dx, int dy)
 	{
-		_rotation.yaw = wrap(_rotation.yaw - static_cast<float>(dx) / 4, -180.f, 180.f);
-		_rotation.pitch = clamp(_rotation.pitch - static_cast<float>(dy) / 4, -90.f, 90.f);
+		_rotation._yaw = wrap(_rotation._yaw - static_cast<float>(dx) / 4, -180.f, 180.f);
+		_rotation._pitch = clamp(_rotation._pitch - static_cast<float>(dy) / 4, -90.f, 90.f);
 	});
 	_window.on_key_event([this](const KeyEvent& event){ on_key_event(event); });
 	_window.on_render([this](Renderer& renderer, const PointF&){ render(renderer); });
@@ -192,7 +192,7 @@ void Game::update(const UpdateEvent& update)
 		"TextureSwitches: ", update.texture_switches, " (Redundant: ", update.redundant_texture_switches, ")\n"
 		"ShaderSwitches: ", update.shader_switches, " (Redundant: ", update.redundant_shader_switches, ")\n"
 		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, "\n"
-		"Pitch: ", _rotation.pitch, ", Yaw: ", _rotation.yaw, "\n"
+		"Pitch: ", _rotation._pitch, ", Yaw: ", _rotation._yaw, "\n"
 		"Center ray:\n"
 		"  ", _center_ray._origin.x, ", ", _center_ray._origin.y, ", ", _center_ray._origin.z, "\n"
 		"  ", (_center_ray._origin + _center_ray._vector).x, ", ", (_center_ray._origin + _center_ray._vector).y, ", ", (_center_ray._origin + _center_ray._vector).z, "\n"
