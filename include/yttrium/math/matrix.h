@@ -84,10 +84,10 @@ namespace Yttrium
 		{
 			const auto xx = 2.f / size._width;
 			const auto yy = -2.f / size._height;
-			const auto zz = 2 / (near - far);
+			const auto zz = -2 / (far - near);
 			const auto tx = -1.f;
 			const auto ty = 1.f;
-			const auto tz = (near + far) / (near - far);
+			const auto tz = (far + near) / (far - near);
 			return
 			{
 				xx, 0,  0,  tx,

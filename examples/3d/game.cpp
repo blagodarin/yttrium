@@ -17,6 +17,7 @@ Game::Game(const Storage& storage)
 {
 	_window.on_cursor_moved([this](int dx, int dy)
 	{
+		// TODO: Smooth 3D rotation.
 		_rotation._yaw = wrap(_rotation._yaw - static_cast<float>(dx) / 4, -180.f, 180.f);
 		_rotation._pitch = clamp(_rotation._pitch - static_cast<float>(dy) / 4, -90.f, 90.f);
 	});

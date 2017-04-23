@@ -210,3 +210,58 @@ BOOST_AUTO_TEST_CASE(test_matrix4_perspective)
 		BOOST_CHECK_CLOSE(v.z, 1, 2e-5);
 	}
 }
+
+BOOST_AUTO_TEST_CASE(test_matrix4_projection_2d)
+{
+	using Yttrium::Vector3;
+
+	const auto m = Matrix4::projection_2d({640, 480}, -.25, .75);
+	{
+		const auto v = m * Vector3{0, 0, -.25};
+		BOOST_CHECK_CLOSE(v.x, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, 1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{0, 0, .75};
+		BOOST_CHECK_CLOSE(v.x, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, -1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{640, 0, -.25};
+		BOOST_CHECK_CLOSE(v.x, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, 1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{640, 0, .75};
+		BOOST_CHECK_CLOSE(v.x, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, -1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{0, 480, -.25};
+		BOOST_CHECK_CLOSE(v.x, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, 1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{0, 480, .75};
+		BOOST_CHECK_CLOSE(v.x, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, -1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{640, 480, -.25};
+		BOOST_CHECK_CLOSE(v.x, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, 1, 2e-5);
+	}
+	{
+		const auto v = m * Vector3{640, 480, .75};
+		BOOST_CHECK_CLOSE(v.x, 1, 2e-5);
+		BOOST_CHECK_CLOSE(v.y, -1, 2e-5);
+		BOOST_CHECK_CLOSE(v.z, -1, 2e-5);
+	}
+}
