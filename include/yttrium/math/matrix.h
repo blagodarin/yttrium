@@ -22,7 +22,7 @@ namespace Yttrium
 		{
 		}
 
-		Matrix4(const Euler& e) noexcept
+		explicit Matrix4(const Euler& e) noexcept
 		{
 			const auto yaw = static_cast<float>(e._yaw / 180 * M_PI);
 			const auto pitch = static_cast<float>(e._pitch / 180 * M_PI);
@@ -41,23 +41,12 @@ namespace Yttrium
 
 		static Matrix4 camera(const Vector3& position, const Euler& orientation) noexcept
 		{
-			const auto yaw = static_cast<float>(orientation._yaw / 180 * M_PI);
-			const auto pitch = static_cast<float>(orientation._pitch / 180 * M_PI);
-			const auto roll = static_cast<float>(orientation._roll / 180 * M_PI);
-			const auto cy = std::cos(yaw);
-			const auto sy = std::sin(yaw);
-			const auto cp = std::cos(pitch);
-			const auto sp = std::sin(pitch);
-			const auto cr = std::cos(roll);
-			const auto sr = std::sin(roll);
-			const Vector3 rx{sy*sp*sr + cy*cr, cy*sp*sr - sy*cr, -cp*sr};
-			const Vector3 ry{sy*cp, cy*cp, sp};
-			const Vector3 rz{cy*sr - sy*sp*cr, -cy*sp*cr - sy*sr, cp*cr};
+			const Matrix4 r{orientation};
 			return
 			{
-				rx.x, rx.y, rx.z, -dot_product(position, rx),
-				ry.x, ry.y, ry.z, -dot_product(position, ry),
-				rz.x, rz.y, rz.z, -dot_product(position, rz),
+				r.x.x, r.x.y, r.x.z, -dot_product(position, {r.x.x, r.x.y, r.x.z}),
+				r.y.x, r.y.y, r.y.z, -dot_product(position, {r.y.x, r.y.y, r.y.z}),
+				r.z.x, r.z.y, r.z.z, -dot_product(position, {r.z.x, r.z.y, r.z.z}),
 				0, 0, 0, 1,
 			};
 		}
@@ -108,12 +97,12 @@ namespace Yttrium
 			};
 		}
 
-		static Matrix4 rotation(float angle, const Vector3& axis) noexcept
+		static Matrix4 rotation(float degrees, const Vector3& axis) noexcept
 		{
 			const auto v = normalize(axis);
-			const auto angle_radians = static_cast<float>(angle / 180 * M_PI);
-			const auto c = std::cos(angle_radians);
-			const auto s = std::sin(angle_radians);
+			const auto radians = static_cast<float>(degrees / 180 * M_PI);
+			const auto c = std::cos(radians);
+			const auto s = std::sin(radians);
 			return
 			{
 				v.x*v.x*(1 - c) + c,     v.y*v.x*(1 - c) - s*v.z, v.z*v.x*(1 - c) + s*v.y, 0,
@@ -213,7 +202,7 @@ namespace Yttrium
 
 	constexpr Matrix4 inverse(const Matrix4& m) noexcept
 	{
-		// Rows 2 and 3.
+		// Z and W rows.
 		auto det01 = m.x.z * m.y.w - m.x.w * m.y.z;
 		auto det02 = m.x.z * m.z.w - m.x.w * m.z.z;
 		auto det03 = m.x.z * m.t.w - m.x.w * m.t.z;
@@ -221,7 +210,7 @@ namespace Yttrium
 		auto det13 = m.y.z * m.t.w - m.y.w * m.t.z;
 		auto det23 = m.z.z * m.t.w - m.z.w * m.t.z;
 
-		// Rows 1, 2 and 3.
+		// Y, Z and W rows.
 		const auto det123 = m.y.y * det23 - m.z.y * det13 + m.t.y * det12;
 		const auto det023 = m.x.y * det23 - m.z.y * det03 + m.t.y * det02;
 		const auto det013 = m.x.y * det13 - m.y.y * det03 + m.t.y * det01;
@@ -239,7 +228,7 @@ namespace Yttrium
 		const auto yz = d * -(m.x.x * det13 - m.y.x * det03 + m.t.x * det01);
 		const auto yw = d *  (m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
 
-		// Rows 1 and 3.
+		// Y and W rows.
 		det01 = m.x.y * m.y.w - m.y.y * m.x.w;
 		det02 = m.x.y * m.z.w - m.z.y * m.x.w;
 		det03 = m.x.y * m.t.w - m.t.y * m.x.w;
@@ -252,7 +241,7 @@ namespace Yttrium
 		const auto zz = d *  (m.x.x * det13 - m.y.x * det03 + m.t.x * det01);
 		const auto zw = d * -(m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
 
-		// Rows 1 and 2.
+		// Y and Z rows.
 		det01 = m.y.z * m.x.y - m.x.z * m.y.y;
 		det02 = m.z.z * m.x.y - m.x.z * m.z.y;
 		det03 = m.t.z * m.x.y - m.x.z * m.t.y;

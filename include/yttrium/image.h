@@ -67,7 +67,7 @@ namespace Yttrium
 			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, bits_per_pixel, 1, orientation} {}
 
 		///
-		size_t bits_per_channel() const { return _bits_per_pixel % _channels ? 0 : _bits_per_pixel / _channels; }
+		size_t bits_per_channel() const { return (_bits_per_pixel % _channels) ? 0 : _bits_per_pixel / _channels; }
 
 		///
 		size_t bits_per_pixel() const { return _bits_per_pixel; }
