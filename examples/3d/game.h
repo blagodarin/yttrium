@@ -5,6 +5,7 @@
 
 #include <yttrium/math/euler.h>
 #include <yttrium/math/line.h>
+#include <yttrium/math/point.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>
@@ -23,7 +24,7 @@ public:
 
 private:
 	void on_key_event(const KeyEvent&);
-	void render(Renderer&);
+	void render(Renderer&, const PointF&);
 	void update(const UpdateEvent&);
 
 private:
@@ -35,19 +36,12 @@ private:
 	Model _cube{_resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material"};
 	Model _checkerboard{_resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material"};
 
-	Vector3 _position{9, 9, 9};
-	Euler _rotation{-135, -29, 0};
+	Vector3 _position{0, -8.5, 16};
+	Euler _rotation{0, -60, 0};
 
-	bool _move_forward = false;
-	bool _move_backward = false;
-	bool _move_left = false;
-	bool _move_right = false;
-
-	unsigned _animation = 0;
-
-	Line3 _center_ray{{0, 0, 0}, {0, 0, 0}};
+	Line3 _cursor_ray{{0, 0, 0}, {0, 0, 0}};
 	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
-	boost::optional<Vector3> _board_point;
+	boost::optional<Point> _board_point;
 };
 
 #endif

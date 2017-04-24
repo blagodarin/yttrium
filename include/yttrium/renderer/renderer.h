@@ -20,7 +20,7 @@ namespace Yttrium
 	class Margins;
 	class Matrix4;
 	class Mesh;
-	class Point;
+	class PointF;
 	class RectF;
 	class Size;
 	class Source;
@@ -81,7 +81,7 @@ namespace Yttrium
 		virtual Matrix4 model_matrix() const = 0;
 
 		///
-		virtual Line3 pixel_ray(const Point&) const = 0;
+		virtual Line3 pixel_ray(const PointF&) const = 0;
 
 		///
 		virtual void set_texture_rect(const RectF&, const Margins&) = 0;

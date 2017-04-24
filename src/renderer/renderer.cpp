@@ -127,11 +127,11 @@ namespace Yttrium
 		return _matrix_stack.back().first;
 	}
 
-	Line3 RendererImpl::pixel_ray(const Point& p) const
+	Line3 RendererImpl::pixel_ray(const PointF& p) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
-		const auto xn = static_cast<float>(2 * p._x + 1) / _window_size._width - 1;
-		const auto yn = static_cast<float>(2 * p._y + 1) / _window_size._height - 1;
+		const auto xn = (2 * p._x + 1) / _window_size._width - 1;
+		const auto yn = 1 - (2 * p._y + 1) / _window_size._height;
 		const auto m = inverse(full_matrix());
 		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
 	}

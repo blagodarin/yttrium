@@ -186,10 +186,10 @@ namespace Yttrium
 				_private->_on_update(update);
 			{
 				_private->_renderer->clear();
-				PushGpuProgram gpu_program(*_private->_renderer, _private->_renderer->program_2d());
-				Push2D projection(*_private->_renderer);
+				PushGpuProgram gpu_program{*_private->_renderer, _private->_renderer->program_2d()};
+				Push2D projection{*_private->_renderer};
 				if (_private->_on_render)
-					_private->_on_render(*_private->_renderer, PointF(_private->_cursor));
+					_private->_on_render(*_private->_renderer, PointF{_private->_cursor});
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)
