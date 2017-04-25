@@ -1,0 +1,14 @@
+on_key "f1" { call "debug" }
+on_key "f10" { call "screenshot" } # KDE grabs "print" key. =(
+
+root screen "main"
+{
+	on_key "esc" { quit }
+
+	stretch # TODO: Aspect-preserving non-center layout.
+	{
+		size "16" "9"
+
+		canvas { id "minimap" position "13.75" "6.75" "2" "2" }
+	}
+}

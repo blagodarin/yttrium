@@ -15,66 +15,68 @@
 Game::Game(const Storage& storage)
 	: _storage{storage}
 {
-	_window.on_key_event([this](const KeyEvent& event){ on_key_event(event); });
-	_window.on_render([this](Renderer& renderer, const PointF& cursor){ render(renderer, cursor); });
+	_script.define("debug", [this](const ScriptCall&){ _debug_text_visible = !_debug_text_visible; });
+	_script.define("screenshot", [this](const ScriptCall&){ _window.take_screenshot(); });
+
+	_window.on_key_event([this](const KeyEvent& event){ _gui.process_key_event(event); });
+	_window.on_render([this](Renderer& renderer, const PointF& cursor)
+	{
+		draw_scene(renderer, cursor);
+		_gui.render(renderer, cursor);
+		{
+			PushTexture push_texture{renderer, nullptr};
+			renderer.draw_rect(RectF{cursor, SizeF{2, 2}}, {1, 1, 0, 1});
+		}
+		if (_debug_text_visible)
+			renderer.draw_debug_text(_debug_text);
+	});
 	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });
+
+	_gui.on_canvas([this](Renderer& renderer, const std::string& canvas, const RectF& rect)
+	{
+		if (canvas == "minimap")
+			draw_minimap(renderer, rect);
+	});
+	_gui.on_quit([this]{ _window.close(); });
 }
 
 void Game::run()
 {
+	_gui.start();
 	_window.show();
 	_window.run();
 }
 
-void Game::on_key_event(const KeyEvent& event)
+void Game::draw_minimap(Renderer& renderer, const RectF& rect)
 {
-	switch (event.key)
-	{
-	case Key::Escape:
-		if (event.pressed)
-			_window.close();
-		break;
+	const auto w = rect.width() / 32;
+	const auto h = rect.height() / 32;
 
-	case Key::F1:
-		if (event.pressed)
-			_debug_text_visible = !_debug_text_visible;
-		break;
+	const auto x = rect.left() + (rect.width() - w) * (_position.x + 64.f) / 128;
+	const auto y = rect.top() + (rect.height() - h) * (64.f - _position.y) / 128;
 
-	case Key::F10: // KDE grabs Key::Print. =(
-		if (event.pressed)
-			_window.take_screenshot();
-		break;
-
-	default: // To avoid compiler warnings.
-		break;
-	}
+	PushTexture push_texture{renderer, nullptr};
+	renderer.draw_rect(rect, {1, 1, 1, 0.25});
+	renderer.draw_rect({{x, y}, SizeF{w, h}}, {1, 0, 0, 1});
 }
 
-void Game::render(Renderer& renderer, const PointF& cursor)
+void Game::draw_scene(Renderer& renderer, const PointF& cursor)
 {
+	Push3D projection{renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
+	_cursor_ray = renderer.pixel_ray(cursor);
 	{
-		Push3D projection{renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
-		_cursor_ray = renderer.pixel_ray(cursor);
+		Vector3 p;
+		if (_cursor_ray.plane_intersection(_board_plane, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
 		{
-			Vector3 p;
-			if (_cursor_ray.plane_intersection(_board_plane, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
-			{
-				_board_point = Point{static_cast<int>(std::floor(p.x)), static_cast<int>(std::floor(p.y))};
-				PushTransformation t{renderer, Matrix4::translation({_board_point->_x + .5f, _board_point->_y + .5f, .5f})};
-				_cube.draw(renderer);
-			}
-			else
-				_board_point = {};
+			_board_point = Point{static_cast<int>(std::floor(p.x)), static_cast<int>(std::floor(p.y))};
+			PushTransformation t{renderer, Matrix4::translation({_board_point->_x + .5f, _board_point->_y + .5f, .5f})};
+			_cube.draw(renderer);
 		}
-		_checkerboard.draw(renderer);
+		else
+			_board_point = {};
 	}
-	{
-		PushTexture push_texture{renderer, nullptr};
-		renderer.draw_rect(RectF{cursor, SizeF{2, 2}}, {1, 1, 0, 1});
-	}
-	if (_debug_text_visible)
-		renderer.draw_debug_text(_debug_text);
+	_checkerboard.draw(renderer);
 }
 
 void Game::update(const UpdateEvent& update)

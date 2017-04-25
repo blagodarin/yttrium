@@ -3,10 +3,12 @@
 
 #include "model.h"
 
+#include <yttrium/gui/gui.h>
 #include <yttrium/math/euler.h>
 #include <yttrium/math/line.h>
 #include <yttrium/math/point.h>
 #include <yttrium/resource_loader.h>
+#include <yttrium/script/context.h>
 #include <yttrium/static_string.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/window.h>
@@ -23,14 +25,16 @@ public:
 	void run();
 
 private:
-	void on_key_event(const KeyEvent&);
-	void render(Renderer&, const PointF&);
+	void draw_minimap(Renderer&, const RectF&);
+	void draw_scene(Renderer&, const PointF&);
 	void update(const UpdateEvent&);
 
 private:
 	const Storage& _storage;
 	Window _window{"Yttrium 3D example"};
 	ResourceLoader _resource_loader{_storage, &_window.renderer()};
+	ScriptContext _script;
+	Gui _gui{_resource_loader, _script, "examples/3d/data/gui.ion"};
 	bool _debug_text_visible = false;
 	std::string _debug_text;
 	Model _cube{_resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material"};
