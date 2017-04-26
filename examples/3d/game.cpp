@@ -50,20 +50,48 @@ void Game::run()
 
 void Game::draw_minimap(Renderer& renderer, const RectF& rect)
 {
-	const auto w = rect.width() / 32;
-	const auto h = rect.height() / 32;
-
-	const auto x = rect.left() + (rect.width() - w) * (_position.x + 64.f) / 128;
-	const auto y = rect.top() + (rect.height() - h) * (64.f - _position.y) / 128;
+	const auto map = [&rect](const PointF& p)
+	{
+		return PointF
+		{
+			rect.left() + rect.width() * (p._x + 64) / 128,
+			rect.top() + rect.height() * (64 - p._y) / 128,
+		};
+	};
 
 	PushTexture push_texture{renderer, nullptr};
 	renderer.draw_rect(rect, {1, 1, 1, 0.25});
-	renderer.draw_rect({{x, y}, SizeF{w, h}}, {1, 0, 0, 1});
+	if (_visibility_rect)
+		renderer.draw_rect({map(_visibility_rect->top_left()), map(_visibility_rect->bottom_right())}, {1, 1, 0, 0.25});
+
+	const auto camera = map({_position.x, _position.y});
+	renderer.draw_rect({{camera._x - 2, camera._y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
 }
 
 void Game::draw_scene(Renderer& renderer, const PointF& cursor)
 {
 	Push3D projection{renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
+	{
+		Vector3 top_left;
+		Vector3 top_right;
+		Vector3 bottom_left;
+		Vector3 bottom_right;
+		const RectF r{SizeF{renderer.window_size()}};
+		if (renderer.pixel_ray(r.top_left()).plane_intersection(_board_plane, top_left)
+			&& renderer.pixel_ray(r.top_right()).plane_intersection(_board_plane, top_right)
+			&& renderer.pixel_ray(r.bottom_left()).plane_intersection(_board_plane, bottom_left)
+			&& renderer.pixel_ray(r.bottom_right()).plane_intersection(_board_plane, bottom_right))
+		{
+			const auto left = std::min(top_left.x, bottom_left.x);
+			const auto right = std::max(top_right.x, bottom_right.x);
+			const auto top = std::max(top_left.y, top_right.y);
+			const auto bottom = std::min(bottom_left.y, bottom_right.y);
+			_visibility_rect = RectF{{left, top}, PointF{right, bottom}};
+		}
+		else
+			_visibility_rect = {};
+	}
+
 	_cursor_ray = renderer.pixel_ray(cursor);
 	{
 		Vector3 p;
