@@ -12,7 +12,6 @@ namespace Yttrium
 	class Color4f;
 	class GuiActions;
 	class Margins;
-	class PointF;
 	class RectF;
 	class SizeF;
 	class Sound;

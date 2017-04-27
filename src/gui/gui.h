@@ -16,7 +16,6 @@ namespace Yttrium
 	class Gui;
 	class GuiScreen;
 	class Music;
-	class PointF;
 	class RectF;
 	class Renderer;
 	class ResourceLoader;
@@ -25,6 +24,7 @@ namespace Yttrium
 	class Texture2D;
 	class TextureFont;
 	class Translation;
+	class Vector2;
 
 	class GuiPrivate
 	{
@@ -40,7 +40,7 @@ namespace Yttrium
 
 		GuiScreen& add_screen(const std::string& name, bool is_transparent, bool is_root);
 		void draw_canvas(Renderer& renderer, const std::string& name, const RectF& rect) const { if (_on_canvas) _on_canvas(renderer, name, rect); }
-		void draw_custom_cursor(Renderer& renderer, const PointF& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
+		void draw_custom_cursor(Renderer& renderer, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
 		bool pop_screen();
 		bool pop_screens_until(const std::string& name);
@@ -70,7 +70,7 @@ namespace Yttrium
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
 		std::function<void(Renderer&, const std::string&, const RectF&)> _on_canvas;
-		std::function<void(Renderer&, const PointF&)> _on_custom_cursor;
+		std::function<void(Renderer&, const Vector2&)> _on_custom_cursor;
 		std::function<void(const std::shared_ptr<const Music>&)> _on_music;
 		std::function<void()> _on_quit;
 

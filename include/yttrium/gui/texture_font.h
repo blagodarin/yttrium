@@ -36,7 +36,7 @@ namespace Yttrium
 		virtual ~TextureFont() = default;
 
 		///
-		virtual void build(std::vector<TexturedRect>&, const PointF& top_left, float font_size, const std::string&, TextCapture* = nullptr) const = 0;
+		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, const std::string&, TextCapture* = nullptr) const = 0;
 
 		///
 		virtual Rect rect() const = 0;

@@ -153,7 +153,7 @@ namespace Yttrium
 		_private->_on_canvas = callback;
 	}
 
-	void Gui::on_custom_cursor(const std::function<void(Renderer&, const PointF&)>& callback)
+	void Gui::on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>& callback)
 	{
 		_private->_on_custom_cursor = callback;
 	}
@@ -184,7 +184,7 @@ namespace Yttrium
 		return false;
 	}
 
-	void Gui::render(Renderer& renderer, const PointF& cursor) const
+	void Gui::render(Renderer& renderer, const Vector2& cursor) const
 	{
 		if (_private->_screen_stack.empty())
 			return;

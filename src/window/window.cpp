@@ -23,7 +23,7 @@ namespace Yttrium
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;
 		std::function<void(const KeyEvent&)> _on_key_event;
-		std::function<void(Renderer&, const PointF&)> _on_render;
+		std::function<void(Renderer&, const Vector2&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(const UpdateEvent&)> _on_update;
 
@@ -151,7 +151,7 @@ namespace Yttrium
 		_private->_on_key_event = callback;
 	}
 
-	void Window::on_render(const std::function<void(Renderer&, const PointF&)>& callback)
+	void Window::on_render(const std::function<void(Renderer&, const Vector2&)>& callback)
 	{
 		_private->_on_render = callback;
 	}
@@ -189,7 +189,7 @@ namespace Yttrium
 				PushGpuProgram gpu_program{*_private->_renderer, _private->_renderer->program_2d()};
 				Push2D projection{*_private->_renderer};
 				if (_private->_on_render)
-					_private->_on_render(*_private->_renderer, PointF{_private->_cursor});
+					_private->_on_render(*_private->_renderer, Vector2{_private->_cursor});
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)

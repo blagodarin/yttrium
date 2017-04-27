@@ -104,7 +104,7 @@ namespace
 
 	RectF block_rect(size_t index)
 	{
-		return { PointF(1, index * FragmentSize + 1), SizeF(FragmentSize - 2, FragmentSize - 2) };
+		return {Vector2(1, index * FragmentSize + 1), SizeF(FragmentSize - 2, FragmentSize - 2)};
 	}
 }
 

@@ -1,10 +1,6 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_math_rect_h_
 #define _include_yttrium_math_rect_h_
 
-#include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 
 #include <algorithm>
@@ -153,28 +149,28 @@ namespace Yttrium
 	{
 	public:
 		RectF() = default;
-		RectF(const PointF& top_left, const PointF& bottom_right) : _left{top_left._x}, _top{top_left._y}, _right{bottom_right._x}, _bottom{bottom_right._y} {}
-		RectF(const PointF& top_left, const SizeF& s) : _left{top_left._x}, _top{top_left._y}, _right{_left + s._width}, _bottom{_top + s._height} {}
+		RectF(const Vector2& top_left, const Vector2& bottom_right) : _left{top_left.x}, _top{top_left.y}, _right{bottom_right.x}, _bottom{bottom_right.y} {}
+		RectF(const Vector2& top_left, const SizeF& s) : _left{top_left.x}, _top{top_left.y}, _right{_left + s._width}, _bottom{_top + s._height} {}
 		explicit RectF(const SizeF& s) : _right{static_cast<float>(s._width)}, _bottom{static_cast<float>(s._height)} {}
 		explicit RectF(const Rect& r) : _left{static_cast<float>(r.left())}, _top{static_cast<float>(r.top())}, _right{static_cast<float>(r.right())}, _bottom{static_cast<float>(r.bottom())} {}
 
 		float bottom() const { return _bottom; }
-		PointF bottom_left() const { return {_left, _bottom}; }
-		PointF bottom_right() const { return {_right, _bottom}; }
+		Vector2 bottom_left() const { return {_left, _bottom}; }
+		Vector2 bottom_right() const { return {_right, _bottom}; }
 		float height() const { return _bottom - _top; }
 		float left() const { return _left; }
 		float right() const { return _right; }
 		SizeF size() const { return {width(), height()}; }
 		float top() const { return _top; }
-		PointF top_left() const { return {_left, _top}; }
-		PointF top_right() const { return {_right, _top}; }
+		Vector2 top_left() const { return {_left, _top}; }
+		Vector2 top_right() const { return {_right, _top}; }
 		float width() const { return _right - _left; }
 
 		///
-		PointF center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
+		Vector2 center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
 
 		///
-		bool contains(const PointF& p) const { return _left <= p._x && p._x < _right && _top <= p._y && p._y < _bottom; }
+		bool contains(const Vector2& v) const { return _left <= v.x && v.x < _right && _top <= v.y && v.y < _bottom; }
 
 	private:
 		float _left = 0;

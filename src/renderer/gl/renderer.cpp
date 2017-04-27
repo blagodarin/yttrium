@@ -288,12 +288,12 @@ namespace Yttrium
 
 	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const
 	{
-		const auto map_point = [orientation](const PointF& point) -> PointF
+		const auto map_point = [orientation](const Vector2& point) -> Vector2
 		{
 			return
 			{
-				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point._x : point._x,
-				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point._y : point._y
+				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point.x : point.x,
+				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point.y : point.y
 			};
 		};
 		return {map_point(rect.top_left()), map_point(rect.bottom_right())};

@@ -118,7 +118,7 @@ namespace Yttrium
 		_widgets.emplace_back(&widget);
 	}
 
-	void GuiScreen::render(Renderer& renderer, const PointF* cursor)
+	void GuiScreen::render(Renderer& renderer, const Vector2* cursor)
 	{
 		const RectF rect({}, SizeF(renderer.window_size()));
 		for (const auto& layout : _layouts)
@@ -153,7 +153,7 @@ namespace Yttrium
 			_cursor_texture = _gui.resource_loader().load_texture_2d(texture);
 	}
 
-	Widget* GuiScreen::widget_at(const PointF& point) const
+	Widget* GuiScreen::widget_at(const Vector2& point) const
 	{
 		for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)
 			if ((*i)->render_rect().contains(point))

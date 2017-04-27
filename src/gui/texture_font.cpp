@@ -27,12 +27,12 @@ namespace Yttrium
 	public:
 		explicit TextureFontImpl(int size) : _size{size} {}
 
-		void build(std::vector<TexturedRect>& rects, const PointF& top_left, float font_size, const std::string& text, TextCapture* capture) const override
+		void build(std::vector<TexturedRect>& rects, const Vector2& top_left, float font_size, const std::string& text, TextCapture* capture) const override
 		{
 			rects.clear();
 
-			auto current_x = top_left._x;
-			const auto current_y = top_left._y;
+			auto current_x = top_left.x;
+			const auto current_y = top_left.y;
 			const auto scaling = font_size / _size;
 
 			float selection_left = 0;
@@ -55,7 +55,7 @@ namespace Yttrium
 					}
 					else if (index == capture->selection_end)
 					{
-						capture->selection_rect = {{selection_left, current_y}, PointF(current_x, current_y + font_size)};
+						capture->selection_rect = {{selection_left, current_y}, Vector2{current_x, current_y + font_size}};
 						capture->has_selection = true;
 					}
 				}

@@ -23,7 +23,7 @@ namespace
 		return {unscaled_text_size._width * font_size / unscaled_text_size._height, font_size};
 	}
 
-	PointF make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)
+	Vector2 make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)
 	{
 		const auto x_left = [&]{ return rect.left() + margin; };
 		const auto x_center = [&]{ return (rect.left() + rect.right() - size._width) / 2; };
@@ -35,15 +35,15 @@ namespace
 		switch (alignment)
 		{
 		default: assert(false);
-		case TopLeftAlignment:     return { x_left(),   y_top()    };
-		case TopAlignment:         return { x_center(), y_top()    };
-		case TopRightAlignment:    return { x_right(),  y_top()    };
-		case LeftAlignment:        return { x_left(),   y_center() };
-		case CenterAlignment:      return { x_center(), y_center() };
-		case RightAlignment:       return { x_right(),  y_center() };
-		case BottomLeftAlignment:  return { x_left(),   y_bottom() };
-		case BottomAlignment:      return { x_center(), y_bottom() };
-		case BottomRightAlignment: return { x_right(),  y_bottom() };
+		case TopLeftAlignment:     return {x_left(), y_top()};
+		case TopAlignment:         return {x_center(), y_top()};
+		case TopRightAlignment:    return {x_right(), y_top()};
+		case LeftAlignment:        return {x_left(), y_center()};
+		case CenterAlignment:      return {x_center(), y_center()};
+		case RightAlignment:       return {x_right(), y_center()};
+		case BottomLeftAlignment:  return {x_left(), y_bottom()};
+		case BottomAlignment:      return {x_center(), y_bottom()};
+		case BottomRightAlignment: return {x_right(), y_bottom()};
 		}
 	}
 }

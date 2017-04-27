@@ -13,12 +13,12 @@ namespace Yttrium
 {
 	class KeyEvent;
 	class Music;
-	class PointF;
 	class RectF;
 	class Renderer;
 	class ResourceLoader;
 	class ScriptContext;
 	class StaticString;
+	class Vector2;
 
 	/// GUI manager.
 	class Y_API Gui
@@ -37,7 +37,7 @@ namespace Yttrium
 		void on_canvas(const std::function<void(Renderer&, const std::string&, const RectF&)>&);
 
 		///
-		void on_custom_cursor(const std::function<void(Renderer&, const PointF&)>&);
+		void on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>&);
 
 		///
 		void on_music(const std::function<void(const std::shared_ptr<const Music>&)>&);
@@ -49,7 +49,7 @@ namespace Yttrium
 		bool process_key_event(const KeyEvent&);
 
 		///
-		void render(Renderer&, const PointF& cursor) const;
+		void render(Renderer&, const Vector2& cursor) const;
 
 		///
 		void start();

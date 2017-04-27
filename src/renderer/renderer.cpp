@@ -113,19 +113,19 @@ namespace Yttrium
 		vertex.color = color;
 
 		vertex.position = quad._a;
-		vertex.texture = {_texture_rect.top_left()._x, _texture_rect.top_left()._y};
+		vertex.texture = _texture_rect.top_left();
 		vertices << vertex;
 
 		vertex.position = quad._b;
-		vertex.texture = {_texture_rect.top_right()._x, _texture_rect.top_right()._y};
+		vertex.texture = _texture_rect.top_right();
 		vertices << vertex;
 
 		vertex.position = quad._c;
-		vertex.texture = {_texture_rect.bottom_right()._x, _texture_rect.bottom_right()._y};
+		vertex.texture = _texture_rect.bottom_right();
 		vertices << vertex;
 
 		vertex.position = quad._d;
-		vertex.texture = {_texture_rect.bottom_left()._x, _texture_rect.bottom_left()._y};
+		vertex.texture = _texture_rect.bottom_left();
 		vertices << vertex;
 
 		indices << index << index + 3 << index + 1 << index + 2;
@@ -166,11 +166,11 @@ namespace Yttrium
 		return _matrix_stack.back().first;
 	}
 
-	Line3 RendererImpl::pixel_ray(const PointF& p) const
+	Line3 RendererImpl::pixel_ray(const Vector2& v) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
-		const auto xn = (2 * p._x + 1) / _window_size._width - 1;
-		const auto yn = 1 - (2 * p._y + 1) / _window_size._height;
+		const auto xn = (2 * v.x + 1) / _window_size._width - 1;
+		const auto yn = 1 - (2 * v.y + 1) / _window_size._height;
 		const auto m = inverse(full_matrix());
 		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
 	}

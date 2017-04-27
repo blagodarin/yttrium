@@ -27,7 +27,7 @@ public:
 
 private:
 	void draw_minimap(Renderer&, const RectF&);
-	void draw_scene(Renderer&, const PointF&);
+	void draw_scene(Renderer&, const Vector2&);
 	void update(const UpdateEvent&);
 
 private:

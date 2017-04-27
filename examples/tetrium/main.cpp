@@ -75,7 +75,7 @@ int main(int, char**)
 	Gui gui{ resource_loader, script, "examples/tetrium/data/gui.ion" };
 
 	window.on_key_event([&gui](const KeyEvent& event){ gui.process_key_event(event); });
-	window.on_render([&gui](Renderer& renderer, const PointF& cursor){ gui.render(renderer, cursor); });
+	window.on_render([&gui](Renderer& renderer, const Vector2& cursor){ gui.render(renderer, cursor); });
 	window.on_screenshot([](Image&& image){ image.save(::make_screenshot_path().c_str()); });
 	window.on_update([&script, &gui, &logic](const UpdateEvent& event)
 	{

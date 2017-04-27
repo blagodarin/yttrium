@@ -38,7 +38,7 @@ namespace Yttrium
 		std::shared_ptr<const Music> music() const { return *_music; }
 		const std::string& name() const { return _name; }
 		void register_widget(Widget&);
-		void render(Renderer&, const PointF* cursor);
+		void render(Renderer&, const Vector2* cursor);
 		void set_cursor(GuiCursor, const StaticString& texture = {});
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
 		void set_music(const std::shared_ptr<const Music>& music) { _music = music; }
@@ -48,7 +48,7 @@ namespace Yttrium
 		void set_on_return(GuiActions&& actions) { _on_return = std::move(actions); }
 
 	private:
-		Widget* widget_at(const PointF&) const;
+		Widget* widget_at(const Vector2&) const;
 
 	private:
 		GuiPrivate& _gui;

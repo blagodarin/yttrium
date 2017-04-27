@@ -1,6 +1,8 @@
 #ifndef _include_yttrium_math_vector_h_
 #define _include_yttrium_math_vector_h_
 
+#include <yttrium/math/point.h>
+
 #include <cmath>
 
 namespace Yttrium
@@ -12,6 +14,7 @@ namespace Yttrium
 
 		Vector2() noexcept = default;
 		constexpr Vector2(float vx, float vy) noexcept : x{vx}, y{vy} {}
+		constexpr explicit Vector2(const Point& p) noexcept : x{static_cast<float>(p._x)}, y{static_cast<float>(p._y)} {}
 
 		constexpr auto& operator +=(const Vector2& v) noexcept { x += v.x; y += v.y; return *this; }
 		constexpr auto& operator +=(float s) noexcept { x += s; y += s; return *this; }

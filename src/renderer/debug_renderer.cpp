@@ -14,13 +14,13 @@ namespace
 	{
 		renderer.draw_rect(
 			{
-				PointF(x * DebugTexture::char_width, y * DebugTexture::char_height),
+				Vector2(x * DebugTexture::char_width, y * DebugTexture::char_height),
 				SizeF(width * DebugTexture::char_width, height * DebugTexture::char_height)
 			},
 			color,
 			{
-				PointF(DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]),
-				PointF(DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1])
+				Vector2(DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]),
+				Vector2(DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1])
 			});
 	}
 }

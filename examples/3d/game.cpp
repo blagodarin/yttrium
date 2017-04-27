@@ -19,7 +19,7 @@ Game::Game(const Storage& storage)
 	_script.define("screenshot", [this](const ScriptCall&){ _window.take_screenshot(); });
 
 	_window.on_key_event([this](const KeyEvent& event){ _gui.process_key_event(event); });
-	_window.on_render([this](Renderer& renderer, const PointF& cursor)
+	_window.on_render([this](Renderer& renderer, const Vector2& cursor)
 	{
 		draw_scene(renderer, cursor);
 		_gui.render(renderer, cursor);
@@ -68,7 +68,7 @@ void Game::draw_minimap(Renderer& renderer, const RectF& rect)
 	renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
 }
 
-void Game::draw_scene(Renderer& renderer, const PointF& cursor)
+void Game::draw_scene(Renderer& renderer, const Vector2& cursor)
 {
 	Push3D projection{renderer, Matrix4::perspective(renderer.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
 	{
