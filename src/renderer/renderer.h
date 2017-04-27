@@ -38,6 +38,7 @@ namespace Yttrium
 		~RendererImpl() override;
 
 		void draw_debug_text(const std::string&) override;
+		void draw_quad(const Quad&, const Color4f&) override;
 		void draw_rect(const RectF&, const Color4f&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Color4f&) override;
 		Matrix4 full_matrix() const override;

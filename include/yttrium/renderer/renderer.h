@@ -21,6 +21,7 @@ namespace Yttrium
 	class Matrix4;
 	class Mesh;
 	class PointF;
+	class Quad;
 	class RectF;
 	class Size;
 	class Source;
@@ -61,6 +62,9 @@ namespace Yttrium
 
 		///
 		virtual void draw_mesh(const Mesh&) = 0;
+
+		///
+		virtual void draw_quad(const Quad&, const Color4f& = {1, 1, 1}) = 0;
 
 		///
 		virtual void draw_rect(const RectF&, const Color4f& = {1, 1, 1}) = 0;

@@ -3,6 +3,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/math/line.h>
 #include <yttrium/math/matrix.h>
+#include <yttrium/math/quad.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
@@ -90,6 +91,44 @@ namespace Yttrium
 			line_end = text.find('\n', line_begin);
 		}
 		debug.draw_text(0, top, StaticString{text.data() + line_begin, text.size() - line_begin});
+	}
+
+	void RendererImpl::draw_quad(const Quad& quad, const Color4f& color)
+	{
+		// TODO: Use one intro code for draw_quad and draw_rect.
+
+		BufferAppender<Vertex2D> vertices(_vertices_2d);
+		BufferAppender<uint16_t> indices(_indices_2d);
+
+		auto index = static_cast<uint16_t>(vertices.count()); // TODO: Check size.
+
+		if (index > 0)
+		{
+			indices << (index - 1) << (index);
+			if (indices.count() & 1)
+				indices << (index); // Add an extra degenerate to ensure the correct face ordering.
+		}
+
+		Vertex2D vertex;
+		vertex.color = color;
+
+		vertex.position = quad._a;
+		vertex.texture = {_texture_rect.top_left()._x, _texture_rect.top_left()._y};
+		vertices << vertex;
+
+		vertex.position = quad._b;
+		vertex.texture = {_texture_rect.top_right()._x, _texture_rect.top_right()._y};
+		vertices << vertex;
+
+		vertex.position = quad._c;
+		vertex.texture = {_texture_rect.bottom_right()._x, _texture_rect.bottom_right()._y};
+		vertices << vertex;
+
+		vertex.position = quad._d;
+		vertex.texture = {_texture_rect.bottom_left()._x, _texture_rect.bottom_left()._y};
+		vertices << vertex;
+
+		indices << index << index + 3 << index + 1 << index + 2;
 	}
 
 	void RendererImpl::draw_rect(const RectF& rect, const Color4f& color)

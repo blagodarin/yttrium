@@ -7,7 +7,7 @@
 #include <yttrium/math/euler.h>
 #include <yttrium/math/line.h>
 #include <yttrium/math/point.h>
-#include <yttrium/math/rect.h>
+#include <yttrium/math/quad.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/static_string.h>
@@ -47,7 +47,7 @@ private:
 	Line3 _cursor_ray{{0, 0, 0}, {0, 0, 0}};
 	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
 	boost::optional<Point> _board_point;
-	boost::optional<RectF> _visibility_rect; // TODO: Visibility trapezium.
+	boost::optional<Quad> _visibility_quad;
 };
 
 #endif

@@ -50,22 +50,22 @@ void Game::run()
 
 void Game::draw_minimap(Renderer& renderer, const RectF& rect)
 {
-	const auto map = [&rect](const PointF& p)
+	const auto map = [&rect](const Vector2& v)
 	{
-		return PointF
+		return Vector2
 		{
-			rect.left() + rect.width() * (p._x + 64) / 128,
-			rect.top() + rect.height() * (64 - p._y) / 128,
+			rect.left() + rect.width() * (v.x + 64) / 128,
+			rect.top() + rect.height() * (64 - v.y) / 128,
 		};
 	};
 
 	PushTexture push_texture{renderer, nullptr};
 	renderer.draw_rect(rect, {1, 1, 1, 0.25});
-	if (_visibility_rect)
-		renderer.draw_rect({map(_visibility_rect->top_left()), map(_visibility_rect->bottom_right())}, {1, 1, 0, 0.25});
+	if (_visibility_quad)
+		renderer.draw_quad({map(_visibility_quad->_a), map(_visibility_quad->_b), map(_visibility_quad->_c), map(_visibility_quad->_d)}, {1, 1, 0, 0.25});
 
 	const auto camera = map({_position.x, _position.y});
-	renderer.draw_rect({{camera._x - 2, camera._y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
+	renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
 }
 
 void Game::draw_scene(Renderer& renderer, const PointF& cursor)
@@ -81,15 +81,9 @@ void Game::draw_scene(Renderer& renderer, const PointF& cursor)
 			&& renderer.pixel_ray(r.top_right()).plane_intersection(_board_plane, top_right)
 			&& renderer.pixel_ray(r.bottom_left()).plane_intersection(_board_plane, bottom_left)
 			&& renderer.pixel_ray(r.bottom_right()).plane_intersection(_board_plane, bottom_right))
-		{
-			const auto left = std::min(top_left.x, bottom_left.x);
-			const auto right = std::max(top_right.x, bottom_right.x);
-			const auto top = std::max(top_left.y, top_right.y);
-			const auto bottom = std::min(bottom_left.y, bottom_right.y);
-			_visibility_rect = RectF{{left, top}, PointF{right, bottom}};
-		}
+			_visibility_quad = Quad{{top_left.x, top_left.y}, {top_right.x, top_right.y}, {bottom_right.x, bottom_right.y}, {bottom_left.x, bottom_left.y}};
 		else
-			_visibility_rect = {};
+			_visibility_quad = {};
 	}
 
 	_cursor_ray = renderer.pixel_ray(cursor);
