@@ -14,19 +14,19 @@ namespace
 	{
 		if (vk >= '0' && vk <= '9')
 		{
-			return static_cast<Key>(KeyType(Key::_0) + vk - '0');
+			return static_cast<Key>(to_underlying(Key::_0) + vk - '0');
 		}
 		else if (vk >= 'A' && vk <= 'Z')
 		{
-			return static_cast<Key>(KeyType(Key::A) + vk - 'A');
+			return static_cast<Key>(to_underlying(Key::A) + vk - 'A');
 		}
 		else if (vk >= VK_F1 && vk <= VK_F24)
 		{
-			return static_cast<Key>(KeyType(Key::F1) + vk - VK_F1);
+			return static_cast<Key>(to_underlying(Key::F1) + vk - VK_F1);
 		}
 		else if (vk >= VK_NUMPAD0 && vk <= VK_NUMPAD9)
 		{
-			return static_cast<Key>(KeyType(Key::Num0) + vk - VK_NUMPAD0);
+			return static_cast<Key>(to_underlying(Key::Num0) + vk - VK_NUMPAD0);
 		}
 		else switch (vk)
 		{

@@ -72,20 +72,15 @@ namespace Yttrium
 		_foreground.draw(renderer);
 	}
 
-	bool ButtonWidget::process_key(const KeyEvent& event)
+	bool ButtonWidget::process_mouse_press(Key key, const Vector2&)
 	{
-		if (_state == WidgetState::Checked || _state == WidgetState::Disabled)
-			return false;
+		return _state != WidgetState::Checked && _state != WidgetState::Disabled && key == Key::Mouse1;
+	}
 
-		if (event.key != Key::Mouse1)
-			return false;
-
-		if (event.pressed)
-			return true;
-
+	void ButtonWidget::process_mouse_release()
+	{
 		if (_sound)
 			_sound->play();
 		_on_click.run(_gui);
-		return true;
 	}
 }

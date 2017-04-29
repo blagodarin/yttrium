@@ -56,8 +56,10 @@ namespace Yttrium
 		const bool _is_transparent;
 		std::vector<std::unique_ptr<GuiLayout>> _layouts;
 		std::vector<Widget*> _widgets;
-		Widget* _mouse_widget = nullptr;
-		const Widget* _left_click_widget = nullptr;
+		Widget* _hover_widget = nullptr;
+		Vector2 _mouse_point;
+		Widget* _click_widget = nullptr;
+		Key _click_key = Key::Null;
 		Widget* _focus_widget = nullptr;
 		GuiActions _on_enter;
 		std::unordered_map<std::string, GuiActions> _on_event;

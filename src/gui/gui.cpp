@@ -42,13 +42,6 @@ namespace Yttrium
 		return result;
 	}
 
-	void GuiPrivate::draw_canvas(Renderer& renderer, const std::string& name, const RectF& rect) const
-	{
-		const auto i = _canvases.find(name);
-		if (i != _canvases.end())
-			i->second->on_draw(renderer, rect);
-	}
-
 	void GuiPrivate::set_translation(const StaticString& path)
 	{
 		if (_translation)
@@ -62,6 +55,19 @@ namespace Yttrium
 	{
 		const auto i = _fonts.find(name);
 		return i != _fonts.end() ? &i->second : nullptr;
+	}
+
+	void GuiPrivate::on_canvas_draw(const std::string& name, const RectF& rect, Renderer& renderer) const
+	{
+		const auto i = _canvases.find(name);
+		if (i != _canvases.end())
+			i->second->on_draw(rect, renderer);
+	}
+
+	bool GuiPrivate::on_canvas_mouse_press(const std::string& name, const RectF& rect, Key key, const Vector2& cursor)
+	{
+		const auto i = _canvases.find(name);
+		return i != _canvases.end() && i->second->on_mouse_press(rect, key, cursor);
 	}
 
 	bool GuiPrivate::pop_screen()

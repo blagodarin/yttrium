@@ -12,13 +12,26 @@
 
 #include <cmath>
 
+namespace
+{
+	Vector3 clamp_position(const Vector3& v)
+	{
+		return
+		{
+			clamp(v.x, -64.f + 12.75f, 64.f - 12.75f),
+			clamp(v.y, -64.f - 3.5f, 64.f - 17.5f),
+			clamp(v.z, 1.f, 64.f),
+		};
+	}
+}
+
 class MinimapCanvas : public Canvas
 {
 public:
-	MinimapCanvas(const Vector3& position, const boost::optional<Quad>& visibility_quad)
+	MinimapCanvas(Vector3& position, const boost::optional<Quad>& visibility_quad)
 		: _position{position}, _visibility_quad{visibility_quad} {}
 
-	void on_draw(Renderer& renderer, const RectF& rect) override
+	void on_draw(const RectF& rect, Renderer& renderer) override
 	{
 		const auto map = [&rect](const Vector2& v)
 		{
@@ -30,7 +43,7 @@ public:
 		};
 
 		PushTexture push_texture{renderer, nullptr};
-		renderer.draw_rect(rect, {1, 1, 1, 0.25});
+		renderer.draw_rect(rect, {0.25, 0.25, 0.25, 0.75});
 		if (_visibility_quad)
 			renderer.draw_quad({map(_visibility_quad->_a), map(_visibility_quad->_b), map(_visibility_quad->_c), map(_visibility_quad->_d)}, {1, 1, 0, 0.25});
 
@@ -38,8 +51,18 @@ public:
 		renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
 	}
 
+	bool on_mouse_press(const RectF& rect, Key key, const Vector2& cursor)
+	{
+		if (key != Key::Mouse1)
+			return false;
+		const auto x = (cursor.x - rect.left()) / rect.width() * 128 - 64;
+		const auto y = (rect.top() - cursor.y) / rect.height() * 128 + 64;
+		_position = ::clamp_position({x, y - 10, _position.z});
+		return true;
+	}
+
 private:
-	const Vector3& _position;
+	Vector3& _position;
 	const boost::optional<Quad>& _visibility_quad;
 };
 
@@ -134,9 +157,7 @@ void Game::update(const UpdateEvent& update)
 		else if (move_right)
 			movement.x += offset;
 
-		_position.x = clamp(_position.x + movement.x, -64.f + 12.75f, 64.f - 12.75f);
-		_position.y = clamp(_position.y + movement.y, -64.f - 3.5f, 64.f - 17.5f);
-		_position.z = clamp(_position.z + movement.z, 1.f, 64.f);
+		_position = ::clamp_position(_position + movement);
 	}
 
 	_debug_text.clear();

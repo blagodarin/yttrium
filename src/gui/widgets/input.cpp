@@ -57,10 +57,6 @@ namespace Yttrium
 				_on_enter.run(_gui);
 				return true;
 
-			case Key::Mouse1:
-				_cursor_mark = std::chrono::steady_clock::now();
-				return true;
-
 			default:
 				if (_logic.process_key(event))
 				{
@@ -72,5 +68,13 @@ namespace Yttrium
 			}
 		}
 		return false;
+	}
+
+	bool InputWidget::process_mouse_press(Key key, const Vector2&)
+	{
+		if (key != Key::Mouse1)
+			return false;
+		_cursor_mark = std::chrono::steady_clock::now();
+		return true;
 	}
 }

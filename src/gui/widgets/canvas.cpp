@@ -16,6 +16,11 @@ namespace Yttrium
 
 	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
-		_gui.draw_canvas(renderer, _id, rect);
+		_gui.on_canvas_draw(_id, rect, renderer);
+	}
+
+	bool CanvasWidget::process_mouse_press(Key key, const Vector2& cursor)
+	{
+		return _gui.on_canvas_mouse_press(_id, render_rect(), key, cursor);
 	}
 }

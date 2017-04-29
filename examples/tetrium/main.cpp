@@ -48,7 +48,7 @@ namespace
 	public:
 		FieldCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
 
-		void on_draw(Renderer&, const RectF& rect) override
+		void on_draw(const RectF& rect, Renderer&) override
 		{
 			_graphics.draw_field(rect, _logic.field(), _logic.current_figure());
 		}
@@ -63,7 +63,7 @@ namespace
 	public:
 		NextFigureCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
 
-		void on_draw(Renderer&, const RectF& rect) override
+		void on_draw(const RectF& rect, Renderer&) override
 		{
 			_graphics.draw_next_figure(rect, _logic.next_figure());
 		}

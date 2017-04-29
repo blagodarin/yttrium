@@ -13,6 +13,7 @@ namespace Yttrium
 		CanvasWidget(GuiPrivate&, GuiPropertyLoader&);
 
 		void draw(Renderer&, const RectF&, WidgetState) const override;
+		bool process_mouse_press(Key, const Vector2&) override;
 
 	private:
 		std::string _id;

@@ -13,9 +13,7 @@
 namespace Yttrium
 {
 	GuiScreen::GuiScreen(GuiPrivate& gui, const std::string& name, bool is_transparent)
-		: _gui(gui)
-		, _name(name)
-		, _is_transparent(is_transparent)
+		: _gui{gui}, _name{name}, _is_transparent{is_transparent}
 	{
 	}
 
@@ -32,9 +30,15 @@ namespace Yttrium
 		const RectF rect{{}, SizeF{renderer.window_size()}};
 		for (const auto& layout : _layouts)
 			layout->update(rect);
-		_mouse_widget = cursor ? widget_at(*cursor) : nullptr;
+		if (cursor)
+		{
+			_mouse_point = *cursor;
+			_hover_widget = widget_at(_mouse_point);
+		}
+		else
+			_hover_widget = nullptr;
 		for (const auto& layout : _layouts)
-			layout->draw(renderer, _mouse_widget, _left_click_widget);
+			layout->draw(renderer, _hover_widget, _click_widget);
 		if (cursor)
 		{
 			switch (_cursor)
@@ -80,7 +84,7 @@ namespace Yttrium
 	bool GuiScreen::handle_key(const KeyEvent& event)
 	{
 		if (event.pressed && event.key >= Key::Mouse1 && event.key <= Key::Mouse5
-			&& _focus_widget && _focus_widget != _mouse_widget)
+			&& _focus_widget && _focus_widget != _hover_widget)
 		{
 			_focus_widget->set_focused(false);
 			_focus_widget = nullptr;
@@ -88,32 +92,39 @@ namespace Yttrium
 
 		bool processed = false;
 
-		if (event.key == Key::Mouse1)
+		if (event.key == Key::Mouse1 || event.key == Key::Mouse2 || event.key == Key::Mouse3 || event.key == Key::Mouse4 || event.key == Key::Mouse5)
 		{
-			if (_mouse_widget)
+			if (event.pressed)
 			{
-				if (event.pressed)
+				if (_click_widget)
+					_click_widget->process_mouse_release();
+				if (_hover_widget)
 				{
-					processed = _mouse_widget->process_key(event);
+					processed = _hover_widget->process_mouse_press(event.key, _mouse_point);
 					if (processed)
 					{
-						_left_click_widget = _mouse_widget;
-						if (_mouse_widget->flags() & Widget::Flag::CanHaveFocus && _mouse_widget != _focus_widget)
+						_click_widget = _hover_widget;
+						_click_key = event.key;
+						if (_hover_widget->flags() & Widget::Flag::CanHaveFocus && _hover_widget != _focus_widget)
 						{
 							assert(!_focus_widget);
-							_focus_widget = _mouse_widget;
+							_focus_widget = _hover_widget;
 							_focus_widget->set_focused(true);
 						}
 					}
 				}
-				else if (_mouse_widget == _left_click_widget)
+			}
+			else if (_click_widget)
+			{
+				processed = true;
+				if (event.key == _click_key)
 				{
-					processed = _mouse_widget->process_key(event);
+					if (_hover_widget == _click_widget)
+						_click_widget->process_mouse_release();
+					_click_widget = nullptr;
+					_click_key = Key::Null;
 				}
 			}
-
-			if (!event.pressed)
-				_left_click_widget = nullptr;
 		}
 		else if (_focus_widget)
 		{

@@ -15,7 +15,8 @@ namespace Yttrium
 		ButtonWidget(GuiPrivate&, GuiPropertyLoader&);
 
 		void draw(Renderer&, const RectF&, WidgetState) const override;
-		bool process_key(const KeyEvent&) override;
+		bool process_mouse_press(Key, const Vector2&) override;
+		void process_mouse_release() override;
 
 	private:
 		struct Style

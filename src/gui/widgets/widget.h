@@ -29,8 +29,10 @@ namespace Yttrium
 		void set_focused(bool focused) { _is_focused = focused; }
 		void set_render_rect(const RectF& rect) { _render_rect = rect; }
 
-		virtual bool process_key(const KeyEvent&);
 		virtual void draw(Renderer&, const RectF&, WidgetState) const = 0;
+		virtual bool process_key(const KeyEvent&) { return false; }
+		virtual bool process_mouse_press(Key, const Vector2&) { return false; }
+		virtual void process_mouse_release() {}
 
 	protected:
 		explicit Widget(GuiPrivate&, Flags<Flag> = {});

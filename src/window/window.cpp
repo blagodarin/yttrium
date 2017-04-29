@@ -84,20 +84,20 @@ namespace Yttrium
 
 		void on_key_event(Key key, bool is_pressed) override
 		{
-			bool& was_pressed = _keys[static_cast<KeyType>(key)];
+			bool& was_pressed = _keys[to_underlying(key)];
 
 			KeyEvent event(key, is_pressed, is_pressed && was_pressed);
 
 			if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
 				was_pressed = is_pressed;
 
-			if (_keys[static_cast<KeyType>(Key::LShift)] || _keys[static_cast<KeyType>(Key::RShift)])
+			if (_keys[to_underlying(Key::LShift)] || _keys[to_underlying(Key::RShift)])
 				event.modifiers |= KeyEvent::Modifier::Shift;
 
-			if (_keys[static_cast<KeyType>(Key::LControl)] || _keys[static_cast<KeyType>(Key::RControl)])
+			if (_keys[to_underlying(Key::LControl)] || _keys[to_underlying(Key::RControl)])
 				event.modifiers |= KeyEvent::Modifier::Control;
 
-			if (_keys[static_cast<KeyType>(Key::LAlt)] || _keys[static_cast<KeyType>(Key::RAlt)])
+			if (_keys[to_underlying(Key::LAlt)] || _keys[to_underlying(Key::RAlt)])
 				event.modifiers |= KeyEvent::Modifier::Alt;
 
 			if (_on_key_event)

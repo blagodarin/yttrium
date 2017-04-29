@@ -8,6 +8,7 @@
 
 namespace Yttrium
 {
+	enum class Key;
 	class KeyEvent;
 	class Music;
 	class RectF;
@@ -21,7 +22,8 @@ namespace Yttrium
 	{
 	public:
 		virtual ~Canvas() = default;
-		virtual void on_draw(Renderer&, const RectF&) {}
+		virtual void on_draw(const RectF&, Renderer&) {}
+		virtual bool on_mouse_press(const RectF&, Key, const Vector2&) { return false; }
 	};
 
 	class Y_API Gui

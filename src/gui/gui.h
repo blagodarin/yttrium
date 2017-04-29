@@ -40,9 +40,10 @@ namespace Yttrium
 		~GuiPrivate();
 
 		GuiScreen& add_screen(const std::string& name, bool is_transparent, bool is_root);
-		void draw_canvas(Renderer&, const std::string& name, const RectF&) const;
 		void draw_custom_cursor(Renderer& renderer, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
+		void on_canvas_draw(const std::string& name, const RectF&, Renderer&) const;
+		bool on_canvas_mouse_press(const std::string& name, const RectF&, Key, const Vector2&);
 		bool pop_screen();
 		bool pop_screens_until(const std::string& name);
 		bool push_screen(const std::string& name);

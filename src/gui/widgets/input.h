@@ -17,6 +17,7 @@ namespace Yttrium
 
 		void draw(Renderer&, const RectF&, WidgetState) const override;
 		bool process_key(const KeyEvent&) override;
+		bool process_mouse_press(Key, const Vector2&) override;
 
 	private:
 		BackgroundProperty _background;

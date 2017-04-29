@@ -8,15 +8,10 @@
 #include <yttrium/flags.h>
 #include <yttrium/utils.h>
 
-#include <cstdint>
-
 namespace Yttrium
 {
-	/// Underlying Key type.
-	typedef uint_fast8_t KeyType;
-
 	/// Input key.
-	enum class Key : KeyType
+	enum class Key
 	{
 		// Null key (0x00):
 
