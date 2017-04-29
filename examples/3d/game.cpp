@@ -12,8 +12,40 @@
 
 #include <cmath>
 
+class MinimapCanvas : public Canvas
+{
+public:
+	MinimapCanvas(const Vector3& position, const boost::optional<Quad>& visibility_quad)
+		: _position{position}, _visibility_quad{visibility_quad} {}
+
+	void on_draw(Renderer& renderer, const RectF& rect) override
+	{
+		const auto map = [&rect](const Vector2& v)
+		{
+			return Vector2
+			{
+				rect.left() + rect.width() * (v.x + 64) / 128,
+				rect.top() + rect.height() * (64 - v.y) / 128,
+			};
+		};
+
+		PushTexture push_texture{renderer, nullptr};
+		renderer.draw_rect(rect, {1, 1, 1, 0.25});
+		if (_visibility_quad)
+			renderer.draw_quad({map(_visibility_quad->_a), map(_visibility_quad->_b), map(_visibility_quad->_c), map(_visibility_quad->_d)}, {1, 1, 0, 0.25});
+
+		const auto camera = map({_position.x, _position.y});
+		renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
+	}
+
+private:
+	const Vector3& _position;
+	const boost::optional<Quad>& _visibility_quad;
+};
+
 Game::Game(const Storage& storage)
 	: _storage{storage}
+	, _minimap_canvas{std::make_unique<MinimapCanvas>(_position, _visibility_quad)}
 {
 	_script.define("debug", [this](const ScriptCall&){ _debug_text_visible = !_debug_text_visible; });
 	_script.define("screenshot", [this](const ScriptCall&){ _window.take_screenshot(); });
@@ -33,35 +65,17 @@ Game::Game(const Storage& storage)
 	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });
 
-	_gui.on_canvas("minimap", [this](Renderer& renderer, const RectF& rect){ draw_minimap(renderer, rect); });
+	_gui.bind_canvas("minimap", *_minimap_canvas);
 	_gui.on_quit([this]{ _window.close(); });
 }
+
+Game::~Game() = default;
 
 void Game::run()
 {
 	_gui.start();
 	_window.show();
 	_window.run();
-}
-
-void Game::draw_minimap(Renderer& renderer, const RectF& rect)
-{
-	const auto map = [&rect](const Vector2& v)
-	{
-		return Vector2
-		{
-			rect.left() + rect.width() * (v.x + 64) / 128,
-			rect.top() + rect.height() * (64 - v.y) / 128,
-		};
-	};
-
-	PushTexture push_texture{renderer, nullptr};
-	renderer.draw_rect(rect, {1, 1, 1, 0.25});
-	if (_visibility_quad)
-		renderer.draw_quad({map(_visibility_quad->_a), map(_visibility_quad->_b), map(_visibility_quad->_c), map(_visibility_quad->_d)}, {1, 1, 0, 0.25});
-
-	const auto camera = map({_position.x, _position.y});
-	renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
 }
 
 void Game::draw_scene(Renderer& renderer, const Vector2& cursor)

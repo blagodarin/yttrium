@@ -44,9 +44,9 @@ namespace Yttrium
 
 	void GuiPrivate::draw_canvas(Renderer& renderer, const std::string& name, const RectF& rect) const
 	{
-		const auto i = _on_canvas.find(name);
-		if (i != _on_canvas.end())
-			i->second(renderer, rect);
+		const auto i = _canvases.find(name);
+		if (i != _canvases.end())
+			i->second->on_draw(renderer, rect);
 	}
 
 	void GuiPrivate::set_translation(const StaticString& path)
@@ -149,6 +149,11 @@ namespace Yttrium
 
 	Gui::~Gui() = default;
 
+	void Gui::bind_canvas(const std::string& name, Canvas& canvas)
+	{
+		_private->_canvases[name] = &canvas;
+	}
+
 	void Gui::draw(Renderer& renderer, const Vector2& cursor) const
 	{
 		if (_private->_screen_stack.empty())
@@ -168,11 +173,6 @@ namespace Yttrium
 	{
 		if (!_private->_screen_stack.empty())
 			_private->_screen_stack.back()->handle_event(event.to_std());
-	}
-
-	void Gui::on_canvas(const std::string& name, const std::function<void(Renderer&, const RectF&)>& callback)
-	{
-		_private->_on_canvas[name] = callback;
 	}
 
 	void Gui::on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>& callback)

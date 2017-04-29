@@ -13,6 +13,7 @@
 
 namespace Yttrium
 {
+	class Canvas;
 	class Gui;
 	class GuiScreen;
 	class Music;
@@ -69,7 +70,7 @@ namespace Yttrium
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
-		std::unordered_map<std::string, std::function<void(Renderer&, const RectF&)>> _on_canvas;
+		std::unordered_map<std::string, Canvas*> _canvases;
 		std::function<void(Renderer&, const Vector2&)> _on_custom_cursor;
 		std::function<void(const std::shared_ptr<const Music>&)> _on_music;
 		std::function<void()> _on_quit;

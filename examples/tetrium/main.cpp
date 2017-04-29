@@ -42,11 +42,41 @@ namespace
 					0xff);
 		}));
 	}
+
+	class FieldCanvas : public Canvas
+	{
+	public:
+		FieldCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
+
+		void on_draw(Renderer&, const RectF& rect) override
+		{
+			_graphics.draw_field(rect, _logic.field(), _logic.current_figure());
+		}
+
+	private:
+		const Tetrium::Game& _logic;
+		const TetriumGraphics& _graphics;
+	};
+
+	class NextFigureCanvas : public Canvas
+	{
+	public:
+		NextFigureCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
+
+		void on_draw(Renderer&, const RectF& rect) override
+		{
+			_graphics.draw_next_figure(rect, _logic.next_figure());
+		}
+
+	private:
+		const Tetrium::Game& _logic;
+		const TetriumGraphics& _graphics;
+	};
 }
 
 int main(int, char**)
 {
-	Window window{ "Tetrium" };
+	Window window{"Tetrium"};
 
 	ScriptContext script;
 
@@ -62,17 +92,18 @@ int main(int, char**)
 	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });
 
-	TetriumStatistics statistics{ script };
+	TetriumStatistics statistics{script};
 	script.define("set_score", 2, [&logic, &statistics](const ScriptCall& call){ statistics.update(call.args[1]->to_int(), call.args[0]->string()); });
 
-	Storage storage{ Storage::UseFileSystem::Never };
+	Storage storage{Storage::UseFileSystem::Never};
 	storage.attach_package("tetrium.ypq");
 	::make_buttons_texture(storage, "examples/tetrium/data/buttons.tga");
 	::make_cursor_texture(storage, "examples/tetrium/data/cursor.tga");
 
 	AudioManager audio;
-	ResourceLoader resource_loader{ storage, &window.renderer(), &audio };
-	Gui gui{ resource_loader, script, "examples/tetrium/data/gui.ion" };
+	ResourceLoader resource_loader{storage, &window.renderer(), &audio};
+	Gui gui{resource_loader, script, "examples/tetrium/data/gui.ion"};
+	gui.on_quit([&window]{ window.close(); });
 
 	window.on_key_event([&gui](const KeyEvent& event){ gui.process_key_event(event); });
 	window.on_render([&gui](Renderer& renderer, const Vector2& cursor){ gui.draw(renderer, cursor); });
@@ -89,13 +120,16 @@ int main(int, char**)
 		}
 	});
 
-	TetriumGraphics graphics{ window.renderer() };
-	AudioPlayer audio_player{ audio, AudioPlayer::State::Playing };
+	TetriumGraphics graphics{window.renderer()};
 
-	gui.on_canvas("field", [&logic, &graphics](Renderer&, const RectF& rect){ graphics.draw_field(rect, logic.field(), logic.current_figure()); });
-	gui.on_canvas("next", [&logic, &graphics](Renderer&, const RectF& rect){ graphics.draw_next_figure(rect, logic.next_figure()); });
+	FieldCanvas field_canvas{logic, graphics};
+	gui.bind_canvas("field", field_canvas);
+
+	NextFigureCanvas next_figure_canvas{logic, graphics};
+	gui.bind_canvas("next", next_figure_canvas);
+
+	AudioPlayer audio_player{audio, AudioPlayer::State::Playing};
 	gui.on_music([&audio_player](const std::shared_ptr<const Music>& music){ audio_player.set_music(music); });
-	gui.on_quit([&window]{ window.close(); });
 
 	gui.start();
 	window.show();

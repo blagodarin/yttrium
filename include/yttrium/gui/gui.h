@@ -17,15 +17,22 @@ namespace Yttrium
 	class StaticString;
 	class Vector2;
 
+	class Y_API Canvas
+	{
+	public:
+		virtual ~Canvas() = default;
+		virtual void on_draw(Renderer&, const RectF&) {}
+	};
+
 	class Y_API Gui
 	{
 	public:
 		Gui(ResourceLoader&, ScriptContext&, const StaticString& name);
 		~Gui();
 
+		void bind_canvas(const std::string& name, Canvas&);
 		void draw(Renderer&, const Vector2& cursor) const;
 		void notify(const StaticString& event);
-		void on_canvas(const std::string& name, const std::function<void(Renderer&, const RectF&)>&);
 		void on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>&);
 		void on_music(const std::function<void(const std::shared_ptr<const Music>&)>&);
 		void on_quit(const std::function<void()>&);

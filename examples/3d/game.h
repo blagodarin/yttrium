@@ -18,10 +18,13 @@
 
 using namespace Yttrium;
 
+class MinimapCanvas;
+
 class Game
 {
 public:
 	explicit Game(const Storage&);
+	~Game();
 
 	void run();
 
@@ -48,6 +51,8 @@ private:
 	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
 	boost::optional<Point> _board_point;
 	boost::optional<Quad> _visibility_quad;
+
+	std::unique_ptr<MinimapCanvas> _minimap_canvas;
 };
 
 #endif
