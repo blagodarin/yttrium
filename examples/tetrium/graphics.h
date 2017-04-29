@@ -22,15 +22,14 @@ class TetriumGraphics
 public:
 	explicit TetriumGraphics(Renderer&);
 
-	void draw(const std::string& canvas, const RectF&, const Tetrium::Game&) const;
+	void draw_field(const RectF&, const Tetrium::Field&, const Tetrium::Figure&) const;
+	void draw_next_figure(const RectF&, const Tetrium::Figure&) const;
 
 private:
 	void draw_block(const RectF&, const SizeF& block_size, float x, float y) const;
-	void draw_field(const RectF&, const Tetrium::Field&, const Tetrium::Figure&) const;
 	void draw_field_blocks(const RectF&, const SizeF& block_size, const Tetrium::Field&) const;
 	void draw_field_figure(const RectF&, const SizeF& block_size, const Tetrium::Figure&) const;
 	void draw_field_frame(const RectF&, const SizeF& block_size) const;
-	void draw_next_figure(const RectF&, const Tetrium::Figure&) const;
 	void set_texture_rect(Tetrium::Figure::Type) const;
 
 private:

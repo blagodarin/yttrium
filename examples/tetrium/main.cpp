@@ -92,7 +92,8 @@ int main(int, char**)
 	TetriumGraphics graphics{ window.renderer() };
 	AudioPlayer audio_player{ audio, AudioPlayer::State::Playing };
 
-	gui.on_canvas([&logic, &graphics](Renderer&, const std::string& canvas, const RectF& rect){ graphics.draw(canvas, rect, logic); });
+	gui.on_canvas("field", [&logic, &graphics](Renderer&, const RectF& rect){ graphics.draw_field(rect, logic.field(), logic.current_figure()); });
+	gui.on_canvas("next", [&logic, &graphics](Renderer&, const RectF& rect){ graphics.draw_next_figure(rect, logic.next_figure()); });
 	gui.on_music([&audio_player](const std::shared_ptr<const Music>& music){ audio_player.set_music(music); });
 	gui.on_quit([&window]{ window.close(); });
 

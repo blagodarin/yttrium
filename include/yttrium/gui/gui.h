@@ -34,7 +34,7 @@ namespace Yttrium
 		void notify(const StaticString& event);
 
 		///
-		void on_canvas(const std::function<void(Renderer&, const std::string&, const RectF&)>&);
+		void on_canvas(const std::string& name, const std::function<void(Renderer&, const RectF&)>&);
 
 		///
 		void on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>&);

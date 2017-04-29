@@ -39,7 +39,7 @@ namespace Yttrium
 		~GuiPrivate();
 
 		GuiScreen& add_screen(const std::string& name, bool is_transparent, bool is_root);
-		void draw_canvas(Renderer& renderer, const std::string& name, const RectF& rect) const { if (_on_canvas) _on_canvas(renderer, name, rect); }
+		void draw_canvas(Renderer&, const std::string& name, const RectF&) const;
 		void draw_custom_cursor(Renderer& renderer, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
 		bool pop_screen();
@@ -69,7 +69,7 @@ namespace Yttrium
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
-		std::function<void(Renderer&, const std::string&, const RectF&)> _on_canvas;
+		std::unordered_map<std::string, std::function<void(Renderer&, const RectF&)>> _on_canvas;
 		std::function<void(Renderer&, const Vector2&)> _on_custom_cursor;
 		std::function<void(const std::shared_ptr<const Music>&)> _on_music;
 		std::function<void()> _on_quit;

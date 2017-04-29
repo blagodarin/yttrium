@@ -33,11 +33,7 @@ Game::Game(const Storage& storage)
 	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });
 
-	_gui.on_canvas([this](Renderer& renderer, const std::string& canvas, const RectF& rect)
-	{
-		if (canvas == "minimap")
-			draw_minimap(renderer, rect);
-	});
+	_gui.on_canvas("minimap", [this](Renderer& renderer, const RectF& rect){ draw_minimap(renderer, rect); });
 	_gui.on_quit([this]{ _window.close(); });
 }
 

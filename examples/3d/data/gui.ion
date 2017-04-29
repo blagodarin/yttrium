@@ -9,6 +9,6 @@ root screen "main"
 	{
 		size "16" "9"
 
-		canvas { id "minimap" position "13.75" "6.75" "2" "2" }
+		canvas { id "minimap" position "13.75" "6.75" "2" "2" } # TODO: canvas "minimap".
 	}
 }

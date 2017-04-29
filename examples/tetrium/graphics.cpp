@@ -109,25 +109,17 @@ namespace
 }
 
 TetriumGraphics::TetriumGraphics(Renderer& renderer)
-	: _renderer(renderer)
-	, _blocks_texture(_renderer.create_texture_2d(::make_blocks_image()))
+	: _renderer{renderer}
+	, _blocks_texture{_renderer.create_texture_2d(::make_blocks_image())}
 {
-}
-
-void TetriumGraphics::draw(const std::string& canvas, const RectF& rect, const Tetrium::Game& logic) const
-{
-	if (canvas == "field")
-		draw_field(rect, logic.field(), logic.current_figure());
-	else if (canvas == "next")
-		draw_next_figure(rect, logic.next_figure());
 }
 
 void TetriumGraphics::draw_field(const RectF& rect, const Tetrium::Field& field, const Tetrium::Figure& current_figure) const
 {
 	static const int total_width = 1 + Tetrium::Field::Width + 1;
 	static const int total_height = 1 + Tetrium::Field::Height + 1;
-	const SizeF block_size(rect.width() / total_width, rect.height() / total_height);
-	PushTexture push_texture(_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter);
+	const SizeF block_size{rect.width() / total_width, rect.height() / total_height};
+	PushTexture push_texture{_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter};
 	draw_field_blocks(rect, block_size, field);
 	draw_field_figure(rect, block_size, current_figure);
 	draw_field_frame(rect, block_size);
@@ -137,7 +129,7 @@ void TetriumGraphics::draw_next_figure(const RectF& rect, const Tetrium::Figure&
 {
 	if (figure.type() == Tetrium::Figure::None)
 		return;
-	PushTexture push_texture(_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter);
+	PushTexture push_texture{_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter};
 	set_texture_rect(figure.type());
 	const SizeF block_size{rect.width() / 4, rect.height() / 2};
 	for (const auto& block : figure.blocks())
@@ -166,7 +158,7 @@ void TetriumGraphics::draw_field_blocks(const RectF& rect, const SizeF& block_si
 
 void TetriumGraphics::draw_field_figure(const RectF& rect, const SizeF& block_size, const Tetrium::Figure& figure) const
 {
-	static const Vector2 frame_offset(1, Tetrium::Field::Height);
+	static const Vector2 frame_offset{1, Tetrium::Field::Height};
 	if (figure.type() == Tetrium::Figure::None)
 		return;
 	set_texture_rect(figure.type());
