@@ -41,22 +41,22 @@ namespace Yttrium
 				if (!capture)
 					return;
 
-				if (capture->cursor_pos == index)
+				if (capture->_cursor_pos == index)
 				{
-					capture->cursor_rect = {{current_x, current_y + font_size * 0.125f}, SizeF(2, font_size * 0.75f)};
-					capture->has_cursor = true;
+					capture->_cursor_rect = {{current_x, current_y + font_size * 0.125f}, SizeF(2, font_size * 0.75f)};
+					capture->_has_cursor = true;
 				}
 
-				if (capture->selection_begin < capture->selection_end)
+				if (capture->_selection_begin < capture->_selection_end)
 				{
-					if (index == capture->selection_begin)
+					if (index == capture->_selection_begin)
 					{
 						selection_left = current_x;
 					}
-					else if (index == capture->selection_end)
+					else if (index == capture->_selection_end)
 					{
-						capture->selection_rect = {{selection_left, current_y}, Vector2{current_x, current_y + font_size}};
-						capture->has_selection = true;
+						capture->_selection_rect = {{selection_left, current_y}, Vector2{current_x, current_y + font_size}};
+						capture->_has_selection = true;
 					}
 				}
 			};

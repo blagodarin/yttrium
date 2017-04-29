@@ -12,11 +12,10 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-		explicit ButtonWidget(GuiPrivate& gui) : Widget{gui} {}
+		ButtonWidget(GuiPrivate&, GuiPropertyLoader&);
 
-		bool load(GuiPropertyLoader&) override;
+		void draw(Renderer&, const RectF&, WidgetState) const override;
 		bool process_key(const KeyEvent&) override;
-		void render(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
 		struct Style

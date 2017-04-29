@@ -27,6 +27,34 @@ namespace Yttrium
 		return *_layouts.back();
 	}
 
+	void GuiScreen::draw(Renderer& renderer, const Vector2* cursor)
+	{
+		const RectF rect{{}, SizeF{renderer.window_size()}};
+		for (const auto& layout : _layouts)
+			layout->update(rect);
+		_mouse_widget = cursor ? widget_at(*cursor) : nullptr;
+		for (const auto& layout : _layouts)
+			layout->draw(renderer, _mouse_widget, _left_click_widget);
+		if (cursor)
+		{
+			switch (_cursor)
+			{
+			case GuiCursor::Custom:
+				_gui.draw_custom_cursor(renderer, *cursor);
+				break;
+			case GuiCursor::Texture:
+				{
+					PushTexture push_texture{renderer, _cursor_texture.get(), Texture2D::TrilinearFilter};
+					renderer.set_texture_rect({{}, SizeF{_cursor_texture->size()}}, {});
+					renderer.draw_rect({*cursor, SizeF{_cursor_texture->size()}});
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
 	void GuiScreen::handle_enter()
 	{
 		_on_enter.run(_gui);
@@ -116,34 +144,6 @@ namespace Yttrium
 	void GuiScreen::register_widget(Widget& widget)
 	{
 		_widgets.emplace_back(&widget);
-	}
-
-	void GuiScreen::render(Renderer& renderer, const Vector2* cursor)
-	{
-		const RectF rect({}, SizeF(renderer.window_size()));
-		for (const auto& layout : _layouts)
-			layout->update(rect);
-		_mouse_widget = cursor ? widget_at(*cursor) : nullptr;
-		for (const auto& layout : _layouts)
-			layout->render(renderer, _mouse_widget, _left_click_widget);
-		if (cursor)
-		{
-			switch (_cursor)
-			{
-			case GuiCursor::Custom:
-				_gui.draw_custom_cursor(renderer, *cursor);
-				break;
-			case GuiCursor::Texture:
-				{
-					PushTexture push_texture(renderer, _cursor_texture.get(), Texture2D::TrilinearFilter);
-					renderer.set_texture_rect({ {}, SizeF{ _cursor_texture->size() } }, {});
-					renderer.draw_rect({ *cursor, SizeF{ _cursor_texture->size() } });
-				}
-				break;
-			default:
-				break;
-			}
-		}
 	}
 
 	void GuiScreen::set_cursor(GuiCursor cursor, const StaticString& texture)

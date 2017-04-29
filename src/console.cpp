@@ -27,6 +27,31 @@ namespace Yttrium
 
 	Console::~Console() = default;
 
+	void Console::draw(Renderer& renderer) const
+	{
+		if (!_private->_visible)
+			return;
+
+		DebugRenderer debug{static_cast<RendererImpl&>(renderer)};
+
+		const auto max_width = debug.max_width();
+
+		debug.set_color(0, 0, 0, 0.5);
+		debug.draw_rectangle(0, 0, max_width + 1, 1);
+
+		if (_private->_line_editor.selection_size())
+		{
+			debug.set_color(1.0, 1.0, 1.0, 0.5);
+			debug.draw_rectangle(_private->_line_editor.selection_offset(), 0, _private->_line_editor.selection_size(), 1);
+		}
+
+		debug.set_color(1.0, 1.0, 1.0);
+		debug.draw_text(0, 0, StaticString{_private->_line_editor.text()}, max_width);
+
+		debug.set_color(1.0, 0.0, 0.0);
+		debug.draw_cursor(_private->_line_editor.cursor(), 0);
+	}
+
 	bool Console::is_visible() const
 	{
 		return _private->_visible;
@@ -52,31 +77,6 @@ namespace Yttrium
 			}
 		}
 		return false;
-	}
-
-	void Console::render(Renderer& renderer) const
-	{
-		if (!_private->_visible)
-			return;
-
-		DebugRenderer debug{static_cast<RendererImpl&>(renderer)};
-
-		const auto max_width = debug.max_width();
-
-		debug.set_color(0, 0, 0, 0.5);
-		debug.draw_rectangle(0, 0, max_width + 1, 1);
-
-		if (_private->_line_editor.selection_size())
-		{
-			debug.set_color(1.0, 1.0, 1.0, 0.5);
-			debug.draw_rectangle(_private->_line_editor.selection_offset(), 0, _private->_line_editor.selection_size(), 1);
-		}
-
-		debug.set_color(1.0, 1.0, 1.0);
-		debug.draw_text(0, 0, StaticString{_private->_line_editor.text()}, max_width);
-
-		debug.set_color(1.0, 0.0, 0.0);
-		debug.draw_cursor(_private->_line_editor.cursor(), 0);
 	}
 
 	void Console::set_visible(bool visible)

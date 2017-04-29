@@ -31,8 +31,8 @@ namespace Yttrium
 
 		Widget& add_widget(const StaticString& type, GuiPropertyLoader&);
 
+		void draw(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;
 		void update(const RectF&);
-		void render(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;
 
 	private:
 		GuiPrivate& _gui;

@@ -5,14 +5,14 @@
 
 namespace Yttrium
 {
-	bool ImageWidget::load(GuiPropertyLoader& loader)
+	ImageWidget::ImageWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
+		: Widget{gui}
 	{
 		loader.load_rect("position"_s, _rect);
 		_background.load(loader);
-		return true;
 	}
 
-	void ImageWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const
+	void ImageWidget::draw(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
 		_background.draw(renderer, rect);
 	}

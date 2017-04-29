@@ -149,6 +149,21 @@ namespace Yttrium
 
 	Gui::~Gui() = default;
 
+	void Gui::draw(Renderer& renderer, const Vector2& cursor) const
+	{
+		if (_private->_screen_stack.empty())
+			return;
+		const auto top_screen = std::prev(_private->_screen_stack.end());
+		{
+			auto screen = top_screen;
+			while (screen != _private->_screen_stack.begin() && (*screen)->is_transparent())
+				--screen;
+			while (screen != top_screen)
+				(*screen++)->draw(renderer, nullptr);
+		}
+		(*top_screen)->draw(renderer, &cursor);
+	}
+
 	void Gui::notify(const StaticString& event)
 	{
 		if (!_private->_screen_stack.empty())
@@ -189,21 +204,6 @@ namespace Yttrium
 			}
 		}
 		return false;
-	}
-
-	void Gui::render(Renderer& renderer, const Vector2& cursor) const
-	{
-		if (_private->_screen_stack.empty())
-			return;
-		const auto top_screen = std::prev(_private->_screen_stack.end());
-		{
-			auto screen = top_screen;
-			while (screen != _private->_screen_stack.begin() && (*screen)->is_transparent())
-				--screen;
-			while (screen != top_screen)
-				(*screen++)->render(renderer, nullptr);
-		}
-		(*top_screen)->render(renderer, &cursor);
 	}
 
 	void Gui::start()

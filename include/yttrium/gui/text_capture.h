@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_gui_text_capture_h_
 #define _include_yttrium_gui_text_capture_h_
 
@@ -8,25 +5,20 @@
 
 namespace Yttrium
 {
-	///
 	class TextCapture
 	{
 	public:
-		const std::size_t cursor_pos;
-		bool              has_cursor = false;
-		RectF             cursor_rect;
+		const std::size_t _cursor_pos;
+		bool              _has_cursor = false;
+		RectF             _cursor_rect;
 
-		const std::size_t selection_begin;
-		const std::size_t selection_end;
-		bool              has_selection = false;
-		RectF             selection_rect;
+		const std::size_t _selection_begin;
+		const std::size_t _selection_end;
+		bool              _has_selection = false;
+		RectF             _selection_rect;
 
-		TextCapture(std::size_t cursor_pos_, std::size_t selection_begin_, std::size_t selection_size_)
-			: cursor_pos(cursor_pos_)
-			, selection_begin(selection_begin_)
-			, selection_end(selection_begin + selection_size_)
-		{
-		}
+		constexpr TextCapture(std::size_t cursor_pos, std::size_t selection_begin, std::size_t selection_size) noexcept
+			: _cursor_pos{cursor_pos}, _selection_begin{selection_begin}, _selection_end{_selection_begin + selection_size} {}
 	};
 }
 

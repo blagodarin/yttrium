@@ -1,19 +1,19 @@
 #include "button.h"
 
 #include <yttrium/audio/sound.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/static_string.h>
 #include "../property_loader.h"
 
 namespace Yttrium
 {
-	constexpr auto ButtonTextSize = 0.875f;
-
-	bool ButtonWidget::load(GuiPropertyLoader& loader)
+	ButtonWidget::ButtonWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
+		: Widget{gui}
 	{
 		if (!loader.load_rect("position"_s, _rect)
 			|| !_foreground.load(loader))
-			return false;
+			throw GuiDataError{"Bad 'button'"_s};
 
 		loader.load_translatable("text"_s, _text);
 
@@ -59,9 +59,17 @@ namespace Yttrium
 
 		loader.unbind();
 
-		_on_click = loader.load_actions("on_click"_s);;
+		_on_click = loader.load_actions("on_click"_s);
+	}
 
-		return true;
+	void ButtonWidget::draw(Renderer& renderer, const RectF& rect, WidgetState state) const
+	{
+		if (_state != WidgetState::NotSet)
+			state = _state;
+		_styles[WidgetStateType(state)].background.draw(renderer, rect);
+		_foreground.color = _styles[WidgetStateType(state)].text_color;
+		_foreground.prepare(_text, rect);
+		_foreground.draw(renderer);
 	}
 
 	bool ButtonWidget::process_key(const KeyEvent& event)
@@ -79,15 +87,5 @@ namespace Yttrium
 			_sound->play();
 		_on_click.run(_gui);
 		return true;
-	}
-
-	void ButtonWidget::render(Renderer& renderer, const RectF& rect, WidgetState state) const
-	{
-		if (_state != WidgetState::NotSet)
-			state = _state;
-		_styles[WidgetStateType(state)].background.draw(renderer, rect);
-		_foreground.color = _styles[WidgetStateType(state)].text_color;
-		_foreground.prepare(_text, rect);
-		_foreground.draw(renderer);
 	}
 }

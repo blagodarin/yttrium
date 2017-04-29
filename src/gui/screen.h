@@ -29,6 +29,7 @@ namespace Yttrium
 		~GuiScreen();
 
 		GuiLayout& add_layout(GuiLayout::Placement);
+		void draw(Renderer&, const Vector2* cursor);
 		void handle_enter();
 		bool handle_event(const std::string&) const;
 		bool handle_key(const KeyEvent&);
@@ -38,7 +39,6 @@ namespace Yttrium
 		std::shared_ptr<const Music> music() const { return *_music; }
 		const std::string& name() const { return _name; }
 		void register_widget(Widget&);
-		void render(Renderer&, const Vector2* cursor);
 		void set_cursor(GuiCursor, const StaticString& texture = {});
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
 		void set_music(const std::shared_ptr<const Music>& music) { _music = music; }

@@ -1,19 +1,20 @@
 #include "canvas.h"
 
+#include <yttrium/exceptions.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
 namespace Yttrium
 {
-	bool CanvasWidget::load(GuiPropertyLoader& loader)
+	CanvasWidget::CanvasWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
+		: Widget{gui}
 	{
 		if (!loader.load_text("id"_s, _id))
-			return false;
+			throw GuiDataError{"Bad 'canvas'"_s};
 		loader.load_rect("position"_s, _rect);
-		return true;
 	}
 
-	void CanvasWidget::render(Renderer& renderer, const RectF& rect, WidgetState) const
+	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetState) const
 	{
 		_gui.draw_canvas(renderer, _id, rect);
 	}

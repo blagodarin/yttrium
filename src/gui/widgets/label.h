@@ -9,10 +9,9 @@ namespace Yttrium
 	class LabelWidget : public Widget
 	{
 	public:
-		explicit LabelWidget(GuiPrivate& gui) : Widget{gui} {}
+		LabelWidget(GuiPrivate&, GuiPropertyLoader&);
 
-		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, WidgetState) const override;
+		void draw(Renderer&, const RectF&, WidgetState) const override;
 
 	private:
 		std::string _text;

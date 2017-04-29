@@ -22,7 +22,7 @@ Game::Game(const Storage& storage)
 	_window.on_render([this](Renderer& renderer, const Vector2& cursor)
 	{
 		draw_scene(renderer, cursor);
-		_gui.render(renderer, cursor);
+		_gui.draw(renderer, cursor);
 		{
 			PushTexture push_texture{renderer, nullptr};
 			renderer.draw_rect(RectF{cursor, SizeF{2, 2}}, {1, 1, 0, 1});

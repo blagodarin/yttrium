@@ -9,10 +9,9 @@ namespace Yttrium
 	class ImageWidget : public Widget
 	{
 	public:
-		explicit ImageWidget(GuiPrivate& gui) : Widget{gui} {}
+		ImageWidget(GuiPrivate&, GuiPropertyLoader&);
 
-		bool load(GuiPropertyLoader&) override;
-		void render(Renderer&, const RectF&, WidgetState) const override;
+		void draw(Renderer& renderer, const RectF& rect, WidgetState) const override;
 
 	private:
 		BackgroundProperty _background;
