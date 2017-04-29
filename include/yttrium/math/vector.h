@@ -72,6 +72,14 @@ namespace Yttrium
 		constexpr auto& operator /=(float s) noexcept { x /= s; y /= s; z /= s; w /= s; return *this; }
 	};
 
+	constexpr bool operator==(const Vector2& a, const Vector2& b) noexcept { return a.x == b.x && a.y == b.y; }
+	constexpr bool operator==(const Vector3& a, const Vector3& b) noexcept { return a.x == b.x && a.y == b.y && a.z == b.z; }
+	constexpr bool operator==(const Vector4& a, const Vector4& b) noexcept { return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w; }
+
+	constexpr bool operator!=(const Vector2& a, const Vector2& b) noexcept { return !(a == b); }
+	constexpr bool operator!=(const Vector3& a, const Vector3& b) noexcept { return !(a == b); }
+	constexpr bool operator!=(const Vector4& a, const Vector4& b) noexcept { return !(a == b); }
+
 	constexpr Vector2 operator+(const Vector2& a, const Vector2& b) noexcept { return {a.x + b.x, a.y + b.y}; }
 	constexpr Vector3 operator+(const Vector3& a, const Vector3& b) noexcept { return {a.x + b.x, a.y + b.y, a.z + b.z}; }
 	constexpr Vector4 operator+(const Vector4& a, const Vector4& b) noexcept { return {a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w}; }

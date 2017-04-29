@@ -43,6 +43,7 @@ namespace Yttrium
 		void draw_custom_cursor(Renderer& renderer, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
 		void on_canvas_draw(const std::string& name, const RectF&, Renderer&) const;
+		void on_canvas_mouse_move(const std::string& name, const RectF&, const Vector2&);
 		bool on_canvas_mouse_press(const std::string& name, const RectF&, Key, const Vector2&);
 		bool pop_screen();
 		bool pop_screens_until(const std::string& name);

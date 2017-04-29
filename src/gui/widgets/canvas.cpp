@@ -19,6 +19,11 @@ namespace Yttrium
 		_gui.on_canvas_draw(_id, rect, renderer);
 	}
 
+	void CanvasWidget::process_mouse_move(const Vector2& cursor)
+	{
+		_gui.on_canvas_mouse_move(_id, render_rect(), cursor);
+	}
+
 	bool CanvasWidget::process_mouse_press(Key key, const Vector2& cursor)
 	{
 		return _gui.on_canvas_mouse_press(_id, render_rect(), key, cursor);

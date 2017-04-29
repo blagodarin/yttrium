@@ -23,6 +23,7 @@ namespace Yttrium
 	public:
 		virtual ~Canvas() = default;
 		virtual void on_draw(const RectF&, Renderer&) {}
+		virtual void on_mouse_move(const RectF&, const Vector2&) {}
 		virtual bool on_mouse_press(const RectF&, Key, const Vector2&) { return false; }
 	};
 

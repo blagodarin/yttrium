@@ -31,6 +31,7 @@ namespace Yttrium
 
 		virtual void draw(Renderer&, const RectF&, WidgetState) const = 0;
 		virtual bool process_key(const KeyEvent&) { return false; }
+		virtual void process_mouse_move(const Vector2&) {}
 		virtual bool process_mouse_press(Key, const Vector2&) { return false; }
 		virtual void process_mouse_release() {}
 

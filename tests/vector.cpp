@@ -2,13 +2,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-namespace
-{
-	bool operator==(const Yttrium::Vector2& a, const Yttrium::Vector2& b) { return a.x == b.x && a.y == b.y; }
-	bool operator==(const Yttrium::Vector3& a, const Yttrium::Vector3& b) { return a.x == b.x && a.y == b.y && a.z == b.z; }
-	bool operator==(const Yttrium::Vector4& a, const Yttrium::Vector4& b) { return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w; }
-}
-
 BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
 {
 	using Yttrium::Vector2;

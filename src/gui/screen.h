@@ -51,16 +51,14 @@ namespace Yttrium
 		Widget* widget_at(const Vector2&) const;
 
 	private:
+		class Activity;
+
 		GuiPrivate& _gui;
 		const std::string _name;
 		const bool _is_transparent;
 		std::vector<std::unique_ptr<GuiLayout>> _layouts;
 		std::vector<Widget*> _widgets;
-		Widget* _hover_widget = nullptr;
-		Vector2 _mouse_point;
-		Widget* _click_widget = nullptr;
-		Key _click_key = Key::Null;
-		Widget* _focus_widget = nullptr;
+		const std::unique_ptr<Activity> _activity;
 		GuiActions _on_enter;
 		std::unordered_map<std::string, GuiActions> _on_event;
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;

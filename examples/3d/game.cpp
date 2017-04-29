@@ -51,13 +51,18 @@ public:
 		renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
 	}
 
-	bool on_mouse_press(const RectF& rect, Key key, const Vector2& cursor)
+	void on_mouse_move(const RectF& rect, const Vector2& cursor) override
 	{
-		if (key != Key::Mouse1)
-			return false;
 		const auto x = (cursor.x - rect.left()) / rect.width() * 128 - 64;
 		const auto y = (rect.top() - cursor.y) / rect.height() * 128 + 64;
 		_position = ::clamp_position({x, y - 10, _position.z});
+	}
+
+	bool on_mouse_press(const RectF& rect, Key key, const Vector2& cursor) override
+	{
+		if (key != Key::Mouse1)
+			return false;
+		on_mouse_move(rect, cursor);
 		return true;
 	}
 

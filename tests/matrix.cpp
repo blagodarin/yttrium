@@ -4,8 +4,7 @@
 
 namespace Yttrium // Anonymous namespace breaks compilation.
 {
-	constexpr bool operator==(const Vector4& a, const Vector4& b) { return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w; }
-	constexpr bool operator==(const Matrix4& a, const Matrix4& b) { return a.x == b.x && a.y == b.y && a.z == b.z && a.t == b.t; }
+	constexpr bool operator==(const Matrix4& a, const Matrix4& b) noexcept { return a.x == b.x && a.y == b.y && a.z == b.z && a.t == b.t; }
 }
 
 using Yttrium::Matrix4;

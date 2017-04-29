@@ -64,6 +64,13 @@ namespace Yttrium
 			i->second->on_draw(rect, renderer);
 	}
 
+	void GuiPrivate::on_canvas_mouse_move(const std::string& name, const RectF& rect, const Vector2& cursor)
+	{
+		const auto i = _canvases.find(name);
+		if (i != _canvases.end())
+			i->second->on_mouse_move(rect, cursor);
+	}
+
 	bool GuiPrivate::on_canvas_mouse_press(const std::string& name, const RectF& rect, Key key, const Vector2& cursor)
 	{
 		const auto i = _canvases.find(name);
