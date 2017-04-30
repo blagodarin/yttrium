@@ -2,11 +2,10 @@
 #define _src_system_gdi_window_h_
 
 #include <yttrium/math/size.h>
+#include <yttrium/std_optional.h>
 #include "wgl.h"
 
 #include <string>
-
-#include <boost/optional/optional.hpp>
 
 namespace Yttrium
 {
@@ -23,7 +22,7 @@ namespace Yttrium
 		bool process_events();
 		bool set_cursor(const Point&);
 		void show();
-		boost::optional<Size> size() const { return _size; }
+		std::optional<Size> size() const { return _size; }
 		void swap_buffers();
 
 	private:
@@ -69,7 +68,7 @@ namespace Yttrium
 		const std::string _name;
 		WindowBackendCallbacks& _callbacks;
 		bool _created = false;
-		boost::optional<Size> _size;
+		std::optional<Size> _size;
 		const HINSTANCE _hinstance = ::GetModuleHandle(nullptr);
 		const WindowClass _wndclass{ _hinstance, reinterpret_cast<WNDPROC>(static_window_proc) };
 		const WindowHandle _hwnd{ _wndclass, _name.c_str(), this };

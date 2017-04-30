@@ -26,10 +26,10 @@ namespace
 
 namespace Yttrium
 {
-	boost::optional<ImageFormat> read_image(const Source& source, ImageType type, Buffer& buffer)
+	std::optional<ImageFormat> read_image(const Source& source, ImageType type, Buffer& buffer)
 	{
 		Reader reader{source};
-		boost::optional<ImageFormat> format;
+		std::optional<ImageFormat> format;
 		switch (type)
 		{
 		case ImageType::Tga: format = read_tga_header(reader); break;

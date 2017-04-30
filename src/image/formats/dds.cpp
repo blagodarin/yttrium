@@ -6,7 +6,7 @@
 
 namespace Yttrium
 {
-	boost::optional<ImageFormat> read_dds_header(Reader& reader)
+	std::optional<ImageFormat> read_dds_header(Reader& reader)
 	{
 		DDS_HEADER header;
 		if (!reader.read(header)
@@ -30,7 +30,7 @@ namespace Yttrium
 			|| header.dwReserved2)
 			return {};
 
-		boost::optional<ImageFormat> format;
+		std::optional<ImageFormat> format;
 
 		switch (header.ddspf.dwFlags & (DDPF_ALPHAPIXELS | DDPF_RGB | DDPF_LUMINANCE))
 		{

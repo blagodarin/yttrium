@@ -43,7 +43,7 @@ namespace Yttrium
 		::draw_debug_char(_renderer, x, y, width, height, _color, DebugTexture::rect_index);
 	}
 
-	void DebugRenderer::draw_text(int x, int y, const StaticString& text, const boost::optional<size_t>& max_size)
+	void DebugRenderer::draw_text(int x, int y, const StaticString& text, const std::optional<size_t>& max_size)
 	{
 		const auto size = max_size ? std::min(text.size(), *max_size) : text.size();
 		for (size_t i = 0; i < size; ++i)

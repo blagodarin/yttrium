@@ -135,7 +135,7 @@ namespace Yttrium
 	void GuiPrivate::enter_screen(GuiScreen& screen)
 	{
 		_screen_stack.emplace_back(&screen);
-		if (screen.has_music() && _on_music)
+		if (screen.music() && _on_music)
 			_on_music(screen.music());
 		screen.handle_enter();
 	}
@@ -144,9 +144,9 @@ namespace Yttrium
 	{
 		const auto screen = _screen_stack.back();
 		screen->handle_return();
-		if (screen->has_music() && _on_music)
+		if (screen->music() && _on_music)
 		{
-			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* screen_){ return screen_->has_music(); });
+			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* s){ return s->music(); });
 			_on_music(i != _screen_stack.rend() ? (*i)->music() : nullptr);
 		}
 		_screen_stack.pop_back();

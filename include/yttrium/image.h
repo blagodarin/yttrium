@@ -6,11 +6,10 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/std_optional.h>
 
 #include <memory>
 #include <string>
-
-#include <boost/optional/optional.hpp> // TODO-17: Use std::optional.
 
 namespace Yttrium
 {
@@ -125,7 +124,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static boost::optional<Image> load(const Source&, ImageType = ImageType::Auto);
+		static std::optional<Image> load(const Source&, ImageType = ImageType::Auto);
 
 		/// Creates an image of the specified format with uninitialized contents.
 		explicit Image(const ImageFormat& format);
@@ -162,7 +161,7 @@ namespace Yttrium
 	Y_API Image grayscale_to_bgra(const Image&);
 
 	///
-	Y_API boost::optional<Image> intensity_to_bgra(const Image&);
+	Y_API std::optional<Image> intensity_to_bgra(const Image&);
 }
 
 #endif

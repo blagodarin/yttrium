@@ -23,7 +23,7 @@ namespace
 
 namespace Yttrium
 {
-	boost::optional<ImageFormat> read_jpeg(const Source& source, Buffer& buffer)
+	std::optional<ImageFormat> read_jpeg(const Source& source, Buffer& buffer)
 	{
 		const auto source_buffer = source.to_buffer();
 

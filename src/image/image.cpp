@@ -43,7 +43,7 @@ namespace Yttrium
 		assert(is_power_of_2(_row_alignment));
 	}
 
-	boost::optional<Image> Image::load(const Source& source, ImageType type)
+	std::optional<Image> Image::load(const Source& source, ImageType type)
 	{
 		if (type == ImageType::Auto && !detect_image_type(source, type))
 			return {};

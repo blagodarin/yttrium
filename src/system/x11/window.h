@@ -2,10 +2,9 @@
 #define _src_system_x11_window_h_
 
 #include <yttrium/math/size.h>
+#include <yttrium/std_optional.h>
 #include "../../utils/unique_ptr.h"
 #include "glx.h"
-
-#include <boost/optional/optional.hpp>
 
 #include <X11/Xlib.h>
 
@@ -27,7 +26,7 @@ namespace Yttrium
 		bool process_events();
 		bool set_cursor(const Point&);
 		void show();
-		boost::optional<Size> size() const { return _size; }
+		std::optional<Size> size() const { return _size; }
 		void swap_buffers();
 
 	private:
@@ -55,7 +54,7 @@ namespace Yttrium
 			::Cursor _cursor = None;
 		};
 
-		boost::optional<Size> _size;
+		std::optional<Size> _size;
 		const P_Display _display;
 		const int _screen = DefaultScreen(_display.get());
 		const GlxContext _glx{ _display.get(), _screen };

@@ -11,10 +11,9 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/static_string.h>
+#include <yttrium/std_optional.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/window.h>
-
-#include <boost/optional/optional.hpp>
 
 using namespace Yttrium;
 
@@ -49,8 +48,8 @@ private:
 
 	Line3 _cursor_ray{{0, 0, 0}, {0, 0, 0}};
 	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
-	boost::optional<Point> _board_point;
-	boost::optional<Quad> _visibility_quad;
+	std::optional<Point> _board_point;
+	std::optional<Quad> _visibility_quad;
 
 	std::unique_ptr<MinimapCanvas> _minimap_canvas;
 };

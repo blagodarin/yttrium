@@ -3,6 +3,8 @@
 #include <yttrium/image.h>
 #include <yttrium/storage/writer.h>
 
+#include <limits>
+
 #include <png.h>
 
 namespace

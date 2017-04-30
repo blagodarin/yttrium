@@ -7,13 +7,12 @@
 #include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/resource_loader.h>
+#include <yttrium/std_optional.h>
 #include <yttrium/storage/storage.h>
 #include "../gui.h"
 #include "../screen.h"
 #include "../widgets/widget.h"
 #include "property_loader.h"
-
-#include <boost/optional/optional.hpp>
 
 namespace
 {
@@ -64,7 +63,7 @@ namespace
 		return result;
 	}
 
-	boost::optional<std::tuple<StaticString, GuiActions, GuiActions>> load_on_key(const IonList& source)
+	std::optional<std::tuple<StaticString, GuiActions, GuiActions>> load_on_key(const IonList& source)
 	{
 		const auto key = source.begin();
 		if (key == source.end() || key->type() != IonValue::Type::String)

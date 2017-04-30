@@ -7,6 +7,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/std_optional.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include "../mesh_data.h"
@@ -14,7 +15,6 @@
 #include <regex>
 
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/optional/optional.hpp>
 
 namespace
 {
@@ -93,7 +93,7 @@ namespace
 			vtn,
 		};
 
-		boost::optional<std::tuple<size_t, size_t, size_t>> make_index(const std::string& text)
+		std::optional<std::tuple<size_t, size_t, size_t>> make_index(const std::string& text)
 		{
 			std::smatch match;
 			switch (_face_format)

@@ -99,7 +99,7 @@ namespace Yttrium
 		GLenum data_type = 0;
 		auto data = image.data();
 
-		boost::optional<Image> temporary;
+		std::optional<Image> temporary;
 		switch (image_format.pixel_format())
 		{
 		case PixelFormat::Gray:

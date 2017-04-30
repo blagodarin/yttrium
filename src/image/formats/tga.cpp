@@ -5,6 +5,8 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
 
+#include <limits>
+
 namespace
 {
 	bool can_write(const Yttrium::ImageFormat& format)
@@ -51,7 +53,7 @@ namespace
 
 namespace Yttrium
 {
-	boost::optional<ImageFormat> read_tga_header(Reader& reader)
+	std::optional<ImageFormat> read_tga_header(Reader& reader)
 	{
 		TgaHeader header;
 
@@ -73,7 +75,7 @@ namespace Yttrium
 			}
 		};
 
-		boost::optional<ImageFormat> format;
+		std::optional<ImageFormat> format;
 
 		if (header.image_type == tgaTrueColor)
 		{

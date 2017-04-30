@@ -28,7 +28,7 @@ namespace
 class MinimapCanvas : public Canvas
 {
 public:
-	MinimapCanvas(Vector3& position, const boost::optional<Quad>& visibility_quad)
+	MinimapCanvas(Vector3& position, const std::optional<Quad>& visibility_quad)
 		: _position{position}, _visibility_quad{visibility_quad} {}
 
 	void on_draw(const RectF& rect, Renderer& renderer) override
@@ -79,8 +79,8 @@ private:
 
 private:
 	Vector3& _position;
-	const boost::optional<Quad>& _visibility_quad;
-	boost::optional<Vector2> _cursor;
+	const std::optional<Quad>& _visibility_quad;
+	std::optional<Vector2> _cursor;
 };
 
 Game::Game(const Storage& storage)

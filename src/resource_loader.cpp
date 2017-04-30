@@ -18,6 +18,7 @@
 #include <yttrium/translation.h>
 #include "renderer/material.h"
 
+#include <cassert>
 #include <mutex>
 
 namespace Yttrium

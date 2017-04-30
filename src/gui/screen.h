@@ -11,8 +11,6 @@
 #include <map>
 #include <unordered_map>
 
-#include <boost/optional/optional.hpp>
-
 namespace Yttrium
 {
 	class GuiLayout;
@@ -34,9 +32,8 @@ namespace Yttrium
 		bool handle_event(const std::string&) const;
 		bool handle_key(const KeyEvent&);
 		void handle_return() const { _on_return.run(_gui); }
-		bool has_music() const noexcept { return static_cast<bool>(_music); }
 		bool is_transparent() const { return _is_transparent; }
-		std::shared_ptr<const Music> music() const { return *_music; }
+		const std::shared_ptr<const Music>& music() const { return _music; }
 		const std::string& name() const { return _name; }
 		void register_widget(Widget&);
 		void set_cursor(GuiCursor, const StaticString& texture = {});
@@ -65,7 +62,7 @@ namespace Yttrium
 		GuiActions _on_return;
 		GuiCursor _cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _cursor_texture;
-		boost::optional<std::shared_ptr<const Music>> _music;
+		std::shared_ptr<const Music> _music;
 	};
 }
 
