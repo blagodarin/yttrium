@@ -6,4 +6,7 @@
 
 #include <windows.h>
 
+#undef far
+#undef near
+
 #endif

@@ -2,6 +2,7 @@
 
 #include <yttrium/memory/buffer.h>
 
+#include <algorithm>
 #include <cstring>
 #include <limits>
 

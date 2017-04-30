@@ -6,6 +6,8 @@
 #include <yttrium/math/size.h>
 #include "../../window/backend.h"
 
+#include <cassert>
+
 namespace
 {
 	using namespace Yttrium;

@@ -3,7 +3,7 @@
 #ifndef _include_yttrium_std_variant_h_
 #define _include_yttrium_std_variant_h_
 
-#if __has_include(<variant>)
+#if defined(_MSC_VER) || __has_include(<variant>)
 	#include <variant>
 #elif __has_include(<experimental/variant>)
 	#include <experimental/variant>
