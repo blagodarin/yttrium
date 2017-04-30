@@ -25,6 +25,7 @@ add_library(yttrium
 	../include/yttrium/resource_loader.h
 	../include/yttrium/static_string.h
 	../include/yttrium/std_optional.h
+	../include/yttrium/std_variant.h
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
 	../include/yttrium/translation.h

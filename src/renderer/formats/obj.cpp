@@ -14,8 +14,6 @@
 
 #include <regex>
 
-#include <boost/algorithm/string/trim.hpp>
-
 namespace
 {
 	const std::string _float = R"(\s+([+-]?\d+(?:\.\d+)))";
@@ -174,6 +172,17 @@ namespace
 		std::vector<Yttrium::Vector3> _normals;
 		std::vector<std::tuple<size_t, size_t, size_t>> _indices;
 	};
+
+	// A replacement for 'boost::algorithm::trim'.
+	inline void trim(std::string& s)
+	{
+		const auto first = s.find_first_not_of("\t\n\r ");
+		const auto last = s.find_last_not_of("\t\n\r ");
+		if (first != std::string::npos || last != std::string::npos)
+			s = s.substr(first, last - first + 1);
+		else
+			s.clear();
+	}
 }
 
 namespace Yttrium
@@ -189,7 +198,7 @@ namespace Yttrium
 			++line_number;
 			if (std::regex_match(line, _obj_empty_regex))
 				continue;
-			boost::algorithm::trim(line);
+			::trim(line);
 			if (!state.process_line(line, result))
 				throw DataError("OBJ processing error (", source.name(), ":", line_number, ")");
 		}
