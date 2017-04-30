@@ -2,10 +2,9 @@
 #define _src_gui_actions_h_
 
 #include <yttrium/script/code.h>
+#include <yttrium/std_variant.h>
 
 #include <vector>
-
-#include <boost/variant/variant.hpp> // TODO-17: Use std::variant.
 
 namespace Yttrium
 {
@@ -49,7 +48,7 @@ namespace Yttrium
 		void run(GuiPrivate&) const;
 
 	private:
-		std::vector<boost::variant<GuiAction_Quit, GuiAction_Call, GuiAction_Enter, GuiAction_Return, GuiAction_ReturnTo>> _actions;
+		std::vector<std::variant<GuiAction_Quit, GuiAction_Call, GuiAction_Enter, GuiAction_Return, GuiAction_ReturnTo>> _actions;
 	};
 }
 

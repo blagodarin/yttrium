@@ -2,8 +2,6 @@
 
 #include "gui.h"
 
-#include <boost/variant/apply_visitor.hpp>
-
 namespace
 {
 	using namespace Yttrium;
@@ -31,6 +29,6 @@ namespace Yttrium
 	{
 		const GuiActionVisitor visitor(gui);
 		for (const auto& action : _actions)
-			boost::apply_visitor(visitor, action);
+			std::visit(visitor, action);
 	}
 }

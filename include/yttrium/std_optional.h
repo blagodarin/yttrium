@@ -7,9 +7,12 @@
 	#include <optional>
 #elif __has_include(<experimental/optional>)
 	#include <experimental/optional>
-	namespace std { using std::experimental::optional; }
+	namespace std
+	{
+		using std::experimental::optional;
+	}
 #else
-	#error Missing required header <optional> or <experimental/optional>.
+	#error Missing required header: <optional> or <experimental/optional>.
 #endif
 
 #endif

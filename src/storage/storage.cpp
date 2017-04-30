@@ -3,12 +3,11 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/static_string.h>
+#include <yttrium/std_variant.h>
 #include "source.h"
 
 #include <list>
 #include <vector>
-
-#include <boost/variant/variant.hpp>
 
 namespace Yttrium
 {
@@ -46,7 +45,7 @@ namespace Yttrium
 			{
 				const auto i = _stored.find(name);
 				if (i != _stored.end()) // TODO-17: Use init-statement.
-					return boost::apply_visitor(*this, i->second);
+					return std::visit(*this, i->second);
 			}
 			if (_use_file_system == Storage::UseFileSystem::After)
 			{
@@ -78,7 +77,7 @@ namespace Yttrium
 			PackageEntry(const PackageReader* package, std::size_t index) : _package{package}, _index{index} {}
 		};
 
-		std::unique_ptr<Source> operator()(const boost::blank&) const { return {}; }
+		std::unique_ptr<Source> operator()(const std::monostate&) const { return {}; }
 		std::unique_ptr<Source> operator()(const BufferEntry& entry) const { return create_source(entry._attachment->_buffer, entry._attachment->_name); }
 		std::unique_ptr<Source> operator()(const PackageEntry& entry) const { return entry._package->open(entry._index); }
 
@@ -86,7 +85,7 @@ namespace Yttrium
 		const Storage::UseFileSystem _use_file_system;
 		std::vector<std::unique_ptr<const PackageReader>> _packages;
 		std::list<BufferAttachment> _buffers;
-		std::map<StaticString, boost::variant<boost::blank, BufferEntry, PackageEntry>> _stored;
+		std::map<StaticString, std::variant<std::monostate, BufferEntry, PackageEntry>> _stored;
 	};
 
 	Storage::Storage(UseFileSystem use_file_system)
