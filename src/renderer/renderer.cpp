@@ -116,6 +116,10 @@ namespace Yttrium
 		vertex.texture = _texture_rect.top_left();
 		vertices << vertex;
 
+		vertex.position = quad._d;
+		vertex.texture = _texture_rect.bottom_left();
+		vertices << vertex;
+
 		vertex.position = quad._b;
 		vertex.texture = _texture_rect.top_right();
 		vertices << vertex;
@@ -124,11 +128,7 @@ namespace Yttrium
 		vertex.texture = _texture_rect.bottom_right();
 		vertices << vertex;
 
-		vertex.position = quad._d;
-		vertex.texture = _texture_rect.bottom_left();
-		vertices << vertex;
-
-		indices << index << index + 3 << index + 1 << index + 2;
+		indices << index << index + 1 << index + 2 << index + 3;
 	}
 
 	void RendererImpl::draw_rect(const RectF& rect, const Color4f& color)

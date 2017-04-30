@@ -33,29 +33,20 @@ public:
 
 	void on_draw(const RectF& rect, Renderer& renderer) override
 	{
-		const auto map = [&rect](const Vector2& v)
-		{
-			return Vector2
-			{
-				rect.left() + rect.width() * (v.x + 64) / 128,
-				rect.top() + rect.height() * (64 - v.y) / 128,
-			};
-		};
-
 		PushTexture push_texture{renderer, nullptr};
 		renderer.draw_rect(rect, {0.25, 0.25, 0.25, 0.75});
 		if (_visibility_quad)
-			renderer.draw_quad({map(_visibility_quad->_a), map(_visibility_quad->_b), map(_visibility_quad->_c), map(_visibility_quad->_d)}, {1, 1, 0, 0.25});
+			renderer.draw_quad(to_window(rect, *_visibility_quad), {1, 1, 0, 0.25});
+		if (_cursor)
+			renderer.draw_rect({*_cursor, SizeF{1, 1}}, {0, 1, 0});
 
-		const auto camera = map({_position.x, _position.y});
-		renderer.draw_rect({{camera.x - 2, camera.y - 2}, SizeF{4, 4}}, {1, 0, 0, 1});
+		renderer.draw_rect({to_window(rect, {_position.x, _position.y}) - Vector2{2, 2}, SizeF{4, 4}}, {1, 0, 0});
 	}
 
 	void on_mouse_move(const RectF& rect, const Vector2& cursor) override
 	{
-		const auto x = (cursor.x - rect.left()) / rect.width() * 128 - 64;
-		const auto y = (rect.top() - cursor.y) / rect.height() * 128 + 64;
-		_position = ::clamp_position({x, y - 10, _position.z});
+		_position = ::clamp_position({to_map(rect, cursor) - Vector2{0, 10}, _position.z});
+		_cursor = cursor;
 	}
 
 	bool on_mouse_press(const RectF& rect, Key key, const Vector2& cursor) override
@@ -67,8 +58,29 @@ public:
 	}
 
 private:
+	static Vector2 to_map(const RectF& rect, const Vector2& v)
+	{
+		return
+		{
+			(v.x - rect.left()) / rect.width() * 128 - 64,
+			(rect.top() - v.y) / rect.height() * 128 + 64,
+		};
+	}
+
+	static Vector2 to_window(const RectF& rect, const Vector2& v)
+	{
+		return rect.top_left() + Vector2{rect.width(), rect.height()} * Vector2{v.x + 64, 64 - v.y} / 128;
+	}
+
+	static Quad to_window(const RectF& rect, const Quad& q)
+	{
+		return {to_window(rect, q._a), to_window(rect, q._b), to_window(rect, q._c), to_window(rect, q._d)};
+	}
+
+private:
 	Vector3& _position;
 	const boost::optional<Quad>& _visibility_quad;
+	boost::optional<Vector2> _cursor;
 };
 
 Game::Game(const Storage& storage)

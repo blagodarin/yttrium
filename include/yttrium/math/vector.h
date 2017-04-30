@@ -36,6 +36,7 @@ namespace Yttrium
 
 		Vector3() noexcept = default;
 		constexpr Vector3(float vx, float vy, float vz) noexcept : x{vx}, y{vy}, z{vz} {}
+		constexpr Vector3(const Vector2& v, float vz) noexcept : x{v.x}, y{v.y}, z{vz} {}
 
 		constexpr auto& operator +=(const Vector3& v) noexcept { x += v.x; y += v.y; z += v.z; return *this; }
 		constexpr auto& operator +=(float s) noexcept { x += s; y += s; z += s; return *this; }
