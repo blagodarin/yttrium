@@ -31,10 +31,13 @@ namespace Yttrium
 		x |= x >> 1;
 		x |= x >> 2;
 		x |= x >> 4;
+#pragma warning(suppress : 4127)
 		if (sizeof x > sizeof(int8_t)) // TODO-17: Use 'if constexpr'.
 			x |= x >> 8;
+#pragma warning(suppress : 4127)
 		if (sizeof x > sizeof(int16_t))
 			x |= x >> 16;
+#pragma warning(suppress : 4127)
 		if (sizeof x > sizeof(int32_t))
 			x |= static_cast<std::conditional_t<std::is_signed<T>::value, int64_t, uint64_t>>(x) >> 32;
 		return x + 1;
