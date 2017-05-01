@@ -102,7 +102,7 @@ Game::Game(const Storage& storage)
 		if (_debug_text_visible)
 			renderer.draw_debug_text(_debug_text);
 	});
-	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path().c_str()); });
+	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });
 
 	_gui.bind_canvas("minimap", *_minimap_canvas);

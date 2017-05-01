@@ -2,23 +2,19 @@ cmake_minimum_required(VERSION 3.7)
 
 project(yttrium C CXX)
 
-option(BOOST_ALL_DYN_LINK "Define BOOST_ALL_DYN_LINK" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(COVERAGE "Build with coverage analysis support" OFF)
+option(NO_TESTS "Disable tests" OFF)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 
-find_package(Boost REQUIRED COMPONENTS program_options unit_test_framework)
 find_package(Threads REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
-if(BOOST_ALL_DYN_LINK)
-	add_definitions(-DBOOST_ALL_DYN_LINK)
-endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wnon-virtual-dtor -Wold-style-cast -Wpedantic -Wshadow -Wsign-conversion")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unknown-pragmas -Wnon-virtual-dtor -Wold-style-cast -Wpedantic -Wshadow -Wsign-conversion")
 	if (COVERAGE)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
@@ -33,7 +29,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
-include_directories(${Boost_INCLUDE_DIR} include)
+include_directories("${PROJECT_SOURCE_DIR}/include")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
@@ -43,10 +39,13 @@ if(WIN32)
 	add_subdirectory(ywinmain)
 endif()
 
-add_subdirectory(tests)
-set_target_properties(
-	check unit_tests
-	PROPERTIES FOLDER "tests")
+if(NOT NO_TESTS)
+	find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+	add_subdirectory(tests)
+	set_target_properties(
+		check unit_tests
+		PROPERTIES FOLDER "tests")
+endif()
 
 add_subdirectory(tools/generate-sounds)
 add_subdirectory(tools/generate-test-images)

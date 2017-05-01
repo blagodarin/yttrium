@@ -4,86 +4,53 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 
+#include <cstring>
 #include <iostream>
-#include <limits>
 #include <vector>
-
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/positional_options.hpp>
-#include <boost/program_options/variables_map.hpp>
-
-using namespace Yttrium;
 
 template <typename... Args>
 void check(bool condition, Args&&... args)
 {
 	if (!condition)
-		throw DataError(std::forward<Args>(args)...);
+		throw Yttrium::DataError{std::forward<Args>(args)...};
 }
 
 int main(int argc, char** argv)
 {
+	if (argc != 3)
+	{
+		std::cerr
+			<< "Usage:\n"
+			<< "  ypack INDEX PACKAGE\n"
+			<< "  ypack (--dependencies|-d) INDEX\n";
+		return 1;
+	}
+
 	std::string index_name;
 	std::string package_name;
+	if (!std::strcmp(argv[1], "-d") || !std::strcmp(argv[1], "--dependencies"))
+		index_name = argv[2];
+	else
 	{
-		boost::program_options::options_description public_options("Options");
-		public_options.add_options()
-			("dependencies,d", boost::program_options::value<bool>()->zero_tokens());
-
-		const auto show_usage = [&public_options]
-		{
-			std::cerr
-				<< "Usage:\n"
-				<< "  ypack INDEX PACKAGE\n"
-				<< "  ypack (--dependencies|-d) INDEX\n"
-				<< "\n"
-				<< public_options << "\n";
-		};
-
-		boost::program_options::options_description o;
-		o.add(public_options).add_options()
-			("input,i", boost::program_options::value<std::string>()->required())
-			("output,o", boost::program_options::value<std::string>());
-
-		boost::program_options::positional_options_description p;
-		p.add("input", 1).add("output", 1);
-
-		try
-		{
-			boost::program_options::variables_map vm;
-			boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(o).positional(p).run(), vm);
-			boost::program_options::notify(vm);
-			index_name = vm["input"].as<std::string>();
-			if (!vm.count("dependencies"))
-				package_name = vm["output"].as<std::string>();
-		}
-		catch (const boost::program_options::error&)
-		{
-			show_usage();
-			return 1;
-		}
-		catch (const boost::bad_any_cast&)
-		{
-			show_usage();
-			return 1;
-		}
+		index_name = argv[1];
+		package_name = argv[2];
 	}
 
 	std::vector<std::pair<std::string, std::map<std::string, std::string>>> entries;
 	try
 	{
-		auto source = Source::from(index_name);
+		auto source = Yttrium::Source::from(index_name);
 		check(static_cast<bool>(source), "Bad index file");
-		IonReader ion{*source};
+		Yttrium::IonReader ion{*source};
 		ion.read().check_name("package");
 		ion.read().check_list_begin();
-		for (auto token = ion.read(); token.type() != IonReader::Token::Type::ListEnd;)
+		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd;)
 		{
 			entries.emplace_back(token.to_value().to_std(), std::map<std::string, std::string>());
 			token = ion.read();
-			if (token.type() == IonReader::Token::Type::ObjectBegin) // TODO-17: Use init-statement.
+			if (token.type() == Yttrium::IonReader::Token::Type::ObjectBegin) // TODO-17: Use init-statement.
 			{
-				for (token = ion.read(); token.type() != IonReader::Token::Type::ObjectEnd; token = ion.read())
+				for (token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ObjectEnd; token = ion.read())
 				{
 					auto property_name = token.to_name().to_std();
 					check(entries.back().second.count(property_name) == 0, "Duplicate property '", property_name, "'");
@@ -107,7 +74,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	const auto package = PackageWriter::create(package_name.c_str(), PackageType::Ypq);
+	const auto package = Yttrium::PackageWriter::create(package_name, Yttrium::PackageType::Ypq);
 	if (!package)
 	{
 		std::cerr << "ERROR(" << package_name << "): Can't open package file\n";
@@ -124,7 +91,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
 	}
-	catch (const DataError& e)
+	catch (const Yttrium::DataError& e)
 	{
 		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
 		return 1;
