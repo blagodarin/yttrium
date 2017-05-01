@@ -27,7 +27,7 @@ namespace Yttrium
 	class Y_API IonReader
 	{
 	public:
-		struct Token
+		struct Y_API Token
 		{
 			enum class Type
 			{
