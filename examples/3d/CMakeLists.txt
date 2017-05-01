@@ -1,4 +1,5 @@
 add_executable(3d WIN32
+	../utils.h
 	game.cpp
 	game.h
 	main.cpp

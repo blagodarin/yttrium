@@ -17,6 +17,7 @@ add_dependencies(tetrium_package tetrium_localization)
 
 # Executable.
 add_executable(tetrium WIN32
+	../utils.h
 	graphics.cpp
 	graphics.h
 	logic.cpp

@@ -3,8 +3,8 @@
 
 #include <yttrium/image.h>
 
-#include <iomanip>
-#include <sstream>
+#include <array>
+#include <ctime>
 #include <tuple>
 
 inline auto make_bgra_tga(size_t width, size_t height, const std::function<std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>(size_t, size_t)>& callback)
@@ -27,10 +27,16 @@ inline auto make_bgra_tga(size_t width, size_t height, const std::function<std::
 
 inline std::string make_screenshot_path()
 {
-	const auto t = std::time(nullptr);
-	std::ostringstream s;
-	s << std::put_time(std::localtime(&t), "%Y-%m-%d_%H-%M-%S.png");
-	return s.str();
+	const auto time = std::time(nullptr);
+	::tm tm;
+#ifdef _MSC_VER
+	::localtime_s(&tm, &time);
+#else
+	::localtime_r(&time, &tm);
+#endif
+	std::array<char, 24> buffer;
+	buffer[std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d_%H-%M-%S.png", &tm)] = '\0';
+	return buffer.data();
 }
 
 #endif
