@@ -9,7 +9,7 @@ namespace Yttrium
 	class ImageWidget : public Widget
 	{
 	public:
-		ImageWidget(GuiPrivate&, GuiPropertyLoader&);
+		ImageWidget(GuiPrivate&, std::string_view name, GuiPropertyLoader&);
 
 		void draw(Renderer& renderer, const RectF& rect, WidgetState) const override;
 

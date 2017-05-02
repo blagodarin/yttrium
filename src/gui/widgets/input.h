@@ -13,7 +13,7 @@ namespace Yttrium
 	class InputWidget : public Widget
 	{
 	public:
-		InputWidget(GuiPrivate&, GuiPropertyLoader&);
+		InputWidget(GuiPrivate&, std::string_view name, GuiPropertyLoader&);
 
 		void draw(Renderer&, const RectF&, WidgetState) const override;
 		bool process_key(const KeyEvent&) override;

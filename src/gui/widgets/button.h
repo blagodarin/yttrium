@@ -12,7 +12,7 @@ namespace Yttrium
 	class ButtonWidget : public Widget
 	{
 	public:
-		ButtonWidget(GuiPrivate&, GuiPropertyLoader&);
+		ButtonWidget(GuiPrivate&, std::string_view name, GuiPropertyLoader&);
 
 		void draw(Renderer&, const RectF&, WidgetState) const override;
 		bool process_mouse_press(Key, const Vector2&) override;

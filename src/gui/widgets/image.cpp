@@ -5,8 +5,8 @@
 
 namespace Yttrium
 {
-	ImageWidget::ImageWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
-		: Widget{gui}
+	ImageWidget::ImageWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
+		: Widget{gui, name}
 	{
 		loader.load_rect("position"_s, _rect);
 		_background.load(loader);

@@ -10,8 +10,8 @@
 
 namespace Yttrium
 {
-	InputWidget::InputWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
-		: Widget{gui, Flag::CanHaveFocus}
+	InputWidget::InputWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
+		: Widget{gui, name, Flag::CanHaveFocus}
 	{
 		if (!loader.load_rect("position"_s, _rect)
 			|| !_foreground.load(loader))

@@ -336,13 +336,11 @@ namespace Yttrium
 			const auto& element = ::load_element(layout_node);
 			if (!element.object)
 				throw GuiDataError("Bad layout entry '"_s, layout_node.name(), "'"_s);
-			if (element.name)
-				throw GuiDataError("Widget names are not supported"_s);
 
 			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(element.attribute->to_std()) : nullptr), _gui);
 			if (_has_default_font)
 				loader.set_default_font_name(&_default_font_name);
-			screen.register_widget(layout.add_widget(layout_node.name(), loader));
+			screen.register_widget(layout.add_widget(layout_node.name(), element.name ? std::string_view{element.name->text(), element.name->size()} : "", loader));
 		}
 	}
 

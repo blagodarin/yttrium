@@ -44,8 +44,8 @@ screen "game"
 		label { position "23.5" "10" "5" "1" align "left"  text {tr"Score:"} }
 		label { position "23.5" "11" "5" "1" align "right" text "{score}"    }
 
-		canvas { id "next" position "2" "4" "4" "2" }
+		canvas "next" { position "2" "4" "4" "2" }
 
-		canvas { id "field" position "9" "1" "12" "24" }
+		canvas "field" { position "9" "1" "12" "24" }
 	}
 }

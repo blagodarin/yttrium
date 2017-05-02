@@ -8,8 +8,8 @@
 
 namespace Yttrium
 {
-	LabelWidget::LabelWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
-		: Widget{gui}
+	LabelWidget::LabelWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
+		: Widget{gui, name}
 	{
 		if (!(loader.load_rect("position"_s, _rect)
 			&& loader.load_translatable("text"_s, _text)

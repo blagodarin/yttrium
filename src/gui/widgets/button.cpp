@@ -8,8 +8,8 @@
 
 namespace Yttrium
 {
-	ButtonWidget::ButtonWidget(GuiPrivate& gui, GuiPropertyLoader& loader)
-		: Widget{gui}
+	ButtonWidget::ButtonWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
+		: Widget{gui, name}
 	{
 		if (!loader.load_rect("position"_s, _rect)
 			|| !_foreground.load(loader))

@@ -10,14 +10,11 @@ namespace Yttrium
 	class CanvasWidget : public Widget
 	{
 	public:
-		CanvasWidget(GuiPrivate&, GuiPropertyLoader&);
+		CanvasWidget(GuiPrivate&, std::string_view name, GuiPropertyLoader&);
 
 		void draw(Renderer&, const RectF&, WidgetState) const override;
 		void process_mouse_move(const Vector2&) override;
 		bool process_mouse_press(Key, const Vector2&) override;
-
-	private:
-		std::string _id;
 	};
 }
 

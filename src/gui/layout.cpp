@@ -17,19 +17,19 @@ namespace Yttrium
 	{
 	}
 
-	Widget& GuiLayout::add_widget(const StaticString& type, GuiPropertyLoader& loader)
+	Widget& GuiLayout::add_widget(const StaticString& type, std::string_view name, GuiPropertyLoader& loader)
 	{
 		std::unique_ptr<Widget> widget;
 		if (type == "button"_s)
-			widget = std::make_unique<ButtonWidget>(_gui, loader);
+			widget = std::make_unique<ButtonWidget>(_gui, name, loader);
 		else if (type == "canvas"_s)
-			widget = std::make_unique<CanvasWidget>(_gui, loader);
+			widget = std::make_unique<CanvasWidget>(_gui, name, loader);
 		else if (type == "image"_s)
-			widget = std::make_unique<ImageWidget>(_gui, loader);
+			widget = std::make_unique<ImageWidget>(_gui, name, loader);
 		else if (type == "input"_s)
-			widget = std::make_unique<InputWidget>(_gui, loader);
+			widget = std::make_unique<InputWidget>(_gui, name, loader);
 		else if (type == "label"_s)
-			widget = std::make_unique<LabelWidget>(_gui, loader);
+			widget = std::make_unique<LabelWidget>(_gui, name, loader);
 		else
 			throw GuiDataError("Unknown widget type '"_s, type, "'"_s);
 		_widgets.emplace_back(std::move(widget));

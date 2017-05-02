@@ -4,6 +4,7 @@
 #include <yttrium/flags.h>
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/std_string_view.h>
 #include "../types.h"
 
 namespace Yttrium
@@ -36,10 +37,11 @@ namespace Yttrium
 		virtual void process_mouse_release() {}
 
 	protected:
-		explicit Widget(GuiPrivate&, Flags<Flag> = {});
+		Widget(GuiPrivate&, std::string_view name, Flags<Flag> = {});
 
 	protected:
 		GuiPrivate& _gui;
+		const std::string _name;
 		RectF _rect;
 
 	private:
