@@ -242,6 +242,7 @@ namespace Yttrium
 		{
 			{ "center"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Center) } },
 			{ "cursor"_s, { &GuiIonLoader::load_screen_cursor, 0 } },
+			{ "left"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Left) } },
 			{ "music"_s, { &GuiIonLoader::load_screen_music, 0 } },
 			{ "on_enter"_s, { &GuiIonLoader::load_screen_on_enter, 0 } },
 			{ "on_event"_s, { &GuiIonLoader::load_screen_on_event, 0 } },
@@ -321,10 +322,24 @@ namespace Yttrium
 			{ "size"_s, &GuiIonLoader::load_layout_size },
 		};
 
-		if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		auto& layout = screen.add_layout(static_cast<GuiLayout::Placement>(extra));
-		for (const auto& layout_node : *node.first()->object())
+		const auto placement = static_cast<GuiLayout::Placement>(extra);
+		auto& layout = screen.add_layout(placement);
+
+		if (placement == GuiLayout::Placement::Left)
+		{
+			int height = 0;
+			if (node.size() != 2 || node.first()->type() != IonValue::Type::String || node.last()->type() != IonValue::Type::Object
+				|| !node.first()->string().to_number(height))
+				throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			layout.set_size({0, static_cast<float>(height)});
+		}
+		else
+		{
+			if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
+				throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		}
+
+		for (const auto& layout_node : *node.last()->object())
 		{
 			const auto i = handlers.find(layout_node.name());
 			if (i != handlers.end())

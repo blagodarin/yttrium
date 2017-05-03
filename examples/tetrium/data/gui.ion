@@ -41,7 +41,7 @@ class "button"
 
 cursor { texture "examples/tetrium/data/cursor.tga" }
 
-on_key "f10" { call "screenshot" } # KDE grabs "print" key. =(
+on_key "f10" { call "screenshot" }
 
 include "examples/tetrium/data/gui/game_over.ion"
 include "examples/tetrium/data/gui/game.ion"

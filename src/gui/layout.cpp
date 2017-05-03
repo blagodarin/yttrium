@@ -49,40 +49,52 @@ namespace Yttrium
 
 	void GuiLayout::update(const RectF& rect)
 	{
-		RectF layout_rect = rect;
+		auto layout_rect = rect;
 
-		Vector2 scaling(1, 1);
-		if (_size._width > 0 && _size._height > 0)
+		Vector2 scaling{1, 1};
+		switch (_placement)
 		{
-			if (_placement == Placement::Center)
+		case Placement::Left:
+			if (_size._height > 0)
 			{
-				const auto window_aspect = rect.width() / rect.height();
-				const auto layout_aspect = _size._width / _size._height;
-				if (window_aspect > layout_aspect)
-				{
-					const auto width = rect.height() * layout_aspect;
-					layout_rect = RectF({(rect.width() - width) / 2, 0}, SizeF(width, rect.height()));
-				}
-				else
-				{
-					const auto height = rect.width() / layout_aspect;
-					layout_rect = RectF({0, (rect.height() - height) / 2}, SizeF(rect.width(), height));
-				}
+				const auto s = rect.height() / _size._height;
+				scaling = {s, s};
 			}
-			scaling = Vector2(layout_rect.width() / _size._width, layout_rect.height() / _size._height);
+			break;
+
+		default:
+			if (_size._width > 0 && _size._height > 0)
+			{
+				if (_placement == Placement::Center)
+				{
+					const auto window_aspect = rect.width() / rect.height();
+					const auto layout_aspect = _size._width / _size._height;
+					if (window_aspect > layout_aspect)
+					{
+						const auto width = rect.height() * layout_aspect;
+						layout_rect = {{(rect.width() - width) / 2, 0}, SizeF{width, rect.height()}};
+					}
+					else
+					{
+						const auto height = rect.width() / layout_aspect;
+						layout_rect = {{0, (rect.height() - height) / 2}, SizeF{rect.width(), height}};
+					}
+				}
+				scaling = {layout_rect.width() / _size._width, layout_rect.height() / _size._height};
+			}
 		}
 
 		for (const auto& widget : _widgets)
 		{
 			const auto& widget_rect = widget->rect();
-			widget->set_render_rect(widget_rect == RectF()
+			widget->set_render_rect(widget_rect == RectF{}
 				? layout_rect
-				: RectF(
+				: RectF{
 					{
 						layout_rect.left() + widget_rect.left() * scaling.x,
 						layout_rect.top() + widget_rect.top() * scaling.y
 					},
-					widget_rect.size() * Vector2{scaling.x, scaling.y}));
+					widget_rect.size() * Vector2{scaling.x, scaling.y}});
 		}
 	}
 }
