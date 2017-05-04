@@ -248,6 +248,7 @@ namespace Yttrium
 			{ "on_event"_s, { &GuiIonLoader::load_screen_on_event, 0 } },
 			{ "on_key"_s, { &GuiIonLoader::load_screen_on_key, 0 } },
 			{ "on_return"_s, { &GuiIonLoader::load_screen_on_return, 0 } },
+			{ "right"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Right) } },
 			{ "stretch"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch) } },
 		};
 
@@ -325,7 +326,7 @@ namespace Yttrium
 		const auto placement = static_cast<GuiLayout::Placement>(extra);
 		auto& layout = screen.add_layout(placement);
 
-		if (placement == GuiLayout::Placement::Left)
+		if (placement == GuiLayout::Placement::Left || placement == GuiLayout::Placement::Right)
 		{
 			int height = 0;
 			if (node.size() != 2 || node.first()->type() != IonValue::Type::String || node.last()->type() != IonValue::Type::Object

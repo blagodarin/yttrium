@@ -5,8 +5,8 @@ root screen "main"
 {
 	on_key "esc" { quit }
 
-	left "40" # TODO: 'right'.
+	right "100"
 	{
-		canvas "minimap" { position "1" "29" "10" "10" }
+		canvas "minimap" { position "1" "79" "20" "20" }
 	}
 }

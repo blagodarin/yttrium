@@ -25,6 +25,7 @@ namespace Yttrium
 			Stretch,
 			Center,
 			Left,
+			Right,
 		};
 
 		GuiLayout(GuiPrivate&, Placement);
