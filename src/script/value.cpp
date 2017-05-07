@@ -1,7 +1,5 @@
 #include <yttrium/script/value.h>
 
-#include <yttrium/string_utils.h>
-
 namespace Yttrium
 {
 	ScriptValue& ScriptValue::operator=(int value)
@@ -12,22 +10,22 @@ namespace Yttrium
 		return *this;
 	}
 
-	ScriptValue& ScriptValue::operator=(const std::string& value)
+	ScriptValue& ScriptValue::operator=(std::string_view value)
 	{
 		_type = Type::String;
-		_value = value;
+		strings::assign_view(_value, value);
 		return *this;
 	}
 
 	ScriptValue::ScriptValue(int value)
-		: _type(Type::Literal)
-		, _value(make_string(value))
+		: _type{Type::Literal}
+		, _value{make_string(value)}
 	{
 	}
 
-	ScriptValue::ScriptValue(const StaticString& value, Type type)
-		: _type(type)
-		, _value(make_string(value))
+	ScriptValue::ScriptValue(std::string_view value, Type type)
+		: _type{type}
+		, _value{strings::from_view(value)}
 	{
 	}
 }

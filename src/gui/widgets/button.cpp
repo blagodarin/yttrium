@@ -3,7 +3,6 @@
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/renderer.h>
-#include <yttrium/static_string.h>
 #include "../property_loader.h"
 
 namespace Yttrium
@@ -11,11 +10,11 @@ namespace Yttrium
 	ButtonWidget::ButtonWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
 		: Widget{gui, name}
 	{
-		if (!loader.load_rect("position"_s, _rect)
+		if (!loader.load_rect("position", _rect)
 			|| !_foreground.load(loader))
-			throw GuiDataError{"Bad 'button'"_s};
+			throw GuiDataError{"Bad 'button'"};
 
-		loader.load_translatable("text"_s, _text);
+		loader.load_translatable("text", _text);
 
 		if (_styles[0].background.load(loader))
 		{
@@ -23,43 +22,43 @@ namespace Yttrium
 				_styles[i].background = _styles[0].background;
 		}
 
-		if (loader.load_color("text_color"_s, &_styles[0].text_color))
+		if (loader.load_color("text_color", &_styles[0].text_color))
 		{
 			for (WidgetStateType i = 1; i < WidgetStateCount; ++i)
 				_styles[i].text_color = _styles[0].text_color;
 		}
 
-		loader.load_state("state"_s, &_state);
+		loader.load_state("state", &_state);
 
-		_sound = loader.load_sound("sound"_s);
+		_sound = loader.load_sound("sound");
 
 		Style* style = &_styles[WidgetStateType(WidgetState::Active)];
 
-		loader.bind("active"_s);
-		loader.load_color("text_color"_s, &style->text_color);
+		loader.bind("active");
+		loader.load_color("text_color", &style->text_color);
 		style->background.update(loader);
 
 		style = &_styles[WidgetStateType(WidgetState::Pressed)];
 
-		loader.bind("pressed"_s);
-		loader.load_color("text_color"_s, &style->text_color);
+		loader.bind("pressed");
+		loader.load_color("text_color", &style->text_color);
 		style->background.update(loader);
 
 		style = &_styles[WidgetStateType(WidgetState::Checked)];
 
-		loader.bind("checked"_s);
-		loader.load_color("text_color"_s, &style->text_color);
+		loader.bind("checked");
+		loader.load_color("text_color", &style->text_color);
 		style->background.update(loader);
 
 		style = &_styles[WidgetStateType(WidgetState::Disabled)];
 
-		loader.bind("disabled"_s);
-		loader.load_color("text_color"_s, &style->text_color);
+		loader.bind("disabled");
+		loader.load_color("text_color", &style->text_color);
 		style->background.update(loader);
 
 		loader.unbind();
 
-		_on_click = loader.load_actions("on_click"_s);
+		_on_click = loader.load_actions("on_click");
 	}
 
 	void ButtonWidget::draw(Renderer& renderer, const RectF& rect, WidgetState state) const

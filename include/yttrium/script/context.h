@@ -1,10 +1,8 @@
-/// \file
-/// \brief Script context.
-
 #ifndef _include_yttrium_script_context_h_
 #define _include_yttrium_script_context_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <functional>
 #include <memory>
@@ -18,17 +16,16 @@ namespace Yttrium
 	/// Script call description.
 	class ScriptCall
 	{
-		friend ScriptContext;
-
 	public:
-		ScriptContext&     context;  ///< Calling context.
-		const std::string& function; ///< Function name, guaranteed to be non-empty.
-		std::string&       result;   ///< Function result.
-		const ScriptArgs&  args;     ///< Function arguments.
+		ScriptContext& _context;      ///< Calling context.
+		const std::string& _function; ///< Function name, guaranteed to be non-empty.
+		std::string& _result;         ///< Function result.
+		const ScriptArgs& _args;      ///< Function arguments.
 
 	private:
-		ScriptCall(ScriptContext& context_, const std::string& function_, std::string& result_, const ScriptArgs& args_)
-			: context(context_), function(function_), result(result_), args(args_) {}
+		ScriptCall(ScriptContext& context, const std::string& function, std::string& result, const ScriptArgs& args)
+			: _context{context}, _function{function}, _result{result}, _args{args} {}
+		friend ScriptContext;
 	};
 
 	/// Script context.
@@ -44,23 +41,13 @@ namespace Yttrium
 		///
 		~ScriptContext();
 
-		/// Call a command.
+		/// Calls a command.
 		bool call(const std::string& name, std::string& result, const ScriptArgs&);
 
-		/// Define a command.
+		/// Defines a command.
 		void define(const std::string& name, size_t min_args, size_t max_args, const Command&);
-
-		///
-		void define(const std::string& name, size_t args, const Command& command)
-		{
-			define(name, args, args, command);
-		}
-
-		///
-		void define(const std::string& name, const Command& command)
-		{
-			define(name, 0, 0, command);
-		}
+		void define(const std::string& name, size_t num_args, const Command& command) { define(name, num_args, num_args, command); }
+		void define(const std::string& name, const Command& command) { define(name, 0, 0, command); }
 
 		/// Find a value by name.
 		/// \param name Value name.
@@ -75,14 +62,14 @@ namespace Yttrium
 		ScriptContext& root();
 
 		///
-		void set(const std::string& name, int value);
+		void set(const std::string& name, int);
 
 		///
-		void set(const std::string& name, const std::string& value);
+		void set(const std::string& name, std::string_view);
 
 		/// Substitutes script variables in a string.
 		/// Every occurence of curly brace pair is threated as a variable reference.
-		void substitute(std::string& target, const std::string& source) const;
+		void substitute(std::string& target, std::string_view source) const;
 
 	private:
 		const std::unique_ptr<class ScriptContextPrivate> _private;

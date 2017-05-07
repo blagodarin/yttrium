@@ -1,14 +1,11 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_gui_texture_font_h_
 #define _include_yttrium_gui_texture_font_h_
 
 #include <yttrium/api.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/std/string_view.h>
 
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace Yttrium
@@ -36,16 +33,16 @@ namespace Yttrium
 		virtual ~TextureFont() = default;
 
 		///
-		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, const std::string&, TextCapture* = nullptr) const = 0;
+		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const = 0;
 
 		///
 		virtual Rect rect() const = 0;
 
 		///
-		virtual Size text_size(const std::string&) const = 0;
+		virtual Size text_size(std::string_view) const = 0;
 
 		///
-		virtual SizeF text_size(const std::string&, const SizeF& font_size) const = 0;
+		virtual SizeF text_size(std::string_view, const SizeF& font_size) const = 0;
 	};
 }
 

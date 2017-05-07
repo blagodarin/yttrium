@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 		{
 			IonReader ion{*source};
 			enum { None, Open, Tr, Text, Close } stage = None;
-			StaticString text;
+			std::string_view text;
 			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
 			{
 				if (token.type() == IonReader::Token::Type::ObjectBegin)

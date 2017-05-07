@@ -14,7 +14,7 @@ namespace Yttrium
 		_selection_size = 0;
 	}
 
-	void LineEditor::insert(const StaticString& text)
+	void LineEditor::insert(std::string_view text)
 	{
 		if (_selection_size > 0)
 		{
@@ -24,7 +24,7 @@ namespace Yttrium
 		}
 		if (text.size() <= _max_size - _text.size())
 		{
-			_text.insert(_cursor, text.text(), text.size());
+			_text.insert(_cursor, text.data(), text.size());
 			_cursor += text.size();
 		}
 	}

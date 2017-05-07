@@ -61,7 +61,7 @@ namespace Yttrium
 		GlShaderHandle(GlShaderHandle&&);
 		~GlShaderHandle();
 
-		bool compile(const std::string&) const;
+		bool compile(std::string_view) const;
 		GLuint get() const { return _handle; }
 		std::string info_log() const;
 

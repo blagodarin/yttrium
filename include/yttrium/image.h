@@ -6,7 +6,7 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/std_optional.h>
+#include <yttrium/std/optional.h>
 
 #include <memory>
 #include <string>

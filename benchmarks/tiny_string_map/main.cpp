@@ -1,4 +1,3 @@
-#include <yttrium/static_string.h>
 #include <yttrium/tiny_string_map.h>
 
 #include <chrono>
@@ -111,7 +110,7 @@ void run_small(const T& map, const std::string& name)
 int main(int, char**)
 {
 	{
-		std::map<StaticString, StaticString> map
+		std::map<std::string_view, std::string_view> map
 		{
 			{"abcdefg", "ABCDEFG"},
 			{"hijklmn", "HIJKLMN"},
@@ -129,7 +128,7 @@ int main(int, char**)
 		run_tiny(map, "TinyStringMap");
 	}
 	{
-		std::map<StaticString, StaticString> map
+		std::map<std::string_view, std::string_view> map
 		{
 			{"abcdefg", "ABCDEFG"},
 			{"hijklmn", "HIJKLMN"},

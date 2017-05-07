@@ -5,11 +5,9 @@
 
 #include "key_lookup.h"
 
-#include <yttrium/static_string.h>
-
 namespace
 {
-	size_t hash(const Yttrium::StaticString& text)
+	size_t hash(std::string_view text)
 	{
 		static const size_t asso_values[] =
 		{
@@ -41,28 +39,21 @@ namespace
 			140, 140, 140, 140, 140, 140,
 		};
 
-		size_t result = text.size();
-
+		auto result = text.size();
 		switch (result)
 		{
 		default:
-
 			result += asso_values[static_cast<unsigned char>(text[1])];
-			// Fallthrough.
-
 		case 1:
-
 			result += asso_values[static_cast<unsigned char>(text[0])];
-			break;
 		}
-
 		return result + asso_values[static_cast<unsigned char>(text[text.size() - 1])];
 	}
 }
 
 namespace Yttrium
 {
-	Key lookup_key(const StaticString& name)
+	Key lookup_key(std::string_view name)
 	{
 		enum
 		{
@@ -239,12 +230,8 @@ namespace Yttrium
 		if (MIN_WORD_LENGTH <= name.size() && name.size() <= MAX_WORD_LENGTH)
 		{
 			const auto key = hash(name);
-			if (key <= MAX_HASH_VALUE)
-			{
-				const StaticString key_name(wordlist[key].name, lengthtable[key]);
-				if (name == key_name)
-					return wordlist[key].key;
-			}
+			if (key <= MAX_HASH_VALUE && name == std::string_view{wordlist[key].name, lengthtable[key]})
+				return wordlist[key].key;
 		}
 
 		return Key::Null;

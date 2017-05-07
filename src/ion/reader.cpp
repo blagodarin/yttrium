@@ -2,7 +2,6 @@
 
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/string_utils.h>
 
 #include <array>
 #include <vector>
@@ -89,20 +88,20 @@ namespace Yttrium
 			throw IonError{_line, _column, "'[' expected"};
 	}
 
-	void IonReader::Token::check_name(const StaticString& name) const
+	void IonReader::Token::check_name(std::string_view name) const
 	{
 		if (to_name() != name)
 			throw IonError{_line, _column, "'", name, "' expected"};
 	}
 
-	StaticString IonReader::Token::to_name() const
+	std::string_view IonReader::Token::to_name() const
 	{
 		if (_type != Type::Name)
 			throw IonError{_line, _column, "ION name expected"};
 		return _text;
 	}
 
-	StaticString IonReader::Token::to_value() const
+	std::string_view IonReader::Token::to_value() const
 	{
 		if (_type != Type::Value)
 			throw IonError{_line, _column, "ION value expected"};

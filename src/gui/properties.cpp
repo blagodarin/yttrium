@@ -5,7 +5,6 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
-#include <yttrium/static_string.h>
 #include "property_loader.h"
 
 #include <cassert>
@@ -14,11 +13,11 @@ namespace
 {
 	using namespace Yttrium;
 
-	SizeF make_text_size(const TextureFont& font, const std::string& text, float max_width, float max_height)
+	SizeF make_text_size(const TextureFont& font, std::string_view text, float max_width, float max_height)
 	{
-		const SizeF unscaled_text_size{font.text_size(text)};
 		if (text.empty())
 			return {0, max_height};
+		const SizeF unscaled_text_size{font.text_size(text)};
 		const auto font_size = std::min(max_height, unscaled_text_size._height * max_width / unscaled_text_size._width);
 		return {unscaled_text_size._width * font_size / unscaled_text_size._height, font_size};
 	}
@@ -59,22 +58,22 @@ namespace Yttrium
 
 	bool BackgroundProperty::load(const GuiPropertyLoader& loader)
 	{
-		loader.load_color("color"_s, &color);
-		if (loader.load_texture("texture"_s, texture, texture_filter))
+		loader.load_color("color", &color);
+		if (loader.load_texture("texture", texture, texture_filter))
 		{
-			if (!loader.load_rect("texture_rect"_s, texture_rect))
+			if (!loader.load_rect("texture_rect", texture_rect))
 				texture_rect = RectF(Rect(texture->size()));
-			loader.load_margins("borders"_s, borders);
+			loader.load_margins("borders", borders);
 		}
 		return true;
 	}
 
 	void BackgroundProperty::update(const GuiPropertyLoader& loader)
 	{
-		loader.load_color("color"_s, &color);
-		loader.load_texture("texture"_s, texture, texture_filter);
-		loader.load_rect("texture_rect"_s, texture_rect, true);
-		loader.load_margins("borders"_s, borders);
+		loader.load_color("color", &color);
+		loader.load_texture("texture", texture, texture_filter);
+		loader.load_rect("texture_rect", texture_rect, true);
+		loader.load_margins("borders", borders);
 	}
 
 	ForegroundProperty::ForegroundProperty() = default;
@@ -88,14 +87,14 @@ namespace Yttrium
 
 	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
 	{
-		loader.load_font("font"_s, &font, &font_texture);
-		loader.load("text_size"_s, size);
-		loader.load_color("text_color"_s, &color);
-		loader.load_alignment("align"_s, &alignment);
+		loader.load_font("font", &font, &font_texture);
+		loader.load("text_size", size);
+		loader.load_color("text_color", &color);
+		loader.load_alignment("align", &alignment);
 		return true;
 	}
 
-	void ForegroundProperty::prepare(const std::string& text, const RectF& rect, TextCapture* capture)
+	void ForegroundProperty::prepare(std::string_view text, const RectF& rect, TextCapture* capture)
 	{
 		const auto max_text_height = rect.height() * size;
 		const auto margins = rect.height() - max_text_height;

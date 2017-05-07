@@ -1,6 +1,5 @@
 #include "canvas.h"
 
-#include <yttrium/exceptions.h>
 #include "../gui.h"
 #include "../property_loader.h"
 
@@ -9,7 +8,7 @@ namespace Yttrium
 	CanvasWidget::CanvasWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
 		: Widget{gui, name}
 	{
-		loader.load_rect("position"_s, _rect);
+		loader.load_rect("position", _rect);
 	}
 
 	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetState) const

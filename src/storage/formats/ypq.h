@@ -16,7 +16,7 @@ namespace Yttrium
 		YpqReader(std::unique_ptr<Source>&&);
 		~YpqReader() override;
 
-		const std::vector<StaticString>& names() const override { return _names; }
+		const std::vector<std::string_view>& names() const override { return _names; }
 		std::unique_ptr<Source> open(std::size_t) const override;
 
 	private:
@@ -24,9 +24,9 @@ namespace Yttrium
 
 		const std::shared_ptr<const Source> _source;
 		Buffer _metadata_buffer;
-		std::vector<StaticString> _names;
+		std::vector<std::string_view> _names;
 		std::vector<Entry> _entries;
-		std::vector<std::pair<StaticString, StaticString>> _properties; // TODO: Map TinyStringMap into the metadata buffer.
+		std::vector<std::pair<std::string_view, std::string_view>> _properties; // TODO: Map TinyStringMap into the metadata buffer.
 	};
 
 	class YpqWriter final : public PackageWriter

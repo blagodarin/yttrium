@@ -3,7 +3,7 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
-#include <yttrium/std_string_view.h>
+#include <yttrium/std/string_view.h>
 
 #include <memory>
 #include <vector>
@@ -14,7 +14,6 @@ namespace Yttrium
 	class GuiPropertyLoader;
 	class RectF;
 	class Renderer;
-	class StaticString;
 	class Widget;
 
 	class GuiLayout
@@ -32,7 +31,7 @@ namespace Yttrium
 
 		void set_size(const SizeF& size) { _size = size; }
 
-		Widget& add_widget(const StaticString& type, std::string_view name, GuiPropertyLoader&);
+		Widget& add_widget(std::string_view type, std::string_view name, GuiPropertyLoader&);
 
 		void draw(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;
 		void update(const RectF&);

@@ -5,16 +5,15 @@
 #define _include_yttrium_storage_package_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <map>
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace Yttrium
 {
 	class Source;
-	class StaticString;
 
 	/// Package file types.
 	enum class PackageType
@@ -34,7 +33,7 @@ namespace Yttrium
 		virtual ~PackageReader() = default;
 
 		///
-		virtual const std::vector<StaticString>& names() const = 0;
+		virtual const std::vector<std::string_view>& names() const = 0;
 
 		///
 		virtual std::unique_ptr<Source> open(std::size_t index) const = 0;

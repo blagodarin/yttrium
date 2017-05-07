@@ -1,10 +1,8 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_ion_object_h_
 #define _include_yttrium_ion_object_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <map>
 #include <vector>
@@ -18,7 +16,6 @@ namespace Yttrium
 	class IonObjectReverseIterator;
 	class IonParser;
 	class IonValue;
-	class StaticString;
 	class String;
 
 	///
@@ -30,19 +27,19 @@ namespace Yttrium
 	public:
 
 		///
-		IonNode* append(const StaticString& name);
+		IonNode* append(std::string_view);
 
 		///
 		IonObjectIterator begin() const;
 
 		///
-		bool contains(const StaticString& name) const;
+		bool contains(std::string_view) const;
 
 		///
 		IonObjectIterator end() const;
 
 		///
-		const IonNode& last(const StaticString& name) const;
+		const IonNode& last(std::string_view) const;
 
 		///
 		IonObjectReverseIterator rbegin() const;
@@ -59,7 +56,7 @@ namespace Yttrium
 	private:
 		explicit IonObject(IonDocumentImpl&);
 
-		Y_PRIVATE IonNode* append(const StaticString& name, const ByReference&);
+		Y_PRIVATE IonNode* append(std::string_view, const ByReference&);
 
 	private:
 		IonDocumentImpl& _document;

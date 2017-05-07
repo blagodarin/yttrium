@@ -7,7 +7,7 @@
 #include <yttrium/ion/utils.h>
 #include <yttrium/ion/value.h>
 #include <yttrium/resource_loader.h>
-#include <yttrium/std_optional.h>
+#include <yttrium/std/optional.h>
 #include <yttrium/storage/storage.h>
 #include "../gui.h"
 #include "../screen.h"
@@ -20,9 +20,9 @@ namespace
 
 	struct GuiElement
 	{
-		const IonObject* object = nullptr;
-		const StaticString* name = nullptr;
-		const StaticString* attribute = nullptr;
+		const IonObject* _object = nullptr;
+		std::string_view _name;
+		std::string_view _attribute;
 	};
 
 	GuiElement load_element(const IonList& source)
@@ -35,7 +35,7 @@ namespace
 
 		if (value->type() == IonValue::Type::String)
 		{
-			value->get(&result.name);
+			value->get(result._name);
 			++value;
 			if (value == source.end())
 				return {};
@@ -44,7 +44,7 @@ namespace
 		if (value->type() == IonValue::Type::List)
 		{
 			const auto& list = value->list();
-			if (list.size() != 1 || !list.first()->get(&result.attribute))
+			if (list.size() != 1 || !list.first()->get(result._attribute))
 				return {};
 			++value;
 			if (value == source.end())
@@ -54,7 +54,7 @@ namespace
 		if (value->type() != IonValue::Type::Object)
 			return {};
 
-		result.object = value->object();
+		result._object = value->object();
 
 		++value;
 		if (value != source.end())
@@ -63,7 +63,7 @@ namespace
 		return result;
 	}
 
-	std::optional<std::tuple<StaticString, GuiActions, GuiActions>> load_on_key(const IonList& source)
+	std::optional<std::tuple<std::string_view, GuiActions, GuiActions>> load_on_key(const IonList& source)
 	{
 		const auto key = source.begin();
 		if (key == source.end() || key->type() != IonValue::Type::String)
@@ -82,11 +82,11 @@ namespace
 namespace Yttrium
 {
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
-		: _gui(gui)
+		: _gui{gui}
 	{
 	}
 
-	void GuiIonLoader::load(const StaticString& source_name)
+	void GuiIonLoader::load(std::string_view source_name)
 	{
 		try
 		{
@@ -106,13 +106,13 @@ namespace Yttrium
 		Transparent = 1 << 2,
 	};
 
-	GuiIonLoader::Attribute GuiIonLoader::load_attribute(const StaticString& name)
+	GuiIonLoader::Attribute GuiIonLoader::load_attribute(std::string_view name)
 	{
-		if (name == "default"_s)
+		if (name == "default")
 			return Attribute::Default;
-		else if (name == "root"_s)
+		else if (name == "root")
 			return Attribute::Root;
-		else if (name == "transparent"_s)
+		else if (name == "transparent")
 			return Attribute::Transparent;
 		else
 			return Attribute::Unknown;
@@ -120,15 +120,15 @@ namespace Yttrium
 
 	void GuiIonLoader::load(const IonObject& source)
 	{
-		static const std::map<StaticString, void (GuiIonLoader::*)(const IonNode&, Flags<Attribute>)> handlers =
+		static const std::map<std::string_view, void (GuiIonLoader::*)(const IonNode&, Flags<Attribute>)> handlers =
 		{
-			{ "class"_s, &GuiIonLoader::load_class },
-			{ "cursor"_s, &GuiIonLoader::load_cursor },
-			{ "font"_s, &GuiIonLoader::load_font },
-			{ "include"_s, &GuiIonLoader::load_include },
-			{ "on_key"_s, &GuiIonLoader::load_on_key },
-			{ "screen"_s, &GuiIonLoader::load_screen },
-			{ "translation"_s, &GuiIonLoader::load_translation },
+			{"class", &GuiIonLoader::load_class},
+			{"cursor", &GuiIonLoader::load_cursor},
+			{"font", &GuiIonLoader::load_font},
+			{"include", &GuiIonLoader::load_include},
+			{"on_key", &GuiIonLoader::load_on_key},
+			{"screen", &GuiIonLoader::load_screen},
+			{"translation", &GuiIonLoader::load_translation},
 		};
 
 		Flags<Attribute> attributes;
@@ -138,14 +138,14 @@ namespace Yttrium
 			{
 				const auto attribute = load_attribute(node.name());
 				if (attribute == Attribute::Unknown)
-					throw GuiDataError("Unknown attribute '"_s, node.name(), "'"_s);
+					throw GuiDataError{"Unknown attribute '", node.name(), "'"};
 				attributes |= attribute;
 			}
 			else
 			{
 				const auto i = handlers.find(node.name());
 				if (i == handlers.end())
-					throw GuiDataError("Unknown entry '"_s, node.name(), "'"_s);
+					throw GuiDataError{"Unknown entry '", node.name(), "'"};
 				(this->*i->second)(node, attributes);
 				attributes = {};
 			}
@@ -155,116 +155,115 @@ namespace Yttrium
 	void GuiIonLoader::load_class(const IonNode& node, Flags<Attribute>)
 	{
 		const auto& element = ::load_element(node);
-		if (!element.object || !element.name)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		if (element.attribute)
+		if (!element._object || !element._name.data())
+			throw GuiDataError{"Bad '", node.name(), "'"};
+		if (element._attribute.data())
 		{
-			const auto attribute = element.attribute->to_std();
-			if (_classes.add(element.name->to_std(), *element.object, &attribute))
+			const auto attribute = strings::from_view(element._attribute);
+			if (_classes.add(strings::from_view(element._name), *element._object, &attribute))
 				return;
 		}
-		else if (_classes.add(element.name->to_std(), *element.object))
+		else if (_classes.add(strings::from_view(element._name), *element._object))
 			return;
-		throw GuiDataError("Bad '"_s, node.name(), "' \""_s, *element.name, "\""_s);
+		throw GuiDataError{"Bad '", node.name(), "' \"", element._name, "\""};
 	}
 
 	void GuiIonLoader::load_cursor(const IonNode& node, Flags<Attribute>)
 	{
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::Object)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		const auto& object = *node.first()->object();
 		if (object.size() != 1)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		const auto& object_node = *object.begin();
-		if (object_node.name() == "none"_s)
+		if (object_node.name() == "none")
 		{
 			if (!object_node.is_empty())
-				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
 			_gui.set_default_cursor(GuiCursor::None);
 		}
-		else if (object_node.name() == "custom"_s)
+		else if (object_node.name() == "custom")
 		{
 			if (!object_node.is_empty())
-				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
 			_gui.set_default_cursor(GuiCursor::Custom);
 		}
-		else if (object_node.name() == "texture"_s)
+		else if (object_node.name() == "texture")
 		{
 			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
-				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
 			_gui.set_default_cursor(GuiCursor::Texture, object_node.first()->string());
 		}
-		else if (object_node.name() != "default"_s)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		else if (object_node.name() != "default")
+			throw GuiDataError{"Bad '", node.name(), "'"};
 	}
 
 	void GuiIonLoader::load_font(const IonNode& node, Flags<Attribute> attributes)
 	{
 		auto element = ::load_element(node);
-		if (!element.object)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		if (!element._object)
+			throw GuiDataError{"Bad '", node.name(), "'"};
 
-		const auto& default_name = "default"_s;
-		if (!element.name)
-			element.name = &default_name;
+		if (!element._name.data())
+			element._name = "default";
 
 		if (attributes & Attribute::Default)
 		{
 			if (_has_default_font)
-				throw GuiDataError("Default '"_s, node.name(), "' redefinition"_s);
-			_default_font_name = element.name->to_std();
+				throw GuiDataError{"Default '", node.name(), "' redefinition"};
+			_default_font_name = strings::from_view(element._name);
 			_has_default_font = true;
 		}
 
-		const StaticString* font_name;
-		if (!GuiIonPropertyLoader::load_text(&font_name, element.object->last("file"_s)))
-			throw GuiDataError("Bad '"_s, node.name(), "' 'file'"_s);
+		std::string_view font_name;
+		if (!GuiIonPropertyLoader::load_text(font_name, element._object->last("file")))
+			throw GuiDataError{"Bad '", node.name(), "' 'file'"};
 
-		const StaticString* texture_name;
-		if (!GuiIonPropertyLoader::load_text(&texture_name, element.object->last("texture"_s)))
-			throw GuiDataError("Bad '"_s, node.name(), "' 'texture'"_s);
+		std::string_view texture_name;
+		if (!GuiIonPropertyLoader::load_text(texture_name, element._object->last("texture")))
+			throw GuiDataError{"Bad '", node.name(), "' 'texture'"};
 
-		_gui.set_font(element.name->to_std(), *font_name, *texture_name);
+		_gui.set_font(strings::from_view(element._name), font_name, texture_name);
 	}
 
 	void GuiIonLoader::load_include(const IonNode& node, Flags<Attribute>)
 	{
-		const StaticString* path;
+		std::string_view path;
 		if (!Ion::get(node, path))
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		load(*path);
+			throw GuiDataError{"Bad '", node.name(), "'"};
+		load(path);
 	}
 
 	void GuiIonLoader::load_screen(const IonNode& node, Flags<Attribute> attributes)
 	{
-		static const std::map<StaticString, std::pair<void (GuiIonLoader::*)(GuiScreen&, const IonNode&, int) const, int>> handlers =
+		static const std::map<std::string_view, std::pair<void (GuiIonLoader::*)(GuiScreen&, const IonNode&, int) const, int>> handlers =
 		{
-			{ "center"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Center) } },
-			{ "cursor"_s, { &GuiIonLoader::load_screen_cursor, 0 } },
-			{ "left"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Left) } },
-			{ "music"_s, { &GuiIonLoader::load_screen_music, 0 } },
-			{ "on_enter"_s, { &GuiIonLoader::load_screen_on_enter, 0 } },
-			{ "on_event"_s, { &GuiIonLoader::load_screen_on_event, 0 } },
-			{ "on_key"_s, { &GuiIonLoader::load_screen_on_key, 0 } },
-			{ "on_return"_s, { &GuiIonLoader::load_screen_on_return, 0 } },
-			{ "right"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Right) } },
-			{ "stretch"_s, { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch) } },
+			{"center", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Center)}},
+			{"cursor", {&GuiIonLoader::load_screen_cursor, 0}},
+			{"left", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Left)}},
+			{"music", {&GuiIonLoader::load_screen_music, 0}},
+			{"on_enter", {&GuiIonLoader::load_screen_on_enter, 0}},
+			{"on_event", {&GuiIonLoader::load_screen_on_event, 0}},
+			{"on_key", {&GuiIonLoader::load_screen_on_key, 0}},
+			{"on_return", {&GuiIonLoader::load_screen_on_return, 0}},
+			{"right", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Right)}},
+			{"stretch", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch)}},
 		};
 
 		const auto& element = ::load_element(node);
-		if (!element.object)
-			throw GuiDataError("Empty '"_s, node.name(), "'"_s);
+		if (!element._object)
+			throw GuiDataError{"Empty '", node.name(), "'"};
 
-		if (!element.name)
-			throw GuiDataError("'"_s, node.name(), "' must have a name"_s);
+		if (!element._name.data())
+			throw GuiDataError{"'", node.name(), "' must have a name"};
 
-		auto& screen = _gui.add_screen(element.name->to_std(), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
-		for (const auto& screen_node : *element.object)
+		auto& screen = _gui.add_screen(strings::from_view(element._name), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
+		for (const auto& screen_node : *element._object)
 		{
 			const auto i = handlers.find(screen_node.name());
 			if (i == handlers.end())
-				throw GuiDataError("Unknown '"_s, node.name(), "' entry '"_s, screen_node.name(), "'"_s);
+				throw GuiDataError{"Unknown '", node.name(), "' entry '", screen_node.name(), "'"};
 			(this->*i->second.first)(screen, screen_node, i->second.second);
 		}
 	}
@@ -273,54 +272,54 @@ namespace Yttrium
 	{
 		auto binding = ::load_on_key(node);
 		if (!binding)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		_gui.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
 	}
 
 	void GuiIonLoader::load_translation(const IonNode& node, Flags<Attribute>)
 	{
-		const StaticString* path;
+		std::string_view path;
 		if (!Ion::get(node, path))
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		_gui.set_translation(*path);
+			throw GuiDataError{"Bad '", node.name(), "'"};
+		_gui.set_translation(path);
 	}
 
 	void GuiIonLoader::load_screen_cursor(GuiScreen& screen, const IonNode& node, int) const
 	{
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::Object)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		const auto& object = *node.first()->object();
 		if (object.size() != 1)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		const auto& object_node = *object.begin();
-		if (object_node.name() == "none"_s)
+		if (object_node.name() == "none")
 		{
 			if (!object_node.is_empty())
-				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
 			screen.set_cursor(GuiCursor::None);
 		}
-		else if (object_node.name() == "custom"_s)
+		else if (object_node.name() == "custom")
 		{
 			if (!object_node.is_empty())
-				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
 			screen.set_cursor(GuiCursor::Custom);
 		}
-		else if (object_node.name() == "texture"_s)
+		else if (object_node.name() == "texture")
 		{
 			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
-				throw GuiDataError("Bad '"_s, node.name(), ".", object_node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
 			screen.set_cursor(GuiCursor::Texture, object_node.first()->string());
 		}
-		else if (object_node.name() != "default"_s)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+		else if (object_node.name() != "default")
+			throw GuiDataError{"Bad '", node.name(), "'"};
 	}
 
 	void GuiIonLoader::load_screen_layout(GuiScreen& screen, const IonNode& node, int extra) const
 	{
-		static const std::map<StaticString, void (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
+		static const std::map<std::string_view, void (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
 		{
-			{ "size"_s, &GuiIonLoader::load_layout_size },
+			{"size", &GuiIonLoader::load_layout_size},
 		};
 
 		const auto placement = static_cast<GuiLayout::Placement>(extra);
@@ -330,14 +329,14 @@ namespace Yttrium
 		{
 			int height = 0;
 			if (node.size() != 2 || node.first()->type() != IonValue::Type::String || node.last()->type() != IonValue::Type::Object
-				|| !node.first()->string().to_number(height))
-				throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+				|| !strings::to_number(node.first()->string(), height))
+				throw GuiDataError{"Bad '", node.name(), "'"};
 			layout.set_size({0, static_cast<float>(height)});
 		}
 		else
 		{
 			if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
-				throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+				throw GuiDataError{"Bad '", node.name(), "'"};
 		}
 
 		for (const auto& layout_node : *node.last()->object())
@@ -350,13 +349,13 @@ namespace Yttrium
 			}
 
 			const auto& element = ::load_element(layout_node);
-			if (!element.object)
-				throw GuiDataError("Bad layout entry '"_s, layout_node.name(), "'"_s);
+			if (!element._object)
+				throw GuiDataError{"Bad layout entry '", layout_node.name(), "'"};
 
-			GuiIonPropertyLoader loader(element.object, (element.attribute ? _classes.find(element.attribute->to_std()) : nullptr), _gui);
+			GuiIonPropertyLoader loader(element._object, (element._attribute.data() ? _classes.find(strings::from_view(element._attribute)) : nullptr), _gui);
 			if (_has_default_font)
 				loader.set_default_font_name(&_default_font_name);
-			screen.register_widget(layout.add_widget(layout_node.name(), element.name ? std::string_view{element.name->text(), element.name->size()} : "", loader));
+			screen.register_widget(layout.add_widget(layout_node.name(), element._name.data() ? element._name : "", loader));
 		}
 	}
 
@@ -364,9 +363,9 @@ namespace Yttrium
 	{
 		const auto values = node.values();
 		if (values.size() != 1 || values->type() != IonValue::Type::String)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		const auto music_name = values->string();
-		screen.set_music(music_name.is_empty() ? nullptr : _gui.resource_loader().load_music(music_name));
+		screen.set_music(music_name.empty() ? nullptr : _gui.resource_loader().load_music(music_name));
 	}
 
 	void GuiIonLoader::load_screen_on_enter(GuiScreen& screen, const IonNode& node, int) const
@@ -378,15 +377,15 @@ namespace Yttrium
 	{
 		const auto values = node.values();
 		if (values.size() != 2 || values->type() != IonValue::Type::String || values.last().type() != IonValue::Type::Object)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
-		screen.set_on_event(values->string().to_std(), GuiIonPropertyLoader::load_actions(*values.last().object()));
+			throw GuiDataError{"Bad '", node.name(), "'"};
+		screen.set_on_event(strings::from_view(values->string()), GuiIonPropertyLoader::load_actions(*values.last().object()));
 	}
 
 	void GuiIonLoader::load_screen_on_key(GuiScreen& screen, const IonNode& node, int) const
 	{
 		auto binding = ::load_on_key(node);
 		if (!binding)
-			throw GuiDataError("Bad '"_s, node.name(), "'"_s);
+			throw GuiDataError{"Bad '", node.name(), "'"};
 		screen.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
 	}
 

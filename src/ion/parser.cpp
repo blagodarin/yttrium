@@ -130,7 +130,7 @@ namespace Yttrium
 				{
 					const auto base = i;
 					do { ++i; } while (::class_of(c[i]) == Name);
-					state->list = state->object->append(StaticString(&c[base], i - base), ByReference());
+					state->list = state->object->append({&c[base], i - base}, ByReference{});
 				}
 				break;
 
@@ -155,7 +155,7 @@ namespace Yttrium
 							++i;
 						}
 					}
-					state->list->append(StaticString(&c[base], i - base), ByReference());
+					state->list->append({&c[base], i - base}, ByReference{});
 					++i;
 				}
 				break;

@@ -29,7 +29,7 @@ namespace Yttrium
 	};
 
 	TemporaryFile::TemporaryFile()
-		: _private(std::make_unique<TemporaryFilePrivate>())
+		: _private{std::make_unique<TemporaryFilePrivate>()}
 	{
 	}
 

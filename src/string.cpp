@@ -19,9 +19,9 @@ namespace Yttrium
 				return;
 			const auto new_capacity = next_power_of_2(capacity);
 			const auto new_text = new char[new_capacity];
-			std::memcpy(new_text, s._text, s._size); // Don't copy the '\0', it will be written to the string later.
-			delete[] s._text;
-			s._text = new_text;
+			std::memcpy(new_text, s._data, s._size); // Don't copy the '\0', it will be written to the string later.
+			delete[] s._data;
+			s._data = new_text;
 			s._capacity = new_capacity;
 		}
 
@@ -29,41 +29,44 @@ namespace Yttrium
 		{
 			assert(s._capacity == 0);
 			const auto actual_capacity = next_power_of_2(std::max(capacity, MinCapacity));
-			s._text = new char[actual_capacity];
+			s._data = new char[actual_capacity];
 			s._capacity = actual_capacity;
 		}
 
-		static void initialize_copy(String& s, const StaticString& source)
+		static void initialize_copy(String& s, std::string_view source)
 		{
-			assert(!s._text);
+			assert(!s._data);
 			assert(s._size == source.size());
 			assert(s._capacity > 0);
-			const auto text = new char[s._capacity];
-			std::memcpy(text, source.text(), source.size());
-			text[source.size()] = '\0';
-			s._text = text;
+			const auto data = new char[s._capacity];
+			std::memcpy(data, source.data(), source.size());
+			data[source.size()] = '\0';
+			s._data = data;
 		}
 	};
 
 	const size_t String::Private::MinCapacity;
 
 	String::String(const String& string)
-		: StaticString(nullptr, string._size)
-		, _capacity(next_power_of_2(std::max(_size + 1, Private::MinCapacity)))
+		: _data{nullptr}
+		, _size{string._size}
+		, _capacity{next_power_of_2(std::max(_size + 1, Private::MinCapacity))}
 	{
 		Private::initialize_copy(*this, string);
 	}
 
 	String::String(String&& string) noexcept
-		: StaticString(string._text, string._size)
-		, _capacity(string._capacity)
+		: _data{string._data}
+		, _size{string._size}
+		, _capacity{string._capacity}
 	{
 		string._capacity = 0;
 	}
 
-	String::String(const StaticString& string)
-		: StaticString(nullptr, string.size())
-		, _capacity(next_power_of_2(std::max(_size + 1, Private::MinCapacity)))
+	String::String(std::string_view string)
+		: _data{nullptr}
+		, _size{string.size()}
+		, _capacity{next_power_of_2(std::max(_size + 1, Private::MinCapacity))}
 	{
 		Private::initialize_copy(*this, string);
 	}
@@ -71,10 +74,10 @@ namespace Yttrium
 	String::~String()
 	{
 		if (_capacity > 0)
-			delete[] _text;
+			delete[] _data;
 	}
 
-	String& String::operator=(const StaticString& string)
+	String& String::operator=(std::string_view string)
 	{
 		const auto capacity = string.size() + 1;
 		if (_capacity > 0)
@@ -82,8 +85,8 @@ namespace Yttrium
 		else
 			Private::initialize(*this, capacity);
 
-		std::memcpy(const_cast<char*>(_text), string.text(), string.size());
-		const_cast<char*>(_text)[string.size()] = '\0';
+		std::memcpy(const_cast<char*>(_data), string.data(), string.size());
+		const_cast<char*>(_data)[string.size()] = '\0';
 		_size = string.size();
 
 		return *this;
@@ -92,11 +95,13 @@ namespace Yttrium
 	String& String::operator=(String&& string) noexcept
 	{
 		if (_capacity > 0)
-			delete[] _text;
-		_text = string._text;
+			delete[] _data;
+		_data = string._data;
 		_size = string._size;
 		_capacity = string._capacity;
 		string._capacity = 0;
 		return *this;
 	}
+
+	char String::Null = '\0';
 }

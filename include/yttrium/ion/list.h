@@ -1,12 +1,8 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_ion_list_h_
 #define _include_yttrium_ion_list_h_
 
 #include <yttrium/api.h>
-
-#include <cstddef>
+#include <yttrium/std/string_view.h>
 
 namespace Yttrium
 {
@@ -17,7 +13,6 @@ namespace Yttrium
 	class IonObject;
 	class IonParser;
 	class IonValue;
-	class StaticString;
 
 	///
 	class Y_API IonList
@@ -35,7 +30,7 @@ namespace Yttrium
 		IonObject* append_object();
 
 		///
-		IonValue* append(const StaticString& string);
+		IonValue* append(std::string_view);
 
 		///
 		IonListIterator begin() const;
@@ -67,7 +62,7 @@ namespace Yttrium
 		const IonDocumentImpl& document() const { return _document; }
 
 	private:
-		Y_PRIVATE IonValue* append(const StaticString& string, const ByReference&);
+		Y_PRIVATE IonValue* append(std::string_view, const ByReference&);
 		Y_PRIVATE void append(IonValue* value);
 
 	private:

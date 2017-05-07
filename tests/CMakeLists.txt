@@ -24,7 +24,6 @@ add_executable(unit_tests
 	rect.cpp
 	resource_loader.cpp
 	source.cpp
-	static_string.cpp
 	string_utils.cpp
 	string.cpp
 	texture_font.cpp

@@ -2,7 +2,7 @@
 #define _src_system_gdi_window_h_
 
 #include <yttrium/math/size.h>
-#include <yttrium/std_optional.h>
+#include <yttrium/std/optional.h>
 #include "wgl.h"
 
 #include <string>

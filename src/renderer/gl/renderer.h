@@ -36,9 +36,9 @@ namespace Yttrium
 
 	private:
 		const GlApi _gl;
-		GlBufferHandle _2d_ibo{ _gl, GL_ELEMENT_ARRAY_BUFFER };
-		GlBufferHandle _2d_vbo{ _gl, GL_ARRAY_BUFFER };
-		GlVertexArrayHandle _2d_vao{ _gl };
+		GlBufferHandle _2d_ibo{_gl, GL_ELEMENT_ARRAY_BUFFER};
+		GlBufferHandle _2d_vbo{_gl, GL_ARRAY_BUFFER};
+		GlVertexArrayHandle _2d_vao{_gl};
 	};
 }
 

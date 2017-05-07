@@ -1,6 +1,3 @@
-/// \file
-/// \brief Parsed script code.
-
 #ifndef _include_yttrium_script_code_h_
 #define _include_yttrium_script_code_h_
 
@@ -13,7 +10,7 @@ namespace Yttrium
 {
 	class ScriptContext;
 
-	/// Script code.
+	/// Parsed script code.
 	class Y_API ScriptCode
 	{
 	public:

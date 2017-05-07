@@ -1,6 +1,5 @@
 #include "image.h"
 
-#include <yttrium/static_string.h>
 #include "../property_loader.h"
 
 namespace Yttrium
@@ -8,7 +7,7 @@ namespace Yttrium
 	ImageWidget::ImageWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
 		: Widget{gui, name}
 	{
-		loader.load_rect("position"_s, _rect);
+		loader.load_rect("position", _rect);
 		_background.load(loader);
 	}
 

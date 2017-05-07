@@ -17,8 +17,8 @@
 namespace Yttrium
 {
 	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context)
-		: _resource_loader(resource_loader)
-		, _script_context(script_context)
+		: _resource_loader{resource_loader}
+		, _script_context{script_context}
 	{
 	}
 
@@ -27,14 +27,14 @@ namespace Yttrium
 	GuiScreen& GuiPrivate::add_screen(const std::string& name, bool is_transparent, bool is_root)
 	{
 		if (!is_root && name.empty())
-			throw GuiDataError("Non-root screen must have a name"_s);
+			throw GuiDataError{"Non-root screen must have a name"};
 		if (_screens.find(name) != _screens.end())
-			throw GuiDataError("Duplicate screen name \""_s, name, "\""_s);
+			throw GuiDataError{"Duplicate screen name \"", name, "\""};
 		auto screen = std::make_unique<GuiScreen>(*this, name, is_transparent);
 		if (is_root)
 		{
 			if (_root_screen)
-				throw GuiDataError("\""_s, name, "\" can't be a root screen, \""_s, _root_screen->name(), "\" is the root screen"_s);
+				throw GuiDataError{"\"", name, "\" can't be a root screen, \"", _root_screen->name(), "\" is the root screen"};
 			_root_screen = screen.get();
 		}
 		auto& result = *_screens.emplace(screen->name(), std::move(screen)).first->second;
@@ -42,13 +42,13 @@ namespace Yttrium
 		return result;
 	}
 
-	void GuiPrivate::set_translation(const StaticString& path)
+	void GuiPrivate::set_translation(std::string_view path)
 	{
 		if (_translation)
-			throw GuiDataError("Only one translation is allowed"_s);
+			throw GuiDataError{"Only one translation is allowed"};
 		_translation = _resource_loader.load_translation(path);
 		if (!_translation)
-			throw GuiDataError("Bad translation \""_s, path, "\""_s);
+			throw GuiDataError{"Bad translation \"", path, "\""};
 	}
 
 	const GuiPrivate::FontDesc* GuiPrivate::font(const std::string& name) const
@@ -104,14 +104,14 @@ namespace Yttrium
 		return true;
 	}
 
-	void GuiPrivate::set_default_cursor(GuiCursor cursor, const StaticString& texture)
+	void GuiPrivate::set_default_cursor(GuiCursor cursor, std::string_view texture)
 	{
 		_default_cursor = cursor;
 		if (_default_cursor == GuiCursor::Texture)
 			_default_cursor_texture = _resource_loader.load_texture_2d(texture);
 	}
 
-	void GuiPrivate::set_font(const std::string& name, const StaticString& font_source, const StaticString& texture_name)
+	void GuiPrivate::set_font(const std::string& name, std::string_view font_source, std::string_view texture_name)
 	{
 		auto texture = _resource_loader.load_texture_2d(texture_name);
 		assert(texture);
@@ -120,16 +120,16 @@ namespace Yttrium
 		assert(texture_font);
 
 		if (!Rect(texture->size()).contains(texture_font->rect()))
-			throw GuiDataError("Can't use font \""_s, font_source, "\" with texture \""_s, texture_name, "\""_s);
+			throw GuiDataError{"Can't use font \"", font_source, "\" with texture \"", texture_name, "\""};
 
 		auto& font = _fonts[name];
 		font.font = std::move(texture_font);
 		font.texture = std::move(texture);
 	}
 
-	std::string GuiPrivate::translate(const StaticString& source) const
+	std::string GuiPrivate::translate(std::string_view source) const
 	{
-		return _translation ? _translation->translate(source) : source.to_std();
+		return _translation ? _translation->translate(source) : strings::from_view(source);
 	}
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)
@@ -152,12 +152,12 @@ namespace Yttrium
 		_screen_stack.pop_back();
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, const StaticString& name)
+	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, std::string_view name)
 		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context))
 	{
 		GuiIonLoader(*_private).load(name);
 		if (!_private->_root_screen)
-			throw GuiDataError("(gui) No root screen has been added"_s);
+			throw GuiDataError{"(gui) No root screen has been added"};
 	}
 
 	Gui::~Gui() = default;
@@ -182,10 +182,10 @@ namespace Yttrium
 		(*top_screen)->draw(renderer, &cursor);
 	}
 
-	void Gui::notify(const StaticString& event)
+	void Gui::notify(std::string_view event)
 	{
 		if (!_private->_screen_stack.empty())
-			_private->_screen_stack.back()->handle_event(event.to_std());
+			_private->_screen_stack.back()->handle_event(strings::from_view(event));
 	}
 
 	void Gui::on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>& callback)

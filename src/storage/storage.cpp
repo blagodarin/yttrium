@@ -2,8 +2,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/static_string.h>
-#include <yttrium/std_variant.h>
+#include <yttrium/std/variant.h>
 #include "source.h"
 
 #include <list>
@@ -22,7 +21,7 @@ namespace Yttrium
 		void attach_buffer(const std::string& name, Buffer&& buffer)
 		{
 			_buffers.emplace_back(name, std::move(buffer));
-			_stored[StaticString{_buffers.back()._name}] = BufferEntry{&_buffers.back()};
+			_stored[_buffers.back()._name] = BufferEntry{&_buffers.back()};
 		}
 
 		void attach_package(std::unique_ptr<PackageReader>&& package)
@@ -34,11 +33,11 @@ namespace Yttrium
 				_stored[names[i]] = PackageEntry{p, i};
 		}
 
-		std::unique_ptr<Source> open(const StaticString& name) const
+		std::unique_ptr<Source> open(std::string_view name) const
 		{
 			if (_use_file_system == Storage::UseFileSystem::Before)
 			{
-				auto source = Source::from(name.to_std());
+				auto source = Source::from(name);
 				if (source)
 					return source;
 			}
@@ -49,7 +48,7 @@ namespace Yttrium
 			}
 			if (_use_file_system == Storage::UseFileSystem::After)
 			{
-				auto source = Source::from(name.to_std());
+				auto source = Source::from(name);
 				if (source)
 					return source;
 			}
@@ -85,7 +84,7 @@ namespace Yttrium
 		const Storage::UseFileSystem _use_file_system;
 		std::vector<std::unique_ptr<const PackageReader>> _packages;
 		std::list<BufferAttachment> _buffers;
-		std::map<StaticString, std::variant<std::monostate, BufferEntry, PackageEntry>> _stored;
+		std::map<std::string_view, std::variant<std::monostate, BufferEntry, PackageEntry>> _stored;
 	};
 
 	Storage::Storage(UseFileSystem use_file_system)
@@ -108,7 +107,7 @@ namespace Yttrium
 		_private->attach_package(std::move(package));
 	}
 
-	std::unique_ptr<Source> Storage::open(const StaticString& name) const
+	std::unique_ptr<Source> Storage::open(std::string_view name) const
 	{
 		return _private->open(name);
 	}

@@ -42,9 +42,9 @@ namespace Yttrium
 				::append(*target_node, source_value);
 		}
 
-		bool get(const IonNode& source, const StaticString*& value)
+		bool get(const IonNode& source, std::string_view& value)
 		{
-			return !source.is_empty() && source.last()->get(&value);
+			return !source.is_empty() && source.last()->get(value);
 		}
 	}
 }

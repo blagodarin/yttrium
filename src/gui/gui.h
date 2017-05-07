@@ -1,7 +1,7 @@
 #ifndef _src_gui_gui_h_
 #define _src_gui_gui_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/std/string_view.h>
 #include "actions.h"
 #include "cursor.h"
 #include "key_lookup.h"
@@ -51,11 +51,11 @@ namespace Yttrium
 		void quit() const { if (_on_quit) _on_quit(); }
 		ResourceLoader& resource_loader() const { return _resource_loader; }
 		ScriptContext& script_context() const { return _script_context; }
-		void set_default_cursor(GuiCursor, const StaticString& texture = {});
-		void set_font(const std::string& name, const StaticString& font_source, const StaticString& texture_name);
-		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
-		void set_translation(const StaticString& path);
-		std::string translate(const StaticString&) const;
+		void set_default_cursor(GuiCursor, std::string_view texture = {});
+		void set_font(const std::string& name, std::string_view font_source, std::string_view texture_name);
+		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
+		void set_translation(std::string_view);
+		std::string translate(std::string_view) const;
 
 	private:
 		void enter_screen(GuiScreen&);
@@ -65,7 +65,7 @@ namespace Yttrium
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
 		std::unordered_map<std::string, FontDesc> _fonts;
-		std::unordered_map<std::string, std::unique_ptr<GuiScreen>> _screens; // TODO-17: Use std::string_view.
+		std::unordered_map<std::string_view, std::unique_ptr<GuiScreen>> _screens;
 		GuiScreen* _root_screen = nullptr;
 		std::vector<GuiScreen*> _screen_stack;
 		std::shared_ptr<const Translation> _translation;

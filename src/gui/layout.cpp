@@ -1,7 +1,6 @@
 #include "layout.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/static_string.h>
 #include "gui.h"
 #include "widgets/button.h"
 #include "widgets/canvas.h"
@@ -12,26 +11,26 @@
 namespace Yttrium
 {
 	GuiLayout::GuiLayout(GuiPrivate& gui, Placement placement)
-		: _gui(gui)
-		, _placement(placement)
+		: _gui{gui}
+		, _placement{placement}
 	{
 	}
 
-	Widget& GuiLayout::add_widget(const StaticString& type, std::string_view name, GuiPropertyLoader& loader)
+	Widget& GuiLayout::add_widget(std::string_view type, std::string_view name, GuiPropertyLoader& loader)
 	{
 		std::unique_ptr<Widget> widget;
-		if (type == "button"_s)
+		if (type == "button")
 			widget = std::make_unique<ButtonWidget>(_gui, name, loader);
-		else if (type == "canvas"_s)
+		else if (type == "canvas")
 			widget = std::make_unique<CanvasWidget>(_gui, name, loader);
-		else if (type == "image"_s)
+		else if (type == "image")
 			widget = std::make_unique<ImageWidget>(_gui, name, loader);
-		else if (type == "input"_s)
+		else if (type == "input")
 			widget = std::make_unique<InputWidget>(_gui, name, loader);
-		else if (type == "label"_s)
+		else if (type == "label")
 			widget = std::make_unique<LabelWidget>(_gui, name, loader);
 		else
-			throw GuiDataError("Unknown widget type '"_s, type, "'"_s);
+			throw GuiDataError{"Unknown widget type '", type, "'"};
 		_widgets.emplace_back(std::move(widget));
 		return *_widgets.back();
 	}

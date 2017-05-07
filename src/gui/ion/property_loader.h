@@ -17,19 +17,19 @@ namespace Yttrium
 
 		void set_default_font_name(const std::string*);
 
-		void bind(const StaticString& name) override;
-		bool load(const StaticString&, float&) const override;
-		GuiActions load_actions(const StaticString& name) const override;
-		bool load_alignment(const StaticString& name, unsigned* alignment) const override;
-		bool load_color(const StaticString& name, Color4f*) const override;
-		void load_font(const StaticString& name, std::shared_ptr<const TextureFont>*, std::shared_ptr<const Texture2D>*) const override;
-		bool load_margins(const StaticString& name, Margins&) const override;
-		bool load_rect(const StaticString& name, RectF&, bool update) const override;
-		std::shared_ptr<const Sound> load_sound(const StaticString& name) const override;
-		bool load_state(const StaticString& name, WidgetState*) const override;
-		bool load_text(const StaticString& name, std::string&) const override;
-		bool load_texture(const StaticString& name, std::shared_ptr<const Texture2D>&, Texture2D::Filter&) const override;
-		bool load_translatable(const StaticString& name, std::string&) const override;
+		void bind(std::string_view name) override;
+		bool load(std::string_view, float&) const override;
+		GuiActions load_actions(std::string_view name) const override;
+		bool load_alignment(std::string_view name, unsigned* alignment) const override;
+		bool load_color(std::string_view name, Color4f*) const override;
+		void load_font(std::string_view name, std::shared_ptr<const TextureFont>*, std::shared_ptr<const Texture2D>*) const override;
+		bool load_margins(std::string_view name, Margins&) const override;
+		bool load_rect(std::string_view name, RectF&, bool update) const override;
+		std::shared_ptr<const Sound> load_sound(std::string_view name) const override;
+		bool load_state(std::string_view name, WidgetState*) const override;
+		bool load_text(std::string_view name, std::string&) const override;
+		bool load_texture(std::string_view name, std::shared_ptr<const Texture2D>&, Texture2D::Filter&) const override;
+		bool load_translatable(std::string_view name, std::string&) const override;
 		void unbind() override;
 
 		static bool load(float&, const IonNode&);
@@ -39,7 +39,7 @@ namespace Yttrium
 		static void load_margins(Margins&, const IonNode&);
 		static void load_size(SizeF&, const IonNode&);
 		static bool load_state(WidgetState*, const IonNode&);
-		static bool load_text(const StaticString**, const IonNode&);
+		static bool load_text(std::string_view&, const IonNode&);
 		static bool load_texture(std::shared_ptr<const Texture2D>&, Texture2D::Filter&, const IonNode&, ResourceLoader&);
 
 	private:

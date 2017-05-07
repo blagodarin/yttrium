@@ -12,10 +12,10 @@ using namespace Yttrium;
 
 namespace
 {
-	std::unique_ptr<Source> open_packed(const PackageReader& package, const std::string& name)
+	std::unique_ptr<Source> open_packed(const PackageReader& package, std::string_view name)
 	{
 		const auto& names = package.names();
-		return package.open(static_cast<std::size_t>(std::find(names.begin(), names.end(), StaticString{name}) - names.begin()));
+		return package.open(static_cast<std::size_t>(std::find(names.begin(), names.end(), name) - names.begin()));
 	}
 }
 

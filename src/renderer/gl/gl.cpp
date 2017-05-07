@@ -3,6 +3,7 @@
 #include <yttrium/exceptions.h>
 #include "version.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 
@@ -41,11 +42,8 @@ namespace Yttrium
 #endif
 	}
 
-	bool GlApi::has_extension(const char* name) const
+	bool GlApi::has_extension(std::string_view name) const
 	{
-		for (const auto& extension : EXTENSIONS)
-			if (extension == name)
-				return true;
-		return false;
+		return std::find(std::begin(EXTENSIONS), std::end(EXTENSIONS), name) != std::end(EXTENSIONS);
 	}
 }

@@ -1,7 +1,6 @@
 #include "writer.h"
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/static_string.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
@@ -15,8 +14,8 @@
 namespace Yttrium
 {
 	BufferWriter::BufferWriter(Buffer& buffer)
-		: WriterPrivate(buffer.size())
-		, _buffer(buffer)
+		: WriterPrivate{buffer.size()}
+		, _buffer{buffer}
 	{
 	}
 
@@ -46,17 +45,17 @@ namespace Yttrium
 	}
 
 	Writer::Writer(Buffer& buffer)
-		: _private(std::make_unique<BufferWriter>(buffer))
+		: _private{std::make_unique<BufferWriter>(buffer)}
 	{
 	}
 
 	Writer::Writer(const std::string& path)
-		: _private(create_file_writer(path))
+		: _private{create_file_writer(path)}
 	{
 	}
 
 	Writer::Writer(TemporaryFile& file)
-		: _private(create_file_writer(file))
+		: _private{create_file_writer(file)}
 	{
 	}
 
@@ -127,9 +126,9 @@ namespace Yttrium
 		return total_size == source.size();
 	}
 
-	bool Writer::write_all(const StaticString& string)
+	bool Writer::write_all(std::string_view string)
 	{
-		return write(string.text(), string.size()) == string.size();
+		return write(string.data(), string.size()) == string.size();
 	}
 
 	size_t Writer::write_at(uint64_t offset, const void* data, size_t size)

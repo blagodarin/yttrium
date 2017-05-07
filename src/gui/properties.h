@@ -5,16 +5,15 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/std/string_view.h>
 
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace Yttrium
 {
 	class GuiPropertyLoader;
 	class Renderer;
-	class StaticString;
 	class TextCapture;
 	class TextureFont;
 	class TexturedRect;
@@ -48,7 +47,7 @@ namespace Yttrium
 
 		void draw(Renderer&) const;
 		bool load(const GuiPropertyLoader&);
-		void prepare(const std::string&, const RectF&, TextCapture* = nullptr);
+		void prepare(std::string_view, const RectF&, TextCapture* = nullptr);
 	};
 }
 

@@ -23,9 +23,9 @@ add_library(yttrium
 	../include/yttrium/exceptions.h
 	../include/yttrium/flags.h
 	../include/yttrium/resource_loader.h
-	../include/yttrium/static_string.h
-	../include/yttrium/std_optional.h
-	../include/yttrium/std_variant.h
+	../include/yttrium/std/optional.h
+	../include/yttrium/std/string_view.h
+	../include/yttrium/std/variant.h
 	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
 	../include/yttrium/translation.h
@@ -33,7 +33,6 @@ add_library(yttrium
 	console.cpp
 	globals.cpp
 	resource_loader.cpp
-	static_string.cpp
 	string_utils.cpp
 	string.cpp
 	tiny_string_map.cpp

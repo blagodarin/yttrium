@@ -1,6 +1,5 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/ion/writer.h>
-#include <yttrium/static_string.h>
 #include <yttrium/storage/writer.h>
 
 #include <boost/test/unit_test.hpp>
@@ -16,7 +15,7 @@ namespace
 	public:
 		explicit TestData(IonWriter::Formatting formatting) : _ion_writer{_writer, formatting} {}
 		IonWriter* operator->() { return &_ion_writer; }
-		std::string to_string() const { return { static_cast<const char*>(_buffer.data()), _buffer.size() }; }
+		std::string_view to_string() const { return { static_cast<const char*>(_buffer.data()), _buffer.size() }; }
 	private:
 		Buffer _buffer;
 		Writer _writer{ _buffer };

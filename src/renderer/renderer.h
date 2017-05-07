@@ -8,7 +8,6 @@
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/static_string.h>
 
 #include <memory>
 
@@ -37,7 +36,7 @@ namespace Yttrium
 
 		~RendererImpl() override;
 
-		void draw_debug_text(const std::string&) override;
+		void draw_debug_text(std::string_view) override;
 		void draw_quad(const Quad&, const Color4f&) override;
 		void draw_rect(const RectF&, const Color4f&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Color4f&) override;

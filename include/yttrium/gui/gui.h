@@ -2,6 +2,7 @@
 #define _include_yttrium_gui_gui_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <functional>
 #include <memory>
@@ -15,7 +16,6 @@ namespace Yttrium
 	class Renderer;
 	class ResourceLoader;
 	class ScriptContext;
-	class StaticString;
 	class Vector2;
 
 	class Y_API Canvas
@@ -30,12 +30,12 @@ namespace Yttrium
 	class Y_API Gui
 	{
 	public:
-		Gui(ResourceLoader&, ScriptContext&, const StaticString& name);
+		Gui(ResourceLoader&, ScriptContext&, std::string_view name);
 		~Gui();
 
 		void bind_canvas(const std::string& name, Canvas&);
 		void draw(Renderer&, const Vector2& cursor) const;
-		void notify(const StaticString& event);
+		void notify(std::string_view event);
 		void on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>&);
 		void on_music(const std::function<void(const std::shared_ptr<const Music>&)>&);
 		void on_quit(const std::function<void()>&);

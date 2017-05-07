@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_storage_storage_h_
 #define _include_yttrium_storage_storage_h_
 
@@ -38,8 +35,8 @@ namespace Yttrium
 		/// Throws MissingDataError if there is no such package.
 		void attach_package(const std::string& path, PackageType = PackageType::Auto);
 
-		/// Opens a resource.
-		std::unique_ptr<Source> open(const StaticString& name) const;
+		/// Opens a data source.
+		std::unique_ptr<Source> open(std::string_view name) const;
 
 	private:
 		const std::unique_ptr<class StoragePrivate> _private;

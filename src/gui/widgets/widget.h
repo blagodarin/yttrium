@@ -4,7 +4,7 @@
 #include <yttrium/flags.h>
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/std_string_view.h>
+#include <yttrium/std/string_view.h>
 #include "../types.h"
 
 namespace Yttrium

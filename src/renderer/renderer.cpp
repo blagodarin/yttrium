@@ -74,7 +74,7 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
-	void RendererImpl::draw_debug_text(const std::string& text)
+	void RendererImpl::draw_debug_text(std::string_view text)
 	{
 		if (text.empty())
 			return;
@@ -86,11 +86,11 @@ namespace Yttrium
 		auto line_end = text.find('\n', line_begin);
 		while (line_end != std::string::npos)
 		{
-			debug.draw_text(0, top++, StaticString{text.data() + line_begin, line_end - line_begin});
+			debug.draw_text(0, top++, {text.data() + line_begin, line_end - line_begin});
 			line_begin = line_end + 1;
 			line_end = text.find('\n', line_begin);
 		}
-		debug.draw_text(0, top, StaticString{text.data() + line_begin, text.size() - line_begin});
+		debug.draw_text(0, top, {text.data() + line_begin, text.size() - line_begin});
 	}
 
 	void RendererImpl::draw_quad(const Quad& quad, const Color4f& color)

@@ -206,7 +206,7 @@ namespace Yttrium
 		_widgets.emplace_back(&widget);
 	}
 
-	void GuiScreen::set_cursor(GuiCursor cursor, const StaticString& texture)
+	void GuiScreen::set_cursor(GuiCursor cursor, std::string_view texture)
 	{
 		_cursor = cursor;
 		if (_cursor == GuiCursor::Texture)

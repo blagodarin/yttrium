@@ -19,7 +19,7 @@
 	#define GLINTEGER(name) GLint name = 0;
 	#define GLINTEGERV(name, count) std::vector<GLint> name;
 	#define GLSTRING(name) const char* name = nullptr;
-	#define GLSTRINGV(name, count) std::vector<std::string> name; // TODO-17: Use std::string_view.
+	#define GLSTRINGV(name, count) std::vector<std::string_view> name;
 #endif
 
 // OpenGL 1.0

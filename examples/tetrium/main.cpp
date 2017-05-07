@@ -82,18 +82,18 @@ int main(int, char**)
 
 	Tetrium::Game logic;
 	script.define("game_pause", [&logic](const ScriptCall&){ logic.pause(); });
-	script.define("game_start", [&logic](const ScriptCall& call){ logic.start(call.context.get_int("start_level", 1)); });
+	script.define("game_start", [&logic](const ScriptCall& call){ logic.start(call._context.get_int("start_level", 1)); });
 	script.define("game_stop", [&logic](const ScriptCall&){ logic.pause(); });
 	script.define("game_resume", [&logic](const ScriptCall&){ logic.resume(); });
-	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call.args[0]->to_int()); });
-	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call.args[0]->to_int()); });
-	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call.args[0]->to_int()); });
+	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call._args[0]->to_int()); });
+	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call._args[0]->to_int()); });
+	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call._args[0]->to_int()); });
 	script.define("screenshot", [&window](const ScriptCall&){ window.take_screenshot(); });
 	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });
 
 	TetriumStatistics statistics{script};
-	script.define("set_score", 2, [&logic, &statistics](const ScriptCall& call){ statistics.update(call.args[1]->to_int(), call.args[0]->string()); });
+	script.define("set_score", 2, [&logic, &statistics](const ScriptCall& call){ statistics.update(call._args[1]->to_int(), call._args[0]->string()); });
 
 	Storage storage{Storage::UseFileSystem::Never};
 	storage.attach_package("tetrium.ypq");

@@ -27,11 +27,11 @@ namespace Yttrium
 		};
 
 		///
-		bool get(const StaticString** value) const
+		bool get(std::string_view& value) const
 		{
 			if (_type != Type::String)
 				return false;
-			*value = &_string;
+			value = _string;
 			return true;
 		}
 
@@ -53,7 +53,7 @@ namespace Yttrium
 		const IonList& list() const { return _list; }
 
 		///
-		StaticString string() const { return _string; }
+		std::string_view string() const { return _string; }
 
 		///
 		Type type() const { return _type; }
@@ -66,8 +66,8 @@ namespace Yttrium
 
 	private:
 		Y_PRIVATE explicit IonValue(IonDocumentImpl&);
-		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString&);
-		Y_PRIVATE IonValue(IonDocumentImpl&, const StaticString&, const ByReference&);
+		Y_PRIVATE IonValue(IonDocumentImpl&, std::string_view);
+		Y_PRIVATE IonValue(IonDocumentImpl&, std::string_view, const ByReference&);
 		Y_PRIVATE IonValue(IonDocumentImpl&, IonObject*);
 
 	private:

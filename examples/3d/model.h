@@ -1,6 +1,8 @@
 #ifndef _examples_3d_model_h_
 #define _examples_3d_model_h_
 
+#include <yttrium/std/string_view.h>
+
 #include <memory>
 
 namespace Yttrium
@@ -9,7 +11,6 @@ namespace Yttrium
 	class Mesh;
 	class Renderer;
 	class ResourceLoader;
-	class StaticString;
 }
 
 using namespace Yttrium;
@@ -17,7 +18,7 @@ using namespace Yttrium;
 class Model
 {
 public:
-	Model(ResourceLoader&, const StaticString& mesh, const StaticString& material);
+	Model(ResourceLoader&, std::string_view mesh, std::string_view material);
 	~Model();
 
 	void draw(Renderer&);

@@ -3,21 +3,21 @@
 
 #include <yttrium/math/color.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/std_optional.h>
+#include <yttrium/std/optional.h>
+#include <yttrium/std/string_view.h>
 
 namespace Yttrium
 {
 	class RendererImpl;
-	class StaticString;
 
 	class DebugRenderer
 	{
 	public:
-		explicit DebugRenderer(RendererImpl& renderer);
+		explicit DebugRenderer(RendererImpl&);
 
 		void draw_cursor(int x, int y);
 		void draw_rectangle(int x, int y, int width, int height);
-		void draw_text(int x, int y, const StaticString& text, const std::optional<size_t>& max_size = {});
+		void draw_text(int x, int y, std::string_view text, const std::optional<size_t>& max_size = {});
 		size_t max_width() const;
 		void set_color(float r, float g, float b, float a = 1);
 

@@ -1,12 +1,10 @@
 #ifndef _src_script_scanner_h_
 #define _src_script_scanner_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/std/string_view.h>
 
 namespace Yttrium
 {
-	class StaticString;
-
 	class ScriptScanner
 	{
 	public:
@@ -25,7 +23,7 @@ namespace Yttrium
 			size_t line;
 			std::ptrdiff_t column;
 			Type type;
-			StaticString string;
+			std::string_view string;
 		};
 
 		explicit ScriptScanner(std::string& text);

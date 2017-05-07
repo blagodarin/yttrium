@@ -2,6 +2,7 @@
 #define _src_gui_ion_loader_h_
 
 #include <yttrium/flags.h>
+#include <yttrium/std/string_view.h>
 #include "classes.h"
 
 namespace Yttrium
@@ -10,19 +11,18 @@ namespace Yttrium
 	class GuiPrivate;
 	class GuiScreen;
 	class IonNode;
-	class StaticString;
 
 	class GuiIonLoader
 	{
 	public:
 		explicit GuiIonLoader(GuiPrivate&);
 
-		void load(const StaticString& source_name);
+		void load(std::string_view source_name);
 
 	private:
 		enum class Attribute;
 
-		static Attribute load_attribute(const StaticString&);
+		static Attribute load_attribute(std::string_view);
 
 		void load(const IonObject&);
 

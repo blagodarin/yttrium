@@ -5,16 +5,15 @@
 #define _include_yttrium_storage_writer_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <memory>
-#include <string>
 
 namespace Yttrium
 {
 	class Buffer;
 	class Reader;
 	class Source;
-	class StaticString;
 	class TemporaryFile;
 
 	///
@@ -65,7 +64,7 @@ namespace Yttrium
 		bool write_all(const Source&);
 
 		///
-		bool write_all(const StaticString&);
+		bool write_all(std::string_view);
 
 		/// Writes data at the specified offset.
 		size_t write_at(uint64_t offset, const void* data, size_t size);

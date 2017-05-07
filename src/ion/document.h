@@ -25,12 +25,12 @@ namespace Yttrium
 		void clear();
 		bool exists() const { return _exists; }
 		IonValue* new_list_value();
-		IonNode* new_node(const StaticString& name);
-		IonNode* new_node(const StaticString& name, const ByReference&);
+		IonNode* new_node(std::string_view);
+		IonNode* new_node(std::string_view, const ByReference&);
 		IonObject* new_object();
 		IonValue* new_object_value(IonObject* object);
-		IonValue* new_value(const StaticString& text);
-		IonValue* new_value(const StaticString& text, const ByReference&);
+		IonValue* new_value(std::string_view);
+		IonValue* new_value(std::string_view, const ByReference&);
 
 	private:
 		const bool _exists; // TODO: Remove.

@@ -1,6 +1,5 @@
 #include "ypq.h"
 
-#include <yttrium/static_string.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include "../../utils/fourcc.h"
@@ -54,19 +53,19 @@ namespace Yttrium
 		YpqHeader header;
 		if (!_source->read_at(0, header)
 			|| header.signature != YpqHeader::Signature)
-			throw BadPackage("Not an YPQ package"_s);
+			throw BadPackage{"Not an YPQ package"};
 
 		const auto metadata_offset = sizeof header + sizeof(YpqEntry) * header.entry_count;
 		if (header.index_size < metadata_offset)
-			throw BadPackage("Bad package header"_s);
+			throw BadPackage{"Bad package header"};
 
 		std::vector<YpqEntry> entries(size_t{header.entry_count});
 		if (!_source->read_all_at(sizeof header, entries.data(), entries.size() * sizeof(YpqEntry)))
-			throw BadPackage("Bad package index"_s);
+			throw BadPackage{"Bad package index"};
 
 		_metadata_buffer.reset(size_t{header.index_size - metadata_offset});
 		if (!_source->read_all_at(metadata_offset, _metadata_buffer.data(), _metadata_buffer.size()))
-			throw BadPackage("Bad package metadata"_s);
+			throw BadPackage{"Bad package metadata"};
 
 		const auto metadata_source = Source::from(_metadata_buffer.data(), _metadata_buffer.size());
 		Reader metadata_reader{*metadata_source};
@@ -75,7 +74,7 @@ namespace Yttrium
 		{
 			uint8_t value = 0;
 			if (!metadata_reader.read(value))
-				throw BadPackage("Bad package index entry metadata"_s);
+				throw BadPackage{"Bad package index entry metadata"};
 			return value;
 		};
 
@@ -83,8 +82,8 @@ namespace Yttrium
 		{
 			const auto size = read_uint8();
 			if (!metadata_reader.skip(size))
-				throw BadPackage("Bad package index entry metadata"_s);
-			return StaticString{static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size};
+				throw BadPackage{"Bad package index entry metadata"};
+			return std::string_view{static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size};
 		};
 
 		_names.reserve(entries.size());
@@ -95,9 +94,9 @@ namespace Yttrium
 		{
 			const auto index = static_cast<std::size_t>(&entry - entries.data());
 			if (entry.data_offset > source_size || entry.data_offset + entry.data_size > source_size)
-				throw BadPackage("Bad package index entry #"_s, index, " data"_s);
+				throw BadPackage{"Bad package index entry #", index, " data"};
 			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
-				throw BadPackage("Bad package index entry #"_s, index, " metadata"_s);
+				throw BadPackage{"Bad package index entry #", index, " metadata"};
 			_names.emplace_back(read_string());
 			const auto properties_begin = _properties.size();
 			for (auto property_count = read_uint8(); property_count > 0; --property_count)
@@ -213,7 +212,7 @@ namespace Yttrium
 			if (!source)
 				return false;
 			const auto i = static_cast<size_t>(&entry - _entries.data());
-			entries[i].data_offset = decltype(entries[i].data_offset){ _writer.offset() };
+			entries[i].data_offset = decltype(entries[i].data_offset){_writer.offset()};
 			entries[i].data_size = source->size();
 			if (entries[i].data_size != source->size())
 				return false;

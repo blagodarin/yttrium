@@ -1,16 +1,13 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_ion_writer_h_
 #define _include_yttrium_ion_writer_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <memory>
 
 namespace Yttrium
 {
-	class StaticString;
 	class Writer;
 
 	///
@@ -32,10 +29,10 @@ namespace Yttrium
 		~IonWriter();
 
 		///
-		void add_name(const StaticString&);
+		void add_name(std::string_view);
 
 		///
-		void add_value(const StaticString&);
+		void add_value(std::string_view);
 
 		///
 		void begin_list();

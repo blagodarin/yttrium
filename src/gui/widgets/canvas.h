@@ -3,8 +3,6 @@
 
 #include "widget.h"
 
-#include <string>
-
 namespace Yttrium
 {
 	class CanvasWidget : public Widget

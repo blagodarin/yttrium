@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_ion_node_h_
 #define _include_yttrium_ion_node_h_
 
@@ -20,12 +17,12 @@ namespace Yttrium
 		bool exists() const;
 
 		///
-		StaticString name() const { return _name; }
+		std::string_view name() const noexcept { return _name; }
 
 	private:
 		Y_PRIVATE explicit IonNode(IonDocumentImpl&);
-		Y_PRIVATE IonNode(IonDocumentImpl&, const StaticString& name);
-		Y_PRIVATE IonNode(IonDocumentImpl&, const StaticString& name, const ByReference&);
+		Y_PRIVATE IonNode(IonDocumentImpl&, std::string_view);
+		Y_PRIVATE IonNode(IonDocumentImpl&, std::string_view, const ByReference&);
 
 	private:
 		const String _name;

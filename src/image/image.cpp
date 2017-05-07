@@ -1,7 +1,7 @@
 #include <yttrium/image.h>
 
-#include <yttrium/static_string.h>
 #include <yttrium/storage/writer.h>
+#include <yttrium/string_utils.h>
 #include <yttrium/utils.h>
 #include "formats.h"
 #include "utils.h"
@@ -70,10 +70,10 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			if (StaticString{path}.ends_with(".tga"_s))
+			if (strings::ends_with(path, ".tga"))
 				type = ImageType::Tga;
 #ifndef Y_NO_PNG
-			else if (StaticString{path}.ends_with(".png"_s))
+			else if (strings::ends_with(path, ".png"))
 				type = ImageType::Png;
 #endif
 			else

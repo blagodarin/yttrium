@@ -1,7 +1,7 @@
 #ifndef _src_gui_logic_line_editor_h_
 #define _src_gui_logic_line_editor_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/std/string_view.h>
 
 namespace Yttrium
 {
@@ -12,8 +12,8 @@ namespace Yttrium
 	public:
 		void clear();
 		size_t cursor() const { return _cursor; }
-		void insert(const StaticString&);
-		void insert(char symbol) { insert({ &symbol, 1 }); }
+		void insert(std::string_view);
+		void insert(char symbol) { insert({&symbol, 1}); }
 		bool process_key(const KeyEvent&);
 		void reset(std::string&&);
 		size_t selection_offset() const { return _selection_offset; }

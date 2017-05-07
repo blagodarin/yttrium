@@ -4,7 +4,6 @@
 #ifndef _include_yttrium_storage_source_h_
 #define _include_yttrium_storage_source_h_
 
-#include <yttrium/static_string.h>
 #include <yttrium/tiny_string_map.h>
 
 namespace Yttrium
@@ -24,6 +23,8 @@ namespace Yttrium
 
 		/// Creates a Source from the specified file.
 		static std::unique_ptr<Source> from(const std::string& path);
+		static std::unique_ptr<Source> from(std::string_view path) { return from(std::string{path.data(), path.size()}); } // TODO-17: Remove.
+		static std::unique_ptr<Source> from(const char* path) { return from(std::string{path}); } // TODO-17: Remove (needed for the above).
 
 		/// Creates a Source from a temporary file.
 		static std::unique_ptr<Source> from(const TemporaryFile&);
@@ -37,10 +38,10 @@ namespace Yttrium
 		virtual const void* data() const noexcept { return nullptr; }
 
 		/// Returns the name of the Source.
-		StaticString name() const noexcept { return StaticString{_name}; }
+		std::string_view name() const noexcept { return _name; }
 
 		/// Retrieves a metadata property value by its name.
-		StaticString property(const StaticString& name) const noexcept { return _properties.find(name); }
+		std::string_view property(std::string_view name) const noexcept { return _properties.find(name); }
 
 		/// Reads data from the source at the specified offset.
 		bool read_all_at(uint64_t offset, void* data, size_t size) const { return read_at(offset, data, size) == size; }
@@ -53,7 +54,7 @@ namespace Yttrium
 		bool read_at(uint64_t offset, T& data) const { return read_at(offset, &data, sizeof data) == sizeof data; }
 
 		/// Sets a metadata property.
-		void set_property(const StaticString& name, const StaticString& value) { _properties.insert_or_assign(name, value); }
+		void set_property(std::string_view name, std::string_view value) { _properties.insert_or_assign(name, value); }
 
 		/// Returns the size of the Source data.
 		uint64_t size() const noexcept { return _size; }

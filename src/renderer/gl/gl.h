@@ -1,9 +1,9 @@
 #ifndef _src_renderer_gl_gl_h_
 #define _src_renderer_gl_gl_h_
 
+#include <yttrium/std/string_view.h>
 #include "../../system/gl.h"
 
-#include <string>
 #include <vector>
 
 #include <GL/gl.h>
@@ -19,12 +19,10 @@ namespace Yttrium
 		GlApi();
 
 		GlApi(const GlApi&) = delete;
-		GlApi(GlApi&&) = delete;
 		GlApi& operator=(const GlApi&) = delete;
-		GlApi& operator=(GlApi&&) = delete;
 
 	private:
-		bool has_extension(const char*) const;
+		bool has_extension(std::string_view) const;
 	};
 }
 

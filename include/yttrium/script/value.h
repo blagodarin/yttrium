@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_script_value_h_
 #define _include_yttrium_script_value_h_
 
-#include <yttrium/static_string.h>
+#include <yttrium/string_utils.h>
 
 namespace Yttrium
 {
@@ -33,7 +33,7 @@ namespace Yttrium
 
 	public:
 		///
-		int to_int() const { return StaticString{ _value }.to_int(); }
+		int to_int() const { return strings::to_int(_value); }
 
 		///
 		Type type() const { return _type; }
@@ -46,7 +46,7 @@ namespace Yttrium
 		ScriptValue& operator=(int);
 
 		///
-		ScriptValue& operator=(const std::string&);
+		ScriptValue& operator=(std::string_view);
 
 	private:
 		Type _type;
@@ -55,7 +55,7 @@ namespace Yttrium
 	private:
 		Y_PRIVATE explicit ScriptValue(int);
 		Y_PRIVATE explicit ScriptValue(double);
-		Y_PRIVATE explicit ScriptValue(const StaticString&, Type = Type::String);
+		Y_PRIVATE explicit ScriptValue(std::string_view, Type = Type::String);
 	};
 }
 

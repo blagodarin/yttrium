@@ -46,7 +46,7 @@ namespace Yttrium
 		}
 
 		debug.set_color(1.0, 1.0, 1.0);
-		debug.draw_text(0, 0, StaticString{_private->_line_editor.text()}, max_width);
+		debug.draw_text(0, 0, _private->_line_editor.text(), max_width);
 
 		debug.set_color(1.0, 0.0, 0.0);
 		debug.draw_cursor(_private->_line_editor.cursor(), 0);
@@ -68,7 +68,7 @@ namespace Yttrium
 				return true;
 
 			case Key::Enter:
-				ScriptCode{std::string{ _private->_line_editor.text()}}.execute(_private->_script_context);
+				ScriptCode{std::string{_private->_line_editor.text()}}.execute(_private->_script_context);
 				_private->_line_editor.clear();
 				return true;
 

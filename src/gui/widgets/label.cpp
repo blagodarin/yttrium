@@ -11,10 +11,10 @@ namespace Yttrium
 	LabelWidget::LabelWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
 		: Widget{gui, name}
 	{
-		if (!(loader.load_rect("position"_s, _rect)
-			&& loader.load_translatable("text"_s, _text)
+		if (!(loader.load_rect("position", _rect)
+			&& loader.load_translatable("text", _text)
 			&& _foreground.load(loader)))
-			throw GuiDataError{"Bad 'label'"_s};
+			throw GuiDataError{"Bad 'label'"};
 	}
 
 	void LabelWidget::draw(Renderer& renderer, const RectF& rect, WidgetState) const

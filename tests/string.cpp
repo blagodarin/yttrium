@@ -10,9 +10,9 @@ BOOST_AUTO_TEST_CASE(test_string_initialization)
 	String s1;
 
 	BOOST_CHECK_EQUAL(s1.size(), 0);
-	BOOST_CHECK(s1.is_empty());
-	BOOST_CHECK(s1.text());
-	BOOST_CHECK_EQUAL(&s1[0], s1.text());
+	BOOST_CHECK(s1.empty());
+	BOOST_CHECK(s1.data());
+	BOOST_CHECK_EQUAL(&s1[0], s1.data());
 	BOOST_CHECK_EQUAL(s1[0], '\0');
 
 	String s2;
@@ -29,9 +29,12 @@ BOOST_AUTO_TEST_CASE(test_string_assignment)
 	s1 = "test";
 
 	BOOST_CHECK_EQUAL(s1.size(), 4);
-	BOOST_CHECK_EQUAL(&s1[0], s1.text());
+	BOOST_CHECK_EQUAL(&s1[0], s1.data());
 	BOOST_CHECK_EQUAL(s1[0], 't');
+	BOOST_CHECK_EQUAL(s1[1], 'e');
 	BOOST_CHECK_EQUAL(s1[2], 's');
+	BOOST_CHECK_EQUAL(s1[3], 't');
+	BOOST_CHECK_EQUAL(s1[4], '\0');
 	BOOST_CHECK_EQUAL(s1, "test");
 
 	s2 = s1;
@@ -49,4 +52,27 @@ BOOST_AUTO_TEST_CASE(test_string_assignment)
 
 	BOOST_CHECK_EQUAL(s1, "!est");
 	BOOST_CHECK_EQUAL(s3, "test");
+}
+
+BOOST_AUTO_TEST_CASE(test_string_comparison)
+{
+	const String ab{"ab"};
+	BOOST_CHECK(ab == ab);
+	BOOST_CHECK(!(ab != ab));
+	// cppcheck-suppress duplicateExpression
+	BOOST_CHECK(!(ab > ab));
+	// cppcheck-suppress duplicateExpression
+	BOOST_CHECK(!(ab < ab));
+	// cppcheck-suppress duplicateExpression
+	BOOST_CHECK(ab >= ab);
+	// cppcheck-suppress duplicateExpression
+	BOOST_CHECK(ab <= ab);
+
+	const String ba{"ba"};
+	BOOST_CHECK(!(ab == ba));
+	BOOST_CHECK(ab != ba);
+	BOOST_CHECK(!(ab > ba));
+	BOOST_CHECK(ab < ba);
+	BOOST_CHECK(!(ab >= ba));
+	BOOST_CHECK(ab <= ba);
 }

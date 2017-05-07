@@ -5,9 +5,9 @@
 namespace Yttrium
 {
 	GlIndexBuffer::GlIndexBuffer(IndexFormat format, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format)
-		: IndexBufferImpl(format, size, element_size)
-		, _buffer(std::move(buffer))
-		, _gl_format(gl_format)
+		: IndexBufferImpl{format, size, element_size}
+		, _buffer{std::move(buffer)}
+		, _gl_format{gl_format}
 	{
 	}
 
@@ -17,9 +17,9 @@ namespace Yttrium
 	}
 
 	GlVertexBuffer::GlVertexBuffer(size_t count, size_t element_size, GlBufferHandle&& buffer, GlVertexArrayHandle&& vertex_array)
-		: VertexBufferImpl(count, element_size)
-		, _buffer(std::move(buffer))
-		, _vertex_array(std::move(vertex_array))
+		: VertexBufferImpl{count, element_size}
+		, _buffer{std::move(buffer)}
+		, _vertex_array{std::move(vertex_array)}
 	{
 	}
 

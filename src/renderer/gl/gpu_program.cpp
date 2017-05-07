@@ -9,10 +9,10 @@
 namespace Yttrium
 {
 	GlGpuProgram::GlGpuProgram(RendererImpl& renderer, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
-		: _renderer(renderer)
-		, _vertex_shader(std::move(vertex_shader))
-		, _fragment_shader(std::move(fragment_shader))
-		, _program(gl)
+		: _renderer{renderer}
+		, _vertex_shader{std::move(vertex_shader)}
+		, _fragment_shader{std::move(fragment_shader)}
+		, _program{gl}
 	{
 		_program.attach(_vertex_shader.get());
 		_program.attach(_fragment_shader.get());

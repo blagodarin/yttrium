@@ -1,6 +1,5 @@
 #include <yttrium/storage/package.h>
 
-#include <yttrium/static_string.h>
 #include <yttrium/storage/source.h>
 #include "formats/ypq.h"
 #include "package.h"
@@ -13,7 +12,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (StaticString{path}.ends_with(".ypq"_s))
+			if (strings::ends_with(path, ".ypq"))
 				type = PackageType::Ypq;
 			else
 				return {};
@@ -37,7 +36,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (StaticString{ path }.ends_with(".ypq"_s))
+			if (strings::ends_with(path, ".ypq"))
 				type = PackageType::Ypq;
 			else
 				return {};

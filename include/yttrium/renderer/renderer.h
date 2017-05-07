@@ -6,6 +6,7 @@
 
 #include <yttrium/flags.h>
 #include <yttrium/math/color.h>
+#include <yttrium/std/string_view.h>
 
 #include <memory>
 #include <vector>
@@ -58,7 +59,7 @@ namespace Yttrium
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
 
 		///
-		virtual void draw_debug_text(const std::string&) = 0;
+		virtual void draw_debug_text(std::string_view) = 0;
 
 		///
 		virtual void draw_mesh(const Mesh&) = 0;

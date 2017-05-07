@@ -2,7 +2,6 @@
 #define _src_gui_screen_h_
 
 #include <yttrium/math/rect.h>
-#include <yttrium/static_string.h>
 #include "actions.h"
 #include "cursor.h"
 #include "key_lookup.h"
@@ -34,14 +33,14 @@ namespace Yttrium
 		void handle_return() const { _on_return.run(_gui); }
 		bool is_transparent() const { return _is_transparent; }
 		const std::shared_ptr<const Music>& music() const { return _music; }
-		const std::string& name() const { return _name; }
+		std::string_view name() const { return _name; }
 		void register_widget(Widget&);
-		void set_cursor(GuiCursor, const StaticString& texture = {});
+		void set_cursor(GuiCursor, std::string_view texture = {});
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
 		void set_music(const std::shared_ptr<const Music>& music) { _music = music; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(const std::string& event, GuiActions&& actions) { _on_event[event] = std::move(actions); }
-		void set_on_key(const StaticString& key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
+		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
 		void set_on_return(GuiActions&& actions) { _on_return = std::move(actions); }
 
 	private:

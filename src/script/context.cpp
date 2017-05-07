@@ -13,35 +13,29 @@ namespace Yttrium
 {
 	struct ScriptCommandContext
 	{
-		ScriptContext::Command command;
-		std::size_t min_args = 0;
-		std::size_t max_args = 0;
+		ScriptContext::Command _command;
+		std::size_t _min_args = 0;
+		std::size_t _max_args = 0;
 
 		ScriptCommandContext() = default;
-
-		ScriptCommandContext(ScriptContext::Command command_, std::size_t min_args_, std::size_t max_args_)
-			: command(command_)
-			, min_args(min_args_)
-			, max_args(max_args_)
-		{
-		}
+		ScriptCommandContext(ScriptContext::Command command, std::size_t min_args, std::size_t max_args)
+			: _command{command}, _min_args{min_args}, _max_args{max_args} {}
 	};
 
 	class ScriptContextPrivate
 	{
 	public:
-		explicit ScriptContextPrivate(ScriptContext* parent)
-			: _parent(parent) {}
+		explicit ScriptContextPrivate(ScriptContext* parent) : _parent{parent} {}
 
 	public:
 		ScriptContext* const _parent;
-		Pool<ScriptValue> _value_pool{ 32 };
+		Pool<ScriptValue> _value_pool{32};
 		std::unordered_map<std::string, ScriptValue*> _values;
 		std::unordered_map<std::string, ScriptCommandContext> _commands;
 	};
 
 	ScriptContext::ScriptContext(ScriptContext* parent)
-		: _private(std::make_unique<ScriptContextPrivate>(parent))
+		: _private{std::make_unique<ScriptContextPrivate>(parent)}
 	{
 	}
 
@@ -62,20 +56,20 @@ namespace Yttrium
 			return false;
 		}
 
-		if (args.size() < command->second.min_args || args.size() > command->second.max_args)
+		if (args.size() < command->second._min_args || args.size() > command->second._max_args)
 		{
 			std::cerr << "Argument number mismatch for \"" << name << "\": "
-				<< args.size() << " instead of " << command->second.min_args << "-" << command->second.max_args << "\n";
+				<< args.size() << " instead of " << command->second._min_args << "-" << command->second._max_args << "\n";
 			return false;
 		}
 
-		command->second.command({ *this, name, result, args });
+		command->second._command({ *this, name, result, args });
 		return true;
 	}
 
 	void ScriptContext::define(const std::string& name, size_t min_args, size_t max_args, const Command& command)
 	{
-		_private->_commands[name] = ScriptCommandContext(command, min_args, max_args);
+		_private->_commands[name] = ScriptCommandContext{command, min_args, max_args};
 	}
 
 	ScriptValue* ScriptContext::find(const std::string& name) const
@@ -103,29 +97,29 @@ namespace Yttrium
 	{
 		const auto i = _private->_values.find(name);
 		if (i == _private->_values.end())
-			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue(value));
+			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue{value});
 		else
 			*i->second = value;
 	}
 
-	void ScriptContext::set(const std::string& name, const std::string& value)
+	void ScriptContext::set(const std::string& name, std::string_view value)
 	{
 		const auto i = _private->_values.find(name);
 		if (i == _private->_values.end())
-			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue(StaticString{ value }));
+			_private->_values.emplace(name, new(_private->_value_pool.allocate()) ScriptValue{value});
 		else
 			*i->second = value;
 	}
 
-	void ScriptContext::substitute(std::string& target, const std::string& source) const
+	void ScriptContext::substitute(std::string& target, std::string_view source) const
 	{
 		target.clear();
-		for (auto left = source.c_str(), right = left, end = left + source.size(); ; )
+		for (auto left = source.data(), right = left, end = left + source.size(); ; )
 		{
 			while (right != end && *right != '{')
 				++right;
 
-			append_to(target, StaticString{left, static_cast<size_t>(right - left)});
+			strings::append_view(target, {left, static_cast<size_t>(right - left)});
 
 			if (right == end)
 				break;
@@ -138,9 +132,9 @@ namespace Yttrium
 			if (right == end)
 				break;
 
-			const auto value = find({ left, static_cast<size_t>(right - left) });
+			const auto value = find({left, static_cast<size_t>(right - left)});
 			if (value)
-				append_to(target, value->string());
+				strings::append_view(target, value->string());
 
 			left = ++right;
 		}

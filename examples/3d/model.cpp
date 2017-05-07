@@ -7,7 +7,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/resource_loader.h>
 
-Model::Model(ResourceLoader& resource_loader, const StaticString& mesh, const StaticString& material)
+Model::Model(ResourceLoader& resource_loader, std::string_view mesh, std::string_view material)
 	: _mesh{resource_loader.load_mesh(mesh)}
 	, _material{resource_loader.load_material(material)}
 {

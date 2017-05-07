@@ -59,8 +59,8 @@ namespace
 namespace Yttrium
 {
 	ScriptScanner::ScriptScanner(std::string& text)
-		: _cursor(const_cast<char*>(text.data())) // TODO-17: Remove const_cast.
-		, _end(text.data() + text.size())
+		: _cursor{const_cast<char*>(text.data())} // TODO-17: Remove const_cast.
+		, _end{text.data() + text.size()}
 	{
 	}
 
@@ -91,7 +91,7 @@ namespace Yttrium
 				has_sign = true;
 				++_cursor;
 				if (::kind_of[static_cast<unsigned char>(*_cursor)] != C::Digit)
-					throw DataError("[", _line, ":", _cursor - _line_origin, "] '+' or '-' must be followed by a digit");
+					throw DataError{"[", _line, ":", _cursor - _line_origin, "] '+' or '-' must be followed by a digit"};
 			case C::Digit:
 				{
 					const auto begin = has_sign ? _cursor - 1 : _cursor;
@@ -144,13 +144,13 @@ namespace Yttrium
 							case '\'': *end++ = '\''; break;
 							case 'n': *end++ = '\n'; break;
 							case 'r': *end++ = '\r'; break;
-							default: throw DataError("[", _line, ":", _cursor - _line_origin, "] Invalid escape character");
+							default: throw DataError{"[", _line, ":", _cursor - _line_origin, "] Invalid escape character"};
 							}
 							++_cursor;
 						}
 						else if (*_cursor == '\n' || *_cursor == '\r')
 						{
-							throw DataError("[", _line, ":", _cursor - _line_origin, "] Unexpected end of line");
+							throw DataError{"[", _line, ":", _cursor - _line_origin, "] Unexpected end of line"};
 						}
 						else if (_cursor != _end)
 						{
@@ -160,7 +160,7 @@ namespace Yttrium
 							++end;
 						}
 						else
-							throw DataError("[", _line, ":", _cursor - _line_origin, "] Unexpected end of file");
+							throw DataError{"[", _line, ":", _cursor - _line_origin, "] Unexpected end of file"};
 					}
 					token.string = {begin, static_cast<size_t>(end - begin)};
 				}
@@ -177,7 +177,7 @@ namespace Yttrium
 				break;
 
 			default:
-				throw DataError("[", _line, ":", _cursor - _line_origin, "] Invalid character");
+				throw DataError{"[", _line, ":", _cursor - _line_origin, "] Invalid character"};
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 #include <yttrium/ion/writer.h>
 
-#include <yttrium/static_string.h>
 #include <yttrium/storage/writer.h>
 
 #include <algorithm>
@@ -14,38 +13,38 @@ namespace Yttrium
 	{
 	public:
 		IonWriterPrivate(Writer& writer, IonWriter::Formatting formatting)
-			: _writer{ writer }
-			, _pretty{ formatting == IonWriter::Formatting::Pretty }
+			: _writer{writer}
+			, _pretty{formatting == IonWriter::Formatting::Pretty}
 		{
 		}
 
-		void add_name(const StaticString& name)
+		void add_name(std::string_view name)
 		{
 			auto& entry = _stack.back();
 			if (!(entry & IsObject))
-				throw std::logic_error("Unexpected name");
+				throw std::logic_error{"Unexpected name"};
 			if (_pretty)
 			{
 				if ((entry & (IsRoot | AcceptsValues)) != IsRoot)
-					write("\n"_s);
-				write(StaticString{ _indentation });
+					write("\n");
+				write(_indentation);
 			}
 			else if (!(entry & HasValues))
-				write(" "_s);
+				write(" ");
 			write(name);
 			entry |= AcceptsValues;
 			entry &= ~HasValues;
 		}
 
-		void add_value(const StaticString& value)
+		void add_value(std::string_view value)
 		{
 			auto& entry = _stack.back();
 			if (!(entry & AcceptsValues))
-				throw std::logic_error("Unexpected value");
+				throw std::logic_error{"Unexpected value"};
 			if (_pretty && entry & (IsObject | HasValues))
-				write(" "_s);
-			write("\""_s);
-			for (auto begin = value.text(), end = begin + value.size();;)
+				write(" ");
+			write("\"");
+			for (auto begin = value.data(), end = begin + value.size();;)
 			{
 				const auto i = std::find_if(begin, end, [](char c){ return c == '\\' || c == '"'; });
 				if (i != begin)
@@ -53,10 +52,10 @@ namespace Yttrium
 				if (i == end)
 					break;
 				const std::array<char, 2> sequence{ '\\', *i };
-				write({ sequence.data(), sequence.size() });
+				write({sequence.data(), sequence.size()});
 				begin = i + 1;
 			}
-			write("\""_s);
+			write("\"");
 			entry |= HasValues;
 		}
 
@@ -64,14 +63,14 @@ namespace Yttrium
 		{
 			auto& entry = _stack.back();
 			if (!(entry & AcceptsValues))
-				throw std::logic_error("Unexpected list");
+				throw std::logic_error{"Unexpected list"};
 			if (_pretty)
 			{
 				if (entry & (IsObject | HasValues))
-					write(" "_s);
+					write(" ");
 				_indentation.push_back('\t');
 			}
-			write("["_s);
+			write("[");
 			entry |= HasValues;
 			_stack.emplace_back(AcceptsValues);
 		}
@@ -80,14 +79,14 @@ namespace Yttrium
 		{
 			auto& entry = _stack.back();
 			if (!(entry & AcceptsValues))
-				throw std::logic_error("Unexpected object");
+				throw std::logic_error{"Unexpected object"};
 			if (_pretty)
 			{
-				write("\n"_s);
-				write(StaticString{ _indentation });
+				write("\n");
+				write(_indentation);
 				_indentation.push_back('\t');
 			}
-			write("{"_s);
+			write("{");
 			entry |= HasValues;
 			_stack.emplace_back(IsObject | HasValues);
 		}
@@ -95,10 +94,10 @@ namespace Yttrium
 		void end_list()
 		{
 			if (_stack.back() & IsObject)
-				throw std::logic_error("Unexpected end of list");
+				throw std::logic_error{"Unexpected end of list"};
 			if (_pretty)
 				_indentation.pop_back();
-			write("]"_s);
+			write("]");
 			_stack.pop_back();
 			assert(!_stack.empty());
 		}
@@ -106,14 +105,14 @@ namespace Yttrium
 		void end_object()
 		{
 			if ((_stack.back() & (IsObject | IsRoot)) != IsObject)
-				throw std::logic_error("Unexpected end of object");
+				throw std::logic_error{"Unexpected end of object"};
 			if (_pretty)
 			{
 				_indentation.pop_back();
-				write("\n"_s);
-				write(StaticString{ _indentation });
+				write("\n");
+				write(_indentation);
 			}
-			write("}"_s);
+			write("}");
 			_stack.pop_back();
 			assert(!_stack.empty());
 		}
@@ -122,19 +121,19 @@ namespace Yttrium
 		{
 			auto& entry = _stack.back();
 			if (!(entry & IsRoot))
-				throw std::logic_error("Unexpected end of file");
+				throw std::logic_error{"Unexpected end of file"};
 			if (_pretty && entry & AcceptsValues)
 			{
-				write("\n"_s);
+				write("\n");
 				entry &= ~AcceptsValues;
 			}
 		}
 
 	private:
-		void write(const StaticString& string) const
+		void write(std::string_view string) const
 		{
-			if (_writer.write(string.text(), string.size()) != string.size())
-				throw std::runtime_error("IonWriter output error");
+			if (_writer.write(string.data(), string.size()) != string.size())
+				throw std::runtime_error{"IonWriter output error"};
 		}
 
 	private:
@@ -153,18 +152,18 @@ namespace Yttrium
 	};
 
 	IonWriter::IonWriter(Writer& writer, Formatting formatting)
-		: _private{ std::make_unique<IonWriterPrivate>(writer, formatting) }
+		: _private{std::make_unique<IonWriterPrivate>(writer, formatting)}
 	{
 	}
 
 	IonWriter::~IonWriter() = default;
 
-	void IonWriter::add_name(const StaticString& name)
+	void IonWriter::add_name(std::string_view name)
 	{
 		_private->add_name(name);
 	}
 
-	void IonWriter::add_value(const StaticString& value)
+	void IonWriter::add_value(std::string_view value)
 	{
 		_private->add_value(value);
 	}

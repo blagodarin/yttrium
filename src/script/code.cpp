@@ -13,13 +13,9 @@ namespace Yttrium
 {
 	struct ScriptCommand
 	{
-		std::string name;
-		std::vector<ScriptValue*> args;
-
-		explicit ScriptCommand(const StaticString& name_)
-			: name(name_.text(), name_.size())
-		{
-		}
+		std::string _name;
+		std::vector<ScriptValue*> _args;
+		explicit ScriptCommand(std::string_view name) : _name{strings::from_view(name)} {}
 	};
 
 	class ScriptCodePrivate
@@ -27,14 +23,14 @@ namespace Yttrium
 	public:
 		explicit ScriptCodePrivate(std::string&& text)
 		{
-			ScriptScanner scanner(text);
+			ScriptScanner scanner{text};
 			for (ScriptCommand* command = nullptr;;)
 			{
 				const auto token = scanner.read();
 				if (token.type == ScriptScanner::Token::End)
 				{
-					if (command && command->name == "=" && command->args.size() != 2)
-						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+					if (command && command->_name == "=" && command->_args.size() != 2)
+						throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
 					break;
 				}
 				if (!command)
@@ -50,7 +46,7 @@ namespace Yttrium
 						break;
 
 					default:
-						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+						throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
 					}
 				}
 				else
@@ -58,38 +54,38 @@ namespace Yttrium
 					switch (token.type)
 					{
 					case ScriptScanner::Token::Identifier:
-						if (command->name == "=" && command->args.size() != 1)
-							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Type::Name));
+						if (command->_name == "=" && command->_args.size() != 1)
+							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{token.string, ScriptValue::Type::Name});
 						break;
 
 					case ScriptScanner::Token::Number:
-						if (command->name == "=" && command->args.size() != 1)
-							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Type::Literal));
+						if (command->_name == "=" && command->_args.size() != 1)
+							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{token.string, ScriptValue::Type::Literal});
 						break;
 
 					case ScriptScanner::Token::String:
-						if (command->name == "=" && command->args.size() != 1)
-							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(token.string, ScriptValue::Type::String));
+						if (command->_name == "=" && command->_args.size() != 1)
+							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{token.string, ScriptValue::Type::String});
 						break;
 
 					case ScriptScanner::Token::Separator:
-						if (command->name == "=" && command->args.size() != 2)
-							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+						if (command->_name == "=" && command->_args.size() != 2)
+							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
 						command = nullptr;
 						break;
 
 					case ScriptScanner::Token::Equals:
-						if (!command->args.empty())
-							throw DataError("[", token.line, ":", token.column, "] Unexpected token");
-						command->args.emplace_back(new(_temporaries.allocate()) ScriptValue(StaticString{ command->name }, ScriptValue::Type::Name));
-						command->name = "=";
+						if (!command->_args.empty())
+							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{command->_name, ScriptValue::Type::Name});
+						command->_name = "=";
 						break;
 
 					default:
-						throw DataError("[", token.line, ":", token.column, "] Unexpected token");
+						throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
 					}
 				}
 			}
@@ -104,7 +100,7 @@ namespace Yttrium
 	ScriptCode::~ScriptCode() = default;
 
 	ScriptCode::ScriptCode(std::string&& text)
-		: _private(std::make_unique<ScriptCodePrivate>(std::move(text)))
+		: _private{std::make_unique<ScriptCodePrivate>(std::move(text))}
 	{
 	}
 
@@ -114,19 +110,19 @@ namespace Yttrium
 			return;
 		std::string result;
 		for (const auto& command : _private->_commands)
-			if (command.name == "=")
+			if (command._name == "=")
 			{
-				assert(command.args.size() == 2);
-				assert(command.args[0]->type() == ScriptValue::Type::Name);
-				if (command.args[1]->type() == ScriptValue::Type::Name)
+				assert(command._args.size() == 2);
+				assert(command._args[0]->type() == ScriptValue::Type::Name);
+				if (command._args[1]->type() == ScriptValue::Type::Name)
 				{
-					const auto value = context.find(command.args[1]->string());
-					context.set(command.args[0]->string(), value ? value->string() : std::string{});
+					const auto value = context.find(command._args[1]->string());
+					context.set(command._args[0]->string(), value ? value->string() : std::string{});
 				}
 				else
-					context.set(command.args[0]->string(), command.args[1]->string());
+					context.set(command._args[0]->string(), command._args[1]->string());
 			}
-			else if (!context.call(command.name, result, ScriptArgs(context, command.args)))
+			else if (!context.call(command._name, result, ScriptArgs{context, command._args}))
 				break;
 	}
 

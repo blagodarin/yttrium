@@ -13,14 +13,14 @@ namespace Yttrium
 	InputWidget::InputWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
 		: Widget{gui, name, Flag::CanHaveFocus}
 	{
-		if (!loader.load_rect("position"_s, _rect)
+		if (!loader.load_rect("position", _rect)
 			|| !_foreground.load(loader))
-			throw GuiDataError{"Bad 'input'"_s};
+			throw GuiDataError{"Bad 'input'"};
 		_background.load(loader);
-		_on_update = loader.load_actions("on_update"_s);
-		_on_enter = loader.load_actions("on_enter"_s);
+		_on_update = loader.load_actions("on_update");
+		_on_enter = loader.load_actions("on_enter");
 		std::string initial_text;
-		if (loader.load_text("text"_s, initial_text)) // TODO-17: Use init-statement.
+		if (loader.load_text("text", initial_text)) // TODO-17: Use init-statement.
 			_logic.reset(std::move(initial_text));
 	}
 

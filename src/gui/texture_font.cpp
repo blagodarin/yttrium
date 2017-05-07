@@ -27,7 +27,7 @@ namespace Yttrium
 	public:
 		explicit TextureFontImpl(int size) : _size{size} {}
 
-		void build(std::vector<TexturedRect>& rects, const Vector2& top_left, float font_size, const std::string& text, TextCapture* capture) const override
+		void build(std::vector<TexturedRect>& rects, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override
 		{
 			rects.clear();
 
@@ -62,7 +62,7 @@ namespace Yttrium
 			};
 
 			char last_symbol = '\0';
-			const char* current_symbol = text.c_str();
+			const char* current_symbol = text.data();
 
 			for (size_t i = 0; i < text.size(); ++i, ++current_symbol)
 			{
@@ -88,7 +88,7 @@ namespace Yttrium
 
 		Rect rect() const override { return _rect; }
 
-		Size text_size(const std::string& text) const override
+		Size text_size(std::string_view text) const override
 		{
 			int width = 0;
 			for (size_t i = 0; i < text.size(); ++i)
@@ -106,7 +106,7 @@ namespace Yttrium
 			return {width, _size};
 		}
 
-		SizeF text_size(const std::string& text, const SizeF& font_size) const override
+		SizeF text_size(std::string_view text, const SizeF& font_size) const override
 		{
 			const auto& size = text_size(text);
 			return {font_size._width * (size._width * font_size._height / size._height), font_size._height};
