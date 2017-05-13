@@ -16,21 +16,8 @@ namespace Yttrium
 	{
 	}
 
-	Widget& GuiLayout::add_widget(std::string_view type, std::string_view name, GuiPropertyLoader& loader)
+	Widget& GuiLayout::add_widget(std::unique_ptr<Widget>&& widget)
 	{
-		std::unique_ptr<Widget> widget;
-		if (type == "button")
-			widget = std::make_unique<ButtonWidget>(_gui, name, loader);
-		else if (type == "canvas")
-			widget = std::make_unique<CanvasWidget>(_gui, name, loader);
-		else if (type == "image")
-			widget = std::make_unique<ImageWidget>(_gui, name, loader);
-		else if (type == "input")
-			widget = std::make_unique<InputWidget>(_gui, name, loader);
-		else if (type == "label")
-			widget = std::make_unique<LabelWidget>(_gui, name, loader);
-		else
-			throw GuiDataError{"Unknown widget type '", type, "'"};
 		_widgets.emplace_back(std::move(widget));
 		return *_widgets.back();
 	}
@@ -39,10 +26,10 @@ namespace Yttrium
 	{
 		for (const auto& widget : _widgets)
 		{
-			WidgetState state = WidgetState::Normal;
+			auto style = WidgetData::Style::Normal;
 			if (widget.get() == hover_widget)
-				state = (widget.get() == click_widget) ? WidgetState::Pressed : WidgetState::Active;
-			widget->draw(renderer, widget->render_rect(), state);
+				style = (widget.get() == click_widget) ? WidgetData::Style::Pressed : WidgetData::Style::Hovered;
+			widget->draw(renderer, widget->render_rect(), style);
 		}
 	}
 

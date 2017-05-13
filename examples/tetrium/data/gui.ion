@@ -2,7 +2,7 @@ translation "examples/tetrium/data/i18n/en.ion"
 
 default font
 {
-	file    "data/font.ytf"
+	file "data/font.ytf"
 	texture "data/font.tga"
 }
 
@@ -14,7 +14,7 @@ class "button"
 	borders      "4" "4" "4" "4"
 	sound        "data/sound.wav"
 
-	active
+	hovered
 	{
 		texture_rect "0" "16"
 	}

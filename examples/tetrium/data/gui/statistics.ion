@@ -7,13 +7,13 @@ class "statistics_index"
 class "statistics_name"
 {
 	position "60" "" "440" "40"
-	align    "left"
+	align "left"
 }
 
 class "statistics_score"
 {
 	position "500" "" "100" "40"
-	align    "right"
+	align "right"
 }
 
 screen "statistics"
@@ -25,10 +25,8 @@ screen "statistics"
 		image { texture "data/textures/wall.jpeg" }
 	}
 
-	center
+	center "640" "480"
 	{
-		size "640" "480"
-
 		image
 		{
 			position "20" "30" "600" "250"

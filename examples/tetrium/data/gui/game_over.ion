@@ -10,10 +10,8 @@ transparent screen "game_over"
 		image { color "0" "0" "0" "0.5" }
 	}
 
-	center
+	center "30" "26"
 	{
-		size "30" "26"
-
 		label
 		{
 			position   "0" "4" "30" "8"

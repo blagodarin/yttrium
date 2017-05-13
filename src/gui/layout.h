@@ -31,7 +31,7 @@ namespace Yttrium
 
 		void set_size(const SizeF& size) { _size = size; }
 
-		Widget& add_widget(std::string_view type, std::string_view name, GuiPropertyLoader&);
+		Widget& add_widget(std::unique_ptr<Widget>&&);
 
 		void draw(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;
 		void update(const RectF&);

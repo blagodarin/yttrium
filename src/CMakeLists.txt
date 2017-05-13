@@ -101,12 +101,8 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/gui/gui.h
 	../include/yttrium/gui/text_capture.h
 	../include/yttrium/gui/texture_font.h
-	gui/ion/classes.cpp
-	gui/ion/classes.h
 	gui/ion/loader.cpp
 	gui/ion/loader.h
-	gui/ion/property_loader.cpp
-	gui/ion/property_loader.h
 	gui/logic/line_editor.cpp
 	gui/logic/line_editor.h
 	gui/widgets/button.cpp
@@ -132,7 +128,6 @@ target_sources(yttrium PRIVATE
 	gui/layout.h
 	gui/properties.cpp
 	gui/properties.h
-	gui/property_loader.h
 	gui/screen.cpp
 	gui/screen.h
 	gui/texture_font.cpp

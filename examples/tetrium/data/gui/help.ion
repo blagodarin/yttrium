@@ -5,8 +5,8 @@ class "help_key"
 
 class "help_text"
 {
-	position  "300" "" "200" "40"
-	align     "left"
+	position "300" "" "200" "40"
+	align "left"
 }
 
 screen "help"
@@ -18,10 +18,8 @@ screen "help"
 		image { texture "data/textures/wall.jpeg" }
 	}
 
-	center
+	center "640" "480"
 	{
-		size "640" "480"
-
 		image
 		{
 			position "120" "30" "400" "300"

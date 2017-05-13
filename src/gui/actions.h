@@ -40,9 +40,6 @@ namespace Yttrium
 	class GuiActions
 	{
 	public:
-		GuiActions() = default;
-		explicit GuiActions(size_t reserve) { _actions.reserve(reserve); }
-
 		template <typename T, typename... Args>
 		void add(Args&&... args) { _actions.emplace_back(T(std::forward<Args>(args)...)); }
 

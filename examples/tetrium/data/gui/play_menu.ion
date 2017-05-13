@@ -7,10 +7,8 @@ screen "play_menu"
 		image { texture "data/textures/wall.jpeg" }
 	}
 
-	center
+	center "640" "480"
 	{
-		size "640" "480"
-
 		label
 		{
 			position "0" "20" "640" "160"

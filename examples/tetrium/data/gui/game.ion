@@ -23,10 +23,8 @@ screen "game"
 		image { texture "data/textures/wall.jpeg" }
 	}
 
-	center
+	center "30" "26"
 	{
-		size "30" "26"
-
 		image ["background"] { position  "1"  "2"  "6"  "5" } # Next
 		image ["background"] { position "10"  "2" "10" "22" } # Field
 		image ["background"] { position "23"  "2"  "6"  "2" } # Level

@@ -5,15 +5,15 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/std/string_view.h>
+#include <yttrium/std/optional.h>
+#include "actions.h"
 
-#include <memory>
-#include <vector>
+#include <map>
 
 namespace Yttrium
 {
-	class GuiPropertyLoader;
 	class Renderer;
+	class Sound;
 	class TextCapture;
 	class TextureFont;
 	class TexturedRect;
@@ -29,8 +29,6 @@ namespace Yttrium
 		BackgroundProperty() = default;
 
 		void draw(Renderer&, const RectF&) const;
-		bool load(const GuiPropertyLoader&);
-		void update(const GuiPropertyLoader&);
 	};
 
 	struct ForegroundProperty
@@ -46,8 +44,45 @@ namespace Yttrium
 		~ForegroundProperty();
 
 		void draw(Renderer&) const;
-		bool load(const GuiPropertyLoader&);
 		void prepare(std::string_view, const RectF&, TextCapture* = nullptr);
+	};
+
+	struct WidgetData
+	{
+		enum class Style
+		{
+			Normal,
+			Hovered,
+			Pressed,
+			Checked,
+			Disabled,
+		};
+
+		struct StyleData
+		{
+			ForegroundProperty _foreground;
+			BackgroundProperty _background;
+		};
+
+		enum class Action
+		{
+			OnClick,
+			OnUpdate,
+			OnEnter,
+		};
+
+		RectF _rect{{0, 0}, SizeF{0, 0}};
+		std::shared_ptr<const Sound> _sound;
+		std::map<Style, StyleData> _styles;
+		std::map<Action, GuiActions> _actions;
+		std::optional<Style> _fixed_style;
+		std::string _text;
+
+		WidgetData();
+		WidgetData(const WidgetData&); // TODO: Fix GuiActions non-copyability.
+
+		void run(GuiPrivate&, Action) const;
+		StyleData& style_data(Style);
 	};
 }
 

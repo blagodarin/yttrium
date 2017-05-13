@@ -1,16 +1,14 @@
 root screen "main"
 {
 	on_key "esc" { quit }
-	center
+	center "100" "100"
 	{
-		size "100" "100"
 	}
 }
 
 transparent screen "game"
 {
-	stretch
+	stretch "640" "480"
 	{
-		size "640" "480"
 	}
 }

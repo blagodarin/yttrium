@@ -14,10 +14,8 @@ transparent screen "pause"
 		image { color "0" "0" "0" "0.5" }
 	}
 
-	center
+	center "30" "26"
 	{
-		size "30" "26"
-
 		button ["pause_button"]
 		{
 			position "" "7"

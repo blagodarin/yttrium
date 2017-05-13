@@ -1,7 +1,6 @@
 #ifndef _src_gui_widgets_image_h_
 #define _src_gui_widgets_image_h_
 
-#include "../properties.h"
 #include "widget.h"
 
 namespace Yttrium
@@ -9,12 +8,9 @@ namespace Yttrium
 	class ImageWidget : public Widget
 	{
 	public:
-		ImageWidget(GuiPrivate&, std::string_view name, GuiPropertyLoader&);
+		ImageWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
 
-		void draw(Renderer&, const RectF&, WidgetState) const override;
-
-	private:
-		BackgroundProperty _background;
+		void draw(Renderer&, const RectF&, WidgetData::Style) const override;
 	};
 }
 

@@ -5,9 +5,7 @@
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
-#include "property_loader.h"
-
-#include <cassert>
+#include "types.h"
 
 namespace
 {
@@ -56,26 +54,6 @@ namespace Yttrium
 		renderer.draw_rect(rect, color);
 	}
 
-	bool BackgroundProperty::load(const GuiPropertyLoader& loader)
-	{
-		loader.load_color("color", &color);
-		if (loader.load_texture("texture", texture, texture_filter))
-		{
-			if (!loader.load_rect("texture_rect", texture_rect))
-				texture_rect = RectF(Rect(texture->size()));
-			loader.load_margins("borders", borders);
-		}
-		return true;
-	}
-
-	void BackgroundProperty::update(const GuiPropertyLoader& loader)
-	{
-		loader.load_color("color", &color);
-		loader.load_texture("texture", texture, texture_filter);
-		loader.load_rect("texture_rect", texture_rect, true);
-		loader.load_margins("borders", borders);
-	}
-
 	ForegroundProperty::ForegroundProperty() = default;
 	ForegroundProperty::~ForegroundProperty() = default;
 
@@ -83,15 +61,6 @@ namespace Yttrium
 	{
 		PushTexture push_texture(renderer, font_texture.get(), Texture2D::TrilinearFilter);
 		renderer.draw_rects(geometry, color);
-	}
-
-	bool ForegroundProperty::load(const GuiPropertyLoader& loader)
-	{
-		loader.load_font("font", &font, &font_texture);
-		loader.load("text_size", size);
-		loader.load_color("text_color", &color);
-		loader.load_alignment("align", &alignment);
-		return true;
 	}
 
 	void ForegroundProperty::prepare(std::string_view text, const RectF& rect, TextCapture* capture)
@@ -106,5 +75,29 @@ namespace Yttrium
 		}
 		const auto& text_size = ::make_text_size(*font, text, max_text_width, max_text_height);
 		font->build(geometry, ::make_top_left(rect, text_size, margins, alignment), text_size._height, text, capture);
+	}
+
+	WidgetData::WidgetData() = default;
+
+	WidgetData::WidgetData(const WidgetData& data)
+		: _rect{data._rect}
+		, _sound{data._sound}
+		, _styles{data._styles}
+		, _fixed_style{data._fixed_style}
+		, _text{data._text}
+	{
+	}
+
+	void WidgetData::run(GuiPrivate& gui, Action action) const
+	{
+		const auto i = _actions.find(action);
+		if (i != _actions.end())
+			i->second.run(gui);
+	}
+
+	WidgetData::StyleData& WidgetData::style_data(Style style)
+	{
+		const auto i = _styles.find(style);
+		return i != _styles.end() ? i->second : _styles[Style::Normal];
 	}
 }

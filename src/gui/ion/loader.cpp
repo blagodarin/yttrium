@@ -1,81 +1,120 @@
 #include "loader.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/ion/document.h>
-#include <yttrium/ion/node.h>
-#include <yttrium/ion/object.h>
-#include <yttrium/ion/utils.h>
-#include <yttrium/ion/value.h>
+#include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/std/optional.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include "../gui.h"
 #include "../screen.h"
-#include "../widgets/widget.h"
-#include "property_loader.h"
+#include "../types.h"
+#include "../widgets/button.h"
+#include "../widgets/canvas.h"
+#include "../widgets/image.h"
+#include "../widgets/input.h"
+#include "../widgets/label.h"
 
 namespace
 {
 	using namespace Yttrium;
 
-	struct GuiElement
+	struct OnKey
 	{
-		const IonObject* _object = nullptr;
-		std::string_view _name;
-		std::string_view _attribute;
+		std::string_view _key;
+		GuiActions _on_press;
+		GuiActions _on_release;
 	};
 
-	GuiElement load_element(const IonList& source)
+	GuiActions read_actions(IonReader& ion, IonReader::Token& token)
 	{
-		GuiElement result;
-
-		auto value = source.begin();
-		if (value == source.end())
-			return {};
-
-		if (value->type() == IonValue::Type::String)
+		GuiActions actions;
+		token.check_object_begin();
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd; token.next(ion))
 		{
-			value->get(result._name);
-			++value;
-			if (value == source.end())
-				return {};
+			const auto action = token.to_name();
+			if (action == "call")
+				actions.add<GuiAction_Call>(token.next(ion).to_value());
+			else if (action == "enter")
+				actions.add<GuiAction_Enter>(token.next(ion).to_value());
+			else if (action == "quit")
+				actions.add<GuiAction_Quit>();
+			else if (action == "return")
+				actions.add<GuiAction_Return>();
+			else if (action == "return_to")
+				actions.add<GuiAction_ReturnTo>(token.next(ion).to_value());
 		}
-
-		if (value->type() == IonValue::Type::List)
-		{
-			const auto& list = value->list();
-			if (list.size() != 1 || !list.first()->get(result._attribute))
-				return {};
-			++value;
-			if (value == source.end())
-				return {};
-		}
-
-		if (value->type() != IonValue::Type::Object)
-			return {};
-
-		result._object = value->object();
-
-		++value;
-		if (value != source.end())
-			return {};
-
-		return result;
+		token.next(ion);
+		return actions;
 	}
 
-	std::optional<std::tuple<std::string_view, GuiActions, GuiActions>> load_on_key(const IonList& source)
+	OnKey read_on_key(IonReader& ion, IonReader::Token& token)
 	{
-		const auto key = source.begin();
-		if (key == source.end() || key->type() != IonValue::Type::String)
-			return {};
-		const auto on_press = key.next();
-		if (on_press == source.end() || on_press->type() != IonValue::Type::Object)
-			return {};
-		const auto on_release = on_press.next();
-		if (on_release != source.end() && (on_release->type() != IonValue::Type::Object || on_release.next() != source.end()))
-			return {};
-		return std::make_tuple(key->string(), GuiIonPropertyLoader::load_actions(*on_press->object()),
-			on_release != source.end() ? GuiIonPropertyLoader::load_actions(*on_release->object()) : GuiActions());
+		OnKey on_key;
+		on_key._key = token.to_value();
+		on_key._on_press = ::read_actions(ion, token.next(ion));
+		if (token.type() == IonReader::Token::Type::ObjectBegin)
+			on_key._on_release = ::read_actions(ion, token);
+		return on_key;
+	}
+
+	bool update_color(Color4f& color, IonReader& ion, IonReader::Token& token)
+	{
+		if (!strings::to_number(token.to_value(), color.r)
+			|| !strings::to_number(token.next(ion).to_value(), color.g)
+			|| !strings::to_number(token.next(ion).to_value(), color.b))
+			return false;
+		if (token.next(ion).type() == IonReader::Token::Type::Value)
+		{
+			if (!strings::to_number(token.text(), color.a))
+				return false;
+			token.next(ion);
+		}
+		else
+			color.a = 1;
+		return true;
+	}
+
+	bool update_rect(RectF& rect, IonReader& ion, IonReader::Token& token)
+	{
+		if (token.type() != IonReader::Token::Type::Value)
+			return true;
+		if (!token.text().empty())
+		{
+			float x = 0;
+			if (!strings::to_number(token.text(), x))
+				return false;
+			rect = {{x, rect.top()}, rect.size()};
+		}
+		if (token.next(ion).type() != IonReader::Token::Type::Value)
+			return true;
+		if (!token.text().empty())
+		{
+			float y = 0;
+			if (!strings::to_number(token.text(), y))
+				return false;
+			rect = {{rect.left(), y}, rect.size()};
+		}
+		if (token.next(ion).type() != IonReader::Token::Type::Value)
+			return true;
+		if (!token.text().empty())
+		{
+			float width = 0;
+			if (!strings::to_number(token.text(), width))
+				return false;
+			rect = {rect.top_left(), SizeF{width, rect.height()}};
+		}
+		if (token.next(ion).type() != IonReader::Token::Type::Value)
+			return true;
+		if (!token.text().empty())
+		{
+			float height = 0;
+			if (!strings::to_number(token.text(), height))
+				return false;
+			rect = {rect.top_left(), SizeF{rect.width(), height}};
+		}
+		token.next(ion);
+		return true;
 	}
 }
 
@@ -84,13 +123,20 @@ namespace Yttrium
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
 		: _gui{gui}
 	{
+		_widget_factory.emplace("button", [this](auto name, auto&& data){ return std::make_unique<ButtonWidget>(_gui, name, std::move(data)); });
+		_widget_factory.emplace("canvas", [this](auto name, auto&& data){ return std::make_unique<CanvasWidget>(_gui, name, std::move(data)); });
+		_widget_factory.emplace("image", [this](auto name, auto&& data){ return std::make_unique<ImageWidget>(_gui, name, std::move(data)); });
+		_widget_factory.emplace("input", [this](auto name, auto&& data){ return std::make_unique<InputWidget>(_gui, name, std::move(data)); });
+		_widget_factory.emplace("label", [this](auto name, auto&& data){ return std::make_unique<LabelWidget>(_gui, name, std::move(data)); });
 	}
 
 	void GuiIonLoader::load(std::string_view source_name)
 	{
+		const auto source = _gui.resource_loader().open(source_name);
+		IonReader ion{*source};
 		try
 		{
-			load(_gui.resource_loader().load_ion(source_name)->root());
+			load(ion);
 		}
 		catch (GuiDataError& e)
 		{
@@ -118,9 +164,9 @@ namespace Yttrium
 			return Attribute::Unknown;
 	}
 
-	void GuiIonLoader::load(const IonObject& source)
+	void GuiIonLoader::load(IonReader& ion)
 	{
-		static const std::map<std::string_view, void (GuiIonLoader::*)(const IonNode&, Flags<Attribute>)> handlers =
+		static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(IonReader&, IonReader::Token&, Flags<Attribute>)> handlers =
 		{
 			{"class", &GuiIonLoader::load_class},
 			{"cursor", &GuiIonLoader::load_cursor},
@@ -131,113 +177,91 @@ namespace Yttrium
 			{"translation", &GuiIonLoader::load_translation},
 		};
 
-		Flags<Attribute> attributes;
-		for (const auto& node : source)
+		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::End;)
 		{
-			if (node.is_empty())
+			Flags<Attribute> attributes;
+			for (;;)
 			{
-				const auto attribute = load_attribute(node.name());
+				const auto attribute = load_attribute(token.to_name());
 				if (attribute == Attribute::Unknown)
-					throw GuiDataError{"Unknown attribute '", node.name(), "'"};
+					break;
 				attributes |= attribute;
+				token.next(ion);
 			}
-			else
-			{
-				const auto i = handlers.find(node.name());
-				if (i == handlers.end())
-					throw GuiDataError{"Unknown entry '", node.name(), "'"};
-				(this->*i->second)(node, attributes);
-				attributes = {};
-			}
+			const auto i = handlers.find(token.text());
+			if (i == handlers.end())
+				throw GuiDataError{"Unknown entry '", token.text(), "'"};
+			(this->*i->second)(ion, token.next(ion), attributes);
 		}
 	}
 
-	void GuiIonLoader::load_class(const IonNode& node, Flags<Attribute>)
+	void GuiIonLoader::load_class(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		const auto& element = ::load_element(node);
-		if (!element._object || !element._name.data())
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		if (element._attribute.data())
-		{
-			const auto attribute = strings::from_view(element._attribute);
-			if (_classes.add(strings::from_view(element._name), *element._object, &attribute))
-				return;
-		}
-		else if (_classes.add(strings::from_view(element._name), *element._object))
-			return;
-		throw GuiDataError{"Bad '", node.name(), "' \"", element._name, "\""};
+		auto name = strings::from_view(token.to_value());
+		const auto i = _prototypes.find(name);
+		if (i != _prototypes.end())
+			throw GuiDataError{"Duplicate 'class' \"", name, "\""};
+		_prototypes.emplace(std::move(name), load_widget(ion, token.next(ion)));
 	}
 
-	void GuiIonLoader::load_cursor(const IonNode& node, Flags<Attribute>)
+	void GuiIonLoader::load_cursor(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		const auto values = node.values();
-		if (values.size() != 1 || values->type() != IonValue::Type::Object)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		const auto& object = *node.first()->object();
-		if (object.size() != 1)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		const auto& object_node = *object.begin();
-		if (object_node.name() == "none")
-		{
-			if (!object_node.is_empty())
-				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
+		token.check_object_begin();
+		const auto type = token.next(ion).to_name();
+		if (type == "none")
 			_gui.set_default_cursor(GuiCursor::None);
-		}
-		else if (object_node.name() == "custom")
-		{
-			if (!object_node.is_empty())
-				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
+		else if (type == "custom")
 			_gui.set_default_cursor(GuiCursor::Custom);
-		}
-		else if (object_node.name() == "texture")
-		{
-			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
-				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
-			_gui.set_default_cursor(GuiCursor::Texture, object_node.first()->string());
-		}
-		else if (object_node.name() != "default")
-			throw GuiDataError{"Bad '", node.name(), "'"};
+		else if (type == "texture")
+			_gui.set_default_cursor(GuiCursor::Texture, token.next(ion).to_value());
+		else if (type != "default")
+			throw GuiDataError{"Unknown cursor type '", type, "'"};
+		token.next(ion).check_object_end();
+		token.next(ion);
 	}
 
-	void GuiIonLoader::load_font(const IonNode& node, Flags<Attribute> attributes)
+	void GuiIonLoader::load_font(IonReader& ion, IonReader::Token& token, Flags<Attribute> attributes)
 	{
-		auto element = ::load_element(node);
-		if (!element._object)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-
-		if (!element._name.data())
-			element._name = "default";
-
+		std::string_view font_name = "default";
+		if (token.type() == IonReader::Token::Type::Value)
+		{
+			font_name = token.text();
+			token.next(ion);
+		}
+		token.check_object_begin();
+		std::string_view font_path;
+		std::string_view texture_path;
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd; token.next(ion))
+		{
+			const auto name = token.to_name();
+			if (name == "file")
+				font_path = token.next(ion).to_value();
+			else if (name == "texture")
+				texture_path = token.next(ion).to_value();
+			else
+				throw GuiDataError{"Unknown font option '", name, "'"};
+		}
+		_gui.set_font(strings::from_view(font_name), font_path, texture_path);
 		if (attributes & Attribute::Default)
 		{
-			if (_has_default_font)
-				throw GuiDataError{"Default '", node.name(), "' redefinition"};
-			_default_font_name = strings::from_view(element._name);
-			_has_default_font = true;
+			if (_default_font)
+				throw GuiDataError{"Default font redefinition"};
+			const auto font_desc = _gui.font(strings::from_view(font_name));
+			_default_font = font_desc->font;
+			_default_font_texture = font_desc->texture;
 		}
-
-		std::string_view font_name;
-		if (!GuiIonPropertyLoader::load_text(font_name, element._object->last("file")))
-			throw GuiDataError{"Bad '", node.name(), "' 'file'"};
-
-		std::string_view texture_name;
-		if (!GuiIonPropertyLoader::load_text(texture_name, element._object->last("texture")))
-			throw GuiDataError{"Bad '", node.name(), "' 'texture'"};
-
-		_gui.set_font(strings::from_view(element._name), font_name, texture_name);
+		token.next(ion);
 	}
 
-	void GuiIonLoader::load_include(const IonNode& node, Flags<Attribute>)
+	void GuiIonLoader::load_include(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		std::string_view path;
-		if (!Ion::get(node, path))
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		load(path);
+		load(token.to_value()); // TODO: Propagate exception from included file.
+		token.next(ion);
 	}
 
-	void GuiIonLoader::load_screen(const IonNode& node, Flags<Attribute> attributes)
+	void GuiIonLoader::load_screen(IonReader& ion, IonReader::Token& token, Flags<Attribute> attributes)
 	{
-		static const std::map<std::string_view, std::pair<void (GuiIonLoader::*)(GuiScreen&, const IonNode&, int) const, int>> handlers =
+		static const std::unordered_map<std::string_view, std::pair<void (GuiIonLoader::*)(GuiScreen&, IonReader&, IonReader::Token&, int) const, int>> handlers =
 		{
 			{"center", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Center)}},
 			{"cursor", {&GuiIonLoader::load_screen_cursor, 0}},
@@ -251,153 +275,363 @@ namespace Yttrium
 			{"stretch", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch)}},
 		};
 
-		const auto& element = ::load_element(node);
-		if (!element._object)
-			throw GuiDataError{"Empty '", node.name(), "'"};
-
-		if (!element._name.data())
-			throw GuiDataError{"'", node.name(), "' must have a name"};
-
-		auto& screen = _gui.add_screen(strings::from_view(element._name), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
-		for (const auto& screen_node : *element._object)
+		auto& screen = _gui.add_screen(strings::from_view(token.to_value()), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
+		token.next(ion).check_object_begin();
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
 		{
-			const auto i = handlers.find(screen_node.name());
+			const auto i = handlers.find(token.to_name());
 			if (i == handlers.end())
-				throw GuiDataError{"Unknown '", node.name(), "' entry '", screen_node.name(), "'"};
-			(this->*i->second.first)(screen, screen_node, i->second.second);
+				throw GuiDataError{"Unknown screen entry '", token.text(), "'"};
+			(this->*i->second.first)(screen, ion, token.next(ion), i->second.second);
 		}
+		token.next(ion);
 	}
 
-	void GuiIonLoader::load_on_key(const IonNode& node, Flags<Attribute>)
+	void GuiIonLoader::load_on_key(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		auto binding = ::load_on_key(node);
-		if (!binding)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		_gui.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
+		auto on_key = ::read_on_key(ion, token);
+		_gui.set_on_key(on_key._key, std::move(on_key._on_press), std::move(on_key._on_release));
 	}
 
-	void GuiIonLoader::load_translation(const IonNode& node, Flags<Attribute>)
+	void GuiIonLoader::load_translation(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		std::string_view path;
-		if (!Ion::get(node, path))
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		_gui.set_translation(path);
+		_gui.set_translation(token.to_value());
+		token.next(ion);
 	}
 
-	void GuiIonLoader::load_screen_cursor(GuiScreen& screen, const IonNode& node, int) const
+	void GuiIonLoader::load_screen_cursor(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
 	{
-		const auto values = node.values();
-		if (values.size() != 1 || values->type() != IonValue::Type::Object)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		const auto& object = *node.first()->object();
-		if (object.size() != 1)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		const auto& object_node = *object.begin();
-		if (object_node.name() == "none")
-		{
-			if (!object_node.is_empty())
-				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
+		token.check_object_begin();
+		const auto type = token.next(ion).to_name();
+		if (type == "none")
 			screen.set_cursor(GuiCursor::None);
-		}
-		else if (object_node.name() == "custom")
-		{
-			if (!object_node.is_empty())
-				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
+		else if (type == "custom")
 			screen.set_cursor(GuiCursor::Custom);
-		}
-		else if (object_node.name() == "texture")
-		{
-			if (object_node.size() != 1 || object_node.first()->type() != IonValue::Type::String)
-				throw GuiDataError{"Bad '", node.name(), ".", object_node.name(), "'"};
-			screen.set_cursor(GuiCursor::Texture, object_node.first()->string());
-		}
-		else if (object_node.name() != "default")
-			throw GuiDataError{"Bad '", node.name(), "'"};
+		else if (type == "texture")
+			screen.set_cursor(GuiCursor::Texture, token.next(ion).to_value());
+		else if (type != "default")
+			throw GuiDataError{"Unknown cursor type '", type, "'"};
+		token.next(ion).check_object_end();
+		token.next(ion);
 	}
 
-	void GuiIonLoader::load_screen_layout(GuiScreen& screen, const IonNode& node, int extra) const
+	void GuiIonLoader::load_screen_layout(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int extra) const
 	{
-		static const std::map<std::string_view, void (GuiIonLoader::*)(GuiLayout&, const IonNode&) const> handlers =
-		{
-			{"size", &GuiIonLoader::load_layout_size},
-		};
-
 		const auto placement = static_cast<GuiLayout::Placement>(extra);
 		auto& layout = screen.add_layout(placement);
-
-		if (placement == GuiLayout::Placement::Left || placement == GuiLayout::Placement::Right)
+		SizeF size{0, 0};
+		if (placement == GuiLayout::Placement::Center)
 		{
-			int height = 0;
-			if (node.size() != 2 || node.first()->type() != IonValue::Type::String || node.last()->type() != IonValue::Type::Object
-				|| !strings::to_number(node.first()->string(), height))
-				throw GuiDataError{"Bad '", node.name(), "'"};
-			layout.set_size({0, static_cast<float>(height)});
+			if (!strings::to_number(token.to_value(), size._width) || !strings::to_number(token.next(ion).to_value(), size._height))
+				throw GuiDataError{"Bad layout size"};
+			token.next(ion);
+		}
+		else if (placement == GuiLayout::Placement::Left || placement == GuiLayout::Placement::Right)
+		{
+			if (!strings::to_number(token.to_value(), size._height))
+				throw GuiDataError{"Bad layout size"};
+			token.next(ion);
+		}
+		else if (token.type() == IonReader::Token::Type::Value)
+		{
+			if (!strings::to_number(token.text(), size._width) || !strings::to_number(token.next(ion).to_value(), size._height))
+				throw GuiDataError{"Bad layout size"};
+			token.next(ion);
+		}
+		layout.set_size(size);
+		token.check_object_begin();
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
+		{
+			const auto i = _widget_factory.find(token.to_name());
+			if (i == _widget_factory.end())
+				throw GuiDataError{"Unknown widget '", token.text(), "'"};
+			std::string_view name;
+			if (token.next(ion).type() == IonReader::Token::Type::Value)
+			{
+				name = token.text();
+				token.next(ion);
+			}
+			screen.register_widget(layout.add_widget(i->second(name, load_widget(ion, token))));
+		}
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_screen_music(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
+	{
+		const auto music_name = token.to_value();
+		screen.set_music(music_name.empty() ? nullptr : _gui.resource_loader().load_music(music_name));
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_screen_on_enter(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
+	{
+		screen.set_on_enter(::read_actions(ion, token));
+	}
+
+	void GuiIonLoader::load_screen_on_event(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
+	{
+		const auto event_name = token.to_value();
+		screen.set_on_event(strings::from_view(event_name), ::read_actions(ion, token.next(ion)));
+	}
+
+	void GuiIonLoader::load_screen_on_key(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
+	{
+		auto on_key = ::read_on_key(ion, token);
+		screen.set_on_key(on_key._key, std::move(on_key._on_press), std::move(on_key._on_release));
+	}
+
+	void GuiIonLoader::load_screen_on_return(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
+	{
+		screen.set_on_return(::read_actions(ion, token));
+	}
+
+	std::unique_ptr<WidgetData> GuiIonLoader::load_widget(IonReader& ion, IonReader::Token& token) const
+	{
+		static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(WidgetData&, IonReader&, IonReader::Token&) const> handlers =
+		{
+			{"on_click", &GuiIonLoader::load_widget_on_click},
+			{"on_enter", &GuiIonLoader::load_widget_on_enter},
+			{"on_update", &GuiIonLoader::load_widget_on_update},
+			{"position", &GuiIonLoader::load_widget_position},
+			{"sound", &GuiIonLoader::load_widget_sound},
+			{"state", &GuiIonLoader::load_widget_state},
+			{"text", &GuiIonLoader::load_widget_text},
+		};
+
+		static const std::unordered_map<std::string_view, WidgetData::Style> styles
+		{
+			{"checked", WidgetData::Style::Checked},
+			{"disabled", WidgetData::Style::Disabled},
+			{"hovered", WidgetData::Style::Hovered},
+			{"pressed", WidgetData::Style::Pressed},
+		};
+
+		const auto load_style_entry = [this, &ion, &token](WidgetData::StyleData& data)
+		{
+			static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(WidgetData::StyleData&, IonReader&, IonReader::Token&) const> style_handlers =
+			{
+				{"align", &GuiIonLoader::load_style_align},
+				{"borders", &GuiIonLoader::load_style_borders},
+				{"color", &GuiIonLoader::load_style_color},
+				{"font", &GuiIonLoader::load_style_font},
+				{"text_color", &GuiIonLoader::load_style_text_color},
+				{"text_size", &GuiIonLoader::load_style_text_size},
+				{"texture", &GuiIonLoader::load_style_texture},
+				{"texture_rect", &GuiIonLoader::load_style_texture_rect},
+			};
+			const auto i = style_handlers.find(token.to_name());
+			if (i == style_handlers.end())
+				return false;
+			(this->*i->second)(data, ion, token.next(ion));
+			return true;
+		};
+
+		std::unique_ptr<WidgetData> data;
+		if (token.type() == IonReader::Token::Type::ListBegin)
+		{
+			const auto i = _prototypes.find(strings::from_view(token.next(ion).to_value()));
+			if (i == _prototypes.end())
+				throw GuiDataError{"Unknown class \"", token.text(), "\""};
+			data = std::make_unique<WidgetData>(*i->second);
+			token.next(ion).check_list_end();
+			token.next(ion);
 		}
 		else
 		{
-			if (node.size() != 1 || node.first()->type() != IonValue::Type::Object)
-				throw GuiDataError{"Bad '", node.name(), "'"};
+			data = std::make_unique<WidgetData>();
+			auto& foreground = data->_styles[WidgetData::Style::Normal]._foreground;
+			foreground.font = _default_font;
+			foreground.font_texture = _default_font_texture;
 		}
-
-		for (const auto& layout_node : *node.last()->object())
+		token.check_object_begin();
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
 		{
-			const auto i = handlers.find(layout_node.name());
+			const auto i = handlers.find(token.to_name());
 			if (i != handlers.end())
 			{
-				(this->*i->second)(layout, layout_node);
+				(this->*i->second)(*data, ion, token.next(ion));
 				continue;
 			}
+			const auto j = styles.find(token.text());
+			if (j != styles.end())
+			{
+				auto k = data->_styles.find(j->second);
+				if (k == data->_styles.end())
+					k = data->_styles.emplace(j->second, data->_styles[WidgetData::Style::Normal]).first;
+				token.next(ion).check_object_begin();
+				for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
+					if (!load_style_entry(k->second))
+						throw GuiDataError{"Unknown '", j->first, "' entry '", token.text(), "'"};
+				token.next(ion);
+			}
+			else
+				load_style_entry(data->_styles[WidgetData::Style::Normal]);
+		}
+		token.next(ion);
+		return data;
+	}
 
-			const auto& element = ::load_element(layout_node);
-			if (!element._object)
-				throw GuiDataError{"Bad layout entry '", layout_node.name(), "'"};
+	void GuiIonLoader::load_widget_on_click(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		data._actions[WidgetData::Action::OnClick] = ::read_actions(ion, token);
+	}
 
-			GuiIonPropertyLoader loader(element._object, (element._attribute.data() ? _classes.find(strings::from_view(element._attribute)) : nullptr), _gui);
-			if (_has_default_font)
-				loader.set_default_font_name(&_default_font_name);
-			screen.register_widget(layout.add_widget(layout_node.name(), element._name.data() ? element._name : "", loader));
+	void GuiIonLoader::load_widget_on_enter(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		data._actions[WidgetData::Action::OnEnter] = ::read_actions(ion, token);
+	}
+
+	void GuiIonLoader::load_widget_on_update(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		data._actions[WidgetData::Action::OnUpdate] = ::read_actions(ion, token);
+	}
+
+	void GuiIonLoader::load_widget_position(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		if (!::update_rect(data._rect, ion, token))
+			throw GuiDataError{"Bad 'position'"};
+	}
+
+	void GuiIonLoader::load_widget_sound(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		data._sound = _gui.resource_loader().load_sound(token.to_value());
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_widget_state(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		static const std::unordered_map<std::string_view, WidgetData::Style> states
+		{
+			{"checked", WidgetData::Style::Checked},
+			{"disabled", WidgetData::Style::Disabled},
+			{"hovered", WidgetData::Style::Hovered},
+			{"normal", WidgetData::Style::Normal},
+			{"pressed", WidgetData::Style::Pressed},
+		};
+
+		const auto i = states.find(token.to_value());
+		if (i == states.end()) // TODO-17: Use init-statement.
+			throw GuiDataError{"Unknown 'state' \"", token.text(), "\""};
+		data._fixed_style = i->second;
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_widget_text(WidgetData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		if (token.type() == IonReader::Token::Type::ObjectBegin)
+		{
+			token.next(ion).check_name("tr");
+			data._text = _gui.translate(token.next(ion).to_value());
+			token.next(ion).check_object_end();
+		}
+		else
+			data._text = strings::from_view(token.to_value());
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_style_align(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		static const std::unordered_map<std::string_view, unsigned> alignment_flags
+		{
+			{"bottom", BottomAlignment},
+			{"center", CenterAlignment},
+			{"left", LeftAlignment},
+			{"right", RightAlignment},
+			{"top", TopAlignment},
+		};
+
+		const auto i = alignment_flags.find(token.to_value());
+		if (i == alignment_flags.end())
+			throw GuiDataError{"Bad 'align' \"", token.text(), "\""};
+		auto alignment = i->second;
+		if (token.next(ion).type() == IonReader::Token::Type::Value)
+		{
+			if (alignment != TopAlignment && alignment != BottomAlignment)
+				throw GuiDataError{"Bad 'align' \"", i->first, "\" \"", token.text(), "\""};
+			const auto j = alignment_flags.find(token.text());
+			if (j == alignment_flags.end())
+				throw GuiDataError{"Bad 'align' \"", i->first, "\" \"", token.text(), "\""};
+			if (j->second != LeftAlignment && j->second != RightAlignment)
+				throw GuiDataError{"Bad 'align' \"", i->first, "\" \"", token.text(), "\""};
+			alignment |= j->second;
+			token.next(ion);
+		}
+		data._foreground.alignment = alignment;
+	}
+
+	void GuiIonLoader::load_style_borders(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		auto& borders = data._background.borders;
+		if (!strings::to_number(token.to_value(), borders._top)
+			|| !strings::to_number(token.next(ion).to_value(), borders._right)
+			|| !strings::to_number(token.next(ion).to_value(), borders._bottom)
+			|| !strings::to_number(token.next(ion).to_value(), borders._left))
+			throw GuiDataError{"Bad 'borders'"};
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_style_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		if (!::update_color(data._background.color, ion, token))
+			throw GuiDataError{"Bad 'color'"};
+	}
+
+	void GuiIonLoader::load_style_font(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		const auto font_desc = _gui.font(strings::from_view(token.to_value()));
+		if (!font_desc)
+			throw GuiDataError{"Unknown font \"", token.text(), "\""};
+		auto& foreground = data._foreground;
+		foreground.font = font_desc->font;
+		foreground.font_texture = font_desc->texture;
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_style_text_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		if (!::update_color(data._foreground.color, ion, token))
+			throw GuiDataError{"Bad 'text_color'"};
+	}
+
+	void GuiIonLoader::load_style_text_size(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		if (!strings::to_number(token.to_value(), data._foreground.size))
+			throw GuiDataError{"Bad 'text_size'"};
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_style_texture(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
+	{
+		auto& background = data._background;
+		background.texture = _gui.resource_loader().load_texture_2d(token.to_value());
+		if (token.next(ion).type() == IonReader::Token::Type::ObjectBegin)
+		{
+			const auto filter = token.next(ion).to_name();
+			if (filter == "nearest")
+				background.texture_filter = Texture2D::NearestFilter;
+			else if (filter == "linear")
+				background.texture_filter = Texture2D::LinearFilter;
+			else if (filter == "bilinear")
+				background.texture_filter = Texture2D::BilinearFilter;
+			else if (filter == "trilinear")
+				background.texture_filter = Texture2D::TrilinearFilter;
+			else
+				throw GuiDataError{"Bad 'texture' filter '", filter, "'"};
+			if (token.next(ion).type() == IonReader::Token::Type::Name)
+			{
+				if (token.text() != "anisotropic")
+					throw GuiDataError{"Bad 'texture' filter '", filter, "' '", token.text(), "'"};
+				background.texture_filter = static_cast<Texture2D::Filter>(background.texture_filter | Texture2D::AnisotropicFilter);
+				token.next(ion);
+			}
+			token.check_object_end();
+			token.next(ion);
 		}
 	}
 
-	void GuiIonLoader::load_screen_music(GuiScreen& screen, const IonNode& node, int) const
+	void GuiIonLoader::load_style_texture_rect(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		const auto values = node.values();
-		if (values.size() != 1 || values->type() != IonValue::Type::String)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		const auto music_name = values->string();
-		screen.set_music(music_name.empty() ? nullptr : _gui.resource_loader().load_music(music_name));
-	}
-
-	void GuiIonLoader::load_screen_on_enter(GuiScreen& screen, const IonNode& node, int) const
-	{
-		screen.set_on_enter(GuiIonPropertyLoader::load_actions(node));
-	}
-
-	void GuiIonLoader::load_screen_on_event(GuiScreen& screen, const IonNode& node, int) const
-	{
-		const auto values = node.values();
-		if (values.size() != 2 || values->type() != IonValue::Type::String || values.last().type() != IonValue::Type::Object)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		screen.set_on_event(strings::from_view(values->string()), GuiIonPropertyLoader::load_actions(*values.last().object()));
-	}
-
-	void GuiIonLoader::load_screen_on_key(GuiScreen& screen, const IonNode& node, int) const
-	{
-		auto binding = ::load_on_key(node);
-		if (!binding)
-			throw GuiDataError{"Bad '", node.name(), "'"};
-		screen.set_on_key(std::get<0>(*binding), std::move(std::get<1>(*binding)), std::move(std::get<2>(*binding)));
-	}
-
-	void GuiIonLoader::load_screen_on_return(GuiScreen& screen, const IonNode& node, int) const
-	{
-		screen.set_on_return(GuiIonPropertyLoader::load_actions(node));
-	}
-
-	void GuiIonLoader::load_layout_size(GuiLayout& layout, const IonNode& node) const
-	{
-		SizeF size;
-		GuiIonPropertyLoader::load_size(size, node);
-		layout.set_size(size);
+		if (!::update_rect(data._background.texture_rect, ion, token))
+			throw GuiDataError{"Bad 'texture_rect'"};
 	}
 }

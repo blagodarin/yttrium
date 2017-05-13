@@ -1,17 +1,15 @@
 #include "canvas.h"
 
 #include "../gui.h"
-#include "../property_loader.h"
 
 namespace Yttrium
 {
-	CanvasWidget::CanvasWidget(GuiPrivate& gui, std::string_view name, GuiPropertyLoader& loader)
-		: Widget{gui, name}
+	CanvasWidget::CanvasWidget(GuiPrivate& gui, std::string_view name, std::unique_ptr<WidgetData>&& data)
+		: Widget{gui, name, std::move(data)}
 	{
-		loader.load_rect("position", _rect);
 	}
 
-	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetState) const
+	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::Style) const
 	{
 		_gui.on_canvas_draw(_name, rect, renderer);
 	}

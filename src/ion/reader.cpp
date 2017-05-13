@@ -88,10 +88,33 @@ namespace Yttrium
 			throw IonError{_line, _column, "'[' expected"};
 	}
 
+	void IonReader::Token::check_list_end() const
+	{
+		if (_type != Type::ListEnd)
+			throw IonError{_line, _column, "']' expected"};
+	}
+
 	void IonReader::Token::check_name(std::string_view name) const
 	{
 		if (to_name() != name)
 			throw IonError{_line, _column, "'", name, "' expected"};
+	}
+
+	void IonReader::Token::check_object_begin() const
+	{
+		if (_type != Type::ObjectBegin)
+			throw IonError{_line, _column, "'{' expected"};
+	}
+
+	void IonReader::Token::check_object_end() const
+	{
+		if (_type != Type::ObjectEnd)
+			throw IonError{_line, _column, "'}' expected"};
+	}
+
+	IonReader::Token& IonReader::Token::next(IonReader& ion)
+	{
+		return *this = ion.read();
 	}
 
 	std::string_view IonReader::Token::to_name() const

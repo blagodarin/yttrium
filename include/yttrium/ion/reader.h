@@ -46,7 +46,11 @@ namespace Yttrium
 
 			void check_end() const;
 			void check_list_begin() const;
+			void check_list_end() const;
 			void check_name(std::string_view) const;
+			void check_object_begin() const;
+			void check_object_end() const;
+			Token& next(IonReader&);
 			std::string_view to_name() const;
 			std::string_view to_value() const;
 

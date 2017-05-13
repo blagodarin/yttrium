@@ -3,7 +3,7 @@
 
 namespace Yttrium
 {
-	class Color4f
+	class Color4f // TODO: Color4ub (or just Color4, or even Bgra).
 	{
 	public:
 		float r, g, b, a;
