@@ -5,7 +5,7 @@
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/std/string_view.h>
-#include "../properties.h"
+#include "widget_data.h"
 
 namespace Yttrium
 {

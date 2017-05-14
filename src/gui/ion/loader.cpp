@@ -8,7 +8,6 @@
 #include <yttrium/storage/storage.h>
 #include "../gui.h"
 #include "../screen.h"
-#include "../types.h"
 #include "../widgets/button.h"
 #include "../widgets/canvas.h"
 #include "../widgets/image.h"
@@ -144,6 +143,31 @@ namespace Yttrium
 		}
 	}
 
+	bool GuiIonLoader::read_texture_filter(IonReader& ion, IonReader::Token& token, Texture2D::Filter& filter)
+	{
+		if (token.type() != IonReader::Token::Type::ObjectBegin)
+			return true;
+		const auto filter_name = token.next(ion).to_name();
+		if (filter_name == "nearest")
+			filter = Texture2D::NearestFilter;
+		else if (filter_name == "linear")
+			filter = Texture2D::LinearFilter;
+		else if (filter_name == "bilinear")
+			filter = Texture2D::BilinearFilter;
+		else if (filter_name == "trilinear")
+			filter = Texture2D::TrilinearFilter;
+		else
+			return false;
+		if (token.next(ion).type() == IonReader::Token::Type::Name && token.text() == "anisotropic")
+		{
+			filter = static_cast<Texture2D::Filter>(filter | Texture2D::AnisotropicFilter);
+			token.next(ion);
+		}
+		token.check_object_end();
+		token.next(ion);
+		return true;
+	}
+
 	enum class GuiIonLoader::Attribute
 	{
 		Unknown     = 0,
@@ -255,7 +279,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_include(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		load(token.to_value()); // TODO: Propagate exception from included file.
+		load(token.to_value());
 		token.next(ion);
 	}
 
@@ -597,29 +621,8 @@ namespace Yttrium
 	{
 		auto& background = data._background;
 		background.texture = _gui.resource_loader().load_texture_2d(token.to_value());
-		if (token.next(ion).type() == IonReader::Token::Type::ObjectBegin)
-		{
-			const auto filter = token.next(ion).to_name();
-			if (filter == "nearest")
-				background.texture_filter = Texture2D::NearestFilter;
-			else if (filter == "linear")
-				background.texture_filter = Texture2D::LinearFilter;
-			else if (filter == "bilinear")
-				background.texture_filter = Texture2D::BilinearFilter;
-			else if (filter == "trilinear")
-				background.texture_filter = Texture2D::TrilinearFilter;
-			else
-				throw GuiDataError{"Bad 'texture' filter '", filter, "'"};
-			if (token.next(ion).type() == IonReader::Token::Type::Name)
-			{
-				if (token.text() != "anisotropic")
-					throw GuiDataError{"Bad 'texture' filter '", filter, "' '", token.text(), "'"};
-				background.texture_filter = static_cast<Texture2D::Filter>(background.texture_filter | Texture2D::AnisotropicFilter);
-				token.next(ion);
-			}
-			token.check_object_end();
-			token.next(ion);
-		}
+		if (!read_texture_filter(ion, token.next(ion), background.texture_filter))
+			throw GuiDataError{"Bad 'texture' filter '", token.text(), "'"};
 	}
 
 	void GuiIonLoader::load_style_texture_rect(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const

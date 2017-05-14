@@ -2,7 +2,7 @@
 #define _src_gui_widgets_input_h_
 
 #include "../logic/line_editor.h"
-#include "widget.h"
+#include "../widget.h"
 
 #include <chrono>
 

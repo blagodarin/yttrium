@@ -47,6 +47,9 @@ namespace Yttrium
 		virtual ~Renderer() = default;
 
 		///
+		virtual void add_debug_text(std::string_view) = 0;
+
+		///
 		virtual std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
 
 		///
@@ -57,9 +60,6 @@ namespace Yttrium
 
 		///
 		virtual std::unique_ptr<VertexBuffer> create_vertex_buffer(const std::vector<VA>&, std::size_t count, const void* data = nullptr) = 0;
-
-		///
-		virtual void draw_debug_text(std::string_view) = 0;
 
 		///
 		virtual void draw_mesh(const Mesh&) = 0;

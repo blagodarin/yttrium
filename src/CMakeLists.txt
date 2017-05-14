@@ -115,8 +115,6 @@ target_sources(yttrium PRIVATE
 	gui/widgets/input.h
 	gui/widgets/label.cpp
 	gui/widgets/label.h
-	gui/widgets/widget.cpp
-	gui/widgets/widget.h
 	gui/actions.cpp
 	gui/actions.h
 	gui/cursor.h
@@ -126,13 +124,14 @@ target_sources(yttrium PRIVATE
 	gui/key_lookup.h
 	gui/layout.cpp
 	gui/layout.h
-	gui/properties.cpp
-	gui/properties.h
 	gui/screen.cpp
 	gui/screen.h
 	gui/texture_font.cpp
 	gui/texture_font.h
-	gui/types.h
+	gui/widget_data.cpp
+	gui/widget_data.h
+	gui/widget.cpp
+	gui/widget.h
 	)
 
 ########################################################################################################################

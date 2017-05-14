@@ -1,11 +1,10 @@
-#include "properties.h"
+#include "widget_data.h"
 
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
-#include "types.h"
 
 namespace
 {
@@ -50,7 +49,8 @@ namespace Yttrium
 	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 	{
 		PushTexture push_texture(renderer, texture.get(), texture_filter);
-		renderer.set_texture_rect(texture_rect, borders);
+		if (texture)
+			renderer.set_texture_rect(texture_rect == RectF{} ? RectF{Rect{texture->size()}} : texture_rect, borders);
 		renderer.draw_rect(rect, color);
 	}
 

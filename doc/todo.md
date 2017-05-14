@@ -4,6 +4,7 @@
 * Library:
 	* GUI:
 		- Line editor widget.
+		- CSS color codes support (e.g. #RRGGBB[AA]).
 	* Image:
 		- Compressed images (e.g. compressed textures).
 		- Multi-level images (e.g. textures with mipmaps).

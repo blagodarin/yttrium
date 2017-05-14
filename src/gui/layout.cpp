@@ -1,12 +1,6 @@
 #include "layout.h"
 
-#include <yttrium/exceptions.h>
-#include "gui.h"
-#include "widgets/button.h"
-#include "widgets/canvas.h"
-#include "widgets/image.h"
-#include "widgets/input.h"
-#include "widgets/label.h"
+#include "widget.h"
 
 namespace Yttrium
 {

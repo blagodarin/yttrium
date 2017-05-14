@@ -6,7 +6,7 @@
 #include <yttrium/resource_loader.h>
 #include "gui.h"
 #include "layout.h"
-#include "widgets/widget.h"
+#include "widget.h"
 
 #include <cassert>
 

@@ -15,6 +15,7 @@
 #include <yttrium/storage/storage.h>
 #include <yttrium/string.h>
 #include <yttrium/translation.h>
+#include "gui/ion/loader.h"
 #include "renderer/material.h"
 
 #include <cassert>
@@ -148,54 +149,8 @@ namespace Yttrium
 					const auto texture_name = ion.read().to_value();
 					if (texture_name.empty())
 						throw DataError{make_location(), "Bad 'texture'"};
-					token = ion.read();
-					if (token.type() == IonReader::Token::Type::ObjectBegin) // TODO: Merge with GuiIonPropertyLoader::load_texture.
-					{
-						bool has_interpolation = false;
-						bool has_anisotropy = false;
-						for (token = ion.read(); token.type() != IonReader::Token::Type::ObjectEnd; token = ion.read())
-						{
-							const auto filter_option = token.to_name();
-							if (filter_option == "nearest")
-							{
-								if (has_interpolation)
-									throw DataError{make_location(), "Bad texture property"};
-								texture_filter = static_cast<Texture2D::Filter>(Texture2D::NearestFilter | (texture_filter & Texture2D::AnisotropicFilter));
-								has_interpolation = true;
-							}
-							else if (filter_option == "linear")
-							{
-								if (has_interpolation)
-									throw DataError{make_location(), "Bad texture property"};
-								texture_filter = static_cast<Texture2D::Filter>(Texture2D::LinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
-								has_interpolation = true;
-							}
-							else if (filter_option == "bilinear")
-							{
-								if (has_interpolation)
-									throw DataError{make_location(), "Bad texture property"};
-								texture_filter = static_cast<Texture2D::Filter>(Texture2D::BilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
-								has_interpolation = true;
-							}
-							else if (filter_option == "trilinear")
-							{
-								if (has_interpolation)
-									throw DataError{make_location(), "Bad texture property"};
-								texture_filter = static_cast<Texture2D::Filter>(Texture2D::TrilinearFilter | (texture_filter & Texture2D::AnisotropicFilter));
-								has_interpolation = true;
-							}
-							else if (filter_option == "anisotropic")
-							{
-								if (!has_interpolation || has_anisotropy)
-									throw DataError{make_location(), "Bad texture property"};
-								texture_filter = static_cast<Texture2D::Filter>((texture_filter & Texture2D::IsotropicFilterMask) | Texture2D::AnisotropicFilter);
-								has_anisotropy = true;
-							}
-							else
-								throw DataError{make_location(), "Bad texture property"};
-						}
-						token = ion.read();
-					}
+					if (!GuiIonLoader::read_texture_filter(ion, token.next(ion), texture_filter))
+						throw DataError{make_location(), "Bad texture property"};
 					texture = load_texture_2d(texture_name);
 				}
 				else

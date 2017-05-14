@@ -74,23 +74,10 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
-	void RendererImpl::draw_debug_text(std::string_view text)
+	void RendererImpl::add_debug_text(std::string_view text)
 	{
-		if (text.empty())
-			return;
-
-		DebugRenderer debug(*this);
-		debug.set_color(1, 1, 1);
-		int top = 0;
-		size_t line_begin = 0;
-		auto line_end = text.find('\n', line_begin);
-		while (line_end != std::string::npos)
-		{
-			debug.draw_text(0, top++, {text.data() + line_begin, line_end - line_begin});
-			line_begin = line_end + 1;
-			line_end = text.find('\n', line_begin);
-		}
-		debug.draw_text(0, top, {text.data() + line_begin, text.size() - line_begin});
+		strings::append_view(_debug_text, text);
+		_debug_text += '\n';
 	}
 
 	void RendererImpl::draw_quad(const Quad& quad, const Color4f& color)
@@ -206,6 +193,26 @@ namespace Yttrium
 	void RendererImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture)
 	{
 		draw_rect(position, color, texture, {});
+	}
+
+	void RendererImpl::finish()
+	{
+		if (!_debug_text.empty())
+		{
+			DebugRenderer debug(*this);
+			debug.set_color(1, 1, 1);
+			int top = 0;
+			size_t line_begin = 0;
+			auto line_end = _debug_text.find('\n', line_begin);
+			while (line_end != std::string::npos)
+			{
+				debug.draw_text(0, top++, {_debug_text.data() + line_begin, line_end - line_begin});
+				line_begin = line_end + 1;
+				line_end = _debug_text.find('\n', line_begin);
+			}
+			debug.draw_text(0, top, {_debug_text.data() + line_begin, _debug_text.size() - line_begin});
+			_debug_text.clear();
+		}
 	}
 
 	void RendererImpl::forget_program(const GpuProgram* program)

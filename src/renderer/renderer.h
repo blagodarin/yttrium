@@ -36,7 +36,7 @@ namespace Yttrium
 
 		~RendererImpl() override;
 
-		void draw_debug_text(std::string_view) override;
+		void add_debug_text(std::string_view) override;
 		void draw_quad(const Quad&, const Color4f&) override;
 		void draw_rect(const RectF&, const Color4f&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Color4f&) override;
@@ -54,6 +54,7 @@ namespace Yttrium
 
 		const Texture2D* debug_texture() const;
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture);
+		void finish();
 		void forget_program(const GpuProgram*);
 		void forget_texture(const Texture2D*);
 		void pop_program();
@@ -129,6 +130,8 @@ namespace Yttrium
 #ifndef NDEBUG
 		std::vector<const GpuProgram*> _seen_programs; // For redundancy statistics.
 #endif
+
+		std::string _debug_text;
 	};
 }
 

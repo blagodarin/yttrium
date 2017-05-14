@@ -1,7 +1,7 @@
 #ifndef _src_gui_widgets_label_h_
 #define _src_gui_widgets_label_h_
 
-#include "widget.h"
+#include "../widget.h"
 
 namespace Yttrium
 {

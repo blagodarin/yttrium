@@ -100,7 +100,7 @@ Game::Game(const Storage& storage)
 			renderer.draw_rect(RectF{cursor, SizeF{2, 2}}, {1, 1, 0, 1});
 		}
 		if (_debug_text_visible)
-			renderer.draw_debug_text(_debug_text);
+			renderer.add_debug_text(_debug_text);
 	});
 	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });

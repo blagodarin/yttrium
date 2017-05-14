@@ -4,7 +4,7 @@
 #include <yttrium/flags.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/std/string_view.h>
-#include "../properties.h"
+#include "../widget_data.h"
 
 #include <unordered_map>
 
@@ -22,6 +22,8 @@ namespace Yttrium
 		explicit GuiIonLoader(GuiPrivate&);
 
 		void load(std::string_view source_name);
+
+		static bool read_texture_filter(IonReader&, IonReader::Token&, Texture2D::Filter&);
 
 	private:
 		enum class Attribute;

@@ -190,6 +190,7 @@ namespace Yttrium
 				Push2D projection{*_private->_renderer};
 				if (_private->_on_render)
 					_private->_on_render(*_private->_renderer, Vector2{_private->_cursor});
+				_private->_renderer->finish();
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)
