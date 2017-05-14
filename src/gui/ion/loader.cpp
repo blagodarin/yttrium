@@ -140,7 +140,7 @@ namespace Yttrium
 		}
 		catch (GuiDataError& e)
 		{
-			throw GuiDataError{source_name, ":", e.what()};
+			throw GuiDataError{source_name, ": ", e.what()};
 		}
 	}
 
@@ -464,8 +464,8 @@ namespace Yttrium
 						throw GuiDataError{"Unknown '", j->first, "' entry '", token.text(), "'"};
 				token.next(ion);
 			}
-			else
-				load_style_entry(data->_styles[WidgetData::Style::Normal]);
+			else if (!load_style_entry(data->_styles[WidgetData::Style::Normal]))
+				throw GuiDataError{"Unknown widget entry '", token.text(), "'"};
 		}
 		token.next(ion);
 		return data;

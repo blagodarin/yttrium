@@ -1,16 +1,9 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/storage/storage.h>
+#include "test_utils.h"
 
 #include <boost/test/unit_test.hpp>
-
-namespace
-{
-	Yttrium::Buffer make_buffer(const std::string& string)
-	{
-		return { string.size(), string.data() };
-	}
-}
 
 BOOST_AUTO_TEST_CASE(test_resource_loader_release_unused)
 {
