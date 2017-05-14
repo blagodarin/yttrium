@@ -2,6 +2,8 @@
 * Overall:
 	- Building with clang.
 * Library:
+	- Multiple windows.
+	- Windowed mode.
 	* GUI:
 		- Line editor widget.
 		- CSS color codes support (e.g. #RRGGBB[AA]).
@@ -15,6 +17,7 @@
 		- Unicode fonts.
 	* Renderer:
 		- Loading textures without intermediate Images.
+		- Don't count debug output in rendering statistics.
 	* Storage:
 		- Hash-based packed file access.
 * Tools:

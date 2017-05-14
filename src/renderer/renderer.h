@@ -87,6 +87,8 @@ namespace Yttrium
 		void update_state();
 
 	private:
+		struct Draw2D;
+
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
 		void reset_texture_state();

@@ -52,6 +52,25 @@ namespace Yttrium
 			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
 		"}\n";
 
+	struct RendererImpl::Draw2D
+	{
+		BufferAppender<Vertex2D> _vertices;
+		BufferAppender<uint16_t> _indices;
+		uint16_t _index = static_cast<uint16_t>(_vertices.count());
+
+		Draw2D(Buffer& vertices, Buffer& indices)
+			: _vertices{vertices}
+			, _indices{indices}
+		{
+			if (_index > 0)
+			{
+				_indices << (_index - 1) << (_index);
+				if (_indices.count() & 1)
+					_indices << (_index); // Extra degenerate to ensure correct face vertex ordering.
+			}
+		}
+	};
+
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&)
 	{
 		auto renderer = std::make_unique<GlRenderer>();
@@ -82,40 +101,28 @@ namespace Yttrium
 
 	void RendererImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
-		// TODO: Use one intro code for draw_quad and draw_rect.
-
-		BufferAppender<Vertex2D> vertices(_vertices_2d);
-		BufferAppender<uint16_t> indices(_indices_2d);
-
-		auto index = static_cast<uint16_t>(vertices.count()); // TODO: Check size.
-
-		if (index > 0)
-		{
-			indices << (index - 1) << (index);
-			if (indices.count() & 1)
-				indices << (index); // Add an extra degenerate to ensure the correct face ordering.
-		}
+		Draw2D draw{_vertices_2d, _indices_2d};
 
 		Vertex2D vertex;
 		vertex.color = color;
 
 		vertex.position = quad._a;
 		vertex.texture = _texture_rect.top_left();
-		vertices << vertex;
+		draw._vertices << vertex;
 
 		vertex.position = quad._d;
 		vertex.texture = _texture_rect.bottom_left();
-		vertices << vertex;
+		draw._vertices << vertex;
 
 		vertex.position = quad._b;
 		vertex.texture = _texture_rect.top_right();
-		vertices << vertex;
+		draw._vertices << vertex;
 
 		vertex.position = quad._c;
 		vertex.texture = _texture_rect.bottom_right();
-		vertices << vertex;
+		draw._vertices << vertex;
 
-		indices << index << index + 1 << index + 2 << index + 3;
+		draw._indices << draw._index << draw._index + 1 << draw._index + 2 << draw._index + 3;
 	}
 
 	void RendererImpl::draw_rect(const RectF& rect, const Color4f& color)
@@ -415,17 +422,7 @@ namespace Yttrium
 
 	void RendererImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
 	{
-		BufferAppender<Vertex2D> vertices(_vertices_2d);
-		BufferAppender<uint16_t> indices(_indices_2d);
-
-		auto index = static_cast<uint16_t>(vertices.count()); // TODO: Check size.
-
-		if (index > 0)
-		{
-			indices << (index - 1) << (index);
-			if (indices.count() & 1)
-				indices << (index); // Add an extra degenerate to ensure the correct face ordering.
-		}
+		Draw2D draw{_vertices_2d, _indices_2d};
 
 		Vertex2D vertex;
 		vertex.color = color;
@@ -440,7 +437,7 @@ namespace Yttrium
 
 		vertex.position.x = position.left();
 		vertex.texture.x = texture.left();
-		vertices << vertex;
+		draw._vertices << vertex;
 
 		if (borders._left > 0)
 		{
@@ -448,7 +445,7 @@ namespace Yttrium
 
 			vertex.position.x = position.left() + left_offset;
 			vertex.texture.x = texture.left() + borders._left;
-			vertices << vertex;
+			draw._vertices << vertex;
 		}
 
 		if (borders._right > 0)
@@ -457,19 +454,18 @@ namespace Yttrium
 
 			vertex.position.x = position.right() - right_offset;
 			vertex.texture.x = texture.right() - borders._right;
-			vertices << vertex;
+			draw._vertices << vertex;
 		}
 
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
-		vertices << vertex;
+		draw._vertices << vertex;
 
 		// Top/only part indices.
 
-		const uint16_t row_vertices = vertices.count() - index;
-
+		const uint16_t row_vertices = draw._vertices.count() - draw._index;
 		for (uint16_t i = 0; i < row_vertices; ++i)
-			indices << (index + i) << (index + i + row_vertices);
+			draw._indices << (draw._index + i) << (draw._index + i + row_vertices);
 
 		if (borders._top > 0)
 		{
@@ -482,33 +478,32 @@ namespace Yttrium
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
-			vertices << vertex;
+			draw._vertices << vertex;
 
 			if (borders._left > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
 				vertex.texture.x = texture.left() + borders._left;
-				vertices << vertex;
+				draw._vertices << vertex;
 			}
 
 			if (borders._right > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
 				vertex.texture.x = texture.right() - borders._right;
-				vertices << vertex;
+				draw._vertices << vertex;
 			}
 
 			vertex.position.x = position.right();
 			vertex.texture.x = texture.right();
-			vertices << vertex;
+			draw._vertices << vertex;
 
 			// Middle/bottom part indices.
 
-			index += row_vertices;
-
-			indices << (index + row_vertices - 1) << (index);
+			draw._index += row_vertices;
+			draw._indices << (draw._index + row_vertices - 1) << (draw._index);
 			for (uint16_t i = 0; i < row_vertices; ++i)
-				indices << (index + i) << (index + i + row_vertices);
+				draw._indices << (draw._index + i) << (draw._index + i + row_vertices);
 		}
 
 		if (borders._bottom > 0)
@@ -522,33 +517,32 @@ namespace Yttrium
 
 			vertex.position.x = position.left();
 			vertex.texture.x = texture.left();
-			vertices << vertex;
+			draw._vertices << vertex;
 
 			if (borders._left > 0)
 			{
 				vertex.position.x = position.left() + left_offset;
 				vertex.texture.x = texture.left() + borders._left;
-				vertices << vertex;
+				draw._vertices << vertex;
 			}
 
 			if (borders._right > 0)
 			{
 				vertex.position.x = position.right() - right_offset;
 				vertex.texture.x = texture.right() - borders._right;
-				vertices << vertex;
+				draw._vertices << vertex;
 			}
 
 			vertex.position.x = position.right();
 			vertex.texture.x = texture.right();
-			vertices << vertex;
+			draw._vertices << vertex;
 
 			// Bottom part indices.
 
-			index += row_vertices;
-
-			indices << (index + row_vertices - 1) << (index);
+			draw._index += row_vertices;
+			draw._indices << (draw._index + row_vertices - 1) << (draw._index);
 			for (size_t i = 0; i < row_vertices; ++i)
-				indices << (index + i) << (index + i + row_vertices);
+				draw._indices << (draw._index + i) << (draw._index + i + row_vertices);
 		}
 
 		// Outer bottom vertex row.
@@ -558,31 +552,33 @@ namespace Yttrium
 
 		vertex.position.x = position.left();
 		vertex.texture.x = texture.left();
-		vertices << vertex;
+		draw._vertices << vertex;
 
 		if (borders._left > 0)
 		{
 			vertex.position.x = position.left() + left_offset;
 			vertex.texture.x = texture.left() + borders._left;
-			vertices << vertex;
+			draw._vertices << vertex;
 		}
 
 		if (borders._right > 0)
 		{
 			vertex.position.x = position.right() - right_offset;
 			vertex.texture.x = texture.right() - borders._right;
-			vertices << vertex;
+			draw._vertices << vertex;
 		}
 
 		vertex.position.x = position.right();
 		vertex.texture.x = texture.right();
-		vertices << vertex;
+		draw._vertices << vertex;
 	}
 
 	void RendererImpl::flush_2d()
 	{
 		if (_vertices_2d.size() > 0)
 		{
+			if (_vertices_2d.size() / sizeof(Vertex2D) > std::numeric_limits<uint16_t>::max())
+				throw std::runtime_error("2D vertex buffer size exceeds 16-bit indexing limitations");
 			_program_2d->set_uniform("mvp", full_matrix());
 			flush_2d_impl(_vertices_2d, _indices_2d);
 			_vertices_2d.resize(0);

@@ -24,7 +24,7 @@ namespace Yttrium
 		}
 
 	public:
-		std::string _name{ "/tmp/yttrium-XXXXXX" };
+		std::string _name{"/tmp/yttrium-XXXXXX"};
 		const int _descriptor = ::mkstemp(const_cast<char*>(_name.data())); // TODO-17: Remove const_cast.
 	};
 

@@ -197,7 +197,7 @@ namespace Yttrium
 		while (!_size ||::XPending(_display.get()) > 0)
 		{
 			::XEvent event;
-			::XNextEvent(_display.get(), &event); // TODO: Don't process events for all windows.
+			::XNextEvent(_display.get(), &event);
 			switch (event.type)
 			{
 			case KeyPress:
