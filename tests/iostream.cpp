@@ -37,3 +37,10 @@ BOOST_AUTO_TEST_CASE(test_iostream_rect)
 	stream << Yttrium::Rect{{1, 2}, Yttrium::Size{3, 4}};
 	BOOST_CHECK_EQUAL(stream.str(), "Rect{{1,2},Size{3,4}}");
 }
+
+BOOST_AUTO_TEST_CASE(test_iostream_string)
+{
+	std::ostringstream stream;
+	stream << Yttrium::String{"test"};
+	BOOST_CHECK_EQUAL(stream.str(), "test");
+}

@@ -1,6 +1,6 @@
 #include <yttrium/storage/source.h>
-#include "buffer.h"
 #include "iostream.h"
+#include "test_utils.h"
 
 #include <boost/test/unit_test.hpp>
 
