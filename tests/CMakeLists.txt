@@ -11,7 +11,6 @@ add_executable(unit_tests
 	image.h
 	ion_reader.cpp
 	ion_writer.cpp
-	ion.cpp
 	iostream.cpp
 	iostream.h
 	key_lookup.cpp

@@ -6,7 +6,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
-#include <yttrium/ion/document.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
@@ -77,7 +76,6 @@ namespace Yttrium
 		bool release_unused()
 		{
 			auto released = _material_cache.release_unused(); // Uses textures.
-			released += _ion_document_cache.release_unused();
 			released += _mesh_cache.release_unused();
 			released += _music_cache.release_unused();
 			released += _sound_cache.release_unused();
@@ -91,7 +89,6 @@ namespace Yttrium
 		const Storage& _storage;
 		Renderer* const _renderer = nullptr;
 		AudioManager* const _audio_manager = nullptr;
-		ResourceCache<IonDocument> _ion_document_cache{_storage};
 		ResourceCache<Material> _material_cache{_storage};
 		ResourceCache<Mesh> _mesh_cache{_storage};
 		ResourceCache<Music> _music_cache{_storage};
@@ -107,14 +104,6 @@ namespace Yttrium
 	}
 
 	ResourceLoader::~ResourceLoader() = default;
-
-	std::shared_ptr<const IonDocument> ResourceLoader::load_ion(std::string_view name)
-	{
-		return _private->_ion_document_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
-		{
-			return IonDocument::load(*source);
-		});
-	}
 
 	std::shared_ptr<const Material> ResourceLoader::load_material(std::string_view name)
 	{

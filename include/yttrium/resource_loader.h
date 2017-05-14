@@ -9,7 +9,6 @@
 namespace Yttrium
 {
 	class AudioManager;
-	class IonDocument;
 	class Material;
 	class Mesh;
 	class Music;
@@ -34,7 +33,6 @@ namespace Yttrium
 		/// Loads a resource by name (if it isn't already loaded) and returns a pointer to the loaded resource.
 		/// Throws ResourceError if there is no such resource.
 		/// Throws DataError if the resource can't be loaded.
-		std::shared_ptr<const IonDocument> load_ion(std::string_view name);
 		std::shared_ptr<const Material> load_material(std::string_view name);
 		std::shared_ptr<const Mesh> load_mesh(std::string_view name);
 		std::shared_ptr<const Music> load_music(std::string_view name);
