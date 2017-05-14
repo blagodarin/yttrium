@@ -49,8 +49,7 @@ namespace Yttrium
 	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
 	{
 		PushTexture push_texture(renderer, texture.get(), texture_filter);
-		if (texture)
-			renderer.set_texture_rect(texture_rect == RectF{} ? RectF{Rect{texture->size()}} : texture_rect, borders);
+		renderer.set_texture_rect(texture_rect, borders);
 		renderer.draw_rect(rect, color);
 	}
 

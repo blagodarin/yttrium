@@ -623,6 +623,7 @@ namespace Yttrium
 		background.texture = _gui.resource_loader().load_texture_2d(token.to_value());
 		if (!read_texture_filter(ion, token.next(ion), background.texture_filter))
 			throw GuiDataError{"Bad 'texture' filter '", token.text(), "'"};
+		background.texture_rect = RectF{Rect{background.texture->size()}};
 	}
 
 	void GuiIonLoader::load_style_texture_rect(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
