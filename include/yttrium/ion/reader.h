@@ -36,12 +36,13 @@ namespace Yttrium
 				End,
 			};
 
-			Token(std::size_t line, std::ptrdiff_t column, Type type, std::string_view text) noexcept
-				: _line{line}, _column{column}, _type{type}, _text{text} {}
+			Token(std::size_t line, std::ptrdiff_t column, Type type, std::string_view text, bool translatable = false) noexcept
+				: _line{line}, _column{column}, _type{type}, _text{text}, _translatable{translatable} {}
 
 			std::ptrdiff_t column() const noexcept { return _column; }
 			std::size_t line() const noexcept { return _line; }
 			std::string_view text() const noexcept { return _text; }
+			bool translatable() const noexcept { return _translatable; }
 			Type type() const noexcept { return _type; }
 
 			void check_end() const;
@@ -59,6 +60,7 @@ namespace Yttrium
 			std::ptrdiff_t _column;
 			Type _type;
 			std::string_view _text;
+			bool _translatable;
 		};
 
 		explicit IonReader(const Source&);

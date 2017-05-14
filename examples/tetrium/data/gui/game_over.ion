@@ -14,26 +14,26 @@ transparent screen "game_over"
 	{
 		label
 		{
-			position   "0" "4" "30" "8"
+			position "0" "4" "30" "8"
 			text_color "1" "1" "0"
-			text       {tr"Game over"}
+			text `Game over`
 		}
 
 		label
 		{
-			position   "0" "13" "30" "3"
+			position "0" "13" "30" "3"
 			text_color "1" "1" "1"
-			text       {tr"Enter your name:"}
+			text `Enter your name:`
 		}
 
 		input
 		{
-			position   "5" "18" "20" "4"
-			color      "1" "1" "1" "0.5"
+			position "5" "18" "20" "4"
+			color "1" "1" "1" "0.5"
 			text_color "0" "0" "0"
-			text       "John Placeholder"
-			on_update  { call "player_name = _" }
-			on_enter   { call "set_score player_name score" return_to "main_menu" enter "statistics" }
+			text "John Placeholder"
+			on_update { call "player_name = _" }
+			on_enter { call "set_score player_name score" return_to "main_menu" enter "statistics" }
 		}
 	}
 }

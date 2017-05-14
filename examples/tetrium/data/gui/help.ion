@@ -23,31 +23,31 @@ screen "help"
 		image
 		{
 			position "120" "30" "400" "300"
-			color    "0" "0" "0" "0.5"
+			color "0" "0" "0" "0.5"
 		}
 
 		label ["help_key" ] { position ""  "35" text "[A]" }
-		label ["help_text"] { position ""  "35" text {tr"Move left"} }
+		label ["help_text"] { position ""  "35" text `Move left` }
 
 		label ["help_key" ] { position ""  "85" text "[D]" }
-		label ["help_text"] { position ""  "85" text {tr"Move right"} }
+		label ["help_text"] { position ""  "85" text `Move right` }
 
 		label ["help_key" ] { position "" "135" text "[S]" }
-		label ["help_text"] { position "" "135" text {tr"Accelerate"} }
+		label ["help_text"] { position "" "135" text `Accelerate` }
 
 		label ["help_key" ] { position "" "185" text "[Left]" }
-		label ["help_text"] { position "" "185" text {tr"Rotate left"} }
+		label ["help_text"] { position "" "185" text `Rotate left` }
 
 		label ["help_key" ] { position "" "235" text "[Right]" }
-		label ["help_text"] { position "" "235" text {tr"Rotate right"} }
+		label ["help_text"] { position "" "235" text `Rotate right` }
 
 		label ["help_key" ] { position "" "285" text "[Esc]" }
-		label ["help_text"] { position "" "285" text {tr"Pause/Exit"} }
+		label ["help_text"] { position "" "285" text `Pause/Exit` }
 
 		button ["button"]
 		{
 			position "" "360"
-			text     {tr"Back"}
+			text `Back`
 			on_click { return }
 		}
 	}

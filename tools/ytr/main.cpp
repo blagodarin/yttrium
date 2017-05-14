@@ -34,24 +34,9 @@ int main(int argc, char** argv)
 		try
 		{
 			IonReader ion{*source};
-			enum { None, Open, Tr, Text, Close } stage = None;
-			std::string_view text;
 			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
-			{
-				if (token.type() == IonReader::Token::Type::ObjectBegin)
-					stage = Open;
-				else if (stage == Open && token.type() == IonReader::Token::Type::Name && token.text() == "tr")
-					stage = Tr;
-				else if (stage == Tr && token.type() == IonReader::Token::Type::Value)
-				{
-					stage = Text;
-					text = token.text();
-				}
-				else if (stage == Text && token.type() == IonReader::Token::Type::ObjectEnd)
-					translation->add(text);
-				else
-					stage = None;
-			}
+				if (token.translatable())
+					translation->add(token.text());
 		}
 		catch (const IonError& e)
 		{

@@ -14,34 +14,34 @@ root screen "main_menu"
 		label
 		{
 			position "0" "20" "640" "160"
-			text     {tr"Tetrium"}
+			text `Tetrium`
 		}
 
 		button ["button"]
 		{
 			position "" "210"
-			text     {tr"Play"}
+			text `Play`
 			on_click { enter "play_menu" }
 		}
 
 		button ["button"]
 		{
 			position "" "260"
-			text     {tr"Statistics"}
+			text `Statistics`
 			on_click { enter "statistics" }
 		}
 
 		button ["button"]
 		{
 			position "" "310"
-			text     {tr"Help"}
+			text `Help`
 			on_click { enter "help" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
-			text     {tr"Exit"}
+			text `Exit`
 			on_click { quit }
 		}
 	}

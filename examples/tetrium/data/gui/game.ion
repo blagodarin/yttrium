@@ -31,16 +31,16 @@ screen "game"
 		image ["background"] { position "23"  "6"  "6"  "2" } # Lines
 		image ["background"] { position "23" "10"  "6"  "2" } # Score
 
-		label { position  "1.5"  "2" "5" "1" align "left"  text {tr"Next:"}  }
+		label { position  "1.5"  "2" "5" "1" align "left"  text `Next:` }
 
-		label { position "23.5"  "2" "5" "1" align "left"  text {tr"Level:"} }
-		label { position "23.5"  "3" "5" "1" align "right" text "{level}"    }
+		label { position "23.5"  "2" "5" "1" align "left"  text `Level:` }
+		label { position "23.5"  "3" "5" "1" align "right" text "{level}" }
 
-		label { position "23.5"  "6" "5" "1" align "left"  text {tr"Lines:"} }
-		label { position "23.5"  "7" "5" "1" align "right" text "{lines}"    }
+		label { position "23.5"  "6" "5" "1" align "left"  text `Lines:` }
+		label { position "23.5"  "7" "5" "1" align "right" text "{lines}" }
 
-		label { position "23.5" "10" "5" "1" align "left"  text {tr"Score:"} }
-		label { position "23.5" "11" "5" "1" align "right" text "{score}"    }
+		label { position "23.5" "10" "5" "1" align "left"  text `Score:` }
+		label { position "23.5" "11" "5" "1" align "right" text "{score}" }
 
 		canvas "next" { position "2" "4" "4" "2" }
 

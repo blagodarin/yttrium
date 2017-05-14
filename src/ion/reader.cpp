@@ -16,7 +16,7 @@ namespace
 		Cr,       // '\r'.
 		Lf,       // '\n'.
 		Name,     // 'A'-'Z', 'a'-'z', '0'-'9' or '_'.
-		Quote,    // '"'.
+		Quote,    // '"', '`'.
 		LBrace,   // '{'.
 		RBrace,   // '}'.
 		LBracket, // '['.
@@ -43,7 +43,7 @@ namespace
 		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // H I J K L M N O
 		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // P Q R S T U V W
 		Name,   Name,   Name,  LBracket, Other, RBracket, Other, Name,  // X Y Z [ \ ] ^ _
-		Other,  Name,   Name,  Name,     Name,  Name,     Name,  Name,  // ` a b c d e f g
+		Quote,  Name,   Name,  Name,     Name,  Name,     Name,  Name,  // ` a b c d e f g
 		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // h i j k l m n o
 		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // p q r s t u v w
 		Name,   Name,   Name,  LBrace,   Other, RBrace,   Other, Other, // x y z { | } ~
@@ -180,8 +180,9 @@ namespace Yttrium
 						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
 					{
 						auto cursor = _cursor;
+						const auto quote = *cursor;
 						const auto base = ++cursor;
-						while (*cursor != '"')
+						while (*cursor != quote)
 						{
 							switch (*cursor)
 							{
@@ -195,7 +196,7 @@ namespace Yttrium
 							}
 						}
 						_cursor = cursor + 1;
-						return make_token<IonReader::Token::Type::Value, -1>(base, cursor - base);
+						return make_token<IonReader::Token::Type::Value, -1>(base, cursor - base, quote == '`');
 					}
 
 				case LBrace:
@@ -231,9 +232,9 @@ namespace Yttrium
 
 	private:
 		template <IonReader::Token::Type type, std::ptrdiff_t column_offset = 0>
-		IonReader::Token make_token(const char* begin, std::ptrdiff_t size) noexcept
+		IonReader::Token make_token(const char* begin, std::ptrdiff_t size, bool translatable = false) noexcept
 		{
-			return {_line, begin - _line_base + column_offset, type, {begin, static_cast<std::size_t>(size)}};
+			return {_line, begin - _line_base + column_offset, type, {begin, static_cast<std::size_t>(size)}, translatable};
 		}
 
 	private:

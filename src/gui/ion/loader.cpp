@@ -518,14 +518,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_text(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (token.type() == IonReader::Token::Type::ObjectBegin)
-		{
-			token.next(ion).check_name("tr");
-			data._text = _gui.translate(token.next(ion).to_value());
-			token.next(ion).check_object_end();
-		}
-		else
-			data._text = strings::from_view(token.to_value());
+		data._text = token.translatable() ? _gui.translate(token.to_value()) : strings::from_view(token.to_value());
 		token.next(ion);
 	}
 

@@ -19,28 +19,28 @@ transparent screen "pause"
 		button ["pause_button"]
 		{
 			position "" "7"
-			text     {tr"Resume"}
+			text `Resume`
 			on_click { return }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "10"
-			text     {tr"Restart"}
+			text `Restart`
 			on_click { return_to "play_menu" enter "game" }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "13"
-			text     {tr"Give up"}
+			text `Give up`
 			on_click { return_to "main_menu" }
 		}
 
 		button ["pause_button"]
 		{
 			position "" "16"
-			text     {tr"Exit game"}
+			text `Exit game`
 			on_click { quit }
 		}
 	}

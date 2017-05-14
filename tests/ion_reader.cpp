@@ -11,7 +11,7 @@ namespace Yttrium
 {
 	inline bool operator==(const IonReader::Token& a, const IonReader::Token& b)
 	{
-		return a.line() == b.line() && a.column() == b.column() && a.type() == b.type() && a.text() == b.text();
+		return a.line() == b.line() && a.column() == b.column() && a.type() == b.type() && a.text() == b.text() && a.translatable() == b.translatable();
 	}
 
 	inline std::ostream& operator<<(std::ostream& stream, const IonReader::Token& token)
@@ -288,4 +288,12 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_empty_source)
 {
 	TestData ion{""};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::End, ""));
+}
+
+BOOST_AUTO_TEST_CASE(test_ion_reader_translatable)
+{
+	TestData ion{R"(name1"value1"`value2`)"};
+	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
+	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
+	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 14, IonReader::Token::Type::Value, "value2", true));
 }

@@ -12,41 +12,41 @@ screen "play_menu"
 		label
 		{
 			position "0" "20" "640" "160"
-			text     {tr"Tetrium"}
+			text `Tetrium`
 		}
 
 		button ["button"]
 		{
 			position "" "210"
-			text     {tr"Play"}
-			state    "checked"
+			text `Play`
+			state "checked"
 		}
 
 		button ["button"]
 		{
 			position "" "260"
-			text     {tr"Easy"}
+			text `Easy`
 			on_click { call "start_level = 1" enter "game" }
 		}
 
 		button ["button"]
 		{
 			position "" "310"
-			text     {tr"Normal"}
+			text `Normal`
 			on_click { call "start_level = 10" enter "game" }
 		}
 
 		button ["button"]
 		{
 			position "" "360"
-			text     {tr"Hard"}
+			text `Hard`
 			on_click { call "start_level = 30" enter "game" }
 		}
 
 		button ["button"]
 		{
 			position "" "410"
-			text     {tr"Back"}
+			text `Back`
 			on_click { return }
 		}
 	}
