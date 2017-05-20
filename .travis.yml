@@ -38,3 +38,6 @@ install:
 script:
   - cmake . $CMAKE_OPTIONS
   - make
+
+notifications:
+  email: false
