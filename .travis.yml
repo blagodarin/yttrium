@@ -3,11 +3,9 @@ language: c++
 addons:
   apt:
     sources:
-      - boost-latest
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
-      - libboost1.55-dev
       - libopenal-dev
       - libvorbis-dev
 
@@ -22,11 +20,19 @@ before_install:
 
 install:
   - mkdir ${TRAVIS_BUILD_DIR}/travis
-  - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz | tar -xz -C ${TRAVIS_BUILD_DIR}/travis/cmake --strip-components 1
-  - export PATH=${TRAVIS_BUILD_DIR}/travis/cmake/bin:${PATH}
+
+  - mkdir ${TRAVIS_BUILD_DIR}/travis/boost && pushd ${TRAVIS_BUILD_DIR}/travis/boost
+  - wget -q -O - http://downloads.sourceforge.net/project/boost/boost/1.64.0/boost_1_64_0.tar.bz2 | tar -xj --strip-components 1
+  - ./bootstrap.sh
+  - ./b2 headers
+  - CMAKE_OPTIONS+=" -DBOOST_ROOT=$(pwd)"
+  - popd
+
+  - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake && pushd ${TRAVIS_BUILD_DIR}/travis/cmake
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz | tar -xz --strip-components 1
+  - export PATH=$(pwd)/bin:${PATH}
+  - popd
 
 script:
-  - cmake .
+  - cmake . $CMAKE_OPTIONS
   - make
-  - make check
