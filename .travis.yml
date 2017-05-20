@@ -3,9 +3,11 @@ language: c++
 addons:
   apt:
     sources:
+      - boost-latest
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
+      - libboost1.55-dev
       - libopenal-dev
 
 matrix:
