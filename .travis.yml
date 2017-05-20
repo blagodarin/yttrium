@@ -1,5 +1,10 @@
 language: c++
 
+addons:
+  apt:
+    packages:
+      - libopenal-dev
+
 install:
   - mkdir ${TRAVIS_BUILD_DIR}/travis
   - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake
