@@ -1,0 +1,11 @@
+version: 0.0.{build}-{branch}
+image: Visual Studio 2017
+branches:
+  only:
+    - master
+shallow_clone: true
+platform: x64
+configuration: Debug
+build_script:
+  - cmd: cmake -G "Visual Studio 15 2017" .
+  - cmd: cmake --build .
