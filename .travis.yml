@@ -1,5 +1,12 @@
-language: cpp
+language: c++
+
+install:
+  - mkdir ${TRAVIS_BUILD_DIR}/travis
+  - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz | tar -xz -C ${TRAVIS_BUILD_DIR}/travis/cmake --strip-components 1
+  - export PATH=${TRAVIS_BUILD_DIR}/travis/cmake/bin:${PATH}
+
 script:
-- cmake .
-- make
-- make check
+  - cmake .
+  - make
+  - make check
