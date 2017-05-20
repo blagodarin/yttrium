@@ -25,7 +25,7 @@ namespace Yttrium
 {
 	std::optional<ImageFormat> read_jpeg(const Source& source, Buffer& buffer)
 	{
-		const auto source_buffer = source.to_buffer();
+		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
