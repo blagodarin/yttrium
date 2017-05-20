@@ -14,7 +14,8 @@
 		using std::experimental::variant;
 	}
 #elif __has_include(<boost/variant.hpp>)
-	#include <boost/variant.hpp>
+	#include <boost/variant/apply_visitor.hpp>
+	#include <boost/variant/variant.hpp>
 	namespace std
 	{
 		using boost::variant;
