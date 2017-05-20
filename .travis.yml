@@ -2,8 +2,20 @@ language: c++
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
+      - g++-6
       - libopenal-dev
+
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: GCC_VERSION=6
+
+before_install:
+  - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION; fi
 
 install:
   - mkdir ${TRAVIS_BUILD_DIR}/travis
