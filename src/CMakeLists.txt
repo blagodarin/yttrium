@@ -344,7 +344,7 @@ if(UNIX)
 		system/x11/window.h
 		)
 	target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
-	target_link_libraries(yttrium ${X11_X11_LIB} ${X11_Xrandr_LIB})
+	target_link_libraries(yttrium ${X11_X11_LIB})
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
 		system/gdi/wgl.cpp
