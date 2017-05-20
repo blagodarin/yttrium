@@ -1,4 +1,4 @@
-# Yttrium
+[![Linux build status](https://travis-ci.org/blagodarin/yttrium.svg?branch=master)](https://travis-ci.org/blagodarin/yttrium)
 
 **Yttrium** is (intended to become) a game development toolkit.
 
