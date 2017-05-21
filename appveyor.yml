@@ -11,6 +11,10 @@ install:
       appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
       7z x openal-soft-1.17.2-bin.zip && del openal-soft-1.17.2-bin.zip
       move openal-soft-1.17.2-bin %OPENALDIR%
+  - cmd: |
+      appveyor DownloadFile https://sourceforge.net/projects/libjpeg-turbo/files/1.5.1/libjpeg-turbo-1.5.1-vc64.exe/download -FileName libjpeg-turbo-1.5.1-vc64.exe
+      7z x -oC:\projects\libjpeg libjpeg-turbo-1.5.1-vc64.exe && del libjpeg-turbo-1.5.1-vc64.exe
+      set PATH=%PATH%;C:\projects\libjpeg
 platform: x64
 configuration: Debug
 build_script:
