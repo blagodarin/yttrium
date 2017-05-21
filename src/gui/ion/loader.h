@@ -6,6 +6,7 @@
 #include <yttrium/std/string_view.h>
 #include "../widget_data.h"
 
+#include <functional>
 #include <unordered_map>
 
 namespace Yttrium

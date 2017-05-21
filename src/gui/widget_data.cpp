@@ -6,6 +6,8 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
 
+#include <cassert>
+
 namespace
 {
 	using namespace Yttrium;

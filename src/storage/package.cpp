@@ -5,6 +5,7 @@
 #include "package.h"
 
 #include <iostream>
+#include <string>
 
 namespace Yttrium
 {

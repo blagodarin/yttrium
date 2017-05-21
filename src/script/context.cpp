@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <unordered_map>
 
 namespace Yttrium

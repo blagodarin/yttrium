@@ -35,5 +35,5 @@ install:
 platform: x64
 configuration: Debug
 build_script:
-  - cmd: cmake -DZLIB_ROOT=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+  - cmd: cmake -DNO_OGG_VORBIS=ON -DZLIB_ROOT=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
   - cmd: cmake --build . --config Release
