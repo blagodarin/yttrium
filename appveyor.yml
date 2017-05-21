@@ -12,11 +12,28 @@ install:
       7z x openal-soft-1.17.2-bin.zip && del openal-soft-1.17.2-bin.zip
       move openal-soft-1.17.2-bin %OPENALDIR%
   - cmd: |
-      appveyor DownloadFile https://sourceforge.net/projects/libjpeg-turbo/files/1.5.1/libjpeg-turbo-1.5.1-vc64.exe/download -FileName libjpeg-turbo-1.5.1-vc64.exe
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1-vc64.exe
       7z x -oC:\projects\libjpeg libjpeg-turbo-1.5.1-vc64.exe && del libjpeg-turbo-1.5.1-vc64.exe
       set PATH=%PATH%;C:\projects\libjpeg
+  - cmd: |
+      appveyor DownloadFile http://www.zlib.net/zlib-1.2.11.tar.xz
+      7z x zlib-1.2.11.tar.xz && del zlib-1.2.11.tar.xz
+      7z x zlib-1.2.11.tar && del zlib-1.2.11.tar
+      cd zlib-1.2.11
+      cmake -DCMAKE_INSTALL_PREFIX=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+      cmake --build . --config Release --target INSTALL
+      cd ..
+  - cmd: |
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.29/lpng1629.7z
+      7z x lpng1629.7z && del lpng1629.7z
+      cd lpng1629
+      cmake -DCMAKE_INSTALL_PREFIX=C:\projects\libpng -DZLIB_ROOT=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+      appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
+      cmake --build . --config Release --target INSTALL
+      cd ..
+      set PATH=%PATH%;C:\projects\libpng
 platform: x64
 configuration: Debug
 build_script:
-  - cmd: cmake -G "Visual Studio 15 2017" .
-  - cmd: cmake --build .
+  - cmd: cmake -DZLIB_ROOT=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+  - cmd: cmake --build . --config Release
