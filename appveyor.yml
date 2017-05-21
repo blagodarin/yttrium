@@ -4,6 +4,13 @@ branches:
   only:
     - master
 shallow_clone: true
+environment:
+  OPENALDIR: C:\projects\openal
+install:
+  - cmd: |
+      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
+      7z x openal-soft-1.17.2-bin.zip && del openal-soft-1.17.2-bin.zip
+      move openal-soft-1.17.2-bin %OPENALDIR%
 platform: x64
 configuration: Debug
 build_script:
