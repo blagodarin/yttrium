@@ -238,7 +238,7 @@ namespace Yttrium
 		}
 
 	private:
-		enum
+		enum : uint8_t
 		{
 			AcceptNames = 1 << 0,
 			AcceptValues = 1 << 1,

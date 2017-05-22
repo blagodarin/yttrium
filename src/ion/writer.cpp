@@ -88,7 +88,7 @@ namespace Yttrium
 			}
 			write("{");
 			entry |= HasValues;
-			_stack.emplace_back(IsObject | HasValues);
+			_stack.emplace_back(static_cast<uint8_t>(IsObject | HasValues));
 		}
 
 		void end_list()
