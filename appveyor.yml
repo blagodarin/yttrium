@@ -5,35 +5,47 @@ branches:
     - master
 shallow_clone: true
 environment:
-  OPENALDIR: C:\projects\openal
+  PREFIX: C:\projects\prefix
 install:
   - cmd: |
+      mkdir %PREFIX%
+      set PATH=%PATH%;%PREFIX%
+      mkdir prefix
+      cd prefix
+  - cmd: |
       appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
-      7z x openal-soft-1.17.2-bin.zip && del openal-soft-1.17.2-bin.zip
-      move openal-soft-1.17.2-bin %OPENALDIR%
+      7z x openal-soft-1.17.2-bin.zip
+      move /y openal-soft-1.17.2-bin\include %PREFIX%
+      move /y openal-soft-1.17.2-bin\libs %PREFIX%
   - cmd: |
       appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1-vc64.exe
-      7z x -oC:\projects\libjpeg libjpeg-turbo-1.5.1-vc64.exe && del libjpeg-turbo-1.5.1-vc64.exe
-      set PATH=%PATH%;C:\projects\libjpeg
+      7z x -olibjpeg-turbo-1.5.1-vc64 libjpeg-turbo-1.5.1-vc64.exe
+      xcopy libjpeg-turbo-1.5.1-vc64\include\* %PREFIX%\include
+      move /y libjpeg-turbo-1.5.1-vc64\lib %PREFIX%
   - cmd: |
       appveyor DownloadFile http://www.zlib.net/zlib-1.2.11.tar.xz
-      7z x zlib-1.2.11.tar.xz && del zlib-1.2.11.tar.xz
-      7z x zlib-1.2.11.tar && del zlib-1.2.11.tar
+      7z x zlib-1.2.11.tar.xz && 7z x zlib-1.2.11.tar
       cd zlib-1.2.11
-      cmake -DCMAKE_INSTALL_PREFIX=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+      cmake -DCMAKE_INSTALL_PREFIX=%PREFIX% -G"Visual Studio 15 2017 Win64" .
       cmake --build . --config Release --target INSTALL
       cd ..
   - cmd: |
       appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.29/lpng1629.7z
-      7z x lpng1629.7z && del lpng1629.7z
+      7z x lpng1629.7z
       cd lpng1629
-      cmake -DCMAKE_INSTALL_PREFIX=C:\projects\libpng -DZLIB_ROOT=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+      cmake -DCMAKE_INSTALL_PREFIX=%PREFIX% -G"Visual Studio 15 2017 Win64" .
       appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
       cmake --build . --config Release --target INSTALL
       cd ..
-      set PATH=%PATH%;C:\projects\libpng
+  - cmd: |
+      mkdir %PREFIX%\include\GL
+      appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/glext.h -FileName %PREFIX%\include\GL\glext.h
+      appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/wglext.h -FileName %PREFIX%\include\GL\wglext.h
+  - cmd: |
+      cd ..
+      rmdir /q /s prefix
 platform: x64
-configuration: Debug
+configuration: Release
 build_script:
-  - cmd: cmake -DNO_OGG_VORBIS=ON -DZLIB_ROOT=C:\projects\zlib -G"Visual Studio 15 2017 Win64" .
+  - cmd: cmake -DNO_OGG_VORBIS=ON -G"Visual Studio 15 2017 Win64" .
   - cmd: cmake --build . --config Release
