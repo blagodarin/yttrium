@@ -3,6 +3,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/utils.h>
 
+#include <algorithm>
 #include <cstring>
 
 namespace
