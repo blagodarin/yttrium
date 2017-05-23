@@ -26,14 +26,14 @@ install:
       appveyor DownloadFile http://www.zlib.net/zlib-1.2.11.tar.xz
       7z x zlib-1.2.11.tar.xz && 7z x zlib-1.2.11.tar
       cd zlib-1.2.11
-      cmake -DCMAKE_INSTALL_PREFIX=%PREFIX% -G"Visual Studio 15 2017 Win64" .
+      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
   - cmd: |
       appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.29/lpng1629.7z
       7z x lpng1629.7z
       cd lpng1629
-      cmake -DCMAKE_INSTALL_PREFIX=%PREFIX% -G"Visual Studio 15 2017 Win64" .
+      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
       cmake --build . --config Release --target INSTALL
       cd ..
@@ -42,10 +42,22 @@ install:
       appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/glext.h -FileName %PREFIX%\include\GL\glext.h
       appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/wglext.h -FileName %PREFIX%\include\GL\wglext.h
   - cmd: |
+      git clone https://git.xiph.org/ogg.git
+      cd ogg
+      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake --build . --config Release --target INSTALL
+      cd ..
+  - cmd: |
+      git clone https://git.xiph.org/vorbis.git
+      cd vorbis
+      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake --build . --config Release --target INSTALL
+      cd ..
+  - cmd: |
       cd ..
       rmdir /q /s prefix
 platform: x64
 configuration: Release
 build_script:
-  - cmd: cmake -DNO_OGG_VORBIS=ON -G"Visual Studio 15 2017 Win64" .
+  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXAMPLES=ON
   - cmd: cmake --build . --config Release
