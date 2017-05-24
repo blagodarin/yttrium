@@ -9,7 +9,7 @@ environment:
 install:
   - cmd: |
       mkdir %PREFIX%
-      set PATH=%PATH%;%PREFIX%
+      set PATH=%PATH%;%PREFIX%;%PREFIX%\bin
       mkdir prefix
       cd prefix
   - cmd: |
@@ -17,10 +17,14 @@ install:
       7z x openal-soft-1.17.2-bin.zip
       move /y openal-soft-1.17.2-bin\include %PREFIX%
       move /y openal-soft-1.17.2-bin\libs %PREFIX%
+      appveyor DownloadFile https://openal.org/downloads/oalinst.zip
+      7z x oalinst.zip
+      oalinst.exe /s
   - cmd: |
       appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1-vc64.exe
       7z x -olibjpeg-turbo-1.5.1-vc64 libjpeg-turbo-1.5.1-vc64.exe
       xcopy libjpeg-turbo-1.5.1-vc64\include\* %PREFIX%\include
+      move /y libjpeg-turbo-1.5.1-vc64\bin %PREFIX%
       move /y libjpeg-turbo-1.5.1-vc64\lib %PREFIX%
   - cmd: |
       appveyor DownloadFile http://www.zlib.net/zlib-1.2.11.tar.xz
