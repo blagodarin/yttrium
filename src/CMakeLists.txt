@@ -87,8 +87,10 @@ if(ON)
 	target_link_libraries(yttrium ${OPENAL_LIBRARY})
 endif()
 if(NOT NO_OGG_VORBIS)
-	# TODO: Use find_library or some third-party package.
-	target_link_libraries(yttrium vorbisfile)
+	find_library(OGG_LIBRARY ogg)
+	find_library(VORBIS_LIBRARY vorbis)
+	find_library(VORBISFILE_LIBRARY vorbisfile)
+	target_link_libraries(yttrium ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
 	target_sources(yttrium PRIVATE
 		audio/formats/ogg_vorbis.cpp
 		audio/formats/ogg_vorbis.h
