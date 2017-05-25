@@ -9,9 +9,12 @@ environment:
 install:
   - cmd: |
       mkdir %PREFIX%
+      mkdir %PREFIX%\bin
       set PATH=%PATH%;%PREFIX%;%PREFIX%\bin
       mkdir prefix
       cd prefix
+
+  # OpenAL
   - cmd: |
       appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
       7z x openal-soft-1.17.2-bin.zip
@@ -20,12 +23,22 @@ install:
       appveyor DownloadFile https://openal.org/downloads/oalinst.zip
       7z x oalinst.zip
       oalinst.exe /s
+
+  # libjpeg
   - cmd: |
-      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1-vc64.exe
-      7z x -olibjpeg-turbo-1.5.1-vc64 libjpeg-turbo-1.5.1-vc64.exe
-      xcopy libjpeg-turbo-1.5.1-vc64\include\* %PREFIX%\include
-      move /y libjpeg-turbo-1.5.1-vc64\bin %PREFIX%
-      move /y libjpeg-turbo-1.5.1-vc64\lib %PREFIX%
+      appveyor DownloadFile http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/win64/nasm-2.13.01-win64.zip
+      7z x nasm-2.13.01-win64.zip
+      xcopy nasm-2.13.01\nasm.exe %PREFIX%\bin
+  - cmd: |
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1.tar.gz
+      7z x libjpeg-turbo-1.5.1.tar.gz
+      7z x libjpeg-turbo-1.5.1.tar
+      cd libjpeg-turbo-1.5.1
+      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake --build . --config Release --target INSTALL
+      cd ..
+
+  # libpng
   - cmd: |
       appveyor DownloadFile http://www.zlib.net/zlib-1.2.11.tar.xz
       7z x zlib-1.2.11.tar.xz && 7z x zlib-1.2.11.tar
@@ -37,14 +50,18 @@ install:
       appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.29/lpng1629.7z
       7z x lpng1629.7z
       cd lpng1629
-      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
+      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
+
+  # OpenGL
   - cmd: |
       mkdir %PREFIX%\include\GL
       appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/glext.h -FileName %PREFIX%\include\GL\glext.h
       appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/wglext.h -FileName %PREFIX%\include\GL\wglext.h
+
+  # Ogg Vorbis
   - cmd: |
       git clone https://git.xiph.org/ogg.git
       cd ogg
@@ -57,6 +74,7 @@ install:
       cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
+
   - cmd: |
       cd ..
       rmdir /q /s prefix
