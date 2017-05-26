@@ -1,12 +1,11 @@
 version: 0.0.{build}-{branch}
 image: Visual Studio 2017
-branches:
-  only:
-    - master
 shallow_clone: true
 environment:
+  BOOST_ROOT: C:\Libraries\boost_1_64_0
   PREFIX: C:\projects\prefix
 install:
+
   - cmd: |
       mkdir %PREFIX%
       mkdir %PREFIX%\bin
@@ -78,8 +77,8 @@ install:
   - cmd: |
       cd ..
       rmdir /q /s prefix
-platform: x64
-configuration: Release
+
 build_script:
-  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXAMPLES=ON
+  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXTRA=ON -DWITH_TESTS=ON
   - cmd: cmake --build . --config Release
+  - cmd: cmake --build . --config Release --target check
