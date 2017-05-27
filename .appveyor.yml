@@ -2,26 +2,21 @@ version: 0.0.{build}-{branch}
 image: Visual Studio 2017
 shallow_clone: true
 environment:
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
   BOOST_ROOT: C:\Libraries\boost_1_64_0
   PREFIX: C:\projects\prefix
 install:
 
   - cmd: |
+      dir /a:d /b C:\Libraries
+      dir /a:d /b %BOOST_ROOT%
+
+  - cmd: |
       mkdir %PREFIX%
       mkdir %PREFIX%\bin
-      set PATH=%PATH%;%PREFIX%;%PREFIX%\bin
+      set PATH=%PATH%;%PREFIX%;%PREFIX%\bin;%BOOST_LIBRARYDIR%
       mkdir prefix
       cd prefix
-
-  # OpenAL
-  - cmd: |
-      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
-      7z x openal-soft-1.17.2-bin.zip
-      move /y openal-soft-1.17.2-bin\include %PREFIX%
-      move /y openal-soft-1.17.2-bin\libs %PREFIX%
-      appveyor DownloadFile https://openal.org/downloads/oalinst.zip
-      7z x oalinst.zip
-      oalinst.exe /s
 
   # libjpeg
   - cmd: |
@@ -54,12 +49,6 @@ install:
       cmake --build . --config Release --target INSTALL
       cd ..
 
-  # OpenGL
-  - cmd: |
-      mkdir %PREFIX%\include\GL
-      appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/glext.h -FileName %PREFIX%\include\GL\glext.h
-      appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/wglext.h -FileName %PREFIX%\include\GL\wglext.h
-
   # Ogg Vorbis
   - cmd: |
       git clone https://git.xiph.org/ogg.git
@@ -74,6 +63,22 @@ install:
       cmake --build . --config Release --target INSTALL
       cd ..
 
+  # OpenAL
+  - cmd: |
+      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
+      7z x openal-soft-1.17.2-bin.zip
+      move /y openal-soft-1.17.2-bin\include\AL %PREFIX%\include
+      move /y openal-soft-1.17.2-bin\libs %PREFIX%
+      appveyor DownloadFile https://openal.org/downloads/oalinst.zip
+      7z x oalinst.zip
+      oalinst.exe /s
+
+  # OpenGL
+  - cmd: |
+      mkdir %PREFIX%\include\GL
+      appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/glext.h -FileName %PREFIX%\include\GL\glext.h
+      appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/wglext.h -FileName %PREFIX%\include\GL\wglext.h
+
   - cmd: |
       cd ..
       rmdir /q /s prefix
@@ -81,4 +86,5 @@ install:
 build_script:
   - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXTRA=ON -DWITH_TESTS=ON
   - cmd: cmake --build . --config Release
+test_script:
   - cmd: cmake --build . --config Release --target check
