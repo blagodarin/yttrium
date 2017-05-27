@@ -14,21 +14,24 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	const auto translation_source = Source::from(argv[1]);
-	if (!translation_source)
+	const auto translation = [](std::string_view path)
 	{
-		std::cerr << "ERROR: Unable to open \"" << argv[1] << "\"\n";
+		const auto source = Source::from(path);
+		return source ? Translation::load(*source) : nullptr;
+	}(argv[1]);
+
+	if (!translation)
+	{
+		std::cerr << "ERROR: Unable to read \"" << argv[1] << "\"\n";
 		return 1;
 	}
-
-	const auto translation = Translation::load(*translation_source);
 
 	for (int i = 2; i < argc; ++i)
 	{
 		const auto source = Source::from(argv[i]);
 		if (!source)
 		{
-			std::cerr << "ERROR: Unable to open source \"" << argv[i] << "\"\n";
+			std::cerr << "ERROR: Unable to read \"" << argv[i] << "\"\n";
 			return 1;
 		}
 		try
@@ -46,5 +49,10 @@ int main(int argc, char** argv)
 	}
 
 	translation->remove_obsolete();
-	translation->save(argv[1]);
+
+	if (!translation->save(argv[1]))
+	{
+		std::cerr << "ERROR: Unable to write \"" << argv[1] << "\"\n";
+		return 1;
+	}
 }

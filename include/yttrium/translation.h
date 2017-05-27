@@ -28,7 +28,7 @@ namespace Yttrium
 		virtual void remove_obsolete() = 0;
 
 		///
-		virtual void save(const std::string& path) const = 0;
+		virtual bool save(const std::string& path) const = 0;
 
 		///
 		virtual std::string translate(std::string_view source) const = 0;

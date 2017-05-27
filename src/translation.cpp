@@ -19,7 +19,7 @@ namespace Yttrium
 
 		void add(std::string_view) override;
 		void remove_obsolete() override;
-		void save(const std::string&) const override;
+		bool save(const std::string&) const override;
 		std::string translate(std::string_view) const override;
 
 	private:
@@ -66,13 +66,15 @@ namespace Yttrium
 				i = _translations.erase(i);
 	}
 
-	void TranslationImpl::save(const std::string& path) const
+	bool TranslationImpl::save(const std::string& path) const
 	{
 		std::vector<std::pair<std::string_view, std::string_view>> translations;
 		translations.reserve(_translations.size());
 		std::for_each(_translations.begin(), _translations.end(), [&translations](const auto& t){ translations.emplace_back(t.first, t.second._text); });
 		std::sort(translations.begin(), translations.end(), [](const auto& a, const auto& b){ return a.first < b.first; });
 		Writer writer{path};
+		if (!writer)
+			return false;
 		IonWriter ion{writer, IonWriter::Formatting::Pretty};
 		for (const auto& translation : translations)
 		{
@@ -81,6 +83,7 @@ namespace Yttrium
 			ion.add_value(translation.second);
 		}
 		ion.flush();
+		return true;
 	}
 
 	std::string TranslationImpl::translate(std::string_view source) const
