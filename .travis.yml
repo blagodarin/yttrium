@@ -2,6 +2,9 @@ language: cpp
 dist: trusty
 sudo: false
 
+git:
+  depth: 1
+
 addons:
   apt:
     sources:
@@ -27,6 +30,7 @@ install:
   - wget -q -O - http://downloads.sourceforge.net/project/boost/boost/1.64.0/boost_1_64_0.tar.bz2 | tar -xj --strip-components 1
   - ./bootstrap.sh
   - ./b2 headers
+  - ./b2 --with-test
   - CMAKE_OPTIONS+=" -DBOOST_ROOT=$(pwd)"
   - popd
 
@@ -36,8 +40,9 @@ install:
   - popd
 
 script:
-  - cmake . $CMAKE_OPTIONS
-  - make
+  - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON
+  - cmake --build .
+  - cmake --build . --target check
 
 notifications:
   email: false
