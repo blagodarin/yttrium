@@ -1,12 +1,13 @@
 version: 0.0.{build}-{branch}
 image: Visual Studio 2017
 shallow_clone: true
+
 environment:
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
   BOOST_ROOT: C:\Libraries\boost_1_64_0
   PREFIX: C:\projects\prefix
-install:
 
+install:
   - cmd: |
       dir /a:d /b C:\Libraries
       dir /a:d /b %BOOST_ROOT%
@@ -87,5 +88,6 @@ install:
 build_script:
   - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON
   - cmd: cmake --build . --config Release
+
 test_script:
   - cmd: cmake --build . --config Release --target check
