@@ -5,6 +5,7 @@ CMakeFiles
 cmake_install.cmake
 coverage/*
 coverage.info
+CTestTestfile.cmake
 *.db
 *.dir
 doc/html
@@ -14,6 +15,7 @@ Makefile
 *.sh
 *.sln
 src/config.h
+Testing
 tetrium.ypq
 *.vcxproj
 *.vcxproj.filters

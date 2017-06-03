@@ -42,7 +42,7 @@ install:
 script:
   - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON
   - cmake --build .
-  - cmake --build . --target check
+  - ctest --output-on-failure
 
 notifications:
   email: false
