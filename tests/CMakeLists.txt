@@ -28,6 +28,7 @@ add_executable(unit_tests
 	test_utils.h
 	texture_font.cpp
 	tiny_string_map.cpp
+	translation.cpp
 	utils.cpp
 	vector.cpp
 	)
