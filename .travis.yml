@@ -21,7 +21,7 @@ matrix:
       env: COVERAGE=1 GCC_VERSION=6
 
 before_install:
-  - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION; fi
+  - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
 
 install:
   - mkdir ${TRAVIS_BUILD_DIR}/travis
@@ -46,7 +46,7 @@ script:
   - ctest --output-on-failure
 
 after_success:
-  - if [ "${COVERAGE}" = "1" ]; then bash <(curl -s https://codecov.io/bash); fi
+  - if [ "${COVERAGE}" = "1" ]; then bash <(curl -s https://codecov.io/bash) -x $GCOV; fi
 
 notifications:
   email: false
