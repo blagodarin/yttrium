@@ -3,11 +3,6 @@ cmake_minimum_required(VERSION 3.7)
 project(yttrium C CXX)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-option(COVERAGE "Build with coverage analysis support" OFF)
-option(FIX_TRAVIS "Fix Travis CI issues" OFF)
-option(WITH_EXAMPLES "Enable examples" OFF)
-option(WITH_EXTRA "Enable extra stuff" OFF)
-option(WITH_TESTS "Enable tests" OFF)
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 
@@ -16,24 +11,36 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unknown-pragmas -Wnon-virtual-dtor -Wpedantic -Wshadow")
+	add_compile_options(-Wall -Werror -Wextra -Wno-unknown-pragmas -Wnon-virtual-dtor -Wpedantic -Wshadow)
+
+	option(FIX_TRAVIS "Fix Travis CI issues" OFF)
 	if(NOT FIX_TRAVIS)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wsign-conversion")
+		add_compile_options(-Wold-style-cast -Wsign-conversion)
 	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
+		add_compile_options(-Wno-sign-compare)
 	endif()
+
+	option(COVERAGE "Build with coverage analysis support" OFF)
 	if(COVERAGE)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+		add_compile_options(--coverage -O0)
+		set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
 	endif()
-	find_package(Boost REQUIRED) # For Boost.Variant which is needed until GCC 7.
+
+	# Boost.Variant is required until GCC 7.
+	find_package(Boost REQUIRED)
 	include_directories("${Boost_INCLUDE_DIR}")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	add_definitions(-D_USE_MATH_DEFINES)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /std:c++latest /W4 /wd4251")
 endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	add_compile_options(/EHsc /std:c++latest /W4 /wd4251)
+	add_definitions(/D_USE_MATH_DEFINES)
+endif()
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
@@ -53,6 +60,7 @@ set_target_properties(
 	ytr
 	PROPERTIES FOLDER "tools")
 
+option(WITH_EXAMPLES "Enable examples" OFF)
 if(WITH_EXAMPLES)
 	if(WIN32)
 		add_subdirectory(ywinmain)
@@ -65,6 +73,7 @@ if(WITH_EXAMPLES)
 		PROPERTIES FOLDER "examples")
 endif()
 
+option(WITH_EXTRA "Enable extra stuff" OFF)
 if(WITH_EXTRA)
 	add_subdirectory(tools/generate-sounds)
 	add_subdirectory(tools/generate-test-images)
@@ -90,6 +99,7 @@ if(WITH_EXTRA)
 		VERBATIM)
 endif()
 
+option(WITH_TESTS "Enable tests" OFF)
 if(WITH_TESTS)
 	enable_testing()
 	add_subdirectory(tests)
@@ -108,16 +118,4 @@ if(WITH_TESTS)
 	set_target_properties(
 		unit_tests
 		PROPERTIES FOLDER "tests")
-endif()
-
-if(COVERAGE)
-	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		add_custom_target(uncover
-			COMMAND lcov --zerocounters --quiet --directory "${PROJECT_BINARY_DIR}"
-			VERBATIM)
-		add_custom_target(cover
-			COMMAND lcov --capture --no-external --quiet --directory "${PROJECT_BINARY_DIR}" --output-file "${PROJECT_BINARY_DIR}/coverage.info"
-			COMMAND genhtml --quiet "${PROJECT_BINARY_DIR}/coverage.info" --output-directory "${PROJECT_BINARY_DIR}/coverage"
-			VERBATIM)
-	endif()
 endif()
