@@ -18,7 +18,7 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=6
+      env: COVERAGE=1 GCC_VERSION=6
 
 before_install:
   - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION; fi
@@ -40,9 +40,13 @@ install:
   - popd
 
 script:
+  - if [ "${COVERAGE}" = "1" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
   - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON
   - cmake --build .
   - ctest --output-on-failure
+
+after_success:
+  - if [ "${COVERAGE}" = "1" ]; then bash <(curl -s https://codecov.io/bash); fi
 
 notifications:
   email: false
