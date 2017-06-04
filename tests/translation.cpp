@@ -54,3 +54,9 @@ BOOST_AUTO_TEST_CASE(translation_save_empty)
 	BOOST_REQUIRE(t->save(f.name()));
 	BOOST_CHECK_EQUAL(Source::from(f.name())->to_string(), "");
 }
+
+BOOST_AUTO_TEST_CASE(translation_save_invalid)
+{
+	const auto t = Translation::load(*Source::from(Buffer{}));
+	BOOST_CHECK(!t->save("/inv*lid"));
+}
