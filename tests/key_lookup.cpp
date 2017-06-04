@@ -4,7 +4,7 @@
 
 #include "../src/gui/key_lookup.cpp"
 
-BOOST_AUTO_TEST_CASE(test_key_lookup)
+BOOST_AUTO_TEST_CASE(key_lookup)
 {
 	using Yttrium::Key;
 	using Yttrium::lookup_key;

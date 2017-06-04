@@ -23,7 +23,7 @@ namespace
 	};
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_writer_compact)
+BOOST_AUTO_TEST_CASE(ion_writer_compact)
 {
 	BOOST_TEST_CONTEXT("Names")
 	{
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_ion_writer_compact)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_writer_escape)
+BOOST_AUTO_TEST_CASE(ion_writer_escape)
 {
 	TestData ion{ IonWriter::Formatting::Compact };
 	ion->add_name("name");
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_ion_writer_escape)
 	BOOST_CHECK_EQUAL(ion.to_string(), expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_writer_flush)
+BOOST_AUTO_TEST_CASE(ion_writer_flush)
 {
 	BOOST_TEST_CONTEXT("Flushing once (compact formatting)")
 	{
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_ion_writer_flush)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_writer_negative)
+BOOST_AUTO_TEST_CASE(ion_writer_negative)
 {
 	BOOST_TEST_CONTEXT("Adding a name in a list")
 	{
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(test_ion_writer_negative)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_writer_pretty)
+BOOST_AUTO_TEST_CASE(ion_writer_pretty)
 {
 	BOOST_TEST_CONTEXT("Names")
 	{

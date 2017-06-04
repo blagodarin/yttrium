@@ -6,7 +6,7 @@ using Yttrium::Point;
 using Yttrium::Rect;
 using Yttrium::Size;
 
-BOOST_AUTO_TEST_CASE(test_rect_initialization)
+BOOST_AUTO_TEST_CASE(rect_construction)
 {
 	Rect null_rect;
 
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(test_rect_initialization)
 	BOOST_CHECK_EQUAL(rect.top() + rect.height(), rect.bottom());
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_bound)
+BOOST_AUTO_TEST_CASE(rect_bound)
 {
 	// Points are treated like solid objects, so e.g. a rect of width 2
 	// can only bound 2 different points with the same Y coordinate.
@@ -52,13 +52,13 @@ BOOST_AUTO_TEST_CASE(test_rect_bound)
 	BOOST_CHECK_EQUAL(Rect({ 1, 1 }, Size{ 2, 2 }).bound({ 4, 4 }), Point(2, 2));
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_center)
+BOOST_AUTO_TEST_CASE(rect_center)
 {
 	BOOST_CHECK_EQUAL(Rect({1, 1}, Size(3, 3)).center(), Point(2, 2));
 	BOOST_CHECK_EQUAL(Rect({2, 2}, Size(4, 4)).center(), Point(4, 4));
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_centered_at)
+BOOST_AUTO_TEST_CASE(rect_centered_at)
 {
 	Rect rect1({0, 0}, Size(1, 1));
 	Rect rect2({0, 0}, Size(3, 3));
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(test_rect_centered_at)
 	BOOST_CHECK_EQUAL(rect2.centered_at(rect1), Rect({-1, -1}, Size(3, 3)));
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_contains)
+BOOST_AUTO_TEST_CASE(rect_contains)
 {
 	Rect rect({0, 0}, Size(10, 10));
 
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_rect_contains)
 	BOOST_CHECK(!smaller_rect.contains(rect));
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_intersected)
+BOOST_AUTO_TEST_CASE(rect_intersected)
 {
 	BOOST_CHECK_EQUAL(Rect({0, 0}, Size(2, 2)).intersected({{0, 0}, Size(2, 2)}), Rect({0, 0}, Size(2, 2)));
 	BOOST_CHECK_EQUAL(Rect({0, 0}, Size(2, 2)).intersected({{0, 1}, Size(2, 2)}), Rect({0, 1}, Size(2, 1)));
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(test_rect_intersected)
 	BOOST_CHECK_EQUAL(Rect({0, 0}, Size(2, 2)).intersected({{2, 2}, Size(2, 2)}), Rect({2, 2}, Size(0, 0)));
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_intersects)
+BOOST_AUTO_TEST_CASE(rect_intersects)
 {
 	Rect rect({0, 0}, Size(3, 3));
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(test_rect_intersects)
 	BOOST_CHECK(!far_rect.intersects_fastest(rect));
 }
 
-BOOST_AUTO_TEST_CASE(test_rect_intersects_null)
+BOOST_AUTO_TEST_CASE(rect_intersects_null)
 {
 	// This test case exists only as an implementation reference,
 	// one should not rely on null rect intersection detection!

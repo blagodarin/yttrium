@@ -7,7 +7,7 @@ using Yttrium::Buffer;
 
 const auto granularity = Buffer::memory_granularity();
 
-BOOST_AUTO_TEST_CASE(test_buffer_initialization)
+BOOST_AUTO_TEST_CASE(buffer_construction)
 {
 	{
 		Buffer buffer;
@@ -15,28 +15,28 @@ BOOST_AUTO_TEST_CASE(test_buffer_initialization)
 		BOOST_CHECK_EQUAL(buffer.capacity(), 0);
 	}
 	{
-		Buffer buffer(0);
+		Buffer buffer{0};
 		BOOST_CHECK_EQUAL(buffer.size(), 0);
 		BOOST_CHECK_EQUAL(buffer.capacity(), 0);
 	}
 	{
-		Buffer buffer(1);
+		Buffer buffer{1};
 		BOOST_CHECK_EQUAL(buffer.size(), 1);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
 	}
 	{
-		Buffer buffer(granularity);
+		Buffer buffer{granularity};
 		BOOST_CHECK_EQUAL(buffer.size(), granularity);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity);
 	}
 	{
-		Buffer buffer(granularity + 1);
+		Buffer buffer{granularity + 1};
 		BOOST_CHECK_EQUAL(buffer.size(), granularity + 1);
 		BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_buffer_reserve)
+BOOST_AUTO_TEST_CASE(buffer_reserve)
 {
 	Buffer buffer;
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_reserve)
 	BOOST_CHECK_EQUAL(buffer.data(), data2);
 }
 
-BOOST_AUTO_TEST_CASE(test_buffer_reset)
+BOOST_AUTO_TEST_CASE(buffer_reset)
 {
 	Buffer buffer;
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_reset)
 	BOOST_CHECK_EQUAL(buffer.capacity(), granularity * 2);
 }
 
-BOOST_AUTO_TEST_CASE(test_buffer_resize)
+BOOST_AUTO_TEST_CASE(buffer_resize)
 {
 	Buffer buffer;
 
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_resize)
 	BOOST_CHECK_EQUAL(buffer.data(), data_before_resize);
 }
 
-BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
+BOOST_AUTO_TEST_CASE(buffer_shrink_to_fit)
 {
 	Buffer buffer(granularity * 2);
 	BOOST_CHECK_EQUAL(buffer.size(), granularity * 2);
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(test_buffer_shrink_to_fit)
 }
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
-BOOST_AUTO_TEST_CASE(test_buffer_total_capacity)
+BOOST_AUTO_TEST_CASE(buffer_total_capacity)
 {
 	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
 	{

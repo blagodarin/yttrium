@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_margins)
+BOOST_AUTO_TEST_CASE(margins_construction)
 {
 	using Yttrium::Margins;
 	{
@@ -40,14 +40,16 @@ BOOST_AUTO_TEST_CASE(test_margins)
 		BOOST_CHECK_EQUAL(m._right, 2);
 		BOOST_CHECK_EQUAL(m._bottom, 3);
 	}
-	{
-		Margins m{1, 2, 3, 4};
-		BOOST_CHECK_EQUAL(min_size(m)._width, m._left + 1 + m._right);
-		BOOST_CHECK_EQUAL(min_size(m)._height, m._top + 1 + m._bottom);
-	}
 }
 
-BOOST_AUTO_TEST_CASE(test_marginsf)
+BOOST_AUTO_TEST_CASE(margins_min_size)
+{
+	Yttrium::Margins m{1, 2, 3, 4};
+	BOOST_CHECK_EQUAL(Yttrium::min_size(m)._width, m._left + 1 + m._right);
+	BOOST_CHECK_EQUAL(Yttrium::min_size(m)._height, m._top + 1 + m._bottom);
+}
+
+BOOST_AUTO_TEST_CASE(marginsf_construction)
 {
 	using Yttrium::MarginsF;
 	{

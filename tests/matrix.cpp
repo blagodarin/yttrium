@@ -9,7 +9,7 @@ namespace Yttrium // Anonymous namespace breaks compilation.
 
 using Yttrium::Matrix4;
 
-BOOST_AUTO_TEST_CASE(test_matrix4)
+BOOST_AUTO_TEST_CASE(matrix4_construction)
 {
 	const Matrix4 m
 	{
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_matrix4)
 	BOOST_CHECK_EQUAL((&m.x.x)[15], 33);
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix4_camera)
+BOOST_AUTO_TEST_CASE(matrix4_camera)
 {
 	const auto actual = Matrix4::camera({1, 2, 3}, {30, 45, 60});
 	const auto expected = Matrix4::rotation(60, {0, -1, 0}) * Matrix4::rotation(45, {-1, 0, 0}) * Matrix4::rotation(30, {0, 0, 1}) * Matrix4::translation({-1, -2, -3});
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(test_matrix4_camera)
 	BOOST_CHECK_CLOSE(actual.t.w, expected.t.w, 3e-5);
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix4_det)
+BOOST_AUTO_TEST_CASE(matrix4_det)
 {
 	// Determinant "can be viewed as the scaling factor of the transformation described by the matrix" (c) Wikipedia.
 	BOOST_CHECK_EQUAL(det(Matrix4::identity()), 1);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_matrix4_det)
 	BOOST_CHECK_CLOSE(det(Matrix4::scaling(4) * Matrix4::rotation(37, {2, 3, 5}) * Matrix4::scaling(2) * Matrix4::translation({2, 3, 5})), 4 * 4 * 4 * 2 * 2 * 2, 2e-5);
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix4_euler)
+BOOST_AUTO_TEST_CASE(matrix4_euler)
 {
 	const Matrix4 actual{Yttrium::Euler{30, 45, 60}};
 	const auto expected = Matrix4::rotation(30, {0, 0, -1}) * Matrix4::rotation(45, {1, 0, 0}) * Matrix4::rotation(60, {0, 1, 0});
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_matrix4_euler)
 	BOOST_CHECK_CLOSE(actual.t.w, expected.t.w, 3e-5);
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix4_inverse)
+BOOST_AUTO_TEST_CASE(matrix4_inverse)
 {
 	BOOST_CHECK_EQUAL(inverse(Matrix4::identity()), Matrix4::identity());
 	BOOST_CHECK_EQUAL(inverse(Matrix4::translation({2, 3, 5})), Matrix4::translation({-2, -3, -5}));
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(test_matrix4_inverse)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix4_perspective)
+BOOST_AUTO_TEST_CASE(matrix4_perspective)
 {
 	using Yttrium::Vector3;
 
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(test_matrix4_perspective)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_matrix4_projection_2d)
+BOOST_AUTO_TEST_CASE(matrix4_projection_2d)
 {
 	using Yttrium::Vector3;
 

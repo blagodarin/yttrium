@@ -9,7 +9,7 @@ using Yttrium::Buffer;
 using Yttrium::Reader;
 using Yttrium::Source;
 
-BOOST_AUTO_TEST_CASE(test_reader_size)
+BOOST_AUTO_TEST_CASE(reader_size)
 {
 	{
 		const auto source = Source::from(Buffer{});
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_reader_size)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_reader_offset)
+BOOST_AUTO_TEST_CASE(reader_offset)
 {
 	{
 		const auto source = Source::from(Buffer{});
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_reader_offset)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_reader_seek)
+BOOST_AUTO_TEST_CASE(reader_seek)
 {
 	const auto source = Source::from(Buffer{997});
 	Reader reader{*source};
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_reader_seek)
 	BOOST_CHECK(!reader.seek(998));
 }
 
-BOOST_AUTO_TEST_CASE(test_reader_skip)
+BOOST_AUTO_TEST_CASE(reader_skip)
 {
 	const auto source = Source::from(Buffer{997});
 	Reader reader{*source};
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_reader_skip)
 	BOOST_CHECK(!reader.skip(1));
 }
 
-BOOST_AUTO_TEST_CASE(test_reader_read_line_unbuffered)
+BOOST_AUTO_TEST_CASE(reader_read_line)
 {
 	struct Entry
 	{

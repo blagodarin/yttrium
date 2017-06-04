@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
+BOOST_AUTO_TEST_CASE(vector2_arithmetics)
 {
 	using Yttrium::Vector2;
 
@@ -25,13 +25,13 @@ BOOST_AUTO_TEST_CASE(test_vector2_arithmetics)
 	BOOST_CHECK(6 / Vector2(2, 3) == Vector2(3, 2));
 }
 
-BOOST_AUTO_TEST_CASE(test_vector3)
+BOOST_AUTO_TEST_CASE(vector3_)
 {
 	BOOST_CHECK_EQUAL(Yttrium::length({1, 4, 8}), 9);
 	BOOST_CHECK_EQUAL(Yttrium::length(Yttrium::normalize({1, 4, 8})), 1);
 }
 
-BOOST_AUTO_TEST_CASE(test_vector3_arithmetics)
+BOOST_AUTO_TEST_CASE(vector3_arithmetics)
 {
 	using Yttrium::Vector3;
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_vector3_arithmetics)
 	BOOST_CHECK(4 / Vector3(1, 2, 4) == Vector3(4, 2, 1));
 }
 
-BOOST_AUTO_TEST_CASE(test_vector4_arithmetics)
+BOOST_AUTO_TEST_CASE(vector4_arithmetics)
 {
 	using Yttrium::Vector4;
 

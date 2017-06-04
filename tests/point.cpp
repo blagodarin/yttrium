@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_point)
+BOOST_AUTO_TEST_CASE(point_construction)
 {
 	using Yttrium::Point;
 	{

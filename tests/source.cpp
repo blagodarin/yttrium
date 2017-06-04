@@ -7,14 +7,14 @@
 using Yttrium::Buffer;
 using Yttrium::Source;
 
-BOOST_AUTO_TEST_CASE(test_source_from)
+BOOST_AUTO_TEST_CASE(source_from)
 {
 	BOOST_CHECK(!Source::from("no_such_file"));
 	BOOST_CHECK(Source::from(nullptr, 0));
 	BOOST_CHECK(Source::from(Buffer{}));
 }
 
-BOOST_AUTO_TEST_CASE(test_source_from_source)
+BOOST_AUTO_TEST_CASE(source_from_source)
 {
 	const auto buffer = ::make_random_buffer(997);
 	const std::shared_ptr<Source> source = Source::from(buffer.data(), buffer.size());
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_source_from_source)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_source_properties)
+BOOST_AUTO_TEST_CASE(source_properties)
 {
 	const auto source = Source::from(nullptr, 0);
 	BOOST_REQUIRE(source);
@@ -52,14 +52,14 @@ BOOST_AUTO_TEST_CASE(test_source_properties)
 	BOOST_CHECK_EQUAL(source->property("name"), "another value");
 }
 
-BOOST_AUTO_TEST_CASE(test_source_size)
+BOOST_AUTO_TEST_CASE(source_size)
 {
 	BOOST_CHECK_EQUAL(Source::from(Buffer{})->size(), 0);
 	BOOST_CHECK_EQUAL(Source::from(Buffer{1})->size(), 1);
 	BOOST_CHECK_EQUAL(Source::from(Buffer{997})->size(), 997);
 }
 
-BOOST_AUTO_TEST_CASE(test_source_to_buffer)
+BOOST_AUTO_TEST_CASE(source_to_buffer)
 {
 	const auto expected = ::make_random_buffer(997);
 	const auto actual = Source::from(expected.data(), expected.size())->to_buffer();
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_source_to_buffer)
 	BOOST_CHECK_EQUAL(actual[actual.size()], '\0');
 }
 
-BOOST_AUTO_TEST_CASE(test_source_to_string)
+BOOST_AUTO_TEST_CASE(source_to_string)
 {
 	const auto expected = ::make_random_buffer(997);
 	const auto actual = Source::from(expected.data(), expected.size())->to_string();

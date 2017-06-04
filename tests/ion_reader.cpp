@@ -20,14 +20,14 @@ namespace Yttrium
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_iostream)
+BOOST_AUTO_TEST_CASE(ion_reader_iostream)
 {
 	std::ostringstream stream;
 	stream << IonReader::Token{1, 2, IonReader::Token::Type::End, "test"};
 	BOOST_CHECK_EQUAL(stream.str(), "{1,2,IonReader::Token::Type(" + std::to_string(to_underlying(IonReader::Token::Type::End)) + "),R\"(test)\"}");
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_token)
+BOOST_AUTO_TEST_CASE(ion_reader_token)
 {
 	using Yttrium::IonError;
 
@@ -73,14 +73,14 @@ namespace
 	};
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_names)
+BOOST_AUTO_TEST_CASE(ion_reader_names)
 {
 	TestData ion{R"(name1)"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_values)
+BOOST_AUTO_TEST_CASE(ion_reader_values)
 {
 	TestData ion{R"(name1"value1""value2"name2)"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_values)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 27, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_lists)
+BOOST_AUTO_TEST_CASE(ion_reader_lists)
 {
 	TestData ion{R"(name1["value1"[[][]]"value2"]name2)"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_lists)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 35, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_objects_and_names)
+BOOST_AUTO_TEST_CASE(ion_reader_objects_and_names)
 {
 	TestData ion{R"(name1{name2}{name3{}}name4)"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_objects_and_names)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 27, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_spaces)
+BOOST_AUTO_TEST_CASE(ion_reader_spaces)
 {
 	TestData ion{" \t name1 \t \"value1\" \t [ \t \"value2\" \t ] \t { \t name2 \t } \t "};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 4, IonReader::Token::Type::Name, "name1"));
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_spaces)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 58, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_newlines)
+BOOST_AUTO_TEST_CASE(ion_reader_newlines)
 {
 	TestData ion{"name1\nname2\r\nname3\rname4\n\r"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_newlines)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(6, 1, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_comments)
+BOOST_AUTO_TEST_CASE(ion_reader_comments)
 {
 	TestData ion{"name1#name2\n\"value1\"\"val#ue2\"#\"value3\n#comment"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_comments)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(3, 9, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_negative)
+BOOST_AUTO_TEST_CASE(ion_reader_negative)
 {
 	using Yttrium::IonError;
 
@@ -284,13 +284,13 @@ BOOST_AUTO_TEST_CASE(test_ion_reader_negative)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_empty_source)
+BOOST_AUTO_TEST_CASE(ion_reader_empty_source)
 {
 	TestData ion{""};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::End, ""));
 }
 
-BOOST_AUTO_TEST_CASE(test_ion_reader_translatable)
+BOOST_AUTO_TEST_CASE(ion_reader_translatable)
 {
 	TestData ion{R"(name1"value1"`value2`)"};
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));

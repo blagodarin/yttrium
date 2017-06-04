@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_iostream_buffer)
+BOOST_AUTO_TEST_CASE(iostream_buffer)
 {
 	using Yttrium::Buffer;
 	{
@@ -17,28 +17,28 @@ BOOST_AUTO_TEST_CASE(test_iostream_buffer)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_iostream_matrix)
+BOOST_AUTO_TEST_CASE(iostream_matrix)
 {
 	std::ostringstream stream;
 	stream << Yttrium::Matrix4::identity();
 	BOOST_CHECK_EQUAL(stream.str(), "Matrix4{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}");
 }
 
-BOOST_AUTO_TEST_CASE(test_iostream_point)
+BOOST_AUTO_TEST_CASE(iostream_point)
 {
 	std::ostringstream stream;
 	stream << Yttrium::Point{1, 2};
 	BOOST_CHECK_EQUAL(stream.str(), "Point{1,2}");
 }
 
-BOOST_AUTO_TEST_CASE(test_iostream_rect)
+BOOST_AUTO_TEST_CASE(iostream_rect)
 {
 	std::ostringstream stream;
 	stream << Yttrium::Rect{{1, 2}, Yttrium::Size{3, 4}};
 	BOOST_CHECK_EQUAL(stream.str(), "Rect{{1,2},Size{3,4}}");
 }
 
-BOOST_AUTO_TEST_CASE(test_iostream_string)
+BOOST_AUTO_TEST_CASE(iostream_string)
 {
 	std::ostringstream stream;
 	stream << Yttrium::String{"test"};

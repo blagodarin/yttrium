@@ -5,7 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_resource_loader_release_unused)
+BOOST_AUTO_TEST_CASE(resource_loader_release_unused)
 {
 	using Yttrium::ResourceLoader;
 	using Yttrium::Storage;

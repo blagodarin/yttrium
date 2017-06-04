@@ -19,7 +19,7 @@ namespace
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_package)
+BOOST_AUTO_TEST_CASE(package_)
 {
 	Buffer buffer1(100003);
 	::memset(buffer1.data(), 1, buffer1.size());
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(test_package)
 	BOOST_CHECK_EQUAL(packed_file3->to_buffer(), buffer3);
 }
 
-BOOST_AUTO_TEST_CASE(test_packed_file_size)
+BOOST_AUTO_TEST_CASE(package_file_size)
 {
 	TemporaryFile file1;
 	Writer(file1).write_all(Buffer(1, "1"));
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_packed_file_size)
 	BOOST_CHECK_EQUAL(data[0], '2');
 }
 
-BOOST_AUTO_TEST_CASE(test_package_duplicates)
+BOOST_AUTO_TEST_CASE(package_duplicates)
 {
 	TemporaryFile package_file;
 	TemporaryFile file;
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(test_package_duplicates)
 	BOOST_CHECK_EQUAL(data[1], '3');
 }
 
-BOOST_AUTO_TEST_CASE(test_package_properties)
+BOOST_AUTO_TEST_CASE(package_properties)
 {
 	TemporaryFile package_file;
 	TemporaryFile file;
