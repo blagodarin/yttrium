@@ -4,26 +4,49 @@
 
 using Yttrium::Point;
 using Yttrium::Rect;
+using Yttrium::RectF;
 using Yttrium::Size;
+using Yttrium::SizeF;
+using Yttrium::Vector2;
 
 BOOST_AUTO_TEST_CASE(rect_construction)
 {
-	Rect null_rect;
-
-	BOOST_CHECK_EQUAL(null_rect.left(), 0);
-	BOOST_CHECK_EQUAL(null_rect.top(), 0);
-	BOOST_CHECK_EQUAL(null_rect.right(), 0);
-	BOOST_CHECK_EQUAL(null_rect.bottom(), 0);
-
-	Rect rect({3, 5}, Size(7, 8));
-
-	BOOST_CHECK_EQUAL(rect.left(), 3);
-	BOOST_CHECK_EQUAL(rect.top(), 5);
-	BOOST_CHECK_EQUAL(rect.width(), 7);
-	BOOST_CHECK_EQUAL(rect.height(), 8);
-
-	BOOST_CHECK_EQUAL(rect.left() + rect.width(), rect.right());
-	BOOST_CHECK_EQUAL(rect.top() + rect.height(), rect.bottom());
+	{
+		Rect r;
+		BOOST_CHECK_EQUAL(r.left(), 0);
+		BOOST_CHECK_EQUAL(r.top(), 0);
+		BOOST_CHECK_EQUAL(r.right(), 0);
+		BOOST_CHECK_EQUAL(r.bottom(), 0);
+		BOOST_CHECK_EQUAL(r.width(), 0);
+		BOOST_CHECK_EQUAL(r.height(), 0);
+	}
+	{
+		Rect r{{1, 2}, Point{4, 7}};
+		BOOST_CHECK_EQUAL(r.left(), 1);
+		BOOST_CHECK_EQUAL(r.top(), 2);
+		BOOST_CHECK_EQUAL(r.right(), 4);
+		BOOST_CHECK_EQUAL(r.bottom(), 7);
+		BOOST_CHECK_EQUAL(r.width(), 3);
+		BOOST_CHECK_EQUAL(r.height(), 5);
+	}
+	{
+		Rect r{{1, 2}, Size{3, 5}};
+		BOOST_CHECK_EQUAL(r.left(), 1);
+		BOOST_CHECK_EQUAL(r.top(), 2);
+		BOOST_CHECK_EQUAL(r.right(), 4);
+		BOOST_CHECK_EQUAL(r.bottom(), 7);
+		BOOST_CHECK_EQUAL(r.width(), 3);
+		BOOST_CHECK_EQUAL(r.height(), 5);
+	}
+	{
+		Rect r{Size{1, 2}};
+		BOOST_CHECK_EQUAL(r.left(), 0);
+		BOOST_CHECK_EQUAL(r.top(), 0);
+		BOOST_CHECK_EQUAL(r.right(), 1);
+		BOOST_CHECK_EQUAL(r.bottom(), 2);
+		BOOST_CHECK_EQUAL(r.width(), 1);
+		BOOST_CHECK_EQUAL(r.height(), 2);
+	}
 }
 
 BOOST_AUTO_TEST_CASE(rect_bound)
@@ -236,4 +259,53 @@ BOOST_AUTO_TEST_CASE(rect_intersects_null)
 	BOOST_CHECK(!rect.intersects(null_rect));
 	BOOST_CHECK(!rect.intersects_fast(null_rect));
 	BOOST_CHECK(!rect.intersects_fastest(null_rect));
+}
+
+BOOST_AUTO_TEST_CASE(rectf_construction)
+{
+	{
+		RectF r;
+		BOOST_CHECK_EQUAL(r.left(), 0);
+		BOOST_CHECK_EQUAL(r.top(), 0);
+		BOOST_CHECK_EQUAL(r.right(), 0);
+		BOOST_CHECK_EQUAL(r.bottom(), 0);
+		BOOST_CHECK_EQUAL(r.width(), 0);
+		BOOST_CHECK_EQUAL(r.height(), 0);
+	}
+	{
+		RectF r{{1, 2}, Vector2{4, 7}};
+		BOOST_CHECK_EQUAL(r.left(), 1);
+		BOOST_CHECK_EQUAL(r.top(), 2);
+		BOOST_CHECK_EQUAL(r.right(), 4);
+		BOOST_CHECK_EQUAL(r.bottom(), 7);
+		BOOST_CHECK_EQUAL(r.width(), 3);
+		BOOST_CHECK_EQUAL(r.height(), 5);
+	}
+	{
+		RectF r{{1, 2}, SizeF{3, 5}};
+		BOOST_CHECK_EQUAL(r.left(), 1);
+		BOOST_CHECK_EQUAL(r.top(), 2);
+		BOOST_CHECK_EQUAL(r.right(), 4);
+		BOOST_CHECK_EQUAL(r.bottom(), 7);
+		BOOST_CHECK_EQUAL(r.width(), 3);
+		BOOST_CHECK_EQUAL(r.height(), 5);
+	}
+	{
+		RectF r{SizeF{1, 2}};
+		BOOST_CHECK_EQUAL(r.left(), 0);
+		BOOST_CHECK_EQUAL(r.top(), 0);
+		BOOST_CHECK_EQUAL(r.right(), 1);
+		BOOST_CHECK_EQUAL(r.bottom(), 2);
+		BOOST_CHECK_EQUAL(r.width(), 1);
+		BOOST_CHECK_EQUAL(r.height(), 2);
+	}
+	{
+		RectF r{Rect{{1, 2}, Point{4, 7}}};
+		BOOST_CHECK_EQUAL(r.left(), 1);
+		BOOST_CHECK_EQUAL(r.top(), 2);
+		BOOST_CHECK_EQUAL(r.right(), 4);
+		BOOST_CHECK_EQUAL(r.bottom(), 7);
+		BOOST_CHECK_EQUAL(r.width(), 3);
+		BOOST_CHECK_EQUAL(r.height(), 5);
+	}
 }
