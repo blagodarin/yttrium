@@ -43,7 +43,7 @@ script:
   - if [ "${COVERAGE}" = "1" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
   - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON
   - cmake --build . -- -j2
-  - ctest --output-on-failure
+  - cmake --build . --target check
 
 after_success:
   - if [ "${COVERAGE}" = "1" ]; then bash <(curl -s https://codecov.io/bash) -x $GCOV -a "-s `pwd`"; fi

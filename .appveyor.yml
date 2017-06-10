@@ -90,4 +90,4 @@ build_script:
   - cmd: cmake --build . --config Release
 
 test_script:
-  - cmd: ctest --output-on-failure --build-config Release
+  - cmd: cmake --build . --config Release --target check

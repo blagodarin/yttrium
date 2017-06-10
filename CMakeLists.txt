@@ -101,21 +101,9 @@ endif()
 
 option(WITH_TESTS "Enable tests" OFF)
 if(WITH_TESTS)
-	enable_testing()
 	add_subdirectory(tests)
-	get_target_property(TEST_SOURCES unit_tests SOURCES)
-	get_target_property(TEST_SOURCES_DIR unit_tests SOURCE_DIR)
-	foreach(TEST_SOURCE ${TEST_SOURCES})
-		if("${TEST_SOURCE}" MATCHES "([^\\.])\\.cpp")
-			file(READ "${TEST_SOURCES_DIR}/${TEST_SOURCE}" TEST_SOURCE_TEXT)
-			string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\(([0-9_a-z]+)\\)" TEST_NAME_LINES ${TEST_SOURCE_TEXT})
-			foreach(TEST_NAME_LINE ${TEST_NAME_LINES})
-				string(REGEX REPLACE "BOOST_AUTO_TEST_CASE\\(([0-9_a-z]+)\\)" "\\1" TEST_NAME ${TEST_NAME_LINE})
-				add_test(NAME ${TEST_NAME} COMMAND unit_tests --run_test=${TEST_NAME})
-			endforeach()
-		endif()
-	endforeach()
+	add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 	set_target_properties(
-		unit_tests
+		unit_tests check
 		PROPERTIES FOLDER "tests")
 endif()
