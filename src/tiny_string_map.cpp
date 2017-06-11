@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-static_assert(sizeof(uint8_t) == sizeof(char), "Unexpected char size");
+static_assert(sizeof(uint8_t) == sizeof(char));
 
 namespace Yttrium
 {

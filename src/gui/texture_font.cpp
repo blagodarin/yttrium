@@ -12,7 +12,7 @@
 
 namespace
 {
-	static_assert(2 * sizeof(char) == sizeof(uint16_t), "Bad char size");
+	static_assert(2 * sizeof(char) == sizeof(uint16_t));
 
 	constexpr uint16_t make_key(char a, char b)
 	{
