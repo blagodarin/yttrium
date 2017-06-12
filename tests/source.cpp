@@ -1,4 +1,5 @@
 #include <yttrium/storage/source.h>
+#include <yttrium/storage/temporary_file.h>
 #include "iostream.h"
 #include "test_utils.h"
 
@@ -39,6 +40,14 @@ BOOST_AUTO_TEST_CASE(source_from_source)
 		BOOST_CHECK_EQUAL(subsource->read_at(0, subbuffer.data(), subbuffer.size()), subsource->size());
 		BOOST_CHECK(!::memcmp(subbuffer.begin(), buffer.begin() + source->size() / 2, subsource->size()));
 	}
+}
+
+BOOST_AUTO_TEST_CASE(source_name)
+{
+	Yttrium::TemporaryFile tf;
+	const auto s = Source::from(tf.name());
+	BOOST_REQUIRE(s);
+	BOOST_CHECK_EQUAL(s->name(), tf.name());
 }
 
 BOOST_AUTO_TEST_CASE(source_properties)

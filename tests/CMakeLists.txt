@@ -1,6 +1,7 @@
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 add_executable(unit_tests
+	buffer_appender.cpp
 	buffer.cpp
 	flags.cpp
 	gui.cpp
