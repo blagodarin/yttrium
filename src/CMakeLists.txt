@@ -4,6 +4,8 @@ option(NO_JPEG "Exclude JPEG support")
 option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
 
+set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
+
 test_big_endian(Y_IS_BIG_ENDIAN)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(Y_IS_LINUX ON)
@@ -245,9 +247,8 @@ target_sources(yttrium PRIVATE
 	renderer/renderer.h
 	renderer/texture.cpp
 	renderer/texture.h
-	system/gl.h
 	)
-if(ON)
+if(Y_RENDERER STREQUAL "OpenGL")
 	find_package(OpenGL REQUIRED)
 	target_sources(yttrium PRIVATE
 		renderer/gl/api.h
@@ -265,9 +266,25 @@ if(ON)
 		renderer/gl/version.h
 		renderer/gl/wrappers.cpp
 		renderer/gl/wrappers.h
+		system/gl.h
 		)
+	target_compile_definitions(yttrium PRIVATE Y_RENDERER_OPENGL)
 	target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
+endif()
+if(Y_RENDERER STREQUAL "Vulkan")
+	find_package(Vulkan REQUIRED)
+	target_sources(yttrium PRIVATE
+		renderer/vulkan/buffer.h
+		renderer/vulkan/gpu_program.h
+		renderer/vulkan/mesh.h
+		renderer/vulkan/renderer.cpp
+		renderer/vulkan/renderer.h
+		renderer/vulkan/texture.h
+		)
+	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
+	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
+	target_link_libraries(yttrium ${Vulkan_LIBRARY})
 endif()
 
 ########################################################################################################################
@@ -340,18 +357,26 @@ target_sources(yttrium PRIVATE
 if(UNIX)
 	find_package(X11 REQUIRED)
 	target_sources(yttrium PRIVATE
-		system/x11/glx.cpp
-		system/x11/glx.h
 		system/x11/window.cpp
 		system/x11/window.h
 		)
+	if(Y_RENDERER STREQUAL "OpenGL")
+		target_sources(yttrium PRIVATE
+			system/x11/glx.cpp
+			system/x11/glx.h
+			)
+	endif()
 	target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
 	target_link_libraries(yttrium ${X11_X11_LIB})
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
-		system/gdi/wgl.cpp
-		system/gdi/wgl.h
 		system/gdi/window.cpp
 		system/gdi/window.h
 		)
+	if(Y_RENDERER STREQUAL "OpenGL")
+		target_sources(yttrium PRIVATE
+			system/gdi/wgl.cpp
+			system/gdi/wgl.h
+			)
+	endif()
 endif()

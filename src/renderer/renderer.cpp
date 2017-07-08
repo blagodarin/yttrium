@@ -12,8 +12,13 @@
 #include "debug_texture.h"
 #include "formats/obj.h"
 #include "mesh_data.h"
-#include "gl/renderer.h"
 #include "texture.h"
+
+#if defined(Y_RENDERER_OPENGL)
+	#include "gl/renderer.h"
+#elif defined(Y_RENDERER_VULKAN)
+	#include "vulkan/renderer.h"
+#endif
 
 #include <algorithm>
 #include <cassert>
@@ -73,7 +78,11 @@ namespace Yttrium
 
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&)
 	{
+#if defined(Y_RENDERER_OPENGL)
 		auto renderer = std::make_unique<GlRenderer>();
+#elif defined(Y_RENDERER_VULKAN)
+		auto renderer = std::make_unique<VulkanRenderer>();
+#endif
 
 		static const int32_t white_texture_data = -1;
 		renderer->_white_texture = renderer->create_texture_2d({ { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, TextureFlag::NoMipmaps);

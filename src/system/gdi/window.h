@@ -3,7 +3,10 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/std/optional.h>
-#include "wgl.h"
+
+#if defined(Y_RENDERER_OPENGL)
+	#include "wgl.h"
+#endif
 
 #include <string>
 
@@ -73,7 +76,9 @@ namespace Yttrium
 		const WindowClass _wndclass{ _hinstance, reinterpret_cast<WNDPROC>(static_window_proc) };
 		const WindowHandle _hwnd{ _wndclass, _name.c_str(), this };
 		const WindowDC _hdc{ _hwnd };
+#if defined(Y_RENDERER_OPENGL)
 		const WglContext _wgl{ _hdc };
+#endif
 	};
 }
 
