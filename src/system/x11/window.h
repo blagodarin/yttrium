@@ -5,9 +5,7 @@
 #include <yttrium/std/optional.h>
 #include "../../utils/unique_ptr.h"
 
-#if defined(Y_RENDERER_OPENGL)
-	#include "glx.h"
-#endif
+#include "glx.h"
 
 #include <X11/Xlib.h>
 
@@ -60,9 +58,7 @@ namespace Yttrium
 		std::optional<Size> _size;
 		const P_Display _display;
 		const int _screen = DefaultScreen(_display.get());
-#if defined(Y_RENDERER_OPENGL)
 		const GlxContext _glx{ _display.get(), _screen };
-#endif
 		WindowHandle _window;
 		const EmptyCursor _empty_cursor{ _display.get(), _window.get() };
 		::Atom _wm_protocols = ::XInternAtom(_display.get(), "WM_PROTOCOLS", True);

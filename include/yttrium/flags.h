@@ -59,7 +59,7 @@ namespace Yttrium
 		return static_cast<T>(static_cast<U>(a) | static_cast<U>(b));
 	}
 
-	inline namespace Operators
+	namespace Operators
 	{
 		template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
 		constexpr Flags<T> operator|(const T a, const T b) noexcept

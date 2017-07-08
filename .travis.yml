@@ -13,7 +13,7 @@ addons:
       - g++-6
       - libopenal-dev
       - libvorbis-dev
-      - libxrandr-dev
+      - libxcb-image0-dev
 
 matrix:
   include:
@@ -44,7 +44,7 @@ install:
   - popd
 
   - git clone https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers
-  - cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/vulkan -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XCB_SUPPORT=OFF
+  - cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/vulkan -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF
   - cd dbuild
   - make -j2
   - make install

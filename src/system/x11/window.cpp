@@ -8,7 +8,6 @@
 #include <cstring>
 
 #include <X11/Xatom.h>
-#include <X11/Xutil.h>
 
 namespace
 {
@@ -22,7 +21,6 @@ namespace
 		return display;
 	}
 
-#if defined(Y_RENDERER_OPENGL)
 	::Window create_window(::Display* display, int screen, const GlxContext& glx)
 	{
 		const auto root_window = RootWindow(display, screen);
@@ -44,28 +42,6 @@ namespace
 
 		return window;
 	}
-#elif defined(Y_RENDERER_VULKAN)
-	::Window create_window(::Display* display, int screen)
-	{
-		const auto root_window = RootWindow(display, screen);
-
-		::XSetWindowAttributes swa;
-		swa.border_pixel = 0;
-		swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
-
-		const auto window = ::XCreateWindow(display, root_window,
-			0, 0, 1, 1, 0, CopyFromParent, InputOutput, CopyFromParent,
-			CWBorderPixel | CWEventMask, &swa);
-
-		if (window == None)
-		{
-			::XFreeColormap(display, swa.colormap);
-			throw InitializationError("Failed to create an X11 window");
-		}
-
-		return window;
-	}
-#endif
 
 	Key key_from_event(::XEvent& event)
 	{
@@ -163,11 +139,7 @@ namespace Yttrium
 {
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
 		: _display{::open_display()}
-#if defined(Y_RENDERER_OPENGL)
 		, _window{_display.get(), ::create_window(_display.get(), _screen, _glx)}
-#elif defined(Y_RENDERER_VULKAN)
-		, _window{_display.get(), ::create_window(_display.get(), _screen)}
-#endif
 		, _callbacks{callbacks}
 	{
 		::XSetWMProtocols(_display.get(), _window.get(), &_wm_delete_window, 1);
@@ -179,13 +151,11 @@ namespace Yttrium
 		// Show window in fullscreen mode.
 		::XChangeProperty(_display.get(), _window.get(), _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 
-#if defined(Y_RENDERER_OPENGL)
 		_glx.bind(_window.get());
 
 		// Force vsync.
 		if (_glx->EXT_swap_control)
 			_glx->SwapIntervalEXT(_display.get(), _window.get(), _glx->EXT_swap_control_tear ? -1 : 1);
-#endif
 	}
 
 	WindowBackend::~WindowBackend() = default;
@@ -194,9 +164,7 @@ namespace Yttrium
 	{
 		if (!_window)
 			return;
-#if defined(Y_RENDERER_OPENGL)
 		_glx.unbind();
-#endif
 		_window.reset();
 	}
 
@@ -302,10 +270,8 @@ namespace Yttrium
 
 	void WindowBackend::swap_buffers()
 	{
-#if defined(Y_RENDERER_OPENGL)
 		if (_window)
 			_glx.swap_buffers(_window.get());
-#endif
 	}
 
 	void WindowBackend::WindowHandle::reset() noexcept

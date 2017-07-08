@@ -355,19 +355,25 @@ target_sources(yttrium PRIVATE
 	window/window.cpp
 	)
 if(UNIX)
-	find_package(X11 REQUIRED)
-	target_sources(yttrium PRIVATE
-		system/x11/window.cpp
-		system/x11/window.h
-		)
 	if(Y_RENDERER STREQUAL "OpenGL")
+		find_package(X11 REQUIRED)
 		target_sources(yttrium PRIVATE
 			system/x11/glx.cpp
 			system/x11/glx.h
+			system/x11/window.cpp
+			system/x11/window.h
 			)
+		target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
+		target_link_libraries(yttrium ${X11_X11_LIB})
 	endif()
-	target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
-	target_link_libraries(yttrium ${X11_X11_LIB})
+	if(Y_RENDERER STREQUAL "Vulkan")
+		# TODO: Use 'FindXCB'.
+		target_sources(yttrium PRIVATE
+			system/xcb/window.cpp
+			system/xcb/window.h
+			)
+		target_link_libraries(yttrium xcb xcb-image)
+	endif()
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
 		system/gdi/window.cpp
