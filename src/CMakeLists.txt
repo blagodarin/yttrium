@@ -284,7 +284,7 @@ if(Y_RENDERER STREQUAL "Vulkan")
 		)
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
-	target_link_libraries(yttrium ${Vulkan_LIBRARY})
+	target_link_libraries(yttrium Vulkan::Vulkan)
 endif()
 
 ########################################################################################################################

@@ -13,12 +13,16 @@ addons:
       - g++-6
       - libopenal-dev
       - libvorbis-dev
+      - libxrandr-dev
 
 matrix:
   include:
     - os: linux
       compiler: gcc
-      env: COVERAGE=1 GCC_VERSION=6
+      env: GCC_VERSION=6 RENDERER=OpenGL COVERAGE=1
+    - os: linux
+      compiler: gcc
+      env: GCC_VERSION=6 RENDERER=Vulkan
 
 before_install:
   - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
@@ -39,9 +43,17 @@ install:
   - export PATH=$(pwd)/bin:${PATH}
   - popd
 
+  - git clone https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers
+  - cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/vulkan -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XCB_SUPPORT=OFF
+  - cd dbuild
+  - make -j2
+  - make install
+  - export VULKAN_SDK=${TRAVIS_BUILD_DIR}/vulkan
+  - popd
+
 script:
   - if [ "${COVERAGE}" = "1" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
-  - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON
+  - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON -DY_RENDERER=$RENDERER
   - cmake --build . -- -j2
   - cmake --build . --target check
 
