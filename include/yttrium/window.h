@@ -1,10 +1,8 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_window_h_
 #define _include_yttrium_window_h_
 
 #include <yttrium/api.h>
+#include <yttrium/std/string_view.h>
 
 #include <chrono>
 #include <functional>
@@ -57,7 +55,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		explicit Window(const std::string& name);
+		explicit Window(std::string_view name);
 
 		///
 		~Window();

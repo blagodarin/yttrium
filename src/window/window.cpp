@@ -12,7 +12,7 @@ namespace Yttrium
 	{
 	public:
 		const std::string _name;
-		WindowBackend _backend{ _name, *this };
+		WindowBackend _backend{_name, *this};
 		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend); // TODO: Store renderer by value.
 		bool _is_active = false;
 		Point _cursor;
@@ -27,8 +27,8 @@ namespace Yttrium
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(const UpdateEvent&)> _on_update;
 
-		explicit WindowPrivate(const std::string& name)
-			: _name(name)
+		explicit WindowPrivate(std::string_view name)
+			: _name{name}
 		{
 			const auto size = _backend.size();
 			if (size)
@@ -53,14 +53,14 @@ namespace Yttrium
 			if (!_is_active)
 				return true;
 
-			Point cursor = Rect(_size).center();
+			Point cursor = Rect{_size}.center();
 			_backend.get_cursor(cursor);
 
 			const auto dx = _cursor._x - cursor._x;
 			const auto dy = cursor._y - _cursor._y;
 
 			if (!_is_cursor_locked)
-				_cursor = Rect(_size).bound(cursor);
+				_cursor = Rect{_size}.bound(cursor);
 			else
 				_backend.set_cursor(_cursor);
 
@@ -119,8 +119,8 @@ namespace Yttrium
 		}
 	};
 
-	Window::Window(const std::string& name)
-		: _private(std::make_unique<WindowPrivate>(name))
+	Window::Window(std::string_view name)
+		: _private{std::make_unique<WindowPrivate>(name)}
 	{
 	}
 
@@ -224,7 +224,7 @@ namespace Yttrium
 
 	bool Window::set_cursor(const Point& cursor)
 	{
-		if (_private->_is_cursor_locked || !Rect(_private->_size).contains(cursor) || !_private->_backend.set_cursor(cursor))
+		if (_private->_is_cursor_locked || !Rect{_private->_size}.contains(cursor) || !_private->_backend.set_cursor(cursor))
 			return false;
 		_private->_cursor = cursor;
 		return true;

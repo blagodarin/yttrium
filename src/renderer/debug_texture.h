@@ -7,17 +7,17 @@ namespace Yttrium
 {
 	namespace DebugTexture
 	{
-		extern const uint8_t char_width;
-		extern const uint8_t char_height;
+		constexpr uint8_t char_width = 8;
+		constexpr uint8_t char_height = 16;
 
-		extern const uint8_t first_char;
-		extern const uint8_t last_char;
+		constexpr uint8_t first_char = 33;
+		constexpr uint8_t last_char = 126;
 
-		extern const uint8_t cursor_index;
-		extern const uint8_t rect_index;
+		constexpr uint8_t cursor_index = 0;
+		constexpr uint8_t rect_index = 127;
 
-		extern const uint16_t width;
-		extern const uint16_t height;
+		constexpr uint16_t width = 128;
+		constexpr uint16_t height = 128;
 
 		extern const int32_t data[];
 
