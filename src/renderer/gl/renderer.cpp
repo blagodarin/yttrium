@@ -16,7 +16,7 @@
 
 namespace Yttrium
 {
-	GlRenderer::GlRenderer()
+	GlRenderer::GlRenderer(WindowBackend&)
 	{
 #ifndef NDEBUG
 		if (_gl.KHR_debug)

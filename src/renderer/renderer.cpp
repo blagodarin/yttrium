@@ -76,12 +76,12 @@ namespace Yttrium
 		}
 	};
 
-	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend&)
+	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window)
 	{
 #if defined(Y_RENDERER_OPENGL)
-		auto renderer = std::make_unique<GlRenderer>();
+		auto renderer = std::make_unique<GlRenderer>(window);
 #elif defined(Y_RENDERER_VULKAN)
-		auto renderer = std::make_unique<VulkanRenderer>();
+		auto renderer = std::make_unique<VulkanRenderer>(window);
 #endif
 
 		static const int32_t white_texture_data = -1;

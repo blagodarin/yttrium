@@ -3,7 +3,11 @@
 
 #include "../config.h"
 #ifdef Y_IS_POSIX
-	#include "x11/window.h"
+	#ifdef Y_RENDERER_OPENGL
+		#include "x11/window.h"
+	#elif defined(Y_RENDERER_VULKAN)
+		#include "xcb/window.h"
+	#endif
 #elif defined(Y_IS_WINDOWS)
 	#include "gdi/window.h"
 #else

@@ -281,6 +281,8 @@ if(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/renderer.cpp
 		renderer/vulkan/renderer.h
 		renderer/vulkan/texture.h
+		renderer/vulkan/wrappers.cpp
+		renderer/vulkan/wrappers.h
 		)
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
@@ -372,6 +374,7 @@ if(UNIX)
 			system/xcb/window.cpp
 			system/xcb/window.h
 			)
+		target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
 		target_link_libraries(yttrium xcb xcb-image)
 	endif()
 elseif(WIN32)

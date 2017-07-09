@@ -9,7 +9,7 @@ namespace Yttrium
 	class GlRenderer final : public RendererImpl
 	{
 	public:
-		GlRenderer();
+		GlRenderer(WindowBackend&);
 
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;

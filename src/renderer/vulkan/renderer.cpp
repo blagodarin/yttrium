@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include <yttrium/math/matrix.h>
-#include <yttrium/utils.h>
 #include "../mesh_data.h"
 #include "buffer.h"
 #include "gpu_program.h"
@@ -9,10 +8,6 @@
 #include "texture.h"
 
 #include <cassert>
-#ifndef NDEBUG
-	#include <csignal>
-	#include <iostream>
-#endif
 
 namespace Yttrium
 {

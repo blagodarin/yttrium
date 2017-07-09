@@ -24,14 +24,17 @@ namespace Yttrium
 		bool process_events();
 		bool set_cursor(const Point&);
 		void show();
-		std::optional<Size> size() const { return _size; }
+		std::optional<Size> size() const noexcept { return _size; }
 		void swap_buffers();
+
+		xcb_connection_t* xcb_connection() const noexcept { return _connection.get(); }
+		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
 		class EmptyCursor;
 
 		WindowBackendCallbacks& _callbacks;
-		std::unique_ptr<xcb_connection_t, void(*)(xcb_connection_t*)> _connection;
+		Y_UNIQUE_PTR(xcb_connection_t, ::xcb_disconnect) _connection;
 		xcb_screen_t* _screen = nullptr;
 		xcb_window_t _window = XCB_WINDOW_NONE;
 		P_Atom _wm_protocols;

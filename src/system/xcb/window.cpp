@@ -163,7 +163,6 @@ namespace Yttrium
 
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
 		: _callbacks{callbacks}
-		, _connection{nullptr, ::xcb_disconnect}
 	{
 		int preferred_screen = 0;
 		_connection.reset(::xcb_connect(nullptr, &preferred_screen));
