@@ -3,9 +3,18 @@
 #include "../../system/window.h"
 
 #include <stdexcept>
+#include <vector>
 
 namespace
 {
+	const std::vector<const char*> vulkan_extensions
+	{
+		VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef VK_USE_PLATFORM_XCB_KHR
+		VK_KHR_XCB_SURFACE_EXTENSION_NAME,
+#endif
+	};
+
 	void vulkan_throw(VkResult result, const std::string& function)
 	{
 		const auto result_to_string = [result]() -> std::string
@@ -64,8 +73,8 @@ namespace Yttrium
 		ici.pNext = nullptr;
 		ici.flags = 0;
 		ici.pApplicationInfo = &ai;
-		ici.enabledExtensionCount = 0;
-		ici.ppEnabledExtensionNames = nullptr;
+		ici.enabledExtensionCount = vulkan_extensions.size();
+		ici.ppEnabledExtensionNames = vulkan_extensions.data();
 		ici.enabledLayerCount = 0;
 		ici.ppEnabledLayerNames = nullptr;
 
