@@ -275,13 +275,13 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 	find_package(Vulkan REQUIRED)
 	target_sources(yttrium PRIVATE
 		renderer/vulkan/buffer.h
+		renderer/vulkan/context.cpp
+		renderer/vulkan/context.h
 		renderer/vulkan/gpu_program.h
 		renderer/vulkan/mesh.h
 		renderer/vulkan/renderer.cpp
 		renderer/vulkan/renderer.h
 		renderer/vulkan/texture.h
-		renderer/vulkan/wrappers.cpp
-		renderer/vulkan/wrappers.h
 		)
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})

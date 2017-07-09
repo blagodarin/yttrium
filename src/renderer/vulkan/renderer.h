@@ -2,14 +2,14 @@
 #define _src_renderer_vulkan_renderer_h_
 
 #include "../renderer.h"
-#include "wrappers.h"
+#include "context.h"
 
 namespace Yttrium
 {
 	class VulkanRenderer final : public RendererImpl
 	{
 	public:
-		VulkanRenderer(const WindowBackend& window) : _window{window} {}
+		VulkanRenderer(const WindowBackend&);
 
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
@@ -30,9 +30,7 @@ namespace Yttrium
 		void set_window_size_impl(const Size&) override;
 
 	private:
-		const WindowBackend& _window;
-		VulkanInstance _instance;
-		VulkanSurface _surface{_instance.get(), _window};
+		VulkanContext _context;
 	};
 }
 

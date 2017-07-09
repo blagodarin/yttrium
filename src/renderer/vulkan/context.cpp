@@ -1,4 +1,4 @@
-#include "wrappers.h"
+#include "context.h"
 
 #include "../../system/window.h"
 
@@ -57,7 +57,17 @@ namespace
 
 namespace Yttrium
 {
-	VulkanInstance::VulkanInstance()
+	VulkanContext::~VulkanContext()
+	{
+		if (_device != VK_NULL_HANDLE)
+			vkDestroyDevice(_device, nullptr);
+		if (_surface != VK_NULL_HANDLE)
+			vkDestroySurfaceKHR(_instance, _surface, nullptr);
+		if (_instance != VK_NULL_HANDLE)
+			vkDestroyInstance(_instance, nullptr);
+	}
+
+	void VulkanContext::initialize(const WindowBackend& window)
 	{
 		VkApplicationInfo ai = {};
 		ai.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -73,35 +83,71 @@ namespace Yttrium
 		ici.pNext = nullptr;
 		ici.flags = 0;
 		ici.pApplicationInfo = &ai;
-		ici.enabledExtensionCount = vulkan_extensions.size();
-		ici.ppEnabledExtensionNames = vulkan_extensions.data();
 		ici.enabledLayerCount = 0;
 		ici.ppEnabledLayerNames = nullptr;
+		ici.enabledExtensionCount = vulkan_extensions.size();
+		ici.ppEnabledExtensionNames = vulkan_extensions.data();
 
 		if (const auto result = vkCreateInstance(&ici, nullptr, &_instance))
 			vulkan_throw(result, "vkCreateInstance");
-	}
 
-	VulkanInstance::~VulkanInstance()
-	{
-		vkDestroyInstance(_instance, nullptr);
-	}
+		uint32_t physical_device_count = 0;
+		if (const auto result = vkEnumeratePhysicalDevices(_instance, &physical_device_count, nullptr))
+			vulkan_throw(result, "vkEnumeratePhysicalDevices");
+		std::vector<VkPhysicalDevice> physical_devices(physical_device_count);
+		if (const auto result = vkEnumeratePhysicalDevices(_instance, &physical_device_count, physical_devices.data()))
+			vulkan_throw(result, "vkEnumeratePhysicalDevices");
 
-	VulkanSurface::VulkanSurface(VkInstance instance, const WindowBackend& backend)
-		: _instance{instance}
-	{
+		const float queue_prioritiy = 0.f;
+
+		VkDeviceQueueCreateInfo dqci = {};
+		dqci.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		dqci.pNext = nullptr;
+		dqci.flags = 0;
+		dqci.queueFamilyIndex = 0;
+		dqci.queueCount = 1;
+		dqci.pQueuePriorities = &queue_prioritiy;
+
+		for (const auto physical_device : physical_devices)
+		{
+			uint32_t queue_family_count = 0;
+			vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, nullptr);
+			std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+			vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, queue_families.data());
+
+			for (const auto& queue_family : queue_families)
+				if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				{
+					_physical_device = physical_device;
+					dqci.queueFamilyIndex = &queue_family - queue_families.data();
+					break;
+				}
+		}
+
+		if (_physical_device == VK_NULL_HANDLE)
+			throw std::runtime_error{"No suitable physical device found"};
+
+		VkDeviceCreateInfo dci = {};
+		dci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		dci.pNext = nullptr;
+		dci.flags = 0;
+		dci.queueCreateInfoCount = 1;
+		dci.pQueueCreateInfos = &dqci;
+		dci.enabledLayerCount = 0;
+		dci.ppEnabledLayerNames = nullptr;
+		dci.enabledExtensionCount = 0;
+		dci.ppEnabledExtensionNames = nullptr;
+		dci.pEnabledFeatures = nullptr;
+		if (const auto result = vkCreateDevice(_physical_device, &dci, nullptr, &_device))
+			vulkan_throw(result, "vkCreateDevice");
+
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		VkXcbSurfaceCreateInfoKHR sci = {};
 		sci.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-		sci.connection = backend.xcb_connection();
-		sci.window = backend.xcb_window();
+		sci.connection = window.xcb_connection();
+		sci.window = window.xcb_window();
 		if (const auto result = vkCreateXcbSurfaceKHR(_instance, &sci, nullptr, &_surface))
 			vulkan_throw(result, "vkCreateXcbSurfaceKHR");
 #endif
-	}
-
-	VulkanSurface::~VulkanSurface()
-	{
-		vkDestroySurfaceKHR(_instance, _surface, nullptr);
 	}
 }

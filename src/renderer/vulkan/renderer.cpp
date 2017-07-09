@@ -10,6 +10,11 @@
 
 namespace Yttrium
 {
+	VulkanRenderer::VulkanRenderer(const WindowBackend& window)
+	{
+		_context.initialize(window);
+	}
+
 	std::unique_ptr<GpuProgram> VulkanRenderer::create_gpu_program(const std::string&, const std::string&)
 	{
 		return std::make_unique<VulkanGpuProgram>();
