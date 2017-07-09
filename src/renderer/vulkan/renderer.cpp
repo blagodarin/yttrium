@@ -1,6 +1,5 @@
 #include "renderer.h"
 
-#include <yttrium/math/matrix.h>
 #include "../mesh_data.h"
 #include "buffer.h"
 #include "gpu_program.h"

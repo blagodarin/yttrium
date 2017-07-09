@@ -5,7 +5,7 @@
 #ifdef Y_IS_POSIX
 	#ifdef Y_RENDERER_OPENGL
 		#include "x11/window.h"
-	#elif defined(Y_RENDERER_VULKAN)
+	#else
 		#include "xcb/window.h"
 	#endif
 #elif defined(Y_IS_WINDOWS)

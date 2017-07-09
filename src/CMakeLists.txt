@@ -271,8 +271,7 @@ if(Y_RENDERER STREQUAL "OpenGL")
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_OPENGL)
 	target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
-endif()
-if(Y_RENDERER STREQUAL "Vulkan")
+elseif(Y_RENDERER STREQUAL "Vulkan")
 	find_package(Vulkan REQUIRED)
 	target_sources(yttrium PRIVATE
 		renderer/vulkan/buffer.h
@@ -287,6 +286,11 @@ if(Y_RENDERER STREQUAL "Vulkan")
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
 	target_link_libraries(yttrium Vulkan::Vulkan)
+else()
+	target_sources(yttrium PRIVATE
+		renderer/null/renderer.cpp
+		renderer/null/renderer.h
+		)
 endif()
 
 ########################################################################################################################
@@ -367,15 +371,16 @@ if(UNIX)
 			)
 		target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium ${X11_X11_LIB})
-	endif()
-	if(Y_RENDERER STREQUAL "Vulkan")
+	else()
 		# TODO: Use 'FindXCB'.
 		target_sources(yttrium PRIVATE
 			system/xcb/window.cpp
 			system/xcb/window.h
 			)
-		target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
 		target_link_libraries(yttrium xcb xcb-image)
+		if(Y_RENDERER STREQUAL "Vulkan")
+			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
+		endif()
 	endif()
 elseif(WIN32)
 	target_sources(yttrium PRIVATE

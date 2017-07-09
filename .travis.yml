@@ -19,7 +19,10 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=6 RENDERER=OpenGL COVERAGE=1
+      env: GCC_VERSION=6 RENDERER=Null COVERAGE=1
+    - os: linux
+      compiler: gcc
+      env: GCC_VERSION=6 RENDERER=OpenGL
     - os: linux
       compiler: gcc
       env: GCC_VERSION=6 RENDERER=Vulkan

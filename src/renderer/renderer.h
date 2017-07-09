@@ -34,6 +34,7 @@ namespace Yttrium
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend&);
 
+		RendererImpl();
 		~RendererImpl() override;
 
 		void add_debug_text(std::string_view) override;

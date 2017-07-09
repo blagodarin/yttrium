@@ -18,6 +18,8 @@
 	#include "gl/renderer.h"
 #elif defined(Y_RENDERER_VULKAN)
 	#include "vulkan/renderer.h"
+#else
+	#include "null/renderer.h"
 #endif
 
 #include <algorithm>
@@ -82,6 +84,8 @@ namespace Yttrium
 		auto renderer = std::make_unique<GlRenderer>(window);
 #elif defined(Y_RENDERER_VULKAN)
 		auto renderer = std::make_unique<VulkanRenderer>(window);
+#else
+		auto renderer = std::make_unique<NullRenderer>(window);
 #endif
 
 		static const int32_t white_texture_data = -1;
@@ -100,6 +104,7 @@ namespace Yttrium
 		return std::move(renderer);
 	}
 
+	RendererImpl::RendererImpl() = default;
 	RendererImpl::~RendererImpl() = default;
 
 	void RendererImpl::add_debug_text(std::string_view text)
