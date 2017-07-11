@@ -1,6 +1,8 @@
 #ifndef _src_renderer_vulkan_context_h_
 #define _src_renderer_vulkan_context_h_
 
+#include <vector>
+
 #include <vulkan/vulkan.h>
 
 namespace Yttrium
@@ -23,6 +25,8 @@ namespace Yttrium
 		VkSurfaceKHR _surface = VK_NULL_HANDLE;
 		VkPhysicalDevice _physical_device = VK_NULL_HANDLE;
 		VkDevice _device = VK_NULL_HANDLE;
+		VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
+		std::vector<VkImageView> _image_views;
 		VkCommandPool _command_pool = VK_NULL_HANDLE;
 		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
 	};
