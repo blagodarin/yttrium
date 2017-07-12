@@ -55,9 +55,11 @@ namespace
 			default: return std::to_string(result);
 			}
 		};
-		throw std::runtime_error{function + " = " + result_to_string()};
+		throw std::runtime_error{function.substr(0, function.find('(')) + " = " + result_to_string()};
 	}
 }
+
+#define CHECK(call) if (const auto result = (call)) vulkan_throw(result, #call);
 
 namespace Yttrium
 {
@@ -83,26 +85,21 @@ namespace Yttrium
 		instance_ci.ppEnabledLayerNames = nullptr;
 		instance_ci.enabledExtensionCount = vulkan_instance_extensions.size();
 		instance_ci.ppEnabledExtensionNames = vulkan_instance_extensions.begin();
-
-		if (const auto result = vkCreateInstance(&instance_ci, nullptr, &_instance))
-			vulkan_throw(result, "vkCreateInstance");
+		CHECK(vkCreateInstance(&instance_ci, nullptr, &_instance));
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		VkXcbSurfaceCreateInfoKHR surface_ci = {};
 		surface_ci.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 		surface_ci.connection = window.xcb_connection();
 		surface_ci.window = window.xcb_window();
-		if (const auto result = vkCreateXcbSurfaceKHR(_instance, &surface_ci, nullptr, &_surface))
-			vulkan_throw(result, "vkCreateXcbSurfaceKHR");
+		CHECK(vkCreateXcbSurfaceKHR(_instance, &surface_ci, nullptr, &_surface));
 #endif
 
 		uint32_t physical_device_count = 0;
-		if (const auto result = vkEnumeratePhysicalDevices(_instance, &physical_device_count, nullptr))
-			vulkan_throw(result, "vkEnumeratePhysicalDevices");
+		CHECK(vkEnumeratePhysicalDevices(_instance, &physical_device_count, nullptr));
 
 		std::vector<VkPhysicalDevice> physical_devices(physical_device_count);
-		if (const auto result = vkEnumeratePhysicalDevices(_instance, &physical_device_count, physical_devices.data()))
-			vulkan_throw(result, "vkEnumeratePhysicalDevices");
+		CHECK(vkEnumeratePhysicalDevices(_instance, &physical_device_count, physical_devices.data()));
 
 		const float queue_prioritiy = 0.f;
 
@@ -128,8 +125,7 @@ namespace Yttrium
 					continue;
 
 				VkBool32 has_present_support = VK_FALSE;
-				if (const auto result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, _surface, &has_present_support))
-					vulkan_throw(result, "vkGetPhysicalDeviceSurfaceSupportKHR");
+				CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, _surface, &has_present_support));
 
 				if (!has_present_support)
 					continue;
@@ -144,19 +140,16 @@ namespace Yttrium
 			throw std::runtime_error{"No suitable physical device found"};
 
 		VkSurfaceCapabilitiesKHR surface_caps = {};
-		if (const auto result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &surface_caps))
-			vulkan_throw(result, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+		CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &surface_caps));
 
 		if (surface_caps.currentExtent.width == 0xffffffff && surface_caps.currentExtent.height == 0xffffffff)
 			throw std::runtime_error{"Bad surface size"};
 
 		uint32_t surface_format_count = 0;
-		if (const auto result = vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, _surface, &surface_format_count, nullptr))
-			vulkan_throw(result, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, _surface, &surface_format_count, nullptr));
 
 		std::vector<VkSurfaceFormatKHR> surface_formats(surface_format_count);
-		if (const auto result = vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, _surface, &surface_format_count, surface_formats.data()))
-			vulkan_throw(result, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, _surface, &surface_format_count, surface_formats.data()));
 
 		if (surface_formats.empty())
 			throw std::runtime_error{"No surface formats defined"};
@@ -174,8 +167,7 @@ namespace Yttrium
 		device_ci.enabledExtensionCount = vulkan_device_extensions.size();
 		device_ci.ppEnabledExtensionNames = vulkan_device_extensions.begin();
 		device_ci.pEnabledFeatures = nullptr;
-		if (const auto result = vkCreateDevice(_physical_device, &device_ci, nullptr, &_device))
-			vulkan_throw(result, "vkCreateDevice");
+		CHECK(vkCreateDevice(_physical_device, &device_ci, nullptr, &_device));
 
 		VkSwapchainCreateInfoKHR swapchain_ci = {};
 		swapchain_ci.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -202,16 +194,13 @@ namespace Yttrium
 		swapchain_ci.presentMode = VK_PRESENT_MODE_FIFO_KHR;
 		swapchain_ci.clipped = VK_TRUE;
 		swapchain_ci.oldSwapchain = VK_NULL_HANDLE;
-		if (const auto result = vkCreateSwapchainKHR(_device, &swapchain_ci, nullptr, &_swapchain))
-			vulkan_throw(result, "vkCreateSwapchainKHR");
+		CHECK(vkCreateSwapchainKHR(_device, &swapchain_ci, nullptr, &_swapchain));
 
 		uint32_t swapchain_image_count = 0;
-		if (const auto result = vkGetSwapchainImagesKHR(_device, _swapchain, &swapchain_image_count, nullptr))
-			vulkan_throw(result, "vkGetSwapchainImagesKHR");
+		CHECK(vkGetSwapchainImagesKHR(_device, _swapchain, &swapchain_image_count, nullptr));
 
 		std::vector<VkImage> swapchain_images(swapchain_image_count);
-		if (const auto result = vkGetSwapchainImagesKHR(_device, _swapchain, &swapchain_image_count, swapchain_images.data()))
-			vulkan_throw(result, "vkGetSwapchainImagesKHR");
+		CHECK(vkGetSwapchainImagesKHR(_device, _swapchain, &swapchain_image_count, swapchain_images.data()));
 
 		_image_views.resize(swapchain_image_count, VK_NULL_HANDLE);
 		for (uint32_t i = 0; i < swapchain_image_count; ++i)
@@ -232,8 +221,7 @@ namespace Yttrium
 			image_view_ci.subresourceRange.levelCount = 1;
 			image_view_ci.subresourceRange.baseArrayLayer = 0;
 			image_view_ci.subresourceRange.layerCount = 1;
-			if (const auto result = vkCreateImageView(_device, &image_view_ci, nullptr, &_image_views[i]))
-				vulkan_throw(result, "vkCreateImageView");
+			CHECK(vkCreateImageView(_device, &image_view_ci, nullptr, &_image_views[i]));
 		}
 
 		VkImageCreateInfo depth_image_ci = {};
@@ -264,8 +252,7 @@ namespace Yttrium
 		depth_image_ci.queueFamilyIndexCount = 0;
 		depth_image_ci.pQueueFamilyIndices = nullptr;
 		depth_image_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		if (const auto result = vkCreateImage(_device, &depth_image_ci, nullptr, &_depth_image))
-			vulkan_throw(result, "vkCreateImage");
+		CHECK(vkCreateImage(_device, &depth_image_ci, nullptr, &_depth_image));
 
 		VkMemoryRequirements depth_memory_reqs = {};
 		vkGetImageMemoryRequirements(_device, _depth_image, &depth_memory_reqs);
@@ -284,11 +271,9 @@ namespace Yttrium
 						return i;
 			throw std::runtime_error{"VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT memory not found"};
 		}();
-		if (const auto result = vkAllocateMemory(_device, &depth_memory_ai, nullptr, &_depth_memory))
-			vulkan_throw(result, "vkAllocateMemory");
+		CHECK(vkAllocateMemory(_device, &depth_memory_ai, nullptr, &_depth_memory));
 
-		if (const auto result = vkBindImageMemory(_device, _depth_image, _depth_memory, 0))
-			vulkan_throw(result, "vkBindImageMemory");
+		CHECK(vkBindImageMemory(_device, _depth_image, _depth_memory, 0));
 
 		VkImageViewCreateInfo depth_image_view_ci = {};
 		depth_image_view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -306,16 +291,14 @@ namespace Yttrium
 		depth_image_view_ci.subresourceRange.levelCount = 1;
 		depth_image_view_ci.subresourceRange.baseArrayLayer = 0;
 		depth_image_view_ci.subresourceRange.layerCount = 1;
-		if (const auto result = vkCreateImageView(_device, &depth_image_view_ci, nullptr, &_depth_image_view))
-			vulkan_throw(result, "vkCreateImageView");
+		CHECK(vkCreateImageView(_device, &depth_image_view_ci, nullptr, &_depth_image_view));
 
 		VkCommandPoolCreateInfo command_pool_ci = {};
 		command_pool_ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		command_pool_ci.pNext = nullptr;
 		command_pool_ci.flags = 0;
 		command_pool_ci.queueFamilyIndex = device_queue_ci.queueFamilyIndex;
-		if (const auto result = vkCreateCommandPool(_device, &command_pool_ci, nullptr, &_command_pool))
-			vulkan_throw(result, "vkCreateCommandPool");
+		CHECK(vkCreateCommandPool(_device, &command_pool_ci, nullptr, &_command_pool));
 
 		VkCommandBufferAllocateInfo command_buffer_ai = {};
 		command_buffer_ai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -323,8 +306,7 @@ namespace Yttrium
 		command_buffer_ai.commandPool = _command_pool;
 		command_buffer_ai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		command_buffer_ai.commandBufferCount = 1;
-		if (const auto result = vkAllocateCommandBuffers(_device, &command_buffer_ai, &_command_buffer))
-			vulkan_throw(result, "vkAllocateCommandBuffers");
+		CHECK(vkAllocateCommandBuffers(_device, &command_buffer_ai, &_command_buffer));
 	}
 
 	void VulkanContext::reset() noexcept
