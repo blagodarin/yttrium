@@ -236,6 +236,79 @@ namespace Yttrium
 				vulkan_throw(result, "vkCreateImageView");
 		}
 
+		VkImageCreateInfo depth_image_ci = {};
+		depth_image_ci.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		depth_image_ci.pNext = nullptr;
+		depth_image_ci.flags = 0;
+		depth_image_ci.imageType = VK_IMAGE_TYPE_2D;
+		depth_image_ci.format = VK_FORMAT_D16_UNORM;
+		depth_image_ci.extent.width = surface_caps.currentExtent.width;
+		depth_image_ci.extent.height = surface_caps.currentExtent.height;
+		depth_image_ci.extent.depth = 1;
+		depth_image_ci.mipLevels = 1;
+		depth_image_ci.arrayLayers = 1;
+		depth_image_ci.samples = VK_SAMPLE_COUNT_1_BIT;
+		depth_image_ci.tiling = [this, &depth_image_ci]
+		{
+			VkFormatProperties depth_format_props = {};
+			vkGetPhysicalDeviceFormatProperties(_physical_device, depth_image_ci.format, &depth_format_props);
+			if (depth_format_props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+				return VK_IMAGE_TILING_LINEAR;
+			else if (depth_format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+				return VK_IMAGE_TILING_OPTIMAL;
+			else
+				throw std::runtime_error{"VK_FORMAT_D16_UNORM is not supported"};
+		}();
+		depth_image_ci.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		depth_image_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		depth_image_ci.queueFamilyIndexCount = 0;
+		depth_image_ci.pQueueFamilyIndices = nullptr;
+		depth_image_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		if (const auto result = vkCreateImage(_device, &depth_image_ci, nullptr, &_depth_image))
+			vulkan_throw(result, "vkCreateImage");
+
+		VkMemoryRequirements depth_memory_reqs = {};
+		vkGetImageMemoryRequirements(_device, _depth_image, &depth_memory_reqs);
+
+		VkMemoryAllocateInfo depth_memory_ai = {};
+		depth_memory_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		depth_memory_ai.pNext = nullptr;
+		depth_memory_ai.allocationSize = depth_memory_reqs.size;
+		depth_memory_ai.memoryTypeIndex = [this, &depth_memory_reqs]
+		{
+			VkPhysicalDeviceMemoryProperties props;
+			vkGetPhysicalDeviceMemoryProperties(_physical_device, &props);
+			for (uint32_t i = 0; i < props.memoryTypeCount; ++i)
+				if (depth_memory_reqs.memoryTypeBits & (1u << i))
+					if (props.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
+						return i;
+			throw std::runtime_error{"VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT memory not found"};
+		}();
+		if (const auto result = vkAllocateMemory(_device, &depth_memory_ai, nullptr, &_depth_memory))
+			vulkan_throw(result, "vkAllocateMemory");
+
+		if (const auto result = vkBindImageMemory(_device, _depth_image, _depth_memory, 0))
+			vulkan_throw(result, "vkBindImageMemory");
+
+		VkImageViewCreateInfo depth_image_view_ci = {};
+		depth_image_view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		depth_image_view_ci.pNext = nullptr;
+		depth_image_view_ci.flags = 0;
+		depth_image_view_ci.image = _depth_image;
+		depth_image_view_ci.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		depth_image_view_ci.format = depth_image_ci.format;
+		depth_image_view_ci.components.r = VK_COMPONENT_SWIZZLE_R;
+		depth_image_view_ci.components.g = VK_COMPONENT_SWIZZLE_G;
+		depth_image_view_ci.components.b = VK_COMPONENT_SWIZZLE_B;
+		depth_image_view_ci.components.a = VK_COMPONENT_SWIZZLE_A;
+		depth_image_view_ci.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+		depth_image_view_ci.subresourceRange.baseMipLevel = 0;
+		depth_image_view_ci.subresourceRange.levelCount = 1;
+		depth_image_view_ci.subresourceRange.baseArrayLayer = 0;
+		depth_image_view_ci.subresourceRange.layerCount = 1;
+		if (const auto result = vkCreateImageView(_device, &depth_image_view_ci, nullptr, &_depth_image_view))
+			vulkan_throw(result, "vkCreateImageView");
+
 		VkCommandPoolCreateInfo command_pool_ci = {};
 		command_pool_ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		command_pool_ci.pNext = nullptr;
@@ -265,6 +338,21 @@ namespace Yttrium
 		{
 			vkDestroyCommandPool(_device, _command_pool, nullptr);
 			_command_pool = VK_NULL_HANDLE;
+		}
+		if (_depth_image_view != VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(_device, _depth_image_view, nullptr);
+			_depth_image_view = VK_NULL_HANDLE;
+		}
+		if (_depth_memory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(_device, _depth_memory, nullptr);
+			_depth_memory = VK_NULL_HANDLE;
+		}
+		if (_depth_image != VK_NULL_HANDLE)
+		{
+			vkDestroyImage(_device, _depth_image, nullptr);
+			_depth_image = VK_NULL_HANDLE;
 		}
 		for (auto i = _image_views.rbegin(); i != _image_views.rend(); ++i)
 			if (*i != VK_NULL_HANDLE)

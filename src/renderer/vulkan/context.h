@@ -27,6 +27,9 @@ namespace Yttrium
 		VkDevice _device = VK_NULL_HANDLE;
 		VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 		std::vector<VkImageView> _image_views;
+		VkImage _depth_image = VK_NULL_HANDLE;
+		VkDeviceMemory _depth_memory = VK_NULL_HANDLE;
+		VkImageView _depth_image_view = VK_NULL_HANDLE;
 		VkCommandPool _command_pool = VK_NULL_HANDLE;
 		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
 	};
