@@ -1,7 +1,10 @@
 #include "context.h"
 
+#include <yttrium/math/matrix.h>
 #include "../../system/window.h"
 
+#include <cassert>
+#include <cstring>
 #include <stdexcept>
 
 namespace
@@ -139,6 +142,8 @@ namespace Yttrium
 		if (_physical_device == VK_NULL_HANDLE)
 			throw std::runtime_error{"No suitable physical device found"};
 
+		vkGetPhysicalDeviceMemoryProperties(_physical_device, &_gpu_memory_props);
+
 		VkSurfaceCapabilitiesKHR surface_caps = {};
 		CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &surface_caps));
 
@@ -254,24 +259,9 @@ namespace Yttrium
 		depth_image_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		CHECK(vkCreateImage(_device, &depth_image_ci, nullptr, &_depth_image));
 
-		VkMemoryRequirements depth_memory_reqs = {};
-		vkGetImageMemoryRequirements(_device, _depth_image, &depth_memory_reqs);
-
-		VkMemoryAllocateInfo depth_memory_ai = {};
-		depth_memory_ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		depth_memory_ai.pNext = nullptr;
-		depth_memory_ai.allocationSize = depth_memory_reqs.size;
-		depth_memory_ai.memoryTypeIndex = [this, &depth_memory_reqs]
-		{
-			VkPhysicalDeviceMemoryProperties props;
-			vkGetPhysicalDeviceMemoryProperties(_physical_device, &props);
-			for (uint32_t i = 0; i < props.memoryTypeCount; ++i)
-				if (depth_memory_reqs.memoryTypeBits & (1u << i))
-					if (props.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
-						return i;
-			throw std::runtime_error{"VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT memory not found"};
-		}();
-		CHECK(vkAllocateMemory(_device, &depth_memory_ai, nullptr, &_depth_memory));
+		VkMemoryRequirements depth_buffer_mr = {};
+		vkGetImageMemoryRequirements(_device, _depth_image, &depth_buffer_mr);
+		_depth_memory = allocate_memory(depth_buffer_mr, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 		CHECK(vkBindImageMemory(_device, _depth_image, _depth_memory, 0));
 
@@ -292,6 +282,23 @@ namespace Yttrium
 		depth_image_view_ci.subresourceRange.baseArrayLayer = 0;
 		depth_image_view_ci.subresourceRange.layerCount = 1;
 		CHECK(vkCreateImageView(_device, &depth_image_view_ci, nullptr, &_depth_image_view));
+
+		VkBufferCreateInfo uniform_buffer_ci = {};
+		uniform_buffer_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		uniform_buffer_ci.pNext = nullptr;
+		uniform_buffer_ci.flags = 0;
+		uniform_buffer_ci.size = 2 * sizeof(Matrix4);
+		uniform_buffer_ci.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+		uniform_buffer_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		uniform_buffer_ci.queueFamilyIndexCount = 0;
+		uniform_buffer_ci.pQueueFamilyIndices = nullptr;
+		CHECK(vkCreateBuffer(_device, &uniform_buffer_ci, nullptr, &_uniform_buffer));
+
+		VkMemoryRequirements uniform_buffer_mr = {};
+		vkGetBufferMemoryRequirements(_device, _uniform_buffer, &uniform_buffer_mr);
+		_uniform_buffer_memory = allocate_memory(uniform_buffer_mr, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		CHECK(vkBindBufferMemory(_device, _uniform_buffer, _uniform_buffer_memory, 0));
 
 		VkCommandPoolCreateInfo command_pool_ci = {};
 		command_pool_ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -321,20 +328,30 @@ namespace Yttrium
 			vkDestroyCommandPool(_device, _command_pool, nullptr);
 			_command_pool = VK_NULL_HANDLE;
 		}
+		if (_uniform_buffer != VK_NULL_HANDLE)
+		{
+			vkDestroyBuffer(_device, _uniform_buffer, nullptr);
+			_uniform_buffer = VK_NULL_HANDLE;
+		}
+		if (_uniform_buffer_memory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(_device, _uniform_buffer_memory, nullptr);
+			_uniform_buffer_memory = VK_NULL_HANDLE;
+		}
 		if (_depth_image_view != VK_NULL_HANDLE)
 		{
 			vkDestroyImageView(_device, _depth_image_view, nullptr);
 			_depth_image_view = VK_NULL_HANDLE;
 		}
-		if (_depth_memory != VK_NULL_HANDLE)
-		{
-			vkFreeMemory(_device, _depth_memory, nullptr);
-			_depth_memory = VK_NULL_HANDLE;
-		}
 		if (_depth_image != VK_NULL_HANDLE)
 		{
 			vkDestroyImage(_device, _depth_image, nullptr);
 			_depth_image = VK_NULL_HANDLE;
+		}
+		if (_depth_memory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(_device, _depth_memory, nullptr);
+			_depth_memory = VK_NULL_HANDLE;
 		}
 		for (auto i = _image_views.rbegin(); i != _image_views.rend(); ++i)
 			if (*i != VK_NULL_HANDLE)
@@ -360,5 +377,36 @@ namespace Yttrium
 			vkDestroyInstance(_instance, nullptr);
 			_instance = VK_NULL_HANDLE;
 		}
+	}
+
+	void VulkanContext::update_uniforms(const void* data, size_t size)
+	{
+		void* memory = nullptr;
+		CHECK(vkMapMemory(_device, _uniform_buffer_memory, 0, size, 0, &memory));
+		std::memcpy(memory, data, size);
+		vkUnmapMemory(_device, _uniform_buffer_memory);
+	}
+
+	VkDeviceMemory VulkanContext::allocate_memory(const VkMemoryRequirements& requirements, uint32_t flags) const
+	{
+		assert(_device);
+		VkMemoryAllocateInfo mai = {};
+		mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		mai.pNext = nullptr;
+		mai.allocationSize = requirements.size;
+		mai.memoryTypeIndex = find_memory_type(requirements.memoryTypeBits, flags);
+		VkDeviceMemory handle = VK_NULL_HANDLE;
+		CHECK(vkAllocateMemory(_device, &mai, nullptr, &handle));
+		return handle;
+	}
+
+	uint32_t VulkanContext::find_memory_type(uint32_t type_bits, uint32_t property_bits) const
+	{
+		assert(_physical_device);
+		for (uint32_t i = 0; i < _gpu_memory_props.memoryTypeCount; ++i)
+			if (type_bits & (1u << i))
+				if ((_gpu_memory_props.memoryTypes[i].propertyFlags & property_bits) == property_bits)
+					return i;
+		throw std::runtime_error{"No suitable memory type found"};
 	}
 }
