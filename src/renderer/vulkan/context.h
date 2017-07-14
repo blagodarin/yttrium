@@ -38,6 +38,11 @@ namespace Yttrium
 		VkImageView _depth_image_view = VK_NULL_HANDLE;
 		VkBuffer _uniform_buffer = VK_NULL_HANDLE;
 		VkDeviceMemory _uniform_buffer_memory = VK_NULL_HANDLE;
+		VkDescriptorSetLayout _descriptor_set_layout = VK_NULL_HANDLE;
+		VkPipelineLayout _pipeline_layout = VK_NULL_HANDLE;
+		VkDescriptorPool _descriptor_pool = VK_NULL_HANDLE;
+		VkDescriptorSet _descriptor_set = VK_NULL_HANDLE;
+		VkRenderPass _render_pass = VK_NULL_HANDLE;
 		VkCommandPool _command_pool = VK_NULL_HANDLE;
 		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
 	};

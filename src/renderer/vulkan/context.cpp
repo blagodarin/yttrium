@@ -300,6 +300,122 @@ namespace Yttrium
 
 		CHECK(vkBindBufferMemory(_device, _uniform_buffer, _uniform_buffer_memory, 0));
 
+		VkDescriptorSetLayoutBinding dslb = {};
+		dslb.binding = 0;
+		dslb.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		dslb.descriptorCount = 1;
+		dslb.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		dslb.pImmutableSamplers = nullptr;
+
+		VkDescriptorSetLayoutCreateInfo descriptor_set_layout_ci = {};
+		descriptor_set_layout_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		descriptor_set_layout_ci.pNext = nullptr;
+		descriptor_set_layout_ci.flags = 0;
+		descriptor_set_layout_ci.bindingCount = 1;
+		descriptor_set_layout_ci.pBindings = &dslb;
+		CHECK(vkCreateDescriptorSetLayout(_device, &descriptor_set_layout_ci, nullptr, &_descriptor_set_layout));
+
+		VkPipelineLayoutCreateInfo pipeline_layout_ci = {};
+		pipeline_layout_ci.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipeline_layout_ci.pNext = nullptr;
+		pipeline_layout_ci.flags = 0;
+		pipeline_layout_ci.setLayoutCount = 1;
+		pipeline_layout_ci.pSetLayouts = &_descriptor_set_layout;
+		pipeline_layout_ci.pushConstantRangeCount = 0;
+		pipeline_layout_ci.pPushConstantRanges = nullptr;
+		CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_ci, nullptr, &_pipeline_layout));
+
+		VkDescriptorPoolSize dps = {};
+		dps.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		dps.descriptorCount = 1;
+
+		VkDescriptorPoolCreateInfo descriptor_pool_ci = {};
+		descriptor_pool_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		descriptor_pool_ci.pNext = nullptr;
+		descriptor_pool_ci.flags = 0;
+		descriptor_pool_ci.maxSets = 1;
+		descriptor_pool_ci.poolSizeCount = 1;
+		descriptor_pool_ci.pPoolSizes = &dps;
+		CHECK(vkCreateDescriptorPool(_device, &descriptor_pool_ci, nullptr, &_descriptor_pool));
+
+		VkDescriptorSetAllocateInfo descriptor_set_ai = {};
+		descriptor_set_ai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptor_set_ai.pNext = nullptr;
+		descriptor_set_ai.descriptorPool = _descriptor_pool;
+		descriptor_set_ai.descriptorSetCount = 1;
+		descriptor_set_ai.pSetLayouts = &_descriptor_set_layout;
+		CHECK(vkAllocateDescriptorSets(_device, &descriptor_set_ai, &_descriptor_set));
+
+		VkDescriptorBufferInfo dbi = {};
+		dbi.buffer = _uniform_buffer;
+		dbi.offset = 0;
+		dbi.range = uniform_buffer_ci.size;
+
+		VkWriteDescriptorSet wds = {};
+		wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		wds.pNext = nullptr;
+		wds.dstSet = _descriptor_set;
+		wds.dstBinding = 0;
+		wds.dstArrayElement = 0;
+		wds.descriptorCount = 1;
+		wds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		wds.pImageInfo = nullptr;
+		wds.pBufferInfo = &dbi;
+		wds.pTexelBufferView = nullptr;
+		vkUpdateDescriptorSets(_device, 1, &wds, 0, nullptr);
+
+		std::array<VkAttachmentDescription, 2> attachments = {};
+		attachments[0].flags = 0;
+		attachments[0].format = swapchain_ci.imageFormat;
+		attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
+		attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		attachments[1].flags = 0;
+		attachments[1].format = depth_image_ci.format;
+		attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
+		attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		VkAttachmentReference color_reference = {};
+		color_reference.attachment = 0;
+		color_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkAttachmentReference depth_reference = {};
+		depth_reference.attachment = 1;
+		depth_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		VkSubpassDescription subpass = {};
+		subpass.flags = 0;
+		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.inputAttachmentCount = 0;
+		subpass.pInputAttachments = nullptr;
+		subpass.colorAttachmentCount = 1;
+		subpass.pColorAttachments = &color_reference;
+		subpass.pResolveAttachments = nullptr;
+		subpass.pDepthStencilAttachment = &depth_reference;
+		subpass.preserveAttachmentCount = 0;
+		subpass.pPreserveAttachments = nullptr;
+
+		VkRenderPassCreateInfo render_pass_ci = {};
+		render_pass_ci.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		render_pass_ci.pNext = nullptr;
+		render_pass_ci.flags = 0;
+		render_pass_ci.attachmentCount = attachments.size();
+		render_pass_ci.pAttachments = attachments.data();
+		render_pass_ci.subpassCount = 1;
+		render_pass_ci.pSubpasses = &subpass;
+		render_pass_ci.dependencyCount = 0;
+		render_pass_ci.pDependencies = nullptr;
+		CHECK(vkCreateRenderPass(_device, &render_pass_ci, nullptr, &_render_pass));
+
 		VkCommandPoolCreateInfo command_pool_ci = {};
 		command_pool_ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		command_pool_ci.pNext = nullptr;
@@ -327,6 +443,31 @@ namespace Yttrium
 		{
 			vkDestroyCommandPool(_device, _command_pool, nullptr);
 			_command_pool = VK_NULL_HANDLE;
+		}
+		if (_render_pass != VK_NULL_HANDLE)
+		{
+			vkDestroyRenderPass(_device, _render_pass, nullptr);
+			_render_pass = VK_NULL_HANDLE;
+		}
+		if (_descriptor_set != VK_NULL_HANDLE)
+		{
+			std::ignore = vkFreeDescriptorSets(_device, _descriptor_pool, 1, &_descriptor_set);
+			_descriptor_set = VK_NULL_HANDLE;
+		}
+		if (_descriptor_pool != VK_NULL_HANDLE)
+		{
+			vkDestroyDescriptorPool(_device, _descriptor_pool, nullptr);
+			_descriptor_pool = VK_NULL_HANDLE;
+		}
+		if (_pipeline_layout != VK_NULL_HANDLE)
+		{
+			vkDestroyPipelineLayout(_device, _pipeline_layout, nullptr);
+			_pipeline_layout = VK_NULL_HANDLE;
+		}
+		if (_descriptor_set_layout != VK_NULL_HANDLE)
+		{
+			vkDestroyDescriptorSetLayout(_device, _descriptor_set_layout, nullptr);
+			_descriptor_set_layout = VK_NULL_HANDLE;
 		}
 		if (_uniform_buffer != VK_NULL_HANDLE)
 		{
