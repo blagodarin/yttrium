@@ -9,19 +9,6 @@
 
 namespace
 {
-	const auto vulkan_instance_extensions =
-	{
-		VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef VK_USE_PLATFORM_XCB_KHR
-		VK_KHR_XCB_SURFACE_EXTENSION_NAME,
-#endif
-	};
-
-	const auto vulkan_device_extensions =
-	{
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	};
-
 	void vulkan_throw(VkResult result, const std::string& function)
 	{
 		const auto result_to_string = [result]() -> std::string
@@ -60,59 +47,64 @@ namespace
 		};
 		throw std::runtime_error{function.substr(0, function.find('(')) + " = " + result_to_string()};
 	}
-}
 
 #define CHECK(call) if (const auto result = (call)) vulkan_throw(result, #call);
 
-namespace Yttrium
-{
-	void VulkanContext::initialize(const WindowBackend& window)
+	VkInstance create_instance()
 	{
-		reset();
-
-		VkApplicationInfo ai = {};
-		ai.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		ai.pNext = nullptr;
-		ai.pApplicationName = nullptr;
-		ai.applicationVersion = 0;
-		ai.pEngineName = nullptr;
-		ai.engineVersion = 0;
-		ai.apiVersion = VK_API_VERSION_1_0;
-
-		VkInstanceCreateInfo instance_ci = {};
-		instance_ci.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		instance_ci.pNext = nullptr;
-		instance_ci.flags = 0;
-		instance_ci.pApplicationInfo = &ai;
-		instance_ci.enabledLayerCount = 0;
-		instance_ci.ppEnabledLayerNames = nullptr;
-		instance_ci.enabledExtensionCount = vulkan_instance_extensions.size();
-		instance_ci.ppEnabledExtensionNames = vulkan_instance_extensions.begin();
-		CHECK(vkCreateInstance(&instance_ci, nullptr, &_instance));
-
+		static const auto extensions =
+		{
+			VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef VK_USE_PLATFORM_XCB_KHR
-		VkXcbSurfaceCreateInfoKHR surface_ci = {};
-		surface_ci.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-		surface_ci.connection = window.xcb_connection();
-		surface_ci.window = window.xcb_window();
-		CHECK(vkCreateXcbSurfaceKHR(_instance, &surface_ci, nullptr, &_surface));
+			VK_KHR_XCB_SURFACE_EXTENSION_NAME,
 #endif
+		};
 
+		VkApplicationInfo application_info = {};
+		application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		application_info.pNext = nullptr;
+		application_info.pApplicationName = nullptr;
+		application_info.applicationVersion = 0;
+		application_info.pEngineName = nullptr;
+		application_info.engineVersion = 0;
+		application_info.apiVersion = VK_API_VERSION_1_0;
+
+		VkInstanceCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.pApplicationInfo = &application_info;
+		create_info.enabledLayerCount = 0;
+		create_info.ppEnabledLayerNames = nullptr;
+		create_info.enabledExtensionCount = extensions.size();
+		create_info.ppEnabledExtensionNames = extensions.begin();
+
+		VkInstance instance = VK_NULL_HANDLE;
+		CHECK(vkCreateInstance(&create_info, nullptr, &instance));
+		return instance;
+	}
+
+	VkSurfaceKHR create_surface(VkInstance instance, const Yttrium::WindowBackend& window)
+	{
+#ifdef VK_USE_PLATFORM_XCB_KHR
+		VkXcbSurfaceCreateInfoKHR create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+		create_info.connection = window.xcb_connection();
+		create_info.window = window.xcb_window();
+
+		VkSurfaceKHR surface = VK_NULL_HANDLE;
+		CHECK(vkCreateXcbSurfaceKHR(instance, &create_info, nullptr, &surface));
+		return surface;
+#endif
+	}
+
+	std::pair<VkPhysicalDevice, uint32_t> select_physical_device(VkInstance instance, VkSurfaceKHR surface)
+	{
 		uint32_t physical_device_count = 0;
-		CHECK(vkEnumeratePhysicalDevices(_instance, &physical_device_count, nullptr));
+		CHECK(vkEnumeratePhysicalDevices(instance, &physical_device_count, nullptr));
 
 		std::vector<VkPhysicalDevice> physical_devices(physical_device_count);
-		CHECK(vkEnumeratePhysicalDevices(_instance, &physical_device_count, physical_devices.data()));
-
-		const float queue_prioritiy = 0.f;
-
-		VkDeviceQueueCreateInfo device_queue_ci = {};
-		device_queue_ci.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		device_queue_ci.pNext = nullptr;
-		device_queue_ci.flags = 0;
-		device_queue_ci.queueFamilyIndex = 0;
-		device_queue_ci.queueCount = 1;
-		device_queue_ci.pQueuePriorities = &queue_prioritiy;
+		CHECK(vkEnumeratePhysicalDevices(instance, &physical_device_count, physical_devices.data()));
 
 		for (const auto physical_device : physical_devices)
 		{
@@ -128,136 +120,259 @@ namespace Yttrium
 					continue;
 
 				VkBool32 has_present_support = VK_FALSE;
-				CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, _surface, &has_present_support));
-
-				if (!has_present_support)
-					continue;
-
-				_physical_device = physical_device;
-				device_queue_ci.queueFamilyIndex = i; // TODO: Support separate queues for graphics and present.
-				break;
+				CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, surface, &has_present_support));
+				if (has_present_support)
+					return {physical_device, i}; // TODO: Support separate queues for graphics and present.
 			}
 		}
 
-		if (_physical_device == VK_NULL_HANDLE)
-			throw std::runtime_error{"No suitable physical device found"};
+		throw std::runtime_error{"No suitable physical device found"};
+	}
 
+	std::vector<VkSurfaceFormatKHR> get_surface_formats(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+	{
+		uint32_t count = 0;
+		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &count, nullptr));
+		std::vector<VkSurfaceFormatKHR> formats(count);
+		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &count, formats.data()));
+		if (formats.empty())
+			throw std::runtime_error{"No surface formats defined"};
+		else if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
+			formats.clear();
+		return formats;
+	}
+
+	VkDevice create_device(VkPhysicalDevice physical_device, uint32_t queue_family_index)
+	{
+		const float queue_prioritiy = 0.f;
+
+		VkDeviceQueueCreateInfo queue_create_info = {};
+		queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queue_create_info.pNext = nullptr;
+		queue_create_info.flags = 0;
+		queue_create_info.queueFamilyIndex = queue_family_index;
+		queue_create_info.queueCount = 1;
+		queue_create_info.pQueuePriorities = &queue_prioritiy;
+
+		static const auto extensions =
+		{
+			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		};
+
+		VkDeviceCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.queueCreateInfoCount = 1;
+		create_info.pQueueCreateInfos = &queue_create_info;
+		create_info.enabledLayerCount = 0;
+		create_info.ppEnabledLayerNames = nullptr;
+		create_info.enabledExtensionCount = extensions.size();
+		create_info.ppEnabledExtensionNames = extensions.begin();
+		create_info.pEnabledFeatures = nullptr;
+
+		VkDevice device = VK_NULL_HANDLE;
+		CHECK(vkCreateDevice(physical_device, &create_info, nullptr, &device));
+		return device;
+	}
+
+	std::vector<VkImage> get_swapchain_images(VkDevice device, VkSwapchainKHR swapchain)
+	{
+		uint32_t count = 0;
+		CHECK(vkGetSwapchainImagesKHR(device, swapchain, &count, nullptr));
+		std::vector<VkImage> images(count);
+		CHECK(vkGetSwapchainImagesKHR(device, swapchain, &count, images.data()));
+		return images;
+	}
+
+	VkImageView create_swapchain_view(VkDevice device, VkImage image, VkFormat format)
+	{
+		VkImageViewCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.image = image;
+		create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		create_info.format = format;
+		create_info.components.r = VK_COMPONENT_SWIZZLE_R;
+		create_info.components.g = VK_COMPONENT_SWIZZLE_G;
+		create_info.components.b = VK_COMPONENT_SWIZZLE_B;
+		create_info.components.a = VK_COMPONENT_SWIZZLE_A;
+		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		create_info.subresourceRange.baseMipLevel = 0;
+		create_info.subresourceRange.levelCount = 1;
+		create_info.subresourceRange.baseArrayLayer = 0;
+		create_info.subresourceRange.layerCount = 1;
+
+		VkImageView view = VK_NULL_HANDLE;
+		CHECK(vkCreateImageView(device, &create_info, nullptr, &view));
+		return view;
+	}
+
+	VkImage create_depth_image(VkDevice device, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling)
+	{
+		VkImageCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.imageType = VK_IMAGE_TYPE_2D;
+		create_info.format = format;
+		create_info.extent.width = width;
+		create_info.extent.height = height;
+		create_info.extent.depth = 1;
+		create_info.mipLevels = 1;
+		create_info.arrayLayers = 1;
+		create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+		create_info.tiling = tiling;
+		create_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		create_info.queueFamilyIndexCount = 0;
+		create_info.pQueueFamilyIndices = nullptr;
+		create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		VkImage image = VK_NULL_HANDLE;
+		CHECK(vkCreateImage(device, &create_info, nullptr, &image));
+		return image;
+	}
+
+	VkImageView create_depth_view(VkDevice device, VkImage image, VkFormat format)
+	{
+		VkImageViewCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.image = image;
+		create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		create_info.format = format;
+		create_info.components.r = VK_COMPONENT_SWIZZLE_R;
+		create_info.components.g = VK_COMPONENT_SWIZZLE_G;
+		create_info.components.b = VK_COMPONENT_SWIZZLE_B;
+		create_info.components.a = VK_COMPONENT_SWIZZLE_A;
+		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+		create_info.subresourceRange.baseMipLevel = 0;
+		create_info.subresourceRange.levelCount = 1;
+		create_info.subresourceRange.baseArrayLayer = 0;
+		create_info.subresourceRange.layerCount = 1;
+
+		VkImageView view = VK_NULL_HANDLE;
+		CHECK(vkCreateImageView(device, &create_info, nullptr, &view));
+		return view;
+	}
+
+	VkBuffer create_uniform_buffer(VkDevice device, uint32_t size)
+	{
+		VkBufferCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.size = size;
+		create_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		create_info.queueFamilyIndexCount = 0;
+		create_info.pQueueFamilyIndices = nullptr;
+
+		VkBuffer buffer = VK_NULL_HANDLE;
+		CHECK(vkCreateBuffer(device, &create_info, nullptr, &buffer));
+		return buffer;
+	}
+
+	VkCommandPool create_command_pool(VkDevice device, uint32_t queue_family_index)
+	{
+		VkCommandPoolCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.queueFamilyIndex = queue_family_index;
+
+		VkCommandPool command_pool = VK_NULL_HANDLE;
+		CHECK(vkCreateCommandPool(device, &create_info, nullptr, &command_pool));
+		return command_pool;
+	}
+
+	VkCommandBuffer allocate_command_buffer(VkDevice device, VkCommandPool pool)
+	{
+		VkCommandBufferAllocateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.commandPool = pool;
+		create_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		create_info.commandBufferCount = 1;
+
+		VkCommandBuffer command_buffer = VK_NULL_HANDLE;
+		CHECK(vkAllocateCommandBuffers(device, &create_info, &command_buffer));
+		return command_buffer;
+	}
+}
+
+namespace Yttrium
+{
+	void VulkanContext::initialize(const WindowBackend& window)
+	{
+		reset();
+
+		_instance = ::create_instance();
+		_surface = ::create_surface(_instance, window);
+		std::tie(_physical_device, _queue_family_index) = ::select_physical_device(_instance, _surface);
 		vkGetPhysicalDeviceMemoryProperties(_physical_device, &_gpu_memory_props);
 
-		VkSurfaceCapabilitiesKHR surface_caps = {};
-		CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &surface_caps));
+		const auto surface_formats = ::get_surface_formats(_physical_device, _surface);
 
-		if (surface_caps.currentExtent.width == 0xffffffff && surface_caps.currentExtent.height == 0xffffffff)
+		VkSurfaceCapabilitiesKHR surface_capabilities = {};
+		CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &surface_capabilities));
+		if (surface_capabilities.currentExtent.width == 0xffffffff && surface_capabilities.currentExtent.height == 0xffffffff)
 			throw std::runtime_error{"Bad surface size"};
 
-		uint32_t surface_format_count = 0;
-		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, _surface, &surface_format_count, nullptr));
+		_device = ::create_device(_physical_device, _queue_family_index);
 
-		std::vector<VkSurfaceFormatKHR> surface_formats(surface_format_count);
-		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, _surface, &surface_format_count, surface_formats.data()));
+		const auto swapchain_image_format = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
+		const auto swapchain_color_space = surface_formats.empty() ? VK_COLOR_SPACE_SRGB_NONLINEAR_KHR : surface_formats[0].colorSpace;
 
-		if (surface_formats.empty())
-			throw std::runtime_error{"No surface formats defined"};
-		else if (surface_formats.size() == 1 && surface_formats[0].format == VK_FORMAT_UNDEFINED)
-			surface_formats.clear();
-
-		VkDeviceCreateInfo device_ci = {};
-		device_ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		device_ci.pNext = nullptr;
-		device_ci.flags = 0;
-		device_ci.queueCreateInfoCount = 1;
-		device_ci.pQueueCreateInfos = &device_queue_ci;
-		device_ci.enabledLayerCount = 0;
-		device_ci.ppEnabledLayerNames = nullptr;
-		device_ci.enabledExtensionCount = vulkan_device_extensions.size();
-		device_ci.ppEnabledExtensionNames = vulkan_device_extensions.begin();
-		device_ci.pEnabledFeatures = nullptr;
-		CHECK(vkCreateDevice(_physical_device, &device_ci, nullptr, &_device));
-
-		VkSwapchainCreateInfoKHR swapchain_ci = {};
-		swapchain_ci.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchain_ci.pNext = nullptr;
-		swapchain_ci.flags = 0;
-		swapchain_ci.surface = _surface;
-		swapchain_ci.minImageCount = surface_caps.minImageCount;
-		swapchain_ci.imageFormat = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
-		swapchain_ci.imageColorSpace = surface_formats.empty() ? VK_COLOR_SPACE_SRGB_NONLINEAR_KHR : surface_formats[0].colorSpace;
-		swapchain_ci.imageExtent = surface_caps.currentExtent;
-		swapchain_ci.imageArrayLayers = 1;
-		swapchain_ci.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-		swapchain_ci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		swapchain_ci.queueFamilyIndexCount = 0;
-		swapchain_ci.pQueueFamilyIndices = nullptr;
-		swapchain_ci.preTransform = surface_caps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : surface_caps.currentTransform;
-		swapchain_ci.compositeAlpha = [&surface_caps]
 		{
-			for (const auto bit : {VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR})
-				if (surface_caps.supportedCompositeAlpha & static_cast<VkFlags>(bit))
-					return bit;
-			return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-		}();
-		swapchain_ci.presentMode = VK_PRESENT_MODE_FIFO_KHR;
-		swapchain_ci.clipped = VK_TRUE;
-		swapchain_ci.oldSwapchain = VK_NULL_HANDLE;
-		CHECK(vkCreateSwapchainKHR(_device, &swapchain_ci, nullptr, &_swapchain));
-
-		uint32_t swapchain_image_count = 0;
-		CHECK(vkGetSwapchainImagesKHR(_device, _swapchain, &swapchain_image_count, nullptr));
-
-		std::vector<VkImage> swapchain_images(swapchain_image_count);
-		CHECK(vkGetSwapchainImagesKHR(_device, _swapchain, &swapchain_image_count, swapchain_images.data()));
-
-		_image_views.resize(swapchain_image_count, VK_NULL_HANDLE);
-		for (uint32_t i = 0; i < swapchain_image_count; ++i)
-		{
-			VkImageViewCreateInfo image_view_ci = {};
-			image_view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			image_view_ci.pNext = nullptr;
-			image_view_ci.flags = 0;
-			image_view_ci.image = swapchain_images[i];
-			image_view_ci.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			image_view_ci.format = swapchain_ci.imageFormat;
-			image_view_ci.components.r = VK_COMPONENT_SWIZZLE_R;
-			image_view_ci.components.g = VK_COMPONENT_SWIZZLE_G;
-			image_view_ci.components.b = VK_COMPONENT_SWIZZLE_B;
-			image_view_ci.components.a = VK_COMPONENT_SWIZZLE_A;
-			image_view_ci.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			image_view_ci.subresourceRange.baseMipLevel = 0;
-			image_view_ci.subresourceRange.levelCount = 1;
-			image_view_ci.subresourceRange.baseArrayLayer = 0;
-			image_view_ci.subresourceRange.layerCount = 1;
-			CHECK(vkCreateImageView(_device, &image_view_ci, nullptr, &_image_views[i]));
+			VkSwapchainCreateInfoKHR swapchain_ci = {};
+			swapchain_ci.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+			swapchain_ci.pNext = nullptr;
+			swapchain_ci.flags = 0;
+			swapchain_ci.surface = _surface;
+			swapchain_ci.minImageCount = surface_capabilities.minImageCount;
+			swapchain_ci.imageFormat = swapchain_image_format;
+			swapchain_ci.imageColorSpace = swapchain_color_space;
+			swapchain_ci.imageExtent = surface_capabilities.currentExtent;
+			swapchain_ci.imageArrayLayers = 1;
+			swapchain_ci.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			swapchain_ci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			swapchain_ci.queueFamilyIndexCount = 0;
+			swapchain_ci.pQueueFamilyIndices = nullptr;
+			swapchain_ci.preTransform = surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : surface_capabilities.currentTransform;
+			swapchain_ci.compositeAlpha = [&surface_capabilities]
+			{
+				for (const auto bit : {VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR})
+					if (surface_capabilities.supportedCompositeAlpha & static_cast<VkFlags>(bit))
+						return bit;
+				return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+			}();
+			swapchain_ci.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+			swapchain_ci.clipped = VK_TRUE;
+			swapchain_ci.oldSwapchain = VK_NULL_HANDLE;
+			CHECK(vkCreateSwapchainKHR(_device, &swapchain_ci, nullptr, &_swapchain));
 		}
 
-		VkImageCreateInfo depth_image_ci = {};
-		depth_image_ci.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		depth_image_ci.pNext = nullptr;
-		depth_image_ci.flags = 0;
-		depth_image_ci.imageType = VK_IMAGE_TYPE_2D;
-		depth_image_ci.format = VK_FORMAT_D16_UNORM;
-		depth_image_ci.extent.width = surface_caps.currentExtent.width;
-		depth_image_ci.extent.height = surface_caps.currentExtent.height;
-		depth_image_ci.extent.depth = 1;
-		depth_image_ci.mipLevels = 1;
-		depth_image_ci.arrayLayers = 1;
-		depth_image_ci.samples = VK_SAMPLE_COUNT_1_BIT;
-		depth_image_ci.tiling = [this, &depth_image_ci]
+		for (const auto image : ::get_swapchain_images(_device, _swapchain))
+			_image_views.emplace_back(::create_swapchain_view(_device, image, swapchain_image_format));
+
+		const auto depth_image_format = VK_FORMAT_D16_UNORM;
+		const auto depth_image_tiling = [this, depth_image_format]
 		{
 			VkFormatProperties depth_format_props = {};
-			vkGetPhysicalDeviceFormatProperties(_physical_device, depth_image_ci.format, &depth_format_props);
+			vkGetPhysicalDeviceFormatProperties(_physical_device, depth_image_format, &depth_format_props);
 			if (depth_format_props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
 				return VK_IMAGE_TILING_LINEAR;
 			else if (depth_format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
 				return VK_IMAGE_TILING_OPTIMAL;
 			else
-				throw std::runtime_error{"VK_FORMAT_D16_UNORM is not supported"};
+				throw std::runtime_error{"Depth buffer format is not supported"};
 		}();
-		depth_image_ci.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		depth_image_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		depth_image_ci.queueFamilyIndexCount = 0;
-		depth_image_ci.pQueueFamilyIndices = nullptr;
-		depth_image_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		CHECK(vkCreateImage(_device, &depth_image_ci, nullptr, &_depth_image));
+
+		_depth_image = ::create_depth_image(_device, surface_capabilities.currentExtent.width, surface_capabilities.currentExtent.height, depth_image_format, depth_image_tiling);
 
 		VkMemoryRequirements depth_buffer_mr = {};
 		vkGetImageMemoryRequirements(_device, _depth_image, &depth_buffer_mr);
@@ -265,34 +380,10 @@ namespace Yttrium
 
 		CHECK(vkBindImageMemory(_device, _depth_image, _depth_memory, 0));
 
-		VkImageViewCreateInfo depth_image_view_ci = {};
-		depth_image_view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		depth_image_view_ci.pNext = nullptr;
-		depth_image_view_ci.flags = 0;
-		depth_image_view_ci.image = _depth_image;
-		depth_image_view_ci.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		depth_image_view_ci.format = depth_image_ci.format;
-		depth_image_view_ci.components.r = VK_COMPONENT_SWIZZLE_R;
-		depth_image_view_ci.components.g = VK_COMPONENT_SWIZZLE_G;
-		depth_image_view_ci.components.b = VK_COMPONENT_SWIZZLE_B;
-		depth_image_view_ci.components.a = VK_COMPONENT_SWIZZLE_A;
-		depth_image_view_ci.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		depth_image_view_ci.subresourceRange.baseMipLevel = 0;
-		depth_image_view_ci.subresourceRange.levelCount = 1;
-		depth_image_view_ci.subresourceRange.baseArrayLayer = 0;
-		depth_image_view_ci.subresourceRange.layerCount = 1;
-		CHECK(vkCreateImageView(_device, &depth_image_view_ci, nullptr, &_depth_image_view));
+		_depth_image_view = ::create_depth_view(_device, _depth_image, depth_image_format);
 
-		VkBufferCreateInfo uniform_buffer_ci = {};
-		uniform_buffer_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		uniform_buffer_ci.pNext = nullptr;
-		uniform_buffer_ci.flags = 0;
-		uniform_buffer_ci.size = 2 * sizeof(Matrix4);
-		uniform_buffer_ci.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-		uniform_buffer_ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		uniform_buffer_ci.queueFamilyIndexCount = 0;
-		uniform_buffer_ci.pQueueFamilyIndices = nullptr;
-		CHECK(vkCreateBuffer(_device, &uniform_buffer_ci, nullptr, &_uniform_buffer));
+		const auto uniform_buffer_size = 2 * sizeof(Matrix4);
+		_uniform_buffer = ::create_uniform_buffer(_device, uniform_buffer_size);
 
 		VkMemoryRequirements uniform_buffer_mr = {};
 		vkGetBufferMemoryRequirements(_device, _uniform_buffer, &uniform_buffer_mr);
@@ -300,136 +391,136 @@ namespace Yttrium
 
 		CHECK(vkBindBufferMemory(_device, _uniform_buffer, _uniform_buffer_memory, 0));
 
-		VkDescriptorSetLayoutBinding dslb = {};
-		dslb.binding = 0;
-		dslb.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		dslb.descriptorCount = 1;
-		dslb.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-		dslb.pImmutableSamplers = nullptr;
+		{
+			VkDescriptorSetLayoutBinding dslb = {};
+			dslb.binding = 0;
+			dslb.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			dslb.descriptorCount = 1;
+			dslb.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+			dslb.pImmutableSamplers = nullptr;
 
-		VkDescriptorSetLayoutCreateInfo descriptor_set_layout_ci = {};
-		descriptor_set_layout_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		descriptor_set_layout_ci.pNext = nullptr;
-		descriptor_set_layout_ci.flags = 0;
-		descriptor_set_layout_ci.bindingCount = 1;
-		descriptor_set_layout_ci.pBindings = &dslb;
-		CHECK(vkCreateDescriptorSetLayout(_device, &descriptor_set_layout_ci, nullptr, &_descriptor_set_layout));
+			VkDescriptorSetLayoutCreateInfo descriptor_set_layout_ci = {};
+			descriptor_set_layout_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			descriptor_set_layout_ci.pNext = nullptr;
+			descriptor_set_layout_ci.flags = 0;
+			descriptor_set_layout_ci.bindingCount = 1;
+			descriptor_set_layout_ci.pBindings = &dslb;
+			CHECK(vkCreateDescriptorSetLayout(_device, &descriptor_set_layout_ci, nullptr, &_descriptor_set_layout));
+		}
 
-		VkPipelineLayoutCreateInfo pipeline_layout_ci = {};
-		pipeline_layout_ci.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipeline_layout_ci.pNext = nullptr;
-		pipeline_layout_ci.flags = 0;
-		pipeline_layout_ci.setLayoutCount = 1;
-		pipeline_layout_ci.pSetLayouts = &_descriptor_set_layout;
-		pipeline_layout_ci.pushConstantRangeCount = 0;
-		pipeline_layout_ci.pPushConstantRanges = nullptr;
-		CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_ci, nullptr, &_pipeline_layout));
+		{
+			VkPipelineLayoutCreateInfo pipeline_layout_ci = {};
+			pipeline_layout_ci.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+			pipeline_layout_ci.pNext = nullptr;
+			pipeline_layout_ci.flags = 0;
+			pipeline_layout_ci.setLayoutCount = 1;
+			pipeline_layout_ci.pSetLayouts = &_descriptor_set_layout;
+			pipeline_layout_ci.pushConstantRangeCount = 0;
+			pipeline_layout_ci.pPushConstantRanges = nullptr;
+			CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_ci, nullptr, &_pipeline_layout));
+		}
 
-		VkDescriptorPoolSize dps = {};
-		dps.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		dps.descriptorCount = 1;
+		{
+			VkDescriptorPoolSize dps = {};
+			dps.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			dps.descriptorCount = 1;
 
-		VkDescriptorPoolCreateInfo descriptor_pool_ci = {};
-		descriptor_pool_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		descriptor_pool_ci.pNext = nullptr;
-		descriptor_pool_ci.flags = 0;
-		descriptor_pool_ci.maxSets = 1;
-		descriptor_pool_ci.poolSizeCount = 1;
-		descriptor_pool_ci.pPoolSizes = &dps;
-		CHECK(vkCreateDescriptorPool(_device, &descriptor_pool_ci, nullptr, &_descriptor_pool));
+			VkDescriptorPoolCreateInfo descriptor_pool_ci = {};
+			descriptor_pool_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+			descriptor_pool_ci.pNext = nullptr;
+			descriptor_pool_ci.flags = 0;
+			descriptor_pool_ci.maxSets = 1;
+			descriptor_pool_ci.poolSizeCount = 1;
+			descriptor_pool_ci.pPoolSizes = &dps;
+			CHECK(vkCreateDescriptorPool(_device, &descriptor_pool_ci, nullptr, &_descriptor_pool));
+		}
 
-		VkDescriptorSetAllocateInfo descriptor_set_ai = {};
-		descriptor_set_ai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptor_set_ai.pNext = nullptr;
-		descriptor_set_ai.descriptorPool = _descriptor_pool;
-		descriptor_set_ai.descriptorSetCount = 1;
-		descriptor_set_ai.pSetLayouts = &_descriptor_set_layout;
-		CHECK(vkAllocateDescriptorSets(_device, &descriptor_set_ai, &_descriptor_set));
+		{
+			VkDescriptorSetAllocateInfo descriptor_set_ai = {};
+			descriptor_set_ai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			descriptor_set_ai.pNext = nullptr;
+			descriptor_set_ai.descriptorPool = _descriptor_pool;
+			descriptor_set_ai.descriptorSetCount = 1;
+			descriptor_set_ai.pSetLayouts = &_descriptor_set_layout;
+			CHECK(vkAllocateDescriptorSets(_device, &descriptor_set_ai, &_descriptor_set));
+		}
 
-		VkDescriptorBufferInfo dbi = {};
-		dbi.buffer = _uniform_buffer;
-		dbi.offset = 0;
-		dbi.range = uniform_buffer_ci.size;
+		{
+			VkDescriptorBufferInfo dbi = {};
+			dbi.buffer = _uniform_buffer;
+			dbi.offset = 0;
+			dbi.range = uniform_buffer_size;
 
-		VkWriteDescriptorSet wds = {};
-		wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		wds.pNext = nullptr;
-		wds.dstSet = _descriptor_set;
-		wds.dstBinding = 0;
-		wds.dstArrayElement = 0;
-		wds.descriptorCount = 1;
-		wds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		wds.pImageInfo = nullptr;
-		wds.pBufferInfo = &dbi;
-		wds.pTexelBufferView = nullptr;
-		vkUpdateDescriptorSets(_device, 1, &wds, 0, nullptr);
+			VkWriteDescriptorSet wds = {};
+			wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			wds.pNext = nullptr;
+			wds.dstSet = _descriptor_set;
+			wds.dstBinding = 0;
+			wds.dstArrayElement = 0;
+			wds.descriptorCount = 1;
+			wds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			wds.pImageInfo = nullptr;
+			wds.pBufferInfo = &dbi;
+			wds.pTexelBufferView = nullptr;
+			vkUpdateDescriptorSets(_device, 1, &wds, 0, nullptr);
+		}
 
-		std::array<VkAttachmentDescription, 2> attachments = {};
-		attachments[0].flags = 0;
-		attachments[0].format = swapchain_ci.imageFormat;
-		attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
-		attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		attachments[1].flags = 0;
-		attachments[1].format = depth_image_ci.format;
-		attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
-		attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		{
+			std::array<VkAttachmentDescription, 2> attachments = {};
+			attachments[0].flags = 0;
+			attachments[0].format = swapchain_image_format;
+			attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
+			attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			attachments[1].flags = 0;
+			attachments[1].format = depth_image_format;
+			attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
+			attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference color_reference = {};
-		color_reference.attachment = 0;
-		color_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			VkAttachmentReference color_reference = {};
+			color_reference.attachment = 0;
+			color_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference depth_reference = {};
-		depth_reference.attachment = 1;
-		depth_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			VkAttachmentReference depth_reference = {};
+			depth_reference.attachment = 1;
+			depth_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkSubpassDescription subpass = {};
-		subpass.flags = 0;
-		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.inputAttachmentCount = 0;
-		subpass.pInputAttachments = nullptr;
-		subpass.colorAttachmentCount = 1;
-		subpass.pColorAttachments = &color_reference;
-		subpass.pResolveAttachments = nullptr;
-		subpass.pDepthStencilAttachment = &depth_reference;
-		subpass.preserveAttachmentCount = 0;
-		subpass.pPreserveAttachments = nullptr;
+			VkSubpassDescription subpass = {};
+			subpass.flags = 0;
+			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+			subpass.inputAttachmentCount = 0;
+			subpass.pInputAttachments = nullptr;
+			subpass.colorAttachmentCount = 1;
+			subpass.pColorAttachments = &color_reference;
+			subpass.pResolveAttachments = nullptr;
+			subpass.pDepthStencilAttachment = &depth_reference;
+			subpass.preserveAttachmentCount = 0;
+			subpass.pPreserveAttachments = nullptr;
 
-		VkRenderPassCreateInfo render_pass_ci = {};
-		render_pass_ci.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		render_pass_ci.pNext = nullptr;
-		render_pass_ci.flags = 0;
-		render_pass_ci.attachmentCount = attachments.size();
-		render_pass_ci.pAttachments = attachments.data();
-		render_pass_ci.subpassCount = 1;
-		render_pass_ci.pSubpasses = &subpass;
-		render_pass_ci.dependencyCount = 0;
-		render_pass_ci.pDependencies = nullptr;
-		CHECK(vkCreateRenderPass(_device, &render_pass_ci, nullptr, &_render_pass));
+			VkRenderPassCreateInfo render_pass_ci = {};
+			render_pass_ci.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+			render_pass_ci.pNext = nullptr;
+			render_pass_ci.flags = 0;
+			render_pass_ci.attachmentCount = attachments.size();
+			render_pass_ci.pAttachments = attachments.data();
+			render_pass_ci.subpassCount = 1;
+			render_pass_ci.pSubpasses = &subpass;
+			render_pass_ci.dependencyCount = 0;
+			render_pass_ci.pDependencies = nullptr;
+			CHECK(vkCreateRenderPass(_device, &render_pass_ci, nullptr, &_render_pass));
+		}
 
-		VkCommandPoolCreateInfo command_pool_ci = {};
-		command_pool_ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		command_pool_ci.pNext = nullptr;
-		command_pool_ci.flags = 0;
-		command_pool_ci.queueFamilyIndex = device_queue_ci.queueFamilyIndex;
-		CHECK(vkCreateCommandPool(_device, &command_pool_ci, nullptr, &_command_pool));
-
-		VkCommandBufferAllocateInfo command_buffer_ai = {};
-		command_buffer_ai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		command_buffer_ai.pNext = nullptr;
-		command_buffer_ai.commandPool = _command_pool;
-		command_buffer_ai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		command_buffer_ai.commandBufferCount = 1;
-		CHECK(vkAllocateCommandBuffers(_device, &command_buffer_ai, &_command_buffer));
+		_command_pool = ::create_command_pool(_device, _queue_family_index);
+		_command_buffer = ::allocate_command_buffer(_device, _command_pool);
 	}
 
 	void VulkanContext::reset() noexcept
@@ -494,9 +585,8 @@ namespace Yttrium
 			vkFreeMemory(_device, _depth_memory, nullptr);
 			_depth_memory = VK_NULL_HANDLE;
 		}
-		for (auto i = _image_views.rbegin(); i != _image_views.rend(); ++i)
-			if (*i != VK_NULL_HANDLE)
-				vkDestroyImageView(_device, *i, nullptr);
+		for (const auto view : _image_views)
+			vkDestroyImageView(_device, view, nullptr);
 		_image_views.clear();
 		if (_swapchain != VK_NULL_HANDLE)
 		{

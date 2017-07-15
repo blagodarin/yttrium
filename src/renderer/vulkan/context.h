@@ -29,6 +29,7 @@ namespace Yttrium
 		VkInstance _instance = VK_NULL_HANDLE;
 		VkSurfaceKHR _surface = VK_NULL_HANDLE;
 		VkPhysicalDevice _physical_device = VK_NULL_HANDLE;
+		uint32_t _queue_family_index = 0;
 		VkPhysicalDeviceMemoryProperties _gpu_memory_props = {};
 		VkDevice _device = VK_NULL_HANDLE;
 		VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
