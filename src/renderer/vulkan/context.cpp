@@ -210,56 +210,6 @@ namespace
 		return view;
 	}
 
-	VkImage create_depth_image(VkDevice device, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling)
-	{
-		VkImageCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.imageType = VK_IMAGE_TYPE_2D;
-		create_info.format = format;
-		create_info.extent.width = width;
-		create_info.extent.height = height;
-		create_info.extent.depth = 1;
-		create_info.mipLevels = 1;
-		create_info.arrayLayers = 1;
-		create_info.samples = VK_SAMPLE_COUNT_1_BIT;
-		create_info.tiling = tiling;
-		create_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		create_info.queueFamilyIndexCount = 0;
-		create_info.pQueueFamilyIndices = nullptr;
-		create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-		VkImage image = VK_NULL_HANDLE;
-		CHECK(vkCreateImage(device, &create_info, nullptr, &image));
-		return image;
-	}
-
-	VkImageView create_depth_view(VkDevice device, VkImage image, VkFormat format)
-	{
-		VkImageViewCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.image = image;
-		create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		create_info.format = format;
-		create_info.components.r = VK_COMPONENT_SWIZZLE_R;
-		create_info.components.g = VK_COMPONENT_SWIZZLE_G;
-		create_info.components.b = VK_COMPONENT_SWIZZLE_B;
-		create_info.components.a = VK_COMPONENT_SWIZZLE_A;
-		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		create_info.subresourceRange.baseMipLevel = 0;
-		create_info.subresourceRange.levelCount = 1;
-		create_info.subresourceRange.baseArrayLayer = 0;
-		create_info.subresourceRange.layerCount = 1;
-
-		VkImageView view = VK_NULL_HANDLE;
-		CHECK(vkCreateImageView(device, &create_info, nullptr, &view));
-		return view;
-	}
-
 	VkCommandPool create_command_pool(VkDevice device, uint32_t queue_family_index)
 	{
 		VkCommandPoolCreateInfo create_info = {};
@@ -329,8 +279,8 @@ namespace Yttrium
 		assert(memory != VK_NULL_HANDLE);
 		assert(_buffer != VK_NULL_HANDLE && _memory == VK_NULL_HANDLE);
 
-		CHECK(vkBindBufferMemory(_device, _buffer, memory, 0));
 		_memory = memory;
+		CHECK(vkBindBufferMemory(_device, _buffer, memory, 0));
 	}
 
 	void VK_Buffer::write(const void* data, size_t size)
@@ -341,6 +291,84 @@ namespace Yttrium
 		CHECK(vkMapMemory(_device, _memory, 0, size, 0, &mapped_memory));
 		std::memcpy(mapped_memory, data, size);
 		vkUnmapMemory(_device, _memory);
+	}
+
+	VK_DepthBuffer::~VK_DepthBuffer() noexcept
+	{
+		if (_view != VK_NULL_HANDLE)
+			vkDestroyImageView(_device, _view, nullptr);
+		if (_image != VK_NULL_HANDLE)
+			vkDestroyImage(_device, _image, nullptr);
+		if (_memory != VK_NULL_HANDLE)
+			vkFreeMemory(_device, _memory, nullptr);
+	}
+
+	void VK_DepthBuffer::create_image(uint32_t width, uint32_t height, VkImageTiling tiling)
+	{
+		assert(_image == VK_NULL_HANDLE);
+
+		VkImageCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.imageType = VK_IMAGE_TYPE_2D;
+		create_info.format = _format;
+		create_info.extent.width = width;
+		create_info.extent.height = height;
+		create_info.extent.depth = 1;
+		create_info.mipLevels = 1;
+		create_info.arrayLayers = 1;
+		create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+		create_info.tiling = tiling;
+		create_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		create_info.queueFamilyIndexCount = 0;
+		create_info.pQueueFamilyIndices = nullptr;
+		create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		CHECK(vkCreateImage(_device, &create_info, nullptr, &_image));
+	}
+
+	VkMemoryRequirements VK_DepthBuffer::memory_requirements() const noexcept
+	{
+		assert(_image != VK_NULL_HANDLE);
+
+		VkMemoryRequirements result;
+		vkGetImageMemoryRequirements(_device, _image, &result);
+		return result;
+	}
+
+	void VK_DepthBuffer::bind_memory(VkDeviceMemory memory)
+	{
+		assert(memory != VK_NULL_HANDLE);
+		assert(_image != VK_NULL_HANDLE && _memory == VK_NULL_HANDLE);
+
+		_memory = memory;
+		CHECK(vkBindImageMemory(_device, _image, _memory, 0));
+	}
+
+	void VK_DepthBuffer::create_view()
+	{
+		assert(_view == VK_NULL_HANDLE);
+
+		VkImageViewCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.image = _image;
+		create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		create_info.format = _format;
+		create_info.components.r = VK_COMPONENT_SWIZZLE_R;
+		create_info.components.g = VK_COMPONENT_SWIZZLE_G;
+		create_info.components.b = VK_COMPONENT_SWIZZLE_B;
+		create_info.components.a = VK_COMPONENT_SWIZZLE_A;
+		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+		create_info.subresourceRange.baseMipLevel = 0;
+		create_info.subresourceRange.levelCount = 1;
+		create_info.subresourceRange.baseArrayLayer = 0;
+		create_info.subresourceRange.layerCount = 1;
+
+		CHECK(vkCreateImageView(_device, &create_info, nullptr, &_view));
 	}
 
 	void VulkanContext::initialize(const WindowBackend& window)
@@ -395,33 +423,22 @@ namespace Yttrium
 		}
 
 		for (const auto image : ::get_swapchain_images(_device, _swapchain))
-			_image_views.emplace_back(::create_swapchain_view(_device, image, swapchain_image_format));
+			_swapchain_views.emplace_back(::create_swapchain_view(_device, image, swapchain_image_format));
 
-		const auto depth_image_format = VK_FORMAT_D16_UNORM;
-
+		_depth_buffer = std::make_unique<VK_DepthBuffer>(_device, VK_FORMAT_D16_UNORM);
+		_depth_buffer->create_image(surface_capabilities.currentExtent.width, surface_capabilities.currentExtent.height, [this]
 		{
-			const auto depth_image_tiling = [this, depth_image_format]
-			{
-				VkFormatProperties depth_format_props = {};
-				vkGetPhysicalDeviceFormatProperties(_physical_device, depth_image_format, &depth_format_props);
-				if (depth_format_props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
-					return VK_IMAGE_TILING_LINEAR;
-				else if (depth_format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
-					return VK_IMAGE_TILING_OPTIMAL;
-				else
-					throw std::runtime_error{"Depth buffer format is not supported"};
-			}();
-
-			_depth_image = ::create_depth_image(_device, surface_capabilities.currentExtent.width, surface_capabilities.currentExtent.height, depth_image_format, depth_image_tiling);
-
-			VkMemoryRequirements depth_buffer_mr = {};
-			vkGetImageMemoryRequirements(_device, _depth_image, &depth_buffer_mr);
-			_depth_memory = allocate_memory(depth_buffer_mr, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-			CHECK(vkBindImageMemory(_device, _depth_image, _depth_memory, 0));
-		}
-
-		_depth_image_view = ::create_depth_view(_device, _depth_image, depth_image_format);
+			VkFormatProperties depth_format_props = {};
+			vkGetPhysicalDeviceFormatProperties(_physical_device, _depth_buffer->_format, &depth_format_props);
+			if (depth_format_props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+				return VK_IMAGE_TILING_LINEAR;
+			else if (depth_format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+				return VK_IMAGE_TILING_OPTIMAL;
+			else
+				throw std::runtime_error{"Depth buffer format is not supported"};
+		}());
+		_depth_buffer->bind_memory(allocate_memory(_depth_buffer->memory_requirements(), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+		_depth_buffer->create_view();
 
 		const auto uniform_buffer_size = 2 * sizeof(Matrix4);
 		_uniform_buffer = std::make_unique<VK_Buffer>(_device);
@@ -519,7 +536,7 @@ namespace Yttrium
 			attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 			attachments[1].flags = 0;
-			attachments[1].format = depth_image_format;
+			attachments[1].format = _depth_buffer->_format;
 			attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
 			attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -563,7 +580,7 @@ namespace Yttrium
 		}
 
 		{
-			std::array<VkImageView, 2> attachments{VK_NULL_HANDLE, _depth_image_view};
+			std::array<VkImageView, 2> attachments{VK_NULL_HANDLE, _depth_buffer->_view};
 
 			VkFramebufferCreateInfo create_info = {};
 			create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -576,10 +593,10 @@ namespace Yttrium
 			create_info.height = surface_capabilities.currentExtent.height;
 			create_info.layers = 1;
 
-			_framebuffers.reserve(_image_views.size());
-			for (const auto swapchain_image : _image_views)
+			_framebuffers.reserve(_swapchain_views.size());
+			for (const auto swapchain_view : _swapchain_views)
 			{
-				attachments[0] = swapchain_image;
+				attachments[0] = swapchain_view;
 
 				VkFramebuffer framebuffer = VK_NULL_HANDLE;
 				CHECK(vkCreateFramebuffer(_device, &create_info, nullptr, &framebuffer));
@@ -721,24 +738,10 @@ namespace Yttrium
 			_descriptor_set_layout = VK_NULL_HANDLE;
 		}
 		_uniform_buffer.reset();
-		if (_depth_image_view != VK_NULL_HANDLE)
-		{
-			vkDestroyImageView(_device, _depth_image_view, nullptr);
-			_depth_image_view = VK_NULL_HANDLE;
-		}
-		if (_depth_image != VK_NULL_HANDLE)
-		{
-			vkDestroyImage(_device, _depth_image, nullptr);
-			_depth_image = VK_NULL_HANDLE;
-		}
-		if (_depth_memory != VK_NULL_HANDLE)
-		{
-			vkFreeMemory(_device, _depth_memory, nullptr);
-			_depth_memory = VK_NULL_HANDLE;
-		}
-		for (const auto view : _image_views)
+		_depth_buffer.reset();
+		for (const auto view : _swapchain_views)
 			vkDestroyImageView(_device, view, nullptr);
-		_image_views.clear();
+		_swapchain_views.clear();
 		if (_swapchain != VK_NULL_HANDLE)
 		{
 			vkDestroySwapchainKHR(_device, _swapchain, nullptr);

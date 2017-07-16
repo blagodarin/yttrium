@@ -25,6 +25,23 @@ namespace Yttrium
 		void write(const void*, size_t);
 	};
 
+	struct VK_DepthBuffer
+	{
+		const VkDevice _device;
+		const VkFormat _format;
+		VkImage _image = VK_NULL_HANDLE;
+		VkDeviceMemory _memory = VK_NULL_HANDLE;
+		VkImageView _view = VK_NULL_HANDLE;
+
+		VK_DepthBuffer(VkDevice device, VkFormat format) noexcept : _device{device}, _format{format} {}
+		~VK_DepthBuffer() noexcept;
+
+		void create_image(uint32_t width, uint32_t height, VkImageTiling);
+		VkMemoryRequirements memory_requirements() const noexcept;
+		void bind_memory(VkDeviceMemory);
+		void create_view();
+	};
+
 	class VulkanContext
 	{
 	public:
@@ -49,10 +66,8 @@ namespace Yttrium
 		VkPhysicalDeviceMemoryProperties _gpu_memory_props = {};
 		VkDevice _device = VK_NULL_HANDLE;
 		VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
-		std::vector<VkImageView> _image_views;
-		VkImage _depth_image = VK_NULL_HANDLE;
-		VkDeviceMemory _depth_memory = VK_NULL_HANDLE;
-		VkImageView _depth_image_view = VK_NULL_HANDLE;
+		std::vector<VkImageView> _swapchain_views;
+		std::unique_ptr<VK_DepthBuffer> _depth_buffer;
 		std::unique_ptr<VK_Buffer> _uniform_buffer;
 		VkDescriptorSetLayout _descriptor_set_layout = VK_NULL_HANDLE;
 		VkPipelineLayout _pipeline_layout = VK_NULL_HANDLE;
