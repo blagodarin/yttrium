@@ -1,6 +1,7 @@
 #include "context.h"
 
 #include <yttrium/math/matrix.h>
+#include <yttrium/std/string_view.h>
 #include "../../system/window.h"
 
 #include <cassert>
@@ -259,23 +260,6 @@ namespace
 		return view;
 	}
 
-	VkBuffer create_uniform_buffer(VkDevice device, uint32_t size)
-	{
-		VkBufferCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.size = size;
-		create_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		create_info.queueFamilyIndexCount = 0;
-		create_info.pQueueFamilyIndices = nullptr;
-
-		VkBuffer buffer = VK_NULL_HANDLE;
-		CHECK(vkCreateBuffer(device, &create_info, nullptr, &buffer));
-		return buffer;
-	}
-
 	VkCommandPool create_command_pool(VkDevice device, uint32_t queue_family_index)
 	{
 		VkCommandPoolCreateInfo create_info = {};
@@ -306,6 +290,59 @@ namespace
 
 namespace Yttrium
 {
+	VK_Buffer::~VK_Buffer() noexcept
+	{
+		if (_buffer != VK_NULL_HANDLE)
+			vkDestroyBuffer(_device, _buffer, nullptr);
+		if (_memory != VK_NULL_HANDLE)
+			vkFreeMemory(_device, _memory, nullptr);
+	}
+
+	void VK_Buffer::create(uint32_t size, VkBufferUsageFlags usage)
+	{
+		assert(_buffer == VK_NULL_HANDLE);
+
+		VkBufferCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.size = size;
+		create_info.usage = usage;
+		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		create_info.queueFamilyIndexCount = 0;
+		create_info.pQueueFamilyIndices = nullptr;
+
+		CHECK(vkCreateBuffer(_device, &create_info, nullptr, &_buffer));
+	}
+
+	VkMemoryRequirements VK_Buffer::memory_requirements() const noexcept
+	{
+		assert(_buffer != VK_NULL_HANDLE);
+
+		VkMemoryRequirements result;
+		vkGetBufferMemoryRequirements(_device, _buffer, &result);
+		return result;
+	}
+
+	void VK_Buffer::bind_memory(VkDeviceMemory memory)
+	{
+		assert(memory != VK_NULL_HANDLE);
+		assert(_buffer != VK_NULL_HANDLE && _memory == VK_NULL_HANDLE);
+
+		CHECK(vkBindBufferMemory(_device, _buffer, memory, 0));
+		_memory = memory;
+	}
+
+	void VK_Buffer::write(const void* data, size_t size)
+	{
+		assert(_memory != VK_NULL_HANDLE);
+
+		void* mapped_memory = nullptr;
+		CHECK(vkMapMemory(_device, _memory, 0, size, 0, &mapped_memory));
+		std::memcpy(mapped_memory, data, size);
+		vkUnmapMemory(_device, _memory);
+	}
+
 	void VulkanContext::initialize(const WindowBackend& window)
 	{
 		reset();
@@ -353,6 +390,7 @@ namespace Yttrium
 			swapchain_ci.presentMode = VK_PRESENT_MODE_FIFO_KHR;
 			swapchain_ci.clipped = VK_TRUE;
 			swapchain_ci.oldSwapchain = VK_NULL_HANDLE;
+
 			CHECK(vkCreateSwapchainKHR(_device, &swapchain_ci, nullptr, &_swapchain));
 		}
 
@@ -360,36 +398,35 @@ namespace Yttrium
 			_image_views.emplace_back(::create_swapchain_view(_device, image, swapchain_image_format));
 
 		const auto depth_image_format = VK_FORMAT_D16_UNORM;
-		const auto depth_image_tiling = [this, depth_image_format]
+
 		{
-			VkFormatProperties depth_format_props = {};
-			vkGetPhysicalDeviceFormatProperties(_physical_device, depth_image_format, &depth_format_props);
-			if (depth_format_props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
-				return VK_IMAGE_TILING_LINEAR;
-			else if (depth_format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
-				return VK_IMAGE_TILING_OPTIMAL;
-			else
-				throw std::runtime_error{"Depth buffer format is not supported"};
-		}();
+			const auto depth_image_tiling = [this, depth_image_format]
+			{
+				VkFormatProperties depth_format_props = {};
+				vkGetPhysicalDeviceFormatProperties(_physical_device, depth_image_format, &depth_format_props);
+				if (depth_format_props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+					return VK_IMAGE_TILING_LINEAR;
+				else if (depth_format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+					return VK_IMAGE_TILING_OPTIMAL;
+				else
+					throw std::runtime_error{"Depth buffer format is not supported"};
+			}();
 
-		_depth_image = ::create_depth_image(_device, surface_capabilities.currentExtent.width, surface_capabilities.currentExtent.height, depth_image_format, depth_image_tiling);
+			_depth_image = ::create_depth_image(_device, surface_capabilities.currentExtent.width, surface_capabilities.currentExtent.height, depth_image_format, depth_image_tiling);
 
-		VkMemoryRequirements depth_buffer_mr = {};
-		vkGetImageMemoryRequirements(_device, _depth_image, &depth_buffer_mr);
-		_depth_memory = allocate_memory(depth_buffer_mr, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+			VkMemoryRequirements depth_buffer_mr = {};
+			vkGetImageMemoryRequirements(_device, _depth_image, &depth_buffer_mr);
+			_depth_memory = allocate_memory(depth_buffer_mr, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-		CHECK(vkBindImageMemory(_device, _depth_image, _depth_memory, 0));
+			CHECK(vkBindImageMemory(_device, _depth_image, _depth_memory, 0));
+		}
 
 		_depth_image_view = ::create_depth_view(_device, _depth_image, depth_image_format);
 
 		const auto uniform_buffer_size = 2 * sizeof(Matrix4);
-		_uniform_buffer = ::create_uniform_buffer(_device, uniform_buffer_size);
-
-		VkMemoryRequirements uniform_buffer_mr = {};
-		vkGetBufferMemoryRequirements(_device, _uniform_buffer, &uniform_buffer_mr);
-		_uniform_buffer_memory = allocate_memory(uniform_buffer_mr, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-		CHECK(vkBindBufferMemory(_device, _uniform_buffer, _uniform_buffer_memory, 0));
+		_uniform_buffer = std::make_unique<VK_Buffer>(_device);
+		_uniform_buffer->create(uniform_buffer_size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+		_uniform_buffer->bind_memory(allocate_memory(_uniform_buffer->memory_requirements(), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
 		{
 			VkDescriptorSetLayoutBinding dslb = {};
@@ -405,6 +442,7 @@ namespace Yttrium
 			descriptor_set_layout_ci.flags = 0;
 			descriptor_set_layout_ci.bindingCount = 1;
 			descriptor_set_layout_ci.pBindings = &dslb;
+
 			CHECK(vkCreateDescriptorSetLayout(_device, &descriptor_set_layout_ci, nullptr, &_descriptor_set_layout));
 		}
 
@@ -417,6 +455,7 @@ namespace Yttrium
 			pipeline_layout_ci.pSetLayouts = &_descriptor_set_layout;
 			pipeline_layout_ci.pushConstantRangeCount = 0;
 			pipeline_layout_ci.pPushConstantRanges = nullptr;
+
 			CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_ci, nullptr, &_pipeline_layout));
 		}
 
@@ -432,6 +471,7 @@ namespace Yttrium
 			descriptor_pool_ci.maxSets = 1;
 			descriptor_pool_ci.poolSizeCount = 1;
 			descriptor_pool_ci.pPoolSizes = &dps;
+
 			CHECK(vkCreateDescriptorPool(_device, &descriptor_pool_ci, nullptr, &_descriptor_pool));
 		}
 
@@ -442,12 +482,13 @@ namespace Yttrium
 			descriptor_set_ai.descriptorPool = _descriptor_pool;
 			descriptor_set_ai.descriptorSetCount = 1;
 			descriptor_set_ai.pSetLayouts = &_descriptor_set_layout;
+
 			CHECK(vkAllocateDescriptorSets(_device, &descriptor_set_ai, &_descriptor_set));
 		}
 
 		{
 			VkDescriptorBufferInfo dbi = {};
-			dbi.buffer = _uniform_buffer;
+			dbi.buffer = _uniform_buffer->_buffer;
 			dbi.offset = 0;
 			dbi.range = uniform_buffer_size;
 
@@ -462,6 +503,7 @@ namespace Yttrium
 			wds.pImageInfo = nullptr;
 			wds.pBufferInfo = &dbi;
 			wds.pTexelBufferView = nullptr;
+
 			vkUpdateDescriptorSets(_device, 1, &wds, 0, nullptr);
 		}
 
@@ -516,7 +558,111 @@ namespace Yttrium
 			render_pass_ci.pSubpasses = &subpass;
 			render_pass_ci.dependencyCount = 0;
 			render_pass_ci.pDependencies = nullptr;
+
 			CHECK(vkCreateRenderPass(_device, &render_pass_ci, nullptr, &_render_pass));
+		}
+
+		{
+			std::array<VkImageView, 2> attachments{VK_NULL_HANDLE, _depth_image_view};
+
+			VkFramebufferCreateInfo create_info = {};
+			create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			create_info.pNext = nullptr;
+			create_info.flags = 0;
+			create_info.renderPass = _render_pass;
+			create_info.attachmentCount = attachments.size();
+			create_info.pAttachments = attachments.data();
+			create_info.width = surface_capabilities.currentExtent.width;
+			create_info.height = surface_capabilities.currentExtent.height;
+			create_info.layers = 1;
+
+			_framebuffers.reserve(_image_views.size());
+			for (const auto swapchain_image : _image_views)
+			{
+				attachments[0] = swapchain_image;
+
+				VkFramebuffer framebuffer = VK_NULL_HANDLE;
+				CHECK(vkCreateFramebuffer(_device, &create_info, nullptr, &framebuffer));
+				_framebuffers.emplace_back(framebuffer);
+			}
+		}
+
+		_vertex_buffer = std::make_unique<VK_Buffer>(_device);
+		_vertex_buffer->create(1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+		_vertex_buffer->bind_memory(allocate_memory(_vertex_buffer->memory_requirements(), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+
+		{
+			static const std::string_view vertex_shader =
+				"#version 400\n"
+				"#extension GL_ARB_separate_shader_objects : enable\n"
+				"#extension GL_ARB_shading_language_420pack : enable\n"
+				"layout (std140, binding = 0) uniform\n"
+				"{\n"
+				"  mat4 mvp;\n"
+				"} u_buffer;\n"
+				"layout (location = 0) in vec4 i_position;\n"
+				"layout (location = 1) in vec4 i_color;\n"
+				"layout (location = 0) out vec4 o_color;\n"
+				"void main()\n"
+				"{\n"
+				"  o_color = i_color;\n"
+				"  gl_Position = u_buffer.mvp * i_position;\n"
+				"}\n";
+
+			const std::array<uint32_t, 2> dummy{0}; // TODO: Compile shader.
+
+			VkShaderModuleCreateInfo create_info = {};
+			create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			create_info.pNext = nullptr;
+			create_info.flags = 0;
+			create_info.codeSize = dummy.size() * sizeof(uint32_t);
+			create_info.pCode = dummy.data();
+
+			CHECK(vkCreateShaderModule(_device, &create_info, nullptr, &_vertex_shader));
+		}
+
+		{
+			static const std::string_view fragment_shader =
+				"#version 400\n"
+				"#extension GL_ARB_separate_shader_objects : enable\n"
+				"#extension GL_ARB_shading_language_420pack : enable\n"
+				"layout (location = 0) in vec4 i_color;\n"
+				"layout (location = 0) out vec4 o_color;\n"
+				"void main()\n"
+				"{\n"
+				"  o_color = i_color;\n"
+				"}\n";
+
+			const std::array<uint32_t, 2> dummy{0}; // TODO: Compile shader.
+
+			VkShaderModuleCreateInfo create_info = {};
+			create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			create_info.pNext = nullptr;
+			create_info.flags = 0;
+			create_info.codeSize = dummy.size() * sizeof(uint32_t);
+			create_info.pCode = dummy.data();
+
+			CHECK(vkCreateShaderModule(_device, &create_info, nullptr, &_fragment_shader));
+		}
+
+		{
+			std::array<VkPipelineShaderStageCreateInfo, 2> create_info = {};
+
+			create_info[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			create_info[0].pNext = nullptr;
+			create_info[0].flags = 0;
+			create_info[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+			create_info[0].module = _vertex_shader;
+			create_info[0].pName = "main";
+			create_info[0].pSpecializationInfo = nullptr;
+
+			create_info[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			create_info[1].pNext = nullptr;
+			create_info[1].flags = 0;
+			create_info[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+			create_info[1].module = _fragment_shader;
+			create_info[1].pName = "main";
+			create_info[1].pSpecializationInfo = nullptr;
 		}
 
 		_command_pool = ::create_command_pool(_device, _queue_family_index);
@@ -535,6 +681,20 @@ namespace Yttrium
 			vkDestroyCommandPool(_device, _command_pool, nullptr);
 			_command_pool = VK_NULL_HANDLE;
 		}
+		if (_fragment_shader != VK_NULL_HANDLE)
+		{
+			vkDestroyShaderModule(_device, _fragment_shader, nullptr);
+			_fragment_shader = VK_NULL_HANDLE;
+		}
+		if (_vertex_shader != VK_NULL_HANDLE)
+		{
+			vkDestroyShaderModule(_device, _vertex_shader, nullptr);
+			_vertex_shader = VK_NULL_HANDLE;
+		}
+		_vertex_buffer.reset();
+		for (const auto framebuffer : _framebuffers)
+			vkDestroyFramebuffer(_device, framebuffer, nullptr);
+		_framebuffers.clear();
 		if (_render_pass != VK_NULL_HANDLE)
 		{
 			vkDestroyRenderPass(_device, _render_pass, nullptr);
@@ -560,16 +720,7 @@ namespace Yttrium
 			vkDestroyDescriptorSetLayout(_device, _descriptor_set_layout, nullptr);
 			_descriptor_set_layout = VK_NULL_HANDLE;
 		}
-		if (_uniform_buffer != VK_NULL_HANDLE)
-		{
-			vkDestroyBuffer(_device, _uniform_buffer, nullptr);
-			_uniform_buffer = VK_NULL_HANDLE;
-		}
-		if (_uniform_buffer_memory != VK_NULL_HANDLE)
-		{
-			vkFreeMemory(_device, _uniform_buffer_memory, nullptr);
-			_uniform_buffer_memory = VK_NULL_HANDLE;
-		}
+		_uniform_buffer.reset();
 		if (_depth_image_view != VK_NULL_HANDLE)
 		{
 			vkDestroyImageView(_device, _depth_image_view, nullptr);
@@ -608,14 +759,6 @@ namespace Yttrium
 			vkDestroyInstance(_instance, nullptr);
 			_instance = VK_NULL_HANDLE;
 		}
-	}
-
-	void VulkanContext::update_uniforms(const void* data, size_t size)
-	{
-		void* memory = nullptr;
-		CHECK(vkMapMemory(_device, _uniform_buffer_memory, 0, size, 0, &memory));
-		std::memcpy(memory, data, size);
-		vkUnmapMemory(_device, _uniform_buffer_memory);
 	}
 
 	VkDeviceMemory VulkanContext::allocate_memory(const VkMemoryRequirements& requirements, uint32_t flags) const
