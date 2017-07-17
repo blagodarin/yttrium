@@ -42,6 +42,15 @@ namespace Yttrium
 		void create_view();
 	};
 
+	struct VK_Semaphore
+	{
+		const VkDevice _device;
+		VkSemaphore _semaphore = VK_NULL_HANDLE;
+
+		VK_Semaphore(VkDevice device);
+		~VK_Semaphore() noexcept;
+	};
+
 	class VulkanContext
 	{
 	public:
@@ -51,6 +60,7 @@ namespace Yttrium
 		VulkanContext& operator=(const VulkanContext&) = delete;
 
 		void initialize(const WindowBackend&);
+		void render();
 		void reset() noexcept;
 		void update_uniforms(const void* data, size_t size) { _uniform_buffer->write(data, size); }
 
@@ -64,6 +74,7 @@ namespace Yttrium
 		VkPhysicalDevice _physical_device = VK_NULL_HANDLE;
 		uint32_t _queue_family_index = 0;
 		VkPhysicalDeviceMemoryProperties _gpu_memory_props = {};
+		VkExtent2D _surface_extent{0, 0};
 		VkDevice _device = VK_NULL_HANDLE;
 		VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 		std::vector<VkImageView> _swapchain_views;
@@ -80,6 +91,8 @@ namespace Yttrium
 		VkShaderModule _fragment_shader = VK_NULL_HANDLE;
 		VkCommandPool _command_pool = VK_NULL_HANDLE;
 		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
+		std::unique_ptr<VK_Semaphore> _image_acquired_semaphore;
+		VkPipeline _pipeline = VK_NULL_HANDLE;
 	};
 }
 
