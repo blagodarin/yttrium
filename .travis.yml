@@ -46,16 +46,23 @@ install:
   - export PATH=$(pwd)/bin:${PATH}
   - popd
 
-  - git clone https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers
-  - cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/vulkan -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF
-  - cd dbuild
-  - make -j2
-  - make install
-  - export VULKAN_SDK=${TRAVIS_BUILD_DIR}/vulkan
-  - popd
+  - if [ "${RENDERER}" = "Vulkan" ]; then git clone https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/vulkan -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then cd dbuild; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then export VULKAN_SDK=${TRAVIS_BUILD_DIR}/vulkan; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
 
 script:
   - if [ "${COVERAGE}" = "1" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
+
+  - if [ "${RENDERER}" = "Vulkan" ]; then pushd ${TRAVIS_BUILD_DIR}/3rdparty/glslang; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then cmake . -DCMAKE_INSTALL_PREFIX=$(cd ../..; pwd) -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
+
   - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON -DY_RENDERER=$RENDERER
   - cmake --build . -- -j2
   - cmake --build . --target check
