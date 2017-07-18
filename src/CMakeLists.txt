@@ -277,6 +277,8 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/buffer.h
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h
+		renderer/vulkan/glsl.cpp
+		renderer/vulkan/glsl.h
 		renderer/vulkan/gpu_program.h
 		renderer/vulkan/mesh.h
 		renderer/vulkan/renderer.cpp
@@ -285,7 +287,7 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		)
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
-	target_link_libraries(yttrium Vulkan::Vulkan)
+	target_link_libraries(yttrium Vulkan::Vulkan SPIRV glslang OSDependent OGLCompiler)
 else()
 	target_sources(yttrium PRIVATE
 		renderer/null/renderer.cpp

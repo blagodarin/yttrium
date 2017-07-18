@@ -58,7 +58,7 @@ script:
   - if [ "${COVERAGE}" = "1" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
 
   - if [ "${RENDERER}" = "Vulkan" ]; then pushd ${TRAVIS_BUILD_DIR}/3rdparty/glslang; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then cmake . -DCMAKE_INSTALL_PREFIX=$(cd ../..; pwd) -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then cmake . -DCMAKE_INSTALL_PREFIX=$(cd ..; pwd) -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi

@@ -1,3 +1,4 @@
+3rdparty/include
 *.bat
 bin
 CMakeCache.txt
@@ -6,8 +7,6 @@ cmake_install.cmake
 *.db
 *.dir
 doc/html
-include/glslang
-include/SPIRV
 lib
 Makefile
 *.opendb

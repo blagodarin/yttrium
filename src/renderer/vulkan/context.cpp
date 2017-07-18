@@ -1,8 +1,8 @@
 #include "context.h"
 
 #include <yttrium/math/matrix.h>
-#include <yttrium/std/string_view.h>
 #include "../../system/window.h"
+#include "glsl.h"
 
 #include <cassert>
 #include <cstring>
@@ -631,11 +631,11 @@ namespace Yttrium
 		_vertex_buffer->bind_memory(allocate_memory(_vertex_buffer->memory_requirements(), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
 
 		{
-			static const std::string_view vertex_shader =
+			static const char* vertex_shader =
 				"#version 400\n"
 				"#extension GL_ARB_separate_shader_objects : enable\n"
 				"#extension GL_ARB_shading_language_420pack : enable\n"
-				"layout (std140, binding = 0) uniform\n"
+				"layout (std140, binding = 0) uniform buffer\n"
 				"{\n"
 				"  mat4 mvp;\n"
 				"} u_buffer;\n"
@@ -648,20 +648,20 @@ namespace Yttrium
 				"  gl_Position = u_buffer.mvp * i_position;\n"
 				"}\n";
 
-			const std::array<uint32_t, 2> dummy{0}; // TODO: Compile shader.
+			const auto spirv = glsl_to_spirv(vertex_shader, VK_SHADER_STAGE_VERTEX_BIT);
 
 			VkShaderModuleCreateInfo create_info = {};
 			create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 			create_info.pNext = nullptr;
 			create_info.flags = 0;
-			create_info.codeSize = dummy.size() * sizeof(uint32_t);
-			create_info.pCode = dummy.data();
+			create_info.codeSize = spirv.size() * sizeof(uint32_t);
+			create_info.pCode = spirv.data();
 
 			CHECK(vkCreateShaderModule(_device, &create_info, nullptr, &_vertex_shader));
 		}
 
 		{
-			static const std::string_view fragment_shader =
+			static const char* fragment_shader =
 				"#version 400\n"
 				"#extension GL_ARB_separate_shader_objects : enable\n"
 				"#extension GL_ARB_shading_language_420pack : enable\n"
@@ -672,14 +672,14 @@ namespace Yttrium
 				"  o_color = i_color;\n"
 				"}\n";
 
-			const std::array<uint32_t, 2> dummy{0}; // TODO: Compile shader.
+			const auto spirv = glsl_to_spirv(fragment_shader, VK_SHADER_STAGE_FRAGMENT_BIT);
 
 			VkShaderModuleCreateInfo create_info = {};
 			create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 			create_info.pNext = nullptr;
 			create_info.flags = 0;
-			create_info.codeSize = dummy.size() * sizeof(uint32_t);
-			create_info.pCode = dummy.data();
+			create_info.codeSize = spirv.size() * sizeof(uint32_t);
+			create_info.pCode = spirv.data();
 
 			CHECK(vkCreateShaderModule(_device, &create_info, nullptr, &_fragment_shader));
 		}
