@@ -20,5 +20,7 @@
 		- Don't count debug output in rendering statistics.
 	* Storage:
 		- Hash-based packed file access.
-* Tools:
+* New tools:
+	- Resource compiler (like Qt's RCC).
+	- Shader compiler (GLSL to SPIR-V).
 	- Textured font builder.

@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <limits>
 #include <stdexcept>
 
 namespace
@@ -410,6 +411,8 @@ namespace Yttrium
 		_surface_extent = surface_capabilities.currentExtent;
 
 		_device = ::create_device(_physical_device, _queue_family_index);
+		vkGetDeviceQueue(_device, _queue_family_index, 0, &_graphics_queue);
+		_present_queue = _graphics_queue;
 
 		const auto swapchain_image_format = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
 		const auto swapchain_color_space = surface_formats.empty() ? VK_COLOR_SPACE_SRGB_NONLINEAR_KHR : surface_formats[0].colorSpace;
@@ -852,10 +855,22 @@ namespace Yttrium
 
 			CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &_pipeline));
 		}
+
+		{
+			VkFenceCreateInfo create_info = {};
+			create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+			create_info.pNext = nullptr;
+			create_info.flags = 0;
+
+			CHECK(vkCreateFence(_device, &create_info, nullptr, &_draw_fence));
+		}
 	}
 
 	void VulkanContext::render()
 	{
+		uint32_t current_framebuffer_index = 0;
+		CHECK(vkAcquireNextImageKHR(_device, _swapchain, std::numeric_limits<uint64_t>::max(), _image_acquired_semaphore->_semaphore, VK_NULL_HANDLE, &current_framebuffer_index));
+
 		{
 			VkCommandBufferBeginInfo begin_info = {};
 			begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -867,9 +882,6 @@ namespace Yttrium
 		}
 
 		{
-			uint32_t current_framebuffer_index = 0;
-			CHECK(vkAcquireNextImageKHR(_device, _swapchain, 0, _image_acquired_semaphore->_semaphore, VK_NULL_HANDLE, &current_framebuffer_index));
-
 			std::array<VkClearValue, 2> clear_values;
 			clear_values[0].color.float32[0] = .25f;
 			clear_values[0].color.float32[1] = .25f;
@@ -892,6 +904,9 @@ namespace Yttrium
 			vkCmdBeginRenderPass(_command_buffer, &begin_info, VK_SUBPASS_CONTENTS_INLINE);
 		}
 
+		vkCmdBindPipeline(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+		vkCmdBindDescriptorSets(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout, 0, 1, &_descriptor_set, 0, nullptr);
+
 		{
 			const std::array<VkDeviceSize, 1> offsets{0};
 
@@ -899,14 +914,57 @@ namespace Yttrium
 		}
 
 		vkCmdEndRenderPass(_command_buffer);
-
 		CHECK(vkEndCommandBuffer(_command_buffer));
 
-		// TODO: Queue command buffer.
+		const VkPipelineStageFlags pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+		{
+			VkSubmitInfo submit_info = {};
+			submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			submit_info.pNext = nullptr;
+			submit_info.waitSemaphoreCount = 1;
+			submit_info.pWaitSemaphores = &_image_acquired_semaphore->_semaphore;
+			submit_info.pWaitDstStageMask = &pipeline_stage_flags;
+			submit_info.commandBufferCount = 1;
+			submit_info.pCommandBuffers = &_command_buffer;
+			submit_info.signalSemaphoreCount = 0;
+			submit_info.pSignalSemaphores = nullptr;
+
+			CHECK(vkQueueSubmit(_graphics_queue, 1, &submit_info, _draw_fence));
+		}
+
+		for (;;)
+		{
+			const auto result = vkWaitForFences(_device, 1, &_draw_fence, VK_TRUE, 1000);
+			if (result == VK_TIMEOUT)
+				continue;
+			if (result)
+				vulkan_throw(result, "vkWaitForFences");
+			break;
+		}
+
+		{
+			VkPresentInfoKHR present_info;
+			present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+			present_info.pNext = nullptr;
+			present_info.waitSemaphoreCount = 0;
+			present_info.pWaitSemaphores = nullptr;
+			present_info.swapchainCount = 1;
+			present_info.pSwapchains = &_swapchain;
+			present_info.pImageIndices = &current_framebuffer_index;
+			present_info.pResults = nullptr;
+
+			CHECK(vkQueuePresentKHR(_present_queue, &present_info));
+		}
 	}
 
 	void VulkanContext::reset() noexcept
 	{
+		if (_draw_fence != VK_NULL_HANDLE)
+		{
+			vkDestroyFence(_device, _draw_fence, nullptr);
+			_draw_fence = VK_NULL_HANDLE;
+		}
 		if (_pipeline != VK_NULL_HANDLE)
 		{
 			vkDestroyPipeline(_device, _pipeline, nullptr);

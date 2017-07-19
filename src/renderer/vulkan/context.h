@@ -76,6 +76,8 @@ namespace Yttrium
 		VkPhysicalDeviceMemoryProperties _gpu_memory_props = {};
 		VkExtent2D _surface_extent{0, 0};
 		VkDevice _device = VK_NULL_HANDLE;
+		VkQueue _graphics_queue = VK_NULL_HANDLE;
+		VkQueue _present_queue = VK_NULL_HANDLE;
 		VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 		std::vector<VkImageView> _swapchain_views;
 		std::unique_ptr<VK_DepthBuffer> _depth_buffer;
@@ -93,6 +95,7 @@ namespace Yttrium
 		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
 		std::unique_ptr<VK_Semaphore> _image_acquired_semaphore;
 		VkPipeline _pipeline = VK_NULL_HANDLE;
+		VkFence _draw_fence = VK_NULL_HANDLE;
 	};
 }
 

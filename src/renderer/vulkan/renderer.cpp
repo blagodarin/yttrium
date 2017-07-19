@@ -69,6 +69,7 @@ namespace Yttrium
 
 	void VulkanRenderer::clear()
 	{
+		_context.render();
 	}
 
 	std::unique_ptr<Mesh> VulkanRenderer::create_mesh(const MeshData& data)
