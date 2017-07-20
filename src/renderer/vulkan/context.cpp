@@ -689,7 +689,8 @@ namespace Yttrium
 
 		_command_pool = ::create_command_pool(_device, _queue_family_index);
 		_command_buffer = ::allocate_command_buffer(_device, _command_pool);
-		_image_acquired_semaphore = std::make_unique<VK_Semaphore>(_device);
+		_image_acquired = std::make_unique<VK_Semaphore>(_device);
+		_rendering_complete = std::make_unique<VK_Semaphore>(_device);
 
 		{
 			std::array<VkPipelineShaderStageCreateInfo, 2> shader_stages = {};
@@ -855,21 +856,14 @@ namespace Yttrium
 
 			CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &_pipeline));
 		}
-
-		{
-			VkFenceCreateInfo create_info = {};
-			create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-			create_info.pNext = nullptr;
-			create_info.flags = 0;
-
-			CHECK(vkCreateFence(_device, &create_info, nullptr, &_draw_fence));
-		}
 	}
 
 	void VulkanContext::render()
 	{
+		CHECK(vkDeviceWaitIdle(_device));
+
 		uint32_t current_framebuffer_index = 0;
-		CHECK(vkAcquireNextImageKHR(_device, _swapchain, std::numeric_limits<uint64_t>::max(), _image_acquired_semaphore->_semaphore, VK_NULL_HANDLE, &current_framebuffer_index));
+		CHECK(vkAcquireNextImageKHR(_device, _swapchain, std::numeric_limits<uint64_t>::max(), _image_acquired->_semaphore, VK_NULL_HANDLE, &current_framebuffer_index));
 
 		{
 			VkCommandBufferBeginInfo begin_info = {};
@@ -883,9 +877,9 @@ namespace Yttrium
 
 		{
 			std::array<VkClearValue, 2> clear_values;
-			clear_values[0].color.float32[0] = .25f;
-			clear_values[0].color.float32[1] = .25f;
-			clear_values[0].color.float32[2] = .25f;
+			clear_values[0].color.float32[0] = 1.f / 32;
+			clear_values[0].color.float32[1] = 1.f / 32;
+			clear_values[0].color.float32[2] = 1.f / 32;
 			clear_values[0].color.float32[3] = 1.f;
 			clear_values[1].depthStencil.depth = 1.f;
 			clear_values[1].depthStencil.stencil = 0;
@@ -923,32 +917,22 @@ namespace Yttrium
 			submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 			submit_info.pNext = nullptr;
 			submit_info.waitSemaphoreCount = 1;
-			submit_info.pWaitSemaphores = &_image_acquired_semaphore->_semaphore;
+			submit_info.pWaitSemaphores = &_image_acquired->_semaphore;
 			submit_info.pWaitDstStageMask = &pipeline_stage_flags;
 			submit_info.commandBufferCount = 1;
 			submit_info.pCommandBuffers = &_command_buffer;
-			submit_info.signalSemaphoreCount = 0;
-			submit_info.pSignalSemaphores = nullptr;
+			submit_info.signalSemaphoreCount = 1;
+			submit_info.pSignalSemaphores = &_rendering_complete->_semaphore;
 
-			CHECK(vkQueueSubmit(_graphics_queue, 1, &submit_info, _draw_fence));
-		}
-
-		for (;;)
-		{
-			const auto result = vkWaitForFences(_device, 1, &_draw_fence, VK_TRUE, 1000);
-			if (result == VK_TIMEOUT)
-				continue;
-			if (result)
-				vulkan_throw(result, "vkWaitForFences");
-			break;
+			CHECK(vkQueueSubmit(_graphics_queue, 1, &submit_info, VK_NULL_HANDLE));
 		}
 
 		{
 			VkPresentInfoKHR present_info;
 			present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 			present_info.pNext = nullptr;
-			present_info.waitSemaphoreCount = 0;
-			present_info.pWaitSemaphores = nullptr;
+			present_info.waitSemaphoreCount = 1;
+			present_info.pWaitSemaphores = &_rendering_complete->_semaphore;
 			present_info.swapchainCount = 1;
 			present_info.pSwapchains = &_swapchain;
 			present_info.pImageIndices = &current_framebuffer_index;
@@ -960,17 +944,13 @@ namespace Yttrium
 
 	void VulkanContext::reset() noexcept
 	{
-		if (_draw_fence != VK_NULL_HANDLE)
-		{
-			vkDestroyFence(_device, _draw_fence, nullptr);
-			_draw_fence = VK_NULL_HANDLE;
-		}
 		if (_pipeline != VK_NULL_HANDLE)
 		{
 			vkDestroyPipeline(_device, _pipeline, nullptr);
 			_pipeline = VK_NULL_HANDLE;
 		}
-		_image_acquired_semaphore.reset();
+		_rendering_complete.reset();
+		_image_acquired.reset();
 		if (_command_buffer != VK_NULL_HANDLE)
 		{
 			vkFreeCommandBuffers(_device, _command_pool, 1, &_command_buffer);

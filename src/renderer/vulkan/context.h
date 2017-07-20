@@ -93,9 +93,9 @@ namespace Yttrium
 		VkShaderModule _fragment_shader = VK_NULL_HANDLE;
 		VkCommandPool _command_pool = VK_NULL_HANDLE;
 		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
-		std::unique_ptr<VK_Semaphore> _image_acquired_semaphore;
+		std::unique_ptr<VK_Semaphore> _image_acquired;
+		std::unique_ptr<VK_Semaphore> _rendering_complete;
 		VkPipeline _pipeline = VK_NULL_HANDLE;
-		VkFence _draw_fence = VK_NULL_HANDLE;
 	};
 }
 
