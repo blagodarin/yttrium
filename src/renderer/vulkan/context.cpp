@@ -241,7 +241,7 @@ namespace Yttrium
 
 	VkSurfaceTransformFlagBitsKHR VK_PhysicalDevice::surface_transform() const noexcept
 	{
-		return _surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : _surface_capabilities.currentTransform;
+		return (_surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : _surface_capabilities.currentTransform;
 	}
 
 	VkImageTiling VK_PhysicalDevice::tiling(VkFormat format, VkFlags flags) const

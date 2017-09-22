@@ -97,7 +97,9 @@ if(WITH_EXTRA)
 			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue
 			-I "${PROJECT_SOURCE_DIR}/include"
 			-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
+			-i "${PROJECT_SOURCE_DIR}/3rdparty"
 			"--relative-paths=${PROJECT_SOURCE_DIR}"
+			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
 			"${PROJECT_SOURCE_DIR}"
 		VERBATIM)
 endif()

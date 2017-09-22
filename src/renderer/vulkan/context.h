@@ -35,7 +35,7 @@ namespace Yttrium
 		VkSurfaceCapabilitiesKHR _surface_capabilities;
 		VkPhysicalDeviceMemoryProperties _memory_properties;
 
-		VK_PhysicalDevice(const VK_Surface&);
+		explicit VK_PhysicalDevice(const VK_Surface&);
 		~VK_PhysicalDevice() noexcept = default;
 
 		VkCompositeAlphaFlagBitsKHR composite_alpha() const noexcept;
@@ -52,7 +52,7 @@ namespace Yttrium
 		VkQueue _graphics_queue = VK_NULL_HANDLE;
 		VkQueue _present_queue = VK_NULL_HANDLE;
 
-		VK_Device(const VK_PhysicalDevice&);
+		explicit VK_Device(const VK_PhysicalDevice&);
 		~VK_Device() noexcept;
 
 		VkDeviceMemory allocate_memory(const VkMemoryRequirements&, VkFlags) const;
@@ -65,7 +65,7 @@ namespace Yttrium
 		VkSwapchainKHR _handle = VK_NULL_HANDLE;
 		std::vector<VkImageView> _views;
 
-		VK_Swapchain(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Swapchain(const VK_Device& device) noexcept : _device{device} {}
 		~VK_Swapchain() noexcept;
 
 		void create();
@@ -83,7 +83,7 @@ namespace Yttrium
 		VkDeviceMemory _memory = VK_NULL_HANDLE;
 		VkImageView _view = VK_NULL_HANDLE;
 
-		VK_DepthBuffer(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_DepthBuffer(const VK_Device& device) noexcept : _device{device} {}
 		~VK_DepthBuffer() noexcept;
 
 		void create_image(VkFormat);
@@ -98,7 +98,7 @@ namespace Yttrium
 		const VK_Device& _device;
 		VkRenderPass _handle = VK_NULL_HANDLE;
 
-		VK_RenderPass(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_RenderPass(const VK_Device& device) noexcept : _device{device} {}
 		~VK_RenderPass() noexcept;
 
 		void create(const VK_Swapchain&, const VK_DepthBuffer&);
@@ -109,7 +109,7 @@ namespace Yttrium
 		const VK_Device& _device;
 		std::vector<VkFramebuffer> _handles;
 
-		VK_Framebuffers(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Framebuffers(const VK_Device& device) noexcept : _device{device} {}
 		~VK_Framebuffers() noexcept;
 
 		void create(const VK_RenderPass&, const VK_Swapchain&, const VK_DepthBuffer&);
@@ -136,7 +136,7 @@ namespace Yttrium
 		const VK_Device& _device;
 		VkSemaphore _handle = VK_NULL_HANDLE;
 
-		VK_Semaphore(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Semaphore(const VK_Device& device) noexcept : _device{device} {}
 		~VK_Semaphore() noexcept;
 
 		void create();
@@ -145,7 +145,7 @@ namespace Yttrium
 	class VulkanContext
 	{
 	public:
-		VulkanContext(const WindowBackend&);
+		explicit VulkanContext(const WindowBackend&);
 		~VulkanContext() noexcept;
 
 		void render();
