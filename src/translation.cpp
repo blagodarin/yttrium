@@ -4,7 +4,6 @@
 #include <yttrium/ion/reader.h>
 #include <yttrium/ion/writer.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/string.h>
 
 #include <algorithm>
 #include <map>
@@ -32,7 +31,7 @@ namespace Yttrium
 			explicit Entry(std::string_view text) : _text{strings::from_view(text)} {}
 		};
 
-		std::map<String, Entry> _translations;
+		std::map<std::string, Entry> _translations;
 	};
 
 	TranslationImpl::TranslationImpl(const Source& source)
@@ -44,17 +43,14 @@ namespace Yttrium
 			token.check_name("tr");
 			const auto text = ion.read().to_value();
 			const auto translation = ion.read().to_value();
-			translations.emplace(String{text}, Entry{translation});
+			translations.emplace(text, Entry{translation});
 		}
 		_translations = std::move(translations);
 	}
 
 	void TranslationImpl::add(std::string_view text)
 	{
-		auto i = _translations.find({text, ByReference{}});
-		if (i == _translations.end())
-			i = _translations.emplace(String{text}, Entry{}).first;
-		i->second._added = true;
+		_translations[std::string{text}]._added = true; // TODO-17: Remove std::string{}.
 	}
 
 	void TranslationImpl::remove_obsolete()
@@ -88,7 +84,7 @@ namespace Yttrium
 
 	std::string TranslationImpl::translate(std::string_view source) const
 	{
-		const auto i = _translations.find({source, ByReference{}});
+		const auto i = _translations.find(std::string{source}); // TODO-17: Remove std::string{}.
 		return i != _translations.end() && !i->second._text.empty() ? i->second._text : strings::from_view(source);
 	}
 

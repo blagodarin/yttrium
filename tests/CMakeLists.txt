@@ -24,7 +24,6 @@ add_executable(unit_tests
 	resource_loader.cpp
 	source.cpp
 	string_utils.cpp
-	string.cpp
 	test_utils.cpp
 	test_utils.h
 	texture_font.cpp

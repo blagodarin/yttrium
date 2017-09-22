@@ -28,7 +28,6 @@ add_library(yttrium
 	../include/yttrium/std/optional.h
 	../include/yttrium/std/string_view.h
 	../include/yttrium/std/variant.h
-	../include/yttrium/string.h
 	../include/yttrium/tiny_string_map.h
 	../include/yttrium/translation.h
 	config.h
@@ -36,7 +35,6 @@ add_library(yttrium
 	globals.cpp
 	resource_loader.cpp
 	string_utils.cpp
-	string.cpp
 	tiny_string_map.cpp
 	translation.cpp
 	)

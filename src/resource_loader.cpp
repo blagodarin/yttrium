@@ -13,7 +13,6 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
-#include <yttrium/string.h>
 #include <yttrium/translation.h>
 #include "gui/ion/loader.h"
 #include "renderer/material.h"
@@ -27,7 +26,7 @@ namespace Yttrium
 	struct ResourceCache
 	{
 		const Storage& _storage;
-		std::map<String, std::shared_ptr<const T>> _map;
+		std::map<std::string, std::shared_ptr<const T>> _map;
 		std::mutex _mutex;
 
 		explicit ResourceCache(const Storage& storage) : _storage{storage} {}
@@ -35,7 +34,7 @@ namespace Yttrium
 		std::shared_ptr<const T> fetch(std::string_view name, const std::function<std::shared_ptr<const T>(std::unique_ptr<Source>&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock{_mutex};
-			const auto i = _map.find({name, ByReference{}});
+			const auto i = _map.find(std::string{name}); // TODO-17: Remove std::string{}.
 			if (i != _map.end())
 				return i->second;
 			auto source = _storage.open(name);
@@ -44,7 +43,7 @@ namespace Yttrium
 			auto resource_ptr = factory(std::move(source));
 			if (!resource_ptr)
 				throw DataError{"Can't load \"", name, "\""}; // We don't have more information at this point. =(
-			_map.emplace(String{name}, resource_ptr);
+			_map.emplace(name, resource_ptr);
 			return resource_ptr;
 		}
 

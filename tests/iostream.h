@@ -5,7 +5,6 @@
 #include <yttrium/math/point.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/string.h>
 
 #include <iostream>
 
@@ -33,11 +32,6 @@ namespace Yttrium
 	inline std::ostream& operator<<(std::ostream& stream, const Rect& rect)
 	{
 		return stream << "Rect{{" << rect.left() << "," << rect.top() << "},Size{" << rect.width() << "," << rect.height() << "}}";
-	}
-
-	inline std::ostream& operator<<(std::ostream& stream, const String& string)
-	{
-		return stream << std::string_view{string};
 	}
 }
 
