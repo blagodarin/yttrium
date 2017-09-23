@@ -11,7 +11,7 @@ namespace Yttrium
 	class Source;
 
 	///
-	class IonError : public std::runtime_error
+	class IonError : public std::runtime_error // TODO: Make DataError.
 	{
 	public:
 		///
