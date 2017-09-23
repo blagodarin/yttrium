@@ -25,10 +25,10 @@ install:
       7z x nasm-2.13.01-win64.zip
       xcopy nasm-2.13.01\nasm.exe %PREFIX%\bin
   - cmd: |
-      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.1/libjpeg-turbo-1.5.1.tar.gz
-      7z x libjpeg-turbo-1.5.1.tar.gz
-      7z x libjpeg-turbo-1.5.1.tar
-      cd libjpeg-turbo-1.5.1
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.2/libjpeg-turbo-1.5.2.tar.gz
+      7z x libjpeg-turbo-1.5.2.tar.gz
+      7z x libjpeg-turbo-1.5.2.tar
+      cd libjpeg-turbo-1.5.2
       cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
@@ -43,9 +43,9 @@ install:
       cmake --build . --config Release --target INSTALL
       cd ..
   - cmd: |
-      appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.29/lpng1629.7z
-      7z x lpng1629.7z
-      cd lpng1629
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.32/lpng1632.7z
+      7z x lpng1632.7z
+      cd lpng1632
       appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
       cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
@@ -67,10 +67,10 @@ install:
 
   # OpenAL
   - cmd: |
-      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.17.2-bin.zip
-      7z x openal-soft-1.17.2-bin.zip
-      move /y openal-soft-1.17.2-bin\include\AL %PREFIX%\include
-      move /y openal-soft-1.17.2-bin\libs %PREFIX%
+      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.18.1-bin.zip
+      7z x openal-soft-1.18.1-bin.zip
+      move /y openal-soft-1.18.1-bin\include\AL %PREFIX%\include
+      move /y openal-soft-1.18.1-bin\libs %PREFIX%
       appveyor DownloadFile https://openal.org/downloads/oalinst.zip
       7z x oalinst.zip
       oalinst.exe /s

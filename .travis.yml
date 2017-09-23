@@ -34,7 +34,7 @@ install:
   - mkdir ${TRAVIS_BUILD_DIR}/travis
 
   - mkdir ${TRAVIS_BUILD_DIR}/travis/boost && pushd ${TRAVIS_BUILD_DIR}/travis/boost
-  - wget -q -O - http://downloads.sourceforge.net/project/boost/boost/1.64.0/boost_1_64_0.tar.bz2 | tar -xj --strip-components 1
+  - wget -q -O - https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.bz2 | tar -xj --strip-components 1
   - ./bootstrap.sh
   - ./b2 headers
   - ./b2 -j2 --with-test
@@ -42,7 +42,7 @@ install:
   - popd
 
   - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake && pushd ${TRAVIS_BUILD_DIR}/travis/cmake
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz | tar -xz --strip-components 1
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.tar.gz | tar -xz --strip-components 1
   - export PATH=$(pwd)/bin:${PATH}
   - popd
 
