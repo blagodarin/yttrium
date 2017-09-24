@@ -42,6 +42,8 @@ namespace
 				actions.add<GuiAction_Return>();
 			else if (action == "return_to")
 				actions.add<GuiAction_ReturnTo>(token.next(ion).to_value());
+			else
+				throw GuiDataError{"Unknown action \"", action, "\""};
 		}
 		token.next(ion);
 		return actions;

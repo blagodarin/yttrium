@@ -47,8 +47,6 @@ namespace Yttrium
 		if (_translation)
 			throw GuiDataError{"Only one translation is allowed"};
 		_translation = _resource_loader.load_translation(path);
-		if (!_translation)
-			throw GuiDataError{"Bad translation \"", path, "\""};
 	}
 
 	const GuiPrivate::FontDesc* GuiPrivate::font(const std::string& name) const
