@@ -11,7 +11,7 @@ namespace Yttrium
 	{
 	public:
 		ALenum _format = 0;
-		size_t _frequency = 0;
+		ALsizei _frequency = 0;
 
 		OpenALFormat() = default;
 		explicit OpenALFormat(const class AudioFormat&);

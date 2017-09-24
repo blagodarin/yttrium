@@ -116,9 +116,9 @@ namespace Yttrium
 		header.color_map.entry_size = 0;
 		header.image.x = 0;
 		header.image.y = 0;
-		header.image.width = format.width();
-		header.image.height = format.height();
-		header.image.pixel_depth = format.bits_per_pixel();
+		header.image.width = static_cast<uint16_t>(format.width());
+		header.image.height = static_cast<uint16_t>(format.height());
+		header.image.pixel_depth = static_cast<uint8_t>(format.bits_per_pixel());
 		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra) ? 8 : 0;
 
 		switch (format.orientation())

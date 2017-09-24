@@ -1,7 +1,7 @@
 #if defined(GLAPI_GET_FUNCTION) && defined(GLAPI_HAS_EXTENSION)
 	// Initialization mode.
 	#define GLEND }
-	#define GLEXTENSION(name) if ((name = GLAPI_HAS_EXTENSION("GL_"#name))) { // TODO-17: Use init-statement.
+	#define GLEXTENSION(name) name = GLAPI_HAS_EXTENSION("GL_"#name); if (name) { // TODO-17: Use init-statement.
 	#define GLFLOAT(name) GetFloatv(GL_##name, &name);
 	#define GLFLOATV(name, count) do { name.resize(count); GetFloatv(GL_##name, name.data()); } while (false);
 	#define GLFUNCTION(name, ret, attr) reinterpret_cast<GlAddress&>(name) = GLAPI_GET_FUNCTION("gl"#name);

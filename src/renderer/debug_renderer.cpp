@@ -10,17 +10,17 @@ namespace
 {
 	using namespace Yttrium;
 
-	void draw_debug_char(RendererImpl& renderer, int x, int y, int width, int height, const Color4f& color, uint8_t value)
+	void draw_debug_char(RendererImpl& renderer, size_t x, size_t y, size_t width, size_t height, const Color4f& color, uint8_t value)
 	{
 		renderer.draw_rect(
 			{
-				Vector2(x * DebugTexture::char_width, y * DebugTexture::char_height),
-				SizeF(width * DebugTexture::char_width, height * DebugTexture::char_height)
+				{static_cast<float>(x * DebugTexture::char_width), static_cast<float>(y * DebugTexture::char_height)},
+				SizeF{static_cast<float>(width * DebugTexture::char_width), static_cast<float>(height * DebugTexture::char_height)}
 			},
 			color,
 			{
-				Vector2(DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]),
-				Vector2(DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1])
+				{DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1]},
+				Vector2{DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1]}
 			});
 	}
 }
@@ -33,24 +33,24 @@ namespace Yttrium
 	{
 	}
 
-	void DebugRenderer::draw_cursor(int x, int y)
+	void DebugRenderer::draw_cursor(size_t x, size_t y)
 	{
 		::draw_debug_char(_renderer, x, y, 1, 1, _color, DebugTexture::cursor_index);
 	}
 
-	void DebugRenderer::draw_rectangle(int x, int y, int width, int height)
+	void DebugRenderer::draw_rectangle(size_t x, size_t y, size_t width, size_t height)
 	{
 		::draw_debug_char(_renderer, x, y, width, height, _color, DebugTexture::rect_index);
 	}
 
-	void DebugRenderer::draw_text(int x, int y, std::string_view text, const std::optional<size_t>& max_size)
+	void DebugRenderer::draw_text(size_t x, size_t y, std::string_view text, const std::optional<size_t>& max_size)
 	{
 		const auto size = max_size ? std::min(text.size(), *max_size) : text.size();
 		for (size_t i = 0; i < size; ++i)
 		{
 			const auto symbol = static_cast<uint8_t>(text[i]);
 			if (symbol >= DebugTexture::first_char && symbol <= DebugTexture::last_char)
-				::draw_debug_char(_renderer, x + static_cast<int>(i), y, 1, 1, _color, symbol);
+				::draw_debug_char(_renderer, x + i, y, 1, 1, _color, symbol);
 		}
 	}
 

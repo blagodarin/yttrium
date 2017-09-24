@@ -86,7 +86,8 @@ namespace Yttrium
 		{
 			_wgl.ARB_extensions_string = true;
 			_wgl.EXTENSIONS_ARB = _wgl.GetExtensionsStringARB(hdc);
-			if (_wgl.EXT_swap_control = ::check_extension(_wgl.EXTENSIONS_ARB, "WGL_EXT_swap_control")) // TODO-17: Use init-statement.
+			_wgl.EXT_swap_control = ::check_extension(_wgl.EXTENSIONS_ARB, "WGL_EXT_swap_control"); // TODO-17: Use init-statement.
+			if (_wgl.EXT_swap_control)
 			{
 				::get_proc_address(_wgl.GetSwapIntervalEXT, "wglGetSwapIntervalEXT");
 				::get_proc_address(_wgl.SwapIntervalEXT, "wglSwapIntervalEXT");

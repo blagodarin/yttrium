@@ -7,12 +7,12 @@
 #include <vector>
 
 // OpenAL doesn't expose its limitations, if any, so a list of common sampling rates should do.
-const std::vector<unsigned> _common_sampling_rates{ 8'000, 11'025, 16'000, 22'050, 32'000, 44'100, 48'000, 88'200, 96'000 };
+const std::vector<ALsizei> _common_sampling_rates{ 8'000, 11'025, 16'000, 22'050, 32'000, 44'100, 48'000, 88'200, 96'000 };
 
 namespace Yttrium
 {
 	OpenALFormat::OpenALFormat(const AudioFormat& format)
-		: _frequency{format.samples_per_second()}
+		: _frequency{static_cast<ALsizei>(format.samples_per_second())}
 	{
 		switch (format.bytes_per_sample())
 		{

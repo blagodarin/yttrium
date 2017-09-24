@@ -84,8 +84,8 @@ namespace
 				return false;
 
 			::png_set_compression_level(_png, 0);
-			::png_set_IHDR(_png, _info, format.width(), format.height(), format.bits_per_channel(),
-				color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+			::png_set_IHDR(_png, _info, static_cast<uint32_t>(format.width()), static_cast<uint32_t>(format.height()),
+				static_cast<int>(format.bits_per_channel()), color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
 			::png_set_rows(_png, _info, data);
 			::png_write_png(_png, _info, transforms, nullptr);

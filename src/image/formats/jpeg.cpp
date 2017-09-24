@@ -26,6 +26,8 @@ namespace Yttrium
 	std::optional<ImageFormat> read_jpeg(const Source& source, Buffer& buffer)
 	{
 		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
+		if (source_buffer.size() > std::numeric_limits<unsigned long>::max())
+			return {};
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
@@ -41,7 +43,7 @@ namespace Yttrium
 			return {};
 		}
 
-		::jpeg_mem_src(&decompressor, &source_buffer[0], source_buffer.size());
+		::jpeg_mem_src(&decompressor, &source_buffer[0], static_cast<unsigned long>(source_buffer.size()));
 
 		::jpeg_read_header(&decompressor, TRUE);
 

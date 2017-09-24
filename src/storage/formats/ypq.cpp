@@ -155,9 +155,8 @@ namespace Yttrium
 
 	bool YpqWriter::commit()
 	{
-		if (_committed)
+		if (std::exchange(_committed, true))
 			return false;
-		_committed = true;
 
 		std::vector<YpqEntry> entries;
 
@@ -176,7 +175,7 @@ namespace Yttrium
 			for (const auto& entry : _entries)
 			{
 				entries.emplace_back();
-				entries.back().metadata_offset = metadata_offset + writer.offset();
+				entries.back().metadata_offset = static_cast<uint32_t>(metadata_offset + writer.offset());
 				if (!write_string(entry.name))
 					return false;
 				const auto property_count = static_cast<uint8_t>(entry.properties.size());
@@ -195,8 +194,8 @@ namespace Yttrium
 
 		YpqHeader header;
 		header.signature = YpqHeader::Signature;
-		header.entry_count = _entries.size();
-		header.index_size = data_offset;
+		header.entry_count = static_cast<uint32_t>(_entries.size());
+		header.index_size = static_cast<uint32_t>(data_offset);
 		if (!_writer.write(header))
 			return false;
 
@@ -213,7 +212,7 @@ namespace Yttrium
 				return false;
 			const auto i = static_cast<size_t>(&entry - _entries.data());
 			entries[i].data_offset = decltype(entries[i].data_offset){_writer.offset()};
-			entries[i].data_size = source->size();
+			entries[i].data_size = static_cast<uint32_t>(source->size());
 			if (entries[i].data_size != source->size())
 				return false;
 			if (!_writer.write_all(*source))

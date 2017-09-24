@@ -15,9 +15,9 @@ namespace Yttrium
 	public:
 		explicit DebugRenderer(RendererImpl&);
 
-		void draw_cursor(int x, int y);
-		void draw_rectangle(int x, int y, int width, int height);
-		void draw_text(int x, int y, std::string_view text, const std::optional<size_t>& max_size = {});
+		void draw_cursor(size_t x, size_t y);
+		void draw_rectangle(size_t x, size_t y, size_t width, size_t height);
+		void draw_text(size_t x, size_t y, std::string_view text, const std::optional<size_t>& max_size = {});
 		size_t max_width() const;
 		void set_color(float r, float g, float b, float a = 1);
 

@@ -33,7 +33,7 @@ namespace Yttrium
 			OVERLAPPED overlapped = {};
 			overlapped.Offset = static_cast<DWORD>(offset);
 			overlapped.OffsetHigh = static_cast<DWORD>(offset >> 32);
-			return ::ReadFile(_handle, data, size, &result, &overlapped) ? result : 0;
+			return ::ReadFile(_handle, data, static_cast<DWORD>(size), &result, &overlapped) ? result : 0;
 		}
 
 	private:
@@ -80,7 +80,7 @@ namespace Yttrium
 			OVERLAPPED overlapped = {};
 			overlapped.Offset = static_cast<DWORD>(offset);
 			overlapped.OffsetHigh = static_cast<DWORD>(offset >> 32);
-			return ::WriteFile(_handle, data, size, &result, &overlapped) ? result : 0;
+			return ::WriteFile(_handle, data, static_cast<DWORD>(size), &result, &overlapped) ? result : 0;
 		}
 
 	private:

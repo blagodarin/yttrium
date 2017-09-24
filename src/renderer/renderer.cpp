@@ -222,7 +222,7 @@ namespace Yttrium
 		{
 			DebugRenderer debug(*this);
 			debug.set_color(1, 1, 1);
-			int top = 0;
+			size_t top = 0;
 			size_t line_begin = 0;
 			auto line_end = _debug_text.find('\n', line_begin);
 			while (line_end != std::string::npos)
