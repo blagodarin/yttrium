@@ -13,7 +13,7 @@ add_executable(unit_tests
 	ion_writer.cpp
 	iostream.cpp
 	iostream.h
-	key_lookup.cpp
+	key.cpp
 	main.cpp
 	margins.cpp
 	matrix.cpp

@@ -4,6 +4,17 @@
 
 #include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_CASE(test_clamp)
+{
+	using Yttrium::clamp;
+
+	BOOST_CHECK_EQUAL(-1, clamp(-2, -1, 1));
+	BOOST_CHECK_EQUAL(-1, clamp(-1, -1, 1));
+	BOOST_CHECK_EQUAL(0, clamp(0, -1, 1));
+	BOOST_CHECK_EQUAL(1, clamp(1, -1, 1));
+	BOOST_CHECK_EQUAL(1, clamp(2, -1, 1));
+}
+
 BOOST_AUTO_TEST_CASE(test_is_power_of_2)
 {
 	using Yttrium::is_power_of_2;

@@ -4,6 +4,39 @@
 
 #include "../src/gui/key_lookup.cpp"
 
+BOOST_AUTO_TEST_CASE(key_event)
+{
+	using Yttrium::Key;
+	using Yttrium::KeyEvent;
+
+	BOOST_CHECK(Key::A == KeyEvent(Key::A, false, false).key);
+	BOOST_CHECK(Key::B == KeyEvent(Key::B, false, false).key);
+	BOOST_CHECK(!KeyEvent(Key::A, false, false).pressed);
+	BOOST_CHECK(KeyEvent(Key::A, true, false).pressed);
+	BOOST_CHECK(!KeyEvent(Key::A, false, false).autorepeat);
+	BOOST_CHECK(KeyEvent(Key::A, false, true).autorepeat);
+}
+
+BOOST_AUTO_TEST_CASE(key_event_to_char)
+{
+	using Yttrium::Flags;
+	using Yttrium::Key;
+	using Yttrium::KeyEvent;
+
+	const auto key_to_char = [](Key key, Flags<KeyEvent::Modifier> modifiers = {})
+	{
+		KeyEvent key_event{key, false, false};
+		key_event.modifiers = modifiers;
+		return key_event.to_char();
+	};
+
+	BOOST_CHECK_EQUAL('\0', key_to_char(Key::Null));
+	BOOST_CHECK_EQUAL('a', key_to_char(Key::A));
+	BOOST_CHECK_EQUAL('A', key_to_char(Key::A, KeyEvent::Modifier::Shift));
+	BOOST_CHECK_EQUAL('b', key_to_char(Key::B));
+	BOOST_CHECK_EQUAL('B', key_to_char(Key::B, KeyEvent::Modifier::Shift));
+}
+
 BOOST_AUTO_TEST_CASE(key_lookup)
 {
 	using Yttrium::Key;

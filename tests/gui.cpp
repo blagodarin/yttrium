@@ -1,3 +1,4 @@
+#include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
@@ -6,11 +7,15 @@
 
 #include <boost/test/unit_test.hpp>
 
+using Yttrium::Gui;
+using Yttrium::GuiDataError;
+using Yttrium::ResourceLoader;
+using Yttrium::ScriptContext;
+using Yttrium::Storage;
+
 BOOST_AUTO_TEST_CASE(test_gui)
 {
-	using namespace Yttrium;
-
-	Storage storage(Storage::UseFileSystem::Before);
+	Storage storage{Storage::UseFileSystem::Before};
 	storage.attach_buffer("gui.ion", ::make_buffer("include \"included.ion\""));
 	storage.attach_buffer("included.ion", ::make_buffer(R"(
 		on_key "esc" { quit }
@@ -54,7 +59,17 @@ BOOST_AUTO_TEST_CASE(test_gui)
 		}
 	)"));
 
-	ResourceLoader resource_loader(storage);
+	ResourceLoader resource_loader{storage};
 	ScriptContext script_context;
-	Gui gui(resource_loader, script_context, "gui.ion");
+	BOOST_CHECK_NO_THROW(Gui(resource_loader, script_context, "gui.ion"));
+}
+
+BOOST_AUTO_TEST_CASE(test_gui_data_error)
+{
+	Storage storage{Storage::UseFileSystem::Before};
+	storage.attach_buffer("gui.ion", ::make_buffer("unknown"));
+
+	ResourceLoader resource_loader{storage};
+	ScriptContext script_context;
+	BOOST_CHECK_THROW(Gui(resource_loader, script_context, "gui.ion"), GuiDataError);
 }
