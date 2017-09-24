@@ -3,9 +3,16 @@ cmake_minimum_required(VERSION 3.7)
 project(yttrium C CXX)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(WITH_EXAMPLES "Enable examples (also enables tools)" OFF)
+option(WITH_EXTRA "Enable extra stuff" OFF)
+option(WITH_TESTS "Enable tests" OFF)
+option(WITH_TOOLS "Enable tools" OFF)
+
+if(WITH_EXAMPLES AND NOT WITH_TOOLS)
+	message(FATAL_ERROR "WITH_EXAMPLES require WITH_TOOLS")
+endif()
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
-
 find_package(Threads REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -56,14 +63,15 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
 add_subdirectory(src)
 
-add_subdirectory(tools/ypack)
-add_subdirectory(tools/ytr)
-set_target_properties(
-	ypack
-	ytr
-	PROPERTIES FOLDER "tools")
+if(WITH_TOOLS)
+	add_subdirectory(tools/ypack)
+	add_subdirectory(tools/ytr)
+	set_target_properties(
+		ypack
+		ytr
+		PROPERTIES FOLDER "tools")
+endif()
 
-option(WITH_EXAMPLES "Enable examples" OFF)
 if(WITH_EXAMPLES)
 	if(WIN32)
 		add_subdirectory(ywinmain)
@@ -76,7 +84,6 @@ if(WITH_EXAMPLES)
 		PROPERTIES FOLDER "examples")
 endif()
 
-option(WITH_EXTRA "Enable extra stuff" OFF)
 if(WITH_EXTRA)
 	add_subdirectory(tools/generate-sounds)
 	add_subdirectory(tools/generate-test-images)
@@ -104,7 +111,6 @@ if(WITH_EXTRA)
 		VERBATIM)
 endif()
 
-option(WITH_TESTS "Enable tests" OFF)
 if(WITH_TESTS)
 	add_subdirectory(tests)
 	add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
