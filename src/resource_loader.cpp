@@ -20,6 +20,18 @@
 #include <cassert>
 #include <mutex>
 
+namespace
+{
+	// https://developercommunity.visualstudio.com/content/problem/74313/compiler-error-in-xsmf-control-with-stdoptional-pa.html
+	Yttrium::Image load_image(const Yttrium::Source& source)
+	{
+		auto image = Yttrium::Image::load(source);
+		if (!image)
+			throw Yttrium::DataError{"Can't load \"", source.name(), "\""};
+		return std::move(*image);
+	}
+}
+
 namespace Yttrium
 {
 	template <typename T>
@@ -206,13 +218,10 @@ namespace Yttrium
 			return {};
 		return _private->_texture_2d_cache.fetch(name, [this](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D>
 		{
-			auto image = Image::load(*source);
-			if (!image)
-				return {};
 			Flags<Renderer::TextureFlag> flags;
 			if (source->property("intensity") == "1")
 				flags |= Renderer::TextureFlag::Intensity;
-			return _private->_renderer->create_texture_2d(std::move(*image), flags);
+			return _private->_renderer->create_texture_2d(::load_image(*source), flags);
 		});
 	}
 

@@ -67,11 +67,11 @@ namespace Yttrium
 		std::string to_string() const;
 
 	protected:
-		const std::string _name;
 		const uint64_t _size;
+		const std::string _name;
 
 		explicit Source(uint64_t size) noexcept : _size{size} {}
-		Source(uint64_t size, const std::string& name) : _name{name}, _size{size} {}
+		Source(uint64_t size, const std::string& name) : _size{size}, _name{name} {}
 
 	private:
 		TinyStringMap _properties;
