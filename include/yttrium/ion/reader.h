@@ -1,6 +1,7 @@
 #ifndef _include_yttrium_ion_reader_h_
 #define _include_yttrium_ion_reader_h_
 
+#include <yttrium/exceptions.h>
 #include <yttrium/string_utils.h>
 
 #include <memory>
@@ -11,12 +12,12 @@ namespace Yttrium
 	class Source;
 
 	///
-	class IonError : public std::runtime_error // TODO: Make DataError.
+	class IonError : public DataError
 	{
 	public:
 		///
 		template <typename... Args>
-		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args) : std::runtime_error{make_string("(", line, ":", column, ") ", std::forward<Args>(args)...)} {}
+		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args) : DataError{"(", line, ":", column, ") ", std::forward<Args>(args)...} {}
 	};
 
 	///
