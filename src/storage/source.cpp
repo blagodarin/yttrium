@@ -111,7 +111,7 @@ namespace Yttrium
 		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
 			throw std::bad_alloc();
 		std::string string(_size, '\0');
-		if (read_at(0, const_cast<char*>(string.data()), string.size()) != string.size()) // TODO-17: Remove const_cast.
+		if (read_at(0, string.data(), string.size()) != string.size())
 			return {};
 		return string;
 	}

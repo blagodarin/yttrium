@@ -125,12 +125,12 @@ namespace Yttrium
 	struct YpqWriter::Entry
 	{
 		std::string name;
-		std::map<std::string, std::string> properties;
+		std::map<std::string, std::string, std::less<>> properties;
 		uint64_t offset = 0;
 		uint32_t size = 0;
 
 		// cppcheck-suppress noExplicitConstructor
-		Entry(const std::string& name_, std::map<std::string, std::string>&& properties_)
+		Entry(const std::string& name_, std::map<std::string, std::string, std::less<>>&& properties_)
 			: name{name_}, properties{std::move(properties_)} {}
 	};
 
@@ -145,7 +145,7 @@ namespace Yttrium
 			_writer.unlink();
 	}
 
-	bool YpqWriter::add(const std::string& path, std::map<std::string, std::string>&& properties)
+	bool YpqWriter::add(const std::string& path, std::map<std::string, std::string, std::less<>>&& properties)
 	{
 		if (_committed)
 			return false;

@@ -28,10 +28,10 @@ namespace Yttrium
 			bool _added = false;
 
 			Entry() = default;
-			explicit Entry(std::string_view text) : _text{strings::from_view(text)} {}
+			explicit Entry(std::string_view text) : _text{text} {}
 		};
 
-		std::map<std::string, Entry> _translations;
+		std::map<std::string, Entry, std::less<>> _translations;
 	};
 
 	TranslationImpl::TranslationImpl(const Source& source)
@@ -50,7 +50,7 @@ namespace Yttrium
 
 	void TranslationImpl::add(std::string_view text)
 	{
-		_translations[std::string{text}]._added = true; // TODO-17: Remove std::string{}.
+		_translations[std::string{text}]._added = true;
 	}
 
 	void TranslationImpl::remove_obsolete()
@@ -84,8 +84,8 @@ namespace Yttrium
 
 	std::string TranslationImpl::translate(std::string_view source) const
 	{
-		const auto i = _translations.find(std::string{source}); // TODO-17: Remove std::string{}.
-		return i != _translations.end() && !i->second._text.empty() ? i->second._text : strings::from_view(source);
+		const auto i = _translations.find(source);
+		return i != _translations.end() && !i->second._text.empty() ? i->second._text : std::string{source};
 	}
 
 	std::unique_ptr<Translation> Translation::load(const Source& source)

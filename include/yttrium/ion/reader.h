@@ -2,7 +2,6 @@
 #define _include_yttrium_ion_reader_h_
 
 #include <yttrium/exceptions.h>
-#include <yttrium/string_utils.h>
 
 #include <memory>
 #include <stdexcept>

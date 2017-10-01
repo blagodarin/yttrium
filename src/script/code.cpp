@@ -15,7 +15,7 @@ namespace Yttrium
 	{
 		std::string _name;
 		std::vector<ScriptValue*> _args;
-		explicit ScriptCommand(std::string_view name) : _name{strings::from_view(name)} {}
+		explicit ScriptCommand(std::string_view name) : _name{name} {}
 	};
 
 	class ScriptCodePrivate

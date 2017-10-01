@@ -38,7 +38,7 @@ namespace Yttrium
 		GuiPrivate(ResourceLoader&, ScriptContext&);
 		~GuiPrivate();
 
-		GuiScreen& add_screen(const std::string& name, bool is_transparent, bool is_root);
+		GuiScreen& add_screen(std::string_view name, bool is_transparent, bool is_root);
 		void draw_custom_cursor(Renderer& renderer, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(renderer, point); }
 		const FontDesc* font(const std::string& name) const;
 		void on_canvas_draw(const std::string& name, const RectF&, Renderer&) const;
@@ -52,7 +52,7 @@ namespace Yttrium
 		ScriptContext& script_context() const { return _script_context; }
 		void set_default_cursor(GuiCursor, std::string_view texture = {});
 		void set_font(const std::string& name, std::string_view font_source, std::string_view texture_name);
-		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
+		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_translation(std::string_view);
 		std::string translate(std::string_view) const;
 

@@ -50,7 +50,7 @@ namespace Yttrium
 		virtual ~PackageWriter() = default;
 
 		///
-		virtual bool add(const std::string&, std::map<std::string, std::string>&& properties) = 0;
+		virtual bool add(const std::string&, std::map<std::string, std::string, std::less<>>&& properties) = 0;
 
 		///
 		virtual bool commit() = 0;

@@ -120,7 +120,7 @@ namespace Yttrium
 			while (right != end && *right != '{')
 				++right;
 
-			strings::append_view(target, {left, static_cast<size_t>(right - left)});
+			append_to(target, std::string_view{left, static_cast<size_t>(right - left)});
 
 			if (right == end)
 				break;
@@ -135,7 +135,7 @@ namespace Yttrium
 
 			const auto value = find({left, static_cast<size_t>(right - left)});
 			if (value)
-				strings::append_view(target, value->string());
+				append_to(target, value->string());
 
 			left = ++right;
 		}

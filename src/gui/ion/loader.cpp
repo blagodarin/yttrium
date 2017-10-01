@@ -222,7 +222,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_class(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		auto name = strings::from_view(token.to_value());
+		const std::string name{token.to_value()};
 		const auto i = _prototypes.find(name);
 		if (i != _prototypes.end())
 			throw GuiDataError{"Duplicate 'class' \"", name, "\""};
@@ -247,12 +247,14 @@ namespace Yttrium
 
 	void GuiIonLoader::load_font(IonReader& ion, IonReader::Token& token, Flags<Attribute> attributes)
 	{
-		std::string_view font_name = "default";
-		if (token.type() == IonReader::Token::Type::Value)
+		const auto font_name = [&ion, &token]() -> std::string
 		{
-			font_name = token.text();
+			if (token.type() != IonReader::Token::Type::Value)
+				return "default";
+			const auto result = token.text();
 			token.next(ion);
-		}
+			return std::string{result};
+		}();
 		token.check_object_begin();
 		std::string_view font_path;
 		std::string_view texture_path;
@@ -266,12 +268,12 @@ namespace Yttrium
 			else
 				throw GuiDataError{"Unknown font option '", name, "'"};
 		}
-		_gui.set_font(strings::from_view(font_name), font_path, texture_path);
+		_gui.set_font(font_name, font_path, texture_path);
 		if (attributes & Attribute::Default)
 		{
 			if (_default_font)
 				throw GuiDataError{"Default font redefinition"};
-			const auto font_desc = _gui.font(strings::from_view(font_name));
+			const auto font_desc = _gui.font(font_name);
 			_default_font = font_desc->font;
 			_default_font_texture = font_desc->texture;
 		}
@@ -300,7 +302,7 @@ namespace Yttrium
 			{"stretch", {&GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch)}},
 		};
 
-		auto& screen = _gui.add_screen(strings::from_view(token.to_value()), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
+		auto& screen = _gui.add_screen(token.to_value(), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
 		token.next(ion).check_object_begin();
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
 		{
@@ -396,7 +398,7 @@ namespace Yttrium
 	void GuiIonLoader::load_screen_on_event(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
 	{
 		const auto event_name = token.to_value();
-		screen.set_on_event(strings::from_view(event_name), ::read_actions(ion, token.next(ion)));
+		screen.set_on_event(event_name, ::read_actions(ion, token.next(ion)));
 	}
 
 	void GuiIonLoader::load_screen_on_key(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
@@ -454,7 +456,7 @@ namespace Yttrium
 		std::unique_ptr<WidgetData> data;
 		if (token.type() == IonReader::Token::Type::ListBegin)
 		{
-			const auto i = _prototypes.find(strings::from_view(token.next(ion).to_value()));
+			const auto i = _prototypes.find(std::string{token.next(ion).to_value()});
 			if (i == _prototypes.end())
 				throw GuiDataError{"Unknown class \"", token.text(), "\""};
 			data = std::make_unique<WidgetData>(*i->second);
@@ -498,17 +500,17 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_on_click(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._actions[WidgetData::Action::OnClick] = ::read_actions(ion, token);
+		data._actions.insert_or_assign(WidgetData::Action::OnClick, ::read_actions(ion, token));
 	}
 
 	void GuiIonLoader::load_widget_on_enter(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._actions[WidgetData::Action::OnEnter] = ::read_actions(ion, token);
+		data._actions.insert_or_assign(WidgetData::Action::OnEnter, ::read_actions(ion, token));
 	}
 
 	void GuiIonLoader::load_widget_on_update(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._actions[WidgetData::Action::OnUpdate] = ::read_actions(ion, token);
+		data._actions.insert_or_assign(WidgetData::Action::OnUpdate, ::read_actions(ion, token));
 	}
 
 	void GuiIonLoader::load_widget_position(WidgetData& data, IonReader& ion, IonReader::Token& token) const
@@ -543,7 +545,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_text(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._text = token.translatable() ? _gui.translate(token.to_value()) : strings::from_view(token.to_value());
+		data._text = token.translatable() ? _gui.translate(token.to_value()) : token.to_value();
 		token.next(ion);
 	}
 
@@ -596,7 +598,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_font(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		const auto font_desc = _gui.font(strings::from_view(token.to_value()));
+		const auto font_desc = _gui.font(std::string{token.to_value()});
 		if (!font_desc)
 			throw GuiDataError{"Unknown font \"", token.text(), "\""};
 		auto& foreground = data._foreground;

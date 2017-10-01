@@ -109,8 +109,7 @@ namespace Yttrium
 
 	void RendererImpl::add_debug_text(std::string_view text)
 	{
-		strings::append_view(_debug_text, text);
-		_debug_text += '\n';
+		append_to(_debug_text, text, '\n');
 	}
 
 	void RendererImpl::draw_quad(const Quad& quad, const Color4f& color)

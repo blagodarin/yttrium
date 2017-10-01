@@ -2,7 +2,6 @@
 #define _src_gui_actions_h_
 
 #include <yttrium/script/code.h>
-#include <yttrium/string_utils.h>
 
 #include <variant>
 #include <vector>
@@ -14,7 +13,7 @@ namespace Yttrium
 	struct GuiAction_Call
 	{
 		ScriptCode _script;
-		explicit GuiAction_Call(std::string_view script) : _script{strings::from_view(script)} {}
+		explicit GuiAction_Call(std::string_view script) : _script{std::string{script}} {}
 	};
 
 	struct GuiAction_Enter

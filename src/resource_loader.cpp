@@ -38,7 +38,7 @@ namespace Yttrium
 	struct ResourceCache
 	{
 		const Storage& _storage;
-		std::map<std::string, std::shared_ptr<const T>> _map;
+		std::map<std::string, std::shared_ptr<const T>, std::less<>> _map;
 		std::mutex _mutex;
 
 		explicit ResourceCache(const Storage& storage) : _storage{storage} {}
@@ -46,7 +46,7 @@ namespace Yttrium
 		std::shared_ptr<const T> fetch(std::string_view name, const std::function<std::shared_ptr<const T>(std::unique_ptr<Source>&&)>& factory)
 		{
 			std::lock_guard<std::mutex> lock{_mutex};
-			const auto i = _map.find(std::string{name}); // TODO-17: Remove std::string{}.
+			const auto i = _map.find(name);
 			if (i != _map.end())
 				return i->second;
 			auto source = _storage.open(name);

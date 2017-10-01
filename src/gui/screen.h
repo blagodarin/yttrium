@@ -22,7 +22,7 @@ namespace Yttrium
 	class GuiScreen
 	{
 	public:
-		GuiScreen(GuiPrivate&, const std::string& name, bool is_transparent);
+		GuiScreen(GuiPrivate&, std::string_view name, bool is_transparent);
 		~GuiScreen();
 
 		GuiLayout& add_layout(GuiLayout::Placement);
@@ -39,8 +39,8 @@ namespace Yttrium
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
 		void set_music(const std::shared_ptr<const Music>& music) { _music = music; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
-		void set_on_event(const std::string& event, GuiActions&& actions) { _on_event[event] = std::move(actions); }
-		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key[lookup_key(key)] = std::make_pair(std::move(on_press), std::move(on_release)); }
+		void set_on_event(std::string_view event, GuiActions&& actions) { _on_event.insert_or_assign(std::string{event}, std::move(actions)); }
+		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_on_return(GuiActions&& actions) { _on_return = std::move(actions); }
 
 	private:

@@ -35,7 +35,7 @@ namespace Yttrium
 
 		void bind_canvas(const std::string& name, Canvas&);
 		void draw(Renderer&, const Vector2& cursor) const;
-		void notify(std::string_view event);
+		void notify(const std::string& event);
 		void on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>&);
 		void on_music(const std::function<void(const std::shared_ptr<const Music>&)>&);
 		void on_quit(const std::function<void()>&);

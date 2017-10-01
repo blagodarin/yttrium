@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		package_name = argv[2];
 	}
 
-	std::vector<std::pair<std::string, std::map<std::string, std::string>>> entries;
+	std::vector<std::pair<std::string, std::map<std::string, std::string, std::less<>>>> entries;
 	try
 	{
 		auto source = Yttrium::Source::from(index_name);
@@ -47,15 +47,15 @@ int main(int argc, char** argv)
 		ion.read().check_list_begin();
 		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd;)
 		{
-			entries.emplace_back(Yttrium::strings::from_view(token.to_value()), std::map<std::string, std::string>{});
+			entries.emplace_back(std::string{token.to_value()}, std::map<std::string, std::string, std::less<>>{});
 			token = ion.read();
 			if (token.type() == Yttrium::IonReader::Token::Type::ObjectBegin) // TODO-17: Use init-statement.
 			{
 				for (token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ObjectEnd; token = ion.read())
 				{
-					auto property_name = Yttrium::strings::from_view(token.to_name());
+					const auto property_name = token.to_name();
 					check(entries.back().second.count(property_name) == 0, "Duplicate property '", property_name, "'");
-					entries.back().second.emplace(std::move(property_name), Yttrium::strings::from_view(ion.read().to_value()));
+					entries.back().second.emplace(std::string{property_name}, ion.read().to_value());
 				}
 				token = ion.read();
 			}

@@ -24,7 +24,7 @@ namespace Yttrium
 
 	GuiPrivate::~GuiPrivate() = default;
 
-	GuiScreen& GuiPrivate::add_screen(const std::string& name, bool is_transparent, bool is_root)
+	GuiScreen& GuiPrivate::add_screen(std::string_view name, bool is_transparent, bool is_root)
 	{
 		if (!is_root && name.empty())
 			throw GuiDataError{"Non-root screen must have a name"};
@@ -127,7 +127,7 @@ namespace Yttrium
 
 	std::string GuiPrivate::translate(std::string_view source) const
 	{
-		return _translation ? _translation->translate(source) : strings::from_view(source);
+		return _translation ? _translation->translate(source) : std::string{source};
 	}
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)
@@ -180,10 +180,10 @@ namespace Yttrium
 		(*top_screen)->draw(renderer, &cursor);
 	}
 
-	void Gui::notify(std::string_view event)
+	void Gui::notify(const std::string& event)
 	{
 		if (!_private->_screen_stack.empty())
-			_private->_screen_stack.back()->handle_event(strings::from_view(event));
+			_private->_screen_stack.back()->handle_event(event);
 	}
 
 	void Gui::on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>& callback)

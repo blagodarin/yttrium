@@ -10,18 +10,10 @@
 
 namespace Yttrium
 {
-	namespace strings
-	{
-		// TODO-17: Remove these functions.
-		inline void append_view(std::string& to, std::string_view what) { to.append(what.data(), what.size()); }
-		inline void assign_view(std::string& to, std::string_view what) { to.assign(what.data(), what.size()); }
-		inline std::string from_view(std::string_view string) { return {string.data(), string.size()}; }
-	}
-
 	namespace detail
 	{
 		inline void append_to(std::string& string, char value) { string.append(1, value); }
-		inline void append_to(std::string& string, std::string_view value) { strings::append_view(string, value); }
+		inline void append_to(std::string& string, std::string_view value) { string.append(value); }
 
 		Y_API void append_to(std::string&, long long);
 		inline void append_to(std::string& string, int value) { append_to(string, static_cast<long long>(value)); }

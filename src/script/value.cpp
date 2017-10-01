@@ -13,7 +13,7 @@ namespace Yttrium
 	ScriptValue& ScriptValue::operator=(std::string_view value)
 	{
 		_type = Type::String;
-		strings::assign_view(_value, value);
+		_value = value;
 		return *this;
 	}
 
@@ -25,7 +25,7 @@ namespace Yttrium
 
 	ScriptValue::ScriptValue(std::string_view value, Type type)
 		: _type{type}
-		, _value{strings::from_view(value)}
+		, _value{value}
 	{
 	}
 }
