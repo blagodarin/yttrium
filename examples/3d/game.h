@@ -10,9 +10,10 @@
 #include <yttrium/math/quad.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
-#include <yttrium/std/optional.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/window.h>
+
+#include <optional>
 
 using namespace Yttrium;
 

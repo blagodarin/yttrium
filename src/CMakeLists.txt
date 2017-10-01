@@ -25,9 +25,6 @@ add_library(yttrium
 	../include/yttrium/exceptions.h
 	../include/yttrium/flags.h
 	../include/yttrium/resource_loader.h
-	../include/yttrium/std/optional.h
-	../include/yttrium/std/string_view.h
-	../include/yttrium/std/variant.h
 	../include/yttrium/tiny_string_map.h
 	../include/yttrium/translation.h
 	config.h

@@ -5,10 +5,10 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/std/optional.h>
 #include "actions.h"
 
 #include <map>
+#include <optional>
 
 namespace Yttrium
 {

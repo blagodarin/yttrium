@@ -1,9 +1,9 @@
 #ifndef _src_renderer_gl_gl_h_
 #define _src_renderer_gl_gl_h_
 
-#include <yttrium/std/string_view.h>
 #include "../../system/gl.h"
 
+#include <string_view>
 #include <vector>
 
 #include <GL/gl.h>

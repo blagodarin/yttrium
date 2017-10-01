@@ -5,7 +5,8 @@
 #define _include_yttrium_string_utils_h_
 
 #include <yttrium/api.h>
-#include <yttrium/std/string_view.h>
+
+#include <string>
 
 namespace Yttrium
 {

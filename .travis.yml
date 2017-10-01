@@ -10,7 +10,7 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-6
+      - g++-7
       - libopenal-dev
       - libvorbis-dev
       - libxcb-image0-dev
@@ -19,13 +19,13 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=6 RENDERER=Null COVERAGE=1
+      env: GCC_VERSION=7 RENDERER=Null COVERAGE=1
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=6 RENDERER=OpenGL
+      env: GCC_VERSION=7 RENDERER=OpenGL
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=6 RENDERER=Vulkan
+      env: GCC_VERSION=7 RENDERER=Vulkan
 
 before_install:
   - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi

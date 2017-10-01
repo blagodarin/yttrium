@@ -2,9 +2,9 @@
 #define _tests_test_utils_h_
 
 #include <yttrium/memory/buffer.h>
-#include <yttrium/std/string_view.h>
 
 #include <random>
+#include <string_view>
 
 inline Yttrium::Buffer make_buffer(std::string_view string)
 {

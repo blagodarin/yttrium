@@ -2,10 +2,10 @@
 #define _include_yttrium_script_context_h_
 
 #include <yttrium/api.h>
-#include <yttrium/std/string_view.h>
 
 #include <functional>
 #include <memory>
+#include <string_view>
 
 namespace Yttrium
 {

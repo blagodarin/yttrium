@@ -15,12 +15,12 @@ endif()
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-Wall -Werror -Wextra -Wno-unknown-pragmas -Wnon-virtual-dtor -Wshadow) # -Wpedantic breaks terse static asserts (GCC 6.3.0).
+	add_compile_options(-Wall -Werror -Wextra -Wno-implicit-fallthrough -Wno-unknown-pragmas -Wnon-virtual-dtor -Wpedantic -Wshadow)
 
 	option(FIX_TRAVIS "Fix Travis CI issues" OFF)
 	if(NOT FIX_TRAVIS)
@@ -34,10 +34,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(--coverage -O0)
 		set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
 	endif()
-
-	# Boost.Variant is required until GCC 7.
-	find_package(Boost REQUIRED)
-	include_directories("${Boost_INCLUDE_DIR}")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

@@ -3,9 +3,9 @@
 
 #include <yttrium/api.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/std/string_view.h>
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace Yttrium

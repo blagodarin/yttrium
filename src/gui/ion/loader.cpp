@@ -3,7 +3,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resource_loader.h>
-#include <yttrium/std/optional.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include "../gui.h"

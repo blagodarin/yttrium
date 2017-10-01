@@ -2,9 +2,9 @@
 #define _src_gui_actions_h_
 
 #include <yttrium/script/code.h>
-#include <yttrium/std/variant.h>
 #include <yttrium/string_utils.h>
 
+#include <variant>
 #include <vector>
 
 namespace Yttrium

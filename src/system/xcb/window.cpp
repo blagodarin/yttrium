@@ -1,7 +1,8 @@
 #include "window.h"
 
-#include <yttrium/std/string_view.h>
 #include "../../window/backend.h"
+
+#include <string_view>
 
 #include <xcb/xcb_image.h>
 

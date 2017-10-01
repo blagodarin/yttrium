@@ -1,7 +1,7 @@
 #ifndef _src_script_scanner_h_
 #define _src_script_scanner_h_
 
-#include <yttrium/std/string_view.h>
+#include <string_view>
 
 namespace Yttrium
 {

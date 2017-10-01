@@ -6,9 +6,9 @@
 
 #include <yttrium/flags.h>
 #include <yttrium/math/color.h>
-#include <yttrium/std/string_view.h>
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace Yttrium

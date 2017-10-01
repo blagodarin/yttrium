@@ -1,7 +1,7 @@
 #ifndef _src_gui_logic_line_editor_h_
 #define _src_gui_logic_line_editor_h_
 
-#include <yttrium/std/string_view.h>
+#include <string>
 
 namespace Yttrium
 {

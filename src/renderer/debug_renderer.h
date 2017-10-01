@@ -3,8 +3,8 @@
 
 #include <yttrium/math/color.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/std/optional.h>
-#include <yttrium/std/string_view.h>
+
+#include <optional>
 
 namespace Yttrium
 {

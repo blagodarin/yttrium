@@ -1,9 +1,8 @@
 #ifndef _examples_3d_model_h_
 #define _examples_3d_model_h_
 
-#include <yttrium/std/string_view.h>
-
 #include <memory>
+#include <string_view>
 
 namespace Yttrium
 {

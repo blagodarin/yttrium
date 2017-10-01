@@ -5,10 +5,10 @@
 #define _include_yttrium_storage_package_h_
 
 #include <yttrium/api.h>
-#include <yttrium/std/string_view.h>
 
 #include <map>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace Yttrium

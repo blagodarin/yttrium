@@ -2,10 +2,10 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/std/variant.h>
 #include "source.h"
 
 #include <list>
+#include <variant>
 #include <vector>
 
 namespace Yttrium

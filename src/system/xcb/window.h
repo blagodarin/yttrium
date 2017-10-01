@@ -2,8 +2,9 @@
 #define _src_system_xcb_window_h_
 
 #include <yttrium/math/size.h>
-#include <yttrium/std/optional.h>
 #include "../../utils/unique_ptr.h"
+
+#include <optional>
 
 #include <xcb/xcb.h>
 

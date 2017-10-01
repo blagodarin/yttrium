@@ -1,8 +1,9 @@
 #ifndef _src_image_formats_h_
 #define _src_image_formats_h_
 
-#include <yttrium/std/optional.h>
 #include "../config.h"
+
+#include <optional>
 
 namespace Yttrium
 {

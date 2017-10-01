@@ -6,9 +6,9 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
-#include <yttrium/std/optional.h>
 
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace Yttrium

@@ -3,7 +3,6 @@
 
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
-#include <yttrium/std/string_view.h>
 
 #include <memory>
 #include <vector>

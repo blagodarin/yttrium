@@ -2,12 +2,12 @@
 #define _src_system_gdi_window_h_
 
 #include <yttrium/math/size.h>
-#include <yttrium/std/optional.h>
 
 #if defined(Y_RENDERER_OPENGL)
 	#include "wgl.h"
 #endif
 
+#include <optional>
 #include <string>
 
 namespace Yttrium

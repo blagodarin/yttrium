@@ -6,11 +6,11 @@
 #include <yttrium/renderer/index_buffer.h>
 #include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/vertex_buffer.h>
-#include <yttrium/std/optional.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include "../mesh_data.h"
 
+#include <optional>
 #include <regex>
 #include <tuple>
 

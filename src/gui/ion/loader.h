@@ -3,7 +3,6 @@
 
 #include <yttrium/flags.h>
 #include <yttrium/ion/reader.h>
-#include <yttrium/std/string_view.h>
 #include "../widget_data.h"
 
 #include <functional>

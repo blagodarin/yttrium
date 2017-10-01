@@ -2,10 +2,9 @@
 #define _include_yttrium_translation_h_
 
 #include <yttrium/api.h>
-#include <yttrium/std/string_view.h>
 
 #include <memory>
-#include <string>
+#include <string_view>
 
 namespace Yttrium
 {

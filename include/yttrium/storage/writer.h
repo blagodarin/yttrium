@@ -5,9 +5,9 @@
 #define _include_yttrium_storage_writer_h_
 
 #include <yttrium/api.h>
-#include <yttrium/std/string_view.h>
 
 #include <memory>
+#include <string_view>
 
 namespace Yttrium
 {

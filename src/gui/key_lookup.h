@@ -2,7 +2,8 @@
 #define _src_gui_key_lookup_h_
 
 #include <yttrium/key.h>
-#include <yttrium/std/string_view.h>
+
+#include <string_view>
 
 namespace Yttrium
 {

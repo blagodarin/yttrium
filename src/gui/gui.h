@@ -1,7 +1,6 @@
 #ifndef _src_gui_gui_h_
 #define _src_gui_gui_h_
 
-#include <yttrium/std/string_view.h>
 #include "actions.h"
 #include "cursor.h"
 #include "key_lookup.h"

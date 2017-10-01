@@ -2,10 +2,10 @@
 #define _src_system_x11_window_h_
 
 #include <yttrium/math/size.h>
-#include <yttrium/std/optional.h>
 #include "../../utils/unique_ptr.h"
-
 #include "glx.h"
+
+#include <optional>
 
 #include <X11/Xlib.h>
 
