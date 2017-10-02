@@ -240,8 +240,7 @@ namespace Yttrium
 			if (!event)
 				return !::xcb_connection_has_error(_connection.get());
 
-			const auto event_type = event->response_type & 0x7f;
-			switch (event_type) // TODO-17: Use init-statement.
+			switch (const auto event_type = event->response_type & 0x7f)
 			{
 			case XCB_KEY_PRESS:
 			case XCB_KEY_RELEASE:
@@ -251,30 +250,27 @@ namespace Yttrium
 
 			case XCB_BUTTON_PRESS:
 			case XCB_BUTTON_RELEASE:
+				switch (const auto e = reinterpret_cast<xcb_button_press_event_t*>(event.get()); e->detail)
 				{
-					const auto e = reinterpret_cast<xcb_button_press_event_t*>(event.get());
-					switch (e->detail) // TODO-17: Use init-statement.
-					{
-					case XCB_BUTTON_INDEX_1:
-						_callbacks.on_key_event(Key::Mouse1, event_type == XCB_BUTTON_PRESS);
-						break;
+				case XCB_BUTTON_INDEX_1:
+					_callbacks.on_key_event(Key::Mouse1, event_type == XCB_BUTTON_PRESS);
+					break;
 
-					case XCB_BUTTON_INDEX_2:
-						_callbacks.on_key_event(Key::Mouse2, event_type == XCB_BUTTON_PRESS);
-						break;
+				case XCB_BUTTON_INDEX_2:
+					_callbacks.on_key_event(Key::Mouse2, event_type == XCB_BUTTON_PRESS);
+					break;
 
-					case XCB_BUTTON_INDEX_3:
-						_callbacks.on_key_event(Key::Mouse3, event_type == XCB_BUTTON_PRESS);
-						break;
+				case XCB_BUTTON_INDEX_3:
+					_callbacks.on_key_event(Key::Mouse3, event_type == XCB_BUTTON_PRESS);
+					break;
 
-					case XCB_BUTTON_INDEX_4:
-						_callbacks.on_key_event(Key::Mouse4, event_type == XCB_BUTTON_PRESS);
-						break;
+				case XCB_BUTTON_INDEX_4:
+					_callbacks.on_key_event(Key::Mouse4, event_type == XCB_BUTTON_PRESS);
+					break;
 
-					case XCB_BUTTON_INDEX_5:
-						_callbacks.on_key_event(Key::Mouse5, event_type == XCB_BUTTON_PRESS);
-						break;
-					}
+				case XCB_BUTTON_INDEX_5:
+					_callbacks.on_key_event(Key::Mouse5, event_type == XCB_BUTTON_PRESS);
+					break;
 				}
 				break;
 
@@ -289,13 +285,11 @@ namespace Yttrium
 				break;
 
 			case XCB_CLIENT_MESSAGE:
+				if (const auto e = reinterpret_cast<xcb_client_message_event_t*>(event.get());
+					e->type == _wm_protocols->atom && e->data.data32[0] == _wm_delete_window->atom)
 				{
-					const auto e = reinterpret_cast<xcb_client_message_event_t*>(event.get());
-					if (e->type == _wm_protocols->atom && e->data.data32[0] == _wm_delete_window->atom) // TODO-17: Use init-statement.
-					{
-						close();
-						return false;
-					}
+					close();
+					return false;
 				}
 				break;
 			}

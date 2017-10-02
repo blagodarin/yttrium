@@ -537,7 +537,7 @@ namespace Yttrium
 		};
 
 		const auto i = states.find(token.to_value());
-		if (i == states.end()) // TODO-17: Use init-statement.
+		if (i == states.end())
 			throw GuiDataError{"Unknown 'state' \"", token.text(), "\""};
 		data._fixed_style = i->second;
 		token.next(ion);

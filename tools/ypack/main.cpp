@@ -48,8 +48,7 @@ int main(int argc, char** argv)
 		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd;)
 		{
 			entries.emplace_back(std::string{token.to_value()}, std::map<std::string, std::string, std::less<>>{});
-			token = ion.read();
-			if (token.type() == Yttrium::IonReader::Token::Type::ObjectBegin) // TODO-17: Use init-statement.
+			if (token = ion.read(); token.type() == Yttrium::IonReader::Token::Type::ObjectBegin)
 			{
 				for (token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ObjectEnd; token = ion.read())
 				{

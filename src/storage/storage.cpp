@@ -36,22 +36,16 @@ namespace Yttrium
 		std::unique_ptr<Source> open(std::string_view name) const
 		{
 			if (_use_file_system == Storage::UseFileSystem::Before)
-			{
-				auto source = Source::from(name);
-				if (source)
+				if (auto source = Source::from(name))
 					return source;
-			}
-			{
-				const auto i = _stored.find(name);
-				if (i != _stored.end()) // TODO-17: Use init-statement.
-					return std::visit(*this, i->second);
-			}
+
+			if (const auto i = _stored.find(name); i != _stored.end())
+				return std::visit(*this, i->second);
+
 			if (_use_file_system == Storage::UseFileSystem::After)
-			{
-				auto source = Source::from(name);
-				if (source)
+				if (auto source = Source::from(name))
 					return source;
-			}
+
 			return {};
 		}
 

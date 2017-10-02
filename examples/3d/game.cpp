@@ -135,19 +135,15 @@ void Game::draw_scene(Renderer& renderer, const Vector2& cursor)
 		else
 			_visibility_quad = {};
 	}
-
 	_cursor_ray = renderer.pixel_ray(cursor);
+	if (Vector3 p; _cursor_ray.plane_intersection(_board_plane, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64)
 	{
-		Vector3 p;
-		if (_cursor_ray.plane_intersection(_board_plane, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64) // TODO-17: Use init-statement.
-		{
-			_board_point = Point{static_cast<int>(std::floor(p.x)), static_cast<int>(std::floor(p.y))};
-			PushTransformation t{renderer, Matrix4::translation({_board_point->_x + .5f, _board_point->_y + .5f, .5f})};
-			_cube.draw(renderer);
-		}
-		else
-			_board_point = {};
+		_board_point = Point{static_cast<int>(std::floor(p.x)), static_cast<int>(std::floor(p.y))};
+		PushTransformation t{renderer, Matrix4::translation({_board_point->_x + .5f, _board_point->_y + .5f, .5f})};
+		_cube.draw(renderer);
 	}
+	else
+		_board_point = {};
 	_checkerboard.draw(renderer);
 }
 

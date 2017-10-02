@@ -118,13 +118,10 @@ namespace Yttrium
 			break;
 
 		default:
+			if (const auto event_char = event.to_char())
 			{
-				const char event_char = event.to_char();
-				if (event_char) // TODO-17: Use init-statement.
-				{
-					insert(event_char);
-					break;
-				}
+				insert(event_char);
+				break;
 			}
 			return false;
 		}
