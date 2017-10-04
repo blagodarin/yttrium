@@ -4,7 +4,7 @@ add_executable(unit_tests
 	buffer_appender.cpp
 	buffer.cpp
 	flags.cpp
-	gui.cpp
+	gui_loading.cpp
 	image_formats.cpp
 	image_formats.h
 	image.cpp

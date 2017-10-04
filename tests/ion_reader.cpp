@@ -41,11 +41,26 @@ BOOST_AUTO_TEST_CASE(ion_reader_token)
 		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ListBegin, "[").check_list_begin());
 		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ObjectBegin, "{").check_list_begin(), IonError);
 	}
+	BOOST_TEST_CONTEXT("IonReader::Token::check_list_end")
+	{
+		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ListEnd, "]").check_list_end());
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ObjectEnd, "}").check_list_end(), IonError);
+	}
 	BOOST_TEST_CONTEXT("IonReader::Token::check_name")
 	{
 		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").check_name("name1"));
 		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").check_name("name2"), IonError);
 		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::Value, "name1").check_name("name1"), IonError);
+	}
+	BOOST_TEST_CONTEXT("IonReader::Token::check_object_begin")
+	{
+		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ObjectBegin, "{").check_object_begin());
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ListBegin, "[").check_object_begin(), IonError);
+	}
+	BOOST_TEST_CONTEXT("IonReader::Token::check_object_end")
+	{
+		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ObjectEnd, "}").check_object_end());
+		BOOST_CHECK_THROW(IonReader::Token(1, 1, IonReader::Token::Type::ListEnd, "]").check_object_end(), IonError);
 	}
 	BOOST_TEST_CONTEXT("IonReader::Token::to_name")
 	{

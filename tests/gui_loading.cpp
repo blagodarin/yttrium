@@ -48,45 +48,6 @@ private:
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load, GuiTest)
 {
-	BOOST_CHECK_NO_THROW(source(R"(
-		class "class"
-		{
-		}
-		root screen "root"
-		{
-			center "10" "10"
-			{
-				button ["class"]
-				{
-					position "4" "4" "2" "2"
-					text `Push`
-					on_click { enter "test" }
-				}
-			}
-			left "10"
-			{
-				label
-				{
-					position "1" "1" "5" "1"
-					text `Hello world!`
-				}
-			}
-			right "10"
-			{
-				canvas "right"
-				{
-					position "1" "1" "2" "8"
-				}
-			}
-			stretch
-			{
-				image
-				{
-				}
-			}
-		}
-	)"));
-
 	BOOST_CHECK_THROW(fragment("test"), GuiDataError);
 }
 
@@ -190,6 +151,74 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_text_color, GuiTest)
 	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` `0.50` `0.75` `test` }"), GuiDataError);
 }
 
+BOOST_FIXTURE_TEST_CASE(test_gui_load_class_style, GuiTest)
+{
+	BOOST_TEST_CONTEXT("checked")
+	{
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { } checked { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { align `center` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { borders `1` `2` `3` `4` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { text_size `0.25` } }"));
+
+		BOOST_CHECK_THROW(fragment("class `test` { checked }"), IonError);
+		BOOST_CHECK_THROW(fragment("class `test` { checked { checked { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { checked { disabled { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { checked { hovered { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { checked { pressed { } } }"), GuiDataError);
+	}
+	BOOST_TEST_CONTEXT("disabled")
+	{
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { } disabled { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { align `center` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { borders `1` `2` `3` `4` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { text_size `0.25` } }"));
+
+		BOOST_CHECK_THROW(fragment("class `test` { disabled }"), IonError);
+		BOOST_CHECK_THROW(fragment("class `test` { disabled { checked { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { disabled { disabled { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { disabled { hovered { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { disabled { pressed { } } }"), GuiDataError);
+	}
+	BOOST_TEST_CONTEXT("hovered")
+	{
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { } hovered { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { align `center` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { borders `1` `2` `3` `4` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { text_size `0.25` } }"));
+
+		BOOST_CHECK_THROW(fragment("class `test` { hovered }"), IonError);
+		BOOST_CHECK_THROW(fragment("class `test` { hovered { checked { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { hovered { disabled { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { hovered { hovered { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { hovered { pressed { } } }"), GuiDataError);
+	}
+	BOOST_TEST_CONTEXT("pressed")
+	{
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { } pressed { } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { align `center` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { borders `1` `2` `3` `4` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { text_size `0.25` } }"));
+
+		BOOST_CHECK_THROW(fragment("class `test` { pressed }"), IonError);
+		BOOST_CHECK_THROW(fragment("class `test` { pressed { checked { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { pressed { disabled { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { pressed { hovered { } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("class `test` { pressed { pressed { } } }"), GuiDataError);
+	}
+}
+
 BOOST_FIXTURE_TEST_CASE(test_gui_load_class_text_size, GuiTest)
 {
 	BOOST_CHECK_NO_THROW(fragment("class `test` { text_size `0.25` }"));
@@ -197,6 +226,25 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_text_size, GuiTest)
 	BOOST_CHECK_THROW(fragment("class `test` { text_size }"), IonError);
 	BOOST_CHECK_THROW(fragment("class `test` { text_size `0.25` `0.50` }"), IonError);
 	BOOST_CHECK_THROW(fragment("class `test` { text_size `test` }"), GuiDataError);
+}
+
+BOOST_FIXTURE_TEST_CASE(test_gui_load_class_texture_rect, GuiTest)
+{
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` `2.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `3.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `3.0` `4.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `` `2.0` `3.0` `4.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` `` `3.0` `4.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `` `4.0` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `3.0` `` }"));
+
+	BOOST_CHECK_THROW(fragment("class `test` { texture_rect }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `3.0` `4.0` `5.0` }"), IonError);
+	BOOST_CHECK_THROW(fragment("class `test` { texture_rect `test` `2.0` `3.0` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { texture_rect `1.0` `test` `3.0` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `test` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { texture_rect `1.0` `2.0` `3.0` `test` }"), GuiDataError);
 }
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load_include, GuiTest)
@@ -372,32 +420,78 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_screen_layout_widget, GuiTest)
 	BOOST_TEST_CONTEXT("button")
 	{
 		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { on_click { call `test` } } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { on_enter { call `test` } } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { on_update { call `test` } } } }"));
 		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button `test` { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { } screen `test` { stretch { button [`test`] { } } }"));
 	}
-	BOOST_TEST_CONTEXT("canvas")
+	BOOST_TEST_CONTEXT("button.align")
+	{
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `bottom` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `bottom` `left` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `bottom` `right` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `center` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `left` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `right` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `top` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `top` `left` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { align `top` `right` } } }"));
+	}
+	BOOST_TEST_CONTEXT("button.class")
+	{
+		BOOST_CHECK_NO_THROW(fragment("class `test` { } screen `test` { stretch { button [`test`] { } } }"));
+
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button [] { } } }"), IonError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button [`test`] { } } }"), GuiDataError);
+	}
+	BOOST_TEST_CONTEXT("button.position")
+	{
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { position `1.0` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` `3.0` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` `3.0` `4.0` } } }"));
+
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { position } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` `3.0` `4.0` `5.0` } } }"), IonError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { position `test` `2.0` `3.0` `4.0` } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { position `1.0` `test` `3.0` `4.0` } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` `test` `4.0` } } }"), GuiDataError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` `3.0` `test` } } }"), GuiDataError);
+	}
+	BOOST_TEST_CONTEXT("button.state")
+	{
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { state `checked` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { state `disabled` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { state `hovered` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { state `normal` } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { state `pressed` } } }"));
+
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { state } } }"), IonError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { state `test` } } }"), GuiDataError);
+	}
+	BOOST_TEST_CONTEXT("button.style")
+	{
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { checked { } } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { disabled { } } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { hovered { } } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { pressed { } } } }"));
+	}
+	BOOST_TEST_CONTEXT("button.text")
+	{
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { text \"test\" } } }"));
+		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { button { text `test` } } }"));
+
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { text } } }"), IonError);
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { button { text { } } } }"), IonError);
+	}
+	BOOST_TEST_CONTEXT("other")
 	{
 		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { canvas { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { canvas `test` { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { } screen `test` { stretch { canvas [`test`] { } } }"));
-	}
-	BOOST_TEST_CONTEXT("image")
-	{
 		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { image { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { image `test` { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { } screen `test` { stretch { image [`test`] { } } }"));
-	}
-	BOOST_TEST_CONTEXT("input")
-	{
 		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { input { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { input `test` { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { } screen `test` { stretch { input [`test`] { } } }"));
-	}
-	BOOST_TEST_CONTEXT("label")
-	{
 		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { label { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("screen `test` { stretch { label `test` { } } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { } screen `test` { stretch { label [`test`] { } } }"));
+
+		BOOST_CHECK_THROW(fragment("screen `test` { stretch { test { } } }"), GuiDataError);
 	}
 }
 

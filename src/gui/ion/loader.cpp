@@ -78,7 +78,7 @@ namespace
 	bool update_rect(RectF& rect, IonReader& ion, IonReader::Token& token)
 	{
 		if (token.type() != IonReader::Token::Type::Value)
-			return true;
+			return false;
 		if (!token.text().empty())
 		{
 			float x = 0;
