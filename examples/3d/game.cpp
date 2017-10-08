@@ -18,9 +18,9 @@ namespace
 	{
 		return
 		{
-			clamp(v.x, -64.f + 12.75f, 64.f - 12.75f),
-			clamp(v.y, -64.f - 3.5f, 64.f - 17.5f),
-			clamp(v.z, 1.f, 64.f),
+			std::clamp(v.x, -64.f + 12.75f, 64.f - 12.75f),
+			std::clamp(v.y, -64.f - 3.5f, 64.f - 17.5f),
+			std::clamp(v.z, 1.f, 64.f),
 		};
 	}
 }

@@ -6,13 +6,6 @@
 
 namespace Yttrium
 {
-	///
-	template <typename T, typename U, typename = std::enable_if_t<std::is_arithmetic<T>::value && std::is_arithmetic<U>::value>>
-	constexpr T clamp(T value, U min, U max)
-	{
-		return value < min ? min : (value > max ? max : value);
-	}
-
 	/// Returns \c true if the value is a power of two.
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
 	constexpr bool is_power_of_2(T x)
@@ -22,7 +15,7 @@ namespace Yttrium
 
 	/// Returns the least power of two not less than the specified positive value.
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value && sizeof(T) <= sizeof(uint64_t)>>
-	T next_power_of_2(T x)
+	constexpr T next_power_of_2(T x)
 	{
 		--x;
 		x |= x >> 1;
@@ -53,7 +46,7 @@ namespace Yttrium
 
 	///
 	template <typename T, typename U, typename = std::enable_if_t<std::is_arithmetic<T>::value && std::is_arithmetic<U>::value>>
-	T wrap(T value, U min, U max)
+	constexpr T wrap(T value, U min, U max)
 	{
 		if (value < min)
 			do { value += max - min; } while (value < min);

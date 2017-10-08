@@ -53,8 +53,8 @@ namespace Yttrium
 			_hover_widget = widget;
 			if (_click_widget && cursor != _click_cursor)
 			{
-				_click_cursor.x = clamp(cursor.x, _click_widget->render_rect().left(), _click_widget->render_rect().right() - 1);
-				_click_cursor.y = clamp(cursor.y, _click_widget->render_rect().top(), _click_widget->render_rect().bottom() - 1);
+				_click_cursor.x = std::clamp(cursor.x, _click_widget->render_rect().left(), _click_widget->render_rect().right() - 1);
+				_click_cursor.y = std::clamp(cursor.y, _click_widget->render_rect().top(), _click_widget->render_rect().bottom() - 1);
 				_click_widget->process_mouse_move(_click_cursor);
 			}
 		}
