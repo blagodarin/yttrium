@@ -5,6 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+using Yttrium::IonError;
 using Yttrium::IonReader;
 
 namespace Yttrium
@@ -29,8 +30,6 @@ BOOST_AUTO_TEST_CASE(ion_reader_iostream)
 
 BOOST_AUTO_TEST_CASE(ion_reader_token)
 {
-	using Yttrium::IonError;
-
 	BOOST_TEST_CONTEXT("IonReader::Token::check_end")
 	{
 		BOOST_CHECK_NO_THROW(IonReader::Token(1, 1, IonReader::Token::Type::End, "").check_end());
@@ -165,17 +164,24 @@ BOOST_AUTO_TEST_CASE(ion_reader_newlines)
 
 BOOST_AUTO_TEST_CASE(ion_reader_comments)
 {
-	TestData ion{"name1#name2\n\"value1\"\"val#ue2\"#\"value3\n#comment"};
-	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(2, 1, IonReader::Token::Type::Value, "value1"));
-	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(2, 9, IonReader::Token::Type::Value, "val#ue2"));
-	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(3, 9, IonReader::Token::Type::End, ""));
+	BOOST_TEST_CONTEXT("Full-line comments")
+	{
+		BOOST_CHECK_THROW(TestData{"/comment"}->read(), IonError);
+		BOOST_CHECK_NO_THROW(TestData{"//comment"}->read());
+		BOOST_CHECK_NO_THROW(TestData{"///comment"}->read());
+	}
+	BOOST_TEST_CONTEXT("Inline comments")
+	{
+		TestData ion{"name1//name2\n\"value1\"\"val//ue2\"//\"value3\n//comment"};
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(2, 1, IonReader::Token::Type::Value, "value1"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(2, 9, IonReader::Token::Type::Value, "val//ue2"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(3, 10, IonReader::Token::Type::End, ""));
+	}
 }
 
 BOOST_AUTO_TEST_CASE(ion_reader_negative)
 {
-	using Yttrium::IonError;
-
 	{
 		TestData ion{"\""};
 		BOOST_CHECK_THROW(ion->read(), IonError);

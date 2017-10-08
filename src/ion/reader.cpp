@@ -21,51 +21,51 @@ namespace
 		RBrace,   // '}'.
 		LBracket, // '['.
 		RBracket, // ']'.
-		Comment,  // '#'.
+		Comment,  // '/'.
 	};
 
 	const std::array<CharClass, 256> char_class =
 	{
 		// #0 - #31: Special character set.
 
-		End,    Other,  Other, Other,    Other, Other,    Other, Other, // \0
-		Other,  Space,  Lf,    Space,    Space, Cr,       Other, Other, // \t \n \v \f \r
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+		End,    Other,  Other, Other,    Other, Other,    Other, Other,   // \0
+		Other,  Space,  Lf,    Space,    Space, Cr,       Other, Other,   // \t \n \v \f \r
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,   //
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,   //
 
 		// #32 - #127: Basic character set.
 
-		Space,  Other,  Quote, Comment,  Other, Other,    Other, Other, //   ! " # $ % & '
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, // ( ) * + , - . /
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // 0 1 2 3 4 5 6 7
-		Name,   Name,   Other, Other,    Other, Other,    Other, Other, // 8 9 : ; < = > ?
-		Other,  Name,   Name,  Name,     Name,  Name,     Name,  Name,  // @ A B C D E F G
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // H I J K L M N O
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // P Q R S T U V W
-		Name,   Name,   Name,  LBracket, Other, RBracket, Other, Name,  // X Y Z [ \ ] ^ _
-		Quote,  Name,   Name,  Name,     Name,  Name,     Name,  Name,  // ` a b c d e f g
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // h i j k l m n o
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,  // p q r s t u v w
-		Name,   Name,   Name,  LBrace,   Other, RBrace,   Other, Other, // x y z { | } ~
+		Space,  Other,  Quote, Other,    Other, Other,    Other, Other,   //   ! " # $ % & '
+		Other,  Other,  Other, Other,    Other, Other,    Other, Comment, // ( ) * + , - . /
+		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // 0 1 2 3 4 5 6 7
+		Name,   Name,   Other, Other,    Other, Other,    Other, Other,   // 8 9 : ; < = > ?
+		Other,  Name,   Name,  Name,     Name,  Name,     Name,  Name,    // @ A B C D E F G
+		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // H I J K L M N O
+		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // P Q R S T U V W
+		Name,   Name,   Name,  LBracket, Other, RBracket, Other, Name,    // X Y Z [ \ ] ^ _
+		Quote,  Name,   Name,  Name,     Name,  Name,     Name,  Name,    // ` a b c d e f g
+		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // h i j k l m n o
+		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // p q r s t u v w
+		Name,   Name,   Name,  LBrace,   Other, RBrace,   Other, Other,   // x y z { | } ~
 
 		// #128 - #255: Extended character set.
 
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other, //
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
 	};
 
 	CharClass class_of(char c)
@@ -224,6 +224,8 @@ namespace Yttrium
 					return make_token<IonReader::Token::Type::ListEnd>(_cursor++, 1);
 
 				case Comment:
+					if (*++_cursor != '/')
+						throw IonError{_line, _cursor - _line_base, "Bad character"};
 					do { ++_cursor; } while (*_cursor != '\n' && *_cursor != '\r' && *_cursor != '\0');
 					break;
 				}

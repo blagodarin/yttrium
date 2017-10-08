@@ -25,11 +25,11 @@ screen "game"
 
 	center "30" "26"
 	{
-		image ["background"] { position  "1"  "2"  "6"  "5" } # Next
-		image ["background"] { position "10"  "2" "10" "22" } # Field
-		image ["background"] { position "23"  "2"  "6"  "2" } # Level
-		image ["background"] { position "23"  "6"  "6"  "2" } # Lines
-		image ["background"] { position "23" "10"  "6"  "2" } # Score
+		image ["background"] { position  "1"  "2"  "6"  "5" } // Next
+		image ["background"] { position "10"  "2" "10" "22" } // Field
+		image ["background"] { position "23"  "2"  "6"  "2" } // Level
+		image ["background"] { position "23"  "6"  "6"  "2" } // Lines
+		image ["background"] { position "23" "10"  "6"  "2" } // Score
 
 		label { position  "1.5"  "2" "5" "1" align "left"  text `Next:` }
 
