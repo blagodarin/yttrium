@@ -20,14 +20,13 @@ namespace Yttrium
 
 		void attach_buffer(const std::string& name, Buffer&& buffer)
 		{
-			_buffers.emplace_back(name, std::move(buffer));
-			_stored[_buffers.back()._name] = BufferEntry{&_buffers.back()};
+			auto& attachment = _buffers.emplace_back(name, std::move(buffer));
+			_stored[attachment._name] = BufferEntry{&attachment};
 		}
 
 		void attach_package(std::unique_ptr<PackageReader>&& package)
 		{
-			_packages.emplace_back(std::move(package));
-			const auto p = _packages.back().get();
+			const auto p = _packages.emplace_back(std::move(package)).get();
 			const auto& names = p->names();
 			for (std::size_t i = 0; i < names.size(); ++i)
 				_stored[names[i]] = PackageEntry{p, i};

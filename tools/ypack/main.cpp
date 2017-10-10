@@ -47,14 +47,14 @@ int main(int argc, char** argv)
 		ion.read().check_list_begin();
 		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd;)
 		{
-			entries.emplace_back(std::string{token.to_value()}, std::map<std::string, std::string, std::less<>>{});
+			auto& properties = entries.emplace_back(std::string{token.to_value()}, std::map<std::string, std::string, std::less<>>{}).second;
 			if (token = ion.read(); token.type() == Yttrium::IonReader::Token::Type::ObjectBegin)
 			{
 				for (token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ObjectEnd; token = ion.read())
 				{
 					const auto property_name = token.to_name();
-					check(entries.back().second.count(property_name) == 0, "Duplicate property '", property_name, "'");
-					entries.back().second.emplace(std::string{property_name}, ion.read().to_value());
+					check(properties.count(property_name) == 0, "Duplicate property '", property_name, "'");
+					properties.emplace(std::string{property_name}, ion.read().to_value());
 				}
 				token = ion.read();
 			}

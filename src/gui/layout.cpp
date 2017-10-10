@@ -12,8 +12,7 @@ namespace Yttrium
 
 	Widget& GuiLayout::add_widget(std::unique_ptr<Widget>&& widget)
 	{
-		_widgets.emplace_back(std::move(widget));
-		return *_widgets.back();
+		return *_widgets.emplace_back(std::move(widget));
 	}
 
 	void GuiLayout::draw(Renderer& renderer, const Widget* hover_widget, const Widget* click_widget) const

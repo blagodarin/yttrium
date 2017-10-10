@@ -174,8 +174,7 @@ namespace Yttrium
 
 			for (const auto& entry : _entries)
 			{
-				entries.emplace_back();
-				entries.back().metadata_offset = static_cast<uint32_t>(metadata_offset + writer.offset());
+				entries.emplace_back().metadata_offset = static_cast<uint32_t>(metadata_offset + writer.offset());
 				if (!write_string(entry.name))
 					return false;
 				const auto property_count = static_cast<uint8_t>(entry.properties.size());
