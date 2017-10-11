@@ -11,7 +11,7 @@ transparent screen "pause"
 
 	stretch
 	{
-		image { color "0" "0" "0" "0.5" }
+		image { color #0008 }
 	}
 
 	center "30" "26"

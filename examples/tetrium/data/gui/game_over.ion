@@ -7,7 +7,7 @@ transparent screen "game_over"
 
 	stretch
 	{
-		image { color "0" "0" "0" "0.5" }
+		image { color #0008 }
 	}
 
 	center "30" "26"
@@ -15,22 +15,22 @@ transparent screen "game_over"
 		label
 		{
 			position "0" "4" "30" "8"
-			text_color "1" "1" "0"
+			text_color #ff0
 			text `Game over`
 		}
 
 		label
 		{
 			position "0" "13" "30" "3"
-			text_color "1" "1" "1"
+			text_color #fff
 			text `Enter your name:`
 		}
 
 		input
 		{
 			position "5" "18" "20" "4"
-			color "1" "1" "1" "0.5"
-			text_color "0" "0" "0"
+			color #fff8
+			text_color #000
 			text "John Placeholder"
 			on_update { call "player_name = _" }
 			on_enter { call "set_score player_name score" return_to "main_menu" enter "statistics" }

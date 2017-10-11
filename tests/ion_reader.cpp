@@ -318,3 +318,19 @@ BOOST_AUTO_TEST_CASE(ion_reader_translatable)
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
 	BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 14, IonReader::Token::Type::Value, "value2", true));
 }
+
+BOOST_AUTO_TEST_CASE(ion_reader_colors)
+{
+	{
+		TestData ion{R"(name#01234567#89abcdef`)"};
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 5, IonReader::Token::Type::Color, "#01234567"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 14, IonReader::Token::Type::Color, "#89abcdef"));
+	}
+	{
+		TestData ion{R"(name#01234567#89ABCDEF`)"};
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 1, IonReader::Token::Type::Name, "name"));
+		BOOST_CHECK_EQUAL(ion->read(), IonReader::Token(1, 5, IonReader::Token::Type::Color, "#01234567"));
+		BOOST_CHECK_THROW(ion->read(), IonError); // Only lowercase hexadecimal digits are allowed.
+	}
+}

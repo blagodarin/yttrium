@@ -123,32 +123,12 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_borders, GuiTest)
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load_class_color, GuiTest)
 {
-	BOOST_CHECK_NO_THROW(fragment("class `test` { color `0.25` `0.50` `0.75` }"));
-	BOOST_CHECK_NO_THROW(fragment("class `test` { color `0.25` `0.50` `0.75` `1.00` }"));
-
-	BOOST_CHECK_THROW(fragment("class `test` { color }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `0.25` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `0.25` `0.50` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `0.25` `0.50` `0.75` `1.00` `1.25` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `test` `0.50` `0.75` `1.00` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `0.25` `test` `0.75` `1.00` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `0.25` `0.50` `test` `1.00` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { color `0.25` `0.50` `0.75` `test` }"), GuiDataError);
+	BOOST_CHECK_NO_THROW(fragment("class `test` { color #12345678 }"));
 }
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load_class_text_color, GuiTest)
 {
-	BOOST_CHECK_NO_THROW(fragment("class `test` { text_color `0.25` `0.50` `0.75` }"));
-	BOOST_CHECK_NO_THROW(fragment("class `test` { text_color `0.25` `0.50` `0.75` `1.00` }"));
-
-	BOOST_CHECK_THROW(fragment("class `test` { text_color }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` `0.50` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` `0.50` `0.75` `1.00` `1.25` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `test` `0.50` `0.75` `1.00` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` `test` `0.75` `1.00` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` `0.50` `test` `1.00` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { text_color `0.25` `0.50` `0.75` `test` }"), GuiDataError);
+	BOOST_CHECK_NO_THROW(fragment("class `test` { text_color #12345678 }"));
 }
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load_class_style, GuiTest)
@@ -159,8 +139,8 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_style, GuiTest)
 		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { } checked { } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { align `center` } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { borders `1` `2` `3` `4` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { color `0.25` `0.50` `0.75` `1.00` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { color #12345678 } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { text_color #12345678 } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { checked { text_size `0.25` } }"));
 
 		BOOST_CHECK_THROW(fragment("class `test` { checked }"), IonError);
@@ -175,8 +155,8 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_style, GuiTest)
 		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { } disabled { } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { align `center` } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { borders `1` `2` `3` `4` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { color `0.25` `0.50` `0.75` `1.00` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { color #12345678 } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { text_color #12345678 } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { disabled { text_size `0.25` } }"));
 
 		BOOST_CHECK_THROW(fragment("class `test` { disabled }"), IonError);
@@ -191,8 +171,8 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_style, GuiTest)
 		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { } hovered { } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { align `center` } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { borders `1` `2` `3` `4` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { color `0.25` `0.50` `0.75` `1.00` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { color #12345678 } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { text_color #12345678 } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { hovered { text_size `0.25` } }"));
 
 		BOOST_CHECK_THROW(fragment("class `test` { hovered }"), IonError);
@@ -207,8 +187,8 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_style, GuiTest)
 		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { } pressed { } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { align `center` } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { borders `1` `2` `3` `4` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { color `0.25` `0.50` `0.75` `1.00` } }"));
-		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { text_color `0.25` `0.50` `0.75` `1.00` } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { color #12345678 } }"));
+		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { text_color #12345678 } }"));
 		BOOST_CHECK_NO_THROW(fragment("class `test` { pressed { text_size `0.25` } }"));
 
 		BOOST_CHECK_THROW(fragment("class `test` { pressed }"), IonError);

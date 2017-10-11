@@ -8,6 +8,7 @@
 
 namespace Yttrium
 {
+	class Color4f;
 	class Source;
 
 	///
@@ -29,6 +30,7 @@ namespace Yttrium
 			{
 				Name,
 				Value,
+				Color,
 				ListBegin,
 				ListEnd,
 				ObjectBegin,
@@ -52,6 +54,7 @@ namespace Yttrium
 			void check_object_begin() const;
 			void check_object_end() const;
 			Token& next(IonReader&);
+			Color4f to_color() const;
 			std::string_view to_name() const;
 			std::string_view to_value() const;
 

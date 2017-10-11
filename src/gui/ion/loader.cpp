@@ -58,23 +58,6 @@ namespace
 		return on_key;
 	}
 
-	bool update_color(Color4f& color, IonReader& ion, IonReader::Token& token)
-	{
-		if (!strings::to_number(token.to_value(), color.r)
-			|| !strings::to_number(token.next(ion).to_value(), color.g)
-			|| !strings::to_number(token.next(ion).to_value(), color.b))
-			return false;
-		if (token.next(ion).type() == IonReader::Token::Type::Value)
-		{
-			if (!strings::to_number(token.text(), color.a))
-				return false;
-			token.next(ion);
-		}
-		else
-			color.a = 1;
-		return true;
-	}
-
 	bool update_rect(RectF& rect, IonReader& ion, IonReader::Token& token)
 	{
 		if (token.type() != IonReader::Token::Type::Value)
@@ -592,8 +575,8 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (!::update_color(data._background.color, ion, token))
-			throw GuiDataError{"Bad 'color'"};
+		data._background.color = token.to_color();
+		token.next(ion);
 	}
 
 	void GuiIonLoader::load_style_font(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
@@ -609,8 +592,8 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_text_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (!::update_color(data._foreground.color, ion, token))
-			throw GuiDataError{"Bad 'text_color'"};
+		data._foreground.color = token.to_color();
+		token.next(ion);
 	}
 
 	void GuiIonLoader::load_style_text_size(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const

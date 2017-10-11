@@ -22,20 +22,20 @@ class "button"
 	pressed
 	{
 		texture_rect "0" "32"
-		color "0.9" "0.9" "0.9"
-		text_color "1" "1" "0"
+		color #eee
+		text_color #ff0
 	}
 
 	checked
 	{
 		texture_rect "0" "48"
-		text_color "1" "1" "0"
+		text_color #ff0
 	}
 
 	disabled
 	{
-		color "0.5" "0.5" "0.5" "0.75"
-		text_color "0.75" "0.75" "0.75"
+		color #888c
+		text_color #ccc
 	}
 }
 

@@ -1,7 +1,9 @@
 #include <yttrium/ion/reader.h>
 
+#include <yttrium/math/color.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
+#include <yttrium/utils.h>
 
 #include <array>
 #include <vector>
@@ -17,6 +19,7 @@ namespace
 		Lf,       // '\n'.
 		Name,     // 'A'-'Z', 'a'-'z', '0'-'9' or '_'.
 		Quote,    // '"', '`'.
+		Hash,     // '#'.
 		LBrace,   // '{'.
 		RBrace,   // '}'.
 		LBracket, // '['.
@@ -35,7 +38,7 @@ namespace
 
 		// #32 - #127: Basic character set.
 
-		Space,  Other,  Quote, Other,    Other, Other,    Other, Other,   //   ! " # $ % & '
+		Space,  Other,  Quote, Hash,     Other, Other,    Other, Other,   //   ! " # $ % & '
 		Other,  Other,  Other, Other,    Other, Other,    Other, Comment, // ( ) * + , - . /
 		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // 0 1 2 3 4 5 6 7
 		Name,   Name,   Other, Other,    Other, Other,    Other, Other,   // 8 9 : ; < = > ?
@@ -117,6 +120,27 @@ namespace Yttrium
 		return *this = ion.read();
 	}
 
+	Color4f IonReader::Token::to_color() const
+	{
+		if (_type != Type::Color)
+			throw IonError{_line, _column, "ION color expected"};
+
+		const auto d = [this](std::size_t i)
+		{
+			const auto c = _text[i];
+			return c < 'a' ? c - '0' : c - 'a' + 10;
+		};
+
+		switch (_text.size())
+		{
+		case 4: return {d(1) / 15.f, d(2) / 15.f, d(3) / 15.f};
+		case 5: return {d(1) / 15.f, d(2) / 15.f, d(3) / 15.f, d(4) / 15.f};
+		case 7: return {(d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f};
+		case 9: return {(d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f, (d(7) * 16 + d(8)) / 255.f};
+		default: throw IonError{_line, _column, "Bad ION color"};
+		}
+	}
+
 	std::string_view IonReader::Token::to_name() const
 	{
 		if (_type != Type::Name)
@@ -149,12 +173,13 @@ namespace Yttrium
 					throw IonError{_line, _cursor - _line_base, "Bad character"};
 
 				case End:
-					if (_cursor != static_cast<const char*>(_buffer.data()) + _buffer.size())
+					if (_cursor == static_cast<const char*>(_buffer.data()) + _buffer.size())
+						return make_token<IonReader::Token::Type::End>(_cursor, 0);
+					else
 						throw IonError{_line, _cursor - _line_base, "Bad character"};
-					return make_token<IonReader::Token::Type::End>(_cursor, 0);
 
 				case Space:
-					do { ++_cursor; } while (::class_of(*_cursor) == Space);
+					_cursor = forward_find_if(_cursor + 1, [](char c){ return ::class_of(c) != Space; });
 					break;
 
 				case Cr:
@@ -166,18 +191,18 @@ namespace Yttrium
 					break;
 
 				case Name:
-					if (!(_stack.back() & AcceptNames))
-						throw IonError{_line, _cursor - _line_base, "Unexpected ION name"};
+					if (_stack.back() & AcceptNames)
 					{
-						const auto base = _cursor;
-						do { ++_cursor; } while (::class_of(*_cursor) == Name);
+						const auto begin = _cursor;
+						_cursor = forward_find_if(begin + 1, [](char c){ return ::class_of(c) != Name; });
 						_stack.back() |= AcceptValues;
-						return make_token<IonReader::Token::Type::Name>(base, _cursor - base);
+						return make_token<IonReader::Token::Type::Name>(begin, _cursor - begin);
 					}
+					else
+						throw IonError{_line, _cursor - _line_base, "Unexpected ION name"};
 
 				case Quote:
-					if (!(_stack.back() & AcceptValues))
-						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
+					if (_stack.back() & AcceptValues)
 					{
 						auto cursor = _cursor;
 						const auto quote = *cursor;
@@ -198,36 +223,66 @@ namespace Yttrium
 						_cursor = cursor + 1;
 						return make_token<IonReader::Token::Type::Value, -1>(base, cursor - base, quote == '`');
 					}
+					else
+						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
+
+				case Hash:
+					if (_stack.back() & AcceptValues)
+					{
+						const auto begin = _cursor;
+						const auto end = forward_find_if(begin + 1, [](char c){ return (c < '0' || c > '9') && (c < 'a' || c > 'f'); });
+						if (const auto next_class = ::class_of(*end); next_class == Other || next_class == Name)
+							throw IonError{_line, end - _line_base, "Bad character"};
+						_cursor = end;
+						return make_token<IonReader::Token::Type::Color>(begin, end - begin);
+					}
+					else
+						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
 
 				case LBrace:
-					if (!(_stack.back() & AcceptValues))
+					if (_stack.back() & AcceptValues)
+					{
+						_stack.emplace_back(AcceptNames);
+						return make_token<IonReader::Token::Type::ObjectBegin>(_cursor++, 1);
+					}
+					else
 						throw IonError{_line, _cursor - _line_base, "Unexpected list"};
-					_stack.emplace_back(AcceptNames);
-					return make_token<IonReader::Token::Type::ObjectBegin>(_cursor++, 1);
 
 				case RBrace:
-					if (!(_stack.back() & AcceptNames) || _stack.size() == 1)
+					if (_stack.back() & AcceptNames && _stack.size() > 1)
+					{
+						_stack.pop_back();
+						return make_token<IonReader::Token::Type::ObjectEnd>(_cursor++, 1);
+					}
+					else
 						throw IonError{_line, _cursor - _line_base, "Unexpected end of object"};
-					_stack.pop_back();
-					return make_token<IonReader::Token::Type::ObjectEnd>(_cursor++, 1);
 
 				case LBracket:
-					if (!(_stack.back() & AcceptValues))
+					if (_stack.back() & AcceptValues)
+					{
+						_stack.emplace_back(AcceptValues);
+						return make_token<IonReader::Token::Type::ListBegin>(_cursor++, 1);
+					}
+					else
 						throw IonError{_line, _cursor - _line_base, "Unexpected list"};
-					_stack.emplace_back(AcceptValues);
-					return make_token<IonReader::Token::Type::ListBegin>(_cursor++, 1);
 
 				case RBracket:
-					if ((_stack.back() & (AcceptNames | AcceptValues)) != AcceptValues)
+					if ((_stack.back() & (AcceptNames | AcceptValues)) == AcceptValues)
+					{
+						_stack.pop_back();
+						return make_token<IonReader::Token::Type::ListEnd>(_cursor++, 1);
+					}
+					else
 						throw IonError{_line, _cursor - _line_base, "Unexpected end of object"};
-					_stack.pop_back();
-					return make_token<IonReader::Token::Type::ListEnd>(_cursor++, 1);
 
 				case Comment:
-					if (*++_cursor != '/')
-						throw IonError{_line, _cursor - _line_base, "Bad character"};
-					do { ++_cursor; } while (*_cursor != '\n' && *_cursor != '\r' && *_cursor != '\0');
-					break;
+					if (auto next = _cursor + 1; *next == '/')
+					{
+						_cursor = forward_find_if(next + 1, [](char c){ return c == '\n' || c == '\r' || c == '\0'; });
+						break;
+					}
+					else
+						throw IonError{_line, next - _line_base, "Bad character"};
 				}
 			}
 		}

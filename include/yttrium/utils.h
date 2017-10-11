@@ -6,6 +6,14 @@
 
 namespace Yttrium
 {
+	///
+	template <typename I, typename P>
+	constexpr I forward_find_if(I iterator, const P& predicate)
+	{
+		for (; !predicate(*iterator); ++iterator);
+		return iterator;
+	}
+
 	/// Returns \c true if the value is a power of two.
 	template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
 	constexpr bool is_power_of_2(T x)
