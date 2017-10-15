@@ -1,7 +1,9 @@
 #ifndef _src_renderer_vulkan_context_h_
 #define _src_renderer_vulkan_context_h_
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -56,10 +58,16 @@ namespace Yttrium
 		~VK_Device() noexcept;
 
 		VkDeviceMemory allocate_memory(const VkMemoryRequirements&, VkFlags) const;
+		void wait_idle();
 	};
 
 	struct VK_Swapchain
 	{
+		struct OutOfDate : std::runtime_error
+		{
+			OutOfDate() : std::runtime_error{"VK_ERROR_OUT_OF_DATE_KHR"} {}
+		};
+
 		const VK_Device& _device;
 		VkFormat _format = VK_FORMAT_UNDEFINED;
 		VkSwapchainKHR _handle = VK_NULL_HANDLE;
@@ -70,9 +78,11 @@ namespace Yttrium
 
 		void create();
 		void create_views();
-		void present(uint32_t index, VkSemaphore) const;
 
 		VkAttachmentDescription attachment_description() const noexcept;
+
+		uint32_t acquire_next_image(VkSemaphore) const;
+		void present(uint32_t framebuffer_index, VkSemaphore) const;
 	};
 
 	struct VK_DepthBuffer
@@ -136,10 +146,64 @@ namespace Yttrium
 		const VK_Device& _device;
 		VkSemaphore _handle = VK_NULL_HANDLE;
 
-		explicit VK_Semaphore(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Semaphore(const VK_Device&);
 		~VK_Semaphore() noexcept;
+	};
 
-		void create();
+	struct VK_Pipeline
+	{
+		const VK_Device& _device;
+		VkPipeline _handle = VK_NULL_HANDLE;
+
+		explicit VK_Pipeline(const VK_Device& device) noexcept : _device{device} {}
+		~VK_Pipeline() noexcept;
+
+		void create(VkPipelineLayout, VkRenderPass, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
+	};
+
+	struct VK_CommandPool
+	{
+		const VK_Device& _device;
+		VkCommandPool _handle = VK_NULL_HANDLE;
+
+		VK_CommandPool(const VK_Device&, uint32_t queue_family_index);
+		~VK_CommandPool() noexcept;
+	};
+
+	struct VK_CommandBuffer
+	{
+		const VK_CommandPool& _pool;
+		VkCommandBuffer _handle = VK_NULL_HANDLE;
+
+		explicit VK_CommandBuffer(const VK_CommandPool&);
+		~VK_CommandBuffer() noexcept;
+
+		void begin() const;
+		void end() const;
+		void submit(VkSemaphore wait_semaphore, VkSemaphore signal_semaphore) const;
+	};
+
+	class VulkanSwapchain
+	{
+	public:
+		VulkanSwapchain(const VK_Device&, const VK_CommandPool&, VkPipelineLayout, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
+		~VulkanSwapchain() noexcept = default;
+
+		void render(const std::function<void(VkCommandBuffer, const std::function<void(const std::function<void()>&)>&)>&) const; // TODO: Improve readability.
+
+	private:
+		void present(uint32_t framebuffer_index, VkSemaphore) const;
+
+	public:
+		const VK_Device& _device;
+		VK_Swapchain _swapchain;
+		VK_DepthBuffer _depth_buffer;
+		VK_RenderPass _render_pass;
+		VK_Framebuffers _framebuffers;
+		VK_Pipeline _pipeline;
+		VK_Semaphore _image_acquired;
+		VK_Semaphore _rendering_complete;
+		VK_CommandBuffer _command_buffer;
 	};
 
 	class VulkanContext
@@ -156,23 +220,16 @@ namespace Yttrium
 		VK_Surface _surface;
 		VK_PhysicalDevice _physical_device;
 		VK_Device _device;
-		VK_Swapchain _swapchain;
-		VK_DepthBuffer _depth_buffer;
-		VK_RenderPass _render_pass;
-		VK_Framebuffers _framebuffers;
 		VK_Buffer _uniform_buffer;
 		VK_Buffer _vertex_buffer;
-		VK_Semaphore _image_acquired;
-		VK_Semaphore _rendering_complete;
+		VK_CommandPool _command_pool;
 		VkDescriptorSetLayout _descriptor_set_layout = VK_NULL_HANDLE;
 		VkPipelineLayout _pipeline_layout = VK_NULL_HANDLE;
 		VkDescriptorPool _descriptor_pool = VK_NULL_HANDLE;
 		VkDescriptorSet _descriptor_set = VK_NULL_HANDLE;
 		VkShaderModule _vertex_shader = VK_NULL_HANDLE;
 		VkShaderModule _fragment_shader = VK_NULL_HANDLE;
-		VkCommandPool _command_pool = VK_NULL_HANDLE;
-		VkCommandBuffer _command_buffer = VK_NULL_HANDLE;
-		VkPipeline _pipeline = VK_NULL_HANDLE;
+		std::unique_ptr<VulkanSwapchain> _swapchain;
 	};
 }
 
