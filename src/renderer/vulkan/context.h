@@ -18,6 +18,8 @@ namespace Yttrium
 
 		VK_Instance();
 		~VK_Instance() noexcept;
+
+		std::vector<VkPhysicalDevice> physical_device_handles() const;
 	};
 
 	struct VK_Surface
@@ -138,6 +140,7 @@ namespace Yttrium
 		void create(VkBufferUsageFlags usage);
 		void allocate_memory(VkFlags);
 
+		VkDescriptorBufferInfo descriptor_buffer_info() const noexcept;
 		void write(const void*, size_t);
 	};
 
@@ -150,6 +153,36 @@ namespace Yttrium
 		~VK_Semaphore() noexcept;
 	};
 
+	struct VK_DescriptorSetLayout
+	{
+		const VK_Device& _device;
+		VkDescriptorSetLayout _handle = VK_NULL_HANDLE;
+
+		struct Binding : VkDescriptorSetLayoutBinding
+		{
+			Binding(VkDescriptorType type, VkShaderStageFlags flags) noexcept
+			{
+				binding = 0;
+				descriptorType = type;
+				descriptorCount = 1;
+				stageFlags = flags;
+				pImmutableSamplers = nullptr;
+			}
+		};
+
+		VK_DescriptorSetLayout(const VK_Device&, std::vector<Binding>&&);
+		~VK_DescriptorSetLayout() noexcept;
+	};
+
+	struct VK_PipelineLayout
+	{
+		const VK_Device& _device;
+		VkPipelineLayout _handle = VK_NULL_HANDLE;
+
+		VK_PipelineLayout(const VK_Device&, std::initializer_list<VkDescriptorSetLayout>);
+		~VK_PipelineLayout() noexcept;
+	};
+
 	struct VK_Pipeline
 	{
 		const VK_Device& _device;
@@ -158,7 +191,7 @@ namespace Yttrium
 		explicit VK_Pipeline(const VK_Device& device) noexcept : _device{device} {}
 		~VK_Pipeline() noexcept;
 
-		void create(VkPipelineLayout, VkRenderPass, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
+		void create(const VK_PipelineLayout&, VkRenderPass, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
 	};
 
 	struct VK_CommandPool
@@ -186,7 +219,7 @@ namespace Yttrium
 	class VulkanSwapchain
 	{
 	public:
-		VulkanSwapchain(const VK_Device&, const VK_CommandPool&, VkPipelineLayout, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
+		VulkanSwapchain(const VK_Device&, const VK_CommandPool&, const VK_PipelineLayout&, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
 		~VulkanSwapchain() noexcept = default;
 
 		void render(const std::function<void(VkCommandBuffer, const std::function<void(const std::function<void()>&)>&)>&) const; // TODO: Improve readability.
@@ -223,8 +256,8 @@ namespace Yttrium
 		VK_Buffer _uniform_buffer;
 		VK_Buffer _vertex_buffer;
 		VK_CommandPool _command_pool;
-		VkDescriptorSetLayout _descriptor_set_layout = VK_NULL_HANDLE;
-		VkPipelineLayout _pipeline_layout = VK_NULL_HANDLE;
+		VK_DescriptorSetLayout _descriptor_set_layout;
+		VK_PipelineLayout _pipeline_layout;
 		VkDescriptorPool _descriptor_pool = VK_NULL_HANDLE;
 		VkDescriptorSet _descriptor_set = VK_NULL_HANDLE;
 		VkShaderModule _vertex_shader = VK_NULL_HANDLE;
