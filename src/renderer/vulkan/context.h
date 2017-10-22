@@ -17,7 +17,7 @@ namespace Yttrium
 		VkInstance _handle = VK_NULL_HANDLE;
 
 		VK_Instance();
-		~VK_Instance() noexcept;
+		~VK_Instance() noexcept { vkDestroyInstance(_handle, nullptr); }
 
 		std::vector<VkPhysicalDevice> physical_device_handles() const;
 	};
@@ -28,7 +28,7 @@ namespace Yttrium
 		VkSurfaceKHR _handle = VK_NULL_HANDLE;
 
 		VK_Surface(const VK_Instance&, const WindowBackend&);
-		~VK_Surface() noexcept;
+		~VK_Surface() noexcept { vkDestroySurfaceKHR(_instance._handle, _handle, nullptr); }
 	};
 
 	struct VK_PhysicalDevice
@@ -57,7 +57,7 @@ namespace Yttrium
 		VkQueue _present_queue = VK_NULL_HANDLE;
 
 		explicit VK_Device(const VK_PhysicalDevice&);
-		~VK_Device() noexcept;
+		~VK_Device() noexcept { vkDestroyDevice(_handle, nullptr); }
 
 		VkDeviceMemory allocate_memory(const VkMemoryRequirements&, VkFlags) const;
 		void wait_idle();
@@ -150,7 +150,7 @@ namespace Yttrium
 		VkSemaphore _handle = VK_NULL_HANDLE;
 
 		explicit VK_Semaphore(const VK_Device&);
-		~VK_Semaphore() noexcept;
+		~VK_Semaphore() noexcept { vkDestroySemaphore(_device._handle, _handle, nullptr); }
 	};
 
 	struct VK_DescriptorSetLayout
@@ -171,7 +171,34 @@ namespace Yttrium
 		};
 
 		VK_DescriptorSetLayout(const VK_Device&, std::vector<Binding>&&);
-		~VK_DescriptorSetLayout() noexcept;
+		~VK_DescriptorSetLayout() noexcept { vkDestroyDescriptorSetLayout(_device._handle, _handle, nullptr); }
+	};
+
+	struct VK_DescriptorPool
+	{
+		const VK_Device& _device;
+		VkDescriptorPool _handle = VK_NULL_HANDLE;
+
+		struct Size : VkDescriptorPoolSize
+		{
+			Size(VkDescriptorType type_, uint32_t count_) noexcept
+			{
+				type = type_;
+				descriptorCount = count_;
+			}
+		};
+
+		VK_DescriptorPool(const VK_Device&, uint32_t max_sets, std::initializer_list<Size>, uint32_t flags = 0);
+		~VK_DescriptorPool() noexcept { vkDestroyDescriptorPool(_device._handle, _handle, nullptr); }
+	};
+
+	struct VK_DescriptorSet
+	{
+		const VK_DescriptorPool& _pool;
+		VkDescriptorSet _handle = VK_NULL_HANDLE;
+
+		VK_DescriptorSet(const VK_DescriptorPool&, VkDescriptorSetLayout);
+		~VK_DescriptorSet() noexcept { std::ignore = vkFreeDescriptorSets(_pool._device._handle, _pool._handle, 1, &_handle); }
 	};
 
 	struct VK_PipelineLayout
@@ -180,7 +207,7 @@ namespace Yttrium
 		VkPipelineLayout _handle = VK_NULL_HANDLE;
 
 		VK_PipelineLayout(const VK_Device&, std::initializer_list<VkDescriptorSetLayout>);
-		~VK_PipelineLayout() noexcept;
+		~VK_PipelineLayout() noexcept { vkDestroyPipelineLayout(_device._handle, _handle, nullptr); }
 	};
 
 	struct VK_Pipeline
@@ -200,7 +227,7 @@ namespace Yttrium
 		VkCommandPool _handle = VK_NULL_HANDLE;
 
 		VK_CommandPool(const VK_Device&, uint32_t queue_family_index);
-		~VK_CommandPool() noexcept;
+		~VK_CommandPool() noexcept { vkDestroyCommandPool(_device._handle, _handle, nullptr); }
 	};
 
 	struct VK_CommandBuffer
@@ -209,7 +236,7 @@ namespace Yttrium
 		VkCommandBuffer _handle = VK_NULL_HANDLE;
 
 		explicit VK_CommandBuffer(const VK_CommandPool&);
-		~VK_CommandBuffer() noexcept;
+		~VK_CommandBuffer() noexcept { vkFreeCommandBuffers(_pool._device._handle, _pool._handle, 1, &_handle); }
 
 		void begin() const;
 		void end() const;
@@ -257,9 +284,9 @@ namespace Yttrium
 		VK_Buffer _vertex_buffer;
 		VK_CommandPool _command_pool;
 		VK_DescriptorSetLayout _descriptor_set_layout;
+		VK_DescriptorPool _descriptor_pool;
+		VK_DescriptorSet _descriptor_set;
 		VK_PipelineLayout _pipeline_layout;
-		VkDescriptorPool _descriptor_pool = VK_NULL_HANDLE;
-		VkDescriptorSet _descriptor_set = VK_NULL_HANDLE;
 		VkShaderModule _vertex_shader = VK_NULL_HANDLE;
 		VkShaderModule _fragment_shader = VK_NULL_HANDLE;
 		std::unique_ptr<VulkanSwapchain> _swapchain;

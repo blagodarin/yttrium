@@ -110,11 +110,6 @@ namespace Yttrium
 		CHECK(vkCreateInstance(&create_info, nullptr, &_handle));
 	}
 
-	VK_Instance::~VK_Instance() noexcept
-	{
-		vkDestroyInstance(_handle, nullptr);
-	}
-
 	std::vector<VkPhysicalDevice> VK_Instance::physical_device_handles() const
 	{
 		uint32_t count = 0;
@@ -137,11 +132,6 @@ namespace Yttrium
 
 		CHECK(vkCreateXcbSurfaceKHR(_instance._handle, &create_info, nullptr, &_handle));
 #endif
-	}
-
-	VK_Surface::~VK_Surface() noexcept
-	{
-		vkDestroySurfaceKHR(_instance._handle, _handle, nullptr);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,11 +259,6 @@ namespace Yttrium
 
 		vkGetDeviceQueue(_handle, _physical_device._queue_family_index, 0, &_graphics_queue);
 		_present_queue = _graphics_queue;
-	}
-
-	VK_Device::~VK_Device() noexcept
-	{
-		vkDestroyDevice(_handle, nullptr);
 	}
 
 	VkDeviceMemory VK_Device::allocate_memory(const VkMemoryRequirements& requirements, VkFlags flags) const
@@ -655,11 +640,6 @@ namespace Yttrium
 		CHECK(vkCreateSemaphore(_device._handle, &create_info, nullptr, &_handle));
 	}
 
-	VK_Semaphore::~VK_Semaphore() noexcept
-	{
-		vkDestroySemaphore(_device._handle, _handle, nullptr);
-	}
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_DescriptorSetLayout::VK_DescriptorSetLayout(const VK_Device& device, std::vector<Binding>&& bindings)
@@ -677,9 +657,35 @@ namespace Yttrium
 		CHECK(vkCreateDescriptorSetLayout(_device._handle, &create_info, nullptr, &_handle));
 	}
 
-	VK_DescriptorSetLayout::~VK_DescriptorSetLayout() noexcept
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	VK_DescriptorPool::VK_DescriptorPool(const VK_Device& device, uint32_t max_sets, std::initializer_list<Size> sizes, uint32_t flags)
+		: _device{device}
 	{
-		vkDestroyDescriptorSetLayout(_device._handle, _handle, nullptr);
+		VkDescriptorPoolCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = flags;
+		create_info.maxSets = max_sets;
+		create_info.poolSizeCount = sizes.size();
+		create_info.pPoolSizes = sizes.begin();
+
+		CHECK(vkCreateDescriptorPool(_device._handle, &create_info, nullptr, &_handle));
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	VK_DescriptorSet::VK_DescriptorSet(const VK_DescriptorPool& pool, VkDescriptorSetLayout layout)
+		: _pool{pool}
+	{
+		VkDescriptorSetAllocateInfo allocate_info = {};
+		allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocate_info.pNext = nullptr;
+		allocate_info.descriptorPool = _pool._handle;
+		allocate_info.descriptorSetCount = 1;
+		allocate_info.pSetLayouts = &layout;
+
+		CHECK(vkAllocateDescriptorSets(_pool._device._handle, &allocate_info, &_handle));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -697,11 +703,6 @@ namespace Yttrium
 		create_info.pPushConstantRanges = nullptr;
 
 		CHECK(vkCreatePipelineLayout(_device._handle, &create_info, nullptr, &_handle));
-	}
-
-	VK_PipelineLayout::~VK_PipelineLayout() noexcept
-	{
-		vkDestroyPipelineLayout(_device._handle, _handle, nullptr);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -892,11 +893,6 @@ namespace Yttrium
 		CHECK(vkCreateCommandPool(_device._handle, &create_info, nullptr, &_handle));
 	}
 
-	VK_CommandPool::~VK_CommandPool() noexcept
-	{
-		vkDestroyCommandPool(_device._handle, _handle, nullptr);
-	}
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_CommandBuffer::VK_CommandBuffer(const VK_CommandPool& pool)
@@ -910,11 +906,6 @@ namespace Yttrium
 		create_info.commandBufferCount = 1;
 
 		CHECK(vkAllocateCommandBuffers(_pool._device._handle, &create_info, &_handle));
-	}
-
-	VK_CommandBuffer::~VK_CommandBuffer() noexcept
-	{
-		vkFreeCommandBuffers(_pool._device._handle, _pool._handle, 1, &_handle);
 	}
 
 	void VK_CommandBuffer::begin() const
@@ -1024,6 +1015,8 @@ namespace Yttrium
 		, _vertex_buffer{_device, 1024}
 		, _command_pool{_device, _physical_device._queue_family_index}
 		, _descriptor_set_layout{_device, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}}}
+		, _descriptor_pool{_device, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}}}
+		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
 		, _pipeline_layout{_device, {_descriptor_set_layout._handle}}
 	{
 		_uniform_buffer.create(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
@@ -1033,39 +1026,12 @@ namespace Yttrium
 		_vertex_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 		{
-			VkDescriptorPoolSize dps = {};
-			dps.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			dps.descriptorCount = 1;
-
-			VkDescriptorPoolCreateInfo descriptor_pool_ci = {};
-			descriptor_pool_ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			descriptor_pool_ci.pNext = nullptr;
-			descriptor_pool_ci.flags = 0;
-			descriptor_pool_ci.maxSets = 1;
-			descriptor_pool_ci.poolSizeCount = 1;
-			descriptor_pool_ci.pPoolSizes = &dps;
-
-			CHECK(vkCreateDescriptorPool(_device._handle, &descriptor_pool_ci, nullptr, &_descriptor_pool));
-		}
-
-		{
-			VkDescriptorSetAllocateInfo descriptor_set_ai = {};
-			descriptor_set_ai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			descriptor_set_ai.pNext = nullptr;
-			descriptor_set_ai.descriptorPool = _descriptor_pool;
-			descriptor_set_ai.descriptorSetCount = 1;
-			descriptor_set_ai.pSetLayouts = &_descriptor_set_layout._handle;
-
-			CHECK(vkAllocateDescriptorSets(_device._handle, &descriptor_set_ai, &_descriptor_set));
-		}
-
-		{
 			const auto dbi = _uniform_buffer.descriptor_buffer_info();
 
 			VkWriteDescriptorSet wds = {};
 			wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			wds.pNext = nullptr;
-			wds.dstSet = _descriptor_set;
+			wds.dstSet = _descriptor_set._handle;
 			wds.dstBinding = 0;
 			wds.dstArrayElement = 0;
 			wds.descriptorCount = 1;
@@ -1119,16 +1085,6 @@ namespace Yttrium
 			vkDestroyShaderModule(_device._handle, _vertex_shader, nullptr);
 			_vertex_shader = VK_NULL_HANDLE;
 		}
-		if (_descriptor_set != VK_NULL_HANDLE)
-		{
-			std::ignore = vkFreeDescriptorSets(_device._handle, _descriptor_pool, 1, &_descriptor_set);
-			_descriptor_set = VK_NULL_HANDLE;
-		}
-		if (_descriptor_pool != VK_NULL_HANDLE)
-		{
-			vkDestroyDescriptorPool(_device._handle, _descriptor_pool, nullptr);
-			_descriptor_pool = VK_NULL_HANDLE;
-		}
 	}
 
 	void VulkanContext::render()
@@ -1142,7 +1098,7 @@ namespace Yttrium
 			{
 				render_pass([this, command_buffer]
 				{
-					vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout._handle, 0, 1, &_descriptor_set, 0, nullptr);
+					vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout._handle, 0, 1, &_descriptor_set._handle, 0, nullptr);
 
 					const std::array<VkDeviceSize, 1> vertex_buffer_offsets{0};
 					vkCmdBindVertexBuffers(command_buffer, 0, 1, &_vertex_buffer._handle, vertex_buffer_offsets.data());
