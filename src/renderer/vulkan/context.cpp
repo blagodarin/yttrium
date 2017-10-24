@@ -11,6 +11,36 @@
 
 namespace
 {
+	const char BuiltinVertexShader[] =
+		"#version 400\n"
+		"#extension GL_ARB_separate_shader_objects : enable\n"
+		"#extension GL_ARB_shading_language_420pack : enable\n"
+		"layout (std140, binding = 0) uniform buffer\n"
+		"{\n"
+		"  mat4 mvp;\n"
+		"} u_buffer;\n"
+		"layout (location = 0) in vec4 i_position;\n"
+		"layout (location = 1) in vec4 i_color;\n"
+		"layout (location = 0) out vec4 o_color;\n"
+		"void main()\n"
+		"{\n"
+		"  o_color = i_color;\n"
+		"  gl_Position = u_buffer.mvp * i_position;\n"
+		"}\n"
+		;
+
+	const char BuiltinFragmentShader[] =
+		"#version 400\n"
+		"#extension GL_ARB_separate_shader_objects : enable\n"
+		"#extension GL_ARB_shading_language_420pack : enable\n"
+		"layout (location = 0) in vec4 i_color;\n"
+		"layout (location = 0) out vec4 o_color;\n"
+		"void main()\n"
+		"{\n"
+		"  o_color = i_color;\n"
+		"}\n"
+		;
+
 	std::string vulkan_result_to_string(VkResult result)
 	{
 		switch (result)
@@ -56,22 +86,6 @@ namespace
 	}
 
 #define CHECK(call) if (const auto result = (call)) vulkan_throw(result, #call);
-
-	VkShaderModule create_glsl_shader(VkDevice device, VkShaderStageFlagBits type, const char* source)
-	{
-		const auto spirv = Yttrium::glsl_to_spirv(source, type);
-
-		VkShaderModuleCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.codeSize = spirv.size() * sizeof(uint32_t);
-		create_info.pCode = spirv.data();
-
-		VkShaderModule shader = VK_NULL_HANDLE;
-		CHECK(vkCreateShaderModule(device, &create_info, nullptr, &shader));
-		return shader;
-	}
 }
 
 namespace Yttrium
@@ -273,7 +287,7 @@ namespace Yttrium
 		return handle;
 	}
 
-	void VK_Device::wait_idle()
+	void VK_Device::wait_idle() const
 	{
 		CHECK(vkDeviceWaitIdle(_handle));
 	}
@@ -690,6 +704,21 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	VK_ShaderModule::VK_ShaderModule(const VK_Device& device, const std::vector<uint32_t>& data)
+		: _device{device}
+	{
+		VkShaderModuleCreateInfo create_info = {};
+		create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		create_info.pNext = nullptr;
+		create_info.flags = 0;
+		create_info.codeSize = data.size() * sizeof(uint32_t);
+		create_info.pCode = data.data();
+
+		CHECK(vkCreateShaderModule(_device._handle, &create_info, nullptr, &_handle));
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	VK_PipelineLayout::VK_PipelineLayout(const VK_Device& device, std::initializer_list<VkDescriptorSetLayout> set_layouts)
 		: _device{device}
 	{
@@ -1018,6 +1047,8 @@ namespace Yttrium
 		, _descriptor_pool{_device, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}}}
 		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
 		, _pipeline_layout{_device, {_descriptor_set_layout._handle}}
+		, _vertex_shader{_device, glsl_to_spirv(::BuiltinVertexShader, VK_SHADER_STAGE_VERTEX_BIT)}
+		, _fragment_shader{_device, glsl_to_spirv(::BuiltinFragmentShader, VK_SHADER_STAGE_FRAGMENT_BIT)}
 	{
 		_uniform_buffer.create(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 		_uniform_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -1042,56 +1073,13 @@ namespace Yttrium
 
 			vkUpdateDescriptorSets(_device._handle, 1, &wds, 0, nullptr);
 		}
-
-		_vertex_shader = ::create_glsl_shader(_device._handle, VK_SHADER_STAGE_VERTEX_BIT,
-			"#version 400\n"
-			"#extension GL_ARB_separate_shader_objects : enable\n"
-			"#extension GL_ARB_shading_language_420pack : enable\n"
-			"layout (std140, binding = 0) uniform buffer\n"
-			"{\n"
-			"  mat4 mvp;\n"
-			"} u_buffer;\n"
-			"layout (location = 0) in vec4 i_position;\n"
-			"layout (location = 1) in vec4 i_color;\n"
-			"layout (location = 0) out vec4 o_color;\n"
-			"void main()\n"
-			"{\n"
-			"  o_color = i_color;\n"
-			"  gl_Position = u_buffer.mvp * i_position;\n"
-			"}\n");
-
-		_fragment_shader = ::create_glsl_shader(_device._handle, VK_SHADER_STAGE_FRAGMENT_BIT,
-			"#version 400\n"
-			"#extension GL_ARB_separate_shader_objects : enable\n"
-			"#extension GL_ARB_shading_language_420pack : enable\n"
-			"layout (location = 0) in vec4 i_color;\n"
-			"layout (location = 0) out vec4 o_color;\n"
-			"void main()\n"
-			"{\n"
-			"  o_color = i_color;\n"
-			"}\n");
-	}
-
-	VulkanContext::~VulkanContext() noexcept
-	{
-		_swapchain.reset();
-		if (_fragment_shader != VK_NULL_HANDLE)
-		{
-			vkDestroyShaderModule(_device._handle, _fragment_shader, nullptr);
-			_fragment_shader = VK_NULL_HANDLE;
-		}
-		if (_vertex_shader != VK_NULL_HANDLE)
-		{
-			vkDestroyShaderModule(_device._handle, _vertex_shader, nullptr);
-			_vertex_shader = VK_NULL_HANDLE;
-		}
 	}
 
 	void VulkanContext::render()
 	{
 		_device.wait_idle();
 		if (!_swapchain)
-			_swapchain = std::make_unique<VulkanSwapchain>(_device, _command_pool, _pipeline_layout, _vertex_shader, _fragment_shader);
+			_swapchain = std::make_unique<VulkanSwapchain>(_device, _command_pool, _pipeline_layout, _vertex_shader._handle, _fragment_shader._handle);
 		try
 		{
 			_swapchain->render([this](VkCommandBuffer command_buffer, const std::function<void(const std::function<void()>&)>& render_pass)

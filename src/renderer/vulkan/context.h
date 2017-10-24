@@ -60,7 +60,7 @@ namespace Yttrium
 		~VK_Device() noexcept { vkDestroyDevice(_handle, nullptr); }
 
 		VkDeviceMemory allocate_memory(const VkMemoryRequirements&, VkFlags) const;
-		void wait_idle();
+		void wait_idle() const;
 	};
 
 	struct VK_Swapchain
@@ -201,6 +201,15 @@ namespace Yttrium
 		~VK_DescriptorSet() noexcept { std::ignore = vkFreeDescriptorSets(_pool._device._handle, _pool._handle, 1, &_handle); }
 	};
 
+	struct VK_ShaderModule
+	{
+		const VK_Device& _device;
+		VkShaderModule _handle = VK_NULL_HANDLE;
+
+		VK_ShaderModule(const VK_Device&, const std::vector<uint32_t>&);
+		~VK_ShaderModule() noexcept { vkDestroyShaderModule(_device._handle, _handle, nullptr); }
+	};
+
 	struct VK_PipelineLayout
 	{
 		const VK_Device& _device;
@@ -270,16 +279,15 @@ namespace Yttrium
 	{
 	public:
 		explicit VulkanContext(const WindowBackend&);
-		~VulkanContext() noexcept;
 
 		void render();
 		void update_uniforms(const void* data, size_t size) { _uniform_buffer.write(data, size); }
 
 	private:
-		VK_Instance _instance;
-		VK_Surface _surface;
-		VK_PhysicalDevice _physical_device;
-		VK_Device _device;
+		const VK_Instance _instance;
+		const VK_Surface _surface;
+		const VK_PhysicalDevice _physical_device;
+		const VK_Device _device;
 		VK_Buffer _uniform_buffer;
 		VK_Buffer _vertex_buffer;
 		VK_CommandPool _command_pool;
@@ -287,8 +295,8 @@ namespace Yttrium
 		VK_DescriptorPool _descriptor_pool;
 		VK_DescriptorSet _descriptor_set;
 		VK_PipelineLayout _pipeline_layout;
-		VkShaderModule _vertex_shader = VK_NULL_HANDLE;
-		VkShaderModule _fragment_shader = VK_NULL_HANDLE;
+		VK_ShaderModule _vertex_shader;
+		VK_ShaderModule _fragment_shader;
 		std::unique_ptr<VulkanSwapchain> _swapchain;
 	};
 }

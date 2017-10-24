@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-    std::vector<uint32_t> glsl_to_spirv(const char*, VkShaderStageFlagBits);
+	std::vector<uint32_t> glsl_to_spirv(const char*, VkShaderStageFlagBits);
 }
 
 #endif
