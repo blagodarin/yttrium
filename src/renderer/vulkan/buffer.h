@@ -2,21 +2,24 @@
 #define _src_renderer_vulkan_buffer_h_
 
 #include "../buffer.h"
+#include "wrappers.h"
 
 namespace Yttrium
 {
-	class VulkanIndexBuffer final : public IndexBufferImpl
+	struct VulkanIndexBuffer final : IndexBufferImpl
 	{
-	public:
-		VulkanIndexBuffer(IndexFormat format, size_t size, size_t element_size) : IndexBufferImpl{format, size, element_size} {}
-		void write(size_t, size_t, const void*) override {}
+		VK_Buffer _buffer;
+
+		VulkanIndexBuffer(IndexFormat format, size_t count, size_t element_size, const VK_Device&);
+		void write(size_t offset, size_t count, const void* data) override;
 	};
 
-	class VulkanVertexBuffer final : public VertexBufferImpl
+	struct VulkanVertexBuffer final : VertexBufferImpl
 	{
-	public:
-		VulkanVertexBuffer(size_t count, size_t element_size) : VertexBufferImpl{count, element_size} {}
-		void write(size_t, size_t, const void*) override {}
+		VK_Buffer _buffer;
+
+		VulkanVertexBuffer(size_t count, size_t element_size, const VK_Device&);
+		void write(size_t offset, size_t count, const void* data) override;
 	};
 }
 

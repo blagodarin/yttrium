@@ -9,10 +9,10 @@ namespace Yttrium
 	class IndexBufferImpl : public IndexBuffer
 	{
 	public:
-		IndexBufferImpl(IndexFormat format, size_t size, size_t element_size)
-			: _size(size)
-			, _element_size(element_size)
-			, _format(format)
+		IndexBufferImpl(IndexFormat format, size_t count, size_t element_size)
+			: _size{count}
+			, _element_size{element_size}
+			, _format{format}
 		{
 		}
 
@@ -29,8 +29,8 @@ namespace Yttrium
 	{
 	public:
 		VertexBufferImpl(size_t count, size_t element_size)
-			: _count(count)
-			, _element_size(element_size)
+			: _count{count}
+			, _element_size{element_size}
 		{
 		}
 

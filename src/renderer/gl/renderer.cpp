@@ -272,16 +272,13 @@ namespace Yttrium
 
 		GlBufferHandle index_buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
 		GLenum index_format = GL_UNSIGNED_INT;
+		if (Buffer index_data; data.make_uint16_indices(index_data))
 		{
-			Buffer index_data;
-			if (data.make_uint16_indices(index_data))
-			{
-				index_buffer.initialize(GL_STATIC_DRAW, index_data.size(), index_data.data());
-				index_format = GL_UNSIGNED_SHORT;
-			}
-			else
-				index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
+			index_buffer.initialize(GL_STATIC_DRAW, index_data.size(), index_data.data());
+			index_format = GL_UNSIGNED_SHORT;
 		}
+		else
+			index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
 
 		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
 	}

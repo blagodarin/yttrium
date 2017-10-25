@@ -4,16 +4,16 @@
 
 namespace Yttrium
 {
-	GlIndexBuffer::GlIndexBuffer(IndexFormat format, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format)
-		: IndexBufferImpl{format, size, element_size}
+	GlIndexBuffer::GlIndexBuffer(IndexFormat format, size_t count, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format)
+		: IndexBufferImpl{format, count, element_size}
 		, _buffer{std::move(buffer)}
 		, _gl_format{gl_format}
 	{
 	}
 
-	void GlIndexBuffer::write(size_t offset, size_t size, const void* data)
+	void GlIndexBuffer::write(size_t offset, size_t count, const void* data)
 	{
-		_buffer.write(_element_size * offset, _element_size * size, data);
+		_buffer.write(_element_size * offset, _element_size * count, data);
 	}
 
 	GlVertexBuffer::GlVertexBuffer(size_t count, size_t element_size, GlBufferHandle&& buffer, GlVertexArrayHandle&& vertex_array)

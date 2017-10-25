@@ -6,20 +6,18 @@
 
 namespace Yttrium
 {
-	class GlIndexBuffer final : public IndexBufferImpl
+	struct GlIndexBuffer final : IndexBufferImpl
 	{
-	public:
 		const GlBufferHandle _buffer;
 		const GLenum _gl_format;
 
-		GlIndexBuffer(IndexFormat, size_t size, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format);
+		GlIndexBuffer(IndexFormat, size_t count, size_t element_size, GlBufferHandle&& buffer, GLenum gl_format);
 
-		void write(size_t offset, size_t size, const void* data) override;
+		void write(size_t offset, size_t count, const void* data) override;
 	};
 
-	class GlVertexBuffer final : public VertexBufferImpl
+	struct GlVertexBuffer final : VertexBufferImpl
 	{
-	public:
 		const GlBufferHandle _buffer;
 		const GlVertexArrayHandle _vertex_array;
 

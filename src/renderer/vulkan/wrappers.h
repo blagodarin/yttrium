@@ -140,7 +140,7 @@ namespace Yttrium
 		void allocate_memory(VkFlags);
 
 		VkDescriptorBufferInfo descriptor_buffer_info() const noexcept;
-		void write(const void*, size_t);
+		void write(const void* data, size_t size, size_t offset = 0);
 	};
 
 	struct VK_Semaphore

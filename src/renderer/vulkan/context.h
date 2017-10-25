@@ -36,6 +36,7 @@ namespace Yttrium
 	public:
 		explicit VulkanContext(const WindowBackend&);
 
+		const VK_Device& device() const noexcept { return _device; }
 		void render();
 		void update_uniforms(const void* data, size_t size) { _uniform_buffer.write(data, size); }
 

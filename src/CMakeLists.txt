@@ -269,6 +269,7 @@ if(Y_RENDERER STREQUAL "OpenGL")
 elseif(Y_RENDERER STREQUAL "Vulkan")
 	find_package(Vulkan REQUIRED)
 	target_sources(yttrium PRIVATE
+		renderer/vulkan/buffer.cpp
 		renderer/vulkan/buffer.h
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h

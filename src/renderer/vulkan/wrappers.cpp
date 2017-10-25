@@ -598,12 +598,13 @@ namespace Yttrium
 		return result;
 	}
 
-	void VK_Buffer::write(const void* data, size_t size)
+	void VK_Buffer::write(const void* data, size_t size, size_t offset)
 	{
 		assert(_memory != VK_NULL_HANDLE);
+		assert(offset <= _size && size <= _size - offset);
 
 		void* mapped_memory = nullptr;
-		CHECK(vkMapMemory(_device._handle, _memory, 0, size, 0, &mapped_memory));
+		CHECK(vkMapMemory(_device._handle, _memory, offset, size, 0, &mapped_memory));
 		std::memcpy(mapped_memory, data, size);
 		vkUnmapMemory(_device._handle, _memory);
 	}
