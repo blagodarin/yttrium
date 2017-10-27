@@ -3,7 +3,6 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/utils.h>
 #include "../mesh_data.h"
-#include "buffer.h"
 #include "gpu_program.h"
 #include "mesh.h"
 #include "texture.h"
@@ -71,16 +70,6 @@ namespace Yttrium
 		return result;
 	}
 
-	std::unique_ptr<IndexBuffer> GlRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
-	{
-		const size_t element_size = (format == IndexFormat::U16) ? 2 : 4;
-		const size_t gl_format = (format == IndexFormat::U16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-
-		GlBufferHandle buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
-		buffer.initialize(GL_STATIC_DRAW, count * element_size, data);
-		return std::make_unique<GlIndexBuffer>(format, count, element_size, std::move(buffer), gl_format);
-	}
-
 	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
 	{
 		if (flags & TextureFlag::Intensity)
@@ -144,46 +133,6 @@ namespace Yttrium
 		return std::make_unique<GlTexture2D>(*this, image_format, has_mipmaps, std::move(texture));
 	}
 
-	std::unique_ptr<VertexBuffer> GlRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
-	{
-		assert(!format.empty());
-
-		GlVertexArrayHandle vertex_array(_gl);
-
-		GLuint index = 0;
-		size_t offset = 0;
-		for (const auto type : format)
-		{
-			vertex_array.vertex_attrib_binding(index, 0);
-			switch (type)
-			{
-			case VA::f:
-				vertex_array.vertex_attrib_format(index, 1, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float);
-				break;
-			case VA::f2:
-				vertex_array.vertex_attrib_format(index, 2, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float) * 2;
-				break;
-			case VA::f3:
-				vertex_array.vertex_attrib_format(index, 3, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float) * 3;
-				break;
-			case VA::f4:
-				vertex_array.vertex_attrib_format(index, 4, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float) * 4;
-				break;
-			}
-			++index;
-		}
-
-		GlBufferHandle buffer(_gl, GL_ARRAY_BUFFER);
-		buffer.initialize(GL_STATIC_DRAW, count * offset, data);
-		vertex_array.bind_vertex_buffer(0, buffer.get(), 0, offset);
-
-		return std::make_unique<GlVertexBuffer>(count, offset, std::move(buffer), std::move(vertex_array));
-	}
-
 	void GlRenderer::draw_mesh(const Mesh& mesh)
 	{
 		update_state();
@@ -201,28 +150,6 @@ namespace Yttrium
 
 		++_statistics._draw_calls;
 		_statistics._triangles += opengl_mesh._index_buffer_size / 3;
-
-		_gl.Disable(GL_DEPTH_TEST);
-	}
-
-	void GlRenderer::draw_triangles(const VertexBuffer& vertex_buffer, const IndexBuffer& index_buffer)
-	{
-		update_state();
-
-		const auto& vertices = static_cast<const GlVertexBuffer&>(vertex_buffer);
-		const auto& indices = static_cast<const GlIndexBuffer&>(index_buffer);
-
-		_gl.Enable(GL_DEPTH_TEST);
-		_gl.DepthFunc(GL_LESS);
-
-		vertices._vertex_array.bind();
-		indices._buffer.bind();
-		_gl.DrawElements(GL_TRIANGLES, indices.size(), indices._gl_format, 0);
-		indices._buffer.unbind();
-		vertices._vertex_array.unbind();
-
-		++_statistics._draw_calls;
-		_statistics._triangles += indices.size() / 3;
 
 		_gl.Disable(GL_DEPTH_TEST);
 	}

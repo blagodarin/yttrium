@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include "../mesh_data.h"
-#include "buffer.h"
 #include "gpu_program.h"
 #include "mesh.h"
 #include "texture.h"
@@ -20,46 +19,13 @@ namespace Yttrium
 		return std::make_unique<VulkanGpuProgram>();
 	}
 
-	std::unique_ptr<IndexBuffer> VulkanRenderer::create_index_buffer(IndexFormat format, size_t count, const void* data)
-	{
-		const size_t element_size = (format == IndexFormat::U16) ? 2 : 4;
-		auto result = std::make_unique<VulkanIndexBuffer>(format, count, element_size, _context.device());
-		if (data)
-			result->write(0, count * element_size, data);
-		return result;
-	}
-
 	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
 	{
 		const auto has_mipmaps = !(flags & TextureFlag::NoMipmaps);
 		return std::make_unique<VulkanTexture2D>(*this, image.format(), has_mipmaps);
 	}
 
-	std::unique_ptr<VertexBuffer> VulkanRenderer::create_vertex_buffer(const std::vector<VA>& format, size_t count, const void* data)
-	{
-		assert(!format.empty());
-		size_t element_size = 0;
-		for (const auto type : format)
-		{
-			switch (type)
-			{
-			case VA::f:  element_size += sizeof(float);     break;
-			case VA::f2: element_size += sizeof(float) * 2; break;
-			case VA::f3: element_size += sizeof(float) * 3; break;
-			case VA::f4: element_size += sizeof(float) * 4; break;
-			}
-		}
-		auto result = std::make_unique<VulkanVertexBuffer>(count, element_size, _context.device());
-		if (data)
-			result->write(0, count * element_size, data);
-		return result;
-	}
-
 	void VulkanRenderer::draw_mesh(const Mesh&)
-	{
-	}
-
-	void VulkanRenderer::draw_triangles(const VertexBuffer&, const IndexBuffer&)
 	{
 	}
 

@@ -219,14 +219,12 @@ endif()
 # renderer
 target_sources(yttrium PRIVATE
 	../include/yttrium/renderer/gpu_program.h
-	../include/yttrium/renderer/index_buffer.h
 	../include/yttrium/renderer/material.h
 	../include/yttrium/renderer/mesh.h
 	../include/yttrium/renderer/modifiers.h
 	../include/yttrium/renderer/renderer.h
 	../include/yttrium/renderer/texture.h
 	../include/yttrium/renderer/textured_rect.h
-	../include/yttrium/renderer/vertex_buffer.h
 	renderer/formats/obj.cpp
 	renderer/formats/obj.h
 	renderer/debug_renderer.cpp
@@ -247,8 +245,6 @@ if(Y_RENDERER STREQUAL "OpenGL")
 	find_package(OpenGL REQUIRED)
 	target_sources(yttrium PRIVATE
 		renderer/gl/api.h
-		renderer/gl/buffer.cpp
-		renderer/gl/buffer.h
 		renderer/gl/gl.cpp
 		renderer/gl/gl.h
 		renderer/gl/gpu_program.cpp
@@ -269,8 +265,6 @@ if(Y_RENDERER STREQUAL "OpenGL")
 elseif(Y_RENDERER STREQUAL "Vulkan")
 	find_package(Vulkan REQUIRED)
 	target_sources(yttrium PRIVATE
-		renderer/vulkan/buffer.cpp
-		renderer/vulkan/buffer.h
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h
 		renderer/vulkan/glsl.cpp

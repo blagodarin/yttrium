@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_renderer_mesh_h_
 #define _include_yttrium_renderer_mesh_h_
 

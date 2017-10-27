@@ -7,7 +7,14 @@
 
 namespace Yttrium
 {
-	enum class VA;
+	/// Vertex attribute type.
+	enum class VA
+	{
+		f,  ///< Single float.
+		f2, ///< Vector of 2 floats.
+		f3, ///< Vector of 3 floats.
+		f4, ///< Vector of 4 floats.
+	};
 
 	class MeshData
 	{
