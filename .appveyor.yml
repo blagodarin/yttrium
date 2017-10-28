@@ -6,6 +6,9 @@ environment:
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
   BOOST_ROOT: C:\Libraries\boost_1_64_0
   PREFIX: C:\projects\prefix
+  matrix:
+    - RENDERER: Null
+    - RENDERER: OpenGL
 
 install:
   - cmd: |
@@ -86,7 +89,7 @@ install:
       rmdir /q /s prefix
 
 build_script:
-  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON -DWITH_TOOLS=ON
+  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON -DWITH_TOOLS=ON -DY_RENDERER=%RENDERER%
   - cmd: cmake --build . --config Release
 
 test_script:
