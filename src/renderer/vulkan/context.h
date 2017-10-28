@@ -11,7 +11,7 @@ namespace Yttrium
 	class VulkanSwapchain
 	{
 	public:
-		VulkanSwapchain(const VK_Device&, const VK_CommandPool&, const VK_PipelineLayout&, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
+		VulkanSwapchain(const VK_Device&, const VK_CommandPool&, const VK_PipelineLayout&, const std::vector<VkPipelineShaderStageCreateInfo>&);
 		~VulkanSwapchain() noexcept = default;
 
 		void render(const std::function<void(VkCommandBuffer, const std::function<void(const std::function<void()>&)>&)>&) const; // TODO: Improve readability.

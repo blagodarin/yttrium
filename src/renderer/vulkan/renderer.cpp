@@ -2,6 +2,7 @@
 
 #include "../mesh_data.h"
 #include "gpu_program.h"
+#include "helpers.h"
 #include "mesh.h"
 #include "texture.h"
 
@@ -13,6 +14,8 @@ namespace Yttrium
 		: _context{window}
 	{
 	}
+
+	VulkanRenderer::~VulkanRenderer() noexcept = default;
 
 	std::unique_ptr<GpuProgram> VulkanRenderer::create_gpu_program(const std::string&, const std::string&)
 	{
@@ -41,19 +44,7 @@ namespace Yttrium
 		assert(data._vertex_data.size() > 0);
 		assert(!data._indices.empty());
 
-		size_t vertex_size = 0;
-		for (const auto type : data._vertex_format)
-		{
-			switch (type)
-			{
-			case VA::f:  vertex_size += sizeof(float);     break;
-			case VA::f2: vertex_size += sizeof(float) * 2; break;
-			case VA::f3: vertex_size += sizeof(float) * 3; break;
-			case VA::f4: vertex_size += sizeof(float) * 4; break;
-			}
-		}
-
-		const auto vertex_buffer_size = data._vertex_data.size() * vertex_size;
+		const auto vertex_buffer_size = data._vertex_data.size() * vertex_format(data._vertex_format)._binding.stride;
 
 		if (Buffer index_data; data.make_uint16_indices(index_data))
 		{
@@ -95,5 +86,11 @@ namespace Yttrium
 
 	void VulkanRenderer::set_window_size_impl(const Size&)
 	{
+	}
+
+	const VulkanVertexFormat& VulkanRenderer::vertex_format(const std::vector<VA>& vas)
+	{
+		const auto i = std::find_if(_vertex_format_cache.begin(), _vertex_format_cache.end(), [&vas](const auto& format){ return format.first == vas; });
+		return i != _vertex_format_cache.end() ? *i->second : *_vertex_format_cache.emplace_back(vas, std::make_unique<VulkanVertexFormat>(vas)).second;
 	}
 }

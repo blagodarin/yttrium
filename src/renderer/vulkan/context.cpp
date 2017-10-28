@@ -2,6 +2,7 @@
 
 #include <yttrium/math/matrix.h>
 #include "glsl.h"
+#include "helpers.h"
 
 namespace
 {
@@ -38,7 +39,7 @@ namespace
 
 namespace Yttrium
 {
-	VulkanSwapchain::VulkanSwapchain(const VK_Device& device, const VK_CommandPool& command_pool, const VK_PipelineLayout& pipeline_layout, VkShaderModule vertex_shader, VkShaderModule fragment_shader)
+	VulkanSwapchain::VulkanSwapchain(const VK_Device& device, const VK_CommandPool& command_pool, const VK_PipelineLayout& pipeline_layout, const std::vector<VkPipelineShaderStageCreateInfo>& shader_stages)
 		: _device{device}
 		, _swapchain{_device}
 		, _depth_buffer{_device}
@@ -60,7 +61,7 @@ namespace Yttrium
 
 		_framebuffers.create(_render_pass, _swapchain, _depth_buffer);
 
-		_pipeline.create(pipeline_layout, _render_pass._handle, vertex_shader, fragment_shader);
+		_pipeline.create(pipeline_layout, _render_pass._handle, VulkanVertexFormat{{VA::f4, VA::f4}}, shader_stages);
 	}
 
 	void VulkanSwapchain::render(const std::function<void(VkCommandBuffer, const std::function<void(const std::function<void()>&)>&)>& callback) const
@@ -110,8 +111,8 @@ namespace Yttrium
 		, _descriptor_pool{_device, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}}}
 		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
 		, _pipeline_layout{_device, {_descriptor_set_layout._handle}}
-		, _vertex_shader{_device, glsl_to_spirv(::BuiltinVertexShader, VK_SHADER_STAGE_VERTEX_BIT)}
-		, _fragment_shader{_device, glsl_to_spirv(::BuiltinFragmentShader, VK_SHADER_STAGE_FRAGMENT_BIT)}
+		, _vertex_shader{_device, VK_SHADER_STAGE_VERTEX_BIT, glsl_to_spirv(::BuiltinVertexShader, VK_SHADER_STAGE_VERTEX_BIT)}
+		, _fragment_shader{_device, VK_SHADER_STAGE_FRAGMENT_BIT, glsl_to_spirv(::BuiltinFragmentShader, VK_SHADER_STAGE_FRAGMENT_BIT)}
 	{
 		_uniform_buffer.create(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 		_uniform_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -142,7 +143,7 @@ namespace Yttrium
 	{
 		_device.wait_idle();
 		if (!_swapchain)
-			_swapchain = std::make_unique<VulkanSwapchain>(_device, _command_pool, _pipeline_layout, _vertex_shader._handle, _fragment_shader._handle);
+			_swapchain = std::make_unique<VulkanSwapchain>(_device, _command_pool, _pipeline_layout, VK_ShaderModule::make_stages({&_vertex_shader, &_fragment_shader}));
 		try
 		{
 			_swapchain->render([this](VkCommandBuffer command_buffer, const std::function<void(const std::function<void()>&)>& render_pass)

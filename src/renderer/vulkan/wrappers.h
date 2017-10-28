@@ -9,6 +9,7 @@
 
 namespace Yttrium
 {
+	class VulkanVertexFormat;
 	class WindowBackend;
 
 	struct VK_Instance
@@ -203,10 +204,13 @@ namespace Yttrium
 	struct VK_ShaderModule
 	{
 		const VK_Device& _device;
+		const VkShaderStageFlagBits _stage;
 		VkShaderModule _handle = VK_NULL_HANDLE;
 
-		VK_ShaderModule(const VK_Device&, const std::vector<uint32_t>&);
+		VK_ShaderModule(const VK_Device&, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data);
 		~VK_ShaderModule() noexcept { vkDestroyShaderModule(_device._handle, _handle, nullptr); }
+
+		static std::vector<VkPipelineShaderStageCreateInfo> make_stages(std::initializer_list<const VK_ShaderModule*>);
 	};
 
 	struct VK_PipelineLayout
@@ -226,7 +230,7 @@ namespace Yttrium
 		explicit VK_Pipeline(const VK_Device& device) noexcept : _device{device} {}
 		~VK_Pipeline() noexcept;
 
-		void create(const VK_PipelineLayout&, VkRenderPass, VkShaderModule vertex_shader, VkShaderModule fragment_shader);
+		void create(const VK_PipelineLayout&, VkRenderPass, const VulkanVertexFormat&, const std::vector<VkPipelineShaderStageCreateInfo>&);
 	};
 
 	struct VK_CommandPool

@@ -6,10 +6,14 @@
 
 namespace Yttrium
 {
+	enum class VA;
+	class VulkanVertexFormat;
+
 	class VulkanRenderer final : public RendererImpl
 	{
 	public:
 		VulkanRenderer(const WindowBackend&);
+		~VulkanRenderer() noexcept;
 
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
@@ -27,7 +31,11 @@ namespace Yttrium
 		void set_window_size_impl(const Size&) override;
 
 	private:
+		const VulkanVertexFormat& vertex_format(const std::vector<VA>&);
+
+	private:
 		VulkanContext _context;
+		std::vector<std::pair<std::vector<VA>, std::unique_ptr<const VulkanVertexFormat>>> _vertex_format_cache;
 	};
 }
 

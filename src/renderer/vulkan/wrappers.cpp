@@ -1,6 +1,7 @@
 #include "wrappers.h"
 
 #include "../../system/window.h"
+#include "helpers.h"
 
 #include <cassert>
 #include <cstring>
@@ -671,8 +672,9 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_ShaderModule::VK_ShaderModule(const VK_Device& device, const std::vector<uint32_t>& data)
+	VK_ShaderModule::VK_ShaderModule(const VK_Device& device, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data)
 		: _device{device}
+		, _stage{stage}
 	{
 		VkShaderModuleCreateInfo create_info = {};
 		create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -682,6 +684,24 @@ namespace Yttrium
 		create_info.pCode = data.data();
 
 		CHECK(vkCreateShaderModule(_device._handle, &create_info, nullptr, &_handle));
+	}
+
+	std::vector<VkPipelineShaderStageCreateInfo> VK_ShaderModule::make_stages(std::initializer_list<const VK_ShaderModule*> modules)
+	{
+		std::vector<VkPipelineShaderStageCreateInfo> stages;
+		stages.reserve(modules.size());
+		for (const auto module : modules)
+		{
+			auto& stage = stages.emplace_back();
+			stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			stage.pNext = nullptr;
+			stage.flags = 0;
+			stage.stage = module->_stage;
+			stage.module = module->_handle;
+			stage.pName = "main";
+			stage.pSpecializationInfo = nullptr;
+		}
+		return stages;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -709,55 +729,8 @@ namespace Yttrium
 			vkDestroyPipeline(_device._handle, _handle, nullptr);
 	}
 
-	void VK_Pipeline::create(const VK_PipelineLayout& layout, VkRenderPass render_pass, VkShaderModule vertex_shader, VkShaderModule fragment_shader)
+	void VK_Pipeline::create(const VK_PipelineLayout& layout, VkRenderPass render_pass, const VulkanVertexFormat& vertex_format, const std::vector<VkPipelineShaderStageCreateInfo>& shader_stages)
 	{
-		std::array<VkPipelineShaderStageCreateInfo, 2> shader_stages = {};
-		shader_stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		shader_stages[0].pNext = nullptr;
-		shader_stages[0].flags = 0;
-		shader_stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-		shader_stages[0].module = vertex_shader;
-		shader_stages[0].pName = "main";
-		shader_stages[0].pSpecializationInfo = nullptr;
-		shader_stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		shader_stages[1].pNext = nullptr;
-		shader_stages[1].flags = 0;
-		shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		shader_stages[1].module = fragment_shader;
-		shader_stages[1].pName = "main";
-		shader_stages[1].pSpecializationInfo = nullptr;
-
-		std::array<VkVertexInputBindingDescription, 1> vertex_input_bindings = {};
-		vertex_input_bindings[0].binding = 0;
-		vertex_input_bindings[0].stride = 32;
-		vertex_input_bindings[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-		std::array<VkVertexInputAttributeDescription, 2> vertex_input_attributes = {};
-		vertex_input_attributes[0].location = 0;
-		vertex_input_attributes[0].binding = 0;
-		vertex_input_attributes[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		vertex_input_attributes[0].offset = 0;
-		vertex_input_attributes[1].location = 1;
-		vertex_input_attributes[1].binding = 0;
-		vertex_input_attributes[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		vertex_input_attributes[1].offset = 16;
-
-		VkPipelineVertexInputStateCreateInfo vertex_input_state = {};
-		vertex_input_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertex_input_state.pNext = nullptr;
-		vertex_input_state.flags = 0;
-		vertex_input_state.vertexBindingDescriptionCount = vertex_input_bindings.size();
-		vertex_input_state.pVertexBindingDescriptions = vertex_input_bindings.data();
-		vertex_input_state.vertexAttributeDescriptionCount = vertex_input_attributes.size();
-		vertex_input_state.pVertexAttributeDescriptions = vertex_input_attributes.data();
-
-		VkPipelineInputAssemblyStateCreateInfo input_assembly_state = {};
-		input_assembly_state.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-		input_assembly_state.pNext = nullptr;
-		input_assembly_state.flags = 0;
-		input_assembly_state.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-		input_assembly_state.primitiveRestartEnable = VK_FALSE;
-
 		VkPipelineViewportStateCreateInfo viewport_state = {};
 		viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		viewport_state.pNext = nullptr;
@@ -857,8 +830,8 @@ namespace Yttrium
 		create_info.flags = 0;
 		create_info.stageCount = shader_stages.size();
 		create_info.pStages = shader_stages.data();
-		create_info.pVertexInputState = &vertex_input_state;
-		create_info.pInputAssemblyState = &input_assembly_state;
+		create_info.pVertexInputState = &vertex_format._input;
+		create_info.pInputAssemblyState = &vertex_format._assembly;
 		create_info.pTessellationState = nullptr;
 		create_info.pViewportState = &viewport_state;
 		create_info.pRasterizationState = &rasterization_state;
