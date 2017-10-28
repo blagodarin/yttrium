@@ -8,6 +8,8 @@ option(WITH_EXTRA "Enable extra stuff" OFF)
 option(WITH_TESTS "Enable tests" OFF)
 option(WITH_TOOLS "Enable tools" OFF)
 
+set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
+
 if(WITH_EXAMPLES AND NOT WITH_TOOLS)
 	message(FATAL_ERROR "WITH_EXAMPLES require WITH_TOOLS")
 endif()
@@ -57,11 +59,10 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
-set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
+add_subdirectory(tools/yrc)
 
 if(Y_RENDERER STREQUAL "Vulkan")
 	add_subdirectory(tools/yglslc)
-	set_target_properties(yglslc PROPERTIES FOLDER "tools")
 endif()
 
 add_subdirectory(src)
@@ -69,10 +70,6 @@ add_subdirectory(src)
 if(WITH_TOOLS)
 	add_subdirectory(tools/ypack)
 	add_subdirectory(tools/ytr)
-	set_target_properties(
-		ypack
-		ytr
-		PROPERTIES FOLDER "tools")
 endif()
 
 if(WITH_EXAMPLES)
@@ -90,17 +87,9 @@ endif()
 if(WITH_EXTRA)
 	add_subdirectory(tools/generate-sounds)
 	add_subdirectory(tools/generate-test-images)
-	set_target_properties(
-		generate-sounds
-		generate-test-images
-		PROPERTIES FOLDER "tools")
 
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/tiny_string_map)
-	set_target_properties(
-		benchmark_buffer
-		benchmark_tiny_string_map
-		PROPERTIES FOLDER "benchmarks")
 
 	add_custom_target(cppcheck
 		COMMAND cppcheck --enable=all --quiet
@@ -116,8 +105,4 @@ endif()
 
 if(WITH_TESTS)
 	add_subdirectory(tests)
-	add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
-	set_target_properties(
-		unit_tests check
-		PROPERTIES FOLDER "tests")
 endif()

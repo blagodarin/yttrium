@@ -20,6 +20,4 @@
 	* Storage:
 		- Hash-based packed file access.
 * New tools:
-	- Resource compiler (like Qt's RCC).
-	- Shader compiler (GLSL to SPIR-V).
 	- Textured font builder.

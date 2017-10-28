@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 		glslang::FinalizeProcess();
 	}
 
-	std::ofstream output{argv[3], std::ios::binary | std::ios::out | std::ios::trunc};
+	std::ofstream output{argv[3], std::ios::out | std::ios::trunc};
 	if (!output.is_open())
 	{
 		std::cerr << "ERROR: Unable to open \"" << argv[3] << "\"\n";

@@ -36,3 +36,7 @@ target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
 target_compile_definitions(unit_tests PRIVATE _HAS_AUTO_PTR_ETC) # Workaround for Boost 1.64.
 target_include_directories(unit_tests PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(unit_tests yttrium ${Boost_LIBRARIES})
+
+add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+
+set_target_properties(unit_tests check PROPERTIES FOLDER "tests")

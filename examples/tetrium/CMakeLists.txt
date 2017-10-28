@@ -31,3 +31,5 @@ if(WIN32)
 	target_link_libraries(tetrium ywinmain)
 endif()
 add_dependencies(tetrium tetrium_package)
+
+set_target_properties(tetrium tetrium_localization tetrium_package PROPERTIES FOLDER "examples")
