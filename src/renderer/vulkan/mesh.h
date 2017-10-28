@@ -15,7 +15,7 @@ namespace Yttrium
 
 		VulkanMesh(const VK_Device&, size_t vertex_buffer_size, size_t index_buffer_size, VkIndexType, size_t index_count);
 
-		void draw(VkCommandBuffer) const;
+		void draw(VkCommandBuffer) const noexcept;
 	};
 }
 

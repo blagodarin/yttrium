@@ -18,6 +18,7 @@ namespace Yttrium
 
 		// RendererImpl
 		void clear() override;
+		std::unique_ptr<GpuProgram> create_builtin_program_2d() override;
 		std::unique_ptr<Mesh> create_mesh(const MeshData&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
 		Image take_screenshot() const override;

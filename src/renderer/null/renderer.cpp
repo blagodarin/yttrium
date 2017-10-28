@@ -26,6 +26,11 @@ namespace Yttrium
 		return std::make_unique<BackendTexture2D>(*this, image.format(), has_mipmaps);
 	}
 
+	std::unique_ptr<GpuProgram> NullRenderer::create_builtin_program_2d()
+	{
+		return std::make_unique<NullGpuProgram>();
+	}
+
 	std::unique_ptr<Mesh> NullRenderer::create_mesh(const MeshData& data)
 	{
 		assert(!data._vertex_format.empty());

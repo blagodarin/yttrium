@@ -14,7 +14,7 @@ namespace Yttrium
 		_index_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
-	void VulkanMesh::draw(VkCommandBuffer command_buffer) const
+	void VulkanMesh::draw(VkCommandBuffer command_buffer) const noexcept
 	{
 		if (command_buffer == VK_NULL_HANDLE) // TODO: Remove.
 			return;

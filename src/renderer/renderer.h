@@ -49,6 +49,7 @@ namespace Yttrium
 		Size window_size() const override { return _window_size; }
 
 		virtual void clear() = 0;
+		virtual std::unique_ptr<GpuProgram> create_builtin_program_2d() = 0;
 		virtual std::unique_ptr<Mesh> create_mesh(const MeshData&) = 0;
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual Image take_screenshot() const = 0;

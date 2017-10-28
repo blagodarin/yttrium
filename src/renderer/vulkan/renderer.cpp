@@ -38,6 +38,11 @@ namespace Yttrium
 		_context.render();
 	}
 
+	std::unique_ptr<GpuProgram> VulkanRenderer::create_builtin_program_2d()
+	{
+		return std::make_unique<VulkanGpuProgram>();
+	}
+
 	std::unique_ptr<Mesh> VulkanRenderer::create_mesh(const MeshData& data)
 	{
 		assert(!data._vertex_format.empty());

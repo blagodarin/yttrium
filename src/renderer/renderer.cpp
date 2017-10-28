@@ -27,38 +27,6 @@
 
 namespace Yttrium
 {
-	const std::string _vertex_shader_2d =
-		"#version 330\n"
-		"\n"
-		"layout(location = 0) in vec2 in_position;\n"
-		"layout(location = 1) in vec4 in_color;\n"
-		"layout(location = 2) in vec2 in_texcoord;\n"
-		"\n"
-		"uniform mat4 mvp;\n"
-		"\n"
-		"out vec4 io_color;\n"
-		"out vec2 io_texcoord;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-			"gl_Position = mvp * vec4(in_position, 0, 1);\n"
-			"io_color = in_color;\n"
-			"io_texcoord = in_texcoord;\n"
-		"}\n";
-
-	const std::string _fragment_shader_2d =
-		"#version 330\n"
-		"\n"
-		"in vec4 io_color;\n"
-		"in vec2 io_texcoord;\n"
-		"\n"
-		"uniform sampler2D surface_texture;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-			"gl_FragColor = io_color * texture2D(surface_texture, io_texcoord);\n"
-		"}\n";
-
 	struct RendererImpl::Draw2D
 	{
 		BufferAppender<Vertex2D> _vertices;
@@ -97,7 +65,7 @@ namespace Yttrium
 		if (!renderer->_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
-		renderer->_program_2d = renderer->create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
+		renderer->_program_2d = renderer->create_builtin_program_2d();
 		if (!renderer->_program_2d)
 			throw InitializationError("Failed to initialize an internal GPU program");
 
