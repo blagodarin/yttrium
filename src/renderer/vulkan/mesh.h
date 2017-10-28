@@ -2,6 +2,7 @@
 #define _src_renderer_vulkan_mesh_h_
 
 #include <yttrium/renderer/mesh.h>
+#include "wrappers.h"
 
 namespace Yttrium
 {
@@ -9,12 +10,12 @@ namespace Yttrium
 	{
 		VK_Buffer _vertex_buffer;
 		VK_Buffer _index_buffer;
+		const VkIndexType _index_type;
+		const uint32_t _index_count;
 
-		VulkanMesh(const VK_Device& device, size_t vertex_buffer_size, size_t index_buffer_size)
-			: _vertex_buffer{device, static_cast<uint32_t>(vertex_buffer_size)}
-			, _index_buffer{device, static_cast<uint32_t>(index_buffer_size)}
-		{
-		}
+		VulkanMesh(const VK_Device&, size_t vertex_buffer_size, size_t index_buffer_size, VkIndexType, size_t index_count);
+
+		void draw(VkCommandBuffer) const;
 	};
 }
 

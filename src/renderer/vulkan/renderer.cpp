@@ -25,8 +25,9 @@ namespace Yttrium
 		return std::make_unique<VulkanTexture2D>(*this, image.format(), has_mipmaps);
 	}
 
-	void VulkanRenderer::draw_mesh(const Mesh&)
+	void VulkanRenderer::draw_mesh(const Mesh& mesh)
 	{
+		static_cast<const VulkanMesh&>(mesh).draw(VK_NULL_HANDLE); // TODO: Use actual command buffer.
 	}
 
 	void VulkanRenderer::clear()
@@ -56,14 +57,14 @@ namespace Yttrium
 
 		if (Buffer index_data; data.make_uint16_indices(index_data))
 		{
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_data.size());
+			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_data.size(), VK_INDEX_TYPE_UINT16, data._indices.size());
 			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
 			result->_index_buffer.write(index_data.data(), index_data.size());
 			return result;
 		}
 		else
 		{
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, data._indices.size() * sizeof(uint32_t));
+			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, data._indices.size() * sizeof(uint32_t), VK_INDEX_TYPE_UINT32, data._indices.size());
 			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
 			result->_index_buffer.write(data._indices.data(), result->_index_buffer._size);
 			return result;
