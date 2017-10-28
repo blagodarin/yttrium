@@ -7,12 +7,12 @@ namespace
 {
 	const std::vector<uint32_t> BuiltinVertexShader
 	{
-#include "2d_vs.spirv"
+#include "2d_vs.spirv.inc"
 	};
 
 	const std::vector<uint32_t> BuiltinFragmentShader
 	{
-#include "2d_fs.spirv"
+#include "2d_fs.spirv.inc"
 	};
 }
 
