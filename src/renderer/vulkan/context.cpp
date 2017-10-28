@@ -1,40 +1,19 @@
 #include "context.h"
 
 #include <yttrium/math/matrix.h>
-#include "glsl.h"
 #include "helpers.h"
 
 namespace
 {
-	const char BuiltinVertexShader[] =
-		"#version 400\n"
-		"#extension GL_ARB_separate_shader_objects : enable\n"
-		"#extension GL_ARB_shading_language_420pack : enable\n"
-		"layout (std140, binding = 0) uniform buffer\n"
-		"{\n"
-		"  mat4 mvp;\n"
-		"} u_buffer;\n"
-		"layout (location = 0) in vec4 i_position;\n"
-		"layout (location = 1) in vec4 i_color;\n"
-		"layout (location = 0) out vec4 o_color;\n"
-		"void main()\n"
-		"{\n"
-		"  o_color = i_color;\n"
-		"  gl_Position = u_buffer.mvp * i_position;\n"
-		"}\n"
-		;
+	const std::vector<uint32_t> BuiltinVertexShader
+	{
+#include "2d_vs.spirv"
+	};
 
-	const char BuiltinFragmentShader[] =
-		"#version 400\n"
-		"#extension GL_ARB_separate_shader_objects : enable\n"
-		"#extension GL_ARB_shading_language_420pack : enable\n"
-		"layout (location = 0) in vec4 i_color;\n"
-		"layout (location = 0) out vec4 o_color;\n"
-		"void main()\n"
-		"{\n"
-		"  o_color = i_color;\n"
-		"}\n"
-		;
+	const std::vector<uint32_t> BuiltinFragmentShader
+	{
+#include "2d_fs.spirv"
+	};
 }
 
 namespace Yttrium
@@ -111,8 +90,8 @@ namespace Yttrium
 		, _descriptor_pool{_device, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}}}
 		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
 		, _pipeline_layout{_device, {_descriptor_set_layout._handle}}
-		, _vertex_shader{_device, VK_SHADER_STAGE_VERTEX_BIT, glsl_to_spirv(::BuiltinVertexShader, VK_SHADER_STAGE_VERTEX_BIT)}
-		, _fragment_shader{_device, VK_SHADER_STAGE_FRAGMENT_BIT, glsl_to_spirv(::BuiltinFragmentShader, VK_SHADER_STAGE_FRAGMENT_BIT)}
+		, _vertex_shader{_device, VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader}
+		, _fragment_shader{_device, VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader}
 	{
 		_uniform_buffer.create(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 		_uniform_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);

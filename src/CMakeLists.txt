@@ -4,8 +4,6 @@ option(NO_JPEG "Exclude JPEG support")
 option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
 
-set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
-
 test_big_endian(Y_IS_BIG_ENDIAN)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(Y_IS_LINUX ON)
@@ -264,11 +262,21 @@ if(Y_RENDERER STREQUAL "OpenGL")
 	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
 elseif(Y_RENDERER STREQUAL "Vulkan")
 	find_package(Vulkan REQUIRED)
+	add_custom_command(OUTPUT renderer/vulkan/2d_fs.spirv
+		COMMAND yglslc --fragment 2d_fs.glsl 2d_fs.spirv
+		MAIN_DEPENDENCY renderer/vulkan/2d_fs.glsl
+		WORKING_DIRECTORY renderer/vulkan
+		VERBATIM)
+	add_custom_command(OUTPUT renderer/vulkan/2d_vs.spirv
+		COMMAND yglslc --vertex 2d_vs.glsl 2d_vs.spirv
+		MAIN_DEPENDENCY renderer/vulkan/2d_vs.glsl
+		WORKING_DIRECTORY renderer/vulkan
+		VERBATIM)
 	target_sources(yttrium PRIVATE
+		renderer/vulkan/2d_fs.spirv
+		renderer/vulkan/2d_vs.spirv
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h
-		renderer/vulkan/glsl.cpp
-		renderer/vulkan/glsl.h
 		renderer/vulkan/gpu_program.h
 		renderer/vulkan/helpers.cpp
 		renderer/vulkan/helpers.h
@@ -282,7 +290,7 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		)
 	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
-	target_link_libraries(yttrium Vulkan::Vulkan SPIRV glslang OSDependent OGLCompiler)
+	target_link_libraries(yttrium Vulkan::Vulkan)
 else()
 	target_sources(yttrium PRIVATE
 		renderer/null/renderer.cpp

@@ -57,6 +57,13 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
+set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
+
+if(Y_RENDERER STREQUAL "Vulkan")
+	add_subdirectory(tools/yglslc)
+	set_target_properties(yglslc PROPERTIES FOLDER "tools")
+endif()
+
 add_subdirectory(src)
 
 if(WITH_TOOLS)

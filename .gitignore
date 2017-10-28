@@ -12,6 +12,7 @@ Makefile
 *.opendb
 *.sh
 *.sln
+*.spirv
 src/config.h
 tetrium.ypq
 *.vcxproj

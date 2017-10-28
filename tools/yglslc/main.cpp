@@ -1,19 +1,12 @@
-#include "glsl.h"
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <vector>
 
 #include <SPIRV/GlslangToSpv.h>
 
-// TODO: Move GLSL compilation to dedicated executable.
-
 namespace
 {
-	struct Context
-	{
-		Context() { glslang::InitializeProcess(); }
-		~Context() { glslang::FinalizeProcess(); }
-	};
-
-	const Context _context;
-
 	void init_resources(TBuiltInResource& resources)
 	{
 		resources.maxLights = 32;
@@ -110,44 +103,91 @@ namespace
 		resources.limits.generalConstantMatrixVectorIndexing = 1;
 	}
 
-	EShLanguage make_language(const VkShaderStageFlagBits shader_type)
+	int print_usage()
 	{
-		switch (shader_type)
-		{
-			case VK_SHADER_STAGE_VERTEX_BIT: return EShLangVertex;
-			case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT: return EShLangTessControl;
-			case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT: return EShLangTessEvaluation;
-			case VK_SHADER_STAGE_GEOMETRY_BIT: return EShLangGeometry;
-			case VK_SHADER_STAGE_FRAGMENT_BIT: return EShLangFragment;
-			case VK_SHADER_STAGE_COMPUTE_BIT: return EShLangCompute;
-			default: throw std::logic_error{"Bad shader type"};
-		}
+		std::cerr
+			<< "Usage:\n"
+			<< "  yglslc --vertex INPUT OUTPUT\n"
+			<< "  yglslc --fragment INPUT OUTPUT\n";
+		return 1;
 	}
 }
 
-namespace Yttrium
+int main(int argc, char** argv)
 {
-	std::vector<uint32_t> glsl_to_spirv(const char* source, VkShaderStageFlagBits shader_type)
+	if (argc != 4)
+		return print_usage();
+
+	EShLanguage language;
+	if (!std::strcmp(argv[1], "--vertex"))
+		language = EShLangVertex;
+	else if (!std::strcmp(argv[1], "--fragment"))
+		language = EShLangFragment;
+	else
+		return print_usage();
+
+	std::string glsl;
 	{
-		const auto language = ::make_language(shader_type);
+		std::ifstream input{argv[2], std::ios::binary | std::ios::in};
+		if (!input.is_open())
+		{
+			std::cerr << "ERROR: Unable to open \"" << argv[2] << "\"\n";
+			return 1;
+		}
+		const auto input_size = input.seekg(0, std::ios::end).tellg();
+		input.seekg(0, std::ios_base::beg);
+		glsl.resize(static_cast<size_t>(input_size));
+		if (!input.read(glsl.data(), input_size))
+		{
+			std::cerr << "ERROR: Unable to read \"" << argv[2] << "\"\n";
+			return 1;
+		}
+	}
+
+	std::vector<uint32_t> spirv;
+	{
+		glslang::InitializeProcess();
+
+		std::array<const char*, 1> source{glsl.data()};
 
 		glslang::TShader shader{language};
-		shader.setStrings(&source, 1);
+		shader.setStrings(source.data(), source.size());
 
 		const auto messages = static_cast<EShMessages>(EShMsgSpvRules | EShMsgVulkanRules);
 
 		TBuiltInResource resources;
 		::init_resources(resources);
 		if (!shader.parse(&resources, 100, false, messages))
-			throw std::runtime_error{shader.getInfoLog()};
+		{
+			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n" << shader.getInfoLog() << '\n';
+			return 1;
+		}
 
 		glslang::TProgram program;
 		program.addShader(&shader);
 		if (!program.link(messages))
-			throw std::runtime_error{shader.getInfoLog()};
+		{
+			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n" << shader.getInfoLog() << '\n';
+			return 1;
+		}
 
-		std::vector<uint32_t> result;
-		glslang::GlslangToSpv(*program.getIntermediate(language), result);
-		return result;
+		glslang::GlslangToSpv(*program.getIntermediate(language), spirv);
+
+		glslang::FinalizeProcess();
 	}
+
+	std::ofstream output{argv[3], std::ios::binary | std::ios::out | std::ios::trunc};
+	if (!output.is_open())
+	{
+		std::cerr << "ERROR: Unable to open \"" << argv[3] << "\"\n";
+		return 1;
+	}
+
+	if (!spirv.empty())
+	{
+		output << spirv[0];
+		for (size_t i = 1; i < spirv.size(); ++i)
+			output << ',' << spirv[i];
+	}
+	output << '\n';
 }
