@@ -84,7 +84,7 @@ namespace
 namespace Yttrium
 {
 	WindowBackend::WindowClass::WindowClass(HINSTANCE hinstance, WNDPROC wndproc)
-		: _hinstance(hinstance)
+		: _hinstance{hinstance}
 	{
 		_wndclass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
 		_wndclass.lpfnWndProc = wndproc;
@@ -94,7 +94,7 @@ namespace Yttrium
 		_wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		_wndclass.lpszClassName = "Yttrium";
 		if (!::RegisterClassExA(&_wndclass))
-			throw InitializationError("Failed to register window class");
+			throw InitializationError{"Failed to register window class"};
 	}
 
 	WindowBackend::WindowClass::~WindowClass()
@@ -103,10 +103,10 @@ namespace Yttrium
 	}
 
 	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
-		: _hwnd(::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data))
+		: _hwnd{::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data)}
 	{
 		if (!_hwnd)
-			throw InitializationError("Failed to create window");
+			throw InitializationError{"Failed to create window"};
 	}
 
 	WindowBackend::WindowHandle::~WindowHandle()
@@ -115,11 +115,11 @@ namespace Yttrium
 	}
 
 	WindowBackend::WindowDC::WindowDC(const WindowHandle& hwnd)
-		: _hwnd(hwnd)
-		, _hdc(::GetDC(_hwnd))
+		: _hwnd{hwnd}
+		, _hdc{::GetDC(_hwnd)}
 	{
 		if (!_hdc)
-			throw InitializationError("Failed to get device context");
+			throw InitializationError{"Failed to get device context"};
 	}
 
 	WindowBackend::WindowDC::~WindowDC()
@@ -128,10 +128,10 @@ namespace Yttrium
 	}
 
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
-		: _name(name)
-		, _callbacks(callbacks)
+		: _name{name}
+		, _callbacks{callbacks}
 	{
-		assert(_size);
+		assert(_size); // Window size is initialized during member construction (from window procedure).
 		_created = true;
 	}
 
@@ -186,7 +186,7 @@ namespace Yttrium
 
 	LRESULT WindowBackend::window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
-		switch(msg)
+		switch (msg)
 		{
 		case WM_CLOSE:
 			::PostQuitMessage(0);
