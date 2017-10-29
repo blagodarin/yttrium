@@ -8,7 +8,7 @@ namespace Yttrium
 	class NullRenderer final : public RendererImpl
 	{
 	public:
-		NullRenderer(const WindowBackend&) {}
+		explicit NullRenderer(const WindowBackend&) {}
 
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const std::string&, const std::string&) override;

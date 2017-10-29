@@ -12,7 +12,7 @@ namespace Yttrium
 	class VulkanRenderer final : public RendererImpl
 	{
 	public:
-		VulkanRenderer(const WindowBackend&);
+		explicit VulkanRenderer(const WindowBackend&);
 		~VulkanRenderer() noexcept;
 
 		// Renderer

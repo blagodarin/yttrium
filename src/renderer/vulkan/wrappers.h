@@ -170,6 +170,7 @@ namespace Yttrium
 			}
 		};
 
+		// cppcheck-suppress noExplicitConstructor
 		VK_DescriptorSetLayout(const VK_Device&, std::vector<Binding>&&);
 		~VK_DescriptorSetLayout() noexcept { vkDestroyDescriptorSetLayout(_device._handle, _handle, nullptr); }
 	};

@@ -78,10 +78,6 @@ if(WITH_EXAMPLES)
 	endif()
 	add_subdirectory(examples/3d)
 	add_subdirectory(examples/tetrium)
-	set_target_properties(
-		3d
-		tetrium tetrium_localization tetrium_package
-		PROPERTIES FOLDER "examples")
 endif()
 
 if(WITH_EXTRA)
@@ -93,7 +89,7 @@ if(WITH_EXTRA)
 
 	add_custom_target(cppcheck
 		COMMAND cppcheck --enable=all --quiet
-			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue
+			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError
 			-I "${PROJECT_SOURCE_DIR}/include"
 			-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
 			-i "${PROJECT_SOURCE_DIR}/3rdparty"

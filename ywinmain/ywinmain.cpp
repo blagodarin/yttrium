@@ -6,7 +6,6 @@
 
 int main(int, char**);
 
-// cppcheck-suppress unusedFunction
 int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	int argc = 0;
