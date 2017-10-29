@@ -60,9 +60,10 @@ namespace Yttrium
 		}
 		else
 		{
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, data._indices.size() * sizeof(uint32_t), VK_INDEX_TYPE_UINT32, data._indices.size());
+			const auto index_buffer_size = data._indices.size() * sizeof(uint32_t);
+			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
 			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
-			result->_index_buffer.write(data._indices.data(), result->_index_buffer._size);
+			result->_index_buffer.write(data._indices.data(), index_buffer_size);
 			return result;
 		}
 	}

@@ -90,17 +90,13 @@ namespace Yttrium
 	struct VK_DepthBuffer
 	{
 		const VK_Device& _device;
-		VkFormat _format = VK_FORMAT_UNDEFINED;
+		const VkFormat _format;
 		VkImage _image = VK_NULL_HANDLE;
 		VkDeviceMemory _memory = VK_NULL_HANDLE;
 		VkImageView _view = VK_NULL_HANDLE;
 
-		explicit VK_DepthBuffer(const VK_Device& device) noexcept : _device{device} {}
+		VK_DepthBuffer(const VK_Device&, VkFormat, VkFlags memory_flags);
 		~VK_DepthBuffer() noexcept;
-
-		void create_image(VkFormat);
-		void allocate_memory(VkFlags);
-		void create_view();
 
 		VkAttachmentDescription attachment_description() const noexcept;
 	};
@@ -134,11 +130,8 @@ namespace Yttrium
 		VkBuffer _handle = VK_NULL_HANDLE;
 		VkDeviceMemory _memory = VK_NULL_HANDLE;
 
-		VK_Buffer(const VK_Device& device, uint32_t size) noexcept : _device{device}, _size{size} {}
+		VK_Buffer(const VK_Device&, uint32_t size, VkBufferUsageFlags buffer_usage, VkFlags memory_flags);
 		~VK_Buffer() noexcept;
-
-		void create(VkBufferUsageFlags usage);
-		void allocate_memory(VkFlags);
 
 		VkDescriptorBufferInfo descriptor_buffer_info() const noexcept;
 		void write(const void* data, size_t size, size_t offset = 0);

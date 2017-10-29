@@ -21,7 +21,7 @@ namespace Yttrium
 	VulkanSwapchain::VulkanSwapchain(const VK_Device& device, const VK_CommandPool& command_pool, const VK_PipelineLayout& pipeline_layout, const std::vector<VkPipelineShaderStageCreateInfo>& shader_stages)
 		: _device{device}
 		, _swapchain{_device}
-		, _depth_buffer{_device}
+		, _depth_buffer{_device, VK_FORMAT_D16_UNORM, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT}
 		, _render_pass{_device}
 		, _framebuffers{_device}
 		, _pipeline{_device}
@@ -31,10 +31,6 @@ namespace Yttrium
 	{
 		_swapchain.create();
 		_swapchain.create_views();
-
-		_depth_buffer.create_image(VK_FORMAT_D16_UNORM);
-		_depth_buffer.allocate_memory(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		_depth_buffer.create_view();
 
 		_render_pass.create(_swapchain, _depth_buffer);
 
@@ -83,8 +79,8 @@ namespace Yttrium
 		, _surface{_instance, window}
 		, _physical_device{_surface}
 		, _device{_physical_device}
-		, _uniform_buffer{_device, 2 * sizeof(Matrix4)}
-		, _vertex_buffer{_device, 1024}
+		, _uniform_buffer{_device, 2 * sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
+		, _vertex_buffer{_device, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
 		, _command_pool{_device, _physical_device._queue_family_index}
 		, _descriptor_set_layout{_device, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}}}
 		, _descriptor_pool{_device, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}}}
@@ -93,29 +89,21 @@ namespace Yttrium
 		, _vertex_shader{_device, VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader}
 		, _fragment_shader{_device, VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader}
 	{
-		_uniform_buffer.create(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
-		_uniform_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		const auto dbi = _uniform_buffer.descriptor_buffer_info();
 
-		_vertex_buffer.create(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-		_vertex_buffer.allocate_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VkWriteDescriptorSet wds = {};
+		wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		wds.pNext = nullptr;
+		wds.dstSet = _descriptor_set._handle;
+		wds.dstBinding = 0;
+		wds.dstArrayElement = 0;
+		wds.descriptorCount = 1;
+		wds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		wds.pImageInfo = nullptr;
+		wds.pBufferInfo = &dbi;
+		wds.pTexelBufferView = nullptr;
 
-		{
-			const auto dbi = _uniform_buffer.descriptor_buffer_info();
-
-			VkWriteDescriptorSet wds = {};
-			wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			wds.pNext = nullptr;
-			wds.dstSet = _descriptor_set._handle;
-			wds.dstBinding = 0;
-			wds.dstArrayElement = 0;
-			wds.descriptorCount = 1;
-			wds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			wds.pImageInfo = nullptr;
-			wds.pBufferInfo = &dbi;
-			wds.pTexelBufferView = nullptr;
-
-			vkUpdateDescriptorSets(_device._handle, 1, &wds, 0, nullptr);
-		}
+		vkUpdateDescriptorSets(_device._handle, 1, &wds, 0, nullptr);
 	}
 
 	void VulkanContext::render()

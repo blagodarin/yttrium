@@ -52,7 +52,112 @@ namespace
 		throw std::runtime_error{function.substr(0, function.find('(')) + " = " + ::vulkan_result_to_string(result)};
 	}
 
-#define CHECK(call) if (const auto result = (call)) vulkan_throw(result, #call);
+#define CHECK(call) if (const auto result = (call)) ::vulkan_throw(result, #call);
+
+	template <typename T>
+	class VK_Handle
+	{
+	public:
+		auto get() const noexcept { return _handle; }
+		auto release() noexcept { return std::exchange(_handle, T{VK_NULL_HANDLE}); }
+
+		explicit operator bool() const noexcept { return VK_NULL_HANDLE != _handle; }
+
+	protected:
+		T _handle = VK_NULL_HANDLE;
+	};
+
+	class VK_VkBuffer : public VK_Handle<VkBuffer>
+	{
+	public:
+		VK_VkBuffer(VkDevice device) noexcept : _device{device} {}
+		~VK_VkBuffer() noexcept { if (*this) vkDestroyBuffer(_device, _handle, nullptr); }
+
+		void bind_memory(VkDeviceMemory memory) const
+		{
+			assert(*this && VK_NULL_HANDLE != memory);
+			CHECK(vkBindBufferMemory(_device, _handle, memory, 0));
+		}
+
+		void create(const VkBufferCreateInfo& create_info)
+		{
+			assert(!*this);
+			CHECK(vkCreateBuffer(_device, &create_info, nullptr, &_handle));
+		}
+
+		VkMemoryRequirements memory_requirements() const noexcept
+		{
+			assert(*this);
+			VkMemoryRequirements requirements;
+			vkGetBufferMemoryRequirements(_device, _handle, &requirements);
+			return requirements;
+		}
+
+	private:
+		const VkDevice _device;
+	};
+
+	class VK_VkDeviceMemory : public VK_Handle<VkDeviceMemory>
+	{
+	public:
+		VK_VkDeviceMemory(VkDevice device) noexcept : _device{device} {}
+		~VK_VkDeviceMemory() noexcept { if (*this) vkFreeMemory(_device, _handle, nullptr); }
+
+		void allocate(const VkMemoryAllocateInfo& allocate_info)
+		{
+			assert(!*this);
+			CHECK(vkAllocateMemory(_device, &allocate_info, nullptr, &_handle));
+		}
+
+	private:
+		const VkDevice _device;
+	};
+
+	class VK_VkImage : public VK_Handle<VkImage>
+	{
+	public:
+		VK_VkImage(VkDevice device) noexcept : _device{device} {}
+		~VK_VkImage() noexcept { if (*this) vkDestroyImage(_device, _handle, nullptr); }
+
+		void bind_memory(VkDeviceMemory memory) const
+		{
+			assert(*this && VK_NULL_HANDLE != memory);
+			CHECK(vkBindImageMemory(_device, _handle, memory, 0));
+		}
+
+		void create(const VkImageCreateInfo& create_info)
+		{
+			assert(!*this);
+			CHECK(vkCreateImage(_device, &create_info, nullptr, &_handle));
+		}
+
+		VkMemoryRequirements memory_requirements() const noexcept
+		{
+			assert(*this);
+			VkMemoryRequirements requirements;
+			vkGetImageMemoryRequirements(_device, _handle, &requirements);
+			return requirements;
+		}
+
+	private:
+		const VkDevice _device;
+	};
+
+	class VK_VkImageView : public VK_Handle<VkImageView>
+	{
+	public:
+		VK_VkImageView(VkDevice device) noexcept : _device{device} {}
+		~VK_VkImageView() noexcept { if (*this) vkDestroyImageView(_device, _handle, nullptr); }
+
+		void create(const VkImageViewCreateInfo& create_info)
+		{
+			assert(!*this);
+			CHECK(vkCreateImageView(_device, &create_info, nullptr, &_handle));
+		}
+
+	private:
+		const VkDevice _device;
+	};
 }
 
 namespace Yttrium
@@ -383,76 +488,73 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	VK_DepthBuffer::VK_DepthBuffer(const VK_Device& device, VkFormat format, VkFlags memory_flags)
+		: _device{device}
+		, _format{format}
+	{
+		VK_VkDeviceMemory memory{_device._handle};
+		VK_VkImage image{_device._handle};
+		VK_VkImageView view{_device._handle};
+
+		VkImageCreateInfo image_info = {};
+		image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		image_info.pNext = nullptr;
+		image_info.flags = 0;
+		image_info.imageType = VK_IMAGE_TYPE_2D;
+		image_info.format = _format;
+		image_info.extent.width = _device._physical_device._surface_capabilities.currentExtent.width;
+		image_info.extent.height = _device._physical_device._surface_capabilities.currentExtent.height;
+		image_info.extent.depth = 1;
+		image_info.mipLevels = 1;
+		image_info.arrayLayers = 1;
+		image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+		image_info.tiling = _device._physical_device.tiling(_format, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		image_info.queueFamilyIndexCount = 0;
+		image_info.pQueueFamilyIndices = nullptr;
+		image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		image.create(image_info);
+
+		const auto memory_requirements = image.memory_requirements();
+
+		VkMemoryAllocateInfo memory_info;
+		memory_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		memory_info.pNext = nullptr;
+		memory_info.allocationSize = memory_requirements.size;
+		memory_info.memoryTypeIndex = _device._physical_device.memory_type_index(memory_requirements.memoryTypeBits, memory_flags);
+		memory.allocate(memory_info);
+
+		image.bind_memory(memory.get());
+
+		VkImageViewCreateInfo view_info;
+		view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		view_info.pNext = nullptr;
+		view_info.flags = 0;
+		view_info.image = image.get();
+		view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		view_info.format = _format;
+		view_info.components.r = VK_COMPONENT_SWIZZLE_R;
+		view_info.components.g = VK_COMPONENT_SWIZZLE_G;
+		view_info.components.b = VK_COMPONENT_SWIZZLE_B;
+		view_info.components.a = VK_COMPONENT_SWIZZLE_A;
+		view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+		view_info.subresourceRange.baseMipLevel = 0;
+		view_info.subresourceRange.levelCount = 1;
+		view_info.subresourceRange.baseArrayLayer = 0;
+		view_info.subresourceRange.layerCount = 1;
+		view.create(view_info);
+
+		_image = image.release();
+		_memory = memory.release();
+		_view = view.release();
+	}
+
 	VK_DepthBuffer::~VK_DepthBuffer() noexcept
 	{
-		if (_view != VK_NULL_HANDLE)
-			vkDestroyImageView(_device._handle, _view, nullptr);
-		if (_image != VK_NULL_HANDLE)
-			vkDestroyImage(_device._handle, _image, nullptr);
-		if (_memory != VK_NULL_HANDLE)
-			vkFreeMemory(_device._handle, _memory, nullptr);
-	}
-
-	void VK_DepthBuffer::create_image(VkFormat format)
-	{
-		assert(_image == VK_NULL_HANDLE);
-
-		VkImageCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.imageType = VK_IMAGE_TYPE_2D;
-		create_info.format = format;
-		create_info.extent.width = _device._physical_device._surface_capabilities.currentExtent.width;
-		create_info.extent.height = _device._physical_device._surface_capabilities.currentExtent.height;
-		create_info.extent.depth = 1;
-		create_info.mipLevels = 1;
-		create_info.arrayLayers = 1;
-		create_info.samples = VK_SAMPLE_COUNT_1_BIT;
-		create_info.tiling = _device._physical_device.tiling(format, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
-		create_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		create_info.queueFamilyIndexCount = 0;
-		create_info.pQueueFamilyIndices = nullptr;
-		create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-		CHECK(vkCreateImage(_device._handle, &create_info, nullptr, &_image));
-
-		_format = format;
-	}
-
-	void VK_DepthBuffer::allocate_memory(VkFlags flags)
-	{
-		assert(_image != VK_NULL_HANDLE && _memory == VK_NULL_HANDLE);
-
-		VkMemoryRequirements memory_requirements;
-		vkGetImageMemoryRequirements(_device._handle, _image, &memory_requirements);
-		_memory = _device.allocate_memory(memory_requirements, flags);
-		CHECK(vkBindImageMemory(_device._handle, _image, _memory, 0));
-	}
-
-	void VK_DepthBuffer::create_view()
-	{
-		assert(_image != VK_NULL_HANDLE && _view == VK_NULL_HANDLE);
-
-		VkImageViewCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.image = _image;
-		create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		create_info.format = _format;
-		create_info.components.r = VK_COMPONENT_SWIZZLE_R;
-		create_info.components.g = VK_COMPONENT_SWIZZLE_G;
-		create_info.components.b = VK_COMPONENT_SWIZZLE_B;
-		create_info.components.a = VK_COMPONENT_SWIZZLE_A;
-		create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		create_info.subresourceRange.baseMipLevel = 0;
-		create_info.subresourceRange.levelCount = 1;
-		create_info.subresourceRange.baseArrayLayer = 0;
-		create_info.subresourceRange.layerCount = 1;
-
-		CHECK(vkCreateImageView(_device._handle, &create_info, nullptr, &_view));
+		vkDestroyImageView(_device._handle, _view, nullptr);
+		vkDestroyImage(_device._handle, _image, nullptr);
+		vkFreeMemory(_device._handle, _memory, nullptr);
 	}
 
 	VkAttachmentDescription VK_DepthBuffer::attachment_description() const noexcept
@@ -555,39 +657,44 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_Buffer::~VK_Buffer() noexcept
+	VK_Buffer::VK_Buffer(const VK_Device& device, uint32_t size, VkBufferUsageFlags buffer_usage, VkFlags memory_flags)
+		: _device{device}
+		, _size{size}
 	{
-		if (_handle != VK_NULL_HANDLE)
-			vkDestroyBuffer(_device._handle, _handle, nullptr);
-		if (_memory != VK_NULL_HANDLE)
-			vkFreeMemory(_device._handle, _memory, nullptr);
-	}
-
-	void VK_Buffer::create(VkBufferUsageFlags usage)
-	{
-		assert(_handle == VK_NULL_HANDLE);
-
-		VkBufferCreateInfo create_info = {};
+		VkBufferCreateInfo create_info;
 		create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
 		create_info.size = _size;
-		create_info.usage = usage;
+		create_info.usage = buffer_usage;
 		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		create_info.queueFamilyIndexCount = 0;
 		create_info.pQueueFamilyIndices = nullptr;
 
-		CHECK(vkCreateBuffer(_device._handle, &create_info, nullptr, &_handle));
+		VK_VkBuffer buffer{_device._handle};
+		buffer.create(create_info);
+
+		const auto memory_requirements = buffer.memory_requirements();
+
+		VkMemoryAllocateInfo allocate_info;
+		allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocate_info.pNext = nullptr;
+		allocate_info.allocationSize = memory_requirements.size;
+		allocate_info.memoryTypeIndex = _device._physical_device.memory_type_index(memory_requirements.memoryTypeBits, memory_flags);
+
+		VK_VkDeviceMemory memory{_device._handle};
+		memory.allocate(allocate_info);
+
+		buffer.bind_memory(memory.get());
+
+		_handle = buffer.release();
+		_memory = memory.release();
 	}
 
-	void VK_Buffer::allocate_memory(VkFlags flags)
+	VK_Buffer::~VK_Buffer() noexcept
 	{
-		assert(_handle != VK_NULL_HANDLE && _memory == VK_NULL_HANDLE);
-
-		VkMemoryRequirements memory_requirements;
-		vkGetBufferMemoryRequirements(_device._handle, _handle, &memory_requirements);
-		_memory = _device.allocate_memory(memory_requirements, flags);
-		CHECK(vkBindBufferMemory(_device._handle, _handle, _memory, 0));
+		vkDestroyBuffer(_device._handle, _handle, nullptr);
+		vkFreeMemory(_device._handle, _memory, nullptr);
 	}
 
 	VkDescriptorBufferInfo VK_Buffer::descriptor_buffer_info() const noexcept
@@ -601,9 +708,7 @@ namespace Yttrium
 
 	void VK_Buffer::write(const void* data, size_t size, size_t offset)
 	{
-		assert(_memory != VK_NULL_HANDLE);
 		assert(offset <= _size && size <= _size - offset);
-
 		void* mapped_memory = nullptr;
 		CHECK(vkMapMemory(_device._handle, _memory, offset, size, 0, &mapped_memory));
 		std::memcpy(mapped_memory, data, size);
