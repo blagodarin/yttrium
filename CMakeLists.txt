@@ -59,10 +59,12 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
-add_subdirectory(tools/yrc)
-
 if(Y_RENDERER STREQUAL "Vulkan")
 	add_subdirectory(tools/yglslc)
+endif()
+
+if(WITH_TOOLS OR Y_RENDERER STREQUAL "OpenGL")
+	add_subdirectory(tools/yrc)
 endif()
 
 add_subdirectory(src)
