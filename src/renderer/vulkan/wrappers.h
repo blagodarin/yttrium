@@ -75,11 +75,8 @@ namespace Yttrium
 		VkSwapchainKHR _handle = VK_NULL_HANDLE;
 		std::vector<VkImageView> _views;
 
-		explicit VK_Swapchain(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Swapchain(const VK_Device&);
 		~VK_Swapchain() noexcept;
-
-		void create();
-		void create_views();
 
 		VkAttachmentDescription attachment_description() const noexcept;
 

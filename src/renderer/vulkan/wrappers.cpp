@@ -58,6 +58,9 @@ namespace
 	class VK_Handle
 	{
 	public:
+		VK_Handle(const VK_Handle&) = delete;
+		VK_Handle& operator=(const VK_Handle&) = delete;
+
 		auto get() const noexcept { return _handle; }
 		auto release() noexcept { return std::exchange(_handle, T{VK_NULL_HANDLE}); }
 
@@ -65,6 +68,9 @@ namespace
 
 	protected:
 		T _handle = VK_NULL_HANDLE;
+
+		VK_Handle() noexcept = default;
+		VK_Handle(T handle) noexcept : _handle{handle} {}
 	};
 
 	class VK_VkBuffer : public VK_Handle<VkBuffer>
@@ -79,10 +85,10 @@ namespace
 			CHECK(vkBindBufferMemory(_device, _handle, memory, 0));
 		}
 
-		void create(const VkBufferCreateInfo& create_info)
+		void create(const VkBufferCreateInfo& info)
 		{
 			assert(!*this);
-			CHECK(vkCreateBuffer(_device, &create_info, nullptr, &_handle));
+			CHECK(vkCreateBuffer(_device, &info, nullptr, &_handle));
 		}
 
 		VkMemoryRequirements memory_requirements() const noexcept
@@ -103,10 +109,10 @@ namespace
 		VK_VkDeviceMemory(VkDevice device) noexcept : _device{device} {}
 		~VK_VkDeviceMemory() noexcept { if (*this) vkFreeMemory(_device, _handle, nullptr); }
 
-		void allocate(const VkMemoryAllocateInfo& allocate_info)
+		void allocate(const VkMemoryAllocateInfo& info)
 		{
 			assert(!*this);
-			CHECK(vkAllocateMemory(_device, &allocate_info, nullptr, &_handle));
+			CHECK(vkAllocateMemory(_device, &info, nullptr, &_handle));
 		}
 
 	private:
@@ -125,10 +131,10 @@ namespace
 			CHECK(vkBindImageMemory(_device, _handle, memory, 0));
 		}
 
-		void create(const VkImageCreateInfo& create_info)
+		void create(const VkImageCreateInfo& info)
 		{
 			assert(!*this);
-			CHECK(vkCreateImage(_device, &create_info, nullptr, &_handle));
+			CHECK(vkCreateImage(_device, &info, nullptr, &_handle));
 		}
 
 		VkMemoryRequirements memory_requirements() const noexcept
@@ -147,12 +153,29 @@ namespace
 	{
 	public:
 		VK_VkImageView(VkDevice device) noexcept : _device{device} {}
+		VK_VkImageView(VK_VkImageView&& view) noexcept : VK_Handle{view._handle}, _device{view._device} { view._handle = VK_NULL_HANDLE; }
 		~VK_VkImageView() noexcept { if (*this) vkDestroyImageView(_device, _handle, nullptr); }
 
-		void create(const VkImageViewCreateInfo& create_info)
+		void create(const VkImageViewCreateInfo& info)
 		{
 			assert(!*this);
-			CHECK(vkCreateImageView(_device, &create_info, nullptr, &_handle));
+			CHECK(vkCreateImageView(_device, &info, nullptr, &_handle));
+		}
+
+	private:
+		const VkDevice _device;
+	};
+
+	class VK_VkSwapchainKHR : public VK_Handle<VkSwapchainKHR>
+	{
+	public:
+		VK_VkSwapchainKHR(VkDevice device) noexcept : _device{device} {}
+		~VK_VkSwapchainKHR() noexcept { if (*this) vkDestroySwapchainKHR(_device, _handle, nullptr); }
+
+		void create(const VkSwapchainCreateInfoKHR& info)
+		{
+			assert(!*this);
+			CHECK(vkCreateSwapchainKHR(_device, &info, nullptr, &_handle));
 		}
 
 	private:
@@ -366,78 +389,76 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	VK_Swapchain::VK_Swapchain(const VK_Device& device)
+		: _device{device}
+	{
+		const auto surface_formats = _device._physical_device.surface_formats();
+		_format = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
+
+		VkSwapchainCreateInfoKHR swapchain_info;
+		swapchain_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		swapchain_info.pNext = nullptr;
+		swapchain_info.flags = 0;
+		swapchain_info.surface = _device._physical_device._surface._handle;
+		swapchain_info.minImageCount = _device._physical_device._surface_capabilities.minImageCount;
+		swapchain_info.imageFormat = _format;
+		swapchain_info.imageColorSpace = surface_formats.empty() ? VK_COLOR_SPACE_SRGB_NONLINEAR_KHR : surface_formats[0].colorSpace;
+		swapchain_info.imageExtent = _device._physical_device._surface_capabilities.currentExtent;
+		swapchain_info.imageArrayLayers = 1;
+		swapchain_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		swapchain_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		swapchain_info.queueFamilyIndexCount = 0;
+		swapchain_info.pQueueFamilyIndices = nullptr;
+		swapchain_info.preTransform = _device._physical_device.surface_transform();
+		swapchain_info.compositeAlpha = _device._physical_device.composite_alpha();
+		swapchain_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+		swapchain_info.clipped = VK_TRUE;
+		swapchain_info.oldSwapchain = VK_NULL_HANDLE;
+
+		VK_VkSwapchainKHR swapchain{_device._handle};
+		swapchain.create(swapchain_info);
+
+		uint32_t image_count = 0;
+		CHECK(vkGetSwapchainImagesKHR(_device._handle, swapchain.get(), &image_count, nullptr));
+
+		std::vector<VkImage> images(image_count, VK_NULL_HANDLE);
+		CHECK(vkGetSwapchainImagesKHR(_device._handle, swapchain.get(), &image_count, images.data()));
+
+		std::vector<VK_VkImageView> views;
+		views.reserve(image_count);
+		for (const auto image : images)
+		{
+			VkImageViewCreateInfo view_info;
+			view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			view_info.pNext = nullptr;
+			view_info.flags = 0;
+			view_info.image = image;
+			view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			view_info.format = _format;
+			view_info.components.r = VK_COMPONENT_SWIZZLE_R;
+			view_info.components.g = VK_COMPONENT_SWIZZLE_G;
+			view_info.components.b = VK_COMPONENT_SWIZZLE_B;
+			view_info.components.a = VK_COMPONENT_SWIZZLE_A;
+			view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			view_info.subresourceRange.baseMipLevel = 0;
+			view_info.subresourceRange.levelCount = 1;
+			view_info.subresourceRange.baseArrayLayer = 0;
+			view_info.subresourceRange.layerCount = 1;
+			views.emplace_back(_device._handle).create(view_info);
+		}
+
+		_views.reserve(views.size());
+
+		_handle = swapchain.release();
+		for (auto& view : views)
+			_views.emplace_back(view.release());
+	}
+
 	VK_Swapchain::~VK_Swapchain() noexcept
 	{
 		for (const auto view : _views)
 			vkDestroyImageView(_device._handle, view, nullptr);
-		if (_handle != VK_NULL_HANDLE)
-			vkDestroySwapchainKHR(_device._handle, _handle, nullptr);
-	}
-
-	void VK_Swapchain::create()
-	{
-		assert(_handle == VK_NULL_HANDLE);
-
-		const auto surface_formats = _device._physical_device.surface_formats();
-		_format = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
-
-		VkSwapchainCreateInfoKHR create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.surface = _device._physical_device._surface._handle;
-		create_info.minImageCount = _device._physical_device._surface_capabilities.minImageCount;
-		create_info.imageFormat = _format;
-		create_info.imageColorSpace = surface_formats.empty() ? VK_COLOR_SPACE_SRGB_NONLINEAR_KHR : surface_formats[0].colorSpace;
-		create_info.imageExtent = _device._physical_device._surface_capabilities.currentExtent;
-		create_info.imageArrayLayers = 1;
-		create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-		create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		create_info.queueFamilyIndexCount = 0;
-		create_info.pQueueFamilyIndices = nullptr;
-		create_info.preTransform = _device._physical_device.surface_transform();
-		create_info.compositeAlpha = _device._physical_device.composite_alpha();
-		create_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
-		create_info.clipped = VK_TRUE;
-		create_info.oldSwapchain = VK_NULL_HANDLE;
-
-		CHECK(vkCreateSwapchainKHR(_device._handle, &create_info, nullptr, &_handle));
-	}
-
-	void VK_Swapchain::create_views()
-	{
-		assert(_handle != VK_NULL_HANDLE && _views.empty());
-
-		uint32_t image_count = 0;
-		CHECK(vkGetSwapchainImagesKHR(_device._handle, _handle, &image_count, nullptr));
-
-		std::vector<VkImage> images(image_count);
-		CHECK(vkGetSwapchainImagesKHR(_device._handle, _handle, &image_count, images.data()));
-
-		_views.reserve(image_count);
-		for (const auto image : images)
-		{
-			VkImageViewCreateInfo create_info;
-			create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			create_info.pNext = nullptr;
-			create_info.flags = 0;
-			create_info.image = image;
-			create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			create_info.format = _format;
-			create_info.components.r = VK_COMPONENT_SWIZZLE_R;
-			create_info.components.g = VK_COMPONENT_SWIZZLE_G;
-			create_info.components.b = VK_COMPONENT_SWIZZLE_B;
-			create_info.components.a = VK_COMPONENT_SWIZZLE_A;
-			create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			create_info.subresourceRange.baseMipLevel = 0;
-			create_info.subresourceRange.levelCount = 1;
-			create_info.subresourceRange.baseArrayLayer = 0;
-			create_info.subresourceRange.layerCount = 1;
-
-			VkImageView view = VK_NULL_HANDLE;
-			CHECK(vkCreateImageView(_device._handle, &create_info, nullptr, &view));
-			_views.emplace_back(view);
-		}
+		vkDestroySwapchainKHR(_device._handle, _handle, nullptr);
 	}
 
 	VkAttachmentDescription VK_Swapchain::attachment_description() const noexcept

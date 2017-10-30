@@ -29,9 +29,6 @@ namespace Yttrium
 		, _rendering_complete{_device}
 		, _command_buffer{command_pool}
 	{
-		_swapchain.create();
-		_swapchain.create_views();
-
 		_render_pass.create(_swapchain, _depth_buffer);
 
 		_framebuffers.create(_render_pass, _swapchain, _depth_buffer);
