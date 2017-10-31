@@ -1,187 +1,13 @@
 #include "wrappers.h"
 
 #include "../../system/window.h"
+#include "handles.h"
 #include "helpers.h"
 
 #include <cassert>
 #include <cstring>
 
-namespace
-{
-	std::string vulkan_result_to_string(VkResult result)
-	{
-		switch (result)
-		{
-		case VK_SUCCESS: return "VK_SUCCESS";
-		case VK_NOT_READY: return "VK_NOT_READY";
-		case VK_TIMEOUT: return "VK_TIMEOUT";
-		case VK_EVENT_SET: return "VK_EVENT_SET";
-		case VK_EVENT_RESET: return "VK_EVENT_RESET";
-		case VK_INCOMPLETE: return "VK_INCOMPLETE";
-		case VK_ERROR_OUT_OF_HOST_MEMORY: return "VK_ERROR_OUT_OF_HOST_MEMORY";
-		case VK_ERROR_OUT_OF_DEVICE_MEMORY: return "VK_ERROR_OUT_OF_DEVICE_MEMORY";
-		case VK_ERROR_INITIALIZATION_FAILED: return "VK_ERROR_INITIALIZATION_FAILED";
-		case VK_ERROR_DEVICE_LOST: return "VK_ERROR_DEVICE_LOST";
-		case VK_ERROR_MEMORY_MAP_FAILED: return "VK_ERROR_MEMORY_MAP_FAILED";
-		case VK_ERROR_LAYER_NOT_PRESENT: return "VK_ERROR_LAYER_NOT_PRESENT";
-		case VK_ERROR_EXTENSION_NOT_PRESENT: return "VK_ERROR_EXTENSION_NOT_PRESENT";
-		case VK_ERROR_FEATURE_NOT_PRESENT: return "VK_ERROR_FEATURE_NOT_PRESENT";
-		case VK_ERROR_INCOMPATIBLE_DRIVER: return "VK_ERROR_INCOMPATIBLE_DRIVER";
-		case VK_ERROR_TOO_MANY_OBJECTS: return "VK_ERROR_TOO_MANY_OBJECTS";
-		case VK_ERROR_FORMAT_NOT_SUPPORTED: return "VK_ERROR_FORMAT_NOT_SUPPORTED";
-		case VK_ERROR_FRAGMENTED_POOL: return "VK_ERROR_FRAGMENTED_POOL";
-		case VK_ERROR_SURFACE_LOST_KHR: return "VK_ERROR_SURFACE_LOST_KHR";
-		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR: return "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
-		case VK_SUBOPTIMAL_KHR: return "VK_SUBOPTIMAL_KHR";
-		case VK_ERROR_OUT_OF_DATE_KHR: return "VK_ERROR_OUT_OF_DATE_KHR";
-		case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR: return "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR";
-		case VK_ERROR_VALIDATION_FAILED_EXT: return "VK_ERROR_VALIDATION_FAILED_EXT";
-		case VK_ERROR_INVALID_SHADER_NV: return "VK_ERROR_INVALID_SHADER_NV";
-		case VK_ERROR_OUT_OF_POOL_MEMORY_KHR: return "VK_ERROR_OUT_OF_POOL_MEMORY_KHR";
-#if VK_HEADER_VERSION < 54
-		case VK_ERROR_INVALID_EXTERNAL_HANDLE_KHX: return "VK_ERROR_INVALID_EXTERNAL_HANDLE_KHX";
-#else
-		case VK_ERROR_INVALID_EXTERNAL_HANDLE_KHR: return "VK_ERROR_INVALID_EXTERNAL_HANDLE_KHR";
-#endif
-		default: return std::to_string(result);
-		}
-	}
-
-	void vulkan_throw(VkResult result, const std::string& function)
-	{
-		throw std::runtime_error{function.substr(0, function.find('(')) + " = " + ::vulkan_result_to_string(result)};
-	}
-
-#define CHECK(call) if (const auto result = (call)) ::vulkan_throw(result, #call);
-
-	template <typename T>
-	class VK_Handle
-	{
-	public:
-		VK_Handle(const VK_Handle&) = delete;
-		VK_Handle& operator=(const VK_Handle&) = delete;
-
-		auto get() const noexcept { return _handle; }
-		auto release() noexcept { return std::exchange(_handle, T{VK_NULL_HANDLE}); }
-
-		explicit operator bool() const noexcept { return VK_NULL_HANDLE != _handle; }
-
-	protected:
-		T _handle = VK_NULL_HANDLE;
-
-		VK_Handle() noexcept = default;
-		VK_Handle(T handle) noexcept : _handle{handle} {}
-	};
-
-	class VK_VkBuffer : public VK_Handle<VkBuffer>
-	{
-	public:
-		VK_VkBuffer(VkDevice device) noexcept : _device{device} {}
-		~VK_VkBuffer() noexcept { if (*this) vkDestroyBuffer(_device, _handle, nullptr); }
-
-		void bind_memory(VkDeviceMemory memory) const
-		{
-			assert(*this && VK_NULL_HANDLE != memory);
-			CHECK(vkBindBufferMemory(_device, _handle, memory, 0));
-		}
-
-		void create(const VkBufferCreateInfo& info)
-		{
-			assert(!*this);
-			CHECK(vkCreateBuffer(_device, &info, nullptr, &_handle));
-		}
-
-		VkMemoryRequirements memory_requirements() const noexcept
-		{
-			assert(*this);
-			VkMemoryRequirements requirements;
-			vkGetBufferMemoryRequirements(_device, _handle, &requirements);
-			return requirements;
-		}
-
-	private:
-		const VkDevice _device;
-	};
-
-	class VK_VkDeviceMemory : public VK_Handle<VkDeviceMemory>
-	{
-	public:
-		VK_VkDeviceMemory(VkDevice device) noexcept : _device{device} {}
-		~VK_VkDeviceMemory() noexcept { if (*this) vkFreeMemory(_device, _handle, nullptr); }
-
-		void allocate(const VkMemoryAllocateInfo& info)
-		{
-			assert(!*this);
-			CHECK(vkAllocateMemory(_device, &info, nullptr, &_handle));
-		}
-
-	private:
-		const VkDevice _device;
-	};
-
-	class VK_VkImage : public VK_Handle<VkImage>
-	{
-	public:
-		VK_VkImage(VkDevice device) noexcept : _device{device} {}
-		~VK_VkImage() noexcept { if (*this) vkDestroyImage(_device, _handle, nullptr); }
-
-		void bind_memory(VkDeviceMemory memory) const
-		{
-			assert(*this && VK_NULL_HANDLE != memory);
-			CHECK(vkBindImageMemory(_device, _handle, memory, 0));
-		}
-
-		void create(const VkImageCreateInfo& info)
-		{
-			assert(!*this);
-			CHECK(vkCreateImage(_device, &info, nullptr, &_handle));
-		}
-
-		VkMemoryRequirements memory_requirements() const noexcept
-		{
-			assert(*this);
-			VkMemoryRequirements requirements;
-			vkGetImageMemoryRequirements(_device, _handle, &requirements);
-			return requirements;
-		}
-
-	private:
-		const VkDevice _device;
-	};
-
-	class VK_VkImageView : public VK_Handle<VkImageView>
-	{
-	public:
-		VK_VkImageView(VkDevice device) noexcept : _device{device} {}
-		VK_VkImageView(VK_VkImageView&& view) noexcept : VK_Handle{view._handle}, _device{view._device} { view._handle = VK_NULL_HANDLE; }
-		~VK_VkImageView() noexcept { if (*this) vkDestroyImageView(_device, _handle, nullptr); }
-
-		void create(const VkImageViewCreateInfo& info)
-		{
-			assert(!*this);
-			CHECK(vkCreateImageView(_device, &info, nullptr, &_handle));
-		}
-
-	private:
-		const VkDevice _device;
-	};
-
-	class VK_VkSwapchainKHR : public VK_Handle<VkSwapchainKHR>
-	{
-	public:
-		VK_VkSwapchainKHR(VkDevice device) noexcept : _device{device} {}
-		~VK_VkSwapchainKHR() noexcept { if (*this) vkDestroySwapchainKHR(_device, _handle, nullptr); }
-
-		void create(const VkSwapchainCreateInfoKHR& info)
-		{
-			assert(!*this);
-			CHECK(vkCreateSwapchainKHR(_device, &info, nullptr, &_handle));
-		}
-
-	private:
-		const VkDevice _device;
-	};
-}
+#define CHECK(call) Y_VK_CHECK(call)
 
 namespace Yttrium
 {
@@ -403,7 +229,7 @@ namespace Yttrium
 		swapchain_info.clipped = VK_TRUE;
 		swapchain_info.oldSwapchain = VK_NULL_HANDLE;
 
-		VK_VkSwapchainKHR swapchain{_device._handle};
+		VK_HSwapchain swapchain{_device._handle};
 		swapchain.create(swapchain_info);
 
 		uint32_t image_count = 0;
@@ -412,7 +238,7 @@ namespace Yttrium
 		std::vector<VkImage> images(image_count, VK_NULL_HANDLE);
 		CHECK(vkGetSwapchainImagesKHR(_device._handle, swapchain.get(), &image_count, images.data()));
 
-		std::vector<VK_VkImageView> views;
+		std::vector<VK_HImageView> views;
 		views.reserve(image_count);
 		for (const auto image : images)
 		{
@@ -471,7 +297,7 @@ namespace Yttrium
 		{
 		case VK_SUCCESS: return index;
 		case VK_ERROR_OUT_OF_DATE_KHR: throw OutOfDate{};
-		default: throw std::runtime_error{"vkAcquireNextImageKHR = " + ::vulkan_result_to_string(result)};
+		default: throw std::runtime_error{"vkAcquireNextImageKHR = " + vulkan_result_to_string(result)};
 		}
 	}
 
@@ -491,7 +317,7 @@ namespace Yttrium
 		{
 		case VK_SUCCESS: return;
 		case VK_ERROR_OUT_OF_DATE_KHR: throw OutOfDate{};
-		default: throw std::runtime_error{"vkQueuePresentKHR = " + ::vulkan_result_to_string(result)};
+		default: throw std::runtime_error{"vkQueuePresentKHR = " + vulkan_result_to_string(result)};
 		}
 	}
 
@@ -501,9 +327,9 @@ namespace Yttrium
 		: _device{device}
 		, _format{format}
 	{
-		VK_VkDeviceMemory memory{_device._handle};
-		VK_VkImage image{_device._handle};
-		VK_VkImageView view{_device._handle};
+		VK_HDeviceMemory memory{_device._handle};
+		VK_HImage image{_device._handle};
+		VK_HImageView view{_device._handle};
 
 		VkImageCreateInfo image_info = {};
 		image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -674,7 +500,7 @@ namespace Yttrium
 		create_info.queueFamilyIndexCount = 0;
 		create_info.pQueueFamilyIndices = nullptr;
 
-		VK_VkBuffer buffer{_device._handle};
+		VK_HBuffer buffer{_device._handle};
 		buffer.create(create_info);
 
 		const auto memory_requirements = buffer.memory_requirements();
@@ -685,7 +511,7 @@ namespace Yttrium
 		allocate_info.allocationSize = memory_requirements.size;
 		allocate_info.memoryTypeIndex = _device._physical_device.memory_type_index(memory_requirements.memoryTypeBits, memory_flags);
 
-		VK_VkDeviceMemory memory{_device._handle};
+		VK_HDeviceMemory memory{_device._handle};
 		memory.allocate(allocate_info);
 
 		buffer.bind_memory(memory.get());

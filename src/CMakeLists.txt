@@ -290,6 +290,8 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h
 		renderer/vulkan/gpu_program.h
+		renderer/vulkan/handles.cpp
+		renderer/vulkan/handles.h
 		renderer/vulkan/helpers.cpp
 		renderer/vulkan/helpers.h
 		renderer/vulkan/mesh.cpp
