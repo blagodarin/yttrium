@@ -59,7 +59,6 @@ namespace Yttrium
 		explicit VK_Device(const VK_PhysicalDevice&);
 		~VK_Device() noexcept { vkDestroyDevice(_handle, nullptr); }
 
-		VkDeviceMemory allocate_memory(const VkMemoryRequirements&, VkFlags) const;
 		void wait_idle() const;
 	};
 
@@ -103,10 +102,8 @@ namespace Yttrium
 		const VK_Device& _device;
 		VkRenderPass _handle = VK_NULL_HANDLE;
 
-		explicit VK_RenderPass(const VK_Device& device) noexcept : _device{device} {}
-		~VK_RenderPass() noexcept;
-
-		void create(const VK_Swapchain&, const VK_DepthBuffer&);
+		VK_RenderPass(const VK_Swapchain&, const VK_DepthBuffer&);
+		~VK_RenderPass() noexcept { vkDestroyRenderPass(_device._handle, _handle, nullptr); }
 	};
 
 	struct VK_Framebuffers

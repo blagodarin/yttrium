@@ -370,18 +370,6 @@ namespace Yttrium
 		_present_queue = _graphics_queue;
 	}
 
-	VkDeviceMemory VK_Device::allocate_memory(const VkMemoryRequirements& requirements, VkFlags flags) const
-	{
-		VkMemoryAllocateInfo mai = {};
-		mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		mai.pNext = nullptr;
-		mai.allocationSize = requirements.size;
-		mai.memoryTypeIndex = _physical_device.memory_type_index(requirements.memoryTypeBits, flags);
-		VkDeviceMemory handle = VK_NULL_HANDLE;
-		CHECK(vkAllocateMemory(_handle, &mai, nullptr, &handle));
-		return handle;
-	}
-
 	void VK_Device::wait_idle() const
 	{
 		CHECK(vkDeviceWaitIdle(_handle));
@@ -595,16 +583,10 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_RenderPass::~VK_RenderPass() noexcept
+	VK_RenderPass::VK_RenderPass(const VK_Swapchain& swapchain, const VK_DepthBuffer& depth_buffer)
+		: _device{swapchain._device}
 	{
-		if (_handle != VK_NULL_HANDLE)
-			vkDestroyRenderPass(_device._handle, _handle, nullptr);
-	}
-
-	void VK_RenderPass::create(const VK_Swapchain& swapchain, const VK_DepthBuffer& depth_buffer)
-	{
-		assert(&_device == &swapchain._device && &_device == &depth_buffer._device);
-		assert(_handle == VK_NULL_HANDLE);
+		assert(&_device == &depth_buffer._device);
 
 		const std::array<VkAttachmentDescription, 2> attachment_descriptions{swapchain.attachment_description(), depth_buffer.attachment_description()};
 

@@ -22,17 +22,14 @@ namespace Yttrium
 		: _device{device}
 		, _swapchain{_device}
 		, _depth_buffer{_device, VK_FORMAT_D16_UNORM, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT}
-		, _render_pass{_device}
+		, _render_pass{_swapchain, _depth_buffer}
 		, _framebuffers{_device}
 		, _pipeline{_device}
 		, _image_acquired{_device}
 		, _rendering_complete{_device}
 		, _command_buffer{command_pool}
 	{
-		_render_pass.create(_swapchain, _depth_buffer);
-
 		_framebuffers.create(_render_pass, _swapchain, _depth_buffer);
-
 		_pipeline.create(pipeline_layout, _render_pass._handle, VulkanVertexFormat{{VA::f4, VA::f4}}, shader_stages);
 	}
 
