@@ -15,6 +15,8 @@ namespace Yttrium
 		explicit VulkanRenderer(const WindowBackend&);
 		~VulkanRenderer() noexcept;
 
+		VulkanContext& context() noexcept { return _context; }
+
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
 		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag>) override;

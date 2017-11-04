@@ -1,6 +1,7 @@
 #include "context.h"
 
 #include <yttrium/math/matrix.h>
+#include "handles.h"
 #include "helpers.h"
 
 namespace
@@ -98,6 +99,45 @@ namespace Yttrium
 		wds.pTexelBufferView = nullptr;
 
 		vkUpdateDescriptorSets(_device._handle, 1, &wds, 0, nullptr);
+	}
+
+	VK_HDeviceMemory VulkanContext::allocate_memory(const VkMemoryRequirements& requirements, VkMemoryPropertyFlags flags) const
+	{
+		VkMemoryAllocateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		info.pNext = nullptr;
+		info.allocationSize = requirements.size;
+		info.memoryTypeIndex = _device._physical_device.memory_type_index(requirements.memoryTypeBits, flags);
+
+		VK_HDeviceMemory memory{_device._handle};
+		memory.allocate(info);
+		return memory;
+	}
+
+	VK_HImage VulkanContext::create_texture_2d_image(size_t width, size_t height, VkFormat format)
+	{
+		VkImageCreateInfo info = {};
+		info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		info.imageType = VK_IMAGE_TYPE_2D;
+		info.format = format;
+		info.extent.width = static_cast<uint32_t>(width);
+		info.extent.height = static_cast<uint32_t>(height);
+		info.extent.depth = 1;
+		info.mipLevels = 1;
+		info.arrayLayers = 1;
+		info.samples = VK_SAMPLE_COUNT_1_BIT;
+		info.tiling = VK_IMAGE_TILING_OPTIMAL;
+		info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+		info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		info.queueFamilyIndexCount = 0;
+		info.pQueueFamilyIndices = nullptr;
+		info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		VK_HImage image{_device._handle};
+		image.create(info);
+		return image;
 	}
 
 	void VulkanContext::render()

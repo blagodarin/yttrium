@@ -2,6 +2,7 @@
 
 #include "../mesh_data.h"
 #include "gpu_program.h"
+#include "handles.h"
 #include "helpers.h"
 #include "mesh.h"
 #include "texture.h"
@@ -15,7 +16,10 @@ namespace Yttrium
 	{
 	}
 
-	VulkanRenderer::~VulkanRenderer() noexcept = default;
+	VulkanRenderer::~VulkanRenderer() noexcept
+	{
+		cleanup();
+	}
 
 	std::unique_ptr<GpuProgram> VulkanRenderer::create_gpu_program(const std::string&, const std::string&)
 	{
@@ -24,8 +28,47 @@ namespace Yttrium
 
 	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
 	{
+		if (flags & TextureFlag::Intensity)
+		{
+			auto converted = intensity_to_bgra(image);
+			if (converted)
+				image = std::move(*converted);
+		}
+
+		const auto format = image.format();
+		if (format.bits_per_channel() != 8)
+			return {};
+
+		auto data = image.data();
+
+		VkFormat vk_format = VK_FORMAT_UNDEFINED;
+		std::optional<Image> temporary;
+		switch (format.pixel_format())
+		{
+		case PixelFormat::Gray:
+		case PixelFormat::GrayAlpha:
+			temporary = grayscale_to_bgra(image);
+			data = temporary->data();
+			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
+			break;
+		case PixelFormat::Rgb:
+			vk_format = VK_FORMAT_R8G8B8_UNORM;
+			break;
+		case PixelFormat::Bgr:
+			vk_format = VK_FORMAT_B8G8R8_UNORM;
+			break;
+		case PixelFormat::Rgba:
+			vk_format = VK_FORMAT_R8G8B8A8_UNORM;
+			break;
+		case PixelFormat::Bgra:
+			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
+			break;
+		default:
+			return {};
+		}
+
 		const auto has_mipmaps = !(flags & TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(*this, image.format(), has_mipmaps);
+		return std::make_unique<VulkanTexture2D>(*this, image.format(), has_mipmaps, vk_format, data);
 	}
 
 	void VulkanRenderer::draw_mesh(const Mesh& mesh)

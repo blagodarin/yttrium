@@ -10,6 +10,7 @@ namespace Yttrium
 	{
 	public:
 		explicit GlRenderer(WindowBackend&);
+		~GlRenderer() noexcept;
 
 		// Renderer
 		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;

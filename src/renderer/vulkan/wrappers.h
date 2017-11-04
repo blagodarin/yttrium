@@ -238,9 +238,11 @@ namespace Yttrium
 		explicit VK_CommandBuffer(const VK_CommandPool&);
 		~VK_CommandBuffer() noexcept { vkFreeCommandBuffers(_pool._device._handle, _pool._handle, 1, &_handle); }
 
-		void begin() const;
+		void begin(VkCommandBufferUsageFlags = 0) const;
+		void add_image_layout_transition(VkImage, VkImageLayout from, VkImageLayout to) const;
 		void end() const;
 		void submit(VkSemaphore wait_semaphore, VkSemaphore signal_semaphore) const;
+		void submit_and_wait() const;
 	};
 }
 

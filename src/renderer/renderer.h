@@ -85,6 +85,7 @@ namespace Yttrium
 		virtual void set_texture(const Texture2D&, Flags<Texture2D::Filter>) = 0;
 		virtual void set_window_size_impl(const Size&) = 0;
 
+		void cleanup() noexcept; // TODO: Make backend a RendererImpl member, so it is destroyed after its resources.
 		const BackendTexture2D* current_texture_2d() const;
 		void update_state();
 

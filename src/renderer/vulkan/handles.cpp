@@ -25,10 +25,34 @@ namespace Yttrium
 		return requirements;
 	}
 
+	VK_HDeviceMemory& VK_HDeviceMemory::operator=(VK_HDeviceMemory&& memory) noexcept
+	{
+		reset();
+		_handle = memory._handle;
+		_device = memory._device;
+		memory._handle = VK_NULL_HANDLE;
+		return *this;
+	}
+
 	void VK_HDeviceMemory::allocate(const VkMemoryAllocateInfo& info)
 	{
 		assert(!*this);
 		Y_VK_CHECK(vkAllocateMemory(_device, &info, nullptr, &_handle));
+	}
+
+	void VK_HDeviceMemory::reset() noexcept
+	{
+		if (*this)
+			vkFreeMemory(_device, _handle, nullptr);
+	}
+
+	VK_HImage& VK_HImage::operator=(VK_HImage&& image) noexcept
+	{
+		reset();
+		_handle = image._handle;
+		_device = image._device;
+		image._handle = VK_NULL_HANDLE;
+		return *this;
 	}
 
 	void VK_HImage::bind_memory(VkDeviceMemory memory) const
@@ -49,6 +73,12 @@ namespace Yttrium
 		VkMemoryRequirements requirements;
 		vkGetImageMemoryRequirements(_device, _handle, &requirements);
 		return requirements;
+	}
+
+	void VK_HImage::reset() noexcept
+	{
+		if (*this)
+			vkDestroyImage(_device, _handle, nullptr);
 	}
 
 	void VK_HImageView::create(const VkImageViewCreateInfo& info)

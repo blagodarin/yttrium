@@ -30,7 +30,7 @@ namespace Yttrium
 	class VK_HBuffer : public VK_Handle<VkBuffer>
 	{
 	public:
-		VK_HBuffer(VkDevice device) noexcept : _device{device} {}
+		explicit VK_HBuffer(VkDevice device) noexcept : _device{device} {}
 		~VK_HBuffer() noexcept { if (*this) vkDestroyBuffer(_device, _handle, nullptr); }
 
 		void bind_memory(VkDeviceMemory) const;
@@ -44,33 +44,40 @@ namespace Yttrium
 	class VK_HDeviceMemory : public VK_Handle<VkDeviceMemory>
 	{
 	public:
-		VK_HDeviceMemory(VkDevice device) noexcept : _device{device} {}
-		~VK_HDeviceMemory() noexcept { if (*this) vkFreeMemory(_device, _handle, nullptr); }
+		VK_HDeviceMemory() noexcept = default;
+		explicit VK_HDeviceMemory(VkDevice device) noexcept : _device{device} {}
+		VK_HDeviceMemory(VK_HDeviceMemory&& memory) noexcept : VK_Handle{memory._handle}, _device{memory._device} { memory._handle = VK_NULL_HANDLE; }
+		~VK_HDeviceMemory() noexcept { reset(); }
+		VK_HDeviceMemory& operator=(VK_HDeviceMemory&&) noexcept;
 
 		void allocate(const VkMemoryAllocateInfo&);
+		void reset() noexcept;
 
 	private:
-		const VkDevice _device;
+		VkDevice _device = VK_NULL_HANDLE;
 	};
 
 	class VK_HImage : public VK_Handle<VkImage>
 	{
 	public:
-		VK_HImage(VkDevice device) noexcept : _device{device} {}
-		~VK_HImage() noexcept { if (*this) vkDestroyImage(_device, _handle, nullptr); }
+		explicit VK_HImage(VkDevice device) noexcept : _device{device} {}
+		VK_HImage(VK_HImage&& image) noexcept : VK_Handle{image._handle}, _device{image._device} { image._handle = VK_NULL_HANDLE; }
+		~VK_HImage() noexcept { reset(); }
+		VK_HImage& operator=(VK_HImage&&) noexcept;
 
 		void bind_memory(VkDeviceMemory) const;
 		void create(const VkImageCreateInfo&);
 		VkMemoryRequirements memory_requirements() const noexcept;
+		void reset() noexcept;
 
 	private:
-		const VkDevice _device;
+		VkDevice _device = VK_NULL_HANDLE;
 	};
 
 	class VK_HImageView : public VK_Handle<VkImageView>
 	{
 	public:
-		VK_HImageView(VkDevice device) noexcept : _device{device} {}
+		explicit VK_HImageView(VkDevice device) noexcept : _device{device} {}
 		VK_HImageView(VK_HImageView&& view) noexcept : VK_Handle{view._handle}, _device{view._device} { view._handle = VK_NULL_HANDLE; }
 		~VK_HImageView() noexcept { if (*this) vkDestroyImageView(_device, _handle, nullptr); }
 
@@ -83,7 +90,7 @@ namespace Yttrium
 	class VK_HSwapchain : public VK_Handle<VkSwapchainKHR>
 	{
 	public:
-		VK_HSwapchain(VkDevice device) noexcept : _device{device} {}
+		explicit VK_HSwapchain(VkDevice device) noexcept : _device{device} {}
 		~VK_HSwapchain() noexcept { if (*this) vkDestroySwapchainKHR(_device, _handle, nullptr); }
 
 		void create(const VkSwapchainCreateInfoKHR&);

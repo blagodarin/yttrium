@@ -54,6 +54,11 @@ namespace Yttrium
 		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
 	}
 
+	GlRenderer::~GlRenderer()
+	{
+		cleanup();
+	}
+
 	std::unique_ptr<GpuProgram> GlRenderer::create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
 		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);

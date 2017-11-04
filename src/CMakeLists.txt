@@ -298,6 +298,7 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/mesh.h
 		renderer/vulkan/renderer.cpp
 		renderer/vulkan/renderer.h
+		renderer/vulkan/texture.cpp
 		renderer/vulkan/texture.h
 		renderer/vulkan/wrappers.cpp
 		renderer/vulkan/wrappers.h

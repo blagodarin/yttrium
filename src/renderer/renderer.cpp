@@ -73,6 +73,7 @@ namespace Yttrium
 	}
 
 	RendererImpl::RendererImpl() = default;
+
 	RendererImpl::~RendererImpl() = default;
 
 	void RendererImpl::add_debug_text(std::string_view text)
@@ -353,6 +354,13 @@ namespace Yttrium
 	{
 		_window_size = size;
 		set_window_size_impl(_window_size);
+	}
+
+	void RendererImpl::cleanup() noexcept
+	{
+		_program_2d.reset();
+		_debug_texture.reset();
+		_white_texture.reset();
 	}
 
 	const BackendTexture2D* RendererImpl::current_texture_2d() const
