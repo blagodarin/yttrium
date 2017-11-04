@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include <yttrium/math/matrix.h>
+#include <yttrium/math/rect.h>
 #include <yttrium/utils.h>
 #include "../mesh_data.h"
 #include "gpu_program.h"
@@ -54,12 +55,19 @@ namespace Yttrium
 		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
 	}
 
-	GlRenderer::~GlRenderer()
+	GlRenderer::~GlRenderer() = default;
+
+	void GlRenderer::clear()
 	{
-		cleanup();
+		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	std::unique_ptr<GpuProgram> GlRenderer::create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader)
+	std::unique_ptr<GpuProgram> GlRenderer::create_builtin_program_2d(RendererImpl& renderer)
+	{
+		return create_gpu_program(renderer, _vertex_shader_2d, _fragment_shader_2d);
+	}
+
+	std::unique_ptr<GpuProgram> GlRenderer::create_gpu_program(RendererImpl& renderer, const std::string& vertex_shader, const std::string& fragment_shader)
 	{
 		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
 		if (!vertex.compile(vertex_shader))
@@ -79,16 +87,67 @@ namespace Yttrium
 			return {};
 		}
 
-		auto result = std::make_unique<GlGpuProgram>(*this, std::move(vertex), std::move(fragment), _gl);
+		auto result = std::make_unique<GlGpuProgram>(renderer, std::move(vertex), std::move(fragment), _gl);
 		if (!result->link())
 			return {};
 
 		return result;
 	}
 
-	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
+	std::unique_ptr<Mesh> GlRenderer::create_mesh(const MeshData& data)
 	{
-		if (flags & TextureFlag::Intensity)
+		assert(!data._vertex_format.empty());
+		assert(data._vertex_data.size() > 0);
+		assert(!data._indices.empty());
+
+		GlVertexArrayHandle vertex_array(_gl);
+		GLuint index = 0;
+		size_t offset = 0;
+		for (const auto type : data._vertex_format)
+		{
+			vertex_array.vertex_attrib_binding(index, 0);
+			switch (type)
+			{
+			case VA::f:
+				vertex_array.vertex_attrib_format(index, 1, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float);
+				break;
+			case VA::f2:
+				vertex_array.vertex_attrib_format(index, 2, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float) * 2;
+				break;
+			case VA::f3:
+				vertex_array.vertex_attrib_format(index, 3, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float) * 3;
+				break;
+			case VA::f4:
+				vertex_array.vertex_attrib_format(index, 4, GL_FLOAT, GL_FALSE, offset);
+				offset += sizeof(float) * 4;
+				break;
+			}
+			++index;
+		}
+
+		GlBufferHandle vertex_buffer(_gl, GL_ARRAY_BUFFER);
+		vertex_buffer.initialize(GL_STATIC_DRAW, data._vertex_data.size(), data._vertex_data.data());
+		vertex_array.bind_vertex_buffer(0, vertex_buffer.get(), 0, offset);
+
+		GlBufferHandle index_buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
+		GLenum index_format = GL_UNSIGNED_INT;
+		if (Buffer index_data; data.make_uint16_indices(index_data))
+		{
+			index_buffer.initialize(GL_STATIC_DRAW, index_data.size(), index_data.data());
+			index_format = GL_UNSIGNED_SHORT;
+		}
+		else
+			index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
+
+		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
+	}
+
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<Renderer::TextureFlag> flags)
+	{
+		if (flags & Renderer::TextureFlag::Intensity)
 		{
 			auto converted = intensity_to_bgra(image);
 			if (converted)
@@ -143,16 +202,14 @@ namespace Yttrium
 		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
 		_gl.PixelStorei(GL_PACK_ALIGNMENT, image_format.row_alignment());
 		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, data);
-		const auto has_mipmaps = !(flags & TextureFlag::NoMipmaps);
+		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
 			texture.generate_mipmaps();
-		return std::make_unique<GlTexture2D>(*this, image_format, has_mipmaps, std::move(texture));
+		return std::make_unique<GlTexture2D>(renderer, image_format, has_mipmaps, std::move(texture));
 	}
 
-	void GlRenderer::draw_mesh(const Mesh& mesh)
+	size_t GlRenderer::draw_mesh(const Mesh& mesh)
 	{
-		update_state();
-
 		const auto& opengl_mesh = static_cast<const OpenGLMesh&>(mesh);
 
 		_gl.Enable(GL_DEPTH_TEST);
@@ -164,108 +221,13 @@ namespace Yttrium
 		opengl_mesh._index_buffer.unbind();
 		opengl_mesh._vertex_array.unbind();
 
-		++_statistics._draw_calls;
-		_statistics._triangles += opengl_mesh._index_buffer_size / 3;
-
 		_gl.Disable(GL_DEPTH_TEST);
+
+		return opengl_mesh._index_buffer_size / 3;
 	}
 
-	void GlRenderer::clear()
+	void GlRenderer::flush_2d(const Buffer& vertices, const Buffer& indices)
 	{
-		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	}
-
-	std::unique_ptr<GpuProgram> GlRenderer::create_builtin_program_2d()
-	{
-		return create_gpu_program(_vertex_shader_2d, _fragment_shader_2d);
-	}
-
-	std::unique_ptr<Mesh> GlRenderer::create_mesh(const MeshData& data)
-	{
-		assert(!data._vertex_format.empty());
-		assert(data._vertex_data.size() > 0);
-		assert(!data._indices.empty());
-
-		GlVertexArrayHandle vertex_array(_gl);
-		GLuint index = 0;
-		size_t offset = 0;
-		for (const auto type : data._vertex_format)
-		{
-			vertex_array.vertex_attrib_binding(index, 0);
-			switch (type)
-			{
-			case VA::f:
-				vertex_array.vertex_attrib_format(index, 1, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float);
-				break;
-			case VA::f2:
-				vertex_array.vertex_attrib_format(index, 2, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float) * 2;
-				break;
-			case VA::f3:
-				vertex_array.vertex_attrib_format(index, 3, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float) * 3;
-				break;
-			case VA::f4:
-				vertex_array.vertex_attrib_format(index, 4, GL_FLOAT, GL_FALSE, offset);
-				offset += sizeof(float) * 4;
-				break;
-			}
-			++index;
-		}
-
-		GlBufferHandle vertex_buffer(_gl, GL_ARRAY_BUFFER);
-		vertex_buffer.initialize(GL_STATIC_DRAW, data._vertex_data.size(), data._vertex_data.data());
-		vertex_array.bind_vertex_buffer(0, vertex_buffer.get(), 0, offset);
-
-		GlBufferHandle index_buffer(_gl, GL_ELEMENT_ARRAY_BUFFER);
-		GLenum index_format = GL_UNSIGNED_INT;
-		if (Buffer index_data; data.make_uint16_indices(index_data))
-		{
-			index_buffer.initialize(GL_STATIC_DRAW, index_data.size(), index_data.data());
-			index_format = GL_UNSIGNED_SHORT;
-		}
-		else
-			index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
-
-		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
-	}
-
-	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const
-	{
-		const auto map_point = [orientation](const Vector2& point) -> Vector2
-		{
-			return
-			{
-				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point.x : point.x,
-				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point.y : point.y
-			};
-		};
-		return {map_point(rect.top_left()), map_point(rect.bottom_right())};
-	}
-
-	Image GlRenderer::take_screenshot() const
-	{
-		const auto& size = window_size();
-
-		GLint unpack_alignment = 0;
-		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
-
-		Image image{{size, PixelFormat::Rgb, 24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp}};
-
-		GLint read_buffer = GL_BACK;
-		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
-		_gl.ReadBuffer(GL_FRONT);
-		_gl.ReadPixels(0, 0, size._width, size._height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
-		_gl.ReadBuffer(static_cast<GLenum>(read_buffer));
-
-		return image;
-	}
-
-	void GlRenderer::flush_2d_impl(const Buffer& vertices, const Buffer& indices)
-	{
-		update_state();
-
 		if (vertices.capacity() > _2d_vbo.size())
 			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices.capacity(), vertices.data());
 		else
@@ -281,9 +243,19 @@ namespace Yttrium
 		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size() / sizeof(uint16_t), GL_UNSIGNED_SHORT, 0);
 		_2d_ibo.unbind();
 		_2d_vao.unbind();
+	}
 
-		++_statistics._draw_calls;
-		_statistics._triangles += indices.size() / sizeof(uint16_t) - 2;
+	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const
+	{
+		const auto map_point = [orientation](const Vector2& point) -> Vector2
+		{
+			return
+			{
+				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point.x : point.x,
+				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point.y : point.y
+			};
+		};
+		return {map_point(rect.top_left()), map_point(rect.bottom_right())};
 	}
 
 	void GlRenderer::set_program(const GpuProgram* program)
@@ -296,9 +268,25 @@ namespace Yttrium
 		static_cast<const GlTexture2D&>(texture).bind(filter);
 	}
 
-	void GlRenderer::set_window_size_impl(const Size& size)
+	void GlRenderer::set_window_size(const Size& size)
 	{
 		_gl.Viewport(0, 0, size._width, size._height);
+	}
+
+	Image GlRenderer::take_screenshot(const Size& window_size) const
+	{
+		GLint unpack_alignment = 0;
+		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
+
+		Image image{{window_size, PixelFormat::Rgb, 24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp}};
+
+		GLint read_buffer = GL_BACK;
+		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
+		_gl.ReadBuffer(GL_FRONT);
+		_gl.ReadPixels(0, 0, window_size._width, window_size._height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+		_gl.ReadBuffer(static_cast<GLenum>(read_buffer));
+
+		return image;
 	}
 
 #ifndef NDEBUG

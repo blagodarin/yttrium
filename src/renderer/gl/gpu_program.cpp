@@ -1,5 +1,6 @@
 #include "gpu_program.h"
 
+#include "../renderer.h"
 #include "renderer.h"
 
 #ifndef NDEBUG

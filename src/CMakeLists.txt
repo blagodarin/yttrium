@@ -225,6 +225,8 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/renderer/textured_rect.h
 	renderer/formats/obj.cpp
 	renderer/formats/obj.h
+	renderer/backend.cpp
+	renderer/backend.h
 	renderer/debug_renderer.cpp
 	renderer/debug_renderer.h
 	renderer/debug_texture.cpp

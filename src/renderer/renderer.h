@@ -5,7 +5,6 @@
 
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
 
@@ -17,9 +16,10 @@ namespace Yttrium
 	class Image;
 	enum class ImageOrientation;
 	class MeshData;
+	class RendererBackend;
 	class WindowBackend;
 
-	class RendererImpl : public Renderer
+	class RendererImpl final : public Renderer
 	{
 	public:
 		struct Statistics
@@ -34,10 +34,13 @@ namespace Yttrium
 
 		static std::unique_ptr<RendererImpl> create(WindowBackend&);
 
-		RendererImpl();
+		RendererImpl(WindowBackend&);
 		~RendererImpl() override;
 
 		void add_debug_text(std::string_view) override;
+		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
+		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag>) override;
+		void draw_mesh(const Mesh&) override;
 		void draw_quad(const Quad&, const Color4f&) override;
 		void draw_rect(const RectF&, const Color4f&) override;
 		void draw_rects(const std::vector<TexturedRect>&, const Color4f&) override;
@@ -48,17 +51,13 @@ namespace Yttrium
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
 
-		virtual void clear() = 0;
-		virtual std::unique_ptr<GpuProgram> create_builtin_program_2d() = 0;
-		virtual std::unique_ptr<Mesh> create_mesh(const MeshData&) = 0;
-		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
-		virtual Image take_screenshot() const = 0;
-
+		void clear();
 		const Texture2D* debug_texture() const;
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture);
 		void finish();
 		void forget_program(const GpuProgram*);
 		void forget_texture(const Texture2D*);
+		RectF map_rect(const RectF&, ImageOrientation) const;
 		void pop_program();
 		void pop_projection();
 		void pop_texture(Flags<Texture2D::Filter>);
@@ -71,21 +70,9 @@ namespace Yttrium
 		void push_transformation(const Matrix4&);
 		Statistics reset_statistics();
 		void set_window_size(const Size&);
+		Image take_screenshot() const;
 
-	protected:
-		struct Vertex2D
-		{
-			Vector2 position;
-			Color4f color;
-			Vector2 texture;
-		};
-
-		virtual void flush_2d_impl(const Buffer& vertices, const Buffer& indices) = 0;
-		virtual void set_program(const GpuProgram*) = 0;
-		virtual void set_texture(const Texture2D&, Flags<Texture2D::Filter>) = 0;
-		virtual void set_window_size_impl(const Size&) = 0;
-
-		void cleanup() noexcept; // TODO: Make backend a RendererImpl member, so it is destroyed after its resources.
+	private:
 		const BackendTexture2D* current_texture_2d() const;
 		void update_state();
 
@@ -96,10 +83,11 @@ namespace Yttrium
 		void flush_2d();
 		void reset_texture_state();
 
-	protected:
+	private:
+		const std::unique_ptr<RendererBackend> _backend;
+
 		Statistics _statistics;
 
-	private:
 		Size _window_size;
 
 		Buffer _vertices_2d;

@@ -4,17 +4,17 @@
 
 namespace Yttrium
 {
-	VulkanTexture2D::VulkanTexture2D(VulkanRenderer& renderer, const ImageFormat& format, bool has_mipmaps, VkFormat vk_format, const void* data)
+	VulkanTexture2D::VulkanTexture2D(RendererImpl& renderer, VulkanContext& context, const ImageFormat& format, bool has_mipmaps, VkFormat vk_format, const void* data)
 		: BackendTexture2D{renderer, format, has_mipmaps}
-		, _image{renderer.context().create_texture_2d_image(format.width(), format.height(), vk_format)}
+		, _image{context.create_texture_2d_image(format.width(), format.height(), vk_format)}
 	{
-		_memory = renderer.context().allocate_memory(_image.memory_requirements(), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		_memory = context.allocate_memory(_image.memory_requirements(), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		_image.bind_memory(_memory.get());
 
-		VK_Buffer staging{renderer.context().device(), static_cast<uint32_t>(format.frame_size()), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
+		VK_Buffer staging{context.device(), static_cast<uint32_t>(format.frame_size()), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
 		staging.write(data, format.frame_size());
 
-		const auto command_buffer = renderer.context().allocate_command_buffer();
+		const auto command_buffer = context.allocate_command_buffer();
 		command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 		command_buffer.add_image_layout_transition(_image.get(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		{

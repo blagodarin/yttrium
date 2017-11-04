@@ -29,7 +29,7 @@ namespace Yttrium
 {
 	struct RendererImpl::Draw2D
 	{
-		BufferAppender<Vertex2D> _vertices;
+		BufferAppender<RendererBackend::Vertex2D> _vertices;
 		BufferAppender<uint16_t> _indices;
 		uint16_t _index = static_cast<uint16_t>(_vertices.count());
 
@@ -48,31 +48,31 @@ namespace Yttrium
 
 	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window)
 	{
-#if defined(Y_RENDERER_OPENGL)
-		auto renderer = std::make_unique<GlRenderer>(window);
-#elif defined(Y_RENDERER_VULKAN)
-		auto renderer = std::make_unique<VulkanRenderer>(window);
-#else
-		auto renderer = std::make_unique<NullRenderer>(window);
-#endif
-
-		static const int32_t white_texture_data = -1;
-		renderer->_white_texture = renderer->create_texture_2d({ { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, TextureFlag::NoMipmaps);
-		if (!renderer->_white_texture)
-			throw InitializationError("Failed to initialize an internal texture");
-
-		renderer->_debug_texture = renderer->create_texture_2d({ { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 }, DebugTexture::data }, TextureFlag::NoMipmaps);
-		if (!renderer->_debug_texture)
-			throw InitializationError("Failed to initialize an internal texture");
-
-		renderer->_program_2d = renderer->create_builtin_program_2d();
-		if (!renderer->_program_2d)
-			throw InitializationError("Failed to initialize an internal GPU program");
-
-		return std::move(renderer);
+		return std::make_unique<RendererImpl>(window);
 	}
 
-	RendererImpl::RendererImpl() = default;
+	RendererImpl::RendererImpl(WindowBackend& window)
+#if defined(Y_RENDERER_OPENGL)
+		: _backend{std::make_unique<GlRenderer>(window)}
+#elif defined(Y_RENDERER_VULKAN)
+		: _backend{std::make_unique<VulkanRenderer>(window)}
+#else
+		: _backend{std::make_unique<NullRenderer>(window)}
+#endif
+	{
+		static const int32_t white_texture_data = -1;
+		_white_texture = _backend->create_texture_2d(*this, { { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, TextureFlag::NoMipmaps);
+		if (!_white_texture)
+			throw InitializationError("Failed to initialize an internal texture");
+
+		_debug_texture = _backend->create_texture_2d(*this, { { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 }, DebugTexture::data }, TextureFlag::NoMipmaps);
+		if (!_debug_texture)
+			throw InitializationError("Failed to initialize an internal texture");
+
+		_program_2d = _backend->create_builtin_program_2d(*this);
+		if (!_program_2d)
+			throw InitializationError("Failed to initialize an internal GPU program");
+	}
 
 	RendererImpl::~RendererImpl() = default;
 
@@ -81,11 +81,28 @@ namespace Yttrium
 		append_to(_debug_text, text, '\n');
 	}
 
+	std::unique_ptr<GpuProgram> RendererImpl::create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader)
+	{
+		return _backend->create_gpu_program(*this, vertex_shader, fragment_shader);
+	}
+
+	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
+	{
+		return _backend->create_texture_2d(*this, std::move(image), flags);
+	}
+
+	void RendererImpl::draw_mesh(const Mesh& mesh)
+	{
+		update_state();
+		_statistics._triangles += _backend->draw_mesh(mesh);
+		++_statistics._draw_calls;
+	}
+
 	void RendererImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
 		Draw2D draw{_vertices_2d, _indices_2d};
 
-		Vertex2D vertex;
+		RendererBackend::Vertex2D vertex;
 		vertex.color = color;
 
 		vertex.position = quad._a;
@@ -117,7 +134,7 @@ namespace Yttrium
 		const SizeF texture_size{current_texture_2d()->size()};
 		const Vector2 texture_scale{texture_size._width, texture_size._height};
 		for (const auto& rect : rects)
-			draw_rect(rect.geometry, color, map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
+			draw_rect(rect.geometry, color, _backend->map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
 	Matrix4 RendererImpl::full_matrix() const
@@ -132,7 +149,7 @@ namespace Yttrium
 
 	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source)
 	{
-		return create_mesh(load_obj_mesh(source));
+		return _backend->create_mesh(load_obj_mesh(source));
 	}
 
 	Matrix4 RendererImpl::model_matrix() const
@@ -164,7 +181,7 @@ namespace Yttrium
 		if (texture_rect_size._width < minimum._width || texture_rect_size._height < minimum._height)
 			return;
 
-		_texture_rect = map_rect(rect / texture_scale, current_texture->orientation());
+		_texture_rect = _backend->map_rect(rect / texture_scale, current_texture->orientation());
 		_texture_borders =
 		{
 			borders._top / texture_size._height,
@@ -172,6 +189,11 @@ namespace Yttrium
 			borders._bottom / texture_size._height,
 			borders._left / texture_size._width,
 		};
+	}
+
+	void RendererImpl::clear()
+	{
+		_backend->clear();
 	}
 
 	const Texture2D* RendererImpl::debug_texture() const
@@ -214,6 +236,11 @@ namespace Yttrium
 	{
 		if (texture == _current_texture)
 			_current_texture = nullptr;
+	}
+
+	RectF RendererImpl::map_rect(const RectF& rect, ImageOrientation orientation) const
+	{
+		return _backend->map_rect(rect, orientation);
 	}
 
 	void RendererImpl::pop_program()
@@ -353,14 +380,12 @@ namespace Yttrium
 	void RendererImpl::set_window_size(const Size& size)
 	{
 		_window_size = size;
-		set_window_size_impl(_window_size);
+		_backend->set_window_size(_window_size);
 	}
 
-	void RendererImpl::cleanup() noexcept
+	Image RendererImpl::take_screenshot() const
 	{
-		_program_2d.reset();
-		_debug_texture.reset();
-		_white_texture.reset();
+		return _backend->take_screenshot(_window_size);
 	}
 
 	const BackendTexture2D* RendererImpl::current_texture_2d() const
@@ -377,7 +402,7 @@ namespace Yttrium
 			if (program != _current_program)
 			{
 				_current_program = program;
-				set_program(program);
+				_backend->set_program(program);
 				++_statistics._shader_switches;
 #ifndef NDEBUG
 				const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
@@ -396,7 +421,7 @@ namespace Yttrium
 			if (texture != _current_texture)
 			{
 				_current_texture = texture;
-				set_texture(*texture, _current_texture_filter);
+				_backend->set_texture(*texture, _current_texture_filter);
 				++_statistics._texture_switches;
 #ifndef NDEBUG
 				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
@@ -413,7 +438,7 @@ namespace Yttrium
 	{
 		Draw2D draw{_vertices_2d, _indices_2d};
 
-		Vertex2D vertex;
+		RendererBackend::Vertex2D vertex;
 		vertex.color = color;
 
 		float left_offset = 0;
@@ -566,10 +591,13 @@ namespace Yttrium
 	{
 		if (_vertices_2d.size() > 0)
 		{
-			if (_vertices_2d.size() / sizeof(Vertex2D) > std::numeric_limits<uint16_t>::max())
+			if (_vertices_2d.size() / sizeof(RendererBackend::Vertex2D) > std::numeric_limits<uint16_t>::max())
 				throw std::runtime_error("2D vertex buffer size exceeds 16-bit indexing limitations");
 			_program_2d->set_uniform("mvp", full_matrix());
-			flush_2d_impl(_vertices_2d, _indices_2d);
+			update_state();
+			_backend->flush_2d(_vertices_2d, _indices_2d);
+			_statistics._triangles += _indices_2d.size() / sizeof(uint16_t) - 2;
+			++_statistics._draw_calls;
 			_vertices_2d.resize(0);
 			_indices_2d.resize(0);
 		}

@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include <yttrium/math/rect.h>
 #include "../mesh_data.h"
 #include "gpu_program.h"
 #include "handles.h"
@@ -16,19 +17,51 @@ namespace Yttrium
 	{
 	}
 
-	VulkanRenderer::~VulkanRenderer() noexcept
+	VulkanRenderer::~VulkanRenderer() noexcept = default;
+
+	void VulkanRenderer::clear()
 	{
-		cleanup();
+		_context.render();
 	}
 
-	std::unique_ptr<GpuProgram> VulkanRenderer::create_gpu_program(const std::string&, const std::string&)
+	std::unique_ptr<GpuProgram> VulkanRenderer::create_builtin_program_2d(RendererImpl&)
 	{
 		return std::make_unique<VulkanGpuProgram>();
 	}
 
-	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
+	std::unique_ptr<GpuProgram> VulkanRenderer::create_gpu_program(RendererImpl&, const std::string&, const std::string&)
 	{
-		if (flags & TextureFlag::Intensity)
+		return std::make_unique<VulkanGpuProgram>();
+	}
+
+	std::unique_ptr<Mesh> VulkanRenderer::create_mesh(const MeshData& data)
+	{
+		assert(!data._vertex_format.empty());
+		assert(data._vertex_data.size() > 0);
+		assert(!data._indices.empty());
+
+		const auto vertex_buffer_size = data._vertex_data.size() * vertex_format(data._vertex_format)._binding.stride;
+
+		if (Buffer index_data; data.make_uint16_indices(index_data))
+		{
+			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_data.size(), VK_INDEX_TYPE_UINT16, data._indices.size());
+			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
+			result->_index_buffer.write(index_data.data(), index_data.size());
+			return result;
+		}
+		else
+		{
+			const auto index_buffer_size = data._indices.size() * sizeof(uint32_t);
+			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
+			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
+			result->_index_buffer.write(data._indices.data(), index_buffer_size);
+			return result;
+		}
+	}
+
+	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<Renderer::TextureFlag> flags)
+	{
+		if (flags & Renderer::TextureFlag::Intensity)
 		{
 			auto converted = intensity_to_bgra(image);
 			if (converted)
@@ -67,62 +100,23 @@ namespace Yttrium
 			return {};
 		}
 
-		const auto has_mipmaps = !(flags & TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(*this, image.format(), has_mipmaps, vk_format, data);
+		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
+		return std::make_unique<VulkanTexture2D>(renderer, _context, image.format(), has_mipmaps, vk_format, data);
 	}
 
-	void VulkanRenderer::draw_mesh(const Mesh& mesh)
+	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)
 	{
 		static_cast<const VulkanMesh&>(mesh).draw(VK_NULL_HANDLE); // TODO: Use actual command buffer.
+		return 0;
 	}
 
-	void VulkanRenderer::clear()
+	void VulkanRenderer::flush_2d(const Buffer&, const Buffer&)
 	{
-		_context.render();
-	}
-
-	std::unique_ptr<GpuProgram> VulkanRenderer::create_builtin_program_2d()
-	{
-		return std::make_unique<VulkanGpuProgram>();
-	}
-
-	std::unique_ptr<Mesh> VulkanRenderer::create_mesh(const MeshData& data)
-	{
-		assert(!data._vertex_format.empty());
-		assert(data._vertex_data.size() > 0);
-		assert(!data._indices.empty());
-
-		const auto vertex_buffer_size = data._vertex_data.size() * vertex_format(data._vertex_format)._binding.stride;
-
-		if (Buffer index_data; data.make_uint16_indices(index_data))
-		{
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_data.size(), VK_INDEX_TYPE_UINT16, data._indices.size());
-			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
-			result->_index_buffer.write(index_data.data(), index_data.size());
-			return result;
-		}
-		else
-		{
-			const auto index_buffer_size = data._indices.size() * sizeof(uint32_t);
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
-			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
-			result->_index_buffer.write(data._indices.data(), index_buffer_size);
-			return result;
-		}
 	}
 
 	RectF VulkanRenderer::map_rect(const RectF& rect, ImageOrientation) const
 	{
 		return rect;
-	}
-
-	Image VulkanRenderer::take_screenshot() const
-	{
-		return Image{{window_size(), PixelFormat::Rgb, 24, 4, ImageOrientation::XRightYDown}};
-	}
-
-	void VulkanRenderer::flush_2d_impl(const Buffer&, const Buffer&)
-	{
 	}
 
 	void VulkanRenderer::set_program(const GpuProgram*)
@@ -133,8 +127,13 @@ namespace Yttrium
 	{
 	}
 
-	void VulkanRenderer::set_window_size_impl(const Size&)
+	void VulkanRenderer::set_window_size(const Size&)
 	{
+	}
+
+	Image VulkanRenderer::take_screenshot(const Size& window_size) const
+	{
+		return Image{{window_size, PixelFormat::Rgb, 24, 4, ImageOrientation::XRightYDown}};
 	}
 
 	const VulkanVertexFormat& VulkanRenderer::vertex_format(const std::vector<VA>& vas)

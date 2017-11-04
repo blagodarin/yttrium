@@ -1,32 +1,31 @@
 #ifndef _src_renderer_gl_renderer_h_
 #define _src_renderer_gl_renderer_h_
 
-#include "../renderer.h"
+#include "../backend.h"
 #include "wrappers.h"
 
 namespace Yttrium
 {
-	class GlRenderer final : public RendererImpl
+	class WindowBackend;
+
+	class GlRenderer final : public RendererBackend
 	{
 	public:
 		explicit GlRenderer(WindowBackend&);
-		~GlRenderer() noexcept;
+		~GlRenderer() noexcept override;
 
-		// Renderer
-		std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
-		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag>) override;
-		void draw_mesh(const Mesh&) override;
-
-		// RendererImpl
 		void clear() override;
-		std::unique_ptr<GpuProgram> create_builtin_program_2d() override;
+		std::unique_ptr<GpuProgram> create_builtin_program_2d(RendererImpl&) override;
+		std::unique_ptr<GpuProgram> create_gpu_program(RendererImpl&, const std::string& vertex_shader, const std::string& fragment_shader) override;
 		std::unique_ptr<Mesh> create_mesh(const MeshData&) override;
+		std::unique_ptr<Texture2D> create_texture_2d(RendererImpl&, Image&&, Flags<Renderer::TextureFlag>) override;
+		size_t draw_mesh(const Mesh&) override;
+		void flush_2d(const Buffer&, const Buffer&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
-		Image take_screenshot() const override;
-		void flush_2d_impl(const Buffer&, const Buffer&) override;
 		void set_program(const GpuProgram*) override;
 		void set_texture(const Texture2D&, Flags<Texture2D::Filter>) override;
-		void set_window_size_impl(const Size&) override;
+		void set_window_size(const Size&) override;
+		Image take_screenshot(const Size&) const override;
 
 	private:
 #ifndef NDEBUG
