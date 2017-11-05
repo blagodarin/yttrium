@@ -20,7 +20,7 @@ namespace Yttrium
 	class RendererImpl final : public Renderer
 	{
 	public:
-		RendererImpl(WindowBackend&);
+		explicit RendererImpl(WindowBackend&);
 		~RendererImpl() override;
 
 		void add_debug_text(std::string_view) override;

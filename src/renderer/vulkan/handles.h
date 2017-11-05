@@ -24,7 +24,7 @@ namespace Yttrium
 		T _handle = VK_NULL_HANDLE;
 
 		VK_Handle() noexcept = default;
-		VK_Handle(T handle) noexcept : _handle{handle} {}
+		explicit VK_Handle(T handle) noexcept : _handle{handle} {}
 	};
 
 	class VK_HBuffer : public VK_Handle<VkBuffer>
