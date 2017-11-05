@@ -7,6 +7,7 @@ option(WITH_EXAMPLES "Enable examples (also enables tools)" OFF)
 option(WITH_EXTRA "Enable extra stuff" OFF)
 option(WITH_TESTS "Enable tests" OFF)
 option(WITH_TOOLS "Enable tools" OFF)
+option(Y_RELEASE "Release build" OFF)
 
 set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
 
@@ -22,7 +23,12 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-Wall -Werror -Wextra -Wno-implicit-fallthrough -Wno-unknown-pragmas -Wnon-virtual-dtor -Wpedantic -Wshadow)
+	add_compile_options(-Wall -Werror -Wextra -Wnon-virtual-dtor -Wpedantic -Wshadow -Wno-implicit-fallthrough -Wno-unknown-pragmas)
+
+	if(NOT Y_RELEASE)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=vptr -g)
+		set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
+	endif()
 
 	option(FIX_TRAVIS "Fix Travis CI issues" OFF)
 	if(NOT FIX_TRAVIS)
