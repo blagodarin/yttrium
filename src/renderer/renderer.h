@@ -13,27 +13,13 @@
 namespace Yttrium
 {
 	class BackendTexture2D;
-	class Image;
 	enum class ImageOrientation;
-	class MeshData;
 	class RendererBackend;
 	class WindowBackend;
 
 	class RendererImpl final : public Renderer
 	{
 	public:
-		struct Statistics
-		{
-			size_t _triangles = 0;
-			size_t _draw_calls = 0;
-			size_t _texture_switches = 0;
-			size_t _redundant_texture_switches = 0;
-			size_t _shader_switches = 0;
-			size_t _redundant_shader_switches = 0;
-		};
-
-		static std::unique_ptr<RendererImpl> create(WindowBackend&);
-
 		RendererImpl(WindowBackend&);
 		~RendererImpl() override;
 
@@ -50,6 +36,17 @@ namespace Yttrium
 		Line3 pixel_ray(const Vector2&) const override;
 		void set_texture_rect(const RectF&, const Margins&) override;
 		Size window_size() const override { return _window_size; }
+
+	public:
+		struct Statistics
+		{
+			size_t _triangles = 0;
+			size_t _draw_calls = 0;
+			size_t _texture_switches = 0;
+			size_t _redundant_texture_switches = 0;
+			size_t _shader_switches = 0;
+			size_t _redundant_shader_switches = 0;
+		};
 
 		void clear();
 		const Texture2D* debug_texture() const;
@@ -74,14 +71,10 @@ namespace Yttrium
 
 	private:
 		const BackendTexture2D* current_texture_2d() const;
-		void update_state();
-
-	private:
-		struct Draw2D;
-
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
 		void flush_2d();
 		void reset_texture_state();
+		void update_state();
 
 	private:
 		const std::unique_ptr<RendererBackend> _backend;

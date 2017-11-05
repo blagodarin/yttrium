@@ -8,8 +8,6 @@
 #include "mesh.h"
 #include "texture.h"
 
-#include <cassert>
-
 namespace Yttrium
 {
 	VulkanRenderer::VulkanRenderer(const WindowBackend& window)
@@ -36,10 +34,6 @@ namespace Yttrium
 
 	std::unique_ptr<Mesh> VulkanRenderer::create_mesh(const MeshData& data)
 	{
-		assert(!data._vertex_format.empty());
-		assert(data._vertex_data.size() > 0);
-		assert(!data._indices.empty());
-
 		const auto vertex_buffer_size = data._vertex_data.size() * vertex_format(data._vertex_format)._binding.stride;
 
 		if (Buffer index_data; data.make_uint16_indices(index_data))

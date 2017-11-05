@@ -25,9 +25,11 @@
 #include <algorithm>
 #include <cassert>
 
-namespace Yttrium
+namespace
 {
-	struct RendererImpl::Draw2D
+	using namespace Yttrium;
+
+	struct Draw2D
 	{
 		BufferAppender<RendererBackend::Vertex2D> _vertices;
 		BufferAppender<uint16_t> _indices;
@@ -45,12 +47,10 @@ namespace Yttrium
 			}
 		}
 	};
+}
 
-	std::unique_ptr<RendererImpl> RendererImpl::create(WindowBackend& window)
-	{
-		return std::make_unique<RendererImpl>(window);
-	}
-
+namespace Yttrium
+{
 	RendererImpl::RendererImpl(WindowBackend& window)
 #if defined(Y_RENDERER_OPENGL)
 		: _backend{std::make_unique<GlRenderer>(window)}
@@ -149,7 +149,11 @@ namespace Yttrium
 
 	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source)
 	{
-		return _backend->create_mesh(load_obj_mesh(source));
+		const auto data = load_obj_mesh(source);
+		assert(!data._vertex_format.empty());
+		assert(data._vertex_data.size() > 0);
+		assert(!data._indices.empty());
+		return _backend->create_mesh(data);
 	}
 
 	Matrix4 RendererImpl::model_matrix() const
@@ -393,47 +397,6 @@ namespace Yttrium
 		return static_cast<const BackendTexture2D*>(_texture_stack.back().first);
 	}
 
-	void RendererImpl::update_state()
-	{
-		if (_reset_program)
-		{
-			_reset_program = false;
-			const auto program = _program_stack.back().first;
-			if (program != _current_program)
-			{
-				_current_program = program;
-				_backend->set_program(program);
-				++_statistics._shader_switches;
-#ifndef NDEBUG
-				const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
-				if (i == _seen_programs.end())
-					_seen_programs.emplace_back(program);
-				else
-					++_statistics._redundant_shader_switches;
-#endif
-			}
-		}
-
-		if (_reset_texture)
-		{
-			_reset_texture = false;
-			const auto texture = _texture_stack.back().first;
-			if (texture != _current_texture)
-			{
-				_current_texture = texture;
-				_backend->set_texture(*texture, _current_texture_filter);
-				++_statistics._texture_switches;
-#ifndef NDEBUG
-				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
-				if (i == _seen_textures.end())
-					_seen_textures.emplace_back(texture);
-				else
-					++_statistics._redundant_texture_switches;
-#endif
-			}
-		}
-	}
-
 	void RendererImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
 	{
 		Draw2D draw{_vertices_2d, _indices_2d};
@@ -606,7 +569,48 @@ namespace Yttrium
 	void RendererImpl::reset_texture_state()
 	{
 		const auto* texture = current_texture_2d();
-		_texture_rect = texture ? texture->full_rectangle() : RectF();
+		_texture_rect = texture ? texture->full_rectangle() : RectF{};
 		_texture_borders = {};
+	}
+
+	void RendererImpl::update_state()
+	{
+		if (_reset_program)
+		{
+			_reset_program = false;
+			const auto program = _program_stack.back().first;
+			if (program != _current_program)
+			{
+				_current_program = program;
+				_backend->set_program(program);
+				++_statistics._shader_switches;
+#ifndef NDEBUG
+				const auto i = std::find(_seen_programs.begin(), _seen_programs.end(), program);
+				if (i == _seen_programs.end())
+					_seen_programs.emplace_back(program);
+				else
+					++_statistics._redundant_shader_switches;
+#endif
+			}
+		}
+
+		if (_reset_texture)
+		{
+			_reset_texture = false;
+			const auto texture = _texture_stack.back().first;
+			if (texture != _current_texture)
+			{
+				_current_texture = texture;
+				_backend->set_texture(*texture, _current_texture_filter);
+				++_statistics._texture_switches;
+#ifndef NDEBUG
+				const auto i = std::find(_seen_textures.begin(), _seen_textures.end(), texture);
+				if (i == _seen_textures.end())
+					_seen_textures.emplace_back(texture);
+				else
+					++_statistics._redundant_texture_switches;
+#endif
+			}
+		}
 	}
 }

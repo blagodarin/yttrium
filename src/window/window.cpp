@@ -13,7 +13,7 @@ namespace Yttrium
 	public:
 		const std::string _name;
 		WindowBackend _backend{_name, *this};
-		const std::unique_ptr<RendererImpl> _renderer = RendererImpl::create(_backend); // TODO: Store renderer by value.
+		RendererImpl _renderer{_backend};
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;
@@ -107,7 +107,7 @@ namespace Yttrium
 		void on_resize_event(const Size& size) override
 		{
 			_size = size;
-			_renderer->set_window_size(_size);
+			_renderer.set_window_size(_size);
 			if (!_is_cursor_locked)
 			{
 				auto cursor = Rect(_size).center();
@@ -168,7 +168,7 @@ namespace Yttrium
 
 	Renderer& Window::renderer()
 	{
-		return *_private->_renderer;
+		return _private->_renderer;
 	}
 
 	void Window::run()
@@ -185,19 +185,19 @@ namespace Yttrium
 			if (_private->_on_update)
 				_private->_on_update(update);
 			{
-				_private->_renderer->clear();
-				PushGpuProgram gpu_program{*_private->_renderer, _private->_renderer->program_2d()};
-				Push2D projection{*_private->_renderer};
+				_private->_renderer.clear();
+				PushGpuProgram gpu_program{_private->_renderer, _private->_renderer.program_2d()};
+				Push2D projection{_private->_renderer};
 				if (_private->_on_render)
-					_private->_on_render(*_private->_renderer, Vector2{_private->_cursor});
-				_private->_renderer->finish();
+					_private->_on_render(_private->_renderer, Vector2{_private->_cursor});
+				_private->_renderer.finish();
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)
 			{
 				_private->_take_screenshot = false;
 				if (_private->_on_screenshot)
-					_private->_on_screenshot(_private->_renderer->take_screenshot());
+					_private->_on_screenshot(_private->_renderer.take_screenshot());
 			}
 			++frames;
 			update.milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - clock);
@@ -212,7 +212,7 @@ namespace Yttrium
 				frames = 0;
 				max_frame_time = 0ms;
 			}
-			const auto& renderer_statistics = _private->_renderer->reset_statistics();
+			const auto& renderer_statistics = _private->_renderer.reset_statistics();
 			update.triangles = renderer_statistics._triangles;
 			update.draw_calls = renderer_statistics._draw_calls;
 			update.texture_switches = renderer_statistics._texture_switches;

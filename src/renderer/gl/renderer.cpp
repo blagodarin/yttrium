@@ -9,6 +9,7 @@
 #include "texture.h"
 
 #include <cassert>
+
 #ifndef NDEBUG
 	#include <csignal>
 	#include <iostream>
@@ -96,10 +97,6 @@ namespace Yttrium
 
 	std::unique_ptr<Mesh> GlRenderer::create_mesh(const MeshData& data)
 	{
-		assert(!data._vertex_format.empty());
-		assert(data._vertex_data.size() > 0);
-		assert(!data._indices.empty());
-
 		GlVertexArrayHandle vertex_array(_gl);
 		GLuint index = 0;
 		size_t offset = 0;
