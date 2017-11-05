@@ -26,7 +26,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	add_compile_options(-Wall -Werror -Wextra -Wnon-virtual-dtor -Wpedantic -Wshadow -Wno-implicit-fallthrough -Wno-unknown-pragmas)
 
 	if(NOT Y_RELEASE)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=vptr -g)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr -g)
 		set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
 	endif()
 
