@@ -77,11 +77,27 @@ namespace Yttrium
 	class VK_HImageView : public VK_Handle<VkImageView>
 	{
 	public:
+		VK_HImageView() noexcept = default;
 		explicit VK_HImageView(VkDevice device) noexcept : _device{device} {}
 		VK_HImageView(VK_HImageView&& view) noexcept : VK_Handle{view._handle}, _device{view._device} { view._handle = VK_NULL_HANDLE; }
-		~VK_HImageView() noexcept { if (*this) vkDestroyImageView(_device, _handle, nullptr); }
+		~VK_HImageView() noexcept { reset(); }
+		VK_HImageView& operator=(VK_HImageView&&) noexcept;
 
 		void create(const VkImageViewCreateInfo&);
+		void reset() noexcept;
+
+	private:
+		VkDevice _device = VK_NULL_HANDLE;
+	};
+
+	class VK_HSampler : public VK_Handle<VkSampler>
+	{
+	public:
+		explicit VK_HSampler(VkDevice device) noexcept : _device{device} {}
+		VK_HSampler(VK_HSampler&& sampler) noexcept : VK_Handle{sampler._handle}, _device{sampler._device} { sampler._handle = VK_NULL_HANDLE; }
+		~VK_HSampler() noexcept { if (*this) vkDestroySampler(_device, _handle, nullptr); }
+
+		void create(const VkSamplerCreateInfo&);
 
 	private:
 		const VkDevice _device;

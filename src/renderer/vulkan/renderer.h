@@ -36,6 +36,8 @@ namespace Yttrium
 	private:
 		VulkanContext _context;
 		std::vector<std::pair<std::vector<VA>, std::unique_ptr<const VulkanVertexFormat>>> _vertex_format_cache;
+		std::optional<VkDescriptorImageInfo> _descriptor_texture_2d;
+		bool _update_descriptors = false;
 	};
 }
 

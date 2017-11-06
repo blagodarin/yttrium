@@ -37,6 +37,7 @@ namespace Yttrium
 		VkPhysicalDevice _handle = VK_NULL_HANDLE;
 		uint32_t _queue_family_index = 0;
 		VkSurfaceCapabilitiesKHR _surface_capabilities;
+		VkPhysicalDeviceFeatures _features;
 		VkPhysicalDeviceMemoryProperties _memory_properties;
 
 		explicit VK_PhysicalDevice(const VK_Surface&);

@@ -10,6 +10,8 @@ namespace Yttrium
 {
 	class VK_HDeviceMemory;
 	class VK_HImage;
+	class VK_HImageView;
+	class VK_HSampler;
 
 	class VulkanSwapchain
 	{
@@ -42,6 +44,8 @@ namespace Yttrium
 		VK_CommandBuffer allocate_command_buffer() const { return VK_CommandBuffer{_command_pool}; }
 		VK_HDeviceMemory allocate_memory(const VkMemoryRequirements&, VkMemoryPropertyFlags) const;
 		VK_HImage create_texture_2d_image(size_t width, size_t height, VkFormat);
+		VK_HSampler create_texture_2d_sampler();
+		VK_HImageView create_texture_2d_view(VkImage, VkFormat);
 		const VK_Device& device() const noexcept { return _device; }
 		void render();
 		void update_uniforms(const void* data, size_t size) { _uniform_buffer.write(data, size); }

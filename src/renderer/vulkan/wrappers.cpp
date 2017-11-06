@@ -108,6 +108,7 @@ namespace Yttrium
 		if (_surface_capabilities.currentExtent.width == 0xffffffff && _surface_capabilities.currentExtent.height == 0xffffffff)
 			throw std::runtime_error{"Bad surface size"};
 
+		vkGetPhysicalDeviceFeatures(_handle, &_features);
 		vkGetPhysicalDeviceMemoryProperties(_handle, &_memory_properties);
 	}
 

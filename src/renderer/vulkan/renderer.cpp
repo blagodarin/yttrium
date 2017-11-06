@@ -117,8 +117,10 @@ namespace Yttrium
 	{
 	}
 
-	void VulkanRenderer::set_texture(const Texture2D&, Flags<Texture2D::Filter>)
+	void VulkanRenderer::set_texture(const Texture2D& texture, Flags<Texture2D::Filter>)
 	{
+		_descriptor_texture_2d = static_cast<const VulkanTexture2D&>(texture).descriptor_image_info();
+		_update_descriptors = true;
 	}
 
 	void VulkanRenderer::set_window_size(const Size&)

@@ -140,6 +140,57 @@ namespace Yttrium
 		return image;
 	}
 
+	VK_HSampler VulkanContext::create_texture_2d_sampler()
+	{
+		VkSamplerCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		info.magFilter = VK_FILTER_LINEAR;
+		info.minFilter = VK_FILTER_LINEAR;
+		info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		info.mipLodBias = 0.f;
+		info.anisotropyEnable = _physical_device._features.samplerAnisotropy;
+		info.maxAnisotropy = _physical_device._features.samplerAnisotropy ? 16.f : 1.f;
+		info.compareEnable = VK_FALSE;
+		info.compareOp = VK_COMPARE_OP_ALWAYS;
+		info.minLod = 0.f;
+		info.maxLod = 0.f;
+		info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+		info.unnormalizedCoordinates = VK_FALSE;
+
+		VK_HSampler sampler{_device._handle};
+		sampler.create(info);
+		return sampler;
+	}
+
+	VK_HImageView VulkanContext::create_texture_2d_view(VkImage image, VkFormat format)
+	{
+		VkImageViewCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		info.image = image;
+		info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		info.format = format;
+		info.components.r = VK_COMPONENT_SWIZZLE_R;
+		info.components.g = VK_COMPONENT_SWIZZLE_G;
+		info.components.b = VK_COMPONENT_SWIZZLE_B;
+		info.components.a = VK_COMPONENT_SWIZZLE_A;
+		info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		info.subresourceRange.baseMipLevel = 0;
+		info.subresourceRange.levelCount = 1;
+		info.subresourceRange.baseArrayLayer = 0;
+		info.subresourceRange.layerCount = 1;
+
+		VK_HImageView view{_device._handle};
+		view.create(info);
+		return view;
+	}
+
 	void VulkanContext::render()
 	{
 		_device.wait_idle();

@@ -81,10 +81,31 @@ namespace Yttrium
 			vkDestroyImage(_device, _handle, nullptr);
 	}
 
+	VK_HImageView& VK_HImageView::operator=(VK_HImageView&& view) noexcept
+	{
+		reset();
+		_handle = view._handle;
+		_device = view._device;
+		view._handle = VK_NULL_HANDLE;
+		return *this;
+	}
+
 	void VK_HImageView::create(const VkImageViewCreateInfo& info)
 	{
 		assert(!*this);
 		Y_VK_CHECK(vkCreateImageView(_device, &info, nullptr, &_handle));
+	}
+
+	void VK_HImageView::reset() noexcept
+	{
+		if (*this)
+			vkDestroyImageView(_device, _handle, nullptr);
+	}
+
+	void VK_HSampler::create(const VkSamplerCreateInfo& info)
+	{
+		assert(!*this);
+		Y_VK_CHECK(vkCreateSampler(_device, &info, nullptr, &_handle));
 	}
 
 	void VK_HSwapchain::create(const VkSwapchainCreateInfoKHR& info)
