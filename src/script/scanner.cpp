@@ -92,6 +92,7 @@ namespace Yttrium
 				++_cursor;
 				if (::kind_of[static_cast<unsigned char>(*_cursor)] != C::Digit)
 					throw DataError{"[", _line, ":", _cursor - _line_origin, "] '+' or '-' must be followed by a digit"};
+				[[fallthrough]];
 			case C::Digit:
 				{
 					const auto begin = has_sign ? _cursor - 1 : _cursor;

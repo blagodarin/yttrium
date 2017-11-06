@@ -22,8 +22,25 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	add_compile_options(
+		-Weverything -Werror
+		-Wno-c++98-compat
+		-Wno-c++98-compat-pedantic
+		-Wno-conversion
+		-Wno-double-promotion
+		-Wno-exit-time-destructors
+		-Wno-float-equal
+		-Wno-global-constructors
+		-Wno-gnu-statement-expression
+		-Wno-padded
+		-Wno-switch-enum
+		-Wno-weak-vtables
+		)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-Wall -Werror -Wextra -Wnon-virtual-dtor -Wpedantic -Wshadow -Wno-implicit-fallthrough -Wno-unknown-pragmas)
+	add_compile_options(-Wall -Werror -Wextra -Wnon-virtual-dtor -Wpedantic -Wshadow -Wno-unknown-pragmas)
 
 	if(Y_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr -g)

@@ -59,6 +59,7 @@ namespace Yttrium
 		std::vector<TexturedRect> geometry;
 
 		ForegroundProperty();
+		ForegroundProperty(const ForegroundProperty&) = default;
 		~ForegroundProperty();
 
 		void draw(Renderer&) const;

@@ -44,6 +44,7 @@ namespace
 		{
 		default:
 			result += asso_values[static_cast<unsigned char>(text[1])];
+			[[fallthrough]];
 		case 1:
 			result += asso_values[static_cast<unsigned char>(text[0])];
 		}

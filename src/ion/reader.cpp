@@ -185,6 +185,7 @@ namespace Yttrium
 				case Cr:
 					if (_cursor[1] == '\n')
 						++_cursor;
+					[[fallthrough]];
 				case Lf:
 					_line_base = _cursor++;
 					++_line;

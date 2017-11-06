@@ -1,6 +1,4 @@
 # TODO
-* Overall:
-	- Building with clang.
 * Library:
 	- Multiple windows.
 	- Windowed mode.

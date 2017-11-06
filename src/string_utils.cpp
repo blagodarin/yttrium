@@ -15,7 +15,7 @@ namespace
 		bool negative = false;
 		switch (*p)
 		{
-		case '-': negative = true;
+		case '-': negative = true; [[fallthrough]];
 		case '+': ++p;
 		}
 
@@ -35,7 +35,7 @@ namespace
 		bool negative = false;
 		switch (*p)
 		{
-		case '-': negative = true;
+		case '-': negative = true; [[fallthrough]];
 		case '+': ++p;
 		}
 
@@ -127,7 +127,7 @@ namespace
 		bool negative = false;
 		switch (*p)
 		{
-		case '-': negative = true;
+		case '-': negative = true; [[fallthrough]];
 		case '+': ++p;
 		}
 
@@ -154,7 +154,7 @@ namespace
 			bool negative_power = false;
 			switch (*p)
 			{
-			case '-': negative_power = true;
+			case '-': negative_power = true; [[fallthrough]];
 			case '+': ++p;
 			}
 
@@ -177,7 +177,7 @@ namespace
 		bool negative = false;
 		switch (*p)
 		{
-		case '-': negative = true;
+		case '-': negative = true; [[fallthrough]];
 		case '+': ++p;
 		}
 
@@ -215,7 +215,7 @@ namespace
 			bool negative_power = false;
 			switch (*p)
 			{
-			case '-': negative_power = true;
+			case '-': negative_power = true; [[fallthrough]];
 			case '+': ++p;
 			}
 
@@ -345,7 +345,7 @@ namespace Yttrium
 			bool negative = false;
 			switch (*p)
 			{
-			case '-': negative = true;
+			case '-': negative = true; [[fallthrough]];
 			case '+': ++p;
 			}
 

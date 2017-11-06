@@ -190,7 +190,7 @@ namespace Yttrium
 
 	std::shared_ptr<const Music> ResourceLoader::load_music(std::string_view name)
 	{
-		return _private->_music_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
+		return _private->_music_cache.fetch(name, [](std::unique_ptr<Source>&& source)
 		{
 			Music::Settings settings;
 			settings.start = strings::to_time(source->property("start"));
@@ -227,7 +227,7 @@ namespace Yttrium
 
 	std::shared_ptr<const TextureFont> ResourceLoader::load_texture_font(std::string_view name)
 	{
-		return _private->_texture_font_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
+		return _private->_texture_font_cache.fetch(name, [](std::unique_ptr<Source>&& source)
 		{
 			return TextureFont::load(*source);
 		});
@@ -235,7 +235,7 @@ namespace Yttrium
 
 	std::shared_ptr<const Translation> ResourceLoader::load_translation(std::string_view name)
 	{
-		return _private->_translation_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
+		return _private->_translation_cache.fetch(name, [](std::unique_ptr<Source>&& source)
 		{
 			return Translation::load(*source);
 		});

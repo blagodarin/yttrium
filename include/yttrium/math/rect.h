@@ -95,8 +95,6 @@ namespace Yttrium
 		}
 
 		/// Find whether the rects intersect.
-		/// \param rect
-		/// \return \c true if this rect intersects \a rect.
 		/// \note This function reports no intersection of a null rect with itself,
 		/// though it does report an intersection for a null rect with a non-null rect
 		/// if the point of the null rect lies inside the non-null rect.
@@ -114,8 +112,6 @@ namespace Yttrium
 		}
 
 		/// Find whether the rects intersect.
-		/// \param rect
-		/// \return \c true if this rect intersects \a rect.
 		/// \note The function assumes <tt>left <= right</tt> and <tt>top <= bottom</tt>.
 		/// \note The function assumes that the subtraction result of any two coordinates along the same axis is valid.
 		/// \note The function reports an intersection of a null rect with itself

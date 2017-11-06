@@ -46,9 +46,9 @@ namespace Yttrium
 			return {};
 		switch (::detect_audio_type(*source))
 		{
-		case AudioType::Wav: return std::make_unique<WavReader>(std::move(source)); break;
+		case AudioType::Wav: return std::make_unique<WavReader>(std::move(source));
 #ifndef Y_NO_OGG_VORBIS
-		case AudioType::OggVorbis: return std::make_unique<OggVorbisReader>(std::move(source)); break;
+		case AudioType::OggVorbis: return std::make_unique<OggVorbisReader>(std::move(source));
 #endif
 		default: throw DataError("Unknown audio format");
 		}
