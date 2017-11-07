@@ -40,10 +40,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-Wall -Werror -Wextra -Wnon-virtual-dtor -Wpedantic -Wshadow -Wno-unknown-pragmas)
+	add_compile_options(-g -Wall -Werror -Wextra -Wnon-virtual-dtor -Wpedantic -Wshadow -Wno-unknown-pragmas)
 
 	if(Y_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr -g)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
 		set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
 	endif()
 

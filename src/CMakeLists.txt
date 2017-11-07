@@ -291,6 +291,7 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/2d_vs.spirv.inc
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h
+		renderer/vulkan/gpu_program.cpp
 		renderer/vulkan/gpu_program.h
 		renderer/vulkan/handles.cpp
 		renderer/vulkan/handles.h

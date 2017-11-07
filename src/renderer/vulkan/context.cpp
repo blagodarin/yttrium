@@ -1,21 +1,7 @@
 #include "context.h"
 
-#include <yttrium/math/matrix.h>
 #include "handles.h"
 #include "helpers.h"
-
-namespace
-{
-	const std::vector<uint32_t> BuiltinVertexShader
-	{
-#include "2d_vs.spirv.inc"
-	};
-
-	const std::vector<uint32_t> BuiltinFragmentShader
-	{
-#include "2d_fs.spirv.inc"
-	};
-}
 
 namespace Yttrium
 {
@@ -74,31 +60,8 @@ namespace Yttrium
 		, _surface{_instance, window}
 		, _physical_device{_surface}
 		, _device{_physical_device}
-		, _uniform_buffer{_device, 2 * sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
-		, _vertex_buffer{_device, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
 		, _command_pool{_device, _physical_device._queue_family_index}
-		, _descriptor_set_layout{_device, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}}}
-		, _descriptor_pool{_device, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}}}
-		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
-		, _pipeline_layout{_device, {_descriptor_set_layout._handle}}
-		, _vertex_shader{_device, VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader}
-		, _fragment_shader{_device, VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader}
 	{
-		const auto dbi = _uniform_buffer.descriptor_buffer_info();
-
-		VkWriteDescriptorSet wds = {};
-		wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		wds.pNext = nullptr;
-		wds.dstSet = _descriptor_set._handle;
-		wds.dstBinding = 0;
-		wds.dstArrayElement = 0;
-		wds.descriptorCount = 1;
-		wds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		wds.pImageInfo = nullptr;
-		wds.pBufferInfo = &dbi;
-		wds.pTexelBufferView = nullptr;
-
-		vkUpdateDescriptorSets(_device._handle, 1, &wds, 0, nullptr);
 	}
 
 	VK_HDeviceMemory VulkanContext::allocate_memory(const VkMemoryRequirements& requirements, VkMemoryPropertyFlags flags) const
@@ -189,32 +152,5 @@ namespace Yttrium
 		VK_HImageView view{_device._handle};
 		view.create(info);
 		return view;
-	}
-
-	void VulkanContext::render()
-	{
-		_device.wait_idle();
-		if (!_swapchain)
-			_swapchain = std::make_unique<VulkanSwapchain>(_device, _command_pool, _pipeline_layout, VK_ShaderModule::make_stages({&_vertex_shader, &_fragment_shader}));
-		try
-		{
-			_swapchain->render([this](VkCommandBuffer command_buffer, const std::function<void(const std::function<void()>&)>& render_pass)
-			{
-				render_pass([this, command_buffer]
-				{
-					vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout._handle, 0, 1, &_descriptor_set._handle, 0, nullptr);
-
-					const std::array<VkDeviceSize, 1> vertex_buffer_offsets{0};
-					vkCmdBindVertexBuffers(command_buffer, 0, 1, &_vertex_buffer._handle, vertex_buffer_offsets.data());
-
-					// TODO: Do actual rendering.
-				});
-			});
-		}
-		catch (const VK_Swapchain::OutOfDate&)
-		{
-			_device.wait_idle();
-			_swapchain.reset();
-		}
 	}
 }
