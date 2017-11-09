@@ -3,6 +3,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <vulkan/vulkan.h>
 
@@ -88,6 +89,16 @@ namespace Yttrium
 
 	private:
 		VkDevice _device = VK_NULL_HANDLE;
+	};
+
+	class VK_HInstance : public VK_Handle<VkInstance>
+	{
+	public:
+		VK_HInstance() noexcept = default;
+		~VK_HInstance() noexcept { if (*this) vkDestroyInstance(_handle, nullptr); }
+
+		void create(const VkInstanceCreateInfo&);
+		std::vector<VkPhysicalDevice> physical_devices() const;
 	};
 
 	class VK_HSampler : public VK_Handle<VkSampler>

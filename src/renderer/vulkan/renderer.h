@@ -9,7 +9,7 @@ namespace Yttrium
 	enum class VA;
 	class VulkanVertexFormat;
 
-	class VulkanRenderer final : public RendererBackend
+	class VulkanRenderer : public RendererBackend // TODO: Add 'final' then work around GCC's bad memory accessing code generation.
 	{
 	public:
 		explicit VulkanRenderer(const WindowBackend&);

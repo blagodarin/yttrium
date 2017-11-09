@@ -1,11 +1,10 @@
 #ifndef _src_renderer_vulkan_wrappers_h_
 #define _src_renderer_vulkan_wrappers_h_
 
+#include "handles.h"
+
 #include <stdexcept>
 #include <tuple>
-#include <vector>
-
-#include <vulkan/vulkan.h>
 
 namespace Yttrium
 {
@@ -14,12 +13,14 @@ namespace Yttrium
 
 	struct VK_Instance
 	{
-		VkInstance _handle = VK_NULL_HANDLE;
+		VK_HInstance _instance;
+#ifndef NDEBUG
+		PFN_vkDestroyDebugReportCallbackEXT _vkDestroyDebugReportCallbackEXT = nullptr;
+		VkDebugReportCallbackEXT _debug_report_callback = VK_NULL_HANDLE;
+#endif
 
 		VK_Instance();
-		~VK_Instance() noexcept { vkDestroyInstance(_handle, nullptr); }
-
-		std::vector<VkPhysicalDevice> physical_device_handles() const;
+		~VK_Instance() noexcept;
 	};
 
 	struct VK_Surface
@@ -28,7 +29,7 @@ namespace Yttrium
 		VkSurfaceKHR _handle = VK_NULL_HANDLE;
 
 		VK_Surface(const VK_Instance&, const WindowBackend&);
-		~VK_Surface() noexcept { vkDestroySurfaceKHR(_instance._handle, _handle, nullptr); }
+		~VK_Surface() noexcept { vkDestroySurfaceKHR(_instance._instance.get(), _handle, nullptr); }
 	};
 
 	struct VK_PhysicalDevice

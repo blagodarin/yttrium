@@ -1,13 +1,27 @@
 #include "wrappers.h"
 
 #include "../../system/window.h"
-#include "handles.h"
 #include "helpers.h"
 
 #include <cassert>
 #include <cstring>
 
+#ifndef NDEBUG
+	#include <iostream>
+#endif
+
 #define CHECK(call) Y_VK_CHECK(call)
+
+namespace
+{
+#ifndef NDEBUG
+	VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_report_callback(VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* layer_prefix, const char* message, void*)
+	{
+		std::cerr << '[' << layer_prefix << "] " << message << '\n';
+		return VK_FALSE;
+	}
+#endif
+}
 
 namespace Yttrium
 {
@@ -15,6 +29,16 @@ namespace Yttrium
 
 	VK_Instance::VK_Instance()
 	{
+#ifndef NDEBUG
+		uint32_t layer_count = 0;
+		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&layer_count, nullptr));
+		std::vector<VkLayerProperties> available_layers(layer_count);
+		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data()));
+		std::cerr << "Vulkan layers:\n";
+		for (const auto& layer : available_layers)
+			std::cerr << "\t" << layer.layerName << " - " << layer.description << '\n';
+#endif
+
 		VkApplicationInfo application_info = {};
 		application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		application_info.pNext = nullptr;
@@ -24,8 +48,18 @@ namespace Yttrium
 		application_info.engineVersion = 0;
 		application_info.apiVersion = VK_API_VERSION_1_0;
 
-		static const auto extensions =
+		static const std::initializer_list<const char*> layers
 		{
+#ifndef NDEBUG
+			"VK_LAYER_LUNARG_standard_validation",
+#endif
+		};
+
+		static const std::initializer_list<const char*> extensions
+		{
+#ifndef NDEBUG
+			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+#endif
 			VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef VK_USE_PLATFORM_XCB_KHR
 			VK_KHR_XCB_SURFACE_EXTENSION_NAME,
@@ -37,21 +71,37 @@ namespace Yttrium
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
 		create_info.pApplicationInfo = &application_info;
-		create_info.enabledLayerCount = 0;
-		create_info.ppEnabledLayerNames = nullptr;
+		create_info.enabledLayerCount = layers.size();
+		create_info.ppEnabledLayerNames = layers.begin();
 		create_info.enabledExtensionCount = extensions.size();
 		create_info.ppEnabledExtensionNames = extensions.begin();
 
-		CHECK(vkCreateInstance(&create_info, nullptr, &_handle));
+		_instance.create(create_info);
+
+#ifndef NDEBUG
+		const auto vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(_instance.get(), "vkCreateDebugReportCallbackEXT"));
+		_vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(_instance.get(), "vkDestroyDebugReportCallbackEXT"));
+		if (vkCreateDebugReportCallbackEXT && _vkDestroyDebugReportCallbackEXT)
+		{
+			VkDebugReportCallbackCreateInfoEXT drc_info;
+			drc_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+			drc_info.pNext = nullptr;
+			drc_info.flags = VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+			drc_info.pfnCallback = vulkan_debug_report_callback;
+			drc_info.pUserData = nullptr;
+
+			Y_VK_CHECK(vkCreateDebugReportCallbackEXT(_instance.get(), &drc_info, nullptr, &_debug_report_callback));
+		}
+#endif
 	}
 
-	std::vector<VkPhysicalDevice> VK_Instance::physical_device_handles() const
+	VK_Instance::~VK_Instance()
 	{
-		uint32_t count = 0;
-		CHECK(vkEnumeratePhysicalDevices(_handle, &count, nullptr));
-		std::vector<VkPhysicalDevice> handles(count);
-		CHECK(vkEnumeratePhysicalDevices(_handle, &count, handles.data()));
-		return handles;
+		if (_debug_report_callback != VK_NULL_HANDLE)
+		{
+			assert(_vkDestroyDebugReportCallbackEXT);
+			_vkDestroyDebugReportCallbackEXT(_instance.get(), _debug_report_callback, nullptr);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +115,7 @@ namespace Yttrium
 		create_info.connection = window.xcb_connection();
 		create_info.window = window.xcb_window();
 
-		CHECK(vkCreateXcbSurfaceKHR(_instance._handle, &create_info, nullptr, &_handle));
+		CHECK(vkCreateXcbSurfaceKHR(_instance._instance.get(), &create_info, nullptr, &_handle));
 #endif
 	}
 
@@ -74,7 +124,7 @@ namespace Yttrium
 	VK_PhysicalDevice::VK_PhysicalDevice(const VK_Surface& surface)
 		: _surface{surface}
 	{
-		for (const auto handle : _surface._instance.physical_device_handles())
+		for (const auto handle : _surface._instance._instance.physical_devices())
 		{
 			uint32_t queue_family_count = 0;
 			vkGetPhysicalDeviceQueueFamilyProperties(handle, &queue_family_count, nullptr);

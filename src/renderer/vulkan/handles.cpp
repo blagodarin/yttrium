@@ -102,6 +102,22 @@ namespace Yttrium
 			vkDestroyImageView(_device, _handle, nullptr);
 	}
 
+	void VK_HInstance::create(const VkInstanceCreateInfo& info)
+	{
+		assert(!*this);
+		Y_VK_CHECK(vkCreateInstance(&info, nullptr, &_handle));
+	}
+
+	std::vector<VkPhysicalDevice> VK_HInstance::physical_devices() const
+	{
+		assert(*this);
+		uint32_t count = 0;
+		Y_VK_CHECK(vkEnumeratePhysicalDevices(_handle, &count, nullptr));
+		std::vector<VkPhysicalDevice> devices(count);
+		Y_VK_CHECK(vkEnumeratePhysicalDevices(_handle, &count, devices.data()));
+		return devices;
+	}
+
 	void VK_HSampler::create(const VkSamplerCreateInfo& info)
 	{
 		assert(!*this);
