@@ -4,62 +4,112 @@
 
 namespace Yttrium
 {
-	Image grayscale_to_bgra(const Image& input)
+	Image to_bgra(const Image& input)
 	{
-		Image output{{input.format().size(), PixelFormat::Bgra, 32, input.format().orientation()}};
+		const auto input_format = input.format();
+		if (input_format.pixel_format() == PixelFormat::Bgra)
+			return Image{input_format, input.data()};
+
+		Image output{{input_format.size(), PixelFormat::Bgra, 32, input_format.orientation()}};
 
 		auto src = static_cast<const uint8_t*>(input.data());
-		const auto src_row_size = input.format().row_size();
+		const auto src_row_size = input_format.row_size();
 
 		auto dst = static_cast<uint8_t*>(output.data());
 		const auto dst_row_size = output.format().row_size();
 
 		const auto scanline_size = output.format().width() * 4;
 
-		switch (input.format().pixel_format())
+		switch (input_format.pixel_format())
 		{
 		case PixelFormat::Gray:
-			if (input.format().bits_per_pixel() == 8)
+			if (input_format.bits_per_pixel() != 8)
+				throw std::logic_error{"Grayscale-to-BGRA conversion requires 8-bit pixels"};
+			for (auto y = output.format().height(); y > 0; --y)
 			{
-				for (auto y = output.format().height(); y > 0; --y)
+				for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
 				{
-					for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
-					{
-						dst[a + 0] = src[b + 0];
-						dst[a + 1] = src[b + 0];
-						dst[a + 2] = src[b + 0];
-						dst[a + 3] = 0xff;
-					}
-					src += src_row_size;
-					dst += dst_row_size;
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 0];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = 0xff;
 				}
-				return output;
+				src += src_row_size;
+				dst += dst_row_size;
 			}
-			break;
+			return output;
 
 		case PixelFormat::GrayAlpha:
-			if (input.format().bits_per_pixel() == 16)
+			if (input_format.bits_per_pixel() != 16)
+				throw std::logic_error{"GrayAlpha-to-BGRA conversion requires 16-bit pixels"};
+			for (auto y = output.format().height(); y > 0; --y)
 			{
-				for (auto y = output.format().height(); y > 0; --y)
+				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
 				{
-					for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
-					{
-						dst[a + 0] = src[b + 0];
-						dst[a + 1] = src[b + 0];
-						dst[a + 2] = src[b + 0];
-						dst[a + 3] = src[b + 1];
-					}
-					src += src_row_size;
-					dst += dst_row_size;
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 0];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = src[b + 1];
 				}
-				return output;
+				src += src_row_size;
+				dst += dst_row_size;
 			}
-			break;
+			return output;
+
+		case PixelFormat::Rgb:
+			if (input_format.bits_per_pixel() != 24)
+				throw std::logic_error{"RGB-to-BGRA conversion requires 24-bit pixels"};
+			for (auto y = output.format().height(); y > 0; --y)
+			{
+				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 3)
+				{
+					dst[a + 0] = src[b + 2];
+					dst[a + 1] = src[b + 1];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = 0xff;
+				}
+				src += src_row_size;
+				dst += dst_row_size;
+			}
+			return output;
+
+		case PixelFormat::Bgr:
+			if (input_format.bits_per_pixel() != 24)
+				throw std::logic_error{"BGR-to-BGRA conversion requires 24-bit pixels"};
+			for (auto y = output.format().height(); y > 0; --y)
+			{
+				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 3)
+				{
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 1];
+					dst[a + 2] = src[b + 2];
+					dst[a + 3] = 0xff;
+				}
+				src += src_row_size;
+				dst += dst_row_size;
+			}
+			return output;
+
+		case PixelFormat::Rgba:
+			if (input_format.bits_per_pixel() != 32)
+				throw std::logic_error{"RGBA-to-BGRA conversion requires 32-bit pixels"};
+			for (auto y = output.format().height(); y > 0; --y)
+			{
+				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 4)
+				{
+					dst[a + 0] = src[b + 2];
+					dst[a + 1] = src[b + 1];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = src[b + 3];
+				}
+				src += src_row_size;
+				dst += dst_row_size;
+			}
+			return output;
 
 		default:
-			break;
+			throw std::logic_error{"Bad image format for BGRA conversion"};
 		}
-		throw std::logic_error{"Bad image format for grayscale-BGRA conversion"};
 	}
 
 	std::optional<Image> intensity_to_bgra(const Image& input)

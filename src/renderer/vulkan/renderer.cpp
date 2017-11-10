@@ -120,15 +120,11 @@ namespace Yttrium
 		{
 		case PixelFormat::Gray:
 		case PixelFormat::GrayAlpha:
-			temporary = grayscale_to_bgra(image);
+		case PixelFormat::Rgb:
+		case PixelFormat::Bgr:
+			temporary = to_bgra(image);
 			data = temporary->data();
 			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
-			break;
-		case PixelFormat::Rgb:
-			vk_format = VK_FORMAT_R8G8B8_UNORM;
-			break;
-		case PixelFormat::Bgr:
-			vk_format = VK_FORMAT_B8G8R8_UNORM;
 			break;
 		case PixelFormat::Rgba:
 			vk_format = VK_FORMAT_R8G8B8A8_UNORM;

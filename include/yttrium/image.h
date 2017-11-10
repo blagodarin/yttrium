@@ -158,7 +158,7 @@ namespace Yttrium
 	};
 
 	///
-	Y_API Image grayscale_to_bgra(const Image&);
+	Y_API Image to_bgra(const Image&);
 
 	///
 	Y_API std::optional<Image> intensity_to_bgra(const Image&);

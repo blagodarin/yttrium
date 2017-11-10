@@ -168,7 +168,7 @@ namespace Yttrium
 			internal_format = GL_RGBA8;
 			data_format = GL_BGRA;
 			data_type = GL_UNSIGNED_BYTE;
-			temporary = grayscale_to_bgra(image);
+			temporary = to_bgra(image);
 			data = temporary->data();
 			break;
 		case PixelFormat::Rgb:
