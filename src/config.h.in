@@ -1,7 +1,6 @@
 #ifndef _src_config_h_
 #define _src_config_h_
 
-#cmakedefine Y_IS_BIG_ENDIAN
 #cmakedefine Y_IS_LINUX
 #cmakedefine Y_IS_POSIX
 #cmakedefine Y_IS_WINDOWS

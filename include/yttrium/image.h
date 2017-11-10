@@ -19,12 +19,12 @@ namespace Yttrium
 	/// Pixel format.
 	enum class PixelFormat
 	{
-		Gray,      ///< Gray.
-		GrayAlpha, ///< Gray-alpha.
-		Rgb,       ///< Red-green-blue.
-		Bgr,       ///< Blue-green-red (reverse).
-		Rgba,      ///< Red-green-blue-alpha.
-		Bgra,      ///< Blue-green-red-alpha (reverse RGB).
+		Gray8,       ///< Gray.
+		GrayAlpha16, ///< Gray-alpha.
+		Rgb24,       ///< Red-green-blue.
+		Bgr24,       ///< Blue-green-red (reverse).
+		Rgba32,      ///< Red-green-blue-alpha.
+		Bgra32,      ///< Blue-green-red-alpha (reverse RGB).
 	};
 
 	/// Image file type.
@@ -51,57 +51,51 @@ namespace Yttrium
 	{
 	public:
 		///
-		ImageFormat(size_t width, size_t height, PixelFormat, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
+		ImageFormat(size_t width, size_t height, PixelFormat, size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
 
 		///
-		ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t bits_per_pixel, ImageOrientation orientation)
-			: ImageFormat{width, height, pixel_format, bits_per_pixel, 1, orientation} {}
+		ImageFormat(size_t width, size_t height, PixelFormat pixel_format, ImageOrientation orientation)
+			: ImageFormat{width, height, pixel_format, 1, orientation} {}
 
 		///
-		ImageFormat(const Size& size, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment = 1, ImageOrientation orientation = ImageOrientation::XRightYDown)
-			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, bits_per_pixel, row_alignment, orientation} {}
+		ImageFormat(const Size& size, PixelFormat pixel_format, size_t row_alignment = 1, ImageOrientation orientation = ImageOrientation::XRightYDown)
+			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, row_alignment, orientation} {}
 
 		///
-		ImageFormat(const Size& size, PixelFormat pixel_format, size_t bits_per_pixel, ImageOrientation orientation)
-			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, bits_per_pixel, 1, orientation} {}
+		ImageFormat(const Size& size, PixelFormat pixel_format, ImageOrientation orientation)
+			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, 1, orientation} {}
+
+		size_t bits_per_channel() const noexcept { return bits_per_pixel() / _channels; }
+		size_t bits_per_pixel() const noexcept { return pixel_size() * 8; }
+		size_t channels() const noexcept { return _channels; }
+		size_t frame_size() const noexcept { return _row_size * _height; }
+		size_t height() const noexcept { return _height; }
+		ImageOrientation orientation() const noexcept { return _orientation; }
+		PixelFormat pixel_format() const noexcept { return _pixel_format; }
+		size_t pixel_size() const noexcept { return pixel_size(_pixel_format); }
+		size_t row_alignment() const noexcept { return _row_alignment; }
+		size_t row_size() const noexcept { return _row_size; }
+		Size size() const noexcept { return {static_cast<int>(_width), static_cast<int>(_height)}; }
+		size_t width() const noexcept { return _width; }
 
 		///
-		size_t bits_per_channel() const { return (_bits_per_pixel % _channels) ? 0 : _bits_per_pixel / _channels; }
-
-		///
-		size_t bits_per_pixel() const { return _bits_per_pixel; }
-
-		///
-		size_t channels() const { return _channels; }
-
-		///
-		size_t frame_size() const { return _row_size * _height; }
-
-		///
-		size_t height() const { return _height; }
-
-		///
-		ImageOrientation orientation() const { return _orientation; }
-
-		///
-		PixelFormat pixel_format() const { return _pixel_format; }
-
-		///
-		size_t row_alignment() const { return _row_alignment; }
-
-		///
-		size_t row_size() const { return _row_size; }
-
-		///
-		Size size() const { return {static_cast<int>(_width), static_cast<int>(_height)}; }
-
-		///
-		size_t width() const { return _width; }
+		static constexpr size_t pixel_size(PixelFormat format) noexcept
+		{
+			switch (format)
+			{
+			case PixelFormat::Gray8: return 1;
+			case PixelFormat::GrayAlpha16: return 2;
+			case PixelFormat::Rgb24: return 3;
+			case PixelFormat::Bgr24: return 3;
+			case PixelFormat::Rgba32: return 4;
+			case PixelFormat::Bgra32: return 4;
+			}
+			return 0;
+		}
 
 	private:
 		PixelFormat _pixel_format;
 		size_t _channels;
-		size_t _bits_per_pixel;
 		ImageOrientation _orientation;
 		size_t _width;
 		size_t _row_alignment;
@@ -110,14 +104,16 @@ namespace Yttrium
 		friend class Image;
 	};
 
-	inline bool operator==(const ImageFormat& a, const ImageFormat& b)
+	inline bool operator==(const ImageFormat& a, const ImageFormat& b) noexcept
 	{
-		return a.pixel_format() == b.pixel_format() && a.bits_per_pixel() == b.bits_per_pixel()
-			&& a.orientation() == b.orientation() && a.width() == b.width() && a.row_size() == b.row_size()
+		return a.pixel_format() == b.pixel_format()
+			&& a.orientation() == b.orientation()
+			&& a.width() == b.width()
+			&& a.row_size() == b.row_size()
 			&& a.height() == b.height();
 	}
 
-	inline bool operator!=(const ImageFormat& a, const ImageFormat& b) { return !(a == b); }
+	inline bool operator!=(const ImageFormat& a, const ImageFormat& b) noexcept { return !(a == b); }
 
 	///
 	class Y_API Image
@@ -146,7 +142,7 @@ namespace Yttrium
 		bool save(Writer&&, ImageType) const;
 
 		///
-		bool swap_channels();
+		bool swap_channels() noexcept;
 
 		///
 		Buffer to_buffer(ImageType) const;

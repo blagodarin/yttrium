@@ -39,7 +39,7 @@ inline Yttrium::Image make_test_image(bool with_alpha)
 				*data++ = static_cast<uint8_t>(x * 16 + 15);
 		}
 	}
-	return { { 16, 16, with_alpha ? Yttrium::PixelFormat::Bgra : Yttrium::PixelFormat::Bgr, with_alpha ? 32u : 24u }, buffer.data() };
+	return { { 16, 16, with_alpha ? Yttrium::PixelFormat::Bgra32 : Yttrium::PixelFormat::Bgr24 }, buffer.data() };
 }
 
 #endif

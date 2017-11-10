@@ -38,9 +38,9 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 24)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && !header.ddspf.dwABitMask)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgr, 24);
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgr24);
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && !header.ddspf.dwABitMask)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgb, 24);
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgb24);
 			else
 				return {};
 			break;
@@ -49,9 +49,9 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 32)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && header.ddspf.dwABitMask == 0xff000000)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgra, 32);
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgra32);
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && header.ddspf.dwABitMask == 0xff000000)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgba, 32);
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgba32);
 			else
 				return {};
 			break;
@@ -60,7 +60,7 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 8)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && !header.ddspf.dwABitMask)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Gray, 8);
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Gray8);
 			else
 				return {};
 			break;
@@ -69,7 +69,7 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 16)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && header.ddspf.dwABitMask == 0xff00)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha, 16);
+				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha16);
 			else
 				return {};
 			break;

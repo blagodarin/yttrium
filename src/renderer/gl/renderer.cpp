@@ -151,9 +151,7 @@ namespace Yttrium
 				image = std::move(*converted);
 		}
 
-		const auto image_format = image.format();
-		if (image_format.bits_per_channel() != 8)
-			return {};
+		const auto& image_format = image.format();
 
 		GLenum internal_format = 0;
 		GLenum data_format = 0;
@@ -163,30 +161,30 @@ namespace Yttrium
 		std::optional<Image> temporary;
 		switch (image_format.pixel_format())
 		{
-		case PixelFormat::Gray:
-		case PixelFormat::GrayAlpha:
+		case PixelFormat::Gray8:
+		case PixelFormat::GrayAlpha16:
 			internal_format = GL_RGBA8;
 			data_format = GL_BGRA;
 			data_type = GL_UNSIGNED_BYTE;
 			temporary = to_bgra(image);
 			data = temporary->data();
 			break;
-		case PixelFormat::Rgb:
+		case PixelFormat::Rgb24:
 			internal_format = GL_RGB8;
 			data_format = GL_RGB;
 			data_type = GL_UNSIGNED_BYTE;
 			break;
-		case PixelFormat::Bgr:
+		case PixelFormat::Bgr24:
 			internal_format = GL_RGB8;
 			data_format = GL_BGR;
 			data_type = GL_UNSIGNED_BYTE;
 			break;
-		case PixelFormat::Rgba:
+		case PixelFormat::Rgba32:
 			internal_format = GL_RGBA8;
 			data_format = GL_RGBA;
 			data_type = GL_UNSIGNED_BYTE;
 			break;
-		case PixelFormat::Bgra:
+		case PixelFormat::Bgra32:
 			internal_format = GL_RGBA8;
 			data_format = GL_BGRA;
 			data_type = GL_UNSIGNED_BYTE;
@@ -275,7 +273,7 @@ namespace Yttrium
 		GLint unpack_alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 
-		Image image{{window_size, PixelFormat::Rgb, 24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp}};
+		Image image{{window_size, PixelFormat::Rgb24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp}};
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);

@@ -12,32 +12,30 @@ namespace
 {
 	using Yttrium::PixelFormat;
 
-	std::size_t channels_of(PixelFormat pixel_format)
+	constexpr std::size_t channels_of(PixelFormat format) noexcept
 	{
-		switch (pixel_format)
+		switch (format)
 		{
-		case PixelFormat::Gray: return 1;
-		case PixelFormat::GrayAlpha: return 2;
-		case PixelFormat::Rgb: return 3;
-		case PixelFormat::Bgr: return 3;
-		case PixelFormat::Rgba: return 4;
-		case PixelFormat::Bgra: return 4;
+		case PixelFormat::Gray8: return 1;
+		case PixelFormat::GrayAlpha16: return 2;
+		case PixelFormat::Rgb24: return 3;
+		case PixelFormat::Bgr24: return 3;
+		case PixelFormat::Rgba32: return 4;
+		case PixelFormat::Bgra32: return 4;
 		}
-		assert(false);
 		return 0;
 	}
 }
 
 namespace Yttrium
 {
-	ImageFormat::ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t bits_per_pixel, size_t row_alignment, ImageOrientation orientation)
+	ImageFormat::ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t row_alignment, ImageOrientation orientation)
 		: _pixel_format{pixel_format}
-		, _channels{::channels_of(pixel_format)}
-		, _bits_per_pixel{bits_per_pixel}
+		, _channels{::channels_of(_pixel_format)}
 		, _orientation{orientation}
 		, _width{width}
 		, _row_alignment{row_alignment}
-		, _row_size{aligned_image_row_size(_width, _bits_per_pixel, _row_alignment)}
+		, _row_size{aligned_image_row_size(_width, pixel_size(_pixel_format) * 8, _row_alignment)}
 		, _height{height}
 	{
 		assert(is_power_of_2(_row_alignment));
@@ -87,16 +85,15 @@ namespace Yttrium
 		return write_image(writer, type, _format, _buffer.data());
 	}
 
-	bool Image::swap_channels()
+	bool Image::swap_channels() noexcept
 	{
 		switch (_format.pixel_format())
 		{
-		case PixelFormat::Gray:
+		case PixelFormat::Gray8:
 			return true;
 
-		case PixelFormat::Rgb:
-		case PixelFormat::Bgr:
-			if (_format.bits_per_pixel() == 24)
+		case PixelFormat::Rgb24:
+		case PixelFormat::Bgr24:
 			{
 				auto scanline = static_cast<uint8_t*>(_buffer.data());
 				for (size_t row = 0; row < _format.height(); ++row)
@@ -109,10 +106,9 @@ namespace Yttrium
 					}
 					scanline += _format.row_size();
 				}
-				_format._pixel_format = _format.pixel_format() == PixelFormat::Rgb ? PixelFormat::Bgr : PixelFormat::Rgb;
-				return true;
 			}
-			break;
+			_format._pixel_format = _format.pixel_format() == PixelFormat::Rgb24 ? PixelFormat::Bgr24 : PixelFormat::Rgb24;
+			return true;
 
 		default:
 			break;

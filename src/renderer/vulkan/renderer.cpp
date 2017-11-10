@@ -109,8 +109,6 @@ namespace Yttrium
 		}
 
 		const auto format = image.format();
-		if (format.bits_per_channel() != 8)
-			return {};
 
 		auto data = image.data();
 
@@ -118,18 +116,18 @@ namespace Yttrium
 		std::optional<Image> temporary;
 		switch (format.pixel_format())
 		{
-		case PixelFormat::Gray:
-		case PixelFormat::GrayAlpha:
-		case PixelFormat::Rgb:
-		case PixelFormat::Bgr:
+		case PixelFormat::Gray8:
+		case PixelFormat::GrayAlpha16:
+		case PixelFormat::Rgb24:
+		case PixelFormat::Bgr24:
 			temporary = to_bgra(image);
 			data = temporary->data();
 			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
 			break;
-		case PixelFormat::Rgba:
+		case PixelFormat::Rgba32:
 			vk_format = VK_FORMAT_R8G8B8A8_UNORM;
 			break;
-		case PixelFormat::Bgra:
+		case PixelFormat::Bgra32:
 			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
 			break;
 		default:
@@ -171,7 +169,7 @@ namespace Yttrium
 
 	Image VulkanRenderer::take_screenshot(const Size& window_size) const
 	{
-		return Image{{window_size, PixelFormat::Rgb, 24, 4, ImageOrientation::XRightYDown}};
+		return Image{{window_size, PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown}};
 	}
 
 	void VulkanRenderer::update_descriptors()

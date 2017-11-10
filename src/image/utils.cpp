@@ -7,10 +7,10 @@ namespace Yttrium
 	Image to_bgra(const Image& input)
 	{
 		const auto input_format = input.format();
-		if (input_format.pixel_format() == PixelFormat::Bgra)
+		if (input_format.pixel_format() == PixelFormat::Bgra32)
 			return Image{input_format, input.data()};
 
-		Image output{{input_format.size(), PixelFormat::Bgra, 32, input_format.orientation()}};
+		Image output{{input_format.size(), PixelFormat::Bgra32, input_format.orientation()}};
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input_format.row_size();
@@ -22,9 +22,7 @@ namespace Yttrium
 
 		switch (input_format.pixel_format())
 		{
-		case PixelFormat::Gray:
-			if (input_format.bits_per_pixel() != 8)
-				throw std::logic_error{"Grayscale-to-BGRA conversion requires 8-bit pixels"};
+		case PixelFormat::Gray8:
 			for (auto y = output.format().height(); y > 0; --y)
 			{
 				for (size_t a = 0, b = 0; a < scanline_size; a += 4, ++b)
@@ -39,9 +37,7 @@ namespace Yttrium
 			}
 			return output;
 
-		case PixelFormat::GrayAlpha:
-			if (input_format.bits_per_pixel() != 16)
-				throw std::logic_error{"GrayAlpha-to-BGRA conversion requires 16-bit pixels"};
+		case PixelFormat::GrayAlpha16:
 			for (auto y = output.format().height(); y > 0; --y)
 			{
 				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 2)
@@ -56,9 +52,7 @@ namespace Yttrium
 			}
 			return output;
 
-		case PixelFormat::Rgb:
-			if (input_format.bits_per_pixel() != 24)
-				throw std::logic_error{"RGB-to-BGRA conversion requires 24-bit pixels"};
+		case PixelFormat::Rgb24:
 			for (auto y = output.format().height(); y > 0; --y)
 			{
 				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 3)
@@ -73,9 +67,7 @@ namespace Yttrium
 			}
 			return output;
 
-		case PixelFormat::Bgr:
-			if (input_format.bits_per_pixel() != 24)
-				throw std::logic_error{"BGR-to-BGRA conversion requires 24-bit pixels"};
+		case PixelFormat::Bgr24:
 			for (auto y = output.format().height(); y > 0; --y)
 			{
 				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 3)
@@ -90,9 +82,7 @@ namespace Yttrium
 			}
 			return output;
 
-		case PixelFormat::Rgba:
-			if (input_format.bits_per_pixel() != 32)
-				throw std::logic_error{"RGBA-to-BGRA conversion requires 32-bit pixels"};
+		case PixelFormat::Rgba32:
 			for (auto y = output.format().height(); y > 0; --y)
 			{
 				for (size_t a = 0, b = 0; a < scanline_size; a += 4, b += 4)
@@ -114,10 +104,10 @@ namespace Yttrium
 
 	std::optional<Image> intensity_to_bgra(const Image& input)
 	{
-		if (input.format().pixel_format() != PixelFormat::Gray || input.format().bits_per_pixel() != 8)
+		if (input.format().pixel_format() != PixelFormat::Gray8)
 			return {};
 
-		Image output{{input.format().size(), PixelFormat::Bgra, 32, input.format().orientation()}};
+		Image output{{input.format().size(), PixelFormat::Bgra32, input.format().orientation()}};
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input.format().row_size();

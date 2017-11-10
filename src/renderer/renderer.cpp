@@ -61,11 +61,11 @@ namespace Yttrium
 #endif
 	{
 		static const int32_t white_texture_data = -1;
-		_white_texture = _backend->create_texture_2d(*this, { { 1, 1, PixelFormat::Bgra, 32 }, &white_texture_data }, TextureFlag::NoMipmaps);
+		_white_texture = _backend->create_texture_2d(*this, { { 1, 1, PixelFormat::Bgra32 }, &white_texture_data }, TextureFlag::NoMipmaps);
 		if (!_white_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 
-		_debug_texture = _backend->create_texture_2d(*this, { { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra, 32 }, DebugTexture::data }, TextureFlag::NoMipmaps);
+		_debug_texture = _backend->create_texture_2d(*this, { { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra32 }, DebugTexture::data }, TextureFlag::NoMipmaps);
 		if (!_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");
 

@@ -83,7 +83,7 @@ namespace
 
 	Image make_blocks_image()
 	{
-		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra, 32 });
+		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra32 });
 		for (size_t i = 0; i < FragmentCount; ++i)
 		{
 			for (size_t y = 0; y < FragmentSize; ++y)

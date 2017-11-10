@@ -9,7 +9,7 @@
 
 inline auto make_bgra_tga(size_t width, size_t height, const std::function<std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>(size_t, size_t)>& callback)
 {
-	Yttrium::Image image({ width, height, Yttrium::PixelFormat::Bgra, 32 });
+	Yttrium::Image image({ width, height, Yttrium::PixelFormat::Bgra32 });
 	for (size_t y = 0; y < height; ++y)
 	{
 		for (size_t x = 0; x < width; ++x)

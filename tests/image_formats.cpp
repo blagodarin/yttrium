@@ -26,11 +26,11 @@ BOOST_AUTO_TEST_CASE(test_jpeg_reading)
 {
 	const auto jpeg_image = Image::load(*Source::from("tests/image/gradient24.jpeg"));
 	BOOST_REQUIRE(jpeg_image);
-	BOOST_REQUIRE(jpeg_image->format().pixel_format() == PixelFormat::Rgb);
+	BOOST_REQUIRE(jpeg_image->format().pixel_format() == PixelFormat::Rgb24);
 
 	auto tga_image = Image::load(*Source::from("tests/image/gradient24.jpeg.tga"));
 	BOOST_REQUIRE(tga_image);
-	BOOST_REQUIRE(tga_image->format().pixel_format() == PixelFormat::Bgr);
+	BOOST_REQUIRE(tga_image->format().pixel_format() == PixelFormat::Bgr24);
 	BOOST_REQUIRE(tga_image->swap_channels());
 
 	BOOST_CHECK(jpeg_image == tga_image);

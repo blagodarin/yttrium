@@ -16,21 +16,10 @@ namespace
 
 		switch (format.pixel_format())
 		{
-		case PixelFormat::Gray:
-			if (format.bits_per_pixel() != 8)
-				return false;
+		case PixelFormat::Gray8:
+		case PixelFormat::Bgr24:
+		case PixelFormat::Bgra32:
 			break;
-
-		case PixelFormat::Bgr:
-			if (format.bits_per_pixel() != 24)
-				return false;
-			break;
-
-		case PixelFormat::Bgra:
-			if (format.bits_per_pixel() != 32)
-				return false;
-			break;
-
 		default:
 			return false;
 		}
@@ -81,14 +70,14 @@ namespace Yttrium
 		{
 			const auto alpha = header.image.descriptor & tgaAlphaMask;
 			if (!alpha && header.image.pixel_depth == 24)
-				format.emplace(header.image.width, header.image.height, PixelFormat::Bgr, 24, orientation());
+				format.emplace(header.image.width, header.image.height, PixelFormat::Bgr24, orientation());
 			else if (alpha == 8 && header.image.pixel_depth == 32)
-				format.emplace(header.image.width, header.image.height, PixelFormat::Bgra, 32, orientation());
+				format.emplace(header.image.width, header.image.height, PixelFormat::Bgra32, orientation());
 			else
 				return {};
 		}
 		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
-			format.emplace(header.image.width, header.image.height, PixelFormat::Gray, 8, orientation());
+			format.emplace(header.image.width, header.image.height, PixelFormat::Gray8, orientation());
 		else
 			return {};
 
@@ -110,7 +99,7 @@ namespace Yttrium
 
 		header.id_length = 0;
 		header.color_map_type = tgaNoColorMap;
-		header.image_type = (format.pixel_format() == PixelFormat::Gray) ? tgaBlackAndWhite : tgaTrueColor;
+		header.image_type = (format.pixel_format() == PixelFormat::Gray8) ? tgaBlackAndWhite : tgaTrueColor;
 		header.color_map.first_entry_index = 0;
 		header.color_map.length = 0;
 		header.color_map.entry_size = 0;
@@ -119,7 +108,7 @@ namespace Yttrium
 		header.image.width = static_cast<uint16_t>(format.width());
 		header.image.height = static_cast<uint16_t>(format.height());
 		header.image.pixel_depth = static_cast<uint8_t>(format.bits_per_pixel());
-		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra) ? 8 : 0;
+		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra32) ? 8 : 0;
 
 		switch (format.orientation())
 		{

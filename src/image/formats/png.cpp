@@ -13,28 +13,13 @@ namespace
 	{
 		switch (format.pixel_format())
 		{
-		case Yttrium::PixelFormat::Gray:
-			if (format.bits_per_pixel() != 8 && format.bits_per_pixel() != 16)
-				return false;
+		case Yttrium::PixelFormat::Gray8:
+		case Yttrium::PixelFormat::GrayAlpha16:
+		case Yttrium::PixelFormat::Rgb24:
+		case Yttrium::PixelFormat::Bgr24:
+		case Yttrium::PixelFormat::Rgba32:
+		case Yttrium::PixelFormat::Bgra32:
 			break;
-
-		case Yttrium::PixelFormat::GrayAlpha:
-			if (format.bits_per_pixel() != 16 && format.bits_per_pixel() != 32)
-				return false;
-			break;
-
-		case Yttrium::PixelFormat::Rgb:
-		case Yttrium::PixelFormat::Bgr:
-			if (format.bits_per_pixel() != 24 && format.bits_per_pixel() != 48)
-				return false;
-			break;
-
-		case Yttrium::PixelFormat::Rgba:
-		case Yttrium::PixelFormat::Bgra:
-			if (format.bits_per_pixel() != 32 && format.bits_per_pixel() != 64)
-				return false;
-			break;
-
 		default:
 			return false;
 		}
@@ -119,42 +104,26 @@ namespace Yttrium
 		int color_type = 0;
 		int transforms = 0;
 
-		if (format.pixel_format() == PixelFormat::Bgr || format.pixel_format() == PixelFormat::Bgra)
+		if (format.pixel_format() == PixelFormat::Bgr24 || format.pixel_format() == PixelFormat::Bgra32)
 			transforms |= PNG_TRANSFORM_BGR;
 
 		switch (format.pixel_format())
 		{
-		case PixelFormat::Gray:
-#ifndef Y_IS_BIG_ENDIAN
-			if (format.bits_per_pixel() > 8)
-				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
-#endif
+		case PixelFormat::Gray8:
 			color_type = PNG_COLOR_TYPE_GRAY;
 			break;
 
-		case PixelFormat::GrayAlpha:
-#ifndef Y_IS_BIG_ENDIAN
-			if (format.bits_per_pixel() > 16)
-				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
-#endif
+		case PixelFormat::GrayAlpha16:
 			color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
 			break;
 
-		case PixelFormat::Rgb:
-		case PixelFormat::Bgr:
-#ifndef Y_IS_BIG_ENDIAN
-			if (format.bits_per_pixel() > 24)
-				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
-#endif
+		case PixelFormat::Rgb24:
+		case PixelFormat::Bgr24:
 			color_type = PNG_COLOR_TYPE_RGB;
 			break;
 
-		case PixelFormat::Rgba:
-		case PixelFormat::Bgra:
-#ifndef Y_IS_BIG_ENDIAN
-			if (format.bits_per_pixel() > 32)
-				transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
-#endif
+		case PixelFormat::Rgba32:
+		case PixelFormat::Bgra32:
 			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 			break;
 		}
