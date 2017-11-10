@@ -15,6 +15,32 @@
 namespace
 {
 #ifndef NDEBUG
+	void print_supported_formats(VkPhysicalDevice device)
+	{
+		static const std::vector<std::pair<VkFormat, std::string_view>> formats
+		{
+			{VK_FORMAT_R8_UNORM, "VK_FORMAT_R8_UNORM"},
+			{VK_FORMAT_R8G8_UNORM, "VK_FORMAT_R8G8_UNORM"},
+			{VK_FORMAT_R8G8B8_UNORM, "VK_FORMAT_R8G8B8_UNORM"},
+			{VK_FORMAT_B8G8R8_UNORM, "VK_FORMAT_B8G8R8_UNORM"},
+			{VK_FORMAT_R8G8B8A8_UNORM, "VK_FORMAT_R8G8B8A8_UNORM"},
+			{VK_FORMAT_B8G8R8A8_UNORM, "VK_FORMAT_B8G8R8A8_UNORM"},
+			{VK_FORMAT_R16_UNORM, "VK_FORMAT_R16_UNORM"},
+			{VK_FORMAT_R16G16_UNORM, "VK_FORMAT_R16G16_UNORM"},
+			{VK_FORMAT_R16G16B16_UNORM, "VK_FORMAT_R16G16B16_UNORM"},
+			{VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM"},
+		};
+
+		std::cerr << "Vulkan texture formats supported:\n";
+		for (const auto& format : formats)
+		{
+			VkFormatProperties properties;
+			vkGetPhysicalDeviceFormatProperties(device, format.first, &properties);
+			std::cerr << '\t' << (properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT ? '+' : '-') << ' ' << format.second << " (" << format.first << ")\n";
+		}
+		std::cerr << '\n';
+	}
+
 	VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_report_callback(VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* layer_prefix, const char* message, void*)
 	{
 		std::cerr << '[' << layer_prefix << "] " << message << '\n';
@@ -34,9 +60,10 @@ namespace Yttrium
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&layer_count, nullptr));
 		std::vector<VkLayerProperties> available_layers(layer_count);
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data()));
-		std::cerr << "Vulkan layers:\n";
+		std::cerr << "Vulkan layers available:\n";
 		for (const auto& layer : available_layers)
-			std::cerr << "\t" << layer.layerName << " - " << layer.description << '\n';
+			std::cerr << '\t' << layer.layerName << " - " << layer.description << '\n';
+		std::cerr << '\n';
 #endif
 
 		VkApplicationInfo application_info = {};
@@ -86,7 +113,7 @@ namespace Yttrium
 			VkDebugReportCallbackCreateInfoEXT drc_info;
 			drc_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
 			drc_info.pNext = nullptr;
-			drc_info.flags = VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+			drc_info.flags = VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT;
 			drc_info.pfnCallback = vulkan_debug_report_callback;
 			drc_info.pUserData = nullptr;
 
@@ -160,6 +187,10 @@ namespace Yttrium
 
 		vkGetPhysicalDeviceFeatures(_handle, &_features);
 		vkGetPhysicalDeviceMemoryProperties(_handle, &_memory_properties);
+
+#ifndef NDEBUG
+		::print_supported_formats(_handle);
+#endif
 	}
 
 	VkCompositeAlphaFlagBitsKHR VK_PhysicalDevice::composite_alpha() const noexcept
