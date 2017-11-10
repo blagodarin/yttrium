@@ -63,7 +63,7 @@ script:
 
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TOOLS=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
-  - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_TESTS=ON -DY_RENDERER=$RENDERER
+  - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_TESTS=ON -DY_RENDERER=$RENDERER -DY_SANITIZERS=ON
   - cmake --build . -- -j2
   - cmake --build . --target check
 
