@@ -1,14 +1,12 @@
 #include <yttrium/image.h>
 
-#include <stdexcept>
+#include <cstring>
 
 namespace Yttrium
 {
 	Image to_bgra(const Image& input)
 	{
 		const auto input_format = input.format();
-		if (input_format.pixel_format() == PixelFormat::Bgra32)
-			return Image{input_format, input.data()};
 
 		Image output{{input_format.size(), PixelFormat::Bgra32, input_format.orientation()}};
 
@@ -35,7 +33,7 @@ namespace Yttrium
 				src += src_row_size;
 				dst += dst_row_size;
 			}
-			return output;
+			break;
 
 		case PixelFormat::GrayAlpha16:
 			for (auto y = output.format().height(); y > 0; --y)
@@ -50,7 +48,7 @@ namespace Yttrium
 				src += src_row_size;
 				dst += dst_row_size;
 			}
-			return output;
+			break;
 
 		case PixelFormat::Rgb24:
 			for (auto y = output.format().height(); y > 0; --y)
@@ -65,7 +63,7 @@ namespace Yttrium
 				src += src_row_size;
 				dst += dst_row_size;
 			}
-			return output;
+			break;
 
 		case PixelFormat::Bgr24:
 			for (auto y = output.format().height(); y > 0; --y)
@@ -80,7 +78,7 @@ namespace Yttrium
 				src += src_row_size;
 				dst += dst_row_size;
 			}
-			return output;
+			break;
 
 		case PixelFormat::Rgba32:
 			for (auto y = output.format().height(); y > 0; --y)
@@ -95,11 +93,14 @@ namespace Yttrium
 				src += src_row_size;
 				dst += dst_row_size;
 			}
-			return output;
+			break;
 
-		default:
-			throw std::logic_error{"Bad image format for BGRA conversion"};
+		case PixelFormat::Bgra32:
+			std::memcpy(dst, src, input_format.frame_size());
+			break;
 		}
+
+		return output;
 	}
 
 	std::optional<Image> intensity_to_bgra(const Image& input)
