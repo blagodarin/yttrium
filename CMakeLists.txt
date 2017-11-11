@@ -52,6 +52,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(-Wold-style-cast -Wsign-conversion)
 	else()
 		add_compile_options(-Wno-sign-compare)
+		set(LINKER_FLAGS "${LINKER_FLAGS} -fuse-ld=gold")
 	endif()
 
 	option(COVERAGE "Build with coverage analysis support" OFF)
