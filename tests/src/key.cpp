@@ -1,8 +1,8 @@
-#include "../src/gui/key_lookup.h"
+#include "../../src/gui/key_lookup.h"
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/gui/key_lookup.cpp"
+#include "../../src/gui/key_lookup.cpp"
 
 BOOST_AUTO_TEST_CASE(key_event)
 {

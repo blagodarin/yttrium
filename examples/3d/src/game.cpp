@@ -1,6 +1,6 @@
 #include "game.h"
 
-#include "../utils.h"
+#include "../../utils.h"
 
 #include <yttrium/image.h>
 #include <yttrium/key.h>

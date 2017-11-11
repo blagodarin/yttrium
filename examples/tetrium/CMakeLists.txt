@@ -18,13 +18,13 @@ add_dependencies(tetrium_package tetrium_localization)
 # Executable.
 add_executable(tetrium WIN32
 	../utils.h
-	graphics.cpp
-	graphics.h
-	logic.cpp
-	logic.h
-	main.cpp
-	statistics.cpp
-	statistics.h
+	src/graphics.cpp
+	src/graphics.h
+	src/logic.cpp
+	src/logic.h
+	src/main.cpp
+	src/statistics.cpp
+	src/statistics.h
 	)
 target_link_libraries(tetrium yttrium)
 if(WIN32)

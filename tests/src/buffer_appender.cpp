@@ -1,5 +1,5 @@
 #include <yttrium/memory/buffer_appender.h>
-#include "../src/utils/fourcc.h"
+#include "../../src/utils/fourcc.h"
 
 #include <boost/test/unit_test.hpp>
 

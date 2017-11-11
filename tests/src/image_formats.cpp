@@ -2,7 +2,7 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../src/config.h"
+#include "../../src/config.h"
 #include "image.h"
 #include "iostream.h"
 
@@ -16,7 +16,7 @@ using Yttrium::TemporaryFile;
 
 BOOST_AUTO_TEST_CASE(test_dds_reading)
 {
-	const auto image = Image::load(*Source::from("tests/image/gradient32.dds"));
+	const auto image = Image::load(*Source::from("tests/data/gradient32.dds"));
 	BOOST_REQUIRE(image);
 	BOOST_CHECK(*image == ::make_test_image(true));
 }
@@ -24,11 +24,11 @@ BOOST_AUTO_TEST_CASE(test_dds_reading)
 #ifndef Y_NO_JPEG
 BOOST_AUTO_TEST_CASE(test_jpeg_reading)
 {
-	const auto jpeg_image = Image::load(*Source::from("tests/image/gradient24.jpeg"));
+	const auto jpeg_image = Image::load(*Source::from("tests/data/gradient24.jpeg"));
 	BOOST_REQUIRE(jpeg_image);
 	BOOST_REQUIRE(jpeg_image->format().pixel_format() == PixelFormat::Rgb24);
 
-	auto tga_image = Image::load(*Source::from("tests/image/gradient24.jpeg.tga"));
+	auto tga_image = Image::load(*Source::from("tests/data/gradient24.jpeg.tga"));
 	BOOST_REQUIRE(tga_image);
 	BOOST_REQUIRE(tga_image->format().pixel_format() == PixelFormat::Bgr24);
 	BOOST_REQUIRE(tga_image->swap_channels());
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(test_png_writing)
 {
 	TemporaryFile file;
 	BOOST_REQUIRE(::make_test_image(false).save(file.name(), ImageType::Png));
-	const auto expected = Source::from("tests/image/gradient24.png")->to_buffer();
+	const auto expected = Source::from("tests/data/gradient24.png")->to_buffer();
 	const auto actual = Source::from(file)->to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_png_writing)
 
 BOOST_AUTO_TEST_CASE(test_tga_reading)
 {
-	const auto image = Image::load(*Source::from("tests/image/gradient32.tga"));
+	const auto image = Image::load(*Source::from("tests/data/gradient32.tga"));
 	BOOST_REQUIRE(image);
 	BOOST_CHECK(*image == ::make_test_image(true));
 }
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(test_tga_writing)
 {
 	TemporaryFile file;
 	BOOST_REQUIRE(::make_test_image(true).save(file.name(), ImageType::Tga));
-	const auto expected = Source::from("tests/image/gradient32.tga")->to_buffer();
+	const auto expected = Source::from("tests/data/gradient32.tga")->to_buffer();
 	const auto actual = Source::from(file)->to_buffer();
 	BOOST_CHECK_EQUAL(expected, actual);
 }
