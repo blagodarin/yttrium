@@ -22,6 +22,6 @@ namespace Yttrium
 
 	Image NullRenderer::take_screenshot(const Size& window_size) const
 	{
-		return Image{{window_size, PixelFormat::Rgb, 24, 4, ImageOrientation::XRightYDown}};
+		return Image{{window_size, PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown}};
 	}
 }
