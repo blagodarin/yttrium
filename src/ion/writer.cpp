@@ -33,7 +33,7 @@ namespace Yttrium
 				write(" ");
 			write(name);
 			entry |= AcceptsValues;
-			entry &= ~HasValues;
+			entry &= static_cast<uint8_t>(~HasValues);
 		}
 
 		void add_value(std::string_view value)
@@ -125,7 +125,7 @@ namespace Yttrium
 			if (_pretty && entry & AcceptsValues)
 			{
 				write("\n");
-				entry &= ~AcceptsValues;
+				entry &= static_cast<uint8_t>(~AcceptsValues);
 			}
 		}
 

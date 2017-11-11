@@ -14,9 +14,9 @@ namespace
 {
 	static_assert(2 * sizeof(char) == sizeof(uint16_t));
 
-	constexpr uint16_t make_key(char a, char b)
+	constexpr auto make_key(char a, char b) noexcept
 	{
-		return static_cast<unsigned char>(a) + (uint16_t{ static_cast<unsigned char>(b) } << 8);
+		return static_cast<uint16_t>(static_cast<unsigned char>(a) + (static_cast<unsigned char>(b) << 8));
 	}
 }
 
@@ -33,7 +33,7 @@ namespace Yttrium
 
 			auto current_x = top_left.x;
 			const auto current_y = top_left.y;
-			const auto scaling = font_size / _size;
+			const auto scaling = font_size / static_cast<float>(_size);
 
 			float selection_left = 0;
 			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](size_t index)
@@ -71,14 +71,14 @@ namespace Yttrium
 				{
 					rects.emplace_back(
 						RectF(
-							{ current_x + info->second.offset._x * scaling, current_y + info->second.offset._y * scaling },
+							{ current_x + static_cast<float>(info->second.offset._x) * scaling, current_y + static_cast<float>(info->second.offset._y) * scaling },
 							SizeF(info->second.rect.size()) * scaling
 						),
 						RectF(info->second.rect)
 					);
 					do_capture(i);
 					const auto kerning = _kernings.find(::make_key(last_symbol, *current_symbol));
-					current_x += (info->second.advance + (kerning != _kernings.end() ? kerning->second : 0)) * scaling;
+					current_x += static_cast<float>(info->second.advance + (kerning != _kernings.end() ? kerning->second : 0)) * scaling;
 				}
 				last_symbol = *current_symbol;
 			}
@@ -108,7 +108,7 @@ namespace Yttrium
 
 		SizeF text_size(std::string_view text, const SizeF& font_size) const override
 		{
-			const auto& size = text_size(text);
+			const SizeF size{text_size(text)};
 			return {font_size._width * (size._width * font_size._height / size._height), font_size._height};
 		}
 

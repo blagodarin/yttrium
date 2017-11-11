@@ -128,7 +128,7 @@ namespace Yttrium
 		const auto d = [this](std::size_t i)
 		{
 			const auto c = _text[i];
-			return c < 'a' ? c - '0' : c - 'a' + 10;
+			return static_cast<float>(c < 'a' ? c - '0' : c - 'a' + 10);
 		};
 
 		switch (_text.size())

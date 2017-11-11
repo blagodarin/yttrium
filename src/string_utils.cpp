@@ -133,14 +133,14 @@ namespace
 
 		T result = 0;
 		for (; p != end && *p >= '0' && *p <= '9'; ++p)
-			result = result * 10 + (*p - '0');
+			result = result * 10 + static_cast<T>(*p - '0');
 
 		if (p != end && *p == '.')
 		{
 			T factor = 1;
 			for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
 			{
-				result = result * 10 + (*p - '0');
+				result = result * 10 + static_cast<T>(*p - '0');
 				factor *= 10;
 			}
 
@@ -160,7 +160,7 @@ namespace
 
 			T power = 0;
 			for (; p != end && *p >= '0' && *p <= '9'; ++p)
-				power = power * 10 + (*p - '0');
+				power = power * 10 + static_cast<T>(*p - '0');
 
 			result *= std::pow(T{10}, negative_power ? -power : power);
 		}
@@ -187,7 +187,7 @@ namespace
 		T result = 0;
 		do
 		{
-			result = result * 10 + (*p++ - '0');
+			result = result * 10 + static_cast<T>(*p++ - '0');
 		} while (p != end && *p >= '0' && *p <= '9');
 
 		if (p != end && *p == '.')
@@ -200,7 +200,7 @@ namespace
 			T factor = 1;
 			do
 			{
-				result = result * 10 + (*p++ - '0');
+				result = result * 10 + static_cast<T>(*p++ - '0');
 				factor *= 10;
 			} while (p != end && *p >= '0' && *p <= '9');
 
@@ -225,7 +225,7 @@ namespace
 			T power = 0;
 			do
 			{
-				power = power * 10 + (*p++ - '0');
+				power = power * 10 + static_cast<T>(*p++ - '0');
 			} while (p != end && *p >= '0' && *p <= '9');
 
 			result *= std::pow(T{10}, negative_power ? -power : power);
@@ -250,7 +250,7 @@ namespace Yttrium
 			auto i = buffer.size();
 			do
 			{
-				buffer[--i] = uvalue % 10 + '0';
+				buffer[--i] = static_cast<char>(uvalue % 10 + static_cast<unsigned char>('0'));
 				uvalue /= 10;
 			} while (uvalue);
 			if (value < 0)
@@ -264,7 +264,7 @@ namespace Yttrium
 			auto i = buffer.size();
 			do
 			{
-				buffer[--i] = value % 10 + '0';
+				buffer[--i] = static_cast<char>(value % 10 + static_cast<unsigned char>('0'));
 				value /= 10;
 			} while (value > 0);
 			string.append(&buffer[i], buffer.size() - i);

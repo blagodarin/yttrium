@@ -11,14 +11,14 @@ namespace
 {
 	struct Rgb
 	{
-		uint8_t r = 0;
-		uint8_t g = 0;
-		uint8_t b = 0;
+		uint8_t _r = 0;
+		uint8_t _g = 0;
+		uint8_t _b = 0;
 
-		Rgb(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
+		Rgb(uint8_t r, uint8_t g, uint8_t b) noexcept : _r{r}, _g{g}, _b{b} {}
 	};
 
-	const std::array<int, 24> weights =
+	const std::array<int, 24> weights
 	{
 		2, 2, 2, // Gray.
 		1, 0, 0, // Red.
@@ -32,7 +32,7 @@ namespace
 
 	enum { TopLeft, Top, TopRight, Left, Center, Right, BottomLeft, Bottom, BottomRight };
 
-	const std::array<int, 9> pattern =
+	const std::array<int, 9> pattern
 	{
 		0, 0, 3,
 		1, 2, 3,
@@ -40,10 +40,10 @@ namespace
 	};
 
 	static constexpr auto FragmentSize = 32u;
-	static constexpr auto FragmentCount = 8;
+	static constexpr auto FragmentCount = 8u;
 	static constexpr auto Border = 3;
 
-	const SizeF BlockSize(FragmentSize - 2, FragmentSize - 2);
+	const SizeF BlockSize{FragmentSize - 2, FragmentSize - 2};
 
 	Rgb pixel_color(size_t block, size_t x, size_t y)
 	{
@@ -76,25 +76,25 @@ namespace
 		const auto scale = [block, base, offset](size_t index)
 		{
 			const auto weight = weights[block * 3 + index];
-			return weight ? base / weight - offset : 0;
+			return static_cast<uint8_t>(weight ? base / weight - offset : 0);
 		};
-		return Rgb(scale(0), scale(1), scale(2));
+		return Rgb{scale(0), scale(1), scale(2)};
 	}
 
 	Image make_blocks_image()
 	{
-		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra32 });
+		Image image({FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra32});
 		for (size_t i = 0; i < FragmentCount; ++i)
 		{
 			for (size_t y = 0; y < FragmentSize; ++y)
 			{
 				for (size_t x = 0; x < FragmentSize; ++x)
 				{
-					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.format().row_size() + x * 4;
+					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + static_cast<size_t>(y)) * image.format().row_size() + x * 4;
 					const auto color = ::pixel_color(i, x, y);
-					pixel[0] = color.b;
-					pixel[1] = color.g;
-					pixel[2] = color.r;
+					pixel[0] = color._b;
+					pixel[1] = color._g;
+					pixel[2] = color._r;
 					pixel[3] = 0xff;
 				}
 			}
@@ -102,9 +102,9 @@ namespace
 		return image;
 	}
 
-	RectF block_rect(size_t index)
+	RectF block_rect(int index)
 	{
-		return {Vector2(1, index * FragmentSize + 1), SizeF(FragmentSize - 2, FragmentSize - 2)};
+		return {{1, static_cast<float>(index) * FragmentSize + 1.f}, SizeF{FragmentSize - 2, FragmentSize - 2}};
 	}
 }
 
@@ -164,7 +164,7 @@ void TetriumGraphics::draw_field_figure(const RectF& rect, const SizeF& block_si
 	set_texture_rect(figure.type());
 	for (const auto& block : figure.blocks())
 		if (block.y < Tetrium::Field::Height * Tetrium::PointsPerRow)
-			draw_block(rect, block_size, frame_offset.x + block.x, frame_offset.y - static_cast<float>(block.y) / Tetrium::PointsPerRow);
+			draw_block(rect, block_size, frame_offset.x + static_cast<float>(block.x), frame_offset.y - static_cast<float>(block.y) / Tetrium::PointsPerRow);
 }
 
 void TetriumGraphics::draw_field_frame(const RectF& rect, const SizeF& block_size) const
@@ -185,6 +185,6 @@ void TetriumGraphics::draw_field_frame(const RectF& rect, const SizeF& block_siz
 
 void TetriumGraphics::set_texture_rect(Tetrium::Figure::Type figure_type) const
 {
-	const auto figure_index = (figure_type == Tetrium::Figure::None) ? 0 : static_cast<size_t>(figure_type) + 1;
+	const auto figure_index = (figure_type == Tetrium::Figure::None) ? 0 : static_cast<int>(figure_type) + 1;
 	_renderer.set_texture_rect(::block_rect(figure_index), {});
 }

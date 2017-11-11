@@ -42,7 +42,7 @@ namespace Yttrium
 		std::shared_ptr<const Texture2D> texture;
 		Texture2D::Filter texture_filter = Texture2D::TrilinearFilter;
 		RectF texture_rect;
-		Margins borders;
+		MarginsF borders;
 
 		BackgroundProperty() = default;
 

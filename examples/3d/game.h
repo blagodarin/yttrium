@@ -48,7 +48,7 @@ private:
 
 	Line3 _cursor_ray{{0, 0, 0}, {0, 0, 0}};
 	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
-	std::optional<Point> _board_point;
+	std::optional<Vector2> _board_point;
 	std::optional<Quad> _visibility_quad;
 
 	std::unique_ptr<MinimapCanvas> _minimap_canvas;

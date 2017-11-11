@@ -9,7 +9,7 @@ namespace Yttrium
 		_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		_attributes.reserve(vas.size());
-		for (size_t i = 0; i < vas.size(); ++i)
+		for (uint32_t i = 0; i < vas.size(); ++i)
 		{
 			auto& attribute = _attributes.emplace_back();
 			attribute.location = i;
@@ -19,19 +19,19 @@ namespace Yttrium
 			{
 			case VA::f:
 				attribute.format = VK_FORMAT_R32_SFLOAT;
-				_binding.stride += sizeof(float);
+				_binding.stride += uint32_t{sizeof(float)};
 				break;
 			case VA::f2:
 				attribute.format = VK_FORMAT_R32G32_SFLOAT;
-				_binding.stride += sizeof(float) * 2;
+				_binding.stride += uint32_t{sizeof(float) * 2};
 				break;
 			case VA::f3:
 				attribute.format = VK_FORMAT_R32G32B32_SFLOAT;
-				_binding.stride += sizeof(float) * 3;
+				_binding.stride += uint32_t{sizeof(float) * 3};
 				break;
 			case VA::f4:
 				attribute.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-				_binding.stride += sizeof(float) * 4;
+				_binding.stride += uint32_t{sizeof(float) * 4};
 				break;
 			}
 		}
@@ -41,7 +41,7 @@ namespace Yttrium
 		_input.flags = 0;
 		_input.vertexBindingDescriptionCount = 1;
 		_input.pVertexBindingDescriptions = &_binding;
-		_input.vertexAttributeDescriptionCount = _attributes.size();
+		_input.vertexAttributeDescriptionCount = static_cast<uint32_t>(_attributes.size());
 		_input.pVertexAttributeDescriptions = _attributes.data();
 
 		_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

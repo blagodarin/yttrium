@@ -70,18 +70,18 @@ BOOST_AUTO_TEST_CASE(test_string_to_int)
 	// Invalid.
 	BOOST_CHECK_EQUAL(to_int(""), 0);
 	BOOST_CHECK_EQUAL(to_int32(""), 0);
-	BOOST_CHECK_EQUAL(to_uint32(""), 0);
-	BOOST_CHECK_EQUAL(to_uint32("-1"), 0);
+	BOOST_CHECK_EQUAL(to_uint32(""), 0u);
+	BOOST_CHECK_EQUAL(to_uint32("-1"), 0u);
 	BOOST_CHECK_EQUAL(to_int64(""), 0);
-	BOOST_CHECK_EQUAL(to_uint64(""), 0);
-	BOOST_CHECK_EQUAL(to_uint64("-1"), 0);
+	BOOST_CHECK_EQUAL(to_uint64(""), 0u);
+	BOOST_CHECK_EQUAL(to_uint64("-1"), 0u);
 
 	// Minimum.
 	BOOST_CHECK_EQUAL(to_int(std::to_string(std::numeric_limits<int>::min())), std::numeric_limits<int>::min());
 	BOOST_CHECK_EQUAL(to_int32("-2147483648"), -2147483647 - 1);
-	BOOST_CHECK_EQUAL(to_uint32("0"), 0);
+	BOOST_CHECK_EQUAL(to_uint32("0"), 0u);
 	BOOST_CHECK_EQUAL(to_int64("-9223372036854775808"), -INT64_C(9223372036854775807) - 1);
-	BOOST_CHECK_EQUAL(to_uint64("0"), 0);
+	BOOST_CHECK_EQUAL(to_uint64("0"), 0u);
 
 	// Maximum.
 	BOOST_CHECK_EQUAL(to_int(std::to_string(std::numeric_limits<int>::max())), std::numeric_limits<int>::max());
@@ -97,12 +97,12 @@ BOOST_AUTO_TEST_CASE(test_string_to_int)
 	// Overflow.
 	BOOST_CHECK_EQUAL(to_int32("2147483648"), -2147483647 - 1);
 	BOOST_CHECK_EQUAL(to_int32("2147483649"), -2147483647);
-	BOOST_CHECK_EQUAL(to_uint32("4294967296"), 0);
-	BOOST_CHECK_EQUAL(to_uint32("4294967297"), 1);
+	BOOST_CHECK_EQUAL(to_uint32("4294967296"), 0u);
+	BOOST_CHECK_EQUAL(to_uint32("4294967297"), 1u);
 	BOOST_CHECK_EQUAL(to_int64("9223372036854775808"), -INT64_C(9223372036854775807) - 1);
 	BOOST_CHECK_EQUAL(to_int64("9223372036854775809"), -INT64_C(9223372036854775807));
-	BOOST_CHECK_EQUAL(to_uint64("18446744073709551616"), 0);
-	BOOST_CHECK_EQUAL(to_uint64("18446744073709551617"), 1);
+	BOOST_CHECK_EQUAL(to_uint64("18446744073709551616"), 0u);
+	BOOST_CHECK_EQUAL(to_uint64("18446744073709551617"), 1u);
 
 	// Underflow.
 	BOOST_CHECK_EQUAL(to_int32("-2147483649"), 2147483647);
@@ -184,10 +184,10 @@ BOOST_AUTO_TEST_CASE(test_string_to_number_uint32)
 	BOOST_CHECK_EQUAL(u, 0);
 
 	BOOST_CHECK(to_number("4294967295", u));
-	BOOST_CHECK_EQUAL(u, 4294967295);
+	BOOST_CHECK_EQUAL(u, 4294967295u);
 
 	BOOST_CHECK(to_number("+4294967295", u));
-	BOOST_CHECK_EQUAL(u, 4294967295);
+	BOOST_CHECK_EQUAL(u, 4294967295u);
 
 	BOOST_CHECK(!to_number("4294967296", u));
 	BOOST_CHECK(!to_number("+4294967296", u));

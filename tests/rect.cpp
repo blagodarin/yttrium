@@ -265,47 +265,47 @@ BOOST_AUTO_TEST_CASE(rectf_construction)
 {
 	{
 		RectF r;
-		BOOST_CHECK_EQUAL(r.left(), 0);
-		BOOST_CHECK_EQUAL(r.top(), 0);
-		BOOST_CHECK_EQUAL(r.right(), 0);
-		BOOST_CHECK_EQUAL(r.bottom(), 0);
-		BOOST_CHECK_EQUAL(r.width(), 0);
-		BOOST_CHECK_EQUAL(r.height(), 0);
+		BOOST_CHECK_EQUAL(r.left(), 0.f);
+		BOOST_CHECK_EQUAL(r.top(), 0.f);
+		BOOST_CHECK_EQUAL(r.right(), 0.f);
+		BOOST_CHECK_EQUAL(r.bottom(), 0.f);
+		BOOST_CHECK_EQUAL(r.width(), 0.f);
+		BOOST_CHECK_EQUAL(r.height(), 0.f);
 	}
 	{
 		RectF r{{1, 2}, Vector2{4, 7}};
-		BOOST_CHECK_EQUAL(r.left(), 1);
-		BOOST_CHECK_EQUAL(r.top(), 2);
-		BOOST_CHECK_EQUAL(r.right(), 4);
-		BOOST_CHECK_EQUAL(r.bottom(), 7);
-		BOOST_CHECK_EQUAL(r.width(), 3);
-		BOOST_CHECK_EQUAL(r.height(), 5);
+		BOOST_CHECK_EQUAL(r.left(), 1.f);
+		BOOST_CHECK_EQUAL(r.top(), 2.f);
+		BOOST_CHECK_EQUAL(r.right(), 4.f);
+		BOOST_CHECK_EQUAL(r.bottom(), 7.f);
+		BOOST_CHECK_EQUAL(r.width(), 3.f);
+		BOOST_CHECK_EQUAL(r.height(), 5.f);
 	}
 	{
 		RectF r{{1, 2}, SizeF{3, 5}};
-		BOOST_CHECK_EQUAL(r.left(), 1);
-		BOOST_CHECK_EQUAL(r.top(), 2);
-		BOOST_CHECK_EQUAL(r.right(), 4);
-		BOOST_CHECK_EQUAL(r.bottom(), 7);
-		BOOST_CHECK_EQUAL(r.width(), 3);
-		BOOST_CHECK_EQUAL(r.height(), 5);
+		BOOST_CHECK_EQUAL(r.left(), 1.f);
+		BOOST_CHECK_EQUAL(r.top(), 2.f);
+		BOOST_CHECK_EQUAL(r.right(), 4.f);
+		BOOST_CHECK_EQUAL(r.bottom(), 7.f);
+		BOOST_CHECK_EQUAL(r.width(), 3.f);
+		BOOST_CHECK_EQUAL(r.height(), 5.f);
 	}
 	{
 		RectF r{SizeF{1, 2}};
-		BOOST_CHECK_EQUAL(r.left(), 0);
-		BOOST_CHECK_EQUAL(r.top(), 0);
-		BOOST_CHECK_EQUAL(r.right(), 1);
-		BOOST_CHECK_EQUAL(r.bottom(), 2);
-		BOOST_CHECK_EQUAL(r.width(), 1);
-		BOOST_CHECK_EQUAL(r.height(), 2);
+		BOOST_CHECK_EQUAL(r.left(), 0.f);
+		BOOST_CHECK_EQUAL(r.top(), 0.f);
+		BOOST_CHECK_EQUAL(r.right(), 1.f);
+		BOOST_CHECK_EQUAL(r.bottom(), 2.f);
+		BOOST_CHECK_EQUAL(r.width(), 1.f);
+		BOOST_CHECK_EQUAL(r.height(), 2.f);
 	}
 	{
 		RectF r{Rect{{1, 2}, Point{4, 7}}};
-		BOOST_CHECK_EQUAL(r.left(), 1);
-		BOOST_CHECK_EQUAL(r.top(), 2);
-		BOOST_CHECK_EQUAL(r.right(), 4);
-		BOOST_CHECK_EQUAL(r.bottom(), 7);
-		BOOST_CHECK_EQUAL(r.width(), 3);
-		BOOST_CHECK_EQUAL(r.height(), 5);
+		BOOST_CHECK_EQUAL(r.left(), 1.f);
+		BOOST_CHECK_EQUAL(r.top(), 2.f);
+		BOOST_CHECK_EQUAL(r.right(), 4.f);
+		BOOST_CHECK_EQUAL(r.bottom(), 7.f);
+		BOOST_CHECK_EQUAL(r.width(), 3.f);
+		BOOST_CHECK_EQUAL(r.height(), 5.f);
 	}
 }

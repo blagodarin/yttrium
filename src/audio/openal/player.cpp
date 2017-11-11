@@ -14,7 +14,7 @@ namespace Yttrium
 
 	void OpenALPlayer::fill_buffer(size_t index, void* data, size_t size)
 	{
-		::alBufferData(_buffers[index], _format._format, data, size, _format._frequency);
+		::alBufferData(_buffers[index], _format._format, data, static_cast<ALsizei>(size), _format._frequency);
 		::alSourceQueueBuffers(_source, 1, &_buffers[index]);
 	}
 
@@ -29,7 +29,7 @@ namespace Yttrium
 	{
 		ALuint buffer = 0;
 		::alSourceUnqueueBuffers(_source, 1, &buffer);
-		::alBufferData(buffer, _format._format, data, size, _format._frequency);
+		::alBufferData(buffer, _format._format, data, static_cast<ALsizei>(size), _format._frequency);
 		::alSourceQueueBuffers(_source, 1, &buffer);
 	}
 

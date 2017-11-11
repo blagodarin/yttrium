@@ -98,9 +98,9 @@ namespace Yttrium
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
 		create_info.pApplicationInfo = &application_info;
-		create_info.enabledLayerCount = layers.size();
+		create_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
 		create_info.ppEnabledLayerNames = layers.begin();
-		create_info.enabledExtensionCount = extensions.size();
+		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		create_info.ppEnabledExtensionNames = extensions.begin();
 
 		_instance.create(create_info);
@@ -268,7 +268,7 @@ namespace Yttrium
 		create_info.pQueueCreateInfos = &queue_create_info;
 		create_info.enabledLayerCount = 0;
 		create_info.ppEnabledLayerNames = nullptr;
-		create_info.enabledExtensionCount = extensions.size();
+		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		create_info.ppEnabledExtensionNames = extensions.begin();
 		create_info.pEnabledFeatures = nullptr;
 
@@ -644,13 +644,13 @@ namespace Yttrium
 		: _device{device}
 	{
 		for (auto& binding : bindings)
-			binding.binding = &binding - bindings.data();
+			binding.binding = static_cast<uint32_t>(&binding - bindings.data());
 
 		VkDescriptorSetLayoutCreateInfo create_info = {};
 		create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
-		create_info.bindingCount = bindings.size();
+		create_info.bindingCount = static_cast<uint32_t>(bindings.size());
 		create_info.pBindings = bindings.data();
 		CHECK(vkCreateDescriptorSetLayout(_device._handle, &create_info, nullptr, &_handle));
 	}
@@ -665,7 +665,7 @@ namespace Yttrium
 		create_info.pNext = nullptr;
 		create_info.flags = flags;
 		create_info.maxSets = max_sets;
-		create_info.poolSizeCount = sizes.size();
+		create_info.poolSizeCount = static_cast<uint32_t>(sizes.size());
 		create_info.pPoolSizes = sizes.begin();
 
 		CHECK(vkCreateDescriptorPool(_device._handle, &create_info, nullptr, &_handle));
@@ -729,7 +729,7 @@ namespace Yttrium
 		create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
-		create_info.setLayoutCount = set_layouts.size();
+		create_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
 		create_info.pSetLayouts = set_layouts.begin();
 		create_info.pushConstantRangeCount = 0;
 		create_info.pPushConstantRanges = nullptr;
@@ -844,7 +844,7 @@ namespace Yttrium
 		create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
-		create_info.stageCount = shader_stages.size();
+		create_info.stageCount = static_cast<uint32_t>(shader_stages.size());
 		create_info.pStages = shader_stages.data();
 		create_info.pVertexInputState = &vertex_format._input;
 		create_info.pInputAssemblyState = &vertex_format._assembly;

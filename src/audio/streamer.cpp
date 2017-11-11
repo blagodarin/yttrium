@@ -47,15 +47,15 @@ namespace Yttrium
 		{
 			// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
 
-			_start_sample = static_cast<uint64_t>(settings.start * format.samples_per_second());
-			_end_sample = static_cast<uint64_t>(settings.end * format.samples_per_second());
+			_start_sample = static_cast<uint64_t>(settings.start * static_cast<double>(format.samples_per_second()));
+			_end_sample = static_cast<uint64_t>(settings.end * static_cast<double>(format.samples_per_second()));
 
 			if (_end_sample == 0 || _end_sample > total_samples)
 				_end_sample = total_samples;
 
 			if (_start_sample < _end_sample && _end_sample - _start_sample >= _buffer_samples)
 			{
-				_loop_sample = static_cast<uint64_t>(settings.loop * format.samples_per_second());
+				_loop_sample = static_cast<uint64_t>(settings.loop * static_cast<double>(format.samples_per_second()));
 				_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_samples);
 				_backend.set_format(format);
 				_block_size = format.block_size();

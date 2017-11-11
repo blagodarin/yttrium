@@ -62,9 +62,9 @@ namespace Yttrium
 			};
 		}
 
-		static Matrix4 perspective(const Size& size, float vertical_fov, float near, float far) noexcept
+		static Matrix4 perspective(const SizeF& size, float vertical_fov, float near, float far) noexcept
 		{
-			const auto aspect = static_cast<float>(size._width) / static_cast<float>(size._height);
+			const auto aspect = size._width / size._height;
 			const auto f = 1 / static_cast<float>(std::tan(vertical_fov / 360 * M_PI));
 			const auto xx = f / aspect;
 			const auto yy = f;
@@ -80,10 +80,10 @@ namespace Yttrium
 			};
 		}
 
-		static constexpr Matrix4 projection_2d(const Size& size, float near = -1.f, float far = 1.f) noexcept
+		static constexpr Matrix4 projection_2d(const SizeF& size, float near = -1.f, float far = 1.f) noexcept
 		{
-			const auto xx = 2.f / size._width;
-			const auto yy = -2.f / size._height;
+			const auto xx = 2 / size._width;
+			const auto yy = -2 / size._height;
 			const auto zz = -2 / (far - near);
 			const auto tx = -1.f;
 			const auto ty = 1.f;

@@ -12,7 +12,7 @@ namespace
 
 	auto make_atom(xcb_connection_t* connection, bool only_if_exists, std::string_view name)
 	{
-		return P_Atom{::xcb_intern_atom_reply(connection, ::xcb_intern_atom(connection, only_if_exists, name.size(), name.data()), nullptr)};
+		return P_Atom{::xcb_intern_atom_reply(connection, ::xcb_intern_atom(connection, only_if_exists, static_cast<uint16_t>(name.size()), name.data()), nullptr)};
 	}
 
 	Key make_key(xcb_keycode_t keycode)
@@ -190,7 +190,7 @@ namespace Yttrium
 		_wm_delete_window = ::make_atom(_connection.get(), false, "WM_DELETE_WINDOW");
 		::xcb_change_property(_connection.get(), XCB_PROP_MODE_REPLACE, _window, _wm_protocols->atom, XCB_ATOM_ATOM, 32, 1, &_wm_delete_window->atom);
 
-		::xcb_change_property(_connection.get(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, name.size(), name.data());
+		::xcb_change_property(_connection.get(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, static_cast<uint32_t>(name.size()), name.data());
 
 		_empty_cursor = std::make_unique<EmptyCursor>(_connection.get(), _window);
 		::xcb_change_window_attributes(_connection.get(), _window, XCB_CW_CURSOR, &_empty_cursor->_cursor);
@@ -300,7 +300,7 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		::xcb_warp_pointer(_connection.get(), XCB_WINDOW_NONE, _window, 0, 0, 0, 0, cursor._x, cursor._y);
+		::xcb_warp_pointer(_connection.get(), XCB_WINDOW_NONE, _window, 0, 0, 0, 0, static_cast<int16_t>(cursor._x), static_cast<int16_t>(cursor._y));
 		::xcb_flush(_connection.get());
 		return true;
 	}

@@ -206,7 +206,7 @@ namespace Yttrium
 			max_frame_time = std::max(max_frame_time, update.milliseconds);
 			if (fps_time >= 1s)
 			{
-				update.fps = frames * 1000 / fps_time.count();
+				update.fps = static_cast<int>(frames * 1000 / fps_time.count());
 				update.max_frame_time = max_frame_time;
 				fps_time = 0ms;
 				frames = 0;

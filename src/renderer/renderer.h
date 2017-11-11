@@ -34,8 +34,8 @@ namespace Yttrium
 		std::unique_ptr<Mesh> load_mesh(const Source&) override;
 		Matrix4 model_matrix() const override;
 		Line3 pixel_ray(const Vector2&) const override;
-		void set_texture_rect(const RectF&, const Margins&) override;
-		Size window_size() const override { return _window_size; }
+		void set_texture_rect(const RectF&, const MarginsF&) override;
+		SizeF window_size() const override { return SizeF{_window_size}; }
 
 	public:
 		struct Statistics

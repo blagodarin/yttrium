@@ -13,8 +13,8 @@ namespace
 {
 	constexpr auto Duration = 1000;
 
-	const auto Granularity = Buffer::memory_granularity();
-	const auto MaxSmallBlock = BufferMemory::MaxSmallBlockSize; // For brevity.
+	const auto Granularity = static_cast<unsigned>(Buffer::memory_granularity());
+	const auto MaxSmallBlock = static_cast<unsigned>(BufferMemory::MaxSmallBlockSize); // For brevity.
 
 	class Measurement
 	{
@@ -24,8 +24,8 @@ namespace
 			unsigned ops = 0;
 			unsigned ms = 0;
 
-			unsigned ns_per_op() const { return ms * 1000000.0 / ops; }
-			unsigned ops_per_second() const { return ops * 1000.0 / ms; }
+			auto ns_per_op() const { return static_cast<unsigned>(ms * 1000000.0 / ops); }
+			auto ops_per_second() const { return static_cast<unsigned>(ops * 1000.0 / ms); }
 		};
 
 		explicit Measurement(Results& results)
@@ -36,7 +36,7 @@ namespace
 		bool next_iteration(unsigned ops)
 		{
 			_results.ops += ops;
-			_results.ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _start).count();
+			_results.ms = static_cast<unsigned>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _start).count());
 			return _results.ms < Duration;
 		}
 
@@ -69,7 +69,7 @@ namespace
 		return stream;
 	}
 
-	std::string human_readable_size(size_t size)
+	std::string human_readable_size(unsigned size)
 	{
 		std::ostringstream stream;
 		if (size < 1024)
@@ -86,11 +86,11 @@ namespace
 
 	struct AllocateSetup : BenchmarkSetup
 	{
-		const size_t size;
+		const unsigned size;
 		const unsigned blocks;
 		const unsigned cycles;
 
-		AllocateSetup(size_t size_, unsigned blocks_, unsigned cycles_)
+		AllocateSetup(unsigned size_, unsigned blocks_, unsigned cycles_)
 			: size(size_)
 			, blocks(blocks_)
 			, cycles(cycles_)
@@ -271,17 +271,16 @@ namespace
 
 	struct ReallocateSetup : BenchmarkSetup
 	{
-		const size_t initial_size;
-		const size_t final_size;
-		const unsigned cycles;
+		const unsigned _initial_size;
+		const unsigned _final_size;
+		const unsigned _cycles;
 
-		ReallocateSetup(size_t initial_size_, size_t final_size_, unsigned cycles_)
-			: initial_size(initial_size_), final_size(final_size_), cycles(cycles_) {}
+		ReallocateSetup(unsigned initial_size, unsigned final_size, unsigned cycles) : _initial_size{initial_size}, _final_size{final_size}, _cycles{cycles} {}
 	};
 
 	std::ostream& operator<<(std::ostream& stream, const ReallocateSetup& setup)
 	{
-		stream << "\n * " << human_readable_size(setup.initial_size) << " - " << human_readable_size(setup.final_size) << ":";
+		stream << "\n * " << human_readable_size(setup._initial_size) << " - " << human_readable_size(setup._final_size) << ":";
 		stream << static_cast<const BenchmarkSetup&>(setup);
 		return stream;
 	}
@@ -300,14 +299,14 @@ namespace
 		Measurement measurement(setup.malloc);
 		do
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
+			for (unsigned i = 0; i < setup._cycles; ++i)
 			{
 				void* allocation = nullptr;
-				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
 					allocation = ::realloc(allocation, size);
 				::free(allocation);
 			}
-		} while (measurement.next_iteration(setup.cycles));
+		} while (measurement.next_iteration(setup._cycles));
 	}
 
 	void buffer_grow(ReallocateSetup& setup)
@@ -315,13 +314,13 @@ namespace
 		Measurement measurement(setup.buffer);
 		do
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
+			for (unsigned i = 0; i < setup._cycles; ++i)
 			{
 				Buffer buffer;
-				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
 					buffer.resize(size);
 			}
-		} while (measurement.next_iteration(setup.cycles));
+		} while (measurement.next_iteration(setup._cycles));
 	}
 
 	ReallocateSetup _grow_touch_setups[] =
@@ -338,10 +337,10 @@ namespace
 		Measurement measurement(setup.malloc);
 		do
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
+			for (unsigned i = 0; i < setup._cycles; ++i)
 			{
 				void* allocation = nullptr;
-				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
 				{
 					allocation = ::realloc(allocation, size);
 					for (auto j = size / 2; j < size; j += Granularity)
@@ -349,7 +348,7 @@ namespace
 				}
 				::free(allocation);
 			}
-		} while (measurement.next_iteration(setup.cycles));
+		} while (measurement.next_iteration(setup._cycles));
 	}
 
 	void buffer_grow_touch(ReallocateSetup& setup)
@@ -357,17 +356,17 @@ namespace
 		Measurement measurement(setup.buffer);
 		do
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
+			for (unsigned i = 0; i < setup._cycles; ++i)
 			{
 				Buffer buffer;
-				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
 				{
 					buffer.resize(size);
 					for (auto j = size / 2; j < size; j += Granularity)
 						buffer[j] = 1;
 				}
 			}
-		} while (measurement.next_iteration(setup.cycles));
+		} while (measurement.next_iteration(setup._cycles));
 	}
 
 	ReallocateSetup _grow_fill_setups[] =
@@ -384,17 +383,17 @@ namespace
 		Measurement measurement(setup.malloc);
 		do
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
+			for (unsigned i = 0; i < setup._cycles; ++i)
 			{
 				void* allocation = nullptr;
-				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
 				{
 					allocation = ::realloc(allocation, size);
 					::memset(static_cast<uint8_t*>(allocation) + size / 2, -1, size - size / 2);
 				}
 				::free(allocation);
 			}
-		} while (measurement.next_iteration(setup.cycles));
+		} while (measurement.next_iteration(setup._cycles));
 	}
 
 	void buffer_grow_fill(ReallocateSetup& setup)
@@ -402,16 +401,16 @@ namespace
 		Measurement measurement(setup.buffer);
 		do
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
+			for (unsigned i = 0; i < setup._cycles; ++i)
 			{
 				Buffer buffer;
-				for (auto size = setup.initial_size; size <= setup.final_size; size *= 2)
+				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
 				{
 					buffer.resize(size);
 					::memset(buffer.begin() + size / 2, -1, size - size / 2);
 				}
 			}
-		} while (measurement.next_iteration(setup.cycles));
+		} while (measurement.next_iteration(setup._cycles));
 	}
 
 	template <typename Setups, typename Setup>

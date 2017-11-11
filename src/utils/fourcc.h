@@ -10,9 +10,7 @@ namespace Yttrium
 	{
 		constexpr uint16_t operator"" _twocc(const char* text, size_t)
 		{
-			return uint16_t{static_cast<unsigned char>(text[0])}
-				| uint16_t{static_cast<unsigned char>(text[1])} << 8
-				;
+			return static_cast<uint16_t>(static_cast<unsigned char>(text[0]) | static_cast<unsigned char>(text[1]) << 8);
 		}
 
 		constexpr uint32_t operator"" _fourcc(const char* text, size_t)

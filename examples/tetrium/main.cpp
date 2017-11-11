@@ -110,7 +110,7 @@ int main(int, char**)
 	window.on_screenshot([](Image&& image){ image.save(::make_screenshot_path()); });
 	window.on_update([&script, &gui, &logic](const UpdateEvent& event)
 	{
-		if (logic.advance(event.milliseconds.count()))
+		if (logic.advance(static_cast<int>(event.milliseconds.count())))
 		{
 			script.set("score", logic.score());
 			script.set("lines", logic.lines());

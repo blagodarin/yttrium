@@ -7,15 +7,18 @@
 
 using namespace Yttrium;
 
-template <typename T>
-void write(Writer& writer, const T& data)
+namespace
 {
-	BOOST_REQUIRE(writer.write_all(&data, sizeof data));
-}
+	template <typename T>
+	void write(Writer& writer, const T& data)
+	{
+		BOOST_REQUIRE(writer.write_all(&data, sizeof data));
+	}
 
-void write(Writer& writer, const std::vector<uint8_t>& data)
-{
-	BOOST_REQUIRE(writer.write_all(data.data(), data.size()));
+	void write(Writer& writer, const std::vector<uint8_t>& data)
+	{
+		BOOST_REQUIRE(writer.write_all(data.data(), data.size()));
+	}
 }
 
 BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)

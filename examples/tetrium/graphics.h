@@ -27,6 +27,7 @@ public:
 
 private:
 	void draw_block(const RectF&, const SizeF& block_size, float x, float y) const;
+	void draw_block(const RectF& rect, const SizeF& block_size, int x, int y) const { draw_block(rect, block_size, static_cast<float>(x), static_cast<float>(y)); }
 	void draw_field_blocks(const RectF&, const SizeF& block_size, const Tetrium::Field&) const;
 	void draw_field_figure(const RectF&, const SizeF& block_size, const Tetrium::Figure&) const;
 	void draw_field_frame(const RectF&, const SizeF& block_size) const;

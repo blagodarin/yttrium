@@ -139,7 +139,7 @@ namespace Yttrium
 		else
 			index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
 
-		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), data._indices.size(), index_format);
+		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), static_cast<GLsizei>(data._indices.size()), index_format);
 	}
 
 	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<Renderer::TextureFlag> flags)
@@ -195,8 +195,8 @@ namespace Yttrium
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
 		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
-		_gl.PixelStorei(GL_PACK_ALIGNMENT, image_format.row_alignment());
-		texture.set_data(0, internal_format, image_format.width(), image_format.height(), data_format, data_type, data);
+		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(image_format.row_alignment()));
+		texture.set_data(0, internal_format, static_cast<GLsizei>(image_format.width()), static_cast<GLsizei>(image_format.height()), data_format, data_type, data);
 		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
 			texture.generate_mipmaps();
@@ -218,7 +218,7 @@ namespace Yttrium
 
 		_gl.Disable(GL_DEPTH_TEST);
 
-		return opengl_mesh._index_buffer_size / 3;
+		return static_cast<size_t>(opengl_mesh._index_buffer_size / 3);
 	}
 
 	void GlRenderer::flush_2d(const Buffer& vertices, const Buffer& indices)
@@ -235,7 +235,7 @@ namespace Yttrium
 
 		_2d_vao.bind();
 		_2d_ibo.bind();
-		_gl.DrawElements(GL_TRIANGLE_STRIP, indices.size() / sizeof(uint16_t), GL_UNSIGNED_SHORT, 0);
+		_gl.DrawElements(GL_TRIANGLE_STRIP, static_cast<GLsizei>(indices.size() / sizeof(uint16_t)), GL_UNSIGNED_SHORT, 0);
 		_2d_ibo.unbind();
 		_2d_vao.unbind();
 	}

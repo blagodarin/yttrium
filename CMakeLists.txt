@@ -21,11 +21,9 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	add_compile_options(
-		-Weverything -Werror
+	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
 		-Wno-c++98-compat-pedantic
-		-Wno-conversion
 		-Wno-double-promotion
 		-Wno-exit-time-destructors
 		-Wno-float-equal
@@ -38,7 +36,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-g -Wall -Werror -Wextra -Wnon-virtual-dtor -Wold-style-cast -Wpedantic -Wshadow -Wsign-conversion -Wno-unknown-pragmas)
+	add_compile_options(-g)
 
 	option(Y_SANITIZERS "Enable sanitizers" OFF)
 	if(Y_SANITIZERS)
@@ -46,23 +44,54 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
 	endif()
 
-	option(Y_TRAVIS "Enable Travis CI workarounds" OFF)
-	if(Y_TRAVIS)
-		add_compile_options(-Wno-old-style-cast -Wno-sign-compare -Wno-sign-conversion)
-		if(Y_SANITIZERS)
-			set(LINKER_FLAGS "${LINKER_FLAGS} -fuse-ld=gold")
-		endif()
-	endif()
-
 	option(Y_COVERAGE "Build with coverage analysis support" OFF)
 	if(Y_COVERAGE)
 		add_compile_options(--coverage -O0)
 		set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
 	endif()
+
+	add_compile_options(-Werror -Wall -Wextra
+		-Wconversion
+		-Wdisabled-optimization
+		#-Wdouble-promotion
+		-Wduplicated-cond
+		-Winline
+		-Wlogical-op
+		-Wmissing-declarations
+		-Wmissing-include-dirs
+		-Wnon-virtual-dtor
+		-Wnull-dereference
+		-Wold-style-cast
+		#-Wpadded
+		-Wpedantic
+		-Wredundant-decls
+		-Wshadow
+		-Wsign-conversion
+		#-Wsuggest-attribute=const -fipa-pure-const
+		-Wsuggest-final-methods
+		-Wsuggest-final-types
+		-Wsuggest-override
+		-Wundef
+		-Wuninitialized
+		-Wunsafe-loop-optimizations
+		#-Wuseless-cast
+		#-Wzero-as-null-pointer-constant
+		-Wno-unknown-pragmas
+		)
+
+	option(Y_TRAVIS "Enable Travis CI workarounds" OFF)
+	if(Y_TRAVIS)
+		add_compile_options(-Wno-missing-declarations -Wno-old-style-cast -Wno-sign-compare -Wno-sign-conversion -Wno-suggest-override -Wno-undef) # Warnings triggered by Boost.
+		if(Y_SANITIZERS)
+			set(LINKER_FLAGS "${LINKER_FLAGS} -fuse-ld=gold")
+		endif()
+	endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	add_compile_options(/EHsc /std:c++latest /W4 /wd4251)
+	add_compile_options(/EHsc /std:c++latest /W4
+		/wd4251 # class '...' needs to have dll-interface to be used by clients of class '...'
+		)
 	add_definitions(/D_USE_MATH_DEFINES)
 endif()
 

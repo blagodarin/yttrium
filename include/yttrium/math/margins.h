@@ -35,8 +35,6 @@ namespace Yttrium
 		constexpr MarginsF(float top, float right, float bottom, float left) noexcept : _top{top}, _right{right}, _bottom{bottom}, _left{left} {}
 		constexpr explicit MarginsF(const Margins& m) noexcept : MarginsF{static_cast<float>(m._top), static_cast<float>(m._right), static_cast<float>(m._bottom), static_cast<float>(m._left)} {}
 	};
-
-	constexpr Size min_size(const Margins& m) noexcept { return {m._left + 1 + m._right, m._top + 1 + m._bottom}; }
 }
 
 #endif

@@ -31,6 +31,7 @@ before_install:
   - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
 
 install:
+  - mkdir ${TRAVIS_BUILD_DIR}/3rdparty/include
   - mkdir ${TRAVIS_BUILD_DIR}/travis
 
   - mkdir ${TRAVIS_BUILD_DIR}/travis/boost && pushd ${TRAVIS_BUILD_DIR}/travis/boost

@@ -16,12 +16,12 @@ namespace Yttrium
 	class GpuProgram;
 	class Image;
 	class Line3;
-	class Margins;
+	class MarginsF;
 	class Matrix4;
 	class Mesh;
 	class Quad;
 	class RectF;
-	class Size;
+	class SizeF;
 	class Source;
 	class Texture2D;
 	class TexturedRect;
@@ -76,10 +76,10 @@ namespace Yttrium
 		virtual Line3 pixel_ray(const Vector2&) const = 0;
 
 		///
-		virtual void set_texture_rect(const RectF&, const Margins&) = 0;
+		virtual void set_texture_rect(const RectF&, const MarginsF&) = 0;
 
 		///
-		virtual Size window_size() const = 0;
+		virtual SizeF window_size() const = 0;
 	};
 }
 

@@ -41,7 +41,7 @@ namespace
 		{
 			if (_index > 0)
 			{
-				_indices << (_index - 1) << (_index);
+				_indices << static_cast<uint16_t>(_index - 1) << (_index);
 				if (_indices.count() & 1)
 					_indices << (_index); // Extra degenerate to ensure correct face vertex ordering.
 			}
@@ -121,7 +121,7 @@ namespace Yttrium
 		vertex.texture = _texture_rect.bottom_right();
 		draw._vertices << vertex;
 
-		draw._indices << draw._index << draw._index + 1 << draw._index + 2 << draw._index + 3;
+		draw._indices << draw._index << static_cast<uint16_t>(draw._index + 1) << static_cast<uint16_t>(draw._index + 2) << static_cast<uint16_t>(draw._index + 3);
 	}
 
 	void RendererImpl::draw_rect(const RectF& rect, const Color4f& color)
@@ -166,13 +166,13 @@ namespace Yttrium
 	Line3 RendererImpl::pixel_ray(const Vector2& v) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
-		const auto xn = (2 * v.x + 1) / _window_size._width - 1;
-		const auto yn = 1 - (2 * v.y + 1) / _window_size._height;
+		const auto xn = (2 * v.x + 1) / static_cast<float>(_window_size._width) - 1;
+		const auto yn = 1 - (2 * v.y + 1) / static_cast<float>(_window_size._height);
 		const auto m = inverse(full_matrix());
 		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
 	}
 
-	void RendererImpl::set_texture_rect(const RectF& rect, const Margins& borders)
+	void RendererImpl::set_texture_rect(const RectF& rect, const MarginsF& borders)
 	{
 		const auto current_texture = current_texture_2d();
 		if (!current_texture)
@@ -181,7 +181,7 @@ namespace Yttrium
 		const SizeF texture_size{current_texture->size()};
 		const Vector2 texture_scale{texture_size._width, texture_size._height};
 		const auto texture_rect_size = _texture_rect.size();
-		const auto minimum = SizeF{min_size(borders)} / texture_scale;
+		const auto minimum = SizeF{borders._left + 1 + borders._right, borders._top + 1 + borders._bottom} / texture_scale;
 		if (texture_rect_size._width < minimum._width || texture_rect_size._height < minimum._height)
 			return;
 
@@ -383,8 +383,8 @@ namespace Yttrium
 
 	void RendererImpl::set_window_size(const Size& size)
 	{
+		_backend->set_window_size(size);
 		_window_size = size;
-		_backend->set_window_size(_window_size);
 	}
 
 	Image RendererImpl::take_screenshot() const
@@ -418,7 +418,7 @@ namespace Yttrium
 
 		if (borders._left > 0)
 		{
-			left_offset = borders._left * current_texture_2d()->size()._width;
+			left_offset = borders._left * static_cast<float>(current_texture_2d()->size()._width);
 
 			vertex.position.x = position.left() + left_offset;
 			vertex.texture.x = texture.left() + borders._left;
@@ -427,7 +427,7 @@ namespace Yttrium
 
 		if (borders._right > 0)
 		{
-			right_offset = borders._right * current_texture_2d()->size()._width;
+			right_offset = borders._right * static_cast<float>(current_texture_2d()->size()._width);
 
 			vertex.position.x = position.right() - right_offset;
 			vertex.texture.x = texture.right() - borders._right;
@@ -440,13 +440,13 @@ namespace Yttrium
 
 		// Top/only part indices.
 
-		const uint16_t row_vertices = draw._vertices.count() - draw._index;
+		const auto row_vertices = static_cast<uint16_t>(draw._vertices.count() - draw._index);
 		for (uint16_t i = 0; i < row_vertices; ++i)
-			draw._indices << (draw._index + i) << (draw._index + i + row_vertices);
+			draw._indices << static_cast<uint16_t>(draw._index + i) << static_cast<uint16_t>(draw._index + i + row_vertices);
 
 		if (borders._top > 0)
 		{
-			float top_offset = borders._top * current_texture_2d()->size()._height;
+			float top_offset = borders._top * static_cast<float>(current_texture_2d()->size()._height);
 
 			// Inner top vertex row.
 
@@ -477,15 +477,15 @@ namespace Yttrium
 
 			// Middle/bottom part indices.
 
-			draw._index += row_vertices;
-			draw._indices << (draw._index + row_vertices - 1) << (draw._index);
+			draw._index = static_cast<uint16_t>(draw._index + row_vertices);
+			draw._indices << static_cast<uint16_t>(draw._index + row_vertices - 1) << (draw._index);
 			for (uint16_t i = 0; i < row_vertices; ++i)
-				draw._indices << (draw._index + i) << (draw._index + i + row_vertices);
+				draw._indices << static_cast<uint16_t>(draw._index + i) << static_cast<uint16_t>(draw._index + i + row_vertices);
 		}
 
 		if (borders._bottom > 0)
 		{
-			float bottom_offset = borders._bottom * current_texture_2d()->size()._height;
+			float bottom_offset = borders._bottom * static_cast<float>(current_texture_2d()->size()._height);
 
 			// Inner bottom vertex row.
 
@@ -516,10 +516,10 @@ namespace Yttrium
 
 			// Bottom part indices.
 
-			draw._index += row_vertices;
-			draw._indices << (draw._index + row_vertices - 1) << (draw._index);
-			for (size_t i = 0; i < row_vertices; ++i)
-				draw._indices << (draw._index + i) << (draw._index + i + row_vertices);
+			draw._index = static_cast<uint16_t>(draw._index + row_vertices);
+			draw._indices << static_cast<uint16_t>(draw._index + row_vertices - 1) << draw._index;
+			for (uint16_t i = 0; i < row_vertices; ++i)
+				draw._indices << static_cast<uint16_t>(draw._index + i) << static_cast<uint16_t>(draw._index + i + row_vertices);
 		}
 
 		// Outer bottom vertex row.

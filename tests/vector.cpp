@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_CASE(vector2_arithmetics)
 
 BOOST_AUTO_TEST_CASE(vector3_)
 {
-	BOOST_CHECK_EQUAL(Yttrium::length({1, 4, 8}), 9);
-	BOOST_CHECK_EQUAL(Yttrium::length(Yttrium::normalize({1, 4, 8})), 1);
+	BOOST_CHECK_EQUAL(Yttrium::length({1, 4, 8}), 9.f);
+	BOOST_CHECK_EQUAL(Yttrium::length(Yttrium::normalize({1, 4, 8})), 1.f);
 }
 
 BOOST_AUTO_TEST_CASE(vector3_arithmetics)

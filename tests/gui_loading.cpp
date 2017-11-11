@@ -108,17 +108,17 @@ BOOST_FIXTURE_TEST_CASE(test_gui_load_class_align, GuiTest)
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load_class_borders, GuiTest)
 {
-	BOOST_CHECK_NO_THROW(fragment("class `test` { borders `1` `2` `3` `4` }"));
+	BOOST_CHECK_NO_THROW(fragment("class `test` { borders `1.0` `2.0` `3.0` `4.0` }"));
 
 	BOOST_CHECK_THROW(fragment("class `test` { borders }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` `2` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` `2` `3` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` `2` `3` `4` `5` }"), IonError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `2` `3` `4` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` `2.0` `3` `4` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` `2` `3.0` `4` }"), GuiDataError);
-	BOOST_CHECK_THROW(fragment("class `test` { borders `1` `2` `3` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` }"), IonError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `2.0` }"), IonError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `2.0` `3.0` }"), IonError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `2.0` `3.0` `4.0` `5.0` }"), IonError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `test` `2.0` `3.0` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `test` `3.0` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `2.0` `test` `4.0` }"), GuiDataError);
+	BOOST_CHECK_THROW(fragment("class `test` { borders `1.0` `2.0` `3.0` `test` }"), GuiDataError);
 }
 
 BOOST_FIXTURE_TEST_CASE(test_gui_load_class_color, GuiTest)

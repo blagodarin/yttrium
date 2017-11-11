@@ -14,7 +14,7 @@ namespace Yttrium
 
 	struct WavFileHeader
 	{
-		enum: uint32_t
+		enum : uint32_t
 		{
 			RIFF = "RIFF"_fourcc,
 			WAVE = "WAVE"_fourcc,
@@ -27,7 +27,7 @@ namespace Yttrium
 
 	struct WavChunkHeader
 	{
-		enum: uint32_t
+		enum : uint32_t
 		{
 			fmt = "fmt "_fourcc,
 			data = "data"_fourcc,

@@ -32,8 +32,8 @@ namespace Yttrium
 			region.imageOffset.x = 0;
 			region.imageOffset.y = 0;
 			region.imageOffset.z = 0;
-			region.imageExtent.width = format.width();
-			region.imageExtent.height = format.height();
+			region.imageExtent.width = static_cast<uint32_t>(format.width());
+			region.imageExtent.height = static_cast<uint32_t>(format.height());
 			region.imageExtent.depth = 1;
 			vkCmdCopyBufferToImage(command_buffer._handle, staging._handle, _image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 		}
