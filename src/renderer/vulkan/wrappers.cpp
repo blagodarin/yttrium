@@ -36,7 +36,7 @@ namespace
 		{
 			VkFormatProperties properties;
 			vkGetPhysicalDeviceFormatProperties(device, format.first, &properties);
-			std::cerr << '\t' << (properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT ? '+' : '-') << ' ' << format.second << " (" << format.first << ")\n";
+			std::cerr << '\t' << ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-') << ' ' << format.second << " (" << format.first << ")\n";
 		}
 		std::cerr << '\n';
 	}

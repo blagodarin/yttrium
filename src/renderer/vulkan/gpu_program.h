@@ -10,7 +10,7 @@ namespace Yttrium
 	class VulkanGpuProgram final : public GpuProgram
 	{
 	public:
-		VulkanGpuProgram(VulkanRenderer& renderer) : _renderer{renderer} {}
+		explicit VulkanGpuProgram(VulkanRenderer& renderer) : _renderer{renderer} {}
 
 		void set_uniform(const std::string&, const Matrix4&) override;
 
