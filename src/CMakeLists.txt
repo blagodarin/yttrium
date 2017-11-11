@@ -14,7 +14,7 @@ set(Y_NO_OGG_VORBIS ${NO_OGG_VORBIS})
 set(Y_NO_PNG ${NO_PNG})
 configure_file(config.h.in config.h)
 
-add_library(yttrium
+add_library(yttrium SHARED
 	../include/yttrium/api.h
 	../include/yttrium/console.h
 	../include/yttrium/exceptions.h

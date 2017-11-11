@@ -89,7 +89,7 @@ install:
       rmdir /q /s prefix
 
 build_script:
-  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TESTS=ON -DWITH_TOOLS=ON -DY_RENDERER=%RENDERER% -DY_SANITIZERS=ON
+  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DY_EXAMPLES=ON -DY_EXTRA=ON -DY_RENDERER=%RENDERER% -DY_TESTS=ON -DY_TOOLS=ON
   - cmd: cmake --build . --config Release
 
 test_script:

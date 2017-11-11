@@ -61,9 +61,9 @@ script:
   - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
 
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DWITH_EXAMPLES=ON -DWITH_EXTRA=ON -DWITH_TOOLS=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DCOVERAGE=ON"; fi
-  - cmake . $CMAKE_OPTIONS -DFIX_TRAVIS=ON -DWITH_TESTS=ON -DY_RENDERER=$RENDERER -DY_SANITIZERS=ON
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_EXAMPLES=ON -DY_EXTRA=ON -DY_TOOLS=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_COVERAGE=ON"; fi
+  - cmake . $CMAKE_OPTIONS -DY_RENDERER=$RENDERER -DY_SANITIZERS=ON -DY_TESTS=ON -DY_TRAVIS=ON
   - cmake --build . -- -j2
   - cmake --build . --target check
 
