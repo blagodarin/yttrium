@@ -2,11 +2,16 @@
 #define _src_renderer_vulkan_renderer_h_
 
 #include "../backend.h"
+#include "buffer.h"
 #include "context.h"
+#include "wrappers.h"
+
+#include <optional>
 
 namespace Yttrium
 {
 	enum class VA;
+	class VulkanSwapchain;
 	class VulkanVertexFormat;
 
 	class VulkanRenderer : public RendererBackend // TODO: Add 'final' then work around GCC's bad memory accessing code generation.
@@ -37,7 +42,7 @@ namespace Yttrium
 
 	private:
 		VulkanContext _context;
-		VK_Buffer _uniform_buffer;
+		VulkanBuffer _uniform_buffer;
 		VK_DescriptorSetLayout _descriptor_set_layout;
 		VK_DescriptorPool _descriptor_pool;
 		VK_DescriptorSet _descriptor_set;
@@ -47,7 +52,7 @@ namespace Yttrium
 		bool _update_descriptors = false;
 		VK_ShaderModule _vertex_shader;
 		VK_ShaderModule _fragment_shader;
-		VK_Buffer _vertex_buffer;
+		VulkanBuffer _vertex_buffer;
 		std::unique_ptr<VulkanSwapchain> _swapchain;
 	};
 }

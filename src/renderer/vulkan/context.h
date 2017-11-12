@@ -1,60 +1,66 @@
 #ifndef _src_renderer_vulkan_context_h_
 #define _src_renderer_vulkan_context_h_
 
-#include <functional>
-#include <memory>
+#include <vector>
 
-#include "wrappers.h"
+#include <vulkan/vulkan.h>
 
 namespace Yttrium
 {
+	class VK_CommandBuffer;
 	class VK_HDeviceMemory;
 	class VK_HImage;
 	class VK_HImageView;
 	class VK_HSampler;
-
-	class VulkanSwapchain
-	{
-	public:
-		VulkanSwapchain(const VK_Device&, const VK_CommandPool&, const VK_PipelineLayout&, const std::vector<VkPipelineShaderStageCreateInfo>&);
-		~VulkanSwapchain() noexcept = default;
-
-		void render(const std::function<void(VkCommandBuffer, const std::function<void(const std::function<void()>&)>&)>&) const; // TODO: Improve readability.
-
-	private:
-		void present(uint32_t framebuffer_index, VkSemaphore) const;
-
-	public:
-		const VK_Device& _device;
-		VK_Swapchain _swapchain;
-		VK_DepthBuffer _depth_buffer;
-		VK_RenderPass _render_pass;
-		VK_Framebuffers _framebuffers;
-		VK_Pipeline _pipeline;
-		VK_Semaphore _image_acquired;
-		VK_Semaphore _rendering_complete;
-		VK_CommandBuffer _command_buffer;
-	};
+	class WindowBackend;
 
 	class VulkanContext
 	{
 	public:
 		explicit VulkanContext(const WindowBackend&);
+		~VulkanContext() noexcept = default;
 
-		VK_CommandBuffer allocate_command_buffer() const { return VK_CommandBuffer{_command_pool}; }
+		const auto* operator->() const noexcept { return &_data; }
+
+		VK_CommandBuffer allocate_command_buffer() const;
 		VK_HDeviceMemory allocate_memory(const VkMemoryRequirements&, VkMemoryPropertyFlags) const;
-		const VK_CommandPool& command_pool() const noexcept { return _command_pool; }
 		VK_HImage create_texture_2d_image(size_t width, size_t height, VkFormat);
 		VK_HSampler create_texture_2d_sampler();
 		VK_HImageView create_texture_2d_view(VkImage, VkFormat);
-		const VK_Device& device() const noexcept { return _device; }
+
+		VkCompositeAlphaFlagBitsKHR composite_alpha() const noexcept;
+		uint32_t memory_type_index(uint32_t type_bits, VkFlags) const;
+		std::vector<VkSurfaceFormatKHR> surface_formats() const;
+		VkSurfaceTransformFlagBitsKHR surface_transform() const noexcept;
+		VkImageTiling tiling(VkFormat, VkFlags) const;
+
+		void wait_idle() const;
 
 	private:
-		const VK_Instance _instance;
-		const VK_Surface _surface;
-		const VK_PhysicalDevice _physical_device;
-		const VK_Device _device;
-		const VK_CommandPool _command_pool;
+		struct Data
+		{
+			VkInstance _instance = VK_NULL_HANDLE;
+#ifndef NDEBUG
+			PFN_vkDestroyDebugReportCallbackEXT _destroy_debug_report_callback = nullptr;
+			VkDebugReportCallbackEXT _debug_report_callback = VK_NULL_HANDLE;
+#endif
+			VkSurfaceKHR _surface = VK_NULL_HANDLE;
+			VkPhysicalDevice _physical_device = VK_NULL_HANDLE;
+			uint32_t _queue_family_index = 0;
+			VkPhysicalDeviceFeatures _physical_device_features;
+			VkPhysicalDeviceMemoryProperties _physical_device_memory_properties;
+			VkSurfaceCapabilitiesKHR _surface_capabilities;
+			VkDevice _device = VK_NULL_HANDLE;
+			VkQueue _queue = VK_NULL_HANDLE;
+			VkCommandPool _command_pool = VK_NULL_HANDLE;
+
+			Data() noexcept = default;
+			~Data() noexcept;
+
+			void create(const WindowBackend&);
+		};
+
+		Data _data;
 	};
 }
 

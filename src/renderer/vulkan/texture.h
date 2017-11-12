@@ -6,8 +6,6 @@
 
 namespace Yttrium
 {
-	class VulkanContext;
-
 	class VulkanTexture2D final : public BackendTexture2D
 	{
 	public:

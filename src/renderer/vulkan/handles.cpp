@@ -1,5 +1,7 @@
 #include "handles.h"
 
+#include "context.h"
+
 #include <cassert>
 #include <stdexcept>
 
@@ -23,6 +25,111 @@ namespace Yttrium
 		VkMemoryRequirements requirements;
 		vkGetBufferMemoryRequirements(_device, _handle, &requirements);
 		return requirements;
+	}
+
+	VK_CommandBuffer::VK_CommandBuffer(const VulkanContext& context)
+		: _context{context}
+	{
+		VkCommandBufferAllocateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		info.pNext = nullptr;
+		info.commandPool = _context->_command_pool;
+		info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		info.commandBufferCount = 1;
+		Y_VK_CHECK(vkAllocateCommandBuffers(_context->_device, &info, &_handle));
+	}
+
+	VK_CommandBuffer::~VK_CommandBuffer() noexcept
+	{
+		vkFreeCommandBuffers(_context->_device, _context->_command_pool, 1, &_handle);
+	}
+
+	void VK_CommandBuffer::begin(VkCommandBufferUsageFlags flags) const
+	{
+		VkCommandBufferBeginInfo info;
+		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		info.pNext = nullptr;
+		info.flags = flags;
+		info.pInheritanceInfo = nullptr;
+		Y_VK_CHECK(vkBeginCommandBuffer(_handle, &info));
+	}
+
+	void VK_CommandBuffer::add_image_layout_transition(VkImage image, VkImageLayout from, VkImageLayout to) const
+	{
+		VkImageMemoryBarrier barrier;
+		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrier.pNext = nullptr;
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = 0;
+		barrier.oldLayout = from;
+		barrier.newLayout = to;
+		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier.image = image;
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		barrier.subresourceRange.baseMipLevel = 0;
+		barrier.subresourceRange.levelCount = 1;
+		barrier.subresourceRange.baseArrayLayer = 0;
+		barrier.subresourceRange.layerCount = 1;
+
+		VkPipelineStageFlags src_stage = 0;
+		VkPipelineStageFlags dst_stage = 0;
+		if (from == VK_IMAGE_LAYOUT_UNDEFINED && to == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+		{
+			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			src_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+			dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		}
+		else if (from == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && to == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+		{
+			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		}
+		else
+			throw std::logic_error{"Bad image layout transition"};
+
+		vkCmdPipelineBarrier(_handle, src_stage, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+	}
+
+	void VK_CommandBuffer::end() const
+	{
+		Y_VK_CHECK(vkEndCommandBuffer(_handle));
+	}
+
+	void VK_CommandBuffer::submit(VkSemaphore wait_semaphore, VkSemaphore signal_semaphore) const
+	{
+		const VkPipelineStageFlags pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+		VkSubmitInfo submit_info = {};
+		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submit_info.pNext = nullptr;
+		submit_info.waitSemaphoreCount = 1;
+		submit_info.pWaitSemaphores = &wait_semaphore;
+		submit_info.pWaitDstStageMask = &pipeline_stage_flags;
+		submit_info.commandBufferCount = 1;
+		submit_info.pCommandBuffers = &_handle;
+		submit_info.signalSemaphoreCount = 1;
+		submit_info.pSignalSemaphores = &signal_semaphore;
+
+		Y_VK_CHECK(vkQueueSubmit(_context->_queue, 1, &submit_info, VK_NULL_HANDLE));
+	}
+
+	void VK_CommandBuffer::submit_and_wait() const
+	{
+		VkSubmitInfo info;
+		info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		info.pNext = nullptr;
+		info.waitSemaphoreCount = 0;
+		info.pWaitSemaphores = nullptr;
+		info.pWaitDstStageMask = nullptr;
+		info.commandBufferCount = 1;
+		info.pCommandBuffers = &_handle;
+		info.signalSemaphoreCount = 0;
+		info.pSignalSemaphores = nullptr;
+		Y_VK_CHECK(vkQueueSubmit(_context->_queue, 1, &info, VK_NULL_HANDLE));
+		Y_VK_CHECK(vkQueueWaitIdle(_context->_queue));
 	}
 
 	VK_HDeviceMemory& VK_HDeviceMemory::operator=(VK_HDeviceMemory&& memory) noexcept
@@ -102,20 +209,25 @@ namespace Yttrium
 			vkDestroyImageView(_device, _handle, nullptr);
 	}
 
-	void VK_HInstance::create(const VkInstanceCreateInfo& info)
+	VK_RenderPass& VK_RenderPass::operator=(VK_RenderPass&& render_pass) noexcept
 	{
-		assert(!*this);
-		Y_VK_CHECK(vkCreateInstance(&info, nullptr, &_handle));
+		destroy();
+		_handle = render_pass._handle;
+		_device = render_pass._device;
+		render_pass._handle = VK_NULL_HANDLE;
+		return *this;
 	}
 
-	std::vector<VkPhysicalDevice> VK_HInstance::physical_devices() const
+	void VK_RenderPass::create(const VkRenderPassCreateInfo& info)
 	{
-		assert(*this);
-		uint32_t count = 0;
-		Y_VK_CHECK(vkEnumeratePhysicalDevices(_handle, &count, nullptr));
-		std::vector<VkPhysicalDevice> devices(count);
-		Y_VK_CHECK(vkEnumeratePhysicalDevices(_handle, &count, devices.data()));
-		return devices;
+		assert(!*this);
+		Y_VK_CHECK(vkCreateRenderPass(_device, &info, nullptr, &_handle));
+	}
+
+	void VK_RenderPass::destroy() noexcept
+	{
+		if (*this)
+			vkDestroyRenderPass(_device, _handle, nullptr);
 	}
 
 	void VK_HSampler::create(const VkSamplerCreateInfo& info)

@@ -9,6 +9,8 @@
 
 namespace Yttrium
 {
+	class VulkanContext;
+
 	template <typename T>
 	class VK_Handle
 	{
@@ -40,6 +42,22 @@ namespace Yttrium
 
 	private:
 		const VkDevice _device;
+	};
+
+	class VK_CommandBuffer : public VK_Handle<VkCommandBuffer>
+	{
+	public:
+		explicit VK_CommandBuffer(const VulkanContext&);
+		~VK_CommandBuffer() noexcept;
+
+		void begin(VkCommandBufferUsageFlags = 0) const;
+		void add_image_layout_transition(VkImage, VkImageLayout from, VkImageLayout to) const;
+		void end() const;
+		void submit(VkSemaphore wait_semaphore, VkSemaphore signal_semaphore) const;
+		void submit_and_wait() const;
+
+	private:
+		const VulkanContext& _context;
 	};
 
 	class VK_HDeviceMemory : public VK_Handle<VkDeviceMemory>
@@ -91,14 +109,21 @@ namespace Yttrium
 		VkDevice _device = VK_NULL_HANDLE;
 	};
 
-	class VK_HInstance : public VK_Handle<VkInstance>
+	struct VK_RenderPass : public VK_Handle<VkRenderPass>
 	{
 	public:
-		VK_HInstance() noexcept = default;
-		~VK_HInstance() noexcept { if (*this) vkDestroyInstance(_handle, nullptr); }
+		explicit VK_RenderPass(VkDevice device) noexcept : _device{device} {}
+		VK_RenderPass(VK_RenderPass&& render_pass) noexcept : VK_Handle{render_pass._handle}, _device{render_pass._device} { render_pass._handle = VK_NULL_HANDLE; }
+		~VK_RenderPass() noexcept { destroy(); }
+		VK_RenderPass& operator=(VK_RenderPass&&) noexcept;
 
-		void create(const VkInstanceCreateInfo&);
-		std::vector<VkPhysicalDevice> physical_devices() const;
+		void create(const VkRenderPassCreateInfo&);
+
+	private:
+		void destroy() noexcept;
+
+	private:
+		VkDevice _device = VK_NULL_HANDLE;
 	};
 
 	class VK_HSampler : public VK_Handle<VkSampler>

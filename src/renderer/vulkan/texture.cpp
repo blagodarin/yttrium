@@ -14,8 +14,8 @@ namespace Yttrium
 
 		_view = context.create_texture_2d_view(_image.get(), vk_format); // Must be created after memory binding.
 
-		VK_Buffer staging{context.device(), static_cast<uint32_t>(format.frame_size()), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
-		staging.write(data, format.frame_size());
+		VulkanBuffer staging_buffer{context, static_cast<uint32_t>(format.frame_size()), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
+		staging_buffer.write(data, format.frame_size());
 
 		const auto command_buffer = context.allocate_command_buffer();
 		command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -35,7 +35,7 @@ namespace Yttrium
 			region.imageExtent.width = static_cast<uint32_t>(format.width());
 			region.imageExtent.height = static_cast<uint32_t>(format.height());
 			region.imageExtent.depth = 1;
-			vkCmdCopyBufferToImage(command_buffer._handle, staging._handle, _image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+			vkCmdCopyBufferToImage(command_buffer.get(), staging_buffer.get(), _image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 		}
 		command_buffer.add_image_layout_transition(_image.get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		command_buffer.end();

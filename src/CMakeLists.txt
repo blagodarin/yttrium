@@ -286,8 +286,12 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 	target_sources(yttrium PRIVATE
 		renderer/vulkan/2d_fs.spirv.inc
 		renderer/vulkan/2d_vs.spirv.inc
+		renderer/vulkan/buffer.cpp
+		renderer/vulkan/buffer.h
 		renderer/vulkan/context.cpp
 		renderer/vulkan/context.h
+		renderer/vulkan/depth_buffer.cpp
+		renderer/vulkan/depth_buffer.h
 		renderer/vulkan/gpu_program.cpp
 		renderer/vulkan/gpu_program.h
 		renderer/vulkan/handles.cpp
@@ -298,6 +302,8 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/mesh.h
 		renderer/vulkan/renderer.cpp
 		renderer/vulkan/renderer.h
+		renderer/vulkan/swapchain.cpp
+		renderer/vulkan/swapchain.h
 		renderer/vulkan/texture.cpp
 		renderer/vulkan/texture.h
 		renderer/vulkan/wrappers.cpp

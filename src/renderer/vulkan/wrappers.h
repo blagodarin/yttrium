@@ -1,6 +1,7 @@
 #ifndef _src_renderer_vulkan_wrappers_h_
 #define _src_renderer_vulkan_wrappers_h_
 
+#include "context.h"
 #include "handles.h"
 
 #include <stdexcept>
@@ -8,61 +9,8 @@
 
 namespace Yttrium
 {
+	class VulkanDepthBuffer;
 	class VulkanVertexFormat;
-	class WindowBackend;
-
-	struct VK_Instance
-	{
-		VK_HInstance _instance;
-#ifndef NDEBUG
-		PFN_vkDestroyDebugReportCallbackEXT _vkDestroyDebugReportCallbackEXT = nullptr;
-		VkDebugReportCallbackEXT _debug_report_callback = VK_NULL_HANDLE;
-#endif
-
-		VK_Instance();
-		~VK_Instance() noexcept;
-	};
-
-	struct VK_Surface
-	{
-		const VK_Instance& _instance;
-		VkSurfaceKHR _handle = VK_NULL_HANDLE;
-
-		VK_Surface(const VK_Instance&, const WindowBackend&);
-		~VK_Surface() noexcept { vkDestroySurfaceKHR(_instance._instance.get(), _handle, nullptr); }
-	};
-
-	struct VK_PhysicalDevice
-	{
-		const VK_Surface& _surface;
-		VkPhysicalDevice _handle = VK_NULL_HANDLE;
-		uint32_t _queue_family_index = 0;
-		VkSurfaceCapabilitiesKHR _surface_capabilities;
-		VkPhysicalDeviceFeatures _features;
-		VkPhysicalDeviceMemoryProperties _memory_properties;
-
-		explicit VK_PhysicalDevice(const VK_Surface&);
-		~VK_PhysicalDevice() noexcept = default;
-
-		VkCompositeAlphaFlagBitsKHR composite_alpha() const noexcept;
-		uint32_t memory_type_index(uint32_t type_bits, VkFlags) const;
-		std::vector<VkSurfaceFormatKHR> surface_formats() const;
-		VkSurfaceTransformFlagBitsKHR surface_transform() const noexcept;
-		VkImageTiling tiling(VkFormat, VkFlags) const;
-	};
-
-	struct VK_Device
-	{
-		const VK_PhysicalDevice& _physical_device;
-		VkDevice _handle = VK_NULL_HANDLE;
-		VkQueue _graphics_queue = VK_NULL_HANDLE;
-		VkQueue _present_queue = VK_NULL_HANDLE;
-
-		explicit VK_Device(const VK_PhysicalDevice&);
-		~VK_Device() noexcept { vkDestroyDevice(_handle, nullptr); }
-
-		void wait_idle() const;
-	};
 
 	struct VK_Swapchain
 	{
@@ -71,12 +19,12 @@ namespace Yttrium
 			OutOfDate() : std::runtime_error{"VK_ERROR_OUT_OF_DATE_KHR"} {}
 		};
 
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		VkFormat _format = VK_FORMAT_UNDEFINED;
 		VkSwapchainKHR _handle = VK_NULL_HANDLE;
 		std::vector<VkImageView> _views;
 
-		explicit VK_Swapchain(const VK_Device&);
+		explicit VK_Swapchain(const VulkanContext&);
 		~VK_Swapchain() noexcept;
 
 		VkAttachmentDescription attachment_description() const noexcept;
@@ -85,66 +33,29 @@ namespace Yttrium
 		void present(uint32_t framebuffer_index, VkSemaphore) const;
 	};
 
-	struct VK_DepthBuffer
-	{
-		const VK_Device& _device;
-		const VkFormat _format;
-		VkImage _image = VK_NULL_HANDLE;
-		VkDeviceMemory _memory = VK_NULL_HANDLE;
-		VkImageView _view = VK_NULL_HANDLE;
-
-		VK_DepthBuffer(const VK_Device&, VkFormat, VkFlags memory_flags);
-		~VK_DepthBuffer() noexcept;
-
-		VkAttachmentDescription attachment_description() const noexcept;
-	};
-
-	struct VK_RenderPass
-	{
-		const VK_Device& _device;
-		VkRenderPass _handle = VK_NULL_HANDLE;
-
-		VK_RenderPass(const VK_Swapchain&, const VK_DepthBuffer&);
-		~VK_RenderPass() noexcept { vkDestroyRenderPass(_device._handle, _handle, nullptr); }
-	};
-
 	struct VK_Framebuffers
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		std::vector<VkFramebuffer> _handles;
 
-		explicit VK_Framebuffers(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Framebuffers(const VulkanContext& context) noexcept : _context{context} {}
 		~VK_Framebuffers() noexcept;
 
-		void create(const VK_RenderPass&, const VK_Swapchain&, const VK_DepthBuffer&);
-	};
-
-	struct VK_Buffer
-	{
-		const VK_Device& _device;
-		const uint32_t _size;
-		VkBuffer _handle = VK_NULL_HANDLE;
-		VkDeviceMemory _memory = VK_NULL_HANDLE;
-
-		VK_Buffer(const VK_Device&, uint32_t size, VkBufferUsageFlags buffer_usage, VkFlags memory_flags);
-		~VK_Buffer() noexcept;
-
-		VkDescriptorBufferInfo descriptor_buffer_info() const noexcept;
-		void write(const void* data, size_t size, size_t offset = 0);
+		void create(VkRenderPass, const VK_Swapchain&, VkImageView depth_buffer_view);
 	};
 
 	struct VK_Semaphore
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		VkSemaphore _handle = VK_NULL_HANDLE;
 
-		explicit VK_Semaphore(const VK_Device&);
-		~VK_Semaphore() noexcept { vkDestroySemaphore(_device._handle, _handle, nullptr); }
+		explicit VK_Semaphore(const VulkanContext&);
+		~VK_Semaphore() noexcept { vkDestroySemaphore(_context->_device, _handle, nullptr); }
 	};
 
 	struct VK_DescriptorSetLayout
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		VkDescriptorSetLayout _handle = VK_NULL_HANDLE;
 
 		struct Binding : VkDescriptorSetLayoutBinding
@@ -160,13 +71,13 @@ namespace Yttrium
 		};
 
 		// cppcheck-suppress noExplicitConstructor
-		VK_DescriptorSetLayout(const VK_Device&, std::vector<Binding>&&);
-		~VK_DescriptorSetLayout() noexcept { vkDestroyDescriptorSetLayout(_device._handle, _handle, nullptr); }
+		VK_DescriptorSetLayout(const VulkanContext&, std::vector<Binding>&&);
+		~VK_DescriptorSetLayout() noexcept { vkDestroyDescriptorSetLayout(_context->_device, _handle, nullptr); }
 	};
 
 	struct VK_DescriptorPool
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		VkDescriptorPool _handle = VK_NULL_HANDLE;
 
 		struct Size : VkDescriptorPoolSize
@@ -178,8 +89,8 @@ namespace Yttrium
 			}
 		};
 
-		VK_DescriptorPool(const VK_Device&, uint32_t max_sets, std::initializer_list<Size>, uint32_t flags = 0);
-		~VK_DescriptorPool() noexcept { vkDestroyDescriptorPool(_device._handle, _handle, nullptr); }
+		VK_DescriptorPool(const VulkanContext&, uint32_t max_sets, std::initializer_list<Size>, uint32_t flags = 0);
+		~VK_DescriptorPool() noexcept { vkDestroyDescriptorPool(_context->_device, _handle, nullptr); }
 	};
 
 	struct VK_DescriptorSet
@@ -188,63 +99,39 @@ namespace Yttrium
 		VkDescriptorSet _handle = VK_NULL_HANDLE;
 
 		VK_DescriptorSet(const VK_DescriptorPool&, VkDescriptorSetLayout);
-		~VK_DescriptorSet() noexcept { std::ignore = vkFreeDescriptorSets(_pool._device._handle, _pool._handle, 1, &_handle); }
+		~VK_DescriptorSet() noexcept { std::ignore = vkFreeDescriptorSets(_pool._context->_device, _pool._handle, 1, &_handle); }
 	};
 
 	struct VK_ShaderModule
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		const VkShaderStageFlagBits _stage;
 		VkShaderModule _handle = VK_NULL_HANDLE;
 
-		VK_ShaderModule(const VK_Device&, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data);
-		~VK_ShaderModule() noexcept { vkDestroyShaderModule(_device._handle, _handle, nullptr); }
+		VK_ShaderModule(const VulkanContext&, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data);
+		~VK_ShaderModule() noexcept { vkDestroyShaderModule(_context->_device, _handle, nullptr); }
 
 		static std::vector<VkPipelineShaderStageCreateInfo> make_stages(std::initializer_list<const VK_ShaderModule*>);
 	};
 
 	struct VK_PipelineLayout
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		VkPipelineLayout _handle = VK_NULL_HANDLE;
 
-		VK_PipelineLayout(const VK_Device&, std::initializer_list<VkDescriptorSetLayout>);
-		~VK_PipelineLayout() noexcept { vkDestroyPipelineLayout(_device._handle, _handle, nullptr); }
+		VK_PipelineLayout(const VulkanContext&, std::initializer_list<VkDescriptorSetLayout>);
+		~VK_PipelineLayout() noexcept { vkDestroyPipelineLayout(_context->_device, _handle, nullptr); }
 	};
 
 	struct VK_Pipeline
 	{
-		const VK_Device& _device;
+		const VulkanContext& _context;
 		VkPipeline _handle = VK_NULL_HANDLE;
 
-		explicit VK_Pipeline(const VK_Device& device) noexcept : _device{device} {}
+		explicit VK_Pipeline(const VulkanContext& context) noexcept : _context{context} {}
 		~VK_Pipeline() noexcept;
 
 		void create(const VK_PipelineLayout&, VkRenderPass, const VulkanVertexFormat&, const std::vector<VkPipelineShaderStageCreateInfo>&);
-	};
-
-	struct VK_CommandPool
-	{
-		const VK_Device& _device;
-		VkCommandPool _handle = VK_NULL_HANDLE;
-
-		VK_CommandPool(const VK_Device&, uint32_t queue_family_index);
-		~VK_CommandPool() noexcept { vkDestroyCommandPool(_device._handle, _handle, nullptr); }
-	};
-
-	struct VK_CommandBuffer
-	{
-		const VK_CommandPool& _pool;
-		VkCommandBuffer _handle = VK_NULL_HANDLE;
-
-		explicit VK_CommandBuffer(const VK_CommandPool&);
-		~VK_CommandBuffer() noexcept { vkFreeCommandBuffers(_pool._device._handle, _pool._handle, 1, &_handle); }
-
-		void begin(VkCommandBufferUsageFlags = 0) const;
-		void add_image_layout_transition(VkImage, VkImageLayout from, VkImageLayout to) const;
-		void end() const;
-		void submit(VkSemaphore wait_semaphore, VkSemaphore signal_semaphore) const;
-		void submit_and_wait() const;
 	};
 }
 

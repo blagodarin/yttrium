@@ -7,6 +7,7 @@
 #include "handles.h"
 #include "helpers.h"
 #include "mesh.h"
+#include "swapchain.h"
 #include "texture.h"
 
 namespace
@@ -26,14 +27,14 @@ namespace Yttrium
 {
 	VulkanRenderer::VulkanRenderer(const WindowBackend& window)
 		: _context{window}
-		, _uniform_buffer{_context.device(), sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
-		, _descriptor_set_layout{_context.device(), {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}}}
-		, _descriptor_pool{_context.device(), 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}, {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}}}
+		, _uniform_buffer{_context, sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
+		, _descriptor_set_layout{_context, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}}}
+		, _descriptor_pool{_context, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}, {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}}}
 		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
-		, _pipeline_layout{_context.device(), {_descriptor_set_layout._handle}}
-		, _vertex_shader{_context.device(), VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader}
-		, _fragment_shader{_context.device(), VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader}
-		, _vertex_buffer{_context.device(), 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
+		, _pipeline_layout{_context, {_descriptor_set_layout._handle}}
+		, _vertex_shader{_context, VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader}
+		, _fragment_shader{_context, VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader}
+		, _vertex_buffer{_context, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
 	{
 	}
 
@@ -41,11 +42,11 @@ namespace Yttrium
 
 	void VulkanRenderer::clear()
 	{
-		_context.device().wait_idle();
+		_context.wait_idle();
 		if (std::exchange(_update_descriptors, false))
 			update_descriptors();
 		if (!_swapchain)
-			_swapchain = std::make_unique<VulkanSwapchain>(_context.device(), _context.command_pool(), _pipeline_layout, VK_ShaderModule::make_stages({&_vertex_shader, &_fragment_shader}));
+			_swapchain = std::make_unique<VulkanSwapchain>(_context, _pipeline_layout, VK_ShaderModule::make_stages({&_vertex_shader, &_fragment_shader}));
 		try
 		{
 			_swapchain->render([this](VkCommandBuffer command_buffer, const std::function<void(const std::function<void()>&)>& render_pass)
@@ -55,7 +56,7 @@ namespace Yttrium
 					vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout._handle, 0, 1, &_descriptor_set._handle, 0, nullptr);
 
 					const std::array<VkDeviceSize, 1> vertex_buffer_offsets{0};
-					vkCmdBindVertexBuffers(command_buffer, 0, 1, &_vertex_buffer._handle, vertex_buffer_offsets.data());
+					vkCmdBindVertexBuffers(command_buffer, 0, 1, &_vertex_buffer.get(), vertex_buffer_offsets.data());
 
 					// TODO: Do actual rendering.
 				});
@@ -63,7 +64,7 @@ namespace Yttrium
 		}
 		catch (const VK_Swapchain::OutOfDate&)
 		{
-			_context.device().wait_idle();
+			_context.wait_idle();
 			_swapchain.reset();
 		}
 	}
@@ -84,7 +85,7 @@ namespace Yttrium
 
 		if (Buffer index_data; data.make_uint16_indices(index_data))
 		{
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_data.size(), VK_INDEX_TYPE_UINT16, data._indices.size());
+			auto result = std::make_unique<VulkanMesh>(_context, vertex_buffer_size, index_data.size(), VK_INDEX_TYPE_UINT16, data._indices.size());
 			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
 			result->_index_buffer.write(index_data.data(), index_data.size());
 			return result;
@@ -92,7 +93,7 @@ namespace Yttrium
 		else
 		{
 			const auto index_buffer_size = data._indices.size() * sizeof(uint32_t);
-			auto result = std::make_unique<VulkanMesh>(_context.device(), vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
+			auto result = std::make_unique<VulkanMesh>(_context, vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
 			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
 			result->_index_buffer.write(data._indices.data(), index_buffer_size);
 			return result;
@@ -200,7 +201,7 @@ namespace Yttrium
 		writes[1].pBufferInfo = nullptr;
 		writes[1].pTexelBufferView = nullptr;
 
-		vkUpdateDescriptorSets(_context.device()._handle, writes.size(), writes.data(), 0, nullptr);
+		vkUpdateDescriptorSets(_context->_device, writes.size(), writes.data(), 0, nullptr);
 	}
 
 	const VulkanVertexFormat& VulkanRenderer::vertex_format(const std::vector<VA>& vas)

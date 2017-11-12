@@ -1,6 +1,5 @@
 #include "wrappers.h"
 
-#include "../../system/window.h"
 #include "helpers.h"
 
 #include <cassert>
@@ -12,313 +11,42 @@
 
 #define CHECK(call) Y_VK_CHECK(call)
 
-namespace
-{
-#ifndef NDEBUG
-	void print_supported_formats(VkPhysicalDevice device)
-	{
-		static const std::vector<std::pair<VkFormat, std::string_view>> formats
-		{
-			{VK_FORMAT_R8_UNORM, "VK_FORMAT_R8_UNORM"},
-			{VK_FORMAT_R8G8_UNORM, "VK_FORMAT_R8G8_UNORM"},
-			{VK_FORMAT_R8G8B8_UNORM, "VK_FORMAT_R8G8B8_UNORM"},
-			{VK_FORMAT_B8G8R8_UNORM, "VK_FORMAT_B8G8R8_UNORM"},
-			{VK_FORMAT_R8G8B8A8_UNORM, "VK_FORMAT_R8G8B8A8_UNORM"},
-			{VK_FORMAT_B8G8R8A8_UNORM, "VK_FORMAT_B8G8R8A8_UNORM"},
-			{VK_FORMAT_R16_UNORM, "VK_FORMAT_R16_UNORM"},
-			{VK_FORMAT_R16G16_UNORM, "VK_FORMAT_R16G16_UNORM"},
-			{VK_FORMAT_R16G16B16_UNORM, "VK_FORMAT_R16G16B16_UNORM"},
-			{VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM"},
-		};
-
-		std::cerr << "Vulkan texture formats supported:\n";
-		for (const auto& format : formats)
-		{
-			VkFormatProperties properties;
-			vkGetPhysicalDeviceFormatProperties(device, format.first, &properties);
-			std::cerr << '\t' << ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-') << ' ' << format.second << " (" << format.first << ")\n";
-		}
-		std::cerr << '\n';
-	}
-
-	VKAPI_ATTR VkBool32 VKAPI_CALL vulkan_debug_report_callback(VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* layer_prefix, const char* message, void*)
-	{
-		std::cerr << '[' << layer_prefix << "] " << message << '\n';
-		return VK_FALSE;
-	}
-#endif
-}
-
 namespace Yttrium
 {
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_Instance::VK_Instance()
+	VK_Swapchain::VK_Swapchain(const VulkanContext& context)
+		: _context{context}
 	{
-#ifndef NDEBUG
-		uint32_t layer_count = 0;
-		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&layer_count, nullptr));
-		std::vector<VkLayerProperties> available_layers(layer_count);
-		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data()));
-		std::cerr << "Vulkan layers available:\n";
-		for (const auto& layer : available_layers)
-			std::cerr << '\t' << layer.layerName << " - " << layer.description << '\n';
-		std::cerr << '\n';
-#endif
-
-		VkApplicationInfo application_info = {};
-		application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		application_info.pNext = nullptr;
-		application_info.pApplicationName = nullptr;
-		application_info.applicationVersion = 0;
-		application_info.pEngineName = nullptr;
-		application_info.engineVersion = 0;
-		application_info.apiVersion = VK_API_VERSION_1_0;
-
-		static const std::initializer_list<const char*> layers
-		{
-#ifndef NDEBUG
-			"VK_LAYER_LUNARG_standard_validation",
-#endif
-		};
-
-		static const std::initializer_list<const char*> extensions
-		{
-#ifndef NDEBUG
-			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-#endif
-			VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef VK_USE_PLATFORM_XCB_KHR
-			VK_KHR_XCB_SURFACE_EXTENSION_NAME,
-#endif
-		};
-
-		VkInstanceCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.pApplicationInfo = &application_info;
-		create_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
-		create_info.ppEnabledLayerNames = layers.begin();
-		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-		create_info.ppEnabledExtensionNames = extensions.begin();
-
-		_instance.create(create_info);
-
-#ifndef NDEBUG
-		const auto vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(_instance.get(), "vkCreateDebugReportCallbackEXT"));
-		_vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(_instance.get(), "vkDestroyDebugReportCallbackEXT"));
-		if (vkCreateDebugReportCallbackEXT && _vkDestroyDebugReportCallbackEXT)
-		{
-			VkDebugReportCallbackCreateInfoEXT drc_info;
-			drc_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-			drc_info.pNext = nullptr;
-			drc_info.flags = VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT;
-			drc_info.pfnCallback = vulkan_debug_report_callback;
-			drc_info.pUserData = nullptr;
-
-			Y_VK_CHECK(vkCreateDebugReportCallbackEXT(_instance.get(), &drc_info, nullptr, &_debug_report_callback));
-		}
-#endif
-	}
-
-	VK_Instance::~VK_Instance()
-	{
-		if (_debug_report_callback != VK_NULL_HANDLE)
-		{
-			assert(_vkDestroyDebugReportCallbackEXT);
-			_vkDestroyDebugReportCallbackEXT(_instance.get(), _debug_report_callback, nullptr);
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_Surface::VK_Surface(const VK_Instance& instance, const WindowBackend& window)
-		: _instance{instance}
-	{
-#ifdef VK_USE_PLATFORM_XCB_KHR
-		VkXcbSurfaceCreateInfoKHR create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-		create_info.connection = window.xcb_connection();
-		create_info.window = window.xcb_window();
-
-		CHECK(vkCreateXcbSurfaceKHR(_instance._instance.get(), &create_info, nullptr, &_handle));
-#endif
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_PhysicalDevice::VK_PhysicalDevice(const VK_Surface& surface)
-		: _surface{surface}
-	{
-		for (const auto handle : _surface._instance._instance.physical_devices())
-		{
-			uint32_t queue_family_count = 0;
-			vkGetPhysicalDeviceQueueFamilyProperties(handle, &queue_family_count, nullptr);
-
-			std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
-			vkGetPhysicalDeviceQueueFamilyProperties(handle, &queue_family_count, queue_families.data());
-
-			for (uint32_t i = 0; i < queue_family_count; ++i)
-			{
-				if (!(queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT))
-					continue;
-
-				VkBool32 has_present_support = VK_FALSE;
-				CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(handle, i, _surface._handle, &has_present_support));
-				if (has_present_support)
-				{
-					_handle = handle;
-					_queue_family_index = i; // TODO: Support separate queues for graphics and present.
-					break;
-				}
-			}
-
-			if (_handle != VK_NULL_HANDLE)
-				break;
-		}
-
-		if (_handle == VK_NULL_HANDLE)
-			throw std::runtime_error{"No suitable physical device found"};
-
-		CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_handle, _surface._handle, &_surface_capabilities));
-		if (_surface_capabilities.currentExtent.width == 0xffffffff && _surface_capabilities.currentExtent.height == 0xffffffff)
-			throw std::runtime_error{"Bad surface size"};
-
-		vkGetPhysicalDeviceFeatures(_handle, &_features);
-		vkGetPhysicalDeviceMemoryProperties(_handle, &_memory_properties);
-
-#ifndef NDEBUG
-		::print_supported_formats(_handle);
-#endif
-	}
-
-	VkCompositeAlphaFlagBitsKHR VK_PhysicalDevice::composite_alpha() const noexcept
-	{
-		for (const auto bit : {VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR})
-			if (_surface_capabilities.supportedCompositeAlpha & static_cast<VkFlags>(bit))
-				return bit;
-		return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	}
-
-	uint32_t VK_PhysicalDevice::memory_type_index(uint32_t type_bits, VkFlags flags) const
-	{
-		for (uint32_t i = 0; i < _memory_properties.memoryTypeCount; ++i)
-			if (type_bits & (1u << i))
-				if ((_memory_properties.memoryTypes[i].propertyFlags & flags) == flags)
-					return i;
-		throw std::runtime_error{"No suitable memory type found"};
-	}
-
-	std::vector<VkSurfaceFormatKHR> VK_PhysicalDevice::surface_formats() const
-	{
-		uint32_t count = 0;
-		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_handle, _surface._handle, &count, nullptr));
-		std::vector<VkSurfaceFormatKHR> formats(count);
-		CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_handle, _surface._handle, &count, formats.data()));
-		if (formats.empty())
-			throw std::runtime_error{"No surface formats defined"};
-		else if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
-			formats.clear();
-		return formats;
-	}
-
-	VkSurfaceTransformFlagBitsKHR VK_PhysicalDevice::surface_transform() const noexcept
-	{
-		return (_surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : _surface_capabilities.currentTransform;
-	}
-
-	VkImageTiling VK_PhysicalDevice::tiling(VkFormat format, VkFlags flags) const
-	{
-		VkFormatProperties properties;
-		vkGetPhysicalDeviceFormatProperties(_handle, format, &properties);
-		if ((properties.linearTilingFeatures & flags) == flags)
-			return VK_IMAGE_TILING_LINEAR;
-		else if ((properties.optimalTilingFeatures & flags) == flags)
-			return VK_IMAGE_TILING_OPTIMAL;
-		else
-			throw std::runtime_error{"Unsupported format"};
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_Device::VK_Device(const VK_PhysicalDevice& physical_device)
-		: _physical_device{physical_device}
-	{
-		const float queue_prioritiy = 0.f;
-
-		VkDeviceQueueCreateInfo queue_create_info = {};
-		queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queue_create_info.pNext = nullptr;
-		queue_create_info.flags = 0;
-		queue_create_info.queueFamilyIndex = _physical_device._queue_family_index;
-		queue_create_info.queueCount = 1;
-		queue_create_info.pQueuePriorities = &queue_prioritiy;
-
-		static const auto extensions =
-		{
-			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-		};
-
-		VkDeviceCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.queueCreateInfoCount = 1;
-		create_info.pQueueCreateInfos = &queue_create_info;
-		create_info.enabledLayerCount = 0;
-		create_info.ppEnabledLayerNames = nullptr;
-		create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-		create_info.ppEnabledExtensionNames = extensions.begin();
-		create_info.pEnabledFeatures = nullptr;
-
-		CHECK(vkCreateDevice(_physical_device._handle, &create_info, nullptr, &_handle));
-
-		vkGetDeviceQueue(_handle, _physical_device._queue_family_index, 0, &_graphics_queue);
-		_present_queue = _graphics_queue;
-	}
-
-	void VK_Device::wait_idle() const
-	{
-		CHECK(vkDeviceWaitIdle(_handle));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_Swapchain::VK_Swapchain(const VK_Device& device)
-		: _device{device}
-	{
-		const auto surface_formats = _device._physical_device.surface_formats();
+		const auto surface_formats = _context.surface_formats();
 		_format = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
 
 		VkSwapchainCreateInfoKHR swapchain_info;
 		swapchain_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		swapchain_info.pNext = nullptr;
 		swapchain_info.flags = 0;
-		swapchain_info.surface = _device._physical_device._surface._handle;
-		swapchain_info.minImageCount = _device._physical_device._surface_capabilities.minImageCount;
+		swapchain_info.surface = _context->_surface;
+		swapchain_info.minImageCount = _context->_surface_capabilities.minImageCount;
 		swapchain_info.imageFormat = _format;
 		swapchain_info.imageColorSpace = surface_formats.empty() ? VK_COLOR_SPACE_SRGB_NONLINEAR_KHR : surface_formats[0].colorSpace;
-		swapchain_info.imageExtent = _device._physical_device._surface_capabilities.currentExtent;
+		swapchain_info.imageExtent = _context->_surface_capabilities.currentExtent;
 		swapchain_info.imageArrayLayers = 1;
 		swapchain_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		swapchain_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		swapchain_info.queueFamilyIndexCount = 0;
 		swapchain_info.pQueueFamilyIndices = nullptr;
-		swapchain_info.preTransform = _device._physical_device.surface_transform();
-		swapchain_info.compositeAlpha = _device._physical_device.composite_alpha();
+		swapchain_info.preTransform = _context.surface_transform();
+		swapchain_info.compositeAlpha = _context.composite_alpha();
 		swapchain_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
 		swapchain_info.clipped = VK_TRUE;
 		swapchain_info.oldSwapchain = VK_NULL_HANDLE;
 
-		VK_HSwapchain swapchain{_device._handle};
+		VK_HSwapchain swapchain{_context->_device};
 		swapchain.create(swapchain_info);
 
 		uint32_t image_count = 0;
-		CHECK(vkGetSwapchainImagesKHR(_device._handle, swapchain.get(), &image_count, nullptr));
+		CHECK(vkGetSwapchainImagesKHR(_context->_device, swapchain.get(), &image_count, nullptr));
 
 		std::vector<VkImage> images(image_count, VK_NULL_HANDLE);
-		CHECK(vkGetSwapchainImagesKHR(_device._handle, swapchain.get(), &image_count, images.data()));
+		CHECK(vkGetSwapchainImagesKHR(_context->_device, swapchain.get(), &image_count, images.data()));
 
 		std::vector<VK_HImageView> views;
 		views.reserve(image_count);
@@ -340,7 +68,7 @@ namespace Yttrium
 			view_info.subresourceRange.levelCount = 1;
 			view_info.subresourceRange.baseArrayLayer = 0;
 			view_info.subresourceRange.layerCount = 1;
-			views.emplace_back(_device._handle).create(view_info);
+			views.emplace_back(_context->_device).create(view_info);
 		}
 
 		_views.reserve(views.size());
@@ -353,8 +81,8 @@ namespace Yttrium
 	VK_Swapchain::~VK_Swapchain() noexcept
 	{
 		for (const auto view : _views)
-			vkDestroyImageView(_device._handle, view, nullptr);
-		vkDestroySwapchainKHR(_device._handle, _handle, nullptr);
+			vkDestroyImageView(_context->_device, view, nullptr);
+		vkDestroySwapchainKHR(_context->_device, _handle, nullptr);
 	}
 
 	VkAttachmentDescription VK_Swapchain::attachment_description() const noexcept
@@ -375,7 +103,7 @@ namespace Yttrium
 	uint32_t VK_Swapchain::acquire_next_image(VkSemaphore semaphore) const
 	{
 		uint32_t index = 0;
-		switch (const auto result = vkAcquireNextImageKHR(_device._handle, _handle, std::numeric_limits<uint64_t>::max(), semaphore, VK_NULL_HANDLE, &index))
+		switch (const auto result = vkAcquireNextImageKHR(_context->_device, _handle, std::numeric_limits<uint64_t>::max(), semaphore, VK_NULL_HANDLE, &index))
 		{
 		case VK_SUCCESS: return index;
 		case VK_ERROR_OUT_OF_DATE_KHR: throw OutOfDate{};
@@ -395,7 +123,7 @@ namespace Yttrium
 		present_info.pImageIndices = &framebuffer_index;
 		present_info.pResults = nullptr;
 
-		switch (const auto result = vkQueuePresentKHR(_device._present_queue, &present_info))
+		switch (const auto result = vkQueuePresentKHR(_context->_queue, &present_info))
 		{
 		case VK_SUCCESS: return;
 		case VK_ERROR_OUT_OF_DATE_KHR: throw OutOfDate{};
@@ -405,154 +133,25 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_DepthBuffer::VK_DepthBuffer(const VK_Device& device, VkFormat format, VkFlags memory_flags)
-		: _device{device}
-		, _format{format}
-	{
-		VK_HDeviceMemory memory{_device._handle};
-		VK_HImage image{_device._handle};
-		VK_HImageView view{_device._handle};
-
-		VkImageCreateInfo image_info = {};
-		image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		image_info.pNext = nullptr;
-		image_info.flags = 0;
-		image_info.imageType = VK_IMAGE_TYPE_2D;
-		image_info.format = _format;
-		image_info.extent.width = _device._physical_device._surface_capabilities.currentExtent.width;
-		image_info.extent.height = _device._physical_device._surface_capabilities.currentExtent.height;
-		image_info.extent.depth = 1;
-		image_info.mipLevels = 1;
-		image_info.arrayLayers = 1;
-		image_info.samples = VK_SAMPLE_COUNT_1_BIT;
-		image_info.tiling = _device._physical_device.tiling(_format, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
-		image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		image_info.queueFamilyIndexCount = 0;
-		image_info.pQueueFamilyIndices = nullptr;
-		image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		image.create(image_info);
-
-		const auto memory_requirements = image.memory_requirements();
-
-		VkMemoryAllocateInfo memory_info;
-		memory_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memory_info.pNext = nullptr;
-		memory_info.allocationSize = memory_requirements.size;
-		memory_info.memoryTypeIndex = _device._physical_device.memory_type_index(memory_requirements.memoryTypeBits, memory_flags);
-		memory.allocate(memory_info);
-
-		image.bind_memory(memory.get());
-
-		VkImageViewCreateInfo view_info;
-		view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		view_info.pNext = nullptr;
-		view_info.flags = 0;
-		view_info.image = image.get();
-		view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		view_info.format = _format;
-		view_info.components.r = VK_COMPONENT_SWIZZLE_R;
-		view_info.components.g = VK_COMPONENT_SWIZZLE_G;
-		view_info.components.b = VK_COMPONENT_SWIZZLE_B;
-		view_info.components.a = VK_COMPONENT_SWIZZLE_A;
-		view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		view_info.subresourceRange.baseMipLevel = 0;
-		view_info.subresourceRange.levelCount = 1;
-		view_info.subresourceRange.baseArrayLayer = 0;
-		view_info.subresourceRange.layerCount = 1;
-		view.create(view_info);
-
-		_image = image.release();
-		_memory = memory.release();
-		_view = view.release();
-	}
-
-	VK_DepthBuffer::~VK_DepthBuffer() noexcept
-	{
-		vkDestroyImageView(_device._handle, _view, nullptr);
-		vkDestroyImage(_device._handle, _image, nullptr);
-		vkFreeMemory(_device._handle, _memory, nullptr);
-	}
-
-	VkAttachmentDescription VK_DepthBuffer::attachment_description() const noexcept
-	{
-		VkAttachmentDescription description;
-		description.flags = 0;
-		description.format = _format;
-		description.samples = VK_SAMPLE_COUNT_1_BIT;
-		description.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		description.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		description.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		description.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		return description;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_RenderPass::VK_RenderPass(const VK_Swapchain& swapchain, const VK_DepthBuffer& depth_buffer)
-		: _device{swapchain._device}
-	{
-		assert(&_device == &depth_buffer._device);
-
-		const std::array<VkAttachmentDescription, 2> attachment_descriptions{swapchain.attachment_description(), depth_buffer.attachment_description()};
-
-		VkAttachmentReference color_reference = {};
-		color_reference.attachment = 0;
-		color_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		VkAttachmentReference depth_reference = {};
-		depth_reference.attachment = 1;
-		depth_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-		VkSubpassDescription subpass = {};
-		subpass.flags = 0;
-		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.inputAttachmentCount = 0;
-		subpass.pInputAttachments = nullptr;
-		subpass.colorAttachmentCount = 1;
-		subpass.pColorAttachments = &color_reference;
-		subpass.pResolveAttachments = nullptr;
-		subpass.pDepthStencilAttachment = &depth_reference;
-		subpass.preserveAttachmentCount = 0;
-		subpass.pPreserveAttachments = nullptr;
-
-		VkRenderPassCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.attachmentCount = attachment_descriptions.size();
-		create_info.pAttachments = attachment_descriptions.data();
-		create_info.subpassCount = 1;
-		create_info.pSubpasses = &subpass;
-		create_info.dependencyCount = 0;
-		create_info.pDependencies = nullptr;
-
-		CHECK(vkCreateRenderPass(_device._handle, &create_info, nullptr, &_handle));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	VK_Framebuffers::~VK_Framebuffers() noexcept
 	{
 		for (const auto handle : _handles)
-			vkDestroyFramebuffer(_device._handle, handle, nullptr);
+			vkDestroyFramebuffer(_context->_device, handle, nullptr);
 	}
 
-	void VK_Framebuffers::create(const VK_RenderPass& render_pass, const VK_Swapchain& swapchain, const VK_DepthBuffer& depth_buffer)
+	void VK_Framebuffers::create(VkRenderPass render_pass, const VK_Swapchain& swapchain, VkImageView depth_buffer_view)
 	{
-		std::array<VkImageView, 2> attachments{VK_NULL_HANDLE, depth_buffer._view};
+		std::array<VkImageView, 2> attachments{VK_NULL_HANDLE, depth_buffer_view};
 
-		VkFramebufferCreateInfo create_info = {};
+		VkFramebufferCreateInfo create_info;
 		create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
-		create_info.renderPass = render_pass._handle;
+		create_info.renderPass = render_pass;
 		create_info.attachmentCount = attachments.size();
 		create_info.pAttachments = attachments.data();
-		create_info.width = _device._physical_device._surface_capabilities.currentExtent.width;
-		create_info.height = _device._physical_device._surface_capabilities.currentExtent.height;
+		create_info.width = _context->_surface_capabilities.currentExtent.width;
+		create_info.height = _context->_surface_capabilities.currentExtent.height;
 		create_info.layers = 1;
 
 		_handles.reserve(swapchain._views.size());
@@ -561,114 +160,54 @@ namespace Yttrium
 			attachments[0] = swapchain_view;
 
 			VkFramebuffer framebuffer = VK_NULL_HANDLE;
-			CHECK(vkCreateFramebuffer(_device._handle, &create_info, nullptr, &framebuffer));
+			CHECK(vkCreateFramebuffer(_context->_device, &create_info, nullptr, &framebuffer));
 			_handles.emplace_back(framebuffer);
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_Buffer::VK_Buffer(const VK_Device& device, uint32_t size, VkBufferUsageFlags buffer_usage, VkFlags memory_flags)
-		: _device{device}
-		, _size{size}
+	VK_Semaphore::VK_Semaphore(const VulkanContext& context)
+		: _context{context}
 	{
-		VkBufferCreateInfo create_info;
-		create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.size = _size;
-		create_info.usage = buffer_usage;
-		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		create_info.queueFamilyIndexCount = 0;
-		create_info.pQueueFamilyIndices = nullptr;
-
-		VK_HBuffer buffer{_device._handle};
-		buffer.create(create_info);
-
-		const auto memory_requirements = buffer.memory_requirements();
-
-		VkMemoryAllocateInfo allocate_info;
-		allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocate_info.pNext = nullptr;
-		allocate_info.allocationSize = memory_requirements.size;
-		allocate_info.memoryTypeIndex = _device._physical_device.memory_type_index(memory_requirements.memoryTypeBits, memory_flags);
-
-		VK_HDeviceMemory memory{_device._handle};
-		memory.allocate(allocate_info);
-
-		buffer.bind_memory(memory.get());
-
-		_handle = buffer.release();
-		_memory = memory.release();
-	}
-
-	VK_Buffer::~VK_Buffer() noexcept
-	{
-		vkDestroyBuffer(_device._handle, _handle, nullptr);
-		vkFreeMemory(_device._handle, _memory, nullptr);
-	}
-
-	VkDescriptorBufferInfo VK_Buffer::descriptor_buffer_info() const noexcept
-	{
-		VkDescriptorBufferInfo result;
-		result.buffer = _handle;
-		result.offset = 0;
-		result.range = _size;
-		return result;
-	}
-
-	void VK_Buffer::write(const void* data, size_t size, size_t offset)
-	{
-		assert(offset <= _size && size <= _size - offset);
-		void* mapped_memory = nullptr;
-		CHECK(vkMapMemory(_device._handle, _memory, offset, size, 0, &mapped_memory));
-		std::memcpy(mapped_memory, data, size);
-		vkUnmapMemory(_device._handle, _memory);
+		VkSemaphoreCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		CHECK(vkCreateSemaphore(_context->_device, &info, nullptr, &_handle));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_Semaphore::VK_Semaphore(const VK_Device& device)
-		: _device{device}
-	{
-		VkSemaphoreCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		CHECK(vkCreateSemaphore(_device._handle, &create_info, nullptr, &_handle));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_DescriptorSetLayout::VK_DescriptorSetLayout(const VK_Device& device, std::vector<Binding>&& bindings)
-		: _device{device}
+	VK_DescriptorSetLayout::VK_DescriptorSetLayout(const VulkanContext& context, std::vector<Binding>&& bindings)
+		: _context{context}
 	{
 		for (auto& binding : bindings)
 			binding.binding = static_cast<uint32_t>(&binding - bindings.data());
 
-		VkDescriptorSetLayoutCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.bindingCount = static_cast<uint32_t>(bindings.size());
-		create_info.pBindings = bindings.data();
-		CHECK(vkCreateDescriptorSetLayout(_device._handle, &create_info, nullptr, &_handle));
+		VkDescriptorSetLayoutCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		info.bindingCount = static_cast<uint32_t>(bindings.size());
+		info.pBindings = bindings.data();
+		CHECK(vkCreateDescriptorSetLayout(_context->_device, &info, nullptr, &_handle));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_DescriptorPool::VK_DescriptorPool(const VK_Device& device, uint32_t max_sets, std::initializer_list<Size> sizes, uint32_t flags)
-		: _device{device}
+	VK_DescriptorPool::VK_DescriptorPool(const VulkanContext& context, uint32_t max_sets, std::initializer_list<Size> sizes, uint32_t flags)
+		: _context{context}
 	{
-		VkDescriptorPoolCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = flags;
-		create_info.maxSets = max_sets;
-		create_info.poolSizeCount = static_cast<uint32_t>(sizes.size());
-		create_info.pPoolSizes = sizes.begin();
+		VkDescriptorPoolCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = flags;
+		info.maxSets = max_sets;
+		info.poolSizeCount = static_cast<uint32_t>(sizes.size());
+		info.pPoolSizes = sizes.begin();
 
-		CHECK(vkCreateDescriptorPool(_device._handle, &create_info, nullptr, &_handle));
+		CHECK(vkCreateDescriptorPool(_context->_device, &info, nullptr, &_handle));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -676,30 +215,30 @@ namespace Yttrium
 	VK_DescriptorSet::VK_DescriptorSet(const VK_DescriptorPool& pool, VkDescriptorSetLayout layout)
 		: _pool{pool}
 	{
-		VkDescriptorSetAllocateInfo allocate_info = {};
-		allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		allocate_info.pNext = nullptr;
-		allocate_info.descriptorPool = _pool._handle;
-		allocate_info.descriptorSetCount = 1;
-		allocate_info.pSetLayouts = &layout;
+		VkDescriptorSetAllocateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		info.pNext = nullptr;
+		info.descriptorPool = _pool._handle;
+		info.descriptorSetCount = 1;
+		info.pSetLayouts = &layout;
 
-		CHECK(vkAllocateDescriptorSets(_pool._device._handle, &allocate_info, &_handle));
+		CHECK(vkAllocateDescriptorSets(_pool._context->_device, &info, &_handle));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_ShaderModule::VK_ShaderModule(const VK_Device& device, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data)
-		: _device{device}
+	VK_ShaderModule::VK_ShaderModule(const VulkanContext& context, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data)
+		: _context{context}
 		, _stage{stage}
 	{
-		VkShaderModuleCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.codeSize = data.size() * sizeof(uint32_t);
-		create_info.pCode = data.data();
+		VkShaderModuleCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		info.codeSize = data.size() * sizeof(uint32_t);
+		info.pCode = data.data();
 
-		CHECK(vkCreateShaderModule(_device._handle, &create_info, nullptr, &_handle));
+		CHECK(vkCreateShaderModule(_context->_device, &info, nullptr, &_handle));
 	}
 
 	std::vector<VkPipelineShaderStageCreateInfo> VK_ShaderModule::make_stages(std::initializer_list<const VK_ShaderModule*> modules)
@@ -722,19 +261,19 @@ namespace Yttrium
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VK_PipelineLayout::VK_PipelineLayout(const VK_Device& device, std::initializer_list<VkDescriptorSetLayout> set_layouts)
-		: _device{device}
+	VK_PipelineLayout::VK_PipelineLayout(const VulkanContext& context, std::initializer_list<VkDescriptorSetLayout> set_layouts)
+		: _context{context}
 	{
-		VkPipelineLayoutCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
-		create_info.pSetLayouts = set_layouts.begin();
-		create_info.pushConstantRangeCount = 0;
-		create_info.pPushConstantRanges = nullptr;
+		VkPipelineLayoutCreateInfo info;
+		info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		info.pNext = nullptr;
+		info.flags = 0;
+		info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
+		info.pSetLayouts = set_layouts.begin();
+		info.pushConstantRangeCount = 0;
+		info.pPushConstantRanges = nullptr;
 
-		CHECK(vkCreatePipelineLayout(_device._handle, &create_info, nullptr, &_handle));
+		CHECK(vkCreatePipelineLayout(_context->_device, &info, nullptr, &_handle));
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -742,7 +281,7 @@ namespace Yttrium
 	VK_Pipeline::~VK_Pipeline() noexcept
 	{
 		if (_handle != VK_NULL_HANDLE)
-			vkDestroyPipeline(_device._handle, _handle, nullptr);
+			vkDestroyPipeline(_context->_device, _handle, nullptr);
 	}
 
 	void VK_Pipeline::create(const VK_PipelineLayout& layout, VkRenderPass render_pass, const VulkanVertexFormat& vertex_format, const std::vector<VkPipelineShaderStageCreateInfo>& shader_stages)
@@ -861,122 +400,6 @@ namespace Yttrium
 		create_info.basePipelineHandle = VK_NULL_HANDLE;
 		create_info.basePipelineIndex = 0;
 
-		CHECK(vkCreateGraphicsPipelines(_device._handle, VK_NULL_HANDLE, 1, &create_info, nullptr, &_handle));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_CommandPool::VK_CommandPool(const VK_Device& device, uint32_t queue_family_index)
-		: _device{device}
-	{
-		VkCommandPoolCreateInfo create_info = {};
-		create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		create_info.pNext = nullptr;
-		create_info.flags = 0;
-		create_info.queueFamilyIndex = queue_family_index;
-
-		CHECK(vkCreateCommandPool(_device._handle, &create_info, nullptr, &_handle));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	VK_CommandBuffer::VK_CommandBuffer(const VK_CommandPool& pool)
-		: _pool{pool}
-	{
-		VkCommandBufferAllocateInfo info = {};
-		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		info.pNext = nullptr;
-		info.commandPool = _pool._handle;
-		info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		info.commandBufferCount = 1;
-		CHECK(vkAllocateCommandBuffers(_pool._device._handle, &info, &_handle));
-	}
-
-	void VK_CommandBuffer::begin(VkCommandBufferUsageFlags flags) const
-	{
-		VkCommandBufferBeginInfo info;
-		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		info.pNext = nullptr;
-		info.flags = flags;
-		info.pInheritanceInfo = nullptr;
-		CHECK(vkBeginCommandBuffer(_handle, &info));
-	}
-
-	void VK_CommandBuffer::add_image_layout_transition(VkImage image, VkImageLayout from, VkImageLayout to) const
-	{
-		VkImageMemoryBarrier barrier;
-		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrier.pNext = nullptr;
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = 0;
-		barrier.oldLayout = from;
-		barrier.newLayout = to;
-		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.image = image;
-		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		barrier.subresourceRange.baseMipLevel = 0;
-		barrier.subresourceRange.levelCount = 1;
-		barrier.subresourceRange.baseArrayLayer = 0;
-		barrier.subresourceRange.layerCount = 1;
-
-		VkPipelineStageFlags src_stage = 0;
-		VkPipelineStageFlags dst_stage = 0;
-		if (from == VK_IMAGE_LAYOUT_UNDEFINED && to == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
-		{
-			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			src_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-			dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		}
-		else if (from == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && to == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-		{
-			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-			dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		}
-		else
-			throw std::logic_error{"Bad image layout transition"};
-
-		vkCmdPipelineBarrier(_handle, src_stage, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-	}
-
-	void VK_CommandBuffer::end() const
-	{
-		CHECK(vkEndCommandBuffer(_handle));
-	}
-
-	void VK_CommandBuffer::submit(VkSemaphore wait_semaphore, VkSemaphore signal_semaphore) const
-	{
-		const VkPipelineStageFlags pipeline_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-		VkSubmitInfo submit_info = {};
-		submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submit_info.pNext = nullptr;
-		submit_info.waitSemaphoreCount = 1;
-		submit_info.pWaitSemaphores = &wait_semaphore;
-		submit_info.pWaitDstStageMask = &pipeline_stage_flags;
-		submit_info.commandBufferCount = 1;
-		submit_info.pCommandBuffers = &_handle;
-		submit_info.signalSemaphoreCount = 1;
-		submit_info.pSignalSemaphores = &signal_semaphore;
-
-		CHECK(vkQueueSubmit(_pool._device._graphics_queue, 1, &submit_info, VK_NULL_HANDLE)); // TODO: Get the queue from the pool.
-	}
-
-	void VK_CommandBuffer::submit_and_wait() const
-	{
-		VkSubmitInfo info;
-		info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		info.pNext = nullptr;
-		info.waitSemaphoreCount = 0;
-		info.pWaitSemaphores = nullptr;
-		info.pWaitDstStageMask = nullptr;
-		info.commandBufferCount = 1;
-		info.pCommandBuffers = &_handle;
-		info.signalSemaphoreCount = 0;
-		info.pSignalSemaphores = nullptr;
-		CHECK(vkQueueSubmit(_pool._device._graphics_queue, 1, &info, VK_NULL_HANDLE)); // TODO: Get the queue from the pool.
-		CHECK(vkQueueWaitIdle(_pool._device._graphics_queue)); // TODO: Get the queue from the pool.
+		CHECK(vkCreateGraphicsPipelines(_context->_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &_handle));
 	}
 }
