@@ -5,34 +5,82 @@ sudo: false
 git:
   depth: 1
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - libopenal-dev
-      - libvorbis-dev
-      - libxcb-image0-dev
-
 matrix:
   include:
+
     - os: linux
       compiler: gcc
       env: GCC_VERSION=7 RENDERER=Null COVERAGE=1
+      addons: &gcc7-xcb
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - libopenal-dev
+            - libvorbis-dev
+            - libxcb-image0-dev
+
     - os: linux
       compiler: gcc
       env: GCC_VERSION=7 RENDERER=OpenGL
+      addons: &gcc7-x11
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - libopenal-dev
+            - libvorbis-dev
+
     - os: linux
       compiler: gcc
       env: GCC_VERSION=7 RENDERER=Vulkan
+      addons: *gcc7-xcb
+
+  exclude:
+
+    # Clang with GCC's libstdc++ doesn't work (https://bugs.llvm.org/show_bug.cgi?id=33222).
+    # Clang with libc++ also doesn't work (https://bugs.llvm.org/show_bug.cgi?id=33736).
+    - os: linux
+      compiler: clang
+      env: CLANG_VERSION=5.0 RENDERER=Null
+      addons: &clang5-x11
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - libopenal-dev
+            - libvorbis-dev
 
 before_install:
-  - if [ "${GCC_VERSION}" != "" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
+  - if [ -n "${CLANG_VERSION}" ]; then export CC=clang-$CLANG_VERSION CXX=clang++-$CLANG_VERSION; fi
+  - if [ -n "${GCC_VERSION}" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
 
 install:
   - mkdir ${TRAVIS_BUILD_DIR}/3rdparty/include
   - mkdir ${TRAVIS_BUILD_DIR}/travis
+
+  - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake && pushd ${TRAVIS_BUILD_DIR}/travis/cmake
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.tar.gz | tar -xz --strip-components 1
+  - export PATH=$(pwd)/bin:${PATH}
+  - popd
+
+  - if [ -n "${CLANG_VERSION}" ]; then mkdir -p ${TRAVIS_BUILD_DIR}/libcxx/include/c++/v1 ${TRAVIS_BUILD_DIR}/libcxx/lib; fi
+  - if [ -n "${CLANG_VERSION}" ]; then export CPLUS_INCLUDE_PATH=${TRAVIS_BUILD_DIR}/libcxx/include/c++/v1:${CPLUS_INCLUDE_PATH}; fi
+  - if [ -n "${CLANG_VERSION}" ]; then export LIBRARY_PATH=${TRAVIS_BUILD_DIR}/libcxx/lib:${LIBRARY_PATH}; fi
+  - if [ -n "${CLANG_VERSION}" ]; then pushd ${TRAVIS_BUILD_DIR}/travis; fi
+  - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/llvm/tags/RELEASE_500/final llvm; fi
+  - if [ -n "${CLANG_VERSION}" ]; then cd llvm/projects; fi
+  - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/tags/RELEASE_500/final libcxx; fi
+  - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxxabi/tags/RELEASE_500/final libcxxabi; fi
+  - if [ -n "${CLANG_VERSION}" ]; then cd ..; fi
+  - if [ -n "${CLANG_VERSION}" ]; then mkdir build && cd build; fi
+  - if [ -n "${CLANG_VERSION}" ]; then cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/libcxx ..; fi
+  - if [ -n "${CLANG_VERSION}" ]; then make cxx; fi
+  - if [ -n "${CLANG_VERSION}" ]; then make install-libcxx install-libcxxabi; fi
+  - if [ -n "${CLANG_VERSION}" ]; then popd; fi
 
   - mkdir ${TRAVIS_BUILD_DIR}/travis/boost && pushd ${TRAVIS_BUILD_DIR}/travis/boost
   - wget -q -O - https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.bz2 | tar -xj --strip-components 1
@@ -40,11 +88,6 @@ install:
   - ./b2 headers
   - ./b2 -j2 --with-test
   - CMAKE_OPTIONS+=" -DBOOST_ROOT=$(pwd)"
-  - popd
-
-  - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake && pushd ${TRAVIS_BUILD_DIR}/travis/cmake
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.tar.gz | tar -xz --strip-components 1
-  - export PATH=$(pwd)/bin:${PATH}
   - popd
 
   - if [ "${RENDERER}" = "Vulkan" ]; then git clone https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers; fi
@@ -64,7 +107,8 @@ script:
 
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_EXAMPLES=ON -DY_EXTRA=ON -DY_TOOLS=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_COVERAGE=ON"; fi
-  - cmake . $CMAKE_OPTIONS -DY_RENDERER=$RENDERER -DY_SANITIZERS=ON -DY_TESTS=ON -DY_TRAVIS=ON
+  - if [ -n "${GCC_VERSION}" ]; then CMAKE_OPTIONS+=" -DY_SANITIZERS=ON -DY_TRAVIS=ON"; fi
+  - cmake . $CMAKE_OPTIONS -DY_RENDERER=$RENDERER -DY_TESTS=ON
   - cmake --build . -- -j2
   - cmake --build . --target check
 
