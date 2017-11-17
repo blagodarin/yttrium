@@ -157,11 +157,11 @@ namespace
 		};
 
 		std::cerr << "Vulkan texture formats supported:\n";
-		for (const auto& format : formats)
+		for (const auto& [format_id, format_name] : formats)
 		{
 			VkFormatProperties properties;
-			vkGetPhysicalDeviceFormatProperties(device, format.first, &properties);
-			std::cerr << '\t' << ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-') << ' ' << format.second << " (" << format.first << ")\n";
+			vkGetPhysicalDeviceFormatProperties(device, format_id, &properties);
+			std::cerr << '\t' << ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-') << ' ' << format_name << " (" << format_id << ")\n";
 		}
 		std::cerr << '\n';
 	}

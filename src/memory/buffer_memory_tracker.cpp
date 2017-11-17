@@ -18,9 +18,9 @@ namespace Yttrium
 			if (size < 1024)
 				stream << size << " B";
 			else if (size < 1024 * 1024)
-				stream << size / 1024. << " KiB";
+				stream << static_cast<double>(size) / 1024. << " KiB";
 			else
-				stream << size / 1024. / 1024. << " MiB";
+				stream << static_cast<double>(size) / 1024. / 1024. << " MiB";
 			return stream.str();
 		};
 
@@ -36,8 +36,8 @@ namespace Yttrium
 		std::cerr << "\n(DEBUG)  * total_allocations : " << _total_allocations;
 		std::cerr << "\n(DEBUG)  * total_reallocations : " << _total_reallocations;
 		std::cerr << "\n(DEBUG)  * remaining_free_blocks : " << human_readable_size(_total_allocated.current_value());
-		for (const auto& block_count : free_block_count)
-			std::cerr << "\n(DEBUG)     - " << human_readable_size(block_count.first) << " : " << block_count.second;
+		for (const auto& [block_bytes, block_count] : free_block_count)
+			std::cerr << "\n(DEBUG)     - " << human_readable_size(block_bytes) << " : " << block_count;
 	#endif
 		std::cerr << "\n";
 		const auto total_usable_memory = _total_capacity.current_value();

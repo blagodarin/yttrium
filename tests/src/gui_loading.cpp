@@ -30,8 +30,8 @@ public:
 	{
 		Storage storage{Storage::UseFileSystem::Never};
 		storage.attach_buffer("main.ion", ::make_buffer(data));
-		for (const auto& source : _sources)
-			storage.attach_buffer(source.first, ::make_buffer(source.second));
+		for (const auto& [extra_name, extra_data] : _sources)
+			storage.attach_buffer(extra_name, ::make_buffer(extra_data));
 		ResourceLoader resource_loader{storage};
 		ScriptContext script_context;
 		Gui{resource_loader, script_context, "main.ion"};

@@ -180,8 +180,8 @@ namespace Yttrium
 				const auto property_count = static_cast<uint8_t>(entry.properties.size());
 				if (property_count != entry.properties.size() || !writer.write(property_count))
 					return false;
-				for (const auto& property : entry.properties)
-					if (!write_string(property.first) || !write_string(property.second))
+				for (const auto& [property_name, property_value] : entry.properties)
+					if (!write_string(property_name) || !write_string(property_value))
 						return false;
 			}
 		}

@@ -72,11 +72,11 @@ namespace Yttrium
 		if (!writer)
 			return false;
 		IonWriter ion{writer, IonWriter::Formatting::Pretty};
-		for (const auto& translation : translations)
+		for (const auto& [source, translation] : translations)
 		{
 			ion.add_name("tr");
-			ion.add_value(translation.first);
-			ion.add_value(translation.second);
+			ion.add_value(source);
+			ion.add_value(translation);
 		}
 		ion.flush();
 		return true;

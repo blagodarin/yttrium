@@ -69,8 +69,11 @@ int main(int argc, char** argv)
 
 	if (package_name.empty())
 	{
-		for (const auto& entry : entries)
-			std::cout << entry.first << "\n";
+		for (const auto& [path, properties] : entries)
+		{
+			std::cout << path << "\n";
+			std::ignore = properties;
+		}
 		return 0;
 	}
 
@@ -83,8 +86,8 @@ int main(int argc, char** argv)
 
 	try
 	{
-		for (auto& entry : entries)
-			package->add(entry.first, std::move(entry.second));
+		for (auto& [path, properties] : entries)
+			package->add(path, std::move(properties));
 		if (!package->commit())
 		{
 			std::cerr << "ERROR(" << package_name << "): Unable to write package file\n";
