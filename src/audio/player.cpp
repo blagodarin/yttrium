@@ -18,7 +18,7 @@ namespace Yttrium
 	AudioPlayerPrivate::~AudioPlayerPrivate()
 	{
 		{
-			std::lock_guard<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock{_mutex};
 			_terminate = true;
 		}
 		_condition.notify_one();
@@ -28,7 +28,7 @@ namespace Yttrium
 	void AudioPlayerPrivate::set_music(const std::shared_ptr<const Music>& music)
 	{
 		{
-			std::lock_guard<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock{_mutex};
 			_music = music;
 			_music_changed = true;
 			if (!_music || _state != AudioPlayer::State::Playing)
@@ -40,7 +40,7 @@ namespace Yttrium
 	void AudioPlayerPrivate::set_state(AudioPlayer::State state)
 	{
 		{
-			std::lock_guard<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock{_mutex};
 			_state = state;
 			if (!_music || _state != AudioPlayer::State::Playing)
 				return;
@@ -55,9 +55,9 @@ namespace Yttrium
 		{
 			std::shared_ptr<const Music> music;
 			{
-				std::unique_lock<std::mutex> lock(_mutex);
+				std::unique_lock<std::mutex> lock{_mutex};
 				if (!_music_changed)
-					_music = {};
+					_music.reset();
 				_condition.wait(lock, [this]{ return (_state == AudioPlayer::State::Playing && _music) || _terminate; });
 				if (_terminate)
 					break;
@@ -71,8 +71,8 @@ namespace Yttrium
 			for (bool restart = false; !restart;)
 			{
 				{
-					std::unique_lock<std::mutex> lock(_mutex);
-					if (_condition.wait_for(lock, std::chrono::milliseconds(300), [this]{ return _state != AudioPlayer::State::Playing || _music_changed || _terminate; }))
+					std::unique_lock<std::mutex> lock{_mutex};
+					if (_condition.wait_for(lock, std::chrono::milliseconds{300}, [this]{ return _state != AudioPlayer::State::Playing || _music_changed || _terminate; }))
 					{
 						_condition.wait(lock, [this]{ return _state == AudioPlayer::State::Playing || _music_changed || _terminate; });
 						if (_music_changed || _terminate)
@@ -100,7 +100,7 @@ namespace Yttrium
 	}
 
 	AudioPlayer::AudioPlayer(AudioManager& manager, State initial_state)
-		: _private(std::make_unique<AudioPlayerPrivate>(manager._private->backend(), initial_state))
+		: _private{std::make_unique<AudioPlayerPrivate>(manager._private->backend(), initial_state)}
 	{
 	}
 

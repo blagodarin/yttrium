@@ -14,10 +14,10 @@ namespace
 	{
 		const auto data = Yttrium::pages_allocate(size);
 		if (!data)
-			throw std::bad_alloc();
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+			throw std::bad_alloc{};
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		Yttrium::_buffer_memory_tracker.track_system_allocation(size);
-	#endif
+#endif
 		return data;
 	}
 
@@ -36,10 +36,10 @@ namespace Yttrium
 {
 	BufferMemory::~BufferMemory()
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		std::map<size_t, size_t> free_block_count;
 		{
-			std::lock_guard<std::mutex> lock(_small_blocks_mutex);
+			std::lock_guard<std::mutex> lock{_small_blocks_mutex};
 			for (auto i = ::level_from_capacity(capacity_for_size(1)); i <= MaxSmallBlockLevel; ++i)
 			{
 				size_t count = 0;
@@ -50,7 +50,7 @@ namespace Yttrium
 			}
 		}
 		_buffer_memory_tracker.print_state(free_block_count);
-	#endif
+#endif
 	}
 
 	void* BufferMemory::allocate(size_t capacity)
@@ -65,7 +65,7 @@ namespace Yttrium
 		{
 			const auto level = ::level_from_capacity(capacity);
 			{
-				std::lock_guard<std::mutex> lock(_small_blocks_mutex);
+				std::lock_guard<std::mutex> lock{_small_blocks_mutex};
 				data = _small_blocks[level];
 				if (data)
 					_small_blocks[level] = *reinterpret_cast<void**>(data);
@@ -74,8 +74,7 @@ namespace Yttrium
 					auto i = level + 1;
 					for (; i <= MaxSmallBlockLevel; ++i)
 					{
-						data = _small_blocks[i];
-						if (data)
+						if (data = _small_blocks[i]; data)
 						{
 							_small_blocks[i] = *reinterpret_cast<void**>(data);
 							break;
@@ -97,9 +96,9 @@ namespace Yttrium
 				}
 			}
 		}
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_tracker.track_capacity_allocation(capacity);
-	#endif
+#endif
 		return data;
 	}
 
@@ -110,22 +109,22 @@ namespace Yttrium
 		if (capacity > MaxSmallBlockSize)
 		{
 			pages_deallocate(data, capacity);
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_system_deallocation(capacity);
-		#endif
+#endif
 		}
 		else
 		{
 			const auto level = ::level_from_capacity(capacity);
 			{
-				std::lock_guard<std::mutex> lock(_small_blocks_mutex);
+				std::lock_guard<std::mutex> lock{_small_blocks_mutex};
 				*reinterpret_cast<void**>(data) = _small_blocks[level];
 				_small_blocks[level] = data;
 			}
 		}
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		_buffer_memory_tracker.track_capacity_deallocation(capacity);
-	#endif
+#endif
 	}
 
 	void* BufferMemory::reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size)
@@ -138,12 +137,12 @@ namespace Yttrium
 		{
 			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
-				throw std::bad_alloc();
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+				throw std::bad_alloc{};
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_system_reallocation(old_capacity, new_capacity);
 			_buffer_memory_tracker.track_capacity_change(old_capacity, new_capacity);
 			_buffer_memory_tracker.track_reallocation(); // TODO: Perhaps pure shrinking reallocations should be counted differently.
-		#endif
+#endif
 			return new_data;
 		}
 		else
@@ -154,9 +153,9 @@ namespace Yttrium
 			if (old_size > 0)
 				::memcpy(new_data, old_data, old_size);
 			deallocate(old_data, old_capacity);
-		#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 			_buffer_memory_tracker.track_reallocation();
-		#endif
+#endif
 			return new_data;
 		}
 	}
@@ -177,10 +176,10 @@ namespace Yttrium
 
 	size_t BufferMemory::total_capacity() noexcept
 	{
-	#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
 		return _buffer_memory_tracker.total_capacity();
-	#else
+#else
 		std::abort();
-	#endif
+#endif
 	}
 }

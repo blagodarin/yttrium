@@ -12,13 +12,13 @@ namespace Yttrium
 	{
 	public:
 		explicit RawAllocation(size_t size)
-			: _pointer{ std::malloc(size) }
+			: _pointer{std::malloc(size)}
 		{
 			if (!_pointer)
-				throw std::bad_alloc();
+				throw std::bad_alloc{};
 		}
 
-		~RawAllocation()
+		~RawAllocation() noexcept
 		{
 			std::free(_pointer);
 		}

@@ -1,6 +1,7 @@
 #ifndef _src_memory_buffer_memory_tracker_h_
 #define _src_memory_buffer_memory_tracker_h_
 
+// TODO: Build script option(s) for buffer memory debugging.
 #define Y_ENABLE_BUFFER_MEMORY_TRACKING 1 // Disable for profiling purposes only.
 #define Y_ENABLE_BUFFER_MEMORY_DEBUGGING 0
 
@@ -19,9 +20,9 @@ namespace Yttrium
 	class BufferMemoryTracker
 	{
 	public:
-	#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		void print_state(const std::map<size_t, size_t>& free_block_count);
-	#endif
+#endif
 
 		size_t total_capacity() const noexcept
 		{
@@ -31,10 +32,10 @@ namespace Yttrium
 		void track_capacity_allocation(size_t capacity) noexcept
 		{
 			_total_capacity += capacity;
-		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			++_allocations;
 			++_total_allocations;
-		#endif
+#endif
 		}
 
 		void track_capacity_change(size_t old_capacity, size_t new_capacity) noexcept
@@ -48,24 +49,24 @@ namespace Yttrium
 		void track_capacity_deallocation(size_t capacity) noexcept
 		{
 			_total_capacity -= capacity;
-		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			--_allocations;
-		#endif
+#endif
 		}
 
 		void track_reallocation() noexcept
 		{
-		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			++_total_reallocations;
-		#endif
+#endif
 		}
 
 		void track_system_allocation(size_t size) noexcept
 		{
 			_total_allocated += size;
-		#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 			++_total_system_allocations;
-		#endif
+#endif
 		}
 
 		void track_system_deallocation(size_t size) noexcept
@@ -84,12 +85,12 @@ namespace Yttrium
 	private:
 		MaxCounter<size_t> _total_allocated;
 		MaxCounter<size_t> _total_capacity;
-	#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		MaxCounter<size_t> _allocations;
 		std::atomic<size_t> _total_system_allocations{0};
 		std::atomic<size_t> _total_allocations{0};
 		std::atomic<size_t> _total_reallocations{0};
-	#endif
+#endif
 	};
 
 	extern BufferMemoryTracker _buffer_memory_tracker;
