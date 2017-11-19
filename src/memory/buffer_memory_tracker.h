@@ -1,8 +1,8 @@
 #ifndef _src_memory_buffer_memory_tracker_h_
 #define _src_memory_buffer_memory_tracker_h_
 
-#ifndef _src_config_h_
-	#error Include "src/config.h".
+#if !Y_ENABLE_BUFFER_MEMORY_TRACKING
+	#error Buffer memory tracking is disabled.
 #endif
 
 #include <yttrium/api.h>

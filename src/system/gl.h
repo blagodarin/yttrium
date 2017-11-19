@@ -2,7 +2,7 @@
 #define _src_system_gl_h_
 
 #include "../config.h"
-#ifdef Y_IS_WINDOWS
+#if Y_IS_WINDOWS
 	#include "windows/windows.h"
 	#define GLAPI_CALL APIENTRY
 #else

@@ -16,11 +16,11 @@ namespace Yttrium
 
 	std::optional<ImageFormat> read_dds_header(Reader&);
 
-#ifndef Y_NO_JPEG
+#if Y_USE_JPEG
 	std::optional<ImageFormat> read_jpeg(const Source&, Buffer&);
 #endif
 
-#ifndef Y_NO_PNG
+#if Y_USE_PNG
 	bool write_png(Writer&, const ImageFormat&, const void*);
 #endif
 

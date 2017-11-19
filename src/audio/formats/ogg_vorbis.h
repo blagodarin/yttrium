@@ -1,6 +1,10 @@
 #ifndef _src_audio_formats_ogg_vorbis_h_
 #define _src_audio_formats_ogg_vorbis_h_
 
+#if !Y_USE_OGG_VORBIS
+	#error Ogg Vorbis support is disabled.
+#endif
+
 #include "../reader.h"
 
 #include <vorbis/vorbisfile.h>

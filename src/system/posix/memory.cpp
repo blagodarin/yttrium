@@ -38,7 +38,7 @@ namespace Yttrium
 
 	void* pages_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
 	{
-#ifdef Y_IS_LINUX
+#if Y_IS_LINUX
 		const auto new_pointer = ::mremap(old_pointer, old_size, new_size, MREMAP_MAYMOVE);
 		if (new_pointer != MAP_FAILED)
 			return new_pointer;

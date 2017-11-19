@@ -2,17 +2,17 @@
 #define _src_config_h_
 
 // Platforms.
-#cmakedefine Y_IS_LINUX
-#cmakedefine Y_IS_POSIX
-#cmakedefine Y_IS_WINDOWS
+#cmakedefine01 Y_IS_LINUX
+#cmakedefine01 Y_IS_POSIX
+#cmakedefine01 Y_IS_WINDOWS
 
 // Features.
 #cmakedefine01 Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 #cmakedefine01 Y_ENABLE_BUFFER_MEMORY_TRACKING
 
 // Components.
-#cmakedefine Y_NO_JPEG
-#cmakedefine Y_NO_OGG_VORBIS
-#cmakedefine Y_NO_PNG
+#cmakedefine01 Y_USE_JPEG
+#cmakedefine01 Y_USE_OGG_VORBIS
+#cmakedefine01 Y_USE_PNG
 
 #endif

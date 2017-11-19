@@ -33,7 +33,7 @@ namespace Yttrium
 		switch (type)
 		{
 		case ImageType::Tga: format = read_tga_header(reader); break;
-#ifndef Y_NO_JPEG
+#if Y_USE_JPEG
 		case ImageType::Jpeg: return read_jpeg(source, buffer);
 #endif
 		case ImageType::Dds: format = read_dds_header(reader); break;
@@ -49,7 +49,7 @@ namespace Yttrium
 		switch (type)
 		{
 		case ImageType::Tga: return write_tga(writer, format, data);
-#ifndef Y_NO_PNG
+#if Y_USE_PNG
 		case ImageType::Png: return write_png(writer, format, data);
 #endif
 		default: return false;
@@ -66,12 +66,12 @@ namespace Yttrium
 		case "DDS "_fourcc:
 			type = ImageType::Dds;
 			return true;
-#ifndef Y_NO_PNG
+#if Y_USE_PNG
 		case "\xff\xd8\xff\xe0"_fourcc: // SOI marker and JFIF APP0 marker.
 			type = ImageType::Jpeg;
 			return true;
 #endif
-#ifndef Y_NO_JPEG
+#if Y_USE_JPEG
 		case "\x89PNG"_fourcc:
 			type = ImageType::Png;
 			return true;

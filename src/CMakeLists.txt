@@ -1,7 +1,3 @@
-option(NO_JPEG "Exclude JPEG support")
-option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
-option(NO_PNG "Exclude PNG support")
-
 # Platforms.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(Y_IS_LINUX ON)
@@ -12,13 +8,13 @@ set(Y_IS_POSIX ${UNIX})
 set(Y_IS_WINDOWS ${WIN32})
 
 # Features.
-set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING ON)
+set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
 
 # Components.
-set(Y_NO_JPEG ${NO_JPEG})
-set(Y_NO_OGG_VORBIS ${NO_OGG_VORBIS})
-set(Y_NO_PNG ${NO_PNG})
+option(Y_USE_JPEG "Exclude JPEG support" ON)
+option(Y_USE_OGG_VORBIS "Exclude Ogg Vorbis support" ON)
+option(Y_USE_PNG "Exclude PNG support" ON)
 
 configure_file(config.h.in config.h)
 
@@ -86,7 +82,7 @@ if(ON)
 	target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENAL_LIBRARY})
 endif()
-if(NOT NO_OGG_VORBIS)
+if(Y_USE_OGG_VORBIS)
 	find_library(OGG_LIBRARY ogg)
 	find_library(VORBIS_LIBRARY vorbis)
 	find_library(VORBISFILE_LIBRARY vorbisfile)
@@ -150,7 +146,7 @@ target_sources(yttrium PRIVATE
 	image/utils.cpp
 	image/utils.h
 	)
-if(NOT NO_JPEG)
+if(Y_USE_JPEG)
 	find_package(JPEG REQUIRED)
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
@@ -158,7 +154,7 @@ if(NOT NO_JPEG)
 	target_include_directories(yttrium PRIVATE ${JPEG_INCLUDE_DIR})
 	target_link_libraries(yttrium ${JPEG_LIBRARIES})
 endif()
-if(NOT NO_PNG)
+if(Y_USE_PNG)
 	find_package(PNG REQUIRED)
 	target_sources(yttrium PRIVATE
 		image/formats/png.cpp

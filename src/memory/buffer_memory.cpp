@@ -1,9 +1,9 @@
 #include "buffer_memory.h"
 
 #include <yttrium/utils.h>
-#include "../config.h"
 #include "../system/memory.h"
 
+#include "../config.h"
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
 	#include "buffer_memory_tracker.h"
 #endif

@@ -70,7 +70,7 @@ namespace Yttrium
 		{
 			if (strings::ends_with(path, ".tga"))
 				type = ImageType::Tga;
-#ifndef Y_NO_PNG
+#if Y_USE_PNG
 			else if (strings::ends_with(path, ".png"))
 				type = ImageType::Png;
 #endif

@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(test_dds_reading)
 	BOOST_CHECK(*image == ::make_test_image(true));
 }
 
-#ifndef Y_NO_JPEG
+#if Y_USE_JPEG
 BOOST_AUTO_TEST_CASE(test_jpeg_reading)
 {
 	const auto jpeg_image = Image::load(*Source::from("tests/data/gradient24.jpeg"));
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(test_jpeg_reading)
 }
 #endif
 
-#ifndef Y_NO_PNG
+#if Y_USE_PNG
 BOOST_AUTO_TEST_CASE(test_png_writing)
 {
 	TemporaryFile file;
