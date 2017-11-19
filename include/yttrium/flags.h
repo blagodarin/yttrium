@@ -19,41 +19,41 @@ namespace Yttrium
 		std::underlying_type_t<T> _flags = 0;
 	};
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr bool operator==(const Flags<T> a, const Flags<T> b) noexcept
 	{
 		using U = std::underlying_type_t<T>;
 		return static_cast<U>(a) == static_cast<U>(b);
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr bool operator!=(const Flags<T> a, const Flags<T> b) noexcept
 	{
 		return !(a == b);
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr auto operator&(const Flags<T> a, const T b) noexcept
 	{
 		using U = std::underlying_type_t<T>;
 		return static_cast<U>(a) & static_cast<U>(b);
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr auto operator&(const T a, const Flags<T> b) noexcept
 	{
 		using U = std::underlying_type_t<T>;
 		return static_cast<U>(a) & static_cast<U>(b);
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr auto operator&(const Flags<T> a, const Flags<T> b) noexcept
 	{
 		using U = std::underlying_type_t<T>;
 		return static_cast<U>(a) & static_cast<U>(b);
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr Flags<T> operator|(const Flags<T> a, const Flags<T> b) noexcept
 	{
 		using U = std::underlying_type_t<T>;
@@ -62,7 +62,7 @@ namespace Yttrium
 
 	namespace Operators
 	{
-		template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+		template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 		constexpr Flags<T> operator|(const T a, const T b) noexcept
 		{
 			using U = std::underlying_type_t<T>;
