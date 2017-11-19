@@ -109,20 +109,14 @@ namespace Yttrium
 				image = std::move(*converted);
 		}
 
-		const auto format = image.format();
-
-		auto data = image.data();
-
 		VkFormat vk_format = VK_FORMAT_UNDEFINED;
-		std::optional<Image> temporary;
-		switch (format.pixel_format())
+		switch (image.format().pixel_format())
 		{
 		case PixelFormat::Gray8:
 		case PixelFormat::GrayAlpha16:
 		case PixelFormat::Rgb24:
 		case PixelFormat::Bgr24:
-			temporary = to_bgra(image);
-			data = temporary->data();
+			image = to_bgra(image);
 			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
 			break;
 		case PixelFormat::Rgba32:
@@ -136,7 +130,7 @@ namespace Yttrium
 		}
 
 		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(renderer, _context, image.format(), has_mipmaps, vk_format, data);
+		return std::make_unique<VulkanTexture2D>(renderer, _context, image.format(), has_mipmaps, vk_format, image.data());
 	}
 
 	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)
