@@ -3,6 +3,9 @@
 	- Multiple windows.
 	- Windowed mode.
 	- Proper benchmarks (e. g. using some benchmarking library).
+	- Debug output, e. g. in a ring buffer that can be dumped on exception.
+	* Audio:
+		- Windows Multimedia audio backend.
 	* GUI:
 		- Line editor widget.
 	* Image:
