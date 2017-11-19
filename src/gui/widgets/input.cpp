@@ -33,7 +33,7 @@ namespace Yttrium
 		if (capture._has_selection)
 		{
 			auto selection_color = style_data._foreground.color;
-			selection_color.a *= .25f;
+			selection_color._a *= .25f;
 			PushTexture push_texture(renderer, nullptr);
 			renderer.draw_rect(capture._selection_rect, selection_color);
 		}

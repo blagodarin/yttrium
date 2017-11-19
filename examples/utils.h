@@ -2,12 +2,12 @@
 #define _examples_utils_h_
 
 #include <yttrium/image.h>
+#include <yttrium/math/color.h>
 
 #include <array>
 #include <ctime>
-#include <tuple>
 
-inline auto make_bgra_tga(size_t width, size_t height, const std::function<std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>(size_t, size_t)>& callback)
+inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yttrium::Bgra32(size_t, size_t)>& callback)
 {
 	Yttrium::Image image({ width, height, Yttrium::PixelFormat::Bgra32 });
 	for (size_t y = 0; y < height; ++y)
@@ -16,10 +16,10 @@ inline auto make_bgra_tga(size_t width, size_t height, const std::function<std::
 		{
 			const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.format().row_size() + x * 4;
 			const auto color = callback(x, y);
-			pixel[0] = std::get<0>(color);
-			pixel[1] = std::get<1>(color);
-			pixel[2] = std::get<2>(color);
-			pixel[3] = std::get<3>(color);
+			pixel[0] = color._b;
+			pixel[1] = color._g;
+			pixel[2] = color._r;
+			pixel[3] = color._a;
 		}
 	}
 	return image.to_buffer(Yttrium::ImageType::Tga);

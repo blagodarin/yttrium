@@ -23,23 +23,24 @@ namespace
 		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [button_size](size_t, size_t y)
 		{
 			const auto style = y / button_size;
-			return std::make_tuple(0xff, 0x44 * style, 0x44 * style, 0xff);
+			return Bgra32{0xff, 0x44 * style, 0x44 * style};
 		}));
 	}
 
 	void make_cursor_texture(Storage& storage, const std::string& name)
 	{
 		constexpr size_t size = 64;
-		storage.attach_buffer(name, ::make_bgra_tga(size, size, [size](size_t x, size_t y) -> std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>
+		storage.attach_buffer(name, ::make_bgra_tga(size, size, [size](size_t x, size_t y)
 		{
 			if (y > 2 * x || 2 * y < x || (y > 2 * (size - x) && x > 2 * (size - y)))
-				return std::make_tuple(0, 0, 0, 0);
+				return Bgra32{0, 0, 0, 0};
 			else
-				return std::make_tuple(
+				return Bgra32
+				{
 					y * 0xff / (size - 1),
 					x * 0xff / (size - 1),
 					(size * size - x * y) * 0xff / (size * size),
-					0xff);
+				};
 		}));
 	}
 

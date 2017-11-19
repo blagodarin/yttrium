@@ -3,6 +3,7 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 add_executable(unit_tests
 	src/buffer_appender.cpp
 	src/buffer.cpp
+	src/color.cpp
 	src/flags.cpp
 	src/gui_loading.cpp
 	src/image_formats.cpp
