@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_make_string)
 	BOOST_CHECK_EQUAL("", make_string(std::string{}));
 
 	BOOST_CHECK_EQUAL("abc", make_string("abc"));
-	BOOST_CHECK_EQUAL("abc", make_string(std::string{ "abc" }));
+	BOOST_CHECK_EQUAL("abc", make_string(std::string{"abc"}));
 
 	BOOST_CHECK_EQUAL("0", make_string(short{ 0 }));
 	BOOST_CHECK_EQUAL("0", make_string(static_cast<unsigned short>(0)));
@@ -178,10 +178,10 @@ BOOST_AUTO_TEST_CASE(test_string_to_number_uint32)
 	BOOST_CHECK(!to_number("-0", u));
 
 	BOOST_CHECK(to_number("0", u));
-	BOOST_CHECK_EQUAL(u, 0);
+	BOOST_CHECK_EQUAL(u, 0u);
 
 	BOOST_CHECK(to_number("+0", u));
-	BOOST_CHECK_EQUAL(u, 0);
+	BOOST_CHECK_EQUAL(u, 0u);
 
 	BOOST_CHECK(to_number("4294967295", u));
 	BOOST_CHECK_EQUAL(u, 4294967295u);
