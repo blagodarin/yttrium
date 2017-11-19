@@ -2,6 +2,8 @@
 
 #include "renderer.h"
 
+#include <cassert>
+
 namespace Yttrium
 {
 	VulkanTexture2D::VulkanTexture2D(RendererImpl& renderer, VulkanContext& context, const ImageFormat& format, bool has_mipmaps, VkFormat vk_format, const void* data)
@@ -23,7 +25,8 @@ namespace Yttrium
 		{
 			VkBufferImageCopy region;
 			region.bufferOffset = 0;
-			region.bufferRowLength = 0;
+			assert(format.row_size() % format.pixel_size() == 0); // TODO: Proper runtime constraint.
+			region.bufferRowLength = static_cast<uint32_t>(format.row_size() / format.pixel_size());
 			region.bufferImageHeight = 0;
 			region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			region.imageSubresource.mipLevel = 0;

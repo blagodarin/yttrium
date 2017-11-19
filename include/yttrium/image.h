@@ -150,7 +150,7 @@ namespace Yttrium
 	private:
 		ImageFormat _format;
 		Buffer _buffer;
-		Image(const ImageFormat& format, Buffer&& buffer) : _format(format), _buffer(std::move(buffer)) {}
+		Image(const ImageFormat& format, Buffer&& buffer) : _format{format}, _buffer{std::move(buffer)} {}
 	};
 
 	///
