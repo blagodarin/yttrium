@@ -82,11 +82,6 @@ namespace Yttrium
 		return BufferMemory::granularity();
 	}
 
-	size_t Buffer::total_capacity() noexcept
-	{
-		return BufferMemory::total_capacity();
-	}
-
 	Buffer::Buffer(Buffer&& other) noexcept
 		: _size(other._size)
 		, _capacity(other._capacity)
@@ -112,8 +107,8 @@ namespace Yttrium
 		return *this;
 	}
 
-	bool operator==(const Buffer& lhs, const Buffer& rhs) noexcept
+	bool operator==(const Buffer& a, const Buffer& b) noexcept
 	{
-		return lhs.size() == rhs.size() && (lhs.size() == 0 || !std::memcmp(lhs.data(), rhs.data(), lhs.size()));
+		return a.size() == b.size() && (a.size() == 0 || !std::memcmp(a.data(), b.data(), a.size()));
 	}
 }

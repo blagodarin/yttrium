@@ -2,6 +2,7 @@ option(NO_JPEG "Exclude JPEG support")
 option(NO_OGG_VORBIS "Exclude Ogg Vorbis support")
 option(NO_PNG "Exclude PNG support")
 
+# Platforms.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(Y_IS_LINUX ON)
 else()
@@ -9,9 +10,16 @@ else()
 endif()
 set(Y_IS_POSIX ${UNIX})
 set(Y_IS_WINDOWS ${WIN32})
+
+# Features.
+set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING ON)
+set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
+
+# Components.
 set(Y_NO_JPEG ${NO_JPEG})
 set(Y_NO_OGG_VORBIS ${NO_OGG_VORBIS})
 set(Y_NO_PNG ${NO_PNG})
+
 configure_file(config.h.in config.h)
 
 add_library(yttrium SHARED
@@ -193,8 +201,6 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/memory/pool.h
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
-	memory/buffer_memory_tracker.cpp
-	memory/buffer_memory_tracker.h
 	memory/buffer.cpp
 	memory/pool.cpp
 	memory/raw.h
@@ -207,6 +213,12 @@ if(UNIX)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
 		system/windows/memory.cpp
+		)
+endif()
+if(Y_ENABLE_BUFFER_MEMORY_TRACKING)
+	target_sources(yttrium PRIVATE
+		memory/buffer_memory_tracker.cpp
+		memory/buffer_memory_tracker.h
 		)
 endif()
 

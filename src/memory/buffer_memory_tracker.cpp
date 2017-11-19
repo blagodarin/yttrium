@@ -1,6 +1,7 @@
+#include "../config.h"
 #include "buffer_memory_tracker.h"
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
+#if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 
 #include <iostream>
 #include <sstream>

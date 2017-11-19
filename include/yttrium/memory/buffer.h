@@ -16,7 +16,6 @@ namespace Yttrium
 	class Y_API Buffer
 	{
 	public:
-
 		/// Creates a buffer with no data.
 		Buffer() noexcept = default;
 
@@ -64,9 +63,6 @@ namespace Yttrium
 		/// Returns the granularity of buffer memory, i.e. the size of a memory page.
 		static size_t memory_granularity() noexcept;
 
-		/// Returns the total capacity of all Buffers.
-		static size_t total_capacity() noexcept;
-
 		Buffer(const Buffer&) = delete;
 		Buffer(Buffer&&) noexcept;
 		~Buffer() noexcept;
@@ -79,7 +75,7 @@ namespace Yttrium
 	};
 
 	Y_API bool operator==(const Buffer&, const Buffer&) noexcept;
-	inline bool operator!=(const Buffer& lhs, const Buffer& rhs) noexcept { return !(lhs == rhs); }
+	inline bool operator!=(const Buffer& a, const Buffer& b) noexcept { return !(a == b); }
 }
 
 #endif

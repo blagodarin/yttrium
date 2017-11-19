@@ -1,12 +1,11 @@
 #ifndef _src_memory_buffer_memory_tracker_h_
 #define _src_memory_buffer_memory_tracker_h_
 
-// TODO: Build script option(s) for buffer memory debugging.
-#define Y_ENABLE_BUFFER_MEMORY_TRACKING 1 // Disable for profiling purposes only.
-#define Y_ENABLE_BUFFER_MEMORY_DEBUGGING 0
+#ifndef _src_config_h_
+	#error Include "src/config.h".
+#endif
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-
+#include <yttrium/api.h>
 #include "../utils/atomic_counters.h"
 
 #include <cstddef>
@@ -93,9 +92,7 @@ namespace Yttrium
 #endif
 	};
 
-	extern BufferMemoryTracker _buffer_memory_tracker;
+	extern Y_API BufferMemoryTracker _buffer_memory_tracker;
 }
-
-#endif
 
 #endif

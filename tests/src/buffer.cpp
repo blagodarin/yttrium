@@ -1,5 +1,9 @@
 #include <yttrium/memory/buffer.h>
-#include "../../src/memory/buffer_memory_tracker.h"
+#include "../../src/config.h"
+
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+	#include "../../src/memory/buffer_memory_tracker.h"
+#endif
 
 #include <boost/test/unit_test.hpp>
 
@@ -123,26 +127,26 @@ BOOST_AUTO_TEST_CASE(buffer_shrink_to_fit)
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
 BOOST_AUTO_TEST_CASE(buffer_total_capacity)
 {
-	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
+	BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), 0);
 	{
 		Buffer buffer;
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
+		BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), 0);
 
 		buffer.reserve(1);
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), granularity);
+		BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), granularity);
 
 		buffer.resize(1);
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), granularity);
+		BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), granularity);
 
 		buffer.resize(0);
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), granularity);
+		BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), granularity);
 
 		buffer.shrink_to_fit();
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
+		BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), 0);
 
 		buffer = Buffer(granularity + 1);
-		BOOST_CHECK_EQUAL(Buffer::total_capacity(), granularity * 2);
+		BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), granularity * 2);
 	}
-	BOOST_CHECK_EQUAL(Buffer::total_capacity(), 0);
+	BOOST_CHECK_EQUAL(Yttrium::_buffer_memory_tracker.total_capacity(), 0);
 }
 #endif

@@ -1,8 +1,12 @@
 #include "buffer_memory.h"
 
 #include <yttrium/utils.h>
+#include "../config.h"
 #include "../system/memory.h"
-#include "buffer_memory_tracker.h"
+
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING
+	#include "buffer_memory_tracker.h"
+#endif
 
 #include <cassert>
 #include <cstring>
@@ -172,14 +176,5 @@ namespace Yttrium
 		static const auto page_size = pages_granularity();
 		assert(is_power_of_2(page_size));
 		return page_size;
-	}
-
-	size_t BufferMemory::total_capacity() noexcept
-	{
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		return _buffer_memory_tracker.total_capacity();
-#else
-		std::abort();
-#endif
 	}
 }
