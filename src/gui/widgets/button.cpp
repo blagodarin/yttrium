@@ -9,11 +9,8 @@ namespace Yttrium
 	{
 	}
 
-	void ButtonWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::Style style) const
+	void ButtonWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
-		if (_data->_fixed_style)
-			style = *_data->_fixed_style;
-		auto& style_data = _data->style_data(style);
 		style_data._background.draw(renderer, rect);
 		style_data._foreground.prepare(_data->_text, rect);
 		style_data._foreground.draw(renderer);

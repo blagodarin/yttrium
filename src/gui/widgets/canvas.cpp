@@ -9,7 +9,7 @@ namespace Yttrium
 	{
 	}
 
-	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::Style) const
+	void CanvasWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::StyleData&) const
 	{
 		_gui.on_canvas_draw(_name, rect, renderer);
 	}

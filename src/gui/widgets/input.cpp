@@ -14,10 +14,8 @@ namespace Yttrium
 		_logic.reset(std::string{_data->_text});
 	}
 
-	void InputWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::Style style) const
+	void InputWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
-		auto& style_data = _data->style_data(style); // TODO: Move up the call stack?
-
 		style_data._background.draw(renderer, rect);
 
 		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());

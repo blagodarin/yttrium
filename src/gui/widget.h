@@ -29,7 +29,7 @@ namespace Yttrium
 		void set_focused(bool focused) { _is_focused = focused; }
 		void set_render_rect(const RectF& rect) { _render_rect = rect; }
 
-		virtual void draw(Renderer&, const RectF&, WidgetData::Style) const = 0;
+		void draw(Renderer&, const RectF&, WidgetData::Style) const;
 		virtual bool process_key(const KeyEvent&) { return false; }
 		virtual void process_mouse_move(const Vector2&) {}
 		virtual bool process_mouse_press(Key, const Vector2&) { return false; }
@@ -37,6 +37,8 @@ namespace Yttrium
 
 	protected:
 		Widget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&, Flags<Flag> = {});
+
+		virtual void draw(Renderer&, const RectF&, WidgetData::StyleData&) const = 0;
 
 	protected:
 		GuiPrivate& _gui;
