@@ -14,9 +14,10 @@ namespace Yttrium
 		friend AudioReader;
 
 	public:
-		uint64_t current_sample() const override { return _current_sample; }
-		AudioFormat format() const override { return _format; }
-		uint64_t total_bytes() const override { return _total_samples * _format.block_size(); }
+		uint64_t current_sample() const noexcept override { return _current_sample; }
+		AudioFormat format() const noexcept override { return _format; }
+		uint64_t total_bytes() const noexcept override { return _total_samples * _format.block_size(); }
+		uint64_t total_samples() const noexcept override { return _total_samples; }
 
 	protected:
 		AudioFormat _format;
@@ -26,7 +27,7 @@ namespace Yttrium
 		Reader _reader{*_source};
 
 		AudioReaderImpl(std::unique_ptr<Source>&& source)
-			: _source(std::move(source))
+			: _source{std::move(source)}
 		{
 		}
 	};

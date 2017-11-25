@@ -55,6 +55,7 @@ target_sources(yttrium PRIVATE
 	audio/formats/wav.cpp
 	audio/formats/wav.h
 	audio/backend.h
+	audio/format.cpp
 	audio/manager.cpp
 	audio/manager.h
 	audio/music.cpp

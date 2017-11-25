@@ -251,11 +251,25 @@ BOOST_AUTO_TEST_CASE(test_string_to_time)
 {
 	using namespace Yttrium::strings;
 
+	BOOST_CHECK_EQUAL(to_time("1"), 1'000);
+	BOOST_CHECK_EQUAL(to_time("1:2"), 62'000);
+	BOOST_CHECK_EQUAL(to_time("1:1:2"), 3662'000);
+	BOOST_CHECK_EQUAL(to_time("1:1:2.5"), 3662'500);
+	BOOST_CHECK_EQUAL(to_time("-10:1:2.25"), -36062'250);
+
+	BOOST_CHECK_EQUAL(to_time("-01:23:45"), -5025'000);
+	BOOST_CHECK_EQUAL(to_time("+01:23:45."), 5025'000);
+	BOOST_CHECK_EQUAL(to_time("-01:23:45.6"), -5025'600);
+	BOOST_CHECK_EQUAL(to_time("+01:23:45.67"), 5025'670);
+	BOOST_CHECK_EQUAL(to_time("-01:23:45.678"), -5025'678);
+	BOOST_CHECK_EQUAL(to_time("+01:23:45.6789"), 5025'678);
+
 	BOOST_CHECK_EQUAL(to_time(""), 0);
-	BOOST_CHECK_EQUAL(to_time("1"), 1);
-	BOOST_CHECK_EQUAL(to_time("1:2"), 62);
-	BOOST_CHECK_EQUAL(to_time("1:1:2"), 3662);
-	BOOST_CHECK_EQUAL(to_time("1:1:2.5"), 3662.5);
-	BOOST_CHECK_EQUAL(to_time("-10:1:2.25"), -36062.25);
-	BOOST_CHECK_EQUAL(to_time("+101:1:2.125"), 363662.125);
+	BOOST_CHECK_EQUAL(to_time("."), 0);
+	BOOST_CHECK_EQUAL(to_time("+::."), 0);
+	BOOST_CHECK_EQUAL(to_time("+::.1"), 100);
+	BOOST_CHECK_EQUAL(to_time("-1.1"), -1'100);
+	BOOST_CHECK_EQUAL(to_time("-1:.1"), -60'100);
+	BOOST_CHECK_EQUAL(to_time("-1::.1"), -3600'100);
+	BOOST_CHECK_EQUAL(to_time("-1:::.1"), -3600'000);
 }

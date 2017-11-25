@@ -7,21 +7,29 @@
 
 namespace Yttrium
 {
+	class AudioFormat;
 	class AudioReader;
 
-	class MusicImpl final : public Music
+	class MusicReaderImpl final : public MusicReader
 	{
 	public:
-		MusicImpl(std::unique_ptr<AudioReader>&&);
+		MusicReaderImpl(std::unique_ptr<AudioReader>&&);
 
-		void set_settings(const Settings&) override;
+		bool set_properties(int start_ms, int end_ms, int loop_ms) noexcept override;
 
-		AudioReader& reader() const { return *_reader; }
-		Settings settings() const { return _settings; }
+		size_t buffer_size() const noexcept { return _buffer_samples * _block_size; }
+		AudioFormat format() const noexcept;
+		size_t read(void*);
+		void seek_start();
 
 	private:
 		const std::unique_ptr<AudioReader> _reader;
-		Settings _settings;
+		const size_t _block_size;
+		const size_t _buffer_samples;
+		uint64_t _start_sample = 0;
+		uint64_t _end_sample = 0;
+		uint64_t _loop_sample = 0;
+		bool _is_looping = false;
 	};
 }
 

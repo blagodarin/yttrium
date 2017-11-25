@@ -17,7 +17,7 @@ namespace Yttrium
 		AudioPlayerPrivate(AudioBackend&, AudioPlayer::State);
 		~AudioPlayerPrivate();
 
-		void set_music(const std::shared_ptr<const Music>&);
+		void set_music(const std::shared_ptr<MusicReader>&);
 		void set_state(AudioPlayer::State);
 
 	private:
@@ -28,7 +28,7 @@ namespace Yttrium
 		std::mutex _mutex;
 		std::condition_variable _condition;
 		AudioPlayer::State _state = AudioPlayer::State::Stopped;
-		std::shared_ptr<const Music> _music;
+		std::shared_ptr<MusicReader> _music;
 		bool _music_changed = false;
 		bool _terminate = false;
 		std::thread _thread;

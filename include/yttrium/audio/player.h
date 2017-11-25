@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 	class AudioManager;
-	class Music;
+	class MusicReader;
 
 	/// Audio player.
 	class Y_API AudioPlayer
@@ -31,7 +31,7 @@ namespace Yttrium
 		~AudioPlayer();
 
 		///
-		void set_music(const std::shared_ptr<const Music>&);
+		void set_music(const std::shared_ptr<MusicReader>&);
 
 		///
 		void set_state(State);

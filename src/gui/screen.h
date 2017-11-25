@@ -14,7 +14,7 @@ namespace Yttrium
 {
 	class GuiLayout;
 	class GuiPrivate;
-	class Music;
+	class MusicReader;
 	class Renderer;
 	class Texture2D;
 	class Widget;
@@ -32,12 +32,12 @@ namespace Yttrium
 		bool handle_key(const KeyEvent&);
 		void handle_return() const { _on_return.run(_gui); }
 		bool is_transparent() const { return _is_transparent; }
-		const std::shared_ptr<const Music>& music() const { return _music; }
+		const std::shared_ptr<MusicReader>& music() const { return _music; }
 		std::string_view name() const { return _name; }
 		void register_widget(Widget&);
 		void set_cursor(GuiCursor, std::string_view texture = {});
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture) { _cursor = cursor; _cursor_texture = texture; }
-		void set_music(const std::shared_ptr<const Music>& music) { _music = music; }
+		void set_music(const std::shared_ptr<MusicReader>& music) { _music = music; }
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(std::string_view event, GuiActions&& actions) { _on_event.insert_or_assign(std::string{event}, std::move(actions)); }
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
@@ -61,7 +61,7 @@ namespace Yttrium
 		GuiActions _on_return;
 		GuiCursor _cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _cursor_texture;
-		std::shared_ptr<const Music> _music;
+		std::shared_ptr<MusicReader> _music;
 	};
 }
 

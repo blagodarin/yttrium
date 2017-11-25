@@ -8,7 +8,8 @@
 namespace Yttrium
 {
 	class AudioPlayerBackend;
-	class Music;
+	class MusicReader;
+	class MusicReaderImpl;
 
 	class AudioStreamer
 	{
@@ -24,22 +25,15 @@ namespace Yttrium
 		~AudioStreamer();
 
 		FetchResult fetch();
-		bool open(const std::shared_ptr<const Music>&);
+		bool open(const std::shared_ptr<MusicReader>&);
 		void start();
 
 	private:
-		size_t read();
-
-	private:
 		AudioPlayerBackend& _backend;
-		std::shared_ptr<const Music> _music;
-		uint64_t _start_sample = 0;
-		uint64_t _end_sample = 0;
-		bool _is_looping = false;
-		uint64_t _loop_sample = 0;
-		Buffer _buffer;
+		std::shared_ptr<MusicReaderImpl> _music;
 		size_t _block_size = 0;
 		size_t _buffer_samples = 0;
+		Buffer _buffer;
 	};
 }
 

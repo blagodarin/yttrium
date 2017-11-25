@@ -334,7 +334,7 @@ namespace Yttrium
 			return ::string_to_float(string.data(), string.data() + string.size(), value);
 		}
 
-		double to_time(std::string_view string) noexcept
+		int to_time(std::string_view string) noexcept
 		{
 			if (string.empty())
 				return 0;
@@ -349,35 +349,36 @@ namespace Yttrium
 			case '+': ++p;
 			}
 
-			double result = 0;
+			int result = 0;
 			for (; p != end && *p >= '0' && *p <= '9'; ++p)
 				result = result * 10 + *p - '0';
 
 			if (p != end && *p == ':')
 			{
-				double mins_or_secs = 0;
+				int minutes_or_seconds = 0;
 				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
-					mins_or_secs = mins_or_secs * 10 + *p - '0';
-				result = result * 60 + mins_or_secs;
+					minutes_or_seconds = minutes_or_seconds * 10 + *p - '0';
+				result = result * 60 + minutes_or_seconds;
 			}
 
 			if (p != end && *p == ':')
 			{
-				double secs = 0;
+				int seconds = 0;
 				for (++p; *p >= '0' && *p <= '9'; ++p)
-					secs = secs * 10 + *p - '0';
-				result = result * 60 + secs;
+					seconds = seconds * 10 + *p - '0';
+				result = result * 60 + seconds;
 			}
+
+			result *= 1000;
 
 			if (p != end && *p == '.')
 			{
-				double factor = 1;
+				int multiplier = 100;
 				for (++p; *p >= '0' && *p <= '9'; ++p)
 				{
-					result = result * 10 + *p - '0';
-					factor *= 10;
+					result += (*p - '0') * multiplier;
+					multiplier /= 10;
 				}
-				result /= factor;
 			}
 
 			return negative ? -result : result;

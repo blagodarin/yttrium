@@ -78,9 +78,9 @@ namespace Yttrium
 		Y_API bool to_number(std::string_view, float&) noexcept;
 		Y_API bool to_number(std::string_view, double&) noexcept;
 
-		/// Interprets the string as time, returning the corresponding number of seconds.
+		/// Interprets the string as a duration, returning the corresponding number of milliseconds.
 		/// The string must be in form `[+|-][[HH:]MM:]SS[.{Z}]`.
-		Y_API double to_time(std::string_view) noexcept;
+		Y_API int to_time(std::string_view) noexcept;
 	}
 }
 

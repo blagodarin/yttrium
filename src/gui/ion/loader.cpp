@@ -1,5 +1,6 @@
 #include "loader.h"
 
+#include <yttrium/audio/music.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resource_loader.h>
@@ -369,7 +370,7 @@ namespace Yttrium
 	void GuiIonLoader::load_screen_music(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
 	{
 		const auto music_name = token.to_value();
-		screen.set_music(music_name.empty() ? nullptr : _gui.resource_loader().load_music(music_name));
+		screen.set_music(music_name.empty() ? nullptr : _gui.resource_loader().open_music(music_name));
 		token.next(ion);
 	}
 

@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_audio_music_h_
 #define _include_yttrium_audio_music_h_
 
@@ -12,28 +9,22 @@ namespace Yttrium
 {
 	class Source;
 
-	/// Music.
-	class Y_API Music
+	/// Music data with corresponding audio decoder.
+	class Y_API MusicReader
 	{
 	public:
 		///
 		/// Returns 'nullptr' for a null Source pointer.
 		/// May throw DataError.
-		static std::unique_ptr<Music> open(std::unique_ptr<Source>&&);
+		static std::unique_ptr<MusicReader> open(std::unique_ptr<Source>&&);
 
-		/// Start, end and loop (re)start time in seconds.
-		/// \note No loop if \a loop >= \a end.
-		struct Settings
-		{
-			double start = 0; ///< Position to start playback at.
-			double end = 0; ///< Position to end playback at.
-			double loop = 0; ///< Position to loop playback at.
-		};
-
-		virtual ~Music() = default;
+		virtual ~MusicReader() noexcept = default;
 
 		///
-		virtual void set_settings(const Settings&) = 0;
+		/// \param start_ms Offset to the start of a playback range.
+		/// \param end_ms Offset to the end of a playback range, must yield at least a two-second range.
+		/// \param loop_ms Offset to the start of a playback loop, must yield at least a one-second loop.
+		virtual bool set_properties(int start_ms, int end_ms, int loop_ms) noexcept = 0;
 	};
 }
 

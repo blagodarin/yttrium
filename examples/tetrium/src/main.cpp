@@ -130,7 +130,7 @@ int main(int, char**)
 	gui.bind_canvas("next", next_figure_canvas);
 
 	AudioPlayer audio_player{audio, AudioPlayer::State::Playing};
-	gui.on_music([&audio_player](const std::shared_ptr<const Music>& music){ audio_player.set_music(music); });
+	gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music){ audio_player.set_music(music); });
 
 	gui.start();
 	window.show();

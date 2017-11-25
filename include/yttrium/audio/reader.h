@@ -20,13 +20,13 @@ namespace Yttrium
 		///
 		static std::unique_ptr<AudioReader> open(std::unique_ptr<Source>&&);
 
-		virtual ~AudioReader() = default;
+		virtual ~AudioReader() noexcept = default;
 
 		/// Returns the current sample offset.
-		virtual uint64_t current_sample() const = 0;
+		virtual uint64_t current_sample() const noexcept = 0;
 
 		/// Returns the audio format.
-		virtual AudioFormat format() const = 0;
+		virtual AudioFormat format() const noexcept = 0;
 
 		/// Read at most \a size bytes into \a buffer.
 		/// \param buffer Buffer to read into.
@@ -39,7 +39,10 @@ namespace Yttrium
 		virtual bool seek(uint64_t offset) = 0;
 
 		/// Returns the audio size in bytes.
-		virtual uint64_t total_bytes() const = 0;
+		virtual uint64_t total_bytes() const noexcept = 0;
+
+		/// Returns the audio size in samples.
+		virtual uint64_t total_samples() const noexcept = 0;
 	};
 }
 

@@ -53,6 +53,13 @@ namespace Yttrium
 	}
 
 	///
+	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
+	constexpr std::make_unsigned_t<T> to_unsigned(T value) noexcept
+	{
+		return static_cast<std::make_unsigned_t<T>>(value);
+	}
+
+	///
 	template <typename T, typename U, typename = std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U>>>
 	constexpr T wrap(T value, U min, U max)
 	{

@@ -89,7 +89,6 @@ namespace Yttrium
 		{
 			auto released = _material_cache.release_unused(); // Uses textures.
 			released += _mesh_cache.release_unused();
-			released += _music_cache.release_unused();
 			released += _sound_cache.release_unused();
 			released += _texture_2d_cache.release_unused();
 			released += _texture_font_cache.release_unused();
@@ -103,7 +102,6 @@ namespace Yttrium
 		AudioManager* const _audio_manager = nullptr;
 		ResourceCache<Material> _material_cache{_storage};
 		ResourceCache<Mesh> _mesh_cache{_storage};
-		ResourceCache<Music> _music_cache{_storage};
 		ResourceCache<Sound> _sound_cache{_storage};
 		ResourceCache<Texture2D> _texture_2d_cache{_storage};
 		ResourceCache<TextureFont> _texture_font_cache{_storage};
@@ -188,20 +186,6 @@ namespace Yttrium
 		});
 	}
 
-	std::shared_ptr<const Music> ResourceLoader::load_music(std::string_view name)
-	{
-		return _private->_music_cache.fetch(name, [](std::unique_ptr<Source>&& source)
-		{
-			Music::Settings settings;
-			settings.start = strings::to_time(source->property("start"));
-			settings.end = strings::to_time(source->property("end"));
-			settings.loop = strings::to_time(source->property("loop"));
-			auto music = Music::open(std::move(source));
-			music->set_settings(settings);
-			return music;
-		});
-	}
-
 	std::shared_ptr<const Sound> ResourceLoader::load_sound(std::string_view name)
 	{
 		if (!_private->_audio_manager)
@@ -247,6 +231,20 @@ namespace Yttrium
 		if (!source)
 			throw ResourceError{"Missing \"", name, "\""};
 		return source;
+	}
+
+	std::unique_ptr<MusicReader> ResourceLoader::open_music(std::string_view name)
+	{
+		auto source = open(name);
+
+		const auto start_ms = strings::to_time(source->property("start"));
+		const auto end_ms = strings::to_time(source->property("end"));
+		const auto loop_ms = strings::to_time(source->property("loop"));
+
+		auto music = MusicReader::open(std::move(source));
+		if (!music->set_properties(start_ms, end_ms, loop_ms))
+			throw DataError{"(", name, ") Bad music properties"};
+		return music;
 	}
 
 	void ResourceLoader::release_unused()

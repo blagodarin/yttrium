@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend)
-		: _backend(backend)
+		: _backend{backend}
 	{
 	}
 
@@ -19,77 +19,28 @@ namespace Yttrium
 
 	AudioStreamer::FetchResult AudioStreamer::fetch()
 	{
-		const size_t size = read();
+		const auto size = _music->read(_buffer.data());
 		if (!size)
 			return NoMoreData;
 		_backend.refill_buffer(_buffer.data(), size);
 		return size < _buffer.size() ? NotEnoughData : Ok;
 	}
 
-	bool AudioStreamer::open(const std::shared_ptr<const Music>& music)
+	bool AudioStreamer::open(const std::shared_ptr<MusicReader>& music)
 	{
-		_music = music;
+		_music = std::static_pointer_cast<MusicReaderImpl>(music);
 		if (!_music)
 			return false;
-
-		auto& reader = static_cast<const MusicImpl&>(*_music).reader();
-		const auto settings = static_cast<const MusicImpl&>(*_music).settings();
-
-		const auto format = reader.format();
-
-		_buffer_samples = format.samples_per_second(); // One-second buffer.
-
-		// NOTE: Currently, music audio must be at least <NumBuffers> buffers long.
-
-		const uint64_t total_samples = reader.total_bytes() / format.block_size();
-
-		if (total_samples >= _buffer_samples * AudioPlayerBackend::NumBuffers)
-		{
-			// NOTE: If loop position is past the end or within 1 buffer before it, no looping would be performed.
-
-			_start_sample = static_cast<uint64_t>(settings.start * static_cast<double>(format.samples_per_second()));
-			_end_sample = static_cast<uint64_t>(settings.end * static_cast<double>(format.samples_per_second()));
-
-			if (_end_sample == 0 || _end_sample > total_samples)
-				_end_sample = total_samples;
-
-			if (_start_sample < _end_sample && _end_sample - _start_sample >= _buffer_samples)
-			{
-				_loop_sample = static_cast<uint64_t>(settings.loop * static_cast<double>(format.samples_per_second()));
-				_is_looping = (_loop_sample < _end_sample && _end_sample - _loop_sample >= _buffer_samples);
-				_backend.set_format(format);
-				_block_size = format.block_size();
-				_buffer.reset(_buffer_samples * _block_size);
-				reader.seek(_start_sample);
-				return true;
-			}
-		}
-
-		_music = {};
-		return false;
+		_backend.set_format(_music->format());
+		_buffer.reset(_music->buffer_size());
+		_music->seek_start();
+		return true;
 	}
 
 	void AudioStreamer::start()
 	{
 		for (size_t i = 0; i < AudioPlayerBackend::NumBuffers; ++i)
-			_backend.fill_buffer(i, _buffer.data(), read());
+			_backend.fill_buffer(i, _buffer.data(), _music->read(_buffer.data()));
 		_backend.play();
-	}
-
-	size_t AudioStreamer::read()
-	{
-		auto& reader = static_cast<const MusicImpl&>(*_music).reader();
-
-		if (_end_sample - reader.current_sample() >= _buffer_samples)
-			return reader.read(_buffer.data(), _buffer.size());
-
-		const size_t tail = (_end_sample - reader.current_sample()) * _block_size;
-		auto size = reader.read(_buffer.data(), tail);
-		if (_is_looping)
-		{
-			reader.seek(_loop_sample);
-			size += reader.read(&_buffer[size], _buffer.size() - tail);
-		}
-		return size;
 	}
 }

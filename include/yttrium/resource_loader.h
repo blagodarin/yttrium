@@ -11,7 +11,7 @@ namespace Yttrium
 	class AudioManager;
 	class Material;
 	class Mesh;
-	class Music;
+	class MusicReader;
 	class Renderer;
 	class Sound;
 	class Source;
@@ -35,7 +35,6 @@ namespace Yttrium
 		/// Throws DataError if the resource can't be loaded.
 		std::shared_ptr<const Material> load_material(std::string_view name);
 		std::shared_ptr<const Mesh> load_mesh(std::string_view name);
-		std::shared_ptr<const Music> load_music(std::string_view name);
 		std::shared_ptr<const Sound> load_sound(std::string_view name);
 		std::shared_ptr<const Texture2D> load_texture_2d(std::string_view name);
 		std::shared_ptr<const TextureFont> load_texture_font(std::string_view name);
@@ -43,6 +42,7 @@ namespace Yttrium
 
 		///
 		std::unique_ptr<Source> open(std::string_view name);
+		std::unique_ptr<MusicReader> open_music(std::string_view name);
 
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();

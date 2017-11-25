@@ -11,7 +11,7 @@ namespace Yttrium
 {
 	enum class Key;
 	class KeyEvent;
-	class Music;
+	class MusicReader;
 	class RectF;
 	class Renderer;
 	class ResourceLoader;
@@ -37,7 +37,7 @@ namespace Yttrium
 		void draw(Renderer&, const Vector2& cursor) const;
 		void notify(const std::string& event);
 		void on_custom_cursor(const std::function<void(Renderer&, const Vector2&)>&);
-		void on_music(const std::function<void(const std::shared_ptr<const Music>&)>&);
+		void on_music(const std::function<void(const std::shared_ptr<MusicReader>&)>&);
 		void on_quit(const std::function<void()>&);
 		bool process_key_event(const KeyEvent&);
 		void start();
