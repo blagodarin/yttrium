@@ -1,11 +1,14 @@
+#include <yttrium/audio/format.h>
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
+#include <yttrium/audio/utils.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 #include <yttrium/storage/storage.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
 
 #include "../../utils.h"
@@ -42,6 +45,29 @@ namespace
 					(size * size - x * y) * 0xff / (size * size),
 				};
 		}));
+	}
+
+	void make_sound(Storage& storage, const std::string& name)
+	{
+		Buffer buffer;
+		{
+			constexpr size_t frequency = 44100;
+			constexpr size_t duration = frequency / 4; // 0.25 s.
+
+			Writer writer{buffer};
+			if (write_wav_header(writer, {2, 1, frequency}, duration))
+			{
+				constexpr auto time_step = 440.0 / frequency;
+
+				for (size_t i = 0; i < duration; ++i)
+				{
+					const auto base = std::numeric_limits<int16_t>::max() * std::sin(2 * M_PI * time_step * static_cast<double>(i));
+					const auto amplitude = static_cast<double>(duration - i) / duration;
+					writer.write(static_cast<int16_t>(base * amplitude));
+				}
+			}
+		}
+		storage.attach_buffer(name, std::move(buffer));
 	}
 
 	class FieldCanvas : public Canvas
@@ -100,6 +126,7 @@ int main(int, char**)
 	storage.attach_package("tetrium.ypq");
 	::make_buttons_texture(storage, "examples/tetrium/data/buttons.tga");
 	::make_cursor_texture(storage, "examples/tetrium/data/cursor.tga");
+	::make_sound(storage, "data/sound.wav");
 
 	AudioManager audio;
 	ResourceLoader resource_loader{storage, &window.renderer(), &audio};

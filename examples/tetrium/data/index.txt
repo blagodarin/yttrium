@@ -3,7 +3,6 @@ package
 	"data/font.tga" { intensity "1" }
 	"data/font.ytf"
 	"data/music.ogg" { end "1:18.40" loop "0:04.95" }
-	"data/sound.wav"
 	"data/textures/wall.jpeg"
 	"examples/tetrium/data/gui.ion"
 	"examples/tetrium/data/gui/game_over.ion"

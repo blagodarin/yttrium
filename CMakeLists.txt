@@ -141,7 +141,6 @@ if(Y_EXAMPLES)
 endif()
 
 if(Y_EXTRA)
-	add_subdirectory(tools/generate-sounds)
 	add_subdirectory(tools/generate-test-images)
 
 	add_subdirectory(benchmarks/buffer)

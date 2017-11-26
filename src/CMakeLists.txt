@@ -51,6 +51,7 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/audio/player.h
 	../include/yttrium/audio/reader.h
 	../include/yttrium/audio/sound.h
+	../include/yttrium/audio/utils.h
 	audio/formats/wav_private.h
 	audio/formats/wav.cpp
 	audio/formats/wav.h
@@ -66,6 +67,7 @@ target_sources(yttrium PRIVATE
 	audio/reader.h
 	audio/streamer.cpp
 	audio/streamer.h
+	audio/utils.cpp
 	)
 if(ON)
 	find_package(OpenAL REQUIRED)

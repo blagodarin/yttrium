@@ -31,7 +31,6 @@ improvements and other code-related issues.
 	- Debug output, e. g. in a ring buffer that can be dumped on exception.
 	* Audio:
 		- Windows Multimedia audio backend.
-		- Runtime PCM audio generation.
 	* GUI:
 		- Line editor widget.
 	* Image:
