@@ -1,21 +1,21 @@
-#include "music.h"
+#include "music_reader.h"
 
 #include <yttrium/audio/format.h>
 #include <yttrium/audio/reader.h>
 #include <yttrium/utils.h>
 #include "backend.h"
 
-#include <cassert>
+#include <algorithm>
 
 namespace Yttrium
 {
 	MusicReaderImpl::MusicReaderImpl(std::unique_ptr<AudioReader>&& reader)
 		: _reader{std::move(reader)}
 		, _block_size{_reader->format().block_size()}
-		, _buffer_samples{_reader->format().samples_per_second()} // One-second buffers.
+		, _buffer_samples{_reader->format().samples_per_second()}
 		, _end_sample{_reader->total_samples()}
+		, _loop_sample{_end_sample}
 	{
-		assert(_end_sample - _start_sample >= AudioPlayerBackend::NumBuffers * _buffer_samples); // TODO: Harder check.
 	}
 
 	bool MusicReaderImpl::set_properties(int start_ms, int end_ms, int loop_ms) noexcept
@@ -26,18 +26,9 @@ namespace Yttrium
 		const auto total_samples = _reader->total_samples();
 		const auto samples_per_second = _reader->format().samples_per_second();
 
-		const auto start_sample = to_unsigned(start_ms) * samples_per_second / 1000;
-		if (start_sample > total_samples)
-			return false;
-
-		const auto end_sample = end_ms > 0 ? std::min(to_unsigned(end_ms) * samples_per_second / 1000, total_samples) : total_samples;
-		if (end_sample - start_sample < AudioPlayerBackend::NumBuffers * samples_per_second)
-			return false;
-
-		_start_sample = start_sample;
-		_end_sample = end_sample;
+		_start_sample = std::min(to_unsigned(start_ms) * samples_per_second / 1000, total_samples);
+		_end_sample = end_ms > 0 ? std::min(to_unsigned(end_ms) * samples_per_second / 1000, total_samples) : total_samples;
 		_loop_sample = std::min(to_unsigned(loop_ms) * samples_per_second / 1000, _end_sample);
-		_is_looping = _loop_sample <= _end_sample && _end_sample - _loop_sample >= samples_per_second;
 		return true;
 	}
 
@@ -48,17 +39,15 @@ namespace Yttrium
 
 	size_t MusicReaderImpl::read(void* buffer)
 	{
-		if (_end_sample - _reader->current_sample() >= _buffer_samples)
-			return _reader->read(buffer, buffer_size());
-
-		const auto tail = (_end_sample - _reader->current_sample()) * _block_size;
-		auto size = _reader->read(buffer, tail);
-		if (_is_looping)
+		for (size_t result = 0;;)
 		{
-			_reader->seek(_loop_sample);
-			size += _reader->read(static_cast<std::byte*>(buffer) + size, buffer_size() - tail);
+			const auto capacity = buffer_size() - result;
+			const auto data_size = (_end_sample - _reader->current_sample()) * _block_size;
+			const auto bytes_read = _reader->read(static_cast<std::byte*>(buffer) + result, std::min(capacity, data_size));
+			result += bytes_read;
+			if (bytes_read == capacity || bytes_read != data_size || _loop_sample >= _end_sample || !_reader->seek(_loop_sample))
+				return result;
 		}
-		return size;
 	}
 
 	void MusicReaderImpl::seek_start()

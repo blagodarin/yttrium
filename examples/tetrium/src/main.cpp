@@ -129,7 +129,7 @@ int main(int, char**)
 	NextFigureCanvas next_figure_canvas{logic, graphics};
 	gui.bind_canvas("next", next_figure_canvas);
 
-	AudioPlayer audio_player{audio, AudioPlayer::State::Playing};
+	AudioPlayer audio_player{audio};
 	gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music){ audio_player.set_music(music); });
 
 	gui.start();

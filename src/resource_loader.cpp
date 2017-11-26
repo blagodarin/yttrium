@@ -1,7 +1,7 @@
 #include <yttrium/resource_loader.h>
 
 #include <yttrium/audio/manager.h>
-#include <yttrium/audio/music.h>
+#include <yttrium/audio/music_reader.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/texture_font.h>

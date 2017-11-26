@@ -47,7 +47,7 @@ endif()
 target_sources(yttrium PRIVATE
 	../include/yttrium/audio/format.h
 	../include/yttrium/audio/manager.h
-	../include/yttrium/audio/music.h
+	../include/yttrium/audio/music_reader.h
 	../include/yttrium/audio/player.h
 	../include/yttrium/audio/reader.h
 	../include/yttrium/audio/sound.h
@@ -58,8 +58,8 @@ target_sources(yttrium PRIVATE
 	audio/format.cpp
 	audio/manager.cpp
 	audio/manager.h
-	audio/music.cpp
-	audio/music.h
+	audio/music_reader.cpp
+	audio/music_reader.h
 	audio/player.cpp
 	audio/player.h
 	audio/reader.cpp

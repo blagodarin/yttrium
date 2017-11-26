@@ -9,22 +9,20 @@
 namespace Yttrium
 {
 	AudioManagerPrivate::AudioManagerPrivate()
-		: _backend(AudioBackend::create())
+		: _backend{AudioBackend::create()}
 	{
 	}
 
 	AudioManager::AudioManager()
-		: _private(std::make_unique<AudioManagerPrivate>())
+		: _private{std::make_unique<AudioManagerPrivate>()}
 	{
 	}
 
-	AudioManager::~AudioManager() = default;
+	AudioManager::~AudioManager() noexcept = default;
 
 	std::unique_ptr<Sound> AudioManager::create_sound(std::unique_ptr<Source>&& source)
 	{
-		const auto audio_reader = AudioReader::open(std::move(source));
-		if (!audio_reader)
-			return {};
-		return _private->_backend->create_sound(*audio_reader);
+		const auto reader = AudioReader::open(std::move(source));
+		return reader ? _private->_backend->create_sound(*reader) : nullptr;
 	}
 }

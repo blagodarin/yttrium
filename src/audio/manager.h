@@ -1,3 +1,6 @@
+#ifndef _src_audio_manager_h_
+#define _src_audio_manager_h_
+
 #include <memory>
 
 namespace Yttrium
@@ -16,3 +19,5 @@ namespace Yttrium
 		const std::unique_ptr<AudioBackend> _backend;
 	};
 }
+
+#endif

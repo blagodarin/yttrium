@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_audio_reader_h_
 #define _include_yttrium_audio_reader_h_
 
@@ -28,7 +25,7 @@ namespace Yttrium
 		/// Returns the audio format.
 		virtual AudioFormat format() const noexcept = 0;
 
-		/// Read at most \a size bytes into \a buffer.
+		/// Reads at most \a size bytes into \a buffer.
 		/// \param buffer Buffer to read into.
 		/// \param bytes_to_read Number of bytes to read.
 		/// \return Number of bytes read or 0 on failure.

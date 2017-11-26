@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_audio_player_h_
 #define _include_yttrium_audio_player_h_
 
@@ -18,23 +15,16 @@ namespace Yttrium
 	{
 	public:
 		///
-		enum class State
-		{
-			Stopped, ///<
-			Playing, ///<
-		};
+		explicit AudioPlayer(AudioManager&);
 
 		///
-		AudioPlayer(AudioManager&, State = State::Stopped);
-
-		///
-		~AudioPlayer();
+		~AudioPlayer() noexcept;
 
 		///
 		void set_music(const std::shared_ptr<MusicReader>&);
 
 		///
-		void set_state(State);
+		void set_paused(bool);
 
 	private:
 		const std::unique_ptr<class AudioPlayerPrivate> _private;

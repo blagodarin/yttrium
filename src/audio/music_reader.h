@@ -1,7 +1,7 @@
-#ifndef _src_audio_music_h_
-#define _src_audio_music_h_
+#ifndef _src_audio_music_reader_h_
+#define _src_audio_music_reader_h_
 
-#include <yttrium/audio/music.h>
+#include <yttrium/audio/music_reader.h>
 
 #include <memory>
 
@@ -29,7 +29,6 @@ namespace Yttrium
 		uint64_t _start_sample = 0;
 		uint64_t _end_sample = 0;
 		uint64_t _loop_sample = 0;
-		bool _is_looping = false;
 	};
 }
 

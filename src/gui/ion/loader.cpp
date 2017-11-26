@@ -1,6 +1,6 @@
 #include "loader.h"
 
-#include <yttrium/audio/music.h>
+#include <yttrium/audio/music_reader.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resource_loader.h>

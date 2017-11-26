@@ -8,31 +8,20 @@
 namespace Yttrium
 {
 	class AudioPlayerBackend;
-	class MusicReader;
 	class MusicReaderImpl;
 
 	class AudioStreamer
 	{
 	public:
-		enum FetchResult
-		{
-			Ok,
-			NotEnoughData,
-			NoMoreData,
-		};
+		AudioStreamer(AudioPlayerBackend&, MusicReaderImpl&);
+		~AudioStreamer() noexcept;
 
-		explicit AudioStreamer(AudioPlayerBackend&);
-		~AudioStreamer();
-
-		FetchResult fetch();
-		bool open(const std::shared_ptr<MusicReader>&);
-		void start();
+		bool play_first();
+		bool play_next();
 
 	private:
 		AudioPlayerBackend& _backend;
-		std::shared_ptr<MusicReaderImpl> _music;
-		size_t _block_size = 0;
-		size_t _buffer_samples = 0;
+		MusicReaderImpl& _music;
 		Buffer _buffer;
 	};
 }

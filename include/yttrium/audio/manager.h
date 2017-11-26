@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_audio_manager_h_
 #define _include_yttrium_audio_manager_h_
 
@@ -21,7 +18,7 @@ namespace Yttrium
 		AudioManager();
 
 		///
-		~AudioManager();
+		~AudioManager() noexcept;
 
 		///
 		std::unique_ptr<Sound> create_sound(std::unique_ptr<Source>&&);
