@@ -10,8 +10,11 @@ add_custom_target(tetrium_localization
 # Package.
 add_custom_target(tetrium_package
 	ypack examples/tetrium/data/index.txt tetrium.ypq
-	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
 	BYPRODUCTS "${PROJECT_SOURCE_DIR}/tetrium.ypq"
+	COMMENT "Generating tetrium.ypq"
+	DEPENDS "${PROJECT_SOURCE_DIR}/examples/tetrium/data/index.txt"
+	VERBATIM
+	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
 	)
 add_dependencies(tetrium_package tetrium_localization)
 
