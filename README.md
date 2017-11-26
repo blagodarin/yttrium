@@ -3,10 +3,14 @@
 [![Codecov](https://codecov.io/gh/blagodarin/yttrium/branch/master/graph/badge.svg)](https://codecov.io/gh/blagodarin/yttrium)
 [![GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
-**Yttrium** is (intended to become) a game development toolkit.
+# Yttrium
 
-**Yttrium** is being developed in my spare time when I have nothing better to do. As a consequence, it is really far from production use, and may never become near to it.
+Yttrium is (intended to become) a game development toolkit.
 
-More:
-* [FAQ](doc/faq.md);
-* [TODO list](doc/todo.md).
+Yttrium is being developed in my spare time when I have nothing better
+to do. As a consequence, it is really far from production use, and may never
+become near to it.
+
+Nevertheless, there is a [Roadmap](doc/roadmap.md) for further development and
+a [FAQ](doc/faq.md) which describes why something is done in one way and not
+the other.
