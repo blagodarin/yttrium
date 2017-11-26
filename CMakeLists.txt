@@ -141,8 +141,6 @@ if(Y_EXAMPLES)
 endif()
 
 if(Y_EXTRA)
-	add_subdirectory(tools/generate-test-images)
-
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/tiny_string_map)
 
@@ -160,4 +158,7 @@ endif()
 
 if(Y_TESTS)
 	add_subdirectory(tests)
+	if(Y_EXTRA)
+		add_subdirectory(tests/gen_test_data)
+	endif()
 endif()
