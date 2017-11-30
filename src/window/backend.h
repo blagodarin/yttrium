@@ -3,6 +3,8 @@
 
 #include <yttrium/key.h>
 
+#include <optional>
+
 namespace Yttrium
 {
 	class Size;
@@ -12,7 +14,7 @@ namespace Yttrium
 	public:
 		virtual ~WindowBackendCallbacks() = default;
 		virtual void on_focus_event(bool is_focused) = 0;
-		virtual void on_key_event(Key, bool is_pressed) = 0;
+		virtual void on_key_event(Key, bool is_pressed, const std::optional<Flags<KeyEvent::Modifier>>&) = 0;
 		virtual void on_resize_event(const Size&) = 0;
 	};
 }

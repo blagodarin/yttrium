@@ -15,7 +15,20 @@ namespace
 		return P_Atom{::xcb_intern_atom_reply(connection, ::xcb_intern_atom(connection, only_if_exists, static_cast<uint16_t>(name.size()), name.data()), nullptr)};
 	}
 
-	Key make_key(xcb_keycode_t keycode)
+	constexpr Key make_button_key(xcb_keycode_t keycode) noexcept
+	{
+		switch (keycode)
+		{
+		case XCB_BUTTON_INDEX_1: return Key::Mouse1;
+		case XCB_BUTTON_INDEX_2: return Key::Mouse2;
+		case XCB_BUTTON_INDEX_3: return Key::Mouse3;
+		case XCB_BUTTON_INDEX_4: return Key::Mouse4;
+		case XCB_BUTTON_INDEX_5: return Key::Mouse5;
+		}
+		return Key::Null;
+	}
+
+	constexpr Key make_key(xcb_keycode_t keycode) noexcept
 	{
 		switch (keycode)
 		{
@@ -127,7 +140,7 @@ namespace
 
 		//case 0x85: return Key::LWin;
 		//case 0x86: return Key::RWin;
-		//case 0x87: return Key::???; // TODO: What's the key between RWin and RControl?
+		//case 0x87: return Key::Menu; // The key between RWin and RControl.
 		}
 		return Key::Null;
 	}
@@ -244,33 +257,31 @@ namespace Yttrium
 			{
 			case XCB_KEY_PRESS:
 			case XCB_KEY_RELEASE:
-				// TODO: Use modifiers from XCB.
-				_callbacks.on_key_event(::make_key(reinterpret_cast<xcb_key_press_event_t*>(event.get())->detail), event_type == XCB_KEY_PRESS);
+				{
+					const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event.get());
+					Flags<KeyEvent::Modifier> modifiers;
+					if (e->state & XCB_MOD_MASK_SHIFT)
+						modifiers |= KeyEvent::Modifier::Shift;
+					if (e->state & XCB_MOD_MASK_CONTROL)
+						modifiers |= KeyEvent::Modifier::Control;
+					if (e->state & XCB_MOD_MASK_1)
+						modifiers |= KeyEvent::Modifier::Alt;
+					_callbacks.on_key_event(::make_key(e->detail), event_type == XCB_KEY_PRESS, modifiers);
+				}
 				break;
 
 			case XCB_BUTTON_PRESS:
 			case XCB_BUTTON_RELEASE:
-				switch (const auto e = reinterpret_cast<xcb_button_press_event_t*>(event.get()); e->detail)
 				{
-				case XCB_BUTTON_INDEX_1:
-					_callbacks.on_key_event(Key::Mouse1, event_type == XCB_BUTTON_PRESS);
-					break;
-
-				case XCB_BUTTON_INDEX_2:
-					_callbacks.on_key_event(Key::Mouse2, event_type == XCB_BUTTON_PRESS);
-					break;
-
-				case XCB_BUTTON_INDEX_3:
-					_callbacks.on_key_event(Key::Mouse3, event_type == XCB_BUTTON_PRESS);
-					break;
-
-				case XCB_BUTTON_INDEX_4:
-					_callbacks.on_key_event(Key::Mouse4, event_type == XCB_BUTTON_PRESS);
-					break;
-
-				case XCB_BUTTON_INDEX_5:
-					_callbacks.on_key_event(Key::Mouse5, event_type == XCB_BUTTON_PRESS);
-					break;
+					const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event.get());
+					Flags<KeyEvent::Modifier> modifiers;
+					if (e->state & XCB_KEY_BUT_MASK_SHIFT)
+						modifiers |= KeyEvent::Modifier::Shift;
+					if (e->state & XCB_KEY_BUT_MASK_CONTROL)
+						modifiers |= KeyEvent::Modifier::Control;
+					if (e->state & XCB_KEY_BUT_MASK_MOD_1)
+						modifiers |= KeyEvent::Modifier::Alt;
+					_callbacks.on_key_event(::make_button_key(e->detail), event_type == XCB_BUTTON_PRESS, modifiers);
 				}
 				break;
 
@@ -315,6 +326,5 @@ namespace Yttrium
 
 	void WindowBackend::swap_buffers()
 	{
-		// TODO: Implement.
 	}
 }

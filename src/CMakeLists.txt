@@ -393,6 +393,7 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/key.h
 	../include/yttrium/window.h
 	system/window.h
+	window/backend.cpp
 	window/backend.h
 	window/key.cpp
 	window/window.cpp

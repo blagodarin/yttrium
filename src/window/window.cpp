@@ -82,7 +82,7 @@ namespace Yttrium
 			set_active(is_focused);
 		}
 
-		void on_key_event(Key key, bool is_pressed) override
+		void on_key_event(Key key, bool is_pressed, const std::optional<Flags<KeyEvent::Modifier>>& modifiers) override
 		{
 			bool& was_pressed = _keys[to_underlying(key)];
 
@@ -91,14 +91,19 @@ namespace Yttrium
 			if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
 				was_pressed = is_pressed;
 
-			if (_keys[to_underlying(Key::LShift)] || _keys[to_underlying(Key::RShift)])
-				event.modifiers |= KeyEvent::Modifier::Shift;
+			if (!modifiers)
+			{
+				if (_keys[to_underlying(Key::LShift)] || _keys[to_underlying(Key::RShift)])
+					event.modifiers |= KeyEvent::Modifier::Shift;
 
-			if (_keys[to_underlying(Key::LControl)] || _keys[to_underlying(Key::RControl)])
-				event.modifiers |= KeyEvent::Modifier::Control;
+				if (_keys[to_underlying(Key::LControl)] || _keys[to_underlying(Key::RControl)])
+					event.modifiers |= KeyEvent::Modifier::Control;
 
-			if (_keys[to_underlying(Key::LAlt)] || _keys[to_underlying(Key::RAlt)])
-				event.modifiers |= KeyEvent::Modifier::Alt;
+				if (_keys[to_underlying(Key::LAlt)] || _keys[to_underlying(Key::RAlt)])
+					event.modifiers |= KeyEvent::Modifier::Alt;
+			}
+			else
+				event.modifiers = *modifiers;
 
 			if (_on_key_event)
 				_on_key_event(event);

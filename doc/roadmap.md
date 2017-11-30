@@ -33,6 +33,7 @@ improvements and other code-related issues.
 		- Windows Multimedia audio backend.
 	* GUI:
 		- Line editor widget.
+		- Separate key input from character input.
 	* Image:
 		- Compressed images (e. g. compressed textures).
 		- Multi-level images (e. g. textures with mipmaps).

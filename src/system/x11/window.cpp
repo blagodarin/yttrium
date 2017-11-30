@@ -43,7 +43,7 @@ namespace
 		return window;
 	}
 
-	Key key_from_event(::XEvent& event)
+	Key key_from_event(::XEvent& event) noexcept
 	{
 		const auto key_sym = ::XLookupKeysym(&event.xkey, 0);
 
@@ -133,6 +133,19 @@ namespace
 
 		return Key::Null;
 	}
+
+	constexpr Key button_from_event(::XEvent& event) noexcept
+	{
+		switch (event.xbutton.button)
+		{
+		case Button1: return Key::Mouse1;
+		case Button2: return Key::Mouse2;
+		case Button3: return Key::Mouse3;
+		case Button4: return Key::Mouse4;
+		case Button5: return Key::Mouse5;
+		}
+		return Key::Null;
+	}
 }
 
 namespace Yttrium
@@ -201,32 +214,29 @@ namespace Yttrium
 			{
 			case KeyPress:
 			case KeyRelease:
-				_callbacks.on_key_event(::key_from_event(event), event.type == KeyPress);
+				{
+					Flags<KeyEvent::Modifier> modifiers;
+					if (event.xkey.state & ShiftMask)
+						modifiers |= KeyEvent::Modifier::Shift;
+					if (event.xkey.state & ControlMask)
+						modifiers |= KeyEvent::Modifier::Control;
+					if (event.xkey.state & Mod1Mask)
+						modifiers |= KeyEvent::Modifier::Alt;
+					_callbacks.on_key_event(::key_from_event(event), event.type == KeyPress, modifiers);
+				}
 				break;
 
 			case ButtonPress:
 			case ButtonRelease:
-				switch (event.xbutton.button)
 				{
-				case Button1:
-					_callbacks.on_key_event(Key::Mouse1, event.type == ButtonPress);
-					break;
-
-				case Button2:
-					_callbacks.on_key_event(Key::Mouse2, event.type == ButtonPress);
-					break;
-
-				case Button3:
-					_callbacks.on_key_event(Key::Mouse3, event.type == ButtonPress);
-					break;
-
-				case Button4:
-					_callbacks.on_key_event(Key::Mouse4, event.type == ButtonPress);
-					break;
-
-				case Button5:
-					_callbacks.on_key_event(Key::Mouse5, event.type == ButtonPress);
-					break;
+					Flags<KeyEvent::Modifier> modifiers;
+					if (event.xkey.state & ShiftMask)
+						modifiers |= KeyEvent::Modifier::Shift;
+					if (event.xkey.state & ControlMask)
+						modifiers |= KeyEvent::Modifier::Control;
+					if (event.xkey.state & Mod1Mask)
+						modifiers |= KeyEvent::Modifier::Alt;
+					_callbacks.on_key_event(::button_from_event(event), event.type == ButtonPress, modifiers);
 				}
 				break;
 

@@ -204,7 +204,7 @@ namespace Yttrium
 		Key key; ///< Key.
 		bool pressed; ///< Is the key pressed?
 		bool autorepeat; ///< Is it an autorepeat event?
-		Flags<Modifier> modifiers = {}; ///< Modifier mask.
+		Flags<Modifier> modifiers; ///< Modifier mask.
 
 		///
 		KeyEvent(Key key_, bool pressed_, bool autorepeat_)

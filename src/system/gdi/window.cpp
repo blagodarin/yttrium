@@ -198,13 +198,13 @@ namespace Yttrium
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			assert(_created);
-			_callbacks.on_key_event(::key_from_wparam(wparam), true);
+			_callbacks.on_key_event(::key_from_wparam(wparam), true, {});
 			break;
 
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			assert(_created);
-			_callbacks.on_key_event(::key_from_wparam(wparam), false);
+			_callbacks.on_key_event(::key_from_wparam(wparam), false, {});
 			break;
 
 		case WM_MOUSEWHEEL:
@@ -221,14 +221,14 @@ namespace Yttrium
 		case WM_MBUTTONUP:
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
+			assert(_created);
 			{
 				const auto buttons = GET_KEYSTATE_WPARAM(wparam);
-				assert(_created);
-				_callbacks.on_key_event(Key::Mouse1, buttons & MK_LBUTTON);
-				_callbacks.on_key_event(Key::Mouse2, buttons & MK_RBUTTON);
-				_callbacks.on_key_event(Key::Mouse3, buttons & MK_MBUTTON);
-				_callbacks.on_key_event(Key::Mouse4, buttons & MK_XBUTTON1);
-				_callbacks.on_key_event(Key::Mouse5, buttons & MK_XBUTTON2);
+				_callbacks.on_key_event(Key::Mouse1, buttons & MK_LBUTTON, {});
+				_callbacks.on_key_event(Key::Mouse2, buttons & MK_RBUTTON, {});
+				_callbacks.on_key_event(Key::Mouse3, buttons & MK_MBUTTON, {});
+				_callbacks.on_key_event(Key::Mouse4, buttons & MK_XBUTTON1, {});
+				_callbacks.on_key_event(Key::Mouse5, buttons & MK_XBUTTON2, {});
 			}
 			break;
 
