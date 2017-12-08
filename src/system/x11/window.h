@@ -20,9 +20,9 @@ namespace Yttrium
 	{
 	public:
 		WindowBackend(const std::string& name, WindowBackendCallbacks&);
-		~WindowBackend();
+		~WindowBackend() noexcept;
 
-		void close();
+		void close() noexcept;
 		bool get_cursor(Point&);
 		bool process_events();
 		bool set_cursor(const Point&);
@@ -35,7 +35,7 @@ namespace Yttrium
 		{
 		public:
 			WindowHandle(::Display* display, ::Window window) : _display(display), _window(window) {}
-			~WindowHandle() { reset(); }
+			~WindowHandle() noexcept { reset(); }
 			explicit operator bool() const noexcept { return _window != None; }
 			::Window get() const noexcept { return _window; }
 			void reset() noexcept;
@@ -48,7 +48,7 @@ namespace Yttrium
 		{
 		public:
 			EmptyCursor(::Display*, ::Window);
-			~EmptyCursor();
+			~EmptyCursor() noexcept;
 			::Cursor get() const { return _cursor; }
 		private:
 			::Display* const _display;

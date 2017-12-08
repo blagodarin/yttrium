@@ -8,6 +8,13 @@ option(Y_TESTS "Enable tests" OFF)
 option(Y_TOOLS "Enable tools" OFF)
 
 set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
+if(Y_RENDERER STREQUAL "OpenGL")
+	set(Y_RENDERER_OPENGL ON)
+elseif(Y_RENDERER STREQUAL "Vulkan")
+	set(Y_RENDERER_VULKAN ON)
+else()
+	set(Y_RENDERER_NULL ON)
+endif()
 
 if(Y_EXAMPLES AND NOT Y_TOOLS)
 	message(FATAL_ERROR "Y_EXAMPLES require Y_TOOLS")
@@ -117,11 +124,11 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
-if(Y_RENDERER STREQUAL "Vulkan")
+if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
 endif()
 
-if(Y_TOOLS OR Y_RENDERER STREQUAL "OpenGL")
+if(Y_TOOLS OR Y_RENDERER_OPENGL)
 	add_subdirectory(tools/yrc)
 endif()
 

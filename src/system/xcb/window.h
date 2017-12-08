@@ -18,9 +18,9 @@ namespace Yttrium
 	{
 	public:
 		WindowBackend(const std::string& name, WindowBackendCallbacks&);
-		~WindowBackend();
+		~WindowBackend() noexcept;
 
-		void close();
+		void close() noexcept;
 		bool get_cursor(Point&);
 		bool process_events();
 		bool set_cursor(const Point&);

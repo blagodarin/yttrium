@@ -43,9 +43,9 @@ namespace
 		return window;
 	}
 
-	Key key_from_event(::XEvent& event) noexcept
+	Key key_from_event(::XKeyEvent& event) noexcept
 	{
-		const auto key_sym = ::XLookupKeysym(&event.xkey, 0);
+		const auto key_sym = ::XLookupKeysym(&event, 0);
 
 		if (key_sym >= XK_0 && key_sym <= XK_9)
 		{
@@ -134,9 +134,9 @@ namespace
 		return Key::Null;
 	}
 
-	constexpr Key button_from_event(::XEvent& event) noexcept
+	constexpr Key button_from_event(const ::XButtonEvent& event) noexcept
 	{
-		switch (event.xbutton.button)
+		switch (event.button)
 		{
 		case Button1: return Key::Mouse1;
 		case Button2: return Key::Mouse2;
@@ -171,9 +171,9 @@ namespace Yttrium
 			_glx->SwapIntervalEXT(_display.get(), _window.get(), _glx->EXT_swap_control_tear ? -1 : 1);
 	}
 
-	WindowBackend::~WindowBackend() = default;
+	WindowBackend::~WindowBackend() noexcept = default;
 
-	void WindowBackend::close()
+	void WindowBackend::close() noexcept
 	{
 		if (!_window)
 			return;
@@ -214,6 +214,7 @@ namespace Yttrium
 			{
 			case KeyPress:
 			case KeyRelease:
+				if (const auto key = ::key_from_event(event.xkey); key != Key::Null)
 				{
 					Flags<KeyEvent::Modifier> modifiers;
 					if (event.xkey.state & ShiftMask)
@@ -222,21 +223,22 @@ namespace Yttrium
 						modifiers |= KeyEvent::Modifier::Control;
 					if (event.xkey.state & Mod1Mask)
 						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(::key_from_event(event), event.type == KeyPress, modifiers);
+					_callbacks.on_key_event(key, event.type == KeyPress, modifiers);
 				}
 				break;
 
 			case ButtonPress:
 			case ButtonRelease:
+				if (const auto key = ::button_from_event(event.xbutton); key != Key::Null)
 				{
 					Flags<KeyEvent::Modifier> modifiers;
-					if (event.xkey.state & ShiftMask)
+					if (event.xbutton.state & ShiftMask)
 						modifiers |= KeyEvent::Modifier::Shift;
-					if (event.xkey.state & ControlMask)
+					if (event.xbutton.state & ControlMask)
 						modifiers |= KeyEvent::Modifier::Control;
-					if (event.xkey.state & Mod1Mask)
+					if (event.xbutton.state & Mod1Mask)
 						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(::button_from_event(event), event.type == ButtonPress, modifiers);
+					_callbacks.on_key_event(key, event.type == ButtonPress, modifiers);
 				}
 				break;
 
@@ -307,7 +309,7 @@ namespace Yttrium
 			throw InitializationError("Failed to create an empty cursor");
 	}
 
-	WindowBackend::EmptyCursor::~EmptyCursor()
+	WindowBackend::EmptyCursor::~EmptyCursor() noexcept
 	{
 		::XFreeCursor(_display, _cursor);
 	}

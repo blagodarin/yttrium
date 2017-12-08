@@ -14,9 +14,10 @@
 #include "mesh_data.h"
 #include "texture.h"
 
-#if defined(Y_RENDERER_OPENGL)
+#include "../config.h"
+#if Y_RENDERER_OPENGL
 	#include "gl/renderer.h"
-#elif defined(Y_RENDERER_VULKAN)
+#elif Y_RENDERER_VULKAN
 	#include "vulkan/renderer.h"
 #else
 	#include "null/renderer.h"
@@ -52,9 +53,9 @@ namespace
 namespace Yttrium
 {
 	RendererImpl::RendererImpl(WindowBackend& window)
-#if defined(Y_RENDERER_OPENGL)
+#if Y_RENDERER_OPENGL
 		: _backend{std::make_unique<GlRenderer>(window)}
-#elif defined(Y_RENDERER_VULKAN)
+#elif Y_RENDERER_VULKAN
 		: _backend{std::make_unique<VulkanRenderer>(window)}
 #else
 		: _backend{std::make_unique<NullRenderer>(window)}

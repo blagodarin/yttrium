@@ -4,7 +4,8 @@
 #include <yttrium/math/size.h>
 #include "../windows/windows.h"
 
-#ifdef Y_RENDERER_OPENGL
+#include "../../config.h"
+#if Y_RENDERER_OPENGL
 	#include "wgl.h"
 #endif
 
@@ -76,7 +77,7 @@ namespace Yttrium
 		const WindowClass _wndclass{_hinstance, reinterpret_cast<WNDPROC>(static_window_proc)};
 		const WindowHandle _hwnd{_wndclass, _name.c_str(), this};
 		const WindowDC _hdc{_hwnd};
-#ifdef Y_RENDERER_OPENGL
+#if Y_RENDERER_OPENGL
 		const WglContext _wgl{_hdc};
 #endif
 	};

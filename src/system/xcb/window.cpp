@@ -1,5 +1,6 @@
 #include "window.h"
 
+#include "../../config.h"
 #include "../../window/backend.h"
 
 #include <string_view>
@@ -144,11 +145,6 @@ namespace
 		}
 		return Key::Null;
 	}
-
-	Size make_size(const xcb_configure_notify_event_t& e)
-	{
-		return {e.width, e.height};
-	}
 }
 
 namespace Yttrium
@@ -169,7 +165,7 @@ namespace Yttrium
 			::xcb_free_pixmap(_connection, pixmap);
 		}
 
-		~EmptyCursor()
+		~EmptyCursor() noexcept
 		{
 			::xcb_free_cursor(_connection, _cursor);
 		}
@@ -217,12 +213,12 @@ namespace Yttrium
 		::xcb_flush(_connection.get());
 	}
 
-	WindowBackend::~WindowBackend()
+	WindowBackend::~WindowBackend() noexcept
 	{
 		close();
 	}
 
-	void WindowBackend::close()
+	void WindowBackend::close() noexcept
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return;
@@ -259,14 +255,17 @@ namespace Yttrium
 			case XCB_KEY_RELEASE:
 				{
 					const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event.get());
-					Flags<KeyEvent::Modifier> modifiers;
-					if (e->state & XCB_MOD_MASK_SHIFT)
-						modifiers |= KeyEvent::Modifier::Shift;
-					if (e->state & XCB_MOD_MASK_CONTROL)
-						modifiers |= KeyEvent::Modifier::Control;
-					if (e->state & XCB_MOD_MASK_1)
-						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(::make_key(e->detail), event_type == XCB_KEY_PRESS, modifiers);
+					if (const auto key = ::make_key(e->detail); key != Key::Null)
+					{
+						Flags<KeyEvent::Modifier> modifiers;
+						if (e->state & XCB_MOD_MASK_SHIFT)
+							modifiers |= KeyEvent::Modifier::Shift;
+						if (e->state & XCB_MOD_MASK_CONTROL)
+							modifiers |= KeyEvent::Modifier::Control;
+						if (e->state & XCB_MOD_MASK_1)
+							modifiers |= KeyEvent::Modifier::Alt;
+						_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, modifiers);
+					}
 				}
 				break;
 
@@ -274,14 +273,17 @@ namespace Yttrium
 			case XCB_BUTTON_RELEASE:
 				{
 					const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event.get());
-					Flags<KeyEvent::Modifier> modifiers;
-					if (e->state & XCB_KEY_BUT_MASK_SHIFT)
-						modifiers |= KeyEvent::Modifier::Shift;
-					if (e->state & XCB_KEY_BUT_MASK_CONTROL)
-						modifiers |= KeyEvent::Modifier::Control;
-					if (e->state & XCB_KEY_BUT_MASK_MOD_1)
-						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(::make_button_key(e->detail), event_type == XCB_BUTTON_PRESS, modifiers);
+					if (const auto key = ::make_button_key(e->detail); key != Key::Null)
+					{
+						Flags<KeyEvent::Modifier> modifiers;
+						if (e->state & XCB_KEY_BUT_MASK_SHIFT)
+							modifiers |= KeyEvent::Modifier::Shift;
+						if (e->state & XCB_KEY_BUT_MASK_CONTROL)
+							modifiers |= KeyEvent::Modifier::Control;
+						if (e->state & XCB_KEY_BUT_MASK_MOD_1)
+							modifiers |= KeyEvent::Modifier::Alt;
+						_callbacks.on_key_event(key, event_type == XCB_BUTTON_PRESS, modifiers);
+					}
 				}
 				break;
 
@@ -291,7 +293,10 @@ namespace Yttrium
 				break;
 
 			case XCB_CONFIGURE_NOTIFY:
-				_size = ::make_size(*reinterpret_cast<xcb_configure_notify_event_t*>(event.get()));
+				{
+					const auto e = reinterpret_cast<const xcb_configure_notify_event_t*>(event.get());
+					_size.emplace(e->width, e->height);
+				}
 				_callbacks.on_resize_event(*_size);
 				break;
 
@@ -326,5 +331,6 @@ namespace Yttrium
 
 	void WindowBackend::swap_buffers()
 	{
+		static_assert(Y_RENDERER_NULL || Y_RENDERER_VULKAN, "Not implemented");
 	}
 }

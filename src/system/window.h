@@ -3,7 +3,7 @@
 
 #include "../config.h"
 #if Y_IS_POSIX
-	#ifdef Y_RENDERER_OPENGL
+	#if Y_RENDERER_OPENGL
 		#include "x11/window.h"
 	#else
 		#include "xcb/window.h"

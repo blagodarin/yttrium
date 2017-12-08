@@ -249,7 +249,7 @@ target_sources(yttrium PRIVATE
 	renderer/texture.cpp
 	renderer/texture.h
 	)
-if(Y_RENDERER STREQUAL "OpenGL")
+if(Y_RENDERER_OPENGL)
 	find_package(OpenGL REQUIRED)
 	add_custom_command(OUTPUT renderer/gl/2d_fs.glsl.inc
 		COMMAND yrc --string 2d_fs.glsl 2d_fs.glsl.inc
@@ -279,10 +279,9 @@ if(Y_RENDERER STREQUAL "OpenGL")
 		renderer/gl/wrappers.h
 		system/gl.h
 		)
-	target_compile_definitions(yttrium PRIVATE Y_RENDERER_OPENGL)
 	target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
-elseif(Y_RENDERER STREQUAL "Vulkan")
+elseif(Y_RENDERER_VULKAN)
 	find_package(Vulkan REQUIRED)
 	add_custom_command(OUTPUT renderer/vulkan/2d_fs.spirv.inc
 		COMMAND yglslc --fragment 2d_fs.glsl 2d_fs.spirv.inc
@@ -320,7 +319,6 @@ elseif(Y_RENDERER STREQUAL "Vulkan")
 		renderer/vulkan/wrappers.cpp
 		renderer/vulkan/wrappers.h
 		)
-	target_compile_definitions(yttrium PRIVATE Y_RENDERER_VULKAN)
 	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
 	target_link_libraries(yttrium Vulkan::Vulkan)
 else()
@@ -399,7 +397,7 @@ target_sources(yttrium PRIVATE
 	window/window.cpp
 	)
 if(UNIX)
-	if(Y_RENDERER STREQUAL "OpenGL")
+	if(Y_RENDERER_OPENGL)
 		find_package(X11 REQUIRED)
 		target_sources(yttrium PRIVATE
 			system/x11/glx.cpp
@@ -416,7 +414,7 @@ if(UNIX)
 			system/xcb/window.h
 			)
 		target_link_libraries(yttrium xcb xcb-image)
-		if(Y_RENDERER STREQUAL "Vulkan")
+		if(Y_RENDERER_VULKAN)
 			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
 		endif()
 	endif()
@@ -425,7 +423,7 @@ elseif(WIN32)
 		system/gdi/window.cpp
 		system/gdi/window.h
 		)
-	if(Y_RENDERER STREQUAL "OpenGL")
+	if(Y_RENDERER_OPENGL)
 		target_sources(yttrium PRIVATE
 			system/gdi/wgl.cpp
 			system/gdi/wgl.h
