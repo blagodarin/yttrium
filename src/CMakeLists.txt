@@ -408,12 +408,12 @@ if(UNIX)
 		target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium ${X11_X11_LIB})
 	else()
-		# TODO: Use 'FindXCB'.
+		# TODO: Use find_package for XCB and libxkbcommon.
 		target_sources(yttrium PRIVATE
 			system/xcb/window.cpp
 			system/xcb/window.h
 			)
-		target_link_libraries(yttrium xcb xcb-image)
+		target_link_libraries(yttrium xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
 			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
 		endif()

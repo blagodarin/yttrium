@@ -20,6 +20,9 @@ matrix:
             - libopenal-dev
             - libvorbis-dev
             - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
 
     - os: linux
       compiler: gcc

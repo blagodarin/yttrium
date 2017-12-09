@@ -32,10 +32,12 @@ namespace Yttrium
 		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
-		class EmptyCursor;
+		struct EmptyCursor;
+		struct XkbContext;
 
 		WindowBackendCallbacks& _callbacks;
 		Y_UNIQUE_PTR(xcb_connection_t, ::xcb_disconnect) _connection;
+		std::unique_ptr<XkbContext> _xkb;
 		xcb_screen_t* _screen = nullptr;
 		xcb_window_t _window = XCB_WINDOW_NONE;
 		P_Atom _wm_protocols;

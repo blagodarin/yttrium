@@ -82,6 +82,9 @@ namespace Yttrium
 		void on_screenshot(const std::function<void(Image&&)>&);
 
 		///
+		void on_text_event(const std::function<void(std::string_view)>&);
+
+		///
 		void on_update(const std::function<void(const UpdateEvent&)>&);
 
 		///

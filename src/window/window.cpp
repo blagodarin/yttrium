@@ -25,6 +25,7 @@ namespace Yttrium
 		std::function<void(const KeyEvent&)> _on_key_event;
 		std::function<void(Renderer&, const Vector2&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
+		std::function<void(std::string_view)> _on_text_event;
 		std::function<void(const UpdateEvent&)> _on_update;
 
 		explicit WindowPrivate(std::string_view name)
@@ -122,6 +123,12 @@ namespace Yttrium
 			else
 				lock_cursor(true);
 		}
+
+		void on_text_event(std::string_view text) override
+		{
+			if (_on_text_event)
+				_on_text_event(text);
+		}
 	};
 
 	Window::Window(std::string_view name)
@@ -164,6 +171,11 @@ namespace Yttrium
 	void Window::on_screenshot(const std::function<void(Image&&)>& callback)
 	{
 		_private->_on_screenshot = callback;
+	}
+
+	void Window::on_text_event(const std::function<void(std::string_view)>& callback)
+	{
+		_private->_on_text_event = callback;
 	}
 
 	void Window::on_update(const std::function<void(const UpdateEvent&)>& callback)

@@ -3,9 +3,15 @@
 #include "../../config.h"
 #include "../../window/backend.h"
 
-#include <string_view>
+#include <algorithm>
+#include <string>
 
 #include <xcb/xcb_image.h>
+#define explicit explicit_ // TODO: Report an XKB bug.
+#include <xcb/xkb.h>
+#undef explicit
+#include <xkbcommon/xkbcommon.h>
+#include <xkbcommon/xkbcommon-x11.h>
 
 namespace
 {
@@ -149,9 +155,8 @@ namespace
 
 namespace Yttrium
 {
-	class WindowBackend::EmptyCursor
+	struct WindowBackend::EmptyCursor
 	{
-	public:
 		xcb_connection_t* const _connection;
 		const xcb_cursor_t _cursor;
 
@@ -171,6 +176,56 @@ namespace Yttrium
 		}
 	};
 
+	struct WindowBackend::XkbContext
+	{
+		xcb_connection_t* const _connection;
+		uint8_t _base_event = 0;
+		int32_t _keyboard_id = -1;
+		Y_UNIQUE_PTR(xkb_context, ::xkb_context_unref) _context;
+		Y_UNIQUE_PTR(xkb_keymap, ::xkb_keymap_unref) _keymap;
+		Y_UNIQUE_PTR(xkb_state, ::xkb_state_unref) _state;
+
+		explicit XkbContext(xcb_connection_t* connection)
+			: _connection{connection}
+		{
+			if (!::xkb_x11_setup_xkb_extension(_connection, XKB_X11_MIN_MAJOR_XKB_VERSION, XKB_X11_MIN_MINOR_XKB_VERSION,
+				XKB_X11_SETUP_XKB_EXTENSION_NO_FLAGS, nullptr, nullptr, &_base_event, nullptr))
+				throw std::runtime_error{"Unable to setup XKB"};
+
+			const uint16_t events = XCB_XKB_EVENT_TYPE_NEW_KEYBOARD_NOTIFY | XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_STATE_NOTIFY;
+			const uint16_t map_parts = XCB_XKB_MAP_PART_KEY_TYPES | XCB_XKB_MAP_PART_KEY_SYMS | XCB_XKB_MAP_PART_MODIFIER_MAP | XCB_XKB_MAP_PART_EXPLICIT_COMPONENTS
+				| XCB_XKB_MAP_PART_KEY_ACTIONS | XCB_XKB_MAP_PART_KEY_BEHAVIORS | XCB_XKB_MAP_PART_VIRTUAL_MODS | XCB_XKB_MAP_PART_VIRTUAL_MOD_MAP;
+			const auto cookie = ::xcb_xkb_select_events_aux_checked(_connection, XCB_XKB_ID_USE_CORE_KBD, events, 0, events, map_parts, map_parts, nullptr);
+			Y_UNIQUE_PTR(xcb_generic_error_t, std::free) error{::xcb_request_check(_connection, cookie)};
+			if (error)
+				throw std::runtime_error{"Unable to select XKB events"};
+
+			_keyboard_id = ::xkb_x11_get_core_keyboard_device_id(_connection);
+			if (_keyboard_id == -1)
+				throw std::runtime_error{"Unable to get XKB core keyboard device ID"};
+
+			_context.reset(::xkb_context_new(XKB_CONTEXT_NO_FLAGS));
+			if (!_context)
+				throw std::runtime_error{"Unable to create XKB context"};
+
+			reset_keymap();
+		}
+
+		void reset_keymap()
+		{
+			decltype(_keymap) keymap{::xkb_x11_keymap_new_from_device(_context.get(), _connection, _keyboard_id, XKB_KEYMAP_COMPILE_NO_FLAGS)};
+			if (!keymap)
+				throw std::runtime_error{"Unable to create XKB keymap"};
+
+			decltype(_state) state{::xkb_x11_state_new_from_device(keymap.get(), _connection, _keyboard_id)};
+			if (!state)
+				throw std::runtime_error{"Unable to create XKB state"};
+
+			std::swap(_keymap, keymap);
+			std::swap(_state, state);
+		}
+	};
+
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
 		: _callbacks{callbacks}
 	{
@@ -178,6 +233,8 @@ namespace Yttrium
 		_connection.reset(::xcb_connect(nullptr, &preferred_screen));
 		if (::xcb_connection_has_error(_connection.get()))
 			return;
+
+		_xkb = std::make_unique<XkbContext>(_connection.get());
 
 		auto screen_iterator = ::xcb_setup_roots_iterator(::xcb_get_setup(_connection.get()));
 		for (; preferred_screen > 0; --preferred_screen)
@@ -266,6 +323,18 @@ namespace Yttrium
 							modifiers |= KeyEvent::Modifier::Alt;
 						_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, modifiers);
 					}
+					if (event_type == XCB_KEY_PRESS)
+					{
+						const auto size = static_cast<size_t>(::xkb_state_key_get_utf8(_xkb->_state.get(), e->detail, nullptr, 0));
+						if (size > 0)
+						{
+							std::string buffer(size, '\0'); // TODO: Explicit small buffer optimization.
+							::xkb_state_key_get_utf8(_xkb->_state.get(), e->detail, buffer.data(), size + 1);
+							buffer.erase(std::remove_if(buffer.begin(), buffer.end(), [](char c){ return to_unsigned(c) < 32 || c == 127; }), buffer.end());
+							if (!buffer.empty())
+								_callbacks.on_text_event(buffer);
+						}
+					}
 				}
 				break;
 
@@ -308,6 +377,44 @@ namespace Yttrium
 					return false;
 				}
 				break;
+
+			default:
+				// There's only one X event for all XKB events (see https://bugs.freedesktop.org/show_bug.cgi?id=51295),
+				// but all XKB events are declared as separate structures with no common union like XEvent.
+				if (event_type == _xkb->_base_event)
+				{
+					union XkbEvent
+					{
+						struct
+						{
+							uint8_t response_type;
+							uint8_t xkbType;
+							uint16_t sequence;
+							xcb_timestamp_t time;
+							uint8_t deviceID;
+						} any;
+						xcb_xkb_new_keyboard_notify_event_t new_keyboard_notify;
+						xcb_xkb_map_notify_event_t map_notify;
+						xcb_xkb_state_notify_event_t state_notify;
+					};
+
+					const auto e = reinterpret_cast<const XkbEvent*>(event.get());
+					if (e->any.deviceID == _xkb->_keyboard_id)
+					{
+						switch (e->any.xkbType)
+						{
+						case XCB_XKB_NEW_KEYBOARD_NOTIFY:
+						case XCB_XKB_MAP_NOTIFY:
+							_xkb->reset_keymap();
+							break;
+						case XCB_XKB_STATE_NOTIFY:
+							::xkb_state_update_mask(_xkb->_state.get(),
+								e->state_notify.baseMods, e->state_notify.latchedMods, e->state_notify.lockedMods,
+								to_unsigned(e->state_notify.baseGroup), to_unsigned(e->state_notify.latchedGroup), e->state_notify.lockedGroup);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

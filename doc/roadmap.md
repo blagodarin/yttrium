@@ -9,12 +9,17 @@ where the project is currently heading to.
      a preferable outcome, but still a possible one.
    - The goal is running examples with Vulkan instead of OpenGL without any
      noticeable visual difference.
+1. **Text input**. Current status: in progress.
+   - Replaces the current workaround key-to-text mapping with platform-supplied
+     Unicode text input, which may be the first step to Unicode support.
+   - It may be better to finally drop X11 port (in favor of XCB port) than to
+     implement text input for X11.
 1. **Android port**. Requires **Vulkan support**. Current status: not started.
    - Requires research on Android development in general. Also OpenAL may be
      unavailable on Android, which in turn will require a new audio backend.
    - It is possible to port to Android without using Vulkan (i. e. using
      OpenGL), but it doesn't look like a good idea because of uncertain future
-     of OpenGL renderer itself.
+     of the OpenGL renderer itself.
    - The goal is running Tetrium on Android. Android devices don't usually have
      keyboard or mouse, requiring an overhaul of user interaction mechanisms.
 
@@ -33,7 +38,6 @@ improvements and other code-related issues.
 		- Windows Multimedia audio backend.
 	* GUI:
 		- Line editor widget.
-		- Separate key input from character input.
 	* Image:
 		- Compressed images (e. g. compressed textures).
 		- Multi-level images (e. g. textures with mipmaps).
