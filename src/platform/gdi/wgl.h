@@ -1,5 +1,5 @@
-#ifndef _src_system_gdi_wgl_h_
-#define _src_system_gdi_wgl_h_
+#ifndef _src_platform_gdi_wgl_h_
+#define _src_platform_gdi_wgl_h_
 
 #include "../windows/windows.h"
 

@@ -1,5 +1,5 @@
-#ifndef _src_system_openal_h_
-#define _src_system_openal_h_
+#ifndef _src_platform_openal_h_
+#define _src_platform_openal_h_
 
 #include "../config.h"
 #if Y_IS_WINDOWS && !defined(AL_APIENTRY)

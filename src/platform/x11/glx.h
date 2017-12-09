@@ -1,5 +1,5 @@
-#ifndef _src_system_x11_glx_h_
-#define _src_system_x11_glx_h_
+#ifndef _src_platform_x11_glx_h_
+#define _src_platform_x11_glx_h_
 
 #include "../../utils/unique_ptr.h"
 

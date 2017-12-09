@@ -1,5 +1,5 @@
-#ifndef _src_system_file_h_
-#define _src_system_file_h_
+#ifndef _src_platform_file_h_
+#define _src_platform_file_h_
 
 #include <memory>
 #include <string>

@@ -38,7 +38,7 @@ target_link_libraries(yttrium Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
 if(WIN32)
 	target_sources(yttrium PRIVATE
-		system/windows/windows.h
+		platform/windows/windows.h
 		)
 endif()
 
@@ -80,7 +80,7 @@ if(ON)
 		audio/openal/player.h
 		audio/openal/sound.cpp
 		audio/openal/sound.h
-		system/openal.h
+		platform/openal.h
 		)
 	target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENAL_LIBRARY})
@@ -203,15 +203,15 @@ target_sources(yttrium PRIVATE
 	memory/buffer.cpp
 	memory/pool.cpp
 	memory/raw.h
-	system/memory.h
+	platform/memory.h
 	)
 if(UNIX)
 	target_sources(yttrium PRIVATE
-		system/posix/memory.cpp
+		platform/posix/memory.cpp
 		)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
-		system/windows/memory.cpp
+		platform/windows/memory.cpp
 		)
 endif()
 if(Y_ENABLE_BUFFER_MEMORY_TRACKING)
@@ -262,6 +262,7 @@ if(Y_RENDERER_OPENGL)
 		WORKING_DIRECTORY renderer/gl
 		VERBATIM)
 	target_sources(yttrium PRIVATE
+		platform/gl.h
 		renderer/gl/2d_fs.glsl.inc
 		renderer/gl/2d_vs.glsl.inc
 		renderer/gl/api.h
@@ -277,7 +278,6 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/version.h
 		renderer/gl/wrappers.cpp
 		renderer/gl/wrappers.h
-		system/gl.h
 		)
 	target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
@@ -352,6 +352,7 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/storage/storage.h
 	../include/yttrium/storage/temporary_file.h
 	../include/yttrium/storage/writer.h
+	platform/file.h
 	storage/formats/ypq.cpp
 	storage/formats/ypq.h
 	storage/package.cpp
@@ -362,17 +363,16 @@ target_sources(yttrium PRIVATE
 	storage/storage.cpp
 	storage/writer.cpp
 	storage/writer.h
-	system/file.h
 	)
 if(UNIX)
 	target_sources(yttrium PRIVATE
-		system/posix/file.cpp
-		system/posix/temporary_file.cpp
+		platform/posix/file.cpp
+		platform/posix/temporary_file.cpp
 		)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
-		system/windows/file.cpp
-		system/windows/temporary_file.cpp
+		platform/windows/file.cpp
+		platform/windows/temporary_file.cpp
 		)
 endif()
 
@@ -390,7 +390,7 @@ target_sources(yttrium PRIVATE
 target_sources(yttrium PRIVATE
 	../include/yttrium/key.h
 	../include/yttrium/window.h
-	system/window.h
+	platform/window.h
 	window/backend.cpp
 	window/backend.h
 	window/key.cpp
@@ -400,18 +400,18 @@ if(UNIX)
 	if(Y_RENDERER_OPENGL)
 		find_package(X11 REQUIRED)
 		target_sources(yttrium PRIVATE
-			system/x11/glx.cpp
-			system/x11/glx.h
-			system/x11/window.cpp
-			system/x11/window.h
+			platform/x11/glx.cpp
+			platform/x11/glx.h
+			platform/x11/window.cpp
+			platform/x11/window.h
 			)
 		target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium ${X11_X11_LIB})
 	else()
 		# TODO: Use find_package for XCB and libxkbcommon.
 		target_sources(yttrium PRIVATE
-			system/xcb/window.cpp
-			system/xcb/window.h
+			platform/xcb/window.cpp
+			platform/xcb/window.h
 			)
 		target_link_libraries(yttrium xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
@@ -420,13 +420,13 @@ if(UNIX)
 	endif()
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
-		system/gdi/window.cpp
-		system/gdi/window.h
+		platform/gdi/window.cpp
+		platform/gdi/window.h
 		)
 	if(Y_RENDERER_OPENGL)
 		target_sources(yttrium PRIVATE
-			system/gdi/wgl.cpp
-			system/gdi/wgl.h
+			platform/gdi/wgl.cpp
+			platform/gdi/wgl.h
 			)
 	endif()
 endif()

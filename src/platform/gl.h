@@ -1,5 +1,5 @@
-#ifndef _src_system_gl_h_
-#define _src_system_gl_h_
+#ifndef _src_platform_gl_h_
+#define _src_platform_gl_h_
 
 #include "../config.h"
 #if Y_IS_WINDOWS

@@ -4,7 +4,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/utils.h>
-#include "../system/file.h"
+#include "../platform/file.h"
 
 #include <algorithm>
 #include <cassert>

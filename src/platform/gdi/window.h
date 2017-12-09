@@ -1,5 +1,5 @@
-#ifndef _src_system_gdi_window_h_
-#define _src_system_gdi_window_h_
+#ifndef _src_platform_gdi_window_h_
+#define _src_platform_gdi_window_h_
 
 #include <yttrium/math/size.h>
 #include "../windows/windows.h"

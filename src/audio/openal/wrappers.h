@@ -2,7 +2,7 @@
 #define _src_audio_openal_wrappers_h_
 
 #include <yttrium/exceptions.h>
-#include "../../system/openal.h"
+#include "../../platform/openal.h"
 
 namespace Yttrium
 {

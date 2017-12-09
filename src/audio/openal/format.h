@@ -1,7 +1,7 @@
 #ifndef _src_audio_openal_format_h_
 #define _src_audio_openal_format_h_
 
-#include "../../system/openal.h"
+#include "../../platform/openal.h"
 
 #include <cstddef>
 

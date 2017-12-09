@@ -2,8 +2,8 @@
 
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
+#include "../platform/window.h"
 #include "../renderer/renderer.h"
-#include "../system/window.h"
 #include "backend.h"
 
 namespace Yttrium

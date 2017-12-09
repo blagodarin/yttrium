@@ -1,7 +1,7 @@
 #ifndef _src_audio_openal_backend_h_
 #define _src_audio_openal_backend_h_
 
-#include "../../system/openal.h"
+#include "../../platform/openal.h"
 #include "../../utils/unique_ptr.h"
 #include "../backend.h"
 
