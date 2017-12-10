@@ -10,8 +10,8 @@
 namespace Yttrium
 {
 	class RectF;
-	class Renderer;
 	class RenderContext;
+	class RenderManager;
 	class SizeF;
 	class Texture2D;
 }
@@ -21,7 +21,7 @@ using namespace Yttrium;
 class TetriumGraphics
 {
 public:
-	explicit TetriumGraphics(Renderer&);
+	explicit TetriumGraphics(RenderManager&);
 
 	void draw_field(RenderContext&, const RectF&, const Tetrium::Field&, const Tetrium::Figure&) const;
 	void draw_next_figure(RenderContext&, const RectF&, const Tetrium::Figure&) const;

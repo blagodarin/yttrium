@@ -8,8 +8,8 @@
 #include <yttrium/image.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/gpu_program.h>
+#include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/mesh.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
@@ -82,8 +82,8 @@ namespace Yttrium
 	class ResourceLoaderPrivate
 	{
 	public:
-		ResourceLoaderPrivate(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
-			: _storage{storage}, _renderer{renderer}, _audio_manager{audio_manager} {}
+		ResourceLoaderPrivate(const Storage& storage, RenderManager* render_manager, AudioManager* audio_manager)
+			: _storage{storage}, _render_manager{render_manager}, _audio_manager{audio_manager} {}
 
 		bool release_unused()
 		{
@@ -98,7 +98,7 @@ namespace Yttrium
 
 	public:
 		const Storage& _storage;
-		Renderer* const _renderer = nullptr;
+		RenderManager* const _render_manager = nullptr;
 		AudioManager* const _audio_manager = nullptr;
 		ResourceCache<Material> _material_cache{_storage};
 		ResourceCache<Mesh> _mesh_cache{_storage};
@@ -108,8 +108,8 @@ namespace Yttrium
 		ResourceCache<Translation> _translation_cache{_storage};
 	};
 
-	ResourceLoader::ResourceLoader(const Storage& storage, Renderer* renderer, AudioManager* audio_manager)
-		: _private{std::make_unique<ResourceLoaderPrivate>(storage, renderer, audio_manager)}
+	ResourceLoader::ResourceLoader(const Storage& storage, RenderManager* render_manager, AudioManager* audio_manager)
+		: _private{std::make_unique<ResourceLoaderPrivate>(storage, render_manager, audio_manager)}
 	{
 	}
 
@@ -117,7 +117,7 @@ namespace Yttrium
 
 	std::shared_ptr<const Material> ResourceLoader::load_material(std::string_view name)
 	{
-		if (!_private->_renderer)
+		if (!_private->_render_manager)
 			return {};
 		return _private->_material_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Material>
 		{
@@ -169,7 +169,7 @@ namespace Yttrium
 				throw DataError{"(", name, ") No 'vertex_shader'"};
 			if (!fragment_shader)
 				throw DataError{"(", name, ") No 'fragment_shader'"};
-			auto program = _private->_renderer->create_gpu_program(vertex_shader->to_string(), fragment_shader->to_string());
+			auto program = _private->_render_manager->create_gpu_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
 				throw DataError{"(", name, ") Bad 'vertex_shader' or 'fragment_shader'"};
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
@@ -178,11 +178,11 @@ namespace Yttrium
 
 	std::shared_ptr<const Mesh> ResourceLoader::load_mesh(std::string_view name)
 	{
-		if (!_private->_renderer)
+		if (!_private->_render_manager)
 			return {};
 		return _private->_mesh_cache.fetch(name, [this](std::unique_ptr<Source>&& source)
 		{
-			return _private->_renderer->load_mesh(*source);
+			return _private->_render_manager->load_mesh(*source);
 		});
 	}
 
@@ -198,14 +198,14 @@ namespace Yttrium
 
 	std::shared_ptr<const Texture2D> ResourceLoader::load_texture_2d(std::string_view name)
 	{
-		if (!_private->_renderer)
+		if (!_private->_render_manager)
 			return {};
 		return _private->_texture_2d_cache.fetch(name, [this](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D>
 		{
-			Flags<Renderer::TextureFlag> flags;
+			Flags<RenderManager::TextureFlag> flags;
 			if (source->property("intensity") == "1")
-				flags |= Renderer::TextureFlag::Intensity;
-			return _private->_renderer->create_texture_2d(::load_image(*source), flags);
+				flags |= RenderManager::TextureFlag::Intensity;
+			return _private->_render_manager->create_texture_2d(::load_image(*source), flags);
 		});
 	}
 

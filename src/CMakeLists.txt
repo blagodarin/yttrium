@@ -224,11 +224,12 @@ endif()
 ########################################################################################################################
 # renderer
 target_sources(yttrium PRIVATE
+	../include/yttrium/renderer/context.h
 	../include/yttrium/renderer/gpu_program.h
+	../include/yttrium/renderer/manager.h
 	../include/yttrium/renderer/material.h
 	../include/yttrium/renderer/mesh.h
 	../include/yttrium/renderer/modifiers.h
-	../include/yttrium/renderer/renderer.h
 	../include/yttrium/renderer/texture.h
 	../include/yttrium/renderer/textured_rect.h
 	renderer/formats/obj.cpp

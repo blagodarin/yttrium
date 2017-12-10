@@ -142,9 +142,9 @@ namespace Yttrium
 		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), static_cast<GLsizei>(data._indices.size()), index_format);
 	}
 
-	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<Renderer::TextureFlag> flags)
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		if (flags & Renderer::TextureFlag::Intensity)
+		if (flags & RenderManager::TextureFlag::Intensity)
 		{
 			auto converted = intensity_to_bgra(image);
 			if (converted)
@@ -197,7 +197,7 @@ namespace Yttrium
 		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
 		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(image_format.row_alignment()));
 		texture.set_data(0, internal_format, static_cast<GLsizei>(image_format.width()), static_cast<GLsizei>(image_format.height()), data_format, data_type, data);
-		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
+		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
 			texture.generate_mipmaps();
 		return std::make_unique<GlTexture2D>(renderer, image_format, has_mipmaps, std::move(texture));

@@ -12,7 +12,7 @@ namespace Yttrium
 	class Material;
 	class Mesh;
 	class MusicReader;
-	class Renderer;
+	class RenderManager;
 	class Sound;
 	class Source;
 	class Storage;
@@ -25,7 +25,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		ResourceLoader(const Storage&, Renderer* = nullptr, AudioManager* = nullptr);
+		ResourceLoader(const Storage&, RenderManager* = nullptr, AudioManager* = nullptr);
 
 		///
 		~ResourceLoader();

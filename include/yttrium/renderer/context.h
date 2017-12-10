@@ -1,17 +1,13 @@
-#ifndef _include_yttrium_renderer_renderer_h_
-#define _include_yttrium_renderer_renderer_h_
+#ifndef _include_yttrium_renderer_context_h_
+#define _include_yttrium_renderer_context_h_
 
-#include <yttrium/flags.h>
 #include <yttrium/math/color.h>
 
-#include <memory>
 #include <string_view>
 #include <vector>
 
 namespace Yttrium
 {
-	class GpuProgram;
-	class Image;
 	class Line3;
 	class MarginsF;
 	class Matrix4;
@@ -19,35 +15,8 @@ namespace Yttrium
 	class Quad;
 	class RectF;
 	class SizeF;
-	class Source;
-	class Texture2D;
 	class TexturedRect;
 	class Vector2;
-
-	///
-	/// \note Lifetimes of entities created by a renderer must not exceed the lifetime of the renderer.
-	class Renderer
-	{
-	public:
-		///
-		enum class TextureFlag
-		{
-			NoMipmaps = 1 << 0,
-			Intensity = 1 << 1,
-		};
-
-		///
-		virtual ~Renderer() noexcept = default;
-
-		///
-		virtual std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
-
-		///
-		virtual std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag> = {}) = 0;
-
-		///
-		virtual std::unique_ptr<Mesh> load_mesh(const Source&) = 0;
-	};
 
 	///
 	class RenderContext

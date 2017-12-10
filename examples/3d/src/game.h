@@ -35,7 +35,7 @@ private:
 private:
 	const Storage& _storage;
 	Window _window{"Yttrium 3D example"};
-	ResourceLoader _resource_loader{_storage, &_window.renderer()};
+	ResourceLoader _resource_loader{_storage, &_window.render_manager()};
 	ScriptContext _script;
 	Gui _gui{_resource_loader, _script, "examples/3d/data/gui.ion"};
 	bool _debug_text_visible = false;

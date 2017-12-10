@@ -1,8 +1,8 @@
 #include "input.h"
 
 #include <yttrium/gui/text_capture.h>
+#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/script/context.h>
 #include "../gui.h"
 

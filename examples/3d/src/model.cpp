@@ -1,10 +1,10 @@
 #include "model.h"
 
 #include <yttrium/math/matrix.h>
+#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/material.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/resource_loader.h>
 
 Model::Model(ResourceLoader& resource_loader, std::string_view mesh, std::string_view material)

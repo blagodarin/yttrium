@@ -183,7 +183,7 @@ namespace Yttrium
 		_private->_on_update = callback;
 	}
 
-	Renderer& Window::renderer()
+	RenderManager& Window::render_manager()
 	{
 		return _private->_renderer;
 	}

@@ -6,8 +6,8 @@
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/string_utils.h>
 
 #include <cmath>

@@ -13,8 +13,8 @@ namespace Yttrium
 	class Image;
 	class KeyEvent;
 	class Point;
-	class Renderer;
 	class RenderContext;
+	class RenderManager;
 	class Size;
 	class Vector2;
 
@@ -89,7 +89,7 @@ namespace Yttrium
 		void on_update(const std::function<void(const UpdateEvent&)>&);
 
 		///
-		Renderer& renderer();
+		RenderManager& render_manager();
 
 		///
 		void run();

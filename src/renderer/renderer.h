@@ -1,7 +1,8 @@
 #ifndef _src_renderer_renderer_h_
 #define _src_renderer_renderer_h_
 
-#include <yttrium/renderer/renderer.h>
+#include <yttrium/renderer/context.h>
+#include <yttrium/renderer/manager.h>
 
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
@@ -17,7 +18,7 @@ namespace Yttrium
 	class RendererBackend;
 	class WindowBackend;
 
-	class RendererImpl final : public Renderer, public RenderContext
+	class RendererImpl final : public RenderManager, public RenderContext
 	{
 	public:
 		explicit RendererImpl(WindowBackend&);

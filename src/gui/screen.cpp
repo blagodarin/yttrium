@@ -1,8 +1,8 @@
 #include "screen.h"
 
 #include <yttrium/math/margins.h>
+#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/resource_loader.h>
 #include "gui.h"
 #include "layout.h"

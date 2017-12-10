@@ -3,7 +3,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/math/vector.h>
 #include <yttrium/memory/buffer_appender.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include "../mesh_data.h"

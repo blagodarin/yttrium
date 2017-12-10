@@ -14,9 +14,9 @@ namespace Yttrium
 		return std::make_unique<NullGpuProgram>();
 	}
 
-	std::unique_ptr<Texture2D> NullRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<Renderer::TextureFlag> flags)
+	std::unique_ptr<Texture2D> NullRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
+		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		return std::make_unique<BackendTexture2D>(renderer, image.format(), has_mipmaps);
 	}
 

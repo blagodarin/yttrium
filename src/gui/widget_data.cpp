@@ -1,8 +1,8 @@
 #include "widget_data.h"
 
 #include <yttrium/gui/texture_font.h>
+#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/renderer/renderer.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
 

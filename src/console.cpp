@@ -27,12 +27,12 @@ namespace Yttrium
 
 	Console::~Console() = default;
 
-	void Console::draw(Renderer& renderer) const
+	void Console::draw(RenderContext& context) const
 	{
 		if (!_private->_visible)
 			return;
 
-		DebugRenderer debug{static_cast<RendererImpl&>(renderer)};
+		DebugRenderer debug{static_cast<RendererImpl&>(context)};
 
 		const auto max_width = debug.max_width();
 

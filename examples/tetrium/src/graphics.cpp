@@ -4,8 +4,9 @@
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/math/vector.h>
+#include <yttrium/renderer/context.h>
+#include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/modifiers.h>
-#include <yttrium/renderer/renderer.h>
 
 namespace
 {
@@ -108,8 +109,8 @@ namespace
 	}
 }
 
-TetriumGraphics::TetriumGraphics(Renderer& renderer)
-	: _blocks_texture{renderer.create_texture_2d(::make_blocks_image())}
+TetriumGraphics::TetriumGraphics(RenderManager& manager)
+	: _blocks_texture{manager.create_texture_2d(::make_blocks_image())}
 {
 }
 

@@ -129,7 +129,7 @@ int main(int, char**)
 	::make_sound(storage, "data/sound.wav");
 
 	AudioManager audio;
-	ResourceLoader resource_loader{storage, &window.renderer(), &audio};
+	ResourceLoader resource_loader{storage, &window.render_manager(), &audio};
 	Gui gui{resource_loader, script, "examples/tetrium/data/gui.ion"};
 	gui.on_quit([&window]{ window.close(); });
 
@@ -148,7 +148,7 @@ int main(int, char**)
 		}
 	});
 
-	TetriumGraphics graphics{window.renderer()};
+	TetriumGraphics graphics{window.render_manager()};
 
 	FieldCanvas field_canvas{logic, graphics};
 	gui.bind_canvas("field", field_canvas);

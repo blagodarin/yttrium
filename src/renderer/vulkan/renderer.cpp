@@ -100,9 +100,9 @@ namespace Yttrium
 		}
 	}
 
-	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<Renderer::TextureFlag> flags)
+	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		if (flags & Renderer::TextureFlag::Intensity)
+		if (flags & RenderManager::TextureFlag::Intensity)
 		{
 			auto converted = intensity_to_bgra(image);
 			if (converted)
@@ -129,7 +129,7 @@ namespace Yttrium
 			return {};
 		}
 
-		const auto has_mipmaps = !(flags & Renderer::TextureFlag::NoMipmaps);
+		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		return std::make_unique<VulkanTexture2D>(renderer, _context, image.format(), has_mipmaps, vk_format, image.data());
 	}
 
