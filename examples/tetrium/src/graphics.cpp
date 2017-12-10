@@ -109,39 +109,38 @@ namespace
 }
 
 TetriumGraphics::TetriumGraphics(Renderer& renderer)
-	: _renderer{renderer}
-	, _blocks_texture{_renderer.create_texture_2d(::make_blocks_image())}
+	: _blocks_texture{renderer.create_texture_2d(::make_blocks_image())}
 {
 }
 
-void TetriumGraphics::draw_field(const RectF& rect, const Tetrium::Field& field, const Tetrium::Figure& current_figure) const
+void TetriumGraphics::draw_field(RenderContext& context, const RectF& rect, const Tetrium::Field& field, const Tetrium::Figure& current_figure) const
 {
 	static const int total_width = 1 + Tetrium::Field::Width + 1;
 	static const int total_height = 1 + Tetrium::Field::Height + 1;
 	const SizeF block_size{rect.width() / total_width, rect.height() / total_height};
-	PushTexture push_texture{_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter};
-	draw_field_blocks(rect, block_size, field);
-	draw_field_figure(rect, block_size, current_figure);
-	draw_field_frame(rect, block_size);
+	PushTexture push_texture{context, _blocks_texture.get(), Texture2D::TrilinearFilter};
+	draw_field_blocks(context, rect, block_size, field);
+	draw_field_figure(context, rect, block_size, current_figure);
+	draw_field_frame(context, rect, block_size);
 }
 
-void TetriumGraphics::draw_next_figure(const RectF& rect, const Tetrium::Figure& figure) const
+void TetriumGraphics::draw_next_figure(RenderContext& context, const RectF& rect, const Tetrium::Figure& figure) const
 {
 	if (figure.type() == Tetrium::Figure::None)
 		return;
-	PushTexture push_texture{_renderer, _blocks_texture.get(), Texture2D::TrilinearFilter};
-	set_texture_rect(figure.type());
+	PushTexture push_texture{context, _blocks_texture.get(), Texture2D::TrilinearFilter};
+	set_texture_rect(context, figure.type());
 	const SizeF block_size{rect.width() / 4, rect.height() / 2};
 	for (const auto& block : figure.blocks())
-		draw_block(rect, block_size, block.x, 1 - block.y / Tetrium::PointsPerRow);
+		draw_block(context, rect, block_size, block.x, 1 - block.y / Tetrium::PointsPerRow);
 }
 
-void TetriumGraphics::draw_block(const RectF& rect, const SizeF& block_size, float x, float y) const
+void TetriumGraphics::draw_block(RenderContext& context, const RectF& rect, const SizeF& block_size, float x, float y) const
 {
-	_renderer.draw_rect({{rect.left() + x * block_size._width, rect.top() + y * block_size._height}, block_size});
+	context.draw_rect({{rect.left() + x * block_size._width, rect.top() + y * block_size._height}, block_size});
 }
 
-void TetriumGraphics::draw_field_blocks(const RectF& rect, const SizeF& block_size, const Tetrium::Field& field) const
+void TetriumGraphics::draw_field_blocks(RenderContext& context, const RectF& rect, const SizeF& block_size, const Tetrium::Field& field) const
 {
 	for (int y = 0; y < Tetrium::Field::Height; ++y)
 	{
@@ -150,41 +149,41 @@ void TetriumGraphics::draw_field_blocks(const RectF& rect, const SizeF& block_si
 			const auto figure_type = field.blocks[y][x];
 			if (figure_type == Tetrium::Figure::None)
 				continue;
-			set_texture_rect(figure_type);
-			draw_block(rect, block_size, 1 + x, Tetrium::Field::Height - y);
+			set_texture_rect(context, figure_type);
+			draw_block(context, rect, block_size, 1 + x, Tetrium::Field::Height - y);
 		}
 	}
 }
 
-void TetriumGraphics::draw_field_figure(const RectF& rect, const SizeF& block_size, const Tetrium::Figure& figure) const
+void TetriumGraphics::draw_field_figure(RenderContext& context, const RectF& rect, const SizeF& block_size, const Tetrium::Figure& figure) const
 {
 	static const Vector2 frame_offset{1, Tetrium::Field::Height};
 	if (figure.type() == Tetrium::Figure::None)
 		return;
-	set_texture_rect(figure.type());
+	set_texture_rect(context, figure.type());
 	for (const auto& block : figure.blocks())
 		if (block.y < Tetrium::Field::Height * Tetrium::PointsPerRow)
-			draw_block(rect, block_size, frame_offset.x + static_cast<float>(block.x), frame_offset.y - static_cast<float>(block.y) / Tetrium::PointsPerRow);
+			draw_block(context, rect, block_size, frame_offset.x + static_cast<float>(block.x), frame_offset.y - static_cast<float>(block.y) / Tetrium::PointsPerRow);
 }
 
-void TetriumGraphics::draw_field_frame(const RectF& rect, const SizeF& block_size) const
+void TetriumGraphics::draw_field_frame(RenderContext& context, const RectF& rect, const SizeF& block_size) const
 {
 	static const int total_width = 1 + Tetrium::Field::Width + 1;
 	static const int total_height = 1 + Tetrium::Field::Height + 1;
-	set_texture_rect(Tetrium::Figure::None);
+	set_texture_rect(context, Tetrium::Figure::None);
 	for (int i = 0; i < total_width; ++i)
-		draw_block(rect, block_size, i, 0);
+		draw_block(context, rect, block_size, i, 0);
 	for (int i = 1; i < total_height - 1; ++i)
 	{
-		draw_block(rect, block_size, 0, i);
-		draw_block(rect, block_size, total_width - 1, i);
+		draw_block(context, rect, block_size, 0, i);
+		draw_block(context, rect, block_size, total_width - 1, i);
 	}
 	for (int i = 0; i < total_width; ++i)
-		draw_block(rect, block_size, i, total_height - 1);
+		draw_block(context, rect, block_size, i, total_height - 1);
 }
 
-void TetriumGraphics::set_texture_rect(Tetrium::Figure::Type figure_type) const
+void TetriumGraphics::set_texture_rect(RenderContext& context, Tetrium::Figure::Type figure_type) const
 {
 	const auto figure_index = (figure_type == Tetrium::Figure::None) ? 0 : static_cast<int>(figure_type) + 1;
-	_renderer.set_texture_rect(::block_rect(figure_index), {});
+	context.set_texture_rect(::block_rect(figure_index), {});
 }

@@ -28,8 +28,8 @@ public:
 	void run();
 
 private:
-	void draw_minimap(Renderer&, const RectF&);
-	void draw_scene(Renderer&, const Vector2&);
+	void draw_minimap(RenderContext&, const RectF&);
+	void draw_scene(RenderContext&, const Vector2&);
 	void update(const UpdateEvent&);
 
 private:

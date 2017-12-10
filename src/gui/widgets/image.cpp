@@ -7,8 +7,8 @@ namespace Yttrium
 	{
 	}
 
-	void ImageWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::StyleData& style_data) const
+	void ImageWidget::draw(RenderContext& context, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
-		style_data._background.draw(renderer, rect);
+		style_data._background.draw(context, rect);
 	}
 }

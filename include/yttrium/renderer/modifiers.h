@@ -14,72 +14,73 @@ namespace Yttrium
 	class GpuProgram;
 	class Material;
 	class Matrix4;
-	class Renderer;
+	class RenderContext;
+	class SizeF;
 
-	/// Base class for Renderer modifiers.
-	class Y_API RendererModifier
+	/// Base class for RenderContext modifiers.
+	class Y_API RenderModifier
 	{
 	public:
-		RendererModifier(const RendererModifier&) = delete;
-		RendererModifier& operator=(const RendererModifier&) = delete;
+		RenderModifier(const RenderModifier&) = delete;
+		RenderModifier& operator=(const RenderModifier&) = delete;
 	protected:
-		Renderer& _renderer;
-		explicit RendererModifier(Renderer& renderer) : _renderer(renderer) {}
+		RenderContext& _context;
+		explicit RenderModifier(RenderContext& context) noexcept : _context{context} {}
 	};
 
 	///
-	class Y_API Push2D : public RendererModifier
+	class Y_API Push2D : public RenderModifier
 	{
 	public:
 		///
-		explicit Push2D(Renderer&);
+		explicit Push2D(RenderContext&);
 
 		///
-		~Push2D();
+		~Push2D() noexcept;
 	};
 
 	///
-	class Y_API Push3D : public RendererModifier
+	class Y_API Push3D : public RenderModifier
 	{
 	public:
 		///
-		Push3D(Renderer&, const Matrix4& projection, const Matrix4& view);
+		Push3D(RenderContext&, const Matrix4& projection, const Matrix4& view);
 
 		///
-		~Push3D();
+		~Push3D() noexcept;
 	};
 
 	///
-	class Y_API PushGpuProgram : public RendererModifier
+	class Y_API PushGpuProgram : public RenderModifier
 	{
 	public:
 		///
-		PushGpuProgram(Renderer&, const GpuProgram*);
+		PushGpuProgram(RenderContext&, const GpuProgram*);
 
 		///
-		~PushGpuProgram();
+		~PushGpuProgram() noexcept;
 	};
 
 	///
-	class Y_API PushTexture : public RendererModifier
+	class Y_API PushTexture : public RenderModifier
 	{
 	public:
 		///
-		PushTexture(Renderer&, const Texture2D*, Flags<Texture2D::Filter> = Texture2D::NearestFilter);
+		PushTexture(RenderContext&, const Texture2D*, Flags<Texture2D::Filter> = Texture2D::NearestFilter);
 
 		///
-		~PushTexture();
+		~PushTexture() noexcept;
 
 	private:
 		const Flags<Texture2D::Filter> _filter;
 	};
 
 	///
-	class Y_API PushMaterial : public RendererModifier
+	class Y_API PushMaterial : public RenderModifier
 	{
 	public:
 		///
-		PushMaterial(Renderer&, const Material*);
+		PushMaterial(RenderContext&, const Material*);
 
 		///
 		void set_uniform(const std::string&, const Matrix4&);
@@ -91,15 +92,15 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushTransformation : public RendererModifier
+	class Y_API PushTransformation : public RenderModifier
 	{
 	public:
 		/// Multiplies the current transformation matrix by the specified one,
 		/// pushes it to the transformation stack and applies the resulting transformation.
-		PushTransformation(Renderer&, const Matrix4&);
+		PushTransformation(RenderContext&, const Matrix4&);
 
 		/// Pops a matrix from the transformation stack and applies the previous matrix.
-		~PushTransformation();
+		~PushTransformation() noexcept;
 	};
 }
 

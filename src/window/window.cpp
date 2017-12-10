@@ -23,7 +23,7 @@ namespace Yttrium
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;
 		std::function<void(const KeyEvent&)> _on_key_event;
-		std::function<void(Renderer&, const Vector2&)> _on_render;
+		std::function<void(RenderContext&, const Vector2&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(std::string_view)> _on_text_event;
 		std::function<void(const UpdateEvent&)> _on_update;
@@ -163,7 +163,7 @@ namespace Yttrium
 		_private->_on_key_event = callback;
 	}
 
-	void Window::on_render(const std::function<void(Renderer&, const Vector2&)>& callback)
+	void Window::on_render(const std::function<void(RenderContext&, const Vector2&)>& callback)
 	{
 		_private->_on_render = callback;
 	}

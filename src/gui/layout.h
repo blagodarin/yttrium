@@ -12,7 +12,7 @@ namespace Yttrium
 	class GuiPrivate;
 	class GuiPropertyLoader;
 	class RectF;
-	class Renderer;
+	class RenderContext;
 	class Widget;
 
 	class GuiLayout
@@ -32,7 +32,7 @@ namespace Yttrium
 
 		Widget& add_widget(std::unique_ptr<Widget>&&);
 
-		void draw(Renderer&, const Widget* hover_widget, const Widget* click_widget) const;
+		void draw(RenderContext&, const Widget* hover_widget, const Widget* click_widget) const;
 		void update(const RectF&);
 
 	private:

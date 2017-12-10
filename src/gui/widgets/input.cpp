@@ -14,26 +14,26 @@ namespace Yttrium
 		_logic.reset(std::string{_data->_text});
 	}
 
-	void InputWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::StyleData& style_data) const
+	void InputWidget::draw(RenderContext& context, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
-		style_data._background.draw(renderer, rect);
+		style_data._background.draw(context, rect);
 
 		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
 		style_data._foreground.prepare(_logic.text(), rect, &capture);
-		style_data._foreground.draw(renderer);
+		style_data._foreground.draw(context);
 
 		if (is_focused() && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)
 		{
-			PushTexture push_texture(renderer, nullptr);
-			renderer.draw_rect(capture._cursor_rect, style_data._foreground.color);
+			PushTexture push_texture{context, nullptr};
+			context.draw_rect(capture._cursor_rect, style_data._foreground.color);
 		}
 
 		if (capture._has_selection)
 		{
 			auto selection_color = style_data._foreground.color;
 			selection_color._a *= .25f;
-			PushTexture push_texture(renderer, nullptr);
-			renderer.draw_rect(capture._selection_rect, selection_color);
+			PushTexture push_texture{context, nullptr};
+			context.draw_rect(capture._selection_rect, selection_color);
 		}
 	}
 

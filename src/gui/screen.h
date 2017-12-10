@@ -15,7 +15,7 @@ namespace Yttrium
 	class GuiLayout;
 	class GuiPrivate;
 	class MusicReader;
-	class Renderer;
+	class RenderContext;
 	class Texture2D;
 	class Widget;
 
@@ -26,7 +26,7 @@ namespace Yttrium
 		~GuiScreen();
 
 		GuiLayout& add_layout(GuiLayout::Placement);
-		void draw(Renderer&, const Vector2* cursor);
+		void draw(RenderContext&, const Vector2* cursor);
 		void handle_enter();
 		bool handle_event(const std::string&) const;
 		bool handle_key(const KeyEvent&);

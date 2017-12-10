@@ -48,20 +48,20 @@ namespace
 
 namespace Yttrium
 {
-	void BackgroundProperty::draw(Renderer& renderer, const RectF& rect) const
+	void BackgroundProperty::draw(RenderContext& context, const RectF& rect) const
 	{
-		PushTexture push_texture(renderer, texture.get(), texture_filter);
-		renderer.set_texture_rect(texture_rect, borders);
-		renderer.draw_rect(rect, color);
+		PushTexture push_texture{context, texture.get(), texture_filter};
+		context.set_texture_rect(texture_rect, borders);
+		context.draw_rect(rect, color);
 	}
 
 	ForegroundProperty::ForegroundProperty() = default;
 	ForegroundProperty::~ForegroundProperty() = default;
 
-	void ForegroundProperty::draw(Renderer& renderer) const
+	void ForegroundProperty::draw(RenderContext& context) const
 	{
-		PushTexture push_texture(renderer, font_texture.get(), Texture2D::TrilinearFilter);
-		renderer.draw_rects(geometry, color);
+		PushTexture push_texture{context, font_texture.get(), Texture2D::TrilinearFilter};
+		context.draw_rects(geometry, color);
 	}
 
 	void ForegroundProperty::prepare(std::string_view text, const RectF& rect, TextCapture* capture)

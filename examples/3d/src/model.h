@@ -8,7 +8,7 @@ namespace Yttrium
 {
 	class Material;
 	class Mesh;
-	class Renderer;
+	class RenderContext;
 	class ResourceLoader;
 }
 
@@ -20,7 +20,7 @@ public:
 	Model(ResourceLoader&, std::string_view mesh, std::string_view material);
 	~Model();
 
-	void draw(Renderer&);
+	void draw(RenderContext&);
 
 private:
 	const std::shared_ptr<const Mesh> _mesh;

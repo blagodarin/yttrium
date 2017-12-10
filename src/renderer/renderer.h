@@ -17,7 +17,7 @@ namespace Yttrium
 	class RendererBackend;
 	class WindowBackend;
 
-	class RendererImpl final : public Renderer
+	class RendererImpl final : public Renderer, public RenderContext
 	{
 	public:
 		explicit RendererImpl(WindowBackend&);

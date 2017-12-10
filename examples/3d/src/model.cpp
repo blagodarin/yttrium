@@ -15,10 +15,10 @@ Model::Model(ResourceLoader& resource_loader, std::string_view mesh, std::string
 
 Model::~Model() = default;
 
-void Model::draw(Renderer& renderer)
+void Model::draw(RenderContext& context)
 {
-	PushMaterial material(renderer, _material.get());
-	material.set_uniform("u_model", renderer.model_matrix());
-	material.set_uniform("u_mvp", renderer.full_matrix());
-	renderer.draw_mesh(*_mesh);
+	PushMaterial material{context, _material.get()};
+	material.set_uniform("u_model", context.model_matrix());
+	material.set_uniform("u_mvp", context.full_matrix());
+	context.draw_mesh(*_mesh);
 }

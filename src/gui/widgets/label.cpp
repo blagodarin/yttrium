@@ -10,10 +10,10 @@ namespace Yttrium
 	{
 	}
 
-	void LabelWidget::draw(Renderer& renderer, const RectF& rect, WidgetData::StyleData& style_data) const
+	void LabelWidget::draw(RenderContext& context, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
 		_gui.script_context().substitute(_final_text, _data->_text);
 		style_data._foreground.prepare(_final_text, rect);
-		style_data._foreground.draw(renderer);
+		style_data._foreground.draw(context);
 	}
 }

@@ -12,7 +12,7 @@
 
 namespace Yttrium
 {
-	class Renderer;
+	class RenderContext;
 	class Sound;
 	class TextCapture;
 	class TextureFont;
@@ -46,7 +46,7 @@ namespace Yttrium
 
 		BackgroundProperty() = default;
 
-		void draw(Renderer&, const RectF&) const;
+		void draw(RenderContext&, const RectF&) const;
 	};
 
 	struct ForegroundProperty
@@ -62,7 +62,7 @@ namespace Yttrium
 		ForegroundProperty(const ForegroundProperty&) = default;
 		~ForegroundProperty();
 
-		void draw(Renderer&) const;
+		void draw(RenderContext&) const;
 		void prepare(std::string_view, const RectF&, TextCapture* = nullptr);
 	};
 

@@ -8,44 +8,44 @@
 
 namespace Yttrium
 {
-	Push2D::Push2D(Renderer& renderer)
-		: RendererModifier(renderer)
+	Push2D::Push2D(RenderContext& context)
+		: RenderModifier{context}
 	{
-		static_cast<RendererImpl&>(_renderer).push_projection_2d(Matrix4::projection_2d(_renderer.window_size()));
+		static_cast<RendererImpl&>(_context).push_projection_2d(Matrix4::projection_2d(context.window_size()));
 	}
 
-	Push2D::~Push2D()
+	Push2D::~Push2D() noexcept
 	{
-		static_cast<RendererImpl&>(_renderer).pop_projection();
+		static_cast<RendererImpl&>(_context).pop_projection();
 	}
 
-	Push3D::Push3D(Renderer& renderer, const Matrix4& projection, const Matrix4& view)
-		: RendererModifier(renderer)
+	Push3D::Push3D(RenderContext& context, const Matrix4& projection, const Matrix4& view)
+		: RenderModifier{context}
 	{
-		static_cast<RendererImpl&>(_renderer).push_projection_3d(projection, view);
+		static_cast<RendererImpl&>(_context).push_projection_3d(projection, view);
 	}
 
-	Push3D::~Push3D()
+	Push3D::~Push3D() noexcept
 	{
-		static_cast<RendererImpl&>(_renderer).pop_projection();
+		static_cast<RendererImpl&>(_context).pop_projection();
 	}
 
-	PushGpuProgram::PushGpuProgram(Renderer& renderer, const GpuProgram* program)
-		: RendererModifier(renderer)
+	PushGpuProgram::PushGpuProgram(RenderContext& context, const GpuProgram* program)
+		: RenderModifier{context}
 	{
-		static_cast<RendererImpl&>(_renderer).push_program(program);
+		static_cast<RendererImpl&>(_context).push_program(program);
 	}
 
-	PushGpuProgram::~PushGpuProgram()
+	PushGpuProgram::~PushGpuProgram() noexcept
 	{
-		static_cast<RendererImpl&>(_renderer).pop_program();
+		static_cast<RendererImpl&>(_context).pop_program();
 	}
 
-	PushMaterial::PushMaterial(Renderer& renderer, const Material* material)
-		: RendererModifier(renderer)
-		, _material(material)
-		, _gpu_program(renderer, &static_cast<const MaterialImpl*>(_material)->gpu_program())
-		, _texture(renderer, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<const MaterialImpl*>(_material)->texture_filter())
+	PushMaterial::PushMaterial(RenderContext& context, const Material* material)
+		: RenderModifier{context}
+		, _material{material}
+		, _gpu_program{context, &static_cast<const MaterialImpl*>(_material)->gpu_program()}
+		, _texture{context, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<const MaterialImpl*>(_material)->texture_filter()}
 	{
 	}
 
@@ -54,25 +54,25 @@ namespace Yttrium
 		const_cast<MaterialImpl*>(static_cast<const MaterialImpl*>(_material))->gpu_program().set_uniform(name, value); // TODO: Remove 'const_cast'.
 	}
 
-	PushTexture::PushTexture(Renderer& renderer, const Texture2D* texture, Flags<Texture2D::Filter> filter)
-		: RendererModifier(renderer)
-		, _filter(static_cast<RendererImpl&>(_renderer).push_texture(texture, filter))
+	PushTexture::PushTexture(RenderContext& context, const Texture2D* texture, Flags<Texture2D::Filter> filter)
+		: RenderModifier{context}
+		, _filter{static_cast<RendererImpl&>(_context).push_texture(texture, filter)}
 	{
 	}
 
-	PushTexture::~PushTexture()
+	PushTexture::~PushTexture() noexcept
 	{
-		static_cast<RendererImpl&>(_renderer).pop_texture(_filter);
+		static_cast<RendererImpl&>(_context).pop_texture(_filter);
 	}
 
-	PushTransformation::PushTransformation(Renderer& renderer, const Matrix4& matrix)
-		: RendererModifier(renderer)
+	PushTransformation::PushTransformation(RenderContext& context, const Matrix4& matrix)
+		: RenderModifier{context}
 	{
-		static_cast<RendererImpl&>(_renderer).push_transformation(matrix);
+		static_cast<RendererImpl&>(_context).push_transformation(matrix);
 	}
 
-	PushTransformation::~PushTransformation()
+	PushTransformation::~PushTransformation() noexcept
 	{
-		static_cast<RendererImpl&>(_renderer).pop_transformation();
+		static_cast<RendererImpl&>(_context).pop_transformation();
 	}
 }

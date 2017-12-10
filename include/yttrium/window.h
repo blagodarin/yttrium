@@ -14,6 +14,7 @@ namespace Yttrium
 	class KeyEvent;
 	class Point;
 	class Renderer;
+	class RenderContext;
 	class Size;
 	class Vector2;
 
@@ -76,7 +77,7 @@ namespace Yttrium
 		void on_key_event(const std::function<void(const KeyEvent&)>&);
 
 		///
-		void on_render(const std::function<void(Renderer&, const Vector2& cursor)>&);
+		void on_render(const std::function<void(RenderContext&, const Vector2& cursor)>&);
 
 		/// Sets a callback to be called when a screenshot image is ready.
 		void on_screenshot(const std::function<void(Image&&)>&);
