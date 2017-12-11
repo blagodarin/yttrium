@@ -14,7 +14,6 @@ namespace Yttrium
 	{
 	public:
 		BackendTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps);
-		~BackendTexture2D() override;
 
 		Size size() const noexcept override { return _size; }
 

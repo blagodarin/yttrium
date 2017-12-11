@@ -19,11 +19,6 @@ namespace Yttrium
 		_program.attach(_fragment_shader.get());
 	}
 
-	GlGpuProgram::~GlGpuProgram()
-	{
-		_renderer.forget_program(this);
-	}
-
 	void GlGpuProgram::set_uniform(const std::string& name, const Matrix4& value)
 	{
 		_program.set_uniform(name.c_str(), value);

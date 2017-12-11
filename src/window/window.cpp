@@ -3,6 +3,7 @@
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
 #include "../platform/window.h"
+#include "../renderer/context.h"
 #include "../renderer/renderer.h"
 #include "backend.h"
 
@@ -202,19 +203,26 @@ namespace Yttrium
 			if (_private->_on_update)
 				_private->_on_update(update);
 			{
-				_private->_renderer.clear();
-				PushGpuProgram gpu_program{_private->_renderer, _private->_renderer.program_2d()};
-				Push2D projection{_private->_renderer};
+				RenderContextImpl context{_private->_renderer, _private->_size};
+				PushGpuProgram gpu_program{context, _private->_renderer.program_2d()};
+				Push2D projection{context};
 				if (_private->_on_render)
-					_private->_on_render(_private->_renderer, Vector2{_private->_cursor});
-				_private->_renderer.finish();
+					_private->_on_render(context, Vector2{_private->_cursor});
+				const auto& statistics = context.statistics();
+				update.triangles = statistics._triangles;
+				update.draw_calls = statistics._draw_calls;
+				update.texture_switches = statistics._texture_switches;
+				update.redundant_texture_switches = statistics._redundant_texture_switches;
+				update.shader_switches = statistics._shader_switches;
+				update.redundant_shader_switches = statistics._redundant_shader_switches;
+				context.draw_debug_text();
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)
 			{
 				_private->_take_screenshot = false;
 				if (_private->_on_screenshot)
-					_private->_on_screenshot(_private->_renderer.take_screenshot());
+					_private->_on_screenshot(_private->_renderer.take_screenshot(_private->_size));
 			}
 			++frames;
 			update.milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - clock);
@@ -229,13 +237,6 @@ namespace Yttrium
 				frames = 0;
 				max_frame_time = 0ms;
 			}
-			const auto& renderer_statistics = _private->_renderer.reset_statistics();
-			update.triangles = renderer_statistics._triangles;
-			update.draw_calls = renderer_statistics._draw_calls;
-			update.texture_switches = renderer_statistics._texture_switches;
-			update.redundant_texture_switches = renderer_statistics._redundant_texture_switches;
-			update.shader_switches = renderer_statistics._shader_switches;
-			update.redundant_shader_switches = renderer_statistics._redundant_shader_switches;
 		}
 	}
 

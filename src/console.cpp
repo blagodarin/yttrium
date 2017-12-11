@@ -32,7 +32,7 @@ namespace Yttrium
 		if (!_private->_visible)
 			return;
 
-		DebugRenderer debug{static_cast<RendererImpl&>(context)};
+		DebugRenderer debug{context};
 
 		const auto max_width = debug.max_width();
 

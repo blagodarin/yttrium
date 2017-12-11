@@ -51,7 +51,6 @@ improvements and other code-related issues.
 		- Port to MacOS X.
 	* Renderer:
 		- Loading textures without intermediate Images.
-		- Don't count debug output in rendering statistics.
 	* Storage:
 		- Hash-based packed file access.
 * New tools:

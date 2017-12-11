@@ -43,7 +43,7 @@ namespace Yttrium
 		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
 		_gl.Enable(GL_BLEND);
 		_gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		_gl.ClearColor(0.5, 0.5, 0.5, 0);
+		_gl.ClearColor(0.125, 0.125, 0.125, 0);
 		_gl.ClearDepth(1);
 
 		_2d_vbo.initialize(GL_DYNAMIC_DRAW, 0, nullptr); // The next line fails without this.

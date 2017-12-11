@@ -236,6 +236,8 @@ target_sources(yttrium PRIVATE
 	renderer/formats/obj.h
 	renderer/backend.cpp
 	renderer/backend.h
+	renderer/context.cpp
+	renderer/context.h
 	renderer/debug_renderer.cpp
 	renderer/debug_renderer.h
 	renderer/debug_texture.cpp

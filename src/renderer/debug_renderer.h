@@ -5,15 +5,16 @@
 #include <yttrium/renderer/modifiers.h>
 
 #include <optional>
+#include <string_view>
 
 namespace Yttrium
 {
-	class RendererImpl;
+	class RenderContextImpl;
 
 	class DebugRenderer
 	{
 	public:
-		explicit DebugRenderer(RendererImpl&);
+		explicit DebugRenderer(RenderContext&);
 
 		void draw_cursor(size_t x, size_t y);
 		void draw_rectangle(size_t x, size_t y, size_t width, size_t height);
@@ -22,7 +23,7 @@ namespace Yttrium
 		void set_color(float r, float g, float b, float a = 1);
 
 	private:
-		RendererImpl& _renderer;
+		RenderContextImpl& _context;
 		Color4f _color{1, 1, 1};
 		PushTexture _debug_texture;
 	};

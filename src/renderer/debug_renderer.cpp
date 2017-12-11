@@ -1,6 +1,6 @@
 #include "debug_renderer.h"
 
-#include <yttrium/renderer/texture.h>
+#include "context.h"
 #include "debug_texture.h"
 #include "renderer.h"
 
@@ -10,9 +10,9 @@ namespace
 {
 	using namespace Yttrium;
 
-	void draw_debug_char(RendererImpl& renderer, size_t x, size_t y, size_t width, size_t height, const Color4f& color, uint8_t value)
+	void draw_debug_char(RenderContextImpl& context, size_t x, size_t y, size_t width, size_t height, const Color4f& color, uint8_t value)
 	{
-		renderer.draw_rect(
+		context.draw_rect(
 			{
 				{static_cast<float>(x * DebugTexture::char_width), static_cast<float>(y * DebugTexture::char_height)},
 				SizeF{static_cast<float>(width * DebugTexture::char_width), static_cast<float>(height * DebugTexture::char_height)}
@@ -27,20 +27,20 @@ namespace
 
 namespace Yttrium
 {
-	DebugRenderer::DebugRenderer(RendererImpl& renderer)
-		: _renderer{renderer}
-		, _debug_texture{_renderer, _renderer.debug_texture(), Texture2D::NearestFilter}
+	DebugRenderer::DebugRenderer(RenderContext& context)
+		: _context{static_cast<RenderContextImpl&>(context)}
+		, _debug_texture{_context, _context.manager().debug_texture(), Texture2D::NearestFilter}
 	{
 	}
 
 	void DebugRenderer::draw_cursor(size_t x, size_t y)
 	{
-		::draw_debug_char(_renderer, x, y, 1, 1, _color, DebugTexture::cursor_index);
+		::draw_debug_char(_context, x, y, 1, 1, _color, DebugTexture::cursor_index);
 	}
 
 	void DebugRenderer::draw_rectangle(size_t x, size_t y, size_t width, size_t height)
 	{
-		::draw_debug_char(_renderer, x, y, width, height, _color, DebugTexture::rect_index);
+		::draw_debug_char(_context, x, y, width, height, _color, DebugTexture::rect_index);
 	}
 
 	void DebugRenderer::draw_text(size_t x, size_t y, std::string_view text, const std::optional<size_t>& max_size)
@@ -50,13 +50,13 @@ namespace Yttrium
 		{
 			const auto symbol = static_cast<uint8_t>(text[i]);
 			if (symbol >= DebugTexture::first_char && symbol <= DebugTexture::last_char)
-				::draw_debug_char(_renderer, x + i, y, 1, 1, _color, symbol);
+				::draw_debug_char(_context, x + i, y, 1, 1, _color, symbol);
 		}
 	}
 
 	size_t DebugRenderer::max_width() const
 	{
-		return static_cast<size_t>(_renderer.window_size()._width) / DebugTexture::char_width;
+		return static_cast<size_t>(_context.window_size()._width) / DebugTexture::char_width;
 	}
 
 	void DebugRenderer::set_color(float r, float g, float b, float a)

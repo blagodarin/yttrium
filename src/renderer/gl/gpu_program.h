@@ -13,7 +13,6 @@ namespace Yttrium
 	{
 	public:
 		GlGpuProgram(RendererImpl&, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);
-		~GlGpuProgram() override;
 
 		void set_uniform(const std::string&, const Matrix4&) override;
 

@@ -1,5 +1,6 @@
 #include "texture.h"
 
+#include <yttrium/math/rect.h>
 #include "renderer.h"
 
 namespace Yttrium
@@ -10,11 +11,6 @@ namespace Yttrium
 		, _orientation(format.orientation())
 		, _has_mipmaps(has_mipmaps)
 	{
-	}
-
-	BackendTexture2D::~BackendTexture2D()
-	{
-		_renderer.forget_texture(this);
 	}
 
 	RectF BackendTexture2D::full_rectangle() const
