@@ -10,7 +10,7 @@ namespace Yttrium
 	public:
 		LabelWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
 
-		void draw(RenderContext&, const RectF&, WidgetData::StyleData&) const override;
+		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 
 	private:
 		mutable std::string _final_text;

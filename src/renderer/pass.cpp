@@ -1,10 +1,10 @@
-#include "context.h"
+#include "pass.h"
 
 #include <yttrium/math/line.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/quad.h>
 #include <yttrium/memory/buffer_appender.h>
-#include <yttrium/renderer/gpu_program.h>
+#include <yttrium/renderer/program.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/string_utils.h>
 #include "debug_renderer.h"
@@ -48,7 +48,7 @@ namespace
 
 namespace Yttrium
 {
-	RenderContextImpl::RenderContextImpl(RendererImpl& renderer, const Size& window_size)
+	RenderPassImpl::RenderPassImpl(RendererImpl& renderer, const Size& window_size)
 		: _renderer{renderer}
 		, _window_size{window_size}
 	{
@@ -56,7 +56,7 @@ namespace Yttrium
 		_renderer._backend->clear();
 	}
 
-	RenderContextImpl::~RenderContextImpl() noexcept
+	RenderPassImpl::~RenderPassImpl() noexcept
 	{
 #ifndef NDEBUG
 		_renderer._seen_textures.clear();
@@ -64,19 +64,19 @@ namespace Yttrium
 #endif
 	}
 
-	void RenderContextImpl::add_debug_text(std::string_view text)
+	void RenderPassImpl::add_debug_text(std::string_view text)
 	{
 		append_to(_renderer._debug_text, text, '\n');
 	}
 
-	void RenderContextImpl::draw_mesh(const Mesh& mesh)
+	void RenderPassImpl::draw_mesh(const Mesh& mesh)
 	{
 		update_state();
 		_statistics._triangles += _renderer._backend->draw_mesh(mesh);
 		++_statistics._draw_calls;
 	}
 
-	void RenderContextImpl::draw_quad(const Quad& quad, const Color4f& color)
+	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
 		Draw2D draw{_renderer._vertices_2d, _renderer._indices_2d};
 
@@ -102,12 +102,12 @@ namespace Yttrium
 		draw._indices << draw._index << static_cast<uint16_t>(draw._index + 1) << static_cast<uint16_t>(draw._index + 2) << static_cast<uint16_t>(draw._index + 3);
 	}
 
-	void RenderContextImpl::draw_rect(const RectF& rect, const Color4f& color)
+	void RenderPassImpl::draw_rect(const RectF& rect, const Color4f& color)
 	{
 		draw_rect(rect, color, _texture_rect, _texture_borders);
 	}
 
-	void RenderContextImpl::draw_rects(const std::vector<TexturedRect>& rects, const Color4f& color)
+	void RenderPassImpl::draw_rects(const std::vector<TexturedRect>& rects, const Color4f& color)
 	{
 		const SizeF texture_size{current_texture_2d()->size()};
 		const Vector2 texture_scale{texture_size._width, texture_size._height};
@@ -115,7 +115,7 @@ namespace Yttrium
 			draw_rect(rect.geometry, color, _renderer._backend->map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
-	Matrix4 RenderContextImpl::full_matrix() const
+	Matrix4 RenderPassImpl::full_matrix() const
 	{
 		const auto current_projection = std::find_if(_renderer._matrix_stack.rbegin(), _renderer._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::Projection; });
 		assert(current_projection != _renderer._matrix_stack.rend());
@@ -125,14 +125,14 @@ namespace Yttrium
 		return current_projection->first * current_view->first * model_matrix();
 	}
 
-	Matrix4 RenderContextImpl::model_matrix() const
+	Matrix4 RenderPassImpl::model_matrix() const
 	{
 		assert(!_renderer._matrix_stack.empty());
 		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
 		return _renderer._matrix_stack.back().first;
 	}
 
-	Line3 RenderContextImpl::pixel_ray(const Vector2& v) const
+	Line3 RenderPassImpl::pixel_ray(const Vector2& v) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
 		const auto xn = (2 * v.x + 1) / static_cast<float>(_window_size._width) - 1;
@@ -141,7 +141,7 @@ namespace Yttrium
 		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
 	}
 
-	void RenderContextImpl::set_texture_rect(const RectF& rect, const MarginsF& borders)
+	void RenderPassImpl::set_texture_rect(const RectF& rect, const MarginsF& borders)
 	{
 		const auto current_texture = current_texture_2d();
 		if (!current_texture)
@@ -164,12 +164,12 @@ namespace Yttrium
 		};
 	}
 
-	SizeF RenderContextImpl::window_size() const
+	SizeF RenderPassImpl::window_size() const
 	{
 		return SizeF{_window_size};
 	}
 
-	void RenderContextImpl::draw_debug_text()
+	void RenderPassImpl::draw_debug_text()
 	{
 		if (_renderer._debug_text.empty())
 			return;
@@ -190,7 +190,7 @@ namespace Yttrium
 		flush_2d();
 	}
 
-	void RenderContextImpl::pop_program() noexcept
+	void RenderPassImpl::pop_program() noexcept
 	{
 		assert(_renderer._program_stack.size() > 1 || (_renderer._program_stack.size() == 1 && _renderer._program_stack.back().second > 1));
 		if (_renderer._program_stack.back().second > 1)
@@ -203,7 +203,7 @@ namespace Yttrium
 		_reset_program = true;
 	}
 
-	void RenderContextImpl::pop_projection() noexcept
+	void RenderPassImpl::pop_projection() noexcept
 	{
 		flush_2d();
 		assert(_renderer._matrix_stack.size() >= 3);
@@ -225,7 +225,7 @@ namespace Yttrium
 #endif
 	}
 
-	void RenderContextImpl::pop_texture(Flags<Texture2D::Filter> filter) noexcept
+	void RenderPassImpl::pop_texture(Flags<Texture2D::Filter> filter) noexcept
 	{
 		assert(_renderer._texture_stack.size() > 1 || (_renderer._texture_stack.size() == 1 && _renderer._texture_stack.back().second > 1));
 		if (_renderer._texture_stack.back().second == 1)
@@ -240,7 +240,7 @@ namespace Yttrium
 		_current_texture_filter = filter;
 	}
 
-	void RenderContextImpl::pop_transformation() noexcept
+	void RenderPassImpl::pop_transformation() noexcept
 	{
 		flush_2d();
 		assert(_renderer._matrix_stack.size() > 3);
@@ -249,7 +249,7 @@ namespace Yttrium
 		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
 	}
 
-	void RenderContextImpl::push_program(const GpuProgram* program)
+	void RenderPassImpl::push_program(const RenderProgram* program)
 	{
 		assert(!_renderer._program_stack.empty());
 		if (_renderer._program_stack.back().first == program)
@@ -262,7 +262,7 @@ namespace Yttrium
 		_reset_program = true;
 	}
 
-	void RenderContextImpl::push_projection_2d(const Matrix4& matrix)
+	void RenderPassImpl::push_projection_2d(const Matrix4& matrix)
 	{
 		flush_2d();
 		_renderer._matrix_stack.emplace_back(matrix, RenderMatrixType::Projection);
@@ -270,7 +270,7 @@ namespace Yttrium
 		_renderer._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
 	}
 
-	void RenderContextImpl::push_projection_3d(const Matrix4& projection, const Matrix4& view)
+	void RenderPassImpl::push_projection_3d(const Matrix4& projection, const Matrix4& view)
 	{
 		flush_2d();
 		_renderer._matrix_stack.emplace_back(projection, RenderMatrixType::Projection);
@@ -278,7 +278,7 @@ namespace Yttrium
 		_renderer._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
 	}
 
-	Flags<Texture2D::Filter> RenderContextImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
+	Flags<Texture2D::Filter> RenderPassImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
 	{
 		if (!texture)
 		{
@@ -298,19 +298,19 @@ namespace Yttrium
 		return std::exchange(_current_texture_filter, filter);
 	}
 
-	void RenderContextImpl::push_transformation(const Matrix4& matrix)
+	void RenderPassImpl::push_transformation(const Matrix4& matrix)
 	{
 		assert(!_renderer._matrix_stack.empty());
 		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
 		_renderer._matrix_stack.emplace_back(_renderer._matrix_stack.back().first * matrix, RenderMatrixType::Model);
 	}
 
-	const BackendTexture2D* RenderContextImpl::current_texture_2d() const
+	const BackendTexture2D* RenderPassImpl::current_texture_2d() const
 	{
 		return static_cast<const BackendTexture2D*>(_renderer._texture_stack.back().first);
 	}
 
-	void RenderContextImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
+	void RenderPassImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
 	{
 		Draw2D draw{_renderer._vertices_2d, _renderer._indices_2d};
 
@@ -463,7 +463,7 @@ namespace Yttrium
 		draw._vertices << vertex;
 	}
 
-	void RenderContextImpl::flush_2d()
+	void RenderPassImpl::flush_2d()
 	{
 		if (_renderer._vertices_2d.size() == 0)
 			return;
@@ -480,14 +480,14 @@ namespace Yttrium
 		_renderer._indices_2d.resize(0);
 	}
 
-	void RenderContextImpl::reset_texture_state()
+	void RenderPassImpl::reset_texture_state()
 	{
 		const auto* texture = current_texture_2d();
 		_texture_rect = texture ? texture->full_rectangle() : RectF{};
 		_texture_borders = {};
 	}
 
-	void RenderContextImpl::update_state()
+	void RenderPassImpl::update_state()
 	{
 		if (_reset_program)
 		{

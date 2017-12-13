@@ -9,9 +9,9 @@ namespace Yttrium
 	{
 	}
 
-	void CanvasWidget::draw(RenderContext& context, const RectF& rect, WidgetData::StyleData&) const
+	void CanvasWidget::draw(RenderPass& pass, const RectF& rect, WidgetData::StyleData&) const
 	{
-		_gui.on_canvas_draw(context, _name, rect);
+		_gui.on_canvas_draw(pass, _name, rect);
 	}
 
 	void CanvasWidget::process_mouse_move(const Vector2& cursor)

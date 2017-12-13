@@ -9,11 +9,11 @@ namespace Yttrium
 	{
 	}
 
-	void ButtonWidget::draw(RenderContext& context, const RectF& rect, WidgetData::StyleData& style_data) const
+	void ButtonWidget::draw(RenderPass& pass, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
-		style_data._background.draw(context, rect);
+		style_data._background.draw(pass, rect);
 		style_data._foreground.prepare(_data->_text, rect);
-		style_data._foreground.draw(context);
+		style_data._foreground.draw(pass);
 	}
 
 	bool ButtonWidget::process_mouse_press(Key key, const Vector2&)

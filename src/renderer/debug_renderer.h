@@ -9,12 +9,12 @@
 
 namespace Yttrium
 {
-	class RenderContextImpl;
+	class RenderPassImpl;
 
 	class DebugRenderer
 	{
 	public:
-		explicit DebugRenderer(RenderContext&);
+		explicit DebugRenderer(RenderPass&);
 
 		void draw_cursor(size_t x, size_t y);
 		void draw_rectangle(size_t x, size_t y, size_t width, size_t height);
@@ -23,7 +23,7 @@ namespace Yttrium
 		void set_color(float r, float g, float b, float a = 1);
 
 	private:
-		RenderContextImpl& _context;
+		RenderPassImpl& _pass;
 		Color4f _color{1, 1, 1};
 		PushTexture _debug_texture;
 	};

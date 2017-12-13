@@ -55,11 +55,11 @@ namespace Yttrium
 		return i != _fonts.end() ? &i->second : nullptr;
 	}
 
-	void GuiPrivate::on_canvas_draw(RenderContext& context, const std::string& name, const RectF& rect) const
+	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
 	{
 		const auto i = _canvases.find(name);
 		if (i != _canvases.end())
-			i->second->on_draw(context, rect);
+			i->second->on_draw(pass, rect);
 	}
 
 	void GuiPrivate::on_canvas_mouse_move(const std::string& name, const RectF& rect, const Vector2& cursor)
@@ -165,7 +165,7 @@ namespace Yttrium
 		_private->_canvases[name] = &canvas;
 	}
 
-	void Gui::draw(RenderContext& context, const Vector2& cursor) const
+	void Gui::draw(RenderPass& pass, const Vector2& cursor) const
 	{
 		if (_private->_screen_stack.empty())
 			return;
@@ -175,9 +175,9 @@ namespace Yttrium
 			while (screen != _private->_screen_stack.begin() && (*screen)->is_transparent())
 				--screen;
 			while (screen != top_screen)
-				(*screen++)->draw(context, nullptr);
+				(*screen++)->draw(pass, nullptr);
 		}
-		(*top_screen)->draw(context, &cursor);
+		(*top_screen)->draw(pass, &cursor);
 	}
 
 	void Gui::notify(const std::string& event)
@@ -186,7 +186,7 @@ namespace Yttrium
 			_private->_screen_stack.back()->handle_event(event);
 	}
 
-	void Gui::on_custom_cursor(const std::function<void(RenderContext&, const Vector2&)>& callback)
+	void Gui::on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>& callback)
 	{
 		_private->_on_custom_cursor = callback;
 	}

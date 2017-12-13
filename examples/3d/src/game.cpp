@@ -6,8 +6,8 @@
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/pass.h>
 #include <yttrium/string_utils.h>
 
 #include <cmath>
@@ -31,15 +31,15 @@ public:
 	MinimapCanvas(Vector3& position, const std::optional<Quad>& visibility_quad)
 		: _position{position}, _visibility_quad{visibility_quad} {}
 
-	void on_draw(RenderContext& context, const RectF& rect) override
+	void on_draw(RenderPass& pass, const RectF& rect) override
 	{
-		PushTexture push_texture{context, nullptr};
-		context.draw_rect(rect, {0.25, 0.25, 0.25, 0.75});
+		PushTexture push_texture{pass, nullptr};
+		pass.draw_rect(rect, {0.25, 0.25, 0.25, 0.75});
 		if (_visibility_quad)
-			context.draw_quad(to_window(rect, *_visibility_quad), {1, 1, 0, 0.25});
+			pass.draw_quad(to_window(rect, *_visibility_quad), {1, 1, 0, 0.25});
 		if (_cursor)
-			context.draw_rect({*_cursor, SizeF{1, 1}}, {0, 1, 0});
-		context.draw_rect({to_window(rect, {_position.x, _position.y}) - Vector2{2, 2}, SizeF{4, 4}}, {1, 0, 0});
+			pass.draw_rect({*_cursor, SizeF{1, 1}}, {0, 1, 0});
+		pass.draw_rect({to_window(rect, {_position.x, _position.y}) - Vector2{2, 2}, SizeF{4, 4}}, {1, 0, 0});
 	}
 
 	void on_mouse_move(const RectF& rect, const Vector2& cursor) override
@@ -90,16 +90,16 @@ Game::Game(const Storage& storage)
 	_script.define("screenshot", [this](const ScriptCall&){ _window.take_screenshot(); });
 
 	_window.on_key_event([this](const KeyEvent& event){ _gui.process_key_event(event); });
-	_window.on_render([this](RenderContext& context, const Vector2& cursor)
+	_window.on_render([this](RenderPass& pass, const Vector2& cursor)
 	{
-		draw_scene(context, cursor);
-		_gui.draw(context, cursor);
+		draw_scene(pass, cursor);
+		_gui.draw(pass, cursor);
 		{
-			PushTexture push_texture{context, nullptr};
-			context.draw_rect(RectF{cursor, SizeF{2, 2}}, {1, 1, 0, 1});
+			PushTexture push_texture{pass, nullptr};
+			pass.draw_rect(RectF{cursor, SizeF{2, 2}}, {1, 1, 0, 1});
 		}
 		if (_debug_text_visible)
-			context.add_debug_text(_debug_text);
+			pass.add_debug_text(_debug_text);
 	});
 	_window.on_screenshot([this](Image&& image){ image.save(::make_screenshot_path()); });
 	_window.on_update([this](const UpdateEvent& event){ update(event); });
@@ -117,33 +117,33 @@ void Game::run()
 	_window.run();
 }
 
-void Game::draw_scene(RenderContext& context, const Vector2& cursor)
+void Game::draw_scene(RenderPass& pass, const Vector2& cursor)
 {
-	Push3D projection{context, Matrix4::perspective(context.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
+	Push3D projection{pass, Matrix4::perspective(pass.window_size(), 35, .5, 256), Matrix4::camera(_position, _rotation)};
 	{
 		Vector3 top_left;
 		Vector3 top_right;
 		Vector3 bottom_left;
 		Vector3 bottom_right;
-		const RectF r{SizeF{context.window_size()}};
-		if (context.pixel_ray(r.top_left()).plane_intersection(_board_plane, top_left)
-			&& context.pixel_ray(r.top_right()).plane_intersection(_board_plane, top_right)
-			&& context.pixel_ray(r.bottom_left()).plane_intersection(_board_plane, bottom_left)
-			&& context.pixel_ray(r.bottom_right()).plane_intersection(_board_plane, bottom_right))
+		const RectF r{SizeF{pass.window_size()}};
+		if (pass.pixel_ray(r.top_left()).plane_intersection(_board_plane, top_left)
+			&& pass.pixel_ray(r.top_right()).plane_intersection(_board_plane, top_right)
+			&& pass.pixel_ray(r.bottom_left()).plane_intersection(_board_plane, bottom_left)
+			&& pass.pixel_ray(r.bottom_right()).plane_intersection(_board_plane, bottom_right))
 			_visibility_quad = Quad{{top_left.x, top_left.y}, {top_right.x, top_right.y}, {bottom_right.x, bottom_right.y}, {bottom_left.x, bottom_left.y}};
 		else
 			_visibility_quad = {};
 	}
-	_cursor_ray = context.pixel_ray(cursor);
+	_cursor_ray = pass.pixel_ray(cursor);
 	if (Vector3 p; _cursor_ray.plane_intersection(_board_plane, p) && std::abs(p.x) <= 64 && std::abs(p.y) <= 64)
 	{
 		_board_point.emplace(std::floor(p.x), std::floor(p.y));
-		PushTransformation t{context, Matrix4::translation({_board_point->x + .5f, _board_point->y + .5f, .5f})};
-		_cube.draw(context);
+		PushTransformation t{pass, Matrix4::translation({_board_point->x + .5f, _board_point->y + .5f, .5f})};
+		_cube.draw(pass);
 	}
 	else
 		_board_point.reset();
-	_checkerboard.draw(context);
+	_checkerboard.draw(pass);
 }
 
 void Game::update(const UpdateEvent& update)

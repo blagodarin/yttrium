@@ -224,20 +224,18 @@ endif()
 ########################################################################################################################
 # renderer
 target_sources(yttrium PRIVATE
-	../include/yttrium/renderer/context.h
-	../include/yttrium/renderer/gpu_program.h
 	../include/yttrium/renderer/manager.h
 	../include/yttrium/renderer/material.h
 	../include/yttrium/renderer/mesh.h
 	../include/yttrium/renderer/modifiers.h
+	../include/yttrium/renderer/pass.h
+	../include/yttrium/renderer/program.h
 	../include/yttrium/renderer/texture.h
 	../include/yttrium/renderer/textured_rect.h
 	renderer/formats/obj.cpp
 	renderer/formats/obj.h
 	renderer/backend.cpp
 	renderer/backend.h
-	renderer/context.cpp
-	renderer/context.h
 	renderer/debug_renderer.cpp
 	renderer/debug_renderer.h
 	renderer/debug_texture.cpp
@@ -247,6 +245,8 @@ target_sources(yttrium PRIVATE
 	renderer/mesh_data.cpp
 	renderer/mesh_data.h
 	renderer/modifiers.cpp
+	renderer/pass.cpp
+	renderer/pass.h
 	renderer/renderer.cpp
 	renderer/renderer.h
 	renderer/texture.cpp
@@ -271,9 +271,9 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/api.h
 		renderer/gl/gl.cpp
 		renderer/gl/gl.h
-		renderer/gl/gpu_program.cpp
-		renderer/gl/gpu_program.h
 		renderer/gl/mesh.h
+		renderer/gl/program.cpp
+		renderer/gl/program.h
 		renderer/gl/renderer.cpp
 		renderer/gl/renderer.h
 		renderer/gl/texture.cpp
@@ -305,14 +305,14 @@ elseif(Y_RENDERER_VULKAN)
 		renderer/vulkan/context.h
 		renderer/vulkan/depth_buffer.cpp
 		renderer/vulkan/depth_buffer.h
-		renderer/vulkan/gpu_program.cpp
-		renderer/vulkan/gpu_program.h
 		renderer/vulkan/handles.cpp
 		renderer/vulkan/handles.h
 		renderer/vulkan/helpers.cpp
 		renderer/vulkan/helpers.h
 		renderer/vulkan/mesh.cpp
 		renderer/vulkan/mesh.h
+		renderer/vulkan/program.cpp
+		renderer/vulkan/program.h
 		renderer/vulkan/renderer.cpp
 		renderer/vulkan/renderer.h
 		renderer/vulkan/swapchain.cpp

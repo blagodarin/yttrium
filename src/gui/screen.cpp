@@ -1,8 +1,8 @@
 #include "screen.h"
 
 #include <yttrium/math/margins.h>
-#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/pass.h>
 #include <yttrium/resource_loader.h>
 #include "gui.h"
 #include "layout.h"
@@ -131,9 +131,9 @@ namespace Yttrium
 		return *_layouts.emplace_back(std::make_unique<GuiLayout>(_gui, placement));
 	}
 
-	void GuiScreen::draw(RenderContext& context, const Vector2* cursor)
+	void GuiScreen::draw(RenderPass& pass, const Vector2* cursor)
 	{
-		const RectF rect{{}, context.window_size()};
+		const RectF rect{{}, pass.window_size()};
 		for (const auto& layout : _layouts)
 			layout->update(rect);
 		if (cursor)
@@ -141,19 +141,19 @@ namespace Yttrium
 		else
 			_activity->reset();
 		for (const auto& layout : _layouts)
-			layout->draw(context, _activity->hover_widget(), _activity->click_widget());
+			layout->draw(pass, _activity->hover_widget(), _activity->click_widget());
 		if (cursor)
 		{
 			switch (_cursor)
 			{
 			case GuiCursor::Custom:
-				_gui.draw_custom_cursor(context, *cursor);
+				_gui.draw_custom_cursor(pass, *cursor);
 				break;
 			case GuiCursor::Texture:
 				{
-					PushTexture push_texture{context, _cursor_texture.get(), Texture2D::TrilinearFilter};
-					context.set_texture_rect({{}, SizeF{_cursor_texture->size()}}, {});
-					context.draw_rect({*cursor, SizeF{_cursor_texture->size()}});
+					PushTexture push_texture{pass, _cursor_texture.get(), Texture2D::TrilinearFilter};
+					pass.set_texture_rect({{}, SizeF{_cursor_texture->size()}}, {});
+					pass.draw_rect({*cursor, SizeF{_cursor_texture->size()}});
 				}
 				break;
 			default:

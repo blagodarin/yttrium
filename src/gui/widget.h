@@ -10,7 +10,7 @@ namespace Yttrium
 {
 	class GuiPrivate;
 	class GuiPropertyLoader;
-	class RenderContext;
+	class RenderPass;
 
 	class Widget
 	{
@@ -29,7 +29,7 @@ namespace Yttrium
 		void set_focused(bool focused) { _is_focused = focused; }
 		void set_render_rect(const RectF& rect) { _render_rect = rect; }
 
-		void draw(RenderContext&, const RectF&, WidgetData::Style) const;
+		void draw(RenderPass&, const RectF&, WidgetData::Style) const;
 		virtual bool process_key(const KeyEvent&) { return false; }
 		virtual void process_mouse_move(const Vector2&) {}
 		virtual bool process_mouse_press(Key, const Vector2&) { return false; }
@@ -38,7 +38,7 @@ namespace Yttrium
 	protected:
 		Widget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&, Flags<Flag> = {});
 
-		virtual void draw(RenderContext&, const RectF&, WidgetData::StyleData&) const = 0;
+		virtual void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const = 0;
 
 	protected:
 		GuiPrivate& _gui;

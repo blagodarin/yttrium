@@ -75,9 +75,9 @@ namespace
 	public:
 		FieldCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
 
-		void on_draw(RenderContext& context, const RectF& rect) override
+		void on_draw(RenderPass& pass, const RectF& rect) override
 		{
-			_graphics.draw_field(context, rect, _logic.field(), _logic.current_figure());
+			_graphics.draw_field(pass, rect, _logic.field(), _logic.current_figure());
 		}
 
 	private:
@@ -90,9 +90,9 @@ namespace
 	public:
 		NextFigureCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
 
-		void on_draw(RenderContext& context, const RectF& rect) override
+		void on_draw(RenderPass& pass, const RectF& rect) override
 		{
-			_graphics.draw_next_figure(context, rect, _logic.next_figure());
+			_graphics.draw_next_figure(pass, rect, _logic.next_figure());
 		}
 
 	private:
@@ -134,7 +134,7 @@ int main(int, char**)
 	gui.on_quit([&window]{ window.close(); });
 
 	window.on_key_event([&gui](const KeyEvent& event){ gui.process_key_event(event); });
-	window.on_render([&gui](RenderContext& context, const Vector2& cursor){ gui.draw(context, cursor); });
+	window.on_render([&gui](RenderPass& pass, const Vector2& cursor){ gui.draw(pass, cursor); });
 	window.on_screenshot([](Image&& image){ image.save(::make_screenshot_path()); });
 	window.on_update([&script, &gui, &logic](const UpdateEvent& event)
 	{

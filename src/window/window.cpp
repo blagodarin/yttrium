@@ -3,7 +3,7 @@
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
 #include "../platform/window.h"
-#include "../renderer/context.h"
+#include "../renderer/pass.h"
 #include "../renderer/renderer.h"
 #include "backend.h"
 
@@ -24,7 +24,7 @@ namespace Yttrium
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;
 		std::function<void(const KeyEvent&)> _on_key_event;
-		std::function<void(RenderContext&, const Vector2&)> _on_render;
+		std::function<void(RenderPass&, const Vector2&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(std::string_view)> _on_text_event;
 		std::function<void(const UpdateEvent&)> _on_update;
@@ -164,7 +164,7 @@ namespace Yttrium
 		_private->_on_key_event = callback;
 	}
 
-	void Window::on_render(const std::function<void(RenderContext&, const Vector2&)>& callback)
+	void Window::on_render(const std::function<void(RenderPass&, const Vector2&)>& callback)
 	{
 		_private->_on_render = callback;
 	}
@@ -203,19 +203,19 @@ namespace Yttrium
 			if (_private->_on_update)
 				_private->_on_update(update);
 			{
-				RenderContextImpl context{_private->_renderer, _private->_size};
-				PushGpuProgram gpu_program{context, _private->_renderer.program_2d()};
-				Push2D projection{context};
+				RenderPassImpl pass{_private->_renderer, _private->_size};
+				PushProgram program{pass, _private->_renderer.program_2d()};
+				Push2D projection{pass};
 				if (_private->_on_render)
-					_private->_on_render(context, Vector2{_private->_cursor});
-				const auto& statistics = context.statistics();
+					_private->_on_render(pass, Vector2{_private->_cursor});
+				const auto& statistics = pass.statistics();
 				update.triangles = statistics._triangles;
 				update.draw_calls = statistics._draw_calls;
 				update.texture_switches = statistics._texture_switches;
 				update.redundant_texture_switches = statistics._redundant_texture_switches;
 				update.shader_switches = statistics._shader_switches;
 				update.redundant_shader_switches = statistics._redundant_shader_switches;
-				context.draw_debug_text();
+				pass.draw_debug_text();
 			}
 			_private->_backend.swap_buffers();
 			if (_private->_take_screenshot)

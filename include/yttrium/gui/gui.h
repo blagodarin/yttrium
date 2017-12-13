@@ -13,7 +13,7 @@ namespace Yttrium
 	class KeyEvent;
 	class MusicReader;
 	class RectF;
-	class RenderContext;
+	class RenderPass;
 	class ResourceLoader;
 	class ScriptContext;
 	class Vector2;
@@ -22,7 +22,7 @@ namespace Yttrium
 	{
 	public:
 		virtual ~Canvas() = default;
-		virtual void on_draw(RenderContext&, const RectF&) {}
+		virtual void on_draw(RenderPass&, const RectF&) {}
 		virtual void on_mouse_move(const RectF&, const Vector2&) {}
 		virtual bool on_mouse_press(const RectF&, Key, const Vector2&) { return false; }
 	};
@@ -34,9 +34,9 @@ namespace Yttrium
 		~Gui();
 
 		void bind_canvas(const std::string& name, Canvas&);
-		void draw(RenderContext&, const Vector2& cursor) const;
+		void draw(RenderPass&, const Vector2& cursor) const;
 		void notify(const std::string& event);
-		void on_custom_cursor(const std::function<void(RenderContext&, const Vector2&)>&);
+		void on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>&);
 		void on_music(const std::function<void(const std::shared_ptr<MusicReader>&)>&);
 		void on_quit(const std::function<void()>&);
 		bool process_key_event(const KeyEvent&);

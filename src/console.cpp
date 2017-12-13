@@ -27,29 +27,29 @@ namespace Yttrium
 
 	Console::~Console() = default;
 
-	void Console::draw(RenderContext& context) const
+	void Console::draw(RenderPass& pass) const
 	{
 		if (!_private->_visible)
 			return;
 
-		DebugRenderer debug{context};
+		DebugRenderer renderer{pass};
 
-		const auto max_width = debug.max_width();
+		const auto max_width = renderer.max_width();
 
-		debug.set_color(0, 0, 0, 0.5);
-		debug.draw_rectangle(0, 0, max_width + 1, 1);
+		renderer.set_color(0, 0, 0, 0.5);
+		renderer.draw_rectangle(0, 0, max_width + 1, 1);
 
 		if (_private->_line_editor.selection_size())
 		{
-			debug.set_color(1.0, 1.0, 1.0, 0.5);
-			debug.draw_rectangle(_private->_line_editor.selection_offset(), 0, _private->_line_editor.selection_size(), 1);
+			renderer.set_color(1.0, 1.0, 1.0, 0.5);
+			renderer.draw_rectangle(_private->_line_editor.selection_offset(), 0, _private->_line_editor.selection_size(), 1);
 		}
 
-		debug.set_color(1.0, 1.0, 1.0);
-		debug.draw_text(0, 0, _private->_line_editor.text(), max_width);
+		renderer.set_color(1.0, 1.0, 1.0);
+		renderer.draw_text(0, 0, _private->_line_editor.text(), max_width);
 
-		debug.set_color(1.0, 0.0, 0.0);
-		debug.draw_cursor(_private->_line_editor.cursor(), 0);
+		renderer.set_color(1.0, 0.0, 0.0);
+		renderer.draw_cursor(_private->_line_editor.cursor(), 0);
 	}
 
 	bool Console::is_visible() const

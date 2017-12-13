@@ -15,14 +15,14 @@ namespace Yttrium
 		~GlRenderer() noexcept override;
 
 		void clear() override;
-		std::unique_ptr<GpuProgram> create_builtin_program_2d(RendererImpl&) override;
-		std::unique_ptr<GpuProgram> create_gpu_program(RendererImpl&, const std::string& vertex_shader, const std::string& fragment_shader) override;
+		std::unique_ptr<RenderProgram> create_builtin_program_2d(RendererImpl&) override;
 		std::unique_ptr<Mesh> create_mesh(const MeshData&) override;
+		std::unique_ptr<RenderProgram> create_program(RendererImpl&, const std::string& vertex_shader, const std::string& fragment_shader) override;
 		std::unique_ptr<Texture2D> create_texture_2d(RendererImpl&, Image&&, Flags<RenderManager::TextureFlag>) override;
 		size_t draw_mesh(const Mesh&) override;
 		void flush_2d(const Buffer&, const Buffer&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
-		void set_program(const GpuProgram*) override;
+		void set_program(const RenderProgram*) override;
 		void set_texture(const Texture2D&, Flags<Texture2D::Filter>) override;
 		void set_window_size(const Size&) override;
 		Image take_screenshot(const Size&) const override;

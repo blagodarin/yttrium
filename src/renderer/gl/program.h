@@ -1,7 +1,7 @@
-#ifndef _src_renderer_gl_gpu_program_h_
-#define _src_renderer_gl_gpu_program_h_
+#ifndef _src_renderer_gl_program_h_
+#define _src_renderer_gl_program_h_
 
-#include <yttrium/renderer/gpu_program.h>
+#include <yttrium/renderer/program.h>
 
 #include "wrappers.h"
 
@@ -9,10 +9,10 @@ namespace Yttrium
 {
 	class RendererImpl;
 
-	class GlGpuProgram final : public GpuProgram
+	class GlProgram final : public RenderProgram
 	{
 	public:
-		GlGpuProgram(RendererImpl&, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);
+		GlProgram(RendererImpl&, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);
 
 		void set_uniform(const std::string&, const Matrix4&) override;
 

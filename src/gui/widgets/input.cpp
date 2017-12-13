@@ -1,8 +1,8 @@
 #include "input.h"
 
 #include <yttrium/gui/text_capture.h>
-#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/pass.h>
 #include <yttrium/script/context.h>
 #include "../gui.h"
 
@@ -14,26 +14,26 @@ namespace Yttrium
 		_logic.reset(std::string{_data->_text});
 	}
 
-	void InputWidget::draw(RenderContext& context, const RectF& rect, WidgetData::StyleData& style_data) const
+	void InputWidget::draw(RenderPass& pass, const RectF& rect, WidgetData::StyleData& style_data) const
 	{
-		style_data._background.draw(context, rect);
+		style_data._background.draw(pass, rect);
 
 		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
 		style_data._foreground.prepare(_logic.text(), rect, &capture);
-		style_data._foreground.draw(context);
+		style_data._foreground.draw(pass);
 
 		if (is_focused() && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)
 		{
-			PushTexture push_texture{context, nullptr};
-			context.draw_rect(capture._cursor_rect, style_data._foreground.color);
+			PushTexture push_texture{pass, nullptr};
+			pass.draw_rect(capture._cursor_rect, style_data._foreground.color);
 		}
 
 		if (capture._has_selection)
 		{
 			auto selection_color = style_data._foreground.color;
 			selection_color._a *= .25f;
-			PushTexture push_texture{context, nullptr};
-			context.draw_rect(capture._selection_rect, selection_color);
+			PushTexture push_texture{pass, nullptr};
+			pass.draw_rect(capture._selection_rect, selection_color);
 		}
 	}
 

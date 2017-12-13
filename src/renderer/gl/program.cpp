@@ -1,4 +1,4 @@
-#include "gpu_program.h"
+#include "program.h"
 
 #include "../renderer.h"
 #include "renderer.h"
@@ -9,7 +9,7 @@
 
 namespace Yttrium
 {
-	GlGpuProgram::GlGpuProgram(RendererImpl& renderer, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
+	GlProgram::GlProgram(RendererImpl& renderer, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
 		: _renderer{renderer}
 		, _vertex_shader{std::move(vertex_shader)}
 		, _fragment_shader{std::move(fragment_shader)}
@@ -19,12 +19,12 @@ namespace Yttrium
 		_program.attach(_fragment_shader.get());
 	}
 
-	void GlGpuProgram::set_uniform(const std::string& name, const Matrix4& value)
+	void GlProgram::set_uniform(const std::string& name, const Matrix4& value)
 	{
 		_program.set_uniform(name.c_str(), value);
 	}
 
-	bool GlGpuProgram::link()
+	bool GlProgram::link()
 	{
 		if (_program.link())
 			return true;

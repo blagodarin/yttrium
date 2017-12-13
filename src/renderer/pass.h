@@ -1,7 +1,7 @@
-#ifndef _src_renderer_context_h_
-#define _src_renderer_context_h_
+#ifndef _src_renderer_pass_h_
+#define _src_renderer_pass_h_
 
-#include <yttrium/renderer/context.h>
+#include <yttrium/renderer/pass.h>
 
 #include <yttrium/flags.h>
 #include <yttrium/math/margins.h>
@@ -11,15 +11,15 @@
 namespace Yttrium
 {
 	class BackendTexture2D;
-	class GpuProgram;
 	class Quad;
 	class RendererImpl;
+	class RenderProgram;
 
-	class RenderContextImpl : public RenderContext
+	class RenderPassImpl : public RenderPass
 	{
 	public:
-		RenderContextImpl(RendererImpl&, const Size& window_size);
-		~RenderContextImpl() noexcept override;
+		RenderPassImpl(RendererImpl&, const Size& window_size);
+		~RenderPassImpl() noexcept override;
 
 		void add_debug_text(std::string_view) override;
 		void draw_mesh(const Mesh&) override;
@@ -50,7 +50,7 @@ namespace Yttrium
 		void pop_projection() noexcept;
 		void pop_texture(Flags<Texture2D::Filter>) noexcept;
 		void pop_transformation() noexcept;
-		void push_program(const GpuProgram*);
+		void push_program(const RenderProgram*);
 		void push_projection_2d(const Matrix4&);
 		void push_projection_3d(const Matrix4& projection, const Matrix4& view);
 		Flags<Texture2D::Filter> push_texture(const Texture2D*, Flags<Texture2D::Filter>);
@@ -74,7 +74,7 @@ namespace Yttrium
 		MarginsF _texture_borders;
 		bool _reset_texture = false;
 
-		const GpuProgram* _current_program = nullptr;
+		const RenderProgram* _current_program = nullptr;
 		bool _reset_program = false;
 
 		Statistics _statistics;

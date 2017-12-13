@@ -4,8 +4,8 @@
 #include <yttrium/image.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/mesh.h>
+#include <yttrium/renderer/program.h>
 #include "debug_texture.h"
 #include "formats/obj.h"
 #include "mesh_data.h"
@@ -48,9 +48,9 @@ namespace Yttrium
 
 	RendererImpl::~RendererImpl() = default;
 
-	std::unique_ptr<GpuProgram> RendererImpl::create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader)
+	std::unique_ptr<RenderProgram> RendererImpl::create_program(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
-		return _backend->create_gpu_program(*this, vertex_shader, fragment_shader);
+		return _backend->create_program(*this, vertex_shader, fragment_shader);
 	}
 
 	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(Image&& image, Flags<TextureFlag> flags)

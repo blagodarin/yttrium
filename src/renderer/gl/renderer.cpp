@@ -4,8 +4,8 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/utils.h>
 #include "../mesh_data.h"
-#include "gpu_program.h"
 #include "mesh.h"
+#include "program.h"
 #include "texture.h"
 
 #include <cassert>
@@ -63,36 +63,9 @@ namespace Yttrium
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	std::unique_ptr<GpuProgram> GlRenderer::create_builtin_program_2d(RendererImpl& renderer)
+	std::unique_ptr<RenderProgram> GlRenderer::create_builtin_program_2d(RendererImpl& renderer)
 	{
-		return create_gpu_program(renderer, _vertex_shader_2d, _fragment_shader_2d);
-	}
-
-	std::unique_ptr<GpuProgram> GlRenderer::create_gpu_program(RendererImpl& renderer, const std::string& vertex_shader, const std::string& fragment_shader)
-	{
-		GlShaderHandle vertex(_gl, GL_VERTEX_SHADER);
-		if (!vertex.compile(vertex_shader))
-		{
-#ifndef NDEBUG
-			std::cerr << vertex.info_log() << "\n";
-#endif
-			return {};
-		}
-
-		GlShaderHandle fragment(_gl, GL_FRAGMENT_SHADER);
-		if (!fragment.compile(fragment_shader))
-		{
-#ifndef NDEBUG
-			std::cerr << fragment.info_log() << "\n";
-#endif
-			return {};
-		}
-
-		auto result = std::make_unique<GlGpuProgram>(renderer, std::move(vertex), std::move(fragment), _gl);
-		if (!result->link())
-			return {};
-
-		return result;
+		return create_program(renderer, _vertex_shader_2d, _fragment_shader_2d);
 	}
 
 	std::unique_ptr<Mesh> GlRenderer::create_mesh(const MeshData& data)
@@ -140,6 +113,33 @@ namespace Yttrium
 			index_buffer.initialize(GL_STATIC_DRAW, data._indices.size() * sizeof(uint32_t), data._indices.data());
 
 		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), static_cast<GLsizei>(data._indices.size()), index_format);
+	}
+
+	std::unique_ptr<RenderProgram> GlRenderer::create_program(RendererImpl& renderer, const std::string& vertex_shader, const std::string& fragment_shader)
+	{
+		GlShaderHandle vertex{_gl, GL_VERTEX_SHADER};
+		if (!vertex.compile(vertex_shader))
+		{
+#ifndef NDEBUG
+			std::cerr << vertex.info_log() << "\n";
+#endif
+			return {};
+		}
+
+		GlShaderHandle fragment{_gl, GL_FRAGMENT_SHADER};
+		if (!fragment.compile(fragment_shader))
+		{
+#ifndef NDEBUG
+			std::cerr << fragment.info_log() << "\n";
+#endif
+			return {};
+		}
+
+		auto result = std::make_unique<GlProgram>(renderer, std::move(vertex), std::move(fragment), _gl);
+		if (!result->link())
+			return {};
+
+		return result;
 	}
 
 	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
@@ -253,9 +253,9 @@ namespace Yttrium
 		return {map_point(rect.top_left()), map_point(rect.bottom_right())};
 	}
 
-	void GlRenderer::set_program(const GpuProgram* program)
+	void GlRenderer::set_program(const RenderProgram* program)
 	{
-		_gl.UseProgram(program ? static_cast<const GlGpuProgram*>(program)->handle() : 0);
+		_gl.UseProgram(program ? static_cast<const GlProgram*>(program)->handle() : 0);
 	}
 
 	void GlRenderer::set_texture(const Texture2D& texture, Flags<Texture2D::Filter> filter)

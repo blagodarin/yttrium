@@ -8,7 +8,7 @@
 namespace Yttrium
 {
 	class KeyEvent;
-	class RenderContext;
+	class RenderPass;
 	class ScriptContext;
 
 	class Y_API Console
@@ -17,7 +17,7 @@ namespace Yttrium
 		explicit Console(ScriptContext&);
 		~Console();
 
-		void draw(RenderContext&) const;
+		void draw(RenderPass&) const;
 		bool is_visible() const;
 		bool process_key_event(const KeyEvent&);
 		void set_visible(bool);

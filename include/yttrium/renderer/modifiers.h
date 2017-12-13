@@ -1,6 +1,3 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_renderer_modifiers_h_
 #define _include_yttrium_renderer_modifiers_h_
 
@@ -11,21 +8,21 @@
 
 namespace Yttrium
 {
-	class GpuProgram;
 	class Material;
 	class Matrix4;
-	class RenderContext;
+	class RenderPass;
+	class RenderProgram;
 	class SizeF;
 
-	/// Base class for RenderContext modifiers.
+	/// Base class for RenderPass modifiers.
 	class Y_API RenderModifier
 	{
 	public:
 		RenderModifier(const RenderModifier&) = delete;
 		RenderModifier& operator=(const RenderModifier&) = delete;
 	protected:
-		RenderContext& _context;
-		explicit RenderModifier(RenderContext& context) noexcept : _context{context} {}
+		RenderPass& _pass;
+		explicit RenderModifier(RenderPass& pass) noexcept : _pass{pass} {}
 	};
 
 	///
@@ -33,7 +30,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		explicit Push2D(RenderContext&);
+		explicit Push2D(RenderPass&);
 
 		///
 		~Push2D() noexcept;
@@ -44,21 +41,21 @@ namespace Yttrium
 	{
 	public:
 		///
-		Push3D(RenderContext&, const Matrix4& projection, const Matrix4& view);
+		Push3D(RenderPass&, const Matrix4& projection, const Matrix4& view);
 
 		///
 		~Push3D() noexcept;
 	};
 
 	///
-	class Y_API PushGpuProgram : public RenderModifier
+	class Y_API PushProgram : public RenderModifier
 	{
 	public:
 		///
-		PushGpuProgram(RenderContext&, const GpuProgram*);
+		PushProgram(RenderPass&, const RenderProgram*);
 
 		///
-		~PushGpuProgram() noexcept;
+		~PushProgram() noexcept;
 	};
 
 	///
@@ -66,7 +63,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		PushTexture(RenderContext&, const Texture2D*, Flags<Texture2D::Filter> = Texture2D::NearestFilter);
+		PushTexture(RenderPass&, const Texture2D*, Flags<Texture2D::Filter> = Texture2D::NearestFilter);
 
 		///
 		~PushTexture() noexcept;
@@ -80,14 +77,14 @@ namespace Yttrium
 	{
 	public:
 		///
-		PushMaterial(RenderContext&, const Material*);
+		PushMaterial(RenderPass&, const Material*);
 
 		///
 		void set_uniform(const std::string&, const Matrix4&);
 
 	private:
 		const Material* const _material;
-		PushGpuProgram _gpu_program;
+		PushProgram _program;
 		PushTexture _texture;
 	};
 
@@ -97,7 +94,7 @@ namespace Yttrium
 	public:
 		/// Multiplies the current transformation matrix by the specified one,
 		/// pushes it to the transformation stack and applies the resulting transformation.
-		PushTransformation(RenderContext&, const Matrix4&);
+		PushTransformation(RenderPass&, const Matrix4&);
 
 		/// Pops a matrix from the transformation stack and applies the previous matrix.
 		~PushTransformation() noexcept;

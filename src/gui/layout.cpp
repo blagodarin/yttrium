@@ -15,14 +15,14 @@ namespace Yttrium
 		return *_widgets.emplace_back(std::move(widget));
 	}
 
-	void GuiLayout::draw(RenderContext& context, const Widget* hover_widget, const Widget* click_widget) const
+	void GuiLayout::draw(RenderPass& pass, const Widget* hover_widget, const Widget* click_widget) const
 	{
 		for (const auto& widget : _widgets)
 		{
 			auto style = WidgetData::Style::Normal;
 			if (widget.get() == hover_widget)
 				style = (widget.get() == click_widget) ? WidgetData::Style::Pressed : WidgetData::Style::Hovered;
-			widget->draw(context, widget->render_rect(), style);
+			widget->draw(pass, widget->render_rect(), style);
 		}
 	}
 

@@ -8,9 +8,9 @@
 
 namespace Yttrium
 {
-	class GpuProgram;
 	class Image;
 	class Mesh;
+	class RenderProgram;
 	class Source;
 	class Texture2D;
 
@@ -30,7 +30,7 @@ namespace Yttrium
 		virtual ~RenderManager() noexcept = default;
 
 		///
-		virtual std::unique_ptr<GpuProgram> create_gpu_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
+		virtual std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
 
 		///
 		virtual std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag> = {}) = 0;

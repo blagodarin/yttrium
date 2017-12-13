@@ -3,10 +3,10 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include "../mesh_data.h"
-#include "gpu_program.h"
 #include "handles.h"
 #include "helpers.h"
 #include "mesh.h"
+#include "program.h"
 #include "swapchain.h"
 #include "texture.h"
 
@@ -69,14 +69,9 @@ namespace Yttrium
 		}
 	}
 
-	std::unique_ptr<GpuProgram> VulkanRenderer::create_builtin_program_2d(RendererImpl&)
+	std::unique_ptr<RenderProgram> VulkanRenderer::create_builtin_program_2d(RendererImpl&)
 	{
-		return std::make_unique<VulkanGpuProgram>(*this);
-	}
-
-	std::unique_ptr<GpuProgram> VulkanRenderer::create_gpu_program(RendererImpl&, const std::string&, const std::string&)
-	{
-		return std::make_unique<VulkanGpuProgram>(*this);
+		return std::make_unique<VulkanProgram>(*this);
 	}
 
 	std::unique_ptr<Mesh> VulkanRenderer::create_mesh(const MeshData& data)
@@ -98,6 +93,11 @@ namespace Yttrium
 			result->_index_buffer.write(data._indices.data(), index_buffer_size);
 			return result;
 		}
+	}
+
+	std::unique_ptr<RenderProgram> VulkanRenderer::create_program(RendererImpl&, const std::string&, const std::string&)
+	{
+		return std::make_unique<VulkanProgram>(*this);
 	}
 
 	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
@@ -148,7 +148,7 @@ namespace Yttrium
 		return rect;
 	}
 
-	void VulkanRenderer::set_program(const GpuProgram*)
+	void VulkanRenderer::set_program(const RenderProgram*)
 	{
 	}
 

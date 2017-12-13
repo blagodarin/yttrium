@@ -1,8 +1,8 @@
 #include "widget_data.h"
 
 #include <yttrium/gui/texture_font.h>
-#include <yttrium/renderer/context.h>
 #include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/pass.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
 
@@ -48,20 +48,20 @@ namespace
 
 namespace Yttrium
 {
-	void BackgroundProperty::draw(RenderContext& context, const RectF& rect) const
+	void BackgroundProperty::draw(RenderPass& pass, const RectF& rect) const
 	{
-		PushTexture push_texture{context, texture.get(), texture_filter};
-		context.set_texture_rect(texture_rect, borders);
-		context.draw_rect(rect, color);
+		PushTexture push_texture{pass, texture.get(), texture_filter};
+		pass.set_texture_rect(texture_rect, borders);
+		pass.draw_rect(rect, color);
 	}
 
 	ForegroundProperty::ForegroundProperty() = default;
 	ForegroundProperty::~ForegroundProperty() = default;
 
-	void ForegroundProperty::draw(RenderContext& context) const
+	void ForegroundProperty::draw(RenderPass& pass) const
 	{
-		PushTexture push_texture{context, font_texture.get(), Texture2D::TrilinearFilter};
-		context.draw_rects(geometry, color);
+		PushTexture push_texture{pass, font_texture.get(), Texture2D::TrilinearFilter};
+		pass.draw_rects(geometry, color);
 	}
 
 	void ForegroundProperty::prepare(std::string_view text, const RectF& rect, TextCapture* capture)

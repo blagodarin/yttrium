@@ -1,5 +1,5 @@
-#ifndef _include_yttrium_renderer_context_h_
-#define _include_yttrium_renderer_context_h_
+#ifndef _include_yttrium_renderer_pass_h_
+#define _include_yttrium_renderer_pass_h_
 
 #include <yttrium/math/color.h>
 
@@ -19,10 +19,10 @@ namespace Yttrium
 	class Vector2;
 
 	///
-	class RenderContext
+	class RenderPass
 	{
 	public:
-		virtual ~RenderContext() noexcept = default;
+		virtual ~RenderPass() noexcept = default;
 
 		///
 		virtual void add_debug_text(std::string_view) = 0;

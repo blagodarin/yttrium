@@ -10,7 +10,7 @@ namespace Yttrium
 	public:
 		ButtonWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
 
-		void draw(RenderContext&, const RectF&, WidgetData::StyleData&) const override;
+		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 		bool process_mouse_press(Key, const Vector2&) override;
 		void process_mouse_release() override;
 	};

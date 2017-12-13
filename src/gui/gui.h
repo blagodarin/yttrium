@@ -19,7 +19,7 @@ namespace Yttrium
 	class GuiScreen;
 	class MusicReader;
 	class RectF;
-	class RenderContext;
+	class RenderPass;
 	class ResourceLoader;
 	class ScriptContext;
 	class Storage;
@@ -41,9 +41,9 @@ namespace Yttrium
 		~GuiPrivate();
 
 		GuiScreen& add_screen(std::string_view name, bool is_transparent, bool is_root);
-		void draw_custom_cursor(RenderContext& context, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(context, point); }
+		void draw_custom_cursor(RenderPass& pass, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(pass, point); }
 		const FontDesc* font(const std::string& name) const;
-		void on_canvas_draw(RenderContext&, const std::string& name, const RectF&) const;
+		void on_canvas_draw(RenderPass&, const std::string& name, const RectF&) const;
 		void on_canvas_mouse_move(const std::string& name, const RectF&, const Vector2&);
 		bool on_canvas_mouse_press(const std::string& name, const RectF&, Key, const Vector2&);
 		bool pop_screen();
@@ -74,7 +74,7 @@ namespace Yttrium
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
 		std::unordered_map<std::string, Canvas*> _canvases;
-		std::function<void(RenderContext&, const Vector2&)> _on_custom_cursor;
+		std::function<void(RenderPass&, const Vector2&)> _on_custom_cursor;
 		std::function<void(const std::shared_ptr<MusicReader>&)> _on_music;
 		std::function<void()> _on_quit;
 

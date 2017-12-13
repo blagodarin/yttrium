@@ -7,9 +7,9 @@
 #include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/reader.h>
-#include <yttrium/renderer/gpu_program.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/mesh.h>
+#include <yttrium/renderer/program.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
@@ -169,7 +169,7 @@ namespace Yttrium
 				throw DataError{"(", name, ") No 'vertex_shader'"};
 			if (!fragment_shader)
 				throw DataError{"(", name, ") No 'fragment_shader'"};
-			auto program = _private->_render_manager->create_gpu_program(vertex_shader->to_string(), fragment_shader->to_string());
+			auto program = _private->_render_manager->create_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
 				throw DataError{"(", name, ") Bad 'vertex_shader' or 'fragment_shader'"};
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
