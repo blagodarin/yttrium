@@ -35,7 +35,7 @@ namespace Yttrium
 		{
 		}
 
-		~FileSource() override
+		~FileSource() noexcept override
 		{
 			if (_temporary)
 				return;
@@ -64,7 +64,7 @@ namespace Yttrium
 		{
 		}
 
-		~FileWriter() override
+		~FileWriter() noexcept override
 		{
 			if (_temporary)
 				return;

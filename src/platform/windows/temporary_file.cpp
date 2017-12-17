@@ -27,9 +27,10 @@ namespace Yttrium
 	class TemporaryFilePrivate
 	{
 	public:
-		~TemporaryFilePrivate()
+		~TemporaryFilePrivate() noexcept
 		{
-			::DeleteFileA(_name.data()); // TODO: Report failure (e.g. with OutputDebugString).
+			if (!::DeleteFileA(_name.data()))
+				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
 		}
 
 	public:

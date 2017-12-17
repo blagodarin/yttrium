@@ -9,7 +9,6 @@
 #include "windows.h"
 
 // TODO: Throw on errors instead of aborting.
-// TODO: Report failures during destruction (e.g. with OutputDebugString).
 
 namespace Yttrium
 {
@@ -22,9 +21,10 @@ namespace Yttrium
 		{
 		}
 
-		~FileSource() override
+		~FileSource() noexcept override
 		{
-			::CloseHandle(_handle);
+			if (!::CloseHandle(_handle))
+				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
 		}
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
@@ -49,11 +49,12 @@ namespace Yttrium
 		{
 		}
 
-		~FileWriter() override
+		~FileWriter() noexcept override
 		{
-			::CloseHandle(_handle);
-			if (_unlink)
-				::DeleteFileA(_name.c_str());
+			if (!::CloseHandle(_handle))
+				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
+			if (_unlink && !::DeleteFileA(_name.c_str()))
+				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
 		}
 
 		void reserve(uint64_t) override
