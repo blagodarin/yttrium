@@ -26,6 +26,7 @@ namespace Yttrium
 
 	private:
 		const std::unique_ptr<class TemporaryFilePrivate> _private;
+		friend TemporaryFilePrivate;
 	};
 }
 

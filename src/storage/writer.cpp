@@ -13,23 +13,23 @@
 
 namespace Yttrium
 {
-	BufferWriter::BufferWriter(Buffer& buffer)
-		: WriterPrivate{buffer.size()}
-		, _buffer{buffer}
+	BufferWriter::BufferWriter(Buffer& buffer) noexcept
+		: _buffer{buffer}
 	{
+		_buffer.resize(0);
 	}
 
 	void BufferWriter::reserve(uint64_t size)
 	{
 		if (size > std::numeric_limits<size_t>::max())
-			throw std::bad_alloc();
+			throw std::bad_alloc{};
 		_buffer.reserve(size);
 	}
 
 	void BufferWriter::resize(uint64_t size)
 	{
 		if (size > std::numeric_limits<size_t>::max())
-			throw std::bad_alloc();
+			throw std::bad_alloc{};
 		_buffer.resize(size);
 	}
 
@@ -37,7 +37,7 @@ namespace Yttrium
 	{
 		assert(offset <= std::numeric_limits<size_t>::max());
 		if (size > std::numeric_limits<size_t>::max() - offset)
-			throw std::bad_alloc();
+			throw std::bad_alloc{};
 		if (offset + size > _buffer.size())
 			_buffer.resize(offset + size);
 		std::memcpy(_buffer.begin() + offset, data, size);

@@ -1,4 +1,4 @@
-#include <yttrium/storage/temporary_file.h>
+#include "temporary_file.h"
 
 #include <system_error>
 
@@ -6,27 +6,21 @@
 
 namespace Yttrium
 {
-	class TemporaryFilePrivate
+	TemporaryFilePrivate::TemporaryFilePrivate()
+		: _name{"/tmp/yttrium-XXXXXX"}
+		, _descriptor{::mkstemp(_name.data())}
 	{
-	public:
-		TemporaryFilePrivate()
-		{
-			if (_descriptor == -1)
-				throw std::system_error(errno, std::generic_category());
-		}
+		if (_descriptor == -1)
+			throw std::system_error{errno, std::generic_category()};
+	}
 
-		~TemporaryFilePrivate()
-		{
-			if (::close(_descriptor))
-				::perror("ERROR! 'close' failed");
-			if (::unlink(_name.c_str()))
-				::perror("ERROR! 'unlink' failed");
-		}
-
-	public:
-		std::string _name{"/tmp/yttrium-XXXXXX"};
-		const int _descriptor = ::mkstemp(_name.data());
-	};
+	TemporaryFilePrivate::~TemporaryFilePrivate() noexcept
+	{
+		if (::close(_descriptor))
+			::perror("ERROR! 'close' failed");
+		if (::unlink(_name.c_str()))
+			::perror("ERROR! 'unlink' failed");
+	}
 
 	TemporaryFile::TemporaryFile()
 		: _private{std::make_unique<TemporaryFilePrivate>()}

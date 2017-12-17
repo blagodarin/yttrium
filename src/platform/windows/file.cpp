@@ -43,9 +43,8 @@ namespace Yttrium
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(uint64_t size, const std::string& name, HANDLE handle)
-			: WriterPrivate{size}
-			, _name{name}
+		FileWriter(const std::string& name, HANDLE handle)
+			: _name{name}
 			, _handle{handle}
 		{
 		}
@@ -110,10 +109,7 @@ namespace Yttrium
 		const auto handle = ::CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
 			return {};
-		LARGE_INTEGER size;
-		if (!::GetFileSizeEx(handle, &size))
-			std::abort();
-		return std::make_unique<FileWriter>(size.QuadPart, path, handle);
+		return std::make_unique<FileWriter>(path, handle);
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)

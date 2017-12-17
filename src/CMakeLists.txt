@@ -371,6 +371,7 @@ if(UNIX)
 	target_sources(yttrium PRIVATE
 		platform/posix/file.cpp
 		platform/posix/temporary_file.cpp
+		platform/posix/temporary_file.h
 		)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE

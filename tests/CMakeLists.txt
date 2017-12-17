@@ -25,6 +25,7 @@ add_executable(unit_tests
 	src/resource_loader.cpp
 	src/source.cpp
 	src/string_utils.cpp
+	src/temporary_file.cpp
 	src/test_utils.cpp
 	src/test_utils.h
 	src/texture_font.cpp
