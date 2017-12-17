@@ -21,6 +21,18 @@ namespace Yttrium
 	class ScriptCodePrivate
 	{
 	public:
+		ScriptCodePrivate(const ScriptCodePrivate& other)
+		{
+			_commands.reserve(other._commands.size());
+			for (const auto& other_command : other._commands)
+			{
+				auto& command = _commands.emplace_back(other_command._name);
+				command._args.reserve(other_command._args.size());
+				for (const auto other_arg : other_command._args)
+					command._args.emplace_back(new(_temporaries.allocate()) ScriptValue{*other_arg});
+			}
+		}
+
 		explicit ScriptCodePrivate(std::string&& text)
 		{
 			ScriptScanner scanner{text};
@@ -97,7 +109,17 @@ namespace Yttrium
 	};
 
 	ScriptCode::ScriptCode() = default;
-	ScriptCode::~ScriptCode() = default;
+
+	ScriptCode::ScriptCode(const ScriptCode& other)
+		: _private{std::make_unique<ScriptCodePrivate>(*other._private)}
+	{
+	}
+
+	ScriptCode::ScriptCode(ScriptCode&&) noexcept = default;
+
+	ScriptCode::~ScriptCode() noexcept = default;
+
+	ScriptCode& ScriptCode::operator=(ScriptCode&&) noexcept = default;
 
 	ScriptCode::ScriptCode(std::string&& text)
 		: _private{std::make_unique<ScriptCodePrivate>(std::move(text))}
@@ -125,7 +147,4 @@ namespace Yttrium
 			else if (!context.call(command._name, result, ScriptArgs{context, command._args}))
 				break;
 	}
-
-	ScriptCode::ScriptCode(ScriptCode&&) noexcept = default;
-	ScriptCode& ScriptCode::operator=(ScriptCode&&) noexcept = default;
 }

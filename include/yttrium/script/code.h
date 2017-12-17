@@ -14,11 +14,12 @@ namespace Yttrium
 	class Y_API ScriptCode
 	{
 	public:
-		///
 		ScriptCode();
-
-		///
+		ScriptCode(const ScriptCode&);
+		ScriptCode(ScriptCode&&) noexcept;
 		~ScriptCode();
+		ScriptCode& operator=(const ScriptCode&) = delete;
+		ScriptCode& operator=(ScriptCode&&) noexcept;
 
 		///
 		explicit ScriptCode(std::string&&);
@@ -28,9 +29,6 @@ namespace Yttrium
 
 		/// Executes the script.
 		void execute(ScriptContext&) const;
-
-		ScriptCode(ScriptCode&&) noexcept;
-		ScriptCode& operator=(ScriptCode&&) noexcept;
 
 	private:
 		std::unique_ptr<class ScriptCodePrivate> _private;

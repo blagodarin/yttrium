@@ -78,17 +78,6 @@ namespace Yttrium
 		font->build(geometry, ::make_top_left(rect, text_size, margins, alignment), text_size._height, text, capture);
 	}
 
-	WidgetData::WidgetData() = default;
-
-	WidgetData::WidgetData(const WidgetData& data)
-		: _rect{data._rect}
-		, _sound{data._sound}
-		, _styles{data._styles}
-		, _fixed_style{data._fixed_style}
-		, _text{data._text}
-	{
-	}
-
 	void WidgetData::run(GuiPrivate& gui, Action action) const
 	{
 		const auto i = _actions.find(action);

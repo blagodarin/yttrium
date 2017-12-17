@@ -97,10 +97,6 @@ namespace Yttrium
 		std::optional<Style> _fixed_style;
 		std::string _text;
 
-		WidgetData();
-		WidgetData(const WidgetData&); // TODO: Fix GuiActions non-copyability.
-		WidgetData& operator=(const WidgetData&) = delete;
-
 		void run(GuiPrivate&, Action) const;
 		StyleData& style_data(Style);
 	};
