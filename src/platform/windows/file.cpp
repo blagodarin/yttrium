@@ -4,11 +4,9 @@
 #include <yttrium/storage/temporary_file.h>
 #include "../../storage/writer.h"
 
-#include <cstdlib>
+#include <system_error>
 
 #include "windows.h"
-
-// TODO: Throw on errors instead of aborting.
 
 namespace Yttrium
 {
@@ -66,7 +64,7 @@ namespace Yttrium
 			LARGE_INTEGER offset;
 			offset.QuadPart = size;
 			if (!::SetFilePointerEx(_handle, offset, nullptr, FILE_BEGIN) || !::SetEndOfFile(_handle)) // TODO: Synchronization?
-				std::abort();
+				throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
 		}
 
 		void unlink() override
@@ -96,7 +94,7 @@ namespace Yttrium
 			return {};
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
-			std::abort();
+			throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
 		return std::make_unique<FileSource>(size.QuadPart, path, handle);
 	}
 
