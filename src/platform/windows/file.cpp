@@ -63,7 +63,7 @@ namespace Yttrium
 		{
 			LARGE_INTEGER offset;
 			offset.QuadPart = size;
-			if (!::SetFilePointerEx(_handle, offset, nullptr, FILE_BEGIN) || !::SetEndOfFile(_handle)) // TODO: Synchronization?
+			if (!::SetFilePointerEx(_handle, offset, nullptr, FILE_BEGIN) || !::SetEndOfFile(_handle))
 				throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
 		}
 
