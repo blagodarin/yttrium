@@ -5,8 +5,7 @@
 #include <algorithm>
 #include <cstring>
 #include <limits>
-
-// TODO: Throw some IO exception if Source::to_xxx() fails.
+#include <system_error>
 
 namespace Yttrium
 {
@@ -97,10 +96,10 @@ namespace Yttrium
 	Buffer Source::to_buffer() const
 	{
 		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
-			throw std::bad_alloc();
+			throw std::bad_alloc{};
 		Buffer buffer{_size + 1};
 		if (read_at(0, buffer.data(), _size) != _size)
-			return {};
+			throw std::system_error{std::make_error_code(std::errc::io_error)};
 		buffer[_size] = '\0';
 		buffer.resize(_size);
 		return buffer;
@@ -109,10 +108,10 @@ namespace Yttrium
 	std::string Source::to_string() const
 	{
 		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
-			throw std::bad_alloc();
+			throw std::bad_alloc{};
 		std::string string(_size, '\0');
 		if (read_at(0, string.data(), string.size()) != string.size())
-			return {};
+			throw std::system_error{std::make_error_code(std::errc::io_error)};
 		return string;
 	}
 }
