@@ -6,8 +6,8 @@
 
 namespace Yttrium
 {
-	VulkanTexture2D::VulkanTexture2D(RendererImpl& renderer, VulkanContext& context, const ImageFormat& format, bool has_mipmaps, VkFormat vk_format, const void* data)
-		: BackendTexture2D{renderer, format, has_mipmaps}
+	VulkanTexture2D::VulkanTexture2D(RenderBackend& backend, VulkanContext& context, const ImageFormat& format, bool has_mipmaps, VkFormat vk_format, const void* data)
+		: BackendTexture2D{backend, format, has_mipmaps}
 		, _image{context.create_texture_2d_image(format.width(), format.height(), vk_format)}
 		, _sampler{context.create_texture_2d_sampler()}
 	{

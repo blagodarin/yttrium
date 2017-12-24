@@ -7,12 +7,10 @@
 
 namespace Yttrium
 {
-	class RendererImpl;
-
 	class GlProgram final : public RenderProgram
 	{
 	public:
-		GlProgram(RendererImpl&, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);
+		GlProgram(GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi&);
 
 		void set_uniform(const std::string&, const Matrix4&) override;
 
@@ -20,7 +18,6 @@ namespace Yttrium
 		bool link();
 
 	private:
-		RendererImpl& _renderer;
 		const GlShaderHandle _vertex_shader;
 		const GlShaderHandle _fragment_shader;
 		const GlProgramHandle _program;

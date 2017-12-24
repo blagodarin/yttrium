@@ -3,6 +3,7 @@
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
 #include "../platform/window.h"
+#include "../renderer/builtin/builtin.h"
 #include "../renderer/pass.h"
 #include "../renderer/renderer.h"
 #include "backend.h"
@@ -15,6 +16,7 @@ namespace Yttrium
 		const std::string _name;
 		WindowBackend _backend{_name, *this};
 		RendererImpl _renderer{_backend};
+		RenderBuiltin _renderer_builtin{*_renderer._backend};
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;
@@ -198,13 +200,14 @@ namespace Yttrium
 		auto max_frame_time = 0ms;
 		auto clock = std::chrono::high_resolution_clock::now();
 		auto fps_time = 0ms;
+		RenderPassData render_pass_data;
 		while (_private->process_events())
 		{
 			if (_private->_on_update)
 				_private->_on_update(update);
 			{
-				RenderPassImpl pass{_private->_renderer, _private->_size};
-				PushProgram program{pass, _private->_renderer.program_2d()};
+				RenderPassImpl pass{*_private->_renderer._backend, _private->_renderer_builtin, render_pass_data, _private->_size};
+				PushProgram program{pass, _private->_renderer_builtin._program_2d.get()};
 				Push2D projection{pass};
 				if (_private->_on_render)
 					_private->_on_render(pass, Vector2{_private->_cursor});

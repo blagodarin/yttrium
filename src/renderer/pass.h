@@ -6,19 +6,54 @@
 #include <yttrium/flags.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
+
+#include <string>
 
 namespace Yttrium
 {
 	class BackendTexture2D;
+	class Matrix4;
 	class Quad;
-	class RendererImpl;
+	class RenderBackend;
+	class RenderBuiltin;
 	class RenderProgram;
+
+	enum class RenderMatrixType
+	{
+		Projection,
+		View,
+		Model,
+	};
+
+	// Data that persists between frames.
+	class RenderPassData
+	{
+	public:
+		RenderPassData();
+		~RenderPassData() noexcept;
+
+	private:
+		Buffer _vertices_2d;
+		Buffer _indices_2d;
+		std::vector<std::pair<Matrix4, RenderMatrixType>> _matrix_stack;
+		std::vector<std::pair<const Texture2D*, int>> _texture_stack{ { nullptr, 1 } };
+#ifndef NDEBUG
+		std::vector<const Texture2D*> _seen_textures; // For redundancy statistics.
+#endif
+		std::vector<std::pair<const RenderProgram*, int>> _program_stack{ { nullptr, 1 } };
+#ifndef NDEBUG
+		std::vector<const RenderProgram*> _seen_programs; // For redundancy statistics.
+#endif
+		std::string _debug_text;
+		friend class RenderPassImpl;
+	};
 
 	class RenderPassImpl : public RenderPass
 	{
 	public:
-		RenderPassImpl(RendererImpl&, const Size& window_size);
+		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& window_size);
 		~RenderPassImpl() noexcept override;
 
 		void add_debug_text(std::string_view) override;
@@ -43,9 +78,9 @@ namespace Yttrium
 			size_t _redundant_shader_switches = 0;
 		};
 
+		RenderBuiltin& builtin() const noexcept { return _builtin; }
 		void draw_debug_text();
 		void draw_rect(const RectF& position, const Color4f& color, const RectF& texture) { draw_rect(position, color, texture, {}); }
-		RendererImpl& manager() const noexcept { return _renderer; }
 		void pop_program() noexcept;
 		void pop_projection() noexcept;
 		void pop_texture(Flags<Texture2D::Filter>) noexcept;
@@ -65,7 +100,9 @@ namespace Yttrium
 		void update_state();
 
 	private:
-		RendererImpl& _renderer;
+		RenderBackend& _backend;
+		RenderBuiltin& _builtin;
+		RenderPassData& _data;
 		const SizeF _window_size;
 
 		const Texture2D* _current_texture = nullptr;

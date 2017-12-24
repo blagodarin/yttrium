@@ -69,7 +69,7 @@ namespace Yttrium
 		}
 	}
 
-	std::unique_ptr<RenderProgram> VulkanRenderer::create_builtin_program_2d(RendererImpl&)
+	std::unique_ptr<RenderProgram> VulkanRenderer::create_builtin_program_2d()
 	{
 		return std::make_unique<VulkanProgram>(*this);
 	}
@@ -95,12 +95,12 @@ namespace Yttrium
 		}
 	}
 
-	std::unique_ptr<RenderProgram> VulkanRenderer::create_program(RendererImpl&, const std::string&, const std::string&)
+	std::unique_ptr<RenderProgram> VulkanRenderer::create_program(const std::string&, const std::string&)
 	{
 		return std::make_unique<VulkanProgram>(*this);
 	}
 
-	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(Image&& image, Flags<RenderManager::TextureFlag> flags)
 	{
 		if (flags & RenderManager::TextureFlag::Intensity)
 		{
@@ -130,7 +130,7 @@ namespace Yttrium
 		}
 
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(renderer, _context, image.format(), has_mipmaps, vk_format, image.data());
+		return std::make_unique<VulkanTexture2D>(*this, _context, image.format(), has_mipmaps, vk_format, image.data());
 	}
 
 	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)

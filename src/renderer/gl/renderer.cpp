@@ -63,9 +63,9 @@ namespace Yttrium
 		_gl.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
-	std::unique_ptr<RenderProgram> GlRenderer::create_builtin_program_2d(RendererImpl& renderer)
+	std::unique_ptr<RenderProgram> GlRenderer::create_builtin_program_2d()
 	{
-		return create_program(renderer, _vertex_shader_2d, _fragment_shader_2d);
+		return create_program(_vertex_shader_2d, _fragment_shader_2d);
 	}
 
 	std::unique_ptr<Mesh> GlRenderer::create_mesh(const MeshData& data)
@@ -115,7 +115,7 @@ namespace Yttrium
 		return std::make_unique<OpenGLMesh>(std::move(vertex_array), std::move(vertex_buffer), std::move(index_buffer), static_cast<GLsizei>(data._indices.size()), index_format);
 	}
 
-	std::unique_ptr<RenderProgram> GlRenderer::create_program(RendererImpl& renderer, const std::string& vertex_shader, const std::string& fragment_shader)
+	std::unique_ptr<RenderProgram> GlRenderer::create_program(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
 		GlShaderHandle vertex{_gl, GL_VERTEX_SHADER};
 		if (!vertex.compile(vertex_shader))
@@ -135,14 +135,14 @@ namespace Yttrium
 			return {};
 		}
 
-		auto result = std::make_unique<GlProgram>(renderer, std::move(vertex), std::move(fragment), _gl);
+		auto result = std::make_unique<GlProgram>(std::move(vertex), std::move(fragment), _gl);
 		if (!result->link())
 			return {};
 
 		return result;
 	}
 
-	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(Image&& image, Flags<RenderManager::TextureFlag> flags)
 	{
 		if (flags & RenderManager::TextureFlag::Intensity)
 		{
@@ -200,7 +200,7 @@ namespace Yttrium
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
 			texture.generate_mipmaps();
-		return std::make_unique<GlTexture2D>(renderer, image_format, has_mipmaps, std::move(texture));
+		return std::make_unique<GlTexture2D>(*this, image_format, has_mipmaps, std::move(texture));
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

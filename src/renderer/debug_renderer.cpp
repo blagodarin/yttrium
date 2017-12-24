@@ -1,8 +1,8 @@
 #include "debug_renderer.h"
 
-#include "debug_texture.h"
+#include "builtin/builtin.h"
+#include "builtin/debug_texture.h"
 #include "pass.h"
-#include "renderer.h"
 
 #include <algorithm>
 
@@ -29,7 +29,7 @@ namespace Yttrium
 {
 	DebugRenderer::DebugRenderer(RenderPass& pass)
 		: _pass{static_cast<RenderPassImpl&>(pass)}
-		, _debug_texture{_pass, _pass.manager().debug_texture(), Texture2D::NearestFilter}
+		, _texture{_pass, _pass.builtin()._debug_texture.get(), Texture2D::NearestFilter}
 	{
 	}
 

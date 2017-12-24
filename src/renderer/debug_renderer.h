@@ -25,7 +25,7 @@ namespace Yttrium
 	private:
 		RenderPassImpl& _pass;
 		Color4f _color{1, 1, 1};
-		PushTexture _debug_texture;
+		PushTexture _texture;
 	};
 }
 

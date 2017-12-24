@@ -1,5 +1,5 @@
-#ifndef _src_renderer_debug_texture_h_
-#define _src_renderer_debug_texture_h_
+#ifndef _src_renderer_builtin_debug_texture_h_
+#define _src_renderer_builtin_debug_texture_h_
 
 #include <cstdint>
 

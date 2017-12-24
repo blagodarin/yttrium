@@ -8,17 +8,17 @@ namespace Yttrium
 {
 	class WindowBackend;
 
-	class GlRenderer final : public RendererBackend
+	class GlRenderer final : public RenderBackend
 	{
 	public:
 		explicit GlRenderer(WindowBackend&);
 		~GlRenderer() noexcept override;
 
 		void clear() override;
-		std::unique_ptr<RenderProgram> create_builtin_program_2d(RendererImpl&) override;
+		std::unique_ptr<RenderProgram> create_builtin_program_2d() override;
 		std::unique_ptr<Mesh> create_mesh(const MeshData&) override;
-		std::unique_ptr<RenderProgram> create_program(RendererImpl&, const std::string& vertex_shader, const std::string& fragment_shader) override;
-		std::unique_ptr<Texture2D> create_texture_2d(RendererImpl&, Image&&, Flags<RenderManager::TextureFlag>) override;
+		std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
+		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<RenderManager::TextureFlag>) override;
 		size_t draw_mesh(const Mesh&) override;
 		void flush_2d(const Buffer&, const Buffer&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;

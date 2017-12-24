@@ -14,17 +14,17 @@ namespace Yttrium
 	class VulkanSwapchain;
 	class VulkanVertexFormat;
 
-	class VulkanRenderer : public RendererBackend // TODO: Add 'final' then work around GCC's bad memory accessing code generation.
+	class VulkanRenderer : public RenderBackend // TODO: Add 'final' then work around GCC's bad memory accessing code generation.
 	{
 	public:
 		explicit VulkanRenderer(const WindowBackend&);
 		~VulkanRenderer() noexcept override;
 
 		void clear() override;
-		std::unique_ptr<RenderProgram> create_builtin_program_2d(RendererImpl&) override;
+		std::unique_ptr<RenderProgram> create_builtin_program_2d() override;
 		std::unique_ptr<Mesh> create_mesh(const MeshData&) override;
-		std::unique_ptr<RenderProgram> create_program(RendererImpl&, const std::string& vertex_shader, const std::string& fragment_shader) override;
-		std::unique_ptr<Texture2D> create_texture_2d(RendererImpl&, Image&&, Flags<RenderManager::TextureFlag>) override;
+		std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
+		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<RenderManager::TextureFlag>) override;
 		size_t draw_mesh(const Mesh&) override;
 		void flush_2d(const Buffer&, const Buffer&) override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;

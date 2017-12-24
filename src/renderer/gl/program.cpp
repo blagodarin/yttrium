@@ -1,17 +1,13 @@
 #include "program.h"
 
-#include "../renderer.h"
-#include "renderer.h"
-
 #ifndef NDEBUG
 	#include <iostream>
 #endif
 
 namespace Yttrium
 {
-	GlProgram::GlProgram(RendererImpl& renderer, GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
-		: _renderer{renderer}
-		, _vertex_shader{std::move(vertex_shader)}
+	GlProgram::GlProgram(GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
+		: _vertex_shader{std::move(vertex_shader)}
 		, _fragment_shader{std::move(fragment_shader)}
 		, _program{gl}
 	{

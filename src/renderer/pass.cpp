@@ -7,9 +7,9 @@
 #include <yttrium/renderer/program.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/string_utils.h>
-#include "debug_renderer.h"
 #include "backend.h"
-#include "renderer.h"
+#include "builtin/builtin.h"
+#include "debug_renderer.h"
 #include "texture.h"
 
 #include <cassert>
@@ -20,7 +20,7 @@ namespace
 
 	struct Draw2D
 	{
-		BufferAppender<RendererBackend::Vertex2D> _vertices;
+		BufferAppender<RenderBackend::Vertex2D> _vertices;
 		BufferAppender<uint16_t> _indices;
 		uint16_t _index = static_cast<uint16_t>(_vertices.count());
 
@@ -48,39 +48,45 @@ namespace
 
 namespace Yttrium
 {
-	RenderPassImpl::RenderPassImpl(RendererImpl& renderer, const Size& window_size)
-		: _renderer{renderer}
+	RenderPassData::RenderPassData() = default;
+
+	RenderPassData::~RenderPassData() noexcept = default;
+
+	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& window_size)
+		: _backend{backend}
+		, _builtin{builtin}
+		, _data{data}
 		, _window_size{window_size}
 	{
-		_renderer._debug_text.clear();
-		_renderer._backend->clear();
+		_data._debug_text.clear();
+		_backend.clear();
 	}
 
 	RenderPassImpl::~RenderPassImpl() noexcept
 	{
 #ifndef NDEBUG
-		_renderer._seen_textures.clear();
-		_renderer._seen_programs.clear();
+		_data._seen_textures.clear();
+		_data._seen_programs.clear();
 #endif
 	}
 
 	void RenderPassImpl::add_debug_text(std::string_view text)
 	{
-		append_to(_renderer._debug_text, text, '\n');
+		append_to(_data._debug_text, text, '\n');
 	}
 
 	void RenderPassImpl::draw_mesh(const Mesh& mesh)
 	{
 		update_state();
-		_statistics._triangles += _renderer._backend->draw_mesh(mesh);
+		_statistics._triangles += _backend.draw_mesh(mesh);
 		++_statistics._draw_calls;
 	}
 
 	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
-		Draw2D draw{_renderer._vertices_2d, _renderer._indices_2d};
+		Draw2D draw{_data._vertices_2d, _data._indices_2d};
 
-		RendererBackend::Vertex2D vertex;
+		RenderBackend::Vertex2D vertex;
 		vertex.color = color;
 
 		vertex.position = quad._a;
@@ -112,24 +118,24 @@ namespace Yttrium
 		const SizeF texture_size{current_texture_2d()->size()};
 		const Vector2 texture_scale{texture_size._width, texture_size._height};
 		for (const auto& rect : rects)
-			draw_rect(rect.geometry, color, _renderer._backend->map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
+			draw_rect(rect.geometry, color, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
 	}
 
 	Matrix4 RenderPassImpl::full_matrix() const
 	{
-		const auto current_projection = std::find_if(_renderer._matrix_stack.rbegin(), _renderer._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::Projection; });
-		assert(current_projection != _renderer._matrix_stack.rend());
+		const auto current_projection = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::Projection; });
+		assert(current_projection != _data._matrix_stack.rend());
 		const auto current_view = current_projection.base();
-		assert(current_view != _renderer._matrix_stack.end());
+		assert(current_view != _data._matrix_stack.end());
 		assert(current_view->second == RenderMatrixType::View);
 		return current_projection->first * current_view->first * model_matrix();
 	}
 
 	Matrix4 RenderPassImpl::model_matrix() const
 	{
-		assert(!_renderer._matrix_stack.empty());
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
-		return _renderer._matrix_stack.back().first;
+		assert(!_data._matrix_stack.empty());
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
+		return _data._matrix_stack.back().first;
 	}
 
 	Line3 RenderPassImpl::pixel_ray(const Vector2& v) const
@@ -154,7 +160,7 @@ namespace Yttrium
 		if (texture_rect_size._width < minimum._width || texture_rect_size._height < minimum._height)
 			return;
 
-		_texture_rect = _renderer._backend->map_rect(rect / texture_scale, current_texture->orientation());
+		_texture_rect = _backend.map_rect(rect / texture_scale, current_texture->orientation());
 		_texture_borders =
 		{
 			borders._top / texture_size._height,
@@ -171,150 +177,150 @@ namespace Yttrium
 
 	void RenderPassImpl::draw_debug_text()
 	{
-		if (_renderer._debug_text.empty())
+		if (_data._debug_text.empty())
 			return;
 		{
 			DebugRenderer debug{*this};
 			debug.set_color(1, 1, 1);
 			size_t top = 0;
 			size_t line_begin = 0;
-			auto line_end = _renderer._debug_text.find('\n', line_begin);
+			auto line_end = _data._debug_text.find('\n', line_begin);
 			while (line_end != std::string::npos)
 			{
-				debug.draw_text(0, top++, {_renderer._debug_text.data() + line_begin, line_end - line_begin});
+				debug.draw_text(0, top++, {_data._debug_text.data() + line_begin, line_end - line_begin});
 				line_begin = line_end + 1;
-				line_end = _renderer._debug_text.find('\n', line_begin);
+				line_end = _data._debug_text.find('\n', line_begin);
 			}
-			debug.draw_text(0, top, {_renderer._debug_text.data() + line_begin, _renderer._debug_text.size() - line_begin});
+			debug.draw_text(0, top, {_data._debug_text.data() + line_begin, _data._debug_text.size() - line_begin});
 		}
 		flush_2d();
 	}
 
 	void RenderPassImpl::pop_program() noexcept
 	{
-		assert(_renderer._program_stack.size() > 1 || (_renderer._program_stack.size() == 1 && _renderer._program_stack.back().second > 1));
-		if (_renderer._program_stack.back().second > 1)
+		assert(_data._program_stack.size() > 1 || (_data._program_stack.size() == 1 && _data._program_stack.back().second > 1));
+		if (_data._program_stack.back().second > 1)
 		{
-			--_renderer._program_stack.back().second;
+			--_data._program_stack.back().second;
 			return;
 		}
 		flush_2d();
-		_renderer._program_stack.pop_back();
+		_data._program_stack.pop_back();
 		_reset_program = true;
 	}
 
 	void RenderPassImpl::pop_projection() noexcept
 	{
 		flush_2d();
-		assert(_renderer._matrix_stack.size() >= 3);
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
-		_renderer._matrix_stack.pop_back();
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::View);
-		_renderer._matrix_stack.pop_back();
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Projection);
-		_renderer._matrix_stack.pop_back();
-		if (_renderer._matrix_stack.empty())
+		assert(_data._matrix_stack.size() >= 3);
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
+		_data._matrix_stack.pop_back();
+		assert(_data._matrix_stack.back().second == RenderMatrixType::View);
+		_data._matrix_stack.pop_back();
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Projection);
+		_data._matrix_stack.pop_back();
+		if (_data._matrix_stack.empty())
 			return;
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
 #ifndef NDEBUG
-		const auto last_view = std::find_if(_renderer._matrix_stack.rbegin(), _renderer._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::View; });
-		assert(last_view != _renderer._matrix_stack.rend());
+		const auto last_view = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::View; });
+		assert(last_view != _data._matrix_stack.rend());
 		const auto last_projection = std::next(last_view);
-		assert(last_projection != _renderer._matrix_stack.rend());
+		assert(last_projection != _data._matrix_stack.rend());
 		assert(last_projection->second == RenderMatrixType::Projection);
 #endif
 	}
 
 	void RenderPassImpl::pop_texture(Flags<Texture2D::Filter> filter) noexcept
 	{
-		assert(_renderer._texture_stack.size() > 1 || (_renderer._texture_stack.size() == 1 && _renderer._texture_stack.back().second > 1));
-		if (_renderer._texture_stack.back().second == 1)
+		assert(_data._texture_stack.size() > 1 || (_data._texture_stack.size() == 1 && _data._texture_stack.back().second > 1));
+		if (_data._texture_stack.back().second == 1)
 		{
 			flush_2d();
-			_renderer._texture_stack.pop_back();
+			_data._texture_stack.pop_back();
 			_reset_texture = true;
 			reset_texture_state();
 		}
 		else
-			--_renderer._texture_stack.back().second;
+			--_data._texture_stack.back().second;
 		_current_texture_filter = filter;
 	}
 
 	void RenderPassImpl::pop_transformation() noexcept
 	{
 		flush_2d();
-		assert(_renderer._matrix_stack.size() > 3);
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
-		_renderer._matrix_stack.pop_back();
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
+		assert(_data._matrix_stack.size() > 3);
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
+		_data._matrix_stack.pop_back();
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
 	}
 
 	void RenderPassImpl::push_program(const RenderProgram* program)
 	{
-		assert(!_renderer._program_stack.empty());
-		if (_renderer._program_stack.back().first == program)
+		assert(!_data._program_stack.empty());
+		if (_data._program_stack.back().first == program)
 		{
-			++_renderer._program_stack.back().second;
+			++_data._program_stack.back().second;
 			return;
 		}
 		flush_2d();
-		_renderer._program_stack.emplace_back(program, 1);
+		_data._program_stack.emplace_back(program, 1);
 		_reset_program = true;
 	}
 
 	void RenderPassImpl::push_projection_2d(const Matrix4& matrix)
 	{
 		flush_2d();
-		_renderer._matrix_stack.emplace_back(matrix, RenderMatrixType::Projection);
-		_renderer._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::View);
-		_renderer._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
+		_data._matrix_stack.emplace_back(matrix, RenderMatrixType::Projection);
+		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::View);
+		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
 	}
 
 	void RenderPassImpl::push_projection_3d(const Matrix4& projection, const Matrix4& view)
 	{
 		flush_2d();
-		_renderer._matrix_stack.emplace_back(projection, RenderMatrixType::Projection);
-		_renderer._matrix_stack.emplace_back(::_3d_directions * view, RenderMatrixType::View);
-		_renderer._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
+		_data._matrix_stack.emplace_back(projection, RenderMatrixType::Projection);
+		_data._matrix_stack.emplace_back(::_3d_directions * view, RenderMatrixType::View);
+		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
 	}
 
 	Flags<Texture2D::Filter> RenderPassImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
 	{
 		if (!texture)
 		{
-			texture = _renderer._white_texture.get();
+			texture = _builtin._white_texture.get();
 			filter = Texture2D::NearestFilter;
 		}
-		assert(!_renderer._texture_stack.empty());
-		if (_renderer._texture_stack.back().first != texture)
+		assert(!_data._texture_stack.empty());
+		if (_data._texture_stack.back().first != texture)
 		{
 			flush_2d();
-			_renderer._texture_stack.emplace_back(texture, 1);
+			_data._texture_stack.emplace_back(texture, 1);
 			_reset_texture = true;
 			reset_texture_state();
 		}
 		else
-			++_renderer._texture_stack.back().second;
+			++_data._texture_stack.back().second;
 		return std::exchange(_current_texture_filter, filter);
 	}
 
 	void RenderPassImpl::push_transformation(const Matrix4& matrix)
 	{
-		assert(!_renderer._matrix_stack.empty());
-		assert(_renderer._matrix_stack.back().second == RenderMatrixType::Model);
-		_renderer._matrix_stack.emplace_back(_renderer._matrix_stack.back().first * matrix, RenderMatrixType::Model);
+		assert(!_data._matrix_stack.empty());
+		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
+		_data._matrix_stack.emplace_back(_data._matrix_stack.back().first * matrix, RenderMatrixType::Model);
 	}
 
 	const BackendTexture2D* RenderPassImpl::current_texture_2d() const
 	{
-		return static_cast<const BackendTexture2D*>(_renderer._texture_stack.back().first);
+		return static_cast<const BackendTexture2D*>(_data._texture_stack.back().first);
 	}
 
 	void RenderPassImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
 	{
-		Draw2D draw{_renderer._vertices_2d, _renderer._indices_2d};
+		Draw2D draw{_data._vertices_2d, _data._indices_2d};
 
-		RendererBackend::Vertex2D vertex;
+		RenderBackend::Vertex2D vertex;
 		vertex.color = color;
 
 		float left_offset = 0;
@@ -465,19 +471,19 @@ namespace Yttrium
 
 	void RenderPassImpl::flush_2d()
 	{
-		if (_renderer._vertices_2d.size() == 0)
+		if (_data._vertices_2d.size() == 0)
 			return;
 
-		if (_renderer._vertices_2d.size() / sizeof(RendererBackend::Vertex2D) > std::numeric_limits<uint16_t>::max())
+		if (_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) > std::numeric_limits<uint16_t>::max())
 			throw std::runtime_error("2D vertex buffer size exceeds 16-bit indexing limitations");
 
-		_renderer._program_2d->set_uniform("mvp", full_matrix());
+		_builtin._program_2d->set_uniform("mvp", full_matrix());
 		update_state();
-		_renderer._backend->flush_2d(_renderer._vertices_2d, _renderer._indices_2d);
-		_statistics._triangles += _renderer._indices_2d.size() / sizeof(uint16_t) - 2;
+		_backend.flush_2d(_data._vertices_2d, _data._indices_2d);
+		_statistics._triangles += _data._indices_2d.size() / sizeof(uint16_t) - 2;
 		++_statistics._draw_calls;
-		_renderer._vertices_2d.resize(0);
-		_renderer._indices_2d.resize(0);
+		_data._vertices_2d.resize(0);
+		_data._indices_2d.resize(0);
 	}
 
 	void RenderPassImpl::reset_texture_state()
@@ -492,16 +498,16 @@ namespace Yttrium
 		if (_reset_program)
 		{
 			_reset_program = false;
-			const auto program = _renderer._program_stack.back().first;
+			const auto program = _data._program_stack.back().first;
 			if (program != _current_program)
 			{
 				_current_program = program;
-				_renderer._backend->set_program(program);
+				_backend.set_program(program);
 				++_statistics._shader_switches;
 #ifndef NDEBUG
-				const auto i = std::find(_renderer._seen_programs.begin(), _renderer._seen_programs.end(), program);
-				if (i == _renderer._seen_programs.end())
-					_renderer._seen_programs.emplace_back(program);
+				const auto i = std::find(_data._seen_programs.begin(), _data._seen_programs.end(), program);
+				if (i == _data._seen_programs.end())
+					_data._seen_programs.emplace_back(program);
 				else
 					++_statistics._redundant_shader_switches;
 #endif
@@ -511,16 +517,16 @@ namespace Yttrium
 		if (_reset_texture)
 		{
 			_reset_texture = false;
-			const auto texture = _renderer._texture_stack.back().first;
+			const auto texture = _data._texture_stack.back().first;
 			if (texture != _current_texture)
 			{
 				_current_texture = texture;
-				_renderer._backend->set_texture(*texture, _current_texture_filter);
+				_backend.set_texture(*texture, _current_texture_filter);
 				++_statistics._texture_switches;
 #ifndef NDEBUG
-				const auto i = std::find(_renderer._seen_textures.begin(), _renderer._seen_textures.end(), texture);
-				if (i == _renderer._seen_textures.end())
-					_renderer._seen_textures.emplace_back(texture);
+				const auto i = std::find(_data._seen_textures.begin(), _data._seen_textures.end(), texture);
+				if (i == _data._seen_textures.end())
+					_data._seen_textures.emplace_back(texture);
 				else
 					++_statistics._redundant_texture_switches;
 #endif

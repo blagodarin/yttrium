@@ -1,12 +1,10 @@
 #include "renderer.h"
 
-#include <yttrium/exceptions.h>
 #include <yttrium/image.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/program.h>
-#include "debug_texture.h"
 #include "formats/obj.h"
 #include "mesh_data.h"
 
@@ -32,30 +30,18 @@ namespace Yttrium
 		: _backend{std::make_unique<NullRenderer>(window)}
 #endif
 	{
-		static const int32_t white_texture_data = -1;
-		_white_texture = _backend->create_texture_2d(*this, { { 1, 1, PixelFormat::Bgra32 }, &white_texture_data }, TextureFlag::NoMipmaps);
-		if (!_white_texture)
-			throw InitializationError("Failed to initialize an internal texture");
-
-		_debug_texture = _backend->create_texture_2d(*this, { { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra32 }, DebugTexture::data }, TextureFlag::NoMipmaps);
-		if (!_debug_texture)
-			throw InitializationError("Failed to initialize an internal texture");
-
-		_program_2d = _backend->create_builtin_program_2d(*this);
-		if (!_program_2d)
-			throw InitializationError("Failed to initialize an internal GPU program");
 	}
 
 	RendererImpl::~RendererImpl() = default;
 
 	std::unique_ptr<RenderProgram> RendererImpl::create_program(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
-		return _backend->create_program(*this, vertex_shader, fragment_shader);
+		return _backend->create_program(vertex_shader, fragment_shader);
 	}
 
 	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
 	{
-		return _backend->create_texture_2d(*this, std::move(image), flags);
+		return _backend->create_texture_2d(std::move(image), flags);
 	}
 
 	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source)

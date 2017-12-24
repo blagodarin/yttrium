@@ -8,12 +8,12 @@
 namespace Yttrium
 {
 	class RectF;
-	class RendererImpl;
+	class RenderBackend;
 
 	class BackendTexture2D : public Texture2D
 	{
 	public:
-		BackendTexture2D(RendererImpl& renderer, const ImageFormat& format, bool has_mipmaps);
+		BackendTexture2D(RenderBackend&, const ImageFormat&, bool has_mipmaps);
 
 		Size size() const noexcept override { return _size; }
 
@@ -21,7 +21,7 @@ namespace Yttrium
 		ImageOrientation orientation() const { return _orientation; }
 
 	protected:
-		RendererImpl& _renderer;
+		RenderBackend& _backend;
 		const Size _size;
 		const ImageOrientation _orientation;
 		const bool _has_mipmaps;

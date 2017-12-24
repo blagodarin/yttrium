@@ -9,7 +9,7 @@ namespace Yttrium
 	class VulkanTexture2D final : public BackendTexture2D
 	{
 	public:
-		VulkanTexture2D(RendererImpl&, VulkanContext&, const ImageFormat&, bool has_mipmaps, VkFormat, const void*);
+		VulkanTexture2D(RenderBackend&, VulkanContext&, const ImageFormat&, bool has_mipmaps, VkFormat, const void*);
 
 		VkDescriptorImageInfo descriptor_image_info() const noexcept;
 

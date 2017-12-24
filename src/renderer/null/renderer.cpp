@@ -5,7 +5,7 @@
 
 namespace Yttrium
 {
-	std::unique_ptr<RenderProgram> NullRenderer::create_program(RendererImpl&, const std::string&, const std::string&)
+	std::unique_ptr<RenderProgram> NullRenderer::create_program(const std::string&, const std::string&)
 	{
 		struct NullProgram : RenderProgram
 		{
@@ -14,10 +14,10 @@ namespace Yttrium
 		return std::make_unique<NullProgram>();
 	}
 
-	std::unique_ptr<Texture2D> NullRenderer::create_texture_2d(RendererImpl& renderer, Image&& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> NullRenderer::create_texture_2d(Image&& image, Flags<RenderManager::TextureFlag> flags)
 	{
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		return std::make_unique<BackendTexture2D>(renderer, image.format(), has_mipmaps);
+		return std::make_unique<BackendTexture2D>(*this, image.format(), has_mipmaps);
 	}
 
 	Image NullRenderer::take_screenshot(const Size& window_size) const

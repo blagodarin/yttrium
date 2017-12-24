@@ -232,14 +232,16 @@ target_sources(yttrium PRIVATE
 	../include/yttrium/renderer/program.h
 	../include/yttrium/renderer/texture.h
 	../include/yttrium/renderer/textured_rect.h
+	renderer/builtin/builtin.h
+	renderer/builtin/builtin.cpp
+	renderer/builtin/debug_texture.cpp
+	renderer/builtin/debug_texture.h
 	renderer/formats/obj.cpp
 	renderer/formats/obj.h
 	renderer/backend.cpp
 	renderer/backend.h
 	renderer/debug_renderer.cpp
 	renderer/debug_renderer.h
-	renderer/debug_texture.cpp
-	renderer/debug_texture.h
 	renderer/material.cpp
 	renderer/material.h
 	renderer/mesh_data.cpp
