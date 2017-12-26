@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.7)
 
 project(yttrium C CXX)
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+option(Y_COTIRE "Enable 'cotire'" OFF)
+if(Y_COTIRE)
+	include(cotire)
+endif()
+
 option(Y_EXAMPLES "Enable examples (also enables tools)" OFF)
 option(Y_EXTRA "Enable extra stuff" OFF)
 option(Y_TESTS "Enable tests" OFF)

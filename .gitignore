@@ -5,6 +5,8 @@
 /CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
+cotire
+*_cotire.cmake
 *.db
 *.dir
 /doc/html

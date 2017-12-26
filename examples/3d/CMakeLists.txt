@@ -11,3 +11,7 @@ if(WIN32)
 	target_link_libraries(3d ywinmain)
 endif()
 set_target_properties(3d PROPERTIES FOLDER "examples")
+
+if(Y_COTIRE)
+	cotire(3d)
+endif()

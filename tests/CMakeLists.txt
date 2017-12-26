@@ -42,3 +42,8 @@ target_link_libraries(unit_tests yttrium ${Boost_LIBRARIES})
 add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
 set_target_properties(unit_tests check PROPERTIES FOLDER "tests")
+
+if(Y_COTIRE)
+	set_source_files_properties(src/main.cpp PROPERTIES COTIRE_EXCLUDED ON)
+	cotire(unit_tests)
+endif()

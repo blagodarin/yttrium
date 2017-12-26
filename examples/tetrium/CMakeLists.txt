@@ -36,3 +36,7 @@ endif()
 add_dependencies(tetrium tetrium_package)
 
 set_target_properties(tetrium tetrium_localization tetrium_package PROPERTIES FOLDER "examples")
+
+if(Y_COTIRE)
+	cotire(tetrium)
+endif()
