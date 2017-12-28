@@ -438,6 +438,7 @@ elseif(WIN32)
 endif()
 
 if(Y_COTIRE)
+	set_target_properties(yttrium PROPERTIES COTIRE_ADD_UNITY_BUILD OFF)
 	if(X11_FOUND)
 		set_target_properties(yttrium PROPERTIES COTIRE_PREFIX_HEADER_IGNORE_PATH "${PROJECT_SOURCE_DIR};${X11_INCLUDE_DIR}")
 	endif()

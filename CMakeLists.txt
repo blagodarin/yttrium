@@ -171,7 +171,7 @@ if(Y_EXTRA)
 endif()
 
 if(Y_TESTS)
-	add_subdirectory(tests)
+	add_subdirectory(tests/unit_tests)
 	if(Y_EXTRA)
 		add_subdirectory(tests/gen_test_data)
 	endif()

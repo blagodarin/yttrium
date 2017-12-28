@@ -39,4 +39,5 @@ set_target_properties(tetrium tetrium_localization tetrium_package PROPERTIES FO
 
 if(Y_COTIRE)
 	cotire(tetrium)
+	add_dependencies(tetrium_unity tetrium_package)
 endif()
