@@ -35,16 +35,8 @@ add_executable(unit_tests
 	vector.cpp
 	)
 target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
-target_compile_definitions(unit_tests PRIVATE _HAS_AUTO_PTR_ETC) # Workaround for Boost 1.64.
-target_include_directories(unit_tests PUBLIC ${Boost_INCLUDE_DIR})
-target_link_libraries(unit_tests yttrium ${Boost_LIBRARIES})
+target_link_libraries(unit_tests PRIVATE yttrium Boost::unit_test_framework)
 
 add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
 set_target_properties(unit_tests check PROPERTIES FOLDER "tests")
-
-if(Y_COTIRE)
-	set_source_files_properties(main.cpp PROPERTIES COTIRE_EXCLUDED ON)
-	set_target_properties(unit_tests PROPERTIES COTIRE_ADD_UNITY_BUILD OFF)
-	cotire(unit_tests)
-endif()

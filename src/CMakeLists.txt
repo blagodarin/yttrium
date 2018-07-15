@@ -12,9 +12,9 @@ set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
 
 # Components.
-option(Y_USE_JPEG "Exclude JPEG support" ON)
-option(Y_USE_OGG_VORBIS "Exclude Ogg Vorbis support" ON)
-option(Y_USE_PNG "Exclude PNG support" ON)
+option(Y_USE_JPEG "Include JPEG support" ON)
+option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
+option(Y_USE_PNG "Include PNG support" ON)
 
 configure_file(config.h.in config.h)
 
@@ -82,7 +82,7 @@ if(ON)
 		audio/openal/sound.h
 		platform/openal.h
 		)
-	target_include_directories(yttrium PRIVATE ${OPENAL_INCLUDE_DIR})
+	target_include_directories(yttrium SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
 	target_link_libraries(yttrium ${OPENAL_LIBRARY})
 endif()
 if(Y_USE_OGG_VORBIS)
@@ -154,7 +154,7 @@ if(Y_USE_JPEG)
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
 		)
-	target_include_directories(yttrium PRIVATE ${JPEG_INCLUDE_DIR})
+	target_include_directories(yttrium SYSTEM PRIVATE ${JPEG_INCLUDE_DIR})
 	target_link_libraries(yttrium ${JPEG_LIBRARIES})
 endif()
 if(Y_USE_PNG)
@@ -162,9 +162,7 @@ if(Y_USE_PNG)
 	target_sources(yttrium PRIVATE
 		image/formats/png.cpp
 		)
-	target_compile_definitions(yttrium PRIVATE ${PNG_DEFINITIONS})
-	target_include_directories(yttrium PRIVATE ${PNG_INCLUDE_DIRS})
-	target_link_libraries(yttrium ${PNG_LIBRARIES})
+	target_link_libraries(yttrium PNG::PNG)
 endif()
 
 ########################################################################################################################
@@ -284,8 +282,7 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/wrappers.cpp
 		renderer/gl/wrappers.h
 		)
-	target_include_directories(yttrium PRIVATE ${OPENGL_INCLUDE_DIR})
-	target_link_libraries(yttrium ${OPENGL_gl_LIBRARY})
+	target_link_libraries(yttrium OpenGL::GL)
 elseif(Y_RENDERER_VULKAN)
 	find_package(Vulkan REQUIRED)
 	add_custom_command(OUTPUT renderer/vulkan/2d_fs.spirv.inc
@@ -324,7 +321,6 @@ elseif(Y_RENDERER_VULKAN)
 		renderer/vulkan/wrappers.cpp
 		renderer/vulkan/wrappers.h
 		)
-	target_include_directories(yttrium PRIVATE ${Vulkan_INCLUDE_DIR})
 	target_link_libraries(yttrium Vulkan::Vulkan)
 else()
 	target_sources(yttrium PRIVATE
@@ -411,7 +407,7 @@ if(UNIX)
 			platform/x11/window.cpp
 			platform/x11/window.h
 			)
-		target_include_directories(yttrium PRIVATE ${X11_INCLUDE_DIR})
+		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium ${X11_X11_LIB})
 	else()
 		# TODO: Use find_package for XCB and libxkbcommon.
@@ -435,12 +431,4 @@ elseif(WIN32)
 			platform/gdi/wgl.h
 			)
 	endif()
-endif()
-
-if(Y_COTIRE)
-	set_target_properties(yttrium PROPERTIES COTIRE_ADD_UNITY_BUILD OFF)
-	if(X11_FOUND)
-		set_target_properties(yttrium PROPERTIES COTIRE_PREFIX_HEADER_IGNORE_PATH "${PROJECT_SOURCE_DIR};${X11_INCLUDE_DIR}")
-	endif()
-	cotire(yttrium)
 endif()

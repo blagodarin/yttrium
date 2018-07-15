@@ -3,7 +3,3 @@ add_executable(gen_test_data
 	)
 target_link_libraries(gen_test_data yttrium)
 set_target_properties(gen_test_data PROPERTIES FOLDER "tests")
-
-if(Y_COTIRE)
-	cotire(gen_test_data)
-endif()

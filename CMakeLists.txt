@@ -2,17 +2,30 @@ cmake_minimum_required(VERSION 3.7)
 
 project(yttrium C CXX)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+set(Boost_USE_STATIC_LIBS OFF)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-option(Y_COTIRE "Enable 'cotire'" OFF)
-if(Y_COTIRE)
-	include(cotire)
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+include(utils)
+
+option(Y_ALL "Build all components" OFF)
+option(Y_EXAMPLES "Build examples (require tools)" OFF)
+option(Y_TESTS "Build tests" OFF)
+option(Y_TOOLS "Build tools" OFF)
+
+if(Y_EXAMPLES AND NOT (Y_ALL OR Y_TOOLS))
+	message(FATAL_ERROR "Y_EXAMPLES require Y_TOOLS")
 endif()
-
-option(Y_EXAMPLES "Enable examples (also enables tools)" OFF)
-option(Y_EXTRA "Enable extra stuff" OFF)
-option(Y_TESTS "Enable tests" OFF)
-option(Y_TOOLS "Enable tools" OFF)
 
 set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
 if(Y_RENDERER STREQUAL "OpenGL")
@@ -23,16 +36,7 @@ else()
 	set(Y_RENDERER_NULL ON)
 endif()
 
-if(Y_EXAMPLES AND NOT Y_TOOLS)
-	message(FATAL_ERROR "Y_EXAMPLES require Y_TOOLS")
-endif()
-
-set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	add_compile_options(-Werror -Weverything
@@ -50,20 +54,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-g)
-
-	option(Y_SANITIZERS "Enable sanitizers" OFF)
-	if(Y_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
-		set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
-	endif()
-
-	option(Y_COVERAGE "Build with coverage analysis support" OFF)
-	if(Y_COVERAGE)
-		add_compile_options(--coverage -O0)
-		set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
-	endif()
-
 	add_compile_options(-Werror -Wall -Wextra
 		-Wconversion
 		-Wdisabled-optimization
@@ -90,15 +80,26 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		-Wunsafe-loop-optimizations
 		#-Wuseless-cast
 		#-Wzero-as-null-pointer-constant
+		-Wno-ignored-qualifiers
+		-Wno-old-style-cast # Triggered by X11 macros.
 		-Wno-unknown-pragmas
 		)
 
+	option(Y_COVERAGE "Build with coverage analysis support" OFF)
+	if(Y_COVERAGE)
+		add_compile_options(--coverage)
+		list(APPEND LINKER_FLAGS --coverage)
+	endif()
+
+	option(Y_SANITIZERS "Enable sanitizers" OFF)
+	if(Y_SANITIZERS)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
+		list(APPEND LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
+	endif()
+
 	option(Y_TRAVIS "Enable Travis CI workarounds" OFF)
-	if(Y_TRAVIS)
-		add_compile_options(-Wno-missing-declarations -Wno-old-style-cast -Wno-sign-compare -Wno-sign-conversion -Wno-suggest-override -Wno-undef) # Warnings triggered by Boost.
-		if(Y_SANITIZERS)
-			set(LINKER_FLAGS "${LINKER_FLAGS} -fuse-ld=gold")
-		endif()
+	if(Y_TRAVIS AND Y_SANITIZERS)
+		list(APPEND LINKER_FLAGS -fuse-ld=gold)
 	endif()
 endif()
 
@@ -109,44 +110,33 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(/D_USE_MATH_DEFINES)
 endif()
 
-message(STATUS "Build flags:")
-get_property(CURRENT_COMPILE_OPTIONS DIRECTORY PROPERTY COMPILE_OPTIONS)
-string(REPLACE ";" " " CURRENT_COMPILE_OPTIONS " ${CURRENT_COMPILE_OPTIONS}")
-message(STATUS "  COMPILER:${CURRENT_COMPILE_OPTIONS}")
-message(STATUS "  LINKER:${LINKER_FLAGS}")
+get_property(DIRECTORY_COMPILE_OPTIONS DIRECTORY PROPERTY COMPILE_OPTIONS)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
+print_list("Compiler flags:" ${DIRECTORY_COMPILE_OPTIONS})
+print_list("Linker flags:" ${LINKER_FLAGS})
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+append_options(CMAKE_EXE_LINKER_FLAGS ${LINKER_FLAGS})
+append_options(CMAKE_MODULE_LINKER_FLAGS ${LINKER_FLAGS})
+append_options(CMAKE_SHARED_LINKER_FLAGS ${LINKER_FLAGS})
 
-include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/3rdparty/include")
-link_directories("${PROJECT_SOURCE_DIR}/3rdparty/lib")
-
-include_directories("${PROJECT_SOURCE_DIR}/include")
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
 endif()
 
-if(Y_TOOLS OR Y_RENDERER_OPENGL)
+if(Y_ALL OR Y_TOOLS OR Y_RENDERER_OPENGL)
 	add_subdirectory(tools/yrc)
 endif()
 
 add_subdirectory(src)
 
-if(Y_TOOLS)
+if(Y_ALL OR Y_TOOLS)
 	add_subdirectory(tools/ypack)
 	add_subdirectory(tools/ytr)
 endif()
 
-if(Y_EXAMPLES)
+if(Y_ALL OR Y_EXAMPLES)
 	if(WIN32)
 		add_subdirectory(ywinmain)
 	endif()
@@ -154,9 +144,14 @@ if(Y_EXAMPLES)
 	add_subdirectory(examples/tetrium)
 endif()
 
-if(Y_EXTRA)
+if(Y_ALL OR Y_TESTS)
+	add_subdirectory(tests/unit_tests)
+endif()
+
+if(Y_ALL)
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/tiny_string_map)
+	add_subdirectory(tests/gen_test_data)
 
 	add_custom_target(cppcheck
 		COMMAND cppcheck --enable=all --quiet
@@ -168,11 +163,4 @@ if(Y_EXTRA)
 			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
 			"${PROJECT_SOURCE_DIR}"
 		VERBATIM)
-endif()
-
-if(Y_TESTS)
-	add_subdirectory(tests/unit_tests)
-	if(Y_EXTRA)
-		add_subdirectory(tests/gen_test_data)
-	endif()
 endif()

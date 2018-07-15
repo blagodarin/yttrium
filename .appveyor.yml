@@ -3,8 +3,8 @@ image: Visual Studio 2017
 shallow_clone: true
 
 environment:
-  BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
-  BOOST_ROOT: C:\Libraries\boost_1_64_0
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.1
+  BOOST_ROOT: C:\Libraries\boost_1_67_0
   PREFIX: C:\projects\prefix
   matrix:
     - RENDERER: Null
@@ -24,33 +24,34 @@ install:
 
   # libjpeg
   - cmd: |
-      appveyor DownloadFile http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/win64/nasm-2.13.01-win64.zip
-      7z x nasm-2.13.01-win64.zip
-      xcopy nasm-2.13.01\nasm.exe %PREFIX%\bin
+      appveyor DownloadFile https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/win64/nasm-2.13.03-win64.zip
+      7z x nasm-2.13.03-win64.zip
+      xcopy nasm-2.13.03\nasm.exe %PREFIX%\bin
+      set ASM=%PREFIX%\bin\nasm.exe
   - cmd: |
-      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.2/libjpeg-turbo-1.5.2.tar.gz
-      7z x libjpeg-turbo-1.5.2.tar.gz
-      7z x libjpeg-turbo-1.5.2.tar
-      cd libjpeg-turbo-1.5.2
-      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.3/libjpeg-turbo-1.5.3.tar.gz
+      7z x libjpeg-turbo-1.5.3.tar.gz
+      7z x libjpeg-turbo-1.5.3.tar
+      cd libjpeg-turbo-1.5.3
+      cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX% -DWITH_TURBOJPEG=OFF
       cmake --build . --config Release --target INSTALL
       cd ..
 
   # libpng
   - cmd: |
-      appveyor DownloadFile http://www.zlib.net/zlib-1.2.11.tar.xz
+      appveyor DownloadFile https://zlib.net/zlib-1.2.11.tar.xz
       7z x zlib-1.2.11.tar.xz
       7z x zlib-1.2.11.tar
       cd zlib-1.2.11
-      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
   - cmd: |
-      appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.32/lpng1632.7z
-      7z x lpng1632.7z
-      cd lpng1632
+      appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.34/lpng1634.7z
+      7z x lpng1634.7z
+      cd lpng1634
       appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
-      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX% -DPNG_TESTS=OFF
       cmake --build . --config Release --target INSTALL
       cd ..
 
@@ -58,22 +59,22 @@ install:
   - cmd: |
       git clone https://git.xiph.org/ogg.git
       cd ogg
-      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
   - cmd: |
       git clone https://git.xiph.org/vorbis.git
       cd vorbis
-      cmake -G"Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
+      cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
       cmake --build . --config Release --target INSTALL
       cd ..
 
   # OpenAL
   - cmd: |
-      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.18.1-bin.zip
-      7z x openal-soft-1.18.1-bin.zip
-      move /y openal-soft-1.18.1-bin\include\AL %PREFIX%\include
-      move /y openal-soft-1.18.1-bin\libs %PREFIX%
+      appveyor DownloadFile http://openal-soft.org/openal-binaries/openal-soft-1.18.2-bin.zip
+      7z x openal-soft-1.18.2-bin.zip
+      move /y openal-soft-1.18.2-bin\include\AL %PREFIX%\include
+      move /y openal-soft-1.18.2-bin\libs %PREFIX%
       appveyor DownloadFile https://openal.org/downloads/oalinst.zip
       7z x oalinst.zip
       oalinst.exe /s
@@ -81,15 +82,17 @@ install:
   # OpenGL
   - cmd: |
       mkdir %PREFIX%\include\GL
+      mkdir %PREFIX%\include\KHR
       appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/glext.h -FileName %PREFIX%\include\GL\glext.h
       appveyor DownloadFile https://khronos.org/registry/OpenGL/api/GL/wglext.h -FileName %PREFIX%\include\GL\wglext.h
+      appveyor DownloadFile https://khronos.org/registry/EGL/api/KHR/khrplatform.h -FileName %PREFIX%\include\KHR\khrplatform.h
 
   - cmd: |
       cd ..
       rmdir /q /s prefix
 
 build_script:
-  - cmd: cmake -G"Visual Studio 15 2017 Win64" . -DY_EXAMPLES=ON -DY_EXTRA=ON -DY_RENDERER=%RENDERER% -DY_TESTS=ON -DY_TOOLS=ON
+  - cmd: cmake -G "Visual Studio 15 2017 Win64" . -DY_ALL=ON -DY_RENDERER=%RENDERER%
   - cmd: cmake --build . --config Release
 
 test_script:
