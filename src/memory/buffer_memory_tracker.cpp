@@ -1,4 +1,3 @@
-#include "../config.h"
 #include "buffer_memory_tracker.h"
 
 #if Y_ENABLE_BUFFER_MEMORY_DEBUGGING

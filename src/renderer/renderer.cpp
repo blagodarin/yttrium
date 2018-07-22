@@ -8,7 +8,6 @@
 #include "formats/obj.h"
 #include "mesh_data.h"
 
-#include "../config.h"
 #if Y_RENDERER_OPENGL
 	#include "gl/renderer.h"
 #elif Y_RENDERER_VULKAN

@@ -3,7 +3,6 @@
 #include <yttrium/utils.h>
 #include "../platform/memory.h"
 
-#include "../config.h"
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
 	#include "buffer_memory_tracker.h"
 #endif

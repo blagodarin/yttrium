@@ -16,7 +16,7 @@ option(Y_USE_JPEG "Include JPEG support" ON)
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
 option(Y_USE_PNG "Include PNG support" ON)
 
-configure_file(config.h.in config.h)
+configure_file(config.h.in ${PROJECT_BINARY_DIR}/src/config.h)
 
 add_library(yttrium SHARED
 	../include/yttrium/api.h
@@ -26,7 +26,6 @@ add_library(yttrium SHARED
 	../include/yttrium/resource_loader.h
 	../include/yttrium/tiny_string_map.h
 	../include/yttrium/translation.h
-	config.h
 	console.cpp
 	globals.cpp
 	resource_loader.cpp
@@ -36,6 +35,8 @@ add_library(yttrium SHARED
 	)
 target_link_libraries(yttrium Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
+include_config(yttrium ${PROJECT_BINARY_DIR}/src/config.h)
+
 if(WIN32)
 	target_sources(yttrium PRIVATE
 		platform/windows/windows.h

@@ -1,7 +1,6 @@
 #ifndef _src_platform_gl_h_
 #define _src_platform_gl_h_
 
-#include "../config.h"
 #if Y_IS_WINDOWS
 	#include "windows/windows.h"
 	#define GLAPI_CALL APIENTRY

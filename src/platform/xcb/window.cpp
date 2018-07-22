@@ -1,6 +1,5 @@
 #include "window.h"
 
-#include "../../config.h"
 #include "../../window/backend.h"
 
 #include <algorithm>

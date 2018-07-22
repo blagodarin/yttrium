@@ -36,6 +36,7 @@ add_executable(unit_tests
 	)
 target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(unit_tests PRIVATE yttrium Boost::unit_test_framework)
+include_config(unit_tests ${PROJECT_BINARY_DIR}/src/config.h)
 
 add_custom_target(check COMMAND unit_tests --log_level=message WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 

@@ -1,7 +1,6 @@
 #ifndef _src_platform_openal_h_
 #define _src_platform_openal_h_
 
-#include "../config.h"
 #if Y_IS_WINDOWS && !defined(AL_APIENTRY)
 	#define AL_APIENTRY __cdecl
 #endif

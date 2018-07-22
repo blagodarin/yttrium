@@ -2,7 +2,6 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../../src/config.h"
 #include "image.h"
 #include "iostream.h"
 

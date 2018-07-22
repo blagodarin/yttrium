@@ -1,4 +1,3 @@
-#include "../../config.h"
 #include "ogg_vorbis.h"
 
 #include <yttrium/exceptions.h>

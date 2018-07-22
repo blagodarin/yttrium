@@ -1,6 +1,3 @@
-#ifndef _src_config_h_
-#define _src_config_h_
-
 // Platforms.
 #cmakedefine01 Y_IS_LINUX
 #cmakedefine01 Y_IS_POSIX
@@ -19,5 +16,3 @@
 #cmakedefine01 Y_USE_JPEG
 #cmakedefine01 Y_USE_OGG_VORBIS
 #cmakedefine01 Y_USE_PNG
-
-#endif

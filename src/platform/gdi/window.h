@@ -4,7 +4,6 @@
 #include <yttrium/math/size.h>
 #include "../windows/windows.h"
 
-#include "../../config.h"
 #if Y_RENDERER_OPENGL
 	#include "wgl.h"
 #endif

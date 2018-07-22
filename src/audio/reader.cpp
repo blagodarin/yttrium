@@ -4,7 +4,6 @@
 #include "../utils/fourcc.h"
 #include "formats/wav.h"
 
-#include "../config.h"
 #if Y_USE_OGG_VORBIS
 	#include "formats/ogg_vorbis.h"
 #endif
