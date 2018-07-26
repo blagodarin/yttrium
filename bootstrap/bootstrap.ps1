@@ -2,7 +2,9 @@ Param(
   [String]$prefix,
   [Switch]$all,
   [Switch]$libjpeg,
+  [Switch]$libogg,
   [Switch]$libpng,
+  [Switch]$libvorbis,
   [Switch]$nasm,
   [Switch]$openal,
   [Switch]$opengl,
@@ -12,11 +14,15 @@ Param(
 # Reverse dependencies.
 $build = @{}
 $build.libjpeg = $libjpeg -or $all
+$build.libogg = $libogg -or $all -or $libvorbis
 $build.libpng = $libpng -or $all
+$build.libvorbis = $libvorbis -or $all
 $build.nasm = $nasm -or $all -or $libjpeg -or $libpng
 $build.openal = $openal -or $all
 $build.opengl = $opengl -or $all
 $build.zlib = $zlib -or $all -or $libpng
+
+$cmake_generator = "Visual Studio 15 2017 Win64"
 
 Import-Module BitsTransfer
 
@@ -64,7 +70,7 @@ If ($build.libjpeg) {
   Remove-Item -Path "libjpeg-turbo-1.5.3" -Recurse -Force
   & $7z x "libjpeg-turbo-1.5.3.tar" | Out-Null
   Push-Location -Path "libjpeg-turbo-1.5.3"
-  cmake -G "Visual Studio 15 2017 Win64" . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DWITH_TURBOJPEG=OFF
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DWITH_TURBOJPEG=OFF
   cmake --build . --config Release --target INSTALL
   Pop-Location
 }
@@ -93,7 +99,7 @@ If ($build.zlib) {
   Remove-Item -Path "zlib-1.2.11" -Recurse -Force
   & $7z x "zlib-1.2.11.tar" | Out-Null
   Push-Location -Path "zlib-1.2.11"
-  cmake -G "Visual Studio 15 2017 Win64" . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DSKIP_INSTALL_FILES=ON
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DSKIP_INSTALL_FILES=ON
   cmake --build . --config Release --target INSTALL
   Pop-Location
 }
@@ -104,7 +110,25 @@ If ($build.libpng) {
   Remove-Item -Path "libpng-1.6.35" -Recurse -Force
   & $7z x "libpng-1.6.35.tar" | Out-Null
   Push-Location -Path "libpng-1.6.35"
-  cmake -G "Visual Studio 15 2017 Win64" . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON
+  cmake --build . --config Release --target INSTALL
+  Pop-Location
+}
+
+If ($build.libogg) {
+  Remove-Item -Path "ogg" -Recurse -Force
+  git clone https://git.xiph.org/ogg.git
+  Push-Location -Path "ogg"
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)"
+  cmake --build . --config Release --target INSTALL
+  Pop-Location
+}
+
+If ($build.libvorbis) {
+  Remove-Item -Path "vorbis" -Recurse -Force
+  git clone https://git.xiph.org/vorbis.git
+  Push-Location -Path "vorbis"
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" "-DOGG_ROOT=$($prefix)"
   cmake --build . --config Release --target INSTALL
   Pop-Location
 }
