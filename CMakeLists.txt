@@ -158,7 +158,6 @@ if(Y_ALL)
 			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError
 			-I "${PROJECT_SOURCE_DIR}/include"
 			-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
-			-i "${PROJECT_SOURCE_DIR}/3rdparty"
 			"--relative-paths=${PROJECT_SOURCE_DIR}"
 			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
 			"${PROJECT_SOURCE_DIR}"

@@ -74,18 +74,18 @@ before_install:
   - if [ -n "${GCC_VERSION}" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
 
 install:
-  - mkdir ${TRAVIS_BUILD_DIR}/3rdparty/include
-  - mkdir ${TRAVIS_BUILD_DIR}/travis
+  - mkdir ${TRAVIS_BUILD_DIR}/_3rdparty
+  - mkdir ${TRAVIS_BUILD_DIR}/_prefix
 
-  - mkdir ${TRAVIS_BUILD_DIR}/travis/cmake && pushd ${TRAVIS_BUILD_DIR}/travis/cmake
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.11/cmake-3.11.4-Linux-x86_64.tar.gz | tar -xz --strip-components 1
+  - mkdir ${TRAVIS_BUILD_DIR}/_3rdparty/cmake && pushd ${TRAVIS_BUILD_DIR}/_3rdparty/cmake
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.11/cmake-3.11.4-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
   - export PATH=$(pwd)/bin:${PATH}
   - popd
 
   - if [ -n "${CLANG_VERSION}" ]; then mkdir -p ${TRAVIS_BUILD_DIR}/libcxx/include/c++/v1 ${TRAVIS_BUILD_DIR}/libcxx/lib; fi
   - if [ -n "${CLANG_VERSION}" ]; then export CPLUS_INCLUDE_PATH=${TRAVIS_BUILD_DIR}/libcxx/include/c++/v1:${CPLUS_INCLUDE_PATH}; fi
   - if [ -n "${CLANG_VERSION}" ]; then export LIBRARY_PATH=${TRAVIS_BUILD_DIR}/libcxx/lib:${LIBRARY_PATH}; fi
-  - if [ -n "${CLANG_VERSION}" ]; then pushd ${TRAVIS_BUILD_DIR}/travis; fi
+  - if [ -n "${CLANG_VERSION}" ]; then pushd ${TRAVIS_BUILD_DIR}/_3rdparty; fi
   - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/llvm/tags/RELEASE_601/final/ llvm; fi
   - if [ -n "${CLANG_VERSION}" ]; then cd llvm/projects; fi
   - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/tags/RELEASE_601/final/ libcxx; fi
@@ -97,33 +97,35 @@ install:
   - if [ -n "${CLANG_VERSION}" ]; then make install-libcxx install-libcxxabi; fi
   - if [ -n "${CLANG_VERSION}" ]; then popd; fi
 
-  - mkdir ${TRAVIS_BUILD_DIR}/travis/boost && pushd ${TRAVIS_BUILD_DIR}/travis/boost
-  - wget -q -O - https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 | tar -xj --strip-components 1
+  - mkdir ${TRAVIS_BUILD_DIR}/_3rdparty/boost && pushd ${TRAVIS_BUILD_DIR}/_3rdparty/boost
+  - wget -q -O - https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 | tar -x --bzip2 --strip-components 1
   - ./bootstrap.sh
-  - ./b2 -j2 --with-test toolset=gcc cxxflags="-Wno-variadic-macros"
+  - ./b2 -j2 --with-test cxxflags="-Wno-variadic-macros" toolset=gcc variant=debug
   - CMAKE_OPTIONS+=" -DBOOST_ROOT=$(pwd)"
   - popd
 
   - if [ "${RENDERER}" = "Vulkan" ]; then git clone --branch sdk-1.0.65 https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/vulkan -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/_prefix -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then cd dbuild; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then export VULKAN_SDK=${TRAVIS_BUILD_DIR}/vulkan; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
 
-script:
-  - if [ "${RENDERER}" = "Vulkan" ]; then pushd ${TRAVIS_BUILD_DIR}/3rdparty/glslang; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then cmake . -DCMAKE_INSTALL_PREFIX=$(cd ..; pwd) -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then mkdir ${TRAVIS_BUILD_DIR}/_3rdparty/glslang && pushd ${TRAVIS_BUILD_DIR}/_3rdparty/glslang; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then wget -q -O - https://github.com/KhronosGroup/glslang/archive/6.2.2596.tar.gz | tar -x --gzip --strip-components 1; fi
+  - if [ "${RENDERER}" = "Vulkan" ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/_prefix -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_NV_EXTENSIONS=OFF; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
 
+script:
+  - mkdir _build && pushd _build
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_ALL=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_COVERAGE=ON -DY_TESTS=ON"; fi
-  - cmake . $CMAKE_OPTIONS -DY_RENDERER=$RENDERER
+  - cmake .. -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/_prefix $CMAKE_OPTIONS -DY_RENDERER=$RENDERER
   - cmake --build . -- -j2
   - cmake --build . --target check
+  - popd
 
 after_success:
   - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x $GCOV -a "-s `pwd`"; fi
