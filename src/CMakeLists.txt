@@ -255,20 +255,8 @@ target_sources(yttrium PRIVATE
 	)
 if(Y_RENDERER_OPENGL)
 	find_package(OpenGL REQUIRED)
-	add_custom_command(OUTPUT renderer/gl/2d_fs.glsl.inc
-		COMMAND yrc --string 2d_fs.glsl 2d_fs.glsl.inc
-		MAIN_DEPENDENCY renderer/gl/2d_fs.glsl DEPENDS yrc
-		WORKING_DIRECTORY renderer/gl
-		VERBATIM)
-	add_custom_command(OUTPUT renderer/gl/2d_vs.glsl.inc
-		COMMAND yrc --string 2d_vs.glsl 2d_vs.glsl.inc
-		MAIN_DEPENDENCY renderer/gl/2d_vs.glsl DEPENDS yrc
-		WORKING_DIRECTORY renderer/gl
-		VERBATIM)
 	target_sources(yttrium PRIVATE
 		platform/gl.h
-		renderer/gl/2d_fs.glsl.inc
-		renderer/gl/2d_vs.glsl.inc
 		renderer/gl/api.h
 		renderer/gl/gl.cpp
 		renderer/gl/gl.h
@@ -283,22 +271,14 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/wrappers.cpp
 		renderer/gl/wrappers.h
 		)
+	add_yrc_sources(yttrium
+		renderer/gl/2d_fs.glsl
+		renderer/gl/2d_vs.glsl
+		)
 	target_link_libraries(yttrium OpenGL::GL)
 elseif(Y_RENDERER_VULKAN)
 	find_package(Vulkan REQUIRED)
-	add_custom_command(OUTPUT renderer/vulkan/2d_fs.spirv.inc
-		COMMAND yglslc --fragment 2d_fs.glsl 2d_fs.spirv.inc
-		MAIN_DEPENDENCY renderer/vulkan/2d_fs.glsl DEPENDS yglslc
-		WORKING_DIRECTORY renderer/vulkan
-		VERBATIM)
-	add_custom_command(OUTPUT renderer/vulkan/2d_vs.spirv.inc
-		COMMAND yglslc --vertex 2d_vs.glsl 2d_vs.spirv.inc
-		MAIN_DEPENDENCY renderer/vulkan/2d_vs.glsl DEPENDS yglslc
-		WORKING_DIRECTORY renderer/vulkan
-		VERBATIM)
 	target_sources(yttrium PRIVATE
-		renderer/vulkan/2d_fs.spirv.inc
-		renderer/vulkan/2d_vs.spirv.inc
 		renderer/vulkan/buffer.cpp
 		renderer/vulkan/buffer.h
 		renderer/vulkan/context.cpp
@@ -321,6 +301,10 @@ elseif(Y_RENDERER_VULKAN)
 		renderer/vulkan/texture.h
 		renderer/vulkan/wrappers.cpp
 		renderer/vulkan/wrappers.h
+		)
+	add_yglslc_sources(yttrium
+		FRAGMENT renderer/vulkan/2d_fs.glsl
+		VERTEX renderer/vulkan/2d_vs.glsl
 		)
 	target_link_libraries(yttrium Vulkan::Vulkan)
 else()

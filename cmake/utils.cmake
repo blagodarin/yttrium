@@ -1,3 +1,52 @@
+function(add_yglslc_sources _target)
+	if(NOT TARGET ${_target})
+		message(SEND_ERROR "'${_target}' is not a target")
+		return()
+	endif()
+	set(_multi_value_args FRAGMENT VERTEX)
+	cmake_parse_arguments(_args "" "" "${_multi_value_args}" ${ARGN})
+	get_target_property(_binary_dir ${_target} BINARY_DIR)
+	get_target_property(_source_dir ${_target} SOURCE_DIR)
+	foreach(_source ${_args_FRAGMENT})
+		get_filename_component(_source_name ${_source} NAME)
+		set(_output ${_source_name}.spirv.inc)
+		add_custom_command(OUTPUT ${_binary_dir}/${_output}
+			COMMAND yglslc --fragment ${_source_dir}/${_source} ${_output}
+			MAIN_DEPENDENCY ${_source} DEPENDS yglslc
+			VERBATIM)
+		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
+	endforeach()
+	foreach(_source ${_args_VERTEX})
+		get_filename_component(_source_name ${_source} NAME)
+		set(_output ${_source_name}.spirv.inc)
+		add_custom_command(OUTPUT ${_binary_dir}/${_output}
+			COMMAND yglslc --vertex ${_source_dir}/${_source} ${_output}
+			MAIN_DEPENDENCY ${_source} DEPENDS yglslc
+			VERBATIM)
+		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
+	endforeach()
+	target_include_directories(${_target} PRIVATE ${_binary_dir})
+endfunction()
+
+function(add_yrc_sources _target)
+	if(NOT TARGET ${_target})
+		message(SEND_ERROR "'${_target}' is not a target")
+		return()
+	endif()
+	get_target_property(_binary_dir ${_target} BINARY_DIR)
+	get_target_property(_source_dir ${_target} SOURCE_DIR)
+	foreach(_source ${ARGN})
+		get_filename_component(_source_name ${_source} NAME)
+		set(_output ${_source_name}.inc)
+		add_custom_command(OUTPUT ${_binary_dir}/${_output}
+			COMMAND yrc --string ${_source_dir}/${_source} ${_output}
+			MAIN_DEPENDENCY ${_source} DEPENDS yrc
+			VERBATIM)
+		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
+	endforeach()
+	target_include_directories(${_target} PRIVATE ${_binary_dir})
+endfunction()
+
 function(append_options _variable)
 	string(REPLACE ";" " " _value "${ARGN}")
 	if(NOT "${${_variable}}" STREQUAL "")
