@@ -364,7 +364,7 @@ namespace Yttrium
 			if (p != end && *p == ':')
 			{
 				int seconds = 0;
-				for (++p; *p >= '0' && *p <= '9'; ++p)
+				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
 					seconds = seconds * 10 + *p - '0';
 				result = result * 60 + seconds;
 			}
@@ -374,7 +374,7 @@ namespace Yttrium
 			if (p != end && *p == '.')
 			{
 				int multiplier = 100;
-				for (++p; *p >= '0' && *p <= '9'; ++p)
+				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
 				{
 					result += (*p - '0') * multiplier;
 					multiplier /= 10;

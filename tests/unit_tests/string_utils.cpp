@@ -249,7 +249,13 @@ BOOST_AUTO_TEST_CASE(test_string_to_number_double)
 
 BOOST_AUTO_TEST_CASE(test_string_to_time)
 {
-	using namespace Yttrium::strings;
+	// Helps sanitizer to catch out-of-bounds errors.
+	const auto to_time = [](std::string_view text)
+	{
+		const auto copy = std::make_unique<char[]>(text.size());
+		std::memcpy(copy.get(), text.data(), text.size());
+		return Yttrium::strings::to_time({copy.get(), text.size()});
+	};
 
 	BOOST_CHECK_EQUAL(to_time("1"), 1'000);
 	BOOST_CHECK_EQUAL(to_time("1:2"), 62'000);
