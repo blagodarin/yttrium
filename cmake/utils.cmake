@@ -4,10 +4,10 @@ function(add_yglslc_sources _target)
 		return()
 	endif()
 	set(_multi_value_args FRAGMENT VERTEX)
-	cmake_parse_arguments(_args "" "" "${_multi_value_args}" ${ARGN})
+	cmake_parse_arguments(_arg "" "" "${_multi_value_args}" ${ARGN})
 	get_target_property(_binary_dir ${_target} BINARY_DIR)
 	get_target_property(_source_dir ${_target} SOURCE_DIR)
-	foreach(_source ${_args_FRAGMENT})
+	foreach(_source ${_arg_FRAGMENT})
 		get_filename_component(_source_name ${_source} NAME)
 		set(_output ${_source_name}.spirv.inc)
 		add_custom_command(OUTPUT ${_binary_dir}/${_output}
@@ -16,7 +16,7 @@ function(add_yglslc_sources _target)
 			VERBATIM)
 		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
 	endforeach()
-	foreach(_source ${_args_VERTEX})
+	foreach(_source ${_arg_VERTEX})
 		get_filename_component(_source_name ${_source} NAME)
 		set(_output ${_source_name}.spirv.inc)
 		add_custom_command(OUTPUT ${_binary_dir}/${_output}
@@ -26,6 +26,21 @@ function(add_yglslc_sources _target)
 		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
 	endforeach()
 	target_include_directories(${_target} PRIVATE ${_binary_dir})
+endfunction()
+
+function(add_ypack_target _target)
+	set(_one_value_args OUTPUT INDEX)
+	set(_multi_value_args DEPENDS)
+	cmake_parse_arguments(_arg "" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
+	file(RELATIVE_PATH _output ${CMAKE_CURRENT_BINARY_DIR} ${_arg_OUTPUT})
+	add_custom_target(${_target}
+		ypack ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX} ${_output}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX}
+		BYPRODUCTS ${_arg_OUTPUT}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMENT "Generating ${_output}"
+		VERBATIM)
+	add_dependencies(${_target} ${_arg_DEPENDS})
 endfunction()
 
 function(add_yrc_sources _target)

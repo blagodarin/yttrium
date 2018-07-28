@@ -8,15 +8,10 @@ add_custom_target(tetrium_localization
 	)
 
 # Package.
-add_custom_target(tetrium_package
-	ypack examples/tetrium/data/index.txt tetrium.ypq
-	BYPRODUCTS "${PROJECT_SOURCE_DIR}/tetrium.ypq"
-	COMMENT "Generating tetrium.ypq"
-	DEPENDS "${PROJECT_SOURCE_DIR}/examples/tetrium/data/index.txt"
-	VERBATIM
-	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-	)
-add_dependencies(tetrium_package tetrium_localization)
+add_ypack_target(tetrium_package
+	OUTPUT ${PROJECT_BINARY_DIR}/tetrium.ypq
+	INDEX data/index.txt
+	DEPENDS tetrium_localization)
 
 # Executable.
 add_executable(tetrium WIN32
