@@ -5,7 +5,6 @@ shallow_clone: true
 environment:
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.1
   BOOST_ROOT: C:\Libraries\boost_1_67_0
-  PREFIX: C:\projects\prefix
   matrix:
     - RENDERER: Null
     - RENDERER: OpenGL
@@ -16,11 +15,11 @@ install:
       dir /a:d /b %BOOST_ROOT%
 
   - cmd: |
+      set PREFIX=%APPVEYOR_BUILD_FOLDER%\_prefix
       mkdir %PREFIX%
       mkdir %PREFIX%\bin
-      set PATH=%PATH%;%PREFIX%;%PREFIX%\bin;%BOOST_LIBRARYDIR%
-      mkdir prefix
-      cd prefix
+      mkdir _3rdparty
+      cd _3rdparty
 
   # libjpeg
   - cmd: |
@@ -89,11 +88,15 @@ install:
 
   - cmd: |
       cd ..
-      rmdir /q /s prefix
 
 build_script:
-  - cmd: cmake -G "Visual Studio 15 2017 Win64" . -DY_ALL=ON -DY_RENDERER=%RENDERER%
-  - cmd: cmake --build . --config Release
+  - cmd: |
+      mkdir _build && cd _build
+      cmake -G "Visual Studio 15 2017 Win64" .. -DCMAKE_PREFIX_PATH=%PREFIX% -DY_ALL=ON -DY_RENDERER=%RENDERER%
+      set PATH=%PATH%;%PREFIX%\bin
+      cmake --build . --config Release
 
 test_script:
-  - cmd: cmake --build . --config Release --target check
+  - cmd: |
+      set PATH=%PATH%;%BOOST_LIBRARYDIR%
+      cmake --build . --config Release --target check
