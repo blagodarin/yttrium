@@ -33,7 +33,7 @@ install:
       7z x libjpeg-turbo-1.5.3.tar
       cd libjpeg-turbo-1.5.3
       cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX% -DWITH_TURBOJPEG=OFF
-      cmake --build . --config Release --target INSTALL
+      cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
       cd ..
 
   # libpng
@@ -43,7 +43,7 @@ install:
       7z x zlib-1.2.11.tar
       cd zlib-1.2.11
       cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
-      cmake --build . --config Release --target INSTALL
+      cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
       cd ..
   - cmd: |
       appveyor DownloadFile https://downloads.sourceforge.net/project/libpng/libpng16/1.6.34/lpng1634.7z
@@ -51,7 +51,7 @@ install:
       cd lpng1634
       appveyor DownloadFile https://raw.githubusercontent.com/glennrp/libpng/libpng16/pngusr.dfa
       cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX% -DPNG_TESTS=OFF
-      cmake --build . --config Release --target INSTALL
+      cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
       cd ..
 
   # Ogg Vorbis
@@ -59,13 +59,13 @@ install:
       git clone https://git.xiph.org/ogg.git
       cd ogg
       cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
-      cmake --build . --config Release --target INSTALL
+      cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
       cd ..
   - cmd: |
       git clone https://git.xiph.org/vorbis.git
       cd vorbis
       cmake -G "Visual Studio 15 2017 Win64" . -DCMAKE_INSTALL_PREFIX=%PREFIX%
-      cmake --build . --config Release --target INSTALL
+      cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
       cd ..
 
   # OpenAL
@@ -94,9 +94,9 @@ build_script:
       mkdir _build && cd _build
       cmake -G "Visual Studio 15 2017 Win64" .. -DCMAKE_PREFIX_PATH=%PREFIX% -DY_ALL=ON -DY_RENDERER=%RENDERER%
       set PATH=%PATH%;%PREFIX%\bin
-      cmake --build . --config Release
+      cmake --build . --config Release -- /nologo /verbosity:minimal
 
 test_script:
   - cmd: |
       set PATH=%PATH%;%BOOST_LIBRARYDIR%
-      cmake --build . --config Release --target check
+      cmake --build . --config Release --target check -- /nologo /verbosity:minimal

@@ -16,10 +16,10 @@ void run_tiny(const T& map, const std::string& name)
 		const auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < 25'000'000; ++i)
 		{
-			map.find("vwxyz01");
-			map.find("abcdefg");
-			map.find("opqrstu");
-			map.find("hijklmn");
+			std::ignore = map.find("vwxyz01");
+			std::ignore = map.find("abcdefg");
+			std::ignore = map.find("opqrstu");
+			std::ignore = map.find("hijklmn");
 		}
 		const auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t0).count();
 		std::cerr << "\tDuration: " << dt << " ms\n\n";
@@ -29,10 +29,10 @@ void run_tiny(const T& map, const std::string& name)
 		const auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < 25'000'000; ++i)
 		{
-			map.find("ABCDEFG");
-			map.find("HIJKLMN");
-			map.find("OPQRSTU");
-			map.find("VWXYZ01");
+			std::ignore = map.find("ABCDEFG");
+			std::ignore = map.find("HIJKLMN");
+			std::ignore = map.find("OPQRSTU");
+			std::ignore = map.find("VWXYZ01");
 		}
 		const auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t0).count();
 		std::cerr << "\tDuration: " << dt << " ms\n\n";
@@ -42,10 +42,10 @@ void run_tiny(const T& map, const std::string& name)
 		const auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < 25'000'000; ++i)
 		{
-			map.find("vwxyz02");
-			map.find("abcdefG");
-			map.find("opqrstU");
-			map.find("hijklmN");
+			std::ignore = map.find("vwxyz02");
+			std::ignore = map.find("abcdefG");
+			std::ignore = map.find("opqrstU");
+			std::ignore = map.find("hijklmN");
 		}
 		const auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t0).count();
 		std::cerr << "\tDuration: " << dt << " ms\n\n";
@@ -60,14 +60,14 @@ void run_small(const T& map, const std::string& name)
 		const auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < 12'500'000; ++i)
 		{
-			map.find("VWXYZ01");
-			map.find("abcdefg");
-			map.find("ABCDEFG");
-			map.find("vwxyz01");
-			map.find("OPQRSTU");
-			map.find("hijklmn");
-			map.find("HIJKLMN");
-			map.find("opqrstu");
+			std::ignore = map.find("VWXYZ01");
+			std::ignore = map.find("abcdefg");
+			std::ignore = map.find("ABCDEFG");
+			std::ignore = map.find("vwxyz01");
+			std::ignore = map.find("OPQRSTU");
+			std::ignore = map.find("hijklmn");
+			std::ignore = map.find("HIJKLMN");
+			std::ignore = map.find("opqrstu");
 		}
 		const auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t0).count();
 		std::cerr << "\tDuration: " << dt << " ms\n\n";
@@ -77,14 +77,14 @@ void run_small(const T& map, const std::string& name)
 		const auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < 12'500'000; ++i)
 		{
-			map.find("1234567");
-			map.find("qwertyu");
-			map.find("sdfghjk");
-			map.find("zxcvbnm");
-			map.find("mnbvcxz");
-			map.find("kjhgfds");
-			map.find("uytrewq");
-			map.find("7654321");
+			std::ignore = map.find("1234567");
+			std::ignore = map.find("qwertyu");
+			std::ignore = map.find("sdfghjk");
+			std::ignore = map.find("zxcvbnm");
+			std::ignore = map.find("mnbvcxz");
+			std::ignore = map.find("kjhgfds");
+			std::ignore = map.find("uytrewq");
+			std::ignore = map.find("7654321");
 		}
 		const auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t0).count();
 		std::cerr << "\tDuration: " << dt << " ms\n\n";
@@ -94,14 +94,14 @@ void run_small(const T& map, const std::string& name)
 		const auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < 12'500'000; ++i)
 		{
-			map.find("VWXYZ02");
-			map.find("abcdefG");
-			map.find("ABCDEFg");
-			map.find("vwxyz02");
-			map.find("OPQRSTu");
-			map.find("hijklmN");
-			map.find("HIJKLMn");
-			map.find("opqrstU");
+			std::ignore = map.find("VWXYZ02");
+			std::ignore = map.find("abcdefG");
+			std::ignore = map.find("ABCDEFg");
+			std::ignore = map.find("vwxyz02");
+			std::ignore = map.find("OPQRSTu");
+			std::ignore = map.find("hijklmN");
+			std::ignore = map.find("HIJKLMn");
+			std::ignore = map.find("opqrstU");
 		}
 		const auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t0).count();
 		std::cerr << "\tDuration: " << dt << " ms\n\n";
