@@ -26,8 +26,6 @@ $cmake_generator = "Visual Studio 15 2017 Win64"
 
 Import-Module BitsTransfer
 
-$7z = "$((Get-ItemProperty -Path HKLM:SOFTWARE\7-Zip -Name Path).Path)7z.exe"
-
 Function Y-Directory([String] $path) {
   If (-Not (Test-Path -Path $path)) {
     New-Item -ItemType "directory" -Name "$($prefix)/bin" -Force | Out-Null
@@ -66,9 +64,8 @@ If ($build.nasm) {
 
 If ($build.libjpeg) {
   Y-Download "https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.3/libjpeg-turbo-1.5.3.tar.gz"
-  & $7z x -y "libjpeg-turbo-1.5.3.tar.gz" | Out-Null
   Remove-Item -Path "libjpeg-turbo-1.5.3" -Recurse -Force
-  & $7z x "libjpeg-turbo-1.5.3.tar" | Out-Null
+  cmake -E tar xz "libjpeg-turbo-1.5.3.tar.gz"
   Push-Location -Path "libjpeg-turbo-1.5.3"
   cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DWITH_TURBOJPEG=OFF
   cmake --build . --config Release --target INSTALL
@@ -95,9 +92,8 @@ If ($build.opengl) {
 
 If ($build.zlib) {
   Y-Download "https://zlib.net/zlib-1.2.11.tar.xz"
-  & $7z x -y "zlib-1.2.11.tar.xz" | Out-Null
   Remove-Item -Path "zlib-1.2.11" -Recurse -Force
-  & $7z x "zlib-1.2.11.tar" | Out-Null
+  cmake -E tar xJ "zlib-1.2.11.tar.xz"
   Push-Location -Path "zlib-1.2.11"
   cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DSKIP_INSTALL_FILES=ON
   cmake --build . --config Release --target INSTALL
@@ -106,9 +102,8 @@ If ($build.zlib) {
 
 If ($build.libpng) {
   Y-Download "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.35/libpng-1.6.35.tar.xz"
-  & $7z x -y "libpng-1.6.35.tar.xz" | Out-Null
   Remove-Item -Path "libpng-1.6.35" -Recurse -Force
-  & $7z x "libpng-1.6.35.tar" | Out-Null
+  cmake -E tar xJ "libpng-1.6.35.tar.xz"
   Push-Location -Path "libpng-1.6.35"
   cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON
   cmake --build . --config Release --target INSTALL
