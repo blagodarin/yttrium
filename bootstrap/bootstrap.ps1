@@ -1,6 +1,7 @@
 Param(
   [String]$prefix,
   [Switch]$all,
+  [Switch]$only,
   [Switch]$libjpeg,
   [Switch]$libogg,
   [Switch]$libpng,
@@ -12,25 +13,19 @@ Param(
 )
 
 # Reverse dependencies.
-$build = @{}
-$build.libjpeg = $libjpeg -or $all
-$build.libogg = $libogg -or $all -or $libvorbis
-$build.libpng = $libpng -or $all
-$build.libvorbis = $libvorbis -or $all
-$build.nasm = $nasm -or $all -or $libjpeg -or $libpng
-$build.openal = $openal -or $all
-$build.opengl = $opengl -or $all
-$build.zlib = $zlib -or $all -or $libpng
+$build           = @{}
+$build.libogg    = $all -Or $libogg
+$build.nasm      = $all -Or $nasm
+$build.openal    = $all -Or $openal
+$build.opengl    = $all -Or $opengl
+$build.zlib      = $all -Or $zlib
+$build.libjpeg   = $all -Or $libjpeg   -Or (-Not $only -And ($build.nasm))
+$build.libpng    = $all -Or $libpng    -Or (-Not $only -And ($build.nasm -Or $build.zlib))
+$build.libvorbis = $all -Or $libvorbis -Or (-Not $only -And ($build.libogg))
 
 $cmake_generator = "Visual Studio 15 2017 Win64"
 
 Import-Module BitsTransfer
-
-Function Y-Directory([String] $path) {
-  If (-Not (Test-Path -Path $path)) {
-    New-Item -ItemType "directory" -Name "$($prefix)/bin" -Force | Out-Null
-  }
-}
 
 Function Y-Download([String] $url) {
   $name = $url.Substring($url.LastIndexOf('/') + 1)
@@ -48,31 +43,43 @@ Function Y-Extract([String] $archive, [String] $dir) {
   Expand-Archive -Path $archive -DestinationPath "."
 }
 
+Function Y-RemoveDirectory([String] $path) {
+  If (Test-Path -Path $path) {
+    Remove-Item -Path $path -Recurse -Force
+  }
+}
+
+Function Y-Report([String] $package) {
+  Write-Host "*** Getting $($package) ***"
+}
+
 New-Item -ItemType "directory" -Name $prefix -Force | Out-Null
 Push-Location -Path $prefix
 $prefix = Get-Location
-New-Item -ItemType "directory" -Name "tmp" -Force | Out-Null
+New-Item -ItemType "directory" -Path $prefix -Name "tmp" -Force | Out-Null
 Push-Location -Path "tmp"
 
-If ($build.nasm) {
-  Y-Download "http://www.nasm.us/pub/nasm/releasebuilds/2.13.01/win64/nasm-2.13.01-win64.zip"
-  Y-Extract "nasm-2.13.01-win64.zip" "nasm-2.13.01"
-  Y-Directory "$($prefix)/bin"
-  Copy-Item -Path "nasm-2.13.01/nasm.exe" -Destination "$($prefix)/bin"
-  $env:ASM = "$($prefix)/bin/nasm.exe"
-}
-
-If ($build.libjpeg) {
-  Y-Download "https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.3/libjpeg-turbo-1.5.3.tar.gz"
-  Remove-Item -Path "libjpeg-turbo-1.5.3" -Recurse -Force
-  cmake -E tar xz "libjpeg-turbo-1.5.3.tar.gz"
-  Push-Location -Path "libjpeg-turbo-1.5.3"
-  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DWITH_TURBOJPEG=OFF
-  cmake --build . --config Release --target INSTALL
+If ($build.libogg) {
+  Y-Report "libogg"
+  Y-RemoveDirectory "ogg"
+  git clone https://git.xiph.org/ogg.git
+  Push-Location -Path "ogg"
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)"
+  cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
   Pop-Location
 }
 
+If ($build.nasm) {
+  Y-Report "nasm"
+  Y-Download "https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/win64/nasm-2.13.03-win64.zip"
+  Y-Extract "nasm-2.13.03-win64.zip" "nasm-2.13.03"
+  New-Item -ItemType "directory" -Path $prefix -Name "bin" -Force | Out-Null
+  Copy-Item -Path "nasm-2.13.03/nasm.exe" -Destination "$($prefix)/bin"
+  $env:ASM = "$($prefix)/bin/nasm.exe"
+}
+
 If ($build.openal) {
+  Y-Report "openal"
   Y-Download "http://openal-soft.org/openal-binaries/openal-soft-1.18.2-bin.zip"
   Y-Extract "openal-soft-1.18.2-bin.zip" "openal-soft-1.18.2-bin"
   Copy-Item -Path "openal-soft-1.18.2-bin/include" -Destination "$($prefix)" -Recurse -Force
@@ -83,48 +90,55 @@ If ($build.openal) {
 }
 
 If ($build.opengl) {
-  New-Item -ItemType "directory" -Name "$($prefix)/include/GL" | Out-Null
-  Y-Download-To "https://khronos.org/registry/OpenGL/api/GL/glext.h" "$($prefix)/include/GL"
-  Y-Download-To "https://khronos.org/registry/OpenGL/api/GL/wglext.h" "$($prefix)/include/GL"
-  New-Item -ItemType "directory" -Name "$($prefix)/include/KHR" | Out-Null
+  Y-Report "opengl"
+  New-Item -ItemType "directory" -Path $prefix -Name "include" -Force | Out-Null
+  New-Item -ItemType "directory" -Path "$($prefix)/include" -Name "GL" -Force | Out-Null
+  Y-Download-To "https://khronos.org/registry/OpenGL/api/GL/glext.h" "$($prefix)\include\GL"
+  Y-Download-To "https://khronos.org/registry/OpenGL/api/GL/wglext.h" "$($prefix)\include\GL"
+  New-Item -ItemType "directory"-Path "$($prefix)/include" -Name "KHR" -Force | Out-Null
   Y-Download-To "https://khronos.org/registry/EGL/api/KHR/khrplatform.h" "$($prefix)/include/KHR"
 }
 
 If ($build.zlib) {
+  Y-Report "zlib"
   Y-Download "https://zlib.net/zlib-1.2.11.tar.xz"
-  Remove-Item -Path "zlib-1.2.11" -Recurse -Force
+  Y-RemoveDirectory "zlib-1.2.11"
   cmake -E tar xJ "zlib-1.2.11.tar.xz"
   Push-Location -Path "zlib-1.2.11"
   cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DSKIP_INSTALL_FILES=ON
-  cmake --build . --config Release --target INSTALL
+  cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
+  Pop-Location
+}
+
+If ($build.libjpeg) {
+  Y-Report "libjpeg"
+  Y-Download "https://downloads.sourceforge.net/project/libjpeg-turbo/1.5.3/libjpeg-turbo-1.5.3.tar.gz"
+  Y-RemoveDirectory "libjpeg-turbo-1.5.3"
+  cmake -E tar xz "libjpeg-turbo-1.5.3.tar.gz"
+  Push-Location -Path "libjpeg-turbo-1.5.3"
+  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DWITH_TURBOJPEG=OFF
+  cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
   Pop-Location
 }
 
 If ($build.libpng) {
+  Y-Report "libpng"
   Y-Download "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.35/libpng-1.6.35.tar.xz"
-  Remove-Item -Path "libpng-1.6.35" -Recurse -Force
+  Y-RemoveDirectory "libpng-1.6.35"
   cmake -E tar xJ "libpng-1.6.35.tar.xz"
   Push-Location -Path "libpng-1.6.35"
   cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON
-  cmake --build . --config Release --target INSTALL
-  Pop-Location
-}
-
-If ($build.libogg) {
-  Remove-Item -Path "ogg" -Recurse -Force
-  git clone https://git.xiph.org/ogg.git
-  Push-Location -Path "ogg"
-  cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)"
-  cmake --build . --config Release --target INSTALL
+  cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
   Pop-Location
 }
 
 If ($build.libvorbis) {
-  Remove-Item -Path "vorbis" -Recurse -Force
+  Y-Report "libvorbis"
+  Y-RemoveDirectory "vorbis"
   git clone https://git.xiph.org/vorbis.git
   Push-Location -Path "vorbis"
   cmake -G $cmake_generator . "-DCMAKE_INSTALL_PREFIX=$($prefix)" "-DOGG_ROOT=$($prefix)"
-  cmake --build . --config Release --target INSTALL
+  cmake --build . --config Release --target INSTALL -- /nologo /verbosity:minimal
   Pop-Location
 }
 
