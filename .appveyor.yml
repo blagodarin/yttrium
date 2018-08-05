@@ -15,16 +15,16 @@ install:
       dir /a:d /b %BOOST_ROOT%
 
   - cmd: |
-      set PREFIX=%APPVEYOR_BUILD_FOLDER%\_3rdparty
-
-  - ps: |
-      .\bootstrap\bootstrap.ps1 -prefix _3rdparty -libjpeg -libogg -libpng -libvorbis -nasm -openal -opengl -zlib
+      set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
+      mkdir %PREFIX_DIR% && cd %PREFIX_DIR%
+      cmake -DBUILD=libjpeg,libpng,libvorbis,openal,opengl -P %APPVEYOR_BUILD_FOLDER%\bootstrap\windows.cmake
 
 build_script:
   - cmd: |
-      mkdir _build && cd _build
-      cmake -G "Visual Studio 15 2017 Win64" .. -DCMAKE_PREFIX_PATH=%PREFIX% -DY_ALL=ON -DY_RENDERER=%RENDERER%
-      set PATH=%PATH%;%PREFIX%\bin
+      set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
+      mkdir %BUILD_DIR% && cd %BUILD_DIR%
+      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_ALL=ON -DY_RENDERER=%RENDERER%
+      set PATH=%PATH%;%PREFIX_DIR%\bin
       cmake --build . --config Release -- /nologo /verbosity:minimal
 
 test_script:
