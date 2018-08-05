@@ -87,11 +87,22 @@ endfunction()
 y_package(libvorbis REQUIRES libogg)
 y_package(libjpeg REQUIRES nasm)
 y_package(libpng REQUIRES nasm zlib)
+y_package(boost)
 y_package(libogg)
 y_package(nasm)
 y_package(openal)
 y_package(opengl)
 y_package(zlib)
+
+if("boost" IN_LIST _y_packages)
+  set(_version "1_67_0")
+  y_download("https://dl.bintray.com/boostorg/release/1.67.0/source/boost_${_version}.7z" SHA1 "64c278c23defe155e630a307ae2c0615348b14b3")
+  y_extract("boost_${_version}.7z" DIR "boost_${_version}")
+  execute_process(COMMAND cmd /c bootstrap.bat
+    WORKING_DIRECTORY ${BUILD_DIR}/boost_${_version})
+  execute_process(COMMAND ${BUILD_DIR}/boost_${_version}/b2 --with-test address-model=64 link=static runtime-link=shared threading=multi variant=debug,release
+    WORKING_DIRECTORY ${BUILD_DIR}/boost_${_version})
+endif()
 
 if("libogg" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/ogg.git" DIR "ogg")
