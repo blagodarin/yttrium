@@ -151,12 +151,18 @@ target_sources(yttrium PRIVATE
 	image/utils.h
 	)
 if(Y_USE_JPEG)
-	find_package(JPEG REQUIRED)
+	if(WIN32)
+		find_package(StaticJPEG REQUIRED)
+		target_include_directories(yttrium SYSTEM PRIVATE ${STATICJPEG_INCLUDE_DIR})
+		target_link_libraries(yttrium ${STATICJPEG_LIBRARY})
+	else()
+		find_package(JPEG REQUIRED)
+		target_include_directories(yttrium SYSTEM PRIVATE ${JPEG_INCLUDE_DIR})
+		target_link_libraries(yttrium ${JPEG_LIBRARIES})
+	endif()
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
 		)
-	target_include_directories(yttrium SYSTEM PRIVATE ${JPEG_INCLUDE_DIR})
-	target_link_libraries(yttrium ${JPEG_LIBRARIES})
 endif()
 if(Y_USE_PNG)
 	find_package(PNG REQUIRED)
