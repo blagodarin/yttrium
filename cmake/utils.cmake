@@ -34,7 +34,7 @@ function(add_ypack_target _target)
 	cmake_parse_arguments(_arg "" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
 	file(RELATIVE_PATH _output ${CMAKE_CURRENT_BINARY_DIR} ${_arg_OUTPUT})
 	add_custom_target(${_target}
-		ypack ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX} ${_output}
+		ypack ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX} ${_arg_OUTPUT}
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX}
 		BYPRODUCTS ${_arg_OUTPUT}
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
