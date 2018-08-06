@@ -11,13 +11,9 @@ environment:
 
 install:
   - cmd: |
-      dir /a:d /b C:\Libraries
-      dir /a:d /b %BOOST_ROOT%
-
-  - cmd: |
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
       mkdir %PREFIX_DIR% && cd %PREFIX_DIR%
-      cmake -DBUILD=libjpeg,libpng,libvorbis,openal,opengl -P %APPVEYOR_BUILD_FOLDER%\bootstrap\windows.cmake
+      call %APPVEYOR_BUILD_FOLDER%\bootstrap.bat
 
 build_script:
   - cmd: |
