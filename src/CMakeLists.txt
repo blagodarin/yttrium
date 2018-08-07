@@ -33,7 +33,7 @@ add_library(yttrium SHARED
 	tiny_string_map.cpp
 	translation.cpp
 	)
-target_link_libraries(yttrium Threads::Threads)
+target_link_libraries(yttrium PRIVATE Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
 include_config(yttrium ${PROJECT_BINARY_DIR}/src/config.h)
 
@@ -84,13 +84,13 @@ if(ON)
 		platform/openal.h
 		)
 	target_include_directories(yttrium SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
-	target_link_libraries(yttrium ${OPENAL_LIBRARY})
+	target_link_libraries(yttrium PRIVATE ${OPENAL_LIBRARY})
 endif()
 if(Y_USE_OGG_VORBIS)
 	find_library(OGG_LIBRARY ogg)
 	find_library(VORBIS_LIBRARY vorbis)
 	find_library(VORBISFILE_LIBRARY vorbisfile)
-	target_link_libraries(yttrium ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
+	target_link_libraries(yttrium PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
 	target_sources(yttrium PRIVATE
 		audio/formats/ogg_vorbis.cpp
 		audio/formats/ogg_vorbis.h
@@ -152,13 +152,12 @@ target_sources(yttrium PRIVATE
 	)
 if(Y_USE_JPEG)
 	if(WIN32)
-		find_package(StaticJPEG REQUIRED)
-		target_include_directories(yttrium SYSTEM PRIVATE ${STATICJPEG_INCLUDE_DIR})
-		target_link_libraries(yttrium ${STATICJPEG_LIBRARY})
+		find_package(LibjpegTurbo REQUIRED)
+		target_link_libraries(yttrium PRIVATE LibjpegTurbo::LibjpegTurbo)
 	else()
 		find_package(JPEG REQUIRED)
 		target_include_directories(yttrium SYSTEM PRIVATE ${JPEG_INCLUDE_DIR})
-		target_link_libraries(yttrium ${JPEG_LIBRARIES})
+		target_link_libraries(yttrium PRIVATE ${JPEG_LIBRARIES})
 	endif()
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
@@ -169,7 +168,7 @@ if(Y_USE_PNG)
 	target_sources(yttrium PRIVATE
 		image/formats/png.cpp
 		)
-	target_link_libraries(yttrium PNG::PNG)
+	target_link_libraries(yttrium PRIVATE PNG::PNG)
 endif()
 
 ########################################################################################################################
@@ -281,7 +280,7 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/2d_fs.glsl
 		renderer/gl/2d_vs.glsl
 		)
-	target_link_libraries(yttrium OpenGL::GL)
+	target_link_libraries(yttrium PRIVATE OpenGL::GL)
 elseif(Y_RENDERER_VULKAN)
 	find_package(Vulkan REQUIRED)
 	target_sources(yttrium PRIVATE
@@ -312,7 +311,7 @@ elseif(Y_RENDERER_VULKAN)
 		FRAGMENT renderer/vulkan/2d_fs.glsl
 		VERTEX renderer/vulkan/2d_vs.glsl
 		)
-	target_link_libraries(yttrium Vulkan::Vulkan)
+	target_link_libraries(yttrium PRIVATE Vulkan::Vulkan)
 else()
 	target_sources(yttrium PRIVATE
 		renderer/null/renderer.cpp
@@ -399,14 +398,14 @@ if(UNIX)
 			platform/x11/window.h
 			)
 		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
-		target_link_libraries(yttrium ${X11_X11_LIB})
+		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
 	else()
 		# TODO: Use find_package for XCB and libxkbcommon.
 		target_sources(yttrium PRIVATE
 			platform/xcb/window.cpp
 			platform/xcb/window.h
 			)
-		target_link_libraries(yttrium xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
+		target_link_libraries(yttrium PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
 			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
 		endif()

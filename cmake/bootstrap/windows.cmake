@@ -7,7 +7,7 @@ set(PREFIX_DIR ${CMAKE_BINARY_DIR})
 set(GENERATOR "Visual Studio 15 2017 Win64")
 
 function(y_cmake _dir)
-  cmake_parse_arguments(_arg "" "TARGET" "OPTIONS" ${ARGN})
+  cmake_parse_arguments(_arg "" "TARGET" "CONFIG;OPTIONS" ${ARGN})
   execute_process(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${BUILD_DIR}/${_dir} -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} ${_arg_OPTIONS}
     WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
   if(_arg_TARGET)
@@ -15,8 +15,10 @@ function(y_cmake _dir)
   else()
     set(_target "INSTALL")
   endif()
-  execute_process(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config Release --target ${_target} -- /nologo /verbosity:minimal
-    WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
+  foreach(_config ${_arg_CONFIG})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config ${_config} --target ${_target} -- /nologo /verbosity:minimal
+      WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
+  endforeach()
 endfunction()
 
 function(y_download _url)
@@ -113,7 +115,8 @@ endif()
 
 if("libogg" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/ogg.git" DIR "ogg")
-  y_cmake("ogg")
+  y_cmake("ogg"
+    CONFIG Release)
 endif()
 
 if("nasm" IN_LIST _y_packages)
@@ -147,7 +150,9 @@ if("zlib" IN_LIST _y_packages)
   set(_version "1.2.11")
   y_download("https://zlib.net/zlib-${_version}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y_extract("zlib-${_version}.tar.xz" DIR "zlib-${_version}")
-  y_cmake("zlib-${_version}" OPTIONS -DSKIP_INSTALL_FILES=ON)
+  y_cmake("zlib-${_version}"
+    CONFIG Release
+    OPTIONS -DSKIP_INSTALL_FILES=ON)
 endif()
 
 if("libjpeg" IN_LIST _y_packages)
@@ -155,22 +160,31 @@ if("libjpeg" IN_LIST _y_packages)
   set(_package "libjpeg-turbo-${_version}")
   y_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz" SHA1 "87ebf4cab2bb27fcb8e7ccb18ec4eb680e1f2c2d")
   y_extract("${_package}.tar.gz" DIR ${_package})
-  y_cmake(${_package} TARGET "jpeg-static" OPTIONS -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
+  y_cmake(${_package}
+    TARGET "jpeg-static"
+    CONFIG Release Debug
+    OPTIONS -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
   file(INSTALL ${BUILD_DIR}/${_package}/jconfig.h DESTINATION ${PREFIX_DIR}/include)
   file(INSTALL ${BUILD_DIR}/${_package}/jerror.h DESTINATION ${PREFIX_DIR}/include)
   file(INSTALL ${BUILD_DIR}/${_package}/jmorecfg.h DESTINATION ${PREFIX_DIR}/include)
   file(INSTALL ${BUILD_DIR}/${_package}/jpeglib.h DESTINATION ${PREFIX_DIR}/include)
   file(INSTALL ${BUILD_DIR}/${_package}/Release/jpeg-static.lib DESTINATION ${PREFIX_DIR}/lib)
+  file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
+  file(INSTALL ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib DESTINATION ${PREFIX_DIR}/lib)
 endif()
 
 if("libpng" IN_LIST _y_packages)
   set(_version "1.6.35")
   y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/libpng-${_version}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y_extract("libpng-${_version}.tar.xz" DIR "libpng-${_version}")
-  y_cmake("libpng-${_version}" OPTIONS -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
+  y_cmake("libpng-${_version}"
+    CONFIG Release
+    OPTIONS -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
 endif()
 
 if("libvorbis" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/vorbis.git" DIR "vorbis")
-  y_cmake("vorbis" OPTIONS -DOGG_ROOT=${PREFIX_DIR})
+  y_cmake("vorbis"
+    CONFIG Release
+    OPTIONS -DOGG_ROOT=${PREFIX_DIR})
 endif()

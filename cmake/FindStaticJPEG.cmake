@@ -1,6 +1,0 @@
-find_path(STATICJPEG_INCLUDE_DIR jpeglib.h)
-find_library(STATICJPEG_LIBRARY NAMES jpeg-static)
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(StaticJPEG
-  REQUIRED_VARS STATICJPEG_LIBRARY STATICJPEG_INCLUDE_DIR)
-mark_as_advanced(STATICJPEG_LIBRARY STATICJPEG_INCLUDE_DIR)
