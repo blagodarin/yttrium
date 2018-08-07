@@ -151,7 +151,7 @@ if("zlib" IN_LIST _y_packages)
   y_download("https://zlib.net/zlib-${_version}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y_extract("zlib-${_version}.tar.xz" DIR "zlib-${_version}")
   y_cmake("zlib-${_version}"
-    CONFIG Release
+    CONFIG Release Debug
     OPTIONS -DSKIP_INSTALL_FILES=ON)
 endif()
 
@@ -178,7 +178,7 @@ if("libpng" IN_LIST _y_packages)
   y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/libpng-${_version}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y_extract("libpng-${_version}.tar.xz" DIR "libpng-${_version}")
   y_cmake("libpng-${_version}"
-    CONFIG Release
+    CONFIG Release Debug
     OPTIONS -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
 endif()
 
