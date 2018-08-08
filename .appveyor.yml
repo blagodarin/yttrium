@@ -20,7 +20,6 @@ build_script:
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
       cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_ALL=ON -DY_RENDERER=%RENDERER%
-      set PATH=%PATH%;%PREFIX_DIR%\bin
       cmake --build . --config Release -- /nologo /verbosity:minimal
 
 test_script:

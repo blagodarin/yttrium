@@ -8,6 +8,6 @@ y_find_package(StaticLibpng
   VERSION_REGEX "^#define[ \t]+PNG_LIBPNG_VER_STRING[ \t]+\"([^\"]+)\".*")
 
 if(TARGET StaticLibpng::StaticLibpng)
-  find_package(ZLIB REQUIRED)
-  set_property(TARGET StaticLibpng::StaticLibpng PROPERTY INTERFACE_LINK_LIBRARIES ZLIB::ZLIB)
+  find_package(StaticZlib REQUIRED)
+  set_property(TARGET StaticLibpng::StaticLibpng PROPERTY INTERFACE_LINK_LIBRARIES StaticZlib::StaticZlib)
 endif()
