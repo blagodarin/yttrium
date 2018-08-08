@@ -179,7 +179,7 @@ if("libpng" IN_LIST _y_packages)
   y_extract("libpng-${_version}.tar.xz" DIR "libpng-${_version}")
   y_cmake("libpng-${_version}"
     CONFIG Release Debug
-    OPTIONS -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
+    OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
 endif()
 
 if("libvorbis" IN_LIST _y_packages)

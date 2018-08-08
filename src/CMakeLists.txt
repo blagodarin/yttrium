@@ -164,11 +164,16 @@ if(Y_USE_JPEG)
 		)
 endif()
 if(Y_USE_PNG)
-	find_package(PNG REQUIRED)
+	if(WIN32)
+		find_package(StaticLibpng REQUIRED)
+		target_link_libraries(yttrium PRIVATE StaticLibpng::StaticLibpng)
+	else()
+		find_package(PNG REQUIRED)
+		target_link_libraries(yttrium PRIVATE PNG::PNG)
+	endif()
 	target_sources(yttrium PRIVATE
 		image/formats/png.cpp
 		)
-	target_link_libraries(yttrium PRIVATE PNG::PNG)
 endif()
 
 ########################################################################################################################
