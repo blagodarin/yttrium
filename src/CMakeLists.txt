@@ -87,10 +87,16 @@ if(ON)
 	target_link_libraries(yttrium PRIVATE ${OPENAL_LIBRARY})
 endif()
 if(Y_USE_OGG_VORBIS)
-	find_library(OGG_LIBRARY ogg)
 	find_library(VORBIS_LIBRARY vorbis)
 	find_library(VORBISFILE_LIBRARY vorbisfile)
-	target_link_libraries(yttrium PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
+	target_link_libraries(yttrium PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY})
+	if(WIN32)
+		find_package(StaticOgg REQUIRED)
+		target_link_libraries(yttrium PRIVATE StaticOgg::StaticOgg)
+	else()
+		find_library(OGG_LIBRARY ogg)
+		target_link_libraries(yttrium PRIVATE ${OGG_LIBRARY})
+	endif()
 	target_sources(yttrium PRIVATE
 		audio/formats/ogg_vorbis.cpp
 		audio/formats/ogg_vorbis.h

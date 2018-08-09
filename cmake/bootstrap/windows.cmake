@@ -105,34 +105,56 @@ y_package(zlib)
 
 if("boost" IN_LIST _y_packages)
   set(_version "1_67_0")
-  y_download("https://dl.bintray.com/boostorg/release/1.67.0/source/boost_${_version}.7z" SHA1 "64c278c23defe155e630a307ae2c0615348b14b3")
-  y_extract("boost_${_version}.7z" DIR "boost_${_version}")
+  set(_package "boost_${_version}")
+  y_download("https://dl.bintray.com/boostorg/release/1.67.0/source/${_package}.7z" SHA1 "64c278c23defe155e630a307ae2c0615348b14b3")
+  y_extract("${_package}.7z" DIR ${_package})
   execute_process(COMMAND cmd /c bootstrap.bat
-    WORKING_DIRECTORY ${BUILD_DIR}/boost_${_version})
-  execute_process(COMMAND ${BUILD_DIR}/boost_${_version}/b2 --with-test address-model=64 link=static runtime-link=shared threading=multi variant=debug,release
-    WORKING_DIRECTORY ${BUILD_DIR}/boost_${_version})
+    WORKING_DIRECTORY ${BUILD_DIR}/${_package})
+  execute_process(COMMAND ${BUILD_DIR}/${_package}/b2 --with-test address-model=64 link=static runtime-link=shared threading=multi variant=debug,release
+    WORKING_DIRECTORY ${BUILD_DIR}/${_package})
 endif()
 
 if("libogg" IN_LIST _y_packages)
-  y_git_clone("https://git.xiph.org/ogg.git" DIR "ogg")
-  y_cmake("ogg"
-    CONFIG Release)
+  set(_package "ogg")
+  y_git_clone("https://git.xiph.org/ogg.git" DIR ${_package})
+  y_cmake(${_package}
+    TARGET "ogg"
+    CONFIG Release Debug)
+  file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
+  file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/include
+    DESTINATION ${PREFIX_DIR}
+    FILES_MATCHING PATTERN "*.h")
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/Release/ogg.lib
+    DESTINATION ${PREFIX_DIR}/lib)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/Debug/oggd.lib
+    ${BUILD_DIR}/${_package}/Debug/oggd.pdb
+    DESTINATION ${PREFIX_DIR}/lib)
 endif()
 
 if("nasm" IN_LIST _y_packages)
   set(_version "2.13.03")
-  y_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/nasm-${_version}-win64.zip" SHA1 "149a814fa53980976a7fc081231f59cfbcd02543")
-  y_extract("nasm-${_version}-win64.zip" DIR "nasm-${_version}")
-  file(INSTALL ${BUILD_DIR}/nasm-${_version}/nasm.exe DESTINATION ${PREFIX_DIR}/bin)
+  set(_package "nasm-${_version}")
+  y_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip" SHA1 "149a814fa53980976a7fc081231f59cfbcd02543")
+  y_extract("${_package}-win64.zip" DIR ${_package})
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/nasm.exe
+    DESTINATION ${PREFIX_DIR}/bin)
 endif()
 
 if("openal" IN_LIST _y_packages)
   set(_version "1.18.2")
-  y_download("http://openal-soft.org/openal-binaries/openal-soft-${_version}-bin.zip" SHA1 "0d2edd1b77cbb998f12e064d0eefea3508446776")
+  set(_package "openal-soft-${_version}-bin")
+  y_download("http://openal-soft.org/openal-binaries/${_package}.zip" SHA1 "0d2edd1b77cbb998f12e064d0eefea3508446776")
   y_download("https://openal.org/downloads/oalinst.zip" SHA1 "45e08368c6755c58902b7746ff3e51ad2df8a8b8")
-  y_extract("openal-soft-${_version}-bin.zip")
-  file(INSTALL ${BUILD_DIR}/openal-soft-${_version}-bin/include DESTINATION ${PREFIX_DIR})
-  file(INSTALL ${BUILD_DIR}/openal-soft-${_version}-bin/libs DESTINATION ${PREFIX_DIR})
+  y_extract("${_package}.zip" DIR ${_package})
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/include
+    ${BUILD_DIR}/${_package}/libs
+    DESTINATION ${PREFIX_DIR})
   y_extract("oalinst.zip")
   execute_process(COMMAND ${BUILD_DIR}/oalinst.exe /s)
 endif()
@@ -141,16 +163,21 @@ if("opengl" IN_LIST _y_packages)
   y_download("https://khronos.org/registry/OpenGL/api/GL/glext.h")
   y_download("https://khronos.org/registry/OpenGL/api/GL/wglext.h")
   y_download("https://khronos.org/registry/EGL/api/KHR/khrplatform.h")
-  file(INSTALL ${CACHE_DIR}/glext.h DESTINATION ${PREFIX_DIR}/include/GL)
-  file(INSTALL ${CACHE_DIR}/wglext.h DESTINATION ${PREFIX_DIR}/include/GL)
-  file(INSTALL ${CACHE_DIR}/khrplatform.h DESTINATION ${PREFIX_DIR}/include/KHR)
+  file(INSTALL
+    ${CACHE_DIR}/glext.h
+    ${CACHE_DIR}/wglext.h
+    DESTINATION ${PREFIX_DIR}/include/GL)
+  file(INSTALL
+    ${CACHE_DIR}/khrplatform.h
+    DESTINATION ${PREFIX_DIR}/include/KHR)
 endif()
 
 if("zlib" IN_LIST _y_packages)
   set(_version "1.2.11")
-  y_download("https://zlib.net/zlib-${_version}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
-  y_extract("zlib-${_version}.tar.xz" DIR "zlib-${_version}")
-  y_cmake("zlib-${_version}"
+  set(_package "zlib-${_version}")
+  y_download("https://zlib.net/${_package}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
+  y_extract("${_package}.tar.xz" DIR ${_package})
+  y_cmake(${_package}
     CONFIG Release Debug
     OPTIONS -DSKIP_INSTALL_FILES=ON)
 endif()
@@ -164,27 +191,37 @@ if("libjpeg" IN_LIST _y_packages)
     TARGET "jpeg-static"
     CONFIG Release Debug
     OPTIONS -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
-  file(INSTALL ${BUILD_DIR}/${_package}/jconfig.h DESTINATION ${PREFIX_DIR}/include)
-  file(INSTALL ${BUILD_DIR}/${_package}/jerror.h DESTINATION ${PREFIX_DIR}/include)
-  file(INSTALL ${BUILD_DIR}/${_package}/jmorecfg.h DESTINATION ${PREFIX_DIR}/include)
-  file(INSTALL ${BUILD_DIR}/${_package}/jpeglib.h DESTINATION ${PREFIX_DIR}/include)
-  file(INSTALL ${BUILD_DIR}/${_package}/Release/jpeg-static.lib DESTINATION ${PREFIX_DIR}/lib)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
-  file(INSTALL ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib DESTINATION ${PREFIX_DIR}/lib)
+  file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/jconfig.h
+    ${BUILD_DIR}/${_package}/jerror.h
+    ${BUILD_DIR}/${_package}/jmorecfg.h
+    ${BUILD_DIR}/${_package}/jpeglib.h
+    DESTINATION ${PREFIX_DIR}/include)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/Release/jpeg-static.lib
+    DESTINATION ${PREFIX_DIR}/lib)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
+    ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb
+    DESTINATION ${PREFIX_DIR}/lib)
 endif()
 
 if("libpng" IN_LIST _y_packages)
   set(_version "1.6.35")
-  y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/libpng-${_version}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
-  y_extract("libpng-${_version}.tar.xz" DIR "libpng-${_version}")
-  y_cmake("libpng-${_version}"
+  set(_package "libpng-${_version}")
+  y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
+  y_extract("${_package}.tar.xz" DIR ${_package})
+  y_cmake(${_package}
     CONFIG Release Debug
     OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
 endif()
 
 if("libvorbis" IN_LIST _y_packages)
-  y_git_clone("https://git.xiph.org/vorbis.git" DIR "vorbis")
-  y_cmake("vorbis"
+  set(_package "vorbis")
+  y_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
+  y_cmake(${_package}
     CONFIG Release
     OPTIONS -DOGG_ROOT=${PREFIX_DIR})
 endif()
