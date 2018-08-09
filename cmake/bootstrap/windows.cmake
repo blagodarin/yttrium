@@ -123,9 +123,10 @@ if("libogg" IN_LIST _y_packages)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
   file(INSTALL
-    ${BUILD_DIR}/${_package}/include
-    DESTINATION ${PREFIX_DIR}
-    FILES_MATCHING PATTERN "*.h")
+    ${BUILD_DIR}/${_package}/include/ogg/config_types.h
+    ${BUILD_DIR}/${_package}/include/ogg/ogg.h
+    ${BUILD_DIR}/${_package}/include/ogg/os_types.h
+    DESTINATION ${PREFIX_DIR}/include/ogg)
   file(INSTALL
     ${BUILD_DIR}/${_package}/Release/ogg.lib
     DESTINATION ${PREFIX_DIR}/lib)
@@ -222,6 +223,25 @@ if("libvorbis" IN_LIST _y_packages)
   set(_package "vorbis")
   y_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
   y_cmake(${_package}
-    CONFIG Release
+    TARGET "vorbisfile"
+    CONFIG Release Debug
     OPTIONS -DOGG_ROOT=${PREFIX_DIR})
+  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
+  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
+  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib)
+  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/include/vorbis/codec.h
+    ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
+    DESTINATION ${PREFIX_DIR}/include/vorbis)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/lib/Release/vorbis.lib
+    ${BUILD_DIR}/${_package}/lib/Release/vorbisfile.lib
+    DESTINATION ${PREFIX_DIR}/lib)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
+    ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb
+    ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
+    ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb
+    DESTINATION ${PREFIX_DIR}/lib)
 endif()
