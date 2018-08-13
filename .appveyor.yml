@@ -6,8 +6,14 @@ environment:
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.1
   BOOST_ROOT: C:\Libraries\boost_1_67_0
   matrix:
-    - RENDERER: Null
-    - RENDERER: OpenGL
+    - CONFIG: Release
+      RENDERER: Null
+    - CONFIG: Debug
+      RENDERER: Null
+    - CONFIG: Release
+      RENDERER: OpenGL
+    - CONFIG: Debug
+      RENDERER: OpenGL
 
 install:
   - cmd: |
@@ -20,9 +26,9 @@ build_script:
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
       cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_ALL=ON -DY_RENDERER=%RENDERER%
-      cmake --build . --config Release -- /nologo /verbosity:minimal
+      cmake --build . --config %CONFIG% -- /nologo /verbosity:minimal
 
 test_script:
   - cmd: |
       set PATH=%PATH%;%BOOST_LIBRARYDIR%
-      cmake --build . --config Release --target check -- /nologo /verbosity:minimal
+      cmake --build . --config %CONFIG% --target check -- /nologo /verbosity:minimal
