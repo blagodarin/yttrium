@@ -119,7 +119,7 @@ if("libogg" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/ogg.git" DIR ${_package})
   y_cmake(${_package}
     TARGET "ogg"
-    CONFIG Release Debug)
+    CONFIG RelWithDebInfo Debug)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
   file(INSTALL
@@ -128,7 +128,8 @@ if("libogg" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
   file(INSTALL
-    ${BUILD_DIR}/${_package}/Release/ogg.lib
+    ${BUILD_DIR}/${_package}/RelWithDebInfo/ogg.lib
+    ${BUILD_DIR}/${_package}/ogg.dir/RelWithDebInfo/ogg.pdb
     DESTINATION ${PREFIX_DIR}/lib)
   file(INSTALL
     ${BUILD_DIR}/${_package}/Debug/oggd.lib
@@ -179,7 +180,7 @@ if("zlib" IN_LIST _y_packages)
   y_download("https://zlib.net/${_package}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y_extract("${_package}.tar.xz" DIR ${_package})
   y_cmake(${_package}
-    CONFIG Release Debug
+    CONFIG RelWithDebInfo Debug
     OPTIONS -DSKIP_INSTALL_FILES=ON)
 endif()
 
@@ -190,7 +191,7 @@ if("libjpeg" IN_LIST _y_packages)
   y_extract("${_package}.tar.gz" DIR ${_package})
   y_cmake(${_package}
     TARGET "jpeg-static"
-    CONFIG Release Debug
+    CONFIG RelWithDebInfo Debug
     OPTIONS -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
   file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
@@ -201,7 +202,8 @@ if("libjpeg" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/jpeglib.h
     DESTINATION ${PREFIX_DIR}/include)
   file(INSTALL
-    ${BUILD_DIR}/${_package}/Release/jpeg-static.lib
+    ${BUILD_DIR}/${_package}/RelWithDebInfo/jpeg-static.lib
+    ${BUILD_DIR}/${_package}/jpeg-static.dir/RelWithDebInfo/jpeg-static.pdb
     DESTINATION ${PREFIX_DIR}/lib)
   file(INSTALL
     ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
@@ -215,7 +217,7 @@ if("libpng" IN_LIST _y_packages)
   y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y_extract("${_package}.tar.xz" DIR ${_package})
   y_cmake(${_package}
-    CONFIG Release Debug
+    CONFIG RelWithDebInfo Debug
     OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
 endif()
 
@@ -224,7 +226,7 @@ if("libvorbis" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
   y_cmake(${_package}
     TARGET "vorbisfile"
-    CONFIG Release Debug
+    CONFIG RelWithDebInfo Debug
     OPTIONS -DOGG_ROOT=${PREFIX_DIR})
   file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
   file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
@@ -235,8 +237,10 @@ if("libvorbis" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
     DESTINATION ${PREFIX_DIR}/include/vorbis)
   file(INSTALL
-    ${BUILD_DIR}/${_package}/lib/Release/vorbis.lib
-    ${BUILD_DIR}/${_package}/lib/Release/vorbisfile.lib
+    ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbis.lib
+    ${BUILD_DIR}/${_package}/lib/vorbis.dir/RelWithDebInfo/vorbis.pdb
+    ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbisfile.lib
+    ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/RelWithDebInfo/vorbisfile.pdb
     DESTINATION ${PREFIX_DIR}/lib)
   file(INSTALL
     ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
