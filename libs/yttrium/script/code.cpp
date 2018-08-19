@@ -103,6 +103,8 @@ namespace Yttrium
 			}
 		}
 
+		ScriptCodePrivate& operator=(const ScriptCodePrivate&) = delete;
+
 	public:
 		Pool<ScriptValue> _temporaries{ 32 };
 		std::vector<ScriptCommand> _commands;

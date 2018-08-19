@@ -13,7 +13,7 @@ namespace Yttrium
 	class MusicReaderImpl final : public MusicReader
 	{
 	public:
-		MusicReaderImpl(std::unique_ptr<AudioReader>&&);
+		explicit MusicReaderImpl(std::unique_ptr<AudioReader>&&);
 
 		bool set_properties(int start_ms, int end_ms, int loop_ms) noexcept override;
 

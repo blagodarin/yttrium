@@ -14,7 +14,7 @@ namespace Yttrium
 	class OggVorbisReader final : public AudioReaderImpl
 	{
 	public:
-		OggVorbisReader(std::unique_ptr<Source>&&);
+		explicit OggVorbisReader(std::unique_ptr<Source>&&);
 		~OggVorbisReader() override;
 
 		size_t read(void*, size_t) override;

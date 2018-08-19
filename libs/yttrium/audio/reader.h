@@ -26,7 +26,7 @@ namespace Yttrium
 		const std::unique_ptr<Source> _source;
 		Reader _reader{*_source};
 
-		AudioReaderImpl(std::unique_ptr<Source>&& source)
+		explicit AudioReaderImpl(std::unique_ptr<Source>&& source)
 			: _source{std::move(source)}
 		{
 		}

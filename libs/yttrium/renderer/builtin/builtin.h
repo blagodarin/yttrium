@@ -16,7 +16,7 @@ namespace Yttrium
 		const std::unique_ptr<const Texture2D> _debug_texture;
 		const std::unique_ptr<RenderProgram> _program_2d;
 
-		RenderBuiltin(RenderBackend&);
+		explicit RenderBuiltin(RenderBackend&);
 		~RenderBuiltin() noexcept;
 	};
 }

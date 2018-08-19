@@ -8,7 +8,7 @@ namespace Yttrium
 	class WavReader final : public AudioReaderImpl
 	{
 	public:
-		WavReader(std::unique_ptr<Source>&&);
+		explicit WavReader(std::unique_ptr<Source>&&);
 
 		size_t read(void*, size_t) override;
 		bool seek(uint64_t) override;

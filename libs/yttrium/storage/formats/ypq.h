@@ -13,7 +13,7 @@ namespace Yttrium
 	class YpqReader final : public PackageReader
 	{
 	public:
-		YpqReader(std::unique_ptr<Source>&&);
+		explicit YpqReader(std::unique_ptr<Source>&&);
 		~YpqReader() override;
 
 		const std::vector<std::string_view>& names() const override { return _names; }
