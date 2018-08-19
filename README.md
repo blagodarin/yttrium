@@ -11,6 +11,6 @@ Yttrium is being developed in my spare time when I have nothing better
 to do. As a consequence, it is really far from production use, and may never
 become near to it.
 
-Nevertheless, there is a [Roadmap](doc/roadmap.md) for further development and
-a [FAQ](doc/faq.md) which describes why something is done in one way and not
+Nevertheless, there is a [Roadmap](docs/roadmap.md) for further development and
+a [FAQ](docs/faq.md) which describes why something is done in one way and not
 the other.

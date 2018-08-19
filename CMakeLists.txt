@@ -133,7 +133,7 @@ if(Y_BUILD_TOOLS OR Y_RENDERER_OPENGL OR Y_BUILD_ALL)
 	add_subdirectory(tools/yrc)
 endif()
 
-add_subdirectory(src)
+add_subdirectory(libs/yttrium)
 
 if(Y_BUILD_TOOLS OR Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 	add_subdirectory(tools/ypack)
@@ -142,7 +142,7 @@ endif()
 
 if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 	if(WIN32)
-		add_subdirectory(ywinmain)
+		add_subdirectory(libs/ywinmain)
 	endif()
 	add_subdirectory(examples/3d)
 	add_subdirectory(examples/tetrium)

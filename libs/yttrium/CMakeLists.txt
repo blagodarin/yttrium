@@ -1,11 +1,11 @@
 add_library(yttrium SHARED
-	../include/yttrium/api.h
-	../include/yttrium/console.h
-	../include/yttrium/exceptions.h
-	../include/yttrium/flags.h
-	../include/yttrium/resource_loader.h
-	../include/yttrium/tiny_string_map.h
-	../include/yttrium/translation.h
+	../../include/yttrium/api.h
+	../../include/yttrium/console.h
+	../../include/yttrium/exceptions.h
+	../../include/yttrium/flags.h
+	../../include/yttrium/resource_loader.h
+	../../include/yttrium/tiny_string_map.h
+	../../include/yttrium/translation.h
 	console.cpp
 	globals.cpp
 	resource_loader.cpp
@@ -26,13 +26,13 @@ endif()
 ########################################################################################################################
 # audio
 target_sources(yttrium PRIVATE
-	../include/yttrium/audio/format.h
-	../include/yttrium/audio/manager.h
-	../include/yttrium/audio/music_reader.h
-	../include/yttrium/audio/player.h
-	../include/yttrium/audio/reader.h
-	../include/yttrium/audio/sound.h
-	../include/yttrium/audio/utils.h
+	../../include/yttrium/audio/format.h
+	../../include/yttrium/audio/manager.h
+	../../include/yttrium/audio/music_reader.h
+	../../include/yttrium/audio/player.h
+	../../include/yttrium/audio/reader.h
+	../../include/yttrium/audio/sound.h
+	../../include/yttrium/audio/utils.h
 	audio/formats/wav_private.h
 	audio/formats/wav.cpp
 	audio/formats/wav.h
@@ -85,9 +85,9 @@ endif()
 ########################################################################################################################
 # gui
 target_sources(yttrium PRIVATE
-	../include/yttrium/gui/gui.h
-	../include/yttrium/gui/text_capture.h
-	../include/yttrium/gui/texture_font.h
+	../../include/yttrium/gui/gui.h
+	../../include/yttrium/gui/text_capture.h
+	../../include/yttrium/gui/texture_font.h
 	gui/ion/loader.cpp
 	gui/ion/loader.h
 	gui/logic/line_editor.cpp
@@ -124,7 +124,7 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # image
 target_sources(yttrium PRIVATE
-	../include/yttrium/image.h
+	../../include/yttrium/image.h
 	image/formats/dds.cpp
 	image/formats/dds.h
 	image/formats/tga.cpp
@@ -163,8 +163,8 @@ endif()
 ########################################################################################################################
 # ion
 target_sources(yttrium PRIVATE
-	../include/yttrium/ion/reader.h
-	../include/yttrium/ion/writer.h
+	../../include/yttrium/ion/reader.h
+	../../include/yttrium/ion/writer.h
 	ion/reader.cpp
 	ion/writer.cpp
 	)
@@ -172,25 +172,25 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # math
 target_sources(yttrium PRIVATE
-	../include/yttrium/math/color.h
-	../include/yttrium/math/euler.h
-	../include/yttrium/math/line.h
-	../include/yttrium/math/margins.h
-	../include/yttrium/math/matrix.h
-	../include/yttrium/math/plane.h
-	../include/yttrium/math/point.h
-	../include/yttrium/math/quad.h
-	../include/yttrium/math/rect.h
-	../include/yttrium/math/size.h
-	../include/yttrium/math/vector.h
+	../../include/yttrium/math/color.h
+	../../include/yttrium/math/euler.h
+	../../include/yttrium/math/line.h
+	../../include/yttrium/math/margins.h
+	../../include/yttrium/math/matrix.h
+	../../include/yttrium/math/plane.h
+	../../include/yttrium/math/point.h
+	../../include/yttrium/math/quad.h
+	../../include/yttrium/math/rect.h
+	../../include/yttrium/math/size.h
+	../../include/yttrium/math/vector.h
 	)
 
 ########################################################################################################################
 # memory
 target_sources(yttrium PRIVATE
-	../include/yttrium/memory/buffer_appender.h
-	../include/yttrium/memory/buffer.h
-	../include/yttrium/memory/pool.h
+	../../include/yttrium/memory/buffer_appender.h
+	../../include/yttrium/memory/buffer.h
+	../../include/yttrium/memory/pool.h
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
 	memory/buffer.cpp
@@ -217,14 +217,14 @@ endif()
 ########################################################################################################################
 # renderer
 target_sources(yttrium PRIVATE
-	../include/yttrium/renderer/manager.h
-	../include/yttrium/renderer/material.h
-	../include/yttrium/renderer/mesh.h
-	../include/yttrium/renderer/modifiers.h
-	../include/yttrium/renderer/pass.h
-	../include/yttrium/renderer/program.h
-	../include/yttrium/renderer/texture.h
-	../include/yttrium/renderer/textured_rect.h
+	../../include/yttrium/renderer/manager.h
+	../../include/yttrium/renderer/material.h
+	../../include/yttrium/renderer/mesh.h
+	../../include/yttrium/renderer/modifiers.h
+	../../include/yttrium/renderer/pass.h
+	../../include/yttrium/renderer/program.h
+	../../include/yttrium/renderer/texture.h
+	../../include/yttrium/renderer/textured_rect.h
 	renderer/builtin/builtin.h
 	renderer/builtin/builtin.cpp
 	renderer/builtin/debug_texture.cpp
@@ -311,10 +311,10 @@ endif()
 ########################################################################################################################
 # script
 target_sources(yttrium PRIVATE
-	../include/yttrium/script/args.h
-	../include/yttrium/script/code.h
-	../include/yttrium/script/context.h
-	../include/yttrium/script/value.h
+	../../include/yttrium/script/args.h
+	../../include/yttrium/script/code.h
+	../../include/yttrium/script/context.h
+	../../include/yttrium/script/value.h
 	script/args.cpp
 	script/code.cpp
 	script/context.cpp
@@ -326,12 +326,12 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # storage
 target_sources(yttrium PRIVATE
-	../include/yttrium/storage/package.h
-	../include/yttrium/storage/reader.h
-	../include/yttrium/storage/source.h
-	../include/yttrium/storage/storage.h
-	../include/yttrium/storage/temporary_file.h
-	../include/yttrium/storage/writer.h
+	../../include/yttrium/storage/package.h
+	../../include/yttrium/storage/reader.h
+	../../include/yttrium/storage/source.h
+	../../include/yttrium/storage/storage.h
+	../../include/yttrium/storage/temporary_file.h
+	../../include/yttrium/storage/writer.h
 	platform/file.h
 	storage/formats/ypq.cpp
 	storage/formats/ypq.h
@@ -360,7 +360,7 @@ endif()
 ########################################################################################################################
 # utils
 target_sources(yttrium PRIVATE
-	../include/yttrium/utils.h
+	../../include/yttrium/utils.h
 	utils/atomic_counters.h
 	utils/fourcc.h
 	utils/unique_ptr.h
@@ -369,8 +369,8 @@ target_sources(yttrium PRIVATE
 ########################################################################################################################
 # window
 target_sources(yttrium PRIVATE
-	../include/yttrium/key.h
-	../include/yttrium/window.h
+	../../include/yttrium/key.h
+	../../include/yttrium/window.h
 	platform/window.h
 	window/backend.cpp
 	window/backend.h

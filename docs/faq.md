@@ -23,8 +23,6 @@ find which tests have failed and why.
 It does compile a bit faster than Boost Test, however, but the difference is
 not very noticeable, and fast builds aren't the primary property of unit tests.
 
-Yttrium also uses other Boost facilities, so Boost Test seems a natural choice.
-
 ## Code style
 
 ### Why not #pragma once?

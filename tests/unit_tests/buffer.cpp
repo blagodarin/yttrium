@@ -1,7 +1,7 @@
 #include <yttrium/memory/buffer.h>
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
-	#include "../../src/memory/buffer_memory_tracker.h"
+	#include "../../libs/yttrium/memory/buffer_memory_tracker.h"
 #endif
 
 #include <boost/test/unit_test.hpp>

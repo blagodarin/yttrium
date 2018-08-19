@@ -1,5 +1,5 @@
 #include <yttrium/memory/buffer.h>
-#include "../../src/memory/buffer_memory.h"
+#include "../../libs/yttrium/memory/buffer_memory.h"
 
 #include <array>
 #include <chrono>
