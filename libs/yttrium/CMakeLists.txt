@@ -14,7 +14,7 @@ add_library(yttrium SHARED
 	translation.cpp
 	)
 target_link_libraries(yttrium PRIVATE Threads::Threads)
-set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
+set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT FOLDER "libs")
 include_config(yttrium ${PROJECT_BINARY_DIR}/config.h)
 
 if(WIN32)
