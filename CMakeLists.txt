@@ -18,10 +18,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(utils)
 
-option(Y_BUILD_ALL "Build all components" OFF)
-option(Y_BUILD_EXAMPLES "Build examples (require tools)" OFF)
+option(Y_BUILD_ALL "Build everything" OFF)
+option(Y_BUILD_EXAMPLES "Build examples" OFF)
 option(Y_BUILD_TESTS "Build tests" OFF)
-option(Y_BUILD_TOOLS "Build tools" OFF)
 
 option(Y_USE_JPEG "Include JPEG support" ON)
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
@@ -125,20 +124,17 @@ configure_file(config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
+# Tools that don't depend on Yttrium library.
 if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
 endif()
-
-if(Y_BUILD_TOOLS OR Y_RENDERER_OPENGL OR Y_BUILD_ALL)
-	add_subdirectory(tools/yrc)
-endif()
+add_subdirectory(tools/yrc)
 
 add_subdirectory(libs/yttrium)
 
-if(Y_BUILD_TOOLS OR Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
-	add_subdirectory(tools/ypack)
-	add_subdirectory(tools/ytr)
-endif()
+# Tools that depend on Yttrium library.
+add_subdirectory(tools/ypack)
+add_subdirectory(tools/ytr)
 
 if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 	if(WIN32)
