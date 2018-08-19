@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(yttrium C CXX)
+project(yttrium CXX)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
