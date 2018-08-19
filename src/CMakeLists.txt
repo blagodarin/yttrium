@@ -1,23 +1,3 @@
-# Platforms.
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	set(Y_IS_LINUX ON)
-else()
-	set(Y_IS_LINUX OFF)
-endif()
-set(Y_IS_POSIX ${UNIX})
-set(Y_IS_WINDOWS ${WIN32})
-
-# Features.
-set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
-set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
-
-# Components.
-option(Y_USE_JPEG "Include JPEG support" ON)
-option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
-option(Y_USE_PNG "Include PNG support" ON)
-
-configure_file(config.h.in ${PROJECT_BINARY_DIR}/src/config.h)
-
 add_library(yttrium SHARED
 	../include/yttrium/api.h
 	../include/yttrium/console.h
@@ -35,7 +15,7 @@ add_library(yttrium SHARED
 	)
 target_link_libraries(yttrium PRIVATE Threads::Threads)
 set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
-include_config(yttrium ${PROJECT_BINARY_DIR}/src/config.h)
+include_config(yttrium ${PROJECT_BINARY_DIR}/config.h)
 
 if(WIN32)
 	target_sources(yttrium PRIVATE
@@ -161,8 +141,7 @@ if(Y_USE_JPEG)
 		target_link_libraries(yttrium PRIVATE StaticLibjpeg::StaticLibjpeg)
 	else()
 		find_package(JPEG REQUIRED)
-		target_include_directories(yttrium SYSTEM PRIVATE ${JPEG_INCLUDE_DIR})
-		target_link_libraries(yttrium PRIVATE ${JPEG_LIBRARIES})
+		target_link_libraries(yttrium PRIVATE JPEG::JPEG)
 	endif()
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp

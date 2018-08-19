@@ -120,8 +120,8 @@ install:
 
 script:
   - mkdir _build && pushd _build
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_ALL=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_COVERAGE=ON -DY_TESTS=ON"; fi
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_ALL=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON"; fi
   - cmake .. -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/_prefix $CMAKE_OPTIONS -DY_RENDERER=$RENDERER
   - cmake --build . -- -j2
   - cmake --build . --target check

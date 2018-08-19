@@ -1,8 +1,3 @@
-// Platforms.
-#cmakedefine01 Y_IS_LINUX
-#cmakedefine01 Y_IS_POSIX
-#cmakedefine01 Y_IS_WINDOWS
-
 // Renderers.
 #cmakedefine01 Y_RENDERER_NULL
 #cmakedefine01 Y_RENDERER_OPENGL

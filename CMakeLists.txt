@@ -18,14 +18,14 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(utils)
 
-option(Y_ALL "Build all components" OFF)
-option(Y_EXAMPLES "Build examples (require tools)" OFF)
-option(Y_TESTS "Build tests" OFF)
-option(Y_TOOLS "Build tools" OFF)
+option(Y_BUILD_ALL "Build all components" OFF)
+option(Y_BUILD_EXAMPLES "Build examples (require tools)" OFF)
+option(Y_BUILD_TESTS "Build tests" OFF)
+option(Y_BUILD_TOOLS "Build tools" OFF)
 
-if(Y_EXAMPLES AND NOT (Y_ALL OR Y_TOOLS))
-	message(FATAL_ERROR "Y_EXAMPLES require Y_TOOLS")
-endif()
+option(Y_USE_JPEG "Include JPEG support" ON)
+option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
+option(Y_USE_PNG "Include PNG support" ON)
 
 set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
 if(Y_RENDERER STREQUAL "OpenGL")
@@ -119,24 +119,28 @@ append_options(CMAKE_EXE_LINKER_FLAGS ${LINKER_FLAGS})
 append_options(CMAKE_MODULE_LINKER_FLAGS ${LINKER_FLAGS})
 append_options(CMAKE_SHARED_LINKER_FLAGS ${LINKER_FLAGS})
 
+set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
+set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
+configure_file(config.h.in ${PROJECT_BINARY_DIR}/config.h)
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
 endif()
 
-if(Y_ALL OR Y_TOOLS OR Y_RENDERER_OPENGL)
+if(Y_BUILD_TOOLS OR Y_RENDERER_OPENGL OR Y_BUILD_ALL)
 	add_subdirectory(tools/yrc)
 endif()
 
 add_subdirectory(src)
 
-if(Y_ALL OR Y_TOOLS)
+if(Y_BUILD_TOOLS OR Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 	add_subdirectory(tools/ypack)
 	add_subdirectory(tools/ytr)
 endif()
 
-if(Y_ALL OR Y_EXAMPLES)
+if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 	if(WIN32)
 		add_subdirectory(ywinmain)
 	endif()
@@ -144,11 +148,11 @@ if(Y_ALL OR Y_EXAMPLES)
 	add_subdirectory(examples/tetrium)
 endif()
 
-if(Y_ALL OR Y_TESTS)
+if(Y_BUILD_TESTS OR Y_BUILD_ALL)
 	add_subdirectory(tests/unit_tests)
 endif()
 
-if(Y_ALL)
+if(Y_BUILD_ALL)
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/tiny_string_map)
 	add_subdirectory(tests/gen_test_data)
