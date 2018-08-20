@@ -32,3 +32,4 @@ test_script:
   - cmd: |
       set PATH=%PATH%;%BOOST_LIBRARYDIR%
       cmake --build . --config %CONFIG% --target check -- /nologo /verbosity:minimal
+      cmake --build . --config %CONFIG% --target catch -- /nologo /verbosity:minimal

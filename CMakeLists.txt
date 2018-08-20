@@ -13,7 +13,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(utils)
@@ -146,6 +146,9 @@ endif()
 
 if(Y_BUILD_TESTS OR Y_BUILD_ALL)
 	add_subdirectory(tests/unit_tests)
+	if(WIN32)
+		add_subdirectory(tests/yttrium)
+	endif()
 endif()
 
 if(Y_BUILD_ALL)

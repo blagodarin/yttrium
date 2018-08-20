@@ -97,6 +97,7 @@ y_package(libvorbis REQUIRES libogg)
 y_package(libjpeg REQUIRES nasm)
 y_package(libpng REQUIRES nasm zlib)
 y_package(boost)
+y_package(catch2)
 y_package(libogg)
 y_package(nasm)
 y_package(openal)
@@ -112,6 +113,16 @@ if("boost" IN_LIST _y_packages)
     WORKING_DIRECTORY ${BUILD_DIR}/${_package})
   execute_process(COMMAND ${BUILD_DIR}/${_package}/b2 --with-test address-model=64 link=static runtime-link=shared threading=multi variant=debug,release
     WORKING_DIRECTORY ${BUILD_DIR}/${_package})
+endif()
+
+if("catch2" IN_LIST _y_packages)
+  set(_version "2.2.3")
+  set(_package "Catch2-${_version}")
+  y_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz" SHA1 "24630ba95ddb0587d74c0c2f37f24a62189cb337")
+  y_extract("v${_version}.tar.gz" DIR ${_package})
+  y_cmake(${_package}
+    CONFIG Release
+    OPTIONS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_DOCDIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
 if("libogg" IN_LIST _y_packages)

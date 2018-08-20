@@ -1,2 +1,2 @@
 @echo off
-cmake -DBUILD=libjpeg,libpng,libvorbis,openal,opengl -P "%~dp0\cmake\bootstrap\windows.cmake"
+cmake -DBUILD=catch2,libjpeg,libpng,libvorbis,openal,opengl -P "%~dp0\cmake\bootstrap\windows.cmake"
