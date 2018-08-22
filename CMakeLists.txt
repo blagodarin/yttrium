@@ -146,9 +146,7 @@ endif()
 
 if(Y_BUILD_TESTS OR Y_BUILD_ALL)
 	add_subdirectory(tests/unit_tests)
-	if(WIN32)
-		add_subdirectory(tests/yttrium)
-	endif()
+	add_subdirectory(tests/yttrium)
 endif()
 
 if(Y_BUILD_ALL)
