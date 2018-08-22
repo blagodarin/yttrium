@@ -132,6 +132,7 @@ script:
   - cmake .. -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/_prefix $CMAKE_OPTIONS -DY_RENDERER=$RENDERER
   - cmake --build . -- -j2
   - cmake --build . --target check
+  - cmake --build . --target catch
   - popd
 
 after_success:
