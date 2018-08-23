@@ -2,7 +2,7 @@
 
 #include <catch/catch.hpp>
 
-TEST_CASE("Point tests")
+TEST_CASE("point")
 {
 	using Yttrium::Point;
 	{

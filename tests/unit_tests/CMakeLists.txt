@@ -16,12 +16,9 @@ add_executable(unit_tests
 	iostream.h
 	key.cpp
 	main.cpp
-	margins.cpp
 	matrix.cpp
 	package.cpp
-	point.cpp
 	reader.cpp
-	rect.cpp
 	resource_loader.cpp
 	source.cpp
 	string_utils.cpp

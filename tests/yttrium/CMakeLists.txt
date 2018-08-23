@@ -1,9 +1,13 @@
 find_package(Catch2)
 
 add_executable(yttrium_tests
-	main.cpp
-	point.cpp
-	)
+  iostream.cpp
+  iostream.h
+  main.cpp
+  margins.cpp
+  point.cpp
+  rect.cpp
+  )
 target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch)
 include_config(yttrium_tests ${PROJECT_BINARY_DIR}/config.h)
 
