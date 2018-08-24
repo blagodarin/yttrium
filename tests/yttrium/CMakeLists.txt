@@ -1,12 +1,21 @@
 find_package(Catch2)
 
 add_executable(yttrium_tests
+  buffer_appender.cpp
+  color.cpp
+  flags.cpp
   iostream.cpp
   iostream.h
   main.cpp
   margins.cpp
   point.cpp
   rect.cpp
+  temporary_file.cpp
+  test_utils.cpp
+  test_utils.h
+  texture_font.cpp
+  translation.cpp
+  utils.cpp
   vector.cpp
   )
 target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch)

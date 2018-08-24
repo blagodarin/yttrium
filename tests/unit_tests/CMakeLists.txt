@@ -1,10 +1,7 @@
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 add_executable(unit_tests
-	buffer_appender.cpp
 	buffer.cpp
-	color.cpp
-	flags.cpp
 	gui_loading.cpp
 	image_formats.cpp
 	image_formats.h
@@ -22,13 +19,9 @@ add_executable(unit_tests
 	resource_loader.cpp
 	source.cpp
 	string_utils.cpp
-	temporary_file.cpp
 	test_utils.cpp
 	test_utils.h
-	texture_font.cpp
 	tiny_string_map.cpp
-	translation.cpp
-	utils.cpp
 	)
 target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(unit_tests PRIVATE yttrium Boost::unit_test_framework)

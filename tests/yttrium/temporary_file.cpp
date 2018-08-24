@@ -3,34 +3,34 @@
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 
 using Yttrium::Reader;
 using Yttrium::Source;
 using Yttrium::TemporaryFile;
 using Yttrium::Writer;
 
-BOOST_AUTO_TEST_CASE(test_temporary_file)
+TEST_CASE("temporary_file")
 {
 	TemporaryFile file;
-	BOOST_CHECK_EQUAL(0, Source::from(file)->size());
+	CHECK(Source::from(file)->size() == 0);
 	{
 		Writer writer{file};
-		BOOST_CHECK_EQUAL(0, writer.size());
+		CHECK(writer.size() == 0);
 		writer.write(int64_t{-1});
-		BOOST_CHECK_EQUAL(sizeof(int64_t), writer.size());
+		CHECK(writer.size() == sizeof(int64_t));
 	}
 	{
 		const auto source = Source::from(file);
-		BOOST_CHECK_EQUAL(sizeof(int64_t), source->size());
+		CHECK(source->size() == sizeof(int64_t));
 		Reader reader{*source};
 		int64_t data = 0;
-		BOOST_CHECK(reader.read(data));
-		BOOST_CHECK_EQUAL(-1, data);
+		CHECK(reader.read(data));
+		CHECK(data == -1);
 	}
 	{
 		Writer writer{file};
-		BOOST_CHECK_EQUAL(0, writer.size());
+		CHECK(writer.size() == 0);
 	}
-	BOOST_CHECK_EQUAL(0, Source::from(file)->size());
+	CHECK(Source::from(file)->size() == 0);
 }

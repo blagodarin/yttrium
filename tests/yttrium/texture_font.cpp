@@ -3,7 +3,7 @@
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 
 using namespace Yttrium;
 
@@ -12,16 +12,16 @@ namespace
 	template <typename T>
 	void write(Writer& writer, const T& data)
 	{
-		BOOST_REQUIRE(writer.write_all(&data, sizeof data));
+		REQUIRE(writer.write_all(&data, sizeof data));
 	}
 
 	void write(Writer& writer, const std::vector<uint8_t>& data)
 	{
-		BOOST_REQUIRE(writer.write_all(data.data(), data.size()));
+		REQUIRE(writer.write_all(data.data(), data.size()));
 	}
 }
 
-BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
+TEST_CASE("texture_font")
 {
 	// ASCII printable character codes.
 	const uint8_t first_char = 33;
@@ -72,5 +72,5 @@ BOOST_AUTO_TEST_CASE(test_texture_font_ytf1)
 	}
 
 	const auto font = TextureFont::load(*Source::from(file));
-	BOOST_REQUIRE(font);
+	REQUIRE(font);
 }
