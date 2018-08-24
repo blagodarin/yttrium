@@ -7,6 +7,7 @@ add_executable(yttrium_tests
   margins.cpp
   point.cpp
   rect.cpp
+  vector.cpp
   )
 target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch)
 include_config(yttrium_tests ${PROJECT_BINARY_DIR}/config.h)

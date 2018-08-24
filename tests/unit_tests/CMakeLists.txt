@@ -29,7 +29,6 @@ add_executable(unit_tests
 	tiny_string_map.cpp
 	translation.cpp
 	utils.cpp
-	vector.cpp
 	)
 target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(unit_tests PRIVATE yttrium Boost::unit_test_framework)

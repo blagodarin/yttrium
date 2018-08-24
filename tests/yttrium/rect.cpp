@@ -1,3 +1,4 @@
+#include <yttrium/math/rect.h>
 #include "iostream.h"
 
 #include <catch/catch.hpp>
