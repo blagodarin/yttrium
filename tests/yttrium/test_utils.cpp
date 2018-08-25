@@ -2,6 +2,7 @@
 
 #include <yttrium/memory/buffer.h>
 
+#include <cstring>
 #include <random>
 
 #include <catch/catch.hpp>

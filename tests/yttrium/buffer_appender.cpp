@@ -1,6 +1,8 @@
 #include <yttrium/memory/buffer_appender.h>
 #include "../../libs/yttrium/utils/fourcc.h"
 
+#include <cstring>
+
 #include <catch/catch.hpp>
 
 TEST_CASE("buffer_appender")
