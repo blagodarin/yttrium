@@ -16,12 +16,9 @@ add_executable(unit_tests
 	matrix.cpp
 	package.cpp
 	reader.cpp
-	resource_loader.cpp
-	source.cpp
 	string_utils.cpp
 	test_utils.cpp
 	test_utils.h
-	tiny_string_map.cpp
 	)
 target_compile_definitions(unit_tests PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(unit_tests PRIVATE yttrium Boost::unit_test_framework)
