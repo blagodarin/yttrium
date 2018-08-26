@@ -14,6 +14,8 @@ add_executable(yttrium_tests
   key.cpp
   main.cpp
   margins.cpp
+  matrix.cpp
+  package.cpp
   point.cpp
   rect.cpp
   resource_loader.cpp

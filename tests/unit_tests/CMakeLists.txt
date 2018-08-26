@@ -7,8 +7,6 @@ add_executable(unit_tests
 	iostream.cpp
 	iostream.h
 	main.cpp
-	matrix.cpp
-	package.cpp
 	reader.cpp
 	test_utils.cpp
 	test_utils.h
