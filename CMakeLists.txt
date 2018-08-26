@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.7)
 
 project(yttrium CXX)
 
-set(Boost_USE_STATIC_LIBS OFF)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_CXX_STANDARD 17)
@@ -145,7 +144,6 @@ if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 endif()
 
 if(Y_BUILD_TESTS OR Y_BUILD_ALL)
-	add_subdirectory(tests/unit_tests)
 	add_subdirectory(tests/yttrium)
 endif()
 

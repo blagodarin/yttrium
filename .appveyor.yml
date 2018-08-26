@@ -3,8 +3,6 @@ image: Visual Studio 2017
 shallow_clone: true
 
 environment:
-  BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.1
-  BOOST_ROOT: C:\Libraries\boost_1_67_0
   matrix:
     - CONFIG: Release
       RENDERER: Null
@@ -30,6 +28,4 @@ build_script:
 
 test_script:
   - cmd: |
-      set PATH=%PATH%;%BOOST_LIBRARYDIR%
       cmake --build . --config %CONFIG% --target check -- /nologo /verbosity:minimal
-      cmake --build . --config %CONFIG% --target catch -- /nologo /verbosity:minimal

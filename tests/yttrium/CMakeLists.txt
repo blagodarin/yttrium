@@ -37,6 +37,6 @@ add_executable(yttrium_tests
 target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch2)
 include_config(yttrium_tests ${PROJECT_BINARY_DIR}/config.h)
 
-add_custom_target(catch COMMAND yttrium_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_custom_target(check COMMAND yttrium_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-set_target_properties(yttrium_tests catch PROPERTIES FOLDER "tests")
+set_target_properties(yttrium_tests check PROPERTIES FOLDER "tests")

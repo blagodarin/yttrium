@@ -97,13 +97,6 @@ install:
   - if [ -n "${CLANG_VERSION}" ]; then make install-libcxx install-libcxxabi; fi
   - if [ -n "${CLANG_VERSION}" ]; then popd; fi
 
-  - mkdir ${TRAVIS_BUILD_DIR}/_3rdparty/boost && pushd ${TRAVIS_BUILD_DIR}/_3rdparty/boost
-  - wget -q -O - https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 | tar -x --bzip2 --strip-components 1
-  - ./bootstrap.sh
-  - ./b2 -j2 --with-test cxxflags="-Wno-variadic-macros" toolset=gcc variant=debug
-  - CMAKE_OPTIONS+=" -DBOOST_ROOT=$(pwd)"
-  - popd
-
   - pushd ${TRAVIS_BUILD_DIR}/_prefix
   - cmake -DBUILD=catch2 -P ../cmake/bootstrap.cmake
   - popd
@@ -129,7 +122,6 @@ script:
   - cmake .. -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/_prefix $CMAKE_OPTIONS -DY_RENDERER=$RENDERER
   - cmake --build . -- -j2
   - cmake --build . --target check
-  - cmake --build . --target catch
   - popd
 
 after_success:
