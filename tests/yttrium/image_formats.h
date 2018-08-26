@@ -1,5 +1,4 @@
-#ifndef _tests_image_formats_h_
-#define _tests_image_formats_h_
+#pragma once
 
 #include <yttrium/image.h>
 
@@ -41,5 +40,3 @@ inline Yttrium::Image make_test_image(bool with_alpha)
 	}
 	return { { 16, 16, with_alpha ? Yttrium::PixelFormat::Bgra32 : Yttrium::PixelFormat::Bgr24 }, buffer.data() };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _tests_image_h_
-#define _tests_image_h_
+#pragma once
 
 #include <yttrium/image.h>
 #include "../../libs/yttrium/image/utils.h"
@@ -28,5 +27,3 @@ namespace Yttrium
 		return !(a == b);
 	}
 }
-
-#endif

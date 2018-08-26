@@ -5,6 +5,10 @@ add_executable(yttrium_tests
   buffer_appender.cpp
   color.cpp
   flags.cpp
+  image.cpp
+  image.h
+  image_formats.cpp
+  image_formats.h
   iostream.cpp
   iostream.h
   key.cpp
