@@ -2,8 +2,6 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 add_executable(unit_tests
 	gui_loading.cpp
-	ion_reader.cpp
-	ion_writer.cpp
 	iostream.cpp
 	iostream.h
 	main.cpp

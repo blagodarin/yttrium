@@ -9,6 +9,8 @@ add_executable(yttrium_tests
   image.h
   image_formats.cpp
   image_formats.h
+  ion_reader.cpp
+  ion_writer.cpp
   iostream.cpp
   iostream.h
   key.cpp
