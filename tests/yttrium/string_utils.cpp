@@ -3,7 +3,7 @@
 #include <cstring>
 #include <limits>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("string_utils.make_string")
 {

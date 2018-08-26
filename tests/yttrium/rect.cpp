@@ -1,7 +1,7 @@
 #include <yttrium/math/rect.h>
 #include "iostream.h"
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 using Yttrium::Point;
 using Yttrium::Rect;

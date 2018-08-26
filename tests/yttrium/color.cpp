@@ -1,6 +1,6 @@
 #include <yttrium/math/color.h>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("color.bgra32")
 {

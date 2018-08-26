@@ -6,7 +6,7 @@
 #include <yttrium/storage/storage.h>
 #include "test_utils.h"
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 using Yttrium::DataError;
 using Yttrium::ResourceError;

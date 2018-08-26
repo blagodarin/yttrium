@@ -4,7 +4,7 @@
 	#include "../../libs/yttrium/memory/buffer_memory_tracker.h"
 #endif
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 using Yttrium::Buffer;
 

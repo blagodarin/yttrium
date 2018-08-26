@@ -24,7 +24,7 @@ add_executable(yttrium_tests
   utils.cpp
   vector.cpp
   )
-target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch)
+target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch2)
 include_config(yttrium_tests ${PROJECT_BINARY_DIR}/config.h)
 
 add_custom_target(catch COMMAND yttrium_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

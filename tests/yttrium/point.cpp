@@ -1,6 +1,6 @@
 #include <yttrium/math/point.h>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("point")
 {

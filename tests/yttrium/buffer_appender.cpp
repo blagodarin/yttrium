@@ -3,7 +3,7 @@
 
 #include <cstring>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("buffer_appender")
 {

@@ -1,7 +1,7 @@
 #include <yttrium/math/vector.h>
 #include "iostream.h"
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("vector2")
 {

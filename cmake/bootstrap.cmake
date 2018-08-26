@@ -112,13 +112,13 @@ y_package(opengl)
 y_package(zlib)
 
 if("catch2" IN_LIST _y_packages)
-  set(_version "2.2.3")
+  set(_version "2.3.0")
   set(_package "Catch2-${_version}")
-  y_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz" SHA1 "24630ba95ddb0587d74c0c2f37f24a62189cb337")
+  y_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz" SHA1 "e913061207ca04dcd3d29e49a226f8caa26304fa")
   y_extract("v${_version}.tar.gz" DIR ${_package})
   y_cmake(${_package}
     CONFIG Release
-    OPTIONS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_DOCDIR=${CMAKE_BINARY_DIR}/.trash -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
+    OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
 if("libogg" IN_LIST _y_packages)

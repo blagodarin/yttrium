@@ -3,7 +3,7 @@
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 using Yttrium::Reader;
 using Yttrium::Source;

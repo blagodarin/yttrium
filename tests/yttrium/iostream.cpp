@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 namespace Yttrium
 {

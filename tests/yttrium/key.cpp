@@ -1,6 +1,6 @@
 #include "../../libs/yttrium/gui/key_lookup.h"
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 #include "../../libs/yttrium/gui/key_lookup.cpp"
 

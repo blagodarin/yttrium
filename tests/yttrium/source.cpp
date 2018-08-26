@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 using Yttrium::Buffer;
 using Yttrium::Source;

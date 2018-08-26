@@ -1,7 +1,7 @@
 #include <yttrium/tiny_string_map.h>
 #include "iostream.h"
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 using Yttrium::TinyStringMap;
 

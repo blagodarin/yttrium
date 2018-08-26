@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("utils.is_power_of_2")
 {

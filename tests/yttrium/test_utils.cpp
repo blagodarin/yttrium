@@ -5,7 +5,7 @@
 #include <cstring>
 #include <random>
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 
 Yttrium::Buffer make_buffer(std::string_view text)
 {
