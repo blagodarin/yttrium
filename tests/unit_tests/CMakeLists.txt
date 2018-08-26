@@ -4,7 +4,6 @@ add_executable(unit_tests
 	iostream.cpp
 	iostream.h
 	main.cpp
-	reader.cpp
 	test_utils.cpp
 	test_utils.h
 	)

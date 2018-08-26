@@ -20,6 +20,7 @@ add_executable(yttrium_tests
   matrix.cpp
   package.cpp
   point.cpp
+  reader.cpp
   rect.cpp
   resource_loader.cpp
   source.cpp
