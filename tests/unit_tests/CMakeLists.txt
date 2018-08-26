@@ -1,7 +1,6 @@
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 add_executable(unit_tests
-	buffer.cpp
 	gui_loading.cpp
 	image_formats.cpp
 	image_formats.h
@@ -11,12 +10,10 @@ add_executable(unit_tests
 	ion_writer.cpp
 	iostream.cpp
 	iostream.h
-	key.cpp
 	main.cpp
 	matrix.cpp
 	package.cpp
 	reader.cpp
-	string_utils.cpp
 	test_utils.cpp
 	test_utils.h
 	)

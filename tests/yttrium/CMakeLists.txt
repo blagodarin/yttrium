@@ -1,17 +1,20 @@
 find_package(Catch2)
 
 add_executable(yttrium_tests
+  buffer.cpp
   buffer_appender.cpp
   color.cpp
   flags.cpp
   iostream.cpp
   iostream.h
+  key.cpp
   main.cpp
   margins.cpp
   point.cpp
   rect.cpp
   resource_loader.cpp
   source.cpp
+  string_utils.cpp
   temporary_file.cpp
   test_utils.cpp
   test_utils.h
