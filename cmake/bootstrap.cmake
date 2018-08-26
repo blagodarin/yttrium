@@ -4,7 +4,15 @@ string(REPLACE "," ";" PACKAGES "${BUILD}")
 set(BUILD_DIR ${CMAKE_BINARY_DIR}/.build)
 set(CACHE_DIR ${CMAKE_BINARY_DIR}/.cache)
 set(PREFIX_DIR ${CMAKE_BINARY_DIR})
-set(GENERATOR "Visual Studio 15 2017 Win64")
+if(WIN32)
+  set(GENERATOR "Visual Studio 15 2017 Win64")
+  set(CONFIGS RelWithDebInfo Debug)
+  set(BUILD_OPTIONS -- /nologo /verbosity:minimal)
+else()
+  set(GENERATOR "Unix Makefiles")
+  set(CONFIGS Release)
+  set(BUILD_OPTIONS)
+endif()
 
 function(y_cmake _dir)
   cmake_parse_arguments(_arg "" "TARGET" "CONFIG;OPTIONS" ${ARGN})
@@ -13,10 +21,10 @@ function(y_cmake _dir)
   if(_arg_TARGET)
     set(_target ${_arg_TARGET})
   else()
-    set(_target "INSTALL")
+    set(_target "install")
   endif()
   foreach(_config ${_arg_CONFIG})
-    execute_process(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config ${_config} --target ${_target} -- /nologo /verbosity:minimal
+    execute_process(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config ${_config} --target ${_target} ${BUILD_OPTIONS}
       WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
   endforeach()
 endfunction()
@@ -96,24 +104,12 @@ endfunction()
 y_package(libvorbis REQUIRES libogg)
 y_package(libjpeg REQUIRES nasm)
 y_package(libpng REQUIRES nasm zlib)
-y_package(boost)
 y_package(catch2)
 y_package(libogg)
 y_package(nasm)
 y_package(openal)
 y_package(opengl)
 y_package(zlib)
-
-if("boost" IN_LIST _y_packages)
-  set(_version "1_67_0")
-  set(_package "boost_${_version}")
-  y_download("https://dl.bintray.com/boostorg/release/1.67.0/source/${_package}.7z" SHA1 "64c278c23defe155e630a307ae2c0615348b14b3")
-  y_extract("${_package}.7z" DIR ${_package})
-  execute_process(COMMAND cmd /c bootstrap.bat
-    WORKING_DIRECTORY ${BUILD_DIR}/${_package})
-  execute_process(COMMAND ${BUILD_DIR}/${_package}/b2 --with-test address-model=64 link=static runtime-link=shared threading=multi variant=debug,release
-    WORKING_DIRECTORY ${BUILD_DIR}/${_package})
-endif()
 
 if("catch2" IN_LIST _y_packages)
   set(_version "2.2.3")
@@ -122,7 +118,7 @@ if("catch2" IN_LIST _y_packages)
   y_extract("v${_version}.tar.gz" DIR ${_package})
   y_cmake(${_package}
     CONFIG Release
-    OPTIONS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_DOCDIR=${CMAKE_BINARY_DIR}/.trash)
+    OPTIONS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_DOCDIR=${CMAKE_BINARY_DIR}/.trash -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
 if("libogg" IN_LIST _y_packages)
@@ -130,22 +126,24 @@ if("libogg" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/ogg.git" DIR ${_package})
   y_cmake(${_package}
     TARGET "ogg"
-    CONFIG RelWithDebInfo Debug)
-  file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
-  file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
+    CONFIG ${CONFIGS})
   file(INSTALL
     ${BUILD_DIR}/${_package}/include/ogg/config_types.h
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/RelWithDebInfo/ogg.lib
-    ${BUILD_DIR}/${_package}/ogg.dir/RelWithDebInfo/ogg.pdb
-    DESTINATION ${PREFIX_DIR}/lib)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/Debug/oggd.lib
-    ${BUILD_DIR}/${_package}/Debug/oggd.pdb
-    DESTINATION ${PREFIX_DIR}/lib)
+  if(WIN32)
+    file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
+    file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
+    file(INSTALL
+      ${BUILD_DIR}/${_package}/RelWithDebInfo/ogg.lib
+      ${BUILD_DIR}/${_package}/ogg.dir/RelWithDebInfo/ogg.pdb
+      DESTINATION ${PREFIX_DIR}/lib)
+    file(INSTALL
+      ${BUILD_DIR}/${_package}/Debug/oggd.lib
+      ${BUILD_DIR}/${_package}/Debug/oggd.pdb
+      DESTINATION ${PREFIX_DIR}/lib)
+  endif()
 endif()
 
 if("nasm" IN_LIST _y_packages)
@@ -162,14 +160,16 @@ if("openal" IN_LIST _y_packages)
   set(_version "1.18.2")
   set(_package "openal-soft-${_version}-bin")
   y_download("http://openal-soft.org/openal-binaries/${_package}.zip" SHA1 "0d2edd1b77cbb998f12e064d0eefea3508446776")
-  y_download("https://openal.org/downloads/oalinst.zip" SHA1 "45e08368c6755c58902b7746ff3e51ad2df8a8b8")
   y_extract("${_package}.zip" DIR ${_package})
   file(INSTALL
     ${BUILD_DIR}/${_package}/include
     ${BUILD_DIR}/${_package}/libs
     DESTINATION ${PREFIX_DIR})
-  y_extract("oalinst.zip")
-  execute_process(COMMAND ${BUILD_DIR}/oalinst.exe /s)
+  if(WIN32)
+    y_download("https://openal.org/downloads/oalinst.zip" SHA1 "45e08368c6755c58902b7746ff3e51ad2df8a8b8")
+    y_extract("oalinst.zip")
+    execute_process(COMMAND ${BUILD_DIR}/oalinst.exe /s)
+  endif()
 endif()
 
 if("opengl" IN_LIST _y_packages)
@@ -191,7 +191,7 @@ if("zlib" IN_LIST _y_packages)
   y_download("https://zlib.net/${_package}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y_extract("${_package}.tar.xz" DIR ${_package})
   y_cmake(${_package}
-    CONFIG RelWithDebInfo Debug
+    CONFIG ${CONFIGS}
     OPTIONS -DSKIP_INSTALL_FILES=ON)
 endif()
 
@@ -202,24 +202,26 @@ if("libjpeg" IN_LIST _y_packages)
   y_extract("${_package}.tar.gz" DIR ${_package})
   y_cmake(${_package}
     TARGET "jpeg-static"
-    CONFIG RelWithDebInfo Debug
+    CONFIG ${CONFIGS}
     OPTIONS -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
-  file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
-  file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
     ${BUILD_DIR}/${_package}/jmorecfg.h
     ${BUILD_DIR}/${_package}/jpeglib.h
     DESTINATION ${PREFIX_DIR}/include)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/RelWithDebInfo/jpeg-static.lib
-    ${BUILD_DIR}/${_package}/jpeg-static.dir/RelWithDebInfo/jpeg-static.pdb
-    DESTINATION ${PREFIX_DIR}/lib)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
-    ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb
-    DESTINATION ${PREFIX_DIR}/lib)
+  if(WIN32)
+    file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
+    file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
+    file(INSTALL
+      ${BUILD_DIR}/${_package}/RelWithDebInfo/jpeg-static.lib
+      ${BUILD_DIR}/${_package}/jpeg-static.dir/RelWithDebInfo/jpeg-static.pdb
+      DESTINATION ${PREFIX_DIR}/lib)
+    file(INSTALL
+      ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
+      ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb
+      DESTINATION ${PREFIX_DIR}/lib)
+  endif()
 endif()
 
 if("libpng" IN_LIST _y_packages)
@@ -228,7 +230,7 @@ if("libpng" IN_LIST _y_packages)
   y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y_extract("${_package}.tar.xz" DIR ${_package})
   y_cmake(${_package}
-    CONFIG RelWithDebInfo Debug
+    CONFIG ${CONFIGS}
     OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
 endif()
 
@@ -237,26 +239,28 @@ if("libvorbis" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
   y_cmake(${_package}
     TARGET "vorbisfile"
-    CONFIG RelWithDebInfo Debug
+    CONFIG ${CONFIGS}
     OPTIONS -DOGG_ROOT=${PREFIX_DIR})
-  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
-  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
-  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib)
-  file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb)
   file(INSTALL
     ${BUILD_DIR}/${_package}/include/vorbis/codec.h
     ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
     DESTINATION ${PREFIX_DIR}/include/vorbis)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbis.lib
-    ${BUILD_DIR}/${_package}/lib/vorbis.dir/RelWithDebInfo/vorbis.pdb
-    ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbisfile.lib
-    ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/RelWithDebInfo/vorbisfile.pdb
-    DESTINATION ${PREFIX_DIR}/lib)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
-    ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb
-    ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
-    ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb
-    DESTINATION ${PREFIX_DIR}/lib)
+  if(WIN32)
+    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
+    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
+    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib)
+    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb)
+    file(INSTALL
+      ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbis.lib
+      ${BUILD_DIR}/${_package}/lib/vorbis.dir/RelWithDebInfo/vorbis.pdb
+      ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbisfile.lib
+      ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/RelWithDebInfo/vorbisfile.pdb
+      DESTINATION ${PREFIX_DIR}/lib)
+    file(INSTALL
+      ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
+      ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb
+      ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
+      ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb
+      DESTINATION ${PREFIX_DIR}/lib)
+  endif()
 endif()
