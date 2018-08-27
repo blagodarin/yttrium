@@ -123,7 +123,13 @@ TEST_CASE("ion.writer.escape")
 	ion->add_value("value\\value");
 	ion->add_value("value\\");
 	ion->flush();
-	CHECK(ion.to_string() == R"(name"\"value""value\"value""value\"""\\value""value\\value""value\\")");
+	CHECK(ion.to_string() == "name"
+		"\"\\\"value\""
+		"\"value\\\"value\""
+		"\"value\\\"\""
+		"\"\\\\value\""
+		"\"value\\\\value\""
+		"\"value\\\\\"");
 }
 
 TEST_CASE("ion.writer.flush")
