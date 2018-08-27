@@ -51,7 +51,6 @@ target_sources(yttrium PRIVATE
 	audio/utils.cpp
 	)
 if(ON)
-	find_package(OpenAL REQUIRED)
 	target_sources(yttrium PRIVATE
 		audio/openal/backend.cpp
 		audio/openal/backend.h
@@ -248,7 +247,6 @@ target_sources(yttrium PRIVATE
 	renderer/texture.h
 	)
 if(Y_RENDERER_OPENGL)
-	find_package(OpenGL REQUIRED)
 	target_sources(yttrium PRIVATE
 		platform/gl.h
 		renderer/gl/api.h
@@ -271,7 +269,6 @@ if(Y_RENDERER_OPENGL)
 		)
 	target_link_libraries(yttrium PRIVATE OpenGL::GL)
 elseif(Y_RENDERER_VULKAN)
-	find_package(Vulkan REQUIRED)
 	target_sources(yttrium PRIVATE
 		renderer/vulkan/buffer.cpp
 		renderer/vulkan/buffer.h
@@ -379,7 +376,6 @@ target_sources(yttrium PRIVATE
 	)
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
-		find_package(X11 REQUIRED)
 		target_sources(yttrium PRIVATE
 			platform/x11/glx.cpp
 			platform/x11/glx.h
@@ -389,7 +385,6 @@ if(UNIX)
 		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
 	else()
-		# TODO: Use find_package for XCB and libxkbcommon.
 		target_sources(yttrium PRIVATE
 			platform/xcb/window.cpp
 			platform/xcb/window.h

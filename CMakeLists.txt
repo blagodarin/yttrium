@@ -27,13 +27,18 @@ option(Y_USE_PNG "Include PNG support" ON)
 
 set(Y_RENDERER "OpenGL" CACHE STRING "Renderer to use (OpenGL, Vulkan)")
 if(Y_RENDERER STREQUAL "OpenGL")
+	find_package(OpenGL REQUIRED)
+	find_package(X11 REQUIRED)
 	set(Y_RENDERER_OPENGL ON)
 elseif(Y_RENDERER STREQUAL "Vulkan")
+	find_package(Vulkan REQUIRED)
+	# TODO: Use find_package for XCB and libxkbcommon.
 	set(Y_RENDERER_VULKAN ON)
 else()
 	set(Y_RENDERER_NULL ON)
 endif()
 
+find_package(OpenAL REQUIRED)
 find_package(Threads REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -144,6 +149,7 @@ if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
 endif()
 
 if(Y_BUILD_TESTS OR Y_BUILD_ALL)
+	find_package(Catch2 2.3.0 REQUIRED)
 	add_subdirectory(tests/yttrium)
 endif()
 

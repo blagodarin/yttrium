@@ -1,5 +1,3 @@
-find_package(Catch2)
-
 add_executable(yttrium_tests
   buffer.cpp
   buffer_appender.cpp
