@@ -105,6 +105,7 @@ y_package(libvorbis REQUIRES libogg)
 y_package(libjpeg REQUIRES nasm)
 y_package(libpng REQUIRES nasm zlib)
 y_package(catch2)
+y_package(glslang)
 y_package(libogg)
 y_package(nasm)
 y_package(openal)
@@ -119,6 +120,16 @@ if("catch2" IN_LIST _y_packages)
   y_cmake(${_package}
     CONFIG Release
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
+endif()
+
+if("glslang" IN_LIST _y_packages)
+  set(_version "7.8.2853")
+  set(_package "glslang-${_version}")
+  y_download("https://github.com/KhronosGroup/glslang/archive/${_version}.tar.gz" SHA1 "9b6d3734abb351e8218e31c4b08c08805f2c22fc")
+  y_extract("${_version}.tar.gz" DIR ${_package})
+  y_cmake(${_package}
+    CONFIG ${CONFIGS}
+    OPTIONS -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
 endif()
 
 if("libogg" IN_LIST _y_packages)
