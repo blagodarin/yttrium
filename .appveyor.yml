@@ -19,8 +19,9 @@ cache:
 install:
   - cmd: |
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
-      mkdir %PREFIX_DIR% && cd %PREFIX_DIR%
-      call %APPVEYOR_BUILD_FOLDER%\bootstrap.bat
+      if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
+      cd %PREFIX_DIR%
+      cmake -DBUILD=catch2,libjpeg,libpng,libvorbis,openal,opengl -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\bootstrap.cmake
 
 build_script:
   - cmd: |

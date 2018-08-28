@@ -6,12 +6,37 @@ set(CACHE_DIR ${CMAKE_BINARY_DIR}/.cache)
 set(PREFIX_DIR ${CMAKE_BINARY_DIR})
 if(WIN32)
   set(GENERATOR "Visual Studio 15 2017 Win64")
-  set(CONFIGS RelWithDebInfo Debug)
   set(BUILD_OPTIONS -- /nologo /verbosity:minimal)
 else()
   set(GENERATOR "Unix Makefiles")
-  set(CONFIGS Release)
   set(BUILD_OPTIONS)
+endif()
+
+if(CONFIG)
+  if(NOT CONFIG STREQUAL "Debug")
+    if(WIN32)
+      set(CONFIG "RelWithDebInfo")
+    else()
+      set(CONFIG "Release")
+    endif()
+  endif()
+  set(CONFIGS ${CONFIG})
+else()
+  if(WIN32)
+    set(CONFIG "RelWithDebInfo")
+    set(CONFIGS ${CONFIG} "Debug")
+  else()
+    set(CONFIG "Release")
+    set(CONFIGS ${CONFIG})
+  endif()
+endif()
+
+if("Debug" IN_LIST CONFIGS)
+  set(WITH_DEBUG ON)
+endif()
+
+if(NOT "Debug" STREQUAL "${CONFIGS}")
+  set(WITH_RELEASE ON)
 endif()
 
 function(y_cmake _dir)
@@ -118,7 +143,7 @@ if("catch2" IN_LIST _y_packages)
   y_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz" SHA1 "e913061207ca04dcd3d29e49a226f8caa26304fa")
   y_extract("v${_version}.tar.gz" DIR ${_package})
   y_cmake(${_package}
-    CONFIG Release
+    CONFIG ${CONFIG}
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
@@ -144,16 +169,20 @@ if("libogg" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
   if(WIN32)
-    file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
-    file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
-    file(INSTALL
-      ${BUILD_DIR}/${_package}/RelWithDebInfo/ogg.lib
-      ${BUILD_DIR}/${_package}/ogg.dir/RelWithDebInfo/ogg.pdb
-      DESTINATION ${PREFIX_DIR}/lib)
-    file(INSTALL
-      ${BUILD_DIR}/${_package}/Debug/oggd.lib
-      ${BUILD_DIR}/${_package}/Debug/oggd.pdb
-      DESTINATION ${PREFIX_DIR}/lib)
+    if(WITH_RELEASE)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/RelWithDebInfo/ogg.lib
+        ${BUILD_DIR}/${_package}/ogg.dir/RelWithDebInfo/ogg.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+    if(WITH_DEBUG)
+      file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
+      file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/Debug/oggd.lib
+        ${BUILD_DIR}/${_package}/Debug/oggd.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
   endif()
 endif()
 
@@ -222,16 +251,20 @@ if("libjpeg" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/jpeglib.h
     DESTINATION ${PREFIX_DIR}/include)
   if(WIN32)
-    file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
-    file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
-    file(INSTALL
-      ${BUILD_DIR}/${_package}/RelWithDebInfo/jpeg-static.lib
-      ${BUILD_DIR}/${_package}/jpeg-static.dir/RelWithDebInfo/jpeg-static.pdb
-      DESTINATION ${PREFIX_DIR}/lib)
-    file(INSTALL
-      ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
-      ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb
-      DESTINATION ${PREFIX_DIR}/lib)
+    if(WITH_RELEASE)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/RelWithDebInfo/jpeg-static.lib
+        ${BUILD_DIR}/${_package}/jpeg-static.dir/RelWithDebInfo/jpeg-static.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+    if(WITH_DEBUG)
+      file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
+      file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
+        ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
   endif()
 endif()
 
@@ -257,21 +290,25 @@ if("libvorbis" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
     DESTINATION ${PREFIX_DIR}/include/vorbis)
   if(WIN32)
-    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
-    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
-    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib)
-    file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb)
-    file(INSTALL
-      ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbis.lib
-      ${BUILD_DIR}/${_package}/lib/vorbis.dir/RelWithDebInfo/vorbis.pdb
-      ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbisfile.lib
-      ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/RelWithDebInfo/vorbisfile.pdb
-      DESTINATION ${PREFIX_DIR}/lib)
-    file(INSTALL
-      ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
-      ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb
-      ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
-      ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb
-      DESTINATION ${PREFIX_DIR}/lib)
+    if(WITH_RELEASE)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbis.lib
+        ${BUILD_DIR}/${_package}/lib/vorbis.dir/RelWithDebInfo/vorbis.pdb
+        ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbisfile.lib
+        ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/RelWithDebInfo/vorbisfile.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+    if(WITH_DEBUG)
+      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
+      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
+      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib)
+      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
+        ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb
+        ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
+        ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
   endif()
 endif()
