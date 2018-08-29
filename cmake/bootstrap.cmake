@@ -40,8 +40,14 @@ if(NOT "Debug" STREQUAL "${CONFIGS}")
 endif()
 
 function(y_cmake _dir)
-  cmake_parse_arguments(_arg "" "TARGET" "CONFIG;OPTIONS" ${ARGN})
-  execute_process(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${BUILD_DIR}/${_dir} -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} ${_arg_OPTIONS}
+  cmake_parse_arguments(_arg "" "SOURCE;TARGET" "CONFIG;OPTIONS" ${ARGN})
+  if(_arg_SOURCE)
+    set(_source ${_arg_SOURCE})
+  else()
+    set(_source ${BUILD_DIR}/${_dir})
+  endif()
+  file(MAKE_DIRECTORY ${BUILD_DIR}/${_dir})
+  execute_process(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source} -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} ${_arg_OPTIONS}
     WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
   if(_arg_TARGET)
     set(_target ${_arg_TARGET})
@@ -124,6 +130,18 @@ function(y_package _package)
     endif()
     _y_add_package(${_package})
   endif()
+endfunction()
+
+function(y_replace _where _what _with)
+  y_cmake(".bootstrap"
+    SOURCE ${CMAKE_CURRENT_LIST_DIR}/bootstrap/replace
+    CONFIG Release
+    OPTIONS -DCMAKE_INSTALL_PREFIX=${BUILD_DIR})
+  file(RENAME ${_where} ${_where}~)
+  execute_process(COMMAND ${BUILD_DIR}/bootstrap_replace ${_what} ${_with}
+    WORKING_DIRECTORY ${BUILD_DIR}
+    INPUT_FILE ${_where}~
+    OUTPUT_FILE ${_where})
 endfunction()
 
 y_package(libvorbis REQUIRES libogg)
@@ -281,6 +299,11 @@ endif()
 if("libvorbis" IN_LIST _y_packages)
   set(_package "vorbis")
   y_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
+  if(WIN32)
+    y_replace(${BUILD_DIR}/${_package}/CMakeLists.txt
+      "    find_library(OGG_LIBRARIES NAMES ogg HINTS \${OGG_ROOT}/lib \${OGG_ROOT}/lib64)"
+      "    find_library(OGG_LIBRARIES NAMES ogg oggd HINTS \${OGG_ROOT}/lib \${OGG_ROOT}/lib64)")
+  endif()
   y_cmake(${_package}
     TARGET "vorbisfile"
     CONFIG ${CONFIGS}
