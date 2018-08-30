@@ -150,7 +150,7 @@ endfunction()
 
 y_package(libvorbis REQUIRES libogg)
 y_package(libjpeg REQUIRES nasm)
-y_package(libpng REQUIRES nasm zlib)
+y_package(libpng REQUIRES zlib)
 y_package(catch2)
 y_package(glslang)
 y_package(libogg)
@@ -317,15 +317,30 @@ if("libpng" IN_LIST _y_packages)
     "  find_package(ZLIB REQUIRED)"
     "  #find_package(ZLIB REQUIRED)")
   y_cmake(${_package}
+    TARGET "png_static"
     CONFIG ${CONFIGS}
-    OPTIONS
-      -DPNG_SHARED=OFF
-      -DPNG_TESTS=OFF
-      -DSKIP_INSTALL_EXECUTABLES=ON
-      -DSKIP_INSTALL_EXPORT=ON
-      -DSKIP_INSTALL_FILES=ON
-      -DSKIP_INSTALL_PROGRAMS=ON
-      -DZLIB_INCLUDE_DIR=${PREFIX_DIR}/include)
+    OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_ALL=ON -DZLIB_INCLUDE_DIR=${PREFIX_DIR}/include)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/png.h
+    ${BUILD_DIR}/${_package}/pngconf.h
+    ${BUILD_DIR}/${_package}/pnglibconf.h
+    DESTINATION ${PREFIX_DIR}/include)
+  if(WIN32)
+    if(WITH_RELEASE)
+      file(RENAME ${BUILD_DIR}/${_package}/png_static.dir/RelWithDebInfo/png_static.pdb ${BUILD_DIR}/${_package}/png_static.dir/RelWithDebInfo/libpng16_static.pdb)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/RelWithDebInfo/libpng16_static.lib
+        ${BUILD_DIR}/${_package}/png_static.dir/RelWithDebInfo/libpng16_static.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+    if(WITH_DEBUG)
+      file(RENAME ${BUILD_DIR}/${_package}/png_static.dir/Debug/png_static.pdb ${BUILD_DIR}/${_package}/png_static.dir/Debug/libpng16_staticd.pdb)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/Debug/libpng16_staticd.lib
+        ${BUILD_DIR}/${_package}/png_static.dir/Debug/libpng16_staticd.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+  endif()
 endif()
 
 if("libvorbis" IN_LIST _y_packages)
