@@ -247,8 +247,28 @@ if("zlib" IN_LIST _y_packages)
   y_download("https://zlib.net/${_package}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y_extract("${_package}.tar.xz" DIR ${_package})
   y_cmake(${_package}
+    TARGET "zlibstatic"
     CONFIG ${CONFIGS}
     OPTIONS -DSKIP_INSTALL_FILES=ON)
+  file(INSTALL
+    ${BUILD_DIR}/${_package}/zconf.h
+    ${BUILD_DIR}/${_package}/zlib.h
+    DESTINATION ${PREFIX_DIR}/include)
+  if(WIN32)
+    if(WITH_RELEASE)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/RelWithDebInfo/zlibstatic.lib
+        ${BUILD_DIR}/${_package}/zlibstatic.dir/RelWithDebInfo/zlibstatic.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+    if(WITH_DEBUG)
+      file(RENAME ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstatic.pdb ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstaticd.pdb)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/Debug/zlibstaticd.lib
+        ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstaticd.pdb
+        DESTINATION ${PREFIX_DIR}/lib)
+    endif()
+  endif()
 endif()
 
 if("libjpeg" IN_LIST _y_packages)
@@ -289,9 +309,19 @@ if("libpng" IN_LIST _y_packages)
   set(_package "libpng-${_version}")
   y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y_extract("${_package}.tar.xz" DIR ${_package})
+  y_replace(${BUILD_DIR}/${_package}/CMakeLists.txt
+    "  find_package(ZLIB REQUIRED)"
+    "  #find_package(ZLIB REQUIRED)")
   y_cmake(${_package}
     CONFIG ${CONFIGS}
-    OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_EXECUTABLES=ON -DSKIP_INSTALL_EXPORT=ON -DSKIP_INSTALL_FILES=ON -DSKIP_INSTALL_PROGRAMS=ON)
+    OPTIONS
+      -DPNG_SHARED=OFF
+      -DPNG_TESTS=OFF
+      -DSKIP_INSTALL_EXECUTABLES=ON
+      -DSKIP_INSTALL_EXPORT=ON
+      -DSKIP_INSTALL_FILES=ON
+      -DSKIP_INSTALL_PROGRAMS=ON
+      -DZLIB_INCLUDE_DIR=${PREFIX_DIR}/include)
 endif()
 
 if("libvorbis" IN_LIST _y_packages)
