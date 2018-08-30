@@ -209,9 +209,7 @@ if("nasm" IN_LIST _y_packages)
   set(_package "nasm-${_version}")
   y_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip" SHA1 "149a814fa53980976a7fc081231f59cfbcd02543")
   y_extract("${_package}-win64.zip" DIR ${_package})
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/nasm.exe
-    DESTINATION ${PREFIX_DIR}/bin)
+  set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
 endif()
 
 if("openal" IN_LIST _y_packages)
@@ -261,7 +259,7 @@ if("libjpeg" IN_LIST _y_packages)
   y_cmake(${_package}
     TARGET "jpeg-static"
     CONFIG ${CONFIGS}
-    OPTIONS -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
+    OPTIONS -DNASM=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
