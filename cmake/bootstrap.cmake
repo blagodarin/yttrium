@@ -133,12 +133,16 @@ function(y_package _package)
 endfunction()
 
 function(y_replace _where _what _with)
-  y_cmake(".bootstrap"
-    SOURCE ${CMAKE_CURRENT_LIST_DIR}/bootstrap/replace
-    CONFIG Release
-    OPTIONS -DCMAKE_INSTALL_PREFIX=${BUILD_DIR})
+  if(NOT BOOTSTRAP_REPLACE)
+    y_cmake(".bootstrap"
+      SOURCE ${CMAKE_CURRENT_LIST_DIR}/bootstrap/replace
+      CONFIG Release
+      OPTIONS -DCMAKE_INSTALL_PREFIX=${BUILD_DIR})
+    set(BOOTSTRAP_REPLACE ${BUILD_DIR}/bootstrap_replace)
+    set(BOOTSTRAP_REPLACE ${BOOTSTRAP_REPLACE} PARENT_SCOPE)
+  endif()
   file(RENAME ${_where} ${_where}~)
-  execute_process(COMMAND ${BUILD_DIR}/bootstrap_replace ${_what} ${_with}
+  execute_process(COMMAND ${BOOTSTRAP_REPLACE} ${_what} ${_with}
     WORKING_DIRECTORY ${BUILD_DIR}
     INPUT_FILE ${_where}~
     OUTPUT_FILE ${_where})
