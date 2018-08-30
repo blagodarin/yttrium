@@ -184,7 +184,8 @@ if("libogg" IN_LIST _y_packages)
   y_git_clone("https://git.xiph.org/ogg.git" DIR ${_package})
   y_cmake(${_package}
     TARGET "ogg"
-    CONFIG ${CONFIGS})
+    CONFIG ${CONFIGS}
+    OPTIONS -DCMAKE_DEBUG_POSTFIX=d)
   file(INSTALL
     ${BUILD_DIR}/${_package}/include/ogg/config_types.h
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
@@ -198,11 +199,10 @@ if("libogg" IN_LIST _y_packages)
         DESTINATION ${PREFIX_DIR}/lib)
     endif()
     if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.lib ${BUILD_DIR}/${_package}/Debug/oggd.lib)
-      file(RENAME ${BUILD_DIR}/${_package}/Debug/ogg.pdb ${BUILD_DIR}/${_package}/Debug/oggd.pdb)
+      file(RENAME ${BUILD_DIR}/${_package}/ogg.dir/Debug/ogg.pdb ${BUILD_DIR}/${_package}/ogg.dir/Debug/oggd.pdb)
       file(INSTALL
         ${BUILD_DIR}/${_package}/Debug/oggd.lib
-        ${BUILD_DIR}/${_package}/Debug/oggd.pdb
+        ${BUILD_DIR}/${_package}/ogg.dir/Debug/oggd.pdb
         DESTINATION ${PREFIX_DIR}/lib)
     endif()
   endif()
@@ -283,7 +283,7 @@ if("libjpeg" IN_LIST _y_packages)
   y_cmake(${_package}
     TARGET "jpeg-static"
     CONFIG ${CONFIGS}
-    OPTIONS -DNASM=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
+    OPTIONS -DCMAKE_DEBUG_POSTFIX=d -DNASM=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
@@ -298,11 +298,10 @@ if("libjpeg" IN_LIST _y_packages)
         DESTINATION ${PREFIX_DIR}/lib)
     endif()
     if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.lib ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib)
-      file(RENAME ${BUILD_DIR}/${_package}/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb)
+      file(RENAME ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-staticd.pdb)
       file(INSTALL
         ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
-        ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.pdb
+        ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-staticd.pdb
         DESTINATION ${PREFIX_DIR}/lib)
     endif()
   endif()
@@ -354,7 +353,7 @@ if("libvorbis" IN_LIST _y_packages)
   y_cmake(${_package}
     TARGET "vorbisfile"
     CONFIG ${CONFIGS}
-    OPTIONS -DOGG_ROOT=${PREFIX_DIR})
+    OPTIONS -DCMAKE_DEBUG_POSTFIX=d -DOGG_ROOT=${PREFIX_DIR})
   file(INSTALL
     ${BUILD_DIR}/${_package}/include/vorbis/codec.h
     ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
@@ -369,15 +368,13 @@ if("libvorbis" IN_LIST _y_packages)
         DESTINATION ${PREFIX_DIR}/lib)
     endif()
     if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib)
-      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb)
-      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.lib ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib)
-      file(RENAME ${BUILD_DIR}/${_package}/lib/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb)
+      file(RENAME ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbisd.pdb)
+      file(RENAME ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfiled.pdb)
       file(INSTALL
         ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
-        ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.pdb
+        ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbisd.pdb
         ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
-        ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.pdb
+        ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfiled.pdb
         DESTINATION ${PREFIX_DIR}/lib)
     endif()
   endif()
