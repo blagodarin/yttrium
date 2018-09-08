@@ -47,7 +47,12 @@ function(y_cmake _dir)
     set(_source ${BUILD_DIR}/${_dir})
   endif()
   file(MAKE_DIRECTORY ${BUILD_DIR}/${_dir})
-  execute_process(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source} -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} ${_arg_OPTIONS}
+  execute_process(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source}
+      -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib
+      -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib
+      -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib
+      -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
+      ${_arg_OPTIONS}
     WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
   if(_arg_TARGET)
     set(_target ${_arg_TARGET})
@@ -191,20 +196,8 @@ if("libogg" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
-  if(WIN32)
-    if(WITH_RELEASE)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/RelWithDebInfo/ogg.lib
-        ${BUILD_DIR}/${_package}/ogg.dir/RelWithDebInfo/ogg.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
-    if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/ogg.dir/Debug/ogg.pdb ${BUILD_DIR}/${_package}/ogg.dir/Debug/oggd.pdb)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/Debug/oggd.lib
-        ${BUILD_DIR}/${_package}/ogg.dir/Debug/oggd.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
+  if(WIN32 AND WITH_DEBUG)
+    file(RENAME ${BUILD_DIR}/${_package}/ogg.dir/Debug/ogg.pdb ${PREFIX_DIR}/lib/oggd.pdb)
   endif()
 endif()
 
@@ -258,20 +251,8 @@ if("zlib" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/zconf.h
     ${BUILD_DIR}/${_package}/zlib.h
     DESTINATION ${PREFIX_DIR}/include)
-  if(WIN32)
-    if(WITH_RELEASE)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/RelWithDebInfo/zlibstatic.lib
-        ${BUILD_DIR}/${_package}/zlibstatic.dir/RelWithDebInfo/zlibstatic.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
-    if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstatic.pdb ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstaticd.pdb)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/Debug/zlibstaticd.lib
-        ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstaticd.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
+  if(WIN32 AND WITH_DEBUG)
+    file(RENAME ${BUILD_DIR}/${_package}/zlibstatic.dir/Debug/zlibstatic.pdb ${PREFIX_DIR}/lib/zlibstaticd.pdb)
   endif()
 endif()
 
@@ -290,20 +271,8 @@ if("libjpeg" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/jmorecfg.h
     ${BUILD_DIR}/${_package}/jpeglib.h
     DESTINATION ${PREFIX_DIR}/include)
-  if(WIN32)
-    if(WITH_RELEASE)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/RelWithDebInfo/jpeg-static.lib
-        ${BUILD_DIR}/${_package}/jpeg-static.dir/RelWithDebInfo/jpeg-static.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
-    if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-static.pdb ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-staticd.pdb)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/Debug/jpeg-staticd.lib
-        ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-staticd.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
+  if(WIN32 AND WITH_DEBUG)
+    file(RENAME ${BUILD_DIR}/${_package}/jpeg-static.dir/Debug/jpeg-static.pdb ${PREFIX_DIR}/lib/jpeg-staticd.pdb)
   endif()
 endif()
 
@@ -326,18 +295,10 @@ if("libpng" IN_LIST _y_packages)
     DESTINATION ${PREFIX_DIR}/include)
   if(WIN32)
     if(WITH_RELEASE)
-      file(RENAME ${BUILD_DIR}/${_package}/png_static.dir/RelWithDebInfo/png_static.pdb ${BUILD_DIR}/${_package}/png_static.dir/RelWithDebInfo/libpng16_static.pdb)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/RelWithDebInfo/libpng16_static.lib
-        ${BUILD_DIR}/${_package}/png_static.dir/RelWithDebInfo/libpng16_static.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
+      file(RENAME ${PREFIX_DIR}/lib/png_static.pdb ${PREFIX_DIR}/lib/libpng16_static.pdb)
     endif()
     if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/png_static.dir/Debug/png_static.pdb ${BUILD_DIR}/${_package}/png_static.dir/Debug/libpng16_staticd.pdb)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/Debug/libpng16_staticd.lib
-        ${BUILD_DIR}/${_package}/png_static.dir/Debug/libpng16_staticd.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
+      file(RENAME ${BUILD_DIR}/${_package}/png_static.dir/Debug/png_static.pdb ${PREFIX_DIR}/lib/libpng16_staticd.pdb)
     endif()
   endif()
 endif()
@@ -358,24 +319,8 @@ if("libvorbis" IN_LIST _y_packages)
     ${BUILD_DIR}/${_package}/include/vorbis/codec.h
     ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
     DESTINATION ${PREFIX_DIR}/include/vorbis)
-  if(WIN32)
-    if(WITH_RELEASE)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbis.lib
-        ${BUILD_DIR}/${_package}/lib/vorbis.dir/RelWithDebInfo/vorbis.pdb
-        ${BUILD_DIR}/${_package}/lib/RelWithDebInfo/vorbisfile.lib
-        ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/RelWithDebInfo/vorbisfile.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
-    if(WITH_DEBUG)
-      file(RENAME ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbis.pdb ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbisd.pdb)
-      file(RENAME ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfile.pdb ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfiled.pdb)
-      file(INSTALL
-        ${BUILD_DIR}/${_package}/lib/Debug/vorbisd.lib
-        ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbisd.pdb
-        ${BUILD_DIR}/${_package}/lib/Debug/vorbisfiled.lib
-        ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfiled.pdb
-        DESTINATION ${PREFIX_DIR}/lib)
-    endif()
+  if(WIN32 AND WITH_DEBUG)
+    file(RENAME ${BUILD_DIR}/${_package}/lib/vorbis.dir/Debug/vorbis.pdb ${PREFIX_DIR}/lib/vorbisd.pdb)
+    file(RENAME ${BUILD_DIR}/${_package}/lib/vorbisfile.dir/Debug/vorbisfile.pdb ${PREFIX_DIR}/lib/vorbisfiled.pdb)
   endif()
 endif()
