@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.0)
+project(bootstrap_tool CXX)
+set(CMAKE_CXX_STANDARD 17)
+add_executable(bootstrap_tool main.cpp)
+install(TARGETS bootstrap_tool RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
