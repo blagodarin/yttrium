@@ -1,7 +1,7 @@
 include(FindPackageHandleStandardArgs)
 include(SelectLibraryConfigurations)
 
-function(y_find_package _package)
+function(y3_find_package _package)
   set(_one_value_args HEADER LIBRARY LIBRARY_LANGUAGE VERSION_HEADER VERSION_REGEX VERSION_SUFFIX)
   cmake_parse_arguments(_arg "" "${_one_value_args}" "" ${ARGN})
 
@@ -30,20 +30,20 @@ function(y_find_package _package)
     VERSION_VAR ${_package}_VERSION_STRING)
 
   if(${_package}_INCLUDE_DIR AND ${_package}_LIBRARY)
-    add_library(${_package}::${_package} UNKNOWN IMPORTED)
-    set_target_properties(${_package}::${_package} PROPERTIES
+    add_library(Y3::${_package} UNKNOWN IMPORTED)
+    set_target_properties(Y3::${_package} PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${${_package}_INCLUDE_DIR}")
     if(${_package}_LIBRARY_RELEASE)
-      set_property(TARGET ${_package}::${_package} APPEND PROPERTY
+      set_property(TARGET Y3::${_package} APPEND PROPERTY
         IMPORTED_CONFIGURATIONS Release)
-      set_target_properties(${_package}::${_package} PROPERTIES
+      set_target_properties(Y3::${_package} PROPERTIES
         IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "${_arg_LIBRARY_LANGUAGE}"
         IMPORTED_LOCATION_RELEASE "${${_package}_LIBRARY_RELEASE}")
     endif()
     if(${_package}_LIBRARY_DEBUG)
-      set_property(TARGET ${_package}::${_package} APPEND PROPERTY
+      set_property(TARGET Y3::${_package} APPEND PROPERTY
         IMPORTED_CONFIGURATIONS Debug)
-      set_target_properties(${_package}::${_package} PROPERTIES
+      set_target_properties(Y3::${_package} PROPERTIES
         IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "${_arg_LIBRARY_LANGUAGE}"
         IMPORTED_LOCATION_DEBUG "${${_package}_LIBRARY_DEBUG}")
     endif()

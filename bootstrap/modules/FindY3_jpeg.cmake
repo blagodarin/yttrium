@@ -1,6 +1,6 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../helpers/find.cmake)
 
-y_find_package(StaticLibjpeg
+y3_find_package(jpeg
   HEADER "jpeglib.h"
   LIBRARY "jpeg-static"
   LIBRARY_LANGUAGE C

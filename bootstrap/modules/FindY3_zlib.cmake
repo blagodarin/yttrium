@@ -1,6 +1,6 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../helpers/find.cmake)
 
-y_find_package(StaticZlib
+y3_find_package(zlib
   HEADER "zlib.h"
   LIBRARY "zlibstatic"
   LIBRARY_LANGUAGE C
