@@ -110,6 +110,13 @@ function(y_git_clone _url)
   execute_process(COMMAND ${GIT_EXECUTABLE} clone ${_url} WORKING_DIRECTORY ${BUILD_DIR})
 endfunction()
 
+function(y_git_patch _dir _patch)
+  if(NOT Git_FOUND)
+    find_package(Git REQUIRED)
+  endif()
+  execute_process(COMMAND ${GIT_EXECUTABLE} apply ${_patch} WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
+endfunction()
+
 macro(_y_add_package _package)
   if(_y_packages)
     set(_y_packages "${_y_packages};${_package}" PARENT_SCOPE)
@@ -135,22 +142,6 @@ function(y_package _package)
     endif()
     _y_add_package(${_package})
   endif()
-endfunction()
-
-function(y_replace _where _what _with)
-  if(NOT BOOTSTRAP_TOOL)
-    y_cmake(".bootstrap"
-      SOURCE ${CMAKE_CURRENT_LIST_DIR}/tool
-      CONFIG Release
-      OPTIONS -DCMAKE_INSTALL_PREFIX=${BUILD_DIR})
-    set(BOOTSTRAP_TOOL ${BUILD_DIR}/bootstrap_tool)
-    set(BOOTSTRAP_TOOL ${BOOTSTRAP_TOOL} PARENT_SCOPE)
-  endif()
-  file(RENAME ${_where} ${_where}~)
-  execute_process(COMMAND ${BOOTSTRAP_TOOL} replace ${_what} ${_with}
-    WORKING_DIRECTORY ${BUILD_DIR}
-    INPUT_FILE ${_where}~
-    OUTPUT_FILE ${_where})
 endfunction()
 
 y_package(libvorbis REQUIRES libogg)
@@ -281,9 +272,7 @@ if("libpng" IN_LIST _y_packages)
   set(_package "libpng-${_version}")
   y_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y_extract("${_package}.tar.xz" DIR ${_package})
-  y_replace(${BUILD_DIR}/${_package}/CMakeLists.txt
-    "  find_package(ZLIB REQUIRED)"
-    "  #find_package(ZLIB REQUIRED)")
+  y_git_patch(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/libpng.patch)
   y_cmake(${_package}
     TARGET "png_static"
     CONFIG ${CONFIGS}
@@ -306,11 +295,7 @@ endif()
 if("libvorbis" IN_LIST _y_packages)
   set(_package "vorbis")
   y_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
-  if(WIN32)
-    y_replace(${BUILD_DIR}/${_package}/CMakeLists.txt
-      "    find_library(OGG_LIBRARIES NAMES ogg HINTS \${OGG_ROOT}/lib \${OGG_ROOT}/lib64)"
-      "    find_library(OGG_LIBRARIES NAMES ogg oggd HINTS \${OGG_ROOT}/lib \${OGG_ROOT}/lib64)")
-  endif()
+  y_git_patch(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/libvorbis.patch)
   y_cmake(${_package}
     TARGET "vorbisfile"
     CONFIG ${CONFIGS}
