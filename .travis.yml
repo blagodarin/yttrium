@@ -11,7 +11,7 @@ matrix:
     # Gcov 8 generates a tremendous amount of warnings which gets our job killed.
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=7 RENDERER=Null COVERAGE=1
+      env: GCC_VERSION=7 RENDERER=Null Y3=catch2 COVERAGE=1
       addons: &gcc7-xcb
         apt:
           sources:
@@ -27,7 +27,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=8 RENDERER=OpenGL
+      env: GCC_VERSION=8 RENDERER=OpenGL Y3=catch2
       addons: &gcc8-x11
         apt:
           sources:
@@ -39,7 +39,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC_VERSION=8 RENDERER=Vulkan
+      env: GCC_VERSION=8 RENDERER=Vulkan Y3=catch2,glslang
       addons: &gcc8-xcb
         apt:
           sources:
@@ -98,19 +98,12 @@ install:
   - if [ -n "${CLANG_VERSION}" ]; then popd; fi
 
   - pushd ${TRAVIS_BUILD_DIR}/_prefix
-  - cmake -DBUILD=catch2 -P ../bootstrap/get.cmake
+  - cmake -DBUILD=${Y3} -P ../bootstrap/get.cmake
   - popd
 
   - if [ "${RENDERER}" = "Vulkan" ]; then git clone --branch sdk-1.0.65 https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers && pushd Vulkan-LoaderAndValidationLayers; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then cmake -H. -Bdbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/_prefix -DBUILD_DEMOS=OFF -DBUILD_LAYERS=OFF -DBUILD_TESTS=OFF -DBUILD_VKJSON=OFF -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then cd dbuild; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
-
-  - if [ "${RENDERER}" = "Vulkan" ]; then mkdir ${TRAVIS_BUILD_DIR}/_3rdparty/glslang && pushd ${TRAVIS_BUILD_DIR}/_3rdparty/glslang; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then wget -q -O - https://github.com/KhronosGroup/glslang/archive/6.2.2596.tar.gz | tar -x --gzip --strip-components 1; fi
-  - if [ "${RENDERER}" = "Vulkan" ]; then cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/_prefix -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_NV_EXTENSIONS=OFF; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make -j2; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then make install; fi
   - if [ "${RENDERER}" = "Vulkan" ]; then popd; fi
