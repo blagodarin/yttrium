@@ -61,8 +61,12 @@ function(y3_cmake _dir)
 endfunction()
 
 function(y3_download _url)
-  cmake_parse_arguments(_arg "" "SHA1" "" ${ARGN})
-  string(REGEX REPLACE "^.*/([^/]+)$" "\\1" _name ${_url})
+  cmake_parse_arguments(_arg "" "NAME;SHA1" "" ${ARGN})
+  if(_arg_NAME)
+    set(_name ${_arg_NAME})
+  else()
+    string(REGEX REPLACE "^.*/([^/]+)$" "\\1" _name ${_url})
+  endif()
   message(STATUS "[Y3] Downloading ${_name}")
   set(_path ${CACHE_DIR}/${_name})
   if(EXISTS ${_path})
@@ -154,8 +158,10 @@ y3_package(zlib)
 if("catch2" IN_LIST _y3_packages)
   set(_version "2.3.0")
   set(_package "Catch2-${_version}")
-  y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz" SHA1 "e913061207ca04dcd3d29e49a226f8caa26304fa")
-  y3_extract("v${_version}.tar.gz" DIR ${_package})
+  y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
+    NAME "${_package}.tar.gz"
+    SHA1 "e913061207ca04dcd3d29e49a226f8caa26304fa")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package}
     CONFIG ${CONFIG}
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
@@ -164,8 +170,10 @@ endif()
 if("glslang" IN_LIST _y3_packages)
   set(_version "7.8.2853")
   set(_package "glslang-${_version}")
-  y3_download("https://github.com/KhronosGroup/glslang/archive/${_version}.tar.gz" SHA1 "9b6d3734abb351e8218e31c4b08c08805f2c22fc")
-  y3_extract("${_version}.tar.gz" DIR ${_package})
+  y3_download("https://github.com/KhronosGroup/glslang/archive/${_version}.tar.gz"
+    NAME "${_package}.tar.gz"
+    SHA1 "9b6d3734abb351e8218e31c4b08c08805f2c22fc")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package}
     CONFIG ${CONFIGS}
     OPTIONS -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
@@ -191,8 +199,10 @@ endif()
 if("nasm" IN_LIST _y3_packages)
   set(_version "2.13.03")
   set(_package "nasm-${_version}")
-  y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip" SHA1 "149a814fa53980976a7fc081231f59cfbcd02543")
-  y3_extract("${_package}-win64.zip" DIR ${_package})
+  y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
+    NAME "${_package}.zip"
+    SHA1 "149a814fa53980976a7fc081231f59cfbcd02543")
+  y3_extract("${_package}.zip" DIR ${_package})
   set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
 endif()
 
@@ -228,7 +238,8 @@ endif()
 if("zlib" IN_LIST _y3_packages)
   set(_version "1.2.11")
   set(_package "zlib-${_version}")
-  y3_download("https://zlib.net/${_package}.tar.xz" SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
+  y3_download("https://zlib.net/${_package}.tar.xz"
+    SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y3_extract("${_package}.tar.xz" DIR ${_package})
   y3_cmake(${_package}
     TARGET "zlibstatic"
@@ -246,7 +257,8 @@ endif()
 if("jpeg" IN_LIST _y3_packages)
   set(_version "1.5.3")
   set(_package "libjpeg-turbo-${_version}")
-  y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz" SHA1 "87ebf4cab2bb27fcb8e7ccb18ec4eb680e1f2c2d")
+  y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
+    SHA1 "87ebf4cab2bb27fcb8e7ccb18ec4eb680e1f2c2d")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package}
     TARGET "jpeg-static"
@@ -266,7 +278,8 @@ endif()
 if("png" IN_LIST _y3_packages)
   set(_version "1.6.35")
   set(_package "libpng-${_version}")
-  y3_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz" SHA1 "0df1561aa1da610e892239348970d574b14deed0")
+  y3_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz"
+    SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y3_extract("${_package}.tar.xz" DIR ${_package})
   y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/libpng.patch)
   y3_cmake(${_package}
