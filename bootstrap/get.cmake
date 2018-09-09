@@ -153,6 +153,7 @@ y3_package(ogg)
 y3_package(nasm)
 y3_package(openal)
 y3_package(opengl)
+y3_package(vulkan)
 y3_package(zlib)
 
 if("catch2" IN_LIST _y3_packages)
@@ -233,6 +234,24 @@ if("opengl" IN_LIST _y3_packages)
   file(INSTALL
     ${CACHE_DIR}/khrplatform.h
     DESTINATION ${PREFIX_DIR}/include/KHR)
+endif()
+
+if("vulkan" IN_LIST _y3_packages)
+  set(_version "1.1.82.0")
+  set(_package "Vulkan-Headers-sdk-${_version}")
+  y3_download("https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-${_version}.tar.gz"
+    NAME "${_package}.tar.gz"
+    SHA1 "2b6814b0a854710b8ee470f1b4f1dbac94edc1b7")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
+  y3_cmake(${_package}
+    CONFIG ${CONFIG}
+    OPTIONS -DCMAKE_INSTALL_DATADIR=${CMAKE_BINARY_DIR}/.trash)
+  set(_package "Vulkan-Loader-sdk-${_version}")
+  y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
+    NAME "${_package}.tar.gz"
+    SHA1 "f8c25d4821ab04a145b7896a295e3a71da891fcb")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
+  # TODO: Build Vulkan loader.
 endif()
 
 if("zlib" IN_LIST _y3_packages)
