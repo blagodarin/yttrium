@@ -300,7 +300,7 @@ if("png" IN_LIST _y3_packages)
   y3_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz"
     SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y3_extract("${_package}.tar.xz" DIR ${_package})
-  y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/libpng.patch)
+  y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/png.patch)
   y3_cmake(${_package}
     TARGET "png_static"
     CONFIG ${CONFIGS}
@@ -323,7 +323,7 @@ endif()
 if("vorbis" IN_LIST _y3_packages)
   set(_package "vorbis")
   y3_git_clone("https://git.xiph.org/vorbis.git" DIR ${_package})
-  y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/libvorbis.patch)
+  y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/vorbis.patch)
   y3_cmake(${_package}
     TARGET "vorbisfile"
     CONFIG ${CONFIGS}
