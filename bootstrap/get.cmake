@@ -113,7 +113,7 @@ function(y3_git_apply _dir _patch)
   if(NOT Git_FOUND)
     find_package(Git REQUIRED)
   endif()
-  message(STATUS "[Y3] Patching ${_name}")
+  message(STATUS "[Y3] Patching ${_dir}")
   execute_process(COMMAND ${GIT_EXECUTABLE} apply ${_patch} WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
 endfunction()
 
