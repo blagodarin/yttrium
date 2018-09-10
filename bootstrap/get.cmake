@@ -40,7 +40,7 @@ if(NOT "Debug" STREQUAL "${CONFIGS}")
 endif()
 
 function(y3_cmake _dir)
-  cmake_parse_arguments(_arg "" "TARGET" "CONFIG;OPTIONS" ${ARGN})
+  cmake_parse_arguments(_arg "" "TARGET" "CL;CONFIG;OPTIONS" ${ARGN})
   message(STATUS "[Y3] Building ${_dir}")
   execute_process(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${BUILD_DIR}/${_dir}
       -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib
@@ -54,8 +54,12 @@ function(y3_cmake _dir)
   else()
     set(_target "install")
   endif()
+  if(_arg_CL)
+    string(REPLACE ";" " " _cl "${_arg_CL}")
+    set(_env_cl "CL=$ENV{CL} ${_cl}")
+  endif()
   foreach(_config ${_arg_CONFIG})
-    execute_process(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config ${_config} --target ${_target} ${BUILD_OPTIONS}
+    execute_process(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config ${_config} --target ${_target} ${BUILD_OPTIONS}
       WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
   endforeach()
 endfunction()
@@ -263,7 +267,8 @@ if("zlib" IN_LIST _y3_packages)
   y3_cmake(${_package}
     TARGET "zlibstatic"
     CONFIG ${CONFIGS}
-    OPTIONS -DSKIP_INSTALL_FILES=ON)
+    OPTIONS -DSKIP_INSTALL_FILES=ON
+    CL -wd4267)
   file(INSTALL
     ${BUILD_DIR}/${_package}/zconf.h
     ${BUILD_DIR}/${_package}/zlib.h
@@ -327,7 +332,8 @@ if("vorbis" IN_LIST _y3_packages)
   y3_cmake(${_package}
     TARGET "vorbisfile"
     CONFIG ${CONFIGS}
-    OPTIONS -DCMAKE_DEBUG_POSTFIX=d -DOGG_ROOT=${PREFIX_DIR})
+    OPTIONS -DCMAKE_DEBUG_POSTFIX=d -DOGG_ROOT=${PREFIX_DIR}
+    CL -wd4244 -wd4267 -wd4305 -wd4996)
   file(INSTALL
     ${BUILD_DIR}/${_package}/include/vorbis/codec.h
     ${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
