@@ -1,9 +1,8 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../helpers/find.cmake)
 
-y3_find_package(vorbis
+y3_find_package(vorbis C
   HEADER "vorbis/codec.h"
-  LIBRARY "vorbis"
-  LIBRARY_LANGUAGE C)
+  LIBRARY "vorbis")
 
 if(TARGET Y3::vorbis)
   find_package(Y3_ogg REQUIRED)
