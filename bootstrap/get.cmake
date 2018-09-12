@@ -42,17 +42,30 @@ function(y3_run)
 endfunction()
 
 function(y3_cmake _dir)
-  cmake_parse_arguments(_arg "HEADER_ONLY" "TARGET" "CL;OPTIONS" ${ARGN})
+  cmake_parse_arguments(_arg "BUILD_TO_PREFIX;HEADER_ONLY" "TARGET" "CL;OPTIONS" ${ARGN})
   message(STATUS "[Y3] Building ${_dir}")
   if(_arg_HEADER_ONLY)
     set(_configs ${CONFIG})
   else()
     set(_configs ${CONFIGS})
-    list(APPEND _options
-      -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
-      -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
-      -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
-      -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release)
+    if(_arg_BUILD_TO_PREFIX)
+      if(WIN32)
+        list(APPEND _options
+          -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
+          -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
+          -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
+          -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
+          -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
+          -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
+          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/bin/Debug
+          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/bin/Release)
+      else()
+        list(APPEND _options
+          -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib
+          -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib
+          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin)
+      endif()
+    endif()
   endif()
   y3_run(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${BUILD_DIR}/${_dir}
       -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
@@ -199,7 +212,7 @@ endif()
 if("ogg" IN_LIST _y3_packages)
   set(_package "ogg")
   y3_git_clone("git://git.xiph.org/ogg.git" DIR ${_package})
-  y3_cmake(${_package} TARGET "ogg")
+  y3_cmake(${_package} TARGET "ogg" BUILD_TO_PREFIX)
   file(INSTALL
     ${BUILD_DIR}/${_package}/include/ogg/config_types.h
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
@@ -253,14 +266,37 @@ if("vulkan" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "2b6814b0a854710b8ee470f1b4f1dbac94edc1b7")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} HEADER_ONLY
-    OPTIONS -DCMAKE_INSTALL_DATADIR=${CMAKE_BINARY_DIR}/.trash)
+  y3_cmake(${_package} HEADER_ONLY)
   set(_package "Vulkan-Loader-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
     SHA1 "f8c25d4821ab04a145b7896a295e3a71da891fcb")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  # TODO: Build Vulkan loader.
+  if(WIN32)
+    y3_cmake(${_package} TARGET "vulkan")
+    if("Debug" IN_LIST CONFIGS)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.dll
+        ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.pdb
+        DESTINATION ${PREFIX_DIR}/bin/Debug)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.lib
+        DESTINATION ${PREFIX_DIR}/lib/Debug)
+    endif()
+    if("RelWithDebInfo" IN_LIST CONFIGS)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.dll
+        ${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.pdb
+        DESTINATION ${PREFIX_DIR}/bin/Release)
+      file(INSTALL
+        ${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.lib
+        DESTINATION ${PREFIX_DIR}/lib/Release)
+    endif()
+  else()
+    y3_cmake(${_package}
+      OPTIONS -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF)
+  endif()
+  file(REMOVE_RECURSE ${PREFIX_DIR}/share)
 endif()
 
 if("zlib" IN_LIST _y3_packages)
@@ -269,7 +305,7 @@ if("zlib" IN_LIST _y3_packages)
   y3_download("https://zlib.net/${_package}.tar.xz"
     SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
   y3_extract("${_package}.tar.xz" DIR ${_package})
-  y3_cmake(${_package} TARGET "zlibstatic"
+  y3_cmake(${_package} TARGET "zlibstatic" BUILD_TO_PREFIX
     OPTIONS -DSKIP_INSTALL_FILES=ON
     CL -wd4267)
   file(INSTALL
@@ -284,7 +320,7 @@ if("jpeg" IN_LIST _y3_packages)
   y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
     SHA1 "87ebf4cab2bb27fcb8e7ccb18ec4eb680e1f2c2d")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} TARGET "jpeg-static"
+  y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
     OPTIONS -DNASM=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
@@ -301,7 +337,7 @@ if("png" IN_LIST _y3_packages)
     SHA1 "0df1561aa1da610e892239348970d574b14deed0")
   y3_extract("${_package}.tar.xz" DIR ${_package})
   y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/png.patch)
-  y3_cmake(${_package} TARGET "png_static"
+  y3_cmake(${_package} TARGET "png_static" BUILD_TO_PREFIX
     OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_ALL=ON -DZLIB_INCLUDE_DIR=${PREFIX_DIR}/include)
   file(INSTALL
     ${BUILD_DIR}/${_package}/png.h
@@ -314,7 +350,7 @@ if("vorbis" IN_LIST _y3_packages)
   set(_package "vorbis")
   y3_git_clone("git://git.xiph.org/vorbis.git" DIR ${_package})
   y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/vorbis.patch)
-  y3_cmake(${_package} TARGET "vorbisfile"
+  y3_cmake(${_package} TARGET "vorbisfile" BUILD_TO_PREFIX
     OPTIONS -DOGG_ROOT=${PREFIX_DIR}
     CL -wd4244 -wd4267 -wd4305 -wd4996)
   file(INSTALL
