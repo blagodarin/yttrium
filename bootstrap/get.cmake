@@ -188,11 +188,11 @@ y3_package(vulkan)
 y3_package(zlib)
 
 if("catch2" IN_LIST _y3_packages)
-  set(_version "2.3.0")
+  set(_version "2.4.0")
   set(_package "Catch2-${_version}")
   y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "e913061207ca04dcd3d29e49a226f8caa26304fa")
+    SHA1 "f486921476d2fde3f24f980b5577b442510301b8")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
@@ -231,9 +231,10 @@ if("nasm" IN_LIST _y3_packages)
 endif()
 
 if("openal" IN_LIST _y3_packages)
-  set(_version "1.18.2")
+  set(_version "1.19.0")
   set(_package "openal-soft-${_version}-bin")
-  y3_download("http://openal-soft.org/openal-binaries/${_package}.zip" SHA1 "0d2edd1b77cbb998f12e064d0eefea3508446776")
+  y3_download("http://openal-soft.org/openal-binaries/${_package}.zip"
+    SHA1 "1b4b321166a4d62588efb52d9d0da17db724eac6")
   y3_extract("${_package}.zip" DIR ${_package})
   file(INSTALL
     ${BUILD_DIR}/${_package}/include
@@ -315,13 +316,13 @@ if("zlib" IN_LIST _y3_packages)
 endif()
 
 if("jpeg" IN_LIST _y3_packages)
-  set(_version "1.5.3")
+  set(_version "2.0.0")
   set(_package "libjpeg-turbo-${_version}")
   y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
-    SHA1 "87ebf4cab2bb27fcb8e7ccb18ec4eb680e1f2c2d")
+    SHA1 "fe49aea935617748c21ecbe46c986d6c1b98f39b")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
-    OPTIONS -DNASM=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
+    OPTIONS -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_TURBOJPEG=OFF)
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
