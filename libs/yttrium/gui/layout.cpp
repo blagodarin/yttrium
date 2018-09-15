@@ -4,9 +4,8 @@
 
 namespace Yttrium
 {
-	GuiLayout::GuiLayout(GuiPrivate& gui, Placement placement)
-		: _gui{gui}
-		, _placement{placement}
+	GuiLayout::GuiLayout(Placement placement)
+		: _placement{placement}
 	{
 	}
 

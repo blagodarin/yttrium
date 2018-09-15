@@ -1,5 +1,3 @@
-#define _FILE_OFFSET_BITS 64
-
 #include "../file.h"
 
 #include <yttrium/storage/source.h>

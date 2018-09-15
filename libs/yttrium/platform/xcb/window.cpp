@@ -6,7 +6,7 @@
 #include <string>
 
 #include <xcb/xcb_image.h>
-#define explicit explicit_ // TODO: Report an XCB XKB bug.
+#define explicit explicit_ // https://bugs.freedesktop.org/show_bug.cgi?id=74080
 #include <xcb/xkb.h>
 #undef explicit
 #include <xkbcommon/xkbcommon.h>

@@ -23,7 +23,7 @@ namespace
 	{
 		constexpr size_t button_size = 16;
 		constexpr size_t button_styles = 4;
-		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [button_size](size_t, size_t y)
+		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [](size_t, size_t y)
 		{
 			const auto style = y / button_size;
 			return Bgra32{0xff, 0x44 * style, 0x44 * style};
@@ -33,7 +33,7 @@ namespace
 	void make_cursor_texture(Storage& storage, const std::string& name)
 	{
 		constexpr size_t size = 64;
-		storage.attach_buffer(name, ::make_bgra_tga(size, size, [size](size_t x, size_t y)
+		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y)
 		{
 			if (y > 2 * x || 2 * y < x || (y > 2 * (size - x) && x > 2 * (size - y)))
 				return Bgra32{0, 0, 0, 0};
@@ -120,7 +120,7 @@ int main(int, char**)
 	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });
 
 	TetriumStatistics statistics{script};
-	script.define("set_score", 2, [&logic, &statistics](const ScriptCall& call){ statistics.update(call._args[1]->to_int(), call._args[0]->string()); });
+	script.define("set_score", 2, [&statistics](const ScriptCall& call){ statistics.update(call._args[1]->to_int(), call._args[0]->string()); });
 
 	Storage storage{Storage::UseFileSystem::Never};
 	storage.attach_package("tetrium.ypq");

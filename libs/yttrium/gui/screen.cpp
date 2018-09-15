@@ -128,7 +128,7 @@ namespace Yttrium
 
 	GuiLayout& GuiScreen::add_layout(GuiLayout::Placement placement)
 	{
-		return *_layouts.emplace_back(std::make_unique<GuiLayout>(_gui, placement));
+		return *_layouts.emplace_back(std::make_unique<GuiLayout>(placement));
 	}
 
 	void GuiScreen::draw(RenderPass& pass, const Vector2* cursor)

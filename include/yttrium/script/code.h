@@ -17,7 +17,7 @@ namespace Yttrium
 		ScriptCode();
 		ScriptCode(const ScriptCode&);
 		ScriptCode(ScriptCode&&) noexcept;
-		~ScriptCode();
+		~ScriptCode() noexcept;
 		ScriptCode& operator=(const ScriptCode&) = delete;
 		ScriptCode& operator=(ScriptCode&&) noexcept;
 

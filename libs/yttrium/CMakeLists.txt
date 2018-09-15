@@ -347,6 +347,7 @@ if(UNIX)
 		platform/posix/temporary_file.cpp
 		platform/posix/temporary_file.h
 		)
+	set_property(SOURCE platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 elseif(WIN32)
 	target_sources(yttrium PRIVATE
 		platform/windows/file.cpp
@@ -392,6 +393,10 @@ if(UNIX)
 		target_link_libraries(yttrium PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
 			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
+		endif()
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
+			set_property(SOURCE platform/xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
 		endif()
 	endif()
 elseif(WIN32)

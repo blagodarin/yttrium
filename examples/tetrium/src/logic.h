@@ -177,7 +177,6 @@ namespace Tetrium
 		Figure   _next_figure;
 		int      _time_remainder = 0;
 
-		int      _delay = 0;
 		int      _fixation_delay = 0;
 
 		bool     _is_accelerating = false;

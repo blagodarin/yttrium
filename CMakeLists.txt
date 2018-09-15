@@ -44,13 +44,16 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
 		-Wno-c++98-compat-pedantic
+		-Wno-covered-switch-default
 		-Wno-double-promotion
 		-Wno-exit-time-destructors
 		-Wno-float-equal
 		-Wno-global-constructors
 		-Wno-gnu-statement-expression
+		-Wno-header-hygiene # TODO: Remove "using namespace" from examples.
 		-Wno-padded
 		-Wno-switch-enum
+		-Wno-tautological-type-limit-compare
 		-Wno-weak-vtables
 		)
 endif()

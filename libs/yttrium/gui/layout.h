@@ -9,7 +9,6 @@
 
 namespace Yttrium
 {
-	class GuiPrivate;
 	class GuiPropertyLoader;
 	class RectF;
 	class RenderPass;
@@ -26,7 +25,7 @@ namespace Yttrium
 			Right,
 		};
 
-		GuiLayout(GuiPrivate&, Placement);
+		GuiLayout(Placement);
 
 		void set_size(const SizeF& size) { _size = size; }
 
@@ -36,7 +35,6 @@ namespace Yttrium
 		void update(const RectF&);
 
 	private:
-		GuiPrivate& _gui;
 		const Placement _placement;
 		SizeF _size;
 		Vector2 _scaling{1, 1};

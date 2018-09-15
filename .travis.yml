@@ -12,9 +12,10 @@ matrix:
     - os: linux
       compiler: gcc
       env: GCC_VERSION=7 RENDERER=Null Y3=catch2 COVERAGE=1
-      addons: &gcc7-xcb
+      addons: &gcc7_xcb
         apt:
-          sources:
+          sources: &all_sources
+            - llvm-toolchain-trusty-6.0
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
@@ -28,10 +29,9 @@ matrix:
     - os: linux
       compiler: gcc
       env: GCC_VERSION=8 RENDERER=OpenGL Y3=catch2
-      addons: &gcc8-x11
+      addons: &gcc8_x11
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
+          sources: *all_sources
           packages:
             - g++-8
             - libopenal-dev
@@ -40,10 +40,9 @@ matrix:
     - os: linux
       compiler: gcc
       env: GCC_VERSION=8 RENDERER=Vulkan Y3=catch2,glslang,vulkan
-      addons: &gcc8-xcb
+      addons: &gcc8_xcb
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
+          sources: *all_sources
           packages:
             - g++-8
             - libopenal-dev
@@ -53,21 +52,21 @@ matrix:
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
 
-  exclude:
-
-    # Clang with GCC's libstdc++ doesn't work (https://bugs.llvm.org/show_bug.cgi?id=33222).
-    # Clang with libc++ also doesn't work (https://bugs.llvm.org/show_bug.cgi?id=33736).
     - os: linux
       compiler: clang
-      env: CLANG_VERSION=6.0 RENDERER=Null
-      addons: &clang6-x11
+      env: CLANG_VERSION=6.0 RENDERER=Null Y3=catch2
+      addons: &clang6_xcb
         apt:
-          sources:
-            - llvm-toolchain-trusty-6.0
+          sources: *all_sources
           packages:
             - clang-6.0
             - libopenal-dev
+            - libstdc++-8-dev
             - libvorbis-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
 
 before_install:
   - if [ -n "${CLANG_VERSION}" ]; then export CC=clang-$CLANG_VERSION CXX=clang++-$CLANG_VERSION; fi
@@ -81,21 +80,6 @@ install:
   - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.0-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
   - export PATH=$(pwd)/bin:${PATH}
   - popd
-
-  - if [ -n "${CLANG_VERSION}" ]; then mkdir -p ${TRAVIS_BUILD_DIR}/libcxx/include/c++/v1 ${TRAVIS_BUILD_DIR}/libcxx/lib; fi
-  - if [ -n "${CLANG_VERSION}" ]; then export CPLUS_INCLUDE_PATH=${TRAVIS_BUILD_DIR}/libcxx/include/c++/v1:${CPLUS_INCLUDE_PATH}; fi
-  - if [ -n "${CLANG_VERSION}" ]; then export LIBRARY_PATH=${TRAVIS_BUILD_DIR}/libcxx/lib:${LIBRARY_PATH}; fi
-  - if [ -n "${CLANG_VERSION}" ]; then pushd ${TRAVIS_BUILD_DIR}/_3rdparty; fi
-  - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/llvm/tags/RELEASE_601/final/ llvm; fi
-  - if [ -n "${CLANG_VERSION}" ]; then cd llvm/projects; fi
-  - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/tags/RELEASE_601/final/ libcxx; fi
-  - if [ -n "${CLANG_VERSION}" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxxabi/tags/RELEASE_601/final libcxxabi; fi
-  - if [ -n "${CLANG_VERSION}" ]; then cd ..; fi
-  - if [ -n "${CLANG_VERSION}" ]; then mkdir build && cd build; fi
-  - if [ -n "${CLANG_VERSION}" ]; then cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/libcxx ..; fi
-  - if [ -n "${CLANG_VERSION}" ]; then make cxx; fi
-  - if [ -n "${CLANG_VERSION}" ]; then make install-libcxx install-libcxxabi; fi
-  - if [ -n "${CLANG_VERSION}" ]; then popd; fi
 
   - pushd ${TRAVIS_BUILD_DIR}/_prefix
   - cmake -DBUILD=${Y3} -P ../bootstrap/get.cmake

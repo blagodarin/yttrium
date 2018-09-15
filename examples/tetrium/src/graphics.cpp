@@ -44,8 +44,6 @@ namespace
 	static constexpr auto FragmentCount = 8u;
 	static constexpr auto Border = 3;
 
-	const SizeF BlockSize{FragmentSize - 2, FragmentSize - 2};
-
 	Rgb pixel_color(size_t block, size_t x, size_t y)
 	{
 		const auto pixel_type = [](auto x_, auto y_)
@@ -72,9 +70,9 @@ namespace
 			}
 			return x_ < Border ? Left : rx < Border ? Right : Center;
 		};
-		const auto base = 255;
+		constexpr auto base = 255;
 		const auto offset = 20 * pattern[pixel_type(x, y)];
-		const auto scale = [block, base, offset](size_t index)
+		const auto scale = [block, offset](size_t index)
 		{
 			const auto weight = weights[block * 3 + index];
 			return static_cast<uint8_t>(weight ? base / weight - offset : 0);
