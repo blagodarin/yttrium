@@ -11,7 +11,7 @@ matrix:
     # Gcov 8 generates a tremendous amount of warnings which gets our job killed.
     - os: linux
       compiler: gcc
-      env: GCC_V=7 CONFIG=Debug RENDERER=Null Y3=catch2 COVERAGE=1
+      env: GCC=7 CONFIG=Debug RENDERER=Null Y3=catch2 COVERAGE=1
       addons: &gcc7_xcb
         apt:
           sources: &all_sources
@@ -28,7 +28,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC_V=8 CONFIG=Release RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Release RENDERER=OpenGL Y3=catch2
       addons: &gcc8_x11
         apt:
           sources: *all_sources
@@ -39,12 +39,12 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC_V=8 CONFIG=Debug RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Debug RENDERER=OpenGL Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
       compiler: gcc
-      env: GCC_V=8 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: &gcc8_xcb
         apt:
           sources: *all_sources
@@ -59,12 +59,12 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC_V=8 CONFIG=Debug RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Debug RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG_V=6.0 CONFIG=Release RENDERER=Null Y3=catch2
+      env: CLANG=6.0 CONFIG=Release RENDERER=Null Y3=catch2
       addons: &clang6_xcb
         apt:
           sources: *all_sources
@@ -80,17 +80,17 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG_V=6.0 CONFIG=Debug RENDERER=Null Y3=catch2
+      env: CLANG=6.0 CONFIG=Debug RENDERER=Null Y3=catch2
       addons: *clang6_xcb
 
 before_install:
-  - if [ -n "${CLANG_V}" ]; then export CC=clang-$CLANG_V CXX=clang++-$CLANG_V; fi
-  - if [ -n "${GCC_V}" ]; then export CC=gcc-$GCC_V CXX=g++-$GCC_V; fi
+  - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
+  - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC}; fi
 
 install:
   - mkdir _cmake && pushd _cmake
   - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
-  - export PATH=$(pwd)/bin:${PATH}
+  - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
   - mkdir _prefix && pushd _prefix
@@ -101,13 +101,13 @@ script:
   - mkdir _build && pushd _build
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_ALL=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON"; fi
-  - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/_prefix $CMAKE_OPTIONS -DY_RENDERER=$RENDERER
+  - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/_prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
   - cmake --build . -- -j2
   - cmake --build . --target check
   - popd
 
 after_success:
-  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-$GCC_V -a "-s `pwd`"; fi
+  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
 
 notifications:
   email: false
