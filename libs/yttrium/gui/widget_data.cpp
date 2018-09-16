@@ -32,7 +32,12 @@ namespace
 
 		switch (alignment)
 		{
-		default: assert(false);
+		default:
+#ifndef NDEBUG
+			assert(false);
+#else
+			[[fallthrough]];
+#endif
 		case TopLeftAlignment:     return {x_left(), y_top()};
 		case TopAlignment:         return {x_center(), y_top()};
 		case TopRightAlignment:    return {x_right(), y_top()};
