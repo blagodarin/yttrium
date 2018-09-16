@@ -24,7 +24,7 @@ namespace Yttrium
 		inline void append_to(std::string& string, unsigned value) { append_to(string, static_cast<unsigned long long>(value)); }
 
 		Y_API void append_to(std::string&, double);
-		inline void append_to(std::string& string, float value) { append_to(string, double{value}); }
+		inline void append_to(std::string& string, float value) { append_to(string, static_cast<double>(value)); }
 	}
 
 	inline void append_to(std::string&) {}

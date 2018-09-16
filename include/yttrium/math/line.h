@@ -17,7 +17,7 @@ namespace Yttrium
 		bool plane_intersection(const Plane& plane, Vector3& intersection) const noexcept
 		{
 			const auto s = dot_product(_vector, plane._normal);
-			if (std::abs(s) < 1e-6)
+			if (std::abs(s) < 1e-6f)
 				return false;
 			const auto u = plane.distance_to(_origin) / -s;
 			if (u < 0 || u > 1)

@@ -6,7 +6,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${PROJECT_SOURCE_DIR}/bootstrap/modules)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/bootstrap/modules)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
@@ -14,7 +14,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-include(utils)
+include(cmake/utils.cmake)
 
 option(Y_BUILD_ALL "Build everything" OFF)
 option(Y_BUILD_EXAMPLES "Build examples" OFF)
@@ -45,7 +45,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-c++98-compat
 		-Wno-c++98-compat-pedantic
 		-Wno-covered-switch-default
-		-Wno-double-promotion
 		-Wno-exit-time-destructors
 		-Wno-float-equal
 		-Wno-global-constructors
@@ -61,7 +60,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	add_compile_options(-Werror -Wall -Wextra
 		-Wconversion
 		-Wdisabled-optimization
-		#-Wdouble-promotion
+		-Wdouble-promotion
 		-Wduplicated-cond
 		-Wlogical-op
 		-Wmissing-declarations
@@ -69,7 +68,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		-Wnon-virtual-dtor
 		-Wnull-dereference
 		-Wold-style-cast
-		#-Wpadded
 		-Wpedantic
 		-Wredundant-decls
 		-Wshadow
