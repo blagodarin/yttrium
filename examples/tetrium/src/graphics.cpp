@@ -70,12 +70,11 @@ namespace
 			}
 			return x_ < Border ? Left : rx < Border ? Right : Center;
 		};
-		constexpr auto base = 255;
 		const auto offset = 20 * pattern[pixel_type(x, y)];
 		const auto scale = [block, offset](size_t index)
 		{
 			const auto weight = weights[block * 3 + index];
-			return static_cast<uint8_t>(weight ? base / weight - offset : 0);
+			return static_cast<uint8_t>(weight ? 255 / weight - offset : 0);
 		};
 		return Rgb{scale(0), scale(1), scale(2)};
 	}

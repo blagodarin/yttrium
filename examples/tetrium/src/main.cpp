@@ -19,9 +19,9 @@ using namespace Yttrium;
 
 namespace
 {
+	template <std::size_t button_size>
 	void make_buttons_texture(Storage& storage, const std::string& name)
 	{
-		constexpr size_t button_size = 16;
 		constexpr size_t button_styles = 4;
 		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [](size_t, size_t y)
 		{
@@ -30,9 +30,9 @@ namespace
 		}));
 	}
 
+	template <std::size_t size>
 	void make_cursor_texture(Storage& storage, const std::string& name)
 	{
-		constexpr size_t size = 64;
 		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y)
 		{
 			if (y > 2 * x || 2 * y < x || (y > 2 * (size - x) && x > 2 * (size - y)))
@@ -124,8 +124,8 @@ int main(int, char**)
 
 	Storage storage{Storage::UseFileSystem::Never};
 	storage.attach_package("tetrium.ypq");
-	::make_buttons_texture(storage, "examples/tetrium/data/buttons.tga");
-	::make_cursor_texture(storage, "examples/tetrium/data/cursor.tga");
+	::make_buttons_texture<16>(storage, "examples/tetrium/data/buttons.tga");
+	::make_cursor_texture<64>(storage, "examples/tetrium/data/cursor.tga");
 	::make_sound(storage, "data/sound.wav");
 
 	AudioManager audio;
