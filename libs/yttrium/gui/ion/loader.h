@@ -20,6 +20,7 @@ namespace Yttrium
 	{
 	public:
 		explicit GuiIonLoader(GuiPrivate&);
+		~GuiIonLoader() noexcept;
 
 		void load(std::string_view source_name);
 

@@ -53,7 +53,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-header-hygiene # TODO: Remove "using namespace" from examples.
 		-Wno-padded
 		-Wno-switch-enum
-		-Wno-tautological-type-limit-compare
 		-Wno-weak-vtables
 		)
 endif()
@@ -64,7 +63,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		-Wdisabled-optimization
 		#-Wdouble-promotion
 		-Wduplicated-cond
-		-Winline
 		-Wlogical-op
 		-Wmissing-declarations
 		-Wmissing-include-dirs
@@ -76,19 +74,25 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		-Wredundant-decls
 		-Wshadow
 		-Wsign-conversion
-		#-Wsuggest-attribute=const -fipa-pure-const
-		-Wsuggest-final-methods
-		-Wsuggest-final-types
+		-Wsuggest-attribute=noreturn
 		-Wsuggest-override
 		-Wundef
 		-Wuninitialized
 		-Wunsafe-loop-optimizations
-		#-Wuseless-cast
-		#-Wzero-as-null-pointer-constant
-		-Wno-ignored-qualifiers
-		-Wno-old-style-cast # Triggered by X11 macros.
-		-Wno-unknown-pragmas
+		-Wuseless-cast
 		)
+
+	if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_compile_options(
+			-Winline # Issued for header-only code.
+			)
+	endif()
+
+	if(NOT Y_RENDERER_VULKAN)
+		add_compile_options(
+			-Wzero-as-null-pointer-constant # Issued for every usage of VK_NULL_HANDLE.
+			)
+	endif()
 
 	option(Y_COVERAGE "Build with coverage analysis support" OFF)
 	if(Y_COVERAGE)

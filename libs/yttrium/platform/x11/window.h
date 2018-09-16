@@ -57,7 +57,7 @@ namespace Yttrium
 
 		std::optional<Size> _size;
 		const P_Display _display;
-		const int _screen = DefaultScreen(_display.get());
+		const int _screen;
 		const GlxContext _glx{ _display.get(), _screen };
 		WindowHandle _window;
 		const EmptyCursor _empty_cursor{ _display.get(), _window.get() };

@@ -145,6 +145,11 @@ if(Y_USE_JPEG)
 	target_sources(yttrium PRIVATE
 		image/formats/jpeg.cpp
 		)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		set_property(SOURCE image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		set_property(SOURCE image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+	endif()
 endif()
 if(Y_USE_PNG)
 	if(WIN32)
@@ -268,6 +273,9 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/2d_vs.glsl
 		)
 	target_link_libraries(yttrium PRIVATE OpenGL::GL)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		set_property(SOURCE renderer/gl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+	endif()
 elseif(Y_RENDERER_VULKAN)
 	target_sources(yttrium PRIVATE
 		renderer/vulkan/buffer.cpp
@@ -341,6 +349,9 @@ target_sources(yttrium PRIVATE
 	storage/writer.cpp
 	storage/writer.h
 	)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		set_property(SOURCE storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+	endif()
 if(UNIX)
 	target_sources(yttrium PRIVATE
 		platform/posix/file.cpp
@@ -385,6 +396,9 @@ if(UNIX)
 			)
 		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			set_property(SOURCE platform/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+		endif()
 	else()
 		target_sources(yttrium PRIVATE
 			platform/xcb/window.cpp

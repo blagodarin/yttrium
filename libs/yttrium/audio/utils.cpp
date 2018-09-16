@@ -30,7 +30,7 @@ namespace Yttrium
 		format_chunk.samples_per_second = static_cast<uint32_t>(format.samples_per_second());
 		format_chunk.bits_per_sample = static_cast<uint16_t>(format.bytes_per_sample() * 8);
 		format_chunk.block_align = static_cast<uint16_t>(format_chunk.channels * format_chunk.bits_per_sample / 8);
-		format_chunk.bytes_per_second = static_cast<uint32_t>(format_chunk.samples_per_second * format_chunk.block_align);
+		format_chunk.bytes_per_second = format_chunk.samples_per_second * format_chunk.block_align;
 
 		WavChunkHeader format_chunk_header;
 		format_chunk_header.name_fourcc = WavChunkHeader::fmt;

@@ -89,7 +89,7 @@ namespace
 			{
 				for (size_t x = 0; x < FragmentSize; ++x)
 				{
-					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + static_cast<size_t>(y)) * image.format().row_size() + x * 4;
+					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.format().row_size() + x * 4;
 					const auto color = ::pixel_color(i, x, y);
 					pixel[0] = color._b;
 					pixel[1] = color._g;

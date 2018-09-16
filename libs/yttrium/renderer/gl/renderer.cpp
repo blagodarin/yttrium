@@ -212,7 +212,7 @@ namespace Yttrium
 
 		opengl_mesh._vertex_array.bind();
 		opengl_mesh._index_buffer.bind();
-		_gl.DrawElements(GL_TRIANGLES, opengl_mesh._index_buffer_size, opengl_mesh._index_buffer_format, 0);
+		_gl.DrawElements(GL_TRIANGLES, opengl_mesh._index_buffer_size, opengl_mesh._index_buffer_format, nullptr);
 		opengl_mesh._index_buffer.unbind();
 		opengl_mesh._vertex_array.unbind();
 
@@ -235,7 +235,7 @@ namespace Yttrium
 
 		_2d_vao.bind();
 		_2d_ibo.bind();
-		_gl.DrawElements(GL_TRIANGLE_STRIP, static_cast<GLsizei>(indices.size() / sizeof(uint16_t)), GL_UNSIGNED_SHORT, 0);
+		_gl.DrawElements(GL_TRIANGLE_STRIP, static_cast<GLsizei>(indices.size() / sizeof(uint16_t)), GL_UNSIGNED_SHORT, nullptr);
 		_2d_ibo.unbind();
 		_2d_vao.unbind();
 	}

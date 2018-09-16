@@ -4,7 +4,7 @@
 	#define GLEXTENSION(name) if (name = GLAPI_HAS_EXTENSION("GL_"#name); name) {
 	#define GLFLOAT(name) GetFloatv(GL_##name, &name);
 	#define GLFLOATV(name, count) do { name.resize(count); GetFloatv(GL_##name, name.data()); } while (false);
-	#define GLFUNCTION(name, ret, attr) reinterpret_cast<GlAddress&>(name) = GLAPI_GET_FUNCTION("gl"#name);
+	#define GLFUNCTION(name, ret, attr) name = reinterpret_cast<decltype(name)>(GLAPI_GET_FUNCTION("gl"#name));
 	#define GLINTEGER(name) GetIntegerv(GL_##name, &name);
 	#define GLINTEGERV(name, count) do { name.resize(static_cast<size_t>(count)); GetIntegerv(GL_##name, name.data()); } while (false);
 	#define GLSTRING(name) name = GetString(GL_##name);

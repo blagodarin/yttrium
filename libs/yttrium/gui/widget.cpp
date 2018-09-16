@@ -16,4 +16,6 @@ namespace Yttrium
 		, _flags{flags}
 	{
 	}
+
+	Widget::~Widget() noexcept = default;
 }

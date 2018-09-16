@@ -68,12 +68,12 @@ TEST_CASE("package")
 	REQUIRE(packed_file1);
 	CHECK(packed_file1->to_buffer() == buffer1);
 
-	packed_file1 = {};
+	packed_file1.reset();
 
 	REQUIRE(packed_file2);
 	CHECK(packed_file2->to_buffer() == buffer2);
 
-	packed_file2 = {};
+	packed_file2.reset();
 
 	REQUIRE(packed_file3);
 	CHECK(packed_file3->to_buffer() == buffer3);

@@ -151,7 +151,7 @@ namespace Yttrium
 		const VkDevice _device;
 	};
 
-	void vulkan_result_check(VkResult, const std::string& function);
+	[[noreturn]] void vulkan_result_check(VkResult, const std::string& function);
 	std::string vulkan_result_to_string(VkResult);
 }
 

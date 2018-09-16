@@ -20,7 +20,7 @@ namespace Yttrium
 			CanHaveFocus = 1 << 0,
 		};
 
-		virtual ~Widget() = default;
+		virtual ~Widget() noexcept;
 
 		Flags<Flag> flags() const { return _flags; }
 		bool is_focused() const { return _is_focused; }

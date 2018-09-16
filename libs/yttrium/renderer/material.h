@@ -10,7 +10,7 @@ namespace Yttrium
 {
 	class RenderProgram;
 
-	class MaterialImpl : public Material
+	class MaterialImpl final : public Material
 	{
 	public:
 		MaterialImpl(std::unique_ptr<RenderProgram>&&, std::shared_ptr<const Texture2D>&&, Texture2D::Filter);

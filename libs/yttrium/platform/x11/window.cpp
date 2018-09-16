@@ -152,6 +152,7 @@ namespace Yttrium
 {
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
 		: _display{::open_display()}
+		, _screen{DefaultScreen(_display.get())}
 		, _window{_display.get(), ::create_window(_display.get(), _screen, _glx)}
 		, _callbacks{callbacks}
 	{

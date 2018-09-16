@@ -114,6 +114,8 @@ namespace Yttrium
 		_widget_factory.emplace("label", [this](auto name, auto&& data){ return std::make_unique<LabelWidget>(_gui, name, std::move(data)); });
 	}
 
+	GuiIonLoader::~GuiIonLoader() noexcept = default;
+
 	void GuiIonLoader::load(std::string_view source_name)
 	{
 		const auto source = _gui.resource_loader().open(source_name);
