@@ -369,7 +369,7 @@ namespace Yttrium
 		Y_VK_CHECK(vkDeviceWaitIdle(_data._device));
 	}
 
-	VulkanContext::Data::~Data()
+	VulkanContext::Data::~Data() noexcept
 	{
 		if (_device != VK_NULL_HANDLE)
 			vkDestroyDevice(_device, nullptr);

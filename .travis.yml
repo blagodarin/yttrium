@@ -64,7 +64,7 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release RENDERER=Null Y3=catch2
+      env: CLANG=6.0 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: &clang6_xcb
         apt:
           sources: *all_sources
@@ -80,7 +80,7 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug RENDERER=Null Y3=catch2
+      env: CLANG=6.0 CONFIG=Debug RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: *clang6_xcb
 
 before_install:

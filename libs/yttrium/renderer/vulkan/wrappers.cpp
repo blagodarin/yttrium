@@ -312,7 +312,7 @@ namespace Yttrium
 
 		VkPipelineMultisampleStateCreateInfo multisample_state = {};
 		multisample_state.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-		multisample_state.pNext = 0;
+		multisample_state.pNext = nullptr;
 		multisample_state.flags = 0;
 		multisample_state.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 		multisample_state.sampleShadingEnable = VK_FALSE;

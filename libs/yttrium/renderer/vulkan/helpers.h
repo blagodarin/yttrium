@@ -7,8 +7,9 @@
 
 namespace Yttrium
 {
-	struct VulkanVertexFormat
+	class VulkanVertexFormat
 	{
+	public:
 		std::vector<VkVertexInputAttributeDescription> _attributes;
 		VkVertexInputBindingDescription _binding;
 		VkPipelineVertexInputStateCreateInfo _input;
