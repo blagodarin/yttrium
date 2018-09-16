@@ -70,18 +70,15 @@ matrix:
 
 before_install:
   - if [ -n "${CLANG_VERSION}" ]; then export CC=clang-$CLANG_VERSION CXX=clang++-$CLANG_VERSION; fi
-  - if [ -n "${GCC_VERSION}" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION GCOV=gcov-$GCC_VERSION; fi
+  - if [ -n "${GCC_VERSION}" ]; then export CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION; fi
 
 install:
-  - mkdir ${TRAVIS_BUILD_DIR}/_3rdparty
-  - mkdir ${TRAVIS_BUILD_DIR}/_prefix
-
-  - mkdir ${TRAVIS_BUILD_DIR}/_3rdparty/cmake && pushd ${TRAVIS_BUILD_DIR}/_3rdparty/cmake
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.0-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
+  - mkdir _cmake && pushd _cmake
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
   - export PATH=$(pwd)/bin:${PATH}
   - popd
 
-  - pushd ${TRAVIS_BUILD_DIR}/_prefix
+  - mkdir _prefix && pushd _prefix
   - cmake -DBUILD=${Y3} -P ../bootstrap/get.cmake
   - popd
 
@@ -95,7 +92,7 @@ script:
   - popd
 
 after_success:
-  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x $GCOV -a "-s `pwd`"; fi
+  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-$GCC_VERSION -a "-s `pwd`"; fi
 
 notifications:
   email: false
