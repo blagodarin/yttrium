@@ -56,7 +56,7 @@ namespace Yttrium
 		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
 	}
 
-	GlRenderer::~GlRenderer() = default;
+	GlRenderer::~GlRenderer() noexcept = default;
 
 	void GlRenderer::clear()
 	{

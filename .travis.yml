@@ -64,6 +64,23 @@ matrix:
 
     - os: linux
       compiler: clang
+      env: CLANG=6.0 CONFIG=Release RENDERER=OpenGL Y3=catch2
+      addons: &clang6_x11
+        apt:
+          sources: *all_sources
+          packages:
+            - clang-6.0
+            - libopenal-dev
+            - libstdc++-8-dev
+            - libvorbis-dev
+
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Debug RENDERER=OpenGL Y3=catch2
+      addons: *clang6_x11
+
+    - os: linux
+      compiler: clang
       env: CLANG=6.0 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: &clang6_xcb
         apt:
