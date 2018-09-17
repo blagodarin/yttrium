@@ -322,7 +322,7 @@ if("jpeg" IN_LIST _y3_packages)
     SHA1 "fe49aea935617748c21ecbe46c986d6c1b98f39b")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
-    OPTIONS -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_TURBOJPEG=OFF)
+    OPTIONS -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
