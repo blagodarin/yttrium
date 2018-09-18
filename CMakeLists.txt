@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.7)
 
 project(yttrium CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)

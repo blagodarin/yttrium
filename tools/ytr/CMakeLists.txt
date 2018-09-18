@@ -3,3 +3,4 @@ add_executable(ytr
 	)
 target_link_libraries(ytr yttrium)
 set_target_properties(ytr PROPERTIES FOLDER "tools")
+install(TARGETS ytr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
