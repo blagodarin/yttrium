@@ -1,4 +1,10 @@
-add_library(yttrium SHARED
+add_library(yttrium SHARED globals.cpp)
+source_group("src" FILES globals.cpp)
+target_link_libraries(yttrium PRIVATE Threads::Threads)
+set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT FOLDER "libs")
+include_config(yttrium ${PROJECT_BINARY_DIR}/config.h)
+
+y_sources(yttrium "include"
 	../../include/yttrium/api.h
 	../../include/yttrium/console.h
 	../../include/yttrium/exceptions.h
@@ -6,26 +12,24 @@ add_library(yttrium SHARED
 	../../include/yttrium/resource_loader.h
 	../../include/yttrium/tiny_string_map.h
 	../../include/yttrium/translation.h
+	)
+y_sources(yttrium "src"
 	console.cpp
-	globals.cpp
 	resource_loader.cpp
 	string_utils.cpp
 	tiny_string_map.cpp
 	translation.cpp
 	)
-target_link_libraries(yttrium PRIVATE Threads::Threads)
-set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT FOLDER "libs")
-include_config(yttrium ${PROJECT_BINARY_DIR}/config.h)
 
 if(WIN32)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/platform/windows"
 		platform/windows/windows.h
 		)
 endif()
 
 ########################################################################################################################
 # audio
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/audio"
 	../../include/yttrium/audio/format.h
 	../../include/yttrium/audio/manager.h
 	../../include/yttrium/audio/music_reader.h
@@ -33,9 +37,8 @@ target_sources(yttrium PRIVATE
 	../../include/yttrium/audio/reader.h
 	../../include/yttrium/audio/sound.h
 	../../include/yttrium/audio/utils.h
-	audio/formats/wav_private.h
-	audio/formats/wav.cpp
-	audio/formats/wav.h
+	)
+y_sources(yttrium "src/audio"
 	audio/backend.h
 	audio/format.cpp
 	audio/manager.cpp
@@ -50,8 +53,13 @@ target_sources(yttrium PRIVATE
 	audio/streamer.h
 	audio/utils.cpp
 	)
+y_sources(yttrium "src/audio/formats"
+	audio/formats/wav_private.h
+	audio/formats/wav.cpp
+	audio/formats/wav.h
+	)
 if(ON)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/audio/openal"
 		audio/openal/backend.cpp
 		audio/openal/backend.h
 		audio/openal/format.cpp
@@ -60,6 +68,8 @@ if(ON)
 		audio/openal/player.h
 		audio/openal/sound.cpp
 		audio/openal/sound.h
+		)
+	y_sources(yttrium "src/platform"
 		platform/openal.h
 		)
 	target_include_directories(yttrium SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
@@ -75,7 +85,7 @@ if(Y_USE_OGG_VORBIS)
 		find_library(VORBISFILE_LIBRARY vorbisfile)
 		target_link_libraries(yttrium PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
 	endif()
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/audio/formats"
 		audio/formats/ogg_vorbis.cpp
 		audio/formats/ogg_vorbis.h
 		)
@@ -83,24 +93,12 @@ endif()
 
 ########################################################################################################################
 # gui
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/gui"
 	../../include/yttrium/gui/gui.h
 	../../include/yttrium/gui/text_capture.h
 	../../include/yttrium/gui/texture_font.h
-	gui/ion/loader.cpp
-	gui/ion/loader.h
-	gui/logic/line_editor.cpp
-	gui/logic/line_editor.h
-	gui/widgets/button.cpp
-	gui/widgets/button.h
-	gui/widgets/canvas.cpp
-	gui/widgets/canvas.h
-	gui/widgets/image.cpp
-	gui/widgets/image.h
-	gui/widgets/input.cpp
-	gui/widgets/input.h
-	gui/widgets/label.cpp
-	gui/widgets/label.h
+	)
+y_sources(yttrium "src/gui"
 	gui/actions.cpp
 	gui/actions.h
 	gui/cursor.h
@@ -119,20 +117,44 @@ target_sources(yttrium PRIVATE
 	gui/widget.cpp
 	gui/widget.h
 	)
+y_sources(yttrium "src/gui/ion"
+	gui/ion/loader.cpp
+	gui/ion/loader.h
+	)
+y_sources(yttrium "src/gui/logic"
+	gui/logic/line_editor.cpp
+	gui/logic/line_editor.h
+	)
+y_sources(yttrium "src/gui/widgets"
+	gui/widgets/button.cpp
+	gui/widgets/button.h
+	gui/widgets/canvas.cpp
+	gui/widgets/canvas.h
+	gui/widgets/image.cpp
+	gui/widgets/image.h
+	gui/widgets/input.cpp
+	gui/widgets/input.h
+	gui/widgets/label.cpp
+	gui/widgets/label.h
+	)
 
 ########################################################################################################################
 # image
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include"
 	../../include/yttrium/image.h
+	)
+y_sources(yttrium "src/image"
+	image/image.cpp
+	image/formats.cpp
+	image/formats.h
+	image/utils.cpp
+	image/utils.h
+	)
+y_sources(yttrium "src/image/formats"
 	image/formats/dds.cpp
 	image/formats/dds.h
 	image/formats/tga.cpp
 	image/formats/tga.h
-	image/formats.cpp
-	image/formats.h
-	image/image.cpp
-	image/utils.cpp
-	image/utils.h
 	)
 if(Y_USE_JPEG)
 	if(WIN32)
@@ -142,7 +164,7 @@ if(Y_USE_JPEG)
 		find_package(JPEG REQUIRED)
 		target_link_libraries(yttrium PRIVATE JPEG::JPEG)
 	endif()
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/image/formats"
 		image/formats/jpeg.cpp
 		)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -159,23 +181,25 @@ if(Y_USE_PNG)
 		find_package(PNG REQUIRED)
 		target_link_libraries(yttrium PRIVATE PNG::PNG)
 	endif()
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/image/formats"
 		image/formats/png.cpp
 		)
 endif()
 
 ########################################################################################################################
 # ion
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/ion"
 	../../include/yttrium/ion/reader.h
 	../../include/yttrium/ion/writer.h
+	)
+y_sources(yttrium "src/ion"
 	ion/reader.cpp
 	ion/writer.cpp
 	)
 
 ########################################################################################################################
 # math
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/math"
 	../../include/yttrium/math/color.h
 	../../include/yttrium/math/euler.h
 	../../include/yttrium/math/line.h
@@ -191,28 +215,32 @@ target_sources(yttrium PRIVATE
 
 ########################################################################################################################
 # memory
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/memory"
 	../../include/yttrium/memory/buffer_appender.h
 	../../include/yttrium/memory/buffer.h
 	../../include/yttrium/memory/pool.h
+	)
+y_sources(yttrium "src/memory"
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
 	memory/buffer.cpp
 	memory/pool.cpp
 	memory/raw.h
+	)
+y_sources(yttrium "src/platform"
 	platform/memory.h
 	)
 if(UNIX)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/platform/posix"
 		platform/posix/memory.cpp
 		)
 elseif(WIN32)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/platform/windows"
 		platform/windows/memory.cpp
 		)
 endif()
 if(Y_ENABLE_BUFFER_MEMORY_TRACKING)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/memory"
 		memory/buffer_memory_tracker.cpp
 		memory/buffer_memory_tracker.h
 		)
@@ -220,7 +248,7 @@ endif()
 
 ########################################################################################################################
 # renderer
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/renderer"
 	../../include/yttrium/renderer/manager.h
 	../../include/yttrium/renderer/material.h
 	../../include/yttrium/renderer/mesh.h
@@ -229,12 +257,8 @@ target_sources(yttrium PRIVATE
 	../../include/yttrium/renderer/program.h
 	../../include/yttrium/renderer/texture.h
 	../../include/yttrium/renderer/textured_rect.h
-	renderer/builtin/builtin.h
-	renderer/builtin/builtin.cpp
-	renderer/builtin/debug_texture.cpp
-	renderer/builtin/debug_texture.h
-	renderer/formats/obj.cpp
-	renderer/formats/obj.h
+	)
+y_sources(yttrium "src/renderer"
 	renderer/backend.cpp
 	renderer/backend.h
 	renderer/debug_renderer.cpp
@@ -251,9 +275,18 @@ target_sources(yttrium PRIVATE
 	renderer/texture.cpp
 	renderer/texture.h
 	)
+y_sources(yttrium "src/renderer/builtin"
+	renderer/builtin/builtin.h
+	renderer/builtin/builtin.cpp
+	renderer/builtin/debug_texture.cpp
+	renderer/builtin/debug_texture.h
+	)
+y_sources(yttrium "src/renderer/formats"
+	renderer/formats/obj.cpp
+	renderer/formats/obj.h
+	)
 if(Y_RENDERER_OPENGL)
-	target_sources(yttrium PRIVATE
-		platform/gl.h
+	y_sources(yttrium "src/renderer/gl"
 		renderer/gl/api.h
 		renderer/gl/gl.cpp
 		renderer/gl/gl.h
@@ -268,7 +301,14 @@ if(Y_RENDERER_OPENGL)
 		renderer/gl/wrappers.cpp
 		renderer/gl/wrappers.h
 		)
+	y_sources(yttrium "src/platform"
+		platform/gl.h
+		)
 	add_yrc_sources(yttrium
+		renderer/gl/2d_fs.glsl
+		renderer/gl/2d_vs.glsl
+		)
+	source_group("src\\renderer\\gl" FILES
 		renderer/gl/2d_fs.glsl
 		renderer/gl/2d_vs.glsl
 		)
@@ -277,7 +317,7 @@ if(Y_RENDERER_OPENGL)
 		set_property(SOURCE renderer/gl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(Y_RENDERER_VULKAN)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/renderer/vulkan"
 		renderer/vulkan/buffer.cpp
 		renderer/vulkan/buffer.h
 		renderer/vulkan/context.cpp
@@ -305,9 +345,13 @@ elseif(Y_RENDERER_VULKAN)
 		FRAGMENT renderer/vulkan/2d_fs.glsl
 		VERTEX renderer/vulkan/2d_vs.glsl
 		)
+	source_group("src\\renderer\\vulkan" FILES
+		renderer/vulkan/2d_fs.glsl
+		renderer/vulkan/2d_vs.glsl
+		)
 	target_link_libraries(yttrium PRIVATE Vulkan::Vulkan)
 else()
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/renderer/null"
 		renderer/null/renderer.cpp
 		renderer/null/renderer.h
 		)
@@ -315,11 +359,13 @@ endif()
 
 ########################################################################################################################
 # script
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/script"
 	../../include/yttrium/script/args.h
 	../../include/yttrium/script/code.h
 	../../include/yttrium/script/context.h
 	../../include/yttrium/script/value.h
+	)
+y_sources(yttrium "src/script"
 	script/args.cpp
 	script/code.cpp
 	script/context.cpp
@@ -330,16 +376,15 @@ target_sources(yttrium PRIVATE
 
 ########################################################################################################################
 # storage
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include/storage"
 	../../include/yttrium/storage/package.h
 	../../include/yttrium/storage/reader.h
 	../../include/yttrium/storage/source.h
 	../../include/yttrium/storage/storage.h
 	../../include/yttrium/storage/temporary_file.h
 	../../include/yttrium/storage/writer.h
-	platform/file.h
-	storage/formats/ypq.cpp
-	storage/formats/ypq.h
+	)
+y_sources(yttrium "src/storage"
 	storage/package.cpp
 	storage/package.h
 	storage/reader.cpp
@@ -349,18 +394,25 @@ target_sources(yttrium PRIVATE
 	storage/writer.cpp
 	storage/writer.h
 	)
-	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-		set_property(SOURCE storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
-	endif()
+y_sources(yttrium "src/storage/formats"
+	storage/formats/ypq.cpp
+	storage/formats/ypq.h
+	)
+y_sources(yttrium "src/platform"
+	platform/file.h
+	)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set_property(SOURCE storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+endif()
 if(UNIX)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/platform/posix"
 		platform/posix/file.cpp
 		platform/posix/temporary_file.cpp
 		platform/posix/temporary_file.h
 		)
 	set_property(SOURCE platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 elseif(WIN32)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/platform/windows"
 		platform/windows/file.cpp
 		platform/windows/temporary_file.cpp
 		)
@@ -368,8 +420,10 @@ endif()
 
 ########################################################################################################################
 # utils
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include"
 	../../include/yttrium/utils.h
+	)
+y_sources(yttrium "src/utils"
 	utils/atomic_counters.h
 	utils/fourcc.h
 	utils/unique_ptr.h
@@ -377,18 +431,22 @@ target_sources(yttrium PRIVATE
 
 ########################################################################################################################
 # window
-target_sources(yttrium PRIVATE
+y_sources(yttrium "include"
 	../../include/yttrium/key.h
 	../../include/yttrium/window.h
-	platform/window.h
+	)
+y_sources(yttrium "src/window"
 	window/backend.cpp
 	window/backend.h
 	window/key.cpp
 	window/window.cpp
 	)
+y_sources(yttrium "src/platform"
+	platform/window.h
+	)
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
-		target_sources(yttrium PRIVATE
+		y_sources(yttrium "src/platform/x11"
 			platform/x11/glx.cpp
 			platform/x11/glx.h
 			platform/x11/window.cpp
@@ -400,7 +458,7 @@ if(UNIX)
 			set_property(SOURCE platform/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
-		target_sources(yttrium PRIVATE
+		y_sources(yttrium "src/platform/xcb"
 			platform/xcb/window.cpp
 			platform/xcb/window.h
 			)
@@ -414,12 +472,12 @@ if(UNIX)
 		endif()
 	endif()
 elseif(WIN32)
-	target_sources(yttrium PRIVATE
+	y_sources(yttrium "src/platform/gdi"
 		platform/gdi/window.cpp
 		platform/gdi/window.h
 		)
 	if(Y_RENDERER_OPENGL)
-		target_sources(yttrium PRIVATE
+		y_sources(yttrium "src/platform/gdi"
 			platform/gdi/wgl.cpp
 			platform/gdi/wgl.h
 			)
