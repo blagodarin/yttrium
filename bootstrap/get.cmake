@@ -126,17 +126,28 @@ function(y3_extract _name)
 endfunction()
 
 function(y3_git_clone _url)
-  cmake_parse_arguments(_arg "" "DIR" "" ${ARGN})
+  cmake_parse_arguments(_arg "" "DIR;COMMIT" "" ${ARGN})
+  if(NOT _arg_DIR)
+    message(FATAL_ERROR "y3_git_clone: DIR is required")
+  endif()
   if(NOT Git_FOUND)
     find_package(Git REQUIRED)
   endif()
   file(MAKE_DIRECTORY ${BUILD_DIR})
-  if(_arg_DIR AND EXISTS ${BUILD_DIR}/${_arg_DIR})
+  set(_dir ${BUILD_DIR}/${_arg_DIR})
+  if(EXISTS ${_dir})
     message(STATUS "[Y3] Removing ${_arg_DIR}")
-    file(REMOVE_RECURSE ${BUILD_DIR}/${_arg_DIR})
+    file(REMOVE_RECURSE ${_dir})
   endif()
-  y3_run(COMMAND ${GIT_EXECUTABLE} clone --depth 1 ${_url}
+  if(NOT _arg_COMMIT)
+    list(APPEND _clone_options --depth 1)
+  endif()
+  y3_run(COMMAND ${GIT_EXECUTABLE} clone ${_clone_options} ${_url}
     WORKING_DIRECTORY ${BUILD_DIR})
+  if(_arg_COMMIT)
+    y3_run(COMMAND ${GIT_EXECUTABLE} reset --hard ${_arg_COMMIT}
+      WORKING_DIRECTORY ${_dir})
+  endif()
 endfunction()
 
 function(y3_git_apply _dir _patch)
@@ -181,6 +192,7 @@ y3_package(png REQUIRES zlib)
 y3_package(catch2)
 y3_package(glslang)
 y3_package(ogg)
+y3_package(lcov)
 y3_package(nasm)
 y3_package(openal)
 y3_package(opengl)
@@ -218,6 +230,12 @@ if("ogg" IN_LIST _y3_packages)
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
+endif()
+
+if("lcov" IN_LIST _y3_packages)
+  set(_package "lcov")
+  # lcov 1.13 doesn't support gcov 8 or higher.
+  y3_git_clone("https://github.com/linux-test-project/lcov.git" DIR ${_package} COMMIT "a5dd9529f9232b8d901a4d6eb9ae54cae179e5b3")
 endif()
 
 if("nasm" IN_LIST _y3_packages)
