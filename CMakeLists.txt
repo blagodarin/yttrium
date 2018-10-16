@@ -98,6 +98,20 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	if(Y_COVERAGE)
 		add_compile_options(--coverage)
 		list(APPEND LINKER_FLAGS --coverage)
+
+		option(Y_COVERAGE_GCOV "Enable Gcov/Lcov coverage analysis" OFF)
+		if(Y_COVERAGE_GCOV)
+			find_package(Gcov REQUIRED)
+			add_custom_target(gcov
+				COMMAND ${LCOV_EXECUTABLE} --capture --no-external --quiet --gcov-tool ${GCOV_EXECUTABLE} --directory ${PROJECT_SOURCE_DIR} --output-file ${PROJECT_BINARY_DIR}/coverage.info
+				COMMAND ${LCOV_EXECUTABLE} --summary ${PROJECT_BINARY_DIR}/coverage.info
+				COMMAND ${GENHTML_EXECUTABLE} --quiet ${PROJECT_BINARY_DIR}/coverage.info --output-directory ${PROJECT_BINARY_DIR}/coverage
+					--rc genhtml_hi_limit=100 --rc genhtml_med_limit=75
+				VERBATIM)
+			add_custom_target(gcov_clean
+				COMMAND ${LCOV_EXECUTABLE} --zerocounters --quiet --directory ${PROJECT_BINARY_DIR}
+				VERBATIM)
+		endif()
 	endif()
 
 	option(Y_SANITIZERS "Enable sanitizers" OFF)

@@ -8,17 +8,16 @@ git:
 matrix:
   include:
 
-    # Gcov 8 generates a tremendous amount of warnings which gets our job killed.
     - os: linux
       compiler: gcc
-      env: GCC=7 CONFIG=Debug RENDERER=Null Y3=catch2 COVERAGE=1
-      addons: &gcc7_xcb
+      env: GCC=8 CONFIG=Debug RENDERER=Null Y3=catch2,lcov COVERAGE=1
+      addons: &gcc8_xcb
         apt:
           sources: &all_sources
             - llvm-toolchain-trusty-6.0
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
+            - g++-8
             - libopenal-dev
             - libvorbis-dev
             - libxcb-image0-dev
@@ -45,17 +44,7 @@ matrix:
     - os: linux
       compiler: gcc
       env: GCC=8 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
-      addons: &gcc8_xcb
-        apt:
-          sources: *all_sources
-          packages:
-            - g++-8
-            - libopenal-dev
-            - libvorbis-dev
-            - libxcb-image0-dev
-            - libxcb-xkb-dev
-            - libxkbcommon-dev
-            - libxkbcommon-x11-dev
+      addons: *gcc8_xcb
 
     - os: linux
       compiler: gcc
@@ -111,20 +100,23 @@ install:
   - popd
 
   - mkdir _prefix && pushd _prefix
+  - export PATH="$(pwd)/bin:${PATH}"
   - cmake -DBUILD=${Y3} -DCONFIG=${CONFIG} -P ../bootstrap/get.cmake
   - popd
 
 script:
   - mkdir _build && pushd _build
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_ALL=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_GCOV=ON"; fi
   - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/_prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
   - cmake --build . -- -j2
   - cmake --build . --target check
+  - if [ -n "${COVERAGE}" ]; then cmake --build . --target gcov; fi
   - popd
 
-after_success:
-  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
+# Codecov doesn't currently support Gcov 8 coverage reports.
+#after_success:
+#  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
 
 notifications:
   email: false

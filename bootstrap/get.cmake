@@ -236,6 +236,8 @@ if("lcov" IN_LIST _y3_packages)
   set(_package "lcov")
   # lcov 1.13 doesn't support gcov 8 or higher.
   y3_git_clone("https://github.com/linux-test-project/lcov.git" DIR ${_package} COMMIT "a5dd9529f9232b8d901a4d6eb9ae54cae179e5b3")
+  y3_run(COMMAND make install PREFIX=${PREFIX_DIR} CFG_DIR=${CMAKE_BINARY_DIR}/.trash MAN_DIR=${CMAKE_BINARY_DIR}/.trash
+    WORKING_DIRECTORY ${BUILD_DIR}/${_package})
 endif()
 
 if("nasm" IN_LIST _y3_packages)
