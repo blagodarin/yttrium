@@ -97,11 +97,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	option(Y_COVERAGE "Build with coverage analysis support" OFF)
 	if(Y_COVERAGE)
 		add_compile_options(--coverage)
-		list(APPEND LINKER_FLAGS --coverage)
+		list(APPEND DYNAMIC_LINKER_FLAGS --coverage)
 
 		option(Y_COVERAGE_GCOV "Enable Gcov/Lcov coverage analysis" OFF)
 		if(Y_COVERAGE_GCOV)
 			find_package(Gcov REQUIRED)
+			find_package(Lcov REQUIRED)
 			add_custom_target(gcov
 				COMMAND ${LCOV_EXECUTABLE} --capture --no-external --quiet --gcov-tool ${GCOV_EXECUTABLE} --directory ${PROJECT_SOURCE_DIR} --output-file ${PROJECT_BINARY_DIR}/coverage.info
 				COMMAND ${LCOV_EXECUTABLE} --summary ${PROJECT_BINARY_DIR}/coverage.info
@@ -117,12 +118,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	option(Y_SANITIZERS "Enable sanitizers" OFF)
 	if(Y_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
-		list(APPEND LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
+		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
 
 	option(Y_TRAVIS "Enable Travis CI workarounds" OFF)
 	if(Y_TRAVIS AND Y_SANITIZERS)
-		list(APPEND LINKER_FLAGS -fuse-ld=gold)
+		list(APPEND DYNAMIC_LINKER_FLAGS -fuse-ld=gold)
 	endif()
 endif()
 
@@ -136,11 +137,13 @@ endif()
 get_property(DIRECTORY_COMPILE_OPTIONS DIRECTORY PROPERTY COMPILE_OPTIONS)
 
 print_list("Compiler flags:" ${DIRECTORY_COMPILE_OPTIONS})
-print_list("Linker flags:" ${LINKER_FLAGS})
+print_list("Static linker flags:" ${STATIC_LINKER_FLAGS})
+print_list("Dynamic linker flags:" ${DYNAMIC_LINKER_FLAGS})
 
-append_options(CMAKE_EXE_LINKER_FLAGS ${LINKER_FLAGS})
-append_options(CMAKE_MODULE_LINKER_FLAGS ${LINKER_FLAGS})
-append_options(CMAKE_SHARED_LINKER_FLAGS ${LINKER_FLAGS})
+append_options(CMAKE_EXE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
+append_options(CMAKE_MODULE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
+append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
+append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
 set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.

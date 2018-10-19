@@ -1,0 +1,7 @@
+find_program(LCOV_EXECUTABLE lcov)
+find_program(GENHTML_EXECUTABLE genhtml)
+
+mark_as_advanced(LCOV_EXECUTABLE GENHTML_EXECUTABLE)
+
+find_package_handle_standard_args(Lcov
+	REQUIRED_VARS LCOV_EXECUTABLE GENHTML_EXECUTABLE)
