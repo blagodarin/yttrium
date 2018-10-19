@@ -56,20 +56,8 @@ namespace Yttrium
 		}
 
 		/// Converts the string to signed decimal integer.
-		/// The string must be in form `[+|-]d{d}`.
+		/// The string must be in form `[-]d{d}`.
 		Y_API int to_int(std::string_view) noexcept;
-		Y_API int32_t to_int32(std::string_view) noexcept;
-		Y_API int64_t to_int64(std::string_view) noexcept;
-
-		/// Converts the string to unsigned decimal integer.
-		/// The string must be in form `[+]d{d}`.
-		Y_API uint32_t to_uint32(std::string_view) noexcept;
-		Y_API uint64_t to_uint64(std::string_view) noexcept;
-
-		/// Converts the string to decimal floating point value.
-		/// The string must be in form `[+|-]d{d}[.d{d}][(e|E)[+|-]d{d}]`.
-		Y_API float to_float(std::string_view) noexcept;
-		Y_API double to_double(std::string_view) noexcept;
 
 		/// Tries to convert the string to decimal value.
 		/// Returns `false` if the string doesn't match the numeric format.

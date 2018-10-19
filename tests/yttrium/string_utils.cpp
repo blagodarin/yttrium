@@ -68,74 +68,9 @@ TEST_CASE("string_utils.to_int")
 {
 	using namespace Yttrium::strings;
 
-	// Invalid.
 	CHECK(to_int("") == 0);
-	CHECK(to_int32("") == 0);
-	CHECK(to_uint32("") == 0u);
-	CHECK(to_uint32("-1") == 0u);
-	CHECK(to_int64("") == 0);
-	CHECK(to_uint64("") == 0u);
-	CHECK(to_uint64("-1") == 0u);
-
-	// Minimum.
 	CHECK(to_int(std::to_string(std::numeric_limits<int>::min())) == std::numeric_limits<int>::min());
-	CHECK(to_int32("-2147483648") == -2147483647 - 1);
-	CHECK(to_uint32("0") == 0u);
-	CHECK(to_int64("-9223372036854775808") == -INT64_C(9223372036854775807) - 1);
-	CHECK(to_uint64("0") == 0u);
-
-	// Maximum.
 	CHECK(to_int(std::to_string(std::numeric_limits<int>::max())) == std::numeric_limits<int>::max());
-	CHECK(to_int32("2147483647") == 2147483647);
-	CHECK(to_int32("+2147483647") == 2147483647);
-	CHECK(to_uint32("4294967295") == UINT32_C(4294967295));
-	CHECK(to_uint32("+4294967295") == UINT32_C(4294967295));
-	CHECK(to_int64("9223372036854775807") == INT64_C(9223372036854775807));
-	CHECK(to_int64("+9223372036854775807") == INT64_C(9223372036854775807));
-	CHECK(to_uint64("18446744073709551615") == UINT64_C(18446744073709551615));
-	CHECK(to_uint64("+18446744073709551615") == UINT64_C(18446744073709551615));
-
-	// Overflow.
-	CHECK(to_int32("2147483648") == -2147483647 - 1);
-	CHECK(to_int32("2147483649") == -2147483647);
-	CHECK(to_uint32("4294967296") == 0u);
-	CHECK(to_uint32("4294967297") == 1u);
-	CHECK(to_int64("9223372036854775808") == -INT64_C(9223372036854775807) - 1);
-	CHECK(to_int64("9223372036854775809") == -INT64_C(9223372036854775807));
-	CHECK(to_uint64("18446744073709551616") == 0u);
-	CHECK(to_uint64("18446744073709551617") == 1u);
-
-	// Underflow.
-	CHECK(to_int32("-2147483649") == 2147483647);
-	CHECK(to_int32("-2147483650") == 2147483646);
-	CHECK(to_int64("-9223372036854775809") == INT64_C(9223372036854775807));
-	CHECK(to_int64("-9223372036854775810") == INT64_C(9223372036854775806));
-}
-
-TEST_CASE("string_utils.to_float")
-{
-	using namespace Yttrium::strings;
-
-	CHECK(to_float("") == 0.f);
-	CHECK(to_double("") == 0.);
-
-	CHECK(to_float("1") == 1.f);
-	CHECK(to_double("1") == 1.);
-
-	CHECK(to_float("0.5") == .5f);
-	CHECK(to_double("0.5") == .5);
-
-	CHECK(to_float("-0.25") == -.25f);
-	CHECK(to_double("-0.25") == -.25);
-
-	CHECK(to_float("+0.125") == .125f);
-	CHECK(to_double("+0.125") == .125);
-
-	CHECK(to_float("+98765.43210e-7") == Approx{ +98765.43210e-7f }.epsilon(1e-13f));
-	CHECK(to_double("+98765.43210e-7") == Approx{ +98765.43210e-7 }.epsilon(1e-13));
-
-	CHECK(to_float("-01234.56789e+7") == Approx{ -01234.56789e+7f }.epsilon(1e-13f));
-	CHECK(to_double("-01234.56789e+7") == Approx{ -01234.56789e+7 }.epsilon(1e-13));
 }
 
 TEST_CASE("string_utils.to_number.int32")
@@ -153,8 +88,7 @@ TEST_CASE("string_utils.to_number.int32")
 	CHECK(to_number("2147483647", i));
 	CHECK(i == 2147483647);
 
-	CHECK(to_number("+2147483647", i));
-	CHECK(i == 2147483647);
+	CHECK(!to_number("+2147483647", i));
 
 	CHECK(!to_number("2147483648", i));
 	CHECK(!to_number("+2147483648", i));
@@ -181,14 +115,12 @@ TEST_CASE("string_utils.to_number.uint32")
 	CHECK(to_number("0", u));
 	CHECK(u == 0u);
 
-	CHECK(to_number("+0", u));
-	CHECK(u == 0u);
+	CHECK(!to_number("+0", u));
 
 	CHECK(to_number("4294967295", u));
 	CHECK(u == 4294967295u);
 
-	CHECK(to_number("+4294967295", u));
-	CHECK(u == 4294967295u);
+	CHECK(!to_number("+4294967295", u));
 
 	CHECK(!to_number("4294967296", u));
 	CHECK(!to_number("+4294967296", u));
@@ -215,9 +147,11 @@ TEST_CASE("string_utils.to_number.double")
 	CHECK(to_number("0.0", d));
 	CHECK(d == 0.0);
 
-	CHECK(!to_number("0.", d));
+	CHECK(to_number("0.", d));
+	CHECK(d == 0.0);
 
-	CHECK(!to_number(".0", d));
+	CHECK(to_number(".0", d));
+	CHECK(d == 0.0);
 
 	CHECK(to_number("1.0", d));
 	CHECK(d == 1.0);
@@ -232,13 +166,15 @@ TEST_CASE("string_utils.to_number.double")
 	CHECK(d == 7.6e+1);
 
 	CHECK(to_number("9.8e-1", d));
-	CHECK(d == Approx{ 9.8e-1 }.epsilon(1e-13));
+	CHECK(d == Approx{9.8e-1}.epsilon(1e-13));
 
-	CHECK(to_number("+98765.43210e-7", d));
-	CHECK(d == Approx{ +98765.43210e-7 }.epsilon(1e-13));
+	CHECK(to_number("98765.43210e-7", d));
+	CHECK(d == Approx{98765.43210e-7}.epsilon(1e-13));
+
+	CHECK(!to_number("+98765.43210e-7", d));
 
 	CHECK(to_number("-01234.56789e+7", d));
-	CHECK(d == Approx{ -01234.56789e+7 }.epsilon(1e-13));
+	CHECK(d == Approx{-01234.56789e+7}.epsilon(1e-13));
 
 	CHECK(!to_number("1 ", d));
 	CHECK(!to_number(" 1", d));
