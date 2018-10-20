@@ -1,4 +1,4 @@
-#include <yttrium/utils.h>
+#include <yttrium/utils/numeric.h>
 
 #include <limits>
 

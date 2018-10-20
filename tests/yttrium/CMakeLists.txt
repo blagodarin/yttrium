@@ -22,14 +22,13 @@ add_executable(yttrium_tests
   rect.cpp
   resource_loader.cpp
   source.cpp
-  string_utils.cpp
   temporary_file.cpp
   test_utils.cpp
   test_utils.h
   texture_font.cpp
   tiny_string_map.cpp
   translation.cpp
-  utils.cpp
+  utils_numeric.cpp
   utils_string.cpp
   vector.cpp
   )

@@ -1,7 +1,7 @@
 #include "ogg_vorbis.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/utils.h>
+#include <yttrium/utils/numeric.h>
 
 #include <algorithm>
 #include <cstring>

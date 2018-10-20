@@ -8,7 +8,7 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
-#include <yttrium/string_utils.h>
+#include <yttrium/utils/string.h>
 
 #include <cmath>
 

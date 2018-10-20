@@ -5,7 +5,6 @@
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/utils.h>
 #include "texture_font.h"
 
 #include <unordered_map>

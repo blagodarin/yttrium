@@ -2,7 +2,7 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/audio/reader.h>
-#include <yttrium/utils.h>
+#include <yttrium/utils/numeric.h>
 #include "backend.h"
 
 #include <algorithm>

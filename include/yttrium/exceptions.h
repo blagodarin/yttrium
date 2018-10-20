@@ -1,10 +1,7 @@
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_exceptions_h_
 #define _include_yttrium_exceptions_h_
 
-#include <yttrium/string_utils.h>
+#include <yttrium/utils/string.h>
 
 #include <stdexcept>
 

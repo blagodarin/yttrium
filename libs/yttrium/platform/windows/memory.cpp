@@ -1,7 +1,5 @@
 #include "../memory.h"
 
-#include <yttrium/utils.h>
-
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>

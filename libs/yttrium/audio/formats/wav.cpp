@@ -1,7 +1,6 @@
 #include "wav.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/utils.h>
 #include "wav_private.h"
 
 #include <algorithm>

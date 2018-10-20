@@ -1,6 +1,5 @@
 #include <yttrium/memory/buffer.h>
 
-#include <yttrium/utils.h>
 #include "buffer_memory.h"
 
 #include <algorithm>

@@ -3,7 +3,6 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include <yttrium/utils.h>
 #include "../platform/file.h"
 
 #include <algorithm>

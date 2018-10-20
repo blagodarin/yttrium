@@ -6,7 +6,7 @@
 
 #include <yttrium/api.h>
 #include <yttrium/flags.h>
-#include <yttrium/utils.h>
+#include <yttrium/utils/numeric.h>
 
 namespace Yttrium
 {

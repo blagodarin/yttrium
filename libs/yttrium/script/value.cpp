@@ -1,6 +1,6 @@
 #include <yttrium/script/value.h>
 
-#include <yttrium/string_utils.h>
+#include <yttrium/utils/string.h>
 
 #include <charconv>
 

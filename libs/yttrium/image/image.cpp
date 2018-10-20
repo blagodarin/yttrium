@@ -1,8 +1,7 @@
 #include <yttrium/image.h>
 
 #include <yttrium/storage/writer.h>
-#include <yttrium/string_utils.h>
-#include <yttrium/utils.h>
+#include <yttrium/utils/numeric.h>
 #include "../utils/string.h"
 #include "formats.h"
 #include "utils.h"

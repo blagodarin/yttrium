@@ -1,7 +1,7 @@
 #include <yttrium/ion/reader.h>
 #include <yttrium/math/color.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/utils.h>
+#include <yttrium/utils/numeric.h>
 #include "iostream.h"
 
 #include <sstream>

@@ -6,7 +6,7 @@
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/program.h>
 #include <yttrium/renderer/textured_rect.h>
-#include <yttrium/string_utils.h>
+#include <yttrium/utils/string.h>
 #include "backend.h"
 #include "builtin/builtin.h"
 #include "debug_renderer.h"

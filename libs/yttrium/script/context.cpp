@@ -3,7 +3,7 @@
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
-#include <yttrium/string_utils.h>
+#include <yttrium/utils/string.h>
 
 #include <cassert>
 #include <iostream>

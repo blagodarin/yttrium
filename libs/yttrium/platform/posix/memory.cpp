@@ -1,7 +1,5 @@
 #include "../memory.h"
 
-#include <yttrium/utils.h>
-
 #include <cstdlib>
 #include <cstring>
 
@@ -45,7 +43,7 @@ namespace Yttrium
 		const auto new_pointer = ::mmap(nullptr, new_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (new_pointer != MAP_FAILED)
 		{
-			std::memcpy(new_pointer, old_pointer, min(old_size, new_size));
+			std::memcpy(new_pointer, old_pointer, std::min(old_size, new_size));
 			if (::munmap(old_pointer, old_size) != 0)
 				std::abort();
 			return new_pointer;
