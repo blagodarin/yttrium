@@ -1,6 +1,7 @@
 #include <yttrium/storage/package.h>
 
 #include <yttrium/storage/source.h>
+#include "../utils/string.h"
 #include "formats/ypq.h"
 #include "package.h"
 

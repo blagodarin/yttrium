@@ -6,6 +6,7 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
+#include "../../utils/string.h"
 #include "../gui.h"
 #include "../screen.h"
 #include "../widgets/button.h"

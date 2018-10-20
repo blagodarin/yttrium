@@ -10,6 +10,7 @@ y_sources(yttrium "include"
 	../../include/yttrium/exceptions.h
 	../../include/yttrium/flags.h
 	../../include/yttrium/resource_loader.h
+	../../include/yttrium/string_utils.h
 	../../include/yttrium/tiny_string_map.h
 	../../include/yttrium/translation.h
 	)
@@ -426,6 +427,8 @@ y_sources(yttrium "include"
 y_sources(yttrium "src/utils"
 	utils/atomic_counters.h
 	utils/fourcc.h
+	utils/string.cpp
+	utils/string.h
 	utils/unique_ptr.h
 	)
 

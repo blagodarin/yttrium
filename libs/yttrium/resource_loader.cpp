@@ -16,6 +16,7 @@
 #include <yttrium/translation.h>
 #include "gui/ion/loader.h"
 #include "renderer/material.h"
+#include "utils/string.h"
 
 #include <cassert>
 #include <mutex>

@@ -30,6 +30,7 @@ add_executable(yttrium_tests
   tiny_string_map.cpp
   translation.cpp
   utils.cpp
+  utils_string.cpp
   vector.cpp
   )
 target_link_libraries(yttrium_tests PRIVATE yttrium Catch2::Catch2)
