@@ -112,8 +112,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 				COMMAND ${LCOV_EXECUTABLE} --summary ${PROJECT_BINARY_DIR}/coverage.info
 				COMMAND ${GENHTML_EXECUTABLE} ${PROJECT_BINARY_DIR}/coverage.info --quiet
 					--output-directory ${PROJECT_BINARY_DIR}/coverage
-					--rc genhtml_hi_limit=100
-					--rc genhtml_med_limit=75
+					--rc genhtml_hi_limit=67
+					--rc genhtml_med_limit=34
 				VERBATIM)
 			add_custom_target(lcov_clean
 				COMMAND ${LCOV_EXECUTABLE} --zerocounters --quiet --directory ${PROJECT_BINARY_DIR}

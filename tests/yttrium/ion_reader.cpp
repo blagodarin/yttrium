@@ -1,4 +1,5 @@
 #include <yttrium/ion/reader.h>
+#include <yttrium/math/color.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/utils.h>
 #include "iostream.h"
@@ -12,6 +13,11 @@ using Yttrium::IonReader;
 
 namespace Yttrium
 {
+	inline bool operator==(const Color4f& a, const Color4f& b)
+	{
+		return a._r == b._r && a._g == b._g && a._b == b._b && a._a == b._a;
+	}
+
 	inline bool operator==(const IonReader::Token& a, const IonReader::Token& b)
 	{
 		return a.line() == b.line() && a.column() == b.column() && a.type() == b.type() && a.text() == b.text() && a.translatable() == b.translatable();
@@ -65,6 +71,30 @@ TEST_CASE("ion.reader.token.iostream")
 	std::ostringstream stream;
 	stream << IonReader::Token{1, 2, IonReader::Token::Type::End, "test"};
 	CHECK(stream.str() == "{1,2,IonReader::Token::Type(" + std::to_string(to_underlying(IonReader::Token::Type::End)) + "),R\"(test)\"}");
+}
+
+TEST_CASE("ion.reader.token.to_color")
+{
+	using Yttrium::Color4f;
+
+	const auto color = [](std::string_view text)
+	{
+		return IonReader::Token{ 1, 1, IonReader::Token::Type::Color, text }.to_color();
+	};
+
+	CHECK(color("#00f") == Color4f(0.f, 0.f, 1.f, 1.f));
+	CHECK(color("#f0f0") == Color4f(1.f, 0.f, 1.f, 0.f));
+	CHECK(color("#0000ff") == Color4f(0.f, 0.f, 1.f, 1.f));
+	CHECK(color("#ff00ff00") == Color4f(1.f, 0.f, 1.f, 0.f));
+
+	CHECK_THROWS_AS(color("#"), IonError);
+	CHECK_THROWS_AS(color("#1"), IonError);
+	CHECK_THROWS_AS(color("#12"), IonError);
+	CHECK_THROWS_AS(color("#12345"), IonError);
+	CHECK_THROWS_AS(color("#1234567"), IonError);
+	CHECK_THROWS_AS(color("#123456789"), IonError);
+
+	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::Value, "value").to_color(), IonError);
 }
 
 TEST_CASE("ion.reader.token.to_name")

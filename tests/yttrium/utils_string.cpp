@@ -108,8 +108,9 @@ TEST_CASE("utils.string.to_number.double")
 	CHECK(d == 3.2);
 
 	CHECK(!to_number(".", d));
-	CHECK(!to_number("-.", d));
 	CHECK(!to_number(".e1", d));
+	CHECK(!to_number("-", d));
+	CHECK(!to_number("-.", d));
 	CHECK(!to_number("-.e1", d));
 
 	CHECK(to_number("5.4e1", d));
