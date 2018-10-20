@@ -153,11 +153,19 @@ TEST_CASE("string_utils.to_number.double")
 	CHECK(to_number(".0", d));
 	CHECK(d == 0.0);
 
+	CHECK(to_number("-.0", d));
+	CHECK(d == -0.0);
+
 	CHECK(to_number("1.0", d));
 	CHECK(d == 1.0);
 
 	CHECK(to_number("3.2", d));
 	CHECK(d == 3.2);
+
+	CHECK(!to_number(".", d));
+	CHECK(!to_number("-.", d));
+	CHECK(!to_number(".e1", d));
+	CHECK(!to_number("-.e1", d));
 
 	CHECK(to_number("5.4e1", d));
 	CHECK(d == 5.4e1);
