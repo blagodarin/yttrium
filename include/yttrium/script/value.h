@@ -4,7 +4,9 @@
 #ifndef _include_yttrium_script_value_h_
 #define _include_yttrium_script_value_h_
 
-#include <yttrium/string_utils.h>
+#include <yttrium/api.h>
+
+#include <string>
 
 namespace Yttrium
 {
@@ -33,10 +35,10 @@ namespace Yttrium
 
 	public:
 		///
-		int to_int() const { return strings::to_int(_value); }
+		int to_int() const noexcept;
 
 		///
-		Type type() const { return _type; }
+		Type type() const noexcept { return _type; }
 
 		///
 		const std::string& string() const noexcept { return _value; }

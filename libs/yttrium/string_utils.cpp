@@ -109,13 +109,6 @@ namespace Yttrium
 
 	namespace strings
 	{
-		int to_int(std::string_view string) noexcept
-		{
-			int result = 0;
-			std::from_chars(string.data(), string.data() + string.size(), result);
-			return result;
-		}
-
 		bool to_number(std::string_view string, int32_t& value) noexcept
 		{
 			const auto end = string.data() + string.size();

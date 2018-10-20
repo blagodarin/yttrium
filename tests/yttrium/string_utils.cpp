@@ -64,15 +64,6 @@ TEST_CASE("string_utils.ends_with")
 	CHECK(!ends_with("test", "test "));
 }
 
-TEST_CASE("string_utils.to_int")
-{
-	using namespace Yttrium::strings;
-
-	CHECK(to_int("") == 0);
-	CHECK(to_int(std::to_string(std::numeric_limits<int>::min())) == std::numeric_limits<int>::min());
-	CHECK(to_int(std::to_string(std::numeric_limits<int>::max())) == std::numeric_limits<int>::max());
-}
-
 TEST_CASE("string_utils.to_number.int32")
 {
 	using namespace Yttrium::strings;

@@ -55,10 +55,6 @@ namespace Yttrium
 			return string.size() >= with.size() && string.substr(string.size() - with.size()) == with;
 		}
 
-		/// Converts the string to signed decimal integer.
-		/// The string must be in form `[-]d{d}`.
-		Y_API int to_int(std::string_view) noexcept;
-
 		/// Tries to convert the string to decimal value.
 		/// Returns `false` if the string doesn't match the numeric format.
 		Y_API bool to_number(std::string_view, int32_t&) noexcept;

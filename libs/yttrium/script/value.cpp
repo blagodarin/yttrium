@@ -1,7 +1,18 @@
 #include <yttrium/script/value.h>
 
+#include <yttrium/string_utils.h>
+
+#include <charconv>
+
 namespace Yttrium
 {
+	int ScriptValue::to_int() const noexcept
+	{
+		int result = 0;
+		std::from_chars(_value.data(), _value.data() + _value.size(), result);
+		return result;
+	}
+
 	ScriptValue& ScriptValue::operator=(int value)
 	{
 		_type = Type::Literal;
