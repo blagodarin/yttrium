@@ -99,17 +99,23 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(--coverage)
 		list(APPEND DYNAMIC_LINKER_FLAGS --coverage)
 
-		option(Y_COVERAGE_GCOV "Enable Gcov/Lcov coverage analysis" OFF)
-		if(Y_COVERAGE_GCOV)
+		option(Y_COVERAGE_LCOV "Enable coverage analysis using Lcov" OFF)
+		if(Y_COVERAGE_LCOV)
 			find_package(Gcov REQUIRED)
 			find_package(Lcov REQUIRED)
-			add_custom_target(gcov
-				COMMAND ${LCOV_EXECUTABLE} --capture --no-external --quiet --gcov-tool ${GCOV_EXECUTABLE} --directory ${PROJECT_SOURCE_DIR} --output-file ${PROJECT_BINARY_DIR}/coverage.info
+			add_custom_target(lcov
+				COMMAND ${LCOV_EXECUTABLE} --capture --no-external --quiet
+					--base-directory ${PROJECT_SOURCE_DIR}
+					--directory ${PROJECT_BINARY_DIR}
+					--gcov-tool ${GCOV_EXECUTABLE}
+					--output-file ${PROJECT_BINARY_DIR}/coverage.info
 				COMMAND ${LCOV_EXECUTABLE} --summary ${PROJECT_BINARY_DIR}/coverage.info
-				COMMAND ${GENHTML_EXECUTABLE} --quiet ${PROJECT_BINARY_DIR}/coverage.info --output-directory ${PROJECT_BINARY_DIR}/coverage
-					--rc genhtml_hi_limit=100 --rc genhtml_med_limit=75
+				COMMAND ${GENHTML_EXECUTABLE} ${PROJECT_BINARY_DIR}/coverage.info --quiet
+					--output-directory ${PROJECT_BINARY_DIR}/coverage
+					--rc genhtml_hi_limit=100
+					--rc genhtml_med_limit=75
 				VERBATIM)
-			add_custom_target(gcov_clean
+			add_custom_target(lcov_clean
 				COMMAND ${LCOV_EXECUTABLE} --zerocounters --quiet --directory ${PROJECT_BINARY_DIR}
 				VERBATIM)
 		endif()

@@ -107,11 +107,11 @@ install:
 script:
   - mkdir _build && pushd _build
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_ALL=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_GCOV=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
   - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/_prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
   - cmake --build . -- -j2
   - cmake --build . --target check
-  - if [ -n "${COVERAGE}" ]; then cmake --build . --target gcov; fi
+  - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
 # Codecov doesn't currently support Gcov 8 coverage reports.
