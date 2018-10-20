@@ -108,15 +108,17 @@ script:
   - mkdir _build && pushd _build
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_ALL=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
-  - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/_prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
+  - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/_install" -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/_prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
   - cmake --build . -- -j2
   - cmake --build . --target check
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
+  - cmake --build . --target install
   - popd
 
-# Codecov doesn't currently support Gcov 8 coverage reports.
-#after_success:
-#  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
+after_success:
+  - du --human-readable --max-depth=1 "${TRAVIS_BUILD_DIR}/_install"
+  # Codecov doesn't currently support Gcov 8 coverage reports.
+  #- if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
 
 notifications:
   email: false
