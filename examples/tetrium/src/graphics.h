@@ -1,5 +1,4 @@
-#ifndef _examples_tetrium_graphics_h_
-#define _examples_tetrium_graphics_h_
+#pragma once
 
 #include "logic.h"
 
@@ -37,5 +36,3 @@ private:
 private:
 	const std::unique_ptr<const Texture2D> _blocks_texture;
 };
-
-#endif

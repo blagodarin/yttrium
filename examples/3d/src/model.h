@@ -1,5 +1,4 @@
-#ifndef _examples_3d_model_h_
-#define _examples_3d_model_h_
+#pragma once
 
 #include <memory>
 #include <string_view>
@@ -26,5 +25,3 @@ private:
 	const std::shared_ptr<const Mesh> _mesh;
 	const std::shared_ptr<const Material> _material;
 };
-
-#endif

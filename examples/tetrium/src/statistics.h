@@ -1,5 +1,4 @@
-#ifndef _examples_tetrium_statistics_h_
-#define _examples_tetrium_statistics_h_
+#pragma once
 
 #include <map>
 
@@ -24,5 +23,3 @@ private:
 	ScriptContext& _script;
 	std::multimap<int, std::string> _statistics;
 };
-
-#endif

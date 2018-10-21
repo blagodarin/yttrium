@@ -1,5 +1,4 @@
-#ifndef _examples_utils_h_
-#define _examples_utils_h_
+#pragma once
 
 #include <yttrium/image.h>
 #include <yttrium/math/color.h>
@@ -38,5 +37,3 @@ inline std::string make_screenshot_path()
 	buffer[std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d_%H-%M-%S.png", &tm)] = '\0';
 	return buffer.data();
 }
-
-#endif

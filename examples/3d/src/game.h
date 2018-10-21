@@ -1,5 +1,4 @@
-#ifndef _examples_3d_game_h_
-#define _examples_3d_game_h_
+#pragma once
 
 #include "model.h"
 
@@ -53,5 +52,3 @@ private:
 
 	std::unique_ptr<MinimapCanvas> _minimap_canvas;
 };
-
-#endif

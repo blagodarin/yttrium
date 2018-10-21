@@ -1,5 +1,4 @@
-#ifndef _examples_tetrium_logic_h_
-#define _examples_tetrium_logic_h_
+#pragma once
 
 #include <array>
 #include <chrono>
@@ -197,5 +196,3 @@ namespace Tetrium
 		std::uniform_int_distribution<int> _random_distribution{ 0, Figure::Count - 1 };
 	};
 }
-
-#endif
