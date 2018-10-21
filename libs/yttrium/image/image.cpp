@@ -68,10 +68,10 @@ namespace Yttrium
 	{
 		if (type == ImageType::Auto)
 		{
-			if (strings::ends_with(path, ".tga"))
+			if (ends_with(path, ".tga"))
 				type = ImageType::Tga;
 #if Y_USE_PNG
-			else if (strings::ends_with(path, ".png"))
+			else if (ends_with(path, ".png"))
 				type = ImageType::Png;
 #endif
 			else

@@ -9,7 +9,7 @@
 namespace
 {
 	template <typename T>
-	bool string_to_float(const char* p, const char* end, T& value)
+	bool float_from_chars(const char* p, const char* end, T& value)
 	{
 		if (p == end)
 			return false;
@@ -86,83 +86,6 @@ namespace
 
 namespace Yttrium
 {
-	namespace strings
-	{
-		bool to_number(std::string_view string, int32_t& value) noexcept
-		{
-			const auto end = string.data() + string.size();
-			auto [ptr, ec] = std::from_chars(string.data(), end, value);
-			return ptr == end && ec == std::errc{};
-		}
-
-		bool to_number(std::string_view string, uint32_t& value) noexcept
-		{
-			const auto end = string.data() + string.size();
-			auto [ptr, ec] = std::from_chars(string.data(), end, value);
-			return ptr == end && ec == std::errc{};
-		}
-
-		bool to_number(std::string_view string, float& value) noexcept
-		{
-			return ::string_to_float(string.data(), string.data() + string.size(), value);
-		}
-
-		bool to_number(std::string_view string, double& value) noexcept
-		{
-			return ::string_to_float(string.data(), string.data() + string.size(), value);
-		}
-
-		int to_time(std::string_view string) noexcept
-		{
-			if (string.empty())
-				return 0;
-
-			auto p = string.data();
-			const auto end = string.data() + string.size();
-
-			bool negative = false;
-			switch (*p)
-			{
-			case '-': negative = true; [[fallthrough]];
-			case '+': ++p;
-			}
-
-			int result = 0;
-			for (; p != end && *p >= '0' && *p <= '9'; ++p)
-				result = result * 10 + *p - '0';
-
-			if (p != end && *p == ':')
-			{
-				int minutes_or_seconds = 0;
-				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
-					minutes_or_seconds = minutes_or_seconds * 10 + *p - '0';
-				result = result * 60 + minutes_or_seconds;
-			}
-
-			if (p != end && *p == ':')
-			{
-				int seconds = 0;
-				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
-					seconds = seconds * 10 + *p - '0';
-				result = result * 60 + seconds;
-			}
-
-			result *= 1000;
-
-			if (p != end && *p == '.')
-			{
-				int multiplier = 100;
-				for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
-				{
-					result += (*p - '0') * multiplier;
-					multiplier /= 10;
-				}
-			}
-
-			return negative ? -result : result;
-		}
-	}
-
 	void _append_to(std::string& string, long long value)
 	{
 		std::array<char, std::numeric_limits<long long>::digits10 + 2> buffer; // Extra chars for a "lossy" digit and a sign.
@@ -181,5 +104,79 @@ namespace Yttrium
 	{
 		std::array<char, 32> buffer;
 		string.append(buffer.data(), static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "%g", value)));
+	}
+
+	bool from_chars(std::string_view string, int32_t& value) noexcept
+	{
+		const auto end = string.data() + string.size();
+		auto [ptr, ec] = std::from_chars(string.data(), end, value);
+		return ptr == end && ec == std::errc{};
+	}
+
+	bool from_chars(std::string_view string, uint32_t& value) noexcept
+	{
+		const auto end = string.data() + string.size();
+		auto [ptr, ec] = std::from_chars(string.data(), end, value);
+		return ptr == end && ec == std::errc{};
+	}
+
+	bool from_chars(std::string_view string, float& value) noexcept
+	{
+		return ::float_from_chars(string.data(), string.data() + string.size(), value);
+	}
+
+	bool from_chars(std::string_view string, double& value) noexcept
+	{
+		return ::float_from_chars(string.data(), string.data() + string.size(), value);
+	}
+
+	int time_from_chars(std::string_view string) noexcept
+	{
+		if (string.empty())
+			return 0;
+
+		auto p = string.data();
+		const auto end = string.data() + string.size();
+
+		bool negative = false;
+		switch (*p)
+		{
+		case '-': negative = true; [[fallthrough]];
+		case '+': ++p;
+		}
+
+		int result = 0;
+		for (; p != end && *p >= '0' && *p <= '9'; ++p)
+			result = result * 10 + *p - '0';
+
+		if (p != end && *p == ':')
+		{
+			int minutes_or_seconds = 0;
+			for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
+				minutes_or_seconds = minutes_or_seconds * 10 + *p - '0';
+			result = result * 60 + minutes_or_seconds;
+		}
+
+		if (p != end && *p == ':')
+		{
+			int seconds = 0;
+			for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
+				seconds = seconds * 10 + *p - '0';
+			result = result * 60 + seconds;
+		}
+
+		result *= 1000;
+
+		if (p != end && *p == '.')
+		{
+			int multiplier = 100;
+			for (++p; p != end && *p >= '0' && *p <= '9'; ++p)
+			{
+				result += (*p - '0') * multiplier;
+				multiplier /= 10;
+			}
+		}
+
+		return negative ? -result : result;
 	}
 }

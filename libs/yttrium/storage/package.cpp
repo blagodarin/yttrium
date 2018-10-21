@@ -14,7 +14,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (strings::ends_with(path, ".ypq"))
+			if (ends_with(path, ".ypq"))
 				type = PackageType::Ypq;
 			else
 				return {};
@@ -38,7 +38,7 @@ namespace Yttrium
 	{
 		if (type == PackageType::Auto)
 		{
-			if (strings::ends_with(path, ".ypq"))
+			if (ends_with(path, ".ypq"))
 				type = PackageType::Ypq;
 			else
 				return {};

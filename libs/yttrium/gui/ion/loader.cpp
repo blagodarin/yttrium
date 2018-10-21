@@ -67,7 +67,7 @@ namespace
 		if (!token.text().empty())
 		{
 			float x = 0;
-			if (!strings::to_number(token.text(), x))
+			if (!from_chars(token.text(), x))
 				return false;
 			rect = {{x, rect.top()}, rect.size()};
 		}
@@ -76,7 +76,7 @@ namespace
 		if (!token.text().empty())
 		{
 			float y = 0;
-			if (!strings::to_number(token.text(), y))
+			if (!from_chars(token.text(), y))
 				return false;
 			rect = {{rect.left(), y}, rect.size()};
 		}
@@ -85,7 +85,7 @@ namespace
 		if (!token.text().empty())
 		{
 			float width = 0;
-			if (!strings::to_number(token.text(), width))
+			if (!from_chars(token.text(), width))
 				return false;
 			rect = {rect.top_left(), SizeF{width, rect.height()}};
 		}
@@ -94,7 +94,7 @@ namespace
 		if (!token.text().empty())
 		{
 			float height = 0;
-			if (!strings::to_number(token.text(), height))
+			if (!from_chars(token.text(), height))
 				return false;
 			rect = {rect.top_left(), SizeF{rect.width(), height}};
 		}
@@ -336,19 +336,19 @@ namespace Yttrium
 		SizeF size{0, 0};
 		if (placement == GuiLayout::Placement::Center)
 		{
-			if (!strings::to_number(token.to_value(), size._width) || !strings::to_number(token.next(ion).to_value(), size._height))
+			if (!from_chars(token.to_value(), size._width) || !from_chars(token.next(ion).to_value(), size._height))
 				throw GuiDataError{"Bad layout size"};
 			token.next(ion);
 		}
 		else if (placement == GuiLayout::Placement::Left || placement == GuiLayout::Placement::Right)
 		{
-			if (!strings::to_number(token.to_value(), size._height))
+			if (!from_chars(token.to_value(), size._height))
 				throw GuiDataError{"Bad layout size"};
 			token.next(ion);
 		}
 		else if (token.type() == IonReader::Token::Type::Value)
 		{
-			if (!strings::to_number(token.text(), size._width) || !strings::to_number(token.next(ion).to_value(), size._height))
+			if (!from_chars(token.text(), size._width) || !from_chars(token.next(ion).to_value(), size._height))
 				throw GuiDataError{"Bad layout size"};
 			token.next(ion);
 		}
@@ -569,10 +569,10 @@ namespace Yttrium
 	void GuiIonLoader::load_style_borders(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
 		auto& borders = data._background.borders;
-		if (!strings::to_number(token.to_value(), borders._top)
-			|| !strings::to_number(token.next(ion).to_value(), borders._right)
-			|| !strings::to_number(token.next(ion).to_value(), borders._bottom)
-			|| !strings::to_number(token.next(ion).to_value(), borders._left))
+		if (!from_chars(token.to_value(), borders._top)
+			|| !from_chars(token.next(ion).to_value(), borders._right)
+			|| !from_chars(token.next(ion).to_value(), borders._bottom)
+			|| !from_chars(token.next(ion).to_value(), borders._left))
 			throw GuiDataError{"Bad 'borders'"};
 		token.next(ion);
 	}
@@ -602,7 +602,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_text_size(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (!strings::to_number(token.to_value(), data._foreground.size))
+		if (!from_chars(token.to_value(), data._foreground.size))
 			throw GuiDataError{"Bad 'text_size'"};
 		token.next(ion);
 	}

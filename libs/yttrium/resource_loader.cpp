@@ -238,9 +238,9 @@ namespace Yttrium
 	{
 		auto source = open(name);
 
-		const auto start_ms = strings::to_time(source->property("start"));
-		const auto end_ms = strings::to_time(source->property("end"));
-		const auto loop_ms = strings::to_time(source->property("loop"));
+		const auto start_ms = time_from_chars(source->property("start"));
+		const auto end_ms = time_from_chars(source->property("end"));
+		const auto loop_ms = time_from_chars(source->property("loop"));
 
 		auto music = MusicReader::open(std::move(source));
 		if (!music->set_properties(start_ms, end_ms, loop_ms))
