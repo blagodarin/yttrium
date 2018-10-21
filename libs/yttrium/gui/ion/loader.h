@@ -1,8 +1,8 @@
 #ifndef _src_gui_ion_loader_h_
 #define _src_gui_ion_loader_h_
 
-#include <yttrium/flags.h>
 #include <yttrium/ion/reader.h>
+#include <yttrium/utils/flags.h>
 #include "../widget_data.h"
 
 #include <functional>

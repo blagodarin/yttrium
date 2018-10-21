@@ -1,5 +1,5 @@
-#ifndef _src_utils_fourcc_h_
-#define _src_utils_fourcc_h_
+#ifndef _libs_yttrium_utils_fourcc_h_
+#define _libs_yttrium_utils_fourcc_h_
 
 #include <cstddef>
 #include <cstdint>

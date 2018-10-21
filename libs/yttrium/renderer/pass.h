@@ -3,11 +3,11 @@
 
 #include <yttrium/renderer/pass.h>
 
-#include <yttrium/flags.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/utils/flags.h>
 
 #include <string>
 

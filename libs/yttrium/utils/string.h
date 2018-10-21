@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _libs_yttrium_utils_string_h_
+#define _libs_yttrium_utils_string_h_
 
 #include <string_view>
 
@@ -19,3 +20,5 @@ namespace Yttrium
 		int to_time(std::string_view) noexcept;
 	}
 }
+
+#endif

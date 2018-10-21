@@ -8,15 +8,12 @@ y_sources(yttrium "include"
 	../../include/yttrium/api.h
 	../../include/yttrium/console.h
 	../../include/yttrium/exceptions.h
-	../../include/yttrium/flags.h
 	../../include/yttrium/resource_loader.h
-	../../include/yttrium/tiny_string_map.h
 	../../include/yttrium/translation.h
 	)
 y_sources(yttrium "src"
 	console.cpp
 	resource_loader.cpp
-	tiny_string_map.cpp
 	translation.cpp
 	)
 
@@ -420,15 +417,18 @@ endif()
 ########################################################################################################################
 # utils
 y_sources(yttrium "include"
-	../../include/yttrium/utils/algorithm.h
+	../../include/yttrium/utils/flags.h
 	../../include/yttrium/utils/numeric.h
 	../../include/yttrium/utils/string.h
+	../../include/yttrium/utils/tiny_string_map.h
 	)
 y_sources(yttrium "src/utils"
+	utils/algorithm.h
 	utils/atomic_counters.h
 	utils/fourcc.h
 	utils/string.cpp
 	utils/string.h
+	utils/tiny_string_map.cpp
 	utils/unique_ptr.h
 	)
 

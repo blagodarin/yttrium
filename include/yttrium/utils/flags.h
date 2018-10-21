@@ -1,5 +1,5 @@
-#ifndef _include_yttrium_flags_h_
-#define _include_yttrium_flags_h_
+#ifndef _include_yttrium_utils_flags_h_
+#define _include_yttrium_utils_flags_h_
 
 #include <type_traits>
 

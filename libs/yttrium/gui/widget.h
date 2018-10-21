@@ -1,9 +1,9 @@
 #ifndef _src_gui_widgets_widget_h_
 #define _src_gui_widgets_widget_h_
 
-#include <yttrium/flags.h>
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/utils/flags.h>
 #include "widget_data.h"
 
 namespace Yttrium

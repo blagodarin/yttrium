@@ -3,7 +3,7 @@
 #include <yttrium/math/color.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/utils/algorithm.h>
+#include "../utils/algorithm.h"
 
 #include <array>
 #include <vector>

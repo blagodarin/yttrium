@@ -1,7 +1,7 @@
 #ifndef _include_yttrium_renderer_manager_h_
 #define _include_yttrium_renderer_manager_h_
 
-#include <yttrium/flags.h>
+#include <yttrium/utils/flags.h>
 
 #include <memory>
 #include <string>

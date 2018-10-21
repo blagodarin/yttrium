@@ -5,7 +5,7 @@
 #define _include_yttrium_key_h_
 
 #include <yttrium/api.h>
-#include <yttrium/flags.h>
+#include <yttrium/utils/flags.h>
 #include <yttrium/utils/numeric.h>
 
 namespace Yttrium

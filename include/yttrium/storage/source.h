@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_storage_source_h_
 #define _include_yttrium_storage_source_h_
 
-#include <yttrium/tiny_string_map.h>
+#include <yttrium/utils/tiny_string_map.h>
 
 namespace Yttrium
 {

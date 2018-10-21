@@ -4,7 +4,7 @@
 #ifndef _include_yttrium_renderer_texture_h_
 #define _include_yttrium_renderer_texture_h_
 
-#include <yttrium/flags.h>
+#include <yttrium/utils/flags.h>
 
 namespace Yttrium
 {

@@ -1,4 +1,4 @@
-#include <yttrium/tiny_string_map.h>
+#include <yttrium/utils/tiny_string_map.h>
 #include "iostream.h"
 
 #include <catch2/catch.hpp>

@@ -1,5 +1,5 @@
-#ifndef _include_yttrium_tiny_string_map_h_
-#define _include_yttrium_tiny_string_map_h_
+#ifndef _include_yttrium_utils_tiny_string_map_h_
+#define _include_yttrium_utils_tiny_string_map_h_
 
 #include <yttrium/api.h>
 
