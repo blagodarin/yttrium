@@ -2,7 +2,7 @@
 #define _src_platform_x11_window_h_
 
 #include <yttrium/math/size.h>
-#include "../../utils/unique_ptr.h"
+#include "../../utils/memory.h"
 #include "glx.h"
 
 #include <optional>
@@ -14,7 +14,7 @@ namespace Yttrium
 	class Point;
 	class WindowBackendCallbacks;
 
-	using P_Display = Y_UNIQUE_PTR(::Display, ::XCloseDisplay);
+	using P_Display = UniquePtr<::Display, ::XCloseDisplay>;
 
 	class WindowBackend
 	{

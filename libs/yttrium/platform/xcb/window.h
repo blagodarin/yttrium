@@ -2,7 +2,7 @@
 #define _src_platform_xcb_window_h_
 
 #include <yttrium/math/size.h>
-#include "../../utils/unique_ptr.h"
+#include "../../utils/memory.h"
 
 #include <optional>
 
@@ -12,7 +12,7 @@ namespace Yttrium
 {
 	class WindowBackendCallbacks;
 
-	using P_Atom = Y_UNIQUE_PTR(xcb_intern_atom_reply_t, std::free);
+	using P_Atom = UniquePtr<xcb_intern_atom_reply_t, std::free>;
 
 	class WindowBackend
 	{
@@ -36,7 +36,7 @@ namespace Yttrium
 		class Keyboard;
 
 		WindowBackendCallbacks& _callbacks;
-		Y_UNIQUE_PTR(xcb_connection_t, ::xcb_disconnect) _connection;
+		UniquePtr<xcb_connection_t, ::xcb_disconnect> _connection;
 		std::unique_ptr<Keyboard> _keyboard;
 		xcb_screen_t* _screen = nullptr;
 		xcb_window_t _window = XCB_WINDOW_NONE;

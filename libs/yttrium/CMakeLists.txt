@@ -426,10 +426,10 @@ y_sources(yttrium "src/utils"
 	utils/algorithm.h
 	utils/atomic_counters.h
 	utils/fourcc.h
+	utils/memory.h
 	utils/string.cpp
 	utils/string.h
 	utils/tiny_string_map.cpp
-	utils/unique_ptr.h
 	)
 
 ########################################################################################################################

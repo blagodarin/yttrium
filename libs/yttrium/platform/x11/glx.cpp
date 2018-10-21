@@ -66,7 +66,7 @@ namespace Yttrium
 		::GLXFBConfig best_fbc = {};
 		{
 			int fbc_count = 0;
-			const Y_UNIQUE_PTR(::GLXFBConfig[], ::XFree) fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
+			const UniquePtr<::GLXFBConfig[], ::XFree> fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
 			if (!fbcs)
 				throw InitializationError("Failed to obtain GLXFBConfigs");
 			for (size_t i = 0; i < static_cast<size_t>(fbc_count); ++i)

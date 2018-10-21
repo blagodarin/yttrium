@@ -197,7 +197,7 @@ namespace Yttrium
 
 			const auto cookie = ::xcb_xkb_select_events_aux_checked(_connection, XCB_XKB_ID_USE_CORE_KBD,
 				selected_events, 0, selected_events, selected_map_parts, selected_map_parts, nullptr);
-			Y_UNIQUE_PTR(xcb_generic_error_t, std::free) error{::xcb_request_check(_connection, cookie)};
+			UniquePtr<xcb_generic_error_t, std::free> error{::xcb_request_check(_connection, cookie)};
 			if (error)
 				throw std::runtime_error{"Unable to select XKB events"};
 
@@ -282,9 +282,9 @@ namespace Yttrium
 		xcb_connection_t* const _connection;
 		uint8_t _base_event = 0;
 		int32_t _keyboard_id = -1;
-		Y_UNIQUE_PTR(xkb_context, ::xkb_context_unref) _context;
-		Y_UNIQUE_PTR(xkb_keymap, ::xkb_keymap_unref) _keymap;
-		Y_UNIQUE_PTR(xkb_state, ::xkb_state_unref) _state;
+		UniquePtr<xkb_context, ::xkb_context_unref> _context;
+		UniquePtr<xkb_keymap, ::xkb_keymap_unref> _keymap;
+		UniquePtr<xkb_state, ::xkb_state_unref> _state;
 	};
 
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
@@ -348,7 +348,7 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		const Y_UNIQUE_PTR(xcb_query_pointer_reply_t, std::free) reply{::xcb_query_pointer_reply(_connection.get(), ::xcb_query_pointer(_connection.get(), _window), nullptr)};
+		const UniquePtr<xcb_query_pointer_reply_t, std::free> reply{::xcb_query_pointer_reply(_connection.get(), ::xcb_query_pointer(_connection.get(), _window), nullptr)};
 		if (!reply)
 			return false;
 		cursor = {reply->win_x, reply->win_y};
@@ -362,7 +362,7 @@ namespace Yttrium
 
 		for (;;)
 		{
-			const Y_UNIQUE_PTR(xcb_generic_event_t, std::free) event{_size ? ::xcb_poll_for_event(_connection.get()) : ::xcb_wait_for_event(_connection.get())};
+			const UniquePtr<xcb_generic_event_t, std::free> event{_size ? ::xcb_poll_for_event(_connection.get()) : ::xcb_wait_for_event(_connection.get())};
 			if (!event)
 				return !::xcb_connection_has_error(_connection.get());
 

@@ -1,7 +1,7 @@
 #ifndef _src_platform_x11_glx_h_
 #define _src_platform_x11_glx_h_
 
-#include "../../utils/unique_ptr.h"
+#include "../../utils/memory.h"
 
 #include <GL/glx.h>
 
@@ -31,7 +31,7 @@ namespace Yttrium
 	private:
 		::Display* const _display;
 		const int _screen;
-		Y_UNIQUE_PTR(::XVisualInfo, ::XFree) _visual_info;
+		UniquePtr<::XVisualInfo, ::XFree> _visual_info;
 		::GLXContext _context = nullptr;
 		Extensions _extensions;
 	};
