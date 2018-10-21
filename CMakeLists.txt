@@ -192,12 +192,12 @@ if(Y_BUILD_ALL)
 		add_custom_target(cppcheck
 			COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
 				--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError --suppress=unusedFunction --suppress=unusedPrivateFunction
-				-I "${PROJECT_SOURCE_DIR}/include"
-				-i "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}"
-				"--include=${PROJECT_BINARY_DIR}/config.h"
-				"--relative-paths=${PROJECT_SOURCE_DIR}"
+				-I ${PROJECT_SOURCE_DIR}/include
+				-i ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}
+				--include=${PROJECT_BINARY_DIR}/config.h
+				--relative-paths=${PROJECT_SOURCE_DIR}
 				"--template=[{file}:{line}]: ({severity}/{id}) {message}"
-				"${PROJECT_SOURCE_DIR}"
+				${PROJECT_SOURCE_DIR}
 			VERBATIM)
 	endif()
 endif()

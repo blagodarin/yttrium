@@ -25,7 +25,7 @@ namespace Yttrium
 			Right,
 		};
 
-		GuiLayout(Placement);
+		explicit GuiLayout(Placement);
 
 		void set_size(const SizeF& size) { _size = size; }
 

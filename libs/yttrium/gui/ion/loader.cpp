@@ -585,13 +585,15 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_font(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		const auto font_desc = _gui.font(std::string{token.to_value()});
-		if (!font_desc)
+		if (const auto font_desc = _gui.font(std::string{token.to_value()}))
+		{
+			auto& foreground = data._foreground;
+			foreground.font = font_desc->font;
+			foreground.font_texture = font_desc->texture;
+			token.next(ion);
+		}
+		else
 			throw GuiDataError{"Unknown font \"", token.text(), "\""};
-		auto& foreground = data._foreground;
-		foreground.font = font_desc->font;
-		foreground.font_texture = font_desc->texture;
-		token.next(ion);
 	}
 
 	void GuiIonLoader::load_style_text_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
