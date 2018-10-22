@@ -10,7 +10,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug RENDERER=Null Y3=catch2,lcov COVERAGE=1
+      env: GCC=8 RENDERER=Null Y3=catch2 COVERAGE=1
       addons: &gcc8_xcb
         apt:
           sources: &all_sources
@@ -27,7 +27,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Release RENDERER=OpenGL Y3=catch2
+      env: GCC=8 RENDERER=OpenGL Y3=catch2
       addons: &gcc8_x11
         apt:
           sources: *all_sources
@@ -38,22 +38,12 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug RENDERER=OpenGL Y3=catch2
-      addons: *gcc8_x11
-
-    - os: linux
-      compiler: gcc
-      env: GCC=8 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
-      addons: *gcc8_xcb
-
-    - os: linux
-      compiler: gcc
-      env: GCC=8 CONFIG=Debug RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release RENDERER=OpenGL Y3=catch2
+      env: CLANG=6.0 RENDERER=OpenGL Y3=catch2
       addons: &clang6_x11
         apt:
           sources: *all_sources
@@ -65,12 +55,7 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug RENDERER=OpenGL Y3=catch2
-      addons: *clang6_x11
-
-    - os: linux
-      compiler: clang
-      env: CLANG=6.0 CONFIG=Release RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=6.0 RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: &clang6_xcb
         apt:
           sources: *all_sources
@@ -84,41 +69,50 @@ matrix:
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
 
-    - os: linux
-      compiler: clang
-      env: CLANG=6.0 CONFIG=Debug RENDERER=Vulkan Y3=catch2,glslang,vulkan
-      addons: *clang6_xcb
-
 before_install:
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC}; fi
 
 install:
-  - mkdir _cmake && pushd _cmake
+  - mkdir "${HOME}/_cmake" && pushd "${HOME}/_cmake"
   - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
   - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
-  - mkdir _prefix && pushd _prefix
+  - if [ -z "${COVERAGE}" ]; then Y3_DEBUG="${Y3}"; fi
+  - if [ -n "${COVERAGE}" ]; then Y3_DEBUG="${Y3},lcov"; fi
+  - mkdir -p "${HOME}/.y3/debug" && pushd "${HOME}/.y3/debug"
+  - cmake -DBUILD=${Y3_DEBUG} -DCACHE="${HOME}/.y3/cache" -DCONFIG=Debug -P ${TRAVIS_BUILD_DIR}/bootstrap/get.cmake
   - export PATH="$(pwd)/bin:${PATH}"
-  - cmake -DBUILD=${Y3} -DCONFIG=${CONFIG} -P ../bootstrap/get.cmake
+  - popd
+
+  - mkdir -p "${HOME}/.y3/release" && pushd "${HOME}/.y3/release"
+  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/.y3/cache" -DCONFIG=Release -P ${TRAVIS_BUILD_DIR}/bootstrap/get.cmake
+  - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
 script:
-  - mkdir _build && pushd _build
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_ALL=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
-  - cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/_install" -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/_prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_BUILD_ALL=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
+  - cmake -H. -B"${HOME}/_build.debug" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="${HOME}/_install.debug" -DCMAKE_PREFIX_PATH="${HOME}/.y3/debug" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
+  - pushd "${HOME}/_build.debug"
   - cmake --build . -- -j2
   - cmake --build . --target check
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - cmake --build . --target install
   - popd
 
-after_success:
-  - du --human-readable --max-depth=1 "${TRAVIS_BUILD_DIR}/_install"
-  # Codecov doesn't currently support Gcov 8 coverage reports.
-  #- if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
+  - CMAKE_OPTIONS="-DY_BUILD_ALL=ON"
+  - cmake -H. -B"${HOME}/_build.release" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${HOME}/_install.release" -DCMAKE_PREFIX_PATH="${HOME}/.y3/release" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
+  - pushd "${HOME}/_build.release"
+  - cmake --build . -- -j2
+  - cmake --build . --target check
+  - cmake --build . --target install
+  - popd
+
+# Codecov doesn't currently support Gcov 8 coverage reports.
+#after_success:
+#  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
 
 notifications:
   email: false
