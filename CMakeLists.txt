@@ -39,7 +39,6 @@ else()
 	set(Y_RENDERER_NULL ON)
 endif()
 
-find_package(OpenAL REQUIRED)
 find_package(Threads REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

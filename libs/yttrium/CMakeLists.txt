@@ -54,7 +54,17 @@ y_sources(yttrium "src/audio/formats"
 	audio/formats/wav.cpp
 	audio/formats/wav.h
 	)
-if(ON)
+if(WIN32)
+	y_sources(yttrium "src/audio/windows"
+		audio/windows/backend.cpp
+		audio/windows/backend.h
+		audio/windows/player.cpp
+		audio/windows/player.h
+		audio/windows/sound.cpp
+		audio/windows/sound.h
+		)
+else()
+	find_package(OpenAL REQUIRED)
 	y_sources(yttrium "src/audio/openal"
 		audio/openal/backend.cpp
 		audio/openal/backend.h
