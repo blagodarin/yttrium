@@ -13,14 +13,8 @@ skip_commits:
 
 environment:
   matrix:
-    - CONFIG: Release
-      RENDERER: Null
-    - CONFIG: Debug
-      RENDERER: Null
-    - CONFIG: Release
-      RENDERER: OpenGL
-    - CONFIG: Debug
-      RENDERER: OpenGL
+    - RENDERER: Null
+    - RENDERER: OpenGL
 
 cache:
   - _3rdparty\.cache
@@ -30,7 +24,7 @@ install:
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
       if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
       cd %PREFIX_DIR%
-      cmake -DBUILD=catch2,jpeg,png,vorbis,openal,opengl -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\bootstrap\get.cmake
+      cmake -DBUILD=catch2,jpeg,png,vorbis,openal,opengl -P %APPVEYOR_BUILD_FOLDER%\bootstrap\get.cmake
       rmdir /s /q .build
       rmdir /s /q .trash
 
@@ -39,8 +33,10 @@ build_script:
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
       cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_BUILD_ALL=ON -DY_RENDERER=%RENDERER%
-      cmake --build . --config %CONFIG% -- /nologo /verbosity:minimal
+      cmake --build . --config Release -- /nologo /verbosity:minimal
+      cmake --build . --config Debug -- /nologo /verbosity:minimal
 
 test_script:
   - cmd: |
-      cmake --build . --config %CONFIG% --target check -- /nologo /verbosity:minimal
+      cmake --build . --config Release --target check -- /nologo /verbosity:minimal
+      cmake --build . --config Debug --target check -- /nologo /verbosity:minimal
