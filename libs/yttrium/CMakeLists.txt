@@ -416,7 +416,7 @@ endif()
 
 ########################################################################################################################
 # utils
-y_sources(yttrium "include"
+y_sources(yttrium "include/utils"
 	../../include/yttrium/utils/flags.h
 	../../include/yttrium/utils/numeric.h
 	../../include/yttrium/utils/string.h
