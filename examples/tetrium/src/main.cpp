@@ -2,6 +2,7 @@
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/audio/utils.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/args.h>
@@ -128,8 +129,16 @@ int main(int, char**)
 	::make_cursor_texture<64>(storage, "examples/tetrium/data/cursor.tga");
 	::make_sound(storage, "data/sound.wav");
 
-	AudioManager audio;
-	ResourceLoader resource_loader{storage, &window.render_manager(), &audio};
+	std::optional<AudioManager> audio;
+	try
+	{
+		audio.emplace();
+	}
+	catch (const InitializationError&)
+	{
+	}
+
+	ResourceLoader resource_loader{storage, &window.render_manager(), audio ? &*audio : nullptr};
 	Gui gui{resource_loader, script, "examples/tetrium/data/gui.ion"};
 	gui.on_quit([&window]{ window.close(); });
 
@@ -156,8 +165,12 @@ int main(int, char**)
 	NextFigureCanvas next_figure_canvas{logic, graphics};
 	gui.bind_canvas("next", next_figure_canvas);
 
-	AudioPlayer audio_player{audio};
-	gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music){ audio_player.set_music(music); });
+	std::optional<AudioPlayer> audio_player;
+	if (audio)
+	{
+		audio_player.emplace(*audio);
+		gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music){ audio_player->set_music(music); });
+	}
 
 	gui.start();
 	window.show();
