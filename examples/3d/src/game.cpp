@@ -174,7 +174,7 @@ void Game::update(const UpdateEvent& update)
 
 	_debug_text.clear();
 	append_to(_debug_text,
-		"FPS: ", update.fps, "\n"
+		"FPS: ", update.fps.value_or(-1), "\n"
 		"MaxFrameTime: ", update.max_frame_time.count(), "\n"
 		"Triangles: ", update.triangles, "\n"
 		"DrawCalls: ", update.draw_calls, "\n"

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string_view>
 
 namespace Yttrium
@@ -24,8 +25,8 @@ namespace Yttrium
 		/// Milliseconds to update the time by.
 		std::chrono::milliseconds milliseconds{ 0 };
 
-		/// Current updates per second (frames per second, FPS) rate, \c -1 if not yet evaluated.
-		int fps = -1;
+		/// Current updates per second (frames per second, FPS) rate.
+		std::optional<int> fps;
 
 		/// Maximum frame time in milliseconds.
 		std::chrono::milliseconds max_frame_time{ 0 };
