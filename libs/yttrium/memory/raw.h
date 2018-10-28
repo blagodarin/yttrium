@@ -41,12 +41,22 @@ namespace Yttrium
 	};
 
 	template <typename T, typename... Args>
-	T* make_raw_sized(size_t size, Args&&... args)
+	T* new_sized(size_t size, Args&&... args)
 	{
 		assert(size >= sizeof(T));
 		RawAllocation allocation(size);
 		new(allocation.get()) T(std::forward<Args>(args)...);
 		return static_cast<T*>(allocation.release());
+	}
+
+	template <typename T>
+	void delete_sized(T* pointer) noexcept
+	{
+		if (pointer)
+		{
+			pointer->~T();
+			std::free(pointer);
+		}
 	}
 }
 

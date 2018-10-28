@@ -106,7 +106,7 @@ namespace Yttrium
 		for (auto chunk = _last_chunk; chunk; )
 		{
 			const auto previous_chunk = _last_chunk->_previous;
-			delete chunk;
+			delete_sized(chunk);
 			chunk = previous_chunk;
 		}
 	}
@@ -114,7 +114,7 @@ namespace Yttrium
 	void* PoolBase::allocate()
 	{
 		if (!_last_chunk || _last_chunk->is_full())
-			_last_chunk = make_raw_sized<PoolChunk>(_chunk_size, _chunk_items, _item_size, _last_chunk);
+			_last_chunk = new_sized<PoolChunk>(_chunk_size, _chunk_items, _item_size, _last_chunk);
 
 		char* pointer = _last_chunk->allocate()->data;
 
@@ -134,7 +134,7 @@ namespace Yttrium
 			if (chunk == _last_chunk)
 				_last_chunk = chunk->_previous;
 
-			delete chunk;
+			delete_sized(chunk);
 		}
 	}
 
