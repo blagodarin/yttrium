@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	WindowsAudioBackend::WindowsAudioBackend()
+	WasapiAudioBackend::WasapiAudioBackend()
 	{
 		ComPtr<IMMDeviceEnumerator> enumerator;
 		::CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
@@ -31,20 +31,20 @@ namespace Yttrium
 		}
 	}
 
-	WindowsAudioBackend::~WindowsAudioBackend() = default;
+	WasapiAudioBackend::~WasapiAudioBackend() = default;
 
-	std::unique_ptr<AudioPlayerBackend> WindowsAudioBackend::create_player()
+	std::unique_ptr<AudioPlayerBackend> WasapiAudioBackend::create_player()
 	{
-		return std::make_unique<WindowsAudioPlayer>();
+		return std::make_unique<WasapiAudioPlayer>();
 	}
 
-	std::unique_ptr<Sound> WindowsAudioBackend::create_sound(AudioReader& reader)
+	std::unique_ptr<Sound> WasapiAudioBackend::create_sound(AudioReader& reader)
 	{
-		return std::make_unique<WindowsSound>(reader);
+		return std::make_unique<WasapiSound>(reader);
 	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create()
 	{
-		return std::make_unique<WindowsAudioBackend>();
+		return std::make_unique<WasapiAudioBackend>();
 	}
 }

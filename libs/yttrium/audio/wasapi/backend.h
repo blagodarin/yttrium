@@ -1,9 +1,9 @@
-#ifndef _libs_yttrium_audio_windows_backend_h_
-#define _libs_yttrium_audio_windows_backend_h_
+#ifndef _libs_yttrium_audio_wasapi_backend_h_
+#define _libs_yttrium_audio_wasapi_backend_h_
 
 #include "../backend.h"
 
-#include <Audioclient.h>
+#include <audioclient.h>
 #include <comip.h>
 #include <mmdeviceapi.h>
 
@@ -24,11 +24,11 @@ using ComPtr = _com_ptr_t<_com_IIID<T, &__uuidof(T)>>;
 
 namespace Yttrium
 {
-	class WindowsAudioBackend final : public AudioBackend
+	class WasapiAudioBackend final : public AudioBackend
 	{
 	public:
-		WindowsAudioBackend();
-		~WindowsAudioBackend() override;
+		WasapiAudioBackend();
+		~WasapiAudioBackend() override;
 
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;

@@ -1,14 +1,14 @@
-#ifndef _libs_yttrium_audio_windows_player_h_
-#define _libs_yttrium_audio_windows_player_h_
+#ifndef _libs_yttrium_audio_wasapi_player_h_
+#define _libs_yttrium_audio_wasapi_player_h_
 
 #include "../backend.h"
 
 namespace Yttrium
 {
-	class WindowsAudioPlayer final : public AudioPlayerBackend
+	class WasapiAudioPlayer final : public AudioPlayerBackend
 	{
 	public:
-		WindowsAudioPlayer();
+		WasapiAudioPlayer();
 
 	private:
 		void set_format(const AudioFormat&) override;

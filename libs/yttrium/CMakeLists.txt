@@ -55,13 +55,13 @@ y_sources(yttrium "src/audio/formats"
 	audio/formats/wav.h
 	)
 if(WIN32)
-	y_sources(yttrium "src/audio/windows"
-		audio/windows/backend.cpp
-		audio/windows/backend.h
-		audio/windows/player.cpp
-		audio/windows/player.h
-		audio/windows/sound.cpp
-		audio/windows/sound.h
+	y_sources(yttrium "src/audio/wasapi"
+		audio/wasapi/backend.cpp
+		audio/wasapi/backend.h
+		audio/wasapi/player.cpp
+		audio/wasapi/player.h
+		audio/wasapi/sound.cpp
+		audio/wasapi/sound.h
 		)
 else()
 	find_package(OpenAL REQUIRED)
