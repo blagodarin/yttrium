@@ -58,6 +58,8 @@ if(WIN32)
 	y_sources(yttrium "src/audio/wasapi"
 		audio/wasapi/backend.cpp
 		audio/wasapi/backend.h
+		audio/wasapi/com.cpp
+		audio/wasapi/com.h
 		audio/wasapi/player.cpp
 		audio/wasapi/player.h
 		audio/wasapi/sound.cpp
