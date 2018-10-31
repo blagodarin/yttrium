@@ -26,7 +26,8 @@ add_executable(tetrium WIN32
 	)
 target_link_libraries(tetrium yttrium)
 if(WIN32)
-	target_link_libraries(tetrium ywinmain)
+	set_property(TARGET tetrium APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
+	target_link_libraries(tetrium optimized ywinmain)
 endif()
 add_dependencies(tetrium tetrium_package)
 
