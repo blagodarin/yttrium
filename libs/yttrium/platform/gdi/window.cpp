@@ -173,7 +173,7 @@ namespace Yttrium
 
 	void WindowBackend::show()
 	{
-		::ShowWindow(_hwnd, SW_SHOW);
+		::ShowWindow(_hwnd, SW_MAXIMIZE);
 		::UpdateWindow(_hwnd);
 		::SetForegroundWindow(_hwnd);
 		::SetFocus(_hwnd);
