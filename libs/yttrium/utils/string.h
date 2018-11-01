@@ -1,7 +1,7 @@
 #ifndef _libs_yttrium_utils_string_h_
 #define _libs_yttrium_utils_string_h_
 
-#include <string_view>
+#include <string>
 
 namespace Yttrium
 {

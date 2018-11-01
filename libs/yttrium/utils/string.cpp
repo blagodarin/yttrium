@@ -100,6 +100,15 @@ namespace Yttrium
 		string.append(buffer.data(), ptr);
 	}
 
+	void _append_to(std::string& string, Hex32 value)
+	{
+		std::array<char, 8> buffer;
+		auto [ptr, ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(), value._value, 16);
+		const auto count = static_cast<std::size_t>(ptr - buffer.data());
+		string.append(8 - count, '0');
+		string.append(buffer.data(), count);
+	}
+
 	void _append_to(std::string& string, double value)
 	{
 		std::array<char, 32> buffer;

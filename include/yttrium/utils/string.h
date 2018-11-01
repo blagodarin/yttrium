@@ -3,12 +3,21 @@
 
 #include <yttrium/api.h>
 
+#include <cstdint>
 #include <string>
 
 namespace Yttrium
 {
+	struct Hex32
+	{
+		const std::uint32_t _value;
+		explicit Hex32(long value) noexcept : _value{static_cast<std::uint32_t>(value)} {}
+		explicit Hex32(unsigned long value) noexcept : _value{static_cast<std::uint32_t>(value)} {}
+	};
+
 	Y_API void _append_to(std::string&, long long);
 	Y_API void _append_to(std::string&, unsigned long long);
+	Y_API void _append_to(std::string&, Hex32);
 	Y_API void _append_to(std::string&, double);
 
 	inline void _append_to(std::string& string, char value) { string.append(1, value); }

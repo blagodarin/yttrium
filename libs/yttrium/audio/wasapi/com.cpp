@@ -34,11 +34,6 @@ namespace Yttrium
 			return std::string{buffer, size};
 		}
 		else
-		{
-			std::string result{"Error 0xHHHHHHHH."};
-			auto* const begin = result.data() + result.find('H');
-			std::to_chars(begin, begin + 8, hr, 16);
-			return result;
-		}
+			return make_string("Error 0x", Hex32{hr}, '.');
 	}
 }

@@ -9,6 +9,10 @@
 #include <cassert>
 #include <vector>
 
+#ifndef NDEBUG
+	#include <iostream>
+#endif
+
 namespace
 {
 	using namespace Yttrium;
@@ -80,6 +84,36 @@ namespace
 		}
 		return Key::Null;
 	}
+
+#ifdef NDEBUG
+	void check_error(bool, std::string_view)
+	{
+	}
+#else
+	void check_error(bool condition, std::string_view function)
+	{
+		if (condition)
+		{
+			const auto error = ::GetLastError();
+			try
+			{
+				std::cerr << Yttrium::make_string(function, " failed: Error 0x", Hex32{error}, '.') << std::endl;
+			}
+			catch (const std::bad_alloc&)
+			{
+			}
+		}
+	}
+#endif
+
+	void report_error(bool condition, std::string_view function)
+	{
+		if (condition)
+		{
+			const auto error = ::GetLastError();
+			throw InitializationError{function, " failed: Error 0x", Hex32{error}, '.'};
+		}
+	}
 }
 
 namespace Yttrium
@@ -91,13 +125,12 @@ namespace Yttrium
 		std::vector<std::uint8_t> and_mask(width * height / 8, 0xff);
 		std::vector<std::uint8_t> xor_mask(width * height / 8, 0x00);
 		_handle = ::CreateCursor(hinstance, 0, 0, width, height, and_mask.data(), xor_mask.data());
-		if (!_handle)
-			throw InitializationError{"Failed to create an empty cursor"};
+		::report_error(!_handle, "CreateCursor");
 	}
 
 	WindowBackend::EmptyCursor::~EmptyCursor() noexcept
 	{
-		::DestroyCursor(_handle);
+		::check_error(!::DestroyCursor(_handle), "DestroyCursor");
 	}
 
 	WindowBackend::WindowClass::WindowClass(HINSTANCE hinstance, WNDPROC wndproc)
@@ -110,25 +143,23 @@ namespace Yttrium
 		_wndclass.hCursor = _empty_cursor;
 		_wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		_wndclass.lpszClassName = "Yttrium";
-		if (!::RegisterClassExA(&_wndclass))
-			throw InitializationError{"Failed to register window class"};
+		::report_error(!::RegisterClassExA(&_wndclass), "RegisterClassEx");
 	}
 
 	WindowBackend::WindowClass::~WindowClass()
 	{
-		::UnregisterClassA(_wndclass.lpszClassName, _hinstance);
+		::check_error(!::UnregisterClassA(_wndclass.lpszClassName, _hinstance), "UnregisterClass");
 	}
 
 	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
 		: _hwnd{::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data)}
 	{
-		if (!_hwnd)
-			throw InitializationError{"Failed to create window"};
+		::report_error(!_hwnd, "CreateWindowEx");
 	}
 
 	WindowBackend::WindowHandle::~WindowHandle()
 	{
-		::DestroyWindow(_hwnd);
+		::check_error(!::DestroyWindow(_hwnd), "DestroyWindow");
 	}
 
 	WindowBackend::WindowDC::WindowDC(const WindowHandle& hwnd)
@@ -136,7 +167,7 @@ namespace Yttrium
 		, _hdc{::GetDC(_hwnd)}
 	{
 		if (!_hdc)
-			throw InitializationError{"Failed to get device context"};
+			throw InitializationError{"GetDC failed"};
 	}
 
 	WindowBackend::WindowDC::~WindowDC()
@@ -206,7 +237,7 @@ namespace Yttrium
 		switch (msg)
 		{
 		case WM_CLOSE:
-			::DestroyWindow(hwnd);
+			::check_error(!::DestroyWindow(hwnd), "DestroyWindow");
 			break;
 
 		case WM_DESTROY:
