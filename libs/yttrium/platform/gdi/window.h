@@ -35,6 +35,16 @@ namespace Yttrium
 		static LRESULT CALLBACK static_window_proc(HWND, UINT, WPARAM, LPARAM);
 
 	private:
+		class EmptyCursor
+		{
+		public:
+			EmptyCursor(HINSTANCE);
+			~EmptyCursor() noexcept;
+			operator HCURSOR() const noexcept { return _handle; }
+		private:
+			HCURSOR _handle = NULL;
+		};
+
 		class WindowClass
 		{
 		public:
@@ -44,6 +54,7 @@ namespace Yttrium
 			const char* name() const { return _wndclass.lpszClassName; }
 		private:
 			const HINSTANCE _hinstance;
+			const EmptyCursor _empty_cursor{_hinstance};
 			WNDCLASSEXA _wndclass = { sizeof _wndclass };
 		};
 
@@ -72,7 +83,7 @@ namespace Yttrium
 		WindowBackendCallbacks& _callbacks;
 		bool _created = false;
 		std::optional<Size> _size;
-		const HINSTANCE _hinstance = ::GetModuleHandle(nullptr);
+		const HINSTANCE _hinstance = ::GetModuleHandleA(nullptr);
 		const WindowClass _wndclass{_hinstance, reinterpret_cast<WNDPROC>(static_window_proc)};
 		const WindowHandle _hwnd{_wndclass, _name.c_str(), this};
 		const WindowDC _hdc{_hwnd};

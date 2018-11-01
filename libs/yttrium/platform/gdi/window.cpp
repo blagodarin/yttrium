@@ -7,6 +7,7 @@
 #include "../../window/backend.h"
 
 #include <cassert>
+#include <vector>
 
 namespace
 {
@@ -83,6 +84,22 @@ namespace
 
 namespace Yttrium
 {
+	WindowBackend::EmptyCursor::EmptyCursor(HINSTANCE hinstance)
+	{
+		const auto width = ::GetSystemMetrics(SM_CXCURSOR);
+		const auto height = ::GetSystemMetrics(SM_CYCURSOR);
+		std::vector<std::uint8_t> and_mask(width * height / 8, 0xff);
+		std::vector<std::uint8_t> xor_mask(width * height / 8, 0x00);
+		_handle = ::CreateCursor(hinstance, 0, 0, width, height, and_mask.data(), xor_mask.data());
+		if (!_handle)
+			throw InitializationError{"Failed to create an empty cursor"};
+	}
+
+	WindowBackend::EmptyCursor::~EmptyCursor() noexcept
+	{
+		::DestroyCursor(_handle);
+	}
+
 	WindowBackend::WindowClass::WindowClass(HINSTANCE hinstance, WNDPROC wndproc)
 		: _hinstance{hinstance}
 	{
@@ -90,7 +107,7 @@ namespace Yttrium
 		_wndclass.lpfnWndProc = wndproc;
 		_wndclass.hInstance = _hinstance;
 		_wndclass.hIcon = ::LoadIconA(nullptr, IDI_APPLICATION);
-		_wndclass.hCursor = ::LoadCursorA(nullptr, IDC_ARROW); // TODO: Empty cursor.
+		_wndclass.hCursor = _empty_cursor;
 		_wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		_wndclass.lpszClassName = "Yttrium";
 		if (!::RegisterClassExA(&_wndclass))
@@ -99,7 +116,7 @@ namespace Yttrium
 
 	WindowBackend::WindowClass::~WindowClass()
 	{
-		::UnregisterClass(_wndclass.lpszClassName, _hinstance);
+		::UnregisterClassA(_wndclass.lpszClassName, _hinstance);
 	}
 
 	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
