@@ -154,9 +154,9 @@ namespace Yttrium
 	{
 		// TODO: Process VK_SNAPSHOT, VK_{L,R}SHIFT, VK_{L,R}CONTROL, VK_{L,R}MENU.
 		MSG msg;
-		while (::PeekMessageA(&msg, _hwnd, 0, 0, PM_NOREMOVE))
+		while (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE))
 		{
-			if (!::GetMessageA(&msg, _hwnd, 0, 0))
+			if (!::GetMessageA(&msg, NULL, 0, 0))
 				return false;
 			::TranslateMessage(&msg);
 			::DispatchMessageA(&msg);
@@ -189,10 +189,11 @@ namespace Yttrium
 		switch (msg)
 		{
 		case WM_CLOSE:
-			::PostQuitMessage(0);
+			::DestroyWindow(hwnd);
 			break;
 
 		case WM_DESTROY:
+			::PostQuitMessage(0);
 			break;
 
 		case WM_SYSKEYDOWN:
