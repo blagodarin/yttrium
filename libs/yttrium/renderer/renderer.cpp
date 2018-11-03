@@ -9,11 +9,11 @@
 #include "mesh_data.h"
 
 #if Y_RENDERER_OPENGL
-	#include "gl/renderer.h"
+	#include "_opengl/renderer.h"
 #elif Y_RENDERER_VULKAN
-	#include "vulkan/renderer.h"
+	#include "_vulkan/renderer.h"
 #else
-	#include "null/renderer.h"
+	#include "_null/renderer.h"
 #endif
 
 #include <cassert>

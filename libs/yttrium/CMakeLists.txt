@@ -49,28 +49,25 @@ y_sources(yttrium "src/audio/formats"
 	audio/formats/wav.h
 	)
 if(WIN32)
-	y_sources(yttrium "src/audio/wasapi"
-		audio/wasapi/backend.cpp
-		audio/wasapi/backend.h
-		audio/wasapi/player.cpp
-		audio/wasapi/player.h
-		audio/wasapi/sound.cpp
-		audio/wasapi/sound.h
+	y_sources(yttrium "src/audio/_wasapi"
+		audio/_wasapi/backend.cpp
+		audio/_wasapi/backend.h
+		audio/_wasapi/player.cpp
+		audio/_wasapi/player.h
+		audio/_wasapi/sound.cpp
+		audio/_wasapi/sound.h
 		)
 else()
 	find_package(OpenAL REQUIRED)
-	y_sources(yttrium "src/audio/openal"
-		audio/openal/backend.cpp
-		audio/openal/backend.h
-		audio/openal/format.cpp
-		audio/openal/format.h
-		audio/openal/player.cpp
-		audio/openal/player.h
-		audio/openal/sound.cpp
-		audio/openal/sound.h
-		)
-	y_sources(yttrium "src/platform"
-		platform/openal.h
+	y_sources(yttrium "src/audio/_openal"
+		audio/_openal/backend.cpp
+		audio/_openal/backend.h
+		audio/_openal/format.cpp
+		audio/_openal/format.h
+		audio/_openal/player.cpp
+		audio/_openal/player.h
+		audio/_openal/sound.cpp
+		audio/_openal/sound.h
 		)
 	target_include_directories(yttrium SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
 	target_link_libraries(yttrium PRIVATE ${OPENAL_LIBRARY})
@@ -235,12 +232,12 @@ if(Y_ENABLE_BUFFER_MEMORY_TRACKING)
 		)
 endif()
 if(UNIX)
-	y_sources(yttrium "src/memory/posix"
-		memory/posix/memory.cpp
+	y_sources(yttrium "src/memory/_posix"
+		memory/_posix/memory.cpp
 		)
 elseif(WIN32)
-	y_sources(yttrium "src/memory/windows"
-		memory/windows/memory.cpp
+	y_sources(yttrium "src/memory/_windows"
+		memory/_windows/memory.cpp
 		)
 endif()
 
@@ -262,26 +259,29 @@ y_sources(yttrium "src/platform"
 	)
 if(Y_RENDERER_OPENGL)
 	y_sources(yttrium "src/platform"
-		platform/gl.h
+		platform/opengl.h
 		)
 endif()
 if(UNIX)
+	y_sources(yttrium "src/platform"
+		platform/openal.h
+		)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yttrium "src/platform/x11"
-			platform/x11/glx.cpp
-			platform/x11/glx.h
-			platform/x11/window.cpp
-			platform/x11/window.h
+		y_sources(yttrium "src/platform/_x11"
+			platform/_x11/glx.cpp
+			platform/_x11/glx.h
+			platform/_x11/window.cpp
+			platform/_x11/window.h
 			)
 		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			set_property(SOURCE platform/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+			set_property(SOURCE platform/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
-		y_sources(yttrium "src/platform/xcb"
-			platform/xcb/window.cpp
-			platform/xcb/window.h
+		y_sources(yttrium "src/platform/_xcb"
+			platform/_xcb/window.cpp
+			platform/_xcb/window.h
 			)
 		target_link_libraries(yttrium PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
@@ -289,21 +289,21 @@ if(UNIX)
 		endif()
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
-			set_property(SOURCE platform/xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
+			set_property(SOURCE platform/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
 		endif()
 	endif()
 elseif(WIN32)
-	y_sources(yttrium "src/platform/windows"
-		platform/windows/api.h
-		platform/windows/com.cpp
-		platform/windows/com.h
-		platform/windows/window.cpp
-		platform/windows/window.h
+	y_sources(yttrium "src/platform/_windows"
+		platform/_windows/api.h
+		platform/_windows/com.cpp
+		platform/_windows/com.h
+		platform/_windows/window.cpp
+		platform/_windows/window.h
 		)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yttrium "src/platform/windows"
-			platform/windows/wgl.cpp
-			platform/windows/wgl.h
+		y_sources(yttrium "src/platform/_windows"
+			platform/_windows/wgl.cpp
+			platform/_windows/wgl.hd
 			)
 	endif()
 endif()
@@ -348,71 +348,71 @@ y_sources(yttrium "src/renderer/formats"
 	renderer/formats/obj.h
 	)
 if(Y_RENDERER_OPENGL)
-	y_sources(yttrium "src/renderer/gl"
-		renderer/gl/api.h
-		renderer/gl/gl.cpp
-		renderer/gl/gl.h
-		renderer/gl/mesh.h
-		renderer/gl/program.cpp
-		renderer/gl/program.h
-		renderer/gl/renderer.cpp
-		renderer/gl/renderer.h
-		renderer/gl/texture.cpp
-		renderer/gl/texture.h
-		renderer/gl/version.h
-		renderer/gl/wrappers.cpp
-		renderer/gl/wrappers.h
+	y_sources(yttrium "src/renderer/_opengl"
+		renderer/_opengl/api.h
+		renderer/_opengl/gl.cpp
+		renderer/_opengl/gl.h
+		renderer/_opengl/mesh.h
+		renderer/_opengl/program.cpp
+		renderer/_opengl/program.h
+		renderer/_opengl/renderer.cpp
+		renderer/_opengl/renderer.h
+		renderer/_opengl/texture.cpp
+		renderer/_opengl/texture.h
+		renderer/_opengl/version.h
+		renderer/_opengl/wrappers.cpp
+		renderer/_opengl/wrappers.h
 		)
 	add_yrc_sources(yttrium
-		renderer/gl/2d_fs.glsl
-		renderer/gl/2d_vs.glsl
+		renderer/_opengl/2d_fs.glsl
+		renderer/_opengl/2d_vs.glsl
 		)
-	source_group("src\\renderer\\gl" FILES
-		renderer/gl/2d_fs.glsl
-		renderer/gl/2d_vs.glsl
+	source_group("src\\renderer\\_opengl" FILES
+		renderer/_opengl/2d_fs.glsl
+		renderer/_opengl/2d_vs.glsl
 		)
 	target_link_libraries(yttrium PRIVATE OpenGL::GL)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set_property(SOURCE renderer/gl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+		set_property(SOURCE renderer/_opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(Y_RENDERER_VULKAN)
-	y_sources(yttrium "src/renderer/vulkan"
-		renderer/vulkan/buffer.cpp
-		renderer/vulkan/buffer.h
-		renderer/vulkan/context.cpp
-		renderer/vulkan/context.h
-		renderer/vulkan/depth_buffer.cpp
-		renderer/vulkan/depth_buffer.h
-		renderer/vulkan/handles.cpp
-		renderer/vulkan/handles.h
-		renderer/vulkan/helpers.cpp
-		renderer/vulkan/helpers.h
-		renderer/vulkan/mesh.cpp
-		renderer/vulkan/mesh.h
-		renderer/vulkan/program.cpp
-		renderer/vulkan/program.h
-		renderer/vulkan/renderer.cpp
-		renderer/vulkan/renderer.h
-		renderer/vulkan/swapchain.cpp
-		renderer/vulkan/swapchain.h
-		renderer/vulkan/texture.cpp
-		renderer/vulkan/texture.h
-		renderer/vulkan/wrappers.cpp
-		renderer/vulkan/wrappers.h
+	y_sources(yttrium "src/renderer/_vulkan"
+		renderer/_vulkan/buffer.cpp
+		renderer/_vulkan/buffer.h
+		renderer/_vulkan/context.cpp
+		renderer/_vulkan/context.h
+		renderer/_vulkan/depth_buffer.cpp
+		renderer/_vulkan/depth_buffer.h
+		renderer/_vulkan/handles.cpp
+		renderer/_vulkan/handles.h
+		renderer/_vulkan/helpers.cpp
+		renderer/_vulkan/helpers.h
+		renderer/_vulkan/mesh.cpp
+		renderer/_vulkan/mesh.h
+		renderer/_vulkan/program.cpp
+		renderer/_vulkan/program.h
+		renderer/_vulkan/renderer.cpp
+		renderer/_vulkan/renderer.h
+		renderer/_vulkan/swapchain.cpp
+		renderer/_vulkan/swapchain.h
+		renderer/_vulkan/texture.cpp
+		renderer/_vulkan/texture.h
+		renderer/_vulkan/wrappers.cpp
+		renderer/_vulkan/wrappers.h
 		)
 	add_yglslc_sources(yttrium
-		FRAGMENT renderer/vulkan/2d_fs.glsl
-		VERTEX renderer/vulkan/2d_vs.glsl
+		FRAGMENT renderer/_vulkan/2d_fs.glsl
+		VERTEX renderer/_vulkan/2d_vs.glsl
 		)
-	source_group("src\\renderer\\vulkan" FILES
-		renderer/vulkan/2d_fs.glsl
-		renderer/vulkan/2d_vs.glsl
+	source_group("src\\renderer\\_vulkan" FILES
+		renderer/_vulkan/2d_fs.glsl
+		renderer/_vulkan/2d_vs.glsl
 		)
 	target_link_libraries(yttrium PRIVATE Vulkan::Vulkan)
 else()
-	y_sources(yttrium "src/renderer/null"
-		renderer/null/renderer.cpp
-		renderer/null/renderer.h
+	y_sources(yttrium "src/renderer/_null"
+		renderer/_null/renderer.cpp
+		renderer/_null/renderer.h
 		)
 endif()
 
@@ -462,16 +462,16 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 endif()
 if(UNIX)
-	y_sources(yttrium "src/storage/posix"
-		storage/posix/file.cpp
-		storage/posix/temporary_file.cpp
-		storage/posix/temporary_file.h
+	y_sources(yttrium "src/storage/_posix"
+		storage/_posix/file.cpp
+		storage/_posix/temporary_file.cpp
+		storage/_posix/temporary_file.h
 		)
-	set_property(SOURCE storage/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
+	set_property(SOURCE storage/_posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 elseif(WIN32)
-	y_sources(yttrium "src/storage/windows"
-		storage/windows/file.cpp
-		storage/windows/temporary_file.cpp
+	y_sources(yttrium "src/storage/_windows"
+		storage/_windows/file.cpp
+		storage/_windows/temporary_file.cpp
 		)
 endif()
 

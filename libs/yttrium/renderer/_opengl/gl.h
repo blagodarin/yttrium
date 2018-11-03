@@ -1,7 +1,7 @@
 #ifndef _src_renderer_gl_gl_h_
 #define _src_renderer_gl_gl_h_
 
-#include "../../platform/gl.h"
+#include "../../platform/opengl.h"
 
 #include <string_view>
 #include <vector>

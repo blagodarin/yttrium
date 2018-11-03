@@ -6,7 +6,7 @@
 
 #include <system_error>
 
-#include "../../platform/windows/api.h"
+#include "../../platform/_windows/api.h"
 
 namespace Yttrium
 {
