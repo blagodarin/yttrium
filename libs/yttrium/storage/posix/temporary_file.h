@@ -1,5 +1,4 @@
-#ifndef _src_platform_posix_temporary_file_h
-#define _src_platform_posix_temporary_file_h
+#pragma once
 
 #include <yttrium/storage/temporary_file.h>
 
@@ -18,5 +17,3 @@ namespace Yttrium
 		const int _descriptor;
 	};
 }
-
-#endif

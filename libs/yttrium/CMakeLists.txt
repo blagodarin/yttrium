@@ -17,12 +17,6 @@ y_sources(yttrium "src"
 	translation.cpp
 	)
 
-if(WIN32)
-	y_sources(yttrium "src/platform/windows"
-		platform/windows/windows.h
-		)
-endif()
-
 ########################################################################################################################
 # audio
 y_sources(yttrium "include/audio"
@@ -58,8 +52,6 @@ if(WIN32)
 	y_sources(yttrium "src/audio/wasapi"
 		audio/wasapi/backend.cpp
 		audio/wasapi/backend.h
-		audio/wasapi/com.cpp
-		audio/wasapi/com.h
 		audio/wasapi/player.cpp
 		audio/wasapi/player.h
 		audio/wasapi/sound.cpp
@@ -232,25 +224,23 @@ y_sources(yttrium "src/memory"
 	memory/buffer_memory.cpp
 	memory/buffer_memory.h
 	memory/buffer.cpp
+	memory/memory.h
 	memory/pool.cpp
 	memory/raw.h
 	)
-y_sources(yttrium "src/platform"
-	platform/memory.h
-	)
-if(UNIX)
-	y_sources(yttrium "src/platform/posix"
-		platform/posix/memory.cpp
-		)
-elseif(WIN32)
-	y_sources(yttrium "src/platform/windows"
-		platform/windows/memory.cpp
-		)
-endif()
 if(Y_ENABLE_BUFFER_MEMORY_TRACKING)
 	y_sources(yttrium "src/memory"
 		memory/buffer_memory_tracker.cpp
 		memory/buffer_memory_tracker.h
+		)
+endif()
+if(UNIX)
+	y_sources(yttrium "src/memory/posix"
+		memory/posix/memory.cpp
+		)
+elseif(WIN32)
+	y_sources(yttrium "src/memory/windows"
+		memory/windows/memory.cpp
 		)
 endif()
 
@@ -393,6 +383,7 @@ y_sources(yttrium "include/storage"
 	../../include/yttrium/storage/writer.h
 	)
 y_sources(yttrium "src/storage"
+	storage/file.h
 	storage/package.cpp
 	storage/package.h
 	storage/reader.cpp
@@ -406,23 +397,20 @@ y_sources(yttrium "src/storage/formats"
 	storage/formats/ypq.cpp
 	storage/formats/ypq.h
 	)
-y_sources(yttrium "src/platform"
-	platform/file.h
-	)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 endif()
 if(UNIX)
-	y_sources(yttrium "src/platform/posix"
-		platform/posix/file.cpp
-		platform/posix/temporary_file.cpp
-		platform/posix/temporary_file.h
+	y_sources(yttrium "src/storage/posix"
+		storage/posix/file.cpp
+		storage/posix/temporary_file.cpp
+		storage/posix/temporary_file.h
 		)
-	set_property(SOURCE platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
+	set_property(SOURCE storage/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 elseif(WIN32)
-	y_sources(yttrium "src/platform/windows"
-		platform/windows/file.cpp
-		platform/windows/temporary_file.cpp
+	y_sources(yttrium "src/storage/windows"
+		storage/windows/file.cpp
+		storage/windows/temporary_file.cpp
 		)
 endif()
 
@@ -452,16 +440,13 @@ y_sources(yttrium "include"
 	../../include/yttrium/window.h
 	)
 y_sources(yttrium "src/window"
-	window/backend.cpp
-	window/backend.h
 	window/event_loop.cpp
 	window/event_loop.h
 	window/key.cpp
 	window/window.cpp
 	window/window.h
-	)
-y_sources(yttrium "src/platform"
-	platform/window.h
+	window/window_backend.h
+	window/window_callbacks.h
 	)
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
@@ -491,14 +476,17 @@ if(UNIX)
 		endif()
 	endif()
 elseif(WIN32)
-	y_sources(yttrium "src/platform/gdi"
-		platform/gdi/window.cpp
-		platform/gdi/window.h
+	y_sources(yttrium "src/platform/windows"
+		platform/windows/api.h
+		platform/windows/com.cpp
+		platform/windows/com.h
+		platform/windows/window.cpp
+		platform/windows/window.h
 		)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yttrium "src/platform/gdi"
-			platform/gdi/wgl.cpp
-			platform/gdi/wgl.h
+		y_sources(yttrium "src/platform/windows"
+			platform/windows/wgl.cpp
+			platform/windows/wgl.h
 			)
 	endif()
 endif()

@@ -1,17 +1,18 @@
 #pragma once
 
-#include <functional>
-
-#include "../platform/window.h"
 #include "../renderer/builtin/builtin.h"
 #include "../renderer/renderer.h"
-#include "backend.h"
 #include "event_loop.h"
+#include "window_backend.h"
+#include "window_callbacks.h"
+
+#include <functional>
 
 namespace Yttrium
 {
 	class RenderPass;
 	struct UpdateEvent;
+	class Window;
 
 	class WindowPrivate final : private WindowBackendCallbacks
 	{
@@ -41,7 +42,6 @@ namespace Yttrium
 		Point _cursor;
 		bool _is_cursor_locked = false;
 		Size _size;
-		bool _fullscreen = false;
 		bool _keys[KeyCount] = {};
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;

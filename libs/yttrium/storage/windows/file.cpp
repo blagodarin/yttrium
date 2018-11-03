@@ -2,11 +2,11 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../../storage/writer.h"
+#include "../writer.h"
 
 #include <system_error>
 
-#include "windows.h"
+#include "../../platform/windows/api.h"
 
 namespace Yttrium
 {

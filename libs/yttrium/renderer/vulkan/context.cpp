@@ -1,6 +1,6 @@
 #include "context.h"
 
-#include "../../platform/window.h"
+#include "../../window/window_backend.h"
 #include "handles.h"
 
 #ifndef NDEBUG

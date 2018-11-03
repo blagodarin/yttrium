@@ -1,8 +1,7 @@
-#ifndef _src_platform_gdi_window_h_
-#define _src_platform_gdi_window_h_
+#pragma once
 
 #include <yttrium/math/size.h>
-#include "../windows/windows.h"
+#include "api.h"
 
 #if Y_RENDERER_OPENGL
 	#include "wgl.h"
@@ -92,5 +91,3 @@ namespace Yttrium
 #endif
 	};
 }
-
-#endif

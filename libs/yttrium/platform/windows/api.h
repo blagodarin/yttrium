@@ -1,5 +1,4 @@
-#ifndef _src_platform_windows_windows_h_
-#define _src_platform_windows_windows_h_
+#pragma once
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -8,5 +7,3 @@
 
 #undef far
 #undef near
-
-#endif

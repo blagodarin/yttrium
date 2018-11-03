@@ -1,7 +1,7 @@
 #include "../file.h"
 
 #include <yttrium/storage/source.h>
-#include "../../storage/writer.h"
+#include "../writer.h"
 #include "temporary_file.h"
 
 #include <cstdlib>

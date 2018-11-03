@@ -4,7 +4,7 @@
 #include <yttrium/key.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include "../../window/backend.h"
+#include "../../window/window_callbacks.h"
 
 #include <cassert>
 #include <vector>

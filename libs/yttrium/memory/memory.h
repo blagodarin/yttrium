@@ -1,5 +1,4 @@
-#ifndef _src_platform_memory_h_
-#define _src_platform_memory_h_
+#pragma once
 
 #include <cstddef>
 
@@ -10,5 +9,3 @@ namespace Yttrium
 	size_t pages_granularity() noexcept;
 	void* pages_reallocate(void*, size_t, size_t) noexcept;
 }
-
-#endif

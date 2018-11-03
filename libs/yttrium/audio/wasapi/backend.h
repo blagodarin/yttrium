@@ -1,8 +1,8 @@
 #ifndef _libs_yttrium_audio_wasapi_backend_h_
 #define _libs_yttrium_audio_wasapi_backend_h_
 
+#include "../../platform/windows/com.h"
 #include "../backend.h"
-#include "com.h"
 
 #include <audioclient.h>
 #include <mmdeviceapi.h>

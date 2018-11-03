@@ -1,7 +1,6 @@
-#ifndef _src_platform_gdi_wgl_h_
-#define _src_platform_gdi_wgl_h_
+#pragma once
 
-#include "../windows/windows.h"
+#include "api.h"
 
 #include <GL/gl.h>
 #include <GL/wglext.h>
@@ -43,5 +42,3 @@ namespace Yttrium
 		Extensions _wgl;
 	};
 }
-
-#endif

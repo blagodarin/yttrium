@@ -1,5 +1,4 @@
-#ifndef _src_window_backend_h_
-#define _src_window_backend_h_
+#pragma once
 
 #include <yttrium/key.h>
 
@@ -20,5 +19,3 @@ namespace Yttrium
 		virtual void on_text_event(std::string_view) = 0;
 	};
 }
-
-#endif

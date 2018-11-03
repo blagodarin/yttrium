@@ -1,5 +1,4 @@
-#ifndef _libs_yttrium_audio_wasapi_com_h_
-#define _libs_yttrium_audio_wasapi_com_h_
+#pragma once
 
 #include <string>
 
@@ -22,5 +21,3 @@ namespace Yttrium
 
 	std::string hresult_to_string(HRESULT);
 }
-
-#endif

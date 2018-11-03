@@ -1,5 +1,4 @@
-#ifndef _src_platform_file_h_
-#define _src_platform_file_h_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -12,5 +11,3 @@ namespace Yttrium
 	std::unique_ptr<WriterPrivate> create_file_writer(const std::string&);
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile&);
 }
-
-#endif

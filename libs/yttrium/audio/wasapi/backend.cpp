@@ -1,7 +1,6 @@
 #include "backend.h"
 
 #include <yttrium/exceptions.h>
-#include "com.h"
 #include "player.h"
 #include "sound.h"
 

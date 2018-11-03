@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "windows.h"
+#include "../../platform/windows/api.h"
 
 namespace Yttrium
 {
