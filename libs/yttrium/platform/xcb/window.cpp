@@ -1,6 +1,6 @@
 #include "window.h"
 
-#include "../../window/window_callbacks.h"
+#include "../window_callbacks.h"
 
 #include <algorithm>
 #include <string>

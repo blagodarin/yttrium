@@ -1,5 +1,4 @@
-#ifndef _src_platform_x11_window_h_
-#define _src_platform_x11_window_h_
+#pragma once
 
 #include <yttrium/math/size.h>
 #include "../../utils/memory.h"
@@ -68,5 +67,3 @@ namespace Yttrium
 		WindowBackendCallbacks& _callbacks;
 	};
 }
-
-#endif

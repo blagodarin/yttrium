@@ -1,5 +1,4 @@
-#ifndef _src_platform_openal_h_
-#define _src_platform_openal_h_
+#pragma once
 
 #if defined(_WIN32) && !defined(AL_APIENTRY)
 	#define AL_APIENTRY __cdecl
@@ -7,5 +6,3 @@
 
 #include <al.h>
 #include <alc.h>
-
-#endif

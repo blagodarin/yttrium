@@ -3,7 +3,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include "../../window/window_callbacks.h"
+#include "../window_callbacks.h"
 
 #include <cstring>
 

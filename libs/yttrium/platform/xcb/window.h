@@ -1,5 +1,4 @@
-#ifndef _src_platform_xcb_window_h_
-#define _src_platform_xcb_window_h_
+#pragma once
 
 #include <yttrium/math/size.h>
 #include "../../utils/memory.h"
@@ -46,5 +45,3 @@ namespace Yttrium
 		std::optional<Size> _size;
 	};
 }
-
-#endif

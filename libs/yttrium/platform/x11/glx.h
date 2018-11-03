@@ -1,5 +1,4 @@
-#ifndef _src_platform_x11_glx_h_
-#define _src_platform_x11_glx_h_
+#pragma once
 
 #include "../../utils/memory.h"
 
@@ -36,5 +35,3 @@ namespace Yttrium
 		Extensions _extensions;
 	};
 }
-
-#endif
