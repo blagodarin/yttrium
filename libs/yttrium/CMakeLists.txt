@@ -447,14 +447,18 @@ y_sources(yttrium "src/utils"
 ########################################################################################################################
 # window
 y_sources(yttrium "include"
+	../../include/yttrium/event_loop.h
 	../../include/yttrium/key.h
 	../../include/yttrium/window.h
 	)
 y_sources(yttrium "src/window"
 	window/backend.cpp
 	window/backend.h
+	window/event_loop.cpp
+	window/event_loop.h
 	window/key.cpp
 	window/window.cpp
+	window/window.h
 	)
 y_sources(yttrium "src/platform"
 	platform/window.h

@@ -11,6 +11,7 @@
 
 namespace Yttrium
 {
+	class EventLoop;
 	class Image;
 	class KeyEvent;
 	class Point;
@@ -57,7 +58,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		explicit Window(std::string_view name);
+		Window(EventLoop&, std::string_view name);
 
 		///
 		~Window();
@@ -91,9 +92,6 @@ namespace Yttrium
 
 		///
 		RenderManager& render_manager();
-
-		///
-		void run();
 
 		///
 		bool set_cursor(const Point& cursor);

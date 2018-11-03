@@ -30,7 +30,6 @@ are also "TODO" comments in source files marking places for some internal
 improvements and other code-related issues.
 
 * Library:
-	- Event loop.
 	- Multiple windows.
 	- Windowed mode.
 	- Proper benchmarks (e. g. using some benchmarking library).
