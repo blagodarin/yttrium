@@ -11,7 +11,7 @@
 
 namespace Yttrium
 {
-	class EventLoop;
+	class Application;
 	class Image;
 	class KeyEvent;
 	class Point;
@@ -58,7 +58,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Window(EventLoop&, std::string_view name);
+		Window(Application&, std::string_view name);
 
 		///
 		~Window();

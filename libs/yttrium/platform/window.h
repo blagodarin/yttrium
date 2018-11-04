@@ -2,7 +2,7 @@
 
 #include "../renderer/builtin/builtin.h"
 #include "../renderer/renderer.h"
-#include "event_loop.h"
+#include "application.h"
 #include "window_backend.h"
 #include "window_callbacks.h"
 
@@ -17,7 +17,7 @@ namespace Yttrium
 	class WindowPrivate final : private WindowBackendCallbacks
 	{
 	public:
-		WindowPrivate(EventLoop& event_loop, std::string_view name);
+		WindowPrivate(Application&, std::string_view name);
 
 		void run();
 
@@ -33,7 +33,7 @@ namespace Yttrium
 		void set_active(bool);
 
 	private:
-		const EventLoopStub _event_loop;
+		const ApplicationStub _application;
 		const std::string _name;
 		WindowBackend _backend{_name, *this};
 		RendererImpl _renderer{_backend};

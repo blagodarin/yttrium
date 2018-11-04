@@ -244,13 +244,13 @@ endif()
 ########################################################################################################################
 # platform
 y_sources(yttrium "include"
-	../../include/yttrium/event_loop.h
+	../../include/yttrium/application.h
 	../../include/yttrium/key.h
 	../../include/yttrium/window.h
 	)
 y_sources(yttrium "src/platform"
-	platform/event_loop.cpp
-	platform/event_loop.h
+	platform/application.cpp
+	platform/application.h
 	platform/key.cpp
 	platform/window.cpp
 	platform/window.h

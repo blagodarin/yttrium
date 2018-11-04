@@ -4,26 +4,26 @@
 
 namespace Yttrium
 {
-	class EventLoop;
+	class Application;
 	class WindowPrivate;
 
-	class EventLoopPrivate
+	class ApplicationPrivate
 	{
 	public:
 		WindowPrivate* window() const noexcept { return _window.load(); }
 
-		static void add_window(EventLoop&, WindowPrivate&);
+		static void add_window(Application&, WindowPrivate&);
 
 	private:
 		std::atomic<WindowPrivate*> _window{ nullptr };
 	};
 
-	struct EventLoopStub
+	struct ApplicationStub
 	{
 	public:
-		EventLoopStub(EventLoop& event_loop, WindowPrivate& window)
+		ApplicationStub(Application& application, WindowPrivate& window)
 		{
-			EventLoopPrivate::add_window(event_loop, window);
+			ApplicationPrivate::add_window(application, window);
 		}
 	};
 }

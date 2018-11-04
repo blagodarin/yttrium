@@ -2,7 +2,7 @@
 
 #include "model.h"
 
-#include <yttrium/event_loop.h>
+#include <yttrium/application.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/math/euler.h>
 #include <yttrium/math/line.h>
@@ -34,8 +34,8 @@ private:
 
 private:
 	const Storage& _storage;
-	EventLoop _event_loop;
-	Window _window{_event_loop, "Yttrium 3D example"};
+	Application _application;
+	Window _window{_application, "Yttrium 3D example"};
 	ResourceLoader _resource_loader{_storage, &_window.render_manager()};
 	ScriptContext _script;
 	Gui _gui{_resource_loader, _script, "examples/3d/data/gui.ion"};

@@ -7,8 +7,8 @@
 
 namespace Yttrium
 {
-	WindowPrivate::WindowPrivate(EventLoop& event_loop, std::string_view name)
-		: _event_loop{ event_loop, *this }
+	WindowPrivate::WindowPrivate(Application& application, std::string_view name)
+		: _application{ application, *this }
 		, _name{ name }
 	{
 		const auto size = _backend.size();
@@ -161,8 +161,8 @@ namespace Yttrium
 		lock_cursor(_is_cursor_locked);
 	}
 
-	Window::Window(EventLoop& event_loop, std::string_view name)
-		: _private{std::make_unique<WindowPrivate>(event_loop, name)}
+	Window::Window(Application& application, std::string_view name)
+		: _private{std::make_unique<WindowPrivate>(application, name)}
 	{
 	}
 

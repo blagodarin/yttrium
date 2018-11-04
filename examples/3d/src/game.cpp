@@ -114,7 +114,7 @@ void Game::run()
 {
 	_gui.start();
 	_window.show();
-	_event_loop.run();
+	_application.run();
 }
 
 void Game::draw_scene(RenderPass& pass, const Vector2& cursor)

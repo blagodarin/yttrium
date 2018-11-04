@@ -1,8 +1,8 @@
+#include <yttrium/application.h>
 #include <yttrium/audio/format.h>
 #include <yttrium/audio/manager.h>
 #include <yttrium/audio/player.h>
 #include <yttrium/audio/utils.h>
-#include <yttrium/event_loop.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/resource_loader.h>
@@ -105,9 +105,9 @@ namespace
 
 int main(int, char**)
 {
-	EventLoop event_loop;
+	Application application;
 
-	Window window{event_loop, "Tetrium"};
+	Window window{application, "Tetrium"};
 
 	ScriptContext script;
 
@@ -177,5 +177,5 @@ int main(int, char**)
 
 	gui.start();
 	window.show();
-	event_loop.run();
+	application.run();
 }
