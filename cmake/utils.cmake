@@ -42,7 +42,9 @@ function(add_ypack_target _target)
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		COMMENT "Generating ${_output}"
 		VERBATIM)
-	add_dependencies(${_target} ${_arg_DEPENDS})
+	if(_arg_DEPENDS)
+		add_dependencies(${_target} ${_arg_DEPENDS})
+	endif()
 endfunction()
 
 function(add_yrc_sources _target)

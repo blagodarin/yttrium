@@ -15,7 +15,8 @@ namespace
 
 int main(int, char**)
 {
-	Storage storage{Storage::UseFileSystem::Before};
+	Storage storage{Storage::UseFileSystem::Never};
+	storage.attach_package("3d.ypq");
 	::make_checkerboard_texture(storage, "examples/3d/data/checkerboard.tga");
 
 	Game game{storage};
