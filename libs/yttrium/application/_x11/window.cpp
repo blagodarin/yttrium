@@ -11,42 +11,33 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	P_Display open_display()
-	{
-		P_Display display(::XOpenDisplay(nullptr));
-		if (!display)
-			throw InitializationError("Failed to open the default X11 display");
-		return display;
-	}
-
-	::Window create_window(::Display* display, int screen, const GlxContext& glx)
+	::Window create_window(::Display* display, int screen, const ::XVisualInfo* visual_info)
 	{
 		const auto root_window = RootWindow(display, screen);
 
 		::XSetWindowAttributes swa;
-		swa.colormap = ::XCreateColormap(display, root_window, glx.visual_info()->visual, AllocNone);
+		swa.colormap = ::XCreateColormap(display, root_window, visual_info->visual, AllocNone);
 		swa.border_pixel = 0;
 		swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | FocusChangeMask | StructureNotifyMask;
 
 		const auto window = ::XCreateWindow(display, root_window,
-			0, 0, 1, 1, 0, glx.visual_info()->depth, InputOutput, glx.visual_info()->visual,
+			0, 0, 1, 1, 0, visual_info->depth, InputOutput, visual_info->visual,
 			CWBorderPixel | CWColormap | CWEventMask, &swa);
 
 		if (window == None)
 		{
 			::XFreeColormap(display, swa.colormap);
-			throw InitializationError("Failed to create an X11 window");
+			throw Yttrium::InitializationError{ "XCreateWindow failed" };
 		}
 
 		return window;
 	}
 
-	Key key_from_event(::XKeyEvent& event) noexcept
+	Yttrium::Key key_from_event(::XKeyEvent& event) noexcept
 	{
-		const auto key_sym = ::XLookupKeysym(&event, 0);
+		using Yttrium::Key;
 
+		const auto key_sym = ::XLookupKeysym(&event, 0);
 		if (key_sym >= XK_0 && key_sym <= XK_9)
 		{
 			return static_cast<Key>(static_cast<::KeySym>(to_underlying(Key::_0)) + key_sym - XK_0);
@@ -134,8 +125,9 @@ namespace
 		return Key::Null;
 	}
 
-	constexpr Key button_from_event(const ::XButtonEvent& event) noexcept
+	constexpr Yttrium::Key button_from_event(const ::XButtonEvent& event) noexcept
 	{
+		using Yttrium::Key;
 		switch (event.button)
 		{
 		case Button1: return Key::Mouse1;
@@ -151,25 +143,23 @@ namespace
 namespace Yttrium
 {
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
-		: _display{::open_display()}
-		, _screen{DefaultScreen(_display.get())}
-		, _window{_display.get(), ::create_window(_display.get(), _screen, _glx)}
+		: _window{_application.display(), ::create_window(_application.display(), _application.screen(), _glx.visual_info())}
 		, _callbacks{callbacks}
 	{
-		::XSetWMProtocols(_display.get(), _window.get(), &_wm_delete_window, 1);
-		::XStoreName(_display.get(), _window.get(), name.c_str());
+		::XSetWMProtocols(_application.display(), _window.get(), &_wm_delete_window, 1);
+		::XStoreName(_application.display(), _window.get(), name.c_str());
 
 		// Hide system cursor.
-		::XDefineCursor(_display.get(), _window.get(), _empty_cursor.get());
+		::XDefineCursor(_application.display(), _window.get(), _empty_cursor.get());
 
 		// Show window in fullscreen mode.
-		::XChangeProperty(_display.get(), _window.get(), _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
+		::XChangeProperty(_application.display(), _window.get(), _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
 
 		_glx.bind(_window.get());
 
 		// Force vsync.
 		if (_glx->EXT_swap_control)
-			_glx->SwapIntervalEXT(_display.get(), _window.get(), _glx->EXT_swap_control_tear ? -1 : 1);
+			_glx->SwapIntervalEXT(_application.display(), _window.get(), _glx->EXT_swap_control_tear ? -1 : 1);
 	}
 
 	WindowBackend::~WindowBackend() noexcept = default;
@@ -195,7 +185,7 @@ namespace Yttrium
 		int window_y = 0;
 		unsigned mask = 0;
 
-		if (!::XQueryPointer(_display.get(), _window.get(), &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
+		if (!::XQueryPointer(_application.display(), _window.get(), &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
 		cursor = {window_x, window_y};
@@ -207,10 +197,10 @@ namespace Yttrium
 	{
 		if (!_window)
 			return false;
-		while (!_size ||::XPending(_display.get()) > 0)
+		while (!_size ||::XPending(_application.display()) > 0)
 		{
 			::XEvent event;
-			::XNextEvent(_display.get(), &event);
+			::XNextEvent(_application.display(), &event);
 			switch (event.type)
 			{
 			case KeyPress:
@@ -270,15 +260,15 @@ namespace Yttrium
 	{
 		if (!_window)
 			return false;
-		::XWarpPointer(_display.get(), None, _window.get(), 0, 0, 0, 0, cursor._x, cursor._y);
-		::XSync(_display.get(), False);
+		::XWarpPointer(_application.display(), None, _window.get(), 0, 0, 0, 0, cursor._x, cursor._y);
+		::XSync(_application.display(), False);
 		return true;
 	}
 
 	void WindowBackend::show()
 	{
 		if (_window)
-			::XMapRaised(_display.get(), _window.get());
+			::XMapRaised(_application.display(), _window.get());
 	}
 
 	void WindowBackend::swap_buffers()

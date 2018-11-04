@@ -1,19 +1,15 @@
 #pragma once
 
 #include <yttrium/math/size.h>
-#include "../../utils/memory.h"
+#include "application.h"
 #include "glx.h"
 
 #include <optional>
-
-#include <X11/Xlib.h>
 
 namespace Yttrium
 {
 	class Point;
 	class WindowBackendCallbacks;
-
-	using P_Display = UniquePtr<::Display, ::XCloseDisplay>;
 
 	class WindowBackend
 	{
@@ -55,15 +51,14 @@ namespace Yttrium
 		};
 
 		std::optional<Size> _size;
-		const P_Display _display;
-		const int _screen;
-		const GlxContext _glx{ _display.get(), _screen };
+		NativeApplication _application;
+		const GlxContext _glx{ _application.display(), _application.screen() };
 		WindowHandle _window;
-		const EmptyCursor _empty_cursor{ _display.get(), _window.get() };
-		::Atom _wm_protocols = ::XInternAtom(_display.get(), "WM_PROTOCOLS", True);
-		::Atom _wm_delete_window = ::XInternAtom(_display.get(), "WM_DELETE_WINDOW", True);
-		::Atom _net_wm_state = ::XInternAtom(_display.get(), "_NET_WM_STATE", True);
-		::Atom _net_wm_state_fullscreen = ::XInternAtom(_display.get(), "_NET_WM_STATE_FULLSCREEN", True);
+		const EmptyCursor _empty_cursor{ _application.display(), _window.get() };
+		::Atom _wm_protocols = ::XInternAtom(_application.display(), "WM_PROTOCOLS", True);
+		::Atom _wm_delete_window = ::XInternAtom(_application.display(), "WM_DELETE_WINDOW", True);
+		::Atom _net_wm_state = ::XInternAtom(_application.display(), "_NET_WM_STATE", True);
+		::Atom _net_wm_state_fullscreen = ::XInternAtom(_application.display(), "_NET_WM_STATE_FULLSCREEN", True);
 		WindowBackendCallbacks& _callbacks;
 	};
 }

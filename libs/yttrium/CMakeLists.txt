@@ -44,6 +44,8 @@ if(UNIX)
 		)
 	if(Y_RENDERER_OPENGL)
 		y_sources(yttrium "src/application/_x11"
+			application/_x11/application.cpp
+			application/_x11/application.h
 			application/_x11/glx.cpp
 			application/_x11/glx.h
 			application/_x11/window.cpp
