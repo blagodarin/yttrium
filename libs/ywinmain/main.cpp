@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <shellapi.h>
+
 int main(int, char**);
 
 int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)

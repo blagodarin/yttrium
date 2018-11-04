@@ -56,7 +56,8 @@ if(UNIX)
 		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			set_property(SOURCE application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
+			set_property(SOURCE application/_x11/application.cpp application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
 		y_sources(yttrium "src/application/_xcb"
