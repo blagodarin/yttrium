@@ -1,9 +1,11 @@
-add_library(yttrium SHARED main.cpp)
+add_library(yttrium main.cpp)
 source_group("src" FILES main.cpp)
 target_link_libraries(yttrium PRIVATE Threads::Threads)
-set_target_properties(yttrium PROPERTIES
-	DEFINE_SYMBOL YTTRIUM_EXPORT
-	FOLDER "libs")
+set_target_properties(yttrium PROPERTIES FOLDER "libs")
+if(BUILD_SHARED_LIBS)
+	set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT)
+	target_compile_definitions(yttrium INTERFACE YTTRIUM_IMPORT)
+endif()
 include_config(yttrium ${PROJECT_BINARY_DIR}/config.h)
 
 y_sources(yttrium "include"

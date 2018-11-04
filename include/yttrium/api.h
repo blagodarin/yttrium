@@ -1,17 +1,4 @@
-/// \file
-/// \brief API definitions.
-
-#ifndef _include_yttrium_api_h_
-#define _include_yttrium_api_h_
-
-/// \def Y_EXPORT
-/// \brief Exported API specifier.
-
-/// \def Y_IMPORT
-/// \brief Imported API specifier.
-
-/// \def Y_PRIVATE
-/// \brief Prevents a declaration from being exported as a part of API.
+#pragma once
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	#define Y_EXPORT __declspec(dllexport)
@@ -25,13 +12,10 @@
 	#error
 #endif
 
-/// \def Y_API
-/// \brief %Yttrium library API specifier.
-
-#ifdef YTTRIUM_EXPORT
+#if defined(YTTRIUM_EXPORT)
 	#define Y_API Y_EXPORT
-#else
+#elif defined(YTTRIUM_IMPORT)
 	#define Y_API Y_IMPORT
-#endif
-
+#else
+	#define Y_API
 #endif

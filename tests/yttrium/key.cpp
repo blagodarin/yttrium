@@ -2,7 +2,9 @@
 
 #include <catch2/catch.hpp>
 
-#include "../../libs/yttrium/gui/key_lookup.cpp"
+#ifdef YTTRIUM_IMPORT
+	#include "../../libs/yttrium/gui/key_lookup.cpp"
+#endif
 
 TEST_CASE("key_event")
 {

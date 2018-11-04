@@ -18,6 +18,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(cmake/utils.cmake)
 
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
 option(Y_BUILD_ALL "Build everything" OFF)
 option(Y_BUILD_EXAMPLES "Build examples" OFF)
 option(Y_BUILD_TESTS "Build tests" OFF)
