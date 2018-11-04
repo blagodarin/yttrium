@@ -1,5 +1,4 @@
-#ifndef _src_audio_openal_sound_h_
-#define _src_audio_openal_sound_h_
+#pragma once
 
 #include <yttrium/audio/sound.h>
 #include "format.h"
@@ -20,5 +19,3 @@ namespace Yttrium
 		OpenALBuffer _buffer;
 	};
 }
-
-#endif

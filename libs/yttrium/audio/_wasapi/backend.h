@@ -1,7 +1,6 @@
-#ifndef _libs_yttrium_audio_wasapi_backend_h_
-#define _libs_yttrium_audio_wasapi_backend_h_
+#pragma once
 
-#include "../../platform/_windows/com.h"
+#include "../../application/_windows/com.h"
 #include "../backend.h"
 
 #include <audioclient.h>
@@ -26,5 +25,3 @@ namespace Yttrium
 		ComPtr<IAudioClient> _client;
 	};
 }
-
-#endif

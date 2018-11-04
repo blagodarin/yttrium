@@ -18,6 +18,73 @@ y_sources(yttrium "src"
 	)
 
 ########################################################################################################################
+# application
+y_sources(yttrium "include"
+	../../include/yttrium/application.h
+	../../include/yttrium/key.h
+	../../include/yttrium/window.h
+	)
+y_sources(yttrium "src/application"
+	application/application.cpp
+	application/application.h
+	application/key.cpp
+	application/window.cpp
+	application/window.h
+	application/window_backend.h
+	application/window_callbacks.h
+	)
+if(Y_RENDERER_OPENGL)
+	y_sources(yttrium "src/application"
+		application/opengl.h
+		)
+endif()
+if(UNIX)
+	y_sources(yttrium "src/application"
+		application/openal.h
+		)
+	if(Y_RENDERER_OPENGL)
+		y_sources(yttrium "src/application/_x11"
+			application/_x11/glx.cpp
+			application/_x11/glx.h
+			application/_x11/window.cpp
+			application/_x11/window.h
+			)
+		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
+		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			set_property(SOURCE application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+		endif()
+	else()
+		y_sources(yttrium "src/application/_xcb"
+			application/_xcb/window.cpp
+			application/_xcb/window.h
+			)
+		target_link_libraries(yttrium PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
+		if(Y_RENDERER_VULKAN)
+			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
+		endif()
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
+			set_property(SOURCE application/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
+		endif()
+	endif()
+elseif(WIN32)
+	y_sources(yttrium "src/application/_windows"
+		application/_windows/api.h
+		application/_windows/com.cpp
+		application/_windows/com.h
+		application/_windows/window.cpp
+		application/_windows/window.h
+		)
+	if(Y_RENDERER_OPENGL)
+		y_sources(yttrium "src/application/_windows"
+			application/_windows/wgl.cpp
+			application/_windows/wgl.h
+			)
+	endif()
+endif()
+
+########################################################################################################################
 # audio
 y_sources(yttrium "include/audio"
 	../../include/yttrium/audio/format.h
@@ -239,73 +306,6 @@ elseif(WIN32)
 	y_sources(yttrium "src/memory/_windows"
 		memory/_windows/memory.cpp
 		)
-endif()
-
-########################################################################################################################
-# platform
-y_sources(yttrium "include"
-	../../include/yttrium/application.h
-	../../include/yttrium/key.h
-	../../include/yttrium/window.h
-	)
-y_sources(yttrium "src/platform"
-	platform/application.cpp
-	platform/application.h
-	platform/key.cpp
-	platform/window.cpp
-	platform/window.h
-	platform/window_backend.h
-	platform/window_callbacks.h
-	)
-if(Y_RENDERER_OPENGL)
-	y_sources(yttrium "src/platform"
-		platform/opengl.h
-		)
-endif()
-if(UNIX)
-	y_sources(yttrium "src/platform"
-		platform/openal.h
-		)
-	if(Y_RENDERER_OPENGL)
-		y_sources(yttrium "src/platform/_x11"
-			platform/_x11/glx.cpp
-			platform/_x11/glx.h
-			platform/_x11/window.cpp
-			platform/_x11/window.h
-			)
-		target_include_directories(yttrium SYSTEM PRIVATE ${X11_INCLUDE_DIR})
-		target_link_libraries(yttrium PRIVATE ${X11_X11_LIB})
-		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			set_property(SOURCE platform/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
-		endif()
-	else()
-		y_sources(yttrium "src/platform/_xcb"
-			platform/_xcb/window.cpp
-			platform/_xcb/window.h
-			)
-		target_link_libraries(yttrium PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
-		if(Y_RENDERER_VULKAN)
-			target_compile_definitions(yttrium PRIVATE VK_USE_PLATFORM_XCB_KHR)
-		endif()
-		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
-			set_property(SOURCE platform/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
-		endif()
-	endif()
-elseif(WIN32)
-	y_sources(yttrium "src/platform/_windows"
-		platform/_windows/api.h
-		platform/_windows/com.cpp
-		platform/_windows/com.h
-		platform/_windows/window.cpp
-		platform/_windows/window.h
-		)
-	if(Y_RENDERER_OPENGL)
-		y_sources(yttrium "src/platform/_windows"
-			platform/_windows/wgl.cpp
-			platform/_windows/wgl.hd
-			)
-	endif()
 endif()
 
 ########################################################################################################################

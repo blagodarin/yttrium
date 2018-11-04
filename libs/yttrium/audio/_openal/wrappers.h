@@ -1,8 +1,7 @@
-#ifndef _src_audio_openal_wrappers_h_
-#define _src_audio_openal_wrappers_h_
+#pragma once
 
 #include <yttrium/exceptions.h>
-#include "../../platform/openal.h"
+#include "../../application/openal.h"
 
 namespace Yttrium
 {
@@ -55,5 +54,3 @@ namespace Yttrium
 		ALuint _source = 0;
 	};
 }
-
-#endif

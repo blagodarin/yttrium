@@ -1,7 +1,6 @@
-#ifndef _src_renderer_gl_gl_h_
-#define _src_renderer_gl_gl_h_
+#pragma once
 
-#include "../../platform/opengl.h"
+#include "../../application/opengl.h"
 
 #include <string_view>
 #include <vector>
@@ -25,5 +24,3 @@ namespace Yttrium
 		bool has_extension(std::string_view) const;
 	};
 }
-
-#endif

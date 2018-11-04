@@ -1,5 +1,4 @@
-#ifndef _libs_yttrium_audio_wasapi_player_h_
-#define _libs_yttrium_audio_wasapi_player_h_
+#pragma once
 
 #include "../backend.h"
 
@@ -20,5 +19,3 @@ namespace Yttrium
 		void stop() noexcept override;
 	};
 }
-
-#endif

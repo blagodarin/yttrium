@@ -1,7 +1,6 @@
-#ifndef _src_audio_openal_backend_h_
-#define _src_audio_openal_backend_h_
+#pragma once
 
-#include "../../platform/openal.h"
+#include "../../application/openal.h"
 #include "../../utils/memory.h"
 #include "../backend.h"
 
@@ -24,5 +23,3 @@ namespace Yttrium
 		const P_ALCcontext _context;
 	};
 }
-
-#endif

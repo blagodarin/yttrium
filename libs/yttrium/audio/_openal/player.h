@@ -1,5 +1,4 @@
-#ifndef _src_audio_openal_player_h_
-#define _src_audio_openal_player_h_
+#pragma once
 
 #include "../backend.h"
 #include "format.h"
@@ -29,5 +28,3 @@ namespace Yttrium
 		OpenALFormat _format;
 	};
 }
-
-#endif

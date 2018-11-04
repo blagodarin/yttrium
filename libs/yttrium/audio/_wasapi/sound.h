@@ -1,5 +1,4 @@
-#ifndef _libs_yttrium_audio_wasapi_sound_h_
-#define _libs_yttrium_audio_wasapi_sound_h_
+#pragma once
 
 #include <yttrium/audio/sound.h>
 
@@ -13,5 +12,3 @@ namespace Yttrium
 		void play() const override;
 	};
 }
-
-#endif
