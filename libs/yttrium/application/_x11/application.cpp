@@ -4,13 +4,11 @@
 
 namespace Yttrium
 {
-	NativeApplication::NativeApplication() = default;
-
-	NativeApplication::DisplayPtr NativeApplication::open_display()
+	NativeApplication::NativeApplication()
 	{
-		DisplayPtr display{ ::XOpenDisplay(nullptr) };
-		if (!display)
+		_display.reset(::XOpenDisplay(nullptr));
+		if (!_display)
 			throw InitializationError{ "XOpenDisplay failed" };
-		return display;
+		_screen = DefaultScreen(_display.get());
 	}
 }

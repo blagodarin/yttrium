@@ -264,6 +264,7 @@ namespace Yttrium
 			return true;
 		}
 
+	private:
 		void reset_keymap()
 		{
 			decltype(_keymap) keymap{::xkb_x11_keymap_new_from_device(_context.get(), _connection, _keyboard_id, XKB_KEYMAP_COMPILE_NO_FLAGS)};
@@ -290,44 +291,34 @@ namespace Yttrium
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
 		: _callbacks{callbacks}
 	{
-		int preferred_screen = 0;
-		_connection.reset(::xcb_connect(nullptr, &preferred_screen));
-		if (::xcb_connection_has_error(_connection.get()))
-			return;
+		_keyboard = std::make_unique<Keyboard>(_application.connection());
 
-		_keyboard = std::make_unique<Keyboard>(_connection.get());
-
-		auto screen_iterator = ::xcb_setup_roots_iterator(::xcb_get_setup(_connection.get()));
-		for (; preferred_screen > 0; --preferred_screen)
-			::xcb_screen_next(&screen_iterator);
-		_screen = screen_iterator.data;
-
-		_window = ::xcb_generate_id(_connection.get());
+		_window = ::xcb_generate_id(_application.connection());
 
 		const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		const uint32_t list[] =
 		{
-			_screen->black_pixel,
+			_application.screen()->black_pixel,
 			XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_FOCUS_CHANGE,
 		};
-		::xcb_create_window(_connection.get(), XCB_COPY_FROM_PARENT, _window, _screen->root,
-			0, 0, _screen->width_in_pixels, _screen->height_in_pixels, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, _screen->root_visual, mask, list);
+		::xcb_create_window(_application.connection(), XCB_COPY_FROM_PARENT, _window, _application.screen()->root,
+			0, 0, _application.screen()->width_in_pixels, _application.screen()->height_in_pixels, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, _application.screen()->root_visual, mask, list);
 
-		_wm_protocols = ::make_atom(_connection.get(), true, "WM_PROTOCOLS");
-		_wm_delete_window = ::make_atom(_connection.get(), false, "WM_DELETE_WINDOW");
-		::xcb_change_property(_connection.get(), XCB_PROP_MODE_REPLACE, _window, _wm_protocols->atom, XCB_ATOM_ATOM, 32, 1, &_wm_delete_window->atom);
+		_wm_protocols = ::make_atom(_application.connection(), true, "WM_PROTOCOLS");
+		_wm_delete_window = ::make_atom(_application.connection(), false, "WM_DELETE_WINDOW");
+		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, _wm_protocols->atom, XCB_ATOM_ATOM, 32, 1, &_wm_delete_window->atom);
 
-		::xcb_change_property(_connection.get(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, static_cast<uint32_t>(name.size()), name.data());
+		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, static_cast<uint32_t>(name.size()), name.data());
 
-		_empty_cursor = std::make_unique<EmptyCursor>(_connection.get(), _window);
+		_empty_cursor = std::make_unique<EmptyCursor>(_application.connection(), _window);
 
 		{
-			const auto net_wm_state = ::make_atom(_connection.get(), false, "_NET_WM_STATE");
-			const auto net_wm_state_fullscreen = ::make_atom(_connection.get(), false, "_NET_WM_STATE_FULLSCREEN");
-			::xcb_change_property(_connection.get(), XCB_PROP_MODE_REPLACE, _window, net_wm_state->atom, XCB_ATOM_ATOM, 32, 1, &net_wm_state_fullscreen->atom);
+			const auto net_wm_state = ::make_atom(_application.connection(), false, "_NET_WM_STATE");
+			const auto net_wm_state_fullscreen = ::make_atom(_application.connection(), false, "_NET_WM_STATE_FULLSCREEN");
+			::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, net_wm_state->atom, XCB_ATOM_ATOM, 32, 1, &net_wm_state_fullscreen->atom);
 		}
 
-		::xcb_flush(_connection.get());
+		::xcb_flush(_application.connection());
 	}
 
 	WindowBackend::~WindowBackend() noexcept
@@ -339,8 +330,8 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return;
-		::xcb_destroy_window(_connection.get(), _window);
-		::xcb_flush(_connection.get());
+		::xcb_destroy_window(_application.connection(), _window);
+		::xcb_flush(_application.connection());
 		_window = XCB_WINDOW_NONE;
 	}
 
@@ -348,7 +339,7 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		const UniquePtr<xcb_query_pointer_reply_t, std::free> reply{::xcb_query_pointer_reply(_connection.get(), ::xcb_query_pointer(_connection.get(), _window), nullptr)};
+		const UniquePtr<xcb_query_pointer_reply_t, std::free> reply{::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr)};
 		if (!reply)
 			return false;
 		cursor = {reply->win_x, reply->win_y};
@@ -362,9 +353,9 @@ namespace Yttrium
 
 		for (;;)
 		{
-			const UniquePtr<xcb_generic_event_t, std::free> event{_size ? ::xcb_poll_for_event(_connection.get()) : ::xcb_wait_for_event(_connection.get())};
+			const UniquePtr<xcb_generic_event_t, std::free> event{_size ? ::xcb_poll_for_event(_application.connection()) : ::xcb_wait_for_event(_application.connection())};
 			if (!event)
-				return !::xcb_connection_has_error(_connection.get());
+				return !::xcb_connection_has_error(_application.connection());
 
 			switch (const auto event_type = event->response_type & 0x7f)
 			{
@@ -442,8 +433,8 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		::xcb_warp_pointer(_connection.get(), XCB_WINDOW_NONE, _window, 0, 0, 0, 0, static_cast<int16_t>(cursor._x), static_cast<int16_t>(cursor._y));
-		::xcb_flush(_connection.get());
+		::xcb_warp_pointer(_application.connection(), XCB_WINDOW_NONE, _window, 0, 0, 0, 0, static_cast<int16_t>(cursor._x), static_cast<int16_t>(cursor._y));
+		::xcb_flush(_application.connection());
 		return true;
 	}
 
@@ -451,8 +442,8 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return;
-		::xcb_map_window(_connection.get(), _window);
-		::xcb_flush(_connection.get());
+		::xcb_map_window(_application.connection(), _window);
+		::xcb_flush(_application.connection());
 	}
 
 	void WindowBackend::swap_buffers()

@@ -15,12 +15,7 @@ namespace Yttrium
 		int screen() const noexcept { return _screen; }
 
 	private:
-		using DisplayPtr = UniquePtr<::Display, ::XCloseDisplay>;
-
-		static DisplayPtr open_display();
-
-	private:
-		const DisplayPtr _display = open_display();
-		const int _screen = DefaultScreen(_display.get());
+		UniquePtr<::Display, ::XCloseDisplay> _display;
+		int _screen = 0;
 	};
 }

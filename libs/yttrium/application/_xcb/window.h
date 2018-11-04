@@ -1,11 +1,9 @@
 #pragma once
 
 #include <yttrium/math/size.h>
-#include "../../utils/memory.h"
+#include "application.h"
 
 #include <optional>
-
-#include <xcb/xcb.h>
 
 namespace Yttrium
 {
@@ -27,7 +25,7 @@ namespace Yttrium
 		std::optional<Size> size() const noexcept { return _size; }
 		void swap_buffers();
 
-		xcb_connection_t* xcb_connection() const noexcept { return _connection.get(); }
+		xcb_connection_t* xcb_connection() const noexcept { return _application.connection(); }
 		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
@@ -35,9 +33,8 @@ namespace Yttrium
 		class Keyboard;
 
 		WindowBackendCallbacks& _callbacks;
-		UniquePtr<xcb_connection_t, ::xcb_disconnect> _connection;
+		NativeApplication _application;
 		std::unique_ptr<Keyboard> _keyboard;
-		xcb_screen_t* _screen = nullptr;
 		xcb_window_t _window = XCB_WINDOW_NONE;
 		P_Atom _wm_protocols;
 		P_Atom _wm_delete_window;

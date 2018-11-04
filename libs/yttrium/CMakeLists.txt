@@ -58,6 +58,8 @@ if(UNIX)
 		endif()
 	else()
 		y_sources(yttrium "src/application/_xcb"
+			application/_xcb/application.cpp
+			application/_xcb/application.h
 			application/_xcb/window.cpp
 			application/_xcb/window.h
 			)
