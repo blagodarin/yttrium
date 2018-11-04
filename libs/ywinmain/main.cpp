@@ -1,8 +1,7 @@
+#include "../yttrium/application/_windows/api.h"
 #include "../yttrium/utils/memory.h"
 
 #include <vector>
-
-#include <windows.h>
 
 int main(int, char**);
 

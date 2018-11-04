@@ -1,7 +1,9 @@
-add_library(yttrium SHARED globals.cpp)
-source_group("src" FILES globals.cpp)
+add_library(yttrium SHARED main.cpp)
+source_group("src" FILES main.cpp)
 target_link_libraries(yttrium PRIVATE Threads::Threads)
-set_target_properties(yttrium PROPERTIES DEFINE_SYMBOL YTTRIUM_EXPORT FOLDER "libs")
+set_target_properties(yttrium PROPERTIES
+	DEFINE_SYMBOL YTTRIUM_EXPORT
+	FOLDER "libs")
 include_config(yttrium ${PROJECT_BINARY_DIR}/config.h)
 
 y_sources(yttrium "include"
