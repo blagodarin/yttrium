@@ -2,8 +2,8 @@ translation "examples/tetrium/data/i18n/en.ion"
 
 default font
 {
-	file "data/font.ytf"
-	texture "data/font.tga"
+	file "examples/tetrium/data/font.ytf"
+	texture "examples/tetrium/data/font.tga"
 }
 
 class "button"
