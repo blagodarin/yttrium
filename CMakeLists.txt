@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(yttrium CXX)
+project(yttrium VERSION 0.0.1 LANGUAGES CXX)
 
+include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -154,7 +155,7 @@ append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
 set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
-configure_file(config.h.in ${PROJECT_BINARY_DIR}/config.h)
+configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
@@ -202,3 +203,16 @@ if(Y_BUILD_ALL)
 			VERBATIM)
 	endif()
 endif()
+
+if(WIN32)
+	set(_cmake_config_dir ${CMAKE_INSTALL_PREFIX}/cmake)
+else()
+	set(_cmake_config_dir ${CMAKE_INSTALL_LIBDIR}/cmake/Yttrium)
+endif()
+configure_package_config_file(cmake/YttriumConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake
+	INSTALL_DESTINATION ${_cmake_config_dir})
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake COMPATIBILITY SameMinorVersion)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake
+	DESTINATION ${_cmake_config_dir})
+install(EXPORT YttriumTargets NAMESPACE Yttrium:: DESTINATION ${_cmake_config_dir})
