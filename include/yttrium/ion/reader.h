@@ -21,10 +21,10 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API IonReader
+	class Y_CORE_API IonReader
 	{
 	public:
-		struct Y_API Token
+		struct Y_CORE_API Token
 		{
 			enum class Type
 			{

@@ -21,7 +21,7 @@ namespace Yttrium
 	class Translation;
 
 	///
-	class Y_API ResourceLoader
+	class Y_ENGINE_API ResourceLoader
 	{
 	public:
 		///

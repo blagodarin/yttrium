@@ -29,7 +29,7 @@ namespace Yttrium
 	};
 
 	/// Script context.
-	class Y_API ScriptContext
+	class Y_CORE_API ScriptContext
 	{
 	public:
 		///

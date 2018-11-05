@@ -12,7 +12,7 @@ namespace Yttrium
 
 	///
 	/// Member functions may throw std::logic_error if the requested value or structure is not representable in ION.
-	class Y_API IonWriter
+	class Y_CORE_API IonWriter
 	{
 	public:
 		///

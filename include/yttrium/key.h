@@ -191,7 +191,7 @@ namespace Yttrium
 	constexpr auto KeyCount = to_underlying(Key::__Count);
 
 	/// %Key event.
-	class Y_API KeyEvent
+	class Y_ENGINE_API KeyEvent
 	{
 	public:
 		enum class Modifier

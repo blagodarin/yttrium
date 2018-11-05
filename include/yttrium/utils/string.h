@@ -15,10 +15,10 @@ namespace Yttrium
 		explicit Hex32(unsigned long value) noexcept : _value{static_cast<std::uint32_t>(value)} {}
 	};
 
-	Y_API void _append_to(std::string&, long long);
-	Y_API void _append_to(std::string&, unsigned long long);
-	Y_API void _append_to(std::string&, Hex32);
-	Y_API void _append_to(std::string&, double);
+	Y_CORE_API void _append_to(std::string&, long long);
+	Y_CORE_API void _append_to(std::string&, unsigned long long);
+	Y_CORE_API void _append_to(std::string&, Hex32);
+	Y_CORE_API void _append_to(std::string&, double);
 
 	inline void _append_to(std::string& string, char value) { string.append(1, value); }
 	inline void _append_to(std::string& string, int value) { _append_to(string, static_cast<long long>(value)); }

@@ -1,6 +1,6 @@
 #include <yttrium/storage/writer.h>
-#include "../../libs/yttrium/image/formats/dds.h"
-#include "../../libs/yttrium/image/formats/tga.h"
+#include "../../libs/core/image/formats/dds.h"
+#include "../../libs/core/image/formats/tga.h"
 #include "../yttrium/image_formats.h"
 
 #include <cstring>

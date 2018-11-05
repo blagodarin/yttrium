@@ -12,7 +12,7 @@ namespace Yttrium
 	class TemporaryFile;
 
 	/// Abstract interface to immutable data.
-	class Y_API Source
+	class Y_CORE_API Source
 	{
 	public:
 		/// Creates a Source from a custom data range. The data must stay valid for the lifetime of the Source.

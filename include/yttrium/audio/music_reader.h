@@ -10,7 +10,7 @@ namespace Yttrium
 	class Source;
 
 	/// Music data with corresponding audio decoder.
-	class Y_API MusicReader
+	class Y_ENGINE_API MusicReader
 	{
 	public:
 		///

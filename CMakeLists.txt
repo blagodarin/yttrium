@@ -159,22 +159,22 @@ configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# Tools that don't depend on Yttrium library.
+add_subdirectory(libs/core)
+
 if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
 endif()
 add_subdirectory(tools/yrc)
-
-add_subdirectory(libs/yttrium)
-
-# Tools that depend on Yttrium library.
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
+add_subdirectory(libs/engine)
+
+if(WIN32)
+	add_subdirectory(libs/winmain)
+endif()
+
 if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
-	if(WIN32)
-		add_subdirectory(libs/ywinmain)
-	endif()
 	add_subdirectory(examples/3d)
 	add_subdirectory(examples/tetrium)
 endif()
@@ -209,10 +209,14 @@ if(WIN32)
 else()
 	set(_cmake_config_dir ${CMAKE_INSTALL_LIBDIR}/cmake/Yttrium)
 endif()
+
 configure_package_config_file(cmake/YttriumConfig.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake
 	INSTALL_DESTINATION ${_cmake_config_dir})
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake COMPATIBILITY SameMinorVersion)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake
-	DESTINATION ${_cmake_config_dir})
+
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake
+	COMPATIBILITY SameMinorVersion)
+
+install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake DESTINATION ${_cmake_config_dir})
 install(EXPORT YttriumTargets NAMESPACE Yttrium:: DESTINATION ${_cmake_config_dir})

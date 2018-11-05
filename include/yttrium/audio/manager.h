@@ -11,7 +11,7 @@ namespace Yttrium
 	class Source;
 
 	/// Audio manager.
-	class Y_API AudioManager
+	class Y_ENGINE_API AudioManager
 	{
 	public:
 		///

@@ -1,13 +1,9 @@
 #include <yttrium/utils/string.h>
-#include "../../libs/yttrium/utils/string.h"
+#include "../../libs/core/utils/string.h"
 
 #include <cstring>
 
 #include <catch2/catch.hpp>
-
-#ifdef YTTRIUM_IMPORT
-	#include "../../libs/yttrium/utils/string.cpp"
-#endif
 
 TEST_CASE("utils_string.ends_with")
 {

@@ -17,7 +17,7 @@ namespace Yttrium
 	class TemporaryFile;
 
 	///
-	class Y_API Writer
+	class Y_CORE_API Writer
 	{
 	public:
 		/// Creates a Writer for a Buffer.

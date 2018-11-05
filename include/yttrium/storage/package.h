@@ -23,7 +23,7 @@ namespace Yttrium
 	};
 
 	/// Package reader interface.
-	class Y_API PackageReader
+	class Y_CORE_API PackageReader
 	{
 	public:
 		///
@@ -40,7 +40,7 @@ namespace Yttrium
 	};
 
 	/// Package writer interface.
-	class Y_API PackageWriter
+	class Y_CORE_API PackageWriter
 	{
 	public:
 		///

@@ -13,7 +13,7 @@ namespace Yttrium
 {
 	/// Memory buffer.
 	/// Buffer memory is allocated in whole pages making each allocation big and very aligned.
-	class Y_API Buffer
+	class Y_CORE_API Buffer
 	{
 	public:
 		/// Creates a buffer with no data.
@@ -74,7 +74,7 @@ namespace Yttrium
 		void* _data = nullptr;
 	};
 
-	Y_API bool operator==(const Buffer&, const Buffer&) noexcept;
+	Y_CORE_API bool operator==(const Buffer&, const Buffer&) noexcept;
 	inline bool operator!=(const Buffer& a, const Buffer& b) noexcept { return !(a == b); }
 }
 

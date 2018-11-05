@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 	///
-	class Y_API TinyStringMap
+	class Y_CORE_API TinyStringMap
 	{
 	public:
 		TinyStringMap() noexcept = default;

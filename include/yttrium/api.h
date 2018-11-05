@@ -12,10 +12,18 @@
 	#error
 #endif
 
-#if defined(YTTRIUM_EXPORT)
-	#define Y_API Y_EXPORT
-#elif defined(YTTRIUM_IMPORT)
-	#define Y_API Y_IMPORT
+#if defined(Y_CORE_EXPORT)
+	#define Y_CORE_API Y_EXPORT
+#elif defined(Y_CORE_IMPORT)
+	#define Y_CORE_API Y_IMPORT
 #else
-	#define Y_API
+	#define Y_CORE_API
+#endif
+
+#if defined(Y_ENGINE_EXPORT)
+	#define Y_ENGINE_API Y_EXPORT
+#elif defined(Y_ENGINE_IMPORT)
+	#define Y_ENGINE_API Y_IMPORT
+#else
+	#define Y_ENGINE_API
 #endif

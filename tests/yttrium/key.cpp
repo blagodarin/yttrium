@@ -1,10 +1,6 @@
-#include "../../libs/yttrium/gui/key_lookup.h"
+#include "../../libs/engine/gui/key_lookup.h"
 
 #include <catch2/catch.hpp>
-
-#ifdef YTTRIUM_IMPORT
-	#include "../../libs/yttrium/gui/key_lookup.cpp"
-#endif
 
 TEST_CASE("key_event")
 {

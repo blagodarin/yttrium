@@ -11,7 +11,7 @@ namespace Yttrium
 	class Source;
 
 	///
-	class Y_API Storage
+	class Y_CORE_API Storage
 	{
 	public:
 		///

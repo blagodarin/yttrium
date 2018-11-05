@@ -54,7 +54,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API Window
+	class Y_ENGINE_API Window
 	{
 	public:
 		///

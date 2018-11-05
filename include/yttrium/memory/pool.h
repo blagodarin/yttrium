@@ -11,7 +11,7 @@
 namespace Yttrium
 {
 	///
-	class Y_API PoolBase
+	class Y_CORE_API PoolBase
 	{
 	public:
 		///

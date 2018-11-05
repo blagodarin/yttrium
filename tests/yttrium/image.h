@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yttrium/image.h>
-#include "../../libs/yttrium/image/utils.h"
+#include "../../libs/core/image/utils.h"
 
 #include <cstring>
 

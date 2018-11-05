@@ -7,7 +7,7 @@
 
 namespace Yttrium
 {
-	class Y_API Application
+	class Y_ENGINE_API Application
 	{
 	public:
 		Application();

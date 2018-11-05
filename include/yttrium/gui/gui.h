@@ -18,7 +18,7 @@ namespace Yttrium
 	class ScriptContext;
 	class Vector2;
 
-	class Y_API Canvas
+	class Y_ENGINE_API Canvas
 	{
 	public:
 		virtual ~Canvas() = default;
@@ -27,7 +27,7 @@ namespace Yttrium
 		virtual bool on_mouse_press(const RectF&, Key, const Vector2&) { return false; }
 	};
 
-	class Y_API Gui
+	class Y_ENGINE_API Gui
 	{
 	public:
 		Gui(ResourceLoader&, ScriptContext&, std::string_view name);

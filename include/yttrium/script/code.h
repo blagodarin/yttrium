@@ -11,7 +11,7 @@ namespace Yttrium
 	class ScriptContext;
 
 	/// Parsed script code.
-	class Y_API ScriptCode
+	class Y_CORE_API ScriptCode
 	{
 	public:
 		ScriptCode();

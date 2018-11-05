@@ -15,7 +15,7 @@ namespace Yttrium
 	class SizeF;
 
 	/// Base class for RenderPass modifiers.
-	class Y_API RenderModifier
+	class Y_ENGINE_API RenderModifier
 	{
 	public:
 		RenderModifier(const RenderModifier&) = delete;
@@ -26,7 +26,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API Push2D : public RenderModifier
+	class Y_ENGINE_API Push2D : public RenderModifier
 	{
 	public:
 		///
@@ -37,7 +37,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API Push3D : public RenderModifier
+	class Y_ENGINE_API Push3D : public RenderModifier
 	{
 	public:
 		///
@@ -48,7 +48,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushProgram : public RenderModifier
+	class Y_ENGINE_API PushProgram : public RenderModifier
 	{
 	public:
 		///
@@ -59,7 +59,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushTexture : public RenderModifier
+	class Y_ENGINE_API PushTexture : public RenderModifier
 	{
 	public:
 		///
@@ -73,7 +73,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushMaterial : public RenderModifier
+	class Y_ENGINE_API PushMaterial : public RenderModifier
 	{
 	public:
 		///
@@ -89,7 +89,7 @@ namespace Yttrium
 	};
 
 	///
-	class Y_API PushTransformation : public RenderModifier
+	class Y_ENGINE_API PushTransformation : public RenderModifier
 	{
 	public:
 		/// Multiplies the current transformation matrix by the specified one,

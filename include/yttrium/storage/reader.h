@@ -15,7 +15,7 @@ namespace Yttrium
 	class Source;
 
 	///
-	class Y_API Reader
+	class Y_CORE_API Reader
 	{
 	public:
 		///

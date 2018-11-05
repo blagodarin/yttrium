@@ -11,7 +11,7 @@ namespace Yttrium
 	class MusicReader;
 
 	/// Audio player.
-	class Y_API AudioPlayer
+	class Y_ENGINE_API AudioPlayer
 	{
 	public:
 		///

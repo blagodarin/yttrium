@@ -11,7 +11,7 @@ namespace Yttrium
 	class Writer;
 
 	///
-	Y_API bool write_wav_header(Writer&, const AudioFormat&, size_t samples);
+	Y_ENGINE_API bool write_wav_header(Writer&, const AudioFormat&, size_t samples);
 }
 
 #endif

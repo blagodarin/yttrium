@@ -12,7 +12,7 @@
 namespace Yttrium
 {
 	///
-	class Y_API TemporaryFile
+	class Y_CORE_API TemporaryFile
 	{
 	public:
 		///

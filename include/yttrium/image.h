@@ -47,7 +47,7 @@ namespace Yttrium
 	};
 
 	/// Image format.
-	class Y_API ImageFormat
+	class Y_CORE_API ImageFormat
 	{
 	public:
 		///
@@ -116,7 +116,7 @@ namespace Yttrium
 	inline bool operator!=(const ImageFormat& a, const ImageFormat& b) noexcept { return !(a == b); }
 
 	///
-	class Y_API Image
+	class Y_CORE_API Image
 	{
 	public:
 		///
@@ -154,10 +154,10 @@ namespace Yttrium
 	};
 
 	///
-	Y_API Image to_bgra(const Image&);
+	Y_CORE_API Image to_bgra(const Image&);
 
 	///
-	Y_API std::optional<Image> intensity_to_bgra(const Image&);
+	Y_CORE_API std::optional<Image> intensity_to_bgra(const Image&);
 }
 
 #endif

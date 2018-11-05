@@ -11,7 +11,7 @@ namespace Yttrium
 	class Source;
 
 	/// Translation file.
-	class Y_API Translation
+	class Y_CORE_API Translation
 	{
 	public:
 		///

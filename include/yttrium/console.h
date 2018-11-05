@@ -11,7 +11,7 @@ namespace Yttrium
 	class RenderPass;
 	class ScriptContext;
 
-	class Y_API Console
+	class Y_ENGINE_API Console
 	{
 	public:
 		explicit Console(ScriptContext&);

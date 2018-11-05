@@ -15,7 +15,7 @@ namespace Yttrium
 	class TexturedRect;
 
 	/// Texture font markup.
-	class Y_API TextureFont
+	class Y_ENGINE_API TextureFont
 	{
 	public:
 		/// Font character information.

@@ -12,7 +12,7 @@ namespace Yttrium
 	class ScriptValue;
 
 	/// Script command arguments.
-	class Y_API ScriptArgs
+	class Y_CORE_API ScriptArgs
 	{
 	public:
 		std::size_t size() const noexcept { return _values.size(); }

@@ -16,7 +16,7 @@ namespace Yttrium
 	class ScriptParser;
 
 	/// Script value data.
-	class Y_API ScriptValue
+	class Y_CORE_API ScriptValue
 	{
 		friend ScriptArgs;
 		friend ScriptCodePrivate;
