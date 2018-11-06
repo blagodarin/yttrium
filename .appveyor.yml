@@ -13,8 +13,12 @@ skip_commits:
 
 environment:
   matrix:
-    - RENDERER: Null
-    - RENDERER: OpenGL
+    - DLL: ON
+      RENDERER: Null
+    - DLL: ON
+      RENDERER: OpenGL
+    - DLL: OFF
+      RENDERER: OpenGL
 
 cache:
   - _3rdparty\.cache
@@ -32,7 +36,7 @@ build_script:
   - cmd: |
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
-      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_BUILD_ALL=ON -DY_RENDERER=%RENDERER%
+      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DBUILD_SHARED_LIBS=%DLL% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_BUILD_ALL=ON -DY_RENDERER=%RENDERER%
       cmake --build . --config Release -- /nologo /verbosity:minimal
       cmake --build . --config Debug -- /nologo /verbosity:minimal
 

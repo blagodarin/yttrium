@@ -10,7 +10,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 RENDERER=Null Y3=catch2 COVERAGE=1
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=Null Y3=catch2,lcov COVERAGE=1
       addons: &gcc8_xcb
         apt:
           sources: &all_sources
@@ -27,7 +27,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Release DLL=ON RENDERER=OpenGL Y3=catch2
       addons: &gcc8_x11
         apt:
           sources: *all_sources
@@ -38,12 +38,42 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=OpenGL Y3=catch2
+      addons: *gcc8_x11
+
+    - os: linux
+      compiler: gcc
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=OpenGL Y3=catch2
+      addons: *gcc8_x11
+
+    - os: linux
+      compiler: gcc
+      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=OpenGL Y3=catch2
+      addons: *gcc8_x11
+
+    - os: linux
+      compiler: gcc
+      env: GCC=8 CONFIG=Release DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      addons: *gcc8_xcb
+
+    - os: linux
+      compiler: gcc
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      addons: *gcc8_xcb
+
+    - os: linux
+      compiler: gcc
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      addons: *gcc8_xcb
+
+    - os: linux
+      compiler: gcc
+      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 RENDERER=OpenGL Y3=catch2
+      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=OpenGL Y3=catch2
       addons: &clang6_x11
         apt:
           sources: *all_sources
@@ -55,7 +85,22 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=OpenGL Y3=catch2
+      addons: *clang6_x11
+
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=OpenGL Y3=catch2
+      addons: *clang6_x11
+
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=OpenGL Y3=catch2
+      addons: *clang6_x11
+
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
       addons: &clang6_xcb
         apt:
           sources: *all_sources
@@ -69,48 +114,44 @@ matrix:
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
 
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      addons: *clang6_xcb
+
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      addons: *clang6_xcb
+
+    - os: linux
+      compiler: clang
+      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      addons: *clang6_xcb
+
 before_install:
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC}; fi
 
 install:
-  # CMake.
   - mkdir "${HOME}/_cmake" && pushd "${HOME}/_cmake"
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
+  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.4-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
   - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
-  # Debug dependencies.
-  - if [ -z "${COVERAGE}" ]; then Y3_DEBUG="${Y3}"; fi
-  - if [ -n "${COVERAGE}" ]; then Y3_DEBUG="${Y3},lcov"; fi
-  - mkdir -p "${HOME}/.y3/debug" && pushd "${HOME}/.y3/debug"
-  - cmake -DBUILD=${Y3_DEBUG} -DCACHE="${HOME}/.y3/cache" -DCONFIG=Debug -P ${TRAVIS_BUILD_DIR}/bootstrap/get.cmake
-  - export PATH="$(pwd)/bin:${PATH}"
-  - popd
-
-  # Release rependencies.
-  - mkdir -p "${HOME}/.y3/release" && pushd "${HOME}/.y3/release"
-  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/.y3/cache" -DCONFIG=Release -P ${TRAVIS_BUILD_DIR}/bootstrap/get.cmake
+  - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
+  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/bootstrap/get.cmake"
   - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
 script:
-  # Release build.
-  - CMAKE_OPTIONS="-DY_BUILD_ALL=ON"
-  - cmake -H. -B"${HOME}/_build.release" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${HOME}/_install.release" -DCMAKE_PREFIX_PATH="${HOME}/.y3/release" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
-  - pushd "${HOME}/_build.release"
-  - cmake --build . -- -j2
-  - cmake --build . --target check
-  - cmake --build . --target install
-  - popd
-
-  # Debug build.
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_BUILD_ALL=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
-  - cmake -H. -B"${HOME}/_build.debug" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="${HOME}/_install.debug" -DCMAKE_PREFIX_PATH="${HOME}/.y3/debug" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
-  - pushd "${HOME}/_build.debug"
+  - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
+  - pushd "${HOME}/yttrium.build"
   - cmake --build . -- -j2
   - cmake --build . --target check
+  - if [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
