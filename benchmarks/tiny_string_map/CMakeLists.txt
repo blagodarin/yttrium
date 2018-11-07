@@ -1,5 +1,5 @@
 add_executable(benchmark_tiny_string_map
 	main.cpp
 	)
-target_link_libraries(benchmark_tiny_string_map YCore)
+target_link_libraries(benchmark_tiny_string_map ycore)
 set_target_properties(benchmark_tiny_string_map PROPERTIES FOLDER "benchmarks")

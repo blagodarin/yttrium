@@ -1,6 +1,6 @@
 add_executable(ytr
 	main.cpp
 	)
-target_link_libraries(ytr YCore)
+target_link_libraries(ytr ycore)
 set_target_properties(ytr PROPERTIES FOLDER "tools")
 install(TARGETS ytr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

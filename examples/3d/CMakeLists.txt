@@ -10,10 +10,10 @@ add_executable(3d WIN32
 	src/model.cpp
 	src/model.h
 	)
-target_link_libraries(3d YCore YEngine)
+target_link_libraries(3d ycore yengine)
 if(WIN32)
 	set_property(TARGET 3d APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
-	target_link_libraries(3d optimized YWinMain)
+	target_link_libraries(3d optimized ywinmain)
 endif()
 add_dependencies(3d 3d_package)
 

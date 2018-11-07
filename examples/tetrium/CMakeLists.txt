@@ -24,10 +24,10 @@ add_executable(tetrium WIN32
 	src/statistics.cpp
 	src/statistics.h
 	)
-target_link_libraries(tetrium YCore YEngine)
+target_link_libraries(tetrium ycore yengine)
 if(WIN32)
 	set_property(TARGET tetrium APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
-	target_link_libraries(tetrium optimized YWinMain)
+	target_link_libraries(tetrium optimized ywinmain)
 endif()
 add_dependencies(tetrium tetrium_package)
 
