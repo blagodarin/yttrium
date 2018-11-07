@@ -89,13 +89,10 @@ endif()
 ########################################################################################################################
 # audio
 y_sources(YEngine "include/audio"
-	../../include/yttrium/audio/format.h
 	../../include/yttrium/audio/manager.h
 	../../include/yttrium/audio/music_reader.h
 	../../include/yttrium/audio/player.h
-	../../include/yttrium/audio/reader.h
 	../../include/yttrium/audio/sound.h
-	../../include/yttrium/audio/utils.h
 	)
 y_sources(YEngine "src/audio"
 	audio/backend.h
@@ -105,16 +102,8 @@ y_sources(YEngine "src/audio"
 	audio/music_reader.h
 	audio/player.cpp
 	audio/player.h
-	audio/reader.cpp
-	audio/reader.h
 	audio/streamer.cpp
 	audio/streamer.h
-	audio/utils.cpp
-	)
-y_sources(YEngine "src/audio/formats"
-	audio/formats/wav_private.h
-	audio/formats/wav.cpp
-	audio/formats/wav.h
 	)
 if(WIN32)
 	y_sources(YEngine "src/audio/_wasapi"
@@ -139,21 +128,6 @@ else()
 		)
 	target_include_directories(YEngine SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
 	target_link_libraries(YEngine PRIVATE ${OPENAL_LIBRARY})
-endif()
-if(Y_USE_OGG_VORBIS)
-	if(WIN32)
-		find_package(Y3_vorbisfile REQUIRED)
-		target_link_libraries(YEngine PRIVATE Y3::vorbisfile)
-	else()
-		find_library(OGG_LIBRARY ogg)
-		find_library(VORBIS_LIBRARY vorbis)
-		find_library(VORBISFILE_LIBRARY vorbisfile)
-		target_link_libraries(YEngine PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
-	endif()
-	y_sources(YEngine "src/audio/formats"
-		audio/formats/ogg_vorbis.cpp
-		audio/formats/ogg_vorbis.h
-		)
 endif()
 
 ########################################################################################################################
@@ -266,6 +240,17 @@ if(Y_RENDERER_OPENGL)
 		renderer/_opengl/2d_vs.glsl
 		)
 	target_link_libraries(YEngine PRIVATE OpenGL::GL)
+	if(WIN32)
+		find_path(GLEXT_INCLUDE_DIR GL/glext.h)
+		find_path(WGLEXT_INCLUDE_DIR GL/wglext.h)
+		if(NOT GLEXT_INCLUDE_DIR)
+			message(SEND_ERROR "Unable to find <GL/glext.h>")
+		endif()
+		if(NOT WGLEXT_INCLUDE_DIR)
+			message(SEND_ERROR "Unable to find <GL/wglext.h>")
+		endif()
+		target_include_directories(YEngine SYSTEM PRIVATE ${GLEXT_INCLUDE_DIR} ${WGLEXT_INCLUDE_DIR})
+	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set_property(SOURCE renderer/_opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()

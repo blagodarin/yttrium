@@ -16,6 +16,39 @@ y_sources(YCore "include"
 	)
 
 ########################################################################################################################
+# audio
+y_sources(YCore "include/audio"
+	../../include/yttrium/audio/format.h
+	../../include/yttrium/audio/reader.h
+	../../include/yttrium/audio/utils.h
+	)
+y_sources(YCore "src/audio"
+	audio/reader.cpp
+	audio/reader.h
+	audio/utils.cpp
+	)
+y_sources(YCore "src/audio/formats"
+	audio/formats/wav_private.h
+	audio/formats/wav.cpp
+	audio/formats/wav.h
+	)
+if(Y_USE_OGG_VORBIS)
+	if(WIN32)
+		find_package(Y3_vorbisfile REQUIRED)
+		target_link_libraries(YCore PRIVATE Y3::vorbisfile)
+	else()
+		find_library(OGG_LIBRARY ogg)
+		find_library(VORBIS_LIBRARY vorbis)
+		find_library(VORBISFILE_LIBRARY vorbisfile)
+		target_link_libraries(YCore PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
+	endif()
+	y_sources(YCore "src/audio/formats"
+		audio/formats/ogg_vorbis.cpp
+		audio/formats/ogg_vorbis.h
+		)
+endif()
+
+########################################################################################################################
 # image
 y_sources(YCore "include"
 	../../include/yttrium/image.h
