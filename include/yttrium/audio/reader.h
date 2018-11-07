@@ -11,7 +11,7 @@ namespace Yttrium
 	class Source;
 
 	/// Read-only audio file access interface.
-	class Y_ENGINE_API AudioReader
+	class Y_CORE_API AudioReader
 	{
 	public:
 		///
