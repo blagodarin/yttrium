@@ -75,6 +75,8 @@ elseif(WIN32)
 		application/_windows/api.h
 		application/_windows/com.cpp
 		application/_windows/com.h
+		application/_windows/error.cpp
+		application/_windows/error.h
 		application/_windows/window.cpp
 		application/_windows/window.h
 		)

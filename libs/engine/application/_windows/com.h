@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include <comip.h>
 
 namespace Yttrium
@@ -18,6 +16,4 @@ namespace Yttrium
 
 	template <typename T>
 	using ComPtr = _com_ptr_t<_com_IIID<T, &__uuidof(T)>>;
-
-	std::string hresult_to_string(HRESULT);
 }

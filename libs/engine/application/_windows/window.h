@@ -48,9 +48,9 @@ namespace Yttrium
 		{
 		public:
 			WindowClass(HINSTANCE, WNDPROC);
-			~WindowClass();
-			HINSTANCE hinstance() const { return _hinstance; }
-			const char* name() const { return _wndclass.lpszClassName; }
+			~WindowClass() noexcept;
+			HINSTANCE hinstance() const noexcept { return _hinstance; }
+			const char* name() const noexcept { return _wndclass.lpszClassName; }
 		private:
 			const HINSTANCE _hinstance;
 			const EmptyCursor _empty_cursor{_hinstance};
@@ -61,20 +61,20 @@ namespace Yttrium
 		{
 		public:
 			WindowHandle(const WindowClass&, const char* title, void* user_data);
-			~WindowHandle();
+			~WindowHandle() noexcept { reset(); }
+			void reset() noexcept;
 			operator HWND() const { return _hwnd; }
 		private:
-			const HWND _hwnd;
+			HWND _hwnd = NULL;
+			HDC _hdc = NULL;
 		};
 
 		class WindowDC
 		{
 		public:
-			explicit WindowDC(const WindowHandle&);
-			~WindowDC();
-			operator HDC() const { return _hdc; }
+			explicit WindowDC(HWND);
+			operator HDC() const noexcept { return _hdc; }
 		private:
-			const WindowHandle& _hwnd;
 			const HDC _hdc;
 		};
 
@@ -84,7 +84,7 @@ namespace Yttrium
 		std::optional<Size> _size;
 		const HINSTANCE _hinstance = ::GetModuleHandleA(nullptr);
 		const WindowClass _wndclass{_hinstance, reinterpret_cast<WNDPROC>(static_window_proc)};
-		const WindowHandle _hwnd{_wndclass, _name.c_str(), this};
+		WindowHandle _hwnd{_wndclass, _name.c_str(), this};
 		const WindowDC _hdc{_hwnd};
 #if Y_RENDERER_OPENGL
 		const WglContext _wgl{_hdc};

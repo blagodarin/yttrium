@@ -5,6 +5,7 @@
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include "../window_callbacks.h"
+#include "error.h"
 
 #include <cassert>
 #include <vector>
@@ -86,35 +87,36 @@ namespace
 	}
 
 #ifdef NDEBUG
-	void check_error(bool, std::string_view)
+	void check(bool, std::string_view, int) noexcept
 	{
 	}
 #else
-	void check_error(bool condition, std::string_view function)
+	void check(bool condition, std::string_view function, int line)
 	{
-		if (condition)
-		{
-			const auto error = ::GetLastError();
-			try
+		if (!condition)
+			if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
 			{
-				std::cerr << Yttrium::make_string(function, " failed: Error 0x", Hex32{error}, '.') << std::endl;
+				try
+				{
+					std::cerr << make_string("[:", line, "] ", function, " failed: ") << error_to_string(error) << std::endl;
+				}
+				catch (const std::bad_alloc&)
+				{
+				}
 			}
-			catch (const std::bad_alloc&)
-			{
-			}
-		}
 	}
 #endif
 
-	void report_error(bool condition, std::string_view function)
+	void verify(bool condition, std::string_view function, int line)
 	{
-		if (condition)
-		{
-			const auto error = ::GetLastError();
-			throw InitializationError{function, " failed: Error 0x", Hex32{error}, '.'};
-		}
+		if (!condition)
+			if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
+				throw InitializationError{ "[:", line, "] ", function, " failed: ", error_to_string(error) };
 	}
 }
+
+#define Y_CHECK(condition, function) ::check(condition, function, __LINE__)
+#define Y_VERIFY(condition, function) ::verify(condition, function, __LINE__)
 
 namespace Yttrium
 {
@@ -125,12 +127,12 @@ namespace Yttrium
 		std::vector<std::uint8_t> and_mask(width * height / 8, 0xff);
 		std::vector<std::uint8_t> xor_mask(width * height / 8, 0x00);
 		_handle = ::CreateCursor(hinstance, 0, 0, width, height, and_mask.data(), xor_mask.data());
-		::report_error(!_handle, "CreateCursor");
+		Y_VERIFY(_handle, "CreateCursor");
 	}
 
 	WindowBackend::EmptyCursor::~EmptyCursor() noexcept
 	{
-		::check_error(!::DestroyCursor(_handle), "DestroyCursor");
+		Y_CHECK(::DestroyCursor(_handle), "DestroyCursor");
 	}
 
 	WindowBackend::WindowClass::WindowClass(HINSTANCE hinstance, WNDPROC wndproc)
@@ -143,36 +145,31 @@ namespace Yttrium
 		_wndclass.hCursor = _empty_cursor;
 		_wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		_wndclass.lpszClassName = "Yttrium";
-		::report_error(!::RegisterClassExA(&_wndclass), "RegisterClassEx");
+		Y_VERIFY(::RegisterClassExA(&_wndclass), "RegisterClassEx");
 	}
 
 	WindowBackend::WindowClass::~WindowClass()
 	{
-		::check_error(!::UnregisterClassA(_wndclass.lpszClassName, _hinstance), "UnregisterClass");
+		Y_CHECK(::UnregisterClassA(_wndclass.lpszClassName, _hinstance), "UnregisterClass");
 	}
 
 	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
 		: _hwnd{::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data)}
 	{
-		::report_error(!_hwnd, "CreateWindowEx");
+		Y_VERIFY(_hwnd, "CreateWindowEx");
 	}
 
-	WindowBackend::WindowHandle::~WindowHandle()
+	void WindowBackend::WindowHandle::reset() noexcept
 	{
-		::check_error(!::DestroyWindow(_hwnd), "DestroyWindow");
+		if (_hwnd)
+			Y_CHECK(::DestroyWindow(std::exchange(_hwnd, {})), "DestroyWindow");
 	}
 
-	WindowBackend::WindowDC::WindowDC(const WindowHandle& hwnd)
-		: _hwnd{hwnd}
-		, _hdc{::GetDC(_hwnd)}
+	WindowBackend::WindowDC::WindowDC(HWND hwnd)
+		: _hdc{::GetDC(hwnd)} // Private DCs don't need to be released.
 	{
 		if (!_hdc)
 			throw InitializationError{"GetDC failed"};
-	}
-
-	WindowBackend::WindowDC::~WindowDC()
-	{
-		::ReleaseDC(_hwnd, _hdc);
 	}
 
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
@@ -237,7 +234,7 @@ namespace Yttrium
 		switch (msg)
 		{
 		case WM_CLOSE:
-			::check_error(!::DestroyWindow(hwnd), "DestroyWindow");
+			_hwnd.reset();
 			break;
 
 		case WM_DESTROY:
