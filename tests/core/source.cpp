@@ -1,8 +1,8 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
+#include "../common/utils.h"
 #include "iostream.h"
-#include "test_utils.h"
 
 #include <cstring>
 

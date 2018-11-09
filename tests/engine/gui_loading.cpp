@@ -5,7 +5,7 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/storage/storage.h>
-#include "test_utils.h"
+#include "../common/utils.h"
 
 #include <unordered_map>
 

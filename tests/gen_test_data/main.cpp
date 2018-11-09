@@ -1,7 +1,7 @@
 #include <yttrium/storage/writer.h>
 #include "../../libs/core/image/formats/dds.h"
 #include "../../libs/core/image/formats/tga.h"
-#include "../yttrium/image_formats.h"
+#include "../core/image_formats.h"
 
 #include <cstring>
 

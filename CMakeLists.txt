@@ -181,7 +181,14 @@ endif()
 
 if(Y_BUILD_TESTS OR Y_BUILD_ALL)
 	find_package(Catch2 2.3.0 REQUIRED)
-	add_subdirectory(tests/yttrium)
+	add_subdirectory(tests/common)
+	add_subdirectory(tests/core)
+	add_subdirectory(tests/engine)
+	add_custom_target(check
+		COMMAND ycore_tests
+		COMMAND yengine_tests
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+	set_target_properties(check PROPERTIES FOLDER "tests")
 endif()
 
 if(Y_BUILD_ALL)
