@@ -84,28 +84,39 @@ namespace Yttrium
 
 	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
-		Draw2D draw{_data._vertices_2d, _data._indices_2d};
+		using Vertex2D = RenderBackend::Vertex2D;
 
-		RenderBackend::Vertex2D vertex;
-		vertex.color = color;
+		const auto next_index = _data._vertices_2d.size() / sizeof(Vertex2D);
+		if (next_index > std::numeric_limits<std::uint16_t>::max() - 4)
+			return;
 
-		vertex.position = quad._a;
-		vertex.texture = _texture_rect.top_left();
-		draw._vertices << vertex;
+		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(Vertex2D) * 4;
+		const auto extra_indices = next_index > 0 ? ((_data._indices_2d.size() / sizeof(std::uint16_t)) & 1 ? 3u : 2u) : 0u;
+		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * (4 + extra_indices);
 
-		vertex.position = quad._d;
-		vertex.texture = _texture_rect.bottom_left();
-		draw._vertices << vertex;
+		_data._vertices_2d.reserve(vertex_buffer_size);
+		_data._indices_2d.reserve(index_buffer_size);
 
-		vertex.position = quad._b;
-		vertex.texture = _texture_rect.top_right();
-		draw._vertices << vertex;
+		auto* const vertex_data = reinterpret_cast<Vertex2D*>(_data._vertices_2d.end());
+		_data._vertices_2d.resize(vertex_buffer_size);
+		vertex_data[0] = {quad._a, color, _texture_rect.top_left()};
+		vertex_data[1] = {quad._d, color, _texture_rect.bottom_left()};
+		vertex_data[2] = {quad._b, color, _texture_rect.top_right()};
+		vertex_data[3] = {quad._c, color, _texture_rect.bottom_right()};
 
-		vertex.position = quad._c;
-		vertex.texture = _texture_rect.bottom_right();
-		draw._vertices << vertex;
-
-		draw._indices << draw._index << static_cast<uint16_t>(draw._index + 1) << static_cast<uint16_t>(draw._index + 2) << static_cast<uint16_t>(draw._index + 3);
+		auto* index_data = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
+		_data._indices_2d.resize(index_buffer_size);
+		if (next_index > 0)
+		{
+			*index_data++ = static_cast<std::uint16_t>(next_index - 1);
+			*index_data++ = static_cast<std::uint16_t>(next_index);
+			if (extra_indices == 3)
+				*index_data++ = static_cast<std::uint16_t>(next_index);
+		}
+		*index_data++ = static_cast<std::uint16_t>(next_index);
+		*index_data++ = static_cast<std::uint16_t>(next_index + 1);
+		*index_data++ = static_cast<std::uint16_t>(next_index + 2);
+		*index_data++ = static_cast<std::uint16_t>(next_index + 3);
 	}
 
 	void RenderPassImpl::draw_rect(const RectF& rect, const Color4f& color)
