@@ -7,7 +7,7 @@ namespace Yttrium
 	class ComInitializer
 	{
 	public:
-		ComInitializer(DWORD coinit);
+		explicit ComInitializer(DWORD coinit);
 		~ComInitializer() noexcept { ::CoUninitialize(); }
 
 		ComInitializer(const ComInitializer&) = delete;

@@ -37,7 +37,7 @@ namespace Yttrium
 		class EmptyCursor
 		{
 		public:
-			EmptyCursor(HINSTANCE);
+			explicit EmptyCursor(HINSTANCE);
 			~EmptyCursor() noexcept;
 			operator HCURSOR() const noexcept { return _handle; }
 		private:
