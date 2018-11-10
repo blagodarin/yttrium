@@ -140,17 +140,17 @@ install:
   - popd
 
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
-  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/bootstrap/get.cmake"
+  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
   - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
 script:
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_BUILD_ALL=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_BUILD_TESTS=ON -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
-  - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" $CMAKE_OPTIONS -DY_RENDERER=${RENDERER}
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS="-DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
+  - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" ${CMAKE_OPTIONS} -DY_RENDERER=${RENDERER}
   - pushd "${HOME}/yttrium.build"
   - cmake --build . -- -j2
-  - cmake --build . --target check
+  - ctest --output-on-failure
   - if [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd

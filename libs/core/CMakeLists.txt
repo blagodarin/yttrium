@@ -40,6 +40,7 @@ if(Y_USE_OGG_VORBIS)
 		find_library(OGG_LIBRARY ogg)
 		find_library(VORBIS_LIBRARY vorbis)
 		find_library(VORBISFILE_LIBRARY vorbisfile)
+		mark_as_advanced(OGG_LIBRARY VORBIS_LIBRARY VORBISFILE_LIBRARY)
 		target_link_libraries(ycore PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
 	endif()
 	y_sources(ycore "src/audio/formats"

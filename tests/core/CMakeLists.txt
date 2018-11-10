@@ -29,3 +29,4 @@ add_executable(ycore_tests
 target_link_libraries(ycore_tests PRIVATE ycore ytest)
 set_target_properties(ycore_tests PROPERTIES FOLDER "tests")
 include_config(ycore_tests ${PROJECT_BINARY_DIR}/config.h)
+add_test(NAME ycore COMMAND ycore_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

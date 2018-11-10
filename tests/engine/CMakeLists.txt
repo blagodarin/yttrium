@@ -7,3 +7,4 @@ add_executable(yengine_tests
 target_link_libraries(yengine_tests PRIVATE ycore yengine ytest)
 set_target_properties(yengine_tests PROPERTIES FOLDER "tests")
 include_config(yengine_tests ${PROJECT_BINARY_DIR}/config.h)
+add_test(NAME yengine COMMAND yengine_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

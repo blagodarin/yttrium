@@ -28,7 +28,7 @@ install:
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
       if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
       cd %PREFIX_DIR%
-      cmake -DBUILD=catch2,jpeg,png,vorbis,opengl -P %APPVEYOR_BUILD_FOLDER%\bootstrap\get.cmake
+      cmake -DBUILD=catch2,jpeg,png,vorbis,opengl -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
       rmdir /s /q .build
       rmdir /s /q .trash
 
@@ -36,11 +36,11 @@ build_script:
   - cmd: |
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
-      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DBUILD_SHARED_LIBS=%DLL% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_BUILD_ALL=ON -DY_RENDERER=%RENDERER%
+      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON -DBUILD_SHARED_LIBS=%DLL% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
       cmake --build . --config Release -- /nologo /verbosity:minimal
       cmake --build . --config Debug -- /nologo /verbosity:minimal
 
 test_script:
   - cmd: |
-      cmake --build . --config Release --target check -- /nologo /verbosity:minimal
-      cmake --build . --config Debug --target check -- /nologo /verbosity:minimal
+      ctest --build-config Release --output-on-failure
+      ctest --build-config Debug --output-on-failure

@@ -3,13 +3,14 @@ cmake_minimum_required(VERSION 3.7)
 project(yttrium VERSION 0.0.1 LANGUAGES CXX)
 
 include(CMakePackageConfigHelpers)
+include(CTest)
 include(GNUInstallDirs)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/bootstrap/modules)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/y3/modules ${PROJECT_SOURCE_DIR}/cmake/modules)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
@@ -19,11 +20,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(cmake/utils.cmake)
 
+option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXTRAS "Build all extra stuff" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-
-option(Y_BUILD_ALL "Build everything" OFF)
-option(Y_BUILD_EXAMPLES "Build examples" OFF)
-option(Y_BUILD_TESTS "Build tests" OFF)
+option(ENABLE_CPPCHECK "Enable 'cppcheck' target" OFF)
 
 option(Y_USE_JPEG "Include JPEG support" ON)
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
@@ -174,12 +174,7 @@ if(WIN32)
 	add_subdirectory(libs/winmain)
 endif()
 
-if(Y_BUILD_EXAMPLES OR Y_BUILD_ALL)
-	add_subdirectory(examples/3d)
-	add_subdirectory(examples/tetrium)
-endif()
-
-if(Y_BUILD_TESTS OR Y_BUILD_ALL)
+if(BUILD_TESTING)
 	find_package(Catch2 2.3.0 REQUIRED)
 	add_subdirectory(tests/common)
 	add_subdirectory(tests/core)
@@ -191,12 +186,20 @@ if(Y_BUILD_TESTS OR Y_BUILD_ALL)
 	set_target_properties(check PROPERTIES FOLDER "tests")
 endif()
 
-if(Y_BUILD_ALL)
+if(BUILD_EXAMPLES)
+	add_subdirectory(examples/3d)
+	add_subdirectory(examples/tetrium)
+endif()
+
+if(BUILD_EXTRAS)
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/tiny_string_map)
 	add_subdirectory(tests/gen_test_data)
+endif()
 
+if(ENABLE_CPPCHECK)
 	find_program(CPPCHECK_EXECUTABLE cppcheck)
+	mark_as_advanced(CPPCHECK_EXECUTABLE)
 	if(CPPCHECK_EXECUTABLE)
 		add_custom_target(cppcheck
 			COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
