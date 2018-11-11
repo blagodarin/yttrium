@@ -80,7 +80,7 @@ namespace Yttrium
 
 		RenderBuiltin& builtin() const noexcept { return _builtin; }
 		void draw_debug_text();
-		void draw_rect(const RectF& position, const Color4f& color, const RectF& texture) { draw_rect(position, color, texture, {}); }
+		void draw_rect(const RectF& position, const Color4f&, const RectF& texture);
 		void pop_program() noexcept;
 		void pop_projection() noexcept;
 		void pop_texture(Flags<Texture2D::Filter>) noexcept;
@@ -93,9 +93,12 @@ namespace Yttrium
 		Statistics statistics() const noexcept { return _statistics; }
 
 	private:
+		struct Batch2D;
+
 		const BackendTexture2D* current_texture_2d() const;
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
 		void flush_2d(); // TODO: 'noexcept' ('pop_*' functions require to be 'noexcept' to be used in destructors).
+		Batch2D prepare_batch_2d(std::size_t vertex_count, std::size_t index_count);
 		void reset_texture_state();
 		void update_state();
 

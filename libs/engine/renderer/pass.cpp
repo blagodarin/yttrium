@@ -27,6 +27,13 @@ namespace
 
 namespace Yttrium
 {
+	struct RenderPassImpl::Batch2D
+	{
+		RenderBackend::Vertex2D* _vertices = nullptr;
+		std::uint16_t* _indices = nullptr;
+		std::size_t _base_index = 0;
+	};
+
 	RenderPassData::RenderPassData() = default;
 
 	RenderPassData::~RenderPassData() noexcept = default;
@@ -63,34 +70,17 @@ namespace Yttrium
 
 	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
-		const auto base_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
-		if (base_index > std::numeric_limits<std::uint16_t>::max() - 4)
-			return;
+		const auto batch = prepare_batch_2d(4, 4);
 
-		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * 4;
-		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * (base_index > 0 ? 6 : 4);
+		batch._vertices[0] = { quad._a, color, _texture_rect.top_left() };
+		batch._vertices[1] = { quad._d, color, _texture_rect.bottom_left() };
+		batch._vertices[2] = { quad._b, color, _texture_rect.top_right() };
+		batch._vertices[3] = { quad._c, color, _texture_rect.bottom_right() };
 
-		_data._vertices_2d.reserve(vertex_buffer_size);
-		_data._indices_2d.reserve(index_buffer_size);
-
-		auto* const vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
-		_data._vertices_2d.resize(vertex_buffer_size);
-		vertices[0] = {quad._a, color, _texture_rect.top_left()};
-		vertices[1] = {quad._d, color, _texture_rect.bottom_left()};
-		vertices[2] = {quad._b, color, _texture_rect.top_right()};
-		vertices[3] = {quad._c, color, _texture_rect.bottom_right()};
-
-		auto* indices = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
-		_data._indices_2d.resize(index_buffer_size);
-		if (base_index > 0)
-		{
-			*indices++ = static_cast<std::uint16_t>(base_index - 1);
-			*indices++ = static_cast<std::uint16_t>(base_index);
-		}
-		indices[0] = static_cast<std::uint16_t>(base_index);
-		indices[1] = static_cast<std::uint16_t>(base_index + 1);
-		indices[2] = static_cast<std::uint16_t>(base_index + 2);
-		indices[3] = static_cast<std::uint16_t>(base_index + 3);
+		batch._indices[0] = static_cast<std::uint16_t>(batch._base_index);
+		batch._indices[1] = static_cast<std::uint16_t>(batch._base_index + 1);
+		batch._indices[2] = static_cast<std::uint16_t>(batch._base_index + 2);
+		batch._indices[3] = static_cast<std::uint16_t>(batch._base_index + 3);
 	}
 
 	void RenderPassImpl::draw_rect(const RectF& rect, const Color4f& color)
@@ -103,7 +93,7 @@ namespace Yttrium
 		const SizeF texture_size{current_texture_2d()->size()};
 		const Vector2 texture_scale{texture_size._width, texture_size._height};
 		for (const auto& rect : rects)
-			draw_rect(rect.geometry, color, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), {});
+			draw_rect(rect.geometry, color, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()));
 	}
 
 	Matrix4 RenderPassImpl::full_matrix() const
@@ -179,6 +169,21 @@ namespace Yttrium
 			debug.draw_text(0, top, {_data._debug_text.data() + line_begin, _data._debug_text.size() - line_begin});
 		}
 		flush_2d();
+	}
+
+	void RenderPassImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture)
+	{
+		auto batch = prepare_batch_2d(4, 4);
+
+		batch._vertices[0] = { position.top_left(), color, texture.top_left() };
+		batch._vertices[1] = { position.bottom_left(), color, texture.bottom_left() };
+		batch._vertices[2] = { position.top_right(), color, texture.top_right() };
+		batch._vertices[3] = { position.bottom_right(), color, texture.bottom_right() };
+
+		batch._indices[0] = static_cast<std::uint16_t>(batch._base_index);
+		batch._indices[1] = static_cast<std::uint16_t>(batch._base_index + 1);
+		batch._indices[2] = static_cast<std::uint16_t>(batch._base_index + 2);
+		batch._indices[3] = static_cast<std::uint16_t>(batch._base_index + 3);
 	}
 
 	void RenderPassImpl::pop_program() noexcept
@@ -321,17 +326,9 @@ namespace Yttrium
 		const auto row_vertices = 2 + static_cast<std::size_t>(has_left_border) + static_cast<std::size_t>(has_right_border);
 		const auto stripe_count = 1 + static_cast<std::size_t>(has_top_border) + static_cast<std::size_t>(has_bottom_border);
 		const auto vertex_count = row_vertices * (stripe_count + 1);
+		const auto index_count = 2 * (stripe_count * row_vertices + stripe_count - 1);
 
-		auto base_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
-		if (base_index > std::numeric_limits<std::uint16_t>::max() - vertex_count)
-			return;
-
-		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * vertex_count;
-		const auto index_count = 2 * (stripe_count - static_cast<std::size_t>(base_index == 0) + stripe_count * row_vertices);
-		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * index_count;
-
-		_data._vertices_2d.reserve(vertex_buffer_size);
-		_data._indices_2d.reserve(index_buffer_size);
+		auto batch = prepare_batch_2d(vertex_count, index_count);
 
 		const auto tx0 = texture.left();
 		const auto tx1 = texture.left() + borders._left;
@@ -343,54 +340,50 @@ namespace Yttrium
 		const auto ty2 = texture.bottom() - borders._bottom;
 		const auto ty3 = texture.bottom();
 
-		auto* vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
-		_data._vertices_2d.resize(vertex_buffer_size);
-		*vertices++ = { { px0, py0 }, color, { tx0, ty0 } };
+		*batch._vertices++ = { { px0, py0 }, color, { tx0, ty0 } };
 		if (has_left_border)
-			*vertices++ = { { px1, py0 }, color, { tx1, ty0 } };
+			*batch._vertices++ = { { px1, py0 }, color, { tx1, ty0 } };
 		if (has_right_border)
-			*vertices++ = { { px2, py0 }, color, { tx2, ty0 } };
-		*vertices++ = { { px3, py0 }, color, { tx3, ty0 } };
+			*batch._vertices++ = { { px2, py0 }, color, { tx2, ty0 } };
+		*batch._vertices++ = { { px3, py0 }, color, { tx3, ty0 } };
 		if (has_top_border)
 		{
-			*vertices++ = { { px0, py1 }, color, { tx0, ty1 } };
+			*batch._vertices++ = { { px0, py1 }, color, { tx0, ty1 } };
 			if (has_left_border)
-				*vertices++ = { { px1, py1 }, color, { tx1, ty1 } };
+				*batch._vertices++ = { { px1, py1 }, color, { tx1, ty1 } };
 			if (has_right_border)
-				*vertices++ = { { px2, py1 }, color, { tx2, ty1 } };
-			*vertices++ = { { px3, py1 }, color, { tx3, ty1 } };
+				*batch._vertices++ = { { px2, py1 }, color, { tx2, ty1 } };
+			*batch._vertices++ = { { px3, py1 }, color, { tx3, ty1 } };
 		}
 		if (has_bottom_border)
 		{
-			*vertices++ = { { px0, py2 }, color, { tx0, ty2 } };
+			*batch._vertices++ = { { px0, py2 }, color, { tx0, ty2 } };
 			if (has_left_border)
-				*vertices++ = { { px1, py2 }, color, { tx1, ty2 } };
+				*batch._vertices++ = { { px1, py2 }, color, { tx1, ty2 } };
 			if (has_right_border)
-				*vertices++ = { { px2, py2 }, color, { tx2, ty2 } };
-			*vertices++ = { { px3, py2 }, color, { tx3, ty2 } };
+				*batch._vertices++ = { { px2, py2 }, color, { tx2, ty2 } };
+			*batch._vertices++ = { { px3, py2 }, color, { tx3, ty2 } };
 		}
-		*vertices++ = { { px0, py3 }, color, { tx0, ty3 } };
+		*batch._vertices++ = { { px0, py3 }, color, { tx0, ty3 } };
 		if (has_left_border)
-			*vertices++ = { { px1, py3 }, color, { tx1, ty3 } };
+			*batch._vertices++ = { { px1, py3 }, color, { tx1, ty3 } };
 		if (has_right_border)
-			*vertices++ = { { px2, py3 }, color, { tx2, ty3 } };
-		*vertices = { { px3, py3 }, color, { tx3, ty3 } };
+			*batch._vertices++ = { { px2, py3 }, color, { tx2, ty3 } };
+		*batch._vertices = { { px3, py3 }, color, { tx3, ty3 } };
 
-		auto* indices = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
-		_data._indices_2d.resize(index_buffer_size);
 		for (std::size_t i = 0; i < stripe_count; ++i)
 		{
-			if (base_index > 0)
+			if (i > 0)
 			{
-				*indices++ = static_cast<std::uint16_t>(base_index + (i > 0 ? row_vertices : 0) - 1);
-				*indices++ = static_cast<std::uint16_t>(base_index);
+				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index + row_vertices - 1);
+				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index);
 			}
 			for (std::size_t j = 0; j < row_vertices; ++j)
 			{
-				*indices++ = static_cast<std::uint16_t>(base_index + j);
-				*indices++ = static_cast<std::uint16_t>(base_index + j + row_vertices);
+				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index + j);
+				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index + j + row_vertices);
 			}
-			base_index += row_vertices;
+			batch._base_index += row_vertices;
 		}
 	}
 
@@ -414,6 +407,30 @@ namespace Yttrium
 		const auto* texture = current_texture_2d();
 		_texture_rect = texture ? texture->full_rectangle() : RectF{};
 		_texture_borders = {};
+	}
+
+	RenderPassImpl::Batch2D RenderPassImpl::prepare_batch_2d(std::size_t vertex_count, std::size_t index_count)
+	{
+		auto next_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
+		if (next_index > std::numeric_limits<std::uint16_t>::max() - vertex_count)
+		{
+			flush_2d();
+			next_index = 0;
+		}
+		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * vertex_count;
+		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * (index_count + (next_index > 0 ? 2 : 0));
+		_data._vertices_2d.reserve(vertex_buffer_size);
+		_data._indices_2d.reserve(index_buffer_size);
+		auto* const vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
+		auto* indices = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
+		_data._vertices_2d.resize(vertex_buffer_size);
+		_data._indices_2d.resize(index_buffer_size);
+		if (next_index > 0)
+		{
+			*indices++ = static_cast<std::uint16_t>(next_index - 1);
+			*indices++ = static_cast<std::uint16_t>(next_index);
+		}
+		return { vertices, indices, next_index };
 	}
 
 	void RenderPassImpl::update_state()
