@@ -176,6 +176,7 @@ endif()
 
 if(BUILD_TESTING)
 	find_package(Catch2 2.3.0 REQUIRED)
+	mark_as_advanced(Catch2_DIR)
 	add_subdirectory(tests/common)
 	add_subdirectory(tests/core)
 	add_subdirectory(tests/engine)

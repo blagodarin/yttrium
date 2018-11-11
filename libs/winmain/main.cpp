@@ -1,9 +1,8 @@
 #include "../core/utils/memory.h"
-#include "../engine/application/_windows/api.h"
 
 #include <vector>
 
-#include <shellapi.h>
+#include <windows.h>
 
 int main(int, char**);
 

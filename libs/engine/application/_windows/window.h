@@ -1,7 +1,6 @@
 #pragma once
 
 #include <yttrium/math/size.h>
-#include "api.h"
 
 #if Y_RENDERER_OPENGL
 	#include "wgl.h"
@@ -9,6 +8,8 @@
 
 #include <optional>
 #include <string>
+
+#include <windows.h>
 
 namespace Yttrium
 {

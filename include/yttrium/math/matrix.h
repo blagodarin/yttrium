@@ -62,14 +62,14 @@ namespace Yttrium
 			};
 		}
 
-		static Matrix4 perspective(const SizeF& size, float vertical_fov, float near, float far) noexcept
+		static Matrix4 perspective(const SizeF& size, float vertical_fov, float near_plane, float far_plane) noexcept
 		{
 			const auto aspect = size._width / size._height;
 			const auto f = 1 / std::tan(vertical_fov / 360 * static_cast<float>(M_PI));
 			const auto xx = f / aspect;
 			const auto yy = f;
-			const auto zz = (near + far) / (near - far);
-			const auto tz = 2 * near * far / (near - far);
+			const auto zz = (near_plane + far_plane) / (near_plane - far_plane);
+			const auto tz = 2 * near_plane * far_plane / (near_plane - far_plane);
 			const auto zw = -1.f;
 			return
 			{
@@ -80,14 +80,14 @@ namespace Yttrium
 			};
 		}
 
-		static constexpr Matrix4 projection_2d(const SizeF& size, float near = -1.f, float far = 1.f) noexcept
+		static constexpr Matrix4 projection_2d(const SizeF& size, float near_plane = -1.f, float far_plane = 1.f) noexcept
 		{
 			const auto xx = 2 / size._width;
 			const auto yy = -2 / size._height;
-			const auto zz = -2 / (far - near);
+			const auto zz = -2 / (far_plane - near_plane);
 			const auto tx = -1.f;
 			const auto ty = 1.f;
-			const auto tz = (far + near) / (far - near);
+			const auto tz = (far_plane + near_plane) / (far_plane - near_plane);
 			return
 			{
 				xx, 0,  0,  tx,

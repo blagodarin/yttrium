@@ -14,6 +14,9 @@ y_sources(ycore "include"
 	../../include/yttrium/exceptions.h
 	../../include/yttrium/translation.h
 	)
+if(WIN32)
+	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+endif()
 
 ########################################################################################################################
 # audio

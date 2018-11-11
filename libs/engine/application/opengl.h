@@ -1,8 +1,7 @@
 #pragma once
 
-#if defined(_WIN32)
-	#include "_windows/api.h"
-	#define GLAPI_CALL APIENTRY
+#ifdef _WIN32
+	#define GLAPI_CALL __stdcall
 #else
 	#define GLAPI_CALL
 #endif

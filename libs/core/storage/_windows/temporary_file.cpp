@@ -3,7 +3,7 @@
 #include <array>
 #include <system_error>
 
-#include "../../../engine/application/_windows/api.h" // TODO: Remove YtEngine reference.
+#include <windows.h>
 
 namespace
 {

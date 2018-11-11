@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api.h"
+#include <windows.h>
 
 #include <GL/gl.h>
 #include <GL/wglext.h>

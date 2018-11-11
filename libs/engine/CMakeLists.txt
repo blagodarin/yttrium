@@ -13,6 +13,9 @@ y_sources(yengine "include"
 	../../include/yttrium/console.h
 	../../include/yttrium/resource_loader.h
 	)
+if(WIN32)
+	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+endif()
 
 ########################################################################################################################
 # application
@@ -72,7 +75,6 @@ if(UNIX)
 	endif()
 elseif(WIN32)
 	y_sources(yengine "src/application/_windows"
-		application/_windows/api.h
 		application/_windows/com.cpp
 		application/_windows/com.h
 		application/_windows/error.cpp
@@ -245,6 +247,7 @@ if(Y_RENDERER_OPENGL)
 	if(WIN32)
 		find_path(GLEXT_INCLUDE_DIR GL/glext.h)
 		find_path(WGLEXT_INCLUDE_DIR GL/wglext.h)
+		mark_as_advanced(GLEXT_INCLUDE_DIR WGLEXT_INCLUDE_DIR)
 		if(NOT GLEXT_INCLUDE_DIR)
 			message(SEND_ERROR "Unable to find <GL/glext.h>")
 		endif()

@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "../../../engine/application/_windows/api.h" // TODO: Remove YtEngine reference.
+#include <windows.h>
 
 namespace Yttrium
 {

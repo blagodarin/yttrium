@@ -2,7 +2,8 @@
 
 #include <yttrium/utils/string.h>
 #include "../../../core/utils/memory.h"
-#include "api.h"
+
+#include <windows.h>
 
 namespace Yttrium
 {
