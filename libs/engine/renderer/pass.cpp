@@ -16,28 +16,7 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	struct Draw2D
-	{
-		BufferAppender<RenderBackend::Vertex2D> _vertices;
-		BufferAppender<uint16_t> _indices;
-		uint16_t _index = static_cast<uint16_t>(_vertices.count());
-
-		Draw2D(Buffer& vertices, Buffer& indices)
-			: _vertices{vertices}
-			, _indices{indices}
-		{
-			if (_index > 0)
-			{
-				_indices << static_cast<uint16_t>(_index - 1) << (_index);
-				if (_indices.count() & 1)
-					_indices << (_index); // Extra degenerate to ensure correct face vertex ordering.
-			}
-		}
-	};
-
-	const Matrix4 _3d_directions // Makes Y point forward and Z point up.
+	const Yttrium::Matrix4 _3d_directions // Makes Y point forward and Z point up.
 	{
 		1,  0,  0,  0,
 		0,  0,  1,  0,
@@ -84,39 +63,34 @@ namespace Yttrium
 
 	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
 	{
-		using Vertex2D = RenderBackend::Vertex2D;
-
-		const auto next_index = _data._vertices_2d.size() / sizeof(Vertex2D);
-		if (next_index > std::numeric_limits<std::uint16_t>::max() - 4)
+		const auto base_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
+		if (base_index > std::numeric_limits<std::uint16_t>::max() - 4)
 			return;
 
-		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(Vertex2D) * 4;
-		const auto extra_indices = next_index > 0 ? ((_data._indices_2d.size() / sizeof(std::uint16_t)) & 1 ? 3u : 2u) : 0u;
-		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * (4 + extra_indices);
+		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * 4;
+		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * (base_index > 0 ? 6 : 4);
 
 		_data._vertices_2d.reserve(vertex_buffer_size);
 		_data._indices_2d.reserve(index_buffer_size);
 
-		auto* const vertex_data = reinterpret_cast<Vertex2D*>(_data._vertices_2d.end());
+		auto* const vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
 		_data._vertices_2d.resize(vertex_buffer_size);
-		vertex_data[0] = {quad._a, color, _texture_rect.top_left()};
-		vertex_data[1] = {quad._d, color, _texture_rect.bottom_left()};
-		vertex_data[2] = {quad._b, color, _texture_rect.top_right()};
-		vertex_data[3] = {quad._c, color, _texture_rect.bottom_right()};
+		vertices[0] = {quad._a, color, _texture_rect.top_left()};
+		vertices[1] = {quad._d, color, _texture_rect.bottom_left()};
+		vertices[2] = {quad._b, color, _texture_rect.top_right()};
+		vertices[3] = {quad._c, color, _texture_rect.bottom_right()};
 
-		auto* index_data = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
+		auto* indices = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
 		_data._indices_2d.resize(index_buffer_size);
-		if (next_index > 0)
+		if (base_index > 0)
 		{
-			*index_data++ = static_cast<std::uint16_t>(next_index - 1);
-			*index_data++ = static_cast<std::uint16_t>(next_index);
-			if (extra_indices == 3)
-				*index_data++ = static_cast<std::uint16_t>(next_index);
+			*indices++ = static_cast<std::uint16_t>(base_index - 1);
+			*indices++ = static_cast<std::uint16_t>(base_index);
 		}
-		*index_data++ = static_cast<std::uint16_t>(next_index);
-		*index_data++ = static_cast<std::uint16_t>(next_index + 1);
-		*index_data++ = static_cast<std::uint16_t>(next_index + 2);
-		*index_data++ = static_cast<std::uint16_t>(next_index + 3);
+		indices[0] = static_cast<std::uint16_t>(base_index);
+		indices[1] = static_cast<std::uint16_t>(base_index + 1);
+		indices[2] = static_cast<std::uint16_t>(base_index + 2);
+		indices[3] = static_cast<std::uint16_t>(base_index + 3);
 	}
 
 	void RenderPassImpl::draw_rect(const RectF& rect, const Color4f& color)
@@ -329,164 +303,102 @@ namespace Yttrium
 
 	void RenderPassImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
 	{
-		Draw2D draw{_data._vertices_2d, _data._indices_2d};
+		const auto px0 = position.left();
+		const auto px1 = position.left() + borders._left * static_cast<float>(current_texture_2d()->size()._width);
+		const auto px2 = position.right() - borders._right * static_cast<float>(current_texture_2d()->size()._width);
+		const auto px3 = position.right();
 
-		RenderBackend::Vertex2D vertex;
-		vertex.color = color;
+		const auto py0 = position.top();
+		const auto py1 = position.top() + borders._top * static_cast<float>(current_texture_2d()->size()._height);
+		const auto py2 = position.bottom() - borders._bottom * static_cast<float>(current_texture_2d()->size()._height);
+		const auto py3 = position.bottom();
 
-		float left_offset = 0;
-		float right_offset = 0;
+		const bool has_left_border = px0 != px1;
+		const bool has_right_border = px2 != px3;
+		const bool has_top_border = py0 != py1;
+		const bool has_bottom_border = py2 != py3;
 
-		// Outer top vertex row.
+		const auto row_vertices = 2 + static_cast<std::size_t>(has_left_border) + static_cast<std::size_t>(has_right_border);
+		const auto stripe_count = 1 + static_cast<std::size_t>(has_top_border) + static_cast<std::size_t>(has_bottom_border);
+		const auto vertex_count = row_vertices * (stripe_count + 1);
 
-		vertex.position.y = position.top();
-		vertex.texture.y = texture.top();
+		auto base_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
+		if (base_index > std::numeric_limits<std::uint16_t>::max() - vertex_count)
+			return;
 
-		vertex.position.x = position.left();
-		vertex.texture.x = texture.left();
-		draw._vertices << vertex;
+		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * vertex_count;
+		const auto index_count = 2 * (stripe_count - static_cast<std::size_t>(base_index == 0) + stripe_count * row_vertices);
+		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * index_count;
 
-		if (borders._left > 0)
+		_data._vertices_2d.reserve(vertex_buffer_size);
+		_data._indices_2d.reserve(index_buffer_size);
+
+		const auto tx0 = texture.left();
+		const auto tx1 = texture.left() + borders._left;
+		const auto tx2 = texture.right() - borders._right;
+		const auto tx3 = texture.right();
+
+		const auto ty0 = texture.top();
+		const auto ty1 = texture.top() + borders._top;
+		const auto ty2 = texture.bottom() - borders._bottom;
+		const auto ty3 = texture.bottom();
+
+		auto* vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
+		_data._vertices_2d.resize(vertex_buffer_size);
+		*vertices++ = { { px0, py0 }, color, { tx0, ty0 } };
+		if (has_left_border)
+			*vertices++ = { { px1, py0 }, color, { tx1, ty0 } };
+		if (has_right_border)
+			*vertices++ = { { px2, py0 }, color, { tx2, ty0 } };
+		*vertices++ = { { px3, py0 }, color, { tx3, ty0 } };
+		if (has_top_border)
 		{
-			left_offset = borders._left * static_cast<float>(current_texture_2d()->size()._width);
-
-			vertex.position.x = position.left() + left_offset;
-			vertex.texture.x = texture.left() + borders._left;
-			draw._vertices << vertex;
+			*vertices++ = { { px0, py1 }, color, { tx0, ty1 } };
+			if (has_left_border)
+				*vertices++ = { { px1, py1 }, color, { tx1, ty1 } };
+			if (has_right_border)
+				*vertices++ = { { px2, py1 }, color, { tx2, ty1 } };
+			*vertices++ = { { px3, py1 }, color, { tx3, ty1 } };
 		}
-
-		if (borders._right > 0)
+		if (has_bottom_border)
 		{
-			right_offset = borders._right * static_cast<float>(current_texture_2d()->size()._width);
-
-			vertex.position.x = position.right() - right_offset;
-			vertex.texture.x = texture.right() - borders._right;
-			draw._vertices << vertex;
+			*vertices++ = { { px0, py2 }, color, { tx0, ty2 } };
+			if (has_left_border)
+				*vertices++ = { { px1, py2 }, color, { tx1, ty2 } };
+			if (has_right_border)
+				*vertices++ = { { px2, py2 }, color, { tx2, ty2 } };
+			*vertices++ = { { px3, py2 }, color, { tx3, ty2 } };
 		}
+		*vertices++ = { { px0, py3 }, color, { tx0, ty3 } };
+		if (has_left_border)
+			*vertices++ = { { px1, py3 }, color, { tx1, ty3 } };
+		if (has_right_border)
+			*vertices++ = { { px2, py3 }, color, { tx2, ty3 } };
+		*vertices = { { px3, py3 }, color, { tx3, ty3 } };
 
-		vertex.position.x = position.right();
-		vertex.texture.x = texture.right();
-		draw._vertices << vertex;
-
-		// Top/only part indices.
-
-		const auto row_vertices = static_cast<uint16_t>(draw._vertices.count() - draw._index);
-		for (uint16_t i = 0; i < row_vertices; ++i)
-			draw._indices << static_cast<uint16_t>(draw._index + i) << static_cast<uint16_t>(draw._index + i + row_vertices);
-
-		if (borders._top > 0)
+		auto* indices = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
+		_data._indices_2d.resize(index_buffer_size);
+		for (std::size_t i = 0; i < stripe_count; ++i)
 		{
-			float top_offset = borders._top * static_cast<float>(current_texture_2d()->size()._height);
-
-			// Inner top vertex row.
-
-			vertex.position.y = position.top() + top_offset;
-			vertex.texture.y = texture.top() + borders._top;
-
-			vertex.position.x = position.left();
-			vertex.texture.x = texture.left();
-			draw._vertices << vertex;
-
-			if (borders._left > 0)
+			if (base_index > 0)
 			{
-				vertex.position.x = position.left() + left_offset;
-				vertex.texture.x = texture.left() + borders._left;
-				draw._vertices << vertex;
+				*indices++ = static_cast<std::uint16_t>(base_index + (i > 0 ? row_vertices : 0) - 1);
+				*indices++ = static_cast<std::uint16_t>(base_index);
 			}
-
-			if (borders._right > 0)
+			for (std::size_t j = 0; j < row_vertices; ++j)
 			{
-				vertex.position.x = position.right() - right_offset;
-				vertex.texture.x = texture.right() - borders._right;
-				draw._vertices << vertex;
+				*indices++ = static_cast<std::uint16_t>(base_index + j);
+				*indices++ = static_cast<std::uint16_t>(base_index + j + row_vertices);
 			}
-
-			vertex.position.x = position.right();
-			vertex.texture.x = texture.right();
-			draw._vertices << vertex;
-
-			// Middle/bottom part indices.
-
-			draw._index = static_cast<uint16_t>(draw._index + row_vertices);
-			draw._indices << static_cast<uint16_t>(draw._index + row_vertices - 1) << (draw._index);
-			for (uint16_t i = 0; i < row_vertices; ++i)
-				draw._indices << static_cast<uint16_t>(draw._index + i) << static_cast<uint16_t>(draw._index + i + row_vertices);
+			base_index += row_vertices;
 		}
-
-		if (borders._bottom > 0)
-		{
-			float bottom_offset = borders._bottom * static_cast<float>(current_texture_2d()->size()._height);
-
-			// Inner bottom vertex row.
-
-			vertex.position.y = position.bottom() - bottom_offset;
-			vertex.texture.y = texture.bottom() - borders._bottom;
-
-			vertex.position.x = position.left();
-			vertex.texture.x = texture.left();
-			draw._vertices << vertex;
-
-			if (borders._left > 0)
-			{
-				vertex.position.x = position.left() + left_offset;
-				vertex.texture.x = texture.left() + borders._left;
-				draw._vertices << vertex;
-			}
-
-			if (borders._right > 0)
-			{
-				vertex.position.x = position.right() - right_offset;
-				vertex.texture.x = texture.right() - borders._right;
-				draw._vertices << vertex;
-			}
-
-			vertex.position.x = position.right();
-			vertex.texture.x = texture.right();
-			draw._vertices << vertex;
-
-			// Bottom part indices.
-
-			draw._index = static_cast<uint16_t>(draw._index + row_vertices);
-			draw._indices << static_cast<uint16_t>(draw._index + row_vertices - 1) << draw._index;
-			for (uint16_t i = 0; i < row_vertices; ++i)
-				draw._indices << static_cast<uint16_t>(draw._index + i) << static_cast<uint16_t>(draw._index + i + row_vertices);
-		}
-
-		// Outer bottom vertex row.
-
-		vertex.position.y = position.bottom();
-		vertex.texture.y = texture.bottom();
-
-		vertex.position.x = position.left();
-		vertex.texture.x = texture.left();
-		draw._vertices << vertex;
-
-		if (borders._left > 0)
-		{
-			vertex.position.x = position.left() + left_offset;
-			vertex.texture.x = texture.left() + borders._left;
-			draw._vertices << vertex;
-		}
-
-		if (borders._right > 0)
-		{
-			vertex.position.x = position.right() - right_offset;
-			vertex.texture.x = texture.right() - borders._right;
-			draw._vertices << vertex;
-		}
-
-		vertex.position.x = position.right();
-		vertex.texture.x = texture.right();
-		draw._vertices << vertex;
 	}
 
 	void RenderPassImpl::flush_2d()
 	{
+		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= std::size_t{std::numeric_limits<uint16_t>::max()} + 1);
 		if (_data._vertices_2d.size() == 0)
 			return;
-
-		if (_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) > std::numeric_limits<uint16_t>::max())
-			throw std::runtime_error("2D vertex buffer size exceeds 16-bit indexing limitations");
 
 		_builtin._program_2d->set_uniform("mvp", full_matrix());
 		update_state();
