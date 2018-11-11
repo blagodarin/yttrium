@@ -10,7 +10,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=Null Y3=catch2,lcov COVERAGE=1
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
       addons: &gcc8_xcb
         apt:
           sources: &all_sources
@@ -27,7 +27,7 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=ON RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
       addons: &gcc8_x11
         apt:
           sources: *all_sources
@@ -38,42 +38,42 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=OpenGL Y3=catch2
+      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=OpenGL Y3=catch2
+      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
       addons: &clang6_x11
         apt:
           sources: *all_sources
@@ -85,22 +85,22 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=OpenGL Y3=catch2
+      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
       addons: *clang6_x11
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=OpenGL Y3=catch2
+      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
       addons: *clang6_x11
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=OpenGL Y3=catch2
+      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
       addons: *clang6_x11
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: &clang6_xcb
         apt:
           sources: *all_sources
@@ -116,17 +116,17 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang6_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang6_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=Vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang6_xcb
 
 before_install:

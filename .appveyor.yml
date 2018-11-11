@@ -14,11 +14,11 @@ skip_commits:
 environment:
   matrix:
     - DLL: ON
-      RENDERER: Null
+      RENDERER: null
     - DLL: ON
-      RENDERER: OpenGL
+      RENDERER: opengl
     - DLL: OFF
-      RENDERER: OpenGL
+      RENDERER: opengl
 
 cache:
   - _3rdparty\.cache
