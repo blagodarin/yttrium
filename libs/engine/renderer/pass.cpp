@@ -387,7 +387,7 @@ namespace Yttrium
 		}
 	}
 
-	void RenderPassImpl::flush_2d()
+	void RenderPassImpl::flush_2d() noexcept
 	{
 		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= std::size_t{std::numeric_limits<uint16_t>::max()} + 1);
 		if (_data._vertices_2d.size() == 0)

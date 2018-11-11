@@ -97,7 +97,7 @@ namespace Yttrium
 
 		const BackendTexture2D* current_texture_2d() const;
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
-		void flush_2d(); // TODO: 'noexcept' ('pop_*' functions require to be 'noexcept' to be used in destructors).
+		void flush_2d() noexcept;
 		Batch2D prepare_batch_2d(std::size_t vertex_count, std::size_t index_count);
 		void reset_texture_state();
 		void update_state();

@@ -16,7 +16,7 @@ namespace Yttrium
 			throw std::runtime_error("glGenBuffers failed");
 	}
 
-	GlBufferHandle::GlBufferHandle(GlBufferHandle&& buffer)
+	GlBufferHandle::GlBufferHandle(GlBufferHandle&& buffer) noexcept
 		: _gl{buffer._gl}
 		, _target{buffer._target}
 		, _handle{buffer._handle}
@@ -25,29 +25,29 @@ namespace Yttrium
 		buffer._handle = 0;
 	}
 
-	GlBufferHandle::~GlBufferHandle()
+	GlBufferHandle::~GlBufferHandle() noexcept
 	{
 		if (_handle)
 			_gl.DeleteBuffers(1, &_handle);
 	}
 
-	void GlBufferHandle::bind() const
+	void GlBufferHandle::bind() const noexcept
 	{
 		_gl.BindBuffer(_target, _handle);
 	}
 
-	void GlBufferHandle::initialize(GLenum usage, size_t size, const void* data)
+	void GlBufferHandle::initialize(GLenum usage, size_t size, const void* data) noexcept
 	{
 		_gl.NamedBufferDataEXT(_handle, static_cast<GLsizeiptr>(size), data, usage);
 		_size = static_cast<GLuint>(size);
 	}
 
-	void GlBufferHandle::unbind() const
+	void GlBufferHandle::unbind() const noexcept
 	{
 		_gl.BindBuffer(_target, 0);
 	}
 
-	void GlBufferHandle::write(size_t offset, size_t size, const void* data) const
+	void GlBufferHandle::write(size_t offset, size_t size, const void* data) const noexcept
 	{
 		_gl.NamedBufferSubDataEXT(_handle, static_cast<GLintptr>(offset), static_cast<GLsizeiptr>(size), data);
 	}
@@ -208,7 +208,7 @@ namespace Yttrium
 			throw std::runtime_error("glGenVertexArrays failed");
 	}
 
-	GlVertexArrayHandle::GlVertexArrayHandle(GlVertexArrayHandle&& vertex_array)
+	GlVertexArrayHandle::GlVertexArrayHandle(GlVertexArrayHandle&& vertex_array) noexcept
 		: _gl{vertex_array._gl}
 		, _handle{vertex_array._handle}
 		, _attributes{vertex_array._attributes}
@@ -216,13 +216,13 @@ namespace Yttrium
 		vertex_array._handle = 0;
 	}
 
-	GlVertexArrayHandle::~GlVertexArrayHandle()
+	GlVertexArrayHandle::~GlVertexArrayHandle() noexcept
 	{
 		if (_handle)
 			_gl.DeleteVertexArrays(1, &_handle);
 	}
 
-	void GlVertexArrayHandle::bind() const
+	void GlVertexArrayHandle::bind() const noexcept
 	{
 		_gl.BindVertexArray(_handle);
 		for (GLuint i = 0; i < 32; ++i)
@@ -230,12 +230,12 @@ namespace Yttrium
 				_gl.EnableVertexAttribArray(i);
 	}
 
-	void GlVertexArrayHandle::bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride)
+	void GlVertexArrayHandle::bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride) noexcept
 	{
 		_gl.VertexArrayBindVertexBufferEXT(_handle, binding, buffer, static_cast<GLintptr>(offset), static_cast<GLsizei>(stride));
 	}
 
-	void GlVertexArrayHandle::unbind() const
+	void GlVertexArrayHandle::unbind() const noexcept
 	{
 		for (GLuint i = 32; i > 0;)
 			if (_attributes & (1u << --i))
@@ -243,12 +243,12 @@ namespace Yttrium
 		_gl.BindVertexArray(0);
 	}
 
-	void GlVertexArrayHandle::vertex_attrib_binding(GLuint attrib, GLuint binding)
+	void GlVertexArrayHandle::vertex_attrib_binding(GLuint attrib, GLuint binding) noexcept
 	{
 		_gl.VertexArrayVertexAttribBindingEXT(_handle, attrib, binding);
 	}
 
-	void GlVertexArrayHandle::vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, size_t offset)
+	void GlVertexArrayHandle::vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, size_t offset) noexcept
 	{
 		_gl.VertexArrayVertexAttribFormatEXT(_handle, attrib, size, type, normalized, static_cast<GLuint>(offset));
 		assert(attrib < 32);

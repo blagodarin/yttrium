@@ -221,7 +221,7 @@ namespace Yttrium
 		return static_cast<size_t>(opengl_mesh._index_buffer_size / 3);
 	}
 
-	void GlRenderer::flush_2d(const Buffer& vertices, const Buffer& indices)
+	void GlRenderer::flush_2d(const Buffer& vertices, const Buffer& indices) noexcept
 	{
 		if (vertices.capacity() > _2d_vbo.size())
 			_2d_vbo.initialize(GL_DYNAMIC_DRAW, vertices.capacity(), vertices.data());

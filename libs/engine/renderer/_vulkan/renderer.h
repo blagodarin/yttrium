@@ -26,7 +26,7 @@ namespace Yttrium
 		std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
 		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<RenderManager::TextureFlag>) override;
 		size_t draw_mesh(const Mesh&) override;
-		void flush_2d(const Buffer&, const Buffer&) override;
+		void flush_2d(const Buffer&, const Buffer&) noexcept override;
 		RectF map_rect(const RectF&, ImageOrientation) const override;
 		void set_program(const RenderProgram*) override;
 		void set_texture(const Texture2D&, Flags<Texture2D::Filter>) override;

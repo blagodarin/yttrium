@@ -11,15 +11,15 @@ namespace Yttrium
 	{
 	public:
 		GlBufferHandle(const GlApi&, GLenum target);
-		GlBufferHandle(GlBufferHandle&&);
-		~GlBufferHandle();
+		GlBufferHandle(GlBufferHandle&&) noexcept;
+		~GlBufferHandle() noexcept;
 
-		void bind() const;
-		GLuint get() const { return _handle; }
-		void initialize(GLenum usage, size_t size, const void* data);
-		GLuint size() const { return _size; }
-		void unbind() const;
-		void write(size_t offset, size_t size, const void* data) const;
+		void bind() const noexcept;
+		GLuint get() const noexcept { return _handle; }
+		void initialize(GLenum usage, size_t size, const void* data) noexcept;
+		GLuint size() const noexcept { return _size; }
+		void unbind() const noexcept;
+		void write(size_t offset, size_t size, const void* data) const noexcept;
 
 		GlBufferHandle(const GlBufferHandle&) = delete;
 		GlBufferHandle& operator=(const GlBufferHandle&) = delete;
@@ -102,14 +102,14 @@ namespace Yttrium
 	{
 	public:
 		explicit GlVertexArrayHandle(const GlApi&);
-		GlVertexArrayHandle(GlVertexArrayHandle&&);
-		~GlVertexArrayHandle();
+		GlVertexArrayHandle(GlVertexArrayHandle&&) noexcept;
+		~GlVertexArrayHandle() noexcept;
 
-		void bind() const;
-		void bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride);
-		void unbind() const;
-		void vertex_attrib_binding(GLuint attrib, GLuint binding);
-		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, size_t offset);
+		void bind() const noexcept;
+		void bind_vertex_buffer(GLuint binding, GLuint buffer, size_t offset, size_t stride) noexcept;
+		void unbind() const noexcept;
+		void vertex_attrib_binding(GLuint attrib, GLuint binding) noexcept;
+		void vertex_attrib_format(GLuint attrib, GLint size, GLenum type, GLboolean normalized, size_t offset) noexcept;
 
 		GlVertexArrayHandle(const GlVertexArrayHandle&) = delete;
 		GlVertexArrayHandle& operator=(const GlVertexArrayHandle&) = delete;

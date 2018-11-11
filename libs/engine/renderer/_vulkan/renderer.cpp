@@ -139,7 +139,7 @@ namespace Yttrium
 		return 0;
 	}
 
-	void VulkanRenderer::flush_2d(const Buffer&, const Buffer&)
+	void VulkanRenderer::flush_2d(const Buffer&, const Buffer&) noexcept
 	{
 	}
 
