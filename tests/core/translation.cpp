@@ -2,7 +2,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/translation.h>
-#include "../common/utils.h"
+#include "../../libs/test/utils.h"
 
 #include <catch2/catch.hpp>
 

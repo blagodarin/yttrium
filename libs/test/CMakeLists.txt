@@ -3,4 +3,4 @@ add_library(ytest STATIC
   utils.cpp
   )
 target_link_libraries(ytest PUBLIC Catch2::Catch2 PRIVATE ycore)
-set_target_properties(ytest PROPERTIES FOLDER "tests")
+set_target_properties(ytest PROPERTIES FOLDER "libs")
