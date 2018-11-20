@@ -16,7 +16,7 @@ namespace
 	{
 		const auto size = ::lseek(descriptor, 0, SEEK_END);
 		if (size == -1)
-			throw std::system_error{errno, std::generic_category()};
+			throw std::system_error{ errno, std::generic_category() };
 		return size;
 	}
 }
@@ -27,9 +27,9 @@ namespace Yttrium
 	{
 	public:
 		FileSource(uint64_t size, const std::string& name, int descriptor, bool temporary)
-			: Source{size, name}
-			, _descriptor{descriptor}
-			, _temporary{temporary}
+			: Source{ size, name }
+			, _descriptor{ descriptor }
+			, _temporary{ temporary }
 		{
 		}
 
@@ -56,9 +56,9 @@ namespace Yttrium
 	{
 	public:
 		FileWriter(const std::string& name, int descriptor, bool temporary)
-			: _name{name}
-			, _descriptor{descriptor}
-			, _temporary{temporary}
+			: _name{ name }
+			, _descriptor{ descriptor }
+			, _temporary{ temporary }
 		{
 		}
 
@@ -79,7 +79,7 @@ namespace Yttrium
 		void resize(uint64_t size) override
 		{
 			if (::ftruncate(_descriptor, static_cast<int64_t>(size)) == -1)
-				throw std::system_error{errno, std::generic_category()};
+				throw std::system_error{ errno, std::generic_category() };
 		}
 
 		void unlink() override
@@ -131,7 +131,7 @@ namespace Yttrium
 	{
 		const auto descriptor = TemporaryFilePrivate::descriptor(file);
 		if (::ftruncate(descriptor, 0) == -1)
-			throw std::system_error{errno, std::generic_category()};
+			throw std::system_error{ errno, std::generic_category() };
 		return std::make_unique<FileWriter>(file.name(), descriptor, true);
 	}
 }

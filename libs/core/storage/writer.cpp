@@ -13,7 +13,7 @@
 namespace Yttrium
 {
 	BufferWriter::BufferWriter(Buffer& buffer) noexcept
-		: _buffer{buffer}
+		: _buffer{ buffer }
 	{
 		_buffer.resize(0);
 	}
@@ -44,17 +44,17 @@ namespace Yttrium
 	}
 
 	Writer::Writer(Buffer& buffer)
-		: _private{std::make_unique<BufferWriter>(buffer)}
+		: _private{ std::make_unique<BufferWriter>(buffer) }
 	{
 	}
 
 	Writer::Writer(const std::string& path)
-		: _private{create_file_writer(path)}
+		: _private{ create_file_writer(path) }
 	{
 	}
 
 	Writer::Writer(TemporaryFile& file)
-		: _private{create_file_writer(file)}
+		: _private{ create_file_writer(file) }
 	{
 	}
 
@@ -114,7 +114,7 @@ namespace Yttrium
 		if (const auto data = source.data())
 			return write_all(data, source.size());
 		uint64_t total_size = 0;
-		Buffer buffer{Buffer::memory_granularity()};
+		Buffer buffer{ Buffer::memory_granularity() };
 		while (auto size_read = source.read_at(total_size, buffer.data(), buffer.size()))
 		{
 			const auto size_written = write(buffer.data(), size_read);

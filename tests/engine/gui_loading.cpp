@@ -23,13 +23,11 @@ TEST_CASE("gui.load")
 {
 	std::unordered_map<std::string, std::string> _sources;
 
-	const auto add = [&_sources](std::string_view name, std::string_view data)
-	{
+	const auto add = [&_sources](std::string_view name, std::string_view data) {
 		_sources.emplace(name, data);
 	};
 
-	const auto source = [&_sources](std::string_view data)
-	{
+	const auto source = [&_sources](std::string_view data) {
 		Storage storage{ Storage::UseFileSystem::Never };
 		storage.attach_buffer("main.ion", ::make_buffer(data));
 		for (const auto& [extra_name, extra_data] : _sources)
@@ -39,8 +37,7 @@ TEST_CASE("gui.load")
 		Gui{ resource_loader, script_context, "main.ion" };
 	};
 
-	const auto fragment = [&source](const std::string& data)
-	{
+	const auto fragment = [&source](const std::string& data) {
 		source("root screen `` { } " + data);
 	};
 

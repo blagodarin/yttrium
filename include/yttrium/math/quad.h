@@ -11,7 +11,8 @@ namespace Yttrium
 		Vector2 _a, _b, _c, _d;
 
 		Quad() noexcept = default;
-		constexpr Quad(const Vector2& a, const Vector2& b, const Vector2& c, const Vector2& d) noexcept : _a{a}, _b{b}, _c{c}, _d{d} {}
+		constexpr Quad(const Vector2& a, const Vector2& b, const Vector2& c, const Vector2& d) noexcept
+			: _a{ a }, _b{ b }, _c{ c }, _d{ d } {}
 	};
 }
 

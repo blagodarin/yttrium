@@ -44,46 +44,44 @@ namespace Yttrium
 		size_t _properties_end = 0;
 
 		Entry(uint64_t offset, uint32_t size, size_t properties_begin, size_t properties_end)
-			: _offset{offset}, _size{size}, _properties_begin{properties_begin}, _properties_end{properties_end} {}
+			: _offset{ offset }, _size{ size }, _properties_begin{ properties_begin }, _properties_end{ properties_end } {}
 	};
 
 	YpqReader::YpqReader(std::unique_ptr<Source>&& source)
-		: _source{std::move(source)}
+		: _source{ std::move(source) }
 	{
 		YpqHeader header;
 		if (!_source->read_at(0, header)
 			|| header.signature != YpqHeader::Signature)
-			throw BadPackage{"Not an YPQ package"};
+			throw BadPackage{ "Not an YPQ package" };
 
 		const auto metadata_offset = sizeof header + sizeof(YpqEntry) * header.entry_count;
 		if (header.index_size < metadata_offset)
-			throw BadPackage{"Bad package header"};
+			throw BadPackage{ "Bad package header" };
 
-		std::vector<YpqEntry> entries(size_t{header.entry_count});
+		std::vector<YpqEntry> entries(size_t{ header.entry_count });
 		if (!_source->read_all_at(sizeof header, entries.data(), entries.size() * sizeof(YpqEntry)))
-			throw BadPackage{"Bad package index"};
+			throw BadPackage{ "Bad package index" };
 
-		_metadata_buffer.reset(size_t{header.index_size - metadata_offset});
+		_metadata_buffer.reset(size_t{ header.index_size - metadata_offset });
 		if (!_source->read_all_at(metadata_offset, _metadata_buffer.data(), _metadata_buffer.size()))
-			throw BadPackage{"Bad package metadata"};
+			throw BadPackage{ "Bad package metadata" };
 
 		const auto metadata_source = Source::from(_metadata_buffer.data(), _metadata_buffer.size());
-		Reader metadata_reader{*metadata_source};
+		Reader metadata_reader{ *metadata_source };
 
-		const auto read_uint8 = [&metadata_reader]
-		{
+		const auto read_uint8 = [&metadata_reader] {
 			uint8_t value = 0;
 			if (!metadata_reader.read(value))
-				throw BadPackage{"Bad package index entry metadata"};
+				throw BadPackage{ "Bad package index entry metadata" };
 			return value;
 		};
 
-		const auto read_string = [this, &metadata_reader, &read_uint8]
-		{
+		const auto read_string = [this, &metadata_reader, &read_uint8] {
 			const auto size = read_uint8();
 			if (!metadata_reader.skip(size))
-				throw BadPackage{"Bad package index entry metadata"};
-			return std::string_view{static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size};
+				throw BadPackage{ "Bad package index entry metadata" };
+			return std::string_view{ static_cast<const char*>(_metadata_buffer.data()) + metadata_reader.offset() - size, size };
 		};
 
 		_names.reserve(entries.size());
@@ -94,9 +92,9 @@ namespace Yttrium
 		{
 			const auto index = static_cast<std::size_t>(&entry - entries.data());
 			if (entry.data_offset > source_size || entry.data_offset + entry.data_size > source_size)
-				throw BadPackage{"Bad package index entry #", index, " data"};
+				throw BadPackage{ "Bad package index entry #", index, " data" };
 			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
-				throw BadPackage{"Bad package index entry #", index, " metadata"};
+				throw BadPackage{ "Bad package index entry #", index, " metadata" };
 			_names.emplace_back(read_string());
 			const auto properties_begin = _properties.size();
 			for (auto property_count = read_uint8(); property_count > 0; --property_count)
@@ -131,7 +129,7 @@ namespace Yttrium
 
 		// cppcheck-suppress noExplicitConstructor
 		Entry(const std::string& name_, std::map<std::string, std::string, std::less<>>&& properties_)
-			: name{name_}, properties{std::move(properties_)} {}
+			: name{ name_ }, properties{ std::move(properties_) } {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
@@ -166,8 +164,7 @@ namespace Yttrium
 		{
 			Writer writer(metadata_buffer);
 
-			const auto write_string = [&writer](const std::string& value)
-			{
+			const auto write_string = [&writer](const std::string& value) {
 				const auto size = static_cast<uint8_t>(value.size());
 				return size == value.size() && writer.write(size) && writer.write(value.data(), size);
 			};
@@ -210,7 +207,7 @@ namespace Yttrium
 			if (!source)
 				return false;
 			const auto i = static_cast<size_t>(&entry - _entries.data());
-			entries[i].data_offset = decltype(entries[i].data_offset){_writer.offset()};
+			entries[i].data_offset = decltype(entries[i].data_offset){ _writer.offset() };
 			entries[i].data_size = static_cast<uint32_t>(source->size());
 			if (entries[i].data_size != source->size())
 				return false;

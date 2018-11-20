@@ -13,13 +13,13 @@ namespace
 		std::array<char, max_temp_path_size + 1> path;
 		static_assert(path.size() <= std::numeric_limits<DWORD>::max());
 		if (!::GetTempPathA(static_cast<DWORD>(path.size()), path.data()))
-			throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
+			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		std::array<char, MAX_PATH> name;
 		const auto status = ::GetTempFileNameA(path.data(), "ytt", 0, name.data());
 		if (!status)
-			throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
+			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		else if (status == ERROR_BUFFER_OVERFLOW)
-			throw std::system_error{static_cast<int>(status), std::system_category()};
+			throw std::system_error{ static_cast<int>(status), std::system_category() };
 		return name.data();
 	}
 }
@@ -40,7 +40,7 @@ namespace Yttrium
 	};
 
 	TemporaryFile::TemporaryFile()
-		: _private{std::make_unique<TemporaryFilePrivate>()}
+		: _private{ std::make_unique<TemporaryFilePrivate>() }
 	{
 	}
 

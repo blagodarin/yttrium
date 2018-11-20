@@ -6,7 +6,7 @@
 #include <vector>
 
 #ifdef _WIN32
-	#include <windows.h>
+#	include <windows.h>
 #endif
 
 #include <GL/gl.h>
@@ -17,7 +17,7 @@ namespace Yttrium
 	class GlApi
 	{
 	public:
-		#include "api.h"
+#include "api.h"
 
 		GlApi();
 

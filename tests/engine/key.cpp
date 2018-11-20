@@ -20,9 +20,8 @@ TEST_CASE("key_event.to_char")
 	using Yttrium::Key;
 	using Yttrium::KeyEvent;
 
-	const auto key_to_char = [](Key key, Yttrium::Flags<KeyEvent::Modifier> modifiers = {})
-	{
-		KeyEvent key_event{key, false, false};
+	const auto key_to_char = [](Key key, Yttrium::Flags<KeyEvent::Modifier> modifiers = {}) {
+		KeyEvent key_event{ key, false, false };
 		key_event.modifiers = modifiers;
 		return key_event.to_char();
 	};

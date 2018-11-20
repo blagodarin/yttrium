@@ -20,9 +20,11 @@ namespace Yttrium
 	public:
 		RenderModifier(const RenderModifier&) = delete;
 		RenderModifier& operator=(const RenderModifier&) = delete;
+
 	protected:
 		RenderPass& _pass;
-		explicit RenderModifier(RenderPass& pass) noexcept : _pass{pass} {}
+		explicit RenderModifier(RenderPass& pass) noexcept
+			: _pass{ pass } {}
 	};
 
 	///

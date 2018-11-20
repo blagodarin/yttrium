@@ -7,9 +7,9 @@
 namespace Yttrium
 {
 	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend, MusicReaderImpl& music)
-		: _backend{backend}
-		, _music{music}
-		, _buffer{_music.buffer_size()}
+		: _backend{ backend }
+		, _music{ music }
+		, _buffer{ _music.buffer_size() }
 	{
 		_backend.set_format(_music.format());
 	}

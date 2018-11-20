@@ -190,7 +190,7 @@ namespace Yttrium
 		std::string line;
 		size_t line_number = 0;
 		ObjState state;
-		for (Reader reader{source}; reader.read_line(line);)
+		for (Reader reader{ source }; reader.read_line(line);)
 		{
 			++line_number;
 			if (std::regex_match(line, _obj_empty_regex))

@@ -8,7 +8,7 @@ namespace Yttrium
 	{
 		const auto input_format = input.format();
 
-		Image output{{input_format.size(), PixelFormat::Bgra32, input_format.orientation()}};
+		Image output{ { input_format.size(), PixelFormat::Bgra32, input_format.orientation() } };
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input_format.row_size();
@@ -108,7 +108,7 @@ namespace Yttrium
 		if (input.format().pixel_format() != PixelFormat::Gray8)
 			return {};
 
-		Image output{{input.format().size(), PixelFormat::Bgra32, input.format().orientation()}};
+		Image output{ { input.format().size(), PixelFormat::Bgra32, input.format().orientation() } };
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input.format().row_size();

@@ -77,7 +77,7 @@ namespace Yttrium
 				_click_widget->process_mouse_release();
 				_click_widget = nullptr;
 				_click_button = Key::Null;
-				_click_cursor = {0, 0};
+				_click_cursor = { 0, 0 };
 			}
 			if (!_hover_widget || !_hover_widget->process_mouse_press(button, _hover_cursor))
 				return false;
@@ -102,25 +102,25 @@ namespace Yttrium
 					_click_widget->process_mouse_release();
 				_click_widget = nullptr;
 				_click_button = Key::Null;
-				_click_cursor = {0, 0};
+				_click_cursor = { 0, 0 };
 			}
 			return true;
 		}
 
 	private:
 		Widget* _hover_widget = nullptr;
-		Vector2 _hover_cursor{0, 0};
+		Vector2 _hover_cursor{ 0, 0 };
 		Widget* _click_widget = nullptr;
 		Key _click_button = Key::Null;
-		Vector2 _click_cursor{0, 0};
+		Vector2 _click_cursor{ 0, 0 };
 		Widget* _focus_widget = nullptr;
 	};
 
 	GuiScreen::GuiScreen(GuiPrivate& gui, std::string_view name, bool is_transparent)
-		: _gui{gui}
-		, _name{name}
-		, _is_transparent{is_transparent}
-		, _activity{std::make_unique<Activity>()}
+		: _gui{ gui }
+		, _name{ name }
+		, _is_transparent{ is_transparent }
+		, _activity{ std::make_unique<Activity>() }
 	{
 	}
 
@@ -133,7 +133,7 @@ namespace Yttrium
 
 	void GuiScreen::draw(RenderPass& pass, const Vector2* cursor)
 	{
-		const RectF rect{{}, pass.window_size()};
+		const RectF rect{ {}, pass.window_size() };
 		for (const auto& layout : _layouts)
 			layout->update(rect);
 		if (cursor)
@@ -150,12 +150,12 @@ namespace Yttrium
 				_gui.draw_custom_cursor(pass, *cursor);
 				break;
 			case GuiCursor::Texture:
-				{
-					PushTexture push_texture{pass, _cursor_texture.get(), Texture2D::TrilinearFilter};
-					pass.set_texture_rect({{}, SizeF{_cursor_texture->size()}}, {});
-					pass.draw_rect({*cursor, SizeF{_cursor_texture->size()}});
-				}
-				break;
+			{
+				PushTexture push_texture{ pass, _cursor_texture.get(), Texture2D::TrilinearFilter };
+				pass.set_texture_rect({ {}, SizeF{ _cursor_texture->size() } }, {});
+				pass.draw_rect({ *cursor, SizeF{ _cursor_texture->size() } });
+			}
+			break;
 			default:
 				break;
 			}
@@ -167,7 +167,7 @@ namespace Yttrium
 		_on_enter.run(_gui);
 
 		std::vector<Widget*> focusable_widgets;
-		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget){ return widget->flags() & Widget::Flag::CanHaveFocus; });
+		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget) { return widget->flags() & Widget::Flag::CanHaveFocus; });
 		if (!focusable_widgets.empty())
 			_activity->set_focus(focusable_widgets.front());
 	}

@@ -26,7 +26,7 @@ TEST_CASE("utils_string.make_string")
 	CHECK(make_string(std::string{}) == "");
 
 	CHECK(make_string("abc") == "abc");
-	CHECK(make_string(std::string{"abc"}) == "abc");
+	CHECK(make_string(std::string{ "abc" }) == "abc");
 
 	CHECK(make_string(short{ 0 }) == "0");
 	CHECK(make_string(static_cast<unsigned short>(0)) == "0");
@@ -166,15 +166,15 @@ TEST_CASE("utils_string.from_chars.double")
 	CHECK(d == 7.6e+1);
 
 	CHECK(from_chars("9.8e-1", d));
-	CHECK(d == Approx{9.8e-1}.epsilon(1e-13));
+	CHECK(d == Approx{ 9.8e-1 }.epsilon(1e-13));
 
 	CHECK(from_chars("98765.43210e-7", d));
-	CHECK(d == Approx{98765.43210e-7}.epsilon(1e-13));
+	CHECK(d == Approx{ 98765.43210e-7 }.epsilon(1e-13));
 
 	CHECK(!from_chars("+98765.43210e-7", d));
 
 	CHECK(from_chars("-01234.56789e+7", d));
-	CHECK(d == Approx{-01234.56789e+7}.epsilon(1e-13));
+	CHECK(d == Approx{ -01234.56789e+7 }.epsilon(1e-13));
 
 	CHECK(!from_chars("1 ", d));
 	CHECK(!from_chars(" 1", d));
@@ -187,11 +187,10 @@ TEST_CASE("utils_string.from_chars.double")
 TEST_CASE("utils_string.time_from_chars")
 {
 	// Helps sanitizer to catch out-of-bounds errors.
-	const auto time_from_chars = [](std::string_view text)
-	{
+	const auto time_from_chars = [](std::string_view text) {
 		const auto copy = std::make_unique<char[]>(text.size());
 		std::memcpy(copy.get(), text.data(), text.size());
-		return Yttrium::time_from_chars({copy.get(), text.size()});
+		return Yttrium::time_from_chars({ copy.get(), text.size() });
 	};
 
 	CHECK(time_from_chars("1") == 1'000);

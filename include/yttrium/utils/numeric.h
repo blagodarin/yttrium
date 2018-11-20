@@ -56,9 +56,15 @@ namespace Yttrium
 	constexpr T wrap(T value, U min, U max)
 	{
 		if (value < min)
-			do { value += max - min; } while (value < min);
+			do
+			{
+				value += max - min;
+			} while (value < min);
 		else if (value >= max)
-			do { value -= max - min; } while (value >= max);
+			do
+			{
+				value -= max - min;
+			} while (value >= max);
 		return value;
 	}
 }

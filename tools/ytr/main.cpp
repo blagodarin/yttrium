@@ -14,8 +14,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	const auto translation = [](std::string_view path)
-	{
+	const auto translation = [](std::string_view path) {
 		const auto source = Source::from(path);
 		return source ? Translation::load(*source) : nullptr;
 	}(argv[1]);
@@ -36,7 +35,7 @@ int main(int argc, char** argv)
 		}
 		try
 		{
-			IonReader ion{*source};
+			IonReader ion{ *source };
 			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
 				if (token.translatable())
 					translation->add(token.text());

@@ -9,25 +9,27 @@
 #include "mesh_data.h"
 
 #if Y_RENDERER_OPENGL
-	#include "_opengl/renderer.h"
+#	include "_opengl/renderer.h"
 #elif Y_RENDERER_VULKAN
-	#include "_vulkan/renderer.h"
+#	include "_vulkan/renderer.h"
 #else
-	#include "_null/renderer.h"
+#	include "_null/renderer.h"
 #endif
 
 #include <cassert>
 
 namespace Yttrium
 {
-	RendererImpl::RendererImpl(WindowBackend& window)
 #if Y_RENDERER_OPENGL
-		: _backend{std::make_unique<GlRenderer>(window)}
+	using RenderBackendImpl = GlRenderer;
 #elif Y_RENDERER_VULKAN
-		: _backend{std::make_unique<VulkanRenderer>(window)}
+	using RenderBackendImpl = VulkanRenderer;
 #else
-		: _backend{std::make_unique<NullRenderer>(window)}
+	using RenderBackendImpl = NullRenderer;
 #endif
+
+	RendererImpl::RendererImpl(WindowBackend& window)
+		: _backend{ std::make_unique<RenderBackendImpl>(window) }
 	{
 	}
 

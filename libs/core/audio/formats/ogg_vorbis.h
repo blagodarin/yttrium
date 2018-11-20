@@ -1,7 +1,7 @@
 #pragma once
 
 #if !Y_USE_OGG_VORBIS
-	#error Ogg Vorbis support is disabled.
+#	error Ogg Vorbis support is disabled.
 #endif
 
 #include "../reader.h"

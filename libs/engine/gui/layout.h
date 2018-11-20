@@ -37,7 +37,7 @@ namespace Yttrium
 	private:
 		const Placement _placement;
 		SizeF _size;
-		Vector2 _scaling{1, 1};
+		Vector2 _scaling{ 1, 1 };
 		std::vector<std::unique_ptr<Widget>> _widgets;
 	};
 }

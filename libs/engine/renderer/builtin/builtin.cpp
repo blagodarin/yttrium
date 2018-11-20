@@ -14,9 +14,9 @@ namespace
 namespace Yttrium
 {
 	RenderBuiltin::RenderBuiltin(RenderBackend& backend)
-		: _white_texture{backend.create_texture_2d({ { 1, 1, PixelFormat::Bgra32 }, &_white_texture_data }, RenderManager::TextureFlag::NoMipmaps)}
-		, _debug_texture{backend.create_texture_2d({ { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra32 }, DebugTexture::data }, RenderManager::TextureFlag::NoMipmaps)}
-		, _program_2d{backend.create_builtin_program_2d()}
+		: _white_texture{ backend.create_texture_2d({ { 1, 1, PixelFormat::Bgra32 }, &_white_texture_data }, RenderManager::TextureFlag::NoMipmaps) }
+		, _debug_texture{ backend.create_texture_2d({ { DebugTexture::width, DebugTexture::height, PixelFormat::Bgra32 }, DebugTexture::data }, RenderManager::TextureFlag::NoMipmaps) }
+		, _program_2d{ backend.create_builtin_program_2d() }
 	{
 		if (!_white_texture || !_debug_texture)
 			throw InitializationError("Failed to initialize an internal texture");

@@ -19,19 +19,19 @@ namespace Yttrium
 			{
 			case VA::f:
 				attribute.format = VK_FORMAT_R32_SFLOAT;
-				_binding.stride += uint32_t{sizeof(float)};
+				_binding.stride += uint32_t{ sizeof(float) };
 				break;
 			case VA::f2:
 				attribute.format = VK_FORMAT_R32G32_SFLOAT;
-				_binding.stride += uint32_t{sizeof(float) * 2};
+				_binding.stride += uint32_t{ sizeof(float) * 2 };
 				break;
 			case VA::f3:
 				attribute.format = VK_FORMAT_R32G32B32_SFLOAT;
-				_binding.stride += uint32_t{sizeof(float) * 3};
+				_binding.stride += uint32_t{ sizeof(float) * 3 };
 				break;
 			case VA::f4:
 				attribute.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-				_binding.stride += uint32_t{sizeof(float) * 4};
+				_binding.stride += uint32_t{ sizeof(float) * 4 };
 				break;
 			}
 		}

@@ -9,7 +9,7 @@
 namespace Yttrium
 {
 	Push2D::Push2D(RenderPass& pass)
-		: RenderModifier{pass}
+		: RenderModifier{ pass }
 	{
 		static_cast<RenderPassImpl&>(_pass).push_projection_2d(Matrix4::projection_2d(pass.window_size()));
 	}
@@ -20,7 +20,7 @@ namespace Yttrium
 	}
 
 	Push3D::Push3D(RenderPass& pass, const Matrix4& projection, const Matrix4& view)
-		: RenderModifier{pass}
+		: RenderModifier{ pass }
 	{
 		static_cast<RenderPassImpl&>(_pass).push_projection_3d(projection, view);
 	}
@@ -31,7 +31,7 @@ namespace Yttrium
 	}
 
 	PushProgram::PushProgram(RenderPass& pass, const RenderProgram* program)
-		: RenderModifier{pass}
+		: RenderModifier{ pass }
 	{
 		static_cast<RenderPassImpl&>(_pass).push_program(program);
 	}
@@ -42,10 +42,10 @@ namespace Yttrium
 	}
 
 	PushMaterial::PushMaterial(RenderPass& pass, const Material* material)
-		: RenderModifier{pass}
-		, _material{material}
-		, _program{pass, &static_cast<const MaterialImpl*>(_material)->program()}
-		, _texture{pass, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<const MaterialImpl*>(_material)->texture_filter()}
+		: RenderModifier{ pass }
+		, _material{ material }
+		, _program{ pass, &static_cast<const MaterialImpl*>(_material)->program() }
+		, _texture{ pass, static_cast<const MaterialImpl*>(_material)->texture(), static_cast<const MaterialImpl*>(_material)->texture_filter() }
 	{
 	}
 
@@ -55,8 +55,8 @@ namespace Yttrium
 	}
 
 	PushTexture::PushTexture(RenderPass& pass, const Texture2D* texture, Flags<Texture2D::Filter> filter)
-		: RenderModifier{pass}
-		, _filter{static_cast<RenderPassImpl&>(_pass).push_texture(texture, filter)}
+		: RenderModifier{ pass }
+		, _filter{ static_cast<RenderPassImpl&>(_pass).push_texture(texture, filter) }
 	{
 	}
 
@@ -66,7 +66,7 @@ namespace Yttrium
 	}
 
 	PushTransformation::PushTransformation(RenderPass& pass, const Matrix4& matrix)
-		: RenderModifier{pass}
+		: RenderModifier{ pass }
 	{
 		static_cast<RenderPassImpl&>(_pass).push_transformation(matrix);
 	}

@@ -12,7 +12,8 @@ namespace Yttrium
 		float _roll;  ///<
 
 		Euler() noexcept = default;
-		constexpr Euler(float yaw, float pitch, float roll) noexcept : _yaw{yaw}, _pitch{pitch}, _roll{roll} {}
+		constexpr Euler(float yaw, float pitch, float roll) noexcept
+			: _yaw{ yaw }, _pitch{ pitch }, _roll{ roll } {}
 	};
 }
 

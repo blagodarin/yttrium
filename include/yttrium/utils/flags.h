@@ -11,10 +11,16 @@ namespace Yttrium
 	public:
 		constexpr Flags() noexcept = default;
 		// cppcheck-suppress noExplicitConstructor
-		constexpr Flags(const T flag) noexcept : _flags{static_cast<std::underlying_type_t<T>>(flag)} {}
+		constexpr Flags(const T flag) noexcept
+			: _flags{ static_cast<std::underlying_type_t<T>>(flag) } {}
 		constexpr explicit operator T() const noexcept { return static_cast<T>(_flags); }
 		constexpr explicit operator std::underlying_type_t<T>() const noexcept { return _flags; }
-		constexpr Flags& operator|=(const Flags other) noexcept { _flags |= other._flags; return *this; }
+		constexpr Flags& operator|=(const Flags other) noexcept
+		{
+			_flags |= other._flags;
+			return *this;
+		}
+
 	private:
 		std::underlying_type_t<T> _flags = 0;
 	};

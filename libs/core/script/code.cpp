@@ -15,7 +15,8 @@ namespace Yttrium
 	{
 		std::string _name;
 		std::vector<ScriptValue*> _args;
-		explicit ScriptCommand(std::string_view name) : _name{name} {}
+		explicit ScriptCommand(std::string_view name)
+			: _name{ name } {}
 	};
 
 	class ScriptCodePrivate
@@ -29,20 +30,20 @@ namespace Yttrium
 				auto& command = _commands.emplace_back(other_command._name);
 				command._args.reserve(other_command._args.size());
 				for (const auto other_arg : other_command._args)
-					command._args.emplace_back(new(_temporaries.allocate()) ScriptValue{*other_arg});
+					command._args.emplace_back(new (_temporaries.allocate()) ScriptValue{ *other_arg });
 			}
 		}
 
 		explicit ScriptCodePrivate(std::string&& text)
 		{
-			ScriptScanner scanner{text};
+			ScriptScanner scanner{ text };
 			for (ScriptCommand* command = nullptr;;)
 			{
 				const auto token = scanner.read();
 				if (token.type == ScriptScanner::Token::End)
 				{
 					if (command && command->_name == "=" && command->_args.size() != 2)
-						throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
 					break;
 				}
 				if (!command)
@@ -58,7 +59,7 @@ namespace Yttrium
 						break;
 
 					default:
-						throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
 					}
 				}
 				else
@@ -67,37 +68,37 @@ namespace Yttrium
 					{
 					case ScriptScanner::Token::Identifier:
 						if (command->_name == "=" && command->_args.size() != 1)
-							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
-						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{token.string, ScriptValue::Type::Name});
+							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ token.string, ScriptValue::Type::Name });
 						break;
 
 					case ScriptScanner::Token::Number:
 						if (command->_name == "=" && command->_args.size() != 1)
-							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
-						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{token.string, ScriptValue::Type::Literal});
+							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ token.string, ScriptValue::Type::Literal });
 						break;
 
 					case ScriptScanner::Token::String:
 						if (command->_name == "=" && command->_args.size() != 1)
-							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
-						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{token.string, ScriptValue::Type::String});
+							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ token.string, ScriptValue::Type::String });
 						break;
 
 					case ScriptScanner::Token::Separator:
 						if (command->_name == "=" && command->_args.size() != 2)
-							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
 						command = nullptr;
 						break;
 
 					case ScriptScanner::Token::Equals:
 						if (!command->_args.empty())
-							throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
-						command->_args.emplace_back(new(_temporaries.allocate()) ScriptValue{command->_name, ScriptValue::Type::Name});
+							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ command->_name, ScriptValue::Type::Name });
 						command->_name = "=";
 						break;
 
 					default:
-						throw DataError{"[", token.line, ":", token.column, "] Unexpected token"};
+						throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
 					}
 				}
 			}
@@ -113,7 +114,7 @@ namespace Yttrium
 	ScriptCode::ScriptCode() = default;
 
 	ScriptCode::ScriptCode(const ScriptCode& other)
-		: _private{std::make_unique<ScriptCodePrivate>(*other._private)}
+		: _private{ std::make_unique<ScriptCodePrivate>(*other._private) }
 	{
 	}
 
@@ -124,7 +125,7 @@ namespace Yttrium
 	ScriptCode& ScriptCode::operator=(ScriptCode&&) noexcept = default;
 
 	ScriptCode::ScriptCode(std::string&& text)
-		: _private{std::make_unique<ScriptCodePrivate>(std::move(text))}
+		: _private{ std::make_unique<ScriptCodePrivate>(std::move(text)) }
 	{
 	}
 
@@ -146,7 +147,7 @@ namespace Yttrium
 				else
 					context.set(command._args[0]->string(), command._args[1]->string());
 			}
-			else if (!context.call(command._name, result, ScriptArgs{context, command._args}))
+			else if (!context.call(command._name, result, ScriptArgs{ context, command._args }))
 				break;
 	}
 }

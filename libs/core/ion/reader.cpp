@@ -27,48 +27,39 @@ namespace
 		Comment,  // '/'.
 	};
 
-	const std::array<CharClass, 256> char_class =
-	{
-		// #0 - #31: Special character set.
-
-		End,    Other,  Other, Other,    Other, Other,    Other, Other,   // \0
-		Other,  Space,  Lf,    Space,    Space, Cr,       Other, Other,   // \t \n \v \f \r
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,   //
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,   //
-
-		// #32 - #127: Basic character set.
-
-		Space,  Other,  Quote, Hash,     Other, Other,    Other, Other,   //   ! " # $ % & '
-		Other,  Other,  Other, Other,    Other, Other,    Other, Comment, // ( ) * + , - . /
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // 0 1 2 3 4 5 6 7
-		Name,   Name,   Other, Other,    Other, Other,    Other, Other,   // 8 9 : ; < = > ?
-		Other,  Name,   Name,  Name,     Name,  Name,     Name,  Name,    // @ A B C D E F G
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // H I J K L M N O
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // P Q R S T U V W
-		Name,   Name,   Name,  LBracket, Other, RBracket, Other, Name,    // X Y Z [ \ ] ^ _
-		Quote,  Name,   Name,  Name,     Name,  Name,     Name,  Name,    // ` a b c d e f g
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // h i j k l m n o
-		Name,   Name,   Name,  Name,     Name,  Name,     Name,  Name,    // p q r s t u v w
-		Name,   Name,   Name,  LBrace,   Other, RBrace,   Other, Other,   // x y z { | } ~
-
-		// #128 - #255: Extended character set.
-
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
-		Other,  Other,  Other, Other,    Other, Other,    Other, Other,
+	const std::array<CharClass, 256> char_class{
+		End, Other, Other, Other, Other, Other, Other, Other,     // \0
+		Other, Space, Lf, Space, Space, Cr, Other, Other,         // \t \n \v \f \r
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Space, Other, Quote, Hash, Other, Other, Other, Other,    //   ! " # $ % & '
+		Other, Other, Other, Other, Other, Other, Other, Comment, // ( ) * + , - . /
+		Name, Name, Name, Name, Name, Name, Name, Name,           // 0 1 2 3 4 5 6 7
+		Name, Name, Other, Other, Other, Other, Other, Other,     // 8 9 : ; < = > ?
+		Other, Name, Name, Name, Name, Name, Name, Name,          // @ A B C D E F G
+		Name, Name, Name, Name, Name, Name, Name, Name,           // H I J K L M N O
+		Name, Name, Name, Name, Name, Name, Name, Name,           // P Q R S T U V W
+		Name, Name, Name, LBracket, Other, RBracket, Other, Name, // X Y Z [ \ ] ^ _
+		Quote, Name, Name, Name, Name, Name, Name, Name,          // ` a b c d e f g
+		Name, Name, Name, Name, Name, Name, Name, Name,           // h i j k l m n o
+		Name, Name, Name, Name, Name, Name, Name, Name,           // p q r s t u v w
+		Name, Name, Name, LBrace, Other, RBrace, Other, Other,    // x y z { | } ~
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
+		Other, Other, Other, Other, Other, Other, Other, Other,   //
 	};
 
 	CharClass class_of(char c)
@@ -82,37 +73,37 @@ namespace Yttrium
 	void IonReader::Token::check_end() const
 	{
 		if (_type != Type::End)
-			throw IonError{_line, _column, "End of file expected"};
+			throw IonError{ _line, _column, "End of file expected" };
 	}
 
 	void IonReader::Token::check_list_begin() const
 	{
 		if (_type != Type::ListBegin)
-			throw IonError{_line, _column, "'[' expected"};
+			throw IonError{ _line, _column, "'[' expected" };
 	}
 
 	void IonReader::Token::check_list_end() const
 	{
 		if (_type != Type::ListEnd)
-			throw IonError{_line, _column, "']' expected"};
+			throw IonError{ _line, _column, "']' expected" };
 	}
 
 	void IonReader::Token::check_name(std::string_view name) const
 	{
 		if (to_name() != name)
-			throw IonError{_line, _column, "'", name, "' expected"};
+			throw IonError{ _line, _column, "'", name, "' expected" };
 	}
 
 	void IonReader::Token::check_object_begin() const
 	{
 		if (_type != Type::ObjectBegin)
-			throw IonError{_line, _column, "'{' expected"};
+			throw IonError{ _line, _column, "'{' expected" };
 	}
 
 	void IonReader::Token::check_object_end() const
 	{
 		if (_type != Type::ObjectEnd)
-			throw IonError{_line, _column, "'}' expected"};
+			throw IonError{ _line, _column, "'}' expected" };
 	}
 
 	IonReader::Token& IonReader::Token::next(IonReader& ion)
@@ -123,35 +114,34 @@ namespace Yttrium
 	Color4f IonReader::Token::to_color() const
 	{
 		if (_type != Type::Color)
-			throw IonError{_line, _column, "ION color expected"};
+			throw IonError{ _line, _column, "ION color expected" };
 
-		const auto d = [this](std::size_t i)
-		{
+		const auto d = [this](std::size_t i) {
 			const auto c = _text[i];
 			return static_cast<float>(c < 'a' ? c - '0' : c - 'a' + 10);
 		};
 
 		switch (_text.size())
 		{
-		case 4: return {d(1) / 15.f, d(2) / 15.f, d(3) / 15.f};
-		case 5: return {d(1) / 15.f, d(2) / 15.f, d(3) / 15.f, d(4) / 15.f};
-		case 7: return {(d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f};
-		case 9: return {(d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f, (d(7) * 16 + d(8)) / 255.f};
-		default: throw IonError{_line, _column, "Bad ION color"};
+		case 4: return { d(1) / 15.f, d(2) / 15.f, d(3) / 15.f };
+		case 5: return { d(1) / 15.f, d(2) / 15.f, d(3) / 15.f, d(4) / 15.f };
+		case 7: return { (d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f };
+		case 9: return { (d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f, (d(7) * 16 + d(8)) / 255.f };
+		default: throw IonError{ _line, _column, "Bad ION color" };
 		}
 	}
 
 	std::string_view IonReader::Token::to_name() const
 	{
 		if (_type != Type::Name)
-			throw IonError{_line, _column, "ION name expected"};
+			throw IonError{ _line, _column, "ION name expected" };
 		return _text;
 	}
 
 	std::string_view IonReader::Token::to_value() const
 	{
 		if (_type != Type::Value)
-			throw IonError{_line, _column, "ION value expected"};
+			throw IonError{ _line, _column, "ION value expected" };
 		return _text;
 	}
 
@@ -159,7 +149,7 @@ namespace Yttrium
 	{
 	public:
 		explicit IonReaderPrivate(const Source& source)
-			: _buffer{source.to_buffer()}
+			: _buffer{ source.to_buffer() }
 		{
 		}
 
@@ -170,16 +160,16 @@ namespace Yttrium
 				switch (::class_of(*_cursor))
 				{
 				case Other:
-					throw IonError{_line, _cursor - _line_base, "Bad character"};
+					throw IonError{ _line, _cursor - _line_base, "Bad character" };
 
 				case End:
 					if (_cursor == static_cast<const char*>(_buffer.data()) + _buffer.size())
 						return make_token<IonReader::Token::Type::End>(_cursor, 0);
 					else
-						throw IonError{_line, _cursor - _line_base, "Bad character"};
+						throw IonError{ _line, _cursor - _line_base, "Bad character" };
 
 				case Space:
-					_cursor = forward_find_if(_cursor + 1, [](char c){ return ::class_of(c) != Space; });
+					_cursor = forward_find_if(_cursor + 1, [](char c) { return ::class_of(c) != Space; });
 					break;
 
 				case Cr:
@@ -195,12 +185,12 @@ namespace Yttrium
 					if (_stack.back() & AcceptNames)
 					{
 						const auto begin = _cursor;
-						_cursor = forward_find_if(begin + 1, [](char c){ return ::class_of(c) != Name; });
+						_cursor = forward_find_if(begin + 1, [](char c) { return ::class_of(c) != Name; });
 						_stack.back() |= AcceptValues;
 						return make_token<IonReader::Token::Type::Name>(begin, _cursor - begin);
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected ION name"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected ION name" };
 
 				case Quote:
 					if (_stack.back() & AcceptValues)
@@ -213,10 +203,10 @@ namespace Yttrium
 							switch (*cursor)
 							{
 							case '\0':
-								throw IonError{_line, cursor - _line_base, cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character"};
+								throw IonError{ _line, cursor - _line_base, cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character" };
 							case '\n':
 							case '\r':
-								throw IonError{_line, cursor - _line_base, "Unexpected end of line"};
+								throw IonError{ _line, cursor - _line_base, "Unexpected end of line" };
 							default:
 								++cursor;
 							}
@@ -225,20 +215,20 @@ namespace Yttrium
 						return make_token<IonReader::Token::Type::Value, -1>(base, cursor - base, quote == '`');
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
 
 				case Hash:
 					if (_stack.back() & AcceptValues)
 					{
 						const auto begin = _cursor;
-						const auto end = forward_find_if(begin + 1, [](char c){ return (c < '0' || c > '9') && (c < 'a' || c > 'f'); });
+						const auto end = forward_find_if(begin + 1, [](char c) { return (c < '0' || c > '9') && (c < 'a' || c > 'f'); });
 						if (const auto next_class = ::class_of(*end); next_class == Other || next_class == Name)
-							throw IonError{_line, end - _line_base, "Bad character"};
+							throw IonError{ _line, end - _line_base, "Bad character" };
 						_cursor = end;
 						return make_token<IonReader::Token::Type::Color>(begin, end - begin);
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected ION value"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
 
 				case LBrace:
 					if (_stack.back() & AcceptValues)
@@ -247,7 +237,7 @@ namespace Yttrium
 						return make_token<IonReader::Token::Type::ObjectBegin>(_cursor++, 1);
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected list"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected list" };
 
 				case RBrace:
 					if (_stack.back() & AcceptNames && _stack.size() > 1)
@@ -256,7 +246,7 @@ namespace Yttrium
 						return make_token<IonReader::Token::Type::ObjectEnd>(_cursor++, 1);
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected end of object"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected end of object" };
 
 				case LBracket:
 					if (_stack.back() & AcceptValues)
@@ -265,7 +255,7 @@ namespace Yttrium
 						return make_token<IonReader::Token::Type::ListBegin>(_cursor++, 1);
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected list"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected list" };
 
 				case RBracket:
 					if ((_stack.back() & (AcceptNames | AcceptValues)) == AcceptValues)
@@ -274,16 +264,16 @@ namespace Yttrium
 						return make_token<IonReader::Token::Type::ListEnd>(_cursor++, 1);
 					}
 					else
-						throw IonError{_line, _cursor - _line_base, "Unexpected end of object"};
+						throw IonError{ _line, _cursor - _line_base, "Unexpected end of object" };
 
 				case Comment:
 					if (auto next = _cursor + 1; *next == '/')
 					{
-						_cursor = forward_find_if(next + 1, [](char c){ return c == '\n' || c == '\r' || c == '\0'; });
+						_cursor = forward_find_if(next + 1, [](char c) { return c == '\n' || c == '\r' || c == '\0'; });
 						break;
 					}
 					else
-						throw IonError{_line, next - _line_base, "Bad character"};
+						throw IonError{ _line, next - _line_base, "Bad character" };
 				}
 			}
 		}
@@ -292,7 +282,7 @@ namespace Yttrium
 		template <IonReader::Token::Type type, std::ptrdiff_t column_offset = 0>
 		IonReader::Token make_token(const char* begin, std::ptrdiff_t size, bool translatable = false) noexcept
 		{
-			return {_line, begin - _line_base + column_offset, type, {begin, static_cast<std::size_t>(size)}, translatable};
+			return { _line, begin - _line_base + column_offset, type, { begin, static_cast<std::size_t>(size) }, translatable };
 		}
 
 	private:
@@ -303,14 +293,14 @@ namespace Yttrium
 		};
 
 		const Buffer _buffer;
-		const char* _cursor{static_cast<const char*>(_buffer.data())};
-		std::size_t _line{1};
-		const char* _line_base{_cursor - 1};
-		std::vector<uint8_t> _stack{AcceptNames};
+		const char* _cursor{ static_cast<const char*>(_buffer.data()) };
+		std::size_t _line{ 1 };
+		const char* _line_base{ _cursor - 1 };
+		std::vector<uint8_t> _stack{ AcceptNames };
 	};
 
 	IonReader::IonReader(const Source& source)
-		: _private{std::make_unique<IonReaderPrivate>(source)}
+		: _private{ std::make_unique<IonReaderPrivate>(source) }
 	{
 	}
 

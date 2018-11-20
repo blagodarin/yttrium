@@ -10,7 +10,7 @@ TEST_CASE("buffer_appender")
 	using namespace Yttrium::Literals;
 
 	Yttrium::Buffer b;
-	Yttrium::BufferAppender<uint32_t> ba{b};
+	Yttrium::BufferAppender<uint32_t> ba{ b };
 	CHECK(ba.count() == 0);
 	ba << "1234"_fourcc;
 	ba << "5678"_fourcc;

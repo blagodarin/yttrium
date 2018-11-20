@@ -12,13 +12,11 @@
 
 namespace
 {
-	const std::vector<uint32_t> BuiltinVertexShader
-	{
+	const std::vector<uint32_t> BuiltinVertexShader{
 #include "2d_vs.glsl.spirv.inc"
 	};
 
-	const std::vector<uint32_t> BuiltinFragmentShader
-	{
+	const std::vector<uint32_t> BuiltinFragmentShader{
 #include "2d_fs.glsl.spirv.inc"
 	};
 }
@@ -26,15 +24,15 @@ namespace
 namespace Yttrium
 {
 	VulkanRenderer::VulkanRenderer(const WindowBackend& window)
-		: _context{window}
-		, _uniform_buffer{_context, sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
-		, _descriptor_set_layout{_context, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}, {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}}}
-		, _descriptor_pool{_context, 1, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}, {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}}}
-		, _descriptor_set{_descriptor_pool, _descriptor_set_layout._handle}
-		, _pipeline_layout{_context, {_descriptor_set_layout._handle}}
-		, _vertex_shader{_context, VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader}
-		, _fragment_shader{_context, VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader}
-		, _vertex_buffer{_context, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT}
+		: _context{ window }
+		, _uniform_buffer{ _context, sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT }
+		, _descriptor_set_layout{ _context, { { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT }, { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT } } }
+		, _descriptor_pool{ _context, 1, { { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }, { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 } } }
+		, _descriptor_set{ _descriptor_pool, _descriptor_set_layout._handle }
+		, _pipeline_layout{ _context, { _descriptor_set_layout._handle } }
+		, _vertex_shader{ _context, VK_SHADER_STAGE_VERTEX_BIT, ::BuiltinVertexShader }
+		, _fragment_shader{ _context, VK_SHADER_STAGE_FRAGMENT_BIT, ::BuiltinFragmentShader }
+		, _vertex_buffer{ _context, 1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT }
 	{
 	}
 
@@ -46,16 +44,14 @@ namespace Yttrium
 		if (std::exchange(_update_descriptors, false))
 			update_descriptors();
 		if (!_swapchain)
-			_swapchain = std::make_unique<VulkanSwapchain>(_context, _pipeline_layout, VK_ShaderModule::make_stages({&_vertex_shader, &_fragment_shader}));
+			_swapchain = std::make_unique<VulkanSwapchain>(_context, _pipeline_layout, VK_ShaderModule::make_stages({ &_vertex_shader, &_fragment_shader }));
 		try
 		{
-			_swapchain->render([this](VkCommandBuffer command_buffer, const std::function<void(const std::function<void()>&)>& render_pass)
-			{
-				render_pass([this, command_buffer]
-				{
+			_swapchain->render([this](VkCommandBuffer command_buffer, const std::function<void(const std::function<void()>&)>& render_pass) {
+				render_pass([this, command_buffer] {
 					vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout._handle, 0, 1, &_descriptor_set._handle, 0, nullptr);
 
-					const std::array<VkDeviceSize, 1> vertex_buffer_offsets{0};
+					const std::array<VkDeviceSize, 1> vertex_buffer_offsets{ 0 };
 					vkCmdBindVertexBuffers(command_buffer, 0, 1, &_vertex_buffer.get(), vertex_buffer_offsets.data());
 
 					// TODO: Do actual rendering.
@@ -164,7 +160,7 @@ namespace Yttrium
 
 	Image VulkanRenderer::take_screenshot(const Size& window_size) const
 	{
-		return Image{{window_size, PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown}};
+		return Image{ { window_size, PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
 	}
 
 	void VulkanRenderer::update_descriptors()
@@ -200,7 +196,7 @@ namespace Yttrium
 
 	const VulkanVertexFormat& VulkanRenderer::vertex_format(const std::vector<VA>& vas)
 	{
-		const auto i = std::find_if(_vertex_format_cache.begin(), _vertex_format_cache.end(), [&vas](const auto& format){ return format.first == vas; });
+		const auto i = std::find_if(_vertex_format_cache.begin(), _vertex_format_cache.end(), [&vas](const auto& format) { return format.first == vas; });
 		return i != _vertex_format_cache.end() ? *i->second : *_vertex_format_cache.emplace_back(vas, std::make_unique<VulkanVertexFormat>(vas)).second;
 	}
 }

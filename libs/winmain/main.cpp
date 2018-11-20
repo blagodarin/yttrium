@@ -11,7 +11,7 @@ int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	int argc = 0;
 	std::vector<char*> argv;
 	{
-		const Yttrium::UniquePtr<LPWSTR, ::LocalFree> argv_w{::CommandLineToArgvW(::GetCommandLineW(), &argc)};
+		const Yttrium::UniquePtr<LPWSTR, ::LocalFree> argv_w{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
 		for (int i = 0; i < argc; ++i)
 		{
 			const auto buffer_size = ::WideCharToMultiByte(CP_ACP, 0, argv_w.get()[i], -1, nullptr, 0, nullptr, nullptr);

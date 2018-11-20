@@ -7,17 +7,17 @@ static_assert(sizeof(uint8_t) == sizeof(char));
 namespace Yttrium
 {
 	TinyStringMap::TinyStringMap(const TinyStringMap& other)
-		: _data{std::make_unique<uint8_t[]>(other._size)}
-		, _capacity{other._size}
-		, _size{other._size}
+		: _data{ std::make_unique<uint8_t[]>(other._size) }
+		, _capacity{ other._size }
+		, _size{ other._size }
 	{
 		std::memcpy(_data.get(), other._data.get(), _size);
 	}
 
 	TinyStringMap::TinyStringMap(TinyStringMap&& other) noexcept
-		: _data{std::move(other._data)}
-		, _capacity{other._capacity}
-		, _size{other._size}
+		: _data{ std::move(other._data) }
+		, _capacity{ other._capacity }
+		, _size{ other._size }
 	{
 		other._capacity = 0;
 		other._size = 0;
@@ -58,7 +58,7 @@ namespace Yttrium
 
 	std::string_view TinyStringMap::find(std::string_view key) const noexcept
 	{
-		for (auto current = _data.get(); current < _data.get() + _size; )
+		for (auto current = _data.get(); current < _data.get() + _size;)
 		{
 			const auto current_key_size = *current++;
 			if (current_key_size == key.size() && !std::memcmp(current, key.data(), current_key_size))

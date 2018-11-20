@@ -19,14 +19,14 @@ namespace Tetrium
 		int y = 0;
 
 		Point() = default;
-		Point(int x_, int y_) : x(x_), y(y_) {}
+		Point(int x_, int y_)
+			: x(x_), y(y_) {}
 	};
 
 	// Data representing the falling tetromino.
 	class Figure
 	{
 	public:
-
 		// Figure type.
 		enum Type
 		{
@@ -57,9 +57,9 @@ namespace Tetrium
 	private:
 		Type _type;
 		std::array<Point, 4> _blocks; // Figure blocks coordinates (x is column, y is line).
-		Point _top_left; // Top left point of the rotation rectangle.
-		Point _bottom_right; // Bottom right point of the rotation rectangle.
-		Point _offset; // Offset on the field.
+		Point _top_left;              // Top left point of the rotation rectangle.
+		Point _bottom_right;          // Bottom right point of the rotation rectangle.
+		Point _offset;                // Offset on the field.
 	};
 
 	// Data structure representing the field (blocks without the falling tetromino).
@@ -68,9 +68,9 @@ namespace Tetrium
 	public:
 		enum
 		{
-			Height        = 22, // Field height.
-			HeightPadding =  4, // Invisible field part height.
-			Width         = 10, // Field width.
+			Height = 22,       // Field height.
+			HeightPadding = 4, // Invisible field part height.
+			Width = 10,        // Field width.
 		};
 
 		Figure::Type blocks[Height + HeightPadding][Width];
@@ -149,7 +149,6 @@ namespace Tetrium
 		bool turn_right();
 
 	private:
-
 		enum State
 		{
 			Stopped,  ///< The game hasn't started.
@@ -167,30 +166,29 @@ namespace Tetrium
 		int process_horizontal_movement(int frames);
 
 	private:
+		State _state = Stopped;
+		bool _paused = false;
+		int _timeout = 0;
+		Field _field;
+		Figure _current_figure;
+		Figure _next_figure;
+		int _time_remainder = 0;
 
-		State    _state = Stopped;
-		bool     _paused = false;
-		int      _timeout = 0;
-		Field    _field;
-		Figure   _current_figure;
-		Figure   _next_figure;
-		int      _time_remainder = 0;
+		int _fixation_delay = 0;
 
-		int      _fixation_delay = 0;
+		bool _is_accelerating = false;
+		int _acceleration_bonus = 0;
 
-		bool     _is_accelerating = false;
-		int      _acceleration_bonus = 0;
+		bool _is_moving_left = false;
+		int _left_movement_timer = 0;
 
-		bool     _is_moving_left = false;
-		int      _left_movement_timer = 0;
+		bool _is_moving_right = false;
+		int _right_movement_timer = 0;
 
-		bool     _is_moving_right = false;
-		int      _right_movement_timer = 0;
-
-		int      _score = 0;
-		int      _lines = 0;
-		int      _level = 0;
-		int      _speed = 0;
+		int _score = 0;
+		int _lines = 0;
+		int _level = 0;
+		int _speed = 0;
 
 		std::default_random_engine _random_engine{ static_cast<std::default_random_engine::result_type>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count()) };
 		std::uniform_int_distribution<int> _random_distribution{ 0, Figure::Count - 1 };

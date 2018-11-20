@@ -24,7 +24,8 @@ namespace Yttrium
 	class TextureFontImpl final : public TextureFont
 	{
 	public:
-		explicit TextureFontImpl(int size) : _size{size} {}
+		explicit TextureFontImpl(int size)
+			: _size{ size } {}
 
 		void build(std::vector<TexturedRect>& rects, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override
 		{
@@ -35,14 +36,13 @@ namespace Yttrium
 			const auto scaling = font_size / static_cast<float>(_size);
 
 			float selection_left = 0;
-			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](size_t index)
-			{
+			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](size_t index) {
 				if (!capture)
 					return;
 
 				if (capture->_cursor_pos == index)
 				{
-					capture->_cursor_rect = {{current_x, current_y + font_size * 0.125f}, SizeF(2, font_size * 0.75f)};
+					capture->_cursor_rect = { { current_x, current_y + font_size * 0.125f }, SizeF(2, font_size * 0.75f) };
 					capture->_has_cursor = true;
 				}
 
@@ -54,7 +54,7 @@ namespace Yttrium
 					}
 					else if (index == capture->_selection_end)
 					{
-						capture->_selection_rect = {{selection_left, current_y}, Vector2{current_x, current_y + font_size}};
+						capture->_selection_rect = { { selection_left, current_y }, Vector2{ current_x, current_y + font_size } };
 						capture->_has_selection = true;
 					}
 				}
@@ -71,10 +71,8 @@ namespace Yttrium
 					rects.emplace_back(
 						RectF(
 							{ current_x + static_cast<float>(info->second.offset._x) * scaling, current_y + static_cast<float>(info->second.offset._y) * scaling },
-							SizeF(info->second.rect.size()) * scaling
-						),
-						RectF(info->second.rect)
-					);
+							SizeF(info->second.rect.size()) * scaling),
+						RectF(info->second.rect));
 					do_capture(i);
 					const auto kerning = _kernings.find(::make_key(last_symbol, *current_symbol));
 					current_x += static_cast<float>(info->second.advance + (kerning != _kernings.end() ? kerning->second : 0)) * scaling;
@@ -102,13 +100,13 @@ namespace Yttrium
 						width += kerning->second;
 				}
 			}
-			return {width, _size};
+			return { width, _size };
 		}
 
 		SizeF text_size(std::string_view text, const SizeF& font_size) const override
 		{
-			const SizeF size{text_size(text)};
-			return {font_size._width * (size._width * font_size._height / size._height), font_size._height};
+			const SizeF size{ text_size(text) };
+			return { font_size._width * (size._width * font_size._height / size._height), font_size._height };
 		}
 
 	private:
@@ -122,7 +120,7 @@ namespace Yttrium
 
 	std::unique_ptr<TextureFont> TextureFont::load(const Source& source)
 	{
-		Reader reader{source};
+		Reader reader{ source };
 
 		uint32_t fourcc = 0;
 		if (!reader.read(fourcc) || fourcc != FourccYtf1)
@@ -152,14 +150,14 @@ namespace Yttrium
 				throw DataError("Bad 'char' section entry ", i);
 
 			CharInfo info;
-			info.rect = {{font_section.base_x + char_data.x, font_section.base_y + char_data.y}, Size{char_data.width, char_data.height}};
+			info.rect = { { font_section.base_x + char_data.x, font_section.base_y + char_data.y }, Size{ char_data.width, char_data.height } };
 			info.offset = Point{ char_data.x_offset, char_data.y_offset };
 			info.advance = char_data.advance;
 
 			font->_chars[char_data.id] = info;
-			font_rect_size = {std::max(font_rect_size._width, char_data.x + char_data.width), std::max(font_rect_size._height, char_data.y + char_data.height)};
+			font_rect_size = { std::max(font_rect_size._width, char_data.x + char_data.width), std::max(font_rect_size._height, char_data.y + char_data.height) };
 		}
-		font->_rect = {{font_section.base_x, font_section.base_y}, font_rect_size};
+		font->_rect = { { font_section.base_x, font_section.base_y }, font_rect_size };
 
 		if (reader.read(fourcc))
 		{

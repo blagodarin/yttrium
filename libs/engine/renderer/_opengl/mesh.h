@@ -16,11 +16,11 @@ namespace Yttrium
 		const GLenum _index_buffer_format;
 
 		OpenGLMesh(GlVertexArrayHandle&& vertex_array, GlBufferHandle&& vertex_buffer, GlBufferHandle&& index_buffer, GLsizei index_buffer_size, GLenum index_buffer_format)
-			: _vertex_buffer{std::move(vertex_buffer)}
-			, _vertex_array{std::move(vertex_array)}
-			, _index_buffer{std::move(index_buffer)}
-			, _index_buffer_size{index_buffer_size}
-			, _index_buffer_format{index_buffer_format}
+			: _vertex_buffer{ std::move(vertex_buffer) }
+			, _vertex_array{ std::move(vertex_array) }
+			, _index_buffer{ std::move(index_buffer) }
+			, _index_buffer_size{ index_buffer_size }
+			, _index_buffer_format{ index_buffer_format }
 		{
 		}
 	};

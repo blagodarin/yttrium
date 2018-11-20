@@ -52,7 +52,10 @@ namespace Yttrium
 
 		/// Writes data to the target.
 		template <typename T>
-		bool write(const T& data) { return write(&data, sizeof data) == sizeof data; }
+		bool write(const T& data)
+		{
+			return write(&data, sizeof data) == sizeof data;
+		}
 
 		/// Writes data to the target.
 		bool write_all(const void* data, size_t size) { return write(data, size) == size; }
@@ -71,7 +74,10 @@ namespace Yttrium
 
 		/// Writes data at the specified offset.
 		template <typename T>
-		bool write_at(uint64_t offset, const T& data) { return write_at(offset, &data, sizeof data) == sizeof data; }
+		bool write_at(uint64_t offset, const T& data)
+		{
+			return write_at(offset, &data, sizeof data) == sizeof data;
+		}
 
 	private:
 		std::unique_ptr<class WriterPrivate> _private;

@@ -24,7 +24,7 @@ namespace Yttrium
 
 	private:
 		ScriptCall(ScriptContext& context, const std::string& function, std::string& result, const ScriptArgs& args)
-			: _context{context}, _function{function}, _result{result}, _args{args} {}
+			: _context{ context }, _function{ function }, _result{ result }, _args{ args } {}
 		friend ScriptContext;
 	};
 

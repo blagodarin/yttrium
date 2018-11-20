@@ -8,17 +8,17 @@ namespace
 {
 	auto create_alc_device()
 	{
-		Yttrium::P_ALCdevice device{::alcOpenDevice(nullptr)};
+		Yttrium::P_ALCdevice device{ ::alcOpenDevice(nullptr) };
 		if (!device)
-			throw Yttrium::InitializationError{"Failed to open the default OpenAL device"};
+			throw Yttrium::InitializationError{ "Failed to open the default OpenAL device" };
 		return device;
 	}
 
 	auto create_alc_context(::ALCdevice* device)
 	{
-		Yttrium::P_ALCcontext context{::alcCreateContext(device, nullptr)};
+		Yttrium::P_ALCcontext context{ ::alcCreateContext(device, nullptr) };
 		if (!context)
-			throw Yttrium::InitializationError{"Failed to create an OpenAL context for \"", ::alcGetString(device, ALC_DEVICE_SPECIFIER), "\" device"};
+			throw Yttrium::InitializationError{ "Failed to create an OpenAL context for \"", ::alcGetString(device, ALC_DEVICE_SPECIFIER), "\" device" };
 		return context;
 	}
 }
@@ -26,8 +26,8 @@ namespace
 namespace Yttrium
 {
 	OpenALBackend::OpenALBackend()
-		: _device{::create_alc_device()}
-		, _context{::create_alc_context(_device.get())}
+		: _device{ ::create_alc_device() }
+		, _context{ ::create_alc_context(_device.get()) }
 	{
 		::alcMakeContextCurrent(_context.get());
 	}

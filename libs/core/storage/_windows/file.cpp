@@ -14,8 +14,8 @@ namespace Yttrium
 	{
 	public:
 		FileSource(uint64_t size, const std::string& name, HANDLE handle)
-			: Source{size, name}
-			, _handle{handle}
+			: Source{ size, name }
+			, _handle{ handle }
 		{
 		}
 
@@ -42,8 +42,8 @@ namespace Yttrium
 	{
 	public:
 		FileWriter(const std::string& name, HANDLE handle)
-			: _name{name}
-			, _handle{handle}
+			: _name{ name }
+			, _handle{ handle }
 		{
 		}
 
@@ -64,7 +64,7 @@ namespace Yttrium
 			LARGE_INTEGER offset;
 			offset.QuadPart = size;
 			if (!::SetFilePointerEx(_handle, offset, nullptr, FILE_BEGIN) || !::SetEndOfFile(_handle))
-				throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
+				throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		}
 
 		void unlink() override
@@ -94,7 +94,7 @@ namespace Yttrium
 			return {};
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
-			throw std::system_error{static_cast<int>(::GetLastError()), std::system_category()};
+			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		return std::make_unique<FileSource>(size.QuadPart, path, handle);
 	}
 

@@ -14,14 +14,14 @@ namespace Yttrium
 	{
 	public:
 		explicit StoragePrivate(Storage::UseFileSystem use_file_system)
-			: _use_file_system{use_file_system}
+			: _use_file_system{ use_file_system }
 		{
 		}
 
 		void attach_buffer(const std::string& name, Buffer&& buffer)
 		{
 			auto& attachment = _buffers.emplace_back(name, std::move(buffer));
-			_stored[attachment._name] = BufferEntry{&attachment};
+			_stored[attachment._name] = BufferEntry{ &attachment };
 		}
 
 		void attach_package(std::unique_ptr<PackageReader>&& package)
@@ -29,7 +29,7 @@ namespace Yttrium
 			const auto p = _packages.emplace_back(std::move(package)).get();
 			const auto& names = p->names();
 			for (std::size_t i = 0; i < names.size(); ++i)
-				_stored[names[i]] = PackageEntry{p, i};
+				_stored[names[i]] = PackageEntry{ p, i };
 		}
 
 		std::unique_ptr<Source> open(std::string_view name) const
@@ -53,20 +53,23 @@ namespace Yttrium
 		{
 			std::string _name;
 			std::shared_ptr<const Buffer> _buffer;
-			BufferAttachment(const std::string& name, Buffer&& buffer) : _name{name}, _buffer{std::make_shared<const Buffer>(std::move(buffer))} {}
+			BufferAttachment(const std::string& name, Buffer&& buffer)
+				: _name{ name }, _buffer{ std::make_shared<const Buffer>(std::move(buffer)) } {}
 		};
 
 		struct BufferEntry
 		{
 			const BufferAttachment* _attachment;
-			explicit BufferEntry(const BufferAttachment* attachment) : _attachment{attachment} {}
+			explicit BufferEntry(const BufferAttachment* attachment)
+				: _attachment{ attachment } {}
 		};
 
 		struct PackageEntry
 		{
 			const PackageReader* _package;
 			std::size_t _index;
-			PackageEntry(const PackageReader* package, std::size_t index) : _package{package}, _index{index} {}
+			PackageEntry(const PackageReader* package, std::size_t index)
+				: _package{ package }, _index{ index } {}
 		};
 
 		std::unique_ptr<Source> operator()(const std::monostate&) const { return {}; }
@@ -81,7 +84,7 @@ namespace Yttrium
 	};
 
 	Storage::Storage(UseFileSystem use_file_system)
-		: _private{std::make_unique<StoragePrivate>(use_file_system)}
+		: _private{ std::make_unique<StoragePrivate>(use_file_system) }
 	{
 	}
 

@@ -25,23 +25,20 @@ namespace
 	void make_buttons_texture(Storage& storage, const std::string& name)
 	{
 		constexpr size_t button_styles = 4;
-		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [](size_t, size_t y)
-		{
+		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [](size_t, size_t y) {
 			const auto style = y / button_size;
-			return Bgra32{0xff, 0x44 * style, 0x44 * style};
+			return Bgra32{ 0xff, 0x44 * style, 0x44 * style };
 		}));
 	}
 
 	template <std::size_t size>
 	void make_cursor_texture(Storage& storage, const std::string& name)
 	{
-		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y)
-		{
+		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y) {
 			if (y > 2 * x || 2 * y < x || (y > 2 * (size - x) && x > 2 * (size - y)))
-				return Bgra32{0, 0, 0, 0};
+				return Bgra32{ 0, 0, 0, 0 };
 			else
-				return Bgra32
-				{
+				return Bgra32{
 					y * 0xff / (size - 1),
 					x * 0xff / (size - 1),
 					(size * size - x * y) * 0xff / (size * size),
@@ -56,8 +53,8 @@ namespace
 			constexpr size_t frequency = 44100;
 			constexpr size_t duration = frequency / 4; // 0.25 s.
 
-			Writer writer{buffer};
-			if (write_wav_header(writer, {2, 1, frequency}, duration))
+			Writer writer{ buffer };
+			if (write_wav_header(writer, { 2, 1, frequency }, duration))
 			{
 				constexpr auto time_step = 440.0 / frequency;
 
@@ -75,7 +72,8 @@ namespace
 	class FieldCanvas : public Canvas
 	{
 	public:
-		FieldCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
+		FieldCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics)
+			: _logic{ logic }, _graphics{ graphics } {}
 
 		void on_draw(RenderPass& pass, const RectF& rect) override
 		{
@@ -90,7 +88,8 @@ namespace
 	class NextFigureCanvas : public Canvas
 	{
 	public:
-		NextFigureCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics) : _logic{logic}, _graphics{graphics} {}
+		NextFigureCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics)
+			: _logic{ logic }, _graphics{ graphics } {}
 
 		void on_draw(RenderPass& pass, const RectF& rect) override
 		{
@@ -107,26 +106,26 @@ int main(int, char**)
 {
 	Application application;
 
-	Window window{application, "Tetrium"};
+	Window window{ application, "Tetrium" };
 
 	ScriptContext script;
 
 	Tetrium::Game logic;
-	script.define("game_pause", [&logic](const ScriptCall&){ logic.pause(); });
-	script.define("game_start", [&logic](const ScriptCall& call){ logic.start(call._context.get_int("start_level", 1)); });
-	script.define("game_stop", [&logic](const ScriptCall&){ logic.pause(); });
-	script.define("game_resume", [&logic](const ScriptCall&){ logic.resume(); });
-	script.define("move_down", 1, [&logic](const ScriptCall& call){ logic.set_acceleration(call._args[0]->to_int()); });
-	script.define("move_left", 1, [&logic](const ScriptCall& call){ logic.set_left_movement(call._args[0]->to_int()); });
-	script.define("move_right", 1, [&logic](const ScriptCall& call){ logic.set_right_movement(call._args[0]->to_int()); });
-	script.define("screenshot", [&window](const ScriptCall&){ window.take_screenshot(); });
-	script.define("turn_left", [&logic](const ScriptCall&){ logic.turn_left(); });
-	script.define("turn_right", [&logic](const ScriptCall&){ logic.turn_right(); });
+	script.define("game_pause", [&logic](const ScriptCall&) { logic.pause(); });
+	script.define("game_start", [&logic](const ScriptCall& call) { logic.start(call._context.get_int("start_level", 1)); });
+	script.define("game_stop", [&logic](const ScriptCall&) { logic.pause(); });
+	script.define("game_resume", [&logic](const ScriptCall&) { logic.resume(); });
+	script.define("move_down", 1, [&logic](const ScriptCall& call) { logic.set_acceleration(call._args[0]->to_int()); });
+	script.define("move_left", 1, [&logic](const ScriptCall& call) { logic.set_left_movement(call._args[0]->to_int()); });
+	script.define("move_right", 1, [&logic](const ScriptCall& call) { logic.set_right_movement(call._args[0]->to_int()); });
+	script.define("screenshot", [&window](const ScriptCall&) { window.take_screenshot(); });
+	script.define("turn_left", [&logic](const ScriptCall&) { logic.turn_left(); });
+	script.define("turn_right", [&logic](const ScriptCall&) { logic.turn_right(); });
 
-	TetriumStatistics statistics{script};
-	script.define("set_score", 2, [&statistics](const ScriptCall& call){ statistics.update(call._args[1]->to_int(), call._args[0]->string()); });
+	TetriumStatistics statistics{ script };
+	script.define("set_score", 2, [&statistics](const ScriptCall& call) { statistics.update(call._args[1]->to_int(), call._args[0]->string()); });
 
-	Storage storage{Storage::UseFileSystem::Never};
+	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");
 	::make_buttons_texture<16>(storage, "examples/tetrium/data/buttons.tga");
 	::make_cursor_texture<64>(storage, "examples/tetrium/data/cursor.tga");
@@ -141,15 +140,14 @@ int main(int, char**)
 	{
 	}
 
-	ResourceLoader resource_loader{storage, &window.render_manager(), audio ? &*audio : nullptr};
-	Gui gui{resource_loader, script, "examples/tetrium/data/gui.ion"};
-	gui.on_quit([&window]{ window.close(); });
+	ResourceLoader resource_loader{ storage, &window.render_manager(), audio ? &*audio : nullptr };
+	Gui gui{ resource_loader, script, "examples/tetrium/data/gui.ion" };
+	gui.on_quit([&window] { window.close(); });
 
-	window.on_key_event([&gui](const KeyEvent& event){ gui.process_key_event(event); });
-	window.on_render([&gui](RenderPass& pass, const Vector2& cursor){ gui.draw(pass, cursor); });
-	window.on_screenshot([](Image&& image){ image.save(::make_screenshot_path()); });
-	window.on_update([&script, &gui, &logic](const UpdateEvent& event)
-	{
+	window.on_key_event([&gui](const KeyEvent& event) { gui.process_key_event(event); });
+	window.on_render([&gui](RenderPass& pass, const Vector2& cursor) { gui.draw(pass, cursor); });
+	window.on_screenshot([](Image&& image) { image.save(::make_screenshot_path()); });
+	window.on_update([&script, &gui, &logic](const UpdateEvent& event) {
 		if (logic.advance(static_cast<int>(event.milliseconds.count())))
 		{
 			script.set("score", logic.score());
@@ -160,19 +158,19 @@ int main(int, char**)
 		}
 	});
 
-	TetriumGraphics graphics{window.render_manager()};
+	TetriumGraphics graphics{ window.render_manager() };
 
-	FieldCanvas field_canvas{logic, graphics};
+	FieldCanvas field_canvas{ logic, graphics };
 	gui.bind_canvas("field", field_canvas);
 
-	NextFigureCanvas next_figure_canvas{logic, graphics};
+	NextFigureCanvas next_figure_canvas{ logic, graphics };
 	gui.bind_canvas("next", next_figure_canvas);
 
 	std::optional<AudioPlayer> audio_player;
 	if (audio)
 	{
 		audio_player.emplace(*audio);
-		gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music){ audio_player->set_music(music); });
+		gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music) { audio_player->set_music(music); });
 	}
 
 	gui.start();

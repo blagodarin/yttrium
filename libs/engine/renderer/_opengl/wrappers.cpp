@@ -8,8 +8,8 @@
 namespace Yttrium
 {
 	GlBufferHandle::GlBufferHandle(const GlApi& gl, GLenum target)
-		: _gl{gl}
-		, _target{target}
+		: _gl{ gl }
+		, _target{ target }
 	{
 		_gl.GenBuffers(1, &_handle);
 		if (!_handle)
@@ -17,10 +17,10 @@ namespace Yttrium
 	}
 
 	GlBufferHandle::GlBufferHandle(GlBufferHandle&& buffer) noexcept
-		: _gl{buffer._gl}
-		, _target{buffer._target}
-		, _handle{buffer._handle}
-		, _size{buffer._size}
+		: _gl{ buffer._gl }
+		, _target{ buffer._target }
+		, _handle{ buffer._handle }
+		, _size{ buffer._size }
 	{
 		buffer._handle = 0;
 	}
@@ -53,16 +53,16 @@ namespace Yttrium
 	}
 
 	GlProgramHandle::GlProgramHandle(const GlApi& gl)
-		: _gl{gl}
-		, _handle{_gl.CreateProgram()}
+		: _gl{ gl }
+		, _handle{ _gl.CreateProgram() }
 	{
 		if (!_handle)
 			throw std::runtime_error("glCreateProgram failed");
 	}
 
 	GlProgramHandle::GlProgramHandle(GlProgramHandle&& program)
-		: _gl{program._gl}
-		, _handle{program._handle}
+		: _gl{ program._gl }
+		, _handle{ program._handle }
 	{
 		program._handle = 0;
 	}
@@ -105,18 +105,18 @@ namespace Yttrium
 	}
 
 	GlShaderHandle::GlShaderHandle(const GlApi& gl, GLenum type)
-		: _gl{gl}
-		, _type{type}
-		, _handle{_gl.CreateShader(_type)}
+		: _gl{ gl }
+		, _type{ type }
+		, _handle{ _gl.CreateShader(_type) }
 	{
 		if (!_handle)
 			throw std::runtime_error("glCreateShader failed");
 	}
 
 	GlShaderHandle::GlShaderHandle(GlShaderHandle&& shader)
-		: _gl{shader._gl}
-		, _type{shader._type}
-		, _handle{shader._handle}
+		: _gl{ shader._gl }
+		, _type{ shader._type }
+		, _handle{ shader._handle }
 	{
 		shader._handle = 0;
 	}
@@ -152,8 +152,8 @@ namespace Yttrium
 	}
 
 	GlTextureHandle::GlTextureHandle(const GlApi& gl, GLenum target)
-		: _gl{gl}
-		, _target{target}
+		: _gl{ gl }
+		, _target{ target }
 	{
 		_gl.GenTextures(1, &_handle);
 		if (!_handle)
@@ -161,9 +161,9 @@ namespace Yttrium
 	}
 
 	GlTextureHandle::GlTextureHandle(GlTextureHandle&& texture)
-		: _gl{texture._gl}
-		, _target{texture._target}
-		, _handle{texture._handle}
+		: _gl{ texture._gl }
+		, _target{ texture._target }
+		, _handle{ texture._handle }
 	{
 		texture._handle = 0;
 	}
@@ -201,7 +201,7 @@ namespace Yttrium
 	}
 
 	GlVertexArrayHandle::GlVertexArrayHandle(const GlApi& gl)
-		: _gl{gl}
+		: _gl{ gl }
 	{
 		_gl.GenVertexArrays(1, &_handle);
 		if (!_handle)
@@ -209,9 +209,9 @@ namespace Yttrium
 	}
 
 	GlVertexArrayHandle::GlVertexArrayHandle(GlVertexArrayHandle&& vertex_array) noexcept
-		: _gl{vertex_array._gl}
-		, _handle{vertex_array._handle}
-		, _attributes{vertex_array._attributes}
+		: _gl{ vertex_array._gl }
+		, _handle{ vertex_array._handle }
+		, _attributes{ vertex_array._attributes }
 	{
 		vertex_array._handle = 0;
 	}

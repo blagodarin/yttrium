@@ -34,38 +34,38 @@ TEST_CASE("texture_font")
 		Writer writer(file);
 
 		// File header.
-		write(writer, {'Y', 'T', 'F', '1'});
+		write(writer, { 'Y', 'T', 'F', '1' });
 
 		// General information section.
-		write(writer, {'f', 'o', 'n', 't'});
-		write(writer, uint8_t{8}); // Vertical distance between consecutive lines.
-		write(writer, uint16_t{0}); // Horizontal offset in the texture.
-		write(writer, uint16_t{0}); // Vertical offset in the texture.
+		write(writer, { 'f', 'o', 'n', 't' });
+		write(writer, uint8_t{ 8 });  // Vertical distance between consecutive lines.
+		write(writer, uint16_t{ 0 }); // Horizontal offset in the texture.
+		write(writer, uint16_t{ 0 }); // Vertical offset in the texture.
 
 		// Character information section.
-		write(writer, {'c', 'h', 'a', 'r'});
-		write(writer, uint8_t{char_count}); // Number of character entries.
+		write(writer, { 'c', 'h', 'a', 'r' });
+		write(writer, uint8_t{ char_count }); // Number of character entries.
 		for (uint8_t id = first_char; id <= last_char; ++id)
 		{
-			write(writer, uint8_t{id}); // Character code.
+			write(writer, uint8_t{ id });                        // Character code.
 			write(writer, static_cast<uint16_t>((id % 16) * 8)); // Horizontal offset on the texture.
 			write(writer, static_cast<uint16_t>((id / 16) * 8)); // Vertical offset on the texture.
-			write(writer, uint8_t{8}); // Character width.
-			write(writer, uint8_t{8}); // Character height.
-			write(writer, int8_t{0}); // Horizontal offset for character output.
-			write(writer, int8_t{0}); // Vertical offset for character output.
-			write(writer, uint8_t{8}); // Base distance to the next character in the output text.
+			write(writer, uint8_t{ 8 });                         // Character width.
+			write(writer, uint8_t{ 8 });                         // Character height.
+			write(writer, int8_t{ 0 });                          // Horizontal offset for character output.
+			write(writer, int8_t{ 0 });                          // Vertical offset for character output.
+			write(writer, uint8_t{ 8 });                         // Base distance to the next character in the output text.
 		}
 
 		// Kerning information section.
-		write(writer, {'k', 'e', 'r', 'n'});
-		write(writer, uint16_t{char_count * char_count}); // Number of kerning entries.
+		write(writer, { 'k', 'e', 'r', 'n' });
+		write(writer, uint16_t{ char_count * char_count }); // Number of kerning entries.
 		for (uint8_t id1 = first_char; id1 <= last_char; ++id1)
 		{
 			for (uint8_t id2 = first_char; id2 <= last_char; ++id2)
 			{
-				write(writer, uint8_t{id1}); // First character.
-				write(writer, uint8_t{id2}); // Second character.
+				write(writer, uint8_t{ id1 });                       // First character.
+				write(writer, uint8_t{ id2 });                       // Second character.
 				write(writer, static_cast<int8_t>((id1 + id2) & 1)); // Kerning amount.
 			}
 		}

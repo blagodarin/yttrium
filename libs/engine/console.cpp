@@ -11,7 +11,8 @@ namespace Yttrium
 	class ConsolePrivate
 	{
 	public:
-		explicit ConsolePrivate(ScriptContext& script_context) : _script_context{script_context} {}
+		explicit ConsolePrivate(ScriptContext& script_context)
+			: _script_context{ script_context } {}
 
 	public:
 		ScriptContext& _script_context;
@@ -20,7 +21,7 @@ namespace Yttrium
 	};
 
 	Console::Console(ScriptContext& script_context)
-		: _private{std::make_unique<ConsolePrivate>(script_context)}
+		: _private{ std::make_unique<ConsolePrivate>(script_context) }
 	{
 	}
 
@@ -31,7 +32,7 @@ namespace Yttrium
 		if (!_private->_visible)
 			return;
 
-		DebugRenderer renderer{pass};
+		DebugRenderer renderer{ pass };
 
 		const auto max_width = renderer.max_width();
 
@@ -67,7 +68,7 @@ namespace Yttrium
 				return true;
 
 			case Key::Enter:
-				ScriptCode{std::string{_private->_line_editor.text()}}.execute(_private->_script_context);
+				ScriptCode{ std::string{ _private->_line_editor.text() } }.execute(_private->_script_context);
 				_private->_line_editor.clear();
 				return true;
 

@@ -17,8 +17,8 @@
 namespace Yttrium
 {
 	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context)
-		: _resource_loader{resource_loader}
-		, _script_context{script_context}
+		: _resource_loader{ resource_loader }
+		, _script_context{ script_context }
 	{
 	}
 
@@ -27,14 +27,14 @@ namespace Yttrium
 	GuiScreen& GuiPrivate::add_screen(std::string_view name, bool is_transparent, bool is_root)
 	{
 		if (!is_root && name.empty())
-			throw GuiDataError{"Non-root screen must have a name"};
+			throw GuiDataError{ "Non-root screen must have a name" };
 		if (_screens.find(name) != _screens.end())
-			throw GuiDataError{"Duplicate screen name \"", name, "\""};
+			throw GuiDataError{ "Duplicate screen name \"", name, "\"" };
 		auto screen = std::make_unique<GuiScreen>(*this, name, is_transparent);
 		if (is_root)
 		{
 			if (_root_screen)
-				throw GuiDataError{"\"", name, "\" can't be a root screen, \"", _root_screen->name(), "\" is the root screen"};
+				throw GuiDataError{ "\"", name, "\" can't be a root screen, \"", _root_screen->name(), "\" is the root screen" };
 			_root_screen = screen.get();
 		}
 		auto& result = *_screens.emplace(screen->name(), std::move(screen)).first->second;
@@ -45,7 +45,7 @@ namespace Yttrium
 	void GuiPrivate::set_translation(std::string_view path)
 	{
 		if (_translation)
-			throw GuiDataError{"Only one translation is allowed"};
+			throw GuiDataError{ "Only one translation is allowed" };
 		_translation = _resource_loader.load_translation(path);
 	}
 
@@ -85,7 +85,7 @@ namespace Yttrium
 
 	bool GuiPrivate::pop_screens_until(const std::string& name)
 	{
-		const auto end = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [&name](GuiScreen* screen){ return screen->name() == name; });
+		const auto end = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [&name](GuiScreen* screen) { return screen->name() == name; });
 		if (end == _screen_stack.rend())
 			return false;
 		for (auto n = std::distance(_screen_stack.rbegin(), end); n > 0; --n)
@@ -118,7 +118,7 @@ namespace Yttrium
 		assert(texture_font);
 
 		if (!Rect(texture->size()).contains(texture_font->rect()))
-			throw GuiDataError{"Can't use font \"", font_source, "\" with texture \"", texture_name, "\""};
+			throw GuiDataError{ "Can't use font \"", font_source, "\" with texture \"", texture_name, "\"" };
 
 		auto& font = _fonts[name];
 		font.font = std::move(texture_font);
@@ -127,7 +127,7 @@ namespace Yttrium
 
 	std::string GuiPrivate::translate(std::string_view source) const
 	{
-		return _translation ? _translation->translate(source) : std::string{source};
+		return _translation ? _translation->translate(source) : std::string{ source };
 	}
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)
@@ -144,7 +144,7 @@ namespace Yttrium
 		screen->handle_return();
 		if (screen->music() && _on_music)
 		{
-			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* s){ return s->music(); });
+			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* s) { return s->music(); });
 			_on_music(i != _screen_stack.rend() ? (*i)->music() : nullptr);
 		}
 		_screen_stack.pop_back();
@@ -155,7 +155,7 @@ namespace Yttrium
 	{
 		GuiIonLoader(*_private).load(name);
 		if (!_private->_root_screen)
-			throw GuiDataError{"(gui) No root screen has been added"};
+			throw GuiDataError{ "(gui) No root screen has been added" };
 	}
 
 	Gui::~Gui() = default;

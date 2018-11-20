@@ -13,7 +13,9 @@ namespace Yttrium
 	{
 		const std::uint32_t _value;
 		template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && sizeof(T) <= sizeof(std::uint32_t)>>
-		explicit Hex32(T value) noexcept : _value{static_cast<std::uint32_t>(value)} {}
+		explicit Hex32(T value) noexcept
+			: _value{ static_cast<std::uint32_t>(value) }
+		{}
 	};
 
 	Y_CORE_API void _append_to(std::string&, long long);

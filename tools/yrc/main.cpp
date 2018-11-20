@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
 	std::vector<char> buffer;
 	{
-		std::ifstream input{argv[2], std::ios::binary | std::ios::in};
+		std::ifstream input{ argv[2], std::ios::binary | std::ios::in };
 		if (!input.is_open())
 		{
 			std::cerr << "ERROR: Unable to open \"" << argv[2] << "\"\n";
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	std::ofstream output{argv[3], std::ios::out | std::ios::trunc};
+	std::ofstream output{ argv[3], std::ios::out | std::ios::trunc };
 	if (!output.is_open())
 	{
 		std::cerr << "ERROR: Unable to open \"" << argv[3] << "\"\n";
@@ -59,7 +59,10 @@ int main(int argc, char** argv)
 		case '\a': output << "\\a"; break;
 		case '\b': output << "\\b"; break;
 		case '\t': output << "\\t"; break;
-		case '\n': output << "\\n"; newline = true; break;
+		case '\n':
+			output << "\\n";
+			newline = true;
+			break;
 		case '\v': output << "\\v"; break;
 		case '\f': output << "\\f"; break;
 		case '\r': output << "\\r"; break;

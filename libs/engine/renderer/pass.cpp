@@ -17,12 +17,24 @@
 namespace
 {
 	const Yttrium::Matrix4 _3d_directions // Makes Y point forward and Z point up.
-	{
-		1,  0,  0,  0,
-		0,  0,  1,  0,
-		0, -1,  0,  0,
-		0,  0,  0,  1,
-	};
+		{
+			1,
+			0,
+			0,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			-1,
+			0,
+			0,
+			0,
+			0,
+			0,
+			1,
+		};
 }
 
 namespace Yttrium
@@ -39,10 +51,10 @@ namespace Yttrium
 	RenderPassData::~RenderPassData() noexcept = default;
 
 	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& window_size)
-		: _backend{backend}
-		, _builtin{builtin}
-		, _data{data}
-		, _window_size{window_size}
+		: _backend{ backend }
+		, _builtin{ builtin }
+		, _data{ data }
+		, _window_size{ window_size }
 	{
 		_data._debug_text.clear();
 		_backend.clear();
@@ -90,15 +102,15 @@ namespace Yttrium
 
 	void RenderPassImpl::draw_rects(const std::vector<TexturedRect>& rects, const Color4f& color)
 	{
-		const SizeF texture_size{current_texture_2d()->size()};
-		const Vector2 texture_scale{texture_size._width, texture_size._height};
+		const SizeF texture_size{ current_texture_2d()->size() };
+		const Vector2 texture_scale{ texture_size._width, texture_size._height };
 		for (const auto& rect : rects)
 			draw_rect(rect.geometry, color, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()));
 	}
 
 	Matrix4 RenderPassImpl::full_matrix() const
 	{
-		const auto current_projection = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::Projection; });
+		const auto current_projection = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m) { return m.second == RenderMatrixType::Projection; });
 		assert(current_projection != _data._matrix_stack.rend());
 		const auto current_view = current_projection.base();
 		assert(current_view != _data._matrix_stack.end());
@@ -119,7 +131,7 @@ namespace Yttrium
 		const auto xn = (2 * v.x + 1) / static_cast<float>(_window_size._width) - 1;
 		const auto yn = 1 - (2 * v.y + 1) / static_cast<float>(_window_size._height);
 		const auto m = inverse(full_matrix());
-		return {m * Vector3{xn, yn, 0}, m * Vector3{xn, yn, 1}};
+		return { m * Vector3{ xn, yn, 0 }, m * Vector3{ xn, yn, 1 } };
 	}
 
 	void RenderPassImpl::set_texture_rect(const RectF& rect, const MarginsF& borders)
@@ -128,26 +140,26 @@ namespace Yttrium
 		if (!current_texture)
 			return;
 
-		const SizeF texture_size{current_texture->size()};
-		const Vector2 texture_scale{texture_size._width, texture_size._height};
+		const SizeF texture_size{ current_texture->size() };
+		const Vector2 texture_scale{ texture_size._width, texture_size._height };
 		const auto texture_rect_size = _texture_rect.size();
-		const auto minimum = SizeF{borders._left + 1 + borders._right, borders._top + 1 + borders._bottom} / texture_scale;
+		const auto minimum = SizeF{ borders._left + 1 + borders._right, borders._top + 1 + borders._bottom } / texture_scale;
 		if (texture_rect_size._width < minimum._width || texture_rect_size._height < minimum._height)
 			return;
 
 		_texture_rect = _backend.map_rect(rect / texture_scale, current_texture->orientation());
 		_texture_borders =
-		{
-			borders._top / texture_size._height,
-			borders._right / texture_size._width,
-			borders._bottom / texture_size._height,
-			borders._left / texture_size._width,
-		};
+			{
+				borders._top / texture_size._height,
+				borders._right / texture_size._width,
+				borders._bottom / texture_size._height,
+				borders._left / texture_size._width,
+			};
 	}
 
 	SizeF RenderPassImpl::window_size() const
 	{
-		return SizeF{_window_size};
+		return SizeF{ _window_size };
 	}
 
 	void RenderPassImpl::draw_debug_text()
@@ -155,18 +167,18 @@ namespace Yttrium
 		if (_data._debug_text.empty())
 			return;
 		{
-			DebugRenderer debug{*this};
+			DebugRenderer debug{ *this };
 			debug.set_color(1, 1, 1);
 			size_t top = 0;
 			size_t line_begin = 0;
 			auto line_end = _data._debug_text.find('\n', line_begin);
 			while (line_end != std::string::npos)
 			{
-				debug.draw_text(0, top++, {_data._debug_text.data() + line_begin, line_end - line_begin});
+				debug.draw_text(0, top++, { _data._debug_text.data() + line_begin, line_end - line_begin });
 				line_begin = line_end + 1;
 				line_end = _data._debug_text.find('\n', line_begin);
 			}
-			debug.draw_text(0, top, {_data._debug_text.data() + line_begin, _data._debug_text.size() - line_begin});
+			debug.draw_text(0, top, { _data._debug_text.data() + line_begin, _data._debug_text.size() - line_begin });
 		}
 		flush_2d();
 	}
@@ -213,7 +225,7 @@ namespace Yttrium
 			return;
 		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
 #ifndef NDEBUG
-		const auto last_view = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m){ return m.second == RenderMatrixType::View; });
+		const auto last_view = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m) { return m.second == RenderMatrixType::View; });
 		assert(last_view != _data._matrix_stack.rend());
 		const auto last_projection = std::next(last_view);
 		assert(last_projection != _data._matrix_stack.rend());
@@ -389,7 +401,7 @@ namespace Yttrium
 
 	void RenderPassImpl::flush_2d() noexcept
 	{
-		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= std::size_t{std::numeric_limits<uint16_t>::max()} + 1);
+		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= std::size_t{ std::numeric_limits<uint16_t>::max() } + 1);
 		if (_data._vertices_2d.size() == 0)
 			return;
 

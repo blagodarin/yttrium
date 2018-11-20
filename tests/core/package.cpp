@@ -106,7 +106,7 @@ TEST_CASE("package.file_size")
 	auto packed_file = ::open_packed(*package, file2.name());
 	REQUIRE(packed_file);
 
-	std::array<uint8_t, 2> data{0, 0};
+	std::array<uint8_t, 2> data{ 0, 0 };
 	CHECK(packed_file->read_at(0, data.data(), data.size()) == 1);
 	CHECK(data[0] == '2');
 }
@@ -131,7 +131,7 @@ TEST_CASE("package.duplicates")
 	auto packed_file = ::open_packed(*package, file.name());
 	REQUIRE(packed_file);
 
-	std::array<uint8_t, 3> data{0, 0, 0};
+	std::array<uint8_t, 3> data{ 0, 0, 0 };
 	REQUIRE(packed_file->read_at(0, data.data(), data.size()) == 2);
 	CHECK(data[0] == '2');
 	CHECK(data[1] == '3');
@@ -144,7 +144,7 @@ TEST_CASE("package.properties")
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file.name(), {{"one", "two"}, {"three", "four"}}));
+		REQUIRE(package_writer->add(file.name(), { { "one", "two" }, { "three", "four" } }));
 		REQUIRE(package_writer->commit());
 	}
 

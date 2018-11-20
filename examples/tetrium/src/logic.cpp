@@ -11,19 +11,19 @@ namespace
 
 		// Delays.
 
-		StartupDelay         = 20, // 0.5 s startup delay.
-		FixDelay             = 16, // 0.4 s delay before the figure fixation.
-		DelayFrames          =  4, // 0.1 s delay between the fixation and the next figure.
+		StartupDelay = 20, // 0.5 s startup delay.
+		FixDelay = 16,     // 0.4 s delay before the figure fixation.
+		DelayFrames = 4,   // 0.1 s delay between the fixation and the next figure.
 
 		// Speed values.
 
-		BaseSpeed            =  1, // 1 point per frame (1 cell per second).
-		AccelerationSpeed    = 80, // 80 points (2 cells) per frame (80 cells per second).
+		BaseSpeed = 1,          // 1 point per frame (1 cell per second).
+		AccelerationSpeed = 80, // 80 points (2 cells) per frame (80 cells per second).
 
 		// Horizontal movement timing.
 
-		HMoveDelay           =  6, // 150 ms initial delay.
-		HMoveInterval        =  2, // 50 ms successive delays.
+		HMoveDelay = 6,    // 150 ms initial delay.
+		HMoveInterval = 2, // 50 ms successive delays.
 	};
 
 	enum
@@ -235,7 +235,7 @@ namespace Tetrium
 		int frames = _time_remainder / MillisecondsPerFrame;
 		_time_remainder %= MillisecondsPerFrame;
 
-		for (bool horizontal = true; frames; )
+		for (bool horizontal = true; frames;)
 		{
 			switch (_state)
 			{

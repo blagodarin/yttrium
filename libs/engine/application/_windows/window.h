@@ -3,7 +3,7 @@
 #include <yttrium/math/size.h>
 
 #if Y_RENDERER_OPENGL
-	#include "wgl.h"
+#	include "wgl.h"
 #endif
 
 #include <optional>
@@ -41,6 +41,7 @@ namespace Yttrium
 			explicit EmptyCursor(HINSTANCE);
 			~EmptyCursor() noexcept;
 			operator HCURSOR() const noexcept { return _handle; }
+
 		private:
 			HCURSOR _handle = NULL;
 		};
@@ -52,9 +53,10 @@ namespace Yttrium
 			~WindowClass() noexcept;
 			HINSTANCE hinstance() const noexcept { return _hinstance; }
 			const char* name() const noexcept { return _wndclass.lpszClassName; }
+
 		private:
 			const HINSTANCE _hinstance;
-			const EmptyCursor _empty_cursor{_hinstance};
+			const EmptyCursor _empty_cursor{ _hinstance };
 			WNDCLASSEXA _wndclass = { sizeof _wndclass };
 		};
 
@@ -65,6 +67,7 @@ namespace Yttrium
 			~WindowHandle() noexcept { reset(); }
 			void reset() noexcept;
 			operator HWND() const { return _hwnd; }
+
 		private:
 			HWND _hwnd = NULL;
 			HDC _hdc = NULL;
@@ -75,6 +78,7 @@ namespace Yttrium
 		public:
 			explicit WindowDC(HWND);
 			operator HDC() const noexcept { return _hdc; }
+
 		private:
 			const HDC _hdc;
 		};
@@ -84,11 +88,11 @@ namespace Yttrium
 		bool _created = false;
 		std::optional<Size> _size;
 		const HINSTANCE _hinstance = ::GetModuleHandleA(nullptr);
-		const WindowClass _wndclass{_hinstance, reinterpret_cast<WNDPROC>(static_window_proc)};
-		WindowHandle _hwnd{_wndclass, _name.c_str(), this};
-		const WindowDC _hdc{_hwnd};
+		const WindowClass _wndclass{ _hinstance, reinterpret_cast<WNDPROC>(static_window_proc) };
+		WindowHandle _hwnd{ _wndclass, _name.c_str(), this };
+		const WindowDC _hdc{ _hwnd };
 #if Y_RENDERER_OPENGL
-		const WglContext _wgl{_hdc};
+		const WglContext _wgl{ _hdc };
 #endif
 	};
 }

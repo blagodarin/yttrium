@@ -12,7 +12,8 @@ namespace Yttrium
 		Vector3 _vector;
 
 		Line3() noexcept = default;
-		constexpr Line3(const Vector3& from, const Vector3& to) noexcept : _origin{from}, _vector{to - from} {}
+		constexpr Line3(const Vector3& from, const Vector3& to) noexcept
+			: _origin{ from }, _vector{ to - from } {}
 
 		bool plane_intersection(const Plane& plane, Vector3& intersection) const noexcept
 		{

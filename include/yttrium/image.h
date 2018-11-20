@@ -55,15 +55,15 @@ namespace Yttrium
 
 		///
 		ImageFormat(size_t width, size_t height, PixelFormat pixel_format, ImageOrientation orientation)
-			: ImageFormat{width, height, pixel_format, 1, orientation} {}
+			: ImageFormat{ width, height, pixel_format, 1, orientation } {}
 
 		///
 		ImageFormat(const Size& size, PixelFormat pixel_format, size_t row_alignment = 1, ImageOrientation orientation = ImageOrientation::XRightYDown)
-			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, row_alignment, orientation} {}
+			: ImageFormat{ static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, row_alignment, orientation } {}
 
 		///
 		ImageFormat(const Size& size, PixelFormat pixel_format, ImageOrientation orientation)
-			: ImageFormat{static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, 1, orientation} {}
+			: ImageFormat{ static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, 1, orientation } {}
 
 		size_t bits_per_channel() const noexcept { return bits_per_pixel() / _channels; }
 		size_t bits_per_pixel() const noexcept { return pixel_size() * 8; }
@@ -75,7 +75,7 @@ namespace Yttrium
 		size_t pixel_size() const noexcept { return pixel_size(_pixel_format); }
 		size_t row_alignment() const noexcept { return _row_alignment; }
 		size_t row_size() const noexcept { return _row_size; }
-		Size size() const noexcept { return {static_cast<int>(_width), static_cast<int>(_height)}; }
+		Size size() const noexcept { return { static_cast<int>(_width), static_cast<int>(_height) }; }
 		size_t width() const noexcept { return _width; }
 
 		///
@@ -150,7 +150,8 @@ namespace Yttrium
 	private:
 		ImageFormat _format;
 		Buffer _buffer;
-		Image(const ImageFormat& format, Buffer&& buffer) : _format{format}, _buffer{std::move(buffer)} {}
+		Image(const ImageFormat& format, Buffer&& buffer)
+			: _format{ format }, _buffer{ std::move(buffer) } {}
 	};
 
 	///

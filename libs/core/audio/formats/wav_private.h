@@ -4,7 +4,7 @@
 
 namespace Yttrium
 {
-	enum: uint16_t
+	enum : uint16_t
 	{
 		WAVE_FORMAT_PCM = 0x0001,
 	};

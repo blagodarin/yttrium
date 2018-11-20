@@ -35,20 +35,20 @@ private:
 private:
 	const Storage& _storage;
 	Application _application;
-	Window _window{_application, "Yttrium 3D example"};
-	ResourceLoader _resource_loader{_storage, &_window.render_manager()};
+	Window _window{ _application, "Yttrium 3D example" };
+	ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
 	ScriptContext _script;
-	Gui _gui{_resource_loader, _script, "examples/3d/data/gui.ion"};
+	Gui _gui{ _resource_loader, _script, "examples/3d/data/gui.ion" };
 	bool _debug_text_visible = false;
 	std::string _debug_text;
-	Model _cube{_resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material"};
-	Model _checkerboard{_resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material"};
+	Model _cube{ _resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material" };
+	Model _checkerboard{ _resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material" };
 
-	Vector3 _position{0, -8.5, 16};
-	Euler _rotation{0, -60, 0};
+	Vector3 _position{ 0, -8.5, 16 };
+	Euler _rotation{ 0, -60, 0 };
 
-	Line3 _cursor_ray{{0, 0, 0}, {0, 0, 0}};
-	const Plane _board_plane{{0, 0, 1}, {0, 0, 0}};
+	Line3 _cursor_ray{ { 0, 0, 0 }, { 0, 0, 0 } };
+	const Plane _board_plane{ { 0, 0, 1 }, { 0, 0, 0 } };
 	std::optional<Vector2> _board_point;
 	std::optional<Quad> _visibility_quad;
 

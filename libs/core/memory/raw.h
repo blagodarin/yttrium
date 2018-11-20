@@ -12,7 +12,7 @@ namespace Yttrium
 	{
 	public:
 		explicit RawAllocation(size_t size)
-			: _pointer{std::malloc(size)}
+			: _pointer{ std::malloc(size) }
 		{
 			if (!_pointer)
 				throw std::bad_alloc{};
@@ -45,7 +45,7 @@ namespace Yttrium
 	{
 		assert(size >= sizeof(T));
 		RawAllocation allocation(size);
-		new(allocation.get()) T(std::forward<Args>(args)...);
+		new (allocation.get()) T(std::forward<Args>(args)...);
 		return static_cast<T*>(allocation.release());
 	}
 

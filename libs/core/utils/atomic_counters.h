@@ -27,8 +27,8 @@ namespace Yttrium
 		}
 
 	private:
-		std::atomic<T> _value{0};
-		std::atomic<T> _maximum{0};
+		std::atomic<T> _value{ 0 };
+		std::atomic<T> _maximum{ 0 };
 	};
 
 	template <typename T>

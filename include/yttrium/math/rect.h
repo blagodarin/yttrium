@@ -12,24 +12,27 @@ namespace Yttrium
 	{
 	public:
 		Rect() = default;
-		Rect(const Point& top_left, const Point& bottom_right) : _left{top_left._x}, _top{top_left._y}, _right{bottom_right._x}, _bottom{bottom_right._y} {}
-		Rect(const Point& top_left, const Size& s) : _left{top_left._x}, _top{top_left._y}, _right{_left + s._width}, _bottom{_top + s._height} {}
-		explicit Rect(const Size& s) : _right{s._width}, _bottom{s._height} {}
+		Rect(const Point& top_left, const Point& bottom_right)
+			: _left{ top_left._x }, _top{ top_left._y }, _right{ bottom_right._x }, _bottom{ bottom_right._y } {}
+		Rect(const Point& top_left, const Size& s)
+			: _left{ top_left._x }, _top{ top_left._y }, _right{ _left + s._width }, _bottom{ _top + s._height } {}
+		explicit Rect(const Size& s)
+			: _right{ s._width }, _bottom{ s._height } {}
 
 		int bottom() const { return _bottom; }
-		Point bottom_left() const { return {_left, _bottom}; }
-		Point bottom_right() const { return {_right, _bottom}; }
+		Point bottom_left() const { return { _left, _bottom }; }
+		Point bottom_right() const { return { _right, _bottom }; }
 		int height() const { return _bottom - _top; }
 		int left() const { return _left; }
 		int right() const { return _right; }
-		Size size() const { return {width(), height()}; }
+		Size size() const { return { width(), height() }; }
 		int top() const { return _top; }
-		Point top_left() const { return {_left, _top}; }
-		Point top_right() const { return {_right, _top}; }
+		Point top_left() const { return { _left, _top }; }
+		Point top_right() const { return { _right, _top }; }
 		int width() const { return _right - _left; }
 
 		///
-		Point center() const { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
+		Point center() const { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
 
 		///
 		bool is_empty() const
@@ -50,15 +53,14 @@ namespace Yttrium
 				y = _top;
 			else if (y >= _bottom)
 				y = _bottom - 1;
-			return {x, y};
+			return { x, y };
 		}
 
 		///
 		Rect centered_at(const Rect& rect) const
 		{
-			return
-			{
-				{(rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2},
+			return {
+				{ (rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2 },
 				size()
 			};
 		}
@@ -87,10 +89,9 @@ namespace Yttrium
 		///
 		Rect intersected(const Rect& rect) const
 		{
-			return
-			{
-				{std::max(_left, rect._left), std::max(_top, rect._top)},
-				Point{std::min(_right, rect._right), std::min(_bottom, rect._bottom)}
+			return {
+				{ std::max(_left, rect._left), std::max(_top, rect._top) },
+				Point{ std::min(_right, rect._right), std::min(_bottom, rect._bottom) }
 			};
 		}
 
@@ -145,25 +146,29 @@ namespace Yttrium
 	{
 	public:
 		constexpr RectF() noexcept = default;
-		constexpr RectF(const Vector2& top_left, const Vector2& bottom_right) noexcept : _left{top_left.x}, _top{top_left.y}, _right{bottom_right.x}, _bottom{bottom_right.y} {}
-		constexpr RectF(const Vector2& top_left, const SizeF& s) noexcept : _left{top_left.x}, _top{top_left.y}, _right{_left + s._width}, _bottom{_top + s._height} {}
-		constexpr explicit RectF(const SizeF& s) noexcept : _right{static_cast<float>(s._width)}, _bottom{static_cast<float>(s._height)} {}
-		explicit RectF(const Rect& r) noexcept : _left{static_cast<float>(r.left())}, _top{static_cast<float>(r.top())}, _right{static_cast<float>(r.right())}, _bottom{static_cast<float>(r.bottom())} {}
+		constexpr RectF(const Vector2& top_left, const Vector2& bottom_right) noexcept
+			: _left{ top_left.x }, _top{ top_left.y }, _right{ bottom_right.x }, _bottom{ bottom_right.y } {}
+		constexpr RectF(const Vector2& top_left, const SizeF& s) noexcept
+			: _left{ top_left.x }, _top{ top_left.y }, _right{ _left + s._width }, _bottom{ _top + s._height } {}
+		constexpr explicit RectF(const SizeF& s) noexcept
+			: _right{ static_cast<float>(s._width) }, _bottom{ static_cast<float>(s._height) } {}
+		explicit RectF(const Rect& r) noexcept
+			: _left{ static_cast<float>(r.left()) }, _top{ static_cast<float>(r.top()) }, _right{ static_cast<float>(r.right()) }, _bottom{ static_cast<float>(r.bottom()) } {}
 
 		constexpr float bottom() const noexcept { return _bottom; }
-		constexpr Vector2 bottom_left() const noexcept { return {_left, _bottom}; }
-		constexpr Vector2 bottom_right() const noexcept { return {_right, _bottom}; }
+		constexpr Vector2 bottom_left() const noexcept { return { _left, _bottom }; }
+		constexpr Vector2 bottom_right() const noexcept { return { _right, _bottom }; }
 		constexpr float height() const noexcept { return _bottom - _top; }
 		constexpr float left() const noexcept { return _left; }
 		constexpr float right() const noexcept { return _right; }
-		constexpr SizeF size() const noexcept { return {width(), height()}; }
+		constexpr SizeF size() const noexcept { return { width(), height() }; }
 		constexpr float top() const noexcept { return _top; }
-		constexpr Vector2 top_left() const noexcept { return {_left, _top}; }
-		constexpr Vector2 top_right() const noexcept { return {_right, _top}; }
+		constexpr Vector2 top_left() const noexcept { return { _left, _top }; }
+		constexpr Vector2 top_right() const noexcept { return { _right, _top }; }
 		constexpr float width() const noexcept { return _right - _left; }
 
 		///
-		constexpr Vector2 center() const noexcept { return {(_left + _right) / 2, (_top + _bottom) / 2}; }
+		constexpr Vector2 center() const noexcept { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
 
 		///
 		constexpr bool contains(const Vector2& v) const noexcept { return _left <= v.x && v.x < _right && _top <= v.y && v.y < _bottom; }
@@ -185,8 +190,8 @@ namespace Yttrium
 		return !(a == b);
 	}
 
-	constexpr RectF operator/(const RectF& rect, float s) noexcept { return {rect.top_left() / s, rect.bottom_right() / s}; }
-	constexpr RectF operator/(const RectF& rect, const Vector2& v) noexcept { return {rect.top_left() / v, rect.bottom_right() / v}; }
+	constexpr RectF operator/(const RectF& rect, float s) noexcept { return { rect.top_left() / s, rect.bottom_right() / s }; }
+	constexpr RectF operator/(const RectF& rect, const Vector2& v) noexcept { return { rect.top_left() / v, rect.bottom_right() / v }; }
 }
 
 #endif

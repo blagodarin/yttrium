@@ -16,7 +16,8 @@ namespace Yttrium
 	{
 		struct OutOfDate : std::runtime_error
 		{
-			OutOfDate() : std::runtime_error{"VK_ERROR_OUT_OF_DATE_KHR"} {}
+			OutOfDate()
+				: std::runtime_error{ "VK_ERROR_OUT_OF_DATE_KHR" } {}
 		};
 
 		const VulkanContext& _context;
@@ -38,7 +39,8 @@ namespace Yttrium
 		const VulkanContext& _context;
 		std::vector<VkFramebuffer> _handles;
 
-		explicit VK_Framebuffers(const VulkanContext& context) noexcept : _context{context} {}
+		explicit VK_Framebuffers(const VulkanContext& context) noexcept
+			: _context{ context } {}
 		~VK_Framebuffers() noexcept;
 
 		void create(VkRenderPass, const VK_Swapchain&, VkImageView depth_buffer_view);
@@ -128,7 +130,8 @@ namespace Yttrium
 		const VulkanContext& _context;
 		VkPipeline _handle = VK_NULL_HANDLE;
 
-		explicit VK_Pipeline(const VulkanContext& context) noexcept : _context{context} {}
+		explicit VK_Pipeline(const VulkanContext& context) noexcept
+			: _context{ context } {}
 		~VK_Pipeline() noexcept;
 
 		void create(const VK_PipelineLayout&, VkRenderPass, const VulkanVertexFormat&, const std::vector<VkPipelineShaderStageCreateInfo>&);

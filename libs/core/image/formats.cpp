@@ -28,7 +28,7 @@ namespace Yttrium
 {
 	std::optional<ImageFormat> read_image(const Source& source, ImageType type, Buffer& buffer)
 	{
-		Reader reader{source};
+		Reader reader{ source };
 		std::optional<ImageFormat> format;
 		switch (type)
 		{

@@ -29,14 +29,14 @@ namespace Yttrium
 	}
 
 	ScriptValue::ScriptValue(int value)
-		: _type{Type::Literal}
-		, _value{make_string(value)}
+		: _type{ Type::Literal }
+		, _value{ make_string(value) }
 	{
 	}
 
 	ScriptValue::ScriptValue(std::string_view value, Type type)
-		: _type{type}
-		, _value{value}
+		: _type{ type }
+		, _value{ value }
 	{
 	}
 }

@@ -9,9 +9,9 @@
 namespace Yttrium
 {
 	InputWidget::InputWidget(GuiPrivate& gui, std::string_view name, std::unique_ptr<WidgetData>&& data)
-		: Widget{gui, name, std::move(data), Flag::CanHaveFocus}
+		: Widget{ gui, name, std::move(data), Flag::CanHaveFocus }
 	{
-		_logic.reset(std::string{_data->_text});
+		_logic.reset(std::string{ _data->_text });
 	}
 
 	void InputWidget::draw(RenderPass& pass, const RectF& rect, WidgetData::StyleData& style_data) const
@@ -24,7 +24,7 @@ namespace Yttrium
 
 		if (is_focused() && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)
 		{
-			PushTexture push_texture{pass, nullptr};
+			PushTexture push_texture{ pass, nullptr };
 			pass.draw_rect(capture._cursor_rect, style_data._foreground.color);
 		}
 
@@ -32,7 +32,7 @@ namespace Yttrium
 		{
 			auto selection_color = style_data._foreground.color;
 			selection_color._a *= .25f;
-			PushTexture push_texture{pass, nullptr};
+			PushTexture push_texture{ pass, nullptr };
 			pass.draw_rect(capture._selection_rect, selection_color);
 		}
 	}

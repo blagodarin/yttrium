@@ -67,8 +67,8 @@ TEST_CASE("source.property")
 TEST_CASE("source.size")
 {
 	CHECK(Source::from(Buffer{})->size() == 0);
-	CHECK(Source::from(Buffer{1})->size() == 1);
-	CHECK(Source::from(Buffer{997})->size() == 997);
+	CHECK(Source::from(Buffer{ 1 })->size() == 1);
+	CHECK(Source::from(Buffer{ 997 })->size() == 997);
 }
 
 TEST_CASE("source.to_buffer")

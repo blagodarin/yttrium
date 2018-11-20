@@ -111,12 +111,11 @@ void run_small(const T& map, const std::string& name)
 int main(int, char**)
 {
 	{
-		std::map<std::string_view, std::string_view> map
-		{
-			{"abcdefg", "ABCDEFG"},
-			{"hijklmn", "HIJKLMN"},
-			{"opqrstu", "OPQRSTU"},
-			{"vwxyz01", "VWXYZ01"},
+		std::map<std::string_view, std::string_view> map{
+			{ "abcdefg", "ABCDEFG" },
+			{ "hijklmn", "HIJKLMN" },
+			{ "opqrstu", "OPQRSTU" },
+			{ "vwxyz01", "VWXYZ01" },
 		};
 		run_tiny(map, "std::map");
 	}
@@ -129,16 +128,15 @@ int main(int, char**)
 		run_tiny(map, "TinyStringMap");
 	}
 	{
-		std::map<std::string_view, std::string_view> map
-		{
-			{"abcdefg", "ABCDEFG"},
-			{"hijklmn", "HIJKLMN"},
-			{"opqrstu", "OPQRSTU"},
-			{"vwxyz01", "VWXYZ01"},
-			{"ABCDEFG", "abcdefg"},
-			{"HIJKLMN", "hijklmn"},
-			{"OPQRSTU", "opqrstu"},
-			{"VWXYZ01", "vwxyz01"},
+		std::map<std::string_view, std::string_view> map{
+			{ "abcdefg", "ABCDEFG" },
+			{ "hijklmn", "HIJKLMN" },
+			{ "opqrstu", "OPQRSTU" },
+			{ "vwxyz01", "VWXYZ01" },
+			{ "ABCDEFG", "abcdefg" },
+			{ "HIJKLMN", "hijklmn" },
+			{ "OPQRSTU", "opqrstu" },
+			{ "VWXYZ01", "vwxyz01" },
 		};
 		run_small(map, "std::map");
 	}

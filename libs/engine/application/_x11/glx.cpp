@@ -46,20 +46,19 @@ namespace Yttrium
 		if (!::glXQueryVersion(display, &major, &minor) || major != 1 || minor < 4)
 			throw InitializationError("GLX 1.4 is unavailable");
 
-		const int attributes[] =
-		{
+		const int attributes[]{
 			GLX_CONFIG_CAVEAT, GLX_NONE,
-			GLX_X_RENDERABLE,  True,
+			GLX_X_RENDERABLE, True,
 			GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, // Default.
-			GLX_RENDER_TYPE,   GLX_RGBA_BIT,   // Default.
+			GLX_RENDER_TYPE, GLX_RGBA_BIT,     // Default.
 			GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
-			GLX_RED_SIZE,      8,
-			GLX_GREEN_SIZE,    8,
-			GLX_BLUE_SIZE,     8,
-			GLX_ALPHA_SIZE,    8,
-			GLX_DEPTH_SIZE,    24,
-			GLX_STENCIL_SIZE,  8,
-			GLX_DOUBLEBUFFER,  True,
+			GLX_RED_SIZE, 8,
+			GLX_GREEN_SIZE, 8,
+			GLX_BLUE_SIZE, 8,
+			GLX_ALPHA_SIZE, 8,
+			GLX_DEPTH_SIZE, 24,
+			GLX_STENCIL_SIZE, 8,
+			GLX_DOUBLEBUFFER, True,
 			None
 		};
 
@@ -93,8 +92,7 @@ namespace Yttrium
 		if (!glXCreateContextAttribsARB) // The official OpenGL context creation example suggests checking this too.
 			throw InitializationError("glXCreateContextAttribsARB is unavailable");
 
-		const int context_attributes[] =
-		{
+		const int context_attributes[]{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
 			GLX_CONTEXT_MINOR_VERSION_ARB, Gl::required_minor,
 #ifndef NDEBUG

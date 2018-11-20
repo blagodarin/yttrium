@@ -95,15 +95,15 @@ namespace Yttrium
 
 	// cppcheck-suppress uninitMemberVar
 	PoolBase::PoolBase(size_t chunk_items, size_t item_size) noexcept
-		: _chunk_items{chunk_items}
-		, _item_size{item_size}
-		, _chunk_size{PoolChunk::size(_chunk_items, _item_size)}
+		: _chunk_items{ chunk_items }
+		, _item_size{ item_size }
+		, _chunk_size{ PoolChunk::size(_chunk_items, _item_size) }
 	{
 	}
 
 	PoolBase::~PoolBase()
 	{
-		for (auto chunk = _last_chunk; chunk; )
+		for (auto chunk = _last_chunk; chunk;)
 		{
 			const auto previous_chunk = _last_chunk->_previous;
 			delete_sized(chunk);

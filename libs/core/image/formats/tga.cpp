@@ -53,14 +53,13 @@ namespace Yttrium
 			|| header.image.descriptor & tgaReservedMask)
 			return {};
 
-		const auto orientation = [&header]
-		{
+		const auto orientation = [&header] {
 			switch (header.image.descriptor & tgaOriginMask)
 			{
-			case tgaBottomLeft:  return ImageOrientation::XRightYUp;
+			case tgaBottomLeft: return ImageOrientation::XRightYUp;
 			case tgaBottomRight: return ImageOrientation::XLeftYUp;
-			case tgaTopRight:    return ImageOrientation::XLeftYDown;
-			default:             return ImageOrientation::XRightYDown;
+			case tgaTopRight: return ImageOrientation::XLeftYDown;
+			default: return ImageOrientation::XRightYDown;
 			}
 		};
 
@@ -112,10 +111,10 @@ namespace Yttrium
 
 		switch (format.orientation())
 		{
-		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft;     break;
-		case ImageOrientation::XRightYUp:   header.image.descriptor |= tgaBottomLeft;  break;
-		case ImageOrientation::XLeftYDown:  header.image.descriptor |= tgaTopRight;    break;
-		case ImageOrientation::XLeftYUp:    header.image.descriptor |= tgaBottomRight; break;
+		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft; break;
+		case ImageOrientation::XRightYUp: header.image.descriptor |= tgaBottomLeft; break;
+		case ImageOrientation::XLeftYDown: header.image.descriptor |= tgaTopRight; break;
+		case ImageOrientation::XLeftYUp: header.image.descriptor |= tgaBottomRight; break;
 		}
 
 		writer.reserve(sizeof header + format.frame_size());

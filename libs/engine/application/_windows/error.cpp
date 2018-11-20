@@ -22,9 +22,9 @@ namespace Yttrium
 					--size;
 			}
 			UniquePtr<char[], ::LocalFree> buffer_ptr{ buffer };
-			return make_string("Error 0x", Hex32{code}, ": ", std::string_view{buffer, size});
+			return make_string("Error 0x", Hex32{ code }, ": ", std::string_view{ buffer, size });
 		}
 		else
-			return make_string("Error 0x", Hex32{code}, '.');
+			return make_string("Error 0x", Hex32{ code }, '.');
 	}
 }

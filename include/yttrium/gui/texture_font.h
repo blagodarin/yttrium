@@ -21,9 +21,9 @@ namespace Yttrium
 		/// Font character information.
 		struct CharInfo
 		{
-			Rect  rect;    ///< The rectangle a character occupies in the texture.
-			Point offset;  ///< The offset to apply before rendering a character.
-			int   advance; ///< The horizontal advance.
+			Rect rect;    ///< The rectangle a character occupies in the texture.
+			Point offset; ///< The offset to apply before rendering a character.
+			int advance;  ///< The horizontal advance.
 		};
 
 		///

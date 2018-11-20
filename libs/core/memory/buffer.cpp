@@ -8,14 +8,14 @@
 namespace Yttrium
 {
 	Buffer::Buffer(size_t size)
-		: _size{size}
-		, _capacity{BufferMemory::capacity_for_size(_size)}
-		, _data{_capacity > 0 ? _buffer_memory.allocate(_capacity) : nullptr}
+		: _size{ size }
+		, _capacity{ BufferMemory::capacity_for_size(_size) }
+		, _data{ _capacity > 0 ? _buffer_memory.allocate(_capacity) : nullptr }
 	{
 	}
 
 	Buffer::Buffer(size_t size, const void* data)
-		: Buffer{size}
+		: Buffer{ size }
 	{
 		std::memcpy(_data, data, size);
 	}

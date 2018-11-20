@@ -137,18 +137,19 @@ namespace
 		case 0x76: return Key::Insert;
 		case 0x77: return Key::Delete;
 
-		case 0x7f: return Key::Pause;
+		case 0x7f:
+			return Key::Pause;
 
-		//case 0x85: return Key::LWin;
-		//case 0x86: return Key::RWin;
-		//case 0x87: return Key::Menu; // The key between RWin and RControl.
+			//case 0x85: return Key::LWin;
+			//case 0x86: return Key::RWin;
+			//case 0x87: return Key::Menu; // The key between RWin and RControl.
 		}
 		return Key::Null;
 	}
 
 	auto make_atom(xcb_connection_t* connection, bool only_if_exists, std::string_view name)
 	{
-		return P_Atom{::xcb_intern_atom_reply(connection, ::xcb_intern_atom(connection, only_if_exists, static_cast<uint16_t>(name.size()), name.data()), nullptr)};
+		return P_Atom{ ::xcb_intern_atom_reply(connection, ::xcb_intern_atom(connection, only_if_exists, static_cast<uint16_t>(name.size()), name.data()), nullptr) };
 	}
 }
 
@@ -158,8 +159,8 @@ namespace Yttrium
 	{
 	public:
 		EmptyCursor(xcb_connection_t* connection, xcb_window_t window)
-			: _connection{connection}
-			, _cursor{::xcb_generate_id(_connection)}
+			: _connection{ connection }
+			, _cursor{ ::xcb_generate_id(_connection) }
 		{
 			uint8_t data = 0;
 			const auto pixmap = ::xcb_create_pixmap_from_bitmap_data(_connection, window, &data, 1, 1, 1, 0, 0, nullptr);
@@ -182,11 +183,11 @@ namespace Yttrium
 	{
 	public:
 		explicit Keyboard(xcb_connection_t* connection)
-			: _connection{connection}
+			: _connection{ connection }
 		{
 			if (!::xkb_x11_setup_xkb_extension(_connection, XKB_X11_MIN_MAJOR_XKB_VERSION, XKB_X11_MIN_MINOR_XKB_VERSION,
-				XKB_X11_SETUP_XKB_EXTENSION_NO_FLAGS, nullptr, nullptr, &_base_event, nullptr))
-				throw std::runtime_error{"Unable to setup XKB"};
+					XKB_X11_SETUP_XKB_EXTENSION_NO_FLAGS, nullptr, nullptr, &_base_event, nullptr))
+				throw std::runtime_error{ "Unable to setup XKB" };
 
 			constexpr uint16_t selected_events = XCB_XKB_EVENT_TYPE_NEW_KEYBOARD_NOTIFY | XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_STATE_NOTIFY;
 
@@ -197,17 +198,17 @@ namespace Yttrium
 
 			const auto cookie = ::xcb_xkb_select_events_aux_checked(_connection, XCB_XKB_ID_USE_CORE_KBD,
 				selected_events, 0, selected_events, selected_map_parts, selected_map_parts, nullptr);
-			UniquePtr<xcb_generic_error_t, std::free> error{::xcb_request_check(_connection, cookie)};
+			UniquePtr<xcb_generic_error_t, std::free> error{ ::xcb_request_check(_connection, cookie) };
 			if (error)
-				throw std::runtime_error{"Unable to select XKB events"};
+				throw std::runtime_error{ "Unable to select XKB events" };
 
 			_keyboard_id = ::xkb_x11_get_core_keyboard_device_id(_connection);
 			if (_keyboard_id == -1)
-				throw std::runtime_error{"Unable to get XKB core keyboard device ID"};
+				throw std::runtime_error{ "Unable to get XKB core keyboard device ID" };
 
 			_context.reset(::xkb_context_new(XKB_CONTEXT_NO_FLAGS));
 			if (!_context)
-				throw std::runtime_error{"Unable to create XKB context"};
+				throw std::runtime_error{ "Unable to create XKB context" };
 
 			reset_keymap();
 		}
@@ -219,7 +220,7 @@ namespace Yttrium
 				return {};
 			std::string buffer(size, '\0'); // TODO: Explicit small buffer optimization.
 			::xkb_state_key_get_utf8(_state.get(), keycode, buffer.data(), size + 1);
-			buffer.erase(std::remove_if(buffer.begin(), buffer.end(), [](char c){ return to_unsigned(c) < 32 || c == 127; }), buffer.end());
+			buffer.erase(std::remove_if(buffer.begin(), buffer.end(), [](char c) { return to_unsigned(c) < 32 || c == 127; }), buffer.end());
 			return buffer;
 		}
 
@@ -267,13 +268,13 @@ namespace Yttrium
 	private:
 		void reset_keymap()
 		{
-			decltype(_keymap) keymap{::xkb_x11_keymap_new_from_device(_context.get(), _connection, _keyboard_id, XKB_KEYMAP_COMPILE_NO_FLAGS)};
+			decltype(_keymap) keymap{ ::xkb_x11_keymap_new_from_device(_context.get(), _connection, _keyboard_id, XKB_KEYMAP_COMPILE_NO_FLAGS) };
 			if (!keymap)
-				throw std::runtime_error{"Unable to create XKB keymap"};
+				throw std::runtime_error{ "Unable to create XKB keymap" };
 
-			decltype(_state) state{::xkb_x11_state_new_from_device(keymap.get(), _connection, _keyboard_id)};
+			decltype(_state) state{ ::xkb_x11_state_new_from_device(keymap.get(), _connection, _keyboard_id) };
 			if (!state)
-				throw std::runtime_error{"Unable to create XKB state"};
+				throw std::runtime_error{ "Unable to create XKB state" };
 
 			std::swap(_keymap, keymap);
 			std::swap(_state, state);
@@ -289,7 +290,7 @@ namespace Yttrium
 	};
 
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
-		: _callbacks{callbacks}
+		: _callbacks{ callbacks }
 	{
 		_keyboard = std::make_unique<Keyboard>(_application.connection());
 
@@ -297,10 +298,10 @@ namespace Yttrium
 
 		const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 		const uint32_t list[] =
-		{
-			_application.screen()->black_pixel,
-			XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_FOCUS_CHANGE,
-		};
+			{
+				_application.screen()->black_pixel,
+				XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_FOCUS_CHANGE,
+			};
 		::xcb_create_window(_application.connection(), XCB_COPY_FROM_PARENT, _window, _application.screen()->root,
 			0, 0, _application.screen()->width_in_pixels, _application.screen()->height_in_pixels, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, _application.screen()->root_visual, mask, list);
 
@@ -339,10 +340,10 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		const UniquePtr<xcb_query_pointer_reply_t, std::free> reply{::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr)};
+		const UniquePtr<xcb_query_pointer_reply_t, std::free> reply{ ::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr) };
 		if (!reply)
 			return false;
-		cursor = {reply->win_x, reply->win_y};
+		cursor = { reply->win_x, reply->win_y };
 		return true;
 	}
 
@@ -353,7 +354,7 @@ namespace Yttrium
 
 		for (;;)
 		{
-			const UniquePtr<xcb_generic_event_t, std::free> event{_size ? ::xcb_poll_for_event(_application.connection()) : ::xcb_wait_for_event(_application.connection())};
+			const UniquePtr<xcb_generic_event_t, std::free> event{ _size ? ::xcb_poll_for_event(_application.connection()) : ::xcb_wait_for_event(_application.connection()) };
 			if (!event)
 				return !::xcb_connection_has_error(_application.connection());
 
@@ -361,45 +362,45 @@ namespace Yttrium
 			{
 			case XCB_KEY_PRESS:
 			case XCB_KEY_RELEASE:
+			{
+				const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event.get());
+				if (const auto key = ::key_from_keycode(e->detail); key != Key::Null)
 				{
-					const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event.get());
-					if (const auto key = ::key_from_keycode(e->detail); key != Key::Null)
-					{
-						Flags<KeyEvent::Modifier> modifiers;
-						if (e->state & XCB_MOD_MASK_SHIFT)
-							modifiers |= KeyEvent::Modifier::Shift;
-						if (e->state & XCB_MOD_MASK_CONTROL)
-							modifiers |= KeyEvent::Modifier::Control;
-						if (e->state & XCB_MOD_MASK_1)
-							modifiers |= KeyEvent::Modifier::Alt;
-						_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, modifiers);
-					}
-					if (event_type == XCB_KEY_PRESS)
-					{
-						const auto text = _keyboard->keycode_to_text(e->detail);
-						if (!text.empty())
-							_callbacks.on_text_event(text);
-					}
+					Flags<KeyEvent::Modifier> modifiers;
+					if (e->state & XCB_MOD_MASK_SHIFT)
+						modifiers |= KeyEvent::Modifier::Shift;
+					if (e->state & XCB_MOD_MASK_CONTROL)
+						modifiers |= KeyEvent::Modifier::Control;
+					if (e->state & XCB_MOD_MASK_1)
+						modifiers |= KeyEvent::Modifier::Alt;
+					_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, modifiers);
 				}
-				break;
+				if (event_type == XCB_KEY_PRESS)
+				{
+					const auto text = _keyboard->keycode_to_text(e->detail);
+					if (!text.empty())
+						_callbacks.on_text_event(text);
+				}
+			}
+			break;
 
 			case XCB_BUTTON_PRESS:
 			case XCB_BUTTON_RELEASE:
+			{
+				const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event.get());
+				if (const auto key = ::key_from_button(e->detail); key != Key::Null)
 				{
-					const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event.get());
-					if (const auto key = ::key_from_button(e->detail); key != Key::Null)
-					{
-						Flags<KeyEvent::Modifier> modifiers;
-						if (e->state & XCB_KEY_BUT_MASK_SHIFT)
-							modifiers |= KeyEvent::Modifier::Shift;
-						if (e->state & XCB_KEY_BUT_MASK_CONTROL)
-							modifiers |= KeyEvent::Modifier::Control;
-						if (e->state & XCB_KEY_BUT_MASK_MOD_1)
-							modifiers |= KeyEvent::Modifier::Alt;
-						_callbacks.on_key_event(key, event_type == XCB_BUTTON_PRESS, modifiers);
-					}
+					Flags<KeyEvent::Modifier> modifiers;
+					if (e->state & XCB_KEY_BUT_MASK_SHIFT)
+						modifiers |= KeyEvent::Modifier::Shift;
+					if (e->state & XCB_KEY_BUT_MASK_CONTROL)
+						modifiers |= KeyEvent::Modifier::Control;
+					if (e->state & XCB_KEY_BUT_MASK_MOD_1)
+						modifiers |= KeyEvent::Modifier::Alt;
+					_callbacks.on_key_event(key, event_type == XCB_BUTTON_PRESS, modifiers);
 				}
-				break;
+			}
+			break;
 
 			case XCB_FOCUS_IN:
 			case XCB_FOCUS_OUT:
@@ -407,10 +408,10 @@ namespace Yttrium
 				break;
 
 			case XCB_CONFIGURE_NOTIFY:
-				{
-					const auto e = reinterpret_cast<const xcb_configure_notify_event_t*>(event.get());
-					_size.emplace(e->width, e->height);
-				}
+			{
+				const auto e = reinterpret_cast<const xcb_configure_notify_event_t*>(event.get());
+				_size.emplace(e->width, e->height);
+			}
 				_callbacks.on_resize_event(*_size);
 				break;
 

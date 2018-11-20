@@ -13,7 +13,7 @@ template <typename... Args>
 void check(bool condition, Args&&... args)
 {
 	if (!condition)
-		throw Yttrium::DataError{std::forward<Args>(args)...};
+		throw Yttrium::DataError{ std::forward<Args>(args)... };
 }
 
 int main(int argc, char** argv)
@@ -42,19 +42,19 @@ int main(int argc, char** argv)
 	{
 		auto source = Yttrium::Source::from(index_name);
 		check(static_cast<bool>(source), "Bad index file");
-		Yttrium::IonReader ion{*source};
+		Yttrium::IonReader ion{ *source };
 		ion.read().check_name("package");
 		ion.read().check_list_begin();
 		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd;)
 		{
-			auto& properties = entries.emplace_back(std::string{token.to_value()}, std::map<std::string, std::string, std::less<>>{}).second;
+			auto& properties = entries.emplace_back(std::string{ token.to_value() }, std::map<std::string, std::string, std::less<>>{}).second;
 			if (token = ion.read(); token.type() == Yttrium::IonReader::Token::Type::ObjectBegin)
 			{
 				for (token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ObjectEnd; token = ion.read())
 				{
 					const auto property_name = token.to_name();
 					check(properties.count(property_name) == 0, "Duplicate property '", property_name, "'");
-					properties.emplace(std::string{property_name}, ion.read().to_value());
+					properties.emplace(std::string{ property_name }, ion.read().to_value());
 				}
 				token = ion.read();
 			}

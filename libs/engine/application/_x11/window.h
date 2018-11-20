@@ -29,11 +29,13 @@ namespace Yttrium
 		class WindowHandle
 		{
 		public:
-			WindowHandle(::Display* display, ::Window window) : _display(display), _window(window) {}
+			WindowHandle(::Display* display, ::Window window)
+				: _display(display), _window(window) {}
 			~WindowHandle() noexcept { reset(); }
 			explicit operator bool() const noexcept { return _window != None; }
 			::Window get() const noexcept { return _window; }
 			void reset() noexcept;
+
 		private:
 			::Display* const _display;
 			::Window _window = None;
@@ -45,6 +47,7 @@ namespace Yttrium
 			EmptyCursor(::Display*, ::Window);
 			~EmptyCursor() noexcept;
 			::Cursor get() const { return _cursor; }
+
 		private:
 			::Display* const _display;
 			::Cursor _cursor = None;

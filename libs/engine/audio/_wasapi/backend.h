@@ -20,7 +20,7 @@ namespace Yttrium
 	private:
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
 		// be on the STA thread. Calls from an MTA thread may result in undefined behavior."
-		ComInitializer _com{COINIT_APARTMENTTHREADED};
+		ComInitializer _com{ COINIT_APARTMENTTHREADED };
 		ComPtr<IMMDevice> _device;
 		ComPtr<IAudioClient> _client;
 	};

@@ -11,27 +11,27 @@ namespace Yttrium
 
 	struct Ytf1Font
 	{
-		uint8_t  size;
+		uint8_t size;
 		uint16_t base_x;
 		uint16_t base_y;
 	};
 
 	struct Ytf1Char
 	{
-		char     id;
+		char id;
 		uint16_t x;
 		uint16_t y;
-		uint8_t  width;
-		uint8_t  height;
-		int8_t   x_offset;
-		int8_t   y_offset;
-		uint8_t  advance;
+		uint8_t width;
+		uint8_t height;
+		int8_t x_offset;
+		int8_t y_offset;
+		uint8_t advance;
 	};
 
 	struct Ytf1Kerning
 	{
-		char   first;
-		char   second;
+		char first;
+		char second;
 		int8_t amount;
 	};
 

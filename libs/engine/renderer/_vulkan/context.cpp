@@ -4,7 +4,7 @@
 #include "handles.h"
 
 #ifndef NDEBUG
-	#include <iostream>
+#	include <iostream>
 #endif
 
 namespace
@@ -34,15 +34,13 @@ namespace
 		application_info.engineVersion = 0;
 		application_info.apiVersion = VK_API_VERSION_1_0;
 
-		static const std::initializer_list<const char*> layers
-		{
+		static const std::initializer_list<const char*> layers{
 #ifndef NDEBUG
 			"VK_LAYER_LUNARG_standard_validation",
 #endif
 		};
 
-		static const std::initializer_list<const char*> extensions
-		{
+		static const std::initializer_list<const char*> extensions{
 #ifndef NDEBUG
 			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 #endif
@@ -79,7 +77,7 @@ namespace
 		const auto vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT"));
 		const auto vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT"));
 		if (!vkCreateDebugReportCallbackEXT || !vkDestroyDebugReportCallbackEXT)
-			return {VK_NULL_HANDLE, nullptr};
+			return { VK_NULL_HANDLE, nullptr };
 
 		VkDebugReportCallbackCreateInfoEXT info;
 		info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
@@ -90,7 +88,7 @@ namespace
 
 		VkDebugReportCallbackEXT handle = VK_NULL_HANDLE;
 		Y_VK_CHECK(vkCreateDebugReportCallbackEXT(instance, &info, nullptr, &handle));
-		return {handle, vkDestroyDebugReportCallbackEXT};
+		return { handle, vkDestroyDebugReportCallbackEXT };
 	}
 #endif
 
@@ -132,28 +130,27 @@ namespace
 				VkBool32 has_present_support = VK_FALSE;
 				Y_VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, queue_family_index, surface, &has_present_support));
 				if (has_present_support)
-					return {physical_device, queue_family_index}; // TODO: Support separate queues for graphics and present.
+					return { physical_device, queue_family_index }; // TODO: Support separate queues for graphics and present.
 			}
 		}
 
-		throw std::runtime_error{"No suitable physical device found"};
+		throw std::runtime_error{ "No suitable physical device found" };
 	}
 
 #ifndef NDEBUG
 	void print_vulkan_texture_formats(VkPhysicalDevice device)
 	{
-		static const std::vector<std::pair<VkFormat, std::string_view>> formats
-		{
-			{VK_FORMAT_R8_UNORM, "VK_FORMAT_R8_UNORM"},
-			{VK_FORMAT_R8G8_UNORM, "VK_FORMAT_R8G8_UNORM"},
-			{VK_FORMAT_R8G8B8_UNORM, "VK_FORMAT_R8G8B8_UNORM"},
-			{VK_FORMAT_B8G8R8_UNORM, "VK_FORMAT_B8G8R8_UNORM"},
-			{VK_FORMAT_R8G8B8A8_UNORM, "VK_FORMAT_R8G8B8A8_UNORM"},
-			{VK_FORMAT_B8G8R8A8_UNORM, "VK_FORMAT_B8G8R8A8_UNORM"},
-			{VK_FORMAT_R16_UNORM, "VK_FORMAT_R16_UNORM"},
-			{VK_FORMAT_R16G16_UNORM, "VK_FORMAT_R16G16_UNORM"},
-			{VK_FORMAT_R16G16B16_UNORM, "VK_FORMAT_R16G16B16_UNORM"},
-			{VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM"},
+		static const std::vector<std::pair<VkFormat, std::string_view>> formats{
+			{ VK_FORMAT_R8_UNORM, "VK_FORMAT_R8_UNORM" },
+			{ VK_FORMAT_R8G8_UNORM, "VK_FORMAT_R8G8_UNORM" },
+			{ VK_FORMAT_R8G8B8_UNORM, "VK_FORMAT_R8G8B8_UNORM" },
+			{ VK_FORMAT_B8G8R8_UNORM, "VK_FORMAT_B8G8R8_UNORM" },
+			{ VK_FORMAT_R8G8B8A8_UNORM, "VK_FORMAT_R8G8B8A8_UNORM" },
+			{ VK_FORMAT_B8G8R8A8_UNORM, "VK_FORMAT_B8G8R8A8_UNORM" },
+			{ VK_FORMAT_R16_UNORM, "VK_FORMAT_R16_UNORM" },
+			{ VK_FORMAT_R16G16_UNORM, "VK_FORMAT_R16G16_UNORM" },
+			{ VK_FORMAT_R16G16B16_UNORM, "VK_FORMAT_R16G16B16_UNORM" },
+			{ VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM" },
 		};
 
 		std::cerr << "Vulkan texture formats supported:\n";
@@ -179,8 +176,7 @@ namespace
 		queue_info.queueCount = 1;
 		queue_info.pQueuePriorities = &queue_prioritiy;
 
-		static const std::initializer_list<const char*> extensions
-		{
+		static const std::initializer_list<const char*> extensions{
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 		};
 
@@ -224,7 +220,7 @@ namespace Yttrium
 
 	VK_CommandBuffer VulkanContext::allocate_command_buffer() const
 	{
-		return VK_CommandBuffer{*this};
+		return VK_CommandBuffer{ *this };
 	}
 
 	VK_HDeviceMemory VulkanContext::allocate_memory(const VkMemoryRequirements& requirements, VkMemoryPropertyFlags flags) const
@@ -235,7 +231,7 @@ namespace Yttrium
 		info.allocationSize = requirements.size;
 		info.memoryTypeIndex = memory_type_index(requirements.memoryTypeBits, flags);
 
-		VK_HDeviceMemory memory{_data._device};
+		VK_HDeviceMemory memory{ _data._device };
 		memory.allocate(info);
 		return memory;
 	}
@@ -261,7 +257,7 @@ namespace Yttrium
 		info.pQueueFamilyIndices = nullptr;
 		info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-		VK_HImage image{_data._device};
+		VK_HImage image{ _data._device };
 		image.create(info);
 		return image;
 	}
@@ -288,7 +284,7 @@ namespace Yttrium
 		info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 		info.unnormalizedCoordinates = VK_FALSE;
 
-		VK_HSampler sampler{_data._device};
+		VK_HSampler sampler{ _data._device };
 		sampler.create(info);
 		return sampler;
 	}
@@ -312,14 +308,14 @@ namespace Yttrium
 		info.subresourceRange.baseArrayLayer = 0;
 		info.subresourceRange.layerCount = 1;
 
-		VK_HImageView view{_data._device};
+		VK_HImageView view{ _data._device };
 		view.create(info);
 		return view;
 	}
 
 	VkCompositeAlphaFlagBitsKHR VulkanContext::composite_alpha() const noexcept
 	{
-		for (const auto bit : {VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR})
+		for (const auto bit : { VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR })
 			if (_data._surface_capabilities.supportedCompositeAlpha & static_cast<VkFlags>(bit))
 				return bit;
 		return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -331,7 +327,7 @@ namespace Yttrium
 			if (type_bits & (1u << i))
 				if ((_data._physical_device_memory_properties.memoryTypes[i].propertyFlags & flags) == flags)
 					return i;
-		throw std::runtime_error{"No suitable memory type found"};
+		throw std::runtime_error{ "No suitable memory type found" };
 	}
 
 	std::vector<VkSurfaceFormatKHR> VulkanContext::surface_formats() const
@@ -341,7 +337,7 @@ namespace Yttrium
 		std::vector<VkSurfaceFormatKHR> formats(count);
 		Y_VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_data._physical_device, _data._surface, &count, formats.data()));
 		if (formats.empty())
-			throw std::runtime_error{"No surface formats defined"};
+			throw std::runtime_error{ "No surface formats defined" };
 		else if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
 			formats.clear();
 		return formats;
@@ -361,7 +357,7 @@ namespace Yttrium
 		else if ((properties.optimalTilingFeatures & flags) == flags)
 			return VK_IMAGE_TILING_OPTIMAL;
 		else
-			throw std::runtime_error{"Unsupported format"};
+			throw std::runtime_error{ "Unsupported format" };
 	}
 
 	void VulkanContext::wait_idle() const
@@ -401,7 +397,7 @@ namespace Yttrium
 		vkGetPhysicalDeviceMemoryProperties(_physical_device, &_physical_device_memory_properties);
 		Y_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &_surface_capabilities));
 		if (_surface_capabilities.currentExtent.width == 0xffffffff && _surface_capabilities.currentExtent.height == 0xffffffff)
-			throw std::runtime_error{"Bad surface size"};
+			throw std::runtime_error{ "Bad surface size" };
 		_device = ::create_vulkan_device(_physical_device, _queue_family_index);
 		vkGetDeviceQueue(_device, _queue_family_index, 0, &_queue);
 		_command_pool = ::create_vulkan_command_pool(_device, _queue_family_index);

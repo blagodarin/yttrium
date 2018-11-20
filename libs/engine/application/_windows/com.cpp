@@ -11,6 +11,6 @@ namespace Yttrium
 	{
 		const auto hr = ::CoInitializeEx(nullptr, coinit);
 		if (FAILED(hr))
-			throw InitializationError{"CoInitializeEx failed: ", error_to_string(hr)};
+			throw InitializationError{ "CoInitializeEx failed: ", error_to_string(hr) };
 	}
 }

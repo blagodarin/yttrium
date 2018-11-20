@@ -22,7 +22,7 @@ TEST_CASE("rect")
 		CHECK(r.height() == 0);
 	}
 	{
-		Rect r{{1, 2}, Point{4, 7}};
+		Rect r{ { 1, 2 }, Point{ 4, 7 } };
 		CHECK(r.left() == 1);
 		CHECK(r.top() == 2);
 		CHECK(r.right() == 4);
@@ -31,7 +31,7 @@ TEST_CASE("rect")
 		CHECK(r.height() == 5);
 	}
 	{
-		Rect r{{1, 2}, Size{3, 5}};
+		Rect r{ { 1, 2 }, Size{ 3, 5 } };
 		CHECK(r.left() == 1);
 		CHECK(r.top() == 2);
 		CHECK(r.right() == 4);
@@ -40,7 +40,7 @@ TEST_CASE("rect")
 		CHECK(r.height() == 5);
 	}
 	{
-		Rect r{Size{1, 2}};
+		Rect r{ Size{ 1, 2 } };
 		CHECK(r.left() == 0);
 		CHECK(r.top() == 0);
 		CHECK(r.right() == 1);
@@ -78,49 +78,49 @@ TEST_CASE("rect.bound")
 
 TEST_CASE("rect.center")
 {
-	CHECK(Rect({1, 1}, Size(3, 3)).center() == Point(2, 2));
-	CHECK(Rect({2, 2}, Size(4, 4)).center() == Point(4, 4));
+	CHECK(Rect({ 1, 1 }, Size(3, 3)).center() == Point(2, 2));
+	CHECK(Rect({ 2, 2 }, Size(4, 4)).center() == Point(4, 4));
 }
 
 TEST_CASE("rect.centered_at")
 {
-	Rect rect1({0, 0}, Size(1, 1));
-	Rect rect2({0, 0}, Size(3, 3));
-	CHECK(rect1.centered_at(rect2) == Rect({1, 1}, Size(1, 1)));
-	CHECK(rect2.centered_at(rect1) == Rect({-1, -1}, Size(3, 3)));
+	Rect rect1({ 0, 0 }, Size(1, 1));
+	Rect rect2({ 0, 0 }, Size(3, 3));
+	CHECK(rect1.centered_at(rect2) == Rect({ 1, 1 }, Size(1, 1)));
+	CHECK(rect2.centered_at(rect1) == Rect({ -1, -1 }, Size(3, 3)));
 }
 
 TEST_CASE("rect.contains")
 {
-	Rect rect({0, 0}, Size(10, 10));
+	Rect rect({ 0, 0 }, Size(10, 10));
 
 	CHECK(rect.contains(rect));
 
-	CHECK(rect.contains({0, 0}));
-	CHECK(rect.contains_fast({0, 0}));
+	CHECK(rect.contains({ 0, 0 }));
+	CHECK(rect.contains_fast({ 0, 0 }));
 
-	CHECK(!rect.contains({-1, 0}));
-	CHECK(!rect.contains_fast({-1, 0}));
+	CHECK(!rect.contains({ -1, 0 }));
+	CHECK(!rect.contains_fast({ -1, 0 }));
 
-	CHECK(!rect.contains({0, -1}));
-	CHECK(!rect.contains_fast({0, -1}));
+	CHECK(!rect.contains({ 0, -1 }));
+	CHECK(!rect.contains_fast({ 0, -1 }));
 
-	CHECK(rect.contains({9, 9}));
-	CHECK(rect.contains_fast({9, 9}));
+	CHECK(rect.contains({ 9, 9 }));
+	CHECK(rect.contains_fast({ 9, 9 }));
 
-	CHECK(!rect.contains({10, 9}));
-	CHECK(!rect.contains_fast({10, 9}));
+	CHECK(!rect.contains({ 10, 9 }));
+	CHECK(!rect.contains_fast({ 10, 9 }));
 
-	CHECK(!rect.contains({9, 10}));
-	CHECK(!rect.contains_fast({9, 10}));
+	CHECK(!rect.contains({ 9, 10 }));
+	CHECK(!rect.contains_fast({ 9, 10 }));
 
-	Rect smaller_rect({1, 1}, Size(9, 9));
+	Rect smaller_rect({ 1, 1 }, Size(9, 9));
 
 	CHECK(rect.contains(smaller_rect));
 
 	CHECK(!smaller_rect.contains(rect));
 
-	smaller_rect = {{0, 0}, Size(9, 9)};
+	smaller_rect = { { 0, 0 }, Size(9, 9) };
 
 	CHECK(rect.contains(smaller_rect));
 
@@ -129,23 +129,23 @@ TEST_CASE("rect.contains")
 
 TEST_CASE("rect.intersected")
 {
-	CHECK(Rect({0, 0}, Size(2, 2)).intersected({{0, 0}, Size(2, 2)}) == Rect({0, 0}, Size(2, 2)));
-	CHECK(Rect({0, 0}, Size(2, 2)).intersected({{0, 1}, Size(2, 2)}) == Rect({0, 1}, Size(2, 1)));
-	CHECK(Rect({0, 0}, Size(2, 2)).intersected({{1, 1}, Size(2, 2)}) == Rect({1, 1}, Size(1, 1)));
-	CHECK(Rect({0, 0}, Size(2, 2)).intersected({{0, 2}, Size(2, 2)}) == Rect({0, 2}, Size(2, 0)));
-	CHECK(Rect({0, 0}, Size(2, 2)).intersected({{1, 2}, Size(2, 2)}) == Rect({1, 2}, Size(1, 0)));
-	CHECK(Rect({0, 0}, Size(2, 2)).intersected({{2, 2}, Size(2, 2)}) == Rect({2, 2}, Size(0, 0)));
+	CHECK(Rect({ 0, 0 }, Size(2, 2)).intersected({ { 0, 0 }, Size(2, 2) }) == Rect({ 0, 0 }, Size(2, 2)));
+	CHECK(Rect({ 0, 0 }, Size(2, 2)).intersected({ { 0, 1 }, Size(2, 2) }) == Rect({ 0, 1 }, Size(2, 1)));
+	CHECK(Rect({ 0, 0 }, Size(2, 2)).intersected({ { 1, 1 }, Size(2, 2) }) == Rect({ 1, 1 }, Size(1, 1)));
+	CHECK(Rect({ 0, 0 }, Size(2, 2)).intersected({ { 0, 2 }, Size(2, 2) }) == Rect({ 0, 2 }, Size(2, 0)));
+	CHECK(Rect({ 0, 0 }, Size(2, 2)).intersected({ { 1, 2 }, Size(2, 2) }) == Rect({ 1, 2 }, Size(1, 0)));
+	CHECK(Rect({ 0, 0 }, Size(2, 2)).intersected({ { 2, 2 }, Size(2, 2) }) == Rect({ 2, 2 }, Size(0, 0)));
 }
 
 TEST_CASE("rect.intersects")
 {
-	Rect rect({0, 0}, Size(3, 3));
+	Rect rect({ 0, 0 }, Size(3, 3));
 
 	CHECK(rect.intersects(rect));
 	CHECK(rect.intersects_fast(rect));
 	CHECK(rect.intersects_fastest(rect));
 
-	Rect another_rect({1, 1}, Size(3, 3));
+	Rect another_rect({ 1, 1 }, Size(3, 3));
 
 	CHECK(rect.intersects(another_rect));
 	CHECK(rect.intersects_fast(another_rect));
@@ -155,7 +155,7 @@ TEST_CASE("rect.intersects")
 	CHECK(another_rect.intersects_fast(rect));
 	CHECK(another_rect.intersects_fastest(rect));
 
-	Rect inner_rect({1, 1}, Size(1, 1)); // So that (L1 - R2 == L2 - R1).
+	Rect inner_rect({ 1, 1 }, Size(1, 1)); // So that (L1 - R2 == L2 - R1).
 
 	CHECK(rect.intersects(inner_rect));
 	CHECK(rect.intersects_fast(inner_rect));
@@ -165,7 +165,7 @@ TEST_CASE("rect.intersects")
 	CHECK(inner_rect.intersects_fast(rect));
 	CHECK(inner_rect.intersects_fastest(rect));
 
-	Rect right_border_rect({2, 0}, Size(3, 3));
+	Rect right_border_rect({ 2, 0 }, Size(3, 3));
 
 	CHECK(rect.intersects(right_border_rect));
 	CHECK(rect.intersects_fast(right_border_rect));
@@ -175,7 +175,7 @@ TEST_CASE("rect.intersects")
 	CHECK(right_border_rect.intersects_fast(rect));
 	CHECK(right_border_rect.intersects_fastest(rect));
 
-	Rect right_rect({3, 0}, Size(3, 3));
+	Rect right_rect({ 3, 0 }, Size(3, 3));
 
 	CHECK(!rect.intersects(right_rect));
 	CHECK(!rect.intersects_fast(right_rect));
@@ -185,7 +185,7 @@ TEST_CASE("rect.intersects")
 	CHECK(!right_rect.intersects_fast(rect));
 	CHECK(!right_rect.intersects_fastest(rect));
 
-	Rect bottom_border_rect({0, 2}, Size(3, 3));
+	Rect bottom_border_rect({ 0, 2 }, Size(3, 3));
 
 	CHECK(rect.intersects(bottom_border_rect));
 	CHECK(rect.intersects_fast(bottom_border_rect));
@@ -195,7 +195,7 @@ TEST_CASE("rect.intersects")
 	CHECK(bottom_border_rect.intersects_fast(rect));
 	CHECK(bottom_border_rect.intersects_fastest(rect));
 
-	Rect bottom_rect({0, 3}, Size(3, 3));
+	Rect bottom_rect({ 0, 3 }, Size(3, 3));
 
 	CHECK(!rect.intersects(bottom_rect));
 	CHECK(!rect.intersects_fast(bottom_rect));
@@ -205,7 +205,7 @@ TEST_CASE("rect.intersects")
 	CHECK(!bottom_rect.intersects_fast(rect));
 	CHECK(!bottom_rect.intersects_fastest(rect));
 
-	Rect far_rect({4, 4}, Size(3, 3));
+	Rect far_rect({ 4, 4 }, Size(3, 3));
 
 	CHECK(!rect.intersects(far_rect));
 	CHECK(!rect.intersects_fast(far_rect));
@@ -231,7 +231,7 @@ TEST_CASE("rect.intersects.null")
 	// null rect lies within the non-null rect (and not on its zero-width border).
 	// Note that a point is equivalent to the rect with width and height set to one, not zero!
 
-	Rect rect({0, 0}, Size(2, 2));
+	Rect rect({ 0, 0 }, Size(2, 2));
 
 	CHECK(!null_rect.intersects(rect));
 	CHECK(!null_rect.intersects_fast(rect));
@@ -241,7 +241,7 @@ TEST_CASE("rect.intersects.null")
 	CHECK(!rect.intersects_fast(null_rect));
 	CHECK(!rect.intersects_fastest(null_rect));
 
-	null_rect = {{1, 1}, Size()};
+	null_rect = { { 1, 1 }, Size() };
 
 	CHECK(null_rect.intersects(rect));
 	CHECK(null_rect.intersects_fast(rect));
@@ -251,7 +251,7 @@ TEST_CASE("rect.intersects.null")
 	CHECK(rect.intersects_fast(null_rect));
 	CHECK(rect.intersects_fastest(null_rect));
 
-	null_rect = {{2, 2}, Size()};
+	null_rect = { { 2, 2 }, Size() };
 
 	CHECK(!null_rect.intersects(rect));
 	CHECK(!null_rect.intersects_fast(rect));
@@ -274,7 +274,7 @@ TEST_CASE("rectf")
 		CHECK(r.height() == 0.f);
 	}
 	{
-		RectF r{{1, 2}, Vector2{4, 7}};
+		RectF r{ { 1, 2 }, Vector2{ 4, 7 } };
 		CHECK(r.left() == 1.f);
 		CHECK(r.top() == 2.f);
 		CHECK(r.right() == 4.f);
@@ -283,7 +283,7 @@ TEST_CASE("rectf")
 		CHECK(r.height() == 5.f);
 	}
 	{
-		RectF r{{1, 2}, SizeF{3, 5}};
+		RectF r{ { 1, 2 }, SizeF{ 3, 5 } };
 		CHECK(r.left() == 1.f);
 		CHECK(r.top() == 2.f);
 		CHECK(r.right() == 4.f);
@@ -292,7 +292,7 @@ TEST_CASE("rectf")
 		CHECK(r.height() == 5.f);
 	}
 	{
-		RectF r{SizeF{1, 2}};
+		RectF r{ SizeF{ 1, 2 } };
 		CHECK(r.left() == 0.f);
 		CHECK(r.top() == 0.f);
 		CHECK(r.right() == 1.f);
@@ -301,7 +301,7 @@ TEST_CASE("rectf")
 		CHECK(r.height() == 2.f);
 	}
 	{
-		RectF r{Rect{{1, 2}, Point{4, 7}}};
+		RectF r{ Rect{ { 1, 2 }, Point{ 4, 7 } } };
 		CHECK(r.left() == 1.f);
 		CHECK(r.top() == 2.f);
 		CHECK(r.right() == 4.f);

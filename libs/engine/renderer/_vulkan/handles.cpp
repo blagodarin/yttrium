@@ -28,7 +28,7 @@ namespace Yttrium
 	}
 
 	VK_CommandBuffer::VK_CommandBuffer(const VulkanContext& context)
-		: _context{context}
+		: _context{ context }
 	{
 		VkCommandBufferAllocateInfo info;
 		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -88,7 +88,7 @@ namespace Yttrium
 			dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		}
 		else
-			throw std::logic_error{"Bad image layout transition"};
+			throw std::logic_error{ "Bad image layout transition" };
 
 		vkCmdPipelineBarrier(_handle, src_stage, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 	}
@@ -244,7 +244,7 @@ namespace Yttrium
 
 	void vulkan_result_check(VkResult result, const std::string& function)
 	{
-		throw std::runtime_error{function.substr(0, function.find('(')) + " = " + vulkan_result_to_string(result)};
+		throw std::runtime_error{ function.substr(0, function.find('(')) + " = " + vulkan_result_to_string(result) };
 	}
 
 	std::string vulkan_result_to_string(VkResult result)

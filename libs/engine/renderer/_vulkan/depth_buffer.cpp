@@ -6,12 +6,12 @@
 namespace Yttrium
 {
 	VulkanDepthBuffer::VulkanDepthBuffer(const VulkanContext& context, uint32_t width, uint32_t height, VkFormat format)
-		: _context{context}
-		, _format{format}
+		: _context{ context }
+		, _format{ format }
 	{
-		VK_HDeviceMemory memory{_context->_device};
-		VK_HImage image{_context->_device};
-		VK_HImageView view{_context->_device};
+		VK_HDeviceMemory memory{ _context->_device };
+		VK_HImage image{ _context->_device };
+		VK_HImageView view{ _context->_device };
 
 		VkImageCreateInfo image_info;
 		image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

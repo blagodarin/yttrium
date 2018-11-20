@@ -63,11 +63,10 @@ namespace Yttrium
 		const RenderingContext legacy_context(hdc, ::wglCreateContext(hdc));
 		if (!legacy_context)
 			throw InitializationError("Unable to create OpenGL legacy context");
-		const auto wglCreateContextAttribsARB = reinterpret_cast<HGLRC (APIENTRY*)(HDC, HGLRC, const int*)>(::wglGetProcAddress("wglCreateContextAttribsARB"));
+		const auto wglCreateContextAttribsARB = reinterpret_cast<HGLRC(APIENTRY*)(HDC, HGLRC, const int*)>(::wglGetProcAddress("wglCreateContextAttribsARB"));
 		if (!wglCreateContextAttribsARB)
 			throw InitializationError("Unable to use WGL_ARB_create_context");
-		const int attributes[] =
-		{
+		const int attributes[]{
 			WGL_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
 			WGL_CONTEXT_MINOR_VERSION_ARB, Gl::required_minor,
 			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,

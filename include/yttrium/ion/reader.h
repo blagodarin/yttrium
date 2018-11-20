@@ -17,7 +17,9 @@ namespace Yttrium
 	public:
 		///
 		template <typename... Args>
-		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args) : DataError{"(", line, ":", column, ") ", std::forward<Args>(args)...} {}
+		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args)
+			: DataError{ "(", line, ":", column, ") ", std::forward<Args>(args)... }
+		{}
 	};
 
 	///
@@ -39,7 +41,7 @@ namespace Yttrium
 			};
 
 			Token(std::size_t line, std::ptrdiff_t column, Type type, std::string_view text, bool translatable = false) noexcept
-				: _line{line}, _column{column}, _type{type}, _text{text}, _translatable{translatable} {}
+				: _line{ line }, _column{ column }, _type{ type }, _text{ text }, _translatable{ translatable } {}
 
 			std::ptrdiff_t column() const noexcept { return _column; }
 			std::size_t line() const noexcept { return _line; }

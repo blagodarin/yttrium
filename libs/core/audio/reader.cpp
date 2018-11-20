@@ -5,7 +5,7 @@
 #include "formats/wav.h"
 
 #if Y_USE_OGG_VORBIS
-	#include "formats/ogg_vorbis.h"
+#	include "formats/ogg_vorbis.h"
 #endif
 
 namespace
@@ -49,7 +49,7 @@ namespace Yttrium
 #if Y_USE_OGG_VORBIS
 		case AudioType::OggVorbis: return std::make_unique<OggVorbisReader>(std::move(source));
 #endif
-		default: throw DataError{"Unknown audio format"};
+		default: throw DataError{ "Unknown audio format" };
 		}
 	}
 }

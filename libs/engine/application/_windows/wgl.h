@@ -12,13 +12,17 @@ namespace Yttrium
 	public:
 		struct Extensions
 		{
+			// clang-format off
+
 			bool ARB_extensions_string = false;
-			const char* (APIENTRY *GetExtensionsStringARB)(HDC) = nullptr;
+			const char* (APIENTRY* GetExtensionsStringARB)(HDC) = nullptr;
 			const char* EXTENSIONS_ARB = nullptr;
 
 			bool EXT_swap_control = false;
-			int (APIENTRY *GetSwapIntervalEXT)() = nullptr;
-			BOOL (APIENTRY *SwapIntervalEXT)(int) = nullptr;
+			int (APIENTRY* GetSwapIntervalEXT)() = nullptr;
+			BOOL (APIENTRY* SwapIntervalEXT) (int) = nullptr;
+
+			// clang-format on
 		};
 
 		explicit WglContext(HDC);
@@ -33,6 +37,7 @@ namespace Yttrium
 			~RenderingContext();
 			operator HGLRC() const { return _hglrc; }
 			static HGLRC create(HDC);
+
 		private:
 			const HGLRC _hglrc;
 		};

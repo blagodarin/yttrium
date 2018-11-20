@@ -13,9 +13,11 @@ namespace
 	class TestData
 	{
 	public:
-		explicit TestData(IonWriter::Formatting formatting) : _ion_writer{_writer, formatting} {}
+		explicit TestData(IonWriter::Formatting formatting)
+			: _ion_writer{ _writer, formatting } {}
 		IonWriter* operator->() { return &_ion_writer; }
 		std::string_view to_string() const { return { static_cast<const char*>(_buffer.data()), _buffer.size() }; }
+
 	private:
 		Buffer _buffer;
 		Writer _writer{ _buffer };
@@ -124,12 +126,12 @@ TEST_CASE("ion.writer.escape")
 	ion->add_value("value\\");
 	ion->flush();
 	CHECK(ion.to_string() == "name"
-		"\"\\\"value\""
-		"\"value\\\"value\""
-		"\"value\\\"\""
-		"\"\\\\value\""
-		"\"value\\\\value\""
-		"\"value\\\\\"");
+							 "\"\\\"value\""
+							 "\"value\\\"value\""
+							 "\"value\\\"\""
+							 "\"\\\\value\""
+							 "\"value\\\\value\""
+							 "\"value\\\\\"");
 }
 
 TEST_CASE("ion.writer.flush")
@@ -167,7 +169,8 @@ TEST_CASE("ion.writer.flush")
 		ion->flush();
 		ion->add_name("name2");
 		ion->flush();
-		CHECK(ion.to_string() == "name1\n" "name2\n");
+		CHECK(ion.to_string() == "name1\n"
+								 "name2\n");
 	}
 
 	SECTION("sequential.compact")
@@ -293,7 +296,8 @@ TEST_CASE("ion.writer.pretty")
 		ion->add_name("name1");
 		ion->add_name("name2");
 		ion->flush();
-		CHECK(ion.to_string() == "name1\n" "name2\n");
+		CHECK(ion.to_string() == "name1\n"
+								 "name2\n");
 	}
 
 	SECTION("values")
@@ -303,7 +307,8 @@ TEST_CASE("ion.writer.pretty")
 		ion->add_value("value2");
 		ion->add_name("name2");
 		ion->flush();
-		CHECK(ion.to_string() == "name1 \"value1\" \"value2\"\n" "name2\n");
+		CHECK(ion.to_string() == "name1 \"value1\" \"value2\"\n"
+								 "name2\n");
 	}
 
 	SECTION("lists")
@@ -321,7 +326,8 @@ TEST_CASE("ion.writer.pretty")
 		ion->end_list();
 		ion->add_name("name2");
 		ion->flush();
-		CHECK(ion.to_string() == "name1 [\"value1\" [[] []] \"value2\"]\n" "name2\n");
+		CHECK(ion.to_string() == "name1 [\"value1\" [[] []] \"value2\"]\n"
+								 "name2\n");
 	}
 
 	SECTION("objects_and_names")
@@ -337,7 +343,16 @@ TEST_CASE("ion.writer.pretty")
 		ion->end_object();
 		ion->add_name("name4");
 		ion->flush();
-		CHECK(ion.to_string() == "name1\n" "{\n" "\tname2\n" "}\n" "{\n" "\tname3\n" "\t{\n" "\t}\n" "}\n" "name4\n");
+		CHECK(ion.to_string() == "name1\n"
+								 "{\n"
+								 "\tname2\n"
+								 "}\n"
+								 "{\n"
+								 "\tname3\n"
+								 "\t{\n"
+								 "\t}\n"
+								 "}\n"
+								 "name4\n");
 	}
 
 	SECTION("objects_and_values")
@@ -351,7 +366,12 @@ TEST_CASE("ion.writer.pretty")
 		ion->begin_object();
 		ion->end_object();
 		ion->flush();
-		CHECK(ion.to_string() == "name1\n" "{\n" "\tname2 \"value1\"\n" "} \"value2\"\n" "{\n" "}\n");
+		CHECK(ion.to_string() == "name1\n"
+								 "{\n"
+								 "\tname2 \"value1\"\n"
+								 "} \"value2\"\n"
+								 "{\n"
+								 "}\n");
 	}
 
 	SECTION("objects_and_lists")
@@ -369,6 +389,13 @@ TEST_CASE("ion.writer.pretty")
 		ion->end_list();
 		ion->end_object();
 		ion->flush();
-		CHECK(ion.to_string() == "name1\n" "{\n" "\tname2 [[\n" "\t\t\t{\n" "\t\t\t}]\n" "\t\t{\n" "\t\t}]\n" "}\n");
+		CHECK(ion.to_string() == "name1\n"
+								 "{\n"
+								 "\tname2 [[\n"
+								 "\t\t\t{\n"
+								 "\t\t\t}]\n"
+								 "\t\t{\n"
+								 "\t\t}]\n"
+								 "}\n");
 	}
 }

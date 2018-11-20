@@ -13,7 +13,7 @@ namespace Yttrium
 		void clear();
 		size_t cursor() const { return _cursor; }
 		void insert(std::string_view);
-		void insert(char symbol) { insert({&symbol, 1}); }
+		void insert(char symbol) { insert({ &symbol, 1 }); }
 		bool process_key(const KeyEvent&);
 		void reset(std::string&&);
 		size_t selection_offset() const { return _selection_offset; }

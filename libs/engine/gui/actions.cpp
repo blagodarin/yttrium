@@ -10,7 +10,8 @@ namespace
 	class GuiActionVisitor
 	{
 	public:
-		explicit GuiActionVisitor(GuiPrivate& gui) : _gui(gui) {}
+		explicit GuiActionVisitor(GuiPrivate& gui)
+			: _gui(gui) {}
 
 		void operator()(const GuiAction_Call& action) const { action._script.execute(_gui.script_context()); }
 		void operator()(const GuiAction_Enter& action) const { _gui.push_screen(action._screen); }

@@ -30,13 +30,13 @@ namespace
 namespace Yttrium
 {
 	ImageFormat::ImageFormat(size_t width, size_t height, PixelFormat pixel_format, size_t row_alignment, ImageOrientation orientation)
-		: _pixel_format{pixel_format}
-		, _channels{::channels_of(_pixel_format)}
-		, _orientation{orientation}
-		, _width{width}
-		, _row_alignment{row_alignment}
-		, _row_size{aligned_image_row_size(_width, pixel_size(_pixel_format) * 8, _row_alignment)}
-		, _height{height}
+		: _pixel_format{ pixel_format }
+		, _channels{ ::channels_of(_pixel_format) }
+		, _orientation{ orientation }
+		, _width{ width }
+		, _row_alignment{ row_alignment }
+		, _row_size{ aligned_image_row_size(_width, pixel_size(_pixel_format) * 8, _row_alignment) }
+		, _height{ height }
 	{
 		assert(is_power_of_2(_row_alignment));
 	}
@@ -49,18 +49,18 @@ namespace Yttrium
 		const auto format = read_image(source, type, buffer);
 		if (!format)
 			return {};
-		return Image{*format, std::move(buffer)};
+		return Image{ *format, std::move(buffer) };
 	}
 
 	Image::Image(const ImageFormat& format)
-		: _format{format}
-		, _buffer{_format.frame_size()}
+		: _format{ format }
+		, _buffer{ _format.frame_size() }
 	{
 	}
 
 	Image::Image(const ImageFormat& format, const void* data)
-		: _format{format}
-		, _buffer{_format.frame_size(), data}
+		: _format{ format }
+		, _buffer{ _format.frame_size(), data }
 	{
 	}
 
@@ -77,7 +77,7 @@ namespace Yttrium
 			else
 				return false;
 		}
-		return save(Writer{path}, type);
+		return save(Writer{ path }, type);
 	}
 
 	bool Image::save(Writer&& writer, ImageType type) const
@@ -94,19 +94,19 @@ namespace Yttrium
 
 		case PixelFormat::Rgb24:
 		case PixelFormat::Bgr24:
+		{
+			auto scanline = static_cast<uint8_t*>(_buffer.data());
+			for (size_t row = 0; row < _format.height(); ++row)
 			{
-				auto scanline = static_cast<uint8_t*>(_buffer.data());
-				for (size_t row = 0; row < _format.height(); ++row)
+				for (size_t offset = 0; offset < _format.width() * 3; offset += 3)
 				{
-					for (size_t offset = 0; offset < _format.width() * 3; offset += 3)
-					{
-						const auto x = scanline[offset];
-						scanline[offset] = scanline[offset + 2];
-						scanline[offset + 2] = x;
-					}
-					scanline += _format.row_size();
+					const auto x = scanline[offset];
+					scanline[offset] = scanline[offset + 2];
+					scanline[offset + 2] = x;
 				}
+				scanline += _format.row_size();
 			}
+		}
 			_format._pixel_format = _format.pixel_format() == PixelFormat::Rgb24 ? PixelFormat::Bgr24 : PixelFormat::Rgb24;
 			return true;
 
@@ -120,6 +120,6 @@ namespace Yttrium
 	Buffer Image::to_buffer(ImageType type) const
 	{
 		Buffer buffer;
-		return save(Writer{buffer}, type) ? std::move(buffer) : Buffer{};
+		return save(Writer{ buffer }, type) ? std::move(buffer) : Buffer{};
 	}
 }

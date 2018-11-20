@@ -1,7 +1,7 @@
 #include "memory/buffer_memory.h"
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
-	#include "memory/buffer_memory_tracker.h"
+#	include "memory/buffer_memory_tracker.h"
 #endif
 
 namespace Yttrium

@@ -23,9 +23,8 @@ namespace Yttrium
 			return false;
 
 		size_t newlines = 0;
-		const auto read_block = [this, &string, &newlines](const char* begin, const char* end)
-		{
-			const auto newline = std::find_if(begin, end, [](char c){ return c == '\r' || c == '\n'; });
+		const auto read_block = [this, &string, &newlines](const char* begin, const char* end) {
+			const auto newline = std::find_if(begin, end, [](char c) { return c == '\r' || c == '\n'; });
 			string.append(begin, newline);
 			if (newline == end)
 				return false; // There may be more data.

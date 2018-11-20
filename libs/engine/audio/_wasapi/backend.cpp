@@ -12,25 +12,25 @@ namespace Yttrium
 		ComPtr<IMMDeviceEnumerator> enumerator;
 		auto hr = ::CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
 		if (!enumerator)
-			throw InitializationError{"CoCreateInstance failed: ", error_to_string(hr)};
+			throw InitializationError{ "CoCreateInstance failed: ", error_to_string(hr) };
 
 		hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &_device);
 		if (!_device)
-			throw InitializationError{"IMMDeviceEnumerator::GetDefaultAudioEndpoint failed: ", error_to_string(hr)};
+			throw InitializationError{ "IMMDeviceEnumerator::GetDefaultAudioEndpoint failed: ", error_to_string(hr) };
 
 		hr = _device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&_client));
 		if (!_client)
-			throw InitializationError{"IMMDevice::Activate failed: ", error_to_string(hr)};
+			throw InitializationError{ "IMMDevice::Activate failed: ", error_to_string(hr) };
 
 		WAVEFORMATEX* format = nullptr;
 		hr = _client->GetMixFormat(&format);
 		if (!format)
-			throw InitializationError{"IAudioClient::GetMixFormat failed: ", error_to_string(hr)};
+			throw InitializationError{ "IAudioClient::GetMixFormat failed: ", error_to_string(hr) };
 
 		hr = _client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, 10'000'000, 0, format, nullptr);
 		::CoTaskMemFree(format);
 		if (FAILED(hr))
-			throw InitializationError{"IAudioClient::Initialize failed: ", error_to_string(hr)};
+			throw InitializationError{ "IAudioClient::Initialize failed: ", error_to_string(hr) };
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;

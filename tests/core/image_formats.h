@@ -25,7 +25,7 @@ inline Yttrium::Image make_test_image(bool with_alpha)
 			else if (y < 12)
 			{
 				g = ((11 - y) * 16 + x) * 4 + 3;
-				b = (( y - 8) * 16 + x) * 4 + 3;
+				b = ((y - 8) * 16 + x) * 4 + 3;
 			}
 			else
 			{

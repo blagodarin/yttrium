@@ -105,10 +105,9 @@ namespace
 
 	int print_usage()
 	{
-		std::cerr
-			<< "Usage:\n"
-			<< "  yglslc --vertex INPUT OUTPUT\n"
-			<< "  yglslc --fragment INPUT OUTPUT\n";
+		std::cerr << "Usage:\n"
+				  << "  yglslc --vertex INPUT OUTPUT\n"
+				  << "  yglslc --fragment INPUT OUTPUT\n";
 		return 1;
 	}
 }
@@ -128,7 +127,7 @@ int main(int argc, char** argv)
 
 	std::string glsl;
 	{
-		std::ifstream input{argv[2], std::ios::binary | std::ios::in};
+		std::ifstream input{ argv[2], std::ios::binary | std::ios::in };
 		if (!input.is_open())
 		{
 			std::cerr << "ERROR: Unable to open \"" << argv[2] << "\"\n";
@@ -148,9 +147,9 @@ int main(int argc, char** argv)
 	{
 		glslang::InitializeProcess();
 
-		std::array<const char*, 1> source{glsl.data()};
+		std::array<const char*, 1> source{ glsl.data() };
 
-		glslang::TShader shader{language};
+		glslang::TShader shader{ language };
 		shader.setStrings(source.data(), source.size());
 
 		const auto messages = static_cast<EShMessages>(EShMsgSpvRules | EShMsgVulkanRules);
@@ -159,7 +158,8 @@ int main(int argc, char** argv)
 		::init_resources(resources);
 		if (!shader.parse(&resources, 100, false, messages))
 		{
-			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n" << shader.getInfoLog() << '\n';
+			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n"
+					  << shader.getInfoLog() << '\n';
 			return 1;
 		}
 
@@ -167,7 +167,8 @@ int main(int argc, char** argv)
 		program.addShader(&shader);
 		if (!program.link(messages))
 		{
-			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n" << shader.getInfoLog() << '\n';
+			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n"
+					  << shader.getInfoLog() << '\n';
 			return 1;
 		}
 
@@ -176,7 +177,7 @@ int main(int argc, char** argv)
 		glslang::FinalizeProcess();
 	}
 
-	std::ofstream output{argv[3], std::ios::out | std::ios::trunc};
+	std::ofstream output{ argv[3], std::ios::out | std::ios::trunc };
 	if (!output.is_open())
 	{
 		std::cerr << "ERROR: Unable to open \"" << argv[3] << "\"\n";

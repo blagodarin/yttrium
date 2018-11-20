@@ -54,73 +54,74 @@ namespace
 		{
 			return static_cast<Key>(static_cast<::KeySym>(to_underlying(Key::Num0)) + key_sym - XK_KP_0);
 		}
-		else switch (key_sym)
-		{
-		case XK_space:        return Key::Space;      // 0x0020
+		else
+			switch (key_sym)
+			{
+			case XK_space: return Key::Space; // 0x0020
 
-		case XK_apostrophe:   return Key::Apostrophe; // 0x0027
+			case XK_apostrophe: return Key::Apostrophe; // 0x0027
 
-		case XK_comma:        return Key::Comma;      // 0x002C
-		case XK_minus:        return Key::Minus;
-		case XK_period:       return Key::Period;
-		case XK_slash:        return Key::Slash;
+			case XK_comma: return Key::Comma; // 0x002C
+			case XK_minus: return Key::Minus;
+			case XK_period: return Key::Period;
+			case XK_slash: return Key::Slash;
 
-		case XK_semicolon:    return Key::Semicolon;  // 0x003B
+			case XK_semicolon: return Key::Semicolon; // 0x003B
 
-		case XK_equal:        return Key::Equals;     // 0x003D
+			case XK_equal: return Key::Equals; // 0x003D
 
-		case XK_bracketleft:  return Key::LBracket;   // 0x005B
-		case XK_backslash:    return Key::Backslash;
-		case XK_bracketright: return Key::RBracket;
+			case XK_bracketleft: return Key::LBracket; // 0x005B
+			case XK_backslash: return Key::Backslash;
+			case XK_bracketright: return Key::RBracket;
 
-		case XK_grave:        return Key::Grave;      // 0x0060
+			case XK_grave: return Key::Grave; // 0x0060
 
-		case XK_BackSpace:    return Key::Backspace;  // 0xFF08
-		case XK_Tab:          return Key::Tab;
-		case XK_Return:       return Key::Enter;
-		case XK_Pause:        return Key::Pause;
-		case XK_Sys_Req:      return Key::Print;
-		case XK_Escape:       return Key::Escape;
+			case XK_BackSpace: return Key::Backspace; // 0xFF08
+			case XK_Tab: return Key::Tab;
+			case XK_Return: return Key::Enter;
+			case XK_Pause: return Key::Pause;
+			case XK_Sys_Req: return Key::Print;
+			case XK_Escape: return Key::Escape;
 
-		case XK_Home:         return Key::Home;       // 0xFF50
-		case XK_Left:         return Key::Left;
-		case XK_Up:           return Key::Up;
-		case XK_Right:        return Key::Right;
-		case XK_Down:         return Key::Down;
-		case XK_Prior:        return Key::PageUp;
-		case XK_Next:         return Key::PageDown;
-		case XK_End:          return Key::End;
+			case XK_Home: return Key::Home; // 0xFF50
+			case XK_Left: return Key::Left;
+			case XK_Up: return Key::Up;
+			case XK_Right: return Key::Right;
+			case XK_Down: return Key::Down;
+			case XK_Prior: return Key::PageUp;
+			case XK_Next: return Key::PageDown;
+			case XK_End: return Key::End;
 
-		case XK_Insert:       return Key::Insert;     // 0xFF63
+			case XK_Insert: return Key::Insert; // 0xFF63
 
-		case XK_KP_Enter:     return Key::NumEnter;   // 0xFF8D
+			case XK_KP_Enter: return Key::NumEnter; // 0xFF8D
 
-		case XK_KP_Home:      return Key::Num7;       // 0xFF95
-		case XK_KP_Left:      return Key::Num4;
-		case XK_KP_Up:        return Key::Num8;
-		case XK_KP_Right:     return Key::Num6;
-		case XK_KP_Down:      return Key::Num2;
-		case XK_KP_Prior:     return Key::Num9;
-		case XK_KP_Next:      return Key::Num3;
-		case XK_KP_End:       return Key::Num1;
+			case XK_KP_Home: return Key::Num7; // 0xFF95
+			case XK_KP_Left: return Key::Num4;
+			case XK_KP_Up: return Key::Num8;
+			case XK_KP_Right: return Key::Num6;
+			case XK_KP_Down: return Key::Num2;
+			case XK_KP_Prior: return Key::Num9;
+			case XK_KP_Next: return Key::Num3;
+			case XK_KP_End: return Key::Num1;
 
-		case XK_KP_Multiply:  return Key::Multiply;   // 0xFFAA
-		case XK_KP_Add:       return Key::Add;
+			case XK_KP_Multiply: return Key::Multiply; // 0xFFAA
+			case XK_KP_Add: return Key::Add;
 
-		case XK_KP_Subtract:  return Key::Subtract;   // 0xFFAD
-		case XK_KP_Decimal:   return Key::Decimal;
-		case XK_KP_Divide:    return Key::Divide;
+			case XK_KP_Subtract: return Key::Subtract; // 0xFFAD
+			case XK_KP_Decimal: return Key::Decimal;
+			case XK_KP_Divide: return Key::Divide;
 
-		case XK_Shift_L:      return Key::LShift;     // 0xFFE1
-		case XK_Shift_R:      return Key::RShift;
-		case XK_Control_L:    return Key::LControl;
-		case XK_Control_R:    return Key::RControl;
+			case XK_Shift_L: return Key::LShift; // 0xFFE1
+			case XK_Shift_R: return Key::RShift;
+			case XK_Control_L: return Key::LControl;
+			case XK_Control_R: return Key::RControl;
 
-		case XK_Alt_L:        return Key::LAlt;       // 0xFFE9
-		case XK_Alt_R:        return Key::RAlt;
+			case XK_Alt_L: return Key::LAlt; // 0xFFE9
+			case XK_Alt_R: return Key::RAlt;
 
-		case XK_Delete:       return Key::Delete;     // 0xFFFF
-		}
+			case XK_Delete: return Key::Delete; // 0xFFFF
+			}
 
 		return Key::Null;
 	}
@@ -143,8 +144,8 @@ namespace
 namespace Yttrium
 {
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
-		: _window{_application.display(), ::create_window(_application.display(), _application.screen(), _glx.visual_info())}
-		, _callbacks{callbacks}
+		: _window{ _application.display(), ::create_window(_application.display(), _application.screen(), _glx.visual_info()) }
+		, _callbacks{ callbacks }
 	{
 		::XSetWMProtocols(_application.display(), _window.get(), &_wm_delete_window, 1);
 		::XStoreName(_application.display(), _window.get(), name.c_str());
@@ -188,7 +189,7 @@ namespace Yttrium
 		if (!::XQueryPointer(_application.display(), _window.get(), &root, &child, &root_x, &root_y, &window_x, &window_y, &mask))
 			return false;
 
-		cursor = {window_x, window_y};
+		cursor = { window_x, window_y };
 
 		return true;
 	}
@@ -197,7 +198,7 @@ namespace Yttrium
 	{
 		if (!_window)
 			return false;
-		while (!_size ||::XPending(_application.display()) > 0)
+		while (!_size || ::XPending(_application.display()) > 0)
 		{
 			::XEvent event;
 			::XNextEvent(_application.display(), &event);

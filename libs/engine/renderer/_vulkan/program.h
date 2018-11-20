@@ -10,7 +10,8 @@ namespace Yttrium
 	class VulkanProgram final : public RenderProgram
 	{
 	public:
-		explicit VulkanProgram(VulkanRenderer& renderer) : _renderer{renderer} {}
+		explicit VulkanProgram(VulkanRenderer& renderer)
+			: _renderer{ renderer } {}
 
 		void set_uniform(const std::string&, const Matrix4&) override;
 

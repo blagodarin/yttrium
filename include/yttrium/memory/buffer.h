@@ -68,6 +68,7 @@ namespace Yttrium
 		~Buffer() noexcept;
 		Buffer& operator=(const Buffer&) = delete;
 		Buffer& operator=(Buffer&&) noexcept;
+
 	private:
 		size_t _size = 0;
 		size_t _capacity = 0;

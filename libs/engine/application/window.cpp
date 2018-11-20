@@ -31,11 +31,11 @@ namespace Yttrium
 			if (_on_update)
 				_on_update(update);
 			{
-				RenderPassImpl pass{*_renderer._backend, _renderer_builtin, render_pass_data, _size};
-				PushProgram program{pass, _renderer_builtin._program_2d.get()};
-				Push2D projection{pass};
+				RenderPassImpl pass{ *_renderer._backend, _renderer_builtin, render_pass_data, _size };
+				PushProgram program{ pass, _renderer_builtin._program_2d.get() };
+				Push2D projection{ pass };
 				if (_on_render)
-					_on_render(pass, Vector2{_cursor});
+					_on_render(pass, Vector2{ _cursor });
 				const auto& statistics = pass.statistics();
 				update.triangles = statistics._triangles;
 				update.draw_calls = statistics._draw_calls;
@@ -138,14 +138,14 @@ namespace Yttrium
 		if (!_is_active)
 			return true;
 
-		Point cursor = Rect{_size}.center();
+		Point cursor = Rect{ _size }.center();
 		_backend.get_cursor(cursor);
 
 		const auto dx = _cursor._x - cursor._x;
 		const auto dy = cursor._y - _cursor._y;
 
 		if (!_is_cursor_locked)
-			_cursor = Rect{_size}.bound(cursor);
+			_cursor = Rect{ _size }.bound(cursor);
 		else
 			_backend.set_cursor(_cursor);
 
@@ -162,7 +162,7 @@ namespace Yttrium
 	}
 
 	Window::Window(Application& application, std::string_view name)
-		: _private{std::make_unique<WindowPrivate>(application, name)}
+		: _private{ std::make_unique<WindowPrivate>(application, name) }
 	{
 	}
 
@@ -220,7 +220,7 @@ namespace Yttrium
 
 	bool Window::set_cursor(const Point& cursor)
 	{
-		if (_private->_is_cursor_locked || !Rect{_private->_size}.contains(cursor) || !_private->_backend.set_cursor(cursor))
+		if (_private->_is_cursor_locked || !Rect{ _private->_size }.contains(cursor) || !_private->_backend.set_cursor(cursor))
 			return false;
 		_private->_cursor = cursor;
 		return true;

@@ -5,7 +5,7 @@
 namespace Yttrium
 {
 	GuiLayout::GuiLayout(Placement placement)
-		: _placement{placement}
+		: _placement{ placement }
 	{
 	}
 
@@ -28,14 +28,14 @@ namespace Yttrium
 	void GuiLayout::update(const RectF& rect)
 	{
 		auto offset = rect.top_left();
-		Vector2 scaling{1, 1};
+		Vector2 scaling{ 1, 1 };
 		switch (_placement)
 		{
 		case Placement::Left:
 			if (_size._height > 0)
 			{
 				const auto s = rect.height() / _size._height;
-				scaling = {s, s};
+				scaling = { s, s };
 			}
 			break;
 
@@ -44,7 +44,7 @@ namespace Yttrium
 			{
 				offset = rect.top_right();
 				const auto s = rect.height() / _size._height;
-				scaling = {-s, s};
+				scaling = { -s, s };
 			}
 			break;
 
@@ -56,31 +56,31 @@ namespace Yttrium
 				if (window_aspect > layout_aspect)
 				{
 					const auto width = rect.height() * layout_aspect;
-					offset = {(rect.width() - width) / 2, 0};
-					scaling = {width / _size._width, rect.height() / _size._height};
+					offset = { (rect.width() - width) / 2, 0 };
+					scaling = { width / _size._width, rect.height() / _size._height };
 				}
 				else
 				{
 					const auto height = rect.width() / layout_aspect;
-					offset = {0, (rect.height() - height) / 2};
-					scaling = {rect.width() / _size._width, height / _size._height};
+					offset = { 0, (rect.height() - height) / 2 };
+					scaling = { rect.width() / _size._width, height / _size._height };
 				}
 			}
 			break;
 
 		default:
 			if (_size._width > 0 && _size._height > 0)
-				scaling = {rect.width() / _size._width, rect.height() / _size._height};
+				scaling = { rect.width() / _size._width, rect.height() / _size._height };
 		}
 
 		for (const auto& widget : _widgets)
 		{
 			const auto layout_rect = widget->rect();
-			auto screen_rect = layout_rect == RectF{} ? rect : RectF{offset + layout_rect.top_left() * scaling, layout_rect.size() * scaling};
+			auto screen_rect = layout_rect == RectF{} ? rect : RectF{ offset + layout_rect.top_left() * scaling, layout_rect.size() * scaling };
 			if (screen_rect.width() < 0)
-				screen_rect = {screen_rect.top_right(), SizeF{-screen_rect.width(), screen_rect.height()}};
+				screen_rect = { screen_rect.top_right(), SizeF{ -screen_rect.width(), screen_rect.height() } };
 			if (screen_rect.height() < 0)
-				screen_rect = {screen_rect.bottom_left(), SizeF{screen_rect.width(), -screen_rect.height()}};
+				screen_rect = { screen_rect.bottom_left(), SizeF{ screen_rect.width(), -screen_rect.height() } };
 			widget->set_render_rect(screen_rect);
 		}
 	}

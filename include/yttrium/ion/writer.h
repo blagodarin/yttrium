@@ -18,7 +18,7 @@ namespace Yttrium
 		///
 		enum class Formatting
 		{
-			Pretty, ///<
+			Pretty,  ///<
 			Compact, ///<
 		};
 

@@ -41,7 +41,11 @@ namespace Yttrium
 		~GuiPrivate();
 
 		GuiScreen& add_screen(std::string_view name, bool is_transparent, bool is_root);
-		void draw_custom_cursor(RenderPass& pass, const Vector2& point) const { if (_on_custom_cursor) _on_custom_cursor(pass, point); }
+		void draw_custom_cursor(RenderPass& pass, const Vector2& point) const
+		{
+			if (_on_custom_cursor)
+				_on_custom_cursor(pass, point);
+		}
 		const FontDesc* font(const std::string& name) const;
 		void on_canvas_draw(RenderPass&, const std::string& name, const RectF&) const;
 		void on_canvas_mouse_move(const std::string& name, const RectF&, const Vector2&);
@@ -49,7 +53,11 @@ namespace Yttrium
 		bool pop_screen();
 		bool pop_screens_until(const std::string& name);
 		bool push_screen(const std::string& name);
-		void quit() const { if (_on_quit) _on_quit(); }
+		void quit() const
+		{
+			if (_on_quit)
+				_on_quit();
+		}
 		ResourceLoader& resource_loader() const { return _resource_loader; }
 		ScriptContext& script_context() const { return _script_context; }
 		void set_default_cursor(GuiCursor, std::string_view texture = {});

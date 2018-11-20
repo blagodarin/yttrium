@@ -11,7 +11,7 @@
 #include <vector>
 
 #ifndef NDEBUG
-	#include <iostream>
+#	include <iostream>
 #endif
 
 namespace
@@ -36,53 +36,54 @@ namespace
 		{
 			return static_cast<Key>(to_underlying(Key::Num0) + vk - VK_NUMPAD0);
 		}
-		else switch (vk)
-		{
-		case VK_LBUTTON:    return Key::Mouse1;
-		case VK_RBUTTON:    return Key::Mouse2;
-		case VK_MBUTTON:    return Key::Mouse3;
-		case VK_XBUTTON1:   return Key::Mouse4;
-		case VK_XBUTTON2:   return Key::Mouse5;
-		case VK_BACK:       return Key::Backspace;
-		case VK_TAB:        return Key::Tab;
-		case VK_RETURN:     return Key::Enter;
-		case VK_PAUSE:      return Key::Pause;
-		case VK_ESCAPE:     return Key::Escape;
-		case VK_SPACE:      return Key::Space;
-		case VK_PRIOR:      return Key::PageUp;
-		case VK_NEXT:       return Key::PageDown;
-		case VK_END:        return Key::End;
-		case VK_HOME:       return Key::Home;
-		case VK_LEFT:       return Key::Left;
-		case VK_UP:         return Key::Up;
-		case VK_RIGHT:      return Key::Right;
-		case VK_DOWN:       return Key::Down;
-		case VK_SNAPSHOT:   return Key::Print;
-		case VK_INSERT:     return Key::Insert;
-		case VK_DELETE:     return Key::Delete;
-		case VK_MULTIPLY:   return Key::Multiply;
-		case VK_ADD:        return Key::Add;
-		case VK_SUBTRACT:   return Key::Subtract;
-		case VK_DECIMAL:    return Key::Decimal;
-		case VK_DIVIDE:     return Key::Divide;
-		case VK_LSHIFT:     return Key::LShift;
-		case VK_RSHIFT:     return Key::RShift;
-		case VK_LCONTROL:   return Key::LControl;
-		case VK_RCONTROL:   return Key::RControl;
-		case VK_LMENU:      return Key::LAlt;
-		case VK_RMENU:      return Key::RAlt;
-		case VK_OEM_1:      return Key::Semicolon;
-		case VK_OEM_PLUS:   return Key::Equals;
-		case VK_OEM_COMMA:  return Key::Comma;
-		case VK_OEM_MINUS:  return Key::Minus;
-		case VK_OEM_PERIOD: return Key::Period;
-		case VK_OEM_2:      return Key::Slash;
-		case VK_OEM_3:      return Key::Grave;
-		case VK_OEM_4:      return Key::LBracket;
-		case VK_OEM_5:      return Key::Backslash;
-		case VK_OEM_6:      return Key::RBracket;
-		case VK_OEM_7:      return Key::Apostrophe;
-		}
+		else
+			switch (vk)
+			{
+			case VK_LBUTTON: return Key::Mouse1;
+			case VK_RBUTTON: return Key::Mouse2;
+			case VK_MBUTTON: return Key::Mouse3;
+			case VK_XBUTTON1: return Key::Mouse4;
+			case VK_XBUTTON2: return Key::Mouse5;
+			case VK_BACK: return Key::Backspace;
+			case VK_TAB: return Key::Tab;
+			case VK_RETURN: return Key::Enter;
+			case VK_PAUSE: return Key::Pause;
+			case VK_ESCAPE: return Key::Escape;
+			case VK_SPACE: return Key::Space;
+			case VK_PRIOR: return Key::PageUp;
+			case VK_NEXT: return Key::PageDown;
+			case VK_END: return Key::End;
+			case VK_HOME: return Key::Home;
+			case VK_LEFT: return Key::Left;
+			case VK_UP: return Key::Up;
+			case VK_RIGHT: return Key::Right;
+			case VK_DOWN: return Key::Down;
+			case VK_SNAPSHOT: return Key::Print;
+			case VK_INSERT: return Key::Insert;
+			case VK_DELETE: return Key::Delete;
+			case VK_MULTIPLY: return Key::Multiply;
+			case VK_ADD: return Key::Add;
+			case VK_SUBTRACT: return Key::Subtract;
+			case VK_DECIMAL: return Key::Decimal;
+			case VK_DIVIDE: return Key::Divide;
+			case VK_LSHIFT: return Key::LShift;
+			case VK_RSHIFT: return Key::RShift;
+			case VK_LCONTROL: return Key::LControl;
+			case VK_RCONTROL: return Key::RControl;
+			case VK_LMENU: return Key::LAlt;
+			case VK_RMENU: return Key::RAlt;
+			case VK_OEM_1: return Key::Semicolon;
+			case VK_OEM_PLUS: return Key::Equals;
+			case VK_OEM_COMMA: return Key::Comma;
+			case VK_OEM_MINUS: return Key::Minus;
+			case VK_OEM_PERIOD: return Key::Period;
+			case VK_OEM_2: return Key::Slash;
+			case VK_OEM_3: return Key::Grave;
+			case VK_OEM_4: return Key::LBracket;
+			case VK_OEM_5: return Key::Backslash;
+			case VK_OEM_6: return Key::RBracket;
+			case VK_OEM_7: return Key::Apostrophe;
+			}
 		return Key::Null;
 	}
 
@@ -136,7 +137,7 @@ namespace Yttrium
 	}
 
 	WindowBackend::WindowClass::WindowClass(HINSTANCE hinstance, WNDPROC wndproc)
-		: _hinstance{hinstance}
+		: _hinstance{ hinstance }
 	{
 		_wndclass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
 		_wndclass.lpfnWndProc = wndproc;
@@ -154,7 +155,7 @@ namespace Yttrium
 	}
 
 	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
-		: _hwnd{::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data)}
+		: _hwnd{ ::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data) }
 	{
 		Y_VERIFY(_hwnd, "CreateWindowEx");
 	}
@@ -166,15 +167,15 @@ namespace Yttrium
 	}
 
 	WindowBackend::WindowDC::WindowDC(HWND hwnd)
-		: _hdc{::GetDC(hwnd)} // Private DCs don't need to be released.
+		: _hdc{ ::GetDC(hwnd) } // Private DCs don't need to be released.
 	{
 		if (!_hdc)
-			throw InitializationError{"GetDC failed"};
+			throw InitializationError{ "GetDC failed" };
 	}
 
 	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
-		: _name{name}
-		, _callbacks{callbacks}
+		: _name{ name }
+		, _callbacks{ callbacks }
 	{
 		assert(_size); // Window size is initialized during member construction (from window procedure).
 		_created = true;
@@ -191,7 +192,7 @@ namespace Yttrium
 		if (!::GetCursorPos(&gdi_cursor))
 			return false;
 		::ScreenToClient(_hwnd, &gdi_cursor);
-		cursor = {gdi_cursor.x, gdi_cursor.y};
+		cursor = { gdi_cursor.x, gdi_cursor.y };
 		return true;
 	}
 
@@ -211,7 +212,7 @@ namespace Yttrium
 
 	bool WindowBackend::set_cursor(const Point& cursor)
 	{
-		POINT gdi_cursor{cursor._x, cursor._y};
+		POINT gdi_cursor{ cursor._x, cursor._y };
 		::ClientToScreen(_hwnd, &gdi_cursor);
 		return ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
 	}
@@ -254,10 +255,10 @@ namespace Yttrium
 			break;
 
 		case WM_MOUSEWHEEL:
-			{
-				const auto wheel = GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
-				(void)wheel; // TODO: Handle mouse wheel.
-			}
+		{
+			const auto wheel = GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
+			(void)wheel; // TODO: Handle mouse wheel.
+		}
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:

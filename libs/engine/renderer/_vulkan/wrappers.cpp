@@ -6,7 +6,7 @@
 #include <cstring>
 
 #ifndef NDEBUG
-	#include <iostream>
+#	include <iostream>
 #endif
 
 #define CHECK(call) Y_VK_CHECK(call)
@@ -14,7 +14,7 @@
 namespace Yttrium
 {
 	VK_Swapchain::VK_Swapchain(const VulkanContext& context)
-		: _context{context}
+		: _context{ context }
 	{
 		const auto surface_formats = _context.surface_formats();
 		_format = surface_formats.empty() ? VK_FORMAT_B8G8R8A8_UNORM : surface_formats[0].format;
@@ -39,7 +39,7 @@ namespace Yttrium
 		swapchain_info.clipped = VK_TRUE;
 		swapchain_info.oldSwapchain = VK_NULL_HANDLE;
 
-		VK_HSwapchain swapchain{_context->_device};
+		VK_HSwapchain swapchain{ _context->_device };
 		swapchain.create(swapchain_info);
 
 		uint32_t image_count = 0;
@@ -107,7 +107,7 @@ namespace Yttrium
 		{
 		case VK_SUCCESS: return index;
 		case VK_ERROR_OUT_OF_DATE_KHR: throw OutOfDate{};
-		default: throw std::runtime_error{"vkAcquireNextImageKHR = " + vulkan_result_to_string(result)};
+		default: throw std::runtime_error{ "vkAcquireNextImageKHR = " + vulkan_result_to_string(result) };
 		}
 	}
 
@@ -127,7 +127,7 @@ namespace Yttrium
 		{
 		case VK_SUCCESS: return;
 		case VK_ERROR_OUT_OF_DATE_KHR: throw OutOfDate{};
-		default: throw std::runtime_error{"vkQueuePresentKHR = " + vulkan_result_to_string(result)};
+		default: throw std::runtime_error{ "vkQueuePresentKHR = " + vulkan_result_to_string(result) };
 		}
 	}
 
@@ -141,7 +141,7 @@ namespace Yttrium
 
 	void VK_Framebuffers::create(VkRenderPass render_pass, const VK_Swapchain& swapchain, VkImageView depth_buffer_view)
 	{
-		std::array<VkImageView, 2> attachments{VK_NULL_HANDLE, depth_buffer_view};
+		std::array<VkImageView, 2> attachments{ VK_NULL_HANDLE, depth_buffer_view };
 
 		VkFramebufferCreateInfo create_info;
 		create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -168,7 +168,7 @@ namespace Yttrium
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_Semaphore::VK_Semaphore(const VulkanContext& context)
-		: _context{context}
+		: _context{ context }
 	{
 		VkSemaphoreCreateInfo info;
 		info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -180,7 +180,7 @@ namespace Yttrium
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_DescriptorSetLayout::VK_DescriptorSetLayout(const VulkanContext& context, std::vector<Binding>&& bindings)
-		: _context{context}
+		: _context{ context }
 	{
 		for (auto& binding : bindings)
 			binding.binding = static_cast<uint32_t>(&binding - bindings.data());
@@ -197,7 +197,7 @@ namespace Yttrium
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_DescriptorPool::VK_DescriptorPool(const VulkanContext& context, uint32_t max_sets, std::initializer_list<Size> sizes, uint32_t flags)
-		: _context{context}
+		: _context{ context }
 	{
 		VkDescriptorPoolCreateInfo info;
 		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -213,7 +213,7 @@ namespace Yttrium
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_DescriptorSet::VK_DescriptorSet(const VK_DescriptorPool& pool, VkDescriptorSetLayout layout)
-		: _pool{pool}
+		: _pool{ pool }
 	{
 		VkDescriptorSetAllocateInfo info;
 		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -228,8 +228,8 @@ namespace Yttrium
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_ShaderModule::VK_ShaderModule(const VulkanContext& context, VkShaderStageFlagBits stage, const std::vector<uint32_t>& data)
-		: _context{context}
-		, _stage{stage}
+		: _context{ context }
+		, _stage{ stage }
 	{
 		VkShaderModuleCreateInfo info;
 		info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -262,7 +262,7 @@ namespace Yttrium
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VK_PipelineLayout::VK_PipelineLayout(const VulkanContext& context, std::initializer_list<VkDescriptorSetLayout> set_layouts)
-		: _context{context}
+		: _context{ context }
 	{
 		VkPipelineLayoutCreateInfo info;
 		info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -370,7 +370,7 @@ namespace Yttrium
 		color_blend_state.blendConstants[2] = 1.f;
 		color_blend_state.blendConstants[3] = 1.f;
 
-		const std::array<VkDynamicState, 2> dynamic_state_data{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		const std::array<VkDynamicState, 2> dynamic_state_data{ VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
 		VkPipelineDynamicStateCreateInfo dynamic_state = {};
 		dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;

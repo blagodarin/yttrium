@@ -35,9 +35,9 @@ namespace Yttrium
 	private:
 		const ApplicationStub _application;
 		const std::string _name;
-		WindowBackend _backend{_name, *this};
-		RendererImpl _renderer{_backend};
-		RenderBuiltin _renderer_builtin{*_renderer._backend};
+		WindowBackend _backend{ _name, *this };
+		RendererImpl _renderer{ _backend };
+		RenderBuiltin _renderer_builtin{ *_renderer._backend };
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;

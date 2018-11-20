@@ -35,8 +35,7 @@ namespace
 		return static_cast<long>(static_cast<Yttrium::Reader*>(datasource)->offset());
 	}
 
-	const ov_callbacks _ov_callbacks
-	{
+	const ov_callbacks _ov_callbacks{
 		read_callback,
 		seek_callback,
 		close_callback,
@@ -47,7 +46,7 @@ namespace
 namespace Yttrium
 {
 	OggVorbisReader::OggVorbisReader(std::unique_ptr<Source>&& source)
-		: AudioReaderImpl{std::move(source)}
+		: AudioReaderImpl{ std::move(source) }
 	{
 		::memset(&_ov_file, 0, sizeof _ov_file);
 		if (::ov_open_callbacks(&_reader, &_ov_file, nullptr, 0, ::_ov_callbacks) < 0)
@@ -61,7 +60,7 @@ namespace Yttrium
 		if (total_samples < 0)
 			throw DataError("Bad Ogg Vorbis file");
 
-		_format = AudioFormat{2, to_unsigned(info->channels), to_unsigned(info->rate)};
+		_format = AudioFormat{ 2, to_unsigned(info->channels), to_unsigned(info->rate) };
 		_total_samples = to_unsigned(total_samples);
 	}
 
@@ -75,7 +74,7 @@ namespace Yttrium
 		const auto block_size = _format.block_size();
 		bytes_to_read = std::min(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
 		size_t bytes_read = 0;
-		for (int bitstream = 0; bytes_read <= bytes_to_read; )
+		for (int bitstream = 0; bytes_read <= bytes_to_read;)
 		{
 			const auto size = static_cast<int>(std::min<size_t>(bytes_to_read - bytes_read, to_unsigned(std::numeric_limits<int>::max()))); // TODO: Better 'min' (to get rid of <size_t>).
 			const auto read = ::ov_read(&_ov_file, static_cast<char*>(buffer) + bytes_read, size, 0, 2, 1, &bitstream);

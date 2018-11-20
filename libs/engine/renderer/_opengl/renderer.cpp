@@ -11,8 +11,8 @@
 #include <cassert>
 
 #ifndef NDEBUG
-	#include <csignal>
-	#include <iostream>
+#	include <csignal>
+#	include <iostream>
 #endif
 
 namespace
@@ -34,10 +34,10 @@ namespace Yttrium
 		if (_gl.KHR_debug)
 		{
 			_gl.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			_gl.DebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* opaque)
-			{
+			_gl.DebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* opaque) {
 				static_cast<const GlRenderer*>(opaque)->debug_callback(source, type, id, severity, length, message);
-			}, this);
+			},
+				this);
 		}
 #endif
 		_gl.Enable(GL_CULL_FACE); // The default behavior is to cull back (clockwise) faces.
@@ -117,7 +117,7 @@ namespace Yttrium
 
 	std::unique_ptr<RenderProgram> GlRenderer::create_program(const std::string& vertex_shader, const std::string& fragment_shader)
 	{
-		GlShaderHandle vertex{_gl, GL_VERTEX_SHADER};
+		GlShaderHandle vertex{ _gl, GL_VERTEX_SHADER };
 		if (!vertex.compile(vertex_shader))
 		{
 #ifndef NDEBUG
@@ -126,7 +126,7 @@ namespace Yttrium
 			return {};
 		}
 
-		GlShaderHandle fragment{_gl, GL_FRAGMENT_SHADER};
+		GlShaderHandle fragment{ _gl, GL_FRAGMENT_SHADER };
 		if (!fragment.compile(fragment_shader))
 		{
 #ifndef NDEBUG
@@ -242,15 +242,13 @@ namespace Yttrium
 
 	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const
 	{
-		const auto map_point = [orientation](const Vector2& point) -> Vector2
-		{
-			return
-			{
+		const auto map_point = [orientation](const Vector2& point) -> Vector2 {
+			return {
 				orientation == ImageOrientation::XLeftYDown || orientation == ImageOrientation::XLeftYUp ? 1.f - point.x : point.x,
 				orientation == ImageOrientation::XRightYUp || orientation == ImageOrientation::XLeftYUp ? 1.f - point.y : point.y
 			};
 		};
-		return {map_point(rect.top_left()), map_point(rect.bottom_right())};
+		return { map_point(rect.top_left()), map_point(rect.bottom_right()) };
 	}
 
 	void GlRenderer::set_program(const RenderProgram* program)
@@ -273,7 +271,7 @@ namespace Yttrium
 		GLint unpack_alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 
-		Image image{{window_size, PixelFormat::Rgb24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp}};
+		Image image{ { window_size, PixelFormat::Rgb24, static_cast<size_t>(unpack_alignment), ImageOrientation::XRightYUp } };
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);

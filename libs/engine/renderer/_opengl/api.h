@@ -1,26 +1,46 @@
 #if defined(GLAPI_GET_FUNCTION) && defined(GLAPI_HAS_EXTENSION)
-	// Initialization mode.
-	#define GLEND }
-	#define GLEXTENSION(name) if (name = GLAPI_HAS_EXTENSION("GL_"#name); name) {
-	#define GLFLOAT(name) GetFloatv(GL_##name, &name);
-	#define GLFLOATV(name, count) do { name.resize(count); GetFloatv(GL_##name, name.data()); } while (false);
-	#define GLFUNCTION(name, ret, attr) name = reinterpret_cast<decltype(name)>(GLAPI_GET_FUNCTION("gl"#name));
-	#define GLINTEGER(name) GetIntegerv(GL_##name, &name);
-	#define GLINTEGERV(name, count) do { name.resize(static_cast<size_t>(count)); GetIntegerv(GL_##name, name.data()); } while (false);
-	#define GLSTRING(name) name = GetString(GL_##name);
-	#define GLSTRINGV(name, count) do { name.reserve(static_cast<size_t>(count)); for (GLsizei i = 0; i < count; ++i) name.emplace_back(GetStringi(GL_##name, static_cast<GLuint>(i))); } while (false);
+// Initialization mode.
+#	define GLEND }
+#	define GLEXTENSION(name) \
+		if (name = GLAPI_HAS_EXTENSION("GL_" #name); name) \
+		{
+#	define GLFLOAT(name) GetFloatv(GL_##name, &name);
+#	define GLFLOATV(name, count) \
+		do \
+		{ \
+			name.resize(count); \
+			GetFloatv(GL_##name, name.data()); \
+		} while (false);
+#	define GLFUNCTION(name, ret, attr) name = reinterpret_cast<decltype(name)>(GLAPI_GET_FUNCTION("gl" #    name));
+#	define GLINTEGER(name) GetIntegerv(GL_##name, &name);
+#	define GLINTEGERV(name, count) \
+		do \
+		{ \
+			name.resize(static_cast<size_t>(count)); \
+			GetIntegerv(GL_##name, name.data()); \
+		} while (false);
+#	define GLSTRING(name) name = GetString(GL_##name);
+#	define GLSTRINGV(name, count) \
+		do \
+		{ \
+			name.reserve(static_cast<size_t>(count)); \
+			for (GLsizei i = 0; i < count; ++i) \
+				name.emplace_back(GetStringi(GL_##name, static_cast<GLuint>(i))); \
+		} while (false);
 #else
-	// Declaration mode.
-	#define GLEND
-	#define GLEXTENSION(name) bool name = false;
-	#define GLFLOAT(name) GLfloat name = 0;
-	#define GLFLOATV(name, count) std::vector<GLfloat> name;
-	#define GLFUNCTION(name, ret, attr) ret (GLAPI_CALL *name)attr = nullptr;
-	#define GLINTEGER(name) GLint name = 0;
-	#define GLINTEGERV(name, count) std::vector<GLint> name;
-	#define GLSTRING(name) const char* name = nullptr;
-	#define GLSTRINGV(name, count) std::vector<std::string_view> name;
+// Declaration mode.
+#	define GLEND
+#	define GLEXTENSION(name) bool name = false;
+#	define GLFLOAT(name) GLfloat name = 0;
+#	define GLFLOATV(name, count) std::vector<GLfloat> name;
+#	define GLFUNCTION(name, ret, attr) ret(GLAPI_CALL* name) attr = nullptr;
+#	define GLINTEGER(name) GLint name = 0;
+#	define GLINTEGERV(name, count) std::vector<GLint> name;
+#	define GLSTRING(name) const char* name = nullptr;
+#	define GLSTRINGV(name, count) std::vector<std::string_view> name;
 #endif
+
+// clang-format off
 
 // OpenGL 1.0
 
@@ -253,6 +273,8 @@ GLEXTENSION(KHR_debug)
 	GLFUNCTION(PopDebugGroup, void, ())
 	GLFUNCTION(PushDebugGroup, void, (GLenum, GLuint, GLsizei, const GLchar*))
 	GLEND
+
+// clang-format on
 
 #undef GLEND
 #undef GLEXTENSION

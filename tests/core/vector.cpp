@@ -51,8 +51,8 @@ TEST_CASE("vector3.arithmetics")
 
 TEST_CASE("vector3.length")
 {
-	CHECK(Yttrium::length({1, 4, 8}) == 9.f);
-	CHECK(Yttrium::length(Yttrium::normalize({1, 4, 8})) == 1.f);
+	CHECK(Yttrium::length({ 1, 4, 8 }) == 9.f);
+	CHECK(Yttrium::length(Yttrium::normalize({ 1, 4, 8 })) == 1.f);
 }
 
 TEST_CASE("vector4")

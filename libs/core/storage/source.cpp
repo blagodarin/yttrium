@@ -12,7 +12,8 @@ namespace Yttrium
 	class MemorySource final : public Source
 	{
 	public:
-		MemorySource(const void* data, size_t size) noexcept : Source{size}, _data{data} {}
+		MemorySource(const void* data, size_t size) noexcept
+			: Source{ size }, _data{ data } {}
 
 		const void* data() const noexcept override
 		{
@@ -35,8 +36,10 @@ namespace Yttrium
 	class BufferSource final : public Source
 	{
 	public:
-		explicit BufferSource(Buffer&& buffer) : Source{buffer.size()}, _buffer{std::make_shared<const Buffer>(std::move(buffer))} {}
-		BufferSource(const std::shared_ptr<const Buffer>& buffer, const std::string& name) : Source{buffer->size(), name}, _buffer{buffer} {}
+		explicit BufferSource(Buffer&& buffer)
+			: Source{ buffer.size() }, _buffer{ std::make_shared<const Buffer>(std::move(buffer)) } {}
+		BufferSource(const std::shared_ptr<const Buffer>& buffer, const std::string& name)
+			: Source{ buffer->size(), name }, _buffer{ buffer } {}
 
 		const void* data() const noexcept override
 		{
@@ -59,7 +62,8 @@ namespace Yttrium
 	class ProxySource final : public Source
 	{
 	public:
-		ProxySource(const std::shared_ptr<const Source>& source, uint64_t base, uint64_t size) : Source{size}, _source{source}, _base{base} {}
+		ProxySource(const std::shared_ptr<const Source>& source, uint64_t base, uint64_t size)
+			: Source{ size }, _source{ source }, _base{ base } {}
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
 		{
@@ -97,9 +101,9 @@ namespace Yttrium
 	{
 		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
 			throw std::bad_alloc{};
-		Buffer buffer{_size + 1};
+		Buffer buffer{ _size + 1 };
 		if (read_at(0, buffer.data(), _size) != _size)
-			throw std::system_error{std::make_error_code(std::errc::io_error)};
+			throw std::system_error{ std::make_error_code(std::errc::io_error) };
 		buffer[_size] = '\0';
 		buffer.resize(_size);
 		return buffer;
@@ -111,7 +115,7 @@ namespace Yttrium
 			throw std::bad_alloc{};
 		std::string string(_size, '\0');
 		if (read_at(0, string.data(), string.size()) != string.size())
-			throw std::system_error{std::make_error_code(std::errc::io_error)};
+			throw std::system_error{ std::make_error_code(std::errc::io_error) };
 		return string;
 	}
 }

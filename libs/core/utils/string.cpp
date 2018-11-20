@@ -73,7 +73,7 @@ namespace
 				power = power * 10 + static_cast<T>(*p++ - '0');
 			} while (p != end && *p >= '0' && *p <= '9');
 
-			result *= std::pow(T{10}, negative_power ? -power : power);
+			result *= std::pow(T{ 10 }, negative_power ? -power : power);
 		}
 
 		if (p != end)

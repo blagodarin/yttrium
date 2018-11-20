@@ -9,8 +9,8 @@
 namespace Yttrium
 {
 	VulkanBuffer::VulkanBuffer(const VulkanContext& context, uint32_t size, VkBufferUsageFlags buffer_usage, VkFlags memory_flags)
-		: _context{context}
-		, _size{size}
+		: _context{ context }
+		, _size{ size }
 	{
 		VkBufferCreateInfo buffer_info;
 		buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -22,7 +22,7 @@ namespace Yttrium
 		buffer_info.queueFamilyIndexCount = 0;
 		buffer_info.pQueueFamilyIndices = nullptr;
 
-		VK_HBuffer buffer{_context->_device};
+		VK_HBuffer buffer{ _context->_device };
 		buffer.create(buffer_info);
 
 		const auto memory_requirements = buffer.memory_requirements();
@@ -33,7 +33,7 @@ namespace Yttrium
 		memory_info.allocationSize = memory_requirements.size;
 		memory_info.memoryTypeIndex = _context.memory_type_index(memory_requirements.memoryTypeBits, memory_flags);
 
-		VK_HDeviceMemory memory{_context->_device};
+		VK_HDeviceMemory memory{ _context->_device };
 		memory.allocate(memory_info);
 
 		buffer.bind_memory(memory.get());

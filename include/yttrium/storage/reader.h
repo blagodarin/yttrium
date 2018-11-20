@@ -19,7 +19,8 @@ namespace Yttrium
 	{
 	public:
 		///
-		explicit Reader(const Source& source) noexcept : _source{source} {}
+		explicit Reader(const Source& source) noexcept
+			: _source{ source } {}
 
 		/// Returns the current offset.
 		uint64_t offset() const noexcept { return _offset; }
@@ -29,7 +30,10 @@ namespace Yttrium
 
 		/// Reads data from the source.
 		template <typename T>
-		bool read(T& data) { return read(&data, sizeof data) == sizeof data; }
+		bool read(T& data)
+		{
+			return read(&data, sizeof data) == sizeof data;
+		}
 
 		///
 		bool read_line(std::string&);

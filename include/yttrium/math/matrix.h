@@ -15,10 +15,10 @@ namespace Yttrium
 		Matrix4() noexcept = default;
 
 		constexpr Matrix4(float xx, float yx, float zx, float tx, float xy, float yy, float zy, float ty, float xz, float yz, float zz, float tz, float xw, float yw, float zw, float tw) noexcept
-			: x{xx, xy, xz, xw}
-			, y{yx, yy, yz, yw}
-			, z{zx, zy, zz, zw}
-			, t{tx, ty, tz, tw}
+			: x{ xx, xy, xz, xw }
+			, y{ yx, yy, yz, yw }
+			, z{ zx, zy, zz, zw }
+			, t{ tx, ty, tz, tw }
 		{
 		}
 
@@ -33,32 +33,34 @@ namespace Yttrium
 			const auto sp = std::sin(pitch);
 			const auto cr = std::cos(roll);
 			const auto sr = std::sin(roll);
-			x = {sy*sp*sr + cy*cr, cy*sp*sr - sy*cr, -cp*sr, 0};
-			y = {sy*cp, cy*cp, sp, 0};
-			z = {cy*sr - sy*sp*cr, -cy*sp*cr - sy*sr, cp*cr, 0};
-			t = {0, 0, 0, 1};
+			x = { sy * sp * sr + cy * cr, cy * sp * sr - sy * cr, -cp * sr, 0 };
+			y = { sy * cp, cy * cp, sp, 0 };
+			z = { cy * sr - sy * sp * cr, -cy * sp * cr - sy * sr, cp * cr, 0 };
+			t = { 0, 0, 0, 1 };
 		}
 
 		static Matrix4 camera(const Vector3& position, const Euler& orientation) noexcept
 		{
-			const Matrix4 r{orientation};
-			return
-			{
+			const Matrix4 r{ orientation };
+			return {
+				// clang-format off
 				r.x.x, r.x.y, r.x.z, -dot_product(position, {r.x.x, r.x.y, r.x.z}),
 				r.y.x, r.y.y, r.y.z, -dot_product(position, {r.y.x, r.y.y, r.y.z}),
 				r.z.x, r.z.y, r.z.z, -dot_product(position, {r.z.x, r.z.y, r.z.z}),
 				0, 0, 0, 1,
+				// clang-format on
 			};
 		}
 
 		static constexpr Matrix4 identity() noexcept
 		{
-			return
-			{
+			return {
+				// clang-format off
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1,
+				// clang-format on
 			};
 		}
 
@@ -71,12 +73,13 @@ namespace Yttrium
 			const auto zz = (near_plane + far_plane) / (near_plane - far_plane);
 			const auto tz = 2 * near_plane * far_plane / (near_plane - far_plane);
 			const auto zw = -1.f;
-			return
-			{
+			return {
+				// clang-format off
 				xx, 0,  0,  0,
 				0,  yy, 0,  0,
 				0,  0,  zz, tz,
 				0,  0,  zw, 0,
+				// clang-format on
 			};
 		}
 
@@ -88,12 +91,13 @@ namespace Yttrium
 			const auto tx = -1.f;
 			const auto ty = 1.f;
 			const auto tz = (far_plane + near_plane) / (far_plane - near_plane);
-			return
-			{
+			return {
+				// clang-format off
 				xx, 0,  0,  tx,
 				0,  yy, 0,  ty,
 				0,  0,  zz, tz,
 				0,  0,  0,  1,
+				// clang-format on
 			};
 		}
 
@@ -103,42 +107,44 @@ namespace Yttrium
 			const auto radians = degrees / 180 * static_cast<float>(M_PI);
 			const auto c = std::cos(radians);
 			const auto s = std::sin(radians);
-			return
-			{
+			return {
+				// clang-format off
 				v.x*v.x*(1 - c) + c,     v.y*v.x*(1 - c) - s*v.z, v.z*v.x*(1 - c) + s*v.y, 0,
 				v.x*v.y*(1 - c) + s*v.z, v.y*v.y*(1 - c) + c,     v.z*v.y*(1 - c) - s*v.x, 0,
 				v.x*v.z*(1 - c) - s*v.y, v.y*v.z*(1 - c) + s*v.x, v.z*v.z*(1 - c) + c,     0,
 				0,                       0,                       0,                       1,
+				// clang-format on
 			};
 		}
 
 		static constexpr Matrix4 scaling(float s) noexcept
 		{
-			return
-			{
+			return {
+				// clang-format off
 				s, 0, 0, 0,
 				0, s, 0, 0,
 				0, 0, s, 0,
 				0, 0, 0, 1,
+				// clang-format on
 			};
 		}
 
 		static constexpr Matrix4 translation(const Vector3& v) noexcept
 		{
-			return
-			{
+			return {
+				// clang-format off
 				1, 0, 0, v.x,
 				0, 1, 0, v.y,
 				0, 0, 1, v.z,
 				0, 0, 0, 1,
+				// clang-format on
 			};
 		}
 	};
 
 	constexpr Matrix4 operator*(const Matrix4& a, const Matrix4& b) noexcept
 	{
-		return
-		{
+		return {
 			a.x.x * b.x.x + a.y.x * b.x.y + a.z.x * b.x.z + a.t.x * b.x.w,
 			a.x.x * b.y.x + a.y.x * b.y.y + a.z.x * b.y.z + a.t.x * b.y.w,
 			a.x.x * b.z.x + a.y.x * b.z.y + a.z.x * b.z.z + a.t.x * b.z.w,
@@ -163,8 +169,7 @@ namespace Yttrium
 
 	constexpr Vector4 operator*(const Matrix4& m, const Vector4& v) noexcept
 	{
-		return
-		{
+		return {
 			m.x.x * v.x + m.y.x * v.y + m.z.x * v.z + m.t.x * v.w,
 			m.x.y * v.x + m.y.y * v.y + m.z.y * v.z + m.t.y * v.w,
 			m.x.z * v.x + m.y.z * v.y + m.z.z * v.z + m.t.z * v.w,
@@ -175,8 +180,7 @@ namespace Yttrium
 	constexpr Vector3 operator*(const Matrix4& m, const Vector3& v) noexcept
 	{
 		const auto w = m.x.w * v.x + m.y.w * v.y + m.z.w * v.z + m.t.w;
-		return
-		{
+		return {
 			(m.x.x * v.x + m.y.x * v.y + m.z.x * v.z + m.t.x) / w,
 			(m.x.y * v.x + m.y.y * v.y + m.z.y * v.z + m.t.y) / w,
 			(m.x.z * v.x + m.y.z * v.y + m.z.z * v.z + m.t.z) / w,
@@ -218,15 +222,15 @@ namespace Yttrium
 
 		const auto d = 1 / (m.x.x * det123 - m.y.x * det023 + m.z.x * det013 - m.t.x * det012);
 
-		const auto xx = d *  det123;
+		const auto xx = d * det123;
 		const auto xy = d * -det023;
-		const auto xz = d *  det013;
+		const auto xz = d * det013;
 		const auto xw = d * -det012;
 
 		const auto yx = d * -(m.y.x * det23 - m.z.x * det13 + m.t.x * det12);
-		const auto yy = d *  (m.x.x * det23 - m.z.x * det03 + m.t.x * det02);
+		const auto yy = d * (m.x.x * det23 - m.z.x * det03 + m.t.x * det02);
 		const auto yz = d * -(m.x.x * det13 - m.y.x * det03 + m.t.x * det01);
-		const auto yw = d *  (m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
+		const auto yw = d * (m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
 
 		// Y and W rows.
 		det01 = m.x.y * m.y.w - m.y.y * m.x.w;
@@ -236,9 +240,9 @@ namespace Yttrium
 		det13 = m.y.y * m.t.w - m.t.y * m.y.w;
 		det23 = m.z.y * m.t.w - m.t.y * m.z.w;
 
-		const auto zx = d *  (m.y.x * det23 - m.z.x * det13 + m.t.x * det12);
+		const auto zx = d * (m.y.x * det23 - m.z.x * det13 + m.t.x * det12);
 		const auto zy = d * -(m.x.x * det23 - m.z.x * det03 + m.t.x * det02);
-		const auto zz = d *  (m.x.x * det13 - m.y.x * det03 + m.t.x * det01);
+		const auto zz = d * (m.x.x * det13 - m.y.x * det03 + m.t.x * det01);
 		const auto zw = d * -(m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
 
 		// Y and Z rows.
@@ -250,16 +254,17 @@ namespace Yttrium
 		det23 = m.t.z * m.z.y - m.z.z * m.t.y;
 
 		const auto tx = d * -(m.y.x * det23 - m.z.x * det13 + m.t.x * det12);
-		const auto ty = d *  (m.x.x * det23 - m.z.x * det03 + m.t.x * det02);
+		const auto ty = d * (m.x.x * det23 - m.z.x * det03 + m.t.x * det02);
 		const auto tz = d * -(m.x.x * det13 - m.y.x * det03 + m.t.x * det01);
-		const auto tw = d *  (m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
+		const auto tw = d * (m.x.x * det12 - m.y.x * det02 + m.z.x * det01);
 
-		return
-		{
+		return {
+			// clang-format off
 			xx, yx, zx, tx,
 			xy, yy, zy, ty,
 			xz, yz, zz, tz,
 			xw, yw, zw, tw,
+			// clang-format on
 		};
 	}
 }

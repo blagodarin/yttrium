@@ -4,7 +4,7 @@
 #include "memory.h"
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
-	#include "buffer_memory_tracker.h"
+#	include "buffer_memory_tracker.h"
 #endif
 
 #include <cassert>
@@ -30,7 +30,7 @@ namespace
 		size_t level = 0;
 		for (auto i = capacity; i > 1; i >>= 1)
 			++level;
-		assert(size_t{1} << level == capacity);
+		assert(size_t{ 1 } << level == capacity);
 		return level;
 	}
 }
@@ -42,7 +42,7 @@ namespace Yttrium
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		std::map<size_t, size_t> free_block_count;
 		{
-			std::lock_guard<std::mutex> lock{_small_blocks_mutex};
+			std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
 			for (auto i = ::level_from_capacity(capacity_for_size(1)); i <= MaxSmallBlockLevel; ++i)
 			{
 				size_t count = 0;
@@ -68,7 +68,7 @@ namespace Yttrium
 		{
 			const auto level = ::level_from_capacity(capacity);
 			{
-				std::lock_guard<std::mutex> lock{_small_blocks_mutex};
+				std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
 				data = _small_blocks[level];
 				if (data)
 					_small_blocks[level] = *reinterpret_cast<void**>(data);
@@ -86,7 +86,7 @@ namespace Yttrium
 					if (!data)
 					{
 						// TODO: Try to merge smaller blocks before allocating a new big one.
-						assert(size_t{1} << i == 2 * MaxSmallBlockSize);
+						assert(size_t{ 1 } << i == 2 * MaxSmallBlockSize);
 						data = ::allocate_big_block(2 * MaxSmallBlockSize);
 					}
 					do
@@ -94,7 +94,7 @@ namespace Yttrium
 						--i;
 						*reinterpret_cast<void**>(data) = _small_blocks[i];
 						_small_blocks[i] = data;
-						data = static_cast<uint8_t*>(data) + (size_t{1} << i);
+						data = static_cast<uint8_t*>(data) + (size_t{ 1 } << i);
 					} while (i > level);
 				}
 			}
@@ -120,7 +120,7 @@ namespace Yttrium
 		{
 			const auto level = ::level_from_capacity(capacity);
 			{
-				std::lock_guard<std::mutex> lock{_small_blocks_mutex};
+				std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
 				*reinterpret_cast<void**>(data) = _small_blocks[level];
 				_small_blocks[level] = data;
 			}

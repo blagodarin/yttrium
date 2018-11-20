@@ -2,7 +2,7 @@
 #define _src_memory_buffer_memory_tracker_h_
 
 #if !Y_ENABLE_BUFFER_MEMORY_TRACKING
-	#error Buffer memory tracking is disabled.
+#	error Buffer memory tracking is disabled.
 #endif
 
 #include <yttrium/api.h>
@@ -11,7 +11,7 @@
 #include <cstddef>
 
 #if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
-	#include <map>
+#	include <map>
 #endif
 
 namespace Yttrium
@@ -86,9 +86,9 @@ namespace Yttrium
 		MaxCounter<size_t> _total_capacity;
 #if Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		MaxCounter<size_t> _allocations;
-		std::atomic<size_t> _total_system_allocations{0};
-		std::atomic<size_t> _total_allocations{0};
-		std::atomic<size_t> _total_reallocations{0};
+		std::atomic<size_t> _total_system_allocations{ 0 };
+		std::atomic<size_t> _total_allocations{ 0 };
+		std::atomic<size_t> _total_reallocations{ 0 };
 #endif
 	};
 

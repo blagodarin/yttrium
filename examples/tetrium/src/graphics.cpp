@@ -16,11 +16,11 @@ namespace
 		uint8_t _g = 0;
 		uint8_t _b = 0;
 
-		Rgb(uint8_t r, uint8_t g, uint8_t b) noexcept : _r{r}, _g{g}, _b{b} {}
+		Rgb(uint8_t r, uint8_t g, uint8_t b) noexcept
+			: _r{ r }, _g{ g }, _b{ b } {}
 	};
 
-	const std::array<int, 24> weights
-	{
+	const std::array<int, 24> weights{
 		2, 2, 2, // Gray.
 		1, 0, 0, // Red.
 		1, 2, 0, // Orange.
@@ -31,13 +31,25 @@ namespace
 		2, 0, 1, // Purple.
 	};
 
-	enum { TopLeft, Top, TopRight, Left, Center, Right, BottomLeft, Bottom, BottomRight };
-
-	const std::array<int, 9> pattern
+	enum
 	{
+		TopLeft,
+		Top,
+		TopRight,
+		Left,
+		Center,
+		Right,
+		BottomLeft,
+		Bottom,
+		BottomRight
+	};
+
+	const std::array<int, 9> pattern{
+		// clang-format off
 		0, 0, 3,
 		1, 2, 3,
 		1, 4, 4,
+		// clang-format on
 	};
 
 	static constexpr auto FragmentSize = 32u;
@@ -46,8 +58,7 @@ namespace
 
 	Rgb pixel_color(size_t block, size_t x, size_t y)
 	{
-		const auto pixel_type = [](auto x_, auto y_)
-		{
+		const auto pixel_type = [](auto x_, auto y_) {
 			const auto rx = FragmentSize - 1 - x_;
 			if (y_ < Border)
 			{
@@ -71,17 +82,16 @@ namespace
 			return x_ < Border ? Left : rx < Border ? Right : Center;
 		};
 		const auto offset = 20 * pattern[pixel_type(x, y)];
-		const auto scale = [block, offset](size_t index)
-		{
+		const auto scale = [block, offset](size_t index) {
 			const auto weight = weights[block * 3 + index];
 			return static_cast<uint8_t>(weight ? 255 / weight - offset : 0);
 		};
-		return Rgb{scale(0), scale(1), scale(2)};
+		return Rgb{ scale(0), scale(1), scale(2) };
 	}
 
 	Image make_blocks_image()
 	{
-		Image image({FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra32});
+		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra32 });
 		for (size_t i = 0; i < FragmentCount; ++i)
 		{
 			for (size_t y = 0; y < FragmentSize; ++y)
@@ -102,12 +112,12 @@ namespace
 
 	RectF block_rect(int index)
 	{
-		return {{1, static_cast<float>(index) * FragmentSize + 1.f}, SizeF{FragmentSize - 2, FragmentSize - 2}};
+		return { { 1, static_cast<float>(index) * FragmentSize + 1.f }, SizeF{ FragmentSize - 2, FragmentSize - 2 } };
 	}
 }
 
 TetriumGraphics::TetriumGraphics(RenderManager& manager)
-	: _blocks_texture{manager.create_texture_2d(::make_blocks_image())}
+	: _blocks_texture{ manager.create_texture_2d(::make_blocks_image()) }
 {
 }
 
@@ -115,8 +125,8 @@ void TetriumGraphics::draw_field(RenderPass& pass, const RectF& rect, const Tetr
 {
 	static const int total_width = 1 + Tetrium::Field::Width + 1;
 	static const int total_height = 1 + Tetrium::Field::Height + 1;
-	const SizeF block_size{rect.width() / total_width, rect.height() / total_height};
-	PushTexture push_texture{pass, _blocks_texture.get(), Texture2D::TrilinearFilter};
+	const SizeF block_size{ rect.width() / total_width, rect.height() / total_height };
+	PushTexture push_texture{ pass, _blocks_texture.get(), Texture2D::TrilinearFilter };
 	draw_field_blocks(pass, rect, block_size, field);
 	draw_field_figure(pass, rect, block_size, current_figure);
 	draw_field_frame(pass, rect, block_size);
@@ -126,16 +136,16 @@ void TetriumGraphics::draw_next_figure(RenderPass& pass, const RectF& rect, cons
 {
 	if (figure.type() == Tetrium::Figure::None)
 		return;
-	PushTexture push_texture{pass, _blocks_texture.get(), Texture2D::TrilinearFilter};
+	PushTexture push_texture{ pass, _blocks_texture.get(), Texture2D::TrilinearFilter };
 	set_texture_rect(pass, figure.type());
-	const SizeF block_size{rect.width() / 4, rect.height() / 2};
+	const SizeF block_size{ rect.width() / 4, rect.height() / 2 };
 	for (const auto& block : figure.blocks())
 		draw_block(pass, rect, block_size, block.x, 1 - block.y / Tetrium::PointsPerRow);
 }
 
 void TetriumGraphics::draw_block(RenderPass& pass, const RectF& rect, const SizeF& block_size, float x, float y) const
 {
-	pass.draw_rect({{rect.left() + x * block_size._width, rect.top() + y * block_size._height}, block_size});
+	pass.draw_rect({ { rect.left() + x * block_size._width, rect.top() + y * block_size._height }, block_size });
 }
 
 void TetriumGraphics::draw_field_blocks(RenderPass& pass, const RectF& rect, const SizeF& block_size, const Tetrium::Field& field) const
@@ -155,7 +165,7 @@ void TetriumGraphics::draw_field_blocks(RenderPass& pass, const RectF& rect, con
 
 void TetriumGraphics::draw_field_figure(RenderPass& pass, const RectF& rect, const SizeF& block_size, const Tetrium::Figure& figure) const
 {
-	static const Vector2 frame_offset{1, Tetrium::Field::Height};
+	static const Vector2 frame_offset{ 1, Tetrium::Field::Height };
 	if (figure.type() == Tetrium::Figure::None)
 		return;
 	set_texture_rect(pass, figure.type());

@@ -7,11 +7,11 @@
 namespace Yttrium
 {
 	TemporaryFilePrivate::TemporaryFilePrivate()
-		: _name{"/tmp/yttrium-XXXXXX"}
-		, _descriptor{::mkstemp(_name.data())}
+		: _name{ "/tmp/yttrium-XXXXXX" }
+		, _descriptor{ ::mkstemp(_name.data()) }
 	{
 		if (_descriptor == -1)
-			throw std::system_error{errno, std::generic_category()};
+			throw std::system_error{ errno, std::generic_category() };
 	}
 
 	TemporaryFilePrivate::~TemporaryFilePrivate() noexcept
@@ -23,7 +23,7 @@ namespace Yttrium
 	}
 
 	TemporaryFile::TemporaryFile()
-		: _private{std::make_unique<TemporaryFilePrivate>()}
+		: _private{ std::make_unique<TemporaryFilePrivate>() }
 	{
 	}
 

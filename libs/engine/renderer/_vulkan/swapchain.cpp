@@ -6,7 +6,7 @@ namespace
 {
 	Yttrium::VK_RenderPass create_render_pass(VkDevice device, const Yttrium::VK_Swapchain& swapchain, const Yttrium::VulkanDepthBuffer& depth_buffer)
 	{
-		const std::array<VkAttachmentDescription, 2> attachment_descriptions{swapchain.attachment_description(), depth_buffer.attachment_description()};
+		const std::array<VkAttachmentDescription, 2> attachment_descriptions{ swapchain.attachment_description(), depth_buffer.attachment_description() };
 
 		VkAttachmentReference color_reference;
 		color_reference.attachment = 0;
@@ -39,7 +39,7 @@ namespace
 		create_info.dependencyCount = 0;
 		create_info.pDependencies = nullptr;
 
-		Yttrium::VK_RenderPass render_pass{device};
+		Yttrium::VK_RenderPass render_pass{ device };
 		render_pass.create(create_info);
 		return render_pass;
 	}
@@ -48,26 +48,25 @@ namespace
 namespace Yttrium
 {
 	VulkanSwapchain::VulkanSwapchain(const VulkanContext& context, const VK_PipelineLayout& pipeline_layout, const std::vector<VkPipelineShaderStageCreateInfo>& shader_stages)
-		: _context{context}
-		, _swapchain{_context}
-		, _depth_buffer{_context, _context->_surface_capabilities.currentExtent.width, _context->_surface_capabilities.currentExtent.height, VK_FORMAT_D16_UNORM}
-		, _render_pass{::create_render_pass(_context->_device, _swapchain, _depth_buffer)}
-		, _framebuffers{_context}
-		, _pipeline{_context}
-		, _image_acquired{_context}
-		, _rendering_complete{_context}
-		, _command_buffer{_context}
+		: _context{ context }
+		, _swapchain{ _context }
+		, _depth_buffer{ _context, _context->_surface_capabilities.currentExtent.width, _context->_surface_capabilities.currentExtent.height, VK_FORMAT_D16_UNORM }
+		, _render_pass{ ::create_render_pass(_context->_device, _swapchain, _depth_buffer) }
+		, _framebuffers{ _context }
+		, _pipeline{ _context }
+		, _image_acquired{ _context }
+		, _rendering_complete{ _context }
+		, _command_buffer{ _context }
 	{
 		_framebuffers.create(_render_pass.get(), _swapchain, _depth_buffer.view());
-		_pipeline.create(pipeline_layout, _render_pass.get(), VulkanVertexFormat{{VA::f4, VA::f4}}, shader_stages);
+		_pipeline.create(pipeline_layout, _render_pass.get(), VulkanVertexFormat{ { VA::f4, VA::f4 } }, shader_stages);
 	}
 
 	void VulkanSwapchain::render(const std::function<void(VkCommandBuffer, const std::function<void(const std::function<void()>&)>&)>& callback) const
 	{
 		const auto framebuffer_index = _swapchain.acquire_next_image(_image_acquired._handle);
 		_command_buffer.begin();
-		callback(_command_buffer.get(), [this, framebuffer_index](const std::function<void()>& render_pass_callback)
-		{
+		callback(_command_buffer.get(), [this, framebuffer_index](const std::function<void()>& render_pass_callback) {
 			std::array<VkClearValue, 2> clear_values;
 			clear_values[0].color.float32[0] = 1.f / 32;
 			clear_values[0].color.float32[1] = 1.f / 32;

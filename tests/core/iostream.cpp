@@ -18,11 +18,11 @@ namespace Yttrium
 
 	std::ostream& operator<<(std::ostream& stream, const Matrix4& m)
 	{
-		return stream << "Matrix4{"
-			"{" << m.x.x << "," << m.y.x << "," << m.z.x << "," << m.t.x << "},"
-			"{" << m.x.y << "," << m.y.y << "," << m.z.y << "," << m.t.y << "},"
-			"{" << m.x.z << "," << m.y.z << "," << m.z.z << "," << m.t.z << "},"
-			"{" << m.x.w << "," << m.y.w << "," << m.z.w << "," << m.t.w << "}}";
+		return stream << "Matrix4{{"
+					  << m.x.x << "," << m.y.x << "," << m.z.x << "," << m.t.x << "},{"
+					  << m.x.y << "," << m.y.y << "," << m.z.y << "," << m.t.y << "},{"
+					  << m.x.z << "," << m.y.z << "," << m.z.z << "," << m.t.z << "},{"
+					  << m.x.w << "," << m.y.w << "," << m.z.w << "," << m.t.w << "}}";
 	}
 
 	std::ostream& operator<<(std::ostream& stream, const Point& point)
@@ -61,7 +61,7 @@ TEST_CASE("iostream.buffer")
 	}
 	{
 		std::ostringstream stream;
-		stream << Buffer{1024};
+		stream << Buffer{ 1024 };
 		CHECK(stream.str() == "Buffer(1024)");
 	}
 }
@@ -76,34 +76,34 @@ TEST_CASE("iostream.matrix4")
 TEST_CASE("iostream.point")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Point{1, 2};
+	stream << Yttrium::Point{ 1, 2 };
 	CHECK(stream.str() == "Point{1,2}");
 }
 
 TEST_CASE("iostream.rect")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Rect{{1, 2}, Yttrium::Size{3, 4}};
+	stream << Yttrium::Rect{ { 1, 2 }, Yttrium::Size{ 3, 4 } };
 	CHECK(stream.str() == "Rect{{1,2},Size{3,4}}");
 }
 
 TEST_CASE("iostream.vector2")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Vector2{1, 2};
+	stream << Yttrium::Vector2{ 1, 2 };
 	CHECK(stream.str() == "Vector2{1,2}");
 }
 
 TEST_CASE("iostream.vector3")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Vector3{1, 2, 3};
+	stream << Yttrium::Vector3{ 1, 2, 3 };
 	CHECK(stream.str() == "Vector3{1,2,3}");
 }
 
 TEST_CASE("iostream.vector4")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Vector4{1, 2, 3, 4};
+	stream << Yttrium::Vector4{ 1, 2, 3, 4 };
 	CHECK(stream.str() == "Vector4{1,2,3,4}");
 }

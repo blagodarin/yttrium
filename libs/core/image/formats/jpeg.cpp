@@ -15,8 +15,7 @@ namespace
 		jmp_buf _jmp_buf;
 	};
 
-	[[noreturn]] void error_callback(jpeg_common_struct* cinfo)
-	{
+	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
 		longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 }

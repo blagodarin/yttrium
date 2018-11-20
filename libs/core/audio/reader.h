@@ -24,10 +24,10 @@ namespace Yttrium
 		uint64_t _total_samples = 0;
 		uint64_t _current_sample = 0;
 		const std::unique_ptr<Source> _source;
-		Reader _reader{*_source};
+		Reader _reader{ *_source };
 
 		explicit AudioReaderImpl(std::unique_ptr<Source>&& source)
-			: _source{std::move(source)}
+			: _source{ std::move(source) }
 		{
 		}
 	};

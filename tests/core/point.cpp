@@ -11,7 +11,7 @@ TEST_CASE("point")
 		CHECK(p._y == 0);
 	}
 	{
-		Point p{1, 2};
+		Point p{ 1, 2 };
 		CHECK(p._x == 1);
 		CHECK(p._y == 2);
 	}

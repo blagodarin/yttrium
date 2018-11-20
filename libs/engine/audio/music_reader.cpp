@@ -10,11 +10,11 @@
 namespace Yttrium
 {
 	MusicReaderImpl::MusicReaderImpl(std::unique_ptr<AudioReader>&& reader)
-		: _reader{std::move(reader)}
-		, _block_size{_reader->format().block_size()}
-		, _buffer_samples{_reader->format().samples_per_second()}
-		, _end_sample{_reader->total_samples()}
-		, _loop_sample{_end_sample}
+		: _reader{ std::move(reader) }
+		, _block_size{ _reader->format().block_size() }
+		, _buffer_samples{ _reader->format().samples_per_second() }
+		, _end_sample{ _reader->total_samples() }
+		, _loop_sample{ _end_sample }
 	{
 	}
 
