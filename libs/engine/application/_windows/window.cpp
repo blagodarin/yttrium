@@ -24,11 +24,6 @@
 #include "error.h"
 
 #include <cassert>
-#include <vector>
-
-#ifndef NDEBUG
-#	include <iostream>
-#endif
 
 namespace
 {
@@ -102,84 +97,18 @@ namespace
 			}
 		return Key::Null;
 	}
-
-#ifdef NDEBUG
-	void check(bool, std::string_view, int) noexcept
-	{
-	}
-#else
-	void check(bool condition, std::string_view function, int line)
-	{
-		if (!condition)
-			if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
-			{
-				try
-				{
-					std::cerr << make_string("[:", line, "] ", function, " failed: ") << error_to_string(error) << std::endl;
-				}
-				catch (const std::bad_alloc&)
-				{
-				}
-			}
-	}
-#endif
-
-	void verify(bool condition, std::string_view function, int line)
-	{
-		if (!condition)
-			if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
-				throw InitializationError{ "[:", line, "] ", function, " failed: ", error_to_string(error) };
-	}
 }
-
-#define Y_CHECK(condition, function) ::check(condition, function, __LINE__)
-#define Y_VERIFY(condition, function) ::verify(condition, function, __LINE__)
 
 namespace Yttrium
 {
-	WindowBackend::EmptyCursor::EmptyCursor(HINSTANCE hinstance)
-	{
-		const auto width = ::GetSystemMetrics(SM_CXCURSOR);
-		const auto height = ::GetSystemMetrics(SM_CYCURSOR);
-		std::vector<std::uint8_t> and_mask(width * height / 8, 0xff);
-		std::vector<std::uint8_t> xor_mask(width * height / 8, 0x00);
-		_handle = ::CreateCursor(hinstance, 0, 0, width, height, and_mask.data(), xor_mask.data());
-		Y_VERIFY(_handle, "CreateCursor");
-	}
-
-	WindowBackend::EmptyCursor::~EmptyCursor() noexcept
-	{
-		Y_CHECK(::DestroyCursor(_handle), "DestroyCursor");
-	}
-
-	WindowBackend::WindowClass::WindowClass(HINSTANCE hinstance, WNDPROC wndproc)
-		: _hinstance{ hinstance }
-	{
-		_wndclass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
-		_wndclass.lpfnWndProc = wndproc;
-		_wndclass.hInstance = _hinstance;
-		_wndclass.hIcon = ::LoadIconA(nullptr, IDI_APPLICATION);
-		_wndclass.hCursor = _empty_cursor;
-		_wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
-		_wndclass.lpszClassName = "Yttrium";
-		Y_VERIFY(::RegisterClassExA(&_wndclass), "RegisterClassEx");
-	}
-
-	WindowBackend::WindowClass::~WindowClass()
-	{
-		Y_CHECK(::UnregisterClassA(_wndclass.lpszClassName, _hinstance), "UnregisterClass");
-	}
-
-	WindowBackend::WindowHandle::WindowHandle(const WindowClass& window_class, const char* title, void* user_data)
-		: _hwnd{ ::CreateWindowExA(WS_EX_APPWINDOW, window_class.name(), title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, window_class.hinstance(), user_data) }
-	{
-		Y_VERIFY(_hwnd, "CreateWindowEx");
-	}
-
 	void WindowBackend::WindowHandle::reset() noexcept
 	{
-		if (_hwnd)
-			Y_CHECK(::DestroyWindow(std::exchange(_hwnd, {})), "DestroyWindow");
+		if (_handle)
+		{
+			if (!::DestroyWindow(_handle))
+				print_last_error("DestroyWindow");
+			_handle = NULL;
+		}
 	}
 
 	WindowBackend::WindowDC::WindowDC(HWND hwnd)
@@ -209,20 +138,6 @@ namespace Yttrium
 			return false;
 		::ScreenToClient(_hwnd, &gdi_cursor);
 		cursor = { gdi_cursor.x, gdi_cursor.y };
-		return true;
-	}
-
-	bool WindowBackend::process_events()
-	{
-		// TODO: Process VK_SNAPSHOT, VK_{L,R}SHIFT, VK_{L,R}CONTROL, VK_{L,R}MENU.
-		MSG msg;
-		while (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE))
-		{
-			if (!::GetMessageA(&msg, NULL, 0, 0))
-				return false;
-			::TranslateMessage(&msg);
-			::DispatchMessageA(&msg);
-		}
 		return true;
 	}
 
@@ -310,18 +225,5 @@ namespace Yttrium
 			return ::DefWindowProcA(hwnd, msg, wparam, lparam);
 		}
 		return 0;
-	}
-
-	LRESULT WindowBackend::static_window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-	{
-		WindowBackend* window = nullptr;
-		if (msg == WM_NCCREATE)
-		{
-			window = static_cast<WindowBackend*>(((CREATESTRUCTA*)lparam)->lpCreateParams);
-			::SetWindowLongPtrA(hwnd, GWLP_USERDATA, (LONG_PTR)window);
-		}
-		else
-			window = (WindowBackend*)::GetWindowLongPtrA(hwnd, GWLP_USERDATA);
-		return window->window_proc(hwnd, msg, wparam, lparam);
 	}
 }

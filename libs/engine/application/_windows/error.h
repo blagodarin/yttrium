@@ -22,4 +22,6 @@
 namespace Yttrium
 {
 	std::string error_to_string(std::uint32_t);
+	void print_last_error(std::string_view function) noexcept;
+	void throw_last_error(std::string_view function);
 }

@@ -91,6 +91,8 @@ if(UNIX)
 	endif()
 elseif(WIN32)
 	y_sources(yengine "src/application/_windows"
+		application/_windows/application.cpp
+		application/_windows/application.h
 		application/_windows/com.cpp
 		application/_windows/com.h
 		application/_windows/error.cpp
