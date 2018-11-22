@@ -220,11 +220,11 @@ y3_package(vulkan)
 y3_package(zlib)
 
 if("catch2" IN_LIST _y3_packages)
-  set(_version "2.4.0")
+  set(_version "2.4.2")
   set(_package "Catch2-${_version}")
   y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "f486921476d2fde3f24f980b5577b442510301b8")
+    SHA1 "3da8c4948a94d5b66c4b2dde75f960abbaef1d89")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
@@ -261,11 +261,11 @@ if("lcov" IN_LIST _y3_packages)
 endif()
 
 if("nasm" IN_LIST _y3_packages)
-  set(_version "2.13.03")
+  set(_version "2.14")
   set(_package "nasm-${_version}")
   y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
     NAME "${_package}.zip"
-    SHA1 "149a814fa53980976a7fc081231f59cfbcd02543")
+    SHA1 "09ade73a5f4e9c0850e42cd5c7b5b03f20931893")
   y3_extract("${_package}.zip" DIR ${_package})
   set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
 endif()
@@ -356,10 +356,10 @@ if("zlib" IN_LIST _y3_packages)
 endif()
 
 if("jpeg" IN_LIST _y3_packages)
-  set(_version "2.0.0")
+  set(_version "2.0.1")
   set(_package "libjpeg-turbo-${_version}")
   y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
-    SHA1 "fe49aea935617748c21ecbe46c986d6c1b98f39b")
+    SHA1 "7ea4a288bccbb5a2d5bfad5fb328d4a839853f4e")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
     OPTIONS -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
