@@ -31,7 +31,7 @@ namespace Yttrium
 	class Point;
 	class WindowBackendCallbacks;
 
-	class WindowBackend : private NativeWindow
+	class WindowBackend : private NativeWindowCallbacks
 	{
 	public:
 		WindowBackend(const std::string& name, WindowBackendCallbacks&);
@@ -45,22 +45,12 @@ namespace Yttrium
 		void swap_buffers();
 
 	private:
-		LRESULT window_proc(HWND, UINT, WPARAM, LPARAM) override;
+		void on_close() override;
+		void on_focus(bool) override;
+		void on_key(Key, bool pressed) override;
+		void on_resize(const Size&) override;
 
 	private:
-		class WindowHandle
-		{
-		public:
-			WindowHandle(HWND hwnd) noexcept
-				: _handle{ hwnd } {}
-			~WindowHandle() noexcept { reset(); }
-			void reset() noexcept;
-			operator HWND() const { return _handle; }
-
-		private:
-			HWND _handle = NULL;
-		};
-
 		class WindowDC
 		{
 		public:
@@ -73,13 +63,12 @@ namespace Yttrium
 
 		const std::string _name;
 		WindowBackendCallbacks& _callbacks;
-		bool _created = false;
-		std::optional<Size> _size;
 		NativeApplication _application;
-		WindowHandle _hwnd{ _application.create_window(_name.c_str(), this) };
+		NativeWindow _hwnd = _application.create_window(_name.c_str(), *this);
 		const WindowDC _hdc{ _hwnd };
 #if Y_RENDERER_OPENGL
 		const WglContext _wgl{ _hdc };
 #endif
+		Size _size;
 	};
 }

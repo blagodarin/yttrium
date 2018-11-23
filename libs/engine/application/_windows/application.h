@@ -16,15 +16,40 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <windows.h>
 
 namespace Yttrium
 {
+	enum class Key;
+	class Size;
+
+	class NativeWindowCallbacks
+	{
+	public:
+		virtual ~NativeWindowCallbacks() = default;
+		virtual void on_close() = 0;
+		virtual void on_focus(bool) = 0;
+		virtual void on_key(Key, bool pressed) = 0;
+		virtual void on_resize(const Size&) = 0;
+	};
+
 	class NativeWindow
 	{
 	public:
-		virtual ~NativeWindow() = default;
-		virtual LRESULT window_proc(HWND, UINT, WPARAM, LPARAM) = 0;
+		NativeWindow(HWND handle) noexcept
+			: _handle{ handle } {}
+		NativeWindow(const NativeWindow&) = delete;
+		NativeWindow(NativeWindow&& other) noexcept
+			: _handle{ other._handle } { other._handle = NULL; }
+		~NativeWindow() noexcept { reset(); }
+		NativeWindow& operator=(const NativeWindow&) = delete;
+		void reset() noexcept;
+		operator HWND() const noexcept { return _handle; }
+
+	private:
+		HWND _handle = NULL;
 	};
 
 	class NativeApplication
@@ -33,10 +58,12 @@ namespace Yttrium
 		NativeApplication();
 		~NativeApplication() noexcept;
 
-		HWND create_window(const char* title, NativeWindow*);
+		NativeWindow create_window(const char* title, NativeWindowCallbacks&);
 		bool process_events();
 
 	private:
+		LRESULT window_proc(HWND, UINT, WPARAM, LPARAM);
+
 		static LRESULT CALLBACK static_window_proc(HWND, UINT, WPARAM, LPARAM);
 
 	private:
@@ -67,5 +94,6 @@ namespace Yttrium
 		const HINSTANCE _hinstance = ::GetModuleHandleA(nullptr);
 		const EmptyCursor _cursor{ _hinstance };
 		const WindowClass _window_class{ _hinstance, _cursor, static_window_proc };
+		std::unordered_map<HWND, NativeWindowCallbacks*> _windows;
 	};
 }
