@@ -71,7 +71,7 @@ namespace Yttrium
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(const std::string& name, int descriptor, bool temporary)
+		FileWriter(std::string_view name, int descriptor, bool temporary)
 			: _name{ name }
 			, _descriptor{ descriptor }
 			, _temporary{ temporary }
@@ -137,7 +137,7 @@ namespace Yttrium
 
 	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
 	{
-		const auto descriptor = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		const auto descriptor = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
 			return {};
 		return std::make_unique<FileWriter>(path, descriptor, false);

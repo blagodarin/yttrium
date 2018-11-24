@@ -37,8 +37,8 @@ namespace
 		case SEEK_SET: return offset >= 0 && reader.seek(Yttrium::to_unsigned(offset)) ? 0 : -1;
 		case SEEK_CUR: return offset >= 0 && reader.skip(Yttrium::to_unsigned(offset)) ? 0 : -1;
 		case SEEK_END: return offset == 0 && reader.seek(reader.size()) ? 0 : -1;
+		default: return -1;
 		}
-		return -1;
 	}
 
 	int close_callback(void*)

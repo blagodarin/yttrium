@@ -45,7 +45,7 @@ namespace Yttrium
 		~Storage();
 
 		/// Attaches a buffer to the storage.
-		void attach_buffer(const std::string& name, Buffer&&);
+		void attach_buffer(std::string_view, Buffer&&);
 
 		/// Attaches a package to the storage.
 		/// Throws MissingDataError if there is no such package.

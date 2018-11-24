@@ -55,7 +55,7 @@ namespace Yttrium
 
 			for (Item** i = _free; i < reinterpret_cast<Item**>(_items); ++i)
 			{
-				Item* item = reinterpret_cast<Item*>(raw_item);
+				auto item = reinterpret_cast<Item*>(raw_item);
 				item->chunk = this;
 				*i = item;
 				raw_item += raw_item_size;

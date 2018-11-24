@@ -29,9 +29,9 @@ namespace
 		{
 			if (!reader.read(header))
 				return false;
-			else if (header.name_fourcc == fourcc)
+			if (header.name_fourcc == fourcc)
 				return true;
-			else if (!reader.skip(header.size))
+			if (!reader.skip(header.size))
 				return false;
 		}
 	}

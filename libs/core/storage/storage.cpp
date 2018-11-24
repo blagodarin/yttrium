@@ -34,7 +34,7 @@ namespace Yttrium
 		{
 		}
 
-		void attach_buffer(const std::string& name, Buffer&& buffer)
+		void attach_buffer(std::string_view name, Buffer&& buffer)
 		{
 			auto& attachment = _buffers.emplace_back(name, std::move(buffer));
 			_stored[attachment._name] = BufferEntry{ &attachment };
@@ -69,7 +69,7 @@ namespace Yttrium
 		{
 			std::string _name;
 			std::shared_ptr<const Buffer> _buffer;
-			BufferAttachment(const std::string& name, Buffer&& buffer)
+			BufferAttachment(std::string_view name, Buffer&& buffer)
 				: _name{ name }, _buffer{ std::make_shared<const Buffer>(std::move(buffer)) } {}
 		};
 
@@ -106,7 +106,7 @@ namespace Yttrium
 
 	Storage::~Storage() = default;
 
-	void Storage::attach_buffer(const std::string& name, Buffer&& buffer)
+	void Storage::attach_buffer(std::string_view name, Buffer&& buffer)
 	{
 		_private->attach_buffer(name, std::move(buffer));
 	}

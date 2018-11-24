@@ -232,6 +232,24 @@ if(ENABLE_CPPCHECK)
 	endif()
 endif()
 
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+	find_program(CLANG_TIDY_EXECUTABLE clang-tidy)
+	mark_as_advanced(CLANG_TIDY_EXECUTABLE)
+	if(CLANG_TIDY_EXECUTABLE)
+		get_target_property(_ycore_source_dir ycore SOURCE_DIR)
+		get_target_property(_ycore_sources ycore SOURCES)
+		set(_ycore_cpps)
+		foreach(_source ${_ycore_sources})
+			if(_source MATCHES "^.*\.cpp$" AND NOT _source STREQUAL "utils/string.cpp") # The skipped file segfaults clang-tidy.
+				list(APPEND _ycore_cpps ${_ycore_source_dir}/${_source})
+			endif()
+		endforeach()
+		add_custom_target(tidy
+			COMMAND ${CLANG_TIDY_EXECUTABLE} -p=${PROJECT_BINARY_DIR} -quiet ${_ycore_cpps}
+			VERBATIM)
+	endif()
+endif()
+
 if(WIN32)
 	set(_cmake_config_dir ${CMAKE_INSTALL_PREFIX}/cmake)
 else()

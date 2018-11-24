@@ -19,20 +19,21 @@
 #include <yttrium/image.h>
 #include <yttrium/storage/source.h>
 
+#include <csetjmp>
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
+
 #include <jpeglib.h>
-#include <setjmp.h>
 
 namespace
 {
 	struct JpegErrorHandler
 	{
 		jpeg_error_mgr _error_mgr;
-		jmp_buf _jmp_buf;
+		std::jmp_buf _jmp_buf;
 	};
 
 	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
-		longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
+		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 }
 
@@ -46,13 +47,13 @@ namespace Yttrium
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
-		if (::setjmp(error_handler._jmp_buf))
+		if (setjmp(error_handler._jmp_buf))
 			return {};
 
 		jpeg_decompress_struct decompressor;
 		decompressor.err = ::jpeg_std_error(&error_handler._error_mgr);
 		::jpeg_create_decompress(&decompressor);
-		if (::setjmp(error_handler._jmp_buf))
+		if (setjmp(error_handler._jmp_buf))
 		{
 			::jpeg_destroy_decompress(&decompressor);
 			return {};
@@ -83,7 +84,7 @@ namespace Yttrium
 			::jpeg_read_scanlines(&decompressor, &scanline, 1);
 		::jpeg_finish_decompress(&decompressor);
 
-		if (::setjmp(error_handler._jmp_buf))
+		if (setjmp(error_handler._jmp_buf))
 			return {};
 
 		::jpeg_destroy_decompress(&decompressor);

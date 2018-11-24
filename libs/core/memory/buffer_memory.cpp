@@ -53,9 +53,9 @@ namespace
 
 namespace Yttrium
 {
+#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 	BufferMemory::~BufferMemory()
 	{
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
 		std::map<size_t, size_t> free_block_count;
 		{
 			std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
@@ -69,8 +69,10 @@ namespace Yttrium
 			}
 		}
 		_buffer_memory_tracker.print_state(free_block_count);
-#endif
 	}
+#else
+	BufferMemory::~BufferMemory() = default;
+#endif
 
 	void* BufferMemory::allocate(size_t capacity)
 	{
@@ -164,19 +166,16 @@ namespace Yttrium
 #endif
 			return new_data;
 		}
-		else
-		{
-			// This situation is rare, so let's do something simple.
-			// TODO: Remap the first part of the big allocation into the small free block if one is available.
-			const auto new_data = allocate(new_capacity);
-			if (old_size > 0)
-				::memcpy(new_data, old_data, old_size);
-			deallocate(old_data, old_capacity);
+		// This situation is rare, so let's do something simple.
+		// TODO: Remap the first part of the big allocation into the small free block if one is available.
+		const auto new_data = allocate(new_capacity);
+		if (old_size > 0)
+			::memcpy(new_data, old_data, old_size);
+		deallocate(old_data, old_capacity);
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
-			_buffer_memory_tracker.track_reallocation();
+		_buffer_memory_tracker.track_reallocation();
 #endif
-			return new_data;
-		}
+		return new_data;
 	}
 
 	size_t BufferMemory::capacity_for_size(size_t size) noexcept
