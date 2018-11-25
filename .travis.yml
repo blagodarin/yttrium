@@ -14,7 +14,7 @@ matrix:
       addons: &gcc8_xcb
         apt:
           sources: &all_sources
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-7
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
@@ -73,39 +73,41 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
-      addons: &clang6_x11
+      env: CLANG=7 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
+      addons: &clang7_x11
         apt:
           sources: *all_sources
           packages:
-            - clang-6.0
+            - clang-7
+            - clang-tidy-7
             - libopenal-dev
             - libstdc++-8-dev
             - libvorbis-dev
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
-      addons: *clang6_x11
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
+      addons: *clang7_x11
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
-      addons: *clang6_x11
+      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
+      addons: *clang7_x11
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
-      addons: *clang6_x11
+      env: CLANG=7 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
+      addons: *clang7_x11
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: &clang6_xcb
+      env: CLANG=7 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: &clang7_xcb
         apt:
           sources: *all_sources
           packages:
-            - clang-6.0
+            - clang-7
+            - clang-tidy-7
             - libopenal-dev
             - libstdc++-8-dev
             - libvorbis-dev
@@ -116,18 +118,18 @@ matrix:
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang6_xcb
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *clang7_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang6_xcb
+      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *clang7_xcb
 
     - os: linux
       compiler: clang
-      env: CLANG=6.0 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang6_xcb
+      env: CLANG=7 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *clang7_xcb
 
 before_install:
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
@@ -145,11 +147,13 @@ install:
   - popd
 
 script:
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS="-DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS="-DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
+  - if [ -n "${CLANG}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON"; fi
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" ${CMAKE_OPTIONS} -DY_RENDERER=${RENDERER}
   - pushd "${HOME}/yttrium.build"
   - cmake --build . -- -j2
+  - if [ -n "${CLANG}" ]; then cmake --build . --target tidy; fi
   - ctest --output-on-failure
   - if [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi

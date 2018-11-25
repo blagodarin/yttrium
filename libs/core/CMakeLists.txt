@@ -92,6 +92,7 @@ if(Y_USE_JPEG)
 		target_link_libraries(ycore PRIVATE Y3::jpeg)
 	else()
 		find_package(JPEG REQUIRED)
+		mark_as_advanced(jconfig_dir)
 		target_link_libraries(ycore PRIVATE JPEG::JPEG)
 	endif()
 	y_sources(ycore "src/image/formats"

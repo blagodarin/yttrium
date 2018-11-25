@@ -24,6 +24,7 @@ include(GNUInstallDirs)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/y3/modules ${PROJECT_SOURCE_DIR}/cmake/modules)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
@@ -39,7 +40,8 @@ option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_EXTRAS "Build all extra stuff" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" ON)
-option(ENABLE_CPPCHECK "Enable 'cppcheck' target" OFF)
+option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
+option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
 
 option(Y_USE_JPEG "Include JPEG support" ON)
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
@@ -71,6 +73,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-gnu-statement-expression
 		-Wno-header-hygiene # TODO: Remove "using namespace" from examples.
 		-Wno-padded
+		-Wno-return-std-move-in-c++11
 		-Wno-switch-enum
 		-Wno-weak-vtables
 		)
@@ -216,38 +219,32 @@ if(BUILD_EXTRAS)
 endif()
 
 if(ENABLE_CPPCHECK)
-	find_program(CPPCHECK_EXECUTABLE cppcheck)
-	mark_as_advanced(CPPCHECK_EXECUTABLE)
-	if(CPPCHECK_EXECUTABLE)
-		add_custom_target(cppcheck
-			COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
-				--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError --suppress=unusedFunction --suppress=unusedPrivateFunction
-				-I ${PROJECT_SOURCE_DIR}/include
-				-i ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}
-				--include=${PROJECT_BINARY_DIR}/config.h
-				--relative-paths=${PROJECT_SOURCE_DIR}
-				"--template=[{file}:{line}]: ({severity}/{id}) {message}"
-				${PROJECT_SOURCE_DIR}
-			VERBATIM)
-	endif()
+	find_package(Cppcheck REQUIRED)
+	add_custom_target(cppcheck
+		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
+			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError --suppress=unusedFunction --suppress=unusedPrivateFunction
+			-I ${PROJECT_SOURCE_DIR}/include
+			-i ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}
+			--include=${PROJECT_BINARY_DIR}/config.h
+			--relative-paths=${PROJECT_SOURCE_DIR}
+			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
+			${PROJECT_SOURCE_DIR}
+		VERBATIM)
 endif()
 
-if(CMAKE_EXPORT_COMPILE_COMMANDS)
-	find_program(CLANG_TIDY_EXECUTABLE clang-tidy)
-	mark_as_advanced(CLANG_TIDY_EXECUTABLE)
-	if(CLANG_TIDY_EXECUTABLE)
-		get_target_property(_ycore_source_dir ycore SOURCE_DIR)
-		get_target_property(_ycore_sources ycore SOURCES)
-		set(_ycore_cpps)
-		foreach(_source ${_ycore_sources})
-			if(_source MATCHES "^.*\.cpp$" AND NOT _source STREQUAL "utils/string.cpp") # The skipped file segfaults clang-tidy.
-				list(APPEND _ycore_cpps ${_ycore_source_dir}/${_source})
-			endif()
-		endforeach()
-		add_custom_target(tidy
-			COMMAND ${CLANG_TIDY_EXECUTABLE} -p=${PROJECT_BINARY_DIR} -quiet ${_ycore_cpps}
-			VERBATIM)
-	endif()
+if(ENABLE_CLANG_TIDY)
+	find_package(ClangTidy REQUIRED)
+	get_target_property(_ycore_source_dir ycore SOURCE_DIR)
+	get_target_property(_ycore_sources ycore SOURCES)
+	set(_ycore_cpps)
+	foreach(_source ${_ycore_sources})
+		if(_source MATCHES "^.*\.cpp$" AND NOT _source STREQUAL "utils/string.cpp") # The skipped file segfaults clang-tidy.
+			list(APPEND _ycore_cpps ${_ycore_source_dir}/${_source})
+		endif()
+	endforeach()
+	add_custom_target(tidy
+		COMMAND ${CLANG_TIDY_EXECUTABLE} -p=${PROJECT_BINARY_DIR} -quiet ${_ycore_cpps}
+		VERBATIM)
 endif()
 
 if(WIN32)
