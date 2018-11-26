@@ -14,7 +14,17 @@
 # limitations under the License.
 #
 
-find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy)
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	message(FATAL_ERROR "ClangTidy is only supported for the Clang compiler!")
+endif()
+
+get_filename_component(_clang_directory ${CMAKE_CXX_COMPILER} DIRECTORY)
+get_filename_component(_clang_name ${CMAKE_CXX_COMPILER} NAME)
+string(REPLACE "clang++" "clang-tidy" _clang_tidy_name ${_clang_name})
+find_program(CLANG_TIDY_EXECUTABLE ${_clang_tidy_name} PATHS ${_clang_directory})
+unset(_clang_directory)
+unset(_clang_name)
+unset(_clang_tidy_name)
 
 if(CLANG_TIDY_EXECUTABLE)
 	execute_process(COMMAND ${CLANG_TIDY_EXECUTABLE} -version OUTPUT_VARIABLE _clang_tidy_version_output ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
