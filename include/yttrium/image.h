@@ -46,11 +46,12 @@ namespace Yttrium
 	/// Image file type.
 	enum class ImageType
 	{
-		Auto, ///< Automatical detection.
+		Auto, ///< Automatic detection.
 		Tga,  ///< Truevision TARGA (TGA) file format.
 		Png,  ///< Portable Network Graphics (PNG) file format (write only).
 		Jpeg, ///< Joint Photographic Experts Group (JPEG) file format (read only).
 		Dds,  ///< DirectDraw Surface (DDS) file format (read only).
+		Bmp,  ///< Windows bitmap (BMP) file format (read only).
 	};
 
 	/// Image orientation.

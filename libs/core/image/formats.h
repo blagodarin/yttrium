@@ -28,6 +28,8 @@ namespace Yttrium
 	class Source;
 	class Writer;
 
+	std::optional<ImageFormat> read_bmp_header(Reader&);
+
 	std::optional<ImageFormat> read_dds_header(Reader&);
 
 #if Y_USE_JPEG

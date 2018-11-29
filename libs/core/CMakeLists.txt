@@ -81,6 +81,8 @@ y_sources(ycore "src/image"
 	image/utils.h
 	)
 y_sources(ycore "src/image/formats"
+	image/formats/bmp.cpp
+	image/formats/bmp.h
 	image/formats/dds.cpp
 	image/formats/dds.h
 	image/formats/tga.cpp

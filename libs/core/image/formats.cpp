@@ -74,21 +74,24 @@ namespace Yttrium
 
 	bool detect_image_type(const Source& source, ImageType& type)
 	{
-		uint32_t signature = 0;
+		std::uint16_t signature = 0;
 		if (!source.read_at(0, signature))
 			return false;
 		switch (signature)
 		{
-		case "DDS "_fourcc:
+		case "BM"_twocc:
+			type = ImageType::Bmp;
+			return true;
+		case "DD"_twocc:
 			type = ImageType::Dds;
 			return true;
-#if Y_USE_PNG
-		case "\xff\xd8\xff\xe0"_fourcc: // SOI marker and JFIF APP0 marker.
+#if Y_USE_JPEG
+		case "\xff\xd8"_twocc: // SOI marker.
 			type = ImageType::Jpeg;
 			return true;
 #endif
-#if Y_USE_JPEG
-		case "\x89PNG"_fourcc:
+#if Y_USE_PNG
+		case "\x89P"_twocc:
 			type = ImageType::Png;
 			return true;
 #endif
