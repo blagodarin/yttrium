@@ -159,7 +159,8 @@ namespace Yttrium
 						++_cursor;
 						break;
 					}
-					else if (*_cursor == '\\')
+
+					if (*_cursor == '\\')
 					{
 						switch (*++_cursor)
 						{

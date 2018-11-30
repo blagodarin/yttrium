@@ -121,7 +121,7 @@ namespace Yttrium
 	{
 		for (auto chunk = _last_chunk; chunk;)
 		{
-			const auto previous_chunk = _last_chunk->_previous;
+			const auto previous_chunk = chunk->_previous;
 			delete_sized(chunk);
 			chunk = previous_chunk;
 		}

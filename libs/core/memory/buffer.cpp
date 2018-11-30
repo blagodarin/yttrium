@@ -33,7 +33,8 @@ namespace Yttrium
 	Buffer::Buffer(size_t size, const void* data)
 		: Buffer{ size }
 	{
-		std::memcpy(_data, data, size);
+		if (_data)
+			std::memcpy(_data, data, size);
 	}
 
 	void Buffer::reserve(size_t capacity)

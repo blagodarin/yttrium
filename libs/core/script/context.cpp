@@ -35,7 +35,7 @@ namespace Yttrium
 		std::size_t _max_args = 0;
 
 		ScriptCommandContext() = default;
-		ScriptCommandContext(ScriptContext::Command command, std::size_t min_args, std::size_t max_args)
+		ScriptCommandContext(const ScriptContext::Command& command, std::size_t min_args, std::size_t max_args)
 			: _command{ command }, _min_args{ min_args }, _max_args{ max_args } {}
 	};
 

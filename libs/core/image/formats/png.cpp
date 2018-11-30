@@ -81,7 +81,7 @@ namespace
 		// without local variables to avoid clobbering warnings.
 		bool write(const Yttrium::ImageFormat& format, int color_type, int transforms, png_bytep* data)
 		{
-			if (::setjmp(png_jmpbuf(_png)))
+			if (setjmp(png_jmpbuf(_png)))
 				return false;
 
 			::png_set_compression_level(_png, 0);
