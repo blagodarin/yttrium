@@ -29,6 +29,13 @@ using Yttrium::PixelFormat;
 using Yttrium::Source;
 using Yttrium::TemporaryFile;
 
+TEST_CASE("image.load.bmp")
+{
+	const auto image = Image::load(*Source::from("tests/data/gradient24.bmp"));
+	REQUIRE(image);
+	CHECK(*image == ::make_test_image(false));
+}
+
 TEST_CASE("image.load.dds")
 {
 	const auto image = Image::load(*Source::from("tests/data/gradient32.dds"));

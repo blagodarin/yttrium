@@ -48,6 +48,7 @@ namespace Yttrium
 		std::optional<ImageFormat> format;
 		switch (type)
 		{
+		case ImageType::Bmp: format = read_bmp_header(reader); break;
 		case ImageType::Tga: format = read_tga_header(reader); break;
 #if Y_USE_JPEG
 		case ImageType::Jpeg: return read_jpeg(source, buffer);

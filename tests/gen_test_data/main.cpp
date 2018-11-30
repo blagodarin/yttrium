@@ -15,6 +15,7 @@
 //
 
 #include <yttrium/storage/writer.h>
+#include "../../libs/core/image/formats/bmp.h"
 #include "../../libs/core/image/formats/dds.h"
 #include "../../libs/core/image/formats/tga.h"
 #include "../core/image_formats.h"
@@ -35,34 +36,58 @@ namespace
 int main()
 {
 	{
+		BmpPrefix prefix;
+		prefix.magic = BmpMagic::Bm;
+
+		BmpHeaders headers;
+		headers.file.file_size = sizeof prefix + sizeof headers + 16 * 16 * 3;
+		headers.file.reserved = 0;
+		headers.file.data_offset = sizeof prefix + sizeof headers;
+		headers.info.header_size = sizeof headers.info;
+		headers.info.width = 16;
+		headers.info.height = -16;
+		headers.info.planes = 1;
+		headers.info.bits_per_pixel = 24;
+		headers.info.compression = BmpCompression::Rgb;
+		headers.info.image_size = 0;
+		headers.info.x_pixels_per_meter = 4724; // 120 dpi.
+		headers.info.y_pixels_per_meter = 4724;
+		headers.info.used_colors = 0;
+		headers.info.required_colors = 0;
+
+		Writer writer{ "tests/data/gradient24.bmp" };
+		if (writer.write(prefix) && writer.write(headers))
+			write_color_gradient(writer, false);
+	}
+	{
 		TgaHeader header;
-		::memset(&header, 0, sizeof(header));
+		std::memset(&header, 0, sizeof header);
 		header.image_type = tgaTrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 24;
 		header.image.descriptor = tgaTopLeft;
 
-		Writer writer("tests/image/gradient24.tga");
+		Writer writer{ "tests/data/gradient24.tga" };
 		if (writer.write(header))
 			write_color_gradient(writer, false);
 	}
 	{
 		TgaHeader header;
-		::memset(&header, 0, sizeof(header));
+		std::memset(&header, 0, sizeof header);
 		header.image_type = tgaTrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 32;
 		header.image.descriptor = tgaTopLeft | 8;
 
-		Writer writer("tests/image/gradient32.tga");
+		Writer writer{ "tests/data/gradient32.tga" };
 		if (writer.write(header))
 			write_color_gradient(writer, true);
 	}
 	{
 		DDS_HEADER header;
-		::memset(&header, 0, sizeof(header));
+		std::memset(&header, 0, sizeof header);
 		header.dwMagic = DDS_HEADER::MAGIC;
 		header.dwSize = DDS_HEADER::SIZE;
 		header.dwFlags = DDS_HEADER_FLAGS_TEXTURE;
@@ -77,7 +102,7 @@ int main()
 		header.ddspf.dwABitMask = 0xFF000000;
 		header.dwCaps = DDSCAPS_TEXTURE;
 
-		Writer writer("tests/image/gradient32.dds");
+		Writer writer{ "tests/data/gradient32.dds" };
 		if (writer.write(header))
 			write_color_gradient(writer, true);
 	}
