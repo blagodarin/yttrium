@@ -42,10 +42,11 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" ON)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
+option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 
-option(Y_USE_JPEG "Include JPEG support" ON)
-option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support" ON)
-option(Y_USE_PNG "Include PNG support" ON)
+option(Y_USE_JPEG "Include JPEG support (requires libjpeg)" ON)
+option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
+option(Y_USE_PNG "Include PNG support (requires libpng)" ON)
 
 set(Y_RENDERER "opengl" CACHE STRING "Renderer to use (opengl, vulkan)")
 if(Y_RENDERER STREQUAL "opengl")
@@ -77,6 +78,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-switch-enum
 		-Wno-weak-vtables
 		)
+
+	if(ENABLE_SANITIZERS)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
+		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
+	endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -142,8 +148,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		endif()
 	endif()
 
-	option(Y_SANITIZERS "Enable sanitizers" OFF)
-	if(Y_SANITIZERS)
+	if(ENABLE_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
