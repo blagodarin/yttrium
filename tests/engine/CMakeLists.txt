@@ -15,11 +15,14 @@
 #
 
 add_executable(yengine_tests
-  gui_loading.cpp
-  key.cpp
-  resource_loader.cpp
-  texture_font.cpp
-  )
+	gui_loading.cpp
+	key.cpp
+	resource_loader.cpp
+	texture_font.cpp
+	)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set_property(SOURCE gui_loading.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
+endif()
 target_link_libraries(yengine_tests PRIVATE ycore yengine ytest)
 set_target_properties(yengine_tests PROPERTIES FOLDER "tests")
 include_config(yengine_tests ${PROJECT_BINARY_DIR}/config.h)

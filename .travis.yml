@@ -1,6 +1,4 @@
 language: cpp
-dist: trusty
-sudo: false
 
 git:
   depth: 1
@@ -9,12 +7,12 @@ matrix:
   include:
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
       addons: &gcc8_xcb
         apt:
           sources: &all_sources
-            - llvm-toolchain-trusty-7
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
@@ -26,6 +24,7 @@ matrix:
             - libxkbcommon-x11-dev
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
       addons: &gcc8_x11
@@ -33,81 +32,91 @@ matrix:
           sources: *all_sources
           packages:
             - g++-8
+            - libgl-dev
             - libopenal-dev
             - libvorbis-dev
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
       addons: *gcc8_x11
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
       addons: &clang7_x11
         apt:
           sources: *all_sources
           packages:
-            - clang-7
-            - clang-tidy-7
+            - libgl-dev
             - libopenal-dev
             - libstdc++-8-dev
             - libvorbis-dev
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2 TIDY=1
       addons: *clang7_x11
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
       addons: *clang7_x11
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
       addons: *clang7_x11
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: &clang7_xcb
         apt:
           sources: *all_sources
           packages:
-            - clang-7
-            - clang-tidy-7
             - libopenal-dev
             - libstdc++-8-dev
             - libvorbis-dev
@@ -117,44 +126,40 @@ matrix:
             - libxkbcommon-x11-dev
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan TIDY=1
       addons: *clang7_xcb
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang7_xcb
 
     - os: linux
+      dist: xenial
       compiler: clang
       env: CLANG=7 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang7_xcb
 
 before_install:
-  - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
-  - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC}; fi
+  - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
 
 install:
-  - mkdir "${HOME}/_cmake" && pushd "${HOME}/_cmake"
-  - wget -q --no-check-certificate -O - https://cmake.org/files/v3.12/cmake-3.12.4-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
-  - export PATH="$(pwd)/bin:${PATH}"
-  - popd
-
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
   - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
-  - export PATH="$(pwd)/bin:${PATH}"
   - popd
 
 script:
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON"; fi
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON -DY_SANITIZERS=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DY_COVERAGE=ON -DY_COVERAGE_LCOV=ON"; fi
   - if [ -n "${TIDY}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" ${CMAKE_OPTIONS} -DY_RENDERER=${RENDERER}
   - pushd "${HOME}/yttrium.build"
   - cmake --build . -- -j2
   - if [ -n "${TIDY}" ]; then cmake --build . --target tidy; fi
-  - ctest --output-on-failure
+  - ctest --verbose
   - if [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd

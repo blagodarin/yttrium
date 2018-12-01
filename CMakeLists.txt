@@ -147,11 +147,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
-
-	option(Y_TRAVIS "Enable Travis CI workarounds" OFF)
-	if(Y_TRAVIS AND Y_SANITIZERS)
-		list(APPEND DYNAMIC_LINKER_FLAGS -fuse-ld=gold)
-	endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -243,7 +238,7 @@ if(ENABLE_CLANG_TIDY)
 		endif()
 	endforeach()
 	add_custom_target(tidy
-		COMMAND ${CLANG_TIDY_EXECUTABLE} -p=${PROJECT_BINARY_DIR} ${_ycore_cpps}
+		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} ${_ycore_cpps}
 		VERBATIM)
 endif()
 

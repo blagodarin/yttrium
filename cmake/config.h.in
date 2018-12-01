@@ -1,3 +1,5 @@
+#pragma once
+
 // Renderers.
 #cmakedefine01 Y_RENDERER_NULL
 #cmakedefine01 Y_RENDERER_OPENGL
