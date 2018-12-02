@@ -243,7 +243,7 @@ if(ENABLE_CLANG_TIDY)
 		endif()
 	endforeach()
 	add_custom_target(tidy
-		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} ${_ycore_cpps}
+		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_ycore_cpps}
 		VERBATIM)
 endif()
 
