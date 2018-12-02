@@ -38,7 +38,7 @@ namespace Yttrium
 	class NativeWindow
 	{
 	public:
-		NativeWindow(HWND handle) noexcept
+		explicit NativeWindow(HWND handle) noexcept
 			: _handle{ handle } {}
 		NativeWindow(const NativeWindow&) = delete;
 		NativeWindow(NativeWindow&& other) noexcept

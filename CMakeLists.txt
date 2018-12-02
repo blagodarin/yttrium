@@ -40,6 +40,7 @@ option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_EXTRAS "Build all extra stuff" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" ON)
+option(ENABLE_CLANG_FORMAT "Enable funning ClangFormat ('format' target)" OFF)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
@@ -203,7 +204,8 @@ if(BUILD_TESTS)
 	add_custom_target(check
 		COMMAND ycore_tests --reporter compact
 		COMMAND yengine_tests --reporter compact
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		VERBATIM)
 	set_target_properties(check PROPERTIES FOLDER "tests")
 endif()
 
@@ -218,18 +220,14 @@ if(BUILD_EXTRAS)
 	add_subdirectory(tests/gen_test_data)
 endif()
 
-if(ENABLE_CPPCHECK)
-	find_package(Cppcheck REQUIRED)
-	add_custom_target(cppcheck
-		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
-			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError --suppress=unusedFunction --suppress=unusedPrivateFunction
-			-I ${PROJECT_SOURCE_DIR}/include
-			-i ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}
-			--include=${PROJECT_BINARY_DIR}/config.h
-			--relative-paths=${PROJECT_SOURCE_DIR}
-			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
-			${PROJECT_SOURCE_DIR}
+if(ENABLE_CLANG_FORMAT)
+	find_package(ClangFormat REQUIRED)
+	file(GLOB_RECURSE _sources LIST_DIRECTORIES FALSE RELATIVE ${PROJECT_SOURCE_DIR} *.h *.cpp)
+	add_custom_target(format
+		COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${_sources}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		VERBATIM)
+	set_target_properties(format PROPERTIES FOLDER ".support")
 endif()
 
 if(ENABLE_CLANG_TIDY)
@@ -247,6 +245,22 @@ if(ENABLE_CLANG_TIDY)
 	add_custom_target(tidy
 		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
 		VERBATIM)
+	set_target_properties(tidy PROPERTIES FOLDER ".support")
+endif()
+
+if(ENABLE_CPPCHECK)
+	find_package(Cppcheck REQUIRED)
+	add_custom_target(cppcheck
+		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
+			--inline-suppr --suppress=missingIncludeSystem --suppress=passedByValue --suppress=syntaxError --suppress=unusedFunction --suppress=unusedPrivateFunction
+			-I ${PROJECT_SOURCE_DIR}/include
+			-i ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}
+			--include=${PROJECT_BINARY_DIR}/config.h
+			--relative-paths=${PROJECT_SOURCE_DIR}
+			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
+			${PROJECT_SOURCE_DIR}
+		VERBATIM)
+	set_target_properties(cppcheck PROPERTIES FOLDER ".support")
 endif()
 
 if(WIN32)
