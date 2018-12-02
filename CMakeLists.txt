@@ -234,16 +234,18 @@ endif()
 
 if(ENABLE_CLANG_TIDY)
 	find_package(ClangTidy REQUIRED)
-	get_target_property(_ycore_source_dir ycore SOURCE_DIR)
-	get_target_property(_ycore_sources ycore SOURCES)
-	set(_ycore_cpps)
-	foreach(_source ${_ycore_sources})
-		if(_source MATCHES "^.*\.cpp$" AND NOT _source STREQUAL "utils/string.cpp") # The skipped file segfaults clang-tidy.
-			list(APPEND _ycore_cpps ${_ycore_source_dir}/${_source})
-		endif()
+	set(_cpps)
+	foreach(_target ycore yengine)
+		get_target_property(_source_dir ${_target} SOURCE_DIR)
+		get_target_property(_sources ${_target} SOURCES)
+		foreach(_source ${_sources})
+			if(_source MATCHES "^.*\.cpp$" AND NOT _source STREQUAL "utils/string.cpp") # The skipped file segfaults clang-tidy.
+				list(APPEND _cpps ${_source_dir}/${_source})
+			endif()
+		endforeach()
 	endforeach()
 	add_custom_target(tidy
-		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_ycore_cpps}
+		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
 		VERBATIM)
 endif()
 
