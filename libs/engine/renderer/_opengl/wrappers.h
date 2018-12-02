@@ -52,7 +52,7 @@ namespace Yttrium
 	{
 	public:
 		explicit GlProgramHandle(const GlApi&);
-		GlProgramHandle(GlProgramHandle&&);
+		GlProgramHandle(GlProgramHandle&&) noexcept;
 		~GlProgramHandle();
 
 		void attach(GLuint) const;
@@ -74,7 +74,7 @@ namespace Yttrium
 	{
 	public:
 		GlShaderHandle(const GlApi&, GLenum type);
-		GlShaderHandle(GlShaderHandle&&);
+		GlShaderHandle(GlShaderHandle&&) noexcept;
 		~GlShaderHandle();
 
 		bool compile(std::string_view) const;
@@ -95,7 +95,7 @@ namespace Yttrium
 	{
 	public:
 		GlTextureHandle(const GlApi&, GLenum target);
-		GlTextureHandle(GlTextureHandle&&);
+		GlTextureHandle(GlTextureHandle&&) noexcept;
 		~GlTextureHandle();
 
 		void bind() const;

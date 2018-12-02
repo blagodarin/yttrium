@@ -124,11 +124,11 @@ namespace Yttrium
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
 		: _gui{ gui }
 	{
-		_widget_factory.emplace("button", [this](auto name, auto&& data) { return std::make_unique<ButtonWidget>(_gui, name, std::move(data)); });
-		_widget_factory.emplace("canvas", [this](auto name, auto&& data) { return std::make_unique<CanvasWidget>(_gui, name, std::move(data)); });
-		_widget_factory.emplace("image", [this](auto name, auto&& data) { return std::make_unique<ImageWidget>(_gui, name, std::move(data)); });
-		_widget_factory.emplace("input", [this](auto name, auto&& data) { return std::make_unique<InputWidget>(_gui, name, std::move(data)); });
-		_widget_factory.emplace("label", [this](auto name, auto&& data) { return std::make_unique<LabelWidget>(_gui, name, std::move(data)); });
+		_widget_factory.emplace("button", [this](auto name, auto&& data) { return std::make_unique<ButtonWidget>(_gui, name, std::forward<decltype(data)>(data)); });
+		_widget_factory.emplace("canvas", [this](auto name, auto&& data) { return std::make_unique<CanvasWidget>(_gui, name, std::forward<decltype(data)>(data)); });
+		_widget_factory.emplace("image", [this](auto name, auto&& data) { return std::make_unique<ImageWidget>(_gui, name, std::forward<decltype(data)>(data)); });
+		_widget_factory.emplace("input", [this](auto name, auto&& data) { return std::make_unique<InputWidget>(_gui, name, std::forward<decltype(data)>(data)); });
+		_widget_factory.emplace("label", [this](auto name, auto&& data) { return std::make_unique<LabelWidget>(_gui, name, std::forward<decltype(data)>(data)); });
 	}
 
 	GuiIonLoader::~GuiIonLoader() noexcept = default;

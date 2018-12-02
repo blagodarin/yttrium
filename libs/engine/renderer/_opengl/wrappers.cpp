@@ -76,7 +76,7 @@ namespace Yttrium
 			throw std::runtime_error("glCreateProgram failed");
 	}
 
-	GlProgramHandle::GlProgramHandle(GlProgramHandle&& program)
+	GlProgramHandle::GlProgramHandle(GlProgramHandle&& program) noexcept
 		: _gl{ program._gl }
 		, _handle{ program._handle }
 	{
@@ -129,7 +129,7 @@ namespace Yttrium
 			throw std::runtime_error("glCreateShader failed");
 	}
 
-	GlShaderHandle::GlShaderHandle(GlShaderHandle&& shader)
+	GlShaderHandle::GlShaderHandle(GlShaderHandle&& shader) noexcept
 		: _gl{ shader._gl }
 		, _type{ shader._type }
 		, _handle{ shader._handle }
@@ -176,7 +176,7 @@ namespace Yttrium
 			throw std::runtime_error("glGenTextures failed");
 	}
 
-	GlTextureHandle::GlTextureHandle(GlTextureHandle&& texture)
+	GlTextureHandle::GlTextureHandle(GlTextureHandle&& texture) noexcept
 		: _gl{ texture._gl }
 		, _target{ texture._target }
 		, _handle{ texture._handle }
