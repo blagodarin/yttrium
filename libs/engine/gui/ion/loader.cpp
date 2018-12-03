@@ -149,17 +149,17 @@ namespace Yttrium
 
 	bool GuiIonLoader::read_texture_filter(IonReader& ion, IonReader::Token& token, Texture2D::Filter& filter)
 	{
+		static const std::unordered_map<std::string_view, Texture2D::Filter> filters{
+			{ "nearest", Texture2D::NearestFilter },
+			{ "linear", Texture2D::LinearFilter },
+			{ "bilinear", Texture2D::BilinearFilter },
+			{ "trilinear", Texture2D::TrilinearFilter },
+		};
+
 		if (token.type() != IonReader::Token::Type::ObjectBegin)
 			return true;
-		const auto filter_name = token.next(ion).to_name();
-		if (filter_name == "nearest")
-			filter = Texture2D::NearestFilter;
-		else if (filter_name == "linear")
-			filter = Texture2D::LinearFilter;
-		else if (filter_name == "bilinear")
-			filter = Texture2D::BilinearFilter;
-		else if (filter_name == "trilinear")
-			filter = Texture2D::TrilinearFilter;
+		if (const auto i = filters.find(token.next(ion).to_name()); i != filters.end())
+			filter = i->second;
 		else
 			return false;
 		if (token.next(ion).type() == IonReader::Token::Type::Name && token.text() == "anisotropic")
@@ -182,14 +182,14 @@ namespace Yttrium
 
 	GuiIonLoader::Attribute GuiIonLoader::load_attribute(std::string_view name)
 	{
-		if (name == "default")
-			return Attribute::Default;
-		else if (name == "root")
-			return Attribute::Root;
-		else if (name == "transparent")
-			return Attribute::Transparent;
-		else
-			return Attribute::Unknown;
+		static const std::unordered_map<std::string_view, Attribute> attributes{
+			{ "default", Attribute::Default },
+			{ "root", Attribute::Root },
+			{ "transparent", Attribute::Transparent },
+		};
+
+		const auto i = attributes.find(name);
+		return i != attributes.end() ? i->second : Attribute::Unknown;
 	}
 
 	void GuiIonLoader::load(IonReader& ion)
@@ -224,7 +224,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_class(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		const std::string name{ token.to_value() };
+		std::string name{ token.to_value() };
 		const auto i = _prototypes.find(name);
 		if (i != _prototypes.end())
 			throw GuiDataError{ "Duplicate 'class' \"", name, "\"" };

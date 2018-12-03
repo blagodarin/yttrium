@@ -97,14 +97,12 @@ namespace Yttrium
 			result->_index_buffer.write(index_data.data(), index_data.size());
 			return result;
 		}
-		else
-		{
-			const auto index_buffer_size = data._indices.size() * sizeof(uint32_t);
-			auto result = std::make_unique<VulkanMesh>(_context, vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
-			result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
-			result->_index_buffer.write(data._indices.data(), index_buffer_size);
-			return result;
-		}
+
+		const auto index_buffer_size = data._indices.size() * sizeof(uint32_t);
+		auto result = std::make_unique<VulkanMesh>(_context, vertex_buffer_size, index_buffer_size, VK_INDEX_TYPE_UINT32, data._indices.size());
+		result->_vertex_buffer.write(data._vertex_data.data(), vertex_buffer_size);
+		result->_index_buffer.write(data._indices.data(), index_buffer_size);
+		return result;
 	}
 
 	std::unique_ptr<RenderProgram> VulkanRenderer::create_program(const std::string&, const std::string&)

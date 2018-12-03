@@ -41,8 +41,8 @@ namespace
 		case XCB_BUTTON_INDEX_3: return Key::Mouse3;
 		case XCB_BUTTON_INDEX_4: return Key::Mouse4;
 		case XCB_BUTTON_INDEX_5: return Key::Mouse5;
+		default: return Key::Null;
 		}
-		return Key::Null;
 	}
 
 	constexpr Key key_from_keycode(xcb_keycode_t keycode) noexcept
@@ -132,16 +132,16 @@ namespace
 		case 0x59: return Key::Num3;
 		case 0x5a: return Key::Num0;
 		case 0x5b: return Key::Decimal;
-
+		//
 		case 0x5e: return Key::Backslash; // TODO: Fix duplicate key.
 		case 0x5f: return Key::F11;
-
+		//
 		case 0x68: return Key::NumEnter;
 		case 0x69: return Key::RControl;
 		case 0x6a: return Key::Divide;
-
+		//
 		case 0x6c: return Key::RAlt;
-
+		//
 		case 0x6e: return Key::Home;
 		case 0x6f: return Key::Up;
 		case 0x70: return Key::PageUp;
@@ -152,15 +152,15 @@ namespace
 		case 0x75: return Key::PageDown;
 		case 0x76: return Key::Insert;
 		case 0x77: return Key::Delete;
-
-		case 0x7f:
-			return Key::Pause;
-
-			//case 0x85: return Key::LWin;
-			//case 0x86: return Key::RWin;
-			//case 0x87: return Key::Menu; // The key between RWin and RControl.
+		//
+		case 0x7f: return Key::Pause;
+		//
+		//case 0x85: return Key::LWin;
+		//case 0x86: return Key::RWin;
+		//case 0x87: return Key::Menu; // The key between RWin and RControl.
+		//
+		default: return Key::Null;
 		}
-		return Key::Null;
 	}
 
 	auto make_atom(xcb_connection_t* connection, bool only_if_exists, std::string_view name)
@@ -313,11 +313,10 @@ namespace Yttrium
 		_window = ::xcb_generate_id(_application.connection());
 
 		const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-		const uint32_t list[] =
-			{
-				_application.screen()->black_pixel,
-				XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_FOCUS_CHANGE,
-			};
+		const uint32_t list[]{
+			_application.screen()->black_pixel,
+			XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_FOCUS_CHANGE,
+		};
 		::xcb_create_window(_application.connection(), XCB_COPY_FROM_PARENT, _window, _application.screen()->root,
 			0, 0, _application.screen()->width_in_pixels, _application.screen()->height_in_pixels, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, _application.screen()->root_visual, mask, list);
 

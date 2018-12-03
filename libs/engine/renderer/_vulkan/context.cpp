@@ -354,7 +354,7 @@ namespace Yttrium
 		Y_VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(_data._physical_device, _data._surface, &count, formats.data()));
 		if (formats.empty())
 			throw std::runtime_error{ "No surface formats defined" };
-		else if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
+		if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
 			formats.clear();
 		return formats;
 	}
@@ -370,10 +370,9 @@ namespace Yttrium
 		vkGetPhysicalDeviceFormatProperties(_data._physical_device, format, &properties);
 		if ((properties.linearTilingFeatures & flags) == flags)
 			return VK_IMAGE_TILING_LINEAR;
-		else if ((properties.optimalTilingFeatures & flags) == flags)
+		if ((properties.optimalTilingFeatures & flags) == flags)
 			return VK_IMAGE_TILING_OPTIMAL;
-		else
-			throw std::runtime_error{ "Unsupported format" };
+		throw std::runtime_error{ "Unsupported format" };
 	}
 
 	void VulkanContext::wait_idle() const
