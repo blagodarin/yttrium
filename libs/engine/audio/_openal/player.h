@@ -20,8 +20,6 @@
 #include "format.h"
 #include "wrappers.h"
 
-#include <array>
-
 namespace Yttrium
 {
 	class OpenALPlayer final : public AudioPlayerBackend
@@ -40,7 +38,7 @@ namespace Yttrium
 
 	private:
 		OpenALSource _source;
-		std::array<OpenALBuffer, 2> _buffers;
+		OpenALBuffers<2> _buffers;
 		OpenALFormat _format;
 	};
 }

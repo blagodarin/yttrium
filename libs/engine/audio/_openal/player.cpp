@@ -25,7 +25,7 @@ namespace Yttrium
 
 	void OpenALPlayer::set_format(const AudioFormat& format)
 	{
-		_format = OpenALFormat(format);
+		_format = OpenALFormat{ format };
 	}
 
 	void OpenALPlayer::fill_buffer(size_t index, void* data, size_t size)

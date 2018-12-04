@@ -147,6 +147,7 @@ else()
 		audio/_openal/player.h
 		audio/_openal/sound.cpp
 		audio/_openal/sound.h
+		audio/_openal/wrappers.h
 		)
 	target_include_directories(yengine SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
 	target_link_libraries(yengine PRIVATE ${OPENAL_LIBRARY})

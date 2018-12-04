@@ -32,6 +32,6 @@ namespace Yttrium
 	private:
 		OpenALFormat _format;
 		OpenALSource _source;
-		OpenALBuffer _buffer;
+		OpenALBuffers<1> _buffers;
 	};
 }

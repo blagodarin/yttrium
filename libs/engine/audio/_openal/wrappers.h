@@ -19,31 +19,33 @@
 #include <yttrium/exceptions.h>
 #include "../../application/openal.h"
 
+#include <array>
+
 namespace Yttrium
 {
-	class OpenALBuffer
+	template <ALsizei N>
+	class OpenALBuffers
 	{
 	public:
-		OpenALBuffer()
+		OpenALBuffers()
 		{
-			::alGenBuffers(1, &_buffer);
+			::alGenBuffers(N, _buffers.data());
 			if (::alGetError() != AL_NO_ERROR)
-				throw InitializationError("Failed to allocate OpenAL buffer");
+				throw InitializationError{ "Failed to allocate OpenAL buffers" };
 		}
 
-		~OpenALBuffer()
+		~OpenALBuffers()
 		{
-			::alDeleteBuffers(1, &_buffer);
+			::alDeleteBuffers(N, _buffers.data());
 		}
 
-		operator ALuint() const { return _buffer; }
-		const ALuint* operator&() const { return &_buffer; }
+		ALuint& operator[](std::size_t i) noexcept { return _buffers[i]; }
 
-		OpenALBuffer(const OpenALBuffer&) = delete;
-		OpenALBuffer& operator=(const OpenALBuffer&) = delete;
+		OpenALBuffers(const OpenALBuffers&) = delete;
+		OpenALBuffers& operator=(const OpenALBuffers&) = delete;
 
 	private:
-		ALuint _buffer = 0;
+		std::array<ALuint, N> _buffers{};
 	};
 
 	class OpenALSource
