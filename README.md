@@ -5,11 +5,12 @@
 
 # Yttrium
 
-Yttrium is (intended to become) a game development toolkit.
+Yttrium is (intended to become) a game development framework.
 
-Yttrium is being developed in my spare time when I have nothing better
-to do. As a consequence, it is really far from production use, and may never
-become near to it.
+Yttrium aims to:
+* Be a *modern C++ framework* in terms of API design, software architecture, development tools and coding practices.
+
+## See also
 
 * [Build instructions](docs/build.md)
 * [Roadmap](docs/roadmap.md)
