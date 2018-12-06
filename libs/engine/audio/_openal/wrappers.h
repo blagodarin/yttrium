@@ -23,20 +23,20 @@
 
 namespace Yttrium
 {
-	template <ALsizei N>
+	template <std::size_t N>
 	class OpenALBuffers
 	{
 	public:
 		OpenALBuffers()
 		{
-			::alGenBuffers(N, _buffers.data());
+			::alGenBuffers(static_cast<ALsizei>(_buffers.size()), _buffers.data());
 			if (::alGetError() != AL_NO_ERROR)
 				throw InitializationError{ "Failed to allocate OpenAL buffers" };
 		}
 
 		~OpenALBuffers()
 		{
-			::alDeleteBuffers(N, _buffers.data());
+			::alDeleteBuffers(static_cast<ALsizei>(_buffers.size()), _buffers.data());
 		}
 
 		ALuint& operator[](std::size_t i) noexcept { return _buffers[i]; }
