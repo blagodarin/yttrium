@@ -81,7 +81,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		)
 
 	if(ENABLE_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
+		if(BUILD_SHARED_LIBS)
+			add_compile_options(-fno-sanitize=vptr)
+		endif()
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
 endif()
@@ -108,17 +111,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		-Wuninitialized
 		-Wunsafe-loop-optimizations
 		-Wuseless-cast
+		-Wzero-as-null-pointer-constant
 		)
 
 	if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
 		add_compile_options(
 			-Winline # Issued for header-only code.
-			)
-	endif()
-
-	if(NOT Y_RENDERER_VULKAN)
-		add_compile_options(
-			-Wzero-as-null-pointer-constant # Issued for every usage of VK_NULL_HANDLE.
 			)
 	endif()
 
@@ -150,7 +148,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	endif()
 
 	if(ENABLE_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute -fno-sanitize=vptr)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
+		if(BUILD_SHARED_LIBS)
+			add_compile_options(-fno-sanitize=vptr)
+		endif()
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
 endif()

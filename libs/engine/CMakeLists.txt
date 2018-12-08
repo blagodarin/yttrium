@@ -312,6 +312,10 @@ elseif(Y_RENDERER_VULKAN)
 		renderer/_vulkan/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE Vulkan::Vulkan)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		# VK_NULL_HANDLE is defined to be 0 and is used for both pointers and integers.
+		target_compile_options(yengine PRIVATE -Wno-zero-as-null-pointer-constant)
+	endif()
 else()
 	y_sources(yengine "src/renderer/_null"
 		renderer/_null/renderer.cpp
