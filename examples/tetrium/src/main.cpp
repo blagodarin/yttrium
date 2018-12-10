@@ -160,10 +160,7 @@ int main(int, char**)
 	Gui gui{ resource_loader, script, "examples/tetrium/data/gui.ion" };
 	gui.on_quit([&window] { window.close(); });
 
-	window.on_key_event([&gui](const KeyEvent& event) { gui.process_key_event(event); });
-	window.on_render([&gui](RenderPass& pass, const Vector2& cursor) { gui.draw(pass, cursor); });
-	window.on_screenshot([](Image&& image) { image.save(::make_screenshot_path()); });
-	window.on_update([&script, &gui, &logic](const UpdateEvent& event) {
+	application.on_update([&script, &gui, &logic](const UpdateEvent& event) {
 		if (logic.advance(static_cast<int>(event.milliseconds.count())))
 		{
 			script.set("score", logic.score());
@@ -173,6 +170,10 @@ int main(int, char**)
 				gui.notify("game_over");
 		}
 	});
+
+	window.on_key_event([&gui](const KeyEvent& event) { gui.process_key_event(event); });
+	window.on_render([&gui](RenderPass& pass, const Vector2& cursor) { gui.draw(pass, cursor); });
+	window.on_screenshot([](Image&& image) { image.save(::make_screenshot_path()); });
 
 	TetriumGraphics graphics{ window.render_manager() };
 

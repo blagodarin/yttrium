@@ -100,6 +100,8 @@ Game::Game(const Storage& storage)
 	: _storage{ storage }
 	, _minimap_canvas{ std::make_unique<MinimapCanvas>(_position, _visibility_quad) }
 {
+	_application.on_update([this](const UpdateEvent& event) { update(event); });
+
 	_script.define("debug", [this](const ScriptCall&) { _debug_text_visible = !_debug_text_visible; });
 	_script.define("screenshot", [this](const ScriptCall&) { _window.take_screenshot(); });
 
@@ -115,7 +117,6 @@ Game::Game(const Storage& storage)
 			pass.add_debug_text(_debug_text);
 	});
 	_window.on_screenshot([](Image&& image) { image.save(::make_screenshot_path()); });
-	_window.on_update([this](const UpdateEvent& event) { update(event); });
 
 	_gui.bind_canvas("minimap", *_minimap_canvas);
 	_gui.on_quit([this] { _window.close(); });

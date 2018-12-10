@@ -37,9 +37,55 @@ namespace Yttrium
 
 	Application::~Application() noexcept = default;
 
+	void Application::on_update(const std::function<void(const UpdateEvent&)>& callback)
+	{
+		_private->_on_update = callback;
+	}
+
 	void Application::run()
 	{
-		if (auto* window = _private->window())
-			window->run();
+		using namespace std::literals::chrono_literals;
+
+		auto* window = _private->window();
+		if (!window)
+			return;
+
+		UpdateEvent update;
+		int frames = 0;
+		auto max_frame_time = 0ms;
+		auto clock = std::chrono::high_resolution_clock::now();
+		auto fps_time = 0ms;
+		while (window->process_events())
+		{
+			window->update();
+
+			if (_private->_on_update)
+				_private->_on_update(update);
+
+			update.triangles = 0;
+			update.draw_calls = 0;
+			update.texture_switches = 0;
+			update.redundant_texture_switches = 0;
+			update.shader_switches = 0;
+			update.redundant_shader_switches = 0;
+
+			window->render(update);
+
+			++frames;
+			update.milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - clock);
+			clock += update.milliseconds;
+			fps_time += update.milliseconds;
+			if (max_frame_time < update.milliseconds)
+				max_frame_time = update.milliseconds;
+
+			if (fps_time >= 1s)
+			{
+				update.fps = static_cast<int>(frames * 1000 / fps_time.count());
+				update.max_frame_time = max_frame_time;
+				fps_time = 0ms;
+				frames = 0;
+				max_frame_time = 0ms;
+			}
+		}
 	}
 }

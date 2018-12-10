@@ -17,6 +17,7 @@
 #pragma once
 
 #include "../renderer/builtin/builtin.h"
+#include "../renderer/pass.h"
 #include "../renderer/renderer.h"
 #include "application.h"
 #include "window_backend.h"
@@ -35,7 +36,9 @@ namespace Yttrium
 	public:
 		WindowPrivate(Application&, std::string_view name);
 
-		void run();
+		bool process_events() { return _backend.process_events(); }
+		void render(UpdateEvent&);
+		void update();
 
 	private:
 		void on_focus_event(bool is_focused) override;
@@ -45,7 +48,6 @@ namespace Yttrium
 
 	private:
 		void lock_cursor(bool);
-		bool process_events();
 		void set_active(bool);
 
 	private:
@@ -54,6 +56,7 @@ namespace Yttrium
 		WindowBackend _backend{ _name, *this };
 		RendererImpl _renderer{ _backend };
 		RenderBuiltin _renderer_builtin{ *_renderer._backend };
+		RenderPassData _render_pass_data;
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;
@@ -65,7 +68,6 @@ namespace Yttrium
 		std::function<void(RenderPass&, const Vector2&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(std::string_view)> _on_text_event;
-		std::function<void(const UpdateEvent&)> _on_update;
 
 		friend Window;
 	};

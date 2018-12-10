@@ -14,6 +14,6 @@ void main()
 	vec3 l = normalize(vec3(0, 0, 8) - v);
 	vec3 r = -reflect(l, nn);
 	vec3 diffuse = vec3(1, 1, 1) * max(dot(nn, l), 0);
-	vec4 c = texture2D(surface_texture, texcoord.xy);
+	vec4 c = texture(surface_texture, texcoord.xy);
 	color = vec4(diffuse, 1) * c;
 }

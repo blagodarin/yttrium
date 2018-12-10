@@ -17,10 +17,12 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
 namespace Yttrium
 {
 	class Application;
+	struct UpdateEvent;
 	class WindowPrivate;
 
 	class ApplicationPrivate
@@ -31,7 +33,10 @@ namespace Yttrium
 		static void add_window(Application&, WindowPrivate&);
 
 	private:
+		std::function<void(const UpdateEvent&)> _on_update;
 		std::atomic<WindowPrivate*> _window{ nullptr };
+
+		friend Application;
 	};
 
 	struct ApplicationStub

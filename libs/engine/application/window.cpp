@@ -17,9 +17,9 @@
 #include <yttrium/window.h>
 #include "window.h"
 
+#include <yttrium/application.h>
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
-#include "../renderer/pass.h"
 
 namespace Yttrium
 {
@@ -32,56 +32,50 @@ namespace Yttrium
 			on_resize_event(*size);
 	}
 
-	void WindowPrivate::run()
+	void WindowPrivate::render(UpdateEvent& update)
 	{
-		using namespace std::literals::chrono_literals;
-
-		UpdateEvent update;
-		int frames = 0;
-		auto max_frame_time = 0ms;
-		auto clock = std::chrono::high_resolution_clock::now();
-		auto fps_time = 0ms;
-		RenderPassData render_pass_data;
-		while (process_events())
 		{
-			if (_on_update)
-				_on_update(update);
-			{
-				RenderPassImpl pass{ *_renderer._backend, _renderer_builtin, render_pass_data, _size };
-				PushProgram program{ pass, _renderer_builtin._program_2d.get() };
-				Push2D projection{ pass };
-				if (_on_render)
-					_on_render(pass, Vector2{ _cursor });
-				const auto& statistics = pass.statistics();
-				update.triangles = statistics._triangles;
-				update.draw_calls = statistics._draw_calls;
-				update.texture_switches = statistics._texture_switches;
-				update.redundant_texture_switches = statistics._redundant_texture_switches;
-				update.shader_switches = statistics._shader_switches;
-				update.redundant_shader_switches = statistics._redundant_shader_switches;
-				pass.draw_debug_text();
-			}
-			_backend.swap_buffers();
-			if (_take_screenshot)
-			{
-				_take_screenshot = false;
-				if (_on_screenshot)
-					_on_screenshot(_renderer.take_screenshot(_size));
-			}
-			++frames;
-			update.milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - clock);
-			clock += update.milliseconds;
-			fps_time += update.milliseconds;
-			max_frame_time = std::max(max_frame_time, update.milliseconds);
-			if (fps_time >= 1s)
-			{
-				update.fps = static_cast<int>(frames * 1000 / fps_time.count());
-				update.max_frame_time = max_frame_time;
-				fps_time = 0ms;
-				frames = 0;
-				max_frame_time = 0ms;
-			}
+			RenderPassImpl pass{ *_renderer._backend, _renderer_builtin, _render_pass_data, _size };
+			PushProgram program{ pass, _renderer_builtin._program_2d.get() };
+			Push2D projection{ pass };
+			if (_on_render)
+				_on_render(pass, Vector2{ _cursor });
+			const auto& statistics = pass.statistics();
+			update.triangles += statistics._triangles;
+			update.draw_calls += statistics._draw_calls;
+			update.texture_switches += statistics._texture_switches;
+			update.redundant_texture_switches += statistics._redundant_texture_switches;
+			update.shader_switches += statistics._shader_switches;
+			update.redundant_shader_switches += statistics._redundant_shader_switches;
+			pass.draw_debug_text();
 		}
+		_backend.swap_buffers();
+		if (_take_screenshot)
+		{
+			_take_screenshot = false;
+			if (_on_screenshot)
+				_on_screenshot(_renderer.take_screenshot(_size));
+		}
+	}
+
+	void WindowPrivate::update()
+	{
+		if (!_is_active)
+			return;
+
+		Point cursor = Rect{ _size }.center();
+		_backend.get_cursor(cursor);
+
+		const auto dx = _cursor._x - cursor._x;
+		const auto dy = cursor._y - _cursor._y;
+
+		if (!_is_cursor_locked)
+			_cursor = Rect{ _size }.bound(cursor);
+		else
+			_backend.set_cursor(_cursor);
+
+		if (_on_cursor_moved)
+			_on_cursor_moved(dx, dy);
 	}
 
 	void WindowPrivate::on_focus_event(bool is_focused)
@@ -146,31 +140,6 @@ namespace Yttrium
 		}
 	}
 
-	bool WindowPrivate::process_events()
-	{
-		if (!_backend.process_events())
-			return false;
-
-		if (!_is_active)
-			return true;
-
-		Point cursor = Rect{ _size }.center();
-		_backend.get_cursor(cursor);
-
-		const auto dx = _cursor._x - cursor._x;
-		const auto dy = cursor._y - _cursor._y;
-
-		if (!_is_cursor_locked)
-			_cursor = Rect{ _size }.bound(cursor);
-		else
-			_backend.set_cursor(_cursor);
-
-		if (_on_cursor_moved)
-			_on_cursor_moved(dx, dy);
-
-		return true;
-	}
-
 	void WindowPrivate::set_active(bool active)
 	{
 		_is_active = active;
@@ -222,11 +191,6 @@ namespace Yttrium
 	void Window::on_text_event(const std::function<void(std::string_view)>& callback)
 	{
 		_private->_on_text_event = callback;
-	}
-
-	void Window::on_update(const std::function<void(const UpdateEvent&)>& callback)
-	{
-		_private->_on_update = callback;
 	}
 
 	RenderManager& Window::render_manager()
