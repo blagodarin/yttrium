@@ -62,7 +62,18 @@ function(y3_run)
 endfunction()
 
 function(y3_cmake _dir)
-  cmake_parse_arguments(_arg "BUILD_TO_PREFIX;HEADER_ONLY" "TARGET" "CL;OPTIONS" ${ARGN})
+  cmake_parse_arguments(_arg "BUILD_TO_PREFIX;HEADER_ONLY;OUT_OF_SOURCE" "TARGET" "CL;OPTIONS" ${ARGN})
+  set(_source_dir ${BUILD_DIR}/${_dir})
+  if(_arg_OUT_OF_SOURCE)
+    set(_build_dir ${_source_dir}-build)
+    if(EXISTS ${_build_dir})
+      message(STATUS "[Y3] Removing ${_dir}-build")
+      file(REMOVE_RECURSE ${_build_dir})
+    endif()
+    file(MAKE_DIRECTORY ${_build_dir})
+  else()
+    set(_build_dir ${_source_dir})
+  endif()
   message(STATUS "[Y3] Building ${_dir}")
   if(_arg_HEADER_ONLY)
     set(_configs ${CONFIG})
@@ -87,11 +98,11 @@ function(y3_cmake _dir)
       endif()
     endif()
   endif()
-  y3_run(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${BUILD_DIR}/${_dir}
+  y3_run(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source_dir}
       -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
       ${_options}
       ${_arg_OPTIONS}
-    WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
+    WORKING_DIRECTORY ${_build_dir})
   if(_arg_TARGET)
     set(_target ${_arg_TARGET})
   else()
@@ -102,8 +113,8 @@ function(y3_cmake _dir)
     set(_env_cl "CL=$ENV{CL} ${_cl}")
   endif()
   foreach(_config ${_configs})
-    y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${BUILD_DIR}/${_dir} --config ${_config} --target ${_target} ${BUILD_OPTIONS}
-      WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
+    y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${_build_dir} --config ${_config} --target ${_target} ${BUILD_OPTIONS}
+      WORKING_DIRECTORY ${_build_dir})
   endforeach()
 endfunction()
 
@@ -210,6 +221,7 @@ y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
 y3_package(png REQUIRES zlib)
 y3_package(catch2)
+y3_package(freetype)
 y3_package(glslang)
 y3_package(ogg)
 y3_package(lcov)
@@ -228,6 +240,22 @@ if("catch2" IN_LIST _y3_packages)
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
+endif()
+
+if("freetype" IN_LIST _y3_packages)
+  set(_version "2.9")
+  set(_package "freetype-${_version}")
+  y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.bz2"
+    SHA1 "94c4399b1a55c5892812e732843fcb4a7c2fe657")
+  y3_extract("${_package}.tar.bz2" DIR ${_package})
+  y3_cmake(${_package} BUILD_TO_PREFIX OUT_OF_SOURCE
+    OPTIONS
+      -DDISABLE_FORCE_DEBUG_POSTFIX=ON
+      -DSKIP_INSTALL_LIBRARIES=ON
+      -DWITH_BZip2=OFF
+      -DWITH_HarfBuzz=OFF
+      -DWITH_PNG=OFF
+      -DWITH_ZLIB=OFF)
 endif()
 
 if("glslang" IN_LIST _y3_packages)
