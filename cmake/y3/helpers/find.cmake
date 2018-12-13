@@ -18,7 +18,19 @@ include(FindPackageHandleStandardArgs)
 include(SelectLibraryConfigurations)
 
 function(y3_find_package _package)
-  set(_one_value_args HEADER LIBRARY LIBRARY_DEBUG VERSION_HEADER VERSION_REGEX VERSION_SUFFIX)
+  set(_one_value_args
+    HEADER
+    HEADER_PREFIX
+    LIBRARY
+    LIBRARY_DEBUG
+    VERSION_HEADER
+    VERSION_REGEX
+    VERSION_REGEX_MAJOR
+    VERSION_REGEX_MINOR
+    VERSION_REGEX_PATCH
+    VERSION_SUFFIX
+    )
+
   cmake_parse_arguments(_arg "C" "${_one_value_args}" "" ${ARGN})
 
   if(_arg_C)
@@ -33,15 +45,29 @@ function(y3_find_package _package)
     set(_library_debug ${_arg_LIBRARY})
   endif()
 
-  find_path(${_package}_INCLUDE_DIR ${_arg_HEADER})
+  if(_arg_HEADER_PREFIX)
+    find_path(${_package}_INCLUDE_DIR ${_arg_HEADER} PATH_SUFFIXES ${_arg_HEADER_PREFIX})
+  else()
+    find_path(${_package}_INCLUDE_DIR ${_arg_HEADER})
+  endif()
   mark_as_advanced(${_package}_INCLUDE_DIR)
 
-  if(_arg_VERSION_HEADER AND _arg_VERSION_REGEX)
+  if(_arg_VERSION_HEADER AND ${_package}_INCLUDE_DIR)
     set(_version_header "${${_package}_INCLUDE_DIR}/${_arg_VERSION_HEADER}")
-    if(${_package}_INCLUDE_DIR AND EXISTS "${_version_header}")
-      file(STRINGS "${_version_header}" _version_string REGEX "${_arg_VERSION_REGEX}")
-      string(REGEX REPLACE "${_arg_VERSION_REGEX}" "\\1" ${_package}_VERSION_STRING "${_version_string}")
-      if(_arg_VERSION_SUFFIX)
+    if(EXISTS "${_version_header}")
+      if(_arg_VERSION_REGEX)
+        file(STRINGS "${_version_header}" _version_string REGEX "${_arg_VERSION_REGEX}")
+        string(REGEX REPLACE "${_arg_VERSION_REGEX}" "\\1" ${_package}_VERSION_STRING "${_version_string}")
+      elseif(_arg_VERSION_REGEX_MAJOR AND _arg_VERSION_REGEX_MINOR AND _arg_VERSION_REGEX_PATCH)
+        file(STRINGS "${_version_header}" _major_string REGEX "${_arg_VERSION_REGEX_MAJOR}")
+        file(STRINGS "${_version_header}" _minor_string REGEX "${_arg_VERSION_REGEX_MINOR}")
+        file(STRINGS "${_version_header}" _patch_string REGEX "${_arg_VERSION_REGEX_PATCH}")
+        string(REGEX REPLACE "${_arg_VERSION_REGEX_MAJOR}" "\\1" _major "${_major_string}")
+        string(REGEX REPLACE "${_arg_VERSION_REGEX_MINOR}" "\\1" _minor "${_minor_string}")
+        string(REGEX REPLACE "${_arg_VERSION_REGEX_PATCH}" "\\1" _patch "${_patch_string}")
+        set(${_package}_VERSION_STRING "${_major}.${_minor}.${_patch}")
+      endif()
+      if(${_package}_VERSION_STRING AND _arg_VERSION_SUFFIX)
         set(${_package}_VERSION_STRING "${${_package}_VERSION_STRING}-${_arg_VERSION_SUFFIX}")
       endif()
     endif()
