@@ -156,6 +156,7 @@ endif()
 ########################################################################################################################
 # gui
 y_sources(yengine "include/gui"
+	../../include/yttrium/gui/font.h
 	../../include/yttrium/gui/gui.h
 	../../include/yttrium/gui/text_capture.h
 	../../include/yttrium/gui/texture_font.h
@@ -164,6 +165,7 @@ y_sources(yengine "src/gui"
 	gui/actions.cpp
 	gui/actions.h
 	gui/cursor.h
+	gui/font.cpp
 	gui/gui.cpp
 	gui/gui.h
 	gui/key_lookup.cpp
@@ -199,6 +201,13 @@ y_sources(yengine "src/gui/widgets"
 	gui/widgets/label.cpp
 	gui/widgets/label.h
 	)
+if(WIN32)
+	find_package(Y3_freetype REQUIRED)
+	target_link_libraries(yengine PRIVATE Y3::freetype)
+else()
+	find_package(Freetype REQUIRED)
+	target_link_libraries(yengine PRIVATE Freetype::Freetype)
+endif()
 
 ########################################################################################################################
 # renderer

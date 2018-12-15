@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_gui_texture_font_h_
-#define _include_yttrium_gui_texture_font_h_
+#ifndef _include_yttrium_gui_font_h_
+#define _include_yttrium_gui_font_h_
 
 #include <yttrium/api.h>
 
@@ -25,7 +25,7 @@
 
 namespace Yttrium
 {
-	class Rect;
+	class Image;
 	class Size;
 	class SizeF;
 	class Source;
@@ -33,27 +33,19 @@ namespace Yttrium
 	class TexturedRect;
 	class Vector2;
 
-	/// Texture font markup.
-	class Y_ENGINE_API TextureFont
+	class Y_ENGINE_API Font
 	{
 	public:
-		///
-		/// May throw DataError.
-		static std::unique_ptr<TextureFont> load(const Source&);
+		explicit Font(const Source&);
+		~Font() noexcept;
 
-		virtual ~TextureFont() = default;
+		void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const;
+		Image image() const;
+		Size text_size(std::string_view) const;
+		SizeF text_size(std::string_view, const SizeF& font_size) const;
 
-		///
-		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const = 0;
-
-		///
-		virtual Rect rect() const = 0;
-
-		///
-		virtual Size text_size(std::string_view) const = 0;
-
-		///
-		virtual SizeF text_size(std::string_view, const SizeF& font_size) const = 0;
+	private:
+		const std::unique_ptr<class FontPrivate> _private;
 	};
 }
 

@@ -40,6 +40,13 @@ namespace Yttrium
 	class TextureFontImpl final : public TextureFont
 	{
 	public:
+		struct CharInfo
+		{
+			Rect rect;
+			Point offset;
+			int advance;
+		};
+
 		explicit TextureFontImpl(int size)
 			: _size{ size } {}
 
@@ -127,7 +134,7 @@ namespace Yttrium
 
 	private:
 		const int _size;
-		std::unordered_map<char, TextureFont::CharInfo> _chars;
+		std::unordered_map<char, CharInfo> _chars;
 		std::unordered_map<uint16_t, int> _kernings;
 		Rect _rect;
 
@@ -165,9 +172,9 @@ namespace Yttrium
 			if (!reader.read(char_data))
 				throw DataError("Bad 'char' section entry ", i);
 
-			CharInfo info;
+			TextureFontImpl::CharInfo info;
 			info.rect = { { font_section.base_x + char_data.x, font_section.base_y + char_data.y }, Size{ char_data.width, char_data.height } };
-			info.offset = Point{ char_data.x_offset, char_data.y_offset };
+			info.offset = { char_data.x_offset, char_data.y_offset };
 			info.advance = char_data.advance;
 
 			font->_chars[char_data.id] = info;
