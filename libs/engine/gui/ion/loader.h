@@ -86,8 +86,7 @@ namespace Yttrium
 	private:
 		GuiPrivate& _gui;
 		std::unordered_map<std::string_view, std::function<std::unique_ptr<Widget>(std::string_view, std::unique_ptr<WidgetData>&&)>> _widget_factory;
-		std::shared_ptr<const TextureFont> _default_font;
-		std::shared_ptr<const Texture2D> _default_font_texture;
+		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
 	};
 }

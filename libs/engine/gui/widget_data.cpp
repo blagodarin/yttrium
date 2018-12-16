@@ -16,7 +16,7 @@
 
 #include "widget_data.h"
 
-#include <yttrium/gui/texture_font.h>
+#include <yttrium/gui/font.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
 #include <yttrium/renderer/texture.h>
@@ -28,7 +28,7 @@ namespace
 {
 	using namespace Yttrium;
 
-	SizeF make_text_size(const TextureFont& font, std::string_view text, float max_width, float max_height)
+	SizeF make_text_size(const Font& font, std::string_view text, float max_width, float max_height)
 	{
 		if (text.empty())
 			return { 0, max_height };
@@ -81,7 +81,7 @@ namespace Yttrium
 
 	void ForegroundProperty::draw(RenderPass& pass) const
 	{
-		PushTexture push_texture{ pass, font_texture.get(), Texture2D::TrilinearFilter };
+		PushTexture push_texture{ pass, font->texture(), Texture2D::TrilinearFilter };
 		pass.draw_rects(geometry, color);
 	}
 

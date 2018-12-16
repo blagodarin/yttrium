@@ -17,10 +17,11 @@
 #include <yttrium/gui/gui.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/gui/texture_font.h>
+#include <yttrium/gui/font.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
 #include "gui.h"
@@ -65,10 +66,10 @@ namespace Yttrium
 		_translation = _resource_loader.load_translation(path);
 	}
 
-	const GuiPrivate::FontDesc* GuiPrivate::font(const std::string& name) const
+	std::shared_ptr<const Font> GuiPrivate::font(const std::string& name) const
 	{
 		const auto i = _fonts.find(name);
-		return i != _fonts.end() ? &i->second : nullptr;
+		return i != _fonts.end() ? i->second : nullptr;
 	}
 
 	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
@@ -127,18 +128,8 @@ namespace Yttrium
 
 	void GuiPrivate::set_font(const std::string& name, std::string_view font_source, std::string_view texture_name)
 	{
-		auto texture = _resource_loader.load_texture_2d(texture_name);
-		assert(texture);
-
-		auto texture_font = _resource_loader.load_texture_font(font_source);
-		assert(texture_font);
-
-		if (!Rect(texture->size()).contains(texture_font->rect()))
-			throw GuiDataError{ "Can't use font \"", font_source, "\" with texture \"", texture_name, "\"" };
-
-		auto& font = _fonts[name];
-		font.font = std::move(texture_font);
-		font.texture = std::move(texture);
+		auto font = Font::load(*_resource_loader.open(font_source), _resource_loader.load_texture_2d(texture_name));
+		_fonts[name] = std::move(font);
 	}
 
 	std::string GuiPrivate::translate(std::string_view source) const

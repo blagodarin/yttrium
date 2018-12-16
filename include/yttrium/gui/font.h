@@ -37,19 +37,14 @@ namespace Yttrium
 	class Y_ENGINE_API Font
 	{
 	public:
-		Font(const Source&, RenderManager&);
-		Font(const Source&, const std::shared_ptr<const Texture2D>&);
-		Font(Font&&) noexcept = default;
-		~Font() noexcept;
-		Font& operator=(Font&&) = default;
+		static std::unique_ptr<Font> load(const Source&, RenderManager&);
+		static std::unique_ptr<Font> load(const Source&, const std::shared_ptr<const Texture2D>&);
 
-		void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const;
-		const Texture2D* texture() const;
-		Size text_size(std::string_view) const;
-		SizeF text_size(std::string_view, const SizeF& font_size) const;
-
-	private:
-		std::unique_ptr<class FontPrivate> _private;
+		virtual ~Font() noexcept = default;
+		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const = 0;
+		virtual Size text_size(std::string_view) const = 0;
+		virtual SizeF text_size(std::string_view, const SizeF& font_size) const = 0;
+		virtual const Texture2D* texture() const = 0;
 	};
 }
 

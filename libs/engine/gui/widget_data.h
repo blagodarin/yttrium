@@ -28,10 +28,10 @@
 
 namespace Yttrium
 {
+	class Font;
 	class RenderPass;
 	class Sound;
 	class TextCapture;
-	class TextureFont;
 	class TexturedRect;
 
 	enum
@@ -67,8 +67,7 @@ namespace Yttrium
 
 	struct ForegroundProperty
 	{
-		std::shared_ptr<const TextureFont> font;
-		std::shared_ptr<const Texture2D> font_texture;
+		std::shared_ptr<const Font> font;
 		float size = 7 / 8.f;
 		Color4f color{ 1, 1, 1 };
 		unsigned alignment = 0;

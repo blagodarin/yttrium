@@ -274,9 +274,7 @@ namespace Yttrium
 		{
 			if (_default_font)
 				throw GuiDataError{ "Default font redefinition" };
-			const auto font_desc = _gui.font(font_name);
-			_default_font = font_desc->font;
-			_default_font_texture = font_desc->texture;
+			_default_font = _gui.font(font_name);
 		}
 		token.next(ion);
 	}
@@ -462,9 +460,7 @@ namespace Yttrium
 		else
 		{
 			data = std::make_unique<WidgetData>();
-			auto& foreground = data->_styles[WidgetData::Style::Normal]._foreground;
-			foreground.font = _default_font;
-			foreground.font_texture = _default_font_texture;
+			data->_styles[WidgetData::Style::Normal]._foreground.font = _default_font;
 		}
 		token.check_object_begin();
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
@@ -592,11 +588,9 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_font(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (const auto font_desc = _gui.font(std::string{ token.to_value() }))
+		if (const auto font = _gui.font(std::string{ token.to_value() }))
 		{
-			auto& foreground = data._foreground;
-			foreground.font = font_desc->font;
-			foreground.font_texture = font_desc->texture;
+			data._foreground.font = font;
 			token.next(ion);
 		}
 		else

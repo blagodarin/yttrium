@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_gui_h_
-#define _src_gui_gui_h_
+#pragma once
 
 #include "actions.h"
 #include "cursor.h"
@@ -31,6 +30,7 @@
 namespace Yttrium
 {
 	class Canvas;
+	class Font;
 	class Gui;
 	class GuiScreen;
 	class MusicReader;
@@ -40,19 +40,12 @@ namespace Yttrium
 	class ScriptContext;
 	class Storage;
 	class Texture2D;
-	class TextureFont;
 	class Translation;
 	class Vector2;
 
 	class GuiPrivate
 	{
 	public:
-		struct FontDesc
-		{
-			std::shared_ptr<const TextureFont> font;
-			std::shared_ptr<const Texture2D> texture;
-		};
-
 		GuiPrivate(ResourceLoader&, ScriptContext&);
 		~GuiPrivate();
 
@@ -62,7 +55,7 @@ namespace Yttrium
 			if (_on_custom_cursor)
 				_on_custom_cursor(pass, point);
 		}
-		const FontDesc* font(const std::string& name) const;
+		std::shared_ptr<const Font> font(const std::string& name) const;
 		void on_canvas_draw(RenderPass&, const std::string& name, const RectF&) const;
 		void on_canvas_mouse_move(const std::string& name, const RectF&, const Vector2&);
 		bool on_canvas_mouse_press(const std::string& name, const RectF&, Key, const Vector2&);
@@ -89,7 +82,7 @@ namespace Yttrium
 	private:
 		ResourceLoader& _resource_loader;
 		ScriptContext& _script_context;
-		std::unordered_map<std::string, FontDesc> _fonts;
+		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
 		std::unordered_map<std::string_view, std::unique_ptr<GuiScreen>> _screens;
 		GuiScreen* _root_screen = nullptr;
 		std::vector<GuiScreen*> _screen_stack;
@@ -105,5 +98,3 @@ namespace Yttrium
 		friend Gui;
 	};
 }
-
-#endif
