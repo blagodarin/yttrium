@@ -19,6 +19,8 @@
 #include "../../application/window_backend.h"
 #include "handles.h"
 
+#include <algorithm>
+
 #ifndef NDEBUG
 #	include <iostream>
 #endif
@@ -331,10 +333,16 @@ namespace Yttrium
 
 	VkCompositeAlphaFlagBitsKHR VulkanContext::composite_alpha() const noexcept
 	{
-		for (const auto bit : { VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR })
-			if (_data._surface_capabilities.supportedCompositeAlpha & static_cast<VkFlags>(bit))
-				return bit;
-		return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+		static const VkCompositeAlphaFlagBitsKHR bits[]{
+			VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+			VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR,
+			VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
+			VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
+		};
+		const auto i = std::find_if(std::begin(bits), std::end(bits), [this](auto bit) {
+			return _data._surface_capabilities.supportedCompositeAlpha & static_cast<VkFlags>(bit);
+		});
+		return i != std::end(bits) ? *i : VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	}
 
 	uint32_t VulkanContext::memory_type_index(uint32_t type_bits, VkFlags flags) const

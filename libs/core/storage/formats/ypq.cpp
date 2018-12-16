@@ -138,14 +138,11 @@ namespace Yttrium
 
 	struct YpqWriter::Entry
 	{
-		std::string name;
-		std::map<std::string, std::string, std::less<>> properties;
-		uint64_t offset = 0;
-		uint32_t size = 0;
+		std::string _name;
+		std::map<std::string, std::string, std::less<>> _properties;
 
-		// cppcheck-suppress noExplicitConstructor
-		Entry(std::string_view name_, std::map<std::string, std::string, std::less<>>&& properties_)
-			: name{ name_ }, properties{ std::move(properties_) } {}
+		Entry(std::string_view name, std::map<std::string, std::string, std::less<>>&& properties)
+			: _name{ name }, _properties{ std::move(properties) } {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
@@ -188,12 +185,12 @@ namespace Yttrium
 			for (const auto& entry : _entries)
 			{
 				entries.emplace_back().metadata_offset = static_cast<uint32_t>(metadata_offset + writer.offset());
-				if (!write_string(entry.name))
+				if (!write_string(entry._name))
 					return false;
-				const auto property_count = static_cast<uint8_t>(entry.properties.size());
-				if (property_count != entry.properties.size() || !writer.write(property_count))
+				const auto property_count = static_cast<uint8_t>(entry._properties.size());
+				if (property_count != entry._properties.size() || !writer.write(property_count))
 					return false;
-				for (const auto& [property_name, property_value] : entry.properties)
+				for (const auto& [property_name, property_value] : entry._properties)
 					if (!write_string(property_name) || !write_string(property_value))
 						return false;
 			}
@@ -219,7 +216,7 @@ namespace Yttrium
 
 		for (const auto& entry : _entries)
 		{
-			const auto source = Source::from(entry.name);
+			const auto source = Source::from(entry._name);
 			if (!source)
 				return false;
 			const auto i = static_cast<size_t>(&entry - _entries.data());

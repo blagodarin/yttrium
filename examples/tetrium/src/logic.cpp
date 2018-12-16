@@ -16,6 +16,7 @@
 
 #include "logic.h"
 
+#include <algorithm>
 #include <cassert>
 
 namespace
@@ -149,14 +150,16 @@ namespace Tetrium
 
 	void Figure::turn_left()
 	{
-		for (auto& block : _blocks)
-			block = { _top_left.x + (_top_left.y - block.y), _top_left.y - (_bottom_right.x - block.x) };
+		std::transform(_blocks.begin(), _blocks.end(), _blocks.begin(), [this](const Point& block) {
+			return Point{ _top_left.x + (_top_left.y - block.y), _top_left.y - (_bottom_right.x - block.x) };
+		});
 	}
 
 	void Figure::turn_right()
 	{
-		for (auto& block : _blocks)
-			block = { _bottom_right.x - (_top_left.y - block.y), _top_left.y + (_top_left.x - block.x) };
+		std::transform(_blocks.begin(), _blocks.end(), _blocks.begin(), [this](const Point& block) {
+			return Point{ _bottom_right.x - (_top_left.y - block.y), _top_left.y + (_top_left.x - block.x) };
+		});
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

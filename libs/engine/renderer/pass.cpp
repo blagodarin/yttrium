@@ -364,8 +364,6 @@ namespace Yttrium
 		const auto tx3 = texture.right();
 
 		const auto ty0 = texture.top();
-		const auto ty1 = texture.top() + borders._top;
-		const auto ty2 = texture.bottom() - borders._bottom;
 		const auto ty3 = texture.bottom();
 
 		*batch._vertices++ = { { px0, py0 }, color, { tx0, ty0 } };
@@ -376,6 +374,7 @@ namespace Yttrium
 		*batch._vertices++ = { { px3, py0 }, color, { tx3, ty0 } };
 		if (has_top_border)
 		{
+			const auto ty1 = texture.top() + borders._top;
 			*batch._vertices++ = { { px0, py1 }, color, { tx0, ty1 } };
 			if (has_left_border)
 				*batch._vertices++ = { { px1, py1 }, color, { tx1, ty1 } };
@@ -385,6 +384,7 @@ namespace Yttrium
 		}
 		if (has_bottom_border)
 		{
+			const auto ty2 = texture.bottom() - borders._bottom;
 			*batch._vertices++ = { { px0, py2 }, color, { tx0, ty2 } };
 			if (has_left_border)
 				*batch._vertices++ = { { px1, py2 }, color, { tx1, ty2 } };

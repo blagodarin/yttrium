@@ -109,7 +109,6 @@ namespace Yttrium
 		char* _items;
 	};
 
-	// cppcheck-suppress uninitMemberVar
 	PoolBase::PoolBase(size_t chunk_items, size_t item_size) noexcept
 		: _chunk_items{ chunk_items }
 		, _item_size{ item_size }

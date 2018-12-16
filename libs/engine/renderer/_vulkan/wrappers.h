@@ -88,7 +88,6 @@ namespace Yttrium
 			}
 		};
 
-		// cppcheck-suppress noExplicitConstructor
 		VK_DescriptorSetLayout(const VulkanContext&, std::vector<Binding>&&);
 		~VK_DescriptorSetLayout() noexcept { vkDestroyDescriptorSetLayout(_context->_device, _handle, nullptr); }
 	};
