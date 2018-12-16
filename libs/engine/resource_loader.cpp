@@ -253,4 +253,9 @@ namespace Yttrium
 		_private->release_unused();
 		assert(!_private->release_unused());
 	}
+
+	RenderManager* ResourceLoader::render_manager() const
+	{
+		return _private->_render_manager;
+	}
 }

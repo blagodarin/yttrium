@@ -61,6 +61,9 @@ namespace Yttrium
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();
 
+		///
+		RenderManager* render_manager() const;
+
 	private:
 		const std::unique_ptr<class ResourceLoaderPrivate> _private;
 	};

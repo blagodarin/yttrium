@@ -63,124 +63,6 @@ namespace Yttrium
 		}
 	};
 
-	class FontPrivate
-	{
-	public:
-		void load(const Source& source, const std::shared_ptr<const Texture2D>& texture)
-		{
-			Reader reader{ source };
-
-			std::uint32_t fourcc = 0;
-			if (!reader.read(fourcc) || fourcc != FourccYtf1)
-				throw DataError("Bad 'YTF1' fourcc");
-
-			if (!reader.read(fourcc) || fourcc != FourccFont)
-				throw DataError("Bad 'font' section fourcc");
-
-			Ytf1Font font_section;
-			if (!reader.read(font_section))
-				throw DataError("Bad 'font' section");
-
-			if (!reader.read(fourcc) || fourcc != FourccChar)
-				throw DataError("Bad 'char' section fourcc");
-
-			std::uint8_t char_count = 0;
-			if (!reader.read(char_count))
-				throw DataError("Bad 'char' section header");
-
-			FontData data;
-			data._size = font_section.size;
-
-			Size font_rect_size;
-			for (uint8_t i = 0; i < char_count; ++i)
-			{
-				Ytf1Char char_data;
-				if (!reader.read(char_data))
-					throw DataError("Bad 'char' section entry ", i);
-
-				FontChar info;
-				info.rect = { { font_section.base_x + char_data.x, font_section.base_y + char_data.y }, Size{ char_data.width, char_data.height } };
-				info.offset = { char_data.x_offset, char_data.y_offset };
-				info.advance = char_data.advance;
-
-				_data._chars[char_data.id] = info;
-				font_rect_size = { std::max(font_rect_size._width, char_data.x + char_data.width), std::max(font_rect_size._height, char_data.y + char_data.height) };
-			}
-
-			if (!Rect(texture->size()).contains({ { font_section.base_x, font_section.base_y }, font_rect_size }))
-				throw DataError{ "Font texture size mismatch" };
-
-			if (reader.read(fourcc))
-			{
-				if (fourcc != FourccKern)
-					throw DataError("Bad 'kern' section fourcc");
-
-				std::uint16_t kerning_count = 0;
-				if (!reader.read(kerning_count))
-					throw DataError("Bad 'kern' section header");
-
-				for (std::uint16_t i = 0; i < kerning_count; ++i)
-				{
-					Ytf1Kerning kerning;
-					if (!reader.read(kerning))
-						throw DataError("Bad 'kern' section entry ", i);
-					_data._kernings.emplace(FontData::key(kerning.first, kerning.second), kerning.amount);
-				}
-			}
-
-			_texture = texture;
-			_data = std::move(data);
-		}
-
-		void render(RenderManager& render_manager, std::size_t size)
-		{
-			assert(_freetype);
-			assert(_freetype->_face);
-			assert(!_texture);
-			const ImageFormat image_format{ size * 16, size * 8, PixelFormat::Gray8 };
-			Image image{ image_format };
-			std::unordered_map<char, FontChar> chars;
-			FT_Set_Pixel_Sizes(_freetype->_face, 0, static_cast<FT_UInt>(_data._size));
-			std::size_t x_offset = 0;
-			std::size_t y_offset = 0;
-			for (FT_UInt char_code = 0; char_code < 128; ++char_code)
-			{
-				if (FT_Load_Char(_freetype->_face, char_code, FT_LOAD_RENDER))
-					continue; // TODO: Report error.
-				if (_freetype->_face->glyph->bitmap.width > image_format.width() - x_offset)
-				{
-					x_offset = 0;
-					y_offset += size;
-				}
-				if (_freetype->_face->glyph->bitmap.rows > image_format.height() - y_offset)
-					break; // TODO: Report error.
-				auto src = _freetype->_face->glyph->bitmap.buffer;
-				auto dst = static_cast<std::uint8_t*>(image.data()) + image_format.row_size() * y_offset + x_offset;
-				for (unsigned y = 0; y < _freetype->_face->glyph->bitmap.rows; ++y)
-				{
-					std::memcpy(dst, src, _freetype->_face->glyph->bitmap.width);
-					src += _freetype->_face->glyph->bitmap.width;
-					dst += image_format.row_size();
-				}
-				auto font_char = chars[static_cast<char>(char_code)];
-				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(_freetype->_face->glyph->bitmap.width), static_cast<int>(_freetype->_face->glyph->bitmap.rows) } };
-				font_char.offset = { 0, 0 };
-				font_char.advance = font_char.rect.width();
-			}
-			_texture = render_manager.create_texture_2d(std::move(image), RenderManager::TextureFlag::Intensity);
-			_data._size = static_cast<int>(size);
-			_data._chars = std::move(chars);
-			_data._kernings.clear();
-		}
-
-	private:
-		std::optional<FreeTypeWrapper> _freetype;
-		FontData _data;
-		std::shared_ptr<const Texture2D> _texture;
-
-		friend Font;
-	};
-
 	class FontImpl : public Font
 	{
 	public:
@@ -191,7 +73,7 @@ namespace Yttrium
 			const ImageFormat image_format{ size * 16, size * 8, PixelFormat::Gray8 };
 			Image image{ image_format };
 			std::unordered_map<char, FontChar> chars;
-			FT_Set_Pixel_Sizes(_freetype->_face, 0, static_cast<FT_UInt>(_data._size));
+			FT_Set_Pixel_Sizes(_freetype->_face, 0, static_cast<FT_UInt>(size));
 			std::size_t x_offset = 0;
 			std::size_t y_offset = 0;
 			for (FT_UInt char_code = 0; char_code < 128; ++char_code)
@@ -213,10 +95,11 @@ namespace Yttrium
 					src += _freetype->_face->glyph->bitmap.width;
 					dst += image_format.row_size();
 				}
-				auto font_char = chars[static_cast<char>(char_code)];
+				auto& font_char = chars[static_cast<char>(char_code)];
 				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(_freetype->_face->glyph->bitmap.width), static_cast<int>(_freetype->_face->glyph->bitmap.rows) } };
 				font_char.offset = { 0, 0 };
 				font_char.advance = font_char.rect.width();
+				x_offset += _freetype->_face->glyph->bitmap.width;
 			}
 			_texture = render_manager.create_texture_2d(std::move(image), RenderManager::TextureFlag::Intensity);
 			_data._size = static_cast<int>(size);

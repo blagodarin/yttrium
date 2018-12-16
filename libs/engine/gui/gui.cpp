@@ -128,7 +128,11 @@ namespace Yttrium
 
 	void GuiPrivate::set_font(const std::string& name, std::string_view font_source, std::string_view texture_name)
 	{
-		auto font = Font::load(*_resource_loader.open(font_source), _resource_loader.load_texture_2d(texture_name));
+		const auto source = _resource_loader.open(font_source);
+		assert(source);
+		auto font = texture_name.empty()
+			? Font::load(*source, *_resource_loader.render_manager()) // TODO: RenderManager* may be nullptr!
+			: Font::load(*source, _resource_loader.load_texture_2d(texture_name));
 		_fonts[name] = std::move(font);
 	}
 
