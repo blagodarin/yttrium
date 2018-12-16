@@ -159,7 +159,6 @@ y_sources(yengine "include/gui"
 	../../include/yttrium/gui/font.h
 	../../include/yttrium/gui/gui.h
 	../../include/yttrium/gui/text_capture.h
-	../../include/yttrium/gui/texture_font.h
 	)
 y_sources(yengine "src/gui"
 	gui/actions.cpp
@@ -176,7 +175,6 @@ y_sources(yengine "src/gui"
 	gui/layout.h
 	gui/screen.cpp
 	gui/screen.h
-	gui/texture_font.cpp
 	gui/texture_font.h
 	gui/widget_data.cpp
 	gui/widget_data.h

@@ -20,7 +20,6 @@
 #include <yttrium/audio/music_reader.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
-#include <yttrium/gui/texture_font.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/manager.h>
@@ -109,7 +108,6 @@ namespace Yttrium
 			released += _mesh_cache.release_unused();
 			released += _sound_cache.release_unused();
 			released += _texture_2d_cache.release_unused();
-			released += _texture_font_cache.release_unused();
 			released += _translation_cache.release_unused();
 			return released > 0;
 		}
@@ -122,7 +120,6 @@ namespace Yttrium
 		ResourceCache<Mesh> _mesh_cache{ _storage };
 		ResourceCache<Sound> _sound_cache{ _storage };
 		ResourceCache<Texture2D> _texture_2d_cache{ _storage };
-		ResourceCache<TextureFont> _texture_font_cache{ _storage };
 		ResourceCache<Translation> _translation_cache{ _storage };
 	};
 
@@ -219,13 +216,6 @@ namespace Yttrium
 			if (source->property("intensity") == "1")
 				flags |= RenderManager::TextureFlag::Intensity;
 			return _private->_render_manager->create_texture_2d(::load_image(*source), flags);
-		});
-	}
-
-	std::shared_ptr<const TextureFont> ResourceLoader::load_texture_font(std::string_view name)
-	{
-		return _private->_texture_font_cache.fetch(name, [](std::unique_ptr<Source>&& source) {
-			return TextureFont::load(*source);
 		});
 	}
 

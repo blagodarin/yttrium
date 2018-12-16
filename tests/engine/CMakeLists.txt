@@ -18,7 +18,6 @@ add_executable(yengine_tests
 	gui_loading.cpp
 	key.cpp
 	resource_loader.cpp
-	texture_font.cpp
 	)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set_property(SOURCE gui_loading.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)

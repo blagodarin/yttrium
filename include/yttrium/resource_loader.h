@@ -33,7 +33,6 @@ namespace Yttrium
 	class Source;
 	class Storage;
 	class Texture2D;
-	class TextureFont;
 	class Translation;
 
 	///
@@ -53,7 +52,6 @@ namespace Yttrium
 		std::shared_ptr<const Mesh> load_mesh(std::string_view name);
 		std::shared_ptr<const Sound> load_sound(std::string_view name);
 		std::shared_ptr<const Texture2D> load_texture_2d(std::string_view name);
-		std::shared_ptr<const TextureFont> load_texture_font(std::string_view name);
 		std::shared_ptr<const Translation> load_translation(std::string_view name);
 
 		///
