@@ -27,8 +27,10 @@ namespace Yttrium
 	class TextureFontImpl final : public TextureFont
 	{
 	public:
-		explicit TextureFontImpl(int size)
-			: _data{ size } {}
+		explicit TextureFontImpl(int size) noexcept
+		{
+			_data._size = size;
+		}
 
 		void build(std::vector<TexturedRect>& rects, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override
 		{

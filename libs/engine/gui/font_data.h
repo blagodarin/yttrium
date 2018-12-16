@@ -36,14 +36,9 @@ namespace Yttrium
 
 	struct FontData
 	{
-		const int _size;
+		int _size = 0;
 		std::unordered_map<char, FontChar> _chars;
 		std::unordered_map<std::uint16_t, int> _kernings;
-
-		explicit FontData(int size) noexcept
-			: _size{ size } {}
-		FontData(FontData&& other) noexcept
-			: _size{ other._size }, _chars{ std::move(other._chars) }, _kernings{ std::move(other._kernings) } {}
 
 		void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const;
 		Size text_size(std::string_view) const;

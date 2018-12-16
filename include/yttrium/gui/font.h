@@ -25,27 +25,31 @@
 
 namespace Yttrium
 {
-	class Image;
+	class RenderManager;
 	class Size;
 	class SizeF;
 	class Source;
 	class TextCapture;
+	class Texture2D;
 	class TexturedRect;
 	class Vector2;
 
 	class Y_ENGINE_API Font
 	{
 	public:
-		explicit Font(const Source&);
+		Font(const Source&, RenderManager&);
+		Font(const Source&, const std::shared_ptr<const Texture2D>&);
+		Font(Font&&) noexcept = default;
 		~Font() noexcept;
+		Font& operator=(Font&&) = default;
 
 		void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const;
-		const Image& image() const;
+		const Texture2D* texture() const;
 		Size text_size(std::string_view) const;
 		SizeF text_size(std::string_view, const SizeF& font_size) const;
 
 	private:
-		const std::unique_ptr<class FontPrivate> _private;
+		std::unique_ptr<class FontPrivate> _private;
 	};
 }
 
