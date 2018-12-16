@@ -164,7 +164,7 @@ script:
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
-# Codecov doesn't currently support Gcov 8 coverage reports.
+# gcov 8 breaks Travis CI builds, see e. g. https://bugzilla.redhat.com/show_bug.cgi?id=1577508
 #after_success:
 #  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
 
