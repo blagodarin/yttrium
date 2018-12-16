@@ -14,39 +14,45 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_gui_font_h_
-#define _include_yttrium_gui_font_h_
+#pragma once
 
-#include <yttrium/api.h>
+#include <yttrium/math/rect.h>
 
-#include <memory>
-#include <string_view>
+#include <unordered_map>
 #include <vector>
 
 namespace Yttrium
 {
-	class Image;
-	class Size;
-	class SizeF;
-	class Source;
 	class TextCapture;
 	class TexturedRect;
 	class Vector2;
 
-	class Y_ENGINE_API Font
+	struct FontChar
 	{
-	public:
-		explicit Font(const Source&);
-		~Font() noexcept;
+		Rect rect;
+		Point offset;
+		int advance = 0;
+	};
+
+	struct FontData
+	{
+		const int _size;
+		std::unordered_map<char, FontChar> _chars;
+		std::unordered_map<std::uint16_t, int> _kernings;
+
+		explicit FontData(int size) noexcept
+			: _size{ size } {}
+		FontData(FontData&& other) noexcept
+			: _size{ other._size }, _chars{ std::move(other._chars) }, _kernings{ std::move(other._kernings) } {}
 
 		void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const;
-		const Image& image() const;
 		Size text_size(std::string_view) const;
 		SizeF text_size(std::string_view, const SizeF& font_size) const;
 
-	private:
-		const std::unique_ptr<class FontPrivate> _private;
+		static constexpr auto key(char a, char b) noexcept
+		{
+			static_assert(2 * sizeof(char) == sizeof(uint16_t));
+			return static_cast<std::uint16_t>(static_cast<unsigned char>(a) + (static_cast<unsigned char>(b) << 8));
+		}
 	};
 }
-
-#endif
