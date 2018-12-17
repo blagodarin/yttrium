@@ -76,30 +76,36 @@ namespace Yttrium
 			FT_Set_Pixel_Sizes(_freetype->_face, 0, static_cast<FT_UInt>(size));
 			std::size_t x_offset = 0;
 			std::size_t y_offset = 0;
+			std::size_t row_height = 0;
+			const auto baseline = static_cast<FT_Int>(size) * _freetype->_face->ascender / _freetype->_face->height;
 			for (FT_UInt char_code = 0; char_code < 128; ++char_code)
 			{
 				if (FT_Load_Char(_freetype->_face, char_code, FT_LOAD_RENDER))
 					continue; // TODO: Report error.
-				if (_freetype->_face->glyph->bitmap.width > image_format.width() - x_offset)
+				const auto glyph = _freetype->_face->glyph;
+				if (glyph->bitmap.width > image_format.width() - x_offset)
 				{
 					x_offset = 0;
-					y_offset += size;
+					y_offset += row_height + 1;
+					row_height = 0;
 				}
-				if (_freetype->_face->glyph->bitmap.rows > image_format.height() - y_offset)
+				if (glyph->bitmap.rows > image_format.height() - y_offset)
 					break; // TODO: Report error.
-				auto src = _freetype->_face->glyph->bitmap.buffer;
+				auto src = glyph->bitmap.buffer;
 				auto dst = static_cast<std::uint8_t*>(image.data()) + image_format.row_size() * y_offset + x_offset;
-				for (unsigned y = 0; y < _freetype->_face->glyph->bitmap.rows; ++y)
+				for (unsigned y = 0; y < glyph->bitmap.rows; ++y)
 				{
-					std::memcpy(dst, src, _freetype->_face->glyph->bitmap.width);
-					src += _freetype->_face->glyph->bitmap.width;
+					std::memcpy(dst, src, glyph->bitmap.width);
+					src += glyph->bitmap.width;
 					dst += image_format.row_size();
 				}
 				auto& font_char = chars[static_cast<char>(char_code)];
-				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(_freetype->_face->glyph->bitmap.width), static_cast<int>(_freetype->_face->glyph->bitmap.rows) } };
-				font_char.offset = { 0, 0 };
-				font_char.advance = font_char.rect.width();
-				x_offset += _freetype->_face->glyph->bitmap.width;
+				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
+				font_char.offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
+				font_char.advance = glyph->advance.x >> 6;
+				x_offset += glyph->bitmap.width + 1;
+				if (row_height < glyph->bitmap.rows)
+					row_height = glyph->bitmap.rows;
 			}
 			_texture = render_manager.create_texture_2d(std::move(image), RenderManager::TextureFlag::Intensity);
 			_data._size = static_cast<int>(size);
