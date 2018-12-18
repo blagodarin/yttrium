@@ -55,7 +55,7 @@ int main()
 		headers.info.used_colors = 0;
 		headers.info.required_colors = 0;
 
-		Writer writer{ "tests/data/gradient24.bmp" };
+		Writer writer{ "tests/core/data/gradient24.bmp" };
 		if (writer.write(prefix) && writer.write(headers))
 			write_color_gradient(writer, false);
 	}
@@ -68,7 +68,7 @@ int main()
 		header.image.pixel_depth = 24;
 		header.image.descriptor = tgaTopLeft;
 
-		Writer writer{ "tests/data/gradient24.tga" };
+		Writer writer{ "tests/core/data/gradient24.tga" };
 		if (writer.write(header))
 			write_color_gradient(writer, false);
 	}
@@ -81,7 +81,7 @@ int main()
 		header.image.pixel_depth = 32;
 		header.image.descriptor = tgaTopLeft | 8;
 
-		Writer writer{ "tests/data/gradient32.tga" };
+		Writer writer{ "tests/core/data/gradient32.tga" };
 		if (writer.write(header))
 			write_color_gradient(writer, true);
 	}
@@ -102,7 +102,7 @@ int main()
 		header.ddspf.dwABitMask = 0xFF000000;
 		header.dwCaps = DDSCAPS_TEXTURE;
 
-		Writer writer{ "tests/data/gradient32.dds" };
+		Writer writer{ "tests/core/data/gradient32.dds" };
 		if (writer.write(header))
 			write_color_gradient(writer, true);
 	}
