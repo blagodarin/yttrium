@@ -165,8 +165,6 @@ y_sources(yengine "src/gui"
 	gui/actions.h
 	gui/cursor.h
 	gui/font.cpp
-	gui/font_data.cpp
-	gui/font_data.h
 	gui/gui.cpp
 	gui/gui.h
 	gui/key_lookup.cpp
