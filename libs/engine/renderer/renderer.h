@@ -36,7 +36,7 @@ namespace Yttrium
 		~RendererImpl() override;
 
 		std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
-		std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<TextureFlag>) override;
+		std::unique_ptr<Texture2D> create_texture_2d(const Image&, Flags<TextureFlag>) override;
 		std::unique_ptr<Mesh> load_mesh(const Source&) override;
 
 	public:

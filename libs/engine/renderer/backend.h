@@ -45,7 +45,7 @@ namespace Yttrium
 		virtual std::unique_ptr<RenderProgram> create_builtin_program_2d() = 0;
 		virtual std::unique_ptr<Mesh> create_mesh(const MeshData&) = 0;
 		virtual std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
-		virtual std::unique_ptr<Texture2D> create_texture_2d(Image&&, Flags<RenderManager::TextureFlag>) = 0;
+		virtual std::unique_ptr<Texture2D> create_texture_2d(const Image&, Flags<RenderManager::TextureFlag>) = 0;
 		virtual size_t draw_mesh(const Mesh&) = 0;
 		virtual void flush_2d(const Buffer& vertices, const Buffer& indices) noexcept = 0;
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;

@@ -106,7 +106,7 @@ namespace Yttrium
 				if (row_height < glyph->bitmap.rows)
 					row_height = glyph->bitmap.rows;
 			}
-			_texture = render_manager.create_texture_2d(std::move(image), RenderManager::TextureFlag::Intensity);
+			_texture = render_manager.create_texture_2d(image, RenderManager::TextureFlag::Intensity);
 			_data._size = static_cast<int>(size);
 			_data._chars = std::move(chars);
 			_data._kernings.clear();

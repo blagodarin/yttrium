@@ -19,6 +19,7 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/utils/numeric.h>
+#include "../image_wrapper.h"
 #include "../mesh_data.h"
 #include "mesh.h"
 #include "program.h"
@@ -158,32 +159,24 @@ namespace Yttrium
 		return result;
 	}
 
-	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(Image&& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		if (flags & RenderManager::TextureFlag::Intensity)
-		{
-			auto converted = intensity_to_bgra(image);
-			if (converted)
-				image = std::move(*converted);
-		}
+		ImageWrapper wrapper{ image };
 
-		const auto& image_format = image.format();
+		if (flags & RenderManager::TextureFlag::Intensity)
+			wrapper.intensity_to_bgra();
 
 		GLenum internal_format = 0;
 		GLenum data_format = 0;
 		GLenum data_type = 0;
-		auto data = image.data();
-
-		std::optional<Image> temporary;
-		switch (image_format.pixel_format())
+		switch (wrapper->format().pixel_format())
 		{
 		case PixelFormat::Gray8:
 		case PixelFormat::GrayAlpha16:
+			wrapper.to_bgra();
 			internal_format = GL_RGBA8;
 			data_format = GL_BGRA;
 			data_type = GL_UNSIGNED_BYTE;
-			temporary = to_bgra(image);
-			data = temporary->data();
 			break;
 		case PixelFormat::Rgb24:
 			internal_format = GL_RGB8;
@@ -210,13 +203,13 @@ namespace Yttrium
 		}
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
-		assert(is_power_of_2(image_format.row_alignment()) && image_format.row_alignment() <= 8); // OpenGL requirements.
-		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(image_format.row_alignment()));
-		texture.set_data(0, internal_format, static_cast<GLsizei>(image_format.width()), static_cast<GLsizei>(image_format.height()), data_format, data_type, data);
+		assert(is_power_of_2(wrapper->format().row_alignment()) && wrapper->format().row_alignment() <= 8); // OpenGL requirements.
+		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(wrapper->format().row_alignment()));
+		texture.set_data(0, internal_format, static_cast<GLsizei>(wrapper->format().width()), static_cast<GLsizei>(wrapper->format().height()), data_format, data_type, wrapper->data());
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
 			texture.generate_mipmaps();
-		return std::make_unique<GlTexture2D>(*this, image_format, has_mipmaps, std::move(texture));
+		return std::make_unique<GlTexture2D>(*this, wrapper->format(), has_mipmaps, std::move(texture));
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

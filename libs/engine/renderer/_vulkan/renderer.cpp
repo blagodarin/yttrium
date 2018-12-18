@@ -18,6 +18,7 @@
 
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
+#include "../image_wrapper.h"
 #include "../mesh_data.h"
 #include "handles.h"
 #include "helpers.h"
@@ -110,23 +111,21 @@ namespace Yttrium
 		return std::make_unique<VulkanProgram>(*this);
 	}
 
-	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(Image&& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
 	{
+		ImageWrapper wrapper{ image };
+
 		if (flags & RenderManager::TextureFlag::Intensity)
-		{
-			auto converted = intensity_to_bgra(image);
-			if (converted)
-				image = std::move(*converted);
-		}
+			wrapper.intensity_to_bgra();
 
 		VkFormat vk_format = VK_FORMAT_UNDEFINED;
-		switch (image.format().pixel_format())
+		switch (wrapper->format().pixel_format())
 		{
 		case PixelFormat::Gray8:
 		case PixelFormat::GrayAlpha16:
 		case PixelFormat::Rgb24:
 		case PixelFormat::Bgr24:
-			image = to_bgra(image);
+			wrapper.to_bgra();
 			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
 			break;
 		case PixelFormat::Rgba32:
@@ -140,7 +139,7 @@ namespace Yttrium
 		}
 
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(*this, _context, image.format(), has_mipmaps, vk_format, image.data());
+		return std::make_unique<VulkanTexture2D>(*this, _context, wrapper->format(), has_mipmaps, vk_format, wrapper->data());
 	}
 
 	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)

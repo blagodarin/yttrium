@@ -56,9 +56,9 @@ namespace Yttrium
 		return _backend->create_program(vertex_shader, fragment_shader);
 	}
 
-	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(Image&& image, Flags<TextureFlag> flags)
+	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(const Image& image, Flags<TextureFlag> flags)
 	{
-		return _backend->create_texture_2d(std::move(image), flags);
+		return _backend->create_texture_2d(image, flags);
 	}
 
 	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source)

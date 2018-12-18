@@ -150,7 +150,7 @@ namespace Yttrium
 		const void* data() const noexcept { return _buffer.data(); }
 
 		///
-		ImageFormat format() const { return _format; }
+		const ImageFormat& format() const noexcept { return _format; }
 
 		///
 		bool save(const std::string& path, ImageType = ImageType::Auto) const;
