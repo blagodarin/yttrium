@@ -38,7 +38,6 @@ namespace Yttrium
 	{
 	public:
 		static std::unique_ptr<Font> load(const Source&, RenderManager&);
-		static std::unique_ptr<Font> load(const Source&, const std::shared_ptr<const Texture2D>&);
 
 		virtual ~Font() noexcept = default;
 		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const = 0;

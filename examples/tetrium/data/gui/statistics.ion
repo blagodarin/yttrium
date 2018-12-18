@@ -6,13 +6,13 @@ class "statistics_index"
 
 class "statistics_name"
 {
-	position "60" "" "440" "40"
+	position "60" "" "400" "40"
 	align "left"
 }
 
 class "statistics_score"
 {
-	position "500" "" "100" "40"
+	position "460" "" "140" "40"
 	align "right"
 }
 

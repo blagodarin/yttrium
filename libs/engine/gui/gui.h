@@ -70,7 +70,7 @@ namespace Yttrium
 		ResourceLoader& resource_loader() const { return _resource_loader; }
 		ScriptContext& script_context() const { return _script_context; }
 		void set_default_cursor(GuiCursor, std::string_view texture = {});
-		void set_font(const std::string& name, std::string_view font_source, std::string_view texture_name);
+		void set_font(const std::string& name, std::string_view path);
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_translation(std::string_view);
 		std::string translate(std::string_view) const;

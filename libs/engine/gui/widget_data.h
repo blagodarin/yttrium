@@ -68,7 +68,7 @@ namespace Yttrium
 	struct ForegroundProperty
 	{
 		std::shared_ptr<const Font> font;
-		float size = 7 / 8.f;
+		float size = .75f;
 		Color4f color{ 1, 1, 1 };
 		unsigned alignment = 0;
 		std::vector<TexturedRect> geometry;

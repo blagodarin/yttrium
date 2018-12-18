@@ -126,14 +126,9 @@ namespace Yttrium
 			_default_cursor_texture = _resource_loader.load_texture_2d(texture);
 	}
 
-	void GuiPrivate::set_font(const std::string& name, std::string_view font_source, std::string_view texture_name)
+	void GuiPrivate::set_font(const std::string& name, std::string_view path)
 	{
-		const auto source = _resource_loader.open(font_source);
-		assert(source);
-		auto font = texture_name.empty()
-			? Font::load(*source, *_resource_loader.render_manager()) // TODO: RenderManager* may be nullptr!
-			: Font::load(*source, _resource_loader.load_texture_2d(texture_name));
-		_fonts[name] = std::move(font);
+		_fonts[name] = Font::load(*_resource_loader.open(path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
 	}
 
 	std::string GuiPrivate::translate(std::string_view source) const

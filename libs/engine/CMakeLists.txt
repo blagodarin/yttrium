@@ -175,7 +175,6 @@ y_sources(yengine "src/gui"
 	gui/layout.h
 	gui/screen.cpp
 	gui/screen.h
-	gui/texture_font.h
 	gui/widget_data.cpp
 	gui/widget_data.h
 	gui/widget.cpp

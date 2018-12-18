@@ -258,18 +258,15 @@ namespace Yttrium
 		}();
 		token.check_object_begin();
 		std::string_view font_path;
-		std::string_view texture_path;
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd; token.next(ion))
 		{
 			const auto name = token.to_name();
 			if (name == "file")
 				font_path = token.next(ion).to_value();
-			else if (name == "texture")
-				texture_path = token.next(ion).to_value();
 			else
 				throw GuiDataError{ "Unknown font option '", name, "'" };
 		}
-		_gui.set_font(font_name, font_path, texture_path);
+		_gui.set_font(font_name, font_path);
 		if (attributes & Attribute::Default)
 		{
 			if (_default_font)
