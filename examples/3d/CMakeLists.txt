@@ -20,11 +20,11 @@ add_ypack_target(3d_package
 
 add_executable(3d WIN32
 	../utils.h
-	src/game.cpp
-	src/game.h
-	src/main.cpp
-	src/model.cpp
-	src/model.h
+	game.cpp
+	game.h
+	main.cpp
+	model.cpp
+	model.h
 	)
 target_link_libraries(3d ycore yengine)
 if(WIN32)

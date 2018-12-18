@@ -32,13 +32,13 @@ add_ypack_target(tetrium_package
 # Executable.
 add_executable(tetrium WIN32
 	../utils.h
-	src/graphics.cpp
-	src/graphics.h
-	src/logic.cpp
-	src/logic.h
-	src/main.cpp
-	src/statistics.cpp
-	src/statistics.h
+	graphics.cpp
+	graphics.h
+	logic.cpp
+	logic.h
+	main.cpp
+	statistics.cpp
+	statistics.h
 	)
 target_link_libraries(tetrium ycore yengine)
 if(WIN32)

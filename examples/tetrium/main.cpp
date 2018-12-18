@@ -29,7 +29,7 @@
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
 
-#include "../../utils.h"
+#include "../utils.h"
 #include "graphics.h"
 #include "statistics.h"
 
