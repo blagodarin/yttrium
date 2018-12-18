@@ -102,7 +102,7 @@ namespace Yttrium
 				auto& font_char = chars[static_cast<char>(char_code)];
 				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
 				font_char.offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
-				font_char.advance = glyph->advance.x >> 6;
+				font_char.advance = static_cast<int>(glyph->advance.x >> 6);
 				x_offset += glyph->bitmap.width + 1;
 				if (row_height < glyph->bitmap.rows)
 					row_height = glyph->bitmap.rows;
