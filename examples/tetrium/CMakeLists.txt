@@ -15,12 +15,15 @@
 #
 
 # Localization.
-file(GLOB LOCALIZATION_SOURCES RELATIVE "${PROJECT_SOURCE_DIR}"
-	"${PROJECT_SOURCE_DIR}/examples/tetrium/data/gui/*.ion")
+file(GLOB LOCALIZATION_SOURCES RELATIVE ${PROJECT_SOURCE_DIR}
+	${PROJECT_SOURCE_DIR}/examples/tetrium/data/gui/*.ion)
 add_custom_target(tetrium_localization
-	ytr examples/tetrium/data/i18n/en.ion ${LOCALIZATION_SOURCES}
-	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-	BYPRODUCTS "${PROJECT_SOURCE_DIR}/examples/tetrium/data/i18n/en.ion"
+	COMMAND ytr examples/tetrium/data/i18n/en.ion ${LOCALIZATION_SOURCES}
+	COMMAND ytr examples/tetrium/data/i18n/ru.ion ${LOCALIZATION_SOURCES}
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	BYPRODUCTS
+		${PROJECT_SOURCE_DIR}/examples/tetrium/data/i18n/en.ion
+		${PROJECT_SOURCE_DIR}/examples/tetrium/data/i18n/ru.ion
 	)
 
 # Package.

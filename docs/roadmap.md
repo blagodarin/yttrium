@@ -44,8 +44,6 @@ improvements and other code-related issues.
 		- Separate image header/data loading.
 		- Image packs (lists of image headers with filenames and raw image data offsets).
 		- Loading image data into the specified buffer (e. g. into mapped texture memory).
-	* Internationalization:
-		- Unicode fonts.
 	* Platforms:
 		- Fully replace X11 port with XCB port.
 		- Port to MacOS X.
@@ -55,5 +53,3 @@ improvements and other code-related issues.
 		- Unit tests.
 	* Storage:
 		- Hash-based packed file access.
-* New tools:
-	- Textured font builder.

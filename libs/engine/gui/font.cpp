@@ -69,7 +69,7 @@ namespace Yttrium
 	public:
 		FontImpl(const Source& source, RenderManager& render_manager, std::size_t size)
 			: _size{ static_cast<int>(size) }
-			, _image{ { size * 16, size * 8, PixelFormat::Gray8 } }
+			, _image{ { size * 32, size * 32, PixelFormat::Gray8 } }
 		{
 			_freetype.load(source.to_buffer());
 			_has_kerning = FT_HAS_KERNING(_freetype._face);
@@ -78,7 +78,7 @@ namespace Yttrium
 			std::size_t y_offset = 0;
 			std::size_t row_height = 0;
 			const auto baseline = static_cast<FT_Int>(size) * _freetype._face->ascender / _freetype._face->height;
-			for (FT_UInt char_code = 0; char_code < 128; ++char_code)
+			for (FT_UInt char_code = 0; char_code < 65536; ++char_code)
 			{
 				const auto glyph_index = FT_Get_Char_Index(_freetype._face, char_code);
 				if (!glyph_index)
@@ -88,23 +88,23 @@ namespace Yttrium
 					continue; // TODO: Report error.
 
 				const auto glyph = _freetype._face->glyph;
-				if (glyph->bitmap.width > _image.format().width() - x_offset)
+				if (x_offset + glyph->bitmap.width > _image.format().width())
 				{
 					x_offset = 0;
 					y_offset += row_height + 1;
 					row_height = 0;
 				}
-				if (glyph->bitmap.rows > _image.format().height() - y_offset)
+				if (y_offset + glyph->bitmap.rows > _image.format().height())
 					break; // TODO: Report error.
 				auto src = glyph->bitmap.buffer;
 				auto dst = static_cast<std::uint8_t*>(_image.data()) + _image.format().row_size() * y_offset + x_offset;
 				for (unsigned y = 0; y < glyph->bitmap.rows; ++y)
 				{
 					std::memcpy(dst, src, glyph->bitmap.width);
-					src += glyph->bitmap.width;
+					src += glyph->bitmap.pitch;
 					dst += _image.format().row_size();
 				}
-				auto& font_char = _chars[static_cast<char>(char_code)];
+				auto& font_char = _chars[char_code];
 				font_char.glyph_index = glyph_index;
 				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
 				font_char.offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
@@ -150,9 +150,10 @@ namespace Yttrium
 			};
 
 			auto previous = _chars.end();
-			for (std::size_t i = 0; i < text.size(); ++i)
+			std::size_t index = 0;
+			for (std::size_t i = 0; i < text.size();)
 			{
-				const auto current = _chars.find(text[i]);
+				const auto current = _chars.find(parse_utf8(text, i));
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
@@ -162,21 +163,20 @@ namespace Yttrium
 						{ current_x + static_cast<float>(current->second.offset._x) * scaling, current_y + static_cast<float>(current->second.offset._y) * scaling },
 						SizeF(current->second.rect.size()) * scaling),
 					RectF(current->second.rect));
-				do_capture(i);
+				do_capture(index++);
 				current_x += static_cast<float>(current->second.advance) * scaling;
 				previous = current;
 			}
-
-			do_capture(text.size());
+			do_capture(index);
 		}
 
 		Size text_size(std::string_view text) const override
 		{
 			int width = 0;
 			auto previous = _chars.end();
-			for (const auto c : text)
+			for (std::size_t i = 0; i < text.size();)
 			{
-				const auto current = _chars.find(c);
+				const auto current = _chars.find(parse_utf8(text, i));
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
@@ -205,6 +205,33 @@ namespace Yttrium
 			return !FT_Get_Kerning(_freetype._face, left_glyph, right_glyph, FT_KERNING_DEFAULT, &kerning_vector) ? static_cast<int>(kerning_vector.x >> 6) : 0;
 		}
 
+		static char32_t parse_utf8(std::string_view text, std::size_t& i) noexcept
+		{
+			const auto part1 = static_cast<std::uint8_t>(text[i++]);
+			if (!(part1 & 0b1000'0000))
+				return part1;
+
+			if (i == text.size())
+				return 0;
+
+			const auto part2 = char32_t{ static_cast<std::uint8_t>(text[i++]) & 0b0011'1111u };
+			if (!(part1 & 0b0010'0000))
+				return ((part1 & 0b0001'1111u) << 6) + part2;
+
+			if (i == text.size())
+				return 0;
+
+			const auto part3 = char32_t{ static_cast<std::uint8_t>(text[i++]) & 0b0011'1111u };
+			if (!(part1 & 0b0001'0000))
+				return ((part1 & 0b0000'1111u) << 12) + (part2 << 6) + part3;
+
+			if (i == text.size())
+				return 0;
+
+			const auto part4 = char32_t{ static_cast<std::uint8_t>(text[i++]) & 0b0011'1111u };
+			return ((part1 & 0b0000'0111u) << 18) + (part2 << 12) + (part3 << 6) + part4;
+		}
+
 	private:
 		struct FontChar
 		{
@@ -218,7 +245,7 @@ namespace Yttrium
 		const int _size;
 		bool _has_kerning = false;
 		Image _image;
-		std::unordered_map<char, FontChar> _chars;
+		std::unordered_map<char32_t, FontChar> _chars;
 		std::shared_ptr<const Texture2D> _texture;
 	};
 
