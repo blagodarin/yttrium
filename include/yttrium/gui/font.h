@@ -37,13 +37,18 @@ namespace Yttrium
 	class Y_ENGINE_API Font
 	{
 	public:
+		struct Graphics
+		{
+			std::shared_ptr<const Texture2D> _texture;
+			std::vector<TexturedRect> _glyphs;
+		};
+
 		static std::unique_ptr<Font> load(const Source&, RenderManager&);
 
 		virtual ~Font() noexcept = default;
-		virtual void build(std::vector<TexturedRect>&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const = 0;
+		virtual void build(Graphics&, const Vector2& top_left, float font_size, std::string_view, TextCapture* = nullptr) const = 0;
 		virtual Size text_size(std::string_view) const = 0;
 		virtual SizeF text_size(std::string_view, const SizeF& font_size) const = 0;
-		virtual const Texture2D* texture() const = 0;
 	};
 }
 

@@ -14,9 +14,9 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_property_h_
-#define _src_gui_property_h_
+#pragma once
 
+#include <yttrium/gui/font.h>
 #include <yttrium/math/color.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
@@ -65,13 +65,13 @@ namespace Yttrium
 		void draw(RenderPass&, const RectF&) const;
 	};
 
-	struct ForegroundProperty
+	class ForegroundProperty
 	{
-		std::shared_ptr<const Font> font;
-		float size = .75f;
-		Color4f color{ 1, 1, 1 };
-		unsigned alignment = 0;
-		std::vector<TexturedRect> geometry;
+	public:
+		std::shared_ptr<const Font> _font;
+		float _size = .75f;
+		Color4f _color{ 1, 1, 1 };
+		unsigned _alignment = 0;
 
 		ForegroundProperty();
 		ForegroundProperty(const ForegroundProperty&) = default;
@@ -79,6 +79,9 @@ namespace Yttrium
 
 		void draw(RenderPass&) const;
 		void prepare(std::string_view, const RectF&, TextCapture* = nullptr);
+
+	private:
+		Font::Graphics _font_graphics; // TODO: Remove from this class.
 	};
 
 	struct WidgetData
@@ -116,5 +119,3 @@ namespace Yttrium
 		StyleData& style_data(Style);
 	};
 }
-
-#endif

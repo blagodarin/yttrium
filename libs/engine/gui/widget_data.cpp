@@ -16,7 +16,6 @@
 
 #include "widget_data.h"
 
-#include <yttrium/gui/font.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
 #include <yttrium/renderer/texture.h>
@@ -81,22 +80,22 @@ namespace Yttrium
 
 	void ForegroundProperty::draw(RenderPass& pass) const
 	{
-		PushTexture push_texture{ pass, font->texture(), Texture2D::TrilinearFilter };
-		pass.draw_rects(geometry, color);
+		PushTexture push_texture{ pass, _font_graphics._texture.get(), Texture2D::TrilinearFilter };
+		pass.draw_rects(_font_graphics._glyphs, _color);
 	}
 
 	void ForegroundProperty::prepare(std::string_view text, const RectF& rect, TextCapture* capture)
 	{
-		const auto max_text_height = rect.height() * size;
+		const auto max_text_height = rect.height() * _size;
 		const auto margins = rect.height() - max_text_height;
 		const auto max_text_width = rect.width() - margins;
 		if (max_text_height < 1 || max_text_width < 1)
 		{
-			geometry.clear();
+			_font_graphics._glyphs.clear();
 			return;
 		}
-		const auto& text_size = ::make_text_size(*font, text, max_text_width, max_text_height);
-		font->build(geometry, ::make_top_left(rect, text_size, margins, alignment), text_size._height, text, capture);
+		const auto& text_size = ::make_text_size(*_font, text, max_text_width, max_text_height);
+		_font->build(_font_graphics, ::make_top_left(rect, text_size, margins, _alignment), text_size._height, text, capture);
 	}
 
 	void WidgetData::run(GuiPrivate& gui, Action action) const

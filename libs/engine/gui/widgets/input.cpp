@@ -41,12 +41,12 @@ namespace Yttrium
 		if (is_focused() && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _cursor_mark).count() % 1000 < 500)
 		{
 			PushTexture push_texture{ pass, nullptr };
-			pass.draw_rect(capture._cursor_rect, style_data._foreground.color);
+			pass.draw_rect(capture._cursor_rect, style_data._foreground._color);
 		}
 
 		if (capture._has_selection)
 		{
-			auto selection_color = style_data._foreground.color;
+			auto selection_color = style_data._foreground._color;
 			selection_color._a *= .25f;
 			PushTexture push_texture{ pass, nullptr };
 			pass.draw_rect(capture._selection_rect, selection_color);

@@ -457,7 +457,7 @@ namespace Yttrium
 		else
 		{
 			data = std::make_unique<WidgetData>();
-			data->_styles[WidgetData::Style::Normal]._foreground.font = _default_font;
+			data->_styles[WidgetData::Style::Normal]._foreground._font = _default_font;
 		}
 		token.check_object_begin();
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
@@ -563,7 +563,7 @@ namespace Yttrium
 			alignment |= j->second;
 			token.next(ion);
 		}
-		data._foreground.alignment = alignment;
+		data._foreground._alignment = alignment;
 	}
 
 	void GuiIonLoader::load_style_borders(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
@@ -587,7 +587,7 @@ namespace Yttrium
 	{
 		if (const auto font = _gui.font(std::string{ token.to_value() }))
 		{
-			data._foreground.font = font;
+			data._foreground._font = font;
 			token.next(ion);
 		}
 		else
@@ -596,13 +596,13 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_text_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._foreground.color = token.to_color();
+		data._foreground._color = token.to_color();
 		token.next(ion);
 	}
 
 	void GuiIonLoader::load_style_text_size(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (!from_chars(token.to_value(), data._foreground.size))
+		if (!from_chars(token.to_value(), data._foreground._size))
 			throw GuiDataError{ "Bad 'text_size'" };
 		token.next(ion);
 	}

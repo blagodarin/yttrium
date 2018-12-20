@@ -116,9 +116,10 @@ namespace Yttrium
 			_texture = render_manager.create_texture_2d(_image, RenderManager::TextureFlag::Intensity);
 		}
 
-		void build(std::vector<TexturedRect>& rects, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override
+		void build(Graphics& graphics, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override
 		{
-			rects.clear();
+			graphics._texture = _texture;
+			graphics._glyphs.clear();
 
 			auto current_x = top_left.x;
 			const auto current_y = top_left.y;
@@ -158,7 +159,7 @@ namespace Yttrium
 					continue;
 				if (_has_kerning && previous != _chars.end())
 					current_x += static_cast<float>(kerning(previous->second.glyph_index, current->second.glyph_index)) * scaling;
-				rects.emplace_back(
+				graphics._glyphs.emplace_back(
 					RectF(
 						{ current_x + static_cast<float>(current->second.offset._x) * scaling, current_y + static_cast<float>(current->second.offset._y) * scaling },
 						SizeF(current->second.rect.size()) * scaling),
@@ -191,11 +192,6 @@ namespace Yttrium
 		{
 			const SizeF size{ text_size(text) };
 			return { font_size._width * (size._width * font_size._height / size._height), font_size._height };
-		}
-
-		const Texture2D* texture() const override
-		{
-			return _texture.get();
 		}
 
 	private:
