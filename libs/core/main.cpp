@@ -20,6 +20,8 @@
 #	include "memory/buffer_memory_tracker.h"
 #endif
 
+// TODO: Debug output, e. g. in a ring buffer that can be dumped on exception.
+
 namespace Yttrium
 {
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING

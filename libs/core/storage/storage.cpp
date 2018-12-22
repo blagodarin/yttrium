@@ -24,6 +24,8 @@
 #include <variant>
 #include <vector>
 
+// TODO: Hash-based packed file access.
+
 namespace Yttrium
 {
 	class StoragePrivate

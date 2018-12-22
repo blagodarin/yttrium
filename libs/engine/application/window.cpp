@@ -21,6 +21,8 @@
 #include <yttrium/image.h>
 #include <yttrium/renderer/modifiers.h>
 
+// TODO: Windowed mode.
+
 namespace Yttrium
 {
 	WindowPrivate::WindowPrivate(Application& application, std::string_view name)

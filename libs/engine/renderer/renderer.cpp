@@ -34,6 +34,8 @@
 
 #include <cassert>
 
+// TODO: Load textures without intermediate Images.
+
 namespace Yttrium
 {
 #if Y_RENDERER_OPENGL

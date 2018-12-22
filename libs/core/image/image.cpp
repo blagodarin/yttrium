@@ -24,20 +24,24 @@
 
 #include <cassert>
 
+// TODO: Compressed images (e. g. compressed textures).
+// TODO: Multi-level images (e. g. textures with mipmaps).
+// TODO: Separate image header/data loading.
+// TODO: Image packs (lists of image headers with filenames and raw image data offsets).
+// TODO: Loading image data into the specified buffer (e. g. into mapped texture memory).
+
 namespace
 {
-	using Yttrium::PixelFormat;
-
-	constexpr std::size_t channels_of(PixelFormat format) noexcept
+	constexpr std::size_t channels_of(Yttrium::PixelFormat format) noexcept
 	{
 		switch (format)
 		{
-		case PixelFormat::Gray8: return 1;
-		case PixelFormat::GrayAlpha16: return 2;
-		case PixelFormat::Rgb24: return 3;
-		case PixelFormat::Bgr24: return 3;
-		case PixelFormat::Rgba32: return 4;
-		case PixelFormat::Bgra32: return 4;
+		case Yttrium::PixelFormat::Gray8: return 1;
+		case Yttrium::PixelFormat::GrayAlpha16: return 2;
+		case Yttrium::PixelFormat::Rgb24: return 3;
+		case Yttrium::PixelFormat::Bgr24: return 3;
+		case Yttrium::PixelFormat::Rgba32: return 4;
+		case Yttrium::PixelFormat::Bgra32: return 4;
 		}
 		return 0;
 	}
