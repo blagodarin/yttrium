@@ -56,6 +56,7 @@ namespace Yttrium
 		void on_music(const std::function<void(const std::shared_ptr<MusicReader>&)>&);
 		void on_quit(const std::function<void()>&);
 		bool process_key_event(const KeyEvent&);
+		bool process_text_input(std::string_view text);
 		void start();
 
 	private:

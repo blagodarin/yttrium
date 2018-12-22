@@ -73,6 +73,7 @@ namespace Yttrium
 		NativeApplication _application;
 		const GlxContext _glx{ _application.display(), _application.screen() };
 		WindowHandle _window;
+		UniquePtr<std::remove_pointer_t<::XIC>, ::XDestroyIC> _input_context;
 		const EmptyCursor _empty_cursor{ _application.display(), _window.get() };
 		::Atom _wm_protocols = ::XInternAtom(_application.display(), "WM_PROTOCOLS", True);
 		::Atom _wm_delete_window = ::XInternAtom(_application.display(), "WM_DELETE_WINDOW", True);

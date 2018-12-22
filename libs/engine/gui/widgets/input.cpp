@@ -76,6 +76,12 @@ namespace Yttrium
 		return false;
 	}
 
+	bool InputWidget::process_text(std::string_view text)
+	{
+		_logic.insert(text);
+		return true;
+	}
+
 	bool InputWidget::process_mouse_press(Key key, const Vector2&)
 	{
 		if (key != Key::Mouse1)

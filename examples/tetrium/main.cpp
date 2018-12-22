@@ -174,6 +174,7 @@ int main(int, char**)
 	window.on_key_event([&gui](const KeyEvent& event) { gui.process_key_event(event); });
 	window.on_render([&gui](RenderPass& pass, const Vector2& cursor) { gui.draw(pass, cursor); });
 	window.on_screenshot([](Image&& image) { image.save(::make_screenshot_path()); });
+	window.on_text_event([&gui](std::string_view text) { gui.process_text_input(text); });
 
 	TetriumGraphics graphics{ window.render_manager() };
 

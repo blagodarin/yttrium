@@ -41,6 +41,11 @@ namespace Yttrium
 				: on_key_event(event);
 		}
 
+		bool process_text(std::string_view text)
+		{
+			return _focus_widget && _focus_widget->process_text(text);
+		}
+
 		void reset()
 		{
 			*this = {};
@@ -214,6 +219,11 @@ namespace Yttrium
 		}
 
 		return false;
+	}
+
+	bool GuiScreen::handle_text(std::string_view text)
+	{
+		return _activity->process_text(text);
 	}
 
 	void GuiScreen::register_widget(Widget& widget)

@@ -49,11 +49,9 @@ namespace
 		return window;
 	}
 
-	Yttrium::Key key_from_event(::XKeyEvent& event) noexcept
+	Yttrium::Key key_from_keysym(::KeySym key_sym) noexcept
 	{
 		using Yttrium::Key;
-
-		const auto key_sym = ::XLookupKeysym(&event, 0);
 
 		if (key_sym >= XK_0 && key_sym <= XK_9)
 			return static_cast<Key>(static_cast<::KeySym>(to_underlying(Key::_0)) + key_sym - XK_0);
@@ -159,11 +157,14 @@ namespace Yttrium
 		: _window{ _application.display(), ::create_window(_application.display(), _application.screen(), _glx.visual_info()) }
 		, _callbacks{ callbacks }
 	{
+		_input_context.reset(::XCreateIC(_application.input_method(), XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, _window.get(), nullptr));
+		if (!_input_context)
+			throw InitializationError{ "XCreateIC failed" };
+
 		::XSetWMProtocols(_application.display(), _window.get(), &_wm_delete_window, 1);
 		::XStoreName(_application.display(), _window.get(), name.c_str());
-
-		// Hide system cursor.
 		::XDefineCursor(_application.display(), _window.get(), _empty_cursor.get());
+		::XSetICFocus(_input_context.get());
 
 		// Show window in fullscreen mode.
 		::XChangeProperty(_application.display(), _window.get(), _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
@@ -214,11 +215,39 @@ namespace Yttrium
 		{
 			::XEvent event;
 			::XNextEvent(_application.display(), &event);
+			if (::XFilterEvent(&event, None))
+				continue;
 			switch (event.type)
 			{
+			case MappingNotify:
+				::XRefreshKeyboardMapping(&event.xmapping);
+				break;
+
 			case KeyPress:
+			{
+				std::array<char, 32> buffer{};
+				::KeySym keysym = 0;
+				Status status = 0;
+				const auto count = ::Xutf8LookupString(_input_context.get(), &event.xkey, buffer.data(), buffer.size(), &keysym, &status);
+				if (status == XLookupKeySym || status == XLookupBoth)
+					if (const auto key = ::key_from_keysym(keysym); key != Key::Null)
+					{
+						Flags<KeyEvent::Modifier> modifiers;
+						if (event.xkey.state & ShiftMask)
+							modifiers |= KeyEvent::Modifier::Shift;
+						if (event.xkey.state & ControlMask)
+							modifiers |= KeyEvent::Modifier::Control;
+						if (event.xkey.state & Mod1Mask)
+							modifiers |= KeyEvent::Modifier::Alt;
+						_callbacks.on_key_event(key, event.type == KeyPress, modifiers);
+					}
+				if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
+					_callbacks.on_text_event(std::string_view{ buffer.data(), static_cast<std::size_t>(count) });
+				break;
+			}
+
 			case KeyRelease:
-				if (const auto key = ::key_from_event(event.xkey); key != Key::Null)
+				if (const auto key = ::key_from_keysym(::XLookupKeysym(&event.xkey, 0)); key != Key::Null)
 				{
 					Flags<KeyEvent::Modifier> modifiers;
 					if (event.xkey.state & ShiftMask)
@@ -304,13 +333,13 @@ namespace Yttrium
 		char data[1] = { 0 };
 		const auto pixmap = ::XCreateBitmapFromData(_display, window, data, 1, 1);
 		if (pixmap == None)
-			throw InitializationError("Failed to create a pixmap for an empty cursor");
+			throw InitializationError{ "Failed to create a pixmap for an empty cursor" };
 		::XColor color;
 		::memset(&color, 0, sizeof(color));
 		_cursor = ::XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
 		::XFreePixmap(_display, pixmap);
 		if (_cursor == None)
-			throw InitializationError("Failed to create an empty cursor");
+			throw InitializationError{ "Failed to create an empty cursor" };
 	}
 
 	WindowBackend::EmptyCursor::~EmptyCursor() noexcept

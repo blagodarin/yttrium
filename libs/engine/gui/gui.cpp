@@ -223,6 +223,11 @@ namespace Yttrium
 		return false;
 	}
 
+	bool Gui::process_text_input(std::string_view text)
+	{
+		return !_private->_screen_stack.empty() && _private->_screen_stack.back()->handle_text(text);
+	}
+
 	void Gui::start()
 	{
 		assert(_private->_screen_stack.empty()); // TODO: Remove explicit 'start()'.

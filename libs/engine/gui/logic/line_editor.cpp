@@ -70,7 +70,7 @@ namespace Yttrium
 			}
 			if (!shift)
 				_selection_size = 0;
-			break;
+			return true;
 
 		case Key::Right:
 			if (_cursor < _text.size())
@@ -92,20 +92,20 @@ namespace Yttrium
 			}
 			if (!shift)
 				_selection_size = 0;
-			break;
+			return true;
 
 		case Key::Home:
 			_selection_size = shift ? _selection_size + _cursor : 0;
 			_cursor = 0;
 			_selection_offset = 0;
-			break;
+			return true;
 
 		case Key::End:
 			if (shift && !_selection_size)
 				_selection_offset = _cursor;
 			_cursor = _text.size();
 			_selection_size = shift ? _cursor - _selection_offset : 0;
-			break;
+			return true;
 
 		case Key::Delete:
 			if (!_selection_size)
@@ -118,7 +118,7 @@ namespace Yttrium
 				_cursor = _selection_offset;
 				_selection_size = 0;
 			}
-			break;
+			return true;
 
 		case Key::Backspace:
 			if (_selection_size > 0)
@@ -131,17 +131,11 @@ namespace Yttrium
 			{
 				_text.erase(--_cursor, 1);
 			}
-			break;
+			return true;
 
 		default:
-			if (const auto event_char = event.to_char())
-			{
-				insert(event_char);
-				break;
-			}
 			return false;
 		}
-		return true;
 	}
 
 	void LineEditor::reset(std::string&& text)
@@ -151,11 +145,16 @@ namespace Yttrium
 		_selection_size = 0;
 	}
 
-	void LineEditor::set_max_size(size_t max_size)
+	void LineEditor::set_max_size(std::size_t max_size)
 	{
 		_max_size = std::min(max_size, _text.max_size());
 		if (_text.size() > _max_size)
-			_text.resize(_max_size);
+		{
+			auto new_size = _max_size;
+			while (new_size > 0 && (static_cast<unsigned char>(_text[new_size]) & 0b1100'0000u) == 0b1000'0000u)
+				--new_size;
+			_text.resize(new_size);
+		}
 		_cursor = std::min(_cursor, _max_size);
 		_selection_offset = std::min(_selection_offset, _max_size);
 		_selection_size = std::min(_selection_size, _max_size - _selection_offset);

@@ -47,6 +47,7 @@ namespace Yttrium
 
 		void draw(RenderPass&, const RectF&, WidgetData::Style) const;
 		virtual bool process_key(const KeyEvent&) { return false; }
+		virtual bool process_text(std::string_view) { return false; }
 		virtual void process_mouse_move(const Vector2&) {}
 		virtual bool process_mouse_press(Key, const Vector2&) { return false; }
 		virtual void process_mouse_release() {}

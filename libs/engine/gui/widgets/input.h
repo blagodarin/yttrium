@@ -31,6 +31,7 @@ namespace Yttrium
 
 		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 		bool process_key(const KeyEvent&) override;
+		bool process_text(std::string_view) override;
 		bool process_mouse_press(Key, const Vector2&) override;
 
 	private:

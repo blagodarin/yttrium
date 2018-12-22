@@ -47,6 +47,7 @@ namespace Yttrium
 		bool handle_event(const std::string&) const;
 		bool handle_key(const KeyEvent&);
 		void handle_return() const { _on_return.run(_gui); }
+		bool handle_text(std::string_view);
 		bool is_transparent() const { return _is_transparent; }
 		const std::shared_ptr<MusicReader>& music() const { return _music; }
 		std::string_view name() const { return _name; }

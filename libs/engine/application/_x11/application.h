@@ -18,6 +18,8 @@
 
 #include "../../../core/utils/memory.h"
 
+#include <type_traits>
+
 #include <X11/Xlib.h>
 
 namespace Yttrium
@@ -28,10 +30,12 @@ namespace Yttrium
 		NativeApplication();
 
 		::Display* display() const noexcept { return _display.get(); }
+		::XIM input_method() const noexcept { return _input_method.get(); }
 		int screen() const noexcept { return _screen; }
 
 	private:
 		UniquePtr<::Display, ::XCloseDisplay> _display;
 		int _screen = 0;
+		UniquePtr<std::remove_pointer_t<::XIM>, ::XCloseIM> _input_method;
 	};
 }

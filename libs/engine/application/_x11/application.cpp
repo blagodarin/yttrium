@@ -18,6 +18,8 @@
 
 #include <yttrium/exceptions.h>
 
+#include <clocale>
+
 namespace Yttrium
 {
 	NativeApplication::NativeApplication()
@@ -25,6 +27,15 @@ namespace Yttrium
 		_display.reset(::XOpenDisplay(nullptr));
 		if (!_display)
 			throw InitializationError{ "XOpenDisplay failed" };
+
 		_screen = DefaultScreen(_display.get());
+
+		const auto locale = std::setlocale(LC_ALL, "");
+		const auto modifiers = ::XSetLocaleModifiers("@im=none");
+		_input_method.reset(::XOpenIM(_display.get(), nullptr, nullptr, nullptr));
+		std::setlocale(LC_ALL, locale);
+		::XSetLocaleModifiers(modifiers);
+		if (!_input_method)
+			throw InitializationError{ "XOpenIM failed" };
 	}
 }
