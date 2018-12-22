@@ -49,7 +49,5 @@ improvements and other code-related issues.
 		- Port to MacOS X.
 	* Renderer:
 		- Loading textures without intermediate Images.
-	* Scripting:
-		- Unit tests.
 	* Storage:
 		- Hash-based packed file access.

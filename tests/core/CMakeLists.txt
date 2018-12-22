@@ -33,6 +33,7 @@ add_executable(ycore_tests
 	point.cpp
 	reader.cpp
 	rect.cpp
+	script.cpp
 	source.cpp
 	temporary_file.cpp
 	test_utils.cpp
