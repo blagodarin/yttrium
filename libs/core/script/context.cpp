@@ -85,6 +85,32 @@ namespace Yttrium
 		return true;
 	}
 
+	bool ScriptContext::call(const std::string& name, const std::vector<std::string>& arg_strings)
+	{
+		const auto command = _private->_commands.find(name);
+		if (command == _private->_commands.end())
+		{
+			std::cerr << "Unknown command \"" << name << "\"\n";
+			return false;
+		}
+
+		if (arg_strings.size() < command->second._min_args || arg_strings.size() > command->second._max_args)
+		{
+			std::cerr << "Argument number mismatch for \"" << name << "\": "
+					  << arg_strings.size() << " instead of " << command->second._min_args << "-" << command->second._max_args << "\n";
+			return false;
+		}
+
+		Pool<ScriptValue> arg_pool{ arg_strings.size() };
+		std::vector<ScriptValue*> arg_values;
+		arg_values.reserve(arg_strings.size());
+		for (const auto& arg_string : arg_strings)
+			arg_values.emplace_back(new (arg_pool.allocate()) ScriptValue{ arg_string });
+		std::string result;
+		command->second._command({ *this, name, result, ScriptArgs{ *this, arg_values } });
+		return true;
+	}
+
 	void ScriptContext::define(const std::string& name, size_t min_args, size_t max_args, const Command& command)
 	{
 		_private->_commands[name] = ScriptCommandContext{ command, min_args, max_args };

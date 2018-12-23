@@ -18,17 +18,9 @@
 
 #include <yttrium/script/context.h>
 
-#include <string>
-
 TetriumStatistics::TetriumStatistics(ScriptContext& script)
 	: _script(script)
-	, _statistics{
-		{ 100000, "John Placeholder" },
-		{ 50000, "John Placeholder" },
-		{ 10000, "John Placeholder" },
-		{ 5000, "John Placeholder" },
-		{ 1000, "John Placeholder" },
-	}
+	, _statistics{ { 0, "" }, { 0, "" }, { 0, "" }, { 0, "" }, { 0, "" } }
 {
 	update_variables();
 }

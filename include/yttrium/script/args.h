@@ -41,6 +41,7 @@ namespace Yttrium
 		ScriptArgs(ScriptContext& context, const std::vector<ScriptValue*>& values)
 			: _context{ context }, _values{ values } {}
 		friend ScriptCode;
+		friend ScriptContext;
 	};
 }
 

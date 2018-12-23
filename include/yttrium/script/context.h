@@ -59,6 +59,7 @@ namespace Yttrium
 
 		/// Calls a command.
 		bool call(const std::string& name, std::string& result, const ScriptArgs&);
+		bool call(const std::string& name, const std::vector<std::string>&);
 
 		/// Defines a command.
 		void define(const std::string& name, size_t min_args, size_t max_args, const Command&);

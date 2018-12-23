@@ -20,6 +20,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resource_loader.h>
+#include <yttrium/script/context.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include "../../../core/utils/string.h"
@@ -195,6 +196,7 @@ namespace Yttrium
 	void GuiIonLoader::load(IonReader& ion)
 	{
 		static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(IonReader&, IonReader::Token&, Flags<Attribute>)> handlers{
+			{ "call", &GuiIonLoader::load_call },
 			{ "class", &GuiIonLoader::load_class },
 			{ "cursor", &GuiIonLoader::load_cursor },
 			{ "font", &GuiIonLoader::load_font },
@@ -220,6 +222,15 @@ namespace Yttrium
 				throw GuiDataError{ "Unknown entry '", token.text(), "'" };
 			(this->*i->second)(ion, token.next(ion), attributes);
 		}
+	}
+
+	void GuiIonLoader::load_call(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
+	{
+		const auto name = token.to_name();
+		std::vector<std::string> args;
+		for (token.next(ion); token.type() == IonReader::Token::Type::Value; token.next(ion))
+			args.emplace_back(token.translatable() ? _gui.translate(token.text()) : token.text());
+		_gui.script_context().call(std::string{ name }, args);
 	}
 
 	void GuiIonLoader::load_class(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
@@ -282,6 +293,12 @@ namespace Yttrium
 		token.next(ion);
 	}
 
+	void GuiIonLoader::load_on_key(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
+	{
+		auto on_key = ::read_on_key(ion, token);
+		_gui.set_on_key(on_key._key, std::move(on_key._on_press), std::move(on_key._on_release));
+	}
+
 	void GuiIonLoader::load_screen(IonReader& ion, IonReader::Token& token, Flags<Attribute> attributes)
 	{
 		static const std::unordered_map<std::string_view, std::pair<void (GuiIonLoader::*)(GuiScreen&, IonReader&, IonReader::Token&, int) const, int>> handlers{
@@ -307,12 +324,6 @@ namespace Yttrium
 			(this->*i->second.first)(screen, ion, token.next(ion), i->second.second);
 		}
 		token.next(ion);
-	}
-
-	void GuiIonLoader::load_on_key(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
-	{
-		auto on_key = ::read_on_key(ion, token);
-		_gui.set_on_key(on_key._key, std::move(on_key._on_press), std::move(on_key._on_release));
 	}
 
 	void GuiIonLoader::load_translation(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
