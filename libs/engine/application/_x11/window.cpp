@@ -220,30 +220,8 @@ namespace Yttrium
 			switch (event.type)
 			{
 			case KeyPress:
-			{
-				std::array<char, 32> buffer{};
-				::KeySym keysym = 0;
-				Status status = 0;
-				const auto count = ::Xutf8LookupString(_input_context.get(), &event.xkey, buffer.data(), buffer.size(), &keysym, &status);
-				if (status == XLookupKeySym || status == XLookupBoth)
-					if (const auto key = ::key_from_keysym(keysym); key != Key::Null)
-					{
-						Flags<KeyEvent::Modifier> modifiers;
-						if (event.xkey.state & ShiftMask)
-							modifiers |= KeyEvent::Modifier::Shift;
-						if (event.xkey.state & ControlMask)
-							modifiers |= KeyEvent::Modifier::Control;
-						if (event.xkey.state & Mod1Mask)
-							modifiers |= KeyEvent::Modifier::Alt;
-						_callbacks.on_key_event(key, event.type == KeyPress, modifiers);
-					}
-				if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
-					_callbacks.on_text_input(std::string_view{ buffer.data(), static_cast<std::size_t>(count) });
-				break;
-			}
-
 			case KeyRelease:
-				if (const auto key = ::key_from_keysym(::XLookupKeysym(&event.xkey, 0)); key != Key::Null)
+				if (const auto key = ::key_from_keysym(::XKeycodeToKeysym(_application.display(), static_cast<KeyCode>(event.xkey.keycode), 0)); key != Key::Null)
 				{
 					Flags<KeyEvent::Modifier> modifiers;
 					if (event.xkey.state & ShiftMask)
@@ -253,6 +231,15 @@ namespace Yttrium
 					if (event.xkey.state & Mod1Mask)
 						modifiers |= KeyEvent::Modifier::Alt;
 					_callbacks.on_key_event(key, event.type == KeyPress, modifiers);
+				}
+				if (event.type == KeyPress)
+				{
+					std::array<char, 32> buffer{};
+					::KeySym keysym = NoSymbol;
+					Status status = 0;
+					const auto count = ::Xutf8LookupString(_input_context.get(), &event.xkey, buffer.data(), buffer.size(), &keysym, &status);
+					if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
+						_callbacks.on_text_input(std::string_view{ buffer.data(), static_cast<std::size_t>(count) });
 				}
 				break;
 

@@ -71,6 +71,8 @@ if(UNIX)
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
 			set_property(SOURCE application/_x11/application.cpp application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+			# TODO: Don't use XKeycodeToKeysym.
+			set_property(SOURCE application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-deprecated-declarations)
 		endif()
 	else()
 		y_sources(yengine "src/application/_xcb"
