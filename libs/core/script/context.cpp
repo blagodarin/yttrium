@@ -134,26 +134,17 @@ namespace Yttrium
 		target.clear();
 		for (auto left = source.data(), right = left, end = left + source.size();;)
 		{
-			while (right != end && *right != '{')
-				++right;
-
+			right = std::find(right, end, '{');
 			append_to(target, std::string_view{ left, static_cast<size_t>(right - left) });
-
 			if (right == end)
 				break;
-
 			left = ++right;
-
-			while (right != end && *right != '}')
-				++right;
-
+			right = std::find(right, end, '}');
 			if (right == end)
 				break;
-
 			const auto value = find({ left, static_cast<size_t>(right - left) });
 			if (value)
 				append_to(target, value->string());
-
 			left = ++right;
 		}
 	}
