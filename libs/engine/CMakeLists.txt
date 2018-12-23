@@ -43,6 +43,7 @@ y_sources(yengine "include"
 y_sources(yengine "src/application"
 	application/application.cpp
 	application/application.h
+	application/key_codes.h
 	application/window.cpp
 	application/window.h
 	application/window_backend.h
@@ -71,8 +72,6 @@ if(UNIX)
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
 			set_property(SOURCE application/_x11/application.cpp application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
-			# TODO: Don't use XKeycodeToKeysym.
-			set_property(SOURCE application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-deprecated-declarations)
 		endif()
 	else()
 		y_sources(yengine "src/application/_xcb"
