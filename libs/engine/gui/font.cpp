@@ -126,23 +126,23 @@ namespace Yttrium
 			const auto scaling = font_size / static_cast<float>(_size);
 
 			float selection_left = 0;
-			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](std::size_t index) {
+			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](std::size_t offset) {
 				if (!capture)
 					return;
 
-				if (capture->_cursor_pos == index)
+				if (capture->_cursor_pos == offset)
 				{
-					capture->_cursor_rect = { { current_x, current_y + font_size * 0.125f }, SizeF(2, font_size * 0.75f) };
+					capture->_cursor_rect = { { current_x, current_y }, SizeF{ 2, font_size } };
 					capture->_has_cursor = true;
 				}
 
 				if (capture->_selection_begin < capture->_selection_end)
 				{
-					if (index == capture->_selection_begin)
+					if (offset == capture->_selection_begin)
 					{
 						selection_left = current_x;
 					}
-					else if (index == capture->_selection_end)
+					else if (offset == capture->_selection_end)
 					{
 						capture->_selection_rect = { { selection_left, current_y }, Vector2{ current_x, current_y + font_size } };
 						capture->_has_selection = true;
@@ -151,9 +151,9 @@ namespace Yttrium
 			};
 
 			auto previous = _chars.end();
-			std::size_t index = 0;
 			for (std::size_t i = 0; i < text.size();)
 			{
+				const auto offset = i;
 				const auto current = _chars.find(parse_utf8(text, i));
 				if (current == _chars.end())
 					continue;
@@ -164,11 +164,11 @@ namespace Yttrium
 						{ current_x + static_cast<float>(current->second.offset._x) * scaling, current_y + static_cast<float>(current->second.offset._y) * scaling },
 						SizeF(current->second.rect.size()) * scaling),
 					RectF(current->second.rect));
-				do_capture(index++);
+				do_capture(offset);
 				current_x += static_cast<float>(current->second.advance) * scaling;
 				previous = current;
 			}
-			do_capture(index);
+			do_capture(text.size());
 		}
 
 		Size text_size(std::string_view text) const override

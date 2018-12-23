@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_logic_line_editor_h_
-#define _src_gui_logic_line_editor_h_
+#pragma once
 
 #include <string>
 
@@ -26,24 +25,26 @@ namespace Yttrium
 	class LineEditor
 	{
 	public:
-		void clear();
-		size_t cursor() const { return _cursor; }
+		void clear() noexcept;
+		auto cursor() const noexcept { return _cursor; }
 		void insert(std::string_view);
 		void insert(char symbol) { insert({ &symbol, 1 }); }
 		bool process_key(const KeyEvent&);
-		void reset(std::string&&);
-		size_t selection_offset() const { return _selection_offset; }
-		size_t selection_size() const { return _selection_size; }
-		void set_max_size(size_t);
-		const std::string& text() const { return _text; }
+		void reset(std::string&&) noexcept;
+		auto selection_offset() const noexcept { return _selection_offset; }
+		auto selection_size() const noexcept { return _selection_size; }
+		void set_max_bytes(std::size_t) noexcept;
+		auto& text() const noexcept { return _text; }
+
+	private:
+		std::size_t left_codepoint_bytes() const noexcept;
+		std::size_t right_codepoint_bytes() const noexcept;
 
 	private:
 		std::string _text;
-		size_t _cursor = 0;
-		size_t _selection_size = 0;
-		size_t _selection_offset = 0;
-		size_t _max_size = _text.max_size();
+		std::size_t _cursor = 0;
+		std::size_t _selection_size = 0;
+		std::size_t _selection_offset = 0;
+		std::size_t _max_bytes = _text.max_size();
 	};
 }
-
-#endif

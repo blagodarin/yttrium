@@ -34,7 +34,7 @@ namespace Yttrium
 	{
 		style_data._background.draw(pass, rect);
 
-		TextCapture capture(_logic.cursor(), _logic.selection_offset(), _logic.selection_size());
+		TextCapture capture{ _logic.cursor(), _logic.selection_offset(), _logic.selection_size() };
 		style_data._foreground.prepare(_logic.text(), rect, &capture);
 		style_data._foreground.draw(pass);
 

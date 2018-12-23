@@ -21,9 +21,17 @@
 #include <algorithm>
 #include <cassert>
 
+namespace
+{
+	constexpr bool is_utf8_continuation(char c) noexcept
+	{
+		return (static_cast<unsigned char>(c) & 0b1100'0000u) == 0b1000'0000u;
+	}
+}
+
 namespace Yttrium
 {
-	void LineEditor::clear()
+	void LineEditor::clear() noexcept
 	{
 		_text.clear();
 		_cursor = 0;
@@ -38,7 +46,7 @@ namespace Yttrium
 			_cursor = _selection_offset;
 			_selection_size = 0;
 		}
-		if (text.size() <= _max_size - _text.size())
+		if (text.size() <= _max_bytes - _text.size())
 		{
 			_text.insert(_cursor, text.data(), text.size());
 			_cursor += text.size();
@@ -54,16 +62,17 @@ namespace Yttrium
 		case Key::Left:
 			if (_cursor > 0)
 			{
-				--_cursor;
+				const auto amount = left_codepoint_bytes();
+				_cursor -= amount;
 				if (shift)
 				{
-					if (_selection_size && _selection_offset <= _cursor)
+					if (_selection_size > 0 && _selection_offset <= _cursor)
 					{
-						--_selection_size;
+						_selection_size -= amount;
 					}
 					else
 					{
-						++_selection_size;
+						_selection_size += amount;
 						_selection_offset = _cursor;
 					}
 				}
@@ -75,20 +84,21 @@ namespace Yttrium
 		case Key::Right:
 			if (_cursor < _text.size())
 			{
+				const auto amount = right_codepoint_bytes();
 				if (shift)
 				{
-					if (_selection_size && _selection_offset == _cursor)
+					if (_selection_size > 0 && _selection_offset == _cursor)
 					{
-						--_selection_size;
-						++_selection_offset;
+						_selection_size -= amount;
+						_selection_offset += amount;
 					}
 					else
 					{
 						_selection_offset = _cursor - _selection_size;
-						++_selection_size;
+						_selection_size += amount;
 					}
 				}
-				++_cursor;
+				_cursor += amount;
 			}
 			if (!shift)
 				_selection_size = 0;
@@ -108,16 +118,14 @@ namespace Yttrium
 			return true;
 
 		case Key::Delete:
-			if (!_selection_size)
-			{
-				_text.erase(_cursor, 1);
-			}
-			else
+			if (_selection_size > 0)
 			{
 				_text.erase(_selection_offset, _selection_size);
 				_cursor = _selection_offset;
 				_selection_size = 0;
 			}
+			else if (_cursor < _text.size())
+				_text.erase(_cursor, right_codepoint_bytes());
 			return true;
 
 		case Key::Backspace:
@@ -129,7 +137,9 @@ namespace Yttrium
 			}
 			else if (_cursor > 0)
 			{
-				_text.erase(--_cursor, 1);
+				const auto amount = left_codepoint_bytes();
+				_cursor -= amount;
+				_text.erase(_cursor, amount);
 			}
 			return true;
 
@@ -138,25 +148,46 @@ namespace Yttrium
 		}
 	}
 
-	void LineEditor::reset(std::string&& text)
+	void LineEditor::reset(std::string&& text) noexcept
 	{
 		_text = std::move(text);
 		_cursor = _text.size();
 		_selection_size = 0;
 	}
 
-	void LineEditor::set_max_size(std::size_t max_size)
+	void LineEditor::set_max_bytes(std::size_t count) noexcept
 	{
-		_max_size = std::min(max_size, _text.max_size());
-		if (_text.size() > _max_size)
+		_max_bytes = std::min(count, _text.max_size());
+		if (_text.size() > _max_bytes)
 		{
-			auto new_size = _max_size;
-			while (new_size > 0 && (static_cast<unsigned char>(_text[new_size]) & 0b1100'0000u) == 0b1000'0000u)
-				--new_size;
-			_text.resize(new_size);
+			auto new_text_size = _max_bytes;
+			while (new_text_size > 0 && ::is_utf8_continuation(_text[new_text_size]))
+				--new_text_size;
+			_text.resize(new_text_size);
 		}
-		_cursor = std::min(_cursor, _max_size);
-		_selection_offset = std::min(_selection_offset, _max_size);
-		_selection_size = std::min(_selection_size, _max_size - _selection_offset);
+		_cursor = std::min(_cursor, _max_bytes);
+		_selection_offset = std::min(_selection_offset, _max_bytes);
+		_selection_size = std::min(_selection_size, _max_bytes - _selection_offset);
+	}
+
+	std::size_t LineEditor::left_codepoint_bytes() const noexcept
+	{
+		assert(_cursor > 0);
+		std::size_t result = 0;
+		do
+			++result;
+		while (_cursor > result && ::is_utf8_continuation(_text[_cursor - result]));
+		return result;
+	}
+
+	std::size_t LineEditor::right_codepoint_bytes() const noexcept
+	{
+		assert(_cursor < _text.size());
+		std::size_t result = 0;
+		const auto max_result = _text.size() - _cursor;
+		do
+			++result;
+		while (result < max_result && ::is_utf8_continuation(_text[_cursor + result]));
+		return result;
 	}
 }
