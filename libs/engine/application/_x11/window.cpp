@@ -238,7 +238,7 @@ namespace Yttrium
 						_callbacks.on_key_event(key, event.type == KeyPress, modifiers);
 					}
 				if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
-					_callbacks.on_text_event(std::string_view{ buffer.data(), static_cast<std::size_t>(count) });
+					_callbacks.on_text_input(std::string_view{ buffer.data(), static_cast<std::size_t>(count) });
 				break;
 			}
 

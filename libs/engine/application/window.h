@@ -44,7 +44,7 @@ namespace Yttrium
 		void on_focus_event(bool is_focused) override;
 		void on_key_event(Key, bool is_pressed, const std::optional<Flags<KeyEvent::Modifier>>&) override;
 		void on_resize_event(const Size&) override;
-		void on_text_event(std::string_view) override;
+		void on_text_input(std::string_view) override;
 
 	private:
 		void lock_cursor(bool);
@@ -67,7 +67,7 @@ namespace Yttrium
 		std::function<void(const KeyEvent&)> _on_key_event;
 		std::function<void(RenderPass&, const Vector2&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
-		std::function<void(std::string_view)> _on_text_event;
+		std::function<void(std::string_view)> _on_text_input;
 
 		friend Window;
 	};

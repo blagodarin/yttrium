@@ -32,6 +32,6 @@ namespace Yttrium
 		virtual void on_focus_event(bool is_focused) = 0;
 		virtual void on_key_event(Key, bool is_pressed, const std::optional<Flags<KeyEvent::Modifier>>&) = 0;
 		virtual void on_resize_event(const Size&) = 0;
-		virtual void on_text_event(std::string_view) = 0;
+		virtual void on_text_input(std::string_view) = 0;
 	};
 }

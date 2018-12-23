@@ -126,10 +126,10 @@ namespace Yttrium
 			lock_cursor(true);
 	}
 
-	void WindowPrivate::on_text_event(std::string_view text)
+	void WindowPrivate::on_text_input(std::string_view text)
 	{
-		if (_on_text_event)
-			_on_text_event(text);
+		if (_on_text_input)
+			_on_text_input(text);
 	}
 
 	void WindowPrivate::lock_cursor(bool lock)
@@ -190,9 +190,9 @@ namespace Yttrium
 		_private->_on_screenshot = callback;
 	}
 
-	void Window::on_text_event(const std::function<void(std::string_view)>& callback)
+	void Window::on_text_input(const std::function<void(std::string_view)>& callback)
 	{
-		_private->_on_text_event = callback;
+		_private->_on_text_input = callback;
 	}
 
 	RenderManager& Window::render_manager()

@@ -394,7 +394,7 @@ namespace Yttrium
 				{
 					const auto text = _keyboard->keycode_to_text(e->detail);
 					if (!text.empty())
-						_callbacks.on_text_event(text);
+						_callbacks.on_text_input(text);
 				}
 			}
 			break;
