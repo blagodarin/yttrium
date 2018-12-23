@@ -31,24 +31,6 @@ TEST_CASE("key_event")
 	CHECK(KeyEvent(Key::A, false, true).autorepeat);
 }
 
-TEST_CASE("key_event.to_char")
-{
-	using Yttrium::Key;
-	using Yttrium::KeyEvent;
-
-	const auto key_to_char = [](Key key, Yttrium::Flags<KeyEvent::Modifier> modifiers = {}) {
-		KeyEvent key_event{ key, false, false };
-		key_event.modifiers = modifiers;
-		return key_event.to_char();
-	};
-
-	CHECK(key_to_char(Key::Null) == '\0');
-	CHECK(key_to_char(Key::A) == 'a');
-	CHECK(key_to_char(Key::A, KeyEvent::Modifier::Shift) == 'A');
-	CHECK(key_to_char(Key::B) == 'b');
-	CHECK(key_to_char(Key::B, KeyEvent::Modifier::Shift) == 'B');
-}
-
 TEST_CASE("key_lookup")
 {
 	using Yttrium::Key;

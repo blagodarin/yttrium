@@ -219,10 +219,6 @@ namespace Yttrium
 				continue;
 			switch (event.type)
 			{
-			case MappingNotify:
-				::XRefreshKeyboardMapping(&event.xmapping);
-				break;
-
 			case KeyPress:
 			{
 				std::array<char, 32> buffer{};

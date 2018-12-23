@@ -225,9 +225,6 @@ namespace Yttrium
 		///
 		KeyEvent(Key key_, bool pressed_, bool autorepeat_)
 			: key{ key_ }, pressed{ pressed_ }, autorepeat{ autorepeat_ } {}
-
-		///
-		char to_char() const;
 	};
 }
 

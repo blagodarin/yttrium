@@ -43,7 +43,6 @@ y_sources(yengine "include"
 y_sources(yengine "src/application"
 	application/application.cpp
 	application/application.h
-	application/key.cpp
 	application/window.cpp
 	application/window.h
 	application/window_backend.h

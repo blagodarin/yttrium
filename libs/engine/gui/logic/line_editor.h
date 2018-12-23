@@ -28,7 +28,6 @@ namespace Yttrium
 		void clear() noexcept;
 		auto cursor() const noexcept { return _cursor; }
 		void insert(std::string_view);
-		void insert(char symbol) { insert({ &symbol, 1 }); }
 		bool process_key(const KeyEvent&);
 		void reset(std::string&&) noexcept;
 		auto selection_offset() const noexcept { return _selection_offset; }
