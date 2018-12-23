@@ -66,9 +66,7 @@ namespace Yttrium
 			default:
 				if (_logic.process_key(event))
 				{
-					_gui.script_context().set("_", _logic.text());
-					_data->run(_gui, WidgetData::Action::OnUpdate);
-					_cursor_mark = std::chrono::steady_clock::now();
+					update_input();
 					return true;
 				}
 			}
@@ -79,6 +77,7 @@ namespace Yttrium
 	bool InputWidget::process_text(std::string_view text)
 	{
 		_logic.insert(text);
+		update_input();
 		return true;
 	}
 
@@ -88,5 +87,12 @@ namespace Yttrium
 			return false;
 		_cursor_mark = std::chrono::steady_clock::now();
 		return true;
+	}
+
+	void InputWidget::update_input()
+	{
+		_gui.script_context().set("_", _logic.text());
+		_data->run(_gui, WidgetData::Action::OnUpdate);
+		_cursor_mark = std::chrono::steady_clock::now();
 	}
 }

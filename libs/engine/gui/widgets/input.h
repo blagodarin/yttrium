@@ -35,6 +35,9 @@ namespace Yttrium
 		bool process_mouse_press(Key, const Vector2&) override;
 
 	private:
+		void update_input();
+
+	private:
 		LineEditor _logic;
 		std::chrono::steady_clock::time_point _cursor_mark;
 	};
