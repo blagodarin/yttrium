@@ -25,6 +25,7 @@
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
+#include "utf8.h"
 
 #include <cassert>
 #include <cstring>
@@ -154,7 +155,7 @@ namespace Yttrium
 			for (std::size_t i = 0; i < text.size();)
 			{
 				const auto offset = i;
-				const auto current = _chars.find(parse_utf8(text, i));
+				const auto current = _chars.find(Utf8::next_codepoint(text, i));
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
@@ -177,7 +178,7 @@ namespace Yttrium
 			auto previous = _chars.end();
 			for (std::size_t i = 0; i < text.size();)
 			{
-				const auto current = _chars.find(parse_utf8(text, i));
+				const auto current = _chars.find(Utf8::next_codepoint(text, i));
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
@@ -199,33 +200,6 @@ namespace Yttrium
 		{
 			FT_Vector kerning_vector;
 			return !FT_Get_Kerning(_freetype._face, left_glyph, right_glyph, FT_KERNING_DEFAULT, &kerning_vector) ? static_cast<int>(kerning_vector.x >> 6) : 0;
-		}
-
-		static char32_t parse_utf8(std::string_view text, std::size_t& i) noexcept
-		{
-			const auto part1 = static_cast<std::uint8_t>(text[i++]);
-			if (!(part1 & 0b1000'0000))
-				return part1;
-
-			if (i == text.size())
-				return 0;
-
-			const auto part2 = char32_t{ static_cast<std::uint8_t>(text[i++]) & 0b0011'1111u };
-			if (!(part1 & 0b0010'0000))
-				return ((part1 & 0b0001'1111u) << 6) + part2;
-
-			if (i == text.size())
-				return 0;
-
-			const auto part3 = char32_t{ static_cast<std::uint8_t>(text[i++]) & 0b0011'1111u };
-			if (!(part1 & 0b0001'0000))
-				return ((part1 & 0b0000'1111u) << 12) + (part2 << 6) + part3;
-
-			if (i == text.size())
-				return 0;
-
-			const auto part4 = char32_t{ static_cast<std::uint8_t>(text[i++]) & 0b0011'1111u };
-			return ((part1 & 0b0000'0111u) << 18) + (part2 << 12) + (part3 << 6) + part4;
 		}
 
 	private:

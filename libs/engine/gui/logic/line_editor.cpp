@@ -17,17 +17,10 @@
 #include "line_editor.h"
 
 #include <yttrium/key.h>
+#include "../utf8.h"
 
 #include <algorithm>
 #include <cassert>
-
-namespace
-{
-	constexpr bool is_utf8_continuation(char c) noexcept
-	{
-		return (static_cast<unsigned char>(c) & 0b1100'0000u) == 0b1000'0000u;
-	}
-}
 
 namespace Yttrium
 {
@@ -161,7 +154,7 @@ namespace Yttrium
 		if (_text.size() > _max_bytes)
 		{
 			auto new_text_size = _max_bytes;
-			while (new_text_size > 0 && ::is_utf8_continuation(_text[new_text_size]))
+			while (new_text_size > 0 && Utf8::is_continuation(_text[new_text_size]))
 				--new_text_size;
 			_text.resize(new_text_size);
 		}
@@ -176,7 +169,7 @@ namespace Yttrium
 		std::size_t result = 0;
 		do
 			++result;
-		while (_cursor > result && ::is_utf8_continuation(_text[_cursor - result]));
+		while (_cursor > result && Utf8::is_continuation(_text[_cursor - result]));
 		return result;
 	}
 
@@ -187,7 +180,7 @@ namespace Yttrium
 		const auto max_result = _text.size() - _cursor;
 		do
 			++result;
-		while (result < max_result && ::is_utf8_continuation(_text[_cursor + result]));
+		while (result < max_result && Utf8::is_continuation(_text[_cursor + result]));
 		return result;
 	}
 }
