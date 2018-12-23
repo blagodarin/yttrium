@@ -27,6 +27,8 @@
 #include "swapchain.h"
 #include "texture.h"
 
+// TODO: Finish Vulkan implementation.
+
 namespace
 {
 	const std::vector<uint32_t> BuiltinVertexShader{

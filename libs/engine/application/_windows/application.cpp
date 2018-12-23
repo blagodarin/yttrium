@@ -23,6 +23,8 @@
 #include <cassert>
 #include <vector>
 
+// TODO: Implement text input.
+
 namespace Yttrium
 {
 	const char* const NativeApplication::WindowClass::Name = "Yttrium";
