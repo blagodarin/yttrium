@@ -17,7 +17,7 @@
 #include "line_editor.h"
 
 #include <yttrium/key.h>
-#include "../utf8.h"
+#include "../../utf8.h"
 
 #include <algorithm>
 #include <cassert>

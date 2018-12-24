@@ -16,13 +16,45 @@
 
 #pragma once
 
+#include <array>
 #include <string_view>
 
 namespace Yttrium
 {
 	namespace Utf8
 	{
-		inline constexpr bool is_continuation(char c) noexcept
+		constexpr std::size_t from_utf32(char32_t codepoint, std::array<char, 4>& buffer)
+		{
+			if (codepoint <= 0x7f)
+			{
+				buffer[0] = static_cast<char>(codepoint);
+				return 1;
+			}
+			else if (codepoint <= 0x7ff)
+			{
+				buffer[0] = static_cast<char>(0b1100'0000u | (0b0001'1111u & (codepoint >> 6)));
+				buffer[1] = static_cast<char>(0b1000'0000u | (0b0011'1111u & codepoint));
+				return 2;
+			}
+			else if (codepoint <= 0xffff)
+			{
+				buffer[0] = static_cast<char>(0b1110'0000u | (0b0000'1111u & (codepoint >> 12)));
+				buffer[1] = static_cast<char>(0b1000'0000u | (0b0011'1111u & (codepoint >> 6)));
+				buffer[2] = static_cast<char>(0b1000'0000u | (0b0011'1111u & codepoint));
+				return 3;
+			}
+			else if (codepoint <= 0x10ffff)
+			{
+				buffer[0] = static_cast<char>(0b1111'0000u | (0b0000'0111u & (codepoint >> 18)));
+				buffer[1] = static_cast<char>(0b1000'0000u | (0b0011'1111u & (codepoint >> 12)));
+				buffer[2] = static_cast<char>(0b1000'0000u | (0b0011'1111u & (codepoint >> 6)));
+				buffer[3] = static_cast<char>(0b1000'0000u | (0b0011'1111u & codepoint));
+				return 4;
+			}
+			return 0;
+		}
+
+		constexpr bool is_continuation(char c) noexcept
 		{
 			return (static_cast<unsigned char>(c) & 0b1100'0000u) == 0b1000'0000u;
 		}

@@ -18,8 +18,10 @@
 
 #include <yttrium/key.h>
 #include <yttrium/math/size.h>
+#include "../../utf8.h"
 #include "error.h"
 
+#include <array>
 #include <cassert>
 #include <vector>
 
@@ -202,6 +204,20 @@ namespace Yttrium
 		case WM_SIZE:
 			if (const auto i = _windows.find(hwnd); i != _windows.end())
 				i->second->on_resize({ LOWORD(lparam), HIWORD(lparam) });
+			break;
+
+		case WM_UNICHAR:
+			if (wparam == UNICODE_NOCHAR)
+				return 1;
+			[[fallthrough]];
+		case WM_CHAR:
+			if (const auto i = _windows.find(hwnd); i != _windows.end())
+			{
+				std::array<char, 4> buffer;
+				if (const auto bytes = Utf8::from_utf32(static_cast<char32_t>(wparam), buffer))
+					if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
+						i->second->on_text({ buffer.data(), bytes });
+			}
 			break;
 
 		default:

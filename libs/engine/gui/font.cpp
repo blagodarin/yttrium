@@ -25,7 +25,7 @@
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include "utf8.h"
+#include "../utf8.h"
 
 #include <cassert>
 #include <cstring>

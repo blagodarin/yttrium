@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <string_view>
 #include <unordered_map>
 
 #include <windows.h>
@@ -33,6 +34,7 @@ namespace Yttrium
 		virtual void on_focus(bool) = 0;
 		virtual void on_key(Key, bool pressed) = 0;
 		virtual void on_resize(const Size&) = 0;
+		virtual void on_text(std::string_view) = 0;
 	};
 
 	class NativeWindow

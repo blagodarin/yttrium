@@ -29,6 +29,9 @@ y_sources(yengine "include"
 	../../include/yttrium/console.h
 	../../include/yttrium/resource_loader.h
 	)
+y_sources(yengine "src"
+	utf8.h
+	)
 if(WIN32)
 	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
@@ -173,7 +176,6 @@ y_sources(yengine "src/gui"
 	gui/layout.h
 	gui/screen.cpp
 	gui/screen.h
-	gui/utf8.h
 	gui/widget_data.cpp
 	gui/widget_data.h
 	gui/widget.cpp

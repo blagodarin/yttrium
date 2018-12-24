@@ -49,6 +49,7 @@ namespace Yttrium
 		void on_focus(bool) override;
 		void on_key(Key, bool pressed) override;
 		void on_resize(const Size&) override;
+		void on_text(std::string_view) override;
 
 	private:
 		class WindowDC

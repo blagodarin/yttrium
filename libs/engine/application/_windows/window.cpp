@@ -98,4 +98,9 @@ namespace Yttrium
 		_size = size;
 		_callbacks.on_resize_event(_size);
 	}
+
+	void WindowBackend::on_text(std::string_view text)
+	{
+		_callbacks.on_text_input(text);
+	}
 }
