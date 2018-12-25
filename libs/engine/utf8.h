@@ -30,20 +30,20 @@ namespace Yttrium
 				buffer[0] = static_cast<char>(codepoint);
 				return 1;
 			}
-			else if (codepoint <= 0x7ff)
+			if (codepoint <= 0x7ff)
 			{
 				buffer[0] = static_cast<char>(0b1100'0000u | (0b0001'1111u & (codepoint >> 6)));
 				buffer[1] = static_cast<char>(0b1000'0000u | (0b0011'1111u & codepoint));
 				return 2;
 			}
-			else if (codepoint <= 0xffff)
+			if (codepoint <= 0xffff)
 			{
 				buffer[0] = static_cast<char>(0b1110'0000u | (0b0000'1111u & (codepoint >> 12)));
 				buffer[1] = static_cast<char>(0b1000'0000u | (0b0011'1111u & (codepoint >> 6)));
 				buffer[2] = static_cast<char>(0b1000'0000u | (0b0011'1111u & codepoint));
 				return 3;
 			}
-			else if (codepoint <= 0x10ffff)
+			if (codepoint <= 0x10ffff)
 			{
 				buffer[0] = static_cast<char>(0b1111'0000u | (0b0000'0111u & (codepoint >> 18)));
 				buffer[1] = static_cast<char>(0b1000'0000u | (0b0011'1111u & (codepoint >> 12)));
