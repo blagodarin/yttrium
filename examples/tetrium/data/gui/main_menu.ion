@@ -2,11 +2,11 @@ root screen "main_menu"
 {
 	on_key "esc" { quit }
 
-	music "examples/tetrium/data/music.ogg"
+	music "examples/tetrium/data/music/music.ogg"
 
 	stretch
 	{
-		image { texture "examples/tetrium/data/background.jpeg" }
+		image { texture "examples/tetrium/data/textures/background.jpeg" }
 	}
 
 	center "640" "480"

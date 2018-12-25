@@ -3,12 +3,12 @@ Font:      Source Sans Pro
 Copyright: (c) 2010-2018 Adobe
 License:   SIL Open Font License (OFL) version 1.1
 
-File:    music.ogg
-Author:  Lohstana David
-Album:   Folk & Acoustic
-Title:   Dans un petit verre d'eau
-License: Creative Commons Attribution 3.0
+File:      music/music.ogg
+Author:    Lohstana David
+Album:     Folk & Acoustic
+Title:     Dans un petit verre d'eau
+License:   Creative Commons Attribution 3.0
 
-File:    background.jpeg
-Source:  LoveTextures.com
-License: Creative Commons Attribution
+File:      textures/background.jpeg
+Source:    LoveTextures.com
+License:   Creative Commons Attribution

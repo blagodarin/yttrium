@@ -1,6 +1,5 @@
 package
 [
-	"examples/tetrium/data/background.jpeg"
 	"examples/tetrium/data/fonts/source_sans_pro.ttf"
 	"examples/tetrium/data/gui.ion"
 	"examples/tetrium/data/gui/game_over.ion"
@@ -12,5 +11,6 @@ package
 	"examples/tetrium/data/gui/statistics.ion"
 	"examples/tetrium/data/i18n/en.ion"
 	"examples/tetrium/data/i18n/ru.ion"
-	"examples/tetrium/data/music.ogg" { end "1:18.40" loop "0:04.95" }
+	"examples/tetrium/data/music/music.ogg" { end "1:18.40" loop "0:04.95" }
+	"examples/tetrium/data/textures/background.jpeg"
 ]

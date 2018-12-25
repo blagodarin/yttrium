@@ -182,9 +182,9 @@ int main(int, char**)
 
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");
-	::make_buttons_texture<16>(storage, "examples/tetrium/data/buttons.tga");
-	::make_cursor_texture<64>(storage, "examples/tetrium/data/cursor.tga");
-	::make_sound(storage, "data/sound.wav");
+	::make_buttons_texture<16>(storage, "textures/buttons.tga");
+	::make_cursor_texture<64>(storage, "textures/cursor.tga");
+	::make_sound(storage, "sounds/sound.wav");
 
 	std::optional<AudioManager> audio;
 	try
