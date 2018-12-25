@@ -196,13 +196,13 @@ namespace Yttrium
 	void GuiIonLoader::load(IonReader& ion)
 	{
 		static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(IonReader&, IonReader::Token&, Flags<Attribute>)> handlers{
-			{ "call", &GuiIonLoader::load_call },
 			{ "class", &GuiIonLoader::load_class },
 			{ "cursor", &GuiIonLoader::load_cursor },
 			{ "font", &GuiIonLoader::load_font },
 			{ "include", &GuiIonLoader::load_include },
 			{ "on_key", &GuiIonLoader::load_on_key },
 			{ "screen", &GuiIonLoader::load_screen },
+			{ "script", &GuiIonLoader::load_script },
 			{ "translation", &GuiIonLoader::load_translation },
 		};
 
@@ -222,15 +222,6 @@ namespace Yttrium
 				throw GuiDataError{ "Unknown entry '", token.text(), "'" };
 			(this->*i->second)(ion, token.next(ion), attributes);
 		}
-	}
-
-	void GuiIonLoader::load_call(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
-	{
-		const auto name = token.to_name();
-		std::vector<std::string> args;
-		for (token.next(ion); token.type() == IonReader::Token::Type::Value; token.next(ion))
-			args.emplace_back(token.translatable() ? _gui.translate(token.text()) : token.text());
-		_gui.script_context().call(std::string{ name }, args);
 	}
 
 	void GuiIonLoader::load_class(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
@@ -322,6 +313,20 @@ namespace Yttrium
 			if (i == handlers.end())
 				throw GuiDataError{ "Unknown screen entry '", token.text(), "'" };
 			(this->*i->second.first)(screen, ion, token.next(ion), i->second.second);
+		}
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_script(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
+	{
+		token.check_object_begin();
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
+		{
+			const auto name = token.to_name();
+			std::vector<std::string> args;
+			for (token.next(ion); token.type() == IonReader::Token::Type::Value; token.next(ion))
+				args.emplace_back(token.translatable() ? _gui.translate(token.text()) : token.text());
+			_gui.script_context().call(std::string{ name }, args);
 		}
 		token.next(ion);
 	}
