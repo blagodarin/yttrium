@@ -1,10 +1,12 @@
 script
 {
-	set_score `Grandmaster` "100000"
-	set_score `Master` "50000"
-	set_score `Professional` "10000"
-	set_score `Amateur` "5000"
-	set_score `Novice` "1000"
+	set_score_count "5"
+
+	add_score `Grandmaster` "100000"
+	add_score `Master` "50000"
+	add_score `Professional` "10000"
+	add_score `Amateur` "5000"
+	add_score `Novice` "1000"
 }
 
 class "statistics_index"

@@ -33,7 +33,7 @@ transparent screen "game_over"
 			text_color #000
 			text "John Placeholder"
 			on_update { call "player_name = _" }
-			on_enter { call "set_score player_name score" return_to "main_menu" enter "statistics" }
+			on_enter { call "add_score player_name score" return_to "main_menu" enter "statistics" }
 		}
 	}
 }

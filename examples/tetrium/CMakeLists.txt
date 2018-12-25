@@ -40,8 +40,6 @@ add_executable(tetrium WIN32
 	logic.cpp
 	logic.h
 	main.cpp
-	statistics.cpp
-	statistics.h
 	)
 target_link_libraries(tetrium ycore yengine)
 if(WIN32)

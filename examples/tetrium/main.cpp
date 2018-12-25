@@ -31,7 +31,6 @@
 
 #include "../utils.h"
 #include "graphics.h"
-#include "statistics.h"
 
 using namespace Yttrium;
 
@@ -116,6 +115,45 @@ namespace
 		const Tetrium::Game& _logic;
 		const TetriumGraphics& _graphics;
 	};
+
+	class ScoreTable
+	{
+	public:
+		explicit ScoreTable(ScriptContext& script)
+			: _script{ script } {}
+
+		void add_score(const std::string& name, int score)
+		{
+			const auto i = std::find_if(_scores.cbegin(), _scores.cend(), [score](const auto& table_score) { return table_score.second < score; });
+			if (i != _scores.cend())
+			{
+				_scores.emplace(i, name, score);
+				_scores.resize(_scores.size() - 1);
+				update_variables();
+			}
+		}
+
+		void set_score_count(int count)
+		{
+			_scores.resize(static_cast<std::size_t>(count));
+			update_variables();
+		}
+
+	private:
+		void update_variables() const
+		{
+			for (const auto& score : _scores)
+			{
+				const auto index = &score - _scores.data() + 1;
+				_script.set("name" + std::to_string(index), score.first);
+				_script.set("score" + std::to_string(index), score.second);
+			}
+		}
+
+	private:
+		ScriptContext& _script;
+		std::vector<std::pair<std::string, int>> _scores;
+	};
 }
 
 int main(int, char**)
@@ -138,8 +176,9 @@ int main(int, char**)
 	script.define("turn_left", [&logic](const ScriptCall&) { logic.turn_left(); });
 	script.define("turn_right", [&logic](const ScriptCall&) { logic.turn_right(); });
 
-	TetriumStatistics statistics{ script };
-	script.define("set_score", 2, [&statistics](const ScriptCall& call) { statistics.update(call._args[1]->to_int(), call._args[0]->string()); });
+	ScoreTable score_table{ script };
+	script.define("add_score", 2, [&score_table](const ScriptCall& call) { score_table.add_score(call._args[0]->string(), call._args[1]->to_int()); });
+	script.define("set_score_count", 1, [&score_table](const ScriptCall& call) { score_table.set_score_count(call._args[0]->to_int()); });
 
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");
