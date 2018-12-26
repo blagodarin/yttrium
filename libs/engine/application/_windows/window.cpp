@@ -45,7 +45,7 @@ namespace Yttrium
 
 	void WindowBackend::close()
 	{
-		::SendMessageA(_hwnd, WM_CLOSE, 0, 0);
+		::SendMessageW(_hwnd, WM_CLOSE, 0, 0);
 	}
 
 	bool WindowBackend::get_cursor(Point& cursor)

@@ -29,7 +29,7 @@
 
 namespace Yttrium
 {
-	const char* const NativeApplication::WindowClass::Name = "Yttrium";
+	const wchar_t* const NativeApplication::WindowClass::Name = L"Yttrium";
 
 	void NativeWindow::reset() noexcept
 	{
@@ -47,7 +47,13 @@ namespace Yttrium
 
 	NativeWindow NativeApplication::create_window(const char* title, NativeWindowCallbacks& callbacks)
 	{
-		const auto hwnd = ::CreateWindowExA(WS_EX_APPWINDOW, WindowClass::Name, title, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, _hinstance, this);
+		const auto title_size = ::MultiByteToWideChar(CP_UTF8, 0, title, -1, nullptr, 0);
+		if (!title_size)
+			throw_last_error("MultiByteToWideChar");
+		const auto title_buffer = std::make_unique<wchar_t[]>(title_size);
+		if (!::MultiByteToWideChar(CP_UTF8, 0, title, -1, title_buffer.get(), title_size))
+			throw_last_error("MultiByteToWideChar");
+		const auto hwnd = ::CreateWindowExW(WS_EX_APPWINDOW, WindowClass::Name, title_buffer.get(), WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, _hinstance, this);
 		if (!hwnd)
 			throw_last_error("CreateWindowEx");
 		NativeWindow result{ hwnd };
@@ -59,12 +65,12 @@ namespace Yttrium
 	{
 		// TODO: Process VK_SNAPSHOT, VK_{L,R}SHIFT, VK_{L,R}CONTROL, VK_{L,R}MENU.
 		MSG msg;
-		while (::PeekMessageA(&msg, NULL, 0, 0, PM_NOREMOVE))
+		while (::PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE))
 		{
-			if (!::GetMessageA(&msg, NULL, 0, 0))
+			if (!::GetMessageW(&msg, NULL, 0, 0))
 				return false;
 			::TranslateMessage(&msg);
-			::DispatchMessageA(&msg);
+			::DispatchMessageW(&msg);
 		}
 		return true;
 	}
@@ -221,7 +227,7 @@ namespace Yttrium
 			break;
 
 		default:
-			return ::DefWindowProcA(hwnd, msg, wparam, lparam);
+			return ::DefWindowProcW(hwnd, msg, wparam, lparam);
 		}
 		return 0;
 	}
@@ -231,11 +237,11 @@ namespace Yttrium
 		NativeApplication* application = nullptr;
 		if (msg == WM_NCCREATE)
 		{
-			application = static_cast<NativeApplication*>(((CREATESTRUCTA*)lparam)->lpCreateParams);
-			::SetWindowLongPtrA(hwnd, GWLP_USERDATA, (LONG_PTR)application);
+			application = static_cast<NativeApplication*>(((CREATESTRUCTW*)lparam)->lpCreateParams);
+			::SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)application);
 		}
 		else
-			application = (NativeApplication*)::GetWindowLongPtrA(hwnd, GWLP_USERDATA);
+			application = (NativeApplication*)::GetWindowLongPtrW(hwnd, GWLP_USERDATA);
 		return application->window_proc(hwnd, msg, wparam, lparam);
 	}
 
@@ -259,7 +265,7 @@ namespace Yttrium
 	NativeApplication::WindowClass::WindowClass(HINSTANCE hinstance, HCURSOR hcursor, WNDPROC wndproc)
 		: _hinstance{ hinstance }
 	{
-		WNDCLASSEXA wndclass{ sizeof wndclass };
+		WNDCLASSEXW wndclass{ sizeof wndclass };
 		wndclass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
 		wndclass.lpfnWndProc = wndproc;
 		wndclass.hInstance = _hinstance;
@@ -267,13 +273,13 @@ namespace Yttrium
 		wndclass.hCursor = hcursor;
 		wndclass.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		wndclass.lpszClassName = Name;
-		if (!::RegisterClassExA(&wndclass))
+		if (!::RegisterClassExW(&wndclass))
 			throw_last_error("RegisterClassEx");
 	}
 
 	NativeApplication::WindowClass::~WindowClass()
 	{
-		if (!::UnregisterClassA(Name, _hinstance))
+		if (!::UnregisterClassW(Name, _hinstance))
 			print_last_error("UnregisterClass");
 	}
 }

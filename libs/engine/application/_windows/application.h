@@ -87,13 +87,13 @@ namespace Yttrium
 			WindowClass(HINSTANCE, HCURSOR, WNDPROC);
 			~WindowClass() noexcept;
 
-			static const char* const Name;
+			static const wchar_t* const Name;
 
 		private:
 			const HINSTANCE _hinstance;
 		};
 
-		const HINSTANCE _hinstance = ::GetModuleHandleA(nullptr);
+		const HINSTANCE _hinstance = ::GetModuleHandleW(nullptr);
 		const EmptyCursor _cursor{ _hinstance };
 		const WindowClass _window_class{ _hinstance, _cursor, static_window_proc };
 		std::unordered_map<HWND, NativeWindowCallbacks*> _windows;
