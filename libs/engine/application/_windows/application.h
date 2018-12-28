@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <yttrium/key.h>
+
 #include <string_view>
 #include <unordered_map>
 
@@ -23,7 +25,6 @@
 
 namespace Yttrium
 {
-	enum class Key;
 	class Size;
 
 	class NativeWindowCallbacks
@@ -32,7 +33,7 @@ namespace Yttrium
 		virtual ~NativeWindowCallbacks() = default;
 		virtual void on_close() = 0;
 		virtual void on_focus(bool) = 0;
-		virtual void on_key(Key, bool pressed) = 0;
+		virtual void on_key(Key, bool pressed, Flags<KeyEvent::Modifier>) = 0;
 		virtual void on_resize(const Size&) = 0;
 		virtual void on_text(std::string_view) = 0;
 	};
@@ -64,6 +65,7 @@ namespace Yttrium
 		bool process_events();
 
 	private:
+		NativeWindowCallbacks* find_callbacks(HWND) const noexcept;
 		LRESULT window_proc(HWND, UINT, WPARAM, LPARAM);
 
 		static LRESULT CALLBACK static_window_proc(HWND, UINT, WPARAM, LPARAM);

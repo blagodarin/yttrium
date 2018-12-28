@@ -88,9 +88,9 @@ namespace Yttrium
 		_callbacks.on_focus_event(focused);
 	}
 
-	void WindowBackend::on_key(Key key, bool pressed)
+	void WindowBackend::on_key(Key key, bool pressed, Flags<KeyEvent::Modifier> modifiers)
 	{
-		_callbacks.on_key_event(key, pressed, {});
+		_callbacks.on_key_event(key, pressed, modifiers);
 	}
 
 	void WindowBackend::on_resize(const Size& size)

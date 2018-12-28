@@ -75,6 +75,12 @@ namespace Yttrium
 		return true;
 	}
 
+	NativeWindowCallbacks* NativeApplication::find_callbacks(HWND hwnd) const noexcept
+	{
+		const auto i = _windows.find(hwnd);
+		return i != _windows.end() ? i->second : nullptr;
+	}
+
 	LRESULT NativeApplication::window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 		auto key_from_wparam = [](WPARAM vk) {
@@ -145,11 +151,30 @@ namespace Yttrium
 			return Key::Null;
 		};
 
+		const auto get_modifiers = [wparam] {
+			Flags<KeyEvent::Modifier> modifiers;
+			if (::GetKeyState(VK_SHIFT) & 0x8000)
+				modifiers |= KeyEvent::Modifier::Shift;
+			if (::GetKeyState(VK_CONTROL) & 0x8000)
+				modifiers |= KeyEvent::Modifier::Control;
+			if (::GetKeyState(VK_MENU) & 0x8000)
+				modifiers |= KeyEvent::Modifier::Alt;
+			return modifiers;
+		};
+
+		const auto call_mouse_keys = [wparam](NativeWindowCallbacks& callbacks, Flags<KeyEvent::Modifier> modifiers) {
+			callbacks.on_key(Key::Mouse1, wparam & MK_LBUTTON, modifiers);
+			callbacks.on_key(Key::Mouse2, wparam & MK_RBUTTON, modifiers);
+			callbacks.on_key(Key::Mouse3, wparam & MK_MBUTTON, modifiers);
+			callbacks.on_key(Key::Mouse4, wparam & MK_XBUTTON1, modifiers);
+			callbacks.on_key(Key::Mouse5, wparam & MK_XBUTTON2, modifiers);
+		};
+
 		switch (msg)
 		{
 		case WM_CLOSE:
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_close();
+			if (const auto callbacks = find_callbacks(hwnd))
+				callbacks->on_close();
 			break;
 
 		case WM_DESTROY:
@@ -163,21 +188,27 @@ namespace Yttrium
 
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(key_from_wparam(wparam), true);
+			if (const auto callbacks = find_callbacks(hwnd))
+				callbacks->on_key(key_from_wparam(wparam), true, get_modifiers());
 			break;
 
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(key_from_wparam(wparam), false);
+			if (const auto callbacks = find_callbacks(hwnd))
+				callbacks->on_key(key_from_wparam(wparam), false, get_modifiers());
 			break;
 
 		case WM_MOUSEWHEEL:
-		{
-			const auto wheel = GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
-			(void)wheel; // TODO: Handle mouse wheel.
-		}
+		case WM_MOUSEHWHEEL:
+			if (const auto callbacks = find_callbacks(hwnd))
+			{
+				const auto modifiers = get_modifiers();
+				call_mouse_keys(*callbacks, modifiers);
+				const auto wheel = GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
+				(void)wheel; // TODO: Handle mouse wheel.
+			}
+			break;
+
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
@@ -187,29 +218,18 @@ namespace Yttrium
 		case WM_MBUTTONUP:
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
-		{
-			const auto buttons = GET_KEYSTATE_WPARAM(wparam);
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(Key::Mouse1, buttons & MK_LBUTTON);
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(Key::Mouse2, buttons & MK_RBUTTON);
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(Key::Mouse3, buttons & MK_MBUTTON);
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(Key::Mouse4, buttons & MK_XBUTTON1);
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_key(Key::Mouse5, buttons & MK_XBUTTON2);
-		}
-		break;
+			if (const auto callbacks = find_callbacks(hwnd))
+				call_mouse_keys(*callbacks, get_modifiers());
+			break;
 
 		case WM_ACTIVATE:
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_focus(wparam == WA_ACTIVE || wparam == WA_CLICKACTIVE);
+			if (const auto callbacks = find_callbacks(hwnd))
+				callbacks->on_focus(wparam == WA_ACTIVE || wparam == WA_CLICKACTIVE);
 			break;
 
 		case WM_SIZE:
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
-				i->second->on_resize({ LOWORD(lparam), HIWORD(lparam) });
+			if (const auto callbacks = find_callbacks(hwnd))
+				callbacks->on_resize({ LOWORD(lparam), HIWORD(lparam) });
 			break;
 
 		case WM_UNICHAR:
@@ -217,12 +237,12 @@ namespace Yttrium
 				return 1;
 			[[fallthrough]];
 		case WM_CHAR:
-			if (const auto i = _windows.find(hwnd); i != _windows.end())
+			if (const auto callbacks = find_callbacks(hwnd))
 			{
 				std::array<char, 4> buffer;
 				if (const auto bytes = Utf8::from_utf32(static_cast<char32_t>(wparam), buffer))
 					if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
-						i->second->on_text({ buffer.data(), bytes });
+						callbacks->on_text({ buffer.data(), bytes });
 			}
 			break;
 
