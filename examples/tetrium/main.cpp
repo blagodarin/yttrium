@@ -160,7 +160,7 @@ int main(int, char**)
 {
 	Application application;
 
-	Window window{ application, "Tetrium" };
+	Window window{ application, "Tetrium" }; // TODO: Get window title from GUI data.
 
 	ScriptContext script;
 

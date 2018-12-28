@@ -94,7 +94,7 @@ namespace Yttrium
 		if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
 			was_pressed = is_pressed;
 
-		if (!modifiers)
+		if (!modifiers) // TODO: Remove optional modifiers support.
 		{
 			if (_keys[to_underlying(Key::LShift)] || _keys[to_underlying(Key::RShift)])
 				event.modifiers |= KeyEvent::Modifier::Shift;
