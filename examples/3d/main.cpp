@@ -32,7 +32,7 @@ int main(int, char**)
 {
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("3d.ypq");
-	::make_checkerboard_texture(storage, "examples/3d/data/checkerboard.tga");
+	::make_checkerboard_texture(storage, "data/checkerboard.tga");
 
 	Game game{ storage };
 	game.run();

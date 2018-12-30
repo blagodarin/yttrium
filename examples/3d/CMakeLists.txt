@@ -15,8 +15,8 @@
 #
 
 add_ypack_target(3d_package
-	OUTPUT ${PROJECT_BINARY_DIR}/3d.ypq
-	INDEX data/index.txt)
+	INDEX data.index
+	OUTPUT ${PROJECT_BINARY_DIR}/3d.ypq)
 
 add_executable(3d WIN32
 	../utils.h

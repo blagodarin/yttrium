@@ -182,9 +182,9 @@ int main(int, char**)
 
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");
-	::make_buttons_texture<16>(storage, "textures/buttons.tga");
-	::make_cursor_texture<64>(storage, "textures/cursor.tga");
-	::make_sound(storage, "sounds/sound.wav");
+	::make_buttons_texture<16>(storage, "data/textures/buttons.tga");
+	::make_cursor_texture<64>(storage, "data/textures/cursor.tga");
+	::make_sound(storage, "data/sounds/sound.wav");
 
 	std::optional<AudioManager> audio;
 	try
@@ -196,7 +196,7 @@ int main(int, char**)
 	}
 
 	ResourceLoader resource_loader{ storage, &window.render_manager(), audio ? &*audio : nullptr };
-	Gui gui{ resource_loader, script, "examples/tetrium/data/gui.ion" };
+	Gui gui{ resource_loader, script, "data/gui.ion" };
 	gui.on_quit([&window] { window.close(); });
 
 	application.on_update([&script, &gui, &logic](const UpdateEvent& event) {

@@ -14,25 +14,22 @@
 # limitations under the License.
 #
 
-# Localization.
-file(GLOB LOCALIZATION_SOURCES RELATIVE ${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/examples/tetrium/data/gui/*.ion)
+file(GLOB _localization_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/data/gui/*.ion)
 add_custom_target(tetrium_localization
-	COMMAND ytr examples/tetrium/data/i18n/en.ion examples/tetrium/data/gui.ion ${LOCALIZATION_SOURCES}
-	COMMAND ytr examples/tetrium/data/i18n/ru.ion examples/tetrium/data/gui.ion ${LOCALIZATION_SOURCES}
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	COMMAND ytr data/i18n/en.ion data/gui.ion ${_localization_sources}
+	COMMAND ytr data/i18n/ru.ion data/gui.ion ${_localization_sources}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	BYPRODUCTS
-		${PROJECT_SOURCE_DIR}/examples/tetrium/data/i18n/en.ion
-		${PROJECT_SOURCE_DIR}/examples/tetrium/data/i18n/ru.ion
+		${CMAKE_CURRENT_SOURCE_DIR}/data/i18n/en.ion
+		${CMAKE_CURRENT_SOURCE_DIR}/data/i18n/ru.ion
 	)
 
-# Package.
 add_ypack_target(tetrium_package
+	INDEX data.index
 	OUTPUT ${PROJECT_BINARY_DIR}/tetrium.ypq
-	INDEX data/index.txt
 	DEPENDS tetrium_localization)
 
-# Executable.
 add_executable(tetrium WIN32
 	../utils.h
 	graphics.cpp

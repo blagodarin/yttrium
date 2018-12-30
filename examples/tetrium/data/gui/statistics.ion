@@ -33,7 +33,7 @@ screen "statistics"
 
 	stretch
 	{
-		image { texture "examples/tetrium/data/textures/background.jpeg" }
+		image { texture "data/textures/background.jpeg" }
 	}
 
 	center "640" "480"

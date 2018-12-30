@@ -55,7 +55,7 @@ function(add_ypack_target _target)
 		ypack ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX} ${_arg_OUTPUT}
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX}
 		BYPRODUCTS ${_arg_OUTPUT}
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		COMMENT "Generating ${_output}"
 		VERBATIM)
 	if(_arg_DEPENDS)

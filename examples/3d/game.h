@@ -54,11 +54,11 @@ private:
 	Window _window{ _application };
 	ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
 	ScriptContext _script;
-	Gui _gui{ _resource_loader, _script, "examples/3d/data/gui.ion" };
+	Gui _gui{ _resource_loader, _script, "data/gui.ion" };
 	bool _debug_text_visible = false;
 	std::string _debug_text;
-	Model _cube{ _resource_loader, "examples/3d/data/cube.obj", "examples/3d/data/cube.material" };
-	Model _checkerboard{ _resource_loader, "examples/3d/data/checkerboard.obj", "examples/3d/data/checkerboard.material" };
+	Model _cube{ _resource_loader, "data/cube.obj", "data/cube.material" };
+	Model _checkerboard{ _resource_loader, "data/checkerboard.obj", "data/checkerboard.material" };
 
 	Vector3 _position{ 0, -8.5, 16 };
 	Euler _rotation{ 0, -60, 0 };
