@@ -79,8 +79,11 @@ namespace Yttrium
 		::XDefineCursor(_application.display(), _window.get(), _empty_cursor.get());
 		::XSetICFocus(_input_context.get());
 
-		// Show window in fullscreen mode.
-		::XChangeProperty(_application.display(), _window.get(), _net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&_net_wm_state_fullscreen), 1);
+		{
+			const auto net_wm_state = ::XInternAtom(_application.display(), "_NET_WM_STATE", False);
+			auto net_wm_state_fullscreen = ::XInternAtom(_application.display(), "_NET_WM_STATE_FULLSCREEN", False);
+			::XChangeProperty(_application.display(), _window.get(), net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&net_wm_state_fullscreen), 1);
+		}
 
 		_glx.bind(_window.get());
 
@@ -211,7 +214,8 @@ namespace Yttrium
 		auto title_data = title.c_str();
 		if (Success != ::Xutf8TextListToTextProperty(_application.display(), const_cast<char**>(&title_data), 1, XUTF8StringStyle, &title_property))
 			return;
-		::XSetWMName(_application.display(), _window.get(), &title_property);
+		const auto net_wm_name = ::XInternAtom(_application.display(), "_NET_WM_NAME", False);
+		::XSetTextProperty(_application.display(), _window.get(), &title_property, net_wm_name);
 		::XFree(title_property.value);
 		::XSync(_application.display(), False);
 	}

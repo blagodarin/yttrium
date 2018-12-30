@@ -25,8 +25,6 @@ namespace Yttrium
 {
 	class WindowBackendCallbacks;
 
-	using P_Atom = UniquePtr<xcb_intern_atom_reply_t, std::free>;
-
 	class WindowBackend
 	{
 	public:
@@ -46,15 +44,20 @@ namespace Yttrium
 		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
+		using P_Atom = UniquePtr<xcb_intern_atom_reply_t, std::free>;
+
+		P_Atom make_atom(std::string_view);
+
+	private:
 		class EmptyCursor;
 		class Keyboard;
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
+		P_Atom _wm_protocols{ make_atom("WM_PROTOCOLS") };
+		P_Atom _wm_delete_window{ make_atom("WM_DELETE_WINDOW") };
 		std::unique_ptr<Keyboard> _keyboard;
 		xcb_window_t _window = XCB_WINDOW_NONE;
-		P_Atom _wm_protocols;
-		P_Atom _wm_delete_window;
 		std::unique_ptr<EmptyCursor> _empty_cursor;
 		std::optional<Size> _size;
 	};

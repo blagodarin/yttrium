@@ -45,11 +45,6 @@ namespace
 		default: return Key::Null;
 		}
 	}
-
-	auto make_atom(xcb_connection_t* connection, bool only_if_exists, std::string_view name)
-	{
-		return P_Atom{ ::xcb_intern_atom_reply(connection, ::xcb_intern_atom(connection, only_if_exists, static_cast<uint16_t>(name.size()), name.data()), nullptr) };
-	}
 }
 
 namespace Yttrium
@@ -203,15 +198,13 @@ namespace Yttrium
 		::xcb_create_window(_application.connection(), XCB_COPY_FROM_PARENT, _window, _application.screen()->root,
 			0, 0, _application.screen()->width_in_pixels, _application.screen()->height_in_pixels, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, _application.screen()->root_visual, mask, list);
 
-		_wm_protocols = ::make_atom(_application.connection(), true, "WM_PROTOCOLS");
-		_wm_delete_window = ::make_atom(_application.connection(), false, "WM_DELETE_WINDOW");
 		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, _wm_protocols->atom, XCB_ATOM_ATOM, 32, 1, &_wm_delete_window->atom);
 
 		_empty_cursor = std::make_unique<EmptyCursor>(_application.connection(), _window);
 
 		{
-			const auto net_wm_state = ::make_atom(_application.connection(), false, "_NET_WM_STATE");
-			const auto net_wm_state_fullscreen = ::make_atom(_application.connection(), false, "_NET_WM_STATE_FULLSCREEN");
+			const auto net_wm_state = make_atom("_NET_WM_STATE");
+			const auto net_wm_state_fullscreen = make_atom("_NET_WM_STATE_FULLSCREEN");
 			::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, net_wm_state->atom, XCB_ATOM_ATOM, 32, 1, &net_wm_state_fullscreen->atom);
 		}
 
@@ -339,8 +332,9 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return;
-		const auto utf8_string = ::make_atom(_application.connection(), false, "UTF8_STRING");
-		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, utf8_string->atom, 8, static_cast<uint32_t>(title.size()), title.data());
+		const auto net_wm_name = make_atom("_NET_WM_NAME");
+		const auto utf8_string = make_atom("UTF8_STRING");
+		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, net_wm_name->atom, utf8_string->atom, 8, static_cast<uint32_t>(title.size()), title.data());
 		::xcb_flush(_application.connection());
 	}
 
@@ -355,5 +349,10 @@ namespace Yttrium
 	void WindowBackend::swap_buffers()
 	{
 		static_assert(Y_RENDERER_NULL || Y_RENDERER_VULKAN, "Not implemented");
+	}
+
+	WindowBackend::P_Atom WindowBackend::make_atom(std::string_view name)
+	{
+		return P_Atom{ ::xcb_intern_atom_reply(_application.connection(), ::xcb_intern_atom(_application.connection(), 0, static_cast<uint16_t>(name.size()), name.data()), nullptr) };
 	}
 }

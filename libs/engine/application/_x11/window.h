@@ -76,10 +76,8 @@ namespace Yttrium
 		WindowHandle _window;
 		UniquePtr<std::remove_pointer_t<::XIC>, ::XDestroyIC> _input_context;
 		const EmptyCursor _empty_cursor{ _application.display(), _window.get() };
-		::Atom _wm_protocols = ::XInternAtom(_application.display(), "WM_PROTOCOLS", True);
-		::Atom _wm_delete_window = ::XInternAtom(_application.display(), "WM_DELETE_WINDOW", True);
-		::Atom _net_wm_state = ::XInternAtom(_application.display(), "_NET_WM_STATE", True);
-		::Atom _net_wm_state_fullscreen = ::XInternAtom(_application.display(), "_NET_WM_STATE_FULLSCREEN", True);
+		::Atom _wm_protocols = ::XInternAtom(_application.display(), "WM_PROTOCOLS", False);
+		::Atom _wm_delete_window = ::XInternAtom(_application.display(), "WM_DELETE_WINDOW", False);
 		WindowBackendCallbacks& _callbacks;
 	};
 }
