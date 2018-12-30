@@ -21,7 +21,7 @@
 
 #include <functional>
 #include <memory>
-#include <string_view>
+#include <string>
 
 namespace Yttrium
 {
@@ -58,6 +58,7 @@ namespace Yttrium
 		bool process_key_event(const KeyEvent&);
 		bool process_text_input(std::string_view text);
 		void start();
+		std::string title() const;
 
 	private:
 		const std::unique_ptr<class GuiPrivate> _private;

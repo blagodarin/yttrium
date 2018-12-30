@@ -1,3 +1,5 @@
+title "Yttrium 3D example"
+
 on_key "f1" { call "debug" }
 on_key "f10" { call "screenshot" }
 

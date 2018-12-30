@@ -205,14 +205,23 @@ namespace Yttrium
 
 	void WindowBackend::set_title(const std::string& title)
 	{
-		if (_window)
-			::XStoreName(_application.display(), _window.get(), title.c_str());
+		if (!_window)
+			return;
+		XTextProperty title_property;
+		auto title_data = title.c_str();
+		if (Success != ::Xutf8TextListToTextProperty(_application.display(), const_cast<char**>(&title_data), 1, XUTF8StringStyle, &title_property))
+			return;
+		::XSetWMName(_application.display(), _window.get(), &title_property);
+		::XFree(title_property.value);
+		::XSync(_application.display(), False);
 	}
 
 	void WindowBackend::show()
 	{
-		if (_window)
-			::XMapRaised(_application.display(), _window.get());
+		if (!_window)
+			return;
+		::XMapRaised(_application.display(), _window.get());
+		::XSync(_application.display(), False);
 	}
 
 	void WindowBackend::swap_buffers()

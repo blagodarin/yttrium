@@ -231,7 +231,7 @@ int main(int, char**)
 	}
 
 	gui.start();
-	window.set_title("Tetrium"); // TODO: Get window title from GUI data.
+	window.set_title(gui.title());
 	window.show();
 	application.run();
 }

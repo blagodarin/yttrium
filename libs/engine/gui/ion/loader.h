@@ -56,6 +56,7 @@ namespace Yttrium
 		void load_on_key(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_screen(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_script(IonReader&, IonReader::Token&, Flags<Attribute>);
+		void load_title(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_translation(IonReader&, IonReader::Token&, Flags<Attribute>);
 
 		void load_screen_cursor(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;

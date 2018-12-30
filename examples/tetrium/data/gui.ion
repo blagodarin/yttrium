@@ -1,5 +1,7 @@
 translation "examples/tetrium/data/i18n/en.ion"
 
+title `Tetrium`
+
 default font
 {
 	file "examples/tetrium/data/fonts/source_sans_pro.ttf"

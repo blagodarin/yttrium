@@ -233,4 +233,9 @@ namespace Yttrium
 		assert(_private->_screen_stack.empty()); // TODO: Remove explicit 'start()'.
 		_private->enter_screen(*_private->_root_screen);
 	}
+
+	std::string Gui::title() const
+	{
+		return _private->_title;
+	}
 }

@@ -339,7 +339,9 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return;
-		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, static_cast<uint32_t>(title.size()), title.data());
+		const auto utf8_string = ::make_atom(_application.connection(), false, "UTF8_STRING");
+		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, utf8_string->atom, 8, static_cast<uint32_t>(title.size()), title.data());
+		::xcb_flush(_application.connection());
 	}
 
 	void WindowBackend::show()

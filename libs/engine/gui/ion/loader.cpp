@@ -203,6 +203,7 @@ namespace Yttrium
 			{ "on_key", &GuiIonLoader::load_on_key },
 			{ "screen", &GuiIonLoader::load_screen },
 			{ "script", &GuiIonLoader::load_script },
+			{ "title", &GuiIonLoader::load_title },
 			{ "translation", &GuiIonLoader::load_translation },
 		};
 
@@ -328,6 +329,12 @@ namespace Yttrium
 				args.emplace_back(token.translatable() ? _gui.translate(token.text()) : token.text());
 			_gui.script_context().call(std::string{ name }, args);
 		}
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_title(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
+	{
+		_gui.set_title(token.translatable() ? _gui.translate(token.to_value()) : token.to_value());
 		token.next(ion);
 	}
 
