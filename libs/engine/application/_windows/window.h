@@ -34,12 +34,13 @@ namespace Yttrium
 	class WindowBackend : private NativeWindowCallbacks
 	{
 	public:
-		WindowBackend(const std::string& name, WindowBackendCallbacks&);
+		WindowBackend(WindowBackendCallbacks&);
 
 		void close();
 		bool get_cursor(Point&);
 		bool process_events() { return _application.process_events(); }
 		bool set_cursor(const Point&);
+		void set_title(const std::string&);
 		void show();
 		std::optional<Size> size() const { return _size; }
 		void swap_buffers();
@@ -62,10 +63,9 @@ namespace Yttrium
 			const HDC _hdc;
 		};
 
-		const std::string _name;
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
-		NativeWindow _hwnd = _application.create_window(_name.c_str(), *this);
+		NativeWindow _hwnd = _application.create_window(*this);
 		const WindowDC _hdc{ _hwnd };
 #if Y_RENDERER_OPENGL
 		const WglContext _wgl{ _hdc };

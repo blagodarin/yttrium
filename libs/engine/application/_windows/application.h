@@ -61,7 +61,7 @@ namespace Yttrium
 		NativeApplication();
 		~NativeApplication() noexcept;
 
-		NativeWindow create_window(const char* title, NativeWindowCallbacks&);
+		NativeWindow create_window(NativeWindowCallbacks&);
 		bool process_events();
 
 	private:

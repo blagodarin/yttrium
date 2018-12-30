@@ -30,13 +30,14 @@ namespace Yttrium
 	class WindowBackend
 	{
 	public:
-		WindowBackend(const std::string& name, WindowBackendCallbacks&);
+		WindowBackend(WindowBackendCallbacks&);
 		~WindowBackend() noexcept;
 
 		void close() noexcept;
 		bool get_cursor(Point&);
 		bool process_events();
 		bool set_cursor(const Point&);
+		void set_title(const std::string&);
 		void show();
 		std::optional<Size> size() const { return _size; }
 		void swap_buffers();

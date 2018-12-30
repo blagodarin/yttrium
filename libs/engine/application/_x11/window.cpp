@@ -67,7 +67,7 @@ namespace
 
 namespace Yttrium
 {
-	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
 		: _window{ _application.display(), ::create_window(_application.display(), _application.screen(), _glx.visual_info()) }
 		, _callbacks{ callbacks }
 	{
@@ -76,7 +76,6 @@ namespace Yttrium
 			throw InitializationError{ "XCreateIC failed" };
 
 		::XSetWMProtocols(_application.display(), _window.get(), &_wm_delete_window, 1);
-		::XStoreName(_application.display(), _window.get(), name.c_str());
 		::XDefineCursor(_application.display(), _window.get(), _empty_cursor.get());
 		::XSetICFocus(_input_context.get());
 
@@ -202,6 +201,12 @@ namespace Yttrium
 		::XWarpPointer(_application.display(), None, _window.get(), 0, 0, 0, 0, cursor._x, cursor._y);
 		::XSync(_application.display(), False);
 		return true;
+	}
+
+	void WindowBackend::set_title(const std::string& title)
+	{
+		if (_window)
+			::XStoreName(_application.display(), _window.get(), title.c_str());
 	}
 
 	void WindowBackend::show()

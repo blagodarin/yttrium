@@ -188,7 +188,7 @@ namespace Yttrium
 		UniquePtr<xkb_state, ::xkb_state_unref> _state;
 	};
 
-	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
+	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
 		: _callbacks{ callbacks }
 	{
 		_keyboard = std::make_unique<Keyboard>(_application.connection());
@@ -206,8 +206,6 @@ namespace Yttrium
 		_wm_protocols = ::make_atom(_application.connection(), true, "WM_PROTOCOLS");
 		_wm_delete_window = ::make_atom(_application.connection(), false, "WM_DELETE_WINDOW");
 		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, _wm_protocols->atom, XCB_ATOM_ATOM, 32, 1, &_wm_delete_window->atom);
-
-		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, static_cast<uint32_t>(name.size()), name.data());
 
 		_empty_cursor = std::make_unique<EmptyCursor>(_application.connection(), _window);
 
@@ -335,6 +333,13 @@ namespace Yttrium
 		::xcb_warp_pointer(_application.connection(), XCB_WINDOW_NONE, _window, 0, 0, 0, 0, static_cast<int16_t>(cursor._x), static_cast<int16_t>(cursor._y));
 		::xcb_flush(_application.connection());
 		return true;
+	}
+
+	void WindowBackend::set_title(const std::string& title)
+	{
+		if (_window == XCB_WINDOW_NONE)
+			return;
+		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, static_cast<uint32_t>(title.size()), title.data());
 	}
 
 	void WindowBackend::show()

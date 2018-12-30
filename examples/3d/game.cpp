@@ -127,6 +127,7 @@ Game::~Game() = default;
 void Game::run()
 {
 	_gui.start();
+	_window.set_title("Yttrium 3D example");
 	_window.show();
 	_application.run();
 }

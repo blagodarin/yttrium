@@ -160,7 +160,7 @@ int main(int, char**)
 {
 	Application application;
 
-	Window window{ application, "Tetrium" }; // TODO: Get window title from GUI data.
+	Window window{ application };
 
 	ScriptContext script;
 
@@ -231,6 +231,7 @@ int main(int, char**)
 	}
 
 	gui.start();
+	window.set_title("Tetrium"); // TODO: Get window title from GUI data.
 	window.show();
 	application.run();
 }

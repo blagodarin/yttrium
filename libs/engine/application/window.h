@@ -34,7 +34,7 @@ namespace Yttrium
 	class WindowPrivate final : private WindowBackendCallbacks
 	{
 	public:
-		WindowPrivate(Application&, std::string_view name);
+		WindowPrivate(Application&);
 
 		bool process_events() { return _backend.process_events(); }
 		void render(UpdateEvent&);
@@ -52,8 +52,7 @@ namespace Yttrium
 
 	private:
 		const ApplicationStub _application;
-		const std::string _name;
-		WindowBackend _backend{ _name, *this };
+		WindowBackend _backend{ *this };
 		RendererImpl _renderer{ _backend };
 		RenderBuiltin _renderer_builtin{ *_renderer._backend };
 		RenderPassData _render_pass_data;

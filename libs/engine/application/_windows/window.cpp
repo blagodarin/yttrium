@@ -34,9 +34,8 @@ namespace Yttrium
 			throw InitializationError{ "GetDC failed" };
 	}
 
-	WindowBackend::WindowBackend(const std::string& name, WindowBackendCallbacks& callbacks)
-		: _name{ name }
-		, _callbacks{ callbacks }
+	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
+		: _callbacks{ callbacks }
 	{
 		RECT client_rect{ 0, 0, 0, 0 };
 		::GetClientRect(_hwnd, &client_rect);
@@ -63,6 +62,18 @@ namespace Yttrium
 		POINT gdi_cursor{ cursor._x, cursor._y };
 		return ::ClientToScreen(_hwnd, &gdi_cursor)
 			&& ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
+	}
+
+	void WindowBackend::set_title(const std::string& title)
+	{
+		const auto title_size = ::MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, nullptr, 0);
+		if (!title_size)
+			throw_last_error("MultiByteToWideChar");
+		const auto title_buffer = std::make_unique<wchar_t[]>(title_size);
+		if (!::MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, title_buffer.get(), title_size))
+			throw_last_error("MultiByteToWideChar");
+		if (!::SetWindowTextW(_hwnd, title_buffer.get()))
+			throw_last_error("SetWindowText");
 	}
 
 	void WindowBackend::show()

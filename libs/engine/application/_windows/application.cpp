@@ -45,15 +45,9 @@ namespace Yttrium
 
 	NativeApplication::~NativeApplication() noexcept = default;
 
-	NativeWindow NativeApplication::create_window(const char* title, NativeWindowCallbacks& callbacks)
+	NativeWindow NativeApplication::create_window(NativeWindowCallbacks& callbacks)
 	{
-		const auto title_size = ::MultiByteToWideChar(CP_UTF8, 0, title, -1, nullptr, 0);
-		if (!title_size)
-			throw_last_error("MultiByteToWideChar");
-		const auto title_buffer = std::make_unique<wchar_t[]>(title_size);
-		if (!::MultiByteToWideChar(CP_UTF8, 0, title, -1, title_buffer.get(), title_size))
-			throw_last_error("MultiByteToWideChar");
-		const auto hwnd = ::CreateWindowExW(WS_EX_APPWINDOW, WindowClass::Name, title_buffer.get(), WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, _hinstance, this);
+		const auto hwnd = ::CreateWindowExW(WS_EX_APPWINDOW, WindowClass::Name, L"", WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, _hinstance, this);
 		if (!hwnd)
 			throw_last_error("CreateWindowEx");
 		NativeWindow result{ hwnd };

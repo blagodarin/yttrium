@@ -39,7 +39,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Window(Application&, std::string_view name);
+		Window(Application&);
 
 		///
 		~Window();
@@ -73,6 +73,9 @@ namespace Yttrium
 
 		///
 		bool set_cursor(const Point& cursor);
+
+		///
+		void set_title(const std::string&);
 
 		///
 		void show();

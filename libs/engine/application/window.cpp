@@ -25,9 +25,8 @@
 
 namespace Yttrium
 {
-	WindowPrivate::WindowPrivate(Application& application, std::string_view name)
+	WindowPrivate::WindowPrivate(Application& application)
 		: _application{ application, *this }
-		, _name{ name }
 	{
 		const auto size = _backend.size();
 		if (size)
@@ -148,8 +147,8 @@ namespace Yttrium
 		lock_cursor(_is_cursor_locked);
 	}
 
-	Window::Window(Application& application, std::string_view name)
-		: _private{ std::make_unique<WindowPrivate>(application, name) }
+	Window::Window(Application& application)
+		: _private{ std::make_unique<WindowPrivate>(application) }
 	{
 	}
 
@@ -206,6 +205,11 @@ namespace Yttrium
 			return false;
 		_private->_cursor = cursor;
 		return true;
+	}
+
+	void Window::set_title(const std::string& title)
+	{
+		_private->_backend.set_title(title);
 	}
 
 	void Window::show()

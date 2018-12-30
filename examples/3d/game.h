@@ -51,7 +51,7 @@ private:
 private:
 	const Storage& _storage;
 	Application _application;
-	Window _window{ _application, "Yttrium 3D example" };
+	Window _window{ _application };
 	ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
 	ScriptContext _script;
 	Gui _gui{ _resource_loader, _script, "examples/3d/data/gui.ion" };
