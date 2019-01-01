@@ -27,7 +27,6 @@ namespace Yttrium
 	class AudioManager;
 	class Material;
 	class Mesh;
-	class MusicReader;
 	class RenderManager;
 	class Sound;
 	class Source;
@@ -56,7 +55,6 @@ namespace Yttrium
 
 		///
 		std::unique_ptr<Source> open(std::string_view name);
-		std::unique_ptr<MusicReader> open_music(std::string_view name);
 
 		/// Releases all loaded resources that have no references outside of the loader.
 		void release_unused();

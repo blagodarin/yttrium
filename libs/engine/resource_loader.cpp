@@ -17,7 +17,6 @@
 #include <yttrium/resource_loader.h>
 
 #include <yttrium/audio/manager.h>
-#include <yttrium/audio/music_reader.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/image.h>
@@ -232,20 +231,6 @@ namespace Yttrium
 		if (!source)
 			throw ResourceError{ "Missing \"", name, "\"" };
 		return source;
-	}
-
-	std::unique_ptr<MusicReader> ResourceLoader::open_music(std::string_view name)
-	{
-		auto source = open(name);
-
-		const auto start_ms = time_from_chars(source->property("start"));
-		const auto end_ms = time_from_chars(source->property("end"));
-		const auto loop_ms = time_from_chars(source->property("loop"));
-
-		auto music = MusicReader::open(std::move(source));
-		if (!music->set_properties(start_ms, end_ms, loop_ms))
-			throw DataError{ "(", name, ") Bad music properties" };
-		return music;
 	}
 
 	void ResourceLoader::release_unused()

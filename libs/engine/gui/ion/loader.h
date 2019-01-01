@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_ion_loader_h_
-#define _src_gui_ion_loader_h_
+#pragma once
 
 #include <yttrium/ion/reader.h>
 #include <yttrium/utils/flags.h>
@@ -54,6 +53,7 @@ namespace Yttrium
 		void load_font(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_icon(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_include(IonReader&, IonReader::Token&, Flags<Attribute>);
+		void load_music(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_on_key(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_screen(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_script(IonReader&, IonReader::Token&, Flags<Attribute>);
@@ -93,5 +93,3 @@ namespace Yttrium
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
 	};
 }
-
-#endif

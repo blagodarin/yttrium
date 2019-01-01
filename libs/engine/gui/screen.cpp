@@ -238,6 +238,12 @@ namespace Yttrium
 			_cursor_texture = _gui.resource_loader().load_texture_2d(texture);
 	}
 
+	void GuiScreen::set_music(std::string_view music)
+	{
+		_music = !music.empty() ? _gui.music(std::string{ music }) : nullptr;
+		_has_music = true;
+	}
+
 	Widget* GuiScreen::widget_at(const Vector2& point) const
 	{
 		for (auto i = _widgets.rbegin(); i != _widgets.rend(); ++i)

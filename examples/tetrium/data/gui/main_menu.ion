@@ -2,7 +2,7 @@ root screen "main_menu"
 {
 	on_key "esc" { quit }
 
-	music "data/music/music.ogg"
+	music "default"
 
 	stretch
 	{

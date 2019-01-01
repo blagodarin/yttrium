@@ -12,6 +12,6 @@ package
 	"data/i18n/en.ion"
 	"data/i18n/ru.ion"
 	"data/icon.tga"
-	"data/music/music.ogg" { end "1:18.40" loop "0:04.95" }
+	"data/music/music.ogg"
 	"data/textures/background.jpeg"
 ]

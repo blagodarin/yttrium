@@ -3,6 +3,13 @@ translation "data/i18n/en.ion"
 title `Tetrium`
 icon "data/icon.tga"
 
+music "default"
+{
+	file "data/music/music.ogg"
+	end "1:18.40"
+	loop "0:04.95"
+}
+
 default font
 {
 	file "data/fonts/source_sans_pro.ttf"

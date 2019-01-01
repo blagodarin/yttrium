@@ -201,6 +201,7 @@ namespace Yttrium
 			{ "font", &GuiIonLoader::load_font },
 			{ "icon", &GuiIonLoader::load_icon },
 			{ "include", &GuiIonLoader::load_include },
+			{ "music", &GuiIonLoader::load_music },
 			{ "on_key", &GuiIonLoader::load_on_key },
 			{ "screen", &GuiIonLoader::load_screen },
 			{ "script", &GuiIonLoader::load_script },
@@ -290,6 +291,36 @@ namespace Yttrium
 	{
 		load(token.to_value());
 		token.next(ion);
+	}
+
+	void GuiIonLoader::load_music(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
+	{
+		std::string_view music_name = token.to_value();
+		if (music_name.empty())
+			throw GuiDataError{ "Empty music name" };
+		std::string_view music_file;
+		int music_start = 0;
+		int music_end = 0;
+		int music_loop = 0;
+		token.next(ion).check_object_begin();
+		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
+		{
+			if (const auto entry_name = token.to_name(); entry_name == "file")
+				music_file = token.next(ion).to_value();
+			else if (entry_name == "start")
+				music_start = time_from_chars(token.next(ion).to_value());
+			else if (entry_name == "end")
+				music_end = time_from_chars(token.next(ion).to_value());
+			else if (entry_name == "loop")
+				music_loop = time_from_chars(token.next(ion).to_value());
+			else
+				throw GuiDataError{ "Unknown music option '", token.text(), "'" };
+			token.next(ion);
+		}
+		if (music_file.empty())
+			throw GuiDataError{ "No music file specified" };
+		token.next(ion);
+		_gui.set_music(music_name, music_file, music_start, music_end, music_loop);
 	}
 
 	void GuiIonLoader::load_on_key(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
@@ -410,8 +441,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_screen_music(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
 	{
-		const auto music_name = token.to_value();
-		screen.set_music(music_name.empty() ? nullptr : _gui.resource_loader().open_music(music_name));
+		screen.set_music(token.to_value());
 		token.next(ion);
 	}
 

@@ -16,6 +16,7 @@
 
 #include <yttrium/gui/gui.h>
 
+#include <yttrium/audio/music_reader.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/font.h>
 #include <yttrium/renderer/texture.h>
@@ -59,17 +60,18 @@ namespace Yttrium
 		return result;
 	}
 
-	void GuiPrivate::set_translation(std::string_view path)
-	{
-		if (_translation)
-			throw GuiDataError{ "Only one translation is allowed" };
-		_translation = _resource_loader.load_translation(path);
-	}
-
 	std::shared_ptr<const Font> GuiPrivate::font(const std::string& name) const
 	{
 		const auto i = _fonts.find(name);
 		return i != _fonts.end() ? i->second : nullptr;
+	}
+
+	std::shared_ptr<MusicReader> GuiPrivate::music(const std::string& name) const
+	{
+		const auto i = _music.find(name);
+		if (i == _music.end())
+			throw GuiDataError{ "Unknown music \"", name, "\"" };
+		return i->second;
 	}
 
 	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
@@ -131,6 +133,20 @@ namespace Yttrium
 		_fonts[name] = Font::load(*_resource_loader.open(path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
 	}
 
+	void GuiPrivate::set_music(std::string_view name, std::string_view file, int start, int end, int loop)
+	{
+		auto music = MusicReader::open(_resource_loader.open(file));
+		music->set_properties(start, end, loop);
+		_music.insert_or_assign(std::string{ name }, std::move(music));
+	}
+
+	void GuiPrivate::set_translation(std::string_view path)
+	{
+		if (_translation)
+			throw GuiDataError{ "Only one translation is allowed" };
+		_translation = _resource_loader.load_translation(path);
+	}
+
 	std::string GuiPrivate::translate(std::string_view source) const
 	{
 		return _translation ? _translation->translate(source) : std::string{ source };
@@ -139,7 +155,7 @@ namespace Yttrium
 	void GuiPrivate::enter_screen(GuiScreen& screen)
 	{
 		_screen_stack.emplace_back(&screen);
-		if (screen.music() && _on_music)
+		if (screen.has_music() && _on_music)
 			_on_music(screen.music());
 		screen.handle_enter();
 	}
@@ -148,9 +164,9 @@ namespace Yttrium
 	{
 		const auto screen = _screen_stack.back();
 		screen->handle_return();
-		if (screen->music() && _on_music)
+		if (screen->has_music() && _on_music)
 		{
-			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* s) { return s->music(); });
+			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* s) { return s->has_music(); });
 			_on_music(i != _screen_stack.rend() ? (*i)->music() : nullptr);
 		}
 		_screen_stack.pop_back();
