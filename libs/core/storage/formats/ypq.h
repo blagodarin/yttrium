@@ -21,7 +21,6 @@
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/writer.h>
 
-#include <map>
 #include <vector>
 
 namespace Yttrium
@@ -42,7 +41,6 @@ namespace Yttrium
 		Buffer _metadata_buffer;
 		std::vector<std::string_view> _names;
 		std::vector<Entry> _entries;
-		std::vector<std::pair<std::string_view, std::string_view>> _properties; // TODO: Map TinyStringMap into the metadata buffer.
 	};
 
 	class YpqWriter final : public PackageWriter
@@ -51,7 +49,7 @@ namespace Yttrium
 		explicit YpqWriter(Writer&&);
 		~YpqWriter() override;
 
-		bool add(const std::string&, std::map<std::string, std::string, std::less<>>&&) override;
+		bool add(const std::string&) override;
 		bool commit() override;
 
 	private:

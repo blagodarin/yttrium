@@ -69,17 +69,6 @@ TEST_CASE("source.name")
 	CHECK(s->name() == tf.name());
 }
 
-TEST_CASE("source.property")
-{
-	const auto source = Source::from(nullptr, 0);
-	REQUIRE(source);
-	CHECK(source->property("name") == "");
-	source->set_property("name", "value");
-	CHECK(source->property("name") == "value");
-	source->set_property("name", "another value");
-	CHECK(source->property("name") == "another value");
-}
-
 TEST_CASE("source.size")
 {
 	CHECK(Source::from(Buffer{})->size() == 0);

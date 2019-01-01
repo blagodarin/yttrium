@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 		package_name = argv[2];
 	}
 
-	std::vector<std::pair<std::string, std::map<std::string, std::string, std::less<>>>> entries;
+	std::vector<std::string> paths;
 	try
 	{
 		auto source = Yttrium::Source::from(index_name);
@@ -61,20 +61,8 @@ int main(int argc, char** argv)
 		Yttrium::IonReader ion{ *source };
 		ion.read().check_name("package");
 		ion.read().check_list_begin();
-		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd;)
-		{
-			auto& properties = entries.emplace_back(std::string{ token.to_value() }, std::map<std::string, std::string, std::less<>>{}).second;
-			if (token = ion.read(); token.type() == Yttrium::IonReader::Token::Type::ObjectBegin)
-			{
-				for (token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ObjectEnd; token = ion.read())
-				{
-					const auto property_name = token.to_name();
-					check(properties.count(property_name) == 0, "Duplicate property '", property_name, "'");
-					properties.emplace(std::string{ property_name }, ion.read().to_value());
-				}
-				token = ion.read();
-			}
-		}
+		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd; token = ion.read())
+			paths.emplace_back(std::string{ token.to_value() });
 		ion.read().check_end();
 	}
 	catch (const std::runtime_error& e)
@@ -85,11 +73,8 @@ int main(int argc, char** argv)
 
 	if (package_name.empty())
 	{
-		for (const auto& [path, properties] : entries)
-		{
+		for (const auto& path : paths)
 			std::cout << path << "\n";
-			std::ignore = properties;
-		}
 		return 0;
 	}
 
@@ -102,8 +87,8 @@ int main(int argc, char** argv)
 
 	try
 	{
-		for (auto& [path, properties] : entries)
-			package->add(path, std::move(properties));
+		for (const auto& path : paths)
+			package->add(path);
 		if (!package->commit())
 		{
 			std::cerr << "ERROR(" << package_name << "): Unable to write package file\n";

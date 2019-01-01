@@ -62,9 +62,9 @@ TEST_CASE("package")
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file1.name(), {}));
-		REQUIRE(package_writer->add(file2.name(), {}));
-		REQUIRE(package_writer->add(file3.name(), {}));
+		REQUIRE(package_writer->add(file1.name()));
+		REQUIRE(package_writer->add(file2.name()));
+		REQUIRE(package_writer->add(file3.name()));
 		REQUIRE(package_writer->commit());
 	}
 
@@ -110,9 +110,9 @@ TEST_CASE("package.file_size")
 	{
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file1.name(), {}));
-		REQUIRE(package_writer->add(file2.name(), {}));
-		REQUIRE(package_writer->add(file3.name(), {}));
+		REQUIRE(package_writer->add(file1.name()));
+		REQUIRE(package_writer->add(file2.name()));
+		REQUIRE(package_writer->add(file3.name()));
 		REQUIRE(package_writer->commit());
 	}
 
@@ -135,9 +135,9 @@ TEST_CASE("package.duplicates")
 		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
 		REQUIRE(package_writer);
 		Writer(file).write_all(Buffer(1, "1"));
-		REQUIRE(package_writer->add(file.name(), {}));
+		REQUIRE(package_writer->add(file.name()));
 		Writer(file).write_all(Buffer(2, "23"));
-		REQUIRE(package_writer->add(file.name(), {}));
+		REQUIRE(package_writer->add(file.name()));
 		REQUIRE(package_writer->commit());
 	}
 
@@ -151,28 +151,4 @@ TEST_CASE("package.duplicates")
 	REQUIRE(packed_file->read_at(0, data.data(), data.size()) == 2);
 	CHECK(data[0] == '2');
 	CHECK(data[1] == '3');
-}
-
-TEST_CASE("package.properties")
-{
-	TemporaryFile package_file;
-	TemporaryFile file;
-	{
-		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
-		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file.name(), { { "one", "two" }, { "three", "four" } }));
-		REQUIRE(package_writer->commit());
-	}
-
-	const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
-	REQUIRE(package);
-
-	auto packed_file = ::open_packed(*package, file.name());
-	REQUIRE(packed_file);
-
-	CHECK(packed_file->property("one") == "two");
-	CHECK(packed_file->property("two") == "");
-	CHECK(packed_file->property("three") == "four");
-	CHECK(packed_file->property("four") == "");
-	CHECK(packed_file->property("five") == "");
 }

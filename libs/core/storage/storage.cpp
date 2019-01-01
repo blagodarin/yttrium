@@ -21,6 +21,7 @@
 #include "source.h"
 
 #include <list>
+#include <map>
 #include <variant>
 #include <vector>
 

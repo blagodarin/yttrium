@@ -32,19 +32,19 @@ namespace
 
 	struct YpqHeader
 	{
-		uint32_t signature = 0;
-		uint32_t entry_count = 0;
-		uint32_t index_size = 0;
-		uint32_t reserved = 0;
+		std::uint32_t signature = 0;
+		std::uint32_t entry_count = 0;
+		std::uint32_t index_size = 0;
+		std::uint32_t reserved = 0;
 
 		static constexpr auto Signature = "\xDFYPQ"_fourcc;
 	};
 
 	struct YpqEntry
 	{
-		uint64_t data_offset = 0;
-		uint32_t data_size = 0;
-		uint32_t metadata_offset = 0; // Name and properties.
+		std::uint64_t data_offset = 0;
+		std::uint32_t data_size = 0;
+		std::uint32_t metadata_offset = 0;
 	};
 
 #pragma pack(pop)
@@ -54,13 +54,11 @@ namespace Yttrium
 {
 	struct YpqReader::Entry
 	{
-		uint64_t _offset = 0;
-		uint32_t _size = 0;
-		size_t _properties_begin = 0;
-		size_t _properties_end = 0;
+		std::uint64_t _offset = 0;
+		std::uint32_t _size = 0;
 
-		Entry(uint64_t offset, uint32_t size, size_t properties_begin, size_t properties_end)
-			: _offset{ offset }, _size{ size }, _properties_begin{ properties_begin }, _properties_end{ properties_end } {}
+		Entry(std::uint64_t offset, std::uint32_t size) noexcept
+			: _offset{ offset }, _size{ size } {}
 	};
 
 	YpqReader::YpqReader(std::unique_ptr<Source>&& source)
@@ -112,14 +110,7 @@ namespace Yttrium
 			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
 				throw BadPackage{ "Bad package index entry #", index, " metadata" };
 			_names.emplace_back(read_string());
-			const auto properties_begin = _properties.size();
-			for (auto property_count = read_uint8(); property_count > 0; --property_count)
-			{
-				const auto property_name = read_string();
-				const auto property_value = read_string();
-				_properties.emplace_back(property_name, property_value);
-			}
-			_entries.emplace_back(entry.data_offset, entry.data_size, properties_begin, _properties.size());
+			_entries.emplace_back(entry.data_offset, entry.data_size);
 		}
 	}
 
@@ -130,19 +121,15 @@ namespace Yttrium
 		if (index >= _entries.size())
 			return {};
 		const auto& entry = _entries[index];
-		auto source = Source::from(_source, entry._offset, entry._size);
-		for (auto i = entry._properties_begin; i < entry._properties_end; ++i)
-			source->set_property(_properties[i].first, _properties[i].second);
-		return source;
+		return Source::from(_source, entry._offset, entry._size);
 	}
 
 	struct YpqWriter::Entry
 	{
 		std::string _name;
-		std::map<std::string, std::string, std::less<>> _properties;
 
-		Entry(std::string_view name, std::map<std::string, std::string, std::less<>>&& properties)
-			: _name{ name }, _properties{ std::move(properties) } {}
+		Entry(std::string_view name)
+			: _name{ name } {}
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
@@ -156,11 +143,11 @@ namespace Yttrium
 			_writer.unlink();
 	}
 
-	bool YpqWriter::add(const std::string& path, std::map<std::string, std::string, std::less<>>&& properties)
+	bool YpqWriter::add(const std::string& path)
 	{
 		if (_committed)
 			return false;
-		_entries.emplace_back(path, std::move(properties));
+		_entries.emplace_back(path);
 		return true;
 	}
 
@@ -175,24 +162,18 @@ namespace Yttrium
 
 		Buffer metadata_buffer;
 		{
-			Writer writer(metadata_buffer);
+			Writer writer{ metadata_buffer };
 
 			const auto write_string = [&writer](const std::string& value) {
-				const auto size = static_cast<uint8_t>(value.size());
+				const auto size = static_cast<std::uint8_t>(value.size());
 				return size == value.size() && writer.write(size) && writer.write(value.data(), size);
 			};
 
 			for (const auto& entry : _entries)
 			{
-				entries.emplace_back().metadata_offset = static_cast<uint32_t>(metadata_offset + writer.offset());
+				entries.emplace_back().metadata_offset = static_cast<std::uint32_t>(metadata_offset + writer.offset());
 				if (!write_string(entry._name))
 					return false;
-				const auto property_count = static_cast<uint8_t>(entry._properties.size());
-				if (property_count != entry._properties.size() || !writer.write(property_count))
-					return false;
-				for (const auto& [property_name, property_value] : entry._properties)
-					if (!write_string(property_name) || !write_string(property_value))
-						return false;
 			}
 		}
 
@@ -203,8 +184,8 @@ namespace Yttrium
 
 		YpqHeader header;
 		header.signature = YpqHeader::Signature;
-		header.entry_count = static_cast<uint32_t>(_entries.size());
-		header.index_size = static_cast<uint32_t>(data_offset);
+		header.entry_count = static_cast<std::uint32_t>(_entries.size());
+		header.index_size = static_cast<std::uint32_t>(data_offset);
 		if (!_writer.write(header))
 			return false;
 
@@ -219,9 +200,9 @@ namespace Yttrium
 			const auto source = Source::from(entry._name);
 			if (!source)
 				return false;
-			const auto i = static_cast<size_t>(&entry - _entries.data());
+			const auto i = static_cast<std::size_t>(&entry - _entries.data());
 			entries[i].data_offset = decltype(entries[i].data_offset){ _writer.offset() };
-			entries[i].data_size = static_cast<uint32_t>(source->size());
+			entries[i].data_size = static_cast<std::uint32_t>(source->size());
 			if (entries[i].data_size != source->size())
 				return false;
 			if (!_writer.write_all(*source))

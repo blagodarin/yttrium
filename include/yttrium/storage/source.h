@@ -14,13 +14,13 @@
 // limitations under the License.
 //
 
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_storage_source_h_
 #define _include_yttrium_storage_source_h_
 
-#include <yttrium/utils/tiny_string_map.h>
+#include <yttrium/api.h>
+
+#include <memory>
+#include <string_view>
 
 namespace Yttrium
 {
@@ -56,9 +56,6 @@ namespace Yttrium
 		/// Returns the name of the Source.
 		std::string_view name() const noexcept { return _name; }
 
-		/// Retrieves a metadata property value by its name.
-		std::string_view property(std::string_view name) const noexcept { return _properties.find(name); }
-
 		/// Reads data from the source at the specified offset.
 		bool read_all_at(uint64_t offset, void* data, size_t size) const { return read_at(offset, data, size) == size; }
 
@@ -71,9 +68,6 @@ namespace Yttrium
 		{
 			return read_at(offset, &data, sizeof data) == sizeof data;
 		}
-
-		/// Sets a metadata property.
-		void set_property(std::string_view name, std::string_view value) { _properties.insert_or_assign(name, value); }
 
 		/// Returns the size of the Source data.
 		uint64_t size() const noexcept { return _size; }
@@ -93,9 +87,6 @@ namespace Yttrium
 			: _size{ size } {}
 		Source(uint64_t size, const std::string& name)
 			: _size{ size }, _name{ name } {}
-
-	private:
-		TinyStringMap _properties;
 	};
 }
 

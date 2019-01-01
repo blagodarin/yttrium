@@ -14,17 +14,13 @@
 // limitations under the License.
 //
 
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_storage_package_h_
 #define _include_yttrium_storage_package_h_
 
 #include <yttrium/api.h>
 
-#include <map>
 #include <memory>
-#include <string_view>
+#include <string>
 #include <vector>
 
 namespace Yttrium
@@ -45,7 +41,6 @@ namespace Yttrium
 		///
 		static std::unique_ptr<PackageReader> create(const std::string& path, PackageType = PackageType::Auto);
 
-		///
 		virtual ~PackageReader() = default;
 
 		///
@@ -62,11 +57,10 @@ namespace Yttrium
 		///
 		static std::unique_ptr<PackageWriter> create(const std::string& path, PackageType = PackageType::Auto);
 
-		///
 		virtual ~PackageWriter() = default;
 
 		///
-		virtual bool add(const std::string&, std::map<std::string, std::string, std::less<>>&& properties) = 0;
+		virtual bool add(const std::string&) = 0;
 
 		///
 		virtual bool commit() = 0;

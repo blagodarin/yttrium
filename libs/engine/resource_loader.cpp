@@ -211,10 +211,7 @@ namespace Yttrium
 		if (!_private->_render_manager)
 			return {};
 		return _private->_texture_2d_cache.fetch(name, [this](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D> {
-			Flags<RenderManager::TextureFlag> flags;
-			if (source->property("intensity") == "1")
-				flags |= RenderManager::TextureFlag::Intensity;
-			return _private->_render_manager->create_texture_2d(::load_image(*source), flags);
+			return _private->_render_manager->create_texture_2d(::load_image(*source));
 		});
 	}
 
