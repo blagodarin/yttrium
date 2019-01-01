@@ -1,6 +1,7 @@
 translation "data/i18n/en.ion"
 
 title `Tetrium`
+icon "data/icon.tga"
 
 default font
 {

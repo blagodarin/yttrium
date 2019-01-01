@@ -51,6 +51,7 @@ namespace Yttrium
 
 		void bind_canvas(const std::string& name, Canvas&);
 		void draw(RenderPass&, const Vector2& cursor) const;
+		const std::string& icon_path() const;
 		void notify(const std::string& event);
 		void on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>&);
 		void on_music(const std::function<void(const std::shared_ptr<MusicReader>&)>&);
@@ -58,7 +59,7 @@ namespace Yttrium
 		bool process_key_event(const KeyEvent&);
 		bool process_text_input(std::string_view text);
 		void start();
-		std::string title() const;
+		const std::string& title() const;
 
 	private:
 		const std::unique_ptr<class GuiPrivate> _private;

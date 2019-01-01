@@ -199,6 +199,7 @@ namespace Yttrium
 			{ "class", &GuiIonLoader::load_class },
 			{ "cursor", &GuiIonLoader::load_cursor },
 			{ "font", &GuiIonLoader::load_font },
+			{ "icon", &GuiIonLoader::load_icon },
 			{ "include", &GuiIonLoader::load_include },
 			{ "on_key", &GuiIonLoader::load_on_key },
 			{ "screen", &GuiIonLoader::load_screen },
@@ -276,6 +277,12 @@ namespace Yttrium
 				throw GuiDataError{ "Default font redefinition" };
 			_default_font = _gui.font(font_name);
 		}
+		token.next(ion);
+	}
+
+	void GuiIonLoader::load_icon(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
+	{
+		_gui.set_icon_path(token.to_value());
 		token.next(ion);
 	}
 

@@ -186,6 +186,11 @@ namespace Yttrium
 		(*top_screen)->draw(pass, &cursor);
 	}
 
+	const std::string& Gui::icon_path() const
+	{
+		return _private->_icon_path;
+	}
+
 	void Gui::notify(const std::string& event)
 	{
 		if (!_private->_screen_stack.empty())
@@ -234,7 +239,7 @@ namespace Yttrium
 		_private->enter_screen(*_private->_root_screen);
 	}
 
-	std::string Gui::title() const
+	const std::string& Gui::title() const
 	{
 		return _private->_title;
 	}

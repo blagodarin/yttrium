@@ -25,6 +25,7 @@
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
@@ -232,6 +233,9 @@ int main(int, char**)
 
 	gui.start();
 	window.set_title(gui.title());
+	if (const auto source = resource_loader.open(gui.icon_path()))
+		if (const auto image = Image::load(*source))
+			window.set_icon(*image);
 	window.show();
 	application.run();
 }

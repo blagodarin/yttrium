@@ -17,6 +17,7 @@
 #include "window.h"
 
 #include <yttrium/exceptions.h>
+#include <yttrium/image.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include "../key_codes.h"
@@ -81,8 +82,8 @@ namespace Yttrium
 
 		{
 			const auto net_wm_state = ::XInternAtom(_application.display(), "_NET_WM_STATE", False);
-			auto net_wm_state_fullscreen = ::XInternAtom(_application.display(), "_NET_WM_STATE_FULLSCREEN", False);
-			::XChangeProperty(_application.display(), _window.get(), net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&net_wm_state_fullscreen), 1);
+			const auto net_wm_state_fullscreen = ::XInternAtom(_application.display(), "_NET_WM_STATE_FULLSCREEN", False);
+			::XChangeProperty(_application.display(), _window.get(), net_wm_state, XA_ATOM, 32, PropModeReplace, reinterpret_cast<const unsigned char*>(&net_wm_state_fullscreen), 1);
 		}
 
 		_glx.bind(_window.get());
@@ -204,6 +205,28 @@ namespace Yttrium
 		::XWarpPointer(_application.display(), None, _window.get(), 0, 0, 0, 0, cursor._x, cursor._y);
 		::XSync(_application.display(), False);
 		return true;
+	}
+
+	void WindowBackend::set_icon(const Image& icon)
+	{
+		if (!_window)
+			return;
+		const auto bgra_icon = to_bgra(icon);
+		const auto& bgra_format = bgra_icon.format();
+		const auto property_size = 2 + bgra_format.width() * bgra_format.height();
+		const auto property_buffer = std::make_unique<long[]>(property_size);
+		property_buffer[0] = static_cast<long>(bgra_format.width());
+		property_buffer[1] = static_cast<long>(bgra_format.height());
+		auto* dst = &property_buffer[2];
+		for (std::size_t y = 0; y < bgra_format.height(); ++y)
+		{
+			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_format.row_size() * y);
+			for (std::size_t x = 0; x < bgra_format.width(); ++x)
+				*dst++ = src[x];
+		}
+		const auto net_wm_icon = ::XInternAtom(_application.display(), "_NET_WM_ICON", False);
+		::XChangeProperty(_application.display(), _window.get(), net_wm_icon, XA_CARDINAL, 32, PropModeReplace, reinterpret_cast<const unsigned char*>(property_buffer.get()), static_cast<int>(property_size));
+		::XSync(_application.display(), False);
 	}
 
 	void WindowBackend::set_title(const std::string& title)

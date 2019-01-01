@@ -207,6 +207,11 @@ namespace Yttrium
 		return true;
 	}
 
+	void Window::set_icon(const Image& icon)
+	{
+		_private->_backend.set_icon(icon);
+	}
+
 	void Window::set_title(const std::string& title)
 	{
 		_private->_backend.set_title(title);

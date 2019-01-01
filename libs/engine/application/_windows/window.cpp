@@ -64,6 +64,10 @@ namespace Yttrium
 			&& ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
 	}
 
+	void WindowBackend::set_icon(const Image&)
+	{
+	}
+
 	void WindowBackend::set_title(const std::string& title)
 	{
 		const auto title_size = ::MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, nullptr, 0);

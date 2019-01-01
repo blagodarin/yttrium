@@ -23,6 +23,7 @@
 
 namespace Yttrium
 {
+	class Image;
 	class WindowBackendCallbacks;
 
 	class WindowBackend
@@ -35,6 +36,7 @@ namespace Yttrium
 		bool get_cursor(Point&);
 		bool process_events();
 		bool set_cursor(const Point&);
+		void set_icon(const Image&);
 		void set_title(const std::string&);
 		void show();
 		std::optional<Size> size() const noexcept { return _size; }

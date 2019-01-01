@@ -75,6 +75,9 @@ namespace Yttrium
 		bool set_cursor(const Point& cursor);
 
 		///
+		void set_icon(const Image&);
+
+		///
 		void set_title(const std::string&);
 
 		///

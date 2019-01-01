@@ -52,6 +52,7 @@ namespace Yttrium
 		void load_class(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_cursor(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_font(IonReader&, IonReader::Token&, Flags<Attribute>);
+		void load_icon(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_include(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_on_key(IonReader&, IonReader::Token&, Flags<Attribute>);
 		void load_screen(IonReader&, IonReader::Token&, Flags<Attribute>);
