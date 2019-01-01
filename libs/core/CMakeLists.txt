@@ -242,7 +242,6 @@ y_sources(ycore "include/utils"
 	../../include/yttrium/utils/flags.h
 	../../include/yttrium/utils/numeric.h
 	../../include/yttrium/utils/string.h
-	../../include/yttrium/utils/tiny_string_map.h
 	)
 y_sources(ycore "src/utils"
 	utils/algorithm.h
@@ -251,7 +250,6 @@ y_sources(ycore "src/utils"
 	utils/memory.h
 	utils/string.cpp
 	utils/string.h
-	utils/tiny_string_map.cpp
 	)
 
 install(TARGETS ycore EXPORT YttriumTargets

@@ -217,7 +217,6 @@ endif()
 
 if(BUILD_EXTRAS)
 	add_subdirectory(benchmarks/buffer)
-	add_subdirectory(benchmarks/tiny_string_map)
 	add_subdirectory(tests/gen_test_data)
 endif()
 

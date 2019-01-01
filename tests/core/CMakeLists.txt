@@ -37,7 +37,6 @@ add_executable(ycore_tests
 	source.cpp
 	temporary_file.cpp
 	test_utils.cpp
-	tiny_string_map.cpp
 	translation.cpp
 	utils_numeric.cpp
 	utils_string.cpp
