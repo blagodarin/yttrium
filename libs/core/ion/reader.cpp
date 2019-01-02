@@ -129,7 +129,7 @@ namespace Yttrium
 
 	Color4f IonReader::Token::to_color() const
 	{
-		if (_type != Type::Color)
+		if (_type != Type::ColorValue)
 			throw IonError{ _line, _column, "ION color expected" };
 
 		const auto d = [this](std::size_t i) {
@@ -156,7 +156,7 @@ namespace Yttrium
 
 	std::string_view IonReader::Token::to_value() const
 	{
-		if (_type != Type::Value)
+		if (_type != Type::StringValue)
 			throw IonError{ _line, _column, "ION value expected" };
 		return _text;
 	}
@@ -228,7 +228,7 @@ namespace Yttrium
 							}
 						}
 						_cursor = cursor + 1;
-						return make_token<IonReader::Token::Type::Value, -1>(base, cursor - base, quote == '`');
+						return make_token<IonReader::Token::Type::StringValue, -1>(base, cursor - base, quote == '`');
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
@@ -241,7 +241,7 @@ namespace Yttrium
 						if (const auto next_class = ::class_of(*end); next_class == Other || next_class == Name)
 							throw IonError{ _line, end - _line_base, "Bad character" };
 						_cursor = end;
-						return make_token<IonReader::Token::Type::Color>(begin, end - begin);
+						return make_token<IonReader::Token::Type::ColorValue>(begin, end - begin);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };

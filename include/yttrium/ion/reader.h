@@ -47,8 +47,8 @@ namespace Yttrium
 			enum class Type
 			{
 				Name,
-				Value,
-				Color,
+				StringValue,
+				ColorValue,
 				ListBegin,
 				ListEnd,
 				ObjectBegin,

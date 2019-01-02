@@ -67,7 +67,7 @@ TEST_CASE("ion.reader.token.check_name")
 {
 	CHECK_NOTHROW(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").check_name("name1"));
 	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").check_name("name2"), IonError);
-	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::Value, "name1").check_name("name1"), IonError);
+	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::StringValue, "name1").check_name("name1"), IonError);
 }
 
 TEST_CASE("ion.reader.token.check_object_begin")
@@ -94,7 +94,7 @@ TEST_CASE("ion.reader.token.to_color")
 	using Yttrium::Color4f;
 
 	const auto color = [](std::string_view text) {
-		return IonReader::Token{ 1, 1, IonReader::Token::Type::Color, text }.to_color();
+		return IonReader::Token{ 1, 1, IonReader::Token::Type::ColorValue, text }.to_color();
 	};
 
 	CHECK(color("#00f") == Color4f(0.f, 0.f, 1.f, 1.f));
@@ -109,18 +109,18 @@ TEST_CASE("ion.reader.token.to_color")
 	CHECK_THROWS_AS(color("#1234567"), IonError);
 	CHECK_THROWS_AS(color("#123456789"), IonError);
 
-	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::Value, "value").to_color(), IonError);
+	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::StringValue, "value").to_color(), IonError);
 }
 
 TEST_CASE("ion.reader.token.to_name")
 {
 	CHECK(IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1").to_name() == "name1");
-	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::Value, "name1").to_name(), IonError);
+	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::StringValue, "name1").to_name(), IonError);
 }
 
 TEST_CASE("ion.reader.token.to_value")
 {
-	CHECK(IonReader::Token(1, 1, IonReader::Token::Type::Value, "value1").to_value() == "value1");
+	CHECK(IonReader::Token(1, 1, IonReader::Token::Type::StringValue, "value1").to_value() == "value1");
 	CHECK_THROWS_AS(IonReader::Token(1, 1, IonReader::Token::Type::Name, "value1").to_value(), IonError);
 }
 
@@ -151,8 +151,8 @@ TEST_CASE("ion.reader.values")
 {
 	TestData ion{ R"(name1"value1""value2"name2)" };
 	CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-	CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
-	CHECK(ion->read() == IonReader::Token(1, 14, IonReader::Token::Type::Value, "value2"));
+	CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::StringValue, "value1"));
+	CHECK(ion->read() == IonReader::Token(1, 14, IonReader::Token::Type::StringValue, "value2"));
 	CHECK(ion->read() == IonReader::Token(1, 22, IonReader::Token::Type::Name, "name2"));
 	CHECK(ion->read() == IonReader::Token(1, 27, IonReader::Token::Type::End, ""));
 }
@@ -162,14 +162,14 @@ TEST_CASE("ion.reader.lists")
 	TestData ion{ R"(name1["value1"[[][]]"value2"]name2)" };
 	CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
 	CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::ListBegin, "["));
-	CHECK(ion->read() == IonReader::Token(1, 7, IonReader::Token::Type::Value, "value1"));
+	CHECK(ion->read() == IonReader::Token(1, 7, IonReader::Token::Type::StringValue, "value1"));
 	CHECK(ion->read() == IonReader::Token(1, 15, IonReader::Token::Type::ListBegin, "["));
 	CHECK(ion->read() == IonReader::Token(1, 16, IonReader::Token::Type::ListBegin, "["));
 	CHECK(ion->read() == IonReader::Token(1, 17, IonReader::Token::Type::ListEnd, "]"));
 	CHECK(ion->read() == IonReader::Token(1, 18, IonReader::Token::Type::ListBegin, "["));
 	CHECK(ion->read() == IonReader::Token(1, 19, IonReader::Token::Type::ListEnd, "]"));
 	CHECK(ion->read() == IonReader::Token(1, 20, IonReader::Token::Type::ListEnd, "]"));
-	CHECK(ion->read() == IonReader::Token(1, 21, IonReader::Token::Type::Value, "value2"));
+	CHECK(ion->read() == IonReader::Token(1, 21, IonReader::Token::Type::StringValue, "value2"));
 	CHECK(ion->read() == IonReader::Token(1, 29, IonReader::Token::Type::ListEnd, "]"));
 	CHECK(ion->read() == IonReader::Token(1, 30, IonReader::Token::Type::Name, "name2"));
 	CHECK(ion->read() == IonReader::Token(1, 35, IonReader::Token::Type::End, ""));
@@ -195,9 +195,9 @@ TEST_CASE("ion.reader.spaces")
 {
 	TestData ion{ " \t name1 \t \"value1\" \t [ \t \"value2\" \t ] \t { \t name2 \t } \t " };
 	CHECK(ion->read() == IonReader::Token(1, 4, IonReader::Token::Type::Name, "name1"));
-	CHECK(ion->read() == IonReader::Token(1, 12, IonReader::Token::Type::Value, "value1"));
+	CHECK(ion->read() == IonReader::Token(1, 12, IonReader::Token::Type::StringValue, "value1"));
 	CHECK(ion->read() == IonReader::Token(1, 23, IonReader::Token::Type::ListBegin, "["));
-	CHECK(ion->read() == IonReader::Token(1, 27, IonReader::Token::Type::Value, "value2"));
+	CHECK(ion->read() == IonReader::Token(1, 27, IonReader::Token::Type::StringValue, "value2"));
 	CHECK(ion->read() == IonReader::Token(1, 38, IonReader::Token::Type::ListEnd, "]"));
 	CHECK(ion->read() == IonReader::Token(1, 42, IonReader::Token::Type::ObjectBegin, "{"));
 	CHECK(ion->read() == IonReader::Token(1, 46, IonReader::Token::Type::Name, "name2"));
@@ -226,8 +226,8 @@ TEST_CASE("ion.reader.comments.inline")
 {
 	TestData ion{ "name1//name2\n\"value1\"\"val//ue2\"//\"value3\n//comment" };
 	CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-	CHECK(ion->read() == IonReader::Token(2, 1, IonReader::Token::Type::Value, "value1"));
-	CHECK(ion->read() == IonReader::Token(2, 9, IonReader::Token::Type::Value, "val//ue2"));
+	CHECK(ion->read() == IonReader::Token(2, 1, IonReader::Token::Type::StringValue, "value1"));
+	CHECK(ion->read() == IonReader::Token(2, 9, IonReader::Token::Type::StringValue, "val//ue2"));
 	CHECK(ion->read() == IonReader::Token(3, 10, IonReader::Token::Type::End, ""));
 }
 
@@ -308,14 +308,14 @@ TEST_CASE("ion.reader.negatives")
 	{
 		TestData ion{ "name1\"value1\"]" };
 		CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
+		CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::StringValue, "value1"));
 		CHECK_THROWS_AS(ion->read(), IonError);
 		CHECK_THROWS_AS(ion->read(), IonError);
 	}
 	{
 		TestData ion{ "name1\"value1\"}" };
 		CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-		CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
+		CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::StringValue, "value1"));
 		CHECK_THROWS_AS(ion->read(), IonError);
 		CHECK_THROWS_AS(ion->read(), IonError);
 	}
@@ -366,8 +366,8 @@ TEST_CASE("ion.reader.translatable")
 {
 	TestData ion{ R"(name1"value1"`value2`)" };
 	CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name1"));
-	CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::Value, "value1"));
-	CHECK(ion->read() == IonReader::Token(1, 14, IonReader::Token::Type::Value, "value2", true));
+	CHECK(ion->read() == IonReader::Token(1, 6, IonReader::Token::Type::StringValue, "value1"));
+	CHECK(ion->read() == IonReader::Token(1, 14, IonReader::Token::Type::StringValue, "value2", true));
 }
 
 TEST_CASE("ion.reader.colors")
@@ -375,13 +375,13 @@ TEST_CASE("ion.reader.colors")
 	{
 		TestData ion{ R"(name#01234567#89abcdef`)" };
 		CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name"));
-		CHECK(ion->read() == IonReader::Token(1, 5, IonReader::Token::Type::Color, "#01234567"));
-		CHECK(ion->read() == IonReader::Token(1, 14, IonReader::Token::Type::Color, "#89abcdef"));
+		CHECK(ion->read() == IonReader::Token(1, 5, IonReader::Token::Type::ColorValue, "#01234567"));
+		CHECK(ion->read() == IonReader::Token(1, 14, IonReader::Token::Type::ColorValue, "#89abcdef"));
 	}
 	{
 		TestData ion{ R"(name#01234567#89ABCDEF`)" };
 		CHECK(ion->read() == IonReader::Token(1, 1, IonReader::Token::Type::Name, "name"));
-		CHECK(ion->read() == IonReader::Token(1, 5, IonReader::Token::Type::Color, "#01234567"));
+		CHECK(ion->read() == IonReader::Token(1, 5, IonReader::Token::Type::ColorValue, "#01234567"));
 		CHECK_THROWS_AS(ion->read(), IonError); // Only lowercase hexadecimal digits are allowed.
 	}
 }

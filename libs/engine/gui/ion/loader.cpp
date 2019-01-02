@@ -79,7 +79,7 @@ namespace
 
 	bool update_rect(RectF& rect, IonReader& ion, IonReader::Token& token)
 	{
-		if (token.type() != IonReader::Token::Type::Value)
+		if (token.type() != IonReader::Token::Type::StringValue)
 			return false;
 		if (!token.text().empty())
 		{
@@ -88,7 +88,7 @@ namespace
 				return false;
 			rect = { { x, rect.top() }, rect.size() };
 		}
-		if (token.next(ion).type() != IonReader::Token::Type::Value)
+		if (token.next(ion).type() != IonReader::Token::Type::StringValue)
 			return true;
 		if (!token.text().empty())
 		{
@@ -97,7 +97,7 @@ namespace
 				return false;
 			rect = { { rect.left(), y }, rect.size() };
 		}
-		if (token.next(ion).type() != IonReader::Token::Type::Value)
+		if (token.next(ion).type() != IonReader::Token::Type::StringValue)
 			return true;
 		if (!token.text().empty())
 		{
@@ -106,7 +106,7 @@ namespace
 				return false;
 			rect = { rect.top_left(), SizeF{ width, rect.height() } };
 		}
-		if (token.next(ion).type() != IonReader::Token::Type::Value)
+		if (token.next(ion).type() != IonReader::Token::Type::StringValue)
 			return true;
 		if (!token.text().empty())
 		{
@@ -255,7 +255,7 @@ namespace Yttrium
 	void GuiIonLoader::load_font(IonReader& ion, IonReader::Token& token, Flags<Attribute> attributes)
 	{
 		const auto font_name = [&ion, &token]() -> std::string {
-			if (token.type() != IonReader::Token::Type::Value)
+			if (token.type() != IonReader::Token::Type::StringValue)
 				return "default";
 			const auto result = token.text();
 			token.next(ion);
@@ -363,7 +363,7 @@ namespace Yttrium
 		{
 			const auto name = token.to_name();
 			std::vector<std::string> args;
-			for (token.next(ion); token.type() == IonReader::Token::Type::Value; token.next(ion))
+			for (token.next(ion); token.type() == IonReader::Token::Type::StringValue; token.next(ion))
 				args.emplace_back(token.translatable() ? _gui.translate(token.text()) : token.text());
 			_gui.script_context().call(std::string{ name }, args);
 		}
@@ -415,7 +415,7 @@ namespace Yttrium
 				throw GuiDataError{ "Bad layout size" };
 			token.next(ion);
 		}
-		else if (token.type() == IonReader::Token::Type::Value)
+		else if (token.type() == IonReader::Token::Type::StringValue)
 		{
 			if (!from_chars(token.text(), size._width) || !from_chars(token.next(ion).to_value(), size._height))
 				throw GuiDataError{ "Bad layout size" };
@@ -429,7 +429,7 @@ namespace Yttrium
 			if (i == _widget_factory.end())
 				throw GuiDataError{ "Unknown widget '", token.text(), "'" };
 			std::string_view name;
-			if (token.next(ion).type() == IonReader::Token::Type::Value)
+			if (token.next(ion).type() == IonReader::Token::Type::StringValue)
 			{
 				name = token.text();
 				token.next(ion);
@@ -611,7 +611,7 @@ namespace Yttrium
 		if (i == alignment_flags.end())
 			throw GuiDataError{ "Bad 'align' \"", token.text(), "\"" };
 		auto alignment = i->second;
-		if (token.next(ion).type() == IonReader::Token::Type::Value)
+		if (token.next(ion).type() == IonReader::Token::Type::StringValue)
 		{
 			if (alignment != TopAlignment && alignment != BottomAlignment)
 				throw GuiDataError{ "Bad 'align' \"", i->first, "\" \"", token.text(), "\"" };
