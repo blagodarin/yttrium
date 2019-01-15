@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -151,6 +151,9 @@ namespace Yttrium
 
 		///
 		const ImageFormat& format() const noexcept { return _format; }
+
+		///
+		void flip_vertically();
 
 		///
 		bool save(const std::string& path, ImageType = ImageType::Auto) const;

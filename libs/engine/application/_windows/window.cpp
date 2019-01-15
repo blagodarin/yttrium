@@ -17,9 +17,11 @@
 #include "window.h"
 
 #include <yttrium/exceptions.h>
+#include <yttrium/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
+#include "../../../core/image/formats/bmp.h"
 #include "../window_callbacks.h"
 #include "error.h"
 
@@ -64,8 +66,34 @@ namespace Yttrium
 			&& ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
 	}
 
-	void WindowBackend::set_icon(const Image&)
+	void WindowBackend::set_icon(const Image& icon)
 	{
+		const auto width = icon.format().width();
+		const auto height = icon.format().height();
+		const auto image_size = width * height * sizeof(std::uint32_t);
+		const auto mask_size = (width + 7) / 8 * height;
+		const auto buffer_size = sizeof(BmpInfoHeader) + image_size + mask_size;
+		const auto buffer = std::make_unique<std::uint8_t[]>(buffer_size);
+		auto* header = reinterpret_cast<BmpInfoHeader*>(buffer.get());
+		header->header_size = sizeof *header;
+		header->width = static_cast<std::int32_t>(width);
+		header->height = static_cast<std::int32_t>(height) * 2;
+		header->planes = 1;
+		header->bits_per_pixel = 32;
+		header->compression = BmpCompression::Rgb;
+		header->image_size = static_cast<std::uint32_t>(image_size);
+		header->x_pixels_per_meter = 0;
+		header->y_pixels_per_meter = 0;
+		header->used_colors = 0;
+		header->required_colors = 0;
+		auto bgra_icon = to_bgra(icon); // TODO: Use buffer data as image conversion output.
+		bgra_icon.flip_vertically(); // TODO: Check image orientation.
+		std::memcpy(buffer.get() + sizeof *header, bgra_icon.data(), image_size);
+		std::memset(buffer.get() + sizeof *header + image_size, 0xff, mask_size);
+		const auto hicon = ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
+		::SendMessageW(_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hicon));
+		::SendMessageW(_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hicon));
+		// TODO: Free icon handle.
 	}
 
 	void WindowBackend::set_title(const std::string& title)

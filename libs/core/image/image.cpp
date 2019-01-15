@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "utils.h"
 
 #include <cassert>
+#include <cstring>
 
 // TODO: Compressed images (e. g. compressed textures).
 // TODO: Multi-level images (e. g. textures with mipmaps).
@@ -82,6 +83,25 @@ namespace Yttrium
 		: _format{ format }
 		, _buffer{ _format.frame_size(), data }
 	{
+	}
+
+	void Image::flip_vertically()
+	{
+		const auto row_size = _format.row_size();
+		Buffer row_buffer{ row_size };
+		for (auto top = &_buffer[0], bottom = &_buffer[(_format.height() - 1) * row_size]; top < bottom; top += row_size, bottom -= row_size)
+		{
+			std::memcpy(row_buffer.data(), top, row_size);
+			std::memcpy(top, bottom, row_size);
+			std::memcpy(bottom, row_buffer.data(), row_size);
+		}
+		switch (_format._orientation)
+		{
+		case ImageOrientation::XRightYDown: _format._orientation = ImageOrientation::XRightYUp; break;
+		case ImageOrientation::XRightYUp: _format._orientation = ImageOrientation::XRightYDown; break;
+		case ImageOrientation::XLeftYDown: _format._orientation = ImageOrientation::XLeftYUp; break;
+		case ImageOrientation::XLeftYUp: _format._orientation = ImageOrientation::XLeftYDown; break;
+		}
 	}
 
 	bool Image::save(const std::string& path, ImageType type) const

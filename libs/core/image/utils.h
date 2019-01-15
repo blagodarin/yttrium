@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_image_utils_h_
-#define _src_image_utils_h_
+#pragma once
 
 #include <cstddef>
 
@@ -31,5 +30,3 @@ namespace Yttrium
 		return (unaligned_image_row_size(width, bits_per_pixel) + row_alignment - 1) / row_alignment * row_alignment;
 	}
 }
-
-#endif
