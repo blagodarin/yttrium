@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
 //
 
 #include "tga.h"
-#include "../formats.h"
 
 #include <yttrium/image.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
+#include "../formats.h"
 
 #include <limits>
 
 namespace
 {
-	bool can_write(const Yttrium::ImageFormat& format)
+	bool can_write(const Yttrium::ImageFormat& format) noexcept
 	{
 		using Yttrium::ImageOrientation;
 		using Yttrium::PixelFormat;

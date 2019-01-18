@@ -52,6 +52,7 @@ namespace Yttrium
 		Jpeg, ///< Joint Photographic Experts Group (JPEG) file format (read only).
 		Dds,  ///< DirectDraw Surface (DDS) file format (read only).
 		Bmp,  ///< Windows bitmap (BMP) file format (read only).
+		Ico,  ///< Windows icon (ICO) file format (read only).
 	};
 
 	/// Image orientation.

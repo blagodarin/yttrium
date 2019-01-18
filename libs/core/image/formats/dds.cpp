@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 //
 
 #include "dds.h"
-#include "../formats.h"
 
 #include <yttrium/image.h>
 #include <yttrium/storage/reader.h>
+#include "../formats.h"
 
 namespace Yttrium
 {

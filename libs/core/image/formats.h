@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_image_formats_h_
-#define _src_image_formats_h_
+#pragma once
 
 #include <optional>
 
@@ -29,18 +28,16 @@ namespace Yttrium
 	class Writer;
 
 	std::optional<ImageFormat> read_bmp_header(Reader&);
-
 	std::optional<ImageFormat> read_dds_header(Reader&);
-
+	std::optional<ImageFormat> read_ico_header(Reader&);
 #if Y_USE_JPEG
 	std::optional<ImageFormat> read_jpeg(const Source&, Buffer&);
 #endif
+	std::optional<ImageFormat> read_tga_header(Reader&);
 
 #if Y_USE_PNG
 	bool write_png(Writer&, const ImageFormat&, const void*);
 #endif
-
-	std::optional<ImageFormat> read_tga_header(Reader&);
 	bool write_tga(Writer&, const ImageFormat&, const void*);
 
 	std::optional<ImageFormat> read_image(const Source&, ImageType, Buffer&);
@@ -48,5 +45,3 @@ namespace Yttrium
 
 	bool detect_image_type(const Source&, ImageType&);
 }
-
-#endif

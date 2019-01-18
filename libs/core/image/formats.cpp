@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,12 +48,13 @@ namespace Yttrium
 		std::optional<ImageFormat> format;
 		switch (type)
 		{
-		case ImageType::Bmp: format = read_bmp_header(reader); break;
 		case ImageType::Tga: format = read_tga_header(reader); break;
 #if Y_USE_JPEG
 		case ImageType::Jpeg: return read_jpeg(source, buffer);
 #endif
 		case ImageType::Dds: format = read_dds_header(reader); break;
+		case ImageType::Bmp: format = read_bmp_header(reader); break;
+		case ImageType::Ico: format = read_ico_header(reader); break;
 		default: return {};
 		}
 		if (!format || !read_image_data(reader, *format, buffer))
@@ -100,6 +101,7 @@ namespace Yttrium
 			// TGA is the last remaining option, and TGA images have no signature,
 			// so we need to read the entire header anyway to determine whether it
 			// is actually a TGA image.
+			// TODO: Add ICO detection.
 			type = ImageType::Tga;
 			return true;
 		}
