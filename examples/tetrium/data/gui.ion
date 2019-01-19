@@ -1,7 +1,7 @@
 translation "data/i18n/en.ion"
 
 title `Tetrium`
-icon "data/icon.tga"
+icon "data/icon.ico"
 
 music "default"
 {

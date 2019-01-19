@@ -11,7 +11,7 @@ package
 	"data/gui/statistics.ion"
 	"data/i18n/en.ion"
 	"data/i18n/ru.ion"
-	"data/icon.tga"
+	"data/icon.ico"
 	"data/music/music.ogg"
 	"data/textures/background.jpeg"
 ]
