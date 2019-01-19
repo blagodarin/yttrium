@@ -76,10 +76,15 @@ namespace Yttrium
 
 	bool detect_image_type(const Source& source, ImageType& type)
 	{
-		std::uint16_t signature = 0;
+		struct
+		{
+			std::uint16_t ab = 0;
+			std::uint16_t cd = 0;
+		} signature;
+		static_assert(sizeof signature == 4);
 		if (!source.read_at(0, signature))
 			return false;
-		switch (signature)
+		switch (signature.ab)
 		{
 		case "BM"_twocc:
 			type = ImageType::Bmp;
@@ -98,11 +103,20 @@ namespace Yttrium
 			return true;
 #endif
 		default:
-			// TGA is the last remaining option, and TGA images have no signature,
-			// so we need to read the entire header anyway to determine whether it
-			// is actually a TGA image.
-			// TODO: Add ICO detection.
-			type = ImageType::Tga;
+			if (signature.ab)
+			{
+				// ICO: reserved value, must be zero.
+				// TGA: ID length and color map type, may be non-zero.
+				type = ImageType::Tga;
+			}
+			else if (signature.cd == 1)
+			{
+				// ICO: file type, 1 for ICO file.
+				// TGA: image type and lower byte of colormap description, 1 means color-mapped image (unsupported).
+				type = ImageType::Ico;
+			}
+			else
+				type = ImageType::Tga; // We're still unsure this isn't TGA.
 			return true;
 		}
 	}

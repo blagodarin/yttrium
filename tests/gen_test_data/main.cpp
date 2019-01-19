@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <yttrium/storage/writer.h>
 #include "../../libs/core/image/formats/bmp.h"
 #include "../../libs/core/image/formats/dds.h"
+#include "../../libs/core/image/formats/ico.h"
 #include "../../libs/core/image/formats/tga.h"
 #include "../core/image_formats.h"
 
@@ -26,10 +27,13 @@ using namespace Yttrium;
 
 namespace
 {
-	void write_color_gradient(Writer& writer, bool with_alpha)
+	template <bool with_alpha, bool flip_vertically = false>
+	bool write_color_gradient(Writer& writer)
 	{
-		const auto image = make_test_image(with_alpha);
-		writer.write(image.data(), image.format().frame_size());
+		auto image = make_test_image(with_alpha);
+		if (flip_vertically)
+			image.flip_vertically();
+		return writer.write_all(image.data(), image.format().frame_size());
 	}
 }
 
@@ -57,7 +61,7 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient24.bmp" };
 		if (writer.write(prefix) && writer.write(headers))
-			write_color_gradient(writer, false);
+			::write_color_gradient<false>(writer);
 	}
 	{
 		TgaHeader header;
@@ -70,20 +74,7 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient24.tga" };
 		if (writer.write(header))
-			write_color_gradient(writer, false);
-	}
-	{
-		TgaHeader header;
-		std::memset(&header, 0, sizeof header);
-		header.image_type = tgaTrueColor;
-		header.image.width = 16;
-		header.image.height = 16;
-		header.image.pixel_depth = 32;
-		header.image.descriptor = tgaTopLeft | 8;
-
-		Writer writer{ "tests/core/data/gradient32.tga" };
-		if (writer.write(header))
-			write_color_gradient(writer, true);
+			::write_color_gradient<false>(writer);
 	}
 	{
 		DDS_HEADER header;
@@ -104,6 +95,59 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient32.dds" };
 		if (writer.write(header))
-			write_color_gradient(writer, true);
+			::write_color_gradient<true>(writer);
+	}
+	{
+		constexpr std::uint32_t mask_data_size = (16 * 16 / 8) * 2; // Two 16x16 bitmasks (XOR bitmask and AND bitmask).
+		constexpr std::uint32_t image_data_size = 16 * 16 * 4;
+
+		IcoFileHeader file_header;
+		file_header.reserved = 0;
+		file_header.type = IcoFileHeader::Type_Ico;
+		file_header.count = 1;
+
+		IcoImageHeader image_header;
+		image_header.width = 16;
+		image_header.height = 16;
+		image_header.color_count = 0;
+		image_header.reserved = 0;
+		image_header.color_planes = 1;
+		image_header.bits_per_pixel = 32;
+		image_header.data_size = sizeof(BmpInfoHeader) + image_data_size + mask_data_size;
+		image_header.data_offset = sizeof file_header + sizeof image_header;
+
+		BmpInfoHeader bitmap_header;
+		bitmap_header.header_size = sizeof bitmap_header;
+		bitmap_header.width = 16;
+		bitmap_header.height = 16 * 2; // Combined height for two bitmasks.
+		bitmap_header.planes = 1;
+		bitmap_header.bits_per_pixel = 32;
+		bitmap_header.compression = BmpCompression::Rgb;
+		bitmap_header.image_size = image_data_size + mask_data_size;
+		bitmap_header.x_pixels_per_meter = 0;
+		bitmap_header.y_pixels_per_meter = 0;
+		bitmap_header.used_colors = 0;
+		bitmap_header.required_colors = 0;
+
+		Writer writer{ "tests/core/data/gradient32.ico" };
+		if (writer.write(file_header) && writer.write(image_header) && writer.write(bitmap_header) && ::write_color_gradient<true, true>(writer))
+		{
+			const auto mask_data_buffer = std::make_unique<std::uint8_t[]>(mask_data_size);
+			std::memset(mask_data_buffer.get(), 0, mask_data_size);
+			writer.write(mask_data_buffer.get(), mask_data_size);
+		}
+	}
+	{
+		TgaHeader header;
+		std::memset(&header, 0, sizeof header);
+		header.image_type = tgaTrueColor;
+		header.image.width = 16;
+		header.image.height = 16;
+		header.image.pixel_depth = 32;
+		header.image.descriptor = tgaTopLeft | 8;
+
+		Writer writer{ "tests/core/data/gradient32.tga" };
+		if (writer.write(header))
+			::write_color_gradient<true>(writer);
 	}
 }

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +41,15 @@ TEST_CASE("image.load.dds")
 	const auto image = Image::load(*Source::from("tests/core/data/gradient32.dds"));
 	REQUIRE(image);
 	CHECK(*image == ::make_test_image(true));
+}
+
+TEST_CASE("image.load.ico")
+{
+	const auto image = Image::load(*Source::from("tests/core/data/gradient32.ico"));
+	REQUIRE(image);
+	auto reference_image = ::make_test_image(true);
+	reference_image.flip_vertically();
+	CHECK(*image == reference_image);
 }
 
 #if Y_USE_JPEG
