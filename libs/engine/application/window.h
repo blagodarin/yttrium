@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace Yttrium
 
 	private:
 		void on_focus_event(bool is_focused) override;
-		void on_key_event(Key, bool is_pressed, const std::optional<Flags<KeyEvent::Modifier>>&) override;
+		void on_key_event(Key, bool is_pressed, Flags<KeyEvent::Modifier>) override;
 		void on_resize_event(const Size&) override;
 		void on_text_input(std::string_view) override;
 

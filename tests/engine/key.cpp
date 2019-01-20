@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ TEST_CASE("key_event")
 	using Yttrium::Key;
 	using Yttrium::KeyEvent;
 
-	CHECK(KeyEvent(Key::A, false, false).key == Key::A);
-	CHECK(KeyEvent(Key::B, false, false).key == Key::B);
-	CHECK(!KeyEvent(Key::A, false, false).pressed);
-	CHECK(KeyEvent(Key::A, true, false).pressed);
-	CHECK(!KeyEvent(Key::A, false, false).autorepeat);
-	CHECK(KeyEvent(Key::A, false, true).autorepeat);
+	CHECK(KeyEvent(Key::A, false, false)._key == Key::A);
+	CHECK(KeyEvent(Key::B, false, false)._key == Key::B);
+	CHECK(!KeyEvent(Key::A, false, false)._pressed);
+	CHECK(KeyEvent(Key::A, true, false)._pressed);
+	CHECK(!KeyEvent(Key::A, false, false)._autorepeat);
+	CHECK(KeyEvent(Key::A, false, true)._autorepeat);
 }
 
 TEST_CASE("key_lookup")

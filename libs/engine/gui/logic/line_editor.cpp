@@ -48,9 +48,9 @@ namespace Yttrium
 
 	bool LineEditor::process_key(const KeyEvent& event)
 	{
-		assert(event.pressed);
-		const bool shift = event.modifiers & KeyEvent::Modifier::Shift;
-		switch (event.key)
+		assert(event._pressed);
+		const bool shift = event._modifiers & KeyEvent::Modifier::Shift;
+		switch (event._key)
 		{
 		case Key::Left:
 			if (_cursor > 0)

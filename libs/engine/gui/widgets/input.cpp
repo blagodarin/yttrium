@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,9 +55,9 @@ namespace Yttrium
 
 	bool InputWidget::process_key(const KeyEvent& event)
 	{
-		if (event.pressed)
+		if (event._pressed)
 		{
-			switch (event.key)
+			switch (event._key)
 			{
 			case Key::Enter:
 				_data->run(_gui, WidgetData::Action::OnEnter);

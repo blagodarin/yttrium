@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -217,14 +217,14 @@ namespace Yttrium
 			Alt = 1 << 2,     ///< Key::LAlt or Key::RAlt is pressed.
 		};
 
-		Key key;                   ///< Key.
-		bool pressed;              ///< Is the key pressed?
-		bool autorepeat;           ///< Is it an autorepeat event?
-		Flags<Modifier> modifiers; ///< Modifier mask.
+		Key _key;                   ///< Key.
+		bool _pressed;              ///< Is the key pressed?
+		bool _autorepeat;           ///< Is it an autorepeat event?
+		Flags<Modifier> _modifiers; ///< Modifier mask.
 
 		///
-		KeyEvent(Key key_, bool pressed_, bool autorepeat_)
-			: key{ key_ }, pressed{ pressed_ }, autorepeat{ autorepeat_ } {}
+		constexpr KeyEvent(Key key, bool pressed, bool autorepeat) noexcept
+			: _key{ key }, _pressed{ pressed }, _autorepeat{ autorepeat } {}
 	};
 }
 

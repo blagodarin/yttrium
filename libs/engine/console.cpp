@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,9 +75,9 @@ namespace Yttrium
 
 	bool Console::process_key_event(const KeyEvent& event)
 	{
-		if (_private->_visible && event.pressed)
+		if (_private->_visible && event._pressed)
 		{
-			switch (event.key)
+			switch (event._key)
 			{
 			case Key::Escape:
 				_private->_visible = false;

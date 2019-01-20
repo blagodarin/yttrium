@@ -232,12 +232,12 @@ namespace Yttrium
 	{
 		if (!_private->_screen_stack.empty() && _private->_screen_stack.back()->handle_key(event))
 			return true;
-		if (!event.autorepeat)
+		if (!event._autorepeat)
 		{
-			const auto i = _private->_on_key.find(event.key);
+			const auto i = _private->_on_key.find(event._key);
 			if (i != _private->_on_key.end())
 			{
-				(event.pressed ? i->second.first : i->second.second).run(*_private);
+				(event._pressed ? i->second.first : i->second.second).run(*_private);
 				return true;
 			}
 		}

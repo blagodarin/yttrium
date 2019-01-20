@@ -36,8 +36,8 @@ namespace Yttrium
 
 		bool process(const KeyEvent& event)
 		{
-			return event.key >= Key::Mouse1 && event.key <= Key::Mouse5
-				? (event.pressed ? on_mouse_press(event.key) : on_mouse_release(event.key))
+			return event._key >= Key::Mouse1 && event._key <= Key::Mouse5
+				? (event._pressed ? on_mouse_press(event._key) : on_mouse_release(event._key))
 				: on_key_event(event);
 		}
 
@@ -207,12 +207,12 @@ namespace Yttrium
 		if (_activity->process(event))
 			return true;
 
-		if (!event.autorepeat)
+		if (!event._autorepeat)
 		{
-			const auto i = _on_key.find(event.key);
+			const auto i = _on_key.find(event._key);
 			if (i != _on_key.end())
 			{
-				(event.pressed ? i->second.first : i->second.second).run(_gui);
+				(event._pressed ? i->second.first : i->second.second).run(_gui);
 				_activity->set_focus(nullptr);
 				return true;
 			}
