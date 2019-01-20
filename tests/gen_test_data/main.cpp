@@ -30,7 +30,7 @@ namespace
 	template <bool with_alpha, bool flip_vertically = false>
 	bool write_color_gradient(Writer& writer)
 	{
-		auto image = make_test_image(with_alpha);
+		auto image = ::make_test_image(with_alpha);
 		if (flip_vertically)
 			image.flip_vertically();
 		return writer.write_all(image.data(), image.format().frame_size());
@@ -40,33 +40,48 @@ namespace
 int main()
 {
 	{
-		BmpPrefix prefix;
-		prefix.magic = BmpMagic::Bm;
+		const auto image = ::make_gray8_test_image<16>();
 
-		BmpHeaders headers;
-		headers.file.file_size = sizeof prefix + sizeof headers + 16 * 16 * 3;
-		headers.file.reserved = 0;
-		headers.file.data_offset = sizeof prefix + sizeof headers;
-		headers.info.header_size = sizeof headers.info;
-		headers.info.width = 16;
-		headers.info.height = -16;
-		headers.info.planes = 1;
-		headers.info.bits_per_pixel = 24;
-		headers.info.compression = BmpCompression::Rgb;
-		headers.info.image_size = 0;
-		headers.info.x_pixels_per_meter = 4724; // 120 dpi.
-		headers.info.y_pixels_per_meter = 4724;
-		headers.info.used_colors = 0;
-		headers.info.required_colors = 0;
+		TgaHeader header;
+		std::memset(&header, 0, sizeof header);
+		header.image_type = TgaImageType::BlackAndWhite;
+		header.image.width = 16;
+		header.image.height = 16;
+		header.image.pixel_depth = 8;
+		header.image.descriptor = tgaTopLeft;
+
+		Writer writer{ "tests/core/data/gradient8.tga" };
+		if (writer.write(header))
+			writer.write_all(image.data(), image.format().frame_size());
+	}
+	{
+		BmpFileHeader file_header;
+		file_header.file_type = BmpFileType::Bm;
+		file_header.file_size = sizeof(BmpFileHeader) + sizeof(BmpInfoHeader) + 16 * 16 * 3;
+		file_header.reserved = 0;
+		file_header.data_offset = sizeof(BmpFileHeader) + sizeof(BmpInfoHeader);
+
+		BmpInfoHeader info_header;
+		info_header.header_size = sizeof info_header;
+		info_header.width = 16;
+		info_header.height = -16;
+		info_header.planes = 1;
+		info_header.bits_per_pixel = 24;
+		info_header.compression = BmpCompression::Rgb;
+		info_header.image_size = 0;
+		info_header.x_pixels_per_meter = 4724; // 120 dpi.
+		info_header.y_pixels_per_meter = 4724;
+		info_header.used_colors = 0;
+		info_header.required_colors = 0;
 
 		Writer writer{ "tests/core/data/gradient24.bmp" };
-		if (writer.write(prefix) && writer.write(headers))
+		if (writer.write(file_header) && writer.write(info_header))
 			::write_color_gradient<false>(writer);
 	}
 	{
 		TgaHeader header;
 		std::memset(&header, 0, sizeof header);
-		header.image_type = tgaTrueColor;
+		header.image_type = TgaImageType::TrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 24;
@@ -103,7 +118,7 @@ int main()
 
 		IcoFileHeader file_header;
 		file_header.reserved = 0;
-		file_header.type = IcoFileHeader::Type_Ico;
+		file_header.type = IcoFileType::Ico;
 		file_header.count = 1;
 
 		IcoImageHeader image_header;
@@ -111,8 +126,8 @@ int main()
 		image_header.height = 16;
 		image_header.color_count = 0;
 		image_header.reserved = 0;
-		image_header.color_planes = 1;
-		image_header.bits_per_pixel = 32;
+		image_header.ico.color_planes = 1;
+		image_header.ico.bits_per_pixel = 32;
 		image_header.data_size = sizeof(BmpInfoHeader) + image_data_size + mask_data_size;
 		image_header.data_offset = sizeof file_header + sizeof image_header;
 
@@ -140,7 +155,7 @@ int main()
 	{
 		TgaHeader header;
 		std::memset(&header, 0, sizeof header);
-		header.image_type = tgaTrueColor;
+		header.image_type = TgaImageType::TrueColor;
 		header.image.width = 16;
 		header.image.height = 16;
 		header.image.pixel_depth = 32;

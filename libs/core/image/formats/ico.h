@@ -20,14 +20,18 @@
 
 namespace Yttrium
 {
+	enum class IcoFileType : uint16_t
+	{
+		Ico = 1,
+		Cur = 2,
+	};
+
 #pragma pack(push, 1)
 
 	struct IcoFileHeader
 	{
-		static constexpr uint16_t Type_Ico = 1;
-
 		uint16_t reserved;
-		uint16_t type;
+		IcoFileType type;
 		uint16_t count;
 	};
 
@@ -37,8 +41,19 @@ namespace Yttrium
 		uint8_t height;
 		uint8_t color_count;
 		uint8_t reserved;
-		uint16_t color_planes;
-		uint16_t bits_per_pixel;
+		union
+		{
+			struct
+			{
+				uint16_t color_planes;
+				uint16_t bits_per_pixel;
+			} ico;
+			struct
+			{
+				uint16_t hotspot_left;
+				uint16_t hotspot_top;
+			} cur;
+		};
 		uint32_t data_size;
 		uint32_t data_offset;
 	};

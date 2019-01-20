@@ -28,43 +28,32 @@ namespace Yttrium
 		IcoFileHeader file_header;
 		if (!reader.read(file_header)
 			|| file_header.reserved != 0
-			|| file_header.type != IcoFileHeader::Type_Ico
+			|| file_header.type != IcoFileType::Ico
 			|| file_header.count != 1)
 			return {};
 
 		IcoImageHeader image_header;
 		if (!reader.read(image_header)
-			|| image_header.width == 0
-			|| image_header.height == 0
 			|| image_header.color_count != 0
 			|| image_header.reserved != 0
-			|| image_header.color_planes != 1)
+			|| image_header.ico.color_planes != 1
+			|| image_header.ico.bits_per_pixel != 32)
 			return {};
+
+		const std::uint16_t width = image_header.width ? image_header.width : 256;
+		const std::uint16_t height = image_header.height ? image_header.height : 256;
 
 		BmpInfoHeader bitmap_header;
 		if (!reader.seek(image_header.data_offset)
 			|| !reader.read(bitmap_header)
 			|| bitmap_header.header_size < sizeof bitmap_header
-			|| bitmap_header.width != image_header.width
-			|| bitmap_header.height != image_header.height * 2
+			|| bitmap_header.width != width
+			|| bitmap_header.height != height * 2
 			|| bitmap_header.planes != 1
-			|| bitmap_header.bits_per_pixel != image_header.bits_per_pixel
+			|| bitmap_header.bits_per_pixel != image_header.ico.bits_per_pixel
 			|| bitmap_header.compression != BmpCompression::Rgb)
 			return {};
 
-		PixelFormat pixel_format;
-		switch (bitmap_header.bits_per_pixel)
-		{
-		case 24: pixel_format = PixelFormat::Bgr24; break;
-		case 32: pixel_format = PixelFormat::Bgra32; break; // Non-standard, actually is BGRX with an unused byte.
-		default: return {};
-		}
-
-		std::optional<ImageFormat> format;
-		if (bitmap_header.height >= 0)
-			format.emplace(bitmap_header.width, bitmap_header.height / 2, pixel_format, ImageOrientation::XRightYUp);
-		else
-			format.emplace(bitmap_header.width, -bitmap_header.height / 2, pixel_format, ImageOrientation::XRightYDown);
-		return format;
+		return ImageFormat{ width, height, PixelFormat::Bgra32, ImageOrientation::XRightYUp };
 	}
 }

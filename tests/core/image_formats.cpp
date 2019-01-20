@@ -68,7 +68,21 @@ TEST_CASE("image.load.jpeg")
 }
 #endif
 
-TEST_CASE("image.load.tga")
+TEST_CASE("image.load.tga8")
+{
+	const auto image = Image::load(*Source::from("tests/core/data/gradient8.tga"));
+	REQUIRE(image);
+	CHECK(*image == (::make_gray8_test_image<16>()));
+}
+
+TEST_CASE("image.load.tga24")
+{
+	const auto image = Image::load(*Source::from("tests/core/data/gradient24.tga"));
+	REQUIRE(image);
+	CHECK(*image == ::make_test_image(false));
+}
+
+TEST_CASE("image.load.tga32")
 {
 	const auto image = Image::load(*Source::from("tests/core/data/gradient32.tga"));
 	REQUIRE(image);
@@ -84,7 +98,14 @@ TEST_CASE("image.save.png")
 }
 #endif
 
-TEST_CASE("image.save.tga")
+TEST_CASE("image.save.tga24")
+{
+	TemporaryFile file;
+	REQUIRE(::make_test_image(false).save(file.name(), ImageType::Tga));
+	CHECK(Source::from(file)->to_buffer() == Source::from("tests/core/data/gradient24.tga")->to_buffer());
+}
+
+TEST_CASE("image.save.tga32")
 {
 	TemporaryFile file;
 	REQUIRE(::make_test_image(true).save(file.name(), ImageType::Tga));

@@ -20,6 +20,23 @@
 
 namespace Yttrium
 {
+	enum class TgaColorMapType : uint8_t
+	{
+		None = 0,
+		ColorMap = 1,
+	};
+
+	enum class TgaImageType : uint8_t
+	{
+		None = 0,
+		ColorMapped = 1,
+		TrueColor = 2,
+		BlackAndWhite = 3,
+		ColorMappedRle = 9,
+		TrueColorRle = 10,
+		BlackAndWhiteRle = 11,
+	};
+
 	enum TgaImageDescriptor : uint8_t
 	{
 		tgaAlphaMask = 0x0F,
@@ -33,51 +50,28 @@ namespace Yttrium
 		tgaReservedMask = 0xC0,
 	};
 
-	enum TgaColorMapType : uint8_t
-	{
-		tgaNoColorMap,
-		tgaColorMap,
-	};
-
-	enum TgaImageType : uint8_t
-	{
-		tgaNone,
-
-		tgaColorMapped,
-		tgaTrueColor,
-		tgaBlackAndWhite,
-
-		tgaColorMappedRle = 9,
-		tgaTrueColorRle,
-		tgaBlackAndWhiteRle,
-	};
-
 #pragma pack(push, 1)
-
-	struct TgaColorMap
-	{
-		uint16_t first_entry_index;
-		uint16_t length;
-		uint8_t entry_size;
-	};
-
-	struct TgaImage
-	{
-		uint16_t x;
-		uint16_t y;
-		uint16_t width;
-		uint16_t height;
-		uint8_t pixel_depth;
-		uint8_t descriptor;
-	};
 
 	struct TgaHeader
 	{
 		uint8_t id_length;
-		uint8_t color_map_type;
-		uint8_t image_type;
-		TgaColorMap color_map;
-		TgaImage image;
+		TgaColorMapType color_map_type;
+		TgaImageType image_type;
+		struct
+		{
+			uint16_t first_entry_index;
+			uint16_t length;
+			uint8_t entry_size;
+		} color_map;
+		struct
+		{
+			uint16_t x;
+			uint16_t y;
+			uint16_t width;
+			uint16_t height;
+			uint8_t pixel_depth;
+			uint8_t descriptor;
+		} image;
 	};
 
 #pragma pack(pop)

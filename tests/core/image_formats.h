@@ -18,6 +18,17 @@
 
 #include <yttrium/image.h>
 
+template <unsigned size>
+inline Yttrium::Image make_gray8_test_image()
+{
+	Yttrium::Buffer buffer{ size * size };
+	auto data = &buffer[0];
+	for (unsigned y = 0; y < size; ++y)
+		for (unsigned x = 0; x < size; ++x)
+			*data++ = static_cast<std::uint8_t>(y < size / 2 ? x * size + y / 2 : (size - 1 - x) * size + (size - 1 - y) / 2);
+	return { { size, size, Yttrium::PixelFormat::Gray8 }, buffer.data() };
+}
+
 inline Yttrium::Image make_test_image(bool with_alpha)
 {
 	Yttrium::Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));

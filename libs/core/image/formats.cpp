@@ -92,15 +92,19 @@ namespace Yttrium
 		case "DD"_twocc:
 			type = ImageType::Dds;
 			return true;
-#if Y_USE_JPEG
 		case "\xff\xd8"_twocc: // SOI marker.
+#if Y_USE_JPEG
 			type = ImageType::Jpeg;
 			return true;
+#else
+			return false;
 #endif
-#if Y_USE_PNG
 		case "\x89P"_twocc:
+#if Y_USE_PNG
 			type = ImageType::Png;
 			return true;
+#else
+			return false;
 #endif
 		default:
 			if (signature.ab)

@@ -61,9 +61,8 @@ namespace Yttrium
 	std::optional<ImageFormat> read_tga_header(Reader& reader)
 	{
 		TgaHeader header;
-
 		if (!reader.read(header)
-			|| header.color_map_type != tgaNoColorMap
+			|| header.color_map_type != TgaColorMapType::None
 			|| !header.image.width
 			|| !header.image.height
 			|| header.image.descriptor & tgaReservedMask)
@@ -81,7 +80,7 @@ namespace Yttrium
 
 		std::optional<ImageFormat> format;
 
-		if (header.image_type == tgaTrueColor)
+		if (header.image_type == TgaImageType::TrueColor)
 		{
 			const auto alpha = header.image.descriptor & tgaAlphaMask;
 			if (!alpha && header.image.pixel_depth == 24)
@@ -91,7 +90,7 @@ namespace Yttrium
 			else
 				return {};
 		}
-		else if (header.image_type == tgaBlackAndWhite && header.image.pixel_depth == 8)
+		else if (header.image_type == TgaImageType::BlackAndWhite && header.image.pixel_depth == 8)
 			format.emplace(header.image.width, header.image.height, PixelFormat::Gray8, orientation());
 		else
 			return {};
@@ -111,10 +110,9 @@ namespace Yttrium
 			return false;
 
 		TgaHeader header;
-
 		header.id_length = 0;
-		header.color_map_type = tgaNoColorMap;
-		header.image_type = (format.pixel_format() == PixelFormat::Gray8) ? tgaBlackAndWhite : tgaTrueColor;
+		header.color_map_type = TgaColorMapType::None;
+		header.image_type = (format.pixel_format() == PixelFormat::Gray8) ? TgaImageType::BlackAndWhite : TgaImageType::TrueColor;
 		header.color_map.first_entry_index = 0;
 		header.color_map.length = 0;
 		header.color_map.entry_size = 0;

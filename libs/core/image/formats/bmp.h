@@ -20,11 +20,24 @@
 
 namespace Yttrium
 {
+	enum class BmpFileType : uint16_t
+	{
+		Bm = "BM"_twocc,
+	};
+
+	enum class BmpCompression : uint32_t
+	{
+		Rgb = 0,
+	};
+
 #pragma pack(push, 1)
 
-	struct BmpPrefix
+	struct BmpFileHeader
 	{
-		uint16_t magic;
+		BmpFileType file_type;
+		uint32_t file_size;
+		uint32_t reserved;
+		uint32_t data_offset;
 	};
 
 	struct BmpInfoHeader
@@ -34,7 +47,7 @@ namespace Yttrium
 		int32_t height;
 		uint16_t planes;
 		uint16_t bits_per_pixel;
-		uint32_t compression;
+		BmpCompression compression;
 		uint32_t image_size;
 		int32_t x_pixels_per_meter;
 		int32_t y_pixels_per_meter;
@@ -42,26 +55,5 @@ namespace Yttrium
 		uint32_t required_colors;
 	};
 
-	struct BmpHeaders
-	{
-		struct
-		{
-			uint32_t file_size;
-			uint32_t reserved;
-			uint32_t data_offset;
-		} file;
-		BmpInfoHeader info;
-	};
-
 #pragma pack(pop)
-
-	namespace BmpCompression
-	{
-		inline constexpr uint16_t Rgb = 0;
-	}
-
-	namespace BmpMagic
-	{
-		inline constexpr uint16_t Bm = "BM"_twocc;
-	}
 }
