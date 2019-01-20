@@ -74,6 +74,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-global-constructors
 		-Wno-gnu-statement-expression
 		-Wno-header-hygiene # TODO: Remove "using namespace" from examples.
+		-Wno-nested-anon-types
 		-Wno-padded
 		-Wno-return-std-move-in-c++11
 		-Wno-switch-enum
