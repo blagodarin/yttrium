@@ -264,7 +264,7 @@ namespace Yttrium
 						modifiers |= KeyEvent::Modifier::Control;
 					if (e->state & XCB_MOD_MASK_1)
 						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, modifiers);
+					_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, {}, modifiers);
 				}
 				if (event_type == XCB_KEY_PRESS)
 				{
@@ -288,7 +288,7 @@ namespace Yttrium
 						modifiers |= KeyEvent::Modifier::Control;
 					if (e->state & XCB_KEY_BUT_MASK_MOD_1)
 						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event_type == XCB_BUTTON_PRESS, modifiers);
+					_callbacks.on_key_event(key, event_type == XCB_BUTTON_PRESS, {}, modifiers);
 				}
 			}
 			break;

@@ -30,7 +30,7 @@ namespace Yttrium
 	public:
 		virtual ~WindowBackendCallbacks() = default;
 		virtual void on_focus_event(bool is_focused) = 0;
-		virtual void on_key_event(Key, bool is_pressed, Flags<KeyEvent::Modifier>) = 0;
+		virtual void on_key_event(Key, bool pressed, const std::optional<bool>& autorepeat, Flags<KeyEvent::Modifier>) = 0;
 		virtual void on_resize_event(const Size&) = 0;
 		virtual void on_text_input(std::string_view) = 0;
 	};

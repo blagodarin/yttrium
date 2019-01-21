@@ -42,7 +42,7 @@ namespace Yttrium
 
 	private:
 		void on_focus_event(bool is_focused) override;
-		void on_key_event(Key, bool is_pressed, Flags<KeyEvent::Modifier>) override;
+		void on_key_event(Key, bool pressed, const std::optional<bool>& autorepeat, Flags<KeyEvent::Modifier>) override;
 		void on_resize_event(const Size&) override;
 		void on_text_input(std::string_view) override;
 

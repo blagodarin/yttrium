@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@
 #include <array>
 #include <cassert>
 #include <vector>
-
-// TODO: Implement text input.
 
 namespace Yttrium
 {
@@ -157,11 +155,11 @@ namespace Yttrium
 		};
 
 		const auto call_mouse_keys = [wparam](NativeWindowCallbacks& callbacks, Flags<KeyEvent::Modifier> modifiers) {
-			callbacks.on_key(Key::Mouse1, wparam & MK_LBUTTON, modifiers);
-			callbacks.on_key(Key::Mouse2, wparam & MK_RBUTTON, modifiers);
-			callbacks.on_key(Key::Mouse3, wparam & MK_MBUTTON, modifiers);
-			callbacks.on_key(Key::Mouse4, wparam & MK_XBUTTON1, modifiers);
-			callbacks.on_key(Key::Mouse5, wparam & MK_XBUTTON2, modifiers);
+			callbacks.on_key(Key::Mouse1, wparam & MK_LBUTTON, false, modifiers);
+			callbacks.on_key(Key::Mouse2, wparam & MK_RBUTTON, false, modifiers);
+			callbacks.on_key(Key::Mouse3, wparam & MK_MBUTTON, false, modifiers);
+			callbacks.on_key(Key::Mouse4, wparam & MK_XBUTTON1, false, modifiers);
+			callbacks.on_key(Key::Mouse5, wparam & MK_XBUTTON2, false, modifiers);
 		};
 
 		switch (msg)
@@ -183,13 +181,13 @@ namespace Yttrium
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			if (const auto callbacks = find_callbacks(hwnd))
-				callbacks->on_key(key_from_wparam(wparam), true, get_modifiers());
+				callbacks->on_key(key_from_wparam(wparam), true, lparam & 0x40000000, get_modifiers());
 			break;
 
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			if (const auto callbacks = find_callbacks(hwnd))
-				callbacks->on_key(key_from_wparam(wparam), false, get_modifiers());
+				callbacks->on_key(key_from_wparam(wparam), false, false, get_modifiers());
 			break;
 
 		case WM_MOUSEWHEEL:

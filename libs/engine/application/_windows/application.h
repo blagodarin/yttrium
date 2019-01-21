@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Yttrium
 		virtual ~NativeWindowCallbacks() = default;
 		virtual void on_close() = 0;
 		virtual void on_focus(bool) = 0;
-		virtual void on_key(Key, bool pressed, Flags<KeyEvent::Modifier>) = 0;
+		virtual void on_key(Key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier>) = 0;
 		virtual void on_resize(const Size&) = 0;
 		virtual void on_text(std::string_view) = 0;
 	};

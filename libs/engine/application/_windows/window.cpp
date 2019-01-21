@@ -131,9 +131,9 @@ namespace Yttrium
 		_callbacks.on_focus_event(focused);
 	}
 
-	void WindowBackend::on_key(Key key, bool pressed, Flags<KeyEvent::Modifier> modifiers)
+	void WindowBackend::on_key(Key key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier> modifiers)
 	{
-		_callbacks.on_key_event(key, pressed, modifiers);
+		_callbacks.on_key_event(key, pressed, autorepeat, modifiers);
 	}
 
 	void WindowBackend::on_resize(const Size& size)

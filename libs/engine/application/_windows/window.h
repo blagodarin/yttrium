@@ -49,7 +49,7 @@ namespace Yttrium
 	private:
 		void on_close() override;
 		void on_focus(bool) override;
-		void on_key(Key, bool pressed, Flags<KeyEvent::Modifier>) override;
+		void on_key(Key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier>) override;
 		void on_resize(const Size&) override;
 		void on_text(std::string_view) override;
 

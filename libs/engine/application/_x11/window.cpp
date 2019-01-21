@@ -147,7 +147,7 @@ namespace Yttrium
 						modifiers |= KeyEvent::Modifier::Control;
 					if (event.xkey.state & Mod1Mask)
 						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event.type == KeyPress, modifiers);
+					_callbacks.on_key_event(key, event.type == KeyPress, {}, modifiers);
 				}
 				if (event.type == KeyPress)
 				{
@@ -171,7 +171,7 @@ namespace Yttrium
 						modifiers |= KeyEvent::Modifier::Control;
 					if (event.xbutton.state & Mod1Mask)
 						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event.type == ButtonPress, modifiers);
+					_callbacks.on_key_event(key, event.type == ButtonPress, {}, modifiers);
 				}
 				break;
 
