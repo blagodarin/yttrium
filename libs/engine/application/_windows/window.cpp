@@ -36,6 +36,16 @@ namespace Yttrium
 			throw InitializationError{ "GetDC failed" };
 	}
 
+	void WindowBackend::IconHolder::reset(HICON handle) noexcept
+	{
+		if (_handle)
+		{
+			if (!::DestroyIcon(_handle))
+				print_last_error("DestroyIcon");
+			_handle = handle;
+		}
+	}
+
 	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
 		: _callbacks{ callbacks }
 	{
@@ -87,13 +97,16 @@ namespace Yttrium
 		header->used_colors = 0;
 		header->required_colors = 0;
 		auto bgra_icon = to_bgra(icon); // TODO: Use buffer data as image conversion output.
-		bgra_icon.flip_vertically();    // TODO: Check image orientation.
+		if (const auto o = bgra_icon.format().orientation(); o == ImageOrientation::XRightYDown || o == ImageOrientation::XLeftYDown)
+			bgra_icon.flip_vertically();
 		std::memcpy(buffer.get() + sizeof *header, bgra_icon.data(), image_size);
 		std::memset(buffer.get() + sizeof *header + image_size, 0xff, mask_size);
 		const auto hicon = ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
+		if (!hicon)
+			return print_last_error("CreateIconFromResourceEx");
+		_icon.reset(hicon);
 		::SendMessageW(_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hicon));
 		::SendMessageW(_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hicon));
-		// TODO: Free icon handle.
 	}
 
 	void WindowBackend::set_title(const std::string& title)

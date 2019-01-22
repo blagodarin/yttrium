@@ -64,8 +64,19 @@ namespace Yttrium
 			const HDC _hdc;
 		};
 
+		class IconHolder
+		{
+		public:
+			~IconHolder() noexcept { reset(NULL); }
+			void reset(HICON) noexcept;
+
+		private:
+			HICON _handle = NULL;
+		};
+
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
+		IconHolder _icon;
 		NativeWindow _hwnd = _application.create_window(*this);
 		const WindowDC _hdc{ _hwnd };
 #if Y_RENDERER_OPENGL
