@@ -23,10 +23,81 @@
 
 #include <new>
 
-namespace
+namespace Yttrium
 {
-	bool read_image_data(Yttrium::Reader& reader, const Yttrium::ImageInfo& info, Yttrium::Buffer& buffer)
+	bool read_image(const Source& source, ImageFormat format, ImageInfo& info, Buffer& buffer)
 	{
+		if (format == ImageFormat::Auto)
+		{
+			struct
+			{
+				std::uint16_t ab = 0;
+				std::uint16_t cd = 0;
+			} signature;
+			static_assert(sizeof signature == 4);
+			if (!source.read_at(0, signature))
+				return false;
+			switch (signature.ab)
+			{
+			case "BM"_twocc:
+				format = ImageFormat::Bmp;
+				break;
+			case "DD"_twocc:
+				format = ImageFormat::Dds;
+				break;
+			case "\xff\xd8"_twocc: // SOI marker.
+				format = ImageFormat::Jpeg;
+				break;
+			case "\x89P"_twocc:
+				format = ImageFormat::Png;
+				break;
+			default:
+				if (signature.ab)
+				{
+					// ICO: reserved value, must be zero.
+					// TGA: ID length and color map type, may be non-zero.
+					format = ImageFormat::Tga;
+				}
+				else if (signature.cd == 1)
+				{
+					// ICO: file type, 1 for ICO file.
+					// TGA: image type and lower byte of colormap description, 1 means color-mapped image (unsupported).
+					format = ImageFormat::Ico;
+				}
+				else
+					format = ImageFormat::Tga; // We're still unsure this isn't TGA.
+			}
+		}
+
+		Reader reader{ source };
+		switch (format)
+		{
+		case ImageFormat::Tga:
+			if (!read_tga_header(reader, info))
+				return false;
+			break;
+		case ImageFormat::Jpeg:
+#if Y_USE_JPEG
+			return read_jpeg(source, info, buffer);
+#else
+			return false;
+#endif
+		case ImageFormat::Dds:
+			if (!read_dds_header(reader, info))
+				return false;
+			break;
+		case ImageFormat::Bmp:
+			if (!read_bmp_header(reader, info))
+				return false;
+			break;
+		case ImageFormat::Ico:
+			if (!read_ico_header(reader, info))
+				return false;
+			break;
+		default:
+			return false;
+		}
+
 		const auto frame_size = info.frame_size();
 		try
 		{
@@ -38,29 +109,6 @@ namespace
 		}
 		return reader.read(buffer.data(), frame_size) == frame_size;
 	}
-}
-
-namespace Yttrium
-{
-	std::optional<ImageInfo> read_image(const Source& source, ImageFormat format, Buffer& buffer)
-	{
-		Reader reader{ source };
-		std::optional<ImageInfo> info;
-		switch (format)
-		{
-		case ImageFormat::Tga: info = read_tga_header(reader); break;
-#if Y_USE_JPEG
-		case ImageFormat::Jpeg: return read_jpeg(source, buffer);
-#endif
-		case ImageFormat::Dds: info = read_dds_header(reader); break;
-		case ImageFormat::Bmp: info = read_bmp_header(reader); break;
-		case ImageFormat::Ico: info = read_ico_header(reader); break;
-		default: return {};
-		}
-		if (!info || !read_image_data(reader, *info, buffer))
-			return {};
-		return info;
-	}
 
 	bool write_image(Writer& writer, ImageFormat format, const ImageInfo& info, const void* data)
 	{
@@ -71,57 +119,6 @@ namespace Yttrium
 		case ImageFormat::Png: return write_png(writer, info, data);
 #endif
 		default: return false;
-		}
-	}
-
-	bool detect_image_format(const Source& source, ImageFormat& format)
-	{
-		struct
-		{
-			std::uint16_t ab = 0;
-			std::uint16_t cd = 0;
-		} signature;
-		static_assert(sizeof signature == 4);
-		if (!source.read_at(0, signature))
-			return false;
-		switch (signature.ab)
-		{
-		case "BM"_twocc:
-			format = ImageFormat::Bmp;
-			return true;
-		case "DD"_twocc:
-			format = ImageFormat::Dds;
-			return true;
-		case "\xff\xd8"_twocc: // SOI marker.
-#if Y_USE_JPEG
-			format = ImageFormat::Jpeg;
-			return true;
-#else
-			return false;
-#endif
-		case "\x89P"_twocc:
-#if Y_USE_PNG
-			format = ImageFormat::Png;
-			return true;
-#else
-			return false;
-#endif
-		default:
-			if (signature.ab)
-			{
-				// ICO: reserved value, must be zero.
-				// TGA: ID length and color map type, may be non-zero.
-				format = ImageFormat::Tga;
-			}
-			else if (signature.cd == 1)
-			{
-				// ICO: file type, 1 for ICO file.
-				// TGA: image type and lower byte of colormap description, 1 means color-mapped image (unsupported).
-				format = ImageFormat::Ico;
-			}
-			else
-				format = ImageFormat::Tga; // We're still unsure this isn't TGA.
-			return true;
 		}
 	}
 }

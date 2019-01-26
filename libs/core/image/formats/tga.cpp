@@ -58,7 +58,7 @@ namespace
 
 namespace Yttrium
 {
-	std::optional<ImageInfo> read_tga_header(Reader& reader)
+	bool read_tga_header(Reader& reader, ImageInfo& info)
 	{
 		TgaHeader header;
 		if (!reader.read(header)
@@ -66,7 +66,29 @@ namespace Yttrium
 			|| !header.image.width
 			|| !header.image.height
 			|| header.image.descriptor & tgaReservedMask)
-			return {};
+			return false;
+
+		PixelFormat pixel_format;
+		if (header.image_type == TgaImageType::TrueColor)
+		{
+			const auto alpha = header.image.descriptor & tgaAlphaMask;
+			if (!alpha && header.image.pixel_depth == 24)
+				pixel_format = PixelFormat::Bgr24;
+			else if (alpha == 8 && header.image.pixel_depth == 32)
+				pixel_format = PixelFormat::Bgra32;
+			else
+				return false;
+		}
+		else if (header.image_type == TgaImageType::BlackAndWhite && header.image.pixel_depth == 8)
+			pixel_format = PixelFormat::Gray8;
+		else
+			return false;
+
+		if (header.id_length && !reader.skip(header.id_length))
+			return false;
+
+		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7u) / 8u)))
+			return false;
 
 		const auto orientation = [&header] {
 			switch (header.image.descriptor & tgaOriginMask)
@@ -78,30 +100,8 @@ namespace Yttrium
 			}
 		};
 
-		std::optional<ImageInfo> info;
-
-		if (header.image_type == TgaImageType::TrueColor)
-		{
-			const auto alpha = header.image.descriptor & tgaAlphaMask;
-			if (!alpha && header.image.pixel_depth == 24)
-				info.emplace(header.image.width, header.image.height, PixelFormat::Bgr24, orientation());
-			else if (alpha == 8 && header.image.pixel_depth == 32)
-				info.emplace(header.image.width, header.image.height, PixelFormat::Bgra32, orientation());
-			else
-				return {};
-		}
-		else if (header.image_type == TgaImageType::BlackAndWhite && header.image.pixel_depth == 8)
-			info.emplace(header.image.width, header.image.height, PixelFormat::Gray8, orientation());
-		else
-			return {};
-
-		if (header.id_length && !reader.skip(header.id_length))
-			return {};
-
-		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7u) / 8u)))
-			return {};
-
-		return info;
+		info = { header.image.width, header.image.height, pixel_format, orientation() };
+		return true;
 	}
 
 	bool write_tga(Writer& writer, const ImageInfo& info, const void* data)

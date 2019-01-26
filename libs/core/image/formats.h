@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <optional>
-
 namespace Yttrium
 {
 	class Buffer;
@@ -27,21 +25,19 @@ namespace Yttrium
 	class Source;
 	class Writer;
 
-	std::optional<ImageInfo> read_bmp_header(Reader&);
-	std::optional<ImageInfo> read_dds_header(Reader&);
-	std::optional<ImageInfo> read_ico_header(Reader&);
+	bool read_bmp_header(Reader&, ImageInfo&);
+	bool read_dds_header(Reader&, ImageInfo&);
+	bool read_ico_header(Reader&, ImageInfo&);
 #if Y_USE_JPEG
-	std::optional<ImageInfo> read_jpeg(const Source&, Buffer&);
+	bool read_jpeg(const Source&, ImageInfo&, Buffer&);
 #endif
-	std::optional<ImageInfo> read_tga_header(Reader&);
+	bool read_tga_header(Reader&, ImageInfo&);
 
 #if Y_USE_PNG
 	bool write_png(Writer&, const ImageInfo&, const void*);
 #endif
 	bool write_tga(Writer&, const ImageInfo&, const void*);
 
-	std::optional<ImageInfo> read_image(const Source&, ImageFormat, Buffer&);
+	bool read_image(const Source&, ImageFormat, ImageInfo&, Buffer&);
 	bool write_image(Writer&, ImageFormat, const ImageInfo&, const void*);
-
-	bool detect_image_format(const Source&, ImageFormat&);
 }

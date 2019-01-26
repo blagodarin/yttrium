@@ -62,6 +62,8 @@ namespace Yttrium
 	class Y_CORE_API ImageInfo
 	{
 	public:
+		ImageInfo() noexcept = default;
+
 		///
 		ImageInfo(std::size_t width, std::size_t height, PixelFormat, std::size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
 

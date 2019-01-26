@@ -24,13 +24,13 @@
 
 namespace Yttrium
 {
-	std::optional<ImageInfo> read_bmp_header(Reader& reader)
+	bool read_bmp_header(Reader& reader, ImageInfo& info)
 	{
 		BmpFileHeader file_header;
 		if (!reader.read(file_header)
 			|| file_header.file_type != BmpFileType::Bm
 			|| file_header.reserved != 0)
-			return {};
+			return false;
 
 		BmpInfoHeader info_header;
 		if (!reader.read(info_header)
@@ -39,24 +39,23 @@ namespace Yttrium
 			|| info_header.height == 0
 			|| info_header.planes != 1
 			|| info_header.compression != BmpCompression::Rgb)
-			return {};
+			return false;
 
 		PixelFormat pixel_format;
 		switch (info_header.bits_per_pixel)
 		{
 		case 24: pixel_format = PixelFormat::Bgr24; break;
 		case 32: pixel_format = PixelFormat::Bgra32; break; // Non-standard, actually is BGRX with an unused byte.
-		default: return {};
+		default: return false;
 		}
 
 		if (!reader.seek(file_header.data_offset))
-			return {};
+			return false;
 
-		std::optional<ImageInfo> info;
 		if (info_header.height >= 0)
-			info.emplace(info_header.width, info_header.height, pixel_format, ImageOrientation::XRightYUp);
+			info = { static_cast<std::size_t>(info_header.width), static_cast<std::size_t>(info_header.height), pixel_format, ImageOrientation::XRightYUp };
 		else
-			info.emplace(info_header.width, -info_header.height, pixel_format, ImageOrientation::XRightYDown);
-		return info;
+			info = { static_cast<std::size_t>(info_header.width), static_cast<std::size_t>(-info_header.height), pixel_format, ImageOrientation::XRightYDown };
+		return true;
 	}
 }

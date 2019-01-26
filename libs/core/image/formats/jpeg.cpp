@@ -38,16 +38,16 @@ namespace
 
 namespace Yttrium
 {
-	std::optional<ImageInfo> read_jpeg(const Source& source, Buffer& buffer)
+	bool read_jpeg(const Source& source, ImageInfo& info, Buffer& buffer)
 	{
 		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
 		if (source_buffer.size() > std::numeric_limits<unsigned long>::max())
-			return {};
+			return false;
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
 		if (setjmp(error_handler._jmp_buf))
-			return {};
+			return false;
 
 		jpeg_decompress_struct decompressor;
 		decompressor.err = ::jpeg_std_error(&error_handler._error_mgr);
@@ -55,7 +55,7 @@ namespace Yttrium
 		if (setjmp(error_handler._jmp_buf))
 		{
 			::jpeg_destroy_decompress(&decompressor);
-			return {};
+			return false;
 		}
 
 		::jpeg_mem_src(&decompressor, &source_buffer[0], static_cast<unsigned long>(source_buffer.size()));
@@ -66,7 +66,7 @@ namespace Yttrium
 
 		::jpeg_calc_output_dimensions(&decompressor);
 
-		ImageInfo info{ decompressor.output_width, decompressor.output_height, PixelFormat::Rgb24 };
+		info = { decompressor.output_width, decompressor.output_height, PixelFormat::Rgb24 };
 
 		try
 		{
@@ -84,10 +84,10 @@ namespace Yttrium
 		::jpeg_finish_decompress(&decompressor);
 
 		if (setjmp(error_handler._jmp_buf))
-			return {};
+			return false;
 
 		::jpeg_destroy_decompress(&decompressor);
 
-		return info;
+		return true;
 	}
 }

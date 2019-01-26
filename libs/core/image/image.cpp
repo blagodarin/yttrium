@@ -53,13 +53,11 @@ namespace Yttrium
 
 	std::optional<Image> Image::load(const Source& source, ImageFormat format)
 	{
-		if (format == ImageFormat::Auto && !detect_image_format(source, format))
-			return {};
+		ImageInfo info;
 		Buffer buffer;
-		const auto info = read_image(source, format, buffer);
-		if (!info)
+		if (!read_image(source, format, info, buffer))
 			return {};
-		return Image{ *info, std::move(buffer) };
+		return Image{ info, std::move(buffer) };
 	}
 
 	Image::Image(const ImageInfo& info)
