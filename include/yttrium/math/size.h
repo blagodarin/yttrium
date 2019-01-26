@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 
 #include <yttrium/math/vector.h>
 
+#include <cstddef>
+
 namespace Yttrium
 {
 	class Size
@@ -30,6 +32,8 @@ namespace Yttrium
 		constexpr Size() noexcept = default;
 		constexpr Size(int w, int h) noexcept
 			: _width{ w }, _height{ h } {}
+		constexpr Size(std::size_t w, std::size_t h) noexcept
+			: _width{ static_cast<int>(w) }, _height{ static_cast<int>(h) } {}
 	};
 
 	class SizeF

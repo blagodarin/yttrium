@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -175,7 +175,7 @@ namespace Yttrium
 
 	Image VulkanRenderer::take_screenshot(const Size& window_size) const
 	{
-		return Image{ { window_size, PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
+		return Image{ { static_cast<std::size_t>(window_size._width), static_cast<std::size_t>(window_size._height), PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
 	}
 
 	void VulkanRenderer::update_descriptors()

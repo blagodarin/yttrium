@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace Yttrium
 	{
 		const auto input_format = input.format();
 
-		Image output{ { input_format.size(), PixelFormat::Bgra32, input_format.orientation() } };
+		Image output{ { input_format.width(), input_format.height(), PixelFormat::Bgra32, input_format.orientation() } };
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input_format.row_size();
@@ -124,7 +124,7 @@ namespace Yttrium
 		if (input.format().pixel_format() != PixelFormat::Gray8)
 			return {};
 
-		Image output{ { input.format().size(), PixelFormat::Bgra32, input.format().orientation() } };
+		Image output{ { input.format().width(), input.format().height(), PixelFormat::Bgra32, input.format().orientation() } };
 
 		auto src = static_cast<const uint8_t*>(input.data());
 		const auto src_row_size = input.format().row_size();

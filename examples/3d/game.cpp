@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
 
 #include <cmath>
@@ -116,7 +117,7 @@ Game::Game(const Storage& storage)
 		if (_debug_text_visible)
 			pass.add_debug_text(_debug_text);
 	});
-	_window.on_screenshot([](Image&& image) { image.save(::make_screenshot_path()); });
+	_window.on_screenshot([](Image&& image) { image.save(Writer{ ::make_screenshot_path() }, ImageType::Png); });
 
 	_gui.bind_canvas("minimap", *_minimap_canvas);
 	_gui.on_quit([this] { _window.close(); });

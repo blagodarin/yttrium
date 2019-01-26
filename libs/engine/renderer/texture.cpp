@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ namespace Yttrium
 {
 	BackendTexture2D::BackendTexture2D(RenderBackend& backend, const ImageFormat& format, bool has_mipmaps)
 		: _backend{ backend }
-		, _size{ format.size() }
+		, _size{ format.width(), format.height() }
 		, _orientation{ format.orientation() }
 		, _has_mipmaps{ has_mipmaps }
 	{

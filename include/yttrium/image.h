@@ -14,18 +14,12 @@
 // limitations under the License.
 //
 
-/// \file
-/// \brief
-
 #ifndef _include_yttrium_image_h_
 #define _include_yttrium_image_h_
 
-#include <yttrium/math/size.h>
 #include <yttrium/memory/buffer.h>
 
-#include <memory>
 #include <optional>
-#include <string>
 
 namespace Yttrium
 {
@@ -69,35 +63,23 @@ namespace Yttrium
 	{
 	public:
 		///
-		ImageFormat(size_t width, size_t height, PixelFormat, size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
+		ImageFormat(std::size_t width, std::size_t height, PixelFormat, std::size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
 
 		///
-		ImageFormat(size_t width, size_t height, PixelFormat pixel_format, ImageOrientation orientation)
+		ImageFormat(std::size_t width, std::size_t height, PixelFormat pixel_format, ImageOrientation orientation)
 			: ImageFormat{ width, height, pixel_format, 1, orientation } {}
 
-		///
-		ImageFormat(const Size& size, PixelFormat pixel_format, size_t row_alignment = 1, ImageOrientation orientation = ImageOrientation::XRightYDown)
-			: ImageFormat{ static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, row_alignment, orientation } {}
-
-		///
-		ImageFormat(const Size& size, PixelFormat pixel_format, ImageOrientation orientation)
-			: ImageFormat{ static_cast<size_t>(size._width), static_cast<size_t>(size._height), pixel_format, 1, orientation } {}
-
-		size_t bits_per_channel() const noexcept { return bits_per_pixel() / _channels; }
-		size_t bits_per_pixel() const noexcept { return pixel_size() * 8; }
-		size_t channels() const noexcept { return _channels; }
-		size_t frame_size() const noexcept { return _row_size * _height; }
-		size_t height() const noexcept { return _height; }
+		std::size_t frame_size() const noexcept { return _row_size * _height; }
+		std::size_t height() const noexcept { return _height; }
 		ImageOrientation orientation() const noexcept { return _orientation; }
 		PixelFormat pixel_format() const noexcept { return _pixel_format; }
-		size_t pixel_size() const noexcept { return pixel_size(_pixel_format); }
-		size_t row_alignment() const noexcept { return _row_alignment; }
-		size_t row_size() const noexcept { return _row_size; }
-		Size size() const noexcept { return { static_cast<int>(_width), static_cast<int>(_height) }; }
-		size_t width() const noexcept { return _width; }
+		std::size_t pixel_size() const noexcept { return pixel_size(_pixel_format); }
+		std::size_t row_alignment() const noexcept { return _row_alignment; }
+		std::size_t row_size() const noexcept { return _row_size; }
+		std::size_t width() const noexcept { return _width; }
 
 		///
-		static constexpr size_t pixel_size(PixelFormat format) noexcept
+		static constexpr std::size_t pixel_size(PixelFormat format) noexcept
 		{
 			switch (format)
 			{
@@ -113,12 +95,11 @@ namespace Yttrium
 
 	private:
 		PixelFormat _pixel_format;
-		size_t _channels;
 		ImageOrientation _orientation;
-		size_t _width;
-		size_t _row_alignment;
-		size_t _row_size;
-		size_t _height;
+		std::size_t _width;
+		std::size_t _row_alignment;
+		std::size_t _row_size;
+		std::size_t _height;
 		friend class Image;
 	};
 
@@ -155,9 +136,6 @@ namespace Yttrium
 
 		///
 		void flip_vertically();
-
-		///
-		bool save(const std::string& path, ImageType = ImageType::Auto) const;
 
 		///
 		bool save(Writer&&, ImageType) const;

@@ -120,7 +120,7 @@ namespace Yttrium
 		header.image.y = 0;
 		header.image.width = static_cast<uint16_t>(format.width());
 		header.image.height = static_cast<uint16_t>(format.height());
-		header.image.pixel_depth = static_cast<uint8_t>(format.bits_per_pixel());
+		header.image.pixel_depth = static_cast<uint8_t>(format.pixel_size() * 8);
 		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra32) ? 8 : 0;
 
 		switch (format.orientation())
