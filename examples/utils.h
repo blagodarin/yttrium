@@ -37,7 +37,7 @@ inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yttri
 			pixel[3] = color._a;
 		}
 	}
-	return image.to_buffer(Yttrium::ImageType::Tga);
+	return image.to_buffer(Yttrium::ImageFormat::Tga);
 }
 
 inline std::string make_screenshot_path()

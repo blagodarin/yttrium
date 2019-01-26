@@ -42,19 +42,19 @@ namespace
 
 namespace Yttrium
 {
-	std::optional<ImageInfo> read_image(const Source& source, ImageType type, Buffer& buffer)
+	std::optional<ImageInfo> read_image(const Source& source, ImageFormat format, Buffer& buffer)
 	{
 		Reader reader{ source };
 		std::optional<ImageInfo> info;
-		switch (type)
+		switch (format)
 		{
-		case ImageType::Tga: info = read_tga_header(reader); break;
+		case ImageFormat::Tga: info = read_tga_header(reader); break;
 #if Y_USE_JPEG
-		case ImageType::Jpeg: return read_jpeg(source, buffer);
+		case ImageFormat::Jpeg: return read_jpeg(source, buffer);
 #endif
-		case ImageType::Dds: info = read_dds_header(reader); break;
-		case ImageType::Bmp: info = read_bmp_header(reader); break;
-		case ImageType::Ico: info = read_ico_header(reader); break;
+		case ImageFormat::Dds: info = read_dds_header(reader); break;
+		case ImageFormat::Bmp: info = read_bmp_header(reader); break;
+		case ImageFormat::Ico: info = read_ico_header(reader); break;
 		default: return {};
 		}
 		if (!info || !read_image_data(reader, *info, buffer))
@@ -62,19 +62,19 @@ namespace Yttrium
 		return info;
 	}
 
-	bool write_image(Writer& writer, ImageType type, const ImageInfo& info, const void* data)
+	bool write_image(Writer& writer, ImageFormat format, const ImageInfo& info, const void* data)
 	{
-		switch (type)
+		switch (format)
 		{
-		case ImageType::Tga: return write_tga(writer, info, data);
+		case ImageFormat::Tga: return write_tga(writer, info, data);
 #if Y_USE_PNG
-		case ImageType::Png: return write_png(writer, info, data);
+		case ImageFormat::Png: return write_png(writer, info, data);
 #endif
 		default: return false;
 		}
 	}
 
-	bool detect_image_type(const Source& source, ImageType& type)
+	bool detect_image_format(const Source& source, ImageFormat& format)
 	{
 		struct
 		{
@@ -87,21 +87,21 @@ namespace Yttrium
 		switch (signature.ab)
 		{
 		case "BM"_twocc:
-			type = ImageType::Bmp;
+			format = ImageFormat::Bmp;
 			return true;
 		case "DD"_twocc:
-			type = ImageType::Dds;
+			format = ImageFormat::Dds;
 			return true;
 		case "\xff\xd8"_twocc: // SOI marker.
 #if Y_USE_JPEG
-			type = ImageType::Jpeg;
+			format = ImageFormat::Jpeg;
 			return true;
 #else
 			return false;
 #endif
 		case "\x89P"_twocc:
 #if Y_USE_PNG
-			type = ImageType::Png;
+			format = ImageFormat::Png;
 			return true;
 #else
 			return false;
@@ -111,16 +111,16 @@ namespace Yttrium
 			{
 				// ICO: reserved value, must be zero.
 				// TGA: ID length and color map type, may be non-zero.
-				type = ImageType::Tga;
+				format = ImageFormat::Tga;
 			}
 			else if (signature.cd == 1)
 			{
 				// ICO: file type, 1 for ICO file.
 				// TGA: image type and lower byte of colormap description, 1 means color-mapped image (unsupported).
-				type = ImageType::Ico;
+				format = ImageFormat::Ico;
 			}
 			else
-				type = ImageType::Tga; // We're still unsure this isn't TGA.
+				format = ImageFormat::Tga; // We're still unsure this isn't TGA.
 			return true;
 		}
 	}

@@ -37,8 +37,8 @@ namespace Yttrium
 		Bgra32,      ///< Blue-green-red-alpha (reverse RGB).
 	};
 
-	/// Image file type.
-	enum class ImageType
+	/// Image format.
+	enum class ImageFormat
 	{
 		Auto, ///< Automatic detection.
 		Tga,  ///< Truevision TARGA (TGA) file format.
@@ -119,7 +119,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::optional<Image> load(const Source&, ImageType = ImageType::Auto);
+		static std::optional<Image> load(const Source&, ImageFormat = ImageFormat::Auto);
 
 		/// Creates an image with uninitialized contents.
 		explicit Image(const ImageInfo&);
@@ -138,13 +138,13 @@ namespace Yttrium
 		void flip_vertically();
 
 		///
-		bool save(Writer&&, ImageType) const;
+		bool save(Writer&&, ImageFormat) const;
 
 		///
 		bool swap_channels() noexcept;
 
 		///
-		Buffer to_buffer(ImageType) const;
+		Buffer to_buffer(ImageFormat) const;
 
 	private:
 		ImageInfo _info;

@@ -22,7 +22,7 @@ namespace Yttrium
 {
 	class Buffer;
 	class ImageInfo;
-	enum class ImageType;
+	enum class ImageFormat;
 	class Reader;
 	class Source;
 	class Writer;
@@ -40,8 +40,8 @@ namespace Yttrium
 #endif
 	bool write_tga(Writer&, const ImageInfo&, const void*);
 
-	std::optional<ImageInfo> read_image(const Source&, ImageType, Buffer&);
-	bool write_image(Writer&, ImageType, const ImageInfo&, const void*);
+	std::optional<ImageInfo> read_image(const Source&, ImageFormat, Buffer&);
+	bool write_image(Writer&, ImageFormat, const ImageInfo&, const void*);
 
-	bool detect_image_type(const Source&, ImageType&);
+	bool detect_image_format(const Source&, ImageFormat&);
 }

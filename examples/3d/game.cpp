@@ -117,7 +117,7 @@ Game::Game(const Storage& storage)
 		if (_debug_text_visible)
 			pass.add_debug_text(_debug_text);
 	});
-	_window.on_screenshot([](Image&& image) { image.save(Writer{ ::make_screenshot_path() }, ImageType::Png); });
+	_window.on_screenshot([](Image&& image) { image.save(Writer{ ::make_screenshot_path() }, ImageFormat::Png); });
 
 	_gui.bind_canvas("minimap", *_minimap_canvas);
 	_gui.on_quit([this] { _window.close(); });

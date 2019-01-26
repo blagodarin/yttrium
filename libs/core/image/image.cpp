@@ -51,12 +51,12 @@ namespace Yttrium
 		assert(is_power_of_2(_row_alignment));
 	}
 
-	std::optional<Image> Image::load(const Source& source, ImageType type)
+	std::optional<Image> Image::load(const Source& source, ImageFormat format)
 	{
-		if (type == ImageType::Auto && !detect_image_type(source, type))
+		if (format == ImageFormat::Auto && !detect_image_format(source, format))
 			return {};
 		Buffer buffer;
-		const auto info = read_image(source, type, buffer);
+		const auto info = read_image(source, format, buffer);
 		if (!info)
 			return {};
 		return Image{ *info, std::move(buffer) };
@@ -93,9 +93,9 @@ namespace Yttrium
 		}
 	}
 
-	bool Image::save(Writer&& writer, ImageType type) const
+	bool Image::save(Writer&& writer, ImageFormat format) const
 	{
-		return write_image(writer, type, _info, _buffer.data());
+		return write_image(writer, format, _info, _buffer.data());
 	}
 
 	bool Image::swap_channels() noexcept
@@ -130,9 +130,9 @@ namespace Yttrium
 		return false;
 	}
 
-	Buffer Image::to_buffer(ImageType type) const
+	Buffer Image::to_buffer(ImageFormat format) const
 	{
 		Buffer buffer;
-		return save(Writer{ buffer }, type) ? std::move(buffer) : Buffer{};
+		return save(Writer{ buffer }, format) ? std::move(buffer) : Buffer{};
 	}
 }

@@ -25,7 +25,7 @@
 #include <catch2/catch.hpp>
 
 using Yttrium::Image;
-using Yttrium::ImageType;
+using Yttrium::ImageFormat;
 using Yttrium::PixelFormat;
 using Yttrium::Source;
 using Yttrium::TemporaryFile;
@@ -95,7 +95,7 @@ TEST_CASE("image.load.tga32")
 TEST_CASE("image.save.png")
 {
 	TemporaryFile file;
-	REQUIRE(::make_test_image(false).save(Writer{ file.name() }, ImageType::Png));
+	REQUIRE(::make_test_image(false).save(Writer{ file.name() }, ImageFormat::Png));
 	CHECK(Source::from(file)->to_buffer() == Source::from("tests/core/data/gradient24.png")->to_buffer());
 }
 #endif
@@ -103,13 +103,13 @@ TEST_CASE("image.save.png")
 TEST_CASE("image.save.tga24")
 {
 	TemporaryFile file;
-	REQUIRE(::make_test_image(false).save(Writer{ file.name() }, ImageType::Tga));
+	REQUIRE(::make_test_image(false).save(Writer{ file.name() }, ImageFormat::Tga));
 	CHECK(Source::from(file)->to_buffer() == Source::from("tests/core/data/gradient24.tga")->to_buffer());
 }
 
 TEST_CASE("image.save.tga32")
 {
 	TemporaryFile file;
-	REQUIRE(::make_test_image(true).save(Writer{ file.name() }, ImageType::Tga));
+	REQUIRE(::make_test_image(true).save(Writer{ file.name() }, ImageFormat::Tga));
 	CHECK(Source::from(file)->to_buffer() == Source::from("tests/core/data/gradient32.tga")->to_buffer());
 }
