@@ -78,8 +78,8 @@ namespace Yttrium
 
 	void WindowBackend::set_icon(const Image& icon)
 	{
-		const auto width = icon.format().width();
-		const auto height = icon.format().height();
+		const auto width = icon.info().width();
+		const auto height = icon.info().height();
 		const auto image_size = width * height * sizeof(std::uint32_t);
 		const auto mask_size = (width + 7) / 8 * height;
 		const auto buffer_size = sizeof(BmpInfoHeader) + image_size + mask_size;
@@ -97,7 +97,7 @@ namespace Yttrium
 		header->used_colors = 0;
 		header->required_colors = 0;
 		auto bgra_icon = to_bgra(icon); // TODO: Use buffer data as image conversion output.
-		if (const auto o = bgra_icon.format().orientation(); o == ImageOrientation::XRightYDown || o == ImageOrientation::XLeftYDown)
+		if (const auto o = bgra_icon.info().orientation(); o == ImageOrientation::XRightYDown || o == ImageOrientation::XLeftYDown)
 			bgra_icon.flip_vertically();
 		std::memcpy(buffer.get() + sizeof *header, bgra_icon.data(), image_size);
 		std::memset(buffer.get() + sizeof *header + image_size, 0xff, mask_size);

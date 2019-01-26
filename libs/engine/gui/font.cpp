@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,21 +89,21 @@ namespace Yttrium
 					continue; // TODO: Report error.
 
 				const auto glyph = _freetype._face->glyph;
-				if (x_offset + glyph->bitmap.width > _image.format().width())
+				if (x_offset + glyph->bitmap.width > _image.info().width())
 				{
 					x_offset = 0;
 					y_offset += row_height + 1;
 					row_height = 0;
 				}
-				if (y_offset + glyph->bitmap.rows > _image.format().height())
+				if (y_offset + glyph->bitmap.rows > _image.info().height())
 					break; // TODO: Report error.
 				auto src = glyph->bitmap.buffer;
-				auto dst = static_cast<std::uint8_t*>(_image.data()) + _image.format().row_size() * y_offset + x_offset;
+				auto dst = static_cast<std::uint8_t*>(_image.data()) + _image.info().row_size() * y_offset + x_offset;
 				for (unsigned y = 0; y < glyph->bitmap.rows; ++y)
 				{
 					std::memcpy(dst, src, glyph->bitmap.width);
 					src += glyph->bitmap.pitch;
-					dst += _image.format().row_size();
+					dst += _image.info().row_size();
 				}
 				auto& font_char = _chars[char_code];
 				font_char.glyph_index = glyph_index;

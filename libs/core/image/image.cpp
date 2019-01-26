@@ -40,7 +40,7 @@ namespace
 
 namespace Yttrium
 {
-	ImageFormat::ImageFormat(std::size_t width, std::size_t height, PixelFormat pixel_format, std::size_t row_alignment, ImageOrientation orientation)
+	ImageInfo::ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, std::size_t row_alignment, ImageOrientation orientation)
 		: _pixel_format{ pixel_format }
 		, _orientation{ orientation }
 		, _width{ width }
@@ -56,51 +56,51 @@ namespace Yttrium
 		if (type == ImageType::Auto && !detect_image_type(source, type))
 			return {};
 		Buffer buffer;
-		const auto format = read_image(source, type, buffer);
-		if (!format)
+		const auto info = read_image(source, type, buffer);
+		if (!info)
 			return {};
-		return Image{ *format, std::move(buffer) };
+		return Image{ *info, std::move(buffer) };
 	}
 
-	Image::Image(const ImageFormat& format)
-		: _format{ format }
-		, _buffer{ _format.frame_size() }
+	Image::Image(const ImageInfo& info)
+		: _info{ info }
+		, _buffer{ _info.frame_size() }
 	{
 	}
 
-	Image::Image(const ImageFormat& format, const void* data)
-		: _format{ format }
-		, _buffer{ _format.frame_size(), data }
+	Image::Image(const ImageInfo& info, const void* data)
+		: _info{ info }
+		, _buffer{ _info.frame_size(), data }
 	{
 	}
 
 	void Image::flip_vertically()
 	{
-		const auto row_size = _format.row_size();
+		const auto row_size = _info.row_size();
 		Buffer row_buffer{ row_size };
-		for (auto top = &_buffer[0], bottom = &_buffer[(_format.height() - 1) * row_size]; top < bottom; top += row_size, bottom -= row_size)
+		for (auto top = &_buffer[0], bottom = &_buffer[(_info.height() - 1) * row_size]; top < bottom; top += row_size, bottom -= row_size)
 		{
 			std::memcpy(row_buffer.data(), top, row_size);
 			std::memcpy(top, bottom, row_size);
 			std::memcpy(bottom, row_buffer.data(), row_size);
 		}
-		switch (_format._orientation)
+		switch (_info._orientation)
 		{
-		case ImageOrientation::XRightYDown: _format._orientation = ImageOrientation::XRightYUp; break;
-		case ImageOrientation::XRightYUp: _format._orientation = ImageOrientation::XRightYDown; break;
-		case ImageOrientation::XLeftYDown: _format._orientation = ImageOrientation::XLeftYUp; break;
-		case ImageOrientation::XLeftYUp: _format._orientation = ImageOrientation::XLeftYDown; break;
+		case ImageOrientation::XRightYDown: _info._orientation = ImageOrientation::XRightYUp; break;
+		case ImageOrientation::XRightYUp: _info._orientation = ImageOrientation::XRightYDown; break;
+		case ImageOrientation::XLeftYDown: _info._orientation = ImageOrientation::XLeftYUp; break;
+		case ImageOrientation::XLeftYUp: _info._orientation = ImageOrientation::XLeftYDown; break;
 		}
 	}
 
 	bool Image::save(Writer&& writer, ImageType type) const
 	{
-		return write_image(writer, type, _format, _buffer.data());
+		return write_image(writer, type, _info, _buffer.data());
 	}
 
 	bool Image::swap_channels() noexcept
 	{
-		switch (_format.pixel_format())
+		switch (_info.pixel_format())
 		{
 		case PixelFormat::Gray8:
 			return true;
@@ -109,18 +109,18 @@ namespace Yttrium
 		case PixelFormat::Bgr24:
 		{
 			auto scanline = static_cast<uint8_t*>(_buffer.data());
-			for (std::size_t row = 0; row < _format.height(); ++row)
+			for (std::size_t row = 0; row < _info.height(); ++row)
 			{
-				for (std::size_t offset = 0; offset < _format.width() * 3; offset += 3)
+				for (std::size_t offset = 0; offset < _info.width() * 3; offset += 3)
 				{
 					const auto x = scanline[offset];
 					scanline[offset] = scanline[offset + 2];
 					scanline[offset + 2] = x;
 				}
-				scanline += _format.row_size();
+				scanline += _info.row_size();
 			}
 		}
-			_format._pixel_format = _format.pixel_format() == PixelFormat::Rgb24 ? PixelFormat::Bgr24 : PixelFormat::Rgb24;
+			_info._pixel_format = _info.pixel_format() == PixelFormat::Rgb24 ? PixelFormat::Bgr24 : PixelFormat::Rgb24;
 			return true;
 
 		default:

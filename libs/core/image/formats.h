@@ -21,27 +21,27 @@
 namespace Yttrium
 {
 	class Buffer;
-	class ImageFormat;
+	class ImageInfo;
 	enum class ImageType;
 	class Reader;
 	class Source;
 	class Writer;
 
-	std::optional<ImageFormat> read_bmp_header(Reader&);
-	std::optional<ImageFormat> read_dds_header(Reader&);
-	std::optional<ImageFormat> read_ico_header(Reader&);
+	std::optional<ImageInfo> read_bmp_header(Reader&);
+	std::optional<ImageInfo> read_dds_header(Reader&);
+	std::optional<ImageInfo> read_ico_header(Reader&);
 #if Y_USE_JPEG
-	std::optional<ImageFormat> read_jpeg(const Source&, Buffer&);
+	std::optional<ImageInfo> read_jpeg(const Source&, Buffer&);
 #endif
-	std::optional<ImageFormat> read_tga_header(Reader&);
+	std::optional<ImageInfo> read_tga_header(Reader&);
 
 #if Y_USE_PNG
-	bool write_png(Writer&, const ImageFormat&, const void*);
+	bool write_png(Writer&, const ImageInfo&, const void*);
 #endif
-	bool write_tga(Writer&, const ImageFormat&, const void*);
+	bool write_tga(Writer&, const ImageInfo&, const void*);
 
-	std::optional<ImageFormat> read_image(const Source&, ImageType, Buffer&);
-	bool write_image(Writer&, ImageType, const ImageFormat&, const void*);
+	std::optional<ImageInfo> read_image(const Source&, ImageType, Buffer&);
+	bool write_image(Writer&, ImageType, const ImageInfo&, const void*);
 
 	bool detect_image_type(const Source&, ImageType&);
 }

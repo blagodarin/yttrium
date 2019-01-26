@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace Yttrium
 	class GlTexture2D final : public BackendTexture2D
 	{
 	public:
-		GlTexture2D(RenderBackend&, const ImageFormat&, bool has_mipmaps, GlTextureHandle&&);
+		GlTexture2D(RenderBackend&, const ImageInfo&, bool has_mipmaps, GlTextureHandle&&);
 
 		void bind(Flags<Texture2D::Filter>) const;
 

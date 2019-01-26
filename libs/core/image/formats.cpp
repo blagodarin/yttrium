@@ -25,9 +25,9 @@
 
 namespace
 {
-	bool read_image_data(Yttrium::Reader& reader, const Yttrium::ImageFormat& format, Yttrium::Buffer& buffer)
+	bool read_image_data(Yttrium::Reader& reader, const Yttrium::ImageInfo& info, Yttrium::Buffer& buffer)
 	{
-		const auto frame_size = format.frame_size();
+		const auto frame_size = info.frame_size();
 		try
 		{
 			buffer.reset(frame_size);
@@ -42,33 +42,33 @@ namespace
 
 namespace Yttrium
 {
-	std::optional<ImageFormat> read_image(const Source& source, ImageType type, Buffer& buffer)
+	std::optional<ImageInfo> read_image(const Source& source, ImageType type, Buffer& buffer)
 	{
 		Reader reader{ source };
-		std::optional<ImageFormat> format;
+		std::optional<ImageInfo> info;
 		switch (type)
 		{
-		case ImageType::Tga: format = read_tga_header(reader); break;
+		case ImageType::Tga: info = read_tga_header(reader); break;
 #if Y_USE_JPEG
 		case ImageType::Jpeg: return read_jpeg(source, buffer);
 #endif
-		case ImageType::Dds: format = read_dds_header(reader); break;
-		case ImageType::Bmp: format = read_bmp_header(reader); break;
-		case ImageType::Ico: format = read_ico_header(reader); break;
+		case ImageType::Dds: info = read_dds_header(reader); break;
+		case ImageType::Bmp: info = read_bmp_header(reader); break;
+		case ImageType::Ico: info = read_ico_header(reader); break;
 		default: return {};
 		}
-		if (!format || !read_image_data(reader, *format, buffer))
+		if (!info || !read_image_data(reader, *info, buffer))
 			return {};
-		return format;
+		return info;
 	}
 
-	bool write_image(Writer& writer, ImageType type, const ImageFormat& format, const void* data)
+	bool write_image(Writer& writer, ImageType type, const ImageInfo& info, const void* data)
 	{
 		switch (type)
 		{
-		case ImageType::Tga: return write_tga(writer, format, data);
+		case ImageType::Tga: return write_tga(writer, info, data);
 #if Y_USE_PNG
-		case ImageType::Png: return write_png(writer, format, data);
+		case ImageType::Png: return write_png(writer, info, data);
 #endif
 		default: return false;
 		}

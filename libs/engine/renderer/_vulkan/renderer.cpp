@@ -121,7 +121,7 @@ namespace Yttrium
 			wrapper.intensity_to_bgra();
 
 		VkFormat vk_format = VK_FORMAT_UNDEFINED;
-		switch (wrapper->format().pixel_format())
+		switch (wrapper->info().pixel_format())
 		{
 		case PixelFormat::Gray8:
 		case PixelFormat::GrayAlpha16:
@@ -141,7 +141,7 @@ namespace Yttrium
 		}
 
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(*this, _context, wrapper->format(), has_mipmaps, vk_format, wrapper->data());
+		return std::make_unique<VulkanTexture2D>(*this, _context, wrapper->info(), has_mipmaps, vk_format, wrapper->data());
 	}
 
 	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)

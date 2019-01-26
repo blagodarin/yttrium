@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace Yttrium
 	class VulkanTexture2D final : public BackendTexture2D
 	{
 	public:
-		VulkanTexture2D(RenderBackend&, VulkanContext&, const ImageFormat&, bool has_mipmaps, VkFormat, const void*);
+		VulkanTexture2D(RenderBackend&, VulkanContext&, const ImageInfo&, bool has_mipmaps, VkFormat, const void*);
 
 		VkDescriptorImageInfo descriptor_image_info() const noexcept;
 

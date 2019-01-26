@@ -30,7 +30,7 @@ namespace Yttrium
 	class BackendTexture2D : public Texture2D
 	{
 	public:
-		BackendTexture2D(RenderBackend&, const ImageFormat&, bool has_mipmaps);
+		BackendTexture2D(RenderBackend&, const ImageInfo&, bool has_mipmaps);
 
 		Size size() const noexcept override { return _size; }
 

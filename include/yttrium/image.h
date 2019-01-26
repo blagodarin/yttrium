@@ -59,15 +59,15 @@ namespace Yttrium
 	};
 
 	/// Image format.
-	class Y_CORE_API ImageFormat
+	class Y_CORE_API ImageInfo
 	{
 	public:
 		///
-		ImageFormat(std::size_t width, std::size_t height, PixelFormat, std::size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
+		ImageInfo(std::size_t width, std::size_t height, PixelFormat, std::size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
 
 		///
-		ImageFormat(std::size_t width, std::size_t height, PixelFormat pixel_format, ImageOrientation orientation)
-			: ImageFormat{ width, height, pixel_format, 1, orientation } {}
+		ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, ImageOrientation orientation)
+			: ImageInfo{ width, height, pixel_format, 1, orientation } {}
 
 		std::size_t frame_size() const noexcept { return _row_size * _height; }
 		std::size_t height() const noexcept { return _height; }
@@ -103,7 +103,7 @@ namespace Yttrium
 		friend class Image;
 	};
 
-	inline bool operator==(const ImageFormat& a, const ImageFormat& b) noexcept
+	inline bool operator==(const ImageInfo& a, const ImageInfo& b) noexcept
 	{
 		return a.pixel_format() == b.pixel_format()
 			&& a.orientation() == b.orientation()
@@ -112,7 +112,7 @@ namespace Yttrium
 			&& a.height() == b.height();
 	}
 
-	inline bool operator!=(const ImageFormat& a, const ImageFormat& b) noexcept { return !(a == b); }
+	inline bool operator!=(const ImageInfo& a, const ImageInfo& b) noexcept { return !(a == b); }
 
 	///
 	class Y_CORE_API Image
@@ -121,18 +121,18 @@ namespace Yttrium
 		///
 		static std::optional<Image> load(const Source&, ImageType = ImageType::Auto);
 
-		/// Creates an image of the specified format with uninitialized contents.
-		explicit Image(const ImageFormat& format);
+		/// Creates an image with uninitialized contents.
+		explicit Image(const ImageInfo&);
 
-		/// Creates an image of the specified format, initialized from the provided data.
-		Image(const ImageFormat&, const void* data);
+		/// Creates an image initialized from the provided data.
+		Image(const ImageInfo&, const void* data);
 
 		///
 		void* data() noexcept { return _buffer.data(); }
 		const void* data() const noexcept { return _buffer.data(); }
 
 		///
-		const ImageFormat& format() const noexcept { return _format; }
+		const ImageInfo& info() const noexcept { return _info; }
 
 		///
 		void flip_vertically();
@@ -147,10 +147,10 @@ namespace Yttrium
 		Buffer to_buffer(ImageType) const;
 
 	private:
-		ImageFormat _format;
+		ImageInfo _info;
 		Buffer _buffer;
-		Image(const ImageFormat& format, Buffer&& buffer)
-			: _format{ format }, _buffer{ std::move(buffer) } {}
+		Image(const ImageInfo& info, Buffer&& buffer) noexcept
+			: _info{ info }, _buffer{ std::move(buffer) } {}
 	};
 
 	///

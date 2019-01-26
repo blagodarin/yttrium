@@ -33,7 +33,7 @@ namespace Yttrium
 	std::unique_ptr<Texture2D> NullRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
 	{
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		return std::make_unique<BackendTexture2D>(*this, image.format(), has_mipmaps);
+		return std::make_unique<BackendTexture2D>(*this, image.info(), has_mipmaps);
 	}
 
 	Image NullRenderer::take_screenshot(const Size& window_size) const

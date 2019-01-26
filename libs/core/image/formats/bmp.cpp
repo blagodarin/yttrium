@@ -24,7 +24,7 @@
 
 namespace Yttrium
 {
-	std::optional<ImageFormat> read_bmp_header(Reader& reader)
+	std::optional<ImageInfo> read_bmp_header(Reader& reader)
 	{
 		BmpFileHeader file_header;
 		if (!reader.read(file_header)
@@ -52,11 +52,11 @@ namespace Yttrium
 		if (!reader.seek(file_header.data_offset))
 			return {};
 
-		std::optional<ImageFormat> format;
+		std::optional<ImageInfo> info;
 		if (info_header.height >= 0)
-			format.emplace(info_header.width, info_header.height, pixel_format, ImageOrientation::XRightYUp);
+			info.emplace(info_header.width, info_header.height, pixel_format, ImageOrientation::XRightYUp);
 		else
-			format.emplace(info_header.width, -info_header.height, pixel_format, ImageOrientation::XRightYDown);
-		return format;
+			info.emplace(info_header.width, -info_header.height, pixel_format, ImageOrientation::XRightYDown);
+		return info;
 	}
 }

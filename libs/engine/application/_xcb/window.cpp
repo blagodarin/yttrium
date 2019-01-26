@@ -335,12 +335,12 @@ namespace Yttrium
 		if (_window == XCB_WINDOW_NONE)
 			return;
 		const auto bgra_icon = to_bgra(icon); // TODO: Use property data as image conversion output.
-		const auto& bgra_format = bgra_icon.format();
-		const auto property_size = 2 + bgra_format.width() * bgra_format.height();
+		const auto& bgra_info = bgra_icon.info();
+		const auto property_size = 2 + bgra_info.width() * bgra_info.height();
 		const auto property_buffer = std::make_unique<std::uint32_t[]>(property_size);
-		property_buffer[0] = static_cast<std::uint32_t>(bgra_format.width());
-		property_buffer[1] = static_cast<std::uint32_t>(bgra_format.height());
-		std::memcpy(&property_buffer[2], bgra_icon.data(), bgra_format.frame_size());
+		property_buffer[0] = static_cast<std::uint32_t>(bgra_info.width());
+		property_buffer[1] = static_cast<std::uint32_t>(bgra_info.height());
+		std::memcpy(&property_buffer[2], bgra_icon.data(), bgra_info.frame_size());
 		const auto net_wm_icon = make_atom("_NET_WM_ICON");
 		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, net_wm_icon->atom, XCB_ATOM_CARDINAL, 32, static_cast<std::uint32_t>(property_size), property_buffer.get());
 		::xcb_flush(_application.connection());

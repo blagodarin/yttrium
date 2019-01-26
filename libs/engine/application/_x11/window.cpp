@@ -212,16 +212,16 @@ namespace Yttrium
 		if (!_window)
 			return;
 		const auto bgra_icon = to_bgra(icon);
-		const auto& bgra_format = bgra_icon.format();
-		const auto property_size = 2 + bgra_format.width() * bgra_format.height();
+		const auto& bgra_info = bgra_icon.info();
+		const auto property_size = 2 + bgra_info.width() * bgra_info.height();
 		const auto property_buffer = std::make_unique<long[]>(property_size);
-		property_buffer[0] = static_cast<long>(bgra_format.width());
-		property_buffer[1] = static_cast<long>(bgra_format.height());
+		property_buffer[0] = static_cast<long>(bgra_info.width());
+		property_buffer[1] = static_cast<long>(bgra_info.height());
 		auto* dst = &property_buffer[2];
-		for (std::size_t y = 0; y < bgra_format.height(); ++y)
+		for (std::size_t y = 0; y < bgra_info.height(); ++y)
 		{
-			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_format.row_size() * y);
-			for (std::size_t x = 0; x < bgra_format.width(); ++x)
+			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_info.row_size() * y);
+			for (std::size_t x = 0; x < bgra_info.width(); ++x)
 				*dst++ = src[x];
 		}
 		const auto net_wm_icon = ::XInternAtom(_application.display(), "_NET_WM_ICON", False);

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ namespace Yttrium
 		GLenum internal_format = 0;
 		GLenum data_format = 0;
 		GLenum data_type = 0;
-		switch (wrapper->format().pixel_format())
+		switch (wrapper->info().pixel_format())
 		{
 		case PixelFormat::Gray8:
 		case PixelFormat::GrayAlpha16:
@@ -203,13 +203,13 @@ namespace Yttrium
 		}
 
 		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
-		assert(is_power_of_2(wrapper->format().row_alignment()) && wrapper->format().row_alignment() <= 8); // OpenGL requirements.
-		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(wrapper->format().row_alignment()));
-		texture.set_data(0, internal_format, static_cast<GLsizei>(wrapper->format().width()), static_cast<GLsizei>(wrapper->format().height()), data_format, data_type, wrapper->data());
+		assert(is_power_of_2(wrapper->info().row_alignment()) && wrapper->info().row_alignment() <= 8); // OpenGL requirements.
+		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(wrapper->info().row_alignment()));
+		texture.set_data(0, internal_format, static_cast<GLsizei>(wrapper->info().width()), static_cast<GLsizei>(wrapper->info().height()), data_format, data_type, wrapper->data());
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
 			texture.generate_mipmaps();
-		return std::make_unique<GlTexture2D>(*this, wrapper->format(), has_mipmaps, std::move(texture));
+		return std::make_unique<GlTexture2D>(*this, wrapper->info(), has_mipmaps, std::move(texture));
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

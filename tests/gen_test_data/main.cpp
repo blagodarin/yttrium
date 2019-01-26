@@ -33,7 +33,7 @@ namespace
 		auto image = ::make_test_image(with_alpha);
 		if (flip_vertically)
 			image.flip_vertically();
-		return writer.write_all(image.data(), image.format().frame_size());
+		return writer.write_all(image.data(), image.info().frame_size());
 	}
 }
 
@@ -52,7 +52,7 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient8.tga" };
 		if (writer.write(header))
-			writer.write_all(image.data(), image.format().frame_size());
+			writer.write_all(image.data(), image.info().frame_size());
 	}
 	{
 		BmpFileHeader file_header;

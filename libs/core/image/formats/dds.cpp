@@ -22,7 +22,7 @@
 
 namespace Yttrium
 {
-	std::optional<ImageFormat> read_dds_header(Reader& reader)
+	std::optional<ImageInfo> read_dds_header(Reader& reader)
 	{
 		DDS_HEADER header;
 		if (!reader.read(header)
@@ -46,7 +46,7 @@ namespace Yttrium
 			|| header.dwReserved2)
 			return {};
 
-		std::optional<ImageFormat> format;
+		std::optional<ImageInfo> info;
 
 		switch (header.ddspf.dwFlags & (DDPF_ALPHAPIXELS | DDPF_RGB | DDPF_LUMINANCE))
 		{
@@ -54,9 +54,9 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 24)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && !header.ddspf.dwABitMask)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgr24);
+				info.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgr24);
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && !header.ddspf.dwABitMask)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgb24);
+				info.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgb24);
 			else
 				return {};
 			break;
@@ -65,9 +65,9 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 32)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff0000 && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff && header.ddspf.dwABitMask == 0xff000000)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgra32);
+				info.emplace(header.dwWidth, header.dwHeight, PixelFormat::Bgra32);
 			else if (header.ddspf.dwRBitMask == 0xff && header.ddspf.dwGBitMask == 0xff00 && header.ddspf.dwBBitMask == 0xff0000 && header.ddspf.dwABitMask == 0xff000000)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgba32);
+				info.emplace(header.dwWidth, header.dwHeight, PixelFormat::Rgba32);
 			else
 				return {};
 			break;
@@ -76,7 +76,7 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 8)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && !header.ddspf.dwABitMask)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::Gray8);
+				info.emplace(header.dwWidth, header.dwHeight, PixelFormat::Gray8);
 			else
 				return {};
 			break;
@@ -85,7 +85,7 @@ namespace Yttrium
 			if (header.ddspf.dwRGBBitCount != 16)
 				return {};
 			if (header.ddspf.dwRBitMask == 0xff && !header.ddspf.dwGBitMask && !header.ddspf.dwBBitMask && header.ddspf.dwABitMask == 0xff00)
-				format.emplace(header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha16);
+				info.emplace(header.dwWidth, header.dwHeight, PixelFormat::GrayAlpha16);
 			else
 				return {};
 			break;
@@ -94,6 +94,6 @@ namespace Yttrium
 			return {};
 		}
 
-		return format;
+		return info;
 	}
 }

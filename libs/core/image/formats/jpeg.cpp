@@ -38,7 +38,7 @@ namespace
 
 namespace Yttrium
 {
-	std::optional<ImageFormat> read_jpeg(const Source& source, Buffer& buffer)
+	std::optional<ImageInfo> read_jpeg(const Source& source, Buffer& buffer)
 	{
 		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
 		if (source_buffer.size() > std::numeric_limits<unsigned long>::max())
@@ -66,11 +66,11 @@ namespace Yttrium
 
 		::jpeg_calc_output_dimensions(&decompressor);
 
-		ImageFormat format(decompressor.output_width, decompressor.output_height, PixelFormat::Rgb24);
+		ImageInfo info{ decompressor.output_width, decompressor.output_height, PixelFormat::Rgb24 };
 
 		try
 		{
-			buffer.reset(format.frame_size());
+			buffer.reset(info.frame_size());
 		}
 		catch (const std::bad_alloc&)
 		{
@@ -79,7 +79,7 @@ namespace Yttrium
 		}
 
 		::jpeg_start_decompress(&decompressor);
-		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += format.row_size())
+		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += info.row_size())
 			::jpeg_read_scanlines(&decompressor, &scanline, 1);
 		::jpeg_finish_decompress(&decompressor);
 
@@ -88,6 +88,6 @@ namespace Yttrium
 
 		::jpeg_destroy_decompress(&decompressor);
 
-		return format;
+		return info;
 	}
 }

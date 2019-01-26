@@ -21,10 +21,10 @@
 
 namespace Yttrium
 {
-	BackendTexture2D::BackendTexture2D(RenderBackend& backend, const ImageFormat& format, bool has_mipmaps)
+	BackendTexture2D::BackendTexture2D(RenderBackend& backend, const ImageInfo& info, bool has_mipmaps)
 		: _backend{ backend }
-		, _size{ format.width(), format.height() }
-		, _orientation{ format.orientation() }
+		, _size{ info.width(), info.height() }
+		, _orientation{ info.orientation() }
 		, _has_mipmaps{ has_mipmaps }
 	{
 	}

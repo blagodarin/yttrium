@@ -25,12 +25,12 @@
 
 namespace
 {
-	bool can_write(const Yttrium::ImageFormat& format) noexcept
+	bool can_write(const Yttrium::ImageInfo& info) noexcept
 	{
 		using Yttrium::ImageOrientation;
 		using Yttrium::PixelFormat;
 
-		switch (format.pixel_format())
+		switch (info.pixel_format())
 		{
 		case PixelFormat::Gray8:
 		case PixelFormat::Bgr24:
@@ -40,16 +40,16 @@ namespace
 			return false;
 		}
 
-		if (format.orientation() != ImageOrientation::XRightYDown
-			&& format.orientation() != ImageOrientation::XRightYUp
-			&& format.orientation() != ImageOrientation::XLeftYDown
-			&& format.orientation() != ImageOrientation::XLeftYUp)
+		if (info.orientation() != ImageOrientation::XRightYDown
+			&& info.orientation() != ImageOrientation::XRightYUp
+			&& info.orientation() != ImageOrientation::XLeftYDown
+			&& info.orientation() != ImageOrientation::XLeftYUp)
 			return false;
 
-		if (format.width() <= 0 || format.width() > std::numeric_limits<uint16_t>::max())
+		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint16_t>::max())
 			return false;
 
-		if (format.height() <= 0 || format.height() > std::numeric_limits<uint16_t>::max())
+		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint16_t>::max())
 			return false;
 
 		return true;
@@ -58,7 +58,7 @@ namespace
 
 namespace Yttrium
 {
-	std::optional<ImageFormat> read_tga_header(Reader& reader)
+	std::optional<ImageInfo> read_tga_header(Reader& reader)
 	{
 		TgaHeader header;
 		if (!reader.read(header)
@@ -78,20 +78,20 @@ namespace Yttrium
 			}
 		};
 
-		std::optional<ImageFormat> format;
+		std::optional<ImageInfo> info;
 
 		if (header.image_type == TgaImageType::TrueColor)
 		{
 			const auto alpha = header.image.descriptor & tgaAlphaMask;
 			if (!alpha && header.image.pixel_depth == 24)
-				format.emplace(header.image.width, header.image.height, PixelFormat::Bgr24, orientation());
+				info.emplace(header.image.width, header.image.height, PixelFormat::Bgr24, orientation());
 			else if (alpha == 8 && header.image.pixel_depth == 32)
-				format.emplace(header.image.width, header.image.height, PixelFormat::Bgra32, orientation());
+				info.emplace(header.image.width, header.image.height, PixelFormat::Bgra32, orientation());
 			else
 				return {};
 		}
 		else if (header.image_type == TgaImageType::BlackAndWhite && header.image.pixel_depth == 8)
-			format.emplace(header.image.width, header.image.height, PixelFormat::Gray8, orientation());
+			info.emplace(header.image.width, header.image.height, PixelFormat::Gray8, orientation());
 		else
 			return {};
 
@@ -101,29 +101,29 @@ namespace Yttrium
 		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7u) / 8u)))
 			return {};
 
-		return format;
+		return info;
 	}
 
-	bool write_tga(Writer& writer, const ImageFormat& format, const void* data)
+	bool write_tga(Writer& writer, const ImageInfo& info, const void* data)
 	{
-		if (!::can_write(format))
+		if (!::can_write(info))
 			return false;
 
 		TgaHeader header;
 		header.id_length = 0;
 		header.color_map_type = TgaColorMapType::None;
-		header.image_type = (format.pixel_format() == PixelFormat::Gray8) ? TgaImageType::BlackAndWhite : TgaImageType::TrueColor;
+		header.image_type = (info.pixel_format() == PixelFormat::Gray8) ? TgaImageType::BlackAndWhite : TgaImageType::TrueColor;
 		header.color_map.first_entry_index = 0;
 		header.color_map.length = 0;
 		header.color_map.entry_size = 0;
 		header.image.x = 0;
 		header.image.y = 0;
-		header.image.width = static_cast<uint16_t>(format.width());
-		header.image.height = static_cast<uint16_t>(format.height());
-		header.image.pixel_depth = static_cast<uint8_t>(format.pixel_size() * 8);
-		header.image.descriptor = (format.pixel_format() == PixelFormat::Bgra32) ? 8 : 0;
+		header.image.width = static_cast<std::uint16_t>(info.width());
+		header.image.height = static_cast<std::uint16_t>(info.height());
+		header.image.pixel_depth = static_cast<std::uint8_t>(info.pixel_size() * 8);
+		header.image.descriptor = (info.pixel_format() == PixelFormat::Bgra32) ? 8 : 0;
 
-		switch (format.orientation())
+		switch (info.orientation())
 		{
 		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft; break;
 		case ImageOrientation::XRightYUp: header.image.descriptor |= tgaBottomLeft; break;
@@ -131,16 +131,16 @@ namespace Yttrium
 		case ImageOrientation::XLeftYUp: header.image.descriptor |= tgaBottomRight; break;
 		}
 
-		writer.reserve(sizeof header + format.frame_size());
+		writer.reserve(sizeof header + info.frame_size());
 		if (!writer.write(header))
 			return false;
 
-		auto scanline = static_cast<const uint8_t*>(data);
-		for (size_t row = 0; row < format.height(); ++row)
+		auto scanline = static_cast<const std::uint8_t*>(data);
+		for (size_t row = 0; row < info.height(); ++row)
 		{
-			if (!writer.write(scanline, format.row_size()))
+			if (!writer.write(scanline, info.row_size()))
 				return false;
-			scanline += format.row_size();
+			scanline += info.row_size();
 		}
 
 		return true;

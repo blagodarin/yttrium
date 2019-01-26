@@ -24,14 +24,14 @@ namespace Yttrium
 {
 	inline bool operator==(const Image& a, const Image& b) noexcept
 	{
-		const auto format = a.format();
-		if (format != b.format())
+		const auto info = a.info();
+		if (info != b.info())
 			return false;
-		for (std::size_t y = 0; y < format.height(); ++y)
+		for (std::size_t y = 0; y < info.height(); ++y)
 		{
-			const auto a_row = static_cast<const std::uint8_t*>(a.data()) + y * format.row_size();
-			const auto b_row = static_cast<const std::uint8_t*>(b.data()) + y * format.row_size();
-			if (std::memcmp(a_row, b_row, format.width() * format.pixel_size()))
+			const auto a_row = static_cast<const std::uint8_t*>(a.data()) + y * info.row_size();
+			const auto b_row = static_cast<const std::uint8_t*>(b.data()) + y * info.row_size();
+			if (std::memcmp(a_row, b_row, info.width() * info.pixel_size()))
 				return false;
 		}
 		return true;

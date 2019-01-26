@@ -20,8 +20,8 @@
 
 namespace Yttrium
 {
-	GlTexture2D::GlTexture2D(RenderBackend& backend, const ImageFormat& format, bool has_mipmaps, GlTextureHandle&& texture)
-		: BackendTexture2D{ backend, format, has_mipmaps }
+	GlTexture2D::GlTexture2D(RenderBackend& backend, const ImageInfo& info, bool has_mipmaps, GlTextureHandle&& texture)
+		: BackendTexture2D{ backend, info, has_mipmaps }
 		, _texture{ std::move(texture) }
 	{
 	}

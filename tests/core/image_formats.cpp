@@ -59,11 +59,11 @@ TEST_CASE("image.load.jpeg")
 {
 	const auto jpeg_image = Image::load(*Source::from("tests/core/data/gradient24.jpeg"));
 	REQUIRE(jpeg_image);
-	REQUIRE(jpeg_image->format().pixel_format() == PixelFormat::Rgb24);
+	REQUIRE(jpeg_image->info().pixel_format() == PixelFormat::Rgb24);
 
 	auto tga_image = Image::load(*Source::from("tests/core/data/gradient24.jpeg.tga"));
 	REQUIRE(tga_image);
-	REQUIRE(tga_image->format().pixel_format() == PixelFormat::Bgr24);
+	REQUIRE(tga_image->info().pixel_format() == PixelFormat::Bgr24);
 	REQUIRE(tga_image->swap_channels());
 
 	CHECK(jpeg_image == tga_image);

@@ -23,7 +23,7 @@
 
 namespace Yttrium
 {
-	std::optional<ImageFormat> read_ico_header(Reader& reader)
+	std::optional<ImageInfo> read_ico_header(Reader& reader)
 	{
 		IcoFileHeader file_header;
 		if (!reader.read(file_header)
@@ -54,6 +54,6 @@ namespace Yttrium
 			|| bitmap_header.compression != BmpCompression::Rgb)
 			return {};
 
-		return ImageFormat{ width, height, PixelFormat::Bgra32, ImageOrientation::XRightYUp };
+		return ImageInfo{ width, height, PixelFormat::Bgra32, ImageOrientation::XRightYUp };
 	}
 }

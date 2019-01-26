@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ namespace
 			{
 				for (size_t x = 0; x < FragmentSize; ++x)
 				{
-					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.format().row_size() + x * 4;
+					const auto pixel = static_cast<uint8_t*>(image.data()) + (i * FragmentSize + y) * image.info().row_size() + x * 4;
 					const auto color = ::pixel_color(i, x, y);
 					pixel[0] = color._b;
 					pixel[1] = color._g;
