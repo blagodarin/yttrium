@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/translation.h>

@@ -17,7 +17,7 @@
 #ifndef _include_yttrium_ion_reader_h_
 #define _include_yttrium_ion_reader_h_
 
-#include <yttrium/exceptions.h>
+#include <yttrium/api.h>
 
 #include <memory>
 #include <stdexcept>
@@ -26,17 +26,6 @@ namespace Yttrium
 {
 	class Color4f;
 	class Source;
-
-	///
-	class IonError : public DataError
-	{
-	public:
-		///
-		template <typename... Args>
-		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args)
-			: DataError{ "(", line, ":", column, ") ", std::forward<Args>(args)... }
-		{}
-	};
 
 	///
 	class Y_CORE_API IonReader

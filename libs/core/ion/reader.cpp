@@ -16,6 +16,7 @@
 
 #include <yttrium/ion/reader.h>
 
+#include <yttrium/exceptions.h>
 #include <yttrium/math/color.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>

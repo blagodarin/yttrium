@@ -64,6 +64,17 @@ namespace Yttrium
 		{}
 	};
 
+	///
+	class IonError : public DataError
+	{
+	public:
+		///
+		template <typename... Args>
+		IonError(std::size_t line, std::ptrdiff_t column, Args&&... args)
+			: DataError{ "(", line, ":", column, ") ", std::forward<Args>(args)... }
+		{}
+	};
+
 	/// Thrown when required data is missing.
 	class MissingDataError : public std::runtime_error
 	{
