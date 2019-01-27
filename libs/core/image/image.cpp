@@ -82,13 +82,7 @@ namespace Yttrium
 			std::memcpy(top, bottom, row_size);
 			std::memcpy(bottom, row_buffer.data(), row_size);
 		}
-		switch (_info._orientation)
-		{
-		case ImageOrientation::XRightYDown: _info._orientation = ImageOrientation::XRightYUp; break;
-		case ImageOrientation::XRightYUp: _info._orientation = ImageOrientation::XRightYDown; break;
-		case ImageOrientation::XLeftYDown: _info._orientation = ImageOrientation::XLeftYUp; break;
-		case ImageOrientation::XLeftYUp: _info._orientation = ImageOrientation::XLeftYDown; break;
-		}
+		_info._orientation = _info._orientation == ImageOrientation::XRightYDown ? ImageOrientation::XRightYUp : ImageOrientation::XRightYDown;
 	}
 
 	bool Image::save(Writer&& writer, ImageFormat format) const

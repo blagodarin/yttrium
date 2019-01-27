@@ -97,7 +97,7 @@ namespace Yttrium
 		header->used_colors = 0;
 		header->required_colors = 0;
 		auto bgra_icon = to_bgra(icon); // TODO: Use buffer data as image conversion output.
-		if (const auto o = bgra_icon.info().orientation(); o == ImageOrientation::XRightYDown || o == ImageOrientation::XLeftYDown)
+		if (bgra_icon.info().orientation() == ImageOrientation::XRightYDown)
 			bgra_icon.flip_vertically();
 		std::memcpy(buffer.get() + sizeof *header, bgra_icon.data(), image_size);
 		std::memset(buffer.get() + sizeof *header + image_size, 0xff, mask_size);

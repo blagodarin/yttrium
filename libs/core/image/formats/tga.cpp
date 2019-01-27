@@ -40,10 +40,7 @@ namespace
 			return false;
 		}
 
-		if (info.orientation() != ImageOrientation::XRightYDown
-			&& info.orientation() != ImageOrientation::XRightYUp
-			&& info.orientation() != ImageOrientation::XLeftYDown
-			&& info.orientation() != ImageOrientation::XLeftYUp)
+		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
 			return false;
 
 		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint16_t>::max())
@@ -84,23 +81,21 @@ namespace Yttrium
 		else
 			return false;
 
+		ImageOrientation orientation;
+		if (const auto origin = header.image.descriptor & tgaOriginMask; origin == tgaBottomLeft)
+			orientation = ImageOrientation::XRightYUp;
+		else if (origin == tgaTopLeft)
+			orientation = ImageOrientation::XRightYDown;
+		else
+			return false;
+
 		if (header.id_length && !reader.skip(header.id_length))
 			return false;
 
 		if (header.color_map.length && !reader.skip(header.color_map.length * ((header.color_map.entry_size + 7u) / 8u)))
 			return false;
 
-		const auto orientation = [&header] {
-			switch (header.image.descriptor & tgaOriginMask)
-			{
-			case tgaBottomLeft: return ImageOrientation::XRightYUp;
-			case tgaBottomRight: return ImageOrientation::XLeftYUp;
-			case tgaTopRight: return ImageOrientation::XLeftYDown;
-			default: return ImageOrientation::XRightYDown;
-			}
-		};
-
-		info = { header.image.width, header.image.height, pixel_format, orientation() };
+		info = { header.image.width, header.image.height, pixel_format, orientation };
 		return true;
 	}
 
@@ -127,8 +122,6 @@ namespace Yttrium
 		{
 		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft; break;
 		case ImageOrientation::XRightYUp: header.image.descriptor |= tgaBottomLeft; break;
-		case ImageOrientation::XLeftYDown: header.image.descriptor |= tgaTopRight; break;
-		case ImageOrientation::XLeftYUp: header.image.descriptor |= tgaBottomRight; break;
 		}
 
 		writer.reserve(sizeof header + info.frame_size());

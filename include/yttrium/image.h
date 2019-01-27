@@ -54,8 +54,6 @@ namespace Yttrium
 	{
 		XRightYDown, ///< X left-to-right, Y top-to-bottom.
 		XRightYUp,   ///< X left-to-right, Y bottom-to-top.
-		XLeftYDown,  ///< X right-to-left, Y top-to-bottom.
-		XLeftYUp,    ///< X right-to-left, Y bottom-to-top.
 	};
 
 	/// Image format.
