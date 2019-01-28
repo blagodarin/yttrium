@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,14 +24,21 @@ namespace Yttrium
 {
 	/// Returns \c true if the value is a power of two.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-	constexpr bool is_power_of_2(T x)
+	constexpr bool is_power_of_2(T x) noexcept
 	{
 		return !(x & (x - 1)) && x > 0;
 	}
 
+	///
+	template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
+	constexpr T max_2_alignment(T x) noexcept
+	{
+		return ((x ^ (x - 1)) + 1) >> 1;
+	}
+
 	/// Returns the least power of two not less than the specified positive value.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && sizeof(T) <= sizeof(uint64_t)>>
-	constexpr T next_power_of_2(T x)
+	constexpr T next_power_of_2(T x) noexcept
 	{
 		--x;
 		x |= x >> 1;
@@ -48,14 +55,14 @@ namespace Yttrium
 
 	/// Returns \c true if both values have the same sign.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-	constexpr bool same_sign(T x, T y)
+	constexpr bool same_sign(T x, T y) noexcept
 	{
 		return (x ^ y) >= 0;
 	}
 
 	///
 	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
-	constexpr auto to_underlying(T value)
+	constexpr auto to_underlying(T value) noexcept
 	{
 		return static_cast<std::underlying_type_t<T>>(value);
 	}
@@ -69,7 +76,7 @@ namespace Yttrium
 
 	///
 	template <typename T, typename U, typename = std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U>>>
-	constexpr T wrap(T value, U min, U max)
+	constexpr T wrap(T value, U min, U max) noexcept
 	{
 		if (value < min)
 			do
