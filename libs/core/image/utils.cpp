@@ -27,10 +27,10 @@ namespace Yttrium
 		Image output{ { input_info.width(), input_info.height(), PixelFormat::Bgra32, input_info.orientation() } };
 
 		auto src = static_cast<const uint8_t*>(input.data());
-		const auto src_row_size = input_info.row_size();
+		const auto src_row_size = input_info.stride();
 
 		auto dst = static_cast<uint8_t*>(output.data());
-		const auto dst_row_size = output.info().row_size();
+		const auto dst_row_size = output.info().stride();
 
 		const auto scanline_size = output.info().width() * 4;
 
@@ -127,10 +127,10 @@ namespace Yttrium
 		Image output{ { input.info().width(), input.info().height(), PixelFormat::Bgra32, input.info().orientation() } };
 
 		auto src = static_cast<const uint8_t*>(input.data());
-		const auto src_row_size = input.info().row_size();
+		const auto src_row_size = input.info().stride();
 
 		auto dst = static_cast<uint8_t*>(output.data());
-		const auto dst_row_size = output.info().row_size();
+		const auto dst_row_size = output.info().stride();
 
 		const auto scanline_size = output.info().width() * 4;
 

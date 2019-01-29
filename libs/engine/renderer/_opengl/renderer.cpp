@@ -202,9 +202,8 @@ namespace Yttrium
 			return {};
 		}
 
-		GlTextureHandle texture(_gl, GL_TEXTURE_2D);
-		assert(is_power_of_2(wrapper->info().row_alignment()) && wrapper->info().row_alignment() <= 8); // OpenGL requirements.
-		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(wrapper->info().row_alignment()));
+		GlTextureHandle texture{ _gl, GL_TEXTURE_2D };
+		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(max_2_alignment(wrapper->info().stride() | 8)));
 		texture.set_data(0, internal_format, static_cast<GLsizei>(wrapper->info().width()), static_cast<GLsizei>(wrapper->info().height()), data_format, data_type, wrapper->data());
 		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 		if (has_mipmaps)
@@ -274,10 +273,10 @@ namespace Yttrium
 
 	Image GlRenderer::take_screenshot(const Size& window_size) const
 	{
-		GLint unpack_alignment = 0;
-		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
+		GLint alignment = 0;
+		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
 
-		Image image{ { static_cast<std::size_t>(window_size._width), static_cast<std::size_t>(window_size._height), PixelFormat::Rgb24, static_cast<std::size_t>(unpack_alignment), ImageOrientation::XRightYUp } };
+		Image image{ { static_cast<std::size_t>(window_size._width), static_cast<std::size_t>(window_size._height), PixelFormat::Rgb24, static_cast<std::size_t>(alignment), ImageOrientation::XRightYUp } };
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);

@@ -29,7 +29,7 @@ inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yttri
 	{
 		for (size_t x = 0; x < width; ++x)
 		{
-			const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.info().row_size() + x * 4;
+			const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.info().stride() + x * 4;
 			const auto color = callback(x, y);
 			pixel[0] = color._b;
 			pixel[1] = color._g;

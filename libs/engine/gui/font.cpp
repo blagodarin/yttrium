@@ -98,12 +98,12 @@ namespace Yttrium
 				if (y_offset + glyph->bitmap.rows > _image.info().height())
 					break; // TODO: Report error.
 				auto src = glyph->bitmap.buffer;
-				auto dst = static_cast<std::uint8_t*>(_image.data()) + _image.info().row_size() * y_offset + x_offset;
+				auto dst = static_cast<std::uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
 				for (unsigned y = 0; y < glyph->bitmap.rows; ++y)
 				{
 					std::memcpy(dst, src, glyph->bitmap.width);
 					src += glyph->bitmap.pitch;
-					dst += _image.info().row_size();
+					dst += _image.info().stride();
 				}
 				auto& font_char = _chars[char_code];
 				font_char.glyph_index = glyph_index;

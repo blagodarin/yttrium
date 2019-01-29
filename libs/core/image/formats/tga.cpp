@@ -115,7 +115,7 @@ namespace Yttrium
 		header.image.y = 0;
 		header.image.width = static_cast<std::uint16_t>(info.width());
 		header.image.height = static_cast<std::uint16_t>(info.height());
-		header.image.pixel_depth = static_cast<std::uint8_t>(info.pixel_size() * 8);
+		header.image.pixel_depth = static_cast<std::uint8_t>(ImageInfo::pixel_size(info.pixel_format()) * 8);
 		header.image.descriptor = (info.pixel_format() == PixelFormat::Bgra32) ? 8 : 0;
 
 		switch (info.orientation())
@@ -131,9 +131,9 @@ namespace Yttrium
 		auto scanline = static_cast<const std::uint8_t*>(data);
 		for (size_t row = 0; row < info.height(); ++row)
 		{
-			if (!writer.write(scanline, info.row_size()))
+			if (!writer.write(scanline, info.stride()))
 				return false;
-			scanline += info.row_size();
+			scanline += info.stride();
 		}
 
 		return true;

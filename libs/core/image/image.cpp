@@ -30,27 +30,8 @@
 // TODO: Image packs (lists of image headers with filenames and raw image data offsets).
 // TODO: Loading image data into the specified buffer (e. g. into mapped texture memory).
 
-namespace
-{
-	constexpr std::size_t aligned_image_row_size(std::size_t width, std::size_t pixel_size, std::size_t row_alignment)
-	{
-		return (width * pixel_size + row_alignment - 1) / row_alignment * row_alignment;
-	}
-}
-
 namespace Yttrium
 {
-	ImageInfo::ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, std::size_t row_alignment, ImageOrientation orientation)
-		: _pixel_format{ pixel_format }
-		, _orientation{ orientation }
-		, _width{ width }
-		, _row_alignment{ row_alignment }
-		, _row_size{ ::aligned_image_row_size(_width, pixel_size(_pixel_format), _row_alignment) }
-		, _height{ height }
-	{
-		assert(is_power_of_2(_row_alignment));
-	}
-
 	std::optional<Image> Image::load(const Source& source, ImageFormat format)
 	{
 		ImageInfo info;
@@ -74,13 +55,13 @@ namespace Yttrium
 
 	void Image::flip_vertically()
 	{
-		const auto row_size = _info.row_size();
-		Buffer row_buffer{ row_size };
-		for (auto top = &_buffer[0], bottom = &_buffer[(_info.height() - 1) * row_size]; top < bottom; top += row_size, bottom -= row_size)
+		const auto stride = _info.stride();
+		Buffer row_buffer{ stride };
+		for (auto top = &_buffer[0], bottom = &_buffer[(_info.height() - 1) * stride]; top < bottom; top += stride, bottom -= stride)
 		{
-			std::memcpy(row_buffer.data(), top, row_size);
-			std::memcpy(top, bottom, row_size);
-			std::memcpy(bottom, row_buffer.data(), row_size);
+			std::memcpy(row_buffer.data(), top, stride);
+			std::memcpy(top, bottom, stride);
+			std::memcpy(bottom, row_buffer.data(), stride);
 		}
 		_info._orientation = _info._orientation == ImageOrientation::XRightYDown ? ImageOrientation::XRightYUp : ImageOrientation::XRightYDown;
 	}
@@ -109,7 +90,7 @@ namespace Yttrium
 					scanline[offset] = scanline[offset + 2];
 					scanline[offset + 2] = x;
 				}
-				scanline += _info.row_size();
+				scanline += _info.stride();
 			}
 		}
 			_info._pixel_format = _info.pixel_format() == PixelFormat::Rgb24 ? PixelFormat::Bgr24 : PixelFormat::Rgb24;

@@ -150,10 +150,10 @@ namespace Yttrium
 
 		const auto rows = std::make_unique<png_bytep[]>(info.height());
 		if (info.orientation() == ImageOrientation::XRightYDown)
-			for (std::size_t i = 0, j = 0; i < info.height(); i++, j += info.row_size())
+			for (std::size_t i = 0, j = 0; i < info.height(); i++, j += info.stride())
 				rows[i] = static_cast<png_bytep>(const_cast<void*>(data)) + j;
 		else
-			for (std::size_t i = info.height(), j = 0; i > 0; i--, j += info.row_size())
+			for (std::size_t i = info.height(), j = 0; i > 0; i--, j += info.stride())
 				rows[i - 1] = static_cast<png_bytep>(const_cast<void*>(data)) + j;
 
 		return PngWriter(writer).write(info, color_type, bits_per_channel, transforms, rows.get());

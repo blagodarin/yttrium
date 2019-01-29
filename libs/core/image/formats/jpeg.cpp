@@ -79,7 +79,7 @@ namespace Yttrium
 		}
 
 		::jpeg_start_decompress(&decompressor);
-		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += info.row_size())
+		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += info.stride())
 			::jpeg_read_scanlines(&decompressor, &scanline, 1);
 		::jpeg_finish_decompress(&decompressor);
 

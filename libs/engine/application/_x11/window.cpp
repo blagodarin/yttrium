@@ -220,7 +220,7 @@ namespace Yttrium
 		auto* dst = &property_buffer[2];
 		for (std::size_t y = 0; y < bgra_info.height(); ++y)
 		{
-			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_info.row_size() * y);
+			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_info.stride() * y);
 			for (std::size_t x = 0; x < bgra_info.width(); ++x)
 				*dst++ = src[x];
 		}

@@ -29,9 +29,9 @@ namespace Yttrium
 			return false;
 		for (std::size_t y = 0; y < info.height(); ++y)
 		{
-			const auto a_row = static_cast<const std::uint8_t*>(a.data()) + y * info.row_size();
-			const auto b_row = static_cast<const std::uint8_t*>(b.data()) + y * info.row_size();
-			if (std::memcmp(a_row, b_row, info.width() * info.pixel_size()))
+			const auto a_row = static_cast<const std::uint8_t*>(a.data()) + y * info.stride();
+			const auto b_row = static_cast<const std::uint8_t*>(b.data()) + y * info.stride();
+			if (std::memcmp(a_row, b_row, info.width() * ImageInfo::pixel_size(info.pixel_format())))
 				return false;
 		}
 		return true;

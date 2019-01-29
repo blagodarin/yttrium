@@ -61,22 +61,25 @@ namespace Yttrium
 	{
 	public:
 		ImageInfo() noexcept = default;
+		constexpr ImageInfo(std::size_t width, std::size_t height, std::size_t stride, PixelFormat pixel_format, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
+			: _width{ width }, _height{ height }, _stride{ stride }, _pixel_format{ pixel_format }, _orientation{ orientation } {}
+		constexpr ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
+			: ImageInfo{ width, height, stride(width, pixel_format), pixel_format, orientation } {}
+		constexpr ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, std::size_t alignment, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
+			: ImageInfo{ width, height, stride(width, pixel_format, alignment), pixel_format, orientation } {}
+
+		constexpr std::size_t frame_size() const noexcept { return _stride * _height; }
+		constexpr std::size_t height() const noexcept { return _height; }
+		constexpr ImageOrientation orientation() const noexcept { return _orientation; }
+		constexpr PixelFormat pixel_format() const noexcept { return _pixel_format; }
+		constexpr std::size_t stride() const noexcept { return _stride; }
+		constexpr std::size_t width() const noexcept { return _width; }
 
 		///
-		ImageInfo(std::size_t width, std::size_t height, PixelFormat, std::size_t row_alignment = 1, ImageOrientation = ImageOrientation::XRightYDown);
-
-		///
-		ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, ImageOrientation orientation)
-			: ImageInfo{ width, height, pixel_format, 1, orientation } {}
-
-		std::size_t frame_size() const noexcept { return _row_size * _height; }
-		std::size_t height() const noexcept { return _height; }
-		ImageOrientation orientation() const noexcept { return _orientation; }
-		PixelFormat pixel_format() const noexcept { return _pixel_format; }
-		std::size_t pixel_size() const noexcept { return pixel_size(_pixel_format); }
-		std::size_t row_alignment() const noexcept { return _row_alignment; }
-		std::size_t row_size() const noexcept { return _row_size; }
-		std::size_t width() const noexcept { return _width; }
+		static constexpr std::size_t stride(std::size_t width, PixelFormat format, std::size_t alignment = 1) noexcept
+		{
+			return (width * pixel_size(format) + alignment - 1) / alignment * alignment;
+		}
 
 		///
 		static constexpr std::size_t pixel_size(PixelFormat format) noexcept
@@ -94,25 +97,24 @@ namespace Yttrium
 		}
 
 	private:
+		std::size_t _width;
+		std::size_t _height;
+		std::size_t _stride;
 		PixelFormat _pixel_format;
 		ImageOrientation _orientation;
-		std::size_t _width;
-		std::size_t _row_alignment;
-		std::size_t _row_size;
-		std::size_t _height;
 		friend class Image;
 	};
 
-	inline bool operator==(const ImageInfo& a, const ImageInfo& b) noexcept
+	constexpr bool operator==(const ImageInfo& a, const ImageInfo& b) noexcept
 	{
-		return a.pixel_format() == b.pixel_format()
-			&& a.orientation() == b.orientation()
-			&& a.width() == b.width()
-			&& a.row_size() == b.row_size()
-			&& a.height() == b.height();
+		return a.width() == b.width()
+			&& a.height() == b.height()
+			&& a.stride() == b.stride()
+			&& a.pixel_format() == b.pixel_format()
+			&& a.orientation() == b.orientation();
 	}
 
-	inline bool operator!=(const ImageInfo& a, const ImageInfo& b) noexcept { return !(a == b); }
+	constexpr bool operator!=(const ImageInfo& a, const ImageInfo& b) noexcept { return !(a == b); }
 
 	///
 	class Y_CORE_API Image
