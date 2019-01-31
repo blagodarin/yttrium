@@ -32,7 +32,12 @@ namespace
 	{
 		auto image = ::make_test_image(with_alpha);
 		if (flip_vertically)
-			image.flip_vertically();
+		{
+			const auto orientation = image.info().orientation() == ImageOrientation::XRightYDown ? ImageOrientation::XRightYUp : ImageOrientation::XRightYDown;
+			Image flipped{ { image.info().width(), image.info().height(), image.info().stride(), image.info().pixel_format(), orientation } };
+			if (!Image::transform(image.info(), image.data(), flipped.info(), flipped.data()))
+				return false;
+		}
 		return writer.write_all(image.data(), image.info().frame_size());
 	}
 }

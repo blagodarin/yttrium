@@ -70,7 +70,7 @@ namespace Yttrium
 	public:
 		FontImpl(const Source& source, RenderManager& render_manager, std::size_t size)
 			: _size{ static_cast<int>(size) }
-			, _image{ { size * 32, size * 32, PixelFormat::Gray8 } }
+			, _image{ { size * 32, size * 32, PixelFormat::Intensity8 } }
 		{
 			_freetype.load(source.to_buffer());
 			_has_kerning = FT_HAS_KERNING(_freetype._face);

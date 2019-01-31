@@ -225,7 +225,6 @@ y_sources(yengine "src/renderer"
 	renderer/backend.h
 	renderer/debug_renderer.cpp
 	renderer/debug_renderer.h
-	renderer/image_wrapper.h
 	renderer/material.cpp
 	renderer/material.h
 	renderer/mesh_data.cpp

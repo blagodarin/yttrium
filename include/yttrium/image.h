@@ -29,6 +29,7 @@ namespace Yttrium
 	/// Pixel format.
 	enum class PixelFormat
 	{
+		Intensity8,  ///< Single channel for both grayscale and alpha.
 		Gray8,       ///< Gray.
 		GrayAlpha16, ///< Gray-alpha.
 		Rgb24,       ///< Red-green-blue.
@@ -86,6 +87,7 @@ namespace Yttrium
 		{
 			switch (format)
 			{
+			case PixelFormat::Intensity8: return 1;
 			case PixelFormat::Gray8: return 1;
 			case PixelFormat::GrayAlpha16: return 2;
 			case PixelFormat::Rgb24: return 3;
@@ -148,18 +150,15 @@ namespace Yttrium
 		///
 		Buffer to_buffer(ImageFormat) const;
 
+		///
+		static bool transform(const ImageInfo&, const void* input, const ImageInfo&, void* output) noexcept;
+
 	private:
 		ImageInfo _info;
 		Buffer _buffer;
 		Image(const ImageInfo& info, Buffer&& buffer) noexcept
 			: _info{ info }, _buffer{ std::move(buffer) } {}
 	};
-
-	///
-	Y_CORE_API Image to_bgra(const Image&);
-
-	///
-	Y_CORE_API std::optional<Image> intensity_to_bgra(const Image&);
 }
 
 #endif

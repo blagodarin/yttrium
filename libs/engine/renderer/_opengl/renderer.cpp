@@ -19,7 +19,6 @@
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/utils/numeric.h>
-#include "../image_wrapper.h"
 #include "../mesh_data.h"
 #include "mesh.h"
 #include "program.h"
@@ -161,54 +160,25 @@ namespace Yttrium
 
 	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		ImageWrapper wrapper{ image };
+		const auto create = [this, flags](const ImageInfo& info, const void* data) -> std::unique_ptr<Texture2D> {
+			GlTextureHandle texture{ _gl, GL_TEXTURE_2D };
+			_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(max_2_alignment(info.stride())));
+			texture.set_data(0, GL_RGBA8, static_cast<GLsizei>(info.width()), static_cast<GLsizei>(info.height()), GL_BGRA, GL_UNSIGNED_BYTE, data);
+			const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
+			if (has_mipmaps)
+				texture.generate_mipmaps();
+			return std::make_unique<GlTexture2D>(*this, info, has_mipmaps, std::move(texture));
+		};
 
-		if (flags & RenderManager::TextureFlag::Intensity)
-			wrapper.intensity_to_bgra();
+		if (image.info().pixel_format() == PixelFormat::Bgra32 && max_2_alignment(image.info().stride()) <= 8)
+			return create(image.info(), image.data());
 
-		GLenum internal_format = 0;
-		GLenum data_format = 0;
-		GLenum data_type = 0;
-		switch (wrapper->info().pixel_format())
-		{
-		case PixelFormat::Gray8:
-		case PixelFormat::GrayAlpha16:
-			wrapper.to_bgra();
-			internal_format = GL_RGBA8;
-			data_format = GL_BGRA;
-			data_type = GL_UNSIGNED_BYTE;
-			break;
-		case PixelFormat::Rgb24:
-			internal_format = GL_RGB8;
-			data_format = GL_RGB;
-			data_type = GL_UNSIGNED_BYTE;
-			break;
-		case PixelFormat::Bgr24:
-			internal_format = GL_RGB8;
-			data_format = GL_BGR;
-			data_type = GL_UNSIGNED_BYTE;
-			break;
-		case PixelFormat::Rgba32:
-			internal_format = GL_RGBA8;
-			data_format = GL_RGBA;
-			data_type = GL_UNSIGNED_BYTE;
-			break;
-		case PixelFormat::Bgra32:
-			internal_format = GL_RGBA8;
-			data_format = GL_BGRA;
-			data_type = GL_UNSIGNED_BYTE;
-			break;
-		default:
+		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
+		Buffer buffer{ transformed_info.frame_size() };
+		if (!Image::transform(image.info(), image.data(), transformed_info, buffer.data()))
 			return {};
-		}
 
-		GlTextureHandle texture{ _gl, GL_TEXTURE_2D };
-		_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(max_2_alignment(wrapper->info().stride() | 8)));
-		texture.set_data(0, internal_format, static_cast<GLsizei>(wrapper->info().width()), static_cast<GLsizei>(wrapper->info().height()), data_format, data_type, wrapper->data());
-		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		if (has_mipmaps)
-			texture.generate_mipmaps();
-		return std::make_unique<GlTexture2D>(*this, wrapper->info(), has_mipmaps, std::move(texture));
+		return create(transformed_info, buffer.data());
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

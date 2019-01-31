@@ -78,29 +78,25 @@ namespace Yttrium
 
 	void WindowBackend::set_icon(const Image& icon)
 	{
-		const auto width = icon.info().width();
-		const auto height = icon.info().height();
-		const auto image_size = width * height * sizeof(std::uint32_t);
-		const auto mask_size = (width + 7) / 8 * height;
-		const auto buffer_size = sizeof(BmpInfoHeader) + image_size + mask_size;
+		const ImageInfo info{ icon.info().width(), icon.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYUp };
+		const auto mask_size = (info.width() + 7) / 8 * info.height();
+		const auto buffer_size = sizeof(BmpInfoHeader) + info.frame_size() + mask_size;
 		const auto buffer = std::make_unique<std::uint8_t[]>(buffer_size);
 		auto* header = reinterpret_cast<BmpInfoHeader*>(buffer.get());
 		header->header_size = sizeof *header;
-		header->width = static_cast<std::int32_t>(width);
-		header->height = static_cast<std::int32_t>(height) * 2;
+		header->width = static_cast<std::int32_t>(info.width());
+		header->height = static_cast<std::int32_t>(info.height()) * 2;
 		header->planes = 1;
 		header->bits_per_pixel = 32;
 		header->compression = BmpCompression::Rgb;
-		header->image_size = static_cast<std::uint32_t>(image_size);
+		header->image_size = static_cast<std::uint32_t>(info.frame_size());
 		header->x_pixels_per_meter = 0;
 		header->y_pixels_per_meter = 0;
 		header->used_colors = 0;
 		header->required_colors = 0;
-		auto bgra_icon = to_bgra(icon); // TODO: Use buffer data as image conversion output.
-		if (bgra_icon.info().orientation() == ImageOrientation::XRightYDown)
-			bgra_icon.flip_vertically();
-		std::memcpy(buffer.get() + sizeof *header, bgra_icon.data(), image_size);
-		std::memset(buffer.get() + sizeof *header + image_size, 0xff, mask_size);
+		if (!Image::transform(icon.info(), icon.data(), info, buffer.get() + sizeof *header))
+			return;
+		std::memset(buffer.get() + sizeof *header + header->image_size, 0xff, mask_size);
 		const auto hicon = ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
 		if (!hicon)
 			return print_last_error("CreateIconFromResourceEx");

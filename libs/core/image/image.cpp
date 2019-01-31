@@ -108,4 +108,137 @@ namespace Yttrium
 		Buffer buffer;
 		return save(Writer{ buffer }, format) ? std::move(buffer) : Buffer{};
 	}
+
+	bool Image::transform(const ImageInfo& src_info, const void* src_data, const ImageInfo& dst_info, void* dst_data) noexcept
+	{
+		const auto width = src_info.width();
+		const auto height = src_info.height();
+		if (width != dst_info.width() || height != dst_info.height())
+			return false;
+
+		auto src = static_cast<const std::uint8_t*>(src_data);
+		const auto src_stride = src_info.stride();
+
+		auto dst = static_cast<std::uint8_t*>(dst_data);
+		auto dst_stride = static_cast<std::ptrdiff_t>(dst_info.stride());
+		if (src_info.orientation() != dst_info.orientation())
+		{
+			dst += (height - 1) * dst_stride;
+			dst_stride = -dst_stride;
+		}
+
+		const auto dst_row_size = ImageInfo::stride(width, dst_info.pixel_format());
+
+		if (src_info.pixel_format() == dst_info.pixel_format())
+		{
+			for (auto y = height; y > 0; --y)
+			{
+				std::memcpy(dst, src, dst_row_size);
+				src += src_stride;
+				dst += dst_stride;
+			}
+			return true;
+		}
+
+		if (dst_info.pixel_format() != PixelFormat::Bgra32)
+			return false;
+
+		switch (src_info.pixel_format())
+		{
+		case PixelFormat::Intensity8:
+			for (auto y = height; y > 0; --y)
+			{
+				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, ++b)
+				{
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 0];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = src[b + 0];
+				}
+				src += src_stride;
+				dst += dst_stride;
+			}
+			break;
+
+		case PixelFormat::Gray8:
+			for (auto y = height; y > 0; --y)
+			{
+				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, ++b)
+				{
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 0];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = 0xff;
+				}
+				src += src_stride;
+				dst += dst_stride;
+			}
+			break;
+
+		case PixelFormat::GrayAlpha16:
+			for (auto y = height; y > 0; --y)
+			{
+				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 2)
+				{
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 0];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = src[b + 1];
+				}
+				src += src_stride;
+				dst += dst_stride;
+			}
+			break;
+
+		case PixelFormat::Rgb24:
+			for (auto y = height; y > 0; --y)
+			{
+				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 3)
+				{
+					dst[a + 0] = src[b + 2];
+					dst[a + 1] = src[b + 1];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = 0xff;
+				}
+				src += src_stride;
+				dst += dst_stride;
+			}
+			break;
+
+		case PixelFormat::Bgr24:
+			for (auto y = height; y > 0; --y)
+			{
+				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 3)
+				{
+					dst[a + 0] = src[b + 0];
+					dst[a + 1] = src[b + 1];
+					dst[a + 2] = src[b + 2];
+					dst[a + 3] = 0xff;
+				}
+				src += src_stride;
+				dst += dst_stride;
+			}
+			break;
+
+		case PixelFormat::Rgba32:
+			for (auto y = height; y > 0; --y)
+			{
+				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 4)
+				{
+					dst[a + 0] = src[b + 2];
+					dst[a + 1] = src[b + 1];
+					dst[a + 2] = src[b + 0];
+					dst[a + 3] = src[b + 3];
+				}
+				src += src_stride;
+				dst += dst_stride;
+			}
+			break;
+
+		default:
+			return false;
+		}
+
+		return true;
+	}
 }

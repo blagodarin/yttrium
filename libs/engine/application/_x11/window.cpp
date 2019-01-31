@@ -211,17 +211,18 @@ namespace Yttrium
 	{
 		if (!_window)
 			return;
-		const auto bgra_icon = to_bgra(icon);
-		const auto& bgra_info = bgra_icon.info();
-		const auto property_size = 2 + bgra_info.width() * bgra_info.height();
+		const auto property_size = 2 + icon.info().width() * icon.info().height();
 		const auto property_buffer = std::make_unique<long[]>(property_size);
-		property_buffer[0] = static_cast<long>(bgra_info.width());
-		property_buffer[1] = static_cast<long>(bgra_info.height());
+		property_buffer[0] = static_cast<long>(icon.info().width());
+		property_buffer[1] = static_cast<long>(icon.info().height());
+		Image bgra_icon{ { icon.info().width(), icon.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYDown } };
+		if (!Image::transform(icon.info(), icon.data(), bgra_icon.info(), bgra_icon.data()))
+			return;
 		auto* dst = &property_buffer[2];
-		for (std::size_t y = 0; y < bgra_info.height(); ++y)
+		for (std::size_t y = 0; y < icon.info().height(); ++y)
 		{
-			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_info.stride() * y);
-			for (std::size_t x = 0; x < bgra_info.width(); ++x)
+			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_icon.info().stride() * y);
+			for (std::size_t x = 0; x < icon.info().width(); ++x)
 				*dst++ = src[x];
 		}
 		const auto net_wm_icon = ::XInternAtom(_application.display(), "_NET_WM_ICON", False);

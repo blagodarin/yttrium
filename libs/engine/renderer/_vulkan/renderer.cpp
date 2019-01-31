@@ -18,7 +18,6 @@
 
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
-#include "../image_wrapper.h"
 #include "../mesh_data.h"
 #include "handles.h"
 #include "helpers.h"
@@ -115,33 +114,20 @@ namespace Yttrium
 
 	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		ImageWrapper wrapper{ image };
+		const auto create = [this, flags](const ImageInfo& info, const void* data) -> std::unique_ptr<Texture2D> {
+			const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
+			return std::make_unique<VulkanTexture2D>(*this, _context, info, has_mipmaps, VK_FORMAT_B8G8R8A8_UNORM, data);
+		};
 
-		if (flags & RenderManager::TextureFlag::Intensity)
-			wrapper.intensity_to_bgra();
+		if (image.info().pixel_format() == PixelFormat::Bgra32 && max_2_alignment(image.info().stride()) <= 8)
+			return create(image.info(), image.data());
 
-		VkFormat vk_format = VK_FORMAT_UNDEFINED;
-		switch (wrapper->info().pixel_format())
-		{
-		case PixelFormat::Gray8:
-		case PixelFormat::GrayAlpha16:
-		case PixelFormat::Rgb24:
-		case PixelFormat::Bgr24:
-			wrapper.to_bgra();
-			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
-			break;
-		case PixelFormat::Rgba32:
-			vk_format = VK_FORMAT_R8G8B8A8_UNORM;
-			break;
-		case PixelFormat::Bgra32:
-			vk_format = VK_FORMAT_B8G8R8A8_UNORM;
-			break;
-		default:
+		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
+		Buffer buffer{ transformed_info.frame_size() };
+		if (!Image::transform(image.info(), image.data(), transformed_info, buffer.data()))
 			return {};
-		}
 
-		const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-		return std::make_unique<VulkanTexture2D>(*this, _context, wrapper->info(), has_mipmaps, vk_format, wrapper->data());
+		return create(transformed_info, buffer.data());
 	}
 
 	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)

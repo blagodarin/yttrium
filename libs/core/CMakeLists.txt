@@ -77,7 +77,6 @@ y_sources(ycore "src/image"
 	image/image.cpp
 	image/formats.cpp
 	image/formats.h
-	image/utils.cpp
 	)
 y_sources(ycore "src/image/formats"
 	image/formats/bmp.cpp

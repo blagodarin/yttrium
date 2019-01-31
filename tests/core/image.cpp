@@ -46,30 +46,7 @@ TEST_CASE("image.compare")
 	}
 }
 
-TEST_CASE("image.intensity_to_bgra")
-{
-	const std::array<std::uint8_t, 8> intensity{
-		// clang-format off
-		0x00, 0x01, 0x02, 0x03,
-		0x10, 0x11, 0x12, 0x13,
-		// clang-format on
-	};
-
-	const std::array<std::uint8_t, 24> bgra{
-		// clang-format off
-		0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02,
-		0x10, 0x10, 0x10, 0x10, 0x11, 0x11, 0x11, 0x11, 0x12, 0x12, 0x12, 0x12,
-		// clang-format on
-	};
-
-	const Image intensity_image{ { 3, 2, PixelFormat::Gray8, 4 }, intensity.data() };
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
-
-	CHECK(*intensity_to_bgra(intensity_image) == bgra_image);
-	CHECK(!intensity_to_bgra(bgra_image));
-}
-
-TEST_CASE("image.to_bgra.bgr")
+TEST_CASE("image.transform.bgr_to_bgra")
 {
 	const std::array<std::uint8_t, 24> bgr{
 		// clang-format off
@@ -85,13 +62,15 @@ TEST_CASE("image.to_bgra.bgr")
 		// clang-format on
 	};
 
-	const Image bgr_image{ { 3, 2, PixelFormat::Bgr24, 4 }, bgr.data() };
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	const Image input{ { 3, 2, PixelFormat::Bgr24, 4 }, bgr.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
 
-	CHECK(to_bgra(bgr_image) == bgra_image);
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
 }
 
-TEST_CASE("image.to_bgra.bgra")
+TEST_CASE("image.transform.bgra_to_bgra")
 {
 	const std::array<std::uint8_t, 24> bgra{
 		// clang-format off
@@ -100,12 +79,15 @@ TEST_CASE("image.to_bgra.bgra")
 		// clang-format on
 	};
 
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	const Image input{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
 
-	CHECK(to_bgra(bgra_image) == bgra_image);
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
 }
 
-TEST_CASE("image.to_bgra.gray")
+TEST_CASE("image.transform.gray_to_bgra")
 {
 	const std::array<std::uint8_t, 8> gray{
 		// clang-format off
@@ -121,13 +103,15 @@ TEST_CASE("image.to_bgra.gray")
 		// clang-format on
 	};
 
-	const Image gray_image{ { 3, 2, PixelFormat::Gray8, 4 }, gray.data() };
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	const Image input{ { 3, 2, PixelFormat::Gray8, 4 }, gray.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
 
-	CHECK(to_bgra(gray_image) == bgra_image);
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
 }
 
-TEST_CASE("image.to_bgra.gray_alpha")
+TEST_CASE("image.transform.gray_alpha_to_bgra")
 {
 	const std::array<std::uint8_t, 16> gray_alpha{
 		// clang-format off
@@ -143,13 +127,39 @@ TEST_CASE("image.to_bgra.gray_alpha")
 		// clang-format on
 	};
 
-	const Image gray_alpha_image{ { 3, 2, PixelFormat::GrayAlpha16, 4 }, gray_alpha.data() };
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	const Image input{ { 3, 2, PixelFormat::GrayAlpha16, 4 }, gray_alpha.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
 
-	CHECK(to_bgra(gray_alpha_image) == bgra_image);
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
 }
 
-TEST_CASE("image.to_bgra.rgb")
+TEST_CASE("image.transform.intensity_to_bgra")
+{
+	const std::array<std::uint8_t, 8> intensity{
+		// clang-format off
+		0x00, 0x01, 0x02, 0x03,
+		0x10, 0x11, 0x12, 0x13,
+		// clang-format on
+	};
+
+	const std::array<std::uint8_t, 24> bgra{
+		// clang-format off
+		0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02,
+		0x10, 0x10, 0x10, 0x10, 0x11, 0x11, 0x11, 0x11, 0x12, 0x12, 0x12, 0x12,
+		// clang-format on
+	};
+
+	const Image input{ { 3, 2, PixelFormat::Intensity8, 4 }, intensity.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
+
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
+}
+
+TEST_CASE("image.transform.rgb_to_bgra")
 {
 	const std::array<std::uint8_t, 24> rgb{
 		// clang-format off
@@ -165,13 +175,15 @@ TEST_CASE("image.to_bgra.rgb")
 		// clang-format on
 	};
 
-	const Image rgb_image{ { 3, 2, PixelFormat::Rgb24, 4 }, rgb.data() };
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	const Image input{ { 3, 2, PixelFormat::Rgb24, 4 }, rgb.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
 
-	CHECK(to_bgra(rgb_image) == bgra_image);
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
 }
 
-TEST_CASE("image.to_bgra.rgba")
+TEST_CASE("image.transform.rgba_to_bgra")
 {
 	const std::array<std::uint8_t, 24> rgba{
 		// clang-format off
@@ -187,10 +199,12 @@ TEST_CASE("image.to_bgra.rgba")
 		// clang-format on
 	};
 
-	const Image rgba_image{ { 3, 2, PixelFormat::Rgba32 }, rgba.data() };
-	const Image bgra_image{ { 3, 2, PixelFormat::Bgra32 }, bgra.data() };
+	const Image input{ { 3, 2, PixelFormat::Rgba32 }, rgba.data() };
+	Image output{ { 3, 2, PixelFormat::Bgra32 } };
+	REQUIRE(Image::transform(input.info(), input.data(), output.info(), output.data()));
 
-	CHECK(to_bgra(rgba_image) == bgra_image);
+	const Image expected{ output.info(), bgra.data() };
+	CHECK(output == expected);
 }
 
 TEST_CASE("image.swap_channels.gray")
