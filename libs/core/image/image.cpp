@@ -30,6 +30,137 @@
 // TODO: Image packs (lists of image headers with filenames and raw image data offsets).
 // TODO: Loading image data into the specified buffer (e. g. into mapped texture memory).
 
+namespace
+{
+	void convert_x_to_x(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		for (auto y = height; y > 0; --y)
+		{
+			std::memcpy(dst, src, width);
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_x_to_xxxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 4;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, ++b)
+			{
+				dst[a + 0] = src[b + 0];
+				dst[a + 1] = src[b + 0];
+				dst[a + 2] = src[b + 0];
+				dst[a + 3] = 0xff;
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_x_to_xxxx(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 4;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, ++b)
+			{
+				dst[a + 0] = src[b + 0];
+				dst[a + 1] = src[b + 0];
+				dst[a + 2] = src[b + 0];
+				dst[a + 3] = src[b + 0];
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_xa_to_xxxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 4;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 2)
+			{
+				dst[a + 0] = src[b + 0];
+				dst[a + 1] = src[b + 0];
+				dst[a + 2] = src[b + 0];
+				dst[a + 3] = src[b + 1];
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_xyz_to_xyza(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 4;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 3)
+			{
+				dst[a + 0] = src[b + 0];
+				dst[a + 1] = src[b + 1];
+				dst[a + 2] = src[b + 2];
+				dst[a + 3] = 0xff;
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_xyz_to_zyx(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 3;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 3, b += 3)
+			{
+				dst[a + 0] = src[b + 2];
+				dst[a + 1] = src[b + 1];
+				dst[a + 2] = src[b + 0];
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_xyz_to_zyxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 4;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 3)
+			{
+				dst[a + 0] = src[b + 2];
+				dst[a + 1] = src[b + 1];
+				dst[a + 2] = src[b + 0];
+				dst[a + 3] = 0xff;
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+
+	void convert_xyza_to_zyxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	{
+		const auto dst_row_size = width * 4;
+		for (auto y = height; y > 0; --y)
+		{
+			for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 4)
+			{
+				dst[a + 0] = src[b + 2];
+				dst[a + 1] = src[b + 1];
+				dst[a + 2] = src[b + 0];
+				dst[a + 3] = src[b + 3];
+			}
+			src += src_stride;
+			dst += dst_stride;
+		}
+	}
+}
+
 namespace Yttrium
 {
 	std::optional<Image> Image::load(const Source& source, ImageFormat format)
@@ -53,54 +184,9 @@ namespace Yttrium
 	{
 	}
 
-	void Image::flip_vertically()
-	{
-		const auto stride = _info.stride();
-		Buffer row_buffer{ stride };
-		for (auto top = &_buffer[0], bottom = &_buffer[(_info.height() - 1) * stride]; top < bottom; top += stride, bottom -= stride)
-		{
-			std::memcpy(row_buffer.data(), top, stride);
-			std::memcpy(top, bottom, stride);
-			std::memcpy(bottom, row_buffer.data(), stride);
-		}
-		_info._orientation = _info._orientation == ImageOrientation::XRightYDown ? ImageOrientation::XRightYUp : ImageOrientation::XRightYDown;
-	}
-
 	bool Image::save(Writer&& writer, ImageFormat format) const
 	{
 		return write_image(writer, format, _info, _buffer.data());
-	}
-
-	bool Image::swap_channels() noexcept
-	{
-		switch (_info.pixel_format())
-		{
-		case PixelFormat::Gray8:
-			return true;
-
-		case PixelFormat::Rgb24:
-		case PixelFormat::Bgr24:
-		{
-			auto scanline = static_cast<uint8_t*>(_buffer.data());
-			for (std::size_t row = 0; row < _info.height(); ++row)
-			{
-				for (std::size_t offset = 0; offset < _info.width() * 3; offset += 3)
-				{
-					const auto x = scanline[offset];
-					scanline[offset] = scanline[offset + 2];
-					scanline[offset + 2] = x;
-				}
-				scanline += _info.stride();
-			}
-		}
-			_info._pixel_format = _info.pixel_format() == PixelFormat::Rgb24 ? PixelFormat::Bgr24 : PixelFormat::Rgb24;
-			return true;
-
-		default:
-			break;
-		}
-
-		return false;
 	}
 
 	Buffer Image::to_buffer(ImageFormat format) const
@@ -116,123 +202,83 @@ namespace Yttrium
 		if (width != dst_info.width() || height != dst_info.height())
 			return false;
 
-		auto src = static_cast<const std::uint8_t*>(src_data);
+		const auto src = static_cast<const std::uint8_t*>(src_data);
 		const auto src_stride = src_info.stride();
+		const auto src_format = src_info.pixel_format();
 
 		auto dst = static_cast<std::uint8_t*>(dst_data);
 		auto dst_stride = static_cast<std::ptrdiff_t>(dst_info.stride());
+		const auto dst_format = dst_info.pixel_format();
+
 		if (src_info.orientation() != dst_info.orientation())
 		{
-			dst += (height - 1) * dst_stride;
+			dst += static_cast<std::ptrdiff_t>(height - 1) * dst_stride;
 			dst_stride = -dst_stride;
 		}
 
-		const auto dst_row_size = ImageInfo::stride(width, dst_info.pixel_format());
-
-		if (src_info.pixel_format() == dst_info.pixel_format())
+		if (src_format == dst_format)
 		{
-			for (auto y = height; y > 0; --y)
-			{
-				std::memcpy(dst, src, dst_row_size);
-				src += src_stride;
-				dst += dst_stride;
-			}
+			::convert_x_to_x(ImageInfo::stride(width, dst_format), height, src, src_stride, dst, dst_stride);
 			return true;
 		}
 
-		if (dst_info.pixel_format() != PixelFormat::Bgra32)
-			return false;
-
-		switch (src_info.pixel_format())
+		switch (src_format)
 		{
 		case PixelFormat::Intensity8:
-			for (auto y = height; y > 0; --y)
-			{
-				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, ++b)
-				{
-					dst[a + 0] = src[b + 0];
-					dst[a + 1] = src[b + 0];
-					dst[a + 2] = src[b + 0];
-					dst[a + 3] = src[b + 0];
-				}
-				src += src_stride;
-				dst += dst_stride;
-			}
+			if (dst_format == PixelFormat::Bgra32 || dst_format == PixelFormat::Rgba32)
+				::convert_x_to_xxxx(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
 			break;
 
 		case PixelFormat::Gray8:
-			for (auto y = height; y > 0; --y)
-			{
-				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, ++b)
-				{
-					dst[a + 0] = src[b + 0];
-					dst[a + 1] = src[b + 0];
-					dst[a + 2] = src[b + 0];
-					dst[a + 3] = 0xff;
-				}
-				src += src_stride;
-				dst += dst_stride;
-			}
+			if (dst_format == PixelFormat::Bgra32 || dst_format == PixelFormat::Rgba32)
+				::convert_x_to_xxxa(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
 			break;
 
 		case PixelFormat::GrayAlpha16:
-			for (auto y = height; y > 0; --y)
-			{
-				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 2)
-				{
-					dst[a + 0] = src[b + 0];
-					dst[a + 1] = src[b + 0];
-					dst[a + 2] = src[b + 0];
-					dst[a + 3] = src[b + 1];
-				}
-				src += src_stride;
-				dst += dst_stride;
-			}
+			if (dst_format == PixelFormat::Bgra32 || dst_format == PixelFormat::Rgba32)
+				::convert_xa_to_xxxa(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
 			break;
 
 		case PixelFormat::Rgb24:
-			for (auto y = height; y > 0; --y)
-			{
-				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 3)
-				{
-					dst[a + 0] = src[b + 2];
-					dst[a + 1] = src[b + 1];
-					dst[a + 2] = src[b + 0];
-					dst[a + 3] = 0xff;
-				}
-				src += src_stride;
-				dst += dst_stride;
-			}
+			if (dst_format == PixelFormat::Bgra32)
+				::convert_xyz_to_zyxa(width, height, src, src_stride, dst, dst_stride);
+			else if (dst_format == PixelFormat::Rgba32)
+				::convert_xyz_to_xyza(width, height, src, src_stride, dst, dst_stride);
+			else if (dst_format == PixelFormat::Bgr24)
+				::convert_xyz_to_zyx(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
 			break;
 
 		case PixelFormat::Bgr24:
-			for (auto y = height; y > 0; --y)
-			{
-				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 3)
-				{
-					dst[a + 0] = src[b + 0];
-					dst[a + 1] = src[b + 1];
-					dst[a + 2] = src[b + 2];
-					dst[a + 3] = 0xff;
-				}
-				src += src_stride;
-				dst += dst_stride;
-			}
+			if (dst_format == PixelFormat::Bgra32)
+				::convert_xyz_to_xyza(width, height, src, src_stride, dst, dst_stride);
+			else if (dst_format == PixelFormat::Rgba32)
+				::convert_xyz_to_zyxa(width, height, src, src_stride, dst, dst_stride);
+			else if (dst_format == PixelFormat::Rgb24)
+				::convert_xyz_to_zyx(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
 			break;
 
 		case PixelFormat::Rgba32:
-			for (auto y = height; y > 0; --y)
-			{
-				for (std::size_t a = 0, b = 0; a < dst_row_size; a += 4, b += 4)
-				{
-					dst[a + 0] = src[b + 2];
-					dst[a + 1] = src[b + 1];
-					dst[a + 2] = src[b + 0];
-					dst[a + 3] = src[b + 3];
-				}
-				src += src_stride;
-				dst += dst_stride;
-			}
+			if (dst_format == PixelFormat::Bgra32)
+				::convert_xyza_to_zyxa(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
+			break;
+
+		case PixelFormat::Bgra32:
+			if (dst_format == PixelFormat::Rgba32)
+				::convert_xyza_to_zyxa(width, height, src, src_stride, dst, dst_stride);
+			else
+				return false;
 			break;
 
 		default:

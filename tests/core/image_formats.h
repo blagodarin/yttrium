@@ -29,12 +29,13 @@ inline Yttrium::Image make_gray8_test_image()
 	return { { size, size, Yttrium::PixelFormat::Gray8 }, buffer.data() };
 }
 
-inline Yttrium::Image make_test_image(bool with_alpha)
+inline Yttrium::Image make_test_image(bool with_alpha, Yttrium::ImageOrientation orientation = Yttrium::ImageOrientation::XRightYDown)
 {
 	Yttrium::Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
 	auto data = &buffer[0];
-	for (int y = 0; y < 16; ++y)
+	for (int row = 0; row < 16; ++row)
 	{
+		const auto y = orientation == Yttrium::ImageOrientation::XRightYDown ? row : 15 - row;
 		for (int x = 0; x < 16; ++x)
 		{
 			int b = 0;
@@ -65,5 +66,5 @@ inline Yttrium::Image make_test_image(bool with_alpha)
 				*data++ = static_cast<uint8_t>(x * 16 + 15);
 		}
 	}
-	return { { 16, 16, with_alpha ? Yttrium::PixelFormat::Bgra32 : Yttrium::PixelFormat::Bgr24 }, buffer.data() };
+	return { { 16, 16, with_alpha ? Yttrium::PixelFormat::Bgra32 : Yttrium::PixelFormat::Bgr24, orientation }, buffer.data() };
 }

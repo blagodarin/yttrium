@@ -49,8 +49,8 @@ TEST_CASE("image.load.ico")
 {
 	const auto image = Image::load(*Source::from("tests/core/data/gradient32.ico"));
 	REQUIRE(image);
-	auto reference_image = ::make_test_image(true);
-	reference_image.flip_vertically();
+
+	const auto reference_image = ::make_test_image(true, Yttrium::ImageOrientation::XRightYUp);
 	CHECK(*image == reference_image);
 }
 
@@ -61,12 +61,14 @@ TEST_CASE("image.load.jpeg")
 	REQUIRE(jpeg_image);
 	REQUIRE(jpeg_image->info().pixel_format() == PixelFormat::Rgb24);
 
-	auto tga_image = Image::load(*Source::from("tests/core/data/gradient24.jpeg.tga"));
+	const auto tga_image = Image::load(*Source::from("tests/core/data/gradient24.jpeg.tga"));
 	REQUIRE(tga_image);
 	REQUIRE(tga_image->info().pixel_format() == PixelFormat::Bgr24);
-	REQUIRE(tga_image->swap_channels());
 
-	CHECK(jpeg_image == tga_image);
+	Image rgb_tga_image{ { tga_image->info().width(), tga_image->info().height(), PixelFormat::Rgb24, tga_image->info().orientation() } };
+	REQUIRE(Image::transform(tga_image->info(), tga_image->data(), rgb_tga_image.info(), rgb_tga_image.data()));
+
+	CHECK(jpeg_image == rgb_tga_image);
 }
 #endif
 

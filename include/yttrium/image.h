@@ -104,7 +104,6 @@ namespace Yttrium
 		std::size_t _stride;
 		PixelFormat _pixel_format;
 		ImageOrientation _orientation;
-		friend class Image;
 	};
 
 	constexpr bool operator==(const ImageInfo& a, const ImageInfo& b) noexcept
@@ -139,13 +138,7 @@ namespace Yttrium
 		const ImageInfo& info() const noexcept { return _info; }
 
 		///
-		void flip_vertically();
-
-		///
 		bool save(Writer&&, ImageFormat) const;
-
-		///
-		bool swap_channels() noexcept;
 
 		///
 		Buffer to_buffer(ImageFormat) const;
