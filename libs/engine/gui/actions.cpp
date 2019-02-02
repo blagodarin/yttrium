@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace
 	{
 	public:
 		explicit GuiActionVisitor(GuiPrivate& gui)
-			: _gui(gui) {}
+			: _gui{ gui } {}
 
 		void operator()(const GuiAction_Call& action) const { action._script.execute(_gui.script_context()); }
 		void operator()(const GuiAction_Enter& action) const { _gui.push_screen(action._screen); }

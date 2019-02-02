@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_key_lookup_h_
-#define _src_gui_key_lookup_h_
+#pragma once
 
 #include <yttrium/key.h>
 
@@ -25,5 +24,3 @@ namespace Yttrium
 {
 	Y_ENGINE_API Key lookup_key(std::string_view name);
 }
-
-#endif

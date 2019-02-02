@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_widgets_label_h_
-#define _src_gui_widgets_label_h_
+#pragma once
 
 #include "../widget.h"
 
@@ -24,7 +23,7 @@ namespace Yttrium
 	class LabelWidget : public Widget
 	{
 	public:
-		LabelWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
+		LabelWidget(GuiPrivate&, std::unique_ptr<WidgetData>&&);
 
 		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 
@@ -32,5 +31,3 @@ namespace Yttrium
 		mutable std::string _final_text;
 	};
 }
-
-#endif

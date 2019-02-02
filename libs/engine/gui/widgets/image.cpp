@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 namespace Yttrium
 {
-	ImageWidget::ImageWidget(GuiPrivate& gui, std::string_view name, std::unique_ptr<WidgetData>&& data)
-		: Widget{ gui, name, std::move(data) }
+	ImageWidget::ImageWidget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data)
+		: Widget{ gui, std::move(data) }
 	{
 	}
 

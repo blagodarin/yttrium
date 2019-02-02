@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_widgets_canvas_h_
-#define _src_gui_widgets_canvas_h_
+#pragma once
 
 #include "../widget.h"
 
@@ -24,12 +23,13 @@ namespace Yttrium
 	class CanvasWidget : public Widget
 	{
 	public:
-		CanvasWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
+		CanvasWidget(GuiPrivate&, std::unique_ptr<WidgetData>&&, std::string_view name);
 
 		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 		void process_mouse_move(const Vector2&) override;
 		bool process_mouse_press(Key, const Vector2&) override;
+
+	private:
+		const std::string _name;
 	};
 }
-
-#endif

@@ -24,8 +24,8 @@
 
 namespace Yttrium
 {
-	InputWidget::InputWidget(GuiPrivate& gui, std::string_view name, std::unique_ptr<WidgetData>&& data)
-		: Widget{ gui, name, std::move(data), Flag::CanHaveFocus }
+	InputWidget::InputWidget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data)
+		: Widget{ gui, std::move(data), Flag::CanHaveFocus }
 	{
 		_logic.reset(std::string{ _data->_text });
 	}

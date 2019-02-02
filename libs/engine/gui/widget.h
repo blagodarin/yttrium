@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_widgets_widget_h_
-#define _src_gui_widgets_widget_h_
+#pragma once
 
 #include <yttrium/key.h>
 #include <yttrium/math/rect.h>
@@ -53,13 +52,12 @@ namespace Yttrium
 		virtual void process_mouse_release() {}
 
 	protected:
-		Widget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&, Flags<Flag> = {});
+		Widget(GuiPrivate&, std::unique_ptr<WidgetData>&&, Flags<Flag> = {});
 
 		virtual void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const = 0;
 
 	protected:
 		GuiPrivate& _gui;
-		const std::string _name;
 		const std::unique_ptr<WidgetData> _data;
 
 	private:
@@ -68,5 +66,3 @@ namespace Yttrium
 		RectF _render_rect;
 	};
 }
-
-#endif

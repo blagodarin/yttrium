@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_widgets_image_h_
-#define _src_gui_widgets_image_h_
+#pragma once
 
 #include "../widget.h"
 
@@ -24,10 +23,8 @@ namespace Yttrium
 	class ImageWidget : public Widget
 	{
 	public:
-		ImageWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
+		ImageWidget(GuiPrivate&, std::unique_ptr<WidgetData>&&);
 
 		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 	};
 }
-
-#endif

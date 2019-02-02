@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_gui_widgets_input_h_
-#define _src_gui_widgets_input_h_
+#pragma once
 
 #include "../logic/line_editor.h"
 #include "../widget.h"
@@ -27,7 +26,7 @@ namespace Yttrium
 	class InputWidget : public Widget
 	{
 	public:
-		InputWidget(GuiPrivate&, std::string_view name, std::unique_ptr<WidgetData>&&);
+		InputWidget(GuiPrivate&, std::unique_ptr<WidgetData>&&);
 
 		void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const override;
 		bool process_key(const KeyEvent&) override;
@@ -42,5 +41,3 @@ namespace Yttrium
 		std::chrono::steady_clock::time_point _cursor_mark;
 	};
 }
-
-#endif

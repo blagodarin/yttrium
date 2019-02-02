@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,9 +25,8 @@ namespace Yttrium
 		return draw(pass, rect, _data->style_data(style));
 	}
 
-	Widget::Widget(GuiPrivate& gui, std::string_view name, std::unique_ptr<WidgetData>&& data, Flags<Flag> flags)
+	Widget::Widget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, Flags<Flag> flags)
 		: _gui{ gui }
-		, _name{ name }
 		, _data{ std::move(data) }
 		, _flags{ flags }
 	{
