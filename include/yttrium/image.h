@@ -144,7 +144,7 @@ namespace Yttrium
 		Buffer to_buffer(ImageFormat) const;
 
 		///
-		static bool transform(const ImageInfo&, const void* input, const ImageInfo&, void* output) noexcept;
+		static bool transform(const ImageInfo&, const void* src_data, const ImageInfo&, void* dst_data) noexcept;
 
 	private:
 		ImageInfo _info;
