@@ -29,6 +29,7 @@ namespace Yttrium
 	class GuiLayout;
 	class GuiPrivate;
 	class GuiScreen;
+	class MusicReader;
 	class Widget;
 
 	class GuiIonLoader
@@ -91,5 +92,6 @@ namespace Yttrium
 		std::unordered_map<std::string_view, std::function<std::unique_ptr<Widget>(std::string_view, std::unique_ptr<WidgetData>&&)>> _widget_factory;
 		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
+		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
 	};
 }

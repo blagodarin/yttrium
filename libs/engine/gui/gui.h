@@ -54,7 +54,6 @@ namespace Yttrium
 				_on_custom_cursor(pass, point);
 		}
 		std::shared_ptr<const Font> font(const std::string&) const;
-		std::shared_ptr<MusicReader> music(const std::string&) const;
 		void on_canvas_draw(RenderPass&, const std::string& name, const RectF&) const;
 		void on_canvas_mouse_move(const std::string& name, const RectF&, const Vector2&);
 		bool on_canvas_mouse_press(const std::string& name, const RectF&, Key, const Vector2&);
@@ -71,7 +70,6 @@ namespace Yttrium
 		void set_default_cursor(GuiCursor, std::string_view texture = {});
 		void set_font(const std::string& name, std::string_view path);
 		void set_icon_path(std::string_view path) { _icon_path = path; }
-		void set_music(std::string_view name, std::string_view file, int start, int end, int loop);
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_title(std::string_view title) { _title = title; }
 		void set_translation(std::string_view);
@@ -86,7 +84,6 @@ namespace Yttrium
 		ScriptContext& _script_context;
 		std::string _title;
 		std::string _icon_path;
-		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music; // TODO: Make temporary (it is not used after GUI is loaded).
 		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
 		std::unordered_map<std::string_view, std::unique_ptr<GuiScreen>> _screens;
 		GuiScreen* _root_screen = nullptr;

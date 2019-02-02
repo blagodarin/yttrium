@@ -238,9 +238,9 @@ namespace Yttrium
 			_cursor_texture = _gui.resource_loader().load_texture_2d(texture);
 	}
 
-	void GuiScreen::set_music(std::string_view music)
+	void GuiScreen::set_music(std::shared_ptr<MusicReader>&& music)
 	{
-		_music = !music.empty() ? _gui.music(std::string{ music }) : nullptr;
+		_music = music;
 		_has_music = true;
 	}
 

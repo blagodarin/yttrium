@@ -66,14 +66,6 @@ namespace Yttrium
 		return i != _fonts.end() ? i->second : nullptr;
 	}
 
-	std::shared_ptr<MusicReader> GuiPrivate::music(const std::string& name) const
-	{
-		const auto i = _music.find(name);
-		if (i == _music.end())
-			throw GuiDataError{ "Unknown music \"", name, "\"" };
-		return i->second;
-	}
-
 	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
 	{
 		const auto i = _canvases.find(name);
@@ -131,13 +123,6 @@ namespace Yttrium
 	void GuiPrivate::set_font(const std::string& name, std::string_view path)
 	{
 		_fonts[name] = Font::load(*_resource_loader.open(path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
-	}
-
-	void GuiPrivate::set_music(std::string_view name, std::string_view file, int start, int end, int loop)
-	{
-		auto music = MusicReader::open(_resource_loader.open(file));
-		music->set_properties(start, end, loop);
-		_music.insert_or_assign(std::string{ name }, std::move(music));
 	}
 
 	void GuiPrivate::set_translation(std::string_view path)

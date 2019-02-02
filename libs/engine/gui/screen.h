@@ -58,7 +58,7 @@ namespace Yttrium
 			_cursor = cursor;
 			_cursor_texture = texture;
 		}
-		void set_music(std::string_view);
+		void set_music(std::shared_ptr<MusicReader>&&);
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(std::string_view event, GuiActions&& actions) { _on_event.insert_or_assign(std::string{ event }, std::move(actions)); }
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }

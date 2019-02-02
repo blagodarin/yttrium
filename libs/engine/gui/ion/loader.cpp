@@ -320,7 +320,9 @@ namespace Yttrium
 		if (music_file.empty())
 			throw GuiDataError{ "No music file specified" };
 		token.next(ion);
-		_gui.set_music(music_name, music_file, music_start, music_end, music_loop);
+		auto music = MusicReader::open(_gui.resource_loader().open(music_name));
+		music->set_properties(music_start, music_end, music_loop);
+		_music.insert_or_assign(std::string{ music_name }, std::move(music));
 	}
 
 	void GuiIonLoader::load_on_key(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
@@ -441,8 +443,16 @@ namespace Yttrium
 
 	void GuiIonLoader::load_screen_music(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
 	{
-		screen.set_music(token.to_value());
+		std::shared_ptr<MusicReader> music;
+		if (const std::string music_name{ token.to_value() }; !music_name.empty())
+		{
+			const auto i = _music.find(music_name);
+			if (i == _music.end())
+				throw GuiDataError{ "Unknown music \"", music_name, "\"" };
+			music = i->second;
+		}
 		token.next(ion);
+		screen.set_music(std::move(music));
 	}
 
 	void GuiIonLoader::load_screen_on_enter(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
