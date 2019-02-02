@@ -24,33 +24,6 @@
 
 namespace
 {
-	bool can_write(const Yttrium::ImageInfo& info)
-	{
-		switch (info.pixel_format())
-		{
-		case Yttrium::PixelFormat::Gray8:
-		case Yttrium::PixelFormat::GrayAlpha16:
-		case Yttrium::PixelFormat::Rgb24:
-		case Yttrium::PixelFormat::Bgr24:
-		case Yttrium::PixelFormat::Rgba32:
-		case Yttrium::PixelFormat::Bgra32:
-			break;
-		default:
-			return false;
-		}
-
-		if (info.orientation() != Yttrium::ImageOrientation::XRightYDown && info.orientation() != Yttrium::ImageOrientation::XRightYUp)
-			return false;
-
-		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint32_t>::max())
-			return false;
-
-		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint32_t>::max())
-			return false;
-
-		return true;
-	}
-
 	class PngWriter
 	{
 	public:
@@ -78,18 +51,16 @@ namespace
 
 		// Code with 'setjmp' must reside in a separate function
 		// without local variables to avoid clobbering warnings.
-		bool write(const Yttrium::ImageInfo& info, int color_type, int bits_per_channel, int transforms, png_bytep* data)
+		bool write(const Yttrium::ImageInfo& info, int color_type, int transforms, png_bytep* data)
 		{
 			if (setjmp(png_jmpbuf(_png)))
 				return false;
-
+			constexpr int bits_per_channel = 8;
 			::png_set_compression_level(_png, 0);
 			::png_set_IHDR(_png, _info, static_cast<std::uint32_t>(info.width()), static_cast<std::uint32_t>(info.height()),
 				bits_per_channel, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
 			::png_set_rows(_png, _info, data);
 			::png_write_png(_png, _info, transforms, nullptr);
-
 			return true;
 		}
 
@@ -113,39 +84,41 @@ namespace Yttrium
 {
 	bool write_png(Writer& writer, const ImageInfo& info, const void* data)
 	{
-		if (!::can_write(info))
+		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
+			return false;
+
+		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint32_t>::max())
+			return false;
+
+		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint32_t>::max())
 			return false;
 
 		int color_type = 0;
-		int bits_per_channel = 0;
 		int transforms = 0;
-
-		if (info.pixel_format() == PixelFormat::Bgr24 || info.pixel_format() == PixelFormat::Bgra32)
-			transforms |= PNG_TRANSFORM_BGR;
-
 		switch (info.pixel_format())
 		{
 		case PixelFormat::Gray8:
 			color_type = PNG_COLOR_TYPE_GRAY;
-			bits_per_channel = 8;
 			break;
-
 		case PixelFormat::GrayAlpha16:
 			color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
-			bits_per_channel = 8;
 			break;
-
 		case PixelFormat::Rgb24:
+			color_type = PNG_COLOR_TYPE_RGB;
+			break;
 		case PixelFormat::Bgr24:
 			color_type = PNG_COLOR_TYPE_RGB;
-			bits_per_channel = 8;
+			transforms = PNG_TRANSFORM_BGR;
 			break;
-
 		case PixelFormat::Rgba32:
+			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+			break;
 		case PixelFormat::Bgra32:
 			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
-			bits_per_channel = 8;
+			transforms = PNG_TRANSFORM_BGR;
 			break;
+		default:
+			return false;
 		}
 
 		const auto rows = std::make_unique<png_bytep[]>(info.height());
@@ -155,7 +128,6 @@ namespace Yttrium
 		else
 			for (std::size_t i = info.height(), j = 0; i > 0; i--, j += info.stride())
 				rows[i - 1] = static_cast<png_bytep>(const_cast<void*>(data)) + j;
-
-		return PngWriter(writer).write(info, color_type, bits_per_channel, transforms, rows.get());
+		return PngWriter(writer).write(info, color_type, transforms, rows.get());
 	}
 }

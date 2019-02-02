@@ -203,7 +203,7 @@ namespace Yttrium
 			return false;
 
 		const auto src = static_cast<const std::uint8_t*>(src_data);
-		const auto src_stride = src_info.stride();
+		const auto src_stride = static_cast<std::ptrdiff_t>(src_info.stride());
 		const auto src_format = src_info.pixel_format();
 
 		auto dst = static_cast<std::uint8_t*>(dst_data);

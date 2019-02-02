@@ -21,37 +21,8 @@
 #include <yttrium/storage/writer.h>
 #include "../formats.h"
 
+#include <cstring>
 #include <limits>
-
-namespace
-{
-	bool can_write(const Yttrium::ImageInfo& info) noexcept
-	{
-		using Yttrium::ImageOrientation;
-		using Yttrium::PixelFormat;
-
-		switch (info.pixel_format())
-		{
-		case PixelFormat::Gray8:
-		case PixelFormat::Bgr24:
-		case PixelFormat::Bgra32:
-			break;
-		default:
-			return false;
-		}
-
-		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
-			return false;
-
-		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint16_t>::max())
-			return false;
-
-		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint16_t>::max())
-			return false;
-
-		return true;
-	}
-}
 
 namespace Yttrium
 {
@@ -101,27 +72,47 @@ namespace Yttrium
 
 	bool write_tga(Writer& writer, const ImageInfo& info, const void* data)
 	{
-		if (!::can_write(info))
+		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint16_t>::max())
+			return false;
+
+		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint16_t>::max())
 			return false;
 
 		TgaHeader header;
-		header.id_length = 0;
+		std::memset(&header, 0, sizeof header);
 		header.color_map_type = TgaColorMapType::None;
-		header.image_type = (info.pixel_format() == PixelFormat::Gray8) ? TgaImageType::BlackAndWhite : TgaImageType::TrueColor;
-		header.color_map.first_entry_index = 0;
-		header.color_map.length = 0;
-		header.color_map.entry_size = 0;
-		header.image.x = 0;
-		header.image.y = 0;
 		header.image.width = static_cast<std::uint16_t>(info.width());
 		header.image.height = static_cast<std::uint16_t>(info.height());
-		header.image.pixel_depth = static_cast<std::uint8_t>(ImageInfo::pixel_size(info.pixel_format()) * 8);
-		header.image.descriptor = (info.pixel_format() == PixelFormat::Bgra32) ? 8 : 0;
+
+		switch (info.pixel_format())
+		{
+		case PixelFormat::Gray8:
+			header.image_type = TgaImageType::BlackAndWhite;
+			header.image.pixel_depth = 8;
+			break;
+		case PixelFormat::Bgr24:
+			header.image_type = TgaImageType::TrueColor;
+			header.image.pixel_depth = 24;
+			break;
+		case PixelFormat::Bgra32:
+			header.image_type = TgaImageType::TrueColor;
+			header.image.pixel_depth = 32;
+			header.image.descriptor = 8;
+			break;
+		default:
+			return false;
+		}
 
 		switch (info.orientation())
 		{
-		case ImageOrientation::XRightYDown: header.image.descriptor |= tgaTopLeft; break;
-		case ImageOrientation::XRightYUp: header.image.descriptor |= tgaBottomLeft; break;
+		case ImageOrientation::XRightYDown:
+			header.image.descriptor |= tgaTopLeft;
+			break;
+		case ImageOrientation::XRightYUp:
+			header.image.descriptor |= tgaBottomLeft;
+			break;
+		default:
+			return false;
 		}
 
 		writer.reserve(sizeof header + info.frame_size());

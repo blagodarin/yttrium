@@ -27,17 +27,9 @@ using namespace Yttrium;
 
 namespace
 {
-	template <bool with_alpha, bool flip_vertically = false>
-	bool write_color_gradient(Writer& writer)
+	bool write_color_gradient(Writer& writer, bool with_alpha, ImageOrientation orientation)
 	{
-		auto image = ::make_test_image(with_alpha);
-		if (flip_vertically)
-		{
-			const auto orientation = image.info().orientation() == ImageOrientation::XRightYDown ? ImageOrientation::XRightYUp : ImageOrientation::XRightYDown;
-			Image flipped{ { image.info().width(), image.info().height(), image.info().stride(), image.info().pixel_format(), orientation } };
-			if (!Image::transform(image.info(), image.data(), flipped.info(), flipped.data()))
-				return false;
-		}
+		const auto image = ::make_test_image(with_alpha, orientation);
 		return writer.write_all(image.data(), image.info().frame_size());
 	}
 }
@@ -81,7 +73,7 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient24.bmp" };
 		if (writer.write(file_header) && writer.write(info_header))
-			::write_color_gradient<false>(writer);
+			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
 	}
 	{
 		TgaHeader header;
@@ -94,7 +86,7 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient24.tga" };
 		if (writer.write(header))
-			::write_color_gradient<false>(writer);
+			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
 	}
 	{
 		DDS_HEADER header;
@@ -115,7 +107,7 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient32.dds" };
 		if (writer.write(header))
-			::write_color_gradient<true>(writer);
+			::write_color_gradient(writer, true, ImageOrientation::XRightYDown);
 	}
 	{
 		constexpr std::uint32_t mask_data_size = (16 * 16 / 8) * 2; // Two 16x16 bitmasks (XOR bitmask and AND bitmask).
@@ -150,7 +142,7 @@ int main()
 		bitmap_header.required_colors = 0;
 
 		Writer writer{ "tests/core/data/gradient32.ico" };
-		if (writer.write(file_header) && writer.write(image_header) && writer.write(bitmap_header) && ::write_color_gradient<true, true>(writer))
+		if (writer.write(file_header) && writer.write(image_header) && writer.write(bitmap_header) && ::write_color_gradient(writer, true, ImageOrientation::XRightYUp))
 		{
 			const auto mask_data_buffer = std::make_unique<std::uint8_t[]>(mask_data_size);
 			std::memset(mask_data_buffer.get(), 0, mask_data_size);
@@ -168,6 +160,6 @@ int main()
 
 		Writer writer{ "tests/core/data/gradient32.tga" };
 		if (writer.write(header))
-			::write_color_gradient<true>(writer);
+			::write_color_gradient(writer, true, ImageOrientation::XRightYDown);
 	}
 }
