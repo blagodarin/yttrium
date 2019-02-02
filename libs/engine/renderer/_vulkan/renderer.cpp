@@ -18,6 +18,7 @@
 
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/utils/numeric.h>
 #include "../mesh_data.h"
 #include "handles.h"
 #include "helpers.h"
@@ -119,7 +120,7 @@ namespace Yttrium
 			return std::make_unique<VulkanTexture2D>(*this, _context, info, has_mipmaps, VK_FORMAT_B8G8R8A8_UNORM, data);
 		};
 
-		if (image.info().pixel_format() == PixelFormat::Bgra32 && max_2_alignment(image.info().stride()) <= 8)
+		if (image.info().pixel_format() == PixelFormat::Bgra32 && power_of_2_alignment(image.info().stride()) >= 4)
 			return create(image.info(), image.data());
 
 		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
@@ -127,6 +128,7 @@ namespace Yttrium
 		if (!Image::transform(image.info(), image.data(), transformed_info, buffer.data()))
 			return {};
 
+		// TODO: Count "slow" textures.
 		return create(transformed_info, buffer.data());
 	}
 

@@ -29,13 +29,6 @@ namespace Yttrium
 		return !(x & (x - 1)) && x > 0;
 	}
 
-	///
-	template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
-	constexpr T max_2_alignment(T x) noexcept
-	{
-		return ((x ^ (x - 1)) + 1) >> 1;
-	}
-
 	/// Returns the least power of two not less than the specified positive value.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && sizeof(T) <= sizeof(uint64_t)>>
 	constexpr T next_power_of_2(T x) noexcept
@@ -51,6 +44,13 @@ namespace Yttrium
 		if constexpr (sizeof x > sizeof(int32_t))
 			x |= static_cast<std::conditional_t<std::is_signed_v<T>, int64_t, uint64_t>>(x) >> 32;
 		return x + 1;
+	}
+
+	///
+	template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+	constexpr T power_of_2_alignment(T x) noexcept
+	{
+		return static_cast<T>(((x ^ (x - 1)) + 1) >> 1);
 	}
 
 	/// Returns \c true if both values have the same sign.

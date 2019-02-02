@@ -160,9 +160,9 @@ namespace Yttrium
 
 	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
 	{
-		const auto create = [this, flags](const ImageInfo& info, const void* data) -> std::unique_ptr<Texture2D> {
+		const auto create = [this, flags](const ImageInfo& info, const void* data, std::size_t alignment) -> std::unique_ptr<Texture2D> {
 			GlTextureHandle texture{ _gl, GL_TEXTURE_2D };
-			_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(max_2_alignment(info.stride())));
+			_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(alignment));
 			texture.set_data(0, GL_RGBA8, static_cast<GLsizei>(info.width()), static_cast<GLsizei>(info.height()), GL_BGRA, GL_UNSIGNED_BYTE, data);
 			const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
 			if (has_mipmaps)
@@ -170,15 +170,17 @@ namespace Yttrium
 			return std::make_unique<GlTexture2D>(*this, info, has_mipmaps, std::move(texture));
 		};
 
-		if (image.info().pixel_format() == PixelFormat::Bgra32 && max_2_alignment(image.info().stride()) <= 8)
-			return create(image.info(), image.data());
+		if (image.info().pixel_format() == PixelFormat::Bgra32)
+			if (const auto alignment = power_of_2_alignment(image.info().stride()); alignment == 4 || alignment == 8)
+				return create(image.info(), image.data(), alignment);
 
 		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
 		Buffer buffer{ transformed_info.frame_size() };
 		if (!Image::transform(image.info(), image.data(), transformed_info, buffer.data()))
 			return {};
 
-		return create(transformed_info, buffer.data());
+		// TODO: Count "slow" textures.
+		return create(transformed_info, buffer.data(), power_of_2_alignment(transformed_info.stride()));
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

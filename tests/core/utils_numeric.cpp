@@ -44,27 +44,6 @@ TEST_CASE("utils.is_power_of_2")
 		CHECK(int{ is_power_of_2(i) } == table[i]);
 }
 
-TEST_CASE("utils.max_2_alignment")
-{
-	using Yttrium::max_2_alignment;
-
-	static const std::array<std::uint8_t, std::numeric_limits<std::int8_t>::max() + 1> table{
-		// clang-format off
-		0, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		32, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		64, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		32, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
-		// clang-format on
-	};
-
-	for (std::size_t i = 1; i <= std::numeric_limits<std::int8_t>::max(); ++i)
-		CHECK(max_2_alignment(i) == table[i]);
-}
-
 TEST_CASE("utils.next_power_of_2")
 {
 	using Yttrium::next_power_of_2;
@@ -89,6 +68,30 @@ TEST_CASE("utils.next_power_of_2")
 	CHECK(next_power_of_2(max_power_of_2 - 1) == max_power_of_2);
 	CHECK(next_power_of_2(max_power_of_2) == max_power_of_2);
 	CHECK(next_power_of_2(max_power_of_2 + 1) != max_power_of_2);
+}
+
+TEST_CASE("utils.power_of_2_alignment")
+{
+	using Yttrium::power_of_2_alignment;
+
+	static const std::array<std::uint8_t, std::numeric_limits<std::int8_t>::max() + 1> table{
+		// clang-format off
+		0, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		32, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		64, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		32, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
+		// clang-format on
+	};
+
+	for (int i = 0; i <= std::numeric_limits<std::int8_t>::max(); ++i)
+	{
+		CHECK(power_of_2_alignment(i) == table[static_cast<std::size_t>(i)]);
+		CHECK(power_of_2_alignment(-i) == table[static_cast<std::size_t>(i)]);
+	}
 }
 
 TEST_CASE("utils.same_sign")
