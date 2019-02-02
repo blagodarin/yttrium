@@ -84,15 +84,24 @@ namespace Yttrium
 			const UniquePtr<::GLXFBConfig[], ::XFree> fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
 			if (!fbcs)
 				throw InitializationError("Failed to obtain GLXFBConfigs");
-			for (size_t i = 0; i < static_cast<size_t>(fbc_count); ++i)
+			int best_has_sample_buffers = 0;
+			int best_samples = 0;
+			for (int i = 0; i < fbc_count; ++i)
 			{
-				// TODO: Try sorting by GLX_SAMPLE_BUFFERS and GLX_SAMPLES as suggested in the official OpenGL example.
-				decltype(_visual_info) vi(::glXGetVisualFromFBConfig(display, fbcs[i]));
-				if (vi->depth == 24) // A depth of 32 will give us an ugly result.
+				const auto fbc = fbcs[static_cast<std::size_t>(i)];
+				decltype(_visual_info) vi{ ::glXGetVisualFromFBConfig(display, fbc) };
+				if (!vi)
+					continue;
+				int has_sample_buffers = 0;
+				int samples = 0;
+				::glXGetFBConfigAttrib(display, fbc, GLX_SAMPLE_BUFFERS, &has_sample_buffers);
+				::glXGetFBConfigAttrib(display, fbc, GLX_SAMPLES, &samples);
+				if (!_visual_info || (has_sample_buffers && !best_has_sample_buffers) || samples > best_samples)
 				{
 					_visual_info = std::move(vi);
-					best_fbc = fbcs[i];
-					break;
+					best_fbc = fbc;
+					best_has_sample_buffers = has_sample_buffers;
+					best_samples = samples;
 				}
 			}
 		}

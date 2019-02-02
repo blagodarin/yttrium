@@ -114,7 +114,7 @@ namespace Yttrium
 				if (row_height < glyph->bitmap.rows)
 					row_height = glyph->bitmap.rows;
 			}
-			_texture = render_manager.create_texture_2d(_image, RenderManager::TextureFlag::Intensity);
+			_texture = render_manager.create_texture_2d(_image);
 		}
 
 		void build(Graphics& graphics, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override

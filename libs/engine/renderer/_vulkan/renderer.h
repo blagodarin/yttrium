@@ -30,7 +30,7 @@ namespace Yttrium
 	class VulkanSwapchain;
 	class VulkanVertexFormat;
 
-	class VulkanRenderer : public RenderBackend // TODO: Add 'final' then work around GCC's bad memory accessing code generation.
+	class VulkanRenderer final : public RenderBackend
 	{
 	public:
 		explicit VulkanRenderer(const WindowBackend&);

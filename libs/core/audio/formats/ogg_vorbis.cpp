@@ -92,7 +92,7 @@ namespace Yttrium
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read;)
 		{
-			const auto size = static_cast<int>(std::min<size_t>(bytes_to_read - bytes_read, to_unsigned(std::numeric_limits<int>::max()))); // TODO: Better 'min' (to get rid of <size_t>).
+			const auto size = static_cast<int>(std::min<size_t>(bytes_to_read - bytes_read, to_unsigned(std::numeric_limits<int>::max())));
 			const auto read = ::ov_read(&_ov_file, static_cast<char*>(buffer) + bytes_read, size, 0, 2, 1, &bitstream);
 			if (read <= 0)
 				break;

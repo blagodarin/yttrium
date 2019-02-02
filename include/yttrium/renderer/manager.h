@@ -39,7 +39,6 @@ namespace Yttrium
 		enum class TextureFlag
 		{
 			NoMipmaps = 1 << 0,
-			Intensity = 1 << 1,
 		};
 
 		///

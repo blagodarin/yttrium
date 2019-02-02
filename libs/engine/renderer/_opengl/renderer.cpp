@@ -171,7 +171,7 @@ namespace Yttrium
 		};
 
 		if (image.info().pixel_format() == PixelFormat::Bgra32)
-			if (const auto alignment = power_of_2_alignment(image.info().stride()); alignment == 4 || alignment == 8)
+			if (const auto alignment = power_of_2_alignment(image.info().stride() | 8); alignment == 4 || alignment == 8)
 				return create(image.info(), image.data(), alignment);
 
 		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
@@ -180,7 +180,7 @@ namespace Yttrium
 			return {};
 
 		// TODO: Count "slow" textures.
-		return create(transformed_info, buffer.data(), power_of_2_alignment(transformed_info.stride()));
+		return create(transformed_info, buffer.data(), power_of_2_alignment(transformed_info.stride() | 8));
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

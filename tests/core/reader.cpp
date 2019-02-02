@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ TEST_CASE("reader.read_line")
 {
 	struct Entry
 	{
-		size_t text_size;
+		std::size_t text_size;
 		std::string newline;
 		std::string comment;
 	};
@@ -107,7 +107,7 @@ TEST_CASE("reader.read_line")
 
 		for (const auto& entry : entries)
 		{
-			// TODO: Add context.
+			INFO(entry.comment);
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
 			const auto source = Source::from(data.data(), data.size());
@@ -138,7 +138,7 @@ TEST_CASE("reader.read_line")
 
 		for (const auto& entry : entries)
 		{
-			// TODO: Add context.
+			INFO(entry.comment);
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
 			const auto source = Source::from(Source::from(data.data(), data.size()), 0, data.size());

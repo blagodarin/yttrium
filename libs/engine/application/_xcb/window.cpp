@@ -109,15 +109,17 @@ namespace Yttrium
 			reset_keymap();
 		}
 
-		std::string keycode_to_text(xcb_keycode_t keycode) const
+		std::string_view keycode_to_text(xcb_keycode_t keycode)
 		{
-			const auto size = static_cast<size_t>(::xkb_state_key_get_utf8(_state.get(), keycode, nullptr, 0));
+			const auto size = static_cast<std::size_t>(::xkb_state_key_get_utf8(_state.get(), keycode, nullptr, 0));
 			if (!size)
 				return {};
-			std::string buffer(size, '\0'); // TODO: Explicit small buffer optimization.
-			::xkb_state_key_get_utf8(_state.get(), keycode, buffer.data(), size + 1);
-			buffer.erase(std::remove_if(buffer.begin(), buffer.end(), [](char c) { return to_unsigned(c) < 32 || c == 127; }), buffer.end());
-			return buffer;
+			if (size > _keycode_text_buffer.size())
+				_keycode_text_buffer.resize(size);
+			::xkb_state_key_get_utf8(_state.get(), keycode, _keycode_text_buffer.data(), size + 1);
+			const auto begin = _keycode_text_buffer.begin();
+			const auto end = std::remove_if(begin, begin + static_cast<std::string::difference_type>(size), [](char c) { return to_unsigned(c) < 32 || c == 127; });
+			return { _keycode_text_buffer.data(), static_cast<std::size_t>(end - begin) };
 		}
 
 		bool process_event(int event_type, const xcb_generic_event_t* event)
@@ -183,6 +185,7 @@ namespace Yttrium
 		UniquePtr<xkb_context, ::xkb_context_unref> _context;
 		UniquePtr<xkb_keymap, ::xkb_keymap_unref> _keymap;
 		UniquePtr<xkb_state, ::xkb_state_unref> _state;
+		std::string _keycode_text_buffer;
 	};
 
 	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
