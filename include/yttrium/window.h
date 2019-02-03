@@ -39,7 +39,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		Window(Application&);
+		explicit Window(Application&);
 
 		///
 		~Window();

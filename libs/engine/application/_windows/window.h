@@ -34,7 +34,7 @@ namespace Yttrium
 	class WindowBackend : private NativeWindowCallbacks
 	{
 	public:
-		WindowBackend(WindowBackendCallbacks&);
+		explicit WindowBackend(WindowBackendCallbacks&);
 
 		void close();
 		bool get_cursor(Point&);

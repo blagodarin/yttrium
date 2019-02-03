@@ -128,7 +128,7 @@ namespace Yttrium
 	{
 		std::string _name;
 
-		Entry(std::string_view name)
+		explicit Entry(std::string_view name)
 			: _name{ name } {}
 	};
 

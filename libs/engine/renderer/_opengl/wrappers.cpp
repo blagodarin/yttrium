@@ -101,9 +101,9 @@ namespace Yttrium
 		if (info_log_length <= 1)
 			return {};
 		std::string result(static_cast<size_t>(info_log_length) - 1, ' ');
-		GLsizei length = 0;
-		_gl.GetProgramInfoLog(_handle, info_log_length, &length, &result[0]);
-		assert(length == info_log_length - 1);
+		GLsizei actual_length = 0;
+		_gl.GetProgramInfoLog(_handle, info_log_length, &actual_length, &result[0]);
+		assert(actual_length == info_log_length - 1);
 		return result;
 	}
 
@@ -161,9 +161,9 @@ namespace Yttrium
 		if (info_log_length <= 1)
 			return {};
 		std::string result(static_cast<size_t>(info_log_length) - 1, ' ');
-		GLsizei length = 0;
-		_gl.GetShaderInfoLog(_handle, info_log_length, &length, &result[0]);
-		assert(length == info_log_length - 1);
+		GLsizei actual_length = 0;
+		_gl.GetShaderInfoLog(_handle, info_log_length, &actual_length, &result[0]);
+		assert(actual_length == info_log_length - 1);
 		return result;
 	}
 

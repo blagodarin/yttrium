@@ -34,7 +34,7 @@ namespace Yttrium
 	class WindowPrivate final : private WindowBackendCallbacks
 	{
 	public:
-		WindowPrivate(Application&);
+		explicit WindowPrivate(Application&);
 
 		bool process_events() { return _backend.process_events(); }
 		void render(UpdateEvent&);
