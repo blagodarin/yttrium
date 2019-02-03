@@ -52,7 +52,6 @@ namespace Yttrium
 		const std::shared_ptr<MusicReader>& music() const { return _music; }
 		std::string_view name() const { return _name; }
 		void register_widget(Widget&);
-		void set_cursor(GuiCursor, std::string_view texture = {});
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture)
 		{
 			_cursor = cursor;

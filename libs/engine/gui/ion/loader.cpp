@@ -122,8 +122,9 @@ namespace
 
 namespace Yttrium
 {
-	GuiIonLoader::GuiIonLoader(GuiPrivate& gui)
+	GuiIonLoader::GuiIonLoader(GuiPrivate& gui, ResourceLoader& resource_loader)
 		: _gui{ gui }
+		, _resource_loader{ resource_loader }
 	{
 		_widget_factory.emplace("button", [this](std::string_view, auto&& data) { return std::make_unique<ButtonWidget>(_gui, std::forward<decltype(data)>(data)); });
 		_widget_factory.emplace("canvas", [this](std::string_view name, auto&& data) { return std::make_unique<CanvasWidget>(_gui, std::forward<decltype(data)>(data), name); });
@@ -136,7 +137,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load(std::string_view source_name)
 	{
-		const auto source = _gui.resource_loader().open(source_name);
+		const auto source = _resource_loader.open(source_name);
 		IonReader ion{ *source };
 		try
 		{
@@ -241,11 +242,11 @@ namespace Yttrium
 		token.check_object_begin();
 		const auto type = token.next(ion).to_name();
 		if (type == "none")
-			_gui.set_default_cursor(GuiCursor::None);
+			_gui.set_default_cursor(GuiCursor::None, {});
 		else if (type == "custom")
-			_gui.set_default_cursor(GuiCursor::Custom);
+			_gui.set_default_cursor(GuiCursor::Custom, {});
 		else if (type == "texture")
-			_gui.set_default_cursor(GuiCursor::Texture, token.next(ion).to_value());
+			_gui.set_default_cursor(GuiCursor::Texture, _resource_loader.load_texture_2d(token.next(ion).to_value()));
 		else if (type != "default")
 			throw GuiDataError{ "Unknown cursor type '", type, "'" };
 		token.next(ion).check_object_end();
@@ -271,14 +272,16 @@ namespace Yttrium
 			else
 				throw GuiDataError{ "Unknown font option '", name, "'" };
 		}
-		_gui.set_font(font_name, font_path);
+		token.next(ion);
+		//
+		std::shared_ptr<const Font> font = Font::load(*_resource_loader.open(font_path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
 		if (attributes & Attribute::Default)
 		{
 			if (_default_font)
 				throw GuiDataError{ "Default font redefinition" };
-			_default_font = _gui.font(font_name);
+			_default_font = font;
 		}
-		token.next(ion);
+		_fonts[font_name] = std::move(font);
 	}
 
 	void GuiIonLoader::load_icon(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
@@ -320,7 +323,7 @@ namespace Yttrium
 		if (music_file.empty())
 			throw GuiDataError{ "No music file specified" };
 		token.next(ion);
-		auto music = MusicReader::open(_gui.resource_loader().open(music_name));
+		auto music = MusicReader::open(_resource_loader.open(music_name));
 		music->set_properties(music_start, music_end, music_loop);
 		_music.insert_or_assign(std::string{ music_name }, std::move(music));
 	}
@@ -380,8 +383,10 @@ namespace Yttrium
 
 	void GuiIonLoader::load_translation(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		_gui.set_translation(token.to_value());
+		const auto path = token.to_value();
 		token.next(ion);
+		//
+		_gui.set_translation(_resource_loader.load_translation(path));
 	}
 
 	void GuiIonLoader::load_screen_cursor(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
@@ -389,11 +394,11 @@ namespace Yttrium
 		token.check_object_begin();
 		const auto type = token.next(ion).to_name();
 		if (type == "none")
-			screen.set_cursor(GuiCursor::None);
+			screen.set_cursor(GuiCursor::None, {});
 		else if (type == "custom")
-			screen.set_cursor(GuiCursor::Custom);
+			screen.set_cursor(GuiCursor::Custom, {});
 		else if (type == "texture")
-			screen.set_cursor(GuiCursor::Texture, token.next(ion).to_value());
+			screen.set_cursor(GuiCursor::Texture, _resource_loader.load_texture_2d(token.next(ion).to_value()));
 		else if (type != "default")
 			throw GuiDataError{ "Unknown cursor type '", type, "'" };
 		token.next(ion).check_object_end();
@@ -580,7 +585,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_sound(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._sound = _gui.resource_loader().load_sound(token.to_value());
+		data._sound = _resource_loader.load_sound(token.to_value());
 		token.next(ion);
 	}
 
@@ -655,13 +660,13 @@ namespace Yttrium
 
 	void GuiIonLoader::load_style_font(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		if (const auto font = _gui.font(std::string{ token.to_value() }))
-		{
-			data._foreground._font = font;
-			token.next(ion);
-		}
-		else
-			throw GuiDataError{ "Unknown font \"", token.text(), "\"" };
+		const std::string font_name{ token.to_value() };
+		token.next(ion);
+		//
+		const auto i = _fonts.find(font_name);
+		if (i == _fonts.end())
+			throw GuiDataError{ "Unknown font \"", font_name, "\"" };
+		data._foreground._font = i->second;
 	}
 
 	void GuiIonLoader::load_style_text_color(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
@@ -680,7 +685,7 @@ namespace Yttrium
 	void GuiIonLoader::load_style_texture(WidgetData::StyleData& data, IonReader& ion, IonReader::Token& token) const
 	{
 		auto& background = data._background;
-		background.texture = _gui.resource_loader().load_texture_2d(token.to_value());
+		background.texture = _resource_loader.load_texture_2d(token.to_value());
 		if (!read_texture_filter(ion, token.next(ion), background.texture_filter))
 			throw GuiDataError{ "Bad 'texture' filter '", token.text(), "'" };
 		background.texture_rect = RectF{ Rect{ background.texture->size() } };

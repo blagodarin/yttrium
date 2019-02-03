@@ -231,13 +231,6 @@ namespace Yttrium
 		_widgets.emplace_back(&widget);
 	}
 
-	void GuiScreen::set_cursor(GuiCursor cursor, std::string_view texture)
-	{
-		_cursor = cursor;
-		if (_cursor == GuiCursor::Texture)
-			_cursor_texture = _gui.resource_loader().load_texture_2d(texture);
-	}
-
 	void GuiScreen::set_music(std::shared_ptr<MusicReader>&& music)
 	{
 		_music = music;

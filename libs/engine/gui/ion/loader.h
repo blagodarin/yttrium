@@ -30,12 +30,13 @@ namespace Yttrium
 	class GuiPrivate;
 	class GuiScreen;
 	class MusicReader;
+	class ResourceLoader;
 	class Widget;
 
 	class GuiIonLoader
 	{
 	public:
-		explicit GuiIonLoader(GuiPrivate&);
+		GuiIonLoader(GuiPrivate&, ResourceLoader&);
 		~GuiIonLoader() noexcept;
 
 		void load(std::string_view source_name);
@@ -89,9 +90,11 @@ namespace Yttrium
 
 	private:
 		GuiPrivate& _gui;
+		ResourceLoader& _resource_loader;
 		std::unordered_map<std::string_view, std::function<std::unique_ptr<Widget>(std::string_view, std::unique_ptr<WidgetData>&&)>> _widget_factory;
 		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
 		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
+		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
 	};
 }

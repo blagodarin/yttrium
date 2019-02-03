@@ -18,7 +18,6 @@
 
 #include <yttrium/audio/music_reader.h>
 #include <yttrium/exceptions.h>
-#include <yttrium/gui/font.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
@@ -34,9 +33,8 @@
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(ResourceLoader& resource_loader, ScriptContext& script_context)
-		: _resource_loader{ resource_loader }
-		, _script_context{ script_context }
+	GuiPrivate::GuiPrivate(ScriptContext& script_context) noexcept
+		: _script_context{ script_context }
 	{
 	}
 
@@ -58,12 +56,6 @@ namespace Yttrium
 		auto& result = *_screens.emplace(screen->name(), std::move(screen)).first->second;
 		result.set_cursor(_default_cursor, _default_cursor_texture);
 		return result;
-	}
-
-	std::shared_ptr<const Font> GuiPrivate::font(const std::string& name) const
-	{
-		const auto i = _fonts.find(name);
-		return i != _fonts.end() ? i->second : nullptr;
 	}
 
 	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
@@ -113,23 +105,17 @@ namespace Yttrium
 		return true;
 	}
 
-	void GuiPrivate::set_default_cursor(GuiCursor cursor, std::string_view texture)
+	void GuiPrivate::set_default_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture)
 	{
 		_default_cursor = cursor;
-		if (_default_cursor == GuiCursor::Texture)
-			_default_cursor_texture = _resource_loader.load_texture_2d(texture);
+		_default_cursor_texture = texture;
 	}
 
-	void GuiPrivate::set_font(const std::string& name, std::string_view path)
-	{
-		_fonts[name] = Font::load(*_resource_loader.open(path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
-	}
-
-	void GuiPrivate::set_translation(std::string_view path)
+	void GuiPrivate::set_translation(const std::shared_ptr<const Translation>& translation)
 	{
 		if (_translation)
 			throw GuiDataError{ "Only one translation is allowed" };
-		_translation = _resource_loader.load_translation(path);
+		_translation = translation;
 	}
 
 	std::string GuiPrivate::translate(std::string_view source) const
@@ -158,9 +144,9 @@ namespace Yttrium
 	}
 
 	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, std::string_view name)
-		: _private(std::make_unique<GuiPrivate>(resource_loader, script_context))
+		: _private(std::make_unique<GuiPrivate>(script_context))
 	{
-		GuiIonLoader(*_private).load(name);
+		GuiIonLoader{ *_private, resource_loader }.load(name);
 		if (!_private->_root_screen)
 			throw GuiDataError{ "(gui) No root screen has been added" };
 	}
