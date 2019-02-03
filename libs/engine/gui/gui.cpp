@@ -23,7 +23,6 @@
 #include <yttrium/script/context.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
-#include <yttrium/translation.h>
 #include "gui.h"
 #include "ion/loader.h"
 #include "screen.h"
@@ -109,18 +108,6 @@ namespace Yttrium
 	{
 		_default_cursor = cursor;
 		_default_cursor_texture = texture;
-	}
-
-	void GuiPrivate::set_translation(const std::shared_ptr<const Translation>& translation)
-	{
-		if (_translation)
-			throw GuiDataError{ "Only one translation is allowed" };
-		_translation = translation;
-	}
-
-	std::string GuiPrivate::translate(std::string_view source) const
-	{
-		return _translation ? _translation->translate(source) : std::string{ source };
 	}
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)

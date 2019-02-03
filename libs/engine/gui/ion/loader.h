@@ -31,6 +31,7 @@ namespace Yttrium
 	class GuiScreen;
 	class MusicReader;
 	class ResourceLoader;
+	class Translation;
 	class Widget;
 
 	class GuiIonLoader
@@ -96,5 +97,6 @@ namespace Yttrium
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
 		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
 		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
+		std::shared_ptr<const Translation> _translation;
 	};
 }

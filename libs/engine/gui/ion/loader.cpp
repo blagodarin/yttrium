@@ -23,6 +23,7 @@
 #include <yttrium/script/context.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
+#include <yttrium/translation.h>
 #include "../../../core/utils/string.h"
 #include "../gui.h"
 #include "../screen.h"
@@ -323,7 +324,8 @@ namespace Yttrium
 		if (music_file.empty())
 			throw GuiDataError{ "No music file specified" };
 		token.next(ion);
-		auto music = MusicReader::open(_resource_loader.open(music_name));
+		//
+		auto music = MusicReader::open(_resource_loader.open(music_file));
 		music->set_properties(music_start, music_end, music_loop);
 		_music.insert_or_assign(std::string{ music_name }, std::move(music));
 	}
@@ -369,7 +371,7 @@ namespace Yttrium
 			const auto name = token.to_name();
 			std::vector<std::string> args;
 			for (token.next(ion); token.type() == IonReader::Token::Type::StringValue; token.next(ion))
-				args.emplace_back(token.translatable() ? _gui.translate(token.text()) : token.text());
+				args.emplace_back(token.translatable() && _translation ? _translation->translate(token.text()) : token.text());
 			_gui.script_context().call(std::string{ name }, args);
 		}
 		token.next(ion);
@@ -377,16 +379,14 @@ namespace Yttrium
 
 	void GuiIonLoader::load_title(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		_gui.set_title(token.translatable() ? _gui.translate(token.to_value()) : token.to_value());
+		_gui.set_title(token.translatable() && _translation ? _translation->translate(token.to_value()) : token.to_value());
 		token.next(ion);
 	}
 
 	void GuiIonLoader::load_translation(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		const auto path = token.to_value();
+		_translation = _resource_loader.load_translation(token.to_value());
 		token.next(ion);
-		//
-		_gui.set_translation(_resource_loader.load_translation(path));
 	}
 
 	void GuiIonLoader::load_screen_cursor(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
@@ -608,7 +608,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_text(WidgetData& data, IonReader& ion, IonReader::Token& token) const
 	{
-		data._text = token.translatable() ? _gui.translate(token.to_value()) : token.to_value();
+		data._text = token.translatable() && _translation ? _translation->translate(token.to_value()) : token.to_value();
 		token.next(ion);
 	}
 

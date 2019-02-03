@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -506,7 +506,7 @@ TEST_CASE("gui.load")
 
 		add("translation.ion", "");
 		CHECK_NOTHROW(fragment("translation `translation.ion`"));
-		CHECK_THROWS_AS(fragment("translation `translation.ion` translation `translation.ion`"), GuiDataError);
+		CHECK_NOTHROW(fragment("translation `translation.ion` translation `translation.ion`"));
 		CHECK_THROWS_AS(fragment("translation `translation.ion` `translation.ion`"), IonError);
 
 		add("garbage.ion", "garbage");

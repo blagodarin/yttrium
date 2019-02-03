@@ -37,7 +37,6 @@ namespace Yttrium
 	class ScriptContext;
 	class Storage;
 	class Texture2D;
-	class Translation;
 	class Vector2;
 
 	class GuiPrivate
@@ -68,8 +67,6 @@ namespace Yttrium
 		void set_icon_path(std::string_view path) { _icon_path = path; }
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_title(std::string_view title) { _title = title; }
-		void set_translation(const std::shared_ptr<const Translation>&);
-		std::string translate(std::string_view) const;
 
 	private:
 		void enter_screen(GuiScreen&);
@@ -82,7 +79,6 @@ namespace Yttrium
 		std::unordered_map<std::string_view, std::unique_ptr<GuiScreen>> _screens;
 		GuiScreen* _root_screen = nullptr;
 		std::vector<GuiScreen*> _screen_stack;
-		std::shared_ptr<const Translation> _translation;
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
