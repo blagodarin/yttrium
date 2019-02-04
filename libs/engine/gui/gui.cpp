@@ -112,22 +112,31 @@ namespace Yttrium
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)
 	{
+		++_screen_recursion; // TODO: Exception safety.
 		_screen_stack.emplace_back(&screen);
-		if (screen.has_music() && _on_music)
-			_on_music(screen.music());
 		screen.handle_enter();
+		if (!--_screen_recursion && update_music())
+			_on_music(_current_music);
 	}
 
 	void GuiPrivate::leave_screen()
 	{
+		++_screen_recursion; // TODO: Exception safety.
 		const auto screen = _screen_stack.back();
-		screen->handle_return();
-		if (screen->has_music() && _on_music)
-		{
-			const auto i = std::find_if(std::next(_screen_stack.rbegin()), _screen_stack.rend(), [](GuiScreen* s) { return s->has_music(); });
-			_on_music(i != _screen_stack.rend() ? (*i)->music() : nullptr);
-		}
 		_screen_stack.pop_back();
+		screen->handle_return();
+		if (!--_screen_recursion && update_music())
+			_on_music(_current_music);
+	}
+
+	bool GuiPrivate::update_music() noexcept
+	{
+		const auto i = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [](GuiScreen* s) { return s->has_music(); });
+		const auto music = i != _screen_stack.rend() ? (*i)->music() : nullptr;
+		if (music == _current_music)
+			return false;
+		_current_music = std::move(music);
+		return true;
 	}
 
 	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, std::string_view name)

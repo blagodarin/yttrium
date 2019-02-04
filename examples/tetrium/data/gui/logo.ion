@@ -1,0 +1,20 @@
+screen "logo" {
+	on_key "esc" {
+		return
+	}
+	cursor {
+		none
+	}
+	music ""
+	stretch {
+		image {
+			color #000
+		}
+	}
+	center "100" "100" {
+		label {
+			position "20" "0" "60" "100"
+			text "Yttrium"
+		}
+	}
+}

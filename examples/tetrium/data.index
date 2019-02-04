@@ -5,6 +5,7 @@ package
 	"data/gui/game_over.ion"
 	"data/gui/game.ion"
 	"data/gui/help.ion"
+	"data/gui/logo.ion"
 	"data/gui/main_menu.ion"
 	"data/gui/pause.ion"
 	"data/gui/play_menu.ion"

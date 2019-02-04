@@ -55,6 +55,7 @@ on_key "f10" { call "screenshot" }
 include "data/gui/game_over.ion"
 include "data/gui/game.ion"
 include "data/gui/help.ion"
+include "data/gui/logo.ion"
 include "data/gui/main_menu.ion"
 include "data/gui/pause.ion"
 include "data/gui/play_menu.ion"

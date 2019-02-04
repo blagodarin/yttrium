@@ -71,6 +71,7 @@ namespace Yttrium
 	private:
 		void enter_screen(GuiScreen&);
 		void leave_screen();
+		bool update_music() noexcept;
 
 	private:
 		ScriptContext& _script_context;
@@ -86,6 +87,8 @@ namespace Yttrium
 		std::function<void(RenderPass&, const Vector2&)> _on_custom_cursor;
 		std::function<void(const std::shared_ptr<MusicReader>&)> _on_music;
 		std::function<void()> _on_quit;
+		std::size_t _screen_recursion = 0;
+		std::shared_ptr<MusicReader> _current_music;
 
 		friend Gui;
 	};

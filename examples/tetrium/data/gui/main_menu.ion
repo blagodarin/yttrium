@@ -1,5 +1,6 @@
 root screen "main_menu"
 {
+	on_enter { enter "logo" }
 	on_key "esc" { quit }
 
 	music "default"

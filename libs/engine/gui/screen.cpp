@@ -185,12 +185,11 @@ namespace Yttrium
 
 	void GuiScreen::handle_enter()
 	{
-		_on_enter.run(_gui);
-
 		std::vector<Widget*> focusable_widgets;
 		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget) { return widget->flags() & Widget::Flag::CanHaveFocus; });
 		if (!focusable_widgets.empty())
 			_activity->set_focus(focusable_widgets.front());
+		_on_enter.run(_gui);
 	}
 
 	bool GuiScreen::handle_event(const std::string& event) const
