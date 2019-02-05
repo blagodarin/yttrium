@@ -47,7 +47,7 @@ public:
 	MinimapCanvas(Vector3& position, const std::optional<Quad>& visibility_quad)
 		: _position{ position }, _visibility_quad{ visibility_quad } {}
 
-	void on_draw(RenderPass& pass, const RectF& rect) override
+	void on_draw(RenderPass& pass, const RectF& rect, std::chrono::milliseconds) override
 	{
 		PushTexture push_texture{ pass, nullptr };
 		pass.draw_rect(rect, { 0.25, 0.25, 0.25, 0.75 });

@@ -21,6 +21,8 @@
 #include <yttrium/audio/utils.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
+#include <yttrium/renderer/modifiers.h>
+#include <yttrium/renderer/pass.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/context.h>
@@ -85,13 +87,35 @@ namespace
 		storage.attach_buffer(name, std::move(buffer));
 	}
 
+	class LogoCanvas : public Canvas
+	{
+	public:
+		LogoCanvas(Gui& gui)
+			: _gui{ gui } {}
+
+		void on_draw(RenderPass& pass, const RectF& rect, std::chrono::milliseconds screen_time) override
+		{
+			const auto ms = screen_time.count();
+			if (ms >= 4000)
+				_gui.notify("finished");
+			const auto opacity = ms < 500 || ms > 3500
+				? 1.f
+				: std::abs(static_cast<float>(ms - 500) / 1500.f - 1.f);
+			PushTexture texture{ pass, nullptr };
+			pass.draw_rect(rect, { 0.f, 0.f, 0.f, opacity });
+		}
+
+	private:
+		Gui& _gui;
+	};
+
 	class FieldCanvas : public Canvas
 	{
 	public:
 		FieldCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics)
 			: _logic{ logic }, _graphics{ graphics } {}
 
-		void on_draw(RenderPass& pass, const RectF& rect) override
+		void on_draw(RenderPass& pass, const RectF& rect, std::chrono::milliseconds) override
 		{
 			_graphics.draw_field(pass, rect, _logic.field(), _logic.current_figure());
 		}
@@ -107,7 +131,7 @@ namespace
 		NextFigureCanvas(const Tetrium::Game& logic, const TetriumGraphics& graphics)
 			: _logic{ logic }, _graphics{ graphics } {}
 
-		void on_draw(RenderPass& pass, const RectF& rect) override
+		void on_draw(RenderPass& pass, const RectF& rect, std::chrono::milliseconds) override
 		{
 			_graphics.draw_next_figure(pass, rect, _logic.next_figure());
 		}
@@ -217,6 +241,9 @@ int main(int, char**)
 	window.on_text_input([&gui](std::string_view text) { gui.process_text_input(text); });
 
 	TetriumGraphics graphics{ window.render_manager() };
+
+	LogoCanvas logo_canvas{ gui };
+	gui.bind_canvas("logo", logo_canvas);
 
 	FieldCanvas field_canvas{ logic, graphics };
 	gui.bind_canvas("field", field_canvas);

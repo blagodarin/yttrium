@@ -185,6 +185,7 @@ namespace Yttrium
 
 	void GuiScreen::handle_enter()
 	{
+		_enter_time = std::chrono::steady_clock::now();
 		std::vector<Widget*> focusable_widgets;
 		std::copy_if(_widgets.begin(), _widgets.end(), std::back_inserter(focusable_widgets), [](Widget* widget) { return widget->flags() & Widget::Flag::CanHaveFocus; });
 		if (!focusable_widgets.empty())

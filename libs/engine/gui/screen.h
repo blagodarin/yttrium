@@ -22,6 +22,7 @@
 #include "key_lookup.h"
 #include "layout.h"
 
+#include <chrono>
 #include <map>
 #include <unordered_map>
 
@@ -62,6 +63,7 @@ namespace Yttrium
 		void set_on_event(std::string_view event, GuiActions&& actions) { _on_event.insert_or_assign(std::string{ event }, std::move(actions)); }
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_on_return(GuiActions&& actions) { _on_return = std::move(actions); }
+		std::chrono::milliseconds time_since_enter() const noexcept { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _enter_time); }
 
 	private:
 		Widget* widget_at(const Vector2&) const;
@@ -83,5 +85,6 @@ namespace Yttrium
 		std::shared_ptr<const Texture2D> _cursor_texture;
 		std::shared_ptr<MusicReader> _music;
 		bool _has_music = false;
+		std::chrono::steady_clock::time_point _enter_time;
 	};
 }

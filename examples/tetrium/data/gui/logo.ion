@@ -1,4 +1,7 @@
 screen "logo" {
+	on_event "finished" {
+		return
+	}
 	on_key "esc" {
 		return
 	}
@@ -15,6 +18,9 @@ screen "logo" {
 		label {
 			position "20" "0" "60" "100"
 			text "Yttrium"
+		}
+		canvas "logo" {
+			position "20" "0" "60" "100"
 		}
 	}
 }
