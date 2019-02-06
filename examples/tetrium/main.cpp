@@ -98,9 +98,7 @@ namespace
 			const auto ms = screen_time.count();
 			if (ms >= 4000)
 				_gui.notify("finished");
-			const auto opacity = ms < 500 || ms > 3500
-				? 1.f
-				: std::abs(static_cast<float>(ms - 500) / 1500.f - 1.f);
+			const auto opacity = std::min(1.f, std::abs(static_cast<float>(ms - 500) / 1500.f - 1.f));
 			PushTexture texture{ pass, nullptr };
 			pass.draw_rect(rect, { 0.f, 0.f, 0.f, opacity });
 		}
