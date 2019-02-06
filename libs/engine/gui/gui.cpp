@@ -30,6 +30,37 @@
 #include <algorithm>
 #include <cassert>
 
+namespace
+{
+	template <typename T>
+	class Increment
+	{
+	public:
+		Increment(T& value) noexcept
+			: _value{ value }
+		{
+			++_value;
+		}
+
+		~Increment() noexcept
+		{
+			if (!_decremented)
+				--_value;
+		}
+
+		T decrement() noexcept
+		{
+			--_value;
+			_decremented = true;
+			return _value;
+		}
+
+	private:
+		T& _value;
+		bool _decremented = false;
+	};
+}
+
 namespace Yttrium
 {
 	GuiPrivate::GuiPrivate(ScriptContext& script_context) noexcept
@@ -112,20 +143,20 @@ namespace Yttrium
 
 	void GuiPrivate::enter_screen(GuiScreen& screen)
 	{
-		++_screen_recursion; // TODO: Exception safety.
+		Increment recursion{ _screen_recursion };
 		_screen_stack.emplace_back(&screen);
 		screen.handle_enter();
-		if (!--_screen_recursion && update_music())
+		if (!recursion.decrement() && update_music())
 			_on_music(_current_music);
 	}
 
 	void GuiPrivate::leave_screen()
 	{
-		++_screen_recursion; // TODO: Exception safety.
+		Increment recursion{ _screen_recursion };
 		const auto screen = _screen_stack.back();
 		_screen_stack.pop_back();
 		screen->handle_return();
-		if (!--_screen_recursion && update_music())
+		if (!recursion.decrement() && update_music())
 			_on_music(_current_music);
 	}
 
