@@ -132,7 +132,7 @@ namespace Yttrium
 	bool GuiPrivate::update_music() noexcept
 	{
 		const auto i = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [](GuiScreen* s) { return s->has_music(); });
-		const auto music = i != _screen_stack.rend() ? (*i)->music() : nullptr;
+		auto music = i != _screen_stack.rend() ? (*i)->music() : nullptr;
 		if (music == _current_music)
 			return false;
 		_current_music = std::move(music);
