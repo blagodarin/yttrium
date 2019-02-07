@@ -127,11 +127,6 @@ namespace Yttrium
 		: _gui{ gui }
 		, _resource_loader{ resource_loader }
 	{
-		_widget_factory.emplace("button", [this](std::string_view, auto&& data) { return std::make_unique<ButtonWidget>(_gui, std::forward<decltype(data)>(data)); });
-		_widget_factory.emplace("canvas", [this](std::string_view name, auto&& data) { return std::make_unique<CanvasWidget>(_gui, std::forward<decltype(data)>(data), name); });
-		_widget_factory.emplace("image", [this](std::string_view, auto&& data) { return std::make_unique<ImageWidget>(_gui, std::forward<decltype(data)>(data)); });
-		_widget_factory.emplace("input", [this](std::string_view, auto&& data) { return std::make_unique<InputWidget>(_gui, std::forward<decltype(data)>(data)); });
-		_widget_factory.emplace("label", [this](std::string_view, auto&& data) { return std::make_unique<LabelWidget>(_gui, std::forward<decltype(data)>(data)); });
 	}
 
 	GuiIonLoader::~GuiIonLoader() noexcept = default;
@@ -277,11 +272,7 @@ namespace Yttrium
 		//
 		std::shared_ptr<const Font> font = Font::load(*_resource_loader.open(font_path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
 		if (attributes & Attribute::Default)
-		{
-			if (_default_font)
-				throw GuiDataError{ "Default font redefinition" };
 			_default_font = font;
-		}
 		_fonts[font_name] = std::move(font);
 	}
 
@@ -407,6 +398,29 @@ namespace Yttrium
 
 	void GuiIonLoader::load_screen_layout(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int extra) const
 	{
+		static const std::unordered_map<std::string_view, std::unique_ptr<Widget> (*)(GuiPrivate&, std::unique_ptr<WidgetData>&&, std::string_view)> handlers{
+			{ "button",
+				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+					return std::make_unique<ButtonWidget>(gui, std::move(data));
+				} },
+			{ "canvas",
+				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view name) -> std::unique_ptr<Widget> {
+					return std::make_unique<CanvasWidget>(gui, std::move(data), name);
+				} },
+			{ "image",
+				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+					return std::make_unique<ImageWidget>(gui, std::move(data));
+				} },
+			{ "input",
+				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+					return std::make_unique<InputWidget>(gui, std::move(data));
+				} },
+			{ "label",
+				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+					return std::make_unique<LabelWidget>(gui, std::move(data));
+				} },
+		};
+
 		const auto placement = static_cast<GuiLayout::Placement>(extra);
 		auto& layout = screen.add_layout(placement);
 		SizeF size{ 0, 0 };
@@ -432,8 +446,8 @@ namespace Yttrium
 		token.check_object_begin();
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
 		{
-			const auto i = _widget_factory.find(token.to_name());
-			if (i == _widget_factory.end())
+			const auto i = handlers.find(token.to_name());
+			if (i == handlers.end())
 				throw GuiDataError{ "Unknown widget '", token.text(), "'" };
 			std::string_view name;
 			if (token.next(ion).type() == IonReader::Token::Type::StringValue)
@@ -441,7 +455,7 @@ namespace Yttrium
 				name = token.text();
 				token.next(ion);
 			}
-			screen.register_widget(layout.add_widget(i->second(name, load_widget(ion, token))));
+			screen.register_widget(layout.add_widget(i->second(_gui, load_widget(ion, token), name)));
 		}
 		token.next(ion);
 	}

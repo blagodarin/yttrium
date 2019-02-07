@@ -20,7 +20,6 @@
 #include <yttrium/utils/flags.h>
 #include "../widget_data.h"
 
-#include <functional>
 #include <unordered_map>
 
 namespace Yttrium
@@ -92,7 +91,6 @@ namespace Yttrium
 	private:
 		GuiPrivate& _gui;
 		ResourceLoader& _resource_loader;
-		std::unordered_map<std::string_view, std::function<std::unique_ptr<Widget>(std::string_view, std::unique_ptr<WidgetData>&&)>> _widget_factory;
 		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
 		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
