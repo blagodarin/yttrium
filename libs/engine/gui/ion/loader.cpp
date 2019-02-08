@@ -173,17 +173,13 @@ namespace Yttrium
 	enum class GuiIonLoader::Attribute
 	{
 		Unknown = 0,
-		Default = 1 << 0,
-		Root = 1 << 1,
-		Transparent = 1 << 2,
+		Root = 1 << 0,
 	};
 
 	GuiIonLoader::Attribute GuiIonLoader::load_attribute(std::string_view name)
 	{
 		static const std::unordered_map<std::string_view, Attribute> attributes{
-			{ "default", Attribute::Default },
 			{ "root", Attribute::Root },
-			{ "transparent", Attribute::Transparent },
 		};
 
 		const auto i = attributes.find(name);
@@ -249,31 +245,27 @@ namespace Yttrium
 		token.next(ion);
 	}
 
-	void GuiIonLoader::load_font(IonReader& ion, IonReader::Token& token, Flags<Attribute> attributes)
+	void GuiIonLoader::load_font(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
 	{
-		const auto font_name = [&ion, &token]() -> std::string {
-			if (token.type() != IonReader::Token::Type::StringValue)
-				return "default";
-			const auto result = token.text();
-			token.next(ion);
-			return std::string{ result };
-		}();
-		token.check_object_begin();
-		std::string_view font_path;
+		// TODO: Use 'font <path>' for setting the default font (until the next 'font' command).
+		const auto font_name = token.to_value();
+		token.next(ion).check_object_begin();
+		std::shared_ptr<const Font> font;
+		bool set_as_default = false;
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd; token.next(ion))
 		{
 			const auto name = token.to_name();
-			if (name == "file")
-				font_path = token.next(ion).to_value();
+			if (name == "default")
+				set_as_default = true;
+			else if (name == "file")
+				font = Font::load(*_resource_loader.open(token.next(ion).to_value()), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
 			else
 				throw GuiDataError{ "Unknown font option '", name, "'" };
 		}
 		token.next(ion);
-		//
-		std::shared_ptr<const Font> font = Font::load(*_resource_loader.open(font_path), *_resource_loader.render_manager()); // TODO: RenderManager* may be nullptr!
-		if (attributes & Attribute::Default)
+		if (set_as_default)
 			_default_font = font;
-		_fonts[font_name] = std::move(font);
+		_fonts.insert_or_assign(std::string{ font_name }, std::move(font));
 	}
 
 	void GuiIonLoader::load_icon(IonReader& ion, IonReader::Token& token, Flags<Attribute>)
@@ -340,9 +332,10 @@ namespace Yttrium
 			{ "on_return", { &GuiIonLoader::load_screen_on_return, 0 } },
 			{ "right", { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Right) } },
 			{ "stretch", { &GuiIonLoader::load_screen_layout, static_cast<int>(GuiLayout::Placement::Stretch) } },
+			{ "transparent", { &GuiIonLoader::load_screen_transparent, 0 } },
 		};
 
-		auto& screen = _gui.add_screen(token.to_value(), attributes & Attribute::Transparent && !(attributes & Attribute::Root), attributes & Attribute::Root);
+		auto& screen = _gui.add_screen(token.to_value(), attributes & Attribute::Root);
 		token.next(ion).check_object_begin();
 		for (token.next(ion); token.type() != IonReader::Token::Type::ObjectEnd;)
 		{
@@ -494,6 +487,11 @@ namespace Yttrium
 	void GuiIonLoader::load_screen_on_return(GuiScreen& screen, IonReader& ion, IonReader::Token& token, int) const
 	{
 		screen.set_on_return(::read_actions(ion, token));
+	}
+
+	void GuiIonLoader::load_screen_transparent(GuiScreen& screen, IonReader&, IonReader::Token&, int) const
+	{
+		screen.set_transparent(true);
 	}
 
 	std::unique_ptr<WidgetData> GuiIonLoader::load_widget(IonReader& ion, IonReader::Token& token) const

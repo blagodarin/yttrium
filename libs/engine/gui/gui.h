@@ -45,7 +45,7 @@ namespace Yttrium
 		explicit GuiPrivate(ScriptContext&) noexcept;
 		~GuiPrivate();
 
-		GuiScreen& add_screen(std::string_view name, bool is_transparent, bool is_root);
+		GuiScreen& add_screen(std::string_view name, bool is_root);
 		void draw_custom_cursor(RenderPass& pass, const Vector2& point) const
 		{
 			if (_on_custom_cursor)

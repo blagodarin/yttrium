@@ -69,6 +69,7 @@ namespace Yttrium
 		void load_screen_on_event(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
 		void load_screen_on_key(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
 		void load_screen_on_return(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
+		void load_screen_transparent(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
 
 		std::unique_ptr<WidgetData> load_widget(IonReader&, IonReader::Token&) const;
 		void load_widget_on_click(WidgetData&, IonReader&, IonReader::Token&) const;

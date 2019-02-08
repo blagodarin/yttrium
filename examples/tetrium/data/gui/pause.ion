@@ -3,8 +3,10 @@ class "pause_button" ["button"]
 	position "11" "" "8" "2"
 }
 
-transparent screen "pause"
+screen "pause"
 {
+	transparent
+
 	on_enter { call "game_pause" }
 	on_key "esc" { return }
 	on_return { call "game_resume" }

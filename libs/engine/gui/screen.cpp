@@ -137,10 +137,9 @@ namespace Yttrium
 		Widget* _focus_widget = nullptr;
 	};
 
-	GuiScreen::GuiScreen(GuiPrivate& gui, std::string_view name, bool is_transparent)
+	GuiScreen::GuiScreen(GuiPrivate& gui, std::string_view name)
 		: _gui{ gui }
 		, _name{ name }
-		, _is_transparent{ is_transparent }
 		, _activity{ std::make_unique<Activity>() }
 	{
 	}

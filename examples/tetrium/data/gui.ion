@@ -10,8 +10,9 @@ music "default"
 	loop "0:04.95"
 }
 
-default font
+font "source_sans_pro"
 {
+	default
 	file "data/fonts/source_sans_pro.ttf"
 }
 

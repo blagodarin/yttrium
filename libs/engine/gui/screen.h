@@ -38,7 +38,7 @@ namespace Yttrium
 	class GuiScreen
 	{
 	public:
-		GuiScreen(GuiPrivate&, std::string_view name, bool is_transparent);
+		GuiScreen(GuiPrivate&, std::string_view name);
 		~GuiScreen();
 
 		GuiLayout& add_layout(GuiLayout::Placement);
@@ -49,7 +49,7 @@ namespace Yttrium
 		void handle_return() const { _on_return.run(_gui); }
 		bool handle_text(std::string_view);
 		bool has_music() const noexcept { return _has_music; }
-		bool is_transparent() const { return _is_transparent; }
+		bool is_transparent() const noexcept { return _is_transparent; }
 		const std::shared_ptr<MusicReader>& music() const { return _music; }
 		std::string_view name() const { return _name; }
 		void register_widget(Widget&);
@@ -63,6 +63,7 @@ namespace Yttrium
 		void set_on_event(std::string_view event, GuiActions&& actions) { _on_event.insert_or_assign(std::string{ event }, std::move(actions)); }
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
 		void set_on_return(GuiActions&& actions) { _on_return = std::move(actions); }
+		void set_transparent(bool transparent) noexcept { _is_transparent = transparent; }
 		std::chrono::milliseconds time_since_enter() const noexcept { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _enter_time); }
 
 	private:
@@ -73,7 +74,7 @@ namespace Yttrium
 
 		GuiPrivate& _gui;
 		const std::string _name;
-		const bool _is_transparent;
+		bool _is_transparent = false;
 		std::vector<std::unique_ptr<GuiLayout>> _layouts;
 		std::vector<Widget*> _widgets;
 		const std::unique_ptr<Activity> _activity;

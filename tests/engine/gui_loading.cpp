@@ -308,7 +308,7 @@ TEST_CASE("gui.load")
 
 		CHECK_NOTHROW(fragment(""));
 		CHECK_NOTHROW(fragment("screen `test` { }"));
-		CHECK_NOTHROW(fragment("transparent screen `test` { }"));
+		CHECK_NOTHROW(fragment("screen `test` { transparent }"));
 
 		CHECK_THROWS_AS(fragment("screen { }"), IonError);
 		CHECK_THROWS_AS(fragment("screen `` { }"), GuiDataError);

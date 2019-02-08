@@ -70,13 +70,13 @@ namespace Yttrium
 
 	GuiPrivate::~GuiPrivate() = default;
 
-	GuiScreen& GuiPrivate::add_screen(std::string_view name, bool is_transparent, bool is_root)
+	GuiScreen& GuiPrivate::add_screen(std::string_view name, bool is_root)
 	{
 		if (!is_root && name.empty())
 			throw GuiDataError{ "Non-root screen must have a name" };
 		if (_screens.find(name) != _screens.end())
 			throw GuiDataError{ "Duplicate screen name \"", name, "\"" };
-		auto screen = std::make_unique<GuiScreen>(*this, name, is_transparent);
+		auto screen = std::make_unique<GuiScreen>(*this, name);
 		if (is_root)
 		{
 			if (_root_screen)
