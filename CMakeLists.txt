@@ -78,6 +78,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-padded
 		-Wno-return-std-move-in-c++11
 		-Wno-switch-enum
+		-Wno-undefined-inline
 		-Wno-weak-vtables
 		)
 
