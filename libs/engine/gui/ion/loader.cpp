@@ -21,7 +21,6 @@
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/resource_loader.h>
-#include <yttrium/script/context.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
@@ -396,7 +395,7 @@ namespace Yttrium
 			std::vector<std::string> args;
 			for (token.next(ion); token.type() == IonToken::Type::StringValue; token.next(ion))
 				args.emplace_back(token.translatable() && _translation ? _translation->translate(token.text()) : token.text());
-			_gui.script_context().call(std::string{ name }, args);
+			_gui.add_startup_command(name, std::move(args));
 		}
 		token.next(ion);
 	}

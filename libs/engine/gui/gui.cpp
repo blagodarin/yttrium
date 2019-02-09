@@ -88,6 +88,11 @@ namespace Yttrium
 		return result;
 	}
 
+	void GuiPrivate::add_startup_command(std::string_view name, std::vector<std::string>&& args)
+	{
+		_startup_commands.emplace_back(name, std::move(args));
+	}
+
 	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
 	{
 		const auto i = _canvases.find(name);
@@ -249,8 +254,10 @@ namespace Yttrium
 
 	void Gui::start()
 	{
+		for (const auto& command : _private->_startup_commands)
+			_private->_script_context.call(command.first, command.second);
 		assert(_private->_screen_stack.empty()); // TODO: Remove explicit 'start()'.
-		_private->enter_screen(*_private->_root_screen);
+		_private->enter_screen(*_private->_root_screen); // TODO: Move it into startup commands.
 	}
 
 	const std::string& Gui::title() const

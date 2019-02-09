@@ -46,6 +46,7 @@ namespace Yttrium
 		~GuiPrivate();
 
 		GuiScreen& add_screen(std::string_view name, bool is_root);
+		void add_startup_command(std::string_view, std::vector<std::string>&&);
 		void draw_custom_cursor(RenderPass& pass, const Vector2& point) const
 		{
 			if (_on_custom_cursor)
@@ -89,6 +90,7 @@ namespace Yttrium
 		std::function<void()> _on_quit;
 		std::size_t _screen_recursion = 0;
 		std::shared_ptr<MusicReader> _current_music;
+		std::vector<std::pair<std::string, std::vector<std::string>>> _startup_commands;
 
 		friend Gui;
 	};
