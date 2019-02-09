@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 		try
 		{
 			IonReader ion{ *source };
-			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
+			for (auto token = ion.read(); token.type() != IonToken::Type::End; token = ion.read())
 				if (token.translatable())
 					translation->add(token.text());
 		}

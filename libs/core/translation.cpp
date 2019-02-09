@@ -55,7 +55,7 @@ namespace Yttrium
 	{
 		IonReader ion{ source };
 		decltype(_translations) translations;
-		for (auto token = ion.read(); token.type() != IonReader::Token::Type::End; token = ion.read())
+		for (auto token = ion.read(); token.type() != IonToken::Type::End; token = ion.read())
 		{
 			token.check_name("tr");
 			const auto text = ion.read().to_value();

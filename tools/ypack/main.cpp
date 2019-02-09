@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 		Yttrium::IonReader ion{ *source };
 		ion.read().check_name("package");
 		ion.read().check_list_begin();
-		for (auto token = ion.read(); token.type() != Yttrium::IonReader::Token::Type::ListEnd; token = ion.read())
+		for (auto token = ion.read(); token.type() != Yttrium::IonToken::Type::ListEnd; token = ion.read())
 			paths.emplace_back(std::string{ token.to_value() });
 		ion.read().check_end();
 	}

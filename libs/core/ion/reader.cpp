@@ -87,48 +87,48 @@ namespace
 
 namespace Yttrium
 {
-	void IonReader::Token::check_end() const
+	void IonToken::check_end() const
 	{
 		if (_type != Type::End)
 			throw IonError{ _line, _column, "End of file expected" };
 	}
 
-	void IonReader::Token::check_list_begin() const
+	void IonToken::check_list_begin() const
 	{
 		if (_type != Type::ListBegin)
 			throw IonError{ _line, _column, "'[' expected" };
 	}
 
-	void IonReader::Token::check_list_end() const
+	void IonToken::check_list_end() const
 	{
 		if (_type != Type::ListEnd)
 			throw IonError{ _line, _column, "']' expected" };
 	}
 
-	void IonReader::Token::check_name(std::string_view name) const
+	void IonToken::check_name(std::string_view name) const
 	{
 		if (to_name() != name)
 			throw IonError{ _line, _column, "'", name, "' expected" };
 	}
 
-	void IonReader::Token::check_object_begin() const
+	void IonToken::check_object_begin() const
 	{
 		if (_type != Type::ObjectBegin)
 			throw IonError{ _line, _column, "'{' expected" };
 	}
 
-	void IonReader::Token::check_object_end() const
+	void IonToken::check_object_end() const
 	{
 		if (_type != Type::ObjectEnd)
 			throw IonError{ _line, _column, "'}' expected" };
 	}
 
-	IonReader::Token& IonReader::Token::next(IonReader& ion)
+	IonToken& IonToken::next(IonReader& ion)
 	{
 		return *this = ion.read();
 	}
 
-	Color4f IonReader::Token::to_color() const
+	Color4f IonToken::to_color() const
 	{
 		if (_type != Type::ColorValue)
 			throw IonError{ _line, _column, "ION color expected" };
@@ -148,14 +148,14 @@ namespace Yttrium
 		}
 	}
 
-	std::string_view IonReader::Token::to_name() const
+	std::string_view IonToken::to_name() const
 	{
 		if (_type != Type::Name)
 			throw IonError{ _line, _column, "ION name expected" };
 		return _text;
 	}
 
-	std::string_view IonReader::Token::to_value() const
+	std::string_view IonToken::to_value() const
 	{
 		if (_type != Type::StringValue)
 			throw IonError{ _line, _column, "ION value expected" };
@@ -170,7 +170,7 @@ namespace Yttrium
 		{
 		}
 
-		IonReader::Token read()
+		IonToken read()
 		{
 			for (;;)
 			{
@@ -181,7 +181,7 @@ namespace Yttrium
 
 				case End:
 					if (_cursor == static_cast<const char*>(_buffer.data()) + _buffer.size())
-						return make_token<IonReader::Token::Type::End>(_cursor, 0);
+						return make_token<IonToken::Type::End>(_cursor, 0);
 					else
 						throw IonError{ _line, _cursor - _line_base, "Bad character" };
 
@@ -204,7 +204,7 @@ namespace Yttrium
 						const auto begin = _cursor;
 						_cursor = forward_find_if(begin + 1, [](char c) { return ::class_of(c) != Name; });
 						_stack.back() |= AcceptValues;
-						return make_token<IonReader::Token::Type::Name>(begin, _cursor - begin);
+						return make_token<IonToken::Type::Name>(begin, _cursor - begin);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected ION name" };
@@ -229,7 +229,7 @@ namespace Yttrium
 							}
 						}
 						_cursor = cursor + 1;
-						return make_token<IonReader::Token::Type::StringValue, -1>(base, cursor - base, quote == '`');
+						return make_token<IonToken::Type::StringValue, -1>(base, cursor - base, quote == '`');
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
@@ -242,7 +242,7 @@ namespace Yttrium
 						if (const auto next_class = ::class_of(*end); next_class == Other || next_class == Name)
 							throw IonError{ _line, end - _line_base, "Bad character" };
 						_cursor = end;
-						return make_token<IonReader::Token::Type::ColorValue>(begin, end - begin);
+						return make_token<IonToken::Type::ColorValue>(begin, end - begin);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
@@ -251,7 +251,7 @@ namespace Yttrium
 					if (_stack.back() & AcceptValues)
 					{
 						_stack.emplace_back(AcceptNames);
-						return make_token<IonReader::Token::Type::ObjectBegin>(_cursor++, 1);
+						return make_token<IonToken::Type::ObjectBegin>(_cursor++, 1);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected list" };
@@ -260,7 +260,7 @@ namespace Yttrium
 					if (_stack.back() & AcceptNames && _stack.size() > 1)
 					{
 						_stack.pop_back();
-						return make_token<IonReader::Token::Type::ObjectEnd>(_cursor++, 1);
+						return make_token<IonToken::Type::ObjectEnd>(_cursor++, 1);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected end of object" };
@@ -269,7 +269,7 @@ namespace Yttrium
 					if (_stack.back() & AcceptValues)
 					{
 						_stack.emplace_back(AcceptValues);
-						return make_token<IonReader::Token::Type::ListBegin>(_cursor++, 1);
+						return make_token<IonToken::Type::ListBegin>(_cursor++, 1);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected list" };
@@ -278,7 +278,7 @@ namespace Yttrium
 					if ((_stack.back() & (AcceptNames | AcceptValues)) == AcceptValues)
 					{
 						_stack.pop_back();
-						return make_token<IonReader::Token::Type::ListEnd>(_cursor++, 1);
+						return make_token<IonToken::Type::ListEnd>(_cursor++, 1);
 					}
 					else
 						throw IonError{ _line, _cursor - _line_base, "Unexpected end of object" };
@@ -296,8 +296,8 @@ namespace Yttrium
 		}
 
 	private:
-		template <IonReader::Token::Type type, std::ptrdiff_t column_offset = 0>
-		IonReader::Token make_token(const char* begin, std::ptrdiff_t size, bool translatable = false) noexcept
+		template <IonToken::Type type, std::ptrdiff_t column_offset = 0>
+		constexpr IonToken make_token(const char* begin, std::ptrdiff_t size, bool translatable = false) noexcept
 		{
 			return { _line, begin - _line_base + column_offset, type, { begin, static_cast<std::size_t>(size) }, translatable };
 		}
@@ -323,7 +323,7 @@ namespace Yttrium
 
 	IonReader::~IonReader() = default;
 
-	IonReader::Token IonReader::read()
+	IonToken IonReader::read()
 	{
 		return _private->read();
 	}

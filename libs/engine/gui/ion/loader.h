@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <yttrium/ion/reader.h>
 #include <yttrium/utils/flags.h>
 #include "../widget_data.h"
 
@@ -28,6 +27,8 @@ namespace Yttrium
 	class GuiLayout;
 	class GuiPrivate;
 	class GuiScreen;
+	class IonReader;
+	class IonToken;
 	class MusicReader;
 	class ResourceLoader;
 	class Translation;
@@ -41,7 +42,7 @@ namespace Yttrium
 
 		void load(std::string_view source_name);
 
-		static bool read_texture_filter(IonReader&, IonReader::Token&, Texture2D::Filter&);
+		static bool read_texture_filter(IonReader&, IonToken&, Texture2D::Filter&);
 
 	private:
 		enum class Attribute;
@@ -50,44 +51,44 @@ namespace Yttrium
 
 		void load(IonReader&);
 
-		void load_class(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_cursor(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_font(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_icon(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_include(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_music(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_on_key(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_screen(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_script(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_title(IonReader&, IonReader::Token&, Flags<Attribute>);
-		void load_translation(IonReader&, IonReader::Token&, Flags<Attribute>);
+		void load_class(IonReader&, IonToken&, Flags<Attribute>);
+		void load_cursor(IonReader&, IonToken&, Flags<Attribute>);
+		void load_font(IonReader&, IonToken&, Flags<Attribute>);
+		void load_icon(IonReader&, IonToken&, Flags<Attribute>);
+		void load_include(IonReader&, IonToken&, Flags<Attribute>);
+		void load_music(IonReader&, IonToken&, Flags<Attribute>);
+		void load_on_key(IonReader&, IonToken&, Flags<Attribute>);
+		void load_screen(IonReader&, IonToken&, Flags<Attribute>);
+		void load_script(IonReader&, IonToken&, Flags<Attribute>);
+		void load_title(IonReader&, IonToken&, Flags<Attribute>);
+		void load_translation(IonReader&, IonToken&, Flags<Attribute>);
 
-		void load_screen_cursor(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_layout(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_music(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_on_enter(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_on_event(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_on_key(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_on_return(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
-		void load_screen_transparent(GuiScreen&, IonReader&, IonReader::Token&, int extra) const;
+		void load_screen_cursor(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_layout(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_music(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_enter(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_event(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_key(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_return(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_transparent(GuiScreen&, IonReader&, IonToken&, int extra) const;
 
-		std::unique_ptr<WidgetData> load_widget(IonReader&, IonReader::Token&) const;
-		void load_widget_on_click(WidgetData&, IonReader&, IonReader::Token&) const;
-		void load_widget_on_enter(WidgetData&, IonReader&, IonReader::Token&) const;
-		void load_widget_on_update(WidgetData&, IonReader&, IonReader::Token&) const;
-		void load_widget_position(WidgetData&, IonReader&, IonReader::Token&) const;
-		void load_widget_sound(WidgetData&, IonReader&, IonReader::Token&) const;
-		void load_widget_state(WidgetData&, IonReader&, IonReader::Token&) const;
-		void load_widget_text(WidgetData&, IonReader&, IonReader::Token&) const;
+		std::unique_ptr<WidgetData> load_widget(IonReader&, IonToken&) const;
+		void load_widget_on_click(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_on_enter(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_on_update(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_position(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_sound(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_state(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_text(WidgetData&, IonReader&, IonToken&) const;
 
-		void load_style_align(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_borders(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_color(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_font(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_text_color(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_text_size(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_texture(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
-		void load_style_texture_rect(WidgetData::StyleData&, IonReader&, IonReader::Token&) const;
+		void load_style_align(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_borders(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_color(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_font(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_text_color(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_text_size(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_texture(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_texture_rect(WidgetData::StyleData&, IonReader&, IonToken&) const;
 
 	private:
 		GuiPrivate& _gui;

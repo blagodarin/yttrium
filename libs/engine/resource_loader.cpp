@@ -140,7 +140,7 @@ namespace Yttrium
 			std::unique_ptr<Source> fragment_shader;
 			std::shared_ptr<const Texture2D> texture;
 			Texture2D::Filter texture_filter = Texture2D::NearestFilter;
-			for (auto token = ion.read(); token.type() != IonReader::Token::Type::End;)
+			for (auto token = ion.read(); token.type() != IonToken::Type::End;)
 			{
 				const auto ion_name = token.to_name();
 				const auto make_location = [name, &token] {
