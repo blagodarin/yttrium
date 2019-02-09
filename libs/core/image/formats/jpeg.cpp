@@ -21,7 +21,7 @@
 #include <csetjmp>
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
 
-#include <jpeglib.h>
+#include <jpeglib.h> // TODO: Load JPEG without libjpeg.
 
 namespace
 {

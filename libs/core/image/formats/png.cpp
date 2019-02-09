@@ -20,7 +20,7 @@
 
 #include <limits>
 
-#include <png.h>
+#include <png.h> // TODO: Write PNG without libpng.
 
 namespace
 {
