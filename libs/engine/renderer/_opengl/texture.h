@@ -17,6 +17,8 @@
 #ifndef _src_renderer_gl_texture_h_
 #define _src_renderer_gl_texture_h_
 
+#include <yttrium/utils/flags.h>
+
 #include "../texture.h"
 #include "wrappers.h"
 

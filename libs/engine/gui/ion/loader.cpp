@@ -124,6 +124,70 @@ namespace
 
 namespace Yttrium
 {
+	class GuiIonLoader
+	{
+	public:
+		GuiIonLoader(GuiPrivate&, ResourceLoader&);
+		~GuiIonLoader() noexcept;
+
+		void load(std::string_view source_name);
+
+	private:
+		enum class Attribute;
+
+		static Attribute load_attribute(std::string_view);
+
+		void load(IonReader&);
+
+		void load_class(IonReader&, IonToken&, Flags<Attribute>);
+		void load_cursor(IonReader&, IonToken&, Flags<Attribute>);
+		void load_font(IonReader&, IonToken&, Flags<Attribute>);
+		void load_icon(IonReader&, IonToken&, Flags<Attribute>);
+		void load_include(IonReader&, IonToken&, Flags<Attribute>);
+		void load_music(IonReader&, IonToken&, Flags<Attribute>);
+		void load_on_key(IonReader&, IonToken&, Flags<Attribute>);
+		void load_screen(IonReader&, IonToken&, Flags<Attribute>);
+		void load_script(IonReader&, IonToken&, Flags<Attribute>);
+		void load_title(IonReader&, IonToken&, Flags<Attribute>);
+		void load_translation(IonReader&, IonToken&, Flags<Attribute>);
+
+		void load_screen_cursor(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_layout(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_music(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_enter(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_event(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_key(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_on_return(GuiScreen&, IonReader&, IonToken&, int extra) const;
+		void load_screen_transparent(GuiScreen&, IonReader&, IonToken&, int extra) const;
+
+		std::unique_ptr<WidgetData> load_widget(IonReader&, IonToken&) const;
+		void load_widget_on_click(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_on_enter(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_on_update(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_position(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_sound(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_state(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_text(WidgetData&, IonReader&, IonToken&) const;
+
+		void load_style_align(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_borders(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_color(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_font(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_text_color(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_text_size(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_texture(WidgetData::StyleData&, IonReader&, IonToken&) const;
+		void load_style_texture_rect(WidgetData::StyleData&, IonReader&, IonToken&) const;
+
+	private:
+		GuiPrivate& _gui;
+		ResourceLoader& _resource_loader;
+		std::shared_ptr<const Font> _default_font;
+		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
+		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
+		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
+		std::shared_ptr<const Translation> _translation;
+	};
+
 	GuiIonLoader::GuiIonLoader(GuiPrivate& gui, ResourceLoader& resource_loader)
 		: _gui{ gui }
 		, _resource_loader{ resource_loader }
@@ -144,31 +208,6 @@ namespace Yttrium
 		{
 			throw GuiDataError{ source_name, ": ", e.what() };
 		}
-	}
-
-	bool GuiIonLoader::read_texture_filter(IonReader& ion, IonToken& token, Texture2D::Filter& filter)
-	{
-		static const std::unordered_map<std::string_view, Texture2D::Filter> filters{
-			{ "nearest", Texture2D::NearestFilter },
-			{ "linear", Texture2D::LinearFilter },
-			{ "bilinear", Texture2D::BilinearFilter },
-			{ "trilinear", Texture2D::TrilinearFilter },
-		};
-
-		if (token.type() != IonToken::Type::ObjectBegin)
-			return true;
-		if (const auto i = filters.find(token.next(ion).to_name()); i != filters.end())
-			filter = i->second;
-		else
-			return false;
-		if (token.next(ion).type() == IonToken::Type::Name && token.text() == "anisotropic")
-		{
-			filter = static_cast<Texture2D::Filter>(filter | Texture2D::AnisotropicFilter);
-			token.next(ion);
-		}
-		token.check_object_end();
-		token.next(ion);
-		return true;
 	}
 
 	enum class GuiIonLoader::Attribute
@@ -699,7 +738,7 @@ namespace Yttrium
 	{
 		auto& background = data._background;
 		background.texture = _resource_loader.load_texture_2d(token.to_value());
-		if (!read_texture_filter(ion, token.next(ion), background.texture_filter))
+		if (!read_ion_texture_filter(ion, token.next(ion), background.texture_filter))
 			throw GuiDataError{ "Bad 'texture' filter '", token.text(), "'" };
 		background.texture_rect = RectF{ Rect{ background.texture->size() } };
 	}
@@ -708,5 +747,35 @@ namespace Yttrium
 	{
 		if (!::update_rect(data._background.texture_rect, ion, token))
 			throw GuiDataError{ "Bad 'texture_rect'" };
+	}
+
+	void load_ion_gui(GuiPrivate& gui, ResourceLoader& resource_loader, std::string_view path)
+	{
+		GuiIonLoader{ gui, resource_loader }.load(path);
+	}
+
+	bool read_ion_texture_filter(IonReader& ion, IonToken& token, Texture2D::Filter& filter)
+	{
+		static const std::unordered_map<std::string_view, Texture2D::Filter> filters{
+			{ "nearest", Texture2D::NearestFilter },
+			{ "linear", Texture2D::LinearFilter },
+			{ "bilinear", Texture2D::BilinearFilter },
+			{ "trilinear", Texture2D::TrilinearFilter },
+		};
+
+		if (token.type() != IonToken::Type::ObjectBegin)
+			return true;
+		if (const auto i = filters.find(token.next(ion).to_name()); i != filters.end())
+			filter = i->second;
+		else
+			return false;
+		if (token.next(ion).type() == IonToken::Type::Name && token.text() == "anisotropic")
+		{
+			filter = static_cast<Texture2D::Filter>(filter | Texture2D::AnisotropicFilter);
+			token.next(ion);
+		}
+		token.check_object_end();
+		token.next(ion);
+		return true;
 	}
 }

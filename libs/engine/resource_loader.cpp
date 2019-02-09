@@ -33,6 +33,7 @@
 #include "renderer/material.h"
 
 #include <cassert>
+#include <map>
 #include <mutex>
 #include <functional>
 
@@ -171,7 +172,7 @@ namespace Yttrium
 					const auto texture_name = ion.read().to_value();
 					if (texture_name.empty())
 						throw DataError{ make_location(), "Bad 'texture'" };
-					if (!GuiIonLoader::read_texture_filter(ion, token.next(ion), texture_filter))
+					if (!read_ion_texture_filter(ion, token.next(ion), texture_filter))
 						throw DataError{ make_location(), "Bad texture property" };
 					texture = load_texture_2d(texture_name);
 				}

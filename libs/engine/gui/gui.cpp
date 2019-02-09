@@ -173,7 +173,7 @@ namespace Yttrium
 	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, std::string_view name)
 		: _private(std::make_unique<GuiPrivate>(script_context))
 	{
-		GuiIonLoader{ *_private, resource_loader }.load(name);
+		load_ion_gui(*_private, resource_loader, name);
 		if (!_private->_root_screen)
 			throw GuiDataError{ "(gui) No root screen has been added" };
 	}

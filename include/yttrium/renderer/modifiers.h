@@ -19,6 +19,7 @@
 
 #include <yttrium/api.h>
 #include <yttrium/renderer/texture.h>
+#include <yttrium/utils/flags.h>
 
 #include <string>
 
