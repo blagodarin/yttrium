@@ -34,6 +34,7 @@
 
 #include <cassert>
 #include <mutex>
+#include <functional>
 
 namespace
 {
