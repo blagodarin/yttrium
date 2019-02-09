@@ -297,7 +297,7 @@ namespace Yttrium
 
 	private:
 		template <IonToken::Type type, std::ptrdiff_t column_offset = 0>
-		constexpr IonToken make_token(const char* begin, std::ptrdiff_t size, bool translatable = false) noexcept
+		IonToken make_token(const char* begin, std::ptrdiff_t size, bool translatable = false) noexcept
 		{
 			return { _line, begin - _line_base + column_offset, type, { begin, static_cast<std::size_t>(size) }, translatable };
 		}
