@@ -118,6 +118,7 @@ if(Y_USE_PNG)
 	endif()
 	y_sources(ycore "src/image/formats"
 		image/formats/png.cpp
+		image/formats/png.h
 		)
 endif()
 

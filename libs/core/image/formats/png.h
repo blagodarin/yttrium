@@ -22,7 +22,7 @@ namespace Yttrium
 {
 	class ImageInfo;
 
-	constexpr auto PngSignature = "\x89PNG\x0d\x0a\x1a\x0a"_eightcc;
+	constexpr auto PngSignature = "\x89PNG\r\n\x1a\n"_eightcc;
 
 	enum class PngChunkType : std::uint32_t
 	{

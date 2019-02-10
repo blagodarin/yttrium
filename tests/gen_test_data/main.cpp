@@ -85,6 +85,11 @@ int main()
 		write_png_2(writer, image.info(), image.data());
 	}
 	{
+		const auto image = ::make_test_image(false, ImageOrientation::XRightYDown);
+		Writer writer{ "tests/core/data/gradient24_v3.png" };
+		write_png_3(writer, image.info(), image.data());
+	}
+	{
 		TgaHeader header;
 		std::memset(&header, 0, sizeof header);
 		header.image_type = TgaImageType::TrueColor;

@@ -92,7 +92,7 @@ namespace
 			auto s1 = _value & 0xffff;
 			auto s2 = _value >> 16;
 			auto block_size = size % 5552;
-			for (std::size_t i = 0; i < size; i += block_size)
+			for (std::size_t i = 0; i < size;)
 			{
 				for (std::size_t j = 0; j < block_size; ++j)
 				{
@@ -101,6 +101,7 @@ namespace
 				}
 				s1 %= 65521;
 				s2 %= 65521;
+				i += block_size;
 				block_size = 5552;
 			}
 			_value = (s2 << 16) + s1;
@@ -224,7 +225,7 @@ namespace Yttrium
 		return PngWriter(writer).write(info, color_type, transforms, rows.get());
 	}
 
-	bool write_png_2(Writer& writer, const ImageInfo& info, const void* data)
+	bool write_png_2(Writer& writer, const ImageInfo& info, const void*)
 	{
 		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
 			return false;
@@ -272,20 +273,90 @@ namespace Yttrium
 		prefix.idat.length = 0;
 		prefix.idat.type = PngChunkType::IDAT;
 
-		// Zlib stream structure for uncompressed data:
-		//   0x00 0x00    -- Sometimes?
-		//   0x78 0x01    -- Stream header (deflate algorithm, 32 KiB window, no compression).
-		//   0x01         -- Block header?
-		//   L1 L2        -- Block size (LE).
-		//   N1 N2        -- Binary negation of block size (LE).
-		//   <block data>
-		//   L1 L2
-		//   N1 N2
-		//   ...
-		//   A1 A2 A3 A4  -- Adler32 checksum.
-		//   0x00 0x00    -- Sometimes?
+		Buffer ibuffer{ 65536 * 2 };
+		for (std::size_t i = 0; i < ibuffer.size(); ++i)
+			ibuffer[i] = static_cast<std::uint8_t>(i);
 
-		Buffer buffer{ info.frame_size() * 2 };
+		Buffer buffer;
+		Writer w{ buffer };
+		w.write("\x78\x01"_twocc); // Deflate algorithm, 32 KiB window, no compression.
+
+		for (std::size_t i = 0; i < ibuffer.size();)
+		{
+			w.write(static_cast<std::uint8_t>(i > 0));
+			const auto r = ibuffer.size() - i;
+			const auto n = r > 65535 ? 65535 : r;
+			w.write(static_cast<std::uint16_t>(n));
+			w.write(static_cast<std::uint16_t>(~n));
+			w.write(ibuffer.begin() + i, n);
+			i += n;
+		}
+
+		w.write(swap_bytes(Adler32{}.process(ibuffer.data(), ibuffer.size()).value()));
+
+		PngSuffix suffix;
+		suffix.idat.crc = swap_bytes(Crc32{}.process(&prefix.idat.type, sizeof prefix.idat.type).process(buffer.data(), buffer.size()).value());
+		suffix.iend.length = 0;
+		suffix.iend.type = PngChunkType::IEND;
+		suffix.iend.crc = swap_bytes(Crc32{}.process(&suffix.iend.type, sizeof suffix.iend.type).value());
+
+		writer.reserve(sizeof prefix + buffer.size() + sizeof suffix);
+		return writer.write(prefix) && writer.write(buffer.data(), buffer.size()) && writer.write(suffix);
+	}
+
+	bool write_png_3(Writer& writer, const ImageInfo& info, const void*)
+	{
+		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
+			return false;
+
+		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint32_t>::max())
+			return false;
+
+		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint32_t>::max())
+			return false;
+
+		PngPrefix prefix;
+		prefix.signature = PngSignature;
+		prefix.ihdr.length = swap_bytes(std::uint32_t{ sizeof prefix.ihdr.data });
+		prefix.ihdr.type = PngChunkType::IHDR;
+		prefix.ihdr.data.width = swap_bytes(static_cast<std::uint32_t>(info.width()));
+		prefix.ihdr.data.height = swap_bytes(static_cast<std::uint32_t>(info.height()));
+		prefix.ihdr.data.bit_depth = 8;
+		switch (info.pixel_format())
+		{
+		case PixelFormat::Gray8:
+			prefix.ihdr.data.color_type = PngColorType::Grayscale;
+			break;
+		case PixelFormat::GrayAlpha16:
+			prefix.ihdr.data.color_type = PngColorType::GrayscaleAlpha;
+			break;
+		case PixelFormat::Rgb24:
+			prefix.ihdr.data.color_type = PngColorType::Truecolor;
+			break;
+		case PixelFormat::Bgr24:
+			prefix.ihdr.data.color_type = PngColorType::Truecolor;
+			break;
+		case PixelFormat::Rgba32:
+			prefix.ihdr.data.color_type = PngColorType::TruecolorAlpha;
+			break;
+		case PixelFormat::Bgra32:
+			prefix.ihdr.data.color_type = PngColorType::TruecolorAlpha;
+			break;
+		default:
+			return false;
+		}
+		prefix.ihdr.data.compression_method = PngCompressionMethod::Zlib;
+		prefix.ihdr.data.filter_method = PngFilterMethod::Adaptive;
+		prefix.ihdr.data.interlace_method = PngInterlaceMethod::None;
+		prefix.ihdr.crc = swap_bytes(Crc32{}.process(&prefix.ihdr.type, sizeof prefix.ihdr.type).process(&prefix.ihdr.data, sizeof prefix.ihdr.data).value());
+		prefix.idat.length = 0;
+		prefix.idat.type = PngChunkType::IDAT;
+
+		Buffer ibuffer{ 65536 * 2 };
+		for (std::size_t i = 0; i < ibuffer.size(); ++i)
+			ibuffer[i] = static_cast<std::uint8_t>(i);
+
+		Buffer buffer{ ibuffer.size() * 2 };
 
 		z_stream s;
 		s.zalloc = Z_NULL;
@@ -293,8 +364,8 @@ namespace Yttrium
 		s.opaque = Z_NULL;
 		::deflateInit(&s, 0);
 
-		s.next_in = static_cast<std::uint8_t*>(const_cast<void*>(data));
-		s.avail_in = static_cast<unsigned>(info.frame_size());
+		s.next_in = static_cast<std::uint8_t*>(const_cast<void*>(ibuffer.data()));
+		s.avail_in = static_cast<unsigned>(ibuffer.size());
 		s.next_out = static_cast<std::uint8_t*>(buffer.data());
 		s.avail_out = static_cast<unsigned>(buffer.size());
 		::deflate(&s, Z_FINISH);
