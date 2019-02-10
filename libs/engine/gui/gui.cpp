@@ -256,7 +256,7 @@ namespace Yttrium
 	{
 		for (const auto& command : _private->_startup_commands)
 			_private->_script_context.call(command.first, command.second);
-		assert(_private->_screen_stack.empty()); // TODO: Remove explicit 'start()'.
+		assert(_private->_screen_stack.empty());         // TODO: Remove explicit 'start()'.
 		_private->enter_screen(*_private->_root_screen); // TODO: Move it into startup commands.
 	}
 

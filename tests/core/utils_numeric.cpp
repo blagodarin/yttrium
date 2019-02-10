@@ -108,6 +108,14 @@ TEST_CASE("utils.same_sign")
 	CHECK(!same_sign(std::numeric_limits<std::intmax_t>::min(), std::numeric_limits<std::intmax_t>::max()));
 }
 
+TEST_CASE("utils.swap_bytes")
+{
+	using Yttrium::swap_bytes;
+
+	CHECK(swap_bytes(std::uint16_t{ 0xff00 }) == 0x00ff);
+	CHECK(swap_bytes(std::uint32_t{ 0xfff00f00 }) == 0x000ff0ff);
+}
+
 TEST_CASE("utils.wrap")
 {
 	using Yttrium::wrap;

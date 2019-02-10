@@ -61,6 +61,10 @@ namespace Yttrium
 	}
 
 	///
+	constexpr std::uint16_t swap_bytes(std::uint16_t x) noexcept { return static_cast<std::uint16_t>(x >> 8 | x << 8); }
+	constexpr std::uint32_t swap_bytes(std::uint32_t x) noexcept { return x << 24 | (x & 0xff00) << 8 | (x & 0xff0000) >> 8 | x >> 24; }
+
+	///
 	template <typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
 	constexpr auto to_underlying(T value) noexcept
 	{
