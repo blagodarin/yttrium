@@ -273,7 +273,7 @@ namespace Yttrium
 		prefix.idat.length = 0;
 		prefix.idat.type = PngChunkType::IDAT;
 
-		Buffer ibuffer{ 65536 * 2 };
+		Buffer ibuffer{ 12345 };
 		for (std::size_t i = 0; i < ibuffer.size(); ++i)
 			ibuffer[i] = static_cast<std::uint8_t>(i);
 
@@ -283,9 +283,9 @@ namespace Yttrium
 
 		for (std::size_t i = 0; i < ibuffer.size();)
 		{
-			w.write(static_cast<std::uint8_t>(i > 0));
 			const auto r = ibuffer.size() - i;
-			const auto n = r > 65535 ? 65535 : r;
+			const auto n = r < 65536 ? r : 65535;
+			w.write(static_cast<std::uint8_t>(r < 65536));
 			w.write(static_cast<std::uint16_t>(n));
 			w.write(static_cast<std::uint16_t>(~n));
 			w.write(ibuffer.begin() + i, n);
@@ -293,6 +293,7 @@ namespace Yttrium
 		}
 
 		w.write(swap_bytes(Adler32{}.process(ibuffer.data(), ibuffer.size()).value()));
+		prefix.idat.length = swap_bytes(static_cast<std::uint32_t>(buffer.size()));
 
 		PngSuffix suffix;
 		suffix.idat.crc = swap_bytes(Crc32{}.process(&prefix.idat.type, sizeof prefix.idat.type).process(buffer.data(), buffer.size()).value());
@@ -352,7 +353,7 @@ namespace Yttrium
 		prefix.idat.length = 0;
 		prefix.idat.type = PngChunkType::IDAT;
 
-		Buffer ibuffer{ 65536 * 2 };
+		Buffer ibuffer{ 12345 };
 		for (std::size_t i = 0; i < ibuffer.size(); ++i)
 			ibuffer[i] = static_cast<std::uint8_t>(i);
 
@@ -364,13 +365,14 @@ namespace Yttrium
 		s.opaque = Z_NULL;
 		::deflateInit(&s, 0);
 
-		s.next_in = static_cast<std::uint8_t*>(const_cast<void*>(ibuffer.data()));
+		s.next_in = static_cast<std::uint8_t*>(ibuffer.data());
 		s.avail_in = static_cast<unsigned>(ibuffer.size());
 		s.next_out = static_cast<std::uint8_t*>(buffer.data());
 		s.avail_out = static_cast<unsigned>(buffer.size());
 		::deflate(&s, Z_FINISH);
 
 		buffer.resize(buffer.size() - s.avail_out);
+		prefix.idat.length = swap_bytes(static_cast<std::uint32_t>(buffer.size()));
 
 		::deflateEnd(&s);
 
