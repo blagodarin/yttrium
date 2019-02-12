@@ -28,7 +28,7 @@ install:
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
       if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
       cd %PREFIX_DIR%
-      cmake -DBUILD=catch2,freetype,jpeg,png,vorbis,opengl -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
+      cmake -DBUILD=catch2,freetype,jpeg,vorbis,opengl -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
       rmdir /s /q .build
       rmdir /s /q .trash
 

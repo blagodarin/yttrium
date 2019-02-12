@@ -12,4 +12,3 @@
 // Components.
 #cmakedefine01 Y_USE_JPEG
 #cmakedefine01 Y_USE_OGG_VORBIS
-#cmakedefine01 Y_USE_PNG

@@ -87,6 +87,8 @@ y_sources(ycore "src/image/formats"
 	image/formats/dds.h
 	image/formats/ico.cpp
 	image/formats/ico.h
+	image/formats/png.cpp
+	image/formats/png.h
 	image/formats/tga.cpp
 	image/formats/tga.h
 	)
@@ -107,19 +109,6 @@ if(Y_USE_JPEG)
 	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set_property(SOURCE image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 	endif()
-endif()
-if(Y_USE_PNG)
-	if(WIN32)
-		find_package(Y3_png REQUIRED)
-		target_link_libraries(ycore PRIVATE Y3::png)
-	else()
-		find_package(PNG REQUIRED)
-		target_link_libraries(ycore PRIVATE PNG::PNG)
-	endif()
-	y_sources(ycore "src/image/formats"
-		image/formats/png.cpp
-		image/formats/png.h
-		)
 endif()
 
 ########################################################################################################################

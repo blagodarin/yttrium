@@ -93,14 +93,12 @@ TEST_CASE("image.load.tga32")
 	CHECK(*image == ::make_test_image(true));
 }
 
-#if Y_USE_PNG
 TEST_CASE("image.save.png")
 {
 	TemporaryFile file;
 	REQUIRE(::make_test_image(false).save(Writer{ file.name() }, ImageFormat::Png));
 	CHECK(Source::from(file)->to_buffer() == Source::from("tests/core/data/gradient24.png")->to_buffer());
 }
-#endif
 
 TEST_CASE("image.save.tga24")
 {

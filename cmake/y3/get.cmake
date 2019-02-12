@@ -1,5 +1,5 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# Copyright 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -219,7 +219,6 @@ endfunction()
 
 y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
-y3_package(png REQUIRES zlib)
 y3_package(catch2)
 y3_package(freetype)
 y3_package(glslang)
@@ -229,7 +228,6 @@ y3_package(nasm)
 y3_package(openal)
 y3_package(opengl)
 y3_package(vulkan)
-y3_package(zlib)
 
 if("catch2" IN_LIST _y3_packages)
   set(_version "2.4.2")
@@ -368,21 +366,6 @@ if("vulkan" IN_LIST _y3_packages)
   file(REMOVE_RECURSE ${PREFIX_DIR}/share)
 endif()
 
-if("zlib" IN_LIST _y3_packages)
-  set(_version "1.2.11")
-  set(_package "zlib-${_version}")
-  y3_download("https://zlib.net/${_package}.tar.xz"
-    SHA1 "e1cb0d5c92da8e9a8c2635dfa249c341dfd00322")
-  y3_extract("${_package}.tar.xz" DIR ${_package})
-  y3_cmake(${_package} TARGET "zlibstatic" BUILD_TO_PREFIX
-    OPTIONS -DSKIP_INSTALL_FILES=ON
-    CL -wd4267)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/zconf.h
-    ${BUILD_DIR}/${_package}/zlib.h
-    DESTINATION ${PREFIX_DIR}/include)
-endif()
-
 if("jpeg" IN_LIST _y3_packages)
   set(_version "2.0.1")
   set(_package "libjpeg-turbo-${_version}")
@@ -396,22 +379,6 @@ if("jpeg" IN_LIST _y3_packages)
     ${BUILD_DIR}/${_package}/jerror.h
     ${BUILD_DIR}/${_package}/jmorecfg.h
     ${BUILD_DIR}/${_package}/jpeglib.h
-    DESTINATION ${PREFIX_DIR}/include)
-endif()
-
-if("png" IN_LIST _y3_packages)
-  set(_version "1.6.35")
-  set(_package "libpng-${_version}")
-  y3_download("https://downloads.sourceforge.net/project/libpng/libpng16/${_version}/${_package}.tar.xz"
-    SHA1 "0df1561aa1da610e892239348970d574b14deed0")
-  y3_extract("${_package}.tar.xz" DIR ${_package})
-  y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/png.patch)
-  y3_cmake(${_package} TARGET "png_static" BUILD_TO_PREFIX
-    OPTIONS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DSKIP_INSTALL_ALL=ON -DZLIB_INCLUDE_DIR=${PREFIX_DIR}/include)
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/png.h
-    ${BUILD_DIR}/${_package}/pngconf.h
-    ${BUILD_DIR}/${_package}/pnglibconf.h
     DESTINATION ${PREFIX_DIR}/include)
 endif()
 

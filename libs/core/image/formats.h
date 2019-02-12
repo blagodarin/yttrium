@@ -33,9 +33,7 @@ namespace Yttrium
 #endif
 	bool read_tga_header(Reader&, ImageInfo&);
 
-#if Y_USE_PNG
 	bool write_png(Writer&, const ImageInfo&, const void*);
-#endif
 	bool write_tga(Writer&, const ImageInfo&, const void*);
 
 	bool read_image(const Source&, ImageFormat, ImageInfo&, Buffer&);

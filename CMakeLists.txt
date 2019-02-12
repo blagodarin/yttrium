@@ -47,7 +47,6 @@ option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 
 option(Y_USE_JPEG "Include JPEG support (requires libjpeg)" ON)
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
-option(Y_USE_PNG "Include PNG support (requires libpng)" ON)
 
 set(Y_RENDERER "opengl" CACHE STRING "Renderer to use (opengl, vulkan)")
 if(Y_RENDERER STREQUAL "opengl")

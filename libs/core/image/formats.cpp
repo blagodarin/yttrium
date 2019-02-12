@@ -115,9 +115,7 @@ namespace Yttrium
 		switch (format)
 		{
 		case ImageFormat::Tga: return write_tga(writer, info, data);
-#if Y_USE_PNG
 		case ImageFormat::Png: return write_png(writer, info, data);
-#endif
 		default: return false;
 		}
 	}
