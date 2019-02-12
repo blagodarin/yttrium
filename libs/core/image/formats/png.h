@@ -47,7 +47,16 @@ namespace Yttrium
 
 	enum class PngFilterMethod : std::uint8_t
 	{
-		Adaptive = 0,
+		Standard = 0,
+	};
+
+	enum class PngStandardFilterType : std::uint8_t
+	{
+		None = 0,
+		Sub = 1,
+		Up = 2,
+		Average = 3,
+		Paeth = 4,
 	};
 
 	enum class PngInterlaceMethod : std::uint8_t

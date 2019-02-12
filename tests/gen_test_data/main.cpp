@@ -14,15 +14,11 @@
 // limitations under the License.
 //
 
-#define Y_USE_JPEG 1
-#define Y_USE_PNG 1
-
 #include <yttrium/storage/writer.h>
 #include "../../libs/core/image/formats/bmp.h"
 #include "../../libs/core/image/formats/dds.h"
 #include "../../libs/core/image/formats/ico.h"
 #include "../../libs/core/image/formats/tga.h"
-#include "../../libs/core/image/formats.h"
 #include "../core/image_formats.h"
 
 #include <cstring>
@@ -79,16 +75,7 @@ int main()
 		if (writer.write(file_header) && writer.write(info_header))
 			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
 	}
-	{
-		const auto image = ::make_test_image(false, ImageOrientation::XRightYDown);
-		Writer writer{ "tests/core/data/gradient24_v2.png" };
-		write_png_2(writer, image.info(), image.data());
-	}
-	{
-		const auto image = ::make_test_image(false, ImageOrientation::XRightYDown);
-		Writer writer{ "tests/core/data/gradient24_v3.png" };
-		write_png_3(writer, image.info(), image.data());
-	}
+	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.png" }, ImageFormat::Png);
 	{
 		TgaHeader header;
 		std::memset(&header, 0, sizeof header);

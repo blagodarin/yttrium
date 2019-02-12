@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <yttrium/api.h>
-
 namespace Yttrium
 {
 	class Buffer;
@@ -37,8 +35,6 @@ namespace Yttrium
 
 #if Y_USE_PNG
 	bool write_png(Writer&, const ImageInfo&, const void*);
-	Y_CORE_API bool write_png_2(Writer&, const ImageInfo&, const void*);
-	Y_CORE_API bool write_png_3(Writer&, const ImageInfo&, const void*);
 #endif
 	bool write_tga(Writer&, const ImageInfo&, const void*);
 
