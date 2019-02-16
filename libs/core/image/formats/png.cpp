@@ -14,11 +14,12 @@
 // limitations under the License.
 //
 
+#include "png.h"
+
 #include <yttrium/image.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/numeric.h>
 #include "../formats.h"
-#include "png.h"
 
 #include <limits>
 

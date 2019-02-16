@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _libs_yttrium_utils_fourcc_h_
-#define _libs_yttrium_utils_fourcc_h_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -54,5 +53,3 @@ namespace Yttrium
 	static_assert("\x00\x80\x7f\xff"_fourcc == 0xff7f8000);
 	static_assert("\x00\x01\x7e\x7f\x80\x81\xfe\xff"_eightcc == 0xfffe81807f7e0100);
 }
-
-#endif
