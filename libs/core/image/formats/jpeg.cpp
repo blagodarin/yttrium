@@ -24,8 +24,6 @@
 #include <jpeglib.h> // TODO: Load JPEG without libjpeg.
 
 #ifndef NDEBUG
-#	include <yttrium/storage/reader.h>
-#	include <yttrium/utils/numeric.h>
 #	include <iomanip>
 #	include <iostream>
 #endif
@@ -41,125 +39,178 @@ namespace
 	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
 		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
-}
 
-namespace Yttrium
-{
 #ifndef NDEBUG
-	namespace
-	{
-		constexpr std::uint16_t twocc(std::uint8_t a, std::uint8_t b) noexcept
-		{
-			return static_cast<std::uint16_t>(a | b << 8);
-		}
+	enum : std::uint8_t {
+		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
+		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
+		DHT = 0xc4,       // Define-Huffman-Tables.
+		RST = 0xd0,       // Restart (0-7).
+		RST_mask = 0xf8,  //
+		RST_value = 0x07, //
+		SOI = 0xd8,       // Start-of-Image.
+		EOI = 0xd9,       // End-of-Image.
+		SOS = 0xda,       // Start-of-Scan.
+		DQT = 0xdb,       // Defile-Quantization-Tables.
+		DNL = 0xdc,       // Define-Number-of-Lines.
+		DRI = 0xdd,       // Define-Restart-Interval.
+		APP = 0xe0,       // Application (0-15).
+		APP_mask = 0xf0,  //
+		APP_value = 0x0f, //
+		COM = 0xfe,       // Comment.
+	};
 
-		enum class JpegMarker : std::uint16_t
-		{
-			Sof0 = twocc(0xff, 0xc0),     // Start-of-Frame (baseline DCT).
-			Sof2 = twocc(0xff, 0xc2),     // Start-of-Frame (progressive DCT).
-			Dht = twocc(0xff, 0xc4),      // Define-Huffman-Tables.
-			Rst = twocc(0xff, 0xd0),      // Restart (0-7).
-			RstMask = twocc(0xff, 0xf8),  //
-			RstValue = twocc(0x00, 0x07), //
-			Soi = twocc(0xff, 0xd8),      // Start-Of-Image.
-			Eoi = twocc(0xff, 0xd9),      // End-Of-Image.
-			Sos = twocc(0xff, 0xda),      // Start-of-Scan.
-			Dqt = twocc(0xff, 0xdb),      // Defile-Quantization-Tables.
-			Dri = twocc(0xff, 0xdd),      // Define-Restart-Interval.
-			App = twocc(0xff, 0xe0),      // Application (0-15).
-			AppMask = twocc(0xff, 0xf0),  //
-			AppValue = twocc(0x00, 0x0f), //
-			Com = twocc(0xff, 0xfe),      // Comment.
+	bool scan_jpeg(const Yttrium::Source& source)
+	{
+		const auto buffer = source.to_buffer();
+
+		auto data = buffer.begin();
+		auto size = buffer.size();
+
+		if (size < 2 || data[0] != 0xff || data[1] != SOI)
+			return false;
+
+		std::cerr << "SOI\n";
+
+		data += 2;
+		size -= 2;
+
+		const auto skip_segment = [&data, &size] {
+			if (size < 2)
+				return false;
+			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+			if (segment_size > size)
+				return false;
+			std::cerr << '<' << segment_size << " bytes>\n";
+			data += segment_size;
+			size -= segment_size;
+			return true;
 		};
 
-		constexpr JpegMarker operator&(JpegMarker a, JpegMarker b) noexcept
-		{
-			return static_cast<JpegMarker>(static_cast<std::uint16_t>(a) & static_cast<std::uint16_t>(b));
-		}
-
-		bool scan_jpeg(const Source& source)
-		{
-			Reader r{ source };
-
-			const auto skip_segment = [&r]
-			{
-				std::uint16_t length;
-				if (!r.read(length))
-					return false;
-				std::cerr << '<' << swap_bytes(length) << " bytes>\n";
-				return r.skip(swap_bytes(length) - 2);
-			};
-
-			JpegMarker marker;
-			if (!r.read(marker) || marker != JpegMarker::Soi)
+		const auto decode_sof0 = [&data, &size] {
+			if (size < 2)
 				return false;
-
-			std::cerr << "SOI\n";
-			for (;;)
+			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+			if (segment_size > size || segment_size < 8)
+				return false;
+			const auto color_bits = int{ data[2] };
+			const auto width = data[3] << 8 | data[4];
+			const auto height = data[5] << 8 | data[6];
+			const auto components = std::size_t{ data[7] };
+			std::cerr << "\tcolor_bits=" << color_bits << '\n';
+			std::cerr << "\twidth=" << width << '\n';
+			std::cerr << "\theight=" << height << '\n';
+			std::cerr << "\tcomponents=" << components << '\n';
+			if (segment_size != 8 + 3 * components)
+				return false;
+			for (std::size_t i = 0; i < components; ++i)
 			{
-				if (!r.read(marker))
+				const auto id = int{ data[8 + 3 * i] };
+				const auto h = int{ data[8 + 3 * i + 1] } >> 4;
+				const auto v = int{ data[8 + 3 * i + 1] } & 0xf;
+				const auto qt = int{ data[8 + 3 * i + 2] };
+				std::cerr << "\t[" << id << "]\n";
+				std::cerr << "\t\th=" << h << '\n';
+				std::cerr << "\t\tv=" << v << '\n';
+				std::cerr << "\t\tqt=" << qt << '\n';
+			}
+			data += segment_size;
+			size -= segment_size;
+			return true;
+		};
+
+		const auto decode_sos = [&data, &size] {
+			if (size < 3)
+				return false;
+			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+			if (segment_size > size)
+				return false;
+			const auto components = std::size_t{ data[2] };
+			if (segment_size != 6 + 2 * components)
+				return false;
+			for (std::size_t i = 0; i < components; ++i)
+			{
+				const auto id = int{ data[3 + 2 * i] };
+				const auto dc = int{ data[3 + 2 * i + 1] } >> 4;
+				const auto ac = int{ data[3 + 2 * i + 1] } & 0xf;
+				std::cerr << "\t[" << id << "]\n";
+				std::cerr << "\t\tdc=" << dc << '\n';
+				std::cerr << "\t\tac=" << ac << '\n';
+			}
+			if (data[3 + 2 * components] != 0 || data[3 + 2 * components + 1] != 63 || data[3 + 2 * components + 2] != 0)
+				return false;
+			data += segment_size;
+			size -= segment_size;
+			std::cerr << "<NOT IMPLEMENTED>\n";
+			return false;
+		};
+
+		for (;;)
+		{
+			if (size < 2 || data[0] != 0xff)
+				return false;
+			const auto marker = data[1];
+			data += 2;
+			size -= 2;
+			switch (marker)
+			{
+			case SOF0:
+				std::cerr << "SOF0\n";
+				if (!decode_sof0())
 					return false;
-				switch (marker)
+				break;
+			case SOF2:
+				std::cerr << "SOF2\n";
+				if (!skip_segment())
+					return false;
+				break;
+			case DHT:
+				std::cerr << "DHT\n";
+				if (!skip_segment())
+					return false;
+				break;
+			case EOI:
+				std::cerr << "EOI\n";
+				return true;
+			case SOS:
+				std::cerr << "SOS\n";
+				if (!decode_sos())
+					return false;
+				break;
+			case DQT:
+				std::cerr << "DQT\n";
+				if (!skip_segment())
+					return false;
+				break;
+			case DRI:
+				std::cerr << "DRI\n";
+				if (!skip_segment())
+					return false;
+				break;
+			case COM:
+				std::cerr << "COM\n";
+				if (!skip_segment())
+					return false;
+				break;
+			default:
+				if ((marker & APP_mask) == APP)
 				{
-				case JpegMarker::Sof0:
-					std::cerr << "SOF0\n";
+					std::cerr << "APP" << (marker & APP_value) << '\n';
 					if (!skip_segment())
 						return false;
-					break;
-				case JpegMarker::Sof2:
-					std::cerr << "SOF2\n";
-					if (!skip_segment())
-						return false;
-					break;
-				case JpegMarker::Dht:
-					std::cerr << "DHT\n";
-					if (!skip_segment())
-						return false;
-					break;
-				case JpegMarker::Eoi:
-					std::cerr << "EOI\n";
-					return true;
-				case JpegMarker::Sos:
-					std::cerr << "SOS\n";
-					if (!skip_segment())
-						return false;
-					break;
-				case JpegMarker::Dqt:
-					std::cerr << "DQT\n";
-					if (!skip_segment())
-						return false;
-					break;
-				case JpegMarker::Dri:
-					std::cerr << "DRI\n";
-					if (!skip_segment())
-						return false;
-					break;
-				case JpegMarker::Com:
-					std::cerr << "COM\n";
-					if (!skip_segment())
-						return false;
-					break;
-				default:
-					if ((marker & JpegMarker::AppMask) == JpegMarker::App)
-					{
-						std::cerr << "APP" << static_cast<std::uint16_t>(marker & JpegMarker::AppValue) << '\n';
-						if (!skip_segment())
-							return false;
-					}
-					else if ((marker & JpegMarker::RstMask) == JpegMarker::Rst)
-						std::cerr << "RST" << static_cast<std::uint16_t>(marker & JpegMarker::RstValue) << '\n';
-					else
-					{
-						std::cerr << "Unknown marker 0x" << std::hex << std::setw(4) << std::setfill('0') << swap_bytes(static_cast<std::uint16_t>(marker))
-							<< " @ " << std::hex << r.offset() - 2 << '\n';
-						return false;
-					}
 				}
+				else if ((marker & RST_mask) == RST)
+					std::cerr << "RST" << (marker & RST_value) << '\n';
+				else
+					return false;
 			}
 		}
 	}
 #endif
+}
 
+namespace Yttrium
+{
 	bool read_jpeg(const Source& source, ImageInfo& info, Buffer& buffer)
 	{
 #ifndef NDEBUG
