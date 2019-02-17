@@ -42,9 +42,11 @@ namespace
 
 #ifndef NDEBUG
 	enum : std::uint8_t {
+		TEM = 0x01,       // Temporary.
 		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
 		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
 		DHT = 0xc4,       // Define-Huffman-Tables.
+		DAC = 0xcc,       // Define-Arithmetic-Coding.
 		RST = 0xd0,       // Restart (0-7).
 		RST_mask = 0xf8,  //
 		RST_value = 0x07, //
@@ -54,6 +56,8 @@ namespace
 		DQT = 0xdb,       // Defile-Quantization-Tables.
 		DNL = 0xdc,       // Define-Number-of-Lines.
 		DRI = 0xdd,       // Define-Restart-Interval.
+		DHP = 0xde,       //
+		EXP = 0xdf,       //
 		APP = 0xe0,       // Application (0-15).
 		APP_mask = 0xf0,  //
 		APP_value = 0x0f, //
@@ -82,6 +86,38 @@ namespace
 			if (segment_size > size)
 				return false;
 			std::cerr << '<' << segment_size << " bytes>\n";
+			data += segment_size;
+			size -= segment_size;
+			return true;
+		};
+
+		const auto decode_dht = [&data, &size] {
+			if (size < 2)
+				return false;
+			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+			if (segment_size > size || segment_size < 3)
+				return false;
+			const auto type = data[2] >> 4;
+			const auto id = data[2] & 0xf;
+			if (type > 1 || id > 1)
+				return false;
+			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
+			std::cerr << "\tid=" << id << '\n';
+			data += segment_size;
+			size -= segment_size;
+			return true;
+		};
+
+		const auto decode_dqt = [&data, &size] {
+			if (size < 67)
+				return false;
+			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+			if (segment_size != 67)
+				return false;
+			const auto id = int{ data[2] };
+			if (id > 3)
+				return false;
+			std::cerr << "\tid=" << id << '\n';
 			data += segment_size;
 			size -= segment_size;
 			return true;
@@ -166,7 +202,7 @@ namespace
 				break;
 			case DHT:
 				std::cerr << "DHT\n";
-				if (!skip_segment())
+				if (!decode_dht())
 					return false;
 				break;
 			case EOI:
@@ -179,7 +215,7 @@ namespace
 				break;
 			case DQT:
 				std::cerr << "DQT\n";
-				if (!skip_segment())
+				if (!decode_dqt())
 					return false;
 				break;
 			case DRI:
