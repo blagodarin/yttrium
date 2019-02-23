@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_audio_streamer_h_
-#define _src_audio_streamer_h_
+#pragma once
 
 #include <yttrium/memory/buffer.h>
 
@@ -41,5 +40,3 @@ namespace Yttrium
 		Buffer _buffer;
 	};
 }
-
-#endif

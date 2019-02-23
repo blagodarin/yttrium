@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_memory_buffer_memory_tracker_h_
-#define _src_memory_buffer_memory_tracker_h_
+#pragma once
 
 #if !Y_ENABLE_BUFFER_MEMORY_TRACKING
 #	error Buffer memory tracking is disabled.
@@ -110,5 +109,3 @@ namespace Yttrium
 
 	extern Y_CORE_API BufferMemoryTracker _buffer_memory_tracker;
 }
-
-#endif

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _libs_yttrium_utils_string_h_
-#define _libs_yttrium_utils_string_h_
+#pragma once
 
 #include <yttrium/api.h>
 
@@ -35,5 +34,3 @@ namespace Yttrium
 
 	Y_CORE_API int time_from_chars(std::string_view) noexcept;
 }
-
-#endif

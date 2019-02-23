@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_renderer_debug_renderer_h_
-#define _src_renderer_debug_renderer_h_
+#pragma once
 
 #include <yttrium/math/color.h>
 #include <yttrium/renderer/modifiers.h>
@@ -44,5 +43,3 @@ namespace Yttrium
 		PushTexture _texture;
 	};
 }
-
-#endif

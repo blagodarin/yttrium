@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_memory_buffer_memory_h_
-#define _src_memory_buffer_memory_h_
+#pragma once
 
 #include <mutex>
 
@@ -49,5 +48,3 @@ namespace Yttrium
 
 	extern BufferMemory _buffer_memory;
 }
-
-#endif

@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_renderer_texture_h_
-#define _src_renderer_texture_h_
+#pragma once
 
 #include <yttrium/renderer/texture.h>
 
@@ -44,5 +43,3 @@ namespace Yttrium
 		const bool _has_mipmaps;
 	};
 }
-
-#endif

@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _src_renderer_gl_texture_h_
-#define _src_renderer_gl_texture_h_
+#pragma once
 
 #include <yttrium/utils/flags.h>
 
@@ -35,5 +34,3 @@ namespace Yttrium
 		const GlTextureHandle _texture;
 	};
 }
-
-#endif
