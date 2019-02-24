@@ -18,6 +18,7 @@
 
 #include <yttrium/key.h>
 #include <yttrium/math/size.h>
+#include <yttrium/utils/numeric.h>
 #include "../../utf8.h"
 #include "error.h"
 

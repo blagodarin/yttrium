@@ -22,7 +22,6 @@
 
 #include <yttrium/api.h>
 #include <yttrium/utils/flags.h>
-#include <yttrium/utils/numeric.h>
 
 namespace Yttrium
 {
@@ -199,12 +198,7 @@ namespace Yttrium
 		WheelRight = 0x8F,
 
 		// - Unassigned keys (0x90 - 0xFF).
-
-		__Count,
 	};
-
-	/// Number of keys defined.
-	constexpr auto KeyCount = to_underlying(Key::__Count);
 
 	/// %Key event.
 	class Y_ENGINE_API KeyEvent

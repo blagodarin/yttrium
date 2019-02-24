@@ -20,6 +20,7 @@
 #include "application.h"
 
 #include <optional>
+#include <vector>
 
 namespace Yttrium
 {
@@ -54,6 +55,8 @@ namespace Yttrium
 		class EmptyCursor;
 		class Keyboard;
 
+		using P_Event = UniquePtr<xcb_generic_event_t, std::free>;
+
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
 		P_Atom _wm_protocols{ make_atom("WM_PROTOCOLS") };
@@ -62,5 +65,6 @@ namespace Yttrium
 		xcb_window_t _window = XCB_WINDOW_NONE;
 		std::unique_ptr<EmptyCursor> _empty_cursor;
 		std::optional<Size> _size;
+		std::vector<P_Event> _events;
 	};
 }

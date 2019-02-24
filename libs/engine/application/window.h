@@ -42,7 +42,7 @@ namespace Yttrium
 
 	private:
 		void on_focus_event(bool is_focused) override;
-		void on_key_event(Key, bool pressed, const std::optional<bool>& autorepeat, Flags<KeyEvent::Modifier>) override;
+		void on_key_event(Key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier>) override;
 		void on_resize_event(const Size&) override;
 		void on_text_input(std::string_view) override;
 
@@ -60,7 +60,6 @@ namespace Yttrium
 		Point _cursor;
 		bool _is_cursor_locked = false;
 		Size _size;
-		bool _keys[KeyCount] = {};
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;
 		std::function<void(const KeyEvent&)> _on_key_event;

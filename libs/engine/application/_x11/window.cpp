@@ -126,6 +126,45 @@ namespace Yttrium
 
 	bool WindowBackend::process_events()
 	{
+		const auto check_autorepeat = [this](const ::XEvent& event) {
+			struct Query
+			{
+				const ::XEvent& _event;
+				bool _matched = false;
+
+				static Bool match(::Display*, ::XEvent* next, ::XPointer pointer) noexcept
+				{
+					const auto query = reinterpret_cast<Query*>(pointer);
+					if (next->type == KeyPress
+						&& next->xkey.window == query->_event.xkey.window
+						&& next->xkey.time == query->_event.xkey.time
+						&& next->xkey.state == query->_event.xkey.state
+						&& next->xkey.keycode == query->_event.xkey.keycode)
+						query->_matched = true;
+					return False;
+				}
+			};
+
+			Query query{ event };
+			::XEvent dummy;
+			if (::XPending(_application.display()) > 0)
+				::XCheckIfEvent(_application.display(), &dummy, &Query::match, reinterpret_cast<::XPointer>(&query));
+			return query._matched;
+		};
+
+		const auto do_key_event = [this](Key key, bool pressed, bool autorepeat, unsigned state) {
+			if (key == Key::Null)
+				return;
+			Flags<KeyEvent::Modifier> modifiers;
+			if (state & ShiftMask)
+				modifiers |= KeyEvent::Modifier::Shift;
+			if (state & ControlMask)
+				modifiers |= KeyEvent::Modifier::Control;
+			if (state & Mod1Mask)
+				modifiers |= KeyEvent::Modifier::Alt;
+			_callbacks.on_key_event(key, pressed, autorepeat, modifiers);
+		};
+
 		if (!_window)
 			return false;
 		while (!_size || ::XPending(_application.display()) > 0)
@@ -137,19 +176,7 @@ namespace Yttrium
 			switch (event.type)
 			{
 			case KeyPress:
-			case KeyRelease:
-				if (const auto key = map_linux_key_code(static_cast<std::uint8_t>(event.xkey.keycode)); key != Key::Null)
-				{
-					Flags<KeyEvent::Modifier> modifiers;
-					if (event.xkey.state & ShiftMask)
-						modifiers |= KeyEvent::Modifier::Shift;
-					if (event.xkey.state & ControlMask)
-						modifiers |= KeyEvent::Modifier::Control;
-					if (event.xkey.state & Mod1Mask)
-						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event.type == KeyPress, {}, modifiers);
-				}
-				if (event.type == KeyPress)
+				do_key_event(map_linux_key_code(static_cast<std::uint8_t>(event.xkey.keycode)), true, std::exchange(_pending_autorepeat, false), event.xkey.state);
 				{
 					std::array<char, 32> buffer{};
 					::KeySym keysym = NoSymbol;
@@ -160,19 +187,15 @@ namespace Yttrium
 				}
 				break;
 
+			case KeyRelease:
+				_pending_autorepeat = check_autorepeat(event);
+				if (!_pending_autorepeat)
+					do_key_event(map_linux_key_code(static_cast<std::uint8_t>(event.xkey.keycode)), false, false, event.xkey.state);
+				break;
+
 			case ButtonPress:
 			case ButtonRelease:
-				if (const auto key = ::button_from_event(event.xbutton); key != Key::Null)
-				{
-					Flags<KeyEvent::Modifier> modifiers;
-					if (event.xbutton.state & ShiftMask)
-						modifiers |= KeyEvent::Modifier::Shift;
-					if (event.xbutton.state & ControlMask)
-						modifiers |= KeyEvent::Modifier::Control;
-					if (event.xbutton.state & Mod1Mask)
-						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event.type == ButtonPress, {}, modifiers);
-				}
+				do_key_event(::button_from_event(event.xbutton), event.type == ButtonPress, false, event.xbutton.state);
 				break;
 
 			case FocusIn:

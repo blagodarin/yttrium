@@ -17,6 +17,7 @@
 #include "window.h"
 
 #include <yttrium/image.h>
+#include <yttrium/utils/numeric.h>
 #include "../key_codes.h"
 #include "../window_callbacks.h"
 
@@ -243,74 +244,89 @@ namespace Yttrium
 
 	bool WindowBackend::process_events()
 	{
+		const auto do_key_event = [this](Key key, bool pressed, bool autorepeat, std::uint16_t state) {
+			if (key == Key::Null)
+				return;
+			Flags<KeyEvent::Modifier> modifiers;
+			if (state & XCB_MOD_MASK_SHIFT)
+				modifiers |= KeyEvent::Modifier::Shift;
+			if (state & XCB_MOD_MASK_CONTROL)
+				modifiers |= KeyEvent::Modifier::Control;
+			if (state & XCB_MOD_MASK_1)
+				modifiers |= KeyEvent::Modifier::Alt;
+			_callbacks.on_key_event(key, pressed, autorepeat, modifiers);
+		};
+
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-
-		for (;;)
+		_events.clear();
+		for (bool blocking = !_size; P_Event event{ blocking ? ::xcb_wait_for_event(_application.connection()) : ::xcb_poll_for_event(_application.connection()) };)
 		{
-			const UniquePtr<xcb_generic_event_t, std::free> event{ _size ? ::xcb_poll_for_event(_application.connection()) : ::xcb_wait_for_event(_application.connection()) };
-			if (!event)
-				return !::xcb_connection_has_error(_application.connection());
-
-			switch (const auto event_type = event->response_type & 0x7f)
+			event->response_type &= 0x7f;
+			if (blocking && event->response_type == XCB_CONFIGURE_NOTIFY)
+				blocking = false;
+			_events.emplace_back(std::move(event));
+		}
+		if (::xcb_connection_has_error(_application.connection()))
+			return false;
+		bool pending_autorepeat = false;
+		for (std::size_t i = 0; i < _events.size(); ++i)
+		{
+			const auto* const event = _events[i].get();
+			switch (event->response_type)
 			{
 			case XCB_KEY_PRESS:
+			{
+				const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event);
+				do_key_event(map_linux_key_code(e->detail), true, std::exchange(pending_autorepeat, false), e->state);
+				const auto text = _keyboard->keycode_to_text(e->detail);
+				if (!text.empty())
+					_callbacks.on_text_input(text);
+			}
+			break;
+
 			case XCB_KEY_RELEASE:
 			{
-				const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event.get());
-				if (const auto key = map_linux_key_code(e->detail); key != Key::Null)
-				{
-					Flags<KeyEvent::Modifier> modifiers;
-					if (e->state & XCB_MOD_MASK_SHIFT)
-						modifiers |= KeyEvent::Modifier::Shift;
-					if (e->state & XCB_MOD_MASK_CONTROL)
-						modifiers |= KeyEvent::Modifier::Control;
-					if (e->state & XCB_MOD_MASK_1)
-						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event_type == XCB_KEY_PRESS, {}, modifiers);
-				}
-				if (event_type == XCB_KEY_PRESS)
-				{
-					const auto text = _keyboard->keycode_to_text(e->detail);
-					if (!text.empty())
-						_callbacks.on_text_input(text);
-				}
+				const auto e = reinterpret_cast<const xcb_key_release_event_t*>(event);
+				if (i + 1 < _events.size() && _events[i + 1]->response_type == XCB_KEY_PRESS)
+					if (const auto n = reinterpret_cast<const xcb_key_press_event_t*>(_events[i + 1].get()); n->detail == e->detail && n->time == e->time && n->event == e->event && n->state == e->state)
+					{
+						pending_autorepeat = true;
+						break;
+					}
+				do_key_event(map_linux_key_code(e->detail), false, false, e->state);
 			}
 			break;
 
 			case XCB_BUTTON_PRESS:
+			{
+				const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event);
+				do_key_event(::key_from_button(e->detail), true, false, e->state);
+			}
+			break;
+
 			case XCB_BUTTON_RELEASE:
 			{
-				const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event.get());
-				if (const auto key = ::key_from_button(e->detail); key != Key::Null)
-				{
-					Flags<KeyEvent::Modifier> modifiers;
-					if (e->state & XCB_KEY_BUT_MASK_SHIFT)
-						modifiers |= KeyEvent::Modifier::Shift;
-					if (e->state & XCB_KEY_BUT_MASK_CONTROL)
-						modifiers |= KeyEvent::Modifier::Control;
-					if (e->state & XCB_KEY_BUT_MASK_MOD_1)
-						modifiers |= KeyEvent::Modifier::Alt;
-					_callbacks.on_key_event(key, event_type == XCB_BUTTON_PRESS, {}, modifiers);
-				}
+				const auto e = reinterpret_cast<const xcb_button_release_event_t*>(event);
+				do_key_event(::key_from_button(e->detail), false, false, e->state);
 			}
 			break;
 
 			case XCB_FOCUS_IN:
 			case XCB_FOCUS_OUT:
-				_callbacks.on_focus_event(event_type == XCB_FOCUS_IN);
+				_callbacks.on_focus_event(event->response_type == XCB_FOCUS_IN);
 				break;
 
 			case XCB_CONFIGURE_NOTIFY:
 			{
-				const auto e = reinterpret_cast<const xcb_configure_notify_event_t*>(event.get());
+				const auto e = reinterpret_cast<const xcb_configure_notify_event_t*>(event);
 				_size.emplace(e->width, e->height);
 			}
 				_callbacks.on_resize_event(*_size);
 				break;
 
 			case XCB_CLIENT_MESSAGE:
-				if (const auto e = reinterpret_cast<xcb_client_message_event_t*>(event.get());
+				if (const auto e = reinterpret_cast<const xcb_client_message_event_t*>(event);
 					e->type == _wm_protocols->atom && e->data.data32[0] == _wm_delete_window->atom)
 				{
 					close();
@@ -319,9 +335,10 @@ namespace Yttrium
 				break;
 
 			default:
-				_keyboard->process_event(event_type, event.get());
+				_keyboard->process_event(event->response_type, event);
 			}
 		}
+		return true;
 	}
 
 	bool WindowBackend::set_cursor(const Point& cursor)

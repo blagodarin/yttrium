@@ -84,17 +84,10 @@ namespace Yttrium
 		set_active(is_focused);
 	}
 
-	void WindowPrivate::on_key_event(Key key, bool pressed, const std::optional<bool>& autorepeat, Flags<KeyEvent::Modifier> modifiers)
+	void WindowPrivate::on_key_event(Key key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier> modifiers)
 	{
-		bool& was_pressed = _keys[to_underlying(key)];
-
-		KeyEvent event(key, pressed, autorepeat ? *autorepeat : pressed && was_pressed);
-
-		if (key != Key::WheelUp && key != Key::WheelDown && key != Key::WheelLeft && key != Key::WheelRight)
-			was_pressed = pressed;
-
+		KeyEvent event{ key, pressed, autorepeat };
 		event._modifiers = modifiers;
-
 		if (_on_key_event)
 			_on_key_event(event);
 	}
