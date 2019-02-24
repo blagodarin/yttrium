@@ -64,184 +64,215 @@ namespace
 		COM = 0xfe,       // Comment.
 	};
 
-	bool scan_jpeg(const Yttrium::Source& source)
+	class JpegDecoder
 	{
-		const auto buffer = source.to_buffer();
-
-		auto data = buffer.begin();
-		auto size = buffer.size();
-
-		if (size < 2 || data[0] != 0xff || data[1] != SOI)
-			return false;
-
-		std::cerr << "SOI\n";
-
-		data += 2;
-		size -= 2;
-
-		const auto skip_segment = [&data, &size] {
-			if (size < 2)
+	public:
+		bool decode(const std::uint8_t* data, std::size_t size)
+		{
+			if (!decode_jpeg(data, size))
+			{
+				std::cerr << "<ERROR>\n";
 				return false;
-			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
-			if (segment_size > size)
-				return false;
-			std::cerr << '<' << segment_size << " bytes>\n";
-			data += segment_size;
-			size -= segment_size;
+			}
+			// TODO: Convert the loaded image to BGRA.
 			return true;
-		};
+		}
 
-		const auto decode_dht = [&data, &size] {
+	private:
+		std::size_t skip_segment(const std::uint8_t* data, const std::size_t size)
+		{
 			if (size < 2)
-				return false;
-			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+				return 0;
+			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
+			if (segment_size > size)
+				return 0;
+			std::cerr << "\t<" << segment_size << " bytes>\n";
+			return segment_size;
+		}
+
+		std::size_t decode_app(int type, const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "APP" << type << "\n";
+			return skip_segment(data, size);
+		}
+
+		std::size_t decode_com(const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "COM\n";
+			return skip_segment(data, size);
+		}
+
+		std::size_t decode_dht(const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "DHT\n";
+			if (size < 2)
+				return 0;
+			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
 			if (segment_size > size || segment_size < 3)
-				return false;
+				return 0;
 			const auto type = data[2] >> 4;
 			const auto id = data[2] & 0xf;
 			if (type > 1 || id > 1)
-				return false;
+				return 0;
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
 			std::cerr << "\tid=" << id << '\n';
-			data += segment_size;
-			size -= segment_size;
-			return true;
-		};
+			return segment_size;
+		}
 
-		const auto decode_dqt = [&data, &size] {
+		std::size_t decode_dqt(const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "DQT\n";
 			if (size < 67)
-				return false;
-			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+				return 0;
+			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
 			if (segment_size != 67)
-				return false;
-			const auto id = int{ data[2] };
-			if (id > 3)
-				return false;
-			std::cerr << "\tid=" << id << '\n';
-			data += segment_size;
-			size -= segment_size;
-			return true;
-		};
+				return 0;
+			const auto id = data[2];
+			if (id > 1)
+				return 0;
+			for (std::size_t i = 0; i < 64; ++i)
+				_quantization_tables[id][_dezigzag_table[i]] = data[3 + i];
+			std::cerr << "\tid=" << int{ id } << '\n';
+			std::cerr << "\tqt=\n";
+			for (int i = 0; i < 8; ++i)
+			{
+				std::cerr << '\t';
+				for  (int j = 0; j < 8; ++j)
+					std::cerr << '\t' << int{ _quantization_tables[id][i * 8 + j] };
+				std::cerr << '\n';
+			}
+			return segment_size;
+		}
 
-		const auto decode_sof0 = [&data, &size] {
+		std::size_t decode_dri(const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "DRI\n";
+			return skip_segment(data, size);
+		}
+
+		std::size_t decode_sof0(const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "SOF0\n";
 			if (size < 2)
-				return false;
-			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+				return 0;
+			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
 			if (segment_size > size || segment_size < 8)
-				return false;
-			const auto color_bits = int{ data[2] };
+				return 0;
+			const auto color_bits = data[2];
 			const auto width = data[3] << 8 | data[4];
 			const auto height = data[5] << 8 | data[6];
 			const auto components = std::size_t{ data[7] };
-			std::cerr << "\tcolor_bits=" << color_bits << '\n';
+			if (segment_size != 8 + 3 * components)
+				return 0;
+			std::cerr << "\tcolor_bits=" << int{ color_bits } << '\n';
 			std::cerr << "\twidth=" << width << '\n';
 			std::cerr << "\theight=" << height << '\n';
 			std::cerr << "\tcomponents=" << components << '\n';
-			if (segment_size != 8 + 3 * components)
-				return false;
 			for (std::size_t i = 0; i < components; ++i)
 			{
-				const auto id = int{ data[8 + 3 * i] };
-				const auto h = int{ data[8 + 3 * i + 1] } >> 4;
-				const auto v = int{ data[8 + 3 * i + 1] } & 0xf;
-				const auto qt = int{ data[8 + 3 * i + 2] };
-				std::cerr << "\t[" << id << "]\n";
+				const auto id = data[8 + 3 * i];
+				const auto h = data[8 + 3 * i + 1] >> 4;
+				const auto v = data[8 + 3 * i + 1] & 0xf;
+				const auto qt = data[8 + 3 * i + 2];
+				std::cerr << "\t[" << int{ id } << "]\n";
 				std::cerr << "\t\th=" << h << '\n';
 				std::cerr << "\t\tv=" << v << '\n';
-				std::cerr << "\t\tqt=" << qt << '\n';
+				std::cerr << "\t\tqt=" << int{ qt } << '\n';
 			}
-			data += segment_size;
-			size -= segment_size;
-			return true;
-		};
+			return segment_size;
+		}
 
-		const auto decode_sos = [&data, &size] {
+		std::size_t decode_sos(const std::uint8_t* data, const std::size_t size)
+		{
+			std::cerr << "SOS\n";
 			if (size < 3)
-				return false;
-			const auto segment_size = static_cast<std::size_t>(data[0] << 8 | data[1]);
+				return 0;
+			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
 			if (segment_size > size)
-				return false;
+				return 0;
 			const auto components = std::size_t{ data[2] };
 			if (segment_size != 6 + 2 * components)
-				return false;
+				return 0;
 			for (std::size_t i = 0; i < components; ++i)
 			{
-				const auto id = int{ data[3 + 2 * i] };
-				const auto dc = int{ data[3 + 2 * i + 1] } >> 4;
-				const auto ac = int{ data[3 + 2 * i + 1] } & 0xf;
-				std::cerr << "\t[" << id << "]\n";
+				const auto id = data[3 + 2 * i];
+				const auto dc = data[3 + 2 * i + 1] >> 4;
+				const auto ac = data[3 + 2 * i + 1] & 0xf;
+				std::cerr << "\t[" << int{ id } << "]\n";
 				std::cerr << "\t\tdc=" << dc << '\n';
 				std::cerr << "\t\tac=" << ac << '\n';
 			}
 			if (data[3 + 2 * components] != 0 || data[3 + 2 * components + 1] != 63 || data[3 + 2 * components + 2] != 0)
-				return false;
-			data += segment_size;
-			size -= segment_size;
-			std::cerr << "<NOT IMPLEMENTED>\n";
-			return false;
-		};
+				return 0;
+			const auto payload_size = decode_payload(data + segment_size, size - segment_size);
+			if (!payload_size)
+				return 0;
+			return segment_size + payload_size;
+		}
 
-		for (;;)
+		std::size_t decode_payload(const std::uint8_t*, std::size_t)
 		{
-			if (size < 2 || data[0] != 0xff)
-				return false;
-			const auto marker = data[1];
-			data += 2;
-			size -= 2;
+			std::cerr << "<NOT IMPLEMENTED>\n";
+			return 0;
+		}
+
+		std::size_t decode_segment(std::uint8_t marker, const std::uint8_t* data, std::size_t size)
+		{
 			switch (marker)
 			{
-			case SOF0:
-				std::cerr << "SOF0\n";
-				if (!decode_sof0())
-					return false;
-				break;
-			case SOF2:
-				std::cerr << "SOF2\n";
-				if (!skip_segment())
-					return false;
-				break;
-			case DHT:
-				std::cerr << "DHT\n";
-				if (!decode_dht())
-					return false;
-				break;
-			case EOI:
-				std::cerr << "EOI\n";
-				return true;
-			case SOS:
-				std::cerr << "SOS\n";
-				if (!decode_sos())
-					return false;
-				break;
-			case DQT:
-				std::cerr << "DQT\n";
-				if (!decode_dqt())
-					return false;
-				break;
-			case DRI:
-				std::cerr << "DRI\n";
-				if (!skip_segment())
-					return false;
-				break;
-			case COM:
-				std::cerr << "COM\n";
-				if (!skip_segment())
-					return false;
-				break;
+			case SOF0: return decode_sof0(data, size);
+			case DHT: return decode_dht(data, size);
+			case SOS: return decode_sos(data, size);
+			case DQT: return decode_dqt(data, size);
+			case DRI: return decode_dri(data, size);
+			case COM: return decode_com(data, size);
 			default:
 				if ((marker & APP_mask) == APP)
-				{
-					std::cerr << "APP" << (marker & APP_value) << '\n';
-					if (!skip_segment())
-						return false;
-				}
-				else if ((marker & RST_mask) == RST)
-					std::cerr << "RST" << (marker & RST_value) << '\n';
-				else
-					return false;
+					return decode_app(marker & APP_value, data, size);
+				return 0;
 			}
 		}
-	}
+
+		bool decode_jpeg(const std::uint8_t* data, std::size_t size)
+		{
+			if (size < 2 || data[0] != 0xff || data[1] != SOI)
+				return false;
+			data += 2;
+			size -= 2;
+			while (size > 0)
+			{
+				if (size < 2 || data[0] != 0xff)
+					return false;
+				const auto marker = data[1];
+				if (marker == EOI)
+					return true; // TODO: Return false if the buffer hasn't been decoded.
+				data += 2;
+				size -= 2;
+				const auto segment_size = decode_segment(marker, data, size);
+				if (!segment_size)
+					return false; // TODO: Return true if the buffer has been decoded.
+				data += segment_size;
+				size -= segment_size;
+			}
+			return false;
+		}
+
+	private:
+		std::uint8_t _quantization_tables[2][64];
+
+		static const std::uint8_t _dezigzag_table[64];
+	};
+
+	const std::uint8_t JpegDecoder::_dezigzag_table[64]{
+		0, 1, 8, 16, 9, 2, 3, 10,
+		17, 24, 32, 25, 18, 11, 4, 5,
+		12, 19, 26, 33, 40, 48, 41, 34,
+		27, 20, 13, 6, 7, 14, 21, 28,
+		35, 42, 49, 56, 57, 50, 43, 36,
+		29, 22, 15, 23, 30, 37, 44, 51,
+		58, 59, 52, 45, 38, 31, 39, 46,
+		53, 60, 61, 54, 47, 55, 62, 63
+	};
 #endif
 }
 
@@ -250,8 +281,10 @@ namespace Yttrium
 	bool read_jpeg(const Source& source, ImageInfo& info, Buffer& buffer)
 	{
 #ifndef NDEBUG
-		if (!scan_jpeg(source))
-			std::cerr << "<ERROR>\n";
+		{
+			const auto jpeg = source.to_buffer();
+			JpegDecoder{}.decode(jpeg.begin(), jpeg.size());
+		}
 #endif
 
 		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
