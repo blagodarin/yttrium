@@ -92,36 +92,57 @@ namespace
 
 		std::size_t decode_app(int type, const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "APP" << type << "\n";
+			std::cerr << "APP" << type << ":\n";
 			return skip_segment(data, size);
 		}
 
 		std::size_t decode_com(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "COM\n";
+			std::cerr << "COM:\n";
 			return skip_segment(data, size);
 		}
 
 		std::size_t decode_dht(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "DHT\n";
+			std::cerr << "DHT:\n";
 			if (size < 2)
 				return 0;
 			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
-			if (segment_size > size || segment_size < 3)
+			if (segment_size > size || segment_size < 19)
 				return 0;
 			const auto type = data[2] >> 4;
 			const auto id = data[2] & 0xf;
 			if (type > 1 || id > 1)
 				return 0;
+			const std::uint8_t* bits = data + 3;
+			std::size_t length = 0;
+			for (std::size_t i = 0; i < 16; ++i)
+				length += bits[i];
+			if (segment_size != 19 + length)
+				return 0;
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
 			std::cerr << "\tid=" << id << '\n';
+			std::cerr << "\tbits";
+			for (std::size_t i = 0; i < 16; ++i)
+				std::cerr << (i ? ',' : '=') << int{ bits[i] };
+			std::cerr << '\n';
+			auto huffman_values = bits + 16;
+			for (std::size_t i = 0; i < 16; ++i)
+			{
+				if (!bits[i])
+					continue;
+				std::cerr << '\t';
+				for (std::size_t j = 0; j < bits[i]; ++j)
+					std::cerr << (j ? ',' : '\t') << int{ huffman_values[j] };
+				huffman_values += bits[i];
+				std::cerr << '\n';
+			}
 			return segment_size;
 		}
 
 		std::size_t decode_dqt(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "DQT\n";
+			std::cerr << "DQT:\n";
 			if (size < 67)
 				return 0;
 			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
@@ -133,7 +154,7 @@ namespace
 			for (std::size_t i = 0; i < 64; ++i)
 				_quantization_tables[id][_dezigzag_table[i]] = data[3 + i];
 			std::cerr << "\tid=" << int{ id } << '\n';
-			std::cerr << "\tqt=\n";
+			std::cerr << "\tqt:\n";
 			for (int i = 0; i < 8; ++i)
 			{
 				std::cerr << '\t';
@@ -152,7 +173,7 @@ namespace
 
 		std::size_t decode_sof0(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "SOF0\n";
+			std::cerr << "SOF0:\n";
 			if (size < 2)
 				return 0;
 			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
@@ -174,17 +195,17 @@ namespace
 				const auto h = data[8 + 3 * i + 1] >> 4;
 				const auto v = data[8 + 3 * i + 1] & 0xf;
 				const auto qt = data[8 + 3 * i + 2];
-				std::cerr << "\t[" << int{ id } << "]\n";
-				std::cerr << "\t\th=" << h << '\n';
-				std::cerr << "\t\tv=" << v << '\n';
-				std::cerr << "\t\tqt=" << int{ qt } << '\n';
+				std::cerr << "\t\t" << int{ id } << ":\n";
+				std::cerr << "\t\t\th=" << h << '\n';
+				std::cerr << "\t\t\tv=" << v << '\n';
+				std::cerr << "\t\t\tqt=" << int{ qt } << '\n';
 			}
 			return segment_size;
 		}
 
 		std::size_t decode_sos(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "SOS\n";
+			std::cerr << "SOS:\n";
 			if (size < 3)
 				return 0;
 			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
@@ -198,7 +219,7 @@ namespace
 				const auto id = data[3 + 2 * i];
 				const auto dc = data[3 + 2 * i + 1] >> 4;
 				const auto ac = data[3 + 2 * i + 1] & 0xf;
-				std::cerr << "\t[" << int{ id } << "]\n";
+				std::cerr << '\t' << int{ id } << ":\n";
 				std::cerr << "\t\tdc=" << dc << '\n';
 				std::cerr << "\t\tac=" << ac << '\n';
 			}
