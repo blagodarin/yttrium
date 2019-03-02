@@ -79,35 +79,26 @@ namespace
 		}
 
 	private:
+		static constexpr auto u16(const std::uint8_t* data) noexcept
+		{
+			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
+		}
+
 		std::size_t skip_segment(const std::uint8_t* data, const std::size_t size)
 		{
 			if (size < 2)
 				return 0;
-			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
+			const auto segment_size = u16(data);
 			if (segment_size > size)
 				return 0;
-			std::cerr << "\t<" << segment_size << " bytes>\n";
 			return segment_size;
-		}
-
-		std::size_t decode_app(int type, const std::uint8_t* data, const std::size_t size)
-		{
-			std::cerr << "APP" << type << ":\n";
-			return skip_segment(data, size);
-		}
-
-		std::size_t decode_com(const std::uint8_t* data, const std::size_t size)
-		{
-			std::cerr << "COM:\n";
-			return skip_segment(data, size);
 		}
 
 		std::size_t decode_dht(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "DHT:\n";
 			if (size < 2)
 				return 0;
-			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
+			const auto segment_size = u16(data);
 			if (segment_size > size || segment_size < 19)
 				return 0;
 			const auto type = data[2] >> 4;
@@ -120,6 +111,7 @@ namespace
 				length += bits[i];
 			if (segment_size != 19 + length)
 				return 0;
+			std::cerr << "DHT:\n";
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
 			std::cerr << "\tid=" << id << '\n';
 			std::cerr << "\tbits";
@@ -142,10 +134,9 @@ namespace
 
 		std::size_t decode_dqt(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "DQT:\n";
 			if (size < 67)
 				return 0;
-			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
+			const auto segment_size = u16(data);
 			if (segment_size != 67)
 				return 0;
 			const auto id = data[2];
@@ -153,105 +144,77 @@ namespace
 				return 0;
 			for (std::size_t i = 0; i < 64; ++i)
 				_quantization_tables[id][_dezigzag_table[i]] = data[3 + i];
-			std::cerr << "\tid=" << int{ id } << '\n';
-			std::cerr << "\tqt:\n";
-			for (int i = 0; i < 8; ++i)
-			{
-				std::cerr << '\t';
-				for  (int j = 0; j < 8; ++j)
-					std::cerr << '\t' << int{ _quantization_tables[id][i * 8 + j] };
-				std::cerr << '\n';
-			}
 			return segment_size;
 		}
 
 		std::size_t decode_dri(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "DRI\n";
-			return skip_segment(data, size);
+			if (size < 4)
+				return 0;
+			const auto segment_size = u16(data);
+			if (segment_size != 4)
+				return 0;
+			_restart_interval = u16(data + 2);
+			return segment_size;
 		}
 
 		std::size_t decode_sof0(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "SOF0:\n";
 			if (size < 2)
 				return 0;
-			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
+			const auto segment_size = u16(data);
 			if (segment_size > size || segment_size < 8)
 				return 0;
 			const auto color_bits = data[2];
-			const auto width = data[3] << 8 | data[4];
-			const auto height = data[5] << 8 | data[6];
+			_width = u16(data + 3);
+			_height = u16(data + 5);
 			const auto components = std::size_t{ data[7] };
-			if (segment_size != 8 + 3 * components)
+			if (color_bits != 8 || !_width || !_height || components != 3 || segment_size != 8 + 3 * components)
 				return 0;
-			std::cerr << "\tcolor_bits=" << int{ color_bits } << '\n';
-			std::cerr << "\twidth=" << width << '\n';
-			std::cerr << "\theight=" << height << '\n';
-			std::cerr << "\tcomponents=" << components << '\n';
 			for (std::size_t i = 0; i < components; ++i)
 			{
 				const auto id = data[8 + 3 * i];
 				const auto h = data[8 + 3 * i + 1] >> 4;
 				const auto v = data[8 + 3 * i + 1] & 0xf;
 				const auto qt = data[8 + 3 * i + 2];
-				std::cerr << "\t\t" << int{ id } << ":\n";
-				std::cerr << "\t\t\th=" << h << '\n';
-				std::cerr << "\t\t\tv=" << v << '\n';
-				std::cerr << "\t\t\tqt=" << int{ qt } << '\n';
+				if (id != i + 1 || h != (i > 0 ? 1 : 2) || v != h || qt > 1)
+					return 0;
+				_components[i]._quantization_table = _quantization_tables[qt];
 			}
 			return segment_size;
 		}
 
 		std::size_t decode_sos(const std::uint8_t* data, const std::size_t size)
 		{
-			std::cerr << "SOS:\n";
 			if (size < 3)
 				return 0;
-			const auto segment_size = static_cast<std::uint16_t>(data[0] << 8 | data[1]);
+			const auto segment_size = u16(data);
 			if (segment_size > size)
 				return 0;
 			const auto components = std::size_t{ data[2] };
-			if (segment_size != 6 + 2 * components)
+			if (components != 3 || segment_size != 6 + 2 * components)
 				return 0;
 			for (std::size_t i = 0; i < components; ++i)
 			{
 				const auto id = data[3 + 2 * i];
 				const auto dc = data[3 + 2 * i + 1] >> 4;
 				const auto ac = data[3 + 2 * i + 1] & 0xf;
-				std::cerr << '\t' << int{ id } << ":\n";
-				std::cerr << "\t\tdc=" << dc << '\n';
-				std::cerr << "\t\tac=" << ac << '\n';
+				if (id != i + 1 || dc > 1 || ac > 1)
+					return 0;
+				// TODO: Setup Huffman tables.
 			}
 			if (data[3 + 2 * components] != 0 || data[3 + 2 * components + 1] != 63 || data[3 + 2 * components + 2] != 0)
 				return 0;
 			const auto payload_size = decode_payload(data + segment_size, size - segment_size);
 			if (!payload_size)
 				return 0;
-			return segment_size + payload_size;
+			return segment_size;
 		}
 
 		std::size_t decode_payload(const std::uint8_t*, std::size_t)
 		{
 			std::cerr << "<NOT IMPLEMENTED>\n";
 			return 0;
-		}
-
-		std::size_t decode_segment(std::uint8_t marker, const std::uint8_t* data, std::size_t size)
-		{
-			switch (marker)
-			{
-			case SOF0: return decode_sof0(data, size);
-			case DHT: return decode_dht(data, size);
-			case SOS: return decode_sos(data, size);
-			case DQT: return decode_dqt(data, size);
-			case DRI: return decode_dri(data, size);
-			case COM: return decode_com(data, size);
-			default:
-				if ((marker & APP_mask) == APP)
-					return decode_app(marker & APP_value, data, size);
-				return 0;
-			}
 		}
 
 		bool decode_jpeg(const std::uint8_t* data, std::size_t size)
@@ -265,13 +228,23 @@ namespace
 				if (size < 2 || data[0] != 0xff)
 					return false;
 				const auto marker = data[1];
-				if (marker == EOI)
-					return true; // TODO: Return false if the buffer hasn't been decoded.
 				data += 2;
 				size -= 2;
-				const auto segment_size = decode_segment(marker, data, size);
+				std::size_t segment_size = 0;
+				switch (marker)
+				{
+				case SOF0: segment_size = decode_sof0(data, size); break;
+				case DHT: segment_size = decode_dht(data, size); break;
+				case SOS: segment_size = decode_sos(data, size); break;
+				case DQT: segment_size = decode_dqt(data, size); break;
+				case DRI: segment_size = decode_dri(data, size); break;
+				case COM: segment_size = skip_segment(data, size); break;
+				default:
+					if ((marker & APP_mask) == APP)
+						segment_size = skip_segment(data, size);
+				}
 				if (!segment_size)
-					return false; // TODO: Return true if the buffer has been decoded.
+					return false;
 				data += segment_size;
 				size -= segment_size;
 			}
@@ -279,7 +252,16 @@ namespace
 		}
 
 	private:
+		struct Component
+		{
+			const std::uint8_t* _quantization_table = nullptr;
+		};
+
+		std::size_t _width = 0;
+		std::size_t _height = 0;
+		Component _components[3];
 		std::uint8_t _quantization_tables[2][64];
+		std::size_t _restart_interval = 0;
 
 		static const std::uint8_t _dezigzag_table[64];
 	};
