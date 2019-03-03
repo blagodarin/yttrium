@@ -98,37 +98,68 @@ namespace
 		{
 			if (size < 2)
 				return 0;
+
 			const auto segment_size = u16(data);
 			if (segment_size > size || segment_size < 19)
 				return 0;
+
 			const auto type = data[2] >> 4;
 			const auto id = data[2] & 0xf;
 			if (type > 1 || id > 1)
 				return 0;
-			const std::uint8_t* bits = data + 3;
-			std::size_t length = 0;
+
+			const std::uint8_t* sizes = data + 3;
+
+			HuffmanTable& huffman = _huffman_tables[type][id];
+			huffman._values = sizes + 16;
+
+			std::size_t value_count = 0;
 			for (std::size_t i = 0; i < 16; ++i)
-				length += bits[i];
-			if (segment_size != 19 + length)
+				for (std::uint8_t j = 0; j < sizes[i]; ++j)
+					huffman._sizes[value_count++] = static_cast<std::uint8_t>(i + 1);
+
+			if (segment_size != 19 + value_count)
 				return 0;
+
+			for (std::size_t index = 0, code = 0, i = 1; i <= 16; ++i)
+			{
+				if (huffman._sizes[index] == i)
+				{
+					while (huffman._sizes[index] == i)
+						huffman._codes[index++] = static_cast<std::uint16_t>(code++);
+					if (code - 1 >= 1u << i)
+						return 0;
+				}
+				code = code << 1;
+			}
+
 			std::cerr << "DHT:\n";
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
 			std::cerr << "\tid=" << id << '\n';
 			std::cerr << "\tbits";
 			for (std::size_t i = 0; i < 16; ++i)
-				std::cerr << (i ? ',' : '=') << int{ bits[i] };
+				std::cerr << (i ? ',' : '=') << int{ sizes[i] };
 			std::cerr << '\n';
-			auto huffman_values = bits + 16;
+			auto huffman_values = huffman._values;
 			for (std::size_t i = 0; i < 16; ++i)
 			{
-				if (!bits[i])
+				if (!sizes[i])
 					continue;
 				std::cerr << '\t';
-				for (std::size_t j = 0; j < bits[i]; ++j)
+				for (std::size_t j = 0; j < sizes[i]; ++j)
 					std::cerr << (j ? ',' : '\t') << int{ huffman_values[j] };
-				huffman_values += bits[i];
+				huffman_values += sizes[i];
 				std::cerr << '\n';
 			}
+			std::cerr << "\tcodes:\n";
+			for (std::size_t i = 0; i < value_count; ++i)
+			{
+				std::string binary;
+				for (std::size_t bit = huffman._sizes[i]; bit; --bit)
+					binary += huffman._codes[i] & (1 << (bit - 1)) ? '1' : '0';
+				std::cerr << "\t\t" << binary << " -> " << int{ huffman._values[i] } << '\n';
+			}
+
 			return segment_size;
 		}
 
@@ -252,6 +283,13 @@ namespace
 		}
 
 	private:
+		struct HuffmanTable
+		{
+			const std::uint8_t* _values = nullptr;
+			std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
+			std::uint16_t _codes[256];
+		};
+
 		struct Component
 		{
 			const std::uint8_t* _quantization_table = nullptr;
@@ -261,6 +299,7 @@ namespace
 		std::size_t _height = 0;
 		Component _components[3];
 		std::uint8_t _quantization_tables[2][64];
+		HuffmanTable _huffman_tables[2][2];
 		std::size_t _restart_interval = 0;
 
 		static const std::uint8_t _dezigzag_table[64];
