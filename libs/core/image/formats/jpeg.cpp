@@ -26,6 +26,7 @@
 #ifndef NDEBUG
 #	include <iomanip>
 #	include <iostream>
+#	include <string>
 #endif
 
 namespace
@@ -202,16 +203,30 @@ namespace
 			const auto components = std::size_t{ data[7] };
 			if (color_bits != 8 || !_width || !_height || components != 3 || segment_size != 8 + 3 * components)
 				return 0;
+			std::size_t max_h = 0;
+			std::size_t max_v = 0;
 			for (std::size_t i = 0; i < components; ++i)
 			{
 				const auto id = data[8 + 3 * i];
-				const auto h = data[8 + 3 * i + 1] >> 4;
-				const auto v = data[8 + 3 * i + 1] & 0xf;
+				const auto h = std::size_t{ data[8 + 3 * i + 1] } >> 4;
+				const auto v = std::size_t{ data[8 + 3 * i + 1] } & 0xf;
 				const auto qt = data[8 + 3 * i + 2];
 				if (id != i + 1 || h != (i > 0 ? 1 : 2) || v != h || qt > 1)
 					return 0;
+				_components[i]._horizontal = h;
+				_components[i]._vertical = v;
 				_components[i]._quantization_table = _quantization_tables[qt];
+				if (max_h < h)
+					max_h = h;
+				if (max_v < v)
+					max_v = v;
 			}
+			_max_horizontal = max_h;
+			_max_vertical = max_v;
+			_mcu_width = max_h * 8;
+			_mcu_height = max_v * 8;
+			_mcu_x_count = (_width + _mcu_width - 1) / _mcu_width;
+			_mcu_y_count = (_height + _mcu_height - 1) / _mcu_height;
 			return segment_size;
 		}
 
@@ -232,7 +247,8 @@ namespace
 				const auto ac = data[3 + 2 * i + 1] & 0xf;
 				if (id != i + 1 || dc > 1 || ac > 1)
 					return 0;
-				// TODO: Setup Huffman tables.
+				_components[i]._dc_table = &_huffman_tables[0][dc];
+				_components[i]._ac_table = &_huffman_tables[0][ac];
 			}
 			if (data[3 + 2 * components] != 0 || data[3 + 2 * components + 1] != 63 || data[3 + 2 * components + 2] != 0)
 				return 0;
@@ -292,11 +308,21 @@ namespace
 
 		struct Component
 		{
+			std::size_t _horizontal = 0;
+			std::size_t _vertical = 0;
 			const std::uint8_t* _quantization_table = nullptr;
+			const HuffmanTable* _dc_table = nullptr;
+			const HuffmanTable* _ac_table = nullptr;
 		};
 
 		std::size_t _width = 0;
 		std::size_t _height = 0;
+		std::size_t _max_horizontal = 0;
+		std::size_t _max_vertical = 0;
+		std::size_t _mcu_width = 0; // Minimum Coded Unit (MCU) width.
+		std::size_t _mcu_height = 0; // MCU height.
+		std::size_t _mcu_x_count = 0;
+		std::size_t _mcu_y_count = 0;
 		Component _components[3];
 		std::uint8_t _quantization_tables[2][64];
 		HuffmanTable _huffman_tables[2][2];
