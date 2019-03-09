@@ -122,8 +122,9 @@ namespace
 			if (segment_size != 19 + value_count)
 				return 0;
 
-			for (std::size_t index = 0, code = 0, i = 1; i <= 16; ++i)
+			for (std::ptrdiff_t index = 0, code = 0, i = 1; i <= 16; ++i)
 			{
+				huffman._delta[i] = index - code;
 				if (huffman._sizes[index] == i)
 				{
 					while (huffman._sizes[index] == i)
@@ -131,8 +132,18 @@ namespace
 					if (code - 1 >= 1u << i)
 						return 0;
 				}
+				huffman._max_codes[i] = code;
 				code = code << 1;
 			}
+			huffman._max_codes[17] = -1;
+
+			const auto to_binary = [](std::uint16_t value, std::size_t bits)
+			{
+				std::string binary;
+				for (std::size_t bit = bits; bit; --bit)
+					binary += value & (1 << (bit - 1)) ? '1' : '0';
+				return binary;
+			};
 
 			std::cerr << "DHT:\n";
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
@@ -154,12 +165,13 @@ namespace
 			}
 			std::cerr << "\tcodes:\n";
 			for (std::size_t i = 0; i < value_count; ++i)
-			{
-				std::string binary;
-				for (std::size_t bit = huffman._sizes[i]; bit; --bit)
-					binary += huffman._codes[i] & (1 << (bit - 1)) ? '1' : '0';
-				std::cerr << "\t\t" << binary << " -> " << int{ huffman._values[i] } << '\n';
-			}
+				std::cerr << "\t\t" << to_binary(huffman._codes[i], huffman._sizes[i]) << " -> " << int{ huffman._values[i] } << '\n';
+			std::cerr << "\tmax_codes:\n";
+			for (std::size_t i = 1; i <= 16; ++i)
+				std::cerr << "\t\t" << std::setw(2) << i << " : " << to_binary(huffman._max_codes[i] - 1, i) << '\n';
+			std::cerr << "\tdelta:\n";
+			for (std::size_t i = 1; i <= 16; ++i)
+				std::cerr << "\t\t" << std::setw(2) << i << " : " << huffman._delta[i] << '\n';
 
 			return segment_size;
 		}
@@ -258,10 +270,42 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_payload(const std::uint8_t*, std::size_t)
+		std::size_t decode_payload(const std::uint8_t* data, std::size_t size)
 		{
-			std::cerr << "<NOT IMPLEMENTED>\n";
-			return 0;
+			std::int16_t buffer[64];
+
+			const auto decode_block = [&](std::size_t x, std::size_t y)
+			{
+				std::cerr << "<NOT IMPLEMENTED>\n";
+				return 0;
+			};
+
+			std::size_t result = 0;
+			for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
+			{
+				for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
+				{
+					for (std::size_t c = 0; c < 3; ++c)
+					{
+						const auto& component = _components[c];
+						for (std::size_t v = 0; v < component._vertical; ++v)
+						{
+							for (std::size_t h = 0; h < component._horizontal; ++h)
+							{
+								const std::size_t x = (mcu_x * component._horizontal + h) * 8;
+								const std::size_t y = (mcu_y * component._vertical + v) * 8;
+								const auto block_size = decode_block(x, y);
+								if (!block_size)
+									return 0;
+								data += block_size;
+								size -= block_size;
+								result += block_size;
+							}
+						}
+					}
+				}
+			}
+			return result;
 		}
 
 		bool decode_jpeg(const std::uint8_t* data, std::size_t size)
@@ -304,6 +348,8 @@ namespace
 			const std::uint8_t* _values = nullptr;
 			std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
 			std::uint16_t _codes[256];
+			std::ptrdiff_t _max_codes[18];
+			std::ptrdiff_t _delta[17];
 		};
 
 		struct Component
