@@ -24,6 +24,7 @@
 #include <jpeglib.h> // TODO: Load JPEG without libjpeg.
 
 #ifndef NDEBUG
+#	include <cassert>
 #	include <iomanip>
 #	include <iostream>
 #	include <string>
@@ -80,19 +81,68 @@ namespace
 		}
 
 	private:
+		class BitstreamParser
+		{
+		public:
+			constexpr BitstreamParser(std::uint8_t const* data, std::size_t size) noexcept
+				: _data{ data }, _end{ data + size } {}
+
+			std::size_t peek_bits(std::size_t bits) const noexcept
+			{
+				assert(_buffer_bits <= bits);
+				return (_buffer >> (_buffer_bits - bits)) & ((std::size_t{ 1 } << bits) - 1);
+			}
+
+			bool prepare_bits(std::size_t bits) noexcept
+			{
+				assert(bits <= 16);
+				while (_buffer_bits < bits)
+				{
+					if (_data == _end)
+					{
+						_buffer = (_buffer << 8) | 0xff; // An infinite number of ones never form a valid code.
+						_buffer_bits += 8;
+						continue;
+					}
+					auto const next = *_data++;
+					_buffer = (_buffer << 8) | next;
+					_buffer_bits += 8;
+					if (next == 0xff && _data != _end)
+					{
+						switch (auto const next_next = *_data++; next_next)
+						{
+						case 0x00: break; // 0xff is followed by 0x00 to prevent forming a valid marker.
+						case EOI: _data = _end; break;
+						case 0xff: break; // 0xff may be used as a filler before a valid marker.
+						default:
+							if ((next_next & RST_mask) == RST)
+							{
+								_buffer = (_buffer << 8) | next_next;
+								_buffer_bits += 8;
+							}
+							else
+								_data = _end;
+						}
+					}
+				}
+			}
+
+			void skip_bits(std::size_t bits) noexcept
+			{
+				assert(_buffer_bits <= bits);
+				_buffer_bits -= bits;
+			}
+
+		private:
+			std::uint8_t const* _data = nullptr;
+			std::uint8_t const* const _end;
+			std::size_t _buffer_bits = 0;
+			std::uint32_t _buffer = 0;
+		};
+
 		static constexpr auto u16(const std::uint8_t* data) noexcept
 		{
 			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
-		}
-
-		std::size_t skip_segment(const std::uint8_t* data, const std::size_t size)
-		{
-			if (size < 2)
-				return 0;
-			const auto segment_size = u16(data);
-			if (segment_size > size)
-				return 0;
-			return segment_size;
 		}
 
 		std::size_t decode_dht(const std::uint8_t* data, const std::size_t size)
@@ -137,8 +187,7 @@ namespace
 			}
 			huffman._max_codes[17] = -1;
 
-			const auto to_binary = [](std::uint16_t value, std::size_t bits)
-			{
+			const auto to_binary = [](std::uint16_t value, std::size_t bits) {
 				std::string binary;
 				for (std::size_t bit = bits; bit; --bit)
 					binary += value & (1 << (bit - 1)) ? '1' : '0';
@@ -168,7 +217,7 @@ namespace
 				std::cerr << "\t\t" << to_binary(huffman._codes[i], huffman._sizes[i]) << " -> " << int{ huffman._values[i] } << '\n';
 			std::cerr << "\tmax_codes:\n";
 			for (std::size_t i = 1; i <= 16; ++i)
-				std::cerr << "\t\t" << std::setw(2) << i << " : " << to_binary(huffman._max_codes[i] - 1, i) << '\n';
+				std::cerr << "\t\t" << std::setw(2) << i << " : " << to_binary(static_cast<std::uint16_t>(huffman._max_codes[i] - 1), i) << '\n';
 			std::cerr << "\tdelta:\n";
 			for (std::size_t i = 1; i <= 16; ++i)
 				std::cerr << "\t\t" << std::setw(2) << i << " : " << huffman._delta[i] << '\n';
@@ -176,7 +225,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_dqt(const std::uint8_t* data, const std::size_t size)
+		std::size_t decode_dqt(const std::uint8_t* data, const std::size_t size) noexcept
 		{
 			if (size < 67)
 				return 0;
@@ -186,12 +235,13 @@ namespace
 			const auto id = data[2];
 			if (id > 1)
 				return 0;
+			data += 3;
 			for (std::size_t i = 0; i < 64; ++i)
-				_quantization_tables[id][_dezigzag_table[i]] = data[3 + i];
+				_quantization_tables[id][_dezigzag_table[i]] = data[i];
 			return segment_size;
 		}
 
-		std::size_t decode_dri(const std::uint8_t* data, const std::size_t size)
+		std::size_t decode_dri(const std::uint8_t* data, const std::size_t size) noexcept
 		{
 			if (size < 4)
 				return 0;
@@ -272,10 +322,7 @@ namespace
 
 		std::size_t decode_payload(const std::uint8_t* data, std::size_t size)
 		{
-			std::int16_t buffer[64];
-
-			const auto decode_block = [&](std::size_t x, std::size_t y)
-			{
+			const auto decode_block = [&](std::size_t, std::size_t) -> std::size_t {
 				std::cerr << "<NOT IMPLEMENTED>\n";
 				return 0;
 			};
@@ -310,6 +357,15 @@ namespace
 
 		bool decode_jpeg(const std::uint8_t* data, std::size_t size)
 		{
+			const auto skip_segment = [&data, &size]() -> std::size_t {
+				if (size < 2)
+					return 0;
+				const auto segment_size = u16(data);
+				if (segment_size > size)
+					return 0;
+				return segment_size;
+			};
+
 			if (size < 2 || data[0] != 0xff || data[1] != SOI)
 				return false;
 			data += 2;
@@ -329,10 +385,10 @@ namespace
 				case SOS: segment_size = decode_sos(data, size); break;
 				case DQT: segment_size = decode_dqt(data, size); break;
 				case DRI: segment_size = decode_dri(data, size); break;
-				case COM: segment_size = skip_segment(data, size); break;
+				case COM: segment_size = skip_segment(); break;
 				default:
 					if ((marker & APP_mask) == APP)
-						segment_size = skip_segment(data, size);
+						segment_size = skip_segment();
 				}
 				if (!segment_size)
 					return false;
@@ -365,7 +421,7 @@ namespace
 		std::size_t _height = 0;
 		std::size_t _max_horizontal = 0;
 		std::size_t _max_vertical = 0;
-		std::size_t _mcu_width = 0; // Minimum Coded Unit (MCU) width.
+		std::size_t _mcu_width = 0;  // Minimum Coded Unit (MCU) width.
 		std::size_t _mcu_height = 0; // MCU height.
 		std::size_t _mcu_x_count = 0;
 		std::size_t _mcu_y_count = 0;
