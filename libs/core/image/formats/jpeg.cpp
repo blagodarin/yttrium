@@ -38,16 +38,15 @@ namespace
 		std::jmp_buf _jmp_buf;
 	};
 
-	[[noreturn]] void error_callback(jpeg_common_struct* cinfo)
-	{
+	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
 		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 
 #ifndef NDEBUG
-	std::string to_binary(int value, std::size_t bits)
+	std::string to_binary(int value, int bits)
 	{
 		std::string binary;
-		for (std::size_t bit = bits; bit; --bit)
+		for (auto bit = bits; bit; --bit)
 			binary += value & (1 << (bit - 1)) ? '1' : '0';
 		return binary;
 	}
@@ -76,6 +75,62 @@ namespace
 		COM = 0xfe,       // Comment.
 	};
 
+	class JpegBitstream
+	{
+	public:
+		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
+			: _data{ data }, _end{ data + size } {}
+
+		int peek_bits(int count) const noexcept
+		{
+			assert(count <= _buffer_bits);
+			return static_cast<int>(_buffer >> (_buffer_bits - count)) & ((1 << count) - 1);
+		}
+
+		bool prepare_bits(int count) noexcept
+		{
+			assert(count <= 16);
+			while (_buffer_bits < count)
+			{
+				if (_data == _end)
+					return false;
+				const auto next = *_data++;
+				_buffer = (_buffer << 8) | next;
+				_buffer_bits += 8;
+				if (next == 0xff && _data != _end)
+				{
+					switch (const auto next_next = *_data++; next_next)
+					{
+					case 0x00: break; // 0xff is followed by 0x00 to prevent forming a valid marker.
+					case EOI: _data = _end; break;
+					case 0xff: break; // 0xff may be used as a filler before a valid marker.
+					default:
+						if ((next_next & RST_mask) == RST)
+						{
+							_buffer = (_buffer << 8) | next_next;
+							_buffer_bits += 8;
+						}
+						else
+							_data = _end;
+					}
+				}
+			}
+			return true;
+		}
+
+		void skip_bits(int count) noexcept
+		{
+			assert(count <= _buffer_bits);
+			_buffer_bits -= count;
+		}
+
+	private:
+		const std::uint8_t* _data = nullptr;
+		const std::uint8_t* const _end;
+		int _buffer_bits = 0;
+		std::uint32_t _buffer = 0;
+	};
+
 	class JpegDecoder
 	{
 	public:
@@ -95,65 +150,6 @@ namespace
 		}
 
 	private:
-		class BitstreamParser
-		{
-		public:
-			constexpr BitstreamParser(const std::uint8_t* data, std::size_t size) noexcept
-				: _data{ data }, _end{ data + size } {}
-
-			int peek_bits(std::size_t count) const noexcept
-			{
-				assert(count <= _buffer_bits);
-				return static_cast<int>(_buffer >> (_buffer_bits - count)) & ((1 << count) - 1);
-			}
-
-			void prepare_bits(std::size_t bits) noexcept
-			{
-				assert(bits <= 16);
-				while (_buffer_bits < bits)
-				{
-					if (_data == _end)
-					{
-						_buffer = (_buffer << 8) | 0xff; // An infinite number of ones never form a valid code.
-						_buffer_bits += 8;
-						continue;
-					}
-					const auto next = *_data++;
-					_buffer = (_buffer << 8) | next;
-					_buffer_bits += 8;
-					if (next == 0xff && _data != _end)
-					{
-						switch (const auto next_next = *_data++; next_next)
-						{
-						case 0x00: break; // 0xff is followed by 0x00 to prevent forming a valid marker.
-						case EOI: _data = _end; break;
-						case 0xff: break; // 0xff may be used as a filler before a valid marker.
-						default:
-							if ((next_next & RST_mask) == RST)
-							{
-								_buffer = (_buffer << 8) | next_next;
-								_buffer_bits += 8;
-							}
-							else
-								_data = _end;
-						}
-					}
-				}
-			}
-
-			void skip_bits(std::size_t count) noexcept
-			{
-				assert(count <= _buffer_bits);
-				_buffer_bits -= count;
-			}
-
-		private:
-			const std::uint8_t* _data = nullptr;
-			const std::uint8_t* const _end;
-			std::size_t _buffer_bits = 0;
-			std::uint32_t _buffer = 0;
-		};
-
 		static constexpr auto u16(const std::uint8_t* data) noexcept
 		{
 			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
@@ -178,7 +174,7 @@ namespace
 			HuffmanTable& huffman = _huffman_tables[type][id];
 			huffman._values = sizes + 16;
 
-			std::size_t value_count = 0;
+			int value_count = 0;
 			for (std::size_t i = 0; i < 16; ++i)
 				for (std::uint8_t j = 0; j < sizes[i]; ++j)
 					huffman._sizes[value_count++] = static_cast<std::uint8_t>(i + 1);
@@ -186,20 +182,20 @@ namespace
 			if (segment_size != 19 + value_count)
 				return 0;
 
-			for (std::ptrdiff_t index = 0, code = 0, i = 1; i <= 16; ++i)
+			for (int index = 0, code = 0, i = 1; i <= 16; ++i)
 			{
 				huffman._delta[i] = index - code;
 				if (huffman._sizes[index] == i)
 				{
 					while (huffman._sizes[index] == i)
 						huffman._codes[index++] = static_cast<std::uint16_t>(code++);
-					if (code - 1 >= std::ptrdiff_t{ 1 } << i)
+					if (code - 1 >= 1 << i)
 						return 0;
 				}
 				huffman._max_codes[i] = code;
-				code = code << 1;
+				code <<= 1;
 			}
-			huffman._max_codes[17] = std::numeric_limits<std::ptrdiff_t>::max();
+			huffman._max_codes[17] = std::numeric_limits<int>::max();
 
 			std::cerr << "DHT:\n";
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
@@ -220,13 +216,13 @@ namespace
 				std::cerr << '\n';
 			}
 			std::cerr << "\tcodes:\n";
-			for (std::size_t i = 0; i < value_count; ++i)
+			for (int i = 0; i < value_count; ++i)
 				std::cerr << "\t\t" << to_binary(huffman._codes[i], huffman._sizes[i]) << " (" << huffman._codes[i] << ") -> " << int{ huffman._values[i] } << '\n';
 			std::cerr << "\tmax_codes:\n";
-			for (std::size_t i = 1; i <= 16; ++i)
+			for (int i = 1; i <= 16; ++i)
 				std::cerr << "\t\t" << std::setw(2) << i << " : " << to_binary(static_cast<std::uint16_t>(huffman._max_codes[i] - 1), i) << '\n';
 			std::cerr << "\tdelta:\n";
-			for (std::size_t i = 1; i <= 16; ++i)
+			for (int i = 1; i <= 16; ++i)
 				std::cerr << "\t\t" << std::setw(2) << i << " : " << huffman._delta[i] << '\n';
 
 			return segment_size;
@@ -312,7 +308,7 @@ namespace
 			return segment_size;
 		}
 
-		std::ptrdiff_t parse_headers(const std::uint8_t* data, std::size_t size) noexcept
+		std::size_t parse_headers(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			const auto skip_segment = [&data, &size]() noexcept->std::size_t
 			{
@@ -354,14 +350,14 @@ namespace
 				data += segment_size;
 				size -= segment_size;
 				if (marker == SOS)
-					return data - base;
+					return static_cast<std::size_t>(data - base);
 			}
 			return 0;
 		}
 
 		bool parse_payload(const std::uint8_t* data, std::size_t size) noexcept
 		{
-			BitstreamParser bitstream{ data, size };
+			JpegBitstream bitstream{ data, size };
 
 			const auto decode_block = [this, &bitstream](std::size_t, std::size_t) noexcept
 			{
@@ -381,7 +377,7 @@ namespace
 			const auto mcu_height = max_v * 8;
 			const auto mcu_x_count = (_width + mcu_width - 1) / mcu_width;
 			const auto mcu_y_count = (_height + mcu_height - 1) / mcu_height;
-			std::uint8_t last_dc[3]{ 0, 0, 0 };
+			int last_dc[3]{ 0, 0, 0 };
 			for (std::size_t mcu_x = 0; mcu_x < mcu_x_count; ++mcu_x)
 			{
 				for (std::size_t mcu_y = 0; mcu_y < mcu_y_count; ++mcu_y)
@@ -397,39 +393,37 @@ namespace
 								const auto y = (mcu_y * component._vertical + v) * 8;
 								if (!decode_block(x, y))
 									return false;
-								int dc_delta = 0;
-								const auto code = component._dc_table->read(bitstream, dc_delta);
-								if (code < 0)
+								int block[64]{};
+								const auto [dc_code, dc_delta] = component._dc_table->read(bitstream);
+								if (dc_code < 0)
 									return false;
-								const auto dc = (last_dc[c] + dc_delta) & 0xff;
-								last_dc[c] = static_cast<std::uint8_t>(dc);
-								std::cerr << ' ' << dc;
+								const auto dc_value = last_dc[c] + dc_delta;
+								last_dc[c] = dc_value;
+								block[0] = dc_value * component._quantization_table[0];
 								int i = 0;
 								do
 								{
-									int ac = 0;
-									const auto rs = component._ac_table->read(bitstream, ac);
-									if (rs < 0)
+									const auto [ac_code, ac_value] = component._ac_table->read(bitstream);
+									if (ac_code < 0)
 										return false;
-									if (!rs)
+									if (!ac_code)
 										break;
-									const auto r = rs >> 4;
-									const auto s = rs & 0xf;
+									const auto r = ac_code >> 4;
+									const auto s = ac_code & 0xf;
 									if (!s && r != 15)
-									{
-										std::cerr << "\t(1) r = " << r << "\n";
 										return false;
-									}
 									i += r + 1;
 									if (i > 63)
-									{
-										std::cerr << "\t(2)\n";
 										return false;
-									}
-									if (s)
-										std::cerr << ' ' << ac;
+									block[_dezigzag_table[i]] = ac_value * component._quantization_table[i];
 								} while (i < 63);
 								std::cerr << '\n';
+								for (int yy = 0; yy < 8; ++yy)
+								{
+									for (int xx = 0; xx < 8; ++xx)
+										std::cerr << '\t' << block[yy * 8 + xx];
+									std::cerr << '\n';
+								}
 							}
 						}
 					}
@@ -444,32 +438,35 @@ namespace
 			const std::uint8_t* _values = nullptr;
 			std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
 			std::uint16_t _codes[256];
-			std::ptrdiff_t _max_codes[18];
-			std::ptrdiff_t _delta[17];
+			int _max_codes[18];
+			int _delta[17];
 
-			int read(BitstreamParser& bitstream, int& value) const noexcept
+			std::pair<int, int> read(JpegBitstream& bitstream) const noexcept
 			{
-				bitstream.prepare_bits(16);
+				// (-1 << i) + 1
+				static constexpr std::int16_t bias[16]{ 0, -1, -3, -7, -15, -31, -63, -127, -255, -511, -1023, -2047, -4095, -8191, -16383, -32767 };
+
+				if (!bitstream.prepare_bits(16))
+					return { -1, 0 };
 				const auto bits = bitstream.peek_bits(16);
-				std::size_t size = 1;
+				int size = 1;
 				for (;; ++size)
 					if (bits >> (16 - size) < _max_codes[size])
 						break;
 				if (size > 16)
-					return -1;
+					return { -1, 0 };
 				bitstream.skip_bits(size);
-				const auto code = (bits >> (16 - size)) + _delta[size];
-				if (const auto length = code & 0xf)
-				{
-					bitstream.prepare_bits(length);
-					value = bitstream.peek_bits(length);
-					bitstream.skip_bits(length);
-					if (value < (1 << (length - 1)))
-						value += (-1 << length) + 1;
-				}
-				else
-					value = 0;
-				return static_cast<int>(code);
+				const auto code = _values[(bits >> (16 - size)) + _delta[size]];
+				const auto length = code & 0xf;
+				if (!length)
+					return { code, 0 };
+				if (!bitstream.prepare_bits(length))
+					return { -1, 0 };
+				auto value = bitstream.peek_bits(length);
+				bitstream.skip_bits(length);
+				if (value < (1 << (length - 1)))
+					value += bias[length];
+				return { code, value };
 			}
 		};
 
@@ -489,18 +486,16 @@ namespace
 		HuffmanTable _huffman_tables[2][2];
 		std::size_t _restart_interval = 0;
 
-		static const std::uint8_t _dezigzag_table[64];
-	};
-
-	const std::uint8_t JpegDecoder::_dezigzag_table[64]{
-		0, 1, 8, 16, 9, 2, 3, 10,
-		17, 24, 32, 25, 18, 11, 4, 5,
-		12, 19, 26, 33, 40, 48, 41, 34,
-		27, 20, 13, 6, 7, 14, 21, 28,
-		35, 42, 49, 56, 57, 50, 43, 36,
-		29, 22, 15, 23, 30, 37, 44, 51,
-		58, 59, 52, 45, 38, 31, 39, 46,
-		53, 60, 61, 54, 47, 55, 62, 63
+		static constexpr std::uint8_t _dezigzag_table[64]{
+			0, 1, 8, 16, 9, 2, 3, 10,
+			17, 24, 32, 25, 18, 11, 4, 5,
+			12, 19, 26, 33, 40, 48, 41, 34,
+			27, 20, 13, 6, 7, 14, 21, 28,
+			35, 42, 49, 56, 57, 50, 43, 36,
+			29, 22, 15, 23, 30, 37, 44, 51,
+			58, 59, 52, 45, 38, 31, 39, 46,
+			53, 60, 61, 54, 47, 55, 62, 63
+		};
 	};
 #endif
 }
