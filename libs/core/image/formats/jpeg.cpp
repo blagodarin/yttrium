@@ -38,12 +38,22 @@ namespace
 		std::jmp_buf _jmp_buf;
 	};
 
-	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
+	[[noreturn]] void error_callback(jpeg_common_struct* cinfo)
+	{
 		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 
 #ifndef NDEBUG
-	enum : std::uint8_t {
+	std::string to_binary(int value, std::size_t bits)
+	{
+		std::string binary;
+		for (std::size_t bit = bits; bit; --bit)
+			binary += value & (1 << (bit - 1)) ? '1' : '0';
+		return binary;
+	}
+
+	enum : std::uint8_t
+	{
 		TEM = 0x01,       // Temporary.
 		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
 		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
@@ -71,29 +81,33 @@ namespace
 	public:
 		bool decode(const std::uint8_t* data, std::size_t size)
 		{
-			if (!decode_jpeg(data, size))
+			if (const auto parsed = parse_headers(data, size); parsed > 0)
 			{
-				std::cerr << "<ERROR>\n";
-				return false;
+				// TODO: Allocate YCbCr buffer.
+				if (parse_payload(data + parsed, size - parsed))
+				{
+					// TODO: Convert the loaded image to BGRA.
+					return true;
+				}
 			}
-			// TODO: Convert the loaded image to BGRA.
-			return true;
+			std::cerr << "<ERROR>\n";
+			return false;
 		}
 
 	private:
 		class BitstreamParser
 		{
 		public:
-			constexpr BitstreamParser(std::uint8_t const* data, std::size_t size) noexcept
+			constexpr BitstreamParser(const std::uint8_t* data, std::size_t size) noexcept
 				: _data{ data }, _end{ data + size } {}
 
-			std::size_t peek_bits(std::size_t bits) const noexcept
+			int peek_bits(std::size_t count) const noexcept
 			{
-				assert(_buffer_bits <= bits);
-				return (_buffer >> (_buffer_bits - bits)) & ((std::size_t{ 1 } << bits) - 1);
+				assert(count <= _buffer_bits);
+				return static_cast<int>(_buffer >> (_buffer_bits - count)) & ((1 << count) - 1);
 			}
 
-			bool prepare_bits(std::size_t bits) noexcept
+			void prepare_bits(std::size_t bits) noexcept
 			{
 				assert(bits <= 16);
 				while (_buffer_bits < bits)
@@ -104,12 +118,12 @@ namespace
 						_buffer_bits += 8;
 						continue;
 					}
-					auto const next = *_data++;
+					const auto next = *_data++;
 					_buffer = (_buffer << 8) | next;
 					_buffer_bits += 8;
 					if (next == 0xff && _data != _end)
 					{
-						switch (auto const next_next = *_data++; next_next)
+						switch (const auto next_next = *_data++; next_next)
 						{
 						case 0x00: break; // 0xff is followed by 0x00 to prevent forming a valid marker.
 						case EOI: _data = _end; break;
@@ -127,15 +141,15 @@ namespace
 				}
 			}
 
-			void skip_bits(std::size_t bits) noexcept
+			void skip_bits(std::size_t count) noexcept
 			{
-				assert(_buffer_bits <= bits);
-				_buffer_bits -= bits;
+				assert(count <= _buffer_bits);
+				_buffer_bits -= count;
 			}
 
 		private:
-			std::uint8_t const* _data = nullptr;
-			std::uint8_t const* const _end;
+			const std::uint8_t* _data = nullptr;
+			const std::uint8_t* const _end;
 			std::size_t _buffer_bits = 0;
 			std::uint32_t _buffer = 0;
 		};
@@ -145,7 +159,7 @@ namespace
 			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
 		}
 
-		std::size_t decode_dht(const std::uint8_t* data, const std::size_t size)
+		std::size_t decode_dht(const std::uint8_t* data, std::size_t size)
 		{
 			if (size < 2)
 				return 0;
@@ -159,7 +173,7 @@ namespace
 			if (type > 1 || id > 1)
 				return 0;
 
-			const std::uint8_t* sizes = data + 3;
+			const auto* const sizes = data + 3;
 
 			HuffmanTable& huffman = _huffman_tables[type][id];
 			huffman._values = sizes + 16;
@@ -179,20 +193,13 @@ namespace
 				{
 					while (huffman._sizes[index] == i)
 						huffman._codes[index++] = static_cast<std::uint16_t>(code++);
-					if (code - 1 >= 1u << i)
+					if (code - 1 >= std::ptrdiff_t{ 1 } << i)
 						return 0;
 				}
 				huffman._max_codes[i] = code;
 				code = code << 1;
 			}
-			huffman._max_codes[17] = -1;
-
-			const auto to_binary = [](std::uint16_t value, std::size_t bits) {
-				std::string binary;
-				for (std::size_t bit = bits; bit; --bit)
-					binary += value & (1 << (bit - 1)) ? '1' : '0';
-				return binary;
-			};
+			huffman._max_codes[17] = std::numeric_limits<std::ptrdiff_t>::max();
 
 			std::cerr << "DHT:\n";
 			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
@@ -214,7 +221,7 @@ namespace
 			}
 			std::cerr << "\tcodes:\n";
 			for (std::size_t i = 0; i < value_count; ++i)
-				std::cerr << "\t\t" << to_binary(huffman._codes[i], huffman._sizes[i]) << " -> " << int{ huffman._values[i] } << '\n';
+				std::cerr << "\t\t" << to_binary(huffman._codes[i], huffman._sizes[i]) << " (" << huffman._codes[i] << ") -> " << int{ huffman._values[i] } << '\n';
 			std::cerr << "\tmax_codes:\n";
 			for (std::size_t i = 1; i <= 16; ++i)
 				std::cerr << "\t\t" << std::setw(2) << i << " : " << to_binary(static_cast<std::uint16_t>(huffman._max_codes[i] - 1), i) << '\n';
@@ -225,7 +232,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_dqt(const std::uint8_t* data, const std::size_t size) noexcept
+		std::size_t decode_dqt(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			if (size < 67)
 				return 0;
@@ -241,7 +248,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_dri(const std::uint8_t* data, const std::size_t size) noexcept
+		std::size_t decode_dri(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			if (size < 4)
 				return 0;
@@ -252,7 +259,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_sof0(const std::uint8_t* data, const std::size_t size)
+		std::size_t decode_sof0(const std::uint8_t* data, std::size_t size)
 		{
 			if (size < 2)
 				return 0;
@@ -265,8 +272,6 @@ namespace
 			const auto components = std::size_t{ data[7] };
 			if (color_bits != 8 || !_width || !_height || components != 3 || segment_size != 8 + 3 * components)
 				return 0;
-			std::size_t max_h = 0;
-			std::size_t max_v = 0;
 			for (std::size_t i = 0; i < components; ++i)
 			{
 				const auto id = data[8 + 3 * i];
@@ -278,21 +283,11 @@ namespace
 				_components[i]._horizontal = h;
 				_components[i]._vertical = v;
 				_components[i]._quantization_table = _quantization_tables[qt];
-				if (max_h < h)
-					max_h = h;
-				if (max_v < v)
-					max_v = v;
 			}
-			_max_horizontal = max_h;
-			_max_vertical = max_v;
-			_mcu_width = max_h * 8;
-			_mcu_height = max_v * 8;
-			_mcu_x_count = (_width + _mcu_width - 1) / _mcu_width;
-			_mcu_y_count = (_height + _mcu_height - 1) / _mcu_height;
 			return segment_size;
 		}
 
-		std::size_t decode_sos(const std::uint8_t* data, const std::size_t size)
+		std::size_t decode_sos(const std::uint8_t* data, std::size_t size)
 		{
 			if (size < 3)
 				return 0;
@@ -310,54 +305,17 @@ namespace
 				if (id != i + 1 || dc > 1 || ac > 1)
 					return 0;
 				_components[i]._dc_table = &_huffman_tables[0][dc];
-				_components[i]._ac_table = &_huffman_tables[0][ac];
+				_components[i]._ac_table = &_huffman_tables[1][ac];
 			}
 			if (data[3 + 2 * components] != 0 || data[3 + 2 * components + 1] != 63 || data[3 + 2 * components + 2] != 0)
-				return 0;
-			const auto payload_size = decode_payload(data + segment_size, size - segment_size);
-			if (!payload_size)
 				return 0;
 			return segment_size;
 		}
 
-		std::size_t decode_payload(const std::uint8_t* data, std::size_t size)
+		std::ptrdiff_t parse_headers(const std::uint8_t* data, std::size_t size) noexcept
 		{
-			const auto decode_block = [&](std::size_t, std::size_t) -> std::size_t {
-				std::cerr << "<NOT IMPLEMENTED>\n";
-				return 0;
-			};
-
-			std::size_t result = 0;
-			for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
+			const auto skip_segment = [&data, &size]() noexcept->std::size_t
 			{
-				for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
-				{
-					for (std::size_t c = 0; c < 3; ++c)
-					{
-						const auto& component = _components[c];
-						for (std::size_t v = 0; v < component._vertical; ++v)
-						{
-							for (std::size_t h = 0; h < component._horizontal; ++h)
-							{
-								const std::size_t x = (mcu_x * component._horizontal + h) * 8;
-								const std::size_t y = (mcu_y * component._vertical + v) * 8;
-								const auto block_size = decode_block(x, y);
-								if (!block_size)
-									return 0;
-								data += block_size;
-								size -= block_size;
-								result += block_size;
-							}
-						}
-					}
-				}
-			}
-			return result;
-		}
-
-		bool decode_jpeg(const std::uint8_t* data, std::size_t size)
-		{
-			const auto skip_segment = [&data, &size]() -> std::size_t {
 				if (size < 2)
 					return 0;
 				const auto segment_size = u16(data);
@@ -367,13 +325,14 @@ namespace
 			};
 
 			if (size < 2 || data[0] != 0xff || data[1] != SOI)
-				return false;
+				return 0;
+			const auto base = data;
 			data += 2;
 			size -= 2;
 			while (size > 0)
 			{
 				if (size < 2 || data[0] != 0xff)
-					return false;
+					return 0;
 				const auto marker = data[1];
 				data += 2;
 				size -= 2;
@@ -391,11 +350,92 @@ namespace
 						segment_size = skip_segment();
 				}
 				if (!segment_size)
-					return false;
+					return 0;
 				data += segment_size;
 				size -= segment_size;
+				if (marker == SOS)
+					return data - base;
 			}
-			return false;
+			return 0;
+		}
+
+		bool parse_payload(const std::uint8_t* data, std::size_t size) noexcept
+		{
+			BitstreamParser bitstream{ data, size };
+
+			const auto decode_block = [this, &bitstream](std::size_t, std::size_t) noexcept
+			{
+				return true;
+			};
+
+			std::size_t max_h = 0;
+			std::size_t max_v = 0;
+			for (std::size_t i = 0; i < 3; ++i)
+			{
+				if (const auto h = _components[i]._horizontal; h > max_h)
+					max_h = h;
+				if (const auto v = _components[i]._vertical; v > max_v)
+					max_v = v;
+			}
+			const auto mcu_width = max_h * 8;
+			const auto mcu_height = max_v * 8;
+			const auto mcu_x_count = (_width + mcu_width - 1) / mcu_width;
+			const auto mcu_y_count = (_height + mcu_height - 1) / mcu_height;
+			std::uint8_t last_dc[3]{ 0, 0, 0 };
+			for (std::size_t mcu_x = 0; mcu_x < mcu_x_count; ++mcu_x)
+			{
+				for (std::size_t mcu_y = 0; mcu_y < mcu_y_count; ++mcu_y)
+				{
+					for (std::size_t c = 0; c < 3; ++c)
+					{
+						const auto& component = _components[c];
+						for (std::size_t v = 0; v < component._vertical; ++v)
+						{
+							for (std::size_t h = 0; h < component._horizontal; ++h)
+							{
+								const auto x = (mcu_x * component._horizontal + h) * 8;
+								const auto y = (mcu_y * component._vertical + v) * 8;
+								if (!decode_block(x, y))
+									return false;
+								int dc_delta = 0;
+								const auto code = component._dc_table->read(bitstream, dc_delta);
+								if (code < 0)
+									return false;
+								const auto dc = (last_dc[c] + dc_delta) & 0xff;
+								last_dc[c] = static_cast<std::uint8_t>(dc);
+								std::cerr << ' ' << dc;
+								int i = 0;
+								do
+								{
+									int ac = 0;
+									const auto rs = component._ac_table->read(bitstream, ac);
+									if (rs < 0)
+										return false;
+									if (!rs)
+										break;
+									const auto r = rs >> 4;
+									const auto s = rs & 0xf;
+									if (!s && r != 15)
+									{
+										std::cerr << "\t(1) r = " << r << "\n";
+										return false;
+									}
+									i += r + 1;
+									if (i > 63)
+									{
+										std::cerr << "\t(2)\n";
+										return false;
+									}
+									if (s)
+										std::cerr << ' ' << ac;
+								} while (i < 63);
+								std::cerr << '\n';
+							}
+						}
+					}
+				}
+			}
+			return true;
 		}
 
 	private:
@@ -406,6 +446,31 @@ namespace
 			std::uint16_t _codes[256];
 			std::ptrdiff_t _max_codes[18];
 			std::ptrdiff_t _delta[17];
+
+			int read(BitstreamParser& bitstream, int& value) const noexcept
+			{
+				bitstream.prepare_bits(16);
+				const auto bits = bitstream.peek_bits(16);
+				std::size_t size = 1;
+				for (;; ++size)
+					if (bits >> (16 - size) < _max_codes[size])
+						break;
+				if (size > 16)
+					return -1;
+				bitstream.skip_bits(size);
+				const auto code = (bits >> (16 - size)) + _delta[size];
+				if (const auto length = code & 0xf)
+				{
+					bitstream.prepare_bits(length);
+					value = bitstream.peek_bits(length);
+					bitstream.skip_bits(length);
+					if (value < (1 << (length - 1)))
+						value += (-1 << length) + 1;
+				}
+				else
+					value = 0;
+				return static_cast<int>(code);
+			}
 		};
 
 		struct Component
@@ -419,12 +484,6 @@ namespace
 
 		std::size_t _width = 0;
 		std::size_t _height = 0;
-		std::size_t _max_horizontal = 0;
-		std::size_t _max_vertical = 0;
-		std::size_t _mcu_width = 0;  // Minimum Coded Unit (MCU) width.
-		std::size_t _mcu_height = 0; // MCU height.
-		std::size_t _mcu_x_count = 0;
-		std::size_t _mcu_y_count = 0;
 		Component _components[3];
 		std::uint8_t _quantization_tables[2][64];
 		HuffmanTable _huffman_tables[2][2];
