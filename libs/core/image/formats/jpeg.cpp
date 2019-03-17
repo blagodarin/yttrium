@@ -25,9 +25,7 @@
 
 #ifndef NDEBUG
 #	include <cassert>
-#	include <iomanip>
 #	include <iostream>
-#	include <string>
 #endif
 
 namespace
@@ -43,14 +41,6 @@ namespace
 	}
 
 #ifndef NDEBUG
-	std::string to_binary(int value, int bits)
-	{
-		std::string binary;
-		for (auto bit = bits; bit; --bit)
-			binary += value & (1 << (bit - 1)) ? '1' : '0';
-		return binary;
-	}
-
 	enum : std::uint8_t
 	{
 		TEM = 0x01,       // Temporary.
@@ -74,6 +64,122 @@ namespace
 		APP_value = 0x0f, //
 		COM = 0xfe,       // Comment.
 	};
+
+	static constexpr std::uint8_t _dezigzag_table[64]{
+		0, 1, 8, 16, 9, 2, 3, 10,
+		17, 24, 32, 25, 18, 11, 4, 5,
+		12, 19, 26, 33, 40, 48, 41, 34,
+		27, 20, 13, 6, 7, 14, 21, 28,
+		35, 42, 49, 56, 57, 50, 43, 36,
+		29, 22, 15, 23, 30, 37, 44, 51,
+		58, 59, 52, 45, 38, 31, 39, 46,
+		53, 60, 61, 54, 47, 55, 62, 63
+	};
+
+	constexpr std::uint8_t clamp(int x) noexcept
+	{
+		if (static_cast<unsigned>(x) > 255)
+		{
+			if (x < 0)
+				return 0;
+			if (x > 255)
+				return 255;
+		}
+		return static_cast<std::uint8_t>(x);
+	}
+
+	constexpr auto f2f(float x) noexcept
+	{
+		return static_cast<int>(x * 4096.f + .5f);
+	}
+
+#	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
+		int p2 = s2; \
+		int p3 = s6; \
+		int p1 = (p2 + p3) * f2f(0.5411961f); \
+		int t2 = p1 + p3 * f2f(-1.847759065f); \
+		int t3 = p1 + p2 * f2f(0.765366865f); \
+		p2 = s0; \
+		p3 = s4; \
+		int t0 = (p2 + p3) * 4096; \
+		int t1 = (p2 - p3) * 4096; \
+		int x0 = t0 + t3; \
+		int x3 = t0 - t3; \
+		int x1 = t1 + t2; \
+		int x2 = t1 - t2; \
+		t0 = s7; \
+		t1 = s5; \
+		t2 = s3; \
+		t3 = s1; \
+		p3 = t0 + t2; \
+		int p4 = t1 + t3; \
+		p1 = t0 + t3; \
+		p2 = t1 + t2; \
+		int p5 = (p3 + p4) * f2f(1.175875602f); \
+		t0 = t0 * f2f(0.298631336f); \
+		t1 = t1 * f2f(2.053119869f); \
+		t2 = t2 * f2f(3.072711026f); \
+		t3 = t3 * f2f(1.501321110f); \
+		p1 = p5 + p1 * f2f(-0.899976223f); \
+		p2 = p5 + p2 * f2f(-2.562915447f); \
+		p3 = p3 * f2f(-1.961570560f); \
+		p4 = p4 * f2f(-0.390180644f); \
+		t3 += p1 + p4; \
+		t2 += p2 + p3; \
+		t1 += p2 + p4; \
+		t0 += p1 + p3
+
+	// IDCT code taken from the STB public domain libraries (https://github.com/nothings/stb).
+	inline void inverse_dct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
+	{
+		int buffer[64];
+
+		for (int* b = &buffer[0]; b != &buffer[8]; ++src, ++b)
+		{
+			if (src[8] == 0 && src[16] == 0 && src[24] == 0 && src[32] == 0 && src[40] == 0 && src[48] == 0 && src[56] == 0)
+			{
+				const auto value = src[0] * 4;
+				b[0] = b[8] = b[16] = b[24] = b[32] = b[40] = b[48] = b[56] = value;
+			}
+			else
+			{
+				IDCT_1D(src[0], src[8], src[16], src[24], src[32], src[40], src[48], src[56]);
+
+				x0 += 512;
+				x1 += 512;
+				x2 += 512;
+				x3 += 512;
+
+				b[0] = (x0 + t3) >> 10;
+				b[56] = (x0 - t3) >> 10;
+				b[8] = (x1 + t2) >> 10;
+				b[48] = (x1 - t2) >> 10;
+				b[16] = (x2 + t1) >> 10;
+				b[40] = (x2 - t1) >> 10;
+				b[24] = (x3 + t0) >> 10;
+				b[32] = (x3 - t0) >> 10;
+			}
+		}
+
+		for (const int* b = &buffer[0]; b != &buffer[64]; b += 8, dst += dst_stride)
+		{
+			IDCT_1D(b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]);
+
+			x0 += 65536 + (128 << 17);
+			x1 += 65536 + (128 << 17);
+			x2 += 65536 + (128 << 17);
+			x3 += 65536 + (128 << 17);
+
+			dst[0] = clamp((x0 + t3) >> 17);
+			dst[7] = clamp((x0 - t3) >> 17);
+			dst[1] = clamp((x1 + t2) >> 17);
+			dst[6] = clamp((x1 - t2) >> 17);
+			dst[2] = clamp((x2 + t1) >> 17);
+			dst[5] = clamp((x2 - t1) >> 17);
+			dst[3] = clamp((x3 + t0) >> 17);
+			dst[4] = clamp((x3 - t0) >> 17);
+		}
+	}
 
 	class JpegBitstream
 	{
@@ -196,34 +302,6 @@ namespace
 				code <<= 1;
 			}
 			huffman._max_codes[17] = std::numeric_limits<int>::max();
-
-			std::cerr << "DHT:\n";
-			std::cerr << "\ttype=" << (type ? "ac" : "dc") << '\n';
-			std::cerr << "\tid=" << id << '\n';
-			std::cerr << "\tbits";
-			for (std::size_t i = 0; i < 16; ++i)
-				std::cerr << (i ? ',' : '=') << int{ sizes[i] };
-			std::cerr << '\n';
-			auto huffman_values = huffman._values;
-			for (std::size_t i = 0; i < 16; ++i)
-			{
-				if (!sizes[i])
-					continue;
-				std::cerr << '\t';
-				for (std::size_t j = 0; j < sizes[i]; ++j)
-					std::cerr << (j ? ',' : '\t') << int{ huffman_values[j] };
-				huffman_values += sizes[i];
-				std::cerr << '\n';
-			}
-			std::cerr << "\tcodes:\n";
-			for (int i = 0; i < value_count; ++i)
-				std::cerr << "\t\t" << to_binary(huffman._codes[i], huffman._sizes[i]) << " (" << huffman._codes[i] << ") -> " << int{ huffman._values[i] } << '\n';
-			std::cerr << "\tmax_codes:\n";
-			for (int i = 1; i <= 16; ++i)
-				std::cerr << "\t\t" << std::setw(2) << i << " : " << to_binary(static_cast<std::uint16_t>(huffman._max_codes[i] - 1), i) << '\n';
-			std::cerr << "\tdelta:\n";
-			for (int i = 1; i <= 16; ++i)
-				std::cerr << "\t\t" << std::setw(2) << i << " : " << huffman._delta[i] << '\n';
 
 			return segment_size;
 		}
@@ -358,12 +436,6 @@ namespace
 		bool parse_payload(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			JpegBitstream bitstream{ data, size };
-
-			const auto decode_block = [this, &bitstream](std::size_t, std::size_t) noexcept
-			{
-				return true;
-			};
-
 			std::size_t max_h = 0;
 			std::size_t max_v = 0;
 			for (std::size_t i = 0; i < 3; ++i)
@@ -377,6 +449,17 @@ namespace
 			const auto mcu_height = max_v * 8;
 			const auto mcu_x_count = (_width + mcu_width - 1) / mcu_width;
 			const auto mcu_y_count = (_height + mcu_height - 1) / mcu_height;
+			std::size_t ycbcr_size = 0;
+			std::size_t ycbcr_offset[4];
+			std::size_t ycbcr_stride[3];
+			for (std::size_t i = 0; i < 3; ++i)
+			{
+				ycbcr_offset[i] = ycbcr_size;
+				ycbcr_stride[i] = mcu_x_count * _components[i]._horizontal * 8;
+				ycbcr_size += ycbcr_stride[i] * mcu_y_count * _components[i]._vertical * 8;
+			}
+			ycbcr_offset[3] = ycbcr_size;
+			Yttrium::Buffer ycbcr_buffer{ ycbcr_size };
 			int last_dc[3]{ 0, 0, 0 };
 			for (std::size_t mcu_x = 0; mcu_x < mcu_x_count; ++mcu_x)
 			{
@@ -389,44 +472,27 @@ namespace
 						{
 							for (std::size_t h = 0; h < component._horizontal; ++h)
 							{
+								std::int16_t block[64]{};
+								if (!component.read_block(&block[0], bitstream, last_dc[c]))
+									return false;
 								const auto x = (mcu_x * component._horizontal + h) * 8;
 								const auto y = (mcu_y * component._vertical + v) * 8;
-								if (!decode_block(x, y))
-									return false;
-								int block[64]{};
-								const auto [dc_code, dc_delta] = component._dc_table->read(bitstream);
-								if (dc_code < 0)
-									return false;
-								const auto dc_value = last_dc[c] + dc_delta;
-								last_dc[c] = dc_value;
-								block[0] = dc_value * component._quantization_table[0];
-								int i = 0;
-								do
-								{
-									const auto [ac_code, ac_value] = component._ac_table->read(bitstream);
-									if (ac_code < 0)
-										return false;
-									if (!ac_code)
-										break;
-									const auto r = ac_code >> 4;
-									const auto s = ac_code & 0xf;
-									if (!s && r != 15)
-										return false;
-									i += r + 1;
-									if (i > 63)
-										return false;
-									block[_dezigzag_table[i]] = ac_value * component._quantization_table[i];
-								} while (i < 63);
-								std::cerr << '\n';
-								for (int yy = 0; yy < 8; ++yy)
-								{
-									for (int xx = 0; xx < 8; ++xx)
-										std::cerr << '\t' << block[yy * 8 + xx];
-									std::cerr << '\n';
-								}
+								std::uint8_t* output = ycbcr_buffer.begin() + ycbcr_offset[c] + y * ycbcr_stride[c] + x;
+								::inverse_dct(output, ycbcr_stride[c], &block[0]);
 							}
 						}
 					}
+				}
+			}
+			for (std::size_t c = 0; c < 3; ++c)
+			{
+				std::cerr << '\n';
+				const std::uint8_t* plane = ycbcr_buffer.begin() + ycbcr_offset[c];
+				for (std::size_t y = 0; y < mcu_y_count * _components[c]._vertical * 8; ++y)
+				{
+					for (std::size_t x = 0; x < ycbcr_stride[c]; ++x)
+						std::cerr << '\t' << int{ plane[y * ycbcr_stride[c] + x] };
+					std::cerr << '\n';
 				}
 			}
 			return true;
@@ -477,6 +543,32 @@ namespace
 			const std::uint8_t* _quantization_table = nullptr;
 			const HuffmanTable* _dc_table = nullptr;
 			const HuffmanTable* _ac_table = nullptr;
+
+			bool read_block(std::int16_t* block, JpegBitstream& bitstream, int& last_dc) const noexcept
+			{
+				const auto [dc_code, dc_delta] = _dc_table->read(bitstream);
+				if (dc_code < 0)
+					return false;
+				block[0] = static_cast<std::int16_t>((last_dc += dc_delta) * _quantization_table[0]);
+				int i = 0;
+				do
+				{
+					const auto [ac_code, ac_value] = _ac_table->read(bitstream);
+					if (ac_code < 0)
+						return false;
+					if (!ac_code)
+						break;
+					const auto r = ac_code >> 4;
+					const auto s = ac_code & 0xf;
+					if (!s && r != 15)
+						return false;
+					i += r + 1;
+					if (i > 63)
+						return false;
+					block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * _quantization_table[i]);
+				} while (i < 63);
+				return true;
+			}
 		};
 
 		std::size_t _width = 0;
@@ -485,17 +577,6 @@ namespace
 		std::uint8_t _quantization_tables[2][64];
 		HuffmanTable _huffman_tables[2][2];
 		std::size_t _restart_interval = 0;
-
-		static constexpr std::uint8_t _dezigzag_table[64]{
-			0, 1, 8, 16, 9, 2, 3, 10,
-			17, 24, 32, 25, 18, 11, 4, 5,
-			12, 19, 26, 33, 40, 48, 41, 34,
-			27, 20, 13, 6, 7, 14, 21, 28,
-			35, 42, 49, 56, 57, 50, 43, 36,
-			29, 22, 15, 23, 30, 37, 44, 51,
-			58, 59, 52, 45, 38, 31, 39, 46,
-			53, 60, 61, 54, 47, 55, 62, 63
-		};
 	};
 #endif
 }
