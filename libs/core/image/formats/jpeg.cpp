@@ -25,6 +25,7 @@
 
 #ifndef NDEBUG
 #	include <cassert>
+#	include <cmath>
 #	include <iostream>
 #endif
 
@@ -65,7 +66,7 @@ namespace
 		COM = 0xfe,       // Comment.
 	};
 
-	static constexpr std::uint8_t _dezigzag_table[64]{
+	constexpr std::uint8_t _dezigzag_table[64]{
 		0, 1, 8, 16, 9, 2, 3, 10,
 		17, 24, 32, 25, 18, 11, 4, 5,
 		12, 19, 26, 33, 40, 48, 41, 34,
@@ -90,7 +91,7 @@ namespace
 
 	constexpr auto f2f(float x) noexcept
 	{
-		return static_cast<int>(x * 4096.f + .5f);
+		return static_cast<int>(std::lround(x * 4096.f));
 	}
 
 #	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
@@ -436,9 +437,9 @@ namespace
 		bool parse_payload(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			JpegBitstream bitstream{ data, size };
-			std::size_t max_h = 0;
-			std::size_t max_v = 0;
-			for (std::size_t i = 0; i < 3; ++i)
+			std::size_t max_h = _components[0]._horizontal;
+			std::size_t max_v = _components[0]._vertical;
+			for (std::size_t i = 1; i < 3; ++i)
 			{
 				if (const auto h = _components[i]._horizontal; h > max_h)
 					max_h = h;
@@ -450,7 +451,7 @@ namespace
 			const auto mcu_x_count = (_width + mcu_width - 1) / mcu_width;
 			const auto mcu_y_count = (_height + mcu_height - 1) / mcu_height;
 			std::size_t ycbcr_size = 0;
-			std::size_t ycbcr_offset[4];
+			std::size_t ycbcr_offset[3];
 			std::size_t ycbcr_stride[3];
 			for (std::size_t i = 0; i < 3; ++i)
 			{
@@ -458,7 +459,6 @@ namespace
 				ycbcr_stride[i] = mcu_x_count * _components[i]._horizontal * 8;
 				ycbcr_size += ycbcr_stride[i] * mcu_y_count * _components[i]._vertical * 8;
 			}
-			ycbcr_offset[3] = ycbcr_size;
 			Yttrium::Buffer ycbcr_buffer{ ycbcr_size };
 			int last_dc[3]{ 0, 0, 0 };
 			for (std::size_t mcu_x = 0; mcu_x < mcu_x_count; ++mcu_x)
