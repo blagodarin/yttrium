@@ -77,22 +77,25 @@ namespace
 		53, 60, 61, 54, 47, 55, 62, 63
 	};
 
-	constexpr std::uint8_t clamp(int x) noexcept
+	// IDCT code taken from the STB public domain libraries (https://github.com/nothings/stb).
+	namespace
 	{
-		if (static_cast<unsigned>(x) > 255)
+		constexpr std::uint8_t clamp(int x) noexcept
 		{
-			if (x < 0)
-				return 0;
-			if (x > 255)
-				return 255;
+			static_assert(static_cast<unsigned>(-1) == std::numeric_limits<unsigned>::max());
+			if (static_cast<unsigned>(x) > 255) // Checks both limits with a single comparison.
+				return x < 0 ? 0 : 255;
+			return static_cast<std::uint8_t>(x);
 		}
-		return static_cast<std::uint8_t>(x);
-	}
 
-	constexpr auto f2f(float x) noexcept
-	{
-		return static_cast<int>(std::lround(x * 4096.f));
-	}
+		constexpr auto f2f(float x) noexcept
+		{
+#	ifdef _MSC_VER
+			return static_cast<int>(x * 4096.f + .5f);
+#	else
+			return static_cast<int>(std::lround(x * 4096.f));
+#	endif
+		}
 
 #	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
 		int p2 = s2; \
@@ -102,8 +105,8 @@ namespace
 		int t3 = p1 + p2 * f2f(0.765366865f); \
 		p2 = s0; \
 		p3 = s4; \
-		int t0 = (p2 + p3) * 4096; \
-		int t1 = (p2 - p3) * 4096; \
+		int t0 = (p2 + p3) * f2f(1.f); \
+		int t1 = (p2 - p3) * f2f(1.f); \
 		int x0 = t0 + t3; \
 		int x3 = t0 - t3; \
 		int x1 = t1 + t2; \
@@ -116,7 +119,7 @@ namespace
 		int p4 = t1 + t3; \
 		p1 = t0 + t3; \
 		p2 = t1 + t2; \
-		int p5 = (p3 + p4) * f2f(1.175875602f); \
+		const int p5 = (p3 + p4) * f2f(1.175875602f); \
 		t0 = t0 * f2f(0.298631336f); \
 		t1 = t1 * f2f(2.053119869f); \
 		t2 = t2 * f2f(3.072711026f); \
@@ -130,20 +133,18 @@ namespace
 		t1 += p2 + p4; \
 		t0 += p1 + p3
 
-	// IDCT code taken from the STB public domain libraries (https://github.com/nothings/stb).
-	inline void inverse_dct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
-	{
-		int buffer[64];
-
-		for (int* b = &buffer[0]; b != &buffer[8]; ++src, ++b)
+		inline void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
 		{
-			if (src[8] == 0 && src[16] == 0 && src[24] == 0 && src[32] == 0 && src[40] == 0 && src[48] == 0 && src[56] == 0)
+			int buffer[64];
+
+			for (int* b = &buffer[0]; b != &buffer[8]; ++src, ++b)
 			{
-				const auto value = src[0] * 4;
-				b[0] = b[8] = b[16] = b[24] = b[32] = b[40] = b[48] = b[56] = value;
-			}
-			else
-			{
+				if (src[8] == 0 && src[16] == 0 && src[24] == 0 && src[32] == 0 && src[40] == 0 && src[48] == 0 && src[56] == 0)
+				{
+					b[0] = b[8] = b[16] = b[24] = b[32] = b[40] = b[48] = b[56] = src[0] * 4;
+					continue;
+				}
+
 				IDCT_1D(src[0], src[8], src[16], src[24], src[32], src[40], src[48], src[56]);
 
 				x0 += 512;
@@ -152,33 +153,33 @@ namespace
 				x3 += 512;
 
 				b[0] = (x0 + t3) >> 10;
-				b[56] = (x0 - t3) >> 10;
 				b[8] = (x1 + t2) >> 10;
-				b[48] = (x1 - t2) >> 10;
 				b[16] = (x2 + t1) >> 10;
-				b[40] = (x2 - t1) >> 10;
 				b[24] = (x3 + t0) >> 10;
 				b[32] = (x3 - t0) >> 10;
+				b[40] = (x2 - t1) >> 10;
+				b[48] = (x1 - t2) >> 10;
+				b[56] = (x0 - t3) >> 10;
 			}
-		}
 
-		for (const int* b = &buffer[0]; b != &buffer[64]; b += 8, dst += dst_stride)
-		{
-			IDCT_1D(b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]);
+			for (const int* b = &buffer[0]; b != &buffer[64]; b += 8, dst += dst_stride)
+			{
+				IDCT_1D(b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]);
 
-			x0 += 65536 + (128 << 17);
-			x1 += 65536 + (128 << 17);
-			x2 += 65536 + (128 << 17);
-			x3 += 65536 + (128 << 17);
+				x0 += 65536 + (128 << 17);
+				x1 += 65536 + (128 << 17);
+				x2 += 65536 + (128 << 17);
+				x3 += 65536 + (128 << 17);
 
-			dst[0] = clamp((x0 + t3) >> 17);
-			dst[7] = clamp((x0 - t3) >> 17);
-			dst[1] = clamp((x1 + t2) >> 17);
-			dst[6] = clamp((x1 - t2) >> 17);
-			dst[2] = clamp((x2 + t1) >> 17);
-			dst[5] = clamp((x2 - t1) >> 17);
-			dst[3] = clamp((x3 + t0) >> 17);
-			dst[4] = clamp((x3 - t0) >> 17);
+				dst[0] = clamp((x0 + t3) >> 17);
+				dst[1] = clamp((x1 + t2) >> 17);
+				dst[2] = clamp((x2 + t1) >> 17);
+				dst[3] = clamp((x3 + t0) >> 17);
+				dst[4] = clamp((x3 - t0) >> 17);
+				dst[5] = clamp((x2 - t1) >> 17);
+				dst[6] = clamp((x1 - t2) >> 17);
+				dst[7] = clamp((x0 - t3) >> 17);
+			}
 		}
 	}
 
@@ -478,7 +479,7 @@ namespace
 								const auto x = (mcu_x * component._horizontal + h) * 8;
 								const auto y = (mcu_y * component._vertical + v) * 8;
 								std::uint8_t* output = ycbcr_buffer.begin() + ycbcr_offset[c] + y * ycbcr_stride[c] + x;
-								::inverse_dct(output, ycbcr_stride[c], &block[0]);
+								::idct(output, ycbcr_stride[c], &block[0]);
 							}
 						}
 					}
