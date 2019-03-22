@@ -29,4 +29,15 @@ namespace Yttrium
 	void copy_image_x_xxxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
 	void copy_image_x_xxxx(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
 	void copy_image_xa_xxxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
+
+	struct YCbCrComponents
+	{
+		const std::uint8_t* y;
+		std::ptrdiff_t y_stride;
+		const std::uint8_t* cb;
+		const std::uint8_t* cr;
+		std::ptrdiff_t cbcr_stride;
+	};
+
+	void convert_jpeg420_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
 }

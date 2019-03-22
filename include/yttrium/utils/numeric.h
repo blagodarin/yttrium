@@ -17,11 +17,31 @@
 #ifndef _include_yttrium_utils_numeric_h_
 #define _include_yttrium_utils_numeric_h_
 
+#ifdef _MSC_VER
+#	include <cmath>
+#endif
 #include <cstdint>
 #include <type_traits>
 
 namespace Yttrium
 {
+	/// Clamps a signed integer value to 8-bit unsigned one.
+	constexpr std::uint8_t clamp_to_uint8(int x) noexcept
+	{
+		return static_cast<std::uint8_t>(static_cast<unsigned>(x) > 255 ? ~x >> (sizeof(int) * 8 - 1) : x);
+	}
+
+	///
+	template <typename T, unsigned Scale>
+	constexpr T float_to_fixed(float x) noexcept
+	{
+#ifdef _MSC_VER
+		return static_cast<T>(x * float{ 1 << Scale } + .5f);
+#else
+		return static_cast<T>(std::lround(x * float{ 1 << Scale }));
+#endif
+	}
+
 	/// Returns \c true if the value is a power of two.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 	constexpr bool is_power_of_2(T x) noexcept

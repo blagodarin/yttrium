@@ -21,6 +21,20 @@
 
 #include <catch2/catch.hpp>
 
+TEST_CASE("utils.clamp_to_uint8")
+{
+	using Yttrium::clamp_to_uint8;
+
+	CHECK(clamp_to_uint8(std::numeric_limits<int>::min()) == 0);
+	CHECK(clamp_to_uint8(-1) == 0);
+	CHECK(clamp_to_uint8(0) == 0);
+	CHECK(clamp_to_uint8(1) == 1);
+	CHECK(clamp_to_uint8(254) == 254);
+	CHECK(clamp_to_uint8(255) == 255);
+	CHECK(clamp_to_uint8(256) == 255);
+	CHECK(clamp_to_uint8(std::numeric_limits<int>::max()) == 255);
+}
+
 TEST_CASE("utils.is_power_of_2")
 {
 	using Yttrium::is_power_of_2;

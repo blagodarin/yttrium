@@ -24,8 +24,8 @@
 #include <jpeglib.h> // TODO: Load JPEG without libjpeg.
 
 #ifndef NDEBUG
+#	include <yttrium/utils/numeric.h>
 #	include <cassert>
-#	include <cmath>
 #	include <iostream>
 #endif
 
@@ -90,11 +90,7 @@ namespace
 
 		constexpr auto f2f(float x) noexcept
 		{
-#	ifdef _MSC_VER
-			return static_cast<int>(x * 4096.f + .5f);
-#	else
-			return static_cast<int>(std::lround(x * 4096.f));
-#	endif
+			return Yttrium::float_to_fixed<int, 12>(x);
 		}
 
 #	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
@@ -171,14 +167,15 @@ namespace
 				x2 += 65536 + (128 << 17);
 				x3 += 65536 + (128 << 17);
 
-				dst[0] = clamp((x0 + t3) >> 17);
-				dst[1] = clamp((x1 + t2) >> 17);
-				dst[2] = clamp((x2 + t1) >> 17);
-				dst[3] = clamp((x3 + t0) >> 17);
-				dst[4] = clamp((x3 - t0) >> 17);
-				dst[5] = clamp((x2 - t1) >> 17);
-				dst[6] = clamp((x1 - t2) >> 17);
-				dst[7] = clamp((x0 - t3) >> 17);
+				using Yttrium::clamp_to_uint8;
+				dst[0] = clamp_to_uint8((x0 + t3) >> 17);
+				dst[1] = clamp_to_uint8((x1 + t2) >> 17);
+				dst[2] = clamp_to_uint8((x2 + t1) >> 17);
+				dst[3] = clamp_to_uint8((x3 + t0) >> 17);
+				dst[4] = clamp_to_uint8((x3 - t0) >> 17);
+				dst[5] = clamp_to_uint8((x2 - t1) >> 17);
+				dst[6] = clamp_to_uint8((x1 - t2) >> 17);
+				dst[7] = clamp_to_uint8((x0 - t3) >> 17);
 			}
 		}
 	}
