@@ -35,6 +35,19 @@ TEST_CASE("utils.clamp_to_uint8")
 	CHECK(clamp_to_uint8(std::numeric_limits<int>::max()) == 255);
 }
 
+TEST_CASE("utils.fixed_point")
+{
+	using Yttrium::fixed_point;
+
+	CHECK(fixed_point<int, 4>(0.0000f) == 0b0000'0000);
+	CHECK(fixed_point<int, 4>(0.0625f) == 0b0000'0001);
+	CHECK(fixed_point<int, 4>(0.1250f) == 0b0000'0010);
+	CHECK(fixed_point<int, 4>(0.2500f) == 0b0000'0100);
+	CHECK(fixed_point<int, 4>(0.5000f) == 0b0000'1000);
+	CHECK(fixed_point<int, 4>(1.0000f) == 0b0001'0000);
+	CHECK(fixed_point<int, 4>(1.9375f) == 0b0001'1111);
+}
+
 TEST_CASE("utils.is_power_of_2")
 {
 	using Yttrium::is_power_of_2;

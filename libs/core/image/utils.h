@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <yttrium/api.h>
+
 #include <cstddef>
 #include <cstdint>
 
@@ -33,11 +35,11 @@ namespace Yttrium
 	struct YCbCrComponents
 	{
 		const std::uint8_t* y;
-		std::ptrdiff_t y_stride;
+		std::size_t y_stride;
 		const std::uint8_t* cb;
 		const std::uint8_t* cr;
-		std::ptrdiff_t cbcr_stride;
+		std::size_t cbcr_stride;
 	};
 
-	void convert_jpeg420_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
+	Y_CORE_API void convert_jpeg420_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, void* dst, std::size_t dst_stride) noexcept;
 }

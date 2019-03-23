@@ -20,40 +20,6 @@
 
 #include <cstring>
 
-namespace
-{
-	struct YCbCrLookupTables
-	{
-		int _cb_b[256];
-		int _cb_g[256];
-		int _cr_g[256];
-		int _cr_r[256];
-
-		static constexpr int Scale = 16;
-
-		YCbCrLookupTables() noexcept
-		{
-			constexpr auto OneHalf = 1 << (Scale - 1);
-			for (int i = 0; i < 256; ++i)
-			{
-				const auto k = i - 128;
-				_cb_b[i] = (fixed(1.77200f) * k + OneHalf) >> Scale;
-				_cb_g[i] = (-fixed(0.34414f)) * k + OneHalf; // Scaled during conversion.
-				_cr_g[i] = (-fixed(0.71414f)) * k; // Added to the corresponding Cb-to-G value which already includes OneHalf.
-				_cr_r[i] = (fixed(1.40200f) * k + OneHalf) >> Scale;
-			}
-		}
-
-	private:
-		static constexpr int fixed(float x) noexcept
-		{
-			return Yttrium::float_to_fixed<int, Scale>(x);
-		}
-	};
-
-	const YCbCrLookupTables _ycbcr;
-}
-
 namespace Yttrium
 {
 	void copy_image_rgb_bgr(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
@@ -184,7 +150,7 @@ namespace Yttrium
 		}
 	}
 
-	void convert_jpeg420_bgra(std::size_t width, std::size_t height, const YCbCrComponents& src, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
+	void convert_jpeg420_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents& src, void* dst, std::size_t dst_stride) noexcept
 	{
 		auto y1 = src.y;
 		auto y2 = src.y + src.y_stride;
@@ -192,31 +158,34 @@ namespace Yttrium
 		auto cb = src.cb;
 		auto cr = src.cr;
 		const auto cbcr_delta = src.cbcr_stride - width / 2;
-		auto bgra1 = dst;
-		auto bgra2 = dst + dst_stride;
+		auto bgra1 = static_cast<std::uint8_t*>(dst);
+		auto bgra2 = bgra1 + dst_stride;
 		const auto bgra_delta = dst_stride * 2 - width * 4;
 		for (auto j = height / 2; j > 0; --j)
 		{
 			for (auto i = width / 2; i > 0; --i)
 			{
-				const auto bx = _ycbcr._cb_b[*cb];
-				const auto gx = (_ycbcr._cb_g[*cb] + _ycbcr._cr_g[*cr]) >> YCbCrLookupTables::Scale;
-				const auto rx = _ycbcr._cr_r[*cr];
-				bgra1[0] = clamp_to_uint8(y1[0] + bx);
-				bgra1[1] = clamp_to_uint8(y1[0] + gx);
-				bgra1[2] = clamp_to_uint8(y1[0] + rx);
+				// See ITU-T T.871 for the exact equations.
+				const auto xcb = *cb - 128;
+				const auto xcr = *cr - 128;
+				const auto xb = ((1 << (16 - 1)) + fixed_point<int, 16>(1.772) * xcb) >> 16;
+				const auto xg = ((1 << (16 - 1)) - fixed_point<int, 16>(0.3441363) * xcb - fixed_point<int, 16>(0.7141363) * xcr) >> 16;
+				const auto xr = ((1 << (16 - 1)) + fixed_point<int, 16>(1.402) * xcr) >> 16;
+				bgra1[0] = clamp_to_uint8(y1[0] + xb);
+				bgra1[1] = clamp_to_uint8(y1[0] + xg);
+				bgra1[2] = clamp_to_uint8(y1[0] + xr);
 				bgra1[3] = 255;
-				bgra1[4] = clamp_to_uint8(y1[1] + bx);
-				bgra1[5] = clamp_to_uint8(y1[1] + gx);
-				bgra1[6] = clamp_to_uint8(y1[1] + rx);
+				bgra1[4] = clamp_to_uint8(y1[1] + xb);
+				bgra1[5] = clamp_to_uint8(y1[1] + xg);
+				bgra1[6] = clamp_to_uint8(y1[1] + xr);
 				bgra1[7] = 255;
-				bgra2[0] = clamp_to_uint8(y2[0] + bx);
-				bgra2[1] = clamp_to_uint8(y2[0] + gx);
-				bgra2[2] = clamp_to_uint8(y2[0] + rx);
+				bgra2[0] = clamp_to_uint8(y2[0] + xb);
+				bgra2[1] = clamp_to_uint8(y2[0] + xg);
+				bgra2[2] = clamp_to_uint8(y2[0] + xr);
 				bgra2[3] = 255;
-				bgra2[4] = clamp_to_uint8(y2[1] + bx);
-				bgra2[5] = clamp_to_uint8(y2[1] + gx);
-				bgra2[6] = clamp_to_uint8(y2[1] + rx);
+				bgra2[4] = clamp_to_uint8(y2[1] + xb);
+				bgra2[5] = clamp_to_uint8(y2[1] + xg);
+				bgra2[6] = clamp_to_uint8(y2[1] + xr);
 				bgra2[7] = 255;
 				y1 += 2;
 				y2 += 2;

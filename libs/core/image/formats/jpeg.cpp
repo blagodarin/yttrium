@@ -42,8 +42,7 @@ namespace
 	}
 
 #ifndef NDEBUG
-	enum : std::uint8_t
-	{
+	enum : std::uint8_t {
 		TEM = 0x01,       // Temporary.
 		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
 		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
@@ -78,31 +77,21 @@ namespace
 	};
 
 	// IDCT code taken from the STB public domain libraries (https://github.com/nothings/stb).
-	namespace
+	inline void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
 	{
-		constexpr std::uint8_t clamp(int x) noexcept
-		{
-			static_assert(static_cast<unsigned>(-1) == std::numeric_limits<unsigned>::max());
-			if (static_cast<unsigned>(x) > 255) // Checks both limits with a single comparison.
-				return x < 0 ? 0 : 255;
-			return static_cast<std::uint8_t>(x);
-		}
-
-		constexpr auto f2f(float x) noexcept
-		{
-			return Yttrium::float_to_fixed<int, 12>(x);
-		}
+		using Yttrium::clamp_to_uint8;
+		using Yttrium::fixed_point;
 
 #	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
 		int p2 = s2; \
 		int p3 = s6; \
-		int p1 = (p2 + p3) * f2f(0.5411961f); \
-		int t2 = p1 + p3 * f2f(-1.847759065f); \
-		int t3 = p1 + p2 * f2f(0.765366865f); \
+		int p1 = (p2 + p3) * fixed_point<int, 12>(0.5411961f); \
+		int t2 = p1 + p3 * fixed_point<int, 12>(-1.847759065f); \
+		int t3 = p1 + p2 * fixed_point<int, 12>(0.765366865f); \
 		p2 = s0; \
 		p3 = s4; \
-		int t0 = (p2 + p3) * f2f(1.f); \
-		int t1 = (p2 - p3) * f2f(1.f); \
+		int t0 = (p2 + p3) * fixed_point<int, 12>(1.f); \
+		int t1 = (p2 - p3) * fixed_point<int, 12>(1.f); \
 		int x0 = t0 + t3; \
 		int x3 = t0 - t3; \
 		int x1 = t1 + t2; \
@@ -115,68 +104,64 @@ namespace
 		int p4 = t1 + t3; \
 		p1 = t0 + t3; \
 		p2 = t1 + t2; \
-		const int p5 = (p3 + p4) * f2f(1.175875602f); \
-		t0 = t0 * f2f(0.298631336f); \
-		t1 = t1 * f2f(2.053119869f); \
-		t2 = t2 * f2f(3.072711026f); \
-		t3 = t3 * f2f(1.501321110f); \
-		p1 = p5 + p1 * f2f(-0.899976223f); \
-		p2 = p5 + p2 * f2f(-2.562915447f); \
-		p3 = p3 * f2f(-1.961570560f); \
-		p4 = p4 * f2f(-0.390180644f); \
+		const int p5 = (p3 + p4) * fixed_point<int, 12>(1.175875602f); \
+		t0 = t0 * fixed_point<int, 12>(0.298631336f); \
+		t1 = t1 * fixed_point<int, 12>(2.053119869f); \
+		t2 = t2 * fixed_point<int, 12>(3.072711026f); \
+		t3 = t3 * fixed_point<int, 12>(1.501321110f); \
+		p1 = p5 + p1 * fixed_point<int, 12>(-0.899976223f); \
+		p2 = p5 + p2 * fixed_point<int, 12>(-2.562915447f); \
+		p3 = p3 * fixed_point<int, 12>(-1.961570560f); \
+		p4 = p4 * fixed_point<int, 12>(-0.390180644f); \
 		t3 += p1 + p4; \
 		t2 += p2 + p3; \
 		t1 += p2 + p4; \
 		t0 += p1 + p3
 
-		inline void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
+		int buffer[64];
+
+		for (int* b = &buffer[0]; b != &buffer[8]; ++src, ++b)
 		{
-			int buffer[64];
-
-			for (int* b = &buffer[0]; b != &buffer[8]; ++src, ++b)
+			if (src[8] == 0 && src[16] == 0 && src[24] == 0 && src[32] == 0 && src[40] == 0 && src[48] == 0 && src[56] == 0)
 			{
-				if (src[8] == 0 && src[16] == 0 && src[24] == 0 && src[32] == 0 && src[40] == 0 && src[48] == 0 && src[56] == 0)
-				{
-					b[0] = b[8] = b[16] = b[24] = b[32] = b[40] = b[48] = b[56] = src[0] * 4;
-					continue;
-				}
-
-				IDCT_1D(src[0], src[8], src[16], src[24], src[32], src[40], src[48], src[56]);
-
-				x0 += 512;
-				x1 += 512;
-				x2 += 512;
-				x3 += 512;
-
-				b[0] = (x0 + t3) >> 10;
-				b[8] = (x1 + t2) >> 10;
-				b[16] = (x2 + t1) >> 10;
-				b[24] = (x3 + t0) >> 10;
-				b[32] = (x3 - t0) >> 10;
-				b[40] = (x2 - t1) >> 10;
-				b[48] = (x1 - t2) >> 10;
-				b[56] = (x0 - t3) >> 10;
+				b[0] = b[8] = b[16] = b[24] = b[32] = b[40] = b[48] = b[56] = src[0] * 4;
+				continue;
 			}
 
-			for (const int* b = &buffer[0]; b != &buffer[64]; b += 8, dst += dst_stride)
-			{
-				IDCT_1D(b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]);
+			IDCT_1D(src[0], src[8], src[16], src[24], src[32], src[40], src[48], src[56]);
 
-				x0 += 65536 + (128 << 17);
-				x1 += 65536 + (128 << 17);
-				x2 += 65536 + (128 << 17);
-				x3 += 65536 + (128 << 17);
+			x0 += 512;
+			x1 += 512;
+			x2 += 512;
+			x3 += 512;
 
-				using Yttrium::clamp_to_uint8;
-				dst[0] = clamp_to_uint8((x0 + t3) >> 17);
-				dst[1] = clamp_to_uint8((x1 + t2) >> 17);
-				dst[2] = clamp_to_uint8((x2 + t1) >> 17);
-				dst[3] = clamp_to_uint8((x3 + t0) >> 17);
-				dst[4] = clamp_to_uint8((x3 - t0) >> 17);
-				dst[5] = clamp_to_uint8((x2 - t1) >> 17);
-				dst[6] = clamp_to_uint8((x1 - t2) >> 17);
-				dst[7] = clamp_to_uint8((x0 - t3) >> 17);
-			}
+			b[0] = (x0 + t3) >> 10;
+			b[8] = (x1 + t2) >> 10;
+			b[16] = (x2 + t1) >> 10;
+			b[24] = (x3 + t0) >> 10;
+			b[32] = (x3 - t0) >> 10;
+			b[40] = (x2 - t1) >> 10;
+			b[48] = (x1 - t2) >> 10;
+			b[56] = (x0 - t3) >> 10;
+		}
+
+		for (const int* b = &buffer[0]; b != &buffer[64]; b += 8, dst += dst_stride)
+		{
+			IDCT_1D(b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]);
+
+			x0 += 65536 + (128 << 17);
+			x1 += 65536 + (128 << 17);
+			x2 += 65536 + (128 << 17);
+			x3 += 65536 + (128 << 17);
+
+			dst[0] = clamp_to_uint8((x0 + t3) >> 17);
+			dst[1] = clamp_to_uint8((x1 + t2) >> 17);
+			dst[2] = clamp_to_uint8((x2 + t1) >> 17);
+			dst[3] = clamp_to_uint8((x3 + t0) >> 17);
+			dst[4] = clamp_to_uint8((x3 - t0) >> 17);
+			dst[5] = clamp_to_uint8((x2 - t1) >> 17);
+			dst[6] = clamp_to_uint8((x1 - t2) >> 17);
+			dst[7] = clamp_to_uint8((x0 - t3) >> 17);
 		}
 	}
 

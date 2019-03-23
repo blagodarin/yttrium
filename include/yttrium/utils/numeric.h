@@ -17,7 +17,7 @@
 #ifndef _include_yttrium_utils_numeric_h_
 #define _include_yttrium_utils_numeric_h_
 
-#ifdef _MSC_VER
+#ifndef _MSC_VER
 #	include <cmath>
 #endif
 #include <cstdint>
@@ -26,19 +26,20 @@
 namespace Yttrium
 {
 	/// Clamps a signed integer value to 8-bit unsigned one.
-	constexpr std::uint8_t clamp_to_uint8(int x) noexcept
+	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
+	constexpr std::uint8_t clamp_to_uint8(T x) noexcept
 	{
-		return static_cast<std::uint8_t>(static_cast<unsigned>(x) > 255 ? ~x >> (sizeof(int) * 8 - 1) : x);
+		return static_cast<std::uint8_t>(static_cast<std::make_unsigned_t<T>>(x) > 255 ? ~x >> (sizeof x * 8 - 1) : x);
 	}
 
-	///
-	template <typename T, unsigned Scale>
-	constexpr T float_to_fixed(float x) noexcept
+	/// Converts a floating-point value to a fixed-point value represented in the specified type with the specified number of fractional bits.
+	template <typename T, unsigned FractionalBits, typename F, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T> && std::is_floating_point_v<F>>>
+	constexpr T fixed_point(F x) noexcept
 	{
 #ifdef _MSC_VER
-		return static_cast<T>(x * float{ 1 << Scale } + .5f);
+		return static_cast<T>(x * F{ 1 << FractionalBits } + F{ .5 });
 #else
-		return static_cast<T>(std::lround(x * float{ 1 << Scale }));
+		return static_cast<T>(std::lround(x * F{ 1 << FractionalBits }));
 #endif
 	}
 
