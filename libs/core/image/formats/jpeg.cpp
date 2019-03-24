@@ -28,7 +28,6 @@
 #	include <yttrium/storage/writer.h>
 #	include "../utils.h"
 #	include <cassert>
-#	include <iostream>
 #endif
 
 namespace
@@ -311,9 +310,7 @@ namespace
 			const auto id = data[2];
 			if (id > 1)
 				return 0;
-			data += 3;
-			for (std::size_t i = 0; i < 64; ++i)
-				_quantization_tables[id][_dezigzag_table[i]] = data[i];
+			_quantization_tables[id] = data + 3;
 			return segment_size;
 		}
 
@@ -479,17 +476,6 @@ namespace
 					}
 				}
 			}
-			for (std::size_t c = 0; c < 3; ++c)
-			{
-				std::cerr << '\n';
-				const std::uint8_t* plane = ycbcr_buffer.begin() + _ycbcr_offset[c];
-				for (std::size_t y = 0; y < _mcu_y_count * _components[c]._vertical * 8; ++y)
-				{
-					for (std::size_t x = 0; x < _ycbcr_stride[c]; ++x)
-						std::cerr << '\t' << int{ plane[y * _ycbcr_stride[c] + x] };
-					std::cerr << '\n';
-				}
-			}
 			return true;
 		}
 
@@ -569,7 +555,7 @@ namespace
 		std::size_t _width = 0;
 		std::size_t _height = 0;
 		Component _components[3];
-		std::uint8_t _quantization_tables[2][64];
+		const std::uint8_t* _quantization_tables[2];
 		HuffmanTable _huffman_tables[2][2];
 		std::size_t _restart_interval = 0;
 		std::size_t _mcu_x_count = 0;
