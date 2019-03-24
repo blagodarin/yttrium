@@ -25,6 +25,8 @@
 
 #ifndef NDEBUG
 #	include <yttrium/utils/numeric.h>
+#	include <yttrium/storage/writer.h>
+#	include "../utils.h"
 #	include <cassert>
 #	include <iostream>
 #endif
@@ -224,18 +226,27 @@ namespace
 	class JpegDecoder
 	{
 	public:
-		bool decode(const std::uint8_t* data, std::size_t size)
+		bool decode(const std::uint8_t* data, std::size_t size, Yttrium::ImageInfo& info, Yttrium::Buffer& buffer)
 		{
 			if (const auto parsed = parse_headers(data, size); parsed > 0)
 			{
-				// TODO: Allocate YCbCr buffer.
-				if (parse_payload(data + parsed, size - parsed))
+				process_headers();
+				assert(_ycbcr_stride[1] == _ycbcr_stride[2]);
+				Yttrium::Buffer ycbcr_buffer{ _ycbcr_size }; // TODO: Try using small stack-based buffer and convert every MCU right after decoding.
+				if (parse_payload(ycbcr_buffer, data + parsed, size - parsed))
 				{
-					// TODO: Convert the loaded image to BGRA.
+					info = { _width, _height, Yttrium::PixelFormat::Bgra32 };
+					buffer.resize(info.frame_size());
+					Yttrium::YCbCrComponents components;
+					components.y = ycbcr_buffer.begin() + _ycbcr_offset[0];
+					components.y_stride = _ycbcr_stride[0];
+					components.cb = ycbcr_buffer.begin() + _ycbcr_offset[1];
+					components.cbcr_stride = _ycbcr_stride[1];
+					components.cr = ycbcr_buffer.begin() + _ycbcr_offset[2];
+					Yttrium::convert_jpeg420_to_bgra(_width, _height, components, buffer.data(), info.stride());
 					return true;
 				}
 			}
-			std::cerr << "<ERROR>\n";
 			return false;
 		}
 
@@ -417,11 +428,10 @@ namespace
 			return 0;
 		}
 
-		bool parse_payload(const std::uint8_t* data, std::size_t size) noexcept
+		void process_headers() noexcept
 		{
-			JpegBitstream bitstream{ data, size };
-			std::size_t max_h = _components[0]._horizontal;
-			std::size_t max_v = _components[0]._vertical;
+			auto max_h = _components[0]._horizontal;
+			auto max_v = _components[0]._vertical;
 			for (std::size_t i = 1; i < 3; ++i)
 			{
 				if (const auto h = _components[i]._horizontal; h > max_h)
@@ -431,22 +441,24 @@ namespace
 			}
 			const auto mcu_width = max_h * 8;
 			const auto mcu_height = max_v * 8;
-			const auto mcu_x_count = (_width + mcu_width - 1) / mcu_width;
-			const auto mcu_y_count = (_height + mcu_height - 1) / mcu_height;
-			std::size_t ycbcr_size = 0;
-			std::size_t ycbcr_offset[3];
-			std::size_t ycbcr_stride[3];
+			_mcu_x_count = (_width + mcu_width - 1) / mcu_width;
+			_mcu_y_count = (_height + mcu_height - 1) / mcu_height;
+			_ycbcr_size = 0;
 			for (std::size_t i = 0; i < 3; ++i)
 			{
-				ycbcr_offset[i] = ycbcr_size;
-				ycbcr_stride[i] = mcu_x_count * _components[i]._horizontal * 8;
-				ycbcr_size += ycbcr_stride[i] * mcu_y_count * _components[i]._vertical * 8;
+				_ycbcr_offset[i] = _ycbcr_size;
+				_ycbcr_stride[i] = _mcu_x_count * _components[i]._horizontal * 8;
+				_ycbcr_size += _ycbcr_stride[i] * _mcu_y_count * _components[i]._vertical * 8;
 			}
-			Yttrium::Buffer ycbcr_buffer{ ycbcr_size };
+		}
+
+		bool parse_payload(Yttrium::Buffer& ycbcr_buffer, const std::uint8_t* data, std::size_t size) noexcept
+		{
 			int last_dc[3]{ 0, 0, 0 };
-			for (std::size_t mcu_x = 0; mcu_x < mcu_x_count; ++mcu_x)
+			JpegBitstream bitstream{ data, size };
+			for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
 			{
-				for (std::size_t mcu_y = 0; mcu_y < mcu_y_count; ++mcu_y)
+				for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
 				{
 					for (std::size_t c = 0; c < 3; ++c)
 					{
@@ -460,8 +472,8 @@ namespace
 									return false;
 								const auto x = (mcu_x * component._horizontal + h) * 8;
 								const auto y = (mcu_y * component._vertical + v) * 8;
-								std::uint8_t* output = ycbcr_buffer.begin() + ycbcr_offset[c] + y * ycbcr_stride[c] + x;
-								::idct(output, ycbcr_stride[c], &block[0]);
+								std::uint8_t* output = ycbcr_buffer.begin() + _ycbcr_offset[c] + y * _ycbcr_stride[c] + x;
+								::idct(output, _ycbcr_stride[c], &block[0]);
 							}
 						}
 					}
@@ -470,11 +482,11 @@ namespace
 			for (std::size_t c = 0; c < 3; ++c)
 			{
 				std::cerr << '\n';
-				const std::uint8_t* plane = ycbcr_buffer.begin() + ycbcr_offset[c];
-				for (std::size_t y = 0; y < mcu_y_count * _components[c]._vertical * 8; ++y)
+				const std::uint8_t* plane = ycbcr_buffer.begin() + _ycbcr_offset[c];
+				for (std::size_t y = 0; y < _mcu_y_count * _components[c]._vertical * 8; ++y)
 				{
-					for (std::size_t x = 0; x < ycbcr_stride[c]; ++x)
-						std::cerr << '\t' << int{ plane[y * ycbcr_stride[c] + x] };
+					for (std::size_t x = 0; x < _ycbcr_stride[c]; ++x)
+						std::cerr << '\t' << int{ plane[y * _ycbcr_stride[c] + x] };
 					std::cerr << '\n';
 				}
 			}
@@ -493,7 +505,7 @@ namespace
 			std::pair<int, int> read(JpegBitstream& bitstream) const noexcept
 			{
 				// (-1 << i) + 1
-				static constexpr std::int16_t bias[16]{ 0, -1, -3, -7, -15, -31, -63, -127, -255, -511, -1023, -2047, -4095, -8191, -16383, -32767 };
+				static constexpr int bias[16]{ 0, -1, -3, -7, -15, -31, -63, -127, -255, -511, -1023, -2047, -4095, -8191, -16383, -32767 };
 
 				if (!bitstream.prepare_bits(16))
 					return { -1, 0 };
@@ -560,6 +572,11 @@ namespace
 		std::uint8_t _quantization_tables[2][64];
 		HuffmanTable _huffman_tables[2][2];
 		std::size_t _restart_interval = 0;
+		std::size_t _mcu_x_count = 0;
+		std::size_t _mcu_y_count = 0;
+		std::size_t _ycbcr_size = 0;
+		std::size_t _ycbcr_offset[3];
+		std::size_t _ycbcr_stride[3];
 	};
 #endif
 }
@@ -571,7 +588,8 @@ namespace Yttrium
 #ifndef NDEBUG
 		{
 			const auto jpeg = source.to_buffer();
-			JpegDecoder{}.decode(jpeg.begin(), jpeg.size());
+			JpegDecoder{}.decode(jpeg.begin(), jpeg.size(), info, buffer);
+			Image{ info, buffer.data() }.save(Writer{ "last_jpeg.png" }, ImageFormat::Png);
 		}
 #endif
 

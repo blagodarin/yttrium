@@ -37,8 +37,8 @@ namespace Yttrium
 		const std::uint8_t* y;
 		std::size_t y_stride;
 		const std::uint8_t* cb;
-		const std::uint8_t* cr;
 		std::size_t cbcr_stride;
+		const std::uint8_t* cr;
 	};
 
 	Y_CORE_API void convert_jpeg420_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, void* dst, std::size_t dst_stride) noexcept;
