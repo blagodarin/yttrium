@@ -18,7 +18,6 @@
 #include "../../libs/core/image/formats/bmp.h"
 #include "../../libs/core/image/formats/dds.h"
 #include "../../libs/core/image/formats/ico.h"
-#include "../../libs/core/image/formats/tga.h"
 #include "../core/image_formats.h"
 
 #include <cstring>
@@ -36,21 +35,7 @@ namespace
 
 int main()
 {
-	{
-		const auto image = ::make_gray8_test_image<16>();
-
-		TgaHeader header;
-		std::memset(&header, 0, sizeof header);
-		header.image_type = TgaImageType::BlackAndWhite;
-		header.image.width = 16;
-		header.image.height = 16;
-		header.image.pixel_depth = 8;
-		header.image.descriptor = tgaTopLeft;
-
-		Writer writer{ "tests/core/data/gradient8.tga" };
-		if (writer.write(header))
-			writer.write_all(image.data(), image.info().frame_size());
-	}
+	::make_gray8_test_image<16>().save(Writer{ "tests/core/data/gradient8.tga" }, ImageFormat::Tga);
 	{
 		BmpFileHeader file_header;
 		file_header.file_type = BmpFileType::Bm;
@@ -76,19 +61,7 @@ int main()
 			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
 	}
 	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.png" }, ImageFormat::Png);
-	{
-		TgaHeader header;
-		std::memset(&header, 0, sizeof header);
-		header.image_type = TgaImageType::TrueColor;
-		header.image.width = 16;
-		header.image.height = 16;
-		header.image.pixel_depth = 24;
-		header.image.descriptor = tgaTopLeft;
-
-		Writer writer{ "tests/core/data/gradient24.tga" };
-		if (writer.write(header))
-			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
-	}
+	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.tga" }, ImageFormat::Tga);
 	{
 		DDS_HEADER header;
 		std::memset(&header, 0, sizeof header);
@@ -150,17 +123,5 @@ int main()
 			writer.write(mask_data_buffer.get(), mask_data_size);
 		}
 	}
-	{
-		TgaHeader header;
-		std::memset(&header, 0, sizeof header);
-		header.image_type = TgaImageType::TrueColor;
-		header.image.width = 16;
-		header.image.height = 16;
-		header.image.pixel_depth = 32;
-		header.image.descriptor = tgaTopLeft | 8;
-
-		Writer writer{ "tests/core/data/gradient32.tga" };
-		if (writer.write(header))
-			::write_color_gradient(writer, true, ImageOrientation::XRightYDown);
-	}
+	::make_test_image(true, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient32.tga" }, ImageFormat::Tga);
 }

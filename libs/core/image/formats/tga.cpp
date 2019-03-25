@@ -14,8 +14,6 @@
 // limitations under the License.
 //
 
-#include "tga.h"
-
 #include <yttrium/image.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/writer.h>
@@ -23,6 +21,74 @@
 
 #include <cstring>
 #include <limits>
+
+namespace
+{
+	enum class TgaColorMapType : uint8_t
+	{
+		None = 0,
+		ColorMap = 1,
+	};
+
+	enum class TgaImageType : uint8_t
+	{
+		None = 0,
+		ColorMapped = 1,
+		TrueColor = 2,
+		BlackAndWhite = 3,
+		ColorMappedRle = 9,
+		TrueColorRle = 10,
+		BlackAndWhiteRle = 11,
+	};
+
+	enum TgaImageDescriptor : uint8_t
+	{
+		tgaAlphaMask = 0x0F,
+
+		tgaOriginMask = 0x30,
+		tgaBottomLeft = 0x00,
+		tgaBottomRight = 0x10,
+		tgaTopLeft = 0x20,
+		tgaTopRight = 0x30,
+
+		tgaReservedMask = 0xC0,
+	};
+
+#pragma pack(push, 1)
+
+	struct TgaHeader
+	{
+		uint8_t id_length;
+		TgaColorMapType color_map_type;
+		TgaImageType image_type;
+		struct
+		{
+			uint16_t first_entry_index;
+			uint16_t length;
+			uint8_t entry_size;
+		} color_map;
+		struct
+		{
+			uint16_t x;
+			uint16_t y;
+			uint16_t width;
+			uint16_t height;
+			uint8_t pixel_depth;
+			uint8_t descriptor;
+		} image;
+	};
+
+#pragma pack(pop)
+
+	enum class TgaRlePacketHeader
+	{
+		PacketTypeMask = 0x80,
+		RawPacket = 0x00,
+		RunLengthPacket = 0x80,
+
+		PixelCountMask = 0x7F,
+	};
+}
 
 namespace Yttrium
 {

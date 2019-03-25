@@ -88,9 +88,7 @@ y_sources(ycore "src/image/formats"
 	image/formats/ico.cpp
 	image/formats/ico.h
 	image/formats/png.cpp
-	image/formats/png.h
 	image/formats/tga.cpp
-	image/formats/tga.h
 	)
 if(Y_USE_JPEG)
 	if(WIN32)
@@ -236,8 +234,10 @@ y_sources(ycore "include/utils"
 	../../include/yttrium/utils/string.h
 	)
 y_sources(ycore "src/utils"
+	utils/adler32.h
 	utils/algorithm.h
 	utils/atomic_counters.h
+	utils/crc32.h
 	utils/fourcc.h
 	utils/memory.h
 	utils/string.cpp
