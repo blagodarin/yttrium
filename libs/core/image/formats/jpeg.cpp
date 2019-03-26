@@ -23,11 +23,17 @@
 
 #include <jpeglib.h> // TODO: Load JPEG without libjpeg.
 
-#ifndef NDEBUG
+#ifdef NDEBUG
+#	define Y_NO_CUSTOM_JPEG
+#endif
+
+#ifndef Y_NO_CUSTOM_JPEG
 #	include <yttrium/utils/numeric.h>
 #	include <yttrium/storage/writer.h>
 #	include "../utils.h"
 #	include <cassert>
+#	include <chrono>
+#	include <iostream>
 #endif
 
 namespace
@@ -38,12 +44,14 @@ namespace
 		std::jmp_buf _jmp_buf;
 	};
 
-	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
+	[[noreturn]] void error_callback(jpeg_common_struct* cinfo)
+	{
 		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 
-#ifndef NDEBUG
-	enum : std::uint8_t {
+#ifndef Y_NO_CUSTOM_JPEG
+	enum : std::uint8_t
+	{
 		TEM = 0x01,       // Temporary.
 		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
 		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
@@ -571,10 +579,13 @@ namespace Yttrium
 {
 	bool read_jpeg(const Source& source, ImageInfo& info, Buffer& buffer)
 	{
-#ifndef NDEBUG
+#ifndef Y_NO_CUSTOM_JPEG
 		{
 			const auto jpeg = source.to_buffer();
+			const auto startTime = std::chrono::high_resolution_clock::now();
 			JpegDecoder{}.decode(jpeg.begin(), jpeg.size(), info, buffer);
+			const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startTime);
+			std::cerr << "Custom JPEG decoder: " << duration.count() << " ns\n";
 			Image{ info, buffer.data() }.save(Writer{ "last_jpeg.png" }, ImageFormat::Png);
 		}
 #endif
@@ -582,6 +593,10 @@ namespace Yttrium
 		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
 		if (source_buffer.size() > std::numeric_limits<unsigned long>::max())
 			return false;
+
+#ifndef Y_NO_CUSTOM_JPEG
+		const auto startTime = std::chrono::high_resolution_clock::now();
+#endif
 
 		JpegErrorHandler error_handler;
 		error_handler._error_mgr.error_exit = ::error_callback;
@@ -627,6 +642,10 @@ namespace Yttrium
 
 		::jpeg_destroy_decompress(&decompressor);
 
+#ifndef Y_NO_CUSTOM_JPEG
+		const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startTime);
+		std::cerr << "Libjpeg decoder: " << duration.count() << " ns\n";
+#endif
 		return true;
 	}
 }
