@@ -1,5 +1,5 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# Copyright 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,5 +17,5 @@
 add_executable(benchmark_buffer
 	main.cpp
 	)
-target_link_libraries(benchmark_buffer ycore)
+target_link_libraries(benchmark_buffer PRIVATE ycore)
 set_target_properties(benchmark_buffer PROPERTIES FOLDER "benchmarks")

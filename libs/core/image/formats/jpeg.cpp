@@ -15,41 +15,14 @@
 //
 
 #include <yttrium/image.h>
-#include <yttrium/storage/source.h>
+#include <yttrium/utils/numeric.h>
 #include "../formats.h"
+#include "../utils.h"
 
-#include <csetjmp>
-#include <cstdio> // <jpeglib.h> requires FILE declaration.
-
-#include <jpeglib.h> // TODO: Load JPEG without libjpeg.
-
-#ifdef NDEBUG
-#	define Y_NO_CUSTOM_JPEG
-#endif
-
-#ifndef Y_NO_CUSTOM_JPEG
-#	include <yttrium/utils/numeric.h>
-#	include <yttrium/storage/writer.h>
-#	include "../utils.h"
-#	include <cassert>
-#	include <chrono>
-#	include <iostream>
-#endif
+#include <cassert>
 
 namespace
 {
-	struct JpegErrorHandler
-	{
-		jpeg_error_mgr _error_mgr;
-		std::jmp_buf _jmp_buf;
-	};
-
-	[[noreturn]] void error_callback(jpeg_common_struct* cinfo)
-	{
-		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
-	}
-
-#ifndef Y_NO_CUSTOM_JPEG
 	enum : std::uint8_t
 	{
 		TEM = 0x01,       // Temporary.
@@ -572,80 +545,12 @@ namespace
 		std::size_t _ycbcr_offset[3];
 		std::size_t _ycbcr_stride[3];
 	};
-#endif
 }
 
 namespace Yttrium
 {
-	bool read_jpeg(const Source& source, ImageInfo& info, Buffer& buffer)
+	bool read_jpeg(const void* data, std::size_t size, ImageInfo& info, Buffer& buffer)
 	{
-#ifndef Y_NO_CUSTOM_JPEG
-		{
-			const auto jpeg = source.to_buffer();
-			const auto startTime = std::chrono::high_resolution_clock::now();
-			JpegDecoder{}.decode(jpeg.begin(), jpeg.size(), info, buffer);
-			const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startTime);
-			std::cerr << "Custom JPEG decoder: " << duration.count() << " ns\n";
-			Image{ info, buffer.data() }.save(Writer{ "last_jpeg.png" }, ImageFormat::Png);
-		}
-#endif
-
-		auto source_buffer = source.to_buffer(); // Some JPEG libraries require non-const source buffer.
-		if (source_buffer.size() > std::numeric_limits<unsigned long>::max())
-			return false;
-
-#ifndef Y_NO_CUSTOM_JPEG
-		const auto startTime = std::chrono::high_resolution_clock::now();
-#endif
-
-		JpegErrorHandler error_handler;
-		error_handler._error_mgr.error_exit = ::error_callback;
-		if (setjmp(error_handler._jmp_buf))
-			return false;
-
-		jpeg_decompress_struct decompressor;
-		decompressor.err = ::jpeg_std_error(&error_handler._error_mgr);
-		::jpeg_create_decompress(&decompressor);
-		if (setjmp(error_handler._jmp_buf))
-		{
-			::jpeg_destroy_decompress(&decompressor);
-			return false;
-		}
-
-		::jpeg_mem_src(&decompressor, &source_buffer[0], static_cast<unsigned long>(source_buffer.size()));
-
-		::jpeg_read_header(&decompressor, TRUE);
-
-		decompressor.out_color_space = JCS_RGB;
-
-		::jpeg_calc_output_dimensions(&decompressor);
-
-		info = { decompressor.output_width, decompressor.output_height, PixelFormat::Rgb24 };
-
-		try
-		{
-			buffer.reset(info.frame_size());
-		}
-		catch (const std::bad_alloc&)
-		{
-			::jpeg_destroy_decompress(&decompressor);
-			throw;
-		}
-
-		::jpeg_start_decompress(&decompressor);
-		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += info.stride())
-			::jpeg_read_scanlines(&decompressor, &scanline, 1);
-		::jpeg_finish_decompress(&decompressor);
-
-		if (setjmp(error_handler._jmp_buf))
-			return false;
-
-		::jpeg_destroy_decompress(&decompressor);
-
-#ifndef Y_NO_CUSTOM_JPEG
-		const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - startTime);
-		std::cerr << "Libjpeg decoder: " << duration.count() << " ns\n";
-#endif
-		return true;
+		return JpegDecoder{}.decode(static_cast<const std::uint8_t*>(data), size, info, buffer);
 	}
 }

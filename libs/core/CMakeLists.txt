@@ -87,27 +87,10 @@ y_sources(ycore "src/image/formats"
 	image/formats/dds.h
 	image/formats/ico.cpp
 	image/formats/ico.h
+	image/formats/jpeg.cpp
 	image/formats/png.cpp
 	image/formats/tga.cpp
 	)
-if(Y_USE_JPEG)
-	if(WIN32)
-		find_package(Y3_jpeg REQUIRED)
-		target_link_libraries(ycore PRIVATE Y3::jpeg)
-	else()
-		find_package(JPEG REQUIRED)
-		mark_as_advanced(jconfig_dir)
-		target_link_libraries(ycore PRIVATE JPEG::JPEG)
-	endif()
-	y_sources(ycore "src/image/formats"
-		image/formats/jpeg.cpp
-		)
-	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set_property(SOURCE image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
-	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-		set_property(SOURCE image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
-	endif()
-endif()
 
 ########################################################################################################################
 # ion

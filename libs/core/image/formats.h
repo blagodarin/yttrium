@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <yttrium/api.h>
+
+#include <cstddef>
+
 namespace Yttrium
 {
 	class Buffer;
@@ -28,10 +32,9 @@ namespace Yttrium
 	bool read_bmp_header(Reader&, ImageInfo&);
 	bool read_dds_header(Reader&, ImageInfo&);
 	bool read_ico_header(Reader&, ImageInfo&);
-#if Y_USE_JPEG
-	bool read_jpeg(const Source&, ImageInfo&, Buffer&);
-#endif
 	bool read_tga_header(Reader&, ImageInfo&);
+
+	Y_CORE_API bool read_jpeg(const void*, std::size_t, ImageInfo&, Buffer&);
 
 	bool write_png(Writer&, const ImageInfo&, const void*);
 	bool write_tga(Writer&, const ImageInfo&, const void*);

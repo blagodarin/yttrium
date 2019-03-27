@@ -217,6 +217,9 @@ endif()
 
 if(BUILD_EXTRAS)
 	add_subdirectory(benchmarks/buffer)
+	if(Y_USE_JPEG)
+		add_subdirectory(benchmarks/jpeg)
+	endif()
 	add_subdirectory(tests/gen_test_data)
 endif()
 

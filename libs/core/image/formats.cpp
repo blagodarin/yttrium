@@ -77,11 +77,10 @@ namespace Yttrium
 				return false;
 			break;
 		case ImageFormat::Jpeg:
-#if Y_USE_JPEG
-			return read_jpeg(source, info, buffer);
-#else
-			return false;
-#endif
+		{
+			auto source_buffer = source.to_buffer();
+			return read_jpeg(source_buffer.data(), source_buffer.size(), info, buffer);
+		}
 		case ImageFormat::Dds:
 			if (!read_dds_header(reader, info))
 				return false;
