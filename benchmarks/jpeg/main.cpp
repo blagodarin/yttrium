@@ -21,8 +21,10 @@
 #include "../../libs/core/image/formats.h"
 
 #include <chrono>
+#include <cmath>
 #include <csetjmp>
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
+#include <cstring>
 #include <iostream>
 
 #include <jpeglib.h>
@@ -93,16 +95,27 @@ namespace
 	}
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	//const auto input = Yttrium::Source::from("tests/core/data/gradient24.jpeg")->to_buffer();
-	const auto input = Yttrium::Source::from("examples/tetrium/data/textures/background.jpeg")->to_buffer();
+	if (argc != 2)
+	{
+		std::cerr << "No file name specified\n";
+		return 1;
+	}
+
+	const auto source = Yttrium::Source::from(argv[1]);
+	if (!source)
+	{
+		std::cerr << "Unable to open \"" << argv[1] << "\"\n";
+		return 1;
+	}
+
+	const auto input = source->to_buffer();
 
 	Yttrium::ImageInfo output_info;
 	Yttrium::Buffer output;
 	output.reserve(1024 * 1024 * 4);
-	for (std::size_t i = 0; i < output.capacity(); i += Yttrium::Buffer::memory_granularity())
-		output[i] = 127; // Force pagefaults.
+	std::memset(output.data(), 0xff, output.capacity());
 
 	std::chrono::microseconds duration;
 
@@ -112,7 +125,7 @@ int main()
 	{
 		if (!Yttrium::read_jpeg(input.data(), input.size(), output_info, output))
 		{
-			std::cerr << "Unsupported JPEG image!\n";
+			std::cerr << "Unsupported JPEG image\n";
 			return 1;
 		}
 		++yttrium_iterations;
@@ -120,9 +133,9 @@ int main()
 		if (duration > std::chrono::seconds{ 1 })
 			break;
 	}
-	const auto yttrium_duration = duration;
+	const auto yttrium_time = static_cast<double>(duration.count());
 
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "last_jpeg.png" }, Yttrium::ImageFormat::Png);
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "yttrium_output.png" }, Yttrium::ImageFormat::Png);
 
 	start_time = std::chrono::high_resolution_clock::now();
 	int libjpeg_iterations = 0;
@@ -130,7 +143,7 @@ int main()
 	{
 		if (!::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output))
 		{
-			std::cerr << "Invalid JPEG image!\n";
+			std::cerr << "Invalid JPEG image\n"; // Shouldn't happen since we're unlikely to support JPEG format better than libjpeg.
 			return 1;
 		}
 		++libjpeg_iterations;
@@ -138,12 +151,12 @@ int main()
 		if (duration > std::chrono::seconds{ 1 })
 			break;
 	}
-	const auto libjpeg_duration = duration;
+	const auto libjpeg_time = static_cast<double>(duration.count());
 
-	// This benchmark is actually unfair because Yttrium produces BGRA images
-	// and libjpeg produces RGB images, but since Yttrium touches MORE memory
-	// it is OK for it to be a bit slower (and is really good to be faster!).
-	std::cerr << "Yttrium decoder: " << std::fixed << static_cast<double>(yttrium_duration.count()) / yttrium_iterations << " us (" << yttrium_iterations << " iterations)\n";
-	std::cerr << "Libjpeg decoder: " << std::fixed << static_cast<double>(libjpeg_duration.count()) / libjpeg_iterations << " us (" << libjpeg_iterations << " iterations)\n";
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "libjpeg_output.png" }, Yttrium::ImageFormat::Png);
+
+	// Yttrium outputs BGRA images and libjpeg produces RGB images, so it is OK for Yttrium to be 33% slower.
+	std::cerr << "Yttrium: " << std::lround(yttrium_time / yttrium_iterations) << " us/image, " << std::lround(yttrium_iterations * 1'000'000.0 / yttrium_time) << " images/s\n";
+	std::cerr << "libjpeg: " << std::lround(libjpeg_time / libjpeg_iterations) << " us/image, " << std::lround(libjpeg_iterations * 1'000'000.0 / libjpeg_time) << " images/s (" << std::fixed << (libjpeg_iterations * yttrium_time) / (yttrium_iterations * libjpeg_time) << " times faster)\n";
 	return 0;
 }

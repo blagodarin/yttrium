@@ -438,9 +438,9 @@ namespace
 		{
 			int last_dc[3]{ 0, 0, 0 };
 			JpegBitstream bitstream{ data, size };
-			for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
+			for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
 			{
-				for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
+				for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
 				{
 					for (std::size_t c = 0; c < 3; ++c)
 					{
