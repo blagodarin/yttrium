@@ -95,8 +95,8 @@ namespace
 
 int main()
 {
-	const auto input = Yttrium::Source::from("tests/core/data/gradient24.jpeg")->to_buffer();
-	//const auto input = Yttrium::Source::from("examples/tetrium/data/textures/background.jpeg")->to_buffer();
+	//const auto input = Yttrium::Source::from("tests/core/data/gradient24.jpeg")->to_buffer();
+	const auto input = Yttrium::Source::from("examples/tetrium/data/textures/background.jpeg")->to_buffer();
 
 	Yttrium::ImageInfo output_info;
 	Yttrium::Buffer output;
@@ -104,7 +104,7 @@ int main()
 	for (std::size_t i = 0; i < output.capacity(); i += Yttrium::Buffer::memory_granularity())
 		output[i] = 127; // Force pagefaults.
 
-	std::chrono::nanoseconds duration;
+	std::chrono::microseconds duration;
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 	int yttrium_iterations = 0;
@@ -116,7 +116,7 @@ int main()
 			return 1;
 		}
 		++yttrium_iterations;
-		duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_time);
+		duration = std::chrono::duration_cast<decltype(duration)>(std::chrono::high_resolution_clock::now() - start_time);
 		if (duration > std::chrono::seconds{ 1 })
 			break;
 	}
@@ -134,7 +134,7 @@ int main()
 			return 1;
 		}
 		++libjpeg_iterations;
-		duration = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start_time);
+		duration = std::chrono::duration_cast<decltype(duration)>(std::chrono::high_resolution_clock::now() - start_time);
 		if (duration > std::chrono::seconds{ 1 })
 			break;
 	}
@@ -143,7 +143,7 @@ int main()
 	// This benchmark is actually unfair because Yttrium produces BGRA images
 	// and libjpeg produces RGB images, but since Yttrium touches MORE memory
 	// it is OK for it to be a bit slower (and is really good to be faster!).
-	std::cerr << "Yttrium decoder: " << static_cast<double>(yttrium_duration.count()) / yttrium_iterations << " ns (" << yttrium_iterations << " iterations)\n";
-	std::cerr << "Libjpeg decoder: " << static_cast<double>(libjpeg_duration.count()) / libjpeg_iterations << " ns (" << libjpeg_iterations << " iterations)\n";
+	std::cerr << "Yttrium decoder: " << std::fixed << static_cast<double>(yttrium_duration.count()) / yttrium_iterations << " us (" << yttrium_iterations << " iterations)\n";
+	std::cerr << "Libjpeg decoder: " << std::fixed << static_cast<double>(libjpeg_duration.count()) / libjpeg_iterations << " us (" << libjpeg_iterations << " iterations)\n";
 	return 0;
 }

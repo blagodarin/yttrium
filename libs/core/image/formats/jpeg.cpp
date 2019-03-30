@@ -165,7 +165,11 @@ namespace
 			while (_buffer_bits < count)
 			{
 				if (_data == _end)
-					return false;
+				{
+					_buffer = (_buffer << 8) | 0xff;
+					_buffer_bits += 8;
+					continue;
+				}
 				const auto next = *_data++;
 				_buffer = (_buffer << 8) | next;
 				_buffer_bits += 8;
