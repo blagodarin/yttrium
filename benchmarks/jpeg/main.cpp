@@ -37,8 +37,7 @@ namespace
 		std::jmp_buf _jmp_buf;
 	};
 
-	[[noreturn]] void error_callback(jpeg_common_struct* cinfo)
-	{
+	[[noreturn]] void error_callback(jpeg_common_struct* cinfo) {
 		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 
@@ -130,7 +129,7 @@ int main(int argc, char** argv)
 		}
 		++yttrium_iterations;
 		duration = std::chrono::duration_cast<decltype(duration)>(std::chrono::high_resolution_clock::now() - start_time);
-		if (duration > std::chrono::seconds{ 1 })
+		if (duration > std::chrono::seconds{ 5 })
 			break;
 	}
 	const auto yttrium_time = static_cast<double>(duration.count());
@@ -148,7 +147,7 @@ int main(int argc, char** argv)
 		}
 		++libjpeg_iterations;
 		duration = std::chrono::duration_cast<decltype(duration)>(std::chrono::high_resolution_clock::now() - start_time);
-		if (duration > std::chrono::seconds{ 1 })
+		if (duration > std::chrono::seconds{ 5 })
 			break;
 	}
 	const auto libjpeg_time = static_cast<double>(duration.count());

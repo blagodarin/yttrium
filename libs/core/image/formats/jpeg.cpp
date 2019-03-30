@@ -47,7 +47,7 @@ namespace
 		COM = 0xfe,       // Comment.
 	};
 
-	constexpr std::uint8_t _dezigzag_table[64]{
+	constexpr std::uint8_t _dezigzag_table[64 + 15]{
 		0, 1, 8, 16, 9, 2, 3, 10,
 		17, 24, 32, 25, 18, 11, 4, 5,
 		12, 19, 26, 33, 40, 48, 41, 34,
@@ -55,7 +55,11 @@ namespace
 		35, 42, 49, 56, 57, 50, 43, 36,
 		29, 22, 15, 23, 30, 37, 44, 51,
 		58, 59, 52, 45, 38, 31, 39, 46,
-		53, 60, 61, 54, 47, 55, 62, 63
+		53, 60, 61, 54, 47, 55, 62, 63,
+
+		// Extra values to prevent index check (see Component::read_block).
+		63, 63, 63, 63, 63, 63, 63, 63,
+		63, 63, 63, 63, 63, 63, 63
 	};
 
 	// IDCT code taken from the STB public domain libraries (https://github.com/nothings/stb).
@@ -64,41 +68,41 @@ namespace
 		using Yttrium::clamp_to_uint8;
 		using Yttrium::fixed_point;
 
-#	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
-		int p2 = s2; \
-		int p3 = s6; \
-		int p1 = (p2 + p3) * fixed_point<int, 12>(0.5411961f); \
-		int t2 = p1 + p3 * fixed_point<int, 12>(-1.847759065f); \
-		int t3 = p1 + p2 * fixed_point<int, 12>(0.765366865f); \
-		p2 = s0; \
-		p3 = s4; \
-		int t0 = (p2 + p3) * fixed_point<int, 12>(1.f); \
-		int t1 = (p2 - p3) * fixed_point<int, 12>(1.f); \
-		int x0 = t0 + t3; \
-		int x3 = t0 - t3; \
-		int x1 = t1 + t2; \
-		int x2 = t1 - t2; \
-		t0 = s7; \
-		t1 = s5; \
-		t2 = s3; \
-		t3 = s1; \
-		p3 = t0 + t2; \
-		int p4 = t1 + t3; \
-		p1 = t0 + t3; \
-		p2 = t1 + t2; \
-		const int p5 = (p3 + p4) * fixed_point<int, 12>(1.175875602f); \
-		t0 = t0 * fixed_point<int, 12>(0.298631336f); \
-		t1 = t1 * fixed_point<int, 12>(2.053119869f); \
-		t2 = t2 * fixed_point<int, 12>(3.072711026f); \
-		t3 = t3 * fixed_point<int, 12>(1.501321110f); \
-		p1 = p5 + p1 * fixed_point<int, 12>(-0.899976223f); \
-		p2 = p5 + p2 * fixed_point<int, 12>(-2.562915447f); \
-		p3 = p3 * fixed_point<int, 12>(-1.961570560f); \
-		p4 = p4 * fixed_point<int, 12>(-0.390180644f); \
-		t3 += p1 + p4; \
-		t2 += p2 + p3; \
-		t1 += p2 + p4; \
-		t0 += p1 + p3
+#define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
+	int p2 = s2; \
+	int p3 = s6; \
+	int p1 = (p2 + p3) * fixed_point<int, 12>(0.5411961f); \
+	int t2 = p1 + p3 * fixed_point<int, 12>(-1.847759065f); \
+	int t3 = p1 + p2 * fixed_point<int, 12>(0.765366865f); \
+	p2 = s0; \
+	p3 = s4; \
+	int t0 = (p2 + p3) * fixed_point<int, 12>(1.f); \
+	int t1 = (p2 - p3) * fixed_point<int, 12>(1.f); \
+	int x0 = t0 + t3; \
+	int x3 = t0 - t3; \
+	int x1 = t1 + t2; \
+	int x2 = t1 - t2; \
+	t0 = s7; \
+	t1 = s5; \
+	t2 = s3; \
+	t3 = s1; \
+	p3 = t0 + t2; \
+	int p4 = t1 + t3; \
+	p1 = t0 + t3; \
+	p2 = t1 + t2; \
+	const int p5 = (p3 + p4) * fixed_point<int, 12>(1.175875602f); \
+	t0 = t0 * fixed_point<int, 12>(0.298631336f); \
+	t1 = t1 * fixed_point<int, 12>(2.053119869f); \
+	t2 = t2 * fixed_point<int, 12>(3.072711026f); \
+	t3 = t3 * fixed_point<int, 12>(1.501321110f); \
+	p1 = p5 + p1 * fixed_point<int, 12>(-0.899976223f); \
+	p2 = p5 + p2 * fixed_point<int, 12>(-2.562915447f); \
+	p3 = p3 * fixed_point<int, 12>(-1.961570560f); \
+	p4 = p4 * fixed_point<int, 12>(-0.390180644f); \
+	t3 += p1 + p4; \
+	t2 += p2 + p3; \
+	t1 += p2 + p4; \
+	t0 += p1 + p3
 
 		int buffer[64];
 
@@ -216,7 +220,7 @@ namespace
 			{
 				process_headers();
 				assert(_ycbcr_stride[1] == _ycbcr_stride[2]);
-				Yttrium::Buffer ycbcr_buffer{ _ycbcr_size }; // TODO: Try using small stack-based buffer and convert every MCU right after decoding.
+				Yttrium::Buffer ycbcr_buffer{ _ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
 				if (parse_payload(ycbcr_buffer, data + parsed, size - parsed))
 				{
 					info = { _width, _height, Yttrium::PixelFormat::Bgra32 };
@@ -240,7 +244,7 @@ namespace
 			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
 		}
 
-		std::size_t decode_dht(const std::uint8_t* data, std::size_t size)
+		std::size_t decode_dht(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			if (size < 2)
 				return 0;
@@ -277,7 +281,7 @@ namespace
 					if (code - 1 >= 1 << i)
 						return 0;
 				}
-				huffman._max_codes[i] = code;
+				huffman._max_codes[i] = code << (16 - i); // Pre-shift max code to avoid shifting bit value in HuffmanTable::read.
 				code <<= 1;
 			}
 			huffman._max_codes[17] = std::numeric_limits<int>::max();
@@ -310,7 +314,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_sof0(const std::uint8_t* data, std::size_t size)
+		std::size_t decode_sof0(const std::uint8_t* data, std::size_t size) noexcept
 		{
 			if (size < 2)
 				return 0;
@@ -483,7 +487,7 @@ namespace
 				const auto bits = bitstream.peek_bits(16);
 				int size = 1;
 				for (;; ++size)
-					if (bits >> (16 - size) < _max_codes[size])
+					if (bits < _max_codes[size])
 						break;
 				if (size > 16)
 					return { -1, 0 };
@@ -520,17 +524,13 @@ namespace
 				do
 				{
 					const auto [ac_code, ac_value] = _ac_table->read(bitstream);
-					if (ac_code < 0)
-						return false;
-					if (!ac_code)
-						break;
+					if (ac_code <= 0)
+						return !ac_code;
 					const auto r = ac_code >> 4;
 					const auto s = ac_code & 0xf;
 					if (!s && r != 15)
 						return false;
 					i += r + 1;
-					if (i > 63)
-						return false;
 					block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * _quantization_table[i]);
 				} while (i < 63);
 				return true;
