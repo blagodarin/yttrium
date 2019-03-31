@@ -20,6 +20,12 @@
 
 #include <cstring>
 
+#define USE_SSE2 __has_include(<emmintrin.h>)
+
+#if USE_SSE2
+#	include <emmintrin.h>
+#endif
+
 namespace Yttrium
 {
 	void copy_image_rgb_bgr(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
@@ -161,6 +167,67 @@ namespace Yttrium
 		auto bgra1 = static_cast<std::uint8_t*>(dst);
 		auto bgra2 = bgra1 + dst_stride;
 		const auto bgra_delta = dst_stride * 2 - width * 4;
+#if USE_SSE2
+		if (!(width & 0xf) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
+		{
+			const auto alpha = _mm_set1_epi16(255);
+			const auto bias = _mm_set1_epi8(static_cast<char>(0x80));
+
+			const auto cr_r = _mm_set1_epi16(fixed_point<std::int16_t, 12>(1.402));
+			const auto cr_g = _mm_set1_epi16(-fixed_point<std::int16_t, 12>(0.7141363));
+			const auto cb_g = _mm_set1_epi16(-fixed_point<std::int16_t, 12>(0.3441363));
+			const auto cb_b = _mm_set1_epi16(fixed_point<std::int16_t, 12>(1.772));
+
+			for (auto j = height / 2; j > 0; --j)
+			{
+				for (auto i = width / 8; i > 0; --i)
+				{
+					const auto y1_values = _mm_srli_epi16(_mm_unpacklo_epi8(bias, _mm_loadl_epi64(reinterpret_cast<const __m128i*>(y1))), 4);
+					const auto y2_values = _mm_srli_epi16(_mm_unpacklo_epi8(bias, _mm_loadl_epi64(reinterpret_cast<const __m128i*>(y2))), 4);
+
+					// TODO: Load 4 bytes.
+					const auto cb_bytes = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(cb));
+					const auto cr_bytes = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(cr));
+
+					const auto cb_values = _mm_unpacklo_epi8(_mm_setzero_si128(), _mm_xor_si128(_mm_unpacklo_epi8(cb_bytes, cb_bytes), bias));
+					const auto cr_values = _mm_unpacklo_epi8(_mm_setzero_si128(), _mm_xor_si128(_mm_unpacklo_epi8(cr_bytes, cr_bytes), bias));
+
+					const auto xb_values = _mm_mulhi_epi16(cb_values, cb_b);
+					const auto xg_values = _mm_add_epi16(_mm_mulhi_epi16(cb_values, cb_g), _mm_mulhi_epi16(cr_values, cr_g));
+					const auto xr_values = _mm_mulhi_epi16(cr_values, cr_r);
+
+					const auto br1 = _mm_packus_epi16(_mm_srai_epi16(_mm_add_epi16(y1_values, xb_values), 4), _mm_srai_epi16(_mm_add_epi16(y1_values, xr_values), 4));
+					const auto br2 = _mm_packus_epi16(_mm_srai_epi16(_mm_add_epi16(y2_values, xb_values), 4), _mm_srai_epi16(_mm_add_epi16(y2_values, xr_values), 4));
+					const auto ga1 = _mm_packus_epi16(_mm_srai_epi16(_mm_add_epi16(y1_values, xg_values), 4), alpha);
+					const auto ga2 = _mm_packus_epi16(_mm_srai_epi16(_mm_add_epi16(y2_values, xg_values), 4), alpha);
+
+					const auto bg1 = _mm_unpacklo_epi8(br1, ga1);
+					const auto bg2 = _mm_unpacklo_epi8(br2, ga2);
+					const auto ra1 = _mm_unpackhi_epi8(br1, ga1);
+					const auto ra2 = _mm_unpackhi_epi8(br2, ga2);
+
+					_mm_store_si128(reinterpret_cast<__m128i*>(bgra1) + 0, _mm_unpacklo_epi16(bg1, ra1));
+					_mm_store_si128(reinterpret_cast<__m128i*>(bgra1) + 1, _mm_unpackhi_epi16(bg1, ra1));
+					_mm_store_si128(reinterpret_cast<__m128i*>(bgra2) + 0, _mm_unpacklo_epi16(bg2, ra2));
+					_mm_store_si128(reinterpret_cast<__m128i*>(bgra2) + 1, _mm_unpackhi_epi16(bg2, ra2));
+
+					y1 += 8;
+					y2 += 8;
+					cb += 4;
+					cr += 4;
+					bgra1 += 32;
+					bgra2 += 32;
+				}
+				y1 += y_delta;
+				y2 += y_delta;
+				cb += cbcr_delta;
+				cr += cbcr_delta;
+				bgra1 += bgra_delta;
+				bgra2 += bgra_delta;
+			}
+			return;
+		}
+#endif
 		for (auto j = height / 2; j > 0; --j)
 		{
 			for (auto i = width / 2; i > 0; --i)
