@@ -65,11 +65,11 @@ namespace
 
 		::jpeg_read_header(&decompressor, TRUE);
 
-		decompressor.out_color_space = JCS_RGB;
+		decompressor.out_color_space = JCS_EXT_BGRA;
 
 		::jpeg_calc_output_dimensions(&decompressor);
 
-		info = { decompressor.output_width, decompressor.output_height, Yttrium::PixelFormat::Rgb24 };
+		info = { decompressor.output_width, decompressor.output_height, Yttrium::PixelFormat::Bgra32 };
 
 		try
 		{
@@ -154,7 +154,6 @@ int main(int argc, char** argv)
 
 	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "libjpeg_output.png" }, Yttrium::ImageFormat::Png);
 
-	// Yttrium outputs BGRA images and libjpeg produces RGB images, so it is OK for Yttrium to be 33% slower.
 	std::cerr << "Yttrium: " << std::lround(yttrium_time / yttrium_iterations) << " us/image, " << std::lround(yttrium_iterations * 1'000'000.0 / yttrium_time) << " images/s\n";
 	std::cerr << "libjpeg: " << std::lround(libjpeg_time / libjpeg_iterations) << " us/image, " << std::lround(libjpeg_iterations * 1'000'000.0 / libjpeg_time) << " images/s (" << std::fixed << (libjpeg_iterations * yttrium_time) / (yttrium_iterations * libjpeg_time) << " times faster)\n";
 	return 0;
