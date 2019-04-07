@@ -14,19 +14,18 @@
 // limitations under the License.
 //
 
+#include "../common/benchmark.h"
+
 #include <yttrium/image.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 #include "../../libs/core/image/formats.h"
 
-#include <chrono>
-#include <cmath>
 #include <csetjmp>
-#include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <cstring>
-#include <iostream>
 
+#include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <jpeglib.h>
 
 namespace
@@ -116,45 +115,19 @@ int main(int argc, char** argv)
 	output.reserve(1024 * 1024 * 4);
 	std::memset(output.data(), 0xff, output.capacity());
 
-	std::chrono::microseconds duration;
+	Benchmark<1000> benchmark;
 
-	auto start_time = std::chrono::high_resolution_clock::now();
-	int yttrium_iterations = 0;
-	for (;;)
-	{
-		if (!Yttrium::read_jpeg(input.data(), input.size(), output_info, output))
-		{
-			std::cerr << "Unsupported JPEG image\n";
-			return 1;
-		}
-		++yttrium_iterations;
-		duration = std::chrono::duration_cast<decltype(duration)>(std::chrono::high_resolution_clock::now() - start_time);
-		if (duration > std::chrono::seconds{ 5 })
-			break;
-	}
-	const auto yttrium_time = static_cast<double>(duration.count());
+	benchmark.add("yttrium", [&input, &output_info, &output] {
+		return Yttrium::read_jpeg(input.data(), input.size(), output_info, output);
+	});
 
 	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "yttrium_output.png" }, Yttrium::ImageFormat::Png);
 
-	start_time = std::chrono::high_resolution_clock::now();
-	int libjpeg_iterations = 0;
-	for (;;)
-	{
-		if (!::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output))
-		{
-			std::cerr << "Invalid JPEG image\n"; // Shouldn't happen since we're unlikely to support JPEG format better than libjpeg.
-			return 1;
-		}
-		++libjpeg_iterations;
-		duration = std::chrono::duration_cast<decltype(duration)>(std::chrono::high_resolution_clock::now() - start_time);
-		if (duration > std::chrono::seconds{ 5 })
-			break;
-	}
-	const auto libjpeg_time = static_cast<double>(duration.count());
+	benchmark.add("libjpeg", [&input, &output_info, &output] {
+		return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output);
+	});
 
 	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "libjpeg_output.png" }, Yttrium::ImageFormat::Png);
 
-	std::cerr << "Yttrium: " << std::lround(yttrium_time / yttrium_iterations) << " us/image, " << std::lround(yttrium_iterations * 1'000'000.0 / yttrium_time) << " images/s\n";
-	std::cerr << "libjpeg: " << std::lround(libjpeg_time / libjpeg_iterations) << " us/image, " << std::lround(libjpeg_iterations * 1'000'000.0 / libjpeg_time) << " images/s (" << std::fixed << (libjpeg_iterations * yttrium_time) / (yttrium_iterations * libjpeg_time) << " times faster)\n";
-	return 0;
+	benchmark.print();
 }

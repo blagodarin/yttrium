@@ -15,6 +15,7 @@
 #
 
 add_executable(benchmark_jpeg
+	../common/benchmark.h
 	main.cpp
 	)
 target_link_libraries(benchmark_jpeg PRIVATE ycore)
