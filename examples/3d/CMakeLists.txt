@@ -19,7 +19,7 @@ add_ypack_target(3d_package
 	OUTPUT ${PROJECT_BINARY_DIR}/3d.ypq)
 
 add_executable(3d WIN32
-	../utils.h
+	../common/utils.h
 	game.cpp
 	game.h
 	main.cpp

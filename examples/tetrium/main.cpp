@@ -31,8 +31,7 @@
 #include <yttrium/storage/storage.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
-
-#include "../utils.h"
+#include "../common/utils.h"
 #include "graphics.h"
 
 using namespace Yttrium;
@@ -90,7 +89,7 @@ namespace
 	class LogoCanvas : public Canvas
 	{
 	public:
-		LogoCanvas(Gui& gui)
+		explicit LogoCanvas(Gui& gui)
 			: _gui{ gui } {}
 
 		void on_draw(RenderPass& pass, const RectF& rect, std::chrono::milliseconds screen_time) override

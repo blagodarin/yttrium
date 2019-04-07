@@ -51,7 +51,8 @@ public:
 		{
 			const double _average_ns;
 			const double _median_ns;
-			constexpr Result(double average_ns, double median_ns) noexcept : _average_ns{ average_ns }, _median_ns{ median_ns } {}
+			constexpr Result(double average_ns, double median_ns) noexcept
+				: _average_ns{ average_ns }, _median_ns{ median_ns } {}
 		};
 
 		std::vector<Result> results;
@@ -115,7 +116,8 @@ private:
 	{
 		std::string _name;
 		std::vector<Duration> _times;
-		Measurement(std::string_view name) : _name{name} {}
+		explicit Measurement(std::string_view name)
+			: _name{ name } {}
 	};
 	std::vector<Measurement> _measurements;
 };

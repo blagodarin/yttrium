@@ -14,9 +14,8 @@
 // limitations under the License.
 //
 
+#include "../common/utils.h"
 #include "game.h"
-
-#include "../utils.h"
 
 namespace
 {

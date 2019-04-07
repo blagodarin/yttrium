@@ -15,7 +15,7 @@
 //
 
 #include <yttrium/memory/buffer.h>
-#include "../../libs/test/utils.h"
+#include "../common/utils.h"
 
 #include <cstring>
 

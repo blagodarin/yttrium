@@ -16,8 +16,6 @@
 
 #include "game.h"
 
-#include "../utils.h"
-
 #include <yttrium/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
@@ -26,6 +24,7 @@
 #include <yttrium/renderer/pass.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
+#include "../common/utils.h"
 
 #include <cmath>
 

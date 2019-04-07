@@ -16,9 +16,8 @@
 
 #pragma once
 
-#include "logic.h"
-
 #include <yttrium/renderer/texture.h>
+#include "logic.h"
 
 #include <memory>
 

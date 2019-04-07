@@ -36,7 +36,7 @@ build_script:
   - cmd: |
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
-      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_EXTRAS=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+      cmake -G "Visual Studio 15 2017 Win64" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
       cmake --build . --config Release -- /nologo /verbosity:minimal
       cmake --build . --config Debug -- /nologo /verbosity:minimal
 

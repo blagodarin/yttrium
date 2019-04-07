@@ -36,8 +36,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(cmake/utils.cmake)
 
+option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
-option(BUILD_EXTRAS "Build all extra stuff" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_CLANG_FORMAT "Enable funning ClangFormat ('format' target)" OFF)
@@ -120,13 +120,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			)
 	endif()
 
-	option(Y_COVERAGE "Build with coverage analysis support" OFF)
-	if(Y_COVERAGE)
+	option(ENABLE_COVERAGE "Build with coverage analysis support" OFF)
+	if(ENABLE_COVERAGE)
 		add_compile_options(--coverage)
 		list(APPEND DYNAMIC_LINKER_FLAGS --coverage)
 
-		option(Y_COVERAGE_LCOV "Enable coverage analysis using Lcov" OFF)
-		if(Y_COVERAGE_LCOV)
+		option(ENABLE_COVERAGE_LCOV "Enable coverage analysis using Lcov" OFF)
+		if(ENABLE_COVERAGE_LCOV)
 			find_package(Gcov REQUIRED)
 			find_package(Lcov REQUIRED)
 			add_custom_target(lcov
@@ -199,9 +199,10 @@ if(BUILD_TESTS)
 	enable_testing()
 	find_package(Catch2 2.3.0 REQUIRED)
 	mark_as_advanced(Catch2_DIR)
-	add_subdirectory(libs/test)
+	add_subdirectory(tests/common)
 	add_subdirectory(tests/core)
 	add_subdirectory(tests/engine)
+	add_subdirectory(tests/gen_test_data)
 	add_custom_target(check
 		COMMAND ycore_tests --reporter compact
 		COMMAND yengine_tests --reporter compact
@@ -215,12 +216,11 @@ if(BUILD_EXAMPLES)
 	add_subdirectory(examples/tetrium)
 endif()
 
-if(BUILD_EXTRAS)
+if(BUILD_BENCHMARKS)
 	add_subdirectory(benchmarks/buffer)
 	if(Y_USE_JPEG)
 		add_subdirectory(benchmarks/jpeg)
 	endif()
-	add_subdirectory(tests/gen_test_data)
 endif()
 
 if(ENABLE_CLANG_FORMAT)

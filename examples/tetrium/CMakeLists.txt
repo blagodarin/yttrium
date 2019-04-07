@@ -31,7 +31,7 @@ add_ypack_target(tetrium_package
 	DEPENDS tetrium_localization)
 
 add_executable(tetrium WIN32
-	../utils.h
+	../common/utils.h
 	graphics.cpp
 	graphics.h
 	logic.cpp

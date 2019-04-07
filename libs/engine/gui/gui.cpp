@@ -36,7 +36,7 @@ namespace
 	class Increment
 	{
 	public:
-		Increment(T& value) noexcept
+		explicit Increment(T& value) noexcept
 			: _value{ value }
 		{
 			++_value;

@@ -21,6 +21,7 @@
 
 #include <array>
 #include <ctime>
+#include <functional>
 
 inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yttrium::Bgra32(size_t, size_t)>& callback)
 {

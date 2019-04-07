@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "model.h"
-
 #include <yttrium/application.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/math/euler.h>
@@ -28,6 +26,7 @@
 #include <yttrium/script/context.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/window.h>
+#include "model.h"
 
 #include <optional>
 
