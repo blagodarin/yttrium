@@ -147,6 +147,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		endif()
 	endif()
 
+	option(ENABLE_PROFILING "Build with profiling support" OFF)
+	if(ENABLE_PROFILING)
+		add_compile_options(-pg)
+		list(APPEND DYNAMIC_LINKER_FLAGS -pg)
+	endif()
+
 	if(ENABLE_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
 		if(BUILD_SHARED_LIBS)
