@@ -171,6 +171,7 @@ endif()
 
 get_property(DIRECTORY_COMPILE_OPTIONS DIRECTORY PROPERTY COMPILE_OPTIONS)
 
+message(STATUS "Target architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 print_list("Compiler flags:" ${DIRECTORY_COMPILE_OPTIONS})
 print_list("Static linker flags:" ${STATIC_LINKER_FLAGS})
 print_list("Dynamic linker flags:" ${DYNAMIC_LINKER_FLAGS})
