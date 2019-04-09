@@ -20,6 +20,7 @@
 #include "../utils.h"
 
 #include <cassert>
+#include <cstring>
 
 #define USE_SSE2 __has_include(<emmintrin.h>)
 
@@ -464,7 +465,8 @@ namespace
 			if (segment_size != 19 + value_count)
 				return 0;
 
-			for (int index = 0, code = 0, i = 1; i <= 16; ++i)
+			int index = 0;
+			for (int code = 0, i = 1; i <= 16; ++i)
 			{
 				huffman._delta[i] = index - code;
 				if (huffman._sizes[index] == i)
@@ -478,6 +480,18 @@ namespace
 				code <<= 1;
 			}
 			huffman._max_codes[17] = std::numeric_limits<int>::max();
+
+			std::memset(huffman._lookup, 0xff, sizeof huffman._lookup);
+			for (int i = 0; i < index; ++i)
+			{
+				if (const auto code_bits = int{ huffman._sizes[i] }; code_bits <= HuffmanTable::LookupBits)
+				{
+					const auto offset = huffman._codes[i] << (HuffmanTable::LookupBits - code_bits);
+					const auto count = 1 << (HuffmanTable::LookupBits - code_bits);
+					for (int j = 0; j < count; ++j)
+						huffman._lookup[offset + j] = static_cast<std::uint8_t>(i);
+				}
+			}
 
 			return segment_size;
 		}
@@ -664,11 +678,14 @@ namespace
 	private:
 		struct HuffmanTable
 		{
+			static constexpr int LookupBits = 9;
+
 			const std::uint8_t* _values = nullptr;
 			std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
 			std::uint16_t _codes[256];
 			int _max_codes[18];
 			int _delta[17];
+			std::uint8_t _lookup[1 << LookupBits];
 
 			std::pair<int, int> read(JpegBitstream& bitstream) const noexcept
 			{
@@ -677,15 +694,27 @@ namespace
 
 				if (!bitstream.prepare_bits(16))
 					return { -1, 0 };
-				const auto bits = bitstream.peek_bits(16);
-				int size = 1;
-				for (;; ++size)
-					if (bits < _max_codes[size])
-						break;
-				if (size > 16)
-					return { -1, 0 };
-				bitstream.skip_bits(size);
-				const auto code = _values[(bits >> (16 - size)) + _delta[size]];
+				std::uint8_t code;
+				{
+					const auto bits = bitstream.peek_bits(16);
+					const auto index = _lookup[bits >> (16 - LookupBits)];
+					if (index < 255)
+					{
+						bitstream.skip_bits(_sizes[index]);
+						code = _values[index];
+					}
+					else
+					{
+						int size = LookupBits + 1;
+						for (;; ++size)
+							if (bits < _max_codes[size])
+								break;
+						if (size > 16)
+							return { -1, 0 };
+						bitstream.skip_bits(size);
+						code = _values[(bits >> (16 - size)) + _delta[size]];
+					}
+				}
 				const auto length = code & 0xf;
 				if (!length)
 					return { code, 0 };
