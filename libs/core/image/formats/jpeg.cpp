@@ -345,32 +345,36 @@ namespace
 #endif
 	}
 
-	class JpegBitstream
+	struct JpegBitstream
 	{
-	public:
+		const std::uint8_t* _data = nullptr;
+		const std::uint8_t* const _end;
+		int _free_bits = 32;
+		std::uint32_t _buffer = 0;
+
 		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
 			: _data{ data }, _end{ data + size } {}
 
 		int peek_bits(int count) const noexcept
 		{
-			assert(count <= _buffer_bits);
-			return static_cast<int>(_buffer >> (_buffer_bits - count)) & ((1 << count) - 1);
+			assert(_free_bits <= 32 - count);
+			return static_cast<int>(_buffer >> (32 - count));
 		}
 
 		bool prepare_bits(int count) noexcept
 		{
 			assert(count <= 16);
-			while (_buffer_bits < count)
+			while (32 - count < _free_bits)
 			{
 				if (_data == _end)
 				{
-					_buffer = (_buffer << 8) | 0xff;
-					_buffer_bits += 8;
+					_free_bits -= 8;
+					_buffer |= 255u << _free_bits;
 					continue;
 				}
 				const auto next = *_data++;
-				_buffer = (_buffer << 8) | next;
-				_buffer_bits += 8;
+				_free_bits -= 8;
+				_buffer |= std::uint32_t{ next } << _free_bits;
 				if (next == 0xff && _data != _end)
 				{
 					switch (const auto next_next = *_data++; next_next)
@@ -381,8 +385,8 @@ namespace
 					default:
 						if ((next_next & RST_mask) == RST)
 						{
-							_buffer = (_buffer << 8) | next_next;
-							_buffer_bits += 8;
+							_free_bits -= 8;
+							_buffer |= std::uint32_t{ next_next } << _free_bits;
 						}
 						else
 							_data = _end;
@@ -394,15 +398,10 @@ namespace
 
 		void skip_bits(int count) noexcept
 		{
-			assert(count <= _buffer_bits);
-			_buffer_bits -= count;
+			assert(_free_bits <= 32 - count);
+			_free_bits += count;
+			_buffer <<= count;
 		}
-
-	private:
-		const std::uint8_t* _data = nullptr;
-		const std::uint8_t* const _end;
-		int _buffer_bits = 0;
-		std::uint32_t _buffer = 0;
 	};
 
 	class JpegDecoder
@@ -476,10 +475,10 @@ namespace
 					if (code - 1 >= 1 << i)
 						return 0;
 				}
-				huffman._max_codes[i] = code << (16 - i); // Pre-shift max code to avoid shifting bit value in HuffmanTable::read.
+				huffman._max_codes[i] = static_cast<std::uint32_t>(code) << (32 - i); // Pre-shift max code to avoid shifting bit value in HuffmanTable::read.
 				code <<= 1;
 			}
-			huffman._max_codes[17] = std::numeric_limits<int>::max();
+			huffman._max_codes[17] = std::numeric_limits<std::uint32_t>::max();
 
 			std::memset(huffman._lookup, 0xff, sizeof huffman._lookup);
 			for (int i = 0; i < index; ++i)
@@ -683,7 +682,7 @@ namespace
 			const std::uint8_t* _values = nullptr;
 			std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
 			std::uint16_t _codes[256];
-			int _max_codes[18];
+			std::uint32_t _max_codes[18];
 			int _delta[17];
 			std::uint8_t _lookup[1 << LookupBits];
 
@@ -695,25 +694,21 @@ namespace
 				if (!bitstream.prepare_bits(16))
 					return { -1, 0 };
 				std::uint8_t code;
+				if (const auto index = _lookup[bitstream._buffer >> (32 - LookupBits)]; index < 255)
 				{
-					const auto bits = bitstream.peek_bits(16);
-					const auto index = _lookup[bits >> (16 - LookupBits)];
-					if (index < 255)
-					{
-						bitstream.skip_bits(_sizes[index]);
-						code = _values[index];
-					}
-					else
-					{
-						int size = LookupBits + 1;
-						for (;; ++size)
-							if (bits < _max_codes[size])
-								break;
-						if (size > 16)
-							return { -1, 0 };
-						bitstream.skip_bits(size);
-						code = _values[(bits >> (16 - size)) + _delta[size]];
-					}
+					code = _values[index];
+					bitstream.skip_bits(_sizes[index]);
+				}
+				else
+				{
+					int size = LookupBits + 1;
+					for (;; ++size)
+						if (bitstream._buffer < _max_codes[size])
+							break;
+					if (size > 16)
+						return { -1, 0 };
+					code = _values[static_cast<std::int32_t>(bitstream._buffer >> (32 - size)) + _delta[size]];
+					bitstream.skip_bits(size);
 				}
 				const auto length = code & 0xf;
 				if (!length)

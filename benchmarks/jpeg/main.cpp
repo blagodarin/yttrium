@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 	output.reserve(1024 * 1024 * 4);
 	std::memset(output.data(), 0xff, output.capacity());
 
-	Benchmark<1000> benchmark;
+	Benchmark<5000> benchmark;
 
 	benchmark.add("yttrium", [&input, &output_info, &output] {
 		return Yttrium::read_jpeg(input.data(), input.size(), output_info, output);
