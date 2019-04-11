@@ -355,16 +355,10 @@ namespace
 		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
 			: _data{ data }, _end{ data + size } {}
 
-		int peek_bits(int count) const noexcept
+		void read_until(int max_free_bits) noexcept
 		{
-			assert(_free_bits <= 32 - count);
-			return static_cast<int>(_buffer >> (32 - count));
-		}
-
-		bool prepare_bits(int count) noexcept
-		{
-			assert(count <= 16);
-			while (32 - count < _free_bits)
+			assert(_free_bits > max_free_bits);
+			do
 			{
 				if (_data == _end)
 				{
@@ -392,8 +386,7 @@ namespace
 							_data = _end;
 					}
 				}
-			}
-			return true;
+			} while (_free_bits > max_free_bits);
 		}
 
 		void skip_bits(int count) noexcept
@@ -688,11 +681,8 @@ namespace
 
 			std::pair<int, int> read(JpegBitstream& bitstream) const noexcept
 			{
-				// (-1 << i) + 1
-				static constexpr int bias[16]{ 0, -1, -3, -7, -15, -31, -63, -127, -255, -511, -1023, -2047, -4095, -8191, -16383, -32767 };
-
-				if (!bitstream.prepare_bits(16))
-					return { -1, 0 };
+				if (bitstream._free_bits > 16)
+					bitstream.read_until(16);
 				std::uint8_t code;
 				if (const auto index = _lookup[bitstream._buffer >> (32 - LookupBits)]; index < 255)
 				{
@@ -713,12 +703,13 @@ namespace
 				const auto length = code & 0xf;
 				if (!length)
 					return { code, 0 };
-				if (!bitstream.prepare_bits(length))
-					return { -1, 0 };
-				auto value = bitstream.peek_bits(length);
+				const auto bit_offset = 32 - length;
+				if (bitstream._free_bits > bit_offset)
+					bitstream.read_until(bit_offset);
+				auto value = static_cast<int>(bitstream._buffer >> bit_offset);
 				bitstream.skip_bits(length);
 				if (value < (1 << (length - 1)))
-					value += bias[length];
+					value += static_cast<int>((std::numeric_limits<unsigned>::max() << length) + 1); // (-1 << length) + 1
 				return { code, value };
 			}
 		};
