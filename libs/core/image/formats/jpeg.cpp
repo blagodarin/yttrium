@@ -54,21 +54,6 @@ namespace
 		COM = 0xfe,       // Comment.
 	};
 
-	constexpr std::uint8_t _dezigzag_table[64 + 15]{
-		0, 1, 8, 16, 9, 2, 3, 10,
-		17, 24, 32, 25, 18, 11, 4, 5,
-		12, 19, 26, 33, 40, 48, 41, 34,
-		27, 20, 13, 6, 7, 14, 21, 28,
-		35, 42, 49, 56, 57, 50, 43, 36,
-		29, 22, 15, 23, 30, 37, 44, 51,
-		58, 59, 52, 45, 38, 31, 39, 46,
-		53, 60, 61, 54, 47, 55, 62, 63,
-
-		// Extra values to prevent index check (see Component::read_block).
-		63, 63, 63, 63, 63, 63, 63, 63,
-		63, 63, 63, 63, 63, 63, 63
-	};
-
 	// All IDCT code is based on or taken from the 'stb_image' public domain library (https://github.com/nothings/stb).
 	void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
 	{
@@ -345,17 +330,90 @@ namespace
 #endif
 	}
 
-	struct JpegBitstream
+	struct JpegHuffmanTable
 	{
-		const std::uint8_t* _data = nullptr;
-		const std::uint8_t* const _end;
-		int _free_bits = 32;
-		std::uint32_t _buffer = 0;
+		static constexpr int FastLookupBits = 9;
 
+		const std::uint8_t* _values = nullptr;
+		std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
+		std::uint32_t _max_codes[18];
+		int _delta[17];
+		std::uint8_t _fast_lookup[1 << FastLookupBits];
+	};
+
+	struct JpegComponent
+	{
+		std::size_t _horizontal = 0;
+		std::size_t _vertical = 0;
+		const std::uint8_t* _quantization_table = nullptr;
+		const JpegHuffmanTable* _dc_table = nullptr;
+		const JpegHuffmanTable* _ac_table = nullptr;
+	};
+
+	class JpegBitstream
+	{
+	public:
 		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
 			: _data{ data }, _end{ data + size } {}
 
-		void read_until(int max_free_bits) noexcept
+		bool read_block(const JpegComponent& component, int& last_dc, std::int16_t* block) noexcept
+		{
+			const auto [dc_code, dc_delta] = read_value(*component._dc_table);
+			if (dc_code < 0)
+				return false;
+			block[0] = static_cast<std::int16_t>((last_dc += dc_delta) * component._quantization_table[0]);
+			int i = 0;
+			do
+			{
+				const auto [ac_code, ac_value] = read_value(*component._ac_table);
+				if (ac_code <= 0)
+					return !ac_code;
+				const auto r = ac_code >> 4;
+				const auto s = ac_code & 0xf;
+				if (!s && r != 15)
+					return false;
+				i += r + 1;
+				block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * component._quantization_table[i]);
+			} while (i < 63);
+			return true;
+		}
+
+	private:
+		std::pair<int, int> read_value(const JpegHuffmanTable& huffman) noexcept
+		{
+			if (_free_bits > 16)
+				read_bits(16);
+			std::uint8_t code;
+			if (const auto index = huffman._fast_lookup[_buffer >> (32 - JpegHuffmanTable::FastLookupBits)]; index < 255)
+			{
+				code = huffman._values[index];
+				skip_bits(huffman._sizes[index]);
+			}
+			else
+			{
+				int size = JpegHuffmanTable::FastLookupBits + 1;
+				for (;; ++size)
+					if (_buffer < huffman._max_codes[size])
+						break;
+				if (size > 16)
+					return { -1, 0 };
+				code = huffman._values[static_cast<std::int32_t>(_buffer >> (32 - size)) + huffman._delta[size]];
+				skip_bits(size);
+			}
+			const auto length = code & 0xf;
+			if (!length)
+				return { code, 0 };
+			const auto bit_offset = 32 - length;
+			if (_free_bits > bit_offset)
+				read_bits(bit_offset);
+			auto value = static_cast<int>(_buffer >> bit_offset);
+			skip_bits(length);
+			if (value < (1 << (length - 1)))
+				value += static_cast<int>((std::numeric_limits<unsigned>::max() << length) + 1); // (-1 << length) + 1
+			return { code, value };
+		}
+
+		void read_bits(int max_free_bits) noexcept
 		{
 			assert(_free_bits > max_free_bits);
 			do
@@ -395,6 +453,25 @@ namespace
 			_free_bits += count;
 			_buffer <<= count;
 		}
+
+	private:
+		const std::uint8_t* _data = nullptr;
+		const std::uint8_t* const _end;
+		int _free_bits = 32;
+		std::uint32_t _buffer = 0;
+
+		static constexpr std::uint8_t _dezigzag_table[64 + 15]{
+			0, 1, 8, 16, 9, 2, 3, 10,
+			17, 24, 32, 25, 18, 11, 4, 5,
+			12, 19, 26, 33, 40, 48, 41, 34,
+			27, 20, 13, 6, 7, 14, 21, 28,
+			35, 42, 49, 56, 57, 50, 43, 36,
+			29, 22, 15, 23, 30, 37, 44, 51,
+			58, 59, 52, 45, 38, 31, 39, 46,
+			53, 60, 61, 54, 47, 55, 62, 63,
+			63, 63, 63, 63, 63, 63, 63, 63, // Extra values to prevent index check (see 'read_block').
+			63, 63, 63, 63, 63, 63, 63
+		};
 	};
 
 	class JpegDecoder
@@ -446,7 +523,7 @@ namespace
 
 			const auto* const sizes = data + 3;
 
-			HuffmanTable& huffman = _huffman_tables[type][id];
+			auto& huffman = _huffman_tables[type][id];
 			huffman._values = sizes + 16;
 
 			int value_count = 0;
@@ -457,6 +534,8 @@ namespace
 			if (segment_size != 19 + value_count)
 				return 0;
 
+			std::uint16_t codes[256];
+
 			int index = 0;
 			for (int code = 0, i = 1; i <= 16; ++i)
 			{
@@ -464,24 +543,24 @@ namespace
 				if (huffman._sizes[index] == i)
 				{
 					while (huffman._sizes[index] == i)
-						huffman._codes[index++] = static_cast<std::uint16_t>(code++);
+						codes[index++] = static_cast<std::uint16_t>(code++);
 					if (code - 1 >= 1 << i)
 						return 0;
 				}
-				huffman._max_codes[i] = static_cast<std::uint32_t>(code) << (32 - i); // Pre-shift max code to avoid shifting bit value in HuffmanTable::read.
+				huffman._max_codes[i] = static_cast<std::uint32_t>(code) << (32 - i); // Pre-shift max code to avoid shifting bit value in JpegHuffmanTable::read.
 				code <<= 1;
 			}
 			huffman._max_codes[17] = std::numeric_limits<std::uint32_t>::max();
 
-			std::memset(huffman._lookup, 0xff, sizeof huffman._lookup);
+			std::memset(huffman._fast_lookup, 0xff, sizeof huffman._fast_lookup);
 			for (int i = 0; i < index; ++i)
 			{
-				if (const auto code_bits = int{ huffman._sizes[i] }; code_bits <= HuffmanTable::LookupBits)
+				if (const auto code_bits = int{ huffman._sizes[i] }; code_bits <= JpegHuffmanTable::FastLookupBits)
 				{
-					const auto offset = huffman._codes[i] << (HuffmanTable::LookupBits - code_bits);
-					const auto count = 1 << (HuffmanTable::LookupBits - code_bits);
+					const auto offset = codes[i] << (JpegHuffmanTable::FastLookupBits - code_bits);
+					const auto count = 1 << (JpegHuffmanTable::FastLookupBits - code_bits);
 					for (int j = 0; j < count; ++j)
-						huffman._lookup[offset + j] = static_cast<std::uint8_t>(i);
+						huffman._fast_lookup[offset + j] = static_cast<std::uint8_t>(i);
 				}
 			}
 
@@ -637,7 +716,7 @@ namespace
 			}
 		}
 
-		bool parse_payload(Yttrium::Buffer& ycbcr_buffer, const std::uint8_t* data, std::size_t size) noexcept
+		bool parse_payload(Yttrium::Buffer& ycbcr_buffer, const std::uint8_t* data, std::size_t size) const noexcept
 		{
 			int last_dc[3]{ 0, 0, 0 };
 			JpegBitstream bitstream{ data, size };
@@ -653,7 +732,7 @@ namespace
 							for (std::size_t h = 0; h < component._horizontal; ++h)
 							{
 								std::int16_t block[64]{};
-								if (!component.read_block(&block[0], bitstream, last_dc[c]))
+								if (!bitstream.read_block(component, last_dc[c], &block[0]))
 									return false;
 								const auto x = (mcu_x * component._horizontal + h) * 8;
 								const auto y = (mcu_y * component._vertical + v) * 8;
@@ -668,88 +747,11 @@ namespace
 		}
 
 	private:
-		struct HuffmanTable
-		{
-			static constexpr int LookupBits = 9;
-
-			const std::uint8_t* _values = nullptr;
-			std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
-			std::uint16_t _codes[256];
-			std::uint32_t _max_codes[18];
-			int _delta[17];
-			std::uint8_t _lookup[1 << LookupBits];
-
-			std::pair<int, int> read(JpegBitstream& bitstream) const noexcept
-			{
-				if (bitstream._free_bits > 16)
-					bitstream.read_until(16);
-				std::uint8_t code;
-				if (const auto index = _lookup[bitstream._buffer >> (32 - LookupBits)]; index < 255)
-				{
-					code = _values[index];
-					bitstream.skip_bits(_sizes[index]);
-				}
-				else
-				{
-					int size = LookupBits + 1;
-					for (;; ++size)
-						if (bitstream._buffer < _max_codes[size])
-							break;
-					if (size > 16)
-						return { -1, 0 };
-					code = _values[static_cast<std::int32_t>(bitstream._buffer >> (32 - size)) + _delta[size]];
-					bitstream.skip_bits(size);
-				}
-				const auto length = code & 0xf;
-				if (!length)
-					return { code, 0 };
-				const auto bit_offset = 32 - length;
-				if (bitstream._free_bits > bit_offset)
-					bitstream.read_until(bit_offset);
-				auto value = static_cast<int>(bitstream._buffer >> bit_offset);
-				bitstream.skip_bits(length);
-				if (value < (1 << (length - 1)))
-					value += static_cast<int>((std::numeric_limits<unsigned>::max() << length) + 1); // (-1 << length) + 1
-				return { code, value };
-			}
-		};
-
-		struct Component
-		{
-			std::size_t _horizontal = 0;
-			std::size_t _vertical = 0;
-			const std::uint8_t* _quantization_table = nullptr;
-			const HuffmanTable* _dc_table = nullptr;
-			const HuffmanTable* _ac_table = nullptr;
-
-			bool read_block(std::int16_t* block, JpegBitstream& bitstream, int& last_dc) const noexcept
-			{
-				const auto [dc_code, dc_delta] = _dc_table->read(bitstream);
-				if (dc_code < 0)
-					return false;
-				block[0] = static_cast<std::int16_t>((last_dc += dc_delta) * _quantization_table[0]);
-				int i = 0;
-				do
-				{
-					const auto [ac_code, ac_value] = _ac_table->read(bitstream);
-					if (ac_code <= 0)
-						return !ac_code;
-					const auto r = ac_code >> 4;
-					const auto s = ac_code & 0xf;
-					if (!s && r != 15)
-						return false;
-					i += r + 1;
-					block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * _quantization_table[i]);
-				} while (i < 63);
-				return true;
-			}
-		};
-
 		std::size_t _width = 0;
 		std::size_t _height = 0;
-		Component _components[3];
+		JpegComponent _components[3];
 		const std::uint8_t* _quantization_tables[2];
-		HuffmanTable _huffman_tables[2][2];
+		JpegHuffmanTable _huffman_tables[2][2];
 		std::size_t _restart_interval = 0;
 		std::size_t _mcu_x_count = 0;
 		std::size_t _mcu_y_count = 0;
