@@ -350,165 +350,73 @@ namespace
 		const JpegHuffmanTable* _ac_table = nullptr;
 	};
 
-	class JpegBitstream
+	struct JpegData
 	{
 	public:
-		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
-			: _data{ data }, _end{ data + size } {}
+		std::size_t _width = 0;
+		std::size_t _height = 0;
+		const std::uint8_t* _quantization_tables[2];
+		JpegHuffmanTable _huffman_tables[2][2];
+		JpegComponent _components[3];
+		std::size_t _restart_interval = 0;
+		std::size_t _mcu_x_count = 0;
+		std::size_t _mcu_y_count = 0;
+		std::size_t _ycbcr_size = 0;
+		std::size_t _ycbcr_offset[3];
+		std::size_t _ycbcr_stride[3];
 
-		bool read_block(const JpegComponent& component, int& last_dc, std::int16_t* block) noexcept
+		std::size_t parse_headers(const std::uint8_t* data, std::size_t size) noexcept
 		{
-			const auto [dc_code, dc_delta] = read_value(*component._dc_table);
-			if (dc_code < 0)
-				return false;
-			block[0] = static_cast<std::int16_t>((last_dc += dc_delta) * component._quantization_table[0]);
-			int i = 0;
-			do
+			const auto skip_segment = [&data, &size]() noexcept->std::size_t
 			{
-				const auto [ac_code, ac_value] = read_value(*component._ac_table);
-				if (ac_code <= 0)
-					return !ac_code;
-				const auto r = ac_code >> 4;
-				const auto s = ac_code & 0xf;
-				if (!s && r != 15)
-					return false;
-				i += r + 1;
-				block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * component._quantization_table[i]);
-			} while (i < 63);
-			return true;
-		}
+				if (size < 2)
+					return 0;
+				const auto segment_size = u16(data);
+				if (segment_size > size)
+					return 0;
+				return segment_size;
+			};
 
-		bool restart(unsigned index) noexcept
-		{
-			if (_free_bits > 8)
-				read_bits(8);
-			if ((_marker & RST_mask) != RST || (_marker & RST_value) != index)
-				return false;
-			_free_bits = 32;
-			_buffer = 0;
-			_marker = 0;
-			return true;
-		}
-
-	private:
-		std::pair<int, int> read_value(const JpegHuffmanTable& huffman) noexcept
-		{
-			if (_free_bits > 16)
-				read_bits(16);
-			std::uint8_t code;
-			if (const auto index = huffman._fast_lookup[_buffer >> (32 - JpegHuffmanTable::FastLookupBits)]; index < 255)
+			if (size < 2 || data[0] != 0xff || data[1] != SOI)
+				return 0;
+			const auto base = data;
+			data += 2;
+			size -= 2;
+			while (size > 0)
 			{
-				code = huffman._values[index];
-				skip_bits(huffman._sizes[index]);
-			}
-			else
-			{
-				int size = JpegHuffmanTable::FastLookupBits + 1;
-				for (;; ++size)
-					if (_buffer < huffman._max_codes[size])
-						break;
-				if (size > 16)
-					return { -1, 0 };
-				code = huffman._values[static_cast<std::int32_t>(_buffer >> (32 - size)) + huffman._delta[size]];
-				skip_bits(size);
-			}
-			const auto length = code & 0xf;
-			if (!length)
-				return { code, 0 };
-			const auto bit_offset = 32 - length;
-			if (_free_bits > bit_offset)
-				read_bits(bit_offset);
-			auto value = static_cast<int>(_buffer >> bit_offset);
-			skip_bits(length);
-			if (value < (1 << (length - 1)))
-				value += static_cast<int>((std::numeric_limits<unsigned>::max() << length) + 1); // (-1 << length) + 1
-			return { code, value };
-		}
-
-		void read_bits(int max_free_bits) noexcept
-		{
-			assert(_free_bits > max_free_bits);
-			do
-			{
-				const auto next = _marker ? std::uint8_t{ 0 } : read_byte();
-				if (next == 0xff)
+				if (size < 2 || data[0] != 0xff)
+					return 0;
+				const auto marker = data[1];
+				data += 2;
+				size -= 2;
+				std::size_t segment_size = 0;
+				switch (marker)
 				{
-					std::uint8_t next_next;
-					do { next_next = read_byte(); } while (next_next == 0xff);
-					if (next_next)
-					{
-						_marker = next_next;
-						return;
-					}
+				case SOF0: segment_size = decode_sof0(data, size); break;
+				case DHT: segment_size = decode_dht(data, size); break;
+				case SOS: segment_size = decode_sos(data, size); break;
+				case DQT: segment_size = decode_dqt(data, size); break;
+				case DRI: segment_size = decode_dri(data, size); break;
+				case COM: segment_size = skip_segment(); break;
+				default:
+					if ((marker & APP_mask) == APP)
+						segment_size = skip_segment();
 				}
-				_free_bits -= 8;
-				_buffer |= std::uint32_t{ next } << _free_bits;
-			} while (_free_bits > max_free_bits);
-		}
-
-		void skip_bits(int count) noexcept
-		{
-			assert(_free_bits <= 32 - count);
-			_free_bits += count;
-			_buffer <<= count;
-		}
-
-		std::uint8_t read_byte() noexcept
-		{
-			return _data != _end ? *_data++ : std::uint8_t{ 0 };
-		}
-
-	private:
-		const std::uint8_t* _data = nullptr;
-		const std::uint8_t* const _end;
-		int _free_bits = 32;
-		std::uint32_t _buffer = 0;
-		std::uint8_t _marker = 0;
-
-		static constexpr std::uint8_t _dezigzag_table[64 + 15]{
-			0, 1, 8, 16, 9, 2, 3, 10,
-			17, 24, 32, 25, 18, 11, 4, 5,
-			12, 19, 26, 33, 40, 48, 41, 34,
-			27, 20, 13, 6, 7, 14, 21, 28,
-			35, 42, 49, 56, 57, 50, 43, 36,
-			29, 22, 15, 23, 30, 37, 44, 51,
-			58, 59, 52, 45, 38, 31, 39, 46,
-			53, 60, 61, 54, 47, 55, 62, 63,
-			63, 63, 63, 63, 63, 63, 63, 63, // Extra values to prevent index check (see 'read_block').
-			63, 63, 63, 63, 63, 63, 63
-		};
-	};
-
-	class JpegDecoder
-	{
-	public:
-		bool decode(const std::uint8_t* data, std::size_t size, Yttrium::ImageInfo& info, Yttrium::Buffer& buffer)
-		{
-			if (const auto parsed = parse_headers(data, size); parsed > 0)
-			{
-				process_headers();
-				assert(_ycbcr_stride[1] == _ycbcr_stride[2]);
-				JpegBitstream bitstream{ data + parsed, size - parsed };
-				Yttrium::Buffer ycbcr_buffer{ _ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
-				if (read_scan(bitstream, ycbcr_buffer))
+				if (!segment_size)
+					return 0;
+				data += segment_size;
+				size -= segment_size;
+				if (marker == SOS)
 				{
-					info = { _width, _height, Yttrium::PixelFormat::Bgra32 };
-					buffer.resize(info.frame_size());
-					Yttrium::YCbCrComponents components;
-					components.y = ycbcr_buffer.begin() + _ycbcr_offset[0];
-					components.y_stride = _ycbcr_stride[0];
-					components.cb = ycbcr_buffer.begin() + _ycbcr_offset[1];
-					components.cbcr_stride = _ycbcr_stride[1];
-					components.cr = ycbcr_buffer.begin() + _ycbcr_offset[2];
-					Yttrium::convert_jpeg420_to_bgra(_width, _height, components, buffer.data(), info.stride());
-					return true;
+					process_headers();
+					return static_cast<std::size_t>(data - base);
 				}
 			}
-			return false;
+			return 0;
 		}
 
 	private:
-		static constexpr auto u16(const std::uint8_t* data) noexcept
+		static constexpr std::uint16_t u16(const std::uint8_t* data) noexcept
 		{
 			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
 		}
@@ -651,53 +559,6 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t parse_headers(const std::uint8_t* data, std::size_t size) noexcept
-		{
-			const auto skip_segment = [&data, &size]() noexcept->std::size_t
-			{
-				if (size < 2)
-					return 0;
-				const auto segment_size = u16(data);
-				if (segment_size > size)
-					return 0;
-				return segment_size;
-			};
-
-			if (size < 2 || data[0] != 0xff || data[1] != SOI)
-				return 0;
-			const auto base = data;
-			data += 2;
-			size -= 2;
-			while (size > 0)
-			{
-				if (size < 2 || data[0] != 0xff)
-					return 0;
-				const auto marker = data[1];
-				data += 2;
-				size -= 2;
-				std::size_t segment_size = 0;
-				switch (marker)
-				{
-				case SOF0: segment_size = decode_sof0(data, size); break;
-				case DHT: segment_size = decode_dht(data, size); break;
-				case SOS: segment_size = decode_sos(data, size); break;
-				case DQT: segment_size = decode_dqt(data, size); break;
-				case DRI: segment_size = decode_dri(data, size); break;
-				case COM: segment_size = skip_segment(); break;
-				default:
-					if ((marker & APP_mask) == APP)
-						segment_size = skip_segment();
-				}
-				if (!segment_size)
-					return 0;
-				data += segment_size;
-				size -= segment_size;
-				if (marker == SOS)
-					return static_cast<std::size_t>(data - base);
-			}
-			return 0;
-		}
-
 		void process_headers() noexcept
 		{
 			auto max_h = _components[0]._horizontal;
@@ -721,38 +582,45 @@ namespace
 				_ycbcr_size += _ycbcr_stride[i] * _mcu_y_count * _components[i]._vertical * 8;
 			}
 		}
+	};
 
-		bool read_scan(JpegBitstream& bitstream, Yttrium::Buffer& ycbcr_buffer) const noexcept
+	class JpegBitstream
+	{
+	public:
+		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
+			: _data{ data }, _end{ data + size } {}
+
+		bool read_scan(const JpegData& data, Yttrium::Buffer& ycbcr_buffer) noexcept
 		{
 			int last_dc[3]{ 0, 0, 0 };
-			std::size_t restart_counter = _restart_interval;
+			auto restart_counter = data._restart_interval ? data._restart_interval : std::numeric_limits<std::size_t>::max();
 			unsigned restart_index = 0;
-			for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
+			for (std::size_t mcu_y = 0; mcu_y < data._mcu_y_count; ++mcu_y)
 			{
-				for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
+				for (std::size_t mcu_x = 0; mcu_x < data._mcu_x_count; ++mcu_x)
 				{
 					for (std::size_t c = 0; c < 3; ++c)
 					{
-						const auto& component = _components[c];
+						const auto& component = data._components[c];
 						for (std::size_t v = 0; v < component._vertical; ++v)
 						{
 							for (std::size_t h = 0; h < component._horizontal; ++h)
 							{
 								std::int16_t block[64]{};
-								if (!bitstream.read_block(component, last_dc[c], &block[0]))
+								if (!read_block(component, last_dc[c], &block[0]))
 									return false;
 								const auto x = (mcu_x * component._horizontal + h) * 8;
 								const auto y = (mcu_y * component._vertical + v) * 8;
-								std::uint8_t* output = ycbcr_buffer.begin() + _ycbcr_offset[c] + y * _ycbcr_stride[c] + x;
-								::idct(output, _ycbcr_stride[c], &block[0]);
+								std::uint8_t* output = ycbcr_buffer.begin() + data._ycbcr_offset[c] + y * data._ycbcr_stride[c] + x;
+								::idct(output, data._ycbcr_stride[c], &block[0]);
 							}
 						}
 					}
 					if (!--restart_counter)
 					{
-						if (!bitstream.restart(restart_index))
+						if (!restart(restart_index))
 							return false;
-						restart_counter = _restart_interval;
+						restart_counter = data._restart_interval;
 						restart_index = (restart_index + 1) & 7;
 					}
 				}
@@ -761,17 +629,126 @@ namespace
 		}
 
 	private:
-		std::size_t _width = 0;
-		std::size_t _height = 0;
-		JpegComponent _components[3];
-		const std::uint8_t* _quantization_tables[2];
-		JpegHuffmanTable _huffman_tables[2][2];
-		std::size_t _restart_interval = std::numeric_limits<std::size_t>::max();
-		std::size_t _mcu_x_count = 0;
-		std::size_t _mcu_y_count = 0;
-		std::size_t _ycbcr_size = 0;
-		std::size_t _ycbcr_offset[3];
-		std::size_t _ycbcr_stride[3];
+		bool read_block(const JpegComponent& component, int& last_dc, std::int16_t* block) noexcept
+		{
+			const auto [dc_code, dc_delta] = read_value(*component._dc_table);
+			if (dc_code < 0)
+				return false;
+			block[0] = static_cast<std::int16_t>((last_dc += dc_delta) * component._quantization_table[0]);
+			int i = 0;
+			do
+			{
+				const auto [ac_code, ac_value] = read_value(*component._ac_table);
+				if (ac_code <= 0)
+					return !ac_code;
+				const auto r = ac_code >> 4;
+				const auto s = ac_code & 0xf;
+				if (!s && r != 15)
+					return false;
+				i += r + 1;
+				block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * component._quantization_table[i]);
+			} while (i < 63);
+			return true;
+		}
+
+		bool restart(unsigned index) noexcept
+		{
+			if (_free_bits > 8)
+				read_bits(8);
+			if ((_marker & RST_mask) != RST || (_marker & RST_value) != index)
+				return false;
+			_free_bits = 32;
+			_buffer = 0;
+			_marker = 0;
+			return true;
+		}
+
+		std::pair<int, int> read_value(const JpegHuffmanTable& huffman) noexcept
+		{
+			if (_free_bits > 16)
+				read_bits(16);
+			std::uint8_t code;
+			if (const auto index = huffman._fast_lookup[_buffer >> (32 - JpegHuffmanTable::FastLookupBits)]; index < 255)
+			{
+				code = huffman._values[index];
+				skip_bits(huffman._sizes[index]);
+			}
+			else
+			{
+				int size = JpegHuffmanTable::FastLookupBits + 1;
+				for (;; ++size)
+					if (_buffer < huffman._max_codes[size])
+						break;
+				if (size > 16)
+					return { -1, 0 };
+				code = huffman._values[static_cast<std::int32_t>(_buffer >> (32 - size)) + huffman._delta[size]];
+				skip_bits(size);
+			}
+			const auto length = code & 0xf;
+			if (!length)
+				return { code, 0 };
+			const auto bit_offset = 32 - length;
+			if (_free_bits > bit_offset)
+				read_bits(bit_offset);
+			auto value = static_cast<int>(_buffer >> bit_offset);
+			skip_bits(length);
+			if (value < (1 << (length - 1)))
+				value += static_cast<int>((std::numeric_limits<unsigned>::max() << length) + 1); // (-1 << length) + 1
+			return { code, value };
+		}
+
+		void read_bits(int max_free_bits) noexcept
+		{
+			assert(_free_bits > max_free_bits);
+			do
+			{
+				const auto next = _marker ? std::uint8_t{ 0 } : read_byte();
+				if (next == 0xff)
+				{
+					std::uint8_t next_next;
+					do { next_next = read_byte(); } while (next_next == 0xff);
+					if (next_next)
+					{
+						_marker = next_next;
+						return;
+					}
+				}
+				_free_bits -= 8;
+				_buffer |= std::uint32_t{ next } << _free_bits;
+			} while (_free_bits > max_free_bits);
+		}
+
+		void skip_bits(int count) noexcept
+		{
+			assert(_free_bits <= 32 - count);
+			_free_bits += count;
+			_buffer <<= count;
+		}
+
+		std::uint8_t read_byte() noexcept
+		{
+			return _data != _end ? *_data++ : std::uint8_t{ 0 };
+		}
+
+	private:
+		const std::uint8_t* _data = nullptr;
+		const std::uint8_t* const _end;
+		int _free_bits = 32;
+		std::uint32_t _buffer = 0;
+		std::uint8_t _marker = 0;
+
+		static constexpr std::uint8_t _dezigzag_table[64 + 15]{
+			0, 1, 8, 16, 9, 2, 3, 10,
+			17, 24, 32, 25, 18, 11, 4, 5,
+			12, 19, 26, 33, 40, 48, 41, 34,
+			27, 20, 13, 6, 7, 14, 21, 28,
+			35, 42, 49, 56, 57, 50, 43, 36,
+			29, 22, 15, 23, 30, 37, 44, 51,
+			58, 59, 52, 45, 38, 31, 39, 46,
+			53, 60, 61, 54, 47, 55, 62, 63,
+			63, 63, 63, 63, 63, 63, 63, 63, // Extra values to prevent index check (see 'read_block').
+			63, 63, 63, 63, 63, 63, 63
+		};
 	};
 }
 
@@ -779,6 +756,22 @@ namespace Yttrium
 {
 	bool read_jpeg(const void* data, std::size_t size, ImageInfo& info, Buffer& buffer)
 	{
-		return JpegDecoder{}.decode(static_cast<const std::uint8_t*>(data), size, info, buffer);
+		JpegData jpeg;
+		const auto scan_offset = jpeg.parse_headers(static_cast<const std::uint8_t*>(data), size);
+		if (!scan_offset)
+			return false;
+		Yttrium::Buffer ycbcr{ jpeg._ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
+		if (!JpegBitstream{ static_cast<const std::uint8_t*>(data) + scan_offset, size - scan_offset }.read_scan(jpeg, ycbcr))
+			return false;
+		info = { jpeg._width, jpeg._height, Yttrium::PixelFormat::Bgra32 };
+		buffer.resize(info.frame_size());
+		Yttrium::YCbCrComponents components;
+		components.y = ycbcr.begin() + jpeg._ycbcr_offset[0];
+		components.y_stride = jpeg._ycbcr_stride[0];
+		components.cb = ycbcr.begin() + jpeg._ycbcr_offset[1];
+		components.cbcr_stride = jpeg._ycbcr_stride[1];
+		components.cr = ycbcr.begin() + jpeg._ycbcr_offset[2];
+		Yttrium::convert_jpeg420_to_bgra(jpeg._width, jpeg._height, components, buffer.data(), info.stride());
+		return true;
 	}
 }
