@@ -378,6 +378,18 @@ namespace
 			return true;
 		}
 
+		bool restart(unsigned index) noexcept
+		{
+			if (_free_bits > 8)
+				read_bits(8);
+			if ((_marker & RST_mask) != RST || (_marker & RST_value) != index)
+				return false;
+			_free_bits = 32;
+			_buffer = 0;
+			_marker = 0;
+			return true;
+		}
+
 	private:
 		std::pair<int, int> read_value(const JpegHuffmanTable& huffman) noexcept
 		{
@@ -418,32 +430,19 @@ namespace
 			assert(_free_bits > max_free_bits);
 			do
 			{
-				if (_data == _end)
+				const auto next = _marker ? std::uint8_t{ 0 } : read_byte();
+				if (next == 0xff)
 				{
-					_free_bits -= 8;
-					_buffer |= 255u << _free_bits;
-					continue;
-				}
-				const auto next = *_data++;
-				_free_bits -= 8;
-				_buffer |= std::uint32_t{ next } << _free_bits;
-				if (next == 0xff && _data != _end)
-				{
-					switch (const auto next_next = *_data++; next_next)
+					std::uint8_t next_next;
+					do { next_next = read_byte(); } while (next_next == 0xff);
+					if (next_next)
 					{
-					case 0x00: break; // 0xff is followed by 0x00 to prevent forming a valid marker.
-					case EOI: _data = _end; break;
-					case 0xff: break; // 0xff may be used as a filler before a valid marker.
-					default:
-						if ((next_next & RST_mask) == RST)
-						{
-							_free_bits -= 8;
-							_buffer |= std::uint32_t{ next_next } << _free_bits;
-						}
-						else
-							_data = _end;
+						_marker = next_next;
+						return;
 					}
 				}
+				_free_bits -= 8;
+				_buffer |= std::uint32_t{ next } << _free_bits;
 			} while (_free_bits > max_free_bits);
 		}
 
@@ -454,11 +453,17 @@ namespace
 			_buffer <<= count;
 		}
 
+		std::uint8_t read_byte() noexcept
+		{
+			return _data != _end ? *_data++ : std::uint8_t{ 0 };
+		}
+
 	private:
 		const std::uint8_t* _data = nullptr;
 		const std::uint8_t* const _end;
 		int _free_bits = 32;
 		std::uint32_t _buffer = 0;
+		std::uint8_t _marker = 0;
 
 		static constexpr std::uint8_t _dezigzag_table[64 + 15]{
 			0, 1, 8, 16, 9, 2, 3, 10,
@@ -483,8 +488,9 @@ namespace
 			{
 				process_headers();
 				assert(_ycbcr_stride[1] == _ycbcr_stride[2]);
+				JpegBitstream bitstream{ data + parsed, size - parsed };
 				Yttrium::Buffer ycbcr_buffer{ _ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
-				if (parse_payload(ycbcr_buffer, data + parsed, size - parsed))
+				if (read_scan(bitstream, ycbcr_buffer))
 				{
 					info = { _width, _height, Yttrium::PixelFormat::Bgra32 };
 					buffer.resize(info.frame_size());
@@ -716,10 +722,11 @@ namespace
 			}
 		}
 
-		bool parse_payload(Yttrium::Buffer& ycbcr_buffer, const std::uint8_t* data, std::size_t size) const noexcept
+		bool read_scan(JpegBitstream& bitstream, Yttrium::Buffer& ycbcr_buffer) const noexcept
 		{
 			int last_dc[3]{ 0, 0, 0 };
-			JpegBitstream bitstream{ data, size };
+			std::size_t restart_counter = _restart_interval;
+			unsigned restart_index = 0;
 			for (std::size_t mcu_y = 0; mcu_y < _mcu_y_count; ++mcu_y)
 			{
 				for (std::size_t mcu_x = 0; mcu_x < _mcu_x_count; ++mcu_x)
@@ -741,6 +748,13 @@ namespace
 							}
 						}
 					}
+					if (!--restart_counter)
+					{
+						if (!bitstream.restart(restart_index))
+							return false;
+						restart_counter = _restart_interval;
+						restart_index = (restart_index + 1) & 7;
+					}
 				}
 			}
 			return true;
@@ -752,7 +766,7 @@ namespace
 		JpegComponent _components[3];
 		const std::uint8_t* _quantization_tables[2];
 		JpegHuffmanTable _huffman_tables[2][2];
-		std::size_t _restart_interval = 0;
+		std::size_t _restart_interval = std::numeric_limits<std::size_t>::max();
 		std::size_t _mcu_x_count = 0;
 		std::size_t _mcu_y_count = 0;
 		std::size_t _ycbcr_size = 0;
