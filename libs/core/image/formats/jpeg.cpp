@@ -622,7 +622,7 @@ namespace
 		{
 			int last_dc[3]{ 0, 0, 0 };
 			auto restart_counter = data._restart_interval ? data._restart_interval : std::numeric_limits<std::size_t>::max();
-			unsigned restart_index = 0;
+			int restart_index = 0;
 			for (std::size_t mcu_y = 0; mcu_y < data._mcu_y_count; ++mcu_y)
 			{
 				for (std::size_t mcu_x = 0; mcu_x < data._mcu_x_count; ++mcu_x)
@@ -692,7 +692,7 @@ namespace
 			return true;
 		}
 
-		bool restart(unsigned index) noexcept
+		bool restart(int index) noexcept
 		{
 			if (_free_bits > 8)
 				read_bits(8);
@@ -742,22 +742,18 @@ namespace
 			assert(_free_bits > max_free_bits);
 			do
 			{
-				auto next = _marker ? std::uint8_t{ 0 } : read_byte();
+				auto next = _marker ? std::uint32_t{ 0 } : read_byte();
 				if (next == 0xff)
 				{
-					std::uint8_t next_next;
 					do
 					{
-						next_next = read_byte();
-					} while (next_next == 0xff);
-					if (next_next)
-					{
-						_marker = next_next;
-						next = 0;
-					}
+						next = read_byte();
+					} while (next == 0xff);
+					_marker = static_cast<std::uint8_t>(next);
+					next ^= 0xff; // Negates lower bits. Produces 0xff for 0x00, stops on marker otherwise.
 				}
 				_free_bits -= 8;
-				_buffer |= std::uint32_t{ next } << _free_bits;
+				_buffer |= next << _free_bits;
 			} while (_free_bits > max_free_bits);
 		}
 
