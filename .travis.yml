@@ -9,7 +9,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
       addons: &gcc8_xcb
         apt:
           sources: &all_sources
@@ -26,7 +26,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
+      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
+      addons: *gcc8_xcb
+
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
       addons: &gcc8_x11
         apt:
           sources: *all_sources
@@ -45,19 +51,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
-      addons: *gcc8_x11
-
-    - os: linux
-      dist: xenial
-      compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
-      addons: *gcc8_x11
-
-    - os: linux
-      dist: xenial
-      compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *gcc8_xcb
 
     - os: linux
@@ -68,20 +62,24 @@ matrix:
 
     - os: linux
       dist: xenial
-      compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *gcc8_xcb
-
-    - os: linux
-      dist: xenial
-      compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *gcc8_xcb
+      compiler: clang
+      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
+      addons: &clang7_xcb
+        apt:
+          sources: *all_sources
+          packages:
+            - libopenal-dev
+            - libstdc++-8-dev
+            - libvorbis-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=ON RENDERER=opengl Y3=catch2
+      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
       addons: &clang7_x11
         apt:
           sources: *all_sources
@@ -100,30 +98,8 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
-      addons: *clang7_x11
-
-    - os: linux
-      dist: xenial
-      compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=OFF RENDERER=opengl Y3=catch2
-      addons: *clang7_x11
-
-    - os: linux
-      dist: xenial
-      compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: &clang7_xcb
-        apt:
-          sources: *all_sources
-          packages:
-            - libopenal-dev
-            - libstdc++-8-dev
-            - libvorbis-dev
-            - libxcb-image0-dev
-            - libxcb-xkb-dev
-            - libxkbcommon-dev
-            - libxkbcommon-x11-dev
+      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *clang7_xcb
 
     - os: linux
       dist: xenial
@@ -131,20 +107,9 @@ matrix:
       env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan TIDY=1
       addons: *clang7_xcb
 
-    - os: linux
-      dist: xenial
-      compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang7_xcb
-
-    - os: linux
-      dist: xenial
-      compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang7_xcb
-
 before_install:
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
+  - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ]; then export NORMAL=1; fi
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
@@ -152,21 +117,23 @@ install:
   - popd
 
 script:
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_BENCHMARKS=ON -DBUILD_EXAMPLES=ON -DENABLE_SANITIZERS=ON"; fi
+  - if [ -n "${BENCHMARK}" ]; then CMAKE_OPTIONS+=" -DBUILD_BENCHMARKS=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
+  - if [ -n "${NORMAL}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DENABLE_SANITIZERS=ON"; fi
   - if [ -n "${TIDY}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - cmake --build . -- -j2
   - if [ -n "${TIDY}" ]; then cmake --build . --target tidy; fi
   - ctest --verbose
-  - if [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
+  - if [ -n "${NORMAL}" ]; then cmake --build . --target install; fi
   - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
-# gcov 8 breaks Travis CI builds, see e. g. https://bugzilla.redhat.com/show_bug.cgi?id=1577508
-#after_success:
-#  - if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
+after_success:
+  - if [ -n "${BENCHMARK}" ]; then "${HOME}/yttrium.build/bin/benchmark_jpeg" "${TRAVIS_BUILD_DIR}/examples/tetrium/data/textures/background.jpeg"; fi
+  # gcov 8 breaks Travis CI builds, see e. g. https://bugzilla.redhat.com/show_bug.cgi?id=1577508
+  #- if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
 
 notifications:
   email: false
