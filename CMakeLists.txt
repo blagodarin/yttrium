@@ -183,6 +183,9 @@ append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
 set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+	set(Y_ARCH_X86 ON)
+endif()
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

@@ -1,5 +1,8 @@
 #pragma once
 
+// Architectures.
+#cmakedefine01 Y_ARCH_X86
+
 // Renderers.
 #cmakedefine01 Y_RENDERER_NULL
 #cmakedefine01 Y_RENDERER_OPENGL
@@ -10,5 +13,4 @@
 #cmakedefine01 Y_ENABLE_BUFFER_MEMORY_TRACKING
 
 // Components.
-#cmakedefine01 Y_USE_JPEG
 #cmakedefine01 Y_USE_OGG_VORBIS

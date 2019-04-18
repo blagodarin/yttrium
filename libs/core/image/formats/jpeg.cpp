@@ -22,10 +22,12 @@
 #include <cassert>
 #include <cstring>
 
-#define USE_SSE2 __has_include(<emmintrin.h>)
-
-#if USE_SSE2
-#	include <emmintrin.h>
+#if Y_ARCH_X86
+#	ifdef _MSC_VER
+#		include <intrin.h>
+#	else
+#		include <x86intrin.h>
+#	endif
 #endif
 
 namespace
@@ -57,7 +59,7 @@ namespace
 	// All IDCT code is based on or taken from the 'stb_image' public domain library (https://github.com/nothings/stb).
 	void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
 	{
-#if USE_SSE2
+#if Y_ARCH_X86
 		constexpr auto fixed = [](float x) constexpr noexcept
 		{
 			return Yttrium::fixed_point<std::int16_t, 12>(x);
