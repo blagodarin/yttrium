@@ -16,19 +16,12 @@
 
 #include <yttrium/image.h>
 #include <yttrium/utils/numeric.h>
+#include "../../intrinsics.h"
 #include "../formats.h"
 #include "../utils.h"
 
 #include <cassert>
 #include <cstring>
-
-#if Y_ARCH_X86
-#	ifdef _MSC_VER
-#		include <intrin.h>
-#	else
-#		include <x86intrin.h>
-#	endif
-#endif
 
 namespace
 {

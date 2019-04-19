@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
 // limitations under the License.
 //
 
-#include "intrinsics.h"
-#include "memory/buffer_memory.h"
-
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-#	include "memory/buffer_memory_tracker.h"
+#if Y_ARCH_X86
+#	ifdef _MSC_VER
+#		include <intrin.h>
+#	else
+#		include <x86intrin.h>
+#	endif
 #endif
-
-// TODO: Debug output, e. g. in a ring buffer that can be dumped on exception.
 
 namespace Yttrium
 {
 #if Y_ARCH_X86
-	bool _is_sse2_enabled = true;
+	extern bool _is_sse2_enabled;
 #endif
-
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-	BufferMemoryTracker _buffer_memory_tracker; // Must outlive BufferMemory.
-#endif
-	BufferMemory _buffer_memory;
 }

@@ -17,16 +17,9 @@
 #include "utils.h"
 
 #include <yttrium/utils/numeric.h>
+#include "../intrinsics.h"
 
 #include <cstring>
-
-#if Y_ARCH_X86
-#	ifdef _MSC_VER
-#		include <intrin.h>
-#	else
-#		include <x86intrin.h>
-#	endif
-#endif
 
 namespace Yttrium
 {
@@ -170,7 +163,7 @@ namespace Yttrium
 		auto bgra2 = bgra1 + dst_stride;
 		const auto bgra_delta = dst_stride * 2 - width * 4;
 #if Y_ARCH_X86
-		if (!(width & 0xf) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
+		if (_is_sse2_enabled && !(width & 0xf) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
 		{
 			const auto alpha = _mm_set1_epi16(255);
 			const auto bias = _mm_set1_epi8(static_cast<char>(0x80));

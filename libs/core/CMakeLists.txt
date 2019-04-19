@@ -30,6 +30,9 @@ y_sources(ycore "include"
 	../../include/yttrium/exceptions.h
 	../../include/yttrium/translation.h
 	)
+y_sources(ycore "src"
+	intrinsics.h
+	)
 if(WIN32)
 	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
