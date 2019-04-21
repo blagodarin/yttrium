@@ -75,6 +75,7 @@ function(y3_cmake _dir)
     set(_build_dir ${_source_dir})
   endif()
   message(STATUS "[Y3] Building ${_dir}")
+  unset(_options)
   if(_arg_HEADER_ONLY)
     set(_configs ${CONFIG})
   else()
@@ -170,6 +171,7 @@ function(y3_git_clone _url)
     message(STATUS "[Y3] Removing ${_arg_DIR}")
     file(REMOVE_RECURSE ${_dir})
   endif()
+  unset(_clone_options)
   if(NOT _arg_COMMIT)
     list(APPEND _clone_options --depth 1)
   endif()
@@ -230,38 +232,38 @@ y3_package(opengl)
 y3_package(vulkan)
 
 if("catch2" IN_LIST _y3_packages)
-  set(_version "2.4.2")
+  set(_version "2.7.1")
   set(_package "Catch2-${_version}")
   y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "3da8c4948a94d5b66c4b2dde75f960abbaef1d89")
+    SHA1 "45b3f4ad38f3a5cace6edabd42099de740185237")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
 if("freetype" IN_LIST _y3_packages)
-  set(_version "2.9")
+  set(_version "2.10.0")
   set(_package "freetype-${_version}")
   y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.bz2"
-    SHA1 "94c4399b1a55c5892812e732843fcb4a7c2fe657")
+    SHA1 "f6abf03e0e3189a0de883981c57d3861b5d314f5")
   y3_extract("${_package}.tar.bz2" DIR ${_package})
   y3_cmake(${_package} BUILD_TO_PREFIX OUT_OF_SOURCE
     OPTIONS
+      -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
+      -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON
+      -DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON
+      -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON
       -DDISABLE_FORCE_DEBUG_POSTFIX=ON
-      -DSKIP_INSTALL_LIBRARIES=ON
-      -DWITH_BZip2=OFF
-      -DWITH_HarfBuzz=OFF
-      -DWITH_PNG=OFF
-      -DWITH_ZLIB=OFF)
+      -DSKIP_INSTALL_LIBRARIES=ON)
 endif()
 
 if("glslang" IN_LIST _y3_packages)
-  set(_version "7.8.2853")
+  set(_version "7.11.3188")
   set(_package "glslang-${_version}")
   y3_download("https://github.com/KhronosGroup/glslang/archive/${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "9b6d3734abb351e8218e31c4b08c08805f2c22fc")
+    SHA1 "296afb72c4607efeacab560e7c21236a14e93676")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package}
     OPTIONS -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
@@ -279,35 +281,40 @@ if("ogg" IN_LIST _y3_packages)
 endif()
 
 if("lcov" IN_LIST _y3_packages)
-  set(_package "lcov")
-  # lcov 1.13 doesn't support gcov 8 or higher.
-  y3_git_clone("https://github.com/linux-test-project/lcov.git" DIR ${_package} COMMIT "94eac0ee870e58630d8052dca1181b0cf802525f")
+  set(_version "1.14")
+  set(_package "lcov-${_version}")
+  y3_download("https://downloads.sourceforge.net/project/ltp/Coverage%20Analysis/LCOV-${_version}/${_package}.tar.gz"
+    SHA1 "5570beba61685b7eadf9351972e164dabaf24f9d")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_run(COMMAND make install PREFIX=${PREFIX_DIR} CFG_DIR=${CMAKE_BINARY_DIR}/.trash MAN_DIR=${CMAKE_BINARY_DIR}/.trash
     WORKING_DIRECTORY ${BUILD_DIR}/${_package})
 endif()
 
 if("nasm" IN_LIST _y3_packages)
-  set(_version "2.14")
+  set(_version "2.14.02")
   set(_package "nasm-${_version}")
-  y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
-    NAME "${_package}.zip"
-    SHA1 "09ade73a5f4e9c0850e42cd5c7b5b03f20931893")
-  y3_extract("${_package}.zip" DIR ${_package})
-  set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
+  if(WIN32)
+    y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
+      NAME "${_package}.zip"
+      SHA1 "d027f30446a96fa842335713c773e81ca8cff793")
+    y3_extract("${_package}.zip" DIR ${_package})
+    set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
+  endif()
 endif()
 
 if("openal" IN_LIST _y3_packages)
-  set(_version "1.19.0")
+  set(_version "1.19.1")
   set(_package "openal-soft-${_version}-bin")
   y3_download("http://openal-soft.org/openal-binaries/${_package}.zip"
-    SHA1 "1b4b321166a4d62588efb52d9d0da17db724eac6")
+    SHA1 "db2acacbbb6b2c3dc41a20691888e79759658e2a")
   y3_extract("${_package}.zip" DIR ${_package})
   file(INSTALL
     ${BUILD_DIR}/${_package}/include
     ${BUILD_DIR}/${_package}/libs
     DESTINATION ${PREFIX_DIR})
   if(WIN32)
-    y3_download("https://openal.org/downloads/oalinst.zip" SHA1 "45e08368c6755c58902b7746ff3e51ad2df8a8b8")
+    y3_download("https://openal.org/downloads/oalinst.zip"
+      SHA1 "45e08368c6755c58902b7746ff3e51ad2df8a8b8")
     y3_extract("oalinst.zip")
     execute_process(COMMAND ${BUILD_DIR}/oalinst.exe /s)
   endif()
@@ -327,20 +334,21 @@ if("opengl" IN_LIST _y3_packages)
 endif()
 
 if("vulkan" IN_LIST _y3_packages)
-  set(_version "1.1.82.0")
+  set(_version "1.1.106.0")
   set(_package "Vulkan-Headers-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "2b6814b0a854710b8ee470f1b4f1dbac94edc1b7")
+    SHA1 "805cfb84af68e21f78c991d32202015adcf09587")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY)
   set(_package "Vulkan-Loader-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "f8c25d4821ab04a145b7896a295e3a71da891fcb")
+    SHA1 "0950817354cd3dd182934732caf170fe6c2e1c21")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   if(WIN32)
-    y3_cmake(${_package} TARGET "vulkan")
+    y3_cmake(${_package} TARGET "vulkan"
+      OPTIONS -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
     if("Debug" IN_LIST CONFIGS)
       file(INSTALL
         ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.dll
@@ -361,19 +369,23 @@ if("vulkan" IN_LIST _y3_packages)
     endif()
   else()
     y3_cmake(${_package}
-      OPTIONS -DBUILD_WSI_MIR_SUPPORT=OFF -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF)
+      OPTIONS -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
   endif()
   file(REMOVE_RECURSE ${PREFIX_DIR}/share)
 endif()
 
 if("jpeg" IN_LIST _y3_packages)
-  set(_version "2.0.1")
+  set(_version "2.0.2")
   set(_package "libjpeg-turbo-${_version}")
   y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
-    SHA1 "7ea4a288bccbb5a2d5bfad5fb328d4a839853f4e")
+    SHA1 "1cff52d50b81755d0bdcf9055eb22157f39a1695")
   y3_extract("${_package}.tar.gz" DIR ${_package})
+  set(_options -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_ARITH_DEC=OFF -DWITH_ARITH_ENC=OFF -DWITH_TURBOJPEG=OFF)
+  if(WIN32)
+    list(APPEND _options -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON)
+  endif()
   y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
-    OPTIONS -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_CRT_DLL=ON -DWITH_TURBOJPEG=OFF)
+    OPTIONS ${_options})
   file(INSTALL
     ${BUILD_DIR}/${_package}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
