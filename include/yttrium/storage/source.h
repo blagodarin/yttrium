@@ -74,7 +74,7 @@ namespace Yttrium
 
 		/// Creates a Buffer from the Source data.
 		/// The buffer is guaranteed to be null-terminated.
-		Buffer to_buffer() const;
+		Buffer to_buffer(std::size_t padding_size = 1) const;
 
 		/// Creates a string from the Source data.
 		std::string to_string() const;

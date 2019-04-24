@@ -166,7 +166,7 @@ namespace Yttrium
 		if (_is_sse2_enabled && !(width & 0xf) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
 		{
 			const auto alpha = _mm_set1_epi16(255);
-			const auto bias = _mm_set1_epi8(static_cast<char>(0x80));
+			const auto bias = _mm_set1_epi8(static_cast<char>(-128));
 
 			const auto cr_r = _mm_set1_epi16(fixed_point<std::int16_t, 12>(1.402));
 			const auto cr_g = _mm_set1_epi16(-fixed_point<std::int16_t, 12>(0.7141363));

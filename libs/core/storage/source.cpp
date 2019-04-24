@@ -113,15 +113,16 @@ namespace Yttrium
 		return std::make_unique<ProxySource>(source, actual_base, std::min(size, source_size - actual_base));
 	}
 
-	Buffer Source::to_buffer() const
+	Buffer Source::to_buffer(std::size_t padding_size) const
 	{
-		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
+		if (_size > std::numeric_limits<std::size_t>::max() - padding_size)
 			throw std::bad_alloc{};
-		Buffer buffer{ _size + 1 };
-		if (read_at(0, buffer.data(), _size) != _size)
+		const auto size = static_cast<std::size_t>(_size);
+		Buffer buffer{ size + padding_size };
+		if (read_at(0, buffer.data(), size) != size)
 			throw std::system_error{ std::make_error_code(std::errc::io_error) };
-		buffer[_size] = '\0';
-		buffer.resize(_size);
+		std::memset(buffer.begin() + size, 0, padding_size);
+		buffer.resize(size);
 		return buffer;
 	}
 

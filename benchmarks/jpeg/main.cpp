@@ -108,7 +108,10 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	const auto input = source->to_buffer();
+	// Pad JPEG image for the Yttrium loader.
+	auto input = source->to_buffer(2);
+	input.end()[0] = 0xff;
+	input.end()[1] = 0xd9;
 
 	Yttrium::ImageInfo output_info;
 	Yttrium::Buffer output;
@@ -118,7 +121,7 @@ int main(int argc, char** argv)
 	Benchmark<5000> benchmark;
 
 	benchmark.add("yttrium", [&input, &output_info, &output] {
-		return Yttrium::read_jpeg(input.data(), input.size(), output_info, output);
+		return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output);
 	});
 
 	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "yttrium_output.png" }, Yttrium::ImageFormat::Png);

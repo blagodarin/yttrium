@@ -32,6 +32,6 @@ Yttrium::Buffer make_random_buffer(std::size_t size)
 	std::default_random_engine engine;
 	std::uniform_int_distribution<unsigned> distribution{ 0, std::numeric_limits<std::uint8_t>::max() }; // Visual C++ 2017 doesn't allow std::uint8_t distribution.
 	Yttrium::Buffer buffer(size);
-	std::generate(buffer.begin(), buffer.end(), [&engine, &distribution] { return distribution(engine); });
+	std::generate(buffer.begin(), buffer.end(), [&engine, &distribution] { return static_cast<std::uint8_t>(distribution(engine)); });
 	return buffer;
 }

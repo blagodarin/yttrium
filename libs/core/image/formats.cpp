@@ -78,8 +78,12 @@ namespace Yttrium
 			break;
 		case ImageFormat::Jpeg:
 		{
-			auto source_buffer = source.to_buffer();
-			return read_jpeg(source_buffer.data(), source_buffer.size(), info, buffer);
+			// Pad JPEG image with extra End-Of-Image marker so we can get rid
+			// of the "are we finished?" check during bitstream decoding.
+			auto input = source.to_buffer(2);
+			input.end()[0] = 0xff;
+			input.end()[1] = 0xd9;
+			return read_jpeg(input.data(), input.size() + 2, info, buffer);
 		}
 		case ImageFormat::Dds:
 			if (!read_dds_header(reader, info))

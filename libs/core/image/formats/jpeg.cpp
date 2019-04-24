@@ -25,30 +25,6 @@
 
 namespace
 {
-	enum : std::uint8_t
-	{
-		TEM = 0x01,       // Temporary.
-		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
-		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
-		DHT = 0xc4,       // Define-Huffman-Tables.
-		DAC = 0xcc,       // Define-Arithmetic-Coding.
-		RST = 0xd0,       // Restart (0-7).
-		RST_mask = 0xf8,  //
-		RST_value = 0x07, //
-		SOI = 0xd8,       // Start-of-Image.
-		EOI = 0xd9,       // End-of-Image.
-		SOS = 0xda,       // Start-of-Scan.
-		DQT = 0xdb,       // Defile-Quantization-Tables.
-		DNL = 0xdc,       // Define-Number-of-Lines.
-		DRI = 0xdd,       // Define-Restart-Interval.
-		DHP = 0xde,       //
-		EXP = 0xdf,       //
-		APP = 0xe0,       // Application (0-15).
-		APP_mask = 0xf0,  //
-		APP_value = 0x0f, //
-		COM = 0xfe,       // Comment.
-	};
-
 	// All IDCT code is based on or taken from the 'stb_image' public domain library (https://github.com/nothings/stb).
 	void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
 	{
@@ -324,6 +300,30 @@ namespace
 #	undef IDCT_1D
 #endif
 	}
+
+	enum : std::uint8_t
+	{
+		TEM = 0x01,       // Temporary.
+		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
+		SOF2 = 0xc2,      // Start-of-Frame (progressive DCT).
+		DHT = 0xc4,       // Define-Huffman-Tables.
+		DAC = 0xcc,       // Define-Arithmetic-Coding.
+		RST = 0xd0,       // Restart (0-7).
+		RST_mask = 0xf8,  //
+		RST_value = 0x07, //
+		SOI = 0xd8,       // Start-of-Image.
+		EOI = 0xd9,       // End-of-Image.
+		SOS = 0xda,       // Start-of-Scan.
+		DQT = 0xdb,       // Defile-Quantization-Tables.
+		DNL = 0xdc,       // Define-Number-of-Lines.
+		DRI = 0xdd,       // Define-Restart-Interval.
+		DHP = 0xde,       //
+		EXP = 0xdf,       //
+		APP = 0xe0,       // Application (0-15).
+		APP_mask = 0xf0,  //
+		APP_value = 0x0f, //
+		COM = 0xfe,       // Comment.
+	};
 
 	struct JpegHuffmanTable
 	{
@@ -610,8 +610,8 @@ namespace
 	class JpegBitstream
 	{
 	public:
-		constexpr JpegBitstream(const std::uint8_t* data, std::size_t size) noexcept
-			: _data{ data }, _end{ data + size } {}
+		constexpr JpegBitstream(const std::uint8_t* data) noexcept
+			: _data{ data } {}
 
 		bool read_scan(const JpegData& data, Yttrium::Buffer& ycbcr_buffer) noexcept
 		{
@@ -737,12 +737,12 @@ namespace
 			assert(_free_bits > max_free_bits);
 			do
 			{
-				auto next = _marker ? std::uint32_t{ 0 } : read_byte();
+				auto next = _marker ? std::uint32_t{ 0 } : *_data++;
 				if (next == 0xff)
 				{
 					do
 					{
-						next = read_byte();
+						next = *_data++;
 					} while (next == 0xff);
 					_marker = static_cast<std::uint8_t>(next);
 					next ^= 0xff; // Negates lower bits. Produces 0xff for 0x00, stops on marker otherwise.
@@ -759,14 +759,8 @@ namespace
 			_buffer <<= count;
 		}
 
-		std::uint8_t read_byte() noexcept
-		{
-			return _data != _end ? *_data++ : std::uint8_t{ 0 };
-		}
-
 	private:
 		const std::uint8_t* _data = nullptr;
-		const std::uint8_t* const _end;
 		int _free_bits = 32;
 		std::uint32_t _buffer = 0;
 		std::uint8_t _marker = 0;
@@ -790,12 +784,14 @@ namespace Yttrium
 {
 	bool read_jpeg(const void* data, std::size_t size, ImageInfo& info, Buffer& buffer)
 	{
+		const auto bytes = static_cast<const std::uint8_t*>(data);
+		assert(size >= 2 && bytes[size - 2] == 0xff && bytes[size - 1] == EOI);
 		JpegData jpeg;
-		const auto scan_offset = jpeg.parse_headers(static_cast<const std::uint8_t*>(data), size);
-		if (!scan_offset)
+		const auto scan_offset = jpeg.parse_headers(bytes, size);
+		if (!scan_offset || size - scan_offset < 2)
 			return false;
 		Yttrium::Buffer ycbcr{ jpeg._ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
-		if (!JpegBitstream{ static_cast<const std::uint8_t*>(data) + scan_offset, size - scan_offset }.read_scan(jpeg, ycbcr))
+		if (!JpegBitstream{ bytes + scan_offset }.read_scan(jpeg, ycbcr))
 			return false;
 		info = { jpeg._width, jpeg._height, Yttrium::PixelFormat::Bgra32 };
 		buffer.resize(info.frame_size());
