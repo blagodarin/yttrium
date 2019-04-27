@@ -80,6 +80,7 @@ namespace
 			throw;
 		}
 
+		decompressor.do_fancy_upsampling = FALSE;
 		::jpeg_start_decompress(&decompressor);
 		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += info.stride())
 			::jpeg_read_scanlines(&decompressor, &scanline, 1);
