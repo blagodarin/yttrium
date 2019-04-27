@@ -494,7 +494,7 @@ namespace
 							if (value < (1 << (value_size - 1)))
 								value += static_cast<int>((~0u << value_size) + 1);
 							if (value >= -128 && value <= 127)
-								ac_lookup[i] = static_cast<std::int16_t>((value << 8) + (code & 0xf0) + code_size + value_size);
+								ac_lookup[i] = static_cast<std::int16_t>(value * 256 + (code & 0xf0) + code_size + value_size);
 						}
 					}
 				}
