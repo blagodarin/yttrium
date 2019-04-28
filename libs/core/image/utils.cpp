@@ -275,6 +275,41 @@ namespace Yttrium
 		const auto cbcr_delta = src.cbcr_stride - width;
 		auto bgra = static_cast<std::uint8_t*>(dst);
 		const auto bgra_delta = dst_stride - width * 4;
+#if Y_ARCH_X86
+		if (_is_sse2_enabled && !(width & 0x7) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
+		{
+			const auto alpha = _mm_set1_epi16(255);
+			const auto bias = _mm_set1_epi8(static_cast<char>(-128));
+			const auto cr_r = _mm_set1_epi16(fixed_point<std::int16_t, 12>(1.402));
+			const auto cr_g = _mm_set1_epi16(-fixed_point<std::int16_t, 12>(0.7141363));
+			const auto cb_g = _mm_set1_epi16(-fixed_point<std::int16_t, 12>(0.3441363));
+			const auto cb_b = _mm_set1_epi16(fixed_point<std::int16_t, 12>(1.772));
+			for (auto j = height; j > 0; --j)
+			{
+				for (auto i = width / 8; i > 0; --i)
+				{
+					const auto y_values = _mm_srli_epi16(_mm_unpacklo_epi8(bias, _mm_loadl_epi64(reinterpret_cast<const __m128i*>(y))), 4);
+					const auto cb_values = _mm_unpacklo_epi8(_mm_setzero_si128(), _mm_xor_si128(_mm_loadl_epi64(reinterpret_cast<const __m128i*>(cb)), bias));
+					const auto cr_values = _mm_unpacklo_epi8(_mm_setzero_si128(), _mm_xor_si128(_mm_loadl_epi64(reinterpret_cast<const __m128i*>(cr)), bias));
+					const auto br = _mm_packus_epi16(_mm_srai_epi16(_mm_add_epi16(y_values, _mm_mulhi_epi16(cb_values, cb_b)), 4), _mm_srai_epi16(_mm_add_epi16(y_values, _mm_mulhi_epi16(cr_values, cr_r)), 4));
+					const auto ga = _mm_packus_epi16(_mm_srai_epi16(_mm_add_epi16(y_values, _mm_add_epi16(_mm_mulhi_epi16(cb_values, cb_g), _mm_mulhi_epi16(cr_values, cr_g))), 4), alpha);
+					const auto bg = _mm_unpacklo_epi8(br, ga);
+					const auto ra = _mm_unpackhi_epi8(br, ga);
+					_mm_store_si128(reinterpret_cast<__m128i*>(bgra) + 0, _mm_unpacklo_epi16(bg, ra));
+					_mm_store_si128(reinterpret_cast<__m128i*>(bgra) + 1, _mm_unpackhi_epi16(bg, ra));
+					y += 8;
+					cb += 8;
+					cr += 8;
+					bgra += 32;
+				}
+				y += y_delta;
+				cb += cbcr_delta;
+				cr += cbcr_delta;
+				bgra += bgra_delta;
+			}
+			return;
+		}
+#endif
 		for (auto j = height; j > 0; --j)
 		{
 			for (auto i = width; i > 0; --i)
