@@ -19,6 +19,7 @@
 #include <yttrium/utils/numeric.h>
 #include "../intrinsics.h"
 
+#include <cassert>
 #include <cstring>
 
 namespace Yttrium
@@ -263,5 +264,70 @@ namespace Yttrium
 			bgra1 += bgra_delta;
 			bgra2 += bgra_delta;
 		}
+	}
+
+	void convert_jpeg444_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents& src, void* dst, std::size_t dst_stride) noexcept
+	{
+		auto y = src.y;
+		const auto y_delta = src.y_stride - width;
+		auto cb = src.cb;
+		auto cr = src.cr;
+		const auto cbcr_delta = src.cbcr_stride - width;
+		auto bgra = static_cast<std::uint8_t*>(dst);
+		const auto bgra_delta = dst_stride - width * 4;
+		for (auto j = height; j > 0; --j)
+		{
+			for (auto i = width; i > 0; --i)
+			{
+				// See ITU-T T.871 for the exact equations.
+				const auto xcb = *cb - 128;
+				const auto xcr = *cr - 128;
+				const auto xb = ((1 << (16 - 1)) + fixed_point<int, 16>(1.772) * xcb) >> 16;
+				const auto xg = ((1 << (16 - 1)) - fixed_point<int, 16>(0.3441363) * xcb - fixed_point<int, 16>(0.7141363) * xcr) >> 16;
+				const auto xr = ((1 << (16 - 1)) + fixed_point<int, 16>(1.402) * xcr) >> 16;
+				bgra[0] = clamp_to_uint8(*y + xb);
+				bgra[1] = clamp_to_uint8(*y + xg);
+				bgra[2] = clamp_to_uint8(*y + xr);
+				bgra[3] = 255;
+				++y;
+				++cb;
+				++cr;
+				bgra += 4;
+			}
+			y += y_delta;
+			cb += cbcr_delta;
+			cr += cbcr_delta;
+			bgra += bgra_delta;
+		}
+	}
+
+	void upsample_2x2_linear(std::size_t width, std::size_t height, const std::uint8_t* src, std::size_t src_stride, std::uint8_t* dst, std::size_t dst_stride) noexcept
+	{
+		const auto upsample_row = [](std::uint8_t* out, std::size_t in_width, const std::uint8_t* in_near, const std::uint8_t* in_far) {
+			auto a = 3 * in_near[0] + in_far[0];
+			*out++ = static_cast<std::uint8_t>((a + 2) >> 2);
+			for (std::size_t i = 1; i < in_width; ++i)
+			{
+				const auto b = a;
+				a = 3 * in_near[i] + in_far[i];
+				*out++ = static_cast<std::uint8_t>((3 * b + a + 8) >> 4);
+				*out++ = static_cast<std::uint8_t>((3 * a + b + 8) >> 4);
+			}
+			*out = static_cast<std::uint8_t>((a + 2) >> 2);
+		};
+
+		assert(width > 0 && height > 0);
+		upsample_row(dst, width, src, src);
+		dst += dst_stride;
+		for (std::size_t i = 1; i < height; ++i)
+		{
+			const auto prev = src;
+			src += src_stride;
+			upsample_row(dst, width, prev, src);
+			dst += dst_stride;
+			upsample_row(dst, width, src, prev);
+			dst += dst_stride;
+		}
+		upsample_row(dst, width, src, src);
 	}
 }

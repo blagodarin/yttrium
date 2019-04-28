@@ -782,7 +782,7 @@ namespace
 
 namespace Yttrium
 {
-	bool read_jpeg(const void* data, std::size_t size, ImageInfo& info, Buffer& buffer)
+	bool read_jpeg(const void* data, std::size_t size, ImageInfo& info, Buffer& buffer, Upsampling upsampling)
 	{
 		const auto bytes = static_cast<const std::uint8_t*>(data);
 		assert(size >= 2 && bytes[size - 2] == 0xff && bytes[size - 1] == EOI);
@@ -790,18 +790,41 @@ namespace Yttrium
 		const auto scan_offset = jpeg.parse_headers(bytes, size);
 		if (!scan_offset || size - scan_offset < 2)
 			return false;
-		Yttrium::Buffer ycbcr{ jpeg._ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
+		Buffer ycbcr{ jpeg._ycbcr_size }; // Converting every MCU after decoding hurts performance due to worse memory access pattern.
 		if (!JpegBitstream{ bytes + scan_offset }.read_scan(jpeg, ycbcr))
 			return false;
-		info = { jpeg._width, jpeg._height, Yttrium::PixelFormat::Bgra32 };
+		info = { jpeg._width, jpeg._height, PixelFormat::Bgra32 };
 		buffer.resize(info.frame_size());
-		Yttrium::YCbCrComponents components;
-		components.y = ycbcr.begin() + jpeg._ycbcr_offset[0];
-		components.y_stride = jpeg._ycbcr_stride[0];
-		components.cb = ycbcr.begin() + jpeg._ycbcr_offset[1];
-		components.cbcr_stride = jpeg._ycbcr_stride[1];
-		components.cr = ycbcr.begin() + jpeg._ycbcr_offset[2];
-		Yttrium::convert_jpeg420_to_bgra(jpeg._width, jpeg._height, components, buffer.data(), info.stride());
+		switch (upsampling)
+		{
+		case Upsampling::Nearest:
+		{
+			YCbCrComponents components;
+			components.y = ycbcr.begin() + jpeg._ycbcr_offset[0];
+			components.y_stride = jpeg._ycbcr_stride[0];
+			components.cb = ycbcr.begin() + jpeg._ycbcr_offset[1];
+			components.cbcr_stride = jpeg._ycbcr_stride[1];
+			components.cr = ycbcr.begin() + jpeg._ycbcr_offset[2];
+			convert_jpeg420_to_bgra(jpeg._width, jpeg._height, components, buffer.data(), info.stride());
+			break;
+		}
+		case Upsampling::Linear:
+		{
+			const auto stride = jpeg._ycbcr_stride[0];
+			const auto plane_size = jpeg._height * stride;
+			Buffer upsampled{ 2 * plane_size };
+			upsample_2x2_linear(jpeg._width / 2, jpeg._height / 2, ycbcr.begin() + jpeg._ycbcr_offset[1], jpeg._ycbcr_stride[1], upsampled.begin(), stride);
+			upsample_2x2_linear(jpeg._width / 2, jpeg._height / 2, ycbcr.begin() + jpeg._ycbcr_offset[2], jpeg._ycbcr_stride[2], upsampled.begin() + plane_size, stride);
+			YCbCrComponents components;
+			components.y = ycbcr.begin() + jpeg._ycbcr_offset[0];
+			components.y_stride = stride;
+			components.cb = upsampled.begin();
+			components.cbcr_stride = stride;
+			components.cr = upsampled.begin() + plane_size;
+			convert_jpeg444_to_bgra(jpeg._width, jpeg._height, components, buffer.data(), info.stride());
+			break;
+		}
+		}
 		return true;
 	}
 }

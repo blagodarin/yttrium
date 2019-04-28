@@ -83,7 +83,7 @@ namespace Yttrium
 			auto input = source.to_buffer(2);
 			input.end()[0] = 0xff;
 			input.end()[1] = 0xd9;
-			return read_jpeg(input.data(), input.size() + 2, info, buffer);
+			return read_jpeg(input.data(), input.size() + 2, info, buffer, Upsampling::Linear);
 		}
 		case ImageFormat::Dds:
 			if (!read_dds_header(reader, info))

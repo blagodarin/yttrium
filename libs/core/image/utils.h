@@ -42,4 +42,7 @@ namespace Yttrium
 	};
 
 	Y_CORE_API void convert_jpeg420_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, void* dst, std::size_t dst_stride) noexcept;
+	void convert_jpeg444_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, void* dst, std::size_t dst_stride) noexcept;
+
+	void upsample_2x2_linear(std::size_t width, std::size_t height, const std::uint8_t* src, std::size_t src_stride, std::uint8_t* dst, std::size_t dst_stride) noexcept;
 }

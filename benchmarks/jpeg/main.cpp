@@ -40,7 +40,7 @@ namespace
 		std::longjmp(reinterpret_cast<JpegErrorHandler*>(cinfo->err)->_jmp_buf, 1);
 	}
 
-	bool read_jpeg_with_libjpeg(const void* data, std::size_t size, Yttrium::ImageInfo& info, Yttrium::Buffer& buffer)
+	bool read_jpeg_with_libjpeg(const void* data, std::size_t size, Yttrium::ImageInfo& info, Yttrium::Buffer& buffer, boolean do_fancy_upsampling)
 	{
 		if (size > std::numeric_limits<unsigned long>::max())
 			return false;
@@ -80,7 +80,7 @@ namespace
 			throw;
 		}
 
-		decompressor.do_fancy_upsampling = FALSE;
+		decompressor.do_fancy_upsampling = do_fancy_upsampling;
 		::jpeg_start_decompress(&decompressor);
 		for (auto scanline = &buffer[0]; decompressor.output_scanline < decompressor.output_height; scanline += info.stride())
 			::jpeg_read_scanlines(&decompressor, &scanline, 1);
@@ -121,17 +121,29 @@ int main(int argc, char** argv)
 
 	Benchmark<5000> benchmark;
 
-	benchmark.add("yttrium", [&input, &output_info, &output] {
-		return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output);
+	benchmark.add("yttrium nearest", [&input, &output_info, &output] {
+		return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Nearest);
 	});
 
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "yttrium_output.png" }, Yttrium::ImageFormat::Png);
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_nearest.png" }, Yttrium::ImageFormat::Png);
 
-	benchmark.add("libjpeg", [&input, &output_info, &output] {
-		return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output);
+	benchmark.add("yttrium linear", [&input, &output_info, &output] {
+		return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Linear);
 	});
 
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "libjpeg_output.png" }, Yttrium::ImageFormat::Png);
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_linear.png" }, Yttrium::ImageFormat::Png);
+
+	benchmark.add("libjpeg nearest", [&input, &output_info, &output] {
+		return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, FALSE);
+	});
+
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_nearest.png" }, Yttrium::ImageFormat::Png);
+
+	benchmark.add("libjpeg linear", [&input, &output_info, &output] {
+		return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, TRUE);
+	});
+
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_linear.png" }, Yttrium::ImageFormat::Png);
 
 	benchmark.print();
 }

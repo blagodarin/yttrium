@@ -34,7 +34,13 @@ namespace Yttrium
 	bool read_ico_header(Reader&, ImageInfo&);
 	bool read_tga_header(Reader&, ImageInfo&);
 
-	Y_CORE_API bool read_jpeg(const void*, std::size_t, ImageInfo&, Buffer&);
+	enum class Upsampling
+	{
+		Nearest,
+		Linear,
+	};
+
+	Y_CORE_API bool read_jpeg(const void*, std::size_t, ImageInfo&, Buffer&, Upsampling);
 
 	bool write_png(Writer&, const ImageInfo&, const void*);
 	bool write_tga(Writer&, const ImageInfo&, const void*);
