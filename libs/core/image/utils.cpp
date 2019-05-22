@@ -339,11 +339,40 @@ namespace Yttrium
 	void upsample_2x2_linear(std::size_t width, std::size_t height, const std::uint8_t* src, std::size_t src_stride, std::uint8_t* dst, std::size_t dst_stride) noexcept
 	{
 		const auto upsample_row = [](std::uint8_t* out, std::size_t in_width, const std::uint8_t* in_near, const std::uint8_t* in_far) {
-			auto a = 3 * in_near[0] + in_far[0];
-			*out++ = static_cast<std::uint8_t>((a + 2) >> 2);
-			for (std::size_t i = 1; i < in_width; ++i)
+			std::size_t i = 0;
+			auto a = 3 * in_near[i] + in_far[i];
+			decltype(a) b;
+#if Y_ARCH_X86
+			if (_is_sse2_enabled && in_width > 1)
 			{
-				const auto b = a;
+				for (; i < ((in_width - 1) & ~std::size_t{ 0b111 }); i += 8)
+				{
+					const auto near = _mm_unpacklo_epi8(_mm_loadl_epi64(reinterpret_cast<const __m128i*>(in_near + i)), _mm_setzero_si128());
+					const auto far = _mm_unpacklo_epi8(_mm_loadl_epi64(reinterpret_cast<const __m128i*>(in_far + i)), _mm_setzero_si128());
+
+					const auto curr = _mm_add_epi16(_mm_slli_epi16(near, 2), _mm_sub_epi16(far, near));
+					const auto prev = _mm_insert_epi16(_mm_slli_si128(curr, 2), static_cast<std::int16_t>(a), 0);
+					const auto next = _mm_insert_epi16(_mm_srli_si128(curr, 2), static_cast<std::int16_t>(3 * in_near[i + 8] + in_far[i + 8]), 7);
+
+					const auto base = _mm_add_epi16(_mm_slli_epi16(curr, 2), _mm_set1_epi16(8));
+					const auto even = _mm_add_epi16(base, _mm_sub_epi16(prev, curr));
+					const auto odd = _mm_add_epi16(base, _mm_sub_epi16(next, curr));
+
+					_mm_storeu_si128(reinterpret_cast<__m128i*>(out), _mm_packus_epi16(_mm_srli_epi16(_mm_unpacklo_epi16(even, odd), 4), _mm_srli_epi16(_mm_unpackhi_epi16(even, odd), 4)));
+					out += 16;
+
+					a = 3 * in_near[i + 7] + in_far[i + 7];
+				}
+				b = a;
+				a = 3 * in_near[i] + in_far[i];
+				*out++ = static_cast<std::uint8_t>((3 * a + b + 8) >> 4);
+			}
+			else
+#endif
+				*out++ = static_cast<std::uint8_t>((a + 2) >> 2);
+			for (++i; i < in_width; ++i)
+			{
+				b = a;
 				a = 3 * in_near[i] + in_far[i];
 				*out++ = static_cast<std::uint8_t>((3 * b + a + 8) >> 4);
 				*out++ = static_cast<std::uint8_t>((3 * a + b + 8) >> 4);
