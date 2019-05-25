@@ -58,7 +58,7 @@ namespace Yttrium
 		void load(Buffer&& buffer)
 		{
 			assert(!_face);
-			if (buffer.size() > std::numeric_limits<FT_Long>::max()
+			if (buffer.size() > static_cast<std::size_t>(std::numeric_limits<FT_Long>::max())
 				|| FT_New_Memory_Face(_library, static_cast<const FT_Byte*>(buffer.data()), static_cast<FT_Long>(buffer.size()), 0, &_face))
 				throw DataError{ "Failed to load font" };
 			_face_buffer = std::move(buffer);

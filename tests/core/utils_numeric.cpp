@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ TEST_CASE("utils.next_power_of_2")
 		// clang-format on
 	};
 
-	for (std::size_t i = 1; i <= std::numeric_limits<std::int8_t>::max(); ++i)
+	for (std::size_t i = 1; i <= static_cast<std::size_t>(std::numeric_limits<std::int8_t>::max()); ++i)
 		CHECK(next_power_of_2(i) == table[i]);
 
 	const auto max_power_of_2 = static_cast<std::uintmax_t>(std::numeric_limits<std::intmax_t>::max()) + 1;

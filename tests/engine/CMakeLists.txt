@@ -1,5 +1,5 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# Copyright 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ add_executable(yengine_tests
 	resource_loader.cpp
 	)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set_property(SOURCE gui_loading.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
+	set_property(SOURCE gui_loading.cpp key.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
 endif()
 target_link_libraries(yengine_tests PRIVATE ycore yengine ytest)
 set_target_properties(yengine_tests PROPERTIES FOLDER "tests")

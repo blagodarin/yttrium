@@ -9,13 +9,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
-      addons: &gcc8_xcb
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
+      addons: &gcc9_xcb
         apt:
           sources: &all_sources
             - ubuntu-toolchain-r-test
           packages:
-            - g++-8
+            - g++-9
             - libopenal-dev
             - libvorbis-dev
             - libxcb-image0-dev
@@ -26,18 +26,18 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
-      addons: *gcc8_xcb
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
+      addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
-      addons: &gcc8_x11
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
+      addons: &gcc9_x11
         apt:
           sources: *all_sources
           packages:
-            - g++-8
+            - g++-9
             - libgl-dev
             - libopenal-dev
             - libvorbis-dev
@@ -45,20 +45,20 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
-      addons: *gcc8_x11
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
+      addons: *gcc9_x11
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *gcc8_xcb
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *gcc8_xcb
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
@@ -115,6 +115,7 @@ install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
   - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
   - popd
+  - if [ -n "${COVERAGE}" ]; then pip install --user codecov; fi
 
 script:
   - if [ -n "${BENCHMARK}" ]; then CMAKE_OPTIONS+=" -DBUILD_BENCHMARKS=ON"; fi
@@ -127,13 +128,13 @@ script:
   - if [ -n "${TIDY}" ]; then cmake --build . --target tidy; fi
   - ctest --verbose
   - if [ -n "${NORMAL}" ]; then cmake --build . --target install; fi
-  - if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
+  # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58
+  #- if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
 after_success:
   - if [ -n "${BENCHMARK}" ]; then "${HOME}/yttrium.build/bin/benchmark_jpeg" "${TRAVIS_BUILD_DIR}/examples/tetrium/data/textures/background.jpeg"; fi
-  # gcov 8 breaks Travis CI builds, see e. g. https://bugzilla.redhat.com/show_bug.cgi?id=1577508
-  #- if [ -n "${COVERAGE}" ]; then bash <(curl -s https://codecov.io/bash) -x gcov-${GCC} -a "-s `pwd`"; fi
+  - if [ -n "${COVERAGE}" ]; then codecov --gcov-root "${HOME}/yttrium.build" --gcov-exec gcov-${GCC} --gcov-args "-s `pwd`"; fi
 
 notifications:
   email: false
