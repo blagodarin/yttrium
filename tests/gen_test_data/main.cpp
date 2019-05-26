@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 #include "../../libs/core/image/formats/bmp.h"
 #include "../../libs/core/image/formats/dds.h"
@@ -60,6 +61,9 @@ int main()
 		if (writer.write(file_header) && writer.write(info_header))
 			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
 	}
+	if (const auto source = Source::from("tests/core/data/gradient24.jpeg"))
+		if (const auto jpeg = Image::load(*source))
+			jpeg->save(Writer{ "tests/core/data/gradient24.jpeg.tga" }, ImageFormat::Tga);
 	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.png" }, ImageFormat::Png);
 	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.tga" }, ImageFormat::Tga);
 	{

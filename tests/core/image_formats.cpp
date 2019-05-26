@@ -54,7 +54,7 @@ TEST_CASE("image.load.ico")
 	CHECK(*image == reference_image);
 }
 
-TEST_CASE("image.load.jpeg", "[!mayfail]")
+TEST_CASE("image.load.jpeg")
 {
 	const auto jpeg_image = Image::load(*Source::from("tests/core/data/gradient24.jpeg"));
 	REQUIRE(jpeg_image);
@@ -62,12 +62,9 @@ TEST_CASE("image.load.jpeg", "[!mayfail]")
 
 	const auto tga_image = Image::load(*Source::from("tests/core/data/gradient24.jpeg.tga"));
 	REQUIRE(tga_image);
-	REQUIRE(tga_image->info().pixel_format() == PixelFormat::Bgr24);
+	REQUIRE(tga_image->info().pixel_format() == PixelFormat::Bgra32);
 
-	Image rgb_tga_image{ { tga_image->info().width(), tga_image->info().height(), PixelFormat::Bgra32, tga_image->info().orientation() } };
-	REQUIRE(Image::transform(tga_image->info(), tga_image->data(), rgb_tga_image.info(), rgb_tga_image.data()));
-
-	CHECK(jpeg_image == rgb_tga_image);
+	CHECK(jpeg_image == tga_image);
 }
 
 TEST_CASE("image.load.tga8")

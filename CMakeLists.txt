@@ -45,7 +45,6 @@ option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 
-option(Y_USE_JPEG "Include JPEG support (requires libjpeg)" ON)
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
 
 set(Y_RENDERER "opengl" CACHE STRING "Renderer to use (opengl, vulkan)")
@@ -228,9 +227,7 @@ endif()
 
 if(BUILD_BENCHMARKS)
 	add_subdirectory(benchmarks/buffer)
-	if(Y_USE_JPEG)
-		add_subdirectory(benchmarks/jpeg)
-	endif()
+	add_subdirectory(benchmarks/jpeg)
 endif()
 
 if(ENABLE_CLANG_FORMAT)
