@@ -62,6 +62,10 @@ endif()
 
 find_package(Threads REQUIRED)
 
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+	set(Y_ARCH_X86 ON)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
@@ -78,6 +82,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-switch-enum
 		-Wno-weak-vtables
 		)
+
+	if(Y_ARCH_X86)
+		add_compile_options(-msse2)
+	endif()
 
 	if(ENABLE_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
@@ -117,6 +125,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(
 			-Winline # Issued for header-only code.
 			)
+	endif()
+
+	if(Y_ARCH_X86)
+		add_compile_options(-msse2)
 	endif()
 
 	option(ENABLE_COVERAGE "Build with coverage analysis support" OFF)
@@ -182,9 +194,6 @@ append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
 set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-	set(Y_ARCH_X86 ON)
-endif()
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
