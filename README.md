@@ -8,6 +8,10 @@
 
 Yttrium is (intended to become) a game development framework.
 
+Yttrium is an occasional hobby project, so don't expect it to be something
+actually valuable or to eventually turn into one. It's more like a bunch of
+various ideas piled together and roughly shaped to look game engine-ish.
+
 Yttrium aims to:
 * Be a *modern C++ framework* in terms of API design, software architecture,
   development tools and coding practices.
@@ -22,5 +26,5 @@ third-party libraries; if you don't have them installed on your system, you can
 get them using *Yttrium third-party bootstrapper (Y3)* which also requires Git
 and CMake (and an Internet connection).
 
-You can check CI configuration files ([.appveyor.yml](.appveyor.yml) and
+Check out CI configuration files ([.appveyor.yml](.appveyor.yml) and
 [.travis.yml](.travis.yml)) for some hints on building Yttrium.
