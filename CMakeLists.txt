@@ -66,6 +66,12 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x
 	set(Y_ARCH_X86 ON)
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -E -P ${PROJECT_SOURCE_DIR}/cmake/arch.cpp OUTPUT_VARIABLE _target_arch)
+	string(STRIP "${_target_arch}" _target_arch)
+	message(STATUS "Target architecture: ${_target_arch}")
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
@@ -182,7 +188,6 @@ endif()
 
 get_property(DIRECTORY_COMPILE_OPTIONS DIRECTORY PROPERTY COMPILE_OPTIONS)
 
-message(STATUS "Target architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 print_list("Compiler flags:" ${DIRECTORY_COMPILE_OPTIONS})
 print_list("Static linker flags:" ${STATIC_LINKER_FLAGS})
 print_list("Dynamic linker flags:" ${DYNAMIC_LINKER_FLAGS})
