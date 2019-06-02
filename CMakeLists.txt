@@ -174,7 +174,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	add_compile_options(/EHsc /std:c++latest /W4
+	add_compile_options(/EHsc /MP /std:c++latest /W4
 		/wd4251 # class '...' needs to have dll-interface to be used by clients of class '...'
 		)
 	add_definitions(/D_USE_MATH_DEFINES)

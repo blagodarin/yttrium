@@ -547,7 +547,7 @@ namespace
 				const auto h = std::size_t{ data[8 + 3 * i + 1] } >> 4;
 				const auto v = std::size_t{ data[8 + 3 * i + 1] } & 0xf;
 				const auto qt = data[8 + 3 * i + 2];
-				if (id != i + 1 || h != (i > 0 ? 1 : 2) || v != h || qt > 1)
+				if (id != i + 1 || h != (i > 0 ? 1u : 2u) || v != h || qt > 1)
 					return 0;
 				_components[i]._horizontal = h;
 				_components[i]._vertical = v;
@@ -629,7 +629,7 @@ namespace
 						{
 							for (std::size_t h = 0; h < component._horizontal; ++h)
 							{
-								std::int16_t block[64]{};
+								alignas(16) std::int16_t block[64]{};
 								if (!read_block(component, last_dc[c], &block[0]))
 									return false;
 								const auto x = (mcu_x * component._horizontal + h) * 8;

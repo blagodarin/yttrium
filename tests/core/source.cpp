@@ -41,23 +41,23 @@ TEST_CASE("source.from.source")
 	{
 		const auto subsource = Source::from(source, 0, source->size());
 		REQUIRE(subsource->size() == source->size());
-		Buffer subbuffer(source->size());
+		Buffer subbuffer{ static_cast<size_t>(source->size()) };
 		CHECK(subsource->read_at(0, subbuffer.data(), subbuffer.size()) == subsource->size());
-		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin(), subsource->size()));
+		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin(), static_cast<size_t>(subsource->size())));
 	}
 	{
 		const auto subsource = Source::from(source, 0, source->size() / 2);
 		REQUIRE(subsource->size() == source->size() / 2);
-		Buffer subbuffer(source->size());
+		Buffer subbuffer{ static_cast<size_t>(source->size()) };
 		CHECK(subsource->read_at(0, subbuffer.data(), subbuffer.size()) == subsource->size());
-		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin(), subsource->size()));
+		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin(), static_cast<size_t>(subsource->size())));
 	}
 	{
 		const auto subsource = Source::from(source, source->size() / 2, source->size() - source->size() / 2);
 		REQUIRE(subsource->size() == source->size() - source->size() / 2);
-		Buffer subbuffer(source->size());
+		Buffer subbuffer{ static_cast<size_t>(source->size()) };
 		CHECK(subsource->read_at(0, subbuffer.data(), subbuffer.size()) == subsource->size());
-		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin() + source->size() / 2, subsource->size()));
+		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin() + source->size() / 2, static_cast<size_t>(subsource->size())));
 	}
 }
 
