@@ -117,7 +117,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		-Wundef
 		-Wuninitialized
 		-Wunsafe-loop-optimizations
-		-Wuseless-cast
+		#-Wuseless-cast # Issued for casting uint64_t to size_t required on platforms with 32-bit size_t (e. g. Win32).
 		-Wzero-as-null-pointer-constant
 		)
 
