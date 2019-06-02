@@ -62,14 +62,10 @@ endif()
 
 find_package(Threads REQUIRED)
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+get_target_arch(_target_arch)
+message(STATUS "Target architecture: ${_target_arch}")
+if(_target_arch STREQUAL "amd64" OR _target_arch STREQUAL "x86")
 	set(Y_ARCH_X86 ON)
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -E -P ${PROJECT_SOURCE_DIR}/cmake/arch.cpp OUTPUT_VARIABLE _target_arch)
-	string(STRIP "${_target_arch}" _target_arch)
-	message(STATUS "Target architecture: ${_target_arch}")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
