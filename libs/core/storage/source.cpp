@@ -40,7 +40,7 @@ namespace Yttrium
 		{
 			if (offset >= _size)
 				return 0;
-			const auto actual_size = std::min(size, _size - offset);
+			const auto actual_size = static_cast<size_t>(std::min<uint64_t>(size, _size - offset));
 			std::memcpy(data, static_cast<const uint8_t*>(_data) + offset, actual_size);
 			return actual_size;
 		}
@@ -66,7 +66,7 @@ namespace Yttrium
 		{
 			if (offset >= _size)
 				return 0;
-			const auto actual_size = std::min(size, _size - offset);
+			const auto actual_size = static_cast<size_t>(std::min<uint64_t>(size, _size - offset));
 			std::memcpy(data, static_cast<const uint8_t*>(_buffer->data()) + offset, actual_size);
 			return actual_size;
 		}
@@ -83,7 +83,7 @@ namespace Yttrium
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
 		{
-			return offset <= std::numeric_limits<uint64_t>::max() - _base ? _source->read_at(_base + offset, data, std::min(size, _size - offset)) : 0;
+			return offset <= std::numeric_limits<uint64_t>::max() - _base ? _source->read_at(_base + offset, data, static_cast<size_t>(std::min<uint64_t>(size, _size - offset))) : 0;
 		}
 
 	private:
@@ -130,7 +130,7 @@ namespace Yttrium
 	{
 		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
 			throw std::bad_alloc{};
-		std::string string(_size, '\0');
+		std::string string(static_cast<size_t>(_size), '\0');
 		if (read_at(0, string.data(), string.size()) != string.size())
 			throw std::system_error{ std::make_error_code(std::errc::io_error) };
 		return string;

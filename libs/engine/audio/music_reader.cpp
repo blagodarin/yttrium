@@ -40,7 +40,7 @@ namespace Yttrium
 			return false;
 
 		const auto total_samples = _reader->total_samples();
-		const auto samples_per_second = _reader->format().samples_per_second();
+		const auto samples_per_second = uint64_t{ _reader->format().samples_per_second() };
 
 		_start_sample = std::min(to_unsigned(start_ms) * samples_per_second / 1000, total_samples);
 		_end_sample = end_ms > 0 ? std::min(to_unsigned(end_ms) * samples_per_second / 1000, total_samples) : total_samples;
@@ -59,7 +59,7 @@ namespace Yttrium
 		{
 			const auto capacity = buffer_size() - result;
 			const auto data_size = (_end_sample - _reader->current_sample()) * _block_size;
-			const auto bytes_read = _reader->read(static_cast<std::byte*>(buffer) + result, std::min(capacity, data_size));
+			const auto bytes_read = _reader->read(static_cast<std::byte*>(buffer) + result, static_cast<size_t>(std::min<uint64_t>(capacity, data_size)));
 			result += bytes_read;
 			if (bytes_read == capacity || bytes_read != data_size || _loop_sample >= _end_sample || !_reader->seek(_loop_sample))
 				return result;

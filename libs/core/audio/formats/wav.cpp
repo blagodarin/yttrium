@@ -70,7 +70,7 @@ namespace Yttrium
 	size_t WavReader::read(void* buffer, size_t bytes_to_read)
 	{
 		const auto block_size = _format.block_size();
-		bytes_to_read = std::min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample) * block_size;
+		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample)) * block_size;
 		const auto bytes_read = _reader.read(buffer, bytes_to_read);
 		_current_sample += bytes_read / block_size;
 		return bytes_read;

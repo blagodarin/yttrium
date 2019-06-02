@@ -38,14 +38,14 @@ namespace Yttrium
 	{
 		if (size > std::numeric_limits<size_t>::max())
 			throw std::bad_alloc{};
-		_buffer.reserve(size);
+		_buffer.reserve(static_cast<size_t>(size));
 	}
 
 	void BufferWriter::resize(uint64_t size)
 	{
 		if (size > std::numeric_limits<size_t>::max())
 			throw std::bad_alloc{};
-		_buffer.resize(size);
+		_buffer.resize(static_cast<size_t>(size));
 	}
 
 	size_t BufferWriter::write_at(uint64_t offset, const void* data, size_t size)
@@ -53,8 +53,9 @@ namespace Yttrium
 		assert(offset <= std::numeric_limits<size_t>::max());
 		if (size > std::numeric_limits<size_t>::max() - offset)
 			throw std::bad_alloc{};
-		if (offset + size > _buffer.size())
-			_buffer.resize(offset + size);
+		const auto required_size = static_cast<size_t>(offset + size);
+		if (required_size > _buffer.size())
+			_buffer.resize(required_size);
 		std::memcpy(_buffer.begin() + offset, data, size);
 		return size;
 	}
@@ -128,7 +129,7 @@ namespace Yttrium
 	bool Writer::write_all(const Source& source)
 	{
 		if (const auto data = source.data())
-			return write_all(data, source.size());
+			return write_all(data, static_cast<size_t>(source.size()));
 		uint64_t total_size = 0;
 		Buffer buffer{ Buffer::memory_granularity() };
 		while (auto size_read = source.read_at(total_size, buffer.data(), buffer.size()))
