@@ -21,10 +21,3 @@
 #		include <x86intrin.h>
 #	endif
 #endif
-
-namespace Yttrium
-{
-#if Y_ARCH_X86
-	extern bool _is_sse2_enabled;
-#endif
-}

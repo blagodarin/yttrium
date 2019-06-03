@@ -1,6 +1,7 @@
 #pragma once
 
 // Architectures.
+#cmakedefine01 Y_ARCH_AMD64
 #cmakedefine01 Y_ARCH_X86
 
 // Renderers.

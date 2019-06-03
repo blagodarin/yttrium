@@ -164,7 +164,7 @@ namespace Yttrium
 		auto bgra2 = bgra1 + dst_stride;
 		const auto bgra_delta = dst_stride * 2 - width * 4;
 #if Y_ARCH_X86
-		if (_is_sse2_enabled && !(width & 0xf) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
+		if (!(width & 0xf) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
 		{
 			const auto alpha = _mm_set1_epi16(255);
 			const auto bias = _mm_set1_epi8(static_cast<char>(-128));
@@ -276,7 +276,7 @@ namespace Yttrium
 		auto bgra = static_cast<std::uint8_t*>(dst);
 		const auto bgra_delta = dst_stride - width * 4;
 #if Y_ARCH_X86
-		if (_is_sse2_enabled && !(width & 0x7) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
+		if (!(width & 0x7) && !(reinterpret_cast<std::uintptr_t>(dst) & 0xf) && !(dst_stride & 0xf))
 		{
 			const auto alpha = _mm_set1_epi16(255);
 			const auto bias = _mm_set1_epi8(static_cast<char>(-128));
@@ -343,7 +343,7 @@ namespace Yttrium
 			auto a = 3 * in_near[i] + in_far[i];
 			decltype(a) b;
 #if Y_ARCH_X86
-			if (_is_sse2_enabled && in_width > 1)
+			if (in_width > 1)
 			{
 				for (; i < ((in_width - 1) & ~std::size_t{ 0b111 }); i += 8)
 				{

@@ -62,13 +62,29 @@ endif()
 
 find_package(Threads REQUIRED)
 
-get_target_arch(_target_arch)
-message(STATUS "Target architecture: ${_target_arch}")
-if(_target_arch STREQUAL "amd64" OR _target_arch STREQUAL "x86")
+get_target_architecture(_architecture)
+message(STATUS "Target architecture: ${_architecture}")
+if(_architecture MATCHES "^amd64$")
+	set(Y_ARCH_AMD64 ON)
+endif()
+if(_architecture MATCHES "^amd64|x86$")
 	set(Y_ARCH_X86 ON)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	if(Y_ARCH_X86)
+		add_compile_options(-msse2)
+	endif()
+
+	if(ENABLE_SANITIZERS)
+		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
+		if(BUILD_SHARED_LIBS)
+			add_compile_options(-fno-sanitize=vptr)
+		endif()
+		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
+	endif()
+
+	# Warnings.
 	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
 		-Wno-c++98-compat-pedantic
@@ -84,51 +100,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-switch-enum
 		-Wno-weak-vtables
 		)
-
-	if(Y_ARCH_X86)
-		add_compile_options(-msse2)
-	endif()
-
-	if(ENABLE_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
-		if(BUILD_SHARED_LIBS)
-			add_compile_options(-fno-sanitize=vptr)
-		endif()
-		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
-	endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	add_compile_options(-Werror -Wall -Wextra
-		-Wconversion
-		-Wdisabled-optimization
-		-Wdouble-promotion
-		-Wduplicated-cond
-		-Wlogical-op
-		-Wmissing-declarations
-		-Wmissing-include-dirs
-		-Wnon-virtual-dtor
-		-Wnull-dereference
-		-Wold-style-cast
-		-Wpedantic
-		-Wredundant-decls
-		-Wshadow
-		-Wsign-conversion
-		-Wsuggest-attribute=noreturn
-		-Wsuggest-override
-		-Wundef
-		-Wuninitialized
-		-Wunsafe-loop-optimizations
-		#-Wuseless-cast # Issued for casting uint64_t to size_t required on platforms with 32-bit size_t (e. g. Win32).
-		-Wzero-as-null-pointer-constant
-		)
-
-	if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-		add_compile_options(
-			-Winline # Issued for header-only code.
-			)
-	endif()
-
 	if(Y_ARCH_X86)
 		add_compile_options(-msse2)
 	endif()
@@ -173,13 +147,49 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		endif()
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
+
+	# Warnings.
+	add_compile_options(-Werror -Wall -Wextra
+		-Wconversion
+		-Wdisabled-optimization
+		-Wdouble-promotion
+		-Wduplicated-cond
+		-Wlogical-op
+		-Wmissing-declarations
+		-Wmissing-include-dirs
+		-Wnon-virtual-dtor
+		-Wnull-dereference
+		-Wold-style-cast
+		-Wpedantic
+		-Wredundant-decls
+		-Wshadow
+		-Wsign-conversion
+		-Wsuggest-attribute=noreturn
+		-Wsuggest-override
+		-Wundef
+		-Wuninitialized
+		-Wunsafe-loop-optimizations
+		#-Wuseless-cast # Issued for casting uint64_t to size_t required on platforms with 32-bit size_t (e. g. Win32).
+		-Wzero-as-null-pointer-constant
+		)
+	if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_compile_options(
+			-Winline # Issued for header-only code.
+			)
+	endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	add_compile_options(/EHsc /MP /std:c++latest /W4
+	if(Y_ARCH_X86)
+		add_compile_options(/arch:SSE2)
+	endif()
+	add_compile_options(/EHsc /MP /std:c++latest)
+	add_definitions(/D_USE_MATH_DEFINES)
+
+	# Warnings.
+	add_compile_options(/W4
 		/wd4251 # class '...' needs to have dll-interface to be used by clients of class '...'
 		)
-	add_definitions(/D_USE_MATH_DEFINES)
 endif()
 
 get_property(DIRECTORY_COMPILE_OPTIONS DIRECTORY PROPERTY COMPILE_OPTIONS)

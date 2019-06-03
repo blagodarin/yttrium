@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 // limitations under the License.
 //
 
-#include "intrinsics.h"
 #include "memory/buffer_memory.h"
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
@@ -25,10 +24,6 @@
 
 namespace Yttrium
 {
-#if Y_ARCH_X86
-	bool _is_sse2_enabled = true;
-#endif
-
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
 	BufferMemoryTracker _buffer_memory_tracker; // Must outlive BufferMemory.
 #endif
