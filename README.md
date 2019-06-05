@@ -30,3 +30,13 @@ and CMake (and an Internet connection).
 
 Check out CI configuration files ([.appveyor.yml](.appveyor.yml) and
 [.travis.yml](.travis.yml)) for some hints on building Yttrium.
+
+
+### Branches
+
+`master` is a branch for Yttrium users. Each commit in this branch represents
+a *usable* (not necessarily *stable*) state of the project. All CI builds
+should succeed, and all tests should pass.
+
+`develop` is a branch for Yttrium developers. All new changes go into this
+branch first, and are merged into `master` when they are ready.
