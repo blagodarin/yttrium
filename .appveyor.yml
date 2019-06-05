@@ -7,16 +7,6 @@ branches:
     - develop
     - master
 
-skip_commits:
-  files:
-    - .clang-format
-    - .clang-tidy
-    - .cppcheck-suppress
-    - .gitignore
-    - .travis.yml
-    - LICENSE
-    - README.md
-
 environment:
   matrix:
     - RENDERER: null
