@@ -2,10 +2,16 @@ version: 0.0.{build}-{branch}
 image: Visual Studio 2017
 shallow_clone: true
 
+branches:
+  only:
+    - develop
+    - master
+
 skip_commits:
   files:
-    - docs/
     - .clang-format
+    - .clang-tidy
+    - .cppcheck-suppress
     - .gitignore
     - .travis.yml
     - LICENSE
