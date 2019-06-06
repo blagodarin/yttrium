@@ -139,6 +139,17 @@ if(WIN32)
 		audio/_wasapi/sound.cpp
 		audio/_wasapi/sound.h
 		)
+elseif(UNIX)
+	find_package(ALSA REQUIRED)
+	y_sources(yengine "src/audio/_alsa"
+		audio/_alsa/backend.cpp
+		audio/_alsa/backend.h
+		audio/_alsa/player.cpp
+		audio/_alsa/player.h
+		audio/_alsa/sound.cpp
+		audio/_alsa/sound.h
+		)
+	target_link_libraries(yengine PRIVATE ALSA::ALSA)
 else()
 	find_package(OpenAL REQUIRED)
 	y_sources(yengine "src/audio/_openal"
