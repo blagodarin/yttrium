@@ -21,7 +21,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-9
-            - libopenal-dev
+            - libasound2-dev
             - libvorbis-dev
             - libxcb-image0-dev
             - libxcb-xkb-dev
@@ -43,8 +43,8 @@ matrix:
           sources: *all_sources
           packages:
             - g++-9
+            - libasound2-dev
             - libgl-dev
-            - libopenal-dev
             - libvorbis-dev
 
     - os: linux
@@ -73,7 +73,7 @@ matrix:
         apt:
           sources: *all_sources
           packages:
-            - libopenal-dev
+            - libasound2-dev
             - libstdc++-8-dev
             - libvorbis-dev
             - libxcb-image0-dev
@@ -89,8 +89,8 @@ matrix:
         apt:
           sources: *all_sources
           packages:
+            - libasound2-dev
             - libgl-dev
-            - libopenal-dev
             - libstdc++-8-dev
             - libvorbis-dev
 
