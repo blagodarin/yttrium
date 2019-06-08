@@ -34,6 +34,16 @@ namespace Yttrium
 		{}
 	};
 
+	///
+	class BadCall : public std::runtime_error
+	{
+	public:
+		template <typename... Args>
+		BadCall(std::string_view component, std::string_view function, Args&&... args)
+			: std::runtime_error{ make_string(component, ": ", function, " failed: ", std::forward<Args>(args)...) }
+		{}
+	};
+
 	/// Thrown if the requested operation is not supported by the implementation.
 	class NotSupportedError : public std::runtime_error
 	{

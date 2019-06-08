@@ -16,15 +16,14 @@
 
 #pragma once
 
-#include "../../../core/utils/memory.h"
 #include "../backend.h"
+
+#include "../../../core/utils/memory.h"
 
 #include <alsa/asoundlib.h>
 
 namespace Yttrium
 {
-	using AlsaPcmHandle = UniquePtr<snd_pcm_t, snd_pcm_close>;
-
 	class AlsaAudioBackend final : public AudioBackend
 	{
 	public:
@@ -35,6 +34,8 @@ namespace Yttrium
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;
 
 	private:
-		AlsaPcmHandle _pcm_handle;
+		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm_handle;
+		snd_pcm_uframes_t _buffer_frames;
+		snd_pcm_uframes_t _period_frames;
 	};
 }
