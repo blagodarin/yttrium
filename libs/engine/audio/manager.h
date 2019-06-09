@@ -16,7 +16,9 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
+#include <thread>
 
 namespace Yttrium
 {
@@ -27,10 +29,16 @@ namespace Yttrium
 	{
 	public:
 		AudioManagerPrivate();
+		~AudioManagerPrivate() noexcept;
 
-		AudioBackend& backend() const { return *_backend; }
+		AudioBackend& backend() const noexcept { return *_backend; }
 
-	public:
+	private:
+		void run();
+
+	private:
 		const std::unique_ptr<AudioBackend> _backend;
+		std::atomic<bool> _done{ false };
+		std::thread _thread;
 	};
 }

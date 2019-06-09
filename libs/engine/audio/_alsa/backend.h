@@ -18,6 +18,7 @@
 
 #include "../backend.h"
 
+#include <yttrium/memory/buffer.h>
 #include "../../../core/utils/memory.h"
 
 #include <alsa/asoundlib.h>
@@ -30,11 +31,13 @@ namespace Yttrium
 		AlsaAudioBackend();
 		~AlsaAudioBackend() override;
 
+		AudioFormat buffer_format() const noexcept override;
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;
+		bool write_buffer(const std::atomic<bool>&) noexcept override;
 
 	private:
-		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm_handle;
+		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
 		snd_pcm_uframes_t _buffer_frames;
 		snd_pcm_uframes_t _period_frames;
 	};

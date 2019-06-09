@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,8 +30,10 @@ namespace Yttrium
 		WasapiAudioBackend();
 		~WasapiAudioBackend() override;
 
+		AudioFormat buffer_format() const noexcept override { return {}; }
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;
+		bool write_buffer(const std::atomic<bool>&) override { return false; }
 
 	private:
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
