@@ -72,7 +72,7 @@ namespace Yttrium
 			CHECK_ALSA(snd_pcm_hw_params_get_period_size(hw, &_period_frames, nullptr));
 			CHECK_ALSA(snd_pcm_hw_params_get_buffer_size(hw, &_buffer_frames));
 		}
-		const auto period_bytes = snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_period_frames));
+		_period_bytes = static_cast<size_t>(snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_period_frames)));
 #ifndef NDEBUG
 		const auto buffer_bytes = snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_buffer_frames));
 		const auto buffers_per_second = FramesPerSecond / static_cast<double>(_buffer_frames);
@@ -82,8 +82,8 @@ namespace Yttrium
 				  << static_cast<double>(_buffer_frames * 1000) / FramesPerSecond << " ms/buffer\n";
 		const auto periods_per_second = FramesPerSecond / static_cast<double>(_period_frames);
 		std::cerr << "[ALSA] PCM period: "
-				  << _period_frames << " frames (" << period_bytes << " bytes), "
-				  << periods_per_second << " periods/s (" << periods_per_second * static_cast<double>(period_bytes) << " bytes/s), "
+				  << _period_frames << " frames (" << _period_bytes << " bytes), "
+				  << periods_per_second << " periods/s (" << periods_per_second * static_cast<double>(_period_bytes) << " bytes/s), "
 				  << static_cast<double>(_period_frames * 1000) / FramesPerSecond << " ms/period\n";
 #endif
 		{
@@ -96,14 +96,13 @@ namespace Yttrium
 			CHECK_ALSA(snd_pcm_sw_params_set_stop_threshold(pcm, sw, _buffer_frames));
 			CHECK_ALSA(snd_pcm_sw_params(pcm, sw));
 		}
-		_buffer.reset(static_cast<size_t>(period_bytes));
 	}
 
 	AlsaAudioBackend::~AlsaAudioBackend() = default;
 
-	AudioFormat AlsaAudioBackend::buffer_format() const noexcept
+	AudioBackend::BufferInfo AlsaAudioBackend::buffer_info() const noexcept
 	{
-		return AudioFormat{ 2, 2, FramesPerSecond };
+		return { { 2, 2, FramesPerSecond }, _period_bytes };
 	}
 
 	std::unique_ptr<AudioPlayerBackend> AlsaAudioBackend::create_player()
@@ -116,10 +115,14 @@ namespace Yttrium
 		return std::make_unique<AlsaSound>(reader);
 	}
 
-	bool AlsaAudioBackend::write_buffer(const std::atomic<bool>& done) noexcept
+	void AlsaAudioBackend::flush() noexcept
 	{
-		auto data = _buffer.begin();
-		const auto frame_bytes = _buffer.size() / _period_frames;
+		snd_pcm_drain(_pcm.get());
+	}
+
+	bool AlsaAudioBackend::write_buffer(const uint8_t* data, const std::atomic<bool>& done) noexcept
+	{
+		const auto frame_bytes = _period_bytes / _period_frames;
 		auto frames_left = _period_frames;
 		while (frames_left > 0 && !done)
 		{

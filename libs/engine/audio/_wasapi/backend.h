@@ -30,10 +30,11 @@ namespace Yttrium
 		WasapiAudioBackend();
 		~WasapiAudioBackend() override;
 
-		AudioFormat buffer_format() const noexcept override { return {}; }
+		BufferInfo buffer_info() const noexcept override { return {}; }
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;
-		bool write_buffer(const std::atomic<bool>&) override { return false; }
+		void flush() override {}
+		bool write_buffer(const uint8_t*, const std::atomic<bool>&) override { return false; }
 
 	private:
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should

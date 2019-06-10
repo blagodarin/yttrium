@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
-/// \file
-/// \brief Memory buffers.
 
 #ifndef _include_yttrium_memory_buffer_h_
 #define _include_yttrium_memory_buffer_h_
@@ -93,24 +90,6 @@ namespace Yttrium
 
 	Y_CORE_API bool operator==(const Buffer&, const Buffer&) noexcept;
 	inline bool operator!=(const Buffer& a, const Buffer& b) noexcept { return !(a == b); }
-
-	///
-	class BufferView
-	{
-	public:
-		constexpr BufferView() noexcept = default;
-		constexpr BufferView(void* data, size_t size) noexcept
-			: _data{ static_cast<void*>(data) }, _size{ size } {}
-		constexpr explicit BufferView(Buffer& buffer) noexcept
-			: _data{ buffer.data() }, _size{ buffer.size() } {}
-
-		constexpr void* data() const noexcept { return _data; }
-		constexpr size_t size() const noexcept { return _size; }
-
-	private:
-		void* _data = nullptr;
-		size_t _size = 0;
-	};
 }
 
 #endif

@@ -31,10 +31,11 @@ namespace Yttrium
 		OpenALBackend();
 		~OpenALBackend() override;
 
-		AudioFormat buffer_format() const noexcept override { return {}; }
+		BufferInfo buffer_info() const noexcept override { return {}; }
 		std::unique_ptr<AudioPlayerBackend> create_player() override;
 		std::unique_ptr<Sound> create_sound(AudioReader&) override;
-		bool write_buffer(const std::atomic<bool>&) override { return false; }
+		void flush() override {}
+		bool write_buffer(const uint8_t*, const std::atomic<bool>&) override { return false; }
 
 	private:
 		const P_ALCdevice _device;

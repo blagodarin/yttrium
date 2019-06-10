@@ -50,18 +50,20 @@ namespace Yttrium
 	class AudioBackend
 	{
 	public:
+		struct BufferInfo
+		{
+			AudioFormat _format;
+			size_t _size = 0;
+		};
+
 		static std::unique_ptr<AudioBackend> create();
 
 		virtual ~AudioBackend() = default;
 
-		virtual AudioFormat buffer_format() const noexcept = 0;
+		virtual BufferInfo buffer_info() const noexcept = 0;
 		virtual std::unique_ptr<AudioPlayerBackend> create_player() = 0;
 		virtual std::unique_ptr<Sound> create_sound(AudioReader&) = 0;
-		virtual bool write_buffer(const std::atomic<bool>& done) = 0;
-
-		BufferView buffer_view() noexcept { return BufferView{ _buffer }; }
-
-	protected:
-		Buffer _buffer;
+		virtual void flush() = 0;
+		virtual bool write_buffer(const uint8_t* data, const std::atomic<bool>& done) = 0;
 	};
 }

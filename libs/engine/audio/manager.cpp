@@ -24,11 +24,35 @@
 
 #include <cmath>
 
+#ifdef _WIN32
+// TODO: Implement.
+#else
+#	include <pthread.h>
+#	include <sched.h>
+#endif
+
+namespace
+{
+	void set_high_priority() noexcept
+	{
+#ifdef _WIN32
+		// TODO: Implement.
+#else
+		const auto thread = pthread_self();
+		int policy;
+		sched_param param;
+		if (pthread_getschedparam(thread, &policy, &param) == 0)
+			if (param.sched_priority = sched_get_priority_max(policy); param.sched_priority != -1)
+				pthread_setschedparam(thread, policy, &param);
+#endif
+	}
+}
+
 namespace Yttrium
 {
 	AudioManagerPrivate::AudioManagerPrivate()
 		: _backend{ AudioBackend::create() }
-		, _thread{ [this]{ run(); }}
+		, _thread{ [this] { run(); } }
 	{
 	}
 
@@ -40,13 +64,15 @@ namespace Yttrium
 
 	void AudioManagerPrivate::run()
 	{
-		const auto buffer = _backend->buffer_view();
-		const auto format = _backend->buffer_format();
-		if (format.bytes_per_sample() != 2)
+		::set_high_priority();
+		const auto buffer_info = _backend->buffer_info();
+		if (buffer_info._format.bytes_per_sample() != 2)
 			return;
-		const auto buffer_frames = buffer.size() / format.block_size();
+		Buffer buffer{ buffer_info._size };
+		const auto buffer_frames = buffer_info._size / buffer_info._format.block_size();
 		constexpr auto frequency = 100.;
-		const auto time_scale = frequency / static_cast<double>(format.samples_per_second());
+		const auto rate = buffer_info._format.samples_per_second();
+		const auto time_scale = frequency / static_cast<double>(rate);
 		uint64_t i = 0;
 		while (!_done)
 		{
@@ -54,15 +80,15 @@ namespace Yttrium
 			for (auto f = buffer_frames; f > 0; --f)
 			{
 				const auto amplitude = std::sin(2. * M_PI * time_scale * static_cast<double>(i++));
-				const auto amplitude_scale = static_cast<double>(format.samples_per_second() - i % format.samples_per_second()) / static_cast<double>(format.samples_per_second());
+				const auto amplitude_scale = 1. - static_cast<double>(i % rate) / static_cast<double>(rate);
 				const auto sample = static_cast<int16_t>(std::numeric_limits<int16_t>::max() * amplitude * amplitude_scale);
-				for (auto c = format.channels(); c > 0; --c)
+				for (auto c = buffer_info._format.channels(); c > 0; --c)
 					*output++ = sample;
 			}
-			if (!_backend->write_buffer(_done))
+			if (!_backend->write_buffer(buffer.begin(), _done))
 				_done = true;
 		}
-		// TODO: Wait for the written data to be processed.
+		_backend->flush();
 	}
 
 	AudioManager::AudioManager()
