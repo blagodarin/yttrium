@@ -325,7 +325,6 @@ namespace Yttrium
 		if (music_name.empty())
 			throw GuiDataError{ "Empty music name" };
 		std::string_view music_file;
-		int music_start = 0;
 		int music_end = 0;
 		int music_loop = 0;
 		token.next(ion).check_object_begin();
@@ -333,8 +332,6 @@ namespace Yttrium
 		{
 			if (const auto entry_name = token.to_name(); entry_name == "file")
 				music_file = token.next(ion).to_value();
-			else if (entry_name == "start")
-				music_start = time_from_chars(token.next(ion).to_value());
 			else if (entry_name == "end")
 				music_end = time_from_chars(token.next(ion).to_value());
 			else if (entry_name == "loop")
@@ -348,7 +345,7 @@ namespace Yttrium
 		token.next(ion);
 		//
 		auto music = MusicReader::open(_resource_loader.open(music_file));
-		music->set_properties(music_start, music_end, music_loop);
+		music->set_properties(music_end, music_loop);
 		_music.insert_or_assign(std::string{ music_name }, std::move(music));
 	}
 

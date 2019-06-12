@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,24 +27,23 @@ namespace Yttrium
 {
 	MusicReaderImpl::MusicReaderImpl(std::unique_ptr<AudioReader>&& reader)
 		: _reader{ std::move(reader) }
-		, _block_size{ _reader->format().block_size() }
-		, _buffer_samples{ _reader->format().samples_per_second() }
-		, _end_sample{ _reader->total_samples() }
-		, _loop_sample{ _end_sample }
+		, _frame_bytes{ _reader->format().frame_bytes() }
+		, _buffer_frames{ _reader->format().frames_per_second() }
+		, _end_frame{ _reader->total_frames() }
+		, _loop_frame{ _end_frame }
 	{
 	}
 
-	bool MusicReaderImpl::set_properties(int start_ms, int end_ms, int loop_ms) noexcept
+	bool MusicReaderImpl::set_properties(int end_ms, int loop_ms) noexcept
 	{
-		if (start_ms < 0 || !(end_ms == 0 || end_ms >= start_ms) || !(loop_ms >= 0 && loop_ms <= end_ms))
+		if (end_ms <= 0 || !(loop_ms >= 0 && loop_ms <= end_ms))
 			return false;
 
-		const auto total_samples = _reader->total_samples();
-		const auto samples_per_second = uint64_t{ _reader->format().samples_per_second() };
+		const auto total_frames = _reader->total_frames();
+		const auto frames_per_second = uint64_t{ _reader->format().frames_per_second() };
 
-		_start_sample = std::min(to_unsigned(start_ms) * samples_per_second / 1000, total_samples);
-		_end_sample = end_ms > 0 ? std::min(to_unsigned(end_ms) * samples_per_second / 1000, total_samples) : total_samples;
-		_loop_sample = std::min(to_unsigned(loop_ms) * samples_per_second / 1000, _end_sample);
+		_end_frame = end_ms > 0 ? std::min(to_unsigned(end_ms) * frames_per_second / 1000, total_frames) : total_frames;
+		_loop_frame = std::min(to_unsigned(loop_ms) * frames_per_second / 1000, _end_frame);
 		return true;
 	}
 
@@ -58,17 +57,17 @@ namespace Yttrium
 		for (size_t result = 0;;)
 		{
 			const auto capacity = buffer_size() - result;
-			const auto data_size = (_end_sample - _reader->current_sample()) * _block_size;
-			const auto bytes_read = _reader->read(static_cast<std::byte*>(buffer) + result, static_cast<size_t>(std::min<uint64_t>(capacity, data_size)));
+			const auto bytes_left = (_end_frame - _reader->current_frame()) * _frame_bytes;
+			const auto bytes_read = _reader->read(static_cast<std::byte*>(buffer) + result, static_cast<size_t>(std::min<uint64_t>(capacity, bytes_left)));
 			result += bytes_read;
-			if (bytes_read == capacity || bytes_read != data_size || _loop_sample >= _end_sample || !_reader->seek(_loop_sample))
+			if (bytes_read == capacity || bytes_read != bytes_left || _loop_frame >= _end_frame || !_reader->seek(_loop_frame))
 				return result;
 		}
 	}
 
 	void MusicReaderImpl::seek_start()
 	{
-		_reader->seek(_start_sample);
+		_reader->seek(0);
 	}
 
 	std::unique_ptr<MusicReader> MusicReader::open(std::unique_ptr<Source>&& source)

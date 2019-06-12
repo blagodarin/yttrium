@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,10 +37,9 @@ namespace Yttrium
 		virtual ~MusicReader() noexcept = default;
 
 		///
-		/// \param start_ms Offset to the start of a playback range.
 		/// \param end_ms Offset to the end of a playback range.
 		/// \param loop_ms Offset to the start of a playback loop.
-		virtual bool set_properties(int start_ms, int end_ms, int loop_ms) noexcept = 0;
+		virtual bool set_properties(int end_ms, int loop_ms) noexcept = 0;
 	};
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ const std::vector<ALsizei> _common_sampling_rates{ 8'000, 11'025, 16'000, 22'050
 namespace Yttrium
 {
 	OpenALFormat::OpenALFormat(const AudioFormat& format)
-		: _frequency{ static_cast<ALsizei>(format.samples_per_second()) }
+		: _frequency{ static_cast<ALsizei>(format.frames_per_second()) }
 	{
 		switch (format.bytes_per_sample())
 		{

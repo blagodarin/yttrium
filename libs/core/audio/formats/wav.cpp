@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,26 +63,26 @@ namespace Yttrium
 			throw DataError("Bad WAV 'data' chunk");
 
 		_format = AudioFormat(fmt.bits_per_sample / 8u, fmt.channels, fmt.samples_per_second);
-		_total_samples = std::min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.block_size();
+		_total_frames = std::min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.frame_bytes();
 		_data_offset = _reader.offset();
 	}
 
 	size_t WavReader::read(void* buffer, size_t bytes_to_read)
 	{
-		const auto block_size = _format.block_size();
-		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample)) * block_size;
+		const auto frame_bytes = _format.frame_bytes();
+		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
 		const auto bytes_read = _reader.read(buffer, bytes_to_read);
-		_current_sample += bytes_read / block_size;
+		_current_frame += bytes_read / frame_bytes;
 		return bytes_read;
 	}
 
 	bool WavReader::seek(uint64_t offset)
 	{
-		if (offset > _total_samples)
+		if (offset > _total_frames)
 			return false;
-		if (!_reader.seek(_data_offset + offset * _format.block_size()))
+		if (!_reader.seek(_data_offset + offset * _format.frame_bytes()))
 			return false;
-		_current_sample = offset;
+		_current_frame = offset;
 		return true;
 	}
 }

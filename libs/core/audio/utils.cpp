@@ -36,14 +36,14 @@ namespace Yttrium
 	{
 		if (!(format.bytes_per_sample() == 1 || format.bytes_per_sample() == 2)
 			|| !(format.channels() == 1 || format.channels() == 2)
-			|| !(format.samples_per_second() >= 8000 && format.samples_per_second() <= 192'000)
+			|| !(format.frames_per_second() >= 8000 && format.frames_per_second() <= 192'000)
 			|| samples > ::_max_wav_data_size / format.bytes_per_sample())
 			return false;
 
 		WavFormatChunk format_chunk;
 		format_chunk.format = WAVE_FORMAT_PCM;
 		format_chunk.channels = static_cast<uint16_t>(format.channels());
-		format_chunk.samples_per_second = static_cast<uint32_t>(format.samples_per_second());
+		format_chunk.samples_per_second = static_cast<uint32_t>(format.frames_per_second());
 		format_chunk.bits_per_sample = static_cast<uint16_t>(format.bytes_per_sample() * 8);
 		format_chunk.block_align = static_cast<uint16_t>(format_chunk.channels * format_chunk.bits_per_sample / 8);
 		format_chunk.bytes_per_second = format_chunk.samples_per_second * format_chunk.block_align;

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,12 +72,12 @@ namespace Yttrium
 		if (info->channels <= 0 || info->rate <= 0)
 			throw DataError("Bad Ogg Vorbis file");
 
-		const auto total_samples = ::ov_pcm_total(&_ov_file, -1);
-		if (total_samples < 0)
+		const auto total_frames = ::ov_pcm_total(&_ov_file, -1);
+		if (total_frames < 0)
 			throw DataError("Bad Ogg Vorbis file");
 
 		_format = AudioFormat{ 2, to_unsigned(info->channels), to_unsigned(info->rate) };
-		_total_samples = to_unsigned(total_samples);
+		_total_frames = to_unsigned(total_frames);
 	}
 
 	OggVorbisReader::~OggVorbisReader()
@@ -87,8 +87,8 @@ namespace Yttrium
 
 	size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)
 	{
-		const auto block_size = _format.block_size();
-		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / block_size, _total_samples - _current_sample)) * block_size;
+		const auto frame_bytes = _format.frame_bytes();
+		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read;)
 		{
@@ -98,17 +98,17 @@ namespace Yttrium
 				break;
 			bytes_read += to_unsigned(read);
 		}
-		_current_sample += bytes_read / block_size;
+		_current_frame += bytes_read / frame_bytes;
 		return bytes_read;
 	}
 
 	bool OggVorbisReader::seek(uint64_t block_offset)
 	{
-		if (block_offset > _total_samples)
+		if (block_offset > _total_frames)
 			return false;
 		if (::ov_pcm_seek(&_ov_file, static_cast<ogg_int64_t>(block_offset)) != 0)
 			return false;
-		_current_sample = block_offset;
+		_current_frame = block_offset;
 		return true;
 	}
 }

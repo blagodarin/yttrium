@@ -69,9 +69,9 @@ namespace Yttrium
 		if (buffer_info._format.bytes_per_sample() != 2)
 			return;
 		Buffer buffer{ buffer_info._size };
-		const auto buffer_frames = buffer_info._size / buffer_info._format.block_size();
+		const auto buffer_frames = buffer_info._size / buffer_info._format.frame_bytes();
 		constexpr auto frequency = 100.;
-		const auto rate = buffer_info._format.samples_per_second();
+		const auto rate = buffer_info._format.frames_per_second();
 		const auto time_scale = frequency / static_cast<double>(rate);
 		uint64_t i = 0;
 		while (!_done)
