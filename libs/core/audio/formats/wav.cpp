@@ -39,8 +39,8 @@ namespace
 
 namespace Yttrium
 {
-	WavReader::WavReader(std::unique_ptr<Source>&& source)
-		: AudioReaderImpl(std::move(source))
+	WavDecoder::WavDecoder(std::unique_ptr<Source>&& source)
+		: AudioDecoder{ std::move(source) }
 	{
 		WavFileHeader file_header;
 		if (!_reader.read(file_header)
@@ -67,7 +67,7 @@ namespace Yttrium
 		_data_offset = _reader.offset();
 	}
 
-	size_t WavReader::read(void* buffer, size_t bytes_to_read)
+	size_t WavDecoder::read(void* buffer, size_t bytes_to_read)
 	{
 		const auto frame_bytes = _format.frame_bytes();
 		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
@@ -76,7 +76,7 @@ namespace Yttrium
 		return bytes_read;
 	}
 
-	bool WavReader::seek(uint64_t offset)
+	bool WavDecoder::seek(uint64_t offset)
 	{
 		if (offset > _total_frames)
 			return false;

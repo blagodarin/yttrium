@@ -17,31 +17,23 @@
 #pragma once
 
 #include <yttrium/audio/reader.h>
-
-#include <yttrium/audio/format.h>
-#include <yttrium/storage/reader.h>
-#include <yttrium/storage/source.h>
+#include "decoder.h"
 
 namespace Yttrium
 {
-	class AudioReaderImpl : public AudioReader
+	class AudioReaderImpl final : public AudioReader
 	{
-		friend AudioReader;
-
 	public:
-		uint64_t current_frame() const noexcept override { return _current_frame; }
-		AudioFormat format() const noexcept override { return _format; }
-		uint64_t total_bytes() const noexcept override { return _total_frames * _format.frame_bytes(); }
-		uint64_t total_frames() const noexcept override { return _total_frames; }
+		explicit AudioReaderImpl(std::unique_ptr<AudioDecoder>&& decoder) : _decoder{ std::move(decoder) } {}
 
-	protected:
-		AudioFormat _format;
-		uint64_t _total_frames = 0;
-		uint64_t _current_frame = 0;
-		const std::unique_ptr<Source> _source;
-		Reader _reader{ *_source };
+		uint64_t current_frame() const noexcept override { return _decoder->current_frame(); }
+		AudioFormat format() const noexcept override { return _decoder->format(); }
+		size_t read(void* data, size_t bytes) override { return _decoder->read(data, bytes); }
+		bool seek(uint64_t frame_offset) override { return _decoder->seek(frame_offset); }
+		uint64_t total_bytes() const noexcept override { return _decoder->total_bytes(); }
+		uint64_t total_frames() const noexcept override { return _decoder->total_frames(); }
 
-		explicit AudioReaderImpl(std::unique_ptr<Source>&& source)
-			: _source{ std::move(source) } {}
+	private:
+		const std::unique_ptr<AudioDecoder> _decoder;
 	};
 }

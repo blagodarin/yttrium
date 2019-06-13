@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 #pragma once
 
-#include "../reader.h"
+#include "../decoder.h"
 
 namespace Yttrium
 {
-	class WavReader final : public AudioReaderImpl
+	class WavDecoder final : public AudioDecoder
 	{
 	public:
-		explicit WavReader(std::unique_ptr<Source>&&);
+		explicit WavDecoder(std::unique_ptr<Source>&&);
 
 		size_t read(void*, size_t) override;
 		bool seek(uint64_t) override;

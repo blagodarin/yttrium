@@ -61,8 +61,8 @@ namespace
 
 namespace Yttrium
 {
-	OggVorbisReader::OggVorbisReader(std::unique_ptr<Source>&& source)
-		: AudioReaderImpl{ std::move(source) }
+	OggVorbisDecoder::OggVorbisDecoder(std::unique_ptr<Source>&& source)
+		: AudioDecoder{ std::move(source) }
 	{
 		::memset(&_ov_file, 0, sizeof _ov_file);
 		if (::ov_open_callbacks(&_reader, &_ov_file, nullptr, 0, ::_ov_callbacks) < 0)
@@ -80,12 +80,12 @@ namespace Yttrium
 		_total_frames = to_unsigned(total_frames);
 	}
 
-	OggVorbisReader::~OggVorbisReader()
+	OggVorbisDecoder::~OggVorbisDecoder()
 	{
 		::ov_clear(&_ov_file);
 	}
 
-	size_t OggVorbisReader::read(void* buffer, size_t bytes_to_read)
+	size_t OggVorbisDecoder::read(void* buffer, size_t bytes_to_read)
 	{
 		const auto frame_bytes = _format.frame_bytes();
 		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
@@ -102,7 +102,7 @@ namespace Yttrium
 		return bytes_read;
 	}
 
-	bool OggVorbisReader::seek(uint64_t block_offset)
+	bool OggVorbisDecoder::seek(uint64_t block_offset)
 	{
 		if (block_offset > _total_frames)
 			return false;

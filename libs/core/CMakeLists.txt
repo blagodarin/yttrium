@@ -45,6 +45,7 @@ y_sources(ycore "include/audio"
 	../../include/yttrium/audio/utils.h
 	)
 y_sources(ycore "src/audio"
+	audio/decoder.h
 	audio/reader.cpp
 	audio/reader.h
 	audio/utils.cpp

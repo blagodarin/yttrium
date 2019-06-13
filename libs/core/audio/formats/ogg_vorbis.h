@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,17 +20,17 @@
 #	error Ogg Vorbis support is disabled.
 #endif
 
-#include "../reader.h"
+#include "../decoder.h"
 
 #include <vorbis/vorbisfile.h>
 
 namespace Yttrium
 {
-	class OggVorbisReader final : public AudioReaderImpl
+	class OggVorbisDecoder final : public AudioDecoder
 	{
 	public:
-		explicit OggVorbisReader(std::unique_ptr<Source>&&);
-		~OggVorbisReader() override;
+		explicit OggVorbisDecoder(std::unique_ptr<Source>&&);
+		~OggVorbisDecoder() override;
 
 		size_t read(void*, size_t) override;
 		bool seek(uint64_t) override;
