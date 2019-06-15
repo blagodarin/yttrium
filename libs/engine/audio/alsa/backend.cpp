@@ -18,8 +18,6 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
-#include "player.h"
-#include "sound.h"
 
 #ifndef NDEBUG
 #	include <iostream>
@@ -103,16 +101,6 @@ namespace Yttrium
 	AudioBackend::BufferInfo AlsaAudioBackend::buffer_info() const noexcept
 	{
 		return { { 2, 2, FramesPerSecond }, _period_bytes };
-	}
-
-	std::unique_ptr<AudioPlayerBackend> AlsaAudioBackend::create_player()
-	{
-		return std::make_unique<AlsaAudioPlayer>();
-	}
-
-	std::unique_ptr<Sound> AlsaAudioBackend::create_sound(AudioReader& reader)
-	{
-		return std::make_unique<AlsaSound>(reader);
 	}
 
 	void AlsaAudioBackend::flush() noexcept

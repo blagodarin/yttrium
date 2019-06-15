@@ -33,7 +33,6 @@ namespace Yttrium
 		AudioManagerPrivate();
 		~AudioManagerPrivate() noexcept;
 
-		AudioBackend& backend() const noexcept { return *_backend; }
 		void play_music(const std::shared_ptr<AudioReader>&);
 
 	private:

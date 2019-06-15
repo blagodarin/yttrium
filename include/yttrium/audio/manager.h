@@ -45,7 +45,6 @@ namespace Yttrium
 
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;
-		friend class AudioPlayer;
 	};
 }
 

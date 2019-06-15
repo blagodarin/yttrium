@@ -18,6 +18,7 @@
 
 #include <yttrium/audio/reader.h>
 #include <yttrium/audio/sound.h>
+#include <yttrium/memory/buffer.h>
 #include "backend.h"
 #include "manager.h"
 
@@ -122,8 +123,17 @@ namespace Yttrium
 	{
 		if (!source)
 			return nullptr;
+
+		class SoundStub : public Sound
+		{
+		public:
+			SoundStub(std::unique_ptr<Source>&&) {}
+			~SoundStub() override = default;
+			void play() const override {}
+		};
+
 		AudioReader reader{ std::move(source) };
-		return _private->backend().create_sound(reader);
+		return std::make_unique<SoundStub>(std::move(source));
 	}
 
 	void AudioManager::play_music(const std::shared_ptr<AudioReader>& music)

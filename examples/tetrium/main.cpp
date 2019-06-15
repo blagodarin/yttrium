@@ -17,7 +17,6 @@
 #include <yttrium/application.h>
 #include <yttrium/audio/format.h>
 #include <yttrium/audio/manager.h>
-#include <yttrium/audio/player.h>
 #include <yttrium/audio/utils.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>

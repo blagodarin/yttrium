@@ -16,29 +16,29 @@
 
 #pragma once
 
-#include "../../../core/utils/memory.h"
-#include "../../application/openal.h"
+#include "../../application/_windows/com.h"
 #include "../backend.h"
+
+#include <audioclient.h>
+#include <mmdeviceapi.h>
 
 namespace Yttrium
 {
-	using P_ALCdevice = UniquePtr<::ALCdevice, ::alcCloseDevice>;
-	using P_ALCcontext = UniquePtr<::ALCcontext, ::alcDestroyContext>;
-
-	class OpenALBackend final : public AudioBackend
+	class WasapiAudioBackend final : public AudioBackend
 	{
 	public:
-		OpenALBackend();
-		~OpenALBackend() override;
+		WasapiAudioBackend();
+		~WasapiAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override { return {}; }
-		std::unique_ptr<AudioPlayerBackend> create_player() override;
-		std::unique_ptr<Sound> create_sound(AudioReader&) override;
 		void flush() override {}
 		bool write_buffer(const uint8_t*, const std::atomic<bool>&) override { return false; }
 
 	private:
-		const P_ALCdevice _device;
-		const P_ALCcontext _context;
+		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
+		// be on the STA thread. Calls from an MTA thread may result in undefined behavior."
+		ComInitializer _com{ COINIT_APARTMENTTHREADED };
+		ComPtr<IMMDevice> _device;
+		ComPtr<IAudioClient> _client;
 	};
 }
