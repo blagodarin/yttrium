@@ -47,11 +47,10 @@ y_sources(ycore "include/audio"
 y_sources(ycore "src/audio"
 	audio/decoder.h
 	audio/reader.cpp
-	audio/reader.h
 	audio/utils.cpp
+	audio/wav.h
 	)
 y_sources(ycore "src/audio/formats"
-	audio/formats/wav_private.h
 	audio/formats/wav.cpp
 	audio/formats/wav.h
 	)

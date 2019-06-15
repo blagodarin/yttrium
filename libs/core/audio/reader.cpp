@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-#include "reader.h"
+#include <yttrium/audio/reader.h>
 
 #include <yttrium/exceptions.h>
 #include "../../core/utils/fourcc.h"
@@ -24,23 +24,62 @@
 #	include "formats/ogg_vorbis.h"
 #endif
 
-namespace Yttrium
+namespace
 {
-	std::unique_ptr<AudioReader> AudioReader::open(std::unique_ptr<Source>&& source)
+	std::unique_ptr<Yttrium::AudioDecoder> create_audio_decoder(std::unique_ptr<Yttrium::Source>&& source)
 	{
+		using namespace Yttrium::Literals;
 		if (!source)
-			return {};
+			throw std::logic_error{ "Can't create AudioDecoder from an empty Source" };
 		uint32_t signature = 0;
 		if (source->read_at(0, signature))
 		{
 			switch (signature)
 			{
-				case "RIFF"_fourcc: return std::make_unique<AudioReaderImpl>(std::make_unique<WavDecoder>(std::move(source)));
+			case "RIFF"_fourcc: return std::make_unique<Yttrium::WavDecoder>(std::move(source));
 #if Y_USE_OGG_VORBIS
-				case "OggS"_fourcc: return std::make_unique<AudioReaderImpl>(std::make_unique<OggVorbisDecoder>(std::move(source)));
+			case "OggS"_fourcc: return std::make_unique<Yttrium::OggVorbisDecoder>(std::move(source));
 #endif
 			}
 		}
-		throw DataError{ "Unknown audio format" };
+		throw Yttrium::DataError{ "Unknown audio format" };
+	}
+}
+
+namespace Yttrium
+{
+	AudioReader::AudioReader(std::unique_ptr<Source>&& source)
+		: _decoder{ ::create_audio_decoder(std::move(source)) } {}
+
+	AudioReader::~AudioReader() noexcept = default;
+
+	uint64_t AudioReader::current_frame() const noexcept
+	{
+		return _decoder->current_frame();
+	}
+
+	AudioFormat AudioReader::format() const noexcept
+	{
+		return _decoder->format();
+	}
+
+	size_t AudioReader::read(void* data, size_t bytes)
+	{
+		return _decoder->read(data, bytes);
+	}
+
+	bool AudioReader::seek(uint64_t frame_offset)
+	{
+		return _decoder->seek(frame_offset);
+	}
+
+	uint64_t AudioReader::total_bytes() const noexcept
+	{
+		return _decoder->total_bytes();
+	}
+
+	uint64_t AudioReader::total_frames() const noexcept
+	{
+		return _decoder->total_frames();
 	}
 }

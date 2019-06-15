@@ -100,7 +100,9 @@ namespace Yttrium
 
 	std::unique_ptr<Sound> AudioManager::create_sound(std::unique_ptr<Source>&& source)
 	{
-		const auto reader = AudioReader::open(std::move(source));
-		return reader ? _private->backend().create_sound(*reader) : nullptr;
+		if (!source)
+			return nullptr;
+		AudioReader reader{ std::move(source) };
+		return _private->backend().create_sound(reader);
 	}
 }

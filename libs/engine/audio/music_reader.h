@@ -18,7 +18,7 @@
 
 #include <yttrium/audio/music_reader.h>
 
-#include <memory>
+#include <yttrium/audio/reader.h>
 
 namespace Yttrium
 {
@@ -28,7 +28,7 @@ namespace Yttrium
 	class MusicReaderImpl final : public MusicReader
 	{
 	public:
-		explicit MusicReaderImpl(std::unique_ptr<AudioReader>&&);
+		explicit MusicReaderImpl(std::unique_ptr<Source>&&);
 
 		bool set_properties(int end_ms, int loop_ms) noexcept override;
 
@@ -38,7 +38,7 @@ namespace Yttrium
 		void seek_start();
 
 	private:
-		const std::unique_ptr<AudioReader> _reader;
+		AudioReader _reader;
 		const size_t _frame_bytes;
 		const size_t _buffer_frames;
 		uint64_t _end_frame = 0;

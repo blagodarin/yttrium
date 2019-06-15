@@ -23,6 +23,7 @@
 
 namespace Yttrium
 {
+	class AudioDecoder;
 	class AudioFormat;
 	class Source;
 
@@ -31,29 +32,34 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<AudioReader> open(std::unique_ptr<Source>&&);
+		explicit AudioReader(std::unique_ptr<Source>&&);
+		~AudioReader() noexcept;
 
-		virtual ~AudioReader() noexcept = default;
-
-		/// Returns the audio format.
-		virtual AudioFormat format() const noexcept = 0;
+		/// Returns audio format.
+		AudioFormat format() const noexcept;
 
 		/// Reads at most \a size bytes into \a buffer.
 		/// \param buffer Buffer to read into.
 		/// \param bytes_to_read Number of bytes to read.
 		/// \return Number of bytes read or 0 on failure.
 		/// \note The passed \a size is rounded down to the frame scale before the actual reading.
-		virtual size_t read(void* buffer, size_t bytes_to_read) = 0;
+		size_t read(void* buffer, size_t bytes_to_read);
 
 		/// Moves the audio offset to the specified position in frames.
-		virtual bool seek(uint64_t offset) = 0;
+		bool seek(uint64_t offset);
 
 		/// Returns the audio size in bytes.
-		virtual uint64_t total_bytes() const noexcept = 0;
+		uint64_t total_bytes() const noexcept;
 
 		/// MusicReader interface.
-		virtual uint64_t current_frame() const noexcept = 0;
-		virtual uint64_t total_frames() const noexcept = 0;
+		uint64_t current_frame() const noexcept;
+		uint64_t total_frames() const noexcept;
+
+		AudioReader(const AudioReader&) = delete;
+		AudioReader& operator=(const AudioReader&) = delete;
+
+	private:
+		const std::unique_ptr<AudioDecoder> _decoder;
 	};
 }
 

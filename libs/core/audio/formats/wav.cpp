@@ -17,7 +17,7 @@
 #include "wav.h"
 
 #include <yttrium/exceptions.h>
-#include "wav_private.h"
+#include "../wav.h"
 
 #include <algorithm>
 

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/storage/writer.h>
-#include "formats/wav_private.h"
+#include "wav.h"
 
 #include <limits>
 
 namespace
 {
-	const size_t _max_wav_data_size = std::numeric_limits<int32_t>::max()
+	constexpr size_t _max_wav_data_size = std::numeric_limits<int32_t>::max()
 		- sizeof(Yttrium::WavFileHeader)
 		- sizeof(Yttrium::WavChunkHeader) - sizeof(Yttrium::WavFormatChunk)
 		- sizeof(Yttrium::WavChunkHeader);
