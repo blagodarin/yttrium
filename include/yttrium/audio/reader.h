@@ -39,11 +39,7 @@ namespace Yttrium
 		/// Returns audio format.
 		AudioFormat format() const noexcept;
 
-		/// Reads at most \a size bytes into \a buffer.
-		/// \param buffer Buffer to read into.
-		/// \param bytes_to_read Number of bytes to read.
-		/// \return Number of bytes read or 0 on failure.
-		/// \note The passed \a size is rounded down to the frame scale before the actual reading.
+		///
 		size_t read(void* buffer, size_t bytes_to_read);
 
 		/// Moves the audio offset to the specified position in frames.

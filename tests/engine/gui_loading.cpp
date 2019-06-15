@@ -50,7 +50,7 @@ TEST_CASE("gui.load")
 			storage.attach_buffer(extra_name, ::make_buffer(extra_data));
 		ResourceLoader resource_loader{ storage };
 		ScriptContext script_context;
-		Gui{ resource_loader, script_context, "main.ion" };
+		Gui{ "main.ion", resource_loader, script_context };
 	};
 
 	const auto fragment = [&source](const std::string& data) {

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_audio_sound_h_
-#define _include_yttrium_audio_sound_h_
+#include <yttrium/audio/sound.h>
 
 #include <yttrium/audio/reader.h>
 
 namespace Yttrium
 {
-	/// Sound.
-	class Sound
+	class SoundImpl final : public Sound
 	{
 	public:
-		virtual ~Sound() noexcept = default;
+		explicit SoundImpl(std::unique_ptr<Source>&& source)
+			: _reader{ std::move(source) } {}
+
+		~SoundImpl() override = default;
+
+	private:
+		AudioReader _reader;
 	};
 }
-
-#endif

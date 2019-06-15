@@ -26,7 +26,7 @@
 
 namespace Yttrium
 {
-	class AudioReader;
+	class AudioManager;
 	enum class Key;
 	class KeyEvent;
 	class RectF;
@@ -47,7 +47,7 @@ namespace Yttrium
 	class Y_ENGINE_API Gui
 	{
 	public:
-		Gui(ResourceLoader&, ScriptContext&, std::string_view name);
+		Gui(std::string_view name, ResourceLoader&, ScriptContext&, const std::shared_ptr<AudioManager>& = {});
 		~Gui();
 
 		void bind_canvas(const std::string& name, Canvas&);
@@ -55,7 +55,6 @@ namespace Yttrium
 		const std::string& icon_path() const;
 		void notify(const std::string& event);
 		void on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>&);
-		void on_music(const std::function<void(const std::shared_ptr<AudioReader>&)>&);
 		void on_quit(const std::function<void()>&);
 		bool process_key_event(const KeyEvent&);
 		bool process_text_input(std::string_view text);

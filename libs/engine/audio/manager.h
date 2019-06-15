@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <yttrium/audio/manager.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <memory>
@@ -25,15 +27,16 @@
 namespace Yttrium
 {
 	class AudioBackend;
-	class AudioReader;
 
-	class AudioManagerPrivate
+	class AudioManagerImpl final : public AudioManager
 	{
 	public:
-		AudioManagerPrivate();
-		~AudioManagerPrivate() noexcept;
+		explicit AudioManagerImpl(std::unique_ptr<AudioBackend>&&);
+		~AudioManagerImpl() noexcept override;
 
-		void play_music(const std::shared_ptr<AudioReader>&);
+		std::shared_ptr<Sound> create_sound(std::unique_ptr<Source>&&) override;
+		void play_music(const std::shared_ptr<AudioReader>&) override;
+		void play_sound(const std::shared_ptr<Sound>&) override;
 
 	private:
 		void run();

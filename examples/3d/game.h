@@ -53,7 +53,7 @@ private:
 	Window _window{ _application };
 	ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
 	ScriptContext _script;
-	Gui _gui{ _resource_loader, _script, "data/gui.ion" };
+	Gui _gui{ "data/gui.ion", _resource_loader, _script };
 	bool _debug_text_visible = false;
 	std::string _debug_text;
 	Model _cube{ _resource_loader, "data/cube.obj", "data/cube.material" };

@@ -62,8 +62,9 @@ namespace
 
 namespace Yttrium
 {
-	GuiPrivate::GuiPrivate(ScriptContext& script_context) noexcept
+	GuiPrivate::GuiPrivate(ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager) noexcept
 		: _script_context{ script_context }
+		, _audio_manager{ audio_manager }
 	{
 	}
 
@@ -90,6 +91,15 @@ namespace Yttrium
 	void GuiPrivate::add_startup_command(std::string_view name, std::vector<std::string>&& args)
 	{
 		_startup_commands.emplace_back(name, std::move(args));
+	}
+
+	std::shared_ptr<Sound> GuiPrivate::load_sound(ResourceLoader& loader, std::string_view name)
+	{
+		if (!_audio_manager)
+			return {};
+		if (const auto i = _sounds.find(name); i != _sounds.end())
+			return i->second;
+		return _sounds.emplace(name, _audio_manager->create_sound(loader.open(name))).first->second;
 	}
 
 	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
@@ -150,8 +160,8 @@ namespace Yttrium
 		Increment recursion{ _screen_recursion };
 		_screen_stack.emplace_back(&screen);
 		screen.handle_enter();
-		if (!recursion.decrement() && update_music())
-			_on_music(_current_music);
+		if (!recursion.decrement())
+			update_music();
 	}
 
 	void GuiPrivate::leave_screen()
@@ -160,22 +170,24 @@ namespace Yttrium
 		const auto screen = _screen_stack.back();
 		_screen_stack.pop_back();
 		screen->handle_return();
-		if (!recursion.decrement() && update_music())
-			_on_music(_current_music);
+		if (!recursion.decrement())
+			update_music();
 	}
 
-	bool GuiPrivate::update_music() noexcept
+	void GuiPrivate::update_music()
 	{
+		if (!_audio_manager)
+			return;
 		const auto i = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [](GuiScreen* s) { return s->has_music(); });
 		auto music = i != _screen_stack.rend() ? (*i)->music() : nullptr;
 		if (music == _current_music)
-			return false;
+			return;
 		_current_music = std::move(music);
-		return true;
+		_audio_manager->play_music(_current_music);
 	}
 
-	Gui::Gui(ResourceLoader& resource_loader, ScriptContext& script_context, std::string_view name)
-		: _private(std::make_unique<GuiPrivate>(script_context))
+	Gui::Gui(std::string_view name, ResourceLoader& resource_loader, ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager)
+		: _private(std::make_unique<GuiPrivate>(script_context, audio_manager))
 	{
 		load_ion_gui(*_private, resource_loader, name);
 		if (!_private->_root_screen)
@@ -218,11 +230,6 @@ namespace Yttrium
 	void Gui::on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>& callback)
 	{
 		_private->_on_custom_cursor = callback;
-	}
-
-	void Gui::on_music(const std::function<void(const std::shared_ptr<AudioReader>&)>& callback)
-	{
-		_private->_on_music = callback;
 	}
 
 	void Gui::on_quit(const std::function<void()>& callback)

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,19 +32,18 @@ namespace Yttrium
 	{
 	public:
 		///
-		AudioManager();
+		static std::shared_ptr<AudioManager> create();
+
+		virtual ~AudioManager() noexcept = default;
 
 		///
-		~AudioManager() noexcept;
+		virtual std::shared_ptr<Sound> create_sound(std::unique_ptr<Source>&&) = 0;
 
 		///
-		std::unique_ptr<Sound> create_sound(std::unique_ptr<Source>&&);
+		virtual void play_music(const std::shared_ptr<AudioReader>&) = 0;
 
 		///
-		void play_music(const std::shared_ptr<AudioReader>& music);
-
-	private:
-		const std::unique_ptr<class AudioManagerPrivate> _private;
+		virtual void play_sound(const std::shared_ptr<Sound>&) = 0;
 	};
 }
 

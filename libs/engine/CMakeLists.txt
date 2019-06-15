@@ -118,6 +118,7 @@ y_sources(yengine "src/audio"
 	audio/backend.h
 	audio/manager.cpp
 	audio/manager.h
+	audio/sound.h
 	)
 if(WIN32)
 	y_sources(yengine "src/audio/wasapi"

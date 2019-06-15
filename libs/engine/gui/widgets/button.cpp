@@ -16,7 +16,7 @@
 
 #include "button.h"
 
-#include <yttrium/audio/sound.h>
+#include "../gui.h"
 
 namespace Yttrium
 {
@@ -39,8 +39,7 @@ namespace Yttrium
 
 	void ButtonWidget::process_mouse_release()
 	{
-		if (_data->_sound)
-			_data->_sound->play();
+		_gui.play_sound(_data->_sound);
 		_data->run(_gui, WidgetData::Action::OnClick);
 	}
 }

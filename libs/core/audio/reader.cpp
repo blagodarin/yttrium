@@ -44,6 +44,7 @@ namespace
 #if Y_USE_OGG_VORBIS
 			case "OggS"_fourcc: return std::make_unique<Yttrium::OggVorbisDecoder>(std::move(source));
 #endif
+			default: break;
 			}
 		}
 		throw Yttrium::DataError{ "Unknown audio format" };
@@ -66,14 +67,14 @@ namespace Yttrium
 		return _decoder->format();
 	}
 
-	size_t AudioReader::read(void* data, size_t bytes_to_read)
+	size_t AudioReader::read(void* buffer, size_t bytes_to_read)
 	{
 		const auto frame_size = _decoder->format().frame_bytes();
 		for (size_t result = 0;;)
 		{
 			const auto requested = bytes_to_read - result;
 			const auto available = (_end_frame - _decoder->current_frame()) * frame_size;
-			const auto decoded = _decoder->read(static_cast<std::byte*>(data) + result, static_cast<size_t>(std::min<uint64_t>(requested, available)));
+			const auto decoded = _decoder->read(static_cast<std::byte*>(buffer) + result, static_cast<size_t>(std::min<uint64_t>(requested, available)));
 			result += decoded;
 			if (decoded == requested || decoded != available || _loop_frame >= _end_frame || !_decoder->seek(_loop_frame))
 				return result;

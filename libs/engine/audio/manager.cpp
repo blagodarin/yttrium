@@ -14,13 +14,13 @@
 // limitations under the License.
 //
 
-#include <yttrium/audio/manager.h>
+#include "manager.h"
 
 #include <yttrium/audio/reader.h>
 #include <yttrium/audio/sound.h>
 #include <yttrium/memory/buffer.h>
 #include "backend.h"
-#include "manager.h"
+#include "sound.h"
 
 #include <cstring>
 
@@ -50,20 +50,25 @@ namespace
 
 namespace Yttrium
 {
-	AudioManagerPrivate::AudioManagerPrivate()
-		: _backend{ AudioBackend::create() }
+	AudioManagerImpl::AudioManagerImpl(std::unique_ptr<AudioBackend>&& backend)
+		: _backend{ std::move(backend) }
 		, _thread{ [this] { run(); } }
 	{
 	}
 
-	AudioManagerPrivate::~AudioManagerPrivate() noexcept
+	AudioManagerImpl::~AudioManagerImpl() noexcept
 	{
 		_done = true;
 		_condition.notify_one();
 		_thread.join();
 	}
 
-	void AudioManagerPrivate::play_music(const std::shared_ptr<AudioReader>& music)
+	std::shared_ptr<Sound> AudioManagerImpl::create_sound(std::unique_ptr<Source>&& source)
+	{
+		return source ? std::make_shared<SoundImpl>(std::move(source)) : nullptr;
+	}
+
+	void AudioManagerImpl::play_music(const std::shared_ptr<AudioReader>& music)
 	{
 		{
 			std::scoped_lock lock{ _mutex };
@@ -74,7 +79,11 @@ namespace Yttrium
 		_condition.notify_one();
 	}
 
-	void AudioManagerPrivate::run()
+	void AudioManagerImpl::play_sound(const std::shared_ptr<Sound>&)
+	{
+	}
+
+	void AudioManagerImpl::run()
 	{
 		::set_high_priority();
 		const auto buffer_info = _backend->buffer_info();
@@ -112,32 +121,8 @@ namespace Yttrium
 		_backend->flush();
 	}
 
-	AudioManager::AudioManager()
-		: _private{ std::make_unique<AudioManagerPrivate>() }
+	std::shared_ptr<AudioManager> AudioManager::create()
 	{
-	}
-
-	AudioManager::~AudioManager() noexcept = default;
-
-	std::unique_ptr<Sound> AudioManager::create_sound(std::unique_ptr<Source>&& source)
-	{
-		if (!source)
-			return nullptr;
-
-		class SoundStub : public Sound
-		{
-		public:
-			SoundStub(std::unique_ptr<Source>&&) {}
-			~SoundStub() override = default;
-			void play() const override {}
-		};
-
-		AudioReader reader{ std::move(source) };
-		return std::make_unique<SoundStub>(std::move(source));
-	}
-
-	void AudioManager::play_music(const std::shared_ptr<AudioReader>& music)
-	{
-		_private->play_music(music);
+		return std::make_shared<AudioManagerImpl>(AudioBackend::create());
 	}
 }

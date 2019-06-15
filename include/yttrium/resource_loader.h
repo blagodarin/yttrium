@@ -24,11 +24,9 @@
 
 namespace Yttrium
 {
-	class AudioManager;
 	class Material;
 	class Mesh;
 	class RenderManager;
-	class Sound;
 	class Source;
 	class Storage;
 	class Texture2D;
@@ -39,7 +37,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		ResourceLoader(const Storage&, RenderManager* = nullptr, AudioManager* = nullptr);
+		ResourceLoader(const Storage&, RenderManager* = nullptr);
 
 		///
 		~ResourceLoader();
@@ -49,7 +47,6 @@ namespace Yttrium
 		/// Throws DataError if the resource can't be loaded.
 		std::shared_ptr<const Material> load_material(std::string_view name);
 		std::shared_ptr<const Mesh> load_mesh(std::string_view name);
-		std::shared_ptr<const Sound> load_sound(std::string_view name);
 		std::shared_ptr<const Texture2D> load_texture_2d(std::string_view name);
 		std::shared_ptr<const Translation> load_translation(std::string_view name);
 

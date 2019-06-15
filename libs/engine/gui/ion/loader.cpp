@@ -633,7 +633,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_sound(WidgetData& data, IonReader& ion, IonToken& token) const
 	{
-		data._sound = _resource_loader.load_sound(token.to_value());
+		data._sound = _gui.load_sound(_resource_loader, token.to_value());
 		token.next(ion);
 	}
 
