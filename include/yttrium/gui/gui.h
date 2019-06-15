@@ -26,9 +26,9 @@
 
 namespace Yttrium
 {
+	class AudioReader;
 	enum class Key;
 	class KeyEvent;
-	class MusicReader;
 	class RectF;
 	class RenderPass;
 	class ResourceLoader;
@@ -55,7 +55,7 @@ namespace Yttrium
 		const std::string& icon_path() const;
 		void notify(const std::string& event);
 		void on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>&);
-		void on_music(const std::function<void(const std::shared_ptr<MusicReader>&)>&);
+		void on_music(const std::function<void(const std::shared_ptr<AudioReader>&)>&);
 		void on_quit(const std::function<void()>&);
 		bool process_key_event(const KeyEvent&);
 		bool process_text_input(std::string_view text);

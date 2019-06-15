@@ -17,17 +17,17 @@
 #include "streamer.h"
 
 #include <yttrium/audio/format.h>
+#include <yttrium/audio/reader.h>
 #include "backend.h"
-#include "music_reader.h"
 
 namespace Yttrium
 {
-	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend, MusicReaderImpl& music)
+	AudioStreamer::AudioStreamer(AudioPlayerBackend& backend, AudioReader& reader)
 		: _backend{ backend }
-		, _music{ music }
-		, _buffer{ _music.buffer_size() }
+		, _reader{ reader }
+		, _buffer{ _reader.format().frames_per_second() * _reader.format().frame_bytes() }
 	{
-		_backend.set_format(_music.format());
+		_backend.set_format(_reader.format());
 	}
 
 	AudioStreamer::~AudioStreamer() noexcept
@@ -37,10 +37,10 @@ namespace Yttrium
 
 	bool AudioStreamer::play_first()
 	{
-		_music.seek_start();
+		_reader.seek(0);
 		for (size_t i = 0; i < AudioPlayerBackend::NumBuffers; ++i)
 		{
-			if (const auto size = _music.read(_buffer.data()); size > 0)
+			if (const auto size = _reader.read(_buffer.data(), _buffer.size()); size > 0)
 				_backend.fill_buffer(i, _buffer.data(), size);
 			else if (i > 0)
 				break;
@@ -56,7 +56,7 @@ namespace Yttrium
 		const auto free_buffers = _backend.check_buffers();
 		for (auto i = free_buffers; i > 0; --i)
 		{
-			const auto size = _music.read(_buffer.data());
+			const auto size = _reader.read(_buffer.data(), _buffer.size());
 			if (!size)
 				return i != free_buffers; // TODO: Return 'false' only when the playback is finished.
 			_backend.refill_buffer(_buffer.data(), size);

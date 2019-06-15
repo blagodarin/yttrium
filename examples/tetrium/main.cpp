@@ -252,7 +252,7 @@ int main(int, char**)
 	if (audio)
 	{
 		audio_player.emplace(*audio);
-		gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music) { audio_player->set_music(music); });
+		gui.on_music([&audio_player](const std::shared_ptr<AudioReader>& music) { audio_player->set_music(music); });
 	}
 
 	gui.start();

@@ -27,10 +27,10 @@
 
 namespace Yttrium
 {
+	class AudioReader;
 	class Canvas;
 	class Gui;
 	class GuiScreen;
-	class MusicReader;
 	class RectF;
 	class RenderPass;
 	class ResourceLoader;
@@ -86,10 +86,10 @@ namespace Yttrium
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
 		std::unordered_map<std::string, Canvas*> _canvases;
 		std::function<void(RenderPass&, const Vector2&)> _on_custom_cursor;
-		std::function<void(const std::shared_ptr<MusicReader>&)> _on_music;
+		std::function<void(const std::shared_ptr<AudioReader>&)> _on_music;
 		std::function<void()> _on_quit;
 		std::size_t _screen_recursion = 0;
-		std::shared_ptr<MusicReader> _current_music;
+		std::shared_ptr<AudioReader> _current_music;
 		std::vector<std::pair<std::string, std::vector<std::string>>> _startup_commands;
 
 		friend Gui;

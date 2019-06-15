@@ -25,7 +25,6 @@
 namespace Yttrium
 {
 	class AudioBackend;
-	class MusicReaderImpl;
 
 	class AudioPlayerPrivate
 	{
@@ -33,7 +32,7 @@ namespace Yttrium
 		explicit AudioPlayerPrivate(AudioBackend&);
 		~AudioPlayerPrivate() noexcept;
 
-		void set_music(const std::shared_ptr<MusicReaderImpl>&);
+		void set_music(const std::shared_ptr<AudioReader>&);
 		void set_paused(bool);
 
 	private:
@@ -44,7 +43,7 @@ namespace Yttrium
 		std::mutex _mutex;
 		std::condition_variable _condition;
 		bool _paused = false;
-		std::shared_ptr<MusicReaderImpl> _music;
+		std::shared_ptr<AudioReader> _music;
 		bool _music_changed = false;
 		bool _terminate = false;
 		std::thread _thread;

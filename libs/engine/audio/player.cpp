@@ -19,7 +19,6 @@
 #include <yttrium/audio/manager.h>
 #include "backend.h"
 #include "manager.h"
-#include "music_reader.h"
 #include "streamer.h"
 
 namespace Yttrium
@@ -40,7 +39,7 @@ namespace Yttrium
 		_thread.join();
 	}
 
-	void AudioPlayerPrivate::set_music(const std::shared_ptr<MusicReaderImpl>& music)
+	void AudioPlayerPrivate::set_music(const std::shared_ptr<AudioReader>& music)
 	{
 		{
 			std::lock_guard<std::mutex> lock{ _mutex };
@@ -105,9 +104,9 @@ namespace Yttrium
 
 	AudioPlayer::~AudioPlayer() noexcept = default;
 
-	void AudioPlayer::set_music(const std::shared_ptr<MusicReader>& music)
+	void AudioPlayer::set_music(const std::shared_ptr<AudioReader>& music)
 	{
-		_private->set_music(std::static_pointer_cast<MusicReaderImpl>(music));
+		_private->set_music(music);
 	}
 
 	void AudioPlayer::set_paused(bool paused)

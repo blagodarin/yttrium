@@ -23,12 +23,12 @@
 namespace Yttrium
 {
 	class AudioPlayerBackend;
-	class MusicReaderImpl;
+	class AudioReader;
 
 	class AudioStreamer
 	{
 	public:
-		AudioStreamer(AudioPlayerBackend&, MusicReaderImpl&);
+		AudioStreamer(AudioPlayerBackend&, AudioReader&);
 		~AudioStreamer() noexcept;
 
 		bool play_first();
@@ -36,7 +36,7 @@ namespace Yttrium
 
 	private:
 		AudioPlayerBackend& _backend;
-		MusicReaderImpl& _music;
+		AudioReader& _reader;
 		Buffer _buffer;
 	};
 }

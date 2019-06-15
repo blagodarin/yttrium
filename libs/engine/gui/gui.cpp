@@ -16,7 +16,6 @@
 
 #include <yttrium/gui/gui.h>
 
-#include <yttrium/audio/music_reader.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/resource_loader.h>
@@ -221,7 +220,7 @@ namespace Yttrium
 		_private->_on_custom_cursor = callback;
 	}
 
-	void Gui::on_music(const std::function<void(const std::shared_ptr<MusicReader>&)>& callback)
+	void Gui::on_music(const std::function<void(const std::shared_ptr<AudioReader>&)>& callback)
 	{
 		_private->_on_music = callback;
 	}

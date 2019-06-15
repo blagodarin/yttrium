@@ -16,7 +16,7 @@
 
 #include "loader.h"
 
-#include <yttrium/audio/music_reader.h>
+#include <yttrium/audio/reader.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/textured_rect.h>
@@ -182,7 +182,7 @@ namespace Yttrium
 		ResourceLoader& _resource_loader;
 		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
-		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
+		std::unordered_map<std::string, std::shared_ptr<AudioReader>> _music;
 		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
 		std::shared_ptr<const Translation> _translation;
 	};
@@ -344,8 +344,8 @@ namespace Yttrium
 			throw GuiDataError{ "No music file specified" };
 		token.next(ion);
 		//
-		auto music = MusicReader::open(_resource_loader.open(music_file));
-		music->set_properties(music_end, music_loop);
+		auto music = std::make_shared<AudioReader>(_resource_loader.open(music_file));
+		music->set_loop(std::chrono::milliseconds{ music_loop }, std::chrono::milliseconds{ music_end });
 		_music.insert_or_assign(std::string{ music_name }, std::move(music));
 	}
 
@@ -491,7 +491,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_screen_music(GuiScreen& screen, IonReader& ion, IonToken& token, int) const
 	{
-		std::shared_ptr<MusicReader> music;
+		std::shared_ptr<AudioReader> music;
 		if (const std::string music_name{ token.to_value() }; !music_name.empty())
 		{
 			const auto i = _music.find(music_name);

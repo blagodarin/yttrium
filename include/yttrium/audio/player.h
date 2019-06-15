@@ -24,7 +24,7 @@
 namespace Yttrium
 {
 	class AudioManager;
-	class MusicReader;
+	class AudioReader;
 
 	/// Audio player.
 	class Y_ENGINE_API AudioPlayer
@@ -37,7 +37,7 @@ namespace Yttrium
 		~AudioPlayer() noexcept;
 
 		///
-		void set_music(const std::shared_ptr<MusicReader>&);
+		void set_music(const std::shared_ptr<AudioReader>&);
 
 		///
 		void set_paused(bool);

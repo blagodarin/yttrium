@@ -115,7 +115,6 @@ endif()
 # audio
 y_sources(yengine "include/audio"
 	../../include/yttrium/audio/manager.h
-	../../include/yttrium/audio/music_reader.h
 	../../include/yttrium/audio/player.h
 	../../include/yttrium/audio/sound.h
 	)
@@ -123,8 +122,6 @@ y_sources(yengine "src/audio"
 	audio/backend.h
 	audio/manager.cpp
 	audio/manager.h
-	audio/music_reader.cpp
-	audio/music_reader.h
 	audio/player.cpp
 	audio/player.h
 	audio/streamer.cpp
