@@ -23,6 +23,7 @@
 
 namespace Yttrium
 {
+	class AudioReader;
 	class Sound;
 	class Source;
 
@@ -38,6 +39,9 @@ namespace Yttrium
 
 		///
 		std::unique_ptr<Sound> create_sound(std::unique_ptr<Source>&&);
+
+		///
+		void play_music(const std::shared_ptr<AudioReader>& music);
 
 	private:
 		const std::unique_ptr<class AudioManagerPrivate> _private;

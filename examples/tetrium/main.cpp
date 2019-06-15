@@ -248,12 +248,8 @@ int main(int, char**)
 	NextFigureCanvas next_figure_canvas{ logic, graphics };
 	gui.bind_canvas("next", next_figure_canvas);
 
-	std::optional<AudioPlayer> audio_player;
 	if (audio)
-	{
-		audio_player.emplace(*audio);
-		gui.on_music([&audio_player](const std::shared_ptr<AudioReader>& music) { audio_player->set_music(music); });
-	}
+		gui.on_music([&audio](const std::shared_ptr<AudioReader>& music) { audio->play_music(music); });
 
 	gui.start();
 	window.set_title(gui.title());

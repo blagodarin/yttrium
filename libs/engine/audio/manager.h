@@ -17,13 +17,15 @@
 #pragma once
 
 #include <atomic>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <thread>
 
 namespace Yttrium
 {
 	class AudioBackend;
-	class AudioPlayerBackend;
+	class AudioReader;
 
 	class AudioManagerPrivate
 	{
@@ -32,12 +34,16 @@ namespace Yttrium
 		~AudioManagerPrivate() noexcept;
 
 		AudioBackend& backend() const noexcept { return *_backend; }
+		void play_music(const std::shared_ptr<AudioReader>&);
 
 	private:
 		void run();
 
 	private:
 		const std::unique_ptr<AudioBackend> _backend;
+		std::mutex _mutex;
+		std::condition_variable _condition;
+		std::shared_ptr<AudioReader> _music;
 		std::atomic<bool> _done{ false };
 		std::thread _thread;
 	};

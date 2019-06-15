@@ -20,9 +20,8 @@
 #include <yttrium/audio/sound.h>
 #include "backend.h"
 #include "manager.h"
-#include "player.h"
 
-#include <cmath>
+#include <cstring>
 
 #ifdef _WIN32
 // TODO: Implement.
@@ -59,34 +58,55 @@ namespace Yttrium
 	AudioManagerPrivate::~AudioManagerPrivate() noexcept
 	{
 		_done = true;
+		_condition.notify_one();
 		_thread.join();
+	}
+
+	void AudioManagerPrivate::play_music(const std::shared_ptr<AudioReader>& music)
+	{
+		{
+			std::scoped_lock lock{ _mutex };
+			if (music == _music)
+				return;
+			_music = music;
+		}
+		_condition.notify_one();
 	}
 
 	void AudioManagerPrivate::run()
 	{
 		::set_high_priority();
 		const auto buffer_info = _backend->buffer_info();
-		if (buffer_info._format.bytes_per_sample() != 2)
-			return;
 		Buffer buffer{ buffer_info._size };
-		const auto buffer_frames = buffer_info._size / buffer_info._format.frame_bytes();
-		constexpr auto frequency = 100.;
-		const auto rate = buffer_info._format.frames_per_second();
-		const auto time_scale = frequency / static_cast<double>(rate);
-		uint64_t i = 0;
-		while (!_done)
+		for (;;)
 		{
-			auto output = static_cast<int16_t*>(buffer.data());
-			for (auto f = buffer_frames; f > 0; --f)
+			decltype(_music) music;
 			{
-				const auto amplitude = std::sin(2. * M_PI * time_scale * static_cast<double>(i++));
-				const auto amplitude_scale = 1. - static_cast<double>(i % rate) / static_cast<double>(rate);
-				const auto sample = static_cast<int16_t>(std::numeric_limits<int16_t>::max() * amplitude * amplitude_scale);
-				for (auto c = buffer_info._format.channels(); c > 0; --c)
-					*output++ = sample;
+				std::unique_lock lock{ _mutex };
+				_condition.wait(lock, [this] { return _music || _done; });
+				if (_done)
+					break;
+				if (_music->format() != buffer_info._format)
+				{
+					_music.reset();
+					continue;
+				}
+				music = _music;
 			}
-			if (!_backend->write_buffer(buffer.begin(), _done))
-				_done = true;
+			music->seek(0);
+			for (;;)
+			{
+				const auto bytes_read = music->read(buffer.data(), buffer_info._size);
+				if (!bytes_read)
+					break;
+				if (bytes_read < buffer_info._size)
+					std::memset(buffer.begin() + bytes_read, 0, buffer_info._size - bytes_read);
+				if (!_backend->write_buffer(buffer.begin(), _done))
+					_done = true;
+				std::scoped_lock lock{ _mutex };
+				if (_music != music || _done)
+					break;
+			}
 		}
 		_backend->flush();
 	}
@@ -104,5 +124,10 @@ namespace Yttrium
 			return nullptr;
 		AudioReader reader{ std::move(source) };
 		return _private->backend().create_sound(reader);
+	}
+
+	void AudioManager::play_music(const std::shared_ptr<AudioReader>& music)
+	{
+		_private->play_music(music);
 	}
 }

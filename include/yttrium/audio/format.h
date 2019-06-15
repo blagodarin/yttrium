@@ -39,6 +39,9 @@ namespace Yttrium
 		size_t _channels = 0;
 		size_t _frames_per_second = 0;
 	};
+
+	constexpr bool operator==(const AudioFormat& a, const AudioFormat& b) noexcept { return a.bytes_per_sample() == b.bytes_per_sample() && a.channels() == b.channels() && a.frames_per_second() == b.frames_per_second(); }
+	constexpr bool operator!=(const AudioFormat& a, const AudioFormat& b) noexcept { return !(a == b); }
 }
 
 #endif

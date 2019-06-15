@@ -64,6 +64,6 @@ namespace Yttrium
 		virtual std::unique_ptr<AudioPlayerBackend> create_player() = 0;
 		virtual std::unique_ptr<Sound> create_sound(AudioReader&) = 0;
 		virtual void flush() = 0;
-		virtual bool write_buffer(const uint8_t* data, const std::atomic<bool>& done) = 0;
+		virtual bool write_buffer(const uint8_t* data, const std::atomic<bool>& interrupt) = 0;
 	};
 }

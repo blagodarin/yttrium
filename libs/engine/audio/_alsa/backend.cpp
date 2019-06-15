@@ -120,11 +120,11 @@ namespace Yttrium
 		snd_pcm_drain(_pcm.get());
 	}
 
-	bool AlsaAudioBackend::write_buffer(const uint8_t* data, const std::atomic<bool>& done) noexcept
+	bool AlsaAudioBackend::write_buffer(const uint8_t* data, const std::atomic<bool>& interrupt) noexcept
 	{
 		const auto frame_bytes = _period_bytes / _period_frames;
 		auto frames_left = _period_frames;
-		while (frames_left > 0 && !done)
+		while (frames_left > 0 && !interrupt)
 		{
 			const auto result = snd_pcm_writei(_pcm.get(), data, frames_left);
 			if (result < 0)
