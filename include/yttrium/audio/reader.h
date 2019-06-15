@@ -19,6 +19,7 @@
 
 #include <yttrium/api.h>
 
+#include <chrono>
 #include <memory>
 
 namespace Yttrium
@@ -48,18 +49,19 @@ namespace Yttrium
 		/// Moves the audio offset to the specified position in frames.
 		bool seek(uint64_t offset);
 
+		///
+		bool set_loop(std::chrono::milliseconds from, std::chrono::milliseconds to = std::chrono::milliseconds::max()) noexcept;
+
 		/// Returns the audio size in bytes.
 		uint64_t total_bytes() const noexcept;
-
-		/// MusicReader interface.
-		uint64_t current_frame() const noexcept;
-		uint64_t total_frames() const noexcept;
 
 		AudioReader(const AudioReader&) = delete;
 		AudioReader& operator=(const AudioReader&) = delete;
 
 	private:
 		const std::unique_ptr<AudioDecoder> _decoder;
+		uint64_t _end_frame;
+		uint64_t _loop_frame;
 	};
 }
 

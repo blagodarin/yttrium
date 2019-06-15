@@ -18,6 +18,7 @@
 
 #include <yttrium/audio/music_reader.h>
 
+#include <yttrium/audio/format.h>
 #include <yttrium/audio/reader.h>
 
 namespace Yttrium
@@ -28,20 +29,17 @@ namespace Yttrium
 	class MusicReaderImpl final : public MusicReader
 	{
 	public:
-		explicit MusicReaderImpl(std::unique_ptr<Source>&&);
+		explicit MusicReaderImpl(std::unique_ptr<Source>&& source)
+			: _reader{ std::move(source) } {}
 
-		bool set_properties(int end_ms, int loop_ms) noexcept override;
+		bool set_properties(int end_ms, int loop_ms) noexcept override { return _reader.set_loop(std::chrono::milliseconds{ loop_ms }, std::chrono::milliseconds{ end_ms }); }
 
-		size_t buffer_size() const noexcept { return _buffer_frames * _frame_bytes; }
-		AudioFormat format() const noexcept;
-		size_t read(void*);
-		void seek_start();
+		size_t buffer_size() const noexcept { return _reader.format().frames_per_second() * _reader.format().frame_bytes(); }
+		AudioFormat format() const noexcept { return _reader.format(); }
+		size_t read(void* buffer) { return _reader.read(buffer, buffer_size()); }
+		void seek_start() { _reader.seek(0); }
 
 	private:
 		AudioReader _reader;
-		const size_t _frame_bytes;
-		const size_t _buffer_frames;
-		uint64_t _end_frame = 0;
-		uint64_t _loop_frame = 0;
 	};
 }
