@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ namespace Yttrium
 {
 	class AudioFormat;
 	class Writer;
+
+	///
+	Y_CORE_API bool transform_audio(size_t frames, size_t src_sample_size, size_t src_channels, const void* src_data, size_t dst_sample_size, size_t dst_channels, void* dst_data);
 
 	///
 	Y_CORE_API bool write_wav_header(Writer&, const AudioFormat&, size_t samples);
