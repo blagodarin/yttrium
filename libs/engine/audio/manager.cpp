@@ -16,13 +16,8 @@
 
 #include "manager.h"
 
-#include <yttrium/audio/reader.h>
-#include <yttrium/audio/sound.h>
-#include <yttrium/memory/buffer.h>
-#include "backend.h"
+#include "mixer.h"
 #include "sound.h"
-
-#include <cstring>
 
 #ifdef _WIN32
 // TODO: Implement.
@@ -72,50 +67,58 @@ namespace Yttrium
 	{
 		{
 			std::scoped_lock lock{ _mutex };
-			if (music == _music)
-				return;
-			_music = music;
+			_commands.emplace_back(PlayMusic{ music });
 		}
 		_condition.notify_one();
 	}
 
-	void AudioManagerImpl::play_sound(const std::shared_ptr<Sound>&)
+	void AudioManagerImpl::play_sound(const std::shared_ptr<Sound>& sound)
 	{
+		{
+			std::scoped_lock lock{ _mutex };
+			_commands.emplace_back(PlaySound{ sound });
+		}
+		_condition.notify_one();
 	}
 
 	void AudioManagerImpl::run()
 	{
-		::set_high_priority();
-		const auto buffer_info = _backend->buffer_info();
-		Buffer buffer{ buffer_info._size };
-		for (;;)
+		struct Context
 		{
-			decltype(_music) music;
+			AudioMixer _mixer;
+			explicit Context(const AudioBackend::BufferInfo& buffer_info) noexcept
+				: _mixer{ buffer_info } {}
+			void operator()(const PlayMusic& command) { _mixer.play_music(command._music); }
+			void operator()(const PlaySound& command) { _mixer.play_sound(command._sound); }
+		};
+
+		::set_high_priority();
+		for (Context context{ _backend->buffer_info() };;)
+		{
+			Command command;
 			{
 				std::unique_lock lock{ _mutex };
-				_condition.wait(lock, [this] { return _music || _done; });
+				_condition.wait(lock, [this] { return !_commands.empty() || _done; });
 				if (_done)
 					break;
-				if (_music->format() != buffer_info._format)
-				{
-					_music.reset();
-					continue;
-				}
-				music = _music;
+				command = std::move(_commands.front());
+				_commands.pop_front();
 			}
-			music->seek(0);
-			for (;;)
+			std::visit(context, command);
+			while (const auto buffer = context._mixer.mix_buffer())
 			{
-				const auto bytes_read = music->read(buffer.data(), buffer_info._size);
-				if (!bytes_read)
-					break;
-				if (bytes_read < buffer_info._size)
-					std::memset(buffer.begin() + bytes_read, 0, buffer_info._size - bytes_read);
-				if (!_backend->write_buffer(buffer.begin(), _done))
+				if (!_backend->write_buffer(buffer, _done))
 					_done = true;
-				std::scoped_lock lock{ _mutex };
-				if (_music != music || _done)
+				if (_done)
 					break;
+				{
+					std::scoped_lock lock{ _mutex };
+					if (_commands.empty())
+						continue;
+					command = std::move(_commands.front());
+					_commands.pop_front();
+				}
+				std::visit(context, command);
 			}
 		}
 		_backend->flush();

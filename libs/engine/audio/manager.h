@@ -20,9 +20,10 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <memory>
+#include <deque>
 #include <mutex>
 #include <thread>
+#include <variant>
 
 namespace Yttrium
 {
@@ -42,10 +43,22 @@ namespace Yttrium
 		void run();
 
 	private:
+		struct PlayMusic
+		{
+			std::shared_ptr<AudioReader> _music;
+		};
+
+		struct PlaySound
+		{
+			std::shared_ptr<Sound> _sound;
+		};
+
+		using Command = std::variant<PlayMusic, PlaySound>;
+
 		const std::unique_ptr<AudioBackend> _backend;
 		std::mutex _mutex;
 		std::condition_variable _condition;
-		std::shared_ptr<AudioReader> _music;
+		std::deque<Command> _commands;
 		std::atomic<bool> _done{ false };
 		std::thread _thread;
 	};

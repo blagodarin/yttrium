@@ -118,6 +118,8 @@ y_sources(yengine "src/audio"
 	audio/backend.h
 	audio/manager.cpp
 	audio/manager.h
+	audio/mixer.cpp
+	audio/mixer.h
 	audio/sound.h
 	)
 if(WIN32)
