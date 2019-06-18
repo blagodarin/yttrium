@@ -18,6 +18,7 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/storage/writer.h>
+#include "../utils/processing.h"
 #include "wav.h"
 
 #include <cstring>
@@ -29,16 +30,6 @@ namespace
 		- sizeof(Yttrium::WavFileHeader)
 		- sizeof(Yttrium::WavChunkHeader) - sizeof(Yttrium::WavFormatChunk)
 		- sizeof(Yttrium::WavChunkHeader);
-
-	void copy_1x16_2x16(size_t src_count, const uint16_t* src, uint16_t* dst)
-	{
-		for (size_t i = 0; i < src_count; ++i)
-		{
-			const auto x = *src++;
-			*dst++ = x;
-			*dst++ = x;
-		}
-	}
 }
 
 namespace Yttrium
@@ -56,7 +47,7 @@ namespace Yttrium
 
 		if (src_channels == 1 && dst_channels == 2)
 		{
-			copy_1x16_2x16(frames, static_cast<const uint16_t*>(src_data), static_cast<uint16_t*>(dst_data));
+			duplicate_i16(dst_data, src_data, frames);
 			return true;
 		}
 

@@ -226,6 +226,8 @@ y_sources(ycore "src/utils"
 	utils/crc32.h
 	utils/fourcc.h
 	utils/memory.h
+	utils/processing.cpp
+	utils/processing.h
 	utils/string.cpp
 	utils/string.h
 	)
