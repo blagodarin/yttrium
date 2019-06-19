@@ -23,12 +23,11 @@ namespace Yttrium
 	class SoundImpl final : public Sound
 	{
 	public:
+		AudioReader _reader;
+
 		explicit SoundImpl(std::unique_ptr<Source>&& source)
 			: _reader{ std::move(source) } {}
 
 		~SoundImpl() override = default;
-
-	private:
-		AudioReader _reader;
 	};
 }

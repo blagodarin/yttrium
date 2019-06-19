@@ -23,6 +23,7 @@ namespace Yttrium
 {
 	class AudioReader;
 	class Sound;
+	class SoundImpl;
 
 	class AudioMixer
 	{
@@ -35,8 +36,14 @@ namespace Yttrium
 		void play_sound(const std::shared_ptr<Sound>&);
 
 	private:
+		bool read(Buffer& out, Buffer& tmp, AudioReader&);
+
+	private:
 		const AudioBackend::BufferInfo _buffer_info;
 		Buffer _buffer{ _buffer_info._size };
+		Buffer _mix_buffer{ _buffer_info._size };
+		Buffer _conversion_buffer{ _buffer_info._size };
 		std::shared_ptr<AudioReader> _music;
+		std::shared_ptr<SoundImpl> _sound;
 	};
 }
