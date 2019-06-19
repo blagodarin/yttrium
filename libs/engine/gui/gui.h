@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <yttrium/audio/manager.h>
 #include "actions.h"
 #include "cursor.h"
 #include "key_lookup.h"
@@ -30,7 +31,6 @@ namespace Yttrium
 	class Canvas;
 	class Gui;
 	class GuiScreen;
-	class MusicReader;
 	class RectF;
 	class RenderPass;
 	class ResourceLoader;
@@ -42,7 +42,7 @@ namespace Yttrium
 	class GuiPrivate
 	{
 	public:
-		explicit GuiPrivate(ScriptContext&) noexcept;
+		explicit GuiPrivate(ScriptContext&, const std::shared_ptr<AudioManager>&) noexcept;
 		~GuiPrivate();
 
 		GuiScreen& add_screen(std::string_view name, bool is_root);
@@ -52,9 +52,15 @@ namespace Yttrium
 			if (_on_custom_cursor)
 				_on_custom_cursor(pass, point);
 		}
+		std::shared_ptr<Sound> load_sound(ResourceLoader&, std::string_view name);
 		void on_canvas_draw(RenderPass&, const std::string& name, const RectF&) const;
 		void on_canvas_mouse_move(const std::string& name, const RectF&, const Vector2&);
 		bool on_canvas_mouse_press(const std::string& name, const RectF&, Key, const Vector2&);
+		void play_sound(const std::shared_ptr<Sound>& sound)
+		{
+			if (_audio_manager)
+				_audio_manager->play_sound(sound);
+		}
 		bool pop_screen();
 		bool pop_screens_until(const std::string& name);
 		bool push_screen(const std::string& name);
@@ -72,12 +78,15 @@ namespace Yttrium
 	private:
 		void enter_screen(GuiScreen&);
 		void leave_screen();
-		bool update_music() noexcept;
+		void update_music();
 
 	private:
 		ScriptContext& _script_context;
 		std::string _title;
 		std::string _icon_path;
+		std::shared_ptr<AudioManager> _audio_manager;
+		std::shared_ptr<AudioReader> _current_music;
+		std::map<std::string, std::shared_ptr<Sound>, std::less<>> _sounds;
 		std::unordered_map<std::string_view, std::unique_ptr<GuiScreen>> _screens;
 		GuiScreen* _root_screen = nullptr;
 		std::vector<GuiScreen*> _screen_stack;
@@ -86,10 +95,8 @@ namespace Yttrium
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
 		std::unordered_map<std::string, Canvas*> _canvases;
 		std::function<void(RenderPass&, const Vector2&)> _on_custom_cursor;
-		std::function<void(const std::shared_ptr<MusicReader>&)> _on_music;
 		std::function<void()> _on_quit;
 		std::size_t _screen_recursion = 0;
-		std::shared_ptr<MusicReader> _current_music;
 		std::vector<std::pair<std::string, std::vector<std::string>>> _startup_commands;
 
 		friend Gui;

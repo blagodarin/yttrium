@@ -16,37 +16,33 @@
 
 #pragma once
 
-#include <yttrium/audio/player.h>
-
-#include <condition_variable>
-#include <mutex>
-#include <thread>
+#include <yttrium/memory/buffer.h>
+#include "backend.h"
 
 namespace Yttrium
 {
-	class AudioBackend;
-	class MusicReaderImpl;
+	class AudioReader;
+	class Sound;
+	class SoundImpl;
 
-	class AudioPlayerPrivate
+	class AudioMixer
 	{
 	public:
-		explicit AudioPlayerPrivate(AudioBackend&);
-		~AudioPlayerPrivate() noexcept;
+		explicit AudioMixer(const AudioBackend::BufferInfo&) noexcept;
 
-		void set_music(const std::shared_ptr<MusicReaderImpl>&);
-		void set_paused(bool);
-
-	private:
-		void run();
+		const uint8_t* mix_buffer();
+		void play_music(const std::shared_ptr<AudioReader>&);
+		void play_sound(const std::shared_ptr<Sound>&);
 
 	private:
-		AudioBackend& _backend;
-		std::mutex _mutex;
-		std::condition_variable _condition;
-		bool _paused = false;
-		std::shared_ptr<MusicReaderImpl> _music;
-		bool _music_changed = false;
-		bool _terminate = false;
-		std::thread _thread;
+		bool read(Buffer& out, Buffer& tmp, AudioReader&);
+
+	private:
+		const AudioBackend::BufferInfo _buffer_info;
+		Buffer _buffer{ _buffer_info._size };
+		Buffer _mix_buffer{ _buffer_info._size };
+		Buffer _conversion_buffer{ _buffer_info._size };
+		std::shared_ptr<AudioReader> _music;
+		std::shared_ptr<SoundImpl> _sound;
 	};
 }

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
-/// \file
-/// \brief Memory buffers.
 
 #ifndef _include_yttrium_memory_buffer_h_
 #define _include_yttrium_memory_buffer_h_
@@ -33,7 +30,7 @@ namespace Yttrium
 	{
 	public:
 		/// Creates a buffer with no data.
-		Buffer() noexcept = default;
+		constexpr Buffer() noexcept = default;
 
 		/// Creates a buffer of the specified size with uninitialized contents.
 		explicit Buffer(size_t);
@@ -42,19 +39,19 @@ namespace Yttrium
 		Buffer(size_t, const void*);
 
 		///
-		uint8_t* begin() noexcept { return static_cast<uint8_t*>(_data); }
-		const uint8_t* begin() const noexcept { return static_cast<const uint8_t*>(_data); }
+		constexpr uint8_t* begin() noexcept { return static_cast<uint8_t*>(_data); }
+		constexpr const uint8_t* begin() const noexcept { return static_cast<const uint8_t*>(_data); }
 
 		/// Returns the size of memory allocated for the buffer.
-		size_t capacity() const noexcept { return _capacity; }
+		constexpr size_t capacity() const noexcept { return _capacity; }
 
 		///
-		void* data() noexcept { return _data; }
-		const void* data() const noexcept { return _data; }
+		constexpr void* data() noexcept { return _data; }
+		constexpr const void* data() const noexcept { return _data; }
 
 		///
-		uint8_t* end() noexcept { return static_cast<uint8_t*>(_data) + _size; }
-		const uint8_t* end() const noexcept { return static_cast<const uint8_t*>(_data) + _size; }
+		constexpr uint8_t* end() noexcept { return static_cast<uint8_t*>(_data) + _size; }
+		constexpr const uint8_t* end() const noexcept { return static_cast<const uint8_t*>(_data) + _size; }
 
 		///
 		void reserve(size_t);
@@ -67,14 +64,14 @@ namespace Yttrium
 		void resize(size_t);
 
 		/// Returns the requested size of the buffer.
-		size_t size() const noexcept { return _size; }
+		constexpr size_t size() const noexcept { return _size; }
 
 		/// Releases unused buffer capacity if possible.
 		void shrink_to_fit();
 
 		///
-		uint8_t& operator[](size_t offset) noexcept { return static_cast<uint8_t*>(_data)[offset]; }
-		const uint8_t& operator[](size_t offset) const noexcept { return static_cast<const uint8_t*>(_data)[offset]; }
+		constexpr uint8_t& operator[](size_t offset) noexcept { return static_cast<uint8_t*>(_data)[offset]; }
+		constexpr const uint8_t& operator[](size_t offset) const noexcept { return static_cast<const uint8_t*>(_data)[offset]; }
 
 		/// Returns the granularity of buffer memory, i.e. the size of a memory page.
 		static size_t memory_granularity() noexcept;

@@ -45,12 +45,12 @@ y_sources(ycore "include/audio"
 	../../include/yttrium/audio/utils.h
 	)
 y_sources(ycore "src/audio"
+	audio/decoder.h
 	audio/reader.cpp
-	audio/reader.h
 	audio/utils.cpp
+	audio/wav.h
 	)
 y_sources(ycore "src/audio/formats"
-	audio/formats/wav_private.h
 	audio/formats/wav.cpp
 	audio/formats/wav.h
 	)
@@ -226,6 +226,8 @@ y_sources(ycore "src/utils"
 	utils/crc32.h
 	utils/fourcc.h
 	utils/memory.h
+	utils/processing.cpp
+	utils/processing.h
 	utils/string.cpp
 	utils/string.h
 	)

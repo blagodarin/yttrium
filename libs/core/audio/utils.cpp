@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/storage/writer.h>
-#include "formats/wav_private.h"
+#include "../utils/processing.h"
+#include "wav.h"
 
+#include <cstring>
 #include <limits>
 
 namespace
 {
-	const size_t _max_wav_data_size = std::numeric_limits<int32_t>::max()
+	constexpr size_t _max_wav_data_size = std::numeric_limits<int32_t>::max()
 		- sizeof(Yttrium::WavFileHeader)
 		- sizeof(Yttrium::WavChunkHeader) - sizeof(Yttrium::WavFormatChunk)
 		- sizeof(Yttrium::WavChunkHeader);
@@ -32,18 +34,44 @@ namespace
 
 namespace Yttrium
 {
+	bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames)
+	{
+		if (dst_format.frames_per_second() != src_format.frames_per_second())
+			return false;
+
+		if (dst_format.bytes_per_sample() != 2 || src_format.bytes_per_sample() != 2)
+			return false;
+
+		const auto dst_channels = dst_format.channels();
+		const auto src_channels = src_format.channels();
+
+		if (dst_channels == src_channels)
+		{
+			std::memcpy(dst, src, frames * src_format.frame_bytes());
+			return true;
+		}
+
+		if (dst_channels == 2 && src_channels == 1)
+		{
+			duplicate_i16(dst, src, frames);
+			return true;
+		}
+
+		return false;
+	}
+
 	bool write_wav_header(Writer& writer, const AudioFormat& format, size_t samples)
 	{
 		if (!(format.bytes_per_sample() == 1 || format.bytes_per_sample() == 2)
 			|| !(format.channels() == 1 || format.channels() == 2)
-			|| !(format.samples_per_second() >= 8000 && format.samples_per_second() <= 192'000)
+			|| !(format.frames_per_second() >= 8000 && format.frames_per_second() <= 192'000)
 			|| samples > ::_max_wav_data_size / format.bytes_per_sample())
 			return false;
 
 		WavFormatChunk format_chunk;
 		format_chunk.format = WAVE_FORMAT_PCM;
 		format_chunk.channels = static_cast<uint16_t>(format.channels());
-		format_chunk.samples_per_second = static_cast<uint32_t>(format.samples_per_second());
+		format_chunk.samples_per_second = static_cast<uint32_t>(format.frames_per_second());
 		format_chunk.bits_per_sample = static_cast<uint16_t>(format.bytes_per_sample() * 8);
 		format_chunk.block_align = static_cast<uint16_t>(format_chunk.channels * format_chunk.bits_per_sample / 8);
 		format_chunk.bytes_per_second = format_chunk.samples_per_second * format_chunk.block_align;

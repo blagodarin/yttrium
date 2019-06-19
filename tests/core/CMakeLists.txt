@@ -15,6 +15,7 @@
 #
 
 add_executable(ycore_tests
+	audio.cpp
 	buffer.cpp
 	buffer_appender.cpp
 	color.cpp
@@ -39,6 +40,7 @@ add_executable(ycore_tests
 	test_utils.cpp
 	translation.cpp
 	utils_numeric.cpp
+	utils_processing.cpp
 	utils_string.cpp
 	vector.cpp
 	)

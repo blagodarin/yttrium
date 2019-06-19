@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,6 @@ TEST_CASE("resource_loader.load")
 
 	CHECK(!resource_loader.load_material("material"));
 	CHECK(!resource_loader.load_mesh("mesh"));
-	CHECK(!resource_loader.load_sound("sound"));
 	CHECK(!resource_loader.load_texture_2d("texture_2d"));
 }
 

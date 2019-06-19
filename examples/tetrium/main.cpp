@@ -17,7 +17,6 @@
 #include <yttrium/application.h>
 #include <yttrium/audio/format.h>
 #include <yttrium/audio/manager.h>
-#include <yttrium/audio/player.h>
 #include <yttrium/audio/utils.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
@@ -33,6 +32,8 @@
 #include <yttrium/window.h>
 #include "../common/utils.h"
 #include "graphics.h"
+
+#include <iostream>
 
 using namespace Yttrium;
 
@@ -84,6 +85,20 @@ namespace
 			}
 		}
 		storage.attach_buffer(name, std::move(buffer));
+	}
+
+	template <typename T, typename... Args>
+	auto try_create(Args&&... args) -> decltype(T::create(std::forward<Args>(args)...))
+	{
+		try
+		{
+			return T::create(std::forward<Args>(args)...);
+		}
+		catch (const std::runtime_error& e)
+		{
+			std::cerr << e.what() << '\n';
+			return {};
+		}
 	}
 
 	class LogoCanvas : public Canvas
@@ -208,17 +223,10 @@ int main(int, char**)
 	::make_cursor_texture<64>(storage, "data/textures/cursor.tga");
 	::make_sound(storage, "data/sounds/sound.wav");
 
-	std::optional<AudioManager> audio;
-	try
-	{
-		audio.emplace();
-	}
-	catch (const InitializationError&)
-	{
-	}
+	const auto audio = try_create<AudioManager>();
 
-	ResourceLoader resource_loader{ storage, &window.render_manager(), audio ? &*audio : nullptr };
-	Gui gui{ resource_loader, script, "data/gui.ion" };
+	ResourceLoader resource_loader{ storage, &window.render_manager() };
+	Gui gui{ "data/gui.ion", resource_loader, script, audio };
 	gui.on_quit([&window] { window.close(); });
 
 	application.on_update([&script, &gui, &logic](const UpdateEvent& event) {
@@ -247,13 +255,6 @@ int main(int, char**)
 
 	NextFigureCanvas next_figure_canvas{ logic, graphics };
 	gui.bind_canvas("next", next_figure_canvas);
-
-	std::optional<AudioPlayer> audio_player;
-	if (audio)
-	{
-		audio_player.emplace(*audio);
-		gui.on_music([&audio_player](const std::shared_ptr<MusicReader>& music) { audio_player->set_music(music); });
-	}
 
 	gui.start();
 	window.set_title(gui.title());

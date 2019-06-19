@@ -58,9 +58,6 @@ if(Y_RENDERER_OPENGL)
 		)
 endif()
 if(UNIX)
-	y_sources(yengine "src/application"
-		application/openal.h
-		)
 	if(Y_RENDERER_OPENGL)
 		y_sources(yengine "src/application/_x11"
 			application/_x11/application.cpp
@@ -115,45 +112,28 @@ endif()
 # audio
 y_sources(yengine "include/audio"
 	../../include/yttrium/audio/manager.h
-	../../include/yttrium/audio/music_reader.h
-	../../include/yttrium/audio/player.h
 	../../include/yttrium/audio/sound.h
 	)
 y_sources(yengine "src/audio"
 	audio/backend.h
 	audio/manager.cpp
 	audio/manager.h
-	audio/music_reader.cpp
-	audio/music_reader.h
-	audio/player.cpp
-	audio/player.h
-	audio/streamer.cpp
-	audio/streamer.h
+	audio/mixer.cpp
+	audio/mixer.h
+	audio/sound.h
 	)
 if(WIN32)
-	y_sources(yengine "src/audio/_wasapi"
-		audio/_wasapi/backend.cpp
-		audio/_wasapi/backend.h
-		audio/_wasapi/player.cpp
-		audio/_wasapi/player.h
-		audio/_wasapi/sound.cpp
-		audio/_wasapi/sound.h
+	y_sources(yengine "src/audio/wasapi"
+		audio/wasapi/backend.cpp
+		audio/wasapi/backend.h
 		)
 else()
-	find_package(OpenAL REQUIRED)
-	y_sources(yengine "src/audio/_openal"
-		audio/_openal/backend.cpp
-		audio/_openal/backend.h
-		audio/_openal/format.cpp
-		audio/_openal/format.h
-		audio/_openal/player.cpp
-		audio/_openal/player.h
-		audio/_openal/sound.cpp
-		audio/_openal/sound.h
-		audio/_openal/wrappers.h
+	find_package(ALSA REQUIRED)
+	y_sources(yengine "src/audio/alsa"
+		audio/alsa/backend.cpp
+		audio/alsa/backend.h
 		)
-	target_include_directories(yengine SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
-	target_link_libraries(yengine PRIVATE ${OPENAL_LIBRARY})
+	target_link_libraries(yengine PRIVATE ALSA::ALSA)
 endif()
 
 ########################################################################################################################

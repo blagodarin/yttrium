@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 
 #include <yttrium/exceptions.h>
 #include "../../application/_windows/error.h"
-#include "player.h"
-#include "sound.h"
 
 namespace Yttrium
 {
@@ -50,16 +48,6 @@ namespace Yttrium
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;
-
-	std::unique_ptr<AudioPlayerBackend> WasapiAudioBackend::create_player()
-	{
-		return std::make_unique<WasapiAudioPlayer>();
-	}
-
-	std::unique_ptr<Sound> WasapiAudioBackend::create_sound(AudioReader& reader)
-	{
-		return std::make_unique<WasapiSound>(reader);
-	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create()
 	{

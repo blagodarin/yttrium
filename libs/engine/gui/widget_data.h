@@ -109,7 +109,7 @@ namespace Yttrium
 		};
 
 		RectF _rect;
-		std::shared_ptr<const Sound> _sound;
+		std::shared_ptr<Sound> _sound;
 		std::map<Style, StyleData> _styles;
 		std::map<Action, GuiActions> _actions;
 		std::optional<Style> _fixed_style;

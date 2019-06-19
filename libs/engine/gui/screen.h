@@ -28,9 +28,9 @@
 
 namespace Yttrium
 {
+	class AudioReader;
 	class GuiLayout;
 	class GuiPrivate;
-	class MusicReader;
 	class RenderPass;
 	class Texture2D;
 	class Widget;
@@ -50,7 +50,7 @@ namespace Yttrium
 		bool handle_text(std::string_view);
 		bool has_music() const noexcept { return _has_music; }
 		bool is_transparent() const noexcept { return _is_transparent; }
-		const std::shared_ptr<MusicReader>& music() const { return _music; }
+		const std::shared_ptr<AudioReader>& music() const { return _music; }
 		std::string_view name() const { return _name; }
 		void register_widget(Widget&);
 		void set_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture)
@@ -58,7 +58,7 @@ namespace Yttrium
 			_cursor = cursor;
 			_cursor_texture = texture;
 		}
-		void set_music(std::shared_ptr<MusicReader>&&);
+		void set_music(std::shared_ptr<AudioReader>&&);
 		void set_on_enter(GuiActions&& actions) { _on_enter = std::move(actions); }
 		void set_on_event(std::string_view event, GuiActions&& actions) { _on_event.insert_or_assign(std::string{ event }, std::move(actions)); }
 		void set_on_key(std::string_view key, GuiActions&& on_press, GuiActions&& on_release) { _on_key.insert_or_assign(lookup_key(key), std::make_pair(std::move(on_press), std::move(on_release))); }
@@ -84,7 +84,7 @@ namespace Yttrium
 		GuiActions _on_return;
 		GuiCursor _cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _cursor_texture;
-		std::shared_ptr<MusicReader> _music;
+		std::shared_ptr<AudioReader> _music;
 		bool _has_music = false;
 		std::chrono::steady_clock::time_point _enter_time;
 	};

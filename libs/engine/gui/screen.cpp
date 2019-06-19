@@ -230,7 +230,7 @@ namespace Yttrium
 		_widgets.emplace_back(&widget);
 	}
 
-	void GuiScreen::set_music(std::shared_ptr<MusicReader>&& music)
+	void GuiScreen::set_music(std::shared_ptr<AudioReader>&& music)
 	{
 		_music = music;
 		_has_music = true;

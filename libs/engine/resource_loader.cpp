@@ -16,8 +16,6 @@
 
 #include <yttrium/resource_loader.h>
 
-#include <yttrium/audio/manager.h>
-#include <yttrium/audio/sound.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/image.h>
 #include <yttrium/ion/reader.h>
@@ -100,14 +98,13 @@ namespace Yttrium
 	class ResourceLoaderPrivate
 	{
 	public:
-		ResourceLoaderPrivate(const Storage& storage, RenderManager* render_manager, AudioManager* audio_manager)
-			: _storage{ storage }, _render_manager{ render_manager }, _audio_manager{ audio_manager } {}
+		ResourceLoaderPrivate(const Storage& storage, RenderManager* render_manager)
+			: _storage{ storage }, _render_manager{ render_manager } {}
 
 		bool release_unused()
 		{
 			auto released = _material_cache.release_unused(); // Uses textures.
 			released += _mesh_cache.release_unused();
-			released += _sound_cache.release_unused();
 			released += _texture_2d_cache.release_unused();
 			released += _translation_cache.release_unused();
 			return released > 0;
@@ -116,16 +113,14 @@ namespace Yttrium
 	public:
 		const Storage& _storage;
 		RenderManager* const _render_manager = nullptr;
-		AudioManager* const _audio_manager = nullptr;
 		ResourceCache<Material> _material_cache{ _storage };
 		ResourceCache<Mesh> _mesh_cache{ _storage };
-		ResourceCache<Sound> _sound_cache{ _storage };
 		ResourceCache<Texture2D> _texture_2d_cache{ _storage };
 		ResourceCache<Translation> _translation_cache{ _storage };
 	};
 
-	ResourceLoader::ResourceLoader(const Storage& storage, RenderManager* render_manager, AudioManager* audio_manager)
-		: _private{ std::make_unique<ResourceLoaderPrivate>(storage, render_manager, audio_manager) }
+	ResourceLoader::ResourceLoader(const Storage& storage, RenderManager* render_manager)
+		: _private{ std::make_unique<ResourceLoaderPrivate>(storage, render_manager) }
 	{
 	}
 
@@ -196,15 +191,6 @@ namespace Yttrium
 			return {};
 		return _private->_mesh_cache.fetch(name, [this](std::unique_ptr<Source>&& source) {
 			return _private->_render_manager->load_mesh(*source);
-		});
-	}
-
-	std::shared_ptr<const Sound> ResourceLoader::load_sound(std::string_view name)
-	{
-		if (!_private->_audio_manager)
-			return {};
-		return _private->_sound_cache.fetch(name, [this](std::unique_ptr<Source>&& source) {
-			return _private->_audio_manager->create_sound(std::move(source));
 		});
 	}
 

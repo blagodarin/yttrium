@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,29 +16,14 @@
 
 #pragma once
 
-#include "../backend.h"
-#include "format.h"
-#include "wrappers.h"
+#include <yttrium/api.h>
+
+#include <cstddef>
+#include <cstdint>
 
 namespace Yttrium
 {
-	class OpenALPlayer final : public AudioPlayerBackend
-	{
-	public:
-		OpenALPlayer();
+	Y_CORE_API void add_saturate_i16(void* dst, const void* src, size_t count);
 
-	private:
-		void set_format(const AudioFormat&) override;
-		void fill_buffer(size_t index, void* data, size_t size) override;
-		size_t check_buffers() override;
-		void refill_buffer(void* data, size_t size) override;
-		void play() override;
-		void pause() override;
-		void stop() noexcept override;
-
-	private:
-		OpenALSource _source;
-		OpenALBuffers<2> _buffers;
-		OpenALFormat _format;
-	};
+	void duplicate_i16(void* dst, const void* src, size_t src_count);
 }

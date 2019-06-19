@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@
 
 #include <yttrium/api.h>
 
+#include <chrono>
 #include <memory>
 
 namespace Yttrium
 {
+	class AudioDecoder;
 	class AudioFormat;
 	class Source;
 
@@ -31,31 +33,31 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<AudioReader> open(std::unique_ptr<Source>&&);
+		explicit AudioReader(std::unique_ptr<Source>&&);
+		~AudioReader() noexcept;
 
-		virtual ~AudioReader() noexcept = default;
+		/// Returns audio format.
+		AudioFormat format() const noexcept;
 
-		/// Returns the current sample offset.
-		virtual uint64_t current_sample() const noexcept = 0;
+		///
+		size_t read(void* buffer, size_t bytes_to_read);
 
-		/// Returns the audio format.
-		virtual AudioFormat format() const noexcept = 0;
+		/// Moves the audio offset to the specified position in frames.
+		bool seek(uint64_t offset);
 
-		/// Reads at most \a size bytes into \a buffer.
-		/// \param buffer Buffer to read into.
-		/// \param bytes_to_read Number of bytes to read.
-		/// \return Number of bytes read or 0 on failure.
-		/// \note The passed \a size is rounded down to the sample scale before the actual reading.
-		virtual size_t read(void* buffer, size_t bytes_to_read) = 0;
-
-		/// Moves the audio offset to the specified position in samples.
-		virtual bool seek(uint64_t offset) = 0;
+		///
+		bool set_loop(std::chrono::milliseconds from, std::chrono::milliseconds to = std::chrono::milliseconds::max()) noexcept;
 
 		/// Returns the audio size in bytes.
-		virtual uint64_t total_bytes() const noexcept = 0;
+		uint64_t total_bytes() const noexcept;
 
-		/// Returns the audio size in samples.
-		virtual uint64_t total_samples() const noexcept = 0;
+		AudioReader(const AudioReader&) = delete;
+		AudioReader& operator=(const AudioReader&) = delete;
+
+	private:
+		const std::unique_ptr<AudioDecoder> _decoder;
+		uint64_t _end_frame;
+		uint64_t _loop_frame;
 	};
 }
 

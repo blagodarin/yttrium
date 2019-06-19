@@ -16,7 +16,7 @@
 
 #include "loader.h"
 
-#include <yttrium/audio/music_reader.h>
+#include <yttrium/audio/reader.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/textured_rect.h>
@@ -182,7 +182,7 @@ namespace Yttrium
 		ResourceLoader& _resource_loader;
 		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
-		std::unordered_map<std::string, std::shared_ptr<MusicReader>> _music;
+		std::unordered_map<std::string, std::shared_ptr<AudioReader>> _music;
 		std::unordered_map<std::string, std::shared_ptr<const Font>> _fonts;
 		std::shared_ptr<const Translation> _translation;
 	};
@@ -325,7 +325,6 @@ namespace Yttrium
 		if (music_name.empty())
 			throw GuiDataError{ "Empty music name" };
 		std::string_view music_file;
-		int music_start = 0;
 		int music_end = 0;
 		int music_loop = 0;
 		token.next(ion).check_object_begin();
@@ -333,8 +332,6 @@ namespace Yttrium
 		{
 			if (const auto entry_name = token.to_name(); entry_name == "file")
 				music_file = token.next(ion).to_value();
-			else if (entry_name == "start")
-				music_start = time_from_chars(token.next(ion).to_value());
 			else if (entry_name == "end")
 				music_end = time_from_chars(token.next(ion).to_value());
 			else if (entry_name == "loop")
@@ -347,8 +344,8 @@ namespace Yttrium
 			throw GuiDataError{ "No music file specified" };
 		token.next(ion);
 		//
-		auto music = MusicReader::open(_resource_loader.open(music_file));
-		music->set_properties(music_start, music_end, music_loop);
+		auto music = std::make_shared<AudioReader>(_resource_loader.open(music_file));
+		music->set_loop(std::chrono::milliseconds{ music_loop }, std::chrono::milliseconds{ music_end });
 		_music.insert_or_assign(std::string{ music_name }, std::move(music));
 	}
 
@@ -494,7 +491,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_screen_music(GuiScreen& screen, IonReader& ion, IonToken& token, int) const
 	{
-		std::shared_ptr<MusicReader> music;
+		std::shared_ptr<AudioReader> music;
 		if (const std::string music_name{ token.to_value() }; !music_name.empty())
 		{
 			const auto i = _music.find(music_name);
@@ -636,7 +633,7 @@ namespace Yttrium
 
 	void GuiIonLoader::load_widget_sound(WidgetData& data, IonReader& ion, IonToken& token) const
 	{
-		data._sound = _resource_loader.load_sound(token.to_value());
+		data._sound = _gui.load_sound(_resource_loader, token.to_value());
 		token.next(ion);
 	}
 
