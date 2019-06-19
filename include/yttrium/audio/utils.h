@@ -27,7 +27,7 @@ namespace Yttrium
 	class Writer;
 
 	///
-	Y_CORE_API bool transform_audio(size_t frames, size_t src_sample_size, size_t src_channels, const void* src_data, size_t dst_sample_size, size_t dst_channels, void* dst_data);
+	Y_CORE_API bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames);
 
 	///
 	Y_CORE_API bool write_wav_header(Writer&, const AudioFormat&, size_t samples);

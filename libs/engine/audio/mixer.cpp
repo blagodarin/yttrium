@@ -21,10 +21,17 @@
 #include "../../core/utils/processing.h"
 #include "sound.h"
 
+#include <cassert>
 #include <cstring>
 
 namespace Yttrium
 {
+	AudioMixer::AudioMixer(const AudioBackend::BufferInfo& buffer_info) noexcept
+		: _buffer_info{ buffer_info }
+	{
+		assert(_buffer_info._format.bytes_per_sample() == 2);
+	}
+
 	const uint8_t* AudioMixer::mix_buffer()
 	{
 		Buffer* out = &_buffer;
@@ -84,7 +91,7 @@ namespace Yttrium
 			if (!tmp_bytes)
 				return false;
 			const auto frames = tmp_bytes / format.frame_bytes();
-			if (!transform_audio(frames, format.bytes_per_sample(), format.channels(), tmp.data(), _buffer_info._format.bytes_per_sample(), _buffer_info._format.channels(), out.data()))
+			if (!transform_audio(out.data(), _buffer_info._format, tmp.data(), format, frames))
 				return false;
 			const auto out_bytes = frames * _buffer_info._format.frame_bytes();
 			if (out_bytes < out.size())

@@ -34,20 +34,26 @@ namespace
 
 namespace Yttrium
 {
-	bool transform_audio(size_t frames, size_t src_sample_size, size_t src_channels, const void* src_data, size_t dst_sample_size, size_t dst_channels, void* dst_data)
+	bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames)
 	{
-		if (src_sample_size != 2 || dst_sample_size != 2)
+		if (dst_format.frames_per_second() != src_format.frames_per_second())
 			return false;
 
-		if (src_channels == dst_channels)
+		if (dst_format.bytes_per_sample() != 2 || src_format.bytes_per_sample() != 2)
+			return false;
+
+		const auto dst_channels = dst_format.channels();
+		const auto src_channels = src_format.channels();
+
+		if (dst_channels == src_channels)
 		{
-			std::memcpy(dst_data, src_data, frames * src_sample_size * src_channels);
+			std::memcpy(dst, src, frames * src_format.frame_bytes());
 			return true;
 		}
 
-		if (src_channels == 1 && dst_channels == 2)
+		if (dst_channels == 2 && src_channels == 1)
 		{
-			duplicate_i16(dst_data, src_data, frames);
+			duplicate_i16(dst, src, frames);
 			return true;
 		}
 

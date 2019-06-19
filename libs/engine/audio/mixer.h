@@ -28,8 +28,7 @@ namespace Yttrium
 	class AudioMixer
 	{
 	public:
-		explicit AudioMixer(const AudioBackend::BufferInfo& buffer_info) noexcept
-			: _buffer_info{ buffer_info } {}
+		explicit AudioMixer(const AudioBackend::BufferInfo&) noexcept;
 
 		const uint8_t* mix_buffer();
 		void play_music(const std::shared_ptr<AudioReader>&);
