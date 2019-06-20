@@ -30,7 +30,8 @@ namespace Yttrium
 		WasapiAudioBackend();
 		~WasapiAudioBackend() override;
 
-		BufferInfo buffer_info() const noexcept override { return {}; }
+		BufferInfo buffer_info() const noexcept override { return _buffer_info; }
+		std::unique_ptr<ThreadContext> create_thread_context() override;
 		void flush() override {}
 		bool write_buffer(const uint8_t*, const std::atomic<bool>&) override { return false; }
 
@@ -40,5 +41,7 @@ namespace Yttrium
 		ComInitializer _com{ COINIT_APARTMENTTHREADED };
 		ComPtr<IMMDevice> _device;
 		ComPtr<IAudioClient> _client;
+		BufferInfo _buffer_info;
+		ComPtr<IAudioRenderClient> _render_client;
 	};
 }

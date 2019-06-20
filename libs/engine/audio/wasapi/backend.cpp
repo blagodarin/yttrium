@@ -17,6 +17,7 @@
 #include "backend.h"
 
 #include <yttrium/exceptions.h>
+#include "../../../core/utils/memory.h"
 #include "../../application/_windows/error.h"
 
 namespace Yttrium
@@ -24,30 +25,58 @@ namespace Yttrium
 	WasapiAudioBackend::WasapiAudioBackend()
 	{
 		ComPtr<IMMDeviceEnumerator> enumerator;
-		auto hr = ::CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
+		auto hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
 		if (!enumerator)
-			throw InitializationError{ "CoCreateInstance failed: ", error_to_string(hr) };
+			throw BadCall{ "WASAPI", "CoCreateInstance", error_to_string(hr) };
 
 		hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &_device);
 		if (!_device)
-			throw InitializationError{ "IMMDeviceEnumerator::GetDefaultAudioEndpoint failed: ", error_to_string(hr) };
+			throw BadCall{ "WASAPI", "IMMDeviceEnumerator::GetDefaultAudioEndpoint", error_to_string(hr) };
 
 		hr = _device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(&_client));
 		if (!_client)
-			throw InitializationError{ "IMMDevice::Activate failed: ", error_to_string(hr) };
+			throw BadCall{ "WASAPI", "IMMDevice::Activate", error_to_string(hr) };
+
+		REFERENCE_TIME period;
+		hr = _client->GetDevicePeriod(nullptr, &period);
+		if (FAILED(hr))
+			throw BadCall{ "WASAPI", "IAudioClient::GetDevicePeriod", error_to_string(hr) };
 
 		WAVEFORMATEX* format = nullptr;
 		hr = _client->GetMixFormat(&format);
 		if (!format)
-			throw InitializationError{ "IAudioClient::GetMixFormat failed: ", error_to_string(hr) };
+			throw BadCall{ "WASAPI", "IAudioClient::GetMixFormat", error_to_string(hr) };
 
-		hr = _client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, 10'000'000, 0, format, nullptr);
-		::CoTaskMemFree(format);
+		UniquePtr<WAVEFORMATEX, CoTaskMemFree> format_deleter{ format };
+
+		hr = _client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, period, 0, format, nullptr);
 		if (FAILED(hr))
-			throw InitializationError{ "IAudioClient::Initialize failed: ", error_to_string(hr) };
+			throw BadCall{ "WASAPI", "IAudioClient::Initialize", error_to_string(hr) };
+
+		UINT32 buffer_frames;
+		hr = _client->GetBufferSize(&buffer_frames);
+		if (FAILED(hr))
+			throw BadCall{ "WASAPI", "IAudioClient::GetBufferSize", error_to_string(hr) };
+
+		hr = _client->GetService(__uuidof(IAudioRenderClient), reinterpret_cast<void**>(&_render_client));
+		if (!_render_client)
+			throw BadCall{ "WASAPI", "IAudioClient::GetService", error_to_string(hr) };
+
+		_buffer_info._format = { format->wBitsPerSample / 8u, format->nChannels, format->nSamplesPerSec };
+		_buffer_info._size = buffer_frames * _buffer_info._format.frame_bytes();
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;
+
+	std::unique_ptr<AudioBackend::ThreadContext> WasapiAudioBackend::create_thread_context()
+	{
+		struct WasapiThreadContext final : public ThreadContext
+		{
+			ComInitializer _com{ COINIT_APARTMENTTHREADED };
+		};
+
+		return std::make_unique<WasapiThreadContext>();
+	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create()
 	{

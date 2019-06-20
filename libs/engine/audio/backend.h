@@ -32,11 +32,17 @@ namespace Yttrium
 			size_t _size = 0;
 		};
 
+		struct ThreadContext
+		{
+			virtual ~ThreadContext() noexcept = default;
+		};
+
 		static std::unique_ptr<AudioBackend> create();
 
 		virtual ~AudioBackend() = default;
 
 		virtual BufferInfo buffer_info() const noexcept = 0;
+		virtual std::unique_ptr<ThreadContext> create_thread_context() { return std::make_unique<ThreadContext>(); }
 		virtual void flush() = 0;
 		virtual bool write_buffer(const uint8_t* data, const std::atomic<bool>& interrupt) = 0;
 	};

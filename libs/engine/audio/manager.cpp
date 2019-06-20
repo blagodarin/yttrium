@@ -20,7 +20,7 @@
 #include "sound.h"
 
 #ifdef _WIN32
-// TODO: Implement.
+#	include <Windows.h>
 #else
 #	include <pthread.h>
 #	include <sched.h>
@@ -31,7 +31,7 @@ namespace
 	void set_high_priority() noexcept
 	{
 #ifdef _WIN32
-		// TODO: Implement.
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 #else
 		const auto thread = pthread_self();
 		int policy;
@@ -93,6 +93,7 @@ namespace Yttrium
 		};
 
 		::set_high_priority();
+		const auto thread_context = _backend->create_thread_context();
 		for (Context context{ _backend->buffer_info() };;)
 		{
 			Command command;
