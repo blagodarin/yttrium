@@ -38,10 +38,13 @@ namespace Yttrium
 		bool read(Buffer& out, Buffer& tmp, AudioReader&);
 
 	private:
+		using AddSaturate = void (*)(void*, const void*, size_t);
+
 		const AudioBackend::BufferInfo _buffer_info;
 		Buffer _buffer{ _buffer_info._size };
 		Buffer _mix_buffer{ _buffer_info._size };
 		Buffer _conversion_buffer{ _buffer_info._size };
+		AddSaturate _add_saturate = nullptr;
 		std::shared_ptr<AudioReader> _music;
 		std::shared_ptr<SoundImpl> _sound;
 	};

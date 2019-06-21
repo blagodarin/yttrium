@@ -76,7 +76,7 @@ namespace Yttrium
 		if (total_frames < 0)
 			throw DataError("Bad Ogg Vorbis file");
 
-		_format = AudioFormat{ 2, to_unsigned(info->channels), to_unsigned(info->rate) };
+		_format = AudioFormat{ AudioSample::i16, to_unsigned(info->channels), to_unsigned(info->rate) };
 		_total_frames = to_unsigned(total_frames);
 	}
 
@@ -87,7 +87,7 @@ namespace Yttrium
 
 	size_t OggVorbisDecoder::read(void* buffer, size_t bytes_to_read)
 	{
-		const auto frame_bytes = _format.frame_bytes();
+		const auto frame_bytes = _format.bytes_per_frame();
 		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read;)

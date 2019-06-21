@@ -29,7 +29,12 @@ namespace Yttrium
 	AudioMixer::AudioMixer(const AudioBackend::BufferInfo& buffer_info) noexcept
 		: _buffer_info{ buffer_info }
 	{
-		assert(_buffer_info._format.bytes_per_sample() == 2);
+		switch (_buffer_info._format.sample_type())
+		{
+		case AudioSample::i16: _add_saturate = add_saturate_i16; break;
+		case AudioSample::f32: _add_saturate = add_saturate_f32; break;
+		}
+		assert(_add_saturate);
 	}
 
 	const uint8_t* AudioMixer::mix_buffer()
@@ -46,10 +51,10 @@ namespace Yttrium
 		{
 			if (read(*out, _conversion_buffer, _sound->_reader))
 			{
-				if (out == &_mix_buffer)
-					add_saturate_i16(_buffer.data(), _mix_buffer.data(), _buffer_info._size / _buffer_info._format.bytes_per_sample());
-				else
+				if (out != &_mix_buffer)
 					out = &_mix_buffer;
+				else if (_add_saturate)
+					_add_saturate(_buffer.data(), _mix_buffer.data(), _buffer_info._size / _buffer_info._format.bytes_per_sample());
 			}
 			else
 				_sound.reset();
@@ -86,14 +91,14 @@ namespace Yttrium
 		}
 		else
 		{
-			tmp.reset(_buffer_info._size / _buffer_info._format.frame_bytes() * format.frame_bytes());
+			tmp.reset(_buffer_info._size / _buffer_info._format.bytes_per_frame() * format.bytes_per_frame());
 			const auto tmp_bytes = reader.read(tmp.data(), tmp.size());
 			if (!tmp_bytes)
 				return false;
-			const auto frames = tmp_bytes / format.frame_bytes();
+			const auto frames = tmp_bytes / format.bytes_per_frame();
 			if (!transform_audio(out.data(), _buffer_info._format, tmp.data(), format, frames))
 				return false;
-			const auto out_bytes = frames * _buffer_info._format.frame_bytes();
+			const auto out_bytes = frames * _buffer_info._format.bytes_per_frame();
 			if (out_bytes < out.size())
 				std::memset(out.begin() + out_bytes, 0, out.size() - out_bytes);
 		}

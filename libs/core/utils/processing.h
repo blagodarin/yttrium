@@ -24,6 +24,12 @@
 namespace Yttrium
 {
 	Y_CORE_API void add_saturate_i16(void* dst, const void* src, size_t count);
+	Y_CORE_API void add_saturate_f32(void* dst, const void* src, size_t count);
+
+	void convert_normalize_f32_i16(void* dst, const void* src, size_t count);
+
+	void convert_normalize_duplicate_f32_i16(void* dst, const void* src, size_t src_count);
 
 	void duplicate_i16(void* dst, const void* src, size_t src_count);
+	void duplicate_f32(void* dst, const void* src, size_t src_count);
 }

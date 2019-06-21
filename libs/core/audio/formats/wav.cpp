@@ -58,18 +58,21 @@ namespace Yttrium
 		if (fmt.format != WAVE_FORMAT_PCM)
 			throw DataError("Bad WAV format (must be WAVE_FORMAT_PCM)");
 
+		if (fmt.bits_per_sample != 16)
+			throw DataError("Bad sample type");
+
 		WavChunkHeader data_header;
 		if (!::find_chunk(_reader, WavChunkHeader::data, data_header))
 			throw DataError("Bad WAV 'data' chunk");
 
-		_format = AudioFormat(fmt.bits_per_sample / 8u, fmt.channels, fmt.samples_per_second);
-		_total_frames = std::min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.frame_bytes();
+		_format = { AudioSample::i16, fmt.channels, fmt.samples_per_second };
+		_total_frames = std::min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.bytes_per_frame();
 		_data_offset = _reader.offset();
 	}
 
 	size_t WavDecoder::read(void* buffer, size_t bytes_to_read)
 	{
-		const auto frame_bytes = _format.frame_bytes();
+		const auto frame_bytes = _format.bytes_per_frame();
 		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
 		const auto bytes_read = _reader.read(buffer, bytes_to_read);
 		_current_frame += bytes_read / frame_bytes;
@@ -80,7 +83,7 @@ namespace Yttrium
 	{
 		if (offset > _total_frames)
 			return false;
-		if (!_reader.seek(_data_offset + offset * _format.frame_bytes()))
+		if (!_reader.seek(_data_offset + offset * _format.bytes_per_frame()))
 			return false;
 		_current_frame = offset;
 		return true;

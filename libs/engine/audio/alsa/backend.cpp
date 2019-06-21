@@ -100,7 +100,7 @@ namespace Yttrium
 
 	AudioBackend::BufferInfo AlsaAudioBackend::buffer_info() const noexcept
 	{
-		return { { 2, 2, FramesPerSecond }, _period_bytes };
+		return { { AudioSample::i16, 2, FramesPerSecond }, _period_bytes };
 	}
 
 	void AlsaAudioBackend::flush() noexcept

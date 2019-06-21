@@ -49,6 +49,37 @@ namespace Yttrium
 
 		UniquePtr<WAVEFORMATEX, CoTaskMemFree> format_deleter{ format };
 
+		const auto sample_type = [format]() {
+			if (format->wFormatTag == WAVE_FORMAT_PCM)
+			{
+				if (format->wBitsPerSample == 16)
+					return AudioSample::i16;
+			}
+			else if (format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+			{
+				const auto extensible = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(format);
+				if (IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_PCM))
+				{
+					if (format->wBitsPerSample == 16)
+						return AudioSample::i16;
+				}
+				else if (IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
+				{
+					if (format->wBitsPerSample == 32)
+						return AudioSample::f32;
+				}
+			}
+			throw std::runtime_error{ "Unsupported audio buffer format" };
+		}();
+
+		DWORD stream_flags = 0;
+		if (format->nSamplesPerSec != 44'100)
+		{
+			stream_flags |= AUDCLNT_STREAMFLAGS_RATEADJUST;
+			format->nSamplesPerSec = 44'100;
+			format->nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
+		}
+
 		hr = _client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, period, 0, format, nullptr);
 		if (FAILED(hr))
 			throw BadCall{ "WASAPI", "IAudioClient::Initialize", error_to_string(hr) };
@@ -62,8 +93,8 @@ namespace Yttrium
 		if (!_render_client)
 			throw BadCall{ "WASAPI", "IAudioClient::GetService", error_to_string(hr) };
 
-		_buffer_info._format = { format->wBitsPerSample / 8u, format->nChannels, format->nSamplesPerSec };
-		_buffer_info._size = buffer_frames * _buffer_info._format.frame_bytes();
+		_buffer_info._format = { sample_type, format->nChannels, format->nSamplesPerSec };
+		_buffer_info._size = buffer_frames * _buffer_info._format.bytes_per_frame();
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;
