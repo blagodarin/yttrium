@@ -37,7 +37,7 @@ namespace Yttrium
 			virtual ~ThreadContext() noexcept = default;
 		};
 
-		static std::unique_ptr<AudioBackend> create();
+		static std::unique_ptr<AudioBackend> create(unsigned frames_per_second);
 
 		virtual ~AudioBackend() = default;
 

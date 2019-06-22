@@ -127,6 +127,6 @@ namespace Yttrium
 
 	std::shared_ptr<AudioManager> AudioManager::create()
 	{
-		return std::make_shared<AudioManagerImpl>(AudioBackend::create());
+		return std::make_shared<AudioManagerImpl>(AudioBackend::create(44'100));
 	}
 }

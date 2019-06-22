@@ -20,9 +20,13 @@
 #include "../../../core/utils/memory.h"
 #include "../../application/_windows/error.h"
 
+#ifndef NDEBUG
+#	include <iostream>
+#endif
+
 namespace Yttrium
 {
-	WasapiAudioBackend::WasapiAudioBackend()
+	WasapiAudioBackend::WasapiAudioBackend(unsigned frames_per_second)
 	{
 		ComPtr<IMMDeviceEnumerator> enumerator;
 		auto hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
@@ -55,6 +59,11 @@ namespace Yttrium
 				if (format->wBitsPerSample == 16)
 					return AudioSample::i16;
 			}
+			else if (format->wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
+			{
+				if (format->wBitsPerSample == 32)
+					return AudioSample::f32;
+			}
 			else if (format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 			{
 				const auto extensible = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(format);
@@ -73,14 +82,14 @@ namespace Yttrium
 		}();
 
 		DWORD stream_flags = 0;
-		if (format->nSamplesPerSec != 44'100)
+		if (format->nSamplesPerSec != frames_per_second)
 		{
-			stream_flags |= AUDCLNT_STREAMFLAGS_RATEADJUST;
-			format->nSamplesPerSec = 44'100;
+			stream_flags = AUDCLNT_STREAMFLAGS_RATEADJUST;
+			format->nSamplesPerSec = frames_per_second;
 			format->nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
 		}
 
-		hr = _client->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, period, 0, format, nullptr);
+		hr = _client->Initialize(AUDCLNT_SHAREMODE_SHARED, stream_flags, period, 0, format, nullptr);
 		if (FAILED(hr))
 			throw BadCall{ "WASAPI", "IAudioClient::Initialize", error_to_string(hr) };
 
@@ -95,6 +104,16 @@ namespace Yttrium
 
 		_buffer_info._format = { sample_type, format->nChannels, format->nSamplesPerSec };
 		_buffer_info._size = buffer_frames * _buffer_info._format.bytes_per_frame();
+
+#ifndef NDEBUG
+		std::cerr << "[WASAPI] Audio buffer: ";
+		switch (_buffer_info._format.sample_type())
+		{
+		case AudioSample::i16: std::cerr << "i16"; break;
+		case AudioSample::f32: std::cerr << "f32"; break;
+		}
+		std::cerr << ", " << format->nChannels << " ch., " << format->nSamplesPerSec << " Hz, " << _buffer_info._size << " bytes\n";
+#endif
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;
@@ -109,8 +128,8 @@ namespace Yttrium
 		return std::make_unique<WasapiThreadContext>();
 	}
 
-	std::unique_ptr<AudioBackend> AudioBackend::create()
+	std::unique_ptr<AudioBackend> AudioBackend::create(unsigned frames_per_second)
 	{
-		return std::make_unique<WasapiAudioBackend>();
+		return std::make_unique<WasapiAudioBackend>(frames_per_second);
 	}
 }

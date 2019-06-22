@@ -55,11 +55,13 @@ namespace Yttrium
 			|| (fmt_header.size > sizeof fmt && !_reader.skip(fmt_header.size - sizeof fmt)))
 			throw DataError("Bad WAV 'fmt' chunk");
 
-		if (fmt.format != WAVE_FORMAT_PCM)
-			throw DataError("Bad WAV format (must be WAVE_FORMAT_PCM)");
-
-		if (fmt.bits_per_sample != 16)
-			throw DataError("Bad sample type");
+		AudioSample sample_type;
+		if (fmt.format == WAVE_FORMAT_PCM && fmt.bits_per_sample == 16)
+			sample_type = AudioSample::i16;
+		else if (fmt.format == WAVE_FORMAT_IEEE_FLOAT && fmt.bits_per_sample == 32)
+			sample_type = AudioSample::f32;
+		else
+			throw DataError("Unsupported WAV sample type");
 
 		WavChunkHeader data_header;
 		if (!::find_chunk(_reader, WavChunkHeader::data, data_header))

@@ -25,8 +25,6 @@
 
 namespace
 {
-	constexpr unsigned FramesPerSecond = 44'100;
-	constexpr snd_pcm_uframes_t FramesPerPeriod = FramesPerSecond / 25;
 	constexpr unsigned PeriodsPerBuffer = 2;
 
 	constexpr std::string_view function_name(const char* signature) noexcept
@@ -47,9 +45,10 @@ namespace
 
 namespace Yttrium
 {
-	AlsaAudioBackend::AlsaAudioBackend()
-		: _buffer_frames{ FramesPerPeriod * PeriodsPerBuffer }
-		, _period_frames{ FramesPerPeriod }
+	AlsaAudioBackend::AlsaAudioBackend(unsigned frames_per_second)
+		: _frames_per_second{ frames_per_second }
+		, _period_frames{ _frames_per_second / 25 }
+		, _buffer_frames{ _period_frames * PeriodsPerBuffer }
 	{
 		snd_pcm_t* pcm = nullptr;
 		CHECK_ALSA(snd_pcm_open(&pcm, "default", SND_PCM_STREAM_PLAYBACK, 0));
@@ -62,7 +61,7 @@ namespace Yttrium
 			CHECK_ALSA(snd_pcm_hw_params_set_access(pcm, hw, SND_PCM_ACCESS_RW_INTERLEAVED));
 			CHECK_ALSA(snd_pcm_hw_params_set_format(pcm, hw, SND_PCM_FORMAT_S16_LE));
 			CHECK_ALSA(snd_pcm_hw_params_set_channels(pcm, hw, 2));
-			CHECK_ALSA(snd_pcm_hw_params_set_rate(pcm, hw, FramesPerSecond, 0));
+			CHECK_ALSA(snd_pcm_hw_params_set_rate(pcm, hw, _frames_per_second, 0));
 			CHECK_ALSA(snd_pcm_hw_params_set_period_size_near(pcm, hw, &_period_frames, nullptr));
 			unsigned periods = PeriodsPerBuffer;
 			CHECK_ALSA(snd_pcm_hw_params_set_periods_near(pcm, hw, &periods, nullptr));
@@ -73,16 +72,16 @@ namespace Yttrium
 		_period_bytes = static_cast<size_t>(snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_period_frames)));
 #ifndef NDEBUG
 		const auto buffer_bytes = snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_buffer_frames));
-		const auto buffers_per_second = FramesPerSecond / static_cast<double>(_buffer_frames);
+		const auto buffers_per_second = _frames_per_second / static_cast<double>(_buffer_frames);
 		std::cerr << "[ALSA] PCM buffer: "
 				  << _buffer_frames << " frames (" << buffer_bytes << " bytes), "
 				  << buffers_per_second << " buffers/s (" << buffers_per_second * static_cast<double>(buffer_bytes) << " bytes/s), "
-				  << static_cast<double>(_buffer_frames * 1000) / FramesPerSecond << " ms/buffer\n";
-		const auto periods_per_second = FramesPerSecond / static_cast<double>(_period_frames);
+				  << static_cast<double>(_buffer_frames * 1000) / _frames_per_second << " ms/buffer\n";
+		const auto periods_per_second = _frames_per_second / static_cast<double>(_period_frames);
 		std::cerr << "[ALSA] PCM period: "
 				  << _period_frames << " frames (" << _period_bytes << " bytes), "
 				  << periods_per_second << " periods/s (" << periods_per_second * static_cast<double>(_period_bytes) << " bytes/s), "
-				  << static_cast<double>(_period_frames * 1000) / FramesPerSecond << " ms/period\n";
+				  << static_cast<double>(_period_frames * 1000) / _frames_per_second << " ms/period\n";
 #endif
 		{
 			snd_pcm_sw_params_t* sw = nullptr;
@@ -100,7 +99,7 @@ namespace Yttrium
 
 	AudioBackend::BufferInfo AlsaAudioBackend::buffer_info() const noexcept
 	{
-		return { { AudioSample::i16, 2, FramesPerSecond }, _period_bytes };
+		return { { AudioSample::i16, 2, _frames_per_second }, _period_bytes };
 	}
 
 	void AlsaAudioBackend::flush() noexcept
@@ -131,7 +130,7 @@ namespace Yttrium
 			}
 			if (result == 0)
 			{
-				snd_pcm_wait(_pcm.get(), static_cast<int>((_period_frames * 1000 + FramesPerSecond - 1) / FramesPerSecond));
+				snd_pcm_wait(_pcm.get(), static_cast<int>((_period_frames * 1000 + _frames_per_second - 1) / _frames_per_second));
 				continue;
 			}
 			data += to_unsigned(result) * frame_bytes;
@@ -140,8 +139,8 @@ namespace Yttrium
 		return true;
 	}
 
-	std::unique_ptr<AudioBackend> AudioBackend::create()
+	std::unique_ptr<AudioBackend> AudioBackend::create(unsigned frames_per_second)
 	{
-		return std::make_unique<AlsaAudioBackend>();
+		return std::make_unique<AlsaAudioBackend>(frames_per_second);
 	}
 }

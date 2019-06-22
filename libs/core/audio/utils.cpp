@@ -24,14 +24,6 @@
 #include <cstring>
 #include <limits>
 
-namespace
-{
-	constexpr size_t _max_wav_data_size = std::numeric_limits<int32_t>::max()
-		- sizeof(Yttrium::WavFileHeader)
-		- sizeof(Yttrium::WavChunkHeader) - sizeof(Yttrium::WavFormatChunk)
-		- sizeof(Yttrium::WavChunkHeader);
-}
-
 namespace Yttrium
 {
 	bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames)
@@ -93,14 +85,23 @@ namespace Yttrium
 
 	bool write_wav_header(Writer& writer, const AudioFormat& format, size_t samples)
 	{
-		if (format.sample_type() != AudioSample::i16
-			|| !(format.channels() == 1 || format.channels() == 2)
+		constexpr size_t max_wav_data_size = std::numeric_limits<int32_t>::max()
+			- sizeof(WavFileHeader)
+			- sizeof(WavChunkHeader) - sizeof(WavFormatChunk)
+			- sizeof(WavChunkHeader);
+
+		if (!(format.channels() == 1 || format.channels() == 2)
 			|| !(format.frames_per_second() >= 8000 && format.frames_per_second() <= 192'000)
-			|| samples > ::_max_wav_data_size / format.bytes_per_sample())
+			|| samples > max_wav_data_size / format.bytes_per_sample())
 			return false;
 
 		WavFormatChunk format_chunk;
-		format_chunk.format = WAVE_FORMAT_PCM;
+		switch (format.sample_type())
+		{
+		case AudioSample::i16: format_chunk.format = WAVE_FORMAT_PCM; break;
+		case AudioSample::f32: format_chunk.format = WAVE_FORMAT_IEEE_FLOAT; break;
+		default: return false;
+		}
 		format_chunk.channels = static_cast<uint16_t>(format.channels());
 		format_chunk.samples_per_second = static_cast<uint32_t>(format.frames_per_second());
 		format_chunk.bits_per_sample = static_cast<uint16_t>(format.bytes_per_sample() * 8);

@@ -27,7 +27,7 @@ namespace Yttrium
 	class AlsaAudioBackend final : public AudioBackend
 	{
 	public:
-		AlsaAudioBackend();
+		AlsaAudioBackend(unsigned frames_per_second);
 		~AlsaAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override;
@@ -35,9 +35,10 @@ namespace Yttrium
 		bool write_buffer(const uint8_t* data, const std::atomic<bool>&) noexcept override;
 
 	private:
-		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
-		snd_pcm_uframes_t _buffer_frames;
+		const unsigned _frames_per_second;
 		snd_pcm_uframes_t _period_frames;
+		snd_pcm_uframes_t _buffer_frames;
+		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
 		size_t _period_bytes = 0;
 	};
 }

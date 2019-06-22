@@ -27,7 +27,7 @@ namespace Yttrium
 	class WasapiAudioBackend final : public AudioBackend
 	{
 	public:
-		WasapiAudioBackend();
+		WasapiAudioBackend(unsigned frames_per_second);
 		~WasapiAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override { return _buffer_info; }
