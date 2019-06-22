@@ -21,7 +21,7 @@
 
 namespace Yttrium
 {
-	void add_saturate_i16(void* dst, const void* src, size_t count)
+	void add_saturate_i16(void* dst, const void* src, size_t count) noexcept
 	{
 		for (size_t i = 0; i < count; ++i)
 		{
@@ -30,19 +30,19 @@ namespace Yttrium
 		}
 	}
 
-	void add_saturate_f32(void* dst, const void* src, size_t count)
+	void add_saturate_f32(void* dst, const void* src, size_t count) noexcept
 	{
 		for (size_t i = 0; i < count; ++i)
 			static_cast<float*>(dst)[i] = std::clamp(static_cast<float*>(dst)[i] + static_cast<const float*>(src)[i], -1.f, 1.f);
 	}
 
-	void convert_normalize_f32_i16(void* dst, const void* src, size_t count)
+	void convert_normalize_f32_i16(void* dst, const void* src, size_t count) noexcept
 	{
 		for (size_t i = 0; i < count; ++i)
 			static_cast<float*>(dst)[i] = static_cast<const int16_t*>(src)[i] / 32768.f;
 	}
 
-	void convert_normalize_duplicate_f32_i16(void* dst, const void* src, size_t src_count)
+	void convert_normalize_duplicate_f32_i16(void* dst, const void* src, size_t src_count) noexcept
 	{
 		for (size_t i = 0; i < src_count; ++i)
 		{
@@ -52,7 +52,7 @@ namespace Yttrium
 		}
 	}
 
-	void duplicate_i16(void* dst, const void* src, size_t src_count)
+	void duplicate_i16(void* dst, const void* src, size_t src_count) noexcept
 	{
 		for (size_t i = 0; i < src_count; ++i)
 		{
@@ -62,7 +62,7 @@ namespace Yttrium
 		}
 	}
 
-	void duplicate_f32(void* dst, const void* src, size_t src_count)
+	void duplicate_f32(void* dst, const void* src, size_t src_count) noexcept
 	{
 		for (size_t i = 0; i < src_count; ++i)
 		{

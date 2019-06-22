@@ -21,18 +21,15 @@
 #include "../../core/utils/processing.h"
 #include "sound.h"
 
+#include <cassert>
 #include <cstring>
 
 namespace Yttrium
 {
-	AudioMixer::AudioMixer(const AudioBackend::BufferInfo& buffer_info) noexcept
+	AudioMixer::AudioMixer(const AudioBackend::BufferInfo& buffer_info)
 		: _buffer_info{ buffer_info }
 	{
-		switch (_buffer_info._format.sample_type())
-		{
-		case AudioSample::i16: _add_saturate = add_saturate_i16; break;
-		case AudioSample::f32: _add_saturate = add_saturate_f32; break;
-		}
+		assert(_buffer_info._format.sample_type() == AudioSample::f32);
 	}
 
 	void AudioMixer::mix(void* buffer)
@@ -50,7 +47,7 @@ namespace Yttrium
 			if (!read(out, _conversion_buffer, _sound->_reader))
 				_sound.reset();
 			else if (out != buffer)
-				_add_saturate(buffer, out, _buffer_info._size / _buffer_info._format.bytes_per_sample());
+				add_saturate_f32(buffer, out, _buffer_info._size / _buffer_info._format.bytes_per_sample());
 		}
 	}
 

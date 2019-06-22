@@ -28,7 +28,7 @@ namespace Yttrium
 	class AlsaAudioBackend final : public AudioBackend
 	{
 	public:
-		AlsaAudioBackend(unsigned frames_per_second);
+		explicit AlsaAudioBackend(unsigned frames_per_second);
 		~AlsaAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override { return _buffer_info; }

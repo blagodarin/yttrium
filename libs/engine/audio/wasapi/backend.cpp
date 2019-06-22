@@ -49,33 +49,25 @@ namespace Yttrium
 
 		UniquePtr<WAVEFORMATEX, CoTaskMemFree> format_deleter{ format };
 
-		const auto sample_type = [format]() {
-			if (format->wFormatTag == WAVE_FORMAT_PCM)
+		if (format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+		{
+			const auto extensible = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(format);
+			if (!IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_IEEE_FLOAT) || extensible->Format.wBitsPerSample != 32)
 			{
-				if (format->wBitsPerSample == 16)
-					return AudioSample::i16;
+				extensible->Format.wBitsPerSample = 32;
+				extensible->Format.nBlockAlign = 4 * format->nChannels;
+				extensible->Format.nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
+				extensible->Samples.wValidBitsPerSample = 32;
+				extensible->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
 			}
-			else if (format->wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
-			{
-				if (format->wBitsPerSample == 32)
-					return AudioSample::f32;
-			}
-			else if (format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
-			{
-				const auto extensible = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(format);
-				if (IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_PCM))
-				{
-					if (format->wBitsPerSample == 16)
-						return AudioSample::i16;
-				}
-				else if (IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
-				{
-					if (format->wBitsPerSample == 32)
-						return AudioSample::f32;
-				}
-			}
-			throw std::runtime_error{ "Unsupported audio buffer format" };
-		}();
+		}
+		else if (format->wFormatTag != WAVE_FORMAT_IEEE_FLOAT || format->wBitsPerSample != 32)
+		{
+			format->wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+			format->wBitsPerSample = 32;
+			format->nBlockAlign = 4 * format->nChannels;
+			format->nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
+		}
 
 		DWORD stream_flags = 0;
 		if (format->nSamplesPerSec != frames_per_second)
@@ -98,7 +90,7 @@ namespace Yttrium
 		if (!_render_client)
 			throw BadCall{ "WASAPI", "IAudioClient::GetService", error_to_string(hr) };
 
-		_buffer_info._format = { sample_type, format->nChannels, format->nSamplesPerSec };
+		_buffer_info._format = { AudioSample::f32, format->nChannels, format->nSamplesPerSec };
 		_buffer_info._size = buffer_frames * _buffer_info._format.bytes_per_frame();
 	}
 

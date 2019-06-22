@@ -28,7 +28,7 @@ namespace Yttrium
 	class AudioMixer
 	{
 	public:
-		explicit AudioMixer(const AudioBackend::BufferInfo&) noexcept;
+		explicit AudioMixer(const AudioBackend::BufferInfo&);
 
 		bool empty() const noexcept { return !(_music || _sound); }
 		void mix(void* buffer);
@@ -44,7 +44,6 @@ namespace Yttrium
 		const AudioBackend::BufferInfo _buffer_info;
 		Buffer _mix_buffer{ _buffer_info._size };
 		Buffer _conversion_buffer{ _buffer_info._size };
-		AddSaturate _add_saturate = [](void*, const void*, size_t) {};
 		std::shared_ptr<AudioReader> _music;
 		std::shared_ptr<SoundImpl> _sound;
 	};
