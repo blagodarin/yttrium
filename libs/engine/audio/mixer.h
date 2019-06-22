@@ -30,21 +30,21 @@ namespace Yttrium
 	public:
 		explicit AudioMixer(const AudioBackend::BufferInfo&) noexcept;
 
-		const uint8_t* mix_buffer();
+		bool empty() const noexcept { return !(_music || _sound); }
+		void mix(void* buffer);
 		void play_music(const std::shared_ptr<AudioReader>&);
 		void play_sound(const std::shared_ptr<Sound>&);
 
 	private:
-		bool read(Buffer& out, Buffer& tmp, AudioReader&);
+		bool read(void* out, Buffer& tmp, AudioReader&);
 
 	private:
 		using AddSaturate = void (*)(void*, const void*, size_t);
 
 		const AudioBackend::BufferInfo _buffer_info;
-		Buffer _buffer{ _buffer_info._size };
 		Buffer _mix_buffer{ _buffer_info._size };
 		Buffer _conversion_buffer{ _buffer_info._size };
-		AddSaturate _add_saturate = nullptr;
+		AddSaturate _add_saturate = [](void*, const void*, size_t) {};
 		std::shared_ptr<AudioReader> _music;
 		std::shared_ptr<SoundImpl> _sound;
 	};

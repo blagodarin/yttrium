@@ -19,12 +19,9 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
 
-#ifndef NDEBUG
-#	include <iostream>
-#endif
-
 namespace
 {
+	constexpr unsigned AudioBufferChannels = 2;
 	constexpr unsigned PeriodsPerBuffer = 2;
 
 	constexpr std::string_view function_name(const char* signature) noexcept
@@ -46,72 +43,67 @@ namespace
 namespace Yttrium
 {
 	AlsaAudioBackend::AlsaAudioBackend(unsigned frames_per_second)
-		: _frames_per_second{ frames_per_second }
-		, _period_frames{ _frames_per_second / 25 }
-		, _buffer_frames{ _period_frames * PeriodsPerBuffer }
 	{
 		snd_pcm_t* pcm = nullptr;
 		CHECK_ALSA(snd_pcm_open(&pcm, "default", SND_PCM_STREAM_PLAYBACK, 0));
 		_pcm.reset(pcm);
+		auto period_frames = snd_pcm_uframes_t{ frames_per_second } / 25;
+		auto buffer_frames = period_frames * PeriodsPerBuffer;
 		{
 			snd_pcm_hw_params_t* hw = nullptr;
 			CHECK_ALSA(snd_pcm_hw_params_malloc(&hw));
 			const UniquePtr<snd_pcm_hw_params_t, snd_pcm_hw_params_free> hw_deleter{ hw };
 			CHECK_ALSA(snd_pcm_hw_params_any(pcm, hw));
 			CHECK_ALSA(snd_pcm_hw_params_set_access(pcm, hw, SND_PCM_ACCESS_RW_INTERLEAVED));
-			CHECK_ALSA(snd_pcm_hw_params_set_format(pcm, hw, SND_PCM_FORMAT_S16_LE));
-			CHECK_ALSA(snd_pcm_hw_params_set_channels(pcm, hw, 2));
-			CHECK_ALSA(snd_pcm_hw_params_set_rate(pcm, hw, _frames_per_second, 0));
-			CHECK_ALSA(snd_pcm_hw_params_set_period_size_near(pcm, hw, &_period_frames, nullptr));
+			CHECK_ALSA(snd_pcm_hw_params_set_format(pcm, hw, SND_PCM_FORMAT_FLOAT));
+			CHECK_ALSA(snd_pcm_hw_params_set_channels(pcm, hw, AudioBufferChannels));
+			CHECK_ALSA(snd_pcm_hw_params_set_rate(pcm, hw, frames_per_second, 0));
+			CHECK_ALSA(snd_pcm_hw_params_set_period_size_near(pcm, hw, &period_frames, nullptr));
 			unsigned periods = PeriodsPerBuffer;
 			CHECK_ALSA(snd_pcm_hw_params_set_periods_near(pcm, hw, &periods, nullptr));
 			CHECK_ALSA(snd_pcm_hw_params(pcm, hw));
-			CHECK_ALSA(snd_pcm_hw_params_get_period_size(hw, &_period_frames, nullptr));
-			CHECK_ALSA(snd_pcm_hw_params_get_buffer_size(hw, &_buffer_frames));
+			CHECK_ALSA(snd_pcm_hw_params_get_period_size(hw, &period_frames, nullptr));
+			CHECK_ALSA(snd_pcm_hw_params_get_buffer_size(hw, &buffer_frames));
 		}
-		_period_bytes = static_cast<size_t>(snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_period_frames)));
-#ifndef NDEBUG
-		const auto buffer_bytes = snd_pcm_frames_to_bytes(pcm, static_cast<snd_pcm_sframes_t>(_buffer_frames));
-		const auto buffers_per_second = _frames_per_second / static_cast<double>(_buffer_frames);
-		std::cerr << "[ALSA] PCM buffer: "
-				  << _buffer_frames << " frames (" << buffer_bytes << " bytes), "
-				  << buffers_per_second << " buffers/s (" << buffers_per_second * static_cast<double>(buffer_bytes) << " bytes/s), "
-				  << static_cast<double>(_buffer_frames * 1000) / _frames_per_second << " ms/buffer\n";
-		const auto periods_per_second = _frames_per_second / static_cast<double>(_period_frames);
-		std::cerr << "[ALSA] PCM period: "
-				  << _period_frames << " frames (" << _period_bytes << " bytes), "
-				  << periods_per_second << " periods/s (" << periods_per_second * static_cast<double>(_period_bytes) << " bytes/s), "
-				  << static_cast<double>(_period_frames * 1000) / _frames_per_second << " ms/period\n";
-#endif
 		{
 			snd_pcm_sw_params_t* sw = nullptr;
 			CHECK_ALSA(snd_pcm_sw_params_malloc(&sw));
 			const UniquePtr<snd_pcm_sw_params_t, snd_pcm_sw_params_free> sw_deleter{ sw };
 			CHECK_ALSA(snd_pcm_sw_params_current(pcm, sw));
-			CHECK_ALSA(snd_pcm_sw_params_set_avail_min(pcm, sw, _period_frames));
+			CHECK_ALSA(snd_pcm_sw_params_set_avail_min(pcm, sw, period_frames));
 			CHECK_ALSA(snd_pcm_sw_params_set_start_threshold(pcm, sw, 1));
-			CHECK_ALSA(snd_pcm_sw_params_set_stop_threshold(pcm, sw, _buffer_frames));
+			CHECK_ALSA(snd_pcm_sw_params_set_stop_threshold(pcm, sw, buffer_frames));
 			CHECK_ALSA(snd_pcm_sw_params(pcm, sw));
 		}
+		_buffer_info._format = { AudioSample::f32, AudioBufferChannels, frames_per_second };
+		_buffer_info._size = period_frames * _buffer_info._format.bytes_per_frame();
+		_buffer.reset(_buffer_info._size);
 	}
 
 	AlsaAudioBackend::~AlsaAudioBackend() = default;
 
-	AudioBackend::BufferInfo AlsaAudioBackend::buffer_info() const noexcept
+	void AlsaAudioBackend::begin_context()
 	{
-		return { { AudioSample::i16, 2, _frames_per_second }, _period_bytes };
 	}
 
-	void AlsaAudioBackend::flush() noexcept
+	void AlsaAudioBackend::end_context() noexcept
 	{
 		snd_pcm_drain(_pcm.get());
 	}
 
-	bool AlsaAudioBackend::write_buffer(const uint8_t* data, const std::atomic<bool>& interrupt) noexcept
+	void* AlsaAudioBackend::lock_buffer()
 	{
-		const auto frame_bytes = _period_bytes / _period_frames;
-		auto frames_left = _period_frames;
-		while (frames_left > 0 && !interrupt)
+		if (_error < 0)
+			throw std::runtime_error{ make_string("[ALSA] Unrecoverable error: (", _error, ") ", snd_strerror(_error)) };
+		return _buffer.data();
+	}
+
+	void AlsaAudioBackend::unlock_buffer() noexcept
+	{
+		auto data = _buffer.begin();
+		const auto buffer_frames = _buffer.size() / _buffer_info._format.bytes_per_frame();
+		auto frames_left = buffer_frames;
+		while (frames_left > 0)
 		{
 			const auto result = snd_pcm_writei(_pcm.get(), data, frames_left);
 			if (result < 0)
@@ -120,23 +112,20 @@ namespace Yttrium
 				{
 					if (const auto recovered = snd_pcm_recover(_pcm.get(), static_cast<int>(result), 1); recovered < 0)
 					{
-#ifndef NDEBUG
-						std::cerr << "[ALSA] Unrecoverable error: (" << recovered << ") " << snd_strerror(recovered) << '\n';
-#endif
-						return false;
+						_error = recovered;
+						return;
 					}
 				}
 				continue;
 			}
 			if (result == 0)
 			{
-				snd_pcm_wait(_pcm.get(), static_cast<int>((_period_frames * 1000 + _frames_per_second - 1) / _frames_per_second));
+				snd_pcm_wait(_pcm.get(), static_cast<int>((buffer_frames * 1000 + _buffer_info._format.frames_per_second() - 1) / _buffer_info._format.frames_per_second()));
 				continue;
 			}
-			data += to_unsigned(result) * frame_bytes;
+			data += to_unsigned(result) * _buffer_info._format.bytes_per_frame();
 			frames_left -= to_unsigned(result);
 		}
-		return true;
 	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create(unsigned frames_per_second)

@@ -26,6 +26,10 @@
 #	include <sched.h>
 #endif
 
+#ifndef NDEBUG
+#	include <iostream>
+#endif
+
 namespace
 {
 	void set_high_priority() noexcept
@@ -49,6 +53,16 @@ namespace Yttrium
 		: _backend{ std::move(backend) }
 		, _thread{ [this] { run(); } }
 	{
+#ifndef NDEBUG
+		const auto buffer_info = _backend->buffer_info();
+		std::cerr << "[Audio] Output buffer: ";
+		switch (buffer_info._format.sample_type())
+		{
+		case AudioSample::i16: std::cerr << "i16"; break;
+		case AudioSample::f32: std::cerr << "f32"; break;
+		}
+		std::cerr << ", " << buffer_info._format.channels() << " ch., " << buffer_info._format.frames_per_second() << " Hz, " << buffer_info._size << " B\n";
+#endif
 	}
 
 	AudioManagerImpl::~AudioManagerImpl() noexcept
@@ -83,46 +97,54 @@ namespace Yttrium
 
 	void AudioManagerImpl::run()
 	{
-		struct Context
+		struct MixerVisitor
 		{
-			AudioMixer _mixer;
-			explicit Context(const AudioBackend::BufferInfo& buffer_info) noexcept
-				: _mixer{ buffer_info } {}
+			AudioMixer& _mixer;
+			explicit MixerVisitor(AudioMixer& mixer) noexcept
+				: _mixer{ mixer } {}
 			void operator()(const PlayMusic& command) { _mixer.play_music(command._music); }
 			void operator()(const PlaySound& command) { _mixer.play_sound(command._sound); }
 		};
 
-		::set_high_priority();
-		const auto thread_context = _backend->create_thread_context();
-		for (Context context{ _backend->buffer_info() };;)
+		try
 		{
-			Command command;
+			::set_high_priority();
+			AudioBackend::Context context{ *_backend };
+			AudioMixer mixer{ _backend->buffer_info() };
+			for (;;)
 			{
-				std::unique_lock lock{ _mutex };
-				_condition.wait(lock, [this] { return !_commands.empty() || _done; });
-				if (_done)
-					break;
-				command = std::move(_commands.front());
-				_commands.pop_front();
-			}
-			std::visit(context, command);
-			while (const auto buffer = context._mixer.mix_buffer())
-			{
-				if (!_backend->write_buffer(buffer, _done))
-					_done = true;
-				if (_done)
-					break;
+				Command command;
 				{
-					std::scoped_lock lock{ _mutex };
-					if (_commands.empty())
-						continue;
+					std::unique_lock lock{ _mutex };
+					_condition.wait(lock, [this] { return !_commands.empty() || _done; });
+					if (_done)
+						break;
 					command = std::move(_commands.front());
 					_commands.pop_front();
 				}
-				std::visit(context, command);
+				std::visit(MixerVisitor{ mixer }, command);
+				while (!mixer.empty())
+				{
+					mixer.mix(AudioBackend::BufferLock{ *_backend }._data);
+					if (_done)
+						break;
+					{
+						std::scoped_lock lock{ _mutex };
+						if (_commands.empty())
+							continue;
+						command = std::move(_commands.front());
+						_commands.pop_front();
+					}
+					std::visit(MixerVisitor{ mixer }, command);
+				}
 			}
 		}
-		_backend->flush();
+		catch ([[maybe_unused]] const std::runtime_error& e)
+		{
+#ifndef NDEBUG
+			std::cerr << e.what() << '\n';
+#endif
+		}
 	}
 
 	std::shared_ptr<AudioManager> AudioManager::create()

@@ -20,10 +20,6 @@
 #include "../../../core/utils/memory.h"
 #include "../../application/_windows/error.h"
 
-#ifndef NDEBUG
-#	include <iostream>
-#endif
-
 namespace Yttrium
 {
 	WasapiAudioBackend::WasapiAudioBackend(unsigned frames_per_second)
@@ -104,28 +100,28 @@ namespace Yttrium
 
 		_buffer_info._format = { sample_type, format->nChannels, format->nSamplesPerSec };
 		_buffer_info._size = buffer_frames * _buffer_info._format.bytes_per_frame();
-
-#ifndef NDEBUG
-		std::cerr << "[WASAPI] Audio buffer: ";
-		switch (_buffer_info._format.sample_type())
-		{
-		case AudioSample::i16: std::cerr << "i16"; break;
-		case AudioSample::f32: std::cerr << "f32"; break;
-		}
-		std::cerr << ", " << format->nChannels << " ch., " << format->nSamplesPerSec << " Hz, " << _buffer_info._size << " bytes\n";
-#endif
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;
 
-	std::unique_ptr<AudioBackend::ThreadContext> WasapiAudioBackend::create_thread_context()
+	void WasapiAudioBackend::begin_context()
 	{
-		struct WasapiThreadContext final : public ThreadContext
-		{
-			ComInitializer _com{ COINIT_APARTMENTTHREADED };
-		};
+		if (const auto hr = ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); FAILED(hr))
+			throw BadCall{ "WASAPI", "CoInitializeEx", error_to_string(hr) };
+	}
 
-		return std::make_unique<WasapiThreadContext>();
+	void WasapiAudioBackend::end_context() noexcept
+	{
+		::CoUninitialize();
+	}
+
+	void* WasapiAudioBackend::lock_buffer()
+	{
+		return nullptr;
+	}
+
+	void WasapiAudioBackend::unlock_buffer() noexcept
+	{
 	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create(unsigned frames_per_second)

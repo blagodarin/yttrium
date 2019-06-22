@@ -18,7 +18,6 @@
 
 #include <yttrium/audio/format.h>
 
-#include <atomic>
 #include <memory>
 
 namespace Yttrium
@@ -32,9 +31,21 @@ namespace Yttrium
 			size_t _size = 0;
 		};
 
-		struct ThreadContext
+		struct BufferLock
 		{
-			virtual ~ThreadContext() noexcept = default;
+			AudioBackend& _backend;
+			void* const _data = _backend.lock_buffer();
+			BufferLock(AudioBackend& backend)
+				: _backend{ backend } {}
+			~BufferLock() noexcept { _backend.unlock_buffer(); }
+		};
+
+		struct Context
+		{
+			AudioBackend& _backend;
+			Context(AudioBackend& backend)
+				: _backend{ backend } { _backend.begin_context(); }
+			~Context() noexcept { _backend.end_context(); }
 		};
 
 		static std::unique_ptr<AudioBackend> create(unsigned frames_per_second);
@@ -42,8 +53,11 @@ namespace Yttrium
 		virtual ~AudioBackend() = default;
 
 		virtual BufferInfo buffer_info() const noexcept = 0;
-		virtual std::unique_ptr<ThreadContext> create_thread_context() { return std::make_unique<ThreadContext>(); }
-		virtual void flush() = 0;
-		virtual bool write_buffer(const uint8_t* data, const std::atomic<bool>& interrupt) = 0;
+
+	protected:
+		virtual void begin_context() = 0;
+		virtual void end_context() noexcept = 0;
+		virtual void* lock_buffer() = 0;
+		virtual void unlock_buffer() noexcept = 0;
 	};
 }

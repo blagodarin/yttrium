@@ -21,7 +21,6 @@
 #include "../../core/utils/processing.h"
 #include "sound.h"
 
-#include <cassert>
 #include <cstring>
 
 namespace Yttrium
@@ -34,32 +33,25 @@ namespace Yttrium
 		case AudioSample::i16: _add_saturate = add_saturate_i16; break;
 		case AudioSample::f32: _add_saturate = add_saturate_f32; break;
 		}
-		assert(_add_saturate);
 	}
 
-	const uint8_t* AudioMixer::mix_buffer()
+	void AudioMixer::mix(void* buffer)
 	{
-		Buffer* out = &_buffer;
+		auto out = buffer;
 		if (_music)
 		{
-			if (read(*out, _conversion_buffer, *_music))
-				out = &_mix_buffer;
-			else
+			if (!read(out, _conversion_buffer, *_music))
 				_music.reset();
+			else
+				out = _mix_buffer.data();
 		}
 		if (_sound)
 		{
-			if (read(*out, _conversion_buffer, _sound->_reader))
-			{
-				if (out != &_mix_buffer)
-					out = &_mix_buffer;
-				else if (_add_saturate)
-					_add_saturate(_buffer.data(), _mix_buffer.data(), _buffer_info._size / _buffer_info._format.bytes_per_sample());
-			}
-			else
+			if (!read(out, _conversion_buffer, _sound->_reader))
 				_sound.reset();
+			else if (out != buffer)
+				_add_saturate(buffer, out, _buffer_info._size / _buffer_info._format.bytes_per_sample());
 		}
-		return out == &_mix_buffer ? _buffer.begin() : nullptr;
 	}
 
 	void AudioMixer::play_music(const std::shared_ptr<AudioReader>& music)
@@ -78,16 +70,16 @@ namespace Yttrium
 			_sound->_reader.seek(0);
 	}
 
-	bool AudioMixer::read(Buffer& out, Buffer& tmp, AudioReader& reader)
+	bool AudioMixer::read(void* out, Buffer& tmp, AudioReader& reader)
 	{
 		const auto format = reader.format();
 		if (format == _buffer_info._format)
 		{
-			const auto out_bytes = reader.read(out.data(), out.size());
+			const auto out_bytes = reader.read(out, _buffer_info._size);
 			if (!out_bytes)
 				return false;
-			if (out_bytes < out.size())
-				std::memset(out.begin() + out_bytes, 0, out.size() - out_bytes);
+			if (out_bytes < _buffer_info._size)
+				std::memset(static_cast<std::byte*>(out) + out_bytes, 0, _buffer_info._size - out_bytes);
 		}
 		else
 		{
@@ -96,11 +88,11 @@ namespace Yttrium
 			if (!tmp_bytes)
 				return false;
 			const auto frames = tmp_bytes / format.bytes_per_frame();
-			if (!transform_audio(out.data(), _buffer_info._format, tmp.data(), format, frames))
+			if (!transform_audio(out, _buffer_info._format, tmp.data(), format, frames))
 				return false;
 			const auto out_bytes = frames * _buffer_info._format.bytes_per_frame();
-			if (out_bytes < out.size())
-				std::memset(out.begin() + out_bytes, 0, out.size() - out_bytes);
+			if (out_bytes < _buffer_info._size)
+				std::memset(static_cast<std::byte*>(out) + out_bytes, 0, _buffer_info._size - out_bytes);
 		}
 		return true;
 	}

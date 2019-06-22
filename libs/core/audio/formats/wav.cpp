@@ -67,7 +67,7 @@ namespace Yttrium
 		if (!::find_chunk(_reader, WavChunkHeader::data, data_header))
 			throw DataError("Bad WAV 'data' chunk");
 
-		_format = { AudioSample::i16, fmt.channels, fmt.samples_per_second };
+		_format = { sample_type, fmt.channels, fmt.samples_per_second };
 		_total_frames = std::min<uint64_t>(_reader.size() - _reader.offset(), data_header.size) / _format.bytes_per_frame();
 		_data_offset = _reader.offset();
 	}

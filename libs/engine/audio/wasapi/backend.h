@@ -31,9 +31,12 @@ namespace Yttrium
 		~WasapiAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override { return _buffer_info; }
-		std::unique_ptr<ThreadContext> create_thread_context() override;
-		void flush() override {}
-		bool write_buffer(const uint8_t*, const std::atomic<bool>&) override { return false; }
+
+	private:
+		void begin_context() override;
+		void end_context() noexcept override;
+		void* lock_buffer() override;
+		void unlock_buffer() noexcept override;
 
 	private:
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
