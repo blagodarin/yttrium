@@ -73,8 +73,6 @@ namespace
 			case AUDCLNT_E_RAW_MODE_UNSUPPORTED: error_name = "AUDCLNT_E_RAW_MODE_UNSUPPORTED"; break;
 			case AUDCLNT_E_ENGINE_PERIODICITY_LOCKED: error_name = "AUDCLNT_E_ENGINE_PERIODICITY_LOCKED"; break;
 			case AUDCLNT_E_ENGINE_FORMAT_LOCKED: error_name = "AUDCLNT_E_ENGINE_FORMAT_LOCKED"; break;
-			case AUDCLNT_E_HEADTRACKING_ENABLED: error_name = "AUDCLNT_E_HEADTRACKING_ENABLED"; break;
-			case AUDCLNT_E_HEADTRACKING_UNSUPPORTED: error_name = "AUDCLNT_E_HEADTRACKING_UNSUPPORTED"; break;
 			}
 			return Yttrium::error_to_string(error, error_name);
 		}
