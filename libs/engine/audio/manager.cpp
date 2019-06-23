@@ -53,16 +53,6 @@ namespace Yttrium
 		: _backend{ std::move(backend) }
 		, _thread{ [this] { run(); } }
 	{
-#ifndef NDEBUG
-		const auto buffer_info = _backend->buffer_info();
-		std::cerr << "[Audio] Output buffer: ";
-		switch (buffer_info._format.sample_type())
-		{
-		case AudioSample::i16: std::cerr << "i16"; break;
-		case AudioSample::f32: std::cerr << "f32"; break;
-		}
-		std::cerr << ", " << buffer_info._format.channels() << " ch., " << buffer_info._format.frames_per_second() << " Hz, " << buffer_info._size << " B\n";
-#endif
 	}
 
 	AudioManagerImpl::~AudioManagerImpl() noexcept
@@ -110,7 +100,7 @@ namespace Yttrium
 		{
 			::set_high_priority();
 			AudioBackend::Context context{ *_backend };
-			AudioMixer mixer{ _backend->buffer_info() };
+			AudioMixer mixer{ _backend->buffer_format() };
 			for (;;)
 			{
 				Command command;
@@ -125,7 +115,7 @@ namespace Yttrium
 				std::visit(MixerVisitor{ mixer }, command);
 				while (!mixer.empty())
 				{
-					mixer.mix(AudioBackend::BufferLock{ *_backend }._data);
+					mixer.mix(AudioBackend::BufferLock{ *_backend }._buffer);
 					_backend->play_buffer();
 					if (_done)
 						break;

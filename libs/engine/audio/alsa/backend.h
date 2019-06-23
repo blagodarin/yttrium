@@ -31,18 +31,19 @@ namespace Yttrium
 		explicit AlsaAudioBackend(unsigned frames_per_second);
 		~AlsaAudioBackend() override;
 
-		BufferInfo buffer_info() const noexcept override { return _buffer_info; }
+		AudioFormat buffer_format() const noexcept override { return _buffer_format; }
 		void play_buffer() override;
 
 	private:
 		void begin_context() override;
 		void end_context() noexcept override;
-		void* lock_buffer() override;
+		BufferView lock_buffer() override;
 		void unlock_buffer(bool) noexcept override;
 
 	private:
 		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
-		BufferInfo _buffer_info;
+		AudioFormat _buffer_format;
+		size_t _buffer_frames;
 		Buffer _buffer;
 	};
 }

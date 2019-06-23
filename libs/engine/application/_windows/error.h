@@ -16,12 +16,11 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
 
 namespace Yttrium
 {
-	std::string error_to_string(uint32_t, std::string_view fallback_message = {});
+	std::string error_to_string(unsigned long, std::string_view fallback_message = {});
 	void print_last_error(std::string_view function) noexcept;
 	void throw_last_error(std::string_view function);
 }

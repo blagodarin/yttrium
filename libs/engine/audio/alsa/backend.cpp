@@ -75,9 +75,9 @@ namespace Yttrium
 			CHECK_ALSA(snd_pcm_sw_params_set_stop_threshold(pcm, sw, buffer_frames));
 			CHECK_ALSA(snd_pcm_sw_params(pcm, sw));
 		}
-		_buffer_info._format = { AudioSample::f32, AudioBufferChannels, frames_per_second };
-		_buffer_info._size = period_frames * _buffer_info._format.bytes_per_frame();
-		_buffer.reset(_buffer_info._size);
+		_buffer_format = { AudioSample::f32, AudioBufferChannels, frames_per_second };
+		_buffer_frames = period_frames;
+		_buffer.reset(_buffer_frames * _buffer_format.bytes_per_frame());
 	}
 
 	AlsaAudioBackend::~AlsaAudioBackend() = default;
@@ -85,8 +85,7 @@ namespace Yttrium
 	void AlsaAudioBackend::play_buffer()
 	{
 		auto data = _buffer.begin();
-		const auto buffer_frames = _buffer.size() / _buffer_info._format.bytes_per_frame();
-		auto frames_left = buffer_frames;
+		auto frames_left = _buffer_frames;
 		while (frames_left > 0)
 		{
 			const auto result = snd_pcm_writei(_pcm.get(), data, frames_left);
@@ -99,10 +98,10 @@ namespace Yttrium
 			}
 			if (result == 0)
 			{
-				snd_pcm_wait(_pcm.get(), static_cast<int>((buffer_frames * 1000 + _buffer_info._format.frames_per_second() - 1) / _buffer_info._format.frames_per_second()));
+				snd_pcm_wait(_pcm.get(), static_cast<int>((_buffer_frames * 1000 + _buffer_format.frames_per_second() - 1) / _buffer_format.frames_per_second()));
 				continue;
 			}
-			data += to_unsigned(result) * _buffer_info._format.bytes_per_frame();
+			data += to_unsigned(result) * _buffer_format.bytes_per_frame();
 			frames_left -= to_unsigned(result);
 		}
 	}
@@ -116,9 +115,9 @@ namespace Yttrium
 		snd_pcm_drain(_pcm.get());
 	}
 
-	void* AlsaAudioBackend::lock_buffer()
+	AudioBackend::BufferView AlsaAudioBackend::lock_buffer()
 	{
-		return _buffer.data();
+		return { _buffer.data(), _buffer_frames };
 	}
 
 	void AlsaAudioBackend::unlock_buffer(bool) noexcept

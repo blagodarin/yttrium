@@ -28,22 +28,20 @@ namespace Yttrium
 	class AudioMixer
 	{
 	public:
-		explicit AudioMixer(const AudioBackend::BufferInfo&);
+		explicit AudioMixer(const AudioFormat&);
 
 		bool empty() const noexcept { return !(_music || _sound); }
-		void mix(void* buffer);
+		void mix(const AudioBackend::BufferView&);
 		void play_music(const std::shared_ptr<AudioReader>&);
 		void play_sound(const std::shared_ptr<Sound>&);
 
 	private:
-		bool read(void* out, Buffer& tmp, AudioReader&);
+		bool read(void* out, size_t out_frames, Buffer& in_buffer, AudioReader&);
 
 	private:
-		using AddSaturate = void (*)(void*, const void*, size_t);
-
-		const AudioBackend::BufferInfo _buffer_info;
-		Buffer _mix_buffer{ _buffer_info._size };
-		Buffer _conversion_buffer{ _buffer_info._size };
+		const AudioFormat _format;
+		Buffer _mix_buffer;
+		Buffer _conversion_buffer;
 		std::shared_ptr<AudioReader> _music;
 		std::shared_ptr<SoundImpl> _sound;
 	};

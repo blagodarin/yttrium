@@ -26,16 +26,18 @@ namespace Yttrium
 	class AudioBackend
 	{
 	public:
-		struct BufferInfo
+		static constexpr unsigned BlockAlignment = 16;
+
+		struct BufferView
 		{
-			AudioFormat _format;
-			size_t _size = 0;
+			void* _data;
+			size_t _frames;
 		};
 
 		struct BufferLock
 		{
 			AudioBackend& _backend;
-			void* const _data = _backend.lock_buffer();
+			const BufferView _buffer = _backend.lock_buffer();
 			const int _exceptions = std::uncaught_exceptions();
 			BufferLock(AudioBackend& backend)
 				: _backend{ backend } {}
@@ -54,13 +56,13 @@ namespace Yttrium
 
 		virtual ~AudioBackend() = default;
 
-		virtual BufferInfo buffer_info() const noexcept = 0;
+		virtual AudioFormat buffer_format() const noexcept = 0;
 		virtual void play_buffer() = 0;
 
 	protected:
 		virtual void begin_context() = 0;
 		virtual void end_context() noexcept = 0;
-		virtual void* lock_buffer() = 0;
+		virtual BufferView lock_buffer() = 0;
 		virtual void unlock_buffer(bool update) noexcept = 0;
 	};
 }

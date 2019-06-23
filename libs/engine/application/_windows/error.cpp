@@ -28,7 +28,7 @@
 
 namespace Yttrium
 {
-	std::string error_to_string(std::uint32_t code, std::string_view fallback_message)
+	std::string error_to_string(unsigned long code, std::string_view fallback_message)
 	{
 		char* buffer = nullptr;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
