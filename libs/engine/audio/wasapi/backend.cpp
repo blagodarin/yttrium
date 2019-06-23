@@ -90,11 +90,18 @@ namespace Yttrium
 		if (!_render_client)
 			throw BadCall{ "WASAPI", "IAudioClient::GetService", error_to_string(hr) };
 
+		_buffer_frames = buffer_frames / 2;
 		_buffer_info._format = { AudioSample::f32, format->nChannels, format->nSamplesPerSec };
-		_buffer_info._size = buffer_frames * _buffer_info._format.bytes_per_frame();
+		_buffer_info._size = _buffer_frames * _buffer_info._format.bytes_per_frame();
 	}
 
 	WasapiAudioBackend::~WasapiAudioBackend() = default;
+
+	void WasapiAudioBackend::play_buffer()
+	{
+		if (FAILED(_unlock_error))
+			throw BadCall{ "WASAPI", "IAudioRenderClient::ReleaseBuffer", error_to_string(_unlock_error) };
+	}
 
 	void WasapiAudioBackend::begin_context()
 	{
@@ -109,11 +116,15 @@ namespace Yttrium
 
 	void* WasapiAudioBackend::lock_buffer()
 	{
-		return nullptr;
+		BYTE* buffer;
+		if (const auto hr = _render_client->GetBuffer(_buffer_frames, &buffer); FAILED(hr))
+			throw BadCall{ "WASAPI", "IAudioRenderClient::GetBuffer", error_to_string(hr) };
+		return static_cast<void*>(buffer);
 	}
 
-	void WasapiAudioBackend::unlock_buffer() noexcept
+	void WasapiAudioBackend::unlock_buffer(bool update) noexcept
 	{
+		_unlock_error = _render_client->ReleaseBuffer(update ? _buffer_frames : 0, 0);
 	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create(unsigned frames_per_second)

@@ -31,12 +31,13 @@ namespace Yttrium
 		~WasapiAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override { return _buffer_info; }
+		void play_buffer() override;
 
 	private:
 		void begin_context() override;
 		void end_context() noexcept override;
 		void* lock_buffer() override;
-		void unlock_buffer() noexcept override;
+		void unlock_buffer(bool) noexcept override;
 
 	private:
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
@@ -44,7 +45,9 @@ namespace Yttrium
 		ComInitializer _com{ COINIT_APARTMENTTHREADED };
 		ComPtr<IMMDevice> _device;
 		ComPtr<IAudioClient> _client;
-		BufferInfo _buffer_info;
 		ComPtr<IAudioRenderClient> _render_client;
+		UINT32 _buffer_frames = 0;
+		BufferInfo _buffer_info;
+		HRESULT _unlock_error = S_OK;
 	};
 }

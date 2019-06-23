@@ -82,6 +82,31 @@ namespace Yttrium
 
 	AlsaAudioBackend::~AlsaAudioBackend() = default;
 
+	void AlsaAudioBackend::play_buffer()
+	{
+		auto data = _buffer.begin();
+		const auto buffer_frames = _buffer.size() / _buffer_info._format.bytes_per_frame();
+		auto frames_left = buffer_frames;
+		while (frames_left > 0)
+		{
+			const auto result = snd_pcm_writei(_pcm.get(), data, frames_left);
+			if (result < 0)
+			{
+				if (result != -EAGAIN)
+					if (const auto recovered = snd_pcm_recover(_pcm.get(), static_cast<int>(result), 1); recovered < 0)
+						throw BadCall{ "ALSA", "snd_pcm_writei", snd_strerror(recovered) };
+				continue;
+			}
+			if (result == 0)
+			{
+				snd_pcm_wait(_pcm.get(), static_cast<int>((buffer_frames * 1000 + _buffer_info._format.frames_per_second() - 1) / _buffer_info._format.frames_per_second()));
+				continue;
+			}
+			data += to_unsigned(result) * _buffer_info._format.bytes_per_frame();
+			frames_left -= to_unsigned(result);
+		}
+	}
+
 	void AlsaAudioBackend::begin_context()
 	{
 	}
@@ -93,39 +118,11 @@ namespace Yttrium
 
 	void* AlsaAudioBackend::lock_buffer()
 	{
-		if (_error < 0)
-			throw std::runtime_error{ make_string("[ALSA] Unrecoverable error: (", _error, ") ", snd_strerror(_error)) };
 		return _buffer.data();
 	}
 
-	void AlsaAudioBackend::unlock_buffer() noexcept
+	void AlsaAudioBackend::unlock_buffer(bool) noexcept
 	{
-		auto data = _buffer.begin();
-		const auto buffer_frames = _buffer.size() / _buffer_info._format.bytes_per_frame();
-		auto frames_left = buffer_frames;
-		while (frames_left > 0)
-		{
-			const auto result = snd_pcm_writei(_pcm.get(), data, frames_left);
-			if (result < 0)
-			{
-				if (result != -EAGAIN)
-				{
-					if (const auto recovered = snd_pcm_recover(_pcm.get(), static_cast<int>(result), 1); recovered < 0)
-					{
-						_error = recovered;
-						return;
-					}
-				}
-				continue;
-			}
-			if (result == 0)
-			{
-				snd_pcm_wait(_pcm.get(), static_cast<int>((buffer_frames * 1000 + _buffer_info._format.frames_per_second() - 1) / _buffer_info._format.frames_per_second()));
-				continue;
-			}
-			data += to_unsigned(result) * _buffer_info._format.bytes_per_frame();
-			frames_left -= to_unsigned(result);
-		}
 	}
 
 	std::unique_ptr<AudioBackend> AudioBackend::create(unsigned frames_per_second)

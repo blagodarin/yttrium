@@ -32,17 +32,17 @@ namespace Yttrium
 		~AlsaAudioBackend() override;
 
 		BufferInfo buffer_info() const noexcept override { return _buffer_info; }
+		void play_buffer() override;
 
 	private:
 		void begin_context() override;
 		void end_context() noexcept override;
 		void* lock_buffer() override;
-		void unlock_buffer() noexcept override;
+		void unlock_buffer(bool) noexcept override;
 
 	private:
 		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
 		BufferInfo _buffer_info;
 		Buffer _buffer;
-		int _error = 0;
 	};
 }

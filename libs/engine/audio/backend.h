@@ -18,6 +18,7 @@
 
 #include <yttrium/audio/format.h>
 
+#include <exception>
 #include <memory>
 
 namespace Yttrium
@@ -35,9 +36,10 @@ namespace Yttrium
 		{
 			AudioBackend& _backend;
 			void* const _data = _backend.lock_buffer();
+			const int _exceptions = std::uncaught_exceptions();
 			BufferLock(AudioBackend& backend)
 				: _backend{ backend } {}
-			~BufferLock() noexcept { _backend.unlock_buffer(); }
+			~BufferLock() noexcept { _backend.unlock_buffer(_exceptions == std::uncaught_exceptions()); }
 		};
 
 		struct Context
@@ -53,11 +55,12 @@ namespace Yttrium
 		virtual ~AudioBackend() = default;
 
 		virtual BufferInfo buffer_info() const noexcept = 0;
+		virtual void play_buffer() = 0;
 
 	protected:
 		virtual void begin_context() = 0;
 		virtual void end_context() noexcept = 0;
 		virtual void* lock_buffer() = 0;
-		virtual void unlock_buffer() noexcept = 0;
+		virtual void unlock_buffer(bool update) noexcept = 0;
 	};
 }

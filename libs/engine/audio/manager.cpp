@@ -126,6 +126,7 @@ namespace Yttrium
 				while (!mixer.empty())
 				{
 					mixer.mix(AudioBackend::BufferLock{ *_backend }._data);
+					_backend->play_buffer();
 					if (_done)
 						break;
 					{
