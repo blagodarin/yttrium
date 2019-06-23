@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 namespace Yttrium
 {
-	std::string error_to_string(std::uint32_t);
+	std::string error_to_string(uint32_t, std::string_view fallback_message = {});
 	void print_last_error(std::string_view function) noexcept;
 	void throw_last_error(std::string_view function);
 }

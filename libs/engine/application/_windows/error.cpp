@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 
 namespace Yttrium
 {
-	std::string error_to_string(std::uint32_t code)
+	std::string error_to_string(std::uint32_t code, std::string_view fallback_message)
 	{
 		char* buffer = nullptr;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -43,10 +43,11 @@ namespace Yttrium
 					--size;
 			}
 			UniquePtr<char[], ::LocalFree> buffer_ptr{ buffer };
-			return make_string("Error 0x", Hex32{ code }, ": ", std::string_view{ buffer, size });
+			return make_string("(0x", Hex32{ code }, ") ", std::string_view{ buffer, size });
 		}
-		else
-			return make_string("Error 0x", Hex32{ code }, '.');
+		if (!fallback_message.empty())
+			return make_string("(0x", Hex32{ code }, ") ", fallback_message, '.');
+		return make_string("(0x", Hex32{ code }, ").");
 	}
 
 	void print_last_error(std::string_view function) noexcept
