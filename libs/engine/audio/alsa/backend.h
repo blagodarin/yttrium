@@ -41,9 +41,11 @@ namespace Yttrium
 		void unlock_buffer(bool) noexcept override;
 
 	private:
+		const AudioFormat _buffer_format;
+		const size_t _block_frames;
 		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
-		AudioFormat _buffer_format;
-		size_t _buffer_frames;
-		Buffer _buffer;
+		snd_pcm_uframes_t _period_frames = 0;
+		snd_pcm_uframes_t _buffer_frames = 0;
+		Buffer _period;
 	};
 }

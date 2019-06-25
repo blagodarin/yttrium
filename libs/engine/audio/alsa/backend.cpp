@@ -19,6 +19,8 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
 
+#include <numeric>
+
 namespace
 {
 	constexpr unsigned AudioBufferChannels = 2;
@@ -31,24 +33,31 @@ namespace
 			++end;
 		return { signature, static_cast<size_t>(end - signature) };
 	}
+
+	class AlsaError : public Yttrium::BadCall
+	{
+	public:
+		AlsaError(std::string_view function, int error)
+			: BadCall{ "ALSA", function, snd_strerror(error) } {}
+	};
 }
 
 #define CHECK_ALSA(call) \
 	do \
 	{ \
 		if (const auto x = call; x < 0) \
-			throw BadCall{ "ALSA", ::function_name(#call), snd_strerror(x) }; \
+			throw AlsaError{ ::function_name(#call), x }; \
 	} while (false)
 
 namespace Yttrium
 {
 	AlsaAudioBackend::AlsaAudioBackend(unsigned frames_per_second)
+		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }
+		, _block_frames{ std::lcm(BlockAlignment, _buffer_format.bytes_per_frame()) / _buffer_format.bytes_per_frame() }
 	{
 		snd_pcm_t* pcm = nullptr;
 		CHECK_ALSA(snd_pcm_open(&pcm, "default", SND_PCM_STREAM_PLAYBACK, 0));
 		_pcm.reset(pcm);
-		auto period_frames = snd_pcm_uframes_t{ frames_per_second } / 25;
-		auto buffer_frames = period_frames * PeriodsPerBuffer;
 		{
 			snd_pcm_hw_params_t* hw = nullptr;
 			CHECK_ALSA(snd_pcm_hw_params_malloc(&hw));
@@ -58,34 +67,36 @@ namespace Yttrium
 			CHECK_ALSA(snd_pcm_hw_params_set_format(pcm, hw, SND_PCM_FORMAT_FLOAT));
 			CHECK_ALSA(snd_pcm_hw_params_set_channels(pcm, hw, AudioBufferChannels));
 			CHECK_ALSA(snd_pcm_hw_params_set_rate(pcm, hw, frames_per_second, 0));
-			CHECK_ALSA(snd_pcm_hw_params_set_period_size_near(pcm, hw, &period_frames, nullptr));
 			unsigned periods = PeriodsPerBuffer;
 			CHECK_ALSA(snd_pcm_hw_params_set_periods_near(pcm, hw, &periods, nullptr));
+			snd_pcm_uframes_t min_period = 0;
+			int dir = 0;
+			CHECK_ALSA(snd_pcm_hw_params_get_period_size_min(hw, &min_period, &dir));
+			_period_frames = (min_period + _block_frames - 1) / _block_frames * _block_frames;
+			CHECK_ALSA(snd_pcm_hw_params_set_period_size(pcm, hw, _period_frames, _period_frames == min_period ? dir : 0));
 			CHECK_ALSA(snd_pcm_hw_params(pcm, hw));
-			CHECK_ALSA(snd_pcm_hw_params_get_period_size(hw, &period_frames, nullptr));
-			CHECK_ALSA(snd_pcm_hw_params_get_buffer_size(hw, &buffer_frames));
+			CHECK_ALSA(snd_pcm_hw_params_get_period_size(hw, &_period_frames, nullptr));
+			CHECK_ALSA(snd_pcm_hw_params_get_buffer_size(hw, &_buffer_frames));
 		}
 		{
 			snd_pcm_sw_params_t* sw = nullptr;
 			CHECK_ALSA(snd_pcm_sw_params_malloc(&sw));
 			const UniquePtr<snd_pcm_sw_params_t, snd_pcm_sw_params_free> sw_deleter{ sw };
 			CHECK_ALSA(snd_pcm_sw_params_current(pcm, sw));
-			CHECK_ALSA(snd_pcm_sw_params_set_avail_min(pcm, sw, period_frames));
+			CHECK_ALSA(snd_pcm_sw_params_set_avail_min(pcm, sw, _period_frames));
 			CHECK_ALSA(snd_pcm_sw_params_set_start_threshold(pcm, sw, 1));
-			CHECK_ALSA(snd_pcm_sw_params_set_stop_threshold(pcm, sw, buffer_frames));
+			CHECK_ALSA(snd_pcm_sw_params_set_stop_threshold(pcm, sw, _buffer_frames));
 			CHECK_ALSA(snd_pcm_sw_params(pcm, sw));
 		}
-		_buffer_format = { AudioSample::f32, AudioBufferChannels, frames_per_second };
-		_buffer_frames = period_frames;
-		_buffer.reset(_buffer_frames * _buffer_format.bytes_per_frame());
+		_period.reset(_period_frames * _buffer_format.bytes_per_frame());
 	}
 
 	AlsaAudioBackend::~AlsaAudioBackend() = default;
 
 	void AlsaAudioBackend::play_buffer()
 	{
-		auto data = _buffer.begin();
-		auto frames_left = _buffer_frames;
+		auto data = _period.begin();
+		auto frames_left = _period_frames;
 		while (frames_left > 0)
 		{
 			const auto result = snd_pcm_writei(_pcm.get(), data, frames_left);
@@ -93,7 +104,7 @@ namespace Yttrium
 			{
 				if (result != -EAGAIN)
 					if (const auto recovered = snd_pcm_recover(_pcm.get(), static_cast<int>(result), 1); recovered < 0)
-						throw BadCall{ "ALSA", "snd_pcm_writei", snd_strerror(recovered) };
+						throw AlsaError{ "snd_pcm_writei", recovered };
 				continue;
 			}
 			if (result == 0)
@@ -117,7 +128,7 @@ namespace Yttrium
 
 	AudioBackend::BufferView AlsaAudioBackend::lock_buffer()
 	{
-		return { _buffer.data(), _buffer_frames };
+		return { _period.data(), _period_frames };
 	}
 
 	void AlsaAudioBackend::unlock_buffer(bool) noexcept
