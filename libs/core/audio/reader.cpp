@@ -69,7 +69,7 @@ namespace Yttrium
 
 	size_t AudioReader::read(void* buffer, size_t bytes_to_read)
 	{
-		const auto frame_size = _decoder->format().frame_bytes();
+		const auto frame_size = _decoder->format().bytes_per_frame();
 		for (size_t result = 0;;)
 		{
 			const auto requested = bytes_to_read - result;

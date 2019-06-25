@@ -20,10 +20,14 @@
 #include "sound.h"
 
 #ifdef _WIN32
-// TODO: Implement.
+#	include <Windows.h>
 #else
 #	include <pthread.h>
 #	include <sched.h>
+#endif
+
+#ifndef NDEBUG
+#	include <iostream>
 #endif
 
 namespace
@@ -31,7 +35,7 @@ namespace
 	void set_high_priority() noexcept
 	{
 #ifdef _WIN32
-		// TODO: Implement.
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 #else
 		const auto thread = pthread_self();
 		int policy;
@@ -83,49 +87,59 @@ namespace Yttrium
 
 	void AudioManagerImpl::run()
 	{
-		struct Context
+		struct MixerVisitor
 		{
-			AudioMixer _mixer;
-			explicit Context(const AudioBackend::BufferInfo& buffer_info) noexcept
-				: _mixer{ buffer_info } {}
+			AudioMixer& _mixer;
+			explicit MixerVisitor(AudioMixer& mixer) noexcept
+				: _mixer{ mixer } {}
 			void operator()(const PlayMusic& command) { _mixer.play_music(command._music); }
 			void operator()(const PlaySound& command) { _mixer.play_sound(command._sound); }
 		};
 
-		::set_high_priority();
-		for (Context context{ _backend->buffer_info() };;)
+		try
 		{
-			Command command;
+			::set_high_priority();
+			AudioBackend::Context context{ *_backend };
+			AudioMixer mixer{ _backend->buffer_format() };
+			for (;;)
 			{
-				std::unique_lock lock{ _mutex };
-				_condition.wait(lock, [this] { return !_commands.empty() || _done; });
-				if (_done)
-					break;
-				command = std::move(_commands.front());
-				_commands.pop_front();
-			}
-			std::visit(context, command);
-			while (const auto buffer = context._mixer.mix_buffer())
-			{
-				if (!_backend->write_buffer(buffer, _done))
-					_done = true;
-				if (_done)
-					break;
+				Command command;
 				{
-					std::scoped_lock lock{ _mutex };
-					if (_commands.empty())
-						continue;
+					std::unique_lock lock{ _mutex };
+					_condition.wait(lock, [this] { return !_commands.empty() || _done; });
+					if (_done)
+						break;
 					command = std::move(_commands.front());
 					_commands.pop_front();
 				}
-				std::visit(context, command);
+				std::visit(MixerVisitor{ mixer }, command);
+				while (!mixer.empty())
+				{
+					mixer.mix(AudioBackend::BufferLock{ *_backend }._buffer);
+					_backend->play_buffer();
+					if (_done)
+						break;
+					{
+						std::scoped_lock lock{ _mutex };
+						if (_commands.empty())
+							continue;
+						command = std::move(_commands.front());
+						_commands.pop_front();
+					}
+					std::visit(MixerVisitor{ mixer }, command);
+				}
 			}
 		}
-		_backend->flush();
+		catch ([[maybe_unused]] const std::runtime_error& e)
+		{
+#ifndef NDEBUG
+			std::cerr << e.what() << '\n';
+#endif
+		}
 	}
 
 	std::shared_ptr<AudioManager> AudioManager::create()
 	{
-		return std::make_shared<AudioManagerImpl>(AudioBackend::create());
+		return std::make_shared<AudioManagerImpl>(AudioBackend::create(44'100));
 	}
 }

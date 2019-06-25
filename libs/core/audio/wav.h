@@ -23,6 +23,7 @@ namespace Yttrium
 	enum : uint16_t
 	{
 		WAVE_FORMAT_PCM = 0x0001,
+		WAVE_FORMAT_IEEE_FLOAT = 0x0003,
 	};
 
 #pragma pack(push, 1)

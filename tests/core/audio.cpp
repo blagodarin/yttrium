@@ -40,7 +40,7 @@ TEST_CASE("audio.transform.i16_to_i16x2")
 	Yttrium::Buffer src{ src_data.size() * sizeof(int16_t), src_data.data() };
 	Yttrium::Buffer dst{ dst_data.size() * sizeof(int16_t) };
 	std::memset(dst.data(), 0xee, dst.size());
-	REQUIRE(Yttrium::transform_audio(dst.data(), { 2, 2, 0 }, src.data(), { 2, 1, 0 }, src_data.size()));
+	REQUIRE(Yttrium::transform_audio(dst.data(), { Yttrium::AudioSample::i16, 2, 0 }, src.data(), { Yttrium::AudioSample::i16, 1, 0 }, src_data.size()));
 	CHECK(std::memcmp(dst.data(), dst_data.data(), dst.size()) == 0);
 }
 
@@ -55,6 +55,6 @@ TEST_CASE("audio.transform.i16x2_to_i16x2")
 	Yttrium::Buffer src{ data.size() * sizeof(int16_t), data.data() };
 	Yttrium::Buffer dst{ data.size() * sizeof(int16_t) };
 	std::memset(dst.data(), 0xee, dst.size());
-	REQUIRE(Yttrium::transform_audio(dst.data(), { 2, 2, 0 }, src.data(), { 2, 2, 0 }, data.size()));
+	REQUIRE(Yttrium::transform_audio(dst.data(), { Yttrium::AudioSample::i16, 2, 0 }, src.data(), { Yttrium::AudioSample::i16, 2, 0 }, data.size()));
 	CHECK(std::memcmp(dst.data(), data.data(), dst.size()) == 0);
 }

@@ -18,7 +18,7 @@
 
 #include <yttrium/audio/format.h>
 
-#include <atomic>
+#include <exception>
 #include <memory>
 
 namespace Yttrium
@@ -26,18 +26,43 @@ namespace Yttrium
 	class AudioBackend
 	{
 	public:
-		struct BufferInfo
+		static constexpr unsigned BlockAlignment = 16;
+
+		struct BufferView
 		{
-			AudioFormat _format;
-			size_t _size = 0;
+			void* _data;
+			size_t _frames;
 		};
 
-		static std::unique_ptr<AudioBackend> create();
+		struct BufferLock
+		{
+			AudioBackend& _backend;
+			const BufferView _buffer = _backend.lock_buffer();
+			const int _exceptions = std::uncaught_exceptions();
+			BufferLock(AudioBackend& backend)
+				: _backend{ backend } {}
+			~BufferLock() noexcept { _backend.unlock_buffer(_exceptions == std::uncaught_exceptions()); }
+		};
+
+		struct Context
+		{
+			AudioBackend& _backend;
+			Context(AudioBackend& backend)
+				: _backend{ backend } { _backend.begin_context(); }
+			~Context() noexcept { _backend.end_context(); }
+		};
+
+		static std::unique_ptr<AudioBackend> create(unsigned frames_per_second);
 
 		virtual ~AudioBackend() = default;
 
-		virtual BufferInfo buffer_info() const noexcept = 0;
-		virtual void flush() = 0;
-		virtual bool write_buffer(const uint8_t* data, const std::atomic<bool>& interrupt) = 0;
+		virtual AudioFormat buffer_format() const noexcept = 0;
+		virtual void play_buffer() = 0;
+
+	protected:
+		virtual void begin_context() = 0;
+		virtual void end_context() noexcept = 0;
+		virtual BufferView lock_buffer() = 0;
+		virtual void unlock_buffer(bool update) noexcept = 0;
 	};
 }

@@ -16,8 +16,11 @@
 
 #pragma once
 
+#include "../../../core/utils/memory.h"
 #include "../../application/_windows/com.h"
 #include "../backend.h"
+
+#include <type_traits>
 
 #include <audioclient.h>
 #include <mmdeviceapi.h>
@@ -27,12 +30,17 @@ namespace Yttrium
 	class WasapiAudioBackend final : public AudioBackend
 	{
 	public:
-		WasapiAudioBackend();
+		explicit WasapiAudioBackend(unsigned frames_per_second);
 		~WasapiAudioBackend() override;
 
-		BufferInfo buffer_info() const noexcept override { return {}; }
-		void flush() override {}
-		bool write_buffer(const uint8_t*, const std::atomic<bool>&) override { return false; }
+		AudioFormat buffer_format() const noexcept override { return _buffer_format; }
+		void play_buffer() override;
+
+	private:
+		void begin_context() override;
+		void end_context() noexcept override;
+		BufferView lock_buffer() override;
+		void unlock_buffer(bool) noexcept override;
 
 	private:
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
@@ -40,5 +48,14 @@ namespace Yttrium
 		ComInitializer _com{ COINIT_APARTMENTTHREADED };
 		ComPtr<IMMDevice> _device;
 		ComPtr<IAudioClient> _client;
+		UniquePtr<std::remove_pointer_t<HANDLE>, CloseHandle> _event;
+		ComPtr<IAudioRenderClient> _render_client;
+		AudioFormat _buffer_format;
+		size_t _block_frames = 0;
+		UINT32 _buffer_frames = 0;
+		UINT32 _update_frames = 0;
+		UINT32 _locked_frames = 0;
+		HRESULT _unlock_error = S_OK;
+		bool _started = false;
 	};
 }

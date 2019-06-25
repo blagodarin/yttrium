@@ -26,35 +26,33 @@
 
 namespace Yttrium
 {
-	AudioMixer::AudioMixer(const AudioBackend::BufferInfo& buffer_info) noexcept
-		: _buffer_info{ buffer_info }
+	AudioMixer::AudioMixer(const AudioFormat& format)
+		: _format{ format }
 	{
-		assert(_buffer_info._format.bytes_per_sample() == 2);
+		assert(_format.sample_type() == AudioSample::f32);
 	}
 
-	const uint8_t* AudioMixer::mix_buffer()
+	void AudioMixer::mix(const AudioBackend::BufferView& buffer)
 	{
-		Buffer* out = &_buffer;
+		assert(buffer._frames * _format.bytes_per_frame() % AudioBackend::BlockAlignment == 0);
+		auto out = buffer._data;
 		if (_music)
 		{
-			if (read(*out, _conversion_buffer, *_music))
-				out = &_mix_buffer;
-			else
+			if (!read(out, buffer._frames, _conversion_buffer, *_music))
 				_music.reset();
+			else
+			{
+				_mix_buffer.reset(buffer._frames * _format.bytes_per_frame());
+				out = _mix_buffer.data();
+			}
 		}
 		if (_sound)
 		{
-			if (read(*out, _conversion_buffer, _sound->_reader))
-			{
-				if (out == &_mix_buffer)
-					add_saturate_i16(_buffer.data(), _mix_buffer.data(), _buffer_info._size / _buffer_info._format.bytes_per_sample());
-				else
-					out = &_mix_buffer;
-			}
-			else
+			if (!read(out, buffer._frames, _conversion_buffer, _sound->_reader))
 				_sound.reset();
+			else if (out != buffer._data)
+				add_saturate_f32(buffer._data, out, buffer._frames * _format.channels());
 		}
-		return out == &_mix_buffer ? _buffer.begin() : nullptr;
 	}
 
 	void AudioMixer::play_music(const std::shared_ptr<AudioReader>& music)
@@ -73,29 +71,29 @@ namespace Yttrium
 			_sound->_reader.seek(0);
 	}
 
-	bool AudioMixer::read(Buffer& out, Buffer& tmp, AudioReader& reader)
+	bool AudioMixer::read(void* out, size_t out_frames, Buffer& in_buffer, AudioReader& reader)
 	{
-		const auto format = reader.format();
-		if (format == _buffer_info._format)
+		const auto out_bytes = out_frames * _format.bytes_per_frame();
+		if (const auto in_format = reader.format(); in_format == _format)
 		{
-			const auto out_bytes = reader.read(out.data(), out.size());
-			if (!out_bytes)
+			const auto read_bytes = reader.read(out, out_bytes);
+			if (!read_bytes)
 				return false;
-			if (out_bytes < out.size())
-				std::memset(out.begin() + out_bytes, 0, out.size() - out_bytes);
+			if (read_bytes < out_bytes)
+				std::memset(static_cast<std::byte*>(out) + read_bytes, 0, out_bytes - read_bytes);
 		}
 		else
 		{
-			tmp.reset(_buffer_info._size / _buffer_info._format.frame_bytes() * format.frame_bytes());
-			const auto tmp_bytes = reader.read(tmp.data(), tmp.size());
-			if (!tmp_bytes)
+			in_buffer.reset(out_frames * in_format.bytes_per_frame());
+			const auto in_bytes = reader.read(in_buffer.data(), in_buffer.size());
+			if (!in_bytes)
 				return false;
-			const auto frames = tmp_bytes / format.frame_bytes();
-			if (!transform_audio(out.data(), _buffer_info._format, tmp.data(), format, frames))
+			const auto in_frames = in_bytes / in_format.bytes_per_frame();
+			if (!transform_audio(out, _format, in_buffer.data(), in_format, in_frames))
 				return false;
-			const auto out_bytes = frames * _buffer_info._format.frame_bytes();
-			if (out_bytes < out.size())
-				std::memset(out.begin() + out_bytes, 0, out.size() - out_bytes);
+			const auto read_bytes = in_frames * _format.bytes_per_frame();
+			if (read_bytes < out_bytes)
+				std::memset(static_cast<std::byte*>(out) + read_bytes, 0, out_bytes - read_bytes);
 		}
 		return true;
 	}

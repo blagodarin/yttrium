@@ -72,7 +72,7 @@ namespace
 			constexpr size_t duration = frequency / 4; // 0.25 s.
 
 			Writer writer{ buffer };
-			if (write_wav_header(writer, { 2, 1, frequency }, duration))
+			if (write_wav_header(writer, { AudioSample::i16, 1, frequency }, duration))
 			{
 				constexpr auto time_step = 440.0 / frequency;
 
