@@ -33,4 +33,30 @@ namespace Yttrium
 
 	template <typename T, auto Deleter>
 	using UniquePtr = std::unique_ptr<T, UniquePtrDeleter<Deleter>>;
+
+	template <typename T, auto Deleter, T* Sentinel = nullptr>
+	class SlimPtr
+	{
+	public:
+		constexpr SlimPtr() noexcept = default;
+		constexpr SlimPtr(SlimPtr&& other) noexcept
+			: _pointer{ other._pointer } { other._pointer = Sentinel; }
+		~SlimPtr() noexcept
+		{
+			if (_pointer != Sentinel)
+				Deleter(_pointer);
+		}
+		constexpr SlimPtr& operator=(SlimPtr&& other) noexcept
+		{
+			const auto pointer = other._pointer;
+			other._pointer = _pointer;
+			_pointer = pointer;
+		}
+		constexpr operator T*() const noexcept { return _pointer; }
+		constexpr T* operator->() const noexcept { return _pointer; }
+		constexpr T** operator&() noexcept { return &_pointer; }
+
+	private:
+		T* _pointer = Sentinel;
+	};
 }

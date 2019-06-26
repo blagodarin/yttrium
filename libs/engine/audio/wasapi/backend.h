@@ -43,6 +43,8 @@ namespace Yttrium
 		void unlock_buffer(bool) noexcept override;
 
 	private:
+		const AudioFormat _buffer_format;
+		const size_t _block_frames;
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
 		// be on the STA thread. Calls from an MTA thread may result in undefined behavior."
 		ComInitializer _com{ COINIT_APARTMENTTHREADED };
@@ -50,8 +52,6 @@ namespace Yttrium
 		ComPtr<IAudioClient> _client;
 		UniquePtr<std::remove_pointer_t<HANDLE>, CloseHandle> _event;
 		ComPtr<IAudioRenderClient> _render_client;
-		AudioFormat _buffer_format;
-		size_t _block_frames = 0;
 		UINT32 _buffer_frames = 0;
 		UINT32 _update_frames = 0;
 		UINT32 _locked_frames = 0;

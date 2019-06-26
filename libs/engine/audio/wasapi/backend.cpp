@@ -25,6 +25,8 @@
 
 namespace
 {
+	constexpr unsigned AudioBufferChannels = 2;
+
 	class WasapiError : public Yttrium::BadCall
 	{
 	public:
@@ -82,6 +84,8 @@ namespace
 namespace Yttrium
 {
 	WasapiAudioBackend::WasapiAudioBackend(unsigned frames_per_second)
+		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }
+		, _block_frames{ std::lcm(BlockAlignment, _buffer_format.bytes_per_frame()) / _buffer_format.bytes_per_frame() }
 	{
 		ComPtr<IMMDeviceEnumerator> enumerator;
 		auto hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
@@ -101,12 +105,10 @@ namespace Yttrium
 		if (FAILED(hr))
 			throw WasapiError{ "IAudioClient::GetDevicePeriod", hr };
 
-		WAVEFORMATEX* format = nullptr;
+		SlimPtr<WAVEFORMATEX, CoTaskMemFree> format;
 		hr = _client->GetMixFormat(&format);
 		if (!format)
 			throw WasapiError{ "IAudioClient::GetMixFormat", hr };
-
-		UniquePtr<WAVEFORMATEX, CoTaskMemFree> format_deleter{ format };
 
 		if (format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 		{
@@ -114,7 +116,7 @@ namespace Yttrium
 			if (!IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_IEEE_FLOAT) || extensible->Format.wBitsPerSample != 32)
 			{
 				extensible->Format.wBitsPerSample = 32;
-				extensible->Format.nBlockAlign = 4 * format->nChannels;
+				extensible->Format.nBlockAlign = (format->wBitsPerSample / 8) * format->nChannels;
 				extensible->Format.nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
 				extensible->Samples.wValidBitsPerSample = 32;
 				extensible->SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
@@ -124,7 +126,7 @@ namespace Yttrium
 		{
 			format->wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
 			format->wBitsPerSample = 32;
-			format->nBlockAlign = 4 * format->nChannels;
+			format->nBlockAlign = (format->wBitsPerSample / 8) * format->nChannels;
 			format->nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
 		}
 
@@ -133,6 +135,14 @@ namespace Yttrium
 		{
 			stream_flags |= AUDCLNT_STREAMFLAGS_RATEADJUST;
 			format->nSamplesPerSec = frames_per_second;
+			format->nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
+		}
+
+		// This shouldn't work, but it should trigger the proper error.
+		if (format->nChannels != AudioBufferChannels)
+		{
+			format->nChannels = AudioBufferChannels;
+			format->nBlockAlign = (format->wBitsPerSample / 8) * format->nChannels;
 			format->nAvgBytesPerSec = format->nBlockAlign * format->nSamplesPerSec;
 		}
 
@@ -157,8 +167,6 @@ namespace Yttrium
 		if (!_render_client)
 			throw WasapiError{ "IAudioClient::GetService", hr };
 
-		_buffer_format = { AudioSample::f32, format->nChannels, format->nSamplesPerSec };
-		_block_frames = std::lcm(BlockAlignment, _buffer_format.bytes_per_frame()) / _buffer_format.bytes_per_frame();
 		_buffer_frames = buffer_frames;
 		_update_frames = buffer_frames / _block_frames * _block_frames / 2;
 	}

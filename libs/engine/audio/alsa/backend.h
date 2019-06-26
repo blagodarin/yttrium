@@ -43,7 +43,7 @@ namespace Yttrium
 	private:
 		const AudioFormat _buffer_format;
 		const size_t _block_frames;
-		UniquePtr<snd_pcm_t, snd_pcm_close> _pcm;
+		SlimPtr<snd_pcm_t, snd_pcm_close> _pcm;
 		snd_pcm_uframes_t _period_frames = 0;
 		snd_pcm_uframes_t _buffer_frames = 0;
 		Buffer _period;
