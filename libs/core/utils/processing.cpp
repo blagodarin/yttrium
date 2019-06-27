@@ -16,26 +16,8 @@
 
 #include "processing.h"
 
-#include <algorithm>
-#include <limits>
-
 namespace Yttrium
 {
-	void add_saturate_i16(void* dst, const void* src, size_t count) noexcept
-	{
-		for (size_t i = 0; i < count; ++i)
-		{
-			const auto x = int32_t{ static_cast<int16_t*>(dst)[i] } + int32_t{ static_cast<const int16_t*>(src)[i] };
-			static_cast<int16_t*>(dst)[i] = static_cast<int16_t>(std::clamp<decltype(x)>(x, std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max()));
-		}
-	}
-
-	void add_saturate_f32(void* dst, const void* src, size_t count) noexcept
-	{
-		for (size_t i = 0; i < count; ++i)
-			static_cast<float*>(dst)[i] = std::clamp(static_cast<float*>(dst)[i] + static_cast<const float*>(src)[i], -1.f, 1.f);
-	}
-
 	void convert_normalize_f32_i16(void* dst, const void* src, size_t count) noexcept
 	{
 		for (size_t i = 0; i < count; ++i)

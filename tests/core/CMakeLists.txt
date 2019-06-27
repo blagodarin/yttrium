@@ -40,7 +40,6 @@ add_executable(ycore_tests
 	test_utils.cpp
 	translation.cpp
 	utils_numeric.cpp
-	utils_processing.cpp
 	utils_string.cpp
 	vector.cpp
 	)

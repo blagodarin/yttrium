@@ -18,11 +18,21 @@
 
 #include <yttrium/audio/reader.h>
 #include <yttrium/audio/utils.h>
-#include "../../core/utils/processing.h"
 #include "sound.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
+
+namespace
+{
+	void add_saturate_f32(void* dst, const void* src, size_t count) noexcept
+	{
+		assert(count * sizeof(float) % Yttrium::AudioBackend::BlockAlignment == 0);
+		for (size_t i = 0; i < count; ++i)
+			static_cast<float*>(dst)[i] = std::clamp(static_cast<float*>(dst)[i] + static_cast<const float*>(src)[i], -1.f, 1.f);
+	}
+}
 
 namespace Yttrium
 {
