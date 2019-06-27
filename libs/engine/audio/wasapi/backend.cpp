@@ -105,14 +105,14 @@ namespace Yttrium
 		if (FAILED(hr))
 			throw WasapiError{ "IAudioClient::GetDevicePeriod", hr };
 
-		SlimPtr<WAVEFORMATEX, CoTaskMemFree> format;
-		hr = _client->GetMixFormat(&format);
+		SmartPtr<WAVEFORMATEX, CoTaskMemFree> format;
+		hr = _client->GetMixFormat(format.out());
 		if (!format)
 			throw WasapiError{ "IAudioClient::GetMixFormat", hr };
 
 		if (format->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 		{
-			const auto extensible = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(format);
+			const auto extensible = format.get_as<WAVEFORMATEXTENSIBLE>();
 			if (!IsEqualGUID(extensible->SubFormat, KSDATAFORMAT_SUBTYPE_IEEE_FLOAT) || extensible->Format.wBitsPerSample != 32)
 			{
 				extensible->Format.wBitsPerSample = 32;

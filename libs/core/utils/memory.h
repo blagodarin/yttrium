@@ -35,26 +35,56 @@ namespace Yttrium
 	using UniquePtr = std::unique_ptr<T, UniquePtrDeleter<Deleter>>;
 
 	template <typename T, auto Deleter, T* Sentinel = nullptr>
-	class SlimPtr
+	class SmartPtr
 	{
 	public:
-		constexpr SlimPtr() noexcept = default;
-		constexpr SlimPtr(SlimPtr&& other) noexcept
-			: _pointer{ other._pointer } { other._pointer = Sentinel; }
-		~SlimPtr() noexcept
+		constexpr SmartPtr() noexcept = default;
+
+		constexpr SmartPtr(SmartPtr&& other) noexcept
+			: _pointer{ other._pointer }
+		{
+			other._pointer = Sentinel;
+		}
+
+		~SmartPtr() noexcept
 		{
 			if (_pointer != Sentinel)
 				Deleter(_pointer);
 		}
-		constexpr SlimPtr& operator=(SlimPtr&& other) noexcept
+
+		constexpr SmartPtr& operator=(SmartPtr&& other) noexcept
 		{
 			const auto pointer = other._pointer;
 			other._pointer = _pointer;
 			_pointer = pointer;
 		}
-		constexpr operator T*() const noexcept { return _pointer; }
-		constexpr T* operator->() const noexcept { return _pointer; }
-		constexpr T** operator&() noexcept { return &_pointer; }
+
+		constexpr operator T*() const noexcept
+		{
+			return _pointer;
+		}
+
+		constexpr T* operator->() const noexcept
+		{
+			return _pointer;
+		}
+
+		template <typename U>
+		constexpr U* get_as() noexcept
+		{
+			return reinterpret_cast<U*>(_pointer);
+		}
+
+		constexpr T** out() noexcept
+		{
+			return &_pointer;
+		}
+
+		template <typename U>
+		constexpr U** out_as() noexcept
+		{
+			return reinterpret_cast<U**>(&_pointer);
+		}
 
 	private:
 		T* _pointer = Sentinel;

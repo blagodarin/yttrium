@@ -55,10 +55,10 @@ namespace Yttrium
 		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }
 		, _block_frames{ std::lcm(BlockAlignment, _buffer_format.bytes_per_frame()) / _buffer_format.bytes_per_frame() }
 	{
-		CHECK_ALSA(snd_pcm_open(&_pcm, "default", SND_PCM_STREAM_PLAYBACK, 0));
+		CHECK_ALSA(snd_pcm_open(_pcm.out(), "default", SND_PCM_STREAM_PLAYBACK, 0));
 		{
-			SlimPtr<snd_pcm_hw_params_t, snd_pcm_hw_params_free> hw;
-			CHECK_ALSA(snd_pcm_hw_params_malloc(&hw));
+			SmartPtr<snd_pcm_hw_params_t, snd_pcm_hw_params_free> hw;
+			CHECK_ALSA(snd_pcm_hw_params_malloc(hw.out()));
 			CHECK_ALSA(snd_pcm_hw_params_any(_pcm, hw));
 			CHECK_ALSA(snd_pcm_hw_params_set_access(_pcm, hw, SND_PCM_ACCESS_RW_INTERLEAVED));
 			CHECK_ALSA(snd_pcm_hw_params_set_format(_pcm, hw, SND_PCM_FORMAT_FLOAT));
@@ -76,8 +76,8 @@ namespace Yttrium
 			CHECK_ALSA(snd_pcm_hw_params_get_buffer_size(hw, &_buffer_frames));
 		}
 		{
-			SlimPtr<snd_pcm_sw_params_t, snd_pcm_sw_params_free> sw;
-			CHECK_ALSA(snd_pcm_sw_params_malloc(&sw));
+			SmartPtr<snd_pcm_sw_params_t, snd_pcm_sw_params_free> sw;
+			CHECK_ALSA(snd_pcm_sw_params_malloc(sw.out()));
 			CHECK_ALSA(snd_pcm_sw_params_current(_pcm, sw));
 			CHECK_ALSA(snd_pcm_sw_params_set_avail_min(_pcm, sw, _period_frames));
 			CHECK_ALSA(snd_pcm_sw_params_set_start_threshold(_pcm, sw, 1));
