@@ -40,16 +40,13 @@ namespace Yttrium
 		AudioFormat format() const noexcept;
 
 		///
-		size_t read(void* buffer, size_t bytes_to_read);
+		size_t read_frames(void* buffer, size_t frames);
 
 		/// Moves the audio offset to the specified position in frames.
-		bool seek(uint64_t offset);
+		bool seek_frame(uint64_t frame);
 
 		///
 		bool set_loop(std::chrono::milliseconds from, std::chrono::milliseconds to = std::chrono::milliseconds::max()) noexcept;
-
-		/// Returns the audio size in bytes.
-		uint64_t total_bytes() const noexcept;
 
 		AudioReader(const AudioReader&) = delete;
 		AudioReader& operator=(const AudioReader&) = delete;

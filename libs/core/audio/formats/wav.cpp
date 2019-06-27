@@ -72,22 +72,22 @@ namespace Yttrium
 		_data_offset = _reader.offset();
 	}
 
-	size_t WavDecoder::read(void* buffer, size_t bytes_to_read)
+	size_t WavDecoder::read_frames(void* buffer, size_t frames)
 	{
-		const auto frame_bytes = _format.bytes_per_frame();
-		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
-		const auto bytes_read = _reader.read(buffer, bytes_to_read);
-		_current_frame += bytes_read / frame_bytes;
-		return bytes_read;
+		const auto bytes_per_frame = _format.bytes_per_frame();
+		const auto bytes_to_read = static_cast<size_t>(std::min<uint64_t>(frames, _total_frames - _current_frame)) * bytes_per_frame;
+		const auto result = _reader.read(buffer, bytes_to_read) / bytes_per_frame;
+		_current_frame += result;
+		return result;
 	}
 
-	bool WavDecoder::seek(uint64_t offset)
+	bool WavDecoder::seek_frame(uint64_t frame)
 	{
-		if (offset > _total_frames)
+		if (frame > _total_frames)
 			return false;
-		if (!_reader.seek(_data_offset + offset * _format.bytes_per_frame()))
+		if (!_reader.seek(_data_offset + frame * _format.bytes_per_frame()))
 			return false;
-		_current_frame = offset;
+		_current_frame = frame;
 		return true;
 	}
 }

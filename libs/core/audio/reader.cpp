@@ -67,23 +67,23 @@ namespace Yttrium
 		return _decoder->format();
 	}
 
-	size_t AudioReader::read(void* buffer, size_t bytes_to_read)
+	size_t AudioReader::read_frames(void* buffer, size_t frames)
 	{
 		const auto frame_size = _decoder->format().bytes_per_frame();
 		for (size_t result = 0;;)
 		{
-			const auto requested = bytes_to_read - result;
-			const auto available = (_end_frame - _decoder->current_frame()) * frame_size;
-			const auto decoded = _decoder->read(static_cast<std::byte*>(buffer) + result, static_cast<size_t>(std::min<uint64_t>(requested, available)));
+			const auto requested = frames - result;
+			const auto available = _end_frame - _decoder->current_frame();
+			const auto decoded = _decoder->read_frames(static_cast<std::byte*>(buffer) + result * frame_size, static_cast<size_t>(std::min<uint64_t>(requested, available)));
 			result += decoded;
-			if (decoded == requested || decoded != available || _loop_frame >= _end_frame || !_decoder->seek(_loop_frame))
+			if (decoded == requested || decoded != available || _loop_frame >= _end_frame || !_decoder->seek_frame(_loop_frame))
 				return result;
 		}
 	}
 
-	bool AudioReader::seek(uint64_t frame_offset)
+	bool AudioReader::seek_frame(uint64_t frame)
 	{
-		return frame_offset < _end_frame && _decoder->seek(frame_offset);
+		return frame < _end_frame && _decoder->seek_frame(frame);
 	}
 
 	bool AudioReader::set_loop(std::chrono::milliseconds from, std::chrono::milliseconds to) noexcept
@@ -106,10 +106,5 @@ namespace Yttrium
 		assert(_loop_frame < total_frames);
 		_end_frame = end_frame;
 		return true;
-	}
-
-	uint64_t AudioReader::total_bytes() const noexcept
-	{
-		return _decoder->total_bytes();
 	}
 }

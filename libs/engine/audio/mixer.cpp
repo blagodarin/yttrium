@@ -60,7 +60,7 @@ namespace Yttrium
 		if (music == _music)
 			return;
 		if (music)
-			music->seek(0);
+			music->seek_frame(0);
 		_music = music;
 	}
 
@@ -68,32 +68,29 @@ namespace Yttrium
 	{
 		_sound = std::static_pointer_cast<SoundImpl>(sound);
 		if (_sound)
-			_sound->_reader.seek(0);
+			_sound->_reader.seek_frame(0);
 	}
 
 	bool AudioMixer::read(void* out, size_t out_frames, Buffer& in_buffer, AudioReader& reader)
 	{
-		const auto out_bytes = out_frames * _format.bytes_per_frame();
 		if (const auto in_format = reader.format(); in_format == _format)
 		{
-			const auto read_bytes = reader.read(out, out_bytes);
-			if (!read_bytes)
+			const auto in_frames = reader.read_frames(out, out_frames);
+			if (!in_frames)
 				return false;
-			if (read_bytes < out_bytes)
-				std::memset(static_cast<std::byte*>(out) + read_bytes, 0, out_bytes - read_bytes);
+			if (in_frames < out_frames)
+				std::memset(static_cast<std::byte*>(out) + in_frames * _format.bytes_per_frame(), 0, (out_frames - in_frames) * _format.bytes_per_frame());
 		}
 		else
 		{
 			in_buffer.reset(out_frames * in_format.bytes_per_frame());
-			const auto in_bytes = reader.read(in_buffer.data(), in_buffer.size());
-			if (!in_bytes)
+			const auto in_frames = reader.read_frames(in_buffer.data(), out_frames);
+			if (!in_frames)
 				return false;
-			const auto in_frames = in_bytes / in_format.bytes_per_frame();
 			if (!transform_audio(out, _format, in_buffer.data(), in_format, in_frames))
 				return false;
-			const auto read_bytes = in_frames * _format.bytes_per_frame();
-			if (read_bytes < out_bytes)
-				std::memset(static_cast<std::byte*>(out) + read_bytes, 0, out_bytes - read_bytes);
+			if (in_frames < out_frames)
+				std::memset(static_cast<std::byte*>(out) + in_frames * _format.bytes_per_frame(), 0, (out_frames - in_frames) * _format.bytes_per_frame());
 		}
 		return true;
 	}

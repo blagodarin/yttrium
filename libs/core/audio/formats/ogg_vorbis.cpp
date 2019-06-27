@@ -85,10 +85,10 @@ namespace Yttrium
 		::ov_clear(&_ov_file);
 	}
 
-	size_t OggVorbisDecoder::read(void* buffer, size_t bytes_to_read)
+	size_t OggVorbisDecoder::read_frames(void* buffer, size_t frames)
 	{
-		const auto frame_bytes = _format.bytes_per_frame();
-		bytes_to_read = static_cast<size_t>(std::min<uint64_t>(bytes_to_read / frame_bytes, _total_frames - _current_frame)) * frame_bytes;
+		const auto bytes_per_frame = _format.bytes_per_frame();
+		const auto bytes_to_read = static_cast<size_t>(std::min<uint64_t>(frames, _total_frames - _current_frame)) * bytes_per_frame;
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read;)
 		{
@@ -98,17 +98,18 @@ namespace Yttrium
 				break;
 			bytes_read += to_unsigned(read);
 		}
-		_current_frame += bytes_read / frame_bytes;
-		return bytes_read;
+		const auto frames_read = bytes_read / bytes_per_frame;
+		_current_frame += frames_read;
+		return frames_read;
 	}
 
-	bool OggVorbisDecoder::seek(uint64_t block_offset)
+	bool OggVorbisDecoder::seek_frame(uint64_t frame)
 	{
-		if (block_offset > _total_frames)
+		if (frame > _total_frames)
 			return false;
-		if (::ov_pcm_seek(&_ov_file, static_cast<ogg_int64_t>(block_offset)) != 0)
+		if (::ov_pcm_seek(&_ov_file, static_cast<ogg_int64_t>(frame)) != 0)
 			return false;
-		_current_frame = block_offset;
+		_current_frame = frame;
 		return true;
 	}
 }

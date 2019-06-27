@@ -25,8 +25,8 @@ namespace Yttrium
 	public:
 		explicit WavDecoder(std::unique_ptr<Source>&&);
 
-		size_t read(void*, size_t) override;
-		bool seek(uint64_t) override;
+		size_t read_frames(void*, size_t) override;
+		bool seek_frame(uint64_t) override;
 
 	private:
 		uint64_t _data_offset = 0;

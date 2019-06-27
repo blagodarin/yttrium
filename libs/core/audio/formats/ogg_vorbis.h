@@ -32,8 +32,8 @@ namespace Yttrium
 		explicit OggVorbisDecoder(std::unique_ptr<Source>&&);
 		~OggVorbisDecoder() override;
 
-		size_t read(void*, size_t) override;
-		bool seek(uint64_t) override;
+		size_t read_frames(void*, size_t) override;
+		bool seek_frame(uint64_t) override;
 
 	private:
 		OggVorbis_File _ov_file;

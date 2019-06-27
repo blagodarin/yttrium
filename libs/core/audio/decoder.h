@@ -29,11 +29,10 @@ namespace Yttrium
 
 		uint64_t current_frame() const noexcept { return _current_frame; }
 		AudioFormat format() const noexcept { return _format; }
-		uint64_t total_bytes() const noexcept { return _total_frames * _format.bytes_per_frame(); }
 		uint64_t total_frames() const noexcept { return _total_frames; }
 
-		virtual size_t read(void* data, size_t bytes) = 0;
-		virtual bool seek(uint64_t frame_offset) = 0;
+		virtual size_t read_frames(void* buffer, size_t frames) = 0;
+		virtual bool seek_frame(uint64_t frame) = 0;
 
 	protected:
 		AudioFormat _format;
