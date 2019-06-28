@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,19 +14,24 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_audio_sound_h_
-#define _include_yttrium_audio_sound_h_
+#pragma once
 
-#include <yttrium/audio/reader.h>
+#include <yttrium/api.h>
+
+#include <comip.h>
 
 namespace Yttrium
 {
-	/// Sound.
-	class Sound
+	class Y_CORE_API ComInitializer
 	{
 	public:
-		virtual ~Sound() noexcept = default;
-	};
-}
+		explicit ComInitializer(DWORD coinit);
+		~ComInitializer() noexcept { ::CoUninitialize(); }
 
-#endif
+		ComInitializer(const ComInitializer&) = delete;
+		ComInitializer& operator=(const ComInitializer&) = delete;
+	};
+
+	template <typename T>
+	using ComPtr = _com_ptr_t<_com_IIID<T, &__uuidof(T)>>;
+}

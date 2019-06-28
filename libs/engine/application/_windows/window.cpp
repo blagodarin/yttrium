@@ -22,8 +22,8 @@
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
 #include "../../../core/image/formats/bmp.h"
+#include "../../../core/platform/windows/error.h"
 #include "../window_callbacks.h"
-#include "error.h"
 
 #include <cassert>
 

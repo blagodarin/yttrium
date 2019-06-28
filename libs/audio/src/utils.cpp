@@ -18,7 +18,7 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/storage/writer.h>
-#include "../utils/processing.h"
+#include "processing.h"
 #include "wav.h"
 
 #include <cstring>

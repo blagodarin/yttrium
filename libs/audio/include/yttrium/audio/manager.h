@@ -14,23 +14,34 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_audio_utils_h_
-#define _include_yttrium_audio_utils_h_
+#pragma once
 
-#include <yttrium/api.h>
+#include <yttrium/audio/api.h>
 
-#include <cstddef>
+#include <memory>
 
 namespace Yttrium
 {
-	class AudioFormat;
-	class Writer;
+	class AudioReader;
+	class Sound;
+	class Source;
 
-	///
-	Y_CORE_API bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames);
+	/// Audio manager.
+	class Y_AUDIO_API AudioManager
+	{
+	public:
+		///
+		static std::shared_ptr<AudioManager> create();
 
-	///
-	Y_CORE_API bool write_wav_header(Writer&, const AudioFormat&, size_t samples);
+		virtual ~AudioManager() noexcept = default;
+
+		///
+		virtual std::shared_ptr<Sound> create_sound(std::unique_ptr<Source>&&) = 0;
+
+		///
+		virtual void play_music(const std::shared_ptr<AudioReader>&) = 0;
+
+		///
+		virtual void play_sound(const std::shared_ptr<Sound>&) = 0;
+	};
 }
-
-#endif

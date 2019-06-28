@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,20 +16,13 @@
 
 #pragma once
 
-#include <comip.h>
+#include <yttrium/api.h>
+
+#include <string>
 
 namespace Yttrium
 {
-	class ComInitializer
-	{
-	public:
-		explicit ComInitializer(DWORD coinit);
-		~ComInitializer() noexcept { ::CoUninitialize(); }
-
-		ComInitializer(const ComInitializer&) = delete;
-		ComInitializer& operator=(const ComInitializer&) = delete;
-	};
-
-	template <typename T>
-	using ComPtr = _com_ptr_t<_com_IIID<T, &__uuidof(T)>>;
+	Y_CORE_API std::string error_to_string(unsigned long, std::string_view fallback_message = {});
+	Y_CORE_API void print_last_error(std::string_view function) noexcept;
+	Y_CORE_API void throw_last_error(std::string_view function);
 }

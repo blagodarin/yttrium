@@ -14,10 +14,9 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_audio_reader_h_
-#define _include_yttrium_audio_reader_h_
+#pragma once
 
-#include <yttrium/api.h>
+#include <yttrium/audio/api.h>
 
 #include <chrono>
 #include <memory>
@@ -29,7 +28,7 @@ namespace Yttrium
 	class Source;
 
 	/// Read-only audio file access interface.
-	class Y_CORE_API AudioReader
+	class Y_AUDIO_API AudioReader
 	{
 	public:
 		///
@@ -57,5 +56,3 @@ namespace Yttrium
 		uint64_t _loop_frame;
 	};
 }
-
-#endif

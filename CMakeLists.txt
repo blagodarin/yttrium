@@ -218,6 +218,7 @@ add_subdirectory(tools/yrc)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
+add_subdirectory(libs/audio)
 add_subdirectory(libs/engine)
 
 if(WIN32)

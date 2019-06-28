@@ -14,37 +14,13 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_audio_manager_h_
-#define _include_yttrium_audio_manager_h_
-
-#include <yttrium/api.h>
-
-#include <memory>
+#pragma once
 
 namespace Yttrium
 {
-	class AudioReader;
-	class Sound;
-	class Source;
-
-	/// Audio manager.
-	class Y_ENGINE_API AudioManager
+	class Sound
 	{
 	public:
-		///
-		static std::shared_ptr<AudioManager> create();
-
-		virtual ~AudioManager() noexcept = default;
-
-		///
-		virtual std::shared_ptr<Sound> create_sound(std::unique_ptr<Source>&&) = 0;
-
-		///
-		virtual void play_music(const std::shared_ptr<AudioReader>&) = 0;
-
-		///
-		virtual void play_sound(const std::shared_ptr<Sound>&) = 0;
+		virtual ~Sound() noexcept = default;
 	};
 }
-
-#endif

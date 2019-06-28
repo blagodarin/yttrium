@@ -16,11 +16,18 @@
 
 #pragma once
 
-#include <string>
+#include <yttrium/audio/api.h>
+
+#include <cstddef>
 
 namespace Yttrium
 {
-	std::string error_to_string(unsigned long, std::string_view fallback_message = {});
-	void print_last_error(std::string_view function) noexcept;
-	void throw_last_error(std::string_view function);
+	class AudioFormat;
+	class Writer;
+
+	///
+	Y_AUDIO_API bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames);
+
+	///
+	Y_AUDIO_API bool write_wav_header(Writer&, const AudioFormat&, size_t samples);
 }

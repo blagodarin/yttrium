@@ -46,7 +46,7 @@ add_executable(ycore_tests
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE tiny_string_map.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-self-assign-overloaded)
 endif()
-target_link_libraries(ycore_tests PRIVATE ycore ytest)
+target_link_libraries(ycore_tests PRIVATE ycore yaudio ytest)
 set_target_properties(ycore_tests PROPERTIES FOLDER "tests")
 include_config(ycore_tests ${PROJECT_BINARY_DIR}/config.h)
 add_test(NAME ycore COMMAND ycore_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

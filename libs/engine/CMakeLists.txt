@@ -17,7 +17,7 @@
 set(_src console.cpp resource_loader.cpp)
 add_library(yengine ${_src})
 source_group("src" FILES ${_src})
-target_link_libraries(yengine PRIVATE ycore Threads::Threads)
+target_link_libraries(yengine PRIVATE ycore yaudio Threads::Threads)
 set_target_properties(yengine PROPERTIES FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_target_properties(yengine PROPERTIES DEFINE_SYMBOL Y_ENGINE_EXPORT)
@@ -93,10 +93,6 @@ elseif(WIN32)
 	y_sources(yengine "src/application/_windows"
 		application/_windows/application.cpp
 		application/_windows/application.h
-		application/_windows/com.cpp
-		application/_windows/com.h
-		application/_windows/error.cpp
-		application/_windows/error.h
 		application/_windows/window.cpp
 		application/_windows/window.h
 		)
@@ -106,34 +102,6 @@ elseif(WIN32)
 			application/_windows/wgl.h
 			)
 	endif()
-endif()
-
-########################################################################################################################
-# audio
-y_sources(yengine "include/audio"
-	../../include/yttrium/audio/manager.h
-	../../include/yttrium/audio/sound.h
-	)
-y_sources(yengine "src/audio"
-	audio/backend.h
-	audio/manager.cpp
-	audio/manager.h
-	audio/mixer.cpp
-	audio/mixer.h
-	audio/sound.h
-	)
-if(WIN32)
-	y_sources(yengine "src/audio/wasapi"
-		audio/wasapi/backend.cpp
-		audio/wasapi/backend.h
-		)
-else()
-	find_package(ALSA REQUIRED)
-	y_sources(yengine "src/audio/alsa"
-		audio/alsa/backend.cpp
-		audio/alsa/backend.h
-		)
-	target_link_libraries(yengine PRIVATE ALSA::ALSA)
 endif()
 
 ########################################################################################################################

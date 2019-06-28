@@ -38,40 +38,6 @@ if(WIN32)
 endif()
 
 ########################################################################################################################
-# audio
-y_sources(ycore "include/audio"
-	../../include/yttrium/audio/format.h
-	../../include/yttrium/audio/reader.h
-	../../include/yttrium/audio/utils.h
-	)
-y_sources(ycore "src/audio"
-	audio/decoder.h
-	audio/reader.cpp
-	audio/utils.cpp
-	audio/wav.h
-	)
-y_sources(ycore "src/audio/formats"
-	audio/formats/wav.cpp
-	audio/formats/wav.h
-	)
-if(Y_USE_OGG_VORBIS)
-	if(WIN32)
-		find_package(Y3_vorbisfile REQUIRED)
-		target_link_libraries(ycore PRIVATE Y3::vorbisfile)
-	else()
-		find_library(OGG_LIBRARY ogg)
-		find_library(VORBIS_LIBRARY vorbis)
-		find_library(VORBISFILE_LIBRARY vorbisfile)
-		mark_as_advanced(OGG_LIBRARY VORBIS_LIBRARY VORBISFILE_LIBRARY)
-		target_link_libraries(ycore PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
-	endif()
-	y_sources(ycore "src/audio/formats"
-		audio/formats/ogg_vorbis.cpp
-		audio/formats/ogg_vorbis.h
-		)
-endif()
-
-########################################################################################################################
 # image
 y_sources(ycore "include"
 	../../include/yttrium/image.h
@@ -154,6 +120,17 @@ elseif(WIN32)
 endif()
 
 ########################################################################################################################
+# platform
+if(WIN32)
+	y_sources(ycore "src/platform/windows"
+		platform/windows/com.cpp
+		platform/windows/com.h
+		platform/windows/error.cpp
+		platform/windows/error.h
+		)
+endif()
+
+########################################################################################################################
 # script
 y_sources(ycore "include/script"
 	../../include/yttrium/script/args.h
@@ -226,8 +203,6 @@ y_sources(ycore "src/utils"
 	utils/crc32.h
 	utils/fourcc.h
 	utils/memory.h
-	utils/processing.cpp
-	utils/processing.h
 	utils/string.cpp
 	utils/string.h
 	)
