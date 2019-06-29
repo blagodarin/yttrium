@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_gui_font_h_
-#define _include_yttrium_gui_font_h_
+#pragma once
 
 #include <yttrium/api.h>
 
@@ -51,5 +50,3 @@ namespace Yttrium
 		virtual SizeF text_size(std::string_view, const SizeF& font_size) const = 0;
 	};
 }
-
-#endif

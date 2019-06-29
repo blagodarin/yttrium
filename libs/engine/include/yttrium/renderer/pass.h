@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_renderer_pass_h_
-#define _include_yttrium_renderer_pass_h_
+#pragma once
 
 #include <yttrium/math/color.h>
 
@@ -71,5 +70,3 @@ namespace Yttrium
 		virtual SizeF window_size() const = 0;
 	};
 }
-
-#endif

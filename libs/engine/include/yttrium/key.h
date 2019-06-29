@@ -14,11 +14,7 @@
 // limitations under the License.
 //
 
-/// \file
-/// \brief Input key declarations.
-
-#ifndef _include_yttrium_key_h_
-#define _include_yttrium_key_h_
+#pragma once
 
 #include <yttrium/api.h>
 #include <yttrium/utils/flags.h>
@@ -221,5 +217,3 @@ namespace Yttrium
 			: _key{ key }, _pressed{ pressed }, _autorepeat{ autorepeat } {}
 	};
 }
-
-#endif

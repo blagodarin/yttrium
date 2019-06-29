@@ -14,8 +14,7 @@
 // limitations under the License.
 //
 
-#ifndef _include_yttrium_window_h_
-#define _include_yttrium_window_h_
+#pragma once
 
 #include <yttrium/api.h>
 
@@ -93,5 +92,3 @@ namespace Yttrium
 		const std::unique_ptr<class WindowPrivate> _private;
 	};
 }
-
-#endif

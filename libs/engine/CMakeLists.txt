@@ -23,29 +23,29 @@ set(_src
 add_library(yengine ${_src})
 source_group("src" FILES ${_src})
 
-target_link_libraries(yengine PRIVATE ycore yaudio Threads::Threads)
+include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(yengine PRIVATE yaudio ycore Threads::Threads)
 set_target_properties(yengine PROPERTIES FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_target_properties(yengine PROPERTIES DEFINE_SYMBOL Y_ENGINE_EXPORT)
 	target_compile_definitions(yengine INTERFACE Y_ENGINE_IMPORT)
 endif()
-include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
-
-y_sources(yengine "include"
-	../../include/yttrium/console.h
-	../../include/yttrium/resource_loader.h
-	)
-
 if(WIN32)
 	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
 
+y_sources(yengine "include"
+	include/yttrium/console.h
+	include/yttrium/resource_loader.h
+	)
+
 ########################################################################################################################
 # application
 y_sources(yengine "include"
-	../../include/yttrium/application.h
-	../../include/yttrium/key.h
-	../../include/yttrium/window.h
+	include/yttrium/application.h
+	include/yttrium/key.h
+	include/yttrium/window.h
 	)
 y_sources(yengine "src/application"
 	src/application/application.cpp
@@ -111,9 +111,9 @@ endif()
 ########################################################################################################################
 # gui
 y_sources(yengine "include/gui"
-	../../include/yttrium/gui/font.h
-	../../include/yttrium/gui/gui.h
-	../../include/yttrium/gui/text_capture.h
+	include/yttrium/gui/font.h
+	include/yttrium/gui/gui.h
+	include/yttrium/gui/text_capture.h
 	)
 y_sources(yengine "src/gui"
 	src/gui/actions.cpp
@@ -164,14 +164,14 @@ endif()
 ########################################################################################################################
 # renderer
 y_sources(yengine "include/renderer"
-	../../include/yttrium/renderer/manager.h
-	../../include/yttrium/renderer/material.h
-	../../include/yttrium/renderer/mesh.h
-	../../include/yttrium/renderer/modifiers.h
-	../../include/yttrium/renderer/pass.h
-	../../include/yttrium/renderer/program.h
-	../../include/yttrium/renderer/texture.h
-	../../include/yttrium/renderer/textured_rect.h
+	include/yttrium/renderer/manager.h
+	include/yttrium/renderer/material.h
+	include/yttrium/renderer/mesh.h
+	include/yttrium/renderer/modifiers.h
+	include/yttrium/renderer/pass.h
+	include/yttrium/renderer/program.h
+	include/yttrium/renderer/texture.h
+	include/yttrium/renderer/textured_rect.h
 	)
 y_sources(yengine "src/renderer"
 	src/renderer/backend.h

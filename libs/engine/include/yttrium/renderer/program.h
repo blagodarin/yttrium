@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,27 +14,21 @@
 // limitations under the License.
 //
 
-/// \file
-/// \brief
+#pragma once
 
-#ifndef _include_yttrium_renderer_textured_rect_h_
-#define _include_yttrium_renderer_textured_rect_h_
-
-#include <yttrium/math/rect.h>
+#include <string>
 
 namespace Yttrium
 {
-	///
-	class TexturedRect
+	class Matrix4;
+
+	/// Rendering pipeline program.
+	class RenderProgram
 	{
 	public:
-		RectF geometry; ///<
-		RectF texture;  ///<
+		virtual ~RenderProgram() = default;
 
-		TexturedRect() = default;
-		TexturedRect(const RectF& geometry_, const RectF& texture_)
-			: geometry(geometry_), texture(texture_) {}
+		///
+		virtual void set_uniform(const std::string& name, const Matrix4&) = 0;
 	};
 }
-
-#endif
