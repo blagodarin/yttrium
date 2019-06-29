@@ -41,10 +41,10 @@ namespace Yttrium
 		constexpr SmartPtr() noexcept = default;
 
 		constexpr SmartPtr(SmartPtr&& other) noexcept
-			: _pointer{ other._pointer }
-		{
-			other._pointer = Sentinel;
-		}
+			: _pointer{ other._pointer } { other._pointer = Sentinel; }
+
+		constexpr explicit SmartPtr(T* pointer) noexcept
+			: _pointer{ pointer } {}
 
 		~SmartPtr() noexcept
 		{
@@ -68,6 +68,9 @@ namespace Yttrium
 		{
 			return _pointer;
 		}
+
+		constexpr T& operator[](size_t index) const noexcept { return _pointer[index]; }
+		constexpr T& operator[](ptrdiff_t index) const noexcept { return _pointer[index]; }
 
 		template <typename U>
 		constexpr U* get_as() noexcept

@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-#include "../core/utils/memory.h"
+#include "../../core/utils/memory.h"
 
 #include <vector>
 
@@ -27,12 +27,12 @@ int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	int argc = 0;
 	std::vector<char*> argv;
 	{
-		const Yttrium::UniquePtr<LPWSTR, ::LocalFree> argv_w{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
+		const Yttrium::SmartPtr<LPWSTR, ::LocalFree> argv_w{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
 		for (int i = 0; i < argc; ++i)
 		{
-			const auto buffer_size = ::WideCharToMultiByte(CP_ACP, 0, argv_w.get()[i], -1, nullptr, 0, nullptr, nullptr);
+			const auto buffer_size = ::WideCharToMultiByte(CP_ACP, 0, argv_w[i], -1, nullptr, 0, nullptr, nullptr);
 			argv.emplace_back(new char[buffer_size]);
-			::WideCharToMultiByte(CP_ACP, 0, argv_w.get()[i], -1, argv[i], buffer_size, nullptr, nullptr);
+			::WideCharToMultiByte(CP_ACP, 0, argv_w[i], -1, argv[i], buffer_size, nullptr, nullptr);
 		}
 	}
 	argv.emplace_back(nullptr);
