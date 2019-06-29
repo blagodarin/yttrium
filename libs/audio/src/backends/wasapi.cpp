@@ -23,6 +23,8 @@
 
 #include <numeric>
 
+#include <comdef.h> // Required for linking COM facilities.
+
 namespace
 {
 	constexpr unsigned AudioBufferChannels = 2;
