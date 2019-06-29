@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <type_traits>
 
 namespace Yttrium
 {
@@ -34,22 +35,24 @@ namespace Yttrium
 	template <typename T, auto Deleter>
 	using UniquePtr = std::unique_ptr<T, UniquePtrDeleter<Deleter>>;
 
-	template <typename T, auto Deleter, T* Sentinel = nullptr>
+	template <typename T, auto deleter>
 	class SmartPtr
 	{
 	public:
+		using Value = std::remove_reference_t<T>;
+
 		constexpr SmartPtr() noexcept = default;
 
 		constexpr SmartPtr(SmartPtr&& other) noexcept
-			: _pointer{ other._pointer } { other._pointer = Sentinel; }
+			: _pointer{ other._pointer } { other._pointer = nullptr; }
 
-		constexpr explicit SmartPtr(T* pointer) noexcept
+		constexpr explicit SmartPtr(Value* pointer) noexcept
 			: _pointer{ pointer } {}
 
 		~SmartPtr() noexcept
 		{
-			if (_pointer != Sentinel)
-				Deleter(_pointer);
+			if (_pointer)
+				deleter(_pointer);
 		}
 
 		constexpr SmartPtr& operator=(SmartPtr&& other) noexcept
@@ -59,18 +62,21 @@ namespace Yttrium
 			_pointer = pointer;
 		}
 
-		constexpr operator T*() const noexcept
+		constexpr operator Value*() const noexcept
 		{
 			return _pointer;
 		}
 
-		constexpr T* operator->() const noexcept
+		constexpr Value* operator->() const noexcept
 		{
 			return _pointer;
 		}
 
-		constexpr T& operator[](size_t index) const noexcept { return _pointer[index]; }
-		constexpr T& operator[](ptrdiff_t index) const noexcept { return _pointer[index]; }
+		template <typename U>
+		constexpr std::enable_if_t<std::is_integral_v<U>, Value>& operator[](U index) const noexcept
+		{
+			return _pointer[index];
+		}
 
 		template <typename U>
 		constexpr U* get_as() noexcept
@@ -78,7 +84,7 @@ namespace Yttrium
 			return reinterpret_cast<U*>(_pointer);
 		}
 
-		constexpr T** out() noexcept
+		constexpr Value** out() noexcept
 		{
 			return &_pointer;
 		}
@@ -90,6 +96,6 @@ namespace Yttrium
 		}
 
 	private:
-		T* _pointer = Sentinel;
+		Value* _pointer = nullptr;
 	};
 }

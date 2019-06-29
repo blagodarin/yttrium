@@ -44,7 +44,7 @@ namespace Yttrium
 
 	private:
 		const AudioFormat _buffer_format;
-		const size_t _block_frames;
+		const UINT32 _block_frames;
 		// MSDN: "In Windows 8, the first use of IAudioClient to access the audio device should
 		// be on the STA thread. Calls from an MTA thread may result in undefined behavior."
 		ComInitializer _com{ COINIT_APARTMENTTHREADED };

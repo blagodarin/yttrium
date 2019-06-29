@@ -87,7 +87,7 @@ namespace Yttrium
 {
 	WasapiAudioBackend::WasapiAudioBackend(unsigned frames_per_second)
 		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }
-		, _block_frames{ std::lcm(BlockAlignment, _buffer_format.bytes_per_frame()) / _buffer_format.bytes_per_frame() }
+		, _block_frames{ static_cast<UINT32>(std::lcm(BlockAlignment, _buffer_format.bytes_per_frame()) / _buffer_format.bytes_per_frame()) }
 	{
 		ComPtr<IMMDeviceEnumerator> enumerator;
 		auto hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), reinterpret_cast<void**>(&enumerator));
@@ -212,7 +212,7 @@ namespace Yttrium
 			locked_frames = (_buffer_frames - padding_frames) / _block_frames * _block_frames;
 			if (locked_frames >= _update_frames)
 				break;
-			const auto padding_ms = padding_frames * 1000 / _buffer_format.frames_per_second();
+			const auto padding_ms = padding_frames * 1000 / static_cast<DWORD>(_buffer_format.frames_per_second());
 			if (const auto status = WaitForSingleObjectEx(_event.get(), 2 * padding_ms, FALSE); status != WAIT_OBJECT_0)
 				throw WasapiError{ "WaitForSingleObjectEx", status == WAIT_TIMEOUT ? ERROR_TIMEOUT : GetLastError() };
 		}
