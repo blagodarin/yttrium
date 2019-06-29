@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,4 +24,4 @@ namespace Yttrium
 }
 
 Yttrium::Buffer make_buffer(std::string_view);
-Yttrium::Buffer make_random_buffer(std::size_t);
+Yttrium::Buffer make_random_buffer(size_t);

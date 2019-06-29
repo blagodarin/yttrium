@@ -21,7 +21,7 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/storage/storage.h>
-#include "../common/utils.h"
+#include "../../common/include/utils.h"
 
 #include <unordered_map>
 

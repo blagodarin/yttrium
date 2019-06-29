@@ -17,7 +17,7 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../common/utils.h"
+#include "../../common/include/utils.h"
 #include "iostream.h"
 
 #include <cstring>

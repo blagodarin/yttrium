@@ -25,7 +25,7 @@ set(_src
 
 add_executable(3d WIN32 ${_src})
 source_group("src" FILES ${_src})
-target_link_libraries(3d ycore yengine)
+target_link_libraries(3d PRIVATE ycore yengine)
 if(WIN32)
 	set_property(TARGET 3d APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
 	target_link_libraries(3d PRIVATE optimized ywinmain)

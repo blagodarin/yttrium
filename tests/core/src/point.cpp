@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,21 @@
 // limitations under the License.
 //
 
-#define CATCH_CONFIG_MAIN
+#include <yttrium/math/point.h>
 
 #include <catch2/catch.hpp>
+
+TEST_CASE("point")
+{
+	using Yttrium::Point;
+	{
+		Point p;
+		CHECK(p._x == 0);
+		CHECK(p._y == 0);
+	}
+	{
+		Point p{ 1, 2 };
+		CHECK(p._x == 1);
+		CHECK(p._y == 2);
+	}
+}

@@ -24,4 +24,5 @@ source_group("src" FILES ${_src})
 include_config(yaudio_tests ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(yaudio_tests PRIVATE yaudio ycore ytest)
 set_target_properties(yaudio_tests PROPERTIES FOLDER "tests")
+
 add_test(NAME yaudio COMMAND yaudio_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

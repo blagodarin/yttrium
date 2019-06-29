@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,6 @@
 // limitations under the License.
 //
 
-#include <yttrium/memory/buffer_appender.h>
-#include "../../libs/core/utils/fourcc.h"
-
-#include <cstring>
+#define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-
-TEST_CASE("buffer_appender")
-{
-	using namespace Yttrium::Literals;
-
-	Yttrium::Buffer b;
-	Yttrium::BufferAppender<uint32_t> ba{ b };
-	CHECK(ba.count() == 0);
-	ba << "1234"_fourcc;
-	ba << "5678"_fourcc;
-	CHECK(ba.count() == 2);
-	REQUIRE(b.size() == 8);
-	CHECK(!std::memcmp("12345678", b.data(), b.size()));
-}

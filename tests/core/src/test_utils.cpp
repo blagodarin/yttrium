@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Sergei Blagodarin
+// Copyright 2019 Sergei Blagodarin
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
 // limitations under the License.
 //
 
-#include <yttrium/math/point.h>
+#include <yttrium/memory/buffer.h>
+#include "../../common/include/utils.h"
+
+#include <cstring>
 
 #include <catch2/catch.hpp>
 
-TEST_CASE("point")
+TEST_CASE("test_utils.make_buffer")
 {
-	using Yttrium::Point;
-	{
-		Point p;
-		CHECK(p._x == 0);
-		CHECK(p._y == 0);
-	}
-	{
-		Point p{ 1, 2 };
-		CHECK(p._x == 1);
-		CHECK(p._y == 2);
-	}
+	const std::string string = "test";
+	const auto buffer = ::make_buffer(string);
+	CHECK(buffer.size() == string.size());
+	CHECK(!std::memcmp(buffer.data(), string.data(), string.size()));
 }

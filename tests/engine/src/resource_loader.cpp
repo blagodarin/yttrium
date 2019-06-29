@@ -20,7 +20,7 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
-#include "../common/utils.h"
+#include "../../common/include/utils.h"
 
 #include <catch2/catch.hpp>
 

@@ -14,15 +14,20 @@
 # limitations under the License.
 #
 
-add_executable(yengine_tests
-	gui_loading.cpp
-	key.cpp
-	resource_loader.cpp
+set(_src
+	src/gui_loading.cpp
+	src/key.cpp
+	src/resource_loader.cpp
 	)
+
+add_executable(yengine_tests ${_src})
+source_group("src" FILES ${_src})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set_property(SOURCE gui_loading.cpp key.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
+	set_property(SOURCE src/gui_loading.cpp src/key.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
 endif()
+
+include_config(yengine_tests ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(yengine_tests PRIVATE ycore yengine ytest)
 set_target_properties(yengine_tests PROPERTIES FOLDER "tests")
-include_config(yengine_tests ${PROJECT_BINARY_DIR}/config.h)
+
 add_test(NAME yengine COMMAND yengine_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
