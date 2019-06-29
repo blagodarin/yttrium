@@ -87,7 +87,7 @@ else()
 		)
 endif()
 
-install(DIRECTORY include/yttrium DESTINATION include)
+install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS yaudio EXPORT YttriumTargets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

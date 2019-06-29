@@ -18,6 +18,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
+#include "../../../core/src/platform/windows/error.h"
 
 #include <numeric>
 

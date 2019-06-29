@@ -22,9 +22,9 @@ set(_src
 add_executable(benchmark_jpeg ${_src})
 source_group("src" FILES ${_src})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set_property(SOURCE main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set_property(SOURCE main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 endif()
 
 target_link_libraries(benchmark_jpeg PRIVATE ycore)
