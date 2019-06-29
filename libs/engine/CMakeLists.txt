@@ -1,5 +1,5 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# Copyright 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,15 @@
 # limitations under the License.
 #
 
-set(_src console.cpp resource_loader.cpp)
+set(_src
+	src/console.cpp
+	src/resource_loader.cpp
+	src/utf8.h
+	)
+
 add_library(yengine ${_src})
 source_group("src" FILES ${_src})
+
 target_link_libraries(yengine PRIVATE ycore yaudio Threads::Threads)
 set_target_properties(yengine PROPERTIES FOLDER "libs")
 if(BUILD_SHARED_LIBS)
@@ -29,9 +35,7 @@ y_sources(yengine "include"
 	../../include/yttrium/console.h
 	../../include/yttrium/resource_loader.h
 	)
-y_sources(yengine "src"
-	utf8.h
-	)
+
 if(WIN32)
 	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
@@ -44,41 +48,41 @@ y_sources(yengine "include"
 	../../include/yttrium/window.h
 	)
 y_sources(yengine "src/application"
-	application/application.cpp
-	application/application.h
-	application/key_codes.h
-	application/window.cpp
-	application/window.h
-	application/window_backend.h
-	application/window_callbacks.h
+	src/application/application.cpp
+	src/application/application.h
+	src/application/key_codes.h
+	src/application/window.cpp
+	src/application/window.h
+	src/application/window_backend.h
+	src/application/window_callbacks.h
 	)
 if(Y_RENDERER_OPENGL)
 	y_sources(yengine "src/application"
-		application/opengl.h
+		src/application/opengl.h
 		)
 endif()
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
 		y_sources(yengine "src/application/_x11"
-			application/_x11/application.cpp
-			application/_x11/application.h
-			application/_x11/glx.cpp
-			application/_x11/glx.h
-			application/_x11/window.cpp
-			application/_x11/window.h
+			src/application/_x11/application.cpp
+			src/application/_x11/application.h
+			src/application/_x11/glx.cpp
+			src/application/_x11/glx.h
+			src/application/_x11/window.cpp
+			src/application/_x11/window.h
 			)
 		target_include_directories(yengine SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yengine PRIVATE ${X11_X11_LIB})
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
-			set_property(SOURCE application/_x11/application.cpp application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+			set_property(SOURCE src/application/_x11/application.cpp src/application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
 		y_sources(yengine "src/application/_xcb"
-			application/_xcb/application.cpp
-			application/_xcb/application.h
-			application/_xcb/window.cpp
-			application/_xcb/window.h
+			src/application/_xcb/application.cpp
+			src/application/_xcb/application.h
+			src/application/_xcb/window.cpp
+			src/application/_xcb/window.h
 			)
 		target_link_libraries(yengine PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
@@ -86,20 +90,20 @@ if(UNIX)
 		endif()
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
-			set_property(SOURCE application/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
+			set_property(SOURCE src/application/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
 		endif()
 	endif()
 elseif(WIN32)
 	y_sources(yengine "src/application/_windows"
-		application/_windows/application.cpp
-		application/_windows/application.h
-		application/_windows/window.cpp
-		application/_windows/window.h
+		src/application/_windows/application.cpp
+		src/application/_windows/application.h
+		src/application/_windows/window.cpp
+		src/application/_windows/window.h
 		)
 	if(Y_RENDERER_OPENGL)
 		y_sources(yengine "src/application/_windows"
-			application/_windows/wgl.cpp
-			application/_windows/wgl.h
+			src/application/_windows/wgl.cpp
+			src/application/_windows/wgl.h
 			)
 	endif()
 endif()
@@ -112,42 +116,42 @@ y_sources(yengine "include/gui"
 	../../include/yttrium/gui/text_capture.h
 	)
 y_sources(yengine "src/gui"
-	gui/actions.cpp
-	gui/actions.h
-	gui/cursor.h
-	gui/font.cpp
-	gui/gui.cpp
-	gui/gui.h
-	gui/key_lookup.cpp
-	gui/key_lookup.h
-	gui/layout.cpp
-	gui/layout.h
-	gui/screen.cpp
-	gui/screen.h
-	gui/widget_data.cpp
-	gui/widget_data.h
-	gui/widget.cpp
-	gui/widget.h
+	src/gui/actions.cpp
+	src/gui/actions.h
+	src/gui/cursor.h
+	src/gui/font.cpp
+	src/gui/gui.cpp
+	src/gui/gui.h
+	src/gui/key_lookup.cpp
+	src/gui/key_lookup.h
+	src/gui/layout.cpp
+	src/gui/layout.h
+	src/gui/screen.cpp
+	src/gui/screen.h
+	src/gui/widget_data.cpp
+	src/gui/widget_data.h
+	src/gui/widget.cpp
+	src/gui/widget.h
 	)
 y_sources(yengine "src/gui/ion"
-	gui/ion/loader.cpp
-	gui/ion/loader.h
+	src/gui/ion/loader.cpp
+	src/gui/ion/loader.h
 	)
 y_sources(yengine "src/gui/logic"
-	gui/logic/line_editor.cpp
-	gui/logic/line_editor.h
+	src/gui/logic/line_editor.cpp
+	src/gui/logic/line_editor.h
 	)
 y_sources(yengine "src/gui/widgets"
-	gui/widgets/button.cpp
-	gui/widgets/button.h
-	gui/widgets/canvas.cpp
-	gui/widgets/canvas.h
-	gui/widgets/image.cpp
-	gui/widgets/image.h
-	gui/widgets/input.cpp
-	gui/widgets/input.h
-	gui/widgets/label.cpp
-	gui/widgets/label.h
+	src/gui/widgets/button.cpp
+	src/gui/widgets/button.h
+	src/gui/widgets/canvas.cpp
+	src/gui/widgets/canvas.h
+	src/gui/widgets/image.cpp
+	src/gui/widgets/image.h
+	src/gui/widgets/input.cpp
+	src/gui/widgets/input.h
+	src/gui/widgets/label.cpp
+	src/gui/widgets/label.h
 	)
 if(WIN32)
 	find_package(Y3_freetype REQUIRED)
@@ -170,54 +174,54 @@ y_sources(yengine "include/renderer"
 	../../include/yttrium/renderer/textured_rect.h
 	)
 y_sources(yengine "src/renderer"
-	renderer/backend.h
-	renderer/debug_renderer.cpp
-	renderer/debug_renderer.h
-	renderer/material.cpp
-	renderer/material.h
-	renderer/mesh_data.cpp
-	renderer/mesh_data.h
-	renderer/modifiers.cpp
-	renderer/pass.cpp
-	renderer/pass.h
-	renderer/renderer.cpp
-	renderer/renderer.h
-	renderer/texture.cpp
-	renderer/texture.h
+	src/renderer/backend.h
+	src/renderer/debug_renderer.cpp
+	src/renderer/debug_renderer.h
+	src/renderer/material.cpp
+	src/renderer/material.h
+	src/renderer/mesh_data.cpp
+	src/renderer/mesh_data.h
+	src/renderer/modifiers.cpp
+	src/renderer/pass.cpp
+	src/renderer/pass.h
+	src/renderer/renderer.cpp
+	src/renderer/renderer.h
+	src/renderer/texture.cpp
+	src/renderer/texture.h
 	)
 y_sources(yengine "src/renderer/builtin"
-	renderer/builtin/builtin.h
-	renderer/builtin/builtin.cpp
-	renderer/builtin/debug_texture.cpp
-	renderer/builtin/debug_texture.h
+	src/renderer/builtin/builtin.h
+	src/renderer/builtin/builtin.cpp
+	src/renderer/builtin/debug_texture.cpp
+	src/renderer/builtin/debug_texture.h
 	)
 y_sources(yengine "src/renderer/formats"
-	renderer/formats/obj.cpp
-	renderer/formats/obj.h
+	src/renderer/formats/obj.cpp
+	src/renderer/formats/obj.h
 	)
 if(Y_RENDERER_OPENGL)
 	y_sources(yengine "src/renderer/_opengl"
-		renderer/_opengl/api.h
-		renderer/_opengl/gl.cpp
-		renderer/_opengl/gl.h
-		renderer/_opengl/mesh.h
-		renderer/_opengl/program.cpp
-		renderer/_opengl/program.h
-		renderer/_opengl/renderer.cpp
-		renderer/_opengl/renderer.h
-		renderer/_opengl/texture.cpp
-		renderer/_opengl/texture.h
-		renderer/_opengl/version.h
-		renderer/_opengl/wrappers.cpp
-		renderer/_opengl/wrappers.h
+		src/renderer/_opengl/api.h
+		src/renderer/_opengl/gl.cpp
+		src/renderer/_opengl/gl.h
+		src/renderer/_opengl/mesh.h
+		src/renderer/_opengl/program.cpp
+		src/renderer/_opengl/program.h
+		src/renderer/_opengl/renderer.cpp
+		src/renderer/_opengl/renderer.h
+		src/renderer/_opengl/texture.cpp
+		src/renderer/_opengl/texture.h
+		src/renderer/_opengl/version.h
+		src/renderer/_opengl/wrappers.cpp
+		src/renderer/_opengl/wrappers.h
 		)
 	add_yrc_sources(yengine
-		renderer/_opengl/2d_fs.glsl
-		renderer/_opengl/2d_vs.glsl
+		src/renderer/_opengl/2d_fs.glsl
+		src/renderer/_opengl/2d_vs.glsl
 		)
 	source_group("src\\renderer\\_opengl" FILES
-		renderer/_opengl/2d_fs.glsl
-		renderer/_opengl/2d_vs.glsl
+		src/renderer/_opengl/2d_fs.glsl
+		src/renderer/_opengl/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE OpenGL::GL)
 	if(WIN32)
@@ -233,40 +237,40 @@ if(Y_RENDERER_OPENGL)
 		target_include_directories(yengine SYSTEM PRIVATE ${GLEXT_INCLUDE_DIR} ${WGLEXT_INCLUDE_DIR})
 	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set_property(SOURCE renderer/_opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+		set_property(SOURCE src/renderer/_opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(Y_RENDERER_VULKAN)
 	y_sources(yengine "src/renderer/_vulkan"
-		renderer/_vulkan/buffer.cpp
-		renderer/_vulkan/buffer.h
-		renderer/_vulkan/context.cpp
-		renderer/_vulkan/context.h
-		renderer/_vulkan/depth_buffer.cpp
-		renderer/_vulkan/depth_buffer.h
-		renderer/_vulkan/handles.cpp
-		renderer/_vulkan/handles.h
-		renderer/_vulkan/helpers.cpp
-		renderer/_vulkan/helpers.h
-		renderer/_vulkan/mesh.cpp
-		renderer/_vulkan/mesh.h
-		renderer/_vulkan/program.cpp
-		renderer/_vulkan/program.h
-		renderer/_vulkan/renderer.cpp
-		renderer/_vulkan/renderer.h
-		renderer/_vulkan/swapchain.cpp
-		renderer/_vulkan/swapchain.h
-		renderer/_vulkan/texture.cpp
-		renderer/_vulkan/texture.h
-		renderer/_vulkan/wrappers.cpp
-		renderer/_vulkan/wrappers.h
+		src/renderer/_vulkan/buffer.cpp
+		src/renderer/_vulkan/buffer.h
+		src/renderer/_vulkan/context.cpp
+		src/renderer/_vulkan/context.h
+		src/renderer/_vulkan/depth_buffer.cpp
+		src/renderer/_vulkan/depth_buffer.h
+		src/renderer/_vulkan/handles.cpp
+		src/renderer/_vulkan/handles.h
+		src/renderer/_vulkan/helpers.cpp
+		src/renderer/_vulkan/helpers.h
+		src/renderer/_vulkan/mesh.cpp
+		src/renderer/_vulkan/mesh.h
+		src/renderer/_vulkan/program.cpp
+		src/renderer/_vulkan/program.h
+		src/renderer/_vulkan/renderer.cpp
+		src/renderer/_vulkan/renderer.h
+		src/renderer/_vulkan/swapchain.cpp
+		src/renderer/_vulkan/swapchain.h
+		src/renderer/_vulkan/texture.cpp
+		src/renderer/_vulkan/texture.h
+		src/renderer/_vulkan/wrappers.cpp
+		src/renderer/_vulkan/wrappers.h
 		)
 	add_yglslc_sources(yengine
-		FRAGMENT renderer/_vulkan/2d_fs.glsl
-		VERTEX renderer/_vulkan/2d_vs.glsl
+		FRAGMENT src/renderer/_vulkan/2d_fs.glsl
+		VERTEX src/renderer/_vulkan/2d_vs.glsl
 		)
 	source_group("src\\renderer\\_vulkan" FILES
-		renderer/_vulkan/2d_fs.glsl
-		renderer/_vulkan/2d_vs.glsl
+		src/renderer/_vulkan/2d_fs.glsl
+		src/renderer/_vulkan/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE Vulkan::Vulkan)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -275,8 +279,8 @@ elseif(Y_RENDERER_VULKAN)
 	endif()
 else()
 	y_sources(yengine "src/renderer/_null"
-		renderer/_null/renderer.cpp
-		renderer/_null/renderer.h
+		src/renderer/_null/renderer.cpp
+		src/renderer/_null/renderer.h
 		)
 endif()
 
