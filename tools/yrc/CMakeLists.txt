@@ -1,5 +1,5 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# Copyright 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,13 @@
 # limitations under the License.
 #
 
-add_executable(yrc
-	main.cpp
+set(_src
+	src/main.cpp
 	)
+
+add_executable(yrc ${_src})
+source_group("src" FILES ${_src})
+
 set_target_properties(yrc PROPERTIES FOLDER "tools")
+
 install(TARGETS yrc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

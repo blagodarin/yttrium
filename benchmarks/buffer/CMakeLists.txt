@@ -14,8 +14,12 @@
 # limitations under the License.
 #
 
-add_executable(benchmark_buffer
-	main.cpp
+set(_src
+	src/main.cpp
 	)
+
+add_executable(benchmark_buffer ${_src})
+source_group("src" FILES ${_src})
+
 target_link_libraries(benchmark_buffer PRIVATE ycore)
 set_target_properties(benchmark_buffer PROPERTIES FOLDER "benchmarks")

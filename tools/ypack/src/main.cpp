@@ -25,11 +25,14 @@
 #include <string>
 #include <vector>
 
-template <typename... Args>
-void check(bool condition, Args&&... args)
+namespace
 {
-	if (!condition)
-		throw Yttrium::DataError{ std::forward<Args>(args)... };
+	template <typename... Args>
+	void check(bool condition, Args&&... args)
+	{
+		if (!condition)
+			throw Yttrium::DataError{ std::forward<Args>(args)... };
+	}
 }
 
 int main(int argc, char** argv)

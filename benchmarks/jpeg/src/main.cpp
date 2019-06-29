@@ -14,13 +14,13 @@
 // limitations under the License.
 //
 
-#include "../common/benchmark.h"
+#include "../../common/include/benchmark.h"
 
 #include <yttrium/image.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
-#include "../../libs/core/image/formats.h"
+#include "../../../libs/core/image/formats.h"
 
 #include <csetjmp>
 #include <cstring>
