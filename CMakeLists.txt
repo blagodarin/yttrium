@@ -235,9 +235,9 @@ if(BUILD_TESTS)
 	add_subdirectory(tests/engine)
 	add_subdirectory(tests/gen_test_data)
 	add_custom_target(check
-		COMMAND yaudio_tests --reporter compact
-		COMMAND ycore_tests --reporter compact
-		COMMAND yengine_tests --reporter compact
+		COMMAND test_audio --reporter compact
+		COMMAND test_core --reporter compact
+		COMMAND test_engine --reporter compact
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		VERBATIM)
 	set_target_properties(check PROPERTIES FOLDER "tests")

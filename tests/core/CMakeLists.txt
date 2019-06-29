@@ -43,14 +43,14 @@ set(_src
 	src/vector.cpp
 	)
 
-add_executable(ycore_tests ${_src})
+add_executable(test_core ${_src})
 source_group("src" FILES ${_src})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE tiny_string_map.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-self-assign-overloaded)
 endif()
 
-include_config(ycore_tests ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(ycore_tests PRIVATE ycore ytest)
-set_target_properties(ycore_tests PROPERTIES FOLDER "tests")
+include_config(test_core ${PROJECT_BINARY_DIR}/config.h)
+target_link_libraries(test_core PRIVATE ycore ytest)
+set_target_properties(test_core PROPERTIES FOLDER "tests")
 
-add_test(NAME ycore COMMAND ycore_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_test(NAME core COMMAND test_core --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

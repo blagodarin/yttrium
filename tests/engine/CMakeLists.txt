@@ -20,14 +20,14 @@ set(_src
 	src/resource_loader.cpp
 	)
 
-add_executable(yengine_tests ${_src})
+add_executable(test_engine ${_src})
 source_group("src" FILES ${_src})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set_property(SOURCE src/gui_loading.cpp src/key.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
 endif()
 
-include_config(yengine_tests ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(yengine_tests PRIVATE ycore yengine ytest)
-set_target_properties(yengine_tests PROPERTIES FOLDER "tests")
+include_config(test_engine ${PROJECT_BINARY_DIR}/config.h)
+target_link_libraries(test_engine PRIVATE ycore yengine ytest)
+set_target_properties(test_engine PROPERTIES FOLDER "tests")
 
-add_test(NAME yengine COMMAND yengine_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_test(NAME engine COMMAND test_engine --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

@@ -18,11 +18,11 @@ set(_src
 	src/transform.cpp
 	)
 
-add_executable(yaudio_tests ${_src})
+add_executable(test_audio ${_src})
 source_group("src" FILES ${_src})
 
-include_config(yaudio_tests ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(yaudio_tests PRIVATE yaudio ycore ytest)
-set_target_properties(yaudio_tests PROPERTIES FOLDER "tests")
+include_config(test_audio ${PROJECT_BINARY_DIR}/config.h)
+target_link_libraries(test_audio PRIVATE yaudio ycore ytest)
+set_target_properties(test_audio PROPERTIES FOLDER "tests")
 
-add_test(NAME yaudio COMMAND yaudio_tests --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_test(NAME audio COMMAND test_audio --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
