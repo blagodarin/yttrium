@@ -207,8 +207,6 @@ set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
 add_subdirectory(libs/core)
 
 if(Y_RENDERER_VULKAN)

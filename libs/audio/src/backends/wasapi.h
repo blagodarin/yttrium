@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "../../../core/platform/windows/com.h"
-#include "../../../core/utils/memory.h"
+#include "../../../core/src/platform/windows/com.h"
+#include "../../../core/src/utils/memory.h"
 #include "../backend.h"
 
 #include <type_traits>

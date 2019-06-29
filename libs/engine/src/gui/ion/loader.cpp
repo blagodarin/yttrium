@@ -24,7 +24,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
-#include "../../../../core/utils/string.h"
+#include "../../../../core/src/utils/string.h"
 #include "../gui.h"
 #include "../screen.h"
 #include "../widgets/button.h"

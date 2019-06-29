@@ -17,7 +17,7 @@
 #include <yttrium/memory/buffer.h>
 
 #if Y_ENABLE_BUFFER_MEMORY_TRACKING
-#	include "../../../libs/core/memory/buffer_memory_tracker.h"
+#	include "../../../libs/core/src/memory/buffer_memory_tracker.h"
 #endif
 
 #include <catch2/catch.hpp>

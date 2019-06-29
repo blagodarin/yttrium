@@ -15,7 +15,7 @@
 //
 
 #include <yttrium/utils/string.h>
-#include "../../../libs/core/utils/string.h"
+#include "../../../libs/core/src/utils/string.h"
 
 #include <cstring>
 

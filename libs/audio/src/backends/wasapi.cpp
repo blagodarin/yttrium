@@ -18,8 +18,6 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
-#include "../../../core/platform/windows/error.h"
-#include "../../../core/utils/memory.h"
 
 #include <numeric>
 

@@ -19,7 +19,7 @@
 #include <yttrium/key.h>
 #include <yttrium/math/size.h>
 #include <yttrium/utils/numeric.h>
-#include "../../../core/platform/windows/error.h"
+#include "../../../core/src/platform/windows/error.h"
 #include "../../utf8.h"
 
 #include <array>

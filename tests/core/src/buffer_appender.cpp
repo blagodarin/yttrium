@@ -15,7 +15,7 @@
 //
 
 #include <yttrium/memory/buffer_appender.h>
-#include "../../../libs/core/utils/fourcc.h"
+#include "../../../libs/core/src/utils/fourcc.h"
 
 #include <cstring>
 

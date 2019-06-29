@@ -18,7 +18,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
-#include "../../core/utils/fourcc.h"
+#include "../../core/src/utils/fourcc.h"
 #include "formats/wav.h"
 
 #if Y_USE_OGG_VORBIS

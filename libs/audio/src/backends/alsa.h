@@ -19,7 +19,7 @@
 #include "../backend.h"
 
 #include <yttrium/memory/buffer.h>
-#include "../../../core/utils/memory.h"
+#include "../../../core/src/utils/memory.h"
 
 #include <alsa/asoundlib.h>
 

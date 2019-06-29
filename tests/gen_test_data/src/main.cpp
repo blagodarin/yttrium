@@ -16,9 +16,9 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
-#include "../../../libs/core/image/formats/bmp.h"
-#include "../../../libs/core/image/formats/dds.h"
-#include "../../../libs/core/image/formats/ico.h"
+#include "../../../libs/core/src/image/formats/bmp.h"
+#include "../../../libs/core/src/image/formats/dds.h"
+#include "../../../libs/core/src/image/formats/ico.h"
 #include "../../core/src/image_formats.h"
 
 #include <cstring>

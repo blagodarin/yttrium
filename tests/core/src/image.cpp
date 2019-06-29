@@ -16,7 +16,7 @@
 
 #include "image.h"
 
-#include "../../../libs/core/image/utils.h"
+#include "../../../libs/core/src/image/utils.h"
 
 #include <array>
 

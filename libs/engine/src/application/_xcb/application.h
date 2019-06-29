@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "../../../../core/utils/memory.h"
+#include "../../../../core/src/utils/memory.h"
 
 #include <xcb/xcb.h>
 

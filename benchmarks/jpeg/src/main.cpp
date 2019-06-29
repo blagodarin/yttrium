@@ -20,7 +20,7 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
-#include "../../../libs/core/image/formats.h"
+#include "../../../libs/core/src/image/formats.h"
 
 #include <csetjmp>
 #include <cstring>

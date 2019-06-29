@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "../../core/utils/fourcc.h"
+#include "../../core/src/utils/fourcc.h"
 
 namespace Yttrium
 {
