@@ -1,5 +1,5 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# Copyright 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+set(_src
+	../common/include/utils.h
+	src/graphics.cpp
+	src/graphics.h
+	src/logic.cpp
+	src/logic.h
+	src/main.cpp
+	)
+
+add_executable(tetrium WIN32 ${_src})
+source_group("src" FILES ${_src})
+target_link_libraries(tetrium PRIVATE yaudio ycore yengine)
+if(WIN32)
+	set_property(TARGET tetrium APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
+	target_link_libraries(tetrium PRIVATE optimized ywinmain)
+	target_sources(tetrium PRIVATE tetrium.rc)
+endif()
 
 file(GLOB _localization_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/data/gui/*.ion)
@@ -29,21 +47,6 @@ add_ypack_target(tetrium_package
 	INDEX data.index
 	OUTPUT ${PROJECT_BINARY_DIR}/tetrium.ypq
 	DEPENDS tetrium_localization)
-
-add_executable(tetrium WIN32
-	../common/utils.h
-	graphics.cpp
-	graphics.h
-	logic.cpp
-	logic.h
-	main.cpp
-	)
-target_link_libraries(tetrium yaudio ycore yengine)
-if(WIN32)
-	set_property(TARGET tetrium APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
-	target_link_libraries(tetrium optimized ywinmain)
-	target_sources(tetrium PRIVATE tetrium.rc)
-endif()
 add_dependencies(tetrium tetrium_package)
 
 set_target_properties(tetrium tetrium_localization tetrium_package PROPERTIES FOLDER "examples")

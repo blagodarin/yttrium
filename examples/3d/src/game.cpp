@@ -24,7 +24,7 @@
 #include <yttrium/renderer/pass.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
-#include "../common/utils.h"
+#include "../../common/include/utils.h"
 
 #include <cmath>
 

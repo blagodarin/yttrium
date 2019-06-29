@@ -30,7 +30,7 @@
 #include <yttrium/storage/storage.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
-#include "../common/utils.h"
+#include "../../common/include/utils.h"
 #include "graphics.h"
 
 #include <iostream>
