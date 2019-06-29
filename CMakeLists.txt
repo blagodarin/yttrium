@@ -230,10 +230,12 @@ if(BUILD_TESTS)
 	find_package(Catch2 2.3.0 REQUIRED)
 	mark_as_advanced(Catch2_DIR)
 	add_subdirectory(tests/common)
+	add_subdirectory(tests/audio)
 	add_subdirectory(tests/core)
 	add_subdirectory(tests/engine)
 	add_subdirectory(tests/gen_test_data)
 	add_custom_target(check
+		COMMAND yaudio_tests --reporter compact
 		COMMAND ycore_tests --reporter compact
 		COMMAND yengine_tests --reporter compact
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

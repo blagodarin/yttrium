@@ -15,7 +15,6 @@
 #
 
 add_executable(ycore_tests
-	audio.cpp
 	buffer.cpp
 	buffer_appender.cpp
 	color.cpp

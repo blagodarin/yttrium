@@ -131,7 +131,7 @@ script:
   - pushd "${HOME}/yttrium.build"
   - cmake --build . -- -j2
   - if [ -n "${TIDY}" ]; then cmake --build . --target tidy; fi
-  - ctest --verbose
+  - ctest --output-on-failure
   - if [ -n "${NORMAL}" ]; then cmake --build . --target install; fi
   # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58
   #- if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
