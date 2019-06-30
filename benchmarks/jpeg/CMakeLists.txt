@@ -1,5 +1,6 @@
 #
-# Copyright 2019 Sergei Blagodarin
+# This file is part of the Yttrium toolkit
+# Copyright (C) 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +15,21 @@
 # limitations under the License.
 #
 
-add_executable(benchmark_jpeg
-	../common/benchmark.h
-	main.cpp
+set(_src
+	../common/include/benchmark.h
+	src/main.cpp
 	)
+
+add_executable(benchmark_jpeg ${_src})
+source_group("src" FILES ${_src})
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+endif()
+
 target_link_libraries(benchmark_jpeg PRIVATE ycore)
+set_target_properties(benchmark_jpeg PROPERTIES FOLDER "benchmarks")
 if(WIN32)
 	find_package(Y3_jpeg REQUIRED)
 	target_link_libraries(benchmark_jpeg PRIVATE Y3::jpeg)
@@ -26,10 +37,4 @@ else()
 	find_package(JPEG REQUIRED)
 	mark_as_advanced(jconfig_dir)
 	target_link_libraries(benchmark_jpeg PRIVATE JPEG::JPEG)
-endif()
-set_target_properties(benchmark_jpeg PROPERTIES FOLDER "benchmarks")
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set_property(SOURCE main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set_property(SOURCE main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 endif()

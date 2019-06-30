@@ -1,5 +1,6 @@
 #
-# Copyright 2019 Sergei Blagodarin
+# This file is part of the Yttrium toolkit
+# Copyright (C) 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -180,7 +181,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	if(Y_ARCH_X86)
+	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(/arch:SSE2)
 	endif()
 	add_compile_options(/EHsc /MP /std:c++latest)
@@ -207,8 +208,6 @@ set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
 set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
 add_subdirectory(libs/core)
 
 if(Y_RENDERER_VULKAN)
@@ -218,6 +217,7 @@ add_subdirectory(tools/yrc)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
+add_subdirectory(libs/audio)
 add_subdirectory(libs/engine)
 
 if(WIN32)
@@ -229,12 +229,14 @@ if(BUILD_TESTS)
 	find_package(Catch2 2.3.0 REQUIRED)
 	mark_as_advanced(Catch2_DIR)
 	add_subdirectory(tests/common)
+	add_subdirectory(tests/audio)
 	add_subdirectory(tests/core)
 	add_subdirectory(tests/engine)
 	add_subdirectory(tests/gen_test_data)
 	add_custom_target(check
-		COMMAND ycore_tests --reporter compact
-		COMMAND yengine_tests --reporter compact
+		COMMAND test_audio --reporter compact
+		COMMAND test_core --reporter compact
+		COMMAND test_engine --reporter compact
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		VERBATIM)
 	set_target_properties(check PROPERTIES FOLDER "tests")
@@ -306,6 +308,5 @@ configure_package_config_file(cmake/YttriumConfig.cmake.in
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake
 	COMPATIBILITY SameMinorVersion)
 
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake DESTINATION ${_cmake_config_dir})
 install(EXPORT YttriumTargets NAMESPACE Yttrium:: DESTINATION ${_cmake_config_dir})

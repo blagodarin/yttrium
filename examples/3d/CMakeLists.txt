@@ -1,5 +1,6 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# This file is part of the Yttrium toolkit
+# Copyright (C) 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +15,26 @@
 # limitations under the License.
 #
 
+set(_src
+	../common/include/utils.h
+	src/game.cpp
+	src/game.h
+	src/main.cpp
+	src/model.cpp
+	src/model.h
+	)
+
+add_executable(3d WIN32 ${_src})
+source_group("src" FILES ${_src})
+target_link_libraries(3d PRIVATE ycore yengine)
+if(WIN32)
+	set_property(TARGET 3d APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
+	target_link_libraries(3d PRIVATE optimized ywinmain)
+endif()
+
 add_ypack_target(3d_package
 	INDEX data.index
 	OUTPUT ${PROJECT_BINARY_DIR}/3d.ypq)
-
-add_executable(3d WIN32
-	../common/utils.h
-	game.cpp
-	game.h
-	main.cpp
-	model.cpp
-	model.h
-	)
-target_link_libraries(3d ycore yengine)
-if(WIN32)
-	set_property(TARGET 3d APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
-	target_link_libraries(3d optimized ywinmain)
-endif()
 add_dependencies(3d 3d_package)
 
 set_target_properties(3d 3d_package PROPERTIES FOLDER "examples")

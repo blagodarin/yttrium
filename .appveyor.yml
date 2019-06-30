@@ -45,10 +45,12 @@ install:
 build_script:
   - cmd: |
       set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
+      set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
       mkdir %BUILD_DIR% && cd %BUILD_DIR%
-      cmake -G "%GENERATOR%" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
-      cmake --build . --config Release -- /nologo /verbosity:minimal
+      cmake -G "%GENERATOR%" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
       cmake --build . --config Debug -- /nologo /verbosity:minimal
+      cmake --build . --config Release -- /nologo /verbosity:minimal
+      cmake --build . --config Release --target install -- /nologo /verbosity:minimal
 
 test_script:
   - cmd: |

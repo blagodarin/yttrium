@@ -1,5 +1,6 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# This file is part of the Yttrium toolkit
+# Copyright (C) 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +15,13 @@
 # limitations under the License.
 #
 
-add_library(ywinmain STATIC
-	main.cpp
+set(_src
+	src/main.cpp
 	)
+
+add_library(ywinmain STATIC ${_src})
+source_group("src" FILES ${_src})
+
 set_target_properties(ywinmain PROPERTIES FOLDER "libs")
 install(TARGETS ywinmain EXPORT YttriumTargets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

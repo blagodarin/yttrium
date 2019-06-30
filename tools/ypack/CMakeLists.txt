@@ -1,5 +1,6 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# This file is part of the Yttrium toolkit
+# Copyright (C) 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +15,14 @@
 # limitations under the License.
 #
 
-add_executable(ypack
-	main.cpp
+set(_src
+	src/main.cpp
 	)
-target_link_libraries(ypack ycore)
+
+add_executable(ypack ${_src})
+source_group("src" FILES ${_src})
+
+target_link_libraries(ypack PRIVATE ycore)
 set_target_properties(ypack PROPERTIES FOLDER "tools")
+
 install(TARGETS ypack RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -1,5 +1,6 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# This file is part of the Yttrium toolkit
+# Copyright (C) 2019 Sergei Blagodarin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +15,13 @@
 # limitations under the License.
 #
 
-add_executable(gen_test_data
-	main.cpp
+set(_src
+	src/main.cpp
 	)
-target_link_libraries(gen_test_data ycore)
+
+add_executable(gen_test_data ${_src})
+source_group("src" FILES ${_src})
+
+include_config(gen_test_data ${PROJECT_BINARY_DIR}/config.h)
+target_link_libraries(gen_test_data PRIVATE ycore)
 set_target_properties(gen_test_data PROPERTIES FOLDER "tests")
