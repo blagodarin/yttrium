@@ -70,9 +70,9 @@ namespace Yttrium
 		constexpr Value** out() noexcept { return &_pointer; }
 
 		template <typename U>
-		constexpr U** out_as() noexcept
+		constexpr std::enable_if_t<std::is_pointer_v<U>, U> out_as() noexcept
 		{
-			return reinterpret_cast<U**>(&_pointer);
+			return reinterpret_cast<U>(&_pointer);
 		}
 
 		void reset(Value* pointer = Sentinel) noexcept

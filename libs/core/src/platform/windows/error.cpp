@@ -33,7 +33,7 @@ namespace Yttrium
 	{
 		SmartPtr<char, ::LocalFree> buffer;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), buffer.out(), 0, nullptr);
+			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), buffer.out_as<char*>(), 0, nullptr);
 		if (buffer)
 		{
 			auto size = std::strlen(buffer);
