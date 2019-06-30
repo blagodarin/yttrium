@@ -18,8 +18,8 @@
 #include "error.h"
 
 #include <yttrium/exceptions.h>
+#include <yttrium/memory/smart_ptr.h>
 #include <yttrium/utils/string.h>
-#include "../../utils/memory.h"
 
 #include <windows.h>
 
@@ -31,9 +31,9 @@ namespace Yttrium
 {
 	std::string error_to_string(unsigned long code, std::string_view fallback_message)
 	{
-		char* buffer = nullptr;
+		SmartPtr<char, ::LocalFree> buffer;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), reinterpret_cast<char*>(&buffer), 0, nullptr);
+			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), buffer.out(), 0, nullptr);
 		if (buffer)
 		{
 			auto size = std::strlen(buffer);
@@ -43,7 +43,6 @@ namespace Yttrium
 				if (size > 0 && buffer[size - 1] == '\r')
 					--size;
 			}
-			UniquePtr<char[], ::LocalFree> buffer_ptr{ buffer };
 			return make_string("(0x", Hex32{ code }, ") ", std::string_view{ buffer, size });
 		}
 		if (!fallback_message.empty())

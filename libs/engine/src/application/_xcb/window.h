@@ -20,6 +20,7 @@
 #include <yttrium/math/size.h>
 #include "application.h"
 
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -48,7 +49,7 @@ namespace Yttrium
 		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
-		using P_Atom = UniquePtr<xcb_intern_atom_reply_t, std::free>;
+		using P_Atom = SmartPtr<xcb_intern_atom_reply_t, ::free>;
 
 		P_Atom make_atom(std::string_view);
 
@@ -56,7 +57,7 @@ namespace Yttrium
 		class EmptyCursor;
 		class Keyboard;
 
-		using P_Event = UniquePtr<xcb_generic_event_t, std::free>;
+		using P_Event = SmartPtr<xcb_generic_event_t, ::free>;
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;

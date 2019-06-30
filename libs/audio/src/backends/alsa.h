@@ -20,7 +20,7 @@
 #include "../backend.h"
 
 #include <yttrium/memory/buffer.h>
-#include "../../../core/src/utils/memory.h"
+#include <yttrium/memory/smart_ptr.h>
 
 #include <alsa/asoundlib.h>
 

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../../core/src/utils/memory.h"
+#include <yttrium/memory/smart_ptr.h>
 
 #include <GL/glx.h>
 
@@ -29,7 +29,7 @@ namespace Yttrium
 		struct Extensions
 		{
 			bool EXT_swap_control = false;
-			void (*SwapIntervalEXT)(::Display*, ::GLXDrawable, int) = nullptr;
+			void (*SwapIntervalEXT)(::Display*, GLXDrawable, int) = nullptr;
 
 			bool EXT_swap_control_tear = false;
 		};
@@ -40,15 +40,15 @@ namespace Yttrium
 		void bind(::Window) const;
 		void swap_buffers(::Window) const;
 		void unbind() const;
-		const ::XVisualInfo* visual_info() const { return _visual_info.get(); }
+		const XVisualInfo* visual_info() const { return _visual_info; }
 
 		const Extensions* operator->() const { return &_extensions; }
 
 	private:
 		::Display* const _display;
 		const int _screen;
-		UniquePtr<::XVisualInfo, ::XFree> _visual_info;
-		::GLXContext _context = nullptr;
+		SmartPtr<XVisualInfo, ::XFree> _visual_info;
+		GLXContext _context = nullptr;
 		Extensions _extensions;
 	};
 }

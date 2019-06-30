@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <yttrium/memory/smart_ptr.h>
 #include "../../../core/src/platform/windows/com.h"
-#include "../../../core/src/utils/memory.h"
 #include "../backend.h"
 
 #include <type_traits>
@@ -51,7 +51,7 @@ namespace Yttrium
 		ComInitializer _com{ COINIT_APARTMENTTHREADED };
 		ComPtr<IMMDevice> _device;
 		ComPtr<IAudioClient> _client;
-		UniquePtr<std::remove_pointer_t<HANDLE>, CloseHandle> _event;
+		SmartPtr<std::remove_pointer_t<HANDLE>, CloseHandle> _event;
 		ComPtr<IAudioRenderClient> _render_client;
 		UINT32 _buffer_frames = 0;
 		UINT32 _update_frames = 0;

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../../core/src/utils/memory.h"
+#include <yttrium/memory/smart_ptr.h>
 
 #include <xcb/xcb.h>
 
@@ -28,11 +28,11 @@ namespace Yttrium
 	public:
 		NativeApplication();
 
-		xcb_connection_t* connection() const noexcept { return _connection.get(); }
+		xcb_connection_t* connection() const noexcept { return _connection; }
 		xcb_screen_t* screen() const noexcept { return _screen; }
 
 	private:
-		UniquePtr<xcb_connection_t, ::xcb_disconnect> _connection;
+		SmartPtr<xcb_connection_t, ::xcb_disconnect> _connection;
 		xcb_screen_t* _screen = nullptr;
 	};
 }
