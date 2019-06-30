@@ -19,7 +19,6 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
-#include "../../core/src/utils/fourcc.h"
 #include "formats/wav.h"
 
 #if Y_USE_OGG_VORBIS
@@ -33,7 +32,6 @@ namespace
 {
 	std::unique_ptr<Yttrium::AudioDecoder> create_audio_decoder(std::unique_ptr<Yttrium::Source>&& source)
 	{
-		using namespace Yttrium::Literals;
 		if (!source)
 			throw std::logic_error{ "Can't create AudioDecoder from an empty Source" };
 		uint32_t signature = 0;
@@ -41,9 +39,9 @@ namespace
 		{
 			switch (signature)
 			{
-			case "RIFF"_fourcc: return std::make_unique<Yttrium::WavDecoder>(std::move(source));
+			case Yttrium::make_cc('R', 'I', 'F', 'F'): return std::make_unique<Yttrium::WavDecoder>(std::move(source));
 #if Y_USE_OGG_VORBIS
-			case "OggS"_fourcc: return std::make_unique<Yttrium::OggVorbisDecoder>(std::move(source));
+			case Yttrium::make_cc('O', 'g', 'g', 'S'): return std::make_unique<Yttrium::OggVorbisDecoder>(std::move(source));
 #endif
 			default: break;
 			}

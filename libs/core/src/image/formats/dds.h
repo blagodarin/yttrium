@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../utils/fourcc.h"
+#include <yttrium/utils/numeric.h>
 
 namespace Yttrium
 {
@@ -235,12 +235,12 @@ namespace Yttrium
 
 		enum : uint32_t
 		{
-			DXT1 = "DXT1"_fourcc,
-			DXT2 = "DXT2"_fourcc,
-			DXT3 = "DXT3"_fourcc,
-			DXT4 = "DXT4"_fourcc,
-			DXT5 = "DXT5"_fourcc,
-			DX10 = "DX10"_fourcc,
+			DXT1 = make_cc('D', 'X', 'T', '1'),
+			DXT2 = make_cc('D', 'X', 'T', '2'),
+			DXT3 = make_cc('D', 'X', 'T', '3'),
+			DXT4 = make_cc('D', 'X', 'T', '4'),
+			DXT5 = make_cc('D', 'X', 'T', '5'),
+			DX10 = make_cc('D', 'X', '1', '0'),
 		};
 
 		uint32_t dwSize;
@@ -257,7 +257,7 @@ namespace Yttrium
 	{
 		enum : uint32_t
 		{
-			MAGIC = "DDS "_fourcc,
+			MAGIC = make_cc('D', 'D', 'S', ' '),
 			SIZE = 124,
 		};
 

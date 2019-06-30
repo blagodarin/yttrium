@@ -206,7 +206,6 @@ y_sources(ycore "src/utils"
 	src/utils/algorithm.h
 	src/utils/atomic_counters.h
 	src/utils/crc32.h
-	src/utils/fourcc.h
 	src/utils/memory.h
 	src/utils/string.cpp
 	src/utils/string.h

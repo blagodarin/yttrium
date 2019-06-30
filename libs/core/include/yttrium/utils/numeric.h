@@ -50,6 +50,24 @@ namespace Yttrium
 		return !(x & (x - 1)) && x > 0;
 	}
 
+	///
+	constexpr uint16_t make_cc(char c0, char c1) noexcept
+	{
+		return static_cast<uint16_t>(static_cast<uint8_t>(c0) | static_cast<uint8_t>(c1) << 8);
+	}
+
+	///
+	constexpr uint32_t make_cc(char c0, char c1, char c2, char c3) noexcept
+	{
+		return uint32_t{ make_cc(c0, c1) } | uint32_t{ make_cc(c2, c3) } << 16;
+	}
+
+	///
+	constexpr uint64_t make_cc(char c0, char c1, char c2, char c3, char c4, char c5, char c6, char c7) noexcept
+	{
+		return uint64_t{ make_cc(c0, c1, c2, c3) } | uint64_t{ make_cc(c4, c5, c6, c7) } << 32;
+	}
+
 	/// Returns the least power of two not less than the specified positive value.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && sizeof(T) <= sizeof(uint64_t)>>
 	constexpr T next_power_of_2(T x) noexcept

@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "../../utils/fourcc.h"
+#include <yttrium/utils/numeric.h>
 
 namespace Yttrium
 {
 	enum class BmpFileType : uint16_t
 	{
-		Bm = "BM"_twocc,
+		Bm = make_cc('B', 'M'),
 	};
 
 	enum class BmpCompression : uint32_t

@@ -20,7 +20,7 @@
 #include <yttrium/image.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include "../utils/fourcc.h"
+#include <yttrium/utils/numeric.h>
 
 #include <new>
 
@@ -40,16 +40,16 @@ namespace Yttrium
 				return false;
 			switch (signature.ab)
 			{
-			case "BM"_twocc:
+			case make_cc('B', 'M'):
 				format = ImageFormat::Bmp;
 				break;
-			case "DD"_twocc:
+			case make_cc('D', 'D'):
 				format = ImageFormat::Dds;
 				break;
-			case "\xff\xd8"_twocc: // SOI marker.
+			case make_cc('\xff', '\xd8'): // SOI marker.
 				format = ImageFormat::Jpeg;
 				break;
-			case "\x89P"_twocc:
+			case make_cc('\x89', 'P'):
 				format = ImageFormat::Png;
 				break;
 			default:

@@ -20,22 +20,19 @@
 #include <yttrium/utils/numeric.h>
 #include "../../utils/adler32.h"
 #include "../../utils/crc32.h"
-#include "../../utils/fourcc.h"
 #include "../formats.h"
 
 #include <limits>
 
-using namespace Yttrium::Literals;
-
 namespace
 {
-	constexpr auto PngSignature = "\x89PNG\r\n\x1a\n"_eightcc;
+	constexpr auto PngSignature = Yttrium::make_cc('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
 
 	enum class PngChunkType : std::uint32_t
 	{
-		IDAT = "IDAT"_fourcc,
-		IEND = "IEND"_fourcc,
-		IHDR = "IHDR"_fourcc,
+		IDAT = Yttrium::make_cc('I', 'D', 'A', 'T'),
+		IEND = Yttrium::make_cc('I', 'E', 'N', 'D'),
+		IHDR = Yttrium::make_cc('I', 'H', 'D', 'R'),
 	};
 
 	enum class PngColorType : std::uint8_t

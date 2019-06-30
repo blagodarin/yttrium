@@ -19,7 +19,7 @@
 
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include "../../utils/fourcc.h"
+#include <yttrium/utils/numeric.h>
 #include "../package.h"
 
 #include <cstring>
@@ -27,25 +27,23 @@
 
 namespace
 {
-	using namespace Yttrium::Literals;
-
 #pragma pack(push, 1)
 
 	struct YpqHeader
 	{
-		std::uint32_t signature = 0;
-		std::uint32_t entry_count = 0;
-		std::uint32_t index_size = 0;
-		std::uint32_t reserved = 0;
+		uint32_t signature = 0;
+		uint32_t entry_count = 0;
+		uint32_t index_size = 0;
+		uint32_t reserved = 0;
 
-		static constexpr auto Signature = "\xDFYPQ"_fourcc;
+		static constexpr auto Signature = Yttrium::make_cc('\xDF', 'Y', 'P', 'Q');
 	};
 
 	struct YpqEntry
 	{
-		std::uint64_t data_offset = 0;
-		std::uint32_t data_size = 0;
-		std::uint32_t metadata_offset = 0;
+		uint64_t data_offset = 0;
+		uint32_t data_size = 0;
+		uint32_t metadata_offset = 0;
 	};
 
 #pragma pack(pop)
@@ -55,10 +53,10 @@ namespace Yttrium
 {
 	struct YpqReader::Entry
 	{
-		std::uint64_t _offset = 0;
-		std::uint32_t _size = 0;
+		uint64_t _offset = 0;
+		uint32_t _size = 0;
 
-		Entry(std::uint64_t offset, std::uint32_t size) noexcept
+		Entry(uint64_t offset, uint32_t size) noexcept
 			: _offset{ offset }, _size{ size } {}
 	};
 
@@ -105,7 +103,7 @@ namespace Yttrium
 		const auto source_size = _source->size();
 		for (const auto& entry : entries)
 		{
-			const auto index = static_cast<std::size_t>(&entry - entries.data());
+			const auto index = static_cast<size_t>(&entry - entries.data());
 			if (entry.data_offset > source_size || entry.data_offset + entry.data_size > source_size)
 				throw BadPackage{ "Bad package index entry #", index, " data" };
 			if (entry.metadata_offset < metadata_offset || !metadata_reader.seek(entry.metadata_offset - metadata_offset))
@@ -117,7 +115,7 @@ namespace Yttrium
 
 	YpqReader::~YpqReader() = default;
 
-	std::unique_ptr<Source> YpqReader::open(std::size_t index) const
+	std::unique_ptr<Source> YpqReader::open(size_t index) const
 	{
 		if (index >= _entries.size())
 			return {};
@@ -166,13 +164,13 @@ namespace Yttrium
 			Writer writer{ metadata_buffer };
 
 			const auto write_string = [&writer](const std::string& value) {
-				const auto size = static_cast<std::uint8_t>(value.size());
+				const auto size = static_cast<uint8_t>(value.size());
 				return size == value.size() && writer.write(size) && writer.write(value.data(), size);
 			};
 
 			for (const auto& entry : _entries)
 			{
-				entries.emplace_back().metadata_offset = static_cast<std::uint32_t>(metadata_offset + writer.offset());
+				entries.emplace_back().metadata_offset = static_cast<uint32_t>(metadata_offset + writer.offset());
 				if (!write_string(entry._name))
 					return false;
 			}
@@ -185,8 +183,8 @@ namespace Yttrium
 
 		YpqHeader header;
 		header.signature = YpqHeader::Signature;
-		header.entry_count = static_cast<std::uint32_t>(_entries.size());
-		header.index_size = static_cast<std::uint32_t>(data_offset);
+		header.entry_count = static_cast<uint32_t>(_entries.size());
+		header.index_size = static_cast<uint32_t>(data_offset);
 		if (!_writer.write(header))
 			return false;
 
@@ -201,9 +199,9 @@ namespace Yttrium
 			const auto source = Source::from(entry._name);
 			if (!source)
 				return false;
-			const auto i = static_cast<std::size_t>(&entry - _entries.data());
+			const auto i = static_cast<size_t>(&entry - _entries.data());
 			entries[i].data_offset = decltype(entries[i].data_offset){ _writer.offset() };
-			entries[i].data_size = static_cast<std::uint32_t>(source->size());
+			entries[i].data_size = static_cast<uint32_t>(source->size());
 			if (entries[i].data_size != source->size())
 				return false;
 			if (!_writer.write_all(*source))
