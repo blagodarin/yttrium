@@ -113,7 +113,7 @@ namespace Yttrium
 
 		std::string_view keycode_to_text(xcb_keycode_t keycode)
 		{
-			const auto size = static_cast<std::size_t>(::xkb_state_key_get_utf8(_state.get(), keycode, nullptr, 0));
+			const auto size = static_cast<size_t>(::xkb_state_key_get_utf8(_state.get(), keycode, nullptr, 0));
 			if (!size)
 				return {};
 			if (size > _keycode_text_buffer.size())
@@ -121,7 +121,7 @@ namespace Yttrium
 			::xkb_state_key_get_utf8(_state.get(), keycode, _keycode_text_buffer.data(), size + 1);
 			const auto begin = _keycode_text_buffer.begin();
 			const auto end = std::remove_if(begin, begin + static_cast<std::string::difference_type>(size), [](char c) { return to_unsigned(c) < 32 || c == 127; });
-			return { _keycode_text_buffer.data(), static_cast<std::size_t>(end - begin) };
+			return { _keycode_text_buffer.data(), static_cast<size_t>(end - begin) };
 		}
 
 		bool process_event(int event_type, const xcb_generic_event_t* event)
@@ -261,8 +261,11 @@ namespace Yttrium
 		if (_window == XCB_WINDOW_NONE)
 			return false;
 		_events.clear();
-		for (bool blocking = !_size; P_Event event{ blocking ? ::xcb_wait_for_event(_application.connection()) : ::xcb_poll_for_event(_application.connection()) };)
+		for (bool blocking = !_size;;)
 		{
+			P_Event event{ blocking ? ::xcb_wait_for_event(_application.connection()) : ::xcb_poll_for_event(_application.connection()) };
+			if (!event)
+				break;
 			event->response_type &= 0x7f;
 			if (blocking && event->response_type == XCB_CONFIGURE_NOTIFY)
 				blocking = false;
@@ -356,9 +359,9 @@ namespace Yttrium
 		if (_window == XCB_WINDOW_NONE)
 			return;
 		const auto property_size = 2 + icon.info().width() * icon.info().height();
-		const auto property_buffer = std::make_unique<std::uint32_t[]>(property_size);
-		property_buffer[0] = static_cast<std::uint32_t>(icon.info().width());
-		property_buffer[1] = static_cast<std::uint32_t>(icon.info().height());
+		const auto property_buffer = std::make_unique<uint32_t[]>(property_size);
+		property_buffer[0] = static_cast<uint32_t>(icon.info().width());
+		property_buffer[1] = static_cast<uint32_t>(icon.info().height());
 		if (!Image::transform(icon.info(), icon.data(), { icon.info().width(), icon.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYDown }, &property_buffer[2]))
 			return;
 		const auto net_wm_icon = make_atom("_NET_WM_ICON");

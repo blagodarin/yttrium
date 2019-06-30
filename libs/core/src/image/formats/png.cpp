@@ -28,14 +28,14 @@ namespace
 {
 	constexpr auto PngSignature = Yttrium::make_cc('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
 
-	enum class PngChunkType : std::uint32_t
+	enum class PngChunkType : uint32_t
 	{
 		IDAT = Yttrium::make_cc('I', 'D', 'A', 'T'),
 		IEND = Yttrium::make_cc('I', 'E', 'N', 'D'),
 		IHDR = Yttrium::make_cc('I', 'H', 'D', 'R'),
 	};
 
-	enum class PngColorType : std::uint8_t
+	enum class PngColorType : uint8_t
 	{
 		Grayscale = 0,
 		Truecolor = 2,
@@ -44,17 +44,17 @@ namespace
 		TruecolorAlpha = 6,
 	};
 
-	enum class PngCompressionMethod : std::uint8_t
+	enum class PngCompressionMethod : uint8_t
 	{
 		Zlib = 0,
 	};
 
-	enum class PngFilterMethod : std::uint8_t
+	enum class PngFilterMethod : uint8_t
 	{
 		Standard = 0,
 	};
 
-	enum class PngStandardFilterType : std::uint8_t
+	enum class PngStandardFilterType : uint8_t
 	{
 		None = 0,
 		Sub = 1,
@@ -63,7 +63,7 @@ namespace
 		Paeth = 4,
 	};
 
-	enum class PngInterlaceMethod : std::uint8_t
+	enum class PngInterlaceMethod : uint8_t
 	{
 		None = 0,
 		Adam7 = 1,
@@ -73,26 +73,26 @@ namespace
 
 	struct PngPrefix
 	{
-		std::uint64_t signature;
+		uint64_t signature;
 		struct
 		{
-			std::uint32_t length;
+			uint32_t length;
 			PngChunkType type;
 			struct
 			{
-				std::uint32_t width;
-				std::uint32_t height;
-				std::uint8_t bit_depth;
+				uint32_t width;
+				uint32_t height;
+				uint8_t bit_depth;
 				PngColorType color_type;
 				PngCompressionMethod compression_method;
 				PngFilterMethod filter_method;
 				PngInterlaceMethod interlace_method;
 			} data;
-			std::uint32_t crc;
+			uint32_t crc;
 		} ihdr;
 		struct
 		{
-			std::uint32_t length;
+			uint32_t length;
 			PngChunkType type;
 		} idat;
 	};
@@ -101,32 +101,32 @@ namespace
 	{
 		struct
 		{
-			std::uint32_t crc;
+			uint32_t crc;
 		} idat;
 		struct
 		{
-			std::uint32_t length;
+			uint32_t length;
 			PngChunkType type;
-			std::uint32_t crc;
+			uint32_t crc;
 		} iend;
 	};
 
 #pragma pack(pop)
 
-	Yttrium::Buffer make_zlib_buffer(const void* data, std::size_t size)
+	Yttrium::Buffer make_zlib_buffer(const void* data, size_t size)
 	{
-		constexpr std::size_t max_block_bytes = 65535;
+		constexpr size_t max_block_bytes = 65535;
 		Yttrium::Buffer buffer;
 		buffer.reserve(size + 2 + (size + max_block_bytes - 1) / max_block_bytes * 5 + 4);
 		Yttrium::Writer writer{ buffer };
-		writer.write(Yttrium::swap_bytes(std::uint16_t{ 0x7801 })); // Deflate algorithm, 32 KiB window, no compression.
-		for (std::size_t offset = 0; offset < size;)
+		writer.write(Yttrium::swap_bytes(uint16_t{ 0x7801 })); // Deflate algorithm, 32 KiB window, no compression.
+		for (size_t offset = 0; offset < size;)
 		{
 			const auto remaining_bytes = size - offset;
 			const auto block_bytes = remaining_bytes > max_block_bytes ? max_block_bytes : remaining_bytes;
-			writer.write(static_cast<std::uint8_t>(block_bytes == remaining_bytes));
-			writer.write(static_cast<std::uint16_t>(block_bytes));
-			writer.write(static_cast<std::uint16_t>(~block_bytes));
+			writer.write(static_cast<uint8_t>(block_bytes == remaining_bytes));
+			writer.write(static_cast<uint16_t>(block_bytes));
+			writer.write(static_cast<uint16_t>(~block_bytes));
 			writer.write(static_cast<const std::byte*>(data) + offset, block_bytes);
 			offset += block_bytes;
 		}
@@ -142,20 +142,20 @@ namespace Yttrium
 		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
 			return false;
 
-		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint32_t>::max())
+		if (!info.width() || info.width() > std::numeric_limits<uint32_t>::max())
 			return false;
 
-		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint32_t>::max())
+		if (!info.height() || info.height() > std::numeric_limits<uint32_t>::max())
 			return false;
 
 		PixelFormat pixel_format;
 
 		PngPrefix prefix;
 		prefix.signature = PngSignature;
-		prefix.ihdr.length = swap_bytes(std::uint32_t{ sizeof prefix.ihdr.data });
+		prefix.ihdr.length = swap_bytes(uint32_t{ sizeof prefix.ihdr.data });
 		prefix.ihdr.type = PngChunkType::IHDR;
-		prefix.ihdr.data.width = swap_bytes(static_cast<std::uint32_t>(info.width()));
-		prefix.ihdr.data.height = swap_bytes(static_cast<std::uint32_t>(info.height()));
+		prefix.ihdr.data.width = swap_bytes(static_cast<uint32_t>(info.width()));
+		prefix.ihdr.data.height = swap_bytes(static_cast<uint32_t>(info.height()));
 		prefix.ihdr.data.bit_depth = 8;
 		switch (info.pixel_format())
 		{

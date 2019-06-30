@@ -283,7 +283,7 @@ endif()
 if(ENABLE_CPPCHECK)
 	find_package(Cppcheck REQUIRED)
 	add_custom_target(cppcheck
-		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --quiet
+		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --error-exitcode=1 --inline-suppr --quiet
 			-I ${PROJECT_SOURCE_DIR}/libs/audio/include
 			-I ${PROJECT_SOURCE_DIR}/libs/core/include
 			-I ${PROJECT_SOURCE_DIR}/libs/engine/include

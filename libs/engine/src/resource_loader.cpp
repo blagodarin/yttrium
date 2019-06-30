@@ -62,7 +62,7 @@ namespace Yttrium
 
 		std::shared_ptr<const T> fetch(std::string_view name, const std::function<std::shared_ptr<const T>(std::unique_ptr<Source>&&)>& factory)
 		{
-			std::lock_guard<std::mutex> lock{ _mutex };
+			std::scoped_lock lock{ _mutex };
 			const auto i = _map.find(name);
 			if (i != _map.end())
 				return i->second;
@@ -79,7 +79,7 @@ namespace Yttrium
 		auto release_unused()
 		{
 			std::vector<std::shared_ptr<const T>> unused;
-			std::lock_guard<std::mutex> lock{ _mutex };
+			std::scoped_lock lock{ _mutex };
 			size_t released = 0;
 			for (auto i = _map.begin(); i != _map.end();)
 			{
@@ -133,9 +133,13 @@ namespace Yttrium
 			return {};
 		return _private->_material_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Material> {
 			IonReader ion{ *source };
+			// cppcheck-suppress shadowVar
 			std::unique_ptr<Source> vertex_shader;
+			// cppcheck-suppress shadowVar
 			std::unique_ptr<Source> fragment_shader;
+			// cppcheck-suppress shadowVar
 			std::shared_ptr<const Texture2D> texture;
+			// cppcheck-suppress shadowVar
 			Texture2D::Filter texture_filter = Texture2D::NearestFilter;
 			for (auto token = ion.read(); token.type() != IonToken::Type::End;)
 			{
@@ -179,6 +183,7 @@ namespace Yttrium
 				throw DataError{ "(", name, ") No 'vertex_shader'" };
 			if (!fragment_shader)
 				throw DataError{ "(", name, ") No 'fragment_shader'" };
+			// cppcheck-suppress shadowVar
 			auto program = _private->_render_manager->create_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
 				throw DataError{ "(", name, ") Bad 'vertex_shader' or 'fragment_shader'" };

@@ -160,7 +160,8 @@ TEST_CASE("buffer.total_capacity")
 		buffer.shrink_to_fit();
 		CHECK(Yttrium::_buffer_memory_tracker.total_capacity() == 0);
 
-		buffer = Buffer(granularity + 1);
+		// cppcheck-suppress unreadVariable
+		buffer = Buffer{ granularity + 1 };
 		CHECK(Yttrium::_buffer_memory_tracker.total_capacity() == granularity * 2);
 	}
 	CHECK(Yttrium::_buffer_memory_tracker.total_capacity() == 0);

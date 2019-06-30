@@ -67,13 +67,11 @@ TEST_CASE("resource_loader.open")
 TEST_CASE("resource_loader.release_unused")
 {
 	Storage storage{ Storage::UseFileSystem::Never };
-	storage.attach_buffer("one", ::make_buffer(_translation_data));
-	storage.attach_buffer("two", ::make_buffer(_translation_data));
+	storage.attach_buffer("translation", ::make_buffer(_translation_data));
 
 	ResourceLoader resource_loader{ storage };
-	const auto one = resource_loader.load_translation("one");
-	const std::weak_ptr<const Translation> two = resource_loader.load_translation("two");
-	CHECK(!two.expired());
+	const std::weak_ptr<const Translation> translation{ resource_loader.load_translation("translation") };
+	CHECK(!translation.expired());
 	resource_loader.release_unused();
-	CHECK(two.expired());
+	CHECK(translation.expired());
 }

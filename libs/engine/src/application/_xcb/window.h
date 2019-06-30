@@ -32,7 +32,7 @@ namespace Yttrium
 	class WindowBackend
 	{
 	public:
-		WindowBackend(WindowBackendCallbacks&);
+		explicit WindowBackend(WindowBackendCallbacks&);
 		~WindowBackend() noexcept;
 
 		void close() noexcept;

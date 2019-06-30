@@ -46,7 +46,11 @@ namespace Yttrium
 			: _handle{ handle } {}
 		NativeWindow(const NativeWindow&) = delete;
 		NativeWindow(NativeWindow&& other) noexcept
-			: _handle{ other._handle } { other._handle = NULL; }
+			: _handle{ other._handle }
+		{
+			// cppcheck-suppress useInitializationList
+			other._handle = NULL;
+		}
 		~NativeWindow() noexcept { reset(); }
 		NativeWindow& operator=(const NativeWindow&) = delete;
 		void reset() noexcept;
