@@ -8,16 +8,18 @@
 
 # Yttrium
 
-Yttrium is (intended to become) a game development framework.
+Yttrium is (intended to become) a game development toolkit.
 
 Yttrium is an occasional hobby project, so don't expect it to be something
 actually valuable or to eventually turn into one. It's more like a bunch of
 various ideas piled together and roughly shaped to look game engine-ish.
 
-Yttrium aims to:
-* Be a *modern C++ framework* in terms of API design, software architecture,
-  development tools and coding practices.
-* Provide flexible yet easy-to-use components for building interactive software.
+Yttrium aims to be:
+* **Simple** to use and maintain.
+* **Concise**: any supported platform, format, feature and technology is a
+  liability that must be justified.
+* **Modern** in terms of API design, software architecture, development tools
+  used and coding practices followed.
 
 
 ## Build instructions
