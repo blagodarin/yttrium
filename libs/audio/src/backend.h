@@ -40,7 +40,7 @@ namespace Yttrium
 			AudioBackend& _backend;
 			const BufferView _buffer = _backend.lock_buffer();
 			const int _exceptions = std::uncaught_exceptions();
-			BufferLock(AudioBackend& backend)
+			explicit BufferLock(AudioBackend& backend)
 				: _backend{ backend } {}
 			~BufferLock() noexcept { _backend.unlock_buffer(_exceptions == std::uncaught_exceptions()); }
 		};
@@ -48,7 +48,7 @@ namespace Yttrium
 		struct Context
 		{
 			AudioBackend& _backend;
-			Context(AudioBackend& backend)
+			explicit Context(AudioBackend& backend)
 				: _backend{ backend } { _backend.begin_context(); }
 			~Context() noexcept { _backend.end_context(); }
 		};

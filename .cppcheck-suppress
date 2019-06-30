@@ -1,4 +1,4 @@
 missingInclude
-noExplicitConstructor:include/yttrium/utils/flags.h
+noExplicitConstructor:libs/core/include/yttrium/utils/flags.h
 syntaxError
 unusedFunction

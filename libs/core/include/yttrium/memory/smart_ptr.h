@@ -62,7 +62,7 @@ namespace Yttrium
 		constexpr Value* get() const noexcept { return _pointer; }
 
 		template <typename U>
-		constexpr U* get_as() const  noexcept
+		constexpr U* get_as() const noexcept
 		{
 			return reinterpret_cast<U*>(_pointer);
 		}
@@ -90,7 +90,10 @@ namespace Yttrium
 	struct SmartPtrFunctionDeleter
 	{
 		template <typename T>
-		static constexpr T* sentinel() noexcept { return nullptr; }
+		static constexpr T* sentinel() noexcept
+		{
+			return nullptr;
+		}
 
 		template <typename T>
 		static void free(T* pointer) noexcept
