@@ -82,7 +82,7 @@ namespace Yttrium
 		}
 
 	private:
-		static constexpr Value* Sentinel = Deleter::template sentinel<Value>();
+		static constexpr Value* Sentinel = Deleter::template Sentinel<Value>;
 		Value* _pointer = Sentinel;
 	};
 
@@ -90,10 +90,7 @@ namespace Yttrium
 	struct SmartPtrFunctionDeleter
 	{
 		template <typename T>
-		static constexpr T* sentinel() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr T* Sentinel = nullptr;
 
 		template <typename T>
 		static void free(T* pointer) noexcept

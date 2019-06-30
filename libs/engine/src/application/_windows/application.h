@@ -18,6 +18,7 @@
 #pragma once
 
 #include <yttrium/key.h>
+#include <yttrium/memory/smart_ptr.h>
 
 #include <string_view>
 #include <unordered_map>
@@ -39,26 +40,14 @@ namespace Yttrium
 		virtual void on_text(std::string_view) = 0;
 	};
 
-	class NativeWindow
+	struct HWndDeleter
 	{
-	public:
-		explicit NativeWindow(HWND handle) noexcept
-			: _handle{ handle } {}
-		NativeWindow(const NativeWindow&) = delete;
-		NativeWindow(NativeWindow&& other) noexcept
-			: _handle{ other._handle }
-		{
-			// cppcheck-suppress useInitializationList
-			other._handle = NULL;
-		}
-		~NativeWindow() noexcept { reset(); }
-		NativeWindow& operator=(const NativeWindow&) = delete;
-		void reset() noexcept;
-		operator HWND() const noexcept { return _handle; }
-
-	private:
-		HWND _handle = NULL;
+		template <typename>
+		static constexpr HWND Sentinel = NULL;
+		static void free(HWND) noexcept;
 	};
+
+	using NativeWindow = SmartPtrBase<std::remove_pointer_t<HWND>, HWndDeleter>;
 
 	class NativeApplication
 	{

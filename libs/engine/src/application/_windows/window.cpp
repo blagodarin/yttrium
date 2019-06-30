@@ -37,14 +37,10 @@ namespace Yttrium
 			throw InitializationError{ "GetDC failed" };
 	}
 
-	void WindowBackend::IconHolder::reset(HICON handle) noexcept
+	void WindowBackend::HIconDeleter::free(HICON handle) noexcept
 	{
-		if (_handle)
-		{
-			if (!::DestroyIcon(_handle))
-				print_last_error("DestroyIcon");
-			_handle = handle;
-		}
+		if (handle && !::DestroyIcon(handle))
+			print_last_error("DestroyIcon");
 	}
 
 	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
@@ -77,9 +73,9 @@ namespace Yttrium
 			&& ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
 	}
 
-	void WindowBackend::set_icon(const Image& icon)
+	void WindowBackend::set_icon(const Image& image)
 	{
-		const ImageInfo info{ icon.info().width(), icon.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYUp };
+		const ImageInfo info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYUp };
 		const auto mask_size = (info.width() + 7) / 8 * info.height();
 		const auto buffer_size = sizeof(BmpInfoHeader) + info.frame_size() + mask_size;
 		const auto buffer = std::make_unique<std::uint8_t[]>(buffer_size);
@@ -95,15 +91,15 @@ namespace Yttrium
 		header->y_pixels_per_meter = 0;
 		header->used_colors = 0;
 		header->required_colors = 0;
-		if (!Image::transform(icon.info(), icon.data(), info, buffer.get() + sizeof *header))
+		if (!Image::transform(image.info(), image.data(), info, buffer.get() + sizeof *header))
 			return;
 		std::memset(buffer.get() + sizeof *header + header->image_size, 0xff, mask_size);
-		const auto hicon = ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR);
-		if (!hicon)
+		decltype(_icon) icon{ ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR) };
+		if (!icon)
 			return print_last_error("CreateIconFromResourceEx");
-		_icon.reset(hicon);
-		::SendMessageW(_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hicon));
-		::SendMessageW(_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hicon));
+		_icon = std::move(icon);
+		::SendMessageW(_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(_icon.get()));
+		::SendMessageW(_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(_icon.get()));
 	}
 
 	void WindowBackend::set_title(const std::string& title)
