@@ -33,7 +33,7 @@ namespace Yttrium
 
 		const auto locale = std::setlocale(LC_ALL, "");
 		const auto modifiers = ::XSetLocaleModifiers("@im=none");
-		_input_method.reset(::XOpenIM(_display.get(), nullptr, nullptr, nullptr));
+		_input_method.reset(::XOpenIM(_display, nullptr, nullptr, nullptr));
 		std::setlocale(LC_ALL, locale);
 		::XSetLocaleModifiers(modifiers);
 		if (!_input_method)

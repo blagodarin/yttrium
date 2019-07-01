@@ -19,6 +19,7 @@
 
 #include "helpers.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 
@@ -91,8 +92,7 @@ namespace Yttrium
 		_views.reserve(views.size());
 
 		_handle = swapchain.release();
-		for (auto& view : views)
-			_views.emplace_back(view.release());
+		std::transform(views.begin(), views.end(), std::back_inserter(_views), [](auto& view) { return view.release(); });
 	}
 
 	VK_Swapchain::~VK_Swapchain() noexcept
@@ -174,6 +174,7 @@ namespace Yttrium
 		_handles.reserve(swapchain._views.size());
 		for (const auto swapchain_view : swapchain._views)
 		{
+			// cppcheck-suppress unreadVariable
 			attachments[0] = swapchain_view;
 
 			VkFramebuffer framebuffer = VK_NULL_HANDLE;

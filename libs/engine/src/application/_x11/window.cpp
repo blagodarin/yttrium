@@ -24,7 +24,9 @@
 #include "../key_codes.h"
 #include "../window_callbacks.h"
 
+#include <array>
 #include <cstring>
+#include <memory>
 
 #include <X11/Xatom.h>
 
@@ -79,7 +81,7 @@ namespace Yttrium
 
 		::XSetWMProtocols(_application.display(), _window.get(), &_wm_delete_window, 1);
 		::XDefineCursor(_application.display(), _window.get(), _empty_cursor.get());
-		::XSetICFocus(_input_context.get());
+		::XSetICFocus(_input_context);
 
 		{
 			const auto net_wm_state = ::XInternAtom(_application.display(), "_NET_WM_STATE", False);
@@ -177,21 +179,21 @@ namespace Yttrium
 			switch (event.type)
 			{
 			case KeyPress:
-				do_key_event(map_linux_key_code(static_cast<std::uint8_t>(event.xkey.keycode)), true, std::exchange(_pending_autorepeat, false), event.xkey.state);
+				do_key_event(map_linux_key_code(static_cast<uint8_t>(event.xkey.keycode)), true, std::exchange(_pending_autorepeat, false), event.xkey.state);
 				{
 					std::array<char, 32> buffer{};
 					::KeySym keysym = NoSymbol;
 					Status status = 0;
-					const auto count = ::Xutf8LookupString(_input_context.get(), &event.xkey, buffer.data(), buffer.size(), &keysym, &status);
+					const auto count = ::Xutf8LookupString(_input_context, &event.xkey, buffer.data(), buffer.size(), &keysym, &status);
 					if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
-						_callbacks.on_text_input(std::string_view{ buffer.data(), static_cast<std::size_t>(count) });
+						_callbacks.on_text_input(std::string_view{ buffer.data(), static_cast<size_t>(count) });
 				}
 				break;
 
 			case KeyRelease:
 				_pending_autorepeat = check_autorepeat(event);
 				if (!_pending_autorepeat)
-					do_key_event(map_linux_key_code(static_cast<std::uint8_t>(event.xkey.keycode)), false, false, event.xkey.state);
+					do_key_event(map_linux_key_code(static_cast<uint8_t>(event.xkey.keycode)), false, false, event.xkey.state);
 				break;
 
 			case ButtonPress:
@@ -243,10 +245,10 @@ namespace Yttrium
 		if (!Image::transform(icon.info(), icon.data(), bgra_icon.info(), bgra_icon.data()))
 			return;
 		auto* dst = &property_buffer[2];
-		for (std::size_t y = 0; y < icon.info().height(); ++y)
+		for (size_t y = 0; y < icon.info().height(); ++y)
 		{
-			const auto* src = reinterpret_cast<const std::uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_icon.info().stride() * y);
-			for (std::size_t x = 0; x < icon.info().width(); ++x)
+			const auto* src = reinterpret_cast<const uint32_t*>(static_cast<const std::byte*>(bgra_icon.data()) + bgra_icon.info().stride() * y);
+			for (size_t x = 0; x < icon.info().width(); ++x)
 				*dst++ = src[x];
 		}
 		const auto net_wm_icon = ::XInternAtom(_application.display(), "_NET_WM_ICON", False);

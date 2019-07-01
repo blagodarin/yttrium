@@ -31,14 +31,10 @@ namespace Yttrium
 {
 	const wchar_t* const NativeApplication::WindowClass::Name = L"Yttrium";
 
-	void NativeWindow::reset() noexcept
+	void HWndDeleter::free(HWND handle) noexcept
 	{
-		if (_handle)
-		{
-			if (!::DestroyWindow(_handle))
-				print_last_error("DestroyWindow");
-			_handle = NULL;
-		}
+		if (handle && !::DestroyWindow(handle))
+			print_last_error("DestroyWindow");
 	}
 
 	NativeApplication::NativeApplication() = default;
@@ -47,11 +43,10 @@ namespace Yttrium
 
 	NativeWindow NativeApplication::create_window(NativeWindowCallbacks& callbacks)
 	{
-		const auto hwnd = ::CreateWindowExW(WS_EX_APPWINDOW, WindowClass::Name, L"", WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, _hinstance, this);
-		if (!hwnd)
+		NativeWindow result{ ::CreateWindowExW(WS_EX_APPWINDOW, WindowClass::Name, L"", WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, _hinstance, this) };
+		if (!result)
 			throw_last_error("CreateWindowEx");
-		NativeWindow result{ hwnd };
-		_windows.emplace(hwnd, &callbacks);
+		_windows.emplace(result, &callbacks);
 		return result;
 	}
 

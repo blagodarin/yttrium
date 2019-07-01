@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../../core/src/utils/memory.h"
+#include <yttrium/memory/smart_ptr.h>
 
 #include <type_traits>
 
@@ -30,13 +30,13 @@ namespace Yttrium
 	public:
 		NativeApplication();
 
-		::Display* display() const noexcept { return _display.get(); }
-		::XIM input_method() const noexcept { return _input_method.get(); }
+		::Display* display() const noexcept { return _display; }
+		XIM input_method() const noexcept { return _input_method; }
 		int screen() const noexcept { return _screen; }
 
 	private:
-		UniquePtr<::Display, ::XCloseDisplay> _display;
+		SmartPtr<::Display, ::XCloseDisplay> _display;
 		int _screen = 0;
-		UniquePtr<std::remove_pointer_t<::XIM>, ::XCloseIM> _input_method;
+		SmartPtr<std::remove_pointer_t<XIM>, ::XCloseIM> _input_method;
 	};
 }

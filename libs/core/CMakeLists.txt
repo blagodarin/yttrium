@@ -99,6 +99,7 @@ y_sources(ycore "include/memory"
 	include/yttrium/memory/buffer_appender.h
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/pool.h
+	include/yttrium/memory/smart_ptr.h
 	)
 y_sources(ycore "src/memory"
 	src/memory/buffer_memory.cpp
@@ -206,8 +207,6 @@ y_sources(ycore "src/utils"
 	src/utils/algorithm.h
 	src/utils/atomic_counters.h
 	src/utils/crc32.h
-	src/utils/fourcc.h
-	src/utils/memory.h
 	src/utils/string.cpp
 	src/utils/string.h
 	)

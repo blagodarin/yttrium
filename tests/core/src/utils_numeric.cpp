@@ -72,6 +72,13 @@ TEST_CASE("utils.is_power_of_2")
 		CHECK(int{ is_power_of_2(i) } == table[i]);
 }
 
+TEST_CASE("utils.make_cc")
+{
+	CHECK(Yttrium::make_cc('\x00', '\xff') == 0xff00);
+	CHECK(Yttrium::make_cc('\x00', '\x80', '\x7f', '\xff') == 0xff7f8000);
+	CHECK(Yttrium::make_cc('\x00', '\x01', '\x7e', '\x7f', '\x80', '\x81', '\xfe', '\xff') == 0xfffe81807f7e0100);
+}
+
 TEST_CASE("utils.next_power_of_2")
 {
 	using Yttrium::next_power_of_2;

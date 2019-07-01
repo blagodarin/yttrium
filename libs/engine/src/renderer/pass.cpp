@@ -33,25 +33,13 @@
 
 namespace
 {
-	const Yttrium::Matrix4 _3d_directions // Makes Y point forward and Z point up.
-		{
-			1,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1,
-			0,
-			0,
-			-1,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1,
-		};
+	// Makes Y point forward and Z point up.
+	const Yttrium::Matrix4 _3d_directions{
+		1, 0, 0, 0,
+		0, 0, 1, 0,
+		0, -1, 0, 0,
+		0, 0, 0, 1
+	};
 }
 
 namespace Yttrium
@@ -104,11 +92,13 @@ namespace Yttrium
 		batch._vertices[0] = { quad._a, color, _texture_rect.top_left() };
 		batch._vertices[1] = { quad._d, color, _texture_rect.bottom_left() };
 		batch._vertices[2] = { quad._b, color, _texture_rect.top_right() };
+		// cppcheck-suppress unreadVariable
 		batch._vertices[3] = { quad._c, color, _texture_rect.bottom_right() };
 
 		batch._indices[0] = static_cast<std::uint16_t>(batch._base_index);
 		batch._indices[1] = static_cast<std::uint16_t>(batch._base_index + 1);
 		batch._indices[2] = static_cast<std::uint16_t>(batch._base_index + 2);
+		// cppcheck-suppress unreadVariable
 		batch._indices[3] = static_cast<std::uint16_t>(batch._base_index + 3);
 	}
 
@@ -207,11 +197,13 @@ namespace Yttrium
 		batch._vertices[0] = { position.top_left(), color, texture.top_left() };
 		batch._vertices[1] = { position.bottom_left(), color, texture.bottom_left() };
 		batch._vertices[2] = { position.top_right(), color, texture.top_right() };
+		// cppcheck-suppress unreadVariable
 		batch._vertices[3] = { position.bottom_right(), color, texture.bottom_right() };
 
 		batch._indices[0] = static_cast<std::uint16_t>(batch._base_index);
 		batch._indices[1] = static_cast<std::uint16_t>(batch._base_index + 1);
 		batch._indices[2] = static_cast<std::uint16_t>(batch._base_index + 2);
+		// cppcheck-suppress unreadVariable
 		batch._indices[3] = static_cast<std::uint16_t>(batch._base_index + 3);
 	}
 

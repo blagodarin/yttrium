@@ -22,6 +22,7 @@ set(_src
 add_library(ywinmain STATIC ${_src})
 source_group("src" FILES ${_src})
 
+target_link_libraries(ywinmain PRIVATE ycore)
 set_target_properties(ywinmain PROPERTIES FOLDER "libs")
 install(TARGETS ywinmain EXPORT YttriumTargets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

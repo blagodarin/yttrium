@@ -68,7 +68,9 @@ namespace Yttrium
 		Point cursor = Rect{ _size }.center();
 		_backend.get_cursor(cursor);
 
+		// cppcheck-suppress variableScope
 		const auto dx = _cursor._x - cursor._x;
+		// cppcheck-suppress variableScope
 		const auto dy = cursor._y - _cursor._y;
 
 		if (!_is_cursor_locked)

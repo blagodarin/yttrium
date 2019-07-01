@@ -65,19 +65,16 @@ namespace Yttrium
 			const HDC _hdc;
 		};
 
-		class IconHolder
+		struct HIconDeleter
 		{
-		public:
-			~IconHolder() noexcept { reset(NULL); }
-			void reset(HICON) noexcept;
-
-		private:
-			HICON _handle = NULL;
+			template <typename>
+			static constexpr HICON Sentinel = NULL;
+			static void free(HICON) noexcept;
 		};
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
-		IconHolder _icon;
+		SmartPtrBase<std::remove_pointer_t<HICON>, HIconDeleter> _icon;
 		NativeWindow _hwnd = _application.create_window(*this);
 		const WindowDC _hdc{ _hwnd };
 #if Y_RENDERER_OPENGL

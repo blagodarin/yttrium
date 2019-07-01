@@ -27,7 +27,7 @@
 #include <string>
 
 #include <xcb/xcb_image.h>
-#define explicit explicit_ // https://bugs.freedesktop.org/show_bug.cgi?id=74080
+#define explicit explicit_ // https://gitlab.freedesktop.org/xorg/lib/libxcb/issues/23
 #include <xcb/xkb.h>
 #undef explicit
 #include <xkbcommon/xkbcommon.h>
@@ -96,7 +96,7 @@ namespace Yttrium
 
 			const auto cookie = ::xcb_xkb_select_events_aux_checked(_connection, XCB_XKB_ID_USE_CORE_KBD,
 				selected_events, 0, selected_events, selected_map_parts, selected_map_parts, nullptr);
-			UniquePtr<xcb_generic_error_t, std::free> error{ ::xcb_request_check(_connection, cookie) };
+			SmartPtr<xcb_generic_error_t, ::free> error{ ::xcb_request_check(_connection, cookie) };
 			if (error)
 				throw std::runtime_error{ "Unable to select XKB events" };
 
@@ -113,7 +113,7 @@ namespace Yttrium
 
 		std::string_view keycode_to_text(xcb_keycode_t keycode)
 		{
-			const auto size = static_cast<std::size_t>(::xkb_state_key_get_utf8(_state.get(), keycode, nullptr, 0));
+			const auto size = static_cast<size_t>(::xkb_state_key_get_utf8(_state.get(), keycode, nullptr, 0));
 			if (!size)
 				return {};
 			if (size > _keycode_text_buffer.size())
@@ -121,7 +121,7 @@ namespace Yttrium
 			::xkb_state_key_get_utf8(_state.get(), keycode, _keycode_text_buffer.data(), size + 1);
 			const auto begin = _keycode_text_buffer.begin();
 			const auto end = std::remove_if(begin, begin + static_cast<std::string::difference_type>(size), [](char c) { return to_unsigned(c) < 32 || c == 127; });
-			return { _keycode_text_buffer.data(), static_cast<std::size_t>(end - begin) };
+			return { _keycode_text_buffer.data(), static_cast<size_t>(end - begin) };
 		}
 
 		bool process_event(int event_type, const xcb_generic_event_t* event)
@@ -184,9 +184,9 @@ namespace Yttrium
 		xcb_connection_t* const _connection;
 		uint8_t _base_event = 0;
 		int32_t _keyboard_id = -1;
-		UniquePtr<xkb_context, ::xkb_context_unref> _context;
-		UniquePtr<xkb_keymap, ::xkb_keymap_unref> _keymap;
-		UniquePtr<xkb_state, ::xkb_state_unref> _state;
+		SmartPtr<xkb_context, ::xkb_context_unref> _context;
+		SmartPtr<xkb_keymap, ::xkb_keymap_unref> _keymap;
+		SmartPtr<xkb_state, ::xkb_state_unref> _state;
 		std::string _keycode_text_buffer;
 	};
 
@@ -236,7 +236,7 @@ namespace Yttrium
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		const UniquePtr<xcb_query_pointer_reply_t, std::free> reply{ ::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr) };
+		const SmartPtr<xcb_query_pointer_reply_t, ::free> reply{ ::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr) };
 		if (!reply)
 			return false;
 		cursor = { reply->win_x, reply->win_y };
@@ -245,7 +245,7 @@ namespace Yttrium
 
 	bool WindowBackend::process_events()
 	{
-		const auto do_key_event = [this](Key key, bool pressed, bool autorepeat, std::uint16_t state) {
+		const auto do_key_event = [this](Key key, bool pressed, bool autorepeat, uint16_t state) {
 			if (key == Key::Null)
 				return;
 			Flags<KeyEvent::Modifier> modifiers;
@@ -261,8 +261,11 @@ namespace Yttrium
 		if (_window == XCB_WINDOW_NONE)
 			return false;
 		_events.clear();
-		for (bool blocking = !_size; P_Event event{ blocking ? ::xcb_wait_for_event(_application.connection()) : ::xcb_poll_for_event(_application.connection()) };)
+		for (bool blocking = !_size;;)
 		{
+			P_Event event{ blocking ? ::xcb_wait_for_event(_application.connection()) : ::xcb_poll_for_event(_application.connection()) };
+			if (!event)
+				break;
 			event->response_type &= 0x7f;
 			if (blocking && event->response_type == XCB_CONFIGURE_NOTIFY)
 				blocking = false;
@@ -356,13 +359,13 @@ namespace Yttrium
 		if (_window == XCB_WINDOW_NONE)
 			return;
 		const auto property_size = 2 + icon.info().width() * icon.info().height();
-		const auto property_buffer = std::make_unique<std::uint32_t[]>(property_size);
-		property_buffer[0] = static_cast<std::uint32_t>(icon.info().width());
-		property_buffer[1] = static_cast<std::uint32_t>(icon.info().height());
+		const auto property_buffer = std::make_unique<uint32_t[]>(property_size);
+		property_buffer[0] = static_cast<uint32_t>(icon.info().width());
+		property_buffer[1] = static_cast<uint32_t>(icon.info().height());
 		if (!Image::transform(icon.info(), icon.data(), { icon.info().width(), icon.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYDown }, &property_buffer[2]))
 			return;
 		const auto net_wm_icon = make_atom("_NET_WM_ICON");
-		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, net_wm_icon->atom, XCB_ATOM_CARDINAL, 32, static_cast<std::uint32_t>(property_size), property_buffer.get());
+		::xcb_change_property(_application.connection(), XCB_PROP_MODE_REPLACE, _window, net_wm_icon->atom, XCB_ATOM_CARDINAL, 32, static_cast<uint32_t>(property_size), property_buffer.get());
 		::xcb_flush(_application.connection());
 	}
 

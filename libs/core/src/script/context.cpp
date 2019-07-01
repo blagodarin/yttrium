@@ -22,6 +22,7 @@
 #include <yttrium/script/value.h>
 #include <yttrium/utils/string.h>
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -32,11 +33,11 @@ namespace Yttrium
 	struct ScriptCommandContext
 	{
 		ScriptContext::Command _command;
-		std::size_t _min_args = 0;
-		std::size_t _max_args = 0;
+		size_t _min_args = 0;
+		size_t _max_args = 0;
 
 		ScriptCommandContext() = default;
-		ScriptCommandContext(const ScriptContext::Command& command, std::size_t min_args, std::size_t max_args)
+		ScriptCommandContext(const ScriptContext::Command& command, size_t min_args, size_t max_args)
 			: _command{ command }, _min_args{ min_args }, _max_args{ max_args } {}
 	};
 
@@ -105,8 +106,8 @@ namespace Yttrium
 		Pool<ScriptValue> arg_pool{ arg_strings.size() };
 		std::vector<ScriptValue*> arg_values;
 		arg_values.reserve(arg_strings.size());
-		for (const auto& arg_string : arg_strings)
-			arg_values.emplace_back(new (arg_pool.allocate()) ScriptValue{ arg_string });
+		std::transform(arg_strings.begin(), arg_strings.end(), std::back_inserter(arg_values),
+			[&arg_pool](const std::string& arg_string) { return new (arg_pool.allocate()) ScriptValue{ arg_string }; });
 		std::string result;
 		command->second._command({ *this, name, result, ScriptArgs{ *this, arg_values } });
 		return true;

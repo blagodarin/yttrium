@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "../../core/src/utils/memory.h"
+#include <yttrium/memory/smart_ptr.h>
 
 #include <vector>
 

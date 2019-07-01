@@ -27,7 +27,7 @@ namespace
 {
 	// X error handling (see below).
 	bool error_occurred = false;
-	int error_handler(::Display*, ::XErrorEvent*)
+	int error_handler(::Display*, XErrorEvent*)
 	{
 		error_occurred = true;
 		return 0;
@@ -55,13 +55,13 @@ namespace
 namespace Yttrium
 {
 	GlxContext::GlxContext(::Display* display, int screen)
-		: _display(display)
-		, _screen(screen)
+		: _display{ display }
+		, _screen{ screen }
 	{
 		int major = 0;
 		int minor = 0;
 		if (!::glXQueryVersion(display, &major, &minor) || major != 1 || minor < 4)
-			throw InitializationError("GLX 1.4 is unavailable");
+			throw InitializationError{ "GLX 1.4 is unavailable" };
 
 		const int attributes[]{
 			GLX_CONFIG_CAVEAT, GLX_NONE,
@@ -79,17 +79,17 @@ namespace Yttrium
 			None
 		};
 
-		::GLXFBConfig best_fbc = {};
+		GLXFBConfig best_fbc{};
 		{
 			int fbc_count = 0;
-			const UniquePtr<::GLXFBConfig[], ::XFree> fbcs(::glXChooseFBConfig(display, screen, attributes, &fbc_count));
+			const SmartPtr<GLXFBConfig, ::XFree> fbcs{ ::glXChooseFBConfig(display, screen, attributes, &fbc_count) };
 			if (!fbcs)
 				throw InitializationError("Failed to obtain GLXFBConfigs");
 			int best_has_sample_buffers = 0;
 			int best_samples = 0;
 			for (int i = 0; i < fbc_count; ++i)
 			{
-				const auto fbc = fbcs[static_cast<std::size_t>(i)];
+				const auto fbc = fbcs[i];
 				decltype(_visual_info) vi{ ::glXGetVisualFromFBConfig(display, fbc) };
 				if (!vi)
 					continue;
@@ -107,16 +107,16 @@ namespace Yttrium
 			}
 		}
 		if (!_visual_info)
-			throw InitializationError("Failed to find suitable GLXFBConfig");
+			throw InitializationError{ "Failed to find suitable GLXFBConfig" };
 
 		const auto extensions = ::glXQueryExtensionsString(_display, _screen);
 		if (!::check_extension(extensions, "GLX_ARB_create_context"))
-			throw InitializationError("GLX_ARB_create_context is unavailable");
+			throw InitializationError{ "GLX_ARB_create_context is unavailable" };
 
-		::GLXContext (*glXCreateContextAttribsARB)(::Display*, ::GLXFBConfig, ::GLXContext, Bool, const int*) = nullptr;
+		::GLXContext (*glXCreateContextAttribsARB)(::Display*, GLXFBConfig, GLXContext, Bool, const int*) = nullptr;
 		::get_proc_address(glXCreateContextAttribsARB, "glXCreateContextAttribsARB");
 		if (!glXCreateContextAttribsARB) // The official OpenGL context creation example suggests checking this too.
-			throw InitializationError("glXCreateContextAttribsARB is unavailable");
+			throw InitializationError{ "glXCreateContextAttribsARB is unavailable" };
 
 		const int context_attributes[]{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, Gl::required_major,
@@ -134,19 +134,19 @@ namespace Yttrium
 		const auto old_error_handler = ::XSetErrorHandler(::error_handler);
 		const auto context = glXCreateContextAttribsARB(_display, best_fbc, nullptr, True, context_attributes);
 		if (!context)
-			throw InitializationError("Failed to create a GLX context");
+			throw InitializationError{ "Failed to create a GLX context" };
 		::XSync(_display, False); // To ensure any errors generated are processed.
 		::XSetErrorHandler(old_error_handler);
 		if (::error_occurred)
 		{
 			::glXDestroyContext(_display, context);
-			throw InitializationError("Failed to create a GLX context");
+			throw InitializationError{ "Failed to create a GLX context" };
 		}
 
 		if (!::glXIsDirect(_display, context))
 		{
 			::glXDestroyContext(_display, context);
-			throw InitializationError("Failed to create a direct GLX context");
+			throw InitializationError{ "Failed to create a direct GLX context" };
 		}
 
 		_context = context;

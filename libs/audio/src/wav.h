@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../core/src/utils/fourcc.h"
+#include <yttrium/utils/numeric.h>
 
 namespace Yttrium
 {
@@ -33,8 +33,8 @@ namespace Yttrium
 	{
 		enum : uint32_t
 		{
-			RIFF = "RIFF"_fourcc,
-			WAVE = "WAVE"_fourcc,
+			RIFF = make_cc('R', 'I', 'F', 'F'),
+			WAVE = make_cc('W', 'A', 'V', 'E'),
 		};
 
 		uint32_t riff_fourcc;
@@ -46,8 +46,8 @@ namespace Yttrium
 	{
 		enum : uint32_t
 		{
-			fmt = "fmt "_fourcc,
-			data = "data"_fourcc,
+			fmt = make_cc('f', 'm', 't', ' '),
+			data = make_cc('d', 'a', 't', 'a'),
 		};
 
 		uint32_t name_fourcc;
