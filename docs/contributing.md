@@ -8,24 +8,29 @@ Yttrium aims to be:
   source code.
 * **Up-to-date.** Yttrium should be kept compatible with the latest development
   tools and libraries available in the continuous integration systems used.
-* **Concise.** Any supported platform, format, feature and technology is a
+* **Concise.** Any supported platform, format, feature or technology is a
   liability that must be justified.
 * **Comprehensive.** It should be possible to create a full-featured game for
   all supported platforms using only Yttrium libraries and tools (apart from the
-  build system, of course).
+  build system).
 
-If your contribution align with these aims, consider your pull request almost
-merged.
+Please don't hesitate to make a contribution that helps Yttrium follow these
+aims.
 
 
 ## Branches
 
 `master` is a branch for Yttrium users. Each commit in this branch represents
 a *usable* (not necessarily *stable*) state of the project. All CI builds
-should succeed, and all tests should pass.
+should succeed, and all tests should pass. All contributions are merged into
+this branch.
+
+To contribute, open a pull request, and when code review finishes and all
+checks pass, it will be merged into `master`.
 
 `develop` is a branch for Yttrium developers. All new changes go into this
-branch first, and are merged into `master` when they are ready.
+branch first and are merged into `master` when they are ready, just like any
+other contributions.
 
 
 ## Repository layout
