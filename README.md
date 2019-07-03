@@ -15,27 +15,7 @@ actually valuable or to eventually turn into one. It's more like a bunch of
 various ideas piled together and roughly shaped to look game engine-ish.
 
 
-## Development
-
-Yttrium aims to be:
-* **Simple** to use and maintain.
-* **Concise**: any supported platform, format, feature and technology is a
-  liability that must be justified.
-* **Modern** in terms of API design, software architecture, development tools
-  used and coding practices followed.
-
-
-### Branches
-
-`master` is a branch for Yttrium users. Each commit in this branch represents
-a *usable* (not necessarily *stable*) state of the project. All CI builds
-should succeed, and all tests should pass.
-
-`develop` is a branch for Yttrium developers. All new changes go into this
-branch first, and are merged into `master` when they are ready.
-
-
-### Build instructions
+## Build instructions
 
 Building Yttrium requires [Git](https://git-scm.com/downloads/) to get it and
 [CMake](https://cmake.org/download/) to build it. Yttrium also depends on some
@@ -46,21 +26,5 @@ and CMake (and an Internet connection).
 Check out CI configuration files ([.appveyor.yml](.appveyor.yml) and
 [.travis.yml](.travis.yml)) for some hints on building Yttrium.
 
-
-### Repository layout
-
-Yttrium components are grouped into several top-level directories:
-* `libs` contains public libraries.
-* `tools` contains command-line tools. Some of the tools are used to build
-  libraries in `libs`.
-* `tests` contains unit tests for the public libraries, as well as other
-  test-related stuff.
-* `benchmarks` contains benchmarks for public library code.
-* `examples` contains example applications build using Yttrium.
-
-All components have the following structure:
-* `src` contains source code of the component.
-* `include` contains public headers which other components can use.
-* `data` contains data required by the component.
-* Files required to build the component (e. g. *CMakeLists.txt*) are placed
-  into the component's root directory.
+[Contribution guidelines](docs/contributing.md) may also help you find your
+way around.
