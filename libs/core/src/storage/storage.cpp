@@ -58,6 +58,7 @@ namespace Yttrium
 				if (auto source = Source::from(name))
 					return source;
 
+			// cppcheck-suppress stlIfFind
 			if (const auto i = _stored.find(name); i != _stored.end())
 				return std::visit(*this, i->second);
 
