@@ -1,5 +1,6 @@
 #
-# Copyright 2018 Sergei Blagodarin
+# This file is part of the Yttrium toolkit.
+# Copyright (C) 2019 Sergei Blagodarin.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +19,8 @@ find_program(CLANG_FORMAT_EXECUTABLE clang-format)
 
 if(CLANG_FORMAT_EXECUTABLE)
 	execute_process(COMMAND ${CLANG_FORMAT_EXECUTABLE} -version OUTPUT_VARIABLE _clang_format_version_output ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-	string(REGEX MATCH "LLVM [0-9]+\\.[0-9]+\\.[a-z0-9]+" _clang_format_version_line ${_clang_format_version_output})
-	string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[a-z0-9]+" CLANG_FORMAT_VERSION_STRING ${_clang_format_version_line})
+	string(REGEX MATCH "clang-format version [0-9]+\\.[0-9]+\\.[0-9]+" _clang_format_version_line ${_clang_format_version_output})
+	string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANG_FORMAT_VERSION_STRING ${_clang_format_version_line})
 	unset(_clang_format_version_line)
 	unset(_clang_format_version_output)
 endif()

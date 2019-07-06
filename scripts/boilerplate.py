@@ -36,7 +36,7 @@ def boilerplate_line(line, prefix):
 
 for root, dirs, files in os.walk('.'):
 	for filename in files:
-		if filename.endswith('.h') or filename.endswith('.cpp') or filename == 'CMakeLists.txt':
+		if filename.endswith('.h') or filename.endswith('.cpp') or filename == 'CMakeLists.txt' or filename.endswith('.cmake'):
 			path = os.path.join(root, filename)
 			with open(path) as f:
 				src = f.readlines()

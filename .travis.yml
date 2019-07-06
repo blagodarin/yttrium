@@ -134,7 +134,6 @@ matrix:
       addons: *clang7_xcb
 
 before_install:
-  - export TERM=dumb
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
   - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ] && [ -z "${STATIC_ANALYSIS}" ]; then export NORMAL=1; fi
 
@@ -149,12 +148,14 @@ script:
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
   - if [ -n "${NORMAL}" ] || [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON"; fi
   - if [ -n "${NORMAL}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
-  - if [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON"; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_FORMAT=ON -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON -DENABLE_DIFF=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target cppcheck; fi
   - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target tidy; fi
-  - if [ -z "${STATIC_ANALYSIS}" ]; then cmake --build .; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target format; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target diff; fi
+  - if [ -z "${STATIC_ANALYSIS}" ]; then TERM=dumb cmake --build .; fi
   - if [ -z "${STATIC_ANALYSIS}" ]; then ctest --output-on-failure; fi
   - if [ -n "${NORMAL}" ]; then cmake --build . --target install; fi
   # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58

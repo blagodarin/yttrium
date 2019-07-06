@@ -41,9 +41,10 @@ option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" OFF)
-option(ENABLE_CLANG_FORMAT "Enable funning ClangFormat ('format' target)" OFF)
+option(ENABLE_CLANG_FORMAT "Enable running ClangFormat ('format' target)" OFF)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
+option(ENABLE_DIFF "Enable checking for source changes ('diff' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
@@ -299,6 +300,15 @@ if(ENABLE_CPPCHECK)
 		COMMENT "Running Cppcheck"
 		VERBATIM)
 	set_target_properties(cppcheck PROPERTIES FOLDER ".support")
+endif()
+
+if(ENABLE_DIFF)
+	find_package(Git REQUIRED)
+	add_custom_target(diff
+		COMMAND ${GIT_EXECUTABLE} diff --color=always --exit-code --histogram
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMENT "Checking for changes"
+		VERBATIM)
 endif()
 
 if(WIN32)
