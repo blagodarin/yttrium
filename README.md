@@ -2,8 +2,8 @@
 
 | Branch | Travis CI | AppVeyor | Codecov |
 |:------:|:---------:|:--------:|:-------:|
-| master | [![Travis CI](https://travis-ci.org/blagodarin/yttrium.svg?branch=master)](https://travis-ci.org/blagodarin/yttrium) | [![AppVeyor](https://ci.appveyor.com/api/projects/status/v3pco3lbvp2y4r9b/branch/master?svg=true)](https://ci.appveyor.com/project/blagodarin/yttrium/branch/master) | [![Codecov](https://codecov.io/gh/blagodarin/yttrium/branch/master/graph/badge.svg)](https://codecov.io/gh/blagodarin/yttrium/branch/master) |
-| develop | [![Travis CI](https://travis-ci.org/blagodarin/yttrium.svg?branch=develop)](https://travis-ci.org/blagodarin/yttrium) | [![AppVeyor](https://ci.appveyor.com/api/projects/status/v3pco3lbvp2y4r9b/branch/develop?svg=true)](https://ci.appveyor.com/project/blagodarin/yttrium/branch/develop) | [![Codecov](https://codecov.io/gh/blagodarin/yttrium/branch/develop/graph/badge.svg)](https://codecov.io/gh/blagodarin/yttrium/branch/develop) |
+| [master](https://github.com/blagodarin/yttrium/tree/master) | [![Travis CI](https://travis-ci.org/blagodarin/yttrium.svg?branch=master)](https://travis-ci.org/blagodarin/yttrium/branches) | [![AppVeyor](https://ci.appveyor.com/api/projects/status/v3pco3lbvp2y4r9b/branch/master?svg=true)](https://ci.appveyor.com/project/blagodarin/yttrium/branch/master) | [![Codecov](https://codecov.io/gh/blagodarin/yttrium/branch/master/graph/badge.svg)](https://codecov.io/gh/blagodarin/yttrium/branch/master) |
+| [develop](https://github.com/blagodarin/yttrium/tree/develop) | [![Travis CI](https://travis-ci.org/blagodarin/yttrium.svg?branch=develop)](https://travis-ci.org/blagodarin/yttrium/branches) | [![AppVeyor](https://ci.appveyor.com/api/projects/status/v3pco3lbvp2y4r9b/branch/develop?svg=true)](https://ci.appveyor.com/project/blagodarin/yttrium/branch/develop) | [![Codecov](https://codecov.io/gh/blagodarin/yttrium/branch/develop/graph/badge.svg)](https://codecov.io/gh/blagodarin/yttrium/branch/develop) |
 
 
 # Yttrium
