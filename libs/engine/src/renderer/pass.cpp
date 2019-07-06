@@ -155,13 +155,12 @@ namespace Yttrium
 			return;
 
 		_texture_rect = _backend.map_rect(rect / texture_scale, current_texture->orientation());
-		_texture_borders =
-			{
-				borders._top / texture_size._height,
-				borders._right / texture_size._width,
-				borders._bottom / texture_size._height,
-				borders._left / texture_size._width,
-			};
+		_texture_borders = {
+			borders._top / texture_size._height,
+			borders._right / texture_size._width,
+			borders._bottom / texture_size._height,
+			borders._left / texture_size._width,
+		};
 	}
 
 	SizeF RenderPassImpl::window_size() const
