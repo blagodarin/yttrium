@@ -113,7 +113,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2 TIDY=1
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
       addons: *clang7_x11
 
     - os: linux
@@ -125,7 +125,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan TIDY=1
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang7_xcb
 
 before_install:
@@ -143,13 +143,12 @@ script:
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
   - if [ -n "${NORMAL}" ] || [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON"; fi
   - if [ -n "${NORMAL}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
-  - if [ -n "${TIDY}" ] || [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON"; fi
-  - if [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CPPCHECK=ON"; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target cppcheck; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target tidy; fi
   - if [ -z "${STATIC_ANALYSIS}" ]; then cmake --build . -- -j2; fi
-  - if [ -n "${TIDY}" ] || [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target tidy; fi
   - if [ -z "${STATIC_ANALYSIS}" ]; then ctest --output-on-failure; fi
   - if [ -n "${NORMAL}" ]; then cmake --build . --target install; fi
   # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58
