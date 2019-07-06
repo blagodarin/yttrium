@@ -13,12 +13,29 @@ matrix:
 
     - os: linux
       dist: xenial
+      compiler: clang
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,cppcheck STATIC_ANALYSIS=1
+      addons: &clang7_xcb
+        apt:
+          sources: &all_sources
+            - ubuntu-toolchain-r-test
+          packages:
+            - libasound2-dev
+            - libstdc++-8-dev
+            - libvorbis-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
+            - ninja-build
+
+    - os: linux
+      dist: xenial
       compiler: gcc
       env: GCC=9 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
       addons: &gcc9_xcb
         apt:
-          sources: &all_sources
-            - ubuntu-toolchain-r-test
+          sources: *all_sources
           packages:
             - g++-9
             - libasound2-dev
@@ -27,6 +44,7 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - ninja-build
 
     - os: linux
       dist: xenial
@@ -46,6 +64,7 @@ matrix:
             - libasound2-dev
             - libgl-dev
             - libvorbis-dev
+            - ninja-build
 
     - os: linux
       dist: xenial
@@ -80,6 +99,7 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - ninja-build
 
     - os: linux
       dist: xenial
@@ -93,11 +113,12 @@ matrix:
             - libgl-dev
             - libstdc++-8-dev
             - libvorbis-dev
+            - ninja-build
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2 TIDY=1
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
       addons: *clang7_x11
 
     - os: linux
@@ -109,12 +130,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan TIDY=1
+      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
       addons: *clang7_xcb
 
 before_install:
+  - export TERM=dumb
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
-  - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ]; then export NORMAL=1; fi
+  - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ] && [ -z "${STATIC_ANALYSIS}" ]; then export NORMAL=1; fi
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
@@ -123,15 +145,17 @@ install:
   - if [ -n "${COVERAGE}" ]; then pip install --user codecov; fi
 
 script:
-  - if [ -n "${BENCHMARK}" ]; then CMAKE_OPTIONS+=" -DBUILD_BENCHMARKS=ON"; fi
+  - if [ -n "${BENCHMARK}" ] || [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DBUILD_BENCHMARKS=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
-  - if [ -n "${NORMAL}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DENABLE_SANITIZERS=ON"; fi
-  - if [ -n "${TIDY}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON"; fi
-  - cmake -H. -B"${HOME}/yttrium.build" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
+  - if [ -n "${NORMAL}" ] || [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON"; fi
+  - if [ -n "${NORMAL}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON"; fi
+  - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
-  - cmake --build . -- -j2
-  - if [ -n "${TIDY}" ]; then cmake --build . --target tidy; fi
-  - ctest --output-on-failure
+  - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target cppcheck; fi
+  - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target tidy; fi
+  - if [ -z "${STATIC_ANALYSIS}" ]; then cmake --build .; fi
+  - if [ -z "${STATIC_ANALYSIS}" ]; then ctest --output-on-failure; fi
   - if [ -n "${NORMAL}" ]; then cmake --build . --target install; fi
   # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58
   #- if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi

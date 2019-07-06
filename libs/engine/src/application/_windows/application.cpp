@@ -167,6 +167,7 @@ namespace Yttrium
 			break;
 
 		case WM_DESTROY:
+			// cppcheck-suppress stlIfFind
 			if (const auto i = _windows.find(hwnd); i != _windows.end())
 			{
 				_windows.erase(i);

@@ -762,6 +762,7 @@ namespace Yttrium
 
 		if (token.type() != IonToken::Type::ObjectBegin)
 			return true;
+		// cppcheck-suppress stlIfFind
 		if (const auto i = filters.find(token.next(ion).to_name()); i != filters.end())
 			filter = i->second;
 		else

@@ -135,9 +135,12 @@ namespace Yttrium
 			{
 				struct
 				{
+					// cppcheck-suppress unusedStructMember
 					uint8_t response_type;
 					uint8_t xkbType;
+					// cppcheck-suppress unusedStructMember
 					uint16_t sequence;
+					// cppcheck-suppress unusedStructMember
 					xcb_timestamp_t time;
 					uint8_t deviceID;
 				} any;

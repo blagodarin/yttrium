@@ -98,6 +98,7 @@ namespace Yttrium
 	{
 		if (!_audio_manager)
 			return {};
+		// cppcheck-suppress stlIfFind
 		if (const auto i = _sounds.find(name); i != _sounds.end())
 			return i->second;
 		return _sounds.emplace(name, _audio_manager->create_sound(loader.open(name))).first->second;

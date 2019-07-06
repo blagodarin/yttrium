@@ -64,13 +64,16 @@ namespace
 		TgaImageType image_type;
 		struct
 		{
+			// cppcheck-suppress unusedStructMember
 			uint16_t first_entry_index;
 			uint16_t length;
 			uint8_t entry_size;
 		} color_map;
 		struct
 		{
+			// cppcheck-suppress unusedStructMember
 			uint16_t x;
+			// cppcheck-suppress unusedStructMember
 			uint16_t y;
 			uint16_t width;
 			uint16_t height;
@@ -139,17 +142,17 @@ namespace Yttrium
 
 	bool write_tga(Writer& writer, const ImageInfo& info, const void* data)
 	{
-		if (info.width() <= 0 || info.width() > std::numeric_limits<std::uint16_t>::max())
+		if (!info.width() || info.width() > std::numeric_limits<uint16_t>::max())
 			return false;
 
-		if (info.height() <= 0 || info.height() > std::numeric_limits<std::uint16_t>::max())
+		if (!info.height() || info.height() > std::numeric_limits<uint16_t>::max())
 			return false;
 
 		TgaHeader header;
 		std::memset(&header, 0, sizeof header);
 		header.color_map_type = TgaColorMapType::None;
-		header.image.width = static_cast<std::uint16_t>(info.width());
-		header.image.height = static_cast<std::uint16_t>(info.height());
+		header.image.width = static_cast<uint16_t>(info.width());
+		header.image.height = static_cast<uint16_t>(info.height());
 
 		switch (info.pixel_format())
 		{
@@ -186,7 +189,7 @@ namespace Yttrium
 		if (!writer.write(header))
 			return false;
 
-		auto scanline = static_cast<const std::uint8_t*>(data);
+		auto scanline = static_cast<const uint8_t*>(data);
 		for (size_t row = 0; row < info.height(); ++row)
 		{
 			if (!writer.write(scanline, info.stride()))

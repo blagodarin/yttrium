@@ -611,7 +611,7 @@ namespace
 	class JpegBitstream
 	{
 	public:
-		constexpr JpegBitstream(const std::uint8_t* data) noexcept
+		constexpr explicit JpegBitstream(const std::uint8_t* data) noexcept
 			: _data{ data } {}
 
 		bool read_scan(const JpegData& data, Yttrium::Buffer& ycbcr_buffer) noexcept
