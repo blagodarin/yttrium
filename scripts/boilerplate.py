@@ -5,8 +5,8 @@ import os
 
 boilerplate = '''\
 
-This file is part of the Yttrium toolkit
-Copyright (C) 2019 Sergei Blagodarin
+This file is part of the Yttrium toolkit.
+Copyright (C) 2019 Sergei Blagodarin.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ limitations under the License.
 
 def boilerplate_prefix(lines):
 	if len(lines) >= 2:
-		if lines[0] == '//\n' and lines[1] == '// This file is part of the Yttrium toolkit\n': return '//'
-		if lines[0] == '#\n' and lines[1] == '# This file is part of the Yttrium toolkit\n': return '#'
+		if lines[0] == '//\n' and lines[1] == '// This file is part of the Yttrium toolkit.\n': return '//'
+		if lines[0] == '#\n' and lines[1] == '# This file is part of the Yttrium toolkit.\n': return '#'
 	return ''
 
 def boilerplate_line(line, prefix):
