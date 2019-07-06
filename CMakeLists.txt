@@ -227,7 +227,7 @@ endif()
 
 if(BUILD_TESTS)
 	enable_testing()
-	find_package(Catch2 2.3.0 REQUIRED)
+	find_package(Catch2 2.9.1 REQUIRED)
 	mark_as_advanced(Catch2_DIR)
 	add_subdirectory(tests/common)
 	add_subdirectory(tests/audio)
@@ -255,7 +255,7 @@ if(BUILD_BENCHMARKS)
 endif()
 
 if(ENABLE_CLANG_FORMAT)
-	find_package(ClangFormat REQUIRED)
+	find_package(ClangFormat 7.0.0 REQUIRED)
 	file(GLOB_RECURSE _sources LIST_DIRECTORIES FALSE RELATIVE ${PROJECT_SOURCE_DIR} *.h *.cpp)
 	add_custom_target(format
 		COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${_sources}
@@ -285,7 +285,7 @@ if(ENABLE_CLANG_TIDY)
 endif()
 
 if(ENABLE_CPPCHECK)
-	find_package(Cppcheck REQUIRED)
+	find_package(Cppcheck 1.88 REQUIRED)
 	add_custom_target(cppcheck
 		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --error-exitcode=1 --inline-suppr --quiet
 			-I ${PROJECT_SOURCE_DIR}/libs/audio/include

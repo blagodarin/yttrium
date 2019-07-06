@@ -237,13 +237,13 @@ y3_package(opengl)
 y3_package(vulkan)
 
 if("catch2" IN_LIST _y3_packages)
-  set(_version "2.7.1")
+  set(_version "2.9.1")
   set(_package "Catch2-${_version}")
   y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "45b3f4ad38f3a5cace6edabd42099de740185237")
+    SHA1 "caf84ac93f6b624b9583bc9712feb3fba9417c68")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} HEADER_ONLY
+  y3_cmake(${_package} HEADER_ONLY OUT_OF_SOURCE
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
@@ -259,11 +259,11 @@ if("cppcheck" IN_LIST _y3_packages)
 endif()
 
 if("freetype" IN_LIST _y3_packages)
-  set(_version "2.10.0")
+  set(_version "2.10.1")
   set(_package "freetype-${_version}")
-  y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.bz2"
-    SHA1 "f6abf03e0e3189a0de883981c57d3861b5d314f5")
-  y3_extract("${_package}.tar.bz2" DIR ${_package})
+  y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
+    SHA1 "3296b64ad1e7540289f22e4b6383e26e928b0a20")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} BUILD_TO_PREFIX OUT_OF_SOURCE
     OPTIONS
       -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
@@ -275,11 +275,11 @@ if("freetype" IN_LIST _y3_packages)
 endif()
 
 if("glslang" IN_LIST _y3_packages)
-  set(_version "7.11.3188")
+  set(_version "7.11.3214")
   set(_package "glslang-${_version}")
   y3_download("https://github.com/KhronosGroup/glslang/archive/${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "296afb72c4607efeacab560e7c21236a14e93676")
+    SHA1 "9bcdcc774ab0ccb9d056a15d3bc18b8af2e60e8d")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package}
     OPTIONS -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
@@ -318,24 +318,6 @@ if("nasm" IN_LIST _y3_packages)
   endif()
 endif()
 
-if("openal" IN_LIST _y3_packages)
-  set(_version "1.19.1")
-  set(_package "openal-soft-${_version}-bin")
-  y3_download("http://openal-soft.org/openal-binaries/${_package}.zip"
-    SHA1 "db2acacbbb6b2c3dc41a20691888e79759658e2a")
-  y3_extract("${_package}.zip" DIR ${_package})
-  file(INSTALL
-    ${BUILD_DIR}/${_package}/include
-    ${BUILD_DIR}/${_package}/libs
-    DESTINATION ${PREFIX_DIR})
-  if(WIN32)
-    y3_download("https://openal.org/downloads/oalinst.zip"
-      SHA1 "45e08368c6755c58902b7746ff3e51ad2df8a8b8")
-    y3_extract("oalinst.zip")
-    execute_process(COMMAND ${BUILD_DIR}/oalinst.exe /s)
-  endif()
-endif()
-
 if("opengl" IN_LIST _y3_packages)
   y3_download("https://khronos.org/registry/OpenGL/api/GL/glext.h")
   y3_download("https://khronos.org/registry/OpenGL/api/GL/wglext.h")
@@ -350,17 +332,17 @@ if("opengl" IN_LIST _y3_packages)
 endif()
 
 if("vulkan" IN_LIST _y3_packages)
-  set(_version "1.1.106.0")
+  set(_version "1.1.108.0")
   set(_package "Vulkan-Headers-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "805cfb84af68e21f78c991d32202015adcf09587")
+    SHA1 "d28cd52f86209cb6cb2966d850d2688680838940")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY)
   set(_package "Vulkan-Loader-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
-    SHA1 "0950817354cd3dd182934732caf170fe6c2e1c21")
+    SHA1 "c2325a90db9d9896fb2e06413a78eedd028782cc")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   if(WIN32)
     y3_cmake(${_package} TARGET "vulkan"
