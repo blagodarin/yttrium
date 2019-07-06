@@ -225,6 +225,7 @@ endfunction()
 y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
 y3_package(catch2)
+y3_package(cppcheck)
 y3_package(freetype)
 y3_package(glslang)
 y3_package(ogg)
@@ -243,6 +244,17 @@ if("catch2" IN_LIST _y3_packages)
   y3_extract("${_package}.tar.gz" DIR ${_package})
   y3_cmake(${_package} HEADER_ONLY
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
+endif()
+
+if("cppcheck" IN_LIST _y3_packages)
+  set(_version "1.88")
+  set(_package "cppcheck-${_version}")
+  y3_download("https://github.com/danmar/cppcheck/archive/${_version}.tar.gz"
+    NAME "${_package}.tar.gz"
+    SHA1 "5d6b957bf4d40bf87585214019f5e50f2179fe37")
+  y3_extract("${_package}.tar.gz" DIR ${_package})
+  y3_cmake(${_package}
+    OPTIONS -DWARNINGS_ANSI_ISO=OFF)
 endif()
 
 if("freetype" IN_LIST _y3_packages)
