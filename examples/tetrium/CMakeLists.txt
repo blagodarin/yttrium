@@ -38,6 +38,7 @@ file(GLOB _localization_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 add_custom_target(tetrium_localization
 	COMMAND ytr data/i18n/en.ion data/gui.ion ${_localization_sources}
 	COMMAND ytr data/i18n/ru.ion data/gui.ion ${_localization_sources}
+	COMMENT "Updating localizations in ${CMAKE_CURRENT_SOURCE_DIR}/data/i18n/"
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	BYPRODUCTS
 		${CMAKE_CURRENT_SOURCE_DIR}/data/i18n/en.ion

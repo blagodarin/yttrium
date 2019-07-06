@@ -150,7 +150,7 @@ script:
   - if [ -n "${NORMAL}" ] || [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON"; fi
   - if [ -n "${NORMAL}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
   - if [ -n "${STATIC_ANALYSIS}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON"; fi
-  - cmake -H. -B"${HOME}/yttrium.build" -G "Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
+  - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target cppcheck; fi
   - if [ -n "${STATIC_ANALYSIS}" ]; then cmake --build . --target tidy; fi

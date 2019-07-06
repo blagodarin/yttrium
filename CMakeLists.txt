@@ -238,6 +238,7 @@ if(BUILD_TESTS)
 		COMMAND test_core --reporter compact
 		COMMAND test_engine --reporter compact
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMENT "Running tests"
 		VERBATIM)
 	set_target_properties(check PROPERTIES FOLDER "tests")
 endif()
@@ -258,6 +259,7 @@ if(ENABLE_CLANG_FORMAT)
 	add_custom_target(format
 		COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${_sources}
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMENT "Running ClangFormat"
 		VERBATIM)
 	set_target_properties(format PROPERTIES FOLDER ".support")
 endif()
@@ -276,6 +278,7 @@ if(ENABLE_CLANG_TIDY)
 	endforeach()
 	add_custom_target(tidy
 		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
+		COMMENT "Running ClangTidy"
 		VERBATIM)
 	set_target_properties(tidy PROPERTIES FOLDER ".support")
 endif()
@@ -293,6 +296,7 @@ if(ENABLE_CPPCHECK)
 			--suppressions-list=${PROJECT_SOURCE_DIR}/.cppcheck-suppress
 			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
 			${PROJECT_SOURCE_DIR}
+		COMMENT "Running Cppcheck"
 		VERBATIM)
 	set_target_properties(cppcheck PROPERTIES FOLDER ".support")
 endif()
