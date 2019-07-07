@@ -109,7 +109,7 @@ function(y3_cmake _dir)
     set(_env_cl "CL=$ENV{CL} ${_cl}")
   endif()
   foreach(_config ${_configs})
-    y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${_build_dir} --config ${_config} --target ${_target} ${BUILD_OPTIONS}
+    y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${_build_dir} --config ${_config} --target ${_target}
       WORKING_DIRECTORY ${_build_dir})
   endforeach()
 endfunction()
@@ -245,7 +245,7 @@ if("cppcheck" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "5d6b957bf4d40bf87585214019f5e50f2179fe37")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package}
+  y3_cmake(${_package} OUT_OF_SOURCE
     OPTIONS -DWARNINGS_ANSI_ISO=OFF)
 endif()
 
@@ -262,7 +262,8 @@ if("freetype" IN_LIST _y3_packages)
       -DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON
       -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON
       -DDISABLE_FORCE_DEBUG_POSTFIX=ON
-      -DSKIP_INSTALL_LIBRARIES=ON)
+      -DSKIP_INSTALL_LIBRARIES=ON
+    CL -wd4018 -wd4244 -wd4267)
 endif()
 
 if("glslang" IN_LIST _y3_packages)
@@ -272,16 +273,16 @@ if("glslang" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "9bcdcc774ab0ccb9d056a15d3bc18b8af2e60e8d")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package}
+  y3_cmake(${_package} OUT_OF_SOURCE
     OPTIONS -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
 endif()
 
 if("ogg" IN_LIST _y3_packages)
   set(_package "ogg")
   y3_git_clone("git://git.xiph.org/ogg.git" DIR ${_package})
-  y3_cmake(${_package} TARGET "ogg" BUILD_TO_PREFIX)
+  y3_cmake(${_package} TARGET "ogg" BUILD_TO_PREFIX OUT_OF_SOURCE)
   file(INSTALL
-    ${BUILD_DIR}/${_package}/include/ogg/config_types.h
+    ${BUILD_DIR}/${_package}-build/include/ogg/config_types.h
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
@@ -329,14 +330,14 @@ if("vulkan" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "d28cd52f86209cb6cb2966d850d2688680838940")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} HEADER_ONLY)
+  y3_cmake(${_package} HEADER_ONLY OUT_OF_SOURCE)
   set(_package "Vulkan-Loader-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
     SHA1 "c2325a90db9d9896fb2e06413a78eedd028782cc")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   if(WIN32)
-    y3_cmake(${_package} TARGET "vulkan"
+    y3_cmake(${_package} TARGET "vulkan" OUT_OF_SOURCE
       OPTIONS -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
     if("Debug" IN_LIST CONFIGS)
       file(INSTALL
@@ -357,7 +358,7 @@ if("vulkan" IN_LIST _y3_packages)
         DESTINATION ${PREFIX_DIR}/lib/Release)
     endif()
   else()
-    y3_cmake(${_package}
+    y3_cmake(${_package} OUT_OF_SOURCE
       OPTIONS -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
   endif()
   file(REMOVE_RECURSE ${PREFIX_DIR}/share)
@@ -373,10 +374,10 @@ if("jpeg" IN_LIST _y3_packages)
   if(WIN32)
     list(APPEND _options -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON)
   endif()
-  y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
+  y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX OUT_OF_SOURCE
     OPTIONS ${_options})
   file(INSTALL
-    ${BUILD_DIR}/${_package}/jconfig.h
+    ${BUILD_DIR}/${_package}-build/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
     ${BUILD_DIR}/${_package}/jmorecfg.h
     ${BUILD_DIR}/${_package}/jpeglib.h
@@ -387,7 +388,7 @@ if("vorbis" IN_LIST _y3_packages)
   set(_package "vorbis")
   y3_git_clone("git://git.xiph.org/vorbis.git" DIR ${_package})
   y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/vorbis.patch)
-  y3_cmake(${_package} TARGET "vorbisfile" BUILD_TO_PREFIX
+  y3_cmake(${_package} TARGET "vorbisfile" BUILD_TO_PREFIX OUT_OF_SOURCE
     OPTIONS -DOGG_ROOT=${PREFIX_DIR}
     CL -wd4244 -wd4267 -wd4305 -wd4996)
   file(INSTALL

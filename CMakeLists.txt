@@ -185,7 +185,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(/arch:SSE2)
 	endif()
-	add_compile_options(/EHsc /MP /std:c++latest)
+	add_compile_options(/std:c++latest)
 	add_compile_definitions(_USE_MATH_DEFINES)
 	list(APPEND RC_FLAGS /nologo)
 
