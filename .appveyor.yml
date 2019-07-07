@@ -10,50 +10,61 @@ branches:
 environment:
   matrix:
     - RENDERER: null
+      ARCHITECTURE: x86
       DLL: OFF
       BENCHMARK: ON
       Y3: catch2,freetype,jpeg,vorbis
-      GENERATOR: Visual Studio 15 2017
     - RENDERER: null
+      ARCHITECTURE: amd64
       DLL: OFF
       BENCHMARK: ON
       Y3: catch2,freetype,jpeg,vorbis
-      GENERATOR: Visual Studio 15 2017 Win64
     - RENDERER: opengl
+      ARCHITECTURE: amd64
       DLL: ON
       BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
-      GENERATOR: Visual Studio 15 2017 Win64
     - RENDERER: opengl
+      ARCHITECTURE: amd64
       DLL: OFF
       BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
-      GENERATOR: Visual Studio 15 2017 Win64
 
 cache:
   - _3rdparty\.cache
 
 install:
   - cmd: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCHITECTURE%
+      cinst ninja
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
       if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
       cd %PREFIX_DIR%
-      cmake -DBUILD=%Y3% "-DGENERATOR=%GENERATOR%" -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
+      cmake -DBUILD=%Y3% -DCONFIG=Debug -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
+      cmake -DBUILD=%Y3% -DCONFIG=Release -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
       rmdir /s /q .build
       rmdir /s /q .trash
 
 build_script:
   - cmd: |
-      set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
+      set DEBUG_DIR=%APPVEYOR_BUILD_FOLDER%\_debug
+      set RELEASE_DIR=%APPVEYOR_BUILD_FOLDER%\_release
       set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
-      mkdir %BUILD_DIR% && cd %BUILD_DIR%
-      cmake -G "%GENERATOR%" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
-      cmake --build . --config Debug -- /nologo /verbosity:minimal
-      cmake --build . --config Release -- /nologo /verbosity:minimal
-      cmake --build . --config Release --target install -- /nologo /verbosity:minimal
+      mkdir %DEBUG_DIR% && cd %DEBUG_DIR%
+      cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+      cmake --build .
+      cd ..
+      mkdir %RELEASE_DIR% && cd %RELEASE_DIR%
+      cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+      cmake --build .
+      cmake --build . --target install
+      cd ..
 
 test_script:
   - cmd: |
+      cd %DEBUG_DIR%
+      ctest --output-on-failure
+      cd ..
+      cd %RELEASE_DIR%
       ctest --build-config Release --output-on-failure
-      ctest --build-config Debug --output-on-failure
-      if "%BENCHMARK%"=="ON" bin\Release\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg
+      if "%BENCHMARK%"=="ON" bin\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg
