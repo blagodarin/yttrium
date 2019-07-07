@@ -83,7 +83,7 @@ function(y3_cmake _dir)
     endif()
     message(STATUS "[Y3] Building ${_dir} (${_config})")
     file(MAKE_DIRECTORY ${_build_dir})
-    y3_run(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source_dir}
+    y3_run(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${CMAKE_COMMAND} -G ${GENERATOR} ${_source_dir}
         -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
         -DCMAKE_BUILD_TYPE=${_config}
         -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
