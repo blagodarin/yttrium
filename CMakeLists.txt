@@ -187,6 +187,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	endif()
 	add_compile_options(/EHsc /MP /std:c++latest)
 	add_compile_definitions(_USE_MATH_DEFINES)
+	list(APPEND RC_FLAGS /nologo)
 
 	# Warnings.
 	string(REGEX REPLACE " /W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # TODO: Remove after upgrade to CMake 3.15.
@@ -195,10 +196,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		)
 endif()
 
-print_current_flags(STATIC_LINKER_FLAGS DYNAMIC_LINKER_FLAGS)
+print_current_flags(RC_FLAGS STATIC_LINKER_FLAGS DYNAMIC_LINKER_FLAGS)
 
 append_options(CMAKE_EXE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_MODULE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
+append_options(CMAKE_RC_FLAGS ${RC_FLAGS})
 append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
