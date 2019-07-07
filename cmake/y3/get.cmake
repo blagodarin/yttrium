@@ -27,24 +27,15 @@ endif()
 set(GENERATOR "Ninja")
 set(PREFIX_DIR ${CMAKE_BINARY_DIR})
 
-if(CONFIG)
-  if(NOT CONFIG STREQUAL "Debug")
-    if(WIN32)
-      set(CONFIG "RelWithDebInfo")
-    else()
-      set(CONFIG "Release")
-    endif()
-  endif()
-  set(CONFIGS ${CONFIG})
-else()
+string(REPLACE "," ";" _y3_configs "${CONFIG}")
+if(_y3_configs STREQUAL "")
   if(WIN32)
-    set(CONFIG "RelWithDebInfo")
-    set(CONFIGS ${CONFIG} "Debug")
+    set(_y3_configs "RelWithDebInfo")
   else()
-    set(CONFIG "Release")
-    set(CONFIGS ${CONFIG})
+    set(_y3_configs "Release")
   endif()
 endif()
+list(GET _y3_configs 0 _y3_config)
 
 function(y3_run)
   cmake_parse_arguments(_arg "" "WORKING_DIRECTORY" "COMMAND" ${ARGN})
@@ -57,48 +48,13 @@ function(y3_run)
 endfunction()
 
 function(y3_cmake _dir)
-  cmake_parse_arguments(_arg "BUILD_TO_PREFIX;HEADER_ONLY;OUT_OF_SOURCE" "TARGET" "CL;OPTIONS" ${ARGN})
+  cmake_parse_arguments(_arg "BUILD_TO_PREFIX;HEADER_ONLY" "TARGET" "CL;OPTIONS" ${ARGN})
   set(_source_dir ${BUILD_DIR}/${_dir})
-  if(_arg_OUT_OF_SOURCE)
-    set(_build_dir ${_source_dir}-build)
-    if(EXISTS ${_build_dir})
-      message(STATUS "[Y3] Removing ${_dir}-build")
-      file(REMOVE_RECURSE ${_build_dir})
-    endif()
-    file(MAKE_DIRECTORY ${_build_dir})
-  else()
-    set(_build_dir ${_source_dir})
-  endif()
-  message(STATUS "[Y3] Building ${_dir}")
-  unset(_options)
   if(_arg_HEADER_ONLY)
-    set(_configs ${CONFIG})
+    set(_configs ${_y3_config})
   else()
-    set(_configs ${CONFIGS})
-    if(_arg_BUILD_TO_PREFIX)
-      if(WIN32)
-        list(APPEND _options
-          -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
-          -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
-          -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
-          -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
-          -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/lib/Debug
-          -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/lib/Release
-          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=${PREFIX_DIR}/bin/Debug
-          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO=${PREFIX_DIR}/bin/Release)
-      else()
-        list(APPEND _options
-          -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib
-          -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib
-          -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin)
-      endif()
-    endif()
+    set(_configs ${_y3_configs})
   endif()
-  y3_run(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source_dir}
-      -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
-      ${_options}
-      ${_arg_OPTIONS}
-    WORKING_DIRECTORY ${_build_dir})
   if(_arg_TARGET)
     set(_target ${_arg_TARGET})
   else()
@@ -109,7 +65,34 @@ function(y3_cmake _dir)
     set(_env_cl "CL=$ENV{CL} ${_cl}")
   endif()
   foreach(_config ${_configs})
-    y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${_build_dir} --config ${_config} --target ${_target}
+    if(NOT WIN32)
+      unset(_output_suffix)
+      unset(_options)
+    else()
+      if(_config STREQUAL "RelWithDebInfo")
+        set(_output_suffix "/Release")
+      else()
+        set(_output_suffix "/${_config}")
+      endif()
+      set(_options -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix})
+    endif()
+    set(_build_dir ${_source_dir}-${_config})
+    if(EXISTS ${_build_dir})
+      message(STATUS "[Y3] Removing ${_dir}-${_config}")
+      file(REMOVE_RECURSE ${_build_dir})
+    endif()
+    message(STATUS "[Y3] Building ${_dir} (${_config})")
+    file(MAKE_DIRECTORY ${_build_dir})
+    y3_run(COMMAND ${CMAKE_COMMAND} -G ${GENERATOR} ${_source_dir}
+        -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
+        -DCMAKE_BUILD_TYPE=${_config}
+        -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
+        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
+        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin${_output_suffix}
+        ${_options}
+        ${_arg_OPTIONS}
+      WORKING_DIRECTORY ${_build_dir})
+    y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target}
       WORKING_DIRECTORY ${_build_dir})
   endforeach()
 endfunction()
@@ -234,7 +217,7 @@ if("catch2" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "caf84ac93f6b624b9583bc9712feb3fba9417c68")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} HEADER_ONLY OUT_OF_SOURCE
+  y3_cmake(${_package} HEADER_ONLY
     OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
 endif()
 
@@ -245,7 +228,7 @@ if("cppcheck" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "5d6b957bf4d40bf87585214019f5e50f2179fe37")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} OUT_OF_SOURCE
+  y3_cmake(${_package}
     OPTIONS -DWARNINGS_ANSI_ISO=OFF)
 endif()
 
@@ -255,7 +238,7 @@ if("freetype" IN_LIST _y3_packages)
   y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
     SHA1 "3296b64ad1e7540289f22e4b6383e26e928b0a20")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} BUILD_TO_PREFIX OUT_OF_SOURCE
+  y3_cmake(${_package} BUILD_TO_PREFIX
     OPTIONS
       -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
       -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON
@@ -273,16 +256,16 @@ if("glslang" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "9bcdcc774ab0ccb9d056a15d3bc18b8af2e60e8d")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} OUT_OF_SOURCE
+  y3_cmake(${_package}
     OPTIONS -DENABLE_AMD_EXTENSIONS=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_NV_EXTENSIONS=OFF -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
 endif()
 
 if("ogg" IN_LIST _y3_packages)
   set(_package "ogg")
   y3_git_clone("git://git.xiph.org/ogg.git" DIR ${_package})
-  y3_cmake(${_package} TARGET "ogg" BUILD_TO_PREFIX OUT_OF_SOURCE)
+  y3_cmake(${_package} TARGET "ogg" BUILD_TO_PREFIX)
   file(INSTALL
-    ${BUILD_DIR}/${_package}-build/include/ogg/config_types.h
+    ${BUILD_DIR}/${_package}-${_y3_config}/include/ogg/config_types.h
     ${BUILD_DIR}/${_package}/include/ogg/ogg.h
     ${BUILD_DIR}/${_package}/include/ogg/os_types.h
     DESTINATION ${PREFIX_DIR}/include/ogg)
@@ -330,16 +313,16 @@ if("vulkan" IN_LIST _y3_packages)
     NAME "${_package}.tar.gz"
     SHA1 "d28cd52f86209cb6cb2966d850d2688680838940")
   y3_extract("${_package}.tar.gz" DIR ${_package})
-  y3_cmake(${_package} HEADER_ONLY OUT_OF_SOURCE)
+  y3_cmake(${_package} HEADER_ONLY)
   set(_package "Vulkan-Loader-sdk-${_version}")
   y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
     NAME "${_package}.tar.gz"
     SHA1 "c2325a90db9d9896fb2e06413a78eedd028782cc")
   y3_extract("${_package}.tar.gz" DIR ${_package})
   if(WIN32)
-    y3_cmake(${_package} TARGET "vulkan" OUT_OF_SOURCE
+    y3_cmake(${_package} TARGET "vulkan"
       OPTIONS -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
-    if("Debug" IN_LIST CONFIGS)
+    if("Debug" IN_LIST _y3_configs)
       file(INSTALL
         ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.dll
         ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.pdb
@@ -348,7 +331,7 @@ if("vulkan" IN_LIST _y3_packages)
         ${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.lib
         DESTINATION ${PREFIX_DIR}/lib/Debug)
     endif()
-    if("RelWithDebInfo" IN_LIST CONFIGS)
+    if("RelWithDebInfo" IN_LIST _y3_configs)
       file(INSTALL
         ${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.dll
         ${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.pdb
@@ -358,7 +341,7 @@ if("vulkan" IN_LIST _y3_packages)
         DESTINATION ${PREFIX_DIR}/lib/Release)
     endif()
   else()
-    y3_cmake(${_package} OUT_OF_SOURCE
+    y3_cmake(${_package}
       OPTIONS -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
   endif()
   file(REMOVE_RECURSE ${PREFIX_DIR}/share)
@@ -374,10 +357,10 @@ if("jpeg" IN_LIST _y3_packages)
   if(WIN32)
     list(APPEND _options -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON)
   endif()
-  y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX OUT_OF_SOURCE
+  y3_cmake(${_package} TARGET "jpeg-static" BUILD_TO_PREFIX
     OPTIONS ${_options})
   file(INSTALL
-    ${BUILD_DIR}/${_package}-build/jconfig.h
+    ${BUILD_DIR}/${_package}-${_y3_config}/jconfig.h
     ${BUILD_DIR}/${_package}/jerror.h
     ${BUILD_DIR}/${_package}/jmorecfg.h
     ${BUILD_DIR}/${_package}/jpeglib.h
@@ -388,7 +371,7 @@ if("vorbis" IN_LIST _y3_packages)
   set(_package "vorbis")
   y3_git_clone("git://git.xiph.org/vorbis.git" DIR ${_package})
   y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/vorbis.patch)
-  y3_cmake(${_package} TARGET "vorbisfile" BUILD_TO_PREFIX OUT_OF_SOURCE
+  y3_cmake(${_package} TARGET "vorbisfile" BUILD_TO_PREFIX
     OPTIONS -DOGG_ROOT=${PREFIX_DIR}
     CL -wd4244 -wd4267 -wd4305 -wd4996)
   file(INSTALL
