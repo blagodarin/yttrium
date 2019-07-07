@@ -47,14 +47,14 @@ install:
 build_script:
   - cmd: |
       set DEBUG_DIR=%APPVEYOR_BUILD_FOLDER%\_debug
-      set RELEASE_DIR=%APPVEYOR_BUILD_FOLDER%\_release
+      set RELWITHDEBINFO_DIR=%APPVEYOR_BUILD_FOLDER%\_relwithdebinfo
       set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
       mkdir %DEBUG_DIR% && cd %DEBUG_DIR%
       cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
       cmake --build .
       cd ..
-      mkdir %RELEASE_DIR% && cd %RELEASE_DIR%
-      cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+      mkdir %RELWITHDEBINFO_DIR% && cd %RELWITHDEBINFO_DIR%
+      cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
       cmake --build .
       cmake --build . --target install
       cd ..
@@ -64,6 +64,6 @@ test_script:
       cd %DEBUG_DIR%
       ctest --output-on-failure
       cd ..
-      cd %RELEASE_DIR%
-      ctest --build-config Release --output-on-failure
+      cd %RELWITHDEBINFO_DIR%
+      ctest --output-on-failure
       if "%BENCHMARK%"=="ON" bin\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg

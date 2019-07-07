@@ -29,11 +29,7 @@ set(PREFIX_DIR ${CMAKE_BINARY_DIR})
 
 string(REPLACE "," ";" _y3_configs "${CONFIG}")
 if(_y3_configs STREQUAL "")
-	if(WIN32)
-		set(_y3_configs "RelWithDebInfo")
-	else()
-		set(_y3_configs "Release")
-	endif()
+	message(FATAL_ERROR "y3: CONFIG is required")
 endif()
 list(GET _y3_configs 0 _y3_config)
 
@@ -65,12 +61,10 @@ function(y3_cmake _dir)
 		set(_env_cl "CL=$ENV{CL} ${_cl}")
 	endif()
 	foreach(_config ${_configs})
-		if(NOT WIN32)
-			unset(_output_suffix)
-		elseif(_config STREQUAL "RelWithDebInfo")
-			set(_output_suffix "/Release")
-		else()
+		if(WIN32)
 			set(_output_suffix "/${_config}")
+		else()
+			unset(_output_suffix)
 		endif()
 		set(_options
 			-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
@@ -319,28 +313,19 @@ if("vulkan" IN_LIST _y3_packages)
 	y3_extract("${_package}.tar.gz" DIR ${_package})
 	if(WIN32)
 		y3_cmake(${_package} TARGET "vulkan"
-		OPTIONS -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
-		if("Debug" IN_LIST _y3_configs)
+			OPTIONS -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
+		foreach(_config ${_y3_configs})
 			file(INSTALL
-				${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.dll
-				${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.pdb
-				DESTINATION ${PREFIX_DIR}/bin/Debug)
+				${BUILD_DIR}/${_package}/loader/${_config}/vulkan-1.dll
+				${BUILD_DIR}/${_package}/loader/${_config}/vulkan-1.pdb
+				DESTINATION ${PREFIX_DIR}/bin/${_config})
 			file(INSTALL
-				${BUILD_DIR}/${_package}/loader/Debug/vulkan-1.lib
-				DESTINATION ${PREFIX_DIR}/lib/Debug)
-		endif()
-		if("RelWithDebInfo" IN_LIST _y3_configs)
-			file(INSTALL
-				${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.dll
-				${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.pdb
-				DESTINATION ${PREFIX_DIR}/bin/Release)
-			file(INSTALL
-				${BUILD_DIR}/${_package}/loader/RelWithDebInfo/vulkan-1.lib
-				DESTINATION ${PREFIX_DIR}/lib/Release)
-		endif()
+				${BUILD_DIR}/${_package}/loader/${_config}/vulkan-1.lib
+				DESTINATION ${PREFIX_DIR}/lib/${_config})
+		endforeach()
 	else()
 		y3_cmake(${_package}
-		OPTIONS -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
+			OPTIONS -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
 	endif()
 	file(REMOVE_RECURSE ${PREFIX_DIR}/share)
 endif()
