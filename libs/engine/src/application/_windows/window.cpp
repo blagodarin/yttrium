@@ -27,6 +27,7 @@
 #include "../window_callbacks.h"
 
 #include <cassert>
+#include <memory>
 
 namespace Yttrium
 {

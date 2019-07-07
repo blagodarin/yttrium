@@ -18,10 +18,10 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../helpers/find.cmake)
 
 y3_find_package(freetype C
-  HEADER "ft2build.h"
-  HEADER_PREFIX "freetype2"
-  LIBRARY "freetype"
-  VERSION_HEADER "freetype/freetype.h"
-  VERSION_REGEX_MAJOR "^#define[ \t]+FREETYPE_MAJOR[ \t]+(.+)"
-  VERSION_REGEX_MINOR "^#define[ \t]+FREETYPE_MINOR[ \t]+(.+)"
-  VERSION_REGEX_PATCH "^#define[ \t]+FREETYPE_PATCH[ \t]+(.+)")
+	HEADER "ft2build.h"
+	HEADER_PREFIX "freetype2"
+	LIBRARY "freetype"
+	VERSION_HEADER "freetype/freetype.h"
+	VERSION_REGEX_MAJOR "^#define[ \t]+FREETYPE_MAJOR[ \t]+(.+)"
+	VERSION_REGEX_MINOR "^#define[ \t]+FREETYPE_MINOR[ \t]+(.+)"
+	VERSION_REGEX_PATCH "^#define[ \t]+FREETYPE_PATCH[ \t]+(.+)")
