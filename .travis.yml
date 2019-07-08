@@ -134,6 +134,7 @@ matrix:
       addons: *clang7_xcb
 
 before_install:
+  - cmake --version
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
   - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ] && [ -z "${STATIC_ANALYSIS}" ]; then export NORMAL=1; fi
 

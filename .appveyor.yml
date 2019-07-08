@@ -35,8 +35,9 @@ cache:
 
 install:
   - cmd: |
-      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCHITECTURE%
+      cmake --version
       cinst ninja
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCHITECTURE%
       set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
       if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
       cd %PREFIX_DIR%
