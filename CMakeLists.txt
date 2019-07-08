@@ -265,7 +265,7 @@ if(ENABLE_CLANG_FORMAT)
 endif()
 
 if(ENABLE_CLANG_TIDY)
-	find_package(ClangTidy REQUIRED)
+	find_package(ClangTidy 7.0.0 REQUIRED)
 	set(_cpps)
 	foreach(_target ycore yengine)
 		get_target_property(_source_dir ${_target} SOURCE_DIR)
