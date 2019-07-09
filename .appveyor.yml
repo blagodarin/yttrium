@@ -62,13 +62,19 @@ install:
   - rmdir /s /q .trash
 
 build_script:
+  - if "%DLL%"=="ON" set SUFFIX=dll
+  - if "%DLL%"=="OFF" set SUFFIX=static
+  - set BUILD_NAME=yttrium-%RENDERER%-%ARCH%-%CONFIG%-%SUFFIX%
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
-  - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
   - mkdir %BUILD_DIR% && cd %BUILD_DIR%
-  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\%BUILD_NAME% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
   - cmake --build .
   - cmake --build . --target install
 
 test_script:
   - ctest --output-on-failure
   - if "%BENCHMARK%"=="ON" bin\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg
+
+artifacts:
+  - path: $(BUILD_NAME)
+    type: zip
