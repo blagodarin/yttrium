@@ -46,6 +46,7 @@ option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
 option(ENABLE_DIFF "Enable checking for source changes ('diff' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
+option(INSTALL_EXAMPLES "Install examples" OFF)
 
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
 

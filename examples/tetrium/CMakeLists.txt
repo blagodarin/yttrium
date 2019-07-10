@@ -52,3 +52,8 @@ add_ypack_target(tetrium_package
 add_dependencies(tetrium tetrium_package)
 
 set_target_properties(tetrium tetrium_localization tetrium_package PROPERTIES FOLDER "examples")
+
+if(INSTALL_EXAMPLES)
+	install(TARGETS tetrium RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	install(FILES ${PROJECT_BINARY_DIR}/tetrium.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
+endif()
