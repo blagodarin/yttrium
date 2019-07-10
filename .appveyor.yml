@@ -9,43 +9,49 @@ environment:
       CONFIG: Release
       ARCH: x86
       DLL: OFF
-      BENCHMARK: ON
       Y3: catch2,freetype,jpeg,vorbis
+      BENCHMARK: ON
+      PUBLISH: OFF
 
     - RENDERER: null
       CONFIG: Release
       ARCH: amd64
       DLL: OFF
-      BENCHMARK: ON
       Y3: catch2,freetype,jpeg,vorbis
+      BENCHMARK: ON
+      PUBLISH: OFF
 
     - RENDERER: opengl
       CONFIG: Release
       ARCH: amd64
       DLL: ON
-      BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: ON
 
     - RENDERER: opengl
       CONFIG: Debug
       ARCH: amd64
       DLL: ON
-      BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
 
     - RENDERER: opengl
       CONFIG: Release
       ARCH: amd64
       DLL: OFF
-      BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
 
     - RENDERER: opengl
       CONFIG: Debug
       ARCH: amd64
       DLL: OFF
-      BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
 
 cache:
   - _3rdparty\.cache
@@ -62,14 +68,14 @@ install:
   - rmdir /s /q .trash
 
 build_script:
-  - if "%DLL%"=="ON" set SUFFIX=dll
-  - if "%DLL%"=="OFF" set SUFFIX=static
-  - set BUILD_NAME=yttrium-%RENDERER%-%ARCH%-%CONFIG%-%SUFFIX%
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
+  - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
   - mkdir %BUILD_DIR% && cd %BUILD_DIR%
-  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\%BUILD_NAME% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
   - cmake --build .
   - cmake --build . --target install
+  - set BUILD_NAME=yttrium-%RENDERER%-%ARCH%
+  - if "%PUBLISH%"=="ON" move %INSTALL_DIR% %BUILD_NAME%
 
 test_script:
   - ctest --output-on-failure
