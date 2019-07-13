@@ -550,17 +550,18 @@ namespace Yttrium
 			{ "pressed", WidgetData::Style::Pressed },
 		};
 
+		static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(WidgetData::StyleData&, IonReader&, IonToken&) const> style_handlers{
+			{ "align", &GuiIonLoader::load_style_align },
+			{ "borders", &GuiIonLoader::load_style_borders },
+			{ "color", &GuiIonLoader::load_style_color },
+			{ "font", &GuiIonLoader::load_style_font },
+			{ "text_color", &GuiIonLoader::load_style_text_color },
+			{ "text_size", &GuiIonLoader::load_style_text_size },
+			{ "texture", &GuiIonLoader::load_style_texture },
+			{ "texture_rect", &GuiIonLoader::load_style_texture_rect },
+		};
+
 		const auto load_style_entry = [this, &ion, &token](WidgetData::StyleData& data) {
-			static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(WidgetData::StyleData&, IonReader&, IonToken&) const> style_handlers{
-				{ "align", &GuiIonLoader::load_style_align },
-				{ "borders", &GuiIonLoader::load_style_borders },
-				{ "color", &GuiIonLoader::load_style_color },
-				{ "font", &GuiIonLoader::load_style_font },
-				{ "text_color", &GuiIonLoader::load_style_text_color },
-				{ "text_size", &GuiIonLoader::load_style_text_size },
-				{ "texture", &GuiIonLoader::load_style_texture },
-				{ "texture_rect", &GuiIonLoader::load_style_texture_rect },
-			};
 			const auto i = style_handlers.find(token.to_name());
 			if (i == style_handlers.end())
 				return false;

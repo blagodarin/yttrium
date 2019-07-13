@@ -1,5 +1,5 @@
 version: 0.0.{build}-{branch}
-image: Visual Studio 2017
+image: Visual Studio 2019
 shallow_clone: true
 
 environment:
@@ -59,7 +59,7 @@ cache:
 install:
   - cmake --version
   - cinst ninja
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
   - set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
   - if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
   - cd %PREFIX_DIR%
