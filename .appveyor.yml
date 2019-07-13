@@ -4,26 +4,54 @@ shallow_clone: true
 
 environment:
   matrix:
+
     - RENDERER: null
-      ARCHITECTURE: x86
+      CONFIG: Release
+      ARCH: x86
       DLL: OFF
-      BENCHMARK: ON
       Y3: catch2,freetype,jpeg,vorbis
+      BENCHMARK: ON
+      PUBLISH: OFF
+
     - RENDERER: null
-      ARCHITECTURE: amd64
+      CONFIG: Release
+      ARCH: amd64
       DLL: OFF
-      BENCHMARK: ON
       Y3: catch2,freetype,jpeg,vorbis
+      BENCHMARK: ON
+      PUBLISH: OFF
+
     - RENDERER: opengl
-      ARCHITECTURE: amd64
+      CONFIG: Release
+      ARCH: amd64
       DLL: ON
-      BENCHMARK: OFF
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: ON
+
     - RENDERER: opengl
-      ARCHITECTURE: amd64
-      DLL: OFF
-      BENCHMARK: OFF
+      CONFIG: Debug
+      ARCH: amd64
+      DLL: ON
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
+
+    - RENDERER: opengl
+      CONFIG: Release
+      ARCH: amd64
+      DLL: OFF
+      Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
+
+    - RENDERER: opengl
+      CONFIG: Debug
+      ARCH: amd64
+      DLL: OFF
+      Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
 
 cache:
   - _3rdparty\.cache
@@ -31,34 +59,30 @@ cache:
 install:
   - cmake --version
   - cinst ninja
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCHITECTURE%
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
   - set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
   - if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
   - cd %PREFIX_DIR%
-  - cmake -DBUILD=%Y3% -DCONFIG=Release,Debug -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
+  - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
   - rmdir /s /q .build
   - rmdir /s /q .trash
 
 build_script:
-  - set DEBUG_DIR=%APPVEYOR_BUILD_FOLDER%\_debug_build
-  - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_debug_install
-  - mkdir %DEBUG_DIR% && cd %DEBUG_DIR%
-  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
+  - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
+  - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
+  - mkdir %BUILD_DIR% && cd %BUILD_DIR%
+  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
   - cmake --build .
   - cmake --build . --target install
-  - cd ..
-  - set RELEASE_DIR=%APPVEYOR_BUILD_FOLDER%\_release_build
-  - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_release_install
-  - mkdir %RELEASE_DIR% && cd %RELEASE_DIR%
-  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DY_RENDERER=%RENDERER%
-  - cmake --build .
-  - cmake --build . --target install
-  - cd ..
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - set BUILD_NAME=yttrium-%RENDERER%-%ARCH%
+  - if "%PUBLISH%"=="ON" move %INSTALL_DIR% %BUILD_NAME%
 
 test_script:
-  - cd %DEBUG_DIR%
-  - ctest --output-on-failure
-  - cd ..
-  - cd %RELEASE_DIR%
+  - cd %BUILD_DIR%
   - ctest --output-on-failure
   - if "%BENCHMARK%"=="ON" bin\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg
+
+artifacts:
+  - path: $(BUILD_NAME)
+    type: zip

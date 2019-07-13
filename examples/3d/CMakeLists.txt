@@ -38,3 +38,8 @@ add_ypack_target(3d_package
 add_dependencies(3d 3d_package)
 
 set_target_properties(3d 3d_package PROPERTIES FOLDER "examples")
+
+if(INSTALL_EXAMPLES)
+	install(TARGETS 3d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	install(FILES ${PROJECT_BINARY_DIR}/3d.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
+endif()
