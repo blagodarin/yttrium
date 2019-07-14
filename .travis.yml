@@ -9,12 +9,15 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,cppcheck STATIC_ANALYSIS=1
-      addons: &clang7_xcb
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,cppcheck STATIC_ANALYSIS=1
+      addons: &clang_xcb
         apt:
           sources: &all_sources
+            - llvm-toolchain-xenial-8
             - ubuntu-toolchain-r-test
           packages:
+            - clang-8
+            - clang-tidy-8
             - libasound2-dev
             - libstdc++-8-dev
             - libvorbis-dev
@@ -82,11 +85,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
-      addons: &clang7_xcb
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
+      addons: &clang_xcb
         apt:
           sources: *all_sources
           packages:
+            - clang-8
+            - clang-tidy-8
             - libasound2-dev
             - libstdc++-8-dev
             - libvorbis-dev
@@ -99,11 +104,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
-      addons: &clang7_x11
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
+      addons: &clang_x11
         apt:
           sources: *all_sources
           packages:
+            - clang-8
+            - clang-tidy-8
             - libasound2-dev
             - libgl-dev
             - libstdc++-8-dev
@@ -113,23 +120,24 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
-      addons: *clang7_x11
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
+      addons: *clang_x11
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang7_xcb
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *clang_xcb
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=7 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
-      addons: *clang7_xcb
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      addons: *clang_xcb
 
 before_install:
   - cmake --version
+  - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
   - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
   - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ] && [ -z "${STATIC_ANALYSIS}" ]; then export NORMAL=1; fi
 
