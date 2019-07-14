@@ -26,6 +26,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	set_property(SOURCE src/main.cpp APPEND PROPERTY COMPILE_OPTIONS
+		/wd4324 # '`anonymous-namespace'::JpegErrorHandler': structure was padded due to alignment specifier
+		/wd4611 # interaction between '_setjmp' and C++ object destruction is non-portable
+		)
 endif()
 
 target_link_libraries(benchmark_jpeg PRIVATE ycore)
