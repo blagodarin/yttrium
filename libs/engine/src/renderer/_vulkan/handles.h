@@ -197,5 +197,8 @@ namespace Yttrium
 }
 
 #define Y_VK_CHECK(call) \
-	if (const auto result = (call)) \
-		::Yttrium::vulkan_result_check(result, #call);
+	do \
+	{ \
+		if (const auto result = (call)) \
+			::Yttrium::vulkan_result_check(result, #call); \
+	} while (false)

@@ -220,9 +220,9 @@ TEST_CASE("ion.reader.newlines")
 
 TEST_CASE("ion.reader.comments.full_line")
 {
-	CHECK_THROWS_AS(TestData { "/comment" }->read(), IonError);
-	CHECK_NOTHROW(TestData { "//comment" }->read());
-	CHECK_NOTHROW(TestData { "///comment" }->read());
+	CHECK_THROWS_AS(TestData("/comment")->read(), IonError);
+	CHECK_NOTHROW(TestData("//comment")->read());
+	CHECK_NOTHROW(TestData("///comment")->read());
 }
 
 TEST_CASE("ion.reader.comments.inline")
