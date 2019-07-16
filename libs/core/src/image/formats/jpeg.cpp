@@ -141,7 +141,7 @@ namespace
 		auto row7 = _mm_load_si128(reinterpret_cast<const __m128i*>(src) + 7);
 
 		// column pass
-		dct_pass(bias_0, 10);
+		dct_pass(bias_0, 10)
 
 		{
 			// 16bit 8x8 transpose pass 1
@@ -164,7 +164,7 @@ namespace
 		}
 
 		// row pass
-		dct_pass(bias_1, 17);
+		dct_pass(bias_1, 17)
 
 		{
 			// pack

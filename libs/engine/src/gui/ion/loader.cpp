@@ -550,6 +550,7 @@ namespace Yttrium
 			{ "pressed", WidgetData::Style::Pressed },
 		};
 
+		// Can't move this inside the lambda (see https://developercommunity.visualstudio.com/content/problem/643913/msvc-1921-stdclatest-compilation-error.html).
 		static const std::unordered_map<std::string_view, void (GuiIonLoader::*)(WidgetData::StyleData&, IonReader&, IonToken&) const> style_handlers{
 			{ "align", &GuiIonLoader::load_style_align },
 			{ "borders", &GuiIonLoader::load_style_borders },

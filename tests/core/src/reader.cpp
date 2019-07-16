@@ -108,7 +108,7 @@ TEST_CASE("reader.read_line")
 
 		for (const auto& entry : entries)
 		{
-			INFO(entry.comment);
+			INFO(entry.comment)
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
 			const auto source = Source::from(data.data(), data.size());
@@ -139,7 +139,7 @@ TEST_CASE("reader.read_line")
 
 		for (const auto& entry : entries)
 		{
-			INFO(entry.comment);
+			INFO(entry.comment)
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
 			const auto source = Source::from(Source::from(data.data(), data.size()), 0, data.size());
