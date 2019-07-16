@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <array>
 #include <cstdint>
 
 namespace Yttrium
@@ -27,22 +27,22 @@ namespace Yttrium
 	public:
 		constexpr Crc32() noexcept = default;
 
-		constexpr Crc32& process(const void* data, std::size_t size) noexcept
+		constexpr Crc32& process(const void* data, size_t size) noexcept
 		{
-			for (std::size_t i = 0; i < size; ++i)
-				_value = _table[static_cast<const std::uint8_t*>(data)[i] ^ (_value & 0xff)] ^ (_value >> 8);
+			for (size_t i = 0; i < size; ++i)
+				_value = _table[static_cast<const uint8_t*>(data)[i] ^ (_value & 0xff)] ^ (_value >> 8);
 			return *this;
 		}
 
-		constexpr std::uint32_t value() const noexcept
+		constexpr uint32_t value() const noexcept
 		{
 			return ~_value;
 		}
 
 	private:
-		std::uint32_t _value = 0xffffffff;
+		uint32_t _value = 0xffffffff;
 
-		static constexpr std::uint32_t _table[256]{
+		static constexpr std::array<uint32_t, 256> _table{
 			0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
 			0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
 			0x1db71064, 0x6ab020f2, 0xf3b97148, 0x84be41de, 0x1adad47d, 0x6ddde4eb, 0xf4d4b551, 0x83d385c7,
