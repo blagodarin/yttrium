@@ -196,11 +196,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	# Warnings.
 	string(REGEX REPLACE " /W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # TODO: Remove after upgrade to CMake 3.15.
 	add_compile_options(/WX /Wall
-		/wd4061 # enumerator '...' in switch of enum '...' is not explicitly handled by a case label
-		/wd4191 # 'reinterpret_cast': unsafe conversion from '...' to '...'
-		/wd4251 # class '...' needs to have dll-interface to be used by clients of class '...'
+		/wd4061 # enumerator '___' in switch of enum '___' is not explicitly handled by a case label
+		/wd4191 # 'reinterpret_cast': unsafe conversion from '___' to '___'
+		/wd4251 # class '___' needs to have dll-interface to be used by clients of class '___'
 		/wd4355 # 'this': used in base member initializer list
-		/wd4365 # conversion from '...' to '...', signed/unsigned mismatch
+		/wd4365 # conversion from '___' to '___', signed/unsigned mismatch
 		/wd4388 # signed/unsigned mismatch
 		/wd4464 # relative include path contains '..'
 		/wd4514 # unreferenced inline function has been removed
@@ -210,13 +210,14 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		/wd4623 # default constructor was implicitly defined as deleted
 		/wd4625 # copy constructor was implicitly defined as deleted
 		/wd4626 # assignment operator was implicitly defined as deleted
-		/wd4668 # '...' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+		/wd4668 # '___' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
 		/wd4710 # function not inlined
-		/wd4711 # function '...' selected for automatic inline expansion
-		/wd4774 # format string expected in argument ... is not a string literal
-		/wd4800 # Implicit conversion from '...' to bool. Possible information loss
-		/wd4820 # '...' bytes padding added after data member '...'
-		/wd4866 # compiler may not enforce left-to-right evaluation order for call to '...'
+		/wd4711 # function '___' selected for automatic inline expansion
+		/wd4738 # storing 32-bit float result in memory, possible loss of performance
+		/wd4774 # format string expected in argument ___ is not a string literal
+		/wd4800 # Implicit conversion from '___' to bool. Possible information loss
+		/wd4820 # '___' bytes padding added after data member '___'
+		/wd4866 # compiler may not enforce left-to-right evaluation order for call to '___'
 		/wd4868 # compiler may not enforce left-to-right evaluation order in braced initializer list
 		/wd5026 # move constructor was implicitly defined as deleted
 		/wd5027 # move assignment operator was implicitly defined as deleted
