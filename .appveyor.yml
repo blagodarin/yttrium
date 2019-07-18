@@ -9,6 +9,7 @@ environment:
       CONFIG: Release
       ARCH: x86
       DLL: OFF
+      TESTS: ON
       Y3: catch2,freetype,jpeg,vorbis
       BENCHMARK: ON
       PUBLISH: OFF
@@ -17,6 +18,7 @@ environment:
       CONFIG: Release
       ARCH: amd64
       DLL: OFF
+      TESTS: ON
       Y3: catch2,freetype,jpeg,vorbis
       BENCHMARK: ON
       PUBLISH: OFF
@@ -25,6 +27,7 @@ environment:
       CONFIG: Release
       ARCH: amd64
       DLL: ON
+      TESTS: ON
       Y3: catch2,freetype,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: ON
@@ -33,6 +36,7 @@ environment:
       CONFIG: Debug
       ARCH: amd64
       DLL: ON
+      TESTS: ON
       Y3: catch2,freetype,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
@@ -41,6 +45,7 @@ environment:
       CONFIG: Release
       ARCH: amd64
       DLL: OFF
+      TESTS: ON
       Y3: catch2,freetype,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
@@ -49,7 +54,18 @@ environment:
       CONFIG: Debug
       ARCH: amd64
       DLL: OFF
+      TESTS: ON
       Y3: catch2,freetype,vorbis,opengl
+      BENCHMARK: OFF
+      PUBLISH: OFF
+
+    # Build Y3 packages without Ninja.
+    - RENDERER: null
+      CONFIG: Debug
+      ARCH: x86
+      DLL: ON
+      TESTS: OFF
+      Y3: freetype,vorbis
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -58,7 +74,7 @@ cache:
 
 install:
   - cmake --version
-  - cinst ninja
+  - if "%TESTS%"=="ON" cinst ninja
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
   - set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
   - if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
@@ -66,12 +82,13 @@ install:
   - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
   - rmdir /s /q .build
   - rmdir /s /q .trash
+  - if "%TESTS%"=="OFF" cinst ninja
 
 build_script:
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
   - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
   - mkdir %BUILD_DIR% && cd %BUILD_DIR%
-  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
+  - cmake -G"Ninja" %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=%TESTS% -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
   - cmake --build .
   - cmake --build . --target install
   - cd %APPVEYOR_BUILD_FOLDER%
@@ -80,7 +97,7 @@ build_script:
 
 test_script:
   - cd %BUILD_DIR%
-  - ctest --output-on-failure
+  - if "%TESTS%"=="ON" ctest --output-on-failure
   - if "%BENCHMARK%"=="ON" bin\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg
 
 artifacts:
