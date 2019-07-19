@@ -74,15 +74,14 @@ cache:
 
 install:
   - cmake --version
-  - if "%TESTS%"=="ON" cinst ninja
+  - ninja --version
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
   - set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
   - if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
   - cd %PREFIX_DIR%
   - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
-  - rmdir /s /q .build
-  - rmdir /s /q .trash
-  - if "%TESTS%"=="OFF" cinst ninja
+  - if exist .build rmdir /s /q .build
+  - if exist .trash rmdir /s /q .trash
 
 build_script:
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
