@@ -74,7 +74,6 @@ cache:
 
 install:
   - cmake --version
-  - ninja --version
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
   - set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
   - if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
@@ -82,6 +81,7 @@ install:
   - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
   - if exist .build rmdir /s /q .build
   - if exist .trash rmdir /s /q .trash
+  - cinst ninja
 
 build_script:
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
