@@ -65,17 +65,20 @@ endif()
 
 find_package(Threads REQUIRED)
 
-get_target_architecture(_architecture)
-message(STATUS "Target architecture: ${_architecture}")
-if(_architecture MATCHES "^amd64$")
+if(NOT TARGET_ARCH MATCHES "^amd64|x86$")
+	get_target_architecture(_target_arch)
+	set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
+endif()
+message(STATUS "Target architecture: ${TARGET_ARCH}")
+if(TARGET_ARCH MATCHES "^amd64$")
 	set(Y_ARCH_AMD64 ON)
 endif()
-if(_architecture MATCHES "^amd64|x86$")
+if(TARGET_ARCH MATCHES "^amd64|x86$")
 	set(Y_ARCH_X86 ON)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	if(Y_ARCH_X86)
+	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(-msse2)
 	endif()
 
@@ -106,7 +109,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	if(Y_ARCH_X86)
+	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(-msse2)
 	endif()
 
@@ -192,8 +195,34 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
 	# Warnings.
 	string(REGEX REPLACE " /W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # TODO: Remove after upgrade to CMake 3.15.
-	add_compile_options(/W4
-		/wd4251 # class '...' needs to have dll-interface to be used by clients of class '...'
+	add_compile_options(/WX /Wall
+		/wd4061 # enumerator '___' in switch of enum '___' is not explicitly handled by a case label
+		/wd4191 # 'reinterpret_cast': unsafe conversion from '___' to '___'
+		/wd4251 # class '___' needs to have dll-interface to be used by clients of class '___'
+		/wd4355 # 'this': used in base member initializer list
+		/wd4365 # conversion from '___' to '___', signed/unsigned mismatch
+		/wd4388 # signed/unsigned mismatch
+		/wd4464 # relative include path contains '..'
+		/wd4514 # unreferenced inline function has been removed
+		/wd4571 # Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
+		/wd4582 # constructor is not implicitly called
+		/wd4583 # destructor is not implicitly called
+		/wd4623 # default constructor was implicitly defined as deleted
+		/wd4625 # copy constructor was implicitly defined as deleted
+		/wd4626 # assignment operator was implicitly defined as deleted
+		/wd4668 # '___' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+		/wd4710 # function not inlined
+		/wd4711 # function '___' selected for automatic inline expansion
+		/wd4738 # storing 32-bit float result in memory, possible loss of performance
+		/wd4774 # format string expected in argument ___ is not a string literal
+		/wd4800 # Implicit conversion from '___' to bool. Possible information loss
+		/wd4820 # '___' bytes padding added after data member '___'
+		/wd4866 # compiler may not enforce left-to-right evaluation order for call to '___'
+		/wd4868 # compiler may not enforce left-to-right evaluation order in braced initializer list
+		/wd5026 # move constructor was implicitly defined as deleted
+		/wd5027 # move assignment operator was implicitly defined as deleted
+		/wd5039 # pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
+		/wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
 		)
 endif()
 

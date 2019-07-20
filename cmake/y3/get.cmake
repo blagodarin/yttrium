@@ -24,7 +24,6 @@ if(CACHE)
 else()
 	set(CACHE_DIR ${CMAKE_BINARY_DIR}/.cache)
 endif()
-set(GENERATOR "Ninja")
 set(PREFIX_DIR ${CMAKE_BINARY_DIR})
 
 string(REPLACE "," ";" _y3_configs "${CONFIG}")
@@ -71,7 +70,7 @@ function(y3_cmake _dir)
 			-DCMAKE_BUILD_TYPE=${_config}
 			-DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
 			-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
-			-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin${_output_suffix})
+			-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin)
 		if(WIN32)
 			list(APPEND _options -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix})
 		endif()
@@ -82,7 +81,7 @@ function(y3_cmake _dir)
 		endif()
 		message(STATUS "[Y3] Building ${_dir} (${_config})")
 		file(MAKE_DIRECTORY ${_build_dir})
-		y3_run(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${CMAKE_COMMAND} -G ${GENERATOR} ${_source_dir} ${_options} ${_arg_OPTIONS}
+		y3_run(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${CMAKE_COMMAND} -G Ninja ${_source_dir} ${_options} ${_arg_OPTIONS}
 			WORKING_DIRECTORY ${_build_dir})
 		y3_run(COMMAND ${CMAKE_COMMAND} -E env ${_env_cl} ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target}
 			WORKING_DIRECTORY ${_build_dir})
@@ -116,15 +115,23 @@ function(y3_download _url)
 endfunction()
 
 function(y3_extract _name)
-	cmake_parse_arguments(_arg "" "DIR" "" ${ARGN})
-	file(MAKE_DIRECTORY ${BUILD_DIR})
-	if(_arg_DIR AND EXISTS ${BUILD_DIR}/${_arg_DIR})
-		message(STATUS "[Y3] Removing ${_arg_DIR}")
-		file(REMOVE_RECURSE ${BUILD_DIR}/${_arg_DIR})
+	cmake_parse_arguments(_arg "" "DIR;TO" "" ${ARGN})
+	if(_arg_TO)
+		set(_target_dir ${CMAKE_BINARY_DIR}/${_arg_TO})
+	else()
+		set(_target_dir ${BUILD_DIR})
+	endif()
+	file(MAKE_DIRECTORY ${_target_dir})
+	if(_arg_DIR)
+		set(_output_dir ${_target_dir}/${_arg_DIR})
+		if(EXISTS ${_output_dir})
+			message(STATUS "[Y3] Removing ${_arg_DIR}")
+			file(REMOVE_RECURSE ${_output_dir})
+		endif()
 	endif()
 	message(STATUS "[Y3] Extracting ${_name}")
 	y3_run(COMMAND ${CMAKE_COMMAND} -E tar xz ${CACHE_DIR}/${_name}
-		WORKING_DIRECTORY ${BUILD_DIR})
+		WORKING_DIRECTORY ${_target_dir})
 endfunction()
 
 function(y3_git_clone _url)
@@ -160,6 +167,22 @@ function(y3_git_apply _dir _patch)
 	message(STATUS "[Y3] Patching ${_dir}")
 	y3_run(COMMAND ${GIT_EXECUTABLE} apply ${_patch}
 		WORKING_DIRECTORY ${BUILD_DIR}/${_dir})
+endfunction()
+
+function(y3_bootstrap)
+	if(WIN32)
+		set(_version "1.9.0")
+		set(_package "ninja-${_version}")
+		y3_download("https://github.com/ninja-build/ninja/releases/download/v${_version}/ninja-win.zip"
+			NAME "${_package}.zip"
+			SHA1 "c68f192e85a12927443bbf535d27b4aa830e7b32")
+		y3_extract("${_package}.zip" TO "bin")
+		set(ENV{PATH} "${PREFIX_DIR}/bin;$ENV{PATH}")
+		find_program(NINJA_EXECUTABLE ninja)
+		if(NINJA_EXECUTABLE)
+			message(STATUS "[Y3] Found Ninja: ${NINJA_EXECUTABLE}")
+		endif()
+	endif()
 endfunction()
 
 macro(_y3_add_package _package)
@@ -201,6 +224,8 @@ y3_package(nasm)
 y3_package(openal)
 y3_package(opengl)
 y3_package(vulkan)
+
+y3_bootstrap()
 
 if("catch2" IN_LIST _y3_packages)
 	set(_version "2.9.1")

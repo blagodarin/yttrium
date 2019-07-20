@@ -10,21 +10,22 @@
 
 Yttrium is (intended to become) a game development toolkit.
 
+Yttrium features:
+* **Friendly and flexible build system.**
+  - To build Yttrium for the first time, you need Internet connection,
+    [Git](https://git-scm.com/downloads/), recent
+    [CMake](https://cmake.org/download/) and a supported C/C++ compiler, and you
+    should already have all that if you build C++ projects from GitHub.
+  - Yttrium can be built as a set of DLLs with user-provided dependencies, or it
+    can yield static libraries that can be linked into a single binary &mdash;
+    the choice is up to you.
+  - Building Yttrium with all its dependencies requires just a couple of
+    minutes, and rebuilds happen in seconds no matter what change you make.
+  - Check out [build instructions](docs/building.md) for more details.
+    [Contribution guidelines](docs/contributing.md) may also help you find your
+    way around.
+
 Yttrium is an occasional hobby project, so don't expect it to be something
-actually valuable or to eventually turn into one. It's more like a bunch of
-various ideas piled together and roughly shaped to look game engine-ish.
-
-
-## Build instructions
-
-Building Yttrium requires [Git](https://git-scm.com/downloads/) to get it and
-[CMake](https://cmake.org/download/) to build it. Yttrium also depends on some
-third-party libraries; if you don't have them installed on your system, you can
-get them using *Yttrium third-party bootstrapper (Y3)* which also requires Git
-and CMake (and an Internet connection).
-
-Check out CI configuration files ([.appveyor.yml](.appveyor.yml) and
-[.travis.yml](.travis.yml)) for some hints on building Yttrium.
-
-[Contribution guidelines](docs/contributing.md) may also help you find your
-way around.
+actually valuable or to eventually turn into one. Right now it is more like a
+bunch of various ideas piled together and roughly shaped to look game
+engine-ish.
