@@ -109,12 +109,6 @@ y_sources(ycore "src/memory"
 	src/memory/pool.cpp
 	src/memory/raw.h
 	)
-if(Y_ENABLE_BUFFER_MEMORY_TRACKING)
-	y_sources(ycore "src/memory"
-		src/memory/buffer_memory_tracker.cpp
-		src/memory/buffer_memory_tracker.h
-		)
-endif()
 if(UNIX)
 	y_sources(ycore "src/memory/_posix"
 		src/memory/_posix/memory.cpp

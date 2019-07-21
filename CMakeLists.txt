@@ -234,8 +234,6 @@ append_options(CMAKE_RC_FLAGS ${RC_FLAGS})
 append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
-set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
-set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 add_subdirectory(libs/core)
