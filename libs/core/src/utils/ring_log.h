@@ -15,11 +15,36 @@
 // limitations under the License.
 //
 
-#include "memory/buffer_memory.h"
-#include "utils/ring_log.h"
+#pragma once
+
+#include <yttrium/api.h>
+
+#include <array>
+#include <mutex>
+#include <string_view>
 
 namespace Yttrium
 {
-	RingLog _ring_log;
-	BufferMemory _buffer_memory;
+	class Y_CORE_API RingLog
+	{
+	public:
+		bool pop(std::string&);
+		void push(std::string_view) noexcept;
+
+		// For testing.
+		size_t offset() const noexcept;
+		size_t size() const noexcept;
+
+	private:
+		static constexpr size_t SizePower = 12; // 4096 bytes.
+		static constexpr size_t Size = 1 << SizePower;
+		static constexpr size_t OffsetMask = Size - 1;
+
+		mutable std::mutex _mutex;
+		size_t _offset = 0;
+		size_t _size = 0;
+		std::array<uint8_t, Size> _buffer;
+	};
+
+	extern RingLog _ring_log;
 }

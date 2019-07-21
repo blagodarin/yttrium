@@ -201,6 +201,8 @@ y_sources(ycore "src/utils"
 	src/utils/algorithm.h
 	src/utils/atomic_counters.h
 	src/utils/crc32.h
+	src/utils/ring_log.cpp
+	src/utils/ring_log.h
 	src/utils/string.cpp
 	src/utils/string.h
 	)
