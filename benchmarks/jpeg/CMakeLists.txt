@@ -16,7 +16,6 @@
 #
 
 set(_src
-	../common/include/benchmark.h
 	src/main.cpp
 	)
 
@@ -33,7 +32,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		)
 endif()
 
-target_link_libraries(benchmark_jpeg PRIVATE ycore)
+target_compile_definitions(benchmark_jpeg PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
+target_link_libraries(benchmark_jpeg PRIVATE ycore ytest)
 set_target_properties(benchmark_jpeg PROPERTIES FOLDER "benchmarks")
 if(WIN32)
 	find_package(Y3_jpeg REQUIRED)
@@ -43,3 +43,10 @@ else()
 	mark_as_advanced(jconfig_dir)
 	target_link_libraries(benchmark_jpeg PRIVATE JPEG::JPEG)
 endif()
+
+add_custom_target(b_jpeg
+	COMMAND benchmark_jpeg
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	COMMENT "Running JPEG decoding benchmark"
+	VERBATIM)
+set_target_properties(b_jpeg PROPERTIES FOLDER ".phony")

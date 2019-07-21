@@ -102,7 +102,7 @@ build_script:
 test_script:
   - cd %BUILD_DIR%
   - if "%TESTS%"=="ON" ctest --output-on-failure
-  - if "%BENCHMARK%"=="ON" bin\benchmark_jpeg.exe %APPVEYOR_BUILD_FOLDER%\examples\tetrium\data\textures\background.jpeg
+  - if "%BENCHMARK%"=="ON" cmake --build . --target benchmark
 
 artifacts:
   - path: $(BUILD_NAME)

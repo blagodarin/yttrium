@@ -15,8 +15,6 @@
 // limitations under the License.
 //
 
-#include "../../common/include/benchmark.h"
-
 #include <yttrium/image.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
@@ -28,6 +26,8 @@
 
 #include <cstdio> // <jpeglib.h> requires FILE declaration.
 #include <jpeglib.h>
+
+#include <catch2/catch.hpp>
 
 namespace
 {
@@ -96,20 +96,10 @@ namespace
 	}
 }
 
-int main(int argc, char** argv)
+TEST_CASE("benchmark.jpeg")
 {
-	if (argc != 2)
-	{
-		std::cerr << "No file name specified\n";
-		return 1;
-	}
-
-	const auto source = Yttrium::Source::from(argv[1]);
-	if (!source)
-	{
-		std::cerr << "Unable to open \"" << argv[1] << "\"\n";
-		return 1;
-	}
+	const auto source = Yttrium::Source::from("examples/tetrium/data/textures/background.jpeg");
+	REQUIRE(source);
 
 	// Pad JPEG image for the Yttrium loader.
 	auto input = source->to_buffer(2);
@@ -121,31 +111,39 @@ int main(int argc, char** argv)
 	output.reserve(1024 * 1024 * 4);
 	std::memset(output.data(), 0xff, output.capacity());
 
-	Benchmark<5000> benchmark;
+	BENCHMARK_ADVANCED("yttrium (nearest)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		meter.measure([&input, &output_info, &output] {
+			return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Nearest);
+		});
+		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_nearest.png" }, Yttrium::ImageFormat::Png);
+	};
 
-	benchmark.add("yttrium nearest", [&input, &output_info, &output] {
-		return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Nearest);
-	});
+	BENCHMARK_ADVANCED("yttrium (linear)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		meter.measure([&input, &output_info, &output] {
+			return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Linear);
+		});
+		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_linear.png" }, Yttrium::ImageFormat::Png);
+	};
 
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_nearest.png" }, Yttrium::ImageFormat::Png);
+	BENCHMARK_ADVANCED("libjpeg (nearest)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		meter.measure([&input, &output_info, &output] {
+			return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, FALSE);
+		});
+		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_nearest.png" }, Yttrium::ImageFormat::Png);
+	};
 
-	benchmark.add("yttrium linear", [&input, &output_info, &output] {
-		return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Linear);
-	});
-
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_linear.png" }, Yttrium::ImageFormat::Png);
-
-	benchmark.add("libjpeg nearest", [&input, &output_info, &output] {
-		return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, FALSE);
-	});
-
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_nearest.png" }, Yttrium::ImageFormat::Png);
-
-	benchmark.add("libjpeg linear", [&input, &output_info, &output] {
-		return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, TRUE);
-	});
-
-	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_linear.png" }, Yttrium::ImageFormat::Png);
-
-	benchmark.print();
+	BENCHMARK_ADVANCED("libjpeg (linear)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		meter.measure([&input, &output_info, &output] {
+			return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, TRUE);
+		});
+		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_linear.png" }, Yttrium::ImageFormat::Png);
+	};
 }
