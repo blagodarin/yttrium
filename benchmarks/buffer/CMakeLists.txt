@@ -22,5 +22,13 @@ set(_src
 add_executable(benchmark_buffer ${_src})
 source_group("src" FILES ${_src})
 
-target_link_libraries(benchmark_buffer PRIVATE ycore)
+target_compile_definitions(benchmark_buffer PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
+target_link_libraries(benchmark_buffer PRIVATE ycore ytest)
 set_target_properties(benchmark_buffer PROPERTIES FOLDER "benchmarks")
+
+add_custom_target(b_buffer
+	COMMAND benchmark_buffer
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	COMMENT "Running Buffer benchmark"
+	VERBATIM)
+set_target_properties(b_buffer PROPERTIES FOLDER ".phony")

@@ -117,8 +117,9 @@ TEST_CASE("benchmark.jpeg")
 		meter.measure([&input, &output_info, &output] {
 			return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Nearest);
 		});
-		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_nearest.png" }, Yttrium::ImageFormat::Png);
 	};
+
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_nearest.png" }, Yttrium::ImageFormat::Png);
 
 	BENCHMARK_ADVANCED("yttrium (linear)")
 	(Catch::Benchmark::Chronometer meter)
@@ -126,8 +127,9 @@ TEST_CASE("benchmark.jpeg")
 		meter.measure([&input, &output_info, &output] {
 			return Yttrium::read_jpeg(input.data(), input.size() + 2, output_info, output, Yttrium::Upsampling::Linear);
 		});
-		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_linear.png" }, Yttrium::ImageFormat::Png);
 	};
+
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_yttrium_linear.png" }, Yttrium::ImageFormat::Png);
 
 	BENCHMARK_ADVANCED("libjpeg (nearest)")
 	(Catch::Benchmark::Chronometer meter)
@@ -135,8 +137,9 @@ TEST_CASE("benchmark.jpeg")
 		meter.measure([&input, &output_info, &output] {
 			return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, FALSE);
 		});
-		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_nearest.png" }, Yttrium::ImageFormat::Png);
 	};
+
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_nearest.png" }, Yttrium::ImageFormat::Png);
 
 	BENCHMARK_ADVANCED("libjpeg (linear)")
 	(Catch::Benchmark::Chronometer meter)
@@ -144,6 +147,7 @@ TEST_CASE("benchmark.jpeg")
 		meter.measure([&input, &output_info, &output] {
 			return ::read_jpeg_with_libjpeg(input.data(), input.size(), output_info, output, TRUE);
 		});
-		Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_linear.png" }, Yttrium::ImageFormat::Png);
 	};
+
+	Yttrium::Image{ output_info, output.data() }.save(Yttrium::Writer{ "jpeg_libjpeg_linear.png" }, Yttrium::ImageFormat::Png);
 }

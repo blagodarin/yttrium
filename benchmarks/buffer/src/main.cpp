@@ -16,453 +16,301 @@
 //
 
 #include <yttrium/memory/buffer.h>
-#include "../../../libs/core/src/memory/buffer_memory.h"
 
 #include <array>
-#include <chrono>
-#include <cstring>
-#include <iostream>
-#include <sstream>
+#include <cstdlib>
 
-using namespace Yttrium;
+#include <catch2/catch.hpp>
 
 namespace
 {
-	constexpr auto Duration = 1000;
+	const auto Granularity = Yttrium::Buffer::memory_granularity();
+	constexpr size_t MaxBlocks = 1024; // 64 MiB.
 
-	const auto Granularity = static_cast<unsigned>(Buffer::memory_granularity());
-	const auto MaxSmallBlock = static_cast<unsigned>(BufferMemory::MaxSmallBlockSize); // For brevity.
-
-	class Measurement
+	template <size_t BlockSize, size_t BlockCount>
+	void allocate(std::array<Yttrium::Buffer, BlockCount>& buffers)
 	{
-	public:
-		struct Results
-		{
-			unsigned ops = 0;
-			unsigned ms = 0;
+		for (auto& buffer : buffers)
+			buffer.reset(BlockSize);
+		for (auto i = buffers.size(); i > 0;)
+			buffers[--i] = {};
+	}
 
-			auto ns_per_op() const { return static_cast<unsigned>(ms * 1000000.0 / ops); }
-			auto ops_per_second() const { return static_cast<unsigned>(ops * 1000.0 / ms); }
-		};
+	template <size_t BlockSize, size_t BlockCount>
+	void allocate(std::array<uint8_t*, BlockCount>& pointers)
+	{
+		for (auto& pointer : pointers)
+			pointer = static_cast<uint8_t*>(std::malloc(BlockSize));
+		for (auto i = pointers.size(); i > 0;)
+			std::free(pointers[--i]);
+	}
 
-		explicit Measurement(Results& results)
-			: _results(results)
+	template <size_t BlockSize, size_t BlockCount>
+	void allocate_and_touch(std::array<Yttrium::Buffer, BlockCount>& buffers)
+	{
+		for (auto& buffer : buffers)
 		{
+			buffer.reset(BlockSize);
+			for (size_t i = 0; i < BlockSize; i += Granularity)
+				buffer[i] = 1;
 		}
+		for (auto i = buffers.size(); i > 0;)
+			buffers[--i] = {};
+	}
 
-		bool next_iteration(unsigned ops)
+	template <size_t BlockSize, size_t BlockCount>
+	void allocate_and_touch(std::array<uint8_t*, BlockCount>& pointers)
+	{
+		for (auto& pointer : pointers)
 		{
-			_results.ops += ops;
-			_results.ms = static_cast<unsigned>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _start).count());
-			return _results.ms < Duration;
+			pointer = static_cast<uint8_t*>(std::malloc(BlockSize));
+			for (size_t i = 0; i < BlockSize; i += Granularity)
+				pointer[i] = 1;
 		}
-
-	private:
-		Results& _results;
-		const std::chrono::steady_clock::time_point _start = std::chrono::steady_clock::now();
-	};
-
-	double operator/(const Measurement::Results& lhs, const Measurement::Results& rhs)
-	{
-		return (static_cast<double>(lhs.ops) / lhs.ms) / (static_cast<double>(rhs.ops) / rhs.ms);
+		for (auto i = pointers.size(); i > 0;)
+			std::free(pointers[--i]);
 	}
 
-	struct BenchmarkSetup
+	template <size_t BlockSize, size_t BlockCount>
+	void allocate_and_fill(std::array<Yttrium::Buffer, BlockCount>& buffers)
 	{
-		Measurement::Results malloc;
-		Measurement::Results buffer;
-	};
-
-	std::ostream& operator<<(std::ostream& stream, const BenchmarkSetup& setup)
-	{
-		stream << "\n   - malloc: "
-			   << setup.malloc.ms << " ms, "
-			   << setup.malloc.ops_per_second() << " ops/s, "
-			   << setup.malloc.ns_per_op() << " ns/op";
-		stream << "\n   - buffer: " << setup.buffer.ms << " ms, "
-			   << setup.buffer.ops_per_second() << " ops/s, "
-			   << setup.buffer.ns_per_op() << " ns/op"
-			   << " (" << setup.buffer / setup.malloc << " x)";
-		return stream;
-	}
-
-	std::string human_readable_size(unsigned size)
-	{
-		std::ostringstream stream;
-		if (size < 1024)
-			stream << size << " B";
-		else if (size < 1024 * 1024)
-			stream << size / 1024. << " KiB";
-		else
-			stream << size / 1024. / 1024. << " MiB";
-		return stream.str();
-	}
-
-	std::array<uint8_t*, 1000> _malloc_allocations;
-	std::array<Buffer, 1000> _buffer_allocations;
-
-	struct AllocateSetup : BenchmarkSetup
-	{
-		const unsigned size;
-		const unsigned blocks;
-		const unsigned cycles;
-
-		AllocateSetup(unsigned size_, unsigned blocks_, unsigned cycles_)
-			: size(size_)
-			, blocks(blocks_)
-			, cycles(cycles_)
+		for (auto& buffer : buffers)
 		{
-			if (blocks > _malloc_allocations.size() || blocks > _buffer_allocations.size())
-				throw std::logic_error("Insufficient allocation list size");
+			buffer.reset(BlockSize);
+			std::memset(buffer.data(), 1, BlockSize);
 		}
-	};
-
-	std::ostream& operator<<(std::ostream& stream, const AllocateSetup& setup)
-	{
-		stream << "\n * " << human_readable_size(setup.size) << " x " << setup.blocks << ":";
-		stream << static_cast<const BenchmarkSetup&>(setup);
-		return stream;
+		for (auto i = buffers.size(); i > 0;)
+			buffers[--i] = {};
 	}
 
-	AllocateSetup _allocate_setups[]{
-		// TODO: Small blocks.
-
-		// Allocating big blocks using more and more memory for all allocations
-		// leaving enough space for service data, if any, in both allocations and memory.
-		// Number of cycles was experimentally chosen to produce reasonable cycle duration.
-
-		{ 63 * 1024, 7, 65536 },  // 0.5 MiB
-		{ 63 * 1024, 15, 65536 }, // 1 MiB
-		{ 63 * 1024, 23, 4096 },  // 1.5 MiB
-		{ 63 * 1024, 31, 2048 },  // 2 MiB
-		{ 63 * 1024, 63, 1024 },  // 4 MiB
-		{ 63 * 1024, 127, 256 },  // 8 MiB
-
-		{ 127 * 1024, 31, 512 },  // 4 MiB
-		{ 127 * 1024, 63, 256 },  // 8 MiB
-		{ 127 * 1024, 127, 128 }, // 16 MiB
-
-		{ 255 * 1024, 31, 256 }, // 8 MiB
-		{ 255 * 1024, 63, 128 }, // 16 MiB
-		{ 255 * 1024, 127, 64 }, // 32 MiB
-
-		{ 511 * 1024, 31, 128 }, // 16 MiB
-		{ 511 * 1024, 63, 64 },  // 32 MiB
-		{ 511 * 1024, 127, 32 }, // 64 MiB
-
-		{ 1023 * 1024, 31, 64 },  // 32 MiB
-		{ 1023 * 1024, 63, 32 },  // 64 MiB
-		{ 1023 * 1024, 127, 16 }, // 128 MiB
-
-		{ 2047 * 1024, 31, 32 }, // 64 MiB
-		{ 2047 * 1024, 63, 16 }, // 128 MiB
-		{ 2047 * 1024, 127, 8 }, // 256 MiB
-	};
-
-	void malloc_allocate(AllocateSetup& setup)
+	template <size_t BlockSize, size_t BlockCount>
+	void allocate_and_fill(std::array<uint8_t*, BlockCount>& pointers)
 	{
-		Measurement measurement(setup.malloc);
-		do
+		for (auto& pointer : pointers)
 		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
-			{
-				unsigned j = 0;
-				while (j < setup.blocks)
-					_malloc_allocations[j++] = static_cast<uint8_t*>(::malloc(setup.size));
-				do
-				{
-					::free(_malloc_allocations[--j]);
-				} while (j > 0);
-			}
-		} while (measurement.next_iteration(setup.cycles * setup.blocks));
-	}
-
-	void buffer_allocate(AllocateSetup& setup)
-	{
-		Measurement measurement(setup.buffer);
-		do
-		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
-			{
-				unsigned j = 0;
-				while (j < setup.blocks)
-					_buffer_allocations[j++] = Buffer(setup.size);
-				do
-				{
-					_buffer_allocations[--j] = {};
-				} while (j > 0);
-			}
-		} while (measurement.next_iteration(setup.cycles * setup.blocks));
-	}
-
-	void malloc_allocate_touch(AllocateSetup& setup)
-	{
-		Measurement measurement(setup.malloc);
-		do
-		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
-			{
-				unsigned j = 0;
-				while (j < setup.blocks)
-				{
-					const auto allocation = static_cast<uint8_t*>(::malloc(setup.size));
-					for (std::size_t k = 0; k < setup.size; k += Granularity)
-						allocation[k] = 1;
-					_malloc_allocations[j++] = allocation;
-				}
-				do
-				{
-					::free(_malloc_allocations[--j]);
-				} while (j > 0);
-			}
-		} while (measurement.next_iteration(setup.cycles * setup.blocks));
-	}
-
-	void buffer_allocate_touch(AllocateSetup& setup)
-	{
-		Measurement measurement(setup.buffer);
-		do
-		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
-			{
-				unsigned j = 0;
-				while (j < setup.blocks)
-				{
-					Buffer buffer(setup.size);
-					for (std::size_t k = 0; k < setup.size; k += Granularity)
-						buffer[k] = 1;
-					_buffer_allocations[j++] = std::move(buffer);
-				}
-				do
-				{
-					_buffer_allocations[--j] = {};
-				} while (j > 0);
-			}
-		} while (measurement.next_iteration(setup.cycles * setup.blocks));
-	}
-
-	void malloc_allocate_fill(AllocateSetup& setup)
-	{
-		Measurement measurement(setup.malloc);
-		do
-		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
-			{
-				unsigned j = 0;
-				while (j < setup.blocks)
-				{
-					const auto allocation = static_cast<uint8_t*>(::malloc(setup.size));
-					::memset(allocation, -1, setup.size);
-					_malloc_allocations[j++] = allocation;
-				}
-				do
-				{
-					::free(_malloc_allocations[--j]);
-				} while (j > 0);
-			}
-		} while (measurement.next_iteration(setup.cycles * setup.blocks));
-	}
-
-	void buffer_allocate_fill(AllocateSetup& setup)
-	{
-		Measurement measurement(setup.buffer);
-		do
-		{
-			for (unsigned i = 0; i < setup.cycles; ++i)
-			{
-				unsigned j = 0;
-				while (j < setup.blocks)
-				{
-					Buffer buffer(setup.size);
-					::memset(buffer.data(), -1, setup.size);
-					_buffer_allocations[j++] = std::move(buffer);
-				}
-				do
-				{
-					_buffer_allocations[--j] = {};
-				} while (j > 0);
-			}
-		} while (measurement.next_iteration(setup.cycles * setup.blocks));
-	}
-
-	struct ReallocateSetup : BenchmarkSetup
-	{
-		const unsigned _initial_size;
-		const unsigned _final_size;
-		const unsigned _cycles;
-
-		ReallocateSetup(unsigned initial_size, unsigned final_size, unsigned cycles)
-			: _initial_size{ initial_size }, _final_size{ final_size }, _cycles{ cycles } {}
-	};
-
-	std::ostream& operator<<(std::ostream& stream, const ReallocateSetup& setup)
-	{
-		stream << "\n * " << human_readable_size(setup._initial_size) << " - " << human_readable_size(setup._final_size) << ":";
-		stream << static_cast<const BenchmarkSetup&>(setup);
-		return stream;
-	}
-
-	ReallocateSetup _grow_setups[]{
-		{ 1, Granularity, 100000 },
-		{ Granularity, MaxSmallBlock, 1000 },
-		{ MaxSmallBlock, 2 * MaxSmallBlock, 1000 },
-		{ 2 * MaxSmallBlock, 256 * 1024 * 1024, 100 },
-		{ 1, 256 * 1024 * 1024, 100 },
-	};
-
-	void malloc_grow(ReallocateSetup& setup)
-	{
-		Measurement measurement(setup.malloc);
-		do
-		{
-			for (unsigned i = 0; i < setup._cycles; ++i)
-			{
-				void* allocation = nullptr;
-				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
-					allocation = ::realloc(allocation, size);
-				::free(allocation);
-			}
-		} while (measurement.next_iteration(setup._cycles));
-	}
-
-	void buffer_grow(ReallocateSetup& setup)
-	{
-		Measurement measurement(setup.buffer);
-		do
-		{
-			for (unsigned i = 0; i < setup._cycles; ++i)
-			{
-				Buffer buffer;
-				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
-					buffer.resize(size);
-			}
-		} while (measurement.next_iteration(setup._cycles));
-	}
-
-	ReallocateSetup _grow_touch_setups[]{
-		{ 1, Granularity, 100000 },
-		{ Granularity, MaxSmallBlock, 1000 },
-		{ MaxSmallBlock, 2 * MaxSmallBlock, 1000 },
-		{ 2 * MaxSmallBlock, 256 * 1024 * 1024, 1 },
-		{ 1, 256 * 1024 * 1024, 1 },
-	};
-
-	void malloc_grow_touch(ReallocateSetup& setup)
-	{
-		Measurement measurement(setup.malloc);
-		do
-		{
-			for (unsigned i = 0; i < setup._cycles; ++i)
-			{
-				void* allocation = nullptr;
-				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
-				{
-					allocation = ::realloc(allocation, size);
-					for (auto j = size / 2; j < size; j += Granularity)
-						static_cast<uint8_t*>(allocation)[j] = 1;
-				}
-				::free(allocation);
-			}
-		} while (measurement.next_iteration(setup._cycles));
-	}
-
-	void buffer_grow_touch(ReallocateSetup& setup)
-	{
-		Measurement measurement(setup.buffer);
-		do
-		{
-			for (unsigned i = 0; i < setup._cycles; ++i)
-			{
-				Buffer buffer;
-				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
-				{
-					buffer.resize(size);
-					for (auto j = size / 2; j < size; j += Granularity)
-						buffer[j] = 1;
-				}
-			}
-		} while (measurement.next_iteration(setup._cycles));
-	}
-
-	ReallocateSetup _grow_fill_setups[]{
-		{ 1, Granularity, 100000 },
-		{ Granularity, MaxSmallBlock, 1000 },
-		{ MaxSmallBlock, 2 * MaxSmallBlock, 1000 },
-		{ 2 * MaxSmallBlock, 256 * 1024 * 1024, 1 },
-		{ 1, 256 * 1024 * 1024, 1 },
-	};
-
-	void malloc_grow_fill(ReallocateSetup& setup)
-	{
-		Measurement measurement(setup.malloc);
-		do
-		{
-			for (unsigned i = 0; i < setup._cycles; ++i)
-			{
-				void* allocation = nullptr;
-				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
-				{
-					allocation = ::realloc(allocation, size);
-					::memset(static_cast<uint8_t*>(allocation) + size / 2, -1, size - size / 2);
-				}
-				::free(allocation);
-			}
-		} while (measurement.next_iteration(setup._cycles));
-	}
-
-	void buffer_grow_fill(ReallocateSetup& setup)
-	{
-		Measurement measurement(setup.buffer);
-		do
-		{
-			for (unsigned i = 0; i < setup._cycles; ++i)
-			{
-				Buffer buffer;
-				for (auto size = setup._initial_size; size <= setup._final_size; size *= 2)
-				{
-					buffer.resize(size);
-					::memset(buffer.begin() + size / 2, -1, size - size / 2);
-				}
-			}
-		} while (measurement.next_iteration(setup._cycles));
-	}
-
-	template <typename Setups, typename Setup>
-	void run_benchmark(const char* name, Setups& setups, void (*malloc_function)(Setup&), void (*buffer_function)(Setup&))
-	{
-		for (auto& setup : setups)
-			malloc_function(setup);
-		for (auto& setup : setups)
-			buffer_function(setup);
-		std::cout << name << ":";
-		for (const auto& setup : setups)
-			std::cout << setup;
-		std::cout << "\n";
+			pointer = static_cast<uint8_t*>(std::malloc(BlockSize));
+			std::memset(pointer, 1, BlockSize);
+		}
+		for (auto i = pointers.size(); i > 0;)
+			std::free(pointers[--i]);
 	}
 }
 
-int main(int argc, char** argv)
+TEST_CASE("Allocate")
 {
-	if (argc != 2)
+	BENCHMARK_ADVANCED("buffer (63 KiB)")
+	(Catch::Benchmark::Chronometer meter)
 	{
-		std::cerr << "Usage:\n\t"
-				  << argv[0] << " 1  -- run \"Allocate\" benchmark;\n\t"
-				  << argv[0] << " 2  -- run \"Allocate & touch\" benchmark;\n\t"
-				  << argv[0] << " 3  -- run \"Allocate & fill\" benchmark;\n\t"
-				  << argv[0] << " 4  -- run \"Grow\" benchmark;\n\t"
-				  << argv[0] << " 5  -- run \"Grow & touch\" benchmark;\n\t"
-				  << argv[0] << " 6  -- run \"Grow & fill\" benchmark;\n\t"
-				  << argv[0] << "    -- print this usage.\n";
-		return 0;
-	}
+		std::array<Yttrium::Buffer, MaxBlocks> buffers;
+		meter.measure([&buffers] { ::allocate<63 * 1024>(buffers); });
+	};
 
-	switch (::atoi(argv[1]))
+	BENCHMARK_ADVANCED("malloc (63 KiB)")
+	(Catch::Benchmark::Chronometer meter)
 	{
-	case 1: run_benchmark("Allocate", _allocate_setups, malloc_allocate, buffer_allocate); break;
-	case 2: run_benchmark("Allocate & touch", _allocate_setups, malloc_allocate_touch, buffer_allocate_touch); break;
-	case 3: run_benchmark("Allocate & fill", _allocate_setups, malloc_allocate_fill, buffer_allocate_fill); break;
-	case 4: run_benchmark("Grow", _grow_setups, malloc_grow, buffer_grow); break;
-	case 5: run_benchmark("Grow & touch", _grow_touch_setups, malloc_grow_touch, buffer_grow_touch); break;
-	case 6: run_benchmark("Grow & fill", _grow_fill_setups, malloc_grow_fill, buffer_grow_fill); break;
-	}
+		std::array<uint8_t*, MaxBlocks> pointers;
+		meter.measure([&pointers] { ::allocate<63 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (127 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 2> buffers;
+		meter.measure([&buffers] { ::allocate<127 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (127 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 2> pointers;
+		meter.measure([&pointers] { ::allocate<127 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (255 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 4> buffers;
+		meter.measure([&buffers] { ::allocate<255 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (255 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 4> pointers;
+		meter.measure([&pointers] { ::allocate<255 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (511 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 8> buffers;
+		meter.measure([&buffers] { ::allocate<511 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (511 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 8> pointers;
+		meter.measure([&pointers] { ::allocate<511 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (1023 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 16> buffers;
+		meter.measure([&buffers] { ::allocate<1023 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (1023 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 16> pointers;
+		meter.measure([&pointers] { ::allocate<1023 * 1024>(pointers); });
+	};
+}
+
+TEST_CASE("Allocate and touch")
+{
+	BENCHMARK_ADVANCED("buffer (63 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks> buffers;
+		meter.measure([&buffers] { ::allocate_and_touch<63 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (63 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks> pointers;
+		meter.measure([&pointers] { ::allocate_and_touch<63 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (127 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 2> buffers;
+		meter.measure([&buffers] { ::allocate_and_touch<127 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (127 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 2> pointers;
+		meter.measure([&pointers] { ::allocate_and_touch<127 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (255 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 4> buffers;
+		meter.measure([&buffers] { ::allocate_and_touch<255 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (255 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 4> pointers;
+		meter.measure([&pointers] { ::allocate_and_touch<255 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (511 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 8> buffers;
+		meter.measure([&buffers] { ::allocate_and_touch<511 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (511 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 8> pointers;
+		meter.measure([&pointers] { ::allocate_and_touch<511 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (1023 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 16> buffers;
+		meter.measure([&buffers] { ::allocate_and_touch<1023 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (1023 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 16> pointers;
+		meter.measure([&pointers] { ::allocate_and_touch<1023 * 1024>(pointers); });
+	};
+}
+
+TEST_CASE("Allocate and fill")
+{
+	BENCHMARK_ADVANCED("buffer (63 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks> buffers;
+		meter.measure([&buffers] { ::allocate_and_fill<63 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (63 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks> pointers;
+		meter.measure([&pointers] { ::allocate_and_fill<63 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (127 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 2> buffers;
+		meter.measure([&buffers] { ::allocate_and_fill<127 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (127 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 2> pointers;
+		meter.measure([&pointers] { ::allocate_and_fill<127 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (255 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 4> buffers;
+		meter.measure([&buffers] { ::allocate_and_fill<255 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (255 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 4> pointers;
+		meter.measure([&pointers] { ::allocate_and_fill<255 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (511 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 8> buffers;
+		meter.measure([&buffers] { ::allocate_and_fill<511 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (511 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 8> pointers;
+		meter.measure([&pointers] { ::allocate_and_fill<511 * 1024>(pointers); });
+	};
+
+	BENCHMARK_ADVANCED("buffer (1023 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<Yttrium::Buffer, MaxBlocks / 16> buffers;
+		meter.measure([&buffers] { ::allocate_and_fill<1023 * 1024>(buffers); });
+	};
+
+	BENCHMARK_ADVANCED("malloc (1023 KiB)")
+	(Catch::Benchmark::Chronometer meter)
+	{
+		std::array<uint8_t*, MaxBlocks / 16> pointers;
+		meter.measure([&pointers] { ::allocate_and_fill<1023 * 1024>(pointers); });
+	};
 }

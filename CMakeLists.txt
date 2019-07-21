@@ -276,6 +276,7 @@ if(BUILD_BENCHMARKS)
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/jpeg)
 	add_custom_target(benchmark
+		COMMAND benchmark_buffer
 		COMMAND benchmark_jpeg
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		COMMENT "Running benchmarks"
