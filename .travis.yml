@@ -167,7 +167,7 @@ script:
   - popd
 
 after_success:
-  - if [ -n "${BENCHMARK}" ]; then "${HOME}/yttrium.build/bin/benchmark_jpeg" "${TRAVIS_BUILD_DIR}/examples/tetrium/data/textures/background.jpeg"; fi
+  - if [ -n "${BENCHMARK}" ]; then cmake --build "${HOME}/yttrium.build" --target benchmark; fi
   - if [ -n "${COVERAGE}" ]; then codecov --gcov-root "${HOME}/yttrium.build" --gcov-exec gcov-${GCC} --gcov-args "-s `pwd`"; fi
 
 notifications:

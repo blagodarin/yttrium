@@ -32,7 +32,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".phony")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(cmake/utils.cmake)
@@ -234,8 +234,6 @@ append_options(CMAKE_RC_FLAGS ${RC_FLAGS})
 append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
-set(Y_ENABLE_BUFFER_MEMORY_DEBUGGING OFF)
-set(Y_ENABLE_BUFFER_MEMORY_TRACKING ON) # Disable for profiling purposes only.
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 add_subdirectory(libs/core)
@@ -250,15 +248,14 @@ add_subdirectory(tools/ytr)
 add_subdirectory(libs/audio)
 add_subdirectory(libs/engine)
 
-if(WIN32)
-	add_subdirectory(libs/winmain)
+if(BUILD_TESTS OR BUILD_BENCHMARKS)
+	find_package(Catch2 2.9.1 REQUIRED)
+	mark_as_advanced(Catch2_DIR)
+	add_subdirectory(tests/common)
 endif()
 
 if(BUILD_TESTS)
 	enable_testing()
-	find_package(Catch2 2.9.1 REQUIRED)
-	mark_as_advanced(Catch2_DIR)
-	add_subdirectory(tests/common)
 	add_subdirectory(tests/audio)
 	add_subdirectory(tests/core)
 	add_subdirectory(tests/engine)
@@ -270,17 +267,28 @@ if(BUILD_TESTS)
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		COMMENT "Running tests"
 		VERBATIM)
-	set_target_properties(check PROPERTIES FOLDER "tests")
-endif()
-
-if(BUILD_EXAMPLES)
-	add_subdirectory(examples/3d)
-	add_subdirectory(examples/tetrium)
+	set_target_properties(check PROPERTIES FOLDER ".phony")
 endif()
 
 if(BUILD_BENCHMARKS)
 	add_subdirectory(benchmarks/buffer)
 	add_subdirectory(benchmarks/jpeg)
+	add_custom_target(benchmark
+		COMMAND benchmark_buffer
+		COMMAND benchmark_jpeg
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMENT "Running benchmarks"
+		VERBATIM)
+	set_target_properties(benchmark PROPERTIES FOLDER ".phony")
+endif()
+
+if(WIN32)
+	add_subdirectory(libs/winmain)
+endif()
+
+if(BUILD_EXAMPLES)
+	add_subdirectory(examples/3d)
+	add_subdirectory(examples/tetrium)
 endif()
 
 if(ENABLE_CLANG_FORMAT)
@@ -291,7 +299,7 @@ if(ENABLE_CLANG_FORMAT)
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		COMMENT "Running ClangFormat"
 		VERBATIM)
-	set_target_properties(format PROPERTIES FOLDER ".support")
+	set_target_properties(format PROPERTIES FOLDER ".phony")
 endif()
 
 if(ENABLE_CLANG_TIDY)
@@ -310,7 +318,7 @@ if(ENABLE_CLANG_TIDY)
 		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
 		COMMENT "Running ClangTidy"
 		VERBATIM)
-	set_target_properties(tidy PROPERTIES FOLDER ".support")
+	set_target_properties(tidy PROPERTIES FOLDER ".phony")
 endif()
 
 if(ENABLE_CPPCHECK)
@@ -328,7 +336,7 @@ if(ENABLE_CPPCHECK)
 			${PROJECT_SOURCE_DIR}
 		COMMENT "Running Cppcheck"
 		VERBATIM)
-	set_target_properties(cppcheck PROPERTIES FOLDER ".support")
+	set_target_properties(cppcheck PROPERTIES FOLDER ".phony")
 endif()
 
 if(ENABLE_DIFF)

@@ -2,3 +2,4 @@ internalAstError
 missingInclude
 syntaxError
 unusedFunction
+useStlAlgorithm

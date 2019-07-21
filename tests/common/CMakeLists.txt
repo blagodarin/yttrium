@@ -28,5 +28,6 @@ y_sources(ytest "include"
 	)
 
 include_config(ytest ${PROJECT_BINARY_DIR}/config.h)
+target_compile_definitions(ytest PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
 target_link_libraries(ytest PUBLIC Catch2::Catch2 PRIVATE ycore)
 set_target_properties(ytest PROPERTIES FOLDER "libs")

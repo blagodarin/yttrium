@@ -20,10 +20,6 @@
 #include <yttrium/utils/numeric.h>
 #include "memory.h"
 
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-#	include "buffer_memory_tracker.h"
-#endif
-
 #include <cassert>
 #include <cstring>
 #include <new>
@@ -35,9 +31,6 @@ namespace
 		const auto data = Yttrium::pages_allocate(size);
 		if (!data)
 			throw std::bad_alloc{};
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		Yttrium::_buffer_memory_tracker.track_system_allocation(size);
-#endif
 		return data;
 	}
 
@@ -54,26 +47,7 @@ namespace
 
 namespace Yttrium
 {
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING && Y_ENABLE_BUFFER_MEMORY_DEBUGGING
-	BufferMemory::~BufferMemory()
-	{
-		std::map<size_t, size_t> free_block_count;
-		{
-			std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
-			for (auto i = ::level_from_capacity(capacity_for_size(1)); i <= MaxSmallBlockLevel; ++i)
-			{
-				size_t count = 0;
-				for (void* block = _small_blocks[i]; block; block = *reinterpret_cast<void**>(block))
-					++count;
-				if (count > 0)
-					free_block_count.emplace(1 << i, count);
-			}
-		}
-		_buffer_memory_tracker.print_state(free_block_count);
-	}
-#else
 	BufferMemory::~BufferMemory() = default;
-#endif
 
 	void* BufferMemory::allocate(size_t capacity)
 	{
@@ -118,9 +92,6 @@ namespace Yttrium
 				}
 			}
 		}
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		_buffer_memory_tracker.track_capacity_allocation(capacity);
-#endif
 		return data;
 	}
 
@@ -131,9 +102,6 @@ namespace Yttrium
 		if (capacity > MaxSmallBlockSize)
 		{
 			pages_deallocate(data, capacity);
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-			_buffer_memory_tracker.track_system_deallocation(capacity);
-#endif
 		}
 		else
 		{
@@ -144,9 +112,6 @@ namespace Yttrium
 				_small_blocks[level] = data;
 			}
 		}
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		_buffer_memory_tracker.track_capacity_deallocation(capacity);
-#endif
 	}
 
 	void* BufferMemory::reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size)
@@ -160,11 +125,6 @@ namespace Yttrium
 			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
 				throw std::bad_alloc{};
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-			_buffer_memory_tracker.track_system_reallocation(old_capacity, new_capacity);
-			_buffer_memory_tracker.track_capacity_change(old_capacity, new_capacity);
-			_buffer_memory_tracker.track_reallocation(); // TODO: Perhaps pure shrinking reallocations should be counted differently.
-#endif
 			return new_data;
 		}
 		// This situation is rare, so let's do something simple.
@@ -173,9 +133,6 @@ namespace Yttrium
 		if (old_size > 0)
 			::memcpy(new_data, old_data, old_size);
 		deallocate(old_data, old_capacity);
-#if Y_ENABLE_BUFFER_MEMORY_TRACKING
-		_buffer_memory_tracker.track_reallocation();
-#endif
 		return new_data;
 	}
 
