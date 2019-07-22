@@ -63,16 +63,4 @@ namespace Yttrium
 			std::memcpy(_buffer.data() + begin, text.data(), text_size);
 		_size += text_size;
 	}
-
-	size_t RingLog::offset() const noexcept
-	{
-		std::scoped_lock lock{ _mutex };
-		return _offset;
-	}
-
-	size_t RingLog::size() const noexcept
-	{
-		std::scoped_lock lock{ _mutex };
-		return _size;
-	}
 }

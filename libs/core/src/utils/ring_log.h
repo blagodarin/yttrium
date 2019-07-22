@@ -21,6 +21,7 @@
 
 #include <array>
 #include <mutex>
+#include <string>
 #include <string_view>
 
 namespace Yttrium
@@ -30,10 +31,6 @@ namespace Yttrium
 	public:
 		bool pop(std::string&);
 		void push(std::string_view) noexcept;
-
-		// For testing.
-		size_t offset() const noexcept;
-		size_t size() const noexcept;
 
 	private:
 		static constexpr size_t SizePower = 12; // 4096 bytes.
