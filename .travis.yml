@@ -143,7 +143,7 @@ before_install:
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
-  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
+  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -DPIC=${DLL} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
   - popd
   - if [ -n "${COVERAGE}" ]; then pip install --user codecov; fi
 
