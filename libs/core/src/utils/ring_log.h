@@ -20,6 +20,8 @@
 #include <yttrium/api.h>
 
 #include <array>
+#include <cstdint>
+#include <limits>
 #include <mutex>
 #include <string>
 #include <string_view>
@@ -29,18 +31,17 @@ namespace Yttrium
 	class Y_CORE_API RingLog
 	{
 	public:
+		static constexpr size_t BufferSize = 4096;
+		static constexpr size_t MaxStringSize = std::numeric_limits<uint8_t>::max();
+
 		bool pop(std::string&);
 		void push(std::string_view) noexcept;
 
 	private:
-		static constexpr size_t SizePower = 12; // 4096 bytes.
-		static constexpr size_t Size = 1 << SizePower;
-		static constexpr size_t OffsetMask = Size - 1;
-
-		mutable std::mutex _mutex;
+		std::mutex _mutex;
 		size_t _offset = 0;
 		size_t _size = 0;
-		std::array<uint8_t, Size> _buffer;
+		std::array<uint8_t, BufferSize> _buffer;
 	};
 
 	extern RingLog _ring_log;

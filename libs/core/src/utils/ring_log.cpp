@@ -17,9 +17,18 @@
 
 #include "ring_log.h"
 
+#include <yttrium/utils/numeric.h>
+
 #include <algorithm>
 #include <cstring>
-#include <limits>
+
+namespace
+{
+	static_assert(Yttrium::is_power_of_2(Yttrium::RingLog::BufferSize));
+
+	// If BufferSize is a power of two, we can wrap offsets using masking.
+	constexpr auto OffsetMask = Yttrium::RingLog::BufferSize - 1;
+}
 
 namespace Yttrium
 {
@@ -44,7 +53,7 @@ namespace Yttrium
 
 	void RingLog::push(std::string_view text) noexcept
 	{
-		const auto text_size = static_cast<uint8_t>(std::min<size_t>(text.size(), std::numeric_limits<uint8_t>::max()));
+		const auto text_size = std::min(text.size(), MaxStringSize);
 		std::scoped_lock lock{ _mutex };
 		while (text_size >= _buffer.size() - _size)
 		{
@@ -52,7 +61,7 @@ namespace Yttrium
 			_offset = (_offset + skip) & OffsetMask;
 			_size -= skip;
 		}
-		_buffer[(_offset + _size++) & OffsetMask] = text_size;
+		_buffer[(_offset + _size++) & OffsetMask] = static_cast<uint8_t>(text_size);
 		const auto begin = (_offset + _size) & OffsetMask;
 		if (const auto continuous_size = _buffer.size() - begin; text_size > continuous_size)
 		{

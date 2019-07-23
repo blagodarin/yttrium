@@ -21,8 +21,9 @@
 
 TEST_CASE("ring_log")
 {
-	constexpr size_t buffer_size = 4096;
-	constexpr size_t string_size = 251; // A prime number less than 256.
+	constexpr size_t buffer_size = Yttrium::RingLog::BufferSize;
+	constexpr size_t string_size = 251; // A prime number.
+	static_assert(string_size <= Yttrium::RingLog::MaxStringSize);
 	constexpr size_t max_strings = buffer_size / string_size;
 
 	Yttrium::RingLog log;
