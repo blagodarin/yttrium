@@ -19,7 +19,7 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
-#include "../writer.h"
+#include "../../storage/writer.h"
 
 #include <system_error>
 

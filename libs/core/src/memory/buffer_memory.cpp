@@ -18,7 +18,7 @@
 #include "buffer_memory.h"
 
 #include <yttrium/utils/numeric.h>
-#include "virtual_memory.h"
+#include "../platform/virtual_memory.h"
 
 #include <cassert>
 #include <cstring>

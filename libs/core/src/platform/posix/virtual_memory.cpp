@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "virtual_memory.h"
+#include "../virtual_memory.h"
 
-#include "../platform/posix/error.h"
+#include "error.h"
 
 #include <algorithm>   // std::min
 #include <array>       // std::array

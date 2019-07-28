@@ -18,8 +18,8 @@
 #include "../file.h"
 
 #include <yttrium/storage/source.h>
-#include "../../platform/posix/error.h"
-#include "../writer.h"
+#include "../../storage/writer.h"
+#include "error.h"
 #include "temporary_file.h"
 
 #include <cstdlib>

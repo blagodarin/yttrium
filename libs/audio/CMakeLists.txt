@@ -36,9 +36,9 @@ source_group("src" FILES ${_src})
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(yaudio PRIVATE ycore Threads::Threads)
-set_target_properties(yaudio PROPERTIES FOLDER "libs")
+set_property(TARGET yaudio PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
-	set_target_properties(yaudio PROPERTIES DEFINE_SYMBOL Y_AUDIO_EXPORT)
+	set_property(TARGET yaudio PROPERTY DEFINE_SYMBOL Y_AUDIO_EXPORT)
 	target_compile_definitions(yaudio INTERFACE Y_AUDIO_IMPORT)
 endif()
 
@@ -50,6 +50,21 @@ y_sources(yaudio "include"
 	include/yttrium/audio/sound.h
 	include/yttrium/audio/utils.h
 	)
+
+if(WIN32)
+	target_compile_definitions(yaudio PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	y_sources(yaudio "src/backends"
+		src/backends/wasapi.cpp
+		src/backends/wasapi.h
+		)
+else()
+	find_package(ALSA REQUIRED)
+	target_link_libraries(yaudio PRIVATE ALSA::ALSA)
+	y_sources(yaudio "src/backends"
+		src/backends/alsa.cpp
+		src/backends/alsa.h
+		)
+endif()
 
 y_sources(yaudio "src/formats"
 	src/formats/wav.cpp
@@ -70,21 +85,6 @@ if(Y_USE_OGG_VORBIS)
 	y_sources(yaudio "src/formats"
 		src/formats/ogg_vorbis.cpp
 		src/formats/ogg_vorbis.h
-		)
-endif()
-
-if(WIN32)
-	target_compile_definitions(yaudio PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	y_sources(yaudio "src/backends"
-		src/backends/wasapi.cpp
-		src/backends/wasapi.h
-		)
-else()
-	find_package(ALSA REQUIRED)
-	target_link_libraries(yaudio PRIVATE ALSA::ALSA)
-	y_sources(yaudio "src/backends"
-		src/backends/alsa.cpp
-		src/backends/alsa.h
 		)
 endif()
 
