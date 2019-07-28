@@ -17,37 +17,15 @@
 
 #include "../memory.h"
 
-#include "../../utils/ring_log.h"
+#include "../../platform/posix/error.h"
 
 #include <algorithm>   // std::min
 #include <array>       // std::array
-#include <cerrno>      // errno
-#include <cstdio>      // std::snprintf
-#include <cstring>     // strerror_r, std::memcpy
+#include <cstring>     // std::memcpy
 #include <type_traits> //
 
 #include <sys/mman.h> // mmap, munmap
 #include <unistd.h>   // sysconf
-
-namespace
-{
-	void report_errno(const char* function) noexcept
-	{
-		const auto error = errno;
-		std::array<char, Yttrium::RingLog::MaxStringSize + 1> buffer;
-		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "[ERR] %s failed: ", function));
-		if (written < Yttrium::RingLog::MaxStringSize)
-		{
-			// cppcheck-suppress unreadVariable
-			[[maybe_unused]] const auto status = ::strerror_r(error, buffer.data() + written, buffer.size() - written);
-#if (_POSIX_C_SOURCE >= 200112L) && !_GNU_SOURCE
-			if (status != 0)
-				return;
-#endif
-		}
-		Yttrium::_ring_log.push(buffer.data());
-	}
-}
 
 namespace Yttrium
 {
@@ -56,21 +34,21 @@ namespace Yttrium
 		const auto result = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (result != MAP_FAILED)
 			return result;
-		::report_errno("mmap");
+		report_errno("mmap");
 		return nullptr;
 	}
 
 	void pages_deallocate(void* pointer, size_t size) noexcept
 	{
 		if (::munmap(pointer, size) != 0)
-			::report_errno("munmap");
+			report_errno("munmap");
 	}
 
 	size_t pages_granularity() noexcept
 	{
 		if (const auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0)
 			return static_cast<size_t>(page_size);
-		::report_errno("sysconf(_SC_PAGESIZE)");
+		report_errno("sysconf(_SC_PAGESIZE)");
 		return 1;
 	}
 
@@ -80,12 +58,12 @@ namespace Yttrium
 		const auto new_pointer = ::mmap(nullptr, new_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (new_pointer == MAP_FAILED)
 		{
-			::report_errno("mmap");
+			report_errno("mmap");
 			return nullptr;
 		}
 		std::memcpy(new_pointer, old_pointer, std::min(old_size, new_size));
 		if (::munmap(old_pointer, old_size) != 0)
-			::report_errno("munmap");
+			report_errno("munmap");
 		return new_pointer;
 	}
 }

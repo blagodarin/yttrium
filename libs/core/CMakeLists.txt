@@ -121,7 +121,12 @@ endif()
 
 ########################################################################################################################
 # platform
-if(WIN32)
+if(UNIX)
+	y_sources(ycore "src/platform/posix"
+		src/platform/posix/error.cpp
+		src/platform/posix/error.h
+		)
+elseif(WIN32)
 	y_sources(ycore "src/platform/windows"
 		src/platform/windows/com.cpp
 		src/platform/windows/com.h
