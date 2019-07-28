@@ -21,8 +21,8 @@
 
 namespace Yttrium
 {
-	void* pages_allocate(size_t) noexcept;
-	void pages_deallocate(void*, size_t) noexcept;
-	size_t pages_granularity() noexcept;
-	void* pages_reallocate(void*, size_t, size_t) noexcept;
+	void* vm_allocate(size_t) noexcept;
+	void vm_deallocate(void*, size_t) noexcept;
+	size_t vm_granularity() noexcept;
+	void* vm_reallocate(void*, size_t, size_t) noexcept;
 }

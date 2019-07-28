@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "../memory.h"
+#include "virtual_memory.h"
 
-#include "../../platform/posix/error.h"
+#include "../platform/posix/error.h"
 
 #include <algorithm>   // std::min
 #include <array>       // std::array
@@ -29,7 +29,7 @@
 
 namespace Yttrium
 {
-	void* pages_allocate(size_t size) noexcept
+	void* vm_allocate(size_t size) noexcept
 	{
 		const auto result = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (result != MAP_FAILED)
@@ -38,13 +38,13 @@ namespace Yttrium
 		return nullptr;
 	}
 
-	void pages_deallocate(void* pointer, size_t size) noexcept
+	void vm_deallocate(void* pointer, size_t size) noexcept
 	{
 		if (::munmap(pointer, size) != 0)
 			report_errno("munmap");
 	}
 
-	size_t pages_granularity() noexcept
+	size_t vm_granularity() noexcept
 	{
 		if (const auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0)
 			return static_cast<size_t>(page_size);
@@ -52,7 +52,7 @@ namespace Yttrium
 		return 1;
 	}
 
-	void* pages_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
+	void* vm_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
 	{
 		// 'mremap' is Linux-specific and known to be very slow.
 		const auto new_pointer = ::mmap(nullptr, new_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

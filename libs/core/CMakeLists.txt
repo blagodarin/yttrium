@@ -105,17 +105,17 @@ y_sources(ycore "src/memory"
 	src/memory/buffer_memory.cpp
 	src/memory/buffer_memory.h
 	src/memory/buffer.cpp
-	src/memory/memory.h
 	src/memory/pool.cpp
 	src/memory/raw.h
+	src/memory/virtual_memory.h
 	)
 if(UNIX)
-	y_sources(ycore "src/memory/_posix"
-		src/memory/_posix/memory.cpp
+	y_sources(ycore "src/memory"
+		src/memory/virtual_memory_posix.cpp
 		)
 elseif(WIN32)
-	y_sources(ycore "src/memory/_windows"
-		src/memory/_windows/memory.cpp
+	y_sources(ycore "src/memory"
+		src/memory/virtual_memory_windows.cpp
 		)
 endif()
 
