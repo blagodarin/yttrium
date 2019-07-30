@@ -18,7 +18,7 @@
 #include "error.h"
 
 #include <yttrium/logger.h>
-#include "../../utils/ring_log.h"
+#include "../../logger/ring_log.h"
 
 #include <cerrno>
 #include <cstdio>

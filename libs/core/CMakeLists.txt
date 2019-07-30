@@ -17,7 +17,6 @@
 
 set(_src
 	src/intrinsics.h
-	src/logger.cpp
 	src/main.cpp
 	src/translation.cpp
 	)
@@ -118,6 +117,12 @@ y_sources(ycore "src/ion"
 	src/ion/writer.cpp
 	)
 
+y_sources(ycore "src/logger"
+	src/logger/logger.cpp
+	src/logger/ring_log.cpp
+	src/logger/ring_log.h
+	)
+
 y_sources(ycore "src/memory"
 	src/memory/buffer_memory.cpp
 	src/memory/buffer_memory.h
@@ -186,8 +191,6 @@ y_sources(ycore "src/utils"
 	src/utils/algorithm.h
 	src/utils/atomic_counters.h
 	src/utils/crc32.h
-	src/utils/ring_log.cpp
-	src/utils/ring_log.h
 	src/utils/string.cpp
 	src/utils/string.h
 	)

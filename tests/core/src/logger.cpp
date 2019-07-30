@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "../../../libs/core/src/utils/ring_log.h"
+#include "../../../libs/core/src/logger/ring_log.h"
 
 #include <catch2/catch.hpp>
 

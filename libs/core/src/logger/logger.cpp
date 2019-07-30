@@ -17,7 +17,7 @@
 
 #include <yttrium/logger.h>
 
-#include "utils/ring_log.h"
+#include "ring_log.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -36,7 +36,7 @@ namespace Yttrium
 	class LoggerPrivate
 	{
 	public:
-		static std::unique_ptr<LoggerPrivate> create()
+		[[nodiscard]] static std::unique_ptr<LoggerPrivate> create()
 		{
 			bool expected = false;
 			return _global_logger_created.compare_exchange_strong(expected, true) ? std::make_unique<LoggerPrivate>() : nullptr;
