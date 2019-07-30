@@ -17,6 +17,7 @@
 
 set(_src
 	src/intrinsics.h
+	src/logger.cpp
 	src/main.cpp
 	src/translation.cpp
 	)
@@ -40,6 +41,7 @@ y_sources(ycore "include"
 	include/yttrium/api.h
 	include/yttrium/exceptions.h
 	include/yttrium/image.h
+	include/yttrium/logger.h
 	include/yttrium/translation.h
 	)
 

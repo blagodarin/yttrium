@@ -21,6 +21,7 @@
 #include <yttrium/audio/utils.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
+#include <yttrium/logger.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
 #include <yttrium/resource_loader.h>
@@ -33,8 +34,6 @@
 #include <yttrium/window.h>
 #include "../../common/include/utils.h"
 #include "graphics.h"
-
-#include <iostream>
 
 using namespace Yttrium;
 
@@ -97,7 +96,7 @@ namespace
 		}
 		catch (const std::runtime_error& e)
 		{
-			std::cerr << e.what() << '\n';
+			Logger::log(e.what());
 			return {};
 		}
 	}
@@ -196,6 +195,7 @@ namespace
 
 int main(int, char**)
 {
+	Logger logger;
 	Application application;
 
 	Window window{ application };

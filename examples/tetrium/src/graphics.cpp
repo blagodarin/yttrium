@@ -69,9 +69,9 @@ namespace
 		// clang-format on
 	};
 
-	static constexpr auto FragmentSize = 32u;
-	static constexpr auto FragmentCount = 8u;
-	static constexpr auto Border = 3;
+	constexpr auto FragmentSize = 32u;
+	constexpr auto FragmentCount = 8u;
+	constexpr auto Border = 3;
 
 	Rgb pixel_color(size_t block, size_t x, size_t y)
 	{

@@ -17,6 +17,7 @@
 
 #include "manager.h"
 
+#include <yttrium/logger.h>
 #include "mixer.h"
 #include "sound.h"
 
@@ -25,10 +26,6 @@
 #else
 #	include <pthread.h>
 #	include <sched.h>
-#endif
-
-#ifndef NDEBUG
-#	include <iostream>
 #endif
 
 namespace
@@ -131,11 +128,9 @@ namespace Yttrium
 				}
 			}
 		}
-		catch ([[maybe_unused]] const std::runtime_error& e)
+		catch (const std::runtime_error& e)
 		{
-#ifndef NDEBUG
-			std::cerr << e.what() << '\n';
-#endif
+			Logger::log("(AudioManager) ", e.what());
 		}
 	}
 

@@ -17,15 +17,13 @@
 
 #include <yttrium/script/context.h>
 
+#include <yttrium/logger.h>
 #include <yttrium/memory/pool.h>
 #include <yttrium/script/args.h>
 #include <yttrium/script/value.h>
 #include <yttrium/utils/string.h>
 
 #include <algorithm>
-#include <cassert>
-#include <iostream>
-#include <string>
 #include <unordered_map>
 
 namespace Yttrium
@@ -65,21 +63,20 @@ namespace Yttrium
 	{
 		if (name.empty())
 		{
-			std::cerr << "Invalid command \"\"\n";
+			Logger::log("Invalid command \"\"");
 			return false;
 		}
 
 		const auto command = _private->_commands.find(name);
 		if (command == _private->_commands.end())
 		{
-			std::cerr << "Unknown command \"" << name << "\"\n";
+			Logger::log("Unknown command \"", name, '"');
 			return false;
 		}
 
 		if (args.size() < command->second._min_args || args.size() > command->second._max_args)
 		{
-			std::cerr << "Argument number mismatch for \"" << name << "\": "
-					  << args.size() << " instead of " << command->second._min_args << "-" << command->second._max_args << "\n";
+			Logger::log("Argument number mismatch for \"", name, "\": ", args.size(), " instead of ", command->second._min_args, "-", command->second._max_args);
 			return false;
 		}
 
@@ -92,14 +89,13 @@ namespace Yttrium
 		const auto command = _private->_commands.find(name);
 		if (command == _private->_commands.end())
 		{
-			std::cerr << "Unknown command \"" << name << "\"\n";
+			Logger::log("Unknown command \"", name, '"');
 			return false;
 		}
 
 		if (arg_strings.size() < command->second._min_args || arg_strings.size() > command->second._max_args)
 		{
-			std::cerr << "Argument number mismatch for \"" << name << "\": "
-					  << arg_strings.size() << " instead of " << command->second._min_args << "-" << command->second._max_args << "\n";
+			Logger::log("Argument number mismatch for \"", name, "\": ", arg_strings.size(), " instead of ", command->second._min_args, "-", command->second._max_args);
 			return false;
 		}
 

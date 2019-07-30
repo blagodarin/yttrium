@@ -15,31 +15,30 @@
 // limitations under the License.
 //
 
-#include "program.h"
+#pragma once
 
-#include <yttrium/logger.h>
+#include <yttrium/utils/string.h>
+
+#include <memory>
 
 namespace Yttrium
 {
-	GlProgram::GlProgram(GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
-		: _vertex_shader{ std::move(vertex_shader) }
-		, _fragment_shader{ std::move(fragment_shader) }
-		, _program{ gl }
+	class Y_CORE_API Logger
 	{
-		_program.attach(_vertex_shader.get());
-		_program.attach(_fragment_shader.get());
-	}
+	public:
+		Logger();
+		~Logger() noexcept;
 
-	void GlProgram::set_uniform(const std::string& name, const Matrix4& value)
-	{
-		_program.set_uniform(name.c_str(), value);
-	}
+		static void flush();
+		static void write(std::string_view) noexcept;
 
-	bool GlProgram::link()
-	{
-		if (_program.link())
-			return true;
-		Logger::log(_program.info_log());
-		return false;
-	}
+		template <typename... Args>
+		static void log(Args&&... args)
+		{
+			write(make_string(std::forward<Args>(args)...));
+		}
+
+	private:
+		const std::unique_ptr<class LoggerPrivate> _private;
+	};
 }

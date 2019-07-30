@@ -17,6 +17,7 @@
 
 #include "renderer.h"
 
+#include <yttrium/logger.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/utils/numeric.h>
@@ -29,7 +30,6 @@
 
 #ifndef NDEBUG
 #	include <csignal>
-#	include <iostream>
 #endif
 
 namespace
@@ -137,18 +137,14 @@ namespace Yttrium
 		GlShaderHandle vertex{ _gl, GL_VERTEX_SHADER };
 		if (!vertex.compile(vertex_shader))
 		{
-#ifndef NDEBUG
-			std::cerr << vertex.info_log() << "\n";
-#endif
+			Logger::log(vertex.info_log());
 			return {};
 		}
 
 		GlShaderHandle fragment{ _gl, GL_FRAGMENT_SHADER };
 		if (!fragment.compile(fragment_shader))
 		{
-#ifndef NDEBUG
-			std::cerr << fragment.info_log() << "\n";
-#endif
+			Logger::log(fragment.info_log());
 			return {};
 		}
 
@@ -267,28 +263,30 @@ namespace Yttrium
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			std::cerr << "[OPENGL] [error] ";
+			Logger::log("(OpenGL) Error! ", message);
 			break;
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			std::cerr << "[OPENGL] [deprecated] ";
+			Logger::log("(OpenGL) Deprecated behavior! ", message);
 			break;
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			std::cerr << "[OPENGL] [undefined behavior] ";
+			Logger::log("(OpenGL) Undefined behavior! ", message);
 			break;
 		case GL_DEBUG_TYPE_PORTABILITY:
-			std::cerr << "[OPENGL] [portability warning] ";
+			Logger::log("(OpenGL) Portability warning! ", message);
 			break;
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			std::cerr << "[OPENGL] [performance warning] ";
+			Logger::log("(OpenGL) Performance warning! ", message);
 			break;
 		default:
-			std::cerr << "[OPENGL] ";
+			Logger::log("(OpenGL) ", message);
 			stop = false;
 			break;
 		}
-		std::cerr << message << "\n";
 		if (stop)
+		{
+			Logger::flush();
 			::raise(SIGINT);
+		}
 	}
 #endif
 }

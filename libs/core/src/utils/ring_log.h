@@ -20,6 +20,7 @@
 #include <yttrium/api.h>
 
 #include <array>
+#include <condition_variable>
 #include <cstdint>
 #include <limits>
 #include <mutex>
@@ -34,14 +35,17 @@ namespace Yttrium
 		static constexpr size_t BufferSize = 4096;
 		static constexpr size_t MaxStringSize = std::numeric_limits<uint8_t>::max();
 
-		bool pop(std::string&);
+		bool pop(std::string&, bool block);
 		void push(std::string_view) noexcept;
+		bool shutdown() noexcept;
 
 	private:
 		std::mutex _mutex;
 		size_t _offset = 0;
 		size_t _size = 0;
 		std::array<uint8_t, BufferSize> _buffer;
+		std::condition_variable _ready;
+		bool _finished = false;
 	};
 
 	extern RingLog _ring_log;

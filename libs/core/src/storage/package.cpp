@@ -17,13 +17,11 @@
 
 #include <yttrium/storage/package.h>
 
+#include <yttrium/logger.h>
 #include <yttrium/storage/source.h>
 #include "../utils/string.h"
 #include "formats/ypq.h"
 #include "package.h"
-
-#include <iostream>
-#include <string>
 
 namespace Yttrium
 {
@@ -46,7 +44,7 @@ namespace Yttrium
 		}
 		catch (const BadPackage& e)
 		{
-			std::cerr << "(" << path << ") " << e.what() << "\n";
+			Logger::log('(', path, ") ", e.what());
 		}
 		return {};
 	}

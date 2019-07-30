@@ -18,14 +18,11 @@
 #include "error.h"
 
 #include <yttrium/exceptions.h>
+#include <yttrium/logger.h>
 #include <yttrium/memory/smart_ptr.h>
 #include <yttrium/utils/string.h>
 
 #include <windows.h>
-
-#ifndef NDEBUG
-#	include <iostream>
-#endif
 
 namespace Yttrium
 {
@@ -52,19 +49,8 @@ namespace Yttrium
 
 	void print_last_error(std::string_view function) noexcept
 	{
-		std::ignore = function;
-#ifndef NDEBUG
 		if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
-		{
-			try
-			{
-				std::cerr << std::string{ function } << " failed: " << error_to_string(error) << '\n';
-			}
-			catch (const std::bad_alloc&)
-			{
-			}
-		}
-#endif
+			Logger::log(function, " failed: ", error_to_string(error)); // TODO: Handle std::bad_alloc.
 	}
 
 	void throw_last_error(std::string_view function)

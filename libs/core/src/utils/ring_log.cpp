@@ -32,9 +32,11 @@ namespace
 
 namespace Yttrium
 {
-	bool RingLog::pop(std::string& text)
+	bool RingLog::pop(std::string& text, bool block)
 	{
-		std::scoped_lock lock{ _mutex };
+		std::unique_lock lock{ _mutex };
+		if (block)
+			_ready.wait(lock, [this] { return _size != 0 || _finished; });
 		if (_size == 0)
 			return false;
 		const auto text_offset = (_offset + 1) & OffsetMask;
@@ -54,22 +56,39 @@ namespace Yttrium
 	void RingLog::push(std::string_view text) noexcept
 	{
 		const auto text_size = std::min(text.size(), MaxStringSize);
-		std::scoped_lock lock{ _mutex };
-		while (text_size >= _buffer.size() - _size)
 		{
-			const auto skip = 1u + _buffer[_offset];
-			_offset = (_offset + skip) & OffsetMask;
-			_size -= skip;
+			std::scoped_lock lock{ _mutex };
+			if (_finished)
+				return;
+			while (text_size >= _buffer.size() - _size)
+			{
+				const auto skip = 1u + _buffer[_offset];
+				_offset = (_offset + skip) & OffsetMask;
+				_size -= skip;
+			}
+			_buffer[(_offset + _size++) & OffsetMask] = static_cast<uint8_t>(text_size);
+			const auto begin = (_offset + _size) & OffsetMask;
+			if (const auto continuous_size = _buffer.size() - begin; text_size > continuous_size)
+			{
+				std::memcpy(_buffer.data() + begin, text.data(), continuous_size);
+				std::memcpy(_buffer.data(), text.data() + continuous_size, text_size - continuous_size);
+			}
+			else
+				std::memcpy(_buffer.data() + begin, text.data(), text_size);
+			_size += text_size;
 		}
-		_buffer[(_offset + _size++) & OffsetMask] = static_cast<uint8_t>(text_size);
-		const auto begin = (_offset + _size) & OffsetMask;
-		if (const auto continuous_size = _buffer.size() - begin; text_size > continuous_size)
+		_ready.notify_one();
+	}
+
+	bool RingLog::shutdown() noexcept
+	{
 		{
-			std::memcpy(_buffer.data() + begin, text.data(), continuous_size);
-			std::memcpy(_buffer.data(), text.data() + continuous_size, text_size - continuous_size);
+			std::scoped_lock lock{ _mutex };
+			if (_finished)
+				return false;
+			_finished = true;
 		}
-		else
-			std::memcpy(_buffer.data() + begin, text.data(), text_size);
-		_size += text_size;
+		_ready.notify_one();
+		return true;
 	}
 }
