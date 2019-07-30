@@ -19,7 +19,7 @@
 
 #include <catch2/catch.hpp>
 
-TEST_CASE("ring_log.nonblocking")
+TEST_CASE("logger.ring_log")
 {
 	constexpr size_t buffer_size = Yttrium::RingLog::BufferSize;
 	constexpr size_t string_size = 251; // A prime number.
@@ -27,24 +27,28 @@ TEST_CASE("ring_log.nonblocking")
 	constexpr size_t max_strings = buffer_size / string_size;
 
 	Yttrium::RingLog log;
+	CHECK(log.empty());
 
 	std::string string;
-	CHECK(!log.pop(string, false));
+	CHECK(!log.pop(string));
 
 	char next = 'A';
 	for (size_t i = 0; i < max_strings + 1; ++i)
 	{
 		log.push(std::string(string_size, next));
+		CHECK(!log.empty());
 		next = next == 'Z' ? 'A' : static_cast<char>(next + 1);
 	}
 
 	next = 'B';
 	for (size_t i = 0; i < max_strings; ++i)
 	{
-		CHECK(log.pop(string, false));
+		CHECK(!log.empty());
+		CHECK(log.pop(string));
 		CHECK(string == std::string(string_size, next));
 		next = next == 'Z' ? 'A' : static_cast<char>(next + 1);
 	}
 
-	CHECK(!log.pop(string, false));
+	CHECK(log.empty());
+	CHECK(!log.pop(string));
 }

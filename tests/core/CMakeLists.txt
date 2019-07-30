@@ -28,13 +28,13 @@ set(_src
 	src/ion_writer.cpp
 	src/iostream.cpp
 	src/iostream.h
+	src/logger.cpp
 	src/margins.cpp
 	src/matrix.cpp
 	src/package.cpp
 	src/point.cpp
 	src/reader.cpp
 	src/rect.cpp
-	src/ring_log.cpp
 	src/script.cpp
 	src/source.cpp
 	src/temporary_file.cpp

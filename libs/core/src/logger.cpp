@@ -20,12 +20,15 @@
 #include "utils/ring_log.h"
 
 #include <atomic>
+#include <condition_variable>
 #include <iostream>
+#include <mutex>
 #include <thread>
 
 namespace
 {
-	std::atomic<Yttrium::Logger*> _the_logger{ nullptr };
+	std::atomic<bool> _global_logger_created{ false };
+	std::atomic<Yttrium::LoggerPrivate*> _global_logger_private{ nullptr };
 }
 
 namespace Yttrium
@@ -33,35 +36,64 @@ namespace Yttrium
 	class LoggerPrivate
 	{
 	public:
-		static std::unique_ptr<LoggerPrivate> create(Logger* logger)
+		static std::unique_ptr<LoggerPrivate> create()
 		{
-			// A race condition can occur if one thread is creating a logger and another thread is
-			// trying to access it. Since it is impossible in a practical scenario, we don't care.
-			Logger* expected = nullptr;
-			return _the_logger.compare_exchange_strong(expected, logger) ? std::make_unique<LoggerPrivate>() : nullptr;
+			bool expected = false;
+			return _global_logger_created.compare_exchange_strong(expected, true) ? std::make_unique<LoggerPrivate>() : nullptr;
+		}
+
+		LoggerPrivate()
+		{
+			_global_logger_private = this;
 		}
 
 		~LoggerPrivate() noexcept
 		{
-			if (_ring_log.shutdown())
-				_thread.join();
-			_the_logger = nullptr;
+			_global_logger_private = nullptr;
+			{
+				std::scoped_lock lock{ _mutex };
+				_stop = true;
+			}
+			_ready.notify_one();
+			_thread.join();
+			_global_logger_created = false;
+		}
+
+		void push(std::string_view message) noexcept
+		{
+			{
+				std::scoped_lock lock{ _mutex };
+				_ring_log.push(message);
+			}
+			_ready.notify_one();
 		}
 
 	private:
 		void run()
 		{
-			std::string string;
-			while (_ring_log.pop(string, true))
-				std::cerr << string << '\n';
+			for (std::string message;;)
+			{
+				{
+					std::unique_lock lock{ _mutex };
+					_ready.wait(lock, [this] { return !_ring_log.empty() || _stop; });
+					if (_stop)
+						break;
+					_ring_log.pop(message);
+				}
+				std::cerr << message << '\n';
+			}
 		}
 
 	private:
+		std::mutex _mutex;
+		RingLog _ring_log;
+		bool _stop = false;
+		std::condition_variable _ready;
 		std::thread _thread{ [this] { run(); } };
 	};
 
 	Logger::Logger()
-		: _private{ LoggerPrivate::create(this) }
+		: _private{ LoggerPrivate::create() }
 	{
 	}
 
@@ -74,6 +106,7 @@ namespace Yttrium
 
 	void Logger::write(std::string_view message) noexcept
 	{
-		_ring_log.push(message);
+		if (const auto logger = _global_logger_private.load())
+			logger->push(message);
 	}
 }

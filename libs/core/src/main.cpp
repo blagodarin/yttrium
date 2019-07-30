@@ -16,10 +16,8 @@
 //
 
 #include "memory/buffer_memory.h"
-#include "utils/ring_log.h"
 
 namespace Yttrium
 {
-	RingLog _ring_log;
 	BufferMemory _buffer_memory;
 }

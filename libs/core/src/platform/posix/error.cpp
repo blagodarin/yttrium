@@ -17,6 +17,7 @@
 
 #include "error.h"
 
+#include <yttrium/logger.h>
 #include "../../utils/ring_log.h"
 
 #include <cerrno>
@@ -39,6 +40,6 @@ namespace Yttrium
 				buffer[written - 2] = '\0'; // Strip ": ".
 #endif
 		}
-		Yttrium::_ring_log.push(buffer.data());
+		Logger::write(buffer.data());
 	}
 }
