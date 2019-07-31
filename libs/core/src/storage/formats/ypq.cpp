@@ -164,7 +164,7 @@ namespace Yttrium
 			Writer writer{ metadata_buffer };
 
 			const auto write_string = [&writer](const std::string& value) {
-				const auto size = static_cast<uint8_t>(value.size());
+				const auto size = static_cast<uint8_t>(value.size()); //-V1029
 				return size == value.size() && writer.write(size) && writer.write(value.data(), size);
 			};
 

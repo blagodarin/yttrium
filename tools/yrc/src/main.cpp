@@ -33,7 +33,7 @@ namespace
 
 int main(int argc, char** argv)
 {
-	if (argc != 4 || std::strcmp(argv[1], "--string"))
+	if (argc != 4 || std::strcmp(argv[1], "--string")) //-V526
 		return print_usage();
 
 	std::vector<char> buffer;
@@ -93,4 +93,5 @@ int main(int argc, char** argv)
 		}
 	}
 	output << "\"\n";
+	return 0;
 }

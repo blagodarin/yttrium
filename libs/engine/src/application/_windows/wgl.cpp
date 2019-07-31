@@ -114,7 +114,10 @@ namespace Yttrium
 	{
 		auto p = ::wglGetProcAddress(name);
 		if (!p || p == (void*)1 || p == (void*)2 || p == (void*)3 || p == (void*)-1) // Extra failure results from the OpenGL wiki.
-			p = ::GetProcAddress(::GetModuleHandleA("opengl32.dll"), name);
+			if (const auto opengl32 = ::GetModuleHandleA("opengl32.dll"))
+				p = ::GetProcAddress(opengl32, name);
+			else
+				p = nullptr;
 		return reinterpret_cast<GlAddress>(p);
 	}
 }

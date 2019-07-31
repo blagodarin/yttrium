@@ -72,4 +72,5 @@ int main(int argc, char** argv)
 		std::cerr << "ERROR: Unable to write \"" << argv[1] << "\"\n";
 		return 1;
 	}
+	return 0;
 }

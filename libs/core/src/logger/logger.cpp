@@ -42,7 +42,7 @@ namespace Yttrium
 			return _global_logger_created.compare_exchange_strong(expected, true) ? std::make_unique<LoggerPrivate>() : nullptr;
 		}
 
-		LoggerPrivate()
+		LoggerPrivate() //-V730
 		{
 			_global_logger_private = this;
 		}

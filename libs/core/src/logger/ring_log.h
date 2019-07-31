@@ -26,7 +26,7 @@
 
 namespace Yttrium
 {
-	class Y_CORE_API RingLog
+	class Y_CORE_API RingLog //-V730
 	{
 	public:
 		static constexpr size_t BufferSize = 4096;

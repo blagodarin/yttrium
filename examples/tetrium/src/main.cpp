@@ -264,4 +264,5 @@ int main(int, char**)
 			window.set_icon(*image);
 	window.show();
 	application.run();
+	return 0;
 }
