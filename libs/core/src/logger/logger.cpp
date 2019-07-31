@@ -54,9 +54,16 @@ namespace Yttrium
 				std::scoped_lock lock{ _mutex };
 				_stop = true;
 			}
+			_flushed.notify_all();
 			_ready.notify_one();
 			_thread.join();
 			_global_logger_created = false;
+		}
+
+		void flush() noexcept
+		{
+			std::unique_lock lock{ _mutex };
+			_flushed.wait(lock, [this] { return _ring_log.empty() || _stop; });
 		}
 
 		void push(std::string_view message) noexcept
@@ -73,14 +80,19 @@ namespace Yttrium
 		{
 			for (std::string message;;)
 			{
+				bool notify = false;
 				{
 					std::unique_lock lock{ _mutex };
 					_ready.wait(lock, [this] { return !_ring_log.empty() || _stop; });
 					if (_stop)
 						break;
 					_ring_log.pop(message);
+					if (_ring_log.empty())
+						notify = true;
 				}
 				std::cerr << message << '\n';
+				if (notify)
+					_flushed.notify_all();
 			}
 		}
 
@@ -89,6 +101,7 @@ namespace Yttrium
 		RingLog _ring_log;
 		bool _stop = false;
 		std::condition_variable _ready;
+		std::condition_variable _flushed;
 		std::thread _thread{ [this] { run(); } };
 	};
 
@@ -99,9 +112,10 @@ namespace Yttrium
 
 	Logger::~Logger() noexcept = default;
 
-	void Logger::flush()
+	void Logger::flush() noexcept
 	{
-		std::this_thread::sleep_for(std::chrono::seconds{ 1 }); // TODO: Proper flushing.
+		if (const auto logger = _global_logger_private.load())
+			logger->flush();
 	}
 
 	void Logger::write(std::string_view message) noexcept

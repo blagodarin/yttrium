@@ -29,7 +29,7 @@ namespace Yttrium
 		Logger();
 		~Logger() noexcept;
 
-		static void flush();
+		static void flush() noexcept;
 		static void write(std::string_view) noexcept;
 
 		template <typename... Args>
