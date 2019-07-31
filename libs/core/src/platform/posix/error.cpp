@@ -30,7 +30,7 @@ namespace Yttrium
 	{
 		const auto error = errno;
 		std::array<char, Yttrium::RingLog::MaxStringSize + 1> buffer;
-		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "[ERR] %s failed: ", function));
+		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: ", function));
 		if (written < Yttrium::RingLog::MaxStringSize)
 		{
 			// cppcheck-suppress unreadVariable
