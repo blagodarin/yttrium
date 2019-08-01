@@ -19,6 +19,7 @@
 
 #include <yttrium/utils/string.h>
 
+#include <functional>
 #include <memory>
 
 namespace Yttrium
@@ -26,7 +27,10 @@ namespace Yttrium
 	class Y_CORE_API Logger
 	{
 	public:
-		Logger();
+		/// Creates a logger that asynchronously feeds messages into the callback
+		/// or to the standard error stream if no callback is specified.
+		Logger(std::function<void(std::string_view)>&& callback = {});
+
 		~Logger() noexcept;
 
 		static void flush() noexcept;

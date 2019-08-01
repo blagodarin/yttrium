@@ -36,13 +36,16 @@ namespace Yttrium
 	class LoggerPrivate
 	{
 	public:
-		[[nodiscard]] static std::unique_ptr<LoggerPrivate> create()
+		[[nodiscard]] static std::unique_ptr<LoggerPrivate> create(std::function<void(std::string_view)>&& callback)
 		{
 			bool expected = false;
-			return _global_logger_created.compare_exchange_strong(expected, true) ? std::make_unique<LoggerPrivate>() : nullptr;
+			return _global_logger_created.compare_exchange_strong(expected, true)
+				? std::make_unique<LoggerPrivate>(std::move(callback))
+				: nullptr;
 		}
 
-		LoggerPrivate() //-V730
+		LoggerPrivate(std::function<void(std::string_view)>&& callback) //-V730
+			: _thread{ [this, cb = std::move(callback)] { run(cb ? cb : [](std::string_view message) { std::cerr << message << '\n'; }); } }
 		{
 			_global_logger_private = this;
 		}
@@ -55,7 +58,7 @@ namespace Yttrium
 				_stop = true;
 			}
 			_flushed.notify_all();
-			_ready.notify_one();
+			_can_process.notify_one();
 			_thread.join();
 			_global_logger_created = false;
 		}
@@ -63,7 +66,9 @@ namespace Yttrium
 		void flush() noexcept
 		{
 			std::unique_lock lock{ _mutex };
-			_flushed.wait(lock, [this] { return _ring_log.empty() || _stop; });
+			++_flushing;
+			_flushed.wait(lock, [this] { return (_ring_log.empty() && !_processing) || _stop; });
+			--_flushing;
 		}
 
 		void push(std::string_view message) noexcept
@@ -72,41 +77,46 @@ namespace Yttrium
 				std::scoped_lock lock{ _mutex };
 				_ring_log.push(message);
 			}
-			_ready.notify_one();
+			_can_process.notify_one();
 		}
 
 	private:
-		void run()
+		void run(const std::function<void(std::string_view)>& callback)
 		{
 			for (std::string message;;)
 			{
-				bool notify = false;
 				{
 					std::unique_lock lock{ _mutex };
-					_ready.wait(lock, [this] { return !_ring_log.empty() || _stop; });
+					_processing = false;
+					if (_ring_log.empty() && _flushing > 0)
+					{
+						lock.unlock();
+						_flushed.notify_all();
+						lock.lock();
+					}
+					_can_process.wait(lock, [this] { return !_ring_log.empty() || _stop; });
 					if (_stop)
 						break;
 					_ring_log.pop(message);
-					if (_ring_log.empty())
-						notify = true;
+					_processing = true;
 				}
-				std::cerr << message << '\n';
-				if (notify)
-					_flushed.notify_all();
+				callback(message);
 			}
 		}
 
 	private:
 		std::mutex _mutex;
-		RingLog _ring_log;
 		bool _stop = false;
-		std::condition_variable _ready;
+		bool _processing = false;
+		size_t _flushing = 0;
+		std::condition_variable _can_process;
 		std::condition_variable _flushed;
-		std::thread _thread{ [this] { run(); } };
+		RingLog _ring_log;
+		std::thread _thread;
 	};
 
-	Logger::Logger()
-		: _private{ LoggerPrivate::create() }
+	Logger::Logger(std::function<void(std::string_view)>&& callback)
+		: _private{ LoggerPrivate::create(std::move(callback)) }
 	{
 	}
 
