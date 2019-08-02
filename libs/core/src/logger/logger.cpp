@@ -44,7 +44,7 @@ namespace Yttrium
 				: nullptr;
 		}
 
-		LoggerPrivate(std::function<void(std::string_view)>&& callback) //-V730
+		explicit LoggerPrivate(std::function<void(std::string_view)>&& callback) //-V730
 			: _thread{ [this, cb = std::move(callback)] { run(cb ? cb : [](std::string_view message) { std::cerr << message << '\n'; }); } }
 		{
 			_global_logger_private = this;
@@ -95,7 +95,7 @@ namespace Yttrium
 						lock.lock();
 					}
 					_can_process.wait(lock, [this] { return !_ring_log.empty() || _stop; });
-					if (_stop)
+					if (_stop && _ring_log.empty())
 						break;
 					_ring_log.pop(message);
 					_processing = true;

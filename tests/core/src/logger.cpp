@@ -23,7 +23,7 @@
 
 #include <catch2/catch.hpp>
 
-TEST_CASE("logger")
+TEST_CASE("logger.flush")
 {
 	std::vector<std::string> messages;
 	std::mutex mutex;
@@ -34,29 +34,47 @@ TEST_CASE("logger")
 		messages.emplace_back(message);
 	} };
 
-	SECTION("flush")
+	logger.write("Hello...");
+	logger.write("...world!");
 	{
+		std::scoped_lock lock{ mutex };
+		CHECK(messages.empty());
+	}
+	logger.flush();
+	logger.write("Hello?");
+	{
+		std::scoped_lock lock{ mutex };
+		REQUIRE(messages.size() == 2);
+		CHECK(messages[0] == "Hello...");
+		CHECK(messages[1] == "...world!");
+	}
+	logger.flush();
+	{
+		std::scoped_lock lock{ mutex };
+		REQUIRE(messages.size() == 3);
+		CHECK(messages[2] == "Hello?");
+	}
+}
+
+TEST_CASE("logger.flush_on_destruction")
+{
+	std::vector<std::string> messages;
+	std::mutex mutex;
+	{
+		Yttrium::Logger logger{ [&](std::string_view message) {
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
+			std::scoped_lock lock{ mutex };
+			messages.emplace_back(message);
+		} };
+
 		logger.write("Hello...");
 		logger.write("...world!");
-		{
-			std::scoped_lock lock{ mutex };
-			CHECK(messages.empty());
-		}
-		logger.flush();
-		logger.write("Hello?");
-		{
-			std::scoped_lock lock{ mutex };
-			REQUIRE(messages.size() == 2);
-			CHECK(messages[0] == "Hello...");
-			CHECK(messages[1] == "...world!");
-		}
-		logger.flush();
-		{
-			std::scoped_lock lock{ mutex };
-			REQUIRE(messages.size() == 3);
-			CHECK(messages[2] == "Hello?");
-		}
+		std::scoped_lock lock{ mutex };
+		CHECK(messages.empty());
 	}
+	REQUIRE(messages.size() == 2);
+	CHECK(messages[0] == "Hello...");
+	CHECK(messages[1] == "...world!");
 }
 
 TEST_CASE("logger.ring_log")
