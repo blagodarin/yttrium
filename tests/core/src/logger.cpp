@@ -23,32 +23,40 @@
 
 #include <catch2/catch.hpp>
 
+using Yttrium::Logger;
+
 TEST_CASE("logger.flush")
 {
 	std::vector<std::string> messages;
 	std::mutex mutex;
 
-	Yttrium::Logger logger{ [&](std::string_view message) {
+	Logger logger{ [&](std::string_view message) {
 		std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
 		std::scoped_lock lock{ mutex };
 		messages.emplace_back(message);
 	} };
-
-	logger.write("Hello...");
-	logger.write("...world!");
 	{
 		std::scoped_lock lock{ mutex };
 		CHECK(messages.empty());
 	}
-	logger.flush();
-	logger.write("Hello?");
+
+	Logger::write("Hello...");
+	Logger::write("...world!");
+	{
+		std::scoped_lock lock{ mutex };
+		CHECK(messages.empty());
+	}
+
+	Logger::flush();
+	Logger::write("Hello?");
 	{
 		std::scoped_lock lock{ mutex };
 		REQUIRE(messages.size() == 2);
 		CHECK(messages[0] == "Hello...");
 		CHECK(messages[1] == "...world!");
 	}
-	logger.flush();
+
+	Logger::flush();
 	{
 		std::scoped_lock lock{ mutex };
 		REQUIRE(messages.size() == 3);
@@ -60,21 +68,38 @@ TEST_CASE("logger.flush_on_destruction")
 {
 	std::vector<std::string> messages;
 	std::mutex mutex;
-	{
-		Yttrium::Logger logger{ [&](std::string_view message) {
-			std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
-			std::scoped_lock lock{ mutex };
-			messages.emplace_back(message);
-		} };
 
-		logger.write("Hello...");
-		logger.write("...world!");
+	auto logger = std::make_unique<Logger>([&](std::string_view message) {
+		std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
+		std::scoped_lock lock{ mutex };
+		messages.emplace_back(message);
+	});
+	{
 		std::scoped_lock lock{ mutex };
 		CHECK(messages.empty());
 	}
-	REQUIRE(messages.size() == 2);
-	CHECK(messages[0] == "Hello...");
-	CHECK(messages[1] == "...world!");
+
+	Logger::write("Hello...");
+	Logger::write("...world!");
+	{
+		std::scoped_lock lock{ mutex };
+		CHECK(messages.empty());
+	}
+
+	logger.reset();
+	{
+		std::scoped_lock lock{ mutex };
+		REQUIRE(messages.size() == 2);
+		CHECK(messages[0] == "Hello...");
+		CHECK(messages[1] == "...world!");
+	}
+
+	Logger::write("Hello?");
+	Logger::flush();
+	{
+		std::scoped_lock lock{ mutex };
+		CHECK(messages.size() == 2);
+	}
 }
 
 TEST_CASE("logger.ring_log")

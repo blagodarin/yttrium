@@ -21,7 +21,8 @@
 #include <yttrium/logger.h>
 #include <yttrium/memory/smart_ptr.h>
 #include <yttrium/utils/string.h>
-#include "../../logger/ring_log.h"
+
+#include <array>
 
 #include <windows.h>
 
@@ -62,7 +63,7 @@ namespace Yttrium
 	{
 		if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
 		{
-			std::array<char, RingLog::MaxStringSize + 1> buffer;
+			std::array<char, Logger::MaxMessageSize + 1> buffer;
 			if (const auto description = ::windows_error_description(error))
 				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X] %s", function, static_cast<unsigned>(error), description.get());
 			else

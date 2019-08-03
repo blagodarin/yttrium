@@ -18,7 +18,6 @@
 #include "error.h"
 
 #include <yttrium/logger.h>
-#include "../../logger/ring_log.h"
 
 #include <cerrno>
 #include <cstdio>
@@ -29,9 +28,9 @@ namespace Yttrium
 	void report_errno(const char* function) noexcept
 	{
 		const auto error = errno;
-		std::array<char, Yttrium::RingLog::MaxStringSize + 1> buffer;
+		std::array<char, Logger::MaxMessageSize + 1> buffer;
 		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: ", function));
-		if (written < Yttrium::RingLog::MaxStringSize)
+		if (written < Logger::MaxMessageSize)
 		{
 			// cppcheck-suppress unreadVariable
 			[[maybe_unused]] const auto status = ::strerror_r(error, buffer.data() + written, buffer.size() - written);

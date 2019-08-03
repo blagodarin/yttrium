@@ -20,6 +20,7 @@
 #include "ring_log.h"
 
 #include <atomic>
+#include <cassert>
 #include <condition_variable>
 #include <iostream>
 #include <mutex>
@@ -27,6 +28,8 @@
 
 namespace
 {
+	static_assert(Yttrium::Logger::MaxMessageSize == Yttrium::RingLog::MaxStringSize);
+
 	std::atomic<bool> _global_logger_created{ false };
 	std::atomic<Yttrium::LoggerPrivate*> _global_logger_private{ nullptr };
 }
@@ -75,7 +78,10 @@ namespace Yttrium
 		{
 			{
 				std::scoped_lock lock{ _mutex };
+				const auto need_notify = _ring_log.empty() && !_processing && !_flushing;
 				_ring_log.push(message);
+				if (!need_notify)
+					return;
 			}
 			_can_process.notify_one();
 		}
@@ -83,24 +89,25 @@ namespace Yttrium
 	private:
 		void run(const std::function<void(std::string_view)>& callback)
 		{
-			for (std::string message;;)
+			std::string message;
+			for (std::unique_lock lock{ _mutex };;)
 			{
-				{
-					std::unique_lock lock{ _mutex };
-					_processing = false;
-					if (_ring_log.empty() && _flushing > 0)
-					{
-						lock.unlock();
-						_flushed.notify_all();
-						lock.lock();
-					}
-					_can_process.wait(lock, [this] { return !_ring_log.empty() || _stop; });
-					if (_stop && _ring_log.empty())
-						break;
-					_ring_log.pop(message);
-					_processing = true;
-				}
+				_can_process.wait(lock, [this] { return !_ring_log.empty() || _stop; });
+				if (_stop && _ring_log.empty())
+					break;
+				assert(!_ring_log.empty());
+				_ring_log.pop(message);
+				_processing = true;
+				lock.unlock();
 				callback(message);
+				lock.lock();
+				_processing = false;
+				if (_flushing > 0 && _ring_log.empty())
+				{
+					lock.unlock();
+					_flushed.notify_all();
+					lock.lock();
+				}
 			}
 		}
 
