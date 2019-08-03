@@ -24,10 +24,7 @@
 // Tetrium game logic.
 namespace Tetrium
 {
-	enum
-	{
-		PointsPerRow = 40, // Logical points per row.
-	};
+	constexpr int PointsPerRow = 40; // Logical points per row.
 
 	// Field coordinate point.
 	struct Point
@@ -83,12 +80,9 @@ namespace Tetrium
 	class Field
 	{
 	public:
-		enum
-		{
-			Height = 22,       // Field height.
-			HeightPadding = 4, // Invisible field part height.
-			Width = 10,        // Field width.
-		};
+		static constexpr int Height = 22;       // Field height.
+		static constexpr int HeightPadding = 4; // Invisible field part height.
+		static constexpr int Width = 10;        // Field width.
 
 		Figure::Type blocks[Height + HeightPadding][Width];
 

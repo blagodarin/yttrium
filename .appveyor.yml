@@ -79,7 +79,7 @@ install:
   - set PREFIX_DIR=%APPVEYOR_BUILD_FOLDER%\_3rdparty
   - if not exist %PREFIX_DIR% mkdir %PREFIX_DIR%
   - cd %PREFIX_DIR%
-  - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
+  - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -DPIC=%DLL% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
   - if exist .build rmdir /s /q .build
   - if exist .trash rmdir /s /q .trash
   - if "%TESTS%"=="ON" cinst ninja

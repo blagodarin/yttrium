@@ -28,6 +28,7 @@ set(_src
 	src/ion_writer.cpp
 	src/iostream.cpp
 	src/iostream.h
+	src/logger.cpp
 	src/margins.cpp
 	src/matrix.cpp
 	src/package.cpp

@@ -15,31 +15,30 @@
 // limitations under the License.
 //
 
-#include "program.h"
+#include "error.h"
 
 #include <yttrium/logger.h>
 
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
+
 namespace Yttrium
 {
-	GlProgram::GlProgram(GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
-		: _vertex_shader{ std::move(vertex_shader) }
-		, _fragment_shader{ std::move(fragment_shader) }
-		, _program{ gl }
+	void report_errno(const char* function) noexcept
 	{
-		_program.attach(_vertex_shader.get());
-		_program.attach(_fragment_shader.get());
-	}
-
-	void GlProgram::set_uniform(const std::string& name, const Matrix4& value)
-	{
-		_program.set_uniform(name.c_str(), value);
-	}
-
-	bool GlProgram::link()
-	{
-		if (_program.link())
-			return true;
-		Logger::log(_program.info_log());
-		return false;
+		const auto error = errno;
+		std::array<char, Logger::MaxMessageSize + 1> buffer;
+		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: ", function));
+		if (written < Logger::MaxMessageSize)
+		{
+			// cppcheck-suppress unreadVariable
+			[[maybe_unused]] const auto status = ::strerror_r(error, buffer.data() + written, buffer.size() - written);
+#if (_POSIX_C_SOURCE >= 200112L) && !_GNU_SOURCE
+			if (status != 0)
+				buffer[written - 2] = '\0'; // Strip ": ".
+#endif
+		}
+		Logger::write(buffer.data());
 	}
 }

@@ -18,20 +18,19 @@
 #include "error.h"
 
 #include <yttrium/exceptions.h>
+#include <yttrium/logger.h>
 #include <yttrium/memory/smart_ptr.h>
 #include <yttrium/utils/string.h>
 
+#include <array>
+
 #include <windows.h>
 
-#ifndef NDEBUG
-#	include <iostream>
-#endif
-
-namespace Yttrium
+namespace
 {
-	std::string error_to_string(unsigned long code, std::string_view fallback_message)
+	Yttrium::SmartPtr<char, ::LocalFree> windows_error_description(unsigned long code)
 	{
-		SmartPtr<char, ::LocalFree> buffer;
+		Yttrium::SmartPtr<char, ::LocalFree> buffer;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), buffer.out_as<char*>(), 0, nullptr);
 		if (buffer)
@@ -42,29 +41,35 @@ namespace Yttrium
 				--size;
 				if (size > 0 && buffer[size - 1] == '\r')
 					--size;
+				buffer[size] = '\0';
 			}
-			return make_string("(0x", Hex32{ code }, ") ", std::string_view{ buffer, size });
 		}
+		return buffer;
+	}
+}
+
+namespace Yttrium
+{
+	std::string error_to_string(unsigned long code, std::string_view fallback_message)
+	{
+		if (const auto description = ::windows_error_description(code))
+			return make_string("[0x", Hex32{ code }, "] ", std::string_view{ description });
 		if (!fallback_message.empty())
-			return make_string("(0x", Hex32{ code }, ") ", fallback_message, '.');
-		return make_string("(0x", Hex32{ code }, ").");
+			return make_string("[0x", Hex32{ code }, "] ", fallback_message, '.');
+		return make_string("[0x", Hex32{ code }, "].");
 	}
 
-	void print_last_error(std::string_view function) noexcept
+	void print_last_error(const char* function) noexcept
 	{
-		std::ignore = function;
-#ifndef NDEBUG
 		if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
 		{
-			try
-			{
-				std::cerr << std::string{ function } << " failed: " << error_to_string(error) << '\n';
-			}
-			catch (const std::bad_alloc&)
-			{
-			}
+			std::array<char, Logger::MaxMessageSize + 1> buffer;
+			if (const auto description = ::windows_error_description(error))
+				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X] %s", function, static_cast<unsigned>(error), description.get());
+			else
+				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X].", function, static_cast<unsigned>(error));
+			Logger::write(buffer.data());
 		}
-#endif
 	}
 
 	void throw_last_error(std::string_view function)

@@ -60,7 +60,7 @@ namespace Yttrium
 		{
 			token.check_name("tr");
 			const auto text = ion.read().to_value();
-			const auto translation = ion.read().to_value();
+			const auto translation = ion.read().to_value(); //-V656
 			translations.emplace(text, Entry{ translation });
 		}
 		_translations = std::move(translations);

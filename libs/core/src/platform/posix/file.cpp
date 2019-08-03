@@ -18,7 +18,8 @@
 #include "../file.h"
 
 #include <yttrium/storage/source.h>
-#include "../writer.h"
+#include "../../storage/writer.h"
+#include "error.h"
 #include "temporary_file.h"
 
 #include <cstdlib>
@@ -55,7 +56,7 @@ namespace Yttrium
 			if (_temporary)
 				return;
 			if (::close(_descriptor))
-				::perror("ERROR! 'close' failed");
+				report_errno("close");
 		}
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
@@ -84,9 +85,9 @@ namespace Yttrium
 			if (_temporary)
 				return;
 			if (::close(_descriptor) == -1)
-				::perror("ERROR! 'close' failed");
+				report_errno("close");
 			if (_unlink && ::unlink(_name.c_str()) == -1)
-				::perror("ERROR! 'unlink' failed");
+				report_errno("unlink");
 		}
 
 		void reserve(uint64_t) override

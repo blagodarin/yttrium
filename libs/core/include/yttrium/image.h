@@ -87,13 +87,17 @@ namespace Yttrium
 		{
 			switch (format)
 			{
-			case PixelFormat::Intensity8: return 1;
-			case PixelFormat::Gray8: return 1;
-			case PixelFormat::GrayAlpha16: return 2;
-			case PixelFormat::Rgb24: return 3;
-			case PixelFormat::Bgr24: return 3;
-			case PixelFormat::Rgba32: return 4;
-			case PixelFormat::Bgra32: return 4;
+			case PixelFormat::Intensity8:
+			case PixelFormat::Gray8:
+				return 1;
+			case PixelFormat::GrayAlpha16:
+				return 2;
+			case PixelFormat::Rgb24:
+			case PixelFormat::Bgr24:
+				return 3;
+			case PixelFormat::Rgba32:
+			case PixelFormat::Bgra32:
+				return 4;
 			}
 			return 0;
 		}

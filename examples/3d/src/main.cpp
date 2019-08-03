@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/logger.h>
 #include "../../common/include/utils.h"
 #include "game.h"
 
@@ -30,6 +31,7 @@ namespace
 
 int main(int, char**)
 {
+	Logger logger;
 	Storage storage{ Storage::UseFileSystem::Never };
 	storage.attach_package("3d.ypq");
 	::make_checkerboard_texture(storage, "data/checkerboard.tga");

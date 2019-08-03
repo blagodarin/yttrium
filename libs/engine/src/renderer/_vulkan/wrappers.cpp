@@ -23,10 +23,6 @@
 #include <cassert>
 #include <cstring>
 
-#ifndef NDEBUG
-#	include <iostream>
-#endif
-
 #define CHECK(call) Y_VK_CHECK(call)
 
 namespace Yttrium

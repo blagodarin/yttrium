@@ -168,17 +168,11 @@ namespace Yttrium
 			pixel_format = PixelFormat::GrayAlpha16;
 			break;
 		case PixelFormat::Rgb24:
-			prefix.ihdr.data.color_type = PngColorType::Truecolor;
-			pixel_format = PixelFormat::Rgb24;
-			break;
 		case PixelFormat::Bgr24:
 			prefix.ihdr.data.color_type = PngColorType::Truecolor;
 			pixel_format = PixelFormat::Rgb24;
 			break;
 		case PixelFormat::Rgba32:
-			prefix.ihdr.data.color_type = PngColorType::TruecolorAlpha;
-			pixel_format = PixelFormat::Rgba32;
-			break;
 		case PixelFormat::Bgra32:
 			prefix.ihdr.data.color_type = PngColorType::TruecolorAlpha;
 			pixel_format = PixelFormat::Rgba32;

@@ -17,30 +17,25 @@
 
 #include "context.h"
 
+#include <yttrium/logger.h>
 #include "../../application/window_backend.h"
 #include "handles.h"
 
 #include <algorithm>
 
-#ifndef NDEBUG
-#	include <iostream>
-#endif
-
 namespace
 {
-#ifndef NDEBUG
 	void print_vulkan_layers_available()
 	{
 		uint32_t count = 0;
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&count, nullptr));
 		std::vector<VkLayerProperties> layers(count);
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&count, layers.data()));
-		std::cerr << "Vulkan layers available:\n";
+		Yttrium::Logger::log("Vulkan layers available:");
 		for (const auto& layer : layers)
-			std::cerr << '\t' << layer.layerName << " - " << layer.description << '\n';
-		std::cerr << '\n';
+			Yttrium::Logger::log("  ", layer.layerName, " - ", layer.description);
+		Yttrium::Logger::log("");
 	}
-#endif
 
 	VkInstance create_vulkan_instance()
 	{
@@ -53,13 +48,14 @@ namespace
 		application_info.engineVersion = 0;
 		application_info.apiVersion = VK_API_VERSION_1_0;
 
-		static const std::initializer_list<const char*> layers{
+		static const std::array layers{
 #ifndef NDEBUG
 			"VK_LAYER_LUNARG_standard_validation",
 #endif
+			"", // std::array{} doesn't compile.
 		};
 
-		static const std::initializer_list<const char*> extensions{
+		static const std::array extensions{
 #ifndef NDEBUG
 			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 #endif
@@ -74,10 +70,10 @@ namespace
 		instance_info.pNext = nullptr;
 		instance_info.flags = 0;
 		instance_info.pApplicationInfo = &application_info;
-		instance_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
-		instance_info.ppEnabledLayerNames = layers.begin();
+		instance_info.enabledLayerCount = static_cast<uint32_t>(layers.size() - 1);
+		instance_info.ppEnabledLayerNames = layers.data();
 		instance_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-		instance_info.ppEnabledExtensionNames = extensions.begin();
+		instance_info.ppEnabledExtensionNames = extensions.data();
 
 		VkInstance handle = VK_NULL_HANDLE;
 		Y_VK_CHECK(vkCreateInstance(&instance_info, nullptr, &handle));
@@ -87,7 +83,7 @@ namespace
 #ifndef NDEBUG
 	VKAPI_ATTR VkBool32 VKAPI_CALL print_vulkan_debug_report(VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* layer_prefix, const char* message, void*)
 	{
-		std::cerr << '[' << layer_prefix << "] " << message << '\n';
+		Yttrium::Logger::log('[', layer_prefix, "] ", message);
 		return VK_FALSE;
 	}
 
@@ -156,7 +152,6 @@ namespace
 		throw std::runtime_error{ "No suitable physical device found" };
 	}
 
-#ifndef NDEBUG
 	void print_vulkan_texture_formats(VkPhysicalDevice device)
 	{
 		static const std::vector<std::pair<VkFormat, std::string_view>> formats{
@@ -172,16 +167,15 @@ namespace
 			{ VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM" },
 		};
 
-		std::cerr << "Vulkan texture formats supported:\n";
+		Yttrium::Logger::log("Vulkan texture formats supported:");
 		for (const auto& [format_id, format_name] : formats)
 		{
 			VkFormatProperties properties;
 			vkGetPhysicalDeviceFormatProperties(device, format_id, &properties);
-			std::cerr << '\t' << ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-') << ' ' << format_name << " (" << format_id << ")\n";
+			Yttrium::Logger::log("  ", ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-'), ' ', format_name, " (", format_id, ')');
 		}
-		std::cerr << '\n';
+		Yttrium::Logger::log("");
 	}
-#endif
 
 	VkDevice create_vulkan_device(VkPhysicalDevice physical_device, uint32_t queue_family_index)
 	{
@@ -405,18 +399,14 @@ namespace Yttrium
 
 	void VulkanContext::Data::create(const WindowBackend& window)
 	{
-#ifndef NDEBUG
 		::print_vulkan_layers_available();
-#endif
 		_instance = ::create_vulkan_instance();
 #ifndef NDEBUG
 		std::tie(_debug_report_callback, _destroy_debug_report_callback) = ::create_vulkan_debug_report_callback(_instance);
 #endif
 		_surface = ::create_vulkan_surface(_instance, window);
 		std::tie(_physical_device, _queue_family_index) = ::select_vulkan_physical_device(_instance, _surface);
-#ifndef NDEBUG
 		::print_vulkan_texture_formats(_physical_device);
-#endif
 		vkGetPhysicalDeviceFeatures(_physical_device, &_physical_device_features);
 		vkGetPhysicalDeviceMemoryProperties(_physical_device, &_physical_device_memory_properties);
 		Y_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, _surface, &_surface_capabilities));

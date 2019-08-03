@@ -17,12 +17,28 @@
 
 #pragma once
 
-#include <cstddef>
+#include <yttrium/api.h>
+
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <string>
 
 namespace Yttrium
 {
-	void* pages_allocate(size_t) noexcept;
-	void pages_deallocate(void*, size_t) noexcept;
-	size_t pages_granularity() noexcept;
-	void* pages_reallocate(void*, size_t, size_t) noexcept;
+	class Y_CORE_API RingLog //-V730
+	{
+	public:
+		static constexpr size_t BufferSize = 4096;
+		static constexpr size_t MaxStringSize = std::numeric_limits<uint8_t>::max();
+
+		[[nodiscard]] constexpr bool empty() const noexcept { return !_size; }
+		bool pop(std::string&);
+		void push(std::string_view) noexcept;
+
+	private:
+		size_t _offset = 0;
+		size_t _size = 0;
+		std::array<uint8_t, BufferSize> _buffer;
+	};
 }

@@ -27,27 +27,45 @@ source_group("src" FILES ${_src})
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(yengine PRIVATE yaudio ycore Threads::Threads)
-set_target_properties(yengine PROPERTIES FOLDER "libs")
+set_property(TARGET yengine PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
-	set_target_properties(yengine PROPERTIES DEFINE_SYMBOL Y_ENGINE_EXPORT)
+	set_property(TARGET yengine PROPERTY DEFINE_SYMBOL Y_ENGINE_EXPORT)
 	target_compile_definitions(yengine INTERFACE Y_ENGINE_IMPORT)
 endif()
 if(WIN32)
+	find_package(Y3_freetype REQUIRED)
 	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_link_libraries(yengine PRIVATE Y3::freetype)
+else()
+	find_package(Freetype REQUIRED)
+	target_link_libraries(yengine PRIVATE Freetype::Freetype)
 endif()
 
 y_sources(yengine "include"
-	include/yttrium/console.h
-	include/yttrium/resource_loader.h
-	)
-
-########################################################################################################################
-# application
-y_sources(yengine "include"
 	include/yttrium/application.h
+	include/yttrium/console.h
 	include/yttrium/key.h
+	include/yttrium/resource_loader.h
 	include/yttrium/window.h
 	)
+
+y_sources(yengine "include/gui"
+	include/yttrium/gui/font.h
+	include/yttrium/gui/gui.h
+	include/yttrium/gui/text_capture.h
+	)
+
+y_sources(yengine "include/renderer"
+	include/yttrium/renderer/manager.h
+	include/yttrium/renderer/material.h
+	include/yttrium/renderer/mesh.h
+	include/yttrium/renderer/modifiers.h
+	include/yttrium/renderer/pass.h
+	include/yttrium/renderer/program.h
+	include/yttrium/renderer/texture.h
+	include/yttrium/renderer/textured_rect.h
+	)
+
 y_sources(yengine "src/application"
 	src/application/application.cpp
 	src/application/application.h
@@ -62,6 +80,7 @@ if(Y_RENDERER_OPENGL)
 		src/application/opengl.h
 		)
 endif()
+
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
 		y_sources(yengine "src/application/_x11"
@@ -109,13 +128,6 @@ elseif(WIN32)
 	endif()
 endif()
 
-########################################################################################################################
-# gui
-y_sources(yengine "include/gui"
-	include/yttrium/gui/font.h
-	include/yttrium/gui/gui.h
-	include/yttrium/gui/text_capture.h
-	)
 y_sources(yengine "src/gui"
 	src/gui/actions.cpp
 	src/gui/actions.h
@@ -134,14 +146,17 @@ y_sources(yengine "src/gui"
 	src/gui/widget.cpp
 	src/gui/widget.h
 	)
+
 y_sources(yengine "src/gui/ion"
 	src/gui/ion/loader.cpp
 	src/gui/ion/loader.h
 	)
+
 y_sources(yengine "src/gui/logic"
 	src/gui/logic/line_editor.cpp
 	src/gui/logic/line_editor.h
 	)
+
 y_sources(yengine "src/gui/widgets"
 	src/gui/widgets/button.cpp
 	src/gui/widgets/button.h
@@ -154,26 +169,7 @@ y_sources(yengine "src/gui/widgets"
 	src/gui/widgets/label.cpp
 	src/gui/widgets/label.h
 	)
-if(WIN32)
-	find_package(Y3_freetype REQUIRED)
-	target_link_libraries(yengine PRIVATE Y3::freetype)
-else()
-	find_package(Freetype REQUIRED)
-	target_link_libraries(yengine PRIVATE Freetype::Freetype)
-endif()
 
-########################################################################################################################
-# renderer
-y_sources(yengine "include/renderer"
-	include/yttrium/renderer/manager.h
-	include/yttrium/renderer/material.h
-	include/yttrium/renderer/mesh.h
-	include/yttrium/renderer/modifiers.h
-	include/yttrium/renderer/pass.h
-	include/yttrium/renderer/program.h
-	include/yttrium/renderer/texture.h
-	include/yttrium/renderer/textured_rect.h
-	)
 y_sources(yengine "src/renderer"
 	src/renderer/backend.h
 	src/renderer/debug_renderer.cpp
@@ -190,16 +186,19 @@ y_sources(yengine "src/renderer"
 	src/renderer/texture.cpp
 	src/renderer/texture.h
 	)
+
 y_sources(yengine "src/renderer/builtin"
 	src/renderer/builtin/builtin.h
 	src/renderer/builtin/builtin.cpp
 	src/renderer/builtin/debug_texture.cpp
 	src/renderer/builtin/debug_texture.h
 	)
+
 y_sources(yengine "src/renderer/formats"
 	src/renderer/formats/obj.cpp
 	src/renderer/formats/obj.h
 	)
+
 if(Y_RENDERER_OPENGL)
 	y_sources(yengine "src/renderer/_opengl"
 		src/renderer/_opengl/api.h

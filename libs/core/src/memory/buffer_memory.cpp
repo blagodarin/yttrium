@@ -18,7 +18,7 @@
 #include "buffer_memory.h"
 
 #include <yttrium/utils/numeric.h>
-#include "memory.h"
+#include "../platform/virtual_memory.h"
 
 #include <cassert>
 #include <cstring>
@@ -28,7 +28,7 @@ namespace
 {
 	void* allocate_big_block(size_t size)
 	{
-		const auto data = Yttrium::pages_allocate(size);
+		const auto data = Yttrium::vm_allocate(size);
 		if (!data)
 			throw std::bad_alloc{};
 		return data;
@@ -101,7 +101,7 @@ namespace Yttrium
 		assert(capacity > 0 && capacity == capacity_for_size(capacity));
 		if (capacity > MaxSmallBlockSize)
 		{
-			pages_deallocate(data, capacity);
+			vm_deallocate(data, capacity);
 		}
 		else
 		{
@@ -122,7 +122,7 @@ namespace Yttrium
 		assert(old_capacity != new_capacity);
 		if (old_capacity > MaxSmallBlockSize && new_capacity > MaxSmallBlockSize)
 		{
-			const auto new_data = pages_reallocate(old_data, old_capacity, new_capacity);
+			const auto new_data = vm_reallocate(old_data, old_capacity, new_capacity);
 			if (!new_data)
 				throw std::bad_alloc{};
 			return new_data;
@@ -145,7 +145,7 @@ namespace Yttrium
 
 	size_t BufferMemory::granularity() noexcept
 	{
-		static const auto page_size = pages_granularity();
+		static const auto page_size = vm_granularity();
 		assert(is_power_of_2(page_size));
 		return page_size;
 	}

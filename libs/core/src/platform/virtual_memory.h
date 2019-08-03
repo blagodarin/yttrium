@@ -15,9 +15,14 @@
 // limitations under the License.
 //
 
-#include "memory/buffer_memory.h"
+#pragma once
+
+#include <cstddef>
 
 namespace Yttrium
 {
-	BufferMemory _buffer_memory;
+	void* vm_allocate(size_t) noexcept;
+	void vm_deallocate(void*, size_t) noexcept;
+	size_t vm_granularity() noexcept;
+	void* vm_reallocate(void*, size_t, size_t) noexcept;
 }

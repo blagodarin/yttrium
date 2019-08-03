@@ -53,7 +53,7 @@ namespace Yttrium
 	template <typename T, typename... Args>
 	void append_to(std::string& string, T&& value, Args&&... args)
 	{
-		_append_to(string, value);
+		_append_to(string, std::forward<T>(value));
 		append_to(string, std::forward<Args>(args)...);
 	}
 

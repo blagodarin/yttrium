@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "../memory.h"
+#include "../virtual_memory.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -25,7 +25,7 @@
 
 namespace Yttrium
 {
-	void* pages_allocate(size_t size) noexcept
+	void* vm_allocate(size_t size) noexcept
 	{
 		const auto result = ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		if (result || ::GetLastError() == ERROR_NOT_ENOUGH_MEMORY)
@@ -33,20 +33,20 @@ namespace Yttrium
 		std::abort();
 	}
 
-	void pages_deallocate(void* pointer, size_t) noexcept
+	void vm_deallocate(void* pointer, size_t) noexcept
 	{
 		if (!::VirtualFree(pointer, 0, MEM_RELEASE))
 			std::abort();
 	}
 
-	size_t pages_granularity() noexcept
+	size_t vm_granularity() noexcept
 	{
 		SYSTEM_INFO system_info;
 		::GetSystemInfo(&system_info);
 		return system_info.dwPageSize;
 	}
 
-	void* pages_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
+	void* vm_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
 	{
 		const auto new_pointer = ::VirtualAlloc(nullptr, new_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		if (new_pointer)

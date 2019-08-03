@@ -71,6 +71,9 @@ function(y3_cmake _dir)
 			-DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
 			-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
 			-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin)
+		if(PIC)
+			list(APPEND _options -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+		endif()
 		if(WIN32)
 			list(APPEND _options -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix})
 		endif()

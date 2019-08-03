@@ -15,9 +15,9 @@
 // limitations under the License.
 //
 
-#include "memory/buffer_memory.h"
+#pragma once
 
 namespace Yttrium
 {
-	BufferMemory _buffer_memory;
+	void report_errno(const char* function) noexcept;
 }

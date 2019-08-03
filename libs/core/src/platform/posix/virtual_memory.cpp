@@ -15,59 +15,55 @@
 // limitations under the License.
 //
 
-#include "../memory.h"
+#include "../virtual_memory.h"
 
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
+#include "error.h"
 
-#include <sys/mman.h>
-#include <unistd.h>
+#include <algorithm>   // std::min
+#include <array>       // std::array
+#include <cstring>     // std::memcpy
+#include <type_traits> //
+
+#include <sys/mman.h> // mmap, munmap
+#include <unistd.h>   // sysconf
 
 namespace Yttrium
 {
-	void* pages_allocate(size_t size) noexcept
+	void* vm_allocate(size_t size) noexcept
 	{
 		const auto result = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (result != MAP_FAILED)
 			return result;
-		if (errno == ENOMEM)
-			return nullptr;
-		std::abort();
+		report_errno("mmap");
+		return nullptr;
 	}
 
-	void pages_deallocate(void* pointer, size_t size) noexcept
+	void vm_deallocate(void* pointer, size_t size) noexcept
 	{
 		if (::munmap(pointer, size) != 0)
-			std::abort();
+			report_errno("munmap");
 	}
 
-	size_t pages_granularity() noexcept
+	size_t vm_granularity() noexcept
 	{
-		const auto page_size = ::sysconf(_SC_PAGESIZE);
-		if (page_size <= 0)
-			std::abort();
-		return static_cast<size_t>(page_size);
+		if (const auto page_size = ::sysconf(_SC_PAGESIZE); page_size > 0)
+			return static_cast<size_t>(page_size);
+		report_errno("sysconf(_SC_PAGESIZE)");
+		return 1;
 	}
 
-	void* pages_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
+	void* vm_reallocate(void* old_pointer, size_t old_size, size_t new_size) noexcept
 	{
-#if defined(__linux__)
-		const auto new_pointer = ::mremap(old_pointer, old_size, new_size, MREMAP_MAYMOVE);
-		if (new_pointer != MAP_FAILED)
-			return new_pointer;
-#else
+		// 'mremap' is Linux-specific and known to be very slow.
 		const auto new_pointer = ::mmap(nullptr, new_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-		if (new_pointer != MAP_FAILED)
+		if (new_pointer == MAP_FAILED)
 		{
-			std::memcpy(new_pointer, old_pointer, std::min(old_size, new_size));
-			if (::munmap(old_pointer, old_size) != 0)
-				std::abort();
-			return new_pointer;
-		}
-#endif
-		if (errno != ENOMEM && old_size < new_size)
+			report_errno("mmap");
 			return nullptr;
-		std::abort();
+		}
+		std::memcpy(new_pointer, old_pointer, std::min(old_size, new_size));
+		if (::munmap(old_pointer, old_size) != 0)
+			report_errno("munmap");
+		return new_pointer;
 	}
 }

@@ -17,6 +17,8 @@
 
 #include "temporary_file.h"
 
+#include "error.h"
+
 #include <system_error>
 
 #include <unistd.h>
@@ -34,9 +36,9 @@ namespace Yttrium
 	TemporaryFilePrivate::~TemporaryFilePrivate() noexcept
 	{
 		if (::close(_descriptor))
-			::perror("ERROR! 'close' failed");
+			report_errno("close");
 		if (::unlink(_name.c_str()))
-			::perror("ERROR! 'unlink' failed");
+			report_errno("unlink");
 	}
 
 	TemporaryFile::TemporaryFile()
