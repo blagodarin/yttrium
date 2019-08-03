@@ -16,6 +16,7 @@
 //
 
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -31,17 +32,18 @@ namespace
 	}
 }
 
-int main(int argc, char** argv)
+int ymain(int argc, char** argv)
 {
 	if (argc != 4 || std::strcmp(argv[1], "--string")) //-V526
 		return print_usage();
 
 	std::vector<char> buffer;
 	{
-		std::ifstream input{ argv[2], std::ios::binary | std::ios::in };
+		const auto input_path = std::filesystem::u8path(argv[2]);
+		std::ifstream input{ input_path, std::ios::binary | std::ios::in };
 		if (!input.is_open())
 		{
-			std::cerr << "ERROR: Unable to open \"" << argv[2] << "\"\n";
+			std::cerr << "ERROR: Unable to open " << input_path << '\n';
 			return 1;
 		}
 		const auto input_size = input.seekg(0, std::ios::end).tellg();
@@ -49,15 +51,16 @@ int main(int argc, char** argv)
 		buffer.resize(static_cast<size_t>(input_size));
 		if (!input.read(buffer.data(), input_size))
 		{
-			std::cerr << "ERROR: Unable to read \"" << argv[2] << "\"\n";
+			std::cerr << "ERROR: Unable to read " << input_path << '\n';
 			return 1;
 		}
 	}
 
-	std::ofstream output{ argv[3], std::ios::out | std::ios::trunc };
+	const auto output_path = std::filesystem::u8path(argv[3]);
+	std::ofstream output{ output_path, std::ios::out | std::ios::trunc };
 	if (!output.is_open())
 	{
-		std::cerr << "ERROR: Unable to open \"" << argv[3] << "\"\n";
+		std::cerr << "ERROR: Unable to open " << output_path << '\n';
 		return 1;
 	}
 

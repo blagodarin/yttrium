@@ -193,7 +193,7 @@ namespace
 	};
 }
 
-int main(int, char**)
+int ymain(int, char**)
 {
 	Logger logger;
 	Application application;

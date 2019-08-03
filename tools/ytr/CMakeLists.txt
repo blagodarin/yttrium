@@ -22,7 +22,7 @@ set(_src
 add_executable(ytr ${_src})
 source_group("src" FILES ${_src})
 
-target_link_libraries(ytr PRIVATE ycore)
+target_link_libraries(ytr PRIVATE ycore ymain)
 set_target_properties(ytr PROPERTIES FOLDER "tools")
 
 install(TARGETS ytr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

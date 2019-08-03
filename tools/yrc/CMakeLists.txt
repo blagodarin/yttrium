@@ -22,6 +22,7 @@ set(_src
 add_executable(yrc ${_src})
 source_group("src" FILES ${_src})
 
+target_link_libraries(yrc PRIVATE ymain)
 set_target_properties(yrc PROPERTIES FOLDER "tools")
 
 install(TARGETS yrc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

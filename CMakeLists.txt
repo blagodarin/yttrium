@@ -190,7 +190,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		add_compile_options(/arch:SSE2)
 	endif()
 	add_compile_options(/std:c++latest)
-	add_compile_definitions(_USE_MATH_DEFINES)
+	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING _USE_MATH_DEFINES)
 	list(APPEND RC_FLAGS /nologo)
 
 	# Warnings.
@@ -238,6 +238,7 @@ configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 add_subdirectory(libs/core)
 add_subdirectory(libs/audio)
+add_subdirectory(libs/main)
 
 if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
@@ -274,10 +275,6 @@ if(BUILD_BENCHMARKS)
 		COMMENT "Running benchmarks"
 		VERBATIM)
 	set_target_properties(benchmark PROPERTIES FOLDER ".phony")
-endif()
-
-if(WIN32)
-	add_subdirectory(libs/winmain)
 endif()
 
 if(BUILD_EXAMPLES)

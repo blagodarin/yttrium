@@ -15,14 +15,23 @@
 # limitations under the License.
 #
 
-set(_src
-	src/main.cpp
-	)
+if(WIN32)
+	set(_src src/main_windows.cpp)
+else()
+	set(_src src/main.cpp)
+endif()
 
-add_library(ywinmain STATIC ${_src})
+add_library(ymain STATIC ${_src})
 source_group("src" FILES ${_src})
 
-target_link_libraries(ywinmain PRIVATE ycore)
-set_target_properties(ywinmain PROPERTIES FOLDER "libs")
-install(TARGETS ywinmain EXPORT YttriumTargets
+y_sources(ymain "include"
+	include/yttrium/main.h
+	)
+
+target_include_directories(ymain PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(ymain PRIVATE ycore)
+set_target_properties(ymain PROPERTIES FOLDER "libs")
+
+install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS ymain EXPORT YttriumTargets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

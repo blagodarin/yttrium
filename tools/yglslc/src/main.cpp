@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -129,7 +130,7 @@ namespace
 	}
 }
 
-int main(int argc, char** argv)
+int ymain(int argc, char** argv)
 {
 	if (argc != 4)
 		return print_usage();
@@ -142,12 +143,14 @@ int main(int argc, char** argv)
 	else
 		return print_usage();
 
+	const auto input_path = std::filesystem::u8path(argv[2]);
+
 	std::string glsl;
 	{
-		std::ifstream input{ argv[2], std::ios::binary | std::ios::in };
+		std::ifstream input{ input_path, std::ios::binary | std::ios::in };
 		if (!input.is_open())
 		{
-			std::cerr << "ERROR: Unable to open \"" << argv[2] << "\"\n";
+			std::cerr << "ERROR: Unable to open " << input_path << '\n';
 			return 1;
 		}
 		const auto input_size = input.seekg(0, std::ios::end).tellg();
@@ -155,7 +158,7 @@ int main(int argc, char** argv)
 		glsl.resize(static_cast<size_t>(input_size));
 		if (!input.read(glsl.data(), input_size))
 		{
-			std::cerr << "ERROR: Unable to read \"" << argv[2] << "\"\n";
+			std::cerr << "ERROR: Unable to read " << input_path << '\n';
 			return 1;
 		}
 	}
@@ -175,7 +178,7 @@ int main(int argc, char** argv)
 		::init_resources(resources);
 		if (!shader.parse(&resources, 100, false, messages))
 		{
-			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n"
+			std::cerr << "ERROR: Unable to process " << input_path << '\n'
 					  << shader.getInfoLog() << '\n';
 			return 1;
 		}
@@ -184,7 +187,7 @@ int main(int argc, char** argv)
 		program.addShader(&shader);
 		if (!program.link(messages))
 		{
-			std::cerr << "ERROR: Unable to process \"" << argv[2] << "\"\n"
+			std::cerr << "ERROR: Unable to process " << input_path << '\n'
 					  << shader.getInfoLog() << '\n';
 			return 1;
 		}
@@ -194,10 +197,11 @@ int main(int argc, char** argv)
 		glslang::FinalizeProcess();
 	}
 
-	std::ofstream output{ argv[3], std::ios::out | std::ios::trunc };
+	const auto output_path = std::filesystem::u8path(argv[3]);
+	std::ofstream output{ output_path, std::ios::out | std::ios::trunc };
 	if (!output.is_open())
 	{
-		std::cerr << "ERROR: Unable to open \"" << argv[3] << "\"\n";
+		std::cerr << "ERROR: Unable to open " << output_path << '\n';
 		return 1;
 	}
 

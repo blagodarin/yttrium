@@ -25,7 +25,7 @@
 
 using namespace Yttrium;
 
-int main(int argc, char** argv)
+int ymain(int argc, char** argv)
 {
 	if (argc < 3)
 	{
@@ -33,25 +33,35 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	const auto translation = [](std::string_view path) {
-		const auto source = Source::from(path);
-		return source ? Translation::load(*source) : nullptr;
-	}(argv[1]);
+	const auto translation_path = std::filesystem::u8path(argv[1]);
 
-	if (!translation)
+	auto translation_source = Source::from(translation_path);
+	if (!translation_source)
 	{
-		std::cerr << "ERROR: Unable to read \"" << argv[1] << "\"\n";
+		std::cerr << "ERROR: Unable to open " << translation_path << " for reading\n";
 		return 1;
 	}
 
+	const auto translation = Translation::load(*translation_source);
+	if (!translation)
+	{
+		std::cerr << "ERROR: Failed to read " << translation_path << '\n';
+		return 1;
+	}
+
+	translation_source.reset(); // To open the file for writing.
+
 	for (int i = 2; i < argc; ++i)
 	{
-		const auto source = Source::from(argv[i]);
+		const auto source_path = std::filesystem::u8path(argv[i]);
+
+		const auto source = Source::from(source_path);
 		if (!source)
 		{
-			std::cerr << "ERROR: Unable to read \"" << argv[i] << "\"\n";
+			std::cerr << "ERROR: Unable to open " << source_path << " for reading\n";
 			return 1;
 		}
+
 		try
 		{
 			IonReader ion{ *source };
@@ -61,17 +71,17 @@ int main(int argc, char** argv)
 		}
 		catch (const IonError& e)
 		{
-			std::cerr << "ERROR(" << argv[i] << "): " << e.what() << "\n";
+			std::cerr << "ERROR: Failed to read " << source_path << ": " << e.what() << '\n';
 			return 1;
 		}
 	}
 
 	translation->remove_obsolete();
 
-	Writer output{ argv[1] };
+	Writer output{ translation_path };
 	if (!output)
 	{
-		std::cerr << "ERROR: Unable to write \"" << argv[1] << "\"\n";
+		std::cerr << "ERROR: Unable to open " << translation_path << " for writing\n";
 		return 1;
 	}
 

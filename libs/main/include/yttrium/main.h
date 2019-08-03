@@ -15,28 +15,7 @@
 // limitations under the License.
 //
 
-#include <yttrium/logger.h>
-#include "../../common/include/utils.h"
-#include "game.h"
+#pragma once
 
-namespace
-{
-	void make_checkerboard_texture(Storage& storage, const std::string& name)
-	{
-		storage.attach_buffer(name, ::make_bgra_tga(128, 128, [](size_t x, size_t y) {
-			return ((x ^ y) & 1) ? Bgra32{ 0xdd, 0xdd, 0xdd } : Bgra32{ 0x00, 0x00, 0x00 };
-		}));
-	}
-}
-
-int ymain(int, char**)
-{
-	Logger logger;
-	Storage storage{ Storage::UseFileSystem::Never };
-	storage.attach_package("3d.ypq");
-	::make_checkerboard_texture(storage, "data/checkerboard.tga");
-
-	Game game{ storage };
-	game.run();
-	return 0;
-}
+//! Called from the main function with UTF-8 arguments.
+int ymain(int argc, char** argv);

@@ -26,10 +26,9 @@ set(_src
 
 add_executable(tetrium WIN32 ${_src})
 source_group("src" FILES ${_src})
-target_link_libraries(tetrium PRIVATE yaudio ycore yengine)
+target_link_libraries(tetrium PRIVATE yaudio ycore yengine ymain)
 if(WIN32)
 	set_property(TARGET tetrium APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
-	target_link_libraries(tetrium PRIVATE optimized ywinmain)
 	target_sources(tetrium PRIVATE tetrium.rc)
 endif()
 
