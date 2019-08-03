@@ -66,7 +66,7 @@ namespace Yttrium
 	{
 	}
 
-	Writer::Writer(const std::string& path)
+	Writer::Writer(const std::filesystem::path& path)
 		: _private{ create_file_writer(path) }
 	{
 	}

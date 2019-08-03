@@ -32,7 +32,7 @@ namespace
 		if (!::GetTempPathA(static_cast<DWORD>(path.size()), path.data()))
 			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		std::array<char, MAX_PATH> name;
-		const auto status = ::GetTempFileNameA(path.data(), "ytt", 0, name.data());
+		const auto status = ::GetTempFileNameA(path.data(), "yt-", 0, name.data());
 		if (!status)
 			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		else if (status == ERROR_BUFFER_OVERFLOW)
@@ -63,7 +63,7 @@ namespace Yttrium
 
 	TemporaryFile::~TemporaryFile() = default;
 
-	const std::string& TemporaryFile::name() const
+	const std::filesystem::path& TemporaryFile::name() const
 	{
 		return _private->_name;
 	}

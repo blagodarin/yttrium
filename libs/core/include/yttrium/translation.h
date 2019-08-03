@@ -25,6 +25,7 @@
 namespace Yttrium
 {
 	class Source;
+	class Writer;
 
 	/// Translation file.
 	class Y_CORE_API Translation
@@ -43,7 +44,7 @@ namespace Yttrium
 		virtual void remove_obsolete() = 0;
 
 		///
-		virtual bool save(const std::string& path) const = 0;
+		virtual void save(Writer&&) const = 0;
 
 		///
 		virtual std::string translate(std::string_view source) const = 0;

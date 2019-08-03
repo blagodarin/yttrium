@@ -18,6 +18,7 @@
 #include "../file.h"
 
 #include <yttrium/storage/source.h>
+#include <yttrium/storage/temporary_file.h>
 #include "../../storage/writer.h"
 #include "error.h"
 #include "temporary_file.h"
@@ -44,8 +45,8 @@ namespace Yttrium
 	class FileSource final : public Source
 	{
 	public:
-		FileSource(uint64_t size, const std::string& name, int descriptor, bool temporary)
-			: Source{ size, name }
+		FileSource(uint64_t size, const std::filesystem::path& path, int descriptor, bool temporary)
+			: Source{ size, path }
 			, _descriptor{ descriptor }
 			, _temporary{ temporary }
 		{
@@ -73,8 +74,8 @@ namespace Yttrium
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(std::string_view name, int descriptor, bool temporary)
-			: _name{ name }
+		FileWriter(const std::filesystem::path& path, int descriptor, bool temporary)
+			: _path{ path }
 			, _descriptor{ descriptor }
 			, _temporary{ temporary }
 		{
@@ -86,7 +87,7 @@ namespace Yttrium
 				return;
 			if (::close(_descriptor) == -1)
 				report_errno("close");
-			if (_unlink && ::unlink(_name.c_str()) == -1)
+			if (_unlink && ::unlink(_path.c_str()) == -1)
 				report_errno("unlink");
 		}
 
@@ -112,13 +113,13 @@ namespace Yttrium
 		}
 
 	private:
-		const std::string _name;
+		const std::filesystem::path _path;
 		const int _descriptor;
 		const bool _temporary;
 		bool _unlink = false;
 	};
 
-	std::unique_ptr<Source> Source::from(const std::string& path)
+	std::unique_ptr<Source> Source::from(const std::filesystem::path& path)
 	{
 #ifdef __linux__
 		const int flags = O_RDONLY | O_NOATIME;
@@ -134,10 +135,10 @@ namespace Yttrium
 	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
 	{
 		const auto descriptor = TemporaryFilePrivate::descriptor(file);
-		return std::make_unique<FileSource>(::maybe_size(descriptor), file.name(), descriptor, true);
+		return std::make_unique<FileSource>(::maybe_size(descriptor), file.path(), descriptor, true);
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(const std::filesystem::path& path)
 	{
 		const auto descriptor = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
@@ -150,6 +151,6 @@ namespace Yttrium
 		const auto descriptor = TemporaryFilePrivate::descriptor(file);
 		if (::ftruncate(descriptor, 0) == -1)
 			throw std::system_error{ errno, std::generic_category() };
-		return std::make_unique<FileWriter>(file.name(), descriptor, true);
+		return std::make_unique<FileWriter>(file.path(), descriptor, true);
 	}
 }

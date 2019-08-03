@@ -18,6 +18,7 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/test/utils.h>
 #include <yttrium/translation.h>
 
@@ -27,54 +28,49 @@ using Yttrium::Buffer;
 using Yttrium::Source;
 using Yttrium::TemporaryFile;
 using Yttrium::Translation;
+using Yttrium::Writer;
 
 TEST_CASE("translation.load")
 {
-	const auto t = Translation::load(*Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
-	CHECK(t->translate("hello") == "Hello");
-	CHECK(t->translate("world") == "world!");
+	const auto translation = Translation::load(*Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
+	CHECK(translation->translate("hello") == "Hello");
+	CHECK(translation->translate("world") == "world!");
 }
 
 TEST_CASE("translation.load.empty")
 {
-	const auto t = Translation::load(*Source::from(Buffer{}));
-	CHECK(t->translate("hello") == "hello");
-	CHECK(t->translate("world") == "world");
+	const auto translation = Translation::load(*Source::from(Buffer{}));
+	CHECK(translation->translate("hello") == "hello");
+	CHECK(translation->translate("world") == "world");
 }
 
 TEST_CASE("translation.remove_obsolete")
 {
-	const auto t = Translation::load(*Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
-	t->add("world");
-	t->remove_obsolete();
+	const auto translation = Translation::load(*Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
+	translation->add("world");
+	translation->remove_obsolete();
 
-	TemporaryFile f;
-	REQUIRE(t->save(f.name()));
-	CHECK(Source::from(f.name())->to_string() == "tr \"world\" \"world!\"\n");
+	TemporaryFile file;
+	translation->save(Writer{ file });
+	CHECK(Source::from(file)->to_string() == "tr \"world\" \"world!\"\n");
 }
 
 TEST_CASE("translation.save")
 {
-	const auto t = Translation::load(*Source::from(Buffer{}));
-	t->add("hello");
-	t->add("world");
+	const auto translation = Translation::load(*Source::from(Buffer{}));
+	translation->add("hello");
+	translation->add("world");
 
-	TemporaryFile f;
-	REQUIRE(t->save(f.name()));
-	CHECK(Source::from(f.name())->to_string() == "tr \"hello\" \"\"\ntr \"world\" \"\"\n");
+	TemporaryFile file;
+	translation->save(Writer{ file });
+	CHECK(Source::from(file)->to_string() == "tr \"hello\" \"\"\ntr \"world\" \"\"\n");
 }
 
 TEST_CASE("translation.save.empty")
 {
-	const auto t = Translation::load(*Source::from(Buffer{}));
+	const auto translation = Translation::load(*Source::from(Buffer{}));
 
-	TemporaryFile f;
-	REQUIRE(t->save(f.name()));
-	CHECK(Source::from(f.name())->to_string().empty());
-}
-
-TEST_CASE("translation.save.invalid")
-{
-	const auto t = Translation::load(*Source::from(Buffer{}));
-	CHECK(!t->save("/inv*lid"));
+	TemporaryFile file;
+	translation->save(Writer{ file });
+	CHECK(Source::from(file)->to_string().empty());
 }

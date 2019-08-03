@@ -22,32 +22,36 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Reader;
-using Yttrium::Source;
-using Yttrium::TemporaryFile;
-using Yttrium::Writer;
-
 TEST_CASE("temporary_file")
 {
-	TemporaryFile file;
-	CHECK(Source::from(file)->size() == 0);
+	Yttrium::TemporaryFile file;
 	{
-		Writer writer{ file };
+		const auto source = Yttrium::Source::from(file);
+		REQUIRE(source);
+		CHECK(source->size() == 0);
+	}
+	{
+		Yttrium::Writer writer{ file };
 		CHECK(writer.size() == 0);
 		writer.write(int64_t{ -1 });
 		CHECK(writer.size() == sizeof(int64_t));
 	}
 	{
-		const auto source = Source::from(file);
+		const auto source = Yttrium::Source::from(file);
+		REQUIRE(source);
 		CHECK(source->size() == sizeof(int64_t));
-		Reader reader{ *source };
+		Yttrium::Reader reader{ *source };
 		int64_t data = 0;
 		CHECK(reader.read(data));
 		CHECK(data == -1);
 	}
 	{
-		Writer writer{ file };
+		Yttrium::Writer writer{ file };
 		CHECK(writer.size() == 0);
 	}
-	CHECK(Source::from(file)->size() == 0);
+	{
+		const auto source = Yttrium::Source::from(file);
+		REQUIRE(source);
+		CHECK(source->size() == 0);
+	}
 }

@@ -18,6 +18,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/storage/source.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/translation.h>
 
 #include <iostream>
@@ -67,10 +68,13 @@ int main(int argc, char** argv)
 
 	translation->remove_obsolete();
 
-	if (!translation->save(argv[1]))
+	Writer output{ argv[1] };
+	if (!output)
 	{
 		std::cerr << "ERROR: Unable to write \"" << argv[1] << "\"\n";
 		return 1;
 	}
+
+	translation->save(std::move(output));
 	return 0;
 }

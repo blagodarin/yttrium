@@ -64,10 +64,10 @@ TEST_CASE("source.from.source")
 
 TEST_CASE("source.name")
 {
-	Yttrium::TemporaryFile tf;
-	const auto s = Source::from(tf.name());
-	REQUIRE(s);
-	CHECK(s->name() == tf.name());
+	Yttrium::TemporaryFile temporary_file;
+	const auto source = Source::from(temporary_file);
+	REQUIRE(source);
+	CHECK(source->name() == temporary_file.path());
 }
 
 TEST_CASE("source.size")

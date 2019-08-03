@@ -58,8 +58,8 @@ namespace Yttrium
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(const std::string& name, HANDLE handle)
-			: _name{ name }
+		FileWriter(const std::filesystem::path& path, HANDLE handle)
+			: _path{ path }
 			, _handle{ handle }
 		{
 		}
@@ -99,7 +99,7 @@ namespace Yttrium
 		}
 
 	private:
-		const std::string _name;
+		const std::filesystem::path _name;
 		const HANDLE _handle;
 		bool _unlink = false;
 	};
@@ -120,7 +120,7 @@ namespace Yttrium
 		return from(file.name());
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(const std::filesystem::path& path)
 	{
 		const auto handle = ::CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)

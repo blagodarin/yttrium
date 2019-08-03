@@ -40,32 +40,32 @@ namespace
 
 TEST_CASE("package")
 {
-	Buffer buffer1(100003);
+	Buffer buffer1{ 100003 };
 	::memset(buffer1.data(), 1, buffer1.size());
 
-	Buffer buffer2(100019);
+	Buffer buffer2{ 100019 };
 	::memset(buffer2.data(), 2, buffer2.size());
 
-	Buffer buffer3(100043);
+	Buffer buffer3{ 100043 };
 	::memset(buffer3.data(), 3, buffer3.size());
 
 	TemporaryFile file1;
-	Writer(file1).write_all(buffer1);
+	Writer{ file1 }.write_all(buffer1);
 
 	TemporaryFile file2;
-	Writer(file2).write_all(buffer2);
+	Writer{ file2 }.write_all(buffer2);
 
 	TemporaryFile file3;
-	Writer(file3).write_all(buffer3);
+	Writer{ file3 }.write_all(buffer3);
 
 	TemporaryFile package_file;
 
 	{
-		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		const auto package_writer = PackageWriter::create(package_file.path(), PackageType::Ypq);
 		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file1.name()));
-		REQUIRE(package_writer->add(file2.name()));
-		REQUIRE(package_writer->add(file3.name()));
+		REQUIRE(package_writer->add(file1.path()));
+		REQUIRE(package_writer->add(file2.path()));
+		REQUIRE(package_writer->add(file3.path()));
 		REQUIRE(package_writer->commit());
 	}
 
@@ -74,12 +74,12 @@ TEST_CASE("package")
 	std::unique_ptr<Source> packed_file3;
 
 	{
-		const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+		const auto package = PackageReader::create(package_file.path(), PackageType::Ypq);
 		REQUIRE(package);
 
-		packed_file3 = ::open_packed(*package, file3.name());
-		packed_file1 = ::open_packed(*package, file1.name());
-		packed_file2 = ::open_packed(*package, file2.name());
+		packed_file3 = ::open_packed(*package, file3.path().c_str());
+		packed_file1 = ::open_packed(*package, file1.path().c_str());
+		packed_file2 = ::open_packed(*package, file2.path().c_str());
 	}
 
 	REQUIRE(packed_file1);
@@ -99,28 +99,28 @@ TEST_CASE("package")
 TEST_CASE("package.file_size")
 {
 	TemporaryFile file1;
-	Writer(file1).write_all(Buffer(1, "1"));
+	Writer{ file1 }.write_all(Buffer(1, "1"));
 
 	TemporaryFile file2;
-	Writer(file2).write_all(Buffer(1, "2"));
+	Writer{ file2 }.write_all(Buffer(1, "2"));
 
 	TemporaryFile file3;
-	Writer(file3).write_all(Buffer(1, "3"));
+	Writer{ file3 }.write_all(Buffer(1, "3"));
 
 	TemporaryFile package_file;
 	{
-		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		const auto package_writer = PackageWriter::create(package_file.path(), PackageType::Ypq);
 		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file1.name()));
-		REQUIRE(package_writer->add(file2.name()));
-		REQUIRE(package_writer->add(file3.name()));
+		REQUIRE(package_writer->add(file1.path()));
+		REQUIRE(package_writer->add(file2.path()));
+		REQUIRE(package_writer->add(file3.path()));
 		REQUIRE(package_writer->commit());
 	}
 
-	const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+	const auto package = PackageReader::create(package_file.path(), PackageType::Ypq);
 	REQUIRE(package);
 
-	auto packed_file = ::open_packed(*package, file2.name());
+	auto packed_file = ::open_packed(*package, file2.path().c_str());
 	REQUIRE(packed_file);
 
 	std::array<uint8_t, 2> data{ 0, 0 };
@@ -133,19 +133,19 @@ TEST_CASE("package.duplicates")
 	TemporaryFile package_file;
 	TemporaryFile file;
 	{
-		const auto package_writer = PackageWriter::create(package_file.name(), PackageType::Ypq);
+		const auto package_writer = PackageWriter::create(package_file.path(), PackageType::Ypq);
 		REQUIRE(package_writer);
-		Writer(file).write_all(Buffer(1, "1"));
-		REQUIRE(package_writer->add(file.name()));
-		Writer(file).write_all(Buffer(2, "23"));
-		REQUIRE(package_writer->add(file.name()));
+		Writer{ file }.write_all(Buffer{ 1, "1" });
+		REQUIRE(package_writer->add(file.path()));
+		Writer{ file }.write_all(Buffer{ 2, "23" });
+		REQUIRE(package_writer->add(file.path()));
 		REQUIRE(package_writer->commit());
 	}
 
-	const auto package = PackageReader::create(package_file.name(), PackageType::Ypq);
+	const auto package = PackageReader::create(package_file.path(), PackageType::Ypq);
 	REQUIRE(package);
 
-	auto packed_file = ::open_packed(*package, file.name());
+	auto packed_file = ::open_packed(*package, file.path().c_str());
 	REQUIRE(packed_file);
 
 	std::array<uint8_t, 3> data{ 0, 0, 0 };

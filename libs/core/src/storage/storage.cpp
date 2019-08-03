@@ -116,11 +116,11 @@ namespace Yttrium
 		_private->attach_buffer(name, std::move(buffer));
 	}
 
-	void Storage::attach_package(const std::string& path, PackageType type)
+	void Storage::attach_package(const std::filesystem::path& path, PackageType type)
 	{
 		auto package = PackageReader::create(path, type);
 		if (!package)
-			throw MissingDataError("Unable to open \"", path, "\"");
+			throw MissingDataError{ "Unable to open \"", path.string(), "\"" };
 		_private->attach_package(std::move(package));
 	}
 

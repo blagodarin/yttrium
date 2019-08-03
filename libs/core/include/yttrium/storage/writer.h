@@ -19,6 +19,7 @@
 
 #include <yttrium/api.h>
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 
@@ -37,7 +38,7 @@ namespace Yttrium
 		explicit Writer(Buffer&);
 
 		/// Creates a Writer for the specified file.
-		explicit Writer(const std::string& path);
+		explicit Writer(const std::filesystem::path&);
 
 		/// Creates a Writer for a temporary file.
 		explicit Writer(TemporaryFile&);

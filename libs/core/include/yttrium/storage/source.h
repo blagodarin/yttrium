@@ -19,8 +19,8 @@
 
 #include <yttrium/api.h>
 
+#include <filesystem>
 #include <memory>
-#include <string_view>
 
 namespace Yttrium
 {
@@ -37,10 +37,8 @@ namespace Yttrium
 		/// Creates a Source from a Buffer.
 		static std::unique_ptr<Source> from(Buffer&&);
 
-		/// Creates a Source from the specified file.
-		static std::unique_ptr<Source> from(const std::string& path);
-		static std::unique_ptr<Source> from(std::string_view path) { return from(std::string{ path }); }
-		static std::unique_ptr<Source> from(const char* path) { return from(std::string{ path }); }
+		/// Creates a Source from a file.
+		static std::unique_ptr<Source> from(const std::filesystem::path&);
 
 		/// Creates a Source from a temporary file.
 		static std::unique_ptr<Source> from(const TemporaryFile&);
