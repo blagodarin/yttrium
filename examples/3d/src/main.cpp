@@ -16,6 +16,7 @@
 //
 
 #include <yttrium/logger.h>
+#include <yttrium/main.h>
 #include "../../common/include/utils.h"
 #include "game.h"
 

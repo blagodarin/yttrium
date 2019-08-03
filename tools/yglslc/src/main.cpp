@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 
+#include <yttrium/main.h>
+
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -212,4 +214,5 @@ int ymain(int argc, char** argv)
 			output << ',' << spirv[i];
 	}
 	output << '\n';
+	return 0;
 }

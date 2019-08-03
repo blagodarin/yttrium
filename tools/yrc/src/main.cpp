@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 
+#include <yttrium/main.h>
+
 #include <cstring>
 #include <filesystem>
 #include <fstream>

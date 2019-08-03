@@ -17,6 +17,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
+#include <yttrium/main.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>

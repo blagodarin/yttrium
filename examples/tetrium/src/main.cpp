@@ -22,6 +22,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/logger.h>
+#include <yttrium/main.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
 #include <yttrium/resource_loader.h>
