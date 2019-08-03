@@ -18,21 +18,20 @@
 #include <yttrium/storage/temporary_file.h>
 
 #include <array>
-#include <system_error>
 
 #include <windows.h>
 
 namespace
 {
-	std::string make_temporary_file_name()
+	std::filesystem::path make_temporary_file_name()
 	{
 		constexpr auto max_temp_path_size = MAX_PATH - 14; // GetTempFileName path length limit.
-		std::array<char, max_temp_path_size + 1> path;
+		std::array<wchar_t, max_temp_path_size + 1> path;
 		static_assert(path.size() <= std::numeric_limits<DWORD>::max());
-		if (!::GetTempPathA(static_cast<DWORD>(path.size()), path.data()))
+		if (!::GetTempPathW(static_cast<DWORD>(path.size()), path.data()))
 			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-		std::array<char, MAX_PATH> name;
-		const auto status = ::GetTempFileNameA(path.data(), "yt-", 0, name.data());
+		std::array<wchar_t, MAX_PATH> name;
+		const auto status = ::GetTempFileNameW(path.data(), L"yt-", 0, name.data());
 		if (!status)
 			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		else if (status == ERROR_BUFFER_OVERFLOW)
@@ -48,12 +47,12 @@ namespace Yttrium
 	public:
 		~TemporaryFilePrivate() noexcept
 		{
-			if (!::DeleteFileA(_name.data()))
+			if (!::DeleteFileW(_path.c_str()))
 				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
 		}
 
 	public:
-		const std::string _name = ::make_temporary_file_name();
+		const std::filesystem::path _path = ::make_temporary_file_name();
 	};
 
 	TemporaryFile::TemporaryFile()
@@ -63,8 +62,8 @@ namespace Yttrium
 
 	TemporaryFile::~TemporaryFile() = default;
 
-	const std::filesystem::path& TemporaryFile::name() const
+	const std::filesystem::path& TemporaryFile::path() const
 	{
-		return _private->_name;
+		return _private->_path;
 	}
 }

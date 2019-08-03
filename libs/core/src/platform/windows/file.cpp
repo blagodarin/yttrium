@@ -30,8 +30,8 @@ namespace Yttrium
 	class FileSource final : public Source
 	{
 	public:
-		FileSource(uint64_t size, const std::string& name, HANDLE handle)
-			: Source{ size, name }
+		FileSource(uint64_t size, const std::filesystem::path& path, HANDLE handle)
+			: Source{ size, path.string() }
 			, _handle{ handle }
 		{
 		}
@@ -68,7 +68,7 @@ namespace Yttrium
 		{
 			if (!::CloseHandle(_handle))
 				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
-			if (_unlink && !::DeleteFileA(_name.c_str()))
+			if (_unlink && !::DeleteFileW(_path.c_str()))
 				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
 		}
 
@@ -99,14 +99,14 @@ namespace Yttrium
 		}
 
 	private:
-		const std::filesystem::path _name;
+		const std::filesystem::path _path;
 		const HANDLE _handle;
 		bool _unlink = false;
 	};
 
-	std::unique_ptr<Source> Source::from(const std::string& path)
+	std::unique_ptr<Source> Source::from(const std::filesystem::path& path)
 	{
-		const auto handle = ::CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+		const auto handle = ::CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
 			return {};
 		LARGE_INTEGER size;
@@ -117,12 +117,12 @@ namespace Yttrium
 
 	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
 	{
-		return from(file.name());
+		return from(file.path());
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(const std::filesystem::path& path)
 	{
-		const auto handle = ::CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		const auto handle = ::CreateFileW(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
 			return {};
 		return std::make_unique<FileWriter>(path, handle);
@@ -130,6 +130,6 @@ namespace Yttrium
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
 	{
-		return create_file_writer(file.name());
+		return create_file_writer(file.path());
 	}
 }
