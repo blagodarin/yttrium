@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "../../../libs/engine/src/gui/key_lookup.h"
+#include "../../src/gui/key_lookup.h"
 
 #include <catch2/catch.hpp>
 

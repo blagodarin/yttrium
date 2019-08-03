@@ -31,4 +31,9 @@ include_config(test_engine ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_engine PRIVATE ycore yengine ytest)
 set_target_properties(test_engine PROPERTIES FOLDER "tests")
 
-add_test(NAME engine COMMAND test_engine --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_test(NAME engine COMMAND test_engine --reporter compact)
+add_custom_target(check_engine
+	COMMAND test_engine --reporter compact
+	COMMENT "Running engine tests"
+	VERBATIM)
+set_target_properties(check_engine PROPERTIES FOLDER ".phony")

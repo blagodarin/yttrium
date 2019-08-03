@@ -16,7 +16,7 @@
 //
 
 #include <yttrium/logger.h>
-#include "../../../libs/core/src/logger/ring_log.h"
+#include "../../src/logger/ring_log.h"
 
 #include <mutex>
 #include <thread>

@@ -17,10 +17,10 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
-#include "../../../libs/core/src/image/formats/bmp.h"
-#include "../../../libs/core/src/image/formats/dds.h"
-#include "../../../libs/core/src/image/formats/ico.h"
-#include "../../core/src/image_formats.h"
+#include "../../../src/image/formats/bmp.h"
+#include "../../../src/image/formats/dds.h"
+#include "../../../src/image/formats/ico.h"
+#include "../../src/image_formats.h"
 
 #include <cstring>
 
@@ -37,7 +37,7 @@ namespace
 
 int main()
 {
-	::make_gray8_test_image<16>().save(Writer{ "tests/core/data/gradient8.tga" }, ImageFormat::Tga);
+	::make_gray8_test_image<16>().save(Writer{ "gradient8.tga" }, ImageFormat::Tga);
 	{
 		BmpFileHeader file_header;
 		file_header.file_type = BmpFileType::Bm;
@@ -58,15 +58,15 @@ int main()
 		info_header.used_colors = 0;
 		info_header.required_colors = 0;
 
-		Writer writer{ "tests/core/data/gradient24.bmp" };
+		Writer writer{ "gradient24.bmp" };
 		if (writer.write(file_header) && writer.write(info_header))
 			::write_color_gradient(writer, false, ImageOrientation::XRightYDown);
 	}
-	if (const auto source = Source::from("tests/core/data/gradient24.jpeg"))
+	if (const auto source = Source::from("gradient24.jpeg"))
 		if (const auto jpeg = Image::load(*source))
-			jpeg->save(Writer{ "tests/core/data/gradient24.jpeg.tga" }, ImageFormat::Tga);
-	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.png" }, ImageFormat::Png);
-	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient24.tga" }, ImageFormat::Tga);
+			jpeg->save(Writer{ "gradient24.jpeg.tga" }, ImageFormat::Tga);
+	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "gradient24.png" }, ImageFormat::Png);
+	::make_test_image(false, ImageOrientation::XRightYDown).save(Writer{ "gradient24.tga" }, ImageFormat::Tga);
 	{
 		DDS_HEADER header;
 		std::memset(&header, 0, sizeof header);
@@ -84,7 +84,7 @@ int main()
 		header.ddspf.dwABitMask = 0xFF000000;
 		header.dwCaps = DDSCAPS_TEXTURE;
 
-		Writer writer{ "tests/core/data/gradient32.dds" };
+		Writer writer{ "gradient32.dds" };
 		if (writer.write(header))
 			::write_color_gradient(writer, true, ImageOrientation::XRightYDown);
 	}
@@ -120,7 +120,7 @@ int main()
 		bitmap_header.used_colors = 0;
 		bitmap_header.required_colors = 0;
 
-		Writer writer{ "tests/core/data/gradient32.ico" };
+		Writer writer{ "gradient32.ico" };
 		if (writer.write(file_header) && writer.write(image_header) && writer.write(bitmap_header) && ::write_color_gradient(writer, true, ImageOrientation::XRightYUp))
 		{
 			const auto mask_data_buffer = std::make_unique<std::uint8_t[]>(mask_data_size);
@@ -128,5 +128,5 @@ int main()
 			writer.write(mask_data_buffer.get(), mask_data_size);
 		}
 	}
-	::make_test_image(true, ImageOrientation::XRightYDown).save(Writer{ "tests/core/data/gradient32.tga" }, ImageFormat::Tga);
+	::make_test_image(true, ImageOrientation::XRightYDown).save(Writer{ "gradient32.tga" }, ImageFormat::Tga);
 }

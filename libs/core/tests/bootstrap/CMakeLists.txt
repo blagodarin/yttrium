@@ -16,14 +16,19 @@
 #
 
 set(_src
-	src/transform.cpp
+	src/main.cpp
 	)
 
-add_executable(test_audio ${_src})
+add_executable(bootstrap_core_tests ${_src})
 source_group("src" FILES ${_src})
 
-include_config(test_audio ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(test_audio PRIVATE yaudio ycore ytest)
-set_target_properties(test_audio PROPERTIES FOLDER "tests")
+include_config(bootstrap_core_tests ${PROJECT_BINARY_DIR}/config.h)
+target_link_libraries(bootstrap_core_tests PRIVATE ycore)
+set_target_properties(bootstrap_core_tests PROPERTIES FOLDER "tests")
 
-add_test(NAME audio COMMAND test_audio --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_custom_target(bootstrap
+	COMMAND bootstrap_core_tests
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../data
+	COMMENT "Bootstrapping core tests"
+	VERBATIM)
+set_target_properties(bootstrap PROPERTIES FOLDER ".phony")

@@ -18,8 +18,8 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
+#include <yttrium/test/utils.h>
 #include <yttrium/translation.h>
-#include "../../common/include/utils.h"
 
 #include <catch2/catch.hpp>
 

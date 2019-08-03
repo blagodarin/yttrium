@@ -22,7 +22,7 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/storage/storage.h>
-#include "../../common/include/utils.h"
+#include <yttrium/test/utils.h>
 
 #include <unordered_map>
 

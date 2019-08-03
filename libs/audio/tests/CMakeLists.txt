@@ -16,12 +16,19 @@
 #
 
 set(_src
-	src/main.cpp
+	src/transform.cpp
 	)
 
-add_executable(gen_test_data ${_src})
+add_executable(test_audio ${_src})
 source_group("src" FILES ${_src})
 
-include_config(gen_test_data ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(gen_test_data PRIVATE ycore)
-set_target_properties(gen_test_data PROPERTIES FOLDER "tests")
+include_config(test_audio ${PROJECT_BINARY_DIR}/config.h)
+target_link_libraries(test_audio PRIVATE yaudio ycore ytest)
+set_target_properties(test_audio PROPERTIES FOLDER "tests")
+
+add_test(NAME audio COMMAND test_audio --reporter compact)
+add_custom_target(check_audio
+	COMMAND test_audio --reporter compact
+	COMMENT "Running audio tests"
+	VERBATIM)
+set_target_properties(check_audio PROPERTIES FOLDER ".phony")

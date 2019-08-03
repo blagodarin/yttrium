@@ -55,4 +55,10 @@ include_config(test_core ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_core PRIVATE ycore ytest)
 set_target_properties(test_core PROPERTIES FOLDER "tests")
 
-add_test(NAME core COMMAND test_core --reporter compact WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_test(NAME core COMMAND test_core --reporter compact WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
+add_custom_target(check_core
+	COMMAND test_core --reporter compact
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+	COMMENT "Running core tests"
+	VERBATIM)
+set_target_properties(check_core PROPERTIES FOLDER ".phony")

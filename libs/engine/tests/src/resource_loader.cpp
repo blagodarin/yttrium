@@ -21,7 +21,7 @@
 #include <yttrium/resource_loader.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
-#include "../../common/include/utils.h"
+#include <yttrium/test/utils.h>
 
 #include <catch2/catch.hpp>
 

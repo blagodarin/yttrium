@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "../include/utils.h"
+#include <yttrium/test/utils.h>
 
 #include <yttrium/memory/buffer.h>
 
