@@ -49,7 +49,7 @@ namespace Yttrium
 	{
 	}
 
-	TemporaryFile::~TemporaryFile() = default;
+	TemporaryFile::~TemporaryFile() noexcept = default;
 
 	const std::filesystem::path& TemporaryFile::path() const
 	{
