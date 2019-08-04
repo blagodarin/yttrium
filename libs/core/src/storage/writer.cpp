@@ -66,7 +66,7 @@ namespace Yttrium
 	{
 	}
 
-	Writer::Writer(const std::string& path)
+	Writer::Writer(const std::filesystem::path& path)
 		: _private{ create_file_writer(path) }
 	{
 	}
@@ -104,12 +104,6 @@ namespace Yttrium
 	uint64_t Writer::size() const
 	{
 		return _private ? _private->_size : 0;
-	}
-
-	void Writer::unlink()
-	{
-		if (_private)
-			_private->unlink();
 	}
 
 	size_t Writer::write(const void* data, size_t size)

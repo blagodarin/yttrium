@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/storage/source.h>
 #include "source.h"
 
 #include <yttrium/memory/buffer.h>
@@ -30,7 +31,7 @@ namespace Yttrium
 	{
 	public:
 		MemorySource(const void* data, size_t size) noexcept
-			: Source{ size }, _data{ data } {}
+			: _data{ data }, _size{ size } {}
 
 		const void* data() const noexcept override
 		{
@@ -46,17 +47,23 @@ namespace Yttrium
 			return actual_size;
 		}
 
+		uint64_t size() const noexcept override
+		{
+			return _size;
+		}
+
 	private:
 		const void* const _data;
+		const size_t _size;
 	};
 
 	class BufferSource final : public Source
 	{
 	public:
 		explicit BufferSource(Buffer&& buffer)
-			: Source{ buffer.size() }, _buffer{ std::make_shared<const Buffer>(std::move(buffer)) } {}
-		BufferSource(const std::shared_ptr<const Buffer>& buffer, const std::string& name)
-			: Source{ buffer->size(), name }, _buffer{ buffer } {}
+			: _buffer{ std::make_shared<const Buffer>(std::move(buffer)) } {}
+		explicit BufferSource(const std::shared_ptr<const Buffer>& buffer) noexcept
+			: _buffer{ buffer } {}
 
 		const void* data() const noexcept override
 		{
@@ -65,11 +72,16 @@ namespace Yttrium
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
 		{
-			if (offset >= _size)
+			if (offset >= _buffer->size())
 				return 0;
-			const auto actual_size = static_cast<size_t>(std::min<uint64_t>(size, _size - offset));
+			const auto actual_size = static_cast<size_t>(std::min<uint64_t>(size, _buffer->size() - offset));
 			std::memcpy(data, static_cast<const uint8_t*>(_buffer->data()) + offset, actual_size);
 			return actual_size;
+		}
+
+		uint64_t size() const noexcept override
+		{
+			return _buffer->size();
 		}
 
 	private:
@@ -79,17 +91,23 @@ namespace Yttrium
 	class ProxySource final : public Source
 	{
 	public:
-		ProxySource(const std::shared_ptr<const Source>& source, uint64_t base, uint64_t size)
-			: Source{ size }, _source{ source }, _base{ base } {}
+		ProxySource(const std::shared_ptr<const Source>& source, uint64_t base, uint64_t size) noexcept
+			: _source{ source }, _base{ base }, _size{ size } {}
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
 		{
 			return offset <= std::numeric_limits<uint64_t>::max() - _base ? _source->read_at(_base + offset, data, static_cast<size_t>(std::min<uint64_t>(size, _size - offset))) : 0;
 		}
 
+		uint64_t size() const noexcept override
+		{
+			return _size;
+		}
+
 	private:
 		const std::shared_ptr<const Source> _source;
 		const uint64_t _base;
+		const uint64_t _size;
 	};
 
 	std::unique_ptr<Source> Source::from(const void* data, size_t size)
@@ -102,9 +120,9 @@ namespace Yttrium
 		return std::make_unique<BufferSource>(std::move(buffer));
 	}
 
-	std::unique_ptr<Source> create_source(const std::shared_ptr<const Buffer>& buffer, const std::string& name)
+	std::unique_ptr<Source> create_source(const std::shared_ptr<const Buffer>& buffer)
 	{
-		return std::make_unique<BufferSource>(buffer, name);
+		return std::make_unique<BufferSource>(buffer);
 	}
 
 	std::unique_ptr<Source> Source::from(const std::shared_ptr<const Source>& source, uint64_t base, uint64_t size)
@@ -116,9 +134,10 @@ namespace Yttrium
 
 	Buffer Source::to_buffer(std::size_t padding_size) const
 	{
-		if (_size > std::numeric_limits<std::size_t>::max() - padding_size)
+		const auto source_size = size();
+		if (source_size > std::numeric_limits<std::size_t>::max() - padding_size)
 			throw std::bad_alloc{};
-		const auto size = static_cast<std::size_t>(_size);
+		const auto size = static_cast<std::size_t>(source_size);
 		Buffer buffer{ size + padding_size };
 		if (read_at(0, buffer.data(), size) != size)
 			throw std::system_error{ std::make_error_code(std::errc::io_error) };
@@ -129,9 +148,10 @@ namespace Yttrium
 
 	std::string Source::to_string() const
 	{
-		if (_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
+		const auto source_size = size();
+		if (source_size >= std::numeric_limits<size_t>::max()) // One extra byte for null terminator.
 			throw std::bad_alloc{};
-		std::string string(static_cast<size_t>(_size), '\0');
+		std::string string(static_cast<size_t>(source_size), '\0');
 		if (read_at(0, string.data(), string.size()) != string.size())
 			throw std::system_error{ std::make_error_code(std::errc::io_error) };
 		return string;

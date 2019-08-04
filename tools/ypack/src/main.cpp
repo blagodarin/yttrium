@@ -17,6 +17,8 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
+#include <yttrium/logger.h>
+#include <yttrium/main.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
@@ -36,8 +38,10 @@ namespace
 	}
 }
 
-int main(int argc, char** argv)
+int ymain(int argc, char** argv)
 {
+	Yttrium::Logger logger;
+
 	if (argc != 3)
 	{
 		std::cerr
@@ -47,20 +51,20 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	std::string index_name;
-	std::string package_name;
+	std::filesystem::path index_path;
+	std::filesystem::path package_path;
 	if (!std::strcmp(argv[1], "-d") || !std::strcmp(argv[1], "--dependencies"))
-		index_name = argv[2];
+		index_path = std::filesystem::u8path(argv[2]);
 	else
 	{
-		index_name = argv[1];
-		package_name = argv[2];
+		index_path = std::filesystem::u8path(argv[1]);
+		package_path = std::filesystem::u8path(argv[2]);
 	}
 
 	std::vector<std::string> paths;
 	try
 	{
-		auto source = Yttrium::Source::from(index_name);
+		auto source = Yttrium::Source::from(index_path);
 		check(static_cast<bool>(source), "Bad index file");
 		Yttrium::IonReader ion{ *source };
 		ion.read().check_name("package");
@@ -71,38 +75,34 @@ int main(int argc, char** argv)
 	}
 	catch (const std::runtime_error& e)
 	{
-		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
+		std::cerr << "ERROR: Unable to read " << index_path << ": " << e.what() << '\n';
 		return 1;
 	}
 
-	if (package_name.empty())
+	if (package_path.empty())
 	{
 		for (const auto& path : paths)
-			std::cout << path << "\n";
+			std::cout << path << '\n';
 		return 0;
 	}
 
-	const auto package = Yttrium::PackageWriter::create(package_name, Yttrium::PackageType::Ypq);
+	auto package = Yttrium::PackageWriter::create(package_path, Yttrium::PackageType::Ypq);
 	if (!package)
 	{
-		std::cerr << "ERROR(" << package_name << "): Can't open package file\n";
+		std::cerr << "ERROR: Unable to open " << package_path << " for writing\n";
 		return 1;
 	}
 
-	try
+	for (const auto& path : paths)
+		package->add(path);
+
+	if (!package->commit())
 	{
-		for (const auto& path : paths)
-			package->add(path);
-		if (!package->commit())
-		{
-			std::cerr << "ERROR(" << package_name << "): Unable to write package file\n";
-			return 1;
-		}
-	}
-	catch (const Yttrium::DataError& e)
-	{
-		std::cerr << "ERROR(" << index_name << "): " << e.what() << "\n";
+		std::cerr << "ERROR: Unable to write " << package_path << '\n';
+		package.reset();
+		std::filesystem::remove(package_path);
 		return 1;
 	}
+
 	return 0;
 }

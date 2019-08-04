@@ -22,7 +22,7 @@ set(_src
 add_executable(ypack ${_src})
 source_group("src" FILES ${_src})
 
-target_link_libraries(ypack PRIVATE ycore)
+target_link_libraries(ypack PRIVATE ycore ymain)
 set_target_properties(ypack PROPERTIES FOLDER "tools")
 
 install(TARGETS ypack RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

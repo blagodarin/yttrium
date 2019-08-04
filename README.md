@@ -19,8 +19,6 @@ Yttrium features:
   - Yttrium can be built as a set of DLLs with user-provided dependencies, or it
     can yield static libraries that can be linked into a single binary &mdash;
     the choice is up to you.
-  - Building Yttrium with all its dependencies requires just a couple of
-    minutes, and rebuilds happen in seconds no matter what change you make.
   - Check out [build instructions](docs/building.md) for more details.
     [Contribution guidelines](docs/contributing.md) may also help you find your
     way around.

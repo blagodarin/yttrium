@@ -41,7 +41,7 @@ namespace Yttrium
 	void WindowBackend::HIconDeleter::free(HICON handle) noexcept
 	{
 		if (handle && !::DestroyIcon(handle))
-			print_last_error("DestroyIcon");
+			log_last_error("DestroyIcon");
 	}
 
 	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
@@ -97,7 +97,7 @@ namespace Yttrium
 		std::memset(buffer.get() + sizeof *header + header->image_size, 0xff, mask_size);
 		decltype(_icon) icon{ ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR) };
 		if (!icon)
-			return print_last_error("CreateIconFromResourceEx");
+			return log_last_error("CreateIconFromResourceEx");
 		_icon = std::move(icon);
 		::SendMessageW(_hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(_icon.get()));
 		::SendMessageW(_hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(_icon.get()));

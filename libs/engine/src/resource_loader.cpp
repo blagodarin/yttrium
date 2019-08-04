@@ -36,18 +36,6 @@
 #include <mutex>
 #include <functional>
 
-namespace
-{
-	// https://developercommunity.visualstudio.com/content/problem/74313/compiler-error-in-xsmf-control-with-stdoptional-pa.html
-	Yttrium::Image load_image(const Yttrium::Source& source)
-	{
-		auto image = Yttrium::Image::load(source);
-		if (!image)
-			throw Yttrium::DataError{ "Can't load \"", source.name(), "\"" };
-		return std::move(*image);
-	}
-}
-
 namespace Yttrium
 {
 	template <typename T>
@@ -195,8 +183,8 @@ namespace Yttrium
 	{
 		if (!_private->_render_manager)
 			return {};
-		return _private->_mesh_cache.fetch(name, [this](std::unique_ptr<Source>&& source) {
-			return _private->_render_manager->load_mesh(*source);
+		return _private->_mesh_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) {
+			return _private->_render_manager->load_mesh(*source, name);
 		});
 	}
 
@@ -204,8 +192,11 @@ namespace Yttrium
 	{
 		if (!_private->_render_manager)
 			return {};
-		return _private->_texture_2d_cache.fetch(name, [this](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D> {
-			return _private->_render_manager->create_texture_2d(::load_image(*source));
+		return _private->_texture_2d_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D> {
+			auto image = Yttrium::Image::load(*source);
+			if (!image)
+				throw DataError{ "Can't load \"", name, "\"" };
+			return _private->_render_manager->create_texture_2d(*image);
 		});
 	}
 

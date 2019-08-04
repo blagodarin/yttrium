@@ -17,20 +17,22 @@
 
 #pragma once
 
-#include <yttrium/storage/temporary_file.h>
+#include <filesystem>
+#include <memory>
 
 namespace Yttrium
 {
 	class TemporaryFilePrivate
 	{
 	public:
-		TemporaryFilePrivate();
+		TemporaryFilePrivate(std::string&& path, int descriptor)
+			: _path{ std::move(path) }, _descriptor{ descriptor } {}
 		~TemporaryFilePrivate() noexcept;
 
 		static auto descriptor(const TemporaryFile& file) noexcept { return file._private->_descriptor; }
 
 	public:
-		std::string _name;
+		const std::filesystem::path _path;
 		const int _descriptor;
 	};
 }

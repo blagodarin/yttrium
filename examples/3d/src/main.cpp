@@ -16,6 +16,7 @@
 //
 
 #include <yttrium/logger.h>
+#include <yttrium/main.h>
 #include "../../common/include/utils.h"
 #include "game.h"
 
@@ -29,7 +30,7 @@ namespace
 	}
 }
 
-int main(int, char**)
+int ymain(int, char**)
 {
 	Logger logger;
 	Storage storage{ Storage::UseFileSystem::Never };

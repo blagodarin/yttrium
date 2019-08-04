@@ -19,8 +19,8 @@
 
 #include <yttrium/api.h>
 
+#include <filesystem>
 #include <memory>
-#include <string>
 
 namespace Yttrium
 {
@@ -32,10 +32,10 @@ namespace Yttrium
 		TemporaryFile();
 
 		///
-		~TemporaryFile();
+		~TemporaryFile() noexcept;
 
 		///
-		const std::string& name() const;
+		const std::filesystem::path& path() const;
 
 	private:
 		const std::unique_ptr<class TemporaryFilePrivate> _private;

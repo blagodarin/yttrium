@@ -15,41 +15,44 @@
 // limitations under the License.
 //
 
-#include "temporary_file.h"
+#include <yttrium/storage/temporary_file.h>
 
 #include "error.h"
-
-#include <system_error>
+#include "temporary_file.h"
 
 #include <unistd.h>
 
+namespace
+{
+	std::unique_ptr<Yttrium::TemporaryFilePrivate> create_temporary_file()
+	{
+		auto path = (std::filesystem::temp_directory_path() / "yt-XXXXXX").string();
+		const auto descriptor = ::mkstemp(path.data());
+		if (descriptor == -1)
+			throw std::system_error{ errno, std::generic_category() };
+		return std::make_unique<Yttrium::TemporaryFilePrivate>(std::move(path), descriptor); // TODO: Fix descriptor leak on exception.
+	}
+}
+
 namespace Yttrium
 {
-	TemporaryFilePrivate::TemporaryFilePrivate()
-		: _name{ "/tmp/yttrium-XXXXXX" }
-		, _descriptor{ ::mkstemp(_name.data()) }
-	{
-		if (_descriptor == -1)
-			throw std::system_error{ errno, std::generic_category() };
-	}
-
 	TemporaryFilePrivate::~TemporaryFilePrivate() noexcept
 	{
 		if (::close(_descriptor))
 			report_errno("close");
-		if (::unlink(_name.c_str()))
+		if (::unlink(_path.c_str()))
 			report_errno("unlink");
 	}
 
 	TemporaryFile::TemporaryFile()
-		: _private{ std::make_unique<TemporaryFilePrivate>() }
+		: _private{ ::create_temporary_file() }
 	{
 	}
 
-	TemporaryFile::~TemporaryFile() = default;
+	TemporaryFile::~TemporaryFile() noexcept = default;
 
-	const std::string& TemporaryFile::name() const
+	const std::filesystem::path& TemporaryFile::path() const
 	{
-		return _private->_name;
+		return _private->_path;
 	}
 }

@@ -132,15 +132,9 @@ namespace Yttrium
 	};
 
 	YpqWriter::YpqWriter(Writer&& writer)
-		: _writer(std::move(writer))
-	{
-	}
+		: _writer{ std::move(writer) } {}
 
-	YpqWriter::~YpqWriter()
-	{
-		if (!_finished)
-			_writer.unlink();
-	}
+	YpqWriter::~YpqWriter() = default;
 
 	bool YpqWriter::add(const std::string& path)
 	{

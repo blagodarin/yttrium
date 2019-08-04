@@ -20,6 +20,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include "../../storage/writer.h"
+#include "error.h"
 
 #include <system_error>
 
@@ -30,16 +31,13 @@ namespace Yttrium
 	class FileSource final : public Source
 	{
 	public:
-		FileSource(uint64_t size, const std::string& name, HANDLE handle)
-			: Source{ size, name }
-			, _handle{ handle }
-		{
-		}
+		FileSource(HANDLE handle, uint64_t size) noexcept
+			: _handle{ handle }, _size{ size } {}
 
 		~FileSource() noexcept override
 		{
 			if (!::CloseHandle(_handle))
-				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
+				log_last_error("CloseHandle");
 		}
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
@@ -51,25 +49,26 @@ namespace Yttrium
 			return ::ReadFile(_handle, data, static_cast<DWORD>(size), &result, &overlapped) ? result : 0;
 		}
 
+		uint64_t size() const noexcept override
+		{
+			return _size;
+		}
+
 	private:
 		const HANDLE _handle;
+		const uint64_t _size;
 	};
 
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(const std::string& name, HANDLE handle)
-			: _name{ name }
-			, _handle{ handle }
-		{
-		}
+		explicit FileWriter(HANDLE handle) noexcept
+			: _handle{ handle } {}
 
 		~FileWriter() noexcept override
 		{
 			if (!::CloseHandle(_handle))
-				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
-			if (_unlink && !::DeleteFileA(_name.c_str()))
-				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
+				log_last_error("CloseHandle");
 		}
 
 		void reserve(uint64_t) override
@@ -84,11 +83,6 @@ namespace Yttrium
 				throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		}
 
-		void unlink() override
-		{
-			_unlink = true;
-		}
-
 		size_t write_at(uint64_t offset, const void* data, size_t size) override
 		{
 			DWORD result = 0;
@@ -99,37 +93,46 @@ namespace Yttrium
 		}
 
 	private:
-		const std::string _name;
 		const HANDLE _handle;
-		bool _unlink = false;
 	};
 
-	std::unique_ptr<Source> Source::from(const std::string& path)
+	std::unique_ptr<Source> Source::from(const std::filesystem::path& path)
 	{
-		const auto handle = ::CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+		const auto handle = ::CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
+		{
+			log_last_error("CreateFile");
 			return {};
+		}
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
-			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-		return std::make_unique<FileSource>(size.QuadPart, path, handle);
+		{
+			log_last_error("GetFileSizeEx");
+			if (!::CloseHandle(handle))
+				log_last_error("CloseHandle");
+			return {};
+		}
+		return std::make_unique<FileSource>(handle, size.QuadPart); // TODO: Fix handle leak on exception.
 	}
 
 	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
 	{
-		return from(file.name());
+		return from(file.path());
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(const std::filesystem::path& path)
 	{
-		const auto handle = ::CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		const auto handle = ::CreateFileW(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
+		{
+			log_last_error("CreateFile");
 			return {};
-		return std::make_unique<FileWriter>(path, handle);
+		}
+		return std::make_unique<FileWriter>(handle); // TODO: Fix handle leak on exception.
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
 	{
-		return create_file_writer(file.name());
+		return create_file_writer(file.path());
 	}
 }

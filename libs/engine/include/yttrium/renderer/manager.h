@@ -51,6 +51,6 @@ namespace Yttrium
 		virtual std::unique_ptr<Texture2D> create_texture_2d(const Image&, Flags<TextureFlag> = {}) = 0;
 
 		///
-		virtual std::unique_ptr<Mesh> load_mesh(const Source&) = 0;
+		virtual std::unique_ptr<Mesh> load_mesh(const Source&, std::string_view source_name) = 0;
 	};
 }

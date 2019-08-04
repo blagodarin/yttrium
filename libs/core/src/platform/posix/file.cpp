@@ -18,6 +18,7 @@
 #include "../file.h"
 
 #include <yttrium/storage/source.h>
+#include <yttrium/storage/temporary_file.h>
 #include "../../storage/writer.h"
 #include "error.h"
 #include "temporary_file.h"
@@ -25,37 +26,20 @@
 #include <cstdlib>
 #include <system_error>
 
-#include <fcntl.h>
-#include <unistd.h>
-
-namespace
-{
-	auto maybe_size(int descriptor)
-	{
-		const auto size = ::lseek(descriptor, 0, SEEK_END);
-		if (size == -1)
-			throw std::system_error{ errno, std::generic_category() };
-		return size;
-	}
-}
+#include <fcntl.h>  // open
+#include <unistd.h> // close, ftruncate, lseek, pread, pwrite
 
 namespace Yttrium
 {
 	class FileSource final : public Source
 	{
 	public:
-		FileSource(uint64_t size, const std::string& name, int descriptor, bool temporary)
-			: Source{ size, name }
-			, _descriptor{ descriptor }
-			, _temporary{ temporary }
-		{
-		}
+		FileSource(int descriptor, uint64_t size, bool proxy) noexcept
+			: _descriptor{ descriptor }, _size{ size }, _proxy{ proxy } {}
 
 		~FileSource() noexcept override
 		{
-			if (_temporary)
-				return;
-			if (::close(_descriptor))
+			if (!_proxy && ::close(_descriptor) == -1)
 				report_errno("close");
 		}
 
@@ -65,29 +49,27 @@ namespace Yttrium
 			return result != -1 ? static_cast<size_t>(result) : 0;
 		}
 
+		uint64_t size() const noexcept override
+		{
+			return _size;
+		}
+
 	private:
 		const int _descriptor;
-		const bool _temporary;
+		const size_t _size;
+		const bool _proxy;
 	};
 
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(std::string_view name, int descriptor, bool temporary)
-			: _name{ name }
-			, _descriptor{ descriptor }
-			, _temporary{ temporary }
-		{
-		}
+		FileWriter(int descriptor, bool proxy) noexcept
+			: _descriptor{ descriptor }, _proxy{ proxy } {}
 
 		~FileWriter() noexcept override
 		{
-			if (_temporary)
-				return;
-			if (::close(_descriptor) == -1)
+			if (!_proxy && ::close(_descriptor) == -1)
 				report_errno("close");
-			if (_unlink && ::unlink(_name.c_str()) == -1)
-				report_errno("unlink");
 		}
 
 		void reserve(uint64_t) override
@@ -100,11 +82,6 @@ namespace Yttrium
 				throw std::system_error{ errno, std::generic_category() };
 		}
 
-		void unlink() override
-		{
-			_unlink = true;
-		}
-
 		size_t write_at(uint64_t offset, const void* data, size_t size) override
 		{
 			const auto result = ::pwrite(_descriptor, data, size, static_cast<int64_t>(offset));
@@ -112,13 +89,11 @@ namespace Yttrium
 		}
 
 	private:
-		const std::string _name;
 		const int _descriptor;
-		const bool _temporary;
-		bool _unlink = false;
+		const bool _proxy;
 	};
 
-	std::unique_ptr<Source> Source::from(const std::string& path)
+	std::unique_ptr<Source> Source::from(const std::filesystem::path& path)
 	{
 #ifdef __linux__
 		const int flags = O_RDONLY | O_NOATIME;
@@ -127,29 +102,52 @@ namespace Yttrium
 #endif
 		const auto descriptor = ::open(path.c_str(), flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
+		{
+			report_errno("open");
 			return {};
-		return std::make_unique<FileSource>(::maybe_size(descriptor), path, descriptor, false);
+		}
+		const auto size = ::lseek(descriptor, 0, SEEK_END);
+		if (size == -1)
+		{
+			report_errno("lseek");
+			if (::close(descriptor) == -1)
+				report_errno("close");
+			return {};
+		}
+		return std::make_unique<FileSource>(descriptor, size, false);
 	}
 
 	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
 	{
 		const auto descriptor = TemporaryFilePrivate::descriptor(file);
-		return std::make_unique<FileSource>(::maybe_size(descriptor), file.name(), descriptor, true);
+		const auto size = ::lseek(descriptor, 0, SEEK_END);
+		if (size == -1)
+		{
+			report_errno("lseek");
+			return {};
+		}
+		return std::make_unique<FileSource>(descriptor, size, true);
 	}
 
-	std::unique_ptr<WriterPrivate> create_file_writer(const std::string& path)
+	std::unique_ptr<WriterPrivate> create_file_writer(const std::filesystem::path& path)
 	{
 		const auto descriptor = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (descriptor == -1)
+		{
+			report_errno("open");
 			return {};
-		return std::make_unique<FileWriter>(path, descriptor, false);
+		}
+		return std::make_unique<FileWriter>(descriptor, false);
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)
 	{
 		const auto descriptor = TemporaryFilePrivate::descriptor(file);
 		if (::ftruncate(descriptor, 0) == -1)
-			throw std::system_error{ errno, std::generic_category() };
-		return std::make_unique<FileWriter>(file.name(), descriptor, true);
+		{
+			report_errno("ftruncate");
+			return {};
+		}
+		return std::make_unique<FileWriter>(descriptor, true);
 	}
 }

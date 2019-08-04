@@ -106,6 +106,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-switch-enum
 		-Wno-weak-vtables
 		)
+
+	link_libraries(stdc++fs) # Required for GCC 8 standard library which is used by Clang.
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -190,7 +192,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		add_compile_options(/arch:SSE2)
 	endif()
 	add_compile_options(/std:c++latest)
-	add_compile_definitions(_USE_MATH_DEFINES)
+	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING _USE_MATH_DEFINES)
 	list(APPEND RC_FLAGS /nologo)
 
 	# Warnings.
@@ -237,6 +239,8 @@ append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 add_subdirectory(libs/core)
+add_subdirectory(libs/audio)
+add_subdirectory(libs/main)
 
 if(Y_RENDERER_VULKAN)
 	add_subdirectory(tools/yglslc)
@@ -245,28 +249,21 @@ add_subdirectory(tools/yrc)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
-add_subdirectory(libs/audio)
 add_subdirectory(libs/engine)
 
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
 	find_package(Catch2 2.9.1 REQUIRED)
 	mark_as_advanced(Catch2_DIR)
-	add_subdirectory(tests/common)
+	add_subdirectory(libs/test)
 endif()
 
 if(BUILD_TESTS)
 	enable_testing()
-	add_subdirectory(tests/audio)
-	add_subdirectory(tests/core)
-	add_subdirectory(tests/engine)
-	add_subdirectory(tests/gen_test_data)
-	add_custom_target(check
-		COMMAND test_audio --reporter compact
-		COMMAND test_core --reporter compact
-		COMMAND test_engine --reporter compact
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		COMMENT "Running tests"
-		VERBATIM)
+	add_subdirectory(libs/audio/tests)
+	add_subdirectory(libs/core/tests)
+	add_subdirectory(libs/core/tests/bootstrap)
+	add_subdirectory(libs/engine/tests)
+	add_custom_target(check DEPENDS check_audio check_core check_engine)
 	set_target_properties(check PROPERTIES FOLDER ".phony")
 endif()
 
@@ -280,10 +277,6 @@ if(BUILD_BENCHMARKS)
 		COMMENT "Running benchmarks"
 		VERBATIM)
 	set_target_properties(benchmark PROPERTIES FOLDER ".phony")
-endif()
-
-if(WIN32)
-	add_subdirectory(libs/winmain)
 endif()
 
 if(BUILD_EXAMPLES)

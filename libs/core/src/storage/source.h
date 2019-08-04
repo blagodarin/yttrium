@@ -17,9 +17,12 @@
 
 #pragma once
 
-#include <yttrium/storage/source.h>
+#include <memory>
 
 namespace Yttrium
 {
-	std::unique_ptr<Source> create_source(const std::shared_ptr<const Buffer>&, const std::string& name);
+	class Buffer;
+	class Source;
+
+	std::unique_ptr<Source> create_source(const std::shared_ptr<const Buffer>&);
 }

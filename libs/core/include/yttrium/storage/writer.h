@@ -19,6 +19,7 @@
 
 #include <yttrium/api.h>
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 
@@ -36,8 +37,8 @@ namespace Yttrium
 		/// Creates a Writer for a Buffer.
 		explicit Writer(Buffer&);
 
-		/// Creates a Writer for the specified file.
-		explicit Writer(const std::string& path);
+		/// Creates a Writer for a file.
+		explicit Writer(const std::filesystem::path&);
 
 		/// Creates a Writer for a temporary file.
 		explicit Writer(TemporaryFile&);
@@ -56,9 +57,6 @@ namespace Yttrium
 
 		/// Returns the size of the target data.
 		uint64_t size() const;
-
-		///
-		void unlink();
 
 		/// Writes data to the target.
 		size_t write(const void*, size_t);

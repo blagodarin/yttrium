@@ -34,7 +34,7 @@ namespace Yttrium
 	void HWndDeleter::free(HWND handle) noexcept
 	{
 		if (handle && !::DestroyWindow(handle))
-			print_last_error("DestroyWindow");
+			log_last_error("DestroyWindow");
 	}
 
 	NativeApplication::NativeApplication() = default;
@@ -269,7 +269,7 @@ namespace Yttrium
 	NativeApplication::EmptyCursor::~EmptyCursor() noexcept
 	{
 		if (!::DestroyCursor(_handle))
-			print_last_error("DestroyCursor");
+			log_last_error("DestroyCursor");
 	}
 
 	NativeApplication::WindowClass::WindowClass(HINSTANCE hinstance, HCURSOR hcursor, WNDPROC wndproc)
@@ -290,6 +290,6 @@ namespace Yttrium
 	NativeApplication::WindowClass::~WindowClass()
 	{
 		if (!::UnregisterClassW(Name, _hinstance))
-			print_last_error("UnregisterClass");
+			log_last_error("UnregisterClass");
 	}
 }

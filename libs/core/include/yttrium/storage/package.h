@@ -19,6 +19,7 @@
 
 #include <yttrium/api.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -39,7 +40,7 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<PackageReader> create(const std::string& path, PackageType = PackageType::Auto);
+		static std::unique_ptr<PackageReader> create(const std::filesystem::path&, PackageType = PackageType::Auto);
 
 		virtual ~PackageReader() = default;
 
@@ -55,14 +56,15 @@ namespace Yttrium
 	{
 	public:
 		///
-		static std::unique_ptr<PackageWriter> create(const std::string& path, PackageType = PackageType::Auto);
+		static std::unique_ptr<PackageWriter> create(const std::filesystem::path&, PackageType = PackageType::Auto);
 
 		virtual ~PackageWriter() = default;
 
 		///
 		virtual bool add(const std::string&) = 0;
 
-		///
+		//! Writes added files into the package.
+		//! If fails, leaves the package file with unspecified contents.
 		virtual bool commit() = 0;
 	};
 }

@@ -19,8 +19,6 @@
 
 #include <yttrium/storage/package.h>
 
-#include <memory>
-
 namespace Yttrium
 {
 	class Buffer;
@@ -49,7 +47,7 @@ namespace Yttrium
 
 		/// Attaches a package to the storage.
 		/// Throws MissingDataError if there is no such package.
-		void attach_package(const std::string& path, PackageType = PackageType::Auto);
+		void attach_package(const std::filesystem::path&, PackageType = PackageType::Auto);
 
 		/// Opens a data source.
 		std::unique_ptr<Source> open(std::string_view name) const;

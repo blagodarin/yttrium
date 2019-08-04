@@ -19,6 +19,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/storage/source.h>
 #include "source.h"
 
 #include <list>
@@ -94,7 +95,7 @@ namespace Yttrium
 		};
 
 		std::unique_ptr<Source> operator()(const std::monostate&) const { return {}; }
-		std::unique_ptr<Source> operator()(const BufferEntry& entry) const { return create_source(entry._attachment->_buffer, entry._attachment->_name); }
+		std::unique_ptr<Source> operator()(const BufferEntry& entry) const { return create_source(entry._attachment->_buffer); }
 		std::unique_ptr<Source> operator()(const PackageEntry& entry) const { return entry._package->open(entry._index); }
 
 	private:
@@ -116,11 +117,11 @@ namespace Yttrium
 		_private->attach_buffer(name, std::move(buffer));
 	}
 
-	void Storage::attach_package(const std::string& path, PackageType type)
+	void Storage::attach_package(const std::filesystem::path& path, PackageType type)
 	{
 		auto package = PackageReader::create(path, type);
 		if (!package)
-			throw MissingDataError("Unable to open \"", path, "\"");
+			throw MissingDataError{ "Unable to open \"", path.string(), "\"" };
 		_private->attach_package(std::move(package));
 	}
 

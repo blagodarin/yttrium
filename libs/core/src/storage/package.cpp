@@ -25,11 +25,11 @@
 
 namespace Yttrium
 {
-	std::unique_ptr<PackageReader> PackageReader::create(const std::string& path, PackageType type)
+	std::unique_ptr<PackageReader> PackageReader::create(const std::filesystem::path& path, PackageType type)
 	{
 		if (type == PackageType::Auto)
 		{
-			if (ends_with(path, ".ypq"))
+			if (path.extension() == ".ypq")
 				type = PackageType::Ypq;
 			else
 				return {};
@@ -44,21 +44,21 @@ namespace Yttrium
 		}
 		catch (const BadPackage& e)
 		{
-			Logger::log('(', path, ") ", e.what());
+			Logger::log('(', path.string(), ") ", e.what());
 		}
 		return {};
 	}
 
-	std::unique_ptr<PackageWriter> PackageWriter::create(const std::string& path, PackageType type)
+	std::unique_ptr<PackageWriter> PackageWriter::create(const std::filesystem::path& path, PackageType type)
 	{
 		if (type == PackageType::Auto)
 		{
-			if (ends_with(path, ".ypq"))
+			if (path.extension() == ".ypq")
 				type = PackageType::Ypq;
 			else
 				return {};
 		}
-		Writer writer(path);
+		Writer writer{ path };
 		if (!writer)
 			return {};
 		if (type == PackageType::Ypq)

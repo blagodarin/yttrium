@@ -22,6 +22,7 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
 #include <yttrium/logger.h>
+#include <yttrium/main.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
 #include <yttrium/resource_loader.h>
@@ -193,7 +194,7 @@ namespace
 	};
 }
 
-int main(int, char**)
+int ymain(int, char**)
 {
 	Logger logger;
 	Application application;
