@@ -24,9 +24,9 @@
 #include <ctime>
 #include <functional>
 
-inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yttrium::Bgra32(size_t, size_t)>& callback)
+inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yt::Bgra32(size_t, size_t)>& callback)
 {
-	Yttrium::Image image({ width, height, Yttrium::PixelFormat::Bgra32 });
+	Yt::Image image({ width, height, Yt::PixelFormat::Bgra32 });
 	for (size_t y = 0; y < height; ++y)
 	{
 		for (size_t x = 0; x < width; ++x)
@@ -39,7 +39,7 @@ inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yttri
 			pixel[3] = color._a;
 		}
 	}
-	return image.to_buffer(Yttrium::ImageFormat::Tga);
+	return image.to_buffer(Yt::ImageFormat::Tga);
 }
 
 inline std::string make_screenshot_path()

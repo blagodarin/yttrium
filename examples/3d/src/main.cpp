@@ -22,18 +22,18 @@
 
 namespace
 {
-	void make_checkerboard_texture(Storage& storage, const std::string& name)
+	void make_checkerboard_texture(Yt::Storage& storage, const std::string& name)
 	{
 		storage.attach_buffer(name, ::make_bgra_tga(128, 128, [](size_t x, size_t y) {
-			return ((x ^ y) & 1) ? Bgra32{ 0xdd, 0xdd, 0xdd } : Bgra32{ 0x00, 0x00, 0x00 };
+			return ((x ^ y) & 1) ? Yt::Bgra32{ 0xdd, 0xdd, 0xdd } : Yt::Bgra32{ 0x00, 0x00, 0x00 };
 		}));
 	}
 }
 
 int ymain(int, char**)
 {
-	Logger logger;
-	Storage storage{ Storage::UseFileSystem::Never };
+	Yt::Logger logger;
+	Yt::Storage storage{ Yt::Storage::UseFileSystem::Never };
 	storage.attach_package("3d.ypq");
 	::make_checkerboard_texture(storage, "data/checkerboard.tga");
 

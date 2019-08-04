@@ -106,9 +106,9 @@ namespace
 		return Rgb{ scale(0), scale(1), scale(2) };
 	}
 
-	Image make_blocks_image()
+	Yt::Image make_blocks_image()
 	{
-		Image image({ FragmentSize, FragmentSize * FragmentCount, PixelFormat::Bgra32 });
+		Yt::Image image({ FragmentSize, FragmentSize * FragmentCount, Yt::PixelFormat::Bgra32 });
 		for (size_t i = 0; i < FragmentCount; ++i)
 		{
 			for (size_t y = 0; y < FragmentSize; ++y)
@@ -127,45 +127,45 @@ namespace
 		return image;
 	}
 
-	RectF block_rect(int index)
+	Yt::RectF block_rect(int index)
 	{
-		return { { 1, static_cast<float>(index) * FragmentSize + 1.f }, SizeF{ FragmentSize - 2, FragmentSize - 2 } };
+		return { { 1, static_cast<float>(index) * FragmentSize + 1.f }, Yt::SizeF{ FragmentSize - 2, FragmentSize - 2 } };
 	}
 }
 
-TetriumGraphics::TetriumGraphics(RenderManager& manager)
+TetriumGraphics::TetriumGraphics(Yt::RenderManager& manager)
 	: _blocks_texture{ manager.create_texture_2d(::make_blocks_image()) }
 {
 }
 
-void TetriumGraphics::draw_field(RenderPass& pass, const RectF& rect, const Tetrium::Field& field, const Tetrium::Figure& current_figure) const
+void TetriumGraphics::draw_field(Yt::RenderPass& pass, const Yt::RectF& rect, const Tetrium::Field& field, const Tetrium::Figure& current_figure) const
 {
 	static const int total_width = 1 + Tetrium::Field::Width + 1;
 	static const int total_height = 1 + Tetrium::Field::Height + 1;
-	const SizeF block_size{ rect.width() / total_width, rect.height() / total_height };
-	PushTexture push_texture{ pass, _blocks_texture.get(), Texture2D::TrilinearFilter };
+	const Yt::SizeF block_size{ rect.width() / total_width, rect.height() / total_height };
+	Yt::PushTexture push_texture{ pass, _blocks_texture.get(), Yt::Texture2D::TrilinearFilter };
 	draw_field_blocks(pass, rect, block_size, field);
 	draw_field_figure(pass, rect, block_size, current_figure);
 	draw_field_frame(pass, rect, block_size);
 }
 
-void TetriumGraphics::draw_next_figure(RenderPass& pass, const RectF& rect, const Tetrium::Figure& figure) const
+void TetriumGraphics::draw_next_figure(Yt::RenderPass& pass, const Yt::RectF& rect, const Tetrium::Figure& figure) const
 {
 	if (figure.type() == Tetrium::Figure::None)
 		return;
-	PushTexture push_texture{ pass, _blocks_texture.get(), Texture2D::TrilinearFilter };
+	Yt::PushTexture push_texture{ pass, _blocks_texture.get(), Yt::Texture2D::TrilinearFilter };
 	set_texture_rect(pass, figure.type());
-	const SizeF block_size{ rect.width() / 4, rect.height() / 2 };
+	const Yt::SizeF block_size{ rect.width() / 4, rect.height() / 2 };
 	for (const auto& block : figure.blocks())
 		draw_block(pass, rect, block_size, block.x, 1 - block.y / Tetrium::PointsPerRow);
 }
 
-void TetriumGraphics::draw_block(RenderPass& pass, const RectF& rect, const SizeF& block_size, float x, float y) const
+void TetriumGraphics::draw_block(Yt::RenderPass& pass, const Yt::RectF& rect, const Yt::SizeF& block_size, float x, float y) const
 {
 	pass.draw_rect({ { rect.left() + x * block_size._width, rect.top() + y * block_size._height }, block_size });
 }
 
-void TetriumGraphics::draw_field_blocks(RenderPass& pass, const RectF& rect, const SizeF& block_size, const Tetrium::Field& field) const
+void TetriumGraphics::draw_field_blocks(Yt::RenderPass& pass, const Yt::RectF& rect, const Yt::SizeF& block_size, const Tetrium::Field& field) const
 {
 	for (int y = 0; y < Tetrium::Field::Height; ++y)
 	{
@@ -180,9 +180,9 @@ void TetriumGraphics::draw_field_blocks(RenderPass& pass, const RectF& rect, con
 	}
 }
 
-void TetriumGraphics::draw_field_figure(RenderPass& pass, const RectF& rect, const SizeF& block_size, const Tetrium::Figure& figure) const
+void TetriumGraphics::draw_field_figure(Yt::RenderPass& pass, const Yt::RectF& rect, const Yt::SizeF& block_size, const Tetrium::Figure& figure) const
 {
-	static const Vector2 frame_offset{ 1, Tetrium::Field::Height };
+	static const Yt::Vector2 frame_offset{ 1, Tetrium::Field::Height };
 	if (figure.type() == Tetrium::Figure::None)
 		return;
 	set_texture_rect(pass, figure.type());
@@ -191,7 +191,7 @@ void TetriumGraphics::draw_field_figure(RenderPass& pass, const RectF& rect, con
 			draw_block(pass, rect, block_size, frame_offset.x + static_cast<float>(block.x), frame_offset.y - static_cast<float>(block.y) / Tetrium::PointsPerRow);
 }
 
-void TetriumGraphics::draw_field_frame(RenderPass& pass, const RectF& rect, const SizeF& block_size) const
+void TetriumGraphics::draw_field_frame(Yt::RenderPass& pass, const Yt::RectF& rect, const Yt::SizeF& block_size) const
 {
 	static const int total_width = 1 + Tetrium::Field::Width + 1;
 	static const int total_height = 1 + Tetrium::Field::Height + 1;
@@ -207,7 +207,7 @@ void TetriumGraphics::draw_field_frame(RenderPass& pass, const RectF& rect, cons
 		draw_block(pass, rect, block_size, i, total_height - 1);
 }
 
-void TetriumGraphics::set_texture_rect(RenderPass& pass, Tetrium::Figure::Type figure_type) const
+void TetriumGraphics::set_texture_rect(Yt::RenderPass& pass, Tetrium::Figure::Type figure_type) const
 {
 	const auto figure_index = (figure_type == Tetrium::Figure::None) ? 0 : static_cast<int>(figure_type) + 1;
 	pass.set_texture_rect(::block_rect(figure_index), {});

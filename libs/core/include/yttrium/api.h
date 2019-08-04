@@ -44,3 +44,9 @@
 #else
 #	define Y_ENGINE_API
 #endif
+
+namespace Yttrium
+{
+}
+
+namespace Yt = Yttrium;
