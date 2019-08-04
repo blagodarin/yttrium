@@ -22,7 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Memory buffer.
 	/// Buffer memory is allocated in whole pages making each allocation big and very aligned.

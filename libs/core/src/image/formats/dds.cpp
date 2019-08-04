@@ -21,7 +21,7 @@
 #include <yttrium/storage/reader.h>
 #include "../formats.h"
 
-namespace Yttrium
+namespace Yt
 {
 	bool read_dds_header(Reader& reader, ImageInfo& info)
 	{

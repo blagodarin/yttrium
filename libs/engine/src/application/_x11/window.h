@@ -23,7 +23,7 @@
 
 #include <optional>
 
-namespace Yttrium
+namespace Yt
 {
 	class Image;
 	class WindowBackendCallbacks;

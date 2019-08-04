@@ -20,7 +20,7 @@
 #include <yttrium/math/matrix.h>
 #include "renderer.h"
 
-namespace Yttrium
+namespace Yt
 {
 	void VulkanProgram::set_uniform(const std::string&, const Matrix4& matrix)
 	{

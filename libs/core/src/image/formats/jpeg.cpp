@@ -780,7 +780,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	bool read_jpeg(const void* data, size_t size, ImageInfo& info, Buffer& buffer, Upsampling upsampling)
 	{

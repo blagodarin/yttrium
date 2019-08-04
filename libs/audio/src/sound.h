@@ -19,7 +19,7 @@
 
 #include <yttrium/audio/reader.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class SoundImpl final : public Sound
 	{

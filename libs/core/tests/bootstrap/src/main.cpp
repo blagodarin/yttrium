@@ -24,7 +24,7 @@
 
 #include <cstring>
 
-using namespace Yttrium;
+using namespace Yt;
 
 namespace
 {

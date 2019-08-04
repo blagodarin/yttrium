@@ -19,7 +19,7 @@
 
 #include <type_traits>
 
-namespace Yttrium
+namespace Yt
 {
 	template <typename T, typename Deleter>
 	class SmartPtrBase

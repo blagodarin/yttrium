@@ -19,7 +19,7 @@
 
 #include <yttrium/memory/buffer.h>
 
-namespace Yttrium
+namespace Yt
 {
 	///
 	template <typename T>

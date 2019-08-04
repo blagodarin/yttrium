@@ -32,7 +32,7 @@
 // TODO: Image packs (lists of image headers with filenames and raw image data offsets).
 // TODO: Loading image data into the specified buffer (e. g. into mapped texture memory).
 
-namespace Yttrium
+namespace Yt
 {
 	std::optional<Image> Image::load(const Source& source, ImageFormat format)
 	{

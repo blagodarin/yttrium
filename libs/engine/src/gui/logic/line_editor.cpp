@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <cassert>
 
-namespace Yttrium
+namespace Yt
 {
 	void LineEditor::clear() noexcept
 	{

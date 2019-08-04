@@ -30,7 +30,7 @@ using Yt::IonError;
 using Yt::IonReader;
 using Yt::IonToken;
 
-namespace Yttrium
+namespace Yt
 {
 	inline bool operator==(const Color4f& a, const Color4f& b)
 	{
@@ -94,16 +94,14 @@ TEST_CASE("ion.reader.token.iostream")
 
 TEST_CASE("ion.reader.token.to_color")
 {
-	using Yttrium::Color4f;
-
 	const auto color = [](std::string_view text) {
 		return IonToken{ 1, 1, IonToken::Type::ColorValue, text }.to_color();
 	};
 
-	CHECK(color("#00f") == Color4f(0.f, 0.f, 1.f, 1.f));
-	CHECK(color("#f0f0") == Color4f(1.f, 0.f, 1.f, 0.f));
-	CHECK(color("#0000ff") == Color4f(0.f, 0.f, 1.f, 1.f));
-	CHECK(color("#ff00ff00") == Color4f(1.f, 0.f, 1.f, 0.f));
+	CHECK(color("#00f") == Yt::Color4f(0.f, 0.f, 1.f, 1.f));
+	CHECK(color("#f0f0") == Yt::Color4f(1.f, 0.f, 1.f, 0.f));
+	CHECK(color("#0000ff") == Yt::Color4f(0.f, 0.f, 1.f, 1.f));
+	CHECK(color("#ff00ff00") == Yt::Color4f(1.f, 0.f, 1.f, 0.f));
 
 	CHECK_THROWS_AS(color("#"), IonError);
 	CHECK_THROWS_AS(color("#1"), IonError);
@@ -138,7 +136,7 @@ namespace
 
 	private:
 		const std::string _data;
-		const std::unique_ptr<const Yttrium::Source> _source{ Yttrium::Source::from(_data.data(), _data.size()) };
+		const std::unique_ptr<const Yt::Source> _source{ Yt::Source::from(_data.data(), _data.size()) };
 		IonReader _ion_reader{ *_source };
 	};
 }

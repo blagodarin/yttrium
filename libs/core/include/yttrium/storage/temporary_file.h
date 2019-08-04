@@ -22,7 +22,7 @@
 #include <filesystem>
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	///
 	class Y_CORE_API TemporaryFile

@@ -24,7 +24,7 @@
 #include <optional>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class Image;
 	class WindowBackendCallbacks;

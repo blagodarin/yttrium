@@ -101,7 +101,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	void _append_to(std::string& string, long long value)
 	{

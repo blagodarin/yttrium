@@ -21,7 +21,7 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioDecoder
 	{

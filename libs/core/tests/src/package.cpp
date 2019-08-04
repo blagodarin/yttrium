@@ -27,7 +27,7 @@
 
 #include <catch2/catch.hpp>
 
-using namespace Yttrium;
+using namespace Yt;
 
 namespace
 {

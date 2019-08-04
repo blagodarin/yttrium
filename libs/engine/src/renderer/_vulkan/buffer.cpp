@@ -23,7 +23,7 @@
 #include <cassert>
 #include <cstring>
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanBuffer::VulkanBuffer(const VulkanContext& context, uint32_t size, VkBufferUsageFlags buffer_usage, VkFlags memory_flags)
 		: _context{ context }

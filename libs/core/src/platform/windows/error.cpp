@@ -48,7 +48,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	std::string error_to_string(unsigned long code, std::string_view fallback_message)
 	{

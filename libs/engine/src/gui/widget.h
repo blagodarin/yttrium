@@ -22,7 +22,7 @@
 #include <yttrium/utils/flags.h>
 #include "widget_data.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class GuiPrivate;
 	class GuiPropertyLoader;

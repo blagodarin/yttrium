@@ -27,7 +27,7 @@
 
 #include <cassert>
 
-namespace Yttrium
+namespace Yt
 {
 	class GuiScreen::Activity
 	{

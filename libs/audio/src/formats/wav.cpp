@@ -38,7 +38,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	WavDecoder::WavDecoder(std::unique_ptr<Source>&& source)
 		: AudioDecoder{ std::move(source) }

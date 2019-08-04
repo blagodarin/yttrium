@@ -102,12 +102,12 @@ TEST_CASE("logger.flush_on_destruction")
 
 TEST_CASE("logger.ring_log")
 {
-	constexpr size_t buffer_size = Yttrium::RingLog::BufferSize;
+	constexpr size_t buffer_size = Yt::RingLog::BufferSize;
 	constexpr size_t string_size = 251; // A prime number.
-	static_assert(string_size <= Yttrium::RingLog::MaxStringSize);
+	static_assert(string_size <= Yt::RingLog::MaxStringSize);
 	constexpr size_t max_strings = buffer_size / string_size;
 
-	Yttrium::RingLog log;
+	Yt::RingLog log;
 	CHECK(log.empty());
 
 	std::string string;

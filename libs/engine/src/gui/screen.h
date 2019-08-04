@@ -27,7 +27,7 @@
 #include <map>
 #include <unordered_map>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioReader;
 	class GuiLayout;

@@ -35,23 +35,21 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	constexpr Key key_from_button(xcb_button_t button) noexcept
+	constexpr Yt::Key key_from_button(xcb_button_t button) noexcept
 	{
 		switch (button)
 		{
-		case XCB_BUTTON_INDEX_1: return Key::Mouse1;
-		case XCB_BUTTON_INDEX_2: return Key::Mouse2;
-		case XCB_BUTTON_INDEX_3: return Key::Mouse3;
-		case XCB_BUTTON_INDEX_4: return Key::Mouse4;
-		case XCB_BUTTON_INDEX_5: return Key::Mouse5;
-		default: return Key::Null;
+		case XCB_BUTTON_INDEX_1: return Yt::Key::Mouse1;
+		case XCB_BUTTON_INDEX_2: return Yt::Key::Mouse2;
+		case XCB_BUTTON_INDEX_3: return Yt::Key::Mouse3;
+		case XCB_BUTTON_INDEX_4: return Yt::Key::Mouse4;
+		case XCB_BUTTON_INDEX_5: return Yt::Key::Mouse5;
+		default: return Yt::Key::Null;
 		}
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	class WindowBackend::EmptyCursor
 	{

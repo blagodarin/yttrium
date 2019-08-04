@@ -41,7 +41,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanRenderer::VulkanRenderer(const WindowBackend& window)
 		: _context{ window }

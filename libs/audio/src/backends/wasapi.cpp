@@ -83,7 +83,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	WasapiAudioBackend::WasapiAudioBackend(unsigned frames_per_second)
 		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }

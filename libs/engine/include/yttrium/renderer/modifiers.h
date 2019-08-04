@@ -23,7 +23,7 @@
 
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class Material;
 	class Matrix4;

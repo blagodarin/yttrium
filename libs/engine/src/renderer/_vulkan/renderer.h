@@ -24,7 +24,7 @@
 
 #include <optional>
 
-namespace Yttrium
+namespace Yt
 {
 	enum class VA;
 	class VulkanSwapchain;

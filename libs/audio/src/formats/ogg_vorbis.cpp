@@ -60,7 +60,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	OggVorbisDecoder::OggVorbisDecoder(std::unique_ptr<Source>&& source)
 		: AudioDecoder{ std::move(source) }

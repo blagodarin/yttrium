@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace Yttrium
+namespace Yt
 {
 	/// Euler angles.
 	class Euler

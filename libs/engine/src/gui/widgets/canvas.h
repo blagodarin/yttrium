@@ -19,7 +19,7 @@
 
 #include "../widget.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class CanvasWidget : public Widget
 	{

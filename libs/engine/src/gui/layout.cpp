@@ -19,7 +19,7 @@
 
 #include "widget.h"
 
-namespace Yttrium
+namespace Yt
 {
 	GuiLayout::GuiLayout(Placement placement)
 		: _placement{ placement }

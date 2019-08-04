@@ -27,7 +27,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace Yttrium
+namespace Yt
 {
 	class Canvas;
 	class Gui;

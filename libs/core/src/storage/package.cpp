@@ -23,7 +23,7 @@
 #include "formats/ypq.h"
 #include "package.h"
 
-namespace Yttrium
+namespace Yt
 {
 	std::unique_ptr<PackageReader> PackageReader::create(const std::filesystem::path& path, PackageType type)
 	{

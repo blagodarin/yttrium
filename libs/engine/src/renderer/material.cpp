@@ -19,7 +19,7 @@
 
 #include <yttrium/renderer/program.h>
 
-namespace Yttrium
+namespace Yt
 {
 	MaterialImpl::MaterialImpl(std::unique_ptr<RenderProgram>&& program, std::shared_ptr<const Texture2D>&& texture, Texture2D::Filter texture_filter)
 		: _program{ std::move(program) }

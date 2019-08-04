@@ -26,7 +26,7 @@
 #include <map>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class TranslationImpl : public Translation
 	{

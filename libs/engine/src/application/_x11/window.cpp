@@ -68,7 +68,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	WindowBackend::WindowBackend(WindowBackendCallbacks& callbacks)
 		: _window{ _application.display(), ::create_window(_application.display(), _application.screen(), _glx.visual_info()) }

@@ -29,7 +29,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class GlApi
 	{

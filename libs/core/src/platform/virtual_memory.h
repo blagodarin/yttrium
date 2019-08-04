@@ -19,7 +19,7 @@
 
 #include <cstddef>
 
-namespace Yttrium
+namespace Yt
 {
 	void* vm_allocate(size_t) noexcept;
 	void vm_deallocate(void*, size_t) noexcept;

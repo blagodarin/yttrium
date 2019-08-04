@@ -135,7 +135,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	bool write_png(Writer& writer, const ImageInfo& info, const void* data)
 	{

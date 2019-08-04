@@ -26,7 +26,7 @@
 
 #include <windows.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class FileSource final : public Source
 	{

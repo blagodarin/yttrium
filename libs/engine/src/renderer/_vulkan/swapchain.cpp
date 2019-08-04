@@ -62,7 +62,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanSwapchain::VulkanSwapchain(const VulkanContext& context, const VK_PipelineLayout& pipeline_layout, const std::vector<VkPipelineShaderStageCreateInfo>& shader_stages)
 		: _context{ context }

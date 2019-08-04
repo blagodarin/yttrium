@@ -42,7 +42,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	struct RenderPassImpl::Batch2D
 	{

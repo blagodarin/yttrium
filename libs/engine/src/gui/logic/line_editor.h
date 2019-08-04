@@ -19,7 +19,7 @@
 
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class KeyEvent;
 

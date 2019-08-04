@@ -21,7 +21,7 @@
 
 #include <stdexcept>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Thrown if the initialization of an object (e.g. Window) fails.
 	/// This usually means the inability to use the corresponding object.

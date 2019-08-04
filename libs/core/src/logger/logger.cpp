@@ -34,7 +34,7 @@ namespace
 	std::atomic<Yt::LoggerPrivate*> _global_logger_private{ nullptr };
 }
 
-namespace Yttrium
+namespace Yt
 {
 	class LoggerPrivate
 	{

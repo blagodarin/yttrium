@@ -224,7 +224,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanContext::VulkanContext(const WindowBackend& window)
 	{

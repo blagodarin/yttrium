@@ -35,7 +35,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	AudioMixer::AudioMixer(const AudioFormat& format)
 		: _format{ format }

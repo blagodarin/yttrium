@@ -26,7 +26,7 @@
 
 #include <catch2/catch.hpp>
 
-namespace Yttrium
+namespace Yt
 {
 	std::ostream& operator<<(std::ostream& stream, const Buffer& buffer)
 	{

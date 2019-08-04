@@ -23,7 +23,7 @@
 #include <memory>
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	class ScriptArgs;
 	class ScriptContext;

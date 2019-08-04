@@ -20,7 +20,7 @@
 #include <yttrium/math/rect.h>
 #include "backend.h"
 
-namespace Yttrium
+namespace Yt
 {
 	BackendTexture2D::BackendTexture2D(RenderBackend& backend, const ImageInfo& info, bool has_mipmaps)
 		: _backend{ backend }

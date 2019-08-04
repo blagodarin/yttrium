@@ -19,7 +19,7 @@
 
 #include <iosfwd>
 
-namespace Yttrium
+namespace Yt
 {
 	class Buffer;
 	class Matrix4;

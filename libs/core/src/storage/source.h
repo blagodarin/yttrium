@@ -19,7 +19,7 @@
 
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class Buffer;
 	class Source;

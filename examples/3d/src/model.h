@@ -20,15 +20,13 @@
 #include <memory>
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	class Material;
 	class Mesh;
 	class RenderPass;
 	class ResourceLoader;
 }
-
-namespace Yt = Yttrium;
 
 class Model
 {

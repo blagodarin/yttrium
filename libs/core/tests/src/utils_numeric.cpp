@@ -24,7 +24,7 @@
 
 TEST_CASE("utils.clamp_to_uint8")
 {
-	using Yttrium::clamp_to_uint8;
+	using Yt::clamp_to_uint8;
 
 	CHECK(clamp_to_uint8(std::numeric_limits<int>::min()) == 0);
 	CHECK(clamp_to_uint8(-1) == 0);
@@ -38,7 +38,7 @@ TEST_CASE("utils.clamp_to_uint8")
 
 TEST_CASE("utils.fixed_point")
 {
-	using Yttrium::fixed_point;
+	using Yt::fixed_point;
 
 	CHECK(fixed_point<int, 4>(0.0000f) == 0b0000'0000);
 	CHECK(fixed_point<int, 4>(0.0625f) == 0b0000'0001);
@@ -51,7 +51,7 @@ TEST_CASE("utils.fixed_point")
 
 TEST_CASE("utils.is_power_of_2")
 {
-	using Yttrium::is_power_of_2;
+	using Yt::is_power_of_2;
 
 	static const std::array<int, std::numeric_limits<std::int8_t>::max() + 1> table{
 		// clang-format off
@@ -74,14 +74,14 @@ TEST_CASE("utils.is_power_of_2")
 
 TEST_CASE("utils.make_cc")
 {
-	CHECK(Yttrium::make_cc('\x00', '\xff') == 0xff00);
-	CHECK(Yttrium::make_cc('\x00', '\x80', '\x7f', '\xff') == 0xff7f8000);
-	CHECK(Yttrium::make_cc('\x00', '\x01', '\x7e', '\x7f', '\x80', '\x81', '\xfe', '\xff') == 0xfffe81807f7e0100);
+	CHECK(Yt::make_cc('\x00', '\xff') == 0xff00);
+	CHECK(Yt::make_cc('\x00', '\x80', '\x7f', '\xff') == 0xff7f8000);
+	CHECK(Yt::make_cc('\x00', '\x01', '\x7e', '\x7f', '\x80', '\x81', '\xfe', '\xff') == 0xfffe81807f7e0100);
 }
 
 TEST_CASE("utils.next_power_of_2")
 {
-	using Yttrium::next_power_of_2;
+	using Yt::next_power_of_2;
 
 	static const std::array<std::uint8_t, std::numeric_limits<std::int8_t>::max() + 1> table{
 		// clang-format off
@@ -107,7 +107,7 @@ TEST_CASE("utils.next_power_of_2")
 
 TEST_CASE("utils.power_of_2_alignment")
 {
-	using Yttrium::power_of_2_alignment;
+	using Yt::power_of_2_alignment;
 
 	static const std::array<std::uint8_t, std::numeric_limits<std::int8_t>::max() + 1> table{
 		// clang-format off
@@ -131,7 +131,7 @@ TEST_CASE("utils.power_of_2_alignment")
 
 TEST_CASE("utils.same_sign")
 {
-	using Yttrium::same_sign;
+	using Yt::same_sign;
 
 	CHECK(same_sign<std::intmax_t>(0, 0));
 	CHECK(same_sign<std::intmax_t>(-1, -1));
@@ -145,7 +145,7 @@ TEST_CASE("utils.same_sign")
 
 TEST_CASE("utils.swap_bytes")
 {
-	using Yttrium::swap_bytes;
+	using Yt::swap_bytes;
 
 	CHECK(swap_bytes(std::uint16_t{ 0xff00 }) == 0x00ff);
 	CHECK(swap_bytes(std::uint32_t{ 0xfff00f00 }) == 0x000ff0ff);
@@ -153,7 +153,7 @@ TEST_CASE("utils.swap_bytes")
 
 TEST_CASE("utils.wrap")
 {
-	using Yttrium::wrap;
+	using Yt::wrap;
 
 	CHECK(wrap(-541, -180, 180) == 179);
 	CHECK(wrap(-540, -180, 180) == -180);

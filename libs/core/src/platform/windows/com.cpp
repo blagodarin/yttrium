@@ -22,7 +22,7 @@
 
 #include <comdef.h>
 
-namespace Yttrium
+namespace Yt
 {
 	ComInitializer::ComInitializer(DWORD coinit)
 	{

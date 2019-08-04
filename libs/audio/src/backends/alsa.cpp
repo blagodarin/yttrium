@@ -50,7 +50,7 @@ namespace
 			throw AlsaError{ ::function_name(#call), x }; \
 	} while (false)
 
-namespace Yttrium
+namespace Yt
 {
 	AlsaAudioBackend::AlsaAudioBackend(unsigned frames_per_second)
 		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }

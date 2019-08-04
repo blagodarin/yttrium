@@ -17,7 +17,7 @@
 
 #include "mesh.h"
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanMesh::VulkanMesh(const VulkanContext& context, size_t vertex_buffer_size, size_t index_buffer_size, VkIndexType index_type, size_t index_count)
 		: _vertex_buffer{ context, static_cast<uint32_t>(vertex_buffer_size), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT }

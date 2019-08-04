@@ -37,7 +37,7 @@
 
 // TODO: Load textures without intermediate Images.
 
-namespace Yttrium
+namespace Yt
 {
 #if Y_RENDERER_OPENGL
 	using RenderBackendImpl = GlRenderer;

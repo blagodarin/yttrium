@@ -19,7 +19,7 @@
 
 #include <yttrium/math/rect.h>
 
-namespace Yttrium
+namespace Yt
 {
 	///
 	class TexturedRect

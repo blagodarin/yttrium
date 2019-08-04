@@ -36,7 +36,7 @@
 #include <mutex>
 #include <functional>
 
-namespace Yttrium
+namespace Yt
 {
 	template <typename T>
 	struct ResourceCache

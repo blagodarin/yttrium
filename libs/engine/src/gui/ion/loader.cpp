@@ -120,7 +120,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	class GuiIonLoader
 	{

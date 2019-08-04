@@ -24,7 +24,7 @@
 #include <memory>
 #include <optional>
 
-namespace Yttrium
+namespace Yt
 {
 	///
 	struct UpdateEvent

@@ -22,7 +22,7 @@
 #include "../texture.h"
 #include "wrappers.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class GlTexture2D final : public BackendTexture2D
 	{

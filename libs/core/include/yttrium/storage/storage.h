@@ -19,7 +19,7 @@
 
 #include <yttrium/storage/package.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Buffer;
 	class Source;

@@ -20,7 +20,7 @@
 #include <array>
 #include <cstdint>
 
-namespace Yttrium
+namespace Yt
 {
 	class Crc32
 	{

@@ -26,7 +26,7 @@
 #include <audioclient.h>
 #include <mmdeviceapi.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class WasapiAudioBackend final : public AudioBackend
 	{

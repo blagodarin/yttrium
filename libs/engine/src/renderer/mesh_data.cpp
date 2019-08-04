@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <limits>
 
-namespace Yttrium
+namespace Yt
 {
 	bool MeshData::make_uint16_indices(Buffer& buffer) const
 	{

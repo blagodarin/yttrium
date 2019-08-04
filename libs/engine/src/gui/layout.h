@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class GuiPropertyLoader;
 	class RectF;

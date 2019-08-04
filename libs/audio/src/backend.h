@@ -22,7 +22,7 @@
 #include <exception>
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioBackend
 	{

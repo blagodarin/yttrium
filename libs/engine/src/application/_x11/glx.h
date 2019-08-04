@@ -21,7 +21,7 @@
 
 #include <GL/glx.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class GlxContext
 	{

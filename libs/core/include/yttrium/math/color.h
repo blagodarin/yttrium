@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace Yttrium
+namespace Yt
 {
 	class Bgra32
 	{

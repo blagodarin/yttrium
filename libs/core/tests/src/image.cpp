@@ -63,16 +63,16 @@ TEST_CASE("image.convert.jpeg420_to_bgra")
 		0xaa, 0xaa, 0xaa, 0xff, 0xff, 0xff, 0xff, 0xff
 	};
 
-	Yttrium::YCbCrComponents components;
+	Yt::YCbCrComponents components;
 	components.y = jpeg420.data();
 	components.y_stride = 2;
 	components.cb = components.y + components.y_stride * 2;
 	components.cbcr_stride = 1;
 	components.cr = components.cb + components.cbcr_stride;
 
-	Yttrium::Buffer output{ bgra.size() };
+	Yt::Buffer output{ bgra.size() };
 	std::memset(output.data(), 0xee, output.size());
-	Yttrium::convert_jpeg420_to_bgra(2, 2, components, output.data(), 8);
+	Yt::convert_jpeg420_to_bgra(2, 2, components, output.data(), 8);
 	CHECK(std::memcmp(output.data(), bgra.data(), bgra.size()) == 0);
 }
 

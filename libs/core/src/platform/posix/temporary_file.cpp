@@ -34,7 +34,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	TemporaryFilePrivate::~TemporaryFilePrivate() noexcept
 	{

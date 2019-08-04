@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <cstring>
 
-namespace Yttrium
+namespace Yt
 {
 	Buffer::Buffer(size_t size)
 		: _size{ size }

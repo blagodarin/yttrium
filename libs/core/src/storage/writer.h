@@ -19,7 +19,7 @@
 
 #include <yttrium/storage/writer.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class WriterPrivate
 	{

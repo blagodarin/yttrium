@@ -43,7 +43,7 @@ namespace
 		;
 }
 
-namespace Yttrium
+namespace Yt
 {
 	GlRenderer::GlRenderer(WindowBackend&)
 	{

@@ -27,7 +27,7 @@
 #include <cassert>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	const wchar_t* const NativeApplication::WindowClass::Name = L"Yttrium";
 

@@ -25,7 +25,7 @@
 #include <limits>
 #include <system_error>
 
-namespace Yttrium
+namespace Yt
 {
 	class MemorySource final : public Source
 	{

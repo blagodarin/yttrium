@@ -45,7 +45,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	AudioManagerImpl::AudioManagerImpl(std::unique_ptr<AudioBackend>&& backend)
 		: _backend{ std::move(backend) }

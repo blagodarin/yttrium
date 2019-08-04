@@ -23,7 +23,7 @@
 #	define GLAPI_CALL
 #endif
 
-namespace Yttrium
+namespace Yt
 {
 	using GlAddress = void(GLAPI_CALL*)();
 	GlAddress gl_address(const char* name);

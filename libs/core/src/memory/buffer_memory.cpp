@@ -28,7 +28,7 @@ namespace
 {
 	void* allocate_big_block(size_t size)
 	{
-		const auto data = Yttrium::vm_allocate(size);
+		const auto data = Yt::vm_allocate(size);
 		if (!data)
 			throw std::bad_alloc{};
 		return data;
@@ -36,7 +36,7 @@ namespace
 
 	size_t level_from_capacity(size_t capacity) noexcept
 	{
-		assert(Yttrium::is_power_of_2(capacity));
+		assert(Yt::is_power_of_2(capacity));
 		size_t level = 0;
 		for (auto i = capacity; i > 1; i >>= 1)
 			++level;
@@ -45,7 +45,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	BufferMemory::~BufferMemory() = default;
 

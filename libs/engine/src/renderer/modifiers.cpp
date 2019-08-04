@@ -23,7 +23,7 @@
 #include "material.h"
 #include "pass.h"
 
-namespace Yttrium
+namespace Yt
 {
 	Push2D::Push2D(RenderPass& pass)
 		: RenderModifier{ pass }

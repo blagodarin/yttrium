@@ -22,7 +22,7 @@
 
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class RectF;
 	class RenderManager;
@@ -30,8 +30,6 @@ namespace Yttrium
 	class SizeF;
 	class Texture2D;
 }
-
-namespace Yt = Yttrium;
 
 class TetriumGraphics
 {

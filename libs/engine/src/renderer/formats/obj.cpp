@@ -197,7 +197,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	MeshData load_obj_mesh(const Source& source, std::string_view source_name)
 	{

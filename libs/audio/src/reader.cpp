@@ -50,7 +50,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	AudioReader::AudioReader(std::unique_ptr<Source>&& source)
 		: _decoder{ ::create_audio_decoder(std::move(source)) }

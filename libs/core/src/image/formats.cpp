@@ -24,7 +24,7 @@
 
 #include <new>
 
-namespace Yttrium
+namespace Yt
 {
 	bool read_image(const Source& source, ImageFormat format, ImageInfo& info, Buffer& buffer)
 	{

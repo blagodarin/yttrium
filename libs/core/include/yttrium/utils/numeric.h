@@ -23,7 +23,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Clamps a signed integer value to 8-bit unsigned one.
 	template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>

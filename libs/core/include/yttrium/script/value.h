@@ -21,7 +21,7 @@
 
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class ScriptArgs;
 	class ScriptCodePrivate;

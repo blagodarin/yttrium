@@ -23,7 +23,7 @@
 #include <string>
 #include <type_traits>
 
-namespace Yttrium
+namespace Yt
 {
 	struct Hex32
 	{

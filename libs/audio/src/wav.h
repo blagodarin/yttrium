@@ -19,7 +19,7 @@
 
 #include <yttrium/utils/numeric.h>
 
-namespace Yttrium
+namespace Yt
 {
 	enum : uint16_t
 	{

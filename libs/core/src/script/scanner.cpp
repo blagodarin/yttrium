@@ -74,7 +74,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	ScriptScanner::ScriptScanner(std::string& text)
 		: _cursor{ text.data() }

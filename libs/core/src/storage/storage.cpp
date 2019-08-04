@@ -29,7 +29,7 @@
 
 // TODO: Hash-based packed file access.
 
-namespace Yttrium
+namespace Yt
 {
 	class StoragePrivate
 	{

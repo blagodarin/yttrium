@@ -20,7 +20,7 @@
 #include <array>
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	namespace Utf8
 	{

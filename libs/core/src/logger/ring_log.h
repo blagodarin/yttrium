@@ -24,7 +24,7 @@
 #include <limits>
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class Y_CORE_API RingLog //-V730
 	{

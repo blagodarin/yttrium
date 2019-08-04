@@ -22,7 +22,7 @@
 #include <memory>
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	class Source;
 	class Writer;

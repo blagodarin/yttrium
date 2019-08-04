@@ -29,7 +29,7 @@
 #include <cassert>
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	WindowBackend::WindowDC::WindowDC(HWND hwnd)
 		: _hdc{ ::GetDC(hwnd) } // Private DCs don't need to be released.

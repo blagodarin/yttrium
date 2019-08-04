@@ -22,7 +22,7 @@
 
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class RenderProgram;
 

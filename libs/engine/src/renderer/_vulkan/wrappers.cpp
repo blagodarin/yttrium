@@ -25,7 +25,7 @@
 
 #define CHECK(call) Y_VK_CHECK(call)
 
-namespace Yttrium
+namespace Yt
 {
 	VK_Swapchain::VK_Swapchain(const VulkanContext& context)
 		: _context{ context }

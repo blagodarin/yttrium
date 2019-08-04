@@ -22,7 +22,7 @@
 #include <new>
 #include <utility>
 
-namespace Yttrium
+namespace Yt
 {
 	class RawAllocation
 	{

@@ -23,7 +23,7 @@
 
 #include <windows.h>
 
-namespace Yttrium
+namespace Yt
 {
 	void* vm_allocate(size_t size) noexcept
 	{

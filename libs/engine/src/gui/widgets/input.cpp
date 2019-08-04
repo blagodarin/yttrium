@@ -23,7 +23,7 @@
 #include <yttrium/script/context.h>
 #include "../gui.h"
 
-namespace Yttrium
+namespace Yt
 {
 	InputWidget::InputWidget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data)
 		: Widget{ gui, std::move(data), Flag::CanHaveFocus }

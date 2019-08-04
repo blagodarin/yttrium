@@ -26,7 +26,7 @@
 
 namespace
 {
-	using namespace Yttrium;
+	using namespace Yt;
 
 	SizeF make_text_size(const Font& font, std::string_view text, float max_width, float max_height)
 	{
@@ -67,7 +67,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	void BackgroundProperty::draw(RenderPass& pass, const RectF& rect) const
 	{

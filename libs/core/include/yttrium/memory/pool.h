@@ -21,7 +21,7 @@
 
 #include <cstddef>
 
-namespace Yttrium
+namespace Yt
 {
 	///
 	class Y_CORE_API PoolBase

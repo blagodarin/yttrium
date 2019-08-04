@@ -20,7 +20,7 @@
 #include "../texture.h"
 #include "handles.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class VulkanTexture2D final : public BackendTexture2D
 	{

@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <cassert>
 
-namespace Yttrium
+namespace Yt
 {
 	GlApi::GlApi()
 	{

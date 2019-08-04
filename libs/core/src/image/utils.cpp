@@ -23,7 +23,7 @@
 #include <cassert>
 #include <cstring>
 
-namespace Yttrium
+namespace Yt
 {
 	void copy_image_rgb_bgr(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept
 	{

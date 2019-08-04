@@ -49,7 +49,7 @@ namespace
 #pragma pack(pop)
 }
 
-namespace Yttrium
+namespace Yt
 {
 	struct YpqReader::Entry
 	{

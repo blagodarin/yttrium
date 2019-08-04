@@ -24,7 +24,7 @@
 
 #include <alsa/asoundlib.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class AlsaAudioBackend final : public AudioBackend
 	{

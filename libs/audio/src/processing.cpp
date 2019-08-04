@@ -17,7 +17,7 @@
 
 #include "processing.h"
 
-namespace Yttrium
+namespace Yt
 {
 	void convert_normalize_f32_i16(void* dst, const void* src, size_t count) noexcept
 	{

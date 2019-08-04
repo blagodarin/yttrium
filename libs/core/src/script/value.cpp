@@ -21,7 +21,7 @@
 
 #include <charconv>
 
-namespace Yttrium
+namespace Yt
 {
 	int ScriptValue::to_int() const noexcept
 	{

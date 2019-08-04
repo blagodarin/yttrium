@@ -31,7 +31,7 @@ namespace
 	constexpr auto OffsetMask = Yt::RingLog::BufferSize - 1;
 }
 
-namespace Yttrium
+namespace Yt
 {
 	bool RingLog::pop(std::string& text)
 	{

@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace Yttrium
+namespace Yt
 {
 	enum class GuiCursor
 	{

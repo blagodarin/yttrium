@@ -23,7 +23,7 @@
 
 #include <X11/Xlib.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class NativeApplication
 	{

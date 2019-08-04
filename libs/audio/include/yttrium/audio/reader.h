@@ -22,7 +22,7 @@
 #include <chrono>
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioDecoder;
 	class AudioFormat;

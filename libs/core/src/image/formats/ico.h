@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-namespace Yttrium
+namespace Yt
 {
 	enum class IcoFileType : uint16_t
 	{

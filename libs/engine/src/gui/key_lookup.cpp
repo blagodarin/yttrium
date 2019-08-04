@@ -65,7 +65,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	Key lookup_key(std::string_view name)
 	{

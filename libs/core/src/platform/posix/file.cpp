@@ -29,7 +29,7 @@
 #include <fcntl.h>  // open
 #include <unistd.h> // close, ftruncate, lseek, pread, pwrite
 
-namespace Yttrium
+namespace Yt
 {
 	class FileSource final : public Source
 	{
