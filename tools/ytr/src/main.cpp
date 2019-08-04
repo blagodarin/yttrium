@@ -17,6 +17,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
+#include <yttrium/logger.h>
 #include <yttrium/main.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
@@ -28,6 +29,8 @@ using namespace Yttrium;
 
 int ymain(int argc, char** argv)
 {
+	Logger logger;
+
 	if (argc < 3)
 	{
 		std::cerr << "Usage: ytr TRANSLATION SOURCES...\n";

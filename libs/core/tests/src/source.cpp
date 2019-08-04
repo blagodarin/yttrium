@@ -62,14 +62,6 @@ TEST_CASE("source.from.source")
 	}
 }
 
-TEST_CASE("source.name")
-{
-	Yttrium::TemporaryFile temporary_file;
-	const auto source = Source::from(temporary_file);
-	REQUIRE(source);
-	CHECK(source->name() == temporary_file.path());
-}
-
 TEST_CASE("source.size")
 {
 	CHECK(Source::from(Buffer{})->size() == 0);

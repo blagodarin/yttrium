@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <limits>
 
 namespace Yttrium
@@ -36,7 +37,10 @@ namespace Yttrium
 	bool Reader::read_line(std::string& string)
 	{
 		string.clear();
-		if (_offset == _source.size())
+
+		const auto source_size = _source.size();
+		assert(_offset <= source_size);
+		if (_offset == source_size)
 			return false;
 
 		size_t newlines = 0;
@@ -56,7 +60,7 @@ namespace Yttrium
 		};
 
 		if (const auto data = static_cast<const char*>(_source.data()))
-			read_block(data + _offset, data + _source.size());
+			read_block(data + _offset, data + source_size);
 		else
 		{
 			std::array<char, 32> buffer;
@@ -71,7 +75,7 @@ namespace Yttrium
 		return true;
 	}
 
-	bool Reader::seek(uint64_t offset)
+	bool Reader::seek(uint64_t offset) noexcept
 	{
 		if (offset > _source.size())
 			return false;
@@ -79,16 +83,18 @@ namespace Yttrium
 		return true;
 	}
 
-	uint64_t Reader::size() const
+	uint64_t Reader::size() const noexcept
 	{
 		return _source.size();
 	}
 
-	bool Reader::skip(uint64_t size)
+	bool Reader::skip(uint64_t bytes) noexcept
 	{
-		if (size > _source.size() - _offset)
+		const auto source_size = _source.size();
+		assert(_offset <= source_size);
+		if (bytes > source_size - _offset)
 			return false;
-		_offset += size;
+		_offset += bytes;
 		return true;
 	}
 }

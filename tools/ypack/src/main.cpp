@@ -17,6 +17,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
+#include <yttrium/logger.h>
 #include <yttrium/main.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>
@@ -39,6 +40,8 @@ namespace
 
 int ymain(int argc, char** argv)
 {
+	Yttrium::Logger logger;
+
 	if (argc != 3)
 	{
 		std::cerr
@@ -83,27 +86,23 @@ int ymain(int argc, char** argv)
 		return 0;
 	}
 
-	const auto package = Yttrium::PackageWriter::create(package_path, Yttrium::PackageType::Ypq);
+	auto package = Yttrium::PackageWriter::create(package_path, Yttrium::PackageType::Ypq);
 	if (!package)
 	{
 		std::cerr << "ERROR: Unable to open " << package_path << " for writing\n";
 		return 1;
 	}
 
-	try
+	for (const auto& path : paths)
+		package->add(path);
+
+	if (!package->commit())
 	{
-		for (const auto& path : paths)
-			package->add(path);
-		if (!package->commit())
-		{
-			std::cerr << "ERROR: Unable to write " << package_path << '\n';
-			return 1;
-		}
-	}
-	catch (const Yttrium::DataError& e)
-	{
-		std::cerr << "ERROR: Unable to write " << index_path << ": " << e.what() << '\n';
+		std::cerr << "ERROR: Unable to write " << package_path << '\n';
+		package.reset();
+		std::filesystem::remove(package_path);
 		return 1;
 	}
+
 	return 0;
 }

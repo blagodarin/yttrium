@@ -19,6 +19,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
+#include <yttrium/storage/source.h>
 #include "source.h"
 
 #include <list>
@@ -94,7 +95,7 @@ namespace Yttrium
 		};
 
 		std::unique_ptr<Source> operator()(const std::monostate&) const { return {}; }
-		std::unique_ptr<Source> operator()(const BufferEntry& entry) const { return create_source(entry._attachment->_buffer, entry._attachment->_name); }
+		std::unique_ptr<Source> operator()(const BufferEntry& entry) const { return create_source(entry._attachment->_buffer); }
 		std::unique_ptr<Source> operator()(const PackageEntry& entry) const { return entry._package->open(entry._index); }
 
 	private:

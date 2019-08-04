@@ -106,12 +106,6 @@ namespace Yttrium
 		return _private ? _private->_size : 0;
 	}
 
-	void Writer::unlink()
-	{
-		if (_private)
-			_private->unlink();
-	}
-
 	size_t Writer::write(const void* data, size_t size)
 	{
 		if (!_private)

@@ -63,7 +63,8 @@ namespace Yttrium
 		///
 		virtual bool add(const std::string&) = 0;
 
-		///
+		//! Writes added files into the package.
+		//! If fails, leaves the package file with unspecified contents.
 		virtual bool commit() = 0;
 	};
 }

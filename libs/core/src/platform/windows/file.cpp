@@ -30,11 +30,8 @@ namespace Yttrium
 	class FileSource final : public Source
 	{
 	public:
-		FileSource(uint64_t size, const std::filesystem::path& path, HANDLE handle)
-			: Source{ size, path.string() }
-			, _handle{ handle }
-		{
-		}
+		FileSource(HANDLE handle, uint64_t size) noexcept
+			: _handle{ handle }, _size{ size } {}
 
 		~FileSource() noexcept override
 		{
@@ -51,25 +48,26 @@ namespace Yttrium
 			return ::ReadFile(_handle, data, static_cast<DWORD>(size), &result, &overlapped) ? result : 0;
 		}
 
+		uint64_t size() const noexcept override
+		{
+			return _size;
+		}
+
 	private:
 		const HANDLE _handle;
+		const uint64_t _size;
 	};
 
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(const std::filesystem::path& path, HANDLE handle)
-			: _path{ path }
-			, _handle{ handle }
-		{
-		}
+		FileWriter(HANDLE handle) noexcept
+			: _handle{ handle } {}
 
 		~FileWriter() noexcept override
 		{
 			if (!::CloseHandle(_handle))
 				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
-			if (_unlink && !::DeleteFileW(_path.c_str()))
-				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
 		}
 
 		void reserve(uint64_t) override
@@ -99,9 +97,7 @@ namespace Yttrium
 		}
 
 	private:
-		const std::filesystem::path _path;
 		const HANDLE _handle;
-		bool _unlink = false;
 	};
 
 	std::unique_ptr<Source> Source::from(const std::filesystem::path& path)
@@ -112,7 +108,7 @@ namespace Yttrium
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
 			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-		return std::make_unique<FileSource>(size.QuadPart, path, handle);
+		return std::make_unique<FileSource>(handle, size.QuadPart);
 	}
 
 	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
@@ -125,7 +121,7 @@ namespace Yttrium
 		const auto handle = ::CreateFileW(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
 			return {};
-		return std::make_unique<FileWriter>(path, handle);
+		return std::make_unique<FileWriter>(handle);
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)

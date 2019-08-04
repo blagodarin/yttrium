@@ -201,7 +201,7 @@ namespace
 
 namespace Yttrium
 {
-	MeshData load_obj_mesh(const Source& source)
+	MeshData load_obj_mesh(const Source& source, std::string_view source_name)
 	{
 		MeshData result;
 		std::string line;
@@ -214,7 +214,7 @@ namespace Yttrium
 				continue;
 			::trim(line);
 			if (!state.process_line(line, result))
-				throw DataError("OBJ processing error (", source.name(), ":", line_number, ")");
+				throw DataError("OBJ processing error (", source_name, ":", line_number, ")");
 		}
 		if (!state.finalize(result))
 			throw DataError("Bad OBJ");

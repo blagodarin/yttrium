@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include <string_view>
+
 namespace Yttrium
 {
 	class MeshData;
 	class Source;
 
-	MeshData load_obj_mesh(const Source&);
+	MeshData load_obj_mesh(const Source&, std::string_view source_name);
 }
