@@ -70,15 +70,14 @@ namespace Yttrium
 
 TEST_CASE("iostream.buffer")
 {
-	using Yttrium::Buffer;
 	{
 		std::ostringstream stream;
-		stream << Buffer{};
+		stream << Yt::Buffer{};
 		CHECK(stream.str() == "Buffer(0)");
 	}
 	{
 		std::ostringstream stream;
-		stream << Buffer{ 1024 };
+		stream << Yt::Buffer{ 1024 };
 		CHECK(stream.str() == "Buffer(1024)");
 	}
 }
@@ -86,41 +85,41 @@ TEST_CASE("iostream.buffer")
 TEST_CASE("iostream.matrix4")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Matrix4::identity();
+	stream << Yt::Matrix4::identity();
 	CHECK(stream.str() == "Matrix4{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}");
 }
 
 TEST_CASE("iostream.point")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Point{ 1, 2 };
+	stream << Yt::Point{ 1, 2 };
 	CHECK(stream.str() == "Point{1,2}");
 }
 
 TEST_CASE("iostream.rect")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Rect{ { 1, 2 }, Yttrium::Size{ 3, 4 } };
+	stream << Yt::Rect{ { 1, 2 }, Yt::Size{ 3, 4 } };
 	CHECK(stream.str() == "Rect{{1,2},Size{3,4}}");
 }
 
 TEST_CASE("iostream.vector2")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Vector2{ 1, 2 };
+	stream << Yt::Vector2{ 1, 2 };
 	CHECK(stream.str() == "Vector2{1,2}");
 }
 
 TEST_CASE("iostream.vector3")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Vector3{ 1, 2, 3 };
+	stream << Yt::Vector3{ 1, 2, 3 };
 	CHECK(stream.str() == "Vector3{1,2,3}");
 }
 
 TEST_CASE("iostream.vector4")
 {
 	std::ostringstream stream;
-	stream << Yttrium::Vector4{ 1, 2, 3, 4 };
+	stream << Yt::Vector4{ 1, 2, 3, 4 };
 	CHECK(stream.str() == "Vector4{1,2,3,4}");
 }

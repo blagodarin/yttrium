@@ -24,7 +24,7 @@
 
 namespace
 {
-	bool find_chunk(Yttrium::Reader& reader, uint32_t fourcc, Yttrium::WavChunkHeader& header)
+	bool find_chunk(Yt::Reader& reader, uint32_t fourcc, Yt::WavChunkHeader& header)
 	{
 		for (;;)
 		{

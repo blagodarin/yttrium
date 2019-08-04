@@ -22,46 +22,42 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Buffer;
-using Yttrium::Reader;
-using Yttrium::Source;
-
 TEST_CASE("reader.size")
 {
 	{
-		const auto source = Source::from(Buffer{});
-		CHECK(Reader{ *source }.size() == 0);
+		const auto source = Yt::Source::from(Yt::Buffer{});
+		CHECK(Yt::Reader{ *source }.size() == 0);
 	}
 	{
-		const auto source = Source::from(Buffer{ 1 });
-		CHECK(Reader{ *source }.size() == 1);
+		const auto source = Yt::Source::from(Yt::Buffer{ 1 });
+		CHECK(Yt::Reader{ *source }.size() == 1);
 	}
 	{
-		const auto source = Source::from(Buffer{ 997 });
-		CHECK(Reader{ *source }.size() == 997);
+		const auto source = Yt::Source::from(Yt::Buffer{ 997 });
+		CHECK(Yt::Reader{ *source }.size() == 997);
 	}
 }
 
 TEST_CASE("reader.offset")
 {
 	{
-		const auto source = Source::from(Buffer{});
-		CHECK(Reader{ *source }.offset() == 0);
+		const auto source = Yt::Source::from(Yt::Buffer{});
+		CHECK(Yt::Reader{ *source }.offset() == 0);
 	}
 	{
-		const auto source = Source::from(Buffer{ 1 });
-		CHECK(Reader{ *source }.offset() == 0);
+		const auto source = Yt::Source::from(Yt::Buffer{ 1 });
+		CHECK(Yt::Reader{ *source }.offset() == 0);
 	}
 	{
-		const auto source = Source::from(Buffer{ 997 });
-		CHECK(Reader{ *source }.offset() == 0);
+		const auto source = Yt::Source::from(Yt::Buffer{ 997 });
+		CHECK(Yt::Reader{ *source }.offset() == 0);
 	}
 }
 
 TEST_CASE("reader.seek")
 {
-	const auto source = Source::from(Buffer{ 997 });
-	Reader reader{ *source };
+	const auto source = Yt::Source::from(Yt::Buffer{ 997 });
+	Yt::Reader reader{ *source };
 	CHECK(reader.seek(1));
 	CHECK(reader.offset() == 1);
 	CHECK(reader.seek(499));
@@ -75,8 +71,8 @@ TEST_CASE("reader.seek")
 
 TEST_CASE("reader.skip")
 {
-	const auto source = Source::from(Buffer{ 997 });
-	Reader reader{ *source };
+	const auto source = Yt::Source::from(Yt::Buffer{ 997 });
+	Yt::Reader reader{ *source };
 	CHECK(reader.skip(1));
 	CHECK(reader.offset() == 1);
 	CHECK(reader.skip(499));
@@ -92,7 +88,7 @@ TEST_CASE("reader.read_line")
 {
 	struct Entry
 	{
-		std::size_t text_size;
+		size_t text_size;
 		std::string newline;
 		std::string comment;
 	};
@@ -111,9 +107,9 @@ TEST_CASE("reader.read_line")
 			INFO(entry.comment)
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
-			const auto source = Source::from(data.data(), data.size());
+			const auto source = Yt::Source::from(data.data(), data.size());
 			REQUIRE(source->data());
-			Reader reader{ *source };
+			Yt::Reader reader{ *source };
 			std::string line;
 			REQUIRE(reader.read_line(line));
 			CHECK(line == text);
@@ -142,9 +138,9 @@ TEST_CASE("reader.read_line")
 			INFO(entry.comment)
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
-			const auto source = Source::from(Source::from(data.data(), data.size()), 0, data.size());
+			const auto source = Yt::Source::from(Yt::Source::from(data.data(), data.size()), 0, data.size());
 			REQUIRE(!source->data());
-			Reader reader{ *source };
+			Yt::Reader reader{ *source };
 			std::string line;
 			REQUIRE(reader.read_line(line));
 			CHECK(line == text);

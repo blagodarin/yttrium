@@ -21,9 +21,9 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Buffer;
-using Yttrium::IonWriter;
-using Yttrium::Writer;
+using Yt::Buffer;
+using Yt::IonWriter;
+using Yt::Writer;
 
 namespace
 {

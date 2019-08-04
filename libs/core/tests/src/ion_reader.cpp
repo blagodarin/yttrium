@@ -26,9 +26,9 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::IonError;
-using Yttrium::IonReader;
-using Yttrium::IonToken;
+using Yt::IonError;
+using Yt::IonReader;
+using Yt::IonToken;
 
 namespace Yttrium
 {

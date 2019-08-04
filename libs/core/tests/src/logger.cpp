@@ -23,14 +23,12 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Logger;
-
 TEST_CASE("logger.flush")
 {
 	std::vector<std::string> messages;
 	std::mutex mutex;
 
-	Logger logger{ [&](std::string_view message) {
+	Yt::Logger logger{ [&](std::string_view message) {
 		std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
 		std::scoped_lock lock{ mutex };
 		messages.emplace_back(message);
@@ -40,15 +38,15 @@ TEST_CASE("logger.flush")
 		CHECK(messages.empty());
 	}
 
-	Logger::write("Hello...");
-	Logger::write("...world!");
+	Yt::Logger::write("Hello...");
+	Yt::Logger::write("...world!");
 	{
 		std::scoped_lock lock{ mutex };
 		CHECK(messages.empty());
 	}
 
-	Logger::flush();
-	Logger::write("Hello?");
+	Yt::Logger::flush();
+	Yt::Logger::write("Hello?");
 	{
 		std::scoped_lock lock{ mutex };
 		REQUIRE(messages.size() == 2);
@@ -56,7 +54,7 @@ TEST_CASE("logger.flush")
 		CHECK(messages[1] == "...world!");
 	}
 
-	Logger::flush();
+	Yt::Logger::flush();
 	{
 		std::scoped_lock lock{ mutex };
 		REQUIRE(messages.size() == 3);
@@ -69,7 +67,7 @@ TEST_CASE("logger.flush_on_destruction")
 	std::vector<std::string> messages;
 	std::mutex mutex;
 
-	auto logger = std::make_unique<Logger>([&](std::string_view message) {
+	auto logger = std::make_unique<Yt::Logger>([&](std::string_view message) {
 		std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
 		std::scoped_lock lock{ mutex };
 		messages.emplace_back(message);
@@ -79,8 +77,8 @@ TEST_CASE("logger.flush_on_destruction")
 		CHECK(messages.empty());
 	}
 
-	Logger::write("Hello...");
-	Logger::write("...world!");
+	Yt::Logger::write("Hello...");
+	Yt::Logger::write("...world!");
 	{
 		std::scoped_lock lock{ mutex };
 		CHECK(messages.empty());
@@ -94,8 +92,8 @@ TEST_CASE("logger.flush_on_destruction")
 		CHECK(messages[1] == "...world!");
 	}
 
-	Logger::write("Hello?");
-	Logger::flush();
+	Yt::Logger::write("Hello?");
+	Yt::Logger::flush();
 	{
 		std::scoped_lock lock{ mutex };
 		CHECK(messages.size() == 2);

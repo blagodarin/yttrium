@@ -25,87 +25,80 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Image;
-using Yttrium::ImageFormat;
-using Yttrium::PixelFormat;
-using Yttrium::Source;
-using Yttrium::TemporaryFile;
-using Yttrium::Writer;
-
 TEST_CASE("image.load.bmp")
 {
-	const auto image = Image::load(*Source::from("gradient24.bmp"));
+	const auto image = Yt::Image::load(*Yt::Source::from("gradient24.bmp"));
 	REQUIRE(image);
 	CHECK(*image == ::make_test_image(false));
 }
 
 TEST_CASE("image.load.dds")
 {
-	const auto image = Image::load(*Source::from("gradient32.dds"));
+	const auto image = Yt::Image::load(*Yt::Source::from("gradient32.dds"));
 	REQUIRE(image);
 	CHECK(*image == ::make_test_image(true));
 }
 
 TEST_CASE("image.load.ico")
 {
-	const auto image = Image::load(*Source::from("gradient32.ico"));
+	const auto image = Yt::Image::load(*Yt::Source::from("gradient32.ico"));
 	REQUIRE(image);
 
-	const auto reference_image = ::make_test_image(true, Yttrium::ImageOrientation::XRightYUp);
+	const auto reference_image = ::make_test_image(true, Yt::ImageOrientation::XRightYUp);
 	CHECK(*image == reference_image);
 }
 
 TEST_CASE("image.load.jpeg")
 {
-	const auto jpeg_image = Image::load(*Source::from("gradient24.jpeg"));
+	const auto jpeg_image = Yt::Image::load(*Yt::Source::from("gradient24.jpeg"));
 	REQUIRE(jpeg_image);
-	REQUIRE(jpeg_image->info().pixel_format() == PixelFormat::Bgra32);
+	REQUIRE(jpeg_image->info().pixel_format() == Yt::PixelFormat::Bgra32);
 
-	const auto tga_image = Image::load(*Source::from("gradient24.jpeg.tga"));
+	const auto tga_image = Yt::Image::load(*Yt::Source::from("gradient24.jpeg.tga"));
 	REQUIRE(tga_image);
-	REQUIRE(tga_image->info().pixel_format() == PixelFormat::Bgra32);
+	REQUIRE(tga_image->info().pixel_format() == Yt::PixelFormat::Bgra32);
 
 	CHECK(jpeg_image == tga_image);
 }
 
 TEST_CASE("image.load.tga8")
 {
-	const auto image = Image::load(*Source::from("gradient8.tga"));
+	const auto image = Yt::Image::load(*Yt::Source::from("gradient8.tga"));
 	REQUIRE(image);
 	CHECK(*image == (::make_gray8_test_image<16>()));
 }
 
 TEST_CASE("image.load.tga24")
 {
-	const auto image = Image::load(*Source::from("gradient24.tga"));
+	const auto image = Yt::Image::load(*Yt::Source::from("gradient24.tga"));
 	REQUIRE(image);
 	CHECK(*image == ::make_test_image(false));
 }
 
 TEST_CASE("image.load.tga32")
 {
-	const auto image = Image::load(*Source::from("gradient32.tga"));
+	const auto image = Yt::Image::load(*Yt::Source::from("gradient32.tga"));
 	REQUIRE(image);
 	CHECK(*image == ::make_test_image(true));
 }
 
 TEST_CASE("image.save.png")
 {
-	TemporaryFile file;
-	REQUIRE(::make_test_image(false).save(Writer{ file }, ImageFormat::Png));
-	CHECK(Source::from(file)->to_buffer() == Source::from("gradient24.png")->to_buffer());
+	Yt::TemporaryFile file;
+	REQUIRE(::make_test_image(false).save(Yt::Writer{ file }, Yt::ImageFormat::Png));
+	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.png")->to_buffer());
 }
 
 TEST_CASE("image.save.tga24")
 {
-	TemporaryFile file;
-	REQUIRE(::make_test_image(false).save(Writer{ file }, ImageFormat::Tga));
-	CHECK(Source::from(file)->to_buffer() == Source::from("gradient24.tga")->to_buffer());
+	Yt::TemporaryFile file;
+	REQUIRE(::make_test_image(false).save(Yt::Writer{ file }, Yt::ImageFormat::Tga));
+	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.tga")->to_buffer());
 }
 
 TEST_CASE("image.save.tga32")
 {
-	TemporaryFile file;
-	REQUIRE(::make_test_image(true).save(Writer{ file }, ImageFormat::Tga));
-	CHECK(Source::from(file)->to_buffer() == Source::from("gradient32.tga")->to_buffer());
+	Yt::TemporaryFile file;
+	REQUIRE(::make_test_image(true).save(Yt::Writer{ file }, Yt::ImageFormat::Tga));
+	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient32.tga")->to_buffer());
 }

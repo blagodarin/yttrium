@@ -29,13 +29,13 @@ namespace
 {
 	constexpr unsigned AudioBufferChannels = 2;
 
-	class WasapiError : public Yttrium::BadCall
+	class WasapiError : public Yt::BadCall
 	{
 	public:
 		WasapiError(std::string_view function, unsigned long error)
 			: BadCall{ "WASAPI", function, make_error_message(error) } {}
 		WasapiError(std::string_view function, long error)
-			: WasapiError{ function, Yttrium::to_unsigned(error) } {}
+			: WasapiError{ function, Yt::to_unsigned(error) } {}
 
 	private:
 		static std::string make_error_message(unsigned long error)
@@ -78,7 +78,7 @@ namespace
 			case AUDCLNT_E_ENGINE_PERIODICITY_LOCKED: error_name = "AUDCLNT_E_ENGINE_PERIODICITY_LOCKED"; break;
 			case AUDCLNT_E_ENGINE_FORMAT_LOCKED: error_name = "AUDCLNT_E_ENGINE_FORMAT_LOCKED"; break;
 			}
-			return Yttrium::error_to_string(error, error_name);
+			return Yt::error_to_string(error, error_name);
 		}
 	};
 }

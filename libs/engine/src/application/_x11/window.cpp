@@ -48,24 +48,23 @@ namespace
 		if (window == None)
 		{
 			::XFreeColormap(display, swa.colormap);
-			throw Yttrium::InitializationError{ "XCreateWindow failed" };
+			throw Yt::InitializationError{ "XCreateWindow failed" };
 		}
 
 		return window;
 	}
 
-	constexpr Yttrium::Key button_from_event(const ::XButtonEvent& event) noexcept
+	constexpr Yt::Key button_from_event(const ::XButtonEvent& event) noexcept
 	{
-		using Yttrium::Key;
 		switch (event.button)
 		{
-		case Button1: return Key::Mouse1;
-		case Button2: return Key::Mouse2;
-		case Button3: return Key::Mouse3;
-		case Button4: return Key::Mouse4;
-		case Button5: return Key::Mouse5;
+		case Button1: return Yt::Key::Mouse1;
+		case Button2: return Yt::Key::Mouse2;
+		case Button3: return Yt::Key::Mouse3;
+		case Button4: return Yt::Key::Mouse4;
+		case Button5: return Yt::Key::Mouse5;
 		}
-		return Key::Null;
+		return Yt::Key::Null;
 	}
 }
 

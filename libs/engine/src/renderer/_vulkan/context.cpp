@@ -31,10 +31,10 @@ namespace
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&count, nullptr));
 		std::vector<VkLayerProperties> layers(count);
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&count, layers.data()));
-		Yttrium::Logger::log("Vulkan layers available:");
+		Yt::Logger::log("Vulkan layers available:");
 		for (const auto& layer : layers)
-			Yttrium::Logger::log("  ", layer.layerName, " - ", layer.description);
-		Yttrium::Logger::log("");
+			Yt::Logger::log("  ", layer.layerName, " - ", layer.description);
+		Yt::Logger::log("");
 	}
 
 	VkInstance create_vulkan_instance()
@@ -83,7 +83,7 @@ namespace
 #ifndef NDEBUG
 	VKAPI_ATTR VkBool32 VKAPI_CALL print_vulkan_debug_report(VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* layer_prefix, const char* message, void*)
 	{
-		Yttrium::Logger::log('[', layer_prefix, "] ", message);
+		Yt::Logger::log('[', layer_prefix, "] ", message);
 		return VK_FALSE;
 	}
 
@@ -107,7 +107,7 @@ namespace
 	}
 #endif
 
-	VkSurfaceKHR create_vulkan_surface(VkInstance instance, const Yttrium::WindowBackend& window)
+	VkSurfaceKHR create_vulkan_surface(VkInstance instance, const Yt::WindowBackend& window)
 	{
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		VkXcbSurfaceCreateInfoKHR info;
@@ -167,14 +167,14 @@ namespace
 			{ VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM" },
 		};
 
-		Yttrium::Logger::log("Vulkan texture formats supported:");
+		Yt::Logger::log("Vulkan texture formats supported:");
 		for (const auto& [format_id, format_name] : formats)
 		{
 			VkFormatProperties properties;
 			vkGetPhysicalDeviceFormatProperties(device, format_id, &properties);
-			Yttrium::Logger::log("  ", ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-'), ' ', format_name, " (", format_id, ')');
+			Yt::Logger::log("  ", ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-'), ' ', format_name, " (", format_id, ')');
 		}
-		Yttrium::Logger::log("");
+		Yt::Logger::log("");
 	}
 
 	VkDevice create_vulkan_device(VkPhysicalDevice physical_device, uint32_t queue_family_index)

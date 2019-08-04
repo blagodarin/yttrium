@@ -24,13 +24,13 @@
 
 namespace
 {
-	std::unique_ptr<Yttrium::TemporaryFilePrivate> create_temporary_file()
+	std::unique_ptr<Yt::TemporaryFilePrivate> create_temporary_file()
 	{
 		auto path = (std::filesystem::temp_directory_path() / "yt-XXXXXX").string();
 		const auto descriptor = ::mkstemp(path.data());
 		if (descriptor == -1)
 			throw std::system_error{ errno, std::generic_category() };
-		return std::make_unique<Yttrium::TemporaryFilePrivate>(std::move(path), descriptor); // TODO: Fix descriptor leak on exception.
+		return std::make_unique<Yt::TemporaryFilePrivate>(std::move(path), descriptor); // TODO: Fix descriptor leak on exception.
 	}
 }
 

@@ -21,7 +21,7 @@
 
 namespace
 {
-	Yttrium::VK_RenderPass create_render_pass(VkDevice device, const Yttrium::VK_Swapchain& swapchain, const Yttrium::VulkanDepthBuffer& depth_buffer)
+	Yt::VK_RenderPass create_render_pass(VkDevice device, const Yt::VK_Swapchain& swapchain, const Yt::VulkanDepthBuffer& depth_buffer)
 	{
 		const std::array<VkAttachmentDescription, 2> attachment_descriptions{ swapchain.attachment_description(), depth_buffer.attachment_description() };
 
@@ -56,7 +56,7 @@ namespace
 		create_info.dependencyCount = 0;
 		create_info.pDependencies = nullptr;
 
-		Yttrium::VK_RenderPass render_pass{ device };
+		Yt::VK_RenderPass render_pass{ device };
 		render_pass.create(create_info);
 		return render_pass;
 	}

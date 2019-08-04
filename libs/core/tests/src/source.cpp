@@ -25,38 +25,35 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Buffer;
-using Yttrium::Source;
-
 TEST_CASE("source.from")
 {
-	CHECK(!Source::from("no_such_file"));
-	CHECK(Source::from(nullptr, 0));
-	CHECK(Source::from(Buffer{}));
+	CHECK(!Yt::Source::from("no_such_file"));
+	CHECK(Yt::Source::from(nullptr, 0));
+	CHECK(Yt::Source::from(Yt::Buffer{}));
 }
 
 TEST_CASE("source.from.source")
 {
 	const auto buffer = ::make_random_buffer(997);
-	const std::shared_ptr<Source> source = Source::from(buffer.data(), buffer.size());
+	const auto source = std::shared_ptr<Yt::Source>{ Yt::Source::from(buffer.data(), buffer.size()) };
 	{
-		const auto subsource = Source::from(source, 0, source->size());
+		const auto subsource = Yt::Source::from(source, 0, source->size());
 		REQUIRE(subsource->size() == source->size());
-		Buffer subbuffer{ static_cast<size_t>(source->size()) };
+		Yt::Buffer subbuffer{ static_cast<size_t>(source->size()) };
 		CHECK(subsource->read_at(0, subbuffer.data(), subbuffer.size()) == subsource->size());
 		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin(), static_cast<size_t>(subsource->size())));
 	}
 	{
-		const auto subsource = Source::from(source, 0, source->size() / 2);
+		const auto subsource = Yt::Source::from(source, 0, source->size() / 2);
 		REQUIRE(subsource->size() == source->size() / 2);
-		Buffer subbuffer{ static_cast<size_t>(source->size()) };
+		Yt::Buffer subbuffer{ static_cast<size_t>(source->size()) };
 		CHECK(subsource->read_at(0, subbuffer.data(), subbuffer.size()) == subsource->size());
 		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin(), static_cast<size_t>(subsource->size())));
 	}
 	{
-		const auto subsource = Source::from(source, source->size() / 2, source->size() - source->size() / 2);
+		const auto subsource = Yt::Source::from(source, source->size() / 2, source->size() - source->size() / 2);
 		REQUIRE(subsource->size() == source->size() - source->size() / 2);
-		Buffer subbuffer{ static_cast<size_t>(source->size()) };
+		Yt::Buffer subbuffer{ static_cast<size_t>(source->size()) };
 		CHECK(subsource->read_at(0, subbuffer.data(), subbuffer.size()) == subsource->size());
 		CHECK(!std::memcmp(subbuffer.begin(), buffer.begin() + source->size() / 2, static_cast<size_t>(subsource->size())));
 	}
@@ -64,15 +61,15 @@ TEST_CASE("source.from.source")
 
 TEST_CASE("source.size")
 {
-	CHECK(Source::from(Buffer{})->size() == 0);
-	CHECK(Source::from(Buffer{ 1 })->size() == 1);
-	CHECK(Source::from(Buffer{ 997 })->size() == 997);
+	CHECK(Yt::Source::from(Yt::Buffer{})->size() == 0);
+	CHECK(Yt::Source::from(Yt::Buffer{ 1 })->size() == 1);
+	CHECK(Yt::Source::from(Yt::Buffer{ 997 })->size() == 997);
 }
 
 TEST_CASE("source.to_buffer")
 {
 	const auto expected = ::make_random_buffer(997);
-	const auto actual = Source::from(expected.data(), expected.size())->to_buffer();
+	const auto actual = Yt::Source::from(expected.data(), expected.size())->to_buffer();
 	CHECK(expected == actual);
 	REQUIRE(actual.capacity() > actual.size());
 	CHECK(actual[actual.size()] == '\0');
@@ -81,7 +78,7 @@ TEST_CASE("source.to_buffer")
 TEST_CASE("source.to_string")
 {
 	const auto expected = ::make_random_buffer(997);
-	const auto actual = Source::from(expected.data(), expected.size())->to_string();
+	const auto actual = Yt::Source::from(expected.data(), expected.size())->to_string();
 	CHECK(actual.size() == expected.size());
 	CHECK(!std::memcmp(actual.data(), expected.data(), expected.size()));
 }

@@ -25,10 +25,10 @@
 
 namespace
 {
-	static_assert(Yttrium::is_power_of_2(Yttrium::RingLog::BufferSize));
+	static_assert(Yt::is_power_of_2(Yt::RingLog::BufferSize));
 
 	// If BufferSize is a power of two, we can wrap offsets using masking.
-	constexpr auto OffsetMask = Yttrium::RingLog::BufferSize - 1;
+	constexpr auto OffsetMask = Yt::RingLog::BufferSize - 1;
 }
 
 namespace Yttrium

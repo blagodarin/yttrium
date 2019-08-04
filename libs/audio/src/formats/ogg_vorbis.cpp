@@ -27,16 +27,16 @@ namespace
 {
 	size_t read_callback(void* ptr, size_t size, size_t nmemb, void* datasource)
 	{
-		return static_cast<Yttrium::Reader*>(datasource)->read(ptr, size * nmemb);
+		return static_cast<Yt::Reader*>(datasource)->read(ptr, size * nmemb);
 	}
 
 	int seek_callback(void* datasource, ogg_int64_t offset, int whence)
 	{
-		auto& reader = *static_cast<Yttrium::Reader*>(datasource);
+		auto& reader = *static_cast<Yt::Reader*>(datasource);
 		switch (whence)
 		{
-		case SEEK_SET: return offset >= 0 && reader.seek(Yttrium::to_unsigned(offset)) ? 0 : -1;
-		case SEEK_CUR: return offset >= 0 && reader.skip(Yttrium::to_unsigned(offset)) ? 0 : -1;
+		case SEEK_SET: return offset >= 0 && reader.seek(Yt::to_unsigned(offset)) ? 0 : -1;
+		case SEEK_CUR: return offset >= 0 && reader.skip(Yt::to_unsigned(offset)) ? 0 : -1;
 		case SEEK_END: return offset == 0 && reader.seek(reader.size()) ? 0 : -1;
 		default: return -1;
 		}
@@ -49,7 +49,7 @@ namespace
 
 	long tell_callback(void* datasource)
 	{
-		return static_cast<long>(static_cast<Yttrium::Reader*>(datasource)->offset());
+		return static_cast<long>(static_cast<Yt::Reader*>(datasource)->offset());
 	}
 
 	const ov_callbacks _ov_callbacks{

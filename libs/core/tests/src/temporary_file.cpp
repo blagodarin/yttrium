@@ -24,33 +24,33 @@
 
 TEST_CASE("temporary_file")
 {
-	Yttrium::TemporaryFile file;
+	Yt::TemporaryFile file;
 	{
-		const auto source = Yttrium::Source::from(file);
+		const auto source = Yt::Source::from(file);
 		REQUIRE(source);
 		CHECK(source->size() == 0);
 	}
 	{
-		Yttrium::Writer writer{ file };
+		Yt::Writer writer{ file };
 		CHECK(writer.size() == 0);
 		writer.write(int64_t{ -1 });
 		CHECK(writer.size() == sizeof(int64_t));
 	}
 	{
-		const auto source = Yttrium::Source::from(file);
+		const auto source = Yt::Source::from(file);
 		REQUIRE(source);
 		CHECK(source->size() == sizeof(int64_t));
-		Yttrium::Reader reader{ *source };
+		Yt::Reader reader{ *source };
 		int64_t data = 0;
 		CHECK(reader.read(data));
 		CHECK(data == -1);
 	}
 	{
-		Yttrium::Writer writer{ file };
+		Yt::Writer writer{ file };
 		CHECK(writer.size() == 0);
 	}
 	{
-		const auto source = Yttrium::Source::from(file);
+		const auto source = Yt::Source::from(file);
 		REQUIRE(source);
 		CHECK(source->size() == 0);
 	}

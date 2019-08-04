@@ -35,7 +35,7 @@ namespace
 		return { signature, static_cast<size_t>(end - signature) };
 	}
 
-	class AlsaError : public Yttrium::BadCall
+	class AlsaError : public Yt::BadCall
 	{
 	public:
 		AlsaError(std::string_view function, int error)

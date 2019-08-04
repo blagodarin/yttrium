@@ -28,9 +28,9 @@
 
 namespace
 {
-	Yttrium::SmartPtr<char, ::LocalFree> windows_error_description(unsigned long code)
+	Yt::SmartPtr<char, ::LocalFree> windows_error_description(unsigned long code)
 	{
-		Yttrium::SmartPtr<char, ::LocalFree> buffer;
+		Yt::SmartPtr<char, ::LocalFree> buffer;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), buffer.out_as<char*>(), 0, nullptr);
 		if (buffer)

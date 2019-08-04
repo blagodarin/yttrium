@@ -193,7 +193,7 @@ namespace Yttrium
 		if (!_private->_render_manager)
 			return {};
 		return _private->_texture_2d_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D> {
-			auto image = Yttrium::Image::load(*source);
+			auto image = Image::load(*source);
 			if (!image)
 				throw DataError{ "Can't load \"", name, "\"" };
 			return _private->_render_manager->create_texture_2d(*image);

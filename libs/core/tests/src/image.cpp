@@ -23,8 +23,8 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Image;
-using Yttrium::PixelFormat;
+using Yt::Image;
+using Yt::PixelFormat;
 
 TEST_CASE("image.compare")
 {
