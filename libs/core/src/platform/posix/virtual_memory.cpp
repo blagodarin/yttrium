@@ -19,10 +19,7 @@
 
 #include "error.h"
 
-#include <algorithm>   // std::min
-#include <array>       // std::array
-#include <cstring>     // std::memcpy
-#include <type_traits> //
+#include <cstring>
 
 #include <sys/mman.h> // mmap, munmap
 #include <unistd.h>   // sysconf
@@ -61,7 +58,7 @@ namespace Yttrium
 			report_errno("mmap");
 			return nullptr;
 		}
-		std::memcpy(new_pointer, old_pointer, std::min(old_size, new_size));
+		std::memcpy(new_pointer, old_pointer, old_size < new_size ? old_size : new_size);
 		if (::munmap(old_pointer, old_size) != 0)
 			report_errno("munmap");
 		return new_pointer;

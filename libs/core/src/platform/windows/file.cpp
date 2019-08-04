@@ -62,7 +62,7 @@ namespace Yttrium
 	class FileWriter final : public WriterPrivate
 	{
 	public:
-		FileWriter(HANDLE handle) noexcept
+		explicit FileWriter(HANDLE handle) noexcept
 			: _handle{ handle } {}
 
 		~FileWriter() noexcept override

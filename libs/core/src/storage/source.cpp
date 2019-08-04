@@ -62,7 +62,7 @@ namespace Yttrium
 	public:
 		explicit BufferSource(Buffer&& buffer)
 			: _buffer{ std::make_shared<const Buffer>(std::move(buffer)) } {}
-		BufferSource(const std::shared_ptr<const Buffer>& buffer) noexcept
+		explicit BufferSource(const std::shared_ptr<const Buffer>& buffer) noexcept
 			: _buffer{ buffer } {}
 
 		const void* data() const noexcept override
