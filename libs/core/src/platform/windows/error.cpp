@@ -59,7 +59,7 @@ namespace Yttrium
 		return make_string("[0x", Hex32{ code }, "].");
 	}
 
-	void print_last_error(const char* function) noexcept
+	void log_last_error(const char* function) noexcept
 	{
 		if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
 		{

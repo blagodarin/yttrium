@@ -20,6 +20,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary_file.h>
 #include "../../storage/writer.h"
+#include "error.h"
 
 #include <system_error>
 
@@ -36,7 +37,7 @@ namespace Yttrium
 		~FileSource() noexcept override
 		{
 			if (!::CloseHandle(_handle))
-				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
+				log_last_error("CloseHandle");
 		}
 
 		size_t read_at(uint64_t offset, void* data, size_t size) const override
@@ -67,7 +68,7 @@ namespace Yttrium
 		~FileWriter() noexcept override
 		{
 			if (!::CloseHandle(_handle))
-				::OutputDebugStringA("ERROR! 'CloseHandle' failed");
+				log_last_error("CloseHandle");
 		}
 
 		void reserve(uint64_t) override
@@ -80,11 +81,6 @@ namespace Yttrium
 			offset.QuadPart = size;
 			if (!::SetFilePointerEx(_handle, offset, nullptr, FILE_BEGIN) || !::SetEndOfFile(_handle))
 				throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-		}
-
-		void unlink() override
-		{
-			_unlink = true;
 		}
 
 		size_t write_at(uint64_t offset, const void* data, size_t size) override
@@ -104,11 +100,19 @@ namespace Yttrium
 	{
 		const auto handle = ::CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
+		{
+			log_last_error("CreateFile");
 			return {};
+		}
 		LARGE_INTEGER size;
 		if (!::GetFileSizeEx(handle, &size))
-			throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-		return std::make_unique<FileSource>(handle, size.QuadPart);
+		{
+			log_last_error("GetFileSizeEx");
+			if (!::CloseHandle(handle))
+				log_last_error("CloseHandle");
+			return {};
+		}
+		return std::make_unique<FileSource>(handle, size.QuadPart); // TODO: Fix handle leak on exception.
 	}
 
 	std::unique_ptr<Source> Source::from(const TemporaryFile& file)
@@ -120,8 +124,11 @@ namespace Yttrium
 	{
 		const auto handle = ::CreateFileW(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (handle == INVALID_HANDLE_VALUE)
+		{
+			log_last_error("CreateFile");
 			return {};
-		return std::make_unique<FileWriter>(handle);
+		}
+		return std::make_unique<FileWriter>(handle); // TODO: Fix handle leak on exception.
 	}
 
 	std::unique_ptr<WriterPrivate> create_file_writer(TemporaryFile& file)

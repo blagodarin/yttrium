@@ -17,6 +17,8 @@
 
 #include <yttrium/storage/temporary_file.h>
 
+#include "error.h"
+
 #include <array>
 
 #include <windows.h>
@@ -48,7 +50,7 @@ namespace Yttrium
 		~TemporaryFilePrivate() noexcept
 		{
 			if (!::DeleteFileW(_path.c_str()))
-				::OutputDebugStringA("ERROR! 'DeleteFile' failed");
+				log_last_error("DeleteFile");
 		}
 
 	public:
