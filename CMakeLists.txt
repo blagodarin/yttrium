@@ -106,6 +106,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-switch-enum
 		-Wno-weak-vtables
 		)
+
+	link_libraries(stdc++fs) # Required for GCC 8 standard library which is used by Clang.
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
